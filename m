@@ -1,668 +1,156 @@
-Return-Path: <netdev+bounces-156476-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156477-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A808A067F9
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 23:09:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 097C1A06803
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 23:14:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5426A7A30DA
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 22:09:45 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BE8267A0856
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 22:13:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97F15205E08;
-	Wed,  8 Jan 2025 22:07:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FE2E20409E;
+	Wed,  8 Jan 2025 22:13:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="XTPVJLZA"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A+USAGhh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89AFB205E35
-	for <netdev@vger.kernel.org>; Wed,  8 Jan 2025 22:07:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A1F1202F97
+	for <netdev@vger.kernel.org>; Wed,  8 Jan 2025 22:13:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736374053; cv=none; b=E5hjIB5Hcr9gVEgsCtR1nRXbV+NXonVWIOSzC++IRSLZZLBV7MoZgcpmo7Mv05X47oyBf+e8X0ldpRYeU6s3S4buEwCjz4Q0a2f+qyeeaJ62gE+8xWJLXXOjzYIvHP6AoNAsw91vrHi2ji+fDtmEmMtu4jsQQQ+5/oaR8eArYqo=
+	t=1736374439; cv=none; b=MeCpjfiPxwxxFBVI3WdLIv6dwn4JecuH+Z4ezOqItGU7ayHlRFokON1ccD8MsdJf4xnYHen8b5/H6JfHukpBjj/mujACX2Ut1F/LO7WAQJz9dBMggM0bLzpnsZ2ulfsMw44yaXoUALoxwW0/AAXTs2CQN++m05FwCcwuIzYVQaw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736374053; c=relaxed/simple;
-	bh=RJ3K+4piK/UVgdgx1vz1appLr/O4OzWUPMB/bMydooE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=kDh1++sAaqcIDzBcKx6zUpW4ZDUv7HkI3kkYFvIYBde2rbrszDU0iE+gqrGWQItjo8mMRSh0oxBn6ISH4tRT/W6eIfYrapiid6DbJXm0MYu5X8y853qKd3eXmQqEqlwpY9uHirItHTlm/OJAZIGYlA5s3lWXGK0/omrfk8sNIMc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=XTPVJLZA; arc=none smtp.client-ip=209.85.214.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-216634dd574so2400355ad.2
-        for <netdev@vger.kernel.org>; Wed, 08 Jan 2025 14:07:31 -0800 (PST)
+	s=arc-20240116; t=1736374439; c=relaxed/simple;
+	bh=RwmIyN+ffMtJ0IEaRffjXwvT1TtiJF4oQBjoYISf8Yc=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=Wysb46wBvFC08rnmNtbfFH7FAUumGdk0xEx1VIg0w5wT3HIlELh+nZup6BrUmd/Rv3H5onhT2GHWQ9G+gCuzTU/En39trOVA4kDzd/J+Ikw+4VVljXVZ/RvtRE3bBeo1mo+SkKKJIm8pnaJUyJhVFmRy9agkVmLbWDXw+xMiHcc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=A+USAGhh; arc=none smtp.client-ip=209.85.128.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-43618283d48so2544345e9.1
+        for <netdev@vger.kernel.org>; Wed, 08 Jan 2025 14:13:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1736374051; x=1736978851; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=t1OiJy+4RfkLKo2enhvLZPVnuvjHilcaCeMjxTsj5g4=;
-        b=XTPVJLZARMwzk7nqaUB8a14mnYAgoRsVvc9BacFpFnfHRGXDnsih1Y8ahNZQbo8uyU
-         i0OFh/q8dUsieS/RzM2QTYEKyeFcoJux8tX8r39iNAgA3IYaJE9zsSjT+a8Vjyw994MW
-         bgwC9/KJVwmTTTCavbq/y3BnlH+Owe4BAGAHOj3hzk1oWT0Ai6x8qSOG5x602eGqNiMk
-         hIpWJthxn7m2CCinDG02oy+NfvFnodriHhCYWdfpnYQvfYii24HUOVviLM7Gwxe5UlAD
-         UZu/z+uhJiuRO/LF407NTmhieBIsAYX8tdr0r1w699TN5ooRhWImhTMyUlk0COChNSS7
-         Y1gA==
+        d=gmail.com; s=20230601; t=1736374436; x=1736979236; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :references:cc:to:from:subject:user-agent:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=01EL5PxRZWr1MpEZPSIqOZvVlFLzdeOPH5lUFGSPCwA=;
+        b=A+USAGhh7YURm9ny3Y1LOwajGK9ryyIwd29mhtUMBeWAFIoxLJgQao+eg9Z12PnhaM
+         JMQOmPRRvtz4JVMVxif5c+SvkHj0Laa6TmJHC/hdaOhudoaVBlYxGqo6pKgC9GcJfxOJ
+         ehFe6UN39lDXNUufn8opdvLwRDkneYzDSdcaWWytdOmveL6G3xJRcaewcHxt6Ilv9EMb
+         YNRc+yLm4NHQ45KibqVP7n6b/nydOkuM3TX8TmQXayAIiaDOxrzEZlTVlOc6wmAXMnVP
+         DITPU1xnArxs79fbdhmvmfWUkg/Tk0Bb1IkWdIfd1nuvffKdO1bT+osgKo36RtctGg1D
+         XNQw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736374051; x=1736978851;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=t1OiJy+4RfkLKo2enhvLZPVnuvjHilcaCeMjxTsj5g4=;
-        b=l0oMpoyfWyQUqFjdzh144uFfsapKxDvmVxToFGB0UvP20UsBaxuwVolQmcaomtXHYY
-         DexjiqKsa6WSyH9sIT1HzOw1ygcAY/qtPaXpxNNini/3vKHIpKwS6MVi0RXWQb58riCR
-         AkBlo+F338GGYRF58IWRcvO6qXWXgOOtBZHVfAw5jCmCnDm+JOIWdvoC4idfT8OIQhC8
-         E8v6Z7GVJCx4TjEynawOwA/oBsCO7IWs2zny3He4gc5CZx4xXgiL+ZYZKr/GJBrTVB5D
-         1N7LdPWE0HIfbgZ2Nsb/+z18DZi5xpitltH+mMQVkqEBwzKzfiffndCNsQ9k2fSPHMnC
-         u8yQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXbNJ/KSyarIILcfaxmG1K11wepTsuUVb6oVRH+xaoX/0lFvcoc6yOS8j9skMyOvaLndJF1Kow=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyZMycLpUFqsvKjmU69Amq/YTck8QW3+k46j08ueCaXjSl03mxu
-	ReGgAEgFr/TCFVHUyArIriGH0TZ6bvvSwpsxzgQJybRiDyIKDLcZ2xQqoLvHYRA=
-X-Gm-Gg: ASbGncs975tU2MEaLWqKP5XWVxNU+uhwI7R7FhlPwDp5xK+GAzLZs62vEl2g1QpYsi3
-	U0vuNLOlWOzNqLstGMVXkr8flMflErQguKrXkcBv2vpo6X++W20eHngc2b4TIt+TxT5t+r5Oesm
-	a0PebJ5XqKm46KN83116TIVUnZLOGvWRnOVfwr+OX/VpCqLPDmCralx1gU3raTPIEfyGLu4JzhZ
-	f6d+9c5I4DMclI4uWEMf5imCCHsGgu6cX1os2NDdA==
-X-Google-Smtp-Source: AGHT+IF3aIvH6+1fmeVyXmr5GDQ6urCt42Jn4lH+KX4J2FddhDTG01lqWOestO2ZxQPMyuf+C+xUAg==
-X-Received: by 2002:a17:902:cec5:b0:215:8270:77e2 with SMTP id d9443c01a7336-21a83da4965mr61317305ad.0.1736374050896;
-        Wed, 08 Jan 2025 14:07:30 -0800 (PST)
-Received: from localhost ([2a03:2880:ff:1f::])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-219dca02b34sm333615695ad.252.2025.01.08.14.07.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 Jan 2025 14:07:30 -0800 (PST)
-From: David Wei <dw@davidwei.uk>
-To: io-uring@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>,
-	Pavel Begunkov <asml.silence@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	David Ahern <dsahern@kernel.org>,
-	Mina Almasry <almasrymina@google.com>,
-	Stanislav Fomichev <stfomichev@gmail.com>,
-	Joe Damato <jdamato@fastly.com>,
-	Pedro Tammela <pctammela@mojatatu.com>
-Subject: [PATCH net-next v10 22/22] io_uring/zcrx: add selftest
-Date: Wed,  8 Jan 2025 14:06:43 -0800
-Message-ID: <20250108220644.3528845-23-dw@davidwei.uk>
-X-Mailer: git-send-email 2.43.5
-In-Reply-To: <20250108220644.3528845-1-dw@davidwei.uk>
-References: <20250108220644.3528845-1-dw@davidwei.uk>
+        d=1e100.net; s=20230601; t=1736374436; x=1736979236;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :references:cc:to:from:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=01EL5PxRZWr1MpEZPSIqOZvVlFLzdeOPH5lUFGSPCwA=;
+        b=V+XV0LN+6zVcwcr/jISb/AUOkxkcoLM2hyY+X7glvCM2CkalUUtcZruZO91ml4UV+T
+         ul5qnQ2nIlbXeoSg714XPaRa0EHJo7LHRe3Kezo+QICfSAWoKzTz39EEwMv4/ubxbcxc
+         j6o9Jm9kaMtXwJppW5GDH0ULLGJbhrMHostM8Mp9V69GF7SyDn8IcUpIiYaLWx50oy2E
+         5yClUK5YVi99SZ+j4KHY4/vct3a7V/jpXw1OEP+WCFAl3tGaIX8QeFdpW0JmM235n6Q9
+         o6F3sOlk6qkzznWNrywY5imBudZVKAWLqDPxlCa2eaLSSDp6fogIY2b56K9KAAtZY2G9
+         YgNQ==
+X-Gm-Message-State: AOJu0YyZu32wdQ0FT6ob5DSqhr+qTMqyk2uJnvEZc6YaJBqrXkZ5Us35
+	lZ5d+MnIZqqDZcNe8ovT48rmtJWiOHyg8Q6qGxAW0ZB0kNJADEIy
+X-Gm-Gg: ASbGncvEZvoMzsC6d3NBoPETnZIE8mRYlGI3OaGjNqkeF5BEBBv0XSKlHhbHrKmDoZX
+	WftBxBDFhupDuOF7/6IVUwZnWxga+eLSYgCukIJZ02pHH3MZD1aMZk4XSW+3SnBgyfhjue7VihL
+	Drd14uRgYFUL8W2KaGfqfdb7eE3U/Sr7+MzcW+oZZyQvFkat72gBJCwUaQNUJiXpCQTznzrAIJ8
+	6kswvyLg07abltMvHskI2gPYnm88uYmfY+TuuJ25SXKuBKcgwEVfdntHfBzbNoLgVsH2yYEtNOE
+	a657DqW2y2NkeqJgbPMQ9L+0wjzw/Vc54HY8lLRLHNvuMdljJYSAkjIrWWnpHp6AdpHifo+E6tv
+	2w9wCoHHOetEUbz6ylq6P8wwWE6xlhe/k0XNIYrtaVDo1nlvR
+X-Google-Smtp-Source: AGHT+IEBGrXmxWc80jSjXmx1Y7eoC5lypRfWjuT5yThbv4yM1xLUjJe2EjpySiREzJG1BJRLjHq4WQ==
+X-Received: by 2002:a05:600c:3143:b0:434:a929:42bb with SMTP id 5b1f17b1804b1-436e26b9d45mr35276915e9.18.1736374435519;
+        Wed, 08 Jan 2025 14:13:55 -0800 (PST)
+Received: from ?IPV6:2a02:3100:a467:5600:9df3:f3ec:1de6:b471? (dynamic-2a02-3100-a467-5600-9df3-f3ec-1de6-b471.310.pool.telefonica.de. [2a02:3100:a467:5600:9df3:f3ec:1de6:b471])
+        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-38a8e4b80d4sm28954f8f.85.2025.01.08.14.13.53
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 08 Jan 2025 14:13:55 -0800 (PST)
+Message-ID: <ec3119cc-9812-40c7-898c-a921a72eee38@gmail.com>
+Date: Wed, 8 Jan 2025 23:13:53 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 0/2] r8169: extend hwmon support
+From: Heiner Kallweit <hkallweit1@gmail.com>
+To: Realtek linux nic maintainers <nic_swsd@realtek.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Eric Dumazet <edumazet@google.com>, David Miller <davem@davemloft.net>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, Simon Horman <horms@kernel.org>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+References: <97bc1a93-d5d5-4444-86f2-a0b9cc89b0c8@gmail.com>
+Content-Language: en-US
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ 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
+In-Reply-To: <97bc1a93-d5d5-4444-86f2-a0b9cc89b0c8@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Add a selftest for io_uring zero copy Rx. This test cannot run locally
-and requires a remote host to be configured in net.config. The remote
-host must have hardware support for zero copy Rx as listed in the
-documentation page. The test will restore the NIC config back to before
-the test and is idempotent.
-
-liburing is required to compile the test and be installed on the remote
-host running the test.
-
-Signed-off-by: David Wei <dw@davidwei.uk>
----
- .../selftests/drivers/net/hw/.gitignore       |   2 +
- .../testing/selftests/drivers/net/hw/Makefile |   6 +
- .../selftests/drivers/net/hw/iou-zcrx.c       | 432 ++++++++++++++++++
- .../selftests/drivers/net/hw/iou-zcrx.py      |  64 +++
- 4 files changed, 504 insertions(+)
- create mode 100644 tools/testing/selftests/drivers/net/hw/iou-zcrx.c
- create mode 100755 tools/testing/selftests/drivers/net/hw/iou-zcrx.py
-
-diff --git a/tools/testing/selftests/drivers/net/hw/.gitignore b/tools/testing/selftests/drivers/net/hw/.gitignore
-index e9fe6ede681a..6942bf575497 100644
---- a/tools/testing/selftests/drivers/net/hw/.gitignore
-+++ b/tools/testing/selftests/drivers/net/hw/.gitignore
-@@ -1 +1,3 @@
-+# SPDX-License-Identifier: GPL-2.0-only
-+iou-zcrx
- ncdevmem
-diff --git a/tools/testing/selftests/drivers/net/hw/Makefile b/tools/testing/selftests/drivers/net/hw/Makefile
-index 21ba64ce1e34..5431af8e8210 100644
---- a/tools/testing/selftests/drivers/net/hw/Makefile
-+++ b/tools/testing/selftests/drivers/net/hw/Makefile
-@@ -1,5 +1,7 @@
- # SPDX-License-Identifier: GPL-2.0+ OR MIT
- 
-+TEST_GEN_FILES = iou-zcrx
-+
- TEST_PROGS = \
- 	csum.py \
- 	devlink_port_split.py \
-@@ -10,6 +12,7 @@ TEST_PROGS = \
- 	ethtool_rmon.sh \
- 	hw_stats_l3.sh \
- 	hw_stats_l3_gre.sh \
-+	iou-zcrx.py \
- 	loopback.sh \
- 	nic_link_layer.py \
- 	nic_performance.py \
-@@ -38,3 +41,6 @@ include ../../../lib.mk
- # YNL build
- YNL_GENS := ethtool netdev
- include ../../../net/ynl.mk
-+
-+$(OUTPUT)/iou-zcrx: CFLAGS += -I/usr/include/
-+$(OUTPUT)/iou-zcrx: LDLIBS += -luring
-diff --git a/tools/testing/selftests/drivers/net/hw/iou-zcrx.c b/tools/testing/selftests/drivers/net/hw/iou-zcrx.c
-new file mode 100644
-index 000000000000..0809db134bba
---- /dev/null
-+++ b/tools/testing/selftests/drivers/net/hw/iou-zcrx.c
-@@ -0,0 +1,432 @@
-+// SPDX-License-Identifier: GPL-2.0
-+#include <assert.h>
-+#include <errno.h>
-+#include <error.h>
-+#include <fcntl.h>
-+#include <limits.h>
-+#include <stdbool.h>
-+#include <stdint.h>
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <string.h>
-+#include <unistd.h>
-+
-+#include <arpa/inet.h>
-+#include <linux/errqueue.h>
-+#include <linux/if_packet.h>
-+#include <linux/ipv6.h>
-+#include <linux/socket.h>
-+#include <linux/sockios.h>
-+#include <net/ethernet.h>
-+#include <net/if.h>
-+#include <netinet/in.h>
-+#include <netinet/ip.h>
-+#include <netinet/ip6.h>
-+#include <netinet/tcp.h>
-+#include <netinet/udp.h>
-+#include <sys/epoll.h>
-+#include <sys/ioctl.h>
-+#include <sys/mman.h>
-+#include <sys/resource.h>
-+#include <sys/socket.h>
-+#include <sys/stat.h>
-+#include <sys/time.h>
-+#include <sys/types.h>
-+#include <sys/un.h>
-+#include <sys/wait.h>
-+
-+#include <liburing.h>
-+
-+#define PAGE_SIZE (4096)
-+#define AREA_SIZE (8192 * PAGE_SIZE)
-+#define SEND_SIZE (512 * 4096)
-+#define min(a, b) \
-+	({ \
-+		typeof(a) _a = (a); \
-+		typeof(b) _b = (b); \
-+		_a < _b ? _a : _b; \
-+	})
-+#define min_t(t, a, b) \
-+	({ \
-+		t _ta = (a); \
-+		t _tb = (b); \
-+		min(_ta, _tb); \
-+	})
-+
-+#define ALIGN_UP(v, align) (((v) + (align) - 1) & ~((align) - 1))
-+
-+static int cfg_family = PF_UNSPEC;
-+static int cfg_server;
-+static int cfg_client;
-+static int cfg_port = 8000;
-+static int cfg_payload_len;
-+static const char *cfg_ifname;
-+static int cfg_queue_id = -1;
-+
-+static socklen_t cfg_alen;
-+static struct sockaddr_storage cfg_addr;
-+
-+static char payload[SEND_SIZE] __attribute__((aligned(PAGE_SIZE)));
-+static void *area_ptr;
-+static void *ring_ptr;
-+static size_t ring_size;
-+static struct io_uring_zcrx_rq rq_ring;
-+static unsigned long area_token;
-+static int connfd;
-+static bool stop;
-+static size_t received;
-+
-+static unsigned long gettimeofday_ms(void)
-+{
-+	struct timeval tv;
-+
-+	gettimeofday(&tv, NULL);
-+	return (tv.tv_sec * 1000) + (tv.tv_usec / 1000);
-+}
-+
-+static inline size_t get_refill_ring_size(unsigned int rq_entries)
-+{
-+	size_t size;
-+
-+	ring_size = rq_entries * sizeof(struct io_uring_zcrx_rqe);
-+	/* add space for the header (head/tail/etc.) */
-+	ring_size += PAGE_SIZE;
-+	return ALIGN_UP(ring_size, 4096);
-+}
-+
-+static void setup_zcrx(struct io_uring *ring)
-+{
-+	unsigned int ifindex;
-+	unsigned int rq_entries = 4096;
-+	int ret;
-+
-+	ifindex = if_nametoindex(cfg_ifname);
-+	if (!ifindex)
-+		error(1, 0, "bad interface name: %s", cfg_ifname);
-+
-+	area_ptr = mmap(NULL,
-+			AREA_SIZE,
-+			PROT_READ | PROT_WRITE,
-+			MAP_ANONYMOUS | MAP_PRIVATE,
-+			0,
-+			0);
-+	if (area_ptr == MAP_FAILED)
-+		error(1, 0, "mmap(): zero copy area");
-+
-+	ring_size = get_refill_ring_size(rq_entries);
-+	ring_ptr = mmap(NULL,
-+			ring_size,
-+			PROT_READ | PROT_WRITE,
-+			MAP_ANONYMOUS | MAP_PRIVATE,
-+			0,
-+			0);
-+
-+	struct io_uring_region_desc region_reg = {
-+		.size = ring_size,
-+		.user_addr = (__u64)(unsigned long)ring_ptr,
-+		.flags = IORING_MEM_REGION_TYPE_USER,
-+	};
-+
-+	struct io_uring_zcrx_area_reg area_reg = {
-+		.addr = (__u64)(unsigned long)area_ptr,
-+		.len = AREA_SIZE,
-+		.flags = 0,
-+	};
-+
-+	struct io_uring_zcrx_ifq_reg reg = {
-+		.if_idx = ifindex,
-+		.if_rxq = cfg_queue_id,
-+		.rq_entries = rq_entries,
-+		.area_ptr = (__u64)(unsigned long)&area_reg,
-+		.region_ptr = (__u64)(unsigned long)&region_reg,
-+	};
-+
-+	ret = io_uring_register_ifq(ring, &reg);
-+	if (ret)
-+		error(1, 0, "io_uring_register_ifq(): %d", ret);
-+
-+	rq_ring.khead = (unsigned int *)((char *)ring_ptr + reg.offsets.head);
-+	rq_ring.ktail = (unsigned int *)((char *)ring_ptr + reg.offsets.tail);
-+	rq_ring.rqes = (struct io_uring_zcrx_rqe *)((char *)ring_ptr + reg.offsets.rqes);
-+	rq_ring.rq_tail = 0;
-+	rq_ring.ring_entries = reg.rq_entries;
-+
-+	area_token = area_reg.rq_area_token;
-+}
-+
-+static void add_accept(struct io_uring *ring, int sockfd)
-+{
-+	struct io_uring_sqe *sqe;
-+
-+	sqe = io_uring_get_sqe(ring);
-+
-+	io_uring_prep_accept(sqe, sockfd, NULL, NULL, 0);
-+	sqe->user_data = 1;
-+}
-+
-+static void add_recvzc(struct io_uring *ring, int sockfd)
-+{
-+	struct io_uring_sqe *sqe;
-+
-+	sqe = io_uring_get_sqe(ring);
-+
-+	io_uring_prep_rw(IORING_OP_RECV_ZC, sqe, sockfd, NULL, 0, 0);
-+	sqe->ioprio |= IORING_RECV_MULTISHOT;
-+	sqe->user_data = 2;
-+}
-+
-+static void process_accept(struct io_uring *ring, struct io_uring_cqe *cqe)
-+{
-+	if (cqe->res < 0)
-+		error(1, 0, "accept()");
-+	if (connfd)
-+		error(1, 0, "Unexpected second connection");
-+
-+	connfd = cqe->res;
-+	add_recvzc(ring, connfd);
-+}
-+
-+static void process_recvzc(struct io_uring *ring, struct io_uring_cqe *cqe)
-+{
-+	unsigned rq_mask = rq_ring.ring_entries - 1;
-+	struct io_uring_zcrx_cqe *rcqe;
-+	struct io_uring_zcrx_rqe *rqe;
-+	struct io_uring_sqe *sqe;
-+	uint64_t mask;
-+	char *data;
-+	ssize_t n;
-+	int i;
-+
-+	if (cqe->res == 0 && cqe->flags == 0) {
-+		stop = true;
-+		return;
-+	}
-+
-+	if (cqe->res < 0)
-+		error(1, 0, "recvzc(): %d", cqe->res);
-+
-+	if (!(cqe->flags & IORING_CQE_F_MORE))
-+		add_recvzc(ring, connfd);
-+
-+	rcqe = (struct io_uring_zcrx_cqe *)(cqe + 1);
-+
-+	n = cqe->res;
-+	mask = (1ULL << IORING_ZCRX_AREA_SHIFT) - 1;
-+	data = (char *)area_ptr + (rcqe->off & mask);
-+
-+	for (i = 0; i < n; i++) {
-+		if (*(data + i) != payload[(received + i)])
-+			error(1, 0, "payload mismatch");
-+	}
-+	received += n;
-+
-+	rqe = &rq_ring.rqes[(rq_ring.rq_tail & rq_mask)];
-+	rqe->off = (rcqe->off & IORING_ZCRX_AREA_MASK) | area_token;
-+	rqe->len = cqe->res;
-+	io_uring_smp_store_release(rq_ring.ktail, ++rq_ring.rq_tail);
-+}
-+
-+static void server_loop(struct io_uring *ring)
-+{
-+	struct io_uring_cqe *cqe;
-+	unsigned int count = 0;
-+	unsigned int head;
-+	int i, ret;
-+
-+	io_uring_submit_and_wait(ring, 1);
-+
-+	io_uring_for_each_cqe(ring, head, cqe) {
-+		if (cqe->user_data == 1)
-+			process_accept(ring, cqe);
-+		else if (cqe->user_data == 2)
-+			process_recvzc(ring, cqe);
-+		else
-+			error(1, 0, "unknown cqe");
-+		count++;
-+	}
-+	io_uring_cq_advance(ring, count);
-+}
-+
-+static void run_server(void)
-+{
-+	unsigned int flags = 0;
-+	struct io_uring ring;
-+	int fd, enable, ret;
-+	uint64_t tstop;
-+
-+	fd = socket(cfg_family, SOCK_STREAM, 0);
-+	if (fd == -1)
-+		error(1, 0, "socket()");
-+
-+	enable = 1;
-+	ret = setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int));
-+	if (ret < 0)
-+		error(1, 0, "setsockopt(SO_REUSEADDR)");
-+
-+	ret = bind(fd, (const struct sockaddr *)&cfg_addr, sizeof(cfg_addr));
-+	if (ret < 0)
-+		error(1, 0, "bind()");
-+
-+	if (listen(fd, 1024) < 0)
-+		error(1, 0, "listen()");
-+
-+	flags |= IORING_SETUP_COOP_TASKRUN;
-+	flags |= IORING_SETUP_SINGLE_ISSUER;
-+	flags |= IORING_SETUP_DEFER_TASKRUN;
-+	flags |= IORING_SETUP_SUBMIT_ALL;
-+	flags |= IORING_SETUP_CQE32;
-+
-+	io_uring_queue_init(512, &ring, flags);
-+
-+	setup_zcrx(&ring);
-+
-+	add_accept(&ring, fd);
-+
-+	tstop = gettimeofday_ms() + 5000;
-+	while (!stop && gettimeofday_ms() < tstop)
-+		server_loop(&ring);
-+
-+	if (!stop)
-+		error(1, 0, "test failed\n");
-+}
-+
-+static void run_client(void)
-+{
-+	ssize_t to_send = SEND_SIZE;
-+	ssize_t sent = 0;
-+	ssize_t chunk, res;
-+	int fd;
-+
-+	fd = socket(cfg_family, SOCK_STREAM, 0);
-+	if (fd == -1)
-+		error(1, 0, "socket()");
-+
-+	if (connect(fd, (void *)&cfg_addr, cfg_alen))
-+		error(1, 0, "connect()");
-+
-+	while (to_send) {
-+		void *src = &payload[sent];
-+
-+		chunk = min_t(ssize_t, cfg_payload_len, to_send);
-+		res = send(fd, src, chunk, 0);
-+		if (res < 0)
-+			error(1, 0, "send(): %d", sent);
-+		sent += res;
-+		to_send -= res;
-+	}
-+
-+	close(fd);
-+}
-+
-+static void usage(const char *filepath)
-+{
-+	error(1, 0, "Usage: %s (-4|-6) (-s|-c) -h<server_ip> -p<port> "
-+		    "-l<payload_size> -i<ifname> -q<rxq_id>", filepath);
-+}
-+
-+static void parse_opts(int argc, char **argv)
-+{
-+	const int max_payload_len = sizeof(payload) -
-+				    sizeof(struct ipv6hdr) -
-+				    sizeof(struct tcphdr) -
-+				    40 /* max tcp options */;
-+	struct sockaddr_in6 *addr6 = (void *) &cfg_addr;
-+	struct sockaddr_in *addr4 = (void *) &cfg_addr;
-+	char *addr = NULL;
-+	int c;
-+
-+	if (argc <= 1)
-+		usage(argv[0]);
-+	cfg_payload_len = max_payload_len;
-+
-+	while ((c = getopt(argc, argv, "46sch:p:l:i:q:")) != -1) {
-+		switch (c) {
-+		case '4':
-+			if (cfg_family != PF_UNSPEC)
-+				error(1, 0, "Pass one of -4 or -6");
-+			cfg_family = PF_INET;
-+			cfg_alen = sizeof(struct sockaddr_in);
-+			break;
-+		case '6':
-+			if (cfg_family != PF_UNSPEC)
-+				error(1, 0, "Pass one of -4 or -6");
-+			cfg_family = PF_INET6;
-+			cfg_alen = sizeof(struct sockaddr_in6);
-+			break;
-+		case 's':
-+			if (cfg_client)
-+				error(1, 0, "Pass one of -s or -c");
-+			cfg_server = 1;
-+			break;
-+		case 'c':
-+			if (cfg_server)
-+				error(1, 0, "Pass one of -s or -c");
-+			cfg_client = 1;
-+			break;
-+		case 'h':
-+			addr = optarg;
-+			break;
-+		case 'p':
-+			cfg_port = strtoul(optarg, NULL, 0);
-+			break;
-+		case 'l':
-+			cfg_payload_len = strtoul(optarg, NULL, 0);
-+			break;
-+		case 'i':
-+			cfg_ifname = optarg;
-+			break;
-+		case 'q':
-+			cfg_queue_id = strtoul(optarg, NULL, 0);
-+			break;
-+		}
-+	}
-+
-+	if (cfg_server && addr)
-+		error(1, 0, "Receiver cannot have -h specified");
-+
-+	switch (cfg_family) {
-+	case PF_INET:
-+		memset(addr4, 0, sizeof(*addr4));
-+		addr4->sin_family = AF_INET;
-+		addr4->sin_port = htons(cfg_port);
-+		addr4->sin_addr.s_addr = htonl(INADDR_ANY);
-+
-+		if (addr &&
-+		    inet_pton(AF_INET, addr, &(addr4->sin_addr)) != 1)
-+			error(1, 0, "ipv4 parse error: %s", addr);
-+		break;
-+	case PF_INET6:
-+		memset(addr6, 0, sizeof(*addr6));
-+		addr6->sin6_family = AF_INET6;
-+		addr6->sin6_port = htons(cfg_port);
-+		addr6->sin6_addr = in6addr_any;
-+
-+		if (addr &&
-+		    inet_pton(AF_INET6, addr, &(addr6->sin6_addr)) != 1)
-+			error(1, 0, "ipv6 parse error: %s", addr);
-+		break;
-+	default:
-+		error(1, 0, "illegal domain");
-+	}
-+
-+	if (cfg_payload_len > max_payload_len)
-+		error(1, 0, "-l: payload exceeds max (%d)", max_payload_len);
-+}
-+
-+int main(int argc, char **argv)
-+{
-+	const char *cfg_test = argv[argc - 1];
-+	int i;
-+
-+	parse_opts(argc, argv);
-+
-+	for (i = 0; i < SEND_SIZE; i++)
-+		payload[i] = 'a' + (i % 26);
-+
-+	if (cfg_server)
-+		run_server();
-+	else if (cfg_client)
-+		run_client();
-+
-+	return 0;
-+}
-diff --git a/tools/testing/selftests/drivers/net/hw/iou-zcrx.py b/tools/testing/selftests/drivers/net/hw/iou-zcrx.py
-new file mode 100755
-index 000000000000..3998d0ad504f
---- /dev/null
-+++ b/tools/testing/selftests/drivers/net/hw/iou-zcrx.py
-@@ -0,0 +1,64 @@
-+#!/usr/bin/env python3
-+# SPDX-License-Identifier: GPL-2.0
-+
-+from os import path
-+from lib.py import ksft_run, ksft_exit
-+from lib.py import NetDrvEpEnv
-+from lib.py import bkg, cmd, wait_port_listen
-+
-+
-+def _get_rx_ring_entries(cfg):
-+    eth_cmd = "ethtool -g {} | awk '/RX:/ {{count++}} count == 2 {{print $2; exit}}'"
-+    res = cmd(eth_cmd.format(cfg.ifname), host=cfg.remote)
-+    return int(res.stdout)
-+
-+
-+def _get_combined_channels(cfg):
-+    eth_cmd = "ethtool -l {} | awk '/Combined:/ {{count++}} count == 2 {{print $2; exit}}'"
-+    res = cmd(eth_cmd.format(cfg.ifname), host=cfg.remote)
-+    return int(res.stdout)
-+
-+
-+def _set_flow_rule(cfg, chan):
-+    eth_cmd = "ethtool -N {} flow-type tcp6 dst-port 9999 action {} | awk '{{print $NF}}'"
-+    res = cmd(eth_cmd.format(cfg.ifname, chan), host=cfg.remote)
-+    return int(res.stdout)
-+
-+
-+def test_zcrx(cfg) -> None:
-+    cfg.require_v6()
-+    cfg.require_cmd("awk", remote=True)
-+
-+    combined_chans = _get_combined_channels(cfg)
-+    if combined_chans < 2:
-+        raise KsftSkipEx('at least 2 combined channels required')
-+    rx_ring = _get_rx_ring_entries(cfg)
-+
-+    rx_cmd = f"{cfg.bin_remote} -6 -s -p 9999 -i {cfg.ifname} -q {combined_chans - 1}"
-+    tx_cmd = f"{cfg.bin_local} -6 -c -h {cfg.remote_v6} -p 9999 -l 12840"
-+
-+    try:
-+        cmd(f"ethtool -G {cfg.ifname} rx 64", host=cfg.remote)
-+        cmd(f"ethtool -X {cfg.ifname} equal {combined_chans - 1}", host=cfg.remote)
-+        flow_rule_id = _set_flow_rule(cfg, combined_chans - 1)
-+
-+        with bkg(rx_cmd, host=cfg.remote, exit_wait=True):
-+            wait_port_listen(9999, proto="tcp", host=cfg.remote)
-+            cmd(tx_cmd)
-+    finally:
-+        cmd(f"ethtool -N {cfg.ifname} delete {flow_rule_id}", host=cfg.remote)
-+        cmd(f"ethtool -X {cfg.ifname} default", host=cfg.remote)
-+        cmd(f"ethtool -G {cfg.ifname} rx {rx_ring}", host=cfg.remote)
-+
-+
-+def main() -> None:
-+    with NetDrvEpEnv(__file__) as cfg:
-+        cfg.bin_local = path.abspath(path.dirname(__file__) + "/../../../drivers/net/hw/iou-zcrx")
-+        cfg.bin_remote = cfg.remote.deploy(cfg.bin_local)
-+
-+        ksft_run(globs=globals(), case_pfx={"test_"}, args=(cfg, ))
-+    ksft_exit()
-+
-+
-+if __name__ == "__main__":
-+    main()
--- 
-2.43.5
+On 06.01.2025 19:00, Heiner Kallweit wrote:
+> This series extends the hwmon support and adds support for the
+> over-temp threshold.
+> 
+> Heiner Kallweit (2):
+>   r8169: prepare for extending hwmon support
+>   r8169: add support for reading over-temp threshold
+> 
+>  drivers/net/ethernet/realtek/r8169_main.c | 30 +++++++++++++++++------
+>  1 file changed, 23 insertions(+), 7 deletions(-)
+> 
+These patches are superseded. The temperature sensor is also available
+in the standalone version of the integrated PHY, so I'll move the hwmon
+support to the Realtek PHY driver.
 
 
