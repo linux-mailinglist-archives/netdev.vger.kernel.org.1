@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-156372-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156373-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49645A062CB
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 18:00:10 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 02C06A062F5
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 18:04:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 48306167A30
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 17:00:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A7E4D3A7A6B
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 17:04:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1498A1FFC6C;
-	Wed,  8 Jan 2025 17:00:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 966D71FF1A5;
+	Wed,  8 Jan 2025 17:04:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="pcYKJSqo"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="LiqIKbvF"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC2F81FF7B4;
-	Wed,  8 Jan 2025 17:00:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E919E18D;
+	Wed,  8 Jan 2025 17:04:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736355605; cv=none; b=YVRJvDv0YETAR9kuvp6zqqGaAJkpwUpEMq29XyJuczHbyTY5eYIT2HWq+Q4wJNknZ2EzPfS8iNHvidgfoyxJ7MeMB+vGbR6T5sXaEWl1fjchtTO3jI+gDrEMMZcTfQEaiwnrqvY574r9xUSJYqlVULNmARvyBofLoyXD2GweyQA=
+	t=1736355844; cv=none; b=WV8AJe3po6lbhj8DzXZ180Z4cjTk4upgL0tshWA+CEo4Y/T/U/Dinm5MWxwMZD+DF4n0OEihh2q969MijHOAlD3lWtPj8wL3LJtoMuUenqStNSuGQW0F1jCi8HxmiAu7RXdYjKsmbLHXpZCW0nDIrMfJGNPaY1brLkWCOYAMDfQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736355605; c=relaxed/simple;
-	bh=HFVc8oLbaMpPOiOm4hXv8z+FIyZjllGwd4MTZEyB5Os=;
+	s=arc-20240116; t=1736355844; c=relaxed/simple;
+	bh=3w9Wh8I5J/bKwu/vEDyku79vbSZeurgnglzCG9hcH58=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sn+1smZGLZH7rOfojRaHkAXec4Sh0Jq6gLkORipM5fkEkGd8DTPr5v20hNI2ExRpch/39UzkOsgCV0FKgRwk74To08NAzPuG3k4T7KdgkVLOAixYStxFAPOaeQSNrGK58/m0YsL+0m0c6FVrpGxUXQUHvmAKcha2lJxLUUhb3jg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=pcYKJSqo; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=pV30zLdkO69MWiS9wBUObk3bunNsQPFUUNlhLGs47PzlOYFeJHGOI2+5ltBur7Ol7k/bSJ3MQyyK5s5qKZ3hVmA/8IBAXdaWeY6J6HXLEglWIeGtt8mh84knXF8Sa+u1uuJ/DxpNZYOqpJVttCYRmt38p9ymhhbFqyQOg7xwY7Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=LiqIKbvF; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,40 +36,27 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=KlH41KXb6DEhXWYu4j1AZW/YcnxDGl2H1tPl1BECyjA=; b=pcYKJSqo34eAhorobLO7X0ODm2
-	xLDLot5xhhBbBJxp75+mj8A+HY4rltgVpkUrxJ5d0Ritf/lHp/KdQ5w1UmIhgkb//hvNHt/maTze5
-	tolADuZJKquheTQUa1yRbaR0lZojJoQukvNaHrG0xqpceAqfxtH/8Kdp2/p55DqQLgQ8=;
+	bh=wElwbqEqYtg6N83+A08t0RJt17oPW/Yout1Z5OV7l2E=; b=LiqIKbvF79gNnpe3mR8Pb6mhfW
+	UUg2iHN3dn42PtoqQBxZLoknQuanz+p4cGI5ayiWZyNkAc2QBgNVh4tOsa0myHvQBxlYLd8yceTB9
+	jpwfOz3xVK4dFJmDKSYzOwFtbFpKbQ9kkM+luWpmwlg41K2n0H7QiL1FgN7tkAf9DF7A=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1tVZPP-002dK9-Gt; Wed, 08 Jan 2025 17:59:55 +0100
-Date: Wed, 8 Jan 2025 17:59:55 +0100
+	id 1tVZSj-002dOZ-NO; Wed, 08 Jan 2025 18:03:21 +0100
+Date: Wed, 8 Jan 2025 18:03:21 +0100
 From: Andrew Lunn <andrew@lunn.ch>
-To: Luo Jie <quic_luoj@quicinc.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Lei Wei <quic_leiwei@quicinc.com>,
-	Suruchi Agarwal <quic_suruchia@quicinc.com>,
-	Pavithra R <quic_pavir@quicinc.com>,
-	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	Kees Cook <kees@kernel.org>,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	Philipp Zabel <p.zabel@pengutronix.de>,
-	linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-hardening@vger.kernel.org,
-	quic_kkumarcs@quicinc.com, quic_linchen@quicinc.com,
-	srinivas.kandagatla@linaro.org, bartosz.golaszewski@linaro.org,
-	john@phrozen.org
-Subject: Re: [PATCH net-next v2 12/14] net: ethernet: qualcomm: Initialize
- PPE L2 bridge settings
-Message-ID: <4dbf1550-32e9-4cce-bf0c-8b92dbd49b50@lunn.ch>
-References: <20250108-qcom_ipq_ppe-v2-0-7394dbda7199@quicinc.com>
- <20250108-qcom_ipq_ppe-v2-12-7394dbda7199@quicinc.com>
+To: Ninad Palsule <ninad@linux.ibm.com>
+Cc: minyard@acm.org, robh@kernel.org, krzk+dt@kernel.org,
+	conor+dt@kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	ratbert@faraday-tech.com, openipmi-developer@lists.sourceforge.net,
+	netdev@vger.kernel.org, joel@jms.id.au, andrew@codeconstruct.com.au,
+	devicetree@vger.kernel.org, eajames@linux.ibm.com,
+	linux-arm-kernel@lists.infradead.org, linux-aspeed@lists.ozlabs.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 05/10] ARM: dts: aspeed: system1: Add RGMII support
+Message-ID: <1dd0165b-22ff-4354-bfcb-85027e787830@lunn.ch>
+References: <20250108163640.1374680-1-ninad@linux.ibm.com>
+ <20250108163640.1374680-6-ninad@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -78,35 +65,21 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250108-qcom_ipq_ppe-v2-12-7394dbda7199@quicinc.com>
+In-Reply-To: <20250108163640.1374680-6-ninad@linux.ibm.com>
 
-On Wed, Jan 08, 2025 at 09:47:19PM +0800, Luo Jie wrote:
-> From: Lei Wei <quic_leiwei@quicinc.com>
+On Wed, Jan 08, 2025 at 10:36:33AM -0600, Ninad Palsule wrote:
+> system1 has 2 transceiver connected through the RGMII interfaces. Added
+> device tree entry to enable RGMII support.
 > 
-> Configure the default L2 bridge settings for the PPE ports to
-> enable L2 frame forwarding between CPU port and PPE Ethernet
-> ports.
+> ASPEED AST2600 documentation recommends using 'rgmii-rxid' as a
+> 'phy-mode' for mac0 and mac1 to enable the RX interface delay from the
+> PHY chip.
 
-It would be good to have an 'only' in there:
+You appear to if ignored my comment. Please don't do that. If you have
+no idea about RGMII delays, please say so, so i can help you debug
+what is wrong.
 
-> to _only_
-> enable L2 frame forwarding between CPU port and PPE Ethernet
-> ports
-
-That makes it clear there is no port to port forwarding, the ports are
-isolated.
-
-> The per-port L2 bridge settings are initialized as follows:
-> For PPE CPU port, the PPE bridge TX is enabled and FDB learn is
-> disabled. For PPE physical port, the PPE bridge TX is disabled
-> and FDB learn is enabled by default and the L2 forward action
-> is initialized as forward to CPU port.
-
-Why is learning needed on physical ports? In general, switches forward
-unknown destination addresses to the CPU. Which is what you want when
-the ports are isolated from each other. Everything goes to the
-CPU. But maybe this switch does not work like this?
+NACK
 
 	Andrew
-
 
