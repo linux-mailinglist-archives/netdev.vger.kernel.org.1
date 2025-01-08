@@ -1,109 +1,140 @@
-Return-Path: <netdev+bounces-156131-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156132-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F292A050FD
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 03:47:17 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 82496A05100
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 03:48:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F3984163310
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 02:47:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2D3C21888C8F
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 02:48:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97BB3192D77;
-	Wed,  8 Jan 2025 02:46:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6512213B2A9;
+	Wed,  8 Jan 2025 02:48:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="I/AzG8ep"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="KPKuk95p"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0B3E2594B9
-	for <netdev@vger.kernel.org>; Wed,  8 Jan 2025 02:46:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86736134AB
+	for <netdev@vger.kernel.org>; Wed,  8 Jan 2025 02:48:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736304417; cv=none; b=R3IVooEnx8kFQa+5sILhLp8tnE4ZOfOO1XzFbesuqvJRqw6y1LNn2NkmRJltQbhTIFnm1ImpH1IHXG7eKbm4ubZjrggP0pHEV6eEWuZhQOl87QmcFbyjL9NUe1Dy1QCHWqo3zQyTjj7aanGZMG2D0XEPAxVGg/98dpsujpGCaIk=
+	t=1736304515; cv=none; b=YrmTpUxJSAtnkLDY37JxmxvWopwjLB1UK2seBHmxxkKeeOx1p2huioCqWdSyS5320Fjf7ID6A3GSqShTcbmOH/SNpGjxP5/svCO1FpYV28nWWvXULh/fVLlHigjPsK+jSXK+C+V8jmAZe9gVjU11urc3KeWjOqNwB4591Em257Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736304417; c=relaxed/simple;
-	bh=ZvnQu/+9kFbCZV9Qdn7c4Qn7Dc86hN0V252atCQCcww=;
+	s=arc-20240116; t=1736304515; c=relaxed/simple;
+	bh=anJETctjzfLlfBQl6bXcjQV73Gexx/OcDpx83VMge54=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rbwu34BadrdPWnpdYkB6+AOqEjPSwHZrKWddhMXXDVR6YmrCrpIQL1knzqGttaLBclAWQft7u5s913z3Z5GebWuSncPP7KFHKB1y4OoHf0hm+NYfdX0dRES/NiXYIb/ZMD7hdEFjfv4PBANc/qqnlMo902EUUa8A1vIXs/STDHU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=I/AzG8ep; arc=none smtp.client-ip=209.85.218.46
+	 To:Cc:Content-Type; b=enoIFJiG91XsFXKLQltio4XMztXIamwmFphCJsxsapR3EDyqMe+xTJ5BTxNXSFJXxMxnTvlijjo7mPiIvRJizpnFudsiG46KHj9L/19wukIPDDoo7sVIZERpUS//eXRnX8YkNEeN4NtCecmF+o6t5LmvbyA+xLSGZkG9PdjQnEc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=KPKuk95p; arc=none smtp.client-ip=209.85.208.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-aaef00ab172so1872462766b.3
-        for <netdev@vger.kernel.org>; Tue, 07 Jan 2025 18:46:55 -0800 (PST)
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-5d3d2a30afcso29998378a12.3
+        for <netdev@vger.kernel.org>; Tue, 07 Jan 2025 18:48:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1736304414; x=1736909214; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1736304512; x=1736909312; darn=vger.kernel.org;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZvnQu/+9kFbCZV9Qdn7c4Qn7Dc86hN0V252atCQCcww=;
-        b=I/AzG8epbodW/JOhAE/oowGdpwe7jc0eiITL6G8m38krBGGK4h7AIUs6rxfcmN2UtT
-         dvpjxpdfpm22rnbjAoJGTH/HTk9Vd4EZwHtk57k/Rn92tlDnpw1jvuom45OctAfDg3YG
-         CS4DI19iGCWIamZjSBnbwNXqo9tg6QXB93MEc=
+        bh=NdquBNZMgGZyXtO0B4oyhF5pFpRgc46mPFlfdHraIFA=;
+        b=KPKuk95pX2AWQvUFW1TulDUcpHF3uoXhNw4SvfnaDm6CK/7UHxS9TaO824kWoFOgyz
+         +wOfn5qMouJlkJc5mhphbQwnuU8e0cZbhRHmYYu+lnRshsx3/ch5yjIeiQCmTC8+c9eO
+         /WOd5M8umvgzincmaC/ddGuj5GCc3NwUDkFeY=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736304414; x=1736909214;
+        d=1e100.net; s=20230601; t=1736304512; x=1736909312;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=ZvnQu/+9kFbCZV9Qdn7c4Qn7Dc86hN0V252atCQCcww=;
-        b=fwoLY6iRmXaGAzE9ACJUxOIwmYnlQ0gg1v9MAy1J7o3SYNJwJv2STY5TksWILdjCBd
-         OnV0gkCcXVaYUhxDz+YOsKiWODU3uFxaNYOctr7oohpQ947BuyqZBpBXcv4uM6oEhMmC
-         Xk9MBiemD+2AJZYtsQRLOfa+RCs70oW/vFQLtDIX45gyAUW22ov5wralItbFRoDxdmQx
-         ivEz6KcydVx3NHOmfB1dtnffY9loSP0DWu6F0E/It/if7WlRWa5QgLzXEG6U4p4fHrBu
-         ModqrnYxjeJJ+ZoLD7nEOdKYLzfFHttBbj8D0+kt0ZPc69fKHcVV659m4GG5jDiHYqOH
-         8iFw==
-X-Forwarded-Encrypted: i=1; AJvYcCWCs58ClCOo/PqrqRug7KUL9R59hLQSPNWt/o74Mh40oubBAvNPZJf6/M3BA2yrMXvFspLYPG4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxgkukmX1ThAer96ACfHLPupKhFhy3/7xdfNoKs+0VmvWspqOrV
-	J2Mwls+Q3KS2W4Orw7+ExBCrXxON/+DwKvlyzlEr9lErd1HEN0lobodwYxC5vuCPj1Lj4jN55pS
-	BZD6ZlmPCGxj+C73oxX+MuiUmTbMUbPxj/EZj
-X-Gm-Gg: ASbGnctwsDMBOgifsNjIACzW1vTBzjAofujEBEEBzRTy55O3We2TUkVdd2w4pK5iHhB
-	Ph976ZORZVyUjaaUxXUIy6iLZVw2exXd74GDkUg0=
-X-Google-Smtp-Source: AGHT+IFMBkvTQdqpcYsfFywrHhGB7KsXQI3TcKGnYaaxro4ypX8rRqD+V9cmvPY40PygXi9BmKA2a1r09+btXeMl8LE=
-X-Received: by 2002:a05:6402:3596:b0:5d0:ea4f:972f with SMTP id
- 4fb4d7f45d1cf-5d972e0b068mr2274740a12.8.1736304414120; Tue, 07 Jan 2025
- 18:46:54 -0800 (PST)
+        bh=NdquBNZMgGZyXtO0B4oyhF5pFpRgc46mPFlfdHraIFA=;
+        b=mUnrDcqSxGBY0ogq1j4CVy+I+KTbm89yV/12HRerN9qCEdfVvYDq4FRyYVLDy1e4qn
+         tIJditsUVUmBNvP+06to2xM9G1lgkhVUH5b+Sa/t3FvTwCezkMvTzpuueBvx4fVnerF5
+         fYErwVqJJTLImUjpjo/LPYjqr3Y3TGLDLHbTEd9w7eLlyjdxqOquqtX2OKpVwZXlxL+3
+         YbT8pUzOGPMo+8DBJWa88GN1uXktNdp0zjkA4yqKgFwIuhA3UKaa2V/fLyWAQANoJHGf
+         Sr4S0Gxf1GD0bstmHpxWmEX+WaWfJZLUR9GSwQgxtE+/fc7XcogYghi+fqP7gAGCD2Fp
+         L+Qw==
+X-Forwarded-Encrypted: i=1; AJvYcCVpXEYgIO1x2CewpEvhCXhGO75SRS/xxmSbGrhIqJl8sHs8QozZH5sJtcOlyud5yI8pKXlTlVI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwSpkLotkUv1eQRWUMyFcYKDC1GaBDPW9AeRYY3X65M6ZfqdOm4
+	aEkR2XD/KD0diNcOUGm0oHBDphmZ+/g0fosRZW+tuA2ReAL9gQ60LrOZ5pQHto7hNtN1thad0o1
+	DpLYLTkFGkBR5n9ZT8AEfa8N6DU0mPU62FgI6
+X-Gm-Gg: ASbGnctGfruRGMuRoIY4zOq1KzVPnEevqqHlAST1vS8128QIkNyOtfaLNoFkEnivUPl
+	DjBUQRUciTb7dLYNghZW5FjXGsGBDThSM15+J82g=
+X-Google-Smtp-Source: AGHT+IHALGptMTJ2rsgtdzyZSlroGMCC59oFCvqUIMsIZkOCMjUTdTdPa02g52IcPFpuG8vqbyAGBFNxhFmGI1TwV8A=
+X-Received: by 2002:a05:6402:42c1:b0:5d1:2677:b047 with SMTP id
+ 4fb4d7f45d1cf-5d972e6e423mr994852a12.28.1736304511838; Tue, 07 Jan 2025
+ 18:48:31 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250107214159.18807-1-johndale@cisco.com> <20250107214159.18807-3-johndale@cisco.com>
-In-Reply-To: <20250107214159.18807-3-johndale@cisco.com>
+References: <20250107190150.1758577-1-anthony.l.nguyen@intel.com> <20250107190150.1758577-4-anthony.l.nguyen@intel.com>
+In-Reply-To: <20250107190150.1758577-4-anthony.l.nguyen@intel.com>
 From: Kalesh Anakkur Purayil <kalesh-anakkur.purayil@broadcom.com>
-Date: Wed, 8 Jan 2025 08:16:41 +0530
-X-Gm-Features: AbW1kvaBiIrOWJudWSA66RtLeGWpJvyjIdFn-ySS6wHD6BdbjalCknfd5ZWPqsQ
-Message-ID: <CAH-L+nPvfnV+dhbpGV4J2Pxy53EQyNfbxWeu73cn=KikYh=Y_A@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 2/3] enic: Obtain the Link speed only after
- the link comes up
-To: John Daley <johndale@cisco.com>
-Cc: benve@cisco.com, satishkh@cisco.com, andrew+netdev@lunn.ch, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	netdev@vger.kernel.org, Nelson Escobar <neescoba@cisco.com>
+Date: Wed, 8 Jan 2025 08:18:19 +0530
+X-Gm-Features: AbW1kvZiOFXmYgdeBcRVTJMNlFdaPNn2CF8t3HqQIi32zosdzPCzOeaUkQ0Lygc
+Message-ID: <CAH-L+nO=q_Fs50e2ib8PgzHj2xL_borPONEM-reqpOr9RtQSZA@mail.gmail.com>
+Subject: Re: [PATCH net 3/3] igc: return early when failing to read EECD register
+To: Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
+	edumazet@google.com, andrew+netdev@lunn.ch, netdev@vger.kernel.org, 
+	En-Wei Wu <en-wei.wu@canonical.com>, vitaly.lifshits@intel.com, 
+	dima.ruinskiy@intel.com, "Chia-Lin Kao (AceLan)" <acelan.kao@canonical.com>, 
+	Mor Bar-Gabay <morx.bar.gabay@intel.com>
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000d868a4062b28df6b"
+	boundary="000000000000ac2b43062b28e569"
 
---000000000000d868a4062b28df6b
+--000000000000ac2b43062b28e569
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jan 8, 2025 at 3:12=E2=80=AFAM John Daley <johndale@cisco.com> wrot=
-e:
+On Wed, Jan 8, 2025 at 12:32=E2=80=AFAM Tony Nguyen <anthony.l.nguyen@intel=
+.com> wrote:
 >
-> The link speed is obtained in the RX adaptive coalescing function. It
-> was being called at probe time when the link may not be up. Change the
-> call to run after the Link comes up.
+> From: En-Wei Wu <en-wei.wu@canonical.com>
 >
-> The impact of not getting the correct link speed was that the low end of
-> the adaptive interrupt range was always being set to 0 which could have
-> caused a slight increase in the number of RX interrupts.
+> When booting with a dock connected, the igc driver may get stuck for ~40
+> seconds if PCIe link is lost during initialization.
 >
-> Co-developed-by: Nelson Escobar <neescoba@cisco.com>
-> Signed-off-by: Nelson Escobar <neescoba@cisco.com>
-> Co-developed-by: Satish Kharat <satishkh@cisco.com>
-> Signed-off-by: Satish Kharat <satishkh@cisco.com>
-> Signed-off-by: John Daley <johndale@cisco.com>
+> This happens because the driver access device after EECD register reads
+> return all F's, indicating failed reads. Consequently, hw->hw_addr is set
+> to NULL, which impacts subsequent rd32() reads. This leads to the driver
+> hanging in igc_get_hw_semaphore_i225(), as the invalid hw->hw_addr
+> prevents retrieving the expected value.
+>
+> To address this, a validation check and a corresponding return value
+> catch is added for the EECD register read result. If all F's are
+> returned, indicating PCIe link loss, the driver will return -ENXIO
+> immediately. This avoids the 40-second hang and significantly improves
+> boot time when using a dock with an igc NIC.
+>
+> Log before the patch:
+> [    0.911913] igc 0000:70:00.0: enabling device (0000 -> 0002)
+> [    0.912386] igc 0000:70:00.0: PTM enabled, 4ns granularity
+> [    1.571098] igc 0000:70:00.0 (unnamed net_device) (uninitialized): PCI=
+e link lost, device now detached
+> [   43.449095] igc_get_hw_semaphore_i225: igc 0000:70:00.0 (unnamed net_d=
+evice) (uninitialized): Driver can't access device - SMBI bit is set.
+> [   43.449186] igc 0000:70:00.0: probe with driver igc failed with error =
+-13
+> [   46.345701] igc 0000:70:00.0: enabling device (0000 -> 0002)
+> [   46.345777] igc 0000:70:00.0: PTM enabled, 4ns granularity
+>
+> Log after the patch:
+> [    1.031000] igc 0000:70:00.0: enabling device (0000 -> 0002)
+> [    1.032097] igc 0000:70:00.0: PTM enabled, 4ns granularity
+> [    1.642291] igc 0000:70:00.0 (unnamed net_device) (uninitialized): PCI=
+e link lost, device now detached
+> [    5.480490] igc 0000:70:00.0: enabling device (0000 -> 0002)
+> [    5.480516] igc 0000:70:00.0: PTM enabled, 4ns granularity
+>
+> Fixes: ab4056126813 ("igc: Add NVM support")
+> Cc: Chia-Lin Kao (AceLan) <acelan.kao@canonical.com>
+> Signed-off-by: En-Wei Wu <en-wei.wu@canonical.com>
+> Reviewed-by: Vitaly Lifshits <vitaly.lifshits@intel.com>
+> Tested-by: Mor Bar-Gabay <morx.bar.gabay@intel.com>
+> Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 LGTM,
 Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
 
@@ -112,7 +143,7 @@ Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
 Regards,
 Kalesh AP
 
---000000000000d868a4062b28df6b
+--000000000000ac2b43062b28e569
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -184,14 +215,14 @@ a30CvRuhokNO6Jzh7ZFtjKVMzYas3oo6HXgA+slRszMu4pc+fRPO41FHjeDM76e6P5OnthhnD+NY
 x6xokUN65DN1bn2MkeNs0nQpizDqd0QxggJtMIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYD
 VQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25h
 bFNpZ24gMiBDQSAyMDIwAgw3wUUJsDUiPdpordMwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcN
-AQkEMSIEIAjQv1fKdI3UqGooOwgfVMqXbcadv/2YD7IBOwiPhlaOMBgGCSqGSIb3DQEJAzELBgkq
-hkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI1MDEwODAyNDY1NFowaQYJKoZIhvcNAQkPMVwwWjAL
+AQkEMSIEIEmVkzM1oAyj3Nmfve4Fzs0zgVqBpUa8stK1iQ3efuFEMBgGCSqGSIb3DQEJAzELBgkq
+hkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI1MDEwODAyNDgzMlowaQYJKoZIhvcNAQkPMVwwWjAL
 BglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG
-9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQAsJZLcXQne
-CGGSIKP2BM+u5fsmMlBrRlChppmICIaprjUqVNxAd/wOhtIfnLB4LjND0VNjmFBEE8aDf6MN5zzn
-hAsJQ4y3r0XyGHl6T8qAMIl51n/7rzB0s3acNKUBU5tXIyjk3puzmTEFG2t8TLUJRwy0tuSsswij
-flFAYR8rehOkWbCvIcTpWTil1qNOurcROdZyphlCXYsxZ84MzqYZqWO0ndMTXMuJBhjw6MSMfLy+
-JrbRDXesGief7N2e6+7A1bCi0Y3gTzkl84KPoAmtylJ4fKvqLOxJr2W2V03fFk0SpTvxjPfsKiL3
-+uIcfCnZly/nLshlUhlMshbfPsix
---000000000000d868a4062b28df6b--
+9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQCPP8UpvTpL
+8EqIDUNp5P5lOnEozMZFO+Yrq0DEok4160djpwwMfCyiJ6fNvIEygs+Kc49LNIFf+lWiBrO7jBtM
+mdq2x/f4JNRzXvKjumUqk58plLdQkKrd3D1lSiob10mqd1GiNPTAaPFNOig409RVXvpB0mki+clb
+BGws762uOFJ3eWtI2o1P3EyZKhSmY3idUiXm7qlSrMz8NhDFj9Zdk4bmLo3v/FQp27hevcND9ZkM
++rFSu4h+pTmmff5BI7hILR6qFE2zAXg0wZrAZ7NAggewuoVyerFh7PP+diq3kHXn/Q5A6YFbgPOl
+Yd9p0yhIUQyCBPYuGA73/3MN2oD9
+--000000000000ac2b43062b28e569--
 
