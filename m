@@ -1,220 +1,146 @@
-Return-Path: <netdev+bounces-156227-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156228-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 63E31A05A3A
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 12:43:35 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A017AA05A65
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 12:51:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 564B97A05F8
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 11:43:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 173243A3D92
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 11:51:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C49041F709F;
-	Wed,  8 Jan 2025 11:43:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="AfFeLjWJ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DFDB1F9F4C;
+	Wed,  8 Jan 2025 11:50:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-113.freemail.mail.aliyun.com (out30-113.freemail.mail.aliyun.com [115.124.30.113])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6D981DE895
-	for <netdev@vger.kernel.org>; Wed,  8 Jan 2025 11:43:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.113
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 792601F8AC5;
+	Wed,  8 Jan 2025 11:50:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736336608; cv=none; b=Urm8jrBLoTRsCyVDgsmHfcKfW1lAMagQizo/XeTBvaPNspcQf7nncyTTn3YJJ7YSP4fCRCQLxB06+HB4DfhlUUFUtbl2R96bNkx7o0HEGK6bvFa/JKjcHjl1EFo+VUtbORNPtokLw8l9OUECO6I1NWdQdmBqf0cGs560wShi1l0=
+	t=1736337040; cv=none; b=UDZQdsbF2m2COrsTvl9Sxq8bTUG0QjNHpJ16dekieebQFbGO4gh5zATNLhJaIWx0dkBY30XAWUHjBfONZ52AcALxz6yTbwrhHVztCgo8dIu1hAO1B8FckW4WVvyAkH3MXTZjredSPSrz6D7zDkEPPdRIErQrQlY+r5DVrrFeObc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736336608; c=relaxed/simple;
-	bh=iRIpSJW20Gz6NxSPrM0f9aGvhsbr2hjaXK+G3wI/bbI=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=DQsjUkckfrrZ0k38rOsaIwjKxp5KK+f+TPuW/Wl3V4xjz+JsdR7T/qPAreXcx/g3cT5rQFZe3UasEffq4DHEnPmRQB7wJCCN1NABwoPGEhEOsQwJART6xQvtev1GZb88osANS37HJIbJ/H2KPNRauPqAQXyZ7NJqZ8aJA2TORL0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=AfFeLjWJ; arc=none smtp.client-ip=115.124.30.113
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1736336603; h=From:To:Subject:Date:Message-Id:MIME-Version;
-	bh=tUihrCBUbs90MR45iVRCgHPNMEBzd7WTUsb3kptxmxw=;
-	b=AfFeLjWJEw9VdXqS3mJUGThAOUqNOpNO6CYQBNaqYxYRosIjD1f5v7dehXa+uPMzmAhGsYuEfRmgZvxJAtqR452lM9DYcaBDtWNo7SpS3N+4aLXpwTWm3pJSqtZWEawZ3o48tJe3d452mxuO2WT0URowVh6mA9vpnT/8wH9jZZQ=
-Received: from localhost(mailfrom:lulie@linux.alibaba.com fp:SMTPD_---0WNDxSRx_1736336601 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Wed, 08 Jan 2025 19:43:22 +0800
-From: Philo Lu <lulie@linux.alibaba.com>
-To: netdev@vger.kernel.org
-Cc: willemdebruijn.kernel@gmail.com,
-	davem@davemloft.net,
-	dsahern@kernel.org,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org
-Subject: [PATCH net] udp: Make rehash4 independent in udp_lib_rehash()
-Date: Wed,  8 Jan 2025 19:43:21 +0800
-Message-Id: <20250108114321.128249-1-lulie@linux.alibaba.com>
-X-Mailer: git-send-email 2.32.0.3.g01195cf9f
+	s=arc-20240116; t=1736337040; c=relaxed/simple;
+	bh=zdLHWj2Qh+I3oRS6DXan+l1E0UCjSGA0XCi+9rpeSLs=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=hm1HBOPr+3R33kUF4s0QcHDyUYHOI6gJF5vF/Ep3YVyOp7zOKJrW8gR0d3aJyyXrM+WxfWsaxi8srF78hU0o8TYn2xdE5wbrMpE8VbgxdDkD2q1y+6AlAqRy2LIBMGrY+DcbZ6XPl7ck4oOA8qD4yZxZ1de+gESebwFRULHuYJ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-aa6c0d1833eso3480356166b.1;
+        Wed, 08 Jan 2025 03:50:38 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736337037; x=1736941837;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=kE5Ik9z58K3vMl+d5jDdiRTT4sfBsakcDNQojzo97Co=;
+        b=HrCHc+9vNrr7NkQj/BrAFPthWVmtROCVnK392sHccF4a0Q9EgJJ5nlOFZ20ctNIbq3
+         phZ9w8WAlVWcTRBgkfbjNNi+NtsKD846uyVg42yZ37MYDS57WroHM1hv//QG02KVgoeo
+         KyPWFhN5+1Qs4D2ABw7A7DI+pEF8UdZs0Nizaf9x4mQq75vy8h4Nz6iXuAt+/awv2L//
+         dUhfoQvU4HdkuviC1iMYHt9cK5bXpJaJbZx8LAAiz6S2o1e31YCyFK9WADXd4SwEQaJ8
+         TnZbkjelJFkLx7pBcWZ6z/PLr42PgqExP8mapXgkcfE5pYu8crEO3GVgWXgeg9Ots6mt
+         FCng==
+X-Forwarded-Encrypted: i=1; AJvYcCVFFftAjLNU/AO1Xi144ouoGGRagnORxfwUb26MRAUhqWTPvvBATyMdCRbKrcHtTeCGLh9uPZhMbj6Gf8U=@vger.kernel.org, AJvYcCWebDA1/3vlN4gyf67g23zpfxHzxs3iOd5Sb1Gu4DctCifXpEIPwqRxYr5bC+8xeFSgyOtzzffKL1250gKfCXRN@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx0AO8SU+S8S8LChfhBPso7IIhi89htpkFizwthfcgsngDj5oTo
+	nZOsnWOscXX/Cx8gsm8SdBcIXBw4cMkyJgw/cB7ji6DmxPFHOeQp
+X-Gm-Gg: ASbGncvmnl4IZT+u+PDSl1df/h7bwuP7Uw2RM4KznnC7VUu99gzbccW1mTjvctD4g9b
+	b3Ix0J4jUlFr3OTR9qkXQ45vm/7EoHs5gA7vFEDRklHof65x3BUg6rN6SUpd9SJ8O7rPd9AoUxI
+	FiHahDX4eSAIigmVhIvadR5lOe67kZ+nDQXMkg1J1lJH3j/3t5hc8nImiz2aAPp9eqz8FYOOtFL
+	MDGCIv7EA7NmU7cAfr9t+aUm4A6QDTmpKRvKpe9p3aYxFE=
+X-Google-Smtp-Source: AGHT+IGYP/nSCvT7/l7vlKva4zNZnpbnsdLesiWhtrvqIxngDr6Y4lfiRxVAIp/SY1k7eGZrkAMb4w==
+X-Received: by 2002:a17:907:2d08:b0:aa6:a21b:2aa with SMTP id a640c23a62f3a-ab2ab6a75f8mr176498066b.12.1736337036391;
+        Wed, 08 Jan 2025 03:50:36 -0800 (PST)
+Received: from localhost ([2a03:2880:30ff:4::])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aac0efe48ecsm2512879266b.126.2025.01.08.03.50.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 08 Jan 2025 03:50:35 -0800 (PST)
+From: Breno Leitao <leitao@debian.org>
+Subject: [PATCH net-next v3 0/4] netconsole: selftest for userdata overflow
+Date: Wed, 08 Jan 2025 03:50:24 -0800
+Message-Id: <20250108-netcons_overflow_test-v3-0-3d85eb091bec@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAIFmfmcC/4XN3QqCMBiA4VsZ37GL/ZnmUfcRIdN900FssY1li
+ PceCZ0E0fELz7tCwugwQUdWiFhccsFDR2RFYJy1n5A6Ax0BwYTiginqMY/Bpz4UjPYWHn3GlCl
+ q28jacNsoCRWBe0Trlt29gMdMPS4ZrhWB2aUc4nMfFr73P3bhlFHd1ro1TI8o+Nng4LQ/hDjtZ
+ BEfpmacyV+MeDPqZE8DHtX4xWzb9gJX/dVcDAEAAA==
+X-Change-ID: 20241204-netcons_overflow_test-eaf735d1f743
+To: Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Shuah Khan <shuah@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org, Breno Leitao <leitao@debian.org>, 
+ kernel-team@meta.com, Simon Horman <horms@kernel.org>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1863; i=leitao@debian.org;
+ h=from:subject:message-id; bh=zdLHWj2Qh+I3oRS6DXan+l1E0UCjSGA0XCi+9rpeSLs=;
+ b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBnfmaKe+YSjDD8UyTlLnI+V86UPDe4OJvUnyAil
+ J6Dtp57HNKJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCZ35migAKCRA1o5Of/Hh3
+ beHVEACby+8F9cpiITtw89SpAr9b8NV5nItZtfMf3atcRX//JC8/aMR3NME2ihLGQzaLsmrqZDP
+ nZcN1sYWDbh/HVIV3ISbP/oYJfDOLnouj0+u1KQGLoi6kLGs9sH89VQevj7Dp+GOgqLEd5Oqz2V
+ hr2xjoB0jR9EknBrtnQdkvLnDxt5N65BQGcQG7Fh3plYu6ufMPhe30IioUApG0vwt8uSkZ8hKts
+ 8MI2KwOy2nZFC6IFr2ZeLz8IESTxux6JCKJBcgnkXFEQB6dsjqgE3OnPcKdH3on+BfLYMlBWj+E
+ T4BJb2M3ZMR9baGsUQqhNVCkSPzcTdQEnReTG5RHaEfmET1NLjL++uqSfDNde1c/w91YTMR46j6
+ jvaqjnjDwbi47L6PxDkb19tK9msMq5JHpoGdB0IAs444/BXAOnZMSNvYzExIcoL+Vdn/nYQn4OO
+ 6140DykdiM6Z4SvA2BS5nxqRxLhR9LkshQW1wv7kuJrMOboPoPxgRedD6gI+g6tjQVS6blD2bLz
+ gyBLnElWzdfEevfWxmA6sBKBf/+IdXWnaxAO7+gIsrhiFe1gPqDYcD3ZsyH6hRc4HRSNdowgyrC
+ tObecnuknzlHs8U4feN1cIa3xuWRW75DChNF9rDivXBPuvwK8lgRQV51CYnzM64vZP6UNskV8wx
+ 6S5sk5VACeaUblQ==
+X-Developer-Key: i=leitao@debian.org; a=openpgp;
+ fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
 
-As discussed in [0], rehash4 could be missed in udp_lib_rehash() when
-udp hash4 changes while hash2 doesn't change. This patch fixes this by
-moving rehash4 codes out of rehash2 checking, and then rehash2 and
-rehash4 are done separately.
+Implement comprehensive testing for netconsole userdata entry handling,
+demonstrating correct behavior when creating maximum entries and
+preventing unauthorized overflow.
 
-By doing this, we no longer need to call rehash4 explicitly in
-udp_lib_hash4(), as the rehash callback in __ip4_datagram_connect takes
-it. Thus, now udp_lib_hash4() returns directly if the sk is already
-hashed.
+Refactor existing test infrastructure to support modular, reusable
+helper functions that validate strict entry limit enforcement.
 
-Note that uhash4 may fail to work under consecutive connect(<dst
-address>) calls because rehash() is not called with every connect(). To
-overcome this, connect(<AF_UNSPEC>) needs to be called after the next
-connect to a new destination.
+Also, add a warning if update_userdata() sees more than
+MAX_USERDATA_ITEMS entries. This shouldn't happen and it is a bug that
+shouldn't be silently ignored.
 
-[0]
-https://lore.kernel.org/all/4761e466ab9f7542c68cdc95f248987d127044d2.1733499715.git.pabeni@redhat.com/
-
-Fixes: 78c91ae2c6de ("ipv4/udp: Add 4-tuple hash for connected socket")
-Suggested-by: Paolo Abeni <pabeni@redhat.com>
-Signed-off-by: Philo Lu <lulie@linux.alibaba.com>
+Signed-off-by: Breno Leitao <leitao@debian.org>
 ---
- net/ipv4/udp.c | 85 +++++++++++++++++++++++++-------------------------
- 1 file changed, 42 insertions(+), 43 deletions(-)
+Changes in v3:
+- Added the new shell helpers files in the TEST_INCLUDES (Jakub)
+- Link to v2: https://lore.kernel.org/r/20250103-netcons_overflow_test-v2-0-a49f9be64c21@debian.org
 
-diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
-index e8953e88efef9..154a1bea071b8 100644
---- a/net/ipv4/udp.c
-+++ b/net/ipv4/udp.c
-@@ -533,30 +533,6 @@ static struct sock *udp4_lib_lookup4(const struct net *net,
- 	return NULL;
- }
- 
--/* In hash4, rehash can happen in connect(), where hash4_cnt keeps unchanged. */
--static void udp_rehash4(struct udp_table *udptable, struct sock *sk,
--			u16 newhash4)
--{
--	struct udp_hslot *hslot4, *nhslot4;
--
--	hslot4 = udp_hashslot4(udptable, udp_sk(sk)->udp_lrpa_hash);
--	nhslot4 = udp_hashslot4(udptable, newhash4);
--	udp_sk(sk)->udp_lrpa_hash = newhash4;
--
--	if (hslot4 != nhslot4) {
--		spin_lock_bh(&hslot4->lock);
--		hlist_nulls_del_init_rcu(&udp_sk(sk)->udp_lrpa_node);
--		hslot4->count--;
--		spin_unlock_bh(&hslot4->lock);
--
--		spin_lock_bh(&nhslot4->lock);
--		hlist_nulls_add_head_rcu(&udp_sk(sk)->udp_lrpa_node,
--					 &nhslot4->nulls_head);
--		nhslot4->count++;
--		spin_unlock_bh(&nhslot4->lock);
--	}
--}
--
- static void udp_unhash4(struct udp_table *udptable, struct sock *sk)
- {
- 	struct udp_hslot *hslot2, *hslot4;
-@@ -582,15 +558,13 @@ void udp_lib_hash4(struct sock *sk, u16 hash)
- 	struct net *net = sock_net(sk);
- 	struct udp_table *udptable;
- 
--	/* Connected udp socket can re-connect to another remote address,
--	 * so rehash4 is needed.
-+	/* Connected udp socket can re-connect to another remote address, which
-+	 * will be handled by rehash. Thus no need to redo hash4 here.
- 	 */
--	udptable = net->ipv4.udp_table;
--	if (udp_hashed4(sk)) {
--		udp_rehash4(udptable, sk, hash);
-+	if (udp_hashed4(sk))
- 		return;
--	}
- 
-+	udptable = net->ipv4.udp_table;
- 	hslot = udp_hashslot(udptable, net, udp_sk(sk)->udp_port_hash);
- 	hslot2 = udp_hashslot2(udptable, udp_sk(sk)->udp_portaddr_hash);
- 	hslot4 = udp_hashslot4(udptable, hash);
-@@ -2170,17 +2144,17 @@ EXPORT_SYMBOL(udp_lib_unhash);
- void udp_lib_rehash(struct sock *sk, u16 newhash, u16 newhash4)
- {
- 	if (sk_hashed(sk)) {
-+		struct udp_hslot *hslot, *hslot2, *nhslot2, *hslot4, *nhslot4;
- 		struct udp_table *udptable = udp_get_table_prot(sk);
--		struct udp_hslot *hslot, *hslot2, *nhslot2;
- 
-+		hslot = udp_hashslot(udptable, sock_net(sk),
-+				     udp_sk(sk)->udp_port_hash);
- 		hslot2 = udp_hashslot2(udptable, udp_sk(sk)->udp_portaddr_hash);
- 		nhslot2 = udp_hashslot2(udptable, newhash);
- 		udp_sk(sk)->udp_portaddr_hash = newhash;
- 
- 		if (hslot2 != nhslot2 ||
- 		    rcu_access_pointer(sk->sk_reuseport_cb)) {
--			hslot = udp_hashslot(udptable, sock_net(sk),
--					     udp_sk(sk)->udp_port_hash);
- 			/* we must lock primary chain too */
- 			spin_lock_bh(&hslot->lock);
- 			if (rcu_access_pointer(sk->sk_reuseport_cb))
-@@ -2199,18 +2173,43 @@ void udp_lib_rehash(struct sock *sk, u16 newhash, u16 newhash4)
- 				spin_unlock(&nhslot2->lock);
- 			}
- 
--			if (udp_hashed4(sk)) {
--				udp_rehash4(udptable, sk, newhash4);
-+			spin_unlock_bh(&hslot->lock);
-+		}
- 
--				if (hslot2 != nhslot2) {
--					spin_lock(&hslot2->lock);
--					udp_hash4_dec(hslot2);
--					spin_unlock(&hslot2->lock);
-+		/* Now process hash4 if necessary:
-+		 * (1) update hslot4;
-+		 * (2) update hslot2->hash4_cnt.
-+		 * Note that hslot2/hslot4 should be checked separately, as
-+		 * either of them may change with the other unchanged.
-+		 */
-+		if (udp_hashed4(sk)) {
-+			hslot4 = udp_hashslot4(udptable,
-+					       udp_sk(sk)->udp_lrpa_hash);
-+			nhslot4 = udp_hashslot4(udptable, newhash4);
-+			udp_sk(sk)->udp_lrpa_hash = newhash4;
- 
--					spin_lock(&nhslot2->lock);
--					udp_hash4_inc(nhslot2);
--					spin_unlock(&nhslot2->lock);
--				}
-+			spin_lock_bh(&hslot->lock);
-+			if (hslot4 != nhslot4) {
-+				spin_lock(&hslot4->lock);
-+				hlist_nulls_del_init_rcu(&udp_sk(sk)->udp_lrpa_node);
-+				hslot4->count--;
-+				spin_unlock(&hslot4->lock);
-+
-+				spin_lock(&nhslot4->lock);
-+				hlist_nulls_add_head_rcu(&udp_sk(sk)->udp_lrpa_node,
-+							 &nhslot4->nulls_head);
-+				nhslot4->count++;
-+				spin_unlock(&nhslot4->lock);
-+			}
-+
-+			if (hslot2 != nhslot2) {
-+				spin_lock(&hslot2->lock);
-+				udp_hash4_dec(hslot2);
-+				spin_unlock(&hslot2->lock);
-+
-+				spin_lock(&nhslot2->lock);
-+				udp_hash4_inc(nhslot2);
-+				spin_unlock(&nhslot2->lock);
- 			}
- 			spin_unlock_bh(&hslot->lock);
- 		}
+Changes in v2:
+- Add the new script (netcons_overflow.sh) in
+  tools/testing/selftests/drivers/net/Makefile as suggested by Simon
+  Horman
+- Link to v1: https://lore.kernel.org/r/20241204-netcons_overflow_test-v1-0-a85a8d0ace21@debian.org
+
+---
+Breno Leitao (4):
+      netconsole: Warn if MAX_USERDATA_ITEMS limit is exceeded
+      netconsole: selftest: Split the helpers from the selftest
+      netconsole: selftest: Delete all userdata keys
+      netconsole: selftest: verify userdata entry limit
+
+ MAINTAINERS                                        |   3 +-
+ drivers/net/netconsole.c                           |   2 +-
+ tools/testing/selftests/drivers/net/Makefile       |   2 +
+ .../selftests/drivers/net/lib/sh/lib_netcons.sh    | 225 +++++++++++++++++++++
+ .../testing/selftests/drivers/net/netcons_basic.sh | 218 +-------------------
+ .../selftests/drivers/net/netcons_overflow.sh      |  67 ++++++
+ 6 files changed, 298 insertions(+), 219 deletions(-)
+---
+base-commit: 7bf1659bad4e9413cdba132ef9cbd0caa9cabcc4
+change-id: 20241204-netcons_overflow_test-eaf735d1f743
+
+Best regards,
 -- 
-2.32.0.3.g01195cf9f
+Breno Leitao <leitao@debian.org>
 
 
