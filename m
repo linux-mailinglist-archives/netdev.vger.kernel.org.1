@@ -1,231 +1,194 @@
-Return-Path: <netdev+bounces-156299-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156300-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B530A05F96
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 16:06:38 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BA7F3A05FC5
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 16:16:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 000221881A99
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 15:06:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AA31B160F3B
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 15:16:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15D0C1FCFE5;
-	Wed,  8 Jan 2025 15:06:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A216192D66;
+	Wed,  8 Jan 2025 15:16:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="fPW+UUnI"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="wdvh5ZqS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47E0415CD74;
-	Wed,  8 Jan 2025 15:06:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1978126C13;
+	Wed,  8 Jan 2025 15:16:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736348793; cv=none; b=TmhhF2qFdiX40zTHCU2BzbUY1fivNyjNfK45TZ2PIC7R/7dmZWacQ1jFrWidCqs1o2CExXJLN/B5mLGO3AmSb7h4qywAMN6dAOTt9WEG4VOa9+ZbrfR9gZmA7X7IqQQCIx/0QHSEAJGPeFW2LzFx0IOVfmThXLqqiOAYAMUXWzI=
+	t=1736349366; cv=none; b=HC0ReOMyiNNPDK7gvAwmPhUKUl4jYDPbukEWIQDZJk/hrRCXymLVrw1Q9y06VSt2a7pUiQAB/2AEPLoBqjBSGZctRn+7X0XJ330vMt9OGZzr1m+rLJVw8nri2lJCiCNo4nn8HvWlU8fPqCpcV6BckIxYEsG6bDf8PXGPwUns+co=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736348793; c=relaxed/simple;
-	bh=GtKrfmly8HIpzFeTR9Cb3QfKE0/JX9V1zAGx74FqQJk=;
-	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
-	 Message-ID:Content-Type; b=EozTy5nRmuae0VvU8I3hK3hBZGhoepCdXnDCns4K/Ym7+x7Qc8A7zrTHK0TTyY2CaPb/hEFiPRcw/ADoewRgEKq0hxmVBnHXElps8KnN32erZR4HXBKhOxlqc6KSHMNLuQAmUfOri8p7Ae1DA94YitLg+zlqmX2ZzIS3jSuOb+A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=fPW+UUnI; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 508D6Ht3026793;
-	Wed, 8 Jan 2025 15:06:22 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:to; s=pp1;
-	 bh=AailQYGz8niMcO0+l3sgqJtd9jI7kG6enCwLr0ojggA=; b=fPW+UUnILC9E
-	iVzO0tviLHwew+3F+EyZ+XGLZjRqruaE6loVcg+19MQFRu37++mqKI2LmuqdmCxq
-	fxL/4W9S8V4QgiCoY0WTi01O3zRSnNvdDgzEIi3mhyeuTw5OFQPjNTHsJ7xryTrr
-	T9UxKfjjOM/3jMxlMqqdjqaaBUe9eVsK+ysGC77ZuE7Dw9l0771gFyW2qdDRrR0n
-	jEfa4kGNoy63311JMKscyrlwShu+b3oihRSSB8++i9Wkn/I9CdXDdVGdB7YZxo5T
-	D6YXxW99mkPsW5Tx4/m/g3d1jDobBimVPJSRheMo1+0EcAtYmrPh0Kt/KgzgB57g
-	cLf0rAbpjw==
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 441e3b3hyy-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 08 Jan 2025 15:06:22 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 508E3iGr028054;
-	Wed, 8 Jan 2025 15:06:21 GMT
-Received: from smtprelay01.wdc07v.mail.ibm.com ([172.16.1.68])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 43yhhk820n-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 08 Jan 2025 15:06:21 +0000
-Received: from smtpav03.wdc07v.mail.ibm.com (smtpav03.wdc07v.mail.ibm.com [10.39.53.230])
-	by smtprelay01.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 508F6LUk17301854
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 8 Jan 2025 15:06:21 GMT
-Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id E1AF15805C;
-	Wed,  8 Jan 2025 15:06:20 +0000 (GMT)
-Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 619A158054;
-	Wed,  8 Jan 2025 15:06:20 +0000 (GMT)
-Received: from ltc.linux.ibm.com (unknown [9.5.196.140])
-	by smtpav03.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Wed,  8 Jan 2025 15:06:20 +0000 (GMT)
+	s=arc-20240116; t=1736349366; c=relaxed/simple;
+	bh=fUC+m3nwxrtFNP/KtgbbqNSnuzcseMWSgoGnut/18vg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bbwIAKOy+ikopRhQ5uAnXPifPdorUUYC2TYvy17MQFY1R7iBNNZw5qxeXYx8i5B5VVeE7DGFQW0f4SLVD6g8Ol4Wdp74loA6zFFuqnaROCsdD4NuBsvj5QNeUcHradOAH8dWcIfA7yyNkY5FHOtomOMjVZfvtqyxjrqE9LLH0VY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=wdvh5ZqS; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=zo6OfvuhHp4sdZ10O6FDkeLKQUGmJO2YNdErvLunkBE=; b=wdvh5ZqSlJU0JlDGRrkedRHGtP
+	tvP3DglrhXA74wVDkAeXEMLW2sr0kt8Yt/9fpW49c3Vl9lUinSNBa0GTXtdSTBZXzqe9QUqnEClHj
+	Xj5I0f8GD9AcYgdlIZx+3lUY27/UKDyISxB2SN6ivBPiLWvhNden6/EtrLwWnaRSzuE+F85YA0e2v
+	blWCayKWezUpou5zTGnNakSQ0CqVJAAVZ0PwSU8dD6Fn0AkGzKuIa3PYfLFPXiZJT+fCafrkppyPp
+	FYuAOcMFGKsCf7E7cl9CnccOHYJGouKfAd/rCLFp9BxqWjlx2bV5VJXRMAzGWBHQQlIYbKaXeoR2l
+	cKmHc5WQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:47478)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1tVXml-0000nP-17;
+	Wed, 08 Jan 2025 15:15:55 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1tVXmi-0006Oy-24;
+	Wed, 08 Jan 2025 15:15:52 +0000
+Date: Wed, 8 Jan 2025 15:15:52 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>, kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	UNGLinuxDriver@microchip.com, Phil Elwell <phil@raspberrypi.org>
+Subject: Re: [PATCH net-next v1 7/7] net: usb: lan78xx: Enable EEE support
+ with phylink integration
+Message-ID: <Z36WqNGpWWkHTjUE@shell.armlinux.org.uk>
+References: <20250108121341.2689130-1-o.rempel@pengutronix.de>
+ <20250108121341.2689130-8-o.rempel@pengutronix.de>
+ <Z35z6ZHspfSZK4U7@shell.armlinux.org.uk>
+ <Z36KacKBd2WaOxfW@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Wed, 08 Jan 2025 16:06:20 +0100
-From: Harald Freudenberger <freude@linux.ibm.com>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Holger Dengler <dengler@linux.ibm.com>,
-        linux-s390@vger.kernel.org
-Subject: Re: [PATCH v2 21/29] crypto: s390/aes-gcm - use the new scatterwalk
- functions
-Reply-To: freude@linux.ibm.com
-Mail-Reply-To: freude@linux.ibm.com
-In-Reply-To: <20241230001418.74739-22-ebiggers@kernel.org>
-References: <20241230001418.74739-1-ebiggers@kernel.org>
- <20241230001418.74739-22-ebiggers@kernel.org>
-Message-ID: <cdcf7da3766aa6f6336f590bd64c12cf@linux.ibm.com>
-X-Sender: freude@linux.ibm.com
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: AUii3IdAVIGaSKXZb90h53cdOhQMPtMU
-X-Proofpoint-GUID: AUii3IdAVIGaSKXZb90h53cdOhQMPtMU
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
- priorityscore=1501 phishscore=0 impostorscore=0 clxscore=1011 bulkscore=0
- lowpriorityscore=0 mlxlogscore=558 adultscore=0 suspectscore=0 spamscore=0
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2411120000 definitions=main-2501080125
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z36KacKBd2WaOxfW@pengutronix.de>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On 2024-12-30 01:14, Eric Biggers wrote:
-> From: Eric Biggers <ebiggers@google.com>
+On Wed, Jan 08, 2025 at 03:23:37PM +0100, Oleksij Rempel wrote:
+> On Wed, Jan 08, 2025 at 12:47:37PM +0000, Russell King (Oracle) wrote:
+> > On Wed, Jan 08, 2025 at 01:13:41PM +0100, Oleksij Rempel wrote:
+> > > Refactor Energy-Efficient Ethernet (EEE) support in the LAN78xx driver
+> > > to integrate with phylink. This includes the following changes:
+> > > 
+> > > - Use phylink_ethtool_get_eee and phylink_ethtool_set_eee to manage
+> > >   EEE settings, aligning with the phylink API.
+> > > - Add a new tx_lpi_timer variable to manage the TX LPI (Low Power Idle)
+> > >   request delay. Default it to 50 microseconds based on LAN7800 documentation
+> > >   recommendations.
+> > 
+> > phylib maintains tx_lpi_timer for you. Please use that instead.
 > 
-> Use scatterwalk_next() which consolidates scatterwalk_clamp() and
-> scatterwalk_map().  Use scatterwalk_done_src() and
-> scatterwalk_done_dst() which consolidate scatterwalk_unmap(),
-> scatterwalk_advance(), and scatterwalk_done().
-> 
-> Besides the new functions being a bit easier to use, this is necessary
-> because scatterwalk_done() is planned to be removed.
-> 
-> Cc: Harald Freudenberger <freude@linux.ibm.com>
-> Cc: Holger Dengler <dengler@linux.ibm.com>
-> Cc: linux-s390@vger.kernel.org
-> Signed-off-by: Eric Biggers <ebiggers@google.com>
-> ---
-> 
-> This patch is part of a long series touching many files, so I have
-> limited the Cc list on the full series.  If you want the full series 
-> and
-> did not receive it, please retrieve it from lore.kernel.org.
-> 
->  arch/s390/crypto/aes_s390.c | 33 +++++++++++++--------------------
->  1 file changed, 13 insertions(+), 20 deletions(-)
-> 
-> diff --git a/arch/s390/crypto/aes_s390.c b/arch/s390/crypto/aes_s390.c
-> index 9c46b1b630b1..7fd303df05ab 100644
-> --- a/arch/s390/crypto/aes_s390.c
-> +++ b/arch/s390/crypto/aes_s390.c
-> @@ -785,32 +785,25 @@ static void gcm_walk_start(struct gcm_sg_walk
-> *gw, struct scatterlist *sg,
->  	scatterwalk_start(&gw->walk, sg);
->  }
-> 
->  static inline unsigned int _gcm_sg_clamp_and_map(struct gcm_sg_walk 
-> *gw)
->  {
-> -	struct scatterlist *nextsg;
-> -
-> -	gw->walk_bytes = scatterwalk_clamp(&gw->walk, gw->walk_bytes_remain);
-> -	while (!gw->walk_bytes) {
-> -		nextsg = sg_next(gw->walk.sg);
-> -		if (!nextsg)
-> -			return 0;
-> -		scatterwalk_start(&gw->walk, nextsg);
-> -		gw->walk_bytes = scatterwalk_clamp(&gw->walk,
-> -						   gw->walk_bytes_remain);
-> -	}
-> -	gw->walk_ptr = scatterwalk_map(&gw->walk);
-> +	if (gw->walk_bytes_remain == 0)
-> +		return 0;
-> +	gw->walk_ptr = scatterwalk_next(&gw->walk, gw->walk_bytes_remain,
-> +					&gw->walk_bytes);
->  	return gw->walk_bytes;
->  }
-> 
->  static inline void _gcm_sg_unmap_and_advance(struct gcm_sg_walk *gw,
-> -					     unsigned int nbytes)
-> +					     unsigned int nbytes, bool out)
->  {
->  	gw->walk_bytes_remain -= nbytes;
-> -	scatterwalk_unmap(gw->walk_ptr);
-> -	scatterwalk_advance(&gw->walk, nbytes);
-> -	scatterwalk_done(&gw->walk, 0, gw->walk_bytes_remain);
-> +	if (out)
-> +		scatterwalk_done_dst(&gw->walk, gw->walk_ptr, nbytes);
-> +	else
-> +		scatterwalk_done_src(&gw->walk, gw->walk_ptr, nbytes);
->  	gw->walk_ptr = NULL;
->  }
-> 
->  static int gcm_in_walk_go(struct gcm_sg_walk *gw, unsigned int 
-> minbytesneeded)
->  {
-> @@ -842,11 +835,11 @@ static int gcm_in_walk_go(struct gcm_sg_walk
-> *gw, unsigned int minbytesneeded)
-> 
->  	while (1) {
->  		n = min(gw->walk_bytes, AES_BLOCK_SIZE - gw->buf_bytes);
->  		memcpy(gw->buf + gw->buf_bytes, gw->walk_ptr, n);
->  		gw->buf_bytes += n;
-> -		_gcm_sg_unmap_and_advance(gw, n);
-> +		_gcm_sg_unmap_and_advance(gw, n, false);
->  		if (gw->buf_bytes >= minbytesneeded) {
->  			gw->ptr = gw->buf;
->  			gw->nbytes = gw->buf_bytes;
->  			goto out;
->  		}
-> @@ -902,11 +895,11 @@ static int gcm_in_walk_done(struct gcm_sg_walk
-> *gw, unsigned int bytesdone)
->  			memmove(gw->buf, gw->buf + bytesdone, n);
->  			gw->buf_bytes = n;
->  		} else
->  			gw->buf_bytes = 0;
->  	} else
-> -		_gcm_sg_unmap_and_advance(gw, bytesdone);
-> +		_gcm_sg_unmap_and_advance(gw, bytesdone, false);
-> 
->  	return bytesdone;
->  }
-> 
->  static int gcm_out_walk_done(struct gcm_sg_walk *gw, unsigned int 
-> bytesdone)
-> @@ -920,14 +913,14 @@ static int gcm_out_walk_done(struct gcm_sg_walk
-> *gw, unsigned int bytesdone)
->  		for (i = 0; i < bytesdone; i += n) {
->  			if (!_gcm_sg_clamp_and_map(gw))
->  				return i;
->  			n = min(gw->walk_bytes, bytesdone - i);
->  			memcpy(gw->walk_ptr, gw->buf + i, n);
-> -			_gcm_sg_unmap_and_advance(gw, n);
-> +			_gcm_sg_unmap_and_advance(gw, n, true);
->  		}
->  	} else
-> -		_gcm_sg_unmap_and_advance(gw, bytesdone);
-> +		_gcm_sg_unmap_and_advance(gw, bytesdone, true);
-> 
->  	return bytesdone;
->  }
-> 
->  static int gcm_aes_crypt(struct aead_request *req, unsigned int flags)
+> Just using this variable directly phydev->eee_cfg.tx_lpi_timer ?
 
-Reviewed-by: Harald Freudenberger <freude@linux.ibm.com>
-Tested-by:  Harald Freudenberger <freude@linux.ibm.com>
+Yes. We're already accessing phydev->enable_tx_lpi directly, and we
+have no helpers for this. Maybe it's more a question for Andrew,
+whether he wishes to see phylib helpers for this state rather than
+directly dereferencing phydev.
+
+> > In any case, I've been submitting phylink EEE support which will help
+> > driver authors get this correct, but I think it needs more feedback.
+> > Please can you look at my patch set previously posted which is now
+> > a bit out of date, review, and think about how this driver can make
+> > use of it.
+> 
+> Ack, will do. It looks like your port of lan743x to the new API
+> looks exactly like what I need for this driver too.
+> 
+> > In particular, I'd like ideas on what phylink should be doing with
+> > tx_lpi_timer values that are out of range of the hardware. Should it
+> > limit the value itself?
+> 
+> Yes, otherwise every MAC driver will need to do it in the
+> ethtool_set_eee() function.
+
+I've had several solutions, and my latest patch set actually has a
+mixture of them in there (which is why I'm eager to try and find a way
+forward on this, so I can fix the patch set):
+
+1. the original idea to address this in Marvell platforms was to limit
+   the LPI timer to the maximum representable value in the hardware,
+   which would be 255us. This ignores that the hardware uses a 1us
+   tick rate for the timer at 1G speeds, and 10us for 100M speeds.
+   (So it limits it to 260us, even though the hardware can do 2550us
+   at 100M speed). This limit was applied by clamping the value passed
+   in from userspace without erroring out.
+
+2. another solution was added the mac_validate_tx_lpi() method, and
+   implementations added _in addition_ to the above, with the idea
+   of erroring out for values > 255us on Marvell hardware.
+
+3. another idea was to have mac_enable_tx_lpi() error out if it wasn't
+   possible to allow e.g. falling back to a software timer (see stmmac
+   comments below.) Another reason for erroring out applies to Marvell
+   hardware, where PP2 hardware supports LPI on the GMAC but not the
+   XGMAC - so it only works at speeds at or below 2.5G. However, that
+   can be handled via the lpi_capabilities, so I don't think needs to
+   be a concern.
+
+> The other question is, should we allow absolute maximum values, or sane
+> maximum? At some point will come the question, why the EEE is even
+> enabled?
+
+As referenced above, stmmac uses the hardware timer for LPI timeouts up
+to and including 1048575us (STMMAC_ET_MAX). Beyond that, it uses a
+normal kernel timer which is:
+
+- disabled (and EEE mode reset) when we have a packet to transmit, or
+  EEE is disabled
+- is re-armed when cleaning up from packet transmission (although
+  it looks like we attempt to immediately enter LPI mode, and would
+  only wait for the timer if there are more packets to queue... maybe
+  this is a bug in stmmac's implementation?) or when EEE mode is first
+  enabled with a LPI timer longer than the above value.
+
+So, should phylink have the capability to switch to a software LPI timer
+implementation when the LPI timeout value exceeds what the hardware
+supports? To put it another way, should the stmmac solution to this be
+made generic?
+
+Note that stmmac has this software timer implementation because not
+only for the reason I've given above, but also because cores other than
+GMAC4 that support LPI do not have support for the hardware timer.
+
+> The same is about minimal value, too low value will cause strong speed
+> degradation. Should we allow set insane minimum, but use sane default
+> value?
+
+We currently allow zero, and the behaviour of that depends on the
+hardware. For example, in the last couple of days, it's been reported
+that stmmac will never enter LPI with a value of zero.
+
+Note that phylib defaults to zero, so imposing a minimum would cause
+a read-modify-write of the EEE settings without setting the timer to
+fail.
+
+> > Should set_eee() error out?
+> 
+> Yes, please.
+
+If we are to convert stmmac, then we need to consider what it's doing
+(as per the above) and whether that should be generic - and if it isn't
+what we want in generic code, then how do we allow drivers to do this if
+they wish.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
