@@ -1,143 +1,169 @@
-Return-Path: <netdev+bounces-156204-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156205-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90DA8A05814
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 11:25:36 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7AEA5A0581A
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 11:26:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 16CD01886AF2
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 10:25:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4D5EC7A19BC
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 10:25:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C062D1F3D3C;
-	Wed,  8 Jan 2025 10:25:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C7FD1F869A;
+	Wed,  8 Jan 2025 10:25:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="gUJbR3m3"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="fLHf7FbT";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="d+X1qumv"
 X-Original-To: netdev@vger.kernel.org
-Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AC5F18B463;
-	Wed,  8 Jan 2025 10:25:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 868D91F868B;
+	Wed,  8 Jan 2025 10:25:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736331930; cv=none; b=FGRPJ9olmSitNGxJcakRaLhqnegrd9WwRDgESTjxEdtscmtIxaVgHhEH2jFpkCMmr7/2Y1ilRZzsDz+VaIof/CcK6S9V1tB5DK37krv6yj77JYpSJvtncG3pLTZd6Hc+gtAlcIezsAtan1p2aHNUBhJBZP5+xa4C4fH9dfMbBBI=
+	t=1736331943; cv=none; b=OAplFsDi0AG45BZSoO+u9/Z78jrhXTyGgVIet6UpM8bCEveChs7X3YEOUMuWMDHYaw112a6UixzOp85mXmcwJfpfcONhBDwg4/yJBDn0YWo0vSMBX26NZe1yXuuOHUvT5BSZbIvLA/cJ1EHoHh8GG4ItuMfwq3RrdKK1VCRE8/Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736331930; c=relaxed/simple;
-	bh=3cZ55hodolcBonWydC/oE7gQh6CX1J5FFqedEknJZJQ=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=D9sGrMATHMWkGtcz9/DyGMBkZhLIGOLKNVL81dPUy7/eRsNUssXltdmoSu26CsJjwiE0jl3wKuk1b+U0SVoG8OZs6/2qRekdaScooD/yFI+SfwP6mmphSAU7fq3PzuiXG69puvBe0IkvSdkMclc2Cp7SWQdrVpRztzalCfT3KDg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=gUJbR3m3; arc=none smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by a.mx.secunet.com (Postfix) with ESMTP id 74B8020842;
-	Wed,  8 Jan 2025 11:25:25 +0100 (CET)
-X-Virus-Scanned: by secunet
-Received: from a.mx.secunet.com ([127.0.0.1])
-	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id RUVdqUoOIaqi; Wed,  8 Jan 2025 11:25:24 +0100 (CET)
-Received: from cas-essen-01.secunet.de (rl1.secunet.de [10.53.40.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by a.mx.secunet.com (Postfix) with ESMTPS id DC64720839;
-	Wed,  8 Jan 2025 11:25:24 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com DC64720839
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1736331924;
-	bh=usGPeQ402tsz9Fi75tKbQFlNSZtqq/m5TNddeEQ1ofg=;
-	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
-	b=gUJbR3m3btQZajtjq8qboCjn8896kCM0S6a2Sw6gXB2ufHgD0U6BPKA28Dgtzvdoe
-	 eCYwAncSUsaOxq9XIozt+Tu0OvoAsH1gTE00/IbjuDZClIvo3G0uaMMNsL3SmTPNI1
-	 A2YYoGoGING3SVYrv4KxMOh0tjwdeAmCQipxy52Z0MNIHZFUKy42nJvxOZiCbyXfOX
-	 n3UKdGzGaTifhipYMyOFIybRVJRnHRsTRwBpnyUWclczfev6akSA+WRPWo65xP/RTJ
-	 hCRP3GpWvDGjD7JbR7g0LlFA3KlSZS3kp1YYx7WAhhp6tpQg+zLTIjlHI+N0mHlsin
-	 Ltib/SSRC/gmA==
-Received: from mbx-essen-02.secunet.de (10.53.40.198) by
- cas-essen-01.secunet.de (10.53.40.201) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Wed, 8 Jan 2025 11:25:24 +0100
-Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
- (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Wed, 8 Jan
- 2025 11:25:24 +0100
-Received: by gauss2.secunet.de (Postfix, from userid 1000)
-	id 0F9DC3183F0A; Wed,  8 Jan 2025 11:25:24 +0100 (CET)
-Date: Wed, 8 Jan 2025 11:25:23 +0100
-From: Steffen Klassert <steffen.klassert@secunet.com>
-To: Leon Romanovsky <leon@kernel.org>
-CC: Jianbo Liu <jianbol@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"Eric Dumazet" <edumazet@google.com>, Herbert Xu
-	<herbert@gondor.apana.org.au>, Jakub Kicinski <kuba@kernel.org>, Jonathan
- Corbet <corbet@lwn.net>, <linux-doc@vger.kernel.org>,
-	<linux-rdma@vger.kernel.org>, <netdev@vger.kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, "Potnuri Bharat Teja" <bharat@chelsio.com>, Saeed
- Mahameed <saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>
-Subject: Re: [PATCH ipsec-next 1/2] xfrm: Support ESN context update to
- hardware for TX
-Message-ID: <Z35Sk688mOcePbJE@gauss3.secunet.de>
-References: <874f965d786606b0b4351c976f50271349f68b03.1734611621.git.leon@kernel.org>
- <20250107102204.GB87447@unreal>
- <Z30WcStdG5Z4tDru@gauss3.secunet.de>
- <20250107120905.GD87447@unreal>
+	s=arc-20240116; t=1736331943; c=relaxed/simple;
+	bh=V79sy8TwmY7YaNY2CtlOZFjZmfOzive83fCVC9e2RJY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=T5WoCRsjnJVv3su3X0m4v4xl3L6GpYUGhRMQXmYFXmUFhx+bAmambB3yaoDKG7o/GWIP90RNxF1qzmRN95qKacr8HLMBGnoUcX8NYwVjon60KL6d/8aVJKaDpEd2YBSFCAim8/FT8sEvCaYIEOw6qi85TDU1H+Cdgillz9NAfFw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=fLHf7FbT; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=d+X1qumv; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+Date: Wed, 8 Jan 2025 11:25:32 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1736331934;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=wDnajRGAKSDjhPvwubZBuXDZ5LOIoIGh7ZTlin0DXQc=;
+	b=fLHf7FbT3jWUtCXukcFugRf7ux0GvEBZXQ34F2GvVNuc6jEJ6rXMIk/0gbPcnh0QRsBBik
+	ZH3ffOAdXx+jQw2l6IeTrNWgg4FU5MHoOEwT287dgYnqqSJWIUTD6cRPVO8UKO9Ufn9J5w
+	ehxwrnAXOzEB4s0xNBLeeZ+okyETfb/JnSQV19TJaCce5Bq5qkWXtx2N/HoXaQVPExCWYd
+	DUXQZDkYJeGLmv5kowwshjtQfXIdKuSNEVCe4Ous4tlx5uwjYq7uwCF4OeMMgd/JaA+Tgk
+	YgLrZEhseffjCsdUyTy2iZPW94HHqYtGQXu6L9dZUOuHXkgk5UdJ8XYS5SEBxg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1736331934;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=wDnajRGAKSDjhPvwubZBuXDZ5LOIoIGh7ZTlin0DXQc=;
+	b=d+X1qumv8hLSPmGBE0V0HlJlSOVx7RABGGcSIKPjRWBa0lKe6iTmFw0d4lqxcYHkZ+W+MA
+	ZAWAW8hRoCIhoXDg==
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To: Wander Lairson Costa <wander@redhat.com>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Clark Williams <clrkwllms@kernel.org>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Jeff Garzik <jgarzik@redhat.com>,
+	Auke Kok <auke-jan.h.kok@intel.com>,
+	"moderated list:INTEL ETHERNET DRIVERS" <intel-wired-lan@lists.osuosl.org>,
+	"open list:NETWORKING DRIVERS" <netdev@vger.kernel.org>,
+	open list <linux-kernel@vger.kernel.org>,
+	"open list:Real-time Linux (PREEMPT_RT):Keyword:PREEMPT_RT" <linux-rt-devel@lists.linux.dev>
+Subject: Re: [PATCH iwl-net 0/4] igb: fix igb_msix_other() handling for
+ PREEMPT_RT
+Message-ID: <20250108102532.VWnKWvoo@linutronix.de>
+References: <20241204114229.21452-1-wander@redhat.com>
+ <20250107135106.WWrtBMXY@linutronix.de>
+ <taea3z7nof4szjir2azxsjtbouymqxyy4draa3hz35zbacqeeq@t3uidpha64k7>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20250107120905.GD87447@unreal>
-X-ClientProxiedBy: cas-essen-02.secunet.de (10.53.40.202) To
- mbx-essen-02.secunet.de (10.53.40.198)
-X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
+In-Reply-To: <taea3z7nof4szjir2azxsjtbouymqxyy4draa3hz35zbacqeeq@t3uidpha64k7>
 
-On Tue, Jan 07, 2025 at 02:09:05PM +0200, Leon Romanovsky wrote:
-> On Tue, Jan 07, 2025 at 12:56:33PM +0100, Steffen Klassert wrote:
-> > On Tue, Jan 07, 2025 at 12:22:04PM +0200, Leon Romanovsky wrote:
-> > > On Thu, Dec 19, 2024 at 02:37:29PM +0200, Leon Romanovsky wrote:
-> > > > From: Jianbo Liu <jianbol@nvidia.com>
-> > > > 
-> > > > Previously xfrm_dev_state_advance_esn() was added for RX only. But
-> > > > it's possible that ESN context also need to be synced to hardware for
-> > > > TX, so call it for outbound in this patch.
-> > > > 
-> > > > Signed-off-by: Jianbo Liu <jianbol@nvidia.com>
-> > > > Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
-> > > > ---
-> > > >  Documentation/networking/xfrm_device.rst                 | 3 ++-
-> > > >  drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c          | 3 +++
-> > > >  drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec.c | 3 +++
-> > > >  net/xfrm/xfrm_replay.c                                   | 1 +
-> > > >  4 files changed, 9 insertions(+), 1 deletion(-)
+On 2025-01-07 15:52:47 [-0300], Wander Lairson Costa wrote:
+> On Tue, Jan 07, 2025 at 02:51:06PM +0100, Sebastian Andrzej Siewior wrote:
+> > On 2024-12-04 08:42:23 [-0300], Wander Lairson Costa wrote:
+> > > This is the second attempt at fixing the behavior of igb_msix_other()
+> > > for PREEMPT_RT. The previous attempt [1] was reverted [2] following
+> > > concerns raised by Sebastian [3].
 > > > 
-> > > Steffen,
+> > > The initial approach proposed converting vfs_lock to a raw_spinlock,
+> > > a minor change intended to make it safe. However, it became evident
+> > > that igb_rcv_msg_from_vf() invokes kcalloc with GFP_ATOMIC,
+> > > which is unsafe in interrupt context on PREEMPT_RT systems.
 > > > 
-> > > This is kindly reminder.
+> > > To address this, the solution involves splitting igb_msg_task()
+> > > into two parts:
+> > > 
+> > >     * One part invoked from the IRQ context.
+> > >     * Another part called from the threaded interrupt handler.
+> > > 
+> > > To accommodate this, vfs_lock has been restructured into a double
+> > > lock: a spinlock_t and a raw_spinlock_t. In the revised design:
+> > > 
+> > >     * igb_disable_sriov() locks both spinlocks.
+> > >     * Each part of igb_msg_task() locks the appropriate spinlock for
+> > >     its execution context.
 > > 
-> > Sorry for the dealy, the holidays came faster than expected :)
-> > 
-> > > > diff --git a/net/xfrm/xfrm_replay.c b/net/xfrm/xfrm_replay.c
-> > > > index bc56c6305725..e500aebbad22 100644
-> > > > --- a/net/xfrm/xfrm_replay.c
-> > > > +++ b/net/xfrm/xfrm_replay.c
-> > > > @@ -729,6 +729,7 @@ static int xfrm_replay_overflow_offload_esn(struct xfrm_state *x, struct sk_buff
-> > > >  		}
-> > > >  
-> > > >  		replay_esn->oseq = oseq;
-> > > > +		xfrm_dev_state_advance_esn(x);
-> > 
-> > This is the only line of code that this patchset adds
-> > to the xfrm stack, so merging this through mlx5 might
-> > create less conflicts.
-> > 
-> > In case you want to do that, you can add my 'Acked-by'
-> > to this patch. Otherwise I'll pull it into the ipsec-next
-> > tree tomorrow.
+> > - Is this limited to PREEMPT_RT or does it also occur on PREEMPT systems
+> >   with threadirqs? And if this is PREEMPT_RT only, why?
 > 
-> Let's do it through your tree, please. IMHO, it is more appropriate.
+> PREEMPT systems configured to use threadirqs should be affected as well,
+> although I never tested with this configuration. Honestly, until now I wasn't
+> aware of the possibility of a non PREEMPT_RT kernel with threaded IRQs by default.
 
-Ok, series applied to ipsec-next, thanks everyone!
+If the issue is indeed the use of threaded interrupts then the fix
+should not be limited to be PREEMPT_RT only.
+
+> > - What causes the failure? I see you reworked into two parts to behave
+> >   similar to what happens without threaded interrupts. There is still no
+> >   explanation for it. Is there a timing limit or was there another
+> >   register operation which removed the mailbox message?
+> > 
+> 
+> I explained the root cause of the issue in the last commit. Maybe I should
+> have added the explanation to the cover letter as well.  Anyway, here is a
+> partial verbatim copy of it:
+> 
+> "During testing of SR-IOV, Red Hat QE encountered an issue where the
+> ip link up command intermittently fails for the igbvf interfaces when
+> using the PREEMPT_RT variant. Investigation revealed that
+> e1000_write_posted_mbx returns an error due to the lack of an ACK
+> from e1000_poll_for_ack.
+
+That ACK would have come if it would poll longer?
+
+> The underlying issue arises from the fact that IRQs are threaded by
+> default under PREEMPT_RT. While the exact hardware details are not
+> available, it appears that the IRQ handled by igb_msix_other must
+> be processed before e1000_poll_for_ack times out. However,
+> e1000_write_posted_mbx is called with preemption disabled, leading
+> to a scenario where the IRQ is serviced only after the failure of
+> e1000_write_posted_mbx."
+
+Where is this disabled preemption coming from? This should be one of the
+ops.write_posted() calls, right? I've been looking around and don't see
+anything obvious.
+Couldn't you wait for an event instead of polling?
+
+> The call chain from igb_msg_task():
+> 
+> igb_msg_task
+> 	igb_rcv_msg_from_vf
+> 		igb_set_vf_multicasts
+> 			igb_set_rx_mode
+> 				igb_write_mc_addr_list
+> 					kmalloc
+> 
+> Cannot happen from interrupt context under PREEMPT_RT. So this part of
+> the interrupt handler is deferred to a threaded IRQ handler.
+>
+> > > Cheers,
+> > > Wander
+
+Sebastian
 
