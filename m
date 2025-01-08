@@ -1,125 +1,132 @@
-Return-Path: <netdev+bounces-156172-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156173-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D9DC8A0547F
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 08:26:43 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 66EB9A054B0
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 08:37:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3C5103A5D87
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 07:26:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 21332162987
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 07:37:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA26B1A9B48;
-	Wed,  8 Jan 2025 07:26:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2126F1AB533;
+	Wed,  8 Jan 2025 07:37:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kL1bVe2e"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgeu2.qq.com (smtpbgeu2.qq.com [18.194.254.142])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 707DA1ACECE
-	for <netdev@vger.kernel.org>; Wed,  8 Jan 2025 07:26:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.194.254.142
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 489511AAA29
+	for <netdev@vger.kernel.org>; Wed,  8 Jan 2025 07:37:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736321196; cv=none; b=TAKtVH7Tr5zvvKadTdZEEl4zpchuu9oWFrf1rRAZKJpISMldHU8EwdZTw8JDKHocCzJIWCLTablEu3u2EOYOeKiFQ2xKGcrlKSRParyS2t0RMp3KFmTvYy1QVHe91sXhzMLeq7bN/kUUV0di1kU4dyZPxT6yOkTlVEBuloA/JMQ=
+	t=1736321836; cv=none; b=ueg0ziyZ1pjHqRyg8P/ymPTvWZQ+I5wZmyjP1o8FGmrIehbndWmDHV0V3ltKFzdvLjDSA8ZKJmv8eGBLLhsjdK4xXGF9bVa1f6r5MUpKAFeDXvEqwCLQ2vxIP7Bv/gmPqn8nyhLHN0XrorlIoz2r048SyKRKePnHYhOmdxkFqPw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736321196; c=relaxed/simple;
-	bh=xEQVnXYtMhz+dfxpJoxTKQp2ZQPjrXdGgd/2QLH+zfs=;
-	h=From:To:Cc:References:In-Reply-To:Subject:Date:Message-ID:
-	 MIME-Version:Content-Type; b=pgI8NpAfjhVtFM57pYhIK4VT49S+OmmXNOytnLPPDGteruMg0H4C8qW85y0uaQ7t7hC8pw5kSvaDiXzyxr84TpsTBTMhaV5Ka166qYJ/p80V6ldAqW6KkF9acVxEcb+q3fd6IY4NIgkJGTuk1O+gkFiqzs9YIyZAIc7fI6ZmFps=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=18.194.254.142
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
-X-QQ-mid:Yeas9t1736321181t488t14533
-Received: from 3DB253DBDE8942B29385B9DFB0B7E889 (jiawenwu@trustnetic.com [218.72.126.41])
-X-QQ-SSF:0000000000000000000000000000000
-From: =?utf-8?b?Smlhd2VuIFd1?= <jiawenwu@trustnetic.com>
-X-BIZMAIL-ID: 8239242233965610756
-To: "'Keller, Jacob E'" <jacob.e.keller@intel.com>,
-	"'Andrew Lunn'" <andrew@lunn.ch>
-Cc: <andrew+netdev@lunn.ch>,
-	<davem@davemloft.net>,
-	<edumazet@google.com>,
-	<kuba@kernel.org>,
-	<pabeni@redhat.com>,
-	<richardcochran@gmail.com>,
-	<linux@armlinux.org.uk>,
-	<horms@kernel.org>,
-	<netdev@vger.kernel.org>,
-	<mengyuanlou@net-swift.com>,
-	"'linglingzhang'" <linglingzhang@net-swift.com>
-References: <20250102103026.1982137-1-jiawenwu@trustnetic.com> <20250102103026.1982137-2-jiawenwu@trustnetic.com> <ab140807-2e49-4782-a58c-2b8d60da5556@lunn.ch> <032b01db600e$8d845430$a88cfc90$@trustnetic.com> <a4576efa-2d20-47e9-b785-66dbfda78633@lunn.ch> <035001db60ab$4707cfd0$d5176f70$@trustnetic.com> <2212dd13-1a02-4f67-a211-adde1ce58dc7@lunn.ch> <CO1PR11MB50894A28220E758BACAADDFBD6122@CO1PR11MB5089.namprd11.prod.outlook.com>
-In-Reply-To: <CO1PR11MB50894A28220E758BACAADDFBD6122@CO1PR11MB5089.namprd11.prod.outlook.com>
-Subject: RE: [PATCH net-next 1/4] net: wangxun: Add support for PTP clock
-Date: Wed, 8 Jan 2025 15:26:20 +0800
-Message-ID: <03e101db619e$9d11d440$d7357cc0$@trustnetic.com>
+	s=arc-20240116; t=1736321836; c=relaxed/simple;
+	bh=3u6bfLayhG54+WPRNwaf/qn6txkoyZ4B6wiWkKksZco=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=u1Zp2WHxRHGh9MYr5TkiWqwrzNI18FVQ56Yc2y07haDrBh15DHr/dm9jbPxCHDR0xdeaDhXIGjQU217chvX12u26ePEqq7qJJScR9q4I5kaMHC6dzWCvFMWA65sDa30Kvnf+j0foKpAD19GawEuN1aYzjMYYIdetD3yKvxKNLHM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kL1bVe2e; arc=none smtp.client-ip=192.198.163.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1736321824; x=1767857824;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=3u6bfLayhG54+WPRNwaf/qn6txkoyZ4B6wiWkKksZco=;
+  b=kL1bVe2eDJO1yNK2JotyMovEtVgo7mSzWJdEa8mAvsX5nn0YM9kA+LjI
+   /P0ge8DkVGYkdtyZEsEjrO/e7SuXFHd6O+1BeRH2iN+GntTdQDVzIKiBC
+   Z69/MxaCkWRf+c96CCIZAbhoMXGS9PXTuj2tOIpJ1zI+WVNVRPC+RUaXf
+   Yfzbnq9CPnN+EREYyQOomBdGaGLzeUt8DQamI1899+yWqN8rxr/we1/ZA
+   A61CG2t20nAAvzKFrfIiW0+LZPPy99U9Z1N5QZ0dlnqGrLLVtS6N02uVT
+   B18WglwCBtbWqSR1Rxmp3F8xk1cS0M7gYnpP8aMhsc5DqXfE19YdqPK5m
+   g==;
+X-CSE-ConnectionGUID: 9qOlcAh+QIer7z4VTB1zkw==
+X-CSE-MsgGUID: FbqC9XmQRwqNtNFOoVyA7w==
+X-IronPort-AV: E=McAfee;i="6700,10204,11308"; a="54081463"
+X-IronPort-AV: E=Sophos;i="6.12,297,1728975600"; 
+   d="scan'208";a="54081463"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jan 2025 23:37:03 -0800
+X-CSE-ConnectionGUID: tfkFk3DfQlG2R76nsCMEHA==
+X-CSE-MsgGUID: I5uzctEQSUqQrc844McEXg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,297,1728975600"; 
+   d="scan'208";a="103225655"
+Received: from unknown (HELO [10.107.18.17]) ([10.107.18.17])
+  by fmviesa008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jan 2025 23:36:59 -0800
+Message-ID: <66b95153-cb12-494d-851c-093a0006547f@linux.intel.com>
+Date: Wed, 8 Jan 2025 15:36:57 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 02/18] net: stmmac: move tx_lpi_timer tracking
+ to phylib
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+ Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Jose Abreu <joabreu@synopsys.com>,
+ linux-arm-kernel@lists.infradead.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+ Paolo Abeni <pabeni@redhat.com>
+References: <Z31V9O8SATRbu2L3@shell.armlinux.org.uk>
+ <E1tVCRZ-007Y35-9N@rmk-PC.armlinux.org.uk>
+Content-Language: en-US
+From: Choong Yong Liang <yong.liang.choong@linux.intel.com>
+In-Reply-To: <E1tVCRZ-007Y35-9N@rmk-PC.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Mailer: Microsoft Outlook 16.0
-Content-Language: zh-cn
-Thread-Index: AQEgJ35Ybs4gTOBDiJnQm6cX+eEXEQKNhMgNAhs0hhkDC4VZPgJmfkjnAhMzQ1oBv9qskwKvPFq9s/4CnzA=
-X-QQ-SENDSIZE: 520
-Feedback-ID: Yeas:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz8a-1
-X-QQ-XMAILINFO: NkLA2q2LD2295QQjPcbC8wCpgVWXuGXOjquTMJNCVt3+Bfd4R3tpnJEQ
-	o5ooBhu2C/G64HFjYjXZR1MiMWPXG7aixBlIYVsOYOgOrcKlQ0+ag2ejkRLOMCgVJKpMm0Q
-	lxFR01EYFKAxINT2mecyBcWYhFkISHVTDmURYn+MjzzZ+cQGcafOzSO+2leOouX1KO1HK/m
-	MchWEaGdUtwfKSPbDml3mqodosz7YRsm7Rn1FGZKDY0GJO+ZlnCn560hL7sCMPxq3mxV+EP
-	Etq7HldwciK2tpNUw3+IqfSB3nQwl8/DQYEWr+Ad3gYInj3PcxDtc462S2IQPu1eib0mQpf
-	68WleyTSdbFqVIjynpvTL7OQiOMzITQ2A3FQzHQXYLG3306l0pSo3J6G+R09+8ZY5fK0TY9
-	fm/f+GITd/aLgefhd2iNBgYqeG3mror/73hFPViYmabKstAcvsBvSlWuZRSGoehtZ/L0aME
-	F4GjX69mzZVB59+UF+htPErHZle4CwCp9r3CK6VPXgEfnRUxZGnfCJV8GS/az/4u/JnM/LT
-	GRdPRY7P1RlsWwhI+oB9Qbmsm6Qr9K+rgirrU30vg8a5BfjI/sgJSM96y3lHI5U1GEOz4AA
-	xE31+vdMdTyJhX0CIODER2qPGZMj9vQHNp7ZfwgQ28XlkNmB+G6kanjP38Tg2J9F0PemCL4
-	RV207e7nKKfqCsBwsFTJFIkDYVyYY2m+/7QuMIbK4yvqETy/KgKM1hd8XhM3bImfp1zsISF
-	Z1v04HliEgifSXiVcIUUGmaT4At+jd7qFzq0ounNXmooYmDrDQJiAQRqqWuBz+7JH8XFbik
-	0d1qp3QMZFXBC3EYyLgFuUF3To2yz85xJIFfUc2YkE5qVwddCsltQuI/5NAuavt9KdkG0Nd
-	bO33vojS+pk4gG8uFu7YPF0Ctj6FpNK+4/6ANVRr4+BctQrjyFjmHB0zliJmGgpYbpPgkDn
-	qXz0HOsvsRTHv4wQd9FnDqjSMj+CX+DFGspqg3KpcZGtUAsOrQ6XkfRHoQLWR1FD6e9e2z3
-	Sen4XvUw==
-X-QQ-XMRINFO: M/715EihBoGSf6IYSX1iLFg=
-X-QQ-RECHKSPAM: 0
 
-> > > > > > > +/**
-> > > > > > > + * wx_ptp_tx_hwtstamp_work
-> > > > > > > + * @work: pointer to the work struct
-> > > > > > > + *
-> > > > > > > + * This work item polls TSYNCTXCTL valid bit to determine when a Tx
-> > hardware
-> > > > > > > + * timestamp has been taken for the current skb. It is necessary,
-> > because the
-> > > > > > > + * descriptor's "done" bit does not correlate with the timestamp event.
-> > > > > > > + */
-> > > > > >
-> > > > > > Are you saying the "done" bit can be set, but the timestamp is not yet
-> > > > > > in place? I've not read the whole patch, but do you start polling once
-> > > > > > "done" is set, or as soon at the skbuff is queues for transmission?
-> > > > >
-> > > > > The descriptor's "done" bit cannot be used as a basis for Tx hardware
-> > > > > timestamp. So we should poll the valid bit in the register.
-> > > >
-> > > > You did not answer my question. When do you start polling?
-> > >
-> > > As soon at the skbuff is queues for transmission.
-> >
-> > I assume polling is not for free? Is it possible to start polling once
-> > 'done' is set? Maybe do some benchmarks and see if that saves you some
-> > cycles?
-> >
-> > 	Andrew
-> >
+
+
+On 8/1/2025 12:28 am, Russell King (Oracle) wrote:
+> When stmmac_ethtool_op_get_eee() is called, stmmac sets the tx_lpi_timer
+> and tx_lpi_enabled members, and then calls into phylink and thus phylib.
+> phylib overwrites these members.
 > 
-> Agreed, I would try to benchmark that. Timestamps need to be returned
-> relatively quickly, which means the polling rate needs to be high. This costs a lot
-> of CPU, and so any mechanism that lets you start later will help the CPU cost.
+> phylib will also cause a link down/link up transition when settings
+> that impact the MAC have been changed.
+> 
+> Convert stmmac to use the tx_lpi_timer setting in struct phy_device,
+> updating priv->tx_lpi_timer each time when the link comes up, rather
+> than trying to maintain this user setting itself. We initialise the
+> phylib tx_lpi_timer setting by doing a get_ee-modify-set_eee sequence
+> with the last known priv->tx_lpi_timer value. In order for this to work
+> correctly, we also need this member to be initialised earlier.
+> 
+> As stmmac_eee_init() is no longer called outside of stmmac_main.c, make
+> it static.
+> 
+> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 
-May not. We should notify the stack as soon as we get Tx hardware timestamp.
-But descriptor's "done" bit may hasn't been set yet.
+Hi Russell,
 
+I have completed the sanity test on the EEE changes to the stmmac driver.
 
+It seems that most of the changes are acceptable with respect to EEE behavior.
+
+However, I noticed that this part of the code requires a minor change to 
+fix the logic:
+
+	/* Configure phylib's copy of the LPI timer */
+	if (phylink_ethtool_get_eee(priv->phylink, &eee) == 0) {
+		eee.tx_lpi_timer = priv->tx_lpi_timer;
+		phylink_ethtool_set_eee(priv->phylink, &eee);
+	}
+
+Otherwise, the "tx_lpi_timer" will not be set correctly during the initial 
+state.
+
+Tested-by: Choong Yong Liang <yong.liang.choong@linux.intel.com>
 
