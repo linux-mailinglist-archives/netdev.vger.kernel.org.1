@@ -1,132 +1,114 @@
-Return-Path: <netdev+bounces-156200-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156201-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C122EA05799
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 11:07:36 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E4B9A0579B
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 11:08:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C342E7A2D0E
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 10:07:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D04873A5933
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 10:07:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D70921F708D;
-	Wed,  8 Jan 2025 10:07:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78B491ACEA2;
+	Wed,  8 Jan 2025 10:08:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CNuhXv1M"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="PtfGjMV6"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE45317C7B1;
-	Wed,  8 Jan 2025 10:07:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18A0C1F0E33
+	for <netdev@vger.kernel.org>; Wed,  8 Jan 2025 10:07:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736330841; cv=none; b=egdAUYU+mUhnzq2eE91xaU0aFNqfe2Fa4Ln5Zb33B+ZaCVUsMpP59FItzrfTiOJ3/2PdX0eN9XOELsxrlNI9maOFUC9WVws+mTF4eUHfrEwye43E4R+74Y0NABD1ud+2RKQA8+gWD8WM5PXGtW3qQ4fK9o1NflQoOqbU5cLFB7w=
+	t=1736330881; cv=none; b=gieOPL37ueT9jss4QwCuTOB2juDpjn/Jz7eem5hFpQKZo1V09wya/HWcDQjivFuGZ/lTWg7Xj+t09sSSvItEH/wzkteP6ne4YZP8/O6m09P4Pat5BKJ6HFyC8vw1w/7m4ia54n7kMk2yz6D1XvFNGxs5OVNA74pLVnDm6GCF/5o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736330841; c=relaxed/simple;
-	bh=kRy3NkapERa2jfPakFO6GuKPXGrT5j/wmYz9guJZFoc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qu2ywGEiVHVmwPVhqDjHY2B3JMjhcnnaxIt2ZVtPjJ6Yyd7ShzTxbgT11i5VX0p/oC14FwbatXikWd87fcVAejaWZl0EqQFsxmvuVBXWkNPMoAZ+AAFL3YaBfmoT9iq1/zsrqqavyZOUDDvXotRhFV352zyuu148QGUwmluUwwU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CNuhXv1M; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8EA1DC4CEE0;
-	Wed,  8 Jan 2025 10:07:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736330841;
-	bh=kRy3NkapERa2jfPakFO6GuKPXGrT5j/wmYz9guJZFoc=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=CNuhXv1MlCJ0j9NnYZq2yG8Rpf5FZcOjsP7QHZx2nBcXRaXiEZ750SADOyjv9XKDa
-	 xaDGG1VYqAp/2UbJQaRpWLkkW8652Igqab/sq5oFRg4Ma9vfGqyd2J83SzkN5vuXOI
-	 cIdA0HWvYa3kXcpmjY6TxCyKmjGFwybBru/Y9ErsQe+mNOFvALKVe/vCLRv3mvFtjy
-	 E2UnwP/MRPAuQejf2/o3owlrU2AmdMWLHqN0R5kTnDRedTUiQz7cAPsCrVFjx0p1ME
-	 fucl9WSYOyBT73wBGz4q+0W+9C5RTrJRPup65WsUiH93S8p85GVjcHaPaKZqJCiJdZ
-	 G+6tsKWgSlRIQ==
-Message-ID: <1ac62b6e-ee3d-499a-8817-f7cdfd2f2db5@kernel.org>
-Date: Wed, 8 Jan 2025 11:07:18 +0100
+	s=arc-20240116; t=1736330881; c=relaxed/simple;
+	bh=kk5f8gTS4BAqtR8GRVUopIZlRTyMZM6FgpS5frXvTQI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YwCCVPlxsibvRo60oBkfXB2g+kLmqk0s22eDXKpT0MIB1FwD7pxcmhd99tILIKt3nJFcjv4LEicuVI6CdADtEAZHHU+rnjrRY0xgg4SEdtSl71ubuo5dxw9zghcStDClLrvnJjQPnCnut0poFKNilKJlQ1blC/imCkUifVXZTvA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=PtfGjMV6; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=IM18OvxnC2Fka89jFAwkpiq2it51EwQpNq/r7/+W1qM=; b=PtfGjMV6PHxFkPsIypAGiLRCK7
+	iqSLKC1OGaVkSIc8VVHCRlTTXaizu2k7rcfRIJjTlqFwILbKNa+VgN5x8UW1RNQQToDvD3IKqKYqQ
+	UdTuwFuXYn3RncFb9zrzkwGJLE31h4YZKzdi6nDvgJYFZrld1MxZAJe2nDd4rOIxGaCcXK7RINXmc
+	I+/+RybMotW6qFPVCbjkW/6c27C9Xj6uo+IxXx7ZHQGOhM69/3PTT+6fJA0oflXXNC0PcM3lVH/h7
+	yl4bYMAx9fq62wORkA5tZU8aezNa97S0XYoA4XIByJsA4JNMAwosQooWALZ8SlU9DLvTzM/mgUM/U
+	gziQYczw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:60424)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1tVSyU-0000Lv-2r;
+	Wed, 08 Jan 2025 10:07:42 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1tVSyP-0006Bv-0q;
+	Wed, 08 Jan 2025 10:07:37 +0000
+Date: Wed, 8 Jan 2025 10:07:37 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Choong Yong Liang <yong.liang.choong@linux.intel.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Jose Abreu <joabreu@synopsys.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net-next v3 02/18] net: stmmac: move tx_lpi_timer
+ tracking to phylib
+Message-ID: <Z35OaQDLS_i2uL_b@shell.armlinux.org.uk>
+References: <Z31V9O8SATRbu2L3@shell.armlinux.org.uk>
+ <E1tVCRZ-007Y35-9N@rmk-PC.armlinux.org.uk>
+ <66b95153-cb12-494d-851c-093a0006547f@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [TEST] mptcp-connect
-Content-Language: en-GB
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- MPTCP Linux <mptcp@lists.linux.dev>
-References: <20250107131845.5e5de3c5@kernel.org>
-From: Matthieu Baerts <matttbe@kernel.org>
-Autocrypt: addr=matttbe@kernel.org; keydata=
- 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
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-In-Reply-To: <20250107131845.5e5de3c5@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <66b95153-cb12-494d-851c-093a0006547f@linux.intel.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Hi Jakub,
+Hi,
 
-(+cc MPTCP list)
+On Wed, Jan 08, 2025 at 03:36:57PM +0800, Choong Yong Liang wrote:
+> I have completed the sanity test on the EEE changes to the stmmac driver.
+> 
+> It seems that most of the changes are acceptable with respect to EEE behavior.
+> 
+> However, I noticed that this part of the code requires a minor change to fix
+> the logic:
+> 
+> 	/* Configure phylib's copy of the LPI timer */
+> 	if (phylink_ethtool_get_eee(priv->phylink, &eee) == 0) {
+> 		eee.tx_lpi_timer = priv->tx_lpi_timer;
+> 		phylink_ethtool_set_eee(priv->phylink, &eee);
+> 	}
+> 
+> Otherwise, the "tx_lpi_timer" will not be set correctly during the initial
+> state.
+> 
+> Tested-by: Choong Yong Liang <yong.liang.choong@linux.intel.com>
 
-On 07/01/2025 22:18, Jakub Kicinski wrote:
-> Unfortunately mptcp_connect.sh has started flaking again :(
-> Looks like it started around Dec 30th, so one of the recent PRs
+Thanks for testing. I can't update the series as there has been a power
+failure at home, hence the machine that has my git trees on is
+inaccessible at the moment.
 
-Thank you for the heads-up!
-
-After the last PR, I was focussing on monitoring simult_flows.sh -- the
-recent behaviour changes could have affected it -- and forgot to look at
-the others, sorry about that...
-
-It looks like our CI doesn't have this issue, but the builds are less
-frequent [1]. I'm going to investigate that ASAP.
-
-[1] https://ci-results.mptcp.dev/flakes.html?branch=export-net
-
-Cheers,
-Matt
 -- 
-Sponsored by the NGI0 Core fund.
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
