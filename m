@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-156192-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156194-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 021E7A05715
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 10:41:03 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A52CBA05734
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 10:43:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D0BFD7A114E
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 09:40:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AA965161F8F
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 09:43:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1A871F1309;
-	Wed,  8 Jan 2025 09:40:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E18F1A00FE;
+	Wed,  8 Jan 2025 09:43:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="emvOYUwx"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="HgmGUnVr"
 X-Original-To: netdev@vger.kernel.org
-Received: from fllv0015.ext.ti.com (fllv0015.ext.ti.com [198.47.19.141])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFE7918A6BD;
-	Wed,  8 Jan 2025 09:40:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.141
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 519F1156F3F;
+	Wed,  8 Jan 2025 09:43:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736329256; cv=none; b=uV43gdU8TLCwg6Qv6N24VvB0IBi1T7G93LDw+nMb9S+7NCL0YMLxvUN/qkyUFyG+NHc1RUEWACoKTm8F5DEFdjhDd+cRggSehWLmloGmx9h/mWSnDJUBgYHFneocUbaDzFtlBH8rMEf4VehpX+ivTQbxh5BwrwZqhnhhRNHh4iA=
+	t=1736329388; cv=none; b=cSbmriW6tpOI/QFapnk6Xd6GqBexwMEP+3nCgF9QJkPyX8jSm70zczC8+BMR4LXitUQs8AWaRqO0rIiqnEEtW+f+ZsdWbyK5xdozCBb2xv53x2GMsioE6odfggCQ9TbXjdW796gVBp/wUcdcg8Z+cTTOGynwb6niP1V5z85lydo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736329256; c=relaxed/simple;
-	bh=R2R1ob8MjWjO0Ho5d/K4vAfwseOJe20BS38o8gkU35Q=;
+	s=arc-20240116; t=1736329388; c=relaxed/simple;
+	bh=27Wi/ioyqkeBKgglqlzrOBuNeT/IA7PHZ6rndp8yNpc=;
 	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=oTND0nLduMmmMXZ8O5e/8PROlPhkctjMUUYMKURpifgPsQlzLqdMjC+QasDndbhY4SxBG668mB9yqdUZupkRWKvyIuA5jaEckVyYdwADW7mMZNBVr72YGvUWfrPlPIHZ/ZbPI61E4olRK8j2l1tjvtH+xP4fb74bbo5xRnG9eCw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=emvOYUwx; arc=none smtp.client-ip=198.47.19.141
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from lelv0265.itg.ti.com ([10.180.67.224])
-	by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id 5089eLlM064190;
-	Wed, 8 Jan 2025 03:40:21 -0600
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1736329221;
-	bh=SHqLg2OgtcaiNPNnY3X4GY4PryKUsFXu3JM4uuBTrPg=;
-	h=Date:Subject:To:CC:References:From:In-Reply-To;
-	b=emvOYUwxCZqVwKNQFmp5xo5YWjsAUkpXT8mrwx4GvshSIZVR99Dcua4v43VdvjEhH
-	 tvAU6NhRML2msBjflwrFuR6Ch9AygwtkXKS6+IzYqIr259tBzIk1DbzNz71F3GJLfB
-	 XZW5sjeGSGrE8cN55jPXJZPqRppKfsVr2tllvnyE=
-Received: from DLEE114.ent.ti.com (dlee114.ent.ti.com [157.170.170.25])
-	by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 5089eL6q017255
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Wed, 8 Jan 2025 03:40:21 -0600
-Received: from DLEE103.ent.ti.com (157.170.170.33) by DLEE114.ent.ti.com
- (157.170.170.25) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Wed, 8
- Jan 2025 03:40:20 -0600
-Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DLEE103.ent.ti.com
- (157.170.170.33) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Wed, 8 Jan 2025 03:40:20 -0600
-Received: from [10.24.69.25] (danish-tpc.dhcp.ti.com [10.24.69.25])
-	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 5089eEJc060529;
-	Wed, 8 Jan 2025 03:40:15 -0600
-Message-ID: <b8d46941-aeb2-466a-acd5-8ad5be832649@ti.com>
-Date: Wed, 8 Jan 2025 15:10:14 +0530
+	 In-Reply-To:Content-Type; b=JAdx3RjwSjG/qfCqsKZOZxiGFXgtqrvWUzYb7u8DNzZAzF8BGnfplgEk408pijdjg5lB+ETJmlkI/L9gmw9BlXtET5CsVWsAbkLW7ZhzG0MzDTNe16VIimWdq8tmUt2AAJ7tyYLBzuPDIut+nTm9jTwIibY6+718+cP1lnEmPLs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=HgmGUnVr; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5089AvcF010610;
+	Wed, 8 Jan 2025 09:42:47 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	jP2UVcYe43DrsnUl3Ch2ueDEccTyGDvlbJ9rlGh+p0I=; b=HgmGUnVr2aATS1Me
+	r+hwiVOHh7VfpTzPu1IuBNkweTByuEqtIMlIhVSiOEK/K2wRAdXaj7JOlT+dCj04
+	DNRcXixb+0Cya1PR9X1SSiPh2J354trIauOE6f02hZ7/GSfM08BSpa5oBkx2ArJJ
+	bUAnBTXc/f6siB6UAiTUyoQgsdvA8lXG0GxMxM7+xABCPX7rAo2VcwOPlj/Yg1CI
+	Uqkg+vZXAUZ6jrbrMawPQKZ0C1JyCv0MWjVuaLcS2ZHYkEpf0lfBcFNbEoN3X81a
+	8xFq5QvQX60QRTEmlSAWQ0v7m07WAtstKjm4T3e10sIWdcekqpBueTsQtJ0K9x+7
+	UPaRyw==
+Received: from nalasppmta05.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 441pgnr2nm-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 08 Jan 2025 09:42:46 +0000 (GMT)
+Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
+	by NALASPPMTA05.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 5089gjTL004331
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 8 Jan 2025 09:42:45 GMT
+Received: from [10.253.35.161] (10.80.80.8) by nalasex01c.na.qualcomm.com
+ (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Wed, 8 Jan 2025
+ 01:42:39 -0800
+Message-ID: <87a7729d-ccdd-46f0-bcfd-3915452344fd@quicinc.com>
+Date: Wed, 8 Jan 2025 17:42:37 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,285 +65,116 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 2/3] net: ti: icssg-prueth: Add Multicast
- Filtering support for VLAN in MAC mode
-To: Paolo Abeni <pabeni@redhat.com>, Jeongjun Park <aha310510@gmail.com>,
-        Alexander Lobakin <aleksander.lobakin@intel.com>,
-        Lukasz Majewski
-	<lukma@denx.de>, Meghana Malladi <m-malladi@ti.com>,
-        Diogo Ivo
-	<diogo.ivo@siemens.com>, Simon Horman <horms@kernel.org>,
-        Jakub Kicinski
-	<kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
-        "David S. Miller"
-	<davem@davemloft.net>,
+Subject: Re: [PATCH 2/3] net: stmmac: qcom-ethqos: Enable RX programmable swap
+ on qcs615
+To: Andrew Lunn <andrew@lunn.ch>
+CC: Krzysztof Kozlowski <krzk@kernel.org>, Vinod Koul <vkoul@kernel.org>,
         Andrew Lunn <andrew+netdev@lunn.ch>,
-        Roger Quadros
-	<rogerq@kernel.org>
-CC: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>, <srk@ti.com>,
-        Vignesh Raghavendra
-	<vigneshr@ti.com>,
-        Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
-        Larysa Zaremba <larysa.zaremba@intel.com>
-References: <20250103092033.1533374-1-danishanwar@ti.com>
- <20250103092033.1533374-3-danishanwar@ti.com>
- <133b8da8-a2da-4bac-b0bb-7dcaebc219b9@redhat.com>
- <31a45fb4-acb6-4eb6-9ffb-ff1be798a064@ti.com>
- <45fac9f0-b31a-495d-bd1b-ccf0fbe19653@redhat.com>
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo
+ Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski
+	<krzk+dt@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Bjorn Andersson
+	<andersson@kernel.org>,
+        Konrad Dybcio <konradybcio@kernel.org>,
+        Alexandre
+ Torgue <alexandre.torgue@foss.st.com>,
+        Jose Abreu <joabreu@synopsys.com>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>, <netdev@vger.kernel.org>,
+        <linux-arm-msm@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>,
+        <linux-stm32@st-md-mailman.stormreply.com>,
+        <linux-arm-kernel@lists.infradead.org>
+References: <20241225-support_10m100m-v1-0-4b52ef48b488@quicinc.com>
+ <20241225-support_10m100m-v1-2-4b52ef48b488@quicinc.com>
+ <4b4ef1c1-a20b-4b65-ad37-b9aabe074ae1@kernel.org>
+ <278de6e8-de8f-458a-a4b9-92b3eb81fa77@quicinc.com>
+ <e47f3b5c-9efa-4b71-b854-3a5124af06d7@lunn.ch>
 Content-Language: en-US
-From: MD Danish Anwar <danishanwar@ti.com>
-In-Reply-To: <45fac9f0-b31a-495d-bd1b-ccf0fbe19653@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+From: Yijie Yang <quic_yijiyang@quicinc.com>
+In-Reply-To: <e47f3b5c-9efa-4b71-b854-3a5124af06d7@lunn.ch>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 7bit
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01c.na.qualcomm.com (10.47.97.35)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: pqYADZSimNJLSAOnC9od8e9uOx41DZJZ
+X-Proofpoint-ORIG-GUID: pqYADZSimNJLSAOnC9od8e9uOx41DZJZ
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 mlxlogscore=891
+ mlxscore=0 suspectscore=0 impostorscore=0 lowpriorityscore=0 spamscore=0
+ adultscore=0 phishscore=0 priorityscore=1501 bulkscore=0 malwarescore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2411120000
+ definitions=main-2501080079
 
-Hi Paolo,
 
-On 07/01/25 11:57 pm, Paolo Abeni wrote:
-> Hi,
-> 
-> On 1/7/25 11:47 AM, MD Danish Anwar wrote:
->> On 07/01/25 3:12 pm, Paolo Abeni wrote:
->>> On 1/3/25 10:20 AM, MD Danish Anwar wrote:
->>>> Add multicast filtering support for VLAN interfaces in dual EMAC mode
->>>> for ICSSG driver.
->>>>
->>>> The driver uses vlan_for_each() API to get the list of available
->>>> vlans. The driver then sync mc addr of vlan interface with a locally
->>>> mainatined list emac->vlan_mcast_list[vid] using __hw_addr_sync_multiple()
->>>> API.
->>>>
->>>> The driver then calls the sync / unsync callbacks and based on whether
->>>> the ndev is vlan or not, driver passes appropriate vid to FDB helper
->>>> functions.
->>>>
->>>> This commit also exports __hw_addr_sync_multiple() in order to use it
->>>> from the ICSSG driver.
->>>>
->>>> Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
->>>> ---
->>>>  drivers/net/ethernet/ti/icssg/icssg_prueth.c | 67 ++++++++++++++++----
->>>>  drivers/net/ethernet/ti/icssg/icssg_prueth.h |  6 ++
->>>>  include/linux/netdevice.h                    |  3 +
->>>>  net/core/dev_addr_lists.c                    |  7 +-
->>>>  4 files changed, 66 insertions(+), 17 deletions(-)
->>>>
->>>> diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.c b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
->>>> index 1663941e59e3..ed8b5a3184d6 100644
->>>> --- a/drivers/net/ethernet/ti/icssg/icssg_prueth.c
->>>> +++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
->>>> @@ -472,30 +472,44 @@ const struct icss_iep_clockops prueth_iep_clockops = {
->>>>  
->>>>  static int icssg_prueth_add_mcast(struct net_device *ndev, const u8 *addr)
->>>>  {
->>>> -	struct prueth_emac *emac = netdev_priv(ndev);
->>>> -	int port_mask = BIT(emac->port_id);
->>>> +	struct net_device *real_dev;
->>>> +	struct prueth_emac *emac;
->>>> +	int port_mask;
->>>> +	u8 vlan_id;
->>>>  
->>>> -	port_mask |= icssg_fdb_lookup(emac, addr, 0);
->>>> -	icssg_fdb_add_del(emac, addr, 0, port_mask, true);
->>>> -	icssg_vtbl_modify(emac, 0, port_mask, port_mask, true);
->>>> +	vlan_id = is_vlan_dev(ndev) ? vlan_dev_vlan_id(ndev) : PRUETH_DFLT_VLAN_MAC;
->>>> +	real_dev = is_vlan_dev(ndev) ? vlan_dev_real_dev(ndev) : ndev;
->>>> +	emac = netdev_priv(real_dev);
->>>> +
->>>> +	port_mask = BIT(emac->port_id) | icssg_fdb_lookup(emac, addr, vlan_id);
->>>> +	icssg_fdb_add_del(emac, addr, vlan_id, port_mask, true);
->>>> +	icssg_vtbl_modify(emac, vlan_id, port_mask, port_mask, true);
->>>>  
->>>>  	return 0;
->>>>  }
->>>>  
->>>>  static int icssg_prueth_del_mcast(struct net_device *ndev, const u8 *addr)
->>>>  {
->>>> -	struct prueth_emac *emac = netdev_priv(ndev);
->>>> -	int port_mask = BIT(emac->port_id);
->>>> +	struct net_device *real_dev;
->>>> +	struct prueth_emac *emac;
->>>>  	int other_port_mask;
->>>> +	int port_mask;
->>>> +	u8 vlan_id;
->>>> +
->>>> +	vlan_id = is_vlan_dev(ndev) ? vlan_dev_vlan_id(ndev) : PRUETH_DFLT_VLAN_MAC;
->>>> +	real_dev = is_vlan_dev(ndev) ? vlan_dev_real_dev(ndev) : ndev;
->>>> +	emac = netdev_priv(real_dev);
->>>>  
->>>> -	other_port_mask = port_mask ^ icssg_fdb_lookup(emac, addr, 0);
->>>> +	port_mask = BIT(emac->port_id);
->>>> +	other_port_mask = port_mask ^ icssg_fdb_lookup(emac, addr, vlan_id);
->>>>  
->>>> -	icssg_fdb_add_del(emac, addr, 0, port_mask, false);
->>>> -	icssg_vtbl_modify(emac, 0, port_mask, port_mask, false);
->>>> +	icssg_fdb_add_del(emac, addr, vlan_id, port_mask, false);
->>>> +	icssg_vtbl_modify(emac, vlan_id, port_mask, port_mask, false);
->>>>  
->>>>  	if (other_port_mask) {
->>>> -		icssg_fdb_add_del(emac, addr, 0, other_port_mask, true);
->>>> -		icssg_vtbl_modify(emac, 0, other_port_mask, other_port_mask, true);
->>>> +		icssg_fdb_add_del(emac, addr, vlan_id, other_port_mask, true);
->>>> +		icssg_vtbl_modify(emac, vlan_id, other_port_mask,
->>>> +				  other_port_mask, true);
->>>>  	}
->>>>  
->>>>  	return 0;
->>>> @@ -531,6 +545,25 @@ static int icssg_prueth_hsr_del_mcast(struct net_device *ndev, const u8 *addr)
->>>>  	return 0;
->>>>  }
->>>>  
->>>> +static int icssg_update_vlan_mcast(struct net_device *vdev, int vid,
->>>> +				   void *args)
->>>> +{
->>>> +	struct prueth_emac *emac = args;
->>>> +
->>>> +	if (!vdev || !vid)
->>>> +		return 0;
->>>> +
->>>> +	netif_addr_lock_bh(vdev);
->>>> +	__hw_addr_sync_multiple(&emac->vlan_mcast_list[vid], &vdev->mc,
->>>> +				vdev->addr_len);
->>>> +	netif_addr_unlock_bh(vdev);
+
+On 2024-12-27 01:21, Andrew Lunn wrote:
+> On Thu, Dec 26, 2024 at 10:29:45AM +0800, Yijie Yang wrote:
+>>
+>>
+>> On 2024-12-25 19:37, Krzysztof Kozlowski wrote:
+>>> On 25/12/2024 11:04, Yijie Yang wrote:
 >>>
->>> At this point, isn't emac->vlan_mcast_list[vid] == vdev->mc?
->>>
+>>>>    static int qcom_ethqos_probe(struct platform_device *pdev)
+>>>>    {
+>>>> -	struct device_node *np = pdev->dev.of_node;
+>>>> +	struct device_node *np = pdev->dev.of_node, *root;
+>>>>    	const struct ethqos_emac_driver_data *data;
+>>>>    	struct plat_stmmacenet_data *plat_dat;
+>>>>    	struct stmmac_resources stmmac_res;
+>>>> @@ -810,6 +805,15 @@ static int qcom_ethqos_probe(struct platform_device *pdev)
+>>>>    	ret = of_get_phy_mode(np, &ethqos->phy_mode);
+>>>>    	if (ret)
+>>>>    		return dev_err_probe(dev, ret, "Failed to get phy mode\n");
 >>>> +
->>>> +	__hw_addr_sync_dev(&emac->vlan_mcast_list[vid], vdev,
->>>> +			   icssg_prueth_add_mcast, icssg_prueth_del_mcast);
+>>>> +	root = of_find_node_by_path("/");
+>>>> +	if (root && of_device_is_compatible(root, "qcom,sa8540p-ride"))
 >>>
->>> If so, can this function be reduced to just:
 >>>
->>> 	__dev_mc_sync(vdev, icssg_prueth_add_mcast, icssg_prueth_del_mcast);
->>>
->>> ?
+>>> Nope, your drivers are not supposed to poke root compatibles. Drop and
+>>> fix your driver to behave correctly for all existing devices.
 >>>
 >>
->> I don't know but for some reason __dev_mc_sync() doesn't work here. My
->> initial approach was to use __dev_mc_sync(vdev, sync, unsync) however it
->> didn't work.
->>
->> When I use __dev_mc_sync() and print the vlan_id in function
->> icssg_prueth_add_mcast(). It always prints vlan_id as 0 implying
->> __dev_mc_sync from here never gets called. Whereas when using
->> __hw_addr_sync_dev() I see the appropriate vlan_id in
->> icssg_prueth_add_mcast()
+>> Since this change introduces a new flag in the DTS, we must maintain ABI
+>> compatibility with the kernel. The new flag is specific to the board, so I
+>> need to ensure root nodes are matched to allow older boards to continue
+>> functioning as before. I'm happy to adopt that approach if there are any
+>> more elegant solutions.
 > 
-> It look like the above needs more investigation, right? is
-> vlan_mcast_list[vid] different from vdev->mc? why? At very least you
-> need to provide a clear explaination of the above.
+> Why is it specific to this board? Does the board have a PHY which is
+> broken and requires this property? What we are missing are the details
+> needed to help you get to the correct way to solve the problem you are
+> facing.
 > 
 
-I did further debug on this. At this point vlan_mcast_list[vid] is
-actually same as vdev->mc in terms of the multicast addresses.
+Let me clarify why this bit is necessary and why it's board-specific. 
+The RX programming swap bit can introduce a time delay of half a clock 
+cycle. This bit, along with the clock delay adjustment functionality, is 
+implemented by a module called 'IO Macro.' This is a Qualcomm-specific 
+hardware design located between the MAC and PHY in the SoC, serving the 
+RGMII interface. The bit works in conjunction with delay adjustment to 
+meet the sampling requirements. The sampling of RX data is also handled 
+by this module.
 
-However the sync_cnt and refcount of the addresses in both the lists are
-not same. Due to which vdev->mc doesn't work here. I will explain it.
+During the board design stage, the RGMII requirements may not have been 
+strictly followed, leading to uncertainty in the relationship between 
+the clock and data waveforms when they reach the IO Macro. This means 
+the time delay introduced by the PC board may not be zero. Therefore, 
+it's necessary for software developers to tune both the RX programming 
+swap bit and the delay to ensure correct sampling.
 
-__dev_mc_sync(vdev, sync, unsync) will call __hw_addr_sync_dev(&dev->mc,
-dev, sync, unsync)
-
-Now in __hw_addr_sync_dev() sync is only called when ha->sync_cnt == 0
-for the given mac address. If ha->sync_cnt is non zero, sync will not
-get called.
-
-When we add a multicast address to the vlan interface using below command,
-	
-	ip maddr add <mac_addr> dev eth1.6
-
-ndo_set_rx_mode() gets called for the vlan interface i.e.
-vlan_dev_set_rx_mode() [net/8021q/vlan_dev.c] which syncs mc list from
-the vdev to the real_dev of vdev by calling dev_mc_sync(real_dev, vdev)
-
-Now dev_mc_sync() sync addresses from vdev to real_dev using
-__hw_addr_sync().
-
-__hw_addr_sync() calls __hw_addr_sync_one() which after successfully
-syncing an address from vdev to real_dev increment the ha->sync_cnt. As
-a result at this point the ha->sync_cnt == 1 for the above address
-passed by command. After this vlan_dev_set_rx_mode() calls the
-set_rx_mode() of the real_dev.
-
-Now when icssg_update_vlan_mcast() calls __dev_mc_sync(vdev, sync,
-unsync), it calls _hw_addr_sync_dev(&dev->mc, dev, sync, unsync) and
-checks the ha->sync_cnt for the given address, since sync_cnt is already
-1, it doesn't consider it as an newly added address and sync / unsync
-callbacks are not called. [1]
-
-list_for_each_entry_safe(ha, tmp, &list->list, list) {
-	if (ha->sync_cnt)
-		continue;
-
-Since for addresses in vlan interfaces, sync_cnt will always be set as
-vlan_dev_set_rx_mode() will sync the mc list of vlan interface with the
-real dev. This will mean that the driver implemented sync / unsync APIs
-will only be called for the real_dev and the real_dev won't have any
-information about the vlan_id which I need in my sync / unsync APIs to
-populate the same in the hardware maintained FDB table.
-
-To overcome this, I am maintaining a local copy of vdev->mc named
-emac->vlan_mcast_list[vid]. I will sync address from vdev->mc to this.
-and then call __hw_addr_sync_dev() on this list as the sync_cnt for
-address in this list will still be zero. Which will then trigger my
-sync() callback on the vdev which will help me obtain the vlan_id in the
-sync callback. I can now populate the same in the hardware maintained
-FDB table.
-
-I hope this explains why I am using
-
-	__hw_addr_sync_dev(&emac->vlan_mcast_list[vid], vdev,
-icssg_prueth_add_mcast, icssg_prueth_del_mcast)
-
-instead of
-
-	__dev_mc_sync(vdev, icssg_prueth_add_mcast, icssg_prueth_del_mcast);
-
->> Anyways, Even if I use __dev_mc_sync(), we will still need the export. I
->> am exporting __hw_addr_sync_multiple() not __hw_addr_sync_dev(). The API
->> being used by me `__hw_addr_sync_dev()` is already exported.
-> 
-> I fear there is a misunderstanding. I'm suggesting dropping
-> __hw_addr_sync_multiple() usage entirely. If that is not possible, a
-> clear and complete explaination of the reason/root cause must be provided.
-> 
-
-As explained above, I need to be able to sync addresses from vdev->mc to
-my local list. Now this can be done using two APIs.
-
-1. __hw_addr_sync() - This is already exported and is actually the first
-choice. However this will fail syncing address from vdev->mc to my local
-copy.
-
-__hw_addr_sync() only syncs the address if ha->sync_cnt == 0. If the
-sync_cnt is non zero, this will skip the address. As explained above,
-for mc addresses of vlan interfaces, sync_cnt will always be set as
-vlan_dev_set_rx_mode() will sync the mc list of vlan interface with the
-real dev. As a result the addresses will be skipped and __hw_addr_sync()
-will not serve the purpose here.
-
-2. __hw_addr_sync_multiple() - This actually works perfectly fine here
-as it sync address even if sync_cnt is non zero. As a result I am using
-this function in my implementation.
-
-Since this is not public, I have to export it so that the driver can
-call this.
-
-So I am afraid dropping __hw_addr_sync_multiple() is not possible here.
-I hope the explanation above makes sense to you.
-
-Please let me know if this is OK with you. If you have some other way
-through which I can make this work please let me know.
-
-[1]
-https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git/tree/net/core/dev_addr_lists.c#n314
-
-> Thanks,
-> 
-> Paolo
+> 	Andrew
 > 
 
 -- 
-Thanks and Regards,
-Danish
+Best Regards,
+Yijie
+
 
