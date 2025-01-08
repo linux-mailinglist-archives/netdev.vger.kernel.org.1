@@ -1,134 +1,132 @@
-Return-Path: <netdev+bounces-156198-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156200-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6586EA0578F
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 11:04:11 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id C122EA05799
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 11:07:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9C9643A60AA
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 10:04:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C342E7A2D0E
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 10:07:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C07461F7589;
-	Wed,  8 Jan 2025 10:04:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D70921F708D;
+	Wed,  8 Jan 2025 10:07:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Bnv+xc/P"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CNuhXv1M"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 820201E04B8;
-	Wed,  8 Jan 2025 10:04:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE45317C7B1;
+	Wed,  8 Jan 2025 10:07:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736330646; cv=none; b=W6ylagIQQEknSXgN5i92ZMArn1DyEX0et+ZhF7WdpU+MvU9Hpx3Y6plloLBKWxTCX9YWixMM33QP13ZJsYkXD7Q6mMsf4HcSBnyWPIdqHnO7T9RnAfrM7RmBs51ErAqZbdu5LbYoh+IQBLUDUU9zE9FgvWrUXjtgfRssHKq+ms4=
+	t=1736330841; cv=none; b=egdAUYU+mUhnzq2eE91xaU0aFNqfe2Fa4Ln5Zb33B+ZaCVUsMpP59FItzrfTiOJ3/2PdX0eN9XOELsxrlNI9maOFUC9WVws+mTF4eUHfrEwye43E4R+74Y0NABD1ud+2RKQA8+gWD8WM5PXGtW3qQ4fK9o1NflQoOqbU5cLFB7w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736330646; c=relaxed/simple;
-	bh=5KwYH4MKyyoitxmJGTPwJ2BwzZVHBvtzdNuUVzIcjq8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IXGs0ciYDH3NpWSzrLfQ8RcvoS0JuJMcfrv1lej5/PHaFTZX+JU2fqphN8X6XbyjBBi5P8MvUugYMzSW/GBIBvMvTAzd5a2jso/6OK3cji+mvAEbcpcPi+WjPUM1SBPXx3JFA8tsw61EoX/+4TdXe8/e33MPf1GQvPN/Tu8Zwi8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Bnv+xc/P; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 84580C4CEE0;
-	Wed,  8 Jan 2025 10:04:00 +0000 (UTC)
+	s=arc-20240116; t=1736330841; c=relaxed/simple;
+	bh=kRy3NkapERa2jfPakFO6GuKPXGrT5j/wmYz9guJZFoc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=qu2ywGEiVHVmwPVhqDjHY2B3JMjhcnnaxIt2ZVtPjJ6Yyd7ShzTxbgT11i5VX0p/oC14FwbatXikWd87fcVAejaWZl0EqQFsxmvuVBXWkNPMoAZ+AAFL3YaBfmoT9iq1/zsrqqavyZOUDDvXotRhFV352zyuu148QGUwmluUwwU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CNuhXv1M; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8EA1DC4CEE0;
+	Wed,  8 Jan 2025 10:07:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736330645;
-	bh=5KwYH4MKyyoitxmJGTPwJ2BwzZVHBvtzdNuUVzIcjq8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Bnv+xc/PK2FCAs+2GaUvBwd7UbTuU4GQ3MiiHCCsetf986sJfqNJeq7fuB403Yih4
-	 8RNw5WADMUesaqrEP9p8FM2i4mTV5LFQWPW1gYvPQzYkD4P3oz5LtKCnOaYAiDtEkZ
-	 hA4NRwBFd19NY0pkAHBc1KtrARsO5P9UYWOa+v4VOtIEyGE8Z4cTfGZfZrKb0fBbPj
-	 LIGv+24XvoQquUlzBPqEoCPDt9Rrc/HQ7KEGp19qhG3drmCBJrcKuSqwbsbaDCW5ci
-	 FxDNF7AhHIP8KhUArRd+viWptL9inElqjWLuaN/n7vIYhcobAOzhdAoff8xiF3oxxY
-	 Pbh88EdGBZpWQ==
-Date: Wed, 8 Jan 2025 10:03:58 +0000
-From: Simon Horman <horms@kernel.org>
-To: Lei Wei <quic_leiwei@quicinc.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org, quic_kkumarcs@quicinc.com,
-	quic_suruchia@quicinc.com, quic_pavir@quicinc.com,
-	quic_linchen@quicinc.com, quic_luoj@quicinc.com,
-	srinivas.kandagatla@linaro.org, bartosz.golaszewski@linaro.org,
-	vsmuthu@qti.qualcomm.com, john@phrozen.org
-Subject: Re: [PATCH net-next v4 3/5] net: pcs: qcom-ipq9574: Add PCS
- instantiation and phylink operations
-Message-ID: <20250108100358.GG2772@kernel.org>
-References: <20250108-ipq_pcs_net-next-v4-0-0de14cd2902b@quicinc.com>
- <20250108-ipq_pcs_net-next-v4-3-0de14cd2902b@quicinc.com>
+	s=k20201202; t=1736330841;
+	bh=kRy3NkapERa2jfPakFO6GuKPXGrT5j/wmYz9guJZFoc=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=CNuhXv1MlCJ0j9NnYZq2yG8Rpf5FZcOjsP7QHZx2nBcXRaXiEZ750SADOyjv9XKDa
+	 xaDGG1VYqAp/2UbJQaRpWLkkW8652Igqab/sq5oFRg4Ma9vfGqyd2J83SzkN5vuXOI
+	 cIdA0HWvYa3kXcpmjY6TxCyKmjGFwybBru/Y9ErsQe+mNOFvALKVe/vCLRv3mvFtjy
+	 E2UnwP/MRPAuQejf2/o3owlrU2AmdMWLHqN0R5kTnDRedTUiQz7cAPsCrVFjx0p1ME
+	 fucl9WSYOyBT73wBGz4q+0W+9C5RTrJRPup65WsUiH93S8p85GVjcHaPaKZqJCiJdZ
+	 G+6tsKWgSlRIQ==
+Message-ID: <1ac62b6e-ee3d-499a-8817-f7cdfd2f2db5@kernel.org>
+Date: Wed, 8 Jan 2025 11:07:18 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250108-ipq_pcs_net-next-v4-3-0de14cd2902b@quicinc.com>
+User-Agent: Mozilla Thunderbird Beta
+Subject: Re: [TEST] mptcp-connect
+Content-Language: en-GB
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ MPTCP Linux <mptcp@lists.linux.dev>
+References: <20250107131845.5e5de3c5@kernel.org>
+From: Matthieu Baerts <matttbe@kernel.org>
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ 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
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <20250107131845.5e5de3c5@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Jan 08, 2025 at 10:50:26AM +0800, Lei Wei wrote:
-> This patch adds the following PCS functionality for the PCS driver
-> for IPQ9574 SoC:
-> 
-> a.) Parses PCS MII DT nodes and instantiate each MII PCS instance.
-> b.) Exports PCS instance get and put APIs. The network driver calls
-> the PCS get API to get and associate the PCS instance with the port
-> MAC.
-> c.) PCS phylink operations for SGMII/QSGMII interface modes.
-> 
-> Signed-off-by: Lei Wei <quic_leiwei@quicinc.com>
+Hi Jakub,
 
-...
+(+cc MPTCP list)
 
-> +static int ipq_pcs_enable(struct phylink_pcs *pcs)
-> +{
-> +	struct ipq_pcs_mii *qpcs_mii = phylink_pcs_to_qpcs_mii(pcs);
-> +	struct ipq_pcs *qpcs = qpcs_mii->qpcs;
-> +	int index = qpcs_mii->index;
-> +	int ret;
-> +
-> +	ret = clk_prepare_enable(qpcs_mii->rx_clk);
-> +	if (ret) {
-> +		dev_err(qpcs->dev, "Failed to enable MII %d RX clock\n", index);
-> +		return ret;
-> +	}
-> +
-> +	ret = clk_prepare_enable(qpcs_mii->tx_clk);
-> +	if (ret) {
-> +		dev_err(qpcs->dev, "Failed to enable MII %d TX clock\n", index);
-> +		return ret;
+On 07/01/2025 22:18, Jakub Kicinski wrote:
+> Unfortunately mptcp_connect.sh has started flaking again :(
+> Looks like it started around Dec 30th, so one of the recent PRs
 
-Hi Lei Wei,
+Thank you for the heads-up!
 
-I think you need something like the following to avoid leaking qpcs_mii->rx_clk.
+After the last PR, I was focussing on monitoring simult_flows.sh -- the
+recent behaviour changes could have affected it -- and forgot to look at
+the others, sorry about that...
 
-		goto err_disable_unprepare_rx_clk;
-	}
+It looks like our CI doesn't have this issue, but the builds are less
+frequent [1]. I'm going to investigate that ASAP.
 
-	return 0;
+[1] https://ci-results.mptcp.dev/flakes.html?branch=export-net
 
-err_disable_unprepare_rx_clk:
-	clk_disable_unprepare(qpcs_mii->rx_clk);
-	return ret;
-}
-
-Flagged by Smatch.
-
-> +	}
-> +
-> +	return 0;
-> +}
-
-...
-
+Cheers,
+Matt
 -- 
-pw-bot: changes-requested
+Sponsored by the NGI0 Core fund.
+
 
