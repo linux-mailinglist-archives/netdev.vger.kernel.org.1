@@ -1,146 +1,122 @@
-Return-Path: <netdev+bounces-156176-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156179-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4048A054DA
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 08:56:59 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E7C5EA05585
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 09:37:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 009733A2365
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 07:56:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9DAA11888081
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 08:37:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AF661ACEAF;
-	Wed,  8 Jan 2025 07:56:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EC461E570E;
+	Wed,  8 Jan 2025 08:37:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="XIWzUywA"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GkG/XGFu"
 X-Original-To: netdev@vger.kernel.org
-Received: from lelvem-ot02.ext.ti.com (lelvem-ot02.ext.ti.com [198.47.23.235])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF9DB1A83F9;
-	Wed,  8 Jan 2025 07:56:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.235
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF1891DFD85;
+	Wed,  8 Jan 2025 08:37:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736323015; cv=none; b=B5ZVPjYgpIyb6Y4LXifdpHAPAz5Ao3xYhPHfFl7+k67g6qiBbF54pvWdiUMmbbWtjNUPnDGyKvB1fPMuwdNnKYSqlc7L1amtgzFhKkMEidBugwW6Z5Wvi8oYX5tOnr7yrLGulJPBIK71nQPWC8oI7KOlvFymuRoaShRoHbBCYTg=
+	t=1736325427; cv=none; b=h7smiKeQZwZx91pBa6CjIjVFWYjpqZxBOjtRcf9yXDp80stN3uQ7yD9ICIw2WpFmzSyfNo0vjl7wRHHFRHIeIELM/nq00wF8cmxMKxTMCg55ZZW6GjttBzm7zCSLkDXsZDmIFD0pk4cnHT3UiKfknrSF+PDuvzEpfJGm2Zeny3o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736323015; c=relaxed/simple;
-	bh=e+ZlfikMJCRvQ+FiB+A8F4gr5P1SbR6gcxHqXQ60rFU=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=VCg4FH6L28wxI6i5qiAIeQUUks7VqHuDM18VDK+RwWVBJbUR4OAIcP7D+RUd5MGSePPasgW+NOkRr1zQluBR6Jr6ynI+j37ZSb8awmwxmrRdN9RS3XfPir6l+MjI6teVTNhZrXAKKC8RrJmCbg6YkzeHlOmBBIUvawhvAp/baYo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=XIWzUywA; arc=none smtp.client-ip=198.47.23.235
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from fllv0034.itg.ti.com ([10.64.40.246])
-	by lelvem-ot02.ext.ti.com (8.15.2/8.15.2) with ESMTPS id 5087uZXD3072777
-	(version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 8 Jan 2025 01:56:35 -0600
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1736322996;
-	bh=KOm+I1ztjs3NUKlqS45RCXVTmE0Fa8kZnCWTvoq5xP0=;
-	h=From:To:CC:Subject:Date;
-	b=XIWzUywAKrBu5ROPlQCGHGtOXXQbtpeHDUcEjNGdXM2xui/Lkpcf8kVTRUitlaeiL
-	 ewARfmQ7m83vuiqZKGuKZRhnD+XvMLEfKZICqrWBiq5GUIt3UiQENc+tuvflt8T2A/
-	 6THxL3TSfh5MzvQce6JfgxRRgWNyzlyxBrkM009g=
-Received: from DFLE104.ent.ti.com (dfle104.ent.ti.com [10.64.6.25])
-	by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 5087uZe8047240
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Wed, 8 Jan 2025 01:56:35 -0600
-Received: from DFLE108.ent.ti.com (10.64.6.29) by DFLE104.ent.ti.com
- (10.64.6.25) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Wed, 8
- Jan 2025 01:56:35 -0600
-Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DFLE108.ent.ti.com
- (10.64.6.29) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Wed, 8 Jan 2025 01:56:35 -0600
-Received: from sudheertest-HP-Z2-Tower-G5-Workstation.dhcp.ti.com (sudheertest-hp-z2-tower-g5-workstation.dhcp.ti.com [172.24.227.182])
-	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 5087uV5M065620;
-	Wed, 8 Jan 2025 01:56:31 -0600
-From: Sudheer Kumar Doredla <s-doredla@ti.com>
-To: <s-vadapalli@ti.com>, <rogerq@kernel.org>, <andrew+netdev@lunn.ch>,
-        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>, <horms@kernel.org>, <gnault@redhat.com>,
-        <linux-omap@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-CC: <s-doredla@ti.com>, <t-patil@ti.com>, <j-keerthy@ti.com>
-Subject: [PATCH net]
-Date: Wed, 8 Jan 2025 13:43:03 +0530
-Message-ID: <20250108081303.228653-1-s-doredla@ti.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1736325427; c=relaxed/simple;
+	bh=nxtV4VMFqi9OawJzTCLL5xTqLQUX4En71MCqEoFkWhU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=bGhq08b60gmuQSYhD4NA0IOtPEloev+NFwMVNw3UydjSlO8yg8vMLjNd8JRBJ3AYUAQrrLKTXKw5L0dVuv1fBNYNKQjgpC4RvIa9kfZCBqJmGL3xUopEXWixZ1udyf6trUKaLRC0QGPvJobZrwv+xz8Seo6U2Rw/pnVNjo4t6aE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GkG/XGFu; arc=none smtp.client-ip=209.85.221.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-385e0e224cbso8206786f8f.2;
+        Wed, 08 Jan 2025 00:37:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1736325424; x=1736930224; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vvettVxfJ9lYY3or3UxLpfyl/cdkwWLgR9kVNnFx6ho=;
+        b=GkG/XGFuEu5fAXYebJ4D+UF1kCOvf9KEv5Ag5qbcOcJAET7p6asIOac8DWx2wzvJDZ
+         pjsikSy6uVdjOKqW9paEA0jTn8RZx0LJHyGP/wxPT4aNsmYUoE2r/UC5+Fq5ZoIDbKCs
+         a2aUfCfzCy+IG4Ph97QlCttaG3A529UNFGBTrr29exWwqgS0FVq0WInljhlpEplKUHpj
+         wiTGspRSfpECmN/hiWF8WjtrkqJMhXIeRUcxVmXklHnrtSiU89rV7S0mRwEtZpikEEAR
+         h+Nx16D+VSFoDiHkbZoeWEopuBkR7bVXVsELelqj/LwjeoUSf9+L9P2dZjHRjm6u0zU0
+         Kx6g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736325424; x=1736930224;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=vvettVxfJ9lYY3or3UxLpfyl/cdkwWLgR9kVNnFx6ho=;
+        b=m+pWUZwxKfJgwVuUdGn763aHhLkNaIxAvh68RRB6/1gvx8+swbfyQd5l7Tf0Wugbbr
+         Yny3fAPyKz0d1zofR8KqIQy3Rz1JwGN2InDMqB291J9+r1YNlP6AbQtgWqR68Uw/P+YE
+         +NGEc8L+6nM/1mNqd68r3cufap23ayN7qoh267u35N01avs9fqYjC9hv4L7BTYOw+amY
+         XbHVP4WNEHNM35RXgr4opxV5ElXSegLi5lGHD328EgcoY8yGmNy+K1IWUhNYPcZZEqh5
+         2AahZ7puXNO1b8tl/vRyZq3DlScuseAiUG5zgC1FnUnfZBptNswzZqi4fvBq6bQnZiZp
+         rkdQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU1/Jb0JC861p9qQ0YT6w8tlcDRadJm1mVthU/GJCJ/aPs2/OG/bPF/E+vGj8NDZTEEpH+spV/U5w2u0HL6@vger.kernel.org, AJvYcCUIpC5zXE0t7oUvcWB/V5IeOSQEb3JyBJzcdMECOlhskj1Xem9ljid6oOgOKT5zkVI3dmW0OKvwyFX5BQ==@vger.kernel.org, AJvYcCUnkqVuCcgIhOlnH3+L/QACy0lOxR/Ys+uI9ak8zCrS3p2FxzPR79dz+pSIZdzsCgaSIUHUr/cjvhN4akK6niVV@vger.kernel.org, AJvYcCVIbb/HaeVt1BOSQenc3OJpSPpQIacorerpd9MePdSYL3jCWzso+TrZXa6em5lJPSVGPuUl/fk2LaQj@vger.kernel.org, AJvYcCVpGooN8S/3Sw6DQInUjv1FPTQfAryiBRlzT3hgHXdWQsh941xOaxHDwgormT6NAuWOwsc=@vger.kernel.org, AJvYcCVq7cHEQ23b622HzPTsykqdggc42oImWyP3Yn3AJjFH73sk2dQNa6tBt72gYSJ89qejQD+Cjg0DW4vP@vger.kernel.org, AJvYcCX09hsXpcdb5GMNx6wwVF199+rvCqpA7DoQR4ZjFFwtngpriT2OzVgTSiwrcTvHMBdGXWEBRSDOyuYVxFQrkj4=@vger.kernel.org, AJvYcCXB62Jhgio/XGsI9ATOEF5oXPl/TM1IS053Dj2WLpllLOWs2UuvPOV63ewayHhMibiF7EbcNGyepuWKIg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyBilIsjevSNkgXOqOUdmeBdi+JOtq+QxJUmctclmpJcQcNzs3z
+	tgNrkECqI5OP2oLXAOk50oSX7tiMdVBkVWbmbjZ/2uw07cPwcssR0iLPn/GevJzv28CS/mAEdnh
+	Kdot9oXASowOyoWPaZEdaAwWxZTs=
+X-Gm-Gg: ASbGnctSFLdWZYz8JTEjL/mehGoOJcmW/NsZfn/rdixYNWZnlKxBwsifHeaE23bYTJj
+	3msWMhnCAE9iZcE9tQdFZNRpHWA6JCYSbCBpR
+X-Google-Smtp-Source: AGHT+IFnmy3aEmpEtSYOMGcp/W5oHyWUG1cZe2OhDShkb+8U3jvy3oPHzekY3BLrSLnXQaOhfCodhl5ttnW21/EGgAw=
+X-Received: by 2002:a05:6000:4712:b0:385:f38e:c0d3 with SMTP id
+ ffacd0b85a97d-38a8731a4d3mr1171129f8f.58.1736325423889; Wed, 08 Jan 2025
+ 00:37:03 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+References: <20250104125732.17335-1-shaw.leon@gmail.com> <20250104125732.17335-3-shaw.leon@gmail.com>
+ <20250107123805.748080ab@kernel.org>
+In-Reply-To: <20250107123805.748080ab@kernel.org>
+From: Xiao Liang <shaw.leon@gmail.com>
+Date: Wed, 8 Jan 2025 16:36:26 +0800
+X-Gm-Features: AbW1kvZots7MSnDo6hVFO1pdLy0jTDp88J1frKk6l9Bo0g1-dsYfw260dsxsY30
+Message-ID: <CABAhCORV_s9m-EJ8914zUXCXt6O_e1wsaOVdSKUtm0Rbvc4orQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v7 02/11] rtnetlink: Pack newlink() params into struct
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	Kuniyuki Iwashima <kuniyu@amazon.com>, Donald Hunter <donald.hunter@gmail.com>, 
+	"David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Ido Schimmel <idosch@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>, Jiri Pirko <jiri@resnulli.us>, 
+	Hangbin Liu <liuhangbin@gmail.com>, linux-rdma@vger.kernel.org, 
+	linux-can@vger.kernel.org, osmocom-net-gprs@lists.osmocom.org, 
+	bpf@vger.kernel.org, linux-ppp@vger.kernel.org, wireguard@lists.zx2c4.com, 
+	linux-wireless@vger.kernel.org, b.a.t.m.a.n@lists.open-mesh.org, 
+	bridge@lists.linux.dev, linux-wpan@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-cpsw_ale_get_field was returning incorrect data when requesting higher
-word fields. Additionally, cpsw_ale_set_field was writing incorrect 
-data into the ALE entry while updating.
+On Wed, Jan 8, 2025 at 4:38=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wro=
+te:
+>
+> On Sat,  4 Jan 2025 20:57:23 +0800 Xiao Liang wrote:
+> > -static int amt_newlink(struct net *net, struct net_device *dev,
+> > -                    struct nlattr *tb[], struct nlattr *data[],
+> > -                    struct netlink_ext_ack *extack)
+> > +static int amt_newlink(struct rtnl_newlink_params *params)
+> >  {
+> > -     struct amt_dev *amt =3D netdev_priv(dev);
+> > +     struct netlink_ext_ack *extack =3D params->extack;
+> > +     struct net_device *dev =3D params->dev;
+> > +     struct nlattr **data =3D params->data;
+> > +     struct nlattr **tb =3D params->tb;
+> > +     struct net *net =3D params->net;
+> > +     struct amt_dev *amt;
+>
+> IMHO you packed a little too much into the struct.
+> Could you take the dev and the extack back out?
 
-For example, while reading word2, word3 fields (62 to 64 bits), the word3
-data was shifted to an incorrect position after reading. The same issue
-occurred when setting an ALE entry.
-
-This patch fixes the shifting of the word3 data by aligning it with the
-required fileds, ensuring the correct value is returned from
-cpsw_ale_get_field, even for higher words.
-It also ensures the correct vlaue is written into ALE entry using
-cpsw_ale_set_field.
-
-Signed-off-by: Sudheer Kumar Doredla <s-doredla@ti.com>
----
- drivers/net/ethernet/ti/cpsw_ale.c | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
-
-diff --git a/drivers/net/ethernet/ti/cpsw_ale.c b/drivers/net/ethernet/ti/cpsw_ale.c
-index 64bf22cd860c..9eccc7064c2b 100644
---- a/drivers/net/ethernet/ti/cpsw_ale.c
-+++ b/drivers/net/ethernet/ti/cpsw_ale.c
-@@ -106,15 +106,15 @@ struct cpsw_ale_dev_id {
- 
- static inline int cpsw_ale_get_field(u32 *ale_entry, u32 start, u32 bits)
- {
--	int idx, idx2;
-+	int idx, idx2, index;
- 	u32 hi_val = 0;
- 
- 	idx    = start / 32;
- 	idx2 = (start + bits - 1) / 32;
- 	/* Check if bits to be fetched exceed a word */
- 	if (idx != idx2) {
--		idx2 = 2 - idx2; /* flip */
--		hi_val = ale_entry[idx2] << ((idx2 * 32) - start);
-+		index = 2 - idx2; /* flip */
-+		hi_val = ale_entry[index] << ((idx2 * 32) - start);
- 	}
- 	start -= idx * 32;
- 	idx    = 2 - idx; /* flip */
-@@ -124,16 +124,16 @@ static inline int cpsw_ale_get_field(u32 *ale_entry, u32 start, u32 bits)
- static inline void cpsw_ale_set_field(u32 *ale_entry, u32 start, u32 bits,
- 				      u32 value)
- {
--	int idx, idx2;
-+	int idx, idx2, index;
- 
- 	value &= BITMASK(bits);
- 	idx = start / 32;
- 	idx2 = (start + bits - 1) / 32;
- 	/* Check if bits to be set exceed a word */
- 	if (idx != idx2) {
--		idx2 = 2 - idx2; /* flip */
--		ale_entry[idx2] &= ~(BITMASK(bits + start - (idx2 * 32)));
--		ale_entry[idx2] |= (value >> ((idx2 * 32) - start));
-+		index = 2 - idx2; /* flip */
-+		ale_entry[index] &= ~(BITMASK(bits + start - (idx2 * 32)));
-+		ale_entry[index] |= (value >> ((idx2 * 32) - start));
- 	}
- 	start -= idx * 32;
- 	idx = 2 - idx; /* flip */
--- 
-2.34.1
-
+Sure. I thought you were suggesting packing them all
+in review of v3...
 
