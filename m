@@ -1,140 +1,134 @@
-Return-Path: <netdev+bounces-156162-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156163-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EEF43A05311
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 07:11:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B2C1DA0532F
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 07:28:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DED86166A08
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 06:11:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A55E01633F9
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 06:28:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B0F319F133;
-	Wed,  8 Jan 2025 06:11:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="bkEZuCDu"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C8411A7264;
+	Wed,  8 Jan 2025 06:28:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-9102.amazon.com (smtp-fw-9102.amazon.com [207.171.184.29])
+Received: from smtpbguseast2.qq.com (smtpbguseast2.qq.com [54.204.34.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 990B6225D7
-	for <netdev@vger.kernel.org>; Wed,  8 Jan 2025 06:11:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.184.29
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 908941A4F1B
+	for <netdev@vger.kernel.org>; Wed,  8 Jan 2025 06:28:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.204.34.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736316677; cv=none; b=TBle2FoxV1CAxrCaPfOt5Ia+X259k7g4aJHZeit6ILGIjktqpJP9q0yUlRm2hMCMpXUOxbF6MKQbETUJKT35VVCKOd9MWTZQFIBYLhnL9zhdhFIpfNODWq3Er/yaD4sfzMN0miIXVqwtrtM+ae2dmxe1NDxRRlPwUtQdUh0XFG4=
+	t=1736317721; cv=none; b=He19ts1y3DoLQhp8ZlWFN9R4H1BHztwjIVLnRd9YLY44iifU4d9ZJThIg6QlvbvZE/C/+HJ6Otxv8PwsyXrnXirzc60ph9y9RH01EZ1MqyP3xAJ1oCud6svONTE9vGnETojPdFZ6PLvSlFTt5YQqUPkk9yrF/A35sAlbWmow87M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736316677; c=relaxed/simple;
-	bh=GbKJdMLVaFfGdsn46/7g24MRDtjORUBxjW+BBv4ppTs=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=InWrBRmN5GwMmF+bJ2x+AIWkSDtDgeT97z03eTrp0oTTVkd43B6gU1sk3ETz8QlPnV1548sodc9T216+5lC5QtBUW/xfxHSjjSoz8oya4CMKgtnSbUZ2zhTNWmbs4rpNQU05qVt2esRUvgBTOmENMfeOlYe0MvBLvOWqGzKsOGo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=bkEZuCDu; arc=none smtp.client-ip=207.171.184.29
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1736316677; x=1767852677;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=ivjUWeVWFHbced6TbMeo0Y2sSnfGtZuuLTx5LMpRyRc=;
-  b=bkEZuCDurQX362oO2kM6PQ0+ZbDLfWcsKulQBTke7f6ytNrNfFVITnch
-   zdySHOHpTey9jkGA80lFu2kdV6XABBoPni7gKjDyMw6wEzrdhR6ylRnsX
-   YDenaSQdHnTJjSZoIGS9tH8ZmZT1OsYW/hJQHl/sGBJvQkEBkg37PmOJV
-   w=;
-X-IronPort-AV: E=Sophos;i="6.12,297,1728950400"; 
-   d="scan'208";a="484427225"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-9102.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jan 2025 06:11:11 +0000
-Received: from EX19MTAUWB002.ant.amazon.com [10.0.38.20:46234]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.53.4:2525] with esmtp (Farcaster)
- id 685f5225-b8cb-447f-b4b2-c5281267222e; Wed, 8 Jan 2025 06:11:09 +0000 (UTC)
-X-Farcaster-Flow-ID: 685f5225-b8cb-447f-b4b2-c5281267222e
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Wed, 8 Jan 2025 06:11:03 +0000
-Received: from 6c7e67c6786f.amazon.com (10.37.244.7) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Wed, 8 Jan 2025 06:10:59 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <pabeni@redhat.com>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <horms@kernel.org>,
-	<kuba@kernel.org>, <kuni1840@gmail.com>, <kuniyu@amazon.com>,
-	<netdev@vger.kernel.org>
-Subject: Re: [PATCH v1 net-next 0/2] dev: Hold per-netns RTNL in register_netdev().
-Date: Wed, 8 Jan 2025 15:10:50 +0900
-Message-ID: <20250108061050.9328-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
-In-Reply-To: <3fe814ea-ede2-415a-8b3e-e09a29e4218d@redhat.com>
-References: <3fe814ea-ede2-415a-8b3e-e09a29e4218d@redhat.com>
+	s=arc-20240116; t=1736317721; c=relaxed/simple;
+	bh=J8CGx16ivWdsu0vHi1nOdqzusa/I7w5xMqZ8UCad9c0=;
+	h=From:To:Cc:References:In-Reply-To:Subject:Date:Message-ID:
+	 MIME-Version:Content-Type; b=MCXMJxJyuZv0q/O1wJWbgiszlMi8pQrFfWJQSrSjn5F9ym0JNTi/W2m72Rq0sKYt27QTzTS+bMe2VD9nUSlZSoHqg/CfZK8/9Q8xtH4WnewP1feDum+IkRFMr9k4WbtwQdwhnAIbfXAuxB+l57LS/fFqDg8lto0rInF+BAW7Huo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=54.204.34.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
+X-QQ-mid:Yeas6t1736317701t217t21531
+Received: from 3DB253DBDE8942B29385B9DFB0B7E889 (jiawenwu@trustnetic.com [218.72.126.41])
+X-QQ-SSF:0000000000000000000000000000000
+From: =?utf-8?b?Smlhd2VuIFd1?= <jiawenwu@trustnetic.com>
+X-BIZMAIL-ID: 8841218007050947155
+To: "'Keller, Jacob E'" <jacob.e.keller@intel.com>,
+	"'Richard Cochran'" <richardcochran@gmail.com>
+Cc: <andrew+netdev@lunn.ch>,
+	<davem@davemloft.net>,
+	<edumazet@google.com>,
+	<kuba@kernel.org>,
+	<pabeni@redhat.com>,
+	<linux@armlinux.org.uk>,
+	<horms@kernel.org>,
+	<netdev@vger.kernel.org>,
+	<vadim.fedorenko@linux.dev>,
+	<mengyuanlou@net-swift.com>
+References: <20250106084506.2042912-1-jiawenwu@trustnetic.com> <20250106084506.2042912-4-jiawenwu@trustnetic.com> <Z3vzwiMzYDvmKisj@hoboy.vegasvil.org> <CO1PR11MB5089788E11ECC1F9F704CEA7D6102@CO1PR11MB5089.namprd11.prod.outlook.com> <035701db60c9$4a2c1ea0$de845be0$@trustnetic.com> <CO1PR11MB5089A5A5ED6C76AA479BE1F4D6122@CO1PR11MB5089.namprd11.prod.outlook.com> <03ce01db6178$581f2ed0$085d8c70$@trustnetic.com>
+In-Reply-To: <03ce01db6178$581f2ed0$085d8c70$@trustnetic.com>
+Subject: RE: [PATCH net-next v2 3/4] net: wangxun: Implement do_aux_work of ptp_clock_info
+Date: Wed, 8 Jan 2025 14:28:20 +0800
+Message-ID: <03e001db6196$82ad8480$88088d80$@trustnetic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D033UWA003.ant.amazon.com (10.13.139.42) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Content-Type: text/plain;
+	charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+X-Mailer: Microsoft Outlook 16.0
+Content-Language: zh-cn
+Thread-Index: AQFgxPKZN8TRQHApGKDHehP8aTZMFAHs3nX/AX2EEwUDF5p6YQGOJ5kVAwF6KEcCsYTFCLOTiXHQ
+X-QQ-SENDSIZE: 520
+Feedback-ID: Yeas:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz8a-1
+X-QQ-XMAILINFO: MAMW4dxoxFytMlZ5pTWcdysxswP0sXuOqXA/zmRO7bPoaE6nL36ynaT7
+	eAeCn+0CTtphsNWFb65rq4w43CNJwzfYg6r+vTIMNbLXnUdSad5ZNvo2d0jXFPXLDZ7DgHl
+	fFC3qH7JjnukUU6lpD4xpss38pQufBuFQ/Dibi7Wl2xE0QM+6kfet86dHV0i5dcoEeM8om9
+	xT/gYNbpaJ9Io21ei9n1IYdoaLIYirYMvLbWBgkuzfceqjVww2gAX+G85RK6FGsNqtN5uOC
+	NE0ZfP40FJoideQS8M4bB5zMLgzKMLi8S13hu93IphwQsOmpUXH/+mEDEhgKJg6GQuMfc5f
+	BBbE5ymYuKasAYzoMHUGL7CpCjCp4zb/nflGESLParj4NMGy9IpoULQsns+vq/vUhQb7V5d
+	rOkZzF0Mb7EUpJvD+5oIGGWKfSOrTa0JqKetqSovrI4P9d8+G96tTyRM5U9XPjd+zaGui3N
+	6KrJ7wCnkzqiexdiisfyRoo+zIFwr+BK2Rd80ymMhLlbN2pO8YBdCIiPhg+1slBpmXA8wgb
+	pj/N67BaIwonnoPYuRgghNpqxmYvtxkm0DrMSVC5BVl9EQxkm9tyaX/q7xIPMUY2kONnM/j
+	3j8mYb9/+UktDKZJAVdTQ3I1UcIjmtBVjwbK5lm+pGJhlkmw8LPEvyI9ShMbzg7dh6D+DjX
+	r/zTecrhv9mU2iuc2z1epH93i8WPsZc5kNAMEjCiwCFyEo1pV2hJL6J63MQ7Uybes2eBY1E
+	cZVKwSGsfNh2ondqiWDjrVd6ySsTUwcvbhAKzoVnO1f9WWpxgymWRXfp6E/cvN+bjijkEKk
+	zyD+oy9N3SyND80uUFHDTJ1uHaeHDUs1uEs4Tv1h8O6T/W3PpahhHMbW49mYAvtV9PyF30S
+	ZN4mTFiyAjozuYYFCCaumuR2YQqqWn5COwuLoxxrzJ+ugPYEs0Ar1CJik7Sc9PYMyUx+f7T
+	EeTcpObRg4EuyylYYI37BCdA1Q0LLa9xz642HiNxtB89beGArRjl7Z5A2
+X-QQ-XMRINFO: NS+P29fieYNw95Bth2bWPxk=
+X-QQ-RECHKSPAM: 0
 
-From: Paolo Abeni <pabeni@redhat.com>
-Date: Tue, 7 Jan 2025 13:55:51 +0100
-> On 1/4/25 9:21 AM, Kuniyuki Iwashima wrote:
-> > Patch 1 adds rtnl_net_lock_killable() and Patch 2 uses it in
-> > register_netdev() and converts it and unregister_netdev() to
-> > per-netns RTNL.
-> > 
-> > With this and the netdev notifier series [0], ASSERT_RTNL_NET()
-> > for NETDEV_REGISTER [1] wasn't fired on a simplest QEMU setup
-> > like e1000 + x86_64_defconfig + CONFIG_DEBUG_NET_SMALL_RTNL.
-> > 
-> > [0]: https://lore.kernel.org/netdev/20250104063735.36945-1-kuniyu@amazon.com/
-> > 
-> > [1]:
-> > ---8<---
-> > diff --git a/net/core/rtnl_net_debug.c b/net/core/rtnl_net_debug.c
-> > index f406045cbd0e..c0c30929002e 100644
-> > --- a/net/core/rtnl_net_debug.c
-> > +++ b/net/core/rtnl_net_debug.c
-> > @@ -21,7 +21,6 @@ static int rtnl_net_debug_event(struct notifier_block *nb,
-> >  	case NETDEV_DOWN:
-> >  	case NETDEV_REBOOT:
-> >  	case NETDEV_CHANGE:
-> > -	case NETDEV_REGISTER:
-> >  	case NETDEV_UNREGISTER:
-> >  	case NETDEV_CHANGEMTU:
-> >  	case NETDEV_CHANGEADDR:
-> > @@ -60,19 +59,10 @@ static int rtnl_net_debug_event(struct notifier_block *nb,
-> >  		ASSERT_RTNL();
-> >  		break;
-> >  
-> > -	/* Once an event fully supports RTNL_NET, move it here
-> > -	 * and remove "if (0)" below.
-> > -	 *
-> > -	 * case NETDEV_XXX:
-> > -	 *	ASSERT_RTNL_NET(net);
-> > -	 *	break;
-> > -	 */
-> > -	}
-> > -
-> > -	/* Just to avoid unused-variable error for dev and net. */
-> > -	if (0)
-> > +	case NETDEV_REGISTER:
-> >  		ASSERT_RTNL_NET(net);
-> > +		break;
-> > +	}
-> >  
-> >  	return NOTIFY_DONE;
-> >  }
-> > ---8<---
+> > > > > > +static int wx_ptp_feature_enable(struct ptp_clock_info *ptp,
+> > > > > > +				 struct ptp_clock_request *rq, int on)
+> > > > > > +{
+> > > > > > +	struct wx *wx = container_of(ptp, struct wx, ptp_caps);
+> > > > > > +
+> > > > > > +	/**
+> > > > > > +	 * When PPS is enabled, unmask the interrupt for the ClockOut
+> > > > > > +	 * feature, so that the interrupt handler can send the PPS
+> > > > > > +	 * event when the clock SDP triggers. Clear mask when PPS is
+> > > > > > +	 * disabled
+> > > > > > +	 */
+> > > > > > +	if (rq->type != PTP_CLK_REQ_PPS || !wx->ptp_setup_sdp)
+> > > > > > +		return -EOPNOTSUPP;
+> > > > >
+> > > > > NAK.
+> > > > >
+> > > > > The logic that you added in patch #4 is a periodic output signal, so
+> > > > > your driver will support PTP_CLK_REQ_PEROUT and not PTP_CLK_REQ_PPS.
+> > > > >
+> > > > > Please change the driver to use that instead.
+> > > > >
+> > > > > Thanks,
+> > > > > Richard
+> > > >
+> > > > This is a common misconception because the industry lingo uses PPS to mean
+> > > > periodic output. I wonder if there's a place we can put an obvious warning
+> > > > about checking if you meant PEROUT... I've had this issue pop up with
+> > > > colleagues many times.
+> > >
+> > > Does a periodic output signal mean that a signal is output every second,
+> > > whenever the start time is? But I want to implement that a signal is
+> > > output when an integer number of seconds for the clock time.
+> > >
+> >
+> > The periodic output can be configured in a bunch of ways, including periods that
+> > are not a full second, when the signal should start, as well as in "one shot" mode
+> > where it will only trigger once. You should check the possible flags in
+> > <uapi/linux/ptp_clock.h> for the various options.
 > 
-> FTR, the above fooled a bit both PW and our scripts: I had to manually
-> mangle the cover letter into the merge commit. I guess it would be good
-> to avoid patch snips in the cover-letter,
+> Looks like I need to configure perout.phase {0, 0} to output signal at the closest next
+> second. And configure perout.period {0, 120 * 1000000} to keep the signal 120ms.
+> 
+> But where should I put these configuration? It used to be:
+> 
+> echo 1 > /sys/class/ptp/ptp0/pps_enable
 
-Oh sorry, noted.
+I see. Thanks for your suggestion.
 
-Thank you !
 
