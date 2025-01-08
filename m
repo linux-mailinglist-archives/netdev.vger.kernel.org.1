@@ -1,190 +1,162 @@
-Return-Path: <netdev+bounces-156257-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156258-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0128DA05B9C
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 13:28:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C6707A05BD8
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 13:43:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1FCD4165C07
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 12:28:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BABF7163F08
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 12:43:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0C071F9439;
-	Wed,  8 Jan 2025 12:27:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0A181F8F14;
+	Wed,  8 Jan 2025 12:43:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dpOUDf0w"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="uDvpDMLF"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B717E1F8667
-	for <netdev@vger.kernel.org>; Wed,  8 Jan 2025 12:27:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C6291F7589;
+	Wed,  8 Jan 2025 12:43:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736339279; cv=none; b=E3T+VS1/eIJMPJ/Vd6Aexge9V0Wv3z5ks1qbRbKcgcMXYjsG7boMUmu3mbjnEGwdDeXTJwjU4ALYX+rI+ZuZ8f2fk0SVqHqhuvVIEsq8ASbEY2uLB7pQ1kgHK7Xl4E412Tbo1w9HqlX2vbdhrIECfG43hw1sN0cw302Y7+Yk6jM=
+	t=1736340224; cv=none; b=E4AZZjGEzHLT6/MaGo3lQqMYLlw1TOTaZR+weaayudG0EW5rvw5rvFIPgG9hWcq6P0JrL7lJpN9P097gDvad/x5cAnj+ux8ChZEdWyBC/tMeL/oXTf1G9lElU9HWkV+Zdh22bWg6j0JjPDP+gy+wKVKm2h23u1nnjtYyBhzyzWI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736339279; c=relaxed/simple;
-	bh=XnLemeL4IHrhEImF6ctGxz/BFHYds4mn0cQmO+AnjTc=;
+	s=arc-20240116; t=1736340224; c=relaxed/simple;
+	bh=vWCs+jTm723AZBxSf005jm1TNBb6NgGISumffZNY77c=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PWLyWXNGKICixZ8wca1l87ILpFKFLmJ1BSvy3YSOL5z8j5ies+osL1bIPi80Vs+RGtA4e8lviSVnh3f6Zcc+YcQLqs2v8/oBjOUzGGab4xzdARcdBRC9jrCpt18sFrpRGReiIRlXnC5R+SOh8QLQ7FXcBhB2nFqR90Jlypb3zak=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dpOUDf0w; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1736339276;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=CE+ieq2Nnj1SjMfQGTDo5V1UJ6zv6x6ViYgzrgENqg0=;
-	b=dpOUDf0weDhWqHhyoIzZsqpSsrMU71Q4LyvD90jEJshrFb6O9TY+fmWghIBO40Wek3dggv
-	3mouxbHkQtP3oxIZbB0ENuLmu77Jssqvnacifiy+5/PDGE3YQT9wwBtx0lm0/ava6YOKgw
-	nod38Bq5JunEmbNPagDIbHLLSvFKyp0=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-605-XKN9bYAcNV2YaV0JKRTCRg-1; Wed, 08 Jan 2025 07:27:55 -0500
-X-MC-Unique: XKN9bYAcNV2YaV0JKRTCRg-1
-X-Mimecast-MFC-AGG-ID: XKN9bYAcNV2YaV0JKRTCRg
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-43651b1ba8aso112989445e9.1
-        for <netdev@vger.kernel.org>; Wed, 08 Jan 2025 04:27:55 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736339274; x=1736944074;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=CE+ieq2Nnj1SjMfQGTDo5V1UJ6zv6x6ViYgzrgENqg0=;
-        b=VILZO/w53NcNjmovXK9lWpl6YEEDiIM3Uq42LV8YEintwlFKIg5M9QHkODPC2p4VS1
-         pf1mXXFN+j6mjtNIs+rJcyqj4qrUwZ2g+PB0+FHnKPMiQ0jFLY8ff7tMM+PmVb9schtX
-         hzib0jS9U0vJe4ADeY4+rXfD2ecTv3Op4iO8/HrIWaayp7AMR/hLeLdpD2UvG4XR82+3
-         cuEzPngoOiM4lDQMYXUp3atK90hshufltwniU09jYCy6RVhPGF0qHR3BB8WcjB35VBRK
-         TIj8foaWGVXPH2BvPF5iziv6o6a5cY7a7GRoDCYfEMV+ner8wfIVV5gqh8T1lYZFGsaw
-         fYAA==
-X-Forwarded-Encrypted: i=1; AJvYcCVc0dmU4pCm+Y6wR/c1S+Yri9fMmBlT6tPAjdYiiJx9H4F78XrG5oSdRUOENwRlQIfMe2T6u0g=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxC6SGv2jMwODS/8zLf8CYeFXFoRniYZuH3hRKgSFKQX5W2V+xP
-	ingWZj3RZ0pZS/XjiJleVmePnlsTtd0imWuHmwHnGBLiq1HGDChJfrxp5Nh5VOM2oxdUt829c5S
-	bKr3GtaGJcUpyNkKWr8aL8SbkcQvN8UEc2U7k5GblT8kH0OroyqIK6Q==
-X-Gm-Gg: ASbGnctGS6JPiVDb91ynf4V3w4sIe3f7U7YMbv247E74m1tTEDeEFSOj7slRjyyquG9
-	fJGXr9RHn89j38N6CyrxpsQIzbr5tlfXiVzc+LuUqRdkfDlqF4RkLal51CmcOvoNwQLbtqzBJ9B
-	qTd80wm+DJeinXjwQwV+C7ALJJvivAV6jJ7ccZVIfaiCHjeYCPwSLEyXIAzBLr+o9uAu19NSC45
-	uxkSI0yOJeqhD2BWd/KpMkVGNOKpcjN+VwnUwBHbgg8Vuf+1Uk=
-X-Received: by 2002:a05:600c:511f:b0:436:1b96:7072 with SMTP id 5b1f17b1804b1-436e26867f6mr21830925e9.5.1736339274303;
-        Wed, 08 Jan 2025 04:27:54 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IENxKhGDHesgYkFwNwBJXCiFFCpFk4h9OPIuCpP1RPQAdqKF9uWZeo5HUnJYIpAberSrBMGeQ==
-X-Received: by 2002:a05:600c:511f:b0:436:1b96:7072 with SMTP id 5b1f17b1804b1-436e26867f6mr21830685e9.5.1736339273849;
-        Wed, 08 Jan 2025 04:27:53 -0800 (PST)
-Received: from redhat.com ([2a02:14f:175:d62d:93ef:d7e2:e7da:ed72])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-436e2e89dfesm19211805e9.32.2025.01.08.04.27.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 Jan 2025 04:27:53 -0800 (PST)
-Date: Wed, 8 Jan 2025 07:27:45 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: "Chia-Yu Chang (Nokia)" <chia-yu.chang@nokia-bell-labs.com>
-Cc: Jason Wang <jasowang@redhat.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"dsahern@gmail.com" <dsahern@gmail.com>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"dsahern@kernel.org" <dsahern@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"joel.granados@kernel.org" <joel.granados@kernel.org>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
-	"horms@kernel.org" <horms@kernel.org>,
-	"pablo@netfilter.org" <pablo@netfilter.org>,
-	"kadlec@netfilter.org" <kadlec@netfilter.org>,
-	"netfilter-devel@vger.kernel.org" <netfilter-devel@vger.kernel.org>,
-	"coreteam@netfilter.org" <coreteam@netfilter.org>,
-	"shenjian15@huawei.com" <shenjian15@huawei.com>,
-	"salil.mehta@huawei.com" <salil.mehta@huawei.com>,
-	"shaojijie@huawei.com" <shaojijie@huawei.com>,
-	"saeedm@nvidia.com" <saeedm@nvidia.com>,
-	"tariqt@nvidia.com" <tariqt@nvidia.com>,
-	"xuanzhuo@linux.alibaba.com" <xuanzhuo@linux.alibaba.com>,
-	"eperezma@redhat.com" <eperezma@redhat.com>,
-	"virtualization@lists.linux.dev" <virtualization@lists.linux.dev>,
-	"ij@kernel.org" <ij@kernel.org>,
-	"ncardwell@google.com" <ncardwell@google.com>,
-	"Koen De Schepper (Nokia)" <koen.de_schepper@nokia-bell-labs.com>,
-	"g.white@cablelabs.com" <g.white@cablelabs.com>,
-	"ingemar.s.johansson@ericsson.com" <ingemar.s.johansson@ericsson.com>,
-	"mirja.kuehlewind@ericsson.com" <mirja.kuehlewind@ericsson.com>,
-	"cheshire@apple.com" <cheshire@apple.com>,
-	"rs.ietf@gmx.at" <rs.ietf@gmx.at>,
-	"Jason_Livingood@comcast.com" <Jason_Livingood@comcast.com>,
-	"vidhi_goel@apple.com" <vidhi_goel@apple.com>
-Subject: Re: [PATCH v6 net-next 11/14] virtio_net: Accurate ECN flag in
- virtio_net_hdr
-Message-ID: <20250108072548-mutt-send-email-mst@kernel.org>
-References: <20241227191211.12485-1-chia-yu.chang@nokia-bell-labs.com>
- <20241227191211.12485-12-chia-yu.chang@nokia-bell-labs.com>
- <CACGkMEu990O+2Sedj+ASv0P5TnZR9THiOdHmx=L0hOxQRXPcsg@mail.gmail.com>
- <PAXPR07MB79849952690901A50688EFEDA3092@PAXPR07MB7984.eurprd07.prod.outlook.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=fE5PEroS48pujaS/kTBl06o+9r0gMFFsnqcfiCV/WZFGeciY5donDWIo+Fcl4eEWPCgU9Ib6ipO8mwWLC/vtvHGqkeFraP732l5ECoKFVfpe4gQg1LqkPjkXb4Yr2CKxzmIvorcBLb34bZKTK6yktzG+Y8uTrS9JVS9x6ndnngk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=uDvpDMLF; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=D+AuAWwzlG3/KL9PcXe30ni+Jn0MyzRe507IB6zEz8k=; b=uDvpDMLFrPPi6FegNmt4Xa0BAH
+	9ZC4D8vozM0TsLtKMPV5G9QHqfedpB32MOZdgQzVmSV3gqOMdwG2RjEfJupIKQYyKhNMumfu6MBJT
+	tXY2W3AKBt7JrmVXnjuZidRC1oYELhvHLa9UWs+BbTUwIZdNUbUAQFdZjd8Agkcty+ZP9WWgz+7cR
+	F0HS/Dpbl9zc3RNqDZXzJ2G3Pa9JtjzOZUg9ul5ImrDyE5iI9wNed5SjWOzdMRvmfqKaJLv4nY001
+	hSb6mxDuEN7iH3C2l1GiJlxv5HtJQNkWOltCE8EcwzCNwbf2O13MINZnczY/qPvqq1GWLrblS0GyB
+	wz0l8z5g==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:46968)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1tVVPJ-0000c5-1k;
+	Wed, 08 Jan 2025 12:43:33 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1tVVPG-0006Iu-2O;
+	Wed, 08 Jan 2025 12:43:30 +0000
+Date: Wed, 8 Jan 2025 12:43:30 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>, kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	UNGLinuxDriver@microchip.com, Phil Elwell <phil@raspberrypi.org>
+Subject: Re: [PATCH net-next v1 1/7] net: usb: lan78xx: Convert to PHYlink
+ for improved PHY and MAC management
+Message-ID: <Z35y8r32QFvZKQLI@shell.armlinux.org.uk>
+References: <20250108121341.2689130-1-o.rempel@pengutronix.de>
+ <20250108121341.2689130-2-o.rempel@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <PAXPR07MB79849952690901A50688EFEDA3092@PAXPR07MB7984.eurprd07.prod.outlook.com>
+In-Reply-To: <20250108121341.2689130-2-o.rempel@pengutronix.de>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Mon, Dec 30, 2024 at 09:50:59AM +0000, Chia-Yu Chang (Nokia) wrote:
-> >From: Jason Wang <jasowang@redhat.com> 
-> >Sent: Monday, December 30, 2024 8:52 AM
-> >To: Chia-Yu Chang (Nokia) <chia-yu.chang@nokia-bell-labs.com>
-> >Cc: netdev@vger.kernel.org; dsahern@gmail.com; davem@davemloft.net; edumazet@google.com; dsahern@kernel.org; pabeni@redhat.com; joel.granados@kernel.org; kuba@kernel.org; andrew+netdev@lunn.ch; horms@kernel.org; pablo@netfilter.org; kadlec@netfilter.org; netfilter-devel@vger.kernel.org; coreteam@netfilter.org; shenjian15@huawei.com; salil.mehta@huawei.com; shaojijie@huawei.com; saeedm@nvidia.com; tariqt@nvidia.com; mst@redhat.com; xuanzhuo@linux.alibaba.com; eperezma@redhat.com; virtualization@lists.linux.dev; ij@kernel.org; ncardwell@google.com; Koen De Schepper (Nokia) <koen.de_schepper@nokia-bell-labs.com>; g.white@cablelabs.com; ingemar.s.johansson@ericsson.com; mirja.kuehlewind@ericsson.com; cheshire@apple.com; rs.ietf@gmx.at; Jason_Livingood@comcast.com; vidhi_goel@apple.com
-> >Subject: Re: [PATCH v6 net-next 11/14] virtio_net: Accurate ECN flag in virtio_net_hdr
-> >
-> >[You don't often get email from jasowang@redhat.com. Learn why this is important at https://aka.ms/LearnAboutSenderIdentification ]
-> >
-> >CAUTION: This is an external email. Please be very careful when clicking links or opening attachments. See the URL nok.it/ext for additional information.
-> >
-> >
-> >
-> >On Sat, Dec 28, 2024 at 3:13 AM <chia-yu.chang@nokia-bell-labs.com> wrote:
-> >>
-> >> From: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
-> >>
-> >> Unlike RFC 3168 ECN, accurate ECN uses the CWR flag as part of the ACE 
-> >> field to count new packets with CE mark; however, it will be corrupted 
-> >> by the RFC 3168 ECN-aware TSO. Therefore, fallback shall be applied by 
-> >> seting NETIF_F_GSO_ACCECN to ensure that the CWR flag should not be 
-> >> changed within a super-skb.
-> >>
-> >> To apply the aforementieond new AccECN GSO for virtio, new featue bits 
-> >> for host and guest are added for feature negotiation between driver 
-> >> and device. And the translation of Accurate ECN GSO flag between 
-> >> virtio_net_hdr and skb header for NETIF_F_GSO_ACCECN is also added to 
-> >> avoid CWR flag corruption due to RFC3168 ECN TSO.
-> >>
-> >> Signed-off-by: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
-> >> ---
-> >>  drivers/net/virtio_net.c        | 14 +++++++++++---
-> >>  drivers/vdpa/pds/debugfs.c      |  6 ++++++
-> >>  include/linux/virtio_net.h      | 16 ++++++++++------
-> >>  include/uapi/linux/virtio_net.h |  5 +++++
-> >>  4 files changed, 32 insertions(+), 9 deletions(-)
-> >
-> >Is there a link to the spec patch? It needs to be accepted first.
-> >
-> >Thanks
-> 
-> Hi Jason,
-> 
-> Thanks for the feedback, I found the virtio-spec in github: https://github.com/oasis-tcs/virtio-spec but not able to find the procedure to propose.
-> Could you help to share the procedure to propose spec patch? Thanks.
+On Wed, Jan 08, 2025 at 01:13:35PM +0100, Oleksij Rempel wrote:
+> @@ -2508,6 +2369,207 @@ static void lan78xx_remove_irq_domain(struct lan78xx_net *dev)
+>  	dev->domain_data.irqdomain = NULL;
+>  }
+>  
+> +static void lan78xx_mac_config(struct phylink_config *config, unsigned int mode,
+> +			       const struct phylink_link_state *state)
+> +{
+> +	struct net_device *net = to_net_dev(config->dev);
+> +	struct lan78xx_net *dev = netdev_priv(net);
+> +	u32 rgmii_id = 0;
+> +	u32 mac_cr = 0;
+> +	int ret;
+> +
+> +	/* Check if the mode is supported */
+> +	if (mode != MLO_AN_FIXED && mode != MLO_AN_PHY) {
+> +		netdev_err(net, "Unsupported negotiation mode: %u\n", mode);
+> +		return;
+> +	}
+> +
+> +	switch (state->interface) {
+> +	case PHY_INTERFACE_MODE_INTERNAL:
+> +	case PHY_INTERFACE_MODE_GMII:
+> +			mac_cr |= MAC_CR_GMII_EN_;
+> +		break;
 
+The indentation has gone a bit weird here.
 
-You post it on virtio-comment for discussion. Github issues are then used
-for voting and to track acceptance.
-https://github.com/oasis-tcs/virtio-spec/blob/master/README.md#use-of-github-issues
+> +	case PHY_INTERFACE_MODE_RGMII_ID:
+> +		break;
 
+Normally, a MAC should support all RGMII interface modes, because these
+define the RGMII delays at the PHY and have little dependence on the
+MAC.
 
-> --
-> Chia-Yu
+> +static int lan78xx_phylink_setup(struct lan78xx_net *dev)
+> +{
+> +	phy_interface_t link_interface;
+> +	struct phylink *phylink;
+> +
+> +	dev->phylink_config.dev = &dev->net->dev;
+> +	dev->phylink_config.type = PHYLINK_NETDEV;
+> +	dev->phylink_config.mac_capabilities = MAC_SYM_PAUSE | MAC_ASYM_PAUSE |
+> +		MAC_10 | MAC_100 | MAC_1000FD;
+> +	dev->phylink_config.mac_managed_pm = true;
+> +
+> +	if (dev->chipid == ID_REV_CHIP_ID_7801_) {
+> +		__set_bit(PHY_INTERFACE_MODE_RGMII,
+> +			  dev->phylink_config.supported_interfaces);
+> +		__set_bit(PHY_INTERFACE_MODE_RGMII_ID,
+> +			  dev->phylink_config.supported_interfaces);
+> +		__set_bit(PHY_INTERFACE_MODE_RGMII_RXID,
+> +			  dev->phylink_config.supported_interfaces);
+> +		__set_bit(PHY_INTERFACE_MODE_RGMII_TXID,
+> +			  dev->phylink_config.supported_interfaces);
 
+The mac_config implementation conflicts with this.
+
+> +		link_interface = PHY_INTERFACE_MODE_NA;
+
+This is supposed to be for DSA, not for general use. Is there any reason
+you can't pass the real mode that is being used here?
+
+> @@ -2576,7 +2673,7 @@ static int lan78xx_phy_init(struct lan78xx_net *dev)
+>  			return -EIO;
+>  		}
+>  		phydev->is_internal = true;
+> -		dev->interface = PHY_INTERFACE_MODE_GMII;
+> +		phydev->interface = PHY_INTERFACE_MODE_INTERNAL;
+
+This needs to be explained.
+
+As for continuing to use fixed-phy, please instead use
+phylink_set_fixed_link() instead.
+
+Thanks.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
