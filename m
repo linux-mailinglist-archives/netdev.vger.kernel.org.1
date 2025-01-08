@@ -1,155 +1,120 @@
-Return-Path: <netdev+bounces-156374-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156376-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A9D8A06306
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 18:08:25 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C53D4A06347
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 18:25:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D7CEA1888FCA
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 17:08:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C4B2B16087D
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 17:25:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C33FA1FFC44;
-	Wed,  8 Jan 2025 17:08:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5A401FFC70;
+	Wed,  8 Jan 2025 17:25:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="k0utPqPF"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="KfuwB3OR"
 X-Original-To: netdev@vger.kernel.org
-Received: from lelv0142.ext.ti.com (lelv0142.ext.ti.com [198.47.23.249])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com [209.85.208.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78AD71FCFE7;
-	Wed,  8 Jan 2025 17:08:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.249
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E07D518D
+	for <netdev@vger.kernel.org>; Wed,  8 Jan 2025 17:25:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736356100; cv=none; b=NuWKKHBNsddfLwe+bD6G6m3t1MjZtjpGUdGuAoPUSfJp/NE/hYwQf74z9q1qvlP6jchsJ9Clh9y0LUylSKajsrrPIVICiYm0IiNIiTiq1qiSuIdvAmyDeKzYs3DIuZxoQH1vkcAzW5HDzEmbkHbtVSMHJU+4QHJ8+0RdIl42Tl0=
+	t=1736357103; cv=none; b=lqufJ122I1dOFrxNGoY6fI/e/1+UWVVMLUEv+qQ6Ky+DYd7OVYz4dXegDwlkGGXJIJ0ya0ujduDaU5cByfTA56PDTm1a7sTGTz3bDhdAxw8x+NAaSi3mRnBCDtzJ/puKX7mt6BQziYuF1VVE78hyKRbSq4zwYJurb8jEKpscjYg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736356100; c=relaxed/simple;
-	bh=5z3Tiw4v8P4zzxedTNT3Lb+3Ro41te0JOX3VXptfFhA=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=MShxOQr1qZ/pvTZ9f0zInw2KBQvxeILO3kGCrYgr5mS6QY93NOq1DOpcB92Jsm/06FBFxbE9A6dmGEG5TGwVbw8bJzPfE4MgdX5VoZ0kyPLTtqMy76eOfQbNPRHmjGAbbEtT20M7QVT5IlDbyz1OQr9VRjOMo27ahEeuqLDNYL8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=k0utPqPF; arc=none smtp.client-ip=198.47.23.249
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from fllv0035.itg.ti.com ([10.64.41.0])
-	by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id 508H87Ov031212;
-	Wed, 8 Jan 2025 11:08:07 -0600
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1736356087;
-	bh=Ntpcvj41f+Yw383BOIT1gjhwHUv71FWbAyEyF+gWZkY=;
-	h=From:To:CC:Subject:Date;
-	b=k0utPqPF6gpxeKL31B+ttlsrq1XWIEKgqZrtLla+TvEpqUCbNHAX/g63JvnC7sjDY
-	 mV6Cpl+SE2CJSYkus7lgeOHQkvqUzdsaFnF7g1fXv59sWm0Xdxpq9YETlVGRAwGC1b
-	 DNueQfGuRpp9GLY3U9oM3Zk6lBxcK0e+GBIAllMQ=
-Received: from DLEE102.ent.ti.com (dlee102.ent.ti.com [157.170.170.32])
-	by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 508H87L2063527
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Wed, 8 Jan 2025 11:08:07 -0600
-Received: from DLEE109.ent.ti.com (157.170.170.41) by DLEE102.ent.ti.com
- (157.170.170.32) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Wed, 8
- Jan 2025 11:08:06 -0600
-Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DLEE109.ent.ti.com
- (157.170.170.41) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Wed, 8 Jan 2025 11:08:07 -0600
-Received: from sudheertest-HP-Z2-Tower-G5-Workstation.dhcp.ti.com (sudheertest-hp-z2-tower-g5-workstation.dhcp.ti.com [172.24.227.182])
-	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 508H829c043915;
-	Wed, 8 Jan 2025 11:08:03 -0600
-From: Sudheer Kumar Doredla <s-doredla@ti.com>
-To: <s-vadapalli@ti.com>, <rogerq@kernel.org>, <andrew+netdev@lunn.ch>,
-        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>, <horms@kernel.org>, <gnault@redhat.com>,
-        <linux-omap@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-CC: <s-doredla@ti.com>, <t-patil@ti.com>, <j-keerthy@ti.com>
-Subject: [PATCH v2 net] net: ethernet: ti: cpsw_ale: Fix cpsw_ale_get_field()
-Date: Wed, 8 Jan 2025 22:54:33 +0530
-Message-ID: <20250108172433.311694-1-s-doredla@ti.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1736357103; c=relaxed/simple;
+	bh=yRNvVFqPhMWRzi/KbLrkLxw8x8RSOT11oTmE10plhfw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ZayqMUmJG/CQymFC+dc8bN9AzBy+FkmuQzckYbtALaV2vBahirTFJ5PLmckPOh+7vEDrCRTsoMe9fLk8+gMY5SouuoliYm+Ethf8fS5FyAUQXOz4UZuLQFnvV+F2eJKRwnYOIXU9NJdW3zXngPqCBwv+D7m7T6issHI1SP6vyUs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=KfuwB3OR; arc=none smtp.client-ip=209.85.208.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-304e4562516so247281fa.1
+        for <netdev@vger.kernel.org>; Wed, 08 Jan 2025 09:25:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1736357100; x=1736961900; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=yRNvVFqPhMWRzi/KbLrkLxw8x8RSOT11oTmE10plhfw=;
+        b=KfuwB3ORDHs/3HlcKUk0Wpeg2knfuAYNNjc4/KW6gkmUzlpF44RJvOIraRMXdK/3Ta
+         NyPpijAs9d6i8bcdZrRQZh9tNVouJs3SB5/P8bmthokhLLJTFkKy1YnTnQaa1vvNKll7
+         6ahVdJQ16h6gkHXPfUKW8JX18VDCghL68MP60=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736357100; x=1736961900;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=yRNvVFqPhMWRzi/KbLrkLxw8x8RSOT11oTmE10plhfw=;
+        b=aPfVF1ptgJshIcdCTomsutqwI9FGPAxlo9rN+aasUmlKmEHntkOnr+BhbFKAJSy9KN
+         h7cgxTM3HheIQk59pdzRRVsgLQLd7VSG9Z64ZsjQPvFGGISCAZ1TLlvhoea09OtVqn3Q
+         R1S5J47x4VG8vo/aQuFmGNIP1iueb4ggBDf7GKOQowGRWRGBEZkxjY8QJ8Kl7pvRLQZB
+         DVYytGfTWA1OhZj3/mBUwWrp0hRZLRsbU89ARp6dZRVyEPq08ibAVM9zeZilbfjSLNd6
+         irmYtuvjNHhZ36yLU9Ca8BoDwJy0x01G9vmYhxCXperVJnobwsBlmoY7t0TfvvwJKHSS
+         n+ig==
+X-Forwarded-Encrypted: i=1; AJvYcCWXf3/eZb+6gLZQXTXjieSxXDLlEFPQOcXe/Qpn30KUN+Kcd6QeO4BS5mc+dsKQin7D5yPRzl0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwAs4/y5GkN0lTHc+dsu6dkqEM+rO3L1KMEid0BJWziKY+gupUY
+	xgOoDJB1N0frQEsH5+HwvIpkMtz/cjTq4OYmUc2j8E+QzTPnGgElpUvEv1TiQAH98BxQUWrG8YI
+	MI/MKp3yqHkMVhL99+wOtTThCkSKc+fgZSSiVHD6NMqsp6rpwFxFN2SUn1yhiJbDurY8ea6ZwKO
+	BS5CqGZ5NNCPkmDOjRFQ==
+X-Gm-Gg: ASbGncsjDzpAQ4ZXnZKQUBXf30anGbX+Lnn91o1+Mr1BTqlyeywmc1YY691Kp8e454n
+	1bWMtvQ8w+mdxjHYwpgWKwvwRouNkZ7buDNrGuV0=
+X-Google-Smtp-Source: AGHT+IGvPYRme0fQyQ3G0E4/27vS2ohN+pn1erZ7u0IxAI1HxDJo/Z7EQpzmyH+f6ITeZXqI+Pvwkm/Bd/rSn9gf728=
+X-Received: by 2002:a05:651c:1993:b0:2ff:b8f5:5a17 with SMTP id
+ 38308e7fff4ca-305fcfcd638mr436811fa.5.1736357100094; Wed, 08 Jan 2025
+ 09:25:00 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+References: <20250105213036.288356-1-atomlin@atomlin.com> <20250106154741.23902c1a@kernel.org>
+ <031eafb1-4fa6-4008-92c3-0f6ecec7ce63@broadcom.com> <20250106165732.3310033e@kernel.org>
+ <2f127a6d-7fa2-5e99-093f-40ab81ece5b1@atomlin.com> <20250107154647.4bcbae3c@kernel.org>
+ <CAP1Q3XQ_Fubke4=SYrFkaiJj0RHB99ehdMedMVDTFtRS6R_RCw@mail.gmail.com>
+In-Reply-To: <CAP1Q3XQ_Fubke4=SYrFkaiJj0RHB99ehdMedMVDTFtRS6R_RCw@mail.gmail.com>
+From: Ronak Doshi <ronak.doshi@broadcom.com>
+Date: Wed, 8 Jan 2025 09:24:43 -0800
+X-Gm-Features: AbW1kvaT4vpj2C2Wax1_P6eksCuaLMSrK-0ALBseaNYTGAnBJ9b1bN50fBoSi6Y
+Message-ID: <CAP1Q3XTK0kP0hE_f1Y-tsQdCSToW9gkQJA2TMJwFh4v+zAhM7w@mail.gmail.com>
+Subject: Re: [RFC PATCH 0/1] vmxnet3: Adjust maximum Rx ring buffer size
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Aaron Tomlin <atomlin@atomlin.com>, Florian Fainelli <florian.fainelli@broadcom.com>, 
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
+	pabeni@redhat.com, bcm-kernel-feedback-list@broadcom.com, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-CPSW ALE has 75-bit ALE entries stored across three 32-bit words.
-The cpsw_ale_get_field() and cpsw_ale_set_field() functions support
-ALE field entries spanning up to two words at the most.
+On Tue, Jan 7, 2025 at 3:46=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wro=
+te:
 
-The cpsw_ale_get_field() and cpsw_ale_set_field() functions work as
-expected when ALE field spanned across word1 and word2, but fails when
-ALE field spanned across word2 and word3.
+>This driver seems to read the default size from the hypervisor, is that
+>the value that is too large in your case?
+The default should be 128 which is way less than max value.
 
-For example, while reading the ALE field spanned across word2 and word3
-(i.e. bits 62 to 64), the word3 data shifted to an incorrect position
-due to the index becoming zero while flipping.
-The same issue occurred when setting an ALE entry.
+Thanks,
+Ronak
 
-This issue has not been seen in practice but will be an issue in the future
-if the driver supports accessing ALE fields spanning word2 and word3
-
-Fix the methods to handle getting/setting fields spanning up to two words.
-
-Fixes: b685f1a58956 ("net: ethernet: ti: cpsw_ale: Fix cpsw_ale_get_field()/cpsw_ale_set_field()")
-Signed-off-by: Sudheer Kumar Doredla <s-doredla@ti.com>
-Reviewed-by: Simon Horman <horms@kernel.org> 
----
-v2: 
-1. Updated the subject and commit message
-2. Added Fixes tag and reviewed suggested by Simon Horman
----
- drivers/net/ethernet/ti/cpsw_ale.c | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
-
-diff --git a/drivers/net/ethernet/ti/cpsw_ale.c b/drivers/net/ethernet/ti/cpsw_ale.c
-index 64bf22cd860c..9eccc7064c2b 100644
---- a/drivers/net/ethernet/ti/cpsw_ale.c
-+++ b/drivers/net/ethernet/ti/cpsw_ale.c
-@@ -106,15 +106,15 @@ struct cpsw_ale_dev_id {
- 
- static inline int cpsw_ale_get_field(u32 *ale_entry, u32 start, u32 bits)
- {
--	int idx, idx2;
-+	int idx, idx2, index;
- 	u32 hi_val = 0;
- 
- 	idx    = start / 32;
- 	idx2 = (start + bits - 1) / 32;
- 	/* Check if bits to be fetched exceed a word */
- 	if (idx != idx2) {
--		idx2 = 2 - idx2; /* flip */
--		hi_val = ale_entry[idx2] << ((idx2 * 32) - start);
-+		index = 2 - idx2; /* flip */
-+		hi_val = ale_entry[index] << ((idx2 * 32) - start);
- 	}
- 	start -= idx * 32;
- 	idx    = 2 - idx; /* flip */
-@@ -124,16 +124,16 @@ static inline int cpsw_ale_get_field(u32 *ale_entry, u32 start, u32 bits)
- static inline void cpsw_ale_set_field(u32 *ale_entry, u32 start, u32 bits,
- 				      u32 value)
- {
--	int idx, idx2;
-+	int idx, idx2, index;
- 
- 	value &= BITMASK(bits);
- 	idx = start / 32;
- 	idx2 = (start + bits - 1) / 32;
- 	/* Check if bits to be set exceed a word */
- 	if (idx != idx2) {
--		idx2 = 2 - idx2; /* flip */
--		ale_entry[idx2] &= ~(BITMASK(bits + start - (idx2 * 32)));
--		ale_entry[idx2] |= (value >> ((idx2 * 32) - start));
-+		index = 2 - idx2; /* flip */
-+		ale_entry[index] &= ~(BITMASK(bits + start - (idx2 * 32)));
-+		ale_entry[index] |= (value >> ((idx2 * 32) - start));
- 	}
- 	start -= idx * 32;
- 	idx = 2 - idx; /* flip */
--- 
-2.34.1
-
+--=20
+This electronic communication and the information and any files transmitted=
+=20
+with it, or attached to it, are confidential and are intended solely for=20
+the use of the individual or entity to whom it is addressed and may contain=
+=20
+information that is confidential, legally privileged, protected by privacy=
+=20
+laws, or otherwise restricted from disclosure to anyone else. If you are=20
+not the intended recipient or the person responsible for delivering the=20
+e-mail to the intended recipient, you are hereby notified that any use,=20
+copying, distributing, dissemination, forwarding, printing, or copying of=
+=20
+this e-mail is strictly prohibited. If you received this e-mail in error,=
+=20
+please return the e-mail to the sender, delete it from your computer, and=
+=20
+destroy any printed copy of it.
 
