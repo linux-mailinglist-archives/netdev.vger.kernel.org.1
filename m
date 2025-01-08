@@ -1,127 +1,162 @@
-Return-Path: <netdev+bounces-156438-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156439-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0DE82A065FE
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 21:25:30 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E78F5A0668F
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 21:45:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0BFDE166DE7
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 20:25:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3C3AD3A522F
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 20:44:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB8931F8EF5;
-	Wed,  8 Jan 2025 20:25:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EE89204F65;
+	Wed,  8 Jan 2025 20:43:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="bgULs6bQ"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="eNflmo6S"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E99F19EEBF
-	for <netdev@vger.kernel.org>; Wed,  8 Jan 2025 20:25:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CEF8204C34;
+	Wed,  8 Jan 2025 20:43:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736367926; cv=none; b=isXaU+zP3RD2RgIvgFQG6DhWdOePaBqSdQVR1ByixodfCEbsxULYOyWVB5gFMuNAoasOhqHH9Tnx36ru1XU4JHVIQ09jsCrdRXytVN3LjufekT/MvsqxpIL0kq7H5TjZ8lxwBiRySbyNCimncUIZ31ZMNClZ1QCYZA38BDuWdEk=
+	t=1736369023; cv=none; b=gsKnalZHsb4hbxZpLsWGJqyfYIvgebXCsYDUcI1Uz5qwN9IlrToyuZvXTu55KawrT9YDgPhkXTu6+pidFis2iNYlj0IoZDo1vxvjo9EyYVwbE2CCMzSUl4pQvvF1pqWnnYh5ALD36KKABF+08/nx6nNqOjDKyNBpUWmFf42glvQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736367926; c=relaxed/simple;
-	bh=3cPwGh4BEDWuDjBsFhJ8FJSpEdbmLLbYu8b1Ht/yLGQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JVt+MlrtXI/xLsp/7ivIALMdz6tZXdBXNKgykAYTsss+KAaDGL9hHC+ybzja7DPNWUKq4jqP8pUKZZm8pTsO1wtCPbCXpvO4nHfIkdEadCEyJpPBwYxWQEBukcnSOuBGrK6yZ6fkBYDrxp+ueokE/UY7G4wm87pTGfpDvGQsUns=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=bgULs6bQ; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=PUDw2uMXlvZKFnYf/nGhrEOQlOnEKNrdrSrZUwzH9YU=; b=bgULs6bQzGZW9Uddr1Ln/594zs
-	Vt9+DfsqfV4bSp5A8CpFEk5PVqbyagYxOG7eiUkt6KlN4zYgexHHHRGZ67E1YtT19gt9Qcu16kQPM
-	+vbDAsasIt/5/6e4pO8EbTtvDNh0nfECU6D/UZqrKAdZqaDqlrwjAJMMzYPHE0FWqHVfGbFHqctMy
-	I6jniHa56A1hvkHEb0KzrCJPhzOqbxZTqn4LmoUuajDAL4SwFSjf3sJkYuu823oHxUr/t9cnYpmZ3
-	zb/pTPwV/3iL4UnidBODEqp9wCcq7lH6Ul3+G1adhBnAplyCbvsedd7k5ITwUu45l93vhG+TS6+M1
-	oSzGG/8Q==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:50228)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1tVcc3-0001BL-1g;
-	Wed, 08 Jan 2025 20:25:11 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1tVcbz-0006a3-24;
-	Wed, 08 Jan 2025 20:25:07 +0000
-Date: Wed, 8 Jan 2025 20:25:07 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Jose Abreu <joabreu@synopsys.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next v4 07/18] net: stmmac: clean up
- stmmac_disable_eee_mode()
-Message-ID: <Z37fI8dMLOS7-ky7@shell.armlinux.org.uk>
-References: <Z36sHIlnExQBuFJE@shell.armlinux.org.uk>
- <E1tVZDw-0002KL-Gg@rmk-PC.armlinux.org.uk>
+	s=arc-20240116; t=1736369023; c=relaxed/simple;
+	bh=l74pdHhuNB7cTbmXFcaaQo3J46KqlmB/Say0v2Vg7y4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=TxbeJqDx4pcxehcIdTqarpqM2Fodfp2o+HHOul6saR/MzaeCQxo6XeU6r3WjP1JmPBjz9z2PVR321C8qJ1pkraNmJoDCcT3urbzyB/zid/nlOpSFXG2uCWWD2b/g8gpNmr6ayqjE+ppzpIORFWVqNrsrEbTQqpztX9q8ZwrhImc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=eNflmo6S; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 508DXA9J028918;
+	Wed, 8 Jan 2025 20:42:42 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=NL/s9B
+	aV7zaTxsqmUo1LrDXYoClwJBwlRVE6OKrf/cc=; b=eNflmo6SvxUT0BrJA7hQ7J
+	FkF9So2pLcLA9eVZqXDTGW/9YLnkk5c1p/oKlmfcQumcxgZcyLedR2TkiJcqmWJJ
+	tANBa5wyvicB9wAwflQVAcC8D2gfnNDRlZhyCXNqfk7WFaA8axghP53szr27Dez2
+	Ju7yCNCEFiOSerFe6mGd/rpVhH0S3tnjlQ9Rh/x+F3y+Mdsuq+fTPxOVhHl5musO
+	o7/d0Jnqys48h1B8rB0r8I4IXe+F5dQxIlVmHo5+4cHUWRgjxApEfWh3tHF/1I9g
+	ch5chv8Zs+thoyxslTA98TU0q5xBQmoGtRPORle0bFsa78U257ItHPtKn4sHzRZw
+	==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 441e3b504h-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 08 Jan 2025 20:42:41 +0000 (GMT)
+Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 508Kgf9C023841;
+	Wed, 8 Jan 2025 20:42:41 GMT
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 441e3b504d-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 08 Jan 2025 20:42:41 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 508H6MFx013698;
+	Wed, 8 Jan 2025 20:42:40 GMT
+Received: from smtprelay03.dal12v.mail.ibm.com ([172.16.1.5])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 43ygap1mk0-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 08 Jan 2025 20:42:40 +0000
+Received: from smtpav06.dal12v.mail.ibm.com (smtpav06.dal12v.mail.ibm.com [10.241.53.105])
+	by smtprelay03.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 508KgdEJ32244282
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 8 Jan 2025 20:42:40 GMT
+Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id D2A9C5805E;
+	Wed,  8 Jan 2025 20:42:39 +0000 (GMT)
+Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id E114C58055;
+	Wed,  8 Jan 2025 20:42:36 +0000 (GMT)
+Received: from [9.61.139.65] (unknown [9.61.139.65])
+	by smtpav06.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Wed,  8 Jan 2025 20:42:35 +0000 (GMT)
+Message-ID: <ffcf60ec-1096-477d-a176-8e0006e19537@linux.ibm.com>
+Date: Wed, 8 Jan 2025 14:42:35 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <E1tVZDw-0002KL-Gg@rmk-PC.armlinux.org.uk>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 05/10] ARM: dts: aspeed: system1: Add RGMII support
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: minyard@acm.org, robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
+        andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+        kuba@kernel.org, pabeni@redhat.com, ratbert@faraday-tech.com,
+        openipmi-developer@lists.sourceforge.net, netdev@vger.kernel.org,
+        joel@jms.id.au, andrew@codeconstruct.com.au,
+        devicetree@vger.kernel.org, eajames@linux.ibm.com,
+        linux-arm-kernel@lists.infradead.org, linux-aspeed@lists.ozlabs.org,
+        linux-kernel@vger.kernel.org
+References: <20250108163640.1374680-1-ninad@linux.ibm.com>
+ <20250108163640.1374680-6-ninad@linux.ibm.com>
+ <1dd0165b-22ff-4354-bfcb-85027e787830@lunn.ch>
+ <0aaa13de-2282-4ea3-a11b-4edefb7d6dd3@linux.ibm.com>
+ <b80b9224-d428-4ad9-a30d-40e2d30be654@lunn.ch>
+Content-Language: en-US
+From: Ninad Palsule <ninad@linux.ibm.com>
+In-Reply-To: <b80b9224-d428-4ad9-a30d-40e2d30be654@lunn.ch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: uuLbOCNnCqgmUzbDmEULaBTqgYB73fYD
+X-Proofpoint-GUID: jiNFDMoRHnfifok2G5gq4nJjzYBletlg
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
+ priorityscore=1501 phishscore=0 impostorscore=0 clxscore=1015 bulkscore=0
+ lowpriorityscore=0 mlxlogscore=999 adultscore=0 suspectscore=0 spamscore=0
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2411120000 definitions=main-2501080167
 
-On Wed, Jan 08, 2025 at 04:48:04PM +0000, Russell King (Oracle) wrote:
-> stmmac_disable_eee_mode() is now only called from stmmac_xmit() when
-> both priv->tx_path_in_lpi_mode and priv->eee_sw_timer_en are true.
-> Therefore:
-> 
-> 	if (!priv->eee_sw_timer_en)
-> 
-> in stmmac_disable_eee_mode() will never be true, so this is dead code.
-> Remove it, and rename the function to indicate that it now only deals
-> with software based EEE mode.
-> 
-> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-> Tested-by: Choong Yong Liang <yong.liang.choong@linux.intel.com>
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-> ---
->  drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 11 +++--------
->  1 file changed, 3 insertions(+), 8 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> index de06aa1ff3f6..9a043d19ebac 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> @@ -427,18 +427,13 @@ static int stmmac_enable_eee_mode(struct stmmac_priv *priv)
->  }
->  
->  /**
-> - * stmmac_disable_eee_mode - disable and exit from LPI mode
-> + * stmmac_disable_sw_eee_mode - disable and exit from LPI mode
->   * @priv: driver private structure
->   * Description: this function is to exit and disable EEE in case of
->   * LPI state is true. This is called by the xmit.
->   */
-> -static void stmmac_disable_eee_mode(struct stmmac_priv *priv)
-> +static void stmmac_disable_sw_eee_mode(struct stmmac_priv *priv)
+Hi Andrew,
 
-Looking at this again, I'm still not happy with the function name, but
-not enough to send another version. I'll change it to
-stmmac_stop_sw_lpi() in the next batch of stmmac EEE cleanups (there
-is more to come!)
+On 1/8/25 14:13, Andrew Lunn wrote:
+> On Wed, Jan 08, 2025 at 12:43:07PM -0600, Ninad Palsule wrote:
+>> Hello Andrew,
+>>
+>>
+>> On 1/8/25 11:03, Andrew Lunn wrote:
+>>> On Wed, Jan 08, 2025 at 10:36:33AM -0600, Ninad Palsule wrote:
+>>>> system1 has 2 transceiver connected through the RGMII interfaces. Added
+>>>> device tree entry to enable RGMII support.
+>>>>
+>>>> ASPEED AST2600 documentation recommends using 'rgmii-rxid' as a
+>>>> 'phy-mode' for mac0 and mac1 to enable the RX interface delay from the
+>>>> PHY chip.
+>>> You appear to if ignored my comment. Please don't do that. If you have
+>>> no idea about RGMII delays, please say so, so i can help you debug
+>>> what is wrong.
+>>>
+>>> NACK
+>> I think there is a misunderstanding. I did not ignore your comment. I have
+>> contacted ASPEED and asked them to respond. I think Jacky from Aspeed
+>> replied to your mail.
+> You did not mention in the cover letter, or the patch. I asked for a
+> detailed explanation in the commit message why it is correct, which
+> you did not do.
+Ah, ok. Sorry about that.
+>
+> Now we have more details, it is clear Ethernet support for this board
+> needs to wait until we figure out how to fix the MAC driver. Please
+> either wait with this patchset until that is done, or drop this one
+> patch for the moment and submit it later once the MAC driver is fixed.
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+ok, Thanks!
+
+Regards,
+
+Ninad
+
+>
+>        Andrew
+>
+>
 
