@@ -1,80 +1,65 @@
-Return-Path: <netdev+bounces-156213-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156214-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C518EA058C8
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 11:54:44 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D6ED3A058EB
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 11:59:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B2B28165049
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 10:54:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 692893A4239
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 10:58:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEE141F868E;
-	Wed,  8 Jan 2025 10:54:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E4761F75AB;
+	Wed,  8 Jan 2025 10:58:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="PVEsKpeV"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hOHOVQYZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABC2E1F8666
-	for <netdev@vger.kernel.org>; Wed,  8 Jan 2025 10:54:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE0CA1F63CC
+	for <netdev@vger.kernel.org>; Wed,  8 Jan 2025 10:58:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736333680; cv=none; b=KDCBbWs3mUmEpGpYvEPbbkLvLGHMGM4iwoqbkdATHskglFrhqmC+rE+nd+l6wvRBTuj0ZXH76EVGa2MQrVxx5hVuHaU4jgM5+FooGnwrKQZu4vBleU05rBiREvLydtNCKnmaDuRZGVShXY2Cnm66ZU4NP5uYvpwcV7uMdQGbzwA=
+	t=1736333919; cv=none; b=RlZyTAirn1VWoBYUzVKgd+spUs8BpgqucNmRorCuGJ/51wels9J4AHlDr883HS+wGwp24mzHB3itP3DMXw+pE8QEnFB6kRLjbMIEOqs4InYNno8WW5TnEgfFh4mSoJXwe45vVIR1tjb/1t8R9hSLCPJRoJXxRnsZv9pykw/XT9s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736333680; c=relaxed/simple;
-	bh=g6ZQhzF7mtGlfzZbczwKZXO6YJPH8GScrbpoWgLiVsc=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=cHz4e7SrG3TP8VjdrT8cWzuuhxax7zqhbmUyuuMMOXh+eEZSydxwLqBtL9Gqo8yiSvUAziG69RqKj8bcbBEh8SGpJWU66wvGp4yRHz9Jv+uGviAN6iUkXXAB4zu3aTCsM+nkFBk7n8hnNIXTRI6RfvD2SHuSv08zOfd0nLIqbq8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=PVEsKpeV; arc=none smtp.client-ip=209.85.128.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-436345cc17bso120037895e9.0
-        for <netdev@vger.kernel.org>; Wed, 08 Jan 2025 02:54:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openvpn.net; s=google; t=1736333677; x=1736938477; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :content-language:references:cc:to:from:subject:user-agent
-         :mime-version:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=DkwxKCwTpAbrqB748510yxJKeafTORsRNcShxVPFWuA=;
-        b=PVEsKpeVcfb+zH7zYJIGNQa+mscXFDvkUdJyxHK8bATRQfoj6UMQiGQSFXMtoc8lpA
-         1Jlu76SrO2+uYE2ccaOv2S/teH+DguuYPuLa4hkk2+pG3774NnE4rXCCR0SBtMzzwLpe
-         U6SE1mFlJuiTDtZAeXpreAbLUFYSbu3DAVYLTl5K9UgEblcs/6muP40wJ03LAnfstqCq
-         f+hNrV/J0z7PYUt22aY35Z5jH7MUmcRbEFsWwYlf2c4qZotJ8xMFFC8xkCSSyrrjr4G6
-         oe3L5YTOIBQagb7GOAE2H+PmV6TH/Keso2P0wKpyFAsABe9fk4rJSDg/zoC7AdN3pSZa
-         pICA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736333677; x=1736938477;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :content-language:references:cc:to:from:subject:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=DkwxKCwTpAbrqB748510yxJKeafTORsRNcShxVPFWuA=;
-        b=REp/a3QvQz+M5HV9h8K/2MM1aDe6A6E+UrdSacEZJKxsdww2c35dyumuCD74DIgAaQ
-         ytMpONQO3aP+j1nFG3Q4Go0aLwz1uRzWUcYyxDVFgxkfQ2IIcLW1IQ/F0GX+gQmX6RqR
-         sSFlsPPo5JLF0Ep2njO/oECdB7y9aBDpuB1nTrHvJwvX3x0/83Q5/SysovUxizQaDsqx
-         bmb9MMfmu8oiQnaNEQRKg+tcsr2UrRQWX6MuYpcizmRoOgvWBMVgMlZ0Pkp0TDqR6JpK
-         0H4G4f8vRcYt1/9HLeGnyVgg84S3V6aerVX6PTMug5pRetI5wMMW8mrX019yB7kElGSJ
-         ho9A==
-X-Gm-Message-State: AOJu0YymKddjwSfMqwdpuV36pQC1WU9SMKwiR4MtiIQ0waazyYWlLGM6
-	i4C+BspGODrUQr0jyQJ1tYFZvCHBpzG6eJNc46m1eYgKBDQiuloDHEmQpRh2SJA=
-X-Gm-Gg: ASbGnctvTUrvF5SpWG5bxG78eH4hqKYMrQUSH2rO9d94Vjie2wIfk2bztCjuylnDLrJ
-	vyYgJYCGOLJ/wy2Xt9M3cAATB578FDF/pwZ3K/IrouZcqJOvNmNqhUffrrh7dltr07J6ySPgeKX
-	CaP1G90k449iN0VeMAwyIqo9tWxq4ApnE44KESE6RuEfyuZraD6cmLg+SCx6CNx18aXfTHyirZA
-	NGUenxb5rayOVCGeDz8P5xjPh5PE/Fl4pD/VQF9LLfU9M44VHL0VD4sKaIjX3FELUZ5AL5Ho6be
-	AsONDMSc8TtqmERyL+8=
-X-Google-Smtp-Source: AGHT+IFShLsq4++uwixYypmnEUHE4h0DqQHK3B1NS9l/FzEaQoxrCcw3MgQyZ1E4N0GFC1Owtmg1hw==
-X-Received: by 2002:a05:600c:4f49:b0:435:194:3cdf with SMTP id 5b1f17b1804b1-436e26bd59amr18373225e9.19.1736333677070;
-        Wed, 08 Jan 2025 02:54:37 -0800 (PST)
-Received: from ?IPV6:2001:67c:2fbc:1:cddc:656c:5e42:308a? ([2001:67c:2fbc:1:cddc:656c:5e42:308a])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-436e2dc12dasm16779275e9.10.2025.01.08.02.54.35
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 08 Jan 2025 02:54:36 -0800 (PST)
-Message-ID: <3a1349ac-acc2-4db5-a8e7-749cd471d3bc@openvpn.net>
-Date: Wed, 8 Jan 2025 11:55:21 +0100
+	s=arc-20240116; t=1736333919; c=relaxed/simple;
+	bh=JAru+JCMinYwvPV/IOHYvgN8V7XoWvB4jQe0QBv0C0s=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=DXi8yYcPbXbHqVHweCmnXRsm/5fEVqa0lJfWbLJjJURaN7T7i3BROeNNgDFcM7eAk2vzpHMYlOyz7aqK5W5ps1zRovsrgz8sM6KgVVF2bvP+RRC1Svkd5o1saAGuAHCLXSh1pbrGwhqpnp6r+8Tn6BZb+PmKuvH7wagjOggGWpQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hOHOVQYZ; arc=none smtp.client-ip=192.198.163.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1736333918; x=1767869918;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=JAru+JCMinYwvPV/IOHYvgN8V7XoWvB4jQe0QBv0C0s=;
+  b=hOHOVQYZQzQejPj+ZmHepuShH7WxtKjsyWmI4+9cwTlNblrrnhQavlrD
+   P5g2k4WZDLhLe4z/ehuOGA/9XNzWozVqW4zXZqv/XMx28poN2kb9wwSg5
+   DV8EHOiGve0dNkOu11eVSMJl9xIVrIhv2uYNLgSpO/kGl5hQRCHuisgsi
+   VTb1sMlxa+KzR/KO2c170V2Ly5E/4WTDMVJrJXV197EjN8KlOfgIy9ZKS
+   9ZHemuayqj1mikJ4IWyiQzXlui+yC/5ama0kemctEcFfADpg22cpOzeI0
+   T39AkB//rQJQU7H0ylb6TWBJd5BgqSYsQpPADyPSeIBrqQ8AIJHZrrZ2v
+   g==;
+X-CSE-ConnectionGUID: rHj/VEm0QfC7VZkciozUEQ==
+X-CSE-MsgGUID: z7zRyLbsSvyo4qZeAQobCg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11308"; a="47970597"
+X-IronPort-AV: E=Sophos;i="6.12,298,1728975600"; 
+   d="scan'208";a="47970597"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jan 2025 02:58:37 -0800
+X-CSE-ConnectionGUID: nm4SBxDATruaz+8W47XtvA==
+X-CSE-MsgGUID: Uj7pV1SWSdqWs7QCL2E5Rg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,298,1728975600"; 
+   d="scan'208";a="133900895"
+Received: from choongyo-mobl.gar.corp.intel.com (HELO [10.247.39.73]) ([10.247.39.73])
+  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jan 2025 02:58:33 -0800
+Message-ID: <3ddc0625-15ea-4010-a830-21020569d685@linux.intel.com>
+Date: Wed, 8 Jan 2025 18:58:28 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,119 +67,45 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v16 07/26] ovpn: introduce the ovpn_socket object
-From: Antonio Quartulli <antonio@openvpn.net>
-To: Sabrina Dubroca <sd@queasysnail.net>
-Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Donald Hunter <donald.hunter@gmail.com>, Shuah Khan <shuah@kernel.org>,
- ryazanov.s.a@gmail.com, Andrew Lunn <andrew+netdev@lunn.ch>,
- Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org, Xiao Liang <shaw.leon@gmail.com>,
- willemdebruijn.kernel@gmail.com
-References: <20241219-b4-ovpn-v16-0-3e3001153683@openvpn.net>
- <20241219-b4-ovpn-v16-7-3e3001153683@openvpn.net> <Z3gXs65jjYc-g2iw@hog>
- <9634a1e1-6cc4-45ef-89d8-30d0e50ba319@openvpn.net>
+Subject: Re: [PATCH net-next v3 02/18] net: stmmac: move tx_lpi_timer tracking
+ to phylib
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Jose Abreu <joabreu@synopsys.com>,
+ linux-arm-kernel@lists.infradead.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+ Paolo Abeni <pabeni@redhat.com>
+References: <Z31V9O8SATRbu2L3@shell.armlinux.org.uk>
+ <E1tVCRZ-007Y35-9N@rmk-PC.armlinux.org.uk>
+ <66b95153-cb12-494d-851c-093a0006547f@linux.intel.com>
+ <Z35WKDhVGMvPIi7d@shell.armlinux.org.uk>
 Content-Language: en-US
-Autocrypt: addr=antonio@openvpn.net; keydata=
- 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
-Organization: OpenVPN Inc.
-In-Reply-To: <9634a1e1-6cc4-45ef-89d8-30d0e50ba319@openvpn.net>
+From: Choong Yong Liang <yong.liang.choong@linux.intel.com>
+In-Reply-To: <Z35WKDhVGMvPIi7d@shell.armlinux.org.uk>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-On 06/01/2025 00:27, Antonio Quartulli wrote:
-> Hi Sabrina,
+
+
+On 8/1/2025 6:40 pm, Russell King (Oracle) wrote:
+> Hi,
 > 
-> On 03/01/2025 18:00, Sabrina Dubroca wrote:
->> Hello Antonio,
->>
->> 2024-12-19, 02:42:01 +0100, Antonio Quartulli wrote:
->>> +static void ovpn_socket_release_kref(struct kref *kref)
->>> +    __releases(sock->sock->sk)
->>> +{
->>> +    struct ovpn_socket *sock = container_of(kref, struct ovpn_socket,
->>> +                        refcount);
->>> +
->>
->> [extend with bits of patch 9]
->>>     /* UDP sockets are detached in this kref callback because
->>>      * we now know for sure that all concurrent users have
->>>      * finally gone (refcounter dropped to 0).
->>>      *
->>>      * Moreover, detachment is performed under lock to prevent
->>>      * a concurrent ovpn_socket_new() call with the same socket
->>>      * to find the socket still attached but with refcounter 0.
->>
->> I'm not convinced this really works, because ovpn_socket_new() doesn't
->> use the same lock. lock_sock and bh_lock_sock both "lock the socket"
->> in some sense, but they're not mutually exclusive (we talked about
->> that around the TCP patch).
+> On Wed, Jan 08, 2025 at 03:36:57PM +0800, Choong Yong Liang wrote:
+>> Tested-by: Choong Yong Liang <yong.liang.choong@linux.intel.com>
 > 
-> You're right - but what prevents us from always using bh_lock_sock?
+> Please let me know if this is for the entire series.
 > 
->>
->> Are you fundamentally opposed to making attach permanent? ie, once
->> a UDP or TCP socket is assigned to an ovpn instance, it can't be
->> detached and reused. I think it would be safer, simpler, and likely
->> sufficient (I don't know openvpn much, but I don't see a use case for
->> moving a socket from one ovpn instance to another, or using it without
->> encap).
+> Thanks.
 > 
-> I hardly believe a socket will ever be moved to a different instance.
-> There is no use case (and no userspace support) for that at the moment.
 
-Actually, there might be situations where userspace may want to close 
-and re-open the device, while keeping the original socket alive.
+Yes, the test is for the entire series.
 
-This means the socket should be able to be attached to a new device 
-without being destroyed and re-opened again.
-
-The refcount_dec with bh_lock_sock still seems to be the approach 
-covering all cases, no?
-
-Regards,
-
-
--- 
-Antonio Quartulli
-OpenVPN Inc.
-
+The only issue that was discovered is that during the initial state, the 
+"tx_lpi_timer" is not set correctly.
+The "tx_lpi_timer" with a value of 0 causes the EEE to be unable to enter 
+LPI mode.
 
