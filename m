@@ -1,283 +1,170 @@
-Return-Path: <netdev+bounces-156255-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156254-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DDF11A05B84
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 13:25:40 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 48A32A05B83
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 13:25:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D7B6D1883969
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 12:25:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7D6103A45B9
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 12:25:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D56C71FA826;
-	Wed,  8 Jan 2025 12:25:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0AC61F9F5A;
+	Wed,  8 Jan 2025 12:25:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rn4WX+7L"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="lOd224tr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-130.freemail.mail.aliyun.com (out30-130.freemail.mail.aliyun.com [115.124.30.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32AA81F9F7F
-	for <netdev@vger.kernel.org>; Wed,  8 Jan 2025 12:25:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B355B1F9A9C
+	for <netdev@vger.kernel.org>; Wed,  8 Jan 2025 12:25:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736339124; cv=none; b=ryM3jDWVdQ4s8KgPixnAx2bcK4mk+TKm9AGIGmhuWNbN7InuFM4Q7J4agDOG394omUZBudtSFU+sykSUiJS7hwe6G1p9pBXMmRRjAzd04OJf14La+Oa1n9J06sstyOdYCsjLKLAcfF4ve/pNtVifQFgaEMwdMoU9a//3lBW4N/0=
+	t=1736339122; cv=none; b=JgoGg6TT/iQ/mO7WpNCwzG6TNStBeAuDGZkfXvSjkRqHm3/jAC6KIDQ8hQiZvlipoo+ay2b1hLRD8uQEZ95N0xUgZMR6lF4+Ba2rU3Ze8nwAsdVEv+6UWATgfy2/mR3pdDK0PUtdM38U6xOf3/Ka6/YAQlACgJIFwlROUnlaZYU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736339124; c=relaxed/simple;
-	bh=6kA8g+OSc2ljb6KsKmB4k2YSfp7PdMRqb0spe+9cA/Q=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Utkraq94rs5ofwaSup+PaHCQP7F67r12Y7izQ9rhsXoCMkiy39KPIuipUW84KmldJfqT0X2o8WICElzHDlLTf8/EYeCvXuB2LcX6utrIc2jZqdtzYuxcBZtggggiivUVxJ5ReYKdKUdZi+ByT46AAKZZ3ZfMY4Zsz25Pqxacf3Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--chharry.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rn4WX+7L; arc=none smtp.client-ip=209.85.214.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--chharry.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-21650d4612eso103400715ad.2
-        for <netdev@vger.kernel.org>; Wed, 08 Jan 2025 04:25:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1736339122; x=1736943922; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=pbsIPENaTak5ngKp77odq0MaZnsc1/fTORrBGc6hWGk=;
-        b=rn4WX+7LHAm4fZ8VUM/PMP5pLkiMbeNcVICR2HrXnpWfwAoSqzkXi6uj0LLqDOUdmz
-         c32lNGoEmFnqHP0NXOAXqGply74hHRqRCFBVecwrFPGinRYDoHh2xze4EPx0RnESDU5k
-         VU1Ip+GxAM8V5WXh77ldoRZYMSOFIFbNug9/h4509+SgnLCwBwpsh/M9JH6XjTSND8K5
-         yMSg1d3TvuZyAqf+JOl3AnyEKhptzpvVKhr0v9en9QOmmvj7vN3alTbYg4ilGcpL97Wk
-         kFes4mXCQ5b1vPqH5STtnquUKpuXhvFxpYB5P9FK3reAnehQa/fb7KuZxAPJO9M+VdTO
-         hTXQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736339122; x=1736943922;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=pbsIPENaTak5ngKp77odq0MaZnsc1/fTORrBGc6hWGk=;
-        b=HFKblIzXbFOiABc84TJ5vV6CTS0KkQvrv7g2SoSMmhavTnTVybCVd14l0hbTFgr2gy
-         1bjx+KTluG5bJoVsk9zGSPCx6BZTQjGkvBArmiTRyLuQdyZGBpuVksBizoFa3QUJ3O1R
-         3rEAWyJ15IJS+Go7lV7sLQLqw36a8IpZInmas783ZsncYSG0/u4BU2HZ/KEdClZKQ9p/
-         egmFhMaK4eLg+TwmU0dvXHJpovUF/M9Vd4Df1LCGZZ1bkhDNmH79tcfWgzMMI2haXMNZ
-         UqzTmv2hueJqE0VX61xsI/FLeILdFNTHm5n3h7WmrDiD6TaVZa8JOLvie1OfWqE/mwt5
-         J47A==
-X-Forwarded-Encrypted: i=1; AJvYcCVY7YkHX14PjzWebuwVaQ/fEKb/vXHJGvViKLQ84Ij1KmOOtEoH1qtEwB0R9nZrICaluBxA1Fo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxElYmQqsk6i1rt6y5Wy75xu//MXGpwkkLVwa57X/z6EoudouuM
-	mun1Od+8n7JPGAjIcC/ZJJbLgyJHYVRo2bsGLMEt4olxIoSWJl7hlDsDg9+ORxcMC+K1n7aSo/B
-	XG6eh7w==
-X-Google-Smtp-Source: AGHT+IGjq+hYgA/Nz34xPugyz/a/Dm4vp6VflM9tKHIXxupKqgfhPnTStP9ZzV5y0kH9n9lSI3SqXwa8NYsB
-X-Received: from pfxa4.prod.google.com ([2002:a05:6a00:1d04:b0:728:e245:6e93])
- (user=chharry job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:9144:b0:1e1:d22d:cf38
- with SMTP id adf61e73a8af0-1e88cfd2144mr4760292637.21.1736339122405; Wed, 08
- Jan 2025 04:25:22 -0800 (PST)
-Date: Wed,  8 Jan 2025 20:24:43 +0800
-In-Reply-To: <20250108202442.v3.1.I66a83f84dce50455c9f7cc7b7ba8fc9d1d465db9@changeid>
+	s=arc-20240116; t=1736339122; c=relaxed/simple;
+	bh=65g/g/4WJkhxlIqd9Nrt1PttwoKaNrjDxhYBVXt0f7k=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ukeP8yDnccKrUk5p09z26Ks5N5Pzn3h5uzMlKkjZ0eLk3iotD6YyblbuyGcego/FKickhCnlImmf7V9CXgBimKMp3q86fJXjUYKyw3a2/S3aMOwmEneUuNYDyG8JlmlvBhE3MI6yV4VlYLliTH9GC0/XKmHv/eO5Meoi2sS9o5o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=lOd224tr; arc=none smtp.client-ip=115.124.30.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1736339112; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	bh=LzHtEUeCMYU3UuQbLzZGZ+pgHGJ++zXUzU8c6VW/R+0=;
+	b=lOd224truPwVnA1T04lRFPqDpmvp7lTMo/c+8MMY6QLW4UVHKNcV3oDfbqjmxMsk63BPw2C1bUIHZfL2vYyOWuKRrIUCWYF6wRH09sGn90jCGxAXPq8jb4tTENywJWIG9Z/GPD25Bl3oZpBV9sgPyHzhjuCwxltxYxD2vaaySpQ=
+Received: from 30.221.178.144(mailfrom:lulie@linux.alibaba.com fp:SMTPD_---0WNDwvMP_1736339110 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Wed, 08 Jan 2025 20:25:11 +0800
+Message-ID: <a1f091fc-727d-470a-835a-863501f28364@linux.alibaba.com>
+Date: Wed, 8 Jan 2025 20:25:10 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250108202442.v3.1.I66a83f84dce50455c9f7cc7b7ba8fc9d1d465db9@changeid>
-X-Mailer: git-send-email 2.47.1.613.gc27f4b7a9f-goog
-Message-ID: <20250108202442.v3.2.Icd16ca64a5d7e212c2801b3b39f65a895fb3e9b4@changeid>
-Subject: [PATCH v3 2/3] Bluetooth: Get rid of cmd_timeout and use the reset callback
-From: Hsin-chen Chuang <chharry@google.com>
-To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Cc: chromeos-bluetooth-upstreaming@chromium.org, 
-	Hsin-chen Chuang <chharry@chromium.org>, 
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Johan Hedberg <johan.hedberg@gmail.com>, 
-	Marcel Holtmann <marcel@holtmann.org>, Matthias Brugger <matthias.bgg@gmail.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] udp: fix l4 hash after reconnect
+To: Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+ David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
+ Simon Horman <horms@kernel.org>, Fred Chen <fred.cc@alibaba-inc.com>,
+ Cambda Zhu <cambda@linux.alibaba.com>, Willem de Bruijn
+ <willemb@google.com>, Stefano Brivio <sbrivio@redhat.com>
+References: <4761e466ab9f7542c68cdc95f248987d127044d2.1733499715.git.pabeni@redhat.com>
+ <CANn89i+aKNhzYKo3H3gx5Uhy4iPQ4p=6WDDF-0brGyR=PzJqjQ@mail.gmail.com>
+ <CANn89i+k11E9XeJZwvgZ7VO0yr1nWge8+U-ESw2GLYDq7-sdBw@mail.gmail.com>
+ <b46a7757-f311-4656-a114-68381d9856e3@redhat.com>
+ <a4085013-daaf-4141-af56-cd438bf8b4c9@linux.alibaba.com>
+ <63b0f262-066a-4f7b-b55a-a7f0ed4aa7f4@redhat.com>
+ <febf62f6-7439-4628-ad47-041ebbb86ede@linux.alibaba.com>
+ <939fa561-841e-442a-be0b-0e71c6843e5c@redhat.com>
+From: Philo Lu <lulie@linux.alibaba.com>
+In-Reply-To: <939fa561-841e-442a-be0b-0e71c6843e5c@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-From: Hsin-chen Chuang <chharry@chromium.org>
+Hi,
 
-The hdev->reset is never used now and the hdev->cmd_timeout actually
-does reset. This patch changes the call path from
-  hdev->cmd_timeout -> vendor_cmd_timeout -> btusb_reset -> hdev->reset
-, to
-  hdev->reset -> vendor_reset -> btusb_reset
-Which makes it clear when we export the hdev->reset to a wider usage
-e.g. allowing reset from sysfs.
+On 2025/1/7 15:56, Paolo Abeni wrote:
+> Hi,
+> 
+> I'm sorry for the latency, I was off in the past days.
+> 
+> On 12/31/24 8:55 AM, Philo Lu wrote:
+>> On 2024/12/10 16:32, Paolo Abeni wrote:
+>>> On 12/7/24 03:34, Philo Lu wrote:
+>>>> On 2024/12/7 00:23, Paolo Abeni wrote:
+>>>>> On 12/6/24 17:01, Eric Dumazet wrote:
+>>>>>> BTW, it seems that udp_lib_rehash() does the udp_rehash4()
+>>>>>> only if the hash2 has changed.
+>>>>>
+>>>>> Oh, you are right, that requires a separate fix.
+>>>>>
+>>>>> @Philo: could you please have a look at that? basically you need to
+>>>>> check separately for hash2 and hash4 changes.
+>>>>
+>>>> This is a good question. IIUC, the only affected case is when trying to
+>>>> re-connect another remote address with the same local address
+>>>
+>>> AFAICS, there is also another case: when re-connection using a different
+>>> local addresses with the same l2 hash...
+>>>
+>>>> (i.e.,
+>>>> hash2 unchanged). And this will be handled by udp_lib_hash4(). So in
+>>>> udp_lib_rehash() I put rehash4() inside hash2 checking, which means a
+>>>> passive rehash4 following rehash2.
+>>>
+>>> ... but even the latter case should be covered from the above.
+>>>
+>>>> So I think it's more about the convention for rehash. We can choose the
+>>>> better one.
+>>>
+>>> IIRC a related question raised during code review for the udp L4 hash
+>>> patches. Perhaps refactoring the code slightly to let udp_rehash()
+>>> really doing the re-hashing and udp_hash really doing only the hashing
+>>> could be worth.
+>>>
+>>
+>> I'm trying to unify rehash() for both hash2 and hash4 in
+>> __ip4_datagram_connect, when I noticed the inet_rcv_saddr checking
+>> before calling rehash():
+>>
+>> ```
+>> if (!inet->inet_rcv_saddr) {
+>> 	inet->inet_rcv_saddr = fl4->saddr;
+>> 	if (sk->sk_prot->rehash)
+>> 		sk->sk_prot->rehash(sk);
+>> }
+>> ```
+>> This means inet_rcv_saddr is reset at most once no matter how many times
+>> connect() is called.
+> 
+> ... if you make consecutive connect(<dst address>) calls.
+> 
+>   __udp_disconnect() clears saddr, so:
+> 
+> connect(<AF_UNSPEC>); connect(<dst address>);
+> 
+> will yield the expected result
+> 
+>> I'm not sure if this is by-design for some reason?
+>> Or can I remove this checking? like:
+>>
+>> --- a/net/ipv4/datagram.c
+>> +++ b/net/ipv4/datagram.c
+>> @@ -67,11 +67,9 @@ int __ip4_datagram_connect(struct sock *sk, struct
+>> sockaddr *uaddr, int addr_len
+>>           inet->inet_dport = usin->sin_port;
+>>           if (!inet->inet_saddr)
+>>                   inet->inet_saddr = fl4->saddr;
+>> -       if (!inet->inet_rcv_saddr) {
+>> -               inet->inet_rcv_saddr = fl4->saddr;
+>> -               if (sk->sk_prot->rehash)
+>> -                       sk->sk_prot->rehash(sk);
+>> -       }
+>> +       inet->inet_rcv_saddr = fl4->saddr;
+>> +       if (sk->sk_prot->rehash)
+>> +               sk->sk_prot->rehash(sk);
+>>           reuseport_has_conns_set(sk);
+>>           sk->sk_state = TCP_ESTABLISHED;
+>>           sk_set_txhash(sk);
+> 
+> This sounds like an unexpected behaviour change which may broke existing
+> applications.
+> 
+> I suggest retaining the current beheviour.
+> 
 
-This patch doesn't introduce any behavior change.
+Thank you for your suggestion. I've sent a fix patch for rehash4 (with 
+few build errors I'll solve soon), leaving __ip4_datagram_connect() 
+unchanged.
 
-Signed-off-by: Hsin-chen Chuang <chharry@chromium.org>
----
-
-Changes in v3:
-- Fixed build failure
-
- drivers/bluetooth/btmtksdio.c    |  4 ++--
- drivers/bluetooth/btusb.c        | 18 +++++++++---------
- drivers/bluetooth/hci_qca.c      |  6 +++---
- include/net/bluetooth/hci_core.h |  1 -
- net/bluetooth/hci_core.c         |  4 ++--
- 5 files changed, 16 insertions(+), 17 deletions(-)
-
-diff --git a/drivers/bluetooth/btmtksdio.c b/drivers/bluetooth/btmtksdio.c
-index a1dfcfe43d3a..bd5464bde174 100644
---- a/drivers/bluetooth/btmtksdio.c
-+++ b/drivers/bluetooth/btmtksdio.c
-@@ -1249,7 +1249,7 @@ static int btmtksdio_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
- 	return 0;
- }
- 
--static void btmtksdio_cmd_timeout(struct hci_dev *hdev)
-+static void btmtksdio_reset(struct hci_dev *hdev)
- {
- 	struct btmtksdio_dev *bdev = hci_get_drvdata(hdev);
- 	u32 status;
-@@ -1360,7 +1360,7 @@ static int btmtksdio_probe(struct sdio_func *func,
- 
- 	hdev->open     = btmtksdio_open;
- 	hdev->close    = btmtksdio_close;
--	hdev->cmd_timeout = btmtksdio_cmd_timeout;
-+	hdev->reset    = btmtksdio_reset;
- 	hdev->flush    = btmtksdio_flush;
- 	hdev->setup    = btmtksdio_setup;
- 	hdev->shutdown = btmtksdio_shutdown;
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 916e9ec7bc85..c891da6483a7 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -907,7 +907,7 @@ static void btusb_reset(struct hci_dev *hdev)
- 	usb_queue_reset_device(data->intf);
- }
- 
--static void btusb_intel_cmd_timeout(struct hci_dev *hdev)
-+static void btusb_intel_reset(struct hci_dev *hdev)
- {
- 	struct btusb_data *data = hci_get_drvdata(hdev);
- 	struct gpio_desc *reset_gpio = data->reset_gpio;
-@@ -985,7 +985,7 @@ static inline void btusb_rtl_alloc_devcoredump(struct hci_dev *hdev,
- 	}
- }
- 
--static void btusb_rtl_cmd_timeout(struct hci_dev *hdev)
-+static void btusb_rtl_reset(struct hci_dev *hdev)
- {
- 	struct btusb_data *data = hci_get_drvdata(hdev);
- 	struct gpio_desc *reset_gpio = data->reset_gpio;
-@@ -1029,13 +1029,13 @@ static void btusb_rtl_hw_error(struct hci_dev *hdev, u8 code)
- 	btusb_rtl_alloc_devcoredump(hdev, &hdr, NULL, 0);
- }
- 
--static void btusb_qca_cmd_timeout(struct hci_dev *hdev)
-+static void btusb_qca_reset(struct hci_dev *hdev)
- {
- 	struct btusb_data *data = hci_get_drvdata(hdev);
- 	struct gpio_desc *reset_gpio = data->reset_gpio;
- 
- 	if (test_bit(BTUSB_HW_SSR_ACTIVE, &data->flags)) {
--		bt_dev_info(hdev, "Ramdump in progress, defer cmd_timeout");
-+		bt_dev_info(hdev, "Ramdump in progress, defer reset");
- 		return;
- 	}
- 
-@@ -3859,7 +3859,7 @@ static int btusb_probe(struct usb_interface *intf,
- 
- 		/* Transport specific configuration */
- 		hdev->send = btusb_send_frame_intel;
--		hdev->cmd_timeout = btusb_intel_cmd_timeout;
-+		hdev->reset = btusb_intel_reset;
- 
- 		if (id->driver_info & BTUSB_INTEL_NO_WBS_SUPPORT)
- 			btintel_set_flag(hdev, INTEL_ROM_LEGACY_NO_WBS_SUPPORT);
-@@ -3879,7 +3879,7 @@ static int btusb_probe(struct usb_interface *intf,
- 		hdev->setup = btusb_mtk_setup;
- 		hdev->shutdown = btusb_mtk_shutdown;
- 		hdev->manufacturer = 70;
--		hdev->cmd_timeout = btmtk_reset_sync;
-+		hdev->reset = btmtk_reset_sync;
- 		hdev->set_bdaddr = btmtk_set_bdaddr;
- 		hdev->send = btusb_send_frame_mtk;
- 		set_bit(HCI_QUIRK_BROKEN_ENHANCED_SETUP_SYNC_CONN, &hdev->quirks);
-@@ -3911,7 +3911,7 @@ static int btusb_probe(struct usb_interface *intf,
- 		data->setup_on_usb = btusb_setup_qca;
- 		hdev->shutdown = btusb_shutdown_qca;
- 		hdev->set_bdaddr = btusb_set_bdaddr_ath3012;
--		hdev->cmd_timeout = btusb_qca_cmd_timeout;
-+		hdev->reset = btusb_qca_reset;
- 		set_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY, &hdev->quirks);
- 		btusb_check_needs_reset_resume(intf);
- 	}
-@@ -3925,7 +3925,7 @@ static int btusb_probe(struct usb_interface *intf,
- 		data->setup_on_usb = btusb_setup_qca;
- 		hdev->shutdown = btusb_shutdown_qca;
- 		hdev->set_bdaddr = btusb_set_bdaddr_wcn6855;
--		hdev->cmd_timeout = btusb_qca_cmd_timeout;
-+		hdev->reset = btusb_qca_reset;
- 		set_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY, &hdev->quirks);
- 		hci_set_msft_opcode(hdev, 0xFD70);
- 	}
-@@ -3944,7 +3944,7 @@ static int btusb_probe(struct usb_interface *intf,
- 		btrtl_set_driver_name(hdev, btusb_driver.name);
- 		hdev->setup = btusb_setup_realtek;
- 		hdev->shutdown = btrtl_shutdown_realtek;
--		hdev->cmd_timeout = btusb_rtl_cmd_timeout;
-+		hdev->reset = btusb_rtl_reset;
- 		hdev->hw_error = btusb_rtl_hw_error;
- 
- 		/* Realtek devices need to set remote wakeup on auto-suspend */
-diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index 37129e6cb0eb..c7ef38fd5e8e 100644
---- a/drivers/bluetooth/hci_qca.c
-+++ b/drivers/bluetooth/hci_qca.c
-@@ -1638,7 +1638,7 @@ static void qca_hw_error(struct hci_dev *hdev, u8 code)
- 	clear_bit(QCA_HW_ERROR_EVENT, &qca->flags);
- }
- 
--static void qca_cmd_timeout(struct hci_dev *hdev)
-+static void qca_reset(struct hci_dev *hdev)
- {
- 	struct hci_uart *hu = hci_get_drvdata(hdev);
- 	struct qca_data *qca = hu->priv;
-@@ -1968,7 +1968,7 @@ static int qca_setup(struct hci_uart *hu)
- 		clear_bit(QCA_IBS_DISABLED, &qca->flags);
- 		qca_debugfs_init(hdev);
- 		hu->hdev->hw_error = qca_hw_error;
--		hu->hdev->cmd_timeout = qca_cmd_timeout;
-+		hu->hdev->reset = qca_reset;
- 		if (hu->serdev) {
- 			if (device_can_wakeup(hu->serdev->ctrl->dev.parent))
- 				hu->hdev->wakeup = qca_wakeup;
-@@ -2202,7 +2202,7 @@ static int qca_power_off(struct hci_dev *hdev)
- 	enum qca_btsoc_type soc_type = qca_soc_type(hu);
- 
- 	hu->hdev->hw_error = NULL;
--	hu->hdev->cmd_timeout = NULL;
-+	hu->hdev->reset = NULL;
- 
- 	del_timer_sync(&qca->wake_retrans_timer);
- 	del_timer_sync(&qca->tx_idle_timer);
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 84b522a10019..f756fac95488 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -633,7 +633,6 @@ struct hci_dev {
- 	int (*post_init)(struct hci_dev *hdev);
- 	int (*set_diag)(struct hci_dev *hdev, bool enable);
- 	int (*set_bdaddr)(struct hci_dev *hdev, const bdaddr_t *bdaddr);
--	void (*cmd_timeout)(struct hci_dev *hdev);
- 	void (*reset)(struct hci_dev *hdev);
- 	bool (*wakeup)(struct hci_dev *hdev);
- 	int (*set_quality_report)(struct hci_dev *hdev, bool enable);
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 899b6f81966a..67032d21540c 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -1457,8 +1457,8 @@ static void hci_cmd_timeout(struct work_struct *work)
- 		bt_dev_err(hdev, "command tx timeout");
- 	}
- 
--	if (hdev->cmd_timeout)
--		hdev->cmd_timeout(hdev);
-+	if (hdev->reset)
-+		hdev->reset(hdev);
- 
- 	atomic_set(&hdev->cmd_cnt, 1);
- 	queue_work(hdev->workqueue, &hdev->cmd_work);
 -- 
-2.47.1.613.gc27f4b7a9f-goog
+Philo
 
 
