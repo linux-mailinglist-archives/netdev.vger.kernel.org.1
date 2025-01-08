@@ -1,198 +1,133 @@
-Return-Path: <netdev+bounces-156426-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156425-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F3F9A065A4
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 20:56:54 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 82DABA065A3
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 20:56:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 146771888E85
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 19:56:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 81FA816394A
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 19:56:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46AB520127E;
-	Wed,  8 Jan 2025 19:56:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D027201262;
+	Wed,  8 Jan 2025 19:56:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="TmnHBpFl"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZOHLHovD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com [209.85.208.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4459C19ABB6
-	for <netdev@vger.kernel.org>; Wed,  8 Jan 2025 19:56:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08B7019ABB6
+	for <netdev@vger.kernel.org>; Wed,  8 Jan 2025 19:56:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736366210; cv=none; b=l3upEhtF9nq3gzd7xItPVIUxEh1nn+kl9M2wHm0vwo1zVT/xmgLyyIkJivqG93KBU06bbw273o+9XJhZX3gn+4y/9eZMMXDwXVOdfTyq6iP1RparAfNZR1XLnduimpEext+RtSfMn3fXifTJAHBSvcG9Oo2RAOv3a8rv7EcTpbk=
+	t=1736366205; cv=none; b=ln6DagJnScrb/vP5Io91Hg46deipGp3Dm5oa7oVidA2DxzAOi3JZn6QRVsqY9nYCtf+vabA4c5zRdJoyd60mki8YRl0shujgrPoXAQW/as2vMG4PBwZ8uL3pCLJxJUz4lbpwTpF7McI5vZlFWFepCf1xnbIxDrdhsJTMwwYUSX8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736366210; c=relaxed/simple;
-	bh=fWkq2Ry7gq/nExb7Ac4tXYG5/DUfjevhsswBM8svATE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=phiKO+yyHtsk5ObHiib3dIxZe+bDhQYGeOYXcliQafVbok4t2J/Z4uCnwhjzPv8y2PZcjiMZAe6Df1XRzTr5KXNsUkJEQSEqM0uFpojqMqxV6WRUDRnwqn9wD+3aG9Dlzyk3uy0rV50AZKnNiNTF3N+rU2CEbHeL7pDkG141JKM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=TmnHBpFl; arc=none smtp.client-ip=209.85.208.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
-Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-3022484d4e4so888041fa.1
-        for <netdev@vger.kernel.org>; Wed, 08 Jan 2025 11:56:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1736366206; x=1736971006; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=J2EYNaFMuEi7gJG6lM4v49TAeFTWkkV0YaEiWcbQBDw=;
-        b=TmnHBpFl7xx0DnlpNguOh1bRB6puGX34oZa0SfaDr8M1V0NQD26RgUKPjEvl4MEUMj
-         IAFa+e8KzNN9JwTuvdrF2C0UvEfQA7Rx8aUGf/7r4mc54MAwM38nKm2q1qjby+wLTUa0
-         Lgj/38QJw62+SWB85sH+3zdKTMFZp+pCyV1ag=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736366206; x=1736971006;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=J2EYNaFMuEi7gJG6lM4v49TAeFTWkkV0YaEiWcbQBDw=;
-        b=wbXHtPy+4nKE5gLqwokWtqn/O8L+c7JI0FEYU50I/3J1t+ugrnzrXOFGCEnKIIlpAh
-         xVsu3DAragiQxj6yWk1/VJN2OxFY/eGb/g7w+7G7so/Av6RW1qTLruzN/jQJKE/KPhZl
-         LqpjRN90Ol5A09BjF++YoOm2L0wnBIQGjwJVfzjcQQtZ4Xlbst5b5Yh8EO+2HiFfbm9V
-         D27nzYKhY0IZ95hD1jl6+K142bfP3yYSvnYZKwx0IsGAZE+2SIq1h8o7JlPFRNawzyeM
-         DZn4JXPQfbotF5Zy6l4KtOntpHDZ0pCSYWljy87d0fuYX3TAMDnjT58OVoiih4exo/eN
-         a+tQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVYigG57HUIuyEX5xKEi/LRqmGh8eIgivjFgluTdxPK3JbidtNC4SrAOEhkX7Kkmr9eWVy5scM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz3Y5GQ6CjGI2mXjAQ0m3/Z7+wO4+IZ1OvEzUYsQqFRtKpthBCn
-	AszbglsEoVr64/Q7doS+S/BqKJ8QNCqOa+f0iM5z+4kSIXeMm85XXQQL8H0qoZJWX6uJvuHYsnM
-	bzMS0hmfIF01CuJ5sryQMKHlsmsLUS4tHULjw
-X-Gm-Gg: ASbGncsxNCef8JT9V1AZTSdRocgh5O9mVJ8uTB0CyCzBO+XV83yUxWONt+Rinhwz30W
-	+cuc7Rjwl5SIwAB4nV2czf8/HpEiKUazMfqBH7Q==
-X-Google-Smtp-Source: AGHT+IFNJGm9HfHOfxxUk2mG33MjpwnqogwU+ysbnjaVFZYxCfbIpp9yJNnmCoOlQAXGf7JUvw70Ig5f0D4owNk+WNM=
-X-Received: by 2002:a05:651c:e02:b0:302:3ff6:c8db with SMTP id
- 38308e7fff4ca-305f45b8cffmr8397761fa.24.1736366206348; Wed, 08 Jan 2025
- 11:56:46 -0800 (PST)
+	s=arc-20240116; t=1736366205; c=relaxed/simple;
+	bh=DgozNOirfb1WaQn2HBdAJJ2qek2P5unGCFmo3ubv5m4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=s5s2wtPrS/CpksVwtpFIjiec3xxcGzWX+XyDfkHcFihoGx0AwfVdOYMWNRXfatgjatPobS5mLzgkAYm+L9nFoFyF+sso4N96DJi+hfbJkINT0iY14Sey7WAgjyiGxiCkE9v20NCQFea8Pe0ZqDb4hOOJW6ZSclUN/mDVFJLj4QA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZOHLHovD; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0048AC4CED3;
+	Wed,  8 Jan 2025 19:56:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1736366204;
+	bh=DgozNOirfb1WaQn2HBdAJJ2qek2P5unGCFmo3ubv5m4=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=ZOHLHovDRoJm39up7H/GChB80A2pghBJ7ktJ+cQ0duKBLVdWWOBWvLpRHmJhdsofW
+	 qIRN4S66TYIuzT/Tl37L07vzIrCTMcMVMph892dKXWyXhmNJFaqC7tbSDdDezGIg7c
+	 H8HV/tcHzoA42jWFty0kV4aPYaQvM8KySOM8sXaFPMx1SDDuR3LATuVKVwuA38omhH
+	 /NCGyE8PtCwCrwMUJ7UKUe/OaiVQDpyAqERHA/5GCwH9MK/ViEhwL10a241dy3wtJU
+	 QxGOV9mx1OgzyiihqUkOGJvJ37nqrJ5duYkG7zuu0XoKqvjs8fcy4ySUSgplOEyMIh
+	 WgAfWrUKI/NKQ==
+Message-ID: <8ba3c7f0-4a14-46bb-82b0-ff9fbc0f71b7@kernel.org>
+Date: Wed, 8 Jan 2025 12:56:42 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241218203740.4081865-1-dualli@chromium.org> <20241218203740.4081865-3-dualli@chromium.org>
- <Z32cpF4tkP5hUbgv@google.com> <Z32fhN6yq673YwmO@google.com>
- <CANBPYPi6O827JiJjEhL_QUztNXHSZA9iVSyzuXPNNgZdOzGk=Q@mail.gmail.com> <Z37NALuyABWOYJUj@google.com>
-In-Reply-To: <Z37NALuyABWOYJUj@google.com>
-From: Li Li <dualli@chromium.org>
-Date: Wed, 8 Jan 2025 11:56:35 -0800
-X-Gm-Features: AbW1kvakBnClUlcgk4uS_9GFWwaQ6OEmfl-h6IqXJUGhnMaRbsWLcXbmu_4LXgQ
-Message-ID: <CANBPYPhEKuxZobTVTGj-BOpKEK+XXv-_C-BuekJDB2CerUn3LA@mail.gmail.com>
-Subject: Re: [PATCH v11 2/2] binder: report txn errors via generic netlink
-To: Carlos Llamas <cmllamas@google.com>
-Cc: dualli@google.com, corbet@lwn.net, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	donald.hunter@gmail.com, gregkh@linuxfoundation.org, arve@android.com, 
-	tkjos@android.com, maco@android.com, joel@joelfernandes.org, 
-	brauner@kernel.org, surenb@google.com, arnd@arndb.de, masahiroy@kernel.org, 
-	bagasdotme@gmail.com, horms@kernel.org, linux-kernel@vger.kernel.org, 
-	linux-doc@vger.kernel.org, netdev@vger.kernel.org, hridya@google.com, 
-	smoreland@google.com, kernel-team@android.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RESEND net-next, v3] netlink: support dumping IPv4
+ multicast addresses
+Content-Language: en-US
+To: Yuyang Huang <yuyanghuang@google.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ roopa@cumulusnetworks.com, jiri@resnulli.us, stephen@networkplumber.org,
+ jimictw@google.com, prohr@google.com, liuhangbin@gmail.com,
+ nicolas.dichtel@6wind.com, andrew@lunn.ch, netdev@vger.kernel.org,
+ =?UTF-8?Q?Maciej_=C5=BBenczykowski?= <maze@google.com>,
+ Lorenzo Colitti <lorenzo@google.com>
+References: <20250105020239.702610-1-yuyanghuang@google.com>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <20250105020239.702610-1-yuyanghuang@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Jan 8, 2025 at 11:07=E2=80=AFAM Carlos Llamas <cmllamas@google.com>=
- wrote:
->
-> On Tue, Jan 07, 2025 at 04:00:39PM -0800, Li Li wrote:
-> > On Tue, Jan 7, 2025 at 1:41=E2=80=AFPM Carlos Llamas <cmllamas@google.c=
-om> wrote:
-> > >
-> > > On Tue, Jan 07, 2025 at 09:29:08PM +0000, Carlos Llamas wrote:
-> > > > On Wed, Dec 18, 2024 at 12:37:40PM -0800, Li Li wrote:
-> > > > > From: Li Li <dualli@google.com>
-> > > >
-> > > > > @@ -6137,6 +6264,11 @@ static int binder_release(struct inode *no=
-dp, struct file *filp)
-> > > > >
-> > > > >     binder_defer_work(proc, BINDER_DEFERRED_RELEASE);
-> > > > >
-> > > > > +   if (proc->pid =3D=3D proc->context->report_portid) {
-> > > > > +           proc->context->report_portid =3D 0;
-> > > > > +           proc->context->report_flags =3D 0;
-> > > >
-> > > > Isn't ->portid the pid from the netlink report manager? How is this=
- ever
-> > > > going to match a certain proc->pid here? Is this manager supposed t=
-o
-> > > > _also_ open a regular binder fd?
-> > > >
-> > > > It seems we are tying the cleanup of the netlink interface to the e=
-xit
-> > > > of the regular binder device, correct? This seems unfortunate as us=
-ing
-> > > > the netlink interface should be independent.
-> > > >
-> > > > I was playing around with this patch with my own PoC and now I'm st=
-uck:
-> > > >   root@debian:~# ./binder-netlink
-> > > >   ./binder-netlink: nlmsgerr No permission to set flags from 1301: =
-Unknown error -1
-> > > >
-> > > > Is there a different way to reset the protid?
-> > > >
-> > >
-> > > Furthermore, this seems to be a problem when the report manager exits
-> > > without a binder instance, we still think the report is enabled:
-> > >
-> > > [  202.821346] binder: Failed to send binder netlink message to 597: =
--111
-> > > [  202.821421] binder: Failed to send binder netlink message to 597: =
--111
-> > > [  202.821304] binder: Failed to send binder netlink message to 597: =
--111
-> > > [  202.821306] binder: Failed to send binder netlink message to 597: =
--111
-> > > [  202.821387] binder: Failed to send binder netlink message to 597: =
--111
-> > > [  202.821464] binder: Failed to send binder netlink message to 597: =
--111
-> > > [  202.821467] binder: Failed to send binder netlink message to 597: =
--111
-> > > [  202.821344] binder: Failed to send binder netlink message to 597: =
--111
-> > > [  202.822513] binder: Failed to send binder netlink message to 597: =
--111
-> > > [  202.822152] binder: Failed to send binder netlink message to 597: =
--111
-> > > [  202.822683] binder: Failed to send binder netlink message to 597: =
--111
-> > > [  202.822629] binder: Failed to send binder netlink message to 597: =
--111
-> >
-> > As the file path (linux/drivers/android/binder.c) suggested,
-> > binder driver is designed to work as the essential IPC in the
-> > Android OS, where binder is used by all system and user apps.
-> >
-> > So the binder netlink is designed to be used with binder IPC.
->
-> Ok, I assume this decision was made because no better alternative was
-> found. Otherwise it would be best to avoid the dependency. This could
-> become an issue e.g. if the admin process was to be split in the future
-> or some other restructuring happens.
->
-> That's why I ask of there is a way to cleanup the netlink info without
-> relying on the binder fd closing. Something cleaner, there might be some
-> callback we can install on the netlink infra? I could look later into
-> this.
->
-> > The manager service also uses the binder interface to communicate
-> > to all other processes. When it exits, the binder file is closed,
-> > where the netlink interface is reset.
->
-> Again, communicating with other processes via binder and setting up a
-> transaction report should be separate functionalities that don't rely on
-> eachother.
->
-> Also, it seems the admin process would have to initially bind() to all
-> binder contexts preventing other from doing so? Sound like this should
-> be restricted to certain capability or maybe via selinux (if possible)
-> instead of relying on the portid. Thoughts?
+On 1/4/25 7:02 PM, Yuyang Huang wrote:
+> @@ -1850,21 +1851,46 @@ static int in_dev_dump_addr(struct in_device *in_dev, struct sk_buff *skb,
+>  			    struct netlink_callback *cb, int *s_ip_idx,
+>  			    struct inet_fill_args *fillargs)
+>  {
+> +	struct ip_mc_list *im;
+>  	struct in_ifaddr *ifa;
+>  	int ip_idx = 0;
+>  	int err;
+>  
+> -	in_dev_for_each_ifa_rcu(ifa, in_dev) {
+> -		if (ip_idx < *s_ip_idx) {
+> +	switch (fillargs->type) {
+> +	case UNICAST_ADDR:
+> +		fillargs->event = RTM_NEWADDR;
+> +		in_dev_for_each_ifa_rcu(ifa, in_dev) {
+> +			if (ip_idx < *s_ip_idx) {
+> +				ip_idx++;
+> +				continue;
+> +			}
+> +			err = inet_fill_ifaddr(skb, ifa, fillargs);
+> +			if (err < 0)
+> +				goto done;
+> +
+> +			nl_dump_check_consistent(cb, nlmsg_hdr(skb));
+>  			ip_idx++;
+> -			continue;
+>  		}
+> -		err = inet_fill_ifaddr(skb, ifa, fillargs);
+> -		if (err < 0)
+> -			goto done;
+> +		break;
 
-This is a valid concern. Adding GENL_ADMIN_PERM should be enough to solve i=
-t.
+Almost all of the logic is under the switch cases, you are not really
+saving a lot here. I think it would be simpler just to have simpler
+in_dev_dump_addr for each type.
 
->
-> --
-> Carlos Llamas
+> +	case MULTICAST_ADDR:
+> +		for (im = rcu_dereference(in_dev->mc_list);
+> +		     im;
+> +		     im = rcu_dereference(im->next_rcu)) {
+> +			if (ip_idx < *s_ip_idx) {
+> +				ip_idx++;
+> +				continue;
+> +			}
+> +			err = inet_fill_ifmcaddr(skb, in_dev->dev, im,
+> +						 RTM_GETMULTICAST, NLM_F_MULTI);
+> +			if (err < 0)
+> +				goto done;
+>  
+> -		nl_dump_check_consistent(cb, nlmsg_hdr(skb));
+> -		ip_idx++;
+> +			nl_dump_check_consistent(cb, nlmsg_hdr(skb));
+> +			ip_idx++;
+> +		}
+> +		break;
+> +	default:
+> +		break;
+>  	}
+>  	err = 0;
+>  	ip_idx = 0;
+
 
