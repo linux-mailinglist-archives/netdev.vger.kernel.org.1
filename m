@@ -1,69 +1,69 @@
-Return-Path: <netdev+bounces-156328-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156329-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 945E1A061B7
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 17:23:29 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AAE33A061B6
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 17:23:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 78BC0166018
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 16:23:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4ED193A1970
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 16:23:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05F581F9AB6;
-	Wed,  8 Jan 2025 16:23:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D0201FF1DD;
+	Wed,  8 Jan 2025 16:23:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Lhyt5iYv"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="a3N6Gdrc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f202.google.com (mail-qt1-f202.google.com [209.85.160.202])
+Received: from mail-qt1-f201.google.com (mail-qt1-f201.google.com [209.85.160.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4448D1F9439
-	for <netdev@vger.kernel.org>; Wed,  8 Jan 2025 16:23:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83BA51FF1C0
+	for <netdev@vger.kernel.org>; Wed,  8 Jan 2025 16:23:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736353382; cv=none; b=q9ejW+velFIa3y5AfBOROv5UR6jz4nDLUi+EglK92K3aZ6YucVmEV3YtmTUmYKVgJE4vexptfA2b8AQi7X0m1Hi66qRw4tN2U7EtvDktui9q8xMbrkkOhbkrQ6FbYTbZuxUnxbuekXzQafG7COQhxMdlxDMjECeGVB30BXBiCIA=
+	t=1736353384; cv=none; b=F9bNzSfNx38bhs5IL7GufV4yBOr5bXM/P7ptAF/R0TbK1nxBx3Z7oKHJspcYDUwYbpTbtwPN6CQUUiXjzHWXm+NgDNO5s7jAbGyvaHTeCAqxyHnX+2/eV+kU8RVtuX5eJj77Fj/nI3cf1VkPeOFmT93avpgtlxihwbb7SjEFkC0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736353382; c=relaxed/simple;
-	bh=FbDbWtrkeO1zLkrOE6W8TLnoL+pS/UMS4N66Svjvmv4=;
+	s=arc-20240116; t=1736353384; c=relaxed/simple;
+	bh=rSqJj4XwTdwc39+3g8QMOFoAWAV1qaibloUAJCEd9D8=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=YB37GhzaeNeIz9x3cXWu6IaXybCj4n+xum7oZPriF2XDhANvWk+p9tBmad6HlZ7oNRQpX6XlxkMeNQA7ml5hfrQfqEaXb5/22RYbtACMH+x+0ZrjzJWiF0/SjvUOUEEnqNT83YniQh0VZ8tKfPrp0xYtmtK74w0JP4wgZxRjcFU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Lhyt5iYv; arc=none smtp.client-ip=209.85.160.202
+	 To:Cc:Content-Type; b=Z1QIvADRG6CZ9E+fkNsAvNG7QObcRHvFcKZ2LMy4ipAQ4Y4J6vAOhwfJ7TKGripKq8D8LQu8WabFfLaybH+DWJh69jsTAakmehokpj09df5c/OfzXvvfAkhrsLrKt9hWENUgsIt2rmAe9vYqK0jXLlflHEOut+DcWuMFz3jagAc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=a3N6Gdrc; arc=none smtp.client-ip=209.85.160.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qt1-f202.google.com with SMTP id d75a77b69052e-4678b42cbfeso335686031cf.3
-        for <netdev@vger.kernel.org>; Wed, 08 Jan 2025 08:23:01 -0800 (PST)
+Received: by mail-qt1-f201.google.com with SMTP id d75a77b69052e-4679db55860so337860101cf.3
+        for <netdev@vger.kernel.org>; Wed, 08 Jan 2025 08:23:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1736353380; x=1736958180; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1736353381; x=1736958181; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=24m9Jbnx67pDSoU0/Ox88pWvSYxaM1gsBFAZIN3yQRY=;
-        b=Lhyt5iYvo2/hFg/RGjaymGmXJntuYx6UN7+3fIhM9MC6xqTp9Bv5oXCIdJCXnmEx/Z
-         lKSj8NyJsFjvX6bgH2uP084ZuoVTvXWlaiw7etMo4XF51cu2I5NaAB9qDLnfTPJd7D99
-         kKQ8d0MXmvPvGbBN6/eR5uQtFgCCt7W9JfxbMrQcp7RWqegnH6rLOqcvM/Mhr75kxiTp
-         6jjpU2d+PRhJPpAGuHxCg34Kw9OU+ZvMTnegz8kyKdyhmSk2wFlnhO0cAGawJCjhE+eb
-         TGD0xzn5dDAZ/QeZllJzXPECc2v5YJEn22MSghw+r23zLQSTDFG+WvBsgYPLRLlJDy7/
-         o4sg==
+        bh=Xhbjwta6TiDMc7v+7DNtDB0Tr9ebF3Qj7Hv8pFJ6cq4=;
+        b=a3N6GdrcTeXSPnq7XmvG57Y2/9qvhrJfNpY1YasIKnUl0sjlF19W+ewPr+FHyHkH7C
+         xMNUeMpj4IVhk93ClMOabQXECpTY7aa9wrUy/qhC7LUqk/uN+CS0iUh/AeYIGam65I2Z
+         HVVz+ODb0VZcAttNdSSvXj33aBJ4/fHAgtkzRPZGfxP+XTWquT0YXYSNKy8BEM5cSzCe
+         bXobaEG4PeeLncgUzRT92L6OMCz9aWJeH0n9LfrPiDcCDK3vGSKtBb0EaO8om4fJTA3d
+         A1ZIPsUmh9pbWNe2Wzo6KwTJKuUQn2CAWMCH9fJWC7kCmuM6gYz6Ps2RbzrerQGisM0d
+         WC2w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736353380; x=1736958180;
+        d=1e100.net; s=20230601; t=1736353381; x=1736958181;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=24m9Jbnx67pDSoU0/Ox88pWvSYxaM1gsBFAZIN3yQRY=;
-        b=xCr3FJuSnD6Q4wIJVBDdfAZT2v4kdcyOkc12ifyMyNcBe7C+ajziRTo1Mbb21v+QjA
-         YsmLWO3xvhGyoLcnz+tRogN5sCosIrrfZ3qL4YO8ysQmet7MPt/OFb2xchIZfu2FnBH4
-         XKHoq6CUVtH+LnzTn3WZFMDyFbWkcE4/8RZ8sg6V8Q+gvo8T09Fzk1EqeMwRO3jIU9WE
-         oEyLW1p1LpLijwxs32tGL4t5zxA6U2Ft365a9Cdp2Ze5fYHygm/tJgphm9a1AvEjsn78
-         IxRJSHBRV8gZ+rcsaMcoNLobYc179iUrx/RLxXpxgNFBpC5SL8ZRKQ1BdzicHu0bqATA
-         jYNg==
-X-Gm-Message-State: AOJu0YwyvMLgQvDYkE0bVk/KS8T0vQYqGG9+kvgsVdGXKFNhGR/ZmaUn
-	MwP9gio4xp8xAGxpv2VkKeAGmlXjKBmo2J5xnb6UeBDKL1/1hLPNz4WH5JlmzM3GonDka+jK9kZ
-	t7a0V5KXKVg==
-X-Google-Smtp-Source: AGHT+IGgtcS3+OOOtwHbf1dIGYX5GuC7oeABEuwMJpxaA+3OnOKbtjxnNpAE4nqMZryLJehIRE357/m7MFVNpQ==
-X-Received: from qtnd3.prod.google.com ([2002:ac8:51c3:0:b0:467:64d0:3f08])
+        bh=Xhbjwta6TiDMc7v+7DNtDB0Tr9ebF3Qj7Hv8pFJ6cq4=;
+        b=rFFytGNpnEysC8pF3n4OeA5mo4/tn7vdFmVrOTgCnq2DcmTBwq6YWjBB81fkD8FcRg
+         eC7Tw1az8GODJfq5TKd1YbGZKIQsJJslYuKRKmIj0rsfSJ15g+rnVWRqrEJG4DerO61T
+         Qp0YbMZk46DAAh7xx8srjhHA0g771vBZE+waB0GLSyX4lRqJGk2IFPtqb/tW9IBWnKvV
+         0s+MLf5RdgDahI9mRxcovbr7EoemhUcYuCM0kOJs9xARuNTdxIgwhJw10QUeniRXojNZ
+         jLMcti2lgNJgfaBdy0w90OkMmWv7/A0eVai17RUUJYYYNCA9OHlddsYk15JJS1uX2MMs
+         uPyw==
+X-Gm-Message-State: AOJu0YwFj+x8+X8yBqY8/wK9HUYQ+bMTqA1Q937H7oO0GEHbV1MtT+ts
+	7alU93hWrBE1c663Uozkf2qzNRKQ2/4wakKQRhpXUDS0p5OcCU01rE9aD+E46rzSk5xleegZIFx
+	xjoh5gBJv4Q==
+X-Google-Smtp-Source: AGHT+IEv8p0Thx3D4GtVYuFmbhZLcdXVvixTic9daCsqvjXKUpOsi4pJUZ7mazF+JuA9GANCbf61us1JpwPuvA==
+X-Received: from qtjw4.prod.google.com ([2002:ac8:7e84:0:b0:467:7076:37d7])
  (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:ac8:5793:0:b0:467:70ce:75ea with SMTP id d75a77b69052e-46c7102bfdbmr49580191cf.23.1736353380222;
- Wed, 08 Jan 2025 08:23:00 -0800 (PST)
-Date: Wed,  8 Jan 2025 16:22:53 +0000
+ 2002:ac8:5807:0:b0:46c:77bc:ce5e with SMTP id d75a77b69052e-46c77bcd922mr20213391cf.7.1736353381550;
+ Wed, 08 Jan 2025 08:23:01 -0800 (PST)
+Date: Wed,  8 Jan 2025 16:22:54 +0000
 In-Reply-To: <20250108162255.1306392-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -73,8 +73,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250108162255.1306392-1-edumazet@google.com>
 X-Mailer: git-send-email 2.47.1.613.gc27f4b7a9f-goog
-Message-ID: <20250108162255.1306392-3-edumazet@google.com>
-Subject: [PATCH v2 net-next 2/4] net: no longer assume RTNL is held in flush_all_backlogs()
+Message-ID: <20250108162255.1306392-4-edumazet@google.com>
+Subject: [PATCH v2 net-next 3/4] net: no longer hold RTNL while calling flush_all_backlogs()
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -82,120 +82,56 @@ Cc: netdev@vger.kernel.org, Simon Horman <horms@kernel.org>, eric.dumazet@gmail.
 	Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-flush_all_backlogs() uses per-cpu and static data to hold its
-temporary data, on the assumption it is called under RTNL
-protection.
+flush_all_backlogs() is called from unregister_netdevice_many_notify()
+as part of netdevice dismantles.
 
-Following patch in the series will break this assumption.
+This is currently called under RTNL, and can last up to 20ms on busy hosts.
 
-Use instead a dynamically allocated piece of memory.
-
-In the unlikely case the allocation fails,
-use a boot-time allocated memory.
+There is no reason to hold RTNL at this stage, if our caller
+is cleanup_net() : netns are no more visible, devices
+are in NETREG_UNREGISTERING state and no other thread
+could mess our state while RTNL is temporarily released.
 
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- net/core/dev.c | 53 +++++++++++++++++++++++++++++++++-----------------
- 1 file changed, 35 insertions(+), 18 deletions(-)
+ net/core/dev.c | 16 +++++++++++++++-
+ 1 file changed, 15 insertions(+), 1 deletion(-)
 
 diff --git a/net/core/dev.c b/net/core/dev.c
-index 76ad68b129eed0407686e8696102aeed9a8b30ec..8ff288cf25dceb5856496388f83f409fcb6f8e5d 100644
+index 8ff288cf25dceb5856496388f83f409fcb6f8e5d..86fa9ae29d31a25dca8204c75fd39974ef84707d 100644
 --- a/net/core/dev.c
 +++ b/net/core/dev.c
-@@ -5978,8 +5978,6 @@ void netif_receive_skb_list(struct list_head *head)
- }
- EXPORT_SYMBOL(netif_receive_skb_list);
- 
--static DEFINE_PER_CPU(struct work_struct, flush_works);
--
- /* Network device is going away, flush any packets still pending */
- static void flush_backlog(struct work_struct *work)
- {
-@@ -6036,36 +6034,54 @@ static bool flush_required(int cpu)
- 	return true;
+@@ -11436,6 +11436,18 @@ static bool from_cleanup_net(void)
+ 	return current == cleanup_net_task;
  }
  
-+struct flush_backlogs {
-+	cpumask_t		flush_cpus;
-+	struct work_struct	w[];
-+};
-+
-+static struct flush_backlogs *flush_backlogs_alloc(void)
++static void rtnl_drop_if_cleanup_net(void)
 +{
-+	return kmalloc(struct_size_t(struct flush_backlogs, w, nr_cpu_ids),
-+		       GFP_KERNEL);
++	if (from_cleanup_net())
++		__rtnl_unlock();
 +}
 +
-+static struct flush_backlogs *flush_backlogs_fallback;
-+static DEFINE_MUTEX(flush_backlogs_mutex);
++static void rtnl_acquire_if_cleanup_net(void)
++{
++	if (from_cleanup_net())
++		rtnl_lock();
++}
 +
- static void flush_all_backlogs(void)
- {
--	static cpumask_t flush_cpus;
-+	struct flush_backlogs *ptr = flush_backlogs_alloc();
- 	unsigned int cpu;
- 
--	/* since we are under rtnl lock protection we can use static data
--	 * for the cpumask and avoid allocating on stack the possibly
--	 * large mask
--	 */
--	ASSERT_RTNL();
-+	if (!ptr) {
-+		mutex_lock(&flush_backlogs_mutex);
-+		ptr = flush_backlogs_fallback;
-+	}
-+	cpumask_clear(&ptr->flush_cpus);
- 
- 	cpus_read_lock();
- 
--	cpumask_clear(&flush_cpus);
- 	for_each_online_cpu(cpu) {
- 		if (flush_required(cpu)) {
--			queue_work_on(cpu, system_highpri_wq,
--				      per_cpu_ptr(&flush_works, cpu));
--			cpumask_set_cpu(cpu, &flush_cpus);
-+			INIT_WORK(&ptr->w[cpu], flush_backlog);
-+			queue_work_on(cpu, system_highpri_wq, &ptr->w[cpu]);
-+			__cpumask_set_cpu(cpu, &ptr->flush_cpus);
- 		}
+ /**
+  *	synchronize_net -  Synchronize with packet receive processing
+  *
+@@ -11548,8 +11560,10 @@ void unregister_netdevice_many_notify(struct list_head *head,
+ 		unlist_netdevice(dev);
+ 		WRITE_ONCE(dev->reg_state, NETREG_UNREGISTERING);
  	}
+-	flush_all_backlogs();
  
- 	/* we can have in flight packet[s] on the cpus we are not flushing,
- 	 * synchronize_net() in unregister_netdevice_many() will take care of
--	 * them
-+	 * them.
- 	 */
--	for_each_cpu(cpu, &flush_cpus)
--		flush_work(per_cpu_ptr(&flush_works, cpu));
-+	for_each_cpu(cpu, &ptr->flush_cpus)
-+		flush_work(&ptr->w[cpu]);
++	rtnl_drop_if_cleanup_net();
++	flush_all_backlogs();
++	rtnl_acquire_if_cleanup_net();
+ 	synchronize_net();
  
- 	cpus_read_unlock();
-+
-+	if (ptr != flush_backlogs_fallback)
-+		kfree(ptr);
-+	else
-+		mutex_unlock(&flush_backlogs_mutex);
- }
- 
- static void net_rps_send_ipi(struct softnet_data *remsd)
-@@ -12259,12 +12275,13 @@ static int __init net_dev_init(void)
- 	 *	Initialise the packet receive queues.
- 	 */
- 
-+	flush_backlogs_fallback = flush_backlogs_alloc();
-+	if (!flush_backlogs_fallback)
-+		goto out;
-+
- 	for_each_possible_cpu(i) {
--		struct work_struct *flush = per_cpu_ptr(&flush_works, i);
- 		struct softnet_data *sd = &per_cpu(softnet_data, i);
- 
--		INIT_WORK(flush, flush_backlog);
--
- 		skb_queue_head_init(&sd->input_pkt_queue);
- 		skb_queue_head_init(&sd->process_queue);
- #ifdef CONFIG_XFRM_OFFLOAD
+ 	list_for_each_entry(dev, head, unreg_list) {
 -- 
 2.47.1.613.gc27f4b7a9f-goog
 
