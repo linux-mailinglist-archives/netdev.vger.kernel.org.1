@@ -1,109 +1,116 @@
-Return-Path: <netdev+bounces-156331-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156332-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7DB10A061C4
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 17:25:06 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 509D6A061CB
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 17:26:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7D22A1638AD
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 16:25:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9DB041885153
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 16:26:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B52F1FE47F;
-	Wed,  8 Jan 2025 16:25:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E00BA1FF1DE;
+	Wed,  8 Jan 2025 16:26:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="jyIuwa/3"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tDn1HA3z"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 248EE19F489;
-	Wed,  8 Jan 2025 16:24:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 191591FECB5
+	for <netdev@vger.kernel.org>; Wed,  8 Jan 2025 16:26:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736353502; cv=none; b=Rz8auN0N5CAgK3Q39uX7SnPU0zCmxuVpfGdniUrBYoHripSTdDIzZJr6cKLxc3QgvOJ4Hn9dlgoN0NG6nvFmrirSTK9gIr4cCC0twQPRVsrYpTCgbVfvOYzcNgNnvVjP9h+LHvKimn0BJSv9RN1by+fqRRUHQeve02uakVUpaHM=
+	t=1736353568; cv=none; b=GHsY8FtbYfAMAAB7D5js6JlGRO8lZgeMIPr+P7XTglLa35dqbaNH86VPnwYvl/NCMLxYTk5XnOJTxT7IobLBhufXNL627P0CI/flYKkYz0eOAFsIVl2ntp2eYVxeewWMnZOD4EtQRQ/6sJfJoWfW4ye3K996FQ5Qb//Y+K4VYnw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736353502; c=relaxed/simple;
-	bh=kPcx6EqSyZVL/wllFQBgnGtYWem7gRt24tVGvP/oRJY=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=OPhtxlcumSZBrv/Jd5xozF4maZdeMxJ97x4ojAerPxVeCmgd+GGURSBNep0G3W5VmTEAgtiNN2DV3Tky9fS6JwtdnDTgeMqJx4y1aeMg/HhbHDtoQ+cseH5lU1nj2bMzijaJJRnfTLCaPuw2gKlBWuorRdiybYHtInhS6iJRZFk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=jyIuwa/3; arc=none smtp.client-ip=217.70.183.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 154F6C000B;
-	Wed,  8 Jan 2025 16:24:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1736353498;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ywtVfbBrJlMkzZ3DHOkUmnWcxehi+NF/Go9lQQuP9pg=;
-	b=jyIuwa/3h8m9CFtJWbn4mMTWJLXgd1MWVSLOyRzcff31dtX/En5BFl0Wmjva0jB72akhHa
-	uLrCvbm4tTH6eT6fcP3ZcVbKKwj8mLBk1YObhV5lSxKVwf9/XdlpznhViGJlLNQjReLfQ9
-	EWDCv9r9WC7wiM0Qkx1VEeu5We083nQP+D6atw6Cryk8hstRoIH46k/8xm+6k4r9LQkMmO
-	StU+DNPHLqjVkeycrGIKZ998H/GdISoc3CPPtz4w8EWj0dzxC73z65FX4sbBFlbrflv5wP
-	fTwenF8/n04WtvEBjFlGebvEMMWfGuNcPMflSrAVmNO0IIHWIdY9zb60iG2M6Q==
-Date: Wed, 8 Jan 2025 17:24:56 +0100
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>, Jakub Kicinski
- <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Andrew Lunn
- <andrew+netdev@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, Jonathan
- Corbet <corbet@lwn.net>, kernel@pengutronix.de,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org, Simon Horman
- <horms@kernel.org>, Russell King <linux@armlinux.org.uk>,
- linux-doc@vger.kernel.org
-Subject: Re: [PATCH net-next v5 2/8] net: ethtool: plumb PHY stats to PHY
- drivers
-Message-ID: <20250108172456.522517ff@fedora.home>
-In-Reply-To: <95111e20-d08a-42e5-b8cc-801e34d15040@lunn.ch>
-References: <20250106083301.1039850-1-o.rempel@pengutronix.de>
-	<20250106083301.1039850-3-o.rempel@pengutronix.de>
-	<20250107180216.5802e941@kernel.org>
-	<Z35ApuS2S1heAqXe@pengutronix.de>
-	<95111e20-d08a-42e5-b8cc-801e34d15040@lunn.ch>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1736353568; c=relaxed/simple;
+	bh=Vrpja7gLp8wClJr7WGS7vASHEC8+FJW4qOfjHyBB1O0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=dvTOUcksP1LFPvj6igDRbeiTywl+F7psE/rNnN1uOJ6CpS3Wi6rfNrU3zjp7qdAGhQjfBik1SbdymEt1f7hcQgf787/ORasSkEZ3QoN3jhxiSnVbpf/RoTZnt6uKnu7nosiO/9WTIl058/LGiKlUDYAZL/QFEvgULl2Xr7SSBmY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=tDn1HA3z; arc=none smtp.client-ip=209.85.208.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-5d3d2a30afcso31257389a12.3
+        for <netdev@vger.kernel.org>; Wed, 08 Jan 2025 08:26:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1736353565; x=1736958365; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Vrpja7gLp8wClJr7WGS7vASHEC8+FJW4qOfjHyBB1O0=;
+        b=tDn1HA3zNZRjj9WMo8acx1ez8tIfQvTIbLvJjF70xmYxxxwwOOvvl5YYDDDgO5sxLv
+         eRTAZFiDVw9Cz4kHPaYIKFE76TaK5iEqPGWXJKRSEwgEdRATaLzdKWsmMt+z+04sgSW0
+         2aRfWEni+MTBDtzEJH6uSg2stfecoJMGNsC9ffCYDRKl3/1/GaMyfUHT8z8ACMarzMfA
+         B8RMJjlQxkES1CCLGjGO2pFHnHHt7lhO5oDIVzZRIireZ1RbxfzV3pjsITidX5TTx3nV
+         WRrDhjlKMbIiuDj6pobx0+w0oB25FTVXzZ1CUhPMv/v+Zz5ieH19kFfnWHaIA86oL/Kg
+         04XQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736353565; x=1736958365;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Vrpja7gLp8wClJr7WGS7vASHEC8+FJW4qOfjHyBB1O0=;
+        b=fo2gv0sVzZ/OBYSi/rGtG15TsACcezzksuyrJPo+M7JY6VLQ9TzapdFIcB6kJNyOrF
+         F+J5N4wIPAObir4SKSnVLokHJQ5yPLSc8iVJYzrEbHCnhKOWUalTkjOPwipMVWH+XWkM
+         YDGOTcx0GgTEYbgi6OV0vWYEFQ3JG615m2oOtwXl5rc0lpNbA1N+63XSligyifKT13hL
+         yR4dLMZV7rtSORBXvq1f6miBPohat4ePMURz79NmC+LAmanDS21NPkSe4C0LKhpyVb1d
+         wRLWeieuVbvEAPolmOdq6cwbtPtkYIbj+LtA9hzbaC5Vlgml7vRCBxgnmc/JZuRshHkt
+         z56w==
+X-Forwarded-Encrypted: i=1; AJvYcCUpyuwQEyP2UrvcYPgPBJsAyA7lVNO9/T2nFDMjdAAvVvk8mG+uzdBuyh1w0CzUO2nHHCukA/I=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwfpYWlfsjD+B4kJzwS/oLgMWvfFQiSvj/vXtb7wWAOBxhLYRf7
+	+YKPRNP0/P0vzVlL4giwKTgUwlumU4Z6ZeA5ev0MIJWS15Wp5MQkaOJ7Ld5fUoB9tEExBqXdOqc
+	oDK6xttPEMSg4AQhREc7ICbpS/QaLM0HehA80
+X-Gm-Gg: ASbGnctOj6LxXMudVeaqdbann/2yYKcITXo6NrgRA2spovRib5bJAqtpXItaKvuyEwD
+	7RCOQA3Jyg1tTtnUX0jpRc7MXpiZyFcujTuUN75g=
+X-Google-Smtp-Source: AGHT+IGeGF4vh8DxTEjN7tESfGNU41x6ofqkC+fyq/M8TSO5+w5+umwB8ua4y8BitM97QdgJt25Wf0pnzPSZGjKvuUs=
+X-Received: by 2002:a05:6402:280e:b0:5d3:e9fd:9a15 with SMTP id
+ 4fb4d7f45d1cf-5d972e6f473mr3265028a12.32.1736353565288; Wed, 08 Jan 2025
+ 08:26:05 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-GND-Sasl: maxime.chevallier@bootlin.com
+References: <20250108-net-sysctl-current-nsproxy-v1-0-5df34b2083e8@kernel.org> <20250108-net-sysctl-current-nsproxy-v1-1-5df34b2083e8@kernel.org>
+In-Reply-To: <20250108-net-sysctl-current-nsproxy-v1-1-5df34b2083e8@kernel.org>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 8 Jan 2025 17:25:54 +0100
+X-Gm-Features: AbW1kvaWCFc1GR9QJN1q6qk-A8PrW0sTYcPB5wSHtxPxsBwUlmaJfdU5wH_8KII
+Message-ID: <CANn89iLPDTRYEGO0C=gtbHnM=OUPhfdK3RoLzzWMOMLEgmT0Tw@mail.gmail.com>
+Subject: Re: [PATCH net 1/9] mptcp: sysctl: avail sched: remove write access
+To: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+Cc: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, 
+	Geliang Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Gregory Detal <gregory.detal@gmail.com>, 
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, Xin Long <lucien.xin@gmail.com>, 
+	Vlad Yasevich <vyasevich@gmail.com>, Neil Horman <nhorman@tuxdriver.com>, 
+	wangweidong <wangweidong1@huawei.com>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Vlad Yasevich <vyasevic@redhat.com>, Allison Henderson <allison.henderson@oracle.com>, 
+	Sowmini Varadhan <sowmini.varadhan@oracle.com>, Al Viro <viro@zeniv.linux.org.uk>, 
+	Joel Granados <joel.granados@kernel.org>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-sctp@vger.kernel.org, 
+	linux-rdma@vger.kernel.org, rds-devel@oss.oracle.com, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Andrew, Oleksij,
+On Wed, Jan 8, 2025 at 4:35=E2=80=AFPM Matthieu Baerts (NGI0)
+<matttbe@kernel.org> wrote:
+>
+> 'net.mptcp.available_schedulers' sysctl knob is there to list available
+> schedulers, not to modify this list.
+>
+> There are then no reasons to give write access to it.
+>
+> Nothing would have been written anyway, but no errors would have been
+> returned, which is unexpected.
+>
+> Fixes: 73c900aa3660 ("mptcp: add net.mptcp.available_schedulers")
+> Cc: stable@vger.kernel.org
+> Reviewed-by: Mat Martineau <martineau@kernel.org>
+> Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
 
-On Wed, 8 Jan 2025 17:03:25 +0100
-Andrew Lunn <andrew@lunn.ch> wrote:
-
-> > On one side I need to address the request to handle phydev specific
-> > thing withing the PHYlib framework. On other side, I can't do it without
-> > openen a pandora box of build dependencies. It will be a new main-side-quest
-> > to resolve build dependency of net/ethtool/ and PHYlib. The workaround is to
-> > put this functions to the header.  
-> 
-> Yes, the code is like this because phylib can be a module, and when it
-> is, you would end up with unresolved symbols if ethtool code is built
-> in. There are circular dependence as well, if both ethtool and phylib
-> are module. The inlines help solve this.
-> 
-> However, the number of these inline functions keeps growing. At some
-> point, we might want a different solution. Maybe phylib needs to
-> register a structure of ops with ethtool when it loads?
-
-Isn't it already the case with the ethtool_phy_ops singleton ? Maybe we
-can add wrap the get_phy_stats / get_link_ext_stats ops to the
-ethtool_phy_ops ? My understanding was that this singleton served this
-purpose.
-
-Thanks,
-
-Maxime
-
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
