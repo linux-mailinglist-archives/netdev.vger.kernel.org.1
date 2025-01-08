@@ -1,172 +1,162 @@
-Return-Path: <netdev+bounces-156280-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156281-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B96AA05DA8
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 14:56:47 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2FC15A05DB8
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 14:58:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3E8C61883BDB
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 13:56:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 62843160D90
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 13:57:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC5181FDE09;
-	Wed,  8 Jan 2025 13:56:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 112451FCCED;
+	Wed,  8 Jan 2025 13:56:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="b+iWfO05"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eoW8Cx85"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-119.freemail.mail.aliyun.com (out30-119.freemail.mail.aliyun.com [115.124.30.119])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05B571FCFEE;
-	Wed,  8 Jan 2025 13:56:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.119
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E389F1514F8
+	for <netdev@vger.kernel.org>; Wed,  8 Jan 2025 13:56:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736344581; cv=none; b=Pw3Fb0yCzrFcwmeBAc9hl8yNfbMxyDCISOPVVsKgsLLvUPYmEydnP2S5mDfJDM2QWGjcy/yvXIbpCzLuzYIesd7F3+FWrdNbW13dHeDxkxdTI5ok4rcMa0/R2mUlE+5A2xOBmkFHkZL/TKsCSApZvV52IesTrmHCbBGaVNkE6+8=
+	t=1736344619; cv=none; b=hvVE+jtvJa0KDrqwMijsPil0HPCyQIDrCyvfBignzMjg/pQnt2+zfe9caS/MngrHU2QKcI643Aow6GD0srpw1CGnge04dDAioo5rbJSL4EgvFJss6KwOhLmbVRhrFf94IVcnMAc7eO1fVAGSwgK9JFELzx0jpK4qb98BO0J9SPM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736344581; c=relaxed/simple;
-	bh=pc4lU5q3Vg5I+/c4kH2jkIvXc1TmkuC/ik4mSuPEovw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bb/7RD4KfUhvxKMWDeID03VVyw2hzbZpsigvmiBZ8BUWHSBnxL/vKPqJxTw/RDHzgUTJN7/giQfsQVcJxzDKS6yN1OX4ZkGDElSDx0RCM/WxCIRxsfmZ/aA/5e/32PKzp486SIaxxNTXl3dTGUKDcpR7ZvDsD4ThkOCoic92MIo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=b+iWfO05; arc=none smtp.client-ip=115.124.30.119
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1736344569; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
-	bh=upKJAJq1cpY+dKRFkgN4ANfmP0Qld4oqm5SVhIFXhTM=;
-	b=b+iWfO05K98apl67Dl7w3HjtaLn3ncETXXt1igfqcsZbgsGU6m61rLMafZkkbrx6MCJBt1h25O5wsFCyjFhvZgYq+C6Lh+jSHCQPrQLXsi1Pn8G3m02AMg5f0Abndl0869N7rV+KDixgXEBKWFVf72wOhAax9xRgSd/c+vsjsPw=
-Received: from localhost(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0WNEIZlZ_1736344566 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Wed, 08 Jan 2025 21:56:07 +0800
-Date: Wed, 8 Jan 2025 21:56:06 +0800
-From: "D. Wythe" <alibuda@linux.alibaba.com    >
-To: Martin KaFai Lau <martin.lau@linux.dev>
-Cc: "D. Wythe" <alibuda@linux.alibaba.com>, kgraul@linux.ibm.com,
-	wenjia@linux.ibm.com, jaka@linux.ibm.com, ast@kernel.org,
-	daniel@iogearbox.net, andrii@kernel.org, pabeni@redhat.com,
-	song@kernel.org, sdf@google.com, haoluo@google.com, yhs@fb.com,
-	edumazet@google.com, john.fastabend@gmail.com, kpsingh@kernel.org,
-	jolsa@kernel.org, guwen@linux.alibaba.com, kuba@kernel.org,
-	davem@davemloft.net, netdev@vger.kernel.org,
-	linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org,
-	bpf@vger.kernel.org
-Subject: Re: [PATCH bpf-next v5 5/5] bpf/selftests: add selftest for
- bpf_smc_ops
-Message-ID: <20250108135606.GB86266@j66a10360.sqa.eu95>
-References: <20250107041715.98342-1-alibuda@linux.alibaba.com>
- <20250107041715.98342-6-alibuda@linux.alibaba.com>
- <5ff5cb2b-625b-44ba-8472-95e007f24824@linux.dev>
+	s=arc-20240116; t=1736344619; c=relaxed/simple;
+	bh=XSmVghZQYJg/guSBgRC1qEwqtZ9lEQ7IH29JTbZ32j8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-type; b=r8ryPRMu0nIDhc2KHf4xU44IZJxelQp80kOC4mXFc4UcAxkqqq2CgsFcqDR1wu3kuLEbtev96I2ai8zmyI4EevI4epTevVT2XbhJ8rj+JJbEqfcs0ytO1kFvZtr/ZDcXPfVkhBvEfw0JXJfpX7UBMk/AbiLRn4pGQyE0p7v/hJY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eoW8Cx85; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1736344615;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=3L7zp1US36o3r95Xqx3Ef6BGfrB7O/v1PvmkGJaUDIE=;
+	b=eoW8Cx85jH6//0HOAC4aulCjPmKdB4hM9iO7I7eAXfXMc/DPc9ZCus60ldojIPdadE/Guz
+	1T5Ewhiywv6iM+0n33PNDEWSAulGOI7+B5F6JbZTUwtMjWbxUm2lFrFqclDU7bL6J5nBap
+	Jl4q6o8i13TkHaNlKMEkiVOkYsGEdOY=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-214-RDc7fjRnMBOKg2eJNv55cw-1; Wed,
+ 08 Jan 2025 08:56:52 -0500
+X-MC-Unique: RDc7fjRnMBOKg2eJNv55cw-1
+X-Mimecast-MFC-AGG-ID: RDc7fjRnMBOKg2eJNv55cw
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6AC0919560A1;
+	Wed,  8 Jan 2025 13:56:51 +0000 (UTC)
+Received: from t14s.redhat.com (unknown [10.45.225.0])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id A2013300018D;
+	Wed,  8 Jan 2025 13:56:48 +0000 (UTC)
+From: Jan Stancek <jstancek@redhat.com>
+To: donald.hunter@gmail.com,
+	stfomichev@gmail.com,
+	kuba@kernel.org,
+	jdamato@fastly.com
+Cc: pabeni@redhat.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	jstancek@redhat.com
+Subject: [PATCH v4 0/4] tools: ynl: add install target
+Date: Wed,  8 Jan 2025 14:56:13 +0100
+Message-ID: <cover.1736343575.git.jstancek@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5ff5cb2b-625b-44ba-8472-95e007f24824@linux.dev>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+Content-type: text/plain
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-On Tue, Jan 07, 2025 at 04:48:51PM -0800, Martin KaFai Lau wrote:
-> On 1/6/25 8:17 PM, D. Wythe wrote:
-> >+static int send_cmd(int fd, __u16 nlmsg_type, __u32 nlmsg_pid, __u16 nlmsg_flags,
-> >+			__u8 genl_cmd, __u16 nla_type,
-> >+	while ((r = sendto(fd, buf, buflen, 0, (struct sockaddr *) &nladdr,
-> >+			   sizeof(nladdr))) < buflen) {
-> >+		if (r > 0) {
-> >+			buf += r;
-> >+			buflen -= r;
-> >+		} else if (errno != EAGAIN)
-> >+			return -1;
-> >+		}
-> 
-> The "}" indentation is off.
-> 
-> I was wondering if it missed a "}" for the while loop. Turns out the
-> "else if" does not have braces while the "if" has. I would add
-> braces to the "else if" also to avoid confusion like this.
-> 
-Take it. I fix change it in next version.
-> >+	return 0;
-> >+}
-> >+
-> >+static bool get_smc_nl_family_id(void)
-> >+{
-> >+	struct sockaddr_nl nl_src;
-> >+	struct msgtemplate msg;
-> >+	ret = send_cmd(fd, smc_nl_family_id, pid,
-> >+		       NLM_F_REQUEST | NLM_F_ACK, op, SMC_NLA_EID_TABLE_ENTRY,
-> >+	(void *)test_ueid, sizeof(test_ueid));
-> 
-> Same. Indentation is off.
-Take it. Thanks for pointing it out.
-> 
-> >+	if (!ASSERT_EQ(ret, 0, "ueid cmd"))
-> >+		goto fail;
-> >+
-> >+	nstoken = open_netns(TEST_NS);
-> 
-> Instead of make_netns and then immediately open_netns, try
-> netns_new(TEST_NS, true) from the test_progs.c.
-Got it, I'll try it in next version.
-> 
-> >+	if (!ASSERT_OK_PTR(nstoken, "open net namespace"))
-> >+		goto fail_open_netns;
-> >+
-> >+	if (!ASSERT_OK(system("ip addr add 127.0.1.0/8 dev lo"), "add server node"))
-> >+		goto fail_ip;
-> >+
-> >+	if (!ASSERT_OK(system("ip addr add 127.0.2.0/8 dev lo"), "server via risk path"))
-> >+	close_netns(nstoken);
-> >+	return false;
-> >+}
-> >+
-> >+	/* Configure ip strat */
-> >+	block_link(map_fd, CLIENT_IP, SERVER_IP_VIA_RISK_PATH);
-> >+	block_link(map_fd, SERVER_IP, SERVER_IP);
-> >+	close(map_fd);
-> 
-> No need to close(map-fd) here. bpf_smc__destroy(skel) will do it.
-Got it. Many thanks.
-> 
-> It seems the new selftest fails also. not always though which is concerning.
-> 
-This might not be a random failure, but rather related to s390x, which
-carries a seid by default, which may affect my action of deleting ueid.
-I am requesting IBM folks to help me analyze this issue since i have no
-s390x machine.
+This series adds an install target for ynl. The python code
+is moved to a subdirectory, so it can be used as a package
+with flat layout, as well as directly from the tree.
 
-Anyway, I will solve it in the next version.
+To try the install as a non-root user you can run:
+  $ mkdir /tmp/myroot
+  $ make DESTDIR=/tmp/myroot install
 
-Best wishes,
-D. Wythe
+  $ PATH="/tmp/myroot/usr/bin:$PATH" PYTHONPATH="$(ls -1d /tmp/myroot/usr/lib/python*/site-packages)" ynl --help
 
-> pw-bot: cr
-> 
-> >+
-> >+	/* should go with smc */
-> >+	run_link(CLIENT_IP, SERVER_IP, SERVICE_1);
-> >+	/* should go with smc fallback */
-> >+	run_link(SERVER_IP, SERVER_IP, SERVICE_2);
-> >+
-> >+	ASSERT_EQ(skel->bss->smc_cnt, 2, "smc count");
-> >+	ASSERT_EQ(skel->bss->fallback_cnt, 1, "fallback count");
-> >+
-> >+	/* should go with smc */
-> >+	run_link(CLIENT_IP, SERVER_IP, SERVICE_2);
-> >+
-> >+	ASSERT_EQ(skel->bss->smc_cnt, 3, "smc count");
-> >+	ASSERT_EQ(skel->bss->fallback_cnt, 1, "fallback count");
-> >+
-> >+	/* should go with smc fallback */
-> >+	run_link(CLIENT_IP, SERVER_IP_VIA_RISK_PATH, SERVICE_3);
-> >+
-> >+	ASSERT_EQ(skel->bss->smc_cnt, 4, "smc count");
-> >+	ASSERT_EQ(skel->bss->fallback_cnt, 2, "fallback count");
-> >+
-> >+fail:
-> >+	bpf_smc__destroy(skel);
-> >+}
-> 
+Proposed install layout is described in last patch.
+
+Changes in v4:
+- 1/4 tools: ynl: move python code to separate sub-directory
+  no code changes, added Reviewed-by tag from v3
+- 2/4 tools: ynl: add initial pyproject.toml for packaging
+  no longer installs ynl-gen-c and ynl-gen-rst
+  updated commit message
+- 3/4 tools: ynl: add install target for generated content
+  fixed mix of tabs and spaces in Makefile
+  factored out SPECS_DIR so the path is not repeated
+  fixed TOOL2->TOOL_RST
+  moved clear of .rst to distclean
+- 4/4 tools: ynl: add main install target
+  no code changes, added Reviewed-by tags from v3
+
+Changes in v3:
+- dropped symlinks
+- added install-headers install-rsts install-specs to PHONY target in generated/Makefile
+- install headers from lib and generated directories to /usr/include/ynl
+
+Changes in v2:
+- squashed 1st and 2nd patch together
+- added symlinks for original user-facing scripts for backwards compatibility
+- updated also Documentation and selftests references
+  (tested Doc build and selftests ping.py test)
+
+
+Jan Stancek (4):
+  tools: ynl: move python code to separate sub-directory
+  tools: ynl: add initial pyproject.toml for packaging
+  tools: ynl: add install target for generated content
+  tools: ynl: add main install target
+
+ Documentation/Makefile                        |  2 +-
+ Documentation/networking/multi-pf-netdev.rst  |  4 +-
+ Documentation/networking/napi.rst             |  4 +-
+ .../networking/netlink_spec/readme.txt        |  2 +-
+ .../userspace-api/netlink/intro-specs.rst     |  8 +--
+ tools/net/ynl/Makefile                        | 29 ++++++++++-
+ tools/net/ynl/generated/.gitignore            |  1 +
+ tools/net/ynl/generated/Makefile              | 51 ++++++++++++++++---
+ tools/net/ynl/lib/.gitignore                  |  1 -
+ tools/net/ynl/lib/Makefile                    |  1 -
+ tools/net/ynl/pyproject.toml                  | 24 +++++++++
+ tools/net/ynl/pyynl/.gitignore                |  2 +
+ tools/net/ynl/pyynl/__init__.py               |  0
+ tools/net/ynl/{ => pyynl}/cli.py              |  0
+ tools/net/ynl/{ => pyynl}/ethtool.py          |  0
+ tools/net/ynl/{ => pyynl}/lib/__init__.py     |  0
+ tools/net/ynl/{ => pyynl}/lib/nlspec.py       |  0
+ tools/net/ynl/{ => pyynl}/lib/ynl.py          |  0
+ .../ynl/{ynl-gen-c.py => pyynl/ynl_gen_c.py}  |  0
+ .../{ynl-gen-rst.py => pyynl/ynl_gen_rst.py}  |  0
+ tools/net/ynl/ynl-regen.sh                    |  2 +-
+ tools/testing/selftests/net/lib/py/ynl.py     |  4 +-
+ tools/testing/selftests/net/ynl.mk            |  3 +-
+ 23 files changed, 113 insertions(+), 25 deletions(-)
+ create mode 100644 tools/net/ynl/pyproject.toml
+ create mode 100644 tools/net/ynl/pyynl/.gitignore
+ create mode 100644 tools/net/ynl/pyynl/__init__.py
+ rename tools/net/ynl/{ => pyynl}/cli.py (100%)
+ rename tools/net/ynl/{ => pyynl}/ethtool.py (100%)
+ rename tools/net/ynl/{ => pyynl}/lib/__init__.py (100%)
+ rename tools/net/ynl/{ => pyynl}/lib/nlspec.py (100%)
+ rename tools/net/ynl/{ => pyynl}/lib/ynl.py (100%)
+ rename tools/net/ynl/{ynl-gen-c.py => pyynl/ynl_gen_c.py} (100%)
+ rename tools/net/ynl/{ynl-gen-rst.py => pyynl/ynl_gen_rst.py} (100%)
+
+-- 
+2.43.0
+
 
