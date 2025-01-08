@@ -1,160 +1,105 @@
-Return-Path: <netdev+bounces-156429-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156430-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 06F9CA065C1
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 21:12:05 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 520C7A065D2
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 21:14:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4DA1E3A66CF
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 20:11:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 51FAD1648BD
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 20:14:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAA7520013D;
-	Wed,  8 Jan 2025 20:12:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6F58202C55;
+	Wed,  8 Jan 2025 20:14:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="cokaGl5r"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out.kfki.hu (smtp-out.kfki.hu [148.6.0.50])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA98B198A06;
-	Wed,  8 Jan 2025 20:11:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.6.0.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E7F120127E;
+	Wed,  8 Jan 2025 20:14:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736367120; cv=none; b=RBUONo6w7uVaahrRy//6jPvxko08ArVbGppztYzksxRxNUrz7+FAJIc4V+gp3RNSRI4qbd79gRm/qhIoj5tLhC95SAm3+D4REZg1hgDEXN8PFgos6PZq0j08GX+fVZkWTdWWGD+a5SHngpd3IxR5ow3qxKYImHpF/LtElMBEyOo=
+	t=1736367271; cv=none; b=uSlmRcoMi4/zXpS5OgYdhK7C3YWyOdXKvWT7Zko+zNH/9+b4JoiJghYj6Sv+7oaA5M6GtdttSoXSVrHlFOUNrw5UEgUHhhjOXv/W/2ORql0xwCnlXha8Wm1HufmMPK/CaNXhvLEMnR8WPGOcXz6YzwCUT30zTawadXG4Cv1hWrw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736367120; c=relaxed/simple;
-	bh=oatabbBNA9Q9wqlrLxwJ7l+gsc9TbdZrfCbPD4csvno=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=SzKSq4+OKw/Sh9Hqgo/xoRxiJYd6tEQuhlmSLmVPMekPCJfLVr9lNR3UAUzLsTiMFZcBncqLu57cr5BrRG38V4f6HwKfegIZ9rxCuVqySAtGUd1nFqBhCnDTvO2vthOua5yvStTUUUMvmUGrvCn8Ak4Vhb3/tSPFOENVJhMxmYQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; arc=none smtp.client-ip=148.6.0.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
-Received: from localhost (localhost [127.0.0.1])
-	by smtp1.kfki.hu (Postfix) with ESMTP id 6085F5C001C5;
-	Wed,  8 Jan 2025 21:11:49 +0100 (CET)
-X-Virus-Scanned: Debian amavis at smtp1.kfki.hu
-Received: from smtp1.kfki.hu ([127.0.0.1])
- by localhost (smtp1.kfki.hu [127.0.0.1]) (amavis, port 10026) with ESMTP
- id uq60o7O87ePj; Wed,  8 Jan 2025 21:11:47 +0100 (CET)
-Received: from mentat.rmki.kfki.hu (85-238-77-85.pool.digikabel.hu [85.238.77.85])
-	(Authenticated sender: kadlecsik.jozsef@wigner.hu)
-	by smtp1.kfki.hu (Postfix) with ESMTPSA id A33005C001C1;
-	Wed,  8 Jan 2025 21:11:46 +0100 (CET)
-Received: by mentat.rmki.kfki.hu (Postfix, from userid 1000)
-	id 5EBF3142729; Wed,  8 Jan 2025 21:11:46 +0100 (CET)
-Received: from localhost (localhost [127.0.0.1])
-	by mentat.rmki.kfki.hu (Postfix) with ESMTP id 5AED31424A2;
-	Wed,  8 Jan 2025 21:11:46 +0100 (CET)
-Date: Wed, 8 Jan 2025 21:11:46 +0100 (CET)
-From: Jozsef Kadlecsik <kadlec@netfilter.org>
-To: =?UTF-8?Q?Sz=C5=91ke_Benjamin?= <egyszeregy@freemail.hu>
-cc: Florian Westphal <fw@strlen.de>, Pablo Neira Ayuso <pablo@netfilter.org>, 
-    lorenzo@kernel.org, daniel@iogearbox.net, leitao@debian.org, 
-    amiculas@cisco.com, David Miller <davem@davemloft.net>, dsahern@kernel.org, 
-    edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
-    netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
-    linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH 01/10] netfilter: x_tables: Merge xt_DSCP.h to
- xt_dscp.h
-In-Reply-To: <98387132-330e-4068-9b71-e98dbcc9cd40@freemail.hu>
-Message-ID: <d7190f89-da4d-40df-2910-5e87ca3cd314@netfilter.org>
-References: <20250107024120.98288-1-egyszeregy@freemail.hu> <20250107024120.98288-2-egyszeregy@freemail.hu> <4fab5e14-2782-62d2-a32d-54b673201f26@netfilter.org> <98387132-330e-4068-9b71-e98dbcc9cd40@freemail.hu>
+	s=arc-20240116; t=1736367271; c=relaxed/simple;
+	bh=fWXWqOox9j68tKJYQQyfrzCuN3RmXdh/TDYs9UfDP7M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oCkm/zJYYG0aLZD0gEirxl0Xy8f6kQDuTzzMNnS5KdUFD71y4mA5+v5kuewgJWwBn4xQXTaJWQCkF7LPQDyDJi1n9YxBvF1/LNr8XUCILcKHGWd/KqFtPhBeyn6NZYQ7E+qlPrpfQscnStwJ6H7awLXHtnHBR/flWRamDTrsoh8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=cokaGl5r; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=hs8uP3N/mTdsE3JF6EEgjMUW9ubX3QrUliIYU0W1Efw=; b=cokaGl5rbCCWR5PLEEXlzlK4cg
+	61kIh8CGC74Kzu7whTHy6mmGZiSShEsvkL/AiJ79CgmLhcin6x2cZmY33bJNEFJBTn2rnElphfZ8A
+	QoBXD8JA3+CWcAR2AKXIabgI7RguloybklWjZ7s0SMDRD9wP03I3Y1lpAgkiPSW+xw0s=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tVcR0-002fvx-Ne; Wed, 08 Jan 2025 21:13:46 +0100
+Date: Wed, 8 Jan 2025 21:13:46 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Ninad Palsule <ninad@linux.ibm.com>
+Cc: minyard@acm.org, robh@kernel.org, krzk+dt@kernel.org,
+	conor+dt@kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	ratbert@faraday-tech.com, openipmi-developer@lists.sourceforge.net,
+	netdev@vger.kernel.org, joel@jms.id.au, andrew@codeconstruct.com.au,
+	devicetree@vger.kernel.org, eajames@linux.ibm.com,
+	linux-arm-kernel@lists.infradead.org, linux-aspeed@lists.ozlabs.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 05/10] ARM: dts: aspeed: system1: Add RGMII support
+Message-ID: <b80b9224-d428-4ad9-a30d-40e2d30be654@lunn.ch>
+References: <20250108163640.1374680-1-ninad@linux.ibm.com>
+ <20250108163640.1374680-6-ninad@linux.ibm.com>
+ <1dd0165b-22ff-4354-bfcb-85027e787830@lunn.ch>
+ <0aaa13de-2282-4ea3-a11b-4edefb7d6dd3@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="8323329-2044228773-1736365386=:4693"
-Content-ID: <436f2469-2d06-5004-1f60-8efaadced9d6@blackhole.kfki.hu>
-X-deepspam: ham 0%
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <0aaa13de-2282-4ea3-a11b-4edefb7d6dd3@linux.ibm.com>
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
+On Wed, Jan 08, 2025 at 12:43:07PM -0600, Ninad Palsule wrote:
+> Hello Andrew,
+> 
+> 
+> On 1/8/25 11:03, Andrew Lunn wrote:
+> > On Wed, Jan 08, 2025 at 10:36:33AM -0600, Ninad Palsule wrote:
+> > > system1 has 2 transceiver connected through the RGMII interfaces. Added
+> > > device tree entry to enable RGMII support.
+> > > 
+> > > ASPEED AST2600 documentation recommends using 'rgmii-rxid' as a
+> > > 'phy-mode' for mac0 and mac1 to enable the RX interface delay from the
+> > > PHY chip.
+> > You appear to if ignored my comment. Please don't do that. If you have
+> > no idea about RGMII delays, please say so, so i can help you debug
+> > what is wrong.
+> > 
+> > NACK
+> 
+> I think there is a misunderstanding. I did not ignore your comment. I have
+> contacted ASPEED and asked them to respond. I think Jacky from Aspeed
+> replied to your mail.
 
---8323329-2044228773-1736365386=:4693
-Content-Type: text/plain; charset=UTF-8
-Content-ID: <de375da8-7330-bc7d-893b-22a6453a4489@blackhole.kfki.hu>
-Content-Transfer-Encoding: quoted-printable
+You did not mention in the cover letter, or the patch. I asked for a
+detailed explanation in the commit message why it is correct, which
+you did not do.
 
-On Tue, 7 Jan 2025, Sz=C5=91ke Benjamin wrote:
+Now we have more details, it is clear Ethernet support for this board
+needs to wait until we figure out how to fix the MAC driver. Please
+either wait with this patchset until that is done, or drop this one
+patch for the moment and submit it later once the MAC driver is fixed.
 
-> 2025. 01. 07. 20:23 keltez=C3=A9ssel, Jozsef Kadlecsik =C3=ADrta:
-> > On Tue, 7 Jan 2025, egyszeregy@freemail.hu wrote:
-> >=20
-> > > From: Benjamin Sz=C5=91ke <egyszeregy@freemail.hu>
-> > >=20
-> > > Merge xt_DSCP.h to xt_dscp.h header file.
-> >=20
-> > I think it'd be better worded as "Merge xt_DSCP.h into the xt_dscp.h=20
-> > header file." (and in the other patches as well).
->=20
-> There will be no any new patchset refactoring anymore just of some=20
-> cosmetics change. If you like to change it, feel free to modify it in m=
-y=20
-> pacthfiles before the final merging. You can do it as a maintainer.
+      Andrew
 
-We don't modify accepted patches. It rarely happens when time presses and=
-=20
-even in that case it is discussed publicly: "sorry, no time to wait for=20
-*you* to respin your patch, so I'm going to fix this part, OK?"
-
-But there's no time constrain here. So it'd be strange at the minimum if=20
-your submitted patches were modified by a maintainer at merging.
-
-Believe it or not, I'm just trying to help to get your patches into the=20
-best shape.
-=20
-> > > -#ifndef _XT_DSCP_H
-> > > -#define _XT_DSCP_H
-> > > +#ifndef _UAPI_XT_DSCP_H
-> > > +#define _UAPI_XT_DSCP_H
-> >=20
-> > In the first four patches you added the _UAPI_ prefix to the header=20
-> > guards while in the next three ones you kept the original ones. Pleas=
-e=20
-> > use one style consistently.
->
-> Style consistently is done in the following files:
->=20
-> - All of xt_*.h files in uppercase name format (old headers for "target=
-")
-> - All of xt_*.h files in lowercase name format (merged header files)
->=20
-> Originally, in these files there was a chaotic state before, it was a=20
-> painful for my eyes, this is why they got these changes. In ipt_*.h=20
-> files the original codes got a far enough consistently style before,=20
-> they was not changed.
->=20
-> In my patchsets, It's not my scope/job to make up for the
-> improvements/refactoring of the last 10 years.
-
-But you are just introducing new inconsistencies:=20
-
---- a/include/uapi/linux/netfilter/xt_dscp.h
-+++ b/include/uapi/linux/netfilter/xt_dscp.h
-...
--#ifndef _XT_DSCP_H
--#define _XT_DSCP_H
-+#ifndef _UAPI_XT_DSCP_H
-+#define _UAPI_XT_DSCP_H
-
-however
-
---- a/include/uapi/linux/netfilter_ipv4/ipt_ecn.h
-+++ b/include/uapi/linux/netfilter_ipv4/ipt_ecn.h
-...
- #ifndef _IPT_ECN_H
- #define _IPT_ECN_H
-
-Why the "_UAPI_" prefixes are needed in the xt_*.h header files?
-
-Best regards,
-Jozsef
---=20
-E-mail : kadlec@netfilter.org, kadlec@blackhole.kfki.hu, kadlecsik.jozsef=
-@wigner.hu
-Address: Wigner Research Centre for Physics
-         H-1525 Budapest 114, POB. 49, Hungary
---8323329-2044228773-1736365386=:4693--
 
