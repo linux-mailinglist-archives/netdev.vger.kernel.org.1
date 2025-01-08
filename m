@@ -1,129 +1,117 @@
-Return-Path: <netdev+bounces-156180-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156181-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65354A0558F
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 09:38:17 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8C3FA055DC
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 09:56:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 19EE01887F21
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 08:38:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A6077161A07
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 08:56:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A4F51B4234;
-	Wed,  8 Jan 2025 08:38:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 178561F0E2D;
+	Wed,  8 Jan 2025 08:55:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="F8cCns+3"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PyyLYDHj"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8878B1D932F
-	for <netdev@vger.kernel.org>; Wed,  8 Jan 2025 08:38:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BCB01A76DA
+	for <netdev@vger.kernel.org>; Wed,  8 Jan 2025 08:55:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736325494; cv=none; b=XZj/Ob7nn5IQRFg4N6JvXXHNxqO1iQGDENCa8j8CjzVElK1wek84nnsr3ltfCiqhNgepWHgOxbbqaAXGLIw3svQWL4TJCi0XR8wXIPEGNJFFceMpFvKyJDA4eRbx7bPsDAcJon1lDzatomDFgTvEoE9/qMB+6Z8Uot5tzAMh2ng=
+	t=1736326557; cv=none; b=rKmtq1YjCp4BhF5G5iZ4Y1aXiQz+c4Ngg5SLzrP+alnj8bnkxfA3ktvsOBoM8qDYLadnyaCZEP7qJFz+DpMziE/NUdDYltdTUaymmLEU1D0P4RWXp9vsiWNNGAOj8M+R6UMaTT21Bzg/ZJoBFKXj43RxZPeQI27PSV5263gQ7/Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736325494; c=relaxed/simple;
-	bh=mkCQIxlLaUgBnpsaSxe82rCriQis8K0QbgJWwMd7+mY=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hE+bYEMuW0Ev3EAlhKNAFPh45J2fciAADdRKIpng45/9PxlUX0eGZj7stUpx+bcgiL8WLngyW/BTz3Q9IhbsATaljJ6TQdy4tq5Oj5Yb0rIV6RBpRm0J0sMszdh53jX6sS/SK/o1S7qkw6tAs6L65GXOqdskS7pJnCCBfuKqm98=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=F8cCns+3; arc=none smtp.client-ip=68.232.154.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1736325492; x=1767861492;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=mkCQIxlLaUgBnpsaSxe82rCriQis8K0QbgJWwMd7+mY=;
-  b=F8cCns+3iYPhi+jUhir/y5QS2a02JRVjvUeoIcqb+SjKAKkHq7pTMVrk
-   Zdi4Wvm+ykGoc0/zAJ7cTht7AClk2mct4nfoBwz+TlvZGZMToDy7ZWxjT
-   UbUp4rbUdMovXziINFepy+rzLb2UGLLdS0we1UsJmaaXccq190kt2Kl3A
-   hoVQdizeNEh3n8Ib9XZisMIAE9il8IgJNO0iJPcSFSWITZr9GeCfQh+9g
-   W1mTRoC7jMHi5Org2z1OUnmdqW+Bc0mKFNKsaqbblmDnL9m+c8CBgIKAH
-   Bx8xZaV24gdgw2QruuoKU8dO8D5rcOJ1qqUznD4/GNPibjv8J7JyiziTa
-   A==;
-X-CSE-ConnectionGUID: 7GbPrTS2SaintIuYjSB5nw==
-X-CSE-MsgGUID: QC3CBfcfSN2Ksk0wDk3+AQ==
-X-IronPort-AV: E=Sophos;i="6.12,297,1728975600"; 
-   d="scan'208";a="35940590"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa4.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 08 Jan 2025 01:38:06 -0700
-Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
- chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Wed, 8 Jan 2025 01:37:48 -0700
-Received: from DEN-DL-M70577 (10.10.85.11) by chn-vm-ex04.mchp-main.com
- (10.10.85.152) with Microsoft SMTP Server id 15.1.2507.35 via Frontend
- Transport; Wed, 8 Jan 2025 01:37:46 -0700
-Date: Wed, 8 Jan 2025 08:37:46 +0000
-From: Daniel Machon <daniel.machon@microchip.com>
-To: Jakub Kicinski <kuba@kernel.org>
-CC: <davem@davemloft.net>, <netdev@vger.kernel.org>, <edumazet@google.com>,
-	<pabeni@redhat.com>, <andrew+netdev@lunn.ch>, <Steen.Hegelund@microchip.com>,
-	<lars.povlsen@microchip.com>
-Subject: Re: [PATCH net 8/8] MAINTAINERS: remove Lars Povlsen from Microchip
- Sparx5 SoC
-Message-ID: <20250108083746.pk2543dxwnykz5g2@DEN-DL-M70577>
-References: <20250106165404.1832481-1-kuba@kernel.org>
- <20250106165404.1832481-9-kuba@kernel.org>
+	s=arc-20240116; t=1736326557; c=relaxed/simple;
+	bh=Q5Dxr4gtscv3A3F72IILVRCAQ/tTaUjpJx/ct0GB/vw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ZeUgvTtRJDLWCncRHUVYwbgSZbzbSC7VQpkbXSPQotxlMN8WYO9qGYr0LM0H49z8TcELqsfAG818LmoSOe1BaxIDRO/oY8nvQ6aL7j8pXaQnoPGIm32T6T9hfLe0IAnKidqiNTBHhsOUfGU8mMpwB0g87YT9THCmJ9dsJSm1Q58=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PyyLYDHj; arc=none smtp.client-ip=209.85.221.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-3863494591bso8452755f8f.1
+        for <netdev@vger.kernel.org>; Wed, 08 Jan 2025 00:55:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1736326553; x=1736931353; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=XnDje2yjlBUu1qE8ko1BsSkGc+IliKEQLX6fjiyoDAU=;
+        b=PyyLYDHjIxa5DfEbN9ueQVzzoeJSOPTDyXym8IngUMhyX+0IDeyTjfOIucP1UCRced
+         fInKpZZmiek0b69vYIFwO3MRyGjVHhM9EalSG6LsKawf1jssk+CtjY0RicZLFbyR1mEW
+         zyTgUYB47z0GGPIN9Ari9W7rMqS+qr09XzDxJbUdOfVElbJe39zxHcjy7cGDSzL1//fb
+         zWnG7thNG9eZA32V2NfMQRA9cejivzuwXVkUGT1dGLSgiYubHGOqvOW79WOSxgNeTNY1
+         C+EBuW+MydX/69JV/3DGidgBzzshXeR/Pu1ISoyCftjoVju/6j40Zqu03+lvRnisTWWd
+         SGdQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736326553; x=1736931353;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=XnDje2yjlBUu1qE8ko1BsSkGc+IliKEQLX6fjiyoDAU=;
+        b=IQ/wvII6FUJSp/1qcVfNXdbA6riJh5JppyOxbO0Y1TJH7C8u6zQpGeeg8mkP2dwyOR
+         T1dP+27sqW7eSZAQFIgiYl2ethgO9hzYyoOFDiq+fa3OdIfRRDyqhT5TqEpcSFusNDMo
+         xH5hYhwO0lnMTNpc/pJ0LDFrNANVVMW1cqEplQdV0PW2UuqAqc6qhn0gROdhu6EIm+FS
+         MixHK19ZLr0eYMdgKuBAglRDIQmyj18+EA7Vq0muYN9v3U+Q5wrW98gIxixOdOznzHvE
+         ynQIz5t3Qf6E96hgDt3yy3yFIMuCihrSUUB8er5YKqkcyTU4OMUM1H9vEFLq+VDb+ok3
+         hxEA==
+X-Forwarded-Encrypted: i=1; AJvYcCX+Pxrq3ePDqUtluVp0KQ6F0EAHwcb7hhpaMV9L344cnIkLVWLClPoYI8514RofuBhbGjGWUDs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxUfEmHf1p3vE2BFpcjbuo1BC4c5QSq2jQK/lE7lMpWsAzCGUqE
+	eCG+pidanWeIujuCWMp2mE/ZRb7ubRySSnqn3ufghylWNy+NKpchU6nRBV+rhUSWLi0FUq4kKOa
+	QNMel5PNfrrZodF/QYvwR3NI+xN4=
+X-Gm-Gg: ASbGncutFCzfMqtzELQtMbMsmkzTZHCDgeu3ooSLpI8ISq3T6DQejnCG6gh8Qhcur6v
+	KfCaBDw/CxJxXrbY5203rVhIp30NGmAAdr+gI
+X-Google-Smtp-Source: AGHT+IHWDMhiTxrI2Iv+BoAUOQP9eCFGMF/1aS1CvVoXc9KmJSHYBt46QITOpmGtIm1ADmNuRnCauWZ9+t9Te7w+rc8=
+X-Received: by 2002:a05:6000:1446:b0:385:f47a:e9d1 with SMTP id
+ ffacd0b85a97d-38a872dec76mr1505888f8f.17.1736326553561; Wed, 08 Jan 2025
+ 00:55:53 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20250106165404.1832481-9-kuba@kernel.org>
+References: <20250108062834.11117-1-kuniyu@amazon.com> <20250108062834.11117-3-kuniyu@amazon.com>
+In-Reply-To: <20250108062834.11117-3-kuniyu@amazon.com>
+From: Xiao Liang <shaw.leon@gmail.com>
+Date: Wed, 8 Jan 2025 16:55:16 +0800
+X-Gm-Features: AbW1kvZ-uS9YNZVFfvy8lWw6EySONvo2FH4TYYHYQMt_Sp-qEI3H0oHR7l4nHfY
+Message-ID: <CABAhCOR7Y058pDUKBOQ6vDeEZkHYQqeyg97nrBYoJHqkFgDd7w@mail.gmail.com>
+Subject: Re: [PATCH v1 net 2/3] gtp: Destroy device along with udp socket's
+ netns dismantle.
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org, 
+	Pablo Neira Ayuso <pablo@netfilter.org>, Harald Welte <laforge@gnumonks.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> We have not seen emails or tags from Lars in almost 4 years.
-> Steen and Daniel are pretty active, but the review coverage
-> isn't stellar (35% of changes go in without a review tag).
-> 
-> Subsystem ARM/Microchip Sparx5 SoC support
->   Changes 28 / 79 (35%)
->   Last activity: 2024-11-24
->   Lars Povlsen <lars.povlsen@microchip.com>:
->   Steen Hegelund <Steen.Hegelund@microchip.com>:
->     Tags 6c7c4b91aa43 2024-04-08 00:00:00 15
->   Daniel Machon <daniel.machon@microchip.com>:
->     Author 48ba00da2eb4 2024-04-09 00:00:00 2
->     Tags f164b296638d 2024-11-24 00:00:00 6
->   Top reviewers:
->     [7]: horms@kernel.org
->     [1]: jacob.e.keller@intel.com
->     [1]: jensemil.schulzostergaard@microchip.com
->     [1]: horatiu.vultur@microchip.com
->   INACTIVE MAINTAINER Lars Povlsen <lars.povlsen@microchip.com>
-> 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
-> CC: Steen.Hegelund@microchip.com
-> CC: daniel.machon@microchip.com
-> CC: lars.povlsen@microchip.com
-> ---
->  MAINTAINERS | 1 -
->  1 file changed, 1 deletion(-)
-> 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 009630fe014c..2dae9d68c9b9 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -2689,7 +2689,6 @@ N:        at91
->  N:     atmel
-> 
->  ARM/Microchip Sparx5 SoC support
-> -M:     Lars Povlsen <lars.povlsen@microchip.com>
->  M:     Steen Hegelund <Steen.Hegelund@microchip.com>
->  M:     Daniel Machon <daniel.machon@microchip.com>
->  M:     UNGLinuxDriver@microchip.com
-> --
-> 2.47.1
+On Wed, Jan 8, 2025 at 2:29=E2=80=AFPM Kuniyuki Iwashima <kuniyu@amazon.com=
+> wrote:
+[...]
+> @@ -2480,6 +2480,11 @@ static void __net_exit gtp_net_exit_batch_rtnl(str=
+uct list_head *net_list,
+>         list_for_each_entry(net, net_list, exit_list) {
+>                 struct gtp_net *gn =3D net_generic(net, gtp_net_id);
+>                 struct gtp_dev *gtp, *gtp_next;
+> +               struct net_device *dev;
+> +
+> +               for_each_netdev(net, dev)
+> +                       if (dev->rtnl_link_ops =3D=3D &gtp_link_ops)
+> +                               gtp_dellink(dev, dev_to_kill);
+
+I'm not sure, but do we usually have to clean up devices
+in the netns being deleted? Seems default_device_ops
+can handle it.
+
 >
-
-Acked-by: Daniel Machon <daniel.machon@microchip.com>
- 
+>                 list_for_each_entry_safe(gtp, gtp_next, &gn->gtp_dev_list=
+, list)
+>                         gtp_dellink(gtp->dev, dev_to_kill);
+> --
+> 2.39.5 (Apple Git-154)
+>
 
