@@ -1,190 +1,191 @@
-Return-Path: <netdev+bounces-156247-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156248-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4ECDDA05B48
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 13:17:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6AC0FA05B52
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 13:18:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6FD9C1889FC9
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 12:16:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8D21A188A390
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 12:17:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3820B1DE895;
-	Wed,  8 Jan 2025 12:15:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C61601FAC55;
+	Wed,  8 Jan 2025 12:16:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ha0Wc5JH"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="b/sWp/WC"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BB2A1FBCB9
-	for <netdev@vger.kernel.org>; Wed,  8 Jan 2025 12:15:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DD301FA8D6
+	for <netdev@vger.kernel.org>; Wed,  8 Jan 2025 12:16:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736338548; cv=none; b=MOeZSgKQxLYdpLWATkLJmYO0VDRukoPYs5y5/a15gHyf3TDOFB/zXNrQsrptCcyM/E8jFhDmP8xnko/c82zGyevGMRdSdaAhQBYZrV3M6/9orOlmPwDpxTDsUSG16J1W50CcvSFfUWjegNlumSmP7IaAoIaNhCrM/BhwUFu/di8=
+	t=1736338590; cv=none; b=awoTKvPfqBpvDJJmOhQ/Xm01Wi59+foD20kLzYhKZYRUQK6+pwdbTlNXm84kdyq1pD4vtRgZqHfqBunbRZIwjitpA4jXi0O45G01bsSLSsZflR+38uYOZQ2I15roBzAT7bLU2iOpLlqbNhCNpLPm77RynuB/mHOCa7WJXE5um0U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736338548; c=relaxed/simple;
-	bh=OqojvAOQdZS0yj4ZVZFm47SzmmZRZEQKJGSfgoE2f+k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TBa+pw2Bp9r5gBiBb1eRv08+KXU/84TwtPB7Xr+pAfwRzHgC1q1Z9H6Sw3RhGx6le/0XVaQBJe6ZIRYvtxXGLHyODkAE3vcWxVtq+AP0R/o93xE1hBkCOh46GmafRJ62XVnaN11pwV3ICpUxJlsFI78Y2WwDw67CGUNRq9kY5f8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ha0Wc5JH; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1736338544;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=LFFT/vNzip1RPoosirB5rZ8ksM/hte4x/jhW8SUMpHI=;
-	b=ha0Wc5JHzN83B6sCVc4QfoA/hlg0KZaMXsp8rxzFgUAkypJPI7DIqhkRQviGbuAvTY1zer
-	KrCGfre/X9IyxxBx8ZsaV9zX1a7hX2Cv8vAXDKpGimRwkXOJz65XzodGn2NRpbgyUCMpHm
-	jz6Lt9sy085or/da6xh+jkAHvA8CSck=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-602-qD2mgp0tMDyrb8Jbr54nyA-1; Wed, 08 Jan 2025 07:15:43 -0500
-X-MC-Unique: qD2mgp0tMDyrb8Jbr54nyA-1
-X-Mimecast-MFC-AGG-ID: qD2mgp0tMDyrb8Jbr54nyA
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-388d1f6f3b2so6682602f8f.0
-        for <netdev@vger.kernel.org>; Wed, 08 Jan 2025 04:15:43 -0800 (PST)
+	s=arc-20240116; t=1736338590; c=relaxed/simple;
+	bh=A8IQUtf7Rmk1xVdUvC2uzIrNpb8eKlN4V/vr7Uhc00g=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=eVDx7mZsSGRo6FQXoxbxnqMlfcJQTtnEa5g5cHSj5ZkLyY8bbk+Rgr7oL5MUip7qGOoStnC0LOBiRA/oZ9F2pVhVpHVKm1vGLtL0+ROiMq0TWFsnyxQ5QoA4+HHmRxdHnBaPzsjVNaakxpce+B7cyHXa+lAFrgpomnuOf9cIUJA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=b/sWp/WC; arc=none smtp.client-ip=209.85.208.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-5d3e6f6cf69so28776335a12.1
+        for <netdev@vger.kernel.org>; Wed, 08 Jan 2025 04:16:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1736338587; x=1736943387; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=wJll1opQKmS6qHfQ2WlROGIyppyUIJ+JIj6K+pGcXvg=;
+        b=b/sWp/WCrbeWUlmbsx7JCOh0K/OZr71273MUHr58CLdlIKG7CFm6YbruSZ1wDen0YI
+         U4FyfY12K1DIKRIa2Ao+7NAMIZeadt0uQAMSKXNaLX+7Unhz9+NOlL+uozLcfa32X65m
+         ikqY789k8KE6snp9R1wB6S0LmuSSXRswd2FcA=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736338542; x=1736943342;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=LFFT/vNzip1RPoosirB5rZ8ksM/hte4x/jhW8SUMpHI=;
-        b=D5/vAtt82F+82pxu4wpMLxa0LmoQMHgrUCwVSIhQPwqH1BDW8VBh9miyum4DRj6T1N
-         pvhA12uT8GnUnKs7jjNYnArOldV7NN8lASdorzujxirDEMCci8qeqHhBsVl2JI/V2DSr
-         bk5+n66lVth73KalwF/43hpmOBZziL4nQYO1I0TC3h1cZnVzuk+3dyZLc+Wfgm0fnt/Z
-         vRjHjjQh0jdJ003VQCDGx1e+TTVy26hf1Jsg3fv8iurQShclAWu2Ldz1nT22yWH9T3r6
-         MBzq0W3vM1TkBDZ9o3ASvXcwoUPJUIw7glI40DCzCDnAz7Xh8T4LAYOtlxmK154Didq5
-         mSKg==
-X-Forwarded-Encrypted: i=1; AJvYcCWx2UvUX42DRBAMgIbZuJb6Tr14cUFG4rovuSNM3lkuBI2K/5XFKzEsgV13tw5BdeOBvqpqjt4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzW3k0BWF6d/OZ5wmriJbJpS65LcvI40QGSjMpEzgRJl5P0qw6t
-	gI8cErIyFaRdIBZOzLmoXoR5Wj2E1xSep7wdRVAcXaqgLa5tSjtdhq8FhKM7ws2iyjbSPUx+CIV
-	X4Qb+b3H078/xe1lBKfQFMTsYiwIZtFVM9ML8t/uDxpTuBCGQIPyKCg==
-X-Gm-Gg: ASbGncveaQVwzz5m9yjqsu2BiLPOKeo31i8E4gvewqwVBMM4YdixWL9c9oH97ZogqPU
-	5u/68ePJvu10Y5ZqqV6QPKOtErbGVNBAKaWTJCFRIUh42AIMNr8Y5nc6u+wBh4AEVq2MclMG0Ld
-	dQIH1VJPCCVZhunQ37Hk4bOe9b+v0JLJTW9YthYIgz9VmRcNN/cvHn409nNQhvXRxbd+S8Vpt/C
-	Q6X0tWJdVKWJd81hkxjJX7iK6WjNLDpT2DoKbEV1w7vaxMm9Y4=
-X-Received: by 2002:a05:6000:1f88:b0:385:fc97:9c63 with SMTP id ffacd0b85a97d-38a872f6915mr2066558f8f.9.1736338542113;
-        Wed, 08 Jan 2025 04:15:42 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IG+hsGgqCsiIWeOXVWHmgrZwnMiJD4OWipciIeE4FGEZqdLeDGimlpEKTMbbuIjZpmwpZibCg==
-X-Received: by 2002:a05:6000:1f88:b0:385:fc97:9c63 with SMTP id ffacd0b85a97d-38a872f6915mr2066535f8f.9.1736338541761;
-        Wed, 08 Jan 2025 04:15:41 -0800 (PST)
-Received: from redhat.com ([2a02:14f:175:d62d:93ef:d7e2:e7da:ed72])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-436e2e03210sm19211155e9.34.2025.01.08.04.15.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 Jan 2025 04:15:41 -0800 (PST)
-Date: Wed, 8 Jan 2025 07:15:38 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Cindy Lu <lulu@redhat.com>
-Cc: jasowang@redhat.com, michael.christie@oracle.com, sgarzare@redhat.com,
-	linux-kernel@vger.kernel.org,
-	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
-Subject: Re: [PATCH v5 5/6] vhost: Add new UAPI to support change to task mode
-Message-ID: <20250108071456-mutt-send-email-mst@kernel.org>
-References: <20241230124445.1850997-1-lulu@redhat.com>
- <20241230124445.1850997-6-lulu@redhat.com>
+        d=1e100.net; s=20230601; t=1736338587; x=1736943387;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=wJll1opQKmS6qHfQ2WlROGIyppyUIJ+JIj6K+pGcXvg=;
+        b=DMwD7LALGKjlM+2wr6fou8f9QMvqd9kJ5CbZ8ikQ1GPNIkA67cbvUSNg1UeWz0m027
+         93dUImDPequAHxTqjphguqC/LGiN4bxXW5AywweT1CZ1GT5GY4YpHDYa23IQXSXr6nzN
+         6FyG+wR5EMXJ08FitcuEQbTs9L2WKAGZnmYeIMQZqk5FvieF/3HM78JCfIHnWf996F4e
+         jD8d99wEmf8pvCKMbyxYXbUdvWhetKDFD4rRiQBwBxQW89LRc5Jv8UIJk1u6ViTFFmC7
+         2cHLmIqhEaBIdhP5U/dckBb0g9+LvFJtga12tQcw5tJU9l+AO6xcsuj5PyBByDet6J4m
+         rOyw==
+X-Forwarded-Encrypted: i=1; AJvYcCUx85Ii9CNZjxqkHOHPOpThEev2vmbm60l8FLxsBcOsQKVhOPY59n1h1nYwXb8YkatkEyLuyfA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyRbRi3mKaDBI6Lw7p28L7eC7LR2W5635hnyTlLH2w9VU9akjgR
+	J+bgYBnKewkFyk+Q7rKX2+LsL5dikucLsw+d9zjC427Q1nO/mrBW73YHliFGr36K4OzBV9ZzyTC
+	DPIzw92nYX88LylWwwcOKLnYT4QmRVdzBBAA8
+X-Gm-Gg: ASbGncszGyey0o+rcsyOgDVk1qSfPwXzQFJCeIQPq4NlGgWfO5i6/jrWat0Wp4Uy4ez
+	fb+rj4fLrYLbRrziXsOxvrlOOumWQrJ4z0Waj
+X-Google-Smtp-Source: AGHT+IHLn8HBlVwNvq+tovXBPbQMwQ9nAuq+jl4DQFxCMXw0zNFrBytsE637M0LgtUvqP5U7YhniyiwkKOeHTx+Apc0=
+X-Received: by 2002:a05:6402:360c:b0:5d0:e826:f0da with SMTP id
+ 4fb4d7f45d1cf-5d972e1683fmr2246245a12.16.1736338586996; Wed, 08 Jan 2025
+ 04:16:26 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241230124445.1850997-6-lulu@redhat.com>
+References: <ee1a790b-f874-4512-b3ae-9c45f99dc640@stanley.mountain>
+In-Reply-To: <ee1a790b-f874-4512-b3ae-9c45f99dc640@stanley.mountain>
+From: Kalesh Anakkur Purayil <kalesh-anakkur.purayil@broadcom.com>
+Date: Wed, 8 Jan 2025 17:46:14 +0530
+X-Gm-Features: AbW1kvYDhfzIql41LdFYILzHNun7Af6T5PK_lZaCo4FP-HiLxTo8FtCtIiOLGrE
+Message-ID: <CAH-L+nMpNvYr4igweeTgkXj_gKBSzSa=SZZ+mkZoKz4v8te7Qw@mail.gmail.com>
+Subject: Re: [PATCH net-next] net/smc: delete pointless divide by one
+To: Dan Carpenter <dan.carpenter@linaro.org>
+Cc: Wenjia Zhang <wenjia@linux.ibm.com>, Jan Karcher <jaka@linux.ibm.com>, 
+	"D. Wythe" <alibuda@linux.alibaba.com>, Tony Lu <tonylu@linux.alibaba.com>, 
+	Wen Gu <guwen@linux.alibaba.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	kernel-janitors@vger.kernel.org
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="000000000000b570e3062b30d4ba"
 
-On Mon, Dec 30, 2024 at 08:43:52PM +0800, Cindy Lu wrote:
-> Add a new UAPI to enable setting the vhost device to task mode.
-> The userspace application can use VHOST_SET_INHERIT_FROM_OWNER
-> to configure the mode if necessary.
-> This setting must be applied before VHOST_SET_OWNER, as the worker
-> will be created in the VHOST_SET_OWNER function
-> 
-> Signed-off-by: Cindy Lu <lulu@redhat.com>
+--000000000000b570e3062b30d4ba
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-I'd like a Kconfig option to control enabling/blocking this
-ioctl. Make it a patch on top pls.
+On Wed, Jan 8, 2025 at 2:56=E2=80=AFPM Dan Carpenter <dan.carpenter@linaro.=
+org> wrote:
+>
+> Here "buf" is a void pointer so sizeof(*buf) is one.  Doing a divide
+> by one makes the code less readable.  Delete it.
+>
+> Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
+LGTM,
+Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
 
 
-> ---
->  drivers/vhost/vhost.c      | 22 +++++++++++++++++++++-
->  include/uapi/linux/vhost.h | 19 +++++++++++++++++++
->  2 files changed, 40 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
-> index ff17c42e2d1a..47c1329360ac 100644
-> --- a/drivers/vhost/vhost.c
-> +++ b/drivers/vhost/vhost.c
-> @@ -2250,15 +2250,35 @@ long vhost_dev_ioctl(struct vhost_dev *d, unsigned int ioctl, void __user *argp)
->  {
->  	struct eventfd_ctx *ctx;
->  	u64 p;
-> -	long r;
-> +	long r = 0;
->  	int i, fd;
-> +	u8 inherit_owner;
->  
->  	/* If you are not the owner, you can become one */
->  	if (ioctl == VHOST_SET_OWNER) {
->  		r = vhost_dev_set_owner(d);
->  		goto done;
->  	}
-> +	if (ioctl == VHOST_SET_INHERIT_FROM_OWNER) {
-> +		/*inherit_owner can only be modified before owner is set*/
-> +		if (vhost_dev_has_owner(d)) {
-> +			r = -EBUSY;
-> +			goto done;
-> +		}
-> +		if (copy_from_user(&inherit_owner, argp, sizeof(u8))) {
-> +			r = -EFAULT;
-> +			goto done;
-> +		}
-> +		/* Validate the inherit_owner value, ensuring it is either 0 or 1 */
-> +		if (inherit_owner > 1) {
-> +			r = -EINVAL;
-> +			goto done;
-> +		}
-> +
-> +		d->inherit_owner = (bool)inherit_owner;
->  
-> +		goto done;
-> +	}
->  	/* You must be the owner to do anything else */
->  	r = vhost_dev_check_owner(d);
->  	if (r)
-> diff --git a/include/uapi/linux/vhost.h b/include/uapi/linux/vhost.h
-> index b95dd84eef2d..f5fcf0b25736 100644
-> --- a/include/uapi/linux/vhost.h
-> +++ b/include/uapi/linux/vhost.h
-> @@ -235,4 +235,23 @@
->   */
->  #define VHOST_VDPA_GET_VRING_SIZE	_IOWR(VHOST_VIRTIO, 0x82,	\
->  					      struct vhost_vring_state)
-> +
-> +/**
-> + * VHOST_SET_INHERIT_FROM_OWNER - Set the inherit_owner flag for the vhost device
-> + *
-> + * @param inherit_owner: An 8-bit value that determines the vhost thread mode
-> + *
-> + * When inherit_owner is set to 1 (default behavior):
-> + *   - The VHOST worker threads inherit their values/checks from
-> + *     the thread that owns the VHOST device. The vhost threads will
-> + *     be counted in the nproc rlimits.
-> + *
-> + * When inherit_owner is set to 0:
-> + *   - The VHOST worker threads will use the traditional kernel thread (kthread)
-> + *     implementation, which may be preferred by older userspace applications that
-> + *     do not utilize the newer vhost_task concept.
-> + */
-> +
-> +#define VHOST_SET_INHERIT_FROM_OWNER _IOW(VHOST_VIRTIO, 0x83, __u8)
-> +
->  #endif
-> -- 
-> 2.45.0
+--=20
+Regards,
+Kalesh AP
 
+--000000000000b570e3062b30d4ba
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
+
+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
+riBJ/K1AFUjRAjFhGV64l++td7dkmnq/X8ET75ti+w1s4FRpFqkD2m7pg5NxdsZphYIXAgMBAAGj
+QjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSP8Et/qC5FJK5N
+UPpjmove4t0bvDANBgkqhkiG9w0BAQsFAAOCAQEAS0DbwFCq/sgM7/eWVEVJu5YACUGssxOGhigH
+M8pr5nS5ugAtrqQK0/Xx8Q+Kv3NnSoPHRHt44K9ubG8DKY4zOUXDjuS5V2yq/BKW7FPGLeQkbLmU
+Y/vcU2hnVj6DuM81IcPJaP7O2sJTqsyQiunwXUaMld16WCgaLx3ezQA3QY/tRG3XUyiXfvNnBB4V
+14qWtNPeTCekTBtzc3b0F5nCH3oO4y0IrQocLP88q1UOD5F+NuvDV0m+4S4tfGCLw0FREyOdzvcy
+a5QBqJnnLDMfOjsl0oZAzjsshnjJYS8Uuu7bVW/fhO4FCU29KNhyztNiUGUe65KXgzHZs7XKR1g/
+XzCCBWowggRSoAMCAQICDDfBRQmwNSI92mit0zANBgkqhkiG9w0BAQsFADBbMQswCQYDVQQGEwJC
+RTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTExMC8GA1UEAxMoR2xvYmFsU2lnbiBHQ0MgUjMg
+UGVyc29uYWxTaWduIDIgQ0EgMjAyMDAeFw0yMjA5MTAwODI5NTZaFw0yNTA5MTAwODI5NTZaMIGi
+MQswCQYDVQQGEwJJTjESMBAGA1UECBMJS2FybmF0YWthMRIwEAYDVQQHEwlCYW5nYWxvcmUxFjAU
+BgNVBAoTDUJyb2FkY29tIEluYy4xHzAdBgNVBAMTFkthbGVzaCBBbmFra3VyIFB1cmF5aWwxMjAw
+BgkqhkiG9w0BCQEWI2thbGVzaC1hbmFra3VyLnB1cmF5aWxAYnJvYWRjb20uY29tMIIBIjANBgkq
+hkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxnv1Reaeezfr6NEmg3xZlh4cz9m7QCN13+j4z1scrX+b
+JfnV8xITT5yvwdQv3R3p7nzD/t29lTRWK3wjodUd2nImo6vBaH3JbDwleIjIWhDXLNZ4u7WIXYwx
+aQ8lYCdKXRsHXgGPY0+zSx9ddpqHZJlHwcvas3oKnQN9WgzZtsM7A8SJefWkNvkcOtef6bL8Ew+3
+FBfXmtsPL9I2vita8gkYzunj9Nu2IM+MnsP7V/+Coy/yZDtFJHp30hDnYGzuOhJchDF9/eASvE8T
+T1xqJODKM9xn5xXB1qezadfdgUs8k8QAYyP/oVBafF9uqDudL6otcBnziyDBQdFCuAQN7wIDAQAB
+o4IB5DCCAeAwDgYDVR0PAQH/BAQDAgWgMIGjBggrBgEFBQcBAQSBljCBkzBOBggrBgEFBQcwAoZC
+aHR0cDovL3NlY3VyZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvZ3NnY2NyM3BlcnNvbmFsc2lnbjJj
+YTIwMjAuY3J0MEEGCCsGAQUFBzABhjVodHRwOi8vb2NzcC5nbG9iYWxzaWduLmNvbS9nc2djY3Iz
+cGVyc29uYWxzaWduMmNhMjAyMDBNBgNVHSAERjBEMEIGCisGAQQBoDIBKAowNDAyBggrBgEFBQcC
+ARYmaHR0cHM6Ly93d3cuZ2xvYmFsc2lnbi5jb20vcmVwb3NpdG9yeS8wCQYDVR0TBAIwADBJBgNV
+HR8EQjBAMD6gPKA6hjhodHRwOi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjNwZXJzb25hbHNp
+Z24yY2EyMDIwLmNybDAuBgNVHREEJzAlgSNrYWxlc2gtYW5ha2t1ci5wdXJheWlsQGJyb2FkY29t
+LmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNVHSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGP
+zzAdBgNVHQ4EFgQUI3+tdStI+ABRGSqksMsiCmO9uDAwDQYJKoZIhvcNAQELBQADggEBAGfe1o9b
+4wUud0FMjb/FNdc433meL15npjdYWUeioHdlCGB5UvEaMGu71QysfoDOfUNeyO9YKp0h0fm7clvo
+cBqeWe4CPv9TQbmLEtXKdEpj5kFZBGmav69mGTlu1A9KDQW3y0CDzCPG2Fdm4s73PnkwvemRk9E2
+u9/kcZ8KWVeS+xq+XZ78kGTKQ6Wii3dMK/EHQhnDfidadoN/n+x2ySC8yyDNvy81BocnblQzvbuB
+a30CvRuhokNO6Jzh7ZFtjKVMzYas3oo6HXgA+slRszMu4pc+fRPO41FHjeDM76e6P5OnthhnD+NY
+x6xokUN65DN1bn2MkeNs0nQpizDqd0QxggJtMIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYD
+VQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25h
+bFNpZ24gMiBDQSAyMDIwAgw3wUUJsDUiPdpordMwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcN
+AQkEMSIEIPow6+HBgLf8WoW+ZUXJNwfjaMP/gSTu/SdfHf3F1gFMMBgGCSqGSIb3DQEJAzELBgkq
+hkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI1MDEwODEyMTYyN1owaQYJKoZIhvcNAQkPMVwwWjAL
+BglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG
+9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQAcYlO8QrqZ
+ZwjgaP9LLlRpAYCYuZ8zrJubRYY9mVos41+9+Fc9A2Azeb9/pPK+QsGOjUfNrmPFGOcXoUqxQFsx
++X7pEjMKAt9lzfnYm1rmEo9a7HDZctmHCJ887Ti2r2acyhP7dNzl0AgSnA4zeaEU2d2wwdCyclJz
+FNoUAm259cBCl+HGG957fx03JjoN5jU0Nq0W1xt4Nf9860R7ZcaJbsXCYUXXJtJfASmYZ+QVqoxk
+fi+A7Ohp/yQ7pcz0A7esCwsnWqWGOeEgVE+dY+U/23Pqc4JZGPtTwM1SuhgJclR9AQ+i0d0n9d+J
+joLhvnEvmqHp1Gum52bQl31u2mdP
+--000000000000b570e3062b30d4ba--
 
