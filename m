@@ -1,200 +1,232 @@
-Return-Path: <netdev+bounces-156151-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156152-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 364CEA051B1
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 04:42:39 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 77094A051B5
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 04:47:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AE261188A272
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 03:42:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DDF04188A1DF
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 03:47:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5252198E92;
-	Wed,  8 Jan 2025 03:42:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFCBD1990C1;
+	Wed,  8 Jan 2025 03:46:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="5CdjzaiH"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="RVYYl6Ci"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2079.outbound.protection.outlook.com [40.107.244.79])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B3492B9B9
-	for <netdev@vger.kernel.org>; Wed,  8 Jan 2025 03:42:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.79
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736307754; cv=fail; b=so2jAErolpfQi06JKk2AwDZa88cpHlaewliO56l5P/oA7kFqAB8BbHEYJP4fk+jfK/+E7nzupByDVysBL7b1/Qf0P7DD9VwM3AgAGQ0SN4DT/N+4RNDvcdj4nZ9U0mjHIgVddcm50CZBLyT2eFD0tHYwzVUpXChpCQ7BvKlAU2g=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736307754; c=relaxed/simple;
-	bh=3Cz/vzhOAt9LhD1G0dvuDHK2KWeNNlYnmgSBkCVuIRY=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=OkUTr/sfRJ49krBXy2anYZCjeqCb/MLKJJylKKdsp0EmwuxThL0aZIVZ65G64h+2y2v6l0p5RF3OkkcVajZwHXw5H/ywOdYCcqFNM4TP1tB9pOwdD1oUV1lKFYCQN9tsDKdktXunLGwMf/lfAYC5qF7O/eJ7ZXzyC3Cp1lZivOg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=5CdjzaiH; arc=fail smtp.client-ip=40.107.244.79
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=y1Pv3ndMCV/FJCuTyoOSFStQynLkWoRHGFgXr809DV7Gkv8tzDsMNqkqdZ1sr/H08sqfmzMkvfjzJffgSTpQMtNQjhUZkmVaVyuhDregJ7gAZvTk0amsIgwvkFnEBrDCz0exSckTPq4zPlcgHCSNlALBkRlUDGD19CTxytjiNQICRT+o2iL98Ksnkq1LS0gjvqddby2HHlt/OMothXhQJ8OmnvH9xG27Kf6jhMHKWTDEz+9KiHNmOVJuTlmHE9DE+RbMWUw0qONkwH1OD7IrPY/d+jMtQspXQY1Oe9CE7X7UAuxNre9J+PbHDJbJGopMq4SzIYZV+lFugnZyMsCfwQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=3Cz/vzhOAt9LhD1G0dvuDHK2KWeNNlYnmgSBkCVuIRY=;
- b=vNfgrZnFo+KCM//EQrQI3saKH7dpKgH9fx3UdyfYBS9utaRSo5Xmmw0SvqW1Z1JSSxkQQTs1Z/8wI/dltJNVuKR43U4AImnc2TgiFXetzlUPEwSNe0t/ScxbY46H8NPhcp3dmc9tWqh6MKVqDL6+E+gbaeVasdVRpJ7Owi0uK26aexTua8Tv7Lai79AMv1T/pDZZ4+4dzrhPg9cfcU5YPnXgb7gjbat0p+1KHcYFzX1/kG5WspuDmrtumqIj23kY03NnHEFXYCUk48lKEjp4UpNdSbo/pohj3Ea2Fu3kaPz4x5cHwAXJnNDXyIhQFJ2tY8ook49N2TlRk9Kxs4g3TA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microchip.com; dmarc=pass action=none
- header.from=microchip.com; dkim=pass header.d=microchip.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microchip.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=3Cz/vzhOAt9LhD1G0dvuDHK2KWeNNlYnmgSBkCVuIRY=;
- b=5CdjzaiH/6nLzb76+7DWA1M4b1xfqUW+PY4hsy6Ub5V81gDXsdVwlsumQXz1Sui0ax7OuHwHIb2WJi0AtNkpB7dvj78BFIgyGj7Zn8tFQ3h5Zmf9I6MsY2CY3IhYOmTgncDfv7WXzZH+QCSRlQt1DlFc2rikrVtQAWtoHgWamqmkGBavwZqO4/G4rJuU1OOXf6z+qGyNhBLHSKwdSX36wRAL3bCvY4wCJ4QHw+rlz7BAY9s9AU75eUH4TqCqTKdyPej2audg3WNBj0KPZFrK9iwFBOf3zcjB1zFNZ5X7q9ikeajTIcGGZcfPIDu6WHH16sw2UUqFRwGEaMz9M4PZUA==
-Received: from DS0PR11MB7481.namprd11.prod.outlook.com (2603:10b6:8:14b::16)
- by PH7PR11MB5944.namprd11.prod.outlook.com (2603:10b6:510:124::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8314.17; Wed, 8 Jan
- 2025 03:42:30 +0000
-Received: from DS0PR11MB7481.namprd11.prod.outlook.com
- ([fe80::3a8a:2d38:64c0:cc4f]) by DS0PR11MB7481.namprd11.prod.outlook.com
- ([fe80::3a8a:2d38:64c0:cc4f%6]) with mapi id 15.20.8335.010; Wed, 8 Jan 2025
- 03:42:30 +0000
-From: <Rengarajan.S@microchip.com>
-To: <Woojung.Huh@microchip.com>, <kuba@kernel.org>
-CC: <Thangaraj.S@microchip.com>, <edumazet@google.com>, <davem@davemloft.net>,
-	<netdev@vger.kernel.org>, <pabeni@redhat.com>, <andrew+netdev@lunn.ch>
-Subject: Re: [PATCH net 2/8] MAINTAINERS: mark Microchip LAN78xx as Orphan
-Thread-Topic: [PATCH net 2/8] MAINTAINERS: mark Microchip LAN78xx as Orphan
-Thread-Index:
- AQHbYFuyrVcAlX+vYkCLN6Uqrkp8arMLWwrwgAAQIgCAAABOIIAAEcCAgAADWjCAALyjAA==
-Date: Wed, 8 Jan 2025 03:42:30 +0000
-Message-ID: <9328391fd5466aa406873dc2d1167be100ad340c.camel@microchip.com>
-References: <20250106165404.1832481-1-kuba@kernel.org>
-	 <20250106165404.1832481-3-kuba@kernel.org>
-	 <BL0PR11MB29136D1F91BBC69E985BFBD6E7112@BL0PR11MB2913.namprd11.prod.outlook.com>
-	 <20250107070802.1326e74a@kernel.org>
-	 <SN6PR11MB29266D59098EEEB22ED3BE86E7112@SN6PR11MB2926.namprd11.prod.outlook.com>
-	 <20250107081239.32c91792@kernel.org>
-	 <SN6PR11MB29264E3220B873B6CCC4C318E7112@SN6PR11MB2926.namprd11.prod.outlook.com>
-In-Reply-To:
- <SN6PR11MB29264E3220B873B6CCC4C318E7112@SN6PR11MB2926.namprd11.prod.outlook.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=microchip.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DS0PR11MB7481:EE_|PH7PR11MB5944:EE_
-x-ms-office365-filtering-correlation-id: 34756b42-73b4-4795-8741-08dd2f967a83
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB7481.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|366016|1800799024|376014|38070700018;
-x-microsoft-antispam-message-info:
- =?utf-8?B?UGxZSndranM0cU5MV3FtZzRUQWcwK0xRTEFZaDlmYkpuQklrcXEzU2JZcGhF?=
- =?utf-8?B?S2x3VTFuVlN2TEVoWWFQZjNZbldITmdxSmVjMFc1VkJUQ1l4L3VrdExGRSt1?=
- =?utf-8?B?N3JHQWIySHJvVFd1M0ZwblhGaUh0eGFkYUJQR1ZKenlRUTJTU1JPc004clZW?=
- =?utf-8?B?K0cwYmYwNURKaGdNaFI1aHp0WHFydkVTcjNZQ2wyQTR0dW83Rko4ejdyK1lH?=
- =?utf-8?B?NnM4ZnJJbjFkMzJmbTIwNW1VaEZtZHY5aGdTQTZsaFpIZUU5SU9jVXdWV0pu?=
- =?utf-8?B?N2FDdVBwN1BDZ3htUHpWZDhFWFNra2h0Y0JYUTRZd2phQnBBR3J4bHc2WlA2?=
- =?utf-8?B?ajVoM2kwNjNjODc2WE02WHduU2gxZUMwWDNnb0FMb3JmZVBOMVpOcnRYSS9Y?=
- =?utf-8?B?VmZSaHpRSWd3dStjbU8ySEF6aTBiK3JCdnB4YVh6R1FSMTJBVzBqa3NXaWtr?=
- =?utf-8?B?YW1KUDR2MFR2cmhKYUtqdFc4ZGJpSzdPWTc3eGRtUmtHbVJVYXdQZUFsbnFt?=
- =?utf-8?B?RCtJdE9GS0paM1Z4c1JVYUVmdGlSOXduaHhWamFiREJmOU1NV2NERElYdUtV?=
- =?utf-8?B?U2xTc2hXZU8rNEp3ay8rNnpsTGRTN0pqaWJmdGlVbTV2MFhVU1ZxTGlFOHNQ?=
- =?utf-8?B?VHRWdkY3UkY3RWJDZkQ4QkxkaWNnRTJXTzk4TUVFOWluK09zMHFrMHZ5cjQ0?=
- =?utf-8?B?UDY5WENhVVRCOHRraExMUnNMV1Z3Q0U0dmVTVGtMbzh0ZkhURm42WXFQSkR5?=
- =?utf-8?B?cm0zdXQxSFc3OFQ5MXcrMnhZelJLZVM0OEJtMVozZjdrTk5xVzhOMTRiV2lx?=
- =?utf-8?B?LzFjUW1hVWxlc0NPbjBCL05lUVROYU5YdStlSndmMDI1b3RieEQ0c2QyUXZi?=
- =?utf-8?B?TG45M29UVkpUNHpHRC82L29XNDdvQkJWR1BNbWFqckZIUm1QdUdTNVJLSWZC?=
- =?utf-8?B?NEZmREpJczVBWVFMY3FobVJKRnhNQlRrNlVzbnRaQWNSVU5obWtSM3BOckY4?=
- =?utf-8?B?SVNzcDd3ZnE2bE9WSlA5TzFEc1hreTFkbjhIS2ZLVk9jL0tyVXRsK0Z2YnRh?=
- =?utf-8?B?SmFjbXE1KzU5d3pEVjROaEpOVE42YU5td3RaSEpjdzhXaGtWZHBiY2pFRnRp?=
- =?utf-8?B?ZHU3TVJobGNlU29yVGFONkFCRUJOQXV4VkhSSWdaNTNLY2tudnpyN2dYeENv?=
- =?utf-8?B?eldLMGxDekxFeUdZY0ZHbllTR2ZsdFBsN290VXlRS280TzNkVm5HZFYwd1pH?=
- =?utf-8?B?Wnh5MlQ4aGdnVzhIclRVenFiRHhUU2VqWk1abEo2c1lIRXZuRyt1VXdEbXNG?=
- =?utf-8?B?eDNWVlB5TWdISG1rU3RLZEwxbjdIREFJbW5UNEt0S0w0cXdvRGRXOXk4cDc0?=
- =?utf-8?B?bGtCcG1YTGdIN0RsSkh5TzFqYmlCc21OUTBuVWIvN012M3pmSllQQm84VHZJ?=
- =?utf-8?B?NlZRSFp1VUlKNVdvUjNUK2RJMEx4U0pKUXJOOFFiTzBFVnFvUXloWjRwajZ3?=
- =?utf-8?B?dkVmbHNsMmVNT2o3N1pLZnE4UHduU2c1dkJtSWFhSFZENHBnNWpsZkVMenVJ?=
- =?utf-8?B?MStQUWFBbEh6UThJUHIrdHhna013dmUzUXhSdkc3bDErcktzcmJpTkVmeUNw?=
- =?utf-8?B?WHBzaTZqYURIZ1ZheXZxVTJBV2d4NzBnMFpBZDhqUGFKR0RnZGNFRy9Ubnli?=
- =?utf-8?B?YlRucDQyZXdRTGt6QXE0TzlMczNRVUZpbTdNd0ZidTFzUm1zUm9IcTBPb2w2?=
- =?utf-8?B?SGwzTkdrQjdrVUpPbFM1a0dPM3h4c2lIR1pUdW8zS2d0amErRGtvVmFKUitu?=
- =?utf-8?B?eEFSSGQ4cHhlOUZLcURNbkxUV2NYWFdXSXM1YjI0Y09JRzVwREFFRG9NS2hz?=
- =?utf-8?B?MWdwaHQwc0Z5dWhUV2ZqMndWeWZVTjdiellZWWZkbnZBVTcwdTYzTE1ZVzJE?=
- =?utf-8?Q?FAKAB8dLYbeIVX0ZwND5+mdyBOIuAHWJ?=
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?RGpoaERXU091TU4zY2FCM2NiZHlzZUd2dlhqeTNha0xWNmZrYnM5aVkwUDJr?=
- =?utf-8?B?OTBzZDJZbUdIYm92bld5R2czYVVwaTFGMG9VOFRWbi81RXZ6UVJmTTFGZktM?=
- =?utf-8?B?RDFvOGZyMTRjemVDOERSM0FDV3A2Qm5Fc3pRM2VFQVNjRWg1TE91dGduSUVJ?=
- =?utf-8?B?QjhZOUlMRDl2dkZ4KzFleVV3emNOTlk0RWx6NmhsV1NoU3FyVmhicVZQU2pH?=
- =?utf-8?B?RW54Uno2OUFmLzliYkpLYWpHZjJPd1ZLU2I0TVlaZ2YrQ3AwbHdXNCtZVHFn?=
- =?utf-8?B?bytrMCtKbnA0RG5FVVFCaFdFaGh4ZG41OEtRVjByYUpJU29ENzBRR2FZc0xD?=
- =?utf-8?B?N1ZVZ0pUeEdZU3hWQWZyRHd2ZlFKZkUzUy80cHcvTmF3d2lPVUFraENhdEt5?=
- =?utf-8?B?VFFRVFoxQk5SSmRYbktkRU84dnpSb1libHV3elJzWXJhWlNsZE04YllwMDFE?=
- =?utf-8?B?Uk9kTEt3UHVjNmZ0b0RBaTlybWh4SGNQbElyVFBPc0FSZFJKZGZJSUhPNkJI?=
- =?utf-8?B?bkszL2pHUTNOam5GQmlucnhnc1BCOTVvTzVrL21nZE1GeXNBSStlRHhFVGNZ?=
- =?utf-8?B?cUdTRlhHTEdaYldNQ0ZtN2pCK1VsaFp2NUNlUkZLWUJXL2h2YkVkenB0bFZX?=
- =?utf-8?B?dXB4ZkJDODY2eWI0Y1NjbFZrVXVPbWUxb3ZPcXg3czhNblZlckphdDdXWVRK?=
- =?utf-8?B?cFRoSmdQOFZyVjZ1YXIyTktiSnYyRDNjQ1JPUVVHaUNxcEhkQ2hwTEtTUWdY?=
- =?utf-8?B?K2J5anN3K2JHWHRwTFByMDVhL05zZnBmODAyZTh6Vys4UVZKSTY5UC9QTU10?=
- =?utf-8?B?L2RiZU50bGhsdmxCQkJldzNjVEpxTk52dHljaUVrTU5rcHRQdzVUOU01T0Y4?=
- =?utf-8?B?aWc0YkFHSVhndVpySjdjb3k4WVBtVnRPUUZjTk9jSkNESVJBaC9HbW5BQkJk?=
- =?utf-8?B?ck5oL1J0SXVRMnlwaGduamNRbTdPSURJNkpWUlJRb2FzWmNqZDVML3VtbHZ0?=
- =?utf-8?B?MTlnbmJZNmxkV05iUWZwSm9scHlmWXFzUWNYWmlQZ3FGd2hyN3FXRm9jempE?=
- =?utf-8?B?NS9vNXZnbG5LbVZ1eldCeGd4dGhiZC93TmdYVmFDaWExdDk0MWNrb3luN0lq?=
- =?utf-8?B?R1dyYkpIalJCaHFnbVpkUXFDYmVTWGRkaGx6dEovQ2wreTEvM3QyTUEydXY3?=
- =?utf-8?B?QXlLZUxmcklRZmovMUlyYkloZi9vM2RYdnh3bjFLTmRGZEZnVFFEWUNMMGpx?=
- =?utf-8?B?Rk42RWZCWFZJeGxGZDZ2OUh5emVWbWR6cFFzZzVIeVQycGpCaWQwUEFLVjlW?=
- =?utf-8?B?cGtDWURlbGNVbEdpbVFiRzlxcDN6bWk1OUljMk9SR2hpWTJpUEErbXdvTVJ1?=
- =?utf-8?B?MXAyWjYvRlMwZTgyMnRURVZuTWRaR0JXeko2TXRNZWlkaDJtL2FmYlVzNGtX?=
- =?utf-8?B?MnhpZS9SdVA4TjJDZXRFMzBOa0xZV3F0bkNwS05sNUVTZ28ydDVOcFZkeGRp?=
- =?utf-8?B?RUdMQzVtNE5BK2taUTRPRW5MekExemZjdVZ1bUVGRm5ydXczWmlPbUlrQ1I3?=
- =?utf-8?B?Q1Awazd1Wmp1Qm1keFJvRGp3OHZCdUZqdm5jNXNlaXRnaEh4WVJmcEVyay8y?=
- =?utf-8?B?d0FEdmg0Tzc4eXcxcmRseC9jVkh4bXBhSXZNZEQ5clIrR2N5ODN4SE9QemNv?=
- =?utf-8?B?eDk3Y2VtbXExcTQ0Wlp4RlBxZGl0b3VtUXFMbTFIUUJRQ1JBWGVqcU53V2NR?=
- =?utf-8?B?bW1vd21QRFNSa1JqbFlydHJpZVd3YXFuSXg4ZWdOSW5QMG1GY2xSVUFJY29T?=
- =?utf-8?B?dy85UGJaQ2xzT2Y4cHkxVTFCKy8ycXZtMG1neUtXMVMvd3ozV2tyYm1DK29k?=
- =?utf-8?B?RVNJVi9OZzNNQ1VYdGo4N1RQUGFPR2dVR3NRMlp4NEtWMlBsK3lVQ3R0ZlAx?=
- =?utf-8?B?a0FvakJLNGRhVUVWVEFhakhEcG1OOENHNlJJRVY0Zy9WeWVOdm80U2ZTVFA3?=
- =?utf-8?B?ckJNR1ZGdm1ScVA3TWpqd1dxSFd5WmNGcmdZQlJHRzUzdHJQNWhYNHBGdVVr?=
- =?utf-8?B?NVVvRkM1REJWRm5ESDF4cTYrTHE2UzV6MGgrSzl6OFZaME1wR3lyaXVZTHdI?=
- =?utf-8?B?Y1Frd1ptRlM1ek1KZmV4NXl3Uy9LV3lXaFVtbnUxVHZMZU5kWi9PQmVIWkc1?=
- =?utf-8?B?L2c9PQ==?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <8E9EE319F8117C46A613A9CF4DE4E79A@namprd11.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F9437083A
+	for <netdev@vger.kernel.org>; Wed,  8 Jan 2025 03:46:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1736308018; cv=none; b=JGRcuPPzNB7Ye+J5MZh0j8YMBxCDjlPPjBACdZF/8yWTue7FICaXRqQkf4CWuUPTEm6/qclAYDamvIM3J7CCW7+Ytfts60JeA9MXedAiYNGoV57k/dsPgxnBr4mnrMr/p1Cw68B4B9TjEGpO8QuthuFo6beAZbYA3JM0Vd8i1cA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1736308018; c=relaxed/simple;
+	bh=3LCFBWDpX022awbUxg9j7aAgxggjyLlvGDhxQ1mEMrs=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=BvdrqLXa76HlMbav2JUEEdl3Zuk8oQabvzTT6HpbAHjgA2GTDgCbjHqBdxTBOB/9uPe9r4GqduDqZylDw/8uhcWn4dzhS+EDAExxWt6SmP+gIT3Gjz6eraepUIEmkJF6xbUmJlwqcy1MAUdTVgkBlljcChVMySR2qfZcR/KD8ug=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=RVYYl6Ci; arc=none smtp.client-ip=209.85.214.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-21670dce0a7so67998675ad.1
+        for <netdev@vger.kernel.org>; Tue, 07 Jan 2025 19:46:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1736308016; x=1736912816; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Mi+CGQoubQ0WXyV85u6vVi98repRddgcWF9ItWY6PUQ=;
+        b=RVYYl6Cisgam4g+5s6BT95TRidn//RJFkxcIfaCxiyyXRAJ08ykbau5Ax9V4713amU
+         N7Qc/U+grXWuL7qKOpJ+BDJWRfw7NiziClOKmj0LJTouN7ZfM5XdbYApAzq/sC+N5GgB
+         ybOwEohVzqYw1O9AVBKZCa7CkNcUtAAxJ0qbU=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736308016; x=1736912816;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Mi+CGQoubQ0WXyV85u6vVi98repRddgcWF9ItWY6PUQ=;
+        b=nvS5gewMJ4dXbNvFN7fzHJfmzLMXdKOOogfiGaiC7lQtYY+aSfR8Mds9vbZzOfobyt
+         GMyJ9PQyYn4WKwKfg/LnTEiOlMy3eHRqKESJPj95d+W73X2ggqQvinB2W9fO/9SC6cdi
+         l4grHYU9Hqy4n6nsToKeeaWK3T1CEhZBoHpOoQ/my+2HWPubhBQWyXd8LehWZQRGLiA8
+         IX3uEkFCCUsYlUf+zNuqt6+b4fHfboJac+rjy5qh78PY1GKJ0VSw1ZqJCVWbMIRsRkx/
+         0LTlNuWkndBRrKPLLyT9zBMAa7b4MGw9wTIpG4jR59apyFQ7fGIqBylo3ulP662iqU3E
+         t3/w==
+X-Gm-Message-State: AOJu0YymRaMgYknWI5sOlQMVuq85RsCFUX50D4jgtP3gzw/8b0qUGUx6
+	lSfCpJps1lI9Vf+aZHZyAWX2T5ig+Uc702MD2oEWQaQ6MwsRPvO5TU53gF8EHZpR+bUcIIqWcKv
+	iDCRppR6uCKdrUTmukb0hCdBYu6iwgk9jNgertGyE3U5Q6jYNKMpOnwC2utpVJD3JYp98h7QTC+
+	mM2pYl8XxxbPuQ8KLyBBlNfstHiTdLmkFjExqryORiXAeqDnsImQhlD4S3j9E=
+X-Gm-Gg: ASbGnctLEMq+uZSvB3y6NpJ7FTzkWMzntbtu2HeTtQHxiGpkRpSatVH5TDxO2LQhylT
+	dw5jC3+6UdyHivCXGoQbmujaN5Bsw5hLmAfoLQSv8KOkTaCjhCiNDGdtv+znAK++gTmQlEutbLD
+	4gRgSLPcbSHMcDn3zD8fz74ngtW8HJ2w7B+qzYVSoLaCmcEcYWjm75HuWyS/sNJNns+OffIifT1
+	Lt/c1wxMGHKQ65OSYhUtQlvzibo0UfNb2sl0UxMZgeSFm1VtTAIRe3iiZsRmBcxktm2QM0ihN2F
+	0bJyWVYnTF7GH9WkxNYPr6En6kUNbnkrFsKYJET2iF4IEKap4UeT3G1BoDkTYK8YV0etzw==
+X-Google-Smtp-Source: AGHT+IFA3KkhNN51bihNTZB7UgR77WHxD+kD+M3694lYFJZ0xWcKF5NN4koPeSDvsfNeikL1QuiMaQ==
+X-Received: by 2002:a17:902:d48a:b0:215:603e:2141 with SMTP id d9443c01a7336-21a83f57383mr21318875ad.19.1736308015712;
+        Tue, 07 Jan 2025 19:46:55 -0800 (PST)
+Received: from sankartest7x-virtual-machine.lvn.broadcom.net ([192.19.161.250])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2f54a2ad3b7sm331253a91.31.2025.01.07.19.46.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 07 Jan 2025 19:46:55 -0800 (PST)
+From: Sankararaman Jayaraman <sankararaman.jayaraman@broadcom.com>
+To: netdev@vger.kernel.org
+Cc: sankararaman.jayaraman@broadcom.com,
+	ronak.doshi@broadcom.com,
+	bcm-kernel-feedback-list@broadcom.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	u9012063@gmail.com,
+	kuba@kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	ast@kernel.org,
+	alexandr.lobakin@intel.com,
+	alexanderduyck@fb.com,
+	bpf@vger.kernel.org,
+	daniel@iogearbox.net,
+	hawk@kernel.org,
+	john.fastabend@gmail.com
+Subject: [PATCH net] vmxnet3: Fix tx queue race condition with XDP
+Date: Wed,  8 Jan 2025 09:18:18 +0530
+Message-Id: <20250108034818.46634-1-sankararaman.jayaraman@broadcom.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: microchip.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB7481.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 34756b42-73b4-4795-8741-08dd2f967a83
-X-MS-Exchange-CrossTenant-originalarrivaltime: 08 Jan 2025 03:42:30.3101
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3f4057f3-b418-4d4e-ba84-d55b4e897d88
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: g7bgu+5rHNXZr6DO6JBGbAupmofp38/sKBkpWi5xsjfDxJvwvShGJfGVv7uSYzvsHE4z1Ifi+CbK/squOW/zmOdwT2epXdQphafrQGn/rNw=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB5944
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-SGkgV29vanVuZyAmIEpha3ViLA0KDQpPbiBUdWUsIDIwMjUtMDEtMDcgYXQgMTY6MjkgKzAwMDAs
-IFdvb2p1bmcgSHVoIC0gQzIxNjk5IHdyb3RlOg0KPiBIaSBSZW5nYXJhamFuLA0KPiANCj4gPiBP
-biBUdWUsIDcgSmFuIDIwMjUgMTU6MTA6MjEgKzAwMDAgV29vanVuZy5IdWhAbWljcm9jaGlwLmNv
-bSB3cm90ZToNCj4gPiA+IEhpIEpha3ViLA0KPiA+ID4gDQo+ID4gPiA+IE9uIFR1ZSwgNyBKYW4g
-MjAyNSAxNDoxNDo1NiArMDAwMCBXb29qdW5nLkh1aEBtaWNyb2NoaXAuY29tDQo+ID4gPiA+IHdy
-b3RlOg0KPiA+ID4gPiA+IFN1cmVseSwgdGhleSBzaG91bGQgaW52b2x2ZSBtb3JlIG9uIHBhdGNo
-ZXMgYW5kIGVhcm4gY3JlZGl0cywNCj4gPiA+ID4gPiBidXQNCj4gPiA+ID4gPiBUaGFuZ2FyYWog
-U2FteW5hdGhhbiA8VGhhbmdhcmFqLlNAbWljcm9jaGlwLmNvbT4gYW5kDQo+ID4gPiA+ID4gUmVu
-Z2FyYWphbiBTIDxSZW5nYXJhamFuLlNAbWljcm9jaGlwLmNvbT4gYXJlIGdvaW5nIHRvIHRha2UN
-Cj4gPiA+ID4gPiBjYXJlDQo+ID4gTEFONzh4eA0KPiA+ID4gPiA+IGZyb20gTWljcm9jaGlwLg0K
-PiA+ID4gPiANCj4gPiA+ID4gSSBjYW4gYWRkIHRoZW0sIEkgbmVlZCB0byByZXNwaW4gdGhlIHNl
-cmllcywgYW55d2F5Lg0KPiA+ID4gDQo+ID4gPiBUaGF0J3MgZ3JlYXQhIFRoYW5rcyENCj4gPiAN
-Cj4gPiBDb3VsZCB5b3Ugc2hhcmUgdGhlIGZ1bGwgbmFtZSBvZiBSZW5nYXJhamFuIFMgPw0KPiAN
-Cj4gV291bGQgeW91IHNoYXJlIGl0Pw0KDQpNeSBmdWxsIG5hbWUgaXMgUmVuZ2FyYWphbiBTdW5k
-YXJhcmFqYW4uDQoNCj4gDQo+IFRoYW5rcw0KPiBXb29qdW5nDQo=
+If XDP traffic runs on a CPU which is greater than or equal to
+the number of the Tx queues of the NIC, then vmxnet3_xdp_get_tq()
+always picks up queue 0 for transmission as it uses reciprocal scale
+instead of simple modulo operation.
+
+vmxnet3_xdp_xmit() and vmxnet3_xdp_xmit_frame() use the above
+returned queue without any locking which can lead to race conditions
+when multiple XDP xmits run in parallel on different=C2=A0CPU's.
+
+This patch uses a simple module scheme when the current CPU equals or
+exceeds the number of Tx queues on the NIC. It also adds locking in
+vmxnet3_xdp_xmit() and vmxnet3_xdp_xmit_frame() functions.
+
+Fixes: 54f00cce1178 ("vmxnet3: Add XDP support.")
+Signed-off-by: Sankararaman Jayaraman <sankararaman.jayaraman@broadcom.com>
+Signed-off-by: Ronak Doshi <ronak.doshi@broadcom.com>
+---
+ drivers/net/vmxnet3/vmxnet3_xdp.c | 17 ++++++++++++++---
+ 1 file changed, 14 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/net/vmxnet3/vmxnet3_xdp.c b/drivers/net/vmxnet3/vmxnet=
+3_xdp.c
+index 1341374a4588..5f177e77cfcb 100644
+--- a/drivers/net/vmxnet3/vmxnet3_xdp.c
++++ b/drivers/net/vmxnet3/vmxnet3_xdp.c
+@@ -1,7 +1,7 @@
+ // SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  * Linux driver for VMware's vmxnet3 ethernet NIC.
+- * Copyright (C) 2008-2023, VMware, Inc. All Rights Reserved.
++ * Copyright (C) 2008-2025, VMware, Inc. All Rights Reserved.
+  * Maintained by: pv-drivers@vmware.com
+  *
+  */
+@@ -28,7 +28,7 @@ vmxnet3_xdp_get_tq(struct vmxnet3_adapter *adapter)
+ 	if (likely(cpu < tq_number))
+ 		tq =3D &adapter->tx_queue[cpu];
+ 	else
+-		tq =3D &adapter->tx_queue[reciprocal_scale(cpu, tq_number)];
++		tq =3D &adapter->tx_queue[cpu % tq_number];
+=20
+ 	return tq;
+ }
+@@ -123,7 +123,9 @@ vmxnet3_xdp_xmit_frame(struct vmxnet3_adapter *adapter,
+ 	struct page *page;
+ 	u32 buf_size;
+ 	u32 dw2;
++	unsigned long irq_flags;
+=20
++	spin_lock_irqsave(&tq->tx_lock, irq_flags);
+ 	dw2 =3D (tq->tx_ring.gen ^ 0x1) << VMXNET3_TXD_GEN_SHIFT;
+ 	dw2 |=3D xdpf->len;
+ 	ctx.sop_txd =3D tq->tx_ring.base + tq->tx_ring.next2fill;
+@@ -134,6 +136,7 @@ vmxnet3_xdp_xmit_frame(struct vmxnet3_adapter *adapter,
+=20
+ 	if (vmxnet3_cmd_ring_desc_avail(&tq->tx_ring) =3D=3D 0) {
+ 		tq->stats.tx_ring_full++;
++		spin_unlock_irqrestore(&tq->tx_lock, irq_flags);
+ 		return -ENOSPC;
+ 	}
+=20
+@@ -142,8 +145,10 @@ vmxnet3_xdp_xmit_frame(struct vmxnet3_adapter *adapter=
+,
+ 		tbi->dma_addr =3D dma_map_single(&adapter->pdev->dev,
+ 					       xdpf->data, buf_size,
+ 					       DMA_TO_DEVICE);
+-		if (dma_mapping_error(&adapter->pdev->dev, tbi->dma_addr))
++		if (dma_mapping_error(&adapter->pdev->dev, tbi->dma_addr)) {
++			spin_unlock_irqrestore(&tq->tx_lock, irq_flags);
+ 			return -EFAULT;
++		}
+ 		tbi->map_type |=3D VMXNET3_MAP_SINGLE;
+ 	} else { /* XDP buffer from page pool */
+ 		page =3D virt_to_page(xdpf->data);
+@@ -182,6 +187,7 @@ vmxnet3_xdp_xmit_frame(struct vmxnet3_adapter *adapter,
+ 	dma_wmb();
+ 	gdesc->dword[2] =3D cpu_to_le32(le32_to_cpu(gdesc->dword[2]) ^
+ 						  VMXNET3_TXD_GEN);
++	spin_unlock_irqrestore(&tq->tx_lock, irq_flags);
+=20
+ 	/* No need to handle the case when tx_num_deferred doesn't reach
+ 	 * threshold. Backend driver at hypervisor side will poll and reset
+@@ -226,6 +232,7 @@ vmxnet3_xdp_xmit(struct net_device *dev,
+ 	struct vmxnet3_adapter *adapter =3D netdev_priv(dev);
+ 	struct vmxnet3_tx_queue *tq;
+ 	int i;
++	struct netdev_queue *nq;
+=20
+ 	if (unlikely(test_bit(VMXNET3_STATE_BIT_QUIESCED, &adapter->state)))
+ 		return -ENETDOWN;
+@@ -236,6 +243,9 @@ vmxnet3_xdp_xmit(struct net_device *dev,
+ 	if (tq->stopped)
+ 		return -ENETDOWN;
+=20
++	nq =3D netdev_get_tx_queue(adapter->netdev, tq->qid);
++
++	__netif_tx_lock(nq, smp_processor_id());
+ 	for (i =3D 0; i < n; i++) {
+ 		if (vmxnet3_xdp_xmit_frame(adapter, frames[i], tq, true)) {
+ 			tq->stats.xdp_xmit_err++;
+@@ -243,6 +253,7 @@ vmxnet3_xdp_xmit(struct net_device *dev,
+ 		}
+ 	}
+ 	tq->stats.xdp_xmit +=3D i;
++	__netif_tx_unlock(nq);
+=20
+ 	return i;
+ }
+--=20
+2.25.1
+
+
+--=20
+This electronic communication and the information and any files transmitted=
+=20
+with it, or attached to it, are confidential and are intended solely for=20
+the use of the individual or entity to whom it is addressed and may contain=
+=20
+information that is confidential, legally privileged, protected by privacy=
+=20
+laws, or otherwise restricted from disclosure to anyone else. If you are=20
+not the intended recipient or the person responsible for delivering the=20
+e-mail to the intended recipient, you are hereby notified that any use,=20
+copying, distributing, dissemination, forwarding, printing, or copying of=
+=20
+this e-mail is strictly prohibited. If you received this e-mail in error,=
+=20
+please return the e-mail to the sender, delete it from your computer, and=
+=20
+destroy any printed copy of it.
 
