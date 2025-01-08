@@ -1,58 +1,57 @@
-Return-Path: <netdev+bounces-156316-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156317-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E94FA060C7
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 16:54:01 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BAD81A060CA
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 16:54:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2E95C1692D6
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 15:53:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DF6D518892B4
+	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 15:54:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7D7C1FF7D2;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEB561FFC44;
 	Wed,  8 Jan 2025 15:52:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lcTY8dJd"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UCnYc9Ge"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A34AB1FF7C2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC36E1FF7D9
 	for <netdev@vger.kernel.org>; Wed,  8 Jan 2025 15:52:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736351567; cv=none; b=AIRf/8pg4eXIgOqjWG7Hkw9NXWVml1BSRzD7zwrD6UUGp1w4WsvAaOhAxKH5ntaMy9RwzkYYf0m0Dzb31ujkCqmvdWRFRRSQ61deMrH1dRjkkPXy6xBCAijSzy+fxAfC52pDpI+8ivCqFtdaUzd/duqJOHmp2g6CANC9HRlgvCs=
+	t=1736351567; cv=none; b=C5QYSNtCinr0qOnmz7R1elPIWnq8jRVODCQhiIsNdmirhydOTvBNztYbaOzSFs/E7jgEj5xfmyHXYhWfHICNdGztk7odemfps07P3Ptvac6zcAsKKzTwSowTcIqFDzihrPqh3CNmS/WkTO9tBNgKDVu6zGGQp003pAqzfxPLp8E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1736351567; c=relaxed/simple;
-	bh=FiEeAf63dNsNuSVHpm2z98RxC5AHWNWFqSf0r32T+/o=;
+	bh=ad8EadHB9tlq8T/aHLKanilCG/V65tlmp/UTD0oqrrk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=cwfng85zS/H2lC+Ejby2ugEfrcd0qxCVmQvPdAvXpyPpc4VysAg3V6MV5FDNp/SmS9iCb7RNAJKcdxfUCces785NcdCXTac7dWUyatUHbXbjgu+J57iVBvBy73nqu9L+gwpnOkVypuHVxuZiyZM1w/gUxsdeVDzvCOaHzRQ81r8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lcTY8dJd; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1A2B6C4CEE5;
+	 MIME-Version; b=D+jt3tVSF6XjpSNGkcvTgYGOtPGBnzY+MXB65LRgaerl1eJRnI6BZgXLlxD3/l/ZTMXj8NcFh2tcHjayivCmkkFEVYQ+hpQyuEnCAdvOIjUbEyX79mEHzFOfho0tfKa2q+FcWwiEJzaXMLUlW3m9cHfJICIvXqIayUNDdcIOmUY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UCnYc9Ge; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7BFA9C4CEDF;
 	Wed,  8 Jan 2025 15:52:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1736351567;
-	bh=FiEeAf63dNsNuSVHpm2z98RxC5AHWNWFqSf0r32T+/o=;
+	bh=ad8EadHB9tlq8T/aHLKanilCG/V65tlmp/UTD0oqrrk=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=lcTY8dJdDhkYxhWkNT2M40j9pLxjn87m+CjpB18gUS8/jHVB1OBrkGzfuqwh9axtm
-	 DajYhA723XgUpF/mxMtmpfIO6zLigY3hmKFq8JakIV3O1yDUe7nupycugA91ZBkIwj
-	 JavOzkv5ORmTpgN+fGvYzXNr0s7eQ1kUxFHBlQB5EhCZPWrN+1obGaRdDef2jIWWEz
-	 JQaFgGKzBOOCUqbeR/P7QP/HVVcZSPmUPaJ1Q1GwNTX/P0lOhUBWhyr3c13dCssY9L
-	 St6hQ9QD7a1jrWcRb1Zb+6w5336MQ2F4BlWb41pDnvfoXMWnAe9FPhycvfpou8oAzl
-	 RcTUAQUR3fx4A==
+	b=UCnYc9GemPATyAo9e3LFsHw2Yn63R2wAQX1I/z7YGUDFqaRhRb/S+z1wYPAbjHArF
+	 m3ggi0B407fKQGtaow5LHabbG1TwNWvO7KW8ASTdSpoPh4diFbO0gONzyx6Nv17kVS
+	 r+Z2HXRkGPnd1Oezp5EFjXaO1EyaFXRkpJUujLIUtms1bozRQbU9pIb2LxpKked9jP
+	 Ombi6hG+G6C79eTlXt7rEqILYIef/DmS8/ioIEUvT3hjnOtvROly5ajlQGPPLwIiv2
+	 ZZjEfqKzmliGBzRfhDEpX8cJoXLRAgA8vsVKxCj2uIVG9YHDtOaes/tXSfPJrBGYax
+	 GMDJLHb/YGjnw==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
 	edumazet@google.com,
 	pabeni@redhat.com,
 	Jakub Kicinski <kuba@kernel.org>,
-	jv@jvosburgh.net,
-	andy@greyhouse.net,
-	razor@blackwall.org
-Subject: [PATCH net v2 3/8] MAINTAINERS: remove Andy Gospodarek from bonding
-Date: Wed,  8 Jan 2025 07:52:37 -0800
-Message-ID: <20250108155242.2575530-4-kuba@kernel.org>
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	joabreu@synopsys.com
+Subject: [PATCH net v2 4/8] MAINTAINERS: mark stmmac ethernet as an Orphan
+Date: Wed,  8 Jan 2025 07:52:38 -0800
+Message-ID: <20250108155242.2575530-5-kuba@kernel.org>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20250108155242.2575530-1-kuba@kernel.org>
 References: <20250108155242.2575530-1-kuba@kernel.org>
@@ -64,63 +63,54 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Andy does not participate much in bonding reviews, unfortunately.
-Move him to CREDITS.
+I tried a couple of things to reinvigorate the stmmac maintainers
+over the last few years but with little effect. The maintainers
+are not active, let the MAINTAINERS file reflect reality.
+The Synopsys IP this driver supports is very popular we need
+a solid maintainer to deal with the complexity of the driver.
 
-gitdm missingmaint says:
+gitdm missingmaints says:
 
-Subsystem BONDING DRIVER
-  Changes 149 / 336 (44%)
-  Last activity: 2024-09-05
-  Jay Vosburgh <jv@jvosburgh.net>:
-    Tags 68db604e16d5 2024-09-05 00:00:00 8
-  Andy Gospodarek <andy@greyhouse.net>:
+Subsystem STMMAC ETHERNET DRIVER
+  Changes 344 / 978 (35%)
+  Last activity: 2020-05-01
+  Alexandre Torgue <alexandre.torgue@foss.st.com>:
+    Tags 1bb694e20839 2020-05-01 00:00:00 1
+  Jose Abreu <joabreu@synopsys.com>:
   Top reviewers:
-    [65]: jay.vosburgh@canonical.com
-    [23]: liuhangbin@gmail.com
-    [16]: razor@blackwall.org
-  INACTIVE MAINTAINER Andy Gospodarek <andy@greyhouse.net>
+    [75]: horms@kernel.org
+    [49]: andrew@lunn.ch
+    [46]: fancer.lancer@gmail.com
+  INACTIVE MAINTAINER Jose Abreu <joabreu@synopsys.com>
 
+Acked-by: Alexandre Torgue <alexandre.torgue@foss.st.com>
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-v2:
- - move to credits
+--
+We could add an entry to AUTHORS, but a quick git log doesn't show
+huge number of patches or LoC. I could be looking wrong..
 
-CC: jv@jvosburgh.net
-CC: andy@greyhouse.net
-CC: razor@blackwall.org
+CC: joabreu@synopsys.com
 ---
- CREDITS     | 4 ++++
- MAINTAINERS | 1 -
- 2 files changed, 4 insertions(+), 1 deletion(-)
+ MAINTAINERS | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
 
-diff --git a/CREDITS b/CREDITS
-index 7a5332907ef0..cda68f04d5f1 100644
---- a/CREDITS
-+++ b/CREDITS
-@@ -1432,6 +1432,10 @@ S: 8124 Constitution Apt. 7
- S: Sterling Heights, Michigan 48313
- S: USA
- 
-+N: Andy Gospodarek
-+E: andy@greyhouse.net
-+D: Maintenance and contributions to the network interface bonding driver.
-+
- N: Wolfgang Grandegger
- E: wg@grandegger.com
- D: Controller Area Network (device drivers)
 diff --git a/MAINTAINERS b/MAINTAINERS
-index f2cace73194e..e16a55c3dd3a 100644
+index e16a55c3dd3a..2b81ed230848 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
-@@ -4065,7 +4065,6 @@ F:	net/bluetooth/
+@@ -22509,11 +22509,8 @@ F:	Documentation/devicetree/bindings/phy/st,stm32mp25-combophy.yaml
+ F:	drivers/phy/st/phy-stm32-combophy.c
  
- BONDING DRIVER
- M:	Jay Vosburgh <jv@jvosburgh.net>
--M:	Andy Gospodarek <andy@greyhouse.net>
+ STMMAC ETHERNET DRIVER
+-M:	Alexandre Torgue <alexandre.torgue@foss.st.com>
+-M:	Jose Abreu <joabreu@synopsys.com>
  L:	netdev@vger.kernel.org
- S:	Maintained
- F:	Documentation/networking/bonding.rst
+-S:	Supported
+-W:	http://www.stlinux.com
++S:	Orphan
+ F:	Documentation/networking/device_drivers/ethernet/stmicro/
+ F:	drivers/net/ethernet/stmicro/stmmac/
+ 
 -- 
 2.47.1
 
