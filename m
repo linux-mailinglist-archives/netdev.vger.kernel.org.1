@@ -1,105 +1,104 @@
-Return-Path: <netdev+bounces-156672-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156676-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D4B0A0758F
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 13:20:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2358AA075AF
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 13:23:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AE6EC3A39E9
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 12:20:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3B9AA3A87B9
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 12:23:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4894F217641;
-	Thu,  9 Jan 2025 12:20:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E7FC217F3D;
+	Thu,  9 Jan 2025 12:23:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bBTDpivS"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IWH5MqKX"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EDCB20551B;
-	Thu,  9 Jan 2025 12:20:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D95121773D;
+	Thu,  9 Jan 2025 12:23:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736425211; cv=none; b=YycPtU3d2QoUCBx+EGW5366YAD+Erv2zIN76XieugzLe8iaGdfACqp2MnfZ3Gpply2/Q7nmzjZ1FWQ6N5JH86uR5x+QySjGSTWQlKkvVF6NfJj4Vqzd0lnML/iLKwvz7XVou0Q+WBfM7jS7MYBhqALhgCoog1euJJdSQVhcRTPA=
+	t=1736425406; cv=none; b=NZgR5SNbyRb9AIs0LA03pZMlITlDOq+1NmgOmGDyMawZbkdM2K74xFkMj7XOaXIs6tZKGX3Mr8t3S89C70zwm8acLbglqoSTcNWvbnI6qrmjxTjEow825dp7/197H96oXpdROqXJNfWcLiBWKhSxmMmPgQ3UIIoMivoCSo0RUgg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736425211; c=relaxed/simple;
-	bh=1y+/0y5Mn+3mmY+Rqdubf97qrdL5lDWfwQl+N0okVJU=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=PTyB+AcmlnwT9fUBunqe7qDx7xb17YJDNwuxxIEcMULg3L5s+1+UgHt8LYFm+xXeGDVNWxloN2+Dd8ztESv4r0wvLvuUCcqZjgQcgaB0++9+BB2EjYHEgrlBK6sCY+gr73WhRfYxgsQAaJ5eFXiE/G13HQzIoGHLZ1jJhnrp4UA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bBTDpivS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8ED65C4CED2;
-	Thu,  9 Jan 2025 12:20:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736425210;
-	bh=1y+/0y5Mn+3mmY+Rqdubf97qrdL5lDWfwQl+N0okVJU=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=bBTDpivSMWuijJnQh3u2XfH9P2b2E4ReENVkg276ScYNV8Ss+42DNVlNmjVmLQUr3
-	 apQ2/amP9GMMjCFtqCT61NPIdITDXPY3uOrt3IiBSUrkpuAmcy0AvW1rEVOc+6oMLA
-	 ML6onBd5rB0YzWtEyB5mMrqlq8WiKRlUfKdxN3y4+Ll6leBYD0RWQQi4rH3o/LhEJI
-	 RjkHYtHLgkgOIxn7mk1Zv5WdZ9OkR/GN+tYej1kiYzelwtXhPIVn3q7RGwH5N3NfTl
-	 5UJfKT0FaCYrZQ6CwtVlUj2LKCfvg1L7TLY0H/xKpSbZ3vOqp+CKpUsu6+e7STHpdg
-	 6GZHN7Aa/zmTg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33DFA3805DB2;
-	Thu,  9 Jan 2025 12:20:33 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1736425406; c=relaxed/simple;
+	bh=rZKR2l04Hhezdm1fat4M6jFM9qd2zpHfQAUzFdZ/lEA=;
+	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
+	 MIME-Version:Content-Type; b=Gx/fipTmCPh8P6f8/hOGw6mu+0/B15JBjQkKoSvoCPKj0JJexV0NgrzrwC9zS4LeNo9mKBB+mSSde2MUbGsYPaUuxusYlWgiwcUUePgYD40kQMhTiyR3cvZFeIgAO2ZCp99l0+nOC/ctOKqjABHP3mdjexbW469hmIawhnAZu48=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IWH5MqKX; arc=none smtp.client-ip=209.85.128.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-43623f0c574so6849475e9.2;
+        Thu, 09 Jan 2025 04:23:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1736425402; x=1737030202; darn=vger.kernel.org;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=rZKR2l04Hhezdm1fat4M6jFM9qd2zpHfQAUzFdZ/lEA=;
+        b=IWH5MqKXkeYMZZ9ZVomsVTCNzv5MoaDgmqCdzV9HHuKrja7u1jK515BjlL3uTlIQfF
+         9YEjliHQKIc52ypIecMyUsWDp+aEaD2GVO1ZZv1HUEjZLL8gFrTdhBIcD10NIW9V+vra
+         eJ8CF5UeuCcUE1wa6QFz/Aw2HOBE8kQgJ4qCxA3UmGDU257goHWHFQ3kcDLLrmh/1Ehf
+         YM9W+pH5tZSFBpRoGY+WJZ47QcqXiNEiV5N6kvOPMtD3vnCcwInHaJYYWQhub7ORLc1v
+         OSOIUKxh+tHq1GeDF6uXJYtaQ7p8RGRIvhXZb9LQQKPvzf5jX6R7bBYPNhkmNUVCEQbE
+         ePLg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736425402; x=1737030202;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rZKR2l04Hhezdm1fat4M6jFM9qd2zpHfQAUzFdZ/lEA=;
+        b=s5On3Juhpn4z8pn9BWrcKzBrN99HkxkAYCmhazV1fSksDfFj3ei49jzVd2dCVbCDZA
+         7w1e2zhRw2Jm4BokRIQ3RJLjaL03LnirFn8LMPibJkjJR7wHvas9c1zMIuEBubHUYt4O
+         FqWAKNq1+SV5LVCICNuk2VNikXvJkspd3GqHxHTmu3naOEFpe1NDr53XE3oi44xoRLl/
+         V1DlvlVcpV0jlcPUPmkwijArMrUHgb7y9Qk/HYikgIKx2pkZuK778PhMuxRPRtc1wF5Q
+         kSKbhZwGAoQanSi25waky3fY6JK0fNBPnViWQLtt0fGv6/PlchdLMjsVQ1fg42ObRDaP
+         Uwsg==
+X-Forwarded-Encrypted: i=1; AJvYcCU0raksen51QxbyXzUvPpVqxVn/ezhx4jiwOiYQ9iTt31UKNNRdz/LnFxIUme9j8/r3RtgSnKRV@vger.kernel.org, AJvYcCXruKmbwbv/dJR2zhR2J3Zs10x8Mi+q7Jr6osojlrvv0IYVPyXIPrpuUMuavkqj1krcpK0uOETJlkS5hPI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxeawaLhlLeIhkQRlL0JQAgofgVHhUqG7m4hO25qIVSIVcoav7w
+	EmW0INOWMRmJg8A8itORrM77l/xstWgnv2Jek/AYA4KEqe0OTdJGDJ3XeQ==
+X-Gm-Gg: ASbGncvpDXAobI9mr1IEjybGf+e/1GAfmNtEflf0qhZkWHo7IhC475x0YWqo8YPqv6t
+	2CoR7MrPCLGIvtlKBccAq8tnWT0tptcR2xJGGhIyHtVyEFvehZys5ct1kjE+iQ6YTKG9oMMWiwv
+	Y/0IdqK2V+VPfF39pFCiA7ydzQ8rQdcN+uUpYqeIBtrqqD0rSzLJi96AQ05L6xZMOATkBbO26Nz
+	DDvCWpJPMpN1FrN0L5X44cj+CIe6j+uZR/tqRYnoWREPlxXH3MYuSmCEYKJyWqtyKl8ow==
+X-Google-Smtp-Source: AGHT+IG9CZxpfozpY653yun0yVD6nhni9k+FD7iXNbXx4YchsTVS2ugr7eJ8Fwr7soELyFR7ltUtlw==
+X-Received: by 2002:a05:600c:3c85:b0:434:a802:e99a with SMTP id 5b1f17b1804b1-436e267821emr57678655e9.4.1736425400684;
+        Thu, 09 Jan 2025 04:23:20 -0800 (PST)
+Received: from imac ([2a02:8010:60a0:0:1cd4:f10c:6f67:2480])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38a8e4c1ce5sm1710942f8f.94.2025.01.09.04.23.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 Jan 2025 04:23:20 -0800 (PST)
+From: Donald Hunter <donald.hunter@gmail.com>
+To: Jan Stancek <jstancek@redhat.com>
+Cc: stfomichev@gmail.com,  kuba@kernel.org,  jdamato@fastly.com,
+  pabeni@redhat.com,  netdev@vger.kernel.org,  linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v4 3/4] tools: ynl: add install target for generated
+ content
+In-Reply-To: <645c68e3d201f1ef4276e3daddfe06262a0c2804.1736343575.git.jstancek@redhat.com>
+	(Jan Stancek's message of "Wed, 8 Jan 2025 14:56:16 +0100")
+Date: Thu, 09 Jan 2025 12:20:37 +0000
+Message-ID: <m27c74mb56.fsf@gmail.com>
+References: <cover.1736343575.git.jstancek@redhat.com>
+	<645c68e3d201f1ef4276e3daddfe06262a0c2804.1736343575.git.jstancek@redhat.com>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] dt-bindings: net: Correct indentation and style in
- DTS example
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173642523202.1303894.12707902460357622367.git-patchwork-notify@kernel.org>
-Date: Thu, 09 Jan 2025 12:20:32 +0000
-References: <20250107125613.211478-1-krzysztof.kozlowski@linaro.org>
-In-Reply-To: <20250107125613.211478-1-krzysztof.kozlowski@linaro.org>
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org,
- conor+dt@kernel.org, neil.armstrong@linaro.org, khilman@baylibre.com,
- jbrunet@baylibre.com, martin.blumenstingl@googlemail.com, opendmb@gmail.com,
- florian.fainelli@broadcom.com, bcm-kernel-feedback-list@broadcom.com,
- rjui@broadcom.com, sbranden@broadcom.com, mkl@pengutronix.de,
- mailhol.vincent@wanadoo.fr, mcoquelin.stm32@gmail.com,
- alexandre.torgue@foss.st.com, kvalo@kernel.org, o.rempel@pengutronix.de,
- dariobin@libero.it, christophe.roullier@foss.st.com,
- grygorii.strashko@ti.com, s-vadapalli@ti.com, rogerq@kernel.org,
- briannorris@chromium.org, Frank.Li@nxp.com, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-amlogic@lists.infradead.org, linux-kernel@vger.kernel.org,
- linux-can@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
- linux-wireless@vger.kernel.org
+Content-Type: text/plain
 
-Hello:
+Jan Stancek <jstancek@redhat.com> writes:
 
-This patch was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+> Generate docs using ynl_gen_rst and add install target for
+> headers, specs and generates rst files.
+>
+> Factor out SPECS_DIR since it's repeated many times.
+>
+> Signed-off-by: Jan Stancek <jstancek@redhat.com>
 
-On Tue,  7 Jan 2025 13:56:13 +0100 you wrote:
-> DTS example in the bindings should be indented with 2- or 4-spaces and
-> aligned with opening '- |', so correct any differences like 3-spaces or
-> mixtures 2- and 4-spaces in one binding.
-> 
-> No functional changes here, but saves some comments during reviews of
-> new patches built on existing code.
-> 
-> [...]
-
-Here is the summary with links:
-  - [net-next] dt-bindings: net: Correct indentation and style in DTS example
-    https://git.kernel.org/netdev/net-next/c/9d8c354a56e9
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
 
