@@ -1,54 +1,54 @@
-Return-Path: <netdev+bounces-156633-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156634-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 87AB6A072D6
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 11:22:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id F1087A072DC
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 11:22:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BDCF316356C
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 10:22:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DB64F168607
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 10:22:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 393F3218E9E;
-	Thu,  9 Jan 2025 10:19:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E989215F70;
+	Thu,  9 Jan 2025 10:19:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="mIhXGucZ"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="XeB5g4g4"
 X-Original-To: netdev@vger.kernel.org
 Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B85DD215F47;
-	Thu,  9 Jan 2025 10:19:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A067A215798;
+	Thu,  9 Jan 2025 10:19:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736417945; cv=none; b=UswxSyh6yWJRK59+4PvqIjYfvzGggZIMXr2hnzT/d8veZxy1tp/ZDyKnp5iAEfGQ7dfL1a+qqqfCP0JlydIbqe6mWxOBcjvzH7zuF6nIpOeBhP95jE5HN1uTpOolO4os27hU8cqVgI1XrzodMDIUf5GkchtOFpjQQ0NFO52dWMg=
+	t=1736417948; cv=none; b=QbLUxnZAFkRHnAW49WOEGzWurb8As5Hkdw62kNG38VCtgFCJV5qbR979yBxH5tOIySLy0cM8kJdLWKBi+7CRq4H31DvAHs5ITBXJrcSgRu+8eGjHA2JaBeYaGSFGk1zx5FXQ0LEYzJzqCR7dXGQ1iD2wKffk4ayJXtohsagqwHk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736417945; c=relaxed/simple;
-	bh=RZuO1r59PlVkQGPxJghut1VS50guz4rBU7rH1G5gD3Y=;
+	s=arc-20240116; t=1736417948; c=relaxed/simple;
+	bh=BgmI5+f007NY5MqD0r01vDQ+FUmwMv2BXyDMGcXeHKc=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=l26ffdqazxg0ZT4lr9y2EYKobU+Dr46on/LaYwQla/bC4S9ra2Pa+QZPu0kekZh7/GrQvK0Pzy2jzDYdEvfje2tGlKKxVDnO/IIWvcwTOyoAAARyAN01tsKs7plz/sLYgARZZ18DP5P7ig/8/FymCAl+MHOlSgjAqD5QW0Jo7jU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=mIhXGucZ; arc=none smtp.client-ip=217.70.183.196
+	 In-Reply-To:To:Cc; b=Md1xdQ6iSC7supTWtJ4Q+l2JbgwN6yTFbwqFnZloqhvZsJoHz8SrR2YIgJNz4bolr8MFowOmkrnEWjcYaE40pbLkcCoG1npJDeOTXfKuDxH4QTVdTdmpQyT5CMb3H/oSnMzku3cXU+85M925b4iu4148de45iI+g+EyvVmHpNqA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=XeB5g4g4; arc=none smtp.client-ip=217.70.183.196
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 68990E000A;
-	Thu,  9 Jan 2025 10:18:58 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 76565E0007;
+	Thu,  9 Jan 2025 10:18:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1736417939;
+	t=1736417940;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=4uU/plfv/Hiqay0ydln3tGT/UUrhcCr+rBb47n8URIY=;
-	b=mIhXGucZ+8+WzBSmmO8gsoF8Rd2AU9Tki46Xuvwe85YyRYEW/AZbKrZH9oRwxzbPIeofsb
-	vgIVbnR/soaRWzPP/ftr+ZAxr1wTyMS5xjdMumCpEpRdBfD4uujclyxigjysyKAzzQdmrp
-	upgcXlQz5u5cA5EO8Ilc+7EQ1s6X6iqNNzFzS5MTtsY/liyBG6bRkiCdKbVPo8/mVhYE9V
-	c4V6YK/8ZZP4IE2o1uqvge31vZPdZAg3LoLjKf0YOYmFvVhXpJqloxLPwXCO1qbxFU/LHO
-	AovKEaV68bjyX/P7Gh1gZNAS90B/qCWuHCgV6xbKBE/E+ILyEIituiysNcKhlw==
+	bh=HqfcEwFHnXLFfj7PAufEvNIFPEEn0o3jJJxQOZR4YCY=;
+	b=XeB5g4g4w/LE2a7HhfO9zVE+CdnHDTRRrnPL0hTF0aKU8fWX7/pG/7R/Bc8yYe1n2tuuMD
+	U1JhQKEA4LCkhfQKEfKeitnCOCbrxJYdI/brqwr5wgnI2RvjU7pdzndxggy1xD652VmTzR
+	LCeS2bAjeJcc385HohL/bXWYI8cV5AnOVH+8Td4DhDDbcb1pnEpmlQP/rRW/n9kJbOnAC2
+	KJvTvPquTGy+/3GYl+/BI91/4CxSHDHFbwH8qTeMEQchhOO5O7Fcx7dfjkSSNn2DTW03wq
+	qFFxWgE37VaDXkLY0v2+JE8dpRI9Uytv7CF9MumsrXVp7UGgIGYnlmJC1rmxWQ==
 From: Kory Maincent <kory.maincent@bootlin.com>
-Date: Thu, 09 Jan 2025 11:18:08 +0100
-Subject: [PATCH net-next v2 14/15] net: pse-pd: Fix missing PI of_node
- description
+Date: Thu, 09 Jan 2025 11:18:09 +0100
+Subject: [PATCH net-next v2 15/15] net: pse-pd: Clean ethtool header of PSE
+ structures
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,7 +57,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250109-b4-feature_poe_arrange-v2-14-55ded947b510@bootlin.com>
+Message-Id: <20250109-b4-feature_poe_arrange-v2-15-55ded947b510@bootlin.com>
 References: <20250109-b4-feature_poe_arrange-v2-0-55ded947b510@bootlin.com>
 In-Reply-To: <20250109-b4-feature_poe_arrange-v2-0-55ded947b510@bootlin.com>
 To: Oleksij Rempel <o.rempel@pengutronix.de>, 
@@ -78,30 +78,102 @@ X-GND-Sasl: kory.maincent@bootlin.com
 
 From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
 
-The PI of_node was not assigned in the regulator_config structure, leading
-to failures in resolving the correct supply when different power supplies
-are assigned to multiple PIs of a PSE controller. This fix ensures that the
-of_node is properly set in the regulator_config, allowing accurate supply
-resolution for each PI.
+Remove PSE-specific structures from the ethtool header to improve code
+modularity, maintain independent headers, and reduce incremental build
+time.
 
-Acked-by: Oleksij Rempel <o.rempel@pengutronix.de>
 Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
 ---
- drivers/net/pse-pd/pse_core.c | 1 +
- 1 file changed, 1 insertion(+)
+
+Changes in v2:
+- New patch.
+---
+ drivers/net/pse-pd/pse_core.c |  1 +
+ include/linux/ethtool.h       | 20 --------------------
+ include/linux/pse-pd/pse.h    | 22 +++++++++++++++++++++-
+ 3 files changed, 22 insertions(+), 21 deletions(-)
 
 diff --git a/drivers/net/pse-pd/pse_core.c b/drivers/net/pse-pd/pse_core.c
-index 830e8d567d4d..be56b3f5425c 100644
+index be56b3f5425c..e907543824d6 100644
 --- a/drivers/net/pse-pd/pse_core.c
 +++ b/drivers/net/pse-pd/pse_core.c
-@@ -423,6 +423,7 @@ devm_pse_pi_regulator_register(struct pse_controller_dev *pcdev,
- 	rconfig.dev = pcdev->dev;
- 	rconfig.driver_data = pcdev;
- 	rconfig.init_data = rinit_data;
-+	rconfig.of_node = pcdev->pi[id].np;
+@@ -6,6 +6,7 @@
+ //
  
- 	rdev = devm_regulator_register(pcdev->dev, rdesc, &rconfig);
- 	if (IS_ERR(rdev)) {
+ #include <linux/device.h>
++#include <linux/ethtool.h>
+ #include <linux/of.h>
+ #include <linux/pse-pd/pse.h>
+ #include <linux/regulator/driver.h>
+diff --git a/include/linux/ethtool.h b/include/linux/ethtool.h
+index f711bfd75c4d..843e2557a197 100644
+--- a/include/linux/ethtool.h
++++ b/include/linux/ethtool.h
+@@ -1303,24 +1303,4 @@ struct ethtool_forced_speed_map {
+ 
+ void
+ ethtool_forced_speed_maps_init(struct ethtool_forced_speed_map *maps, u32 size);
+-
+-/* C33 PSE extended state and substate. */
+-struct ethtool_c33_pse_ext_state_info {
+-	enum ethtool_c33_pse_ext_state c33_pse_ext_state;
+-	union {
+-		enum ethtool_c33_pse_ext_substate_error_condition error_condition;
+-		enum ethtool_c33_pse_ext_substate_mr_pse_enable mr_pse_enable;
+-		enum ethtool_c33_pse_ext_substate_option_detect_ted option_detect_ted;
+-		enum ethtool_c33_pse_ext_substate_option_vport_lim option_vport_lim;
+-		enum ethtool_c33_pse_ext_substate_ovld_detected ovld_detected;
+-		enum ethtool_c33_pse_ext_substate_power_not_available power_not_available;
+-		enum ethtool_c33_pse_ext_substate_short_detected short_detected;
+-		u32 __c33_pse_ext_substate;
+-	};
+-};
+-
+-struct ethtool_c33_pse_pw_limit_range {
+-	u32 min;
+-	u32 max;
+-};
+ #endif /* _LINUX_ETHTOOL_H */
+diff --git a/include/linux/pse-pd/pse.h b/include/linux/pse-pd/pse.h
+index be877dea6a11..1452ed7ca6d7 100644
+--- a/include/linux/pse-pd/pse.h
++++ b/include/linux/pse-pd/pse.h
+@@ -5,7 +5,6 @@
+ #ifndef _LINUX_PSE_CONTROLLER_H
+ #define _LINUX_PSE_CONTROLLER_H
+ 
+-#include <linux/ethtool.h>
+ #include <linux/list.h>
+ #include <uapi/linux/ethtool.h>
+ 
+@@ -16,6 +15,27 @@
+ 
+ struct phy_device;
+ struct pse_controller_dev;
++struct netlink_ext_ack;
++
++/* C33 PSE extended state and substate. */
++struct ethtool_c33_pse_ext_state_info {
++	enum ethtool_c33_pse_ext_state c33_pse_ext_state;
++	union {
++		enum ethtool_c33_pse_ext_substate_error_condition error_condition;
++		enum ethtool_c33_pse_ext_substate_mr_pse_enable mr_pse_enable;
++		enum ethtool_c33_pse_ext_substate_option_detect_ted option_detect_ted;
++		enum ethtool_c33_pse_ext_substate_option_vport_lim option_vport_lim;
++		enum ethtool_c33_pse_ext_substate_ovld_detected ovld_detected;
++		enum ethtool_c33_pse_ext_substate_power_not_available power_not_available;
++		enum ethtool_c33_pse_ext_substate_short_detected short_detected;
++		u32 __c33_pse_ext_substate;
++	};
++};
++
++struct ethtool_c33_pse_pw_limit_range {
++	u32 min;
++	u32 max;
++};
+ 
+ /**
+  * struct pse_control_config - PSE control/channel configuration.
 
 -- 
 2.34.1
