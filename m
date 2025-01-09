@@ -1,237 +1,230 @@
-Return-Path: <netdev+bounces-156648-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156649-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A1F0A073CE
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 11:55:01 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A790BA073E9
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 11:57:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 90B4016791A
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 10:54:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0E9C9188A43C
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 10:57:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD3B321638B;
-	Thu,  9 Jan 2025 10:54:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8EE2217641;
+	Thu,  9 Jan 2025 10:56:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MZzsvayx"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b="S0kIQWv+"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from server.wki.vra.mybluehostin.me (server.wki.vra.mybluehostin.me [162.240.238.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC34E215F4C
-	for <netdev@vger.kernel.org>; Thu,  9 Jan 2025 10:54:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB384216E37;
+	Thu,  9 Jan 2025 10:56:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.240.238.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736420094; cv=none; b=O0QrlVXJvQf4W1Cz0APC7Fn5tL8cMuZmB0xoduhKLI7rsOX+rjCsyjWrkm9aWbqtFq0dVEseHuAt5vs+tkEChkBip6PDaGi9hugNSmTMjo0gE6b6Fw5f0N8jvX9l9s3d43DKscxs0Gr0eePItioJ2TApYWtmmWv8hFmiUYbamt8=
+	t=1736420194; cv=none; b=dGNbSIby84yy0gWHlcetezQb6pUMK8KyyDJ+31wJYHuK51CHyXGzEd+UE4gq41aN51rGXtEhxOkwti84EDtDagBA6gHJo8OZSXl8RLxUn6j+xfdBRarnqUKb7WEJhhkpS1eduXXNNjD0vLfc01dRxJpYu1zp7Jn4+cgkLsQXLD8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736420094; c=relaxed/simple;
-	bh=xjYW09EFLzW2yW/rm2jKIbdQTrSIoe4IkZQrwEIOLtY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gULlPzjDMqLXISy775IiwWEf/C7956GsMXcdK9t2TZxtd/8ehWgKOozUcmUn5MkM0zpb+oWk4QZfZU7oS0qC7uFf3os+LVaJGmYoBWW9g4k96Wik0Z70zOPMZoHmWQe7Eyv6ZWSJ2G616JO9SsCKer3SQn4MkCEatBd2g3R0AKM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MZzsvayx; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1736420092;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xIj/wFJWJng3DU5tsrpsirFE9no8V87x/TiEdYyqsbI=;
-	b=MZzsvayxwmQ1wsDztuwFpRa76Y7GwOP5wJPmKHsiNcJsxbXUaoAqg/1i+nYa2dPQSBO+UN
-	HY2SFieU7QJND3kq1y+eqDDJSzZLjSp8vScDiX4s37N+Kf0QWDGHxfyHuQrDBpAxf/9Iy4
-	OQFqhYolRq2vdwtTbdTxJAWrFoaIPEc=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-534-JeW6zlDUMeCfmA2P7Wq_9Q-1; Thu, 09 Jan 2025 05:54:50 -0500
-X-MC-Unique: JeW6zlDUMeCfmA2P7Wq_9Q-1
-X-Mimecast-MFC-AGG-ID: JeW6zlDUMeCfmA2P7Wq_9Q
-Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-ab2b300e5daso79069966b.1
-        for <netdev@vger.kernel.org>; Thu, 09 Jan 2025 02:54:49 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736420089; x=1737024889;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xIj/wFJWJng3DU5tsrpsirFE9no8V87x/TiEdYyqsbI=;
-        b=OFPDTNlAiFCSESIm0cIHBZH9SPYnH+CMHCZib3PKpeoUCDBMtGZj43q9NV7SYR4uG1
-         JsyJXc4TxIKlmZ/FIckeD0pW9DKQm/kbP8pq6LEY8DJWXZVkUnUr1mYzzaejZt3yNW51
-         /yQhdyLiRnQM7iKFg3HSgiKUX/Fj5IkNAswWqBidnLu0lE7MPe17iJPy1icvVPdStP5o
-         HnVKd/cT6/M4LYyW2uG7IiDfVcNvrTO/Jj4mD7zrOraW9+FfTKDLdSBdIrvkqLqTmJG8
-         eoQDhpo2URR9Qk99waulXtREZ7dzgK5dCOHW4i/mnnV8gpg6QmzDX6doN4SCdM2PsGmj
-         SPGA==
-X-Forwarded-Encrypted: i=1; AJvYcCUXMKpYYLuYcpvkLqlaVgnfY7AZfwO2Gqe3lcBxbScRYZmaeZLQu7S9DGewp6T66V7NivErTO4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzqxhTNBSvOKkMpmv3haAkasBKC7sBcNFGmNor5TuYJwh7KdSst
-	lM/C5RhW2FMCtnH2pQcWAohDf3Vn88KYu3jrZ+to59vVOJEa0jpd6OOCL7GOY3nBLBZj4xA3pt6
-	pAXtlN0mP6oVvCpXjeahDu+3RVCuKu6S+j7rLLNHn4/l4bwmFKJ7Zig==
-X-Gm-Gg: ASbGncs3kPLdb2qc9r39OumllW/w4uvLWKzVb0dnBMvMHe14pXy8D5I0Z4EZLAwM+Dl
-	lhmAN8Ab729B3cgBg0Cffm+fbpBFCDd19bA3qHAtEVApv8pquBh/xypiKAASIuNqUGMWqsHRV/Y
-	R2uObVy/Mzw6plYXZ/UTizRMuWRiDdtmGUF4yQwc1pvLhyitQZyqWnygfxm4jCJ+Sbi1rgO9M73
-	Awe1YHIf41Rck4C2J4sJzvORIGmaF6tos8jqnSLQSiBKqBmaQ4=
-X-Received: by 2002:a17:907:72cb:b0:aab:daf0:3198 with SMTP id a640c23a62f3a-ab2abca7800mr500877466b.40.1736420088903;
-        Thu, 09 Jan 2025 02:54:48 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IExyIT+vLyZuSRO1HYHRpQZAcLjGAM/DPQm1sU+k2N6FecPo+8VNAPHL27tLDu8PEC84rgUxQ==
-X-Received: by 2002:a17:907:72cb:b0:aab:daf0:3198 with SMTP id a640c23a62f3a-ab2abca7800mr500875966b.40.1736420088534;
-        Thu, 09 Jan 2025 02:54:48 -0800 (PST)
-Received: from redhat.com ([2a02:14f:175:d62d:93ef:d7e2:e7da:ed72])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ab2c9562e9bsm58983266b.106.2025.01.09.02.54.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Jan 2025 02:54:47 -0800 (PST)
-Date: Thu, 9 Jan 2025 05:54:41 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Akihiko Odaki <akihiko.odaki@daynix.com>
-Cc: Jonathan Corbet <corbet@lwn.net>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	Jason Wang <jasowang@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Shuah Khan <shuah@kernel.org>, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-	linux-kselftest@vger.kernel.org,
-	Yuri Benditovich <yuri.benditovich@daynix.com>,
-	Andrew Melnychenko <andrew@daynix.com>,
-	Stephen Hemminger <stephen@networkplumber.org>,
-	gur.stavi@huawei.com, devel@daynix.com
-Subject: Re: [PATCH v2 3/3] tun: Set num_buffers for virtio 1.0
-Message-ID: <20250109055425-mutt-send-email-mst@kernel.org>
-References: <20250109-tun-v2-0-388d7d5a287a@daynix.com>
- <20250109-tun-v2-3-388d7d5a287a@daynix.com>
- <20250109023144-mutt-send-email-mst@kernel.org>
- <20250109023829-mutt-send-email-mst@kernel.org>
- <ad580d7b-2bd1-401e-bb7b-b67ec943918f@daynix.com>
+	s=arc-20240116; t=1736420194; c=relaxed/simple;
+	bh=onm4zJn7MyQ6YUGH22+as5NstLjiZZN4eKwR7lNl+To=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=MiwzEGrs8rdUC8i4hY3DHwsP9kzwGofyFIz+1xle0FuzQ4d0zaIVYBydF6GM3UC3oYxoGQBk9tZRvL42O/1loG7HrWADttwrZ/YbazozQa0pa6Hmqe6vCJ5MAxN8x3KTiaa09InBYyI9pnPkuHGAwKdMXRM9jwR/j+yfFU3QlpY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=couthit.com; spf=pass smtp.mailfrom=couthit.com; dkim=pass (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b=S0kIQWv+; arc=none smtp.client-ip=162.240.238.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=couthit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=couthit.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=couthit.com
+	; s=default; h=Content-Transfer-Encoding:MIME-Version:Message-Id:Date:Subject
+	:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:Content-Description:
+	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
+	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=6t1cVsmBCN+t39+NHF9BN+vdKzGRs+qPanQcu9WVnh0=; b=S0kIQWv+3gA19DcEf0cungI2wS
+	5bewSBSx8DTrwkrfv7lzpMsp1IbDgvzL3p5kHIEbF3+qx0Eq5Gt38F50cvciCBzR/0dsQQDCwhPfL
+	aSmQ4hq0c0xYpaXGjq7vTp1nLnaTW1nyCoTKwVY9FCaPHxCNVIOvLBSBeT/ePFMbq6dic+eXtiJ1O
+	2VDqfW5R+EzotgEW/YoJGOe9WUXFfUYQEmDvWeh+MoSPcWYuHg4SXe46YHx8prxFJFcxxpXolO7KD
+	nQlqnChmyTJBV0Dpw8kT7N0/UVTiwDoPOzr2J37MCljpnf996yWportlAGOb2veILg17L8CjK1yBT
+	3MD86HiQ==;
+Received: from [122.175.9.182] (port=16507 helo=cypher.couthit.local)
+	by server.wki.vra.mybluehostin.me with esmtpa (Exim 4.96.2)
+	(envelope-from <basharath@couthit.com>)
+	id 1tVqDB-0006Xj-1X;
+	Thu, 09 Jan 2025 16:26:25 +0530
+From: Basharath Hussain Khaja <basharath@couthit.com>
+To: danishanwar@ti.com,
+	rogerq@kernel.org,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	robh@kernel.org,
+	krzk+dt@kernel.org,
+	conor+dt@kernel.org,
+	nm@ti.com,
+	ssantosh@kernel.org,
+	tony@atomide.com,
+	richardcochran@gmail.com,
+	parvathi@couthit.com,
+	basharath@couthit.com,
+	schnelle@linux.ibm.com,
+	rdunlap@infradead.org,
+	diogo.ivo@siemens.com,
+	m-karicheri2@ti.com,
+	horms@kernel.org,
+	jacob.e.keller@intel.com,
+	m-malladi@ti.com,
+	javier.carrasco.cruz@gmail.com,
+	afd@ti.com,
+	s-anna@ti.com
+Cc: linux-arm-kernel@lists.infradead.org,
+	netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-omap@vger.kernel.org,
+	pratheesh@ti.com,
+	prajith@ti.com,
+	vigneshr@ti.com,
+	praneeth@ti.com,
+	srk@ti.com,
+	rogerq@ti.com,
+	krishna@couthit.com,
+	pmohan@couthit.com,
+	mohan@couthit.com
+Subject: [RFC PATCH 00/10] PRU-ICSSM Ethernet Driver
+Date: Thu,  9 Jan 2025 16:25:50 +0530
+Message-Id: <20250109105600.41297-1-basharath@couthit.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ad580d7b-2bd1-401e-bb7b-b67ec943918f@daynix.com>
+Content-Transfer-Encoding: 8bit
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - server.wki.vra.mybluehostin.me
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - couthit.com
+X-Get-Message-Sender-Via: server.wki.vra.mybluehostin.me: authenticated_id: basharath@couthit.com
+X-Authenticated-Sender: server.wki.vra.mybluehostin.me: basharath@couthit.com
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
 
-On Thu, Jan 09, 2025 at 06:38:10PM +0900, Akihiko Odaki wrote:
-> On 2025/01/09 16:40, Michael S. Tsirkin wrote:
-> > On Thu, Jan 09, 2025 at 02:32:25AM -0500, Michael S. Tsirkin wrote:
-> > > On Thu, Jan 09, 2025 at 03:58:45PM +0900, Akihiko Odaki wrote:
-> > > > The specification says the device MUST set num_buffers to 1 if
-> > > > VIRTIO_NET_F_MRG_RXBUF has not been negotiated.
-> > > > 
-> > > > Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
-> > > 
-> > > 
-> > > How do we know this is v1 and not v0? Confused.
-> > 
-> > Ah I got it, you assume userspace will over-write it
-> > if VIRTIO_NET_F_MRG_RXBUF is set.
-> > If we are leaving this up to userspace, why not let it do
-> > it always?
-> 
-> tun may be used with vhost_net, which does not set the field.
+Hi,
 
-I'd fix that in vhost net.
+The Programmable Real-Time Unit Industrial Communication Sub-system (PRU-ICSS)
+is available on the TI SOCs in two flavors: Gigabit ICSS (ICSSG) and the older
+Megabit ICSS (ICSSM).
+
+Support for ICSSG Dual-EMAC mode has already been mainlined [1] and the
+fundamental components/drivers such as PRUSS driver, Remoteproc driver,
+PRU-ICSS INTC, and PRU-ICSS IEP drivers are already available in the mainline
+Linux kernel. The current RFC patch series builds on top of these components
+and introduces changes to support the Dual-EMAC mode on ICSSM, especially on
+the TI AM57xx devices.
 
 
-> > 
-> > > > ---
-> > > >   drivers/net/tap.c      |  2 +-
-> > > >   drivers/net/tun.c      |  6 ++++--
-> > > >   drivers/net/tun_vnet.c | 14 +++++++++-----
-> > > >   drivers/net/tun_vnet.h |  4 ++--
-> > > >   4 files changed, 16 insertions(+), 10 deletions(-)
-> > > > 
-> > > > diff --git a/drivers/net/tap.c b/drivers/net/tap.c
-> > > > index 60804855510b..fe9554ee5b8b 100644
-> > > > --- a/drivers/net/tap.c
-> > > > +++ b/drivers/net/tap.c
-> > > > @@ -713,7 +713,7 @@ static ssize_t tap_put_user(struct tap_queue *q,
-> > > >   	int total;
-> > > >   	if (q->flags & IFF_VNET_HDR) {
-> > > > -		struct virtio_net_hdr vnet_hdr;
-> > > > +		struct virtio_net_hdr_v1 vnet_hdr;
-> > > >   		vnet_hdr_len = READ_ONCE(q->vnet_hdr_sz);
-> > > > diff --git a/drivers/net/tun.c b/drivers/net/tun.c
-> > > > index dbf0dee92e93..f211d0580887 100644
-> > > > --- a/drivers/net/tun.c
-> > > > +++ b/drivers/net/tun.c
-> > > > @@ -1991,7 +1991,9 @@ static ssize_t tun_put_user_xdp(struct tun_struct *tun,
-> > > >   	size_t total;
-> > > >   	if (tun->flags & IFF_VNET_HDR) {
-> > > > -		struct virtio_net_hdr gso = { 0 };
-> > > > +		struct virtio_net_hdr_v1 gso = {
-> > > > +			.num_buffers = __virtio16_to_cpu(true, 1)
-> > > > +		};
-> > > >   		vnet_hdr_sz = READ_ONCE(tun->vnet_hdr_sz);
-> > > >   		ret = tun_vnet_hdr_put(vnet_hdr_sz, iter, &gso);
-> > > > @@ -2044,7 +2046,7 @@ static ssize_t tun_put_user(struct tun_struct *tun,
-> > > >   	}
-> > > >   	if (vnet_hdr_sz) {
-> > > > -		struct virtio_net_hdr gso;
-> > > > +		struct virtio_net_hdr_v1 gso;
-> > > >   		ret = tun_vnet_hdr_from_skb(tun->flags, tun->dev, skb, &gso);
-> > > >   		if (ret < 0)
-> > > > diff --git a/drivers/net/tun_vnet.c b/drivers/net/tun_vnet.c
-> > > > index ffb2186facd3..a7a7989fae56 100644
-> > > > --- a/drivers/net/tun_vnet.c
-> > > > +++ b/drivers/net/tun_vnet.c
-> > > > @@ -130,15 +130,17 @@ int tun_vnet_hdr_get(int sz, unsigned int flags, struct iov_iter *from,
-> > > >   EXPORT_SYMBOL_GPL(tun_vnet_hdr_get);
-> > > >   int tun_vnet_hdr_put(int sz, struct iov_iter *iter,
-> > > > -		     const struct virtio_net_hdr *hdr)
-> > > > +		     const struct virtio_net_hdr_v1 *hdr)
-> > > >   {
-> > > > +	int content_sz = MIN(sizeof(*hdr), sz);
-> > > > +
-> > > >   	if (iov_iter_count(iter) < sz)
-> > > >   		return -EINVAL;
-> > > > -	if (copy_to_iter(hdr, sizeof(*hdr), iter) != sizeof(*hdr))
-> > > > +	if (copy_to_iter(hdr, content_sz, iter) != content_sz)
-> > > >   		return -EFAULT;
-> > > > -	if (iov_iter_zero(sz - sizeof(*hdr), iter) != sz - sizeof(*hdr))
-> > > > +	if (iov_iter_zero(sz - content_sz, iter) != sz - content_sz)
-> > > >   		return -EFAULT;
-> > > >   	return 0;
-> > > > @@ -154,11 +156,11 @@ EXPORT_SYMBOL_GPL(tun_vnet_hdr_to_skb);
-> > > >   int tun_vnet_hdr_from_skb(unsigned int flags, const struct net_device *dev,
-> > > >   			  const struct sk_buff *skb,
-> > > > -			  struct virtio_net_hdr *hdr)
-> > > > +			  struct virtio_net_hdr_v1 *hdr)
-> > > >   {
-> > > >   	int vlan_hlen = skb_vlan_tag_present(skb) ? VLAN_HLEN : 0;
-> > > > -	if (virtio_net_hdr_from_skb(skb, hdr,
-> > > > +	if (virtio_net_hdr_from_skb(skb, (struct virtio_net_hdr *)hdr,
-> > > >   				    tun_vnet_is_little_endian(flags), true,
-> > > >   				    vlan_hlen)) {
-> > > >   		struct skb_shared_info *sinfo = skb_shinfo(skb);
-> > > > @@ -176,6 +178,8 @@ int tun_vnet_hdr_from_skb(unsigned int flags, const struct net_device *dev,
-> > > >   		return -EINVAL;
-> > > >   	}
-> > > > +	hdr->num_buffers = 1;
-> > > > +
-> > > >   	return 0;
-> > > >   }
-> > > >   EXPORT_SYMBOL_GPL(tun_vnet_hdr_from_skb);
-> > > > diff --git a/drivers/net/tun_vnet.h b/drivers/net/tun_vnet.h
-> > > > index 2dfdbe92bb24..d8fd94094227 100644
-> > > > --- a/drivers/net/tun_vnet.h
-> > > > +++ b/drivers/net/tun_vnet.h
-> > > > @@ -12,13 +12,13 @@ int tun_vnet_hdr_get(int sz, unsigned int flags, struct iov_iter *from,
-> > > >   		     struct virtio_net_hdr *hdr);
-> > > >   int tun_vnet_hdr_put(int sz, struct iov_iter *iter,
-> > > > -		     const struct virtio_net_hdr *hdr);
-> > > > +		     const struct virtio_net_hdr_v1 *hdr);
-> > > >   int tun_vnet_hdr_to_skb(unsigned int flags, struct sk_buff *skb,
-> > > >   			const struct virtio_net_hdr *hdr);
-> > > >   int tun_vnet_hdr_from_skb(unsigned int flags, const struct net_device *dev,
-> > > >   			  const struct sk_buff *skb,
-> > > > -			  struct virtio_net_hdr *hdr);
-> > > > +			  struct virtio_net_hdr_v1 *hdr);
-> > > >   #endif /* TUN_VNET_H */
-> > > > 
-> > > > -- 
-> > > > 2.47.1
-> > 
+TI AM57xx series of devices have two identical PRU-ICSS instances (PRU-ICSS1
+and PRU-ICSS2), each with two 32-bit RISC PRU cores. Each PRU core has
+(a) dedicated Ethernet interface (MII, MDIO), timers, capture modules, and
+serial communication interfaces, and (b) dedicated data and instruction RAM as
+well as shared RAM for inter PRU communication within the PRU-ICSS.
+
+This set of patches is a follow-up to [2]. These patches add support for the
+following features::
+- RX and TX over PRU Ethernet ports in Dual-EMAC mode
+- VLAN Filtering
+- Multicast Filtering
+- Promiscuous mode
+- Storm prevention  
+- Interrupt coalescing
+- Linux PTP (ptp4l) Ordinary clock
+
+Further, note that these are the first set of patches for PRU-ICSS2 Ethernet.
+Switch mode support, PRU-ICSS1 support, PRU Ethernet for AM437x and AM335x in
+Dual-EMAC and Switch mode support with full feature set changes will be posted
+subsequently.
+
+These changes are validated on top of Linux next kernel by reverting a recent
+commit [3]. This commit is breaking the Ethernet functionality on TI AM57xx
+due to zero block size allocation in SRAM during initialization. We are
+following up on commit [3] in a separate thread to find a resolution.
+
+The patches presented in this series have gone through the patch verification
+tools and no warnings or errors are reported. Sample test logs verifying the
+functionality on Linux next kernel are available here:
+
+
+[Interface up Testing](https://gist.github.com/basharath-cit/d845969ab300e9fbd327b09498b27790)
+
+[Ping Testing](https://gist.github.com/basharath-cit/12391ea30bb75b02cc7cfb7bc4678b01)
+
+[Iperf Testing](https://gist.github.com/basharath-cit/b27095917fef2fc6b437ada9f4262042)
+
+[1] https://lore.kernel.org/all/20230106121046.886863-1-danishanwar@ti.com/
+[2] https://lore.kernel.org/all/20241223135550.6898-1-basharath@couthit.com/
+[3] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?h=v6.13-rc5&id=1a52a094c2f0821860d9ce15fffe01103a146f1f
+
+
+Thanks & Best Regards,
+Basharath
+
+Murali Karicheri (1):
+  net: ti: prueth: Adds support for RX interrupt coalescing/pacing
+
+Parvathi Pudi (1):
+  dt-bindings: net: ti: Adds device tree binding for DUAL-EMAC mode
+    support on PRU-ICSS2 for AM57xx SOCs
+
+Roger Quadros (8):
+  net: ti: prueth: Adds ICSSM Ethernet driver
+  net: ti: prueth: Adds PRUETH HW and SW configuration
+  net: ti: prueth: Adds link detection, RX and TX support.
+  net: ti: prueth: Adds ethtool support for ICSSM PRUETH Driver
+  net: ti: prueth: Adds HW timestamping support for PTP using PRU-ICSS
+    IEP module
+  net: ti: prueth: Adds support for network filters for traffic control
+    supported by PRU-ICSS
+  net: ti: prueth: Adds power management support for PRU-ICSS
+  arm: dts: ti: Adds device tree nodes for PRU Cores, IEP and eCAP
+    modules of PRU-ICSS2 Instance.
+
+ .../devicetree/bindings/net/ti,icss-iep.yaml  |    6 +
+ .../bindings/net/ti,icssm-prueth.yaml         |  153 ++
+ .../bindings/net/ti,pruss-ecap.yaml           |   32 +
+ .../devicetree/bindings/soc/ti/ti,pruss.yaml  |    9 +
+ arch/arm/boot/dts/ti/omap/am57-pruss.dtsi     |   11 +
+ arch/arm/boot/dts/ti/omap/am571x-idk.dts      |    8 +-
+ arch/arm/boot/dts/ti/omap/am572x-idk.dts      |   10 +-
+ arch/arm/boot/dts/ti/omap/am574x-idk.dts      |   10 +-
+ .../boot/dts/ti/omap/am57xx-idk-common.dtsi   |   63 +
+ drivers/net/ethernet/ti/Kconfig               |   24 +
+ drivers/net/ethernet/ti/Makefile              |    5 +
+ drivers/net/ethernet/ti/icssg/icss_iep.c      |   42 +
+ drivers/net/ethernet/ti/icssg/icssg_mii_rt.h  |    6 +
+ drivers/net/ethernet/ti/icssm/icssm_ethtool.c |  306 +++
+ drivers/net/ethernet/ti/icssm/icssm_prueth.c  | 2421 +++++++++++++++++
+ drivers/net/ethernet/ti/icssm/icssm_prueth.h  |  424 +++
+ .../net/ethernet/ti/icssm/icssm_prueth_dos.c  |  225 ++
+ .../net/ethernet/ti/icssm/icssm_prueth_ecap.c |  312 +++
+ .../net/ethernet/ti/icssm/icssm_prueth_ecap.h |   47 +
+ .../net/ethernet/ti/icssm/icssm_prueth_ptp.h  |   85 +
+ drivers/net/ethernet/ti/icssm/icssm_switch.h  |  285 ++
+ .../ti/icssm/icssm_vlan_mcast_filter_mmap.h   |  120 +
+ 22 files changed, 4595 insertions(+), 9 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/net/ti,icssm-prueth.yaml
+ create mode 100644 Documentation/devicetree/bindings/net/ti,pruss-ecap.yaml
+ create mode 100644 drivers/net/ethernet/ti/icssm/icssm_ethtool.c
+ create mode 100644 drivers/net/ethernet/ti/icssm/icssm_prueth.c
+ create mode 100644 drivers/net/ethernet/ti/icssm/icssm_prueth.h
+ create mode 100644 drivers/net/ethernet/ti/icssm/icssm_prueth_dos.c
+ create mode 100644 drivers/net/ethernet/ti/icssm/icssm_prueth_ecap.c
+ create mode 100644 drivers/net/ethernet/ti/icssm/icssm_prueth_ecap.h
+ create mode 100644 drivers/net/ethernet/ti/icssm/icssm_prueth_ptp.h
+ create mode 100644 drivers/net/ethernet/ti/icssm/icssm_switch.h
+ create mode 100644 drivers/net/ethernet/ti/icssm/icssm_vlan_mcast_filter_mmap.h
+
+-- 
+2.34.1
 
 
