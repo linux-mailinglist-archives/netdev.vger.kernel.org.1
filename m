@@ -1,273 +1,193 @@
-Return-Path: <netdev+bounces-156751-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156752-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B13B2A07C5B
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 16:48:11 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 00D72A07C92
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 16:53:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4CA54188C443
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 15:48:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EC82C1678A4
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 15:53:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3546A21A42C;
-	Thu,  9 Jan 2025 15:47:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD76F21E0A4;
+	Thu,  9 Jan 2025 15:53:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RK/zhna/"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dZqFplc6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f182.google.com (mail-il1-f182.google.com [209.85.166.182])
+Received: from mail-il1-f177.google.com (mail-il1-f177.google.com [209.85.166.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68F9A14D6F9
-	for <netdev@vger.kernel.org>; Thu,  9 Jan 2025 15:47:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CFC8221DA0
+	for <netdev@vger.kernel.org>; Thu,  9 Jan 2025 15:53:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736437664; cv=none; b=lwuIEQ0seRF1aCjXSinTeOq30zS3RqTvIxdZr2n6tHXpAduhApNbYxN1r2c/eKD850APM7C1kLtcO7ehSjRLEyMVMwoVBpUa4hywvFKVP9rpQXbXVXGsJbB+Q8Cl3wgSWzWkElx5XuKMJjlChTgsjv/SYqsJ/5HEbXwC3lzBEcI=
+	t=1736437993; cv=none; b=c/n28jAesDuF1kutAzhXYJjVW66VWEXud2johQQhqbjOizFNWZ1w1dH0ZdD27HErgS0JrLpqnM3uFWxvRfov3nVDa4AGb3TT1PrO101b86yCZ8jAeMznxKFPmRiaW4Qp9cHh+S3tUiLN3dtE3xopumi3P39H25fYwxqMRVkHYDE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736437664; c=relaxed/simple;
-	bh=FwRc5w/Cbfd/75LqiaadKhUorUVR0aomnvAmVFsBBPc=;
+	s=arc-20240116; t=1736437993; c=relaxed/simple;
+	bh=mxjz5KSPzu3ZUbllGez9dNdWPuH3SNSUKGLDwZP1XbU=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=SnQE+VsuuaZ0zjFxnKrcu/Wqu0z63b6PTeGtchV/qwsrcMF9tgJdjTJU7FnOFBz+YSKfSF7Ldv9vpvs7xEwO7iFJPkviE8A7CNZLqs6jro8e9bViDyzzYjBe4YnP6xX3aMKfW7/CmyMpgSfuGdljU0fBRLhx/jRLLSI7rXHeCLg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RK/zhna/; arc=none smtp.client-ip=209.85.166.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f182.google.com with SMTP id e9e14a558f8ab-3a9cb8460f7so6454145ab.2
-        for <netdev@vger.kernel.org>; Thu, 09 Jan 2025 07:47:42 -0800 (PST)
+	 To:Cc:Content-Type; b=VQvAkUDsjvUBW3fJW4W7cM6vspmAVinfx4h70/ckewQHGGYW1o66pmxEoYuH3xEtYB2AfEhU0CfP9grd9LFvQ86HfgGClB0VdF9X7f9tWZ5Pv53QrQDS3QHSkCjvXCErUJsKS4PpXdpBcRabS2laGRpwwFtmbhLfu6LuaokYXjI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dZqFplc6; arc=none smtp.client-ip=209.85.166.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-il1-f177.google.com with SMTP id e9e14a558f8ab-3a9d5a7ecc3so165ab.1
+        for <netdev@vger.kernel.org>; Thu, 09 Jan 2025 07:53:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736437661; x=1737042461; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1736437991; x=1737042791; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=2pb6kNDYGesGw4YsIQlr8SphyjqZTdljtimufmTEUnk=;
-        b=RK/zhna/BI4XypIy2nH0KtF0z0qk9Oa774GMKeQdv8110qrMHf8eCCbhwoycpfsV49
-         5NnvjoK3wm0fhoNFFlUJpo97AhcW3acTfVqT8EsFXC9HJggZ7+1eyjFJyjuDWeXsgiLr
-         IiR6eG8ELUXM+hbBhZ/3wlHggjSN/e3mJIOZbFKInVw6DT05T0JEYu7v0orJ1YvXj6q8
-         EWf6pzpYm15efTl4qHxz9LOJFonjYsdOvGXDQ1Ekz+BGyn9p+PZP5s6e3ZW2h+4Er5si
-         jaYxj/z04zlqNvqGUMN8rRmA18r29TVef4qRAJfnPBuGOm821wiB/bLFXBcGboB2N7W4
-         xGwA==
+        bh=e+KssHQqR2FaveAfqDzOq7iaLeJQWdcrD06d0jyXhfg=;
+        b=dZqFplc6xGVnIF7hm56Zi/4o67R5+ObbJjcHj34yLnXpmornadSrD2hEHh6VCLO+3+
+         d+Rg79xd0T0IjBsbSZ52x6mlYCNzjv8/CHCQ1JD2QiHtfgCRkemt0c1Vm0mL1A3TosOH
+         1+Q39WEs30gFLPDzlu/nhHWnpy1WSH5uAB+af7kdQG8goQIw92J6BQwGUxTK+TNRDmyk
+         8ky0tqbo4f8LKnnXhgAOFZYnaXENeZ5aDnls3XvlkRfjdXH4/cI1lgbzBdy04oWnFeST
+         bvIqhlWZfca+LSun5XcQwfCTjPXMS/xYlqe/BDRLM0BRIIFLeFDeOOB95xzGRwQ/+kEP
+         Re1A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736437661; x=1737042461;
+        d=1e100.net; s=20230601; t=1736437991; x=1737042791;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=2pb6kNDYGesGw4YsIQlr8SphyjqZTdljtimufmTEUnk=;
-        b=EXfUNRJNOLn5e6dqdj6W3KDsYiyix3BxYM9FMzQn/pAdUJm/6bcu0HjKTLxmJ5u+X8
-         CZ0WeoBaCtaQq24DRD+Xka5XpgH9+nPqgCq/nvBmdaxWARS9Dc6/WFmjXYMsibTy3d71
-         mJjhKXP8B5mgQQylKKcgefmWDnqjQPddW9j6yIJ96eZU4d4TnepbMOaoIhWZLOOo7Fxl
-         nwjBVI0bTupGCb/VPjIcL0TRV5W/4rmr0bphLO8ni/0nSEOu7YJ6CaQeKCI0gAzzXYG0
-         VPb6SbrHwz1Jd4p0DfV9Uk9J3E3cyajN/TRoPSkETeEE6+jYamn6Q5jzNYUrP358WTCm
-         Xt7Q==
-X-Gm-Message-State: AOJu0YxSWZ2ItwGmDb4TB6HY4rOhGnWB1ytOp2tmz24kTSFw8E1t4kyu
-	/+G3fzQa2cX2izuh8pDfgc86e9X888fRnvD99Udejpc9RzS7ocMHEYbgH0hnSf/IIXG6koNIuaA
-	wsOyvt7I6RjbnaNcsy++kDJHbqx50aeGl
-X-Gm-Gg: ASbGncvQd6BI5dhTC5BscsJXTFmRwt9nlN6kcTPvD0dkc0nYM0cMf7YP0Y6WdUEsVhd
-	2KW1DgI+vTMfltdgy4PhgZzFt/PSCDutHcADsLlQ=
-X-Google-Smtp-Source: AGHT+IFXrSk3x4wtuxxcb64E2dP4TYuEYMZYlSalNhpNhk9wGi/f6Bn7cmqx65SenkChVe4dFOn0nKql7mGP8uDQRU4=
-X-Received: by 2002:a05:6e02:1607:b0:3a7:66e0:a98a with SMTP id
- e9e14a558f8ab-3ce3a877f10mr48737525ab.9.1736437661403; Thu, 09 Jan 2025
- 07:47:41 -0800 (PST)
+        bh=e+KssHQqR2FaveAfqDzOq7iaLeJQWdcrD06d0jyXhfg=;
+        b=n0xPuNZliC/42LNqtfwIVCkLWUVr9lUAun59XcHaMLldYJ5AE3EOXAXl8hsHlvQxHB
+         hyge8+fPuOKLxpWWGV3sF9i51MoqiVxw6rM/E4E44q0aGYwyRVHB/9zs5w7HRw2mWYaV
+         bLeeb/sGdMTMQoha2UIoqHa7WQYF6qsSrua+8pfP9HhQySpg4iE2sqA5/jp1LCisO1QH
+         dQki45RGR3103+6uTHCLoarqRHSzM49SWftKf2UEzrOUO/rL6nESIpnSLO0rLHZ5KYsW
+         zyf9idZ1njfA4WoIO221+Qi+8D+4HcQhsbP8C4jwgi9Kjxh+6REFxgkKj19+454VXGAr
+         hHKw==
+X-Forwarded-Encrypted: i=1; AJvYcCUeC3n+RziRpBdJUyiAo700pv72MkxGg1gD4dkfpO31eOs/16WKgCfZMnyBS9Z+tY72e5ato/M=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxDeDVvRRhTKs5pDDOpoNOAJ46c0lZWm02p9PntiRTOZN+PGUNN
+	qi+0PItCkQXbS6IiyQk1Q4C7bC2dc++R2BumbH37xc13fvA6qNwCXff+0G+GWnaAnbP/i0KQoRW
+	8Oig+zFAla1xLKupZx/LCTEeb4QJC3mAFxkEs
+X-Gm-Gg: ASbGnctS1+VXjDfuvqPVz0iuv2KNANeLq98dQpsA+uUvB5QK7A/TzwHGjA32UfezT1h
+	2zMQ6RPsurwYroxALvPMPuXtRM4dTADxkRbwKXw==
+X-Google-Smtp-Source: AGHT+IGmizlDg74pH/H01Szxctvaw2+2vEFO9c201KH2ay5+pYZ7L489qrKrwFYnRktXGUVI3yVsXgmGIePaWWTc+wE=
+X-Received: by 2002:a05:6e02:198d:b0:3a7:d682:36f6 with SMTP id
+ e9e14a558f8ab-3ce53da0f5emr104555ab.0.1736437990683; Thu, 09 Jan 2025
+ 07:53:10 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <b9e81aa97ab8ca62e979b7d55c2ee398790b935b.1736176112.git.lucien.xin@gmail.com>
- <e20ce5c1-9cd4-4719-9c3b-93ca8a947298@redhat.com>
-In-Reply-To: <e20ce5c1-9cd4-4719-9c3b-93ca8a947298@redhat.com>
-From: Xin Long <lucien.xin@gmail.com>
-Date: Thu, 9 Jan 2025 10:47:30 -0500
-X-Gm-Features: AbW1kvaB_zrsSYjuIcoVpImfVdrB6OdPufBTzqL8veqGkU-CGSyL24gYE34h_pQ
-Message-ID: <CADvbK_chW7898xRLXeJkis3dLnDjP72MZQ__5GB57R1OHW6Z3w@mail.gmail.com>
-Subject: Re: [PATCH net] net: sched: refine software bypass handling in tc_run
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: network dev <netdev@vger.kernel.org>, davem@davemloft.net, kuba@kernel.org, 
-	Eric Dumazet <edumazet@google.com>, Jamal Hadi Salim <jhs@mojatatu.com>, 
-	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, 
-	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, ast@fiberby.net, Shuang Li <shuali@redhat.com>
+References: <20250109072245.2928832-1-yuyanghuang@google.com> <d33c8463-e3ae-46a6-a34d-ced78228c2c2@kernel.org>
+In-Reply-To: <d33c8463-e3ae-46a6-a34d-ced78228c2c2@kernel.org>
+From: Yuyang Huang <yuyanghuang@google.com>
+Date: Fri, 10 Jan 2025 00:52:33 +0900
+X-Gm-Features: AbW1kvZgTsAkAIXi1eYVxjUMm194VEpzxqL9sLLrua9PzYEaSD0WdptEiKvvoSA
+Message-ID: <CADXeF1F7eXj5K+rvLmRCVbi7ZoqxE8Y0b_Baqawe5P-dF8eCdw@mail.gmail.com>
+Subject: Re: [PATCH net-next, v4] netlink: support dumping IPv4 multicast addresses
+To: David Ahern <dsahern@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	roopa@cumulusnetworks.com, jiri@resnulli.us, stephen@networkplumber.org, 
+	jimictw@google.com, prohr@google.com, liuhangbin@gmail.com, 
+	nicolas.dichtel@6wind.com, andrew@lunn.ch, netdev@vger.kernel.org, 
+	=?UTF-8?Q?Maciej_=C5=BBenczykowski?= <maze@google.com>, 
+	Lorenzo Colitti <lorenzo@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jan 9, 2025 at 5:46=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wrot=
-e:
->
-> On 1/6/25 4:08 PM, Xin Long wrote:
-> > This patch addresses issues with filter counting in block (tcf_block),
-> > particularly for software bypass scenarios, by introducing a more
-> > accurate mechanism using useswcnt.
-> >
-> > Previously, filtercnt and skipswcnt were introduced by:
-> >
-> >   Commit 2081fd3445fe ("net: sched: cls_api: add filter counter") and
-> >   Commit f631ef39d819 ("net: sched: cls_api: add skip_sw counter")
-> >
-> >   filtercnt tracked all tp (tcf_proto) objects added to a block, and
-> >   skipswcnt counted tp objects with the skipsw attribute set.
-> >
-> > The problem is: a single tp can contain multiple filters, some with ski=
-psw
-> > and others without. The current implementation fails in the case:
-> >
-> >   When the first filter in a tp has skipsw, both skipswcnt and filtercn=
-t
-> >   are incremented, then adding a second filter without skipsw to the sa=
-me
-> >   tp does not modify these counters because tp->counted is already set.
-> >
-> >   This results in bypass software behavior based solely on skipswcnt
-> >   equaling filtercnt, even when the block includes filters without
-> >   skipsw. Consequently, filters without skipsw are inadvertently bypass=
-ed.
-> >
-> > To address this, the patch introduces useswcnt in block to explicitly c=
-ount
-> > tp objects containing at least one filter without skipsw. Key changes
-> > include:
-> >
-> >   Whenever a filter without skipsw is added, its tp is marked with uses=
-w
-> >   and counted in useswcnt. tc_run() now uses useswcnt to determine soft=
-ware
-> >   bypass, eliminating reliance on filtercnt and skipswcnt.
-> >
-> >   This refined approach prevents software bypass for blocks containing
-> >   mixed filters, ensuring correct behavior in tc_run().
-> >
-> > Additionally, as atomic operations on useswcnt ensure thread safety and
-> > tp->lock guards access to tp->usesw and tp->counted, the broader lock
-> > down_write(&block->cb_lock) is no longer required in tc_new_tfilter(),
-> > and this resolves a performance regression caused by the filter countin=
-g
-> > mechanism during parallel filter insertions.
-> >
-> >   The improvement can be demonstrated using the following script:
-> >
-> >   # cat insert_tc_rules.sh
-> >
-> >     tc qdisc add dev ens1f0np0 ingress
-> >     for i in $(seq 16); do
-> >         taskset -c $i tc -b rules_$i.txt &
-> >     done
-> >     wait
-> >
-> >   Each of rules_$i.txt files above includes 100000 tc filter rules to a
-> >   mlx5 driver NIC ens1f0np0.
-> >
-> >   Without this patch:
-> >
-> >   # time sh insert_tc_rules.sh
-> >
-> >     real    0m50.780s
-> >     user    0m23.556s
-> >     sys           4m13.032s
-> >
-> >   With this patch:
-> >
-> >   # time sh insert_tc_rules.sh
-> >
-> >     real    0m17.718s
-> >     user    0m7.807s
-> >     sys     3m45.050s
-> >
-> > Fixes: 047f340b36fc ("net: sched: make skip_sw actually skip software")
-> > Reported-by: Shuang Li <shuali@redhat.com>
-> > Signed-off-by: Xin Long <lucien.xin@gmail.com>
-> > Acked-by: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
->
-> Given the quite large scope of this change and the functional and
-> performance implications, I think it's more suited for net-next.
->
-Sounds fine to me.
+>my comment meant that this `type` should be removed and the wrappers
+>below just call the intended function. No need for the extra layers.
 
-> > ---
-> >  include/net/pkt_cls.h     | 18 +++++++-------
-> >  include/net/sch_generic.h |  5 ++--
-> >  net/core/dev.c            | 11 ++-------
-> >  net/sched/cls_api.c       | 52 +++++++++------------------------------
-> >  net/sched/cls_bpf.c       |  2 ++
-> >  net/sched/cls_flower.c    |  2 ++
-> >  net/sched/cls_matchall.c  |  2 ++
-> >  net/sched/cls_u32.c       |  2 ++
-> >  8 files changed, 32 insertions(+), 62 deletions(-)
-> >
-> > diff --git a/include/net/pkt_cls.h b/include/net/pkt_cls.h
-> > index cf199af85c52..d66cb315a6b5 100644
-> > --- a/include/net/pkt_cls.h
-> > +++ b/include/net/pkt_cls.h
-> > @@ -74,15 +74,6 @@ static inline bool tcf_block_non_null_shared(struct =
-tcf_block *block)
-> >       return block && block->index;
+Sorry, I still do not fully understand the suggestions.
+
+In the current inet_dump_ifaddr() function, there are two places where
+in_dev_dump_addr() is called.
+
+For example, we have the following code snippet.
+
+>if (!in_dev)
+>goto done;
+>err =3D in_dev_dump_addr(in_dev, skb, cb, &ctx->ip_idx,
+>       &fillargs);
+>goto done;
+>}
+
+Do you suggest we do the following way?
+
+> If (type =3D=3D UNICAST_ADDR)
+>    err =3D in_dev_dump_ifaddr(in_dev, skb, cb, &ctx->ip_idx,
+>                                             &fillargs);
+> else if (type =3D=3D MULTICAST_ADDR)
+>    in_dev_dump_ifmcaddr(in_dev, skb, cb, s_ip_idx,
+>                                         &fillargs);
+
+The current functional call stack is as follows:
+
+inet_dump_ifaddr()/inet_dump_ifmcaddr() -> inet_dump_addr() ->
+in_dev_dump_ifaddr()/in_dev_dump_ifmcaddr().
+
+The ifaddr and ifmcaddr dump code paths share common logic inside
+inet_dump_addr(). If we don't do the dispatching in
+in_dev_dump_addr(), we have to do the dispatching in inet_dump_addr()
+instead, and the dispatching logic will be duplicated twice. I don't
+think this will simplify the code.
+
+Or do you suggest I should pass a function pointer for
+in_dev_dump_ifaddr()/in_dev_dump_ifmcaddr() into inet_dump_addr()?
+
+Thanks,
+
+Yuyang
+
+On Fri, Jan 10, 2025 at 12:33=E2=80=AFAM David Ahern <dsahern@kernel.org> w=
+rote:
+>
+> On 1/9/25 12:22 AM, Yuyang Huang wrote:
+> > @@ -1889,15 +1935,16 @@ static u32 inet_base_seq(const struct net *net)
+> >       return res;
 > >  }
 > >
-> > -#ifdef CONFIG_NET_CLS_ACT
-> > -DECLARE_STATIC_KEY_FALSE(tcf_bypass_check_needed_key);
->
-> I think it would be better, if possible, to preserve this static key;
-> will reduce the delta and avoid additional tests in fast-path for S/W
-> only setup.
-That's difficult. This static key will in/decrement according to
-block->useswcnt, and we have to hold down_write(&block->cb_lock)
-for its update when adding a filter, and the performance issue
-will come back again.
-
->
-> > -
-> > -static inline bool tcf_block_bypass_sw(struct tcf_block *block)
-> > -{
-> > -     return block && block->bypass_wanted;
-> > -}
-> > -#endif
-> > -
-> >  static inline struct Qdisc *tcf_block_q(struct tcf_block *block)
+> > -static int inet_dump_ifaddr(struct sk_buff *skb, struct netlink_callba=
+ck *cb)
+> > +static int inet_dump_addr(struct sk_buff *skb, struct netlink_callback=
+ *cb,
+> > +                       enum addr_type_t type)
 > >  {
-> >       WARN_ON(tcf_block_shared(block));
-> > @@ -760,6 +751,15 @@ tc_cls_common_offload_init(struct flow_cls_common_=
-offload *cls_common,
-> >               cls_common->extack =3D extack;
+> >       const struct nlmsghdr *nlh =3D cb->nlh;
+> >       struct inet_fill_args fillargs =3D {
+> >               .portid =3D NETLINK_CB(cb->skb).portid,
+> >               .seq =3D nlh->nlmsg_seq,
+> > -             .event =3D RTM_NEWADDR,
+> >               .flags =3D NLM_F_MULTI,
+> >               .netnsid =3D -1,
+> > +             .type =3D type,
+>
+> my comment meant that this `type` should be removed and the wrappers
+> below just call the intended function. No need for the extra layers.
+>
+> >       };
+> >       struct net *net =3D sock_net(skb->sk);
+> >       struct net *tgt_net =3D net;
+> > @@ -1949,6 +1996,20 @@ static int inet_dump_ifaddr(struct sk_buff *skb,=
+ struct netlink_callback *cb)
+> >       return err;
 > >  }
 > >
-> > +static inline void tcf_proto_update_usesw(struct tcf_proto *tp, u32 fl=
-ags)
+> > +static int inet_dump_ifaddr(struct sk_buff *skb, struct netlink_callba=
+ck *cb)
 > > +{
-> > +     if (tp->usesw)
-> > +             return;
-> > +     if (tc_skip_sw(flags) && tc_in_hw(flags))
-> > +             return;
-> > +     tp->usesw =3D true;
+> > +     enum addr_type_t type =3D UNICAST_ADDR;
+> > +
+> > +     return inet_dump_addr(skb, cb, type);
 > > +}
+> > +
+> > +static int inet_dump_ifmcaddr(struct sk_buff *skb, struct netlink_call=
+back *cb)
+> > +{
+> > +     enum addr_type_t type =3D MULTICAST_ADDR;
+> > +
+> > +     return inet_dump_addr(skb, cb, type);
+> > +}
+> > +
+> >  static void rtmsg_ifa(int event, struct in_ifaddr *ifa, struct nlmsghd=
+r *nlh,
+> >                     u32 portid)
+> >  {
 >
-> It looks like 'usesw' is never cleared. Can't user-space change the
-> skipsw flag for an existing tp?
-skipsw flag belongs to a tc rule/filter, and a tp may include multiple
-rules/filters, and a tp doesn't have flags for skipsw directly.
-
-Now we are adding a tp->usesw to reflect if any rule without skipsw flag
-is ever added in this tp. And yes, this tp->usesw will NOT be cleared
-even if this rule without the skipsw flag is deleted. I guess that's
-all we can do now.
-
-If we want to use a tp->skipswcnt to dynamically track the skipsw flag
-for a tp, some common code/functions for rule adding and deleting will
-be needed. However,there's no such code in tc for a rule deleting, so
-it's not doable unless we touch all cls_*.c files.
-
->
-> [...]
-> > diff --git a/net/sched/cls_u32.c b/net/sched/cls_u32.c
-> > index d3a03c57545b..5e8f191fd820 100644
-> > --- a/net/sched/cls_u32.c
-> > +++ b/net/sched/cls_u32.c
-> > @@ -1164,6 +1164,8 @@ static int u32_change(struct net *net, struct sk_=
-buff *in_skb,
-> >               if (!tc_in_hw(n->flags))
-> >                       n->flags |=3D TCA_CLS_FLAGS_NOT_IN_HW;
-> >
-> > +             tcf_proto_update_usesw(tp, n->flags);
->
-> Why don't you need to hook also in the 'key existing' branch on line 909?
->
-Good catch, didn't notice that cls_u32 calls to replace hw filter in
-two places.
-
-Thanks.
 
