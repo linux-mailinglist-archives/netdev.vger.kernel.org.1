@@ -1,125 +1,129 @@
-Return-Path: <netdev+bounces-156512-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156513-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D16B9A06BAD
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 03:50:33 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 78832A06BC3
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 04:01:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8B8F01888FB5
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 02:50:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8B7137A1554
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 03:01:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3EAA39AEB;
-	Thu,  9 Jan 2025 02:50:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25F00127E18;
+	Thu,  9 Jan 2025 03:01:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=ieee.org header.i=@ieee.org header.b="eycMJDfP"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f50.google.com (mail-io1-f50.google.com [209.85.166.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4798C847C;
-	Thu,  9 Jan 2025 02:50:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.255
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1ADC91F94C
+	for <netdev@vger.kernel.org>; Thu,  9 Jan 2025 03:01:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736391027; cv=none; b=euZ+DV8e442DUJz0e3DSdqy8cYHWYZ8et0NOEJeT4mY1aVwSv6rFuVXhljouwvDKOFblVFsLDeW68TLTeAsR93DNKQJtVrNjHq/Mbjh+UJZjQsyLEMjJX5bdLIc89GWjaEQsGjuX3IT3b4bPsRPaPIArSB4naeiwGVNVBE2Tkug=
+	t=1736391679; cv=none; b=Xf9eiz6K38lTKU4cj8XoCggrzGo4dkf4EPQvyZ4BuuvgtxGyTHqUM164ejc1VZ6YYc40ML+4q8UimVj4qw+Yo/fxCgOXcsUprEw2YTM5XGP2eJ9CsgqYo7KIausAbxQGgVUWu+xAlcFu0m9RNzrEngQNHH0OhKIr7YU+Ehso4R8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736391027; c=relaxed/simple;
-	bh=kwYWjpWfNmL1d5hD26X0HlYhelzrjDrfHJjfWnrO1i0=;
-	h=Subject:To:References:CC:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=aG0TSzjGO1rar+lrvcWoRfso/ll4pjzFZ6sXrriTW0uCoJLyAVRcgdUSnQUtsSgyowrWnypWKUQsAHGwvxy35SdRFm6lWRuKsWeDqFuQFqFFqpj+kqRyfrxuyZRonWbq8qSa0EEhpy1DufUn9jWSCDytbosNYZ45B14/j6mOZkA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.255
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.174])
-	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4YT8Ll1PkJz1W3QY;
-	Thu,  9 Jan 2025 10:46:39 +0800 (CST)
-Received: from kwepemh100016.china.huawei.com (unknown [7.202.181.102])
-	by mail.maildlp.com (Postfix) with ESMTPS id CCEBC140135;
-	Thu,  9 Jan 2025 10:50:21 +0800 (CST)
-Received: from [10.174.179.93] (10.174.179.93) by
- kwepemh100016.china.huawei.com (7.202.181.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Thu, 9 Jan 2025 10:50:18 +0800
-Subject: Re: [PATCH v4 -next 00/15] sysctl: move sysctls from vm_table into
- its own files
-To: Joel Granados <joel.granados@kernel.org>
-References: <20241228145746.2783627-1-yukaixiong@huawei.com>
- <tgp2b7kbbdx4obapr4fgtmgjjo6zjbxbligucs32eewiasacko@f4h6uoamznry>
-CC: <akpm@linux-foundation.org>, <mcgrof@kernel.org>,
-	<ysato@users.sourceforge.jp>, <dalias@libc.org>,
-	<glaubitz@physik.fu-berlin.de>, <luto@kernel.org>, <tglx@linutronix.de>,
-	<mingo@redhat.com>, <bp@alien8.de>, <dave.hansen@linux.intel.com>,
-	<hpa@zytor.com>, <viro@zeniv.linux.org.uk>, <brauner@kernel.org>,
-	<jack@suse.cz>, <kees@kernel.org>, <j.granados@samsung.com>,
-	<willy@infradead.org>, <Liam.Howlett@oracle.com>, <vbabka@suse.cz>,
-	<lorenzo.stoakes@oracle.com>, <trondmy@kernel.org>, <anna@kernel.org>,
-	<chuck.lever@oracle.com>, <jlayton@kernel.org>, <neilb@suse.de>,
-	<okorniev@redhat.com>, <Dai.Ngo@oracle.com>, <tom@talpey.com>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <paul@paul-moore.com>, <jmorris@namei.org>,
-	<linux-sh@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-fsdevel@vger.kernel.org>, <linux-mm@kvack.org>,
-	<linux-nfs@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<linux-security-module@vger.kernel.org>, <dhowells@redhat.com>,
-	<haifeng.xu@shopee.com>, <baolin.wang@linux.alibaba.com>,
-	<shikemeng@huaweicloud.com>, <dchinner@redhat.com>, <bfoster@redhat.com>,
-	<souravpanda@google.com>, <hannes@cmpxchg.org>, <rientjes@google.com>,
-	<pasha.tatashin@soleen.com>, <david@redhat.com>, <ryan.roberts@arm.com>,
-	<ying.huang@intel.com>, <yang@os.amperecomputing.com>,
-	<zev@bewilderbeest.net>, <serge@hallyn.com>, <vegard.nossum@oracle.com>,
-	<wangkefeng.wang@huawei.com>
-From: yukaixiong <yukaixiong@huawei.com>
-Message-ID: <5eeef365-6a33-ca76-2406-3102eb49f99f@huawei.com>
-Date: Thu, 9 Jan 2025 10:50:17 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
- Thunderbird/45.7.1
+	s=arc-20240116; t=1736391679; c=relaxed/simple;
+	bh=styal6a10fBSjAdXfS/03k5/+K6pkiyNCbLjLqDpKJI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=KCDDH4qmoe9PANn4X0/2HLyh9ohWphaOFtJpdAXid+picHeFRithKdtjhT/TW1i3S4AZyZhhErS+QZr6Of1Ve4wPS3TkhxQ1NwTjStRgv0bOI1wbG5acxEjdHJnre+jrzRITV3YuDhMkAYG+A4sawkjMj308KUGeLelMoTyRBBM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ieee.org; spf=pass smtp.mailfrom=ieee.org; dkim=pass (1024-bit key) header.d=ieee.org header.i=@ieee.org header.b=eycMJDfP; arc=none smtp.client-ip=209.85.166.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ieee.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ieee.org
+Received: by mail-io1-f50.google.com with SMTP id ca18e2360f4ac-84a012f7232so51373539f.0
+        for <netdev@vger.kernel.org>; Wed, 08 Jan 2025 19:01:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ieee.org; s=google; t=1736391676; x=1736996476; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=chLFunAF/6a+8neQ/O4A300WGPV8Q4UnrjtHUfVgGHY=;
+        b=eycMJDfP6/cPe5uB6nhiFej8YK+SSUMNnoqiGbGMWBqnP4MjvMLqe/eDN9U1ouJeDh
+         dMZXCvyAoOrmEk13KXmjLxNxqrxAhTxcAihykCE3YdMRqPoS8JHJI/6MdMpcgXJyKZig
+         cT/IJOduplB9DOqEjqlyid/Kgm6nJ3ZKMbJZY=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736391676; x=1736996476;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=chLFunAF/6a+8neQ/O4A300WGPV8Q4UnrjtHUfVgGHY=;
+        b=Jbg5EruBMKhClcAmwj1PYQodbbC15zqdlv2irhAM6b5LWjj6cy/Q7WSEa8rifao2oP
+         6eN0ZmSXddAX4OMpzoi47Wp8a1p4I7M3CkUtq1gVc8o2d+j/X0d2H7kF3vjFrNGzmgoG
+         b9V7Fwas6DncAzQQvnLyrFHshLq91mTJAT66fr0jkgtWycFLV1/IW3CuYdhefb6QdRxN
+         mnLwmkc/RKBQd0iq3yx3HFFyQObiG6BI9jWdczTFDnf8yFIFKuYZmyvNGa+ofFOqjVxU
+         GzndULNZJK/2bGB5nn7rAptFvnZ74lGBVxbcb1INzY0uiT6DHTWRWcN7iSTFs6tuha37
+         BN2w==
+X-Forwarded-Encrypted: i=1; AJvYcCWAO0tVjuoMYz8ER0BtWtEfGXQsloDhh/SBQvUgcXUnHUZjqndCkAyPww1519kPqTpIsEmRQaE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz8NXBOtY+yB+dT2MUeKuKjmaBhD6kAVFlc/6kMD6WUqTSxmVTg
+	X1BbS4JJfPhwkzVYECeBsHy1yFYWlcxVMmQ6saQ9lhIBlF/a0HM1HRReYiew+Jms4qH76OeXZ6O
+	0Yw==
+X-Gm-Gg: ASbGncutfZpGyX6DsKwL4Frn0aNPBcLivjP6C27C3MR1D+iP8xlRAlkN2+l7/wpnSTV
+	YT1XRA0uUdyebcoATZy+PNlLAiGC1QBJKRmHPqIlulEXH11TUmRgBANncAxui0JHRY7RsRm4JIg
+	b5NowH+TmMff4s+goPT4m8mi9Svnt46VyhK5w3m/qRzeJzRQkKDvFQ10cAznxBbO9PWZE/fr+Oa
+	fF9EGnUP6C5xf4hyumlZkUmkbvRq4SKc94bjTeIE5Ife171/LfcM3zuZCywU12yzbDz0CnqBEb+
+	9xzMCLQviq33MwGZpDVUnj8n
+X-Google-Smtp-Source: AGHT+IEmu7TPSTXMcXWqBPqzgGP992fYz6d0NlpSB4pe0TArY/5e/MlCpviUh6kU6qxRmMV/w50qsQ==
+X-Received: by 2002:a05:6e02:1a8a:b0:3cd:d14c:be69 with SMTP id e9e14a558f8ab-3ce4b212f1dmr5019645ab.11.1736391676216;
+        Wed, 08 Jan 2025 19:01:16 -0800 (PST)
+Received: from [10.211.55.5] (c-73-228-159-35.hsd1.mn.comcast.net. [73.228.159.35])
+        by smtp.googlemail.com with ESMTPSA id e9e14a558f8ab-3ce4adbc838sm1149235ab.30.2025.01.08.19.01.13
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 08 Jan 2025 19:01:14 -0800 (PST)
+Message-ID: <9b7a7b9a-7f70-4ba2-b948-ffa1a7ae8f53@ieee.org>
+Date: Wed, 8 Jan 2025 21:01:12 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <tgp2b7kbbdx4obapr4fgtmgjjo6zjbxbligucs32eewiasacko@f4h6uoamznry>
-Content-Type: text/plain; charset="windows-1252"; format=flowed
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] dt-bindings: net: qcom,ipa: Use recommended MBN
+ firmware format in DTS example
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>, Alex Elder <elder@kernel.org>,
+ linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20250108120242.156201-1-krzysztof.kozlowski@linaro.org>
+Content-Language: en-US
+From: Alex Elder <elder@ieee.org>
+In-Reply-To: <20250108120242.156201-1-krzysztof.kozlowski@linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggpeml500006.china.huawei.com (7.185.36.76) To
- kwepemh100016.china.huawei.com (7.202.181.102)
 
+On 1/8/25 6:02 AM, Krzysztof Kozlowski wrote:
+> All Qualcomm firmwares uploaded to linux-firmware are in MBN format,
+> instead of split MDT.  No functional changes, just correct the DTS
+> example so people will not rely on unaccepted files.
+> 
+> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 
+Looks good.  I don't see SC7180 modem firmware there right
+now but this seems like a good change.  Thanks Krzysztof.
 
-On 2025/1/6 20:15, Joel Granados wrote:
-> On Sat, Dec 28, 2024 at 10:57:31PM +0800, Kaixiong Yu wrote:
->> This patch series moves sysctls of vm_table in kernel/sysctl.c to
->> places where they actually belong, and do some related code clean-ups.
->> After this patch series, all sysctls in vm_table have been moved into its
->> own files, meanwhile, delete vm_table.
->>
->> All the modifications of this patch series base on
->> linux-next(tags/next-20241219). To test this patch series, the code was
->> compiled with both the CONFIG_SYSCTL enabled and disabled on arm64 and
->> x86_64 architectures. After this patch series is applied, all files
->> under /proc/sys/vm can be read or written normally.
->>
->> Changes in v4:
->>   - due to my mistake, the previous version sent 15 patches twice.
->>     Please ignore that, as this version is the correct one.
-> I would not ignore the reviewed-by tags that you got from Lorenzo.
-> Please include those moving forward.
-Good suggestion!
-Thx !
->>   - change all "static struct ctl_table" type into
->>     "static const struct ctl_table" type in patch1~10,12,13,14
->>   - simplify result of rpcauth_cache_shrink_count() in patch11
-> ...
->>   mm/vmscan.c                        |  23 +++
->>   mm/vmstat.c                        |  44 +++++-
->>   net/sunrpc/auth.c                  |   2 +-
->>   security/min_addr.c                |  11 ++
->>   23 files changed, 330 insertions(+), 312 deletions(-)
->>
->> -- 
->> 2.34.1
->>
-> best
->
+Reviewed-by: Alex Elder <elder@kernel.org>
+
+> ---
+>   Documentation/devicetree/bindings/net/qcom,ipa.yaml | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/Documentation/devicetree/bindings/net/qcom,ipa.yaml b/Documentation/devicetree/bindings/net/qcom,ipa.yaml
+> index 53cae71d9957..1a46d80a66e8 100644
+> --- a/Documentation/devicetree/bindings/net/qcom,ipa.yaml
+> +++ b/Documentation/devicetree/bindings/net/qcom,ipa.yaml
+> @@ -239,7 +239,7 @@ examples:
+>   
+>                   qcom,gsi-loader = "self";
+>                   memory-region = <&ipa_fw_mem>;
+> -                firmware-name = "qcom/sc7180-trogdor/modem/modem.mdt";
+> +                firmware-name = "qcom/sc7180-trogdor/modem/modem.mbn";
+>   
+>                   iommus = <&apps_smmu 0x440 0x0>,
+>                            <&apps_smmu 0x442 0x0>;
 
 
