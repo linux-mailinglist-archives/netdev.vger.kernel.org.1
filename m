@@ -1,437 +1,326 @@
-Return-Path: <netdev+bounces-156821-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156823-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6404A07EAE
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 18:24:02 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CD241A07EBC
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 18:28:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BEDC216555C
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 17:24:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 029CD3A888F
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 17:27:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8580318B482;
-	Thu,  9 Jan 2025 17:23:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FD9A18FC80;
+	Thu,  9 Jan 2025 17:27:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hDvWW7Jy"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="g5Z3DL6l"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72F4BB644
-	for <netdev@vger.kernel.org>; Thu,  9 Jan 2025 17:23:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 698A418D621;
+	Thu,  9 Jan 2025 17:27:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736443439; cv=none; b=TdEf5e6CZTP7MQb7EfiADPpueGL4jZlSNpCXeCZPXrCkvgqZYaqpGEVYQYViykRyFZLOppIl/uRxbhe6hqmkwKdPWuDkC2zmLpivQDIU3bdfPX+afJlWUnORa0bwZnVTBTF7bGYNNiIuetGuLEEbIiZrnl2hb216ZfuklFwcCAo=
+	t=1736443646; cv=none; b=CUf7M6JK7MYK2BnOc0/9RpE0gTqJKlEUW50gZlZ/z05fp6+MmHMW36S7hPwSdrWnUX6sqnWYkz6wdl9pJN8aTTEj3xs7MoG0CbamYSCoAfvQ0jg8W3UqiNilsb5Zf8opMrcwjwQn3v0NJukCtzxIscnsRvlJj0Ep/zZcGJkdruc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736443439; c=relaxed/simple;
-	bh=wkU5vrtjJ0iBbh5cxTqnJAM3GJpTK5uIVH3kE8O3SQU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=U77BOkqsDB3s/qLE+4ZvSsUvLJRRXV7ZDMKh35R9FI6NAITTbLarbAHS8tYmzp1q0lSliA/F8zgwH/ms9M7krjzSxGFAHovHuXoUpsYbYEizqynswNuBuVzjAHwZrdT8QutKqhkkQoC00BqvzaK498b0J0TbcGMq1BUdaVX8bvk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hDvWW7Jy; arc=none smtp.client-ip=209.85.160.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-4679b5c66d0so272671cf.1
-        for <netdev@vger.kernel.org>; Thu, 09 Jan 2025 09:23:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1736443436; x=1737048236; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mRMjIgQWUIwN6QpFn0RcgfGqNDmO4zkkZ/imQKoaR4U=;
-        b=hDvWW7JyI/6X5OqCunty9ymz7vzBDo4JynkI1fFMUcs1gILOsyl9cQdkGjPq246D8Q
-         +3/18KvpBucvz9cMBfRhf/B7oAnNNfzDc+DRGxQyL5/MgDv60mQ0sFnsef8cToI+UZLt
-         aq7JJxae9eh5b7vF7wF1rGiuUav9XafAR+MSNv65b1lf2FHNWXWb8KfY4hzxMuaiUbv2
-         xytOpf3bhYfgFn0YBNU9iDVBENgvAYEIulMdVCkCItsf1asdMuClHE9AFsqFVA4DhyoF
-         NXj2RPhtdJsHOWX7q2h5Hob03awSn++AEBH2VSMkOmdGpiKYNEnJq6XHOGo2bwucLQYG
-         1kig==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736443436; x=1737048236;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=mRMjIgQWUIwN6QpFn0RcgfGqNDmO4zkkZ/imQKoaR4U=;
-        b=iNkTMuvJoX/5oRyaWlozIhyCs3OgtY8Nx1IOrfxjvLytaWr3mFYrbY42LafdPX1ZAN
-         Wwu443973tn4rJfVY3VVjOqAQ75CtL8+qnBnhEgDuh/JrWGFgC+HHoQVwdLcvLPk3dYh
-         FP5C/3KKFarU02HWCOdc8YUGkyHW6wcrYSZ7oSwbd2IZBgH7pdn9W4bRRTQNQ3VpTa8W
-         HFmDDGgVJN7XwuJTjL0rzG7BoK9lLvJ9rW0KVBYr9GR8qHQAcW62GCPZXpVqypB5lL2b
-         RHH3uWbiATfsBeZBIUgicqVwWlgDM8R36CuSSb5WLZu5sagn5Q8ouYcIJHoCtdRqG/rJ
-         yiFg==
-X-Forwarded-Encrypted: i=1; AJvYcCUlq7XHnT2KG30YEY5lnUyVz+Kf4135tIpHIUpRZIrbbVgEn9iC0ykRN5Vuczzwag6OV7/UXMw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz/WKDnPEetijGeVJuMgoRyQl4fWrjyq4XEilOjYVd7G3HtYHUR
-	VHMWDaIy4s04h1DnbLE8nFHXGzsCyXHHrfgPcujliMoIZUnFqrQy7agqQY4SNw8iAXV5dvCkzzy
-	SfGnDTxuR5hXa91x5DRy244Hqh7hZ3e+LLbVp
-X-Gm-Gg: ASbGncsRsqW+XVczcxAYym5f4Al20w8ZzBaGNHqWswTkqzdXzqJuXudgHCa+sTb119u
-	o67EhTC1tqYt8ZuJfKuW9JHsOWTDsasivsGvM2SeY9LvOQ/wv6UR6alkYvPvgl6+O57IG9g==
-X-Google-Smtp-Source: AGHT+IFQi0YrWSTf+XX43CkPygYY5XMUR1ByblGG0z00MVNJXWHyYTCc88Kto6pl5wFXxpVZ6c5KdydaV7kLI4bejpI=
-X-Received: by 2002:ac8:5ac5:0:b0:46c:78e4:a9cc with SMTP id
- d75a77b69052e-46c7cf066c0mr4034621cf.25.1736443435933; Thu, 09 Jan 2025
- 09:23:55 -0800 (PST)
+	s=arc-20240116; t=1736443646; c=relaxed/simple;
+	bh=IT1QOUNXoldS8cdepl3rRhAaBVSDhbH4kwk0D3peLJ8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=S70w83g/Aa6MWnmatBmIbeSpd0MNFh8iM9gykzOBSYgOo8Qw4yvu6xtgDZfqIpPy+p73xTQ35R4VzusCw1hjqtESljpNRlbYriRuC61lno0xskkYBed2+kBre1WqbrpKYX4wFDVemZkWEra4Pv4ry6WKqI0TVQDOu2kFrMqc0Qo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=g5Z3DL6l; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
+	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=6Z3kH0M+JOWq7Ngarm3TYX7mK+xaT7wHTYqJBA3ueks=; b=g5Z3DL6lWTnePJbO68WV/hS193
+	H2DtAai6O2kPucZeQHVhHtUAC0v9mo7PSAxtP0ycAS0akagtLwxKFEJsHG5/x5Ahp91x2PbqRDiye
+	3Z6qrnRUiWmhy0dZAhHkiwm2jMi24jdg9goSMZitBGSpBiI7jX/d0EzxHPcEibpFgkEqsjvbUDeQf
+	hzOqgzBrOUYvd6TFNLVpEeSoYtfGCxO2BDqVmSm3ezZXAcZVwBFnfK+z5o2/XUKII2pL3vzQH/D0H
+	hXNS0H6TUuBWCgbL2Y0KNrTdP9zrctNrcfFd9jpIMUi+Ywm/wVRiG3230vToN49DuELBwkUnk06U6
+	rMAs633Q==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:58848)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1tVwJN-0002R5-36;
+	Thu, 09 Jan 2025 17:27:14 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1tVwJL-0007UF-0q;
+	Thu, 09 Jan 2025 17:27:11 +0000
+Date: Thu, 9 Jan 2025 17:27:11 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>, kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	UNGLinuxDriver@microchip.com, Phil Elwell <phil@raspberrypi.org>
+Subject: Re: [PATCH net-next v1 7/7] net: usb: lan78xx: Enable EEE support
+ with phylink integration
+Message-ID: <Z4AG7zvIvQDv3GTn@shell.armlinux.org.uk>
+References: <20250108121341.2689130-1-o.rempel@pengutronix.de>
+ <20250108121341.2689130-8-o.rempel@pengutronix.de>
+ <Z35z6ZHspfSZK4U7@shell.armlinux.org.uk>
+ <Z36KacKBd2WaOxfW@pengutronix.de>
+ <Z36WqNGpWWkHTjUE@shell.armlinux.org.uk>
+ <Z4ADpj0DlqBRUEK-@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <408334417.4436448.1736139157134.ref@mail.yahoo.com>
- <408334417.4436448.1736139157134@mail.yahoo.com> <CANn89iLzo0Wk7p=dtUQ4Q2-pCAsjSxXZw71ngNTw6NZbEEvoDA@mail.gmail.com>
- <2046438615.4484034.1736328888690@mail.yahoo.com>
-In-Reply-To: <2046438615.4484034.1736328888690@mail.yahoo.com>
-From: Neal Cardwell <ncardwell@google.com>
-Date: Thu, 9 Jan 2025 12:23:39 -0500
-X-Gm-Features: AbW1kvZ9-T34UzKVXc1osW1TrOgeUgxI4NO7FRpiLmfgDpzIsdoCGkbVR8J_QV8
-Message-ID: <CADVnQymzCpJozeF-wMPbppizg0SUAUufgyQEeD7AB5DZDNBTEw@mail.gmail.com>
-Subject: Re: [PATCH net] tcp_cubic: Fix for bug in HyStart implementation in
- the Linux kernel
-To: Mahdi Arghavani <ma.arghavani@yahoo.com>
-Cc: Eric Dumazet <edumazet@google.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
-	Haibo Zhang <haibo.zhang@otago.ac.nz>, David Eyers <david.eyers@otago.ac.nz>, 
-	Abbas Arghavani <abbas.arghavani@mdu.se>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <Z4ADpj0DlqBRUEK-@pengutronix.de>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Wed, Jan 8, 2025 at 4:36=E2=80=AFAM Mahdi Arghavani <ma.arghavani@yahoo.=
-com> wrote:
->
-> Dear Eric and Neal,
->
-> Thank you for the email.
+On Thu, Jan 09, 2025 at 06:13:10PM +0100, Oleksij Rempel wrote:
+> On Wed, Jan 08, 2025 at 03:15:52PM +0000, Russell King (Oracle) wrote:
+> > On Wed, Jan 08, 2025 at 03:23:37PM +0100, Oleksij Rempel wrote:
+> > > Yes, otherwise every MAC driver will need to do it in the
+> > > ethtool_set_eee() function.
+> > 
+> > I've had several solutions, and my latest patch set actually has a
+> > mixture of them in there (which is why I'm eager to try and find a way
+> > forward on this, so I can fix the patch set):
+> > 
+> > 1. the original idea to address this in Marvell platforms was to limit
+> >    the LPI timer to the maximum representable value in the hardware,
+> >    which would be 255us. This ignores that the hardware uses a 1us
+> >    tick rate for the timer at 1G speeds, and 10us for 100M speeds.
+> >    (So it limits it to 260us, even though the hardware can do 2550us
+> >    at 100M speed). This limit was applied by clamping the value passed
+> >    in from userspace without erroring out.
+> > 
+> > 2. another solution was added the mac_validate_tx_lpi() method, and
+> >    implementations added _in addition_ to the above, with the idea
+> >    of erroring out for values > 255us on Marvell hardware.
+> > 
+> > 3. another idea was to have mac_enable_tx_lpi() error out if it wasn't
+> >    possible to allow e.g. falling back to a software timer (see stmmac
+> >    comments below.) Another reason for erroring out applies to Marvell
+> >    hardware, where PP2 hardware supports LPI on the GMAC but not the
+> >    XGMAC - so it only works at speeds at or below 2.5G. However, that
+> >    can be handled via the lpi_capabilities, so I don't think needs to
+> >    be a concern.
+> > 
+> > > The other question is, should we allow absolute maximum values, or sane
+> > > maximum? At some point will come the question, why the EEE is even
+> > > enabled?
+> > 
+> > As referenced above, stmmac uses the hardware timer for LPI timeouts up
+> > to and including 1048575us (STMMAC_ET_MAX). Beyond that, it uses a
+> > normal kernel timer which is:
+> > 
+> > - disabled (and EEE mode reset) when we have a packet to transmit, or
+> >   EEE is disabled
+> > - is re-armed when cleaning up from packet transmission (although
+> >   it looks like we attempt to immediately enter LPI mode, and would
+> >   only wait for the timer if there are more packets to queue... maybe
+> >   this is a bug in stmmac's implementation?) or when EEE mode is first
+> >   enabled with a LPI timer longer than the above value.
+> > 
+> > So, should phylink have the capability to switch to a software LPI timer
+> > implementation when the LPI timeout value exceeds what the hardware
+> > supports?
+> 
+> No, i'll list my arguments later down.
+> 
+> > To put it another way, should the stmmac solution to this be
+> > made generic?
+> 
+> May be partially?
+> 
+> > Note that stmmac has this software timer implementation because not
+> > only for the reason I've given above, but also because cores other than
+> > GMAC4 that support LPI do not have support for the hardware timer.
+> 
+> There seems to be a samsung ethernet driver which implements software
+> based timer too.
+> 
+> > > The same is about minimal value, too low value will cause strong speed
+> > > degradation. Should we allow set insane minimum, but use sane default
+> > > value?
+> > 
+> > We currently allow zero, and the behaviour of that depends on the
+> > hardware. For example, in the last couple of days, it's been reported
+> > that stmmac will never enter LPI with a value of zero.
+> > 
+> > Note that phylib defaults to zero, so imposing a minimum would cause
+> > a read-modify-write of the EEE settings without setting the timer to
+> > fail.
+> >
+> > > > Should set_eee() error out?
+> > > 
+> > > Yes, please.
+> > 
+> > If we are to convert stmmac, then we need to consider what it's doing
+> > (as per the above) and whether that should be generic - and if it isn't
+> > what we want in generic code, then how do we allow drivers to do this if
+> > they wish.
+> 
+> I'll try to approach this from a user perspective. Currently, we have a single
+> `lpi_timer` interface for all link modes. If I start using it, I'm trying to
+> address a specific issue, but in most cases, I have no idea what link mode will
+> be active at any given time. To my knowledge, there are no user space tools
+> that allow users to configure different timer values for different link speeds.
+> 
+> So, what problems am I really trying to solve by adjusting this timer? I can
+> imagine the following:
+> 
+> 1. Noticeable Speed Degradation:
+>  
+>    This happens when the timer is configured to a value smaller than the time
+> needed to put the hardware to sleep and wake it up again. For interfaces
+> supporting multiple link speeds with EEE, the most plausible configuration to
+> avoid degradation would be to set the timer to the maximum sleep-wake time
+> across all supported EEE link speeds.
+> 
+> 2. Other Use Cases: 
+>  
+>    Most other scenarios involve trying to work around specific constraints or
+> optimizing for particular use cases:
+> 
+>    - Maximizing Power Savings: Setting the timer to the smallest possible
+> value to achieve aggressive power-saving. Why would a user do this? It seems
+> niche but might apply in low-traffic environments.
+> 
+>    - Reducing Latency for Periodic Traffic: For example, in audio
+> streaming, frames might be sent every X milliseconds. In this case, the timer
+> could be set slightly higher than X to allow the interface to enter LPI mode
+> between frames. As soon as the audio stops and no other traffic is present, the
+> interface transitions to LPI mode entirely. If the hardware supports timers
+> with values ≥ X, no additional complexity is needed. However, if the hardware
+> timer is not supported or the supported range is lower than X, a
+> software-assisted timer would be required. This might introduce additional
+> latency, and users should be made aware of this potential impact.
+> In my expectation HW timer based latency can be different to software based
+> timer.
+> 
+> From my current user perspective, I would expect the following behavior from
+> the existing `lpi_timer` interface:
+> 
+> 1. Subtle Disabling of LPI Should Be Prevented: 
+>  
+>    If setting the `lpi_timer` to 0 effectively disables LPI, then this value
+> should not be allowed. The interface should ensure that LPI remains functional
+> unless explicitly turned off by the user.
+> 
+> 2. Maximum Timer Value Should Align with Timer Implementation: 
+>  
+>    The maximum value of the `lpi_timer` should correspond to the timer
+> implementation in use:
+> 
+>    - No software and hardware timer should be mixed, otherwise it would
+>      affect latency behavior depending on the timer value.
+> 
+>    - If a hardware timer is supported but has a lower maximum range than
+>      required, the interface should support either:
+> 
+>      - Only the hardware timer within its valid range.
+>      - A fallback to only a software timer (if feasible for the system).  
+> 
+>    However, for hardware like switches, software-based LPI implementations
+> are not feasible.
+> 
+> 3. Sensible Maximum Timer Values: 
+>  
+>    Setting the timer to excessively high values (e.g., one or two seconds or
+> more) makes the behavior unpredictable. Such configurations seem more like a
+> "time bomb" or a workaround for another issue that should be addressed
+> differently. For example:
+> 
+>    - If the use case requires such long timer values, it may make more sense to
+> disable `tx_lpi` entirely and manage power savings differently.
+> 
+> 4. Errors for Unsupported Configurations: 
+>  
+>    If a configuration variation is not supported - whether due to hardware
+> constraints, a mismatch with the current link mode, or a similar limitation - the
+> user should receive a clear error message. EEE is already challenging to debug,
+> and silent failures or corner-case issues (e.g., a speed downshift from 1000
+> Mbps to 100 Mbps causing configuration to fail) would significantly degrade the
+> user experience.
+>    Some HW or drivers (for example dsa/microchip/ driver) do no support
+> LPI timer configuration. In this case the error should be returned too.
+> 
+> 5. Separate Handling of LPI Activation:
+> 
+>    Some MACs support both automatic LPI activation (based on egress queue and
+> EEE/LPI activation bits) and forced activation for testing or software based
+> timers. Some PHYs, such as the Atheros AR8035, appear sensitive to premature
+> LPI activation, particularly during the transition from autonegotiation to an
+> active link. To address this:
+> 
+>    - The MAC driver should expose controls for managing automatic versus forced
+>      LPI activation where applicable. This will be needed for common software
+>      based timer implementation.
+> 
+>    - The PHYLINK API should provide separate control mechanisms for LPI
+>      activation and link state transitions. (done)
+> 
+> 6. Consideration for Link-Independent Modes: 
+>  
+>    Certain EEE-related configurations can be applied without a PHY, while
+> others are entirely dependent on the PHY being present. The system should
+> differentiate between these cases and handle them as follows:
+> 
+>    - EEE On/Off: 
+>  
+>      Enabling or disabling EEE at the MAC level should be allowed without a
+> PHY. This can be treated as a user preference - "I prefer EEE to be on if
+> supported." If a PHY becomes available later and supports EEE, this preference
+> can then take effect.
+> 
+>    - LPI On/Off: 
+>  
+>      Similar to EEE on/off, enabling or disabling Low Power Idle (LPI) can be
+> managed at the MAC level independently of the PHY. This setting reflects the
+> MAC's ability to enter LPI mode. In SmartEEE or similar modes, this could
+> potentially involve PHY-specific behavior, but the basic LPI on/off setting
+> remains primarily MAC-specific.
+> 
+>    - LPI Timer:  
+> 
+>      The LPI timer is implementation-specific to the MAC driver and does not
+> inherently depend on the PHY. Yes, it depends at least on the link speed,
+> but this can't be addresses with existing interface.
+> 
+>    - EEE Advertisement:  
+> 
+>      Advertising EEE capabilities is entirely dependent on the PHY. Without a
+> PHY, these settings cannot be determined or validated, as the PHY defines the
+> supported capabilities. Any attempt to configure EEE advertisement without an
+> attached PHY should fail immediately with an appropriate error, such as:  "EEE
+> advertisement configuration not applied: no PHY available to validate
+> capabilities."
 
-Please use plain text email so that your emails will be forwarded by
-the netdev mail server. :-)
+Sorry, at this point, I give up with phylink managed EEE. What you
+detail above is way too much for me to get involved with, and goes
+well beyond simply:
 
-> >>> Am I right to say you are referring to
-> commit 8165a96f6b7122f25bf809aecf06f17b0ec37b58
->
-> Yes. The issue arises as a side effect of the changes introduced in this =
-commit.
->
-> >>> Please provide a packetdrill test, this will be the most efficient wa=
-y to demonstrate the issue.
->
-> Below are two different methods of demonstrating the issue:
-> A) Demonstrating via the source code
-> The changes introduced in commit 8165a9 move the caller of the `bictcp_hy=
-start_reset` function inside the `hystart_update` function.
-> This modification adds an additional condition for triggering the caller,=
- requiring that (tcp_snd_cwnd(tp) >=3D hystart_low_window) must also be sat=
-isfied before invoking `bictcp_hystart_reset`.
+1) Fixing the cockup with the phylib-managed EEE that has caused *user*
+   *regressions* that we need to resolve.
 
-Thanks for the nice analysis.
+2) Providing core functionality so that newer implementations can have
+   a consistency of behaviour.
 
-Looks like 8165a96f6b7122f25bf809aecf06f17b0ec37b58  is a stable
-branch fix, and the original commit is:
-4e1fddc98d2585ddd4792b5e44433dcee7ece001
+I have *no* interest in doing a total rewrite of kernel EEE
+functionality - that goes well beyond my aims here.
 
-So the ultimate patch to fix this can use a Fixes tag like:
+So I'm afraid that I really lost interest in reading your email, sorry.
 
-Fixes: 4e1fddc98d25 ("tcp_cubic: fix spurious Hystart ACK train
-detections for not-cwnd-limited flows")
-
-Please also move the "hystart triggers when cwnd is larger than some
-threshold" comment to the line above where you have moved the logic:
-
-So the patch reads something like:
-
-@@ -392,6 +392,9 @@ static void hystart_update(struct sock *sk, u32 delay)
-        if (after(tp->snd_una, ca->end_seq))
-                bictcp_hystart_reset(sk);
-
-+      /* hystart triggers when cwnd is larger than some threshold */
-+       if (tcp_snd_cwnd(tp) < hystart_low_window)
-+               return;
-+
-...
--       /* hystart triggers when cwnd is larger than some threshold */
--       if (!ca->found && tcp_in_slow_start(tp) && hystart &&
--           tcp_snd_cwnd(tp) >=3D hystart_low_window)
-+       if (!ca->found && tcp_in_slow_start(tp) && hystart)
-                hystart_update(sk, delay);
- }
-
-> B) Demonstrating via a test
-> Unfortunately, I was unable to directly print the value of `ca->round_sta=
-rt` (a variable defined in `tcp_cubic.c`) using packetdrill and provide you=
- with the requested script.
-> Instead, I added a few lines of code to log the status of TCP variables u=
-pon packet transmission and ACK reception.
-> To reproduce the same output on your Linux system, you need to apply the =
-changes I made to `tcp_cubic.c` and `tcp_output.c` (see the attached files)=
- and recompile the kernel.
-> I used the attached packetdrill script "only" to emulate data transmissio=
-n for the test.
-> Below are the logs accumulated in kern.log after running the packetdrill =
-script:
->
-> In Line01, the start of the first round is marked by the cubictcp_init fu=
-nction. However, the second round is marked by the reception of the 7th ACK=
- when cwnd is 16 (see Line20).
-> This is incorrect because the 2nd round is started upon receiving the fir=
-st ACK.
-> This means that `ca->round_start` is updated at t=3D720994842, while it s=
-hould have been updated 15.5 ms earlier, at t=3D720979320.
-> In this test, the length of the ACK train in the second round is calculat=
-ed to be 15.5 ms shorter, which renders one of HyStart's criteria ineffecti=
-ve.
->
-> Line01. 2025-01-08T08:16:23.321839+00:00 h1a kernel: New round is started=
-. t=3D720873683 Sport=3D36895 cwnd=3D10 inflight=3D0 RTT=3D100300
-> Line02. 2025-01-08T08:16:23.321842+00:00 h1a kernel: Pkt sending. t=3D720=
-873878 Sport=3D36895 cwnd=3D10 inflight=3D0 RTT=3D100300 nextSeq=3D39151834=
-79
-> Line03. 2025-01-08T08:16:23.321845+00:00 h1a kernel: Pkt sending. t=3D720=
-873896 Sport=3D36895 cwnd=3D10 inflight=3D2 RTT=3D100300 nextSeq=3D39151854=
-79
-> Line04. 2025-01-08T08:16:23.321847+00:00 h1a kernel: Pkt sending. t=3D720=
-873896 Sport=3D36895 cwnd=3D10 inflight=3D4 RTT=3D100300 nextSeq=3D39151874=
-79
-> Line05. 2025-01-08T08:16:23.321849+00:00 h1a kernel: Pkt sending. t=3D720=
-873896 Sport=3D36895 cwnd=3D10 inflight=3D6 RTT=3D100300 nextSeq=3D39151894=
-79
-> Line06. 2025-01-08T08:16:23.427777+00:00 h1a kernel: Pkt sending. t=3D720=
-873896 Sport=3D36895 cwnd=3D10 inflight=3D8 RTT=3D100300 nextSeq=3D39151914=
-79
-> Line07. 2025-01-08T08:16:23.427787+00:00 h1a kernel: Ack receiving. t=3D7=
-20979320 Sport=3D36895 cwnd=3D10 inflight=3D9 RTT=3D100942 acked=3D1
-> Line08. 2025-01-08T08:16:23.427790+00:00 h1a kernel: Pkt sending. t=3D720=
-979335 Sport=3D36895 cwnd=3D11 inflight=3D9 RTT=3D100942 nextSeq=3D39151934=
-79
-> Line09. 2025-01-08T08:16:23.427792+00:00 h1a kernel: Ack receiving. t=3D7=
-20979421 Sport=3D36895 cwnd=3D11 inflight=3D10 RTT=3D101517 acked=3D1
-> Line10. 2025-01-08T08:16:23.432773+00:00 h1a kernel: Pkt sending. t=3D720=
-979431 Sport=3D36895 cwnd=3D12 inflight=3D10 RTT=3D101517 nextSeq=3D3915195=
-479
-> Line11. 2025-01-08T08:16:23.432785+00:00 h1a kernel: Ack receiving. t=3D7=
-20984502 Sport=3D36895 cwnd=3D12 inflight=3D11 RTT=3D102654 acked=3D1
-> Line12. 2025-01-08T08:16:23.432788+00:00 h1a kernel: Pkt sending. t=3D720=
-984514 Sport=3D36895 cwnd=3D13 inflight=3D11 RTT=3D102654 nextSeq=3D3915197=
-479
-> Line13. 2025-01-08T08:16:23.432790+00:00 h1a kernel: Ack receiving. t=3D7=
-20984585 Sport=3D36895 cwnd=3D13 inflight=3D12 RTT=3D103658 acked=3D1
-> Line14. 2025-01-08T08:16:23.437774+00:00 h1a kernel: Pkt sending. t=3D720=
-984594 Sport=3D36895 cwnd=3D14 inflight=3D12 RTT=3D103658 nextSeq=3D3915199=
-479
-> Line15. 2025-01-08T08:16:23.437783+00:00 h1a kernel: Ack receiving. t=3D7=
-20989668 Sport=3D36895 cwnd=3D14 inflight=3D13 RTT=3D105172 acked=3D1
-> Line16. 2025-01-08T08:16:23.437785+00:00 h1a kernel: Pkt sending. t=3D720=
-989679 Sport=3D36895 cwnd=3D15 inflight=3D13 RTT=3D105172 nextSeq=3D3915201=
-479
-> Line17. 2025-01-08T08:16:23.437787+00:00 h1a kernel: Ack receiving. t=3D7=
-20989747 Sport=3D36895 cwnd=3D15 inflight=3D14 RTT=3D106507 acked=3D1
-> Line18. 2025-01-08T08:16:23.442773+00:00 h1a kernel: Pkt sending. t=3D720=
-989757 Sport=3D36895 cwnd=3D16 inflight=3D14 RTT=3D106507 nextSeq=3D3915203=
-479
-> Line19. 2025-01-08T08:16:23.442780+00:00 h1a kernel: Ack receiving. t=3D7=
-20994842 Sport=3D36895 cwnd=3D16 inflight=3D15 RTT=3D108312 acked=3D1
->
-> Line20. 2025-01-08T08:16:23.442782+00:00 h1a kernel: New round is started=
-. t=3D720994842 Sport=3D36895 cwnd=3D16 inflight=3D15 RTT=3D108312
->
-> Line21. 2025-01-08T08:16:23.442783+00:00 h1a kernel: Pkt sending. t=3D720=
-994857 Sport=3D36895 cwnd=3D17 inflight=3D15 RTT=3D108312 nextSeq=3D3915205=
-479
-> Line22. 2025-01-08T08:16:23.442785+00:00 h1a kernel: Ack receiving. t=3D7=
-20994927 Sport=3D36895 cwnd=3D17 inflight=3D16 RTT=3D109902 acked=3D1
-> Line23. 2025-01-08T08:16:23.448788+00:00 h1a kernel: Pkt sending. t=3D720=
-994936 Sport=3D36895 cwnd=3D18 inflight=3D16 RTT=3D109902 nextSeq=3D3915207=
-479
-> Line24. 2025-01-08T08:16:23.448805+00:00 h1a kernel: Ack receiving. t=3D7=
-21000016 Sport=3D36895 cwnd=3D18 inflight=3D17 RTT=3D111929 acked=3D1
-> Line25. 2025-01-08T08:16:23.448807+00:00 h1a kernel: Pkt sending. t=3D721=
-000026 Sport=3D36895 cwnd=3D19 inflight=3D17 RTT=3D111929 nextSeq=3D3915209=
-479
-> Line26. 2025-01-08T08:16:23.448808+00:00 h1a kernel: Ack receiving. t=3D7=
-21000100 Sport=3D36895 cwnd=3D19 inflight=3D18 RTT=3D113713 acked=3D1
-> Line27. 2025-01-08T08:16:23.496807+00:00 h1a kernel: Pkt sending. t=3D721=
-000110 Sport=3D36895 cwnd=3D20 inflight=3D18 RTT=3D113713 nextSeq=3D3915211=
-479
-
-To create a packetdrill test, you don't need to print round_start. You
-can simply construct a packetdrill scenario and assert that
-tcpi_snd_cwnd and tcpi_snd_ssthresh change in the expected ways over
-the course of the test, as packetdrill injects ACKs into your kernel
-under test.
-
-I have upstreamed our packetdrill tests for TCP CUBIC today, so you
-can have some examples to look at. I recommend looking at the
-gtests/net/tcp/cubic/cubic-hystart-delay-rtt-jumps-upward.pkt file in
-this patch:
-
-https://github.com/google/packetdrill/commit/8d63bbc7d6273f86e826ac16dbc3c3=
-8d4a41b129#diff-d7a68a37bc59309d374f8b97abcd406e263980415dd5af5c68db23f90f2=
-d21a6
-
-Before sending your patch to the list, please:
-
-+ Download and build packetdrill. For tips on using packetdrill, you
-can start with:
-
-https://github.com/google/packetdrill
-
-+ run all cubic packetdrill tests, to help test that your commit does
-not introduce any bugs:
-
-cd ~/packetdrill/gtests/net/
-./packetdrill/run_all.py -S -v -L -l tcp/cubic/
-
-+ read: https://www.kernel.org/doc/html/v6.11/process/maintainer-netdev.htm=
-l
-
-+ run something like the following to verify the format of the patch
-
-git format-patch --subject-prefix=3D'PATCH net' HEAD~1..HEAD
-./scripts/checkpatch.pl 00*patch
-
-When all the warnings have been resolved, you can send the patch to
-the list. :-)
-
-> >>> Note that we are still waiting for an HyStart++ implementation for li=
-nux, you may be interested in working on it.
->
-> Thank you for the suggestion. I would be happy to work on the HyStart++ i=
-mplementation for Linux. Could you kindly provide more details on the speci=
-fic requirements, workflow, and expected outcomes to help me get started?
-
-The specific requirements are in the Hystart++ RFC:
-  https://datatracker.ietf.org/doc/html/rfc9406
-
-The workflow would be to develop the code, run your kernel to test it
-with packetdrill and test transfers in a controlled setting, then send
-the patches to the netdev list for review.
-
-The expected outcome would be to come up with working patches that are
-readable, pass ./scripts/checkpatch.pl, compile and pass packetdrill
-cubic tests, and produce improved behavior in at least some test
-(probably a test where the Hystart++ implementation prevents a
-spurious exit of slow-start when min_rtt jumps upward, which is common
-in cellular/wifi cases).
-
-thanks,
-neal
-
-> Best wishes,
-> Mahdi Arghavani
->
-> On Monday, January 6, 2025 at 09:24:49 PM GMT+13, Eric Dumazet <edumazet@=
-google.com> wrote:
->
->
-> On Mon, Jan 6, 2025 at 5:53=E2=80=AFAM Mahdi Arghavani <ma.arghavani@yaho=
-o.com> wrote:
-> >
-> > Hi,
-> >
-> > While refining the source code for our project (SUSS), I discovered a b=
-ug in the implementation of HyStart in the Linux kernel, starting from vers=
-ion v5.15.6. The issue, caused by incorrect marking of round starts, result=
-s in inaccurate measurement of the length of each ACK train. Since HyStart =
-relies on the length of ACK trains as one of two key criteria to stop expon=
-ential cwnd growth during Slow-Start, this inaccuracy renders the criterion=
- ineffective, potentially degrading TCP performance.
-> >
->
-> Hi Mahdi
->
-> netdev@ mailing list does not accept HTML messages.
->
-> Am I right to say you are referring to
->
-> commit 8165a96f6b7122f25bf809aecf06f17b0ec37b58
-> Author: Eric Dumazet <edumazet@google.com>
-> Date:  Tue Nov 23 12:25:35 2021 -0800
->
->     tcp_cubic: fix spurious Hystart ACK train detections for
-> not-cwnd-limited flows
->
->     [ Upstream commit 4e1fddc98d2585ddd4792b5e44433dcee7ece001 ]
->
->
->
-> > Issue Description: The problem arises because the hystart_reset functio=
-n is not called upon receiving the first ACK (when cwnd=3Diw=3D10, see the =
-attached figure). Instead, its invocation is delayed until the condition cw=
-nd >=3D hystart_low_window is satisfied. In each round, this delay causes:
-> >
-> > 1) A postponed marking of the start of a new round.
-> >
-> > 2) An incorrect update of ca->end_seq, leading to incorrect marking of =
-the subsequent round.
-> >
-> > As a result, the ACK train length is underestimated, which adversely af=
-fects HyStart=E2=80=99s first criterion for stopping cwnd exponential growt=
-h.
-> >
-> > Proposed Solution: Below is a tested patch that addresses the issue by =
-ensuring hystart_reset is triggered appropriately:
-> >
->
->
->
-> Please provide a packetdrill test, this will be the most efficient way
-> to demonstrate the issue.
->
-> In general, ACK trains detection is not useful in modern networks,
-> because of TSO and GRO.
->
-> Reference : https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linu=
-x.git/commit/?id=3Dede656e8465839530c3287c7f54adf75dc2b9563
->
-> Note that we are still waiting for an HyStart++ implementation for linux,
-> you may be interested in working on it.
->
-> Thank you.
->
->
-> >
-> >
-> > diff --git a/net/ipv4/tcp_cubic.c b/net/ipv4/tcp_cubic.c
-> >
-> > index 5dbed91c6178..78d9cf493ace 100644
-> >
-> > --- a/net/ipv4/tcp_cubic.c
-> >
-> > +++ b/net/ipv4/tcp_cubic.c
-> >
-> > @@ -392,6 +392,9 @@ static void hystart_update(struct sock *sk, u32 del=
-ay)
-> >
-> >        if (after(tp->snd_una, ca->end_seq))
-> >
-> >                bictcp_hystart_reset(sk);
-> >
-> >
-> >
-> > +      if (tcp_snd_cwnd(tp) < hystart_low_window)
-> >
-> > +              return;
-> >
-> > +
-> >
-> >        if (hystart_detect & HYSTART_ACK_TRAIN) {
-> >
-> >                u32 now =3D bictcp_clock_us(sk);
-> >
-> >
-> >
-> > @@ -468,8 +471,7 @@ __bpf_kfunc static void cubictcp_acked(struct sock =
-*sk, const struct ack_sample
-> >
-> >                ca->delay_min =3D delay;
-> >
-> >
-> >
-> >        /* hystart triggers when cwnd is larger than some threshold */
-> >
-> > -      if (!ca->found && tcp_in_slow_start(tp) && hystart &&
-> >
-> > -          tcp_snd_cwnd(tp) >=3D hystart_low_window)
-> >
-> > +      if (!ca->found && tcp_in_slow_start(tp) && hystart)
-> >
-> >                hystart_update(sk, delay);
-> >
-> >  }
-> >
-> > Best wishes,
-> > Mahdi Arghavani
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
