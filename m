@@ -1,208 +1,252 @@
-Return-Path: <netdev+bounces-156646-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156647-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6BAA1A07374
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 11:38:12 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DFD3A073A4
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 11:46:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 29F273A457D
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 10:37:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 497F53A570C
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 10:46:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 242AD215F53;
-	Thu,  9 Jan 2025 10:37:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD815204C3C;
+	Thu,  9 Jan 2025 10:46:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="UhabqEOq";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="fqGqhtka";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="UhabqEOq";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="fqGqhtka"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iWzjDjC8"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A992204C0D;
-	Thu,  9 Jan 2025 10:37:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE9642594BA
+	for <netdev@vger.kernel.org>; Thu,  9 Jan 2025 10:46:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736419075; cv=none; b=DLXauAxIE3slLXzj0BSRsVJHm2ohVxFrSjXqJo+SxNw6M5mtC1CntM6BAnjPIuNmj7gc4F6K2ZcvUHxD9cyWOxhwjHI6OpkrJg4CLT3yXa2QcYLtPwMkwSSXHUNded4u8zDfbymk/5rMbsrbtxrEVSX8lM2N/hnscr8LXOTyUGg=
+	t=1736419575; cv=none; b=gltNcUBXIYfTJqtzbo9Q4Oc+R7RjAP+8pIao+y+P2Sz5MvT8RKHpeP6q+BvP1wk+tsnT/nL49UyiR1rUgEP00sTBZ/QhGkoOhB8nOObbjjbPklY6NoD7H6k/1ixAhynrzC3omMVku2LqgyXcrHmeiJBr370eBHL+8tFo2GJpsbI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736419075; c=relaxed/simple;
-	bh=7xl1sBFt2GFWC41AWFg2risMqWrJmQ862WAJ8DnWKlc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZFPbIPj2SU5c7cvX8DpqpfKPwFMeBUZQYyxuYEysXt1cDhiwsbg8C4Kty+iKpuEO2mRwvjce/lnTgVhI6KQHa0wyrV0jRYu5cmqtQfNTfWyf6mZ3r/TyodER0GNBEa7F9ML7HPBAa+DGYcgtOIytdFUWtjBxDasYY85f+Ky7Tbk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=UhabqEOq; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=fqGqhtka; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=UhabqEOq; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=fqGqhtka; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 235E821114;
-	Thu,  9 Jan 2025 10:37:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1736419071; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
+	s=arc-20240116; t=1736419575; c=relaxed/simple;
+	bh=ximbtAUwJR7jZa+BpiHI5ZiCSMfIizcjU7aeh29wekY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Q7P/JuXp4qU59cHw49fVmRspWC8HDlmR6U5OqS8UbTkDfVVqNtVv6bpGSHwpu6ZmR4ZJIBuYGeNb3i9gIjaWsHwwEYGaj+btwhAYM4dAT2yJmO0ztc0+OKSahadnZAhbk2ZvCEJxPEkbpv8lW6luSm4h6PjSKpxIIdb5zH1pLWs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iWzjDjC8; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1736419572;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=CX40sLvsmEhDLSJTaTldfvB4pJb1E1M5ld3ODr0Mkbs=;
-	b=UhabqEOqWkFJt9pS2Eg7bmNobXgAaYioaBedkfwEo6llN+5M7LZttYYlHSWbWwnIK5CAv4
-	uCYy6llxHAUGUOZRo2WXQ8ksSFDzmbZMGytwVMhwE0AztxyqrPRhgLGuTlQTRygCldfEhg
-	HiYoojxFk1Z5q1xzu01v0zQdB2VgIQU=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1736419071;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=CX40sLvsmEhDLSJTaTldfvB4pJb1E1M5ld3ODr0Mkbs=;
-	b=fqGqhtka0ItNK7M+x7GYmey/2CvecS9u9o5ZCX/Gzcn4G1CO+LTRHjXpV4N1ALoQKV4UZE
-	WppUXtBqx4qV0aAA==
-Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=UhabqEOq;
-	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=fqGqhtka
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1736419071; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=CX40sLvsmEhDLSJTaTldfvB4pJb1E1M5ld3ODr0Mkbs=;
-	b=UhabqEOqWkFJt9pS2Eg7bmNobXgAaYioaBedkfwEo6llN+5M7LZttYYlHSWbWwnIK5CAv4
-	uCYy6llxHAUGUOZRo2WXQ8ksSFDzmbZMGytwVMhwE0AztxyqrPRhgLGuTlQTRygCldfEhg
-	HiYoojxFk1Z5q1xzu01v0zQdB2VgIQU=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1736419071;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=CX40sLvsmEhDLSJTaTldfvB4pJb1E1M5ld3ODr0Mkbs=;
-	b=fqGqhtka0ItNK7M+x7GYmey/2CvecS9u9o5ZCX/Gzcn4G1CO+LTRHjXpV4N1ALoQKV4UZE
-	WppUXtBqx4qV0aAA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 14593139AB;
-	Thu,  9 Jan 2025 10:37:51 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id 1pDtBP+mf2ewFQAAD6G6ig
-	(envelope-from <jack@suse.cz>); Thu, 09 Jan 2025 10:37:51 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-	id BF005A0887; Thu,  9 Jan 2025 11:37:46 +0100 (CET)
-Date: Thu, 9 Jan 2025 11:37:46 +0100
-From: Jan Kara <jack@suse.cz>
-To: Akihiko Odaki <akihiko.odaki@daynix.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, 
-	Alexander Viro <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, 
-	linux-fsdevel@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
-	Jonathan Corbet <corbet@lwn.net>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
-	Jason Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
-	Shuah Khan <shuah@kernel.org>, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	kvm@vger.kernel.org, virtualization@lists.linux-foundation.org, 
-	linux-kselftest@vger.kernel.org, Yuri Benditovich <yuri.benditovich@daynix.com>, 
-	Andrew Melnychenko <andrew@daynix.com>, Stephen Hemminger <stephen@networkplumber.org>, 
-	gur.stavi@huawei.com, devel@daynix.com
-Subject: Re: [PATCH v2 2/3] tun: Pad virtio header with zero
-Message-ID: <apouzqstvjjracsde2o4ky3wguw7xeerolc5mp4aty4zgnpxct@gongys63jwdw>
-References: <20250109-tun-v2-0-388d7d5a287a@daynix.com>
- <20250109-tun-v2-2-388d7d5a287a@daynix.com>
- <20250109023056-mutt-send-email-mst@kernel.org>
- <571a2d61-5fbe-4e49-b4d1-6bf0c7604a57@daynix.com>
- <20250109024247-mutt-send-email-mst@kernel.org>
- <6f33c048-81ad-4d15-872d-187e965e6d79@daynix.com>
+	bh=5ODZ7Mw/IPxuJJXv6/DpD9mSnnSx7QDhpUfClTuqggc=;
+	b=iWzjDjC8c4huQE2mXUWRmyKZncVTsxRYWgpCZOdbejJpsp7M5Cg9kXI7pnk272lJ4boOTn
+	EbpXFF763P7++bqPODSaAwdFaNYYgQdj+MqyTfOPjcqrgJAbgx6kYfVrnVL7C93uzUued5
+	FWrgnrVzr0VPfLgwWZsMNGe1C68Top0=
+Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
+ [209.85.219.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-7-vMqO0_nwPQCd25uh9mjkRg-1; Thu, 09 Jan 2025 05:46:11 -0500
+X-MC-Unique: vMqO0_nwPQCd25uh9mjkRg-1
+X-Mimecast-MFC-AGG-ID: vMqO0_nwPQCd25uh9mjkRg
+Received: by mail-qv1-f72.google.com with SMTP id 6a1803df08f44-6dcccc8b035so13842116d6.1
+        for <netdev@vger.kernel.org>; Thu, 09 Jan 2025 02:46:11 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736419571; x=1737024371;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=5ODZ7Mw/IPxuJJXv6/DpD9mSnnSx7QDhpUfClTuqggc=;
+        b=Qgudn0cH3PJIWhl2Vb7xMpey8yHAk7IxLwd3kkE/iK7VhwHNu+ZYWil0HfYimCkFjp
+         iaINcRMC/34KdPDRjmHKhGIBsbHYhhZ31pjUweC9DtiQz6jl4fmX0bvXJlQ60d/hwi2Z
+         uGKJx49FedYlerT2Y5/6U/YvwBfZyw8IQPuwhw8cEG92CJsbqYW0/RFPZyI03xH8eEkk
+         ELzRDH1vYnjFJtP56OJFewATkvQQ/eAqLar4pKyoeuiijMrMUaTH115DegT6H5RTDSH/
+         bRtE7cdSFFtOEAxWRXmTvJB7PahmR0djBugHasCa8KCgxDslORC0w6pFi4nZFDmlzpAG
+         36xA==
+X-Forwarded-Encrypted: i=1; AJvYcCVAXcY6XNHABwb/tkrL9Hds35vShZaxMzHFZQNfzZMiqhoU2pMTZtoqAB2O3viuGXZ0Y0U+Mi8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwcwkgIco0dZMufIQSrupDYPJIEHO+pPHRscpYS0iJ+mzpdlVcd
+	NDmmf+eA66lN+hGh8bwJwWGxwaMvRvi+nQpAtrrtoczmZw1LvFB4WUZZNyiQZm98vyAJSxf73eM
+	4xxr4pbMW0dzeVpM1WiGBTEaqbX6VOe6pn3LQmknRbSyX4CRukh08iw==
+X-Gm-Gg: ASbGncu4NCF8HEHkWRLZr13VneR5egyDOtCdqDCF3po5/iYhkg+80Z4jZAo4FqozR3/
+	kDHqwbrZwnIXFelXnYMzOezGdJsWnPJd8vxYcCvV40zxcGl66xa+0X1jBvg5sVaarv1eG+pAhsU
+	gfFOOrDy83KF+JwViHwO52zK0T/62q1k4AYs1PKwhs2M+68701FMop93fYAWDi4IGQJnAoOJF8u
+	3y8exBNxAJ+zXgaUelGu76TQoAX96KpPogxaT/t83wBm4+JhenOwiu7LMMXxF39UITNVivRflG7
+	jio0msEO
+X-Received: by 2002:a05:6214:5502:b0:6d8:9bfa:76dc with SMTP id 6a1803df08f44-6dfa3a7773emr31918856d6.7.1736419570726;
+        Thu, 09 Jan 2025 02:46:10 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHtFYrj4ng0BpyKdjkT+FbJc67Ck9X/xo+Y37ggyn21e4M1QbVxckUPpvibLq/85Tx9x6jbgQ==
+X-Received: by 2002:a05:6214:5502:b0:6d8:9bfa:76dc with SMTP id 6a1803df08f44-6dfa3a7773emr31918646d6.7.1736419570389;
+        Thu, 09 Jan 2025 02:46:10 -0800 (PST)
+Received: from [192.168.88.253] (146-241-2-244.dyn.eolo.it. [146.241.2.244])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6dd1810d5d5sm200246736d6.43.2025.01.09.02.46.08
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 09 Jan 2025 02:46:10 -0800 (PST)
+Message-ID: <e20ce5c1-9cd4-4719-9c3b-93ca8a947298@redhat.com>
+Date: Thu, 9 Jan 2025 11:46:07 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <6f33c048-81ad-4d15-872d-187e965e6d79@daynix.com>
-X-Rspamd-Queue-Id: 235E821114
-X-Spam-Level: 
-X-Spamd-Result: default: False [-2.51 / 50.00];
-	BAYES_HAM(-3.00)[99.99%];
-	SUSPICIOUS_RECIPS(1.50)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	ARC_NA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[27];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_COUNT_THREE(0.00)[3];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	RCVD_TLS_LAST(0.00)[];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	TO_DN_SOME(0.00)[];
-	TAGGED_RCPT(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	R_RATELIMIT(0.00)[to_ip_from(RLxr8yp7wrfbdywxro7ki6ncu8)];
-	MISSING_XM_UA(0.00)[];
-	FREEMAIL_CC(0.00)[redhat.com,zeniv.linux.org.uk,kernel.org,suse.cz,vger.kernel.org,davemloft.net,google.com,lwn.net,gmail.com,linux.alibaba.com,lists.linux-foundation.org,daynix.com,networkplumber.org,huawei.com];
-	DKIM_TRACE(0.00)[suse.cz:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns,suse.cz:dkim]
-X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
-X-Rspamd-Action: no action
-X-Spam-Score: -2.51
-X-Spam-Flag: NO
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net: sched: refine software bypass handling in tc_run
+To: Xin Long <lucien.xin@gmail.com>, network dev <netdev@vger.kernel.org>
+Cc: davem@davemloft.net, kuba@kernel.org, Eric Dumazet <edumazet@google.com>,
+ Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>,
+ Jiri Pirko <jiri@resnulli.us>,
+ Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, ast@fiberby.net,
+ Shuang Li <shuali@redhat.com>
+References: <b9e81aa97ab8ca62e979b7d55c2ee398790b935b.1736176112.git.lucien.xin@gmail.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <b9e81aa97ab8ca62e979b7d55c2ee398790b935b.1736176112.git.lucien.xin@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu 09-01-25 18:36:52, Akihiko Odaki wrote:
-> On 2025/01/09 16:43, Michael S. Tsirkin wrote:
-> > On Thu, Jan 09, 2025 at 04:41:50PM +0900, Akihiko Odaki wrote:
-> > > On 2025/01/09 16:31, Michael S. Tsirkin wrote:
-> > > > On Thu, Jan 09, 2025 at 03:58:44PM +0900, Akihiko Odaki wrote:
-> > > > > tun used to simply advance iov_iter when it needs to pad virtio header,
-> > > > > which leaves the garbage in the buffer as is. This is especially
-> > > > > problematic when tun starts to allow enabling the hash reporting
-> > > > > feature; even if the feature is enabled, the packet may lack a hash
-> > > > > value and may contain a hole in the virtio header because the packet
-> > > > > arrived before the feature gets enabled or does not contain the
-> > > > > header fields to be hashed. If the hole is not filled with zero, it is
-> > > > > impossible to tell if the packet lacks a hash value.
-> > > > > 
-> > > > > In theory, a user of tun can fill the buffer with zero before calling
-> > > > > read() to avoid such a problem, but leaving the garbage in the buffer is
-> > > > > awkward anyway so fill the buffer in tun.
-> > > > > 
-> > > > > Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
-> > > > 
-> > > > But if the user did it, you have just overwritten his value,
-> > > > did you not?
-> > > 
-> > > Yes. but that means the user expects some part of buffer is not filled after
-> > > read() or recvmsg(). I'm a bit worried that not filling the buffer may break
-> > > assumptions others (especially the filesystem and socket infrastructures in
-> > > the kernel) may have.
-> > > 
-> > > If we are really confident that it will not cause problems, this behavior
-> > > can be opt-in based on a flag or we can just write some documentation
-> > > warning userspace programmers to initialize the buffer.
-> > 
-> > It's been like this for years, I'd say we wait until we know there's a problem?
+On 1/6/25 4:08 PM, Xin Long wrote:
+> This patch addresses issues with filter counting in block (tcf_block),
+> particularly for software bypass scenarios, by introducing a more
+> accurate mechanism using useswcnt.
 > 
-> Perhaps we can just leave it as is. Let me ask filesystem and networking
-> people:
+> Previously, filtercnt and skipswcnt were introduced by:
 > 
-> Is it OK to leave some part of buffer uninitialized with read_iter() or
-> recvmsg()?
+>   Commit 2081fd3445fe ("net: sched: cls_api: add filter counter") and
+>   Commit f631ef39d819 ("net: sched: cls_api: add skip_sw counter")
+> 
+>   filtercnt tracked all tp (tcf_proto) objects added to a block, and
+>   skipswcnt counted tp objects with the skipsw attribute set.
+> 
+> The problem is: a single tp can contain multiple filters, some with skipsw
+> and others without. The current implementation fails in the case:
+> 
+>   When the first filter in a tp has skipsw, both skipswcnt and filtercnt
+>   are incremented, then adding a second filter without skipsw to the same
+>   tp does not modify these counters because tp->counted is already set.
+> 
+>   This results in bypass software behavior based solely on skipswcnt
+>   equaling filtercnt, even when the block includes filters without
+>   skipsw. Consequently, filters without skipsw are inadvertently bypassed.
+> 
+> To address this, the patch introduces useswcnt in block to explicitly count
+> tp objects containing at least one filter without skipsw. Key changes
+> include:
+> 
+>   Whenever a filter without skipsw is added, its tp is marked with usesw
+>   and counted in useswcnt. tc_run() now uses useswcnt to determine software
+>   bypass, eliminating reliance on filtercnt and skipswcnt.
+> 
+>   This refined approach prevents software bypass for blocks containing
+>   mixed filters, ensuring correct behavior in tc_run().
+> 
+> Additionally, as atomic operations on useswcnt ensure thread safety and
+> tp->lock guards access to tp->usesw and tp->counted, the broader lock
+> down_write(&block->cb_lock) is no longer required in tc_new_tfilter(),
+> and this resolves a performance regression caused by the filter counting
+> mechanism during parallel filter insertions.
+> 
+>   The improvement can be demonstrated using the following script:
+> 
+>   # cat insert_tc_rules.sh
+> 
+>     tc qdisc add dev ens1f0np0 ingress
+>     for i in $(seq 16); do
+>         taskset -c $i tc -b rules_$i.txt &
+>     done
+>     wait
+> 
+>   Each of rules_$i.txt files above includes 100000 tc filter rules to a
+>   mlx5 driver NIC ens1f0np0.
+> 
+>   Without this patch:
+> 
+>   # time sh insert_tc_rules.sh
+> 
+>     real    0m50.780s
+>     user    0m23.556s
+>     sys	    4m13.032s
+> 
+>   With this patch:
+> 
+>   # time sh insert_tc_rules.sh
+> 
+>     real    0m17.718s
+>     user    0m7.807s
+>     sys     3m45.050s
+> 
+> Fixes: 047f340b36fc ("net: sched: make skip_sw actually skip software")
+> Reported-by: Shuang Li <shuali@redhat.com>
+> Signed-off-by: Xin Long <lucien.xin@gmail.com>
+> Acked-by: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
 
-I think that leaving part of the IO buffer within returned IO length
-uninitialized is a very bad practice and I'm not aware of any place in
-filesystem area that would do that. It makes life unnecessarily harder
-for userspace and also it is invitation for subtle information leaks
-(depending on who allocates the buffer and who then gets to read the
-results). So I think the patch makes sense.
+Given the quite large scope of this change and the functional and
+performance implications, I think it's more suited for net-next.
 
-								Honza
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+> ---
+>  include/net/pkt_cls.h     | 18 +++++++-------
+>  include/net/sch_generic.h |  5 ++--
+>  net/core/dev.c            | 11 ++-------
+>  net/sched/cls_api.c       | 52 +++++++++------------------------------
+>  net/sched/cls_bpf.c       |  2 ++
+>  net/sched/cls_flower.c    |  2 ++
+>  net/sched/cls_matchall.c  |  2 ++
+>  net/sched/cls_u32.c       |  2 ++
+>  8 files changed, 32 insertions(+), 62 deletions(-)
+> 
+> diff --git a/include/net/pkt_cls.h b/include/net/pkt_cls.h
+> index cf199af85c52..d66cb315a6b5 100644
+> --- a/include/net/pkt_cls.h
+> +++ b/include/net/pkt_cls.h
+> @@ -74,15 +74,6 @@ static inline bool tcf_block_non_null_shared(struct tcf_block *block)
+>  	return block && block->index;
+>  }
+>  
+> -#ifdef CONFIG_NET_CLS_ACT
+> -DECLARE_STATIC_KEY_FALSE(tcf_bypass_check_needed_key);
+
+I think it would be better, if possible, to preserve this static key;
+will reduce the delta and avoid additional tests in fast-path for S/W
+only setup.
+
+> -
+> -static inline bool tcf_block_bypass_sw(struct tcf_block *block)
+> -{
+> -	return block && block->bypass_wanted;
+> -}
+> -#endif
+> -
+>  static inline struct Qdisc *tcf_block_q(struct tcf_block *block)
+>  {
+>  	WARN_ON(tcf_block_shared(block));
+> @@ -760,6 +751,15 @@ tc_cls_common_offload_init(struct flow_cls_common_offload *cls_common,
+>  		cls_common->extack = extack;
+>  }
+>  
+> +static inline void tcf_proto_update_usesw(struct tcf_proto *tp, u32 flags)
+> +{
+> +	if (tp->usesw)
+> +		return;
+> +	if (tc_skip_sw(flags) && tc_in_hw(flags))
+> +		return;
+> +	tp->usesw = true;
+> +}
+
+It looks like 'usesw' is never cleared. Can't user-space change the
+skipsw flag for an existing tp?
+
+[...]
+> diff --git a/net/sched/cls_u32.c b/net/sched/cls_u32.c
+> index d3a03c57545b..5e8f191fd820 100644
+> --- a/net/sched/cls_u32.c
+> +++ b/net/sched/cls_u32.c
+> @@ -1164,6 +1164,8 @@ static int u32_change(struct net *net, struct sk_buff *in_skb,
+>  		if (!tc_in_hw(n->flags))
+>  			n->flags |= TCA_CLS_FLAGS_NOT_IN_HW;
+>  
+> +		tcf_proto_update_usesw(tp, n->flags);
+
+Why don't you need to hook also in the 'key existing' branch on line 909?
+
+Thanks!
+
+Paolo
+
 
