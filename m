@@ -1,134 +1,120 @@
-Return-Path: <netdev+bounces-156790-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156791-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81825A07D66
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 17:25:26 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B989EA07D77
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 17:27:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 26897188AA96
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 16:25:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3D68F3A8449
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 16:27:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67548221D8E;
-	Thu,  9 Jan 2025 16:25:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="mv7JKCcr"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78D8F222564;
+	Thu,  9 Jan 2025 16:27:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0EC82206AE;
-	Thu,  9 Jan 2025 16:25:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED532221DB6
+	for <netdev@vger.kernel.org>; Thu,  9 Jan 2025 16:27:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736439922; cv=none; b=jtSUlZMNXuaEdDIXm/RWQ29mII3LpAzwtNHIpYCQcJVwrYEiRuFaokQoK3ADxkXpKfJw1bDBvXRAruZag/V84+pVZLllhUzbRH4UxP6kgfU/9oqlz7hPul+tPft7WjHZC2/3vRuizo2Q2mmykwOQCRzYDWr0rkBCeSMcn4jBr9E=
+	t=1736440049; cv=none; b=gA3ywy83YaVpbp1wM9xL1Zd0hlfMwQg1vF5uRoiCVB5X+6oZkiDVewlwN/VqklHne5JHDfwrQJAjNDR64LPI3hSQk7MExafLuCzzNCcz4LruYplEqr4MDInMQBtAAGtXd/WdL0HhHlpVSNJkz/iVqmQ0acuX58IB5t7Snux4G0I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736439922; c=relaxed/simple;
-	bh=l+rXxODw+VS9BSJrzGpfyM9tNsZ0dhwPA/7+8v0Fzs4=;
+	s=arc-20240116; t=1736440049; c=relaxed/simple;
+	bh=LGrMbpGbumR9Cyu0T/UXw/+NPRwpsavIvCI8lKtgS+s=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NpVTMC+bSh+Eor3LS1SjXV8/3cBTxCoJL+7Hc5T4y/giJqsupIskiMBmKxb9kfDoVZ8lxtmMsAIMoLiAfwUfb8SM71sv5vAEwgpRBD0vmvPiGscFV8WBMgOd019gr2WUZQqybp+EtCD8vvPOvjBvT3Xkqhh+rJZWRrQuQ/qSNdI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=mv7JKCcr; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=TTXini+czMs1unGWfy+9RDBWtdxNH7Ox1uD++fpTx/0=; b=mv7JKCcr1Vdbzmm78Cb8yDIma2
-	KvWR974hzYEBNpvuEPDgEKZPrL4Y28RUqK0390pXSfABbnf8X0Q501h5s9MAW6asQgLZdd0jPB8gk
-	/ndpidG2eAMuZX2FV2ktO5JdhBglJmtuTui7VkmSIhLXTO7iVf4uzoW8asKW9YIfxiK4=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tVvL9-002wx8-Ey; Thu, 09 Jan 2025 17:24:59 +0100
-Date: Thu, 9 Jan 2025 17:24:59 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Basharath Hussain Khaja <basharath@couthit.com>
-Cc: danishanwar@ti.com, rogerq@kernel.org, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org,
-	conor+dt@kernel.org, nm@ti.com, ssantosh@kernel.org,
-	tony@atomide.com, richardcochran@gmail.com, parvathi@couthit.com,
-	schnelle@linux.ibm.com, rdunlap@infradead.org,
-	diogo.ivo@siemens.com, m-karicheri2@ti.com, horms@kernel.org,
-	jacob.e.keller@intel.com, m-malladi@ti.com,
-	javier.carrasco.cruz@gmail.com, afd@ti.com, s-anna@ti.com,
-	linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-omap@vger.kernel.org, pratheesh@ti.com, prajith@ti.com,
-	vigneshr@ti.com, praneeth@ti.com, srk@ti.com, rogerq@ti.com,
-	krishna@couthit.com, pmohan@couthit.com, mohan@couthit.com
-Subject: Re: [RFC PATCH 04/10] net: ti: prueth: Adds link detection, RX and
- TX support.
-Message-ID: <fce8d698-2ae2-460c-a288-3d70d61dbf9e@lunn.ch>
-References: <20250109105600.41297-1-basharath@couthit.com>
- <20250109105600.41297-5-basharath@couthit.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=bKtRwEcQEnIjI1hRP3fGf2XRrQud9sWihSDHf4GPMmlXiC47SWpufH+MXXA6Yf0XGHZnWsUgc931O4uqGak4BzS22lchumlXLpVPH60nI13x+Ad4gaVwM2cBTd0yhlzDZhildkxHX+nhTc/ggCa0DaB4cQyq8qEpVdCXlmwXOdQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1tVvNF-0007jf-4e; Thu, 09 Jan 2025 17:27:09 +0100
+Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1tVvN9-0000oo-1S;
+	Thu, 09 Jan 2025 17:27:03 +0100
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1tVvN9-0001L1-14;
+	Thu, 09 Jan 2025 17:27:03 +0100
+Date: Thu, 9 Jan 2025 17:27:03 +0100
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Liam Girdwood <lgirdwood@gmail.com>,
+	Mark Brown <broonie@kernel.org>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	linux-doc@vger.kernel.org, Kyle Swenson <kyle.swenson@est.tech>,
+	Dent Project <dentproject@linuxfoundation.org>,
+	kernel@pengutronix.de,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>
+Subject: Re: [PATCH net-next v2 11/15] net: pse-pd: Add support for PSE
+ device index
+Message-ID: <Z3_415FoqTn_sV87@pengutronix.de>
+References: <20250109-b4-feature_poe_arrange-v2-0-55ded947b510@bootlin.com>
+ <20250109-b4-feature_poe_arrange-v2-11-55ded947b510@bootlin.com>
+ <20250109075926.52a699de@kernel.org>
+ <20250109170957.1a4bad9c@kmaincent-XPS-13-7390>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20250109105600.41297-5-basharath@couthit.com>
+In-Reply-To: <20250109170957.1a4bad9c@kmaincent-XPS-13-7390>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-> +/* update phy/port status information for firmware */
-> +static void icssm_emac_update_phystatus(struct prueth_emac *emac)
-> +{
-> +	struct prueth *prueth = emac->prueth;
-> +	u32 phy_speed, port_status = 0;
-> +	enum prueth_mem region;
-> +	u32 delay;
-> +
-> +	region = emac->dram;
-> +	phy_speed = emac->speed;
-> +	icssm_prueth_write_reg(prueth, region, PHY_SPEED_OFFSET, phy_speed);
-> +
-> +	if (phy_speed == SPEED_10)
-> +		delay = TX_CLK_DELAY_10M;
+On Thu, Jan 09, 2025 at 05:09:57PM +0100, Kory Maincent wrote:
+> On Thu, 9 Jan 2025 07:59:26 -0800
+> Jakub Kicinski <kuba@kernel.org> wrote:
+> 
+> > On Thu, 09 Jan 2025 11:18:05 +0100 Kory Maincent wrote:
+> > > From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
+> > > 
+> > > Add support for a PSE device index to report the PSE controller index to
+> > > the user through ethtool. This will be useful for future support of power
+> > > domains and port priority management.  
+> > 
+> > This index is not used in the series, I see later on you'll add power
+> > evaluation strategy but that also seems to be within a domain not
+> > device?
+> > 
+> > Doesn't it make sense to move patches 11-14 to the next series?
+> > The other 11 patches seem to my untrained eye to reshuffle existing
+> > stuff, so they would make sense as a cohesive series.
+> 
+> Indeed PSE index is used only as user information but there is nothing
+> correlated. You are right maybe we can add PSE index when we have something
+> usable for it.
 
-How can speed to 10? You removed those link modes?
+No user, means, it is not exposed to the user space, it is not about
+actual user space users.
 
-> +/**
-> + * icssm_emac_ndo_start_xmit - EMAC Transmit function
-> + * @skb: SKB pointer
-> + * @ndev: EMAC network adapter
-> + *
-> + * Called by the system to transmit a packet  - we queue the packet in
-> + * EMAC hardware transmit queue
-> + *
-> + * Return: success(NETDEV_TX_OK) or error code (typically out of desc's)
-> + */
-> +static int icssm_emac_ndo_start_xmit(struct sk_buff *skb,
-> +				     struct net_device *ndev)
-> +{
-> +	struct prueth_emac *emac = netdev_priv(ndev);
-> +	int ret = 0;
-> +	u16 qid;
-> +
-> +	if (unlikely(!emac->link)) {
-> +		if (netif_msg_tx_err(emac) && net_ratelimit())
-> +			netdev_err(ndev, "No link to transmit");
-> +		goto fail_tx;
-> +	}
-
-Do many other MAC drivers have this test?
-
-> --- a/drivers/net/ethernet/ti/icssm/icssm_prueth.h
-> +++ b/drivers/net/ethernet/ti/icssm/icssm_prueth.h
-> @@ -17,6 +17,11 @@
->  
->  /* PRUSS local memory map */
->  #define ICSS_LOCAL_SHARED_RAM	0x00010000
-> +#define EMAC_MAX_PKTLEN		(ETH_HLEN + VLAN_HLEN + ETH_DATA_LEN)
-> +/* Below macro is for 1528 Byte Frame support, to Allow even with
-> + * Redundancy tag
-> + */
-> +#define EMAC_MAX_FRM_SUPPORT (ETH_HLEN + VLAN_HLEN + ETH_DATA_LEN + 6)
-
-This looks familiar....
-
-	Andrew
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
