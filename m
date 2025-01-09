@@ -1,126 +1,120 @@
-Return-Path: <netdev+bounces-156843-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156844-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5030A07FDE
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 19:36:54 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 77A3AA07FE7
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 19:38:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0A39A3A315A
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 18:36:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3CAC3188BB21
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 18:38:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 498AF1A0712;
-	Thu,  9 Jan 2025 18:36:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b="vOA3lc0A"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D88DB199E80;
+	Thu,  9 Jan 2025 18:37:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp1.cs.Stanford.EDU (smtp1.cs.stanford.edu [171.64.64.25])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A157B199239
-	for <netdev@vger.kernel.org>; Thu,  9 Jan 2025 18:36:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=171.64.64.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 216F513B2B8;
+	Thu,  9 Jan 2025 18:37:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736447802; cv=none; b=ioq+Zp0OR6PlTfG0SYQL6l0AAXE8odHyaqYgFjphT3SBfLSkYy5H33Y7L33CMmCzKRq49KuKhz8xq9zrYQF1a5pq5ROtL3YV8U0ofOjGxSXnZSYjCwt6mJyEZC5kTp2Ta9s+vYA5BZGydCUmvza7PoZs+tqq09R/W2KALN38mTo=
+	t=1736447877; cv=none; b=ShKo/wuX1/ZaEtt4wCiwCAWs5N8a02hdzbky0u118ybQ7zWSyvFe+tGXs+jt4xjEs7sTsNFOPzzALND87hbZ5Jfh3YOOl8ERgxgs3s7pDn+oqM0UdiYdiP1dLNk2gk9OyE2nOnKPbpWElyJn6dRYiJsefpxKrNot/qjLHuEvxp0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736447802; c=relaxed/simple;
-	bh=iZOss7/NTcXa+D2geSTjVGOqGhyQFaYymVnt/4HeFB8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mHV5PrUTyAxZc+gPo+xEBf5MENxnfE4skyPWai31sJd4+yu0wj4Z+chzBTzjXURpyN+AymLvqUzqeYDSzfyX5ujHvOhZAgp4tBSIroSWFlYpyV/1lWfpKhwvs+jlunQuofChl5UgOsBdQliK5hBn/x4zxnsbpBkhh7DClYEzYpQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu; spf=pass smtp.mailfrom=cs.stanford.edu; dkim=pass (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b=vOA3lc0A; arc=none smtp.client-ip=171.64.64.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cs.stanford.edu
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=cs.stanford.edu; s=cs2308; h=Content-Transfer-Encoding:Content-Type:Cc:To:
-	Subject:Message-ID:Date:From:In-Reply-To:References:MIME-Version:Sender:
-	Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender
-	:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=QPexWF+1NsuV7DrMamikN7hh/U78Vtr5LmjQRD4ZoLM=; t=1736447800; x=1737311800; 
-	b=vOA3lc0Au9pBo8YR/GeyPoyhWwCUUCibZF9J4WgjWJyz38D/5OWxZOOSETDzxHa/LsTPFwJMXB/
-	891uAK9yOgsUw5GqGHCK8PPJLTQ2qDJISy0lqDnDIMStBJC1TyXaVbl3cb39m7DQNa6PdwBahH2ru
-	ETnNRzB7ITowJIRfVgMtWDUxQwyug+//RG0JwA3LXGiKdG1RhcZaCn6CvKWhuL9d70U6j2CiSfqV9
-	XmZ9mV9moTAPDGszneXQCaSauPHDzGcaHV+ryUvaudxJfeu5E6L+cCvYYEczxioirxgl8/JTRL1BL
-	ac8ljHqT9ri0zmjfyT+MZrQaLR6H/jnD9wtQ==;
-Received: from mail-oa1-f45.google.com ([209.85.160.45]:56468)
-	by smtp1.cs.Stanford.EDU with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.94.2)
-	(envelope-from <ouster@cs.stanford.edu>)
-	id 1tVxOT-0005mR-6N
-	for netdev@vger.kernel.org; Thu, 09 Jan 2025 10:36:34 -0800
-Received: by mail-oa1-f45.google.com with SMTP id 586e51a60fabf-29fc424237bso753485fac.0
-        for <netdev@vger.kernel.org>; Thu, 09 Jan 2025 10:36:33 -0800 (PST)
-X-Gm-Message-State: AOJu0YzgBJoovVh7ku85qeqgOIlrdLIYyPEHgLMdIlAPFyTD2Y8l+0qP
-	Jd4GFcKfZwPSmDV9ICwkV6jx3PXZnzl68/TDIHeVYO18PxHVwZKrAtqpSfPFNg/Opx2AD3M3nJo
-	4Sq5+0wH3OSShM9wRUXe4yThauHg=
-X-Google-Smtp-Source: AGHT+IEtbdPFxBu4R6eY+vUpofCqGuJ42HYouejwL7kMiWac6POy1vxYJ5PgFGdqqhk2oplHhVdBkclKrV8A+1czxuo=
-X-Received: by 2002:a05:6871:2283:b0:2a7:d345:c0bb with SMTP id
- 586e51a60fabf-2aa069763f5mr4701463fac.27.1736447792628; Thu, 09 Jan 2025
- 10:36:32 -0800 (PST)
+	s=arc-20240116; t=1736447877; c=relaxed/simple;
+	bh=jDKZZHjwM0ZVYhG0quFjVJNsgX1hy4Gswz2TQbrNtKY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=Pr7tomdrulSIFR80PO+hzEcWHDvUY13pJ47KCUD1J9wBhhlj5Eci4DRWDRx4FVZ6WWiARZpuWyUh3CHQpUCQTmo87tOJM9JHnNkGlw1ASnD8sjP2hxYciyL69xE4Eop2cqkT2AwU/raF+5sofgdTMeeXknhjjvIvby3ocSCTCyA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
+Received: from [192.168.2.102] (213.87.139.224) by msexch01.omp.ru
+ (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Thu, 9 Jan
+ 2025 21:37:34 +0300
+Message-ID: <678cb572-0320-4cd2-9628-06dadebefbc1@omp.ru>
+Date: Thu, 9 Jan 2025 21:37:33 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250106181219.1075-1-ouster@cs.stanford.edu> <20250106181219.1075-8-ouster@cs.stanford.edu>
- <20250108145641.GA21926@j66a10360.sqa.eu95>
-In-Reply-To: <20250108145641.GA21926@j66a10360.sqa.eu95>
-From: John Ousterhout <ouster@cs.stanford.edu>
-Date: Thu, 9 Jan 2025 10:35:56 -0800
-X-Gmail-Original-Message-ID: <CAGXJAmxstm21n50hjim3hLHrt0eKOGit2nfBfhgU-DvnyL7caQ@mail.gmail.com>
-X-Gm-Features: AbW1kvZEHe81SpDyQz3Z904r9D4AcQ76_BkjtRg0ECpc545ZYToHhfLcFUPtuKE
-Message-ID: <CAGXJAmxstm21n50hjim3hLHrt0eKOGit2nfBfhgU-DvnyL7caQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v5 07/12] net: homa: create homa_sock.h and homa_sock.c
-To: "D. Wythe" <alibuda@linux.alibaba.com>
-Cc: netdev@vger.kernel.org, pabeni@redhat.com, edumazet@google.com, 
-	horms@kernel.org, kuba@kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [net PATCH] net: ravb: Fix max TX frame size for RZ/V2M
+To: Paul Barker <paul.barker.ct@bp.renesas.com>,
+	=?UTF-8?Q?Niklas_S=C3=B6derlund?= <niklas.soderlund@ragnatech.se>, Andrew
+ Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
+CC: Simon Horman <horms@kernel.org>, <netdev@vger.kernel.org>,
+	<linux-renesas-soc@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+References: <20250109113706.1409149-1-paul.barker.ct@bp.renesas.com>
+Content-Language: en-US
+From: Sergey Shtylyov <s.shtylyov@omp.ru>
+Organization: Open Mobile Platform
+In-Reply-To: <20250109113706.1409149-1-paul.barker.ct@bp.renesas.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Score: -1.0
-X-Spam-Level: 
-X-Scan-Signature: dcedbbeaec314583a5a6d4e37e27e533
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.1.1, Database issued on: 01/09/2025 18:26:10
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 19
+X-KSE-AntiSpam-Info: Lua profiles 190244 [Jan 09 2025]
+X-KSE-AntiSpam-Info: Version: 6.1.1.7
+X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 49 0.3.49
+ 28b3b64a43732373258a371bd1554adb2caa23cb
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 213.87.139.224 in (user)
+ b.barracudacentral.org}
+X-KSE-AntiSpam-Info:
+	omp.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2
+X-KSE-AntiSpam-Info: FromAlignment: s
+X-KSE-AntiSpam-Info: ApMailHostAddress: 213.87.139.224
+X-KSE-AntiSpam-Info: {DNS response errors}
+X-KSE-AntiSpam-Info: Rate: 19
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 01/09/2025 18:28:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 1/9/2025 4:56:00 PM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-On Wed, Jan 8, 2025 at 6:56=E2=80=AFAM D. Wythe <alibuda@linux.alibaba.com>=
- wrote:
->
-> > +int homa_sock_init(struct homa_sock *hsk, struct homa *homa)
-> > +{
-> > +     struct homa_socktab *socktab =3D homa->port_map;
-> > +     int result =3D 0;
-> > +     int i;
-> > +
-> > +     spin_lock_bh(&socktab->write_lock);
-> > +     atomic_set(&hsk->protect_count, 0);
-> > +     spin_lock_init(&hsk->lock);
-> > +     hsk->last_locker =3D "none";
-> > +     atomic_set(&hsk->protect_count, 0);
-> > +     hsk->homa =3D homa;
-> > +     hsk->ip_header_length =3D (hsk->inet.sk.sk_family =3D=3D AF_INET)
-> > +                     ? HOMA_IPV4_HEADER_LENGTH : HOMA_IPV6_HEADER_LENG=
-TH;
-> > +     hsk->shutdown =3D false;
-> > +     while (1) {
-> > +             if (homa->next_client_port < HOMA_MIN_DEFAULT_PORT)
-> > +                     homa->next_client_port =3D HOMA_MIN_DEFAULT_PORT;
-> > +             if (!homa_sock_find(socktab, homa->next_client_port))
-> > +                     break;
-> > +             homa->next_client_port++;
->
-> It seems there might be a possibility of an infinite loop if all the
-> ports are in use.
+On 1/9/25 2:37 PM, Paul Barker wrote:
 
-Oops, you're right. I have fixed this to detect "all ports in use".
+> When tx_max_frame_size was added to struct ravb_hw_info, no value was
+> set in ravb_rzv2m_hw_info so the default value of zero was used.
+> 
+> The maximum MTU is set by subtracting from tx_max_frame_size to allow
+> space for headers and frame checksums. As ndev->max_mtu is unsigned,
+> this subtraction wraps around leading to a ridiculously large positive
+> value that is obviously incorrect.
+> 
+> Before tx_max_frame_size was introduced, the maximum MTU was based on
+> rx_max_frame_size. So, we can restore the correct maximum MTU by copying
+> the rx_max_frame_size value into tx_max_frame_size for RZ/V2M.
 
-> > +     hsk->buffer_pool =3D kzalloc(sizeof(*hsk->buffer_pool), GFP_KERNE=
-L);
->
-> using GFP_ATOMIC. I noticed that Homa frequently uses GFP_KERNEL with BH =
-disabled.
-> Please fix it all.
+   Seems to be reviewers' fault as well?
 
-Done. Thanks for the comments.
+> Fixes: 1d63864299ca ("net: ravb: Fix maximum TX frame size for GbEth devices")
+> Signed-off-by: Paul Barker <paul.barker.ct@bp.renesas.com>
 
--John-
+Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
+
+MBR, Sergey
+
 
