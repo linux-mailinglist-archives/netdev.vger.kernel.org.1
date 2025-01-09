@@ -1,93 +1,219 @@
-Return-Path: <netdev+bounces-156703-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156704-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E089A078B9
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 15:11:55 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF7AEA078D3
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 15:13:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F1D3C1882AE9
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 14:11:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D5DC91636A2
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 14:13:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EBB6218EBF;
-	Thu,  9 Jan 2025 14:11:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8305219EB6;
+	Thu,  9 Jan 2025 14:13:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="vKnDRRcF"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IiSBNNlb"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f42.google.com (mail-qv1-f42.google.com [209.85.219.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEFF921764D;
-	Thu,  9 Jan 2025 14:11:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31F27217658;
+	Thu,  9 Jan 2025 14:13:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736431913; cv=none; b=ef+XEx0ADicpWptIZW+ZHOeLGcKRAivJwQICevxOayUE9AQDl3jHIBGCx9j3NmohuK4xAA5PulL0mM9mOau5jgERYmPtI9mGOQWUU7QuvNNj+g5+TItbB3reGqfTu2IqDwR0C0yl/iXGZgJ5giklv++m0qDCeWF2sAzEkeDmPJA=
+	t=1736432017; cv=none; b=JfeA05p4RQ4XQ5+oq4d24RyuCGS19SQKqa5uhFteUHN4qw7I4DV43egdAU1LT7FytDJLJUYU6QNUTPO3dA89EHhD34hS8edt+JiZPauf8rK+BExMZm9FA3Io9ayfmx2TIf72Gf0C0D/6lLFRANyE6pHrueYXVs9hjjgAZvLCbrI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736431913; c=relaxed/simple;
-	bh=/oLYBdeqAYZ93lQ4dBkYr/2nv+qCGKWjw4hYhSEUm+A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FRw0sT2k1t6qyH9rz93od0gK2Vxc1wNSaakHqoxxXAqKHZYrvkaLpr1aCEItCndg52YQ/1ya21lGRi2huWuwHcCvNbjELLrolQoUDf9k8+0Owjc6vmWIoKTll+mRNm0qCXV7XB3GbHapwU3KVZc9qqUJSyMnqpP09UEr0h0Lopk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=vKnDRRcF; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=vNh7DueZ0ROhGXSoVao0r4XYvV32aPWQzqAogsGA9pE=; b=vKnDRRcF0Gff8rhBV3+joaGp0z
-	QB/FUdZLbjzRvbvftL0QBE9Jed2l6xIG4FfwIpMGgxT0s0ux9rgALc94CQDJhXzJt+ZjgF0VuAI8k
-	QUBxaqp2Q72CTK3UXbTpS56Xut3Jy2W9sUADpgrbMJm0TenBa2Z0nXgwLnuyshETkN1I=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tVtG1-002uSH-NK; Thu, 09 Jan 2025 15:11:33 +0100
-Date: Thu, 9 Jan 2025 15:11:33 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Basharath Hussain Khaja <basharath@couthit.com>
-Cc: danishanwar@ti.com, rogerq@kernel.org, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org,
-	conor+dt@kernel.org, nm@ti.com, ssantosh@kernel.org,
-	tony@atomide.com, richardcochran@gmail.com, parvathi@couthit.com,
-	schnelle@linux.ibm.com, rdunlap@infradead.org,
-	diogo.ivo@siemens.com, m-karicheri2@ti.com, horms@kernel.org,
-	jacob.e.keller@intel.com, m-malladi@ti.com,
-	javier.carrasco.cruz@gmail.com, afd@ti.com, s-anna@ti.com,
-	linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-omap@vger.kernel.org, pratheesh@ti.com, prajith@ti.com,
-	vigneshr@ti.com, praneeth@ti.com, srk@ti.com, rogerq@ti.com,
-	krishna@couthit.com, pmohan@couthit.com, mohan@couthit.com
-Subject: Re: [RFC PATCH 00/10] PRU-ICSSM Ethernet Driver
-Message-ID: <2e82fb20-c6f9-4cc3-a700-fce049295f58@lunn.ch>
-References: <20250109105600.41297-1-basharath@couthit.com>
+	s=arc-20240116; t=1736432017; c=relaxed/simple;
+	bh=zyy3moZDkbBG+czu1d7X5YD5pi5vZzi9VgokJOCwylk=;
+	h=Date:From:To:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=Xj2FeSqkUS9dTn6uP1D8jxAm1NDWOIfjyoi7mHp+p5BYtRImK5wkgdVsyaIepTyEyIXSONjpYPUdrOLfVBHZZm7+iwEnVdEhFNYeOZbU/OuBe8RW53WDGIQF7uraOf1Bu1Ujoc7HJmTUs0EXMh8/cfB9Ei9R9aKV8PfHGE674hU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IiSBNNlb; arc=none smtp.client-ip=209.85.219.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f42.google.com with SMTP id 6a1803df08f44-6d92cd1e811so16470446d6.1;
+        Thu, 09 Jan 2025 06:13:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1736432015; x=1737036815; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vBEhWD1K9TGnwPZW+7/5J69P4pRtuGWs9a6RJnwPAas=;
+        b=IiSBNNlbDMaxrQ5GfGfaBYxWhlYMYPFbZroXTqdt2pXhif7h+vW8yvZQZtpiUFujwc
+         VBXI7kNHVTPK59gpssxAtaf0an+yKGmhn0YcpbC5V1mF0qjcTJRi+sWHqZUmECUSOK39
+         0HG/5zwOsDw375R/q9cHG6GCfqSSNHeOz46jVLRz4doMa7hlrNi5yHIvZ59zhgvxTTZ6
+         3TZYSGOOUjWyEbmGJUwm2paXWdar1obip+tWzNqd0GNQq3bSSFpOtD90gsuG1nZrzyvp
+         OXvdOgOUFVWicMLw0YxpDZDj+OEnh6+odGx3SD/Ji8I5jDRX4AyRaCtp98c12qujvJBU
+         ZKeQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736432015; x=1737036815;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=vBEhWD1K9TGnwPZW+7/5J69P4pRtuGWs9a6RJnwPAas=;
+        b=uZILmL+fV2xuN+nJeKSqwijAcKhwPWIBiEMvk15voB/itut+IjNZ7fu2P0J1FgHE24
+         1dX/rzTxinkkp+22I95Am3WCJGRTzSoDcSOv+VxEIwiDhYXv1HfN66opYjCvb/n+OxII
+         WjBj1VSTr+Qx8G6TiJUyd+DWlgdoDwCr9jTSRhoSWmJbx1rqHoQH9XTas7OvdkmNfE3n
+         mHrgr9kOuxyb14XKBvy5JRyYrqw3sB9QcNtsnUVET0r5RI80Ll//WPqhOXuc+nI1AdQ/
+         BLDRMwIj1/NJUJg3Qn0lGU5d5ucKA+jvKWk02BXYayuonH31IyDTkCrVmo/J5mHHUAqu
+         Y3HA==
+X-Forwarded-Encrypted: i=1; AJvYcCV+SrpUtFPrTF4YAfgXP4lWDFTSLGY+7xam9v/8UUZ0yRG+WKuulRBtC7hiFNopq99pdD8atd3Oj9MI@vger.kernel.org, AJvYcCVTyaQOaoaI2hNpKAgUvX7T9ngwC11oalzW2Su/Z5rKuc0jNupt+w3SvQRGVm/9Df5L7iIs30Oy/++/ZpL6@vger.kernel.org, AJvYcCVyZ69HTXgPYLaQdNEOoQ65G+Qs3yJLFyd0YCBPJ45XEnkKFkI9+ydfqjAa9zWX5QLXjXp2+AuL5huuLUK2TK8D@vger.kernel.org, AJvYcCVzQqwtUMnl+oOGsQsDMFnLnhFbHbEzzaxSASjnulqvwEPYQMxoEv5iubxeugrh1JgHke6DOn1W@vger.kernel.org, AJvYcCXzeRus+F6fSZeHD7OwnIqjPxG4MKZOwNAXE/EuCmVXb35gHelc3iZN/lWp0smiKhUtdIs=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxq+7BhxVZscWnF9zelcjwoUtc99W8UtLZAA5/9DQoJC5BJ/n5p
+	GI7+X+m0BhWT2V4pWomT7X0hpjwGuNAxxJPdI/KRexDnLqmrmdPI
+X-Gm-Gg: ASbGncvtwS/2mWZLPrnBBHJtlGuSFsiiIaruHjC3lSMdwVRzE+J1J9qgijiiaT68ECw
+	bgG0VVFuQKkQjacvuohreyKoM63vWWXkyrHFdEzCtn4QtFHUMkX+EROlLsfzFOzmCKqTNv//ZA8
+	VqhAmKBLXzoqU17rLkVhgYk3d9AOiRFeYsYp1cMpXorOrCByEr5Dym6dF8/y81PzkUToe5ZXMjF
+	Q31YCcMH+Vk42O1/nwHxjRFL+nyRHK2TxLJmwJFNY6wEqt+n7KdNVdW4pzz5hUdKpLoCIWwt5yk
+	+GNv8a8fCvRlxr5sIGg0C4E+nOMo
+X-Google-Smtp-Source: AGHT+IHIdNIzp5p1G8XahHluwZvKPdRIT1LWx03OX6jYqP63ZJjh8hSiwgfOtm/xBp8p/l0BBmw0eA==
+X-Received: by 2002:ad4:5964:0:b0:6d8:94f4:d2a8 with SMTP id 6a1803df08f44-6dfa3a77ca6mr51443876d6.9.1736432015072;
+        Thu, 09 Jan 2025 06:13:35 -0800 (PST)
+Received: from localhost (15.60.86.34.bc.googleusercontent.com. [34.86.60.15])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6dd32b2be9esm179389276d6.34.2025.01.09.06.13.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 Jan 2025 06:13:34 -0800 (PST)
+Date: Thu, 09 Jan 2025 09:13:33 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Akihiko Odaki <akihiko.odaki@daynix.com>, 
+ Jonathan Corbet <corbet@lwn.net>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ Jason Wang <jasowang@redhat.com>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ "Michael S. Tsirkin" <mst@redhat.com>, 
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+ Shuah Khan <shuah@kernel.org>, 
+ linux-doc@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ netdev@vger.kernel.org, 
+ kvm@vger.kernel.org, 
+ virtualization@lists.linux-foundation.org, 
+ linux-kselftest@vger.kernel.org, 
+ Yuri Benditovich <yuri.benditovich@daynix.com>, 
+ Andrew Melnychenko <andrew@daynix.com>, 
+ Stephen Hemminger <stephen@networkplumber.org>, 
+ gur.stavi@huawei.com, 
+ Akihiko Odaki <akihiko.odaki@daynix.com>
+Message-ID: <677fd98d89df1_362bc12942f@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20250109-rss-v6-1-b1c90ad708f6@daynix.com>
+References: <20250109-rss-v6-0-b1c90ad708f6@daynix.com>
+ <20250109-rss-v6-1-b1c90ad708f6@daynix.com>
+Subject: Re: [PATCH v6 1/6] virtio_net: Add functions for hashing
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250109105600.41297-1-basharath@couthit.com>
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Jan 09, 2025 at 04:25:50PM +0530, Basharath Hussain Khaja wrote:
-> Hi,
-> 
-> The Programmable Real-Time Unit Industrial Communication Sub-system (PRU-ICSS)
-> is available on the TI SOCs in two flavors: Gigabit ICSS (ICSSG) and the older
-> Megabit ICSS (ICSSM).
-> 
-> Support for ICSSG Dual-EMAC mode has already been mainlined [1] and the
-> fundamental components/drivers such as PRUSS driver, Remoteproc driver,
-> PRU-ICSS INTC, and PRU-ICSS IEP drivers are already available in the mainline
-> Linux kernel. The current RFC patch series builds on top of these components
-> and introduces changes to support the Dual-EMAC mode on ICSSM, especially on
-> the TI AM57xx devices.
+Akihiko Odaki wrote:
+> They are useful to implement VIRTIO_NET_F_RSS and
+> VIRTIO_NET_F_HASH_REPORT.
+
+Toeplitz potentially has users beyond virtio. I wonder if we should
+from the start implement this as net/core/rss.c.
+
  
-I guess this version also has the horrible architecture of multiple
-firmware's you need to swap between at runtime?
+> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
+> ---
+>  include/linux/virtio_net.h | 188 +++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 188 insertions(+)
+> 
+> diff --git a/include/linux/virtio_net.h b/include/linux/virtio_net.h
+> index 02a9f4dc594d..3b25ca75710b 100644
+> --- a/include/linux/virtio_net.h
+> +++ b/include/linux/virtio_net.h
+> @@ -9,6 +9,194 @@
+>  #include <uapi/linux/tcp.h>
+>  #include <uapi/linux/virtio_net.h>
+>  
+> +struct virtio_net_hash {
+> +	u32 value;
+> +	u16 report;
+> +};
+> +
+> +struct virtio_net_toeplitz_state {
+> +	u32 hash;
+> +	const u32 *key;
+> +};
+> +
+> +#define VIRTIO_NET_SUPPORTED_HASH_TYPES (VIRTIO_NET_RSS_HASH_TYPE_IPv4 | \
+> +					 VIRTIO_NET_RSS_HASH_TYPE_TCPv4 | \
+> +					 VIRTIO_NET_RSS_HASH_TYPE_UDPv4 | \
+> +					 VIRTIO_NET_RSS_HASH_TYPE_IPv6 | \
+> +					 VIRTIO_NET_RSS_HASH_TYPE_TCPv6 | \
+> +					 VIRTIO_NET_RSS_HASH_TYPE_UDPv6)
+> +
+> +#define VIRTIO_NET_RSS_MAX_KEY_SIZE 40
+> +
+> +static inline void virtio_net_toeplitz_convert_key(u32 *input, size_t len)
+> +{
+> +	while (len >= sizeof(*input)) {
+> +		*input = be32_to_cpu((__force __be32)*input);
+> +		input++;
+> +		len -= sizeof(*input);
+> +	}
+> +}
+> +
+> +static inline void virtio_net_toeplitz_calc(struct virtio_net_toeplitz_state *state,
+> +					    const __be32 *input, size_t len)
+> +{
+> +	while (len >= sizeof(*input)) {
+> +		for (u32 map = be32_to_cpu(*input); map; map &= (map - 1)) {
+> +			u32 i = ffs(map);
+> +
+> +			state->hash ^= state->key[0] << (32 - i) |
+> +				       (u32)((u64)state->key[1] >> i);
+> +		}
+> +
+> +		state->key++;
+> +		input++;
+> +		len -= sizeof(*input);
+> +	}
+> +}
 
-	Andrew
+Have you verified that this algorithm matches a known toeplitz
+implementation. And computes the expected values for the test
+inputs in
+
+https://learn.microsoft.com/en-us/windows-hardware/drivers/network/verifying-the-rss-hash-calculation
+
+We have a toeplitz implementation in
+tools/testing/selftests/net/toeplitz.c that can also be used as
+reference.
+
+> +
+> +static inline u8 virtio_net_hash_key_length(u32 types)
+> +{
+> +	size_t len = 0;
+> +
+> +	if (types & VIRTIO_NET_HASH_REPORT_IPv4)
+> +		len = max(len,
+> +			  sizeof(struct flow_dissector_key_ipv4_addrs));
+> +
+> +	if (types &
+> +	    (VIRTIO_NET_HASH_REPORT_TCPv4 | VIRTIO_NET_HASH_REPORT_UDPv4))
+> +		len = max(len,
+> +			  sizeof(struct flow_dissector_key_ipv4_addrs) +
+> +			  sizeof(struct flow_dissector_key_ports));
+> +
+> +	if (types & VIRTIO_NET_HASH_REPORT_IPv6)
+> +		len = max(len,
+> +			  sizeof(struct flow_dissector_key_ipv6_addrs));
+> +
+> +	if (types &
+> +	    (VIRTIO_NET_HASH_REPORT_TCPv6 | VIRTIO_NET_HASH_REPORT_UDPv6))
+> +		len = max(len,
+> +			  sizeof(struct flow_dissector_key_ipv6_addrs) +
+> +			  sizeof(struct flow_dissector_key_ports));
+> +
+> +	return len + 4;
+
+Avoid magic constants. Please use sizeof or something else to signal
+what this 4 derives from.
 
