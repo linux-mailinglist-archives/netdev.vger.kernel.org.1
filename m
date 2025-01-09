@@ -1,126 +1,151 @@
-Return-Path: <netdev+bounces-156726-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156727-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C167CA079D6
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 15:56:43 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 238C1A079FD
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 16:00:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 03A403A7BBF
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 14:56:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 95CB9188290D
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 15:00:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EF1B2185AC;
-	Thu,  9 Jan 2025 14:56:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C71921C190;
+	Thu,  9 Jan 2025 15:00:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RqAjn7NS"
+	dkim=pass (1024-bit key) header.d=blackhole.kfki.hu header.i=@blackhole.kfki.hu header.b="Aarefuv+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-out.kfki.hu (smtp-out.kfki.hu [148.6.0.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90E6A21764D
-	for <netdev@vger.kernel.org>; Thu,  9 Jan 2025 14:56:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C45B721C173;
+	Thu,  9 Jan 2025 15:00:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.6.0.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736434599; cv=none; b=EW5rfAnIpyNefvqJbfSfuiazrkO8TpacOpwwlfHlzp/vwtljcnP6OvNZ+kYiQrH6ouVLbqXxcu4pZh4PHfd0vjrQ8jFvXlIDHeLR8OC8oK/P2JIgt1ygceVblvZzjEefiaDcbJMzXhieZ3/xhOnt6Ovju0Oobusu/o+f6UnaCZc=
+	t=1736434808; cv=none; b=DjcOTWNHip6gdn/oqKOHQIG6w/u2xJ9VCdarK3kIoCZi/Izwk3rYQ/+AHk/fQHnnS50DAzL4iioPLVA/sIrA/c5dZKNmvvri3Jj9KyJk2T5NVQaLax0coEIDn/ZXufd/gfr6DrLOhOYUdVWJF07VkmHWkiAZXaLMDI6M/RMQBSY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736434599; c=relaxed/simple;
-	bh=Wq1W5SdbTAgcDnemQXNPaTquQUXKrrFh25MbfnwDdF0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=A3J6WjuvrQPDqmp4diPeH0UJbddmpYRufBpjcr/j6f7N/h2EqGxFklpTpSfg1LB5HTjbYsbaHeoH3UAuSddziD/4G5yqKdaJy15kLQAq6DhvtCpTEmhQ6JPmRChxdKQvBW3lMLmZ4DUQJa7WgzPUy+rhn0g0m0QvykGesz3Y6I0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=RqAjn7NS; arc=none smtp.client-ip=209.85.208.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-5d3d0205bd5so1374845a12.3
-        for <netdev@vger.kernel.org>; Thu, 09 Jan 2025 06:56:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1736434596; x=1737039396; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HsVA5zcRNLnUHNShAg5rbAgv0zI23W1c5lFBP96eoMQ=;
-        b=RqAjn7NS9guBu5mHD+6Av0ipiBri9/UDQJfSRXAbJ3hyCj+reGNW1YhGFBJG5Tqq94
-         7qCWlb08wh28nVDAqqiwgUdNUhleyPVfQELXU5llHmHYRzhTNpCHonGQpCMNNHxXrWjs
-         /jM1DoalPdhDdJzHIVPWx9D/qGJqRENRwqHDrA4fhCrW0QhhVmtX7vY9OIR0hWe2kk+T
-         M40STxAzGO0h1zHFCrnD69qWGUZ8K/5RrgVsClyLthzbaGwggKTFPng8AbJRFWINlUHm
-         K1iiyFhzsrpabIM4O6UA/f2R3upjXHFWhar7pbnoCG5gCOMVA96ONlzE6EE0b2Bprzgw
-         iZpg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736434596; x=1737039396;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=HsVA5zcRNLnUHNShAg5rbAgv0zI23W1c5lFBP96eoMQ=;
-        b=mkx93j8FrCZkLYrouJhrG6QGF+9nqy8VQhf8ZMckfWxD0mdHQ0PgiTwew/P9Slcz76
-         55DXLb7O4WHYKogPGe/eB6mR3hVvGVyRq/RaZsU7SMYnszKHo7WYDoza/pEUA32ClYUO
-         ZNiZ/zCrCtc76vUpRN8iYdvIVIiAKMIlQirVDXrhSg9qLOR5yH4PlWgYXkFi4ldK2lQ8
-         gbKFudyY73s/z3Jc5/kgop8FB85tQlijCqd8mZfOtuCsgtVevNeH2ccuFVugezRkY/0u
-         33n/lGHcS5UqdYJP8KgLBrHeFS4rO/ttEkIciUNKK2ZNW9ysDfHLq7McyYjfJDexBU9x
-         buEw==
-X-Forwarded-Encrypted: i=1; AJvYcCVz/7Cwk6shx36nukhw5vgbWQP7WIDBW1GZWdZSjAWFtQYEmnguhRyhpqvzeqh2OtZ6PYMkgkI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxEBvaXPBjW8SVNrEjQKw7Bm9XPb6bNVnvWxb0TJxORdVw6eavW
-	Vb1Mw2zqivhy0De4FQjo2W0X2qb5eYSmgnf0Id9SCNeuhFuOkcbJZjiuiu9VlfxBfM/Lljb2QCX
-	KIags4AX0paziwuKNW6sSNVM1PZhAd79PfE0jBJVDqSWPnwQ4fA==
-X-Gm-Gg: ASbGncvsxeodp80lEe8iWtjCHBEGHoBe87I6x6eS1AI71UPULjpbPi3PpKxuV9U+QyM
-	MicrgR3ofeul6N81knXPNoBgJ6azmfbE19ft0/w==
-X-Google-Smtp-Source: AGHT+IGFyAV7yc2JvyrclzC2Uys62am1FXdbTdw72OOQjGneO1VFYkCSEcMTBrBFhy3w4iSyWH0sl3YxQQRiOdKJP34=
-X-Received: by 2002:a05:6402:5251:b0:5d7:ea25:c72f with SMTP id
- 4fb4d7f45d1cf-5d972e4e6e8mr5724813a12.25.1736434595726; Thu, 09 Jan 2025
- 06:56:35 -0800 (PST)
+	s=arc-20240116; t=1736434808; c=relaxed/simple;
+	bh=qy0cOgKZMKaHBf1ZSyMrw8UzWrsa/7+5DNZN3D6ClxM=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=sKuOaXVnuqFqHoTcOsHYzEsxNg30cZQRv8MtnFebsoSNdveZUB38lwVN4tXkNTNLnMjyCUFK+wyO6m432XqolSqJfV14xMUv/fkylxzcMQ6ZjCGJuZKUcZBpy8Y87DifQZSnv53DHeFnN3laswXGVRJ55asiQTwuYNgrfUHB+Ns=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=blackhole.kfki.hu; spf=pass smtp.mailfrom=blackhole.kfki.hu; dkim=pass (1024-bit key) header.d=blackhole.kfki.hu header.i=@blackhole.kfki.hu header.b=Aarefuv+; arc=none smtp.client-ip=148.6.0.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=blackhole.kfki.hu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=blackhole.kfki.hu
+Received: from localhost (localhost [127.0.0.1])
+	by smtp1.kfki.hu (Postfix) with ESMTP id 7628D5C001C1;
+	Thu,  9 Jan 2025 16:00:02 +0100 (CET)
+Authentication-Results: smtp012.wigner.hu (amavis); dkim=pass (1024-bit key)
+ reason="pass (just generated, assumed good)" header.d=blackhole.kfki.hu
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	blackhole.kfki.hu; h=mime-version:references:message-id
+	:in-reply-to:from:from:date:date:received:received:received
+	:received; s=20151130; t=1736434800; x=1738249201; bh=N3i12alHig
+	CwPVvfmYnCbCQRAmnOP77N7AI8TyQW6ek=; b=Aarefuv+or2Ql8vk2pLn3U6PW/
+	fwSpnhZvbDnHSTVJVOVSTCaliF0riRYX4rnOI6yJOS+216WZStgOY3Ml2QmMknzV
+	40DudLPqQHWZ1Lb9ncPFXdPnai9nX35QWcu53uZ98Otm+o4+vimC0X9lZsuj0PLv
+	Lh1WhlNpnm+AqaFOc=
+X-Virus-Scanned: Debian amavis at smtp1.kfki.hu
+Received: from smtp1.kfki.hu ([127.0.0.1])
+ by localhost (smtp1.kfki.hu [127.0.0.1]) (amavis, port 10026) with ESMTP
+ id NV8O3dG5qeUU; Thu,  9 Jan 2025 16:00:00 +0100 (CET)
+Received: from blackhole.kfki.hu (blackhole.szhk.kfki.hu [IPv6:2001:738:5001:1::240:2])
+	by smtp1.kfki.hu (Postfix) with ESMTP id 1398E5C001D0;
+	Thu,  9 Jan 2025 15:59:59 +0100 (CET)
+Received: by blackhole.kfki.hu (Postfix, from userid 1000)
+	id E404C34316A; Thu,  9 Jan 2025 15:59:59 +0100 (CET)
+Received: from localhost (localhost [127.0.0.1])
+	by blackhole.kfki.hu (Postfix) with ESMTP id E21F9343169;
+	Thu,  9 Jan 2025 15:59:59 +0100 (CET)
+Date: Thu, 9 Jan 2025 15:59:59 +0100 (CET)
+From: Jozsef Kadlecsik <kadlec@blackhole.kfki.hu>
+To: =?ISO-8859-2?Q?Sz=F5ke_Benjamin?= <egyszeregy@freemail.hu>
+cc: Jozsef Kadlecsik <kadlec@netfilter.org>, Florian Westphal <fw@strlen.de>, 
+    Pablo Neira Ayuso <pablo@netfilter.org>, lorenzo@kernel.org, 
+    daniel@iogearbox.net, leitao@debian.org, amiculas@cisco.com, 
+    David Miller <davem@davemloft.net>, dsahern@kernel.org, 
+    edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
+    netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
+    linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH 01/10] netfilter: x_tables: Merge xt_DSCP.h to
+ xt_dscp.h
+In-Reply-To: <a42bcc51-255f-4c52-b95c-56e562946d3a@freemail.hu>
+Message-ID: <128620a6-a02e-db25-dd69-4ebee326d15c@blackhole.kfki.hu>
+References: <20250107024120.98288-1-egyszeregy@freemail.hu> <20250107024120.98288-2-egyszeregy@freemail.hu> <4fab5e14-2782-62d2-a32d-54b673201f26@netfilter.org> <98387132-330e-4068-9b71-e98dbcc9cd40@freemail.hu> <d7190f89-da4d-40df-2910-5e87ca3cd314@netfilter.org>
+ <a42bcc51-255f-4c52-b95c-56e562946d3a@freemail.hu>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250109142724.29228-1-tbogendoerfer@suse.de>
-In-Reply-To: <20250109142724.29228-1-tbogendoerfer@suse.de>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 9 Jan 2025 15:56:24 +0100
-X-Gm-Features: AbW1kvYsOQH25fjeTRYqNL1tcprjkMIKWtgg60XMQrxX9Vi-DZAin7bOZlWmPMM
-Message-ID: <CANn89iKY1x11hHgQDsVtTYe6L_FtN4SKpzFhPk-8fYPp5Wp4ng@mail.gmail.com>
-Subject: Re: [PATCH net] gro_cells: Avoid packet re-ordering for cloned skbs
-To: Thomas Bogendoerfer <tbogendoerfer@suse.de>
-Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/mixed; boundary="110363376-1821688513-1736434799=:36632"
+
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
+
+--110363376-1821688513-1736434799=:36632
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jan 9, 2025 at 3:27=E2=80=AFPM Thomas Bogendoerfer
-<tbogendoerfer@suse.de> wrote:
->
-> gro_cells_receive() passes a cloned skb directly up the stack and
-> could cause re-ordering against segments still in GRO. To avoid
-> this copy the skb and let GRO do it's work.
->
-> Fixes: c9e6bc644e55 ("net: add gro_cells infrastructure")
-> Signed-off-by: Thomas Bogendoerfer <tbogendoerfer@suse.de>
-> ---
->  net/core/gro_cells.c | 11 ++++++++++-
->  1 file changed, 10 insertions(+), 1 deletion(-)
->
-> diff --git a/net/core/gro_cells.c b/net/core/gro_cells.c
-> index ff8e5b64bf6b..2f8d688f9d82 100644
-> --- a/net/core/gro_cells.c
-> +++ b/net/core/gro_cells.c
-> @@ -20,11 +20,20 @@ int gro_cells_receive(struct gro_cells *gcells, struc=
-t sk_buff *skb)
->         if (unlikely(!(dev->flags & IFF_UP)))
->                 goto drop;
->
-> -       if (!gcells->cells || skb_cloned(skb) || netif_elide_gro(dev)) {
-> +       if (!gcells->cells || netif_elide_gro(dev)) {
-> +netif_rx:
->                 res =3D netif_rx(skb);
->                 goto unlock;
->         }
-> +       if (skb_cloned(skb)) {
-> +               struct sk_buff *n;
->
-> +               n =3D skb_copy(skb, GFP_KERNEL);
+On Wed, 8 Jan 2025, Sz=C5=91ke Benjamin wrote:
 
-I do not think we want this skb_copy(). This is going to fail too often.
+> 2025. 01. 08. 21:11 keltez=C3=A9ssel, Jozsef Kadlecsik =C3=ADrta:
+>> On Tue, 7 Jan 2025, Sz=C5=91ke Benjamin wrote:
+>>=20
+>>> 2025. 01. 07. 20:23 keltez=C3=A9ssel, Jozsef Kadlecsik =C3=ADrta:
+>>>> On Tue, 7 Jan 2025, egyszeregy@freemail.hu wrote:
+>>>>=20
+>>>>> From: Benjamin Sz=C5=91ke <egyszeregy@freemail.hu>
+>>>>>=20
+>>>>> Merge xt_DSCP.h to xt_dscp.h header file.
+>>>>=20
+>>>> I think it'd be better worded as "Merge xt_DSCP.h into the xt_dscp.h
+>>>> header file." (and in the other patches as well).
+>>>=20
+>>> There will be no any new patchset refactoring anymore just of some
+>>> cosmetics change. If you like to change it, feel free to modify it in=
+ my
+>>> pacthfiles before the final merging. You can do it as a maintainer.
+>>=20
+>> We don't modify accepted patches. It rarely happens when time presses =
+and
+>> even in that case it is discussed publicly: "sorry, no time to wait fo=
+r
+>> *you* to respin your patch, so I'm going to fix this part, OK?"
+>>=20
+>> But there's no time constrain here. So it'd be strange at the minimum =
+if
+>> your submitted patches were modified by a maintainer at merging.
+>>=20
+>> Believe it or not, I'm just trying to help to get your patches into th=
+e
+>> best shape.
+>
+> Holyday session is end, i have no time to refactoring and regenerate my=
+=20
+> patchset in every day, because you have a new idea about cosmetics=20
+> changes in every next days. (this is why asked you before what you like=
+=20
+> to get, there was no any answer) If you feel it is need, you can solve=20
+> it as a maintainer, i know. If you found any critical issue i can fix i=
+t=20
+> later, please start to look for them, but i will not waste my time with=
+=20
+> this usless commit name and header comment changes, sorry. It is a=20
+> hobby, i am not a paied Linux developer which is supported by a company=
+=20
+> for this stuff.
 
-Can you remind us why we have this skb_cloned() check here ?
+Your patches do not fix any bug in the code itself. The unified=20
+match/target modules would be a good to have for less memory usage but=20
+it's not pressing either.
+
+So there's no time pressure at all, if you wish/need you can continue to=20
+improve your patchset when you'll have the time.
+
+Best regards,
+Jozsef
+
+Ps: I have been doing my Linux developing/maintenance in my spare time.
+--110363376-1821688513-1736434799=:36632--
 
