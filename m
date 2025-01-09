@@ -1,124 +1,138 @@
-Return-Path: <netdev+bounces-156496-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156497-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E459A0698E
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 00:40:20 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 59D87A069DC
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 01:20:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6F7261675C6
-	for <lists+netdev@lfdr.de>; Wed,  8 Jan 2025 23:40:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9EB603A63DF
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 00:20:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 902DC204C1A;
-	Wed,  8 Jan 2025 23:40:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A539336D;
+	Thu,  9 Jan 2025 00:20:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="F0oTw53F"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="NVY7nGea"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f52.google.com (mail-io1-f52.google.com [209.85.166.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-173.mta1.migadu.com (out-173.mta1.migadu.com [95.215.58.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C13E020469D
-	for <netdev@vger.kernel.org>; Wed,  8 Jan 2025 23:40:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A50C748D
+	for <netdev@vger.kernel.org>; Thu,  9 Jan 2025 00:20:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736379614; cv=none; b=MKxzwg33MOI8ZTHHGAnQRMHPa3j4wIeQHbgqbkBDcVeHs2OxoYM9+KQ2PME4l6FgGLga/3YpIEQYWHHSSd/1H5qoHMNQCzy+YjjH0ko5Xu98Gc6NJoEv7rLJgpIGCnHu3FwfLNUpbw/s0WXm6IGeztwsLMWKDVXGOCUiyapKsK0=
+	t=1736382034; cv=none; b=aIoOOnIiaT+wjjKVThWQUMo1/Valsm1B1qoGueLX/771YAN2DjjeDIwW+Pk3WqzML8R1jYxAUtv9cTNawf6wtXG+senTXjl9W1Hvwr7empo/Fcf36cF2obbX9qa8w7Th2mUq5SfLd8UHgp0sf49Oc8sN20EJWTF7ZrOGiATH7WM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736379614; c=relaxed/simple;
-	bh=6MdkO+ANHM9A60tsmkecbfdrjtmSsD6weQX4DUCJNuQ=;
+	s=arc-20240116; t=1736382034; c=relaxed/simple;
+	bh=M6vl0RMK+ho5HYPkE0qG/6MXqpDkopAitRRlUbB2JHk=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=H/kytDHkfBu2P/LRnGgh3/3Y165pQikDtCLyWykcGzk6+bX4d9Wgbu5KtgD3naHSbzob8/iWbFxdY3vdrfiN8o2GbRRtq1pAisHpFPArim9btw7V63l4AHDb+8uaY+P+azosR7XL2owDpwpno9cIQCbFTkkX1BmLfULeqZaIIaY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxfoundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=F0oTw53F; arc=none smtp.client-ip=209.85.166.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxfoundation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
-Received: by mail-io1-f52.google.com with SMTP id ca18e2360f4ac-844ef6275c5so10660339f.0
-        for <netdev@vger.kernel.org>; Wed, 08 Jan 2025 15:40:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linuxfoundation.org; s=google; t=1736379612; x=1736984412; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=6Ri8mtVirUvyyZ6nmOnC/LZjhObjSlPKVdDOjjMdr2c=;
-        b=F0oTw53Fn6BhcYe32Cl26yv7NTB+xwr/Tn6Wlw+dXXw4Yu1XtShmOVs5v5YnD1KQPU
-         /Zw5xKnTC8jpEEbG2OItlLvTVeRICjHKktPXPsNkS4sDAHJ33DpYeGwEl0epNYEk/u01
-         N1sJ55oLZg9Xshm+OZN5JgGfVfP940fBQWcXQ=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736379612; x=1736984412;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6Ri8mtVirUvyyZ6nmOnC/LZjhObjSlPKVdDOjjMdr2c=;
-        b=JN0H6knWzNlv4uJWbwGx8DTgp+ksN+UAK9RuFJw2AzJt2iASwgQ9hdJxgMWFQ8N91Y
-         MWG8d0idg6bQ5H+4YsfIIw6ZjooqRlq7H1qo4O/q0Q2fAqBv5YEBwn4jNFq3ShpD76CZ
-         fS4isbjjAnx1MiUuYQLOoa0FiiBqnZ122T+C6H5LXVny8YcpNx9RyKcNosFkMMmTTFwA
-         Xx+is1GWXV54vq2TUONxrbZW++oRLKeLjNWSSYtiAiU64X5oYv9U3e2B3+tl8R2kyotP
-         qARBNFqqZ453yDHILACZhC61SsbAVmwt2rX8upnKQgYiKFBagilev3Rxe7SW6Y97iyGo
-         QpzA==
-X-Gm-Message-State: AOJu0Ywh10tPAHW1QWvYbSJzvw3mDnua0lI1yuhFcdLgZliOjSMEtg/w
-	QE47h7nvg+PBdifPY8I0TinotfaJZrB2P2f/bDV8Vua3Srgjh56692km8ZdoND8=
-X-Gm-Gg: ASbGncsSnRfvw0UORRyuporwjuFQn1Mw6YDXj/qzEjoZAz4CInWC24Dcv9aZRSNxB9O
-	hI70gUxttarULfWoL+o+0hFYcgGFTaTFnxM6Fnh6hXsAw0jgcZiFXt53CW+JrJ9ep+tVLZoqQ8I
-	yMl+fCzbjP63Ada85jsk9uGed6/1LZLu/Ewxcc4npO8VZaeV7wiMeSmqEbPxz41KLOkRPIu0dNB
-	RBL/nRnQBM4DO+Mrl575GsW2PD5/xB6mVv1hWe2JkvzTHRzkyY+rbliFvtTQJdgmJdj
-X-Google-Smtp-Source: AGHT+IF6eYSuISgD+RCYfI+Ara0n1whGJDeBklXH6p//wxMXgzwItnvsMB1eg/4jHGvsuHgbZqdB3A==
-X-Received: by 2002:a05:6e02:152d:b0:3a7:fe8c:b014 with SMTP id e9e14a558f8ab-3ce3aa763a6mr36286005ab.21.1736379611869;
-        Wed, 08 Jan 2025 15:40:11 -0800 (PST)
-Received: from [192.168.1.128] ([38.175.170.29])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-3ce4af56167sm398725ab.58.2025.01.08.15.40.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 08 Jan 2025 15:40:11 -0800 (PST)
-Message-ID: <057fdf09-ef2b-42fa-9300-dd7bf348362c@linuxfoundation.org>
-Date: Wed, 8 Jan 2025 16:40:10 -0700
+	 In-Reply-To:Content-Type; b=Aq9CVF7jH0+EUVGTifKxM522WoK+tSqqd9FN8+mM2C1iYYZJaBTuan6K0e4hlar+Hw/+mw7uewBDWfevpwSbbz0qeHB9acK6CDFbSAGjZtmNpinOVpOnW+o41v6NrGbFFPb7tP2aP0b2oSypJpTW69eYzXWJfB3OhvF3QgeH0vQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=NVY7nGea; arc=none smtp.client-ip=95.215.58.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <3961c9ce-21d3-4a35-956c-5e1a6eb6031b@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1736382029;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=COsGZGkKQF0TN0B0u/zldHpm4WzP2FBRThAycZ11GDk=;
+	b=NVY7nGeaE8XaJMjQzLnJvtYht1ViHyPauG7fWnbmlONe2C44uJG/QZ9+TfOi09EbGAVLEx
+	Y1pTloiq0MBc0OrF9LF6WRO878P8K2hfATklyoMu7OS7suKveFEdCKDTp7+ng3XW6Z6bjH
+	RoIGZB02d5OWdb1vGGIg3Q80cgh72C0=
+Date: Wed, 8 Jan 2025 16:20:21 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: linux-next: manual merge of the kselftest tree with the net-next
- tree
-To: Stephen Rothwell <sfr@canb.auug.org.au>, Shuah Khan <shuah@kernel.org>,
- David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>
-Cc: Networking <netdev@vger.kernel.org>, Laura Nao <laura.nao@collabora.com>,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
- Linux Next Mailing List <linux-next@vger.kernel.org>,
- Willem de Bruijn <willemb@google.com>, Shuah Khan <skhan@linuxfoundation.org>
-References: <20250108144003.67532649@canb.auug.org.au>
+Subject: Re: [PATCH bpf-next v2 08/14] bpf: net_sched: Add a qdisc watchdog
+ timer
+To: Amery Hung <ameryhung@gmail.com>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, daniel@iogearbox.net,
+ andrii@kernel.org, alexei.starovoitov@gmail.com, martin.lau@kernel.org,
+ sinquersw@gmail.com, toke@redhat.com, jhs@mojatatu.com, jiri@resnulli.us,
+ stfomichev@gmail.com, ekarani.silvestre@ccc.ufcg.edu.br,
+ yangpeihao@sjtu.edu.cn, xiyou.wangcong@gmail.com, yepeilin.cs@gmail.com,
+ amery.hung@bytedance.com
+References: <20241220195619.2022866-1-amery.hung@gmail.com>
+ <20241220195619.2022866-9-amery.hung@gmail.com>
 Content-Language: en-US
-From: Shuah Khan <skhan@linuxfoundation.org>
-In-Reply-To: <20250108144003.67532649@canb.auug.org.au>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <20241220195619.2022866-9-amery.hung@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On 1/7/25 20:40, Stephen Rothwell wrote:
-> Hi all,
-> 
-> Today's linux-next merge of the kselftest tree got a conflict in:
-> 
->    tools/testing/selftests/kselftest/ktap_helpers.sh
-> 
-> between commit:
-> 
->    912d6f669725 ("selftests/net: packetdrill: report benign debug flakes as xfail")
-> 
-> from the net-next tree and commit:
-> 
->    279e9403c5bd ("selftests: Warn about skipped tests in result summary")
-> 
-> from the kselftest tree.
-> 
-> I fixed it up (see below) and can carry the fix as necessary. This
-> is now fixed as far as linux-next is concerned, but any non trivial
-> conflicts should be mentioned to your upstream maintainer when your tree
-> is submitted for merging.  You may also want to consider cooperating
-> with the maintainer of the conflicting tree to minimise any particularly
-> complex conflicts.
-> 
+On 12/20/24 11:55 AM, Amery Hung wrote:
+> diff --git a/net/sched/bpf_qdisc.c b/net/sched/bpf_qdisc.c
+> index 1c92bfcc3847..bbe7aded6f24 100644
+> --- a/net/sched/bpf_qdisc.c
+> +++ b/net/sched/bpf_qdisc.c
+> @@ -8,6 +8,10 @@
+>   
+>   static struct bpf_struct_ops bpf_Qdisc_ops;
+>   
+> +struct bpf_sched_data {
+> +	struct qdisc_watchdog watchdog;
+> +};
+> +
+>   struct bpf_sk_buff_ptr {
+>   	struct sk_buff *skb;
+>   };
+> @@ -108,6 +112,46 @@ static int bpf_qdisc_btf_struct_access(struct bpf_verifier_log *log,
+>   	return 0;
+>   }
+>   
+> +BTF_ID_LIST(bpf_qdisc_init_prologue_ids)
+> +BTF_ID(func, bpf_qdisc_init_prologue)
+> +
+> +static int bpf_qdisc_gen_prologue(struct bpf_insn *insn_buf, bool direct_write,
+> +				  const struct bpf_prog *prog)
+> +{
+> +	struct bpf_insn *insn = insn_buf;
+> +
+> +	if (strcmp(prog->aux->attach_func_name, "init"))
+> +		return 0;
+> +
+> +	*insn++ = BPF_MOV64_REG(BPF_REG_6, BPF_REG_1);
+> +	*insn++ = BPF_LDX_MEM(BPF_DW, BPF_REG_1, BPF_REG_1, 0);
+> +	*insn++ = BPF_CALL_KFUNC(0, bpf_qdisc_init_prologue_ids[0]);
 
-Thank you for finding this. I will mention this when I send pr to Linus.
+I was wondering if patch 7 is needed if BPF_EMIT_CALL() and BPF_CALL_1() were 
+used, so it looks more like a bpf helper instead of kfunc. I tried but failed at 
+the "fn = env->ops->get_func_proto(insn->imm, env->prog);" in do_misc_fixups(). 
+I think the change in patch 7 is simple enough instead of getting 
+get_func_proto() works for this case.
 
-thanks,
--- Shuah
+> +	*insn++ = BPF_MOV64_REG(BPF_REG_1, BPF_REG_6);
+> +	*insn++ = prog->insnsi[0];
+> +
+> +	return insn - insn_buf;
+> +}
+> +
+> +BTF_ID_LIST(bpf_qdisc_reset_destroy_epilogue_ids)
+> +BTF_ID(func, bpf_qdisc_reset_destroy_epilogue)
+> +
+> +static int bpf_qdisc_gen_epilogue(struct bpf_insn *insn_buf, const struct bpf_prog *prog,
+> +				  s16 ctx_stack_off)
+> +{
+> +	struct bpf_insn *insn = insn_buf;
+> +
+> +	if (strcmp(prog->aux->attach_func_name, "reset") &&
+> +	    strcmp(prog->aux->attach_func_name, "destroy"))
+> +		return 0;
+> +
+> +	*insn++ = BPF_LDX_MEM(BPF_DW, BPF_REG_1, BPF_REG_FP, ctx_stack_off);
+> +	*insn++ = BPF_LDX_MEM(BPF_DW, BPF_REG_1, BPF_REG_1, 0);
+> +	*insn++ = BPF_CALL_KFUNC(0, bpf_qdisc_reset_destroy_epilogue_ids[0]);
+> +	*insn++ = BPF_EXIT_INSN();
+> +
+> +	return insn - insn_buf;
+> +}
+> +
 
