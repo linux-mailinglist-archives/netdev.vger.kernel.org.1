@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-156738-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156739-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5E61A07BCB
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 16:23:17 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 66FE4A07BA8
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 16:19:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4A91B7A50D0
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 15:19:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 37F9816A92E
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 15:19:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB67721CA1D;
-	Thu,  9 Jan 2025 15:16:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6510E21D004;
+	Thu,  9 Jan 2025 15:16:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="QYS9SWNC"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="ummhw3n0"
 X-Original-To: netdev@vger.kernel.org
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 102BF21D58B
-	for <netdev@vger.kernel.org>; Thu,  9 Jan 2025 15:16:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 457D121E091
+	for <netdev@vger.kernel.org>; Thu,  9 Jan 2025 15:16:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736435779; cv=none; b=BWB1QzWbs5vcZLxK+Dnx3p7YJXWoq4QoUMy7C6Z/5uaKhp9+r0JMV2tfNGo6xk4I5UicOIx/O6efIXCY+Kp/EK8gpT9gvzaKFR3u8fWomWaUFW26MkjULkrM/cmxTwL8JpnzgzX8/NZDPEB8T/Mcm5yTTSp4878Tstueuqaj00I=
+	t=1736435782; cv=none; b=AI5FUJ/an2Q4zkHOZTl+2BlV8A/x0QGyCULuVpawkGYKNdjUQe6E4/MrK2DXAKby1IK9Y1EUkQ1iFJUGdbkTyjy45IHhOLrupx03Yyv8pfjzq+/gAQ+TCPiwoyJOtUTW24SLbBVYDMw4w5eJwhGFPVQ97/N6yD/bvfO199ugn+Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736435779; c=relaxed/simple;
-	bh=OZaTgWlLom/GrrWGgGoNr8D3OaaEo8MsEjpjkRCQ6Pk=;
+	s=arc-20240116; t=1736435782; c=relaxed/simple;
+	bh=DJBqwgnEDopLUdLho90KrKRYlZqWf1riW9pMSMndcQw=;
 	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
-	 Content-Disposition:Content-Type:Message-Id:Date; b=QB1aUM5dvNAdwzfwdHaQNO3wNtNzi1GtJeBMuIJSkL4TZj4I4Onwkx8g56qVSqO9NTR/8EJVZ7ibLhA6GHjje9Ugmr68zFni3JRcpQJmMgHJYF3ueSyqaUwd+4iwgOA4sJ4IeSI4kgZ+OTZWj1DWPPnhjeRcSQluCimw6dmJ0cc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=QYS9SWNC; arc=none smtp.client-ip=78.32.30.218
+	 Content-Disposition:Content-Type:Message-Id:Date; b=KEmkI8CVS0s0nHnm7SkYsz/Jj5XfIP3vpG8T7m3aBO5cy3wBY+rA9P2U8apZOjcG5TKNN0g4PlKNAO7Bn7tqHU2Ybthmn10SYs43MnCQNzW0qeKj1iayoW9I54mW4pOsR3PGl9oL4qAGjJvCQt8zIRnZ4dfKUMUWTwn7dlzwck8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=ummhw3n0; arc=none smtp.client-ip=78.32.30.218
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
@@ -37,21 +37,21 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
 	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
 	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=7GCy3jlWvpGrgseejQGj5nJ77+jAJq7Shg7BjgEB+XA=; b=QYS9SWNC7494nuF5xCV6KkPLqh
-	QATw1/oqeIzSJ6Xx0SkesQTcikydZuzs3V7fGTTCXnrqF/5cCJ8OvL8SWwKSK4Nf1cXyZP3U6hnJd
-	QxGuCAgey7v126zvDL/GvnId8DsemKahsPS02gtHCC37MB4p7qdLO+TSc5UDxnKeQ0IF3HGkKwQup
-	cJk5XDi0P0JQ/MuKXxWKYQzUxeYdtWGXQxVK3e4VTpskl6pa40wdcCZY0mAwr+8wlEW4Os3/NmCso
-	fPJ5qK6D/tKmUU9l+PxozszVn+v5K9fj+ZwLkvJk/k9RkS0P0tjO+OgBH3/3tBVz4mfvbRCM7xzAF
-	RB4AFKcg==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:37394 helo=rmk-PC.armlinux.org.uk)
+	bh=MpGGZSUI+WeruL3LFk7HIJG+rWlujUTuGWD8czotisw=; b=ummhw3n0l/qAEztCt+kMX0X8Nr
+	mU2+7NQHasLGa0OVqTQTA49NLbBqdoFZ6z1LGroU+3jrH+rBTOc0hWqfSchzPxh2iEF07OipZDV6v
+	EDDC/+LJsUGIgSWAafjl9CkbUkuATYq47MftoxWD+ygWWjLCtE4/tQSmS2kxXHU8jvpvExnpaONr4
+	/Gm3JtiF51MRbM+/EtLT75iq05zXzwkwXeL7OIjBzbO9qrEwgCtBJk1RWI3J6hKasUtYeu/ErmywC
+	B1DaJCAAZ4LNW5O1mK/HdnEIyFBNzpayFRRntM7iL/A1bf/hN2qKOgf5F8T6FxB3NoWyt/9mzNrAl
+	5Bx/hLUQ==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:37406 helo=rmk-PC.armlinux.org.uk)
 	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <rmk@armlinux.org.uk>)
-	id 1tVuG5-0002DF-1r;
-	Thu, 09 Jan 2025 15:15:41 +0000
+	id 1tVuGB-0002DT-0k;
+	Thu, 09 Jan 2025 15:15:47 +0000
 Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
 	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1tVuFm-000BXW-Gq; Thu, 09 Jan 2025 15:15:22 +0000
+	id 1tVuFr-000BXc-Kk; Thu, 09 Jan 2025 15:15:27 +0000
 In-Reply-To: <Z3_n_5BXkxQR4zEG@shell.armlinux.org.uk>
 References: <Z3_n_5BXkxQR4zEG@shell.armlinux.org.uk>
 From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
@@ -92,8 +92,8 @@ Cc: Alexander Couzens <lynxis@fe80.eu>,
 	UNGLinuxDriver@microchip.com,
 	Vladimir Oltean <olteanv@gmail.com>,
 	Eric Woudstra <ericwouds@gmail.com>
-Subject: [PATCH net-next 2/5] net: phylink: pass neg_mode into
- .pcs_get_state() method
+Subject: [PATCH net-next 3/5] net: phylink: pass neg_mode into c22 state
+ decoder
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -103,353 +103,220 @@ MIME-Version: 1.0
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1tVuFm-000BXW-Gq@rmk-PC.armlinux.org.uk>
+Message-Id: <E1tVuFr-000BXc-Kk@rmk-PC.armlinux.org.uk>
 Sender: Russell King <rmk@armlinux.org.uk>
-Date: Thu, 09 Jan 2025 15:15:22 +0000
+Date: Thu, 09 Jan 2025 15:15:27 +0000
 
-Pass the current neg_mode into the .pcs_get_state() method. Update all
-users of phylink PCS.
+Pass the current neg_mode into phylink_mii_c22_pcs_get_state() and
+phylink_mii_c22_pcs_decode_state(). Update all users of phylink PCS
+that use these functions.
 
 Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 ---
- drivers/net/dsa/b53/b53_serdes.c                         | 4 ++--
- drivers/net/dsa/mt7530.c                                 | 2 +-
- drivers/net/dsa/mv88e6xxx/pcs-6185.c                     | 1 +
- drivers/net/dsa/mv88e6xxx/pcs-6352.c                     | 1 +
- drivers/net/dsa/mv88e6xxx/pcs-639x.c                     | 5 ++++-
- drivers/net/dsa/qca/qca8k-8xxx.c                         | 2 +-
- drivers/net/ethernet/cadence/macb_main.c                 | 3 ++-
  drivers/net/ethernet/freescale/fman/fman_dtsec.c         | 2 +-
- drivers/net/ethernet/marvell/mvneta.c                    | 2 +-
- drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c          | 2 ++
- drivers/net/ethernet/marvell/prestera/prestera_main.c    | 1 +
- drivers/net/ethernet/meta/fbnic/fbnic_phylink.c          | 2 +-
- drivers/net/ethernet/microchip/lan966x/lan966x_phylink.c | 1 +
- drivers/net/ethernet/microchip/sparx5/sparx5_phylink.c   | 2 +-
- drivers/net/ethernet/xilinx/xilinx_axienet_main.c        | 1 +
+ drivers/net/ethernet/microchip/lan966x/lan966x_main.h    | 2 +-
+ drivers/net/ethernet/microchip/lan966x/lan966x_phylink.c | 2 +-
+ drivers/net/ethernet/microchip/lan966x/lan966x_port.c    | 4 ++--
+ drivers/net/ethernet/xilinx/xilinx_axienet_main.c        | 2 +-
  drivers/net/pcs/pcs-lynx.c                               | 2 +-
- drivers/net/pcs/pcs-mtk-lynxi.c                          | 1 +
- drivers/net/pcs/pcs-xpcs.c                               | 2 +-
- drivers/net/phy/phylink.c                                | 2 +-
- include/linux/phylink.h                                  | 8 ++++++--
- 20 files changed, 31 insertions(+), 15 deletions(-)
+ drivers/net/pcs/pcs-mtk-lynxi.c                          | 3 ++-
+ drivers/net/pcs/pcs-xpcs.c                               | 5 +++--
+ drivers/net/phy/phylink.c                                | 7 +++++--
+ include/linux/phylink.h                                  | 3 ++-
+ 10 files changed, 19 insertions(+), 13 deletions(-)
 
-diff --git a/drivers/net/dsa/b53/b53_serdes.c b/drivers/net/dsa/b53/b53_serdes.c
-index 3f8a491ce885..4730982b6840 100644
---- a/drivers/net/dsa/b53/b53_serdes.c
-+++ b/drivers/net/dsa/b53/b53_serdes.c
-@@ -99,8 +99,8 @@ static void b53_serdes_an_restart(struct phylink_pcs *pcs)
- 			 SERDES_MII_BLK, reg);
- }
- 
--static void b53_serdes_get_state(struct phylink_pcs *pcs,
--				  struct phylink_link_state *state)
-+static void b53_serdes_get_state(struct phylink_pcs *pcs, unsigned int neg_mode,
-+				 struct phylink_link_state *state)
+diff --git a/drivers/net/ethernet/freescale/fman/fman_dtsec.c b/drivers/net/ethernet/freescale/fman/fman_dtsec.c
+index c47108c820ea..b3e2a596ad2c 100644
+--- a/drivers/net/ethernet/freescale/fman/fman_dtsec.c
++++ b/drivers/net/ethernet/freescale/fman/fman_dtsec.c
+@@ -760,7 +760,7 @@ static void dtsec_pcs_get_state(struct phylink_pcs *pcs, unsigned int neg_mode,
  {
- 	struct b53_device *dev = pcs_to_b53_pcs(pcs)->dev;
- 	u8 lane = pcs_to_b53_pcs(pcs)->lane;
-diff --git a/drivers/net/dsa/mt7530.c b/drivers/net/dsa/mt7530.c
-index d2d0f091e49e..1c83af805209 100644
---- a/drivers/net/dsa/mt7530.c
-+++ b/drivers/net/dsa/mt7530.c
-@@ -2994,7 +2994,7 @@ static int mt753x_pcs_validate(struct phylink_pcs *pcs,
- 	return 0;
+ 	struct fman_mac *dtsec = pcs_to_dtsec(pcs);
+ 
+-	phylink_mii_c22_pcs_get_state(dtsec->tbidev, state);
++	phylink_mii_c22_pcs_get_state(dtsec->tbidev, neg_mode, state);
  }
  
--static void mt7530_pcs_get_state(struct phylink_pcs *pcs,
-+static void mt7530_pcs_get_state(struct phylink_pcs *pcs, unsigned int neg_mode,
- 				 struct phylink_link_state *state)
+ static int dtsec_pcs_config(struct phylink_pcs *pcs, unsigned int neg_mode,
+diff --git a/drivers/net/ethernet/microchip/lan966x/lan966x_main.h b/drivers/net/ethernet/microchip/lan966x/lan966x_main.h
+index 25cb2f61986f..1efa584e7107 100644
+--- a/drivers/net/ethernet/microchip/lan966x/lan966x_main.h
++++ b/drivers/net/ethernet/microchip/lan966x/lan966x_main.h
+@@ -443,7 +443,7 @@ int lan966x_stats_init(struct lan966x *lan966x);
+ 
+ void lan966x_port_config_down(struct lan966x_port *port);
+ void lan966x_port_config_up(struct lan966x_port *port);
+-void lan966x_port_status_get(struct lan966x_port *port,
++void lan966x_port_status_get(struct lan966x_port *port, unsigned int neg_mode,
+ 			     struct phylink_link_state *state);
+ int lan966x_port_pcs_set(struct lan966x_port *port,
+ 			 struct lan966x_port_config *config);
+diff --git a/drivers/net/ethernet/microchip/lan966x/lan966x_phylink.c b/drivers/net/ethernet/microchip/lan966x/lan966x_phylink.c
+index a761777259bf..75188b99e4e7 100644
+--- a/drivers/net/ethernet/microchip/lan966x/lan966x_phylink.c
++++ b/drivers/net/ethernet/microchip/lan966x/lan966x_phylink.c
+@@ -93,7 +93,7 @@ static void lan966x_pcs_get_state(struct phylink_pcs *pcs,
  {
- 	struct mt7530_priv *priv = pcs_to_mt753x_pcs(pcs)->priv;
-diff --git a/drivers/net/dsa/mv88e6xxx/pcs-6185.c b/drivers/net/dsa/mv88e6xxx/pcs-6185.c
-index 5a27d047a38e..75ed1fa500a5 100644
---- a/drivers/net/dsa/mv88e6xxx/pcs-6185.c
-+++ b/drivers/net/dsa/mv88e6xxx/pcs-6185.c
-@@ -55,6 +55,7 @@ static irqreturn_t mv88e6185_pcs_handle_irq(int irq, void *dev_id)
+ 	struct lan966x_port *port = lan966x_pcs_to_port(pcs);
+ 
+-	lan966x_port_status_get(port, state);
++	lan966x_port_status_get(port, neg_mode, state);
  }
  
- static void mv88e6185_pcs_get_state(struct phylink_pcs *pcs,
-+				    unsigned int neg_mode,
- 				    struct phylink_link_state *state)
+ static int lan966x_pcs_config(struct phylink_pcs *pcs, unsigned int neg_mode,
+diff --git a/drivers/net/ethernet/microchip/lan966x/lan966x_port.c b/drivers/net/ethernet/microchip/lan966x/lan966x_port.c
+index fdfa4040d9ee..cf7de0267c32 100644
+--- a/drivers/net/ethernet/microchip/lan966x/lan966x_port.c
++++ b/drivers/net/ethernet/microchip/lan966x/lan966x_port.c
+@@ -284,7 +284,7 @@ void lan966x_port_config_up(struct lan966x_port *port)
+ 	lan966x_port_link_up(port);
+ }
+ 
+-void lan966x_port_status_get(struct lan966x_port *port,
++void lan966x_port_status_get(struct lan966x_port *port, unsigned int neg_mode,
+ 			     struct phylink_link_state *state)
  {
- 	struct mv88e6185_pcs *mpcs = pcs_to_mv88e6185_pcs(pcs);
-diff --git a/drivers/net/dsa/mv88e6xxx/pcs-6352.c b/drivers/net/dsa/mv88e6xxx/pcs-6352.c
-index 88f624b65470..143fe21d1834 100644
---- a/drivers/net/dsa/mv88e6xxx/pcs-6352.c
-+++ b/drivers/net/dsa/mv88e6xxx/pcs-6352.c
-@@ -158,6 +158,7 @@ static void marvell_c22_pcs_disable(struct phylink_pcs *pcs)
- }
+ 	struct lan966x *lan966x = port->lan966x;
+@@ -314,7 +314,7 @@ void lan966x_port_status_get(struct lan966x_port *port,
+ 		bmsr |= BMSR_ANEGCOMPLETE;
  
- static void marvell_c22_pcs_get_state(struct phylink_pcs *pcs,
-+				      unsigned int neg_mode,
- 				      struct phylink_link_state *state)
+ 		lp_adv = DEV_PCS1G_ANEG_STATUS_LP_ADV_GET(val);
+-		phylink_mii_c22_pcs_decode_state(state, bmsr, lp_adv);
++		phylink_mii_c22_pcs_decode_state(state, neg_mode, bmsr, lp_adv);
+ 	} else {
+ 		if (!state->link)
+ 			return;
+diff --git a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
+index f9e695d7cc4a..3531646ef6ab 100644
+--- a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
++++ b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
+@@ -2336,7 +2336,7 @@ static void axienet_pcs_get_state(struct phylink_pcs *pcs,
  {
- 	struct marvell_c22_pcs *mpcs = pcs_to_marvell_c22_pcs(pcs);
-diff --git a/drivers/net/dsa/mv88e6xxx/pcs-639x.c b/drivers/net/dsa/mv88e6xxx/pcs-639x.c
-index d758a6c1b226..026b7bfb7ee5 100644
---- a/drivers/net/dsa/mv88e6xxx/pcs-639x.c
-+++ b/drivers/net/dsa/mv88e6xxx/pcs-639x.c
-@@ -257,6 +257,7 @@ static int mv88e639x_sgmii_pcs_post_config(struct phylink_pcs *pcs,
+ 	struct mdio_device *pcs_phy = pcs_to_axienet_local(pcs)->pcs_phy;
+ 
+-	phylink_mii_c22_pcs_get_state(pcs_phy, state);
++	phylink_mii_c22_pcs_get_state(pcs_phy, neg_mode, state);
  }
  
- static void mv88e639x_sgmii_pcs_get_state(struct phylink_pcs *pcs,
-+					  unsigned int neg_mode,
- 					  struct phylink_link_state *state)
- {
- 	struct mv88e639x_pcs *mpcs = sgmii_pcs_to_mv88e639x_pcs(pcs);
-@@ -395,6 +396,7 @@ static void mv88e639x_xg_pcs_disable(struct mv88e639x_pcs *mpcs)
+ static void axienet_pcs_an_restart(struct phylink_pcs *pcs)
+diff --git a/drivers/net/pcs/pcs-lynx.c b/drivers/net/pcs/pcs-lynx.c
+index f359f62f69ad..e46f588cae7d 100644
+--- a/drivers/net/pcs/pcs-lynx.c
++++ b/drivers/net/pcs/pcs-lynx.c
+@@ -109,7 +109,7 @@ static void lynx_pcs_get_state(struct phylink_pcs *pcs, unsigned int neg_mode,
+ 	case PHY_INTERFACE_MODE_1000BASEX:
+ 	case PHY_INTERFACE_MODE_SGMII:
+ 	case PHY_INTERFACE_MODE_QSGMII:
+-		phylink_mii_c22_pcs_get_state(lynx->mdio, state);
++		phylink_mii_c22_pcs_get_state(lynx->mdio, neg_mode, state);
+ 		break;
+ 	case PHY_INTERFACE_MODE_2500BASEX:
+ 		lynx_pcs_get_state_2500basex(lynx->mdio, state);
+diff --git a/drivers/net/pcs/pcs-mtk-lynxi.c b/drivers/net/pcs/pcs-mtk-lynxi.c
+index e1b6f332c3c2..7d6261dee534 100644
+--- a/drivers/net/pcs/pcs-mtk-lynxi.c
++++ b/drivers/net/pcs/pcs-mtk-lynxi.c
+@@ -115,7 +115,8 @@ static void mtk_pcs_lynxi_get_state(struct phylink_pcs *pcs,
+ 	regmap_read(mpcs->regmap, SGMSYS_PCS_CONTROL_1, &bm);
+ 	regmap_read(mpcs->regmap, SGMSYS_PCS_ADVERTISE, &adv);
+ 
+-	phylink_mii_c22_pcs_decode_state(state, FIELD_GET(SGMII_BMSR, bm),
++	phylink_mii_c22_pcs_decode_state(state, neg_mode,
++					 FIELD_GET(SGMII_BMSR, bm),
+ 					 FIELD_GET(SGMII_LPA, adv));
  }
  
- static void mv88e639x_xg_pcs_get_state(struct phylink_pcs *pcs,
-+				       unsigned int neg_mode,
- 				       struct phylink_link_state *state)
- {
- 	struct mv88e639x_pcs *mpcs = xg_pcs_to_mv88e639x_pcs(pcs);
-@@ -889,6 +891,7 @@ static int mv88e6393x_xg_pcs_post_config(struct phylink_pcs *pcs,
+diff --git a/drivers/net/pcs/pcs-xpcs.c b/drivers/net/pcs/pcs-xpcs.c
+index 4cd0c4fe6496..1aef2afd3c73 100644
+--- a/drivers/net/pcs/pcs-xpcs.c
++++ b/drivers/net/pcs/pcs-xpcs.c
+@@ -1030,6 +1030,7 @@ static int xpcs_get_state_c37_sgmii(struct dw_xpcs *xpcs,
  }
  
- static void mv88e6393x_xg_pcs_get_state(struct phylink_pcs *pcs,
+ static int xpcs_get_state_c37_1000basex(struct dw_xpcs *xpcs,
 +					unsigned int neg_mode,
  					struct phylink_link_state *state)
  {
- 	struct mv88e639x_pcs *mpcs = xg_pcs_to_mv88e639x_pcs(pcs);
-@@ -896,7 +899,7 @@ static void mv88e6393x_xg_pcs_get_state(struct phylink_pcs *pcs,
- 	int err;
+ 	int lpa, bmsr;
+@@ -1058,7 +1059,7 @@ static int xpcs_get_state_c37_1000basex(struct dw_xpcs *xpcs,
+ 			}
+ 		}
  
- 	if (state->interface != PHY_INTERFACE_MODE_USXGMII)
--		return mv88e639x_xg_pcs_get_state(pcs, state);
-+		return mv88e639x_xg_pcs_get_state(pcs, neg_mode, state);
- 
- 	state->link = false;
- 
-diff --git a/drivers/net/dsa/qca/qca8k-8xxx.c b/drivers/net/dsa/qca/qca8k-8xxx.c
-index 2d56a8152420..76b0b86666f1 100644
---- a/drivers/net/dsa/qca/qca8k-8xxx.c
-+++ b/drivers/net/dsa/qca/qca8k-8xxx.c
-@@ -1491,7 +1491,7 @@ static struct qca8k_pcs *pcs_to_qca8k_pcs(struct phylink_pcs *pcs)
- 	return container_of(pcs, struct qca8k_pcs, pcs);
- }
- 
--static void qca8k_pcs_get_state(struct phylink_pcs *pcs,
-+static void qca8k_pcs_get_state(struct phylink_pcs *pcs, unsigned int neg_mode,
- 				struct phylink_link_state *state)
- {
- 	struct qca8k_priv *priv = pcs_to_qca8k_pcs(pcs)->priv;
-diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
-index 640f500f989d..48496209fb16 100644
---- a/drivers/net/ethernet/cadence/macb_main.c
-+++ b/drivers/net/ethernet/cadence/macb_main.c
-@@ -568,6 +568,7 @@ static void macb_usx_pcs_link_up(struct phylink_pcs *pcs, unsigned int neg_mode,
- }
- 
- static void macb_usx_pcs_get_state(struct phylink_pcs *pcs,
-+				   unsigned int neg_mode,
- 				   struct phylink_link_state *state)
- {
- 	struct macb *bp = container_of(pcs, struct macb, phylink_usx_pcs);
-@@ -598,7 +599,7 @@ static int macb_usx_pcs_config(struct phylink_pcs *pcs,
- 	return 0;
- }
- 
--static void macb_pcs_get_state(struct phylink_pcs *pcs,
-+static void macb_pcs_get_state(struct phylink_pcs *pcs, unsigned int neg_mode,
- 			       struct phylink_link_state *state)
- {
- 	state->link = 0;
-diff --git a/drivers/net/ethernet/freescale/fman/fman_dtsec.c b/drivers/net/ethernet/freescale/fman/fman_dtsec.c
-index 85617bb94959..c47108c820ea 100644
---- a/drivers/net/ethernet/freescale/fman/fman_dtsec.c
-+++ b/drivers/net/ethernet/freescale/fman/fman_dtsec.c
-@@ -755,7 +755,7 @@ static struct fman_mac *pcs_to_dtsec(struct phylink_pcs *pcs)
- 	return container_of(pcs, struct fman_mac, pcs);
- }
- 
--static void dtsec_pcs_get_state(struct phylink_pcs *pcs,
-+static void dtsec_pcs_get_state(struct phylink_pcs *pcs, unsigned int neg_mode,
- 				struct phylink_link_state *state)
- {
- 	struct fman_mac *dtsec = pcs_to_dtsec(pcs);
-diff --git a/drivers/net/ethernet/marvell/mvneta.c b/drivers/net/ethernet/marvell/mvneta.c
-index fe6261b81540..9e79a60baebc 100644
---- a/drivers/net/ethernet/marvell/mvneta.c
-+++ b/drivers/net/ethernet/marvell/mvneta.c
-@@ -3983,7 +3983,7 @@ static unsigned int mvneta_pcs_inband_caps(struct phylink_pcs *pcs,
- 	return LINK_INBAND_DISABLE;
- }
- 
--static void mvneta_pcs_get_state(struct phylink_pcs *pcs,
-+static void mvneta_pcs_get_state(struct phylink_pcs *pcs, unsigned int neg_mode,
- 				 struct phylink_link_state *state)
- {
- 	struct mvneta_port *pp = mvneta_pcs_to_port(pcs);
-diff --git a/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c b/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
-index f85229a30844..d294580f4832 100644
---- a/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
-+++ b/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
-@@ -6188,6 +6188,7 @@ static struct mvpp2_port *mvpp2_pcs_gmac_to_port(struct phylink_pcs *pcs)
- }
- 
- static void mvpp2_xlg_pcs_get_state(struct phylink_pcs *pcs,
-+				    unsigned int neg_mode,
- 				    struct phylink_link_state *state)
- {
- 	struct mvpp2_port *port = mvpp2_pcs_xlg_to_port(pcs);
-@@ -6247,6 +6248,7 @@ static unsigned int mvpp2_gmac_pcs_inband_caps(struct phylink_pcs *pcs,
- }
- 
- static void mvpp2_gmac_pcs_get_state(struct phylink_pcs *pcs,
-+				     unsigned int neg_mode,
- 				     struct phylink_link_state *state)
- {
- 	struct mvpp2_port *port = mvpp2_pcs_gmac_to_port(pcs);
-diff --git a/drivers/net/ethernet/marvell/prestera/prestera_main.c b/drivers/net/ethernet/marvell/prestera/prestera_main.c
-index 22ca6ee9665e..440a4c42b405 100644
---- a/drivers/net/ethernet/marvell/prestera/prestera_main.c
-+++ b/drivers/net/ethernet/marvell/prestera/prestera_main.c
-@@ -280,6 +280,7 @@ prestera_mac_select_pcs(struct phylink_config *config,
- }
- 
- static void prestera_pcs_get_state(struct phylink_pcs *pcs,
-+				   unsigned int neg_mode,
- 				   struct phylink_link_state *state)
- {
- 	struct prestera_port *port = container_of(pcs, struct prestera_port,
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_phylink.c b/drivers/net/ethernet/meta/fbnic/fbnic_phylink.c
-index 1a5e1e719b30..bb11fc83367d 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_phylink.c
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_phylink.c
-@@ -15,7 +15,7 @@ fbnic_pcs_to_net(struct phylink_pcs *pcs)
- }
- 
- static void
--fbnic_phylink_pcs_get_state(struct phylink_pcs *pcs,
-+fbnic_phylink_pcs_get_state(struct phylink_pcs *pcs, unsigned int neg_mode,
- 			    struct phylink_link_state *state)
- {
- 	struct fbnic_net *fbn = fbnic_pcs_to_net(pcs);
-diff --git a/drivers/net/ethernet/microchip/lan966x/lan966x_phylink.c b/drivers/net/ethernet/microchip/lan966x/lan966x_phylink.c
-index 1d63903f9006..a761777259bf 100644
---- a/drivers/net/ethernet/microchip/lan966x/lan966x_phylink.c
-+++ b/drivers/net/ethernet/microchip/lan966x/lan966x_phylink.c
-@@ -88,6 +88,7 @@ static struct lan966x_port *lan966x_pcs_to_port(struct phylink_pcs *pcs)
- }
- 
- static void lan966x_pcs_get_state(struct phylink_pcs *pcs,
-+				  unsigned int neg_mode,
- 				  struct phylink_link_state *state)
- {
- 	struct lan966x_port *port = lan966x_pcs_to_port(pcs);
-diff --git a/drivers/net/ethernet/microchip/sparx5/sparx5_phylink.c b/drivers/net/ethernet/microchip/sparx5/sparx5_phylink.c
-index 035d2f1bea0d..cfb4b2e17ace 100644
---- a/drivers/net/ethernet/microchip/sparx5/sparx5_phylink.c
-+++ b/drivers/net/ethernet/microchip/sparx5/sparx5_phylink.c
-@@ -89,7 +89,7 @@ static struct sparx5_port *sparx5_pcs_to_port(struct phylink_pcs *pcs)
- 	return container_of(pcs, struct sparx5_port, phylink_pcs);
- }
- 
--static void sparx5_pcs_get_state(struct phylink_pcs *pcs,
-+static void sparx5_pcs_get_state(struct phylink_pcs *pcs, unsigned int neg_mode,
- 				 struct phylink_link_state *state)
- {
- 	struct sparx5_port *port = sparx5_pcs_to_port(pcs);
-diff --git a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
-index 0f4b02fe6f85..f9e695d7cc4a 100644
---- a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
-+++ b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
-@@ -2331,6 +2331,7 @@ static struct axienet_local *pcs_to_axienet_local(struct phylink_pcs *pcs)
- }
- 
- static void axienet_pcs_get_state(struct phylink_pcs *pcs,
-+				  unsigned int neg_mode,
- 				  struct phylink_link_state *state)
- {
- 	struct mdio_device *pcs_phy = pcs_to_axienet_local(pcs)->pcs_phy;
-diff --git a/drivers/net/pcs/pcs-lynx.c b/drivers/net/pcs/pcs-lynx.c
-index 6457190ec6e7..f359f62f69ad 100644
---- a/drivers/net/pcs/pcs-lynx.c
-+++ b/drivers/net/pcs/pcs-lynx.c
-@@ -100,7 +100,7 @@ static void lynx_pcs_get_state_2500basex(struct mdio_device *pcs,
- 	state->duplex = DUPLEX_FULL;
- }
- 
--static void lynx_pcs_get_state(struct phylink_pcs *pcs,
-+static void lynx_pcs_get_state(struct phylink_pcs *pcs, unsigned int neg_mode,
- 			       struct phylink_link_state *state)
- {
- 	struct lynx_pcs *lynx = phylink_pcs_to_lynx(pcs);
-diff --git a/drivers/net/pcs/pcs-mtk-lynxi.c b/drivers/net/pcs/pcs-mtk-lynxi.c
-index 4fe0fb6d12a4..e1b6f332c3c2 100644
---- a/drivers/net/pcs/pcs-mtk-lynxi.c
-+++ b/drivers/net/pcs/pcs-mtk-lynxi.c
-@@ -105,6 +105,7 @@ static unsigned int mtk_pcs_lynxi_inband_caps(struct phylink_pcs *pcs,
- }
- 
- static void mtk_pcs_lynxi_get_state(struct phylink_pcs *pcs,
-+				    unsigned int neg_mode,
- 				    struct phylink_link_state *state)
- {
- 	struct mtk_pcs_lynxi *mpcs = pcs_to_mtk_pcs_lynxi(pcs);
-diff --git a/drivers/net/pcs/pcs-xpcs.c b/drivers/net/pcs/pcs-xpcs.c
-index c06b66f40022..4cd0c4fe6496 100644
---- a/drivers/net/pcs/pcs-xpcs.c
-+++ b/drivers/net/pcs/pcs-xpcs.c
-@@ -1086,7 +1086,7 @@ static int xpcs_get_state_2500basex(struct dw_xpcs *xpcs,
- 	return 0;
- }
- 
--static void xpcs_get_state(struct phylink_pcs *pcs,
-+static void xpcs_get_state(struct phylink_pcs *pcs, unsigned int neg_mode,
- 			   struct phylink_link_state *state)
- {
- 	struct dw_xpcs *xpcs = phylink_pcs_to_xpcs(pcs);
-diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
-index d08cdbbbbc1e..6443cf39593c 100644
---- a/drivers/net/phy/phylink.c
-+++ b/drivers/net/phy/phylink.c
-@@ -1520,7 +1520,7 @@ static void phylink_mac_pcs_get_state(struct phylink *pl,
+-		phylink_mii_c22_pcs_decode_state(state, bmsr, lpa);
++		phylink_mii_c22_pcs_decode_state(state, neg_mode, bmsr, lpa);
  	}
  
- 	if (pcs)
--		pcs->ops->pcs_get_state(pcs, state);
-+		pcs->ops->pcs_get_state(pcs, pl->pcs_neg_mode, state);
- 	else
- 		state->link = 0;
- }
-diff --git a/include/linux/phylink.h b/include/linux/phylink.h
-index 4b7a20620b49..0bbcb4898e93 100644
---- a/include/linux/phylink.h
-+++ b/include/linux/phylink.h
-@@ -446,7 +446,7 @@ struct phylink_pcs_ops {
- 			       phy_interface_t interface);
- 	int (*pcs_post_config)(struct phylink_pcs *pcs,
- 			       phy_interface_t interface);
--	void (*pcs_get_state)(struct phylink_pcs *pcs,
-+	void (*pcs_get_state)(struct phylink_pcs *pcs, unsigned int neg_mode,
- 			      struct phylink_link_state *state);
- 	int (*pcs_config)(struct phylink_pcs *pcs, unsigned int neg_mode,
- 			  phy_interface_t interface,
-@@ -505,6 +505,7 @@ void pcs_disable(struct phylink_pcs *pcs);
+ 	return 0;
+@@ -1114,7 +1115,7 @@ static void xpcs_get_state(struct phylink_pcs *pcs, unsigned int neg_mode,
+ 				"xpcs_get_state_c37_sgmii", ERR_PTR(ret));
+ 		break;
+ 	case DW_AN_C37_1000BASEX:
+-		ret = xpcs_get_state_c37_1000basex(xpcs, state);
++		ret = xpcs_get_state_c37_1000basex(xpcs, neg_mode, state);
+ 		if (ret)
+ 			dev_err(&xpcs->mdiodev->dev, "%s returned %pe\n",
+ 				"xpcs_get_state_c37_1000basex", ERR_PTR(ret));
+diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
+index 6443cf39593c..99737bb6d1c7 100644
+--- a/drivers/net/phy/phylink.c
++++ b/drivers/net/phy/phylink.c
+@@ -3860,6 +3860,7 @@ static void phylink_decode_usgmii_word(struct phylink_link_state *state,
  /**
-  * pcs_get_state() - Read the current inband link state from the hardware
-  * @pcs: a pointer to a &struct phylink_pcs.
+  * phylink_mii_c22_pcs_decode_state() - Decode MAC PCS state from MII registers
+  * @state: a pointer to a &struct phylink_link_state.
++ * @neg_mode: link negotiation mode (PHYLINK_PCS_NEG_xxx)
+  * @bmsr: The value of the %MII_BMSR register
+  * @lpa: The value of the %MII_LPA register
+  *
+@@ -3872,7 +3873,7 @@ static void phylink_decode_usgmii_word(struct phylink_link_state *state,
+  * accessing @bmsr and @lpa cannot be done with MDIO directly.
+  */
+ void phylink_mii_c22_pcs_decode_state(struct phylink_link_state *state,
+-				      u16 bmsr, u16 lpa)
++				      unsigned int neg_mode, u16 bmsr, u16 lpa)
+ {
+ 	state->link = !!(bmsr & BMSR_LSTATUS);
+ 	state->an_complete = !!(bmsr & BMSR_ANEGCOMPLETE);
+@@ -3910,6 +3911,7 @@ EXPORT_SYMBOL_GPL(phylink_mii_c22_pcs_decode_state);
+ /**
+  * phylink_mii_c22_pcs_get_state() - read the MAC PCS state
+  * @pcs: a pointer to a &struct mdio_device.
 + * @neg_mode: link negotiation mode (PHYLINK_PCS_NEG_xxx)
   * @state: a pointer to a &struct phylink_link_state.
   *
-  * Read the current inband link state from the MAC PCS, reporting the
-@@ -513,8 +514,11 @@ void pcs_disable(struct phylink_pcs *pcs);
-  * negotiation completion state in @state->an_complete, and link up state
-  * in @state->link. If possible, @state->lp_advertising should also be
-  * populated.
-+ *
-+ * Note that the @neg_mode parameter is always the PHYLINK_PCS_NEG_xxx
-+ * state, not MLO_AN_xxx.
+  * Helper for MAC PCS supporting the 802.3 clause 22 register set for
+@@ -3922,6 +3924,7 @@ EXPORT_SYMBOL_GPL(phylink_mii_c22_pcs_decode_state);
+  * structure.
   */
--void pcs_get_state(struct phylink_pcs *pcs,
-+void pcs_get_state(struct phylink_pcs *pcs, unsigned int neg_mode,
- 		   struct phylink_link_state *state);
+ void phylink_mii_c22_pcs_get_state(struct mdio_device *pcs,
++				   unsigned int neg_mode,
+ 				   struct phylink_link_state *state)
+ {
+ 	int bmsr, lpa;
+@@ -3933,7 +3936,7 @@ void phylink_mii_c22_pcs_get_state(struct mdio_device *pcs,
+ 		return;
+ 	}
  
- /**
+-	phylink_mii_c22_pcs_decode_state(state, bmsr, lpa);
++	phylink_mii_c22_pcs_decode_state(state, neg_mode, bmsr, lpa);
+ }
+ EXPORT_SYMBOL_GPL(phylink_mii_c22_pcs_get_state);
+ 
+diff --git a/include/linux/phylink.h b/include/linux/phylink.h
+index 0bbcb4898e93..f19b7108c840 100644
+--- a/include/linux/phylink.h
++++ b/include/linux/phylink.h
+@@ -693,8 +693,9 @@ static inline int phylink_get_link_timer_ns(phy_interface_t interface)
+ }
+ 
+ void phylink_mii_c22_pcs_decode_state(struct phylink_link_state *state,
+-				      u16 bmsr, u16 lpa);
++				      unsigned int neg_mode, u16 bmsr, u16 lpa);
+ void phylink_mii_c22_pcs_get_state(struct mdio_device *pcs,
++				   unsigned int neg_mode,
+ 				   struct phylink_link_state *state);
+ int phylink_mii_c22_pcs_encode_advertisement(phy_interface_t interface,
+ 					     const unsigned long *advertising);
 -- 
 2.30.2
 
