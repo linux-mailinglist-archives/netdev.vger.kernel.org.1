@@ -1,63 +1,59 @@
-Return-Path: <netdev+bounces-156688-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156696-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F2FDA076C9
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 14:12:49 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 113E0A07813
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 14:47:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A856C7A3A9A
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 13:12:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C483B1883742
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 13:47:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5865217F4A;
-	Thu,  9 Jan 2025 13:11:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 689F2219A72;
+	Thu,  9 Jan 2025 13:47:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="OFEaCKIW"
+	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="SLpARO5/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E2F1BA2E;
-	Thu,  9 Jan 2025 13:11:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6CB81A83E1
+	for <netdev@vger.kernel.org>; Thu,  9 Jan 2025 13:47:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736428310; cv=none; b=njXe2XVwwYL6yrem/XY/ojeoa8NyQOyZ5EeTDE+Q48rJ7+EfoEpsxlh/jqBpDwE5LstyjSb89R2+hVp+0mOJ90LVqyZX6Cw94ePMWl/1SGRQkhuqjadXXKkVTWZV214B26ZW6nII09ZFi9ppTYp45OAsmadUJB21K20CAfL0gHA=
+	t=1736430435; cv=none; b=j21G+27dHjdy80zcjpDQfB1WDuhN+xl3ZyFI/WwOE0Y+pIE8FatszvJutC5Xn6lUvrD84njj9ZZjS1ujtxW1WQ60SGEfXTeOQyppJguGjo1T0w73StLpjnWBTUGIzIVFqIEC3IoSLTT+z856w1ZkFE4IU5v8vYIUoV0G7fSUjr8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736428310; c=relaxed/simple;
-	bh=WNqCG5aj1Z5Z6Vavi0yXahgnOvyN0Yo7pSJg84dzMJc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=av9+99JZ+ihsuZ/waUurm0EmmVPtikMSbBID0xJHQelZTRYVZYr4H4SOZDuj3XdK3mRCmWN95Yy54PMUwsOdWrinYACR2z9MMCMVw3RbYwakbP+ZW4peTUvOZnLqJIR86V03h5jni2VIQqMEYHhKs9VELsdO46Je6+NmPts6KGI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=OFEaCKIW; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5094gtAv018495;
-	Thu, 9 Jan 2025 13:11:32 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	fdSr1sOO2d/Y41hZnhsfJ24JQqQV44b/b/fbT7QktRI=; b=OFEaCKIWBiZaHKEn
-	Q2RJsNyC5Y/IPUJZo3YQJoqqEAiw+TID72Kp+ZdZJMFNt7MDz7RCeJ0l5cGdFzCx
-	yJu4J3yI4ja+vfNqK8zPN/sLbBwxK7hPfBdbPcLbhVrCcaqpVUchA4hkC4XCfbam
-	qWUYxzWlhftTCGc/9R3XyNdwsyzCkmyrDrkZOTcYA5M8NJN4MZq4GxEO/9lBsjl3
-	18O2wFSWzermgNBe2qUknkqN7XU6jIxkfHubkRDkhrPbq/RR22vOLu8eCFp+mfIH
-	StJo3Jq2r26gfg41EGm5ou8SR1z/gYmB7qIA08cRQPRTgtQc3QbfQeKidCpmTFJB
-	8CfWvw==
-Received: from nasanppmta04.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4427nws4tv-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 09 Jan 2025 13:11:32 +0000 (GMT)
-Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
-	by NASANPPMTA04.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 509DBVmU025772
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 9 Jan 2025 13:11:31 GMT
-Received: from [10.253.38.216] (10.80.80.8) by nasanex01a.na.qualcomm.com
- (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Thu, 9 Jan 2025
- 05:11:26 -0800
-Message-ID: <8ac3167c-c8aa-4ddb-948f-758714df7495@quicinc.com>
-Date: Thu, 9 Jan 2025 21:11:05 +0800
+	s=arc-20240116; t=1736430435; c=relaxed/simple;
+	bh=+t6xL6aUUlHqw/1BySaYl0XfaP/8IBcJEMltDRiNodQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=bOuEQxyAiU+zBJGK3h2Eb7sQeHG5nPkLnAZWm151J/z4e06oe2CjVUghU0dgOH+tHsGYx1FUjPAjbpKgiEWYYbrhHB8iQKNncvTpNu6oCEOaXDszb65bszuKDSnd5PB9zHTOLtGE7fEUjzcxBQavnGTb2gU669bA0dy5EYycqHk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=SLpARO5/; arc=none smtp.client-ip=185.226.149.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
+Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
+	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.93)
+	(envelope-from <mhal@rbox.co>)
+	id 1tVsN6-002pyd-0c; Thu, 09 Jan 2025 14:14:48 +0100
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+	s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
+	References:Cc:To:Subject:MIME-Version:Date:Message-ID;
+	bh=3cUkymQJSJr9t9+pyatWi8KGoJKjDsSNQ5WB+gYAx38=; b=SLpARO5/+f9xc+MCY3o5+fIY4m
+	n/M0P0FembpPsxfv9pfCtkC2FqUGFZiWj+C2EqMgYv3ugkDKr8SL+zMlIODzoulXcQ++9O5c2oT1V
+	M8J46X3fy2lezu3dn//tLXmZ+8KUQMfqqp+gRH3IDzN8KgpIdVO3Z1R6R+oswEDviWYo8vEqbifnZ
+	iNyPVXpvMdCc4Up545J2klv1IRx54+ot1HzuX20VrN1wbEsS1m9K46NjGeSxoRaXFvhz5cIWDF0xU
+	x9dWdU9YdVeXKtw3QnsSemb4NXO3Ulia30lbX2GzC/fwTNMwN9Bm6niVIixwJgEvPJTTHWaJCIRMB
+	ZDvo98Ow==;
+Received: from [10.9.9.72] (helo=submission01.runbox)
+	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
+	(envelope-from <mhal@rbox.co>)
+	id 1tVsN4-0003CP-FR; Thu, 09 Jan 2025 14:14:46 +0100
+Received: by submission01.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.93)
+	id 1tVsMw-006OkQ-0S; Thu, 09 Jan 2025 14:14:38 +0100
+Message-ID: <c0896f6a-d8b8-4db5-804d-0e4b35827a62@rbox.co>
+Date: Thu, 9 Jan 2025 14:14:35 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,125 +61,99 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v4 3/5] net: pcs: qcom-ipq9574: Add PCS
- instantiation and phylink operations
-To: Simon Horman <horms@kernel.org>
-CC: Andrew Lunn <andrew+netdev@lunn.ch>,
-        "David S. Miller"
-	<davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Rob Herring
-	<robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley
-	<conor+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
-        Heiner Kallweit
-	<hkallweit1@gmail.com>,
-        Russell King <linux@armlinux.org.uk>, <netdev@vger.kernel.org>,
-        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-arm-msm@vger.kernel.org>, <quic_kkumarcs@quicinc.com>,
-        <quic_suruchia@quicinc.com>, <quic_pavir@quicinc.com>,
-        <quic_linchen@quicinc.com>, <quic_luoj@quicinc.com>,
-        <srinivas.kandagatla@linaro.org>, <bartosz.golaszewski@linaro.org>,
-        <vsmuthu@qti.qualcomm.com>, <john@phrozen.org>
-References: <20250108-ipq_pcs_net-next-v4-0-0de14cd2902b@quicinc.com>
- <20250108-ipq_pcs_net-next-v4-3-0de14cd2902b@quicinc.com>
- <20250108100358.GG2772@kernel.org>
-Content-Language: en-US
-From: Lei Wei <quic_leiwei@quicinc.com>
-In-Reply-To: <20250108100358.GG2772@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+Subject: Re: [PATCH net 2/2] vsock/bpf: return early if transport is not
+ assigned
+To: Stefano Garzarella <sgarzare@redhat.com>, netdev@vger.kernel.org
+Cc: Simon Horman <horms@kernel.org>, Stefan Hajnoczi <stefanha@redhat.com>,
+ linux-kernel@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Wongi Lee <qwerty@theori.io>,
+ "David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
+ Jason Wang <jasowang@redhat.com>,
+ Bobby Eshleman <bobby.eshleman@bytedance.com>,
+ virtualization@lists.linux.dev, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
+ <eperezma@redhat.com>, Luigi Leonardi <leonardi@redhat.com>,
+ bpf@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Hyunwoo Kim <v4bel@theori.io>,
+ kvm@vger.kernel.org
+References: <20250108180617.154053-1-sgarzare@redhat.com>
+ <20250108180617.154053-3-sgarzare@redhat.com>
+From: Michal Luczaj <mhal@rbox.co>
+Content-Language: pl-PL, en-GB
+In-Reply-To: <20250108180617.154053-3-sgarzare@redhat.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nasanex01a.na.qualcomm.com (10.52.223.231)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: Jt4ELdp5GQdwqa7zj0rpHoY5rcng5sFq
-X-Proofpoint-GUID: Jt4ELdp5GQdwqa7zj0rpHoY5rcng5sFq
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- suspectscore=0 phishscore=0 bulkscore=0 adultscore=0 mlxlogscore=756
- mlxscore=0 clxscore=1011 impostorscore=0 spamscore=0 priorityscore=1501
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2411120000 definitions=main-2501090105
+
+On 1/8/25 19:06, Stefano Garzarella wrote:
+> Some of the core functions can only be called if the transport
+> has been assigned.
+> 
+> As Michal reported, a socket might have the transport at NULL,
+> for example after a failed connect(), causing the following trace:
+> 
+>     BUG: kernel NULL pointer dereference, address: 00000000000000a0
+>     #PF: supervisor read access in kernel mode
+>     #PF: error_code(0x0000) - not-present page
+>     PGD 12faf8067 P4D 12faf8067 PUD 113670067 PMD 0
+>     Oops: Oops: 0000 [#1] PREEMPT SMP NOPTI
+>     CPU: 15 UID: 0 PID: 1198 Comm: a.out Not tainted 6.13.0-rc2+
+>     RIP: 0010:vsock_connectible_has_data+0x1f/0x40
+>     Call Trace:
+>      vsock_bpf_recvmsg+0xca/0x5e0
+>      sock_recvmsg+0xb9/0xc0
+>      __sys_recvfrom+0xb3/0x130
+>      __x64_sys_recvfrom+0x20/0x30
+>      do_syscall_64+0x93/0x180
+>      entry_SYSCALL_64_after_hwframe+0x76/0x7e
+> 
+> So we need to check the `vsk->transport` in vsock_bpf_recvmsg(),
+> especially for connected sockets (stream/seqpacket) as we already
+> do in __vsock_connectible_recvmsg().
+> 
+> Fixes: 634f1a7110b4 ("vsock: support sockmap")
+> Reported-by: Michal Luczaj <mhal@rbox.co>
+> Closes: https://lore.kernel.org/netdev/5ca20d4c-1017-49c2-9516-f6f75fd331e9@rbox.co/
+> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+
+Tested-by: Michal Luczaj <mhal@rbox.co>
 
 
-
-On 1/8/2025 6:03 PM, Simon Horman wrote:
-> On Wed, Jan 08, 2025 at 10:50:26AM +0800, Lei Wei wrote:
->> This patch adds the following PCS functionality for the PCS driver
->> for IPQ9574 SoC:
->>
->> a.) Parses PCS MII DT nodes and instantiate each MII PCS instance.
->> b.) Exports PCS instance get and put APIs. The network driver calls
->> the PCS get API to get and associate the PCS instance with the port
->> MAC.
->> c.) PCS phylink operations for SGMII/QSGMII interface modes.
->>
->> Signed-off-by: Lei Wei <quic_leiwei@quicinc.com>
+> ---
+>  net/vmw_vsock/vsock_bpf.c | 9 +++++++++
+>  1 file changed, 9 insertions(+)
 > 
-> ...
-> 
->> +static int ipq_pcs_enable(struct phylink_pcs *pcs)
->> +{
->> +	struct ipq_pcs_mii *qpcs_mii = phylink_pcs_to_qpcs_mii(pcs);
->> +	struct ipq_pcs *qpcs = qpcs_mii->qpcs;
->> +	int index = qpcs_mii->index;
->> +	int ret;
->> +
->> +	ret = clk_prepare_enable(qpcs_mii->rx_clk);
->> +	if (ret) {
->> +		dev_err(qpcs->dev, "Failed to enable MII %d RX clock\n", index);
->> +		return ret;
->> +	}
->> +
->> +	ret = clk_prepare_enable(qpcs_mii->tx_clk);
->> +	if (ret) {
->> +		dev_err(qpcs->dev, "Failed to enable MII %d TX clock\n", index);
->> +		return ret;
-> 
-> Hi Lei Wei,
-> 
-> I think you need something like the following to avoid leaking qpcs_mii->rx_clk.
-> 
-> 		goto err_disable_unprepare_rx_clk;
-> 	}
-> 
-> 	return 0;
-> 
-> err_disable_unprepare_rx_clk:
-> 	clk_disable_unprepare(qpcs_mii->rx_clk);
-> 	return ret;
-> }
-> 
-> Flagged by Smatch.
-> 
-
-We had a conversation with Russell King in v2 that even if the phylink 
-pcs enable sequence encounters an error, it does not unwind the steps it 
-has already done. So we removed the call to unprepare in case of error 
-here, since an error here is essentially fatal in this path with no 
-unwind possibility.
-
-https://lore.kernel.org/all/38d7191f-e4bf-4457-9898-bb2b186ec3c7@quicinc.com/
-
-However to satisfy this smatch warning/error, we may need to revert back 
-to the adding the unprepare call in case of error. Request Russel to 
-comment as well if this is fine.
-
-Is it possible to share the log/command-options of the smatch failure so 
-that we can reproduce this? Thanks.
-
-
->> +	}
->> +
->> +	return 0;
->> +}
-> 
-> ...
-> 
+> diff --git a/net/vmw_vsock/vsock_bpf.c b/net/vmw_vsock/vsock_bpf.c
+> index 4aa6e74ec295..f201d9eca1df 100644
+> --- a/net/vmw_vsock/vsock_bpf.c
+> +++ b/net/vmw_vsock/vsock_bpf.c
+> @@ -77,6 +77,7 @@ static int vsock_bpf_recvmsg(struct sock *sk, struct msghdr *msg,
+>  			     size_t len, int flags, int *addr_len)
+>  {
+>  	struct sk_psock *psock;
+> +	struct vsock_sock *vsk;
+>  	int copied;
+>  
+>  	psock = sk_psock_get(sk);
+> @@ -84,6 +85,13 @@ static int vsock_bpf_recvmsg(struct sock *sk, struct msghdr *msg,
+>  		return __vsock_recvmsg(sk, msg, len, flags);
+>  
+>  	lock_sock(sk);
+> +	vsk = vsock_sk(sk);
+> +
+> +	if (!vsk->transport) {
+> +		copied = -ENODEV;
+> +		goto out;
+> +	}
+> +
+>  	if (vsock_has_data(sk, psock) && sk_psock_queue_empty(psock)) {
+>  		release_sock(sk);
+>  		sk_psock_put(sk, psock);
+> @@ -108,6 +116,7 @@ static int vsock_bpf_recvmsg(struct sock *sk, struct msghdr *msg,
+>  		copied = sk_msg_recvmsg(sk, psock, msg, len, flags);
+>  	}
+>  
+> +out:
+>  	release_sock(sk);
+>  	sk_psock_put(sk, psock);
+>  
 
 
