@@ -1,131 +1,144 @@
-Return-Path: <netdev+bounces-156580-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156581-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6CD76A0719F
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 10:37:30 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 26DC4A071A4
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 10:37:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E0BEF188ABC0
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 09:37:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 551EE3A5C5D
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 09:37:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 336C52153E0;
-	Thu,  9 Jan 2025 09:37:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17BBE2153CE;
+	Thu,  9 Jan 2025 09:37:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O61cUJnX"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AFOQmSTz"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09B4C2153CE;
-	Thu,  9 Jan 2025 09:37:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E7112594BA
+	for <netdev@vger.kernel.org>; Thu,  9 Jan 2025 09:37:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736415435; cv=none; b=bdBvhJZ3m8OVkxEbz/7saI8Zdjg5sTjIEDAxFRvRGvp2NDHxnnno+fGkDF3gvkwjUv58wS5tM4+BbwxpI02VWQlFzkFIHMYT9YmHb6jeRAPgYaCULyFV9cdjLVC3yYmtxCMRrIlJxVxn2Qu58pW/VZEx/HG0tFjAA7xpaVJeqtU=
+	t=1736415462; cv=none; b=Veo7l7Fwsmv65z6jPR166Nj8IWmw0iE0BsnaD6zgocfQcWUp/I2vpLYxTi39yNF/OM9QT613od273xm2BYqYwyUVrzJK7lIDxAGtrlUT6jV5ALP9d77GjVcTiC3IJnzfoC+vHq/SbpI+jXI7ziKJUU1ieWm8bmrRvElZmTrbsR0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736415435; c=relaxed/simple;
-	bh=aqJf6bJtcvpupemt4+UV6C4fhRmFmBym9M66ZRrUbZ4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nivW+sOT7y5fRzttvBGACCuz2alu9E03c3tz9waaj9il1YQ4K27fLE9ILt+FPhhK4eiVDo9dLFI6+UPDbegk9IhKhybRWfjNHL2qR1b4EB1wppuK5MTdTop74AKjatzxce037kadyu9Lu2/VlxhJqdp3qB8Lsn+/yent7ErTyPg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O61cUJnX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 829DBC4CED2;
-	Thu,  9 Jan 2025 09:37:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736415433;
-	bh=aqJf6bJtcvpupemt4+UV6C4fhRmFmBym9M66ZRrUbZ4=;
-	h=From:To:Cc:Subject:Date:From;
-	b=O61cUJnXYsX7To1dvkwt8c4Nd7CJ54k+XHRR7bAjSfv3iF990+fmp0U75gvyQpf0P
-	 cS7+ln1P1Sq93SULHUFkeZD3a1Fhkmc5l7tH09RlqiQ3VsIcgNc9qP0lKl4PmxfD54
-	 CtOK7vvBzkkAkRgpCLA8FktAnQqWKDu+pFgU5v+2mWJKoMuX4RhzczF4V/p3X+hZt0
-	 wGiphn5Yg3Sz8qWCFcsneMMeDHxGAFQjkh2+0Kmj/J9lE8kvb6lFSGqhnLt58+IXDn
-	 FD8i+PXpvF955hlVFC44K5BUHxban49TVa/OllW5Olis+l0YrEMrDEdQZVFVLTW5nK
-	 fIED9p+VtbdTw==
-From: Antoine Tenart <atenart@kernel.org>
-To: pablo@netfilter.org,
-	kadlec@netfilter.org
-Cc: Antoine Tenart <atenart@kernel.org>,
-	dsahern@kernel.org,
-	menglong8.dong@gmail.com,
-	netfilter-devel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH nf-next] netfilter: br_netfilter: remove unused conditional and dead code
-Date: Thu,  9 Jan 2025 10:37:09 +0100
-Message-ID: <20250109093710.494322-1-atenart@kernel.org>
-X-Mailer: git-send-email 2.47.1
+	s=arc-20240116; t=1736415462; c=relaxed/simple;
+	bh=fU8s7w7K7tvNKOVFFKMzVGMmQWFxUprl9XPXzD7hEBM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=oVOGT3r5XFAoQgOsd+Rl5vBXhI8g0nNhH65s19zogQJnfHm/wIy9wKowx+ggM9YyajmQIJDgHkdm52ArZko9Xz7CC8s6uoFkj3XVA3FS4iLyksihy805uPA4R+unoRu+4/cyZPzjvh7bZfqvB45HrDdAzR1kmyiCfJ/MYPDApCU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AFOQmSTz; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1736415459;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=zlguHxDSv6f2kjam2JyYQgfvVb9DaN2aNRpw2oQi+Nc=;
+	b=AFOQmSTz7/A8IlVZytHZ0Dhy7TskflXSK/T9F9r8LVEAhlhhCSfij4ChApqt4aWOI35b+E
+	9Ovc9l8qpIH2/iKCrxFAPmYz2b1j40pR09uGrMm1PTmBtQK+smOZKPTHzrcchlzsvWywZS
+	4oZTwJuw3Y8ksPHL9byn+RB68/c/T08=
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
+ [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-632-wNypPUEcOIyl5Dbehzb_jA-1; Thu, 09 Jan 2025 04:37:38 -0500
+X-MC-Unique: wNypPUEcOIyl5Dbehzb_jA-1
+X-Mimecast-MFC-AGG-ID: wNypPUEcOIyl5Dbehzb_jA
+Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-7b6e178d4f8so121899785a.3
+        for <netdev@vger.kernel.org>; Thu, 09 Jan 2025 01:37:38 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736415457; x=1737020257;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=zlguHxDSv6f2kjam2JyYQgfvVb9DaN2aNRpw2oQi+Nc=;
+        b=C38HLaQm8yP7DEOOlDbVazV5Vdaozee3GAPaAmNjkoVb5h+7Msg7730SgCTcBNYBSc
+         T71cwRvGSgDI41BOAIOrrb9hP0PL0bUP2XG6ZDSawe7zjL4XwruAJKeaFVLSDhHcm9LY
+         G2D7iDYNpFxAQKoA0XkdB9DfrgEcZP0xEXBpbOOuo8xY+62YsTLx1Hyj3LTn4e8E2NfL
+         hULqHQmthkFHVIzJY35F9qmbxXO+bsiYB1m8lwhtWFyoOthyy/TxlwAecAIKFV8GVuFp
+         aVX29GQhYnvWz+j8AvbIJAXvSyVCzqqBIbcDb2NFdhu3U7z2/GclnkuBGc2XfijqAbla
+         /awQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXIxKIUKWuejk11hMFhmy0FXd8I++S6Svdq0dnGoLWqCY9y0C6Vk2bnmxTZF3N8eWuLgxPpiQg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzoopZDKdASplUX0Lm6NTSv7L64HEEaxL7ZT01NN7YdXSX1PLat
+	14gtNU7qk2xZBL8XCgDzQAKgL5jNTlcmiC5oUjspZPetGQD/RgApaX2XVyqlpq0uQ7Zcq1/aFSq
+	FYaXmohYKsp9aKLLMhD123S/HWWT2bnDgLEXOO8V3cKmpVgdYOtkhHw==
+X-Gm-Gg: ASbGncudMSEOFpA2WAELkPrstc2ssHwFRwXtvVd9qvIbf7fJ0jxdX1m0vDKQpSMx07H
+	3Tyx377fTIyO8s/2oqyzAFnVq0VRMeZ08PRKT+25QFr6JufI9pLdUZCtvpxQNYK80l6Bv1Gp2YL
+	Z6t9mrjoao32+LPNf1QL4Scsq//nlxXGgnkX0mW8OO0lZfehrJ+zRfbo3FH5rgJqh6O7lR9ADsa
+	MloU/V0UKj+jED2Q/TKnG9dAiJpEzqYr4gAzbqE3sf55Mxk9rAKLB0A3RZfvZRAAgcAffE63Fpo
+	gNruxc+I
+X-Received: by 2002:a05:620a:2443:b0:7b6:72bc:df67 with SMTP id af79cd13be357-7bcd96fa150mr889455085a.1.1736415457731;
+        Thu, 09 Jan 2025 01:37:37 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IG2F6Ru6Ok/aPxAZik1gN132odWyGCZsSRKmKWIOUestXgwhfS9+7n6PwHtMVo8+7sYD3e+Kg==
+X-Received: by 2002:a05:620a:2443:b0:7b6:72bc:df67 with SMTP id af79cd13be357-7bcd96fa150mr889452685a.1.1736415457435;
+        Thu, 09 Jan 2025 01:37:37 -0800 (PST)
+Received: from [192.168.88.253] (146-241-2-244.dyn.eolo.it. [146.241.2.244])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7bce3237e3bsm49254385a.23.2025.01.09.01.37.34
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 09 Jan 2025 01:37:37 -0800 (PST)
+Message-ID: <690fc7d2-c235-450c-981a-a889f976936e@redhat.com>
+Date: Thu, 9 Jan 2025 10:37:32 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 08/14] net: pse-pd: Split ethtool_get_status into
+ multiple callbacks
+To: Jakub Kicinski <kuba@kernel.org>,
+ Kory Maincent <kory.maincent@bootlin.com>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Simon Horman <horms@kernel.org>, Donald Hunter <donald.hunter@gmail.com>,
+ Jonathan Corbet <corbet@lwn.net>, Liam Girdwood <lgirdwood@gmail.com>,
+ Mark Brown <broonie@kernel.org>,
+ Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ linux-doc@vger.kernel.org, Kyle Swenson <kyle.swenson@est.tech>,
+ Dent Project <dentproject@linuxfoundation.org>, kernel@pengutronix.de,
+ Maxime Chevallier <maxime.chevallier@bootlin.com>
+References: <20250104-b4-feature_poe_arrange-v1-0-92f804bd74ed@bootlin.com>
+ <20250104-b4-feature_poe_arrange-v1-8-92f804bd74ed@bootlin.com>
+ <20250107171554.742dcf59@kernel.org>
+ <20250108102736.18c8a58f@kmaincent-XPS-13-7390>
+ <20250108093645.72947028@kernel.org>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250108093645.72947028@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-The SKB_DROP_REASON_IP_INADDRERRORS drop reason is never returned from
-any function, as such it cannot be returned from the ip_route_input call
-tree. The 'reason != SKB_DROP_REASON_IP_INADDRERRORS' conditional is
-thus always true.
+On 1/8/25 6:36 PM, Jakub Kicinski wrote:
+> On Wed, 8 Jan 2025 10:27:36 +0100 Kory Maincent wrote:
+>>> Is there a reason this is defined in ethtool.h?  
+>>
+>> I moved in to ethtool because the PSE drivers does not need it anymore.
+>> I can keep it in pse.h.
+>>
+>>> I have a weak preference towards keeping it in pse-pd/pse.h
+>>> since touching ethtool.h rebuilds bulk of networking code.
+>>> From that perspective it's also suboptimal that pse-pd/pse.h
+>>> pulls in ethtool.h.  
+>>
+>> Do you prefer the other way around, ethtool.h pulls in pse.h?
+> 
+> No, no, I'd say the order of deceasing preference is:
+>  - headers are independent
+>  - smaller header includes bigger one
+>  - bigger one includes smaller one
 
-Looking back at history, commit 50038bf38e65 ("net: ip: make
-ip_route_input() return drop reasons") changed the ip_route_input
-returned value check in br_nf_pre_routing_finish from -EHOSTUNREACH to
-SKB_DROP_REASON_IP_INADDRERRORS. It turns out -EHOSTUNREACH could not be
-returned either from the ip_route_input call tree and this since commit
-251da4130115 ("ipv4: Cache ip_error() routes even when not
-forwarding.").
+In this specific case, given the widespread inclusion of ethtool.h, I
+think keeping the struct definition in pse.h is necessary - the reduced
+incremental builds time would be a good enough reason for it.
 
-Not a fix as this won't change the behavior. While at it use
-kfree_skb_reason.
+Thanks!
 
-Signed-off-by: Antoine Tenart <atenart@kernel.org>
----
- net/bridge/br_netfilter_hooks.c | 30 +-----------------------------
- 1 file changed, 1 insertion(+), 29 deletions(-)
-
-diff --git a/net/bridge/br_netfilter_hooks.c b/net/bridge/br_netfilter_hooks.c
-index 451e45b9a6a5..94cbe967d1c1 100644
---- a/net/bridge/br_netfilter_hooks.c
-+++ b/net/bridge/br_netfilter_hooks.c
-@@ -393,38 +393,10 @@ static int br_nf_pre_routing_finish(struct net *net, struct sock *sk, struct sk_
- 		reason = ip_route_input(skb, iph->daddr, iph->saddr,
- 					ip4h_dscp(iph), dev);
- 		if (reason) {
--			struct in_device *in_dev = __in_dev_get_rcu(dev);
--
--			/* If err equals -EHOSTUNREACH the error is due to a
--			 * martian destination or due to the fact that
--			 * forwarding is disabled. For most martian packets,
--			 * ip_route_output_key() will fail. It won't fail for 2 types of
--			 * martian destinations: loopback destinations and destination
--			 * 0.0.0.0. In both cases the packet will be dropped because the
--			 * destination is the loopback device and not the bridge. */
--			if (reason != SKB_DROP_REASON_IP_INADDRERRORS || !in_dev ||
--			    IN_DEV_FORWARD(in_dev))
--				goto free_skb;
--
--			rt = ip_route_output(net, iph->daddr, 0,
--					     ip4h_dscp(iph), 0,
--					     RT_SCOPE_UNIVERSE);
--			if (!IS_ERR(rt)) {
--				/* - Bridged-and-DNAT'ed traffic doesn't
--				 *   require ip_forwarding. */
--				if (rt->dst.dev == dev) {
--					skb_dst_drop(skb);
--					skb_dst_set(skb, &rt->dst);
--					goto bridged_dnat;
--				}
--				ip_rt_put(rt);
--			}
--free_skb:
--			kfree_skb(skb);
-+			kfree_skb_reason(skb, reason);
- 			return 0;
- 		} else {
- 			if (skb_dst(skb)->dev == dev) {
--bridged_dnat:
- 				skb->dev = br_indev;
- 				nf_bridge_update_protocol(skb);
- 				nf_bridge_push_encap_header(skb);
--- 
-2.47.1
+Paolo
 
 
