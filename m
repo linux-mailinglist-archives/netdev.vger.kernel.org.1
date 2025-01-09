@@ -1,69 +1,127 @@
-Return-Path: <netdev+bounces-156829-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156830-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 840B9A07F01
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 18:41:36 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A292A07F11
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 18:43:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E0016188D653
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 17:41:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 234723A510D
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 17:42:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E979D1FA8D9;
-	Thu,  9 Jan 2025 17:39:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D47A1204C00;
+	Thu,  9 Jan 2025 17:40:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kxYDKtFm"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE4C919ADB0
-	for <netdev@vger.kernel.org>; Thu,  9 Jan 2025 17:39:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EDF8191499;
+	Thu,  9 Jan 2025 17:40:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736444394; cv=none; b=vDee5lt9ZiwCMs+3+3UveI2rLQBVrRjg/aly8D90gPqUeehH1UvOAJWCJ0IWCCTnJTQ8gQKiteD5J5CS3jsljuKe4WF/HJ0Qwxf+mwBjgaG6iKfx3eud0fztFY4Oj9lu243UAIHDIKjElS7rJkYcct8HnURTxiz8Y1gSVEa9jAs=
+	t=1736444413; cv=none; b=FqsQeOyIP35AndS351rNHZlkRjYkQCjSfdpAv2ZGaeC4fafoKjI9e5XpVGR+hG8gEMdXF2VK5eFxB0iWTmy9ah1aYFzaMpO0UKmp75WNmwXT9bFgBSJvQ2+Y6QRry3V1QL/6zUiRogG/6f9+fLjpN6IESzYnkC5YjH0S9xMHqEc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736444394; c=relaxed/simple;
-	bh=jijRYU/KHDpDFxPipJNhowBxN18iiyG6Z+gjO6HhG/8=;
+	s=arc-20240116; t=1736444413; c=relaxed/simple;
+	bh=sgY/WTgpLVob/H26v16vqR9o2OrCi4sBG/wp4T0MeF4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Glg3vkQAOw+MlpD+cLhcc41qNBGHnena5t4HmPLULncvjrffY+9iwkIypA94gHFewOS+AQmCoojcSgOLEH4nDpMZa2OAnddbMQelhJRyZHPK7EIW8x+ipSmDqSMyUgJjM8tG4OqVgpPl99G4g53lFLsAB7MxQNB2NEXqYNlrXFY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1tVwVW-0005ud-Ck; Thu, 09 Jan 2025 18:39:46 +0100
-Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1tVwVV-0001J6-21;
-	Thu, 09 Jan 2025 18:39:45 +0100
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1tVwVV-000319-1g;
-	Thu, 09 Jan 2025 18:39:45 +0100
-Date: Thu, 9 Jan 2025 18:39:45 +0100
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: "David S. Miller" <davem@davemloft.net>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=i8FjNXQNn8RbNtP8kguG9TNFuPiUAtLk1dNP+l7oPPrZ6tCgD0Jsfxr5eIP5w4n4XtgArJr3JMCEKUqXCR2G1lBCuua2/OoiGer6qGhsqqxLLVoK7Dh8o/CSfxd7R0ovJrpo7od9TlUALW7MirAQxab2r395brKQc4k+Tdm5uEE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kxYDKtFm; arc=none smtp.client-ip=209.85.216.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-2ef760a1001so1964313a91.0;
+        Thu, 09 Jan 2025 09:40:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1736444411; x=1737049211; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=tWpZAtZ5fwsLcgO5aqlcO3OYh1NgLbgjWHyNFFao33Y=;
+        b=kxYDKtFmK/XZikqpNb+WWnSfItRCtjNabdE5eMqKZHR0qwpi4hrZu2d7roxLzTuxTl
+         T6M4hxEXM7WaIJpdDW2w2pJnbkHcFZ4BvDVrZpNU2fLHoNx+0qUaz0I+RgZbYPLujNEj
+         quJIzXvcC0lr2QdO6vfVNSowux256wEWDejv0lZcyfUcTEcQJKlEdQPXShyazaL/1UA7
+         cFmLgnHzzrMxuPx5TaOI9TGM64s4lzTkunbQ6RMQ05k6S7oxZNwTCUm/uA0GB5Yjaa8m
+         89dBS0m6oiZDht7ml3k0c23Fif7RWg/X6d3vvpY+SjRrOAJvGdWiw6/fL7Fwt3CEXPTT
+         Xwdg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736444411; x=1737049211;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tWpZAtZ5fwsLcgO5aqlcO3OYh1NgLbgjWHyNFFao33Y=;
+        b=Jf40ld+WFRiwiBC0FRv0vlYEvsPWw8pJPZLUfc56I8ng6xbwjc4vk+Yu0Elh4ZWE0c
+         P4MCqNJmn4PuVcfr1XIsu4vuoy190Y/LKSO21Aa5f8LjZzIm8EjGebmtlXVfUOKCsFLY
+         p+vhCEwIgkrWXXSMh2pp2CGPHZBPiXwNThyh/Jg6IrdcfoUd91g/t/rg7Ye19zaMDY5l
+         RsXUFfqmPAnZxB50oNTWQrJK3LUN1LsImNewQ2C+qalZBofOZVUOYfb3aKv1eQU8Cku+
+         fRE3OHFNMXWqvM1+OdjjBL38yXA/biFwM1qwscKVKaUx3cxhOdxHC1jWEttrlaJPsvPC
+         ixOA==
+X-Forwarded-Encrypted: i=1; AJvYcCUGJ5op8VYK09mtia2uE7i9jF4UVGbMP5cGtJ0wk1dyGTMZkDjXudqW5uglRULRGMs2qx3FhAjZd3mTOEBwDG1Y@vger.kernel.org, AJvYcCVAEkseggCGr0TfYIV7d8XK10RMYQDalDqWLgiB22v47FB2MD3zkjIvzYNAuZcAhXUVF/uF9zfSKXQW5vzv@vger.kernel.org, AJvYcCWDCS18WAh/6P1R0FzgyXK3HcQjKxt9zng8DUbQZOgzy/6nlBw3a4nUJrEeXcxKplt0xgBtX1eKDA4N@vger.kernel.org, AJvYcCXDeB/wR1M77ih1ePzIZ1CIlqbzKN2OXjhS4z+F5b6haxSGYgP04KPKIlULq3eccaesv5kDdTA/@vger.kernel.org, AJvYcCXzh/DZ5xCGecAiv+fFmE5x2fdk6eu/scEtiAa5zjPYVf3+yKddoBEUym5e6Za6Egy+gbg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy+xgZTp3EhVcmhdc8ZeuRZG036JDQBNubpLL/lq+7omGK2qptQ
+	WU0zzO1HnSNmRrFAyxZNFNclmJd58o3QZH19tKbB7pqiD9diM4c=
+X-Gm-Gg: ASbGncu2N1IRhXg5M+2Ad0GWGg4OZ9pJ3xM5u2c6qYNXIVV5dd5kgztcLzEDYCpKawt
+	NUdoZNWTZ+GmJX3GKBnmXu/9YURVR5rZkD+lL6mkUbC9ql4u+lLT4oCpywKmu0Zd7jkrhvL1tmD
+	rls4iT3Z8maiGY0ArioKOGvQWAsYIZzsYp6jph4laRy/rC6eBHRI4vQ1lOuj0Jd78oGGylBngvS
+	72wQBiQxg+FtRp1KM6YPNwWpkDDPhUy2PPt/F2NleUqOLPdY3D5COsS
+X-Google-Smtp-Source: AGHT+IEZHpA+1As7rYRP/wbYTv7BBI8EycFV1R1kQaORb6ULu5g6y7WttO6FZ+OmR/qIEMsz9TCzbg==
+X-Received: by 2002:a17:90a:d887:b0:2ea:7cd5:4ad6 with SMTP id 98e67ed59e1d1-2f5490dbefemr9659697a91.32.1736444411540;
+        Thu, 09 Jan 2025 09:40:11 -0800 (PST)
+Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2f5593d0911sm1848116a91.8.2025.01.09.09.40.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 Jan 2025 09:40:11 -0800 (PST)
+Date: Thu, 9 Jan 2025 09:40:10 -0800
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: "Song, Yoong Siang" <yoong.siang.song@intel.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Woojung Huh <woojung.huh@microchip.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>, kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	UNGLinuxDriver@microchip.com, Phil Elwell <phil@raspberrypi.org>
-Subject: Re: [PATCH net-next v1 7/7] net: usb: lan78xx: Enable EEE support
- with phylink integration
-Message-ID: <Z4AJ4bxLePBbbR2u@pengutronix.de>
-References: <20250108121341.2689130-1-o.rempel@pengutronix.de>
- <20250108121341.2689130-8-o.rempel@pengutronix.de>
- <Z35z6ZHspfSZK4U7@shell.armlinux.org.uk>
- <Z36KacKBd2WaOxfW@pengutronix.de>
- <Z36WqNGpWWkHTjUE@shell.armlinux.org.uk>
- <Z4ADpj0DlqBRUEK-@pengutronix.de>
- <Z4AG7zvIvQDv3GTn@shell.armlinux.org.uk>
+	Simon Horman <horms@kernel.org>,
+	Willem de Bruijn <willemb@google.com>,
+	"Bezdeka, Florian" <florian.bezdeka@siemens.com>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Jonathan Corbet <corbet@lwn.net>, Bjorn Topel <bjorn@kernel.org>,
+	"Karlsson, Magnus" <magnus.karlsson@intel.com>,
+	"Fijalkowski, Maciej" <maciej.fijalkowski@intel.com>,
+	Jonathan Lemon <jonathan.lemon@gmail.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	"Damato, Joe" <jdamato@fastly.com>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Mina Almasry <almasrymina@google.com>,
+	Daniel Jurgens <danielj@nvidia.com>,
+	Amritha Nambiar <amritha.nambiar@intel.com>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Eduard Zingerman <eddyz87@gmail.com>,
+	Mykola Lysenko <mykolal@fb.com>,
+	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	KP Singh <kpsingh@kernel.org>, Hao Luo <haoluo@google.com>,
+	Jiri Olsa <jolsa@kernel.org>, Shuah Khan <shuah@kernel.org>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	"Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
+	"Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+	"bpf@vger.kernel.org" <bpf@vger.kernel.org>,
+	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+	"linux-stm32@st-md-mailman.stormreply.com" <linux-stm32@st-md-mailman.stormreply.com>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	"xdp-hints@xdp-project.net" <xdp-hints@xdp-project.net>
+Subject: Re: [PATCH bpf-next v4 1/4] xsk: Add launch time hardware offload
+ support to XDP Tx metadata
+Message-ID: <Z4AJ-pIyAUbXJJpx@mini-arch>
+References: <20250106135606.9704-1-yoong.siang.song@intel.com>
+ <Z31bQ6xEkyQvbutN@mini-arch>
+ <PH0PR11MB5830D33B679A0ACD3FD6E23CD8132@PH0PR11MB5830.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -72,131 +130,26 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <Z4AG7zvIvQDv3GTn@shell.armlinux.org.uk>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+In-Reply-To: <PH0PR11MB5830D33B679A0ACD3FD6E23CD8132@PH0PR11MB5830.namprd11.prod.outlook.com>
 
-On Thu, Jan 09, 2025 at 05:27:11PM +0000, Russell King (Oracle) wrote:
-> On Thu, Jan 09, 2025 at 06:13:10PM +0100, Oleksij Rempel wrote:
-> > On Wed, Jan 08, 2025 at 03:15:52PM +0000, Russell King (Oracle) wrote:
-> > > On Wed, Jan 08, 2025 at 03:23:37PM +0100, Oleksij Rempel wrote:
-> > > > Yes, otherwise every MAC driver will need to do it in the
-> > > > ethtool_set_eee() function.
-> > > 
-> > > I've had several solutions, and my latest patch set actually has a
-> > > mixture of them in there (which is why I'm eager to try and find a way
-> > > forward on this, so I can fix the patch set):
-> > > 
-> > > 1. the original idea to address this in Marvell platforms was to limit
-> > >    the LPI timer to the maximum representable value in the hardware,
-> > >    which would be 255us. This ignores that the hardware uses a 1us
-> > >    tick rate for the timer at 1G speeds, and 10us for 100M speeds.
-> > >    (So it limits it to 260us, even though the hardware can do 2550us
-> > >    at 100M speed). This limit was applied by clamping the value passed
-> > >    in from userspace without erroring out.
-> > > 
-> > > 2. another solution was added the mac_validate_tx_lpi() method, and
-> > >    implementations added _in addition_ to the above, with the idea
-> > >    of erroring out for values > 255us on Marvell hardware.
-> > > 
-> > > 3. another idea was to have mac_enable_tx_lpi() error out if it wasn't
-> > >    possible to allow e.g. falling back to a software timer (see stmmac
-> > >    comments below.) Another reason for erroring out applies to Marvell
-> > >    hardware, where PP2 hardware supports LPI on the GMAC but not the
-> > >    XGMAC - so it only works at speeds at or below 2.5G. However, that
-> > >    can be handled via the lpi_capabilities, so I don't think needs to
-> > >    be a concern.
-> > > 
-> > > > The other question is, should we allow absolute maximum values, or sane
-> > > > maximum? At some point will come the question, why the EEE is even
-> > > > enabled?
-> > > 
-> > > As referenced above, stmmac uses the hardware timer for LPI timeouts up
-> > > to and including 1048575us (STMMAC_ET_MAX). Beyond that, it uses a
-> > > normal kernel timer which is:
-> > > 
-> > > - disabled (and EEE mode reset) when we have a packet to transmit, or
-> > >   EEE is disabled
-> > > - is re-armed when cleaning up from packet transmission (although
-> > >   it looks like we attempt to immediately enter LPI mode, and would
-> > >   only wait for the timer if there are more packets to queue... maybe
-> > >   this is a bug in stmmac's implementation?) or when EEE mode is first
-> > >   enabled with a LPI timer longer than the above value.
-> > > 
-> > > So, should phylink have the capability to switch to a software LPI timer
-> > > implementation when the LPI timeout value exceeds what the hardware
-> > > supports?
-> > 
-> > No, i'll list my arguments later down.
-> > 
-> > > To put it another way, should the stmmac solution to this be
-> > > made generic?
-> > 
-> > May be partially?
-> > 
-> > > Note that stmmac has this software timer implementation because not
-> > > only for the reason I've given above, but also because cores other than
-> > > GMAC4 that support LPI do not have support for the hardware timer.
-> > 
-> > There seems to be a samsung ethernet driver which implements software
-> > based timer too.
-> > 
-> > > > The same is about minimal value, too low value will cause strong speed
-> > > > degradation. Should we allow set insane minimum, but use sane default
-> > > > value?
-> > > 
-> > > We currently allow zero, and the behaviour of that depends on the
-> > > hardware. For example, in the last couple of days, it's been reported
-> > > that stmmac will never enter LPI with a value of zero.
-> > > 
-> > > Note that phylib defaults to zero, so imposing a minimum would cause
-> > > a read-modify-write of the EEE settings without setting the timer to
-> > > fail.
-> > >
-> > > > > Should set_eee() error out?
-> > > > 
-> > > > Yes, please.
-> > > 
-> > > If we are to convert stmmac, then we need to consider what it's doing
-> > > (as per the above) and whether that should be generic - and if it isn't
-> > > what we want in generic code, then how do we allow drivers to do this if
-> > > they wish.
-> > 
-> >    - EEE Advertisement:  
-> > 
-> >      Advertising EEE capabilities is entirely dependent on the PHY. Without a
-> > PHY, these settings cannot be determined or validated, as the PHY defines the
-> > supported capabilities. Any attempt to configure EEE advertisement without an
-> > attached PHY should fail immediately with an appropriate error, such as:  "EEE
-> > advertisement configuration not applied: no PHY available to validate
-> > capabilities."
+On 01/09, Song, Yoong Siang wrote:
+> On Wednesday, January 8, 2025 12:50 AM, Stanislav Fomichev <stfomichev@gmail.com> wrote:
+> >On 01/06, Song Yoong Siang wrote:
+> >> Extend the XDP Tx metadata framework so that user can requests launch time
+> >> hardware offload, where the Ethernet device will schedule the packet for
+> >> transmission at a pre-determined time called launch time. The value of
+> >> launch time is communicated from user space to Ethernet driver via
+> >> launch_time field of struct xsk_tx_metadata.
+> >>
+> >> Suggested-by: Stanislav Fomichev <sdf@google.com>
 > 
-> Sorry, at this point, I give up with phylink managed EEE. What you
-> detail above is way too much for me to get involved with, and goes
-> well beyond simply:
+> Hi Stanislav Fomichev,
 > 
-> 1) Fixing the cockup with the phylib-managed EEE that has caused *user*
->    *regressions* that we need to resolve.
+> Thanks for your review comments.
+> I notice that you have two emails:
+> sdf@google.com & stfomichev@gmail.com
 > 
-> 2) Providing core functionality so that newer implementations can have
->    a consistency of behaviour.
-> 
-> I have *no* interest in doing a total rewrite of kernel EEE
-> functionality - that goes well beyond my aims here.
->
-> So I'm afraid that I really lost interest in reading your email, sorry.
- 
-Sorry for killing your motivation. I can feel your pain...
+> Which one I should use in the suggested-by tag?
 
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+google.com should be bouncing now. sdf@fomichev.me is preferred.
 
