@@ -1,155 +1,121 @@
-Return-Path: <netdev+bounces-156830-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156832-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A292A07F11
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 18:43:15 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 761CAA07F24
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 18:45:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 234723A510D
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 17:42:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A30053A6D6C
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 17:43:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D47A1204C00;
-	Thu,  9 Jan 2025 17:40:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDD291B0421;
+	Thu,  9 Jan 2025 17:42:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kxYDKtFm"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gJX8iyrc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EDF8191499;
-	Thu,  9 Jan 2025 17:40:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7AA01B0412
+	for <netdev@vger.kernel.org>; Thu,  9 Jan 2025 17:42:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736444413; cv=none; b=FqsQeOyIP35AndS351rNHZlkRjYkQCjSfdpAv2ZGaeC4fafoKjI9e5XpVGR+hG8gEMdXF2VK5eFxB0iWTmy9ah1aYFzaMpO0UKmp75WNmwXT9bFgBSJvQ2+Y6QRry3V1QL/6zUiRogG/6f9+fLjpN6IESzYnkC5YjH0S9xMHqEc=
+	t=1736444567; cv=none; b=BHTZJQwjNvmiZy5R5V7eHtsUekar2JW6c+OblWWavqoQPYJF8pi47B2Qw64PlPx1HiuFLDxTCmCb20AUcCG7TIF6dopxWhyKVkyUTGg+Uqv6oIk1bK8M2EQJ/KYgGoJbcmJtLKPwEoHr6au9I6ifiDY2RX0OYiXjYdJMG6lOj/k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736444413; c=relaxed/simple;
-	bh=sgY/WTgpLVob/H26v16vqR9o2OrCi4sBG/wp4T0MeF4=;
+	s=arc-20240116; t=1736444567; c=relaxed/simple;
+	bh=TPi1jWgepqP30sAUxR/sHKQYrWqP6iP8Nn9Nr2Bpx28=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=i8FjNXQNn8RbNtP8kguG9TNFuPiUAtLk1dNP+l7oPPrZ6tCgD0Jsfxr5eIP5w4n4XtgArJr3JMCEKUqXCR2G1lBCuua2/OoiGer6qGhsqqxLLVoK7Dh8o/CSfxd7R0ovJrpo7od9TlUALW7MirAQxab2r395brKQc4k+Tdm5uEE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kxYDKtFm; arc=none smtp.client-ip=209.85.216.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-2ef760a1001so1964313a91.0;
-        Thu, 09 Jan 2025 09:40:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736444411; x=1737049211; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=tWpZAtZ5fwsLcgO5aqlcO3OYh1NgLbgjWHyNFFao33Y=;
-        b=kxYDKtFmK/XZikqpNb+WWnSfItRCtjNabdE5eMqKZHR0qwpi4hrZu2d7roxLzTuxTl
-         T6M4hxEXM7WaIJpdDW2w2pJnbkHcFZ4BvDVrZpNU2fLHoNx+0qUaz0I+RgZbYPLujNEj
-         quJIzXvcC0lr2QdO6vfVNSowux256wEWDejv0lZcyfUcTEcQJKlEdQPXShyazaL/1UA7
-         cFmLgnHzzrMxuPx5TaOI9TGM64s4lzTkunbQ6RMQ05k6S7oxZNwTCUm/uA0GB5Yjaa8m
-         89dBS0m6oiZDht7ml3k0c23Fif7RWg/X6d3vvpY+SjRrOAJvGdWiw6/fL7Fwt3CEXPTT
-         Xwdg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736444411; x=1737049211;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tWpZAtZ5fwsLcgO5aqlcO3OYh1NgLbgjWHyNFFao33Y=;
-        b=Jf40ld+WFRiwiBC0FRv0vlYEvsPWw8pJPZLUfc56I8ng6xbwjc4vk+Yu0Elh4ZWE0c
-         P4MCqNJmn4PuVcfr1XIsu4vuoy190Y/LKSO21Aa5f8LjZzIm8EjGebmtlXVfUOKCsFLY
-         p+vhCEwIgkrWXXSMh2pp2CGPHZBPiXwNThyh/Jg6IrdcfoUd91g/t/rg7Ye19zaMDY5l
-         RsXUFfqmPAnZxB50oNTWQrJK3LUN1LsImNewQ2C+qalZBofOZVUOYfb3aKv1eQU8Cku+
-         fRE3OHFNMXWqvM1+OdjjBL38yXA/biFwM1qwscKVKaUx3cxhOdxHC1jWEttrlaJPsvPC
-         ixOA==
-X-Forwarded-Encrypted: i=1; AJvYcCUGJ5op8VYK09mtia2uE7i9jF4UVGbMP5cGtJ0wk1dyGTMZkDjXudqW5uglRULRGMs2qx3FhAjZd3mTOEBwDG1Y@vger.kernel.org, AJvYcCVAEkseggCGr0TfYIV7d8XK10RMYQDalDqWLgiB22v47FB2MD3zkjIvzYNAuZcAhXUVF/uF9zfSKXQW5vzv@vger.kernel.org, AJvYcCWDCS18WAh/6P1R0FzgyXK3HcQjKxt9zng8DUbQZOgzy/6nlBw3a4nUJrEeXcxKplt0xgBtX1eKDA4N@vger.kernel.org, AJvYcCXDeB/wR1M77ih1ePzIZ1CIlqbzKN2OXjhS4z+F5b6haxSGYgP04KPKIlULq3eccaesv5kDdTA/@vger.kernel.org, AJvYcCXzh/DZ5xCGecAiv+fFmE5x2fdk6eu/scEtiAa5zjPYVf3+yKddoBEUym5e6Za6Egy+gbg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy+xgZTp3EhVcmhdc8ZeuRZG036JDQBNubpLL/lq+7omGK2qptQ
-	WU0zzO1HnSNmRrFAyxZNFNclmJd58o3QZH19tKbB7pqiD9diM4c=
-X-Gm-Gg: ASbGncu2N1IRhXg5M+2Ad0GWGg4OZ9pJ3xM5u2c6qYNXIVV5dd5kgztcLzEDYCpKawt
-	NUdoZNWTZ+GmJX3GKBnmXu/9YURVR5rZkD+lL6mkUbC9ql4u+lLT4oCpywKmu0Zd7jkrhvL1tmD
-	rls4iT3Z8maiGY0ArioKOGvQWAsYIZzsYp6jph4laRy/rC6eBHRI4vQ1lOuj0Jd78oGGylBngvS
-	72wQBiQxg+FtRp1KM6YPNwWpkDDPhUy2PPt/F2NleUqOLPdY3D5COsS
-X-Google-Smtp-Source: AGHT+IEZHpA+1As7rYRP/wbYTv7BBI8EycFV1R1kQaORb6ULu5g6y7WttO6FZ+OmR/qIEMsz9TCzbg==
-X-Received: by 2002:a17:90a:d887:b0:2ea:7cd5:4ad6 with SMTP id 98e67ed59e1d1-2f5490dbefemr9659697a91.32.1736444411540;
-        Thu, 09 Jan 2025 09:40:11 -0800 (PST)
-Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2f5593d0911sm1848116a91.8.2025.01.09.09.40.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Jan 2025 09:40:11 -0800 (PST)
-Date: Thu, 9 Jan 2025 09:40:10 -0800
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: "Song, Yoong Siang" <yoong.siang.song@intel.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Willem de Bruijn <willemb@google.com>,
-	"Bezdeka, Florian" <florian.bezdeka@siemens.com>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Jonathan Corbet <corbet@lwn.net>, Bjorn Topel <bjorn@kernel.org>,
-	"Karlsson, Magnus" <magnus.karlsson@intel.com>,
-	"Fijalkowski, Maciej" <maciej.fijalkowski@intel.com>,
-	Jonathan Lemon <jonathan.lemon@gmail.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	"Damato, Joe" <jdamato@fastly.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Mina Almasry <almasrymina@google.com>,
-	Daniel Jurgens <danielj@nvidia.com>,
-	Amritha Nambiar <amritha.nambiar@intel.com>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Eduard Zingerman <eddyz87@gmail.com>,
-	Mykola Lysenko <mykolal@fb.com>,
-	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	KP Singh <kpsingh@kernel.org>, Hao Luo <haoluo@google.com>,
-	Jiri Olsa <jolsa@kernel.org>, Shuah Khan <shuah@kernel.org>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	"Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
-	"Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-	"bpf@vger.kernel.org" <bpf@vger.kernel.org>,
-	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-	"linux-stm32@st-md-mailman.stormreply.com" <linux-stm32@st-md-mailman.stormreply.com>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-	"xdp-hints@xdp-project.net" <xdp-hints@xdp-project.net>
-Subject: Re: [PATCH bpf-next v4 1/4] xsk: Add launch time hardware offload
- support to XDP Tx metadata
-Message-ID: <Z4AJ-pIyAUbXJJpx@mini-arch>
-References: <20250106135606.9704-1-yoong.siang.song@intel.com>
- <Z31bQ6xEkyQvbutN@mini-arch>
- <PH0PR11MB5830D33B679A0ACD3FD6E23CD8132@PH0PR11MB5830.namprd11.prod.outlook.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=ozXqZs9O2thKSspUAKGdY8GQI12K0Bf0Fc6fekWFh52CUPQQMAeRG5hWdiGzRsduHsbo3YJCaoATgt8LaQCXzdEjHbhwWeHxRHQE+gMYur9U+e+sgX9S5jem6P47Ihfjnfb9fgCp68wgatawUnGZ4Q84m6TQGJjyzaQ+iXlvC5M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gJX8iyrc; arc=none smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1736444566; x=1767980566;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=TPi1jWgepqP30sAUxR/sHKQYrWqP6iP8Nn9Nr2Bpx28=;
+  b=gJX8iyrc9Bm4vCi7HPQTviMMNLEnHi4NZeQP3nzkYOqLZwXp8+S7QL74
+   PltALxFpgJ6ArIBVzo7xRZqAPkTgw4ScNV0BiR3BTnSy3oBmoagNLC+0d
+   1s25QkhScC2jWWJRO5mvAAhA6hn/FbHRZ7qJnVSAFCtdVAhAol75c2m9s
+   WdIUwk5Bw/Cxhh7MTkbD0rngskwNOttH0qzhGVSNqTn1YhkdmPgV4SQFq
+   8CXXREoO9BZ4movPtjHkWIqKrw49VSjQvj9xaB69BFV6JFNCgntrS7lgv
+   +MBGb2RIMidhbncTAhr04uWXxWOwh03KgayMzKOgiCsnjiL6jAKvrZ1Zb
+   g==;
+X-CSE-ConnectionGUID: L5St/X5xSoaQqWLdJ0keVg==
+X-CSE-MsgGUID: 4wNWUMPlTzamXucxb0LBmw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11310"; a="36602364"
+X-IronPort-AV: E=Sophos;i="6.12,302,1728975600"; 
+   d="scan'208";a="36602364"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jan 2025 09:42:45 -0800
+X-CSE-ConnectionGUID: weaQC6DFSMajJlFHvc8ucg==
+X-CSE-MsgGUID: 9lzX1tdbTlKV9fM1+9bZIQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="126759246"
+Received: from lkp-server01.sh.intel.com (HELO d63d4d77d921) ([10.239.97.150])
+  by fmviesa002.fm.intel.com with ESMTP; 09 Jan 2025 09:42:43 -0800
+Received: from kbuild by d63d4d77d921 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1tVwYL-000HwV-10;
+	Thu, 09 Jan 2025 17:42:41 +0000
+Date: Fri, 10 Jan 2025 01:42:01 +0800
+From: kernel test robot <lkp@intel.com>
+To: Eric Dumazet <edumazet@google.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	Simon Horman <horms@kernel.org>, eric.dumazet@gmail.com,
+	Eric Dumazet <edumazet@google.com>
+Subject: Re: [PATCH net-next 3/4] net: expedite synchronize_net() for
+ cleanup_net()
+Message-ID: <202501100127.LhRwhYMs-lkp@intel.com>
+References: <20250107173838.1130187-4-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <PH0PR11MB5830D33B679A0ACD3FD6E23CD8132@PH0PR11MB5830.namprd11.prod.outlook.com>
+In-Reply-To: <20250107173838.1130187-4-edumazet@google.com>
 
-On 01/09, Song, Yoong Siang wrote:
-> On Wednesday, January 8, 2025 12:50 AM, Stanislav Fomichev <stfomichev@gmail.com> wrote:
-> >On 01/06, Song Yoong Siang wrote:
-> >> Extend the XDP Tx metadata framework so that user can requests launch time
-> >> hardware offload, where the Ethernet device will schedule the packet for
-> >> transmission at a pre-determined time called launch time. The value of
-> >> launch time is communicated from user space to Ethernet driver via
-> >> launch_time field of struct xsk_tx_metadata.
-> >>
-> >> Suggested-by: Stanislav Fomichev <sdf@google.com>
-> 
-> Hi Stanislav Fomichev,
-> 
-> Thanks for your review comments.
-> I notice that you have two emails:
-> sdf@google.com & stfomichev@gmail.com
-> 
-> Which one I should use in the suggested-by tag?
+Hi Eric,
 
-google.com should be bouncing now. sdf@fomichev.me is preferred.
+kernel test robot noticed the following build errors:
+
+[auto build test ERROR on net-next/main]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Eric-Dumazet/net-no-longer-assume-RTNL-is-held-in-flush_all_backlogs/20250108-014049
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20250107173838.1130187-4-edumazet%40google.com
+patch subject: [PATCH net-next 3/4] net: expedite synchronize_net() for cleanup_net()
+config: mips-bmips_be_defconfig (https://download.01.org/0day-ci/archive/20250110/202501100127.LhRwhYMs-lkp@intel.com/config)
+compiler: mips-linux-gcc (GCC) 14.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250110/202501100127.LhRwhYMs-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202501100127.LhRwhYMs-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   mips-linux-ld: net/core/dev.o: in function `synchronize_net':
+   dev.c:(.text+0x2250): undefined reference to `cleanup_net_task'
+>> mips-linux-ld: dev.c:(.text+0x225c): undefined reference to `cleanup_net_task'
+   mips-linux-ld: net/core/dev.o: in function `free_netdev':
+   dev.c:(.text+0x5824): undefined reference to `cleanup_net_task'
+   mips-linux-ld: net/core/dev.o: in function `netdev_rx_handler_unregister':
+   dev.c:(.text+0x6204): undefined reference to `cleanup_net_task'
+   mips-linux-ld: dev.c:(.text+0x620c): undefined reference to `cleanup_net_task'
+   mips-linux-ld: net/core/dev.o:dev.c:(.text+0x6764): more undefined references to `cleanup_net_task' follow
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
