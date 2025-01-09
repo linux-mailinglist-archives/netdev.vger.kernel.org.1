@@ -1,80 +1,50 @@
-Return-Path: <netdev+bounces-156525-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156521-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3868FA06C66
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 04:42:42 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 84A7AA06C57
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 04:40:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7F4233A6E91
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 03:42:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 81A6B164074
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 03:40:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F00CC13C9C4;
-	Thu,  9 Jan 2025 03:42:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B01713B7AE;
+	Thu,  9 Jan 2025 03:40:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="E3gSkZz6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZCV2fwwM"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.4])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95146768FD;
-	Thu,  9 Jan 2025 03:42:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.4
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D1072AE8C;
+	Thu,  9 Jan 2025 03:40:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736394152; cv=none; b=d7TZ3QSdOfHCi4ga46krgIyVhD87gNcShSp/fs94VDV8entlxXsDdVQdSq1lWjeGBM0ocIABUa0KDj7TZhRd8uV7KTzbj6mG3icUnoZc1jki8gCW4liZJMvdlHiVWJb6aPQg7bM6LPMTxDhHykukbTYhQKdTMwUhrwmowDaN6QM=
+	t=1736394008; cv=none; b=Dmc8KomAP5lauBTr9ChnYVw9NIS5h4EPLcttU54aRtiyoF3NqERFycJu1U/4I4N5KTswZJPo5weEA9K9rAmplfO0IzAixEjaWkAslir2shBmrjoJVfC6Dilb3F1U7eQJckrDUQ4CCutHKr55n6dlLU4YMHTDdEWkzA5aw0KcVHw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736394152; c=relaxed/simple;
-	bh=RJmrHncmAiYfQZgHBbGZ9N6pX/NJqX1TU++10eqVLQ4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=EbaMn4tLN6xAZbK3I7AF6IYC73YoZLNG1v8cKoemn4YiqsMUc2ftASFSIl65rHSCXAojVoyp/h7+OKs9UnF2YbxTiPL/VnUUJCbgbKmSXEnG7agX9Tone9cQbLjryVjcNrKTFSpf55S77NbQA8w41sN63T7cII0GAcKuHu/qr7Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=E3gSkZz6; arc=none smtp.client-ip=117.135.210.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:Subject:Date:Message-ID:MIME-Version; bh=W1HRi
-	UHKkNK4KFvLch5WDTwcRDvo+NOPbJJW0YrzMOo=; b=E3gSkZz65S9UfMaBWsFCI
-	jLjAPf/vESCmPCUVnz5P3bWNIU16Z5uETQHSxJ3cNTRFmS6kATjumOQioVKRPFCw
-	nnoza+ZVRXOlVelEQVCwJQxTBDhdXZbudDzQJHafgyp8QOtuKsdL49EoBu2+6X8z
-	Re/5NQVQl9cjc2yzmT2GrE=
-Received: from localhost.localdomain (unknown [47.252.33.72])
-	by gzsmtp5 (Coremail) with SMTP id QCgvCgAXYaYcRX9na6O1Jw--.42275S5;
-	Thu, 09 Jan 2025 11:40:55 +0800 (CST)
-From: Jiayuan Chen <mrpre@163.com>
-To: bpf@vger.kernel.org,
-	jakub@cloudflare.com,
-	john.fastabend@gmail.com
-Cc: netdev@vger.kernel.org,
-	martin.lau@linux.dev,
-	ast@kernel.org,
-	edumazet@google.com,
-	davem@davemloft.net,
-	dsahern@kernel.org,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	linux-kernel@vger.kernel.org,
-	song@kernel.org,
-	andrii@kernel.org,
-	mhal@rbox.co,
-	yonghong.song@linux.dev,
-	daniel@iogearbox.net,
-	xiyou.wangcong@gmail.com,
-	horms@kernel.org,
-	corbet@lwn.net,
-	eddyz87@gmail.com,
-	cong.wang@bytedance.com,
-	shuah@kernel.org,
-	mykolal@fb.com,
-	jolsa@kernel.org,
-	haoluo@google.com,
-	sdf@fomichev.me,
-	kpsingh@kernel.org,
-	linux-doc@vger.kernel.org,
-	Jiayuan Chen <mrpre@163.com>
-Subject: [PATCH bpf v4 3/3] bpf, strparser, docs: Add new callback for bpf
-Date: Thu,  9 Jan 2025 11:40:05 +0800
-Message-ID: <20250109034005.861063-4-mrpre@163.com>
-X-Mailer: git-send-email 2.43.5
-In-Reply-To: <20250109034005.861063-1-mrpre@163.com>
-References: <20250109034005.861063-1-mrpre@163.com>
+	s=arc-20240116; t=1736394008; c=relaxed/simple;
+	bh=Odlt3PXU9AZTBZsbiZcERPyInIU1wmU8mY24xb0mfG8=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=B8SIaBe4kO1htX8+KwiJAenDfi0Aivppo5cx4aBAZjicq5UP3XmQoMLRGn3nr/+m2uJ6IsfD/BkCvP2S3GU25w0Ek/NGMHJVl7DcJAXURUFlLCXnX5kNOfnlhg+3ZC5WO3Di2XyGpnPikqTdY3W10ldsjQy6fCZxTVk57ThqT7A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZCV2fwwM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 99678C4CED2;
+	Thu,  9 Jan 2025 03:40:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1736394007;
+	bh=Odlt3PXU9AZTBZsbiZcERPyInIU1wmU8mY24xb0mfG8=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=ZCV2fwwMPIdle8CvxS3y7cizRdWuO0ZToxif5VP9jBnz9Jmp8+fWfy5Cz98DLkcpI
+	 0gO978FvoNdnyo97XbeT3AUGbQ0Y4quCNEHE7bsLkJeJvpJ42gwEpT54Pijw2NCYuf
+	 faFkqz+omwc6xabuCGNKkmoyPbVHZ1U/kohdQwI1MHGI0Zft29PNbbWORwrH+immtH
+	 QpSOvu4YAjpxLGUFp0ruZW679mAyIi0AMYD+U0Vz/G04rEKVCVfPCyN81wXqNUMsql
+	 4lrCHyZZ48FDCeaLLXE+qQKSfZejSZMUF4+8mxOZRwqjcrXkUvmA27RDKxxWWAFg52
+	 jiACmNngqD1Gg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70E37380A965;
+	Thu,  9 Jan 2025 03:40:30 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,51 +52,44 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:QCgvCgAXYaYcRX9na6O1Jw--.42275S5
-X-Coremail-Antispam: 1Uf129KBjvdXoWrKryDXFyruFy5GF4rAw17trb_yoWkCrcEka
-	yS9Fs5GFykZF43KayUua1kWr93GrWI9r18ZF4rtFZxC348XrykXF95Jrn5Zr18WrW3ury3
-	K3s5JFyfJr129jkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7xRRdWrJUUUUU==
-X-CM-SenderInfo: xpus2vi6rwjhhfrp/1tbiDwbPp2d-QGaV3wACsX
+Subject: Re: [PATCH] dt-bindings: net: pse-pd: Fix unusual character in
+ documentation
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <173639402926.861924.10694042923792739546.git-patchwork-notify@kernel.org>
+Date: Thu, 09 Jan 2025 03:40:29 +0000
+References: <20250107142659.425877-1-kory.maincent@bootlin.com>
+In-Reply-To: <20250107142659.425877-1-kory.maincent@bootlin.com>
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: o.rempel@pengutronix.de, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ thomas.petazzoni@bootlin.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, robh@kernel.org,
+ krzk+dt@kernel.org, conor+dt@kernel.org
 
-sockmap with strparser need customized read operations to fix copied_seq
-error.
+Hello:
 
-Signed-off-by: Jiayuan Chen <mrpre@163.com>
----
- Documentation/networking/strparser.rst | 11 ++++++++++-
- 1 file changed, 10 insertions(+), 1 deletion(-)
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-diff --git a/Documentation/networking/strparser.rst b/Documentation/networking/strparser.rst
-index 6cab1f74ae05..e41c18eee2f4 100644
---- a/Documentation/networking/strparser.rst
-+++ b/Documentation/networking/strparser.rst
-@@ -112,7 +112,7 @@ Functions
- Callbacks
- =========
- 
--There are six callbacks:
-+There are seven callbacks:
- 
-     ::
- 
-@@ -182,6 +182,15 @@ There are six callbacks:
-     the length of the message. skb->len - offset may be greater
-     then full_len since strparser does not trim the skb.
- 
-+    ::
-+
-+	int (*read_sock)(struct strparser *strp, read_descriptor_t *desc,
-+                     sk_read_actor_t recv_actor);
-+
-+    read_sock is called when the user specify it, allowing for customized
-+    read operations. If the callback is not set (NULL in strp_init) native
-+    read_sock operation of the socket is used.
-+
-     ::
- 
- 	int (*read_sock_done)(struct strparser *strp, int err);
+On Tue,  7 Jan 2025 15:26:59 +0100 you wrote:
+> The documentation contained an unusual character due to an issue in my
+> personal b4 setup. Fix the problem by providing the correct PSE Pinout
+> Alternatives table number description.
+> 
+> Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
+> ---
+> 
+> [...]
+
+Here is the summary with links:
+  - dt-bindings: net: pse-pd: Fix unusual character in documentation
+    https://git.kernel.org/netdev/net/c/d1bf27c4e176
+
+You are awesome, thank you!
 -- 
-2.43.5
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
