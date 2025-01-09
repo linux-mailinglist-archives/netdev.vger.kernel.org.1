@@ -1,326 +1,254 @@
-Return-Path: <netdev+bounces-156823-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156822-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD241A07EBC
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 18:28:00 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4056FA07EB6
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 18:27:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 029CD3A888F
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 17:27:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2EFA1167F99
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 17:27:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FD9A18FC80;
-	Thu,  9 Jan 2025 17:27:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D265718FC9D;
+	Thu,  9 Jan 2025 17:27:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="g5Z3DL6l"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iw1g/gHf"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 698A418D621;
-	Thu,  9 Jan 2025 17:27:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8737018E756;
+	Thu,  9 Jan 2025 17:27:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736443646; cv=none; b=CUf7M6JK7MYK2BnOc0/9RpE0gTqJKlEUW50gZlZ/z05fp6+MmHMW36S7hPwSdrWnUX6sqnWYkz6wdl9pJN8aTTEj3xs7MoG0CbamYSCoAfvQ0jg8W3UqiNilsb5Zf8opMrcwjwQn3v0NJukCtzxIscnsRvlJj0Ep/zZcGJkdruc=
+	t=1736443641; cv=none; b=Vf/TPhKI66So61u8wTsL69DJWMhxcawaLTQ99sP+YzMQDDo/QuMlyVqlPoZ2BrAllgdMwpJdreLn8T7ftXwDkUa0zzhX63K1Tf7/VugTi9MfQerl3xia0GGuGhTLK9Tsd8YuU/WAZrP6I+SblTg+fSAuNUnH2AXVCZp+X9fW+6Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736443646; c=relaxed/simple;
-	bh=IT1QOUNXoldS8cdepl3rRhAaBVSDhbH4kwk0D3peLJ8=;
+	s=arc-20240116; t=1736443641; c=relaxed/simple;
+	bh=k6dSHtIzHPXjCi55pFzcPs0hQ6RidrPUUyk4gC3kNmw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=S70w83g/Aa6MWnmatBmIbeSpd0MNFh8iM9gykzOBSYgOo8Qw4yvu6xtgDZfqIpPy+p73xTQ35R4VzusCw1hjqtESljpNRlbYriRuC61lno0xskkYBed2+kBre1WqbrpKYX4wFDVemZkWEra4Pv4ry6WKqI0TVQDOu2kFrMqc0Qo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=g5Z3DL6l; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=6Z3kH0M+JOWq7Ngarm3TYX7mK+xaT7wHTYqJBA3ueks=; b=g5Z3DL6lWTnePJbO68WV/hS193
-	H2DtAai6O2kPucZeQHVhHtUAC0v9mo7PSAxtP0ycAS0akagtLwxKFEJsHG5/x5Ahp91x2PbqRDiye
-	3Z6qrnRUiWmhy0dZAhHkiwm2jMi24jdg9goSMZitBGSpBiI7jX/d0EzxHPcEibpFgkEqsjvbUDeQf
-	hzOqgzBrOUYvd6TFNLVpEeSoYtfGCxO2BDqVmSm3ezZXAcZVwBFnfK+z5o2/XUKII2pL3vzQH/D0H
-	hXNS0H6TUuBWCgbL2Y0KNrTdP9zrctNrcfFd9jpIMUi+Ywm/wVRiG3230vToN49DuELBwkUnk06U6
-	rMAs633Q==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:58848)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1tVwJN-0002R5-36;
-	Thu, 09 Jan 2025 17:27:14 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1tVwJL-0007UF-0q;
-	Thu, 09 Jan 2025 17:27:11 +0000
-Date: Thu, 9 Jan 2025 17:27:11 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: "David S. Miller" <davem@davemloft.net>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=TbXZATN5Q9CunAPiL3YxtnMj4KOHuc3qDYpOcNlJKNxG1PM3Nnm/EyidH1dic94bfGNOks7iEryynt9a0OVGH6OQ6jc49myq32mGTdkyj6AMfevrMOvS771tSJ5cBw/8NjXllL3VSJ9qtJhtLmN6G06MFqmPnID4dHq2mzyJX6g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iw1g/gHf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5E216C4CED2;
+	Thu,  9 Jan 2025 17:27:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1736443641;
+	bh=k6dSHtIzHPXjCi55pFzcPs0hQ6RidrPUUyk4gC3kNmw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=iw1g/gHf9UnQ6FPaRmdIh69NJ2JP4qyUVC7TdimvhOvT39hb8cevQEIQZR2wac6LZ
+	 /wPyHWsWBAq0Y4Bk5qIMRY1X8UgoEECnc/XTfTa6q+BqUzST6zcpVBA5TmVR/PK8Lp
+	 nWcrvKqkNFQbNQvP7bYrP7TJS3vmELKIf5yy/REnM9H+J+e+tPHo/ACLd+GjhQM8r3
+	 aZtFdyyskZ/TdjuExwsO+M1hA5HM99NiUuu3egJinnB4FT1EfiG5RzdwM6fpROxQ65
+	 6LpB+rTv6jNwhDbdA6XLDMaX+NsXYidNsPV1TFavPfHfyw0RGbmuNj7BZiq5AA8kZb
+	 6nHuTNpJ0Fo2Q==
+Date: Thu, 9 Jan 2025 17:27:14 +0000
+From: Simon Horman <horms@kernel.org>
+To: Luo Jie <quic_luoj@quicinc.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Woojung Huh <woojung.huh@microchip.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>, kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	UNGLinuxDriver@microchip.com, Phil Elwell <phil@raspberrypi.org>
-Subject: Re: [PATCH net-next v1 7/7] net: usb: lan78xx: Enable EEE support
- with phylink integration
-Message-ID: <Z4AG7zvIvQDv3GTn@shell.armlinux.org.uk>
-References: <20250108121341.2689130-1-o.rempel@pengutronix.de>
- <20250108121341.2689130-8-o.rempel@pengutronix.de>
- <Z35z6ZHspfSZK4U7@shell.armlinux.org.uk>
- <Z36KacKBd2WaOxfW@pengutronix.de>
- <Z36WqNGpWWkHTjUE@shell.armlinux.org.uk>
- <Z4ADpj0DlqBRUEK-@pengutronix.de>
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Lei Wei <quic_leiwei@quicinc.com>,
+	Suruchi Agarwal <quic_suruchia@quicinc.com>,
+	Pavithra R <quic_pavir@quicinc.com>,
+	Jonathan Corbet <corbet@lwn.net>, Kees Cook <kees@kernel.org>,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	Philipp Zabel <p.zabel@pengutronix.de>,
+	linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-hardening@vger.kernel.org,
+	quic_kkumarcs@quicinc.com, quic_linchen@quicinc.com,
+	srinivas.kandagatla@linaro.org, bartosz.golaszewski@linaro.org,
+	john@phrozen.org
+Subject: Re: [PATCH net-next v2 04/14] net: ethernet: qualcomm: Initialize
+ PPE buffer management for IPQ9574
+Message-ID: <20250109172714.GN7706@kernel.org>
+References: <20250108-qcom_ipq_ppe-v2-0-7394dbda7199@quicinc.com>
+ <20250108-qcom_ipq_ppe-v2-4-7394dbda7199@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <Z4ADpj0DlqBRUEK-@pengutronix.de>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <20250108-qcom_ipq_ppe-v2-4-7394dbda7199@quicinc.com>
 
-On Thu, Jan 09, 2025 at 06:13:10PM +0100, Oleksij Rempel wrote:
-> On Wed, Jan 08, 2025 at 03:15:52PM +0000, Russell King (Oracle) wrote:
-> > On Wed, Jan 08, 2025 at 03:23:37PM +0100, Oleksij Rempel wrote:
-> > > Yes, otherwise every MAC driver will need to do it in the
-> > > ethtool_set_eee() function.
-> > 
-> > I've had several solutions, and my latest patch set actually has a
-> > mixture of them in there (which is why I'm eager to try and find a way
-> > forward on this, so I can fix the patch set):
-> > 
-> > 1. the original idea to address this in Marvell platforms was to limit
-> >    the LPI timer to the maximum representable value in the hardware,
-> >    which would be 255us. This ignores that the hardware uses a 1us
-> >    tick rate for the timer at 1G speeds, and 10us for 100M speeds.
-> >    (So it limits it to 260us, even though the hardware can do 2550us
-> >    at 100M speed). This limit was applied by clamping the value passed
-> >    in from userspace without erroring out.
-> > 
-> > 2. another solution was added the mac_validate_tx_lpi() method, and
-> >    implementations added _in addition_ to the above, with the idea
-> >    of erroring out for values > 255us on Marvell hardware.
-> > 
-> > 3. another idea was to have mac_enable_tx_lpi() error out if it wasn't
-> >    possible to allow e.g. falling back to a software timer (see stmmac
-> >    comments below.) Another reason for erroring out applies to Marvell
-> >    hardware, where PP2 hardware supports LPI on the GMAC but not the
-> >    XGMAC - so it only works at speeds at or below 2.5G. However, that
-> >    can be handled via the lpi_capabilities, so I don't think needs to
-> >    be a concern.
-> > 
-> > > The other question is, should we allow absolute maximum values, or sane
-> > > maximum? At some point will come the question, why the EEE is even
-> > > enabled?
-> > 
-> > As referenced above, stmmac uses the hardware timer for LPI timeouts up
-> > to and including 1048575us (STMMAC_ET_MAX). Beyond that, it uses a
-> > normal kernel timer which is:
-> > 
-> > - disabled (and EEE mode reset) when we have a packet to transmit, or
-> >   EEE is disabled
-> > - is re-armed when cleaning up from packet transmission (although
-> >   it looks like we attempt to immediately enter LPI mode, and would
-> >   only wait for the timer if there are more packets to queue... maybe
-> >   this is a bug in stmmac's implementation?) or when EEE mode is first
-> >   enabled with a LPI timer longer than the above value.
-> > 
-> > So, should phylink have the capability to switch to a software LPI timer
-> > implementation when the LPI timeout value exceeds what the hardware
-> > supports?
+On Wed, Jan 08, 2025 at 09:47:11PM +0800, Luo Jie wrote:
+> The BM (Buffer Management) config controls the pause frame generated
+> on the PPE port. There are maximum 15 BM ports and 4 groups supported,
+> all BM ports are assigned to group 0 by default. The number of hardware
+> buffers configured for the port influence the threshold of the flow
+> control for that port.
 > 
-> No, i'll list my arguments later down.
-> 
-> > To put it another way, should the stmmac solution to this be
-> > made generic?
-> 
-> May be partially?
-> 
-> > Note that stmmac has this software timer implementation because not
-> > only for the reason I've given above, but also because cores other than
-> > GMAC4 that support LPI do not have support for the hardware timer.
-> 
-> There seems to be a samsung ethernet driver which implements software
-> based timer too.
-> 
-> > > The same is about minimal value, too low value will cause strong speed
-> > > degradation. Should we allow set insane minimum, but use sane default
-> > > value?
-> > 
-> > We currently allow zero, and the behaviour of that depends on the
-> > hardware. For example, in the last couple of days, it's been reported
-> > that stmmac will never enter LPI with a value of zero.
-> > 
-> > Note that phylib defaults to zero, so imposing a minimum would cause
-> > a read-modify-write of the EEE settings without setting the timer to
-> > fail.
-> >
-> > > > Should set_eee() error out?
-> > > 
-> > > Yes, please.
-> > 
-> > If we are to convert stmmac, then we need to consider what it's doing
-> > (as per the above) and whether that should be generic - and if it isn't
-> > what we want in generic code, then how do we allow drivers to do this if
-> > they wish.
-> 
-> I'll try to approach this from a user perspective. Currently, we have a single
-> `lpi_timer` interface for all link modes. If I start using it, I'm trying to
-> address a specific issue, but in most cases, I have no idea what link mode will
-> be active at any given time. To my knowledge, there are no user space tools
-> that allow users to configure different timer values for different link speeds.
-> 
-> So, what problems am I really trying to solve by adjusting this timer? I can
-> imagine the following:
-> 
-> 1. Noticeable Speed Degradation:
->  
->    This happens when the timer is configured to a value smaller than the time
-> needed to put the hardware to sleep and wake it up again. For interfaces
-> supporting multiple link speeds with EEE, the most plausible configuration to
-> avoid degradation would be to set the timer to the maximum sleep-wake time
-> across all supported EEE link speeds.
-> 
-> 2. Other Use Cases: 
->  
->    Most other scenarios involve trying to work around specific constraints or
-> optimizing for particular use cases:
-> 
->    - Maximizing Power Savings: Setting the timer to the smallest possible
-> value to achieve aggressive power-saving. Why would a user do this? It seems
-> niche but might apply in low-traffic environments.
-> 
->    - Reducing Latency for Periodic Traffic: For example, in audio
-> streaming, frames might be sent every X milliseconds. In this case, the timer
-> could be set slightly higher than X to allow the interface to enter LPI mode
-> between frames. As soon as the audio stops and no other traffic is present, the
-> interface transitions to LPI mode entirely. If the hardware supports timers
-> with values ≥ X, no additional complexity is needed. However, if the hardware
-> timer is not supported or the supported range is lower than X, a
-> software-assisted timer would be required. This might introduce additional
-> latency, and users should be made aware of this potential impact.
-> In my expectation HW timer based latency can be different to software based
-> timer.
-> 
-> From my current user perspective, I would expect the following behavior from
-> the existing `lpi_timer` interface:
-> 
-> 1. Subtle Disabling of LPI Should Be Prevented: 
->  
->    If setting the `lpi_timer` to 0 effectively disables LPI, then this value
-> should not be allowed. The interface should ensure that LPI remains functional
-> unless explicitly turned off by the user.
-> 
-> 2. Maximum Timer Value Should Align with Timer Implementation: 
->  
->    The maximum value of the `lpi_timer` should correspond to the timer
-> implementation in use:
-> 
->    - No software and hardware timer should be mixed, otherwise it would
->      affect latency behavior depending on the timer value.
-> 
->    - If a hardware timer is supported but has a lower maximum range than
->      required, the interface should support either:
-> 
->      - Only the hardware timer within its valid range.
->      - A fallback to only a software timer (if feasible for the system).  
-> 
->    However, for hardware like switches, software-based LPI implementations
-> are not feasible.
-> 
-> 3. Sensible Maximum Timer Values: 
->  
->    Setting the timer to excessively high values (e.g., one or two seconds or
-> more) makes the behavior unpredictable. Such configurations seem more like a
-> "time bomb" or a workaround for another issue that should be addressed
-> differently. For example:
-> 
->    - If the use case requires such long timer values, it may make more sense to
-> disable `tx_lpi` entirely and manage power savings differently.
-> 
-> 4. Errors for Unsupported Configurations: 
->  
->    If a configuration variation is not supported - whether due to hardware
-> constraints, a mismatch with the current link mode, or a similar limitation - the
-> user should receive a clear error message. EEE is already challenging to debug,
-> and silent failures or corner-case issues (e.g., a speed downshift from 1000
-> Mbps to 100 Mbps causing configuration to fail) would significantly degrade the
-> user experience.
->    Some HW or drivers (for example dsa/microchip/ driver) do no support
-> LPI timer configuration. In this case the error should be returned too.
-> 
-> 5. Separate Handling of LPI Activation:
-> 
->    Some MACs support both automatic LPI activation (based on egress queue and
-> EEE/LPI activation bits) and forced activation for testing or software based
-> timers. Some PHYs, such as the Atheros AR8035, appear sensitive to premature
-> LPI activation, particularly during the transition from autonegotiation to an
-> active link. To address this:
-> 
->    - The MAC driver should expose controls for managing automatic versus forced
->      LPI activation where applicable. This will be needed for common software
->      based timer implementation.
-> 
->    - The PHYLINK API should provide separate control mechanisms for LPI
->      activation and link state transitions. (done)
-> 
-> 6. Consideration for Link-Independent Modes: 
->  
->    Certain EEE-related configurations can be applied without a PHY, while
-> others are entirely dependent on the PHY being present. The system should
-> differentiate between these cases and handle them as follows:
-> 
->    - EEE On/Off: 
->  
->      Enabling or disabling EEE at the MAC level should be allowed without a
-> PHY. This can be treated as a user preference - "I prefer EEE to be on if
-> supported." If a PHY becomes available later and supports EEE, this preference
-> can then take effect.
-> 
->    - LPI On/Off: 
->  
->      Similar to EEE on/off, enabling or disabling Low Power Idle (LPI) can be
-> managed at the MAC level independently of the PHY. This setting reflects the
-> MAC's ability to enter LPI mode. In SmartEEE or similar modes, this could
-> potentially involve PHY-specific behavior, but the basic LPI on/off setting
-> remains primarily MAC-specific.
-> 
->    - LPI Timer:  
-> 
->      The LPI timer is implementation-specific to the MAC driver and does not
-> inherently depend on the PHY. Yes, it depends at least on the link speed,
-> but this can't be addresses with existing interface.
-> 
->    - EEE Advertisement:  
-> 
->      Advertising EEE capabilities is entirely dependent on the PHY. Without a
-> PHY, these settings cannot be determined or validated, as the PHY defines the
-> supported capabilities. Any attempt to configure EEE advertisement without an
-> attached PHY should fail immediately with an appropriate error, such as:  "EEE
-> advertisement configuration not applied: no PHY available to validate
-> capabilities."
+> Signed-off-by: Luo Jie <quic_luoj@quicinc.com>
 
-Sorry, at this point, I give up with phylink managed EEE. What you
-detail above is way too much for me to get involved with, and goes
-well beyond simply:
+...
 
-1) Fixing the cockup with the phylib-managed EEE that has caused *user*
-   *regressions* that we need to resolve.
+> diff --git a/drivers/net/ethernet/qualcomm/ppe/ppe_config.c b/drivers/net/ethernet/qualcomm/ppe/ppe_config.c
 
-2) Providing core functionality so that newer implementations can have
-   a consistency of behaviour.
+...
 
-I have *no* interest in doing a total rewrite of kernel EEE
-functionality - that goes well beyond my aims here.
+> +/* The buffer configurations per PPE port. There are 15 BM ports and
+> + * 4 BM groups supported by PPE. BM port (0-7) is for EDMA port 0,
+> + * BM port (8-13) is for PPE physical port 1-6 and BM port 14 is for
+> + * EIP port.
+> + */
+> +static struct ppe_bm_port_config ipq9574_ppe_bm_port_config[] = {
+> +	{
+> +		/* Buffer configuration for the BM port ID 0 of EDMA. */
+> +		.port_id_start	= 0,
+> +		.port_id_end	= 0,
+> +		.pre_alloc	= 0,
+> +		.in_fly_buf	= 100,
+> +		.ceil		= 1146,
+> +		.weight		= 7,
+> +		.resume_offset	= 8,
+> +		.resume_ceil	= 0,
+> +		.dynamic	= true,
+> +	},
+> +	{
+> +		/* Buffer configuration for the BM port ID 1-7 of EDMA. */
+> +		.port_id_start	= 1,
+> +		.port_id_end	= 7,
+> +		.pre_alloc	= 0,
+> +		.in_fly_buf	= 100,
+> +		.ceil		= 250,
+> +		.weight		= 4,
+> +		.resume_offset	= 36,
+> +		.resume_ceil	= 0,
+> +		.dynamic	= true,
+> +	},
+> +	{
+> +		/* Buffer configuration for the BM port ID 8-13 of PPE ports. */
+> +		.port_id_start	= 8,
+> +		.port_id_end	= 13,
+> +		.pre_alloc	= 0,
+> +		.in_fly_buf	= 128,
+> +		.ceil		= 250,
+> +		.weight		= 4,
+> +		.resume_offset	= 36,
+> +		.resume_ceil	= 0,
+> +		.dynamic	= true,
+> +	},
+> +	{
+> +		/* Buffer configuration for the BM port ID 14 of EIP. */
+> +		.port_id_start	= 14,
+> +		.port_id_end	= 14,
+> +		.pre_alloc	= 0,
+> +		.in_fly_buf	= 40,
+> +		.ceil		= 250,
+> +		.weight		= 4,
+> +		.resume_offset	= 36,
+> +		.resume_ceil	= 0,
+> +		.dynamic	= true,
+> +	},
+> +};
+> +
+> +static int ppe_config_bm_threshold(struct ppe_device *ppe_dev, int bm_port_id,
+> +				   struct ppe_bm_port_config port_cfg)
+> +{
+> +	u32 reg, val, bm_fc_val[2];
+> +	int ret;
+> +
+> +	/* Configure BM flow control related threshold. */
+> +	PPE_BM_PORT_FC_SET_WEIGHT(bm_fc_val, port_cfg.weight);
 
-So I'm afraid that I really lost interest in reading your email, sorry.
+Hi Luo Jie,
+
+When compiling with W=1 for x86_32 and ARM (32bit)
+(but, curiously not x86_64 or arm64), gcc-14 complains that
+bm_fc_val is uninitialised, I believe due to the line above and
+similar lines below.
+
+In file included from drivers/net/ethernet/qualcomm/ppe/ppe_config.c:10:
+In function 'u32p_replace_bits',
+    inlined from 'ppe_config_bm_threshold' at drivers/net/ethernet/qualcomm/ppe/ppe_config.c:112:2:
+./include/linux/bitfield.h:189:15: warning: 'bm_fc_val' is used uninitialized [-Wuninitialized]
+  189 |         *p = (*p & ~to(field)) | type##_encode_bits(val, field);        \
+      |               ^~
+./include/linux/bitfield.h:198:9: note: in expansion of macro '____MAKE_OP'
+  198 |         ____MAKE_OP(u##size,u##size,,)
+      |         ^~~~~~~~~~~
+./include/linux/bitfield.h:201:1: note: in expansion of macro '__MAKE_OP'
+  201 | __MAKE_OP(32)
+      | ^~~~~~~~~
+drivers/net/ethernet/qualcomm/ppe/ppe_config.c: In function 'ppe_config_bm_threshold':
+drivers/net/ethernet/qualcomm/ppe/ppe_config.c:108:23: note: 'bm_fc_val' declared here
+  108 |         u32 reg, val, bm_fc_val[2];
+      |                       ^~~~~~~~~
+
+> +	PPE_BM_PORT_FC_SET_RESUME_OFFSET(bm_fc_val, port_cfg.resume_offset);
+> +	PPE_BM_PORT_FC_SET_RESUME_THRESHOLD(bm_fc_val, port_cfg.resume_ceil);
+> +	PPE_BM_PORT_FC_SET_DYNAMIC(bm_fc_val, port_cfg.dynamic);
+> +	PPE_BM_PORT_FC_SET_REACT_LIMIT(bm_fc_val, port_cfg.in_fly_buf);
+> +	PPE_BM_PORT_FC_SET_PRE_ALLOC(bm_fc_val, port_cfg.pre_alloc);
+> +
+> +	/* Configure low/high bits of the ceiling for the BM port. */
+> +	val = FIELD_PREP(GENMASK(2, 0), port_cfg.ceil);
+
+The value of port_cfg.ceil is 250 or 1146, as set in
+ipq9574_ppe_bm_port_config. clang-19 W=1 builds complain that this
+value is too large for the field (3 bits).
+
+drivers/net/ethernet/qualcomm/ppe/ppe_config.c:120:8: error: call to '__compiletime_assert_925' declared with 'error' attribute: FIELD_PREP: value too large for the field
+  120 |         val = FIELD_PREP(GENMASK(2, 0), port_cfg.ceil);
+      |               ^
+./include/linux/bitfield.h:115:3: note: expanded from macro 'FIELD_PREP'
+  115 |                 __BF_FIELD_CHECK(_mask, 0ULL, _val, "FIELD_PREP: ");    \
+      |                 ^
+./include/linux/bitfield.h:68:3: note: expanded from macro '__BF_FIELD_CHECK'
+   68 |                 BUILD_BUG_ON_MSG(__builtin_constant_p(_val) ?           \
+      |                 ^
+./include/linux/build_bug.h:39:37: note: expanded from macro 'BUILD_BUG_ON_MSG'
+   39 | #define BUILD_BUG_ON_MSG(cond, msg) compiletime_assert(!(cond), msg)
+      |                                     ^
+note: (skipping 1 expansions in backtrace; use -fmacro-backtrace-limit=0 to see all)
+././include/linux/compiler_types.h:530:2: note: expanded from macro '_compiletime_assert'
+  530 |         __compiletime_assert(condition, msg, prefix, suffix)
+      |         ^
+././include/linux/compiler_types.h:523:4: note: expanded from macro '__compiletime_assert'
+  523 |                         prefix ## suffix();                             \
+      |                         ^
+<scratch space>:95:1: note: expanded from here
+   95 | __compiletime_assert_925
+      | ^
+1 error generated
+
+> +	PPE_BM_PORT_FC_SET_CEILING_LOW(bm_fc_val, val);
+> +	val = FIELD_PREP(GENMASK(10, 3), port_cfg.ceil);
+> +	PPE_BM_PORT_FC_SET_CEILING_HIGH(bm_fc_val, val);
+> +
+> +	reg = PPE_BM_PORT_FC_CFG_TBL_ADDR + PPE_BM_PORT_FC_CFG_TBL_INC * bm_port_id;
+> +	ret = regmap_bulk_write(ppe_dev->regmap, reg,
+> +				bm_fc_val, ARRAY_SIZE(bm_fc_val));
+> +	if (ret)
+> +		return ret;
+> +
+> +	/* Assign the default group ID 0 to the BM port. */
+> +	val = FIELD_PREP(PPE_BM_PORT_GROUP_ID_SHARED_GROUP_ID, 0);
+> +	reg = PPE_BM_PORT_GROUP_ID_ADDR + PPE_BM_PORT_GROUP_ID_INC * bm_port_id;
+> +	ret = regmap_update_bits(ppe_dev->regmap, reg,
+> +				 PPE_BM_PORT_GROUP_ID_SHARED_GROUP_ID,
+> +				 val);
+> +	if (ret)
+> +		return ret;
+> +
+> +	/* Enable BM port flow control. */
+> +	val = FIELD_PREP(PPE_BM_PORT_FC_MODE_EN, true);
+> +	reg = PPE_BM_PORT_FC_MODE_ADDR + PPE_BM_PORT_FC_MODE_INC * bm_port_id;
+> +
+> +	return regmap_update_bits(ppe_dev->regmap, reg,
+> +				  PPE_BM_PORT_FC_MODE_EN,
+> +				  val);
+> +}
+
+...
 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+pw-bot: changes-requested
 
