@@ -1,79 +1,120 @@
-Return-Path: <netdev+bounces-156885-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156886-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 82577A0835F
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 00:20:51 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF3DCA08368
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 00:24:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A609A3A7F8D
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 23:20:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C69DF168FB9
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 23:24:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5388D205AA4;
-	Thu,  9 Jan 2025 23:20:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 381F5205E2F;
+	Thu,  9 Jan 2025 23:24:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rJ96rqBg"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="jHjHdouV"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-175.mta1.migadu.com (out-175.mta1.migadu.com [95.215.58.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A2D01FCFF7;
-	Thu,  9 Jan 2025 23:20:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EA2C1FCFF7
+	for <netdev@vger.kernel.org>; Thu,  9 Jan 2025 23:24:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736464846; cv=none; b=SS0Z7jnLLnh2ODv1gdaM4HIqdJLZAqv4xrUvyHxFpXt31wtz5S+AxoJR5KZ8eiewoDHW0ehKQ7K5ODBu/LlnODYfp+1uoQxalF2zY/J4FwOXKVyRgH0XllM7R/qDbLynI6ke15vVEqgFGy0Yc6JvpwfYxGPDxX5rPOYw8HrbJUs=
+	t=1736465064; cv=none; b=JrklXU+WvCdP6v/t7mXsW8KRdHZcqmYYnruaTWzyNzng9F4YulRdIRPdyZRVEK9vb8ba949kSlCfEpsrHTsBWFeehzgBQvMmqlrtPi/uG2z0cjDdnLT4B6A7IauGYeuMMZsTfvdgcyWevauilbOoIchPi6dDH8rD/DyAIAz7u7k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736464846; c=relaxed/simple;
-	bh=DEgfqbU/jsY3ku2DNiqBd1YR8lIkFTsUg02q7kBihwo=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=aeCZ6HYdWOc+QZQzb90xVQ5Qix6MmhDzXIBC5230TKa94XQLhYQkxz3MhXas+JHCRNSVYB641YPvsUxbq31Lf/WWU7rs0tSmEOpz+++kGtJfooqH6l3wr8mnINGzkgRcFjP0jwVlbGVRCStpnQ5Pke7Pc8Fg2Qg7fduS11fP8+I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rJ96rqBg; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 01683C4CED2;
-	Thu,  9 Jan 2025 23:20:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736464846;
-	bh=DEgfqbU/jsY3ku2DNiqBd1YR8lIkFTsUg02q7kBihwo=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=rJ96rqBgHtm/SP2In2vM9JB3hOopKSSG43FWfSO21E4gZ8+DT/cM5c7YCNrA+UKZJ
-	 zAerX8aiDb3pwpqImf1u5pJviKVE2EIaiBNmxdP2x5+9W8w7Mju3/PLQOFCKo7SWtd
-	 HvEEJuJzSrUJPvooP9y/WfTzv15+YVpx7TKwjzaudtaykhv5gcBiuVD+8x8o/6KJE5
-	 J+F1W04gqvWVbJxmOOl7acoGmpRzfyOYmB2rZNNgFmXaz0K6vTVENCfOjRXy4gi7cg
-	 dMcBa02b58+M3ETjzTGtWlCV89POo/9xrs3Mukqy3vv8Om+Y/qgHQ/ybN1nc1ZPqbF
-	 1jOsr3Kh6nfiA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB154380A97F;
-	Thu,  9 Jan 2025 23:21:08 +0000 (UTC)
-Subject: Re: [GIT PULL] Networking for v6.13-rc7
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <20250109182953.2752717-1-kuba@kernel.org>
-References: <20250109182953.2752717-1-kuba@kernel.org>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20250109182953.2752717-1-kuba@kernel.org>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-6.13-rc7
-X-PR-Tracked-Commit-Id: b5cf67a8f716afbd7f8416edfe898c2df460811a
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: c77cd47cee041bc1664b8e5fcd23036e5aab8e2a
-Message-Id: <173646486752.1541533.15419405499323104668.pr-tracker-bot@kernel.org>
-Date: Thu, 09 Jan 2025 23:21:07 +0000
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: torvalds@linux-foundation.org, kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, pabeni@redhat.com
+	s=arc-20240116; t=1736465064; c=relaxed/simple;
+	bh=fK4BhzON9616F3GKp3F5hG/ybmIxpnX5Q03z+puuedQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=rRU9h1MM8vcTJY4swXzAei9LdQ8R/insnR6irOPKPyXkRCkpN0EcMcaVDX/gQWooHxHqWIVTQoiiGOwx5OI28kZVpkD0O74FSO8neoIPx6uPuqvJEdW+2jRGlv/3GLjEcfMH0BTXHwZwStD6EuqrLeFbi24uDjHQL8d6OjRst48=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=jHjHdouV; arc=none smtp.client-ip=95.215.58.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <5b819ac4-a282-4413-aa45-356563550198@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1736465059;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=7V7la2Ow0dmMmaXPhyzYEGUuO3tHH+m08W0Z8ZWwrZA=;
+	b=jHjHdouV9m1wON/w/VN2qk2cwYN9hSBt+dOM6o6IC8nRm39mMpwrvsZmqFts3iJb52/Hra
+	Oj7Z5+07NG9FYx6Wms7UNHr+5bwxjzotbABllcYJyyBjtGn0imQTvGXt+jiqKnl6kYNQi0
+	8ITiiMuErzJeGJJ3LNMOLRXnxTpNZ14=
+Date: Thu, 9 Jan 2025 18:24:14 -0500
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Subject: Re: [PATCH net v3] net: xilinx: axienet: Fix IRQ coalescing packet
+ count overflow
+To: Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
+ Shannon Nelson <shannon.nelson@amd.com>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
+Cc: Michal Simek <michal.simek@amd.com>, Simon Horman <horms@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>, Andy Chiu <andy.chiu@sifive.com>,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+References: <20250109224246.1866690-1-sean.anderson@linux.dev>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Sean Anderson <sean.anderson@linux.dev>
+In-Reply-To: <20250109224246.1866690-1-sean.anderson@linux.dev>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-The pull request you sent on Thu,  9 Jan 2025 10:29:53 -0800:
+On 1/9/25 17:42, Sean Anderson wrote:
+> If coalece_count is greater than 255 it will not fit in the register and
+> will overflow. This can be reproduced by running
+> 
+>     # ethtool -C ethX rx-frames 256
+> 
+> which will result in a timeout of 0us instead. Fix this by checking for
+> invalid values and reporting an error.
+> 
+> Signed-off-by: Sean Anderson <sean.anderson@linux.dev>
+> Fixes: 8a3b7a252dca ("drivers/net/ethernet/xilinx: added Xilinx AXI Ethernet driver")
+> ---
+> 
+> Changes in v3:
+> - Validate and reject instead of silently clamping
+> 
+> Changes in v2:
+> - Use FIELD_MAX to extract the max value from the mask
+> - Expand the commit message with an example on how to reproduce this
+>   issue
+> 
+>  drivers/net/ethernet/xilinx/xilinx_axienet_main.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
+> index 0f4b02fe6f85..c2991aeccf2b 100644
+> --- a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
+> +++ b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
+> @@ -2056,6 +2056,12 @@ axienet_ethtools_set_coalesce(struct net_device *ndev,
+>  		return -EBUSY;
+>  	}
+>  
+> +	if (ecoalesce->rx_max_coalesced_frames > 255 ||
+> +	    ecoalesce->rx_max_coalesced_frames > 255) {
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-6.13-rc7
+The second line should be for tx and not rx.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/c77cd47cee041bc1664b8e5fcd23036e5aab8e2a
+Will resend tomorrow if no other feedback.
 
-Thank you!
+--Sean
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+> +		NL_SET_ERR_MSG(extack, "frames must be less than 256");
+> +		return -EINVAL;
+> +	}
+> +
+>  	if (ecoalesce->rx_max_coalesced_frames)
+>  		lp->coalesce_count_rx = ecoalesce->rx_max_coalesced_frames;
+>  	if (ecoalesce->rx_coalesce_usecs)
+
 
