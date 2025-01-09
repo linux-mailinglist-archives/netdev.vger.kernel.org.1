@@ -1,120 +1,158 @@
-Return-Path: <netdev+bounces-156886-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156887-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF3DCA08368
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 00:24:28 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C6A99A08380
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 00:31:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C69DF168FB9
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 23:24:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C2D1F3A7F52
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 23:31:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 381F5205E2F;
-	Thu,  9 Jan 2025 23:24:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 828B5204F9D;
+	Thu,  9 Jan 2025 23:31:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="jHjHdouV"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GnbD9SZ5"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-175.mta1.migadu.com (out-175.mta1.migadu.com [95.215.58.175])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EA2C1FCFF7
-	for <netdev@vger.kernel.org>; Thu,  9 Jan 2025 23:24:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9502B189BBB
+	for <netdev@vger.kernel.org>; Thu,  9 Jan 2025 23:31:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736465064; cv=none; b=JrklXU+WvCdP6v/t7mXsW8KRdHZcqmYYnruaTWzyNzng9F4YulRdIRPdyZRVEK9vb8ba949kSlCfEpsrHTsBWFeehzgBQvMmqlrtPi/uG2z0cjDdnLT4B6A7IauGYeuMMZsTfvdgcyWevauilbOoIchPi6dDH8rD/DyAIAz7u7k=
+	t=1736465484; cv=none; b=G2FH6dVA48qpDFLRbUyxZq4g7Vy1n3iwNFZmx+vq41+Dzo/Iowse/P1512eUgMQ+jRO6kShlUykyw9vYUrB38l1CyDbjCJw9ZYmv9quYzJso6lsn31erqW0EepFmJPZ2eEiPKhushVWUXfimmpufsoJ+yT3BCCaSyHZxG+8ThsQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736465064; c=relaxed/simple;
-	bh=fK4BhzON9616F3GKp3F5hG/ybmIxpnX5Q03z+puuedQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rRU9h1MM8vcTJY4swXzAei9LdQ8R/insnR6irOPKPyXkRCkpN0EcMcaVDX/gQWooHxHqWIVTQoiiGOwx5OI28kZVpkD0O74FSO8neoIPx6uPuqvJEdW+2jRGlv/3GLjEcfMH0BTXHwZwStD6EuqrLeFbi24uDjHQL8d6OjRst48=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=jHjHdouV; arc=none smtp.client-ip=95.215.58.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <5b819ac4-a282-4413-aa45-356563550198@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1736465059;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7V7la2Ow0dmMmaXPhyzYEGUuO3tHH+m08W0Z8ZWwrZA=;
-	b=jHjHdouV9m1wON/w/VN2qk2cwYN9hSBt+dOM6o6IC8nRm39mMpwrvsZmqFts3iJb52/Hra
-	Oj7Z5+07NG9FYx6Wms7UNHr+5bwxjzotbABllcYJyyBjtGn0imQTvGXt+jiqKnl6kYNQi0
-	8ITiiMuErzJeGJJ3LNMOLRXnxTpNZ14=
-Date: Thu, 9 Jan 2025 18:24:14 -0500
+	s=arc-20240116; t=1736465484; c=relaxed/simple;
+	bh=gwKLjM9Um+c1EtV0m7N+KQ5yVfvCVeVP8yakpHm8yRs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ni3nVjR3tOlaGGGjR/bTYpD4FVw5kb3AwcnYkWuBVs3fNM5nLTWSL6kZTnuCocIUgg/HIS8mBd0z/XEzg8+3ZnFcTmynPXTCHx13/eCVPCe7l5HRwk1r+NJJn+p6oMTbtCqJboEny0M2+CxwymH2c5UhqLufDskBuPie9AVCqPY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=GnbD9SZ5; arc=none smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1736465483; x=1768001483;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=gwKLjM9Um+c1EtV0m7N+KQ5yVfvCVeVP8yakpHm8yRs=;
+  b=GnbD9SZ5i+z24s8IkQmHq9GUU28WUNzHrO/ec3YXAPyFKPLo4+92dD9G
+   XB0J8u3d8hF1AH+6TaefALyHcFY8K7FZUrGGhuRCg7UaV9UQT74YYKbWw
+   xgKTFddbMq4iiLiXXI8w7AQS9ry4kguS1Zb15Xd3eH0PPnb2+mnTS2ZGB
+   wcqED12hBfhnmV/dubVsnw1VHRm9dboErT8G8OmvUhYbV4nXbG4qMFUA/
+   vkzKqP39Mum4f5OIA96eqR4gRvQN6abpaFDdsnPbDdnQvNTo6AInZdgUv
+   62mz5HF/78mvjNdLolRD/6YDsxYcdxuXcoqzCLCkk2zkOJ9BZZO/JoI5k
+   A==;
+X-CSE-ConnectionGUID: dC2/Q3sATyqlpP38uHa6Sg==
+X-CSE-MsgGUID: TYuZsphwTRywl1G7ThNp6w==
+X-IronPort-AV: E=McAfee;i="6700,10204,11310"; a="47245094"
+X-IronPort-AV: E=Sophos;i="6.12,302,1728975600"; 
+   d="scan'208";a="47245094"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jan 2025 15:31:22 -0800
+X-CSE-ConnectionGUID: t1IqzDLVRfy/oDErVC9tcA==
+X-CSE-MsgGUID: 40EVSXihQJWJNjBwZdsZHQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,302,1728975600"; 
+   d="scan'208";a="134398933"
+Received: from kinlongk-mobl1.amr.corp.intel.com (HELO azaki-desk1.intel.com) ([10.125.111.128])
+  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jan 2025 15:31:15 -0800
+From: Ahmed Zaki <ahmed.zaki@intel.com>
+To: netdev@vger.kernel.org
+Cc: intel-wired-lan@lists.osuosl.org,
+	andrew+netdev@lunn.ch,
+	edumazet@google.com,
+	kuba@kernel.org,
+	horms@kernel.org,
+	pabeni@redhat.com,
+	davem@davemloft.net,
+	michael.chan@broadcom.com,
+	tariqt@nvidia.com,
+	anthony.l.nguyen@intel.com,
+	przemyslaw.kitszel@intel.com,
+	jdamato@fastly.com,
+	shayd@nvidia.com,
+	akpm@linux-foundation.org,
+	shayagr@amazon.com,
+	kalesh-anakkur.purayil@broadcom.com,
+	Ahmed Zaki <ahmed.zaki@intel.com>
+Subject: [PATCH net-next v4 0/6] net: napi: add CPU affinity to napi->config
+Date: Thu,  9 Jan 2025 16:31:01 -0700
+Message-ID: <20250109233107.17519-1-ahmed.zaki@intel.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net v3] net: xilinx: axienet: Fix IRQ coalescing packet
- count overflow
-To: Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
- Shannon Nelson <shannon.nelson@amd.com>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
-Cc: Michal Simek <michal.simek@amd.com>, Simon Horman <horms@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, Andy Chiu <andy.chiu@sifive.com>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-References: <20250109224246.1866690-1-sean.anderson@linux.dev>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Sean Anderson <sean.anderson@linux.dev>
-In-Reply-To: <20250109224246.1866690-1-sean.anderson@linux.dev>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
 
-On 1/9/25 17:42, Sean Anderson wrote:
-> If coalece_count is greater than 255 it will not fit in the register and
-> will overflow. This can be reproduced by running
-> 
->     # ethtool -C ethX rx-frames 256
-> 
-> which will result in a timeout of 0us instead. Fix this by checking for
-> invalid values and reporting an error.
-> 
-> Signed-off-by: Sean Anderson <sean.anderson@linux.dev>
-> Fixes: 8a3b7a252dca ("drivers/net/ethernet/xilinx: added Xilinx AXI Ethernet driver")
-> ---
-> 
-> Changes in v3:
-> - Validate and reject instead of silently clamping
-> 
-> Changes in v2:
-> - Use FIELD_MAX to extract the max value from the mask
-> - Expand the commit message with an example on how to reproduce this
->   issue
-> 
->  drivers/net/ethernet/xilinx/xilinx_axienet_main.c | 6 ++++++
->  1 file changed, 6 insertions(+)
-> 
-> diff --git a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
-> index 0f4b02fe6f85..c2991aeccf2b 100644
-> --- a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
-> +++ b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
-> @@ -2056,6 +2056,12 @@ axienet_ethtools_set_coalesce(struct net_device *ndev,
->  		return -EBUSY;
->  	}
->  
-> +	if (ecoalesce->rx_max_coalesced_frames > 255 ||
-> +	    ecoalesce->rx_max_coalesced_frames > 255) {
+Drivers usually need to re-apply the user-set IRQ affinity to their IRQs
+after reset. However, since there can only be one IRQ affinity notifier
+for each IRQ, registering IRQ notifiers conflicts with the ARFS rmap
+management in the core (which also registers separate IRQ affinity
+notifiers).   
 
-The second line should be for tx and not rx.
+Move the IRQ affinity management to the napi struct. This way we can have
+a unified IRQ notifier to re-apply the user-set affinity and also manage
+the ARFS rmaps. Patches 1 and 2 move the ARFS rmap management to CORE.
+Patch 3 adds the IRQ affinity mask to napi_config and re-applies the mask
+after reset. Patches 4-6 use the new API for bnxt, ice and idpf drivers.
 
-Will resend tomorrow if no other feedback.
+Tested on bnxt, ice and idpf.
+v4:
+    - Better introduction in the cover letter.
+    - Fix Kernel build errors in ena_init_rx_cpu_rmap() (Patch 1)
+    - Fix kernel test robot warnings reported by Dan Carpenter:
+      https://lore.kernel.org/all/202501050625.nY1c97EX-lkp@intel.com/
+    - Remove unrelated empty line in patch 4 (Kalesh Anakkur Purayil)
+    - Fix a memleak (rmap was not freed) by calling cpu_rmap_put() in
+      netif_napi_affinity_release() (patch 2).
 
---Sean
+v3:
+    - https://lore.kernel.org/netdev/20250104004314.208259-1-ahmed.zaki@intel.com/
+    - Assign one cpu per mask starting from local NUMA node (Shay Drori).
+    - Keep the new ARFS and Affinity flags per nedev (Jakub).
 
-> +		NL_SET_ERR_MSG(extack, "frames must be less than 256");
-> +		return -EINVAL;
-> +	}
-> +
->  	if (ecoalesce->rx_max_coalesced_frames)
->  		lp->coalesce_count_rx = ecoalesce->rx_max_coalesced_frames;
->  	if (ecoalesce->rx_coalesce_usecs)
+v2:
+    - https://lore.kernel.org/netdev/202412190454.nwvp3hU2-lkp@intel.com/T/
+    - Also move the ARFS IRQ affinity management from drivers to core. Via
+      netif_napi_set_irq(), drivers can ask the core to add the IRQ to the
+      ARFS rmap (already allocated by the driver).
+
+RFC -> v1:
+    - https://lore.kernel.org/netdev/20241210002626.366878-1-ahmed.zaki@intel.com/
+    - move static inline affinity functions to net/dev/core.c
+    - add the new napi->irq_flags (patch 1)
+    - add code changes to bnxt, mlx4 and ice.
+
+Ahmed Zaki (6):
+  net: move ARFS rmap management to core
+  net: napi: add internal ARFS rmap management
+  net: napi: add CPU affinity to napi_config
+  bnxt: use napi's irq affinity
+  ice: use napi's irq affinity
+  idpf: use napi's irq affinity
+
+ drivers/net/ethernet/amazon/ena/ena_netdev.c |  38 +----
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c    |  52 +------
+ drivers/net/ethernet/broadcom/bnxt/bnxt.h    |   2 -
+ drivers/net/ethernet/intel/ice/ice.h         |   3 -
+ drivers/net/ethernet/intel/ice/ice_arfs.c    |  17 +--
+ drivers/net/ethernet/intel/ice/ice_base.c    |   7 +-
+ drivers/net/ethernet/intel/ice/ice_lib.c     |   6 -
+ drivers/net/ethernet/intel/ice/ice_main.c    |  47 +-----
+ drivers/net/ethernet/intel/idpf/idpf_lib.c   |   1 +
+ drivers/net/ethernet/intel/idpf/idpf_txrx.c  |  22 +--
+ drivers/net/ethernet/intel/idpf/idpf_txrx.h  |   6 +-
+ include/linux/cpu_rmap.h                     |   1 +
+ include/linux/netdevice.h                    |  23 ++-
+ lib/cpu_rmap.c                               |   2 +-
+ net/core/dev.c                               | 145 ++++++++++++++++++-
+ 15 files changed, 191 insertions(+), 181 deletions(-)
+
+-- 
+2.43.0
 
 
