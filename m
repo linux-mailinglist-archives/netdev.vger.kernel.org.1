@@ -1,190 +1,189 @@
-Return-Path: <netdev+bounces-156687-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156688-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B65A1A0760C
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 13:47:27 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F2FDA076C9
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 14:12:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A36A7166299
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 12:47:25 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A856C7A3A9A
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 13:12:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25492217710;
-	Thu,  9 Jan 2025 12:47:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5865217F4A;
+	Thu,  9 Jan 2025 13:11:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=toke.dk header.i=@toke.dk header.b="YQNBVHHR"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="OFEaCKIW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.toke.dk (mail.toke.dk [45.145.95.4])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CFC4217707
-	for <netdev@vger.kernel.org>; Thu,  9 Jan 2025 12:47:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.145.95.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E2F1BA2E;
+	Thu,  9 Jan 2025 13:11:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736426844; cv=none; b=HUG+HmsCMWiYouEUiGcfTd3tm5yMAXyRtrq3GGK6pf+bhvXNuW9XSYH8H8JiekSzitYyWb0ETOLXqxUypertAKJKqEA7kjaoFR1YUdGC4+NZjZAwbGckXJQxBUtOq+exlkM1KmcaPpb3fm/q7W2s25FWGQVSuENID7e2OBNBaY0=
+	t=1736428310; cv=none; b=njXe2XVwwYL6yrem/XY/ojeoa8NyQOyZ5EeTDE+Q48rJ7+EfoEpsxlh/jqBpDwE5LstyjSb89R2+hVp+0mOJ90LVqyZX6Cw94ePMWl/1SGRQkhuqjadXXKkVTWZV214B26ZW6nII09ZFi9ppTYp45OAsmadUJB21K20CAfL0gHA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736426844; c=relaxed/simple;
-	bh=SQuxm+ItjKfTHqDCnhmWPP3mexlv7P5RG77HW1/uIAQ=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=M/gWPXKD1PuN9jwPiOULcLzI5YqWoSwQgR1Qrt7+fqO0aW2fwQdUoohLDys9xhm/6NR0D6gRDmbThJ8X9xfBfOGJoP8FHAU8zcO1u0v9QdOjOThLLQIsShQ9ZAimyBcJ/pZbbUHFVRSbC8M83iuXqXvl5RezxBedtfWR7YxQPZw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=toke.dk; spf=pass smtp.mailfrom=toke.dk; dkim=pass (2048-bit key) header.d=toke.dk header.i=@toke.dk header.b=YQNBVHHR; arc=none smtp.client-ip=45.145.95.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=toke.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=toke.dk
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=toke.dk; s=20161023;
-	t=1736426838; bh=SQuxm+ItjKfTHqDCnhmWPP3mexlv7P5RG77HW1/uIAQ=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=YQNBVHHRUFbGfQ7S1lj/AaI1UHht3Yop0leBB6u0I4shd8583P21MwnUnaK/RcQVn
-	 im1b8k+iLaZ4a6wI+S448xPTyPkgaP4Wq5hns8uqvpV6pVvhGasQhEQC7UczKJt0PA
-	 qdl7aPqmFc1Kk/yXQQqUBIx16LMd2KG0KII6zTkFSsFgiqjDY8t2jVh1N4FSGLjwuG
-	 6VHJ+OPmnfpZSJEp9+tQce1fjl52TRhoOctIXaL54+PRngLCWaYuWEq1Jt7+KcNnf0
-	 lMTX08vw8hH3DdFtY4OU4yUuw5vT0lVTQOPzkJCDKo5Q1iLMU/sc6MwVnnLIbVxxE4
-	 sCT+HzLk+MFpQ==
-To: Paolo Abeni <pabeni@redhat.com>, Jamal Hadi Salim <jhs@mojatatu.com>,
- Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>
-Cc: syzbot+f63600d288bfb7057424@syzkaller.appspotmail.com, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
- cake@lists.bufferbloat.net, netdev@vger.kernel.org
-Subject: Re: [PATCH net v2] sched: sch_cake: add bounds checks to host bulk
- flow fairness counts
-In-Reply-To: <fb7a1324-41c6-4e10-a6a3-f16d96f44f65@redhat.com>
-References: <20250107120105.70685-1-toke@redhat.com>
- <fb7a1324-41c6-4e10-a6a3-f16d96f44f65@redhat.com>
-Date: Thu, 09 Jan 2025 13:47:17 +0100
-X-Clacks-Overhead: GNU Terry Pratchett
-Message-ID: <87plkwi27e.fsf@toke.dk>
+	s=arc-20240116; t=1736428310; c=relaxed/simple;
+	bh=WNqCG5aj1Z5Z6Vavi0yXahgnOvyN0Yo7pSJg84dzMJc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=av9+99JZ+ihsuZ/waUurm0EmmVPtikMSbBID0xJHQelZTRYVZYr4H4SOZDuj3XdK3mRCmWN95Yy54PMUwsOdWrinYACR2z9MMCMVw3RbYwakbP+ZW4peTUvOZnLqJIR86V03h5jni2VIQqMEYHhKs9VELsdO46Je6+NmPts6KGI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=OFEaCKIW; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5094gtAv018495;
+	Thu, 9 Jan 2025 13:11:32 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	fdSr1sOO2d/Y41hZnhsfJ24JQqQV44b/b/fbT7QktRI=; b=OFEaCKIWBiZaHKEn
+	Q2RJsNyC5Y/IPUJZo3YQJoqqEAiw+TID72Kp+ZdZJMFNt7MDz7RCeJ0l5cGdFzCx
+	yJu4J3yI4ja+vfNqK8zPN/sLbBwxK7hPfBdbPcLbhVrCcaqpVUchA4hkC4XCfbam
+	qWUYxzWlhftTCGc/9R3XyNdwsyzCkmyrDrkZOTcYA5M8NJN4MZq4GxEO/9lBsjl3
+	18O2wFSWzermgNBe2qUknkqN7XU6jIxkfHubkRDkhrPbq/RR22vOLu8eCFp+mfIH
+	StJo3Jq2r26gfg41EGm5ou8SR1z/gYmB7qIA08cRQPRTgtQc3QbfQeKidCpmTFJB
+	8CfWvw==
+Received: from nasanppmta04.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4427nws4tv-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 09 Jan 2025 13:11:32 +0000 (GMT)
+Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
+	by NASANPPMTA04.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 509DBVmU025772
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 9 Jan 2025 13:11:31 GMT
+Received: from [10.253.38.216] (10.80.80.8) by nasanex01a.na.qualcomm.com
+ (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Thu, 9 Jan 2025
+ 05:11:26 -0800
+Message-ID: <8ac3167c-c8aa-4ddb-948f-758714df7495@quicinc.com>
+Date: Thu, 9 Jan 2025 21:11:05 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v4 3/5] net: pcs: qcom-ipq9574: Add PCS
+ instantiation and phylink operations
+To: Simon Horman <horms@kernel.org>
+CC: Andrew Lunn <andrew+netdev@lunn.ch>,
+        "David S. Miller"
+	<davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Rob Herring
+	<robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley
+	<conor+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+        Heiner Kallweit
+	<hkallweit1@gmail.com>,
+        Russell King <linux@armlinux.org.uk>, <netdev@vger.kernel.org>,
+        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-arm-msm@vger.kernel.org>, <quic_kkumarcs@quicinc.com>,
+        <quic_suruchia@quicinc.com>, <quic_pavir@quicinc.com>,
+        <quic_linchen@quicinc.com>, <quic_luoj@quicinc.com>,
+        <srinivas.kandagatla@linaro.org>, <bartosz.golaszewski@linaro.org>,
+        <vsmuthu@qti.qualcomm.com>, <john@phrozen.org>
+References: <20250108-ipq_pcs_net-next-v4-0-0de14cd2902b@quicinc.com>
+ <20250108-ipq_pcs_net-next-v4-3-0de14cd2902b@quicinc.com>
+ <20250108100358.GG2772@kernel.org>
+Content-Language: en-US
+From: Lei Wei <quic_leiwei@quicinc.com>
+In-Reply-To: <20250108100358.GG2772@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nasanex01a.na.qualcomm.com (10.52.223.231)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: Jt4ELdp5GQdwqa7zj0rpHoY5rcng5sFq
+X-Proofpoint-GUID: Jt4ELdp5GQdwqa7zj0rpHoY5rcng5sFq
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ suspectscore=0 phishscore=0 bulkscore=0 adultscore=0 mlxlogscore=756
+ mlxscore=0 clxscore=1011 impostorscore=0 spamscore=0 priorityscore=1501
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2411120000 definitions=main-2501090105
 
-Paolo Abeni <pabeni@redhat.com> writes:
 
-> On 1/7/25 1:01 PM, Toke H=C3=B8iland-J=C3=B8rgensen wrote:
->> Even though we fixed a logic error in the commit cited below, syzbot
->> still managed to trigger an underflow of the per-host bulk flow
->> counters, leading to an out of bounds memory access.
->>=20
->> To avoid any such logic errors causing out of bounds memory accesses,
->> this commit factors out all accesses to the per-host bulk flow counters
->> to a series of helpers that perform bounds-checking before any
->> increments and decrements. This also has the benefit of improving
->> readability by moving the conditional checks for the flow mode into
->> these helpers, instead of having them spread out throughout the
->> code (which was the cause of the original logic error).
->>=20
->> v2:
->> - Remove now-unused srchost and dsthost local variables in cake_dequeue()
->
-> Small nit: the changelog should come after the '---' separator. No need
-> to repost just for this.
 
-Oh, I was under the impression that we wanted them preserved in the git
-log (and hence above the ---). Is that not the case (anymore?)?
-
->> Fixes: 546ea84d07e3 ("sched: sch_cake: fix bulk flow accounting logic fo=
-r host fairness")
->> Reported-by: syzbot+f63600d288bfb7057424@syzkaller.appspotmail.com
->> Signed-off-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
->> ---
->>  net/sched/sch_cake.c | 140 +++++++++++++++++++++++--------------------
->>  1 file changed, 75 insertions(+), 65 deletions(-)
->>=20
->> diff --git a/net/sched/sch_cake.c b/net/sched/sch_cake.c
->> index 8d8b2db4653c..2c2e2a67f3b2 100644
->> --- a/net/sched/sch_cake.c
->> +++ b/net/sched/sch_cake.c
->> @@ -627,6 +627,63 @@ static bool cake_ddst(int flow_mode)
->>  	return (flow_mode & CAKE_FLOW_DUAL_DST) =3D=3D CAKE_FLOW_DUAL_DST;
->>  }
->>=20=20
->> +static void cake_dec_srchost_bulk_flow_count(struct cake_tin_data *q,
->> +					     struct cake_flow *flow,
->> +					     int flow_mode)
+On 1/8/2025 6:03 PM, Simon Horman wrote:
+> On Wed, Jan 08, 2025 at 10:50:26AM +0800, Lei Wei wrote:
+>> This patch adds the following PCS functionality for the PCS driver
+>> for IPQ9574 SoC:
+>>
+>> a.) Parses PCS MII DT nodes and instantiate each MII PCS instance.
+>> b.) Exports PCS instance get and put APIs. The network driver calls
+>> the PCS get API to get and associate the PCS instance with the port
+>> MAC.
+>> c.) PCS phylink operations for SGMII/QSGMII interface modes.
+>>
+>> Signed-off-by: Lei Wei <quic_leiwei@quicinc.com>
+> 
+> ...
+> 
+>> +static int ipq_pcs_enable(struct phylink_pcs *pcs)
 >> +{
->> +	if (likely(cake_dsrc(flow_mode) &&
->> +		   q->hosts[flow->srchost].srchost_bulk_flow_count))
->> +		q->hosts[flow->srchost].srchost_bulk_flow_count--;
+>> +	struct ipq_pcs_mii *qpcs_mii = phylink_pcs_to_qpcs_mii(pcs);
+>> +	struct ipq_pcs *qpcs = qpcs_mii->qpcs;
+>> +	int index = qpcs_mii->index;
+>> +	int ret;
+>> +
+>> +	ret = clk_prepare_enable(qpcs_mii->rx_clk);
+>> +	if (ret) {
+>> +		dev_err(qpcs->dev, "Failed to enable MII %d RX clock\n", index);
+>> +		return ret;
+>> +	}
+>> +
+>> +	ret = clk_prepare_enable(qpcs_mii->tx_clk);
+>> +	if (ret) {
+>> +		dev_err(qpcs->dev, "Failed to enable MII %d TX clock\n", index);
+>> +		return ret;
+> 
+> Hi Lei Wei,
+> 
+> I think you need something like the following to avoid leaking qpcs_mii->rx_clk.
+> 
+> 		goto err_disable_unprepare_rx_clk;
+> 	}
+> 
+> 	return 0;
+> 
+> err_disable_unprepare_rx_clk:
+> 	clk_disable_unprepare(qpcs_mii->rx_clk);
+> 	return ret;
+> }
+> 
+> Flagged by Smatch.
+> 
+
+We had a conversation with Russell King in v2 that even if the phylink 
+pcs enable sequence encounters an error, it does not unwind the steps it 
+has already done. So we removed the call to unprepare in case of error 
+here, since an error here is essentially fatal in this path with no 
+unwind possibility.
+
+https://lore.kernel.org/all/38d7191f-e4bf-4457-9898-bb2b186ec3c7@quicinc.com/
+
+However to satisfy this smatch warning/error, we may need to revert back 
+to the adding the unprepare call in case of error. Request Russel to 
+comment as well if this is fine.
+
+Is it possible to share the log/command-options of the smatch failure so 
+that we can reproduce this? Thanks.
+
+
+>> +	}
+>> +
+>> +	return 0;
 >> +}
->> +
->> +static void cake_inc_srchost_bulk_flow_count(struct cake_tin_data *q,
->> +					     struct cake_flow *flow,
->> +					     int flow_mode)
->> +{
->> +	if (likely(cake_dsrc(flow_mode) &&
->> +		   q->hosts[flow->srchost].srchost_bulk_flow_count < CAKE_QUEUES))
->> +		q->hosts[flow->srchost].srchost_bulk_flow_count++;
->> +}
->> +
->> +static void cake_dec_dsthost_bulk_flow_count(struct cake_tin_data *q,
->> +					     struct cake_flow *flow,
->> +					     int flow_mode)
->> +{
->> +	if (likely(cake_ddst(flow_mode) &&
->> +		   q->hosts[flow->dsthost].dsthost_bulk_flow_count))
->> +		q->hosts[flow->dsthost].dsthost_bulk_flow_count--;
->> +}
->> +
->> +static void cake_inc_dsthost_bulk_flow_count(struct cake_tin_data *q,
->> +					     struct cake_flow *flow,
->> +					     int flow_mode)
->> +{
->> +	if (likely(cake_ddst(flow_mode) &&
->> +		   q->hosts[flow->dsthost].dsthost_bulk_flow_count < CAKE_QUEUES))
->> +		q->hosts[flow->dsthost].dsthost_bulk_flow_count++;
->> +}
->> +
->> +static u16 cake_get_flow_quantum(struct cake_tin_data *q,
->> +				 struct cake_flow *flow,
->> +				 int flow_mode)
->> +{
->> +	u16 host_load =3D 1;
->> +
->> +	if (cake_dsrc(flow_mode))
->> +		host_load =3D max(host_load,
->> +				q->hosts[flow->srchost].srchost_bulk_flow_count);
->> +
->> +	if (cake_ddst(flow_mode))
->> +		host_load =3D max(host_load,
->> +				q->hosts[flow->dsthost].dsthost_bulk_flow_count);
->> +
->> +	/* The get_random_u16() is a way to apply dithering to avoid
->> +	 * accumulating roundoff errors
->> +	 */
->> +	return (q->flow_quantum * quantum_div[host_load] +
->> +		get_random_u16()) >> 16;
->
-> dithering is now applied on both enqueue and dequeue, while prior to
-> this patch it only happened on dequeue. Is that intentional? can't lead
-> to (small) flow_deficit increase?
+> 
+> ...
+> 
 
-Yeah, that was deliberate. The flow quantum is only set on enqueue when
-the flow is first initialised as a sparse flow, not for every packet.
-The only user-visible effect I can see this having is that the maximum
-packet size that can be sent while a flow stays sparse will now vary
-with +/- one byte in some cases. I am pretty sure this won't have any
-consequence in practice, and I don't think it's worth complicating the
-code (with a 'dither' argument to cake_flow_get_quantum(), say) to
-preserve the old behaviour.
-
-I guess I should have mentioned in the commit message that this was
-deliberate. Since it seems you'll be editing that anyway (cf the above),
-how about adding a paragraph like:
-
- As part of this change, the flow quantum calculation is consolidated
- into a helper function, which means that the dithering applied to the
- host load scaling is now applied both in the DRR rotation and when a
- sparse flow's quantum is first initiated. The only user-visible effect
- of this is that the maximum packet size that can be sent while a flow
- stays sparse will now vary with +/- one byte in some cases. This should
- not make a noticeable difference in practice, and thus it's not worth
- complicating the code to preserve the old behaviour.
-
--Toke
 
