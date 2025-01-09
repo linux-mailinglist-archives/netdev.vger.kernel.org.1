@@ -1,197 +1,166 @@
-Return-Path: <netdev+bounces-156857-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156858-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F33AEA08083
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 20:17:35 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D3C3A08090
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 20:30:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E7466168CA6
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 19:17:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C6F333A1433
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 19:30:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FF194A2D;
-	Thu,  9 Jan 2025 19:17:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5730C19CC1F;
+	Thu,  9 Jan 2025 19:30:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="KrZxJeBT"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vJHrkX/L"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 622A5191499
-	for <netdev@vger.kernel.org>; Thu,  9 Jan 2025 19:17:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE96E2F43
+	for <netdev@vger.kernel.org>; Thu,  9 Jan 2025 19:30:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736450252; cv=none; b=LuALwMjk74BCLubLEIpFAeVWbvWICm21wGWpSEuG/493+Lk3h4mAXgRDky/DzdibE6rbWRd5I+opNMeB+hXW+nBCQ4x3YrwwGT4kiY8rW5tOJnhOrXYbnOa5KsuiB/Rh0suVwgiekUe3nuFyCh9GSZw4ivocR68845UtO21GPRA=
+	t=1736451055; cv=none; b=WHohx4n3d0LJbYiNtlKQF4M4i7b/3jCctgvue8RZ+6uNrdQDn2bXQi6Fs6LUBRx5T+pETGR5k58I9oyqW7e5lRgbpJX5/knuqpP4HZ9txzO1BZeA/2q3lc1GShYpWeJBJ18RW09YzcNROxiOKkDGh2NLciXrIJ1+uLiKAEWV2Rc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736450252; c=relaxed/simple;
-	bh=PLBmstpypQDOR38l+Mz9m58zRUu7pXRWxmWOwdil0mU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=g7eov8sPqMiATNxnILw0zwesgdzBdM3j05nO+Gr0KjNuaQNTDyqJ6ZeFgyo2WcKXZLxGcFSUuogRYWpGUpVoMW0Ibe3OItTLAxe/5TQU+cEH7n6Qa+KXltwZ0J651qClSezqC2aoyZ5IJABHSNx6gYOLVca9Zg9rqLEbQ84wZcA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=KrZxJeBT; arc=none smtp.client-ip=209.85.208.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-5d3e8f64d5dso2281789a12.3
-        for <netdev@vger.kernel.org>; Thu, 09 Jan 2025 11:17:30 -0800 (PST)
+	s=arc-20240116; t=1736451055; c=relaxed/simple;
+	bh=Jhtvix7xSu3NnLP8KBl8g422PKpvaIRqarLc6lutKPg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VNkBjdf+QKclUdqMcPD3/DUSHrrl0i6LCYC4BvB0Xod74zgWTykymzNekNf/vfaGx0K4QTdlQUisSgba+8RgL8iqk3ewPMECr0LPuJwFroexgwlD9W8nM6FkG/twvqHCiCgKSCTQCqONY7ViqIlTxikJaAfp3GLaydjGIBYdEgI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vJHrkX/L; arc=none smtp.client-ip=209.85.214.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-2163affd184so19375ad.1
+        for <netdev@vger.kernel.org>; Thu, 09 Jan 2025 11:30:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1736450249; x=1737055049; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=vRIFNqifn6Kn1Cd7oMVLV2WgrAHItd07pKTi4U1YIgY=;
-        b=KrZxJeBTUoDCQLkMfLMHWZW721c9APAwGqFHyKya6Gj2ZXGIBwYQgV+V7J6x8FAa8b
-         5A9jJ4BKqfPEA6+Sosl3zXubLc4EmL24FqBwcvQtO7jWuedEDzIB5WWawJCW/gKSvUEw
-         zzk8Fn6eRJBUUYe//6ngLjxgNJIgRjb17aI0c=
+        d=google.com; s=20230601; t=1736451053; x=1737055853; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=G4oGp2x/UCnR+jaxZ+9JKVEatLAse5UBIsi8oCs7U7Y=;
+        b=vJHrkX/LtKXoWq7Zqx2PleHUF/UMMO0UwiUGd/4ZJcltI+ERfUFRQ/fzLAZktEbvT+
+         GU3D3dxr3re3G6oGz7PivFZiIKxyOAGS5/ZaSNUEUlIFS5EpzJawdk0EyzmqZHjz81A9
+         hAR4pJ+0qO/7xRgR+PLFguefPMsT+jdTiD/xLusZqo4Tlj8DM6DbjNdEszc4fuQkHG5C
+         nTdxNtr2CqUaLfBdMMRqsdFQ+kR/xFLq1Us79G9NVwhTrazeW9PfT2fdv+EXgFlGQx99
+         pN37x9oS7Ddjhi29gE/lLl6exkzC86R0DuPdx0mqIjPKyeIrozZ4n28rnw1ZScwfGuzt
+         EqPg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736450249; x=1737055049;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=vRIFNqifn6Kn1Cd7oMVLV2WgrAHItd07pKTi4U1YIgY=;
-        b=lIX0rgxzaAvdxCD2o08dN8yToaVrWhlY6hwqaZwZi6TbB2bQoCRKH7rLy/0gM03kLI
-         aXF1BCv9L8y/IycvMTo9WPOH1rKzfqaEcElTYpJYWEWqAlLXfu0gJbAlg3AOV165rEvy
-         /NrIVM/1kvmXIlrrP3hFsGBvIi8uFkUzRJypxI3HQKADaF7cZdL0sT296IncO7PEszNe
-         fH35FzEq23gQJ5IlAkdcoBKgLKDYLNB74MJ6UKhC/cBiGWSNn5evu7uzDHWs1vNmDVze
-         kd/t5o3LWdGMWqwjkIu7Ee3LcQBwkHg2TFuvFwwekguOZrObhrxF6Ul98GdIhCgIPRAd
-         GJFQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV/i4USG4qxWlNA6YTZHHpinbUW9Y5LyslsD32NoAoRuLbNJlLFGMmY5laJJZN2Jwrdxkaxi7w=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyS9kqDzh7G+pY3fd5u2r+VKSEduyViDIR35sPw20EeNsDYF9zN
-	idQHMMLMO2F9X2Q7RobTo04HsXziQ/uQdp4xp9X3JpJxnk5sZlxJh6yOxZZdtV6Roza6DiEw5Hq
-	gY5jU0YWBINAS5VdYyC8m5EhOANp0q73Cwv0V
-X-Gm-Gg: ASbGncuhJlw0reqp54vgyT0huaCjTXpnMIoQEfgEa0xMfK9Ad7Jpp3+Uoyspd0S4kRC
-	Vjp7Iu7wArwPhXr12nKXwOB0tadr8QeGx3RvXLg==
-X-Google-Smtp-Source: AGHT+IHe6nVra9B5G0ue0S6KJwAXjNyEP1XQsua9Th7Uy0/LIL6iMwUx1oJgUwgJ1hzqY8Zm9iSs13eFa2B2wBMf+sk=
-X-Received: by 2002:a05:6402:320b:b0:5d0:cfdd:2ac1 with SMTP id
- 4fb4d7f45d1cf-5d972dfcbcfmr8024451a12.6.1736450248565; Thu, 09 Jan 2025
- 11:17:28 -0800 (PST)
+        d=1e100.net; s=20230601; t=1736451053; x=1737055853;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=G4oGp2x/UCnR+jaxZ+9JKVEatLAse5UBIsi8oCs7U7Y=;
+        b=isaVCkFcy/5nHMIdU1lMyfbm2oO2Cj7ItuRE/U+80xstBF7PVDtY6YNHPQWrCVmJAn
+         mxd1qeUFgAvMPp2viC0FHCQJlnySh2U/fYhqfvAzUZ+tqvK22XCQlzPMwqMY8heB/10/
+         TgVWJo2vBRebhIwKab6urYOp08uy20+jnJI93EKPATlEBmZaui1KBGGvuQV9tNaMrOwF
+         PkrQjyoifoz7wNYJpObnyL16OQMSe4S96ESO95Y65N8oE/jgBKLnn9UJRUV7e5IO6A0Z
+         s9uURWrqdTl+AJ9CEbbiWjEBottCjSFtyeELWIh92RkV04TvCQ9cYHmtg0/kCn/gkNNh
+         IALA==
+X-Forwarded-Encrypted: i=1; AJvYcCVYkKCAzaT2OlRGNZVKugi+OoCyoEbg3Hnq7s6f9C5XfCK8dfJ4xcTQpVVJNwqfmwgrQVgJuzY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwUNqkJYmcDeu68yin3QXi4LWb77wES9F4ir9jGqVN6iXSMkkJJ
+	5PKseZdjlxUvQIEiwhTcYmsvdtIhajxuLJm7PTgjilzIFpPUhgV2GxBxcgFlwA==
+X-Gm-Gg: ASbGncuSSp/E6xLxu73R0Yu/MWO+chV7QXkWmj4FhXs+AGl6Fd5DGq8h6t6O9TmpDm8
+	6blKgeJNW91Pg2s5eyv0y+hdtDFUBHj81oCC6WaR5jZkzti+Fjdljss7GuOIS6ZCjsbKbOi8nKH
+	z6Ntcq9RKSAB3b8Uf52uRUZ462Th9QlmY9KRUGQ/WqHlMNAYTLlJHvrbyIgJyVZlig8pekP+g3o
+	TrCior+xoaQMyqlmnvE/66iy4oQ9JyFI3P+M9Da4dfbIM/seER7v2fewVQO1Vbi9wG+GwIdNUlX
+	sgAdJ59HIcXd+2xM7y8=
+X-Google-Smtp-Source: AGHT+IFzCNaUMLZQpS69edpNe2wTv3yaxb8Nr5prG24P/7W0nGcPA5P5+q8wd2dZxn6wPzbERuUARA==
+X-Received: by 2002:a17:902:74ca:b0:21a:5501:9d3 with SMTP id d9443c01a7336-21aa0a7e7a5mr123485ad.21.1736451052856;
+        Thu, 09 Jan 2025 11:30:52 -0800 (PST)
+Received: from google.com (57.145.233.35.bc.googleusercontent.com. [35.233.145.57])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2f5594512f0sm1827201a91.36.2025.01.09.11.30.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 Jan 2025 11:30:52 -0800 (PST)
+Date: Thu, 9 Jan 2025 19:30:48 +0000
+From: Carlos Llamas <cmllamas@google.com>
+To: Li Li <dualli@chromium.org>
+Cc: dualli@google.com, corbet@lwn.net, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	donald.hunter@gmail.com, gregkh@linuxfoundation.org,
+	arve@android.com, tkjos@android.com, maco@android.com,
+	joel@joelfernandes.org, brauner@kernel.org, surenb@google.com,
+	arnd@arndb.de, masahiroy@kernel.org, bagasdotme@gmail.com,
+	horms@kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, netdev@vger.kernel.org,
+	hridya@google.com, smoreland@google.com, kernel-team@android.com
+Subject: Re: [PATCH v11 2/2] binder: report txn errors via generic netlink
+Message-ID: <Z4Aj6KqkQGHXAQLK@google.com>
+References: <20241218203740.4081865-1-dualli@chromium.org>
+ <20241218203740.4081865-3-dualli@chromium.org>
+ <Z32cpF4tkP5hUbgv@google.com>
+ <Z32fhN6yq673YwmO@google.com>
+ <CANBPYPi6O827JiJjEhL_QUztNXHSZA9iVSyzuXPNNgZdOzGk=Q@mail.gmail.com>
+ <Z4Aaz4F_oS-rJ4ij@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241115200412.1340286-1-wei.huang2@amd.com> <20241115200412.1340286-2-wei.huang2@amd.com>
- <20241115140434.50457691@kernel.org> <68e23536-5295-4ae0-94c9-691a74339de0@kernel.org>
- <f1f6af31-7667-4416-95d0-2f59c91a1b62@amd.com>
-In-Reply-To: <f1f6af31-7667-4416-95d0-2f59c91a1b62@amd.com>
-From: Michael Chan <michael.chan@broadcom.com>
-Date: Thu, 9 Jan 2025 11:17:16 -0800
-X-Gm-Features: AbW1kvYDuqp5xvhpzi7zNFsUb7yr2gYuPctAvyRXOz90gm5xsZ8dFIsVhtkRatg
-Message-ID: <CACKFLinrbYO71ahdmvHG+ZZaDk0zyZJXnRpq9YTE1JnZ=tc-Aw@mail.gmail.com>
-Subject: Re: [PATCH V1 1/2] bnxt_en: Add TPH support in BNXT driver
-To: Wei Huang <wei.huang2@amd.com>
-Cc: Jiri Slaby <jirislaby@kernel.org>, Jakub Kicinski <kuba@kernel.org>, bhelgaas@google.com, 
-	linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, helgaas@kernel.org, davem@davemloft.net, 
-	edumazet@google.com, pabeni@redhat.com, asml.silence@gmail.com, 
-	almasrymina@google.com, gospo@broadcom.com, ajit.khaparde@broadcom.com, 
-	somnath.kotur@broadcom.com, andrew.gospodarek@broadcom.com, 
-	manoj.panicker2@amd.com, Eric.VanTassell@amd.com
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000440139062b4ad45c"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z4Aaz4F_oS-rJ4ij@google.com>
 
---000000000000440139062b4ad45c
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+On Thu, Jan 09, 2025 at 06:51:59PM +0000, Carlos Llamas wrote:
+> Did you happen to look into netlink_register_notifier()? That seems like
+> an option to keep the device vs netlink socket interface from mixing up.
+> I believe we could check for NETLINK_URELEASE events and do the cleanup
+> then. I'll do a quick try.
 
-On Thu, Jan 9, 2025 at 11:09=E2=80=AFAM Wei Huang <wei.huang2@amd.com> wrot=
-e:
->
-> On 1/8/25 05:33, Jiri Slaby wrote:
-> >
-> > Based on the above, I assume a new version was expected, but I cannot
-> > find any. So, Wei Huang, what's the status of this?
->
-> Currently the Broadcom team is driving the changes for upstream bnxt. I
-> will leave this question to them (Andy, Somnath, Michael).
->
+Yeah, this quick prototype worked for me. Although I haven't looked at
+the api details closely.
 
-We'll be sending the next version around the end of the week.  It will
-include the NAPI disable/enable that we discussed here:
+diff --git a/drivers/android/binder.c b/drivers/android/binder.c
+index 536be42c531e..fa2146cf02a7 100644
+--- a/drivers/android/binder.c
++++ b/drivers/android/binder.c
++static int binder_netlink_notify(struct notifier_block *nb,
++	+	+	+	 unsigned long action,
++	+	+	+	 void *data)
++{
++	struct netlink_notify *n = data;
++	struct binder_device *device;
++
++	if (action != NETLINK_URELEASE)
++	+	return NOTIFY_DONE;
++
++	hlist_for_each_entry(device, &binder_devices, hlist) {
++	+	if (device->context.report_portid == n->portid)
++	+	+	pr_info("%s: socket released\n", __func__);
++	}
++
++	return NOTIFY_DONE;
++}
++
++static struct notifier_block binder_netlink_notifier = {
++	.notifier_call = binder_netlink_notify,
++};
++
+ static int __init binder_init(void)
+ {
++	int ret;
+@@ -7244,6 +7259,8 @@ static int __init binder_init(void)
++	+	goto err_init_binder_device_failed;
++	}
 
-https://lore.kernel.org/netdev/5336d624-8d8b-40a6-b732-b020e4a119a2@davidwe=
-i.uk/
++	netlink_register_notifier(&binder_netlink_notifier);
++
++	return ret;
 
-Thanks.
+ err_init_binder_device_failed:
 
---000000000000440139062b4ad45c
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
 
-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
-OnaLEot1MoQO7BIe5S9H4AcCEXXcrJJiAtMCl47ARpyHmvQFQFFTrHgUYEd9V+9bOzY7MBIGSV1N
-/JfsT1sZw6HT0lJkSQefhPGpBniAob62DJP3qr11tu8CAwEAAaOCAdowggHWMA4GA1UdDwEB/wQE
-AwIFoDCBowYIKwYBBQUHAQEEgZYwgZMwTgYIKwYBBQUHMAKGQmh0dHA6Ly9zZWN1cmUuZ2xvYmFs
-c2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNydDBBBggrBgEFBQcw
-AYY1aHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAw
-TQYDVR0gBEYwRDBCBgorBgEEAaAyASgKMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2Jh
-bHNpZ24uY29tL3JlcG9zaXRvcnkvMAkGA1UdEwQCMAAwSQYDVR0fBEIwQDA+oDygOoY4aHR0cDov
-L2NybC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcmwwJAYDVR0R
-BB0wG4EZbWljaGFlbC5jaGFuQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
-HSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQU31rAyTdZweIF0tJTFYwfOv2w
-L4QwDQYJKoZIhvcNAQELBQADggEBACcuyaGmk0NSZ7Kio7O7WSZ0j0f9xXcBnLbJvQXFYM7JI5uS
-kw5ozATEN5gfmNIe0AHzqwoYjAf3x8Dv2w7HgyrxWdpjTKQFv5jojxa3A5LVuM8mhPGZfR/L5jSk
-5xc3llsKqrWI4ov4JyW79p0E99gfPA6Waixoavxvv1CZBQ4Stu7N660kTu9sJrACf20E+hdKLoiU
-hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
-E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
-aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
-EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIE1+5fixUGP5qpkoZgr6iJUzvaPgKPmi
-WijfmG/3SbNHMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI1MDEw
-OTE5MTcyOVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
-SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQAbG1HUTIxYqH2ppyirFTjazfgTvOu60NlB63CTkUQznIYTLxz5
-YVNVq21ZWqXesFKsMSEcD1QllvvIyBaTqJd84kVPfcAUBUx6J4Iq7/7DoBG/lMgEoIGR5KGjIT+9
-xjAiVN1zolTmL/UM5o8eQWLWtNE6ZGrcl+x8V81BB0AP5FgC/US20vNMfHqlfgTa1yMPyQ7TNfy+
-8kczUZYQKd/UuR4KoWy1MmuMV6JJTsxxYsqSYJEflBCadvU5BGlqw3x7+s6mNgAGTMcfmwmtumwZ
-zNKJQLIcdtpzGs002nDcBrniukbRa+QO09N4YZJdZgCKGLIK0Iyyz/FjtHqvIR/y
---000000000000440139062b4ad45c--
+With that change we get notified when the socket that registered the
+report exits:
+
+  root@debian:~# ./binder-netlink
+  report setup complete!
+  ^C[   63.682485] binder: binder_netlink_notify: socket released
+
+
+I don't know if this would be the preferred approach to "install" a
+notification callback with a netlink socket but it works. wdyt?
+
+--
+Carlos Llamas
 
