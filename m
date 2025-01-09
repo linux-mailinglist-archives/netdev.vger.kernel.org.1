@@ -1,80 +1,68 @@
-Return-Path: <netdev+bounces-156604-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156594-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02C32A07218
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 10:51:51 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 884FDA071EF
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 10:47:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 304E23A32BB
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 09:51:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4FF3F188A5B5
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 09:47:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79BF1215764;
-	Thu,  9 Jan 2025 09:47:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="iPbKZEA4"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E0D22165F9;
+	Thu,  9 Jan 2025 09:45:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.4])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC30E2153F9;
-	Thu,  9 Jan 2025 09:47:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.4
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 724BC2163A5
+	for <netdev@vger.kernel.org>; Thu,  9 Jan 2025 09:45:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736416037; cv=none; b=Ddz7Dp2jatsbjKwSPGApixEwLXZHs/P3lvIDUPg3r1A+kTBUoq/ojaKbFyi6XmQnHNlEf6fYaqS1LJfwogr8oPIUckOQ+Ah6DocUgvKEyuO14P/bJrbztMg+eht+Uhuv4jXgLpfGDi0cm/C8peZDo/z9DsMGD7NPiF7Gk9ybFg4=
+	t=1736415928; cv=none; b=myihSnOp7mJGm30Hv7m+rl9qg8LEobCnfiW4DNPcr75DsChhjUTMDf58982xmpPZ6QeBiz4SHyRbfzNIUBpjBEEzRG1i//LGCyhrZXrAjM8Lpgd6NWXjn9Lkum8ZaLyjigybGuxXOSRPS5CB9pM6bzW/jwXm/hbIMnY4UYXz/4c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736416037; c=relaxed/simple;
-	bh=RJmrHncmAiYfQZgHBbGZ9N6pX/NJqX1TU++10eqVLQ4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=aiOIjt+OVXizR9k5D4S7wDUNWFSa0d5pdx/P/0DJGu3JEU6Q2qnDuzREs/ROxlM2q3dcrjQq9YipdBsyPZ/rqAlFMCQXJS0XMVAyYwbK93zQQ3VLMfJ85KNdMCNv1hZ5bTmZqS1poM+cUYDuVj28xDQijijzFnlEEWrsv8+6FrU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=iPbKZEA4; arc=none smtp.client-ip=220.197.31.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:Subject:Date:Message-ID:MIME-Version; bh=W1HRi
-	UHKkNK4KFvLch5WDTwcRDvo+NOPbJJW0YrzMOo=; b=iPbKZEA4hgy3lQ6oQTBGv
-	cPjpLZ9Jh6cSxmHzlTWBZqmZ+i6uV46rguUsC3YSUOvz4q7vuesrjYAZPOcSg/yC
-	7RQ7BUtLnKp9IGCSIYQEmdMaYB9TFm+C+xH/l+j0IMp2oYgu83LRccwnqi2abY6m
-	BCXEw1JQ+RGHpnkerArunk=
-Received: from localhost.localdomain (unknown [])
-	by gzsmtp4 (Coremail) with SMTP id PygvCgBnDnRlmn9no5XNEA--.12216S5;
-	Thu, 09 Jan 2025 17:44:48 +0800 (CST)
-From: Jiayuan Chen <mrpre@163.com>
-To: bpf@vger.kernel.org,
-	jakub@cloudflare.com,
-	john.fastabend@gmail.com
-Cc: netdev@vger.kernel.org,
-	martin.lau@linux.dev,
-	ast@kernel.org,
-	edumazet@google.com,
-	davem@davemloft.net,
-	dsahern@kernel.org,
-	kuba@kernel.org,
-	pabeni@redhat.com,
+	s=arc-20240116; t=1736415928; c=relaxed/simple;
+	bh=0Lf1hvxJlw8NY5me4Cd+9DkMBtiJ1x0BsZtQ8w+6NRU=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=EC+YRKgPlZPf7Q9xNMxfY8w1MeHhGT8mJBuz+qvdISjOVru6+1oyRBMDPht7UEtmx1PDcrSmErz2SZ+MAylrWix0a7lTAHsx9+ONq30XDVng6iuef0ga1qsjWysF0si1+sEHg84zPV7Wikb3W852z6oW0mNM4rZitSFCbYx2sSc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1tVp64-00088C-Ch; Thu, 09 Jan 2025 10:45:00 +0100
+Received: from dude04.red.stw.pengutronix.de ([2a0a:edc0:0:1101:1d::ac])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1tVp62-007fa2-0F;
+	Thu, 09 Jan 2025 10:44:58 +0100
+Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1tVp62-000PMj-2V;
+	Thu, 09 Jan 2025 10:44:58 +0100
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Jonathan Corbet <corbet@lwn.net>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
+	kernel@pengutronix.de,
 	linux-kernel@vger.kernel.org,
-	song@kernel.org,
-	andrii@kernel.org,
-	mhal@rbox.co,
-	yonghong.song@linux.dev,
-	daniel@iogearbox.net,
-	xiyou.wangcong@gmail.com,
-	horms@kernel.org,
-	corbet@lwn.net,
-	eddyz87@gmail.com,
-	cong.wang@bytedance.com,
-	shuah@kernel.org,
-	mykolal@fb.com,
-	jolsa@kernel.org,
-	haoluo@google.com,
-	sdf@fomichev.me,
-	kpsingh@kernel.org,
-	linux-doc@vger.kernel.org,
-	Jiayuan Chen <mrpre@163.com>
-Subject: [PATCH bpf v5 3/3] bpf, strparser, docs: Add new callback for bpf
-Date: Thu,  9 Jan 2025 17:44:01 +0800
-Message-ID: <20250109094402.50838-4-mrpre@163.com>
-X-Mailer: git-send-email 2.43.5
-In-Reply-To: <20250109094402.50838-1-mrpre@163.com>
-References: <20250109094402.50838-1-mrpre@163.com>
+	netdev@vger.kernel.org,
+	Simon Horman <horms@kernel.org>,
+	Russell King <linux@armlinux.org.uk>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	linux-doc@vger.kernel.org
+Subject: [PATCH net-next v6 0/7] Introduce unified and structured PHY
+Date: Thu,  9 Jan 2025 10:44:50 +0100
+Message-Id: <20250109094457.97466-1-o.rempel@pengutronix.de>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,51 +70,59 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:PygvCgBnDnRlmn9no5XNEA--.12216S5
-X-Coremail-Antispam: 1Uf129KBjvdXoWrKryDXFyruFy5GF4rAw17trb_yoWkCrcEka
-	yS9Fs5GFykZF43KayUua1kWr93GrWI9r18ZF4rtFZxC348XrykXF95Jrn5Zr18WrW3ury3
-	K3s5JFyfJr129jkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7xRRdWrJUUUUU==
-X-CM-SenderInfo: xpus2vi6rwjhhfrp/1tbiDwbPp2d-kzTJjQAAsa
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-sockmap with strparser need customized read operations to fix copied_seq
-error.
+This patch set introduces a unified and well-structured interface for
+reporting PHY statistics. Instead of relying on arbitrary strings in PHY
+drivers, this interface provides a consistent and structured way to
+expose PHY statistics to userspace via ethtool.
 
-Signed-off-by: Jiayuan Chen <mrpre@163.com>
----
- Documentation/networking/strparser.rst | 11 ++++++++++-
- 1 file changed, 10 insertions(+), 1 deletion(-)
+The initial groundwork for this effort was laid by Jakub Kicinski, who
+contributed patches to plumb PHY statistics to drivers and added support
+for structured statistics in ethtool. Building on Jakub's work, I tested
+the implementation with several PHYs, addressed a few issues, and added
+support for statistics in two specific PHY drivers.
 
-diff --git a/Documentation/networking/strparser.rst b/Documentation/networking/strparser.rst
-index 6cab1f74ae05..e41c18eee2f4 100644
---- a/Documentation/networking/strparser.rst
-+++ b/Documentation/networking/strparser.rst
-@@ -112,7 +112,7 @@ Functions
- Callbacks
- =========
- 
--There are six callbacks:
-+There are seven callbacks:
- 
-     ::
- 
-@@ -182,6 +182,15 @@ There are six callbacks:
-     the length of the message. skb->len - offset may be greater
-     then full_len since strparser does not trim the skb.
- 
-+    ::
-+
-+	int (*read_sock)(struct strparser *strp, read_descriptor_t *desc,
-+                     sk_read_actor_t recv_actor);
-+
-+    read_sock is called when the user specify it, allowing for customized
-+    read operations. If the callback is not set (NULL in strp_init) native
-+    read_sock operation of the socket is used.
-+
-     ::
- 
- 	int (*read_sock_done)(struct strparser *strp, int err);
--- 
-2.43.5
+Most of changes are tracked in separate patches.
+changes v6:
+- drop ethtool_stat_add patch
+changes v5:
+- rebase against latest net-next
+
+Jakub Kicinski (2):
+  net: ethtool: plumb PHY stats to PHY drivers
+  net: ethtool: add support for structured PHY statistics
+
+Oleksij Rempel (5):
+  ethtool: linkstate: migrate linkstate functions to support multi-PHY
+    setups
+  Documentation: networking: update PHY error counter diagnostics in
+    twisted pair guide
+  net: phy: introduce optional polling interface for PHY statistics
+  net: phy: dp83td510: add statistics support
+  net: phy: dp83tg720: add statistics support
+
+ .../twisted_pair_layer1_diagnostics.rst       |  39 +++--
+ Documentation/networking/ethtool-netlink.rst  |   1 +
+ drivers/net/phy/dp83td510.c                   | 112 ++++++++++++
+ drivers/net/phy/dp83tg720.c                   | 161 ++++++++++++++++++
+ drivers/net/phy/phy.c                         |  63 +++++++
+ drivers/net/phy/phy_device.c                  |   2 +
+ include/linux/ethtool.h                       |  23 +++
+ include/linux/phy.h                           |  57 +++++++
+ include/linux/phylib_stubs.h                  |  42 +++++
+ include/uapi/linux/ethtool.h                  |   2 +
+ include/uapi/linux/ethtool_netlink.h          |  14 ++
+ net/ethtool/linkstate.c                       |  26 ++-
+ net/ethtool/netlink.h                         |   1 +
+ net/ethtool/stats.c                           |  55 ++++++
+ net/ethtool/strset.c                          |   5 +
+ 15 files changed, 583 insertions(+), 20 deletions(-)
+
+--
+2.39.5
 
 
