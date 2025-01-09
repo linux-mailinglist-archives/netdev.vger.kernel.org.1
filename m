@@ -1,121 +1,174 @@
-Return-Path: <netdev+bounces-156718-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156719-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05C0AA07955
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 15:36:13 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F6F3A07957
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 15:36:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3C4533A2396
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 14:36:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 07193168C36
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 14:36:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7952921A457;
-	Thu,  9 Jan 2025 14:36:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B756A21A45E;
+	Thu,  9 Jan 2025 14:36:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="KNZaB8jj"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T0DMy7mN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f172.google.com (mail-qk1-f172.google.com [209.85.222.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B403621A431
-	for <netdev@vger.kernel.org>; Thu,  9 Jan 2025 14:36:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1860F217F5C;
+	Thu,  9 Jan 2025 14:36:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736433369; cv=none; b=cbbjBOY1TuksYAkaEkImMMBbgj28fta/6pbHvN+2hC+D58vrK0chc8dWBsC/0ZJq83bMxzgsfgZX+GpbDQd2557p6Pe/Ou8mliauLTXH4ZCM3JDZex0h0fF7JPIqtALT86N0RhRt0ElQLZKgqZYkjyGy3uDYnSpBjU4B5Lg461k=
+	t=1736433381; cv=none; b=R/vwWrjSDnddlNpQRxLUOPukf+L4L2qUn/V2pq1POqa0uy+W0+gFy65gtiwopv2utEB0UZdVwsqG7h+3PXoepRiZo0McgwIWnkx1G7Ceqr8JRwyOZWPjgDMQL+6Sch5QceJla+bUuL2hhQ7Ohp4SNih6YPslXOCyzC1pau76DF4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736433369; c=relaxed/simple;
-	bh=VITV59GbUxGVZi+9c8e4gHb8aUcyhWoobrnDe90KlgY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=S6JKG79s1rdo3CRH0FSTWww7dWaV9t5FiM2grFFn2XFu7y0c0jCTOL9EFtmz/D9VoQg0PL+0TJaFbucW4dOd98IRxjN63//CFXgllO5cbPGEgUze++AfKvBq+K/06RAniDzptqQZNKW9B0MRqqJQSTfbcstJEIhXXZ5PzJqGTO8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=KNZaB8jj; arc=none smtp.client-ip=198.175.65.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1736433368; x=1767969368;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=VITV59GbUxGVZi+9c8e4gHb8aUcyhWoobrnDe90KlgY=;
-  b=KNZaB8jjEhcbvVTjg+NMi6WhCbmMJy7ONgK4N/Q7goz+1qvaR1JK7cAV
-   +GDHOdYE0ym0qSJ1R5S6wmppZM8gxev0SIc2ltcbHoL8JIXYHpGEzTmlj
-   Ix1eH9ehCdIhWg1elIetwfXGaWVLsBnLP40kNEStiU2Zh7LUfDEZYrnZd
-   EEJS9QplSnNbWkolMAfX7WogoMv04bBGBQDiyoRw3wdGPgQrrTj7Lh5GY
-   im9cMjtlBjy1lUR/PM1IKdpMuZ9uhGCTSLYorAVazNEenBUpLSwP0Tf6V
-   4dB2vEkFBIZHmygxErZ0E1P2N62+sYvD+h23s4cBijY7aP5sr989zWhjp
-   A==;
-X-CSE-ConnectionGUID: kVFZ+UIvQfKJ7mhzRMES+A==
-X-CSE-MsgGUID: yVcmwkbITaiUtkl8OF1vpQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11310"; a="36581999"
-X-IronPort-AV: E=Sophos;i="6.12,301,1728975600"; 
-   d="scan'208";a="36581999"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jan 2025 06:36:07 -0800
-X-CSE-ConnectionGUID: H2rdLzUDRvajJxqUL5bk0w==
-X-CSE-MsgGUID: FLepIv0rTdOwWtsD13HO0A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,301,1728975600"; 
-   d="scan'208";a="108413991"
-Received: from lkp-server01.sh.intel.com (HELO d63d4d77d921) ([10.239.97.150])
-  by orviesa004.jf.intel.com with ESMTP; 09 Jan 2025 06:36:05 -0800
-Received: from kbuild by d63d4d77d921 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1tVtdj-000HgB-0n;
-	Thu, 09 Jan 2025 14:36:03 +0000
-Date: Thu, 9 Jan 2025 22:35:51 +0800
-From: kernel test robot <lkp@intel.com>
-To: Eric Dumazet <edumazet@google.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	Simon Horman <horms@kernel.org>, eric.dumazet@gmail.com,
-	Eric Dumazet <edumazet@google.com>
-Subject: Re: [PATCH v2 net-next 1/4] net: expedite synchronize_net() for
- cleanup_net()
-Message-ID: <202501092210.1YCfipFl-lkp@intel.com>
-References: <20250108162255.1306392-2-edumazet@google.com>
+	s=arc-20240116; t=1736433381; c=relaxed/simple;
+	bh=msjFFpRNIoIz+b905oDvoFmaWYdAZMtswIZ6602H/P0=;
+	h=Date:From:To:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=j1K/k33YR7MUps//tPQdJl04UzWOfsPLZN+hNEt48jOgOMIhsb0RGd3iHXSzDMol9dPi3ZwVddPpP6poCC6g4XStmC3eYJEE+YPiBaIjJogDED5WEPf9iRCz+NeGDJ2ZyT4gE8SwFgevm6blsnBUfmBeFi5SMcay8hI1feHbc3s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=T0DMy7mN; arc=none smtp.client-ip=209.85.222.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f172.google.com with SMTP id af79cd13be357-7ba0fa25f07so76119085a.2;
+        Thu, 09 Jan 2025 06:36:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1736433379; x=1737038179; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QNunDNoIF2mrY2oVc9mlVfBWrl6u/4dyH5yl1p2uXyM=;
+        b=T0DMy7mNXZaWp2NIzgA7kdxs0X0CX/RqKF7VVrZwAZ2NqP1sfJvt67QyTcl11rExgp
+         QFmVtqpvxkjL2q+dC0imfV3Mk69SReMERHwB19aOrwNS9bsGjMVTbOwX+UZ1OTT88nNA
+         7S8yXc9u9RGLNugdCf8/UMZZGf2VUu/beGBKF4zud3zqYQJHxziwJi1pdyfj+YKtGN/3
+         +kjolqqAttm81vtvcHL7U4TTlzD3Ud+kazxtm/uycpxqtNE/eXxmfnvPQjSeS9r1HxDx
+         0hSnwrIG3B32o23C1jTTPmfes+t2NFReC1nBalfQeSlhcBV0+w8q7JYAhB8ckTZO6a9q
+         lYkA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736433379; x=1737038179;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=QNunDNoIF2mrY2oVc9mlVfBWrl6u/4dyH5yl1p2uXyM=;
+        b=h/KvEYimD7uhq3QkBuIwPmQ6yr/hybxa0Kr9RPsMffCaVX6On5TykBaKDDq5nVTCur
+         1lUol2yjfcmx9xnwUwcdIBLhMou1beJmOnaYsWoXRj2qtUH8myIEC0a+Y9joVuLqzC4H
+         ZqSLfbQjEOI89GLIzzbZvDBMpgAh4aZNzPBmKt3HJbKcPXOIMegQFBkthz0ouTSVN6J8
+         1RdXATMExfZ9w5WT88SfqI3vsMWezlPLjcDlri4e9hpkd7BG7GTKAXqubPMiTZQbgYAi
+         Gqou6zN4r87CqwQyreazAeEiu/fBHlM42hEa19+s2kXzqOTgFZeX55uJ9P+GGtJ7+JSf
+         EvsQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU5MNYdE5HUvlGU+haQchDZidbAfBZjZwUjNSdfn3f4JrVyMoaEVFc9fBPfqar5L0hqrakt5PpbIcK5@vger.kernel.org, AJvYcCVToJIz0W7fa16ZW4ezm9QRYpDhtkm5G07BikgkX6suucMFEOvlh+ESMjplPT4y1lcXZPQZwfPQYthyg4yX@vger.kernel.org, AJvYcCVs04AON25hkCJxhktv7gR1g+DwyL37k6ndMuKuedUOXTV0cSK01fzIpD3/klpclHddT9Q1afAgQ9+rGDRBEPis@vger.kernel.org, AJvYcCW9D+6MjmFqBfCXgljNeCm7UAVq/aZUqr9KvIGMhHHVxS60S4hDKWNXJL7wNhGp/MEUVpXLTJ0+@vger.kernel.org, AJvYcCXBGPfIc0xX3WbByN86kopjLjco79E5ILN4631Ev+bTGgybFDS4HT7QCs/YdCSsgslWB0g=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz/BokhRgND5/uUXgxaFXAu9/EdhwWuaeOgSu1pMyBSnCK9wkcj
+	6LCpxIM1on8AzzZgmAHs1Afem+UIelQ9XhNgdxxyiRsytjVUxmmv
+X-Gm-Gg: ASbGncv1Ue+VOVGWXdyyKyzOMQU1HWFcsndEHUY473lO1pRB9rDkIWxYXsfRumox/yr
+	rYtzRRt2byOUXPzEavqKlZsQwopHqC+H+wH0vbFjYfCoZGWnema/GPGGDEegiR05Y8kJFeiEIiT
+	pVBLJk8H7zbReFIVHRMNBwQ3zcOhFz6heEM/DcH3LYijGQyIaTfndJ4lKqbwN+xpkAUmrH4cKpY
+	yqiKWIK41wWVOSFPccf54XLDt0kHgNq46avvCQJuZrs8Gld+2TOQHrr3e5EQ0u+18zbfA1QwQjN
+	iSsUyITOLmwThqG0WPVfzunkcC9n
+X-Google-Smtp-Source: AGHT+IFryBKl+CgzeHnlshqOHgd4HEgss/hRNR6TRDEv+l/RB0gB9QwsktP04rpoXg5ryVYIaPfcmg==
+X-Received: by 2002:a05:620a:4142:b0:7b7:106a:19b7 with SMTP id af79cd13be357-7bcd970d4b8mr1005540485a.18.1736433378983;
+        Thu, 09 Jan 2025 06:36:18 -0800 (PST)
+Received: from localhost (15.60.86.34.bc.googleusercontent.com. [34.86.60.15])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7bce3516068sm71749885a.100.2025.01.09.06.36.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 Jan 2025 06:36:18 -0800 (PST)
+Date: Thu, 09 Jan 2025 09:36:18 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Akihiko Odaki <akihiko.odaki@daynix.com>, 
+ Jonathan Corbet <corbet@lwn.net>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ Jason Wang <jasowang@redhat.com>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ "Michael S. Tsirkin" <mst@redhat.com>, 
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+ Shuah Khan <shuah@kernel.org>, 
+ linux-doc@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ netdev@vger.kernel.org, 
+ kvm@vger.kernel.org, 
+ virtualization@lists.linux-foundation.org, 
+ linux-kselftest@vger.kernel.org, 
+ Yuri Benditovich <yuri.benditovich@daynix.com>, 
+ Andrew Melnychenko <andrew@daynix.com>, 
+ Stephen Hemminger <stephen@networkplumber.org>, 
+ gur.stavi@huawei.com, 
+ Akihiko Odaki <akihiko.odaki@daynix.com>
+Message-ID: <677fdee2b56d_362bc129446@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20250109-rss-v6-5-b1c90ad708f6@daynix.com>
+References: <20250109-rss-v6-0-b1c90ad708f6@daynix.com>
+ <20250109-rss-v6-5-b1c90ad708f6@daynix.com>
+Subject: Re: [PATCH v6 5/6] selftest: tun: Add tests for virtio-net hashing
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250108162255.1306392-2-edumazet@google.com>
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-Hi Eric,
+Akihiko Odaki wrote:
+> The added tests confirm tun can perform RSS and hash reporting, and
+> reject invalid configurations for them.
+> 
+> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
+> ---
+>  tools/testing/selftests/net/Makefile |   2 +-
+>  tools/testing/selftests/net/tun.c    | 558 ++++++++++++++++++++++++++++++++++-
+>  2 files changed, 551 insertions(+), 9 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
+> index cb2fc601de66..92762ce3ebd4 100644
+> --- a/tools/testing/selftests/net/Makefile
+> +++ b/tools/testing/selftests/net/Makefile
+> @@ -121,6 +121,6 @@ $(OUTPUT)/reuseport_bpf_numa: LDLIBS += -lnuma
+>  $(OUTPUT)/tcp_mmap: LDLIBS += -lpthread -lcrypto
+>  $(OUTPUT)/tcp_inq: LDLIBS += -lpthread
+>  $(OUTPUT)/bind_bhash: LDLIBS += -lpthread
+> -$(OUTPUT)/io_uring_zerocopy_tx: CFLAGS += -I../../../include/
+> +$(OUTPUT)/io_uring_zerocopy_tx $(OUTPUT)/tun: CFLAGS += -I../../../include/
+>  
+>  include bpf.mk
+> diff --git a/tools/testing/selftests/net/tun.c b/tools/testing/selftests/net/tun.c
+> index 463dd98f2b80..9424d897e341 100644
+> --- a/tools/testing/selftests/net/tun.c
+> +++ b/tools/testing/selftests/net/tun.c
+> @@ -2,21 +2,37 @@
+>  
+>  #define _GNU_SOURCE
+>  
+> +#include <endian.h>
+>  #include <errno.h>
+>  #include <fcntl.h>
+> +#include <stddef.h>
+>  #include <stdio.h>
+>  #include <stdlib.h>
+>  #include <string.h>
+>  #include <unistd.h>
+> -#include <linux/if.h>
+> +#include <net/if.h>
+> +#include <netinet/ip.h>
+> +#include <sys/ioctl.h>
+> +#include <sys/socket.h>
+> +#include <linux/compiler.h>
+> +#include <linux/icmp.h>
+> +#include <linux/if_arp.h>
+>  #include <linux/if_tun.h>
+> +#include <linux/ipv6.h>
+>  #include <linux/netlink.h>
+>  #include <linux/rtnetlink.h>
+> -#include <sys/ioctl.h>
+> -#include <sys/socket.h>
+> +#include <linux/sockios.h>
+> +#include <linux/tcp.h>
+> +#include <linux/udp.h>
+> +#include <linux/virtio_net.h>
 
-kernel test robot noticed the following build errors:
-
-[auto build test ERROR on net-next/main]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Eric-Dumazet/net-expedite-synchronize_net-for-cleanup_net/20250109-002516
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20250108162255.1306392-2-edumazet%40google.com
-patch subject: [PATCH v2 net-next 1/4] net: expedite synchronize_net() for cleanup_net()
-config: openrisc-defconfig (https://download.01.org/0day-ci/archive/20250109/202501092210.1YCfipFl-lkp@intel.com/config)
-compiler: or1k-linux-gcc (GCC) 14.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250109/202501092210.1YCfipFl-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202501092210.1YCfipFl-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   or1k-linux-ld: net/core/dev.o: in function `synchronize_net':
->> dev.c:(.text+0x22c8): undefined reference to `cleanup_net_task'
->> or1k-linux-ld: dev.c:(.text+0x22d0): undefined reference to `cleanup_net_task'
-   or1k-linux-ld: net/core/dev.o: in function `dev_remove_pack':
-   dev.c:(.text+0x7058): undefined reference to `cleanup_net_task'
-   or1k-linux-ld: dev.c:(.text+0x7060): undefined reference to `cleanup_net_task'
-   or1k-linux-ld: net/core/dev.o: in function `free_netdev':
-   dev.c:(.text+0x7130): undefined reference to `cleanup_net_task'
-   or1k-linux-ld: net/core/dev.o:dev.c:(.text+0x713c): more undefined references to `cleanup_net_task' follow
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Are all these include changes strictly needed? Iff so, might as well
+fix ordering to be alphabetical (lexicographic).
+  
 
