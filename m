@@ -1,128 +1,199 @@
-Return-Path: <netdev+bounces-156505-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156507-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 55AA2A06AD0
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 03:20:24 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C1E8A06AEB
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 03:27:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 421E7163546
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 02:20:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DC7BB3A5E83
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 02:27:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 630987CF16;
-	Thu,  9 Jan 2025 02:20:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tdKz8+J7"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D86E913B7AE;
+	Thu,  9 Jan 2025 02:27:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 365726F30F;
-	Thu,  9 Jan 2025 02:20:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF1C113A26D;
+	Thu,  9 Jan 2025 02:26:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736389212; cv=none; b=NdM0mw4m6zpU+Q/B4hOvbcUBZHYe73YP2F6XXalkT1gYt7J0jyOrFjC+0GIml9yISzkjxAWDRsAR1DROLlORRLwLAQf8eRBvXdwlFtxqHoezm7T4ULd1jKTe1OXFP+eEWmPosxwy/XX/LeDui/GRv/ZF8y5Jh0YzDV/tlonG/k8=
+	t=1736389620; cv=none; b=PbxAsjR0jwImeehrqNuNvTpyHbT2x3p9mt14KXIV9b4+I3Mk2ZbfPeErJ3HpUA0/kA+o1hHr1jtdJImH6SPJEqzIJTejERUYOdL2fqzGMiajphKY9b5nUw6ADiS9vwAEAENsngENmmEIOZ94BTb52CRO+EyxcrMK/HWoLEBNLdU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736389212; c=relaxed/simple;
-	bh=5o2Si8C+2FKN1RT3tKic0+fY2AVR7kGb/gwSx9YjJxM=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=ODHwIMnTJgY/lRh3sIMa/b0xqMxNjBewV1iA1VQkqqPx2ZQcbf4yvpM9iDf+AVLSWkwp3LcB2ihz20Mo0uNQNNmwsYMkr1VfQuBPPNRhB/DFqm7QbyP4J+yM5E2fx/FfgJ8ihpYfnX6RAtMfL4ZAWoMMISkhYcCvBtAgnN+i540=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tdKz8+J7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9B5D3C4CEDD;
-	Thu,  9 Jan 2025 02:20:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736389211;
-	bh=5o2Si8C+2FKN1RT3tKic0+fY2AVR7kGb/gwSx9YjJxM=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=tdKz8+J7E6I7Y6iNqZF1ZtqQpRGEknpXQEwpvk+cLzJj4022xc74fnepRGfs3ZJG2
-	 xgWotQ0tUEyn6oyhE8LcJGbzxTO3c8/EigUYly6XbOkcASYs8yYtQtazDn7nBdNCHr
-	 SxUPWg3qO8ycRNEqe3o5uJ4dYoBPMW8H91DkyhtOpty9hKCqdHEWoK2YSuZtf0UHDp
-	 CHwc4E+w+77sGcrlMKessGt+Rm7btGpwBVaGOiK01Fj5a7tAtj0C1ad4NI6qtHqlg9
-	 E0FirT8NUnBfO3k00t/XjFHMLHi/iCkL0AYoYpW79jfKlTozE/dVes9FyHr7SQ+0V2
-	 E8F+AUTXmbqyw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 71085380A965;
-	Thu,  9 Jan 2025 02:20:34 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1736389620; c=relaxed/simple;
+	bh=Mz0ho6wNcmmRUFppI5RY+Mgz0y94H2qe68tpL2oT7vQ=;
+	h=Subject:To:References:CC:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=Pn5tNXSSu8GF83iP8nmpomOtoTMwILZl91QK4yB9+eYfj9hB8qX1TFo+5QgZat1ecWoNj8O3vqa3dW8kNe6hnPMLsBdU5SQ0FYMer0PoP2op8A0tEgCp4COSa85cvA/ZRidAfPLZPODEclmLHgxyZ5Jn8w26Pv1Z6HOWJokrslI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.105])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4YT7qh6fqxzjYB7;
+	Thu,  9 Jan 2025 10:23:12 +0800 (CST)
+Received: from kwepemh100016.china.huawei.com (unknown [7.202.181.102])
+	by mail.maildlp.com (Postfix) with ESMTPS id C86EE140382;
+	Thu,  9 Jan 2025 10:26:55 +0800 (CST)
+Received: from [10.174.179.93] (10.174.179.93) by
+ kwepemh100016.china.huawei.com (7.202.181.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Thu, 9 Jan 2025 10:26:52 +0800
+Subject: Re: [PATCH v4 -next 08/15] mm: nommu: move sysctl to mm/nommu.c
+To: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
+References: <20241223141550.638616-1-yukaixiong@huawei.com>
+ <20241223141550.638616-9-yukaixiong@huawei.com>
+ <93c2a55b-3f3b-488e-9156-0a7726f30be3@lucifer.local>
+CC: <akpm@linux-foundation.org>, <mcgrof@kernel.org>,
+	<ysato@users.sourceforge.jp>, <dalias@libc.org>,
+	<glaubitz@physik.fu-berlin.de>, <luto@kernel.org>, <tglx@linutronix.de>,
+	<mingo@redhat.com>, <bp@alien8.de>, <dave.hansen@linux.intel.com>,
+	<hpa@zytor.com>, <viro@zeniv.linux.org.uk>, <brauner@kernel.org>,
+	<jack@suse.cz>, <kees@kernel.org>, <j.granados@samsung.com>,
+	<willy@infradead.org>, <Liam.Howlett@oracle.com>, <vbabka@suse.cz>,
+	<trondmy@kernel.org>, <anna@kernel.org>, <chuck.lever@oracle.com>,
+	<jlayton@kernel.org>, <neilb@suse.de>, <okorniev@redhat.com>,
+	<Dai.Ngo@oracle.com>, <tom@talpey.com>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<paul@paul-moore.com>, <jmorris@namei.org>, <linux-sh@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
+	<linux-mm@kvack.org>, <linux-nfs@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<linux-security-module@vger.kernel.org>, <dhowells@redhat.com>,
+	<haifeng.xu@shopee.com>, <baolin.wang@linux.alibaba.com>,
+	<shikemeng@huaweicloud.com>, <dchinner@redhat.com>, <bfoster@redhat.com>,
+	<souravpanda@google.com>, <hannes@cmpxchg.org>, <rientjes@google.com>,
+	<pasha.tatashin@soleen.com>, <david@redhat.com>, <ryan.roberts@arm.com>,
+	<ying.huang@intel.com>, <yang@os.amperecomputing.com>,
+	<zev@bewilderbeest.net>, <serge@hallyn.com>, <vegard.nossum@oracle.com>,
+	<wangkefeng.wang@huawei.com>
+From: yukaixiong <yukaixiong@huawei.com>
+Message-ID: <1959b553-decd-7525-865e-425776841833@huawei.com>
+Date: Thu, 9 Jan 2025 10:26:51 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.7.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH bpf-next v2 00/16] bpf: Reduce the use of
- migrate_{disable|enable}()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173638923326.842935.15837805191875975956.git-patchwork-notify@kernel.org>
-Date: Thu, 09 Jan 2025 02:20:33 +0000
-References: <20250108010728.207536-1-houtao@huaweicloud.com>
-In-Reply-To: <20250108010728.207536-1-houtao@huaweicloud.com>
-To: Hou Tao <houtao@huaweicloud.com>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, martin.lau@linux.dev,
- alexei.starovoitov@gmail.com, andrii@kernel.org, eddyz87@gmail.com,
- song@kernel.org, haoluo@google.com, yonghong.song@linux.dev,
- daniel@iogearbox.net, kpsingh@kernel.org, sdf@fomichev.me, jolsa@kernel.org,
- john.fastabend@gmail.com, houtao1@huawei.com, xukuohai@huawei.com
+In-Reply-To: <93c2a55b-3f3b-488e-9156-0a7726f30be3@lucifer.local>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggpeml500006.china.huawei.com (7.185.36.76) To
+ kwepemh100016.china.huawei.com (7.202.181.102)
 
-Hello:
 
-This series was applied to bpf/bpf-next.git (master)
-by Alexei Starovoitov <ast@kernel.org>:
 
-On Wed,  8 Jan 2025 09:07:12 +0800 you wrote:
-> From: Hou Tao <houtao1@huawei.com>
-> 
-> Hi,
-> 
-> The use of migrate_{disable|enable} pair in BPF is mainly due to the
-> introduction of bpf memory allocator and the use of per-CPU data struct
-> in its internal implementation. The caller needs to disable migration
-> before invoking the alloc or free APIs of bpf memory allocator, and
-> enable migration after the invocation.
-> 
-> [...]
+On 2025/1/2 22:09, Lorenzo Stoakes wrote:
+> On Mon, Dec 23, 2024 at 10:15:27PM +0800, Kaixiong Yu wrote:
+>> The sysctl_nr_trim_pages belongs to nommu.c, move it to mm/nommu.c
+>> from /kernel/sysctl.c. And remove the useless extern variable declaration
+>> from include/linux/mm.h
+>>
+>> Signed-off-by: Kaixiong Yu <yukaixiong@huawei.com>
+> Looks good to me,
+>
+> Reviewed-by: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
+Thanks for your review !
 
-Here is the summary with links:
-  - [bpf-next,v2,01/16] bpf: Remove migrate_{disable|enable} from LPM trie
-    https://git.kernel.org/bpf/bpf-next/c/1b1a01db17af
-  - [bpf-next,v2,02/16] bpf: Remove migrate_{disable|enable} in ->map_for_each_callback
-    https://git.kernel.org/bpf/bpf-next/c/ea5b229630a6
-  - [bpf-next,v2,03/16] bpf: Remove migrate_{disable|enable} in htab_elem_free
-    https://git.kernel.org/bpf/bpf-next/c/53f2ba0b1cc0
-  - [bpf-next,v2,04/16] bpf: Remove migrate_{disable|enable} from bpf_cgrp_storage_lock helpers
-    https://git.kernel.org/bpf/bpf-next/c/25dc65f75b08
-  - [bpf-next,v2,05/16] bpf: Remove migrate_{disable|enable} from bpf_task_storage_lock helpers
-    https://git.kernel.org/bpf/bpf-next/c/9e6c958b5466
-  - [bpf-next,v2,06/16] bpf: Disable migration when destroying inode storage
-    https://git.kernel.org/bpf/bpf-next/c/e319cdc89566
-  - [bpf-next,v2,07/16] bpf: Disable migration when destroying sock storage
-    https://git.kernel.org/bpf/bpf-next/c/7d1032d1e303
-  - [bpf-next,v2,08/16] bpf: Disable migration when cloning sock storage
-    https://git.kernel.org/bpf/bpf-next/c/dfccfc47bde5
-  - [bpf-next,v2,09/16] bpf: Disable migration in bpf_selem_free_rcu
-    https://git.kernel.org/bpf/bpf-next/c/090d7f2e640b
-  - [bpf-next,v2,10/16] bpf: Disable migration before calling ops->map_free()
-    https://git.kernel.org/bpf/bpf-next/c/4b7e7cd1c105
-  - [bpf-next,v2,11/16] bpf: Remove migrate_{disable|enable} in bpf_obj_free_fields()
-    https://git.kernel.org/bpf/bpf-next/c/1d2dbe7120e8
-  - [bpf-next,v2,12/16] bpf: Remove migrate_{disable,enable} in bpf_cpumask_release()
-    https://git.kernel.org/bpf/bpf-next/c/6a52b965ab6f
-  - [bpf-next,v2,13/16] bpf: Remove migrate_{disable|enable} from bpf_selem_alloc()
-    https://git.kernel.org/bpf/bpf-next/c/2269b32ab00e
-  - [bpf-next,v2,14/16] bpf: Remove migrate_{disable|enable} from bpf_local_storage_alloc()
-    https://git.kernel.org/bpf/bpf-next/c/4855a75ebf48
-  - [bpf-next,v2,15/16] bpf: Remove migrate_{disable|enable} from bpf_local_storage_free()
-    https://git.kernel.org/bpf/bpf-next/c/7b984359e097
-  - [bpf-next,v2,16/16] bpf: Remove migrate_{disable|enable} from bpf_selem_free()
-    https://git.kernel.org/bpf/bpf-next/c/d86088e2c35d
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+Best ...
+>> ---
+>> v4:
+>>   - const qualify struct ctl_table nommu_table
+>> v3:
+>>   - change the title
+>> v2:
+>>   - fix the build error: expected ';' after top level declarator
+>>   - fix the build error: call to undeclared function 'register_syscall_init',
+>>     use 'register_sysctl_init' to replace it.
+>> ---
+>> ---
+>>   include/linux/mm.h |  2 --
+>>   kernel/sysctl.c    | 10 ----------
+>>   mm/nommu.c         | 15 ++++++++++++++-
+>>   3 files changed, 14 insertions(+), 13 deletions(-)
+>>
+>> diff --git a/include/linux/mm.h b/include/linux/mm.h
+>> index b3b87c1dc1e4..9813b5b9c093 100644
+>> --- a/include/linux/mm.h
+>> +++ b/include/linux/mm.h
+>> @@ -4080,8 +4080,6 @@ unsigned long wp_shared_mapping_range(struct address_space *mapping,
+>>   				      pgoff_t first_index, pgoff_t nr);
+>>   #endif
+>>
+>> -extern int sysctl_nr_trim_pages;
+>> -
+>>   #ifdef CONFIG_PRINTK
+>>   void mem_dump_obj(void *object);
+>>   #else
+>> diff --git a/kernel/sysctl.c b/kernel/sysctl.c
+>> index 62a58e417c40..97f9abffff0f 100644
+>> --- a/kernel/sysctl.c
+>> +++ b/kernel/sysctl.c
+>> @@ -2031,16 +2031,6 @@ static struct ctl_table vm_table[] = {
+>>   		.extra1		= SYSCTL_ONE,
+>>   		.extra2		= SYSCTL_FOUR,
+>>   	},
+>> -#ifndef CONFIG_MMU
+>> -	{
+>> -		.procname	= "nr_trim_pages",
+>> -		.data		= &sysctl_nr_trim_pages,
+>> -		.maxlen		= sizeof(sysctl_nr_trim_pages),
+>> -		.mode		= 0644,
+>> -		.proc_handler	= proc_dointvec_minmax,
+>> -		.extra1		= SYSCTL_ZERO,
+>> -	},
+>> -#endif
+> Of course later on in the series you do what I asked in a previous commit :P Nice.
+>
+>>   	{
+>>   		.procname	= "vfs_cache_pressure",
+>>   		.data		= &sysctl_vfs_cache_pressure,
+>> diff --git a/mm/nommu.c b/mm/nommu.c
+>> index baa79abdaf03..3c32f8b1eb54 100644
+>> --- a/mm/nommu.c
+>> +++ b/mm/nommu.c
+>> @@ -48,7 +48,6 @@ struct page *mem_map;
+>>   unsigned long max_mapnr;
+>>   EXPORT_SYMBOL(max_mapnr);
+>>   unsigned long highest_memmap_pfn;
+>> -int sysctl_nr_trim_pages = CONFIG_NOMMU_INITIAL_TRIM_EXCESS;
+>>   int heap_stack_gap = 0;
+>>
+>>   atomic_long_t mmap_pages_allocated;
+>> @@ -392,6 +391,19 @@ SYSCALL_DEFINE1(brk, unsigned long, brk)
+>>   	return mm->brk = brk;
+>>   }
+>>
+>> +static int sysctl_nr_trim_pages = CONFIG_NOMMU_INITIAL_TRIM_EXCESS;
+>> +
+>> +static const struct ctl_table nommu_table[] = {
+>> +	{
+>> +		.procname	= "nr_trim_pages",
+>> +		.data		= &sysctl_nr_trim_pages,
+>> +		.maxlen		= sizeof(sysctl_nr_trim_pages),
+>> +		.mode		= 0644,
+>> +		.proc_handler	= proc_dointvec_minmax,
+>> +		.extra1		= SYSCTL_ZERO,
+>> +	},
+>> +};
+>> +
+>>   /*
+>>    * initialise the percpu counter for VM and region record slabs
+>>    */
+>> @@ -402,6 +414,7 @@ void __init mmap_init(void)
+>>   	ret = percpu_counter_init(&vm_committed_as, 0, GFP_KERNEL);
+>>   	VM_BUG_ON(ret);
+>>   	vm_region_jar = KMEM_CACHE(vm_region, SLAB_PANIC|SLAB_ACCOUNT);
+>> +	register_sysctl_init("vm", nommu_table);
+>>   }
+>>
+>>   /*
+>> --
+>> 2.34.1
+>>
+> .
+>
 
 
