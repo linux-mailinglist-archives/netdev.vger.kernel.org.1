@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-156740-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156741-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C471EA07BA7
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 16:19:46 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1880DA07BAA
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 16:20:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2E2693AA781
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 15:19:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 11B4616AD61
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 15:19:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0157221CA17;
-	Thu,  9 Jan 2025 15:16:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4111C220697;
+	Thu,  9 Jan 2025 15:16:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="qfnUm3qe"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="lja7CoXJ"
 X-Original-To: netdev@vger.kernel.org
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4647221E08A
-	for <netdev@vger.kernel.org>; Thu,  9 Jan 2025 15:16:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D0BF21E08A
+	for <netdev@vger.kernel.org>; Thu,  9 Jan 2025 15:16:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736435788; cv=none; b=Ijnw95W6iaUjPffvBCoUV9XyMaPrxcnw/5JuYMPWp1cCPtZ63MM9KM0FTalwBvaNCjIksrTUqoqsrE0/E2tXpoG6TeuDyG1dig/ilKG+iFW4OfT/+pp7/TzqrKyY/QJNML8JApfUIJgs3eHu+GewvFq4KxOKKvlroWXKqcEsvBc=
+	t=1736435792; cv=none; b=nERPDuBLq8Q0kEfCFKJSIV7gCu9jzGuJPX1BWOcfdeW6rGWKCCDAbOkqSjUlEd0OZovCvCz4ptH8o7s/SUfQuR9jMxhJB6txcw0ZkuYZVwlP2jTAbpp3KxTGbyalNCXK6sAeo1Jt1z88+qHnps0n2l4v1vn7OR8VoE4D6wQL0j0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736435788; c=relaxed/simple;
-	bh=jipgO/mCQDKIymxtLoy0ofHCtl7B6zWS68+xkVnOhvw=;
+	s=arc-20240116; t=1736435792; c=relaxed/simple;
+	bh=MZtLE5F1Y++R/FvnltKHa6duo1px+Eq1zh+gP458lDg=;
 	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
-	 Content-Disposition:Content-Type:Message-Id:Date; b=Ihwxyt8tq1ZCC4CdORhGqvonXHq+dQwgdNW6IIV01zl+cVv8jlcej/Yl/7nROrvuPgHn6roy0LY8YH9bnxj9DuZh5xThFi3xYdILV9Yxxs2+ESWFd2DJqudYTQLEgCrloWYFCQo1Ux4Rq7L14PJ4TINi3ItQwpZu+TVII+jdJck=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=qfnUm3qe; arc=none smtp.client-ip=78.32.30.218
+	 Content-Disposition:Content-Type:Message-Id:Date; b=CinzPBZujON61yBUiPqRL0QcgdKbVJigG1qSafR5F6bk+PrM+8Kx9LbNrSR9d0ZtFH/Xmfjcl3Qrzx8jYlBIu73nWOFuGON1Z6H0XVYdFu3f7dnr3MlDF2GrdLEYgZ5X0GnSbkFRTtI3uZUowlrmfCLXXAEPoY3EnPf9CgpmYIY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=lja7CoXJ; arc=none smtp.client-ip=78.32.30.218
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
@@ -37,21 +37,21 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
 	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
 	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=EZ6gCF9Xs1wyIlL4qZQGrdpwvHi9FsSNpKv+lE6EdZ4=; b=qfnUm3qeth9MD0rOWovR0a540h
-	uL7+pPROrsHAt8D8OHaDu2UAXt3l2ueM8ZaZ7M9gayl80lPcqnV3NtcXKSF7YZiuKpHB2Xth7k3JN
-	AGPgDdPLr8+5zn/MEt/MD7ZyU4mZfJHOUoMvY22E0QOOgghYcBBPjFP5DegHf/JEk3vBhSXXRzfve
-	1Ak6Oz08uRrAX2N2mm8n3aTQTwbxOq1Xf5S2QD022Yn8t9ykMUciKNmxwLGwIBobMxWkZ16+VlcwU
-	6G/e7PULxzwACC7Ht2taIDI5ojAmVmvPAOl1KX24pqid/CUgDItw+GQQOlhQvmTOd7OcOToyDzZUU
-	1Y/6W0kw==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:47882 helo=rmk-PC.armlinux.org.uk)
+	bh=5xzWHY7CCln9l/THG/P2Qq643Grj7kUnbBQsLpWiTZM=; b=lja7CoXJcshFjyTvCXDsLzzcv4
+	EPHfppnHRakqRMypQzy/m0zVfZCnzfnNkKmQ/e68bvk0Kxa1SoasnjS4CaHCMcdGyQYppWVPjT8Wf
+	FcjA9oXj9EDjz24tAVvmoYTvLHR+RmbT+LCSgmhSu2Hv6p1bxRYtdYaDCpW17T/odhTfP6ySsC2C6
+	fcW+/eQEa1yTPxHpeldlwk7yRNHzIc+6cHpqQv2Ex1Zm2R3Bynafgb1nZvjn7R8W2xLS+6WKbvd6v
+	1Ti5xcKXPX8PhcV+lg0GXoZLN8tDozIN6DvoAZqneokrVBFj2GhNaDPZS20BKxdK1NBHT0BiQx+nX
+	KOxIIxsQ==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:47886 helo=rmk-PC.armlinux.org.uk)
 	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <rmk@armlinux.org.uk>)
-	id 1tVuGG-0002Dw-2c;
-	Thu, 09 Jan 2025 15:15:52 +0000
+	id 1tVuGO-0002EH-0g;
+	Thu, 09 Jan 2025 15:16:00 +0000
 Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
 	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1tVuFw-000BXi-OZ; Thu, 09 Jan 2025 15:15:32 +0000
+	id 1tVuG1-000BXo-S7; Thu, 09 Jan 2025 15:15:37 +0000
 In-Reply-To: <Z3_n_5BXkxQR4zEG@shell.armlinux.org.uk>
 References: <Z3_n_5BXkxQR4zEG@shell.armlinux.org.uk>
 From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
@@ -92,8 +92,8 @@ Cc: Alexander Couzens <lynxis@fe80.eu>,
 	UNGLinuxDriver@microchip.com,
 	Vladimir Oltean <olteanv@gmail.com>,
 	Eric Woudstra <ericwouds@gmail.com>
-Subject: [PATCH net-next 4/5] net: phylink: use neg_mode in
- phylink_mii_c22_pcs_decode_state()
+Subject: [PATCH net-next 5/5] net: phylink: provide fixed state for 1000base-X
+ and 2500base-X
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -103,43 +103,72 @@ MIME-Version: 1.0
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1tVuFw-000BXi-OZ@rmk-PC.armlinux.org.uk>
+Message-Id: <E1tVuG1-000BXo-S7@rmk-PC.armlinux.org.uk>
 Sender: Russell King <rmk@armlinux.org.uk>
-Date: Thu, 09 Jan 2025 15:15:32 +0000
+Date: Thu, 09 Jan 2025 15:15:37 +0000
 
-Rather than using the state of the Autoneg bit, which is unreliable
-with the new PCS neg mode support, use the passed neg_mode to decide
-whether to decode the link partner advertisement data.
+When decoding clause 22 state, if in-band is disabled and using either
+1000base-X or 2500base-X, rather than reporting link-down, we know the
+speed, and we only support full duplex. Pause modes taken from XPCS.
+
+This fixes a problem reported by Eric Woudstra.
 
 Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 ---
- drivers/net/phy/phylink.c | 12 ++++++++----
- 1 file changed, 8 insertions(+), 4 deletions(-)
+ drivers/net/phy/phylink.c | 29 +++++++++++++++++++----------
+ 1 file changed, 19 insertions(+), 10 deletions(-)
 
 diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
-index 99737bb6d1c7..5174c22e2091 100644
+index 5174c22e2091..0ae96d1376b4 100644
 --- a/drivers/net/phy/phylink.c
 +++ b/drivers/net/phy/phylink.c
-@@ -3877,11 +3877,15 @@ void phylink_mii_c22_pcs_decode_state(struct phylink_link_state *state,
- {
- 	state->link = !!(bmsr & BMSR_LSTATUS);
- 	state->an_complete = !!(bmsr & BMSR_ANEGCOMPLETE);
--	/* If there is no link or autonegotiation is disabled, the LP advertisement
--	 * data is not meaningful, so don't go any further.
-+
-+	/* If the link is down, the advertisement data is undefined. */
-+	if (!state->link)
-+		return;
-+
-+	/* If in-band is disabled, then the advertisement data is not
-+	 * meaningful.
- 	 */
--	if (!state->link || !linkmode_test_bit(ETHTOOL_LINK_MODE_Autoneg_BIT,
--					       state->advertising))
-+	if (neg_mode != PHYLINK_PCS_NEG_INBAND_ENABLED)
+@@ -3882,27 +3882,36 @@ void phylink_mii_c22_pcs_decode_state(struct phylink_link_state *state,
+ 	if (!state->link)
  		return;
  
+-	/* If in-band is disabled, then the advertisement data is not
+-	 * meaningful.
+-	 */
+-	if (neg_mode != PHYLINK_PCS_NEG_INBAND_ENABLED)
+-		return;
+-
  	switch (state->interface) {
+ 	case PHY_INTERFACE_MODE_1000BASEX:
+-		phylink_decode_c37_word(state, lpa, SPEED_1000);
++		if (neg_mode == PHYLINK_PCS_NEG_INBAND_ENABLED) {
++			phylink_decode_c37_word(state, lpa, SPEED_1000);
++		} else {
++			state->speed = SPEED_1000;
++			state->duplex = DUPLEX_FULL;
++			state->pause |= MLO_PAUSE_TX | MLO_PAUSE_RX;
++		}
+ 		break;
+ 
+ 	case PHY_INTERFACE_MODE_2500BASEX:
+-		phylink_decode_c37_word(state, lpa, SPEED_2500);
++		if (neg_mode == PHYLINK_PCS_NEG_INBAND_ENABLED) {
++			phylink_decode_c37_word(state, lpa, SPEED_2500);
++		} else {
++			state->speed = SPEED_2500;
++			state->duplex = DUPLEX_FULL;
++			state->pause |= MLO_PAUSE_TX | MLO_PAUSE_RX;
++		}
+ 		break;
+ 
+ 	case PHY_INTERFACE_MODE_SGMII:
+ 	case PHY_INTERFACE_MODE_QSGMII:
+-		phylink_decode_sgmii_word(state, lpa);
++		if (neg_mode == PHYLINK_PCS_NEG_INBAND_ENABLED)
++			phylink_decode_sgmii_word(state, lpa);
+ 		break;
++
+ 	case PHY_INTERFACE_MODE_QUSGMII:
+-		phylink_decode_usgmii_word(state, lpa);
++		if (neg_mode == PHYLINK_PCS_NEG_INBAND_ENABLED)
++			phylink_decode_usgmii_word(state, lpa);
+ 		break;
+ 
+ 	default:
 -- 
 2.30.2
 
