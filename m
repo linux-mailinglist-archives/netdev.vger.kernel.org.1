@@ -1,125 +1,96 @@
-Return-Path: <netdev+bounces-156864-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156865-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 32CDBA080ED
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 20:59:32 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 84CA1A08119
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 21:02:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 363E7167081
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 19:59:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 890AD167834
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 20:02:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D54171F4293;
-	Thu,  9 Jan 2025 19:59:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 379EA18EFD4;
+	Thu,  9 Jan 2025 20:02:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JmKbiGaO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="toKB7s9v"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D4F42F43;
-	Thu,  9 Jan 2025 19:59:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D9A8B677;
+	Thu,  9 Jan 2025 20:02:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736452767; cv=none; b=kH7kr8nsfAvA4O79PLWyjuKmonhK6TEmovoeY8chAA6OLpQu5r/KSdt+1B8Lvkogqwb9xv/oggeNRU7ZQG08HBeFh8xY49MuTeNjSeCwQgrLXEuZh1JpcfWRMoVYS59cwr8MIDiq5QpDE/3kMKBoZlGkc+9s9xrb1m2FrZrAN70=
+	t=1736452973; cv=none; b=WQhvEa8CAWlpBRwXakjF3gOHpNRuvwQDqcrJgdVPgNW5oThZMYp0jeoi4tSqTe+FgjIR/KmcwSETapbpzzjv2n6qjLJdMFUe/w9TC9j5Fx2d3vr6EnefOZUz4kARKr8rGGQ8fPS64qOBFIYN7dwm79fBG6F0Ftnh3O9V1xBYLNk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736452767; c=relaxed/simple;
-	bh=mhPRywFd9ukygV++MaAXiNyV5JNms8b00h2HE8kvKOg=;
+	s=arc-20240116; t=1736452973; c=relaxed/simple;
+	bh=xhITiGNW0w7CtQVtgtjX4dQRvwS1bcH2km6k9wqjuEo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gArTZnXE2Z2AcEeY7yDiOqafXPtg2f+liU3r+hDqYo6bz6xc2DzIKYbjSUoVfaMzJcx/8Wx1rVftkPGWAPzQ8rdwih8UI9ahQJRlEFWmH0BXlm/Dw0+Oiuf32UUcQjv1yTwRBneDp9d6kgmAROEFUQCb2ctbtP9jq4bsuaaqCbE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JmKbiGaO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ADE4AC4CEE1;
-	Thu,  9 Jan 2025 19:59:23 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=quKGuhv86g/rXInxUZjNOQhOhmCDrUHNcumzg79Zs4Oau9Oz52CaEGdDVezeH4WuF/7rSpZQQUppL5T4AvB8UshCwrZuftXaNu0jlCz4V2eQO6HfZ9CXIw56Xe6AVrJsWb34tFAMwsLUiyEpZ/SR6SuwzFw3tlq02dNdNBjmxqg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=toKB7s9v; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E4AB8C4CED2;
+	Thu,  9 Jan 2025 20:02:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736452767;
-	bh=mhPRywFd9ukygV++MaAXiNyV5JNms8b00h2HE8kvKOg=;
+	s=k20201202; t=1736452972;
+	bh=xhITiGNW0w7CtQVtgtjX4dQRvwS1bcH2km6k9wqjuEo=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=JmKbiGaOvh4kRZyPoFMpl4Hv7UZ64wj9aEqot7bZkr24mg24dXgcC0q96WYxsIsMk
-	 lv2D2KaZbv5yw+HRlLz+1xI6pEtU+Qovx+8CVTzvCJ14mctvGFQCz7uZ3KgqYAOekt
-	 QYPN2i4fDfkzVsCynTxKCXJOeUF7mid0xI2HhNVUBShzQ/Pwbqllh2TXgOVCXbmIRW
-	 jTcQO8hrHBwuJZs6IYqZEBjiqCZhS7WmpHE4+ywVXHzs5LcsHh3CPt1vKQDuBK2Uua
-	 qqYA2qIUPdnrC/B1U0+YjSolD6dJA4AjIrPPKERupn3KMFWKspODmOT5OjvBQpoV9T
-	 AYQNubLiDyffw==
-Date: Thu, 9 Jan 2025 19:59:20 +0000
-From: Mark Brown <broonie@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Kory Maincent <kory.maincent@bootlin.com>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Liam Girdwood <lgirdwood@gmail.com>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org, Kyle Swenson <kyle.swenson@est.tech>,
-	Dent Project <dentproject@linuxfoundation.org>,
-	kernel@pengutronix.de,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>
-Subject: Re: [PATCH net-next v2 11/15] net: pse-pd: Add support for PSE
- device index
-Message-ID: <94386bd6-18b7-4779-a4eb-98e26c90326b@sirena.org.uk>
-References: <20250109-b4-feature_poe_arrange-v2-0-55ded947b510@bootlin.com>
- <20250109-b4-feature_poe_arrange-v2-11-55ded947b510@bootlin.com>
- <20250109075926.52a699de@kernel.org>
- <20250109170957.1a4bad9c@kmaincent-XPS-13-7390>
- <Z3_415FoqTn_sV87@pengutronix.de>
- <20250109174942.391cbe6a@kmaincent-XPS-13-7390>
- <20250109115141.690c87b8@kernel.org>
+	b=toKB7s9vslTiWOs7O3qMR7VxiCpLqxN8SFSd6itWHt1eJd5C8O2iRMnlmMC1WeJLT
+	 oY0tObmN9udf+eKCMx2LBTSmDvVkMr+PwALZH34L8OrVlUvpzvaP3GqUAjy95HBH3q
+	 /1CAnFlF4wR+7Z5LrsASoygpEk/WQRkuS6qpNEhA5qcYvqwiXW+l+66BYBqSWBCKrs
+	 /m3sXpfJvRBc9Khdahg3UZOgEdDicOsFB4gU0SwjzdkxNO/nNUkKHgPG/bLo515Oqr
+	 3esUHxP2cmyl9P8b2nc8Pta5IQJaIknY2Qcb2Z7WwPfxT9J1HAwVjtdZAtI5qA9szy
+	 2nbtCqWj1jA+Q==
+Date: Thu, 9 Jan 2025 20:02:47 +0000
+From: Simon Horman <horms@kernel.org>
+To: Divya Koppera <divya.koppera@microchip.com>
+Cc: andrew@lunn.ch, arun.ramadoss@microchip.com,
+	UNGLinuxDriver@microchip.com, hkallweit1@gmail.com,
+	linux@armlinux.org.uk, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, richardcochran@gmail.com,
+	vadim.fedorenko@linux.dev
+Subject: Re: [PATCH net] net: phy: Kconfig: Fix error related to undefined
+ reference
+Message-ID: <20250109200247.GR7706@kernel.org>
+References: <20250109121432.12664-1-divya.koppera@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="NSkeXpHCuIxL2qxl"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250109115141.690c87b8@kernel.org>
-X-Cookie: I'll be Grateful when they're Dead.
+In-Reply-To: <20250109121432.12664-1-divya.koppera@microchip.com>
 
+On Thu, Jan 09, 2025 at 05:44:32PM +0530, Divya Koppera wrote:
+> When microchip_t1_phy is built in and phyptp is module
+> facing undefined reference issue. This get fixed when
+> microchip_t1_phy made dependent on PTP_1588_CLOCK_OPTIONAL.
+> 
+> Reported-by: kernel test robot <lkp@intel.com>
+> Closes:
+> https://lore.kernel.org/oe-kbuild-all/202501090604.YEoJXCXi-lkp@intel.com
+> Fixes: fa51199c5f34 ("net: phy: microchip_rds_ptp : Add rds ptp library for Microchip phys")
+> Signed-off-by: Divya Koppera <divya.koppera@microchip.com>
 
---NSkeXpHCuIxL2qxl
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Hi Divya,
 
-On Thu, Jan 09, 2025 at 11:51:41AM -0800, Jakub Kicinski wrote:
-> On Thu, 9 Jan 2025 17:49:42 +0100 Kory Maincent wrote:
+I think that this patch should be targeted at net-next, where
+the problem seems to manifest, rather than net where it does not.
+Likewise, this patch applies to net-next, but not net.
 
-> > I think I should only drop patch 11 and 12 from this series which add s=
-omething
-> > new while the rest is reshuffle or fix code.
+Also, I think the prefix for the patch should be "net: phy: microchip_t1".
+And perhaps the following subject is a bit more descriptive.
 
-> I mentioned 13 & 14 because I suspected we may need to wait for
-> the maintainers of regulator, and merge 13 in some special way.
-> Looks like Mark merged 13 already, so =F0=9F=A4=B7=EF=B8=8F
+	[PATCH net-next] net: phy: microchip_t1: depend on PTP_1588_CLOCK_OPTIONAL
 
-Well, you were saying that the subdevice structure didn't make sense and
-you wanted to see it dropped for now so given that it's -rc6 and it's
-unlikely that'll get fixed for this release it made sense to just apply
-the regulator bit for now and get myself off these huge threads.
+As for the code change itself, it looks good to me.
 
-There's no direct dependency here so it should be fine to merge the
-networking stuff separately if that does get sorted out.
+Reviewed-by: Simon Horman <horms@kernel.org>
+Tested-by: Simon Horman <horms@kernel.org> # build-tested
 
---NSkeXpHCuIxL2qxl
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmeAKpgACgkQJNaLcl1U
-h9DJGQf/TrjYjWyxWPOe93U9iK8pbYy1z+8Fdp7XW16bvIYUyy2wIgOhxHN6C4Hy
-GFIJunL04e/lAYn2JASs+Kye89yTJuJHcP21XKh/NRpxBsjs2dTZYAEkPNBGIZeM
-wOwWf+z2s7f61Rr+HHv5cYt0RPOPTshtzlvN+x6AP4yaxdFj/S9GBVy7H+jDL9Dp
-3Tocxr84eIkzV4bO2F3o1OghlE5DFoJm8e/CzX6urG1kl7VoLVtjnPBOmykJb22y
-1kwUQ9kzCVmLIaOkiaEMRWj3YIU7Du4yKnI8tXCHlObwdNmvyHzvS7amHDwzj4Va
-oeOxnigonsYDoeuVB1f7NOqKt6xWnw==
-=gJu2
------END PGP SIGNATURE-----
-
---NSkeXpHCuIxL2qxl--
+-- 
+pw-bot: changes-requested
 
