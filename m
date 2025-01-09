@@ -1,106 +1,93 @@
-Return-Path: <netdev+bounces-156702-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156703-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A6B9DA078B4
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 15:11:27 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E089A078B9
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 15:11:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 691573AA0F7
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 14:10:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F1D3C1882AE9
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 14:11:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 470D0219A86;
-	Thu,  9 Jan 2025 14:10:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EBB6218EBF;
+	Thu,  9 Jan 2025 14:11:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KF9vu/Tj"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="vKnDRRcF"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AD9E21764D;
-	Thu,  9 Jan 2025 14:10:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEFF921764D;
+	Thu,  9 Jan 2025 14:11:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736431812; cv=none; b=SEUtx0TtsmVk1X8UuCMXQqjtjFiv2+QbD4ymh50NNCMUmiUmvgVE34mna/PS7BNQheDiEDuNgZeRBXkn4yf/u+PFlz72x5P3aB0s0GkFiSowQKf/yrAaOed8VJKdH3SYIInb77pNCMeqeaI4dMN24QNmHg5yVzCVlG2tMidl+/4=
+	t=1736431913; cv=none; b=ef+XEx0ADicpWptIZW+ZHOeLGcKRAivJwQICevxOayUE9AQDl3jHIBGCx9j3NmohuK4xAA5PulL0mM9mOau5jgERYmPtI9mGOQWUU7QuvNNj+g5+TItbB3reGqfTu2IqDwR0C0yl/iXGZgJ5giklv++m0qDCeWF2sAzEkeDmPJA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736431812; c=relaxed/simple;
-	bh=wfH6VvZX6J6Cw/yMPl7F1JdtOldjRp6CfpZO5Faq3Vk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=BQd3CimrPciKFdVZbrzDePQQIfSEmldJEQbixYyMT1befSAa3p0hlJUQNSOT1Y83KRG6JweyD7AZtCLGmerNYWQiKWKUGR4V/rRI0SRfTyDsBNeZX9StL7k/zLkkpZ87MyFK4JjXo6yuuULKmVhv6GaMHmWrK/lmIhb/ZUe4cIY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KF9vu/Tj; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0935DC4CED3;
-	Thu,  9 Jan 2025 14:10:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736431811;
-	bh=wfH6VvZX6J6Cw/yMPl7F1JdtOldjRp6CfpZO5Faq3Vk=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=KF9vu/Tj7Zf6BSq2Bka0T/01GmWUsd7XAAsDBvZrsGZZkJLPydFmwo6IsynaGPOGb
-	 HHjM1pliUCDxY33SYbuVIti7VZorL3phVyl02cvqtFfi3XUXTcGe3bPopmK2ZWp2MB
-	 Sut+/7GW4Qk1aBv1RPDcc8GmtW8s7heR+Hp+1ITnUxTpi4skwBb8apX2aQR0nmNHHI
-	 gP/sqdAOnrQ70+m9bcVeIrgD9FEUx+aWzmsm/bYIsmrg/JAK21pbSGmmvvxAgMFp0s
-	 HX8MhGTG8noXGxbZwBsIICr+hwrDifzrLF7rsoRO3WMhkCvQUivNCO6vAZdRGwMZgW
-	 8PVDl7t5wE2/w==
-From: cel@kernel.org
-To: Donald Hunter <donald.hunter@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Neil Brown <neilb@suse.de>,
-	Olga Kornievskaia <okorniev@redhat.com>,
-	Dai Ngo <Dai.Ngo@oracle.com>,
-	Tom Talpey <tom@talpey.com>,
-	Trond Myklebust <trondmy@kernel.org>,
-	Anna Schumaker <anna@kernel.org>,
-	Jeff Layton <jlayton@kernel.org>
-Cc: Chuck Lever <chuck.lever@oracle.com>,
-	Scott Mayhew <smayhew@redhat.com>,
-	Yongcheng Yang <yoyang@redhat.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-nfs@vger.kernel.org
-Subject: Re: [PATCH] lockd: add netlink control interface
-Date: Thu,  9 Jan 2025 09:10:06 -0500
-Message-ID: <173643164044.18486.14928337621532013382.b4-ty@oracle.com>
-X-Mailer: git-send-email 2.47.0
-In-Reply-To: <20250108-lockd-nl-v1-1-b39f89ae0f20@kernel.org>
-References: <20250108-lockd-nl-v1-1-b39f89ae0f20@kernel.org>
+	s=arc-20240116; t=1736431913; c=relaxed/simple;
+	bh=/oLYBdeqAYZ93lQ4dBkYr/2nv+qCGKWjw4hYhSEUm+A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FRw0sT2k1t6qyH9rz93od0gK2Vxc1wNSaakHqoxxXAqKHZYrvkaLpr1aCEItCndg52YQ/1ya21lGRi2huWuwHcCvNbjELLrolQoUDf9k8+0Owjc6vmWIoKTll+mRNm0qCXV7XB3GbHapwU3KVZc9qqUJSyMnqpP09UEr0h0Lopk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=vKnDRRcF; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=vNh7DueZ0ROhGXSoVao0r4XYvV32aPWQzqAogsGA9pE=; b=vKnDRRcF0Gff8rhBV3+joaGp0z
+	QB/FUdZLbjzRvbvftL0QBE9Jed2l6xIG4FfwIpMGgxT0s0ux9rgALc94CQDJhXzJt+ZjgF0VuAI8k
+	QUBxaqp2Q72CTK3UXbTpS56Xut3Jy2W9sUADpgrbMJm0TenBa2Z0nXgwLnuyshETkN1I=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tVtG1-002uSH-NK; Thu, 09 Jan 2025 15:11:33 +0100
+Date: Thu, 9 Jan 2025 15:11:33 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Basharath Hussain Khaja <basharath@couthit.com>
+Cc: danishanwar@ti.com, rogerq@kernel.org, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org,
+	conor+dt@kernel.org, nm@ti.com, ssantosh@kernel.org,
+	tony@atomide.com, richardcochran@gmail.com, parvathi@couthit.com,
+	schnelle@linux.ibm.com, rdunlap@infradead.org,
+	diogo.ivo@siemens.com, m-karicheri2@ti.com, horms@kernel.org,
+	jacob.e.keller@intel.com, m-malladi@ti.com,
+	javier.carrasco.cruz@gmail.com, afd@ti.com, s-anna@ti.com,
+	linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-omap@vger.kernel.org, pratheesh@ti.com, prajith@ti.com,
+	vigneshr@ti.com, praneeth@ti.com, srk@ti.com, rogerq@ti.com,
+	krishna@couthit.com, pmohan@couthit.com, mohan@couthit.com
+Subject: Re: [RFC PATCH 00/10] PRU-ICSSM Ethernet Driver
+Message-ID: <2e82fb20-c6f9-4cc3-a700-fce049295f58@lunn.ch>
+References: <20250109105600.41297-1-basharath@couthit.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250109105600.41297-1-basharath@couthit.com>
 
-From: Chuck Lever <chuck.lever@oracle.com>
-
-On Wed, 08 Jan 2025 16:00:15 -0500, Jeff Layton wrote:
-> The legacy rpc.nfsd tool will set the nlm_grace_period if the NFSv4
-> grace period is set. nfsdctl is missing this functionality, so add a new
-> netlink control interface for lockd that it can use. For now, it only
-> allows setting the grace period, and the tcp and udp listener ports.
+On Thu, Jan 09, 2025 at 04:25:50PM +0530, Basharath Hussain Khaja wrote:
+> Hi,
 > 
-> lockd currently uses module parameters and sysctls for configuration, so
-> all of its settings are global. With this change, lockd now tracks these
-> values on a per-net-ns basis. It will only fall back to using the global
-> values if any of them are 0.
+> The Programmable Real-Time Unit Industrial Communication Sub-system (PRU-ICSS)
+> is available on the TI SOCs in two flavors: Gigabit ICSS (ICSSG) and the older
+> Megabit ICSS (ICSSM).
 > 
-> [...]
+> Support for ICSSG Dual-EMAC mode has already been mainlined [1] and the
+> fundamental components/drivers such as PRUSS driver, Remoteproc driver,
+> PRU-ICSS INTC, and PRU-ICSS IEP drivers are already available in the mainline
+> Linux kernel. The current RFC patch series builds on top of these components
+> and introduces changes to support the Dual-EMAC mode on ICSSM, especially on
+> the TI AM57xx devices.
+ 
+I guess this version also has the horrible architecture of multiple
+firmware's you need to swap between at runtime?
 
-Applied to nfsd-testing, thanks!
-
-This seems utterly reasonable to me. I'm thinking that it's a bit
-late for v6.14, so for the moment it is parked in the testing
-branch.
-
-[1/1] lockd: add netlink control interface
-      commit: c7ec1d59e4adf1660eec9e5ec0ee83f4a32c0a49
-
---
-Chuck Lever
-
+	Andrew
 
