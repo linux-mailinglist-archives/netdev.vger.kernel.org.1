@@ -1,206 +1,143 @@
-Return-Path: <netdev+bounces-156670-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156675-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0714A07562
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 13:11:49 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6CE39A075AC
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 13:23:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6049C7A053B
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 12:11:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D7DF2188B44E
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 12:23:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06268217640;
-	Thu,  9 Jan 2025 12:11:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48E7F217641;
+	Thu,  9 Jan 2025 12:23:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="afR7TU/S"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SJ8WKZDK"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 452D6216E24
-	for <netdev@vger.kernel.org>; Thu,  9 Jan 2025 12:11:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75C9F20551B;
+	Thu,  9 Jan 2025 12:23:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736424702; cv=none; b=j7fCKpjpupux9kWzz6zxgca9SiC76d8F5qBCrg2i2eZS+Bvf7NvssCeNt25EeX03s6snl2OERdaG4/+KUCnCzIXJ6kwNFuRaCPQw7vjXUWM+wz6ocPcVvdZRwtSiKwEfdo8j62+Pww97rTuPD7ftjTpkYp0T8/znPi564AmnQB8=
+	t=1736425403; cv=none; b=kcr7JFNmdWv2y4DdtI7Au9wuFGnPZWf95hqendXHtJbQlDd8RLNTEZVn3usdpD13WlSNslncm0SzR7MVcEacY7yQki9/HTiM/qIBFCi4jTsz98r4DNrDzY3tOFJC70jWAygtb+PtogMSg1JMxaqU/wvKFFCAiUWDxySjcJOY6CU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736424702; c=relaxed/simple;
-	bh=V9Igcc57UG9HRjSech9JKcEzhucrTa40yP8znsLc6RI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tvkkr3sbeQm66d4Hd2OFA71nVG81Uu/D1VBie5W3EKlNI6+r+qQvRO3UH8Bs5alQVgpuADKTNBT2fZ4W3r2QfPiD0EV2bf4LG4B+p+PTjYil6gjUHO/suurDvPi2M814NEZO+g5ors6/5kfVTTJAJvQRVej1Aq1kSm75FV++nwA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=afR7TU/S; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1736424700;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6UX0y6Cp3sQrCE2nh5veQWVG7OewsvHWIAkmGcNadoM=;
-	b=afR7TU/SrO6VLHwoJlMf58aZbcmwtTa2XzZ8lMrPFsrkY+8B50vdhvaArWO5WFHKuAL0t7
-	oEYtK6HyHEczwsDvBkWnSFhthw2REmby8JyARPov8P1AhhiRPQdbW6y82ljOPycVkYqea4
-	k5lYyYPkQxaMbHOjUmbU6Pu3RgyUcgM=
-Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
- [209.85.160.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-256-9Fmd4Ao2PRqiWMNPqO2NEA-1; Thu, 09 Jan 2025 07:11:38 -0500
-X-MC-Unique: 9Fmd4Ao2PRqiWMNPqO2NEA-1
-X-Mimecast-MFC-AGG-ID: 9Fmd4Ao2PRqiWMNPqO2NEA
-Received: by mail-qt1-f198.google.com with SMTP id d75a77b69052e-468f6f2f57aso10359461cf.0
-        for <netdev@vger.kernel.org>; Thu, 09 Jan 2025 04:11:38 -0800 (PST)
+	s=arc-20240116; t=1736425403; c=relaxed/simple;
+	bh=WKEaDlzHJnTsoJs9OpNYkFEiipKOXlfflYE+8TYUNHA=;
+	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
+	 MIME-Version:Content-Type; b=SmGiyiCmCjGKZO3dYbTUjDjc3RN5k2dFkYlYv+JKm72YnQs3ga+ToNUuTa+LebpbSOAwW2fDmFBtAZ4LnbPFVRxis9ggx/8YXdsdZTDxYvYAcUvsODbxsADRIHqmuSsGbj3Knp74ycYETrebGDfUP6tGaRgvSDrMH0V+9GnpNTc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SJ8WKZDK; arc=none smtp.client-ip=209.85.221.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-3863494591bso461216f8f.1;
+        Thu, 09 Jan 2025 04:23:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1736425399; x=1737030199; darn=vger.kernel.org;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=WE6LPyrGRltfhXMKoN4nkqD77PNtIn7bXA/hoAUj5dQ=;
+        b=SJ8WKZDK5BX6JXqv99xy3K0HO6W0gvXFP9pMqI3WdtciMLYwgEqpsiji5htQbLsDGN
+         kd4Nvc8givCE6ahu+/KZy8K1hHItT0uSPZ+5vdHMO4ecU1uDFFGvdN3PmPFpBiCFYoe2
+         qN7yRlBnNPwC7KziM8lUYJKpBpqaKTnHWUxxPozs2ZpExwI5GtWb31B1gCWMou+xFELJ
+         YLn4AMjDJRXDwW93EqWVTV+q3/HSfaxI1bdkG/l6NayfsilDhi4T9h6HGsfWvi5Lr/b6
+         4pKGPEz1bemMRnDA8eVeZxZGGLPu7LD3EPTEHB41g3BV4QVLGoyO5Kk0C2yIGiX/m96V
+         86cw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736424698; x=1737029498;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6UX0y6Cp3sQrCE2nh5veQWVG7OewsvHWIAkmGcNadoM=;
-        b=Nwjz280gu5oi2oros1Dpik2VkH+PRwGWIGV5epVhdACWP58d9sBy6LBBPb8gHHy4Bw
-         awx4A75tfteUQF775L7DJ3kc6Go6dyx9yqofZQ7/9euO2OL6D7MNFQM84pwqucfS5ucS
-         ABv9IituneiW2k6J/TYCgQbetpR+rjEx0YejwW8tz37dcPiz03q8tsmwkiWYkQdQAW1M
-         XPvvOf+kH/8uywam49CRM+qtlExriPoBxzeH+toIuul99OianUR0EsrlR9DpJqNziOiB
-         GvML6FKYPmvLIYU8fqRj/CtoJSn40xyK7mS0vjAkdKZTcRKfwVRJQxOOjRdoI4lb+GJG
-         n+Bw==
-X-Forwarded-Encrypted: i=1; AJvYcCWYNMZC3XIh9QifHLDZeWS7fpySHS9/4VLbwHadxRtkhAF8CnKlAxlav/to6sA4xtaGVevO5EY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwvFNoiv5Fq/n4PHluXk+BslAWtzln/vx9WLZQ7iLVghk7jyDiI
-	dfapaJ5QLvYWJMrjQ4OTyiPpwHZUQtbS/2LRZiYoZATzavMcHRYoHvQWvSw0BGl5DJsTsbI/Ymg
-	+F2Uv765MevVwCF8Jn1LvFFEumwkfh1nKeGv2b1Un0XAoUu/OQVOXkg==
-X-Gm-Gg: ASbGnct870wCS19a5+K33rA4RITXMnPPypCoGdzZlnViXX5iMttVx/EKdSFok34cO27
-	M5/DwTr/CUS0Kd1aSiYUh11RN/s9XRpnCxXTQtbzAvE9Dn9fG5/ZaGTQmG9/yid9/saGZB5NiXZ
-	clVAy9Z5ZoW92FqdqjZVqW3H25PVgbvxkkt80ANdLU20buAoe2+2lVHDRhLlRpQ19FdwCAGxR/A
-	BidXT025X8CuzfW4HmMjFspqXit1/2ignEJAYnPCcO1TzIzlAzBesZAivjL/JlWSLgLZTskEEUP
-	TWGS0T5s
-X-Received: by 2002:a05:622a:242:b0:467:54e5:ceaa with SMTP id d75a77b69052e-46c71079ea3mr95295221cf.9.1736424698340;
-        Thu, 09 Jan 2025 04:11:38 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGqKaxlWIfd8ANpdNqMYSDWxka7BN+0vCp0a2UKun8ljcvGi8/js/ptgg8silyjum2+0LQEyA==
-X-Received: by 2002:a05:622a:242:b0:467:54e5:ceaa with SMTP id d75a77b69052e-46c71079ea3mr95294811cf.9.1736424697984;
-        Thu, 09 Jan 2025 04:11:37 -0800 (PST)
-Received: from [192.168.88.253] (146-241-2-244.dyn.eolo.it. [146.241.2.244])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-46a3eb30dc4sm206077481cf.76.2025.01.09.04.11.35
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 09 Jan 2025 04:11:37 -0800 (PST)
-Message-ID: <fb7a1324-41c6-4e10-a6a3-f16d96f44f65@redhat.com>
-Date: Thu, 9 Jan 2025 13:11:34 +0100
+        d=1e100.net; s=20230601; t=1736425399; x=1737030199;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=WE6LPyrGRltfhXMKoN4nkqD77PNtIn7bXA/hoAUj5dQ=;
+        b=cCDnOTNRuGTUhkUrbQmmgHThRO1sN0V/SM8fQreXOzhcLcBZkcrUKbjebJp7C8qE9H
+         Lkti4OvhND56WEtwtccfK342x3OXiETVN5iHfI0q3pxdlnrSYUEwr2TMhJnnNq2dMTlj
+         nHfpCMfuMDVYE5fImToW3trvgQf9Lslz0sZPZsD86QV/uMR+Q5yj5CFmJ8ntCzHOgTF6
+         DTe1hFOJe/cmtni8yvBmQcRM/pXOhOO108lLPKnMsOvP/8OV3SaQdBqxPaY1gCb43HlY
+         XUxHOS8PkmRT0dwlXS0b4EVw702KFFCdd7Izgc3ngomqIPiQwJOC32TWu7vEhkbYnFDZ
+         QAPQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWLb/bA48CFKzA2LJvt4T5EpgbnKm3yCobDCIPafvnEnLokMoS+XZofmm0Lt15lj/4lkok1K+3x@vger.kernel.org, AJvYcCXpsH/G/GWM77VgUZX3hKRGPnDlsDwfEtk6bL4Kcw85LMkL+VOD1QzCOmcWfey6LdJ2spoaryAZuqLrZ5Q=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwFKxm2p2nSkDfkb+lTYRVs2ad4qHAHodeyoZXkvDyZT6VNoxfM
+	ef0s2CAcCDf5fFhPgUGAxi6XZIsW4Yog1VKTgacSQnbJDtNPjEtRbaZhkQ==
+X-Gm-Gg: ASbGnctJhJn0RUhl2886gbz8BH1OzUAIi20RNBk/2cywEvf7NX/U2lwmX038v1uyFNH
+	qxXa/KmFJ2EAOH2szz7KBEhOeEnCqgziesPgzK7lUZrHnsmmFIqw4TM9PuObms2SmsNSLaAup50
+	m3rsXgu11O3bzL39PG5NsMR1TOKWPwBerk2T7/VH1d7lPDILFqyCimNttrEEcQNKCvDF/MDE0Z6
+	dsz+HPH+we6sbyiNVcr4RNA9MB/+CHjWsA6FqSALoBIVgsme1/VvYQz582WpVYMWyJILQ==
+X-Google-Smtp-Source: AGHT+IEDzkEjt6Vqd+CguQByd6QQ8gbv5rTgMCU/HxEALK+dtsNWLRLRs7aQuCHniZYlTLTi06LmTA==
+X-Received: by 2002:a5d:6da1:0:b0:385:dc45:ea06 with SMTP id ffacd0b85a97d-38a872deb27mr5726352f8f.13.1736425399236;
+        Thu, 09 Jan 2025 04:23:19 -0800 (PST)
+Received: from imac ([2a02:8010:60a0:0:1cd4:f10c:6f67:2480])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38a8e4c1bebsm1686665f8f.95.2025.01.09.04.23.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 Jan 2025 04:23:18 -0800 (PST)
+From: Donald Hunter <donald.hunter@gmail.com>
+To: Jan Stancek <jstancek@redhat.com>
+Cc: stfomichev@gmail.com,  kuba@kernel.org,  jdamato@fastly.com,
+  pabeni@redhat.com,  netdev@vger.kernel.org,  linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v4 2/4] tools: ynl: add initial pyproject.toml for
+ packaging
+In-Reply-To: <b184b43340f08aef97387bfd7f2b2cd9b015c343.1736343575.git.jstancek@redhat.com>
+	(Jan Stancek's message of "Wed, 8 Jan 2025 14:56:15 +0100")
+Date: Thu, 09 Jan 2025 12:13:14 +0000
+Message-ID: <m2bjwgmbhh.fsf@gmail.com>
+References: <cover.1736343575.git.jstancek@redhat.com>
+	<b184b43340f08aef97387bfd7f2b2cd9b015c343.1736343575.git.jstancek@redhat.com>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2] sched: sch_cake: add bounds checks to host bulk
- flow fairness counts
-To: =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
- =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>,
- Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>,
- Jiri Pirko <jiri@resnulli.us>
-Cc: syzbot+f63600d288bfb7057424@syzkaller.appspotmail.com,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
- cake@lists.bufferbloat.net, netdev@vger.kernel.org
-References: <20250107120105.70685-1-toke@redhat.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20250107120105.70685-1-toke@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-On 1/7/25 1:01 PM, Toke Høiland-Jørgensen wrote:
-> Even though we fixed a logic error in the commit cited below, syzbot
-> still managed to trigger an underflow of the per-host bulk flow
-> counters, leading to an out of bounds memory access.
-> 
-> To avoid any such logic errors causing out of bounds memory accesses,
-> this commit factors out all accesses to the per-host bulk flow counters
-> to a series of helpers that perform bounds-checking before any
-> increments and decrements. This also has the benefit of improving
-> readability by moving the conditional checks for the flow mode into
-> these helpers, instead of having them spread out throughout the
-> code (which was the cause of the original logic error).
-> 
-> v2:
-> - Remove now-unused srchost and dsthost local variables in cake_dequeue()
+Jan Stancek <jstancek@redhat.com> writes:
 
-Small nit: the changelog should come after the '---' separator. No need
-to repost just for this.
+> Add pyproject.toml and define authors, dependencies and
+> user-facing scripts. This will be used later by pip to
+> install python code.
+>
+> Signed-off-by: Jan Stancek <jstancek@redhat.com>
 
-> Fixes: 546ea84d07e3 ("sched: sch_cake: fix bulk flow accounting logic for host fairness")
-> Reported-by: syzbot+f63600d288bfb7057424@syzkaller.appspotmail.com
-> Signed-off-by: Toke Høiland-Jørgensen <toke@redhat.com>
+The ynl-ethtool script is broken when installed because it hard-codes
+spec and schema paths to in-tree locations.  I'd be happy to fix that in
+a followup patch, since I have a schema lookup patch in progress.
+
+Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
+
 > ---
->  net/sched/sch_cake.c | 140 +++++++++++++++++++++++--------------------
->  1 file changed, 75 insertions(+), 65 deletions(-)
-> 
-> diff --git a/net/sched/sch_cake.c b/net/sched/sch_cake.c
-> index 8d8b2db4653c..2c2e2a67f3b2 100644
-> --- a/net/sched/sch_cake.c
-> +++ b/net/sched/sch_cake.c
-> @@ -627,6 +627,63 @@ static bool cake_ddst(int flow_mode)
->  	return (flow_mode & CAKE_FLOW_DUAL_DST) == CAKE_FLOW_DUAL_DST;
->  }
->  
-> +static void cake_dec_srchost_bulk_flow_count(struct cake_tin_data *q,
-> +					     struct cake_flow *flow,
-> +					     int flow_mode)
-> +{
-> +	if (likely(cake_dsrc(flow_mode) &&
-> +		   q->hosts[flow->srchost].srchost_bulk_flow_count))
-> +		q->hosts[flow->srchost].srchost_bulk_flow_count--;
-> +}
+>  tools/net/ynl/pyproject.toml | 24 ++++++++++++++++++++++++
+>  1 file changed, 24 insertions(+)
+>  create mode 100644 tools/net/ynl/pyproject.toml
+>
+> diff --git a/tools/net/ynl/pyproject.toml b/tools/net/ynl/pyproject.toml
+> new file mode 100644
+> index 000000000000..a81d8779b0e0
+> --- /dev/null
+> +++ b/tools/net/ynl/pyproject.toml
+> @@ -0,0 +1,24 @@
+> +[build-system]
+> +requires = ["setuptools>=61.0"]
+> +build-backend = "setuptools.build_meta"
 > +
-> +static void cake_inc_srchost_bulk_flow_count(struct cake_tin_data *q,
-> +					     struct cake_flow *flow,
-> +					     int flow_mode)
-> +{
-> +	if (likely(cake_dsrc(flow_mode) &&
-> +		   q->hosts[flow->srchost].srchost_bulk_flow_count < CAKE_QUEUES))
-> +		q->hosts[flow->srchost].srchost_bulk_flow_count++;
-> +}
+> +[project]
+> +name = "pyynl"
+> +authors = [
+> +    {name = "Donald Hunter", email = "donald.hunter@gmail.com"},
+> +    {name = "Jakub Kicinski", email = "kuba@kernel.org"},
+> +]
+> +description = "yaml netlink (ynl)"
+> +version = "0.0.1"
+> +requires-python = ">=3.9"
+> +dependencies = [
+> +    "pyyaml==6.*",
+> +    "jsonschema==4.*"
+> +]
 > +
-> +static void cake_dec_dsthost_bulk_flow_count(struct cake_tin_data *q,
-> +					     struct cake_flow *flow,
-> +					     int flow_mode)
-> +{
-> +	if (likely(cake_ddst(flow_mode) &&
-> +		   q->hosts[flow->dsthost].dsthost_bulk_flow_count))
-> +		q->hosts[flow->dsthost].dsthost_bulk_flow_count--;
-> +}
+> +[tool.setuptools.packages.find]
+> +include = ["pyynl", "pyynl.lib"]
 > +
-> +static void cake_inc_dsthost_bulk_flow_count(struct cake_tin_data *q,
-> +					     struct cake_flow *flow,
-> +					     int flow_mode)
-> +{
-> +	if (likely(cake_ddst(flow_mode) &&
-> +		   q->hosts[flow->dsthost].dsthost_bulk_flow_count < CAKE_QUEUES))
-> +		q->hosts[flow->dsthost].dsthost_bulk_flow_count++;
-> +}
-> +
-> +static u16 cake_get_flow_quantum(struct cake_tin_data *q,
-> +				 struct cake_flow *flow,
-> +				 int flow_mode)
-> +{
-> +	u16 host_load = 1;
-> +
-> +	if (cake_dsrc(flow_mode))
-> +		host_load = max(host_load,
-> +				q->hosts[flow->srchost].srchost_bulk_flow_count);
-> +
-> +	if (cake_ddst(flow_mode))
-> +		host_load = max(host_load,
-> +				q->hosts[flow->dsthost].dsthost_bulk_flow_count);
-> +
-> +	/* The get_random_u16() is a way to apply dithering to avoid
-> +	 * accumulating roundoff errors
-> +	 */
-> +	return (q->flow_quantum * quantum_div[host_load] +
-> +		get_random_u16()) >> 16;
-
-dithering is now applied on both enqueue and dequeue, while prior to
-this patch it only happened on dequeue. Is that intentional? can't lead
-to (small) flow_deficit increase?
-
-Thanks!
-
-Paolo
-
+> +[project.scripts]
+> +ynl = "pyynl.cli:main"
+> +ynl-ethtool = "pyynl.ethtool:main"
 
