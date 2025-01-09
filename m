@@ -1,50 +1,56 @@
-Return-Path: <netdev+bounces-156786-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156788-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DAD9BA07D3C
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 17:18:29 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0EE59A07D57
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 17:20:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1AE3B3A5032
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 16:18:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0642E3A63A0
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 16:20:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A42A1221DA3;
-	Thu,  9 Jan 2025 16:16:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BCFF21D5B0;
+	Thu,  9 Jan 2025 16:20:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QAvCBxtp"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="P44MPWJ5"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73D25221D9F;
-	Thu,  9 Jan 2025 16:16:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.3])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59DFC7FD;
+	Thu,  9 Jan 2025 16:20:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.3
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736439398; cv=none; b=B8p2Sp7s1jeAJGznJZMJgD/xIDKKCP5LmJwACLbWHOMWOunFs9S/WsfENPpWUFHgBinMgNTVD0paw/UdHJqgHaHdcfF4Uh6FAkFob5i82/82+Butl3Wyc/QaDf+k1swfeOf0ScD8VKG1jsSsUfaSP3twsxKv2scA9ccuMRZgCh4=
+	t=1736439652; cv=none; b=Am09Be1Wwq8TlhYOJ16UcxGxYhhCjfHQs8EzzVNViwZqYsyTrP1KDXgeWP3CFAXOczxHq+XEj3j0rdaGchbuSNDEDfVMhn6+0jbRcuNEK0vJdgvgt+z92SNnVb+/YOBnwkBs1UHRNRmVJK++TFMFahxIxm0ZoJIieTLJh2geocw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736439398; c=relaxed/simple;
-	bh=IWttuhlwlQnX1EnSOFdjIOs03ZVqS9WprcVW6tKzbqc=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=bpbrpk2w1LR1+9xdw6zD4Lnxgc3/LAOaH6jv4isOiUYmJa0/bmy6qU9L+ZU3C+urW+mLWuKj60UjX0SMedx81p41mGIy5LUoKbt9zYBAAbKOAvl3EGS0tLXwCwUsmd3AIS2b+LDiP6xuyN8KB4HCnrqHZK4q3Ww190o/RJaz+Og=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QAvCBxtp; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 46BB3C4CED2;
-	Thu,  9 Jan 2025 16:16:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736439398;
-	bh=IWttuhlwlQnX1EnSOFdjIOs03ZVqS9WprcVW6tKzbqc=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=QAvCBxtpMEmCV8rfm31Hjt9C8Jv5CA0NcO3Fl7h9SMjoyokYwtwTp0R0yGYYQbfx3
-	 Nrb2Iv0MNZm3prceGAO4+BzqaI1Kh10aJqM2XbTA+grAcoWEcmlos9X3Y9B9Ne22VE
-	 j0UHhxsemVz7AXJtU4KxX7hFEuYsxxkn1QINhmy2JB4TBGlPtOexugIaLB87MjKdUT
-	 qlra4KvQP5Azy20UfM1wZ9I9kK7DOhBnsozsL66ntYk2q9pOXPJWUaA8k/ZuhsrpSD
-	 Mnb210XYWdqd85xETumxiWC83aLB7+2fjZML1h9D36NVIbFPJ8tRcUns86OCL2gf8f
-	 rs7DTXYSLSCww==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33B95380A97D;
-	Thu,  9 Jan 2025 16:17:01 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1736439652; c=relaxed/simple;
+	bh=yZiYcWcbWWYqIAe/qJHoWcZE+V8TbhwxvxOGHOOBYHc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=dpmblfA/KgMn3a931XnQGo8934ISx6Bv5ohR2IedL5h812xI4upKgUNkBCuE4US3vodYu0OoA+NPUV3Jf8hX1aDTvRfSoCYOKO9yE0zPHC8e1gW8hdSiaNW7jA/xzrsq7zYBe45+XGhnleiXYmFEaDk2DJoUx5P4m3zp4d7APfM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=P44MPWJ5; arc=none smtp.client-ip=117.135.210.3
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:Subject:Date:Message-ID:MIME-Version; bh=ylIvY
+	0+HP+9mC+jUr9hYJK2bhIBCcYgyn+9ca3sZITw=; b=P44MPWJ5NTWvjCh9d2QHD
+	hGPSzU7lQQfiZIp7BSuiTpv41bRykwrmly4w1xcjqEucjJfKs/gJrqfWYCHTvcB9
+	nz5vwtSpLnJJXZzDvdGfhNUSgYjo3BYxzDyX5MNEpMWAnklDHLCqwcQKqpAoo5I3
+	SSLvfWc4+dBtO7WdtDSYyo=
+Received: from lizhe.. (unknown [157.0.89.51])
+	by gzsmtp3 (Coremail) with SMTP id PigvCgCn9Mu99n9nBrxVIg--.51946S2;
+	Fri, 10 Jan 2025 00:18:18 +0800 (CST)
+From: Lizhe <sensor1010@163.com>
+To: edumazet@google.com,
+	davem@davemloft.net,
+	dsahern@kernel.org,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Lizhe <sensor1010@163.com>
+Subject: [PATCH] tcp: Add an extra check for consecutive failed keepalive probes
+Date: Fri, 10 Jan 2025 00:18:02 +0800
+Message-ID: <20250109161802.3599-1-sensor1010@163.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,49 +58,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] Bluetooth: L2CAP: handle NULL sock pointer in
- l2cap_sock_alloc
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <173643941974.1375203.8976214892409778601.git-patchwork-notify@kernel.org>
-Date: Thu, 09 Jan 2025 16:16:59 +0000
-References: <20241217211959.279881-1-pchelkin@ispras.ru>
-In-Reply-To: <20241217211959.279881-1-pchelkin@ispras.ru>
-To: Fedor Pchelkin <pchelkin@ispras.ru>
-Cc: luiz.dentz@gmail.com, kuba@kernel.org, johan.hedberg@gmail.com,
- marcel@holtmann.org, ignat@cloudflare.com, kuniyu@amazon.com,
- edumazet@google.com, linux-bluetooth@vger.kernel.org,
- linux-kernel@vger.kernel.org, lvc-project@linuxtesting.org,
- netdev@vger.kernel.org, stable@vger.kernel.org
+X-CM-TRANSID:PigvCgCn9Mu99n9nBrxVIg--.51946S2
+X-Coremail-Antispam: 1Uf129KBjvdXoW7Xw1kuF17Zw18Jr4rtF4fXwb_yoWfXwc_uw
+	4kJFWUWr47XFy2ga1UZw43GryFk34xZF1ruFyfKasxJ3WvqF1qkFZ2gF909rn7uFZxWF95
+	Aws8try5Ar1a9jkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7sRNuWl7UUUUU==
+X-CM-SenderInfo: 5vhq20jurqiii6rwjhhfrp/1tbiKAHPq2d-8RdYmwAAsw
 
-Hello:
+Add an additional check to handle situations where consecutive
+keepalive probe packets are sent without receiving a response.
 
-This patch was applied to bluetooth/bluetooth-next.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+Signed-off-by: Lizhe <sensor1010@163.com>
+---
+ net/ipv4/tcp_timer.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-On Wed, 18 Dec 2024 00:19:59 +0300 you wrote:
-> A NULL sock pointer is passed into l2cap_sock_alloc() when it is called
-> from l2cap_sock_new_connection_cb() and the error handling paths should
-> also be aware of it.
-> 
-> Seemingly a more elegant solution would be to swap bt_sock_alloc() and
-> l2cap_chan_create() calls since they are not interdependent to that moment
-> but then l2cap_chan_create() adds the soon to be deallocated and still
-> dummy-initialized channel to the global list accessible by many L2CAP
-> paths. The channel would be removed from the list in short period of time
-> but be a bit more straight-forward here and just check for NULL instead of
-> changing the order of function calls.
-> 
-> [...]
-
-Here is the summary with links:
-  - Bluetooth: L2CAP: handle NULL sock pointer in l2cap_sock_alloc
-    https://git.kernel.org/bluetooth/bluetooth-next/c/a5d2ee08adc1
-
-You are awesome, thank you!
+diff --git a/net/ipv4/tcp_timer.c b/net/ipv4/tcp_timer.c
+index b412ed88ccd9..5a5dee8cd6d3 100644
+--- a/net/ipv4/tcp_timer.c
++++ b/net/ipv4/tcp_timer.c
+@@ -828,6 +828,12 @@ static void tcp_keepalive_timer (struct timer_list *t)
+ 		}
+ 		if (tcp_write_wakeup(sk, LINUX_MIB_TCPKEEPALIVE) <= 0) {
+ 			icsk->icsk_probes_out++;
++			if (icsk->icsk_probes_out >= keepalive_probes(tp)) {
++				tcp_send_active_reset(sk, GFP_ATOMIC,
++						SK_RST_REASON_TCP_KEEPALIVE_TIMEOUT);
++				tcp_write_err(sk);
++				goto out;
++			}
+ 			elapsed = keepalive_intvl_when(tp);
+ 		} else {
+ 			/* If keepalive was lost due to local congestion,
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.43.0
 
 
