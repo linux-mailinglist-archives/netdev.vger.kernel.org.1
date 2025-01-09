@@ -1,114 +1,181 @@
-Return-Path: <netdev+bounces-156575-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156576-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5869A07142
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 10:18:33 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 59908A07167
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 10:24:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F1A833A1F49
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 09:18:27 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4327D7A135D
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 09:24:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F14892153FB;
-	Thu,  9 Jan 2025 09:16:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 827AD215767;
+	Thu,  9 Jan 2025 09:24:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="L4ZB8MDV"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DPpnh0xd"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E62682153DE;
-	Thu,  9 Jan 2025 09:16:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFEC52153F7
+	for <netdev@vger.kernel.org>; Thu,  9 Jan 2025 09:24:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736414179; cv=none; b=QZEIXIhVBPOM0PL1x+o6NCSBjXL1ZaWX0aK+Ea0Tuyl/SkmOVXbcgIO/Q12Pk7q2tMV8/oebjhOKq6EnRieVnIO9kJVR4F1ntpXUAPANUWxtYalpE63vCwgL+3mrDU4M/Hmh7Vis+4YHZScWexHdzXpMVAgk8GAiQjV51KNBilo=
+	t=1736414679; cv=none; b=OYIcsdLXDr6oX2Mntols3M2EvMaCskz0T9EE4Jmb9t4c28fuokPLQ7SENxnDtJz+OSkQzrE+msuoqmuQhpyTUJnqshfVHNPsAyhe1eYMvfIFZ5ij3TSRKU/fa4XEq/4SxjiyZWQwQ8cmw9/OgtqnWyBtntgOxUicPF1bukSnbzI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736414179; c=relaxed/simple;
-	bh=kSjWcYtkqH8R+JRDGnB2aLYV7zkmXfylg3X6xMRY4vA=;
+	s=arc-20240116; t=1736414679; c=relaxed/simple;
+	bh=jlK8j4aB/doijMgWbUxTmxGTZMXqwrbD1dH/0gqbpUU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=g4GjYwYMkmPbJDGbBiQEK+2bZg64cmSN2CKDQbTNaDa7XI18YZq6XtSdfDcEI1T+ChnqG2NX8RdyFbvGKNilbG9FsZ3gmjzJpeTQ/V+G1T1Aee7r/jN9NNomNRW7oJ+KPGVr4C1BeleYUJ9Fymdyb86cVVJALXL7xV/6dTxVVKw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=L4ZB8MDV; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=R2z1ESVuVcDzbxcpb3sc64PCr4c05BAv4LDC9oyfa7s=; b=L4ZB8MDV1RBG7G8NSURC7qZQ3A
-	qvL8HWzbo7iVXe/7oTalE7eJwQfWrWgFE3pE8tn9nD8hHXKq5fkEatoELVfIPL8sh0NwED/hInbgw
-	RCTSNRNKdl9vOn70vjC/Xj8o2afinyk+LuedUBhugETfYryDTX+TJ1OOvQVccDr1qYrTKWCLwCN4X
-	T0Ylh6f72ij58CSbUyfgRJTppxnCwun62Ofytl/7+bU09/16MnSdS7rw/iFdDhJ0YNSvhIYFE280t
-	e1qWDcLPZ3g6/eLHdl0uk218eEKmVH+Q+HrnFRP8yh/TMHd0OwM4nME37G0yKiJ4L16sqxhaOXzmU
-	4kgH/NWw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:46832)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1tVoe3-0001oO-2e;
-	Thu, 09 Jan 2025 09:16:03 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1tVodz-0007Cf-0c;
-	Thu, 09 Jan 2025 09:15:59 +0000
-Date: Thu, 9 Jan 2025 09:15:59 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Eric Woudstra <ericwouds@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Frank Wunderlich <frank-w@public-files.de>,
-	Daniel Golle <daniel@makrotopia.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org, bridge@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH RFC net-next] net: phylink: always config mac for
- (delayed) phy
-Message-ID: <Z3-Tz5WdLCat91vm@shell.armlinux.org.uk>
-References: <20250107123615.161095-1-ericwouds@gmail.com>
- <Z30iUj6DE9-fRp0n@shell.armlinux.org.uk>
- <4b9b2a9a-061b-43ad-b402-a49aee317f41@gmail.com>
- <Z31CJS1YUvPGiEXs@shell.armlinux.org.uk>
- <98234080-946e-4b36-832f-113b185e7bca@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=axa5rlDZ4GQswL71s/tENXCvxFuxdGByV3vFZuF+/syDUhmIIBQ42JFufxN2FQvPUx27I6GOlFJyQob19BRtCrLbntAKr60VCAmuZU7Sr9rFsMcd+IxeLRtTakKpNPKhwpTeeVTWn63YDEt9x6O+yyf1lHv/mgZ2d7tbUg60Uac=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DPpnh0xd; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1736414676;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=uQouyoUVw3UF/y4WVQgr7kFf7syR/XKsLwR+hpvWeXU=;
+	b=DPpnh0xdQs/XiE+OQlteE6nPL5uVrY/A+YvnwpL6X09hslvSIryf3moZ5Gd4M4VwqlFcE7
+	G5gaGA9R7VrOqqqOP7IWxfVy0bI/e4S/o6bif4M25JjrQ/8oGCB6OgiJQM4jbInAHzXxII
+	m047D6CRzV1mfAS+omtDExR7SzIihQo=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-175-vninosTCOciXJGjC1_fPwQ-1; Thu, 09 Jan 2025 04:24:34 -0500
+X-MC-Unique: vninosTCOciXJGjC1_fPwQ-1
+X-Mimecast-MFC-AGG-ID: vninosTCOciXJGjC1_fPwQ
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4361a8fc3bdso3445255e9.2
+        for <netdev@vger.kernel.org>; Thu, 09 Jan 2025 01:24:34 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736414673; x=1737019473;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=uQouyoUVw3UF/y4WVQgr7kFf7syR/XKsLwR+hpvWeXU=;
+        b=Sh61rHKcInQzjtSXf5jfwRp/hFQ0X8thai8Au+rc3azGkERGm47swuMjQt/D3IKt7O
+         Wc7oInKfQCBfGKPPjj5gJyurwJFGdl807hrlJbQv4sZItkIDi92LVfObgT05Dgu6BZpi
+         zhheN3w58AqzpHn255/zLhqJtjf1FTKtUU6oQngngfoXJW24q9lVnMTixwdBd22fpMdW
+         0JnK+v/olxbDGQfQ+zxAXEsDg9ImEb0KbueMuwIDu6Ddefp07bv76I882QWjGdXx9X7x
+         6ZeIglLgF5j83/UkSJLtxkNCuRgm2g+j7pIysRZjkw/ZISmVXVi7SJNHu+FNWSDvTbFu
+         LrsQ==
+X-Gm-Message-State: AOJu0Yx1SanO2vhWipqDjXSE9fzLFWWixbnI/kCbzkpXlLTs85I+3rma
+	F7TkDk427q4Z4DltbZmY0czzZGOz0XfcW3dSdVlRfzRw+rWn3bdffx6tWSAasty0fgQBpIl/uoQ
+	EmopoyZkR41g9pBgykeB190YVW9gLIACmL6PYtng+Z3dHk9lPS9mHlQ==
+X-Gm-Gg: ASbGncu/4xkCIxPxKzBX6VsifK8l1MQwQgrVQdcIL0YJByVBpoW7jBmfNJfGP3Rr0B1
+	CO798FnMa51fkic6qK0+vW8GqKtakeQD4g9oXxvV9LDv2fjbDCp0lKB3ZrCclM3b3aaO4rlHbfB
+	H7yCGSbakX/KDsd68gyislTpwfd+ZzKx+fOzCmwypQ/gQKrea3ex29C0PxpLXdZKyeIao7Spx/i
+	cxSc18KUf8OvmKWBdiY01zzAxCP9p6hJf0AwDCRYIUtSBF5ioaEwSNdN37h
+X-Received: by 2002:a05:600c:8706:b0:434:f0df:9f6 with SMTP id 5b1f17b1804b1-436e2677356mr48292155e9.3.1736414673537;
+        Thu, 09 Jan 2025 01:24:33 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHF9yOFWG608kMqPxd4403ULCrAWAOMeA3kgACaIOLpshtLvQXF4xTWy4dUUWcivL4hxRInjA==
+X-Received: by 2002:a05:600c:8706:b0:434:f0df:9f6 with SMTP id 5b1f17b1804b1-436e2677356mr48291885e9.3.1736414673125;
+        Thu, 09 Jan 2025 01:24:33 -0800 (PST)
+Received: from leonardi-redhat ([176.206.32.19])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-436e2ddd013sm49297785e9.24.2025.01.09.01.24.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 Jan 2025 01:24:32 -0800 (PST)
+Date: Thu, 9 Jan 2025 10:24:30 +0100
+From: Luigi Leonardi <leonardi@redhat.com>
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: netdev@vger.kernel.org, Simon Horman <horms@kernel.org>, 
+	Stefan Hajnoczi <stefanha@redhat.com>, linux-kernel@vger.kernel.org, Eric Dumazet <edumazet@google.com>, 
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Wongi Lee <qwerty@theori.io>, 
+	"David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, 
+	Jason Wang <jasowang@redhat.com>, Bobby Eshleman <bobby.eshleman@bytedance.com>, 
+	virtualization@lists.linux.dev, Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, 
+	bpf@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Hyunwoo Kim <v4bel@theori.io>, Michal Luczaj <mhal@rbox.co>, 
+	kvm@vger.kernel.org
+Subject: Re: [PATCH net 2/2] vsock/bpf: return early if transport is not
+ assigned
+Message-ID: <sho5ird455tiirzbsgjug6owi2leknai4xu45ddnesynb632oz@owq5b56n3f6h>
+References: <20250108180617.154053-1-sgarzare@redhat.com>
+ <20250108180617.154053-3-sgarzare@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <98234080-946e-4b36-832f-113b185e7bca@gmail.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <20250108180617.154053-3-sgarzare@redhat.com>
 
-On Thu, Jan 09, 2025 at 09:56:17AM +0100, Eric Woudstra wrote:
-> So I've narrowed down the problem a bit:
-> 
-> At first state->link is set to true, while looking at the bmsr.
-> 
-> But because linkmode_test_bit(fd_bit, state->advertising) and
-> linkmode_test_bit(fd_bit, state->lp_advertising) are both false,
-> state->link is set to false after looking at the bmsr.
+On Wed, Jan 08, 2025 at 07:06:17PM +0100, Stefano Garzarella wrote:
+>Some of the core functions can only be called if the transport
+>has been assigned.
+>
+>As Michal reported, a socket might have the transport at NULL,
+>for example after a failed connect(), causing the following trace:
+>
+>    BUG: kernel NULL pointer dereference, address: 00000000000000a0
+>    #PF: supervisor read access in kernel mode
+>    #PF: error_code(0x0000) - not-present page
+>    PGD 12faf8067 P4D 12faf8067 PUD 113670067 PMD 0
+>    Oops: Oops: 0000 [#1] PREEMPT SMP NOPTI
+>    CPU: 15 UID: 0 PID: 1198 Comm: a.out Not tainted 6.13.0-rc2+
+>    RIP: 0010:vsock_connectible_has_data+0x1f/0x40
+>    Call Trace:
+>     vsock_bpf_recvmsg+0xca/0x5e0
+>     sock_recvmsg+0xb9/0xc0
+>     __sys_recvfrom+0xb3/0x130
+>     __x64_sys_recvfrom+0x20/0x30
+>     do_syscall_64+0x93/0x180
+>     entry_SYSCALL_64_after_hwframe+0x76/0x7e
+>
+>So we need to check the `vsk->transport` in vsock_bpf_recvmsg(),
+>especially for connected sockets (stream/seqpacket) as we already
+>do in __vsock_connectible_recvmsg().
+>
+>Fixes: 634f1a7110b4 ("vsock: support sockmap")
+>Reported-by: Michal Luczaj <mhal@rbox.co>
+>Closes: https://lore.kernel.org/netdev/5ca20d4c-1017-49c2-9516-f6f75fd331e9@rbox.co/
+>Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+>---
+> net/vmw_vsock/vsock_bpf.c | 9 +++++++++
+> 1 file changed, 9 insertions(+)
+>
+>diff --git a/net/vmw_vsock/vsock_bpf.c b/net/vmw_vsock/vsock_bpf.c
+>index 4aa6e74ec295..f201d9eca1df 100644
+>--- a/net/vmw_vsock/vsock_bpf.c
+>+++ b/net/vmw_vsock/vsock_bpf.c
+>@@ -77,6 +77,7 @@ static int vsock_bpf_recvmsg(struct sock *sk, struct msghdr *msg,
+> 			     size_t len, int flags, int *addr_len)
+> {
+> 	struct sk_psock *psock;
+>+	struct vsock_sock *vsk;
+> 	int copied;
+>
+> 	psock = sk_psock_get(sk);
+>@@ -84,6 +85,13 @@ static int vsock_bpf_recvmsg(struct sock *sk, struct msghdr *msg,
+> 		return __vsock_recvmsg(sk, msg, len, flags);
+>
+> 	lock_sock(sk);
+>+	vsk = vsock_sk(sk);
+>+
+>+	if (!vsk->transport) {
+>+		copied = -ENODEV;
+>+		goto out;
+>+	}
+>+
+> 	if (vsock_has_data(sk, psock) && sk_psock_queue_empty(psock)) {
+> 		release_sock(sk);
+> 		sk_psock_put(sk, psock);
+>@@ -108,6 +116,7 @@ static int vsock_bpf_recvmsg(struct sock *sk, struct msghdr *msg,
+> 		copied = sk_msg_recvmsg(sk, psock, msg, len, flags);
+> 	}
+>
+>+out:
+> 	release_sock(sk);
+> 	sk_psock_put(sk, psock);
+>
+>-- 
+>2.47.1
+>
+LGTM!
 
-We shouldn't be getting that far if aneg isn't being used. The problem
-is this is no longer sufficient:
+Reviewed-By: Luigi Leonardi <leonardi@redhat.com>
 
-        if (!state->link || !linkmode_test_bit(ETHTOOL_LINK_MODE_Autoneg_BIT,
-                                               state->advertising))
-                return;
-
-since whether we use aneg or not now depends on state other than just
-the Autoneg bit. It isn't going to be a simple fix, because we need
-the PCS neg_mode here, but we don't have it as an argument to the
-.pcs_get_state() method. I'll look at what we can do for this today.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
