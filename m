@@ -1,278 +1,128 @@
-Return-Path: <netdev+bounces-156506-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156505-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC694A06AD4
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 03:20:38 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55AA2A06AD0
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 03:20:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 53D7E3A3E80
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 02:20:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 421E7163546
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 02:20:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AB002D052;
-	Thu,  9 Jan 2025 02:20:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 630987CF16;
+	Thu,  9 Jan 2025 02:20:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tdKz8+J7"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8005BE5E;
-	Thu,  9 Jan 2025 02:20:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 365726F30F;
+	Thu,  9 Jan 2025 02:20:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736389226; cv=none; b=Nyj2ptLlLYxApwyFchThgmSaSZTXzMKyp+p5EjXcTDhETs1nkAUMTMYBZh+HzchV63v2PoK6FDEZxNtuIuhM3V9cK44OKSnsGwlzN+pi+8Y44pp8Os1BMawPNpd7Sr8EjuUuSPLCrzVxJb3FuImzlV0ucppkneCnWGZWz0cszOA=
+	t=1736389212; cv=none; b=NdM0mw4m6zpU+Q/B4hOvbcUBZHYe73YP2F6XXalkT1gYt7J0jyOrFjC+0GIml9yISzkjxAWDRsAR1DROLlORRLwLAQf8eRBvXdwlFtxqHoezm7T4ULd1jKTe1OXFP+eEWmPosxwy/XX/LeDui/GRv/ZF8y5Jh0YzDV/tlonG/k8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736389226; c=relaxed/simple;
-	bh=/sQEQ5TutOnrYYS0lFylL2fbNiVpAWSQGdovRBLQkiA=;
-	h=Subject:To:References:CC:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=MGAsQpnPMVnRuW5n/WgQKYKCOPygWrmGqUmWv0pVRp59POPgTMa+INXreK+IpxWc8Lw/Axc3VYD4Dp8dhahikKUR3ddl+kLwAjIfIwAVwAORicn8PWh3podW+uj6lT9pHUkkByMyncti4XruKJnB2k+dBz2hkgE6zYtOet8YKmU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.252])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4YT7h55PQ3zjY89;
-	Thu,  9 Jan 2025 10:16:37 +0800 (CST)
-Received: from kwepemh100016.china.huawei.com (unknown [7.202.181.102])
-	by mail.maildlp.com (Postfix) with ESMTPS id A0DFE1800D1;
-	Thu,  9 Jan 2025 10:20:20 +0800 (CST)
-Received: from [10.174.179.93] (10.174.179.93) by
- kwepemh100016.china.huawei.com (7.202.181.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Thu, 9 Jan 2025 10:20:17 +0800
-Subject: Re: [PATCH v4 -next 06/15] mm: mmap: move sysctl to mm/mmap.c
-To: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
-References: <20241223141550.638616-1-yukaixiong@huawei.com>
- <20241223141550.638616-7-yukaixiong@huawei.com>
- <ef1d602b-23cb-4a95-b83e-c506958dc90c@lucifer.local>
-CC: <akpm@linux-foundation.org>, <mcgrof@kernel.org>,
-	<ysato@users.sourceforge.jp>, <dalias@libc.org>,
-	<glaubitz@physik.fu-berlin.de>, <luto@kernel.org>, <tglx@linutronix.de>,
-	<mingo@redhat.com>, <bp@alien8.de>, <dave.hansen@linux.intel.com>,
-	<hpa@zytor.com>, <viro@zeniv.linux.org.uk>, <brauner@kernel.org>,
-	<jack@suse.cz>, <kees@kernel.org>, <j.granados@samsung.com>,
-	<willy@infradead.org>, <Liam.Howlett@oracle.com>, <vbabka@suse.cz>,
-	<trondmy@kernel.org>, <anna@kernel.org>, <chuck.lever@oracle.com>,
-	<jlayton@kernel.org>, <neilb@suse.de>, <okorniev@redhat.com>,
-	<Dai.Ngo@oracle.com>, <tom@talpey.com>, <davem@davemloft.net>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<paul@paul-moore.com>, <jmorris@namei.org>, <linux-sh@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
-	<linux-mm@kvack.org>, <linux-nfs@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<linux-security-module@vger.kernel.org>, <dhowells@redhat.com>,
-	<haifeng.xu@shopee.com>, <baolin.wang@linux.alibaba.com>,
-	<shikemeng@huaweicloud.com>, <dchinner@redhat.com>, <bfoster@redhat.com>,
-	<souravpanda@google.com>, <hannes@cmpxchg.org>, <rientjes@google.com>,
-	<pasha.tatashin@soleen.com>, <david@redhat.com>, <ryan.roberts@arm.com>,
-	<ying.huang@intel.com>, <yang@os.amperecomputing.com>,
-	<zev@bewilderbeest.net>, <serge@hallyn.com>, <vegard.nossum@oracle.com>,
-	<wangkefeng.wang@huawei.com>
-From: yukaixiong <yukaixiong@huawei.com>
-Message-ID: <66d64c25-5c82-1388-e09d-f49765efcfba@huawei.com>
-Date: Thu, 9 Jan 2025 10:20:16 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
- Thunderbird/45.7.1
+	s=arc-20240116; t=1736389212; c=relaxed/simple;
+	bh=5o2Si8C+2FKN1RT3tKic0+fY2AVR7kGb/gwSx9YjJxM=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=ODHwIMnTJgY/lRh3sIMa/b0xqMxNjBewV1iA1VQkqqPx2ZQcbf4yvpM9iDf+AVLSWkwp3LcB2ihz20Mo0uNQNNmwsYMkr1VfQuBPPNRhB/DFqm7QbyP4J+yM5E2fx/FfgJ8ihpYfnX6RAtMfL4ZAWoMMISkhYcCvBtAgnN+i540=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tdKz8+J7; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9B5D3C4CEDD;
+	Thu,  9 Jan 2025 02:20:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1736389211;
+	bh=5o2Si8C+2FKN1RT3tKic0+fY2AVR7kGb/gwSx9YjJxM=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=tdKz8+J7E6I7Y6iNqZF1ZtqQpRGEknpXQEwpvk+cLzJj4022xc74fnepRGfs3ZJG2
+	 xgWotQ0tUEyn6oyhE8LcJGbzxTO3c8/EigUYly6XbOkcASYs8yYtQtazDn7nBdNCHr
+	 SxUPWg3qO8ycRNEqe3o5uJ4dYoBPMW8H91DkyhtOpty9hKCqdHEWoK2YSuZtf0UHDp
+	 CHwc4E+w+77sGcrlMKessGt+Rm7btGpwBVaGOiK01Fj5a7tAtj0C1ad4NI6qtHqlg9
+	 E0FirT8NUnBfO3k00t/XjFHMLHi/iCkL0AYoYpW79jfKlTozE/dVes9FyHr7SQ+0V2
+	 E8F+AUTXmbqyw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 71085380A965;
+	Thu,  9 Jan 2025 02:20:34 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <ef1d602b-23cb-4a95-b83e-c506958dc90c@lucifer.local>
-Content-Type: text/plain; charset="windows-1252"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggpeml500006.china.huawei.com (7.185.36.76) To
- kwepemh100016.china.huawei.com (7.202.181.102)
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH bpf-next v2 00/16] bpf: Reduce the use of
+ migrate_{disable|enable}()
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <173638923326.842935.15837805191875975956.git-patchwork-notify@kernel.org>
+Date: Thu, 09 Jan 2025 02:20:33 +0000
+References: <20250108010728.207536-1-houtao@huaweicloud.com>
+In-Reply-To: <20250108010728.207536-1-houtao@huaweicloud.com>
+To: Hou Tao <houtao@huaweicloud.com>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, martin.lau@linux.dev,
+ alexei.starovoitov@gmail.com, andrii@kernel.org, eddyz87@gmail.com,
+ song@kernel.org, haoluo@google.com, yonghong.song@linux.dev,
+ daniel@iogearbox.net, kpsingh@kernel.org, sdf@fomichev.me, jolsa@kernel.org,
+ john.fastabend@gmail.com, houtao1@huawei.com, xukuohai@huawei.com
 
+Hello:
 
+This series was applied to bpf/bpf-next.git (master)
+by Alexei Starovoitov <ast@kernel.org>:
 
-On 2025/1/2 22:08, Lorenzo Stoakes wrote:
-> On Mon, Dec 23, 2024 at 10:15:25PM +0800, Kaixiong Yu wrote:
->> This moves all mmap related sysctls to mm/mmap.c, as part of the
->> kernel/sysctl.c cleaning, also move the variable declaration from
->> kernel/sysctl.c into mm/mmap.c.
->>
->> Signed-off-by: Kaixiong Yu <yukaixiong@huawei.com>
->> Reviewed-by: Kees Cook <kees@kernel.org>
-> Looks good to me, thanks!
->
-> Reviewed-by: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
+On Wed,  8 Jan 2025 09:07:12 +0800 you wrote:
+> From: Hou Tao <houtao1@huawei.com>
+> 
+> Hi,
+> 
+> The use of migrate_{disable|enable} pair in BPF is mainly due to the
+> introduction of bpf memory allocator and the use of per-CPU data struct
+> in its internal implementation. The caller needs to disable migration
+> before invoking the alloc or free APIs of bpf memory allocator, and
+> enable migration after the invocation.
+> 
+> [...]
 
-Thanks for your review!
+Here is the summary with links:
+  - [bpf-next,v2,01/16] bpf: Remove migrate_{disable|enable} from LPM trie
+    https://git.kernel.org/bpf/bpf-next/c/1b1a01db17af
+  - [bpf-next,v2,02/16] bpf: Remove migrate_{disable|enable} in ->map_for_each_callback
+    https://git.kernel.org/bpf/bpf-next/c/ea5b229630a6
+  - [bpf-next,v2,03/16] bpf: Remove migrate_{disable|enable} in htab_elem_free
+    https://git.kernel.org/bpf/bpf-next/c/53f2ba0b1cc0
+  - [bpf-next,v2,04/16] bpf: Remove migrate_{disable|enable} from bpf_cgrp_storage_lock helpers
+    https://git.kernel.org/bpf/bpf-next/c/25dc65f75b08
+  - [bpf-next,v2,05/16] bpf: Remove migrate_{disable|enable} from bpf_task_storage_lock helpers
+    https://git.kernel.org/bpf/bpf-next/c/9e6c958b5466
+  - [bpf-next,v2,06/16] bpf: Disable migration when destroying inode storage
+    https://git.kernel.org/bpf/bpf-next/c/e319cdc89566
+  - [bpf-next,v2,07/16] bpf: Disable migration when destroying sock storage
+    https://git.kernel.org/bpf/bpf-next/c/7d1032d1e303
+  - [bpf-next,v2,08/16] bpf: Disable migration when cloning sock storage
+    https://git.kernel.org/bpf/bpf-next/c/dfccfc47bde5
+  - [bpf-next,v2,09/16] bpf: Disable migration in bpf_selem_free_rcu
+    https://git.kernel.org/bpf/bpf-next/c/090d7f2e640b
+  - [bpf-next,v2,10/16] bpf: Disable migration before calling ops->map_free()
+    https://git.kernel.org/bpf/bpf-next/c/4b7e7cd1c105
+  - [bpf-next,v2,11/16] bpf: Remove migrate_{disable|enable} in bpf_obj_free_fields()
+    https://git.kernel.org/bpf/bpf-next/c/1d2dbe7120e8
+  - [bpf-next,v2,12/16] bpf: Remove migrate_{disable,enable} in bpf_cpumask_release()
+    https://git.kernel.org/bpf/bpf-next/c/6a52b965ab6f
+  - [bpf-next,v2,13/16] bpf: Remove migrate_{disable|enable} from bpf_selem_alloc()
+    https://git.kernel.org/bpf/bpf-next/c/2269b32ab00e
+  - [bpf-next,v2,14/16] bpf: Remove migrate_{disable|enable} from bpf_local_storage_alloc()
+    https://git.kernel.org/bpf/bpf-next/c/4855a75ebf48
+  - [bpf-next,v2,15/16] bpf: Remove migrate_{disable|enable} from bpf_local_storage_free()
+    https://git.kernel.org/bpf/bpf-next/c/7b984359e097
+  - [bpf-next,v2,16/16] bpf: Remove migrate_{disable|enable} from bpf_selem_free()
+    https://git.kernel.org/bpf/bpf-next/c/d86088e2c35d
 
-Best ...
->> ---
->> v4:
->>   - const qualify struct ctl_table mmap_table
->> v3:
->>   - change the title
->> v2:
->>   - fix sysctl_max_map_count undeclared issue in mm/nommu.c
->> ---
->> ---
->>   kernel/sysctl.c | 50 +--------------------------------------------
->>   mm/mmap.c       | 54 +++++++++++++++++++++++++++++++++++++++++++++++++
->>   2 files changed, 55 insertions(+), 49 deletions(-)
->>
->> diff --git a/kernel/sysctl.c b/kernel/sysctl.c
->> index aea3482106e0..9c245898f535 100644
->> --- a/kernel/sysctl.c
->> +++ b/kernel/sysctl.c
->> @@ -127,12 +127,6 @@ enum sysctl_writes_mode {
->>
->>   static enum sysctl_writes_mode sysctl_writes_strict = SYSCTL_WRITES_STRICT;
->>   #endif /* CONFIG_PROC_SYSCTL */
->> -
->> -#if defined(HAVE_ARCH_PICK_MMAP_LAYOUT) || \
->> -    defined(CONFIG_ARCH_WANT_DEFAULT_TOPDOWN_MMAP_LAYOUT)
->> -int sysctl_legacy_va_layout;
->> -#endif
->> -
->>   #endif /* CONFIG_SYSCTL */
->>
->>   /*
->> @@ -2037,16 +2031,7 @@ static struct ctl_table vm_table[] = {
->>   		.extra1		= SYSCTL_ONE,
->>   		.extra2		= SYSCTL_FOUR,
->>   	},
->> -#ifdef CONFIG_MMU
->> -	{
->> -		.procname	= "max_map_count",
->> -		.data		= &sysctl_max_map_count,
->> -		.maxlen		= sizeof(sysctl_max_map_count),
->> -		.mode		= 0644,
->> -		.proc_handler	= proc_dointvec_minmax,
->> -		.extra1		= SYSCTL_ZERO,
->> -	},
->> -#else
->> +#ifndef CONFIG_MMU
->>   	{
->>   		.procname	= "nr_trim_pages",
->>   		.data		= &sysctl_nr_trim_pages,
->> @@ -2064,17 +2049,6 @@ static struct ctl_table vm_table[] = {
->>   		.proc_handler	= proc_dointvec_minmax,
->>   		.extra1		= SYSCTL_ZERO,
->>   	},
-> Nitty, but  this bit belongs in mm/nommu.c?
->
->> -#if defined(HAVE_ARCH_PICK_MMAP_LAYOUT) || \
->> -    defined(CONFIG_ARCH_WANT_DEFAULT_TOPDOWN_MMAP_LAYOUT)
->> -	{
->> -		.procname	= "legacy_va_layout",
->> -		.data		= &sysctl_legacy_va_layout,
->> -		.maxlen		= sizeof(sysctl_legacy_va_layout),
->> -		.mode		= 0644,
->> -		.proc_handler	= proc_dointvec_minmax,
->> -		.extra1		= SYSCTL_ZERO,
->> -	},
->> -#endif
->>   #ifdef CONFIG_MMU
->>   	{
->>   		.procname	= "mmap_min_addr",
->> @@ -2100,28 +2074,6 @@ static struct ctl_table vm_table[] = {
->>   		.extra1		= SYSCTL_ZERO,
->>   	},
->>   #endif
->> -#ifdef CONFIG_HAVE_ARCH_MMAP_RND_BITS
->> -	{
->> -		.procname	= "mmap_rnd_bits",
->> -		.data		= &mmap_rnd_bits,
->> -		.maxlen		= sizeof(mmap_rnd_bits),
->> -		.mode		= 0600,
->> -		.proc_handler	= proc_dointvec_minmax,
->> -		.extra1		= (void *)&mmap_rnd_bits_min,
->> -		.extra2		= (void *)&mmap_rnd_bits_max,
->> -	},
->> -#endif
->> -#ifdef CONFIG_HAVE_ARCH_MMAP_RND_COMPAT_BITS
->> -	{
->> -		.procname	= "mmap_rnd_compat_bits",
->> -		.data		= &mmap_rnd_compat_bits,
->> -		.maxlen		= sizeof(mmap_rnd_compat_bits),
->> -		.mode		= 0600,
->> -		.proc_handler	= proc_dointvec_minmax,
->> -		.extra1		= (void *)&mmap_rnd_compat_bits_min,
->> -		.extra2		= (void *)&mmap_rnd_compat_bits_max,
->> -	},
->> -#endif
->>   };
->>
->>   int __init sysctl_init_bases(void)
->> diff --git a/mm/mmap.c b/mm/mmap.c
->> index aef835984b1c..cc579aafd7ba 100644
->> --- a/mm/mmap.c
->> +++ b/mm/mmap.c
->> @@ -1603,6 +1603,57 @@ struct vm_area_struct *_install_special_mapping(
->>   					&special_mapping_vmops);
->>   }
->>
->> +#ifdef CONFIG_SYSCTL
->> +#if defined(HAVE_ARCH_PICK_MMAP_LAYOUT) || \
->> +		defined(CONFIG_ARCH_WANT_DEFAULT_TOPDOWN_MMAP_LAYOUT)
->> +int sysctl_legacy_va_layout;
->> +#endif
->> +
->> +static const struct ctl_table mmap_table[] = {
->> +		{
->> +				.procname       = "max_map_count",
->> +				.data           = &sysctl_max_map_count,
->> +				.maxlen         = sizeof(sysctl_max_map_count),
->> +				.mode           = 0644,
->> +				.proc_handler   = proc_dointvec_minmax,
->> +				.extra1         = SYSCTL_ZERO,
->> +		},
->> +#if defined(HAVE_ARCH_PICK_MMAP_LAYOUT) || \
->> +		defined(CONFIG_ARCH_WANT_DEFAULT_TOPDOWN_MMAP_LAYOUT)
->> +		{
->> +				.procname       = "legacy_va_layout",
->> +				.data           = &sysctl_legacy_va_layout,
->> +				.maxlen         = sizeof(sysctl_legacy_va_layout),
->> +				.mode           = 0644,
->> +				.proc_handler   = proc_dointvec_minmax,
->> +				.extra1         = SYSCTL_ZERO,
->> +		},
->> +#endif
->> +#ifdef CONFIG_HAVE_ARCH_MMAP_RND_BITS
->> +		{
->> +				.procname       = "mmap_rnd_bits",
->> +				.data           = &mmap_rnd_bits,
->> +				.maxlen         = sizeof(mmap_rnd_bits),
->> +				.mode           = 0600,
->> +				.proc_handler   = proc_dointvec_minmax,
->> +				.extra1         = (void *)&mmap_rnd_bits_min,
->> +				.extra2         = (void *)&mmap_rnd_bits_max,
->> +		},
->> +#endif
->> +#ifdef CONFIG_HAVE_ARCH_MMAP_RND_COMPAT_BITS
->> +		{
->> +				.procname       = "mmap_rnd_compat_bits",
->> +				.data           = &mmap_rnd_compat_bits,
->> +				.maxlen         = sizeof(mmap_rnd_compat_bits),
->> +				.mode           = 0600,
->> +				.proc_handler   = proc_dointvec_minmax,
->> +				.extra1         = (void *)&mmap_rnd_compat_bits_min,
->> +				.extra2         = (void *)&mmap_rnd_compat_bits_max,
->> +		},
->> +#endif
->> +};
->> +#endif /* CONFIG_SYSCTL */
->> +
->>   /*
->>    * initialise the percpu counter for VM
->>    */
->> @@ -1612,6 +1663,9 @@ void __init mmap_init(void)
->>
->>   	ret = percpu_counter_init(&vm_committed_as, 0, GFP_KERNEL);
->>   	VM_BUG_ON(ret);
->> +#ifdef CONFIG_SYSCTL
->> +	register_sysctl_init("vm", mmap_table);
->> +#endif
->>   }
->>
->>   /*
->> --
->> 2.34.1
->>
-> .
->
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
