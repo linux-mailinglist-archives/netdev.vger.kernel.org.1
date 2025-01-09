@@ -1,365 +1,202 @@
-Return-Path: <netdev+bounces-156535-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156540-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id ADBD4A06DF5
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 07:07:16 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 09E33A06E32
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 07:22:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D302E1889389
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 06:07:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 443743A7582
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 06:22:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A95D02147E0;
-	Thu,  9 Jan 2025 06:07:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12A52213E86;
+	Thu,  9 Jan 2025 06:22:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LPAl08ZR"
 X-Original-To: netdev@vger.kernel.org
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C85D25949C;
-	Thu,  9 Jan 2025 06:07:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5EE019BBA;
+	Thu,  9 Jan 2025 06:22:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736402822; cv=none; b=hyAQhhPW152w97AmvsjzCihF+/xkeb6CuUwMohEQ/hbQ2UKIx0wxiyXalfQLsC1xdD++TaguU2fUikh7HBu7GSZSzj+khaMxSNQLOE86Qx8oLN4SmGBXHliRgeGl36JaZifqNSeKvTru2VW4QFLoNfbUdYc1A20PsH1Trrdfcx4=
+	t=1736403761; cv=none; b=Yqgs3FuDyA8P5tgvZFfWJ+bm+X3hdSWNdiw2gDdwot1wI+T18P4nz3N0oK0e0r2FEMZqAgzUNvBJOpflFKKj1GxcOibP0ZYvl+XpQOE5yI5o9DYjEIM8uixaUi5KJSLpNcJEYhP4zRLeKKYhqpickp9MQdZQB+llekI1VfPgWJs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736402822; c=relaxed/simple;
-	bh=FI+NkTda/WuOdm2ZoJy+YlzC8D7pemqKRf1RPO8NzYQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=CRjdu0Mzh6vQAn0pGgpNHuOKYyr0LFOpgYcr9XU2Z79mNKqp62iHBQdDX3HyKOILCJF2A0qDAX5yYahVGXubdzQkn3eC+7PAZDWl5VGhatn1LbO6kIm6nS3E4kcYf3qtQuXswL/ruAkgwsy1Gf6MHKpGpcvDGuFUBTX4fYkJHrk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.235])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4YTDnT1gP7z4f3jXV;
-	Thu,  9 Jan 2025 14:06:37 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id 6BDA41A0B7C;
-	Thu,  9 Jan 2025 14:06:57 +0800 (CST)
-Received: from huaweicloud.com (unknown [10.175.124.27])
-	by APP4 (Coremail) with SMTP id gCh0CgAni196Z39nvD3QAQ--.4010S9;
-	Thu, 09 Jan 2025 14:06:57 +0800 (CST)
-From: Hou Tao <houtao@huaweicloud.com>
-To: bpf@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: Martin KaFai Lau <martin.lau@linux.dev>,
-	Alexei Starovoitov <alexei.starovoitov@gmail.com>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Eduard Zingerman <eddyz87@gmail.com>,
-	Song Liu <song@kernel.org>,
-	Hao Luo <haoluo@google.com>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	KP Singh <kpsingh@kernel.org>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Jiri Olsa <jolsa@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	houtao1@huawei.com,
-	xukuohai@huawei.com
-Subject: [PATCH bpf-next v2 5/5] selftests/bpf: Add test case for the freeing of bpf_timer
-Date: Thu,  9 Jan 2025 14:19:01 +0800
-Message-Id: <20250109061901.2620825-6-houtao@huaweicloud.com>
-X-Mailer: git-send-email 2.29.2
-In-Reply-To: <20250109061901.2620825-1-houtao@huaweicloud.com>
-References: <20250109061901.2620825-1-houtao@huaweicloud.com>
+	s=arc-20240116; t=1736403761; c=relaxed/simple;
+	bh=FkMzPFhEGjnNHwRYNzAGpJ/UO3cHyHY9vqO84TqClvw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=G19BRZw0gATuTyqzWC8IEFtRnHdDkpjwIGePbTl1HSo14UDOrkpjt2sE4gj3IcGUmyLlfHMbdDQgVh2YnCsi5khWmcz/G8D9RjzfmsRE0unbrKGTEXsBkLVIeQQnGe5CO2I/534XO5yUkeW1ODsGoQemiWw2F6CPbL+UhE6UUX4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LPAl08ZR; arc=none smtp.client-ip=198.175.65.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1736403759; x=1767939759;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=FkMzPFhEGjnNHwRYNzAGpJ/UO3cHyHY9vqO84TqClvw=;
+  b=LPAl08ZRSUhlFnCGSQwtbTSEBsQ+ioNni0wxlInC31GySbMWYl4LYxpr
+   S9LPM/kYrQji3hSZO2S2ni46E6YtJYyukmIbXkD8YVfx4khnjVoj+3Flk
+   Qvt4NC3dn/UZIblZnK0jCTZgakq0qiJeHaFYHZKGPh287qYS8qsX6jfY4
+   EB6eSYfc0KhmhrkzA3ZGGieIV/hDqyHOOw40HdkpFvwBuD4Rqb+l4/oA3
+   mrh3sx2ovNfVNtCdQUEN5Br7WSkGOfW2RvxrSuQPv72GZCkps2UgVcZN8
+   c+23TBSVqBSlzNRUmvyMo0+ESS7o6OWfyFVVnMzYmp19gW/O0jnvDx206
+   A==;
+X-CSE-ConnectionGUID: qtvSMBPbTB+Unr3XmVGkcw==
+X-CSE-MsgGUID: QikCUrNxQZOr/DWJZRpxAg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11309"; a="54068356"
+X-IronPort-AV: E=Sophos;i="6.12,300,1728975600"; 
+   d="scan'208";a="54068356"
+Received: from fmviesa006.fm.intel.com ([10.60.135.146])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jan 2025 22:22:38 -0800
+X-CSE-ConnectionGUID: 20rmiwpXQuCqdFvG70VR+A==
+X-CSE-MsgGUID: QCCNxdfVRI6qVPsCRGqHZg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,300,1728975600"; 
+   d="scan'208";a="103120382"
+Received: from mev-dev.igk.intel.com ([10.237.112.144])
+  by fmviesa006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jan 2025 22:22:34 -0800
+Date: Thu, 9 Jan 2025 07:19:17 +0100
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+To: Shradha Gupta <shradhagupta@linux.microsoft.com>
+Cc: linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Long Li <longli@microsoft.com>,
+	Konstantin Taranov <kotaranov@microsoft.com>,
+	Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>,
+	Yury Norov <yury.norov@gmail.com>,
+	Kalesh AP <kalesh-anakkur.purayil@broadcom.com>,
+	Maxim Levitsky <mlevitsk@redhat.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Shradha Gupta <shradhagupta@microsoft.com>, stable@vger.kernel.org
+Subject: Re: [PATCH net] net: mana: Cleanup "mana" debugfs dir after cleanup
+ of all children
+Message-ID: <Z39qZWlXtjNnrcMt@mev-dev.igk.intel.com>
+References: <1736398991-764-1-git-send-email-shradhagupta@linux.microsoft.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgAni196Z39nvD3QAQ--.4010S9
-X-Coremail-Antispam: 1UD129KBjvJXoWxKr1kZF4xuF1ruF15XFW7CFg_yoWxuw1Upa
-	yrK345Kr4rXw47Ww48tFn7GrWfKrs5XFyxGry0gw1UZr1Iqws5tF92gFy5tFW3CFWDWryS
-	vF4FkFZ8GrZrJrJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUPvb4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28IrcIa0xkI8VA2jI8067AKxVWUAV
-	Cq3wA2048vs2IY020Ec7CjxVAFwI0_Xr0E3s1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0
-	rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW7JVWDJwA2z4x0Y4vE2Ix0cI8IcVCY1x0267
-	AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E
-	14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7
-	xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Y
-	z7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAaw2
-	AFwI0_GFv_Wryl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAq
-	x4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r4a6r
-	W5MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_JFI_Gr1lIxAIcVC0I7IYx2IY6xkF
-	7I0E14v26r4UJVWxJr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14
-	v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr1j6F4UJbIYCTnIWIevJa73UjIFyTuY
-	vjxUI-eODUUUU
-X-CM-SenderInfo: xkrx3t3r6k3tpzhluzxrxghudrp/
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1736398991-764-1-git-send-email-shradhagupta@linux.microsoft.com>
 
-From: Hou Tao <houtao1@huawei.com>
+On Wed, Jan 08, 2025 at 09:03:11PM -0800, Shradha Gupta wrote:
+> In mana_driver_exit(), mana_debugfs_root gets cleanup before any of it's
+> children (which happens later in the pci_unregister_driver()).
+> Due to this, when mana driver is configured as a module and rmmod is
+> invoked, following stack gets printed along with failure in rmmod command.
+> 
+> [ 2399.317651] BUG: kernel NULL pointer dereference, address: 0000000000000098
+> [ 2399.318657] #PF: supervisor write access in kernel mode
+> [ 2399.319057] #PF: error_code(0x0002) - not-present page
+> [ 2399.319528] PGD 10eb68067 P4D 0
+> [ 2399.319914] Oops: Oops: 0002 [#1] SMP NOPTI
+> [ 2399.320308] CPU: 72 UID: 0 PID: 5815 Comm: rmmod Not tainted 6.13.0-rc5+ #89
+> [ 2399.320986] Hardware name: Microsoft Corporation Virtual Machine/Virtual Machine, BIOS Hyper-V UEFI Release v4.1 09/28/2024
+> [ 2399.321892] RIP: 0010:down_write+0x1a/0x50
+> [ 2399.322303] Code: 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 0f 1f 44 00 00 55 48 89 e5 41 54 49 89 fc e8 9d cd ff ff 31 c0 ba 01 00 00 00 <f0> 49 0f b1 14 24 75 17 65 48 8b 05 f6 84 dd 5f 49 89 44 24 08 4c
+> [ 2399.323669] RSP: 0018:ff53859d6c663a70 EFLAGS: 00010246
+> [ 2399.324061] RAX: 0000000000000000 RBX: ff1d4eb505060180 RCX: ffffff8100000000
+> [ 2399.324620] RDX: 0000000000000001 RSI: 0000000000000064 RDI: 0000000000000098
+> [ 2399.325167] RBP: ff53859d6c663a78 R08: 00000000000009c4 R09: ff1d4eb4fac90000
+> [ 2399.325681] R10: 0000000000000000 R11: 0000000000000001 R12: 0000000000000098
+> [ 2399.326185] R13: ff1d4e42e1a4a0c8 R14: ff1d4eb538ce0000 R15: 0000000000000098
+> [ 2399.326755] FS:  00007fe729570000(0000) GS:ff1d4eb2b7200000(0000) knlGS:0000000000000000
+> [ 2399.327269] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> [ 2399.327690] CR2: 0000000000000098 CR3: 00000001c0584005 CR4: 0000000000373ef0
+> [ 2399.328166] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> [ 2399.328623] DR3: 0000000000000000 DR6: 00000000fffe07f0 DR7: 0000000000000400
+> [ 2399.329055] Call Trace:
+> [ 2399.329243]  <TASK>
+> [ 2399.329379]  ? show_regs+0x69/0x80
+> [ 2399.329602]  ? __die+0x25/0x70
+> [ 2399.329856]  ? page_fault_oops+0x271/0x550
+> [ 2399.330088]  ? psi_group_change+0x217/0x470
+> [ 2399.330341]  ? do_user_addr_fault+0x455/0x7b0
+> [ 2399.330667]  ? finish_task_switch.isra.0+0x91/0x2f0
+> [ 2399.331004]  ? exc_page_fault+0x73/0x160
+> [ 2399.331275]  ? asm_exc_page_fault+0x27/0x30
+> [ 2399.343324]  ? down_write+0x1a/0x50
+> [ 2399.343631]  simple_recursive_removal+0x4d/0x2c0
+> [ 2399.343977]  ? __pfx_remove_one+0x10/0x10
+> [ 2399.344251]  debugfs_remove+0x45/0x70
+> [ 2399.344511]  mana_destroy_rxq+0x44/0x400 [mana]
+> [ 2399.344845]  mana_destroy_vport+0x54/0x1c0 [mana]
+> [ 2399.345229]  mana_detach+0x2f1/0x4e0 [mana]
+> [ 2399.345466]  ? ida_free+0x150/0x160
+> [ 2399.345718]  ? __cond_resched+0x1a/0x50
+> [ 2399.345987]  mana_remove+0xf4/0x1a0 [mana]
+> [ 2399.346243]  mana_gd_remove+0x25/0x80 [mana]
+> [ 2399.346605]  pci_device_remove+0x41/0xb0
+> [ 2399.346878]  device_remove+0x46/0x70
+> [ 2399.347150]  device_release_driver_internal+0x1e3/0x250
+> [ 2399.347831]  ? klist_remove+0x81/0xe0
+> [ 2399.348377]  driver_detach+0x4b/0xa0
+> [ 2399.348906]  bus_remove_driver+0x83/0x100
+> [ 2399.349435]  driver_unregister+0x31/0x60
+> [ 2399.349919]  pci_unregister_driver+0x40/0x90
+> [ 2399.350492]  mana_driver_exit+0x1c/0xb50 [mana]
+> [ 2399.351102]  __do_sys_delete_module.constprop.0+0x184/0x320
+> [ 2399.351664]  ? __fput+0x1a9/0x2d0
+> [ 2399.352200]  __x64_sys_delete_module+0x12/0x20
+> [ 2399.352760]  x64_sys_call+0x1e66/0x2140
+> [ 2399.353316]  do_syscall_64+0x79/0x150
+> [ 2399.353813]  ? syscall_exit_to_user_mode+0x49/0x230
+> [ 2399.354346]  ? do_syscall_64+0x85/0x150
+> [ 2399.354816]  ? irqentry_exit+0x1d/0x30
+> [ 2399.355287]  ? exc_page_fault+0x7f/0x160
+> [ 2399.355756]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+> [ 2399.356302] RIP: 0033:0x7fe728d26aeb
+> [ 2399.356776] Code: 73 01 c3 48 8b 0d 45 33 0f 00 f7 d8 64 89 01 48 83 c8 ff c3 66 2e 0f 1f 84 00 00 00 00 00 90 f3 0f 1e fa b8 b0 00 00 00 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d 15 33 0f 00 f7 d8 64 89 01 48
+> [ 2399.358372] RSP: 002b:00007ffff954d6f8 EFLAGS: 00000206 ORIG_RAX: 00000000000000b0
+> [ 2399.359066] RAX: ffffffffffffffda RBX: 00005609156cc760 RCX: 00007fe728d26aeb
+> [ 2399.359779] RDX: 000000000000000a RSI: 0000000000000800 RDI: 00005609156cc7c8
+> [ 2399.360535] RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000000
+> [ 2399.361261] R10: 00007fe728dbeac0 R11: 0000000000000206 R12: 00007ffff954d950
+> [ 2399.361952] R13: 00005609156cc2a0 R14: 00007ffff954ee5f R15: 00005609156cc760
+> [ 2399.362688]  </TASK>
+> 
+> Fixes: 6607c17c6c5e ("net: mana: Enable debugfs files for MANA device")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Shradha Gupta <shradhagupta@linux.microsoft.com>
+> ---
+>  drivers/net/ethernet/microsoft/mana/gdma_main.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
+> index 2dc0c6ad54be..be95336ce089 100644
+> --- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
+> +++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
+> @@ -1656,9 +1656,9 @@ static int __init mana_driver_init(void)
+>  
+>  static void __exit mana_driver_exit(void)
+>  {
+> -	debugfs_remove(mana_debugfs_root);
+> -
+>  	pci_unregister_driver(&mana_driver);
+> +
+> +	debugfs_remove(mana_debugfs_root);
 
-The main purpose of the test is to demonstrate the lock problem for the
-free of bpf_timer under PREEMPT_RT. When freeing a bpf_timer which is
-running on other CPU in bpf_timer_cancel_and_free(), hrtimer_cancel()
-will try to acquire a spin-lock (namely softirq_expiry_lock), however
-the freeing procedure has already held a raw-spin-lock.
+Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 
-The test first creates two threads: one to start timers and the other to
-free timers. The start-timers thread will start the timer and then wake
-up the free-timers thread to free these timers when the starts complete.
-After freeing, the free-timer thread will wake up the start-timer thread
-to complete the current iteration. A loop of 10 iterations is used.
+Thanks
 
-Signed-off-by: Hou Tao <houtao1@huawei.com>
----
- .../selftests/bpf/prog_tests/free_timer.c     | 165 ++++++++++++++++++
- .../testing/selftests/bpf/progs/free_timer.c  |  71 ++++++++
- 2 files changed, 236 insertions(+)
- create mode 100644 tools/testing/selftests/bpf/prog_tests/free_timer.c
- create mode 100644 tools/testing/selftests/bpf/progs/free_timer.c
-
-diff --git a/tools/testing/selftests/bpf/prog_tests/free_timer.c b/tools/testing/selftests/bpf/prog_tests/free_timer.c
-new file mode 100644
-index 0000000000000..b7b77a6b29799
---- /dev/null
-+++ b/tools/testing/selftests/bpf/prog_tests/free_timer.c
-@@ -0,0 +1,165 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright (C) 2025. Huawei Technologies Co., Ltd */
-+#define _GNU_SOURCE
-+#include <unistd.h>
-+#include <sys/syscall.h>
-+#include <test_progs.h>
-+
-+#include "free_timer.skel.h"
-+
-+struct run_ctx {
-+	struct bpf_program *start_prog;
-+	struct bpf_program *overwrite_prog;
-+	pthread_barrier_t notify;
-+	int loop;
-+	bool start;
-+	bool stop;
-+};
-+
-+static void start_threads(struct run_ctx *ctx)
-+{
-+	ctx->start = true;
-+}
-+
-+static void stop_threads(struct run_ctx *ctx)
-+{
-+	ctx->stop = true;
-+	/* Guarantee the order between ->stop and ->start */
-+	__atomic_store_n(&ctx->start, true, __ATOMIC_RELEASE);
-+}
-+
-+static int wait_for_start(struct run_ctx *ctx)
-+{
-+	while (!__atomic_load_n(&ctx->start, __ATOMIC_ACQUIRE))
-+		usleep(10);
-+
-+	return ctx->stop;
-+}
-+
-+static void *overwrite_timer_fn(void *arg)
-+{
-+	struct run_ctx *ctx = arg;
-+	int loop, fd, err;
-+	cpu_set_t cpuset;
-+	long ret = 0;
-+
-+	/* Pin on CPU 0 */
-+	CPU_ZERO(&cpuset);
-+	CPU_SET(0, &cpuset);
-+	pthread_setaffinity_np(pthread_self(), sizeof(cpuset), &cpuset);
-+
-+	/* Is the thread being stopped ? */
-+	err = wait_for_start(ctx);
-+	if (err)
-+		return NULL;
-+
-+	fd = bpf_program__fd(ctx->overwrite_prog);
-+	loop = ctx->loop;
-+	while (loop-- > 0) {
-+		LIBBPF_OPTS(bpf_test_run_opts, opts);
-+
-+		/* Wait for start thread to complete */
-+		pthread_barrier_wait(&ctx->notify);
-+
-+		/* Overwrite timers */
-+		err = bpf_prog_test_run_opts(fd, &opts);
-+		if (err)
-+			ret |= 1;
-+		else if (opts.retval)
-+			ret |= 2;
-+
-+		/* Notify start thread to start timers */
-+		pthread_barrier_wait(&ctx->notify);
-+	}
-+
-+	return (void *)ret;
-+}
-+
-+static void *start_timer_fn(void *arg)
-+{
-+	struct run_ctx *ctx = arg;
-+	int loop, fd, err;
-+	cpu_set_t cpuset;
-+	long ret = 0;
-+
-+	/* Pin on CPU 1 */
-+	CPU_ZERO(&cpuset);
-+	CPU_SET(1, &cpuset);
-+	pthread_setaffinity_np(pthread_self(), sizeof(cpuset), &cpuset);
-+
-+	/* Is the thread being stopped ? */
-+	err = wait_for_start(ctx);
-+	if (err)
-+		return NULL;
-+
-+	fd = bpf_program__fd(ctx->start_prog);
-+	loop = ctx->loop;
-+	while (loop-- > 0) {
-+		LIBBPF_OPTS(bpf_test_run_opts, opts);
-+
-+		/* Run the prog to start timer */
-+		err = bpf_prog_test_run_opts(fd, &opts);
-+		if (err)
-+			ret |= 4;
-+		else if (opts.retval)
-+			ret |= 8;
-+
-+		/* Notify overwrite thread to do overwrite */
-+		pthread_barrier_wait(&ctx->notify);
-+
-+		/* Wait for overwrite thread to complete */
-+		pthread_barrier_wait(&ctx->notify);
-+	}
-+
-+	return (void *)ret;
-+}
-+
-+void test_free_timer(void)
-+{
-+	struct free_timer *skel;
-+	struct bpf_program *prog;
-+	struct run_ctx ctx;
-+	pthread_t tid[2];
-+	void *ret;
-+	int err;
-+
-+	skel = free_timer__open_and_load();
-+	if (!ASSERT_OK_PTR(skel, "open_load"))
-+		return;
-+
-+	memset(&ctx, 0, sizeof(ctx));
-+
-+	prog = bpf_object__find_program_by_name(skel->obj, "start_timer");
-+	if (!ASSERT_OK_PTR(prog, "find start prog"))
-+		goto out;
-+	ctx.start_prog = prog;
-+
-+	prog = bpf_object__find_program_by_name(skel->obj, "overwrite_timer");
-+	if (!ASSERT_OK_PTR(prog, "find overwrite prog"))
-+		goto out;
-+	ctx.overwrite_prog = prog;
-+
-+	pthread_barrier_init(&ctx.notify, NULL, 2);
-+	ctx.loop = 10;
-+
-+	err = pthread_create(&tid[0], NULL, start_timer_fn, &ctx);
-+	if (!ASSERT_OK(err, "create start_timer"))
-+		goto out;
-+
-+	err = pthread_create(&tid[1], NULL, overwrite_timer_fn, &ctx);
-+	if (!ASSERT_OK(err, "create overwrite_timer")) {
-+		stop_threads(&ctx);
-+		goto out;
-+	}
-+
-+	start_threads(&ctx);
-+
-+	ret = NULL;
-+	err = pthread_join(tid[0], &ret);
-+	ASSERT_EQ(err | (long)ret, 0, "start_timer");
-+	ret = NULL;
-+	err = pthread_join(tid[1], &ret);
-+	ASSERT_EQ(err | (long)ret, 0, "overwrite_timer");
-+out:
-+	free_timer__destroy(skel);
-+}
-diff --git a/tools/testing/selftests/bpf/progs/free_timer.c b/tools/testing/selftests/bpf/progs/free_timer.c
-new file mode 100644
-index 0000000000000..4501ae8fc4143
---- /dev/null
-+++ b/tools/testing/selftests/bpf/progs/free_timer.c
-@@ -0,0 +1,71 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright (C) 2025. Huawei Technologies Co., Ltd */
-+#include <linux/bpf.h>
-+#include <time.h>
-+#include <bpf/bpf_tracing.h>
-+#include <bpf/bpf_helpers.h>
-+
-+#define MAX_ENTRIES 8
-+
-+struct map_value {
-+	struct bpf_timer timer;
-+};
-+
-+struct {
-+	__uint(type, BPF_MAP_TYPE_HASH);
-+	__type(key, int);
-+	__type(value, struct map_value);
-+	__uint(max_entries, MAX_ENTRIES);
-+} map SEC(".maps");
-+
-+static int timer_cb(void *map, void *key, struct map_value *value)
-+{
-+	volatile int sum = 0;
-+	int i;
-+
-+	bpf_for(i, 0, 1024 * 1024) sum += i;
-+
-+	return 0;
-+}
-+
-+static int start_cb(int key)
-+{
-+	struct map_value *value;
-+
-+	value = bpf_map_lookup_elem(&map, (void *)&key);
-+	if (!value)
-+		return 0;
-+
-+	bpf_timer_init(&value->timer, &map, CLOCK_MONOTONIC);
-+	bpf_timer_set_callback(&value->timer, timer_cb);
-+	/* Hope 100us will be enough to wake-up and run the overwrite thread */
-+	bpf_timer_start(&value->timer, 100000, BPF_F_TIMER_CPU_PIN);
-+
-+	return 0;
-+}
-+
-+static int overwrite_cb(int key)
-+{
-+	struct map_value zero = {};
-+
-+	/* Free the timer which may run on other CPU */
-+	bpf_map_update_elem(&map, (void *)&key, &zero, BPF_ANY);
-+
-+	return 0;
-+}
-+
-+SEC("syscall")
-+int BPF_PROG(start_timer)
-+{
-+	bpf_loop(MAX_ENTRIES, start_cb, NULL, 0);
-+	return 0;
-+}
-+
-+SEC("syscall")
-+int BPF_PROG(overwrite_timer)
-+{
-+	bpf_loop(MAX_ENTRIES, overwrite_cb, NULL, 0);
-+	return 0;
-+}
-+
-+char _license[] SEC("license") = "GPL";
--- 
-2.29.2
-
+>  }
+>  
+>  module_init(mana_driver_init);
+> -- 
+> 2.34.1
+> 
 
