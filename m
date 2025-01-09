@@ -1,120 +1,156 @@
-Return-Path: <netdev+bounces-156844-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156845-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77A3AA07FE7
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 19:38:06 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6EC5A07FEC
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 19:38:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3CAC3188BB21
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 18:38:09 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2EABC7A28E6
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 18:38:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D88DB199E80;
-	Thu,  9 Jan 2025 18:37:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06BEA1A9B38;
+	Thu,  9 Jan 2025 18:38:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="rQZq5oQK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 216F513B2B8;
-	Thu,  9 Jan 2025 18:37:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5C3313B2B8;
+	Thu,  9 Jan 2025 18:38:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736447877; cv=none; b=ShKo/wuX1/ZaEtt4wCiwCAWs5N8a02hdzbky0u118ybQ7zWSyvFe+tGXs+jt4xjEs7sTsNFOPzzALND87hbZ5Jfh3YOOl8ERgxgs3s7pDn+oqM0UdiYdiP1dLNk2gk9OyE2nOnKPbpWElyJn6dRYiJsefpxKrNot/qjLHuEvxp0=
+	t=1736447903; cv=none; b=D5JBzWqXEGPwnzXPhl7FRYQ7RJbL5PIgXbKctxR0RXnCWF02erhjUlHMc6FFhzx64Xoqdc5K/jnHXn17HXYP2Nf/4NSWUH+I2b6tdFegPCxKLTUaY/HZkiwxUMka6SeXJGF04t+suSq1X2S6ReEkJl4+froTJE/F4TIGtd71c+w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736447877; c=relaxed/simple;
-	bh=jDKZZHjwM0ZVYhG0quFjVJNsgX1hy4Gswz2TQbrNtKY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=Pr7tomdrulSIFR80PO+hzEcWHDvUY13pJ47KCUD1J9wBhhlj5Eci4DRWDRx4FVZ6WWiARZpuWyUh3CHQpUCQTmo87tOJM9JHnNkGlw1ASnD8sjP2hxYciyL69xE4Eop2cqkT2AwU/raF+5sofgdTMeeXknhjjvIvby3ocSCTCyA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
-Received: from [192.168.2.102] (213.87.139.224) by msexch01.omp.ru
- (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Thu, 9 Jan
- 2025 21:37:34 +0300
-Message-ID: <678cb572-0320-4cd2-9628-06dadebefbc1@omp.ru>
-Date: Thu, 9 Jan 2025 21:37:33 +0300
+	s=arc-20240116; t=1736447903; c=relaxed/simple;
+	bh=3beYjMhSJaOr4cvKfxRV0js+xV1+RIWvdMPbZLdkq1c=;
+	h=From:Subject:Date:Message-ID:MIME-Version:Content-Type:To:CC; b=j+Rg42k+y+H+mDsEy2DInw/JUB/uUdPHEoDhWZifxf77Cvbm6+iFzficSRFiqsc4Ut+RLT6IV95ldR7NZz0+U9FkFpjgEYhy0gr/7Fi75dUbXpAFx9m/Iq6uSuXkYepAjcw1Gu7bk6F399qkRcxpSbx9VkfCyYjnT6SmKPaU650=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=rQZq5oQK; arc=none smtp.client-ip=68.232.154.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1736447901; x=1767983901;
+  h=from:subject:date:message-id:mime-version:
+   content-transfer-encoding:to:cc;
+  bh=3beYjMhSJaOr4cvKfxRV0js+xV1+RIWvdMPbZLdkq1c=;
+  b=rQZq5oQKTbgFxes8VwOKJ2G6KLqXtz2hqFf9nvapkvQ01qnWaHVwhqhs
+   +bNUuFekS7BOQDfxM/Og0ogR0kgXy4soza+4c65pTK8SgMCUSpd1w+474
+   TdS9cee/LiXtneDYp02cuj18f8lWN2lhgz5O7eHMEpzv45UqSImXO5WrY
+   ZwC+5S1R0goMvvXytx8G0v30wb3Zepef1BKGE/oQv8uQ5NM8UTelgtD0f
+   MbtUms3PID11kxPMpJ3GWafv2lZm3bh0U1yZxsDJrpzauRUVErfC6JbPU
+   LEECqOoayHFCN/85jXVqmluCi9u6IIFQSzoysX05yk83l7EhhSeJKLnoQ
+   w==;
+X-CSE-ConnectionGUID: lYxo9VQwQ0yequjZYTYLoQ==
+X-CSE-MsgGUID: XJ3zDsrzR7OJpunoJAADUA==
+X-IronPort-AV: E=Sophos;i="6.12,302,1728975600"; 
+   d="scan'208";a="36007556"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa4.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 09 Jan 2025 11:38:20 -0700
+Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
+ chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Thu, 9 Jan 2025 11:38:05 -0700
+Received: from DEN-DL-M70577.microchip.com (10.10.85.11) by
+ chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server id
+ 15.1.2507.35 via Frontend Transport; Thu, 9 Jan 2025 11:38:02 -0700
+From: Daniel Machon <daniel.machon@microchip.com>
+Subject: [PATCH net-next 0/6] net: lan969x: add FDMA support
+Date: Thu, 9 Jan 2025 19:37:52 +0100
+Message-ID: <20250109-sparx5-lan969x-switch-driver-5-v1-0-13d6d8451e63@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [net PATCH] net: ravb: Fix max TX frame size for RZ/V2M
-To: Paul Barker <paul.barker.ct@bp.renesas.com>,
-	=?UTF-8?Q?Niklas_S=C3=B6derlund?= <niklas.soderlund@ragnatech.se>, Andrew
- Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
-CC: Simon Horman <horms@kernel.org>, <netdev@vger.kernel.org>,
-	<linux-renesas-soc@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-References: <20250109113706.1409149-1-paul.barker.ct@bp.renesas.com>
-Content-Language: en-US
-From: Sergey Shtylyov <s.shtylyov@omp.ru>
-Organization: Open Mobile Platform
-In-Reply-To: <20250109113706.1409149-1-paul.barker.ct@bp.renesas.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.1.1, Database issued on: 01/09/2025 18:26:10
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 19
-X-KSE-AntiSpam-Info: Lua profiles 190244 [Jan 09 2025]
-X-KSE-AntiSpam-Info: Version: 6.1.1.7
-X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 49 0.3.49
- 28b3b64a43732373258a371bd1554adb2caa23cb
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: {SMTP from is not routable}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 213.87.139.224 in (user)
- b.barracudacentral.org}
-X-KSE-AntiSpam-Info:
-	omp.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2
-X-KSE-AntiSpam-Info: FromAlignment: s
-X-KSE-AntiSpam-Info: ApMailHostAddress: 213.87.139.224
-X-KSE-AntiSpam-Info: {DNS response errors}
-X-KSE-AntiSpam-Info: Rate: 19
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 01/09/2025 18:28:00
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 1/9/2025 4:56:00 PM
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+X-B4-Tracking: v=1; b=H4sIAIAXgGcC/x2N0QqDMAwAf0XyvICKFd2vjD2kNVsDWyZp0YL47
+ +v2eBzcHZDYhBNcmwOMN0ny0QrdpYEQSZ+MslSGvu1d27UjppWsOHyRzuNcMO2SQ8TFZGNDh66
+ nYeTg3TBNUCOr8UPKf3AD5YzKJcO9Gk+J0RtpiL/Bm0ThPL9aG0HOkQAAAA==
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Andrew Lunn
+	<andrew+netdev@lunn.ch>, Lars Povlsen <lars.povlsen@microchip.com>, "Steen
+ Hegelund" <Steen.Hegelund@microchip.com>, <UNGLinuxDriver@microchip.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	<jensemil.schulzostergaard@microchip.com>, <horatiu.vultur@microchip.com>,
+	<jacob.e.keller@intel.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>
+X-Mailer: b4 0.14-dev
 
-On 1/9/25 2:37 PM, Paul Barker wrote:
+== Description:
 
-> When tx_max_frame_size was added to struct ravb_hw_info, no value was
-> set in ravb_rzv2m_hw_info so the default value of zero was used.
-> 
-> The maximum MTU is set by subtracting from tx_max_frame_size to allow
-> space for headers and frame checksums. As ndev->max_mtu is unsigned,
-> this subtraction wraps around leading to a ridiculously large positive
-> value that is obviously incorrect.
-> 
-> Before tx_max_frame_size was introduced, the maximum MTU was based on
-> rx_max_frame_size. So, we can restore the correct maximum MTU by copying
-> the rx_max_frame_size value into tx_max_frame_size for RZ/V2M.
+This series is the last of a multi-part series, that prepares and adds
+support for the new lan969x switch driver.
 
-   Seems to be reviewers' fault as well?
+The upstreaming efforts has been split into multiple series:
 
-> Fixes: 1d63864299ca ("net: ravb: Fix maximum TX frame size for GbEth devices")
-> Signed-off-by: Paul Barker <paul.barker.ct@bp.renesas.com>
+        1) Prepare the Sparx5 driver for lan969x (merged)
 
-Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
+        2) Add support for lan969x (same basic features as Sparx5
+           provides excl. FDMA and VCAP, merged).
 
-MBR, Sergey
+        3) Add lan969x VCAP functionality (merged).
+
+        4) Add RGMII support (merged).
+
+    --> 5) Add FDMA support.
+
+== FDMA support:
+
+The lan969x switch device uses the same FDMA engine as the Sparx5 switch
+device, with the same number of channels etc. This means we can utilize
+the newly added FDMA library, that is already in use by the lan966x and
+sparx5 drivers.
+
+As previous lan969x series, the FDMA implementation will hook into the
+Sparx5 implementation where possible, however both RX and TX handling
+will be done differently on lan969x and therefore requires a separate
+implementation of the RX and TX path.
+
+Details are in the commit description of the individual patches
+
+== Patch breakdown:
+
+Patch #1: Enable FDMA support on lan969x
+Patch #2: Split start()/stop() functions
+Patch #3: Activate TX FDMA in start()
+Patch #4: Move consumption of SKB's to xmit()
+Patch #5: Ops out a few functions that differ on the two platforms
+Patch #6: Add FDMA implementation for lan969x
+
+Signed-off-by: Daniel Machon <daniel.machon@microchip.com>
+---
+Daniel Machon (6):
+      net: sparx5: enable FDMA on lan969x
+      net: sparx5: split sparx5_fdma_{start(),stop()}
+      net: sparx5: activate FDMA tx in start()
+      net: sparx5: move SKB consumption to xmit()
+      net: sparx5: ops out certain FDMA functions
+      net: lan969x: add FDMA implementation
+
+ drivers/net/ethernet/microchip/sparx5/Kconfig      |   1 +
+ drivers/net/ethernet/microchip/sparx5/Makefile     |   3 +-
+ .../ethernet/microchip/sparx5/lan969x/lan969x.c    |   4 +
+ .../ethernet/microchip/sparx5/lan969x/lan969x.h    |   6 +
+ .../microchip/sparx5/lan969x/lan969x_fdma.c        | 408 +++++++++++++++++++++
+ .../net/ethernet/microchip/sparx5/sparx5_fdma.c    |  67 ++--
+ .../net/ethernet/microchip/sparx5/sparx5_main.c    |  19 +-
+ .../net/ethernet/microchip/sparx5/sparx5_main.h    |  28 +-
+ .../net/ethernet/microchip/sparx5/sparx5_packet.c  |   6 +-
+ 9 files changed, 510 insertions(+), 32 deletions(-)
+---
+base-commit: 3e5908172c05ab1511f2a6719b806d6eda6e1715
+change-id: 20250106-sparx5-lan969x-switch-driver-5-52a46ecb5488
+
+Best regards,
+-- 
+Daniel Machon <daniel.machon@microchip.com>
 
 
