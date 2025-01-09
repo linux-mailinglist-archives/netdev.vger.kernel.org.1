@@ -1,111 +1,114 @@
-Return-Path: <netdev+bounces-156574-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156575-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B616A07121
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 10:15:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B5869A07142
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 10:18:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2C7CA3A645F
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 09:15:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F1A833A1F49
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 09:18:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D58CD21518F;
-	Thu,  9 Jan 2025 09:15:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F14892153FB;
+	Thu,  9 Jan 2025 09:16:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DKF36eSW"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="L4ZB8MDV"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99C28215070;
-	Thu,  9 Jan 2025 09:15:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E62682153DE;
+	Thu,  9 Jan 2025 09:16:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736414130; cv=none; b=TeS26heAvkoTUbjXj03fxLkyUKHRkwyzHrQYg4T5XxTZyP4dOSWq+cj1M4fn87ynFl3Ou4jh5QtjaPjxJ4Y55ZxD3oihNkhwKDN9xoB2h6W8u9bczlC5D3Trg5qbREuFkWSm22SxGE7lAzZF8P3nRZu4rzUYOUBzGNHtJ3KiZ0Q=
+	t=1736414179; cv=none; b=QZEIXIhVBPOM0PL1x+o6NCSBjXL1ZaWX0aK+Ea0Tuyl/SkmOVXbcgIO/Q12Pk7q2tMV8/oebjhOKq6EnRieVnIO9kJVR4F1ntpXUAPANUWxtYalpE63vCwgL+3mrDU4M/Hmh7Vis+4YHZScWexHdzXpMVAgk8GAiQjV51KNBilo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736414130; c=relaxed/simple;
-	bh=XonJNleXueCiBlpzejK+vB2VywAex0avXvLejhJ9BKs=;
+	s=arc-20240116; t=1736414179; c=relaxed/simple;
+	bh=kSjWcYtkqH8R+JRDGnB2aLYV7zkmXfylg3X6xMRY4vA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dADe3ABodLRbJx0NU1gAR5lDMyFPXfP2Wntgu6KzJSHTzJuW9fnJZmlsOkY3YYoggm2D8c6HS7uRT4NBvP6EyjtIYH8/y8W4vLTzjsUAMGB/zf5uJj6LNBIJ+Xn3GjFp4UhxTA6yv66Lvwqlc+UDfQWu6EXIngYhqscKcBVFhDY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DKF36eSW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3B237C4CEDF;
-	Thu,  9 Jan 2025 09:15:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736414130;
-	bh=XonJNleXueCiBlpzejK+vB2VywAex0avXvLejhJ9BKs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=DKF36eSWPanxZKCMweCQnSYx9VcN/32Nol9RpoJsFPW4g2O6Rdrf+tW95FmH7b/hk
-	 gYfw650Ox6DZ2HDw1rJKaTUIe0N8cme5Gu2GYl9l6pYkoGHshSgz7eu7vr/kCZ7D0Q
-	 FSMqu80ksLLGg+PotK41x26bUFF1j2/L13werB3/d8Ogdi33dgVZvtNVrLZGPPszrv
-	 OJ6gIXi5BOSBg3VT1JYAVCy1so4ib7V7BWjQsInL9UVaktBm0ZxiOakZd3+vEkEebN
-	 yByxkFuq/05vM90gtR7eb1ZfFChbMqrtntl0na6zuWGQMeOO3b1QRmwEc15A99PKOp
-	 u25QGb1TDMoZQ==
-Date: Thu, 9 Jan 2025 10:15:26 +0100
-From: Krzysztof Kozlowski <krzk@kernel.org>
-To: Luo Jie <quic_luoj@quicinc.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Lei Wei <quic_leiwei@quicinc.com>, Suruchi Agarwal <quic_suruchia@quicinc.com>, 
-	Pavithra R <quic_pavir@quicinc.com>, Simon Horman <horms@kernel.org>, 
-	Jonathan Corbet <corbet@lwn.net>, Kees Cook <kees@kernel.org>, 
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>, Philipp Zabel <p.zabel@pengutronix.de>, 
-	linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, linux-hardening@vger.kernel.org, 
-	quic_kkumarcs@quicinc.com, quic_linchen@quicinc.com, srinivas.kandagatla@linaro.org, 
-	bartosz.golaszewski@linaro.org, john@phrozen.org
-Subject: Re: [PATCH net-next v2 01/14] dt-bindings: net: Add PPE for Qualcomm
- IPQ9574 SoC
-Message-ID: <s7z6d6mza3a6bzmokwnuszpgkjqh2gnnxowdqklewzswogaapn@rhb5uhes7gbw>
-References: <20250108-qcom_ipq_ppe-v2-0-7394dbda7199@quicinc.com>
- <20250108-qcom_ipq_ppe-v2-1-7394dbda7199@quicinc.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=g4GjYwYMkmPbJDGbBiQEK+2bZg64cmSN2CKDQbTNaDa7XI18YZq6XtSdfDcEI1T+ChnqG2NX8RdyFbvGKNilbG9FsZ3gmjzJpeTQ/V+G1T1Aee7r/jN9NNomNRW7oJ+KPGVr4C1BeleYUJ9Fymdyb86cVVJALXL7xV/6dTxVVKw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=L4ZB8MDV; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=R2z1ESVuVcDzbxcpb3sc64PCr4c05BAv4LDC9oyfa7s=; b=L4ZB8MDV1RBG7G8NSURC7qZQ3A
+	qvL8HWzbo7iVXe/7oTalE7eJwQfWrWgFE3pE8tn9nD8hHXKq5fkEatoELVfIPL8sh0NwED/hInbgw
+	RCTSNRNKdl9vOn70vjC/Xj8o2afinyk+LuedUBhugETfYryDTX+TJ1OOvQVccDr1qYrTKWCLwCN4X
+	T0Ylh6f72ij58CSbUyfgRJTppxnCwun62Ofytl/7+bU09/16MnSdS7rw/iFdDhJ0YNSvhIYFE280t
+	e1qWDcLPZ3g6/eLHdl0uk218eEKmVH+Q+HrnFRP8yh/TMHd0OwM4nME37G0yKiJ4L16sqxhaOXzmU
+	4kgH/NWw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:46832)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1tVoe3-0001oO-2e;
+	Thu, 09 Jan 2025 09:16:03 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1tVodz-0007Cf-0c;
+	Thu, 09 Jan 2025 09:15:59 +0000
+Date: Thu, 9 Jan 2025 09:15:59 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Eric Woudstra <ericwouds@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Frank Wunderlich <frank-w@public-files.de>,
+	Daniel Golle <daniel@makrotopia.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org, bridge@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: Re: [PATCH RFC net-next] net: phylink: always config mac for
+ (delayed) phy
+Message-ID: <Z3-Tz5WdLCat91vm@shell.armlinux.org.uk>
+References: <20250107123615.161095-1-ericwouds@gmail.com>
+ <Z30iUj6DE9-fRp0n@shell.armlinux.org.uk>
+ <4b9b2a9a-061b-43ad-b402-a49aee317f41@gmail.com>
+ <Z31CJS1YUvPGiEXs@shell.armlinux.org.uk>
+ <98234080-946e-4b36-832f-113b185e7bca@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250108-qcom_ipq_ppe-v2-1-7394dbda7199@quicinc.com>
+In-Reply-To: <98234080-946e-4b36-832f-113b185e7bca@gmail.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Wed, Jan 08, 2025 at 09:47:08PM +0800, Luo Jie wrote:
-> +    required:
-> +      - clocks
-> +      - clock-names
-> +      - resets
-> +      - interrupts
-> +      - interrupt-names
-> +
-> +  ethernet-ports:
+On Thu, Jan 09, 2025 at 09:56:17AM +0100, Eric Woudstra wrote:
+> So I've narrowed down the problem a bit:
+> 
+> At first state->link is set to true, while looking at the bmsr.
+> 
+> But because linkmode_test_bit(fd_bit, state->advertising) and
+> linkmode_test_bit(fd_bit, state->lp_advertising) are both false,
+> state->link is set to false after looking at the bmsr.
 
-This device really looks like DSA or other ethernet switch, so I would
-really expect proper $ref in top-level.
+We shouldn't be getting that far if aneg isn't being used. The problem
+is this is no longer sufficient:
 
-> +    type: object
-> +    additionalProperties: false
-> +    properties:
-> +      '#address-cells':
-> +        const: 1
-> +      '#size-cells':
-> +        const: 0
-> +
-> +    patternProperties:
-> +      "^port@[1-6]$":
-> +        type: object
-> +        $ref: ethernet-controller.yaml#
+        if (!state->link || !linkmode_test_bit(ETHTOOL_LINK_MODE_Autoneg_BIT,
+                                               state->advertising))
+                return;
 
-Everything here is duplicating DSA or ethernet-switch, so that's
-surprising.
+since whether we use aneg or not now depends on state other than just
+the Autoneg bit. It isn't going to be a simple fix, because we need
+the PCS neg_mode here, but we don't have it as an argument to the
+.pcs_get_state() method. I'll look at what we can do for this today.
 
-> +        unevaluatedProperties: false
-> +        description:
-> +          PPE port that includes the MAC used to connect the external
-> +          switch or PHY via the PCS.
-
-Best regards,
-Krzysztof
-
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
