@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-156521-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156522-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 84A7AA06C57
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 04:40:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E4F4DA06C59
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 04:40:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 81A6B164074
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 03:40:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DE145164199
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 03:40:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B01713B7AE;
-	Thu,  9 Jan 2025 03:40:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0B62156220;
+	Thu,  9 Jan 2025 03:40:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZCV2fwwM"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LtKCT3Q4"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D1072AE8C;
-	Thu,  9 Jan 2025 03:40:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B601155744
+	for <netdev@vger.kernel.org>; Thu,  9 Jan 2025 03:40:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736394008; cv=none; b=Dmc8KomAP5lauBTr9ChnYVw9NIS5h4EPLcttU54aRtiyoF3NqERFycJu1U/4I4N5KTswZJPo5weEA9K9rAmplfO0IzAixEjaWkAslir2shBmrjoJVfC6Dilb3F1U7eQJckrDUQ4CCutHKr55n6dlLU4YMHTDdEWkzA5aw0KcVHw=
+	t=1736394009; cv=none; b=Bw2gXEEZEd2nJG3zR0IBIKA3ly1W+UA22caOl9iRMDN5rl20ViEgKcwPqwurlvldEPFTeqcgRDhMNmA+XVKtXxIr7MgQAsg1eaa6HReLi+vgJ/XN570lrwYGk5TR/qTsw/YzWOiyvvD74oZfacXbqZ4ZZYrGMzGr5xm4148COJw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736394008; c=relaxed/simple;
-	bh=Odlt3PXU9AZTBZsbiZcERPyInIU1wmU8mY24xb0mfG8=;
+	s=arc-20240116; t=1736394009; c=relaxed/simple;
+	bh=u0arFl/qOQOsk33MLA2ENK0kTx8k8CbKbh6Sq1FxgVg=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=B8SIaBe4kO1htX8+KwiJAenDfi0Aivppo5cx4aBAZjicq5UP3XmQoMLRGn3nr/+m2uJ6IsfD/BkCvP2S3GU25w0Ek/NGMHJVl7DcJAXURUFlLCXnX5kNOfnlhg+3ZC5WO3Di2XyGpnPikqTdY3W10ldsjQy6fCZxTVk57ThqT7A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZCV2fwwM; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 99678C4CED2;
-	Thu,  9 Jan 2025 03:40:07 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=m3+ic8Ncn9lWtt6mixjBNLk7EjAp6WHUdoWwmd4Vx3kxdQIdA06EpzGS2x80bV7hJMdMvvNCdnIhUzrYkqfgvUWD6t70uN8LKfWXx2/XEnooS/Yx5X2qaDnpthvp+Fj4qiwOAAlDTld69hP0fQ47qvTu+0v+bjSwQEeBwoKVZwE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LtKCT3Q4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1F998C4CEE2;
+	Thu,  9 Jan 2025 03:40:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736394007;
-	bh=Odlt3PXU9AZTBZsbiZcERPyInIU1wmU8mY24xb0mfG8=;
+	s=k20201202; t=1736394009;
+	bh=u0arFl/qOQOsk33MLA2ENK0kTx8k8CbKbh6Sq1FxgVg=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ZCV2fwwMPIdle8CvxS3y7cizRdWuO0ZToxif5VP9jBnz9Jmp8+fWfy5Cz98DLkcpI
-	 0gO978FvoNdnyo97XbeT3AUGbQ0Y4quCNEHE7bsLkJeJvpJ42gwEpT54Pijw2NCYuf
-	 faFkqz+omwc6xabuCGNKkmoyPbVHZ1U/kohdQwI1MHGI0Zft29PNbbWORwrH+immtH
-	 QpSOvu4YAjpxLGUFp0ruZW679mAyIi0AMYD+U0Vz/G04rEKVCVfPCyN81wXqNUMsql
-	 4lrCHyZZ48FDCeaLLXE+qQKSfZejSZMUF4+8mxOZRwqjcrXkUvmA27RDKxxWWAFg52
-	 jiACmNngqD1Gg==
+	b=LtKCT3Q4zkEDy+8LGwewMQ2UAvh0rH/O6tNqFZpoz9IZQb16iEG8CxIaLdmicwp0Q
+	 BBMyyKTbVSmHiWJj4QaY8KL4P6qeyFf0Hhz2HlKtGejedQ8T8LqAFcTwMs3XwOGH/L
+	 roGkxQRuLJFUuVlOZFuqdejMrXxDKdpm95J2XGDTQ7ZOb0SsgXqwmYqVEyQbj/45dy
+	 l+qqoxaOT5+gAiRnbal7CBsekJ6G5QQJpUi7D/++6t2WbUFTy9ggeN6oGjy/hJgO6F
+	 WdQrpx0k1X1Sd8/PQm3IyVhXqtdEHDAtgceIwL0d5Px4b9ijnXpfIaeFXpOXc0NYsm
+	 x27IuLFZCx77g==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70E37380A965;
-	Thu,  9 Jan 2025 03:40:30 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EADAB380A965;
+	Thu,  9 Jan 2025 03:40:31 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,39 +52,41 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] dt-bindings: net: pse-pd: Fix unusual character in
- documentation
+Subject: Re: [PATCH net 0/3][pull request] Intel Wired LAN Driver Updates
+ 2025-01-07 (ice, igc)
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <173639402926.861924.10694042923792739546.git-patchwork-notify@kernel.org>
-Date: Thu, 09 Jan 2025 03:40:29 +0000
-References: <20250107142659.425877-1-kory.maincent@bootlin.com>
-In-Reply-To: <20250107142659.425877-1-kory.maincent@bootlin.com>
-To: Kory Maincent <kory.maincent@bootlin.com>
-Cc: o.rempel@pengutronix.de, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- thomas.petazzoni@bootlin.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, robh@kernel.org,
- krzk+dt@kernel.org, conor+dt@kernel.org
+ <173639403053.861924.14818642283159680442.git-patchwork-notify@kernel.org>
+Date: Thu, 09 Jan 2025 03:40:30 +0000
+References: <20250107190150.1758577-1-anthony.l.nguyen@intel.com>
+In-Reply-To: <20250107190150.1758577-1-anthony.l.nguyen@intel.com>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, andrew+netdev@lunn.ch, netdev@vger.kernel.org
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+This series was applied to netdev/net.git (main)
+by Tony Nguyen <anthony.l.nguyen@intel.com>:
 
-On Tue,  7 Jan 2025 15:26:59 +0100 you wrote:
-> The documentation contained an unusual character due to an issue in my
-> personal b4 setup. Fix the problem by providing the correct PSE Pinout
-> Alternatives table number description.
+On Tue,  7 Jan 2025 11:01:44 -0800 you wrote:
+> For ice:
 > 
-> Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
-> ---
+> Arkadiusz corrects mask value being used to determine DPLL phase range.
+> 
+> Przemyslaw corrects frequency value for E823 devices.
+> 
+> For igc:
 > 
 > [...]
 
 Here is the summary with links:
-  - dt-bindings: net: pse-pd: Fix unusual character in documentation
-    https://git.kernel.org/netdev/net/c/d1bf27c4e176
+  - [net,1/3] ice: fix max values for dpll pin phase adjust
+    https://git.kernel.org/netdev/net/c/65104599b3a8
+  - [net,2/3] ice: fix incorrect PHY settings for 100 GB/s
+    https://git.kernel.org/netdev/net/c/6c5b98911608
+  - [net,3/3] igc: return early when failing to read EECD register
+    https://git.kernel.org/netdev/net/c/bd2776e39c2a
 
 You are awesome, thank you!
 -- 
