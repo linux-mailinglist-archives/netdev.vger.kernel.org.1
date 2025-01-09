@@ -1,106 +1,166 @@
-Return-Path: <netdev+bounces-156812-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156813-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07209A07E3E
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 18:01:07 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9908FA07E43
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 18:02:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 07CB116A3DC
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 17:00:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C3E453A455A
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 17:02:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CFA9191F7A;
-	Thu,  9 Jan 2025 17:00:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D77A1779AE;
+	Thu,  9 Jan 2025 17:02:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TiUgDqs8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aBBk8lNa"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 270646F31E
-	for <netdev@vger.kernel.org>; Thu,  9 Jan 2025 17:00:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76F59273F9
+	for <netdev@vger.kernel.org>; Thu,  9 Jan 2025 17:02:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736442030; cv=none; b=fYXKIRMs+Smvevwivvp81BNlP/uD02zyla0Fj0DUyNHXVUXbSYkvdYKk0CuxqRnEj0Vh9ytzxM7y0bpvctd7AwPCA/W0ZQZse50zOtmahT0GAR5N3WM88bM+mBTMKIqVi98F1IMc2yJrtvQlNUvdMjjVR5zMQ3O+itQR/ae5wsc=
+	t=1736442151; cv=none; b=ozKPmVA1b14fsazsHaoTzQZSYZegj80ZQQoz5k/2qq8Wvf7J1sOgjaU7Y2t3b6g2k6gHdBXuZ+VHoQCdtR6wFcPalZGXmWjDjcYXo7hCPJETB/aidVKMPd/4KYWyIvv1b+T2ubITp7uxshfwmTyyEBuiyes+5glY4VZB3FXzfvY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736442030; c=relaxed/simple;
-	bh=/kE4CP138gTZhMuwGi729ji6f/BLddxaY0IqjowX5J4=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=AZjRLVVUCheyyzzonWfIbglUwfUhIo4xrdqksQeIT3x+eW06r3BQSRyeOOHxlSF5Q7fRlHRrTPRG5l0fNFQiGgPbLkKNGyGLhQM7SgAHJVRPfs4OQVGgziIaPBdoqp/PW+X26Dq/191OdNyWfRlXBsPrOP5eX9W14mddgp1Dmk8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TiUgDqs8; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4BD5C4CED3;
-	Thu,  9 Jan 2025 17:00:29 +0000 (UTC)
+	s=arc-20240116; t=1736442151; c=relaxed/simple;
+	bh=Fg3vYZyTO2Fw+Xxth4e/W3NjOlbC7sP2c8f+MJ5K2ng=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=E5ut4K/9Rbb1j7WRdienYH1UczzMVulj68rJDrWM5+z8b8I5H9hhgX9W+uqKbf6T+MhUYatHw+NDov+jgAtREp4lekE4FgfJNEJnZ4e4bBzZ/L1FdsRtM4hW5cv8oNGmecnINvfI4XIBbW9OIopFw+mNCz6uEG8G6j+TQClPph8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aBBk8lNa; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 486B8C4CED2;
+	Thu,  9 Jan 2025 17:02:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736442029;
-	bh=/kE4CP138gTZhMuwGi729ji6f/BLddxaY0IqjowX5J4=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=TiUgDqs8dBr5l8pN/w1fUFw1Dc2PJp1X4Dv/QrKavMup9Q5R5i5Uoqcr/qsjp4N41
-	 V2SSdXkjzG55C8mdP2q5UTl8MzNI0VXYIg8ngjbFgKzYcPOxjxZ363pgJ6aaX7Gxfb
-	 /zV20yTE4sbejGZRS6ReUBecnEH9q6anCemwT/OgidkTZbufrSYqTv164HwR4gjrfX
-	 87E+ib5uUHHB7XqkXSh8/u7y/pC0BvEt1o4HO3g24w0KkFj5HHD3BcGwxt5o9GaPjZ
-	 PWrly+tvUheV9eqEAn9clFkHYgrgJPhr6JwWR+yoA6A8Y1oM7ojA6o8TAZTslgMLau
-	 Y95BM9acz4rSw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 97EA0380A97E;
-	Thu,  9 Jan 2025 17:00:52 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1736442150;
+	bh=Fg3vYZyTO2Fw+Xxth4e/W3NjOlbC7sP2c8f+MJ5K2ng=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=aBBk8lNaYerCF5M/6HUJQLFK2H9nv6ugX8pIQ6ULhnqMjYY5l0Hf6pGBJy8rTdnuc
+	 1BL4mOfvX3nXoqhvpIrNBoH9Go1oDuuJo1BcKi4Ixl/rO0juAZFlWI4VL85zYV6hRy
+	 1KOMj/ZB8WePQqQEdZ39UXHlvH5peHLFEYWxb9hSQovRvYAX04XdvZHKAeEOCr+8kF
+	 5/4+5X6Bx2vHP4c85w7jb2FgadOGQTZQODLBHmk57Ju83dInKsMEOBSdvtNP6Ka4CZ
+	 2kaF8OrF0NQo/SSUGcU47UcCex5CyYUF8oksXuetOpos5aAPdPuRfcNvQEBpMPBl0U
+	 ZGbUvG8aumS4Q==
+Date: Thu, 9 Jan 2025 17:02:22 +0000
+From: Simon Horman <horms@kernel.org>
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Alexander Couzens <lynxis@fe80.eu>,
+	Alexander Duyck <alexanderduyck@fb.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	=?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Daniel Machon <daniel.machon@microchip.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	DENG Qingfang <dqfext@gmail.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Horatiu Vultur <horatiu.vultur@microchip.com>,
+	Ioana Ciornei <ioana.ciornei@nxp.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jose Abreu <Jose.Abreu@synopsys.com>, kernel-team@meta.com,
+	Lars Povlsen <lars.povlsen@microchip.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org,
+	Madalin Bucur <madalin.bucur@nxp.com>,
+	Marcin Wojtas <marcin.s.wojtas@gmail.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	Michal Simek <michal.simek@amd.com>, netdev@vger.kernel.org,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
+	Sean Anderson <sean.anderson@seco.com>,
+	Sean Wang <sean.wang@mediatek.com>,
+	Steen Hegelund <Steen.Hegelund@microchip.com>,
+	Taras Chornyi <taras.chornyi@plvision.eu>,
+	UNGLinuxDriver@microchip.com, Vladimir Oltean <olteanv@gmail.com>,
+	Eric Woudstra <ericwouds@gmail.com>
+Subject: Re: [PATCH net-next 1/5] net: phylink: use pcs_neg_mode in
+ phylink_mac_pcs_get_state()
+Message-ID: <20250109170222.GM7706@kernel.org>
+References: <Z3_n_5BXkxQR4zEG@shell.armlinux.org.uk>
+ <E1tVuFh-000BXQ-D7@rmk-PC.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2 0/8] MAINTAINERS: spring 2025 cleanup of networking
- maintainers
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173644205114.1449021.3681553118929629727.git-patchwork-notify@kernel.org>
-Date: Thu, 09 Jan 2025 17:00:51 +0000
-References: <20250108155242.2575530-1-kuba@kernel.org>
-In-Reply-To: <20250108155242.2575530-1-kuba@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <E1tVuFh-000BXQ-D7@rmk-PC.armlinux.org.uk>
 
-Hello:
-
-This series was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Wed,  8 Jan 2025 07:52:34 -0800 you wrote:
-> Annual cleanup of inactive maintainers. To identify inactive maintainers
-> we use Jon Corbet's maintainer analysis script from gitdm, and some manual
-> scanning of lore.
+On Thu, Jan 09, 2025 at 03:15:17PM +0000, Russell King (Oracle) wrote:
+> As in-band AN no longer just depends on MLO_AN_INBAND + Autoneg bit,
+> we need to take account of the pcs_neg_mode when deciding how to
+> initialise the speed, duplex and pause state members before calling
+> into the .pcs_neg_mode() method. Add this.
 > 
-> Please feel free to comment if you either disagree with the removal
-> or think it should be done differently!
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> ---
+>  drivers/net/phy/phylink.c | 22 ++++++++++++++++------
+>  1 file changed, 16 insertions(+), 6 deletions(-)
 > 
-> [...]
+> diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
+> index 31754d5fd659..d08cdbbbbc1e 100644
+> --- a/drivers/net/phy/phylink.c
+> +++ b/drivers/net/phy/phylink.c
+> @@ -1492,12 +1492,24 @@ static int phylink_change_inband_advert(struct phylink *pl)
+>  static void phylink_mac_pcs_get_state(struct phylink *pl,
+>  				      struct phylink_link_state *state)
+>  {
+> +	struct phylink_pcs *pcs;
+> +	bool autoneg;
+> +
+>  	linkmode_copy(state->advertising, pl->link_config.advertising);
+>  	linkmode_zero(state->lp_advertising);
+>  	state->interface = pl->link_config.interface;
+>  	state->rate_matching = pl->link_config.rate_matching;
+> -	if (linkmode_test_bit(ETHTOOL_LINK_MODE_Autoneg_BIT,
+> -			      state->advertising)) {
+> +	state->an_complete = 0;
+> +	state->link = 1;
+> +
+> +	pcs = pl->pcs;
+> +	if (pcs->neg_mode)
+> +		autoneg = pl->pcs_neg_mode == PHYLINK_PCS_NEG_INBAND_ENABLED;
+> +	else
+> +		autoneg = linkmode_test_bit(ETHTOOL_LINK_MODE_Autoneg_BIT,
+> +					    state->advertising);
+> +
+> +	if (autoneg) {
+>  		state->speed = SPEED_UNKNOWN;
+>  		state->duplex = DUPLEX_UNKNOWN;
+>  		state->pause = MLO_PAUSE_NONE;
+> @@ -1506,11 +1518,9 @@ static void phylink_mac_pcs_get_state(struct phylink *pl,
+>  		state->duplex = pl->link_config.duplex;
+>  		state->pause = pl->link_config.pause;
+>  	}
+> -	state->an_complete = 0;
+> -	state->link = 1;
+>  
+> -	if (pl->pcs)
+> -		pl->pcs->ops->pcs_get_state(pl->pcs, state);
+> +	if (pcs)
+> +		pcs->ops->pcs_get_state(pcs, state);
+>  	else
+>  		state->link = 0;
 
-Here is the summary with links:
-  - [net,v2,1/8] MAINTAINERS: mark Synopsys DW XPCS as Orphan
-    https://git.kernel.org/netdev/net/c/d58200966ed7
-  - [net,v2,2/8] MAINTAINERS: update maintainers for Microchip LAN78xx
-    https://git.kernel.org/netdev/net/c/b506668613ef
-  - [net,v2,3/8] MAINTAINERS: remove Andy Gospodarek from bonding
-    https://git.kernel.org/netdev/net/c/e049fb86d391
-  - [net,v2,4/8] MAINTAINERS: mark stmmac ethernet as an Orphan
-    https://git.kernel.org/netdev/net/c/03868822c553
-  - [net,v2,5/8] MAINTAINERS: remove Mark Lee from MediaTek Ethernet
-    https://git.kernel.org/netdev/net/c/9d7b1191d030
-  - [net,v2,6/8] MAINTAINERS: remove Ying Xue from TIPC
-    https://git.kernel.org/netdev/net/c/d4782fbab1c0
-  - [net,v2,7/8] MAINTAINERS: remove Noam Dagan from AMAZON ETHERNET
-    https://git.kernel.org/netdev/net/c/d95e2cc73701
-  - [net,v2,8/8] MAINTAINERS: remove Lars Povlsen from Microchip Sparx5 SoC
-    https://git.kernel.org/netdev/net/c/d9e03c6ffc4c
+Hi Russell,
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Here it is assumed that pcs may be NULL.
+But it is dereferenced unconditionally immediately
+after it is assigned above.
 
+This seems inconsistent.
 
+Flagged by Smatch.
+
+>  }
+> -- 
+> 2.30.2
+> 
+> 
 
