@@ -1,85 +1,79 @@
-Return-Path: <netdev+bounces-156798-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156800-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23EF5A07D92
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 17:32:08 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 46BE8A07DA3
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 17:33:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 29D56167AE6
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 16:32:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EA874188CAA6
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 16:33:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCCC9221DA0;
-	Thu,  9 Jan 2025 16:32:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A7C7221DBB;
+	Thu,  9 Jan 2025 16:33:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ninimN//"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nSqLcRmc"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0922153800;
-	Thu,  9 Jan 2025 16:32:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F9B3221DA3;
+	Thu,  9 Jan 2025 16:33:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736440323; cv=none; b=f5VIWeYdI9COS0CyOSU2XflpfcAdm4TBqrYOPAONzdEbrjRayFylx61vZlR/6jbgryYM3YxhLZ4NZg4gMV0MwN+guFZxBftV5DdEyXhFWJJY2pOUieQx8cTm+NQWxzqSl9LBujOUq2OHs/W1agUGx7Rks2w41YodOcrOIo57uuI=
+	t=1736440394; cv=none; b=ua1jiFJ/ANrFwyhUe/PCXeebKvq4VY0xUey2qKY/jQjZ3QlCscbPB1rF5hPgA8uCdzsUOzjG/OqpjwhcxhOb+RpMKzK62xpCwLRgqmHogO+uT9ibFTXbN57YmI8Jmvj9eUkZ3Qk7VUYiYu+LQlq+t9XOK8mmdEZ9H1+7cqEKB00=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736440323; c=relaxed/simple;
-	bh=7z+H3IV0LSHJJ8Jr+i+bPcQuVTp6atA4vvxRn03iitQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Szudca8fATjLVbDZZPl8tqLi4TgawOiNyZv78cWHpQQolxy7gh8PZZktrBXRRb7GQmpv7662HVvcHjjcY2Nrjwxa/ybwuLBrO7Xb9nfnd4m3UX8RATQPzfQUv3EqePkkKFZvDBbVU9ezsPMu5PGhbUDMnfEhDRtfeY5cudEcTw0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ninimN//; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 54824C4CED2;
-	Thu,  9 Jan 2025 16:32:01 +0000 (UTC)
+	s=arc-20240116; t=1736440394; c=relaxed/simple;
+	bh=3WNjhjrCWMP3ve0lxWjpqAK+e2+TuzKMIFEAX8YG8Cg=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=rfv6bHyPG30bkUB1YZSsOkCHYUoch69LYIx3rvpJvK/4q5dghQQT7e/iGEerhn1iFIMuDuglu732SBtAjAEqZmw1FNb9+L5IYn0Cxe4DeiH8IKS59NGwcaeKZcT1TPumFwy5U8ldUA8/8D9sf/JIpgkxgQS0MUKEsxISxNHBWFA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nSqLcRmc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 49A27C4CED2;
+	Thu,  9 Jan 2025 16:33:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736440323;
-	bh=7z+H3IV0LSHJJ8Jr+i+bPcQuVTp6atA4vvxRn03iitQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ninimN//TwgdSRnPe9/vftonmHamKlYUtJR3KFr1FMZeMuh9dlW7zx3PYZkp/3Ium
-	 8vnaf5FP8b7Dg11liAbLoT+PtkG+pC9n4yzwjGtD3ulw14SJnNvKxaRVGo8afeBK+P
-	 x1sR05GKiJaCjHxZu3xkHigf992Nf6ryDQyyEvUWXY4k6blYapWNpdFDTa/Oyla4Qp
-	 KwFcgMnKfAqJiuZzl5qjXk3LQjN1GxFCcG+RTFGUj5lmyHwvndmN0As/nOFo3B+7Zw
-	 xtyQRCUoCDc5Nt2aEmFZmNZtrk/4s1YmNhhTjh0lTM6GOXDVfAKzVTit/1iDDAL/Qt
-	 FqHcM6k8f6Ckg==
-Date: Thu, 9 Jan 2025 16:31:59 +0000
-From: Simon Horman <horms@kernel.org>
-To: Paul Barker <paul.barker.ct@bp.renesas.com>
-Cc: Niklas =?utf-8?Q?S=C3=B6derlund?= <niklas.soderlund@ragnatech.se>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Sergey Shtylyov <s.shtylyov@omp.ru>, netdev@vger.kernel.org,
-	linux-renesas-soc@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [net PATCH] net: ravb: Fix max TX frame size for RZ/V2M
-Message-ID: <20250109163159.GL7706@kernel.org>
-References: <20250109113706.1409149-1-paul.barker.ct@bp.renesas.com>
+	s=k20201202; t=1736440392;
+	bh=3WNjhjrCWMP3ve0lxWjpqAK+e2+TuzKMIFEAX8YG8Cg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=nSqLcRmcG1ELOuXucIaWZjPvGxHDC1RTsH5uQhUWoAVBx9XSEBFPsyBAJkhWi17bS
+	 ATBqnkjn94ZYpV1g4OfZjq6vA11sHTDVaWyUdLHOpVju7vPUHB5ZpZtA/qbXOgvOM5
+	 hig6E+hRsi/TbaWHm5aCUILUMGbPAazL7Mn8cPXVovRW+RB14k36rJzQyvXOrNso6a
+	 Y87RZPyN5+xyccFz0ubs81RPL5tyFeZNtBtJqRWVoZNVZ+oZGNN++tn1ba65Tw8Ak1
+	 3ua5Ttk3bTvUURbASWSz4nBvFwsf9NF4u50ciGqWXcpibNXrtnGsFn8PHLqCKsTMSr
+	 IR79iODkX8l2Q==
+Date: Thu, 9 Jan 2025 08:33:11 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Potin Lai <potin.lai@quantatw.com>
+Cc: Paul Fertser <fercerpav@gmail.com>, Samuel Mendoza-Jonas
+ <sam@mendozajonas.com>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon
+ Horman <horms@kernel.org>, Ivan Mikhaylov <fr0st61te@gmail.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ stable@vger.kernel.org
+Subject: Re: [PATCH] net/ncsi: fix locking in Get MAC Address handling
+Message-ID: <20250109083311.20f5f802@kernel.org>
+In-Reply-To: <20250109145054.30925-1-fercerpav@gmail.com>
+References: <20250108192346.2646627-1-kuba@kernel.org>
+	<20250109145054.30925-1-fercerpav@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250109113706.1409149-1-paul.barker.ct@bp.renesas.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, Jan 09, 2025 at 11:37:06AM +0000, Paul Barker wrote:
-> When tx_max_frame_size was added to struct ravb_hw_info, no value was
-> set in ravb_rzv2m_hw_info so the default value of zero was used.
+On Thu,  9 Jan 2025 17:50:54 +0300 Paul Fertser wrote:
+> Obtaining RTNL lock in a response handler is not allowed since it runs
+> in an atomic softirq context. Postpone setting the MAC address by adding
+> a dedicated step to the configuration FSM.
 > 
-> The maximum MTU is set by subtracting from tx_max_frame_size to allow
-> space for headers and frame checksums. As ndev->max_mtu is unsigned,
-> this subtraction wraps around leading to a ridiculously large positive
-> value that is obviously incorrect.
-> 
-> Before tx_max_frame_size was introduced, the maximum MTU was based on
-> rx_max_frame_size. So, we can restore the correct maximum MTU by copying
-> the rx_max_frame_size value into tx_max_frame_size for RZ/V2M.
-> 
-> Fixes: 1d63864299ca ("net: ravb: Fix maximum TX frame size for GbEth devices")
-> Signed-off-by: Paul Barker <paul.barker.ct@bp.renesas.com>
+> Fixes: 790071347a0a ("net/ncsi: change from ndo_set_mac_address to dev_set_mac_address")
+> Cc: stable@vger.kernel.org
+> Cc: Potin Lai <potin.lai@quantatw.com>
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+Neat!
 
-...
+Potin, please give this a test ASAP.
 
