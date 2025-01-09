@@ -1,164 +1,155 @@
-Return-Path: <netdev+bounces-156685-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156686-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9BF56A075FD
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 13:45:54 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 811F8A07602
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 13:46:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8F95A167C95
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 12:45:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 07E17188A51C
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 12:46:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1685A21660C;
-	Thu,  9 Jan 2025 12:45:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFA77218593;
+	Thu,  9 Jan 2025 12:46:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b="hli4JEZ6";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="EgirdQLs"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fvRoZwRM"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-b7-smtp.messagingengine.com (fhigh-b7-smtp.messagingengine.com [202.12.124.158])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f180.google.com (mail-qk1-f180.google.com [209.85.222.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8174B802;
-	Thu,  9 Jan 2025 12:45:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.158
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34C52216E37;
+	Thu,  9 Jan 2025 12:46:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736426746; cv=none; b=nLpJt+5MHgTeVuJtwN2Naup8sVs7Yr9clSkkpQLg/pHWiBK7BT/RSEPTRVilvhgyHYE7BYCecLhmiVHZzY4CNe85hERcmDBOXhYMhQD7cXXqZ92J9dm2e/wF2RmlUNrcX00ZSKY6hbrRiB9qvTPMFv9hjSDmOERcsaSjHVp3OIM=
+	t=1736426780; cv=none; b=p1wvoSrurTnxMlKA8Z9xtup9LFsos73aYlYs+NpEVYPlSPbQiOzuY0ClfMMlDVkG86hm75x0ZLVRqJ39+vK3Y6KHCrsapo2/J1LF3EJ3/YrWlFjGq4o87+Ya2IN4gLMqKMENBOSJSP30vt6g2iy7FzyjR42zx0nu6CrMRLGCwOA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736426746; c=relaxed/simple;
-	bh=kkNkCQyXS23nIqEL3zoEHxlEQniH4nfkUpW/nTL8N8s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PfIEDnYoaBGf6JAM6Q5h1zoPTkp52Bz103NHCdi06qk4BOu1m5RupZnAqZspmA5inP1lNW6/jZHklG53WqpbRCzULJgY46z0GjSpIgUcrY3+XonXprQTP1eC8kq5WNSPC1V7RtWKEmYrUcHT6USr1I1ibMPHwbypfR0rW6mcJk4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se; spf=pass smtp.mailfrom=ragnatech.se; dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b=hli4JEZ6; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=EgirdQLs; arc=none smtp.client-ip=202.12.124.158
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ragnatech.se
-Received: from phl-compute-06.internal (phl-compute-06.phl.internal [10.202.2.46])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id 5B9D82540184;
-	Thu,  9 Jan 2025 07:45:42 -0500 (EST)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-06.internal (MEProxy); Thu, 09 Jan 2025 07:45:42 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ragnatech.se; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm1; t=1736426742;
-	 x=1736513142; bh=4HfbkcoM6ShhVV3pgNRaBb/fX8MsUZSoXh2AIHC7HA4=; b=
-	hli4JEZ6Z+k/GBDvhVgkgBE1f91R2VYZwp8fbfEO80k6DZDs+ooPeGonzNNcK14y
-	zipDH8kvvJskXSh2TK7o8iJrj1AeJRDFrf4yeROxXdvgKFNZHUcjMIb8D2mFq3lZ
-	2hFW8XYrqi1JX1lY+DcJ9cFk6DJ3kNlRbFUYwzPcAW65UScBd/2TuVfsk9qmpzGH
-	6Ky9D+i9MxmlhvbMB0FVjQ9eD6pFVEdND42wjBURpCv7zAEm6KZ9Nt6PggmYWZbo
-	w3bZiFKW52Ekg5WL6IewwDRCTG2b+9ZTGM1CuyuZRlXMeuQMLCtpkHJJQ7yy9ciM
-	RRnXgS/PNl/em/NpuuebzQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1736426742; x=
-	1736513142; bh=4HfbkcoM6ShhVV3pgNRaBb/fX8MsUZSoXh2AIHC7HA4=; b=E
-	girdQLswsQQ2Cnw0+gTtXIisRmgKdny6xMOplf2QMjKFW6X5fi0gLdZYOLN3vLIL
-	lPvqtNnFx2c7vVlKEmA/YmdtaouzPmXFcw36buF6ezOxDewokWpQ/nxSoVNkZiSm
-	Br71yGW4OhZoSujTqn6ZJJ8CW50+f6YFgjclCZ047Dk5aNGaWOYhZ89RLFkrKwcT
-	HCn7YMYCR/N9t6iEw59RKCDCnlaq00fCz5Tg/2VAdKOzzKeYIRZhI6V5JcdPDPJ4
-	S0dTDxbB8d8lGP8FY7oMu47VALK8yAI1FvV+e1Cdwwn1OBGmW+v49PwFTL27+tqs
-	yYAJpbZmxHDK9e3RbToCw==
-X-ME-Sender: <xms:9cR_Z6Q86ObzoMV44TsOs5OSnvpn4Dy5aKO-1id_Gu4TTkvSud1rdw>
-    <xme:9cR_Z_xFg16yS9Vx_5c1CbIg7U1ALo9TGFwWI4Vu8ihY4SQEZfnloaHb11p1us8hb
-    OBEwrIXYqdV40OVeg4>
-X-ME-Received: <xmr:9cR_Z32MdTLFnkvFNGScuyHDA1ubEEE6TRJaZD8IHKgccU8AxWkgFkQiWJgwulvbV7by0JBNc9hP7i5zqisxsrKU7YwAK3g0Gw>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrudegiedggedvucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
-    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
-    htshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggugfgjsehtkeertddttdej
-    necuhfhrohhmpefpihhklhgrshcuufpnuggvrhhluhhnugcuoehnihhklhgrshdrshhoug
-    gvrhhluhhnugesrhgrghhnrghtvggthhdrshgvqeenucggtffrrghtthgvrhhnpefgfedu
-    gffgteekvdfgieelueettdejvddukeegtdfgudduveduiedvgfdvieeiueenucffohhmrg
-    hinheprhgrvhgspghriihvvdhmpghhfigpihhnfhhordhnvghtnecuvehluhhsthgvrhfu
-    ihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepnhhikhhlrghsrdhsohguvghrlh
-    hunhgusehrrghgnhgrthgvtghhrdhsvgdpnhgspghrtghpthhtohepuddtpdhmohguvgep
-    shhmthhpohhuthdprhgtphhtthhopehprghulhdrsggrrhhkvghrrdgtthessghprdhrvg
-    hnvghsrghsrdgtohhmpdhrtghpthhtoheprghnughrvgifodhnvghtuggvvheslhhunhhn
-    rdgthhdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpth
-    htohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehprggsvghn
-    ihesrhgvughhrghtrdgtohhmpdhrtghpthhtohephhhorhhmsheskhgvrhhnvghlrdhorh
-    hgpdhrtghpthhtohepshdrshhhthihlhihohhvsehomhhprdhruhdprhgtphhtthhopehn
-    vghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqd
-    hrvghnvghsrghsqdhsohgtsehvghgvrhdrkhgvrhhnvghlrdhorhhg
-X-ME-Proxy: <xmx:9cR_Z2CLZEYIJ8Zm_vDSPZ_xazYxuVG0HiMJf6Hv3N01yHc8SqR_rQ>
-    <xmx:9cR_Zzhcy0b_ZIzKSzP9hR1K4Y_n8Dutt4HMoOKj-FNZ_PlSQWe3hA>
-    <xmx:9cR_Zyow9-2U1QeOE30soSYjqGYXEBx7WldqOdHL5DD_vj3H85jrbA>
-    <xmx:9cR_Z2jP2qzn1mlUnvQPbcETTUxIWxuR9avg06kXQvdRekFWxL7dAA>
-    <xmx:9sR_Z4ZsIeoNxZOltgFFLW-S-IPn2X-OotFxFOCkubqDoVBEODSc2LdH>
-Feedback-ID: i80c9496c:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 9 Jan 2025 07:45:40 -0500 (EST)
-Date: Thu, 9 Jan 2025 13:45:38 +0100
-From: Niklas =?utf-8?Q?S=C3=B6derlund?= <niklas.soderlund@ragnatech.se>
-To: Paul Barker <paul.barker.ct@bp.renesas.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Sergey Shtylyov <s.shtylyov@omp.ru>, netdev@vger.kernel.org,
-	linux-renesas-soc@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [net PATCH] net: ravb: Fix max TX frame size for RZ/V2M
-Message-ID: <20250109124538.GR2766897@ragnatech.se>
-References: <20250109113706.1409149-1-paul.barker.ct@bp.renesas.com>
+	s=arc-20240116; t=1736426780; c=relaxed/simple;
+	bh=nOOZA+iN0ga0CTphyM/C05+qgOczZ68TEd0WLotUewg=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=KLmbaAeFCp6TgOP0r0KdtNF5ImN+Wb50AgQZO8ihSXNF+lsZN6JV0RNYJ0Z/m+QvY4sj6x6M1VNr5yhs+PuimaAv9xGBCtaRiDBNQR4kWymGBbqJSNJN0TqWGYENUV1ulFjMkyKThZfD0R9tCJgxuLeEIldf6B4/V/gW09lJH7g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fvRoZwRM; arc=none smtp.client-ip=209.85.222.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f180.google.com with SMTP id af79cd13be357-7b85d5cc39eso87453285a.3;
+        Thu, 09 Jan 2025 04:46:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1736426777; x=1737031577; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kaPMLCUZXOj8V/TsoKhneA/pbfWV2N1nHu6od460Xzw=;
+        b=fvRoZwRMvr5M/MLiHu4/wjKv6pIXRtlIZXjCImm2KGwBN8zmaSX1NjxlzebJvvr/QK
+         enQ+pTbyap/SMJmZKseFnH27xnx7GQAUpwXV2RveO2tBTzDcYtFKn8Vrqx9hSeg5Pzew
+         Ta6PQ8sesIuV7hE+h46OikRUBwoqHodMahXI7xAphfnDlZeZ+1pF+49Lvr2SaoRIiVq3
+         BLsB4FZR6+uc1VsvswzCgquThpNrvI/BcqEM89Pu2PmDvPgMVHR+OV1IN+HXWDHiToXL
+         48K0w4y53Hh2LoGhH/UNgrZGRBG10DKbmpc8Qum1Vc3NcChXiJ25eMs+iz3dxBwE2Sl/
+         wh/w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736426777; x=1737031577;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=kaPMLCUZXOj8V/TsoKhneA/pbfWV2N1nHu6od460Xzw=;
+        b=wX9UYrGAhzRzaVioXKMg0g6DAfet2PVRLBNpJ5xSopSBM17/T3bg2ZAXk8Rfn30Ao9
+         3mPsJG7u8jD23NoC91/dh+JPKS3O+7zZUftqkmSViCi+WtyT/segvJO/IJ4zbs7uIEre
+         0+XcDIP4LZjmcF4/ks/tmDnTSXiYMjyltABnHVau53+wwm7rb7v017xCNNxVEoweGHbm
+         z9sUzF+BmAdn+5UWUD6hTUsGi3SDDPuMFWcer+M+Olc0yWi1VpiSLa9PykVb3tR4NDOG
+         8FgywiGrXTm/zZqbz7QaebpckzN3rXMCIROAPEl9KAq7la88KRr9czjKfbWoSS7/EjKK
+         U7mQ==
+X-Forwarded-Encrypted: i=1; AJvYcCURWYcFuaNu6VJZwalB584a/mzeDyRc6h8UCC1qguwoR3ou4HVZBdbXPfF/hGyXEQJJefWVnwqaPvm38zTVTXjK@vger.kernel.org, AJvYcCUkaJFEShQ0LhXToNzOloP5CekWcGzGXxFQBIjWF2s/6EgFSk7KrFA2azE8Kbh9XxfLruA=@vger.kernel.org, AJvYcCUrlRjwYs2JqEXVDKlCCQodaFAJ2fTZVu4EBJ73Og+VCyd0aDIVZfc04UhaoVk3vSz2QHcf6yWcvpNBqFA+@vger.kernel.org, AJvYcCVYZhGyEyxCYhYLSbYaRaWVB537feG/zIYcbJIWW1PJMC8KhuOwgYgouT7Epqz+gDSgy+5fK+ni@vger.kernel.org, AJvYcCW6IY0XLhpA0mIIvp0FWZ4/Uq3nu+4LsHD4h1VvVnxe+TCl8wswai4hq4UT4OuemTiThInFpC/oZx4I@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw00mAZAtw1hhDB44QuHsQaxhOIAaWXBu9aRkcS1wPyIRAq6iQw
+	hckMKAdFePZ3lftHb/mDQz79lEu9j3/McUJ2Rrtq300827xAgWsZ
+X-Gm-Gg: ASbGnctRW9bcYo2V9/31gJ+TVIQIV1D13IbG9vqGdgInL2ZC7z8PtGzs7W4f/ihBDHz
+	onFR5Kbl4BypUTARCK7ejXQBCVBHHGDHSTMgQ/dTkj7rFe6P3cqbru3KZuZRNcQN0gZiSbHKQIG
+	d5Ebkd8dj7ONdwcl1hs7Orm9v+UVp5lqMGV2wUS38bTrWPpJ+IHrerBUttrcc7ZgBYC1IEj8lFL
+	+PPywj39KDAqgHkHEOdkfxZI6a3XSSTCTI+9SjMhRhk4OvRohuV7S4uWKveI4+V4hoXLjnGHkQH
+	pXkIcCxUT1AGMVgVXvSKI6A8nlyZ
+X-Google-Smtp-Source: AGHT+IElltpq0Se5BPymgSR44p/+E1b35WmaB/SUjKp4ksNe7YwiYRSh+K5j9T3I6qKRunWydJbAbg==
+X-Received: by 2002:a05:620a:444f:b0:7b6:f1be:4f7e with SMTP id af79cd13be357-7bcd9755084mr912637385a.26.1736426777023;
+        Thu, 09 Jan 2025 04:46:17 -0800 (PST)
+Received: from localhost (15.60.86.34.bc.googleusercontent.com. [34.86.60.15])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7bce3516068sm62500685a.100.2025.01.09.04.46.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 Jan 2025 04:46:16 -0800 (PST)
+Date: Thu, 09 Jan 2025 07:46:15 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Akihiko Odaki <akihiko.odaki@daynix.com>, 
+ "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Jonathan Corbet <corbet@lwn.net>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ Jason Wang <jasowang@redhat.com>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+ Shuah Khan <shuah@kernel.org>, 
+ linux-doc@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ netdev@vger.kernel.org, 
+ kvm@vger.kernel.org, 
+ virtualization@lists.linux-foundation.org, 
+ linux-kselftest@vger.kernel.org, 
+ Yuri Benditovich <yuri.benditovich@daynix.com>, 
+ Andrew Melnychenko <andrew@daynix.com>, 
+ Stephen Hemminger <stephen@networkplumber.org>, 
+ gur.stavi@huawei.com, 
+ devel@daynix.com
+Message-ID: <677fc517b7b6e_362bc12945@willemb.c.googlers.com.notmuch>
+In-Reply-To: <571a2d61-5fbe-4e49-b4d1-6bf0c7604a57@daynix.com>
+References: <20250109-tun-v2-0-388d7d5a287a@daynix.com>
+ <20250109-tun-v2-2-388d7d5a287a@daynix.com>
+ <20250109023056-mutt-send-email-mst@kernel.org>
+ <571a2d61-5fbe-4e49-b4d1-6bf0c7604a57@daynix.com>
+Subject: Re: [PATCH v2 2/3] tun: Pad virtio header with zero
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250109113706.1409149-1-paul.barker.ct@bp.renesas.com>
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-Hi Paul,
+Akihiko Odaki wrote:
+> On 2025/01/09 16:31, Michael S. Tsirkin wrote:
+> > On Thu, Jan 09, 2025 at 03:58:44PM +0900, Akihiko Odaki wrote:
+> >> tun used to simply advance iov_iter when it needs to pad virtio header,
+> >> which leaves the garbage in the buffer as is. This is especially
+> >> problematic when tun starts to allow enabling the hash reporting
+> >> feature; even if the feature is enabled, the packet may lack a hash
+> >> value and may contain a hole in the virtio header because the packet
+> >> arrived before the feature gets enabled or does not contain the
+> >> header fields to be hashed. If the hole is not filled with zero, it is
+> >> impossible to tell if the packet lacks a hash value.
 
-Nice catch.
+Zero is a valid hash value, so cannot be used as an indication that
+hashing is inactive.
 
-On 2025-01-09 11:37:06 +0000, Paul Barker wrote:
-> When tx_max_frame_size was added to struct ravb_hw_info, no value was
-> set in ravb_rzv2m_hw_info so the default value of zero was used.
+> >> In theory, a user of tun can fill the buffer with zero before calling
+> >> read() to avoid such a problem, but leaving the garbage in the buffer is
+> >> awkward anyway so fill the buffer in tun.
+> >>
+> >> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
+> > 
+> > But if the user did it, you have just overwritten his value,
+> > did you not?
 > 
-> The maximum MTU is set by subtracting from tx_max_frame_size to allow
-> space for headers and frame checksums. As ndev->max_mtu is unsigned,
-> this subtraction wraps around leading to a ridiculously large positive
-> value that is obviously incorrect.
-> 
-> Before tx_max_frame_size was introduced, the maximum MTU was based on
-> rx_max_frame_size. So, we can restore the correct maximum MTU by copying
-> the rx_max_frame_size value into tx_max_frame_size for RZ/V2M.
-> 
-> Fixes: 1d63864299ca ("net: ravb: Fix maximum TX frame size for GbEth devices")
-> Signed-off-by: Paul Barker <paul.barker.ct@bp.renesas.com>
+> Yes. but that means the user expects some part of buffer is not filled 
+> after read() or recvmsg(). I'm a bit worried that not filling the buffer 
+> may break assumptions others (especially the filesystem and socket 
+> infrastructures in the kernel) may have.
 
-Reviewed-by: Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
+If this is user memory that is ignored by the kernel, just reflected
+back, then there is no need in general to zero it. There are many such
+instances, also in msg_control.
 
-> ---
->  drivers/net/ethernet/renesas/ravb_main.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
-> index ac0f093f647a..bc395294a32d 100644
-> --- a/drivers/net/ethernet/renesas/ravb_main.c
-> +++ b/drivers/net/ethernet/renesas/ravb_main.c
-> @@ -2763,6 +2763,7 @@ static const struct ravb_hw_info ravb_rzv2m_hw_info = {
->  	.net_features = NETIF_F_RXCSUM,
->  	.stats_len = ARRAY_SIZE(ravb_gstrings_stats),
->  	.tccr_mask = TCCR_TSRQ0 | TCCR_TSRQ1 | TCCR_TSRQ2 | TCCR_TSRQ3,
-> +	.tx_max_frame_size = SZ_2K,
->  	.rx_max_frame_size = SZ_2K,
->  	.rx_buffer_size = SZ_2K +
->  			  SKB_DATA_ALIGN(sizeof(struct skb_shared_info)),
-> 
-> base-commit: 2d2d4f60ed266a8f340a721102d035252606980b
-> -- 
-> 2.39.5
-> 
-
--- 
-Kind Regards,
-Niklas Söderlund
+If not zeroing leads to ambiguity with the new feature, that would be
+a reason to add it -- it is always safe to do so.
+ 
+> If we are really confident that it will not cause problems, this 
+> behavior can be opt-in based on a flag or we can just write some 
+> documentation warning userspace programmers to initialize the buffer.
 
