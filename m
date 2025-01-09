@@ -1,79 +1,73 @@
-Return-Path: <netdev+bounces-156832-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156831-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 761CAA07F24
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 18:45:14 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 911E8A07F17
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 18:43:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A30053A6D6C
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 17:43:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0D4FE1691F2
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 17:43:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDD291B0421;
-	Thu,  9 Jan 2025 17:42:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 509B119DF52;
+	Thu,  9 Jan 2025 17:42:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gJX8iyrc"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p7qV75z4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7AA01B0412
-	for <netdev@vger.kernel.org>; Thu,  9 Jan 2025 17:42:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1491F192D7E;
+	Thu,  9 Jan 2025 17:42:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736444567; cv=none; b=BHTZJQwjNvmiZy5R5V7eHtsUekar2JW6c+OblWWavqoQPYJF8pi47B2Qw64PlPx1HiuFLDxTCmCb20AUcCG7TIF6dopxWhyKVkyUTGg+Uqv6oIk1bK8M2EQJ/KYgGoJbcmJtLKPwEoHr6au9I6ifiDY2RX0OYiXjYdJMG6lOj/k=
+	t=1736444563; cv=none; b=ru29GR42VRQTzOE5v3mLbOoSKrJVM76zexm/AglEvs9GPELxa8vP7fnR4EQ3jn0ikZdwAgXvJ1Er/GdPirqgPT+IVLDmp3znwrudSlk8pOtuAykEAg/lNhx2kLmZq3bO0cEVKostu43o34JuLJs4G6ERUCJwcvFB1JZ+q5Xw6XQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736444567; c=relaxed/simple;
-	bh=TPi1jWgepqP30sAUxR/sHKQYrWqP6iP8Nn9Nr2Bpx28=;
+	s=arc-20240116; t=1736444563; c=relaxed/simple;
+	bh=EijKJl28wp+gcuB4mOs6c/TVvHLtx/iw+sxnVMthWYE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ozXqZs9O2thKSspUAKGdY8GQI12K0Bf0Fc6fekWFh52CUPQQMAeRG5hWdiGzRsduHsbo3YJCaoATgt8LaQCXzdEjHbhwWeHxRHQE+gMYur9U+e+sgX9S5jem6P47Ihfjnfb9fgCp68wgatawUnGZ4Q84m6TQGJjyzaQ+iXlvC5M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gJX8iyrc; arc=none smtp.client-ip=198.175.65.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1736444566; x=1767980566;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=TPi1jWgepqP30sAUxR/sHKQYrWqP6iP8Nn9Nr2Bpx28=;
-  b=gJX8iyrc9Bm4vCi7HPQTviMMNLEnHi4NZeQP3nzkYOqLZwXp8+S7QL74
-   PltALxFpgJ6ArIBVzo7xRZqAPkTgw4ScNV0BiR3BTnSy3oBmoagNLC+0d
-   1s25QkhScC2jWWJRO5mvAAhA6hn/FbHRZ7qJnVSAFCtdVAhAol75c2m9s
-   WdIUwk5Bw/Cxhh7MTkbD0rngskwNOttH0qzhGVSNqTn1YhkdmPgV4SQFq
-   8CXXREoO9BZ4movPtjHkWIqKrw49VSjQvj9xaB69BFV6JFNCgntrS7lgv
-   +MBGb2RIMidhbncTAhr04uWXxWOwh03KgayMzKOgiCsnjiL6jAKvrZ1Zb
-   g==;
-X-CSE-ConnectionGUID: L5St/X5xSoaQqWLdJ0keVg==
-X-CSE-MsgGUID: 4wNWUMPlTzamXucxb0LBmw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11310"; a="36602364"
-X-IronPort-AV: E=Sophos;i="6.12,302,1728975600"; 
-   d="scan'208";a="36602364"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jan 2025 09:42:45 -0800
-X-CSE-ConnectionGUID: weaQC6DFSMajJlFHvc8ucg==
-X-CSE-MsgGUID: 9lzX1tdbTlKV9fM1+9bZIQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="126759246"
-Received: from lkp-server01.sh.intel.com (HELO d63d4d77d921) ([10.239.97.150])
-  by fmviesa002.fm.intel.com with ESMTP; 09 Jan 2025 09:42:43 -0800
-Received: from kbuild by d63d4d77d921 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1tVwYL-000HwV-10;
-	Thu, 09 Jan 2025 17:42:41 +0000
-Date: Fri, 10 Jan 2025 01:42:01 +0800
-From: kernel test robot <lkp@intel.com>
-To: Eric Dumazet <edumazet@google.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	Simon Horman <horms@kernel.org>, eric.dumazet@gmail.com,
-	Eric Dumazet <edumazet@google.com>
-Subject: Re: [PATCH net-next 3/4] net: expedite synchronize_net() for
- cleanup_net()
-Message-ID: <202501100127.LhRwhYMs-lkp@intel.com>
-References: <20250107173838.1130187-4-edumazet@google.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=uUSUOFJeoo1vCSgon1yjWfBZ8qlMsubpJKKHcP/0fDN23awdwgc1GE9tqam5y0Ya+kTq1azQMCE7DP+miRW6IAghnMwIe6SMe6aA36U/Mze0IWDQ9MeikS8es1tDjZYh2Uj5iRvbCG0EjY7qxE5zFiAczzwZhSB5VsHdgYALRho=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=p7qV75z4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E7544C4CED2;
+	Thu,  9 Jan 2025 17:42:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1736444561;
+	bh=EijKJl28wp+gcuB4mOs6c/TVvHLtx/iw+sxnVMthWYE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=p7qV75z4FmBSLJbt39+WewUqPOjCeSu1TiqeR1vuQkGR/v/WEhXbohOlZi0J+cNg6
+	 EYZtY1F9KLKvJfwJtHMO0ly3KoBUnd6Yx0UxjqPCCkuuU0GcqPM2pOxcrpOqts8nVl
+	 3oBUhaXCkkdMsevFFbau9KMsobHOlKvyKbG2dO89xQ4HEZ+69koBU+V1BUF3BC9YyB
+	 Q6G2KRzajkCcw7rzt9BZLP9jPvwOuonRLKt5grRbl+8fBYT19skPaRWWdkSzzxxngt
+	 pPUT9KinyWtt1hMxSE+5M9d/2iC3OTsea25obE9autsUMHykBLcZkLdMz3ZduwJaG9
+	 0BSS/fh5yCDbQ==
+Date: Thu, 9 Jan 2025 17:42:34 +0000
+From: Simon Horman <horms@kernel.org>
+To: Luo Jie <quic_luoj@quicinc.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Lei Wei <quic_leiwei@quicinc.com>,
+	Suruchi Agarwal <quic_suruchia@quicinc.com>,
+	Pavithra R <quic_pavir@quicinc.com>,
+	Jonathan Corbet <corbet@lwn.net>, Kees Cook <kees@kernel.org>,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	Philipp Zabel <p.zabel@pengutronix.de>,
+	linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-hardening@vger.kernel.org,
+	quic_kkumarcs@quicinc.com, quic_linchen@quicinc.com,
+	srinivas.kandagatla@linaro.org, bartosz.golaszewski@linaro.org,
+	john@phrozen.org
+Subject: Re: [PATCH net-next v2 06/14] net: ethernet: qualcomm: Initialize
+ the PPE scheduler settings
+Message-ID: <20250109174234.GO7706@kernel.org>
+References: <20250108-qcom_ipq_ppe-v2-0-7394dbda7199@quicinc.com>
+ <20250108-qcom_ipq_ppe-v2-6-7394dbda7199@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,40 +76,58 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250107173838.1130187-4-edumazet@google.com>
+In-Reply-To: <20250108-qcom_ipq_ppe-v2-6-7394dbda7199@quicinc.com>
 
-Hi Eric,
+On Wed, Jan 08, 2025 at 09:47:13PM +0800, Luo Jie wrote:
+> The PPE scheduler settings determine the priority of scheduling the
+> packet across the different hardware queues per PPE port.
+> 
+> Signed-off-by: Luo Jie <quic_luoj@quicinc.com>
+> ---
+>  drivers/net/ethernet/qualcomm/ppe/ppe_config.c | 789 ++++++++++++++++++++++++-
+>  drivers/net/ethernet/qualcomm/ppe/ppe_config.h |  37 ++
+>  drivers/net/ethernet/qualcomm/ppe/ppe_regs.h   |  97 +++
+>  3 files changed, 922 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/qualcomm/ppe/ppe_config.c b/drivers/net/ethernet/qualcomm/ppe/ppe_config.c
 
-kernel test robot noticed the following build errors:
+...
 
-[auto build test ERROR on net-next/main]
+> +/**
+> + * ppe_queue_scheduler_set - Configure scheduler for PPE hardware queue
+> + * @ppe_dev: PPE device
+> + * @node_id: PPE queue ID or flow ID
+> + * @flow_level: Flow level scheduler or queue level scheduler
+> + * @port: PPE port ID set scheduler configuration
+> + * @scheduler_cfg: PPE scheduler configuration
+> + *
+> + * PPE scheduler configuration supports queue level and flow level on
+> + * the PPE egress port.
+> + *
+> + * Return 0 on success, negative error code on failure.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Eric-Dumazet/net-no-longer-assume-RTNL-is-held-in-flush_all_backlogs/20250108-014049
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20250107173838.1130187-4-edumazet%40google.com
-patch subject: [PATCH net-next 3/4] net: expedite synchronize_net() for cleanup_net()
-config: mips-bmips_be_defconfig (https://download.01.org/0day-ci/archive/20250110/202501100127.LhRwhYMs-lkp@intel.com/config)
-compiler: mips-linux-gcc (GCC) 14.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250110/202501100127.LhRwhYMs-lkp@intel.com/reproduce)
+Nit: The tooling would prefer this last line formatted as;
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202501100127.LhRwhYMs-lkp@intel.com/
+    * Return: ...
 
-All errors (new ones prefixed by >>):
+or
 
-   mips-linux-ld: net/core/dev.o: in function `synchronize_net':
-   dev.c:(.text+0x2250): undefined reference to `cleanup_net_task'
->> mips-linux-ld: dev.c:(.text+0x225c): undefined reference to `cleanup_net_task'
-   mips-linux-ld: net/core/dev.o: in function `free_netdev':
-   dev.c:(.text+0x5824): undefined reference to `cleanup_net_task'
-   mips-linux-ld: net/core/dev.o: in function `netdev_rx_handler_unregister':
-   dev.c:(.text+0x6204): undefined reference to `cleanup_net_task'
-   mips-linux-ld: dev.c:(.text+0x620c): undefined reference to `cleanup_net_task'
-   mips-linux-ld: net/core/dev.o:dev.c:(.text+0x6764): more undefined references to `cleanup_net_task' follow
+    * Returns: ...
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Flagged by ./scripts/kernel-doc -none -Wall
+
+> + */
+> +int ppe_queue_scheduler_set(struct ppe_device *ppe_dev,
+> +			    int node_id, bool flow_level, int port,
+> +			    struct ppe_scheduler_cfg scheduler_cfg)
+> +{
+> +	if (flow_level)
+> +		return ppe_scheduler_l1_queue_map_set(ppe_dev, node_id,
+> +						      port, scheduler_cfg);
+> +
+> +	return ppe_scheduler_l0_queue_map_set(ppe_dev, node_id,
+> +					      port, scheduler_cfg);
+> +}
+
+...
 
