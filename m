@@ -1,223 +1,220 @@
-Return-Path: <netdev+bounces-156565-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156566-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 677F6A07021
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 09:33:34 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 029A4A0702C
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 09:37:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3C6237A195B
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 08:33:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 891B11889C79
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 08:37:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E75B9214218;
-	Thu,  9 Jan 2025 08:33:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A191421504D;
+	Thu,  9 Jan 2025 08:37:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ag+LV3Z4"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Xe666t05"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D76081FDA
-	for <netdev@vger.kernel.org>; Thu,  9 Jan 2025 08:33:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1270B1FDA;
+	Thu,  9 Jan 2025 08:37:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736411607; cv=none; b=cQIbt+cBRu7KJpUnV/QdJhevpFGEDcRBiL5wpfh8J7hMCwv7IuW0DbNoUVnODZapSK0qmvRltZ7o6RzHs50yt66AkAitCJJGL6pHgbZt0BBgLfLNtF2WbD9NDjz55uCDtpUd5PnCiWHv4ITv0gaW0po3jouRoUPZNoOaRGsXS8g=
+	t=1736411857; cv=none; b=apZ6igRHVD3MhNh2ekC7cqajWG+fI5vDAfMF8Uf7J37TPadJTq56LBG4o3JLaiXOhxB1ruWfd/tiC1iGK8gmNr7jWafMuCp8jBAWbBqpkfmTPXhY/V1L+h23R3xFLu9CLRkXdFGmKup6UiN84OH/rLyQaBLIl76iCvrfamRS8Ww=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736411607; c=relaxed/simple;
-	bh=gNHm1ZRWd6QZ3EhHhcH7DAjavJAkn9sWeqtF5IZenuA=;
+	s=arc-20240116; t=1736411857; c=relaxed/simple;
+	bh=0dr0+T7QZnjroGZ5z0KHvZ0v75x3dfYB7mTK1iBfr+s=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NXPMVRvgh8VTKpnm+juUlDCM58UZ73JEsRn66yiX/Ggu4et4WBU84c0e4ruspuPwYItWdroqmk5gjPFJEYfel8tCYY9aVoxrtM7mKcLb6NkCAP+6TFS2LDX7xm9eJPnHU9+uzq4QQ3R78yrPUHoZPGNJs4T8x5IQsIKbeMZAUSI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ag+LV3Z4; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1736411604;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=uqRP5f1dFunit71HPNsUwkwx3/dTBxrPG9UiLsklLDM=;
-	b=Ag+LV3Z4XvTqxdr/ll5Mlg7+mduAwho2uEdHr60Mjo9Q9YX0cAvVrpgb4jns/sifBeKJe4
-	cE8y1AhwBUVsWZzMcMq/ap62zPNRVNTM3m3vWIerAdxK5SQTImwmMNHFkqrJgoTh2wADnq
-	QPFhJInm4DQFO+5VwQx6CvNiQwUbWpM=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-18-XHzw3ZmyPOWTLEMwuUiS-w-1; Thu, 09 Jan 2025 03:33:23 -0500
-X-MC-Unique: XHzw3ZmyPOWTLEMwuUiS-w-1
-X-Mimecast-MFC-AGG-ID: XHzw3ZmyPOWTLEMwuUiS-w
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-4359206e1e4so5265775e9.2
-        for <netdev@vger.kernel.org>; Thu, 09 Jan 2025 00:33:23 -0800 (PST)
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZNunWmFM2BHWzumYrirV6AKQUavKPzMILctlQ9iPZyFDNGXRz299pBrBuLks4hLTZ3UlDTx/Q8WVXaubnFM4memRPd2tqUhfFdSYWjEh5IKE7wr7FqUdfWJCBhFaFTcJyJJs+66ABdkleKvxcx2uuUV8QIMMOrLzZvGFpnvUXdg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Xe666t05; arc=none smtp.client-ip=209.85.214.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-21619108a6bso9301945ad.3;
+        Thu, 09 Jan 2025 00:37:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1736411855; x=1737016655; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=84B0RNeNpnyJnx6ts+MMJFqcCSs0cCqPqFLFhHuue/k=;
+        b=Xe666t05jo1JYiKlY1dwPx6LTek+JAba/qAtToB+vja/myAIZSMy4cdyPiv3dI0pMI
+         mGDpT7BMez/MiLepFL4Fe+qrRVQJgRsy/I5jlJ9k6eAHJF7mxr/DHp/lS2rwSYKNIeG1
+         t32kYTBRQwweSI2XzTpBmrXOAWqfLWJJ7GZsHKp2Roc9ULC9NzQ75TySDIjWK21XjoZ8
+         3817qRfFwWruuB3TXumk7atXufEE6YP+eA94lwUzuChn+1h7mlxKMnPMBmilg/oi+Obd
+         Cnax2ixOv22NpGih080AsCTBWFyp4CDC4vj/uvlqsxPbcPF36IjLpAksETD+L0tVUO/Y
+         34bw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736411602; x=1737016402;
+        d=1e100.net; s=20230601; t=1736411855; x=1737016655;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=uqRP5f1dFunit71HPNsUwkwx3/dTBxrPG9UiLsklLDM=;
-        b=mvI5CvSKplSVmP2sSHsGZKdDC/Vl/ptI58BW5Ug1614N2Us+1StjZsHHf+urZBadF6
-         n/fC939oZt23JEvRObN3qfGesIfSGcaKMYa77aKKqTvIbs4tjFwmxeGlh1ygDpAMDruQ
-         93BXrdzRP15R0MCwG43xvPdXZjRZqR7nuiMrHWuyvKcfTe19GgEpr012UvHrjPmljtlq
-         44DWgF5AQdQnvjXDDN4B+GYoLebBO3Fssv/N8wjfcvOQlMrnVIUc8B3FS8REcFVatv7Z
-         DjMI4IAkPL81ZQ1DRrKvwfKVVuoilRZj4g3phuOolAhU1+Ryp/egM9Is7nUDRgbjkd7L
-         SyFg==
-X-Forwarded-Encrypted: i=1; AJvYcCVNgkEPP666PnWjAQlrhmF4wa3++x4hamTo30sAxrkHgpR7m/kzUASsUt29kDh2klwp58sEVow=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxZAqijsxPuIvkpAU6Vo09xTROmJ5ZY6BKNI+NRrZR/qcmwlm+I
-	lc5VtM4qJx0tZ+dn+OMcINv1AQdalHBa0hLyCpehOlDBLT27eG2ACFLwsI5v0nWGBnMqHwY5XIf
-	S3BbAuWaVGuwSreY1clbU+oT3Uo8upxogeLIgg7UQmyEB06oZgVt1Vw==
-X-Gm-Gg: ASbGncsjoH9w9r1VinQxaExi6y4DKNZ9kJB4aTCyaHlTZyGkdcZCT5E1i8gy8pJBB4I
-	CiWQvTkmcJX9k59r692V8ziNV0FTySyaJt8aduLH5BGj+le7pZRVh6ZdUdb+uf3f28XlbwzJmEN
-	eCfzvCWvwILRsdMV4DYyjlHvi5AlAoMMQWU2krYeJSTFf8dHTMlLI/R5MK8TJ046ZpFLuxSZjtE
-	ZsObTy0USnFNXUYxGI4hSMkQRuyqhhYcs5AOtI0S6On5+96ndPFUbodXt4=
-X-Received: by 2002:a5d:6d02:0:b0:38a:50f7:24fa with SMTP id ffacd0b85a97d-38a87357a07mr5310618f8f.54.1736411602086;
-        Thu, 09 Jan 2025 00:33:22 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEk1MDrg8tu6jB97ExyCN1fqiiCxS8wPYxwQC29oBrKPhm516/evymAwLslSjLurHxQbye5HA==
-X-Received: by 2002:a5d:6d02:0:b0:38a:50f7:24fa with SMTP id ffacd0b85a97d-38a87357a07mr5310558f8f.54.1736411601434;
-        Thu, 09 Jan 2025 00:33:21 -0800 (PST)
-Received: from sgarzare-redhat ([5.77.115.218])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38a8e38332asm1136441f8f.23.2025.01.09.00.33.19
+        bh=84B0RNeNpnyJnx6ts+MMJFqcCSs0cCqPqFLFhHuue/k=;
+        b=oYZxhIDRKJcEquZDzzOV+OQu7cRMVRGkkVyxPAK5Jpf+nOVok4zTEZmN7qzSoB5xEB
+         k9qLQm7G5TxsH1mf10cIfmfkfhnQVKA/J8099XB4Kx7iYuTZrOvxcsQAqzodNCiqgsdN
+         lCkJ3GrDK5dwUC9KNlYVdqmy9R9GJq0OpMrpLIK0Yd7SvNkKk2oH3MSgejyhCRNreAMB
+         DojD1DDVfwxNHa6gf6ywOYXMHIcq9PmJGHCgL1YV4r0uEsNAKDRtMT7kBFMfSYveqvT4
+         rCaAUUOit5enzdKaJ/JFgVzReiKqcEygIla8Hqvx6EsdVh0kqW+gSh80sr2dQIJUUbho
+         tHcw==
+X-Forwarded-Encrypted: i=1; AJvYcCVA9A3YfehQj/lsIgQsztqdHAbIioEoj0/wUigQ6GG3vR46kVa4JQSRD0nP7J7E7Kuz+Xg6JO/Vpqp6+mE=@vger.kernel.org, AJvYcCVOalJdzPHSp22tX5WRq9YichY58+0zlQwbXgfWgg2QPV86tEREmolAmKM4wG03nVHqvZkZTcia2AbeEQN1ipny@vger.kernel.org, AJvYcCWwUer4KUjikYglEgX+Q3bPZqwCUKd9CSBqV/JHSLASt9WcCMI0v9kyrCr6Eof871D7ZicdpqNK@vger.kernel.org
+X-Gm-Message-State: AOJu0YzFT7mosZAnz8kh3Gh8t03WKUM8EUzeh+FO7iIpBid+vayxftQ8
+	wOmc++3jqbOWOMDLQWXpjOiTOtnvkoiJmTIHIIMxXF+IVJP/yFTX
+X-Gm-Gg: ASbGnctv2bTAvsQRv4zLQqot7o3kUpRPiorths8o7yIZzWeP1w/cURLtwttcSr2iHRj
+	B33ENoyChTrsTWq7Vf9NH27VAFl9NxnuZBNSqosR5BkssomlCr7qx52ye+5j8kjnhn+ZtYu2NYU
+	R8wUkDnoMJl/VQnw7uFj+Y+GLNksB0T6orfxI0jVoYMx4anUhkBNvtMnAb1Kzyx1VPMK85BqIpE
+	h1xe4q/v2wzhvHcF4i3/m2gi1kdgEN5Tf3FGLlapmtthVQxrbOlZtRRBSAnVg==
+X-Google-Smtp-Source: AGHT+IFzA+T9PPh8OZiq7E8qPdc4YQXZGmueGDWAwk/vJWf3An6eZSWFs/dZFc49o2hNl2yJSwq6Ow==
+X-Received: by 2002:a17:902:d2c6:b0:216:2426:767f with SMTP id d9443c01a7336-21a83ffc1f1mr82521675ad.49.1736411853826;
+        Thu, 09 Jan 2025 00:37:33 -0800 (PST)
+Received: from fedora ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-219dc9f4f5esm339802285ad.178.2025.01.09.00.37.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Jan 2025 00:33:20 -0800 (PST)
-Date: Thu, 9 Jan 2025 09:33:14 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: syzbot <syzbot+3affdbfc986ecd9200fd@syzkaller.appspotmail.com>
-Cc: cong.wang@bytedance.com, davem@davemloft.net, edumazet@google.com, 
-	horms@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org, mst@redhat.com, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com, 
-	virtualization@lists.linux.dev
-Subject: Re: [syzbot] [virt?] [net?] general protection fault in
- vsock_connectible_has_data
-Message-ID: <a4n77w3u22efhdnyz5xn5gjvsfq7xncy3lyn32xqobnuw6gb27@kxubdyn4hr2q>
-References: <677f84a8.050a0220.25a300.01b3.GAE@google.com>
+        Thu, 09 Jan 2025 00:37:33 -0800 (PST)
+Date: Thu, 9 Jan 2025 08:37:25 +0000
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Jianbo Liu <jianbol@nvidia.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+	Jay Vosburgh <jv@jvosburgh.net>,
+	Andy Gospodarek <andy@greyhouse.net>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Simon Horman <horms@kernel.org>, Tariq Toukan <tariqt@nvidia.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>, Shuah Khan <shuah@kernel.org>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Sabrina Dubroca <sd@queasysnail.net>,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net 0/2] bond: fix xfrm offload feature during init
+Message-ID: <Z3-KxbofkhOrWin7@fedora>
+References: <20241212062734.182a0164@kernel.org>
+ <Z1vfsAyuxcohT7th@fedora>
+ <20241213193127.4c31ef80@kernel.org>
+ <Z3X9pfu12GUOBUY6@fedora>
+ <1d8c901f-e292-43e4-970f-8440b26e92b0@nvidia.com>
+ <Z3u0q5HSOshLn2V0@fedora>
+ <Z33nEKg4PxwReUu_@fedora>
+ <ad289f9a-41c3-4544-8aeb-535615f45aef@nvidia.com>
+ <Z34l6hpbzPP9n65Y@fedora>
+ <e01bae5f-30b5-4ec4-8c4b-5c133dd4552a@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <677f84a8.050a0220.25a300.01b3.GAE@google.com>
+In-Reply-To: <e01bae5f-30b5-4ec4-8c4b-5c133dd4552a@nvidia.com>
 
-On Thu, Jan 09, 2025 at 12:11:20AM -0800, syzbot wrote:
->Hello,
->
->syzbot found the following issue on:
->
->HEAD commit:    8ce4f287524c net: libwx: fix firmware mailbox abnormal ret..
->git tree:       net
->console+strace: https://syzkaller.appspot.com/x/log.txt?x=13f06edf980000
->kernel config:  https://syzkaller.appspot.com/x/.config?x=1c541fa8af5c9cc7
->dashboard link: https://syzkaller.appspot.com/bug?extid=3affdbfc986ecd9200fd
->compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
->syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=15695418580000
->C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=124c56f8580000
->
->Downloadable assets:
->disk image: https://storage.googleapis.com/syzbot-assets/e09bf4b8939b/disk-8ce4f287.raw.xz
->vmlinux: https://storage.googleapis.com/syzbot-assets/f7f7846f83db/vmlinux-8ce4f287.xz
->kernel image: https://storage.googleapis.com/syzbot-assets/44540dea47ac/bzImage-8ce4f287.xz
->
->The issue was bisected to:
->
->commit 69139d2919dd4aa9a553c8245e7c63e82613e3fc
->Author: Cong Wang <cong.wang@bytedance.com>
->Date:   Mon Aug 12 02:21:53 2024 +0000
->
->    vsock: fix recursive ->recvmsg calls
->
->bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=116bc4b0580000
->final oops:     https://syzkaller.appspot.com/x/report.txt?x=136bc4b0580000
->console output: https://syzkaller.appspot.com/x/log.txt?x=156bc4b0580000
->
->IMPORTANT: if you fix the issue, please add the following tag to the commit:
->Reported-by: syzbot+3affdbfc986ecd9200fd@syzkaller.appspotmail.com
->Fixes: 69139d2919dd ("vsock: fix recursive ->recvmsg calls")
->
->Oops: general protection fault, probably for non-canonical address 0xdffffc0000000014: 0000 [#1] PREEMPT SMP KASAN PTI
->KASAN: null-ptr-deref in range [0x00000000000000a0-0x00000000000000a7]
->CPU: 1 UID: 0 PID: 5828 Comm: syz-executor976 Not tainted 6.13.0-rc5-syzkaller-00142-g8ce4f287524c #0
->Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
->RIP: 0010:vsock_connectible_has_data+0x85/0x100 net/vmw_vsock/af_vsock.c:882
->Code: 80 3c 38 00 74 08 48 89 df e8 e7 e0 5f f6 48 8b 1b 66 83 fd 05 75 3a e8 d9 78 f9 f5 48 81 c3 a0 00 00 00 48 89 d8 48 c1 e8 03 <42> 80 3c 38 00 74 08 48 89 df e8 bc e0 5f f6 4c 8b 1b 4c 89 f7 41
->RSP: 0018:ffffc900015976f8 EFLAGS: 00010206
->RAX: 0000000000000014 RBX: 00000000000000a0 RCX: ffff888033e09e00
->RDX: 0000000000000000 RSI: 0000000000000005 RDI: 0000000000000005
->RBP: 0000000000000005 R08: ffffffff8ba5fadc R09: 1ffffffff285492b
->R10: dffffc0000000000 R11: fffffbfff285492c R12: 0000000000002000
->R13: dffffc0000000000 R14: ffff888033e18000 R15: dffffc0000000000
->FS:  00005555565ca380(0000) GS:ffff8880b8700000(0000) knlGS:0000000000000000
->CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
->CR2: 00000000200061c8 CR3: 0000000074f74000 CR4: 00000000003526f0
->DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
->DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
->Call Trace:
-> <TASK>
-> vsock_has_data net/vmw_vsock/vsock_bpf.c:30 [inline]
-> vsock_bpf_recvmsg+0x4b5/0x10a0 net/vmw_vsock/vsock_bpf.c:87
-> sock_recvmsg_nosec net/socket.c:1033 [inline]
-> sock_recvmsg+0x22f/0x280 net/socket.c:1055
-> ____sys_recvmsg+0x1c6/0x480 net/socket.c:2803
-> ___sys_recvmsg net/socket.c:2845 [inline]
-> do_recvmmsg+0x426/0xab0 net/socket.c:2940
-> __sys_recvmmsg net/socket.c:3014 [inline]
-> __do_sys_recvmmsg net/socket.c:3037 [inline]
-> __se_sys_recvmmsg net/socket.c:3030 [inline]
-> __x64_sys_recvmmsg+0x199/0x250 net/socket.c:3030
-> do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-> do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
-> entry_SYSCALL_64_after_hwframe+0x77/0x7f
->RIP: 0033:0x7fb38b2465e9
->Code: 48 83 c4 28 c3 e8 37 17 00 00 0f 1f 80 00 00 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
->RSP: 002b:00007fffd43f6938 EFLAGS: 00000246 ORIG_RAX: 000000000000012b
->RAX: ffffffffffffffda RBX: 00007fffd43f6b08 RCX: 00007fb38b2465e9
->RDX: 0000000000000001 RSI: 00000000200061c0 RDI: 0000000000000003
->RBP: 00007fb38b2b9610 R08: 0000000000000000 R09: 00007fffd43f6b08
->R10: 0000000000002000 R11: 0000000000000246 R12: 0000000000000001
->R13: 00007fffd43f6af8 R14: 0000000000000001 R15: 0000000000000001
-> </TASK>
->Modules linked in:
->---[ end trace 0000000000000000 ]---
->RIP: 0010:vsock_connectible_has_data+0x85/0x100 net/vmw_vsock/af_vsock.c:882
->Code: 80 3c 38 00 74 08 48 89 df e8 e7 e0 5f f6 48 8b 1b 66 83 fd 05 75 3a e8 d9 78 f9 f5 48 81 c3 a0 00 00 00 48 89 d8 48 c1 e8 03 <42> 80 3c 38 00 74 08 48 89 df e8 bc e0 5f f6 4c 8b 1b 4c 89 f7 41
->RSP: 0018:ffffc900015976f8 EFLAGS: 00010206
->RAX: 0000000000000014 RBX: 00000000000000a0 RCX: ffff888033e09e00
->RDX: 0000000000000000 RSI: 0000000000000005 RDI: 0000000000000005
->RBP: 0000000000000005 R08: ffffffff8ba5fadc R09: 1ffffffff285492b
->R10: dffffc0000000000 R11: fffffbfff285492c R12: 0000000000002000
->R13: dffffc0000000000 R14: ffff888033e18000 R15: dffffc0000000000
->FS:  00005555565ca380(0000) GS:ffff8880b8600000(0000) knlGS:0000000000000000
->CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
->CR2: 000000000066c7e0 CR3: 0000000074f74000 CR4: 00000000003526f0
->DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
->DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
->----------------
->Code disassembly (best guess):
->   0:	80 3c 38 00          	cmpb   $0x0,(%rax,%rdi,1)
->   4:	74 08                	je     0xe
->   6:	48 89 df             	mov    %rbx,%rdi
->   9:	e8 e7 e0 5f f6       	call   0xf65fe0f5
->   e:	48 8b 1b             	mov    (%rbx),%rbx
->  11:	66 83 fd 05          	cmp    $0x5,%bp
->  15:	75 3a                	jne    0x51
->  17:	e8 d9 78 f9 f5       	call   0xf5f978f5
->  1c:	48 81 c3 a0 00 00 00 	add    $0xa0,%rbx
->  23:	48 89 d8             	mov    %rbx,%rax
->  26:	48 c1 e8 03          	shr    $0x3,%rax
->* 2a:	42 80 3c 38 00       	cmpb   $0x0,(%rax,%r15,1) <-- trapping instruction
->  2f:	74 08                	je     0x39
->  31:	48 89 df             	mov    %rbx,%rdi
->  34:	e8 bc e0 5f f6       	call   0xf65fe0f5
->  39:	4c 8b 1b             	mov    (%rbx),%r11
->  3c:	4c 89 f7             	mov    %r14,%rdi
->  3f:	41                   	rex.B
->
->
+On Thu, Jan 09, 2025 at 09:26:38AM +0800, Jianbo Liu wrote:
+> 
+> 
+> On 1/8/2025 3:14 PM, Hangbin Liu wrote:
+> > On Wed, Jan 08, 2025 at 11:40:05AM +0800, Jianbo Liu wrote:
+> > > 
+> > > 
+> > > On 1/8/2025 10:46 AM, Hangbin Liu wrote:
+> > > > On Mon, Jan 06, 2025 at 10:47:16AM +0000, Hangbin Liu wrote:
+> > > > > On Thu, Jan 02, 2025 at 11:33:34AM +0800, Jianbo Liu wrote:
+> > > > > > > > Re-locking doesn't look great, glancing at the code I don't see any
+> > > > > > > > obvious better workarounds. Easiest fix would be to don't let the
+> > > > > > > > drivers sleep in the callbacks and then we can go back to a spin lock.
+> > > > > > > > Maybe nvidia people have better ideas, I'm not familiar with this
+> > > > > > > > offload.
+> > > > > > > 
+> > > > > > > I don't know how to disable bonding sleeping since we use mutex_lock now.
+> > > > > > > Hi Jianbo, do you have any idea?
+> > > > > > > 
+> > > > > > 
+> > > > > > I think we should allow drivers to sleep in the callbacks. So, maybe it's
+> > > > > > better to move driver's xdo_dev_state_delete out of state's spin lock.
+> > > > > 
+> > > > > I just check the code, xfrm_dev_state_delete() and later
+> > > > > dev->xfrmdev_ops->xdo_dev_state_delete(x) have too many xfrm_state x
+> > > > > checks. Can we really move it out of spin lock from xfrm_state_delete()
+> > > > 
+> > > > I tried to move the mutex lock code to a work queue, but found we need to
+> > > > check (ipsec->xs == xs) in bonding. So we still need xfrm_state x during bond
+> > > 
+> > > Maybe I miss something, but why need to hold spin lock. You can keep xfrm
+> > > state by its refcnt.
+> > 
+> > Do you mean move the xfrm_dev_state_delete() out of spin lock directly like:
+> > 
+> 
+> Yes. Not feasible?
+> 
+> > diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
+> > index 67ca7ac955a3..6881ddeb4360 100644
+> > --- a/net/xfrm/xfrm_state.c
+> > +++ b/net/xfrm/xfrm_state.c
+> > @@ -766,13 +766,6 @@ int __xfrm_state_delete(struct xfrm_state *x)
+> >   		if (x->encap_sk)
+> >   			sock_put(rcu_dereference_raw(x->encap_sk));
+> > -		xfrm_dev_state_delete(x);
+> > -
+> > -		/* All xfrm_state objects are created by xfrm_state_alloc.
+> > -		 * The xfrm_state_alloc call gives a reference, and that
+> > -		 * is what we are dropping here.
+> > -		 */
+> > -		xfrm_state_put(x);
+> >   		err = 0;
+> >   	}
+> > @@ -787,8 +780,20 @@ int xfrm_state_delete(struct xfrm_state *x)
+> >   	spin_lock_bh(&x->lock);
+> >   	err = __xfrm_state_delete(x);
+> >   	spin_unlock_bh(&x->lock);
+> > +	if (err)
+> > +		return err;
+> > -	return err;
+> > +	if (x->km.state == XFRM_STATE_DEAD) {
+> > +		xfrm_dev_state_delete(x);
+> > +
+> > +		/* All xfrm_state objects are created by xfrm_state_alloc.
+> > +		 * The xfrm_state_alloc call gives a reference, and that
+> > +		 * is what we are dropping here.
+> > +		 */
+> > +		xfrm_state_put(x);
+> > +	}
+> > +
+> > +	return 0;
+> >   }
+> >   EXPORT_SYMBOL(xfrm_state_delete);
+> > 
+> > Then why we need the spin lock in xfrm_state_delete?
+> > 
+> 
+> No, we don't need. But I am trying to understand what you said in your last
+> email about adding a new lock, or unlocking spin lock in
 
-This looks related to the same issue fixed by the patch I sent
-yesterday: https://lore.kernel.org/netdev/20250108180617.154053-3-sgarzare@redhat.com/
+I *thought* we need the spin lock in xfrm_state_delete(). So to protect xfrm_state,
+we need a new lock. Although it looks redundant. e.g. 
 
-I just pushed them on my fix-vsock-null-transport brach:
+int xfrm_state_delete(struct xfrm_state *x)
+{
+        int err;
 
-#syz test: https://github.com/stefano-garzarella/linux.git fix-vsock-null-transport
+        spin_lock_bh(&x->lock);
+        err = __xfrm_state_delete(x);
+        spin_unlock_bh(&x->lock);
+        if (err)
+                return err;
 
+	another_lock(&x->other_lock)
+        if (x->km.state == XFRM_STATE_DEAD) {
+                xfrm_dev_state_delete(x);
+                xfrm_state_put(x);
+        }
+	another_unlock(&x->other_lock)
+
+        return 0;
+}
+> bond_ipsec_del_sa(). Anything I missed?
+
+The unlock spin lock in bond_ipsec_del_sa looks like
+https://lore.kernel.org/netdev/Z1vfsAyuxcohT7th@fedora/
+
+Thanks
+Hangbin
 
