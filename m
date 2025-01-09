@@ -1,85 +1,87 @@
-Return-Path: <netdev+bounces-156736-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156737-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95B32A07BA6
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 16:19:34 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D9FCBA07BCA
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 16:23:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2B7D716B257
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 15:19:18 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 354947A50B4
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 15:19:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1E5F21C19F;
-	Thu,  9 Jan 2025 15:16:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5D7021D003;
+	Thu,  9 Jan 2025 15:16:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="nYLMZl3K"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="PUAn1K1c"
 X-Original-To: netdev@vger.kernel.org
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09DE921C167
-	for <netdev@vger.kernel.org>; Thu,  9 Jan 2025 15:16:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EC9321CA1D
+	for <netdev@vger.kernel.org>; Thu,  9 Jan 2025 15:16:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736435774; cv=none; b=GsZgNP9KUnYWFhqqXz3LP7DgEaB7qi4mK+CD/6b0Ms97gqb+JYnMc+nus7FT/rQQxnNkWpfFIXkX16jWwjp/0bQp0Cn/7K8RhlzNWvzpolgT/ZVAfV/HuyjRbbagg0e0G2wxZZdDGis7mYrZBRVBSDU64IS3cf5+QgGgX39tGbI=
+	t=1736435777; cv=none; b=Tx+Lut5UqlYqlGQQNPk0moxv+IFFBWB8vS1OGw6PP7WpQSn3gDxnq38E63R/IvrBRmteMAGQLasZrqTVJA8mfDjuYAy6ijxv2JCwgPAqmx5uwv2irn5r22qXNTInKuZ007YVMiNVuMeGu6PaKUqx7gN72bF6Zak4zXZpsSKDmWc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736435774; c=relaxed/simple;
-	bh=2/mH/dh+L+INYwLeVhhjKzMuzAKZOx2twcedb9u+1js=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=RRKMOvXwsl5ubKJCiu6hGIGgFC661fcp+8cYY07wgYC044aO+Ov9mkkReRhNpBP3lk8EfxrlXYspeimv6M1XHMI2R7SlgtQ5EZQoueWZFNcOPFNJNeHv0rAbUGmxnNqjKWd31sboWlYKljbL1QTCm8WN0O3P/g1Wf3xmrdunPmI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=nYLMZl3K; arc=none smtp.client-ip=78.32.30.218
+	s=arc-20240116; t=1736435777; c=relaxed/simple;
+	bh=yHXOnnT64YTp8+aF31IpDCCTYE420aZtzyIPTc5K8v8=;
+	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
+	 Content-Disposition:Content-Type:Message-Id:Date; b=leIUegAHMRP3N5bFqzypcv4kGg5crDjZ2ejc4cAahCSYa5M/RQK6UIbJzF58LdpV+IPfOQIwRFarDy6aKSFWZiAK5gEbpfF9Zto1FgB9e6XbG4xIanWtg6QvUpH9gR6YFP4tGYtj5dzXjDsvDjt5hnFhxnQ0ipac1JGt3m5Rs5Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=PUAn1K1c; arc=none smtp.client-ip=78.32.30.218
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:Content-Type:MIME-Version:
-	Message-ID:Subject:Cc:To:From:Date:Reply-To:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
-	Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=pu7iKMgFtLxoX0yqIz2R3oUnaHmPu6/03Ud8YYLEne4=; b=nYLMZl3Kke+BNNOpQ7d/djHSTH
-	Rf+A2ly5KkGFLUD1NF6skHEPqKTBL4KSq0HsjWD8Rr7SDmczQBAlYzA0sfyAQN3kNDqCI0YWOKWyr
-	x1/qi1ScIsz5dlXoJBeAB/ShUhk86wY08BRnx42MVr64sjC1Z2w9gt5REcQhxxOj8zN+biE6VOVMw
-	JBIDzOrgfF8Qq4xIbwOxL1Jo7aVyiCFgviBPJ2cL1CYd7ka6xDagYKd3yQwkkE9x8tFqvhkXpA0gY
-	SYIIQrwiZO1bjzeNB7VJ3xSSy7vsRObANsYPqmIDAIg9XUrj6Gp2VLTpx7OAljHiIo2nCnBywQt7k
-	EhPwMOpQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:40130)
+	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
+	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:References:
+	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=BEkzOP+TYKc4XOYXIthJckwH65MhpFEHyONM5gD+WwU=; b=PUAn1K1chNeJydB10OieWZJcME
+	BleSKFdpoI0ZZb2s9t2YIQINwENbElALY0JC76AzUd/Ivy/FaWKIN3+D7ccesKZYmM6G85T8nhNz1
+	iwhqI9kd47qrPA15IvYJJMlxCtF/iEVHnb1fiiQhjV27pRjar3mtq7AeIxg7j0jjbNsZM7sgyHWcp
+	3hBSJSmkOJMpCxcQbXiXEAQ1xSqjzaPZk1Vvo+YlP4OFMYpTjqOj941X7gGqiBW9BGbX9v2a9Nnu9
+	w5qDIHNwZlze8rVEetBmKR3TWBOUV157xNEcFWEnVtHdIuz15hSEjhFfY+XuPyVeW69M7Ie+3zppW
+	x356MfWA==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:36270 helo=rmk-PC.armlinux.org.uk)
 	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1tVuFk-0002Cp-0K;
-	Thu, 09 Jan 2025 15:15:20 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1tVuFb-0007PQ-1c;
-	Thu, 09 Jan 2025 15:15:11 +0000
-Date: Thu, 9 Jan 2025 15:15:11 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
+	(envelope-from <rmk@armlinux.org.uk>)
+	id 1tVuG0-0002D0-1I;
+	Thu, 09 Jan 2025 15:15:36 +0000
+Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
+	id 1tVuFh-000BXQ-D7; Thu, 09 Jan 2025 15:15:17 +0000
+In-Reply-To: <Z3_n_5BXkxQR4zEG@shell.armlinux.org.uk>
+References: <Z3_n_5BXkxQR4zEG@shell.armlinux.org.uk>
+From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>
 Cc: Alexander Couzens <lynxis@fe80.eu>,
 	Alexander Duyck <alexanderduyck@fb.com>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
 	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	=?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>,
+	"Ar__n__ __NAL" <arinc.unal@arinc9.com>,
 	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
 	Daniel Golle <daniel@makrotopia.org>,
 	Daniel Machon <daniel.machon@microchip.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	DENG Qingfang <dqfext@gmail.com>,
 	Eric Dumazet <edumazet@google.com>,
-	Eric Woudstra <ericwouds@gmail.com>,
 	Florian Fainelli <florian.fainelli@broadcom.com>,
 	Horatiu Vultur <horatiu.vultur@microchip.com>,
 	Ioana Ciornei <ioana.ciornei@nxp.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Jose Abreu <Jose.Abreu@synopsys.com>, kernel-team@meta.com,
+	Jose Abreu <Jose.Abreu@synopsys.com>,
+	kernel-team@meta.com,
 	Lars Povlsen <lars.povlsen@microchip.com>,
 	linux-arm-kernel@lists.infradead.org,
 	linux-mediatek@lists.infradead.org,
 	Madalin Bucur <madalin.bucur@nxp.com>,
 	Marcin Wojtas <marcin.s.wojtas@gmail.com>,
 	Matthias Brugger <matthias.bgg@gmail.com>,
-	Michal Simek <michal.simek@amd.com>, netdev@vger.kernel.org,
+	Michal Simek <michal.simek@amd.com>,
+	netdev@vger.kernel.org,
 	Nicolas Ferre <nicolas.ferre@microchip.com>,
 	Paolo Abeni <pabeni@redhat.com>,
 	Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
@@ -87,85 +89,80 @@ Cc: Alexander Couzens <lynxis@fe80.eu>,
 	Sean Wang <sean.wang@mediatek.com>,
 	Steen Hegelund <Steen.Hegelund@microchip.com>,
 	Taras Chornyi <taras.chornyi@plvision.eu>,
-	UNGLinuxDriver@microchip.com, Vladimir Oltean <olteanv@gmail.com>
-Subject: [PATCH net-next 0/5] net: phylink: fix PCS without autoneg
-Message-ID: <Z3_n_5BXkxQR4zEG@shell.armlinux.org.uk>
+	UNGLinuxDriver@microchip.com,
+	Vladimir Oltean <olteanv@gmail.com>,
+	Eric Woudstra <ericwouds@gmail.com>
+Subject: [PATCH net-next 1/5] net: phylink: use pcs_neg_mode in
+ phylink_mac_pcs_get_state()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Message-Id: <E1tVuFh-000BXQ-D7@rmk-PC.armlinux.org.uk>
+Sender: Russell King <rmk@armlinux.org.uk>
+Date: Thu, 09 Jan 2025 15:15:17 +0000
 
-Hi,
+As in-band AN no longer just depends on MLO_AN_INBAND + Autoneg bit,
+we need to take account of the pcs_neg_mode when deciding how to
+initialise the speed, duplex and pause state members before calling
+into the .pcs_neg_mode() method. Add this.
 
-Eric Woudstra reported that a PCS attached using 2500base-X does not
-see link when phylink is using in-band mode, but autoneg is disabled,
-despite there being a valid 2500base-X signal being received. We have
-these settings:
+Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+---
+ drivers/net/phy/phylink.c | 22 ++++++++++++++++------
+ 1 file changed, 16 insertions(+), 6 deletions(-)
 
-	act_link_an_mode = MLO_AN_INBAND
-	pcs_neg_mode = PHYLINK_PCS_NEG_INBAND_DISABLED
-
-Eric diagnosed it to phylink_decode_c37_word() setting state->link
-false because the full-duplex bit isn't set in the non-existent link
-partner advertisement word (which doesn't exist because in-band
-autoneg is disabled!)
-
-The test in phylink_mii_c22_pcs_decode_state() is supposed to catch
-this state, but since we converted PCS to use neg_mode, testing the
-Autoneg in the local advertisement is no longer sufficient - we need
-to be looking at the neg_mode, which currently isn't provided.
-
-We need to provide this via the .pcs_get_state() method, and this
-will require modifying all PCS implementations to add the extra
-argument to this method.
-
-Patch 1 uses the PCS neg_mode in phylink_mac_pcs_get_state() to correct
-the now obsolute usage of the Autoneg bit in the advertisement.
-
-Patch 2 passes neg_mode into the .pcs_get_state() method, and updates
-all users.
-
-Patch 3 adds neg_mode as an argument to the various clause 22 state
-decoder functions in phylink, modifying drivers to pass the neg_mode
-through.
-
-Patch 4 makes use of phylink_mii_c22_pcs_decode_state() rather than
-using the Autoneg bit in the advertising field.
-
-Patch 5 may be required for Eric's case - it ensures that we report
-the correct state for interface types that we support only one set
-of modes for when autoneg is disabled.
-
- drivers/net/dsa/b53/b53_serdes.c                   |  4 +-
- drivers/net/dsa/mt7530.c                           |  2 +-
- drivers/net/dsa/mv88e6xxx/pcs-6185.c               |  1 +
- drivers/net/dsa/mv88e6xxx/pcs-6352.c               |  1 +
- drivers/net/dsa/mv88e6xxx/pcs-639x.c               |  5 +-
- drivers/net/dsa/qca/qca8k-8xxx.c                   |  2 +-
- drivers/net/ethernet/cadence/macb_main.c           |  3 +-
- drivers/net/ethernet/freescale/fman/fman_dtsec.c   |  4 +-
- drivers/net/ethernet/marvell/mvneta.c              |  2 +-
- drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c    |  2 +
- .../net/ethernet/marvell/prestera/prestera_main.c  |  1 +
- drivers/net/ethernet/meta/fbnic/fbnic_phylink.c    |  2 +-
- .../net/ethernet/microchip/lan966x/lan966x_main.h  |  2 +-
- .../ethernet/microchip/lan966x/lan966x_phylink.c   |  3 +-
- .../net/ethernet/microchip/lan966x/lan966x_port.c  |  4 +-
- .../net/ethernet/microchip/sparx5/sparx5_phylink.c |  2 +-
- drivers/net/ethernet/xilinx/xilinx_axienet_main.c  |  3 +-
- drivers/net/pcs/pcs-lynx.c                         |  4 +-
- drivers/net/pcs/pcs-mtk-lynxi.c                    |  4 +-
- drivers/net/pcs/pcs-xpcs.c                         |  7 +--
- drivers/net/phy/phylink.c                          | 60 ++++++++++++++++------
- include/linux/phylink.h                            | 11 ++--
- 22 files changed, 87 insertions(+), 42 deletions(-)
-
+diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
+index 31754d5fd659..d08cdbbbbc1e 100644
+--- a/drivers/net/phy/phylink.c
++++ b/drivers/net/phy/phylink.c
+@@ -1492,12 +1492,24 @@ static int phylink_change_inband_advert(struct phylink *pl)
+ static void phylink_mac_pcs_get_state(struct phylink *pl,
+ 				      struct phylink_link_state *state)
+ {
++	struct phylink_pcs *pcs;
++	bool autoneg;
++
+ 	linkmode_copy(state->advertising, pl->link_config.advertising);
+ 	linkmode_zero(state->lp_advertising);
+ 	state->interface = pl->link_config.interface;
+ 	state->rate_matching = pl->link_config.rate_matching;
+-	if (linkmode_test_bit(ETHTOOL_LINK_MODE_Autoneg_BIT,
+-			      state->advertising)) {
++	state->an_complete = 0;
++	state->link = 1;
++
++	pcs = pl->pcs;
++	if (pcs->neg_mode)
++		autoneg = pl->pcs_neg_mode == PHYLINK_PCS_NEG_INBAND_ENABLED;
++	else
++		autoneg = linkmode_test_bit(ETHTOOL_LINK_MODE_Autoneg_BIT,
++					    state->advertising);
++
++	if (autoneg) {
+ 		state->speed = SPEED_UNKNOWN;
+ 		state->duplex = DUPLEX_UNKNOWN;
+ 		state->pause = MLO_PAUSE_NONE;
+@@ -1506,11 +1518,9 @@ static void phylink_mac_pcs_get_state(struct phylink *pl,
+ 		state->duplex = pl->link_config.duplex;
+ 		state->pause = pl->link_config.pause;
+ 	}
+-	state->an_complete = 0;
+-	state->link = 1;
+ 
+-	if (pl->pcs)
+-		pl->pcs->ops->pcs_get_state(pl->pcs, state);
++	if (pcs)
++		pcs->ops->pcs_get_state(pcs, state);
+ 	else
+ 		state->link = 0;
+ }
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.30.2
+
 
