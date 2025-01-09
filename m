@@ -1,138 +1,234 @@
-Return-Path: <netdev+bounces-156497-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156498-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 59D87A069DC
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 01:20:38 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8160FA069F5
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 01:34:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9EB603A63DF
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 00:20:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0FB071887BFD
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 00:35:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A539336D;
-	Thu,  9 Jan 2025 00:20:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="NVY7nGea"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 771DDC8C7;
+	Thu,  9 Jan 2025 00:34:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-173.mta1.migadu.com (out-173.mta1.migadu.com [95.215.58.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A50C748D
-	for <netdev@vger.kernel.org>; Thu,  9 Jan 2025 00:20:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C41F4C7D;
+	Thu,  9 Jan 2025 00:34:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736382034; cv=none; b=aIoOOnIiaT+wjjKVThWQUMo1/Valsm1B1qoGueLX/771YAN2DjjeDIwW+Pk3WqzML8R1jYxAUtv9cTNawf6wtXG+senTXjl9W1Hvwr7empo/Fcf36cF2obbX9qa8w7Th2mUq5SfLd8UHgp0sf49Oc8sN20EJWTF7ZrOGiATH7WM=
+	t=1736382882; cv=none; b=VukZc2+BM5i6Vx15mod3/PaB8fAdK2tzssHhc8yQUMScsjRZ5hNiIQDOsUK8aFonQSUReCce7uSelxnFRVc9e+QfPSbp2XHOb9Pngugo+6wE8FGnswQTjdkwZNseiwXQrUkncVbwcvEdz9xpeTnCLKE3oVbDStYNXP+8kbSleg4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736382034; c=relaxed/simple;
-	bh=M6vl0RMK+ho5HYPkE0qG/6MXqpDkopAitRRlUbB2JHk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Aq9CVF7jH0+EUVGTifKxM522WoK+tSqqd9FN8+mM2C1iYYZJaBTuan6K0e4hlar+Hw/+mw7uewBDWfevpwSbbz0qeHB9acK6CDFbSAGjZtmNpinOVpOnW+o41v6NrGbFFPb7tP2aP0b2oSypJpTW69eYzXWJfB3OhvF3QgeH0vQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=NVY7nGea; arc=none smtp.client-ip=95.215.58.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <3961c9ce-21d3-4a35-956c-5e1a6eb6031b@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1736382029;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=COsGZGkKQF0TN0B0u/zldHpm4WzP2FBRThAycZ11GDk=;
-	b=NVY7nGeaE8XaJMjQzLnJvtYht1ViHyPauG7fWnbmlONe2C44uJG/QZ9+TfOi09EbGAVLEx
-	Y1pTloiq0MBc0OrF9LF6WRO878P8K2hfATklyoMu7OS7suKveFEdCKDTp7+ng3XW6Z6bjH
-	RoIGZB02d5OWdb1vGGIg3Q80cgh72C0=
-Date: Wed, 8 Jan 2025 16:20:21 -0800
+	s=arc-20240116; t=1736382882; c=relaxed/simple;
+	bh=N7uQgpwx5Tq20EZGgLEyaaZiYgkGeHmiOXDE0pRQiDk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=MX/CxZ5HV1EK85TaddQbM/qaRItI79/8H+/Q4daZ9y0dF89fvOidFVnRJSeQ2zBOzbrKbzqeXEst1kyehi10ymIseyg7LlhsbQOJ9c5An2atXOxU15gJmR2y4e4a28mVMzoJ6ywtqrBlpR65COcAIj2UMnl6HVx+14LrQPpDd+w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.216.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-2ee709715d9so530270a91.3;
+        Wed, 08 Jan 2025 16:34:38 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736382877; x=1736987677;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=sO/Jlo3f11ieMelu59pnl/lMnd2Xx5XpvanT5x9CNZc=;
+        b=YtA7tI4YgAtNRNIpyvQLu7GqH2S/UBgEtamn/0Llk5fjEcQyz5jY9Cl3PuriNwG6Jh
+         jNTjBDPuk51h64U+ESdscn3FEdSQm5UqP44y5KBn0ciEy6xH4HC56h6F9YC/FsZAGldz
+         x268SMVKH5wl1INH9cvf8BAWg8Ixg0GKC+4d+TjHX+VAoXD3AtOK43cEQHr8zbQ/SqeF
+         m3IH0wTO4vkUH6SOIWp/j4x4MHfHQXtOWUE3GV4R7nKIMDVinHFyCtSYwa2C8CgS2jJM
+         DUpzQAlcHBrWtxSMKOLrC+9dzmVuA9GeXATIangc0XWAPAQRMMKgwblO0VBAFatzSS5M
+         MApQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX+48CysCLyEaYF6l4erzKkWRxPQULyHRjzImjxIGP3jsftkr5V/bdaRS/DDUHf3C4wxHuUPxLpfT5qGDph@vger.kernel.org, AJvYcCX+E3UwRuxBvxCVTojUVJBaxrK0mTYAsCfIp9hT7Yo2SKp1E2NV/szooJEkvgqdgPD7RIU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxR3ijfxh9Xu7x+OfPpxD4OHR+14DIA5yUakp/nnmmTao5rirHn
+	L/U7/u/ULXDT72LYPzQJDkwUrp/wh4cnAGmDbufAN/Pu3pbfkb3WwzM8
+X-Gm-Gg: ASbGncs83bDDs8DaidHHuB3i+/3biaWME+7eoqE2jIBPQbtspDXv85RV4ycgG/vVIdd
+	QAeFvkB63GySDnWJ9ZvHcRylHVlgp/UKfSHWzWjTh+homjwrInRiRpvfBu3b3iN4cVDjZt2TdjO
+	7d8Z52N+FPAwE+94bwHfGA2HhfC6ewO3BXXhtErWjnvGpw+cl5sosLVTuxYbg588jR/88/ZkNai
+	oLWIIUYo+SAhofa2+saGrUAdVTP3oCsxKWWgnR2YElDr3fcl6lS9pAx
+X-Google-Smtp-Source: AGHT+IHH4t+ec42lHtHvK1TJkh4muj48bt8siRClPaMBrPs58wC6Q8ZCT+hLAnCeabS52vgTCVD3Qw==
+X-Received: by 2002:a05:6a00:170a:b0:725:1de3:1c4a with SMTP id d2e1a72fcca58-72d21f167b0mr6752408b3a.3.1736382877187;
+        Wed, 08 Jan 2025 16:34:37 -0800 (PST)
+Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72aad816312sm35992090b3a.1.2025.01.08.16.34.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 08 Jan 2025 16:34:36 -0800 (PST)
+From: Stanislav Fomichev <sdf@fomichev.me>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux-kernel@vger.kernel.org,
+	bpf@vger.kernel.org,
+	horms@kernel.org,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	hawk@kernel.org,
+	john.fastabend@gmail.com,
+	bjorn@kernel.org,
+	magnus.karlsson@intel.com,
+	maciej.fijalkowski@intel.com,
+	jonathan.lemon@gmail.com,
+	jdamato@fastly.com,
+	mkarsten@uwaterloo.ca
+Subject: [PATCH net] xsk: Bring back busy polling support
+Date: Wed,  8 Jan 2025 16:34:36 -0800
+Message-ID: <20250109003436.2829560-1-sdf@fomichev.me>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next v2 08/14] bpf: net_sched: Add a qdisc watchdog
- timer
-To: Amery Hung <ameryhung@gmail.com>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, daniel@iogearbox.net,
- andrii@kernel.org, alexei.starovoitov@gmail.com, martin.lau@kernel.org,
- sinquersw@gmail.com, toke@redhat.com, jhs@mojatatu.com, jiri@resnulli.us,
- stfomichev@gmail.com, ekarani.silvestre@ccc.ufcg.edu.br,
- yangpeihao@sjtu.edu.cn, xiyou.wangcong@gmail.com, yepeilin.cs@gmail.com,
- amery.hung@bytedance.com
-References: <20241220195619.2022866-1-amery.hung@gmail.com>
- <20241220195619.2022866-9-amery.hung@gmail.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <20241220195619.2022866-9-amery.hung@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
 
-On 12/20/24 11:55 AM, Amery Hung wrote:
-> diff --git a/net/sched/bpf_qdisc.c b/net/sched/bpf_qdisc.c
-> index 1c92bfcc3847..bbe7aded6f24 100644
-> --- a/net/sched/bpf_qdisc.c
-> +++ b/net/sched/bpf_qdisc.c
-> @@ -8,6 +8,10 @@
->   
->   static struct bpf_struct_ops bpf_Qdisc_ops;
->   
-> +struct bpf_sched_data {
-> +	struct qdisc_watchdog watchdog;
-> +};
-> +
->   struct bpf_sk_buff_ptr {
->   	struct sk_buff *skb;
->   };
-> @@ -108,6 +112,46 @@ static int bpf_qdisc_btf_struct_access(struct bpf_verifier_log *log,
->   	return 0;
->   }
->   
-> +BTF_ID_LIST(bpf_qdisc_init_prologue_ids)
-> +BTF_ID(func, bpf_qdisc_init_prologue)
-> +
-> +static int bpf_qdisc_gen_prologue(struct bpf_insn *insn_buf, bool direct_write,
-> +				  const struct bpf_prog *prog)
-> +{
-> +	struct bpf_insn *insn = insn_buf;
-> +
-> +	if (strcmp(prog->aux->attach_func_name, "init"))
-> +		return 0;
-> +
-> +	*insn++ = BPF_MOV64_REG(BPF_REG_6, BPF_REG_1);
-> +	*insn++ = BPF_LDX_MEM(BPF_DW, BPF_REG_1, BPF_REG_1, 0);
-> +	*insn++ = BPF_CALL_KFUNC(0, bpf_qdisc_init_prologue_ids[0]);
+Commit 86e25f40aa1e ("net: napi: Add napi_config") moved napi->napi_id
+assignment to a later point in time (napi_hash_add_with_id). This breaks
+__xdp_rxq_info_reg which copies napi_id at an earlier time and now
+stores 0 napi_id. It also makes sk_mark_napi_id_once_xdp and
+__sk_mark_napi_id_once useless because they now work against 0 napi_id.
+Since sk_busy_loop requires valid napi_id to busy-poll on, there is no way
+to busy-poll AF_XDP sockets anymore.
 
-I was wondering if patch 7 is needed if BPF_EMIT_CALL() and BPF_CALL_1() were 
-used, so it looks more like a bpf helper instead of kfunc. I tried but failed at 
-the "fn = env->ops->get_func_proto(insn->imm, env->prog);" in do_misc_fixups(). 
-I think the change in patch 7 is simple enough instead of getting 
-get_func_proto() works for this case.
+Bring back the ability to busy-poll on XSK by resolving socket's napi_id
+at bind time. This relies on relatively recent netif_queue_set_napi,
+but (assume) at this point most popular drivers should have been converted.
+This also removes per-tx/rx cycles which used to check and/or set
+the napi_id value.
 
-> +	*insn++ = BPF_MOV64_REG(BPF_REG_1, BPF_REG_6);
-> +	*insn++ = prog->insnsi[0];
-> +
-> +	return insn - insn_buf;
-> +}
-> +
-> +BTF_ID_LIST(bpf_qdisc_reset_destroy_epilogue_ids)
-> +BTF_ID(func, bpf_qdisc_reset_destroy_epilogue)
-> +
-> +static int bpf_qdisc_gen_epilogue(struct bpf_insn *insn_buf, const struct bpf_prog *prog,
-> +				  s16 ctx_stack_off)
-> +{
-> +	struct bpf_insn *insn = insn_buf;
-> +
-> +	if (strcmp(prog->aux->attach_func_name, "reset") &&
-> +	    strcmp(prog->aux->attach_func_name, "destroy"))
-> +		return 0;
-> +
-> +	*insn++ = BPF_LDX_MEM(BPF_DW, BPF_REG_1, BPF_REG_FP, ctx_stack_off);
-> +	*insn++ = BPF_LDX_MEM(BPF_DW, BPF_REG_1, BPF_REG_1, 0);
-> +	*insn++ = BPF_CALL_KFUNC(0, bpf_qdisc_reset_destroy_epilogue_ids[0]);
-> +	*insn++ = BPF_EXIT_INSN();
-> +
-> +	return insn - insn_buf;
-> +}
-> +
+Confirmed by running a busy-polling AF_XDP socket
+(github.com/fomichev/xskrtt) on mlx5 and looking at BusyPollRxPackets
+from /proc/net/netstat.
+
+Fixes: 86e25f40aa1e ("net: napi: Add napi_config")
+Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
+---
+ include/net/busy_poll.h    |  8 --------
+ include/net/xdp.h          |  1 -
+ include/net/xdp_sock_drv.h | 14 --------------
+ net/core/xdp.c             |  1 -
+ net/xdp/xsk.c              | 14 +++++++++-----
+ 5 files changed, 9 insertions(+), 29 deletions(-)
+
+diff --git a/include/net/busy_poll.h b/include/net/busy_poll.h
+index c858270141bc..c39a426ebf52 100644
+--- a/include/net/busy_poll.h
++++ b/include/net/busy_poll.h
+@@ -174,12 +174,4 @@ static inline void sk_mark_napi_id_once(struct sock *sk,
+ #endif
+ }
+ 
+-static inline void sk_mark_napi_id_once_xdp(struct sock *sk,
+-					    const struct xdp_buff *xdp)
+-{
+-#ifdef CONFIG_NET_RX_BUSY_POLL
+-	__sk_mark_napi_id_once(sk, xdp->rxq->napi_id);
+-#endif
+-}
+-
+ #endif /* _LINUX_NET_BUSY_POLL_H */
+diff --git a/include/net/xdp.h b/include/net/xdp.h
+index e6770dd40c91..b5b10f2b88e5 100644
+--- a/include/net/xdp.h
++++ b/include/net/xdp.h
+@@ -62,7 +62,6 @@ struct xdp_rxq_info {
+ 	u32 queue_index;
+ 	u32 reg_state;
+ 	struct xdp_mem_info mem;
+-	unsigned int napi_id;
+ 	u32 frag_size;
+ } ____cacheline_aligned; /* perf critical, avoid false-sharing */
+ 
+diff --git a/include/net/xdp_sock_drv.h b/include/net/xdp_sock_drv.h
+index 40085afd9160..7a7316d9c0da 100644
+--- a/include/net/xdp_sock_drv.h
++++ b/include/net/xdp_sock_drv.h
+@@ -59,15 +59,6 @@ static inline void xsk_pool_fill_cb(struct xsk_buff_pool *pool,
+ 	xp_fill_cb(pool, desc);
+ }
+ 
+-static inline unsigned int xsk_pool_get_napi_id(struct xsk_buff_pool *pool)
+-{
+-#ifdef CONFIG_NET_RX_BUSY_POLL
+-	return pool->heads[0].xdp.rxq->napi_id;
+-#else
+-	return 0;
+-#endif
+-}
+-
+ static inline void xsk_pool_dma_unmap(struct xsk_buff_pool *pool,
+ 				      unsigned long attrs)
+ {
+@@ -306,11 +297,6 @@ static inline void xsk_pool_fill_cb(struct xsk_buff_pool *pool,
+ {
+ }
+ 
+-static inline unsigned int xsk_pool_get_napi_id(struct xsk_buff_pool *pool)
+-{
+-	return 0;
+-}
+-
+ static inline void xsk_pool_dma_unmap(struct xsk_buff_pool *pool,
+ 				      unsigned long attrs)
+ {
+diff --git a/net/core/xdp.c b/net/core/xdp.c
+index bcc5551c6424..2315feed94ef 100644
+--- a/net/core/xdp.c
++++ b/net/core/xdp.c
+@@ -186,7 +186,6 @@ int __xdp_rxq_info_reg(struct xdp_rxq_info *xdp_rxq,
+ 	xdp_rxq_info_init(xdp_rxq);
+ 	xdp_rxq->dev = dev;
+ 	xdp_rxq->queue_index = queue_index;
+-	xdp_rxq->napi_id = napi_id;
+ 	xdp_rxq->frag_size = frag_size;
+ 
+ 	xdp_rxq->reg_state = REG_STATE_REGISTERED;
+diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
+index 3fa70286c846..89d2bef96469 100644
+--- a/net/xdp/xsk.c
++++ b/net/xdp/xsk.c
+@@ -322,7 +322,6 @@ static int xsk_rcv_check(struct xdp_sock *xs, struct xdp_buff *xdp, u32 len)
+ 		return -ENOSPC;
+ 	}
+ 
+-	sk_mark_napi_id_once_xdp(&xs->sk, xdp);
+ 	return 0;
+ }
+ 
+@@ -908,11 +907,8 @@ static int __xsk_sendmsg(struct socket *sock, struct msghdr *m, size_t total_len
+ 	if (unlikely(!xs->tx))
+ 		return -ENOBUFS;
+ 
+-	if (sk_can_busy_loop(sk)) {
+-		if (xs->zc)
+-			__sk_mark_napi_id_once(sk, xsk_pool_get_napi_id(xs->pool));
++	if (sk_can_busy_loop(sk))
+ 		sk_busy_loop(sk, 1); /* only support non-blocking sockets */
+-	}
+ 
+ 	if (xs->zc && xsk_no_wakeup(sk))
+ 		return 0;
+@@ -1298,6 +1294,14 @@ static int xsk_bind(struct socket *sock, struct sockaddr *addr, int addr_len)
+ 	xs->queue_id = qid;
+ 	xp_add_xsk(xs->pool, xs);
+ 
++	if (xs->zc && qid < dev->real_num_rx_queues) {
++		struct netdev_rx_queue *rxq;
++
++		rxq = __netif_get_rx_queue(dev, qid);
++		if (rxq->napi)
++			__sk_mark_napi_id_once(sk, rxq->napi->napi_id);
++	}
++
+ out_unlock:
+ 	if (err) {
+ 		dev_put(dev);
+-- 
+2.47.1
+
 
