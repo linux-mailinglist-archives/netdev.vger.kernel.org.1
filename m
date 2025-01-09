@@ -1,254 +1,127 @@
-Return-Path: <netdev+bounces-156822-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156824-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4056FA07EB6
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 18:27:27 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id F2775A07EBE
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 18:28:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2EFA1167F99
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 17:27:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6C000188D336
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 17:28:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D265718FC9D;
-	Thu,  9 Jan 2025 17:27:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iw1g/gHf"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 248B818C93C;
+	Thu,  9 Jan 2025 17:27:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8737018E756;
-	Thu,  9 Jan 2025 17:27:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 912BE18C910
+	for <netdev@vger.kernel.org>; Thu,  9 Jan 2025 17:27:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736443641; cv=none; b=Vf/TPhKI66So61u8wTsL69DJWMhxcawaLTQ99sP+YzMQDDo/QuMlyVqlPoZ2BrAllgdMwpJdreLn8T7ftXwDkUa0zzhX63K1Tf7/VugTi9MfQerl3xia0GGuGhTLK9Tsd8YuU/WAZrP6I+SblTg+fSAuNUnH2AXVCZp+X9fW+6Y=
+	t=1736443677; cv=none; b=rutSXJyVInYTExoWXLN8eP3mcFlQldg5GUjnj66N/uY0iq0QJzXvS+aCY49iTy3IoDObv9EwNpmdFFEmszPW6gdevyRZPzAFcKReDKHzN0PuBD8K1xjNEoXqZAECnaBlBEX2vFqPOdY8hcqNkhYfBsLoC83VJeBGT4xCvKYZrD0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736443641; c=relaxed/simple;
-	bh=k6dSHtIzHPXjCi55pFzcPs0hQ6RidrPUUyk4gC3kNmw=;
+	s=arc-20240116; t=1736443677; c=relaxed/simple;
+	bh=VvuOKDECwtpuV8SMHLUcer4yP+FEKBgFtFrjoiBWSGg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TbXZATN5Q9CunAPiL3YxtnMj4KOHuc3qDYpOcNlJKNxG1PM3Nnm/EyidH1dic94bfGNOks7iEryynt9a0OVGH6OQ6jc49myq32mGTdkyj6AMfevrMOvS771tSJ5cBw/8NjXllL3VSJ9qtJhtLmN6G06MFqmPnID4dHq2mzyJX6g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iw1g/gHf; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5E216C4CED2;
-	Thu,  9 Jan 2025 17:27:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736443641;
-	bh=k6dSHtIzHPXjCi55pFzcPs0hQ6RidrPUUyk4gC3kNmw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=iw1g/gHf9UnQ6FPaRmdIh69NJ2JP4qyUVC7TdimvhOvT39hb8cevQEIQZR2wac6LZ
-	 /wPyHWsWBAq0Y4Bk5qIMRY1X8UgoEECnc/XTfTa6q+BqUzST6zcpVBA5TmVR/PK8Lp
-	 nWcrvKqkNFQbNQvP7bYrP7TJS3vmELKIf5yy/REnM9H+J+e+tPHo/ACLd+GjhQM8r3
-	 aZtFdyyskZ/TdjuExwsO+M1hA5HM99NiUuu3egJinnB4FT1EfiG5RzdwM6fpROxQ65
-	 6LpB+rTv6jNwhDbdA6XLDMaX+NsXYidNsPV1TFavPfHfyw0RGbmuNj7BZiq5AA8kZb
-	 6nHuTNpJ0Fo2Q==
-Date: Thu, 9 Jan 2025 17:27:14 +0000
-From: Simon Horman <horms@kernel.org>
-To: Luo Jie <quic_luoj@quicinc.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Lei Wei <quic_leiwei@quicinc.com>,
-	Suruchi Agarwal <quic_suruchia@quicinc.com>,
-	Pavithra R <quic_pavir@quicinc.com>,
-	Jonathan Corbet <corbet@lwn.net>, Kees Cook <kees@kernel.org>,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	Philipp Zabel <p.zabel@pengutronix.de>,
-	linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-hardening@vger.kernel.org,
-	quic_kkumarcs@quicinc.com, quic_linchen@quicinc.com,
-	srinivas.kandagatla@linaro.org, bartosz.golaszewski@linaro.org,
-	john@phrozen.org
-Subject: Re: [PATCH net-next v2 04/14] net: ethernet: qualcomm: Initialize
- PPE buffer management for IPQ9574
-Message-ID: <20250109172714.GN7706@kernel.org>
-References: <20250108-qcom_ipq_ppe-v2-0-7394dbda7199@quicinc.com>
- <20250108-qcom_ipq_ppe-v2-4-7394dbda7199@quicinc.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=KKc3pE1PjCPP3/2GYKrH5pUIlenCbTxXDOxI0g5dV/p4r5CwcTzO9JKXu6/PMYYpRwuLWDVu3UhtjFGExrNU+aO0yO0VA01cX5tYozniCTLFh9sm5au1vSBPgX5VKG/gNIYQcavLubt02EGw49utiFt3DIL33+CcDvBaAV9WNaU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1tVwJt-0005ON-NA; Thu, 09 Jan 2025 18:27:45 +0100
+Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1tVwJs-0001Dm-2P;
+	Thu, 09 Jan 2025 18:27:44 +0100
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1tVwJs-0002mp-22;
+	Thu, 09 Jan 2025 18:27:44 +0100
+Date: Thu, 9 Jan 2025 18:27:44 +0100
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Jonathan Corbet <corbet@lwn.net>, kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	Simon Horman <horms@kernel.org>,
+	Russell King <linux@armlinux.org.uk>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	linux-doc@vger.kernel.org
+Subject: Re: [PATCH net-next v6 2/7] net: ethtool: plumb PHY stats to PHY
+ drivers
+Message-ID: <Z4AHEEX1c0gcGEV6@pengutronix.de>
+References: <20250109094457.97466-1-o.rempel@pengutronix.de>
+ <20250109094457.97466-3-o.rempel@pengutronix.de>
+ <20250109080758.608e6e1a@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20250108-qcom_ipq_ppe-v2-4-7394dbda7199@quicinc.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250109080758.608e6e1a@kernel.org>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Wed, Jan 08, 2025 at 09:47:11PM +0800, Luo Jie wrote:
-> The BM (Buffer Management) config controls the pause frame generated
-> on the PPE port. There are maximum 15 BM ports and 4 groups supported,
-> all BM ports are assigned to group 0 by default. The number of hardware
-> buffers configured for the port influence the threshold of the flow
-> control for that port.
+On Thu, Jan 09, 2025 at 08:07:58AM -0800, Jakub Kicinski wrote:
+> On Thu,  9 Jan 2025 10:44:52 +0100 Oleksij Rempel wrote:
+> > +static inline void phy_ethtool_get_phy_stats(struct phy_device *phydev,
+> > +					struct ethtool_eth_phy_stats *phy_stats,
+> > +					struct ethtool_phy_stats *phydev_stats)
+> > +{
+> > +	ASSERT_RTNL();
+> > +
+> > +	if (!phylib_stubs)
+> > +		return;
+> > +
+> > +	phylib_stubs->get_phy_stats(phydev, phy_stats, phydev_stats);
+> > +}
+> > +
+> > +static inline void phy_ethtool_get_link_ext_stats(struct phy_device *phydev,
+> > +				    struct ethtool_link_ext_stats *link_stats)
+> > +{
+> > +	ASSERT_RTNL();
+> > +
+> > +	if (!phylib_stubs)
+> > +		return;
+> > +
+> > +	phylib_stubs->get_link_ext_stats(phydev, link_stats);
+> > +}
 > 
-> Signed-off-by: Luo Jie <quic_luoj@quicinc.com>
+> So we traded on set of static inlines for another?
+> What's wrong with adding a C source which is always built in?
+> Like drivers/net/phy/stubs.c, maybe call it drivers/net/phy/accessors.c
+> or drivers/net/phy/helpers.c
 
-...
-
-> diff --git a/drivers/net/ethernet/qualcomm/ppe/ppe_config.c b/drivers/net/ethernet/qualcomm/ppe/ppe_config.c
-
-...
-
-> +/* The buffer configurations per PPE port. There are 15 BM ports and
-> + * 4 BM groups supported by PPE. BM port (0-7) is for EDMA port 0,
-> + * BM port (8-13) is for PPE physical port 1-6 and BM port 14 is for
-> + * EIP port.
-> + */
-> +static struct ppe_bm_port_config ipq9574_ppe_bm_port_config[] = {
-> +	{
-> +		/* Buffer configuration for the BM port ID 0 of EDMA. */
-> +		.port_id_start	= 0,
-> +		.port_id_end	= 0,
-> +		.pre_alloc	= 0,
-> +		.in_fly_buf	= 100,
-> +		.ceil		= 1146,
-> +		.weight		= 7,
-> +		.resume_offset	= 8,
-> +		.resume_ceil	= 0,
-> +		.dynamic	= true,
-> +	},
-> +	{
-> +		/* Buffer configuration for the BM port ID 1-7 of EDMA. */
-> +		.port_id_start	= 1,
-> +		.port_id_end	= 7,
-> +		.pre_alloc	= 0,
-> +		.in_fly_buf	= 100,
-> +		.ceil		= 250,
-> +		.weight		= 4,
-> +		.resume_offset	= 36,
-> +		.resume_ceil	= 0,
-> +		.dynamic	= true,
-> +	},
-> +	{
-> +		/* Buffer configuration for the BM port ID 8-13 of PPE ports. */
-> +		.port_id_start	= 8,
-> +		.port_id_end	= 13,
-> +		.pre_alloc	= 0,
-> +		.in_fly_buf	= 128,
-> +		.ceil		= 250,
-> +		.weight		= 4,
-> +		.resume_offset	= 36,
-> +		.resume_ceil	= 0,
-> +		.dynamic	= true,
-> +	},
-> +	{
-> +		/* Buffer configuration for the BM port ID 14 of EIP. */
-> +		.port_id_start	= 14,
-> +		.port_id_end	= 14,
-> +		.pre_alloc	= 0,
-> +		.in_fly_buf	= 40,
-> +		.ceil		= 250,
-> +		.weight		= 4,
-> +		.resume_offset	= 36,
-> +		.resume_ceil	= 0,
-> +		.dynamic	= true,
-> +	},
-> +};
-> +
-> +static int ppe_config_bm_threshold(struct ppe_device *ppe_dev, int bm_port_id,
-> +				   struct ppe_bm_port_config port_cfg)
-> +{
-> +	u32 reg, val, bm_fc_val[2];
-> +	int ret;
-> +
-> +	/* Configure BM flow control related threshold. */
-> +	PPE_BM_PORT_FC_SET_WEIGHT(bm_fc_val, port_cfg.weight);
-
-Hi Luo Jie,
-
-When compiling with W=1 for x86_32 and ARM (32bit)
-(but, curiously not x86_64 or arm64), gcc-14 complains that
-bm_fc_val is uninitialised, I believe due to the line above and
-similar lines below.
-
-In file included from drivers/net/ethernet/qualcomm/ppe/ppe_config.c:10:
-In function 'u32p_replace_bits',
-    inlined from 'ppe_config_bm_threshold' at drivers/net/ethernet/qualcomm/ppe/ppe_config.c:112:2:
-./include/linux/bitfield.h:189:15: warning: 'bm_fc_val' is used uninitialized [-Wuninitialized]
-  189 |         *p = (*p & ~to(field)) | type##_encode_bits(val, field);        \
-      |               ^~
-./include/linux/bitfield.h:198:9: note: in expansion of macro '____MAKE_OP'
-  198 |         ____MAKE_OP(u##size,u##size,,)
-      |         ^~~~~~~~~~~
-./include/linux/bitfield.h:201:1: note: in expansion of macro '__MAKE_OP'
-  201 | __MAKE_OP(32)
-      | ^~~~~~~~~
-drivers/net/ethernet/qualcomm/ppe/ppe_config.c: In function 'ppe_config_bm_threshold':
-drivers/net/ethernet/qualcomm/ppe/ppe_config.c:108:23: note: 'bm_fc_val' declared here
-  108 |         u32 reg, val, bm_fc_val[2];
-      |                       ^~~~~~~~~
-
-> +	PPE_BM_PORT_FC_SET_RESUME_OFFSET(bm_fc_val, port_cfg.resume_offset);
-> +	PPE_BM_PORT_FC_SET_RESUME_THRESHOLD(bm_fc_val, port_cfg.resume_ceil);
-> +	PPE_BM_PORT_FC_SET_DYNAMIC(bm_fc_val, port_cfg.dynamic);
-> +	PPE_BM_PORT_FC_SET_REACT_LIMIT(bm_fc_val, port_cfg.in_fly_buf);
-> +	PPE_BM_PORT_FC_SET_PRE_ALLOC(bm_fc_val, port_cfg.pre_alloc);
-> +
-> +	/* Configure low/high bits of the ceiling for the BM port. */
-> +	val = FIELD_PREP(GENMASK(2, 0), port_cfg.ceil);
-
-The value of port_cfg.ceil is 250 or 1146, as set in
-ipq9574_ppe_bm_port_config. clang-19 W=1 builds complain that this
-value is too large for the field (3 bits).
-
-drivers/net/ethernet/qualcomm/ppe/ppe_config.c:120:8: error: call to '__compiletime_assert_925' declared with 'error' attribute: FIELD_PREP: value too large for the field
-  120 |         val = FIELD_PREP(GENMASK(2, 0), port_cfg.ceil);
-      |               ^
-./include/linux/bitfield.h:115:3: note: expanded from macro 'FIELD_PREP'
-  115 |                 __BF_FIELD_CHECK(_mask, 0ULL, _val, "FIELD_PREP: ");    \
-      |                 ^
-./include/linux/bitfield.h:68:3: note: expanded from macro '__BF_FIELD_CHECK'
-   68 |                 BUILD_BUG_ON_MSG(__builtin_constant_p(_val) ?           \
-      |                 ^
-./include/linux/build_bug.h:39:37: note: expanded from macro 'BUILD_BUG_ON_MSG'
-   39 | #define BUILD_BUG_ON_MSG(cond, msg) compiletime_assert(!(cond), msg)
-      |                                     ^
-note: (skipping 1 expansions in backtrace; use -fmacro-backtrace-limit=0 to see all)
-././include/linux/compiler_types.h:530:2: note: expanded from macro '_compiletime_assert'
-  530 |         __compiletime_assert(condition, msg, prefix, suffix)
-      |         ^
-././include/linux/compiler_types.h:523:4: note: expanded from macro '__compiletime_assert'
-  523 |                         prefix ## suffix();                             \
-      |                         ^
-<scratch space>:95:1: note: expanded from here
-   95 | __compiletime_assert_925
-      | ^
-1 error generated
-
-> +	PPE_BM_PORT_FC_SET_CEILING_LOW(bm_fc_val, val);
-> +	val = FIELD_PREP(GENMASK(10, 3), port_cfg.ceil);
-> +	PPE_BM_PORT_FC_SET_CEILING_HIGH(bm_fc_val, val);
-> +
-> +	reg = PPE_BM_PORT_FC_CFG_TBL_ADDR + PPE_BM_PORT_FC_CFG_TBL_INC * bm_port_id;
-> +	ret = regmap_bulk_write(ppe_dev->regmap, reg,
-> +				bm_fc_val, ARRAY_SIZE(bm_fc_val));
-> +	if (ret)
-> +		return ret;
-> +
-> +	/* Assign the default group ID 0 to the BM port. */
-> +	val = FIELD_PREP(PPE_BM_PORT_GROUP_ID_SHARED_GROUP_ID, 0);
-> +	reg = PPE_BM_PORT_GROUP_ID_ADDR + PPE_BM_PORT_GROUP_ID_INC * bm_port_id;
-> +	ret = regmap_update_bits(ppe_dev->regmap, reg,
-> +				 PPE_BM_PORT_GROUP_ID_SHARED_GROUP_ID,
-> +				 val);
-> +	if (ret)
-> +		return ret;
-> +
-> +	/* Enable BM port flow control. */
-> +	val = FIELD_PREP(PPE_BM_PORT_FC_MODE_EN, true);
-> +	reg = PPE_BM_PORT_FC_MODE_ADDR + PPE_BM_PORT_FC_MODE_INC * bm_port_id;
-> +
-> +	return regmap_update_bits(ppe_dev->regmap, reg,
-> +				  PPE_BM_PORT_FC_MODE_EN,
-> +				  val);
-> +}
-
-...
+I chose the current stubs approach based on existing examples like
+hw_timestamps. Any implementation, including the current one, will have
+zero kernel size impact because each function is only used once. While
+moving them to a C source file is an option, it doesn't seem necessary
+given the current usage pattern. Do we really want to spend more time on
+this for something that won’t impact functionality or size? :)
 
 -- 
-pw-bot: changes-requested
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
