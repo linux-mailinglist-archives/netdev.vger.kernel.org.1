@@ -1,113 +1,100 @@
-Return-Path: <netdev+bounces-156785-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156786-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A2BCA07D1A
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 17:15:07 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DAD9BA07D3C
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 17:18:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E62C4188CF8B
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 16:14:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1AE3B3A5032
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 16:18:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3E822206B0;
-	Thu,  9 Jan 2025 16:14:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A42A1221DA3;
+	Thu,  9 Jan 2025 16:16:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pOVP5l4W"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QAvCBxtp"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B680121A45C;
-	Thu,  9 Jan 2025 16:14:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73D25221D9F;
+	Thu,  9 Jan 2025 16:16:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736439246; cv=none; b=BuZFOl172lQA6/FtNZtNrDE+ek/RjCHj7FOvFvmZWEmmFrXWwWV2wGnxu+gvp2OiL51euhMybNsoaTJjxCCDF+u/sp1a5632M5gNfogdBZx89UrvAqW7VcWHQ9Rr2WjN+zJME2qjUVr+1mXrHYVJGTFksTzABsCrj/GFbJ/XgW4=
+	t=1736439398; cv=none; b=B8p2Sp7s1jeAJGznJZMJgD/xIDKKCP5LmJwACLbWHOMWOunFs9S/WsfENPpWUFHgBinMgNTVD0paw/UdHJqgHaHdcfF4Uh6FAkFob5i82/82+Butl3Wyc/QaDf+k1swfeOf0ScD8VKG1jsSsUfaSP3twsxKv2scA9ccuMRZgCh4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736439246; c=relaxed/simple;
-	bh=8AW2JBM9p7hPaetzgChckRCvgTEi/URlyTvd+dPc5Vk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pr51wbBVOusnWfxPyycXJ4u6U4gYVZ3StA2rkKn/HOI+3icK4yjYXQwfbe8ncS7qZm5LwF51PL1FpiaMjC/gKEbt3i13EAP4f7/Q7EJlTTJSdTn9QOC0fMd9lxvITY+LclVg8nYZ8BvhXORR+sBcGVLEhc+pP/J1Pd3R9srnXD0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pOVP5l4W; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9E485C4CED2;
-	Thu,  9 Jan 2025 16:14:02 +0000 (UTC)
+	s=arc-20240116; t=1736439398; c=relaxed/simple;
+	bh=IWttuhlwlQnX1EnSOFdjIOs03ZVqS9WprcVW6tKzbqc=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=bpbrpk2w1LR1+9xdw6zD4Lnxgc3/LAOaH6jv4isOiUYmJa0/bmy6qU9L+ZU3C+urW+mLWuKj60UjX0SMedx81p41mGIy5LUoKbt9zYBAAbKOAvl3EGS0tLXwCwUsmd3AIS2b+LDiP6xuyN8KB4HCnrqHZK4q3Ww190o/RJaz+Og=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QAvCBxtp; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 46BB3C4CED2;
+	Thu,  9 Jan 2025 16:16:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736439246;
-	bh=8AW2JBM9p7hPaetzgChckRCvgTEi/URlyTvd+dPc5Vk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=pOVP5l4WvoKrafD6oNo3GwJl8ddzDNF9T6fRhcd0mLjzdQHHpBZnJqMfF889IghkU
-	 AnC/CmkjhcvaCDMbfZA8XKXMMpiqUQyqZlGFW3Fx49HbKYxHRSwSumheUU38S97VsB
-	 L75dsEyNWNDBcza+d6uaKBi224ICHGqLRmzXdop6rsmrDOFmXISjwxhoBXhBc4gFQD
-	 mOD2SveLpRZpvScTZhq5X86mTk18quIHKgxZ0WM0YYmONab213oiMlviyyzw5lmNBT
-	 Gqyeixeo0eupnXjcKaHWez4P5KNCmwLMLNJrNr+FWmLgAL7zl9ZzTWQ0OebKynMi9z
-	 VPMdCPFOsXmhA==
-Date: Thu, 9 Jan 2025 16:14:00 +0000
-From: Simon Horman <horms@kernel.org>
-To: Suman Ghosh <sumang@marvell.com>
-Cc: sgoutham@marvell.com, gakula@marvell.com, sbhatta@marvell.com,
-	hkelam@marvell.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, lcherian@marvell.com,
-	jerinj@marvell.com, john.fastabend@gmail.com, bbhushan2@marvell.com,
-	hawk@kernel.org, andrew+netdev@lunn.ch, ast@kernel.org,
-	daniel@iogearbox.net, bpf@vger.kernel.org
-Subject: Re: [net-next PATCH v2 3/6] octeontx2-pf: Add AF_XDP zero copy
- support for rx side
-Message-ID: <20250109161400.GK7706@kernel.org>
-References: <20250108183329.2207738-1-sumang@marvell.com>
- <20250108183329.2207738-4-sumang@marvell.com>
+	s=k20201202; t=1736439398;
+	bh=IWttuhlwlQnX1EnSOFdjIOs03ZVqS9WprcVW6tKzbqc=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=QAvCBxtpMEmCV8rfm31Hjt9C8Jv5CA0NcO3Fl7h9SMjoyokYwtwTp0R0yGYYQbfx3
+	 Nrb2Iv0MNZm3prceGAO4+BzqaI1Kh10aJqM2XbTA+grAcoWEcmlos9X3Y9B9Ne22VE
+	 j0UHhxsemVz7AXJtU4KxX7hFEuYsxxkn1QINhmy2JB4TBGlPtOexugIaLB87MjKdUT
+	 qlra4KvQP5Azy20UfM1wZ9I9kK7DOhBnsozsL66ntYk2q9pOXPJWUaA8k/ZuhsrpSD
+	 Mnb210XYWdqd85xETumxiWC83aLB7+2fjZML1h9D36NVIbFPJ8tRcUns86OCL2gf8f
+	 rs7DTXYSLSCww==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33B95380A97D;
+	Thu,  9 Jan 2025 16:17:01 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250108183329.2207738-4-sumang@marvell.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] Bluetooth: L2CAP: handle NULL sock pointer in
+ l2cap_sock_alloc
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <173643941974.1375203.8976214892409778601.git-patchwork-notify@kernel.org>
+Date: Thu, 09 Jan 2025 16:16:59 +0000
+References: <20241217211959.279881-1-pchelkin@ispras.ru>
+In-Reply-To: <20241217211959.279881-1-pchelkin@ispras.ru>
+To: Fedor Pchelkin <pchelkin@ispras.ru>
+Cc: luiz.dentz@gmail.com, kuba@kernel.org, johan.hedberg@gmail.com,
+ marcel@holtmann.org, ignat@cloudflare.com, kuniyu@amazon.com,
+ edumazet@google.com, linux-bluetooth@vger.kernel.org,
+ linux-kernel@vger.kernel.org, lvc-project@linuxtesting.org,
+ netdev@vger.kernel.org, stable@vger.kernel.org
 
-On Thu, Jan 09, 2025 at 12:03:26AM +0530, Suman Ghosh wrote:
-> This patch adds support to AF_XDP zero copy for CN10K.
-> This patch specifically adds receive side support. In this approach once
-> a xdp program with zero copy support on a specific rx queue is enabled,
-> then that receive quse is disabled/detached from the existing kernel
-> queue and re-assigned to the umem memory.
+Hello:
+
+This patch was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+
+On Wed, 18 Dec 2024 00:19:59 +0300 you wrote:
+> A NULL sock pointer is passed into l2cap_sock_alloc() when it is called
+> from l2cap_sock_new_connection_cb() and the error handling paths should
+> also be aware of it.
 > 
-> Signed-off-by: Suman Ghosh <sumang@marvell.com>
+> Seemingly a more elegant solution would be to swap bt_sock_alloc() and
+> l2cap_chan_create() calls since they are not interdependent to that moment
+> but then l2cap_chan_create() adds the soon to be deallocated and still
+> dummy-initialized channel to the global list accessible by many L2CAP
+> paths. The channel would be removed from the list in short period of time
+> but be a bit more straight-forward here and just check for NULL instead of
+> changing the order of function calls.
+> 
+> [...]
 
-...
+Here is the summary with links:
+  - Bluetooth: L2CAP: handle NULL sock pointer in l2cap_sock_alloc
+    https://git.kernel.org/bluetooth/bluetooth-next/c/a5d2ee08adc1
 
-> diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-...
 
-> @@ -572,20 +575,31 @@ int otx2_napi_handler(struct napi_struct *napi, int budget)
->  		if (pfvf->flags & OTX2_FLAG_ADPTV_INT_COAL_ENABLED)
->  			otx2_adjust_adaptive_coalese(pfvf, cq_poll);
->  
-> +		if (likely(cq))
-> +			pool = &pfvf->qset.pool[cq->cq_idx];
-> +
-
-Hi Suman,
-
-FWIIW, Smatch is still concerned that cq may be used uninitialised here.
-
-...
-
-> @@ -1429,13 +1447,24 @@ static bool otx2_xdp_rcv_pkt_handler(struct otx2_nic *pfvf,
->  	unsigned char *hard_start;
->  	struct otx2_pool *pool;
->  	int qidx = cq->cq_idx;
-> -	struct xdp_buff xdp;
-> +	struct xdp_buff xdp, *xsk_buff = NULL;
->  	struct page *page;
->  	u64 iova, pa;
->  	u32 act;
->  	int err;
-
-Please consider preserving reverse xmas tree order - longest line to
-shortest - for local variable declarations.
-
-...
 
