@@ -1,96 +1,92 @@
-Return-Path: <netdev+bounces-156788-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156787-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0EE59A07D57
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 17:20:58 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 623E9A07D4F
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 17:20:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0642E3A63A0
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 16:20:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id ED7231884927
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 16:19:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BCFF21D5B0;
-	Thu,  9 Jan 2025 16:20:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0453F2206BE;
+	Thu,  9 Jan 2025 16:18:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="P44MPWJ5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VaD9up5G"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.3])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59DFC7FD;
-	Thu,  9 Jan 2025 16:20:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.3
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D43712206BC
+	for <netdev@vger.kernel.org>; Thu,  9 Jan 2025 16:18:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736439652; cv=none; b=Am09Be1Wwq8TlhYOJ16UcxGxYhhCjfHQs8EzzVNViwZqYsyTrP1KDXgeWP3CFAXOczxHq+XEj3j0rdaGchbuSNDEDfVMhn6+0jbRcuNEK0vJdgvgt+z92SNnVb+/YOBnwkBs1UHRNRmVJK++TFMFahxIxm0ZoJIieTLJh2geocw=
+	t=1736439492; cv=none; b=RSnszjdAA6fbS0Y3e5zNbcpFhalEUD1vzQ5itQ63QfnvWfPh8KB8a93Susb+BKGL6KsC/Ek9HEQlaWz3l2Ma+KbASsJzSM8vC2btsEphNq9LUJDjvUnjcOFa27m/mDlhdLF2q2XVMb1+HO7K1pEU6qc8egIHNCsEQWPT7OItrBY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736439652; c=relaxed/simple;
-	bh=yZiYcWcbWWYqIAe/qJHoWcZE+V8TbhwxvxOGHOOBYHc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=dpmblfA/KgMn3a931XnQGo8934ISx6Bv5ohR2IedL5h812xI4upKgUNkBCuE4US3vodYu0OoA+NPUV3Jf8hX1aDTvRfSoCYOKO9yE0zPHC8e1gW8hdSiaNW7jA/xzrsq7zYBe45+XGhnleiXYmFEaDk2DJoUx5P4m3zp4d7APfM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=P44MPWJ5; arc=none smtp.client-ip=117.135.210.3
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:Subject:Date:Message-ID:MIME-Version; bh=ylIvY
-	0+HP+9mC+jUr9hYJK2bhIBCcYgyn+9ca3sZITw=; b=P44MPWJ5NTWvjCh9d2QHD
-	hGPSzU7lQQfiZIp7BSuiTpv41bRykwrmly4w1xcjqEucjJfKs/gJrqfWYCHTvcB9
-	nz5vwtSpLnJJXZzDvdGfhNUSgYjo3BYxzDyX5MNEpMWAnklDHLCqwcQKqpAoo5I3
-	SSLvfWc4+dBtO7WdtDSYyo=
-Received: from lizhe.. (unknown [157.0.89.51])
-	by gzsmtp3 (Coremail) with SMTP id PigvCgCn9Mu99n9nBrxVIg--.51946S2;
-	Fri, 10 Jan 2025 00:18:18 +0800 (CST)
-From: Lizhe <sensor1010@163.com>
-To: edumazet@google.com,
-	davem@davemloft.net,
-	dsahern@kernel.org,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Lizhe <sensor1010@163.com>
-Subject: [PATCH] tcp: Add an extra check for consecutive failed keepalive probes
-Date: Fri, 10 Jan 2025 00:18:02 +0800
-Message-ID: <20250109161802.3599-1-sensor1010@163.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1736439492; c=relaxed/simple;
+	bh=10+Dg1BFv4IwT+mfDUUg++YF0ACEY5Xdn5RCQC9n7x0=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=H+o3RzfHpf4/Swn5QgoSAcbQ27VmYvF17meTAAoE/Ky6a1RXaO5NLJT9LQuV8a9lalzuuL1rp9VrroECZIX/8JS+mLySMvnn3uotz+E2pes+3q4O8GUMx8hMvhr8EyHQj9cOTMVuFzFAafZ30WhpX+H6XKx77nAwOeHPSEEZpGs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VaD9up5G; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 46624C4CED2;
+	Thu,  9 Jan 2025 16:18:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1736439492;
+	bh=10+Dg1BFv4IwT+mfDUUg++YF0ACEY5Xdn5RCQC9n7x0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=VaD9up5GXA9v64/lMaOzJOYE+w682V2ZN2vhCVKLEFMj1e52pi2ajwdscruac9aHJ
+	 /Lq1J97TCBId3IHrg6edXUay0E99IqfaqYRMUscyTUgBiS84Qp6YvMXCRtv6A6ftTz
+	 SwIeUuZlzrVHZnI46XXysBWetiK+lumkfl3OAFjvLpYyo9MKkpcv0UHxaU2AMgrjJD
+	 AtNZAonmkAwWVQHcyevyJujOXojhCLjX/ih0EEtEgOiVMopo3DXj+b2dI9Qk3zgMft
+	 Dg9lpONgtxabJWkFdebvAxsFzaLgGiE5uDTzSpavPVgUYpZ1CM0uGqjbm3SB9Hb/ht
+	 16S0GXizoZv6w==
+Date: Thu, 9 Jan 2025 08:18:11 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Toke =?UTF-8?B?SMO4aWxhbmQtSsO4cmdlbnNlbg==?= <toke@toke.dk>
+Cc: Paolo Abeni <pabeni@redhat.com>, Jamal Hadi Salim <jhs@mojatatu.com>,
+ Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
+ syzbot+f63600d288bfb7057424@syzkaller.appspotmail.com, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Simon Horman
+ <horms@kernel.org>, cake@lists.bufferbloat.net, netdev@vger.kernel.org
+Subject: Re: [PATCH net v2] sched: sch_cake: add bounds checks to host bulk
+ flow fairness counts
+Message-ID: <20250109081811.01b7bad1@kernel.org>
+In-Reply-To: <87ikqohswh.fsf@toke.dk>
+References: <20250107120105.70685-1-toke@redhat.com>
+	<fb7a1324-41c6-4e10-a6a3-f16d96f44f65@redhat.com>
+	<87plkwi27e.fsf@toke.dk>
+	<11915c70-ec5e-4d94-b890-f07f41094e2c@redhat.com>
+	<87ikqohswh.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:PigvCgCn9Mu99n9nBrxVIg--.51946S2
-X-Coremail-Antispam: 1Uf129KBjvdXoW7Xw1kuF17Zw18Jr4rtF4fXwb_yoWfXwc_uw
-	4kJFWUWr47XFy2ga1UZw43GryFk34xZF1ruFyfKasxJ3WvqF1qkFZ2gF909rn7uFZxWF95
-	Aws8try5Ar1a9jkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7sRNuWl7UUUUU==
-X-CM-SenderInfo: 5vhq20jurqiii6rwjhhfrp/1tbiKAHPq2d-8RdYmwAAsw
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-Add an additional check to handle situations where consecutive
-keepalive probe packets are sent without receiving a response.
+On Thu, 09 Jan 2025 17:08:14 +0100 Toke H=C3=B8iland-J=C3=B8rgensen wrote:
+> >> I guess I should have mentioned in the commit message that this was
+> >> deliberate. Since it seems you'll be editing that anyway (cf the above=
+),
+> >> how about adding a paragraph like:
+> >>=20
+> >>  As part of this change, the flow quantum calculation is consolidated
+> >>  into a helper function, which means that the dithering applied to the
+> >>  host load scaling is now applied both in the DRR rotation and when a
+> >>  sparse flow's quantum is first initiated. The only user-visible effect
+> >>  of this is that the maximum packet size that can be sent while a flow
+> >>  stays sparse will now vary with +/- one byte in some cases. This shou=
+ld
+> >>  not make a noticeable difference in practice, and thus it's not worth
+> >>  complicating the code to preserve the old behaviour. =20
+> >
+> > It's in Jakub's hands now, possibly he could prefer a repost to reduce
+> > the maintainer's overhead. =20
+>=20
+> Alright, sure, I'll respin :)
 
-Signed-off-by: Lizhe <sensor1010@163.com>
----
- net/ipv4/tcp_timer.c | 6 ++++++
- 1 file changed, 6 insertions(+)
-
-diff --git a/net/ipv4/tcp_timer.c b/net/ipv4/tcp_timer.c
-index b412ed88ccd9..5a5dee8cd6d3 100644
---- a/net/ipv4/tcp_timer.c
-+++ b/net/ipv4/tcp_timer.c
-@@ -828,6 +828,12 @@ static void tcp_keepalive_timer (struct timer_list *t)
- 		}
- 		if (tcp_write_wakeup(sk, LINUX_MIB_TCPKEEPALIVE) <= 0) {
- 			icsk->icsk_probes_out++;
-+			if (icsk->icsk_probes_out >= keepalive_probes(tp)) {
-+				tcp_send_active_reset(sk, GFP_ATOMIC,
-+						SK_RST_REASON_TCP_KEEPALIVE_TIMEOUT);
-+				tcp_write_err(sk);
-+				goto out;
-+			}
- 			elapsed = keepalive_intvl_when(tp);
- 		} else {
- 			/* If keepalive was lost due to local congestion,
--- 
-2.43.0
-
+Hold on, I'll do it :)
 
