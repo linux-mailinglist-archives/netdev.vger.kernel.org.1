@@ -1,114 +1,171 @@
-Return-Path: <netdev+bounces-156734-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156736-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7ED53A07B74
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 16:13:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 95B32A07BA6
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 16:19:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 83F9F168FF0
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 15:13:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2B7D716B257
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 15:19:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B702421D5AA;
-	Thu,  9 Jan 2025 15:11:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1E5F21C19F;
+	Thu,  9 Jan 2025 15:16:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BjPEZE6W"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="nYLMZl3K"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 802AE21CA14;
-	Thu,  9 Jan 2025 15:11:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09DE921C167
+	for <netdev@vger.kernel.org>; Thu,  9 Jan 2025 15:16:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736435464; cv=none; b=bZ13MlQfnFenhGTqNeG9I6SsFM/zK/gTFf+mCjmNbFh2mfk4sJMqnsNj0alUqYXhHnEF2pjzEjF4/geqSBwxpvLZmzPR2ymckD3xKgpQ5pwGmZoW+XNuJ20MynYaS0zLEMyA7iJ8ujXmnwCEQixY1vZBd7QI1lMhg3I4il6hh4g=
+	t=1736435774; cv=none; b=GsZgNP9KUnYWFhqqXz3LP7DgEaB7qi4mK+CD/6b0Ms97gqb+JYnMc+nus7FT/rQQxnNkWpfFIXkX16jWwjp/0bQp0Cn/7K8RhlzNWvzpolgT/ZVAfV/HuyjRbbagg0e0G2wxZZdDGis7mYrZBRVBSDU64IS3cf5+QgGgX39tGbI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736435464; c=relaxed/simple;
-	bh=RZhfDkE6p46GlDtLzAG8SL7OVdV6Nd9Z6bBWdU17A2I=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=D2HHzUqYoHpVTPeWov7sW9/ZNrWJ7hKzGTkZKi0GmwtkTMqBX3JCio9ajHx94lxyCU3v8S3g93uHXu7Ki4Fm5HAemADF6zbkUkxvNhRnPoH6rx2pnVI8Nrpa8OCTvMjABnCGBBUFVwU2fTw5GPD8QQui2kYiK/O9/R9gp3YttKU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BjPEZE6W; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9B594C4CED2;
-	Thu,  9 Jan 2025 15:11:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736435464;
-	bh=RZhfDkE6p46GlDtLzAG8SL7OVdV6Nd9Z6bBWdU17A2I=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=BjPEZE6WcTgx0B90cbZDD4QCTZETHaAl+AC4yNzA1tcaDVwBnBHagf5P4+6Z7G3pk
-	 zySY3kNdNnF1jxtT9AJ8RT68j0A+7mdMuq1zqIO5R/7Ag/ubHu2/G7aPJ3Td7qqJqM
-	 1aY3AxxO05pvf6oko/+8Z3OnTMZt4kF7Pzgwc/LN7cHyN2zR+OImkENRoWzYs0fxwp
-	 JlcozEJMMvwCKPjDbQMdda0u/EOCA9UYyxAW1ckNBcVM5tYNsD4Yi1RUD3a/7P11Y0
-	 xUaxynEdCE9Q09LcpOAmKYR9vuop/j2DAwn07F6i3mD/aeqgCjYTohVBZl5Lti9sEQ
-	 MdxthGFJhTHXQ==
-Date: Thu, 9 Jan 2025 07:11:02 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Fedor Pchelkin <pchelkin@ispras.ru>
-Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>, Johan Hedberg
- <johan.hedberg@gmail.com>, Marcel Holtmann <marcel@holtmann.org>, Ignat
- Korchagin <ignat@cloudflare.com>, Kuniyuki Iwashima <kuniyu@amazon.com>,
- Eric Dumazet <edumazet@google.com>, linux-bluetooth@vger.kernel.org,
- linux-kernel@vger.kernel.org, lvc-project@linuxtesting.org,
- netdev@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: L2CAP: handle NULL sock pointer in
- l2cap_sock_alloc
-Message-ID: <20250109071102.23a5205d@kernel.org>
-In-Reply-To: <20250109-fbd0cb9fa9036bc76ea9b003-pchelkin@ispras.ru>
-References: <20241217211959.279881-1-pchelkin@ispras.ru>
-	<20250109-fbd0cb9fa9036bc76ea9b003-pchelkin@ispras.ru>
+	s=arc-20240116; t=1736435774; c=relaxed/simple;
+	bh=2/mH/dh+L+INYwLeVhhjKzMuzAKZOx2twcedb9u+1js=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=RRKMOvXwsl5ubKJCiu6hGIGgFC661fcp+8cYY07wgYC044aO+Ov9mkkReRhNpBP3lk8EfxrlXYspeimv6M1XHMI2R7SlgtQ5EZQoueWZFNcOPFNJNeHv0rAbUGmxnNqjKWd31sboWlYKljbL1QTCm8WN0O3P/g1Wf3xmrdunPmI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=nYLMZl3K; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:Content-Type:MIME-Version:
+	Message-ID:Subject:Cc:To:From:Date:Reply-To:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=pu7iKMgFtLxoX0yqIz2R3oUnaHmPu6/03Ud8YYLEne4=; b=nYLMZl3Kke+BNNOpQ7d/djHSTH
+	Rf+A2ly5KkGFLUD1NF6skHEPqKTBL4KSq0HsjWD8Rr7SDmczQBAlYzA0sfyAQN3kNDqCI0YWOKWyr
+	x1/qi1ScIsz5dlXoJBeAB/ShUhk86wY08BRnx42MVr64sjC1Z2w9gt5REcQhxxOj8zN+biE6VOVMw
+	JBIDzOrgfF8Qq4xIbwOxL1Jo7aVyiCFgviBPJ2cL1CYd7ka6xDagYKd3yQwkkE9x8tFqvhkXpA0gY
+	SYIIQrwiZO1bjzeNB7VJ3xSSy7vsRObANsYPqmIDAIg9XUrj6Gp2VLTpx7OAljHiIo2nCnBywQt7k
+	EhPwMOpQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:40130)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1tVuFk-0002Cp-0K;
+	Thu, 09 Jan 2025 15:15:20 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1tVuFb-0007PQ-1c;
+	Thu, 09 Jan 2025 15:15:11 +0000
+Date: Thu, 9 Jan 2025 15:15:11 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Alexander Couzens <lynxis@fe80.eu>,
+	Alexander Duyck <alexanderduyck@fb.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	=?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Daniel Machon <daniel.machon@microchip.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	DENG Qingfang <dqfext@gmail.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Eric Woudstra <ericwouds@gmail.com>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Horatiu Vultur <horatiu.vultur@microchip.com>,
+	Ioana Ciornei <ioana.ciornei@nxp.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jose Abreu <Jose.Abreu@synopsys.com>, kernel-team@meta.com,
+	Lars Povlsen <lars.povlsen@microchip.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org,
+	Madalin Bucur <madalin.bucur@nxp.com>,
+	Marcin Wojtas <marcin.s.wojtas@gmail.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	Michal Simek <michal.simek@amd.com>, netdev@vger.kernel.org,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
+	Sean Anderson <sean.anderson@seco.com>,
+	Sean Wang <sean.wang@mediatek.com>,
+	Steen Hegelund <Steen.Hegelund@microchip.com>,
+	Taras Chornyi <taras.chornyi@plvision.eu>,
+	UNGLinuxDriver@microchip.com, Vladimir Oltean <olteanv@gmail.com>
+Subject: [PATCH net-next 0/5] net: phylink: fix PCS without autoneg
+Message-ID: <Z3_n_5BXkxQR4zEG@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Thu, 9 Jan 2025 10:47:12 +0300 Fedor Pchelkin wrote:
-> On Wed, 18. Dec 00:19, Fedor Pchelkin wrote:
-> > A NULL sock pointer is passed into l2cap_sock_alloc() when it is called
-> > from l2cap_sock_new_connection_cb() and the error handling paths should
-> > also be aware of it.
-> > 
-> > Seemingly a more elegant solution would be to swap bt_sock_alloc() and
-> > l2cap_chan_create() calls since they are not interdependent to that moment
-> > but then l2cap_chan_create() adds the soon to be deallocated and still
-> > dummy-initialized channel to the global list accessible by many L2CAP
-> > paths. The channel would be removed from the list in short period of time
-> > but be a bit more straight-forward here and just check for NULL instead of
-> > changing the order of function calls.
-> > 
-> > Found by Linux Verification Center (linuxtesting.org) with SVACE static
-> > analysis tool.
-> > 
-> > Fixes: 7c4f78cdb8e7 ("Bluetooth: L2CAP: do not leave dangling sk pointer on error in l2cap_sock_create()")
-> > Cc: stable@vger.kernel.org
-> > Signed-off-by: Fedor Pchelkin <pchelkin@ispras.ru>
-> > ---  
-> 
-> Urgh.. a bit confused about which tree the patch should go to - net or
-> bluetooth.
-> 
-> I've now noticed the Fixes commit went directly via net-next as part of a
-> series (despite "Bluetooth: L2CAP:" patches usually go through bluetooth
-> tree first). So what about this patch?
+Hi,
 
-7c4f78cdb8e7 went directly to net-next because it was a larger series touching
-multiple sub-subsystems:
+Eric Woudstra reported that a PCS attached using 2500base-X does not
+see link when phylink is using in-band mode, but autoneg is disabled,
+despite there being a valid 2500base-X signal being received. We have
+these settings:
 
-$ git log -12 --graph --oneline 2d859aff775df54
-*   2d859aff775d Merge branch 'do-not-leave-dangling-sk-pointers-in-pf-create-functions'
-|\  
-| * 18429e6e0c2a Revert "net: do not leave a dangling sk pointer, when socket creation fails"
-| * 48156296a08c net: warn, if pf->create does not clear sock->sk on error
-| * 9df99c395d0f net: inet6: do not leave a dangling sk pointer in inet6_create()
-| * 9365fa510c6f net: inet: do not leave a dangling sk pointer in inet_create()
-| * b4fcd63f6ef7 net: ieee802154: do not leave a dangling sk pointer in ieee802154_create()
-| * 811a7ca7320c net: af_can: do not leave a dangling sk pointer in can_create()
-| * 3945c799f12b Bluetooth: RFCOMM: avoid leaving dangling sk pointer in rfcomm_sock_alloc()
-| * 7c4f78cdb8e7 Bluetooth: L2CAP: do not leave dangling sk pointer on error in l2cap_sock_create()
-| * 46f2a11cb82b af_packet: avoid erroring out after sock_init_data() in packet_create()
-|/  
-* 397006ba5d91 net/sched: cbs: Fix integer overflow in cbs_set_port_rate()
+	act_link_an_mode = MLO_AN_INBAND
+	pcs_neg_mode = PHYLINK_PCS_NEG_INBAND_DISABLED
+
+Eric diagnosed it to phylink_decode_c37_word() setting state->link
+false because the full-duplex bit isn't set in the non-existent link
+partner advertisement word (which doesn't exist because in-band
+autoneg is disabled!)
+
+The test in phylink_mii_c22_pcs_decode_state() is supposed to catch
+this state, but since we converted PCS to use neg_mode, testing the
+Autoneg in the local advertisement is no longer sufficient - we need
+to be looking at the neg_mode, which currently isn't provided.
+
+We need to provide this via the .pcs_get_state() method, and this
+will require modifying all PCS implementations to add the extra
+argument to this method.
+
+Patch 1 uses the PCS neg_mode in phylink_mac_pcs_get_state() to correct
+the now obsolute usage of the Autoneg bit in the advertisement.
+
+Patch 2 passes neg_mode into the .pcs_get_state() method, and updates
+all users.
+
+Patch 3 adds neg_mode as an argument to the various clause 22 state
+decoder functions in phylink, modifying drivers to pass the neg_mode
+through.
+
+Patch 4 makes use of phylink_mii_c22_pcs_decode_state() rather than
+using the Autoneg bit in the advertising field.
+
+Patch 5 may be required for Eric's case - it ensures that we report
+the correct state for interface types that we support only one set
+of modes for when autoneg is disabled.
+
+ drivers/net/dsa/b53/b53_serdes.c                   |  4 +-
+ drivers/net/dsa/mt7530.c                           |  2 +-
+ drivers/net/dsa/mv88e6xxx/pcs-6185.c               |  1 +
+ drivers/net/dsa/mv88e6xxx/pcs-6352.c               |  1 +
+ drivers/net/dsa/mv88e6xxx/pcs-639x.c               |  5 +-
+ drivers/net/dsa/qca/qca8k-8xxx.c                   |  2 +-
+ drivers/net/ethernet/cadence/macb_main.c           |  3 +-
+ drivers/net/ethernet/freescale/fman/fman_dtsec.c   |  4 +-
+ drivers/net/ethernet/marvell/mvneta.c              |  2 +-
+ drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c    |  2 +
+ .../net/ethernet/marvell/prestera/prestera_main.c  |  1 +
+ drivers/net/ethernet/meta/fbnic/fbnic_phylink.c    |  2 +-
+ .../net/ethernet/microchip/lan966x/lan966x_main.h  |  2 +-
+ .../ethernet/microchip/lan966x/lan966x_phylink.c   |  3 +-
+ .../net/ethernet/microchip/lan966x/lan966x_port.c  |  4 +-
+ .../net/ethernet/microchip/sparx5/sparx5_phylink.c |  2 +-
+ drivers/net/ethernet/xilinx/xilinx_axienet_main.c  |  3 +-
+ drivers/net/pcs/pcs-lynx.c                         |  4 +-
+ drivers/net/pcs/pcs-mtk-lynxi.c                    |  4 +-
+ drivers/net/pcs/pcs-xpcs.c                         |  7 +--
+ drivers/net/phy/phylink.c                          | 60 ++++++++++++++++------
+ include/linux/phylink.h                            | 11 ++--
+ 22 files changed, 87 insertions(+), 42 deletions(-)
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
