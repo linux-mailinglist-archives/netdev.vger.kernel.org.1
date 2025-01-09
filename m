@@ -1,91 +1,125 @@
-Return-Path: <netdev+bounces-156616-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156617-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0DE5AA07289
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 11:15:24 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 808C4A0728F
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 11:15:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 08C4716824E
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 10:15:22 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4C3147A2B0D
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 10:15:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E56D216381;
-	Thu,  9 Jan 2025 10:15:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA2F3215777;
+	Thu,  9 Jan 2025 10:15:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f69.google.com (mail-io1-f69.google.com [209.85.166.69])
+Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2899215786
-	for <netdev@vger.kernel.org>; Thu,  9 Jan 2025 10:15:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.69
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABF862040B6;
+	Thu,  9 Jan 2025 10:15:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736417706; cv=none; b=Ma2p8nYyxkQoXYm5f8G2hoRw0zemN341M9Vw6OJjCnoyO6OvVVphaVwrBadWNQbSFqKThOvZew1RUb8OB73meiaLcPNYBlDDIPoeGs93qPzyjGpNYblgP78dFZTxuSVxLltna1AyZ8U33u2DZG8y4rClLqH7EJ0vaL/Gvy558IY=
+	t=1736417724; cv=none; b=S7G/OhwYrrvO53BPL4ClsBXjdGWD2jlLRUQA7wphhEEWEzc5dmyfM8UbDZpuwHgDOCrrBVg0Ag6UgJzw15oHOUTdULkO0RNQDURqYUAjPuVGfoOnpf5cuCQU+VoHOeqEGFj/juPd0v6pFz4RoUoBNvfqwn1MKIqj21vGF0VL15U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736417706; c=relaxed/simple;
-	bh=kbyruUblBhGqvdvcdX8FQpbEnhYxPFdcdXEruhRjdaY=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=IPsgv+09HtLef/jcGEoLIiVFvLn1FBmgs4q7Od3HPER5MzLONeCWgmbSNAIV+OXjdIdLBIii3m/DBJRX9JSOhb6+LD/kIiDUEhcQytCSvVmsWOBdwpMyl/pUZceU4L2nbtGYaOIgg+Bhazw+aBbXQ0zAMikL7f9lWXrOsIKN+vM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.69
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-845dee0425cso60243839f.0
-        for <netdev@vger.kernel.org>; Thu, 09 Jan 2025 02:15:04 -0800 (PST)
+	s=arc-20240116; t=1736417724; c=relaxed/simple;
+	bh=311/ikchyM8xu+Txmxl7n+xLSLICgYUMKH6CYUynGt4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FzEeqm5KlLAACZ8aytOWYsPlUWOeigbtASpgEQSXbxC8mPQAuuUH2AvxNSG/zpCRltCQgT8lKXgSZV/MBQQvcy9dWwFbTEeOxewWCtuyvGPdE9sHcRzTEGHvzmD0dQltmhSM7lDX1wbz7xhTsuiDIPfnrelAcRCeU2zGdbrVJX4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-5d3d2a30afcso1089405a12.3;
+        Thu, 09 Jan 2025 02:15:22 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736417704; x=1737022504;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=B1KyLOxtLSju+kMk5DlvaCFJoyIAsTFtQb1SI5TVf6g=;
-        b=lj36LH+InFO28pz4AvJbFg7Z42FtrIk5pXd2Sy8sAiP/Fc6Lo70AJyBZ/h1bsS2sJ0
-         STMUImVvFwYLLkS/I3UYlKF0cLXAJvFWPziw0NJN1ixEvadWpp+XjQFjCQCR1qiqglmJ
-         Kn0QX7ckFqBOr7oFNtc7da5QzEDXrrH3HSmEnOyX1VfjX/9h3RvY5cNEVijM5BJ1flSN
-         MKJmR7RMlB53iDQUca4Tmdc9+7Hl/1CnOXfzZsznMMVEUIrypUIMNCUkcURWxDou8YsB
-         HAh0p6aEGElZwNOG2Nw88tOgUSxqPzsPW2te0IuhUoWFcQjh2UQE0zWOTQ51zpze+SDc
-         c53g==
-X-Forwarded-Encrypted: i=1; AJvYcCWYu3av8123XhWvISChwJmA3puMZ1l3netvSBPSXV+FkBR5VSBCGtJ+GIQPBV2U9X5nkS0lWuE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzdou/oYHiamaRbKzJSGpb4h2udhZJgUlTGoTg3fGxVwWyzaqnt
-	8CzpM1GN4TD7Tg1TGg4RMsuEh6E/m3nCS+6MviiTe8pPrVFKsgxjSgxMs4l9x6MlULfBKaKm5vC
-	24HJu/QoOl66JF07ywgiUKM+bDKnRvpkEmdRwjsmNcYimt/Y9WlXD9bk=
-X-Google-Smtp-Source: AGHT+IH2QInG3jDHyiVNPfZgn0++Tkz4Y5LCkLxo9WKy/mclasTAGOgowMoJPjHgAXD1Pi/vi3la0WkAWKV44ggGP4GmCciogWru
+        d=1e100.net; s=20230601; t=1736417720; x=1737022520;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=JDRp8Y48+Qc4viK5TPOssGsm1V9bKxfNVfJifzYZl7Q=;
+        b=hd0cL/LDbRSXqc/LaB3LgD1e02AO443WYztGV9uBtO+WTmyo4L37lwh5gaaCInQAI0
+         n5y7k/prpyIjY1CYXN82QoRQl33AIp5NPw2M3ICSGjL00aqk12qqKtK9p6THQVfDMfZw
+         pjewrvLek24TocitEfUd2iVcU5Pxwa1FkoMMOyPSy+aOU32nZv4z68V/zU25JSJ4KsEX
+         LWmFTpAIqq4j4AT8sPj9Nsv+T2GjTmdknEgmWZhHzhj4wVncr7BIsDrOvj0UqOwWcYYk
+         lI6IySEv8GRdw6UstLJEmV+1/wJt4oBxNf3Kw5G6V721hC0gDUdjajkHHkFqkiZYih9O
+         GeUw==
+X-Forwarded-Encrypted: i=1; AJvYcCUX9KNwggfUREEfafe7qpXbmWfemt/hSeNVAy6ZYWy1SrVGs4NNaJ4JkIKSgo4n4snjm4cHa2DlWt4VBps=@vger.kernel.org, AJvYcCV/c2STLKll8L/nzQZ/Os1xrfRS+rxvNKOZsbV5OAjOe3+q+W8aJS3k6hr4yI5lbWbkf5csRJaguLJLsIjh@vger.kernel.org, AJvYcCWCV0o14gWl9ARtl/w998eLJm6Ujs86rRwIetVnc7ROJO9n2De/aeiTH38d8lpYuzab1xwcJqS6@vger.kernel.org
+X-Gm-Message-State: AOJu0YylqUM+TPiE+ZeAdrzFUo5WQqDBUr4C23Bq+TMk/E5X3Z2/bslz
+	sZMBIsqROgokA4o78Bcp71V/G3dg8r+ZdUCTaSFuEVZrcFQe7CV6
+X-Gm-Gg: ASbGncuMVOoJJ8AjdDaMIkrB7U8hafTmX/J0n3ZiHYEVU9UnmLpGwI4ZcnZkFODNhS5
+	p7gakzgTkFNfJ7Mjw4hMGtigFX/5vGpM6JG58+dh0RU1B+jzRpai+XiWtoBHFlBJxHzVxxgb2C8
+	EC/8Tr+WjbVHvQNs9jH3sNvf6nPhCAB6DZR5lAXEAAIqIuzuz/2lyL/KnTeOjxX7S1FmLlAC9ZZ
+	2KsMLVQsU7UEymExPTIPap8lThB9mQBb3bkltTkIzg2ovM=
+X-Google-Smtp-Source: AGHT+IFlrf4GxaUQV5QxSnOq4UImdTGUQj634dbvUjEFoa3RwIk41IIuT3auoj1ux1Aj70DsJwOnUg==
+X-Received: by 2002:a05:6402:51cf:b0:5d1:22c2:6c56 with SMTP id 4fb4d7f45d1cf-5d972e1be28mr5504022a12.17.1736417720392;
+        Thu, 09 Jan 2025 02:15:20 -0800 (PST)
+Received: from gmail.com ([2a03:2880:30ff:6::])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5d99046dd55sm433118a12.54.2025.01.09.02.15.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 Jan 2025 02:15:19 -0800 (PST)
+Date: Thu, 9 Jan 2025 02:15:17 -0800
+From: Breno Leitao <leitao@debian.org>
+To: Michael Kelley <mhklinux@outlook.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	"saeedm@nvidia.com" <saeedm@nvidia.com>,
+	"tariqt@nvidia.com" <tariqt@nvidia.com>,
+	"linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Thomas Graf <tgraf@suug.ch>, Tejun Heo <tj@kernel.org>,
+	Hao Luo <haoluo@google.com>, Josh Don <joshdon@google.com>,
+	Barret Rhoden <brho@google.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] rhashtable: Fix potential deadlock by moving
+ schedule_work outside lock
+Message-ID: <20250109-marigold-bandicoot-of-exercise-8ebede@leitao>
+References: <20241128-scx_lockdep-v1-1-2315b813b36b@debian.org>
+ <Z1rYGzEpMub4Fp6i@gondor.apana.org.au>
+ <Z2aFL3dNLYOcmzH3@gondor.apana.org.au>
+ <20250102-daffy-vanilla-boar-6e1a61@leitao>
+ <SN6PR02MB41572415707F0FA6D9A61247D4132@SN6PR02MB4157.namprd02.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:160e:b0:3a7:e86a:e80f with SMTP id
- e9e14a558f8ab-3ce3a9a5b0cmr54427525ab.3.1736417703971; Thu, 09 Jan 2025
- 02:15:03 -0800 (PST)
-Date: Thu, 09 Jan 2025 02:15:03 -0800
-In-Reply-To: <a4n77w3u22efhdnyz5xn5gjvsfq7xncy3lyn32xqobnuw6gb27@kxubdyn4hr2q>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <677fa1a7.050a0220.25a300.01b5.GAE@google.com>
-Subject: Re: [syzbot] [virt?] [net?] general protection fault in vsock_connectible_has_data
-From: syzbot <syzbot+3affdbfc986ecd9200fd@syzkaller.appspotmail.com>
-To: cong.wang@bytedance.com, davem@davemloft.net, edumazet@google.com, 
-	horms@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	mst@redhat.com, netdev@vger.kernel.org, pabeni@redhat.com, 
-	sgarzare@redhat.com, syzkaller-bugs@googlegroups.com, 
-	virtualization@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <SN6PR02MB41572415707F0FA6D9A61247D4132@SN6PR02MB4157.namprd02.prod.outlook.com>
 
-Hello,
+Hello Michael,
 
-syzbot has tested the proposed patch and the reproducer did not trigger any issue:
+On Thu, Jan 09, 2025 at 03:16:03AM +0000, Michael Kelley wrote:
+> From: Breno Leitao <leitao@debian.org> Sent: Thursday, January 2, 2025 2:16 AM
+> > 
+> > On Sat, Dec 21, 2024 at 05:06:55PM +0800, Herbert Xu wrote:
+> > > On Thu, Dec 12, 2024 at 08:33:31PM +0800, Herbert Xu wrote:
+> > > >
+> > > > The growth check should stay with the atomic_inc.  Something like
+> > > > this should work:
+> > >
+> > > OK I've applied your patch with the atomic_inc move.
+> > 
+> > Sorry, I was on vacation, and I am back now. Let me know if you need
+> > anything further.
+> > 
+> > Thanks for fixing it,
+> > --breno
+> 
+> Breno and Herbert --
+> 
+> This patch seems to break things in linux-next. I'm testing with
+> linux-next20250108 in a VM in the Azure public cloud. The Mellanox mlx5
+> ethernet NIC in the VM is failing to get setup.
 
-Reported-by: syzbot+3affdbfc986ecd9200fd@syzkaller.appspotmail.com
-Tested-by: syzbot+3affdbfc986ecd9200fd@syzkaller.appspotmail.com
+Thanks for reporting the issue. I started rolling this patch to Meta's
+fleet, and we started seeing a similar problem. Altough not fully
+understood yet.
 
-Tested on:
+I would suggest we revert this patch until we investigate further. I'll
+prepare and send a revert patch shortly.
 
-commit:         767faff2 vsock/bpf: return early if transport is not a..
-git tree:       https://github.com/stefano-garzarella/linux.git fix-vsock-null-transport
-console output: https://syzkaller.appspot.com/x/log.txt?x=17c9d4b0580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=4ef22c4fce5135b4
-dashboard link: https://syzkaller.appspot.com/bug?extid=3affdbfc986ecd9200fd
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-
-Note: no patches were applied.
-Note: testing is done by a robot and is best-effort only.
+Sorry for the noise,
+--breno
 
