@@ -1,155 +1,190 @@
-Return-Path: <netdev+bounces-156686-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156687-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 811F8A07602
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 13:46:33 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B65A1A0760C
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 13:47:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 07E17188A51C
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 12:46:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A36A7166299
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 12:47:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFA77218593;
-	Thu,  9 Jan 2025 12:46:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25492217710;
+	Thu,  9 Jan 2025 12:47:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fvRoZwRM"
+	dkim=pass (2048-bit key) header.d=toke.dk header.i=@toke.dk header.b="YQNBVHHR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f180.google.com (mail-qk1-f180.google.com [209.85.222.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.toke.dk (mail.toke.dk [45.145.95.4])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34C52216E37;
-	Thu,  9 Jan 2025 12:46:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CFC4217707
+	for <netdev@vger.kernel.org>; Thu,  9 Jan 2025 12:47:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.145.95.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736426780; cv=none; b=p1wvoSrurTnxMlKA8Z9xtup9LFsos73aYlYs+NpEVYPlSPbQiOzuY0ClfMMlDVkG86hm75x0ZLVRqJ39+vK3Y6KHCrsapo2/J1LF3EJ3/YrWlFjGq4o87+Ya2IN4gLMqKMENBOSJSP30vt6g2iy7FzyjR42zx0nu6CrMRLGCwOA=
+	t=1736426844; cv=none; b=HUG+HmsCMWiYouEUiGcfTd3tm5yMAXyRtrq3GGK6pf+bhvXNuW9XSYH8H8JiekSzitYyWb0ETOLXqxUypertAKJKqEA7kjaoFR1YUdGC4+NZjZAwbGckXJQxBUtOq+exlkM1KmcaPpb3fm/q7W2s25FWGQVSuENID7e2OBNBaY0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736426780; c=relaxed/simple;
-	bh=nOOZA+iN0ga0CTphyM/C05+qgOczZ68TEd0WLotUewg=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=KLmbaAeFCp6TgOP0r0KdtNF5ImN+Wb50AgQZO8ihSXNF+lsZN6JV0RNYJ0Z/m+QvY4sj6x6M1VNr5yhs+PuimaAv9xGBCtaRiDBNQR4kWymGBbqJSNJN0TqWGYENUV1ulFjMkyKThZfD0R9tCJgxuLeEIldf6B4/V/gW09lJH7g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fvRoZwRM; arc=none smtp.client-ip=209.85.222.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f180.google.com with SMTP id af79cd13be357-7b85d5cc39eso87453285a.3;
-        Thu, 09 Jan 2025 04:46:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736426777; x=1737031577; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kaPMLCUZXOj8V/TsoKhneA/pbfWV2N1nHu6od460Xzw=;
-        b=fvRoZwRMvr5M/MLiHu4/wjKv6pIXRtlIZXjCImm2KGwBN8zmaSX1NjxlzebJvvr/QK
-         enQ+pTbyap/SMJmZKseFnH27xnx7GQAUpwXV2RveO2tBTzDcYtFKn8Vrqx9hSeg5Pzew
-         Ta6PQ8sesIuV7hE+h46OikRUBwoqHodMahXI7xAphfnDlZeZ+1pF+49Lvr2SaoRIiVq3
-         BLsB4FZR6+uc1VsvswzCgquThpNrvI/BcqEM89Pu2PmDvPgMVHR+OV1IN+HXWDHiToXL
-         48K0w4y53Hh2LoGhH/UNgrZGRBG10DKbmpc8Qum1Vc3NcChXiJ25eMs+iz3dxBwE2Sl/
-         wh/w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736426777; x=1737031577;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=kaPMLCUZXOj8V/TsoKhneA/pbfWV2N1nHu6od460Xzw=;
-        b=wX9UYrGAhzRzaVioXKMg0g6DAfet2PVRLBNpJ5xSopSBM17/T3bg2ZAXk8Rfn30Ao9
-         3mPsJG7u8jD23NoC91/dh+JPKS3O+7zZUftqkmSViCi+WtyT/segvJO/IJ4zbs7uIEre
-         0+XcDIP4LZjmcF4/ks/tmDnTSXiYMjyltABnHVau53+wwm7rb7v017xCNNxVEoweGHbm
-         z9sUzF+BmAdn+5UWUD6hTUsGi3SDDPuMFWcer+M+Olc0yWi1VpiSLa9PykVb3tR4NDOG
-         8FgywiGrXTm/zZqbz7QaebpckzN3rXMCIROAPEl9KAq7la88KRr9czjKfbWoSS7/EjKK
-         U7mQ==
-X-Forwarded-Encrypted: i=1; AJvYcCURWYcFuaNu6VJZwalB584a/mzeDyRc6h8UCC1qguwoR3ou4HVZBdbXPfF/hGyXEQJJefWVnwqaPvm38zTVTXjK@vger.kernel.org, AJvYcCUkaJFEShQ0LhXToNzOloP5CekWcGzGXxFQBIjWF2s/6EgFSk7KrFA2azE8Kbh9XxfLruA=@vger.kernel.org, AJvYcCUrlRjwYs2JqEXVDKlCCQodaFAJ2fTZVu4EBJ73Og+VCyd0aDIVZfc04UhaoVk3vSz2QHcf6yWcvpNBqFA+@vger.kernel.org, AJvYcCVYZhGyEyxCYhYLSbYaRaWVB537feG/zIYcbJIWW1PJMC8KhuOwgYgouT7Epqz+gDSgy+5fK+ni@vger.kernel.org, AJvYcCW6IY0XLhpA0mIIvp0FWZ4/Uq3nu+4LsHD4h1VvVnxe+TCl8wswai4hq4UT4OuemTiThInFpC/oZx4I@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw00mAZAtw1hhDB44QuHsQaxhOIAaWXBu9aRkcS1wPyIRAq6iQw
-	hckMKAdFePZ3lftHb/mDQz79lEu9j3/McUJ2Rrtq300827xAgWsZ
-X-Gm-Gg: ASbGnctRW9bcYo2V9/31gJ+TVIQIV1D13IbG9vqGdgInL2ZC7z8PtGzs7W4f/ihBDHz
-	onFR5Kbl4BypUTARCK7ejXQBCVBHHGDHSTMgQ/dTkj7rFe6P3cqbru3KZuZRNcQN0gZiSbHKQIG
-	d5Ebkd8dj7ONdwcl1hs7Orm9v+UVp5lqMGV2wUS38bTrWPpJ+IHrerBUttrcc7ZgBYC1IEj8lFL
-	+PPywj39KDAqgHkHEOdkfxZI6a3XSSTCTI+9SjMhRhk4OvRohuV7S4uWKveI4+V4hoXLjnGHkQH
-	pXkIcCxUT1AGMVgVXvSKI6A8nlyZ
-X-Google-Smtp-Source: AGHT+IElltpq0Se5BPymgSR44p/+E1b35WmaB/SUjKp4ksNe7YwiYRSh+K5j9T3I6qKRunWydJbAbg==
-X-Received: by 2002:a05:620a:444f:b0:7b6:f1be:4f7e with SMTP id af79cd13be357-7bcd9755084mr912637385a.26.1736426777023;
-        Thu, 09 Jan 2025 04:46:17 -0800 (PST)
-Received: from localhost (15.60.86.34.bc.googleusercontent.com. [34.86.60.15])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7bce3516068sm62500685a.100.2025.01.09.04.46.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Jan 2025 04:46:16 -0800 (PST)
-Date: Thu, 09 Jan 2025 07:46:15 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Akihiko Odaki <akihiko.odaki@daynix.com>, 
- "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Jonathan Corbet <corbet@lwn.net>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- Jason Wang <jasowang@redhat.com>, 
- "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
- Shuah Khan <shuah@kernel.org>, 
- linux-doc@vger.kernel.org, 
- linux-kernel@vger.kernel.org, 
- netdev@vger.kernel.org, 
- kvm@vger.kernel.org, 
- virtualization@lists.linux-foundation.org, 
- linux-kselftest@vger.kernel.org, 
- Yuri Benditovich <yuri.benditovich@daynix.com>, 
- Andrew Melnychenko <andrew@daynix.com>, 
- Stephen Hemminger <stephen@networkplumber.org>, 
- gur.stavi@huawei.com, 
- devel@daynix.com
-Message-ID: <677fc517b7b6e_362bc12945@willemb.c.googlers.com.notmuch>
-In-Reply-To: <571a2d61-5fbe-4e49-b4d1-6bf0c7604a57@daynix.com>
-References: <20250109-tun-v2-0-388d7d5a287a@daynix.com>
- <20250109-tun-v2-2-388d7d5a287a@daynix.com>
- <20250109023056-mutt-send-email-mst@kernel.org>
- <571a2d61-5fbe-4e49-b4d1-6bf0c7604a57@daynix.com>
-Subject: Re: [PATCH v2 2/3] tun: Pad virtio header with zero
+	s=arc-20240116; t=1736426844; c=relaxed/simple;
+	bh=SQuxm+ItjKfTHqDCnhmWPP3mexlv7P5RG77HW1/uIAQ=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=M/gWPXKD1PuN9jwPiOULcLzI5YqWoSwQgR1Qrt7+fqO0aW2fwQdUoohLDys9xhm/6NR0D6gRDmbThJ8X9xfBfOGJoP8FHAU8zcO1u0v9QdOjOThLLQIsShQ9ZAimyBcJ/pZbbUHFVRSbC8M83iuXqXvl5RezxBedtfWR7YxQPZw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=toke.dk; spf=pass smtp.mailfrom=toke.dk; dkim=pass (2048-bit key) header.d=toke.dk header.i=@toke.dk header.b=YQNBVHHR; arc=none smtp.client-ip=45.145.95.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=toke.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=toke.dk
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=toke.dk; s=20161023;
+	t=1736426838; bh=SQuxm+ItjKfTHqDCnhmWPP3mexlv7P5RG77HW1/uIAQ=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=YQNBVHHRUFbGfQ7S1lj/AaI1UHht3Yop0leBB6u0I4shd8583P21MwnUnaK/RcQVn
+	 im1b8k+iLaZ4a6wI+S448xPTyPkgaP4Wq5hns8uqvpV6pVvhGasQhEQC7UczKJt0PA
+	 qdl7aPqmFc1Kk/yXQQqUBIx16LMd2KG0KII6zTkFSsFgiqjDY8t2jVh1N4FSGLjwuG
+	 6VHJ+OPmnfpZSJEp9+tQce1fjl52TRhoOctIXaL54+PRngLCWaYuWEq1Jt7+KcNnf0
+	 lMTX08vw8hH3DdFtY4OU4yUuw5vT0lVTQOPzkJCDKo5Q1iLMU/sc6MwVnnLIbVxxE4
+	 sCT+HzLk+MFpQ==
+To: Paolo Abeni <pabeni@redhat.com>, Jamal Hadi Salim <jhs@mojatatu.com>,
+ Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>
+Cc: syzbot+f63600d288bfb7057424@syzkaller.appspotmail.com, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
+ cake@lists.bufferbloat.net, netdev@vger.kernel.org
+Subject: Re: [PATCH net v2] sched: sch_cake: add bounds checks to host bulk
+ flow fairness counts
+In-Reply-To: <fb7a1324-41c6-4e10-a6a3-f16d96f44f65@redhat.com>
+References: <20250107120105.70685-1-toke@redhat.com>
+ <fb7a1324-41c6-4e10-a6a3-f16d96f44f65@redhat.com>
+Date: Thu, 09 Jan 2025 13:47:17 +0100
+X-Clacks-Overhead: GNU Terry Pratchett
+Message-ID: <87plkwi27e.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Akihiko Odaki wrote:
-> On 2025/01/09 16:31, Michael S. Tsirkin wrote:
-> > On Thu, Jan 09, 2025 at 03:58:44PM +0900, Akihiko Odaki wrote:
-> >> tun used to simply advance iov_iter when it needs to pad virtio header,
-> >> which leaves the garbage in the buffer as is. This is especially
-> >> problematic when tun starts to allow enabling the hash reporting
-> >> feature; even if the feature is enabled, the packet may lack a hash
-> >> value and may contain a hole in the virtio header because the packet
-> >> arrived before the feature gets enabled or does not contain the
-> >> header fields to be hashed. If the hole is not filled with zero, it is
-> >> impossible to tell if the packet lacks a hash value.
+Paolo Abeni <pabeni@redhat.com> writes:
 
-Zero is a valid hash value, so cannot be used as an indication that
-hashing is inactive.
+> On 1/7/25 1:01 PM, Toke H=C3=B8iland-J=C3=B8rgensen wrote:
+>> Even though we fixed a logic error in the commit cited below, syzbot
+>> still managed to trigger an underflow of the per-host bulk flow
+>> counters, leading to an out of bounds memory access.
+>>=20
+>> To avoid any such logic errors causing out of bounds memory accesses,
+>> this commit factors out all accesses to the per-host bulk flow counters
+>> to a series of helpers that perform bounds-checking before any
+>> increments and decrements. This also has the benefit of improving
+>> readability by moving the conditional checks for the flow mode into
+>> these helpers, instead of having them spread out throughout the
+>> code (which was the cause of the original logic error).
+>>=20
+>> v2:
+>> - Remove now-unused srchost and dsthost local variables in cake_dequeue()
+>
+> Small nit: the changelog should come after the '---' separator. No need
+> to repost just for this.
 
-> >> In theory, a user of tun can fill the buffer with zero before calling
-> >> read() to avoid such a problem, but leaving the garbage in the buffer is
-> >> awkward anyway so fill the buffer in tun.
-> >>
-> >> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
-> > 
-> > But if the user did it, you have just overwritten his value,
-> > did you not?
-> 
-> Yes. but that means the user expects some part of buffer is not filled 
-> after read() or recvmsg(). I'm a bit worried that not filling the buffer 
-> may break assumptions others (especially the filesystem and socket 
-> infrastructures in the kernel) may have.
+Oh, I was under the impression that we wanted them preserved in the git
+log (and hence above the ---). Is that not the case (anymore?)?
 
-If this is user memory that is ignored by the kernel, just reflected
-back, then there is no need in general to zero it. There are many such
-instances, also in msg_control.
+>> Fixes: 546ea84d07e3 ("sched: sch_cake: fix bulk flow accounting logic fo=
+r host fairness")
+>> Reported-by: syzbot+f63600d288bfb7057424@syzkaller.appspotmail.com
+>> Signed-off-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
+>> ---
+>>  net/sched/sch_cake.c | 140 +++++++++++++++++++++++--------------------
+>>  1 file changed, 75 insertions(+), 65 deletions(-)
+>>=20
+>> diff --git a/net/sched/sch_cake.c b/net/sched/sch_cake.c
+>> index 8d8b2db4653c..2c2e2a67f3b2 100644
+>> --- a/net/sched/sch_cake.c
+>> +++ b/net/sched/sch_cake.c
+>> @@ -627,6 +627,63 @@ static bool cake_ddst(int flow_mode)
+>>  	return (flow_mode & CAKE_FLOW_DUAL_DST) =3D=3D CAKE_FLOW_DUAL_DST;
+>>  }
+>>=20=20
+>> +static void cake_dec_srchost_bulk_flow_count(struct cake_tin_data *q,
+>> +					     struct cake_flow *flow,
+>> +					     int flow_mode)
+>> +{
+>> +	if (likely(cake_dsrc(flow_mode) &&
+>> +		   q->hosts[flow->srchost].srchost_bulk_flow_count))
+>> +		q->hosts[flow->srchost].srchost_bulk_flow_count--;
+>> +}
+>> +
+>> +static void cake_inc_srchost_bulk_flow_count(struct cake_tin_data *q,
+>> +					     struct cake_flow *flow,
+>> +					     int flow_mode)
+>> +{
+>> +	if (likely(cake_dsrc(flow_mode) &&
+>> +		   q->hosts[flow->srchost].srchost_bulk_flow_count < CAKE_QUEUES))
+>> +		q->hosts[flow->srchost].srchost_bulk_flow_count++;
+>> +}
+>> +
+>> +static void cake_dec_dsthost_bulk_flow_count(struct cake_tin_data *q,
+>> +					     struct cake_flow *flow,
+>> +					     int flow_mode)
+>> +{
+>> +	if (likely(cake_ddst(flow_mode) &&
+>> +		   q->hosts[flow->dsthost].dsthost_bulk_flow_count))
+>> +		q->hosts[flow->dsthost].dsthost_bulk_flow_count--;
+>> +}
+>> +
+>> +static void cake_inc_dsthost_bulk_flow_count(struct cake_tin_data *q,
+>> +					     struct cake_flow *flow,
+>> +					     int flow_mode)
+>> +{
+>> +	if (likely(cake_ddst(flow_mode) &&
+>> +		   q->hosts[flow->dsthost].dsthost_bulk_flow_count < CAKE_QUEUES))
+>> +		q->hosts[flow->dsthost].dsthost_bulk_flow_count++;
+>> +}
+>> +
+>> +static u16 cake_get_flow_quantum(struct cake_tin_data *q,
+>> +				 struct cake_flow *flow,
+>> +				 int flow_mode)
+>> +{
+>> +	u16 host_load =3D 1;
+>> +
+>> +	if (cake_dsrc(flow_mode))
+>> +		host_load =3D max(host_load,
+>> +				q->hosts[flow->srchost].srchost_bulk_flow_count);
+>> +
+>> +	if (cake_ddst(flow_mode))
+>> +		host_load =3D max(host_load,
+>> +				q->hosts[flow->dsthost].dsthost_bulk_flow_count);
+>> +
+>> +	/* The get_random_u16() is a way to apply dithering to avoid
+>> +	 * accumulating roundoff errors
+>> +	 */
+>> +	return (q->flow_quantum * quantum_div[host_load] +
+>> +		get_random_u16()) >> 16;
+>
+> dithering is now applied on both enqueue and dequeue, while prior to
+> this patch it only happened on dequeue. Is that intentional? can't lead
+> to (small) flow_deficit increase?
 
-If not zeroing leads to ambiguity with the new feature, that would be
-a reason to add it -- it is always safe to do so.
- 
-> If we are really confident that it will not cause problems, this 
-> behavior can be opt-in based on a flag or we can just write some 
-> documentation warning userspace programmers to initialize the buffer.
+Yeah, that was deliberate. The flow quantum is only set on enqueue when
+the flow is first initialised as a sparse flow, not for every packet.
+The only user-visible effect I can see this having is that the maximum
+packet size that can be sent while a flow stays sparse will now vary
+with +/- one byte in some cases. I am pretty sure this won't have any
+consequence in practice, and I don't think it's worth complicating the
+code (with a 'dither' argument to cake_flow_get_quantum(), say) to
+preserve the old behaviour.
+
+I guess I should have mentioned in the commit message that this was
+deliberate. Since it seems you'll be editing that anyway (cf the above),
+how about adding a paragraph like:
+
+ As part of this change, the flow quantum calculation is consolidated
+ into a helper function, which means that the dithering applied to the
+ host load scaling is now applied both in the DRR rotation and when a
+ sparse flow's quantum is first initiated. The only user-visible effect
+ of this is that the maximum packet size that can be sent while a flow
+ stays sparse will now vary with +/- one byte in some cases. This should
+ not make a noticeable difference in practice, and thus it's not worth
+ complicating the code to preserve the old behaviour.
+
+-Toke
 
