@@ -1,62 +1,61 @@
-Return-Path: <netdev+bounces-156803-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156804-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83E5EA07DB4
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 17:36:14 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id AFFAEA07DE6
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 17:43:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8995A1692D3
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 16:36:12 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B417E7A368C
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 16:43:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEA37222573;
-	Thu,  9 Jan 2025 16:36:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C96122259C;
+	Thu,  9 Jan 2025 16:43:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K0vZAMXC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gPa4Ar5S"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91F99222569;
-	Thu,  9 Jan 2025 16:36:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DBB6222591;
+	Thu,  9 Jan 2025 16:43:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736440566; cv=none; b=RrqXe597uKCUQ4WKzCPf8CL2zUT4JtTv5n+8rhzv+oh0YGeLaF/8SKYIusAlIHEluXUst+bRPdDOTfAqfePOJWmFzVbml09uy1QgGRX63ID+rLRbSbgQ5OcAcdKNaDolhi3qTyspsupRfKeH+UIFa8TKbfE2ej+JenmqyT1dQQs=
+	t=1736440983; cv=none; b=UhXSHswpgLbb8+b898oMhmmW/Yr1MAHG3rrq+Vy0hEDzm0o3/PhBmaW0haqWhtG/kbs+rRv1WSI3L8ge/h8UCzJr4GANCzU4zjRNGzDY+mFctRk3T/L/OIZIGoeem5GFkKwKehFuDPVs1qvx9QMjcZYY5MThR6RK5SZvr9hfoSs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736440566; c=relaxed/simple;
-	bh=jU3RypXovbkii7FU1sbotxWRcH9k7T1/3ojFfFsJa0I=;
+	s=arc-20240116; t=1736440983; c=relaxed/simple;
+	bh=5NdOS4sZnyyqMpbk/MDryGSHWiIvVszi3oKpS1TBCIc=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hImkMrBoL6yBIutKmiGGz6+7rLRsm77IXOPURZHbHeo3IdC7Xlgo+H/RcY1uccsJfxjl96xLQtDwy6rv/ZqEruklUF7+kOrG8DdeG920b1XnNenjNj/a+5aw/AlHpLtNM8+DQglEIbZv+d6W9CSPZJKMvy0ZdmC7Ax+rTEM3tCM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K0vZAMXC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66D73C4CED3;
-	Thu,  9 Jan 2025 16:36:05 +0000 (UTC)
+	 MIME-Version:Content-Type; b=jsM1aGQdRwalT7ONSBcy8OUVa0BGf3za06ZeWPXrmANar4qtvD4faUNAm6uTfOkoM0mmCtvDcEnGcd9dymTLGhVejB1pgv/PO2dE/OaeeOn9FZxl/Nd/JLZcxlMn2I6nbDc0jSo1LdMc0W6iG52vQB2WIUd7dPxVIhQnIHSQl/8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gPa4Ar5S; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1EAA4C4CED2;
+	Thu,  9 Jan 2025 16:43:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736440566;
-	bh=jU3RypXovbkii7FU1sbotxWRcH9k7T1/3ojFfFsJa0I=;
+	s=k20201202; t=1736440982;
+	bh=5NdOS4sZnyyqMpbk/MDryGSHWiIvVszi3oKpS1TBCIc=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=K0vZAMXCMDfwNFpDIttwYNvzv/Evr02hJiaBlveeXLMmK5ubZovHlbn+isIVjzJxb
-	 low1xU4JRif4413Tvq00TG3uVBdbfHGkYPiL0QaYpP/4UotrqisCGG4o++k/tvkagq
-	 Sl0JXgXh4VtsPa3nHXkLDzDi7BzLero2AEWZ1Tx8p/TBTI9Mq5/UjmnFhgTmt9GmmQ
-	 RcDQeaKjsbrFVye2QUxqfoAR/uvjNa5wt3HxNaXW0Vv2KhwRPWrkllvSGnbv4uVi9B
-	 P+t3csxGUgDXpKtRh2xhy6Cw3lzQzFjL9ASxo4nDQzf8Z68oCsS7iRDbdTCFHSOHnu
-	 2DwWILLpSvpUw==
-Date: Thu, 9 Jan 2025 08:36:04 -0800
+	b=gPa4Ar5SRxxm+r/jPKU+V86yDefmXi4Huicc4JWHjvb2i/Au2KuPm9GSsoIBIih2n
+	 H8AaYfdiN7JydpKgRuOxwl1W5qFfcJ4dwThrC6jsRaOhY0ucReNiEVeSi9et5SN+gU
+	 W9wPJnRzkJhh9E2i8WPW/f+4aOSVM2CPRmqHMWwISLuJQVUChuF13sfNUqJKFgrD9c
+	 AaBkUPB2w9X8au3e8G/pX/zJyZ9MDnwwzLIIcnXO+zpp4q4o1tumIZXH4GEGhk44kj
+	 M+lQ3fMu+e3NYSm5/ggxtzzwrODJjbSwBIiw/AGIh6Tt8Jy7uBJkUb89VlCMuX0CVh
+	 f8TNNz0MPXnWQ==
+Date: Thu, 9 Jan 2025 08:43:01 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Jeff Layton <jlayton@kernel.org>
-Cc: Donald Hunter <donald.hunter@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Chuck Lever
- <chuck.lever@oracle.com>, Neil Brown <neilb@suse.de>, Olga Kornievskaia
- <okorniev@redhat.com>, Dai Ngo <Dai.Ngo@oracle.com>, Tom Talpey
- <tom@talpey.com>, Trond Myklebust <trondmy@kernel.org>, Anna Schumaker
- <anna@kernel.org>, Scott Mayhew <smayhew@redhat.com>, Yongcheng Yang
- <yoyang@redhat.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-nfs@vger.kernel.org
-Subject: Re: [PATCH] lockd: add netlink control interface
-Message-ID: <20250109083604.77ffe61d@kernel.org>
-In-Reply-To: <20250108-lockd-nl-v1-1-b39f89ae0f20@kernel.org>
-References: <20250108-lockd-nl-v1-1-b39f89ae0f20@kernel.org>
+To: Magnus Karlsson <magnus.karlsson@gmail.com>
+Cc: Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org,
+ davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ linux-kernel@vger.kernel.org, bpf@vger.kernel.org, horms@kernel.org,
+ ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org,
+ john.fastabend@gmail.com, bjorn@kernel.org, magnus.karlsson@intel.com,
+ maciej.fijalkowski@intel.com, jonathan.lemon@gmail.com, jdamato@fastly.com,
+ mkarsten@uwaterloo.ca
+Subject: Re: [PATCH net] xsk: Bring back busy polling support
+Message-ID: <20250109084301.2445a3e3@kernel.org>
+In-Reply-To: <CAJ8uoz3bMk_0bbtGdEAkbXNHu0c5Zr+-sAUyqk2M84VLE4FtpQ@mail.gmail.com>
+References: <20250109003436.2829560-1-sdf@fomichev.me>
+	<CAJ8uoz3bMk_0bbtGdEAkbXNHu0c5Zr+-sAUyqk2M84VLE4FtpQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,24 +65,23 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 08 Jan 2025 16:00:15 -0500 Jeff Layton wrote:
-> The legacy rpc.nfsd tool will set the nlm_grace_period if the NFSv4
-> grace period is set. nfsdctl is missing this functionality, so add a new
-> netlink control interface for lockd that it can use. For now, it only
-> allows setting the grace period, and the tcp and udp listener ports.
+On Thu, 9 Jan 2025 16:22:16 +0100 Magnus Karlsson wrote:
+> > Confirmed by running a busy-polling AF_XDP socket
+> > (github.com/fomichev/xskrtt) on mlx5 and looking at BusyPollRxPackets
+> > from /proc/net/netstat.  
 > 
-> lockd currently uses module parameters and sysctls for configuration, so
-> all of its settings are global. With this change, lockd now tracks these
-> values on a per-net-ns basis. It will only fall back to using the global
-> values if any of them are 0.
+> Thanks Stanislav for finding and fixing this. As a bonus, the
+> resulting code is much nicer too.
 > 
-> Finally, as a backward compatability measure, if updating the nlm
-> settings in the init_net namespace, also update the legacy global
-> values to match.
+> I just took a look at the Intel drivers and some of our drivers have
+> not been converted to use netif_queue_set_napi() yet. Just ice, e1000,
+> and e1000e use it. But that is on us to fix.
 
-Netlinky stuff LGTM, FWIW!
+Yup, on a quick look yesterday I think I spotted a few embedded
+drivers (stmmac, tsnep, dpaa2), nfp and virtio_net which don't seem 
+to link the NAPI to queues. But I can't think of a better fix, and
+updating those drivers to link NAPI to queues will be generally
+beneficial, so in case someone else applies this:
 
-To encourage more doc: properties I should point out that we
-render the specs on docs.kernel.org, now ;)
-https://docs.kernel.org/next/networking/netlink_spec/nfsd.html
+Reviewed-by: Jakub Kicinski <kuba@kernel.org>
 
