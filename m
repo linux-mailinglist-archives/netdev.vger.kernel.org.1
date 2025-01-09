@@ -1,94 +1,238 @@
-Return-Path: <netdev+bounces-156655-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156657-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD9D0A0743B
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 12:10:14 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A92EA07444
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 12:11:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6A5341886E16
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 11:10:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BDF79167CC4
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 11:11:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E908A215F55;
-	Thu,  9 Jan 2025 11:10:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCD9E2165E0;
+	Thu,  9 Jan 2025 11:10:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="czjLaIjZ"
+	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="XWRQ2O4p"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF04F1714D7;
-	Thu,  9 Jan 2025 11:10:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4EA92163B7
+	for <netdev@vger.kernel.org>; Thu,  9 Jan 2025 11:10:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736421010; cv=none; b=EAz6zGvOzqh1+C1JD/PcwgPCVhYDjqEYKibFE/s/HUxrjImcKUIJRi4nP3NOg/r/4//gMRiHHOXagkamUA2W7WTvouIRQ6pH2GnmNAxsxO2sZSRdOpSAdBgeSJ7AgcZu2l7+SC0b2p0Ln+Gm7nkTjtwORaQAYEx3YwMiKjTT7vA=
+	t=1736421049; cv=none; b=TuTgWJo8ah9++/DqWors14Sj1dPZVd1UBYHLnRXUKckN761IbGqslIidNrFGSvjxwQKqsk5a0X4Qdj8EuceVFuWHOSpgJYilQaxfST+ul6wupfMauQf3zCa79X1IqBfBz44J2yUaGrkViTICNOYVAfeIkXvc7BesdsK6uixtcZw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736421010; c=relaxed/simple;
-	bh=TBEVsOoPldXZwQh7tAdbmVwyDSgmW78wARuRAkczgPY=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=K0FYui7na6gZy2Cw4IR9xYxKVlAN9ZtSbyQHTdbBFlf1fdqqIPTG2SvVwJYOdJy/bjJJ3HK+vKo/xuKd7q71Qq3DZAn785umAEcrUXcfVv1tuoRLzjucswwm0pLVYk/zJ4L1PS9/6D/R/GmlDqDsKpwfA59tEUf14t/3KemkPAs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=czjLaIjZ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8B5DFC4CED2;
-	Thu,  9 Jan 2025 11:10:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736421010;
-	bh=TBEVsOoPldXZwQh7tAdbmVwyDSgmW78wARuRAkczgPY=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=czjLaIjZpYJ5M5V3cVXXIFF60YpZ83Mz0YXkF5cHVpLSNHzW+FwgjT4cdJ1TGLMio
-	 dOixNqfv00kSf5ABcwlsOGNS5Nz7kzkvXS0anfiAlG1Qf0GKbwQPFEoZLPoHh0k/wU
-	 XBpFeSt9id8Xa9kDn0YBaIvBxWd8OLZTfT4GQ77TQQsLCc3zoQGgsc6G+kyJocPboi
-	 tvmZhXpTnb0Z0O5AFQ3EOm7VKB/nZC4UaCXNiSsU+Ue3FSTlmZiERBMivi4ia/A81G
-	 RMsuuikLxas+C0wuOn3lABzqm5Ih9RCQ6I1IGKH2ScsZ9NITyke6FYoeDZ7o+Bwi1P
-	 4mb3ALf3h71bg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70CD83805DB2;
-	Thu,  9 Jan 2025 11:10:33 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1736421049; c=relaxed/simple;
+	bh=OBb7WnRDA/eExZU7D3/aK8uhImmdl6QUV+d3JW/hSbc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ZN1gPrkGxKVFoQR/Xg8nOq36phBrMgDAkVTzT10JVH0ObgvZBn+PiwzkPnzDrHbGT3n1CKTkvpnkCWarTu4fTknlyEL3NSL6qR7QILECEraKy0itZqWDKNDqE/HIOvwbE/R1GD9i9GwwhQm+m5+JCiRVYk3LRnAa9aA/YJDmYlE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=pass smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=XWRQ2O4p; arc=none smtp.client-ip=209.85.214.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=daynix.com
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-219f8263ae0so11697005ad.0
+        for <netdev@vger.kernel.org>; Thu, 09 Jan 2025 03:10:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1736421047; x=1737025847; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ZR674zUgyjyCfLgZwJdeM+9L7LlWuveDZzXkvs31rv4=;
+        b=XWRQ2O4plA9t6m646yZ4ahESwYI2HrblY6gZmd0BRpcgA3fnFoZVy9klw4V4XKZUUj
+         6ogh2gzmEUuxpkIOenVkRjoKN8VZpeNRQjb8BoLaKCX/YneBl98NNEyVzcxuzlcPZE6T
+         MsW4ziZzXqpj74b5Jd0+oh6rhPO/bDRfSNZDL3EtAh38Wg1yLOC0IoA46cyibr19GyyT
+         UvAVnDfvsdUkAkqHvXd5yUuqvAWA1+8/9C28BFkiS1/siSgjuvjQhtrEs7BTwbUlVfP/
+         fVosdTRL/Iky5Ctw+pHUtYiKC29Prq4m38YPQz7mmUI4ug6Sou4U99kX/HDt9neou8EC
+         +Kxw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736421047; x=1737025847;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZR674zUgyjyCfLgZwJdeM+9L7LlWuveDZzXkvs31rv4=;
+        b=TEXkpEJM8uD3LCeUAvgC451GmvNYDxmbBnLDzYfMEBRnAtXtzAh4aCwbVrnmXhRre4
+         gug1E8t0XivM5XBLJOY8QAOZ3nIxIueubj+IugToBQ+CrAr1zlfwrI+jYzULHeXbUmpi
+         +2x4LPbJvfS9pi12G4qoxxCDwF0pm2n0sUNJLD4IFJY6/Elx3bBkPgZTXD9IwDM3/0yC
+         i3NtKFtY9sa/0XOLqrsXtRPuOQTQ0lV5Xmi8Q+qChl5v3vhKW6DPEhfqaCy6hjgpQuxu
+         sOaHBl25aQE5Uy+/AQE3JpTV3EjClhOSN3hyZgqWrgEIFRM4dQM4fdMyq83Fi8VnvGso
+         motQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUX0qr+wfqAhryWNG9lq7KkI9hDB5hFTjRT6mw+e7oxt/dEvNGnG15g8LutNMmBfxQT9Rewjqo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywf5ERvhSgwCAloKAjEd5g1CaVvpgcZeh4enUM9yYbSJalUoEhD
+	girMR5OwADI0e0rIUwtXxAI3H3daKKHE3oeyW2DacywGr5IXRXb8nszqeCxVAEQ=
+X-Gm-Gg: ASbGncsJmoqiiZY2Q1qKS4e2hvw1ipxzQBGL0WJP9ZJzUbXQmjXsLW6cciJAZosFLvl
+	XUAN/5dT0/3a1E50afWY+nhYK4H/k7FVJmjKyTo6etq7sRImQPbvy66Ntmn9Uowg1F2cW2tyKbS
+	9xYG6CDnyW42zigUdj9t58C1ZnUJee5GIKT/FMUg5iy+LPfq5vmOv/DCS6NpgIpQ1SHEafumQOh
+	CXnY5/1y0/3qX1UIFXO2Ksut7ig9I7J9Yx7Bmk4lRUc+6BM+THl/lSgpPztqGru8sI=
+X-Google-Smtp-Source: AGHT+IErb9LUclnkXFQGn0vJiPxbHdGenSK/alc5p9FV2tY+1eSNLiHiCoCuCfOfmQGgoqtm3g0RKA==
+X-Received: by 2002:a17:902:db09:b0:216:5556:8b46 with SMTP id d9443c01a7336-21a83fd96e7mr91665305ad.49.1736421047119;
+        Thu, 09 Jan 2025 03:10:47 -0800 (PST)
+Received: from [157.82.203.37] ([157.82.203.37])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21a91744428sm10194715ad.60.2025.01.09.03.10.41
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 09 Jan 2025 03:10:46 -0800 (PST)
+Message-ID: <293ce6ac-4bf8-4b26-9291-023b7e101572@daynix.com>
+Date: Thu, 9 Jan 2025 20:10:41 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2] mctp i3c: fix MCTP I3C driver multi-thread issue
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173642103231.1282460.4168413665645922160.git-patchwork-notify@kernel.org>
-Date: Thu, 09 Jan 2025 11:10:32 +0000
-References: <20250107031529.3296094-1-Leo-Yang@quantatw.com>
-In-Reply-To: <20250107031529.3296094-1-Leo-Yang@quantatw.com>
-To: Leo Yang <leo.yang.sy0@gmail.com>
-Cc: jk@codeconstruct.com.au, matt@codeconstruct.com.au, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- horms@kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- Leo-Yang@quantatw.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 3/3] tun: Set num_buffers for virtio 1.0
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Jonathan Corbet <corbet@lwn.net>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ Jason Wang <jasowang@redhat.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+ Shuah Khan <shuah@kernel.org>, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org, kvm@vger.kernel.org,
+ virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org,
+ Yuri Benditovich <yuri.benditovich@daynix.com>,
+ Andrew Melnychenko <andrew@daynix.com>,
+ Stephen Hemminger <stephen@networkplumber.org>, gur.stavi@huawei.com,
+ devel@daynix.com
+References: <20250109-tun-v2-0-388d7d5a287a@daynix.com>
+ <20250109-tun-v2-3-388d7d5a287a@daynix.com>
+ <20250109023144-mutt-send-email-mst@kernel.org>
+ <20250109023829-mutt-send-email-mst@kernel.org>
+ <ad580d7b-2bd1-401e-bb7b-b67ec943918f@daynix.com>
+ <20250109055425-mutt-send-email-mst@kernel.org>
+Content-Language: en-US
+From: Akihiko Odaki <akihiko.odaki@daynix.com>
+In-Reply-To: <20250109055425-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This patch was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Tue,  7 Jan 2025 11:15:30 +0800 you wrote:
-> We found a timeout problem with the pldm command on our system.  The
-> reason is that the MCTP-I3C driver has a race condition when receiving
-> multiple-packet messages in multi-thread, resulting in a wrong packet
-> order problem.
+On 2025/01/09 19:54, Michael S. Tsirkin wrote:
+> On Thu, Jan 09, 2025 at 06:38:10PM +0900, Akihiko Odaki wrote:
+>> On 2025/01/09 16:40, Michael S. Tsirkin wrote:
+>>> On Thu, Jan 09, 2025 at 02:32:25AM -0500, Michael S. Tsirkin wrote:
+>>>> On Thu, Jan 09, 2025 at 03:58:45PM +0900, Akihiko Odaki wrote:
+>>>>> The specification says the device MUST set num_buffers to 1 if
+>>>>> VIRTIO_NET_F_MRG_RXBUF has not been negotiated.
+>>>>>
+>>>>> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
+>>>>
+>>>>
+>>>> How do we know this is v1 and not v0? Confused.
+>>>
+>>> Ah I got it, you assume userspace will over-write it
+>>> if VIRTIO_NET_F_MRG_RXBUF is set.
+>>> If we are leaving this up to userspace, why not let it do
+>>> it always?
+>>
+>> tun may be used with vhost_net, which does not set the field.
 > 
-> We identified this problem by adding a debug message to the
-> mctp_i3c_read function.
+> I'd fix that in vhost net.
+
+Let's see what filesystem and networking people will say for the earlier 
+patch. We can fix num_buffers for free if the earlier patch is getting 
+merged. We will need to come up with another solution otherwise.
+
 > 
-> [...]
-
-Here is the summary with links:
-  - [net,v2] mctp i3c: fix MCTP I3C driver multi-thread issue
-    https://git.kernel.org/netdev/net/c/2d2d4f60ed26
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+> 
+>>>
+>>>>> ---
+>>>>>    drivers/net/tap.c      |  2 +-
+>>>>>    drivers/net/tun.c      |  6 ++++--
+>>>>>    drivers/net/tun_vnet.c | 14 +++++++++-----
+>>>>>    drivers/net/tun_vnet.h |  4 ++--
+>>>>>    4 files changed, 16 insertions(+), 10 deletions(-)
+>>>>>
+>>>>> diff --git a/drivers/net/tap.c b/drivers/net/tap.c
+>>>>> index 60804855510b..fe9554ee5b8b 100644
+>>>>> --- a/drivers/net/tap.c
+>>>>> +++ b/drivers/net/tap.c
+>>>>> @@ -713,7 +713,7 @@ static ssize_t tap_put_user(struct tap_queue *q,
+>>>>>    	int total;
+>>>>>    	if (q->flags & IFF_VNET_HDR) {
+>>>>> -		struct virtio_net_hdr vnet_hdr;
+>>>>> +		struct virtio_net_hdr_v1 vnet_hdr;
+>>>>>    		vnet_hdr_len = READ_ONCE(q->vnet_hdr_sz);
+>>>>> diff --git a/drivers/net/tun.c b/drivers/net/tun.c
+>>>>> index dbf0dee92e93..f211d0580887 100644
+>>>>> --- a/drivers/net/tun.c
+>>>>> +++ b/drivers/net/tun.c
+>>>>> @@ -1991,7 +1991,9 @@ static ssize_t tun_put_user_xdp(struct tun_struct *tun,
+>>>>>    	size_t total;
+>>>>>    	if (tun->flags & IFF_VNET_HDR) {
+>>>>> -		struct virtio_net_hdr gso = { 0 };
+>>>>> +		struct virtio_net_hdr_v1 gso = {
+>>>>> +			.num_buffers = __virtio16_to_cpu(true, 1)
+>>>>> +		};
+>>>>>    		vnet_hdr_sz = READ_ONCE(tun->vnet_hdr_sz);
+>>>>>    		ret = tun_vnet_hdr_put(vnet_hdr_sz, iter, &gso);
+>>>>> @@ -2044,7 +2046,7 @@ static ssize_t tun_put_user(struct tun_struct *tun,
+>>>>>    	}
+>>>>>    	if (vnet_hdr_sz) {
+>>>>> -		struct virtio_net_hdr gso;
+>>>>> +		struct virtio_net_hdr_v1 gso;
+>>>>>    		ret = tun_vnet_hdr_from_skb(tun->flags, tun->dev, skb, &gso);
+>>>>>    		if (ret < 0)
+>>>>> diff --git a/drivers/net/tun_vnet.c b/drivers/net/tun_vnet.c
+>>>>> index ffb2186facd3..a7a7989fae56 100644
+>>>>> --- a/drivers/net/tun_vnet.c
+>>>>> +++ b/drivers/net/tun_vnet.c
+>>>>> @@ -130,15 +130,17 @@ int tun_vnet_hdr_get(int sz, unsigned int flags, struct iov_iter *from,
+>>>>>    EXPORT_SYMBOL_GPL(tun_vnet_hdr_get);
+>>>>>    int tun_vnet_hdr_put(int sz, struct iov_iter *iter,
+>>>>> -		     const struct virtio_net_hdr *hdr)
+>>>>> +		     const struct virtio_net_hdr_v1 *hdr)
+>>>>>    {
+>>>>> +	int content_sz = MIN(sizeof(*hdr), sz);
+>>>>> +
+>>>>>    	if (iov_iter_count(iter) < sz)
+>>>>>    		return -EINVAL;
+>>>>> -	if (copy_to_iter(hdr, sizeof(*hdr), iter) != sizeof(*hdr))
+>>>>> +	if (copy_to_iter(hdr, content_sz, iter) != content_sz)
+>>>>>    		return -EFAULT;
+>>>>> -	if (iov_iter_zero(sz - sizeof(*hdr), iter) != sz - sizeof(*hdr))
+>>>>> +	if (iov_iter_zero(sz - content_sz, iter) != sz - content_sz)
+>>>>>    		return -EFAULT;
+>>>>>    	return 0;
+>>>>> @@ -154,11 +156,11 @@ EXPORT_SYMBOL_GPL(tun_vnet_hdr_to_skb);
+>>>>>    int tun_vnet_hdr_from_skb(unsigned int flags, const struct net_device *dev,
+>>>>>    			  const struct sk_buff *skb,
+>>>>> -			  struct virtio_net_hdr *hdr)
+>>>>> +			  struct virtio_net_hdr_v1 *hdr)
+>>>>>    {
+>>>>>    	int vlan_hlen = skb_vlan_tag_present(skb) ? VLAN_HLEN : 0;
+>>>>> -	if (virtio_net_hdr_from_skb(skb, hdr,
+>>>>> +	if (virtio_net_hdr_from_skb(skb, (struct virtio_net_hdr *)hdr,
+>>>>>    				    tun_vnet_is_little_endian(flags), true,
+>>>>>    				    vlan_hlen)) {
+>>>>>    		struct skb_shared_info *sinfo = skb_shinfo(skb);
+>>>>> @@ -176,6 +178,8 @@ int tun_vnet_hdr_from_skb(unsigned int flags, const struct net_device *dev,
+>>>>>    		return -EINVAL;
+>>>>>    	}
+>>>>> +	hdr->num_buffers = 1;
+>>>>> +
+>>>>>    	return 0;
+>>>>>    }
+>>>>>    EXPORT_SYMBOL_GPL(tun_vnet_hdr_from_skb);
+>>>>> diff --git a/drivers/net/tun_vnet.h b/drivers/net/tun_vnet.h
+>>>>> index 2dfdbe92bb24..d8fd94094227 100644
+>>>>> --- a/drivers/net/tun_vnet.h
+>>>>> +++ b/drivers/net/tun_vnet.h
+>>>>> @@ -12,13 +12,13 @@ int tun_vnet_hdr_get(int sz, unsigned int flags, struct iov_iter *from,
+>>>>>    		     struct virtio_net_hdr *hdr);
+>>>>>    int tun_vnet_hdr_put(int sz, struct iov_iter *iter,
+>>>>> -		     const struct virtio_net_hdr *hdr);
+>>>>> +		     const struct virtio_net_hdr_v1 *hdr);
+>>>>>    int tun_vnet_hdr_to_skb(unsigned int flags, struct sk_buff *skb,
+>>>>>    			const struct virtio_net_hdr *hdr);
+>>>>>    int tun_vnet_hdr_from_skb(unsigned int flags, const struct net_device *dev,
+>>>>>    			  const struct sk_buff *skb,
+>>>>> -			  struct virtio_net_hdr *hdr);
+>>>>> +			  struct virtio_net_hdr_v1 *hdr);
+>>>>>    #endif /* TUN_VNET_H */
+>>>>>
+>>>>> -- 
+>>>>> 2.47.1
+>>>
+> 
 
 
