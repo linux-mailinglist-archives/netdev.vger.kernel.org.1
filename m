@@ -1,113 +1,278 @@
-Return-Path: <netdev+bounces-156504-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156506-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E6B7A06ABD
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 03:10:00 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC694A06AD4
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 03:20:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 88A827A36D4
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 02:09:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 53D7E3A3E80
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 02:20:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C976C22339;
-	Thu,  9 Jan 2025 02:09:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Xsbioz+c"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AB002D052;
+	Thu,  9 Jan 2025 02:20:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 435C1B677
-	for <netdev@vger.kernel.org>; Thu,  9 Jan 2025 02:09:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8005BE5E;
+	Thu,  9 Jan 2025 02:20:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736388586; cv=none; b=uaJk63AS/yWdAjxJ/HxAhcT/Qq2lGwT7/kNBOKPcIHFXqHqvFHdXh7UaocSKw5optC36QKmMCeAS0xpij7FtZEiaj9sq+C8Azk9e8uLPKsz3KHgMZn3aSRpjJzSh3RlKgq3EQpqTvEb0YAYmb6ZjJf/saIhj8QPwfU+CpFvPVc4=
+	t=1736389226; cv=none; b=Nyj2ptLlLYxApwyFchThgmSaSZTXzMKyp+p5EjXcTDhETs1nkAUMTMYBZh+HzchV63v2PoK6FDEZxNtuIuhM3V9cK44OKSnsGwlzN+pi+8Y44pp8Os1BMawPNpd7Sr8EjuUuSPLCrzVxJb3FuImzlV0ucppkneCnWGZWz0cszOA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736388586; c=relaxed/simple;
-	bh=RQCroYWa2RIpndvniBhc+nEzW+xgirSrvaBgEUnjeIs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bB7JH8xuT2YN10o3VvUgWPXnQY7RcrN7MM6lkzGBNYyO5Y1UEJT2piIqzbdzJkfgMcjROo1Txz/iHnii0HQsmXPDt/q+W5JWpUlQ2Tb3xKBheOWvsBrJ/1kQLVoRXmsjajc/TIoAnvpxa56g9kftAPmspUsDygn9Wep5no7acKw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Xsbioz+c; arc=none smtp.client-ip=209.85.214.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-216634dd574so3986455ad.2
-        for <netdev@vger.kernel.org>; Wed, 08 Jan 2025 18:09:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736388584; x=1736993384; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=yBu9zwaldD0I2kKZNy8ryR+6MM6s4k4SCSM5cCy+M6E=;
-        b=Xsbioz+crIRwtY0jcBncVhgmKBupQUs5S/FcCuDW5Cq84Cf5MiH0o6Z2080a+4sMp0
-         Jj9mIH/GOf+Tm+dS471zaXO+3+x8z970vFIB8Uk9pAMMvuB4jeO50UCk4twcy6jnAw6T
-         a/eUzkZUhzVuepfaP0wOyVDt8+5ZYdBs88kuPkdsgmZBQ6Vlg0woE7owUVZSCIkBjCE+
-         bCUiK0+1WDoNidqlDX60IFd79ihEwdf/+djVa6H/1bo9RnDdLIHXLDnB+5Voyke3xAjB
-         vGP6nlwHwaQsnAey5uTzNSmUusjifDdmOBjRAgsyTHUgjDIaL22c9Jhnpw9laM0uAROK
-         2xaA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736388584; x=1736993384;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yBu9zwaldD0I2kKZNy8ryR+6MM6s4k4SCSM5cCy+M6E=;
-        b=e5z3EFBIzIOxmRBFNug/n6wB+9VVBxU7hSIyWCGKaqJxmE6ONwEmKXcjomQdeuROwp
-         Mn3Agg+5BQpEdoALWhPgRsAIQ+UKmjRVNRQviJKUpqm20mVTTYD8FW+NXWuxxj21Z8BJ
-         xOFU1x38LYSonAjSQLY8m+8lDrnXRd/0RHGbwHjoq4Y5ScsfFDv9S4nM4CvApCTHB04E
-         OsdmugruNaUKyi4uJ6LTlDGSW2x0p0xpUwpxyzHLA/ZJaGI6EvS7WBoE/l/S38HSWKJl
-         oAYRXX/NJ1wRPCIvmtMgGD+VnIoNDMp1JNJ2vSdXSAIQadOnMDNEP2m5mMnKuI9wGdrL
-         bCuQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWKUpY4nGEUN5TVUAFTTGwGjgsL1/tBg3NA47QGPerskh4RHACFOpF1UiI9MZmcr+EHuan6AIs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyNCla7b1d6vIsIi6R3VvI+9/5/HIWgtoowgrZlhfD38N94Up6o
-	SubhEDg8BdsYEfT14o+jOWlNKrO3aFT5sd9Fhnjob8Gkdd344eY=
-X-Gm-Gg: ASbGncsSVHb2ALME592a7+iBZCKArJwFs2aBpf4vXguNY684WPQFjfS8e0kmoPie39i
-	cdScTGW92Apmaj4GwCYCLtHCRBgi12cOVJyp6TnrKHuOHZ8O6DMuChYL0aBO2k+d0iLXRchyXTy
-	09nuMYYo0UzGAP2e7JGBpxnT3ZpIsRsOHMKvagLV1xkZjHK6b4h87cBr+XLcRmyR0MX17W/uE4x
-	ia2NaXG/qAHk1B4deIlzOq3nv/G1JazuI4uLjCFPbwOm3uXeUYfxT+J
-X-Google-Smtp-Source: AGHT+IEUyoUqgQWSGqsv0aI6hwpUUSgqsIuDj4bEJx3+tyIW1cUBboz1Q2rzstn2FFmJkGioqG4aJg==
-X-Received: by 2002:a17:902:e74a:b0:216:2e6d:baac with SMTP id d9443c01a7336-21a83f649e0mr79552065ad.29.1736388584398;
-        Wed, 08 Jan 2025 18:09:44 -0800 (PST)
-Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-219dca014b0sm334917685ad.233.2025.01.08.18.09.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 Jan 2025 18:09:43 -0800 (PST)
-Date: Wed, 8 Jan 2025 18:09:43 -0800
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
-	dw@davidwei.uk, donald.hunter@gmail.com, nicolas.dichtel@6wind.com,
-	sdf@fomichev.me
-Subject: Re: [PATCH net-next] tools: ynl-gen-c: improve support for empty
- nests
-Message-ID: <Z38v56eT7P57n3V4@mini-arch>
-References: <20250108200758.2693155-1-kuba@kernel.org>
+	s=arc-20240116; t=1736389226; c=relaxed/simple;
+	bh=/sQEQ5TutOnrYYS0lFylL2fbNiVpAWSQGdovRBLQkiA=;
+	h=Subject:To:References:CC:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=MGAsQpnPMVnRuW5n/WgQKYKCOPygWrmGqUmWv0pVRp59POPgTMa+INXreK+IpxWc8Lw/Axc3VYD4Dp8dhahikKUR3ddl+kLwAjIfIwAVwAORicn8PWh3podW+uj6lT9pHUkkByMyncti4XruKJnB2k+dBz2hkgE6zYtOet8YKmU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.252])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4YT7h55PQ3zjY89;
+	Thu,  9 Jan 2025 10:16:37 +0800 (CST)
+Received: from kwepemh100016.china.huawei.com (unknown [7.202.181.102])
+	by mail.maildlp.com (Postfix) with ESMTPS id A0DFE1800D1;
+	Thu,  9 Jan 2025 10:20:20 +0800 (CST)
+Received: from [10.174.179.93] (10.174.179.93) by
+ kwepemh100016.china.huawei.com (7.202.181.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Thu, 9 Jan 2025 10:20:17 +0800
+Subject: Re: [PATCH v4 -next 06/15] mm: mmap: move sysctl to mm/mmap.c
+To: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
+References: <20241223141550.638616-1-yukaixiong@huawei.com>
+ <20241223141550.638616-7-yukaixiong@huawei.com>
+ <ef1d602b-23cb-4a95-b83e-c506958dc90c@lucifer.local>
+CC: <akpm@linux-foundation.org>, <mcgrof@kernel.org>,
+	<ysato@users.sourceforge.jp>, <dalias@libc.org>,
+	<glaubitz@physik.fu-berlin.de>, <luto@kernel.org>, <tglx@linutronix.de>,
+	<mingo@redhat.com>, <bp@alien8.de>, <dave.hansen@linux.intel.com>,
+	<hpa@zytor.com>, <viro@zeniv.linux.org.uk>, <brauner@kernel.org>,
+	<jack@suse.cz>, <kees@kernel.org>, <j.granados@samsung.com>,
+	<willy@infradead.org>, <Liam.Howlett@oracle.com>, <vbabka@suse.cz>,
+	<trondmy@kernel.org>, <anna@kernel.org>, <chuck.lever@oracle.com>,
+	<jlayton@kernel.org>, <neilb@suse.de>, <okorniev@redhat.com>,
+	<Dai.Ngo@oracle.com>, <tom@talpey.com>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<paul@paul-moore.com>, <jmorris@namei.org>, <linux-sh@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
+	<linux-mm@kvack.org>, <linux-nfs@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<linux-security-module@vger.kernel.org>, <dhowells@redhat.com>,
+	<haifeng.xu@shopee.com>, <baolin.wang@linux.alibaba.com>,
+	<shikemeng@huaweicloud.com>, <dchinner@redhat.com>, <bfoster@redhat.com>,
+	<souravpanda@google.com>, <hannes@cmpxchg.org>, <rientjes@google.com>,
+	<pasha.tatashin@soleen.com>, <david@redhat.com>, <ryan.roberts@arm.com>,
+	<ying.huang@intel.com>, <yang@os.amperecomputing.com>,
+	<zev@bewilderbeest.net>, <serge@hallyn.com>, <vegard.nossum@oracle.com>,
+	<wangkefeng.wang@huawei.com>
+From: yukaixiong <yukaixiong@huawei.com>
+Message-ID: <66d64c25-5c82-1388-e09d-f49765efcfba@huawei.com>
+Date: Thu, 9 Jan 2025 10:20:16 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.7.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250108200758.2693155-1-kuba@kernel.org>
+In-Reply-To: <ef1d602b-23cb-4a95-b83e-c506958dc90c@lucifer.local>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggpeml500006.china.huawei.com (7.185.36.76) To
+ kwepemh100016.china.huawei.com (7.202.181.102)
 
-On 01/08, Jakub Kicinski wrote:
-> Empty nests are the same size as a flag at the netlink level
-> (just a 4 byte nlattr without a payload). They are sometimes
-> useful in case we want to only communicate a presence of
-> something but may want to add more details later.
-> This may be the case in the upcoming io_uring ZC patches,
-> for example.
-> 
-> Improve handling of nested empty structs. We already support
-> empty structs since a lot of netlink replies are empty, but
-> for nested ones we need minor tweaks to avoid pointless empty
-> lines and unused variables.
-> 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-Acked-by: Stanislav Fomichev <sdf@fomichev.me>
 
-Looks sensible. Assuming the context is:
-https://lore.kernel.org/netdev/20250108220644.3528845-1-dw@davidwei.uk/T/#Z2e.:..:20250108220644.3528845-8-dw::40davidwei.uk:1Documentation:netlink:specs:netdev.yaml
+On 2025/1/2 22:08, Lorenzo Stoakes wrote:
+> On Mon, Dec 23, 2024 at 10:15:25PM +0800, Kaixiong Yu wrote:
+>> This moves all mmap related sysctls to mm/mmap.c, as part of the
+>> kernel/sysctl.c cleaning, also move the variable declaration from
+>> kernel/sysctl.c into mm/mmap.c.
+>>
+>> Signed-off-by: Kaixiong Yu <yukaixiong@huawei.com>
+>> Reviewed-by: Kees Cook <kees@kernel.org>
+> Looks good to me, thanks!
+>
+> Reviewed-by: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
+
+Thanks for your review!
+
+Best ...
+>> ---
+>> v4:
+>>   - const qualify struct ctl_table mmap_table
+>> v3:
+>>   - change the title
+>> v2:
+>>   - fix sysctl_max_map_count undeclared issue in mm/nommu.c
+>> ---
+>> ---
+>>   kernel/sysctl.c | 50 +--------------------------------------------
+>>   mm/mmap.c       | 54 +++++++++++++++++++++++++++++++++++++++++++++++++
+>>   2 files changed, 55 insertions(+), 49 deletions(-)
+>>
+>> diff --git a/kernel/sysctl.c b/kernel/sysctl.c
+>> index aea3482106e0..9c245898f535 100644
+>> --- a/kernel/sysctl.c
+>> +++ b/kernel/sysctl.c
+>> @@ -127,12 +127,6 @@ enum sysctl_writes_mode {
+>>
+>>   static enum sysctl_writes_mode sysctl_writes_strict = SYSCTL_WRITES_STRICT;
+>>   #endif /* CONFIG_PROC_SYSCTL */
+>> -
+>> -#if defined(HAVE_ARCH_PICK_MMAP_LAYOUT) || \
+>> -    defined(CONFIG_ARCH_WANT_DEFAULT_TOPDOWN_MMAP_LAYOUT)
+>> -int sysctl_legacy_va_layout;
+>> -#endif
+>> -
+>>   #endif /* CONFIG_SYSCTL */
+>>
+>>   /*
+>> @@ -2037,16 +2031,7 @@ static struct ctl_table vm_table[] = {
+>>   		.extra1		= SYSCTL_ONE,
+>>   		.extra2		= SYSCTL_FOUR,
+>>   	},
+>> -#ifdef CONFIG_MMU
+>> -	{
+>> -		.procname	= "max_map_count",
+>> -		.data		= &sysctl_max_map_count,
+>> -		.maxlen		= sizeof(sysctl_max_map_count),
+>> -		.mode		= 0644,
+>> -		.proc_handler	= proc_dointvec_minmax,
+>> -		.extra1		= SYSCTL_ZERO,
+>> -	},
+>> -#else
+>> +#ifndef CONFIG_MMU
+>>   	{
+>>   		.procname	= "nr_trim_pages",
+>>   		.data		= &sysctl_nr_trim_pages,
+>> @@ -2064,17 +2049,6 @@ static struct ctl_table vm_table[] = {
+>>   		.proc_handler	= proc_dointvec_minmax,
+>>   		.extra1		= SYSCTL_ZERO,
+>>   	},
+> Nitty, but  this bit belongs in mm/nommu.c?
+>
+>> -#if defined(HAVE_ARCH_PICK_MMAP_LAYOUT) || \
+>> -    defined(CONFIG_ARCH_WANT_DEFAULT_TOPDOWN_MMAP_LAYOUT)
+>> -	{
+>> -		.procname	= "legacy_va_layout",
+>> -		.data		= &sysctl_legacy_va_layout,
+>> -		.maxlen		= sizeof(sysctl_legacy_va_layout),
+>> -		.mode		= 0644,
+>> -		.proc_handler	= proc_dointvec_minmax,
+>> -		.extra1		= SYSCTL_ZERO,
+>> -	},
+>> -#endif
+>>   #ifdef CONFIG_MMU
+>>   	{
+>>   		.procname	= "mmap_min_addr",
+>> @@ -2100,28 +2074,6 @@ static struct ctl_table vm_table[] = {
+>>   		.extra1		= SYSCTL_ZERO,
+>>   	},
+>>   #endif
+>> -#ifdef CONFIG_HAVE_ARCH_MMAP_RND_BITS
+>> -	{
+>> -		.procname	= "mmap_rnd_bits",
+>> -		.data		= &mmap_rnd_bits,
+>> -		.maxlen		= sizeof(mmap_rnd_bits),
+>> -		.mode		= 0600,
+>> -		.proc_handler	= proc_dointvec_minmax,
+>> -		.extra1		= (void *)&mmap_rnd_bits_min,
+>> -		.extra2		= (void *)&mmap_rnd_bits_max,
+>> -	},
+>> -#endif
+>> -#ifdef CONFIG_HAVE_ARCH_MMAP_RND_COMPAT_BITS
+>> -	{
+>> -		.procname	= "mmap_rnd_compat_bits",
+>> -		.data		= &mmap_rnd_compat_bits,
+>> -		.maxlen		= sizeof(mmap_rnd_compat_bits),
+>> -		.mode		= 0600,
+>> -		.proc_handler	= proc_dointvec_minmax,
+>> -		.extra1		= (void *)&mmap_rnd_compat_bits_min,
+>> -		.extra2		= (void *)&mmap_rnd_compat_bits_max,
+>> -	},
+>> -#endif
+>>   };
+>>
+>>   int __init sysctl_init_bases(void)
+>> diff --git a/mm/mmap.c b/mm/mmap.c
+>> index aef835984b1c..cc579aafd7ba 100644
+>> --- a/mm/mmap.c
+>> +++ b/mm/mmap.c
+>> @@ -1603,6 +1603,57 @@ struct vm_area_struct *_install_special_mapping(
+>>   					&special_mapping_vmops);
+>>   }
+>>
+>> +#ifdef CONFIG_SYSCTL
+>> +#if defined(HAVE_ARCH_PICK_MMAP_LAYOUT) || \
+>> +		defined(CONFIG_ARCH_WANT_DEFAULT_TOPDOWN_MMAP_LAYOUT)
+>> +int sysctl_legacy_va_layout;
+>> +#endif
+>> +
+>> +static const struct ctl_table mmap_table[] = {
+>> +		{
+>> +				.procname       = "max_map_count",
+>> +				.data           = &sysctl_max_map_count,
+>> +				.maxlen         = sizeof(sysctl_max_map_count),
+>> +				.mode           = 0644,
+>> +				.proc_handler   = proc_dointvec_minmax,
+>> +				.extra1         = SYSCTL_ZERO,
+>> +		},
+>> +#if defined(HAVE_ARCH_PICK_MMAP_LAYOUT) || \
+>> +		defined(CONFIG_ARCH_WANT_DEFAULT_TOPDOWN_MMAP_LAYOUT)
+>> +		{
+>> +				.procname       = "legacy_va_layout",
+>> +				.data           = &sysctl_legacy_va_layout,
+>> +				.maxlen         = sizeof(sysctl_legacy_va_layout),
+>> +				.mode           = 0644,
+>> +				.proc_handler   = proc_dointvec_minmax,
+>> +				.extra1         = SYSCTL_ZERO,
+>> +		},
+>> +#endif
+>> +#ifdef CONFIG_HAVE_ARCH_MMAP_RND_BITS
+>> +		{
+>> +				.procname       = "mmap_rnd_bits",
+>> +				.data           = &mmap_rnd_bits,
+>> +				.maxlen         = sizeof(mmap_rnd_bits),
+>> +				.mode           = 0600,
+>> +				.proc_handler   = proc_dointvec_minmax,
+>> +				.extra1         = (void *)&mmap_rnd_bits_min,
+>> +				.extra2         = (void *)&mmap_rnd_bits_max,
+>> +		},
+>> +#endif
+>> +#ifdef CONFIG_HAVE_ARCH_MMAP_RND_COMPAT_BITS
+>> +		{
+>> +				.procname       = "mmap_rnd_compat_bits",
+>> +				.data           = &mmap_rnd_compat_bits,
+>> +				.maxlen         = sizeof(mmap_rnd_compat_bits),
+>> +				.mode           = 0600,
+>> +				.proc_handler   = proc_dointvec_minmax,
+>> +				.extra1         = (void *)&mmap_rnd_compat_bits_min,
+>> +				.extra2         = (void *)&mmap_rnd_compat_bits_max,
+>> +		},
+>> +#endif
+>> +};
+>> +#endif /* CONFIG_SYSCTL */
+>> +
+>>   /*
+>>    * initialise the percpu counter for VM
+>>    */
+>> @@ -1612,6 +1663,9 @@ void __init mmap_init(void)
+>>
+>>   	ret = percpu_counter_init(&vm_committed_as, 0, GFP_KERNEL);
+>>   	VM_BUG_ON(ret);
+>> +#ifdef CONFIG_SYSCTL
+>> +	register_sysctl_init("vm", mmap_table);
+>> +#endif
+>>   }
+>>
+>>   /*
+>> --
+>> 2.34.1
+>>
+> .
+>
+
 
