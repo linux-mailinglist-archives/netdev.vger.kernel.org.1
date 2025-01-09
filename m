@@ -1,168 +1,118 @@
-Return-Path: <netdev+bounces-156561-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156562-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E4FBA06F41
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 08:43:39 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 76798A06F81
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 08:55:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 093BA1889AFD
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 07:43:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 30750188993D
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 07:55:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 834FD214A62;
-	Thu,  9 Jan 2025 07:43:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B170A21506B;
+	Thu,  9 Jan 2025 07:54:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dqwrd5kW"
+	dkim=pass (1024-bit key) header.d=ispras.ru header.i=@ispras.ru header.b="AW6NGAGu"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail.ispras.ru (mail.ispras.ru [83.149.199.84])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 975B32147FA
-	for <netdev@vger.kernel.org>; Thu,  9 Jan 2025 07:43:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FAF1215062;
+	Thu,  9 Jan 2025 07:54:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.149.199.84
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736408615; cv=none; b=WKyD5td+cHgRdXmaCTTyO3f76zlrmuyImEyvE2zokgs6PuTD32uBCAcAgGOA6riff5DCtlT342i3+Fle0VdFILmlks1L0kuB5nfcXdG9Dh0CTZkirH2V8wZ3u/f+PThnHJyQ8KTx0f83R0WoUq1HsuQl6qTHBN6WQGG785sgKh0=
+	t=1736409272; cv=none; b=nbBd6d/koGlNijioC37CvkukhVD9sMAeYMnpO8zxPVROGC25yfYkP/SqqOmPPUJq2cIhFXsmNnVShhhEdV2VNAWnm27e8J4lo3iLIwmOWNxFx11mbgt+N2JKPAxbi7rBTr6jSdVoeJWO0eHerOele7ENFMczKJ8/2Vb3W/l2+dQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736408615; c=relaxed/simple;
-	bh=jsaMuSUGwo+RJxj4wQLWlpqmbzwxs+PjsUjLgqIv9aA=;
+	s=arc-20240116; t=1736409272; c=relaxed/simple;
+	bh=mmJmJ6JAz9YIssksstd+v3lMHGHxtGiOwH0/0URMdf4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EQiBDbbAbLOYyLMvSl2S0rnU4aWpNZZYCfLiedOxCbQB6FBqzdj3m/w6WaX9D/ht6r1gyIpbD8LGsyBDLOcMoTJRsS/OJqsYmNL3glc/BYbyjpyNxwZnB9vhnluLnQlLLNrOEXm+BKOtmX13Pq37dPunUj7wmUZ0lj8L7me05s8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dqwrd5kW; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1736408612;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=x3MkaKicJuTxKB4Uwx+L5vUrVj7eiLsn1FE86R/YDhg=;
-	b=dqwrd5kWzHf+pWTOpScn/Jt0o+KoeUicgs3oas3PovDJhh18bW9Cn3FrOa9SXJUd5QlfHv
-	P5kpscUuL3lldqShAQNhfCs85wRhUpzdKmyCgCYRtP5yJBXzBiWaG7/HefAUv/fC/voaU7
-	jLd7kKkiAvkcdYnzNyk5xleOE/8/CVo=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-660-9cE8RrT9M-GWCfjFPglz3A-1; Thu, 09 Jan 2025 02:43:31 -0500
-X-MC-Unique: 9cE8RrT9M-GWCfjFPglz3A-1
-X-Mimecast-MFC-AGG-ID: 9cE8RrT9M-GWCfjFPglz3A
-Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-aa66bc3b46dso50481466b.3
-        for <netdev@vger.kernel.org>; Wed, 08 Jan 2025 23:43:30 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736408610; x=1737013410;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=x3MkaKicJuTxKB4Uwx+L5vUrVj7eiLsn1FE86R/YDhg=;
-        b=kfiiW+9qnAVyxkyTAwqxltAHK+mbAUpbJVrnBGRyeUOWnobYFv0p1yu/JmWK9N7Ddy
-         cybhEH+kQDs0KMmjP76BCQhGPjIvUSSpRK4emulEawF7mSiA5nQa2MELwFNlSn/skf2f
-         lwJ31NR8+roGKYG+MAIIUIB3ZdncDy/IxxM9KtDib1cxfQuBzj/iEz9NKbwn96JuSirD
-         2PxFW9W3IEisjSPILwyL2LejgbX41NxlhfL/3hoH/lN1R7ezqeAUnLLSuGP3t/R5uSKf
-         /jaGNKIshIiqpdqsBvSP5noDLZ9sZPIH7cJZ6gzBrtPf/JYfnnpaKtDAbSk29hodZFXw
-         OlYQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXu7i2l9yGoreklUY8BbzDLFr2CFVgQTY6wII+za2hto/SxniFby4kP33yh9CnPNJdsCY11KJA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzbXOrT8BbARRbov4wWYRSg5eq77WrdGykmlOY2cCFytaP76kmC
-	LU4aGJASI39M5femIkvv0yvnUdEOE9yEcDZwEBkGA/s6K3kZDIPHFXfE3bl9Ps8sFg+0E4uWfqM
-	IFCfNXYZUoZSqH6h2TGtO2M1P+qw50vLvyWUyMQv7YNVILP6KCUObIQ==
-X-Gm-Gg: ASbGncsubHjydegdt4Qy9BRtsLrfpm85Owm/3VYRtEawuYopEXl8uiF+0q/aAimY0zm
-	LyasCahJElOs8X0R6E3CkTEuKaPsVytuc7CSPfyDF2jqFpV9RQMkqMNI9PTw2PosM8eD93XDkHQ
-	pfyMFJnnWbnKn0gWt+XhtXUndBT1/tj9CdR6uZkljxgybaNuodjtLgYcaALl5awKBlbqpqBCj7N
-	+LYO87u1ijX/5h9CfPTEwMR1rSJMuU7FoLOiBE6Vb1QeufBknQ=
-X-Received: by 2002:a05:6402:4415:b0:5d0:abb8:7a3 with SMTP id 4fb4d7f45d1cf-5d972e000c5mr13006286a12.6.1736408609792;
-        Wed, 08 Jan 2025 23:43:29 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHYt/wbH0uxT4gdtapB81xUXkFqeKr4f1zw0epCAPN6UFsJyXpBp3gKNbdqX6u30o9JHhMZqQ==
-X-Received: by 2002:a05:6402:4415:b0:5d0:abb8:7a3 with SMTP id 4fb4d7f45d1cf-5d972e000c5mr13006223a12.6.1736408609409;
-        Wed, 08 Jan 2025 23:43:29 -0800 (PST)
-Received: from redhat.com ([2a02:14f:175:d62d:93ef:d7e2:e7da:ed72])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ab2c9563b06sm42928566b.100.2025.01.08.23.43.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 Jan 2025 23:43:28 -0800 (PST)
-Date: Thu, 9 Jan 2025 02:43:24 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Akihiko Odaki <akihiko.odaki@daynix.com>
-Cc: Jonathan Corbet <corbet@lwn.net>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	Jason Wang <jasowang@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Shuah Khan <shuah@kernel.org>, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-	linux-kselftest@vger.kernel.org,
-	Yuri Benditovich <yuri.benditovich@daynix.com>,
-	Andrew Melnychenko <andrew@daynix.com>,
-	Stephen Hemminger <stephen@networkplumber.org>,
-	gur.stavi@huawei.com, devel@daynix.com
-Subject: Re: [PATCH v2 2/3] tun: Pad virtio header with zero
-Message-ID: <20250109024247-mutt-send-email-mst@kernel.org>
-References: <20250109-tun-v2-0-388d7d5a287a@daynix.com>
- <20250109-tun-v2-2-388d7d5a287a@daynix.com>
- <20250109023056-mutt-send-email-mst@kernel.org>
- <571a2d61-5fbe-4e49-b4d1-6bf0c7604a57@daynix.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=PHkjTbcGTw97yo9gkLLo0OjQ3T0fJrYgBkVenI02dkRvooknKPau47Esru2+WV7QBxDh/pThvXbkPT+JIPfF7fZNi3Cpf9Iwwe+1CiYifrt8U4xMCQH8ADUxAWEvxcDY6haSTFl9mV8QBdsOJ/AjVeKS4KUMKtXMKIwFCEyB8kM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ispras.ru; spf=pass smtp.mailfrom=ispras.ru; dkim=pass (1024-bit key) header.d=ispras.ru header.i=@ispras.ru header.b=AW6NGAGu; arc=none smtp.client-ip=83.149.199.84
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ispras.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ispras.ru
+Received: from fpc (unknown [10.10.165.9])
+	by mail.ispras.ru (Postfix) with ESMTPSA id C5404518E771;
+	Thu,  9 Jan 2025 07:47:17 +0000 (UTC)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.ispras.ru C5404518E771
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ispras.ru;
+	s=default; t=1736408837;
+	bh=Az+6jP8MDfErUyWOlmvn0SscA94IxS3v4GF6Z/31+20=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=AW6NGAGu9rjGITuPyvR1LZvYTnvSU1nCyWseMYP4MeQUu2OigXCT/Bno6C3A15YdL
+	 Lj6LYwL8QK8claIPQMxIC81IRP8coEbswFzDw4z3KACbsQCd1yDn9iPIRQ0pO92Hnd
+	 SaaYFDBcTcG5k+ZyV8j9CJD9LtozMakLlP7TrnTg=
+Date: Thu, 9 Jan 2025 10:47:12 +0300
+From: Fedor Pchelkin <pchelkin@ispras.ru>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>
+Cc: Johan Hedberg <johan.hedberg@gmail.com>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Ignat Korchagin <ignat@cloudflare.com>,
+	Kuniyuki Iwashima <kuniyu@amazon.com>,
+	Eric Dumazet <edumazet@google.com>, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org, lvc-project@linuxtesting.org,
+	netdev@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: L2CAP: handle NULL sock pointer in
+ l2cap_sock_alloc
+Message-ID: <20250109-fbd0cb9fa9036bc76ea9b003-pchelkin@ispras.ru>
+References: <20241217211959.279881-1-pchelkin@ispras.ru>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <571a2d61-5fbe-4e49-b4d1-6bf0c7604a57@daynix.com>
+In-Reply-To: <20241217211959.279881-1-pchelkin@ispras.ru>
 
-On Thu, Jan 09, 2025 at 04:41:50PM +0900, Akihiko Odaki wrote:
-> On 2025/01/09 16:31, Michael S. Tsirkin wrote:
-> > On Thu, Jan 09, 2025 at 03:58:44PM +0900, Akihiko Odaki wrote:
-> > > tun used to simply advance iov_iter when it needs to pad virtio header,
-> > > which leaves the garbage in the buffer as is. This is especially
-> > > problematic when tun starts to allow enabling the hash reporting
-> > > feature; even if the feature is enabled, the packet may lack a hash
-> > > value and may contain a hole in the virtio header because the packet
-> > > arrived before the feature gets enabled or does not contain the
-> > > header fields to be hashed. If the hole is not filled with zero, it is
-> > > impossible to tell if the packet lacks a hash value.
-> > > 
-> > > In theory, a user of tun can fill the buffer with zero before calling
-> > > read() to avoid such a problem, but leaving the garbage in the buffer is
-> > > awkward anyway so fill the buffer in tun.
-> > > 
-> > > Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
-> > 
-> > But if the user did it, you have just overwritten his value,
-> > did you not?
+On Wed, 18. Dec 00:19, Fedor Pchelkin wrote:
+> A NULL sock pointer is passed into l2cap_sock_alloc() when it is called
+> from l2cap_sock_new_connection_cb() and the error handling paths should
+> also be aware of it.
 > 
-> Yes. but that means the user expects some part of buffer is not filled after
-> read() or recvmsg(). I'm a bit worried that not filling the buffer may break
-> assumptions others (especially the filesystem and socket infrastructures in
-> the kernel) may have.
+> Seemingly a more elegant solution would be to swap bt_sock_alloc() and
+> l2cap_chan_create() calls since they are not interdependent to that moment
+> but then l2cap_chan_create() adds the soon to be deallocated and still
+> dummy-initialized channel to the global list accessible by many L2CAP
+> paths. The channel would be removed from the list in short period of time
+> but be a bit more straight-forward here and just check for NULL instead of
+> changing the order of function calls.
 > 
-> If we are really confident that it will not cause problems, this behavior
-> can be opt-in based on a flag or we can just write some documentation
-> warning userspace programmers to initialize the buffer.
+> Found by Linux Verification Center (linuxtesting.org) with SVACE static
+> analysis tool.
+> 
+> Fixes: 7c4f78cdb8e7 ("Bluetooth: L2CAP: do not leave dangling sk pointer on error in l2cap_sock_create()")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Fedor Pchelkin <pchelkin@ispras.ru>
+> ---
 
-It's been like this for years, I'd say we wait until we know there's a problem?
+Urgh.. a bit confused about which tree the patch should go to - net or
+bluetooth.
 
-> > 
-> > > ---
-> > >   drivers/net/tun_vnet.c | 3 ++-
-> > >   1 file changed, 2 insertions(+), 1 deletion(-)
-> > > 
-> > > diff --git a/drivers/net/tun_vnet.c b/drivers/net/tun_vnet.c
-> > > index fe842df9e9ef..ffb2186facd3 100644
-> > > --- a/drivers/net/tun_vnet.c
-> > > +++ b/drivers/net/tun_vnet.c
-> > > @@ -138,7 +138,8 @@ int tun_vnet_hdr_put(int sz, struct iov_iter *iter,
-> > >   	if (copy_to_iter(hdr, sizeof(*hdr), iter) != sizeof(*hdr))
-> > >   		return -EFAULT;
-> > > -	iov_iter_advance(iter, sz - sizeof(*hdr));
-> > > +	if (iov_iter_zero(sz - sizeof(*hdr), iter) != sz - sizeof(*hdr))
-> > > +		return -EFAULT;
-> > >   	return 0;
-> > >   }
-> > > 
-> > > -- 
-> > > 2.47.1
-> > 
+I've now noticed the Fixes commit went directly via net-next as part of a
+series (despite "Bluetooth: L2CAP:" patches usually go through bluetooth
+tree first). So what about this patch?
 
+>  net/bluetooth/l2cap_sock.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+> index 3d2553dcdb1b..49f97d4138ea 100644
+> --- a/net/bluetooth/l2cap_sock.c
+> +++ b/net/bluetooth/l2cap_sock.c
+> @@ -1888,7 +1888,8 @@ static struct sock *l2cap_sock_alloc(struct net *net, struct socket *sock,
+>  	chan = l2cap_chan_create();
+>  	if (!chan) {
+>  		sk_free(sk);
+> -		sock->sk = NULL;
+> +		if (sock)
+> +			sock->sk = NULL;
+>  		return NULL;
+>  	}
+>  
+> -- 
+> 2.39.5
+>
 
