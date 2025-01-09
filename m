@@ -1,129 +1,185 @@
-Return-Path: <netdev+bounces-156513-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156514-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 78832A06BC3
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 04:01:25 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E65BA06BD2
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 04:04:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8B7137A1554
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 03:01:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A79CD3A538F
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 03:04:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25F00127E18;
-	Thu,  9 Jan 2025 03:01:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E86713B791;
+	Thu,  9 Jan 2025 03:04:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ieee.org header.i=@ieee.org header.b="eycMJDfP"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="SLVbenMt"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f50.google.com (mail-io1-f50.google.com [209.85.166.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1ADC91F94C
-	for <netdev@vger.kernel.org>; Thu,  9 Jan 2025 03:01:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CB0F139CF2;
+	Thu,  9 Jan 2025 03:04:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736391679; cv=none; b=Xf9eiz6K38lTKU4cj8XoCggrzGo4dkf4EPQvyZ4BuuvgtxGyTHqUM164ejc1VZ6YYc40ML+4q8UimVj4qw+Yo/fxCgOXcsUprEw2YTM5XGP2eJ9CsgqYo7KIausAbxQGgVUWu+xAlcFu0m9RNzrEngQNHH0OhKIr7YU+Ehso4R8=
+	t=1736391885; cv=none; b=sg9X0b2qzdd+tq5o2HqJgpz0xRwDy7hEZY+QIzt5yfZxZ+9V/qD7+eXlJSnY/7tyI97AY37uv0+gu42NVvAcBsXOuLneiHOudLpwHMTDk0dPjXnIjbvXzWoWXNdkCaihZkQ453qa/sa+N3YCjnQCr8A35cYAhR1dXF5yy8GNRRc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736391679; c=relaxed/simple;
-	bh=styal6a10fBSjAdXfS/03k5/+K6pkiyNCbLjLqDpKJI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=KCDDH4qmoe9PANn4X0/2HLyh9ohWphaOFtJpdAXid+picHeFRithKdtjhT/TW1i3S4AZyZhhErS+QZr6Of1Ve4wPS3TkhxQ1NwTjStRgv0bOI1wbG5acxEjdHJnre+jrzRITV3YuDhMkAYG+A4sawkjMj308KUGeLelMoTyRBBM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ieee.org; spf=pass smtp.mailfrom=ieee.org; dkim=pass (1024-bit key) header.d=ieee.org header.i=@ieee.org header.b=eycMJDfP; arc=none smtp.client-ip=209.85.166.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ieee.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ieee.org
-Received: by mail-io1-f50.google.com with SMTP id ca18e2360f4ac-84a012f7232so51373539f.0
-        for <netdev@vger.kernel.org>; Wed, 08 Jan 2025 19:01:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ieee.org; s=google; t=1736391676; x=1736996476; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=chLFunAF/6a+8neQ/O4A300WGPV8Q4UnrjtHUfVgGHY=;
-        b=eycMJDfP6/cPe5uB6nhiFej8YK+SSUMNnoqiGbGMWBqnP4MjvMLqe/eDN9U1ouJeDh
-         dMZXCvyAoOrmEk13KXmjLxNxqrxAhTxcAihykCE3YdMRqPoS8JHJI/6MdMpcgXJyKZig
-         cT/IJOduplB9DOqEjqlyid/Kgm6nJ3ZKMbJZY=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736391676; x=1736996476;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=chLFunAF/6a+8neQ/O4A300WGPV8Q4UnrjtHUfVgGHY=;
-        b=Jbg5EruBMKhClcAmwj1PYQodbbC15zqdlv2irhAM6b5LWjj6cy/Q7WSEa8rifao2oP
-         6eN0ZmSXddAX4OMpzoi47Wp8a1p4I7M3CkUtq1gVc8o2d+j/X0d2H7kF3vjFrNGzmgoG
-         b9V7Fwas6DncAzQQvnLyrFHshLq91mTJAT66fr0jkgtWycFLV1/IW3CuYdhefb6QdRxN
-         mnLwmkc/RKBQd0iq3yx3HFFyQObiG6BI9jWdczTFDnf8yFIFKuYZmyvNGa+ofFOqjVxU
-         GzndULNZJK/2bGB5nn7rAptFvnZ74lGBVxbcb1INzY0uiT6DHTWRWcN7iSTFs6tuha37
-         BN2w==
-X-Forwarded-Encrypted: i=1; AJvYcCWAO0tVjuoMYz8ER0BtWtEfGXQsloDhh/SBQvUgcXUnHUZjqndCkAyPww1519kPqTpIsEmRQaE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz8NXBOtY+yB+dT2MUeKuKjmaBhD6kAVFlc/6kMD6WUqTSxmVTg
-	X1BbS4JJfPhwkzVYECeBsHy1yFYWlcxVMmQ6saQ9lhIBlF/a0HM1HRReYiew+Jms4qH76OeXZ6O
-	0Yw==
-X-Gm-Gg: ASbGncutfZpGyX6DsKwL4Frn0aNPBcLivjP6C27C3MR1D+iP8xlRAlkN2+l7/wpnSTV
-	YT1XRA0uUdyebcoATZy+PNlLAiGC1QBJKRmHPqIlulEXH11TUmRgBANncAxui0JHRY7RsRm4JIg
-	b5NowH+TmMff4s+goPT4m8mi9Svnt46VyhK5w3m/qRzeJzRQkKDvFQ10cAznxBbO9PWZE/fr+Oa
-	fF9EGnUP6C5xf4hyumlZkUmkbvRq4SKc94bjTeIE5Ife171/LfcM3zuZCywU12yzbDz0CnqBEb+
-	9xzMCLQviq33MwGZpDVUnj8n
-X-Google-Smtp-Source: AGHT+IEmu7TPSTXMcXWqBPqzgGP992fYz6d0NlpSB4pe0TArY/5e/MlCpviUh6kU6qxRmMV/w50qsQ==
-X-Received: by 2002:a05:6e02:1a8a:b0:3cd:d14c:be69 with SMTP id e9e14a558f8ab-3ce4b212f1dmr5019645ab.11.1736391676216;
-        Wed, 08 Jan 2025 19:01:16 -0800 (PST)
-Received: from [10.211.55.5] (c-73-228-159-35.hsd1.mn.comcast.net. [73.228.159.35])
-        by smtp.googlemail.com with ESMTPSA id e9e14a558f8ab-3ce4adbc838sm1149235ab.30.2025.01.08.19.01.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 08 Jan 2025 19:01:14 -0800 (PST)
-Message-ID: <9b7a7b9a-7f70-4ba2-b948-ffa1a7ae8f53@ieee.org>
-Date: Wed, 8 Jan 2025 21:01:12 -0600
+	s=arc-20240116; t=1736391885; c=relaxed/simple;
+	bh=K+nUBd2JGauhb1BPitIYbNWXqXl1MYo9/CXFAZQ0+cY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=PvLlihFe+gq4C6yKh7fDr8JWsS4LPHLCcj8AZIKWDkdoD61YyQqQrtcCZh9pmBKgOjPynuYxi+CKk9dkLUn3uqF2o+5JYLdVxwlFLfd7x1dXcC7UJRkG0SUcJwd+OzO5YQU3Rl78u011KF2XftIp0K2jdRaLaDK7MVEOoQRq/pE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=SLVbenMt; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 508Nwd4U016940;
+	Thu, 9 Jan 2025 03:04:38 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=F521Mj
+	HfEQEV+dlWDHPgFtwV3eLXoTVg74aU2NY3oRw=; b=SLVbenMtH6CVzvsmJMpr+1
+	vSBMKFQi5iTCtZDd/aTxjmbI7iqAY5WGtaPCfXmcqDBwkgLhBdadRYQKi4ScpWNx
+	K2zhCwYTF6SxlE52xMp63+WHd+iDeBUSJeToOKhQQ7zDkVLB5k2ImauMVhLOx8O1
+	6owydunUXOyfnlKS4L8iJdrAgeNPVBtaNipAHjrqwHDiWpIC3ZSpxhACeCvtpSZU
+	4PLyoBrP0UIvFFP3Pxcrst4JEDHf+uzrGAXoOEpBzg2fgPoWVS0YLZPGZ/3ML8Ac
+	PE8OruzedWR9suYpetN2gcYyHxUuKqtjw6BWoKcoBxWLw9PzdnVdaREvKojAAa+A
+	==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4423ghrmeq-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 09 Jan 2025 03:04:37 +0000 (GMT)
+Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 5092vBLK007706;
+	Thu, 9 Jan 2025 03:04:37 GMT
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4423ghrmen-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 09 Jan 2025 03:04:37 +0000 (GMT)
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 50905YnZ008869;
+	Thu, 9 Jan 2025 03:04:35 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 43yfq037eg-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 09 Jan 2025 03:04:35 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 50934W2Z8585492
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 9 Jan 2025 03:04:32 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id F184220043;
+	Thu,  9 Jan 2025 03:04:31 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id E3EC32004B;
+	Thu,  9 Jan 2025 03:04:30 +0000 (GMT)
+Received: from li-ce58cfcc-320b-11b2-a85c-85e19b5285e0 (unknown [9.171.84.105])
+	by smtpav03.fra02v.mail.ibm.com (Postfix) with SMTP;
+	Thu,  9 Jan 2025 03:04:30 +0000 (GMT)
+Date: Thu, 9 Jan 2025 04:04:29 +0100
+From: Halil Pasic <pasic@linux.ibm.com>
+To: Guangguan Wang <guangguan.wang@linux.alibaba.com>
+Cc: Paolo Abeni <pabeni@redhat.com>, wenjia@linux.ibm.com, jaka@linux.ibm.com,
+        alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
+        guwen@linux.alibaba.com, davem@davemloft.net, edumazet@google.com,
+        kuba@kernel.org, horms@kernel.org, linux-rdma@vger.kernel.org,
+        linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Alexandra Winter <wintera@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>
+Subject: Re: [PATCH net] net/smc: use the correct ndev to find pnetid by
+ pnetid table
+Message-ID: <20250109040429.350fdd60.pasic@linux.ibm.com>
+In-Reply-To: <908be351-b4f8-4c25-9171-4f033e11ffc4@linux.alibaba.com>
+References: <20241227040455.91854-1-guangguan.wang@linux.alibaba.com>
+	<1f4a721f-fa23-4f1d-97a9-1b27bdcd1e21@redhat.com>
+	<20250107203218.5787acb4.pasic@linux.ibm.com>
+	<908be351-b4f8-4c25-9171-4f033e11ffc4@linux.alibaba.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] dt-bindings: net: qcom,ipa: Use recommended MBN
- firmware format in DTS example
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, Alex Elder <elder@kernel.org>,
- linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20250108120242.156201-1-krzysztof.kozlowski@linaro.org>
-Content-Language: en-US
-From: Alex Elder <elder@ieee.org>
-In-Reply-To: <20250108120242.156201-1-krzysztof.kozlowski@linaro.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: c-YJzEI6PimfRixeIzOGUPFCXjLQCG_e
+X-Proofpoint-ORIG-GUID: -i-ItMAOiafV3SiAw9NPA3NkVctKgiuD
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 phishscore=0
+ mlxscore=0 impostorscore=0 bulkscore=0 priorityscore=1501 suspectscore=0
+ clxscore=1015 mlxlogscore=500 spamscore=0 adultscore=0 lowpriorityscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2411120000
+ definitions=main-2501090022
 
-On 1/8/25 6:02 AM, Krzysztof Kozlowski wrote:
-> All Qualcomm firmwares uploaded to linux-firmware are in MBN format,
-> instead of split MDT.  No functional changes, just correct the DTS
-> example so people will not rely on unaccepted files.
+On Wed, 8 Jan 2025 12:57:00 +0800
+Guangguan Wang <guangguan.wang@linux.alibaba.com> wrote:
+
+> > sorry for chiming in late. Wenjia is on vacation and Jan is out sick!
+> > After some reading and thinking I could not figure out how 890a2cb4a966
+> > ("net/smc: rework pnet table") is broken.  
 > 
-> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-
-Looks good.  I don't see SC7180 modem firmware there right
-now but this seems like a good change.  Thanks Krzysztof.
-
-Reviewed-by: Alex Elder <elder@kernel.org>
-
-> ---
->   Documentation/devicetree/bindings/net/qcom,ipa.yaml | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
+> Before commit 890a2cb4a966:
+> smc_pnet_find_roce_resource
+>     smc_pnet_find_roce_by_pnetid(ndev, ...) /* lookup via hardware-defined pnetid */
+>         smc_pnetid_by_dev_port(base_ndev, ...)
+>     smc_pnet_find_roce_by_table(ndev, ...) /* lookup via SMC PNET table */
+>     {
+>         ...
+>         list_for_each_entry(pnetelem, &smc_pnettable.pnetlist, list) {
+>                 if (ndev == pnetelem->ndev) { /* notice here, it was ndev to matching pnetid element in pnet table */
+>         ...
+>     }
 > 
-> diff --git a/Documentation/devicetree/bindings/net/qcom,ipa.yaml b/Documentation/devicetree/bindings/net/qcom,ipa.yaml
-> index 53cae71d9957..1a46d80a66e8 100644
-> --- a/Documentation/devicetree/bindings/net/qcom,ipa.yaml
-> +++ b/Documentation/devicetree/bindings/net/qcom,ipa.yaml
-> @@ -239,7 +239,7 @@ examples:
->   
->                   qcom,gsi-loader = "self";
->                   memory-region = <&ipa_fw_mem>;
-> -                firmware-name = "qcom/sc7180-trogdor/modem/modem.mdt";
-> +                firmware-name = "qcom/sc7180-trogdor/modem/modem.mbn";
->   
->                   iommus = <&apps_smmu 0x440 0x0>,
->                            <&apps_smmu 0x442 0x0>;
+> After commit 890a2cb4a966:
+> smc_pnet_find_roce_resource
+>     smc_pnet_find_roce_by_pnetid
+>     {
+>         ...
+>         base_ndev = pnet_find_base_ndev(ndev); /* rename the variable name to base_ndev for better understanding */
+>         smc_pnetid_by_dev_port(base_ndev, ...)
+>         smc_pnet_find_ndev_pnetid_by_table(base_ndev, ...)
+>         {
+>                 ...
+>                 list_for_each_entry(pnetelem, &smc_pnettable.pnetlist, list) {
+>                 if (base_ndev == pnetelem->ndev) { /* notice here, it is base_ndev to matching pnetid element in pnet table */
+>                 ...
+>         }
+> 
+>     }
+> 
+> The commit 890a2cb4a966 has changed ndev to base_ndev when matching pnetid element in pnet table.
+> But in the function smc_pnet_add_eth, the pnetid is attached to the ndev itself, not the base_ndev.
+> smc_pnet_add_eth(...)
+> {
+>     ...
+>     ndev = dev_get_by_name(net, eth_name);
+>     ...
+>         if (new_netdev) {
+>             if (ndev) {
+>                 new_pe->ndev = ndev;
+>                 netdev_tracker_alloc(ndev, &new_pe->dev_tracker,
+>                     GFP_ATOMIC);
+>             }
+>             list_add_tail(&new_pe->list, &pnettable->pnetlist);
+>             mutex_unlock(&pnettable->lock);
+>         } else {
+>     ...
+> }
 
+I still not understand why do you think that 890a2cb4a966~1 is better
+than 890a2cb4a966 even if things changed with 890a2cb4a966 which
+I did not verify for myself but am willing to assume.
+
+Is there some particular setup that you think would benefit from
+you patch? I.e. going back to the 890a2cb4a966~1 behavior I suppose.
+
+I think I showed a valid and practical setup that would break with your
+patch as is. Do you agree with that statement?
+
+Regards,
+Halil
 
