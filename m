@@ -1,127 +1,69 @@
-Return-Path: <netdev+bounces-156828-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156829-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E373AA07EEA
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 18:39:40 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 840B9A07F01
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 18:41:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BF04C168698
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 17:39:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E0016188D653
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 17:41:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1675319924E;
-	Thu,  9 Jan 2025 17:39:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fLrvEsCs"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E979D1FA8D9;
+	Thu,  9 Jan 2025 17:39:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 332DC191499;
-	Thu,  9 Jan 2025 17:39:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE4C919ADB0
+	for <netdev@vger.kernel.org>; Thu,  9 Jan 2025 17:39:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736444362; cv=none; b=LDv5pUDOce92N5aPmHJV/jLfagZpOKkhM9U99Sp/Q21Mn5aoz8vXOsKrZr1j7YsyE9kVR73fgvV579G5x8+Zunh6SjQ535uyX9XuNSGuVxdMD56eUHIXq5SFlo3A7oTlqpXfH1/Wl8zyRLL5vEKPVezzhjtntuwqKcXOhzCYYl0=
+	t=1736444394; cv=none; b=vDee5lt9ZiwCMs+3+3UveI2rLQBVrRjg/aly8D90gPqUeehH1UvOAJWCJ0IWCCTnJTQ8gQKiteD5J5CS3jsljuKe4WF/HJ0Qwxf+mwBjgaG6iKfx3eud0fztFY4Oj9lu243UAIHDIKjElS7rJkYcct8HnURTxiz8Y1gSVEa9jAs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736444362; c=relaxed/simple;
-	bh=zVcyNZXN3VvSpw0kulxzE8v0LRQqK88fl5EDuOLBaYs=;
+	s=arc-20240116; t=1736444394; c=relaxed/simple;
+	bh=jijRYU/KHDpDFxPipJNhowBxN18iiyG6Z+gjO6HhG/8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EUQEbYFEuD2YWaMqUGOF2HVp4UoRhBi5KUbvpjbo0ZLQzyrBzA3lqHi1SHGbNpY6/FTN5ZThG8MWGix2TUhEZqj4eFcmsmGjEOmH7R8zUvGHosswvJ8SaNE2IpFX4djprw+v4li94nWyvo+24N08KlVYR6/aQjdbfAUuwuW86vM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fLrvEsCs; arc=none smtp.client-ip=209.85.214.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-21669fd5c7cso19315555ad.3;
-        Thu, 09 Jan 2025 09:39:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736444360; x=1737049160; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=6KsRQIc1JxQBezEIVdfkOzKqKFxNDLhEnsfcwp5vSS0=;
-        b=fLrvEsCs266ief/HIKVkKkTSNjOmMJiOS4K7TNmKEujm8Gdh+vT9ph1wCXv21QQPjR
-         Pqgm1XSaL6lq1d9m2E54KYtkAQLS1klnrcPB5db8qbSjOqZsQ3l/R7PZ3H1Fiayp7BF6
-         55Imw0JiaB8OGDiqNWaFDA6WrwldNZgMYNOMO866AVcnPgM4TZHFRHH2/A83zwli7Ngx
-         3iQGvdIWonPZQGGbxBoass/ex5BeArOnPxZgXReKKLv9vUl8Or0f4KY2mveArgKZYl5v
-         I1SK80dNcFmH72/2FJJMLfNHzMyBslyP6n/M1UntC5nmq3Y/CD8/t4ajwIP2w6wD9XK/
-         zYyA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736444360; x=1737049160;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6KsRQIc1JxQBezEIVdfkOzKqKFxNDLhEnsfcwp5vSS0=;
-        b=TN9MVYiqc78zZN3SUAUJvYcAYcrxj/jPAL4XUqMm+w5FvWG98c62O4VagwXXDKwcoB
-         FDBgaa3CvGqHqqITWkXDQvBiUDEqlSm2EupDDDgx7FmIeaen7XIg8r01XmHP67BNmSub
-         L/PUeZX0G8FcfsXfkvChqnrObdF0wVE1YUene6OunBA9nvOD7lLZ1nxLsIcO1nAjRrHj
-         PEtuvkMeHPqlD5Z5x3pjcjY3lVEJt7GVXyDld9ja8m9hIfBRuylAMPxSiinxUlZrw74I
-         gBdOMLoo/q7zKnRNv6ZDu9m4IMLBqhYLPwBNpS6VuSffTgB9L7+xXE19psgtlGr/9JM6
-         1Liw==
-X-Forwarded-Encrypted: i=1; AJvYcCUkQKrHdvkeBGP7Q9EURSXIsJpNxb9BGEj31qhFF3N/xDSP/A+dpj8Tr/EEGOyRj6+ATnX7ggzH@vger.kernel.org, AJvYcCVdHXX+LHB50g8azcQIN34c7oxzkcEeOdl8cASenIOANiqGgcCxmGp4+xCML1shj2kn8X9FQPHJ91nV@vger.kernel.org, AJvYcCVgzZ6kBNZTnxPjr0TOZOQtICjKIj351vk2HCinPxa0B38GSNhB6+T5vogVHUp4uOl6mizEKfefMrkwhk1SyUoj@vger.kernel.org, AJvYcCWAcauJTO5abggW2v2bH6YjbwmKEprqiGaTL9aWXM+B9yXUi/4DVuUvPxNKt3yYi0Mg4t8=@vger.kernel.org, AJvYcCXxLUxk6EKjlcCWQHM4A0bkczSIi2RaA+knTwJeELooVTZIvuK0vyUEAcAdg6/NjHsKK0gTt94bXlegcDxF@vger.kernel.org
-X-Gm-Message-State: AOJu0YxE0LYCf33TD53/smm9C6ScijrVyNb2xwLrZnxIaKAdk3aEM2UP
-	9xz/h/s6v55h+no/gH8cU4C0juonfJ4nD6hIX0FkMlWSsj2mlGo=
-X-Gm-Gg: ASbGnctrnKE9P5agziqblp/jv2u5b3zZudHItTJfgjihpJ3ahow8IpD6UzZ8TxGEo6b
-	ZSvqLNe/GN3Xitw+u8BlQhmx3ibKA4KizGjm/QohLfLZrbbuGoLd3bfHOZnwF1ELPR8U7U0COe4
-	SbPhNKSE2AHDXnDKDcYmSgmuMHQpMRhA+jiRznWkpIijoOECTiEJCP+coOSjsKQMViGlBg0NOoM
-	FXP2KJVj7ZW0tfug2MP/J0f7PE9+ZTENWZzsQCbGrWMZrnX1E/RqEjZ
-X-Google-Smtp-Source: AGHT+IEOsPd8gi8EzkqvvII6DaS7kpXwJUDoEvR9sz6x99GD7Aypk+y99jv+WqRaCxVsNJdjbVm5kQ==
-X-Received: by 2002:a17:902:d2ca:b0:216:56d5:d87 with SMTP id d9443c01a7336-21a83f8ea52mr112422135ad.34.1736444360267;
-        Thu, 09 Jan 2025 09:39:20 -0800 (PST)
-Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21a9f22f051sm516575ad.203.2025.01.09.09.39.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Jan 2025 09:39:19 -0800 (PST)
-Date: Thu, 9 Jan 2025 09:39:19 -0800
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: "Song, Yoong Siang" <yoong.siang.song@intel.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=Glg3vkQAOw+MlpD+cLhcc41qNBGHnena5t4HmPLULncvjrffY+9iwkIypA94gHFewOS+AQmCoojcSgOLEH4nDpMZa2OAnddbMQelhJRyZHPK7EIW8x+ipSmDqSMyUgJjM8tG4OqVgpPl99G4g53lFLsAB7MxQNB2NEXqYNlrXFY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1tVwVW-0005ud-Ck; Thu, 09 Jan 2025 18:39:46 +0100
+Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1tVwVV-0001J6-21;
+	Thu, 09 Jan 2025 18:39:45 +0100
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1tVwVV-000319-1g;
+	Thu, 09 Jan 2025 18:39:45 +0100
+Date: Thu, 9 Jan 2025 18:39:45 +0100
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Willem de Bruijn <willemb@google.com>,
-	"Bezdeka, Florian" <florian.bezdeka@siemens.com>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Jonathan Corbet <corbet@lwn.net>, Bjorn Topel <bjorn@kernel.org>,
-	"Karlsson, Magnus" <magnus.karlsson@intel.com>,
-	"Fijalkowski, Maciej" <maciej.fijalkowski@intel.com>,
-	Jonathan Lemon <jonathan.lemon@gmail.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	"Damato, Joe" <jdamato@fastly.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Mina Almasry <almasrymina@google.com>,
-	Daniel Jurgens <danielj@nvidia.com>,
-	Amritha Nambiar <amritha.nambiar@intel.com>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Eduard Zingerman <eddyz87@gmail.com>,
-	Mykola Lysenko <mykolal@fb.com>,
-	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	KP Singh <kpsingh@kernel.org>, Hao Luo <haoluo@google.com>,
-	Jiri Olsa <jolsa@kernel.org>, Shuah Khan <shuah@kernel.org>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	"Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
-	"Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-	"bpf@vger.kernel.org" <bpf@vger.kernel.org>,
-	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-	"linux-stm32@st-md-mailman.stormreply.com" <linux-stm32@st-md-mailman.stormreply.com>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-	"xdp-hints@xdp-project.net" <xdp-hints@xdp-project.net>
-Subject: Re: [PATCH bpf-next v4 3/4] net: stmmac: Add launch time support to
- XDP ZC
-Message-ID: <Z4AJx-a-eY3pgHNv@mini-arch>
-References: <20250106135658.9734-1-yoong.siang.song@intel.com>
- <Z31fXHxWuKNog_Qh@mini-arch>
- <PH0PR11MB58304082BF0EA96D1A74E4C5D8132@PH0PR11MB5830.namprd11.prod.outlook.com>
+	Woojung Huh <woojung.huh@microchip.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>, kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	UNGLinuxDriver@microchip.com, Phil Elwell <phil@raspberrypi.org>
+Subject: Re: [PATCH net-next v1 7/7] net: usb: lan78xx: Enable EEE support
+ with phylink integration
+Message-ID: <Z4AJ4bxLePBbbR2u@pengutronix.de>
+References: <20250108121341.2689130-1-o.rempel@pengutronix.de>
+ <20250108121341.2689130-8-o.rempel@pengutronix.de>
+ <Z35z6ZHspfSZK4U7@shell.armlinux.org.uk>
+ <Z36KacKBd2WaOxfW@pengutronix.de>
+ <Z36WqNGpWWkHTjUE@shell.armlinux.org.uk>
+ <Z4ADpj0DlqBRUEK-@pengutronix.de>
+ <Z4AG7zvIvQDv3GTn@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -130,64 +72,131 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <PH0PR11MB58304082BF0EA96D1A74E4C5D8132@PH0PR11MB5830.namprd11.prod.outlook.com>
+In-Reply-To: <Z4AG7zvIvQDv3GTn@shell.armlinux.org.uk>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On 01/09, Song, Yoong Siang wrote:
-> On Wednesday, January 8, 2025 1:08 AM, Stanislav Fomichev <stfomichev@gmail.com> wrote:
-> >On 01/06, Song Yoong Siang wrote:
-> >> Enable launch time (Time-Based Scheduling) support to XDP zero copy via XDP
-> >> Tx metadata framework.
-> >>
-> >> This patch is tested with tools/testing/selftests/bpf/xdp_hw_metadata on
-> >> Intel Tiger Lake platform. Below are the test steps and result.
-> >>
-> >> Test Steps:
-> >> 1. Add mqprio qdisc:
-> >>    $ sudo tc qdisc add dev enp0s30f4 handle 8001: parent root mqprio num_tc
-> >>      4 map 0 1 2 3 3 3 3 3 3 3 3 3 3 3 3 3 queues 1@0 1@1 1@2 1@3 hw 0
-> >>
-> >> 2. Enable launch time hardware offload on hardware queue 1:
-> >>    $ sudo tc qdisc replace dev enp0s30f4 parent 8001:2 etf offload clockid
-> >>      CLOCK_TAI delta 500000
-> >>
-> >> 3. Add an ingress qdisc:
-> >>    $ sudo tc qdisc add dev enp0s30f4 ingress
-> >>
-> >> 4. Add a flower filter to route incoming packet with VLAN priority 1 into
-> >>    hardware queue 1:
-> >>    $ sudo tc filter add dev enp0s30f4 parent ffff: protocol 802.1Q flower
-> >>      vlan_prio 1 hw_tc 1
-> >>
-> >> 5. Enable VLAN tag stripping:
-> >>    $ sudo ethtool -K enp0s30f4 rxvlan on
-> >>
-> >> 6. Start xdp_hw_metadata selftest application:
-> >>    $ sudo ./xdp_hw_metadata enp0s30f4 -l 1000000000
-> >>
-> >> 7. Send an UDP packet with VLAN priority 1 to port 9091 of DUT.
-> >
-> >Tangential: I wonder whether we can add the setup steps to the
-> >xdp_hw_metadata tool? It is useful to have one command to run that
-> >takes care of all the details. Same way it already enables HW
-> >tstamping..
-> >
-> >Or, if not the full setup, some kind of detection we can signal to the
-> >user that some things might be missing?
+On Thu, Jan 09, 2025 at 05:27:11PM +0000, Russell King (Oracle) wrote:
+> On Thu, Jan 09, 2025 at 06:13:10PM +0100, Oleksij Rempel wrote:
+> > On Wed, Jan 08, 2025 at 03:15:52PM +0000, Russell King (Oracle) wrote:
+> > > On Wed, Jan 08, 2025 at 03:23:37PM +0100, Oleksij Rempel wrote:
+> > > > Yes, otherwise every MAC driver will need to do it in the
+> > > > ethtool_set_eee() function.
+> > > 
+> > > I've had several solutions, and my latest patch set actually has a
+> > > mixture of them in there (which is why I'm eager to try and find a way
+> > > forward on this, so I can fix the patch set):
+> > > 
+> > > 1. the original idea to address this in Marvell platforms was to limit
+> > >    the LPI timer to the maximum representable value in the hardware,
+> > >    which would be 255us. This ignores that the hardware uses a 1us
+> > >    tick rate for the timer at 1G speeds, and 10us for 100M speeds.
+> > >    (So it limits it to 260us, even though the hardware can do 2550us
+> > >    at 100M speed). This limit was applied by clamping the value passed
+> > >    in from userspace without erroring out.
+> > > 
+> > > 2. another solution was added the mac_validate_tx_lpi() method, and
+> > >    implementations added _in addition_ to the above, with the idea
+> > >    of erroring out for values > 255us on Marvell hardware.
+> > > 
+> > > 3. another idea was to have mac_enable_tx_lpi() error out if it wasn't
+> > >    possible to allow e.g. falling back to a software timer (see stmmac
+> > >    comments below.) Another reason for erroring out applies to Marvell
+> > >    hardware, where PP2 hardware supports LPI on the GMAC but not the
+> > >    XGMAC - so it only works at speeds at or below 2.5G. However, that
+> > >    can be handled via the lpi_capabilities, so I don't think needs to
+> > >    be a concern.
+> > > 
+> > > > The other question is, should we allow absolute maximum values, or sane
+> > > > maximum? At some point will come the question, why the EEE is even
+> > > > enabled?
+> > > 
+> > > As referenced above, stmmac uses the hardware timer for LPI timeouts up
+> > > to and including 1048575us (STMMAC_ET_MAX). Beyond that, it uses a
+> > > normal kernel timer which is:
+> > > 
+> > > - disabled (and EEE mode reset) when we have a packet to transmit, or
+> > >   EEE is disabled
+> > > - is re-armed when cleaning up from packet transmission (although
+> > >   it looks like we attempt to immediately enter LPI mode, and would
+> > >   only wait for the timer if there are more packets to queue... maybe
+> > >   this is a bug in stmmac's implementation?) or when EEE mode is first
+> > >   enabled with a LPI timer longer than the above value.
+> > > 
+> > > So, should phylink have the capability to switch to a software LPI timer
+> > > implementation when the LPI timeout value exceeds what the hardware
+> > > supports?
+> > 
+> > No, i'll list my arguments later down.
+> > 
+> > > To put it another way, should the stmmac solution to this be
+> > > made generic?
+> > 
+> > May be partially?
+> > 
+> > > Note that stmmac has this software timer implementation because not
+> > > only for the reason I've given above, but also because cores other than
+> > > GMAC4 that support LPI do not have support for the hardware timer.
+> > 
+> > There seems to be a samsung ethernet driver which implements software
+> > based timer too.
+> > 
+> > > > The same is about minimal value, too low value will cause strong speed
+> > > > degradation. Should we allow set insane minimum, but use sane default
+> > > > value?
+> > > 
+> > > We currently allow zero, and the behaviour of that depends on the
+> > > hardware. For example, in the last couple of days, it's been reported
+> > > that stmmac will never enter LPI with a value of zero.
+> > > 
+> > > Note that phylib defaults to zero, so imposing a minimum would cause
+> > > a read-modify-write of the EEE settings without setting the timer to
+> > > fail.
+> > >
+> > > > > Should set_eee() error out?
+> > > > 
+> > > > Yes, please.
+> > > 
+> > > If we are to convert stmmac, then we need to consider what it's doing
+> > > (as per the above) and whether that should be generic - and if it isn't
+> > > what we want in generic code, then how do we allow drivers to do this if
+> > > they wish.
+> > 
+> >    - EEE Advertisement:  
+> > 
+> >      Advertising EEE capabilities is entirely dependent on the PHY. Without a
+> > PHY, these settings cannot be determined or validated, as the PHY defines the
+> > supported capabilities. Any attempt to configure EEE advertisement without an
+> > attached PHY should fail immediately with an appropriate error, such as:  "EEE
+> > advertisement configuration not applied: no PHY available to validate
+> > capabilities."
 > 
-> Sure. I can try to add the setup steps into xdp_hw_metadata
-> by using ioctl() function. However, there are some device specific
-> command, like the number of queue, their priority,
-> how they route the incoming packet, etc. I will try to find out
-> a common way that can work for most of the devices,
-> at least work for both igc and stmmac.
+> Sorry, at this point, I give up with phylink managed EEE. What you
+> detail above is way too much for me to get involved with, and goes
+> well beyond simply:
+> 
+> 1) Fixing the cockup with the phylib-managed EEE that has caused *user*
+>    *regressions* that we need to resolve.
+> 
+> 2) Providing core functionality so that newer implementations can have
+>    a consistency of behaviour.
+> 
+> I have *no* interest in doing a total rewrite of kernel EEE
+> functionality - that goes well beyond my aims here.
+>
+> So I'm afraid that I really lost interest in reading your email, sorry.
+ 
+Sorry for killing your motivation. I can feel your pain...
 
-We can query the number of queues (and everything else you need) in the
-tool, similar to what we do in
-testing/selftests/drivers/net/hw/ncdevmem.c, take a look. But if it's
-too complicated, maybe at least print these commands on startup and tell
-the user to run them.
-
-The reason I'm asking is that I hope that we eventually can run this
-tool from (automatic) testing/selftests/drivers/net/hw testsuite to
-make sure the metadata stuff keeps working.
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
