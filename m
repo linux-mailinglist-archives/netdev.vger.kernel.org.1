@@ -1,141 +1,149 @@
-Return-Path: <netdev+bounces-156618-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156619-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 303D2A072A2
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 11:17:25 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E60BA072AA
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 11:19:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E09CE1888E51
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 10:17:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D7E6E3A277C
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 10:19:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96E2621578B;
-	Thu,  9 Jan 2025 10:17:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D8C1215F71;
+	Thu,  9 Jan 2025 10:18:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kQJSU2YU"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="STwe3ogN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 156AA2153FA;
-	Thu,  9 Jan 2025 10:17:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6305321579F;
+	Thu,  9 Jan 2025 10:18:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736417832; cv=none; b=OAHrgfIaTQKAjWPR4dAzunBsfEIW0pHBQ4HAaPajdHpF+pks7r08PPJCdHdkYuZUGfcwLidr+q0sNLAown+UxuKpLjDIVKqdn/jfpwZ2FTL6jMT0XXHJcVvFTIKaW2gCRUKS/FgsSLgkkl6ffq4wtpWuRtb7y7G8LkNr4ScQjVE=
+	t=1736417934; cv=none; b=op1e2ji/uBqsxqOH2i/j24+EpQ1xwobLl2UTCcfl6Ns4U3K15Jc8hWT3vopesuHjoNFRhNh5Uo5p0zX0CcOWNStwBbb01Lkd3MfuC8klq6XEX8VGZBbhJFbk1EL/op2RzAOkwZ7+E7yYaBTGfmjnjQmOgu/lZVOiSdVAZjacMqc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736417832; c=relaxed/simple;
-	bh=+rnIXIXl+omhSFdifxJMCOg+IS+vRghw3Hf4napuhs8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eTWilHH4zQ3lk/EjOI8OawM1z5T6kq3Q4gchhy7BR9NFS2IhXGYVmDKWejBCM0Yl+BDX9+nzXHO2MeqxLgKVk8DI5HLWLHtCh0f9L4rE7yFGEI6mLZSVDi3wT2dC3+iHZlm5OvUZ+A5wJ3o9ofDbZfuQ0Dk5UZTyfb5698gQJL0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kQJSU2YU; arc=none smtp.client-ip=209.85.216.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-2ee8e8e29f6so995705a91.0;
-        Thu, 09 Jan 2025 02:17:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736417830; x=1737022630; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Wxwj8Vr2NS04fD1ExMGN1qbk+uSKoXbrW6r3E3W4B6U=;
-        b=kQJSU2YU4/YMPgBLXjDQyJDYlWJOgrmQVrcNCvCMFEK3ZmXaLLuKxbhrGiZjHRef/d
-         VW3ivUnG2ap/ubAh6AkMeYJ7hSMIHEcqz/sNJhAhcgPTLWdN0iiNcslkMdB9tV1/fQnW
-         4VUBGBGLdMw/7qOaufhsTGPGLGUqhsJv5rCOZIt8bjPmWVgmzrQHT0l11tS1oDoAPSqQ
-         LT+H/0kBGI/vkQRRUoOCK7JboYp2wA0haO46SUuOU1JmlpEQKon0clbUVNRhNI71aCAr
-         AGbhxqGniUOLpw0k8k7/6V6m6W8yWSS4O8uOTNX4URmPeTSZocGK6SABf3e9biMTxiWg
-         3xnQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736417830; x=1737022630;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Wxwj8Vr2NS04fD1ExMGN1qbk+uSKoXbrW6r3E3W4B6U=;
-        b=QNdgwyCIeMY6UnS5QyDOUsufI09836L8w2eYES23wt3m9ReKMYdAFHCzJ7InvcZ3om
-         Jm6ZV3FMPPW9b7lHJWDsrIM2S8d/cyAAX2EKb6pmVuexsAk1NM/oBEVYw1ODkZBUvkd/
-         bgDzNp9nieqTCjkeZzmdTNYtfIiN1oTPwkGhZ4z3Z5e7wzlDDSFElvotGiSuNXLp+pNz
-         H97ZTQhMWTU6/+X1wd6B2OgJzNvu5p2gZEHi1v1T7S3fnR7a8VheXkIPtnlQ4MnDeqAx
-         vlJM1nVWTcFaob26DVEQPAGQrsOxtyAAaib5OKTAWaaqt90g9pXpxBMN4et2Fczq1X2Y
-         82Mg==
-X-Forwarded-Encrypted: i=1; AJvYcCW2zLU9GGmARuHUztDMqk4gz3sOnAYTr5bWKy/ZPYWMKRcCYhqiRYlVzQ1qb4un0gqbwZdxbYzMqinOpjvY2IlG@vger.kernel.org, AJvYcCWVDZPaQtwFBFzNBCoYhBmcL1xkTitp35tCPGnSvMWEV+cL71y+g+/yeZPumLXfpT5EiZC28fpM@vger.kernel.org, AJvYcCWeVO1nWjymf/O0EiyyZdI8KzVZgjpgPzS7zz5/fYbhV8ui4DQ3YC/a1tHbFtjScwKtjH7HaWuJVNmi7lE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyhalEGP9Nu9N0a6kB/II4uqnPXPrkw3Vbat6hWa6NcmBZm6MHb
-	rAO86PbAQf9+wLuN7ZjpqvmDsSU5TKQoQ7bVoBP7mzswCxzl7AWC
-X-Gm-Gg: ASbGncu4eEh6g0JaztWdjq9tXD9wNkWhtL9zdoGQEoM9ES9mgLDXZxh+6dSqo4SKalp
-	T8Trnu21twthrr53e+o9bWnZ0QVjV2WC77y9W/NlMdibWmF+PViohNzQEJW6XUyeTISWNOkL31s
-	Sf38PUvXqgVh2huZSznJsqr9pSVmImiuM8A85o2QMJh/yPSzt4ShX5MRnohp5Zi6XFyV9/olkCR
-	TNz6j0TqcIOkOXMileFV1WRlmtqobZ7fDyBDgT6Hm/hq0ajD8kSApYr4RuzWQ==
-X-Google-Smtp-Source: AGHT+IFBOOb/qVq5kprleuNjAH5wcJBcISGwHGfGP/smHaUA0POLs59ltUxYscizxSHgVnGFNjk8gw==
-X-Received: by 2002:a05:6a00:3e01:b0:725:e37d:cd35 with SMTP id d2e1a72fcca58-72d21ff4af7mr9963216b3a.18.1736417830140;
-        Thu, 09 Jan 2025 02:17:10 -0800 (PST)
-Received: from fedora ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72aad8faf9esm37939042b3a.144.2025.01.09.02.17.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Jan 2025 02:17:09 -0800 (PST)
-Date: Thu, 9 Jan 2025 10:17:00 +0000
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Jianbo Liu <jianbol@nvidia.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	Jay Vosburgh <jv@jvosburgh.net>,
-	Andy Gospodarek <andy@greyhouse.net>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Simon Horman <horms@kernel.org>, Tariq Toukan <tariqt@nvidia.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>, Shuah Khan <shuah@kernel.org>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Sabrina Dubroca <sd@queasysnail.net>,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net 0/2] bond: fix xfrm offload feature during init
-Message-ID: <Z3-iHO1gqQt3T0Tl@fedora>
-References: <20241213193127.4c31ef80@kernel.org>
- <Z3X9pfu12GUOBUY6@fedora>
- <1d8c901f-e292-43e4-970f-8440b26e92b0@nvidia.com>
- <Z3u0q5HSOshLn2V0@fedora>
- <Z33nEKg4PxwReUu_@fedora>
- <ad289f9a-41c3-4544-8aeb-535615f45aef@nvidia.com>
- <Z34l6hpbzPP9n65Y@fedora>
- <e01bae5f-30b5-4ec4-8c4b-5c133dd4552a@nvidia.com>
- <Z3-KxbofkhOrWin7@fedora>
- <b39dfbee-dd80-48b2-b79c-29682269522a@nvidia.com>
+	s=arc-20240116; t=1736417934; c=relaxed/simple;
+	bh=m2/2B8DgsQWKP2dTKHY6Uo/hbqT8KQFiKmV/nwAePok=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=civ6GGSALJ6Sjy+vZU9ycLYurX9rwz/tLfx/a6MGwL5NMhYJNA7gxGCj//il22EDnlFMNN5LjRl3hg7RpNIdnNjG8AlvsARIHp2xbxlsQYklaeKr4yYJPfpnn87Jx54t6I30ZWyQX0FRtmsnGCbaid4ghrKyBy/RoWhNyysfRRE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=STwe3ogN; arc=none smtp.client-ip=217.70.183.196
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 8CF61E000C;
+	Thu,  9 Jan 2025 10:18:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1736417924;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=QQzbUGpRpqJpruHFivHLZPolA0wMskDZ+pQZE56/8yo=;
+	b=STwe3ogNYIyg384FVkecEy4NjGiK7VWz9GpTOtrGo5O+Sk8v5NlCILz4bgJIA9P56WDrrO
+	A8ugqZsA9abF6kSoDts56RkRlZMnJlz6hDWA8z/IXEmIuqAG3XaiJedMJ9Y5l7RbI0Sd7x
+	ufjsg+1XDAXsSSx7z6wM4TY0jYrW1XtAGduqrZt/Jj6Lz2pvW2LyZ3IcmGCAzN1hctx78u
+	RVLuuhKm5WccoWUUtf6X4dFk3MRAovYmnuiw/tyVmPSoZDT1qGR7sZKmdkJ9HoFn4L/g+v
+	yvwIdro+XQGDLnhmcyxfoF4K/bkSwgJ/2r4DBm+wYRIN1WqA9x+IFe25Xg2NVg==
+From: Kory Maincent <kory.maincent@bootlin.com>
+Subject: [PATCH net-next v2 00/15] Arrange PSE core and update TPS23881
+ driver
+Date: Thu, 09 Jan 2025 11:17:54 +0100
+Message-Id: <20250109-b4-feature_poe_arrange-v2-0-55ded947b510@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b39dfbee-dd80-48b2-b79c-29682269522a@nvidia.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-B4-Tracking: v=1; b=H4sIAFKif2cC/4WNUQrCMBBEr1L220gaolW/vIeUkjQbu6BJ2cRSK
+ b27IRfwc3gzbzZIyIQJbs0GjAsliqEEdWhgnEx4oiBXMiipTrKVWlgtPJr8YRzmiINhrq3OOKn
+ PyivjEcp4ZvS0VvEDAmYRcM3QFzJRypG/9XFpK/8nX1ohxVX5i9TWdRrd3caYXxSOY3xDv+/7D
+ 6tQh5bIAAAA
+To: Oleksij Rempel <o.rempel@pengutronix.de>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, Donald Hunter <donald.hunter@gmail.com>, 
+ Jonathan Corbet <corbet@lwn.net>, Liam Girdwood <lgirdwood@gmail.com>, 
+ Mark Brown <broonie@kernel.org>
+Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>, 
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+ linux-doc@vger.kernel.org, Kyle Swenson <kyle.swenson@est.tech>, 
+ Dent Project <dentproject@linuxfoundation.org>, kernel@pengutronix.de, 
+ Maxime Chevallier <maxime.chevallier@bootlin.com>, 
+ Kory Maincent <kory.maincent@bootlin.com>, 
+ Kalesh AP <kalesh-anakkur.purayil@broadcom.com>, 
+ Andrew Lunn <andrew@lunn.ch>
+X-Mailer: b4 0.15-dev-8cb71
+X-GND-Sasl: kory.maincent@bootlin.com
 
-On Thu, Jan 09, 2025 at 05:51:07PM +0800, Jianbo Liu wrote:
-> > > No, we don't need. But I am trying to understand what you said in your last
-> > > email about adding a new lock, or unlocking spin lock in
-> > 
-> > I *thought* we need the spin lock in xfrm_state_delete(). So to protect xfrm_state,
-> 
-> But not need in bond_ipsec_del_sa() because the state still hold by
-> xfrm_state_hold(), right?
+From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
 
-Hmm, I'm not sure. If xfrm_state_hold() is safe. Why not just remove the spin
-lock in xfrm_state_delete(). This is more straightforward. e.g.
+This patch includes several improvements to the PSE core for better
+implementation and maintainability:
 
-diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
-index 67ca7ac955a3..150562abf513 100644
---- a/net/xfrm/xfrm_state.c
-+++ b/net/xfrm/xfrm_state.c
-@@ -784,9 +784,7 @@ int xfrm_state_delete(struct xfrm_state *x)
- {
-        int err;
+- Move the conversion between current limit and power limit from the driver
+  to the PSE core.
+- Update power and current limit checks.
+- Split the ethtool_get_status callback into multiple callbacks.
+- Add support for PSE device index.
+- Fix PSE PI of_node detection.
+- Clean ethtool header of PSE structures.
 
--       spin_lock_bh(&x->lock);
-        err = __xfrm_state_delete(x);
--       spin_unlock_bh(&x->lock);
+Additionally, the TPS23881 driver has been updated to support power
+limit and measurement features, aligning with the new PSE core
+functionalities.
 
-        return err;
- }
+This patch series is the first part of the budget evaluation strategy
+support patch series sent earlier:
+https://lore.kernel.org/netdev/20250104161622.7b82dfdf@kmaincent-XPS-13-7390/T/#t
 
-We can even rename xfrm_state_delete() to xfrm_state_delete() directly.
+Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
+---
+Changes in v2:
+- Add a patch to clean ethtool header of PSE structures
+- Link to v1: https://lore.kernel.org/r/20250104-b4-feature_poe_arrange-v1-0-92f804bd74ed@bootlin.com
 
-Thanks
-Hangbin
+---
+Kory Maincent (15):
+      net: pse-pd: Remove unused pse_ethtool_get_pw_limit function declaration
+      net: pse-pd: Avoid setting max_uA in regulator constraints
+      net: pse-pd: Add power limit check
+      net: pse-pd: tps23881: Simplify function returns by removing redundant checks
+      net: pse-pd: tps23881: Use helpers to calculate bit offset for a channel
+      net: pse-pd: tps23881: Add missing configuration register after disable
+      net: pse-pd: Use power limit at driver side instead of current limit
+      net: pse-pd: Split ethtool_get_status into multiple callbacks
+      net: pse-pd: Remove is_enabled callback from drivers
+      net: pse-pd: tps23881: Add support for power limit and measurement features
+      net: pse-pd: Add support for PSE device index
+      net: ethtool: Add support for new PSE device index description
+      regulator: core: Resolve supply using of_node from regulator_config
+      net: pse-pd: Fix missing PI of_node description
+      net: pse-pd: Clean ethtool header of PSE structures
+
+ Documentation/netlink/specs/ethtool.yaml       |   5 +
+ Documentation/networking/ethtool-netlink.rst   |   4 +
+ drivers/net/pse-pd/pd692x0.c                   | 224 ++++++------
+ drivers/net/pse-pd/pse_core.c                  | 207 ++++++++----
+ drivers/net/pse-pd/pse_regulator.c             |  23 +-
+ drivers/net/pse-pd/tps23881.c                  | 449 ++++++++++++++++++++-----
+ drivers/regulator/core.c                       |  39 ++-
+ include/linux/ethtool.h                        |  20 --
+ include/linux/pse-pd/pse.h                     | 138 ++++++--
+ include/uapi/linux/ethtool_netlink.h           |   1 -
+ include/uapi/linux/ethtool_netlink_generated.h |   1 +
+ net/ethtool/pse-pd.c                           |  12 +-
+ 12 files changed, 798 insertions(+), 325 deletions(-)
+---
+base-commit: 849b7ca06e68813750c71c4c204372999cea6d0a
+change-id: 20250104-b4-feature_poe_arrange-7ad0462f2afe
+
+Best regards,
+-- 
+Köry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
+
 
