@@ -1,91 +1,208 @@
-Return-Path: <netdev+bounces-156705-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156706-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21103A078EE
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 15:16:28 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F0CBA078F9
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 15:18:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 24CE21688B8
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 14:16:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4D2663A12FF
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 14:18:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5562B219A78;
-	Thu,  9 Jan 2025 14:16:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13BC1219EA5;
+	Thu,  9 Jan 2025 14:18:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="WoCyI9/2"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="So6wUWxo"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9DBB21660A;
-	Thu,  9 Jan 2025 14:16:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33515290F;
+	Thu,  9 Jan 2025 14:18:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736432184; cv=none; b=X5oapuKhmIAqwV6TkPs1cjaWPTXlQCxfy3tLRxJ8Gi86AgEuX02dFM42TQ09LNLFKQYk9rj4WkvhNEgVzt6QDnNGp8PrXB67IW/3F2C5qtnS4v+wQNkDZAb7nkVBvOENwYL9O+597ktw6I2NaGJtPv/BlVGDF1akyLUbLo0c6MU=
+	t=1736432321; cv=none; b=qbeutBIgf6/d5WZCRA3sPaKynW0BV1epPsCg4ErGh2sP1Ri2mO+Q7ZCKCQFXdB501+gVyqSiB9ZeOtZgHFZAWhA/Qj6jyv6Wq8cp1T/3u8rkHOMFU5dBDvxu47c7/fXjyhmwwNV9WdxNWPxNLKtngRdk4RdGPJb0NJLX0TzXaJI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736432184; c=relaxed/simple;
-	bh=IZ0acXhT0YMIXDW/44pyB4O/k30FmTzei1H7JU0mxac=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dktDtKmsxdn/2L8EWxWO6yDvgtDEjQSHjVS6YHAl8kvaXgDh/CjliPBTno5Q8EZzIXDR/5HKvmqKCmOXkJBJJ16MCFngJWDtIyxa1bqxRCnR5SmPnrfPSIl4e9MWjl7y+w2g7LYU3HGrmI/1ZFj3J2XIkLXY74D5lhKaAbTW47s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=WoCyI9/2; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=9JESPOQS4EHqjM5dyI36/1mlgYqQI2J+aklQe3TUDMk=; b=WoCyI9/2gjr2asx5Kgb+1GDr4r
-	Dt2N92ECfFohKn8OS+gWxGtDgABQvRW/ny4oM9Zb4F3OFIEQalk0n9goY6oGMLbgHo/79I4JxZ+oE
-	pSYFobCNiqfq1O3KXlieCm/8EgVSlebNa8KeFVCvrVLP8+609r1papRROmM0oRNHhR2M=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tVtKP-002uXi-Fv; Thu, 09 Jan 2025 15:16:05 +0100
-Date: Thu, 9 Jan 2025 15:16:05 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Basharath Hussain Khaja <basharath@couthit.com>
-Cc: danishanwar@ti.com, rogerq@kernel.org, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org,
-	conor+dt@kernel.org, nm@ti.com, ssantosh@kernel.org,
-	tony@atomide.com, richardcochran@gmail.com, parvathi@couthit.com,
-	schnelle@linux.ibm.com, rdunlap@infradead.org,
-	diogo.ivo@siemens.com, m-karicheri2@ti.com, horms@kernel.org,
-	jacob.e.keller@intel.com, m-malladi@ti.com,
-	javier.carrasco.cruz@gmail.com, afd@ti.com, s-anna@ti.com,
-	linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-omap@vger.kernel.org, pratheesh@ti.com, prajith@ti.com,
-	vigneshr@ti.com, praneeth@ti.com, srk@ti.com, rogerq@ti.com,
-	krishna@couthit.com, pmohan@couthit.com, mohan@couthit.com
-Subject: Re: [RFC PATCH 01/10] dt-bindings: net: ti: Adds device tree binding
- for DUAL-EMAC mode support on PRU-ICSS2 for AM57xx SOCs
-Message-ID: <4a8fb859-e173-42bf-8d9b-8d6423f45a9b@lunn.ch>
-References: <20250109105600.41297-1-basharath@couthit.com>
- <20250109105600.41297-2-basharath@couthit.com>
+	s=arc-20240116; t=1736432321; c=relaxed/simple;
+	bh=YfAm5GzIjdbz4owa5xnWV9gtpuvmrM2mW6eQhbKiSt0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=bgmtE/Rqq3aK2T437HihmAjX+VTowRW6cHmi4yjfL5zotRwX5wx5cZrWVjazhJHMIP/uZqTz2Emm/LOqroLYG7vvosXwtgQAELxkfz5+C/4e6zzojHN8JD9P6Y+kF2/Q5ynpTyRuf2y85bjJJbczQMUaxWXn+jx9PWPk3QKaPPQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=So6wUWxo; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5096hk55022415;
+	Thu, 9 Jan 2025 14:18:23 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	/2s/dlH3acuxpVLW+nsSRc87IEUOplUi45AC4Nv79ps=; b=So6wUWxoVKMlvaYL
+	v4h3W39kWv41GLRwa2qJaLfr+fN5xVGQczlg4sdGFkUxvs4cR6o8W9wDIuDv3hIt
+	UV18KpxS+L3zXQY+Rz3sugoYpDpH5DfuxoCo9WMHny+r23E0X2T5JZOKdbbmgFhq
+	uIBBtj6VDsOKhtdj4wdzQiqOKMgPB3qB9c005e+nn++BDkG0FwbItgAqtsmjpiLS
+	ryFDtzNpOgVORWBAtKO6tPqS/j6Fie88EmuopnwoG2HQplgJCJqLAt8h4KYZfcGU
+	H68A8iy0T/7m/vp3sR6JqNELNgf94esK4QlYbwQCxnZ/qZsM8jT5SkoYcD2J/uXm
+	kz60Jw==
+Received: from nasanppmta04.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4429eph2ga-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 09 Jan 2025 14:18:23 +0000 (GMT)
+Received: from nasanex01b.na.qualcomm.com (nasanex01b.na.qualcomm.com [10.46.141.250])
+	by NASANPPMTA04.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 509EIMfI028063
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 9 Jan 2025 14:18:22 GMT
+Received: from [10.253.12.10] (10.80.80.8) by nasanex01b.na.qualcomm.com
+ (10.46.141.250) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Thu, 9 Jan 2025
+ 06:18:16 -0800
+Message-ID: <6a980f4f-d27f-40a5-99f1-6f7c90949b6a@quicinc.com>
+Date: Thu, 9 Jan 2025 22:18:13 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250109105600.41297-2-basharath@couthit.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 03/14] net: ethernet: qualcomm: Add PPE driver
+ for IPQ9574 SoC
+To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+        Andrew Lunn
+	<andrew+netdev@lunn.ch>,
+        "David S. Miller" <davem@davemloft.net>,
+        "Eric
+ Dumazet" <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>,
+        Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski
+	<krzk+dt@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>, Lei Wei
+	<quic_leiwei@quicinc.com>,
+        Suruchi Agarwal <quic_suruchia@quicinc.com>,
+        Pavithra R <quic_pavir@quicinc.com>, Simon Horman <horms@kernel.org>,
+        Jonathan Corbet <corbet@lwn.net>, Kees Cook <kees@kernel.org>,
+        "Gustavo A. R.
+ Silva" <gustavoars@kernel.org>,
+        Philipp Zabel <p.zabel@pengutronix.de>
+CC: <linux-arm-msm@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-doc@vger.kernel.org>, <linux-hardening@vger.kernel.org>,
+        <quic_kkumarcs@quicinc.com>, <quic_linchen@quicinc.com>,
+        <srinivas.kandagatla@linaro.org>, <bartosz.golaszewski@linaro.org>,
+        <john@phrozen.org>
+References: <20250108-qcom_ipq_ppe-v2-0-7394dbda7199@quicinc.com>
+ <20250108-qcom_ipq_ppe-v2-3-7394dbda7199@quicinc.com>
+ <29e742c9-82f5-41d5-a06f-70f010a3f39e@wanadoo.fr>
+Content-Language: en-US
+From: Jie Luo <quic_luoj@quicinc.com>
+In-Reply-To: <29e742c9-82f5-41d5-a06f-70f010a3f39e@wanadoo.fr>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nasanex01b.na.qualcomm.com (10.46.141.250)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: 8M9rqI-1R3Ky2R0AyHoR0hbZDhjrBXzM
+X-Proofpoint-ORIG-GUID: 8M9rqI-1R3Ky2R0AyHoR0hbZDhjrBXzM
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 spamscore=0
+ bulkscore=0 lowpriorityscore=0 impostorscore=0 mlxscore=0 adultscore=0
+ mlxlogscore=999 phishscore=0 priorityscore=1501 clxscore=1011
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2411120000 definitions=main-2501090115
 
-On Thu, Jan 09, 2025 at 04:25:51PM +0530, Basharath Hussain Khaja wrote:
-> From: Parvathi Pudi <parvathi@couthit.com>
+
+
+On 1/9/2025 3:19 AM, Christophe JAILLET wrote:
+> Le 08/01/2025 à 14:47, Luo Jie a écrit :
+>> The PPE (Packet Process Engine) hardware block is available
+>> on Qualcomm IPQ SoC that support PPE architecture, such as
+>> IPQ9574.
+>>
+>> The PPE in IPQ9574 includes six integrated ethernet MAC
+>> (for 6 PPE ports), buffer management, queue management and
+>> scheduler functions. The MACs can connect with the external
+>> PHY or switch devices using the UNIPHY PCS block available
+>> in the SoC.
+>>
+>> The PPE also includes various packet processing offload
+>> capabilities such as L3 routing and L2 bridging, VLAN and
+>> tunnel processing offload. It also includes Ethernet DMA
+>> function for transferring packets between ARM cores and
+>> PPE ethernet ports.
+>>
+>> This patch adds the base source files and Makefiles for
+>> the PPE driver such as platform driver registration,
+>> clock initialization, and PPE reset routines.
+>>
+>> Signed-off-by: Luo Jie <quic_luoj@quicinc.com>
+>> ---
 > 
-> Documentation update for the newly added "pruss2_eth" device tree
-> node and its dependencies along with compatibility for PRU-ICSS
-> Industrial Ethernet Peripheral (IEP), PRU-ICSS Enhanced Capture
-> (eCAP) peripheral and using YAML binding document for AM57xx SoCs.
+> ...
+> 
+>> +static int qcom_ppe_probe(struct platform_device *pdev)
+>> +{
+>> +    struct device *dev = &pdev->dev;
+>> +    struct ppe_device *ppe_dev;
+>> +    void __iomem *base;
+>> +    int ret, num_icc;
+>> +
+>> +    num_icc = ARRAY_SIZE(ppe_icc_data);
+>> +    ppe_dev = devm_kzalloc(dev, struct_size(ppe_dev, icc_paths, 
+>> num_icc),
+>> +                   GFP_KERNEL);
+>> +    if (!ppe_dev)
+>> +        return dev_err_probe(dev, -ENOMEM, "PPE alloc memory failed\n");
+> 
+> Usually, no error message in logged in case of devm_kzalloc().
+> It is already loud enough.
+> 
 
-If i was to do a side by side diff with the ICSSG, how much would be
-the same? Does it make sense to refactor this into a yaml file for all
-the common properties, and then yaml files for all the specific
-properties?
+OK. Will remove.
 
-	Andrew
+>> +
+>> +    base = devm_platform_ioremap_resource(pdev, 0);
+>> +    if (IS_ERR(base))
+>> +        return dev_err_probe(dev, PTR_ERR(base), "PPE ioremap 
+>> failed\n");
+>> +
+>> +    ppe_dev->regmap = devm_regmap_init_mmio(dev, base, 
+>> &regmap_config_ipq9574);
+>> +    if (IS_ERR(ppe_dev->regmap))
+>> +        return dev_err_probe(dev, PTR_ERR(ppe_dev->regmap),
+>> +                     "PPE initialize regmap failed\n");
+>> +    ppe_dev->dev = dev;
+>> +    ppe_dev->clk_rate = PPE_CLK_RATE;
+>> +    ppe_dev->num_ports = PPE_PORT_MAX;
+>> +    ppe_dev->num_icc_paths = num_icc;
+>> +
+>> +    ret = ppe_clock_init_and_reset(ppe_dev);
+>> +    if (ret)
+>> +        return dev_err_probe(dev, ret, "PPE clock config failed\n");
+>> +
+>> +    platform_set_drvdata(pdev, ppe_dev);
+>> +
+>> +    return 0;
+>> +}
+>> +
+>> +static const struct of_device_id qcom_ppe_of_match[] = {
+>> +    { .compatible = "qcom,ipq9574-ppe" },
+>> +    {},
+> 
+> The ending comma after a terminator like that is not needed.
+
+Will remove it.
+
+> 
+>> +};
+> 
+> ...
+> 
+> CJ
+> 
+
 
