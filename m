@@ -1,143 +1,193 @@
-Return-Path: <netdev+bounces-156827-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156828-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E64F5A07EDE
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 18:36:31 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E373AA07EEA
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 18:39:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AB1C53A7665
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 17:36:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BF04C168698
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 17:39:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A62F1925BC;
-	Thu,  9 Jan 2025 17:36:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1675319924E;
+	Thu,  9 Jan 2025 17:39:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="EzCvHiCT"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fLrvEsCs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95A6318C93C
-	for <netdev@vger.kernel.org>; Thu,  9 Jan 2025 17:36:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 332DC191499;
+	Thu,  9 Jan 2025 17:39:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736444182; cv=none; b=g1h3lMpx6Blopx+FUeo0gSuIDcKVXAwsWHoZU2HoK4OiK4AyHrKP7qd2uNi1lWEndWFBSLA1Jj7M1o5o+koKTyVUTwHGVHsLXYTpuQMO7eeIRSQ+HB5+9n+95juISK+M/o6pvnDDjAMGLDoVhf32bUgIRFR758eGc7+31iXtVhI=
+	t=1736444362; cv=none; b=LDv5pUDOce92N5aPmHJV/jLfagZpOKkhM9U99Sp/Q21Mn5aoz8vXOsKrZr1j7YsyE9kVR73fgvV579G5x8+Zunh6SjQ535uyX9XuNSGuVxdMD56eUHIXq5SFlo3A7oTlqpXfH1/Wl8zyRLL5vEKPVezzhjtntuwqKcXOhzCYYl0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736444182; c=relaxed/simple;
-	bh=x3uYksfOoCqvS4XniyEV29UETSR2DPCFoV/TeVAweyw=;
+	s=arc-20240116; t=1736444362; c=relaxed/simple;
+	bh=zVcyNZXN3VvSpw0kulxzE8v0LRQqK88fl5EDuOLBaYs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jPmOCM3Vol//sMaGFX3Yc1LTHA+bHvWVolG/TMPRH30SXI7atlWNB2Dfdf5EN0+AprZ4TKtI4ZPgo3KGcMI7g/hXZYxtV1sxSko53uA+SMzdQjm3uwCUVIketSlKSFlMj355jlg4vY8tiqCfivLxtw2ZI8qsRvnNI/wdTRZ4Uz0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=EzCvHiCT; arc=none smtp.client-ip=209.85.214.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-21680814d42so15910155ad.2
-        for <netdev@vger.kernel.org>; Thu, 09 Jan 2025 09:36:19 -0800 (PST)
+	 Content-Type:Content-Disposition:In-Reply-To; b=EUQEbYFEuD2YWaMqUGOF2HVp4UoRhBi5KUbvpjbo0ZLQzyrBzA3lqHi1SHGbNpY6/FTN5ZThG8MWGix2TUhEZqj4eFcmsmGjEOmH7R8zUvGHosswvJ8SaNE2IpFX4djprw+v4li94nWyvo+24N08KlVYR6/aQjdbfAUuwuW86vM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fLrvEsCs; arc=none smtp.client-ip=209.85.214.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-21669fd5c7cso19315555ad.3;
+        Thu, 09 Jan 2025 09:39:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1736444179; x=1737048979; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=EZHhPMMDgJMypLywgbNALwEdp/HyHOu1g/oZooCDLms=;
-        b=EzCvHiCTSE28neDl9j/D9H7k4H+oLv393N904jPbz2MkF9ndMSDAsffGPSTmjOJr8C
-         9ssl7AvcQSrhKfiEmrcWE+lkGXs+XFHUgf1EB3w/WTAX3WzrsSrecGWl843Rw38TsG0T
-         jUeEclRUXeq+8wQCT2vJkoTXiXsX1W4uHMWYQ=
+        d=gmail.com; s=20230601; t=1736444360; x=1737049160; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=6KsRQIc1JxQBezEIVdfkOzKqKFxNDLhEnsfcwp5vSS0=;
+        b=fLrvEsCs266ief/HIKVkKkTSNjOmMJiOS4K7TNmKEujm8Gdh+vT9ph1wCXv21QQPjR
+         Pqgm1XSaL6lq1d9m2E54KYtkAQLS1klnrcPB5db8qbSjOqZsQ3l/R7PZ3H1Fiayp7BF6
+         55Imw0JiaB8OGDiqNWaFDA6WrwldNZgMYNOMO866AVcnPgM4TZHFRHH2/A83zwli7Ngx
+         3iQGvdIWonPZQGGbxBoass/ex5BeArOnPxZgXReKKLv9vUl8Or0f4KY2mveArgKZYl5v
+         I1SK80dNcFmH72/2FJJMLfNHzMyBslyP6n/M1UntC5nmq3Y/CD8/t4ajwIP2w6wD9XK/
+         zYyA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736444179; x=1737048979;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=EZHhPMMDgJMypLywgbNALwEdp/HyHOu1g/oZooCDLms=;
-        b=kmfz7VQ8XvwA1EE5B3HcZqxYexKIR+va867L8sZzi4cfElN7FFlYInFmU+J8NG65BE
-         ITeUpgMwhBiexjeOZ87l2eGoA6+utaSJfI/H5KKQHD9o+97GQl7G64C4R7ZJhiexVdVh
-         bgcVWvxBHp56JDNZ40Dv0U01onpXxamNuvg5hIB7LnY2Tits7wQo5QH3pwQRiol2vPev
-         6iafyr5kL1Qa/9rmGAlEhCsdZyyDzz9Gp/OO0/9/8v2eW6wS3O0gYjkYECsHbKrtD1M4
-         f65m+j8473+f8UIplrdReGgOeiZIFH72TWbTx08YsFqscqXUM57ybw7ikbT/yS2SeCP9
-         aE7A==
-X-Forwarded-Encrypted: i=1; AJvYcCUtbNnC55ryfkXBwO5OdGJWv+pJn/RQk7wS0Qam1aZecqnjzTHMsdxxLGj0CJPkG76Rq0BPzwY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyyUFTkdcCK9RX9DMJAKt9pcK5ChFjMpoIS9JZwipPCRV5k53JS
-	FnbaknEZt5ONj/8uMF7U/X/HUoRONFCN9Z4d3Agdod6gLHuVu0OCh+47Vak7eJE=
-X-Gm-Gg: ASbGncsj6h8WXFXell6Ofg36HMV3G1TBh4AoB1BJBsAPNGwI+JxtH6XWOpCouGXteua
-	BfZ/4DtqP0NP9LeT9+VsuOiTB+71Gbi4sGFavpvi9ZkAhXhN19uoazeBONu0If1BF6eNUGF5ceQ
-	2pTkvNWuvc90LqN3y7dZe+Ib0wj8IrUtnzO8i1JtE+B/TrT18qDoxtNlEfVDP33cdhseQ2yWfsI
-	y8RnsexdGyakzqPdzKvzx98QeQ4sczPR4oCTvsCVgM+EqrWUay7KVCWlrDr+wKKI20p8NlBQypO
-	2QNyvea/3sA9CRXQwQdfH7A=
-X-Google-Smtp-Source: AGHT+IEa3zYxpMXCXFOwlLMPkEEXePt9PsXFMZbJIFnWJoslOR8muwkSZIVXyD3D5iar6ke0LsXsVw==
-X-Received: by 2002:a05:6a20:2591:b0:1e0:cfc0:df34 with SMTP id adf61e73a8af0-1e88d0e2320mr11880124637.16.1736444178914;
-        Thu, 09 Jan 2025 09:36:18 -0800 (PST)
-Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72d405489fbsm59505b3a.24.2025.01.09.09.36.17
+        d=1e100.net; s=20230601; t=1736444360; x=1737049160;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6KsRQIc1JxQBezEIVdfkOzKqKFxNDLhEnsfcwp5vSS0=;
+        b=TN9MVYiqc78zZN3SUAUJvYcAYcrxj/jPAL4XUqMm+w5FvWG98c62O4VagwXXDKwcoB
+         FDBgaa3CvGqHqqITWkXDQvBiUDEqlSm2EupDDDgx7FmIeaen7XIg8r01XmHP67BNmSub
+         L/PUeZX0G8FcfsXfkvChqnrObdF0wVE1YUene6OunBA9nvOD7lLZ1nxLsIcO1nAjRrHj
+         PEtuvkMeHPqlD5Z5x3pjcjY3lVEJt7GVXyDld9ja8m9hIfBRuylAMPxSiinxUlZrw74I
+         gBdOMLoo/q7zKnRNv6ZDu9m4IMLBqhYLPwBNpS6VuSffTgB9L7+xXE19psgtlGr/9JM6
+         1Liw==
+X-Forwarded-Encrypted: i=1; AJvYcCUkQKrHdvkeBGP7Q9EURSXIsJpNxb9BGEj31qhFF3N/xDSP/A+dpj8Tr/EEGOyRj6+ATnX7ggzH@vger.kernel.org, AJvYcCVdHXX+LHB50g8azcQIN34c7oxzkcEeOdl8cASenIOANiqGgcCxmGp4+xCML1shj2kn8X9FQPHJ91nV@vger.kernel.org, AJvYcCVgzZ6kBNZTnxPjr0TOZOQtICjKIj351vk2HCinPxa0B38GSNhB6+T5vogVHUp4uOl6mizEKfefMrkwhk1SyUoj@vger.kernel.org, AJvYcCWAcauJTO5abggW2v2bH6YjbwmKEprqiGaTL9aWXM+B9yXUi/4DVuUvPxNKt3yYi0Mg4t8=@vger.kernel.org, AJvYcCXxLUxk6EKjlcCWQHM4A0bkczSIi2RaA+knTwJeELooVTZIvuK0vyUEAcAdg6/NjHsKK0gTt94bXlegcDxF@vger.kernel.org
+X-Gm-Message-State: AOJu0YxE0LYCf33TD53/smm9C6ScijrVyNb2xwLrZnxIaKAdk3aEM2UP
+	9xz/h/s6v55h+no/gH8cU4C0juonfJ4nD6hIX0FkMlWSsj2mlGo=
+X-Gm-Gg: ASbGnctrnKE9P5agziqblp/jv2u5b3zZudHItTJfgjihpJ3ahow8IpD6UzZ8TxGEo6b
+	ZSvqLNe/GN3Xitw+u8BlQhmx3ibKA4KizGjm/QohLfLZrbbuGoLd3bfHOZnwF1ELPR8U7U0COe4
+	SbPhNKSE2AHDXnDKDcYmSgmuMHQpMRhA+jiRznWkpIijoOECTiEJCP+coOSjsKQMViGlBg0NOoM
+	FXP2KJVj7ZW0tfug2MP/J0f7PE9+ZTENWZzsQCbGrWMZrnX1E/RqEjZ
+X-Google-Smtp-Source: AGHT+IEOsPd8gi8EzkqvvII6DaS7kpXwJUDoEvR9sz6x99GD7Aypk+y99jv+WqRaCxVsNJdjbVm5kQ==
+X-Received: by 2002:a17:902:d2ca:b0:216:56d5:d87 with SMTP id d9443c01a7336-21a83f8ea52mr112422135ad.34.1736444360267;
+        Thu, 09 Jan 2025 09:39:20 -0800 (PST)
+Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21a9f22f051sm516575ad.203.2025.01.09.09.39.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Jan 2025 09:36:18 -0800 (PST)
-Date: Thu, 9 Jan 2025 09:36:15 -0800
-From: Joe Damato <jdamato@fastly.com>
-To: Magnus Karlsson <magnus.karlsson@gmail.com>
-Cc: Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, linux-kernel@vger.kernel.org,
-	bpf@vger.kernel.org, horms@kernel.org, ast@kernel.org,
-	daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com,
-	bjorn@kernel.org, magnus.karlsson@intel.com,
-	maciej.fijalkowski@intel.com, jonathan.lemon@gmail.com,
-	mkarsten@uwaterloo.ca
-Subject: Re: [PATCH net] xsk: Bring back busy polling support
-Message-ID: <Z4AJD97LFmjfCrc2@LQ3V64L9R2>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Magnus Karlsson <magnus.karlsson@gmail.com>,
-	Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, linux-kernel@vger.kernel.org,
-	bpf@vger.kernel.org, horms@kernel.org, ast@kernel.org,
-	daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com,
-	bjorn@kernel.org, magnus.karlsson@intel.com,
-	maciej.fijalkowski@intel.com, jonathan.lemon@gmail.com,
-	mkarsten@uwaterloo.ca
-References: <20250109003436.2829560-1-sdf@fomichev.me>
- <CAJ8uoz3bMk_0bbtGdEAkbXNHu0c5Zr+-sAUyqk2M84VLE4FtpQ@mail.gmail.com>
+        Thu, 09 Jan 2025 09:39:19 -0800 (PST)
+Date: Thu, 9 Jan 2025 09:39:19 -0800
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: "Song, Yoong Siang" <yoong.siang.song@intel.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Willem de Bruijn <willemb@google.com>,
+	"Bezdeka, Florian" <florian.bezdeka@siemens.com>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Jonathan Corbet <corbet@lwn.net>, Bjorn Topel <bjorn@kernel.org>,
+	"Karlsson, Magnus" <magnus.karlsson@intel.com>,
+	"Fijalkowski, Maciej" <maciej.fijalkowski@intel.com>,
+	Jonathan Lemon <jonathan.lemon@gmail.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	"Damato, Joe" <jdamato@fastly.com>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Mina Almasry <almasrymina@google.com>,
+	Daniel Jurgens <danielj@nvidia.com>,
+	Amritha Nambiar <amritha.nambiar@intel.com>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Eduard Zingerman <eddyz87@gmail.com>,
+	Mykola Lysenko <mykolal@fb.com>,
+	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	KP Singh <kpsingh@kernel.org>, Hao Luo <haoluo@google.com>,
+	Jiri Olsa <jolsa@kernel.org>, Shuah Khan <shuah@kernel.org>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	"Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
+	"Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+	"bpf@vger.kernel.org" <bpf@vger.kernel.org>,
+	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+	"linux-stm32@st-md-mailman.stormreply.com" <linux-stm32@st-md-mailman.stormreply.com>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	"xdp-hints@xdp-project.net" <xdp-hints@xdp-project.net>
+Subject: Re: [PATCH bpf-next v4 3/4] net: stmmac: Add launch time support to
+ XDP ZC
+Message-ID: <Z4AJx-a-eY3pgHNv@mini-arch>
+References: <20250106135658.9734-1-yoong.siang.song@intel.com>
+ <Z31fXHxWuKNog_Qh@mini-arch>
+ <PH0PR11MB58304082BF0EA96D1A74E4C5D8132@PH0PR11MB5830.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <CAJ8uoz3bMk_0bbtGdEAkbXNHu0c5Zr+-sAUyqk2M84VLE4FtpQ@mail.gmail.com>
+In-Reply-To: <PH0PR11MB58304082BF0EA96D1A74E4C5D8132@PH0PR11MB5830.namprd11.prod.outlook.com>
 
-On Thu, Jan 09, 2025 at 04:22:16PM +0100, Magnus Karlsson wrote:
-> On Thu, 9 Jan 2025 at 01:35, Stanislav Fomichev <sdf@fomichev.me> wrote:
+On 01/09, Song, Yoong Siang wrote:
+> On Wednesday, January 8, 2025 1:08 AM, Stanislav Fomichev <stfomichev@gmail.com> wrote:
+> >On 01/06, Song Yoong Siang wrote:
+> >> Enable launch time (Time-Based Scheduling) support to XDP zero copy via XDP
+> >> Tx metadata framework.
+> >>
+> >> This patch is tested with tools/testing/selftests/bpf/xdp_hw_metadata on
+> >> Intel Tiger Lake platform. Below are the test steps and result.
+> >>
+> >> Test Steps:
+> >> 1. Add mqprio qdisc:
+> >>    $ sudo tc qdisc add dev enp0s30f4 handle 8001: parent root mqprio num_tc
+> >>      4 map 0 1 2 3 3 3 3 3 3 3 3 3 3 3 3 3 queues 1@0 1@1 1@2 1@3 hw 0
+> >>
+> >> 2. Enable launch time hardware offload on hardware queue 1:
+> >>    $ sudo tc qdisc replace dev enp0s30f4 parent 8001:2 etf offload clockid
+> >>      CLOCK_TAI delta 500000
+> >>
+> >> 3. Add an ingress qdisc:
+> >>    $ sudo tc qdisc add dev enp0s30f4 ingress
+> >>
+> >> 4. Add a flower filter to route incoming packet with VLAN priority 1 into
+> >>    hardware queue 1:
+> >>    $ sudo tc filter add dev enp0s30f4 parent ffff: protocol 802.1Q flower
+> >>      vlan_prio 1 hw_tc 1
+> >>
+> >> 5. Enable VLAN tag stripping:
+> >>    $ sudo ethtool -K enp0s30f4 rxvlan on
+> >>
+> >> 6. Start xdp_hw_metadata selftest application:
+> >>    $ sudo ./xdp_hw_metadata enp0s30f4 -l 1000000000
+> >>
+> >> 7. Send an UDP packet with VLAN priority 1 to port 9091 of DUT.
 > >
-> > Commit 86e25f40aa1e ("net: napi: Add napi_config") moved napi->napi_id
-> > assignment to a later point in time (napi_hash_add_with_id). This breaks
-> > __xdp_rxq_info_reg which copies napi_id at an earlier time and now
-> > stores 0 napi_id. It also makes sk_mark_napi_id_once_xdp and
-> > __sk_mark_napi_id_once useless because they now work against 0 napi_id.
-> > Since sk_busy_loop requires valid napi_id to busy-poll on, there is no way
-> > to busy-poll AF_XDP sockets anymore.
+> >Tangential: I wonder whether we can add the setup steps to the
+> >xdp_hw_metadata tool? It is useful to have one command to run that
+> >takes care of all the details. Same way it already enables HW
+> >tstamping..
 > >
-> > Bring back the ability to busy-poll on XSK by resolving socket's napi_id
-> > at bind time. This relies on relatively recent netif_queue_set_napi,
-> > but (assume) at this point most popular drivers should have been converted.
-> > This also removes per-tx/rx cycles which used to check and/or set
-> > the napi_id value.
-> >
-> > Confirmed by running a busy-polling AF_XDP socket
-> > (github.com/fomichev/xskrtt) on mlx5 and looking at BusyPollRxPackets
-> > from /proc/net/netstat.
+> >Or, if not the full setup, some kind of detection we can signal to the
+> >user that some things might be missing?
 > 
-> Thanks Stanislav for finding and fixing this. As a bonus, the
-> resulting code is much nicer too.
-> 
-> I just took a look at the Intel drivers and some of our drivers have
-> not been converted to use netif_queue_set_napi() yet. Just ice, e1000,
-> and e1000e use it. But that is on us to fix.
+> Sure. I can try to add the setup steps into xdp_hw_metadata
+> by using ioctl() function. However, there are some device specific
+> command, like the number of queue, their priority,
+> how they route the incoming packet, etc. I will try to find out
+> a common way that can work for most of the devices,
+> at least work for both igc and stmmac.
 
-igc also supports it ;)
+We can query the number of queues (and everything else you need) in the
+tool, similar to what we do in
+testing/selftests/drivers/net/hw/ncdevmem.c, take a look. But if it's
+too complicated, maybe at least print these commands on startup and tell
+the user to run them.
 
-I tried to add support to i40e some time ago, but ran into some
-issues and didn't hear back, so I gave up on i40e.
-
-In case my previous attempt is helpful for anyone at Intel, see [1].
-
-[1]: https://lore.kernel.org/lkml/20240410043936.206169-1-jdamato@fastly.com/
+The reason I'm asking is that I hope that we eventually can run this
+tool from (automatic) testing/selftests/drivers/net/hw testsuite to
+make sure the metadata stuff keeps working.
 
