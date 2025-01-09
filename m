@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-156810-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156811-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7FD01A07E38
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 18:00:37 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 03871A07E3C
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 18:00:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D51221696EC
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 17:00:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9CEF03A765D
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 17:00:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8BB9188722;
-	Thu,  9 Jan 2025 17:00:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C736018FDA5;
+	Thu,  9 Jan 2025 17:00:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JE6Xm4jQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G8Rw+jU0"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3C17273F9;
-	Thu,  9 Jan 2025 17:00:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0FB218EFD4;
+	Thu,  9 Jan 2025 17:00:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736442027; cv=none; b=KX6/JqE5IoXQPNTHPflq2T/yxownLHpouZw8YQoBqX2YBiF/tCCDIdVvjNiYHbXvtnFsewym2wjK3CB3a/PejuhMtSzQGWiEUUh/Hs2/ovZVtOGeZ4uqZ393UFGPSp+eG3+DSefhtKQXVJMfYBpVsq6XM68eVvoPStroryWAjMc=
+	t=1736442029; cv=none; b=Qgokd+oGwECxHy6uh9S24ExFj1mYoj63cAqcIoIJwmq6jri+EIwHOLmezKKIZ4JW40U1ffeFfjZBirJD1cOsmB223PaARa2vo3x4eVWwUyIIlP3f955U7unfNI1QjOU/T6NA0eomjYnA7eBMkh62zB6mcWapUVxuWIUdSKMZXJ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736442027; c=relaxed/simple;
-	bh=6634pWrQTlGcDLuTISOrV8M6pjKmd4U2P6WyzGzAO3s=;
+	s=arc-20240116; t=1736442029; c=relaxed/simple;
+	bh=RGcbmkp5R199fM6Pee+V30xTkmnsrNtH0sOMVIS+t7Q=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Ze0Qipqvb7sJJDKFZP/0UP8TUSiDlZmLQAiviwbMekKfnH4UppqjJUMyBo+mgGCV6dpzXFcqIuxnT1nGvntZRklCElE+w1IotecuOFwCsJVNs3Va1fdob2RgrabKC7yENghzK06t8i8jOO58RZn+dDhIltcTSt3T9gIdYa37w1A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JE6Xm4jQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 17558C4CED2;
-	Thu,  9 Jan 2025 17:00:27 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=E455j842M44J+yvpfoIAUHzb/1qX784cyioG0ilRXMG1A/x1IfzWROLMry2y3oX9Ojg3XBb80qMFER9GcupdKPeLC575ZFBwg735VOTN7gAuDLAQxoTJd7QyaO0xZLiTXG+0yX1YmOVEVNJX190YzMW0eCFDQPzfd6cFxoXgy7g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G8Rw+jU0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2707CC4CED2;
+	Thu,  9 Jan 2025 17:00:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736442027;
-	bh=6634pWrQTlGcDLuTISOrV8M6pjKmd4U2P6WyzGzAO3s=;
+	s=k20201202; t=1736442028;
+	bh=RGcbmkp5R199fM6Pee+V30xTkmnsrNtH0sOMVIS+t7Q=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=JE6Xm4jQ6mEZi9FORUN2gyXIXB65b7G0CYX7nJVDbttIb5NGG7z/BXt0cYjUEYeLj
-	 oC61tbkL086I408rPggj+00McFDrRh6u78SgIAErW29sEA8TpoV26qPezD+aDh1Ibr
-	 MsOOucmTu/dPHzb2sLJJQAAQkLLNAAAtT2BE/i5TZnqMoPata8SovE8Aic6YHBGSiZ
-	 Z/AEEp5cL8YG3Vy5tA49WxL9egHPvRoIBnBi4eVykRAYqH4mNTL5ki1JahhOnEpZLx
-	 BqV53oREO3yLsD46pgMNbDRojtyagmslvptpmODgbcLnJmiTPAIiEXicy0VcddIMYL
-	 cWH3DgMcZSCgA==
+	b=G8Rw+jU095YC7zTE9+QRDrFVAFsEW9tgxRFuX3yTnSawVEjlZbN29Duomh3ETGRhM
+	 2/TmQUaO7i58x5vGF+xXPWc+TgWSPxfcMaEsp7aAcEMnZDduGq+ig7AQTmH1cDymvq
+	 MYwo48MUDOY/VqunZpCVRXmjq6ZpOvTBh4AnaXLJ1UPAa92VSmffMvjondN5ZV4+Xe
+	 icZefIRaWmlhme7yQ4rqtXfbNCkepimcTm53vWE+C/NbnZUwSBfWVhShjOECDW8sgM
+	 JQaDLsKSwDY++8dNDxfAKEyN53ItrfktCdVS4sRUvUdVnVGuKcm5n/E2du9zkfYqLg
+	 UITHv7DcLb5ig==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB79D380A97E;
-	Thu,  9 Jan 2025 17:00:49 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 1A3C4380A97E;
+	Thu,  9 Jan 2025 17:00:51 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,59 +52,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 0/9] net: sysctl: avoid using current->nsproxy
+Subject: Re: [PATCH net 1/2] netfilter: nf_tables: imbalance in flowtable binding
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <173644204876.1449021.3388211513784045754.git-patchwork-notify@kernel.org>
-Date: Thu, 09 Jan 2025 17:00:48 +0000
-References: <20250108-net-sysctl-current-nsproxy-v1-0-5df34b2083e8@kernel.org>
-In-Reply-To: <20250108-net-sysctl-current-nsproxy-v1-0-5df34b2083e8@kernel.org>
-To: Matthieu Baerts <matttbe@kernel.org>
-Cc: mptcp@lists.linux.dev, martineau@kernel.org, geliang@kernel.org,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- horms@kernel.org, gregory.detal@gmail.com, marcelo.leitner@gmail.com,
- lucien.xin@gmail.com, vyasevich@gmail.com, nhorman@tuxdriver.com,
- wangweidong1@huawei.com, daniel@iogearbox.net, vyasevic@redhat.com,
- allison.henderson@oracle.com, sowmini.varadhan@oracle.com,
- viro@zeniv.linux.org.uk, joel.granados@kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-sctp@vger.kernel.org,
- linux-rdma@vger.kernel.org, rds-devel@oss.oracle.com, stable@vger.kernel.org,
- syzbot+e364f774c6f57f2c86d1@syzkaller.appspotmail.com
+ <173644205002.1449021.7734848326971151272.git-patchwork-notify@kernel.org>
+Date: Thu, 09 Jan 2025 17:00:50 +0000
+References: <20250109123806.42021-1-pablo@netfilter.org>
+In-Reply-To: <20250109123806.42021-1-pablo@netfilter.org>
+To: Pablo Neira Ayuso <pablo@netfilter.org>
+Cc: netfilter-devel@vger.kernel.org, davem@davemloft.net,
+ netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, fw@strlen.de
 
 Hello:
 
 This series was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+by Pablo Neira Ayuso <pablo@netfilter.org>:
 
-On Wed, 08 Jan 2025 16:34:28 +0100 you wrote:
-> As pointed out by Al Viro and Eric Dumazet in [1], using the 'net'
-> structure via 'current' is not recommended for different reasons:
+On Thu,  9 Jan 2025 13:38:05 +0100 you wrote:
+> All these cases cause imbalance between BIND and UNBIND calls:
 > 
-> - Inconsistency: getting info from the reader's/writer's netns vs only
->   from the opener's netns as it is usually done. This could cause
->   unexpected issues when other operations are done on the wrong netns.
+> - Delete an interface from a flowtable with multiple interfaces
+> 
+> - Add a (device to a) flowtable with --check flag
+> 
+> - Delete a netns containing a flowtable
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,1/9] mptcp: sysctl: avail sched: remove write access
-    https://git.kernel.org/netdev/net/c/771ec78dc8b4
-  - [net,2/9] mptcp: sysctl: sched: avoid using current->nsproxy
-    https://git.kernel.org/netdev/net/c/d38e26e36206
-  - [net,3/9] mptcp: sysctl: blackhole timeout: avoid using current->nsproxy
-    https://git.kernel.org/netdev/net/c/92cf7a51bdae
-  - [net,4/9] sctp: sysctl: cookie_hmac_alg: avoid using current->nsproxy
-    https://git.kernel.org/netdev/net/c/ea62dd138391
-  - [net,5/9] sctp: sysctl: rto_min/max: avoid using current->nsproxy
-    https://git.kernel.org/netdev/net/c/9fc17b76fc70
-  - [net,6/9] sctp: sysctl: auth_enable: avoid using current->nsproxy
-    https://git.kernel.org/netdev/net/c/15649fd5415e
-  - [net,7/9] sctp: sysctl: udp_port: avoid using current->nsproxy
-    https://git.kernel.org/netdev/net/c/c10377bbc197
-  - [net,8/9] sctp: sysctl: plpmtud_probe_interval: avoid using current->nsproxy
-    https://git.kernel.org/netdev/net/c/6259d2484d0c
-  - [net,9/9] rds: sysctl: rds_tcp_{rcv,snd}buf: avoid using current->nsproxy
-    https://git.kernel.org/netdev/net/c/7f5611cbc487
+  - [net,1/2] netfilter: nf_tables: imbalance in flowtable binding
+    https://git.kernel.org/netdev/net/c/13210fc63f35
+  - [net,2/2] netfilter: conntrack: clamp maximum hashtable size to INT_MAX
+    https://git.kernel.org/netdev/net/c/b541ba7d1f5a
 
 You are awesome, thank you!
 -- 
