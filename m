@@ -1,90 +1,115 @@
-Return-Path: <netdev+bounces-156809-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156810-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EAA5FA07E1A
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 17:53:02 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7FD01A07E38
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 18:00:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2B472161E1D
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 16:53:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D51221696EC
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 17:00:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5713617C9F1;
-	Thu,  9 Jan 2025 16:52:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8BB9188722;
+	Thu,  9 Jan 2025 17:00:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QrzBm/zc"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JE6Xm4jQ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F7ED139D19;
-	Thu,  9 Jan 2025 16:52:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3C17273F9;
+	Thu,  9 Jan 2025 17:00:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736441575; cv=none; b=mJB7Pv95OgpTXTQ97tglFekPGjK6jJlg3TAzKZjngM0/Ewn+S+ZydAPQ1NPW008b6+N9LnM5qNHd2lC2JZFxOXWdRV5gwZUPsikDXV23BeT7okaxUyPkSQ75bTNLpycXGMTKRfpd4TJMVvWvvosZdJTwmCuXExRUAmx2hRyMLcg=
+	t=1736442027; cv=none; b=KX6/JqE5IoXQPNTHPflq2T/yxownLHpouZw8YQoBqX2YBiF/tCCDIdVvjNiYHbXvtnFsewym2wjK3CB3a/PejuhMtSzQGWiEUUh/Hs2/ovZVtOGeZ4uqZ393UFGPSp+eG3+DSefhtKQXVJMfYBpVsq6XM68eVvoPStroryWAjMc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736441575; c=relaxed/simple;
-	bh=D9wPmSGM+XKwwXedjCZUph0IWYMqhMZDIHz6GWv8qw8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fDg5oH+3jexuivzlY+Q6qNY0t4y5fWDPN3kpBQ2pSO3bRR7J70lQOhZk0/w+8J2/nFS0sZZnlO8JxYE/119p1UzSar1HJraAZ8+4NfMipmi+MocbzavJvawSMJ81XfxIxafSkAscEmpArVrHjnWf3vnNtCZytvo0lfdPOePDqOg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QrzBm/zc; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9A816C4CED2;
-	Thu,  9 Jan 2025 16:52:54 +0000 (UTC)
+	s=arc-20240116; t=1736442027; c=relaxed/simple;
+	bh=6634pWrQTlGcDLuTISOrV8M6pjKmd4U2P6WyzGzAO3s=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=Ze0Qipqvb7sJJDKFZP/0UP8TUSiDlZmLQAiviwbMekKfnH4UppqjJUMyBo+mgGCV6dpzXFcqIuxnT1nGvntZRklCElE+w1IotecuOFwCsJVNs3Va1fdob2RgrabKC7yENghzK06t8i8jOO58RZn+dDhIltcTSt3T9gIdYa37w1A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JE6Xm4jQ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 17558C4CED2;
+	Thu,  9 Jan 2025 17:00:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736441574;
-	bh=D9wPmSGM+XKwwXedjCZUph0IWYMqhMZDIHz6GWv8qw8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=QrzBm/zc/7hrXaE0GlSJpd9qLH3JywU0ZDLwH7UMDR51AsYxxuFS9AgQXBx0/IuJg
-	 5mRc9rZ1B89/eSCmX6KwK/uqbG5J9GmrSHSwc+zAP8MQG58GPA3r0uxVqMCdDUovx2
-	 JMiUMyd89sA+9B++YJAPaUUpmiojTcTSQSBVJZzbGd6+CZVZtWHCltQRRrkRDSHPdz
-	 ayekRYOG8yniRDTk4Q2xatb9MRry0bDXMORkzQp412iUnYg1nYkGm5coDGNvZNrGK+
-	 CZX3IjTK/w4+WBjIVhP2o+LT9Bnt28R6Rgv/v7odmVOJW7F56o44ljKvR/YJjPXe0c
-	 bYjrl+ZXbUx4w==
-Date: Thu, 9 Jan 2025 08:52:50 -0800
-From: Kees Cook <kees@kernel.org>
-To: Gal Pressman <gal@nvidia.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	David Ahern <dsahern@kernel.org>, Simon Horman <horms@kernel.org>,
-	linux-hardening@vger.kernel.org, Cosmin Ratiu <cratiu@nvidia.com>
-Subject: Re: [PATCH net-next] net: Silence false field-spanning write warning
- in ip_tunnel_info_opts_set() memcpy
-Message-ID: <202501090852.AA32AF8BD@keescook>
-References: <20250107165509.3008505-1-gal@nvidia.com>
- <53D1D353-B8F6-4ADC-8F29-8C48A7C9C6F1@kernel.org>
- <35791134-6c58-4cc4-a6ab-2965dce9cd4b@nvidia.com>
+	s=k20201202; t=1736442027;
+	bh=6634pWrQTlGcDLuTISOrV8M6pjKmd4U2P6WyzGzAO3s=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=JE6Xm4jQ6mEZi9FORUN2gyXIXB65b7G0CYX7nJVDbttIb5NGG7z/BXt0cYjUEYeLj
+	 oC61tbkL086I408rPggj+00McFDrRh6u78SgIAErW29sEA8TpoV26qPezD+aDh1Ibr
+	 MsOOucmTu/dPHzb2sLJJQAAQkLLNAAAtT2BE/i5TZnqMoPata8SovE8Aic6YHBGSiZ
+	 Z/AEEp5cL8YG3Vy5tA49WxL9egHPvRoIBnBi4eVykRAYqH4mNTL5ki1JahhOnEpZLx
+	 BqV53oREO3yLsD46pgMNbDRojtyagmslvptpmODgbcLnJmiTPAIiEXicy0VcddIMYL
+	 cWH3DgMcZSCgA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB79D380A97E;
+	Thu,  9 Jan 2025 17:00:49 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <35791134-6c58-4cc4-a6ab-2965dce9cd4b@nvidia.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net 0/9] net: sysctl: avoid using current->nsproxy
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <173644204876.1449021.3388211513784045754.git-patchwork-notify@kernel.org>
+Date: Thu, 09 Jan 2025 17:00:48 +0000
+References: <20250108-net-sysctl-current-nsproxy-v1-0-5df34b2083e8@kernel.org>
+In-Reply-To: <20250108-net-sysctl-current-nsproxy-v1-0-5df34b2083e8@kernel.org>
+To: Matthieu Baerts <matttbe@kernel.org>
+Cc: mptcp@lists.linux.dev, martineau@kernel.org, geliang@kernel.org,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ horms@kernel.org, gregory.detal@gmail.com, marcelo.leitner@gmail.com,
+ lucien.xin@gmail.com, vyasevich@gmail.com, nhorman@tuxdriver.com,
+ wangweidong1@huawei.com, daniel@iogearbox.net, vyasevic@redhat.com,
+ allison.henderson@oracle.com, sowmini.varadhan@oracle.com,
+ viro@zeniv.linux.org.uk, joel.granados@kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-sctp@vger.kernel.org,
+ linux-rdma@vger.kernel.org, rds-devel@oss.oracle.com, stable@vger.kernel.org,
+ syzbot+e364f774c6f57f2c86d1@syzkaller.appspotmail.com
 
-On Thu, Jan 09, 2025 at 11:00:24AM +0200, Gal Pressman wrote:
-> On 08/01/2025 1:28, Kees Cook wrote:
-> >> This resolves the following warning:
-> >>  memcpy: detected field-spanning write (size 8) of single field "_Generic(info, const struct ip_tunnel_info * : ((const void *)((info) + 1)), struct ip_tunnel_info * : ((void *)((info) + 1)) )" at include/net/ip_tunnels.h:662 (size 0)
-> > 
-> > Then you can drop this macro and just use: info->options
-> > 
-> > Looks like you'd need to do it for all the types in struct metadata_dst, but at least you could stop hiding it from the compiler. :)
+Hello:
+
+This series was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Wed, 08 Jan 2025 16:34:28 +0100 you wrote:
+> As pointed out by Al Viro and Eric Dumazet in [1], using the 'net'
+> structure via 'current' is not recommended for different reasons:
 > 
-> Can you please explain the "do it for all the types in struct
-> metadata_dst" part?
-> AFAICT, struct ip_tunnel_info is the only one that's extendable, I don't
-> think others need to be modified.
+> - Inconsistency: getting info from the reader's/writer's netns vs only
+>   from the opener's netns as it is usually done. This could cause
+>   unexpected issues when other operations are done on the wrong netns.
+> 
+> [...]
 
-Ah, sorry. If that's the case, then just ip_tunnel_info is fine. (Is all
-of the metadata_dst trailing byte allocation logic just for
-ip_tunnel_info?)
+Here is the summary with links:
+  - [net,1/9] mptcp: sysctl: avail sched: remove write access
+    https://git.kernel.org/netdev/net/c/771ec78dc8b4
+  - [net,2/9] mptcp: sysctl: sched: avoid using current->nsproxy
+    https://git.kernel.org/netdev/net/c/d38e26e36206
+  - [net,3/9] mptcp: sysctl: blackhole timeout: avoid using current->nsproxy
+    https://git.kernel.org/netdev/net/c/92cf7a51bdae
+  - [net,4/9] sctp: sysctl: cookie_hmac_alg: avoid using current->nsproxy
+    https://git.kernel.org/netdev/net/c/ea62dd138391
+  - [net,5/9] sctp: sysctl: rto_min/max: avoid using current->nsproxy
+    https://git.kernel.org/netdev/net/c/9fc17b76fc70
+  - [net,6/9] sctp: sysctl: auth_enable: avoid using current->nsproxy
+    https://git.kernel.org/netdev/net/c/15649fd5415e
+  - [net,7/9] sctp: sysctl: udp_port: avoid using current->nsproxy
+    https://git.kernel.org/netdev/net/c/c10377bbc197
+  - [net,8/9] sctp: sysctl: plpmtud_probe_interval: avoid using current->nsproxy
+    https://git.kernel.org/netdev/net/c/6259d2484d0c
+  - [net,9/9] rds: sysctl: rds_tcp_{rcv,snd}buf: avoid using current->nsproxy
+    https://git.kernel.org/netdev/net/c/7f5611cbc487
 
--Kees
-
+You are awesome, thank you!
 -- 
-Kees Cook
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
