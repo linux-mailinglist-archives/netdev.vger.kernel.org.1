@@ -1,220 +1,237 @@
-Return-Path: <netdev+bounces-156566-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156567-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 029A4A0702C
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 09:37:42 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB841A07064
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 09:56:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 891B11889C79
-	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 08:37:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D72031656F7
+	for <lists+netdev@lfdr.de>; Thu,  9 Jan 2025 08:56:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A191421504D;
-	Thu,  9 Jan 2025 08:37:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F22A520371A;
+	Thu,  9 Jan 2025 08:56:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Xe666t05"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F21auoWG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1270B1FDA;
-	Thu,  9 Jan 2025 08:37:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 088591EBA19;
+	Thu,  9 Jan 2025 08:56:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736411857; cv=none; b=apZ6igRHVD3MhNh2ekC7cqajWG+fI5vDAfMF8Uf7J37TPadJTq56LBG4o3JLaiXOhxB1ruWfd/tiC1iGK8gmNr7jWafMuCp8jBAWbBqpkfmTPXhY/V1L+h23R3xFLu9CLRkXdFGmKup6UiN84OH/rLyQaBLIl76iCvrfamRS8Ww=
+	t=1736412984; cv=none; b=atQJzTAF3SP2U2+DayLN6z3TUdZGTctcjiF1Dp4iO5TI/pUSUvNfExgA26r4W70qIjaNRbyIrnYymYOtMyZyDK6u/jI9Qfl7y2vvMt0O4ZN/vLHmCEq2nB1mwLk0OgtS02470ZEW4TRmao124Fu2gDwy4DaFd2+8yE254dngoik=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736411857; c=relaxed/simple;
-	bh=0dr0+T7QZnjroGZ5z0KHvZ0v75x3dfYB7mTK1iBfr+s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZNunWmFM2BHWzumYrirV6AKQUavKPzMILctlQ9iPZyFDNGXRz299pBrBuLks4hLTZ3UlDTx/Q8WVXaubnFM4memRPd2tqUhfFdSYWjEh5IKE7wr7FqUdfWJCBhFaFTcJyJJs+66ABdkleKvxcx2uuUV8QIMMOrLzZvGFpnvUXdg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Xe666t05; arc=none smtp.client-ip=209.85.214.174
+	s=arc-20240116; t=1736412984; c=relaxed/simple;
+	bh=wp2CVqXaTLMEhu/P0gxP9vMepAcXofaZ9f1o56WSI8o=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=lWTUiwh0wOk/yNo14JL3YFwMP88B1dt8/b2Q/4hQPtOCAXHOr38gsV24xZ5C0xgLNoQFlFaNX5+kSTH4vS/kZqcEAo92i37H8NmKgR0OihQdn9ifs3xQ3mH4W6Felm6gs357PhTFmhysJxpbD8D6+hGHpBqs55yuPT24NPEMTzM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=F21auoWG; arc=none smtp.client-ip=209.85.218.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-21619108a6bso9301945ad.3;
-        Thu, 09 Jan 2025 00:37:35 -0800 (PST)
+Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-aa69107179cso152561566b.0;
+        Thu, 09 Jan 2025 00:56:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736411855; x=1737016655; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=84B0RNeNpnyJnx6ts+MMJFqcCSs0cCqPqFLFhHuue/k=;
-        b=Xe666t05jo1JYiKlY1dwPx6LTek+JAba/qAtToB+vja/myAIZSMy4cdyPiv3dI0pMI
-         mGDpT7BMez/MiLepFL4Fe+qrRVQJgRsy/I5jlJ9k6eAHJF7mxr/DHp/lS2rwSYKNIeG1
-         t32kYTBRQwweSI2XzTpBmrXOAWqfLWJJ7GZsHKp2Roc9ULC9NzQ75TySDIjWK21XjoZ8
-         3817qRfFwWruuB3TXumk7atXufEE6YP+eA94lwUzuChn+1h7mlxKMnPMBmilg/oi+Obd
-         Cnax2ixOv22NpGih080AsCTBWFyp4CDC4vj/uvlqsxPbcPF36IjLpAksETD+L0tVUO/Y
-         34bw==
+        d=gmail.com; s=20230601; t=1736412981; x=1737017781; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=XS6TlRWyTSRfC4D8CM7324D8iXz+6nRl08PCaLYh1SA=;
+        b=F21auoWGLzJ75oTsQNwogo9Q1Z7NQwCDd+jEQZ0bETnBK0Y2aJMGL4pqbb7W54R7Hs
+         F4JOnCTBMKfWvzuwz5Vi6kS5jQPgSpNA7EFlhSC2ZcIk0DQDspvz3b2neMufkaT54pVq
+         58UmRUThCDovoiKWFXbh0vazNP1jmYgXR6VaYEIPJimRPLNJNylmBtqNE2qX2l0nQVbE
+         eSf5ZbtLpq5rdvIUct47BTLDQ+hf7g/yl7HnUfFihidGodFdeRAttHijABU7iv9QVOJ3
+         lPJnXfAsCshA8HmiYlZ++JIgPZBuPHKfLvMi0drjicyPhTD2Zj3WJ6YRCuISR/gQaQGf
+         bddw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736411855; x=1737016655;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=84B0RNeNpnyJnx6ts+MMJFqcCSs0cCqPqFLFhHuue/k=;
-        b=oYZxhIDRKJcEquZDzzOV+OQu7cRMVRGkkVyxPAK5Jpf+nOVok4zTEZmN7qzSoB5xEB
-         k9qLQm7G5TxsH1mf10cIfmfkfhnQVKA/J8099XB4Kx7iYuTZrOvxcsQAqzodNCiqgsdN
-         lCkJ3GrDK5dwUC9KNlYVdqmy9R9GJq0OpMrpLIK0Yd7SvNkKk2oH3MSgejyhCRNreAMB
-         DojD1DDVfwxNHa6gf6ywOYXMHIcq9PmJGHCgL1YV4r0uEsNAKDRtMT7kBFMfSYveqvT4
-         rCaAUUOit5enzdKaJ/JFgVzReiKqcEygIla8Hqvx6EsdVh0kqW+gSh80sr2dQIJUUbho
-         tHcw==
-X-Forwarded-Encrypted: i=1; AJvYcCVA9A3YfehQj/lsIgQsztqdHAbIioEoj0/wUigQ6GG3vR46kVa4JQSRD0nP7J7E7Kuz+Xg6JO/Vpqp6+mE=@vger.kernel.org, AJvYcCVOalJdzPHSp22tX5WRq9YichY58+0zlQwbXgfWgg2QPV86tEREmolAmKM4wG03nVHqvZkZTcia2AbeEQN1ipny@vger.kernel.org, AJvYcCWwUer4KUjikYglEgX+Q3bPZqwCUKd9CSBqV/JHSLASt9WcCMI0v9kyrCr6Eof871D7ZicdpqNK@vger.kernel.org
-X-Gm-Message-State: AOJu0YzFT7mosZAnz8kh3Gh8t03WKUM8EUzeh+FO7iIpBid+vayxftQ8
-	wOmc++3jqbOWOMDLQWXpjOiTOtnvkoiJmTIHIIMxXF+IVJP/yFTX
-X-Gm-Gg: ASbGnctv2bTAvsQRv4zLQqot7o3kUpRPiorths8o7yIZzWeP1w/cURLtwttcSr2iHRj
-	B33ENoyChTrsTWq7Vf9NH27VAFl9NxnuZBNSqosR5BkssomlCr7qx52ye+5j8kjnhn+ZtYu2NYU
-	R8wUkDnoMJl/VQnw7uFj+Y+GLNksB0T6orfxI0jVoYMx4anUhkBNvtMnAb1Kzyx1VPMK85BqIpE
-	h1xe4q/v2wzhvHcF4i3/m2gi1kdgEN5Tf3FGLlapmtthVQxrbOlZtRRBSAnVg==
-X-Google-Smtp-Source: AGHT+IFzA+T9PPh8OZiq7E8qPdc4YQXZGmueGDWAwk/vJWf3An6eZSWFs/dZFc49o2hNl2yJSwq6Ow==
-X-Received: by 2002:a17:902:d2c6:b0:216:2426:767f with SMTP id d9443c01a7336-21a83ffc1f1mr82521675ad.49.1736411853826;
-        Thu, 09 Jan 2025 00:37:33 -0800 (PST)
-Received: from fedora ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-219dc9f4f5esm339802285ad.178.2025.01.09.00.37.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Jan 2025 00:37:33 -0800 (PST)
-Date: Thu, 9 Jan 2025 08:37:25 +0000
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Jianbo Liu <jianbol@nvidia.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	Jay Vosburgh <jv@jvosburgh.net>,
-	Andy Gospodarek <andy@greyhouse.net>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Simon Horman <horms@kernel.org>, Tariq Toukan <tariqt@nvidia.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>, Shuah Khan <shuah@kernel.org>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Sabrina Dubroca <sd@queasysnail.net>,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net 0/2] bond: fix xfrm offload feature during init
-Message-ID: <Z3-KxbofkhOrWin7@fedora>
-References: <20241212062734.182a0164@kernel.org>
- <Z1vfsAyuxcohT7th@fedora>
- <20241213193127.4c31ef80@kernel.org>
- <Z3X9pfu12GUOBUY6@fedora>
- <1d8c901f-e292-43e4-970f-8440b26e92b0@nvidia.com>
- <Z3u0q5HSOshLn2V0@fedora>
- <Z33nEKg4PxwReUu_@fedora>
- <ad289f9a-41c3-4544-8aeb-535615f45aef@nvidia.com>
- <Z34l6hpbzPP9n65Y@fedora>
- <e01bae5f-30b5-4ec4-8c4b-5c133dd4552a@nvidia.com>
+        d=1e100.net; s=20230601; t=1736412981; x=1737017781;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=XS6TlRWyTSRfC4D8CM7324D8iXz+6nRl08PCaLYh1SA=;
+        b=idcpyyIzeCr1H8HDhSCKkmFlq5dT37sGDzEnYBcwbzL7vxLLAKZl8i6M8EZ8dpMexx
+         VUsRnJRKb+klS1aTp1djw4h4OCpRKAA4JfgrcdB8jJg7LjdRuRbCrKmpf0TXAqDE2YwJ
+         tEdCMWpE83Xf82C4jmwcK3x3odYSAVAuyYn7SwsFYALMdWq8dcCYszNkKsVGRWNtFVrD
+         23/p2QBefGYxz0AHKssdB8fSenwM8+cknhGxahPeZ/z8x4GKkZCWxK/5uDITWTV8YwZC
+         28htqB21lyqMw+7mWdN86manqhXeNdMUjFHxtZH1Du8yZ6VvM/E/+58bSTRXGVFlWUf2
+         LvdQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUFhGPBdSz0V3lQWtMPE0+4sgymWwELv6y4QncVYYmb85ziygv6TGyOPMAmcivQzxFo8U5by3HIwdwkQL8=@vger.kernel.org, AJvYcCUHsE6pES2A/6/tfrqoP5+ekwUcA6YHV1/ofwLrKJQf9c+Tc88ESO4jGi3CWJUUdue0yFoBlqKBbdQDIfRvzhPa@vger.kernel.org, AJvYcCWxXNuklEBV6ATOJngkncuwRyExkvxTLcbNIb+Aif8CCiSW+bxDSGZJ3HUVDS5pNbBsA3hUNR6r@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzv3b3eepqKJR6+lrbQCK3cZRuiXB/sEIf+RRhzaPQODM4dtvJV
+	LgLjlLUYZatBU6/9/OB2nW9rtHNBNYZi3P7KKey6iivC99hvycMH
+X-Gm-Gg: ASbGnctWLfj1Vbs9FdW143Uk3An5e9dEr770wGOav8J/V88FT7RyHWO10U1oC3JPMlE
+	d7uVtNiOpPxFZZgf4dQavEx7rWpyaLXNgephCIodUPhLa+4p3WBikB7mPRVAx0IYN5YQ3RHdfep
+	bEMW+9U1fesZCxn6hsGwbNAtCdPqh9v3rLGcSBKZ6x0chbxblEEDC4hHPbvEIz4xPEdpau7cmtl
+	+KbxdrUxfzSWehiuk7jfBnK3Ahy+0dPkI59qGmsp1MAKh5qHDzRkUDU6wVW0MXn34Q5ELDqJmYP
+	SNOLv36fNtVt6EeHxb+iDpcpQPW40wIHBQbMLdeio+k+w69oJLMOY5vHKsds9mmJKMmczmsLThO
+	yNfHWlAGaAMitm4dwMth+WYAW8f7w60o=
+X-Google-Smtp-Source: AGHT+IH3My3UUh3xFM8ZgIgF0aWMNmsqTttAtJxwpSIcvfI0XILfisWjLOFCeDXh+SXgbl3J8Hxz3A==
+X-Received: by 2002:a17:907:3e24:b0:aac:2298:8960 with SMTP id a640c23a62f3a-ab2ab6fcf7amr446231766b.35.1736412980929;
+        Thu, 09 Jan 2025 00:56:20 -0800 (PST)
+Received: from ?IPV6:2001:1c00:20d:1300:1b1c:4449:176a:89ea? (2001-1c00-020d-1300-1b1c-4449-176a-89ea.cable.dynamic.v6.ziggo.nl. [2001:1c00:20d:1300:1b1c:4449:176a:89ea])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ab2c9060a4fsm50179466b.15.2025.01.09.00.56.19
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 09 Jan 2025 00:56:20 -0800 (PST)
+Message-ID: <98234080-946e-4b36-832f-113b185e7bca@gmail.com>
+Date: Thu, 9 Jan 2025 09:56:17 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e01bae5f-30b5-4ec4-8c4b-5c133dd4552a@nvidia.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC net-next] net: phylink: always config mac for
+ (delayed) phy
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ Frank Wunderlich <frank-w@public-files.de>,
+ Daniel Golle <daniel@makrotopia.org>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, netfilter-devel@vger.kernel.org,
+ coreteam@netfilter.org, bridge@lists.linux.dev,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
+References: <20250107123615.161095-1-ericwouds@gmail.com>
+ <Z30iUj6DE9-fRp0n@shell.armlinux.org.uk>
+ <4b9b2a9a-061b-43ad-b402-a49aee317f41@gmail.com>
+ <Z31CJS1YUvPGiEXs@shell.armlinux.org.uk>
+From: Eric Woudstra <ericwouds@gmail.com>
+Content-Language: en-US
+In-Reply-To: <Z31CJS1YUvPGiEXs@shell.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Jan 09, 2025 at 09:26:38AM +0800, Jianbo Liu wrote:
-> 
-> 
-> On 1/8/2025 3:14 PM, Hangbin Liu wrote:
-> > On Wed, Jan 08, 2025 at 11:40:05AM +0800, Jianbo Liu wrote:
-> > > 
-> > > 
-> > > On 1/8/2025 10:46 AM, Hangbin Liu wrote:
-> > > > On Mon, Jan 06, 2025 at 10:47:16AM +0000, Hangbin Liu wrote:
-> > > > > On Thu, Jan 02, 2025 at 11:33:34AM +0800, Jianbo Liu wrote:
-> > > > > > > > Re-locking doesn't look great, glancing at the code I don't see any
-> > > > > > > > obvious better workarounds. Easiest fix would be to don't let the
-> > > > > > > > drivers sleep in the callbacks and then we can go back to a spin lock.
-> > > > > > > > Maybe nvidia people have better ideas, I'm not familiar with this
-> > > > > > > > offload.
-> > > > > > > 
-> > > > > > > I don't know how to disable bonding sleeping since we use mutex_lock now.
-> > > > > > > Hi Jianbo, do you have any idea?
-> > > > > > > 
-> > > > > > 
-> > > > > > I think we should allow drivers to sleep in the callbacks. So, maybe it's
-> > > > > > better to move driver's xdo_dev_state_delete out of state's spin lock.
-> > > > > 
-> > > > > I just check the code, xfrm_dev_state_delete() and later
-> > > > > dev->xfrmdev_ops->xdo_dev_state_delete(x) have too many xfrm_state x
-> > > > > checks. Can we really move it out of spin lock from xfrm_state_delete()
-> > > > 
-> > > > I tried to move the mutex lock code to a work queue, but found we need to
-> > > > check (ipsec->xs == xs) in bonding. So we still need xfrm_state x during bond
-> > > 
-> > > Maybe I miss something, but why need to hold spin lock. You can keep xfrm
-> > > state by its refcnt.
-> > 
-> > Do you mean move the xfrm_dev_state_delete() out of spin lock directly like:
-> > 
-> 
-> Yes. Not feasible?
-> 
-> > diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
-> > index 67ca7ac955a3..6881ddeb4360 100644
-> > --- a/net/xfrm/xfrm_state.c
-> > +++ b/net/xfrm/xfrm_state.c
-> > @@ -766,13 +766,6 @@ int __xfrm_state_delete(struct xfrm_state *x)
-> >   		if (x->encap_sk)
-> >   			sock_put(rcu_dereference_raw(x->encap_sk));
-> > -		xfrm_dev_state_delete(x);
-> > -
-> > -		/* All xfrm_state objects are created by xfrm_state_alloc.
-> > -		 * The xfrm_state_alloc call gives a reference, and that
-> > -		 * is what we are dropping here.
-> > -		 */
-> > -		xfrm_state_put(x);
-> >   		err = 0;
-> >   	}
-> > @@ -787,8 +780,20 @@ int xfrm_state_delete(struct xfrm_state *x)
-> >   	spin_lock_bh(&x->lock);
-> >   	err = __xfrm_state_delete(x);
-> >   	spin_unlock_bh(&x->lock);
-> > +	if (err)
-> > +		return err;
-> > -	return err;
-> > +	if (x->km.state == XFRM_STATE_DEAD) {
-> > +		xfrm_dev_state_delete(x);
-> > +
-> > +		/* All xfrm_state objects are created by xfrm_state_alloc.
-> > +		 * The xfrm_state_alloc call gives a reference, and that
-> > +		 * is what we are dropping here.
-> > +		 */
-> > +		xfrm_state_put(x);
-> > +	}
-> > +
-> > +	return 0;
-> >   }
-> >   EXPORT_SYMBOL(xfrm_state_delete);
-> > 
-> > Then why we need the spin lock in xfrm_state_delete?
-> > 
-> 
-> No, we don't need. But I am trying to understand what you said in your last
-> email about adding a new lock, or unlocking spin lock in
 
-I *thought* we need the spin lock in xfrm_state_delete(). So to protect xfrm_state,
-we need a new lock. Although it looks redundant. e.g. 
 
-int xfrm_state_delete(struct xfrm_state *x)
+On 1/7/25 4:03 PM, Russell King (Oracle) wrote:
+> On Tue, Jan 07, 2025 at 02:14:03PM +0100, Eric Woudstra wrote:
+>>
+>>
+>> On 1/7/25 1:47 PM, Russell King (Oracle) wrote:
+>>> Going through the log...
+>>>
+>>> On Tue, Jan 07, 2025 at 01:36:15PM +0100, Eric Woudstra wrote:
+>>>> Log before this patch is applied:
+>>>> [root@bpir3 ~]# dmesg | grep eth1
+>>>> [    2.515179] mtk_soc_eth 15100000.ethernet eth1: mediatek frame engine at 0xffff800082380000, irq 123
+>>>> [   38.271431] mtk_soc_eth 15100000.ethernet eth1: configuring for inband/2500base-x link mode
+>>>> [   38.279828] mtk_soc_eth 15100000.ethernet eth1: major config, requested inband/2500base-x
+>>>> [   38.288009] mtk_soc_eth 15100000.ethernet eth1: interface 2500base-x inband modes: pcs=01 phy=00
+>>>> [   38.296800] mtk_soc_eth 15100000.ethernet eth1: major config, active inband/inband,an-disabled/2500base-x
+>>>
+>>> This is indeed without the PHY. We're using inband, although the PCS
+>>> mode is PHYLINK_PCS_NEG_INBAND_DISABLED, meaning inband won't be
+>>> used. As there is no PHY, we can't switch to MLO_AN_PHY.
+>>>
+>>>> [   38.306362] mtk_soc_eth 15100000.ethernet eth1: phylink_mac_config: mode=inband/2500base-x/none adv=00,00000000,00008000,0000e240 pause=04
+>>>> [   39.220149] mtk_soc_eth 15100000.ethernet eth1:  interface 2 (mii) rate match none supports 0-3,6-7,13-14
+>>>> [   39.229758] mtk_soc_eth 15100000.ethernet eth1:  interface 3 (gmii) rate match none supports 0-3,5-7,13-14
+>>>> [   39.239420] mtk_soc_eth 15100000.ethernet eth1:  interface 4 (sgmii) rate match none supports 0-3,5-7,13-14
+>>>> [   39.249173] mtk_soc_eth 15100000.ethernet eth1:  interface 22 (1000base-x) rate match none supports 5-7,13-14
+>>>> [   39.259080] mtk_soc_eth 15100000.ethernet eth1:  interface 23 (2500base-x) rate match none supports 6-7,13-14,47
+>>>> [   39.594676] mtk_soc_eth 15100000.ethernet eth1: PHY i2c:sfp-1:11 uses interfaces 4,23, validating 4,23
+>>>
+>>> The PHY comes along...
+>>>
+>>>> [   39.603992] mtk_soc_eth 15100000.ethernet eth1:  interface 4 (sgmii) rate match none supports 0-3,5-7,13-14
+>>>> [   39.650080] mtk_soc_eth 15100000.ethernet eth1:  interface 23 (2500base-x) rate match none supports 6-7,13-14,47
+>>>> [   39.660266] mtk_soc_eth 15100000.ethernet eth1: PHY [i2c:sfp-1:11] driver [RTL8221B-VB-CG 2.5Gbps PHY (C45)] (irq=POLL)
+>>>> [   39.671037] mtk_soc_eth 15100000.ethernet eth1: phy: 2500base-x setting supported 00,00000000,00008000,000060ef advertising 00,00000000,00008000,000060ef
+>>>> [   39.684761] mtk_soc_eth 15100000.ethernet eth1: requesting link mode inband/2500base-x with support 00,00000000,00008000,000060ef
+>>>
+>>> We decide to use MLO_AN_INBAND and 2500base-X, which we're already using.
+>>>
+>>>> [   40.380076] mtk_soc_eth 15100000.ethernet eth1: phy link down 2500base-x/Unknown/Unknown/none/off
+>>>> [   40.397090] brlan: port 5(eth1) entered blocking state
+>>>> [   40.402223] brlan: port 5(eth1) entered disabled state
+>>>> [   40.407437] mtk_soc_eth 15100000.ethernet eth1: entered allmulticast mode
+>>>> [   40.414400] mtk_soc_eth 15100000.ethernet eth1: entered promiscuous mode
+>>>> [   44.500077] mtk_soc_eth 15100000.ethernet eth1: phy link up 2500base-x/2.5Gbps/Full/none/off
+>>>> [   44.508528] mtk_soc_eth 15100000.ethernet eth1: No phy led trigger registered for speed(2500)
+>>>
+>>> ... but we don't see link-up reported by the PCS after the PHY comes
+>>> up. Why is that - I think that needs investigation before we proceed
+>>> to patch the issue, because that suggests the PCS isn't seeing
+>>> valid 2500base-X from the PHY.
+>>>
+>>
+>> I think it is because pl->act_link_an_mode stays at MLO_AN_INBAND, but
+>> it needs to be set to MLO_AN_PHY, so that only the phy determines the
+>> link state:
+>>
+>> phylink_resolve() {
+>>     ...
+>> 	} else if (pl->act_link_an_mode == MLO_AN_PHY) {
+>> 		link_state = pl->phy_state;
+>>     ...
+>> }
+> 
+> Please see my reply to Daniel. The PCS should still be capable of
+> reporting whether its link is up or down irrespective of whether
+> in-band status is being used or not.
+> 
+> While it is correct that PHY mode needs to be used here, your report
+> has pointed out that the driver is not reporting the PCS link state
+> correctly when in-band is disabled.
+> 
+> Given that the current state of affairs has revealed this other bug,
+> I would like that addressed first while there is a trivial test case
+> here.
+> 
+
+So I've narrowed down the problem a bit:
+
+At first state->link is set to true, while looking at the bmsr.
+
+But because linkmode_test_bit(fd_bit, state->advertising) and
+linkmode_test_bit(fd_bit, state->lp_advertising) are both false,
+state->link is set to false after looking at the bmsr.
+
+void phylink_mii_c22_pcs_decode_state(struct phylink_link_state *state,
+				      u16 bmsr, u16 lpa)
 {
-        int err;
-
-        spin_lock_bh(&x->lock);
-        err = __xfrm_state_delete(x);
-        spin_unlock_bh(&x->lock);
-        if (err)
-                return err;
-
-	another_lock(&x->other_lock)
-        if (x->km.state == XFRM_STATE_DEAD) {
-                xfrm_dev_state_delete(x);
-                xfrm_state_put(x);
-        }
-	another_unlock(&x->other_lock)
-
-        return 0;
+	state->link = !!(bmsr & BMSR_LSTATUS);
+	...
+	case PHY_INTERFACE_MODE_2500BASEX:
+		phylink_decode_c37_word(state, lpa, SPEED_2500);
+	...
 }
-> bond_ipsec_del_sa(). Anything I missed?
 
-The unlock spin lock in bond_ipsec_del_sa looks like
-https://lore.kernel.org/netdev/Z1vfsAyuxcohT7th@fedora/
+static void phylink_decode_c37_word(struct phylink_link_state *state,
+				    uint16_t config_reg, int speed)
+{
+	...
+	if (linkmode_test_bit(fd_bit, state->advertising) &&
+	    linkmode_test_bit(fd_bit, state->lp_advertising)) {
+		state->speed = speed;
+		state->duplex = DUPLEX_FULL;
+	} else {
+		/* negotiation failure */
+		state->link = false;
+	}
+	...
+}
 
-Thanks
-Hangbin
+And I can confirm, if I change the part above into the part below
+(removing the if statement), the PCS also reports the link is up and the
+connection is functional end-to-end. Not that I'm saying this change is
+the solution, only for narrowing down the problem.
+
+static void phylink_decode_c37_word(struct phylink_link_state *state,
+				    uint16_t config_reg, int speed)
+{
+	...
+	state->speed = speed;
+	state->duplex = DUPLEX_FULL;
+	...
+}
+
+Also worth mentioning, up until v12 of the pcs-mtk-lynxy.c
+mtk_pcs_lynxi_get_state() did not call
+phylink_mii_c22_pcs_decode_state() at all for 2500base-x.
+
 
