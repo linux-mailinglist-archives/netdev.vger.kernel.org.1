@@ -1,178 +1,287 @@
-Return-Path: <netdev+bounces-156989-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156993-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ABC43A089BB
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 09:20:24 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3048FA08A19
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 09:28:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C983E3A37D4
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 08:20:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E3D621884CA7
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 08:28:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F53E207A20;
-	Fri, 10 Jan 2025 08:20:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00876207DFB;
+	Fri, 10 Jan 2025 08:28:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=leica-geosystems.com header.i=@leica-geosystems.com header.b="Hb2BU193"
+	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="ibSmOIFU"
 X-Original-To: netdev@vger.kernel.org
-Received: from PA4PR04CU001.outbound.protection.outlook.com (mail-francecentralazon11013026.outbound.protection.outlook.com [40.107.162.26])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44DD4257D;
-	Fri, 10 Jan 2025 08:20:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.162.26
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736497218; cv=fail; b=rxPA2G3LTzZbPX4OHrGipZH2RyMMlZmUdvrmjgxP8RgmJPThQgzqiSLjssIZBL1IptGT6y8O3dsW9DeCRVG1ypJZ1yjt73EddcRRXo52cWLZ9/au4oav6FKZqvy1l91lkHDEcQPCw+aD2ITHeKRta6T2EyUsd3aVcXyRoyn1RUs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736497218; c=relaxed/simple;
-	bh=LDDJcUrXFkWKe5FKTIJ1hpQpKblSf4eAw0bOSHuH8iE=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=i+oCidfBK3U5uQ8EIuWfSJy267h6RIM6Tpy2jlC4RB36hqPloPeknbS1WpxRKiVjdLOzuvyNgTTXnXsEugF59XhEmhrnXBQSi2NfqWt7VLSh7DHVfp4DEpYM0bEILk2yDhOwKYyhD+bdmRZajNZOL4loAQip+igjbzAsq9Oqvlk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=leica-geosystems.com; spf=fail smtp.mailfrom=leica-geosystems.com; dkim=pass (1024-bit key) header.d=leica-geosystems.com header.i=@leica-geosystems.com header.b=Hb2BU193; arc=fail smtp.client-ip=40.107.162.26
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=leica-geosystems.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=leica-geosystems.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=oP6oprrVhTeeLkDPyV0BxqRex6UEfFgLVvcd2fIqQP2b0OGQOQIZ0uDJvIBDTI1S6POGO2xdX9lD4aRqWg3utajNkY8jfjj/joiMhfteDJCI4zND1WZ8ulNolruXLg76mQD5VVAG/POMgk2W2DQH/XDgsFV6pGKggrDf3HRu+Gmh4vj3Tp12LRAQfpJrePHJmwzPPci2zUrrtBX74kuDIfyd1U6jJQhoG2plqzrsgwVPEiI5r2yih901W9/3Eb75Lv6AIpwuTkqAc10PdTKysmJvw9nrdBfMVrK8+Scb4JYv9nSglMjUPhVe9nR4ZEpx5mLx4EM8D3ywj9fDW5KJnw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Z7ePe8LrpbKbpFWmraqm2BTfhKZLA99rUCyeM3NWd/s=;
- b=jjD5eC8PRjVKMzBO6b4P6FFH94ZDcgdlj2neCvKUBzzvPTAXUO+qeE2bn5VWT2dfh204fpJtBVTv4qicyqBgaXf09SaTMifwSCesuhA5C04l/wkBHBwPBGrPM5p9N8jQTOMsXSxqIfkl/UYSu34FfYQLrUEHSkWu0rI30fBcfvQljhzurQvvKfh8sDzk5KQG3fn8qvmspta4nUiYUPM6dXJJsiP9nxUPSa99tNs5FbxLeEDIhI8i06oWS0Lh5RYZm5PVQnFVumPG3C5CKGc0w9AntEEyF154CNxbmJs81/Ctb6Plmhq+fFpdJ0RQEHnyyvm4jMuP2c55w9hCBpKRuA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 193.8.40.94) smtp.rcpttodomain=vger.kernel.org
- smtp.mailfrom=leica-geosystems.com; dmarc=pass (p=reject sp=reject pct=100)
- action=none header.from=leica-geosystems.com; dkim=none (message not signed);
- arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=leica-geosystems.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Z7ePe8LrpbKbpFWmraqm2BTfhKZLA99rUCyeM3NWd/s=;
- b=Hb2BU193yYjTdzhi1EYMSCYOpSqYvQC0hpH9aitksFbwHJo4Vhrk4GmlzYG1fS5NviDl4isZTIgdP0TBV4XNt9v2LDnqvd2oY+tIoHsKF80XcW/6NDpBiv53/NNi63stY70xkEq94GuM0/tXAkea3e3xUMNbBhwof0QOPKpCe18=
-Received: from AS8PR07CA0058.eurprd07.prod.outlook.com (2603:10a6:20b:459::15)
- by VI0PR06MB9747.eurprd06.prod.outlook.com (2603:10a6:800:21c::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8335.12; Fri, 10 Jan
- 2025 08:20:11 +0000
-Received: from AM4PEPF00025F9C.EURPRD83.prod.outlook.com
- (2603:10a6:20b:459:cafe::5c) by AS8PR07CA0058.outlook.office365.com
- (2603:10a6:20b:459::15) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8356.6 via Frontend Transport; Fri,
- 10 Jan 2025 08:20:11 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 193.8.40.94)
- smtp.mailfrom=leica-geosystems.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=leica-geosystems.com;
-Received-SPF: Pass (protection.outlook.com: domain of leica-geosystems.com
- designates 193.8.40.94 as permitted sender) receiver=protection.outlook.com;
- client-ip=193.8.40.94; helo=hexagon.com; pr=C
-Received: from hexagon.com (193.8.40.94) by
- AM4PEPF00025F9C.mail.protection.outlook.com (10.167.16.11) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8356.0 via Frontend Transport; Fri, 10 Jan 2025 08:20:11 +0000
-Received: from aherlnxbspsrv01.lgs-net.com ([10.60.34.116]) by hexagon.com with Microsoft SMTPSVC(10.0.17763.1697);
-	 Fri, 10 Jan 2025 09:20:08 +0100
-From: Catalin Popescu <catalin.popescu@leica-geosystems.com>
-To: andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	robh@kernel.org
-Cc: netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-wireless@vger.kernel.org,
-	m.felsch@pengutronix.de,
-	bsp-development.geo@leica-geosystems.com,
-	Catalin Popescu <catalin.popescu@leica-geosystems.com>
-Subject: [PATCH net-next 2/2] net: rfkill: gpio: allow booting in blocked state
-Date: Fri, 10 Jan 2025 09:19:02 +0100
-Message-Id: <20250110081902.1846296-2-catalin.popescu@leica-geosystems.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250110081902.1846296-1-catalin.popescu@leica-geosystems.com>
-References: <20250110081902.1846296-1-catalin.popescu@leica-geosystems.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A713207A2C
+	for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 08:28:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1736497727; cv=none; b=NbMV+plPzSXq6YjIG+k+ne8Dm6r6/973MMX69yRASPZ18qd9L7pvuFwXq4hf/HjP+9oULKobysBdbBJIf2BxQfSmN+fYdcMzWUky0rg/Vy0uCXktufSHTuAfk0NS5Kzw3+iTBzznBAMht7L7ETWkKgp9bAeYMtcgNscxNXUzHr4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1736497727; c=relaxed/simple;
+	bh=mpE7hYntObRlHLj2s8ybBavAi+cZh37RwpDamWOgN40=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=IV0n7ND/nXw3GRlHAQMpi/0lDXEzSx/u5J5JDXoLtldfScqADJ6fWAql0wr59PESn+sVvq4G+YVf4RQfFPCzK3yohpkkozCjNQg1em9vQgtlEm160Fd8rYA24bbXJcijoNaN7wRIDSf1sPSM+lAnEF4pm3Ug6CWS/8dzCPUvubE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=pass smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=ibSmOIFU; arc=none smtp.client-ip=209.85.214.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=daynix.com
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-216728b1836so29094585ad.0
+        for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 00:28:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1736497725; x=1737102525; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=fMHAnr47gYJmPF4Dg6UKLdQQ9r7gUgpmT9CNdLeTBRg=;
+        b=ibSmOIFU95uLATydrlyBKwidi+SiBBJLTbHROLEupNuyUdhtsPo3JPxU1iBTcry3Fd
+         Y3sh+sXTQ54mu063/v8sDikWMRzTPNMPlj4T0fMvhzjKyqUQSUnUKDEjOwRrXk0XkVh5
+         zKvEI5+Y2dGpMMXdaXAeddnE08xaeLFOlOlRRV4pXq2xUmzWOZF68D94xeLjfmmgY4cW
+         uNpL4wu2pFrEf5ql8q4QogNgiSzOwwh2j9lfMup4CLPMlqotjagZLNuWj8ViTR8FbM9k
+         jfuveoSIx3pOMk/nzwYvdeDYrp3YWpAe59RktpbQRTv/5tpLtPOtEOj5o8YuI2MYxD9G
+         5ZQA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736497725; x=1737102525;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=fMHAnr47gYJmPF4Dg6UKLdQQ9r7gUgpmT9CNdLeTBRg=;
+        b=nOs4QUQq+1Bf/Fq5UsUykvl3ugI/PZIyosPI1u/3TrgH2UGw5xIM8AKJULEwiOQWHi
+         yLWRlklpFX3FOImgv8kS2HYANH1Y+0Q0YRX5yrSStDqrdUyWfPCMErfI27hMTdN64MzG
+         pwIhS36ZJHzj54+jjLeIpEphO6MF/sG8FwVl8yhLWByyoVnu6iVW5yvDZBFlY3sx5Aby
+         hnFc+mgk2olnCq5A8xvl8KD9IveKjPI4TVE+FllgVeV7KNVoSjztt//96TLf/8y7rE6X
+         xi4Pb+J/zv0t530v/cqW0HkqbL2xJ+1hY60xb2ZliC/tChWpq7176gZWrCVvey7tsU8x
+         8v5Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUQ/gZXwRcDVA1iU2FJh+g3cf/rrLwySjsQjAXWCExDFYHhdafPjXJMrIXx0fHSKK3A5nGGCl8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzibPcCQzR5tktV8KS+nd6wJVL03ntJT3FX20j0kr0h3whfaj/E
+	v/XsNaq4Gc7tvfPYDVW4xfE/UXDBsvt9rgej7lzbpwj/cVmeBeTY7fh3bOyd31Q=
+X-Gm-Gg: ASbGncvUqCGF1mu0h8BZ+irFLDCwt/tVh+sHs+MsZ8c8l4LRf/RUp1pUCfa7l/B67YW
+	L6+QlXr2np6nYg5MZsPksDTqebCkNpCE5i0gfiW/iaWCOt9mGm4U02kIkkDPJiradGNZ2FHVG0M
+	56h7hgBrAgZeIsKn7hYaCOE94XBYG7cwiwcRWddfcHlbYgZIoIFSijPR/kQU5UUogo9oKueXU5a
+	8oOmHOG0mRo2njP+b8gOMXwZOHs6bQy6H2IUTW9TN6ktl0GrbmdZyx7Je4z6uBu04U=
+X-Google-Smtp-Source: AGHT+IF1ZJ34S8wHfK4e0giFWrsLi/td4d5wyPmgupD6AicJN1a26QYSVhI7ULzCco4C0ujTpbXL5A==
+X-Received: by 2002:a05:6a20:c70a:b0:1dc:37a:8dc0 with SMTP id adf61e73a8af0-1e88cfd5b94mr16188605637.21.1736497725427;
+        Fri, 10 Jan 2025 00:28:45 -0800 (PST)
+Received: from [157.82.203.37] ([157.82.203.37])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72d40569fddsm1067441b3a.39.2025.01.10.00.28.39
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 10 Jan 2025 00:28:44 -0800 (PST)
+Message-ID: <aeb2bd68-f5b9-49b7-81ff-18472bd8b7b0@daynix.com>
+Date: Fri, 10 Jan 2025 17:28:38 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-OriginalArrivalTime: 10 Jan 2025 08:20:08.0371 (UTC) FILETIME=[75D40830:01DB6338]
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM4PEPF00025F9C:EE_|VI0PR06MB9747:EE_
-Content-Type: text/plain
-X-MS-Office365-Filtering-Correlation-Id: 03912be0-91aa-4275-17ec-08dd314f9a47
-X-SET-LOWER-SCL-SCANNER: YES
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|82310400026|1800799024|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?PNzEp44U+6aQdrmUQkUgVNYN/gdAW6WF3Kr6+U9usSajPF5LNfnVg56dvu9o?=
- =?us-ascii?Q?Jf7Igm32bCTcIPShi0b5tRle1X/GxLW9QskvwVGvUwZr/M13yTB6EAvW9YQC?=
- =?us-ascii?Q?lKBfcZq2DJkqzLB7A9sIopBVBrvkOQJyUDeITIXetClDHANrBqDlilDQomFi?=
- =?us-ascii?Q?OBf3AqNf3Bg3hJGNzYW+AHxp1ZwwLaxnF3JC9ZHxLWjYP2rcPmofNDaI0g14?=
- =?us-ascii?Q?/X4ICBxgqWVWLei2Cj7d3WlxUg7t5eF5WY1IDjwvWEYSvvy9NWoS1AHTkk5F?=
- =?us-ascii?Q?p00f/ffoPrD6X+/c6J71T4tyaaLFaPVMNRh+/7vTT9KHy8R6w2H9U3AdlU90?=
- =?us-ascii?Q?4GP5YurUxUDZPQvQXmRUcgzpM2XdCIDE5dH7hmwUqzYIZk1BV8fC9YyeHs6S?=
- =?us-ascii?Q?aJBp40y99MHEpWKdKUWT++JVoVoot7fy4FYJGPShQp0BQJtTE6HQ9QzUB0tt?=
- =?us-ascii?Q?ldZnvP3SmObQVKIkqJ06aiGGXLPpZf3uhCz8cQxMz/YZ+EPVLWQi/19Meh0D?=
- =?us-ascii?Q?P0QOJ91AyBlZP9n6ntxP/MskJrHfRJbZWqqvpRQLZbOe3ttG2jByf3/W6FWw?=
- =?us-ascii?Q?JI/OrYxA4JcKj81zjUF3nHnNk8b7IOSvfaBFhoQXUluZ+KYrGDelz/lIeue3?=
- =?us-ascii?Q?7DTuDgQwF5NqzUEMA8M4EXP7Uh6W5yVCBgmaMPen6+FhBVjIRHB9yhKs80xf?=
- =?us-ascii?Q?+V/7xNJKJ7sJsihXlRrIsE6htxjfdJqOnfItGrOfO8y6gcJ5WZlc23SJ4DtN?=
- =?us-ascii?Q?Go7WtAohZcJoUJxJCYnQdxrm+CkH9rsCKc3s8P897d5jWfM0cyfyyengJiBI?=
- =?us-ascii?Q?hlHLVFXawdPkjlOemnzik9V7xviHJSxj6NH1VIRWELKcVRpFnahTkMUnQSda?=
- =?us-ascii?Q?RZiV/cSCNLIkBD9H/rBcSC1xMQ/F83N2yks0ApqAvpLdGxAAmp71V6dXrL9k?=
- =?us-ascii?Q?f2tu9KF9GQZsdEPIMEu4GzRU6d9b2zZ9097ZFG5qrMTB1yBcYEiQSLYmJ2E9?=
- =?us-ascii?Q?2lcLEHk/yUygIBnlshIbqEP+oZzhQ1U6lBvV1kU8XajS2+6yXa8YjZ9eSZol?=
- =?us-ascii?Q?tAX6Byvx15HJdiJIZxfzHgQWgcneZeuANWChHODLOqDezsA9Z3u0uU61uDfk?=
- =?us-ascii?Q?4Xw7CKscfDDX3MPk71qo3b/tY+44p76SX4AILuPBUjTDDEkPk3qyqPVEIa12?=
- =?us-ascii?Q?XSvYt6EbTnojcvKeSAPvS0VHviOeUF3Iy26vlRBk/K6DQZbefjcYLU2LfzE2?=
- =?us-ascii?Q?bYNKOhkBHVuLEAch4ad6+JpQDooCYv6PS/vFNt+3G7tDH9FCCbnaFk9UP6xi?=
- =?us-ascii?Q?hclFc8AiYtGH7Oq6we4D2b9tEIG0iEPT++nRBYQMwlo/obnGu2SOTOrCguzm?=
- =?us-ascii?Q?KNwHSRs1XDSn1ldi6FdA3rZPdkIkrD+xZm4rHHCbxEHD1jM9R/CMY8oLVyL+?=
- =?us-ascii?Q?tL2Uf6QJIMoq/vVeUUOtY1oecyd/1utETthZeqIZ/xiYu5VkPT4vR/8P1090?=
- =?us-ascii?Q?SFKC70TdsH/GDvQ=3D?=
-X-Forefront-Antispam-Report:
-	CIP:193.8.40.94;CTRY:CH;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:hexagon.com;PTR:ahersrvdom50.leica-geosystems.com;CAT:NONE;SFS:(13230040)(36860700013)(82310400026)(1800799024)(376014);DIR:OUT;SFP:1101;
-X-OriginatorOrg: leica-geosystems.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Jan 2025 08:20:11.6068
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 03912be0-91aa-4275-17ec-08dd314f9a47
-X-MS-Exchange-CrossTenant-Id: 1b16ab3e-b8f6-4fe3-9f3e-2db7fe549f6a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=1b16ab3e-b8f6-4fe3-9f3e-2db7fe549f6a;Ip=[193.8.40.94];Helo=[hexagon.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	AM4PEPF00025F9C.EURPRD83.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI0PR06MB9747
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 1/3] tun: Unify vnet implementation
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ Jonathan Corbet <corbet@lwn.net>, Jason Wang <jasowang@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Xuan Zhuo
+ <xuanzhuo@linux.alibaba.com>, Shuah Khan <shuah@kernel.org>,
+ linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, kvm@vger.kernel.org,
+ virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org,
+ Yuri Benditovich <yuri.benditovich@daynix.com>,
+ Andrew Melnychenko <andrew@daynix.com>,
+ Stephen Hemminger <stephen@networkplumber.org>, gur.stavi@huawei.com,
+ devel@daynix.com
+References: <20250109-tun-v2-0-388d7d5a287a@daynix.com>
+ <20250109-tun-v2-1-388d7d5a287a@daynix.com>
+ <677fd7d26e090_362bc129432@willemb.c.googlers.com.notmuch>
+Content-Language: en-US
+From: Akihiko Odaki <akihiko.odaki@daynix.com>
+In-Reply-To: <677fd7d26e090_362bc129432@willemb.c.googlers.com.notmuch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-By default, rfkill state is unblocked and this behavior is not
-configurable. Add support for booting in blocked state based on the
-presence of a devicetree property.
+On 2025/01/09 23:06, Willem de Bruijn wrote:
+> Akihiko Odaki wrote:
+>> Both tun and tap exposes the same set of virtio-net-related features.
+>> Unify their implementations to ease future changes.
+>>
+>> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
+>> ---
+>>   MAINTAINERS            |   1 +
+>>   drivers/net/Kconfig    |   5 ++
+>>   drivers/net/Makefile   |   1 +
+>>   drivers/net/tap.c      | 172 ++++++----------------------------------
+>>   drivers/net/tun.c      | 208 ++++++++-----------------------------------------
+>>   drivers/net/tun_vnet.c | 186 +++++++++++++++++++++++++++++++++++++++++++
+>>   drivers/net/tun_vnet.h |  24 ++++++
+>>   7 files changed, 273 insertions(+), 324 deletions(-)
+>>
+>> diff --git a/MAINTAINERS b/MAINTAINERS
+>> index 910305c11e8a..1be8a452d11f 100644
+>> --- a/MAINTAINERS
+>> +++ b/MAINTAINERS
+>> @@ -23903,6 +23903,7 @@ F:	Documentation/networking/tuntap.rst
+>>   F:	arch/um/os-Linux/drivers/
+>>   F:	drivers/net/tap.c
+>>   F:	drivers/net/tun.c
+>> +F:	drivers/net/tun_vnet.h
+>>   
+>>   TURBOCHANNEL SUBSYSTEM
+>>   M:	"Maciej W. Rozycki" <macro@orcam.me.uk>
+>> diff --git a/drivers/net/Kconfig b/drivers/net/Kconfig
+>> index 1fd5acdc73c6..255c8f9f1d7c 100644
+>> --- a/drivers/net/Kconfig
+>> +++ b/drivers/net/Kconfig
+>> @@ -395,6 +395,7 @@ config TUN
+>>   	tristate "Universal TUN/TAP device driver support"
+>>   	depends on INET
+>>   	select CRC32
+>> +	select TUN_VNET
+> 
+> No need for this new Kconfig
 
-Signed-off-by: Catalin Popescu <catalin.popescu@leica-geosystems.com>
----
- net/rfkill/rfkill-gpio.c | 3 +++
- 1 file changed, 3 insertions(+)
+I will merge tun_vnet.c into TAP.
 
-diff --git a/net/rfkill/rfkill-gpio.c b/net/rfkill/rfkill-gpio.c
-index 9fa019e0dcad..41e657e97761 100644
---- a/net/rfkill/rfkill-gpio.c
-+++ b/net/rfkill/rfkill-gpio.c
-@@ -162,6 +162,9 @@ static int rfkill_gpio_probe(struct platform_device *pdev)
- 	if (!rfkill->rfkill_dev)
- 		return -ENOMEM;
- 
-+	if (device_property_present(&pdev->dev, "default-blocked"))
-+		rfkill_init_sw_state(rfkill->rfkill_dev, true);
-+
- 	ret = rfkill_register(rfkill->rfkill_dev);
- 	if (ret < 0)
- 		goto err_destroy;
--- 
-2.34.1
+> 
+>>   static struct proto tap_proto = {
+>>   	.name = "tap",
+>> @@ -641,10 +576,10 @@ static ssize_t tap_get_user(struct tap_queue *q, void *msg_control,
+>>   	struct sk_buff *skb;
+>>   	struct tap_dev *tap;
+>>   	unsigned long total_len = iov_iter_count(from);
+>> -	unsigned long len = total_len;
+>> +	unsigned long len;
+>>   	int err;
+>>   	struct virtio_net_hdr vnet_hdr = { 0 };
+>> -	int vnet_hdr_len = 0;
+>> +	int hdr_len;
+>>   	int copylen = 0;
+>>   	int depth;
+>>   	bool zerocopy = false;
+>> @@ -652,38 +587,20 @@ static ssize_t tap_get_user(struct tap_queue *q, void *msg_control,
+>>   	enum skb_drop_reason drop_reason;
+>>   
+>>   	if (q->flags & IFF_VNET_HDR) {
+>> -		vnet_hdr_len = READ_ONCE(q->vnet_hdr_sz);
+>> -
+>> -		err = -EINVAL;
+>> -		if (len < vnet_hdr_len)
+>> -			goto err;
+>> -		len -= vnet_hdr_len;
+>> -
+>> -		err = -EFAULT;
+>> -		if (!copy_from_iter_full(&vnet_hdr, sizeof(vnet_hdr), from))
+>> -			goto err;
+>> -		iov_iter_advance(from, vnet_hdr_len - sizeof(vnet_hdr));
+>> -		if ((vnet_hdr.flags & VIRTIO_NET_HDR_F_NEEDS_CSUM) &&
+>> -		     tap16_to_cpu(q, vnet_hdr.csum_start) +
+>> -		     tap16_to_cpu(q, vnet_hdr.csum_offset) + 2 >
+>> -			     tap16_to_cpu(q, vnet_hdr.hdr_len))
+>> -			vnet_hdr.hdr_len = cpu_to_tap16(q,
+>> -				 tap16_to_cpu(q, vnet_hdr.csum_start) +
+>> -				 tap16_to_cpu(q, vnet_hdr.csum_offset) + 2);
+>> -		err = -EINVAL;
+>> -		if (tap16_to_cpu(q, vnet_hdr.hdr_len) > len)
+>> +		hdr_len = tun_vnet_hdr_get(READ_ONCE(q->vnet_hdr_sz), q->flags, from, &vnet_hdr);
+>> +		if (hdr_len < 0) {
+>> +			err = hdr_len;
+>>   			goto err;
+>> +		}
+>> +	} else {
+>> +		hdr_len = 0;
+>>   	}
+>>   
+>> -	err = -EINVAL;
+>> -	if (unlikely(len < ETH_HLEN))
+>> -		goto err;
+>> -
+> 
+> Is this check removal intentional?
 
+No, I'm not sure what this check is for, but it is irrlevant with vnet 
+header and shouldn't be modified with this patch. I'll restore the check 
+with the next version.
+
+> 
+>> +	len = iov_iter_count(from);
+>>   	if (msg_control && sock_flag(&q->sk, SOCK_ZEROCOPY)) {
+>>   		struct iov_iter i;
+>>   
+>> -		copylen = vnet_hdr.hdr_len ?
+>> -			tap16_to_cpu(q, vnet_hdr.hdr_len) : GOODCOPY_LEN;
+>> +		copylen = hdr_len ? hdr_len : GOODCOPY_LEN;
+>>   		if (copylen > good_linear)
+>>   			copylen = good_linear;
+>>   		else if (copylen < ETH_HLEN)
+>> @@ -697,7 +614,7 @@ static ssize_t tap_get_user(struct tap_queue *q, void *msg_control,
+>>   
+>>   	if (!zerocopy) {
+>>   		copylen = len;
+>> -		linear = tap16_to_cpu(q, vnet_hdr.hdr_len);
+>> +		linear = hdr_len;
+>>   		if (linear > good_linear)
+>>   			linear = good_linear;
+>>   		else if (linear < ETH_HLEN)
+>> @@ -732,9 +649,8 @@ static ssize_t tap_get_user(struct tap_queue *q, void *msg_control,
+>>   	}
+>>   	skb->dev = tap->dev;
+>>   
+>> -	if (vnet_hdr_len) {
+>> -		err = virtio_net_hdr_to_skb(skb, &vnet_hdr,
+>> -					    tap_is_little_endian(q));
+>> +	if (q->flags & IFF_VNET_HDR) {
+>> +		err = tun_vnet_hdr_to_skb(q->flags, skb, &vnet_hdr);
+>>   		if (err) {
+>>   			rcu_read_unlock();
+>>   			drop_reason = SKB_DROP_REASON_DEV_HDR;
+>> @@ -797,23 +713,17 @@ static ssize_t tap_put_user(struct tap_queue *q,
+>>   	int total;
+>>   
+>>   	if (q->flags & IFF_VNET_HDR) {
+>> -		int vlan_hlen = skb_vlan_tag_present(skb) ? VLAN_HLEN : 0;
+>>   		struct virtio_net_hdr vnet_hdr;
+>>   
+>>   		vnet_hdr_len = READ_ONCE(q->vnet_hdr_sz);
+>> -		if (iov_iter_count(iter) < vnet_hdr_len)
+>> -			return -EINVAL;
+>> -
+>> -		if (virtio_net_hdr_from_skb(skb, &vnet_hdr,
+>> -					    tap_is_little_endian(q), true,
+>> -					    vlan_hlen))
+>> -			BUG();
+>>   
+>> -		if (copy_to_iter(&vnet_hdr, sizeof(vnet_hdr), iter) !=
+>> -		    sizeof(vnet_hdr))
+>> -			return -EFAULT;
+>> +		ret = tun_vnet_hdr_from_skb(q->flags, NULL, skb, &vnet_hdr);
+>> +		if (ret < 0)
+>> +			goto done;
+>>   
+>> -		iov_iter_advance(iter, vnet_hdr_len - sizeof(vnet_hdr));
+>> +		ret = tun_vnet_hdr_put(vnet_hdr_len, iter, &vnet_hdr);
+>> +		if (ret < 0)
+>> +			goto done;
+> 
+> Please split this patch in to a series of smaller patches.
+> 
+> If feasible:
+> 
+> 1. one that move the head of tun.c into tun_vnet.[hc].
+> 2. then one that uses that also in tap.c.
+> 3. then a separate patch for the ioctl changes.
+> 4. then introduce tun_vnet_hdr_from_skb, tun_vnet_hdr_put
+> and friends in (a) follow-up patch(es).
+
+I will do so.
+
+> 
+> This is subtle code. Please report what tests you ran to ensure
+> that it does not introduce behavioral changes / regressions.
+
+I tried:
+- curl on QEMU with macvtap (vhost=on)
+- curl on QEMU with macvtap (vhost=off)
 
