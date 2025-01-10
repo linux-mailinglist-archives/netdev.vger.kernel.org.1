@@ -1,128 +1,124 @@
-Return-Path: <netdev+bounces-157143-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157138-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 933E9A08FFD
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 13:07:43 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE1A7A08FCE
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 12:55:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 63B29188CC7C
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 12:07:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D8F9916A2E7
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 11:55:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 856B22063FE;
-	Fri, 10 Jan 2025 12:07:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 477AD20B7E0;
+	Fri, 10 Jan 2025 11:55:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="vMIyk6mC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="R6EKDKf5"
 X-Original-To: netdev@vger.kernel.org
-Received: from out203-205-221-231.mail.qq.com (out203-205-221-231.mail.qq.com [203.205.221.231])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E75BA2063D2;
-	Fri, 10 Jan 2025 12:07:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.205.221.231
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2342220ADFF
+	for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 11:55:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736510860; cv=none; b=a23CwSb/zEQ4KqJDC3JB5Oh0iKW+2QW8m2YbFgIWH6CAgZM9Ob/UZmQn4PrCpd+eoJEf0ss73Rm5Iz8L8COrCodXlZcj9N0g+fvHl14O4/RJbY71xWGJKbmaVE6KgVkA2vPk+bUwHLXxG//rnxyU1BE9QMk1WjGIVsi8sGWHOgc=
+	t=1736510154; cv=none; b=UyHHw/FEoExDKbFDr3+mYemijA4mzznvYVDfdktNuIC/KyFiwdIe/SqfxdufLgHHoirDbrghUvlxad4qUTnVKnkFPRfBAV9tHQd6zjR8IEM5KGPW4rAKS7QmItv2aN3x/mdiNp0W2BfTpjOVIGsQbyIW8nh282W/M++NiChWxY4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736510860; c=relaxed/simple;
-	bh=dGyXiHXYSkXULV+7gq5B3uZ51dNtzN5PZbK8aBV0on4=;
-	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=KgYZWABucdoXu20qLWPk9Ov9bVCgOKilErAhYHbqA6jeErREHRtRAwliXoV2hlXdwavsXnEWUB/8wulGq/X+WPhkaCnh/2mKGFl49X+EslMuAJ/Cxt4xixr8AgtxmQ7DHz2JA7U3oRSeQLijpV15BMYJFg08+Sh3Neg+s2eJaYE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=Red54.com; spf=pass smtp.mailfrom=red54.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=vMIyk6mC; arc=none smtp.client-ip=203.205.221.231
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=Red54.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=red54.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
-	t=1736510850; bh=SppLlbAwX++5g3aw7t0/ZLyCLAOdweh/cAZUiMzXCbY=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=vMIyk6mC8/CkJ9sjHBi7QZNLwpCCI2Rsc6fAWFJE5SRRUrJJDfNzJiQS2z2kViFIP
-	 9KK9hDQ0sWsLi/bD9m8LLx9UrMQEeu2Ety+IP1mD9cXfMybaMUiHqcAbzPO8NUpbb2
-	 mLyoMezgg5UOmcSQjYYMo3dpphMVjHB+XRSML1EE=
-Received: from mail.red54.com ([185.220.101.106])
-	by newxmesmtplogicsvrsza29-0.qq.com (NewEsmtp) with SMTP
-	id DE229AA3; Fri, 10 Jan 2025 19:55:34 +0800
-X-QQ-mid: xmsmtpt1736510134tfb195ql6
-Message-ID: <tencent_6CF6E720909156A227D23AE8CFE4F9BA5D05@qq.com>
-X-QQ-XMAILINFO: MyirvGjpKb1jifP4Fsi15RpHUIitcR95FdyfWxhH2jqhuP2FXqt6AVIQLZSmHg
-	 I8stj84Ve2RyxVylHtnVfVIWK7rmAHEclkYIQ39AI8jfORQkRIysKYEkuqMdbY6jFF9XPZpKjKgR
-	 r5eu2ofsr7IR9emVwz8+eouymsDG9LmsYs8/I42qPfo5u2NEBNgIoG1/DTNUlqHwWqjwwijhqIj8
-	 6vo1q5ereMqAmbmvMd28TbVfcjO5NmFUCd6JFEIdCp6RmREebBBAcAkkBMwS0uhbYuAAijDUNfiT
-	 0neMQb+u/MtzRmF3TnugOeYU7/fKFjvTGF2JsmAAwcxpUWZig9jbOkslmw4ThwCOGfWUzMDIsbhk
-	 t1NFkg5MT5o9o0FwlKnoQa5uGfV8Do2E/ePIocO2aYuuuZbudOxNGd5b2m2SRlBSGDqt71lLpovJ
-	 91dJMCFa5M0sDe3mKimT7BMMAb9ngb3jtJObR3vntFXCIT+U9YZ9vWFxEPoN5ZgRhWgS3OCge+GT
-	 Q7dWeTOoz9RBcnE5PMFUoIVnQ2VxoLTQEjoz7nV6p9vixmsAhnO29lxrSRhAOGwJ0YwvXOwzdOce
-	 NM/+aDqxD8cwcQ4iS9guG3uPrgt1+8Fys49e6KluonC1hRkCY5Q8gfpTQ/u6b3ZM10XcXKaZMbka
-	 ZPek+MBJly9J07OU5JdLdBQvXaYSGLDSwA4rbv9SOHciUfPky/0wsKakEA3r+XJvw2j2BYS4c0bs
-	 pKRyFoTMj2HGPyTaxCb24p3EvTRPR59UGgnqtZX4AyNDRgdyWmzW+rrXGwPb8po+qFRf5WZLG5fn
-	 2XIVVOacQMf44w4DGww6Gl9/rsbm0fcxoQjbrZs88cAQ6weOYgLCd33SCAZB5c7ABqr29thPviwP
-	 FLAQjaJ4rZFpxUukwMEikC9o/pgCqQbRWIRvocFxgJnB7wypUTS1NFJ660vDsDvlD8oR7OK+gnxg
-	 Tih8qKIhW0xm04we5+Ibd5FFi27cs3
-X-QQ-XMRINFO: NyFYKkN4Ny6FSmKK/uo/jdU=
-Sender: yeking@red54.com
-From: Yeking@Red54.com
-To: kuba@kernel.org
-Cc: =?UTF-8?q?=E8=B0=A2=E8=87=B4=E9=82=A6=20=28XIE=20Zhibang=29?= <Yeking@Red54.com>,
-	Wells Lu <wellslutw@gmail.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Jason Gunthorpe <jgg@ziepe.ca>,
-	Arnd Bergmann <arnd@arndb.de>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net v3] net: ethernet: sunplus: Switch to ndo_eth_ioctl
-Date: Fri, 10 Jan 2025 11:53:33 +0000
-X-OQ-MSGID: <20250110115332.79191-2-Yeking@Red54.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250109180212.71e4e53c@kernel.org>
-References: <20250109180212.71e4e53c@kernel.org>
+	s=arc-20240116; t=1736510154; c=relaxed/simple;
+	bh=Fsfxz2Yqi9F5DV6PEsxBP8dlNuNGhbGhsOkKNA8EEb4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TJHupuvkOlpay7rfItYHjs6DVTvykW3un6yPDBLrCqPKURQLZ9BJdYyjOsxU1kw5flJ4myi0S4FJvgbeGk2+dd6soXOiWPYjEsc10R9CwRXfB5a72GdrpHxGsBbPKVtB6XrF+jq2Xpwh79vvM9iexR1+nnmA8dl+MROIkPxo8e8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=R6EKDKf5; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 83ACCC4CED6;
+	Fri, 10 Jan 2025 11:55:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1736510153;
+	bh=Fsfxz2Yqi9F5DV6PEsxBP8dlNuNGhbGhsOkKNA8EEb4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=R6EKDKf5/bJffVT0v2JPBVVBPjpF8/VDbkvWMu39fxOdLEWKgjDirUPqpe5c6Bepb
+	 LdnxgStqEtxN3zgATBQX6ss5QF7GSSr8OgbbP5SB3VyZQ8riD1+6BjDyvNo91bhMDI
+	 /7T9JyaXXllefxVicPxFfoqPewpx5Bb+kcT6L6Kt2PIRyfUhEvQm2Wkj4+u9Mbm2wp
+	 zWQkCr7T8Qx5TZ7eZ7rdL4+W17T8qfkEQwV1+70neNPdZ9F8ekZf1esO8lZVeZx59T
+	 rE012vXJGapv89/MmgSSnJCkl+Dx5kGLXyWvjTvXDyWn+K/SCYBRrxZ7ancYXhPwwq
+	 yM8yj5v7U5G6A==
+Date: Fri, 10 Jan 2025 11:55:48 +0000
+From: Simon Horman <horms@kernel.org>
+To: Ahmed Zaki <ahmed.zaki@intel.com>
+Cc: netdev@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
+	andrew+netdev@lunn.ch, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, davem@davemloft.net, michael.chan@broadcom.com,
+	tariqt@nvidia.com, anthony.l.nguyen@intel.com,
+	przemyslaw.kitszel@intel.com, jdamato@fastly.com, shayd@nvidia.com,
+	akpm@linux-foundation.org, shayagr@amazon.com,
+	kalesh-anakkur.purayil@broadcom.com
+Subject: Re: [PATCH net-next v4 2/6] net: napi: add internal ARFS rmap
+ management
+Message-ID: <20250110115548.GB7706@kernel.org>
+References: <20250109233107.17519-1-ahmed.zaki@intel.com>
+ <20250109233107.17519-3-ahmed.zaki@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250109233107.17519-3-ahmed.zaki@intel.com>
 
-From: 谢致邦 (XIE Zhibang) <Yeking@Red54.com>
+On Thu, Jan 09, 2025 at 04:31:03PM -0700, Ahmed Zaki wrote:
+> For drivers using the netif_enable_cpu_rmap(), move the IRQ rmap notifier
+> inside the napi_struct.
+> 
+> Signed-off-by: Ahmed Zaki <ahmed.zaki@intel.com>
 
-The device ioctl handler no longer calls ndo_do_ioctl, but calls
-ndo_eth_ioctl to handle mii ioctls. However, sunplus still used
-ndo_do_ioctl when it was introduced. So switch to ndo_eth_ioctl. (found
-by code inspection)
+...
 
-Fixes: fd3040b9394c ("net: ethernet: Add driver for Sunplus SP7021", 2022-05-08)
-Fixes: a76053707dbf ("dev_ioctl: split out ndo_eth_ioctl", 2021-07-27)
-Signed-off-by: 谢致邦 (XIE Zhibang) <Yeking@Red54.com>
----
-V2 -> V3: Update commit message again, and add short author date to the
-Fixes tag to make it clear at a glance and reduce misunderstandings.
-V1 -> V2: Update commit message
+> diff --git a/net/core/dev.c b/net/core/dev.c
 
-To Jakub Kicinski:
-The old Fixes tag style is at least 10 years old. It lacks date
-information, which can lead to misjudgment. So I added short author date
-to avoid this. However, if you disagree, I can change it back to the old
-Fixes tag style.
+...
 
- drivers/net/ethernet/sunplus/spl2sw_driver.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> +static int napi_irq_cpu_rmap_add(struct napi_struct *napi, int irq)
+> +{
+> +	struct cpu_rmap *rmap = napi->dev->rx_cpu_rmap;
+> +	int rc;
+> +
+> +	if (!napi || !rmap)
+> +		return -EINVAL;
 
-diff --git a/drivers/net/ethernet/sunplus/spl2sw_driver.c b/drivers/net/ethernet/sunplus/spl2sw_driver.c
-index 721d8ed3f302..5e0e4c9ecbb0 100644
---- a/drivers/net/ethernet/sunplus/spl2sw_driver.c
-+++ b/drivers/net/ethernet/sunplus/spl2sw_driver.c
-@@ -199,7 +199,7 @@ static const struct net_device_ops netdev_ops = {
- 	.ndo_start_xmit = spl2sw_ethernet_start_xmit,
- 	.ndo_set_rx_mode = spl2sw_ethernet_set_rx_mode,
- 	.ndo_set_mac_address = spl2sw_ethernet_set_mac_address,
--	.ndo_do_ioctl = phy_do_ioctl,
-+	.ndo_eth_ioctl = phy_do_ioctl,
- 	.ndo_tx_timeout = spl2sw_ethernet_tx_timeout,
- };
- 
+Hi Ahmed,
+
+Here it is assumed that napi may be NULL.  But it is dereferenced
+unconditionally on the first like of this function.
+
+Flagged by Smatch.
+
+> +	napi->notify.notify = netif_irq_cpu_rmap_notify;
+> +	napi->notify.release = netif_napi_affinity_release;
+> +	cpu_rmap_get(rmap);
+> +	rc = cpu_rmap_add(rmap, napi);
+> +	if (rc < 0)
+> +		goto err_add;
+> +
+> +	napi->napi_rmap_idx = rc;
+> +	rc = irq_set_affinity_notifier(irq, &napi->notify);
+> +	if (rc)
+> +		goto err_set;
+> +
+> +	return 0;
+> +
+> +err_set:
+> +	rmap->obj[napi->napi_rmap_idx] = NULL;
+> +err_add:
+> +	cpu_rmap_put(rmap);
+> +	return rc;
+> +}
+>  #endif
+>  
+>  void netif_napi_set_irq(struct napi_struct *napi, int irq)
+
+...
+
 -- 
-2.43.0
-
+pw-bot: changes-requested
 
