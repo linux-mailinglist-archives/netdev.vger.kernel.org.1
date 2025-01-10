@@ -1,220 +1,115 @@
-Return-Path: <netdev+bounces-156963-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156962-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 54396A086BA
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 06:44:06 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F6FEA086B5
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 06:42:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 45EBF1692C6
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 05:44:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DC17B188C98F
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 05:42:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9068F2066C6;
-	Fri, 10 Jan 2025 05:44:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 970952063F0;
+	Fri, 10 Jan 2025 05:41:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="mLRbtEG+"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="UdkosnMX"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-124.freemail.mail.aliyun.com (out30-124.freemail.mail.aliyun.com [115.124.30.124])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84FBC746E;
-	Fri, 10 Jan 2025 05:43:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5F6D205E36;
+	Fri, 10 Jan 2025 05:41:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736487840; cv=none; b=bmnUlTABkcX6opTIzJYeyulBAV0CDow+S5Zb1gOwSmT6T74K0C55CT0lBkvgAG7En6x8gc4x93FeIcNqJKBly5jagqIzbexOlCZNY8f8NKfHRjuXTUBaaxk/DtWybtENZcjJMaQGW2di+H9ow6OvbvVoI5vFPxQzFoPBmXIM318=
+	t=1736487690; cv=none; b=E8ukaaQuc3wp9SE3PQEA3FsIo5TA1xcqyf6jFzkqfDiiTRw4Mignjy7ZdkAAi0R0mT1PYFjBIeNWMPXwqyvsN94Ruvnawb+Sf1rq2Fei1yTpc2bF0DUlW3N7K6pNudFZhaxRiaWEOp5BZ+XIVGa+eoTr7UH+jF/ReFKwFHL17yU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736487840; c=relaxed/simple;
-	bh=9G/L1ZomCQwviZeWuRSudJqgRPVeuQmTot+azaFSyS8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mvIaAWo/qtsUptZ5F9op1ckfv7+0ZVDdSWEiJLwUTc5uGIuyZQovemy4ikt6EqWHN0ToWe6+DrLuyBrgg7gz8KAcxLdI2V2yPY+BmWqICOIHhIAlXXCjA2lP2ghlGdBhO/AKlkRYWSSXoa0kfu9ZFoMDyMoNhJ4kecUdOgNZZ3A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=mLRbtEG+; arc=none smtp.client-ip=115.124.30.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1736487827; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=xAyuwYq8sl8JF7mbt/6XCIrVbtDcyq2uevTq8dLVNrk=;
-	b=mLRbtEG+7GUMB5zKf6BaeRQCOP42HFvlOEnuOh4oW8nvF4qy52a74gP+z3CuRtwEqOO922pXF7xep5X8Kb5ZglJPDyvnGkthXSfEuoh68hkZQoTvy3bTwk/9hqUfVhR0xG4QkEdgbufUU7ZWq5atH7qjuGtS8Kpche+ffEcN7v4=
-Received: from 30.221.98.188(mailfrom:guangguan.wang@linux.alibaba.com fp:SMTPD_---0WNJnBTV_1736487825 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Fri, 10 Jan 2025 13:43:46 +0800
-Message-ID: <b1053a92-3a3f-4042-9be9-60b94b97747d@linux.alibaba.com>
-Date: Fri, 10 Jan 2025 13:43:44 +0800
+	s=arc-20240116; t=1736487690; c=relaxed/simple;
+	bh=1Y7sefoQ0YoJuF1C26LElU/gmvm1zRtYCQDDma8W3tY=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=B1oW0lRIq/EFGpKFXp5uGQrnmCpte/r+2pvW3+vtjNZzXSYTn2z7ykPSNJCIPgmM3SDOpQtOiGcBo2K2okKPpeo1aHF9cJoQq2SVvhG18XSATS8WRj71nPXMWy8EHYLkClrzlT0STOur68l6rCwxp8kkBSNCQeAP6fSfSKR8dEc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=UdkosnMX; arc=none smtp.client-ip=68.232.153.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1736487689; x=1768023689;
+  h=from:to:subject:date:message-id:mime-version;
+  bh=1Y7sefoQ0YoJuF1C26LElU/gmvm1zRtYCQDDma8W3tY=;
+  b=UdkosnMXw1WE9+lbkwFmi6cgT0licDP0cDuBKaLhHCfOkPhnofySal3m
+   mXlwfMbNu5I4R9x/Jy4i6yAnzdGOGhJTFjPrch1z07OfE1sT05LKJFCtS
+   TN5XULWHmJjgzJJOQNAwA+bZmEeaxMfQvJB4Tpi3GSKjwWMWNciPlgsqf
+   t3BNy6+dtNB05s27XM8AcS0HgikwkeFuxJoHsNSt8HDasrmUrD+9MRiaR
+   xTSAQ+sGiVHubrtL+b+4oSF8uQjWZLQmvG2el+RfwbZPBpKeakzQVMr8W
+   kSnjKx9gL9JdNB/UKq0bN+muK8tX/6TEq9gXkrNake1rSE7P2i7Yw/HH3
+   g==;
+X-CSE-ConnectionGUID: YaO9AIrEQPOehTjwwOqDvA==
+X-CSE-MsgGUID: NyK4883oTW+tK/aaE4Na+g==
+X-IronPort-AV: E=Sophos;i="6.12,303,1728975600"; 
+   d="scan'208";a="36379889"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa3.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 09 Jan 2025 22:41:28 -0700
+Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
+ chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Thu, 9 Jan 2025 22:40:57 -0700
+Received: from training-HP-280-G1-MT-PC.microchip.com (10.10.85.11) by
+ chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server id
+ 15.1.2507.35 via Frontend Transport; Thu, 9 Jan 2025 22:40:53 -0700
+From: Divya Koppera <divya.koppera@microchip.com>
+To: <andrew@lunn.ch>, <arun.ramadoss@microchip.com>,
+	<UNGLinuxDriver@microchip.com>, <hkallweit1@gmail.com>,
+	<linux@armlinux.org.uk>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <richardcochran@gmail.com>,
+	<vadim.fedorenko@linux.dev>
+Subject: [PATCH net-next v2] net: phy: microchip_t1: depend on PTP_1588_CLOCK_OPTIONAL
+Date: Fri, 10 Jan 2025 11:14:24 +0530
+Message-ID: <20250110054424.16807-1-divya.koppera@microchip.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net/smc: use the correct ndev to find pnetid by
- pnetid table
-To: Halil Pasic <pasic@linux.ibm.com>
-Cc: Paolo Abeni <pabeni@redhat.com>, wenjia@linux.ibm.com,
- jaka@linux.ibm.com, alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
- guwen@linux.alibaba.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, horms@kernel.org, linux-rdma@vger.kernel.org,
- linux-s390@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, Alexandra Winter <wintera@linux.ibm.com>
-References: <20241227040455.91854-1-guangguan.wang@linux.alibaba.com>
- <1f4a721f-fa23-4f1d-97a9-1b27bdcd1e21@redhat.com>
- <20250107203218.5787acb4.pasic@linux.ibm.com>
- <908be351-b4f8-4c25-9171-4f033e11ffc4@linux.alibaba.com>
- <20250109040429.350fdd60.pasic@linux.ibm.com>
-Content-Language: en-US
-From: Guangguan Wang <guangguan.wang@linux.alibaba.com>
-In-Reply-To: <20250109040429.350fdd60.pasic@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
+When microchip_t1_phy is built in and phyptp is module
+facing undefined reference issue. This get fixed when
+microchip_t1_phy made dependent on PTP_1588_CLOCK_OPTIONAL.
 
+Reported-by: kernel test robot <lkp@intel.com>
+Closes:
+https://lore.kernel.org/oe-kbuild-all/202501090604.YEoJXCXi-lkp@intel.com
+Fixes: fa51199c5f34 ("net: phy: microchip_rds_ptp : Add rds ptp library for Microchip phys")
+Signed-off-by: Divya Koppera <divya.koppera@microchip.com>
+Reviewed-by: Simon Horman <horms@kernel.org>
+Tested-by: Simon Horman <horms@kernel.org> # build-tested
+---
+v1 -> v2
+- Modifed prefix for the patch and subject.
+- Changed target to net-next from net.
+---
+ drivers/net/phy/Kconfig | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-On 2025/1/9 11:04, Halil Pasic wrote:
-> On Wed, 8 Jan 2025 12:57:00 +0800
-> Guangguan Wang <guangguan.wang@linux.alibaba.com> wrote:
-> 
->>> sorry for chiming in late. Wenjia is on vacation and Jan is out sick!
->>> After some reading and thinking I could not figure out how 890a2cb4a966
->>> ("net/smc: rework pnet table") is broken.  
->>
->> Before commit 890a2cb4a966:
->> smc_pnet_find_roce_resource
->>     smc_pnet_find_roce_by_pnetid(ndev, ...) /* lookup via hardware-defined pnetid */
->>         smc_pnetid_by_dev_port(base_ndev, ...)
->>     smc_pnet_find_roce_by_table(ndev, ...) /* lookup via SMC PNET table */
->>     {
->>         ...
->>         list_for_each_entry(pnetelem, &smc_pnettable.pnetlist, list) {
->>                 if (ndev == pnetelem->ndev) { /* notice here, it was ndev to matching pnetid element in pnet table */
->>         ...
->>     }
->>
->> After commit 890a2cb4a966:
->> smc_pnet_find_roce_resource
->>     smc_pnet_find_roce_by_pnetid
->>     {
->>         ...
->>         base_ndev = pnet_find_base_ndev(ndev); /* rename the variable name to base_ndev for better understanding */
->>         smc_pnetid_by_dev_port(base_ndev, ...)
->>         smc_pnet_find_ndev_pnetid_by_table(base_ndev, ...)
->>         {
->>                 ...
->>                 list_for_each_entry(pnetelem, &smc_pnettable.pnetlist, list) {
->>                 if (base_ndev == pnetelem->ndev) { /* notice here, it is base_ndev to matching pnetid element in pnet table */
->>                 ...
->>         }
->>
->>     }
->>
->> The commit 890a2cb4a966 has changed ndev to base_ndev when matching pnetid element in pnet table.
->> But in the function smc_pnet_add_eth, the pnetid is attached to the ndev itself, not the base_ndev.
->> smc_pnet_add_eth(...)
->> {
->>     ...
->>     ndev = dev_get_by_name(net, eth_name);
->>     ...
->>         if (new_netdev) {
->>             if (ndev) {
->>                 new_pe->ndev = ndev;
->>                 netdev_tracker_alloc(ndev, &new_pe->dev_tracker,
->>                     GFP_ATOMIC);
->>             }
->>             list_add_tail(&new_pe->list, &pnettable->pnetlist);
->>             mutex_unlock(&pnettable->lock);
->>         } else {
->>     ...
->> }
-> 
-> I still not understand why do you think that 890a2cb4a966~1 is better
-> than 890a2cb4a966 even if things changed with 890a2cb4a966 which
-> I did not verify for myself but am willing to assume.
-> 
-> Is there some particular setup that you think would benefit from
-> you patch? I.e. going back to the 890a2cb4a966~1 behavior I suppose.
-> 
+diff --git a/drivers/net/phy/Kconfig b/drivers/net/phy/Kconfig
+index dc625f2b3ae4..9ad3dbfd2f99 100644
+--- a/drivers/net/phy/Kconfig
++++ b/drivers/net/phy/Kconfig
+@@ -287,8 +287,8 @@ config MICROCHIP_PHY
+ 
+ config MICROCHIP_T1_PHY
+ 	tristate "Microchip T1 PHYs"
+-	select MICROCHIP_PHY_RDS_PTP if NETWORK_PHY_TIMESTAMPING && \
+-				  PTP_1588_CLOCK_OPTIONAL
++	select MICROCHIP_PHY_RDS_PTP if NETWORK_PHY_TIMESTAMPING
++	depends on PTP_1588_CLOCK_OPTIONAL
+ 	help
+ 	  Supports the LAN8XXX PHYs.
+ 
+-- 
+2.17.1
 
-We want to use SMC in container on cloud environment, and encounter problem
-when using smc_pnet with commit 890a2cb4a966. In container, there have choices
-of different container network, such as directly using host network, virtual
-network IPVLAN, veth, etc. Different choices of container network have different
-netdev hierarchy. Examples of netdev hierarchy show below. (eth0 and eth1 in host
-below is the netdev directly related to the physical device).
- _______________________________      ________________________________   
-|   _________________           |     |   _________________           |  
-|  |POD              |          |     |  |POD  __________  |          |  
-|  |                 |          |     |  |    |upper_ndev| |          |  
-|  | eth0_________   |          |     |  |eth0|__________| |          |  
-|  |____|         |__|          |     |  |_______|_________|          |  
-|       |         |             |     |          |lower netdev        |  
-|       |         |             |     |        __|______              |  
-|   eth1|base_ndev| eth0_______ |     |   eth1|         | eth0_______ |  
-|       |         |    | RDMA  ||     |       |base_ndev|    | RDMA  ||  
-| host  |_________|    |_______||     | host  |_________|    |_______||  
-———————————————————————————————-      ———————————————————————————————-    
- netdev hierarchy if directly          netdev hierarchy if using IPVLAN    
-   using host network
- _______________________________
-|   _____________________       |
-|  |POD        _________ |      |
-|  |          |base_ndev||      |
-|  |eth0(veth)|_________||      |
-|  |____________|________|      |
-|               |pairs          |
-|        _______|_              |
-|       |         | eth0_______ |
-|   veth|base_ndev|    | RDMA  ||
-|       |_________|    |_______||
-|        _________              |
-|   eth1|base_ndev|             |
-| host  |_________|             |
- ———————————————————————————————
-  netdev hierarchy if using veth
-
-Due to some reasons, the eth1 in host is not RDMA attached netdevice, pnetid
-is needed to map the eth1(in host) with RDMA device so that POD can do SMC-R.
-Because the eth1(in host) is managed by CNI plugin(such as Terway, network
-management plugin in container environment), and in cloud environment the
-eth(in host) can dynamically be inserted by CNI when POD create and dynamically
-be removed by CNI when POD destroy and no POD related to the eth(in host)
-anymore. It is hard for us to config the pnetid to the eth1(in host). So we
-config the pnetid to the netdevice which can be seen in POD. When do SMC-R, both
-the container directly using host network and the container using veth network
-can successfully match the RDMA device, because the configured pnetid netdev is a
-base_ndev. But the container using IPVLAN can not successfully match the RDMA
-device and 0x03030000 fallback happens, because the configured pnetid netdev is
-not a base_ndev. Additionally, if config pnetid to the eth1(in host) also can not
-work for matching RDMA device when using veth network and doing SMC-R in POD.
-
-My patch can resolve the problem we encountered and also can unify the pnetid setup
-of different network choices list above, assuming the pnetid is not limited to
-config to the base_ndev directly related to the physical device(indeed, the current
-implementation has not limited it yet).
-
-> I think I showed a valid and practical setup that would break with your
-> patch as is. Do you agree with that statement?
-Did you mean
-"
-Now for something like a bond of two OSA
-interfaces, I would expect the two legs of the bond to probably have a
-"HW PNETID", but the netdev representing the bond itself won't have one
-unless the Linux admin defines a software PNETID, which is work, and
-can't have a HW PNETID because it is a software construct within Linux.
-Breaking for example an active-backup bond setup where the legs have
-HW PNETIDs and the admin did not bother to specify a PNETID for the bond
-is not acceptable.
-" ?
-If the legs have HW pnetids, add pnetid to bond netdev will fail as
-smc_pnet_add_eth will check whether the base_ndev already have HW pnetid.
-
-If the legs without HW pnetids, and admin add pnetids to legs through smc_pnet.
-Yes, my patch will break the setup. What Paolo suggests(both checking ndev and
-base_ndev, and replace || by && )can help compatible with the setup.
-
-
-Thanks,
-Guangguan Wang
-> 
-> Regards,
-> Halil
 
