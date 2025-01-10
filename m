@@ -1,159 +1,100 @@
-Return-Path: <netdev+bounces-157233-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157234-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52009A09900
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 19:01:04 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C673A09909
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 19:02:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6C1BF3AACD9
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 18:00:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E16903AB001
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 18:01:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6857205AA2;
-	Fri, 10 Jan 2025 18:01:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21AF4212B01;
+	Fri, 10 Jan 2025 18:01:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bzCgb0jq"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="QI2xnspt"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f179.google.com (mail-yb1-f179.google.com [209.85.219.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-6001.amazon.com (smtp-fw-6001.amazon.com [52.95.48.154])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5583F224D7;
-	Fri, 10 Jan 2025 18:00:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E391224D7
+	for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 18:01:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.48.154
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736532060; cv=none; b=l0wi7EKhL4KuhXGjVZwslhSOB6b0hEwxXdScAtFZ4RXIonfperEMOiY2igKf6IcvtZre99qGy1csDl9rZ2TPWonF6Ha9hzqKQ8NkBmYjv/Dia9hybOxof7Lvb2RuRmh4RdOlgp5hXsMuw55Zm/uM7L6Z59TU2xapMBY3HTmNUMY=
+	t=1736532114; cv=none; b=BJah0QbTRlIJB4DdQMD6xUI87ZWFYOhbSwDBybNY+YadJnSAoYASupvpHv4nc2jHvGA7J9lBwZsiZE1GOt12Z2ngvJnNK9eOfFUCteSF2O2nYSIiSzQZvUvqaP5lPl/t3mJECwlKv531++ldKdAnHnUfy9wkk2EGazLgytuWZXs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736532060; c=relaxed/simple;
-	bh=jWmGZq/yTVUzsPsRDgWRFPHu7pbFN+46aq8jeS7vP/s=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=VDu8WsYZzu/RQBNKC64h7hrNPxfyTV5bBG/gGd6dzy1YGiMt05IY02qtXyg77TgvxjuZZ2g7N5DLKf8BIxzW8u1QC0TjZv28JnBjDfHSfHl/FrCGdFOFNAKwmExmnioL4vGbecsO9he8OdXos4v3jAnLIb1bhYUR2D8RFS/jXCI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bzCgb0jq; arc=none smtp.client-ip=209.85.219.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f179.google.com with SMTP id 3f1490d57ef6-e53ef7462b6so3997282276.3;
-        Fri, 10 Jan 2025 10:00:59 -0800 (PST)
+	s=arc-20240116; t=1736532114; c=relaxed/simple;
+	bh=Z4UXGe7ECPYl7yU1O12FNqqmp6VrFqvyHX9jrf1R388=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=R1k/o1/+HZrT9Llk2fiDNULzG18hYYbMV9+DvK2IKQjn8oJxMMRY5X61DYBCHIuW+CCv6aR6WSxVUmhGpEjgSIV8IXlJ/yY6WQJl3auBNWlHbVBoOTK3ereFTpwwNNeEkPFEiKvXl6ubx8eC1J49wQQiH/mUvMN7leoxq6g7b2o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=QI2xnspt; arc=none smtp.client-ip=52.95.48.154
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736532058; x=1737136858; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0FxFVtu1V78zPcPPY+mV2lhvGlXOTUqXWxxIhWG8ybw=;
-        b=bzCgb0jqLBp8YjsfSttZuFHnCOp4AttvOVWCCwt5QUcUwfzvYaiaEzgVXtlUZBhPSU
-         PsU6Uqa465ftkiw5FGxb0w/1Yvw33eOWE869nUUn6TnKTIPwlpAv9udgQ0b3HwJWSplB
-         Vx1Im4w56Kc9D5Uc6DvEFR58+T0XMqZXgorjz6ywFH7OglPmo+EO8cph7KexphZaS1EV
-         lEf6Zw4CYQHECvz/Od5fetgihrVb8tWmBriMeo/+EEyO1J7ahZW74I6RbvLSDwysnjAf
-         MzjFNfS7CTlMy0We6lsiwxzAP1FSMRDsgeTS1JPnpwgjkwFuVBFrILlqmL5hOm0fDT12
-         OjvQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736532058; x=1737136858;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=0FxFVtu1V78zPcPPY+mV2lhvGlXOTUqXWxxIhWG8ybw=;
-        b=JAtOUA6UOcdW1IJsb354TyaKPfQSFLJHjoWiv0de5BHcYLgVwW1HB53msECtXVT5/x
-         PM/ZnIjToAI68F+7p4iRzxl8Zt9BmS5ylgCQO4O95jClOSYdSZZo0tUD3s18Hv8Nz5MQ
-         fd7Qbi97rgwb4lIIQDqJvjkZnUnMcrBghLYGes6UUL8UH1wmq6Pl9hghPop1xMQDvRRZ
-         mVwBWJClyAwdB/LQbzQai/UTVsC7er37xlnIdw4tyDw3GBDXbCFMi678Ifms0hDVJ3a/
-         FpIgFGmkt18UPZ0MHaWibhvbkseowrRaPXFd9oQM+HUyAy+VWcsc7zY9JHFtBLnkQ5S9
-         RpGQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUDf+7twfpk/mWhbSO9cSFNocVxsB8XQ3Pa1klZddgFJo2FfR752C6AtfBvUVkHeHRGmcGofLg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzyv8UlmkWYs+MSPgPB1GyM/w91J2JTKuwhefCUiUNtvRfDulOv
-	8GZGgmRkPjKqzHk2QEOWyxIITzjK+VhJHHWJRe9eiOXyYtonlaXiUS0qmPYEQjnxW913BRROuz6
-	LkD+S7n43ax4oUV38IRNJ0Y3i+Wg=
-X-Gm-Gg: ASbGnctzotTkk146SROABiLaOPO0+6P9wvJYPHSPWFF8CwZpRFbGx/ak6c/DJdrkuiI
-	YuvqjySAHuwUTxrNCZlkw0idzjSMNYdChU5jSleZvaymsxLboQJSSNg==
-X-Google-Smtp-Source: AGHT+IF2F3C7l16WMw2Alhg43G6MD0kwjDA1rS4sTTLV0C5mBTbCV2vngMFC8GkuYYhTOCl3FV/MAq022dDkqTSSLcQ=
-X-Received: by 2002:a05:690c:7409:b0:6ef:e39f:bbd with SMTP id
- 00721157ae682-6f5312d6be0mr99896447b3.33.1736532058186; Fri, 10 Jan 2025
- 10:00:58 -0800 (PST)
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1736532112; x=1768068112;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=bEmR5UEtps4cqJyrRFZgztJvI9Kn60gwrU+xAkifl8k=;
+  b=QI2xnsptXjS+sae0CHI3TC1CBq+aSkBwMIJaVwiBu6uC5cwFqLKW4eGu
+   Vbh9Egpgn4Tp2nbb1zO+I34jGdwamwoLAQxfG4TmEuDxb8zUOVDDcEaFQ
+   YE3Yeofw8jrxl5k21bTSIrT9Isi7kYa2ZmCJ0wHHex07m72eIW1m7ZKoA
+   E=;
+X-IronPort-AV: E=Sophos;i="6.12,303,1728950400"; 
+   d="scan'208";a="453323051"
+Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.2])
+  by smtp-border-fw-6001.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jan 2025 18:01:49 +0000
+Received: from EX19MTAUWC001.ant.amazon.com [10.0.38.20:64665]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.45.174:2525] with esmtp (Farcaster)
+ id d471b738-b639-4e45-ba98-49cdbd8e199e; Fri, 10 Jan 2025 18:01:48 +0000 (UTC)
+X-Farcaster-Flow-ID: d471b738-b639-4e45-ba98-49cdbd8e199e
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
+ Fri, 10 Jan 2025 18:01:47 +0000
+Received: from 6c7e67c6786f.amazon.com (10.118.252.101) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
+ Fri, 10 Jan 2025 18:01:44 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <edumazet@google.com>
+CC: <davem@davemloft.net>, <eric.dumazet@gmail.com>, <horms@kernel.org>,
+	<kuba@kernel.org>, <kuniyu@amazon.com>, <ncardwell@google.com>,
+	<netdev@vger.kernel.org>, <pabeni@redhat.com>
+Subject: Re: [PATCH net-next 1/2] tcp: add drop_reason support to tcp_disordered_ack()
+Date: Sat, 11 Jan 2025 03:01:34 +0900
+Message-ID: <20250110180134.57158-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+In-Reply-To: <20250110143315.571872-2-edumazet@google.com>
+References: <20250110143315.571872-2-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241220195619.2022866-1-amery.hung@gmail.com>
- <20241220195619.2022866-7-amery.hung@gmail.com> <5e1c5729-9bc0-4cb7-969a-a334fb544595@linux.dev>
-In-Reply-To: <5e1c5729-9bc0-4cb7-969a-a334fb544595@linux.dev>
-From: Amery Hung <ameryhung@gmail.com>
-Date: Fri, 10 Jan 2025 10:00:47 -0800
-X-Gm-Features: AbW1kvbn4166dhIjtUPc7tFdMAai_iZXXiRwJLjZo6A4gJt3TCQ19Ymxoty_Hf4
-Message-ID: <CAMB2axM1qA-+4PYyYJ3AmoKHoKAWwu-8sh1UYdZBsPGURbmh4Q@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v2 06/14] bpf: net_sched: Add basic bpf qdisc kfuncs
-To: Martin KaFai Lau <martin.lau@linux.dev>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, daniel@iogearbox.net, 
-	andrii@kernel.org, alexei.starovoitov@gmail.com, martin.lau@kernel.org, 
-	sinquersw@gmail.com, toke@redhat.com, jhs@mojatatu.com, jiri@resnulli.us, 
-	stfomichev@gmail.com, ekarani.silvestre@ccc.ufcg.edu.br, 
-	yangpeihao@sjtu.edu.cn, xiyou.wangcong@gmail.com, yepeilin.cs@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D036UWC001.ant.amazon.com (10.13.139.233) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On Thu, Jan 9, 2025 at 4:24=E2=80=AFPM Martin KaFai Lau <martin.lau@linux.d=
-ev> wrote:
->
-> On 12/20/24 11:55 AM, Amery Hung wrote:
-> > +BTF_KFUNCS_START(qdisc_kfunc_ids)
-> > +BTF_ID_FLAGS(func, bpf_skb_get_hash, KF_TRUSTED_ARGS)
-> > +BTF_ID_FLAGS(func, bpf_kfree_skb, KF_RELEASE)
-> > +BTF_ID_FLAGS(func, bpf_qdisc_skb_drop, KF_RELEASE)
-> > +BTF_ID_FLAGS(func, bpf_dynptr_from_skb, KF_TRUSTED_ARGS)
-> > +BTF_KFUNCS_END(qdisc_kfunc_ids)
-> > +
-> > +BTF_SET_START(qdisc_common_kfunc_set)
-> > +BTF_ID(func, bpf_skb_get_hash)
-> > +BTF_ID(func, bpf_kfree_skb)
->
-> I think bpf_dynptr_from_skb should also be here.
+From: Eric Dumazet <edumazet@google.com>
+Date: Fri, 10 Jan 2025 14:33:14 +0000
+> Following patch is adding a new drop_reason to tcp_validate_incoming().
+> 
+> Change tcp_disordered_ack() to not return a boolean anymore,
+> but a drop reason.
+> 
+> Change its name to tcp_disordered_ack_check()
+> 
+> Refactor tcp_validate_incoming() to ease the code
+> review of the following patch, and reduce indentation
+> level.
+> 
+> This patch is a refactor, with no functional change.
+> 
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
 
-Good catch
-
->
-> > +BTF_SET_END(qdisc_common_kfunc_set)
-> > +
-> > +BTF_SET_START(qdisc_enqueue_kfunc_set)
-> > +BTF_ID(func, bpf_qdisc_skb_drop)
-> > +BTF_SET_END(qdisc_enqueue_kfunc_set)
-> > +
-> > +static int bpf_qdisc_kfunc_filter(const struct bpf_prog *prog, u32 kfu=
-nc_id)
-> > +{
-> > +     if (bpf_Qdisc_ops.type !=3D btf_type_by_id(prog->aux->attach_btf,
-> > +                                              prog->aux->attach_btf_id=
-))
-> > +             return 0;
-> > +
-> > +     /* Skip the check when prog->attach_func_name is not yet availabl=
-e
-> > +      * during check_cfg().
->
-> Instead of using attach_func_name, it is better to directly use the
-> prog->expected_attach_type provided by the user space. It is essentially =
-the
-> member index of the "struct Qdisc_ops". Take a look at the prog_ops_moff(=
-) in
-> bpf_tcp_ca.c.
-
-I will replace all places that use attach_func_name to refer to the
-ops to prog_ops_moff.
-
-Thank,
-Amery
-
->
-> > +      */
-> > +     if (!btf_id_set8_contains(&qdisc_kfunc_ids, kfunc_id) ||
-> > +         !prog->aux->attach_func_name)
-> > +             return 0;
-> > +
-> > +     if (!strcmp(prog->aux->attach_func_name, "enqueue")) {
-> > +             if (btf_id_set_contains(&qdisc_enqueue_kfunc_set, kfunc_i=
-d))
-> > +                    return 0;
-> > +     }
-> > +
-> > +     return btf_id_set_contains(&qdisc_common_kfunc_set, kfunc_id) ? 0=
- : -EACCES;
-> > +}
+Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 
