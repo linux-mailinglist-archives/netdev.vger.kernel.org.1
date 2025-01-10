@@ -1,69 +1,69 @@
-Return-Path: <netdev+bounces-157179-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157180-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C769DA0938D
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 15:33:32 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96CBCA0938F
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 15:33:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7BF6B3A934D
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 14:33:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 03445188BEDF
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 14:33:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A9E1211290;
-	Fri, 10 Jan 2025 14:33:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B818B21129C;
+	Fri, 10 Jan 2025 14:33:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hqkbyCMx"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="G5nHQVAf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f202.google.com (mail-qt1-f202.google.com [209.85.160.202])
+Received: from mail-qk1-f202.google.com (mail-qk1-f202.google.com [209.85.222.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A23A7211276
-	for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 14:33:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F124B211298
+	for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 14:33:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736519601; cv=none; b=MvIdiEkERGBRd8VFqS1Crkk/PmhsjRSJzSP6l/iIk3q90zU0pdral0FMZRlHV9CHXYMGR5siL/0hILZn/2qR4P6Kh9uEHfT4wNDcMo6YTjx+mro+sX2Fe2q3zb3rajYogApha9FaYk+6OU3WKTHHbV6OC79IMHJrBSjXMGYu6sw=
+	t=1736519602; cv=none; b=IyVB5n3UdxKAQUqayY9NHWIpcF97I7k65JJH/T7rOYep8cVCC4FqH/u8n6dZ+Wp0N+sBAjL1WrJ+eBFaLoMa2d/MdBDtFmB2GNmFPxj/0Ao28tFBrINWWHA1ZbBoiCJvCoytgxSGQgXTyAJkbzEZcmSys9ZDPm6uhOb8daWJv08=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736519601; c=relaxed/simple;
-	bh=fAj3SIoN1NOZi2bg5USp+VhVX2DMj74elwRBJIxES6w=;
+	s=arc-20240116; t=1736519602; c=relaxed/simple;
+	bh=1S6qbsBKfTppE9eisub13pjTDPOYeVwUrXKQRjkJgG8=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=qNLkluylm1HcSd/Alvh0RXNlegr0rbRZ3ln1euPDf7RIJ1/R7A1ei6ZEdf94VyO/Te7swyC2HdcS4AyVQvAoll6m0d9aNFX6T36fnoYPjl1En0ryYcrav/h0IS1/ttTxONm4DV1bESyQ+ZjwIlpxjMIyTyV+YpC7fKrjpJqoNeI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hqkbyCMx; arc=none smtp.client-ip=209.85.160.202
+	 To:Cc:Content-Type; b=lZa9dxpRq363cv8uhP9N3qysk0kdCudHVfiwmkKzagWOzgDfjdPybQQrnTgYGGWO79/0hCnkF1xiUgHf3v60eGPjcUXFcYw3/Bsdm1GA/uyMvkHho447tskDLwf6EMPVglnMHZ0uZrvv2sLlk7gzsOTy291Pc/9mDE9s9utp4uY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=G5nHQVAf; arc=none smtp.client-ip=209.85.222.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qt1-f202.google.com with SMTP id d75a77b69052e-468f6f2f57aso26621791cf.0
-        for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 06:33:19 -0800 (PST)
+Received: by mail-qk1-f202.google.com with SMTP id af79cd13be357-7b6e1c50ef1so296348785a.2
+        for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 06:33:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1736519598; x=1737124398; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1736519600; x=1737124400; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=MShUowdvrdvE0bZpUlV/TBDtENDgPKABR7tVk3EqboY=;
-        b=hqkbyCMxvOUalkZzBoz3mEs0bZmxbwxAvL1+ZUHArv7gL4RuOVpCjpVIpPRlwqmNlo
-         PBYdzSY47rLal35ta2IKQMJt/vQGNESULNHT9bWvguhBow7VUf/d5iV8jDScQ39WhBOE
-         Aq4CQ/5FcQSf+rWar77fH2yqcg+ILZrabjTmah0EQKdF9I83nsI/vdzZB6EsavOP9Ulm
-         30qpdkI1iVHZPSX6GoI0m5Xqo03kMqYW03JJIGitO1JJEMOlmvAMlQ3PExoAuglntVe9
-         tiQ4clK86LV+ZnhABgF3eEFLYOk2nH2WjrM9eI3Y6g7FvqnPjaErmAtU7UgYVKFHbzqt
-         9BQQ==
+        bh=Vtslpac2oU1C1mFmOo7/eOYL6PrtZjI6ro6i9TjMAzo=;
+        b=G5nHQVAfHOXasVEvI2VxNUZ1MnqSZIvWn1+xzi3maeHIFROlw+DLkk64Hf5Xq+jEtU
+         Wb3o1ffatsCHN/Iy2xNTXcEnP/xXVvQ0OXLrCsiLIPM/2kTVI6O45Bb1S6jh6i/YX9mG
+         v0oplcMLbdHPgMGbR504rBKgJY+6F2fOFf/lb6LUr8KZ5CU8JZqiwSVfcGh1MiYlglE1
+         IAVtrSwMEdPCV8r0iLlBcH3LWqAsCYrserGLnFDIRzlkZ2qw01h6HpyaFY9HaS3Sy+Y1
+         wvj2qlEzLRobaLuUeNRPiGMBN5JqfbgOS14v4US6ZhxXwlRsCkDpdzm5KguPl/xYduRC
+         Sxzg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736519598; x=1737124398;
+        d=1e100.net; s=20230601; t=1736519600; x=1737124400;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=MShUowdvrdvE0bZpUlV/TBDtENDgPKABR7tVk3EqboY=;
-        b=a0GHD+892esIgJWMOwLU4d+S58oATq6tLznM7E8mEEXv+2AaYsQbazhRRiv3guq8lx
-         tYS8PLNOVsAJuhrys8nuofHBAxWz5f5gUdhjiOrjSRdArD7za23mOS21WljXqI/gHR3U
-         7ckEfh32/qmSudk7XtWLStU5hGQaxlYfkvJ5sEcvqNXPB74Hu11EEpqPmlvYFzDzbCKI
-         9heLWPPRQif2bqB7G6ndXMNLyJ25kHdIohT7ZFQ0EV8MlxHL99vLVJn7w3woVgD7r1/g
-         4PtXdhJwY5wbDm0tqVHy9eidUQ94NygnRBf26sTfXI4tP+yiqr1vK5C4OFjqGBNp+4Jr
-         P9ZQ==
-X-Gm-Message-State: AOJu0YwvWgXaHYoZTOWC9sn7en+EC3+jDU5LbKoUM1hoi2MT/tBj3As6
-	ioIdIE3Ttif8uQ0TVfvdgk1wjnMuDV3SlFNtNKScBnJ4VmUdbC/UHmSIjqcWin/WDI7/z9PV+5K
-	3ISdC3HdY2A==
-X-Google-Smtp-Source: AGHT+IF3nf3NP2afcZVriuUPQyRraCuZVT2yuLQKhsUDPm/i6PQEI/I6xz0qrVVk3GJEVSwbAXfMG6P2gQUHuQ==
-X-Received: from qtbnv13.prod.google.com ([2002:a05:622a:7bcd:b0:467:518e:d31b])
+        bh=Vtslpac2oU1C1mFmOo7/eOYL6PrtZjI6ro6i9TjMAzo=;
+        b=SMJ7MyHuA3YaSTnn71MnmwcAF7FG0Zfo3ZdD5QE6fAYoJjSSjbjTOZHI8iCOhsyHwD
+         wgG2Q7mUB9cHe88ZAONYdpgsVyFM7praFPQcBFocvGBi1AIq2GZ3KsRlQSIpwMhG9ia3
+         ymBEu1G/9kUj2rYEW5dkMDCbYHjABkKNT9VOUMnQhU3nzsa7r7cYlrQeEZANGAxdM25v
+         kBZT4qwvBzoK65b5gx4/b9yOEbyr5n1hC6T/3RSb7ygR44hzvpBobaLjEkTbq2pC68tP
+         PBEsTdlYLA5Bq54F+mf5Kuq2RPGtDi4IiOnpE8Li5MboRs47udLGKUnA3AeOfNErwSYR
+         TQDg==
+X-Gm-Message-State: AOJu0Ywy/758AIDedYgA4M5+RBBVs4ojHs1toMgpyTL2qhfPXlzaDzGu
+	w/NUYAH09d2tkT34kLRqfx3+hAGSFkz9bqpHs2/VjjRbetICm6e10GOANJmqo7kIUeaKJWGCG/c
+	Rraoko4TvJA==
+X-Google-Smtp-Source: AGHT+IE03yHvuewdIOj5wSQoNyAjz9GUSLAA83MOwUx+Cfey9Ow5byDQZf9hEyEMkVgYOqJoIPacUaeMSA1Jig==
+X-Received: from qknrb8.prod.google.com ([2002:a05:620a:8d08:b0:7bc:a1f4:3d5f])
  (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:622a:180c:b0:466:b1b2:6f0d with SMTP id d75a77b69052e-46c710e1398mr182501821cf.36.1736519598547;
- Fri, 10 Jan 2025 06:33:18 -0800 (PST)
-Date: Fri, 10 Jan 2025 14:33:14 +0000
+ 2002:a05:620a:25cd:b0:7b6:de65:9ee7 with SMTP id af79cd13be357-7bcd97ae12fmr1682878585a.43.1736519599957;
+ Fri, 10 Jan 2025 06:33:19 -0800 (PST)
+Date: Fri, 10 Jan 2025 14:33:15 +0000
 In-Reply-To: <20250110143315.571872-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -73,8 +73,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250110143315.571872-1-edumazet@google.com>
 X-Mailer: git-send-email 2.47.1.613.gc27f4b7a9f-goog
-Message-ID: <20250110143315.571872-2-edumazet@google.com>
-Subject: [PATCH net-next 1/2] tcp: add drop_reason support to tcp_disordered_ack()
+Message-ID: <20250110143315.571872-3-edumazet@google.com>
+Subject: [PATCH net-next 2/2] tcp: add TCP_RFC7323_PAWS_ACK drop reason
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -83,131 +83,101 @@ Cc: netdev@vger.kernel.org, Simon Horman <horms@kernel.org>,
 	Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Following patch is adding a new drop_reason to tcp_validate_incoming().
+XPS can cause reorders because of the relaxed OOO
+conditions for pure ACK packets.
 
-Change tcp_disordered_ack() to not return a boolean anymore,
-but a drop reason.
+For hosts not using RFS, what can happpen is that ACK
+packets are sent on behalf of the cpu processing NIC
+interrupts, selecting TX queue A for ACK packet P1.
 
-Change its name to tcp_disordered_ack_check()
+Then a subsequent sendmsg() can run on another cpu.
+TX queue selection uses the socket hash and can choose
+another queue B for packets P2 (with payload).
 
-Refactor tcp_validate_incoming() to ease the code
-review of the following patch, and reduce indentation
-level.
+If queue A is more congested than queue B,
+the ACK packet P1 could be sent on the wire after
+P2.
 
-This patch is a refactor, with no functional change.
+A linux receiver when processing P2 currently increments
+LINUX_MIB_PAWSESTABREJECTED (TcpExtPAWSEstab)
+and use TCP_RFC7323_PAWS drop reason.
+It might also send a DUPACK if not rate limited.
+
+In order to better understand this pattern, this
+patch adds a new drop_reason : TCP_RFC7323_PAWS_ACK.
+
+For old ACKS like these, we no longer increment
+LINUX_MIB_PAWSESTABREJECTED and no longer sends a DUPACK,
+keeping credit for other more interesting DUPACK.
+
+perf record -e skb:kfree_skb -a
+perf script
+...
+         swapper       0 [148] 27475.438637: skb:kfree_skb: ... location=tcp_validate_incoming+0x4f0 reason: TCP_RFC7323_PAWS_ACK
+         swapper       0 [208] 27475.438706: skb:kfree_skb: ... location=tcp_validate_incoming+0x4f0 reason: TCP_RFC7323_PAWS_ACK
+         swapper       0 [208] 27475.438908: skb:kfree_skb: ... location=tcp_validate_incoming+0x4f0 reason: TCP_RFC7323_PAWS_ACK
+         swapper       0 [148] 27475.439010: skb:kfree_skb: ... location=tcp_validate_incoming+0x4f0 reason: TCP_RFC7323_PAWS_ACK
+         swapper       0 [148] 27475.439214: skb:kfree_skb: ... location=tcp_validate_incoming+0x4f0 reason: TCP_RFC7323_PAWS_ACK
+         swapper       0 [208] 27475.439286: skb:kfree_skb: ... location=tcp_validate_incoming+0x4f0 reason: TCP_RFC7323_PAWS_ACK
+...
 
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- net/ipv4/tcp_input.c | 79 ++++++++++++++++++++++++--------------------
- 1 file changed, 44 insertions(+), 35 deletions(-)
+ include/net/dropreason-core.h |  5 +++++
+ net/ipv4/tcp_input.c          | 10 +++++++++-
+ 2 files changed, 14 insertions(+), 1 deletion(-)
 
+diff --git a/include/net/dropreason-core.h b/include/net/dropreason-core.h
+index 3a6602f379783078388eaaad3a9237b11baad534..28555109f9bdf883af2567f74dea86a327beba26 100644
+--- a/include/net/dropreason-core.h
++++ b/include/net/dropreason-core.h
+@@ -36,6 +36,7 @@
+ 	FN(TCP_OVERWINDOW)		\
+ 	FN(TCP_OFOMERGE)		\
+ 	FN(TCP_RFC7323_PAWS)		\
++	FN(TCP_RFC7323_PAWS_ACK)	\
+ 	FN(TCP_OLD_SEQUENCE)		\
+ 	FN(TCP_INVALID_SEQUENCE)	\
+ 	FN(TCP_INVALID_ACK_SEQUENCE)	\
+@@ -259,6 +260,10 @@ enum skb_drop_reason {
+ 	 * LINUX_MIB_PAWSESTABREJECTED, LINUX_MIB_PAWSACTIVEREJECTED
+ 	 */
+ 	SKB_DROP_REASON_TCP_RFC7323_PAWS,
++	/**
++	 * @SKB_DROP_REASON_TCP_RFC7323_PAWS_ACK: PAWS check, old ACK packet.
++	 */
++	SKB_DROP_REASON_TCP_RFC7323_PAWS_ACK,
+ 	/** @SKB_DROP_REASON_TCP_OLD_SEQUENCE: Old SEQ field (duplicate packet) */
+ 	SKB_DROP_REASON_TCP_OLD_SEQUENCE,
+ 	/** @SKB_DROP_REASON_TCP_INVALID_SEQUENCE: Not acceptable SEQ field */
 diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
-index 4811727b8a02258ec6fa1fd129beecf7cbb0f90e..24966dd3e49f698e110f8601e098b65afdf0718a 100644
+index 24966dd3e49f698e110f8601e098b65afdf0718a..dc0e88bcc5352dafee38143076f9e4feebdf8be3 100644
 --- a/net/ipv4/tcp_input.c
 +++ b/net/ipv4/tcp_input.c
-@@ -4450,34 +4450,38 @@ static u32 tcp_tsval_replay(const struct sock *sk)
- 	return inet_csk(sk)->icsk_rto * 1200 / HZ;
- }
+@@ -4465,7 +4465,9 @@ static enum skb_drop_reason tcp_disordered_ack_check(const struct sock *sk,
  
--static int tcp_disordered_ack(const struct sock *sk, const struct sk_buff *skb)
-+static enum skb_drop_reason tcp_disordered_ack_check(const struct sock *sk,
-+						     const struct sk_buff *skb)
- {
- 	const struct tcp_sock *tp = tcp_sk(sk);
- 	const struct tcphdr *th = tcp_hdr(skb);
--	u32 seq = TCP_SKB_CB(skb)->seq;
-+	SKB_DR_INIT(reason, TCP_RFC7323_PAWS);
- 	u32 ack = TCP_SKB_CB(skb)->ack_seq;
-+	u32 seq = TCP_SKB_CB(skb)->seq;
+ 	/* 2. Is its sequence not the expected one ? */
+ 	if (seq != tp->rcv_nxt)
+-		return reason;
++		return before(seq, tp->rcv_nxt) ?
++			SKB_DROP_REASON_TCP_RFC7323_PAWS_ACK :
++			reason;
  
--	return	/* 1. Pure ACK with correct sequence number. */
--		(th->ack && seq == TCP_SKB_CB(skb)->end_seq && seq == tp->rcv_nxt) &&
-+	/* 1. Is this not a pure ACK ? */
-+	if (!th->ack || seq != TCP_SKB_CB(skb)->end_seq)
-+		return reason;
+ 	/* 3. Is this not a duplicate ACK ? */
+ 	if (ack != tp->snd_una)
+@@ -5967,6 +5969,12 @@ static bool tcp_validate_incoming(struct sock *sk, struct sk_buff *skb,
+ 	if (unlikely(th->syn))
+ 		goto syn_challenge;
  
--		/* 2. ... and duplicate ACK. */
--		ack == tp->snd_una &&
-+	/* 2. Is its sequence not the expected one ? */
-+	if (seq != tp->rcv_nxt)
-+		return reason;
- 
--		/* 3. ... and does not update window. */
--		!tcp_may_update_window(tp, ack, seq, ntohs(th->window) << tp->rx_opt.snd_wscale) &&
-+	/* 3. Is this not a duplicate ACK ? */
-+	if (ack != tp->snd_una)
-+		return reason;
- 
--		/* 4. ... and sits in replay window. */
--		(s32)(tp->rx_opt.ts_recent - tp->rx_opt.rcv_tsval) <=
--		tcp_tsval_replay(sk);
--}
-+	/* 4. Is this updating the window ? */
-+	if (tcp_may_update_window(tp, ack, seq, ntohs(th->window) <<
-+						tp->rx_opt.snd_wscale))
-+		return reason;
- 
--static inline bool tcp_paws_discard(const struct sock *sk,
--				   const struct sk_buff *skb)
--{
--	const struct tcp_sock *tp = tcp_sk(sk);
-+	/* 5. Is this not in the replay window ? */
-+	if ((s32)(tp->rx_opt.ts_recent - tp->rx_opt.rcv_tsval) >
-+	    tcp_tsval_replay(sk))
-+		return reason;
- 
--	return !tcp_paws_check(&tp->rx_opt, TCP_PAWS_WINDOW) &&
--	       !tcp_disordered_ack(sk, skb);
-+	return 0;
- }
- 
- /* Check segment sequence number for validity.
-@@ -5949,23 +5953,28 @@ static bool tcp_validate_incoming(struct sock *sk, struct sk_buff *skb,
- 	SKB_DR(reason);
- 
- 	/* RFC1323: H1. Apply PAWS check first. */
--	if (tcp_fast_parse_options(sock_net(sk), skb, th, tp) &&
--	    tp->rx_opt.saw_tstamp &&
--	    tcp_paws_discard(sk, skb)) {
--		if (!th->rst) {
--			if (unlikely(th->syn))
--				goto syn_challenge;
--			NET_INC_STATS(sock_net(sk), LINUX_MIB_PAWSESTABREJECTED);
--			if (!tcp_oow_rate_limited(sock_net(sk), skb,
--						  LINUX_MIB_TCPACKSKIPPEDPAWS,
--						  &tp->last_oow_ack_time))
--				tcp_send_dupack(sk, skb);
--			SKB_DR_SET(reason, TCP_RFC7323_PAWS);
--			goto discard;
--		}
--		/* Reset is accepted even if it did not pass PAWS. */
--	}
--
-+	if (!tcp_fast_parse_options(sock_net(sk), skb, th, tp) ||
-+	    !tp->rx_opt.saw_tstamp ||
-+	    tcp_paws_check(&tp->rx_opt, TCP_PAWS_WINDOW))
-+		goto step1;
++	/* Old ACK are common, do not change PAWSESTABREJECTED
++	 * and do not send a dupack.
++	 */
++	if (reason == SKB_DROP_REASON_TCP_RFC7323_PAWS_ACK)
++		goto discard;
 +
-+	reason = tcp_disordered_ack_check(sk, skb);
-+	if (!reason)
-+		goto step1;
-+	/* Reset is accepted even if it did not pass PAWS. */
-+	if (th->rst)
-+		goto step1;
-+	if (unlikely(th->syn))
-+		goto syn_challenge;
-+
-+	NET_INC_STATS(sock_net(sk), LINUX_MIB_PAWSESTABREJECTED);
-+	if (!tcp_oow_rate_limited(sock_net(sk), skb,
-+				  LINUX_MIB_TCPACKSKIPPEDPAWS,
-+				  &tp->last_oow_ack_time))
-+		tcp_send_dupack(sk, skb);
-+	goto discard;
-+
-+step1:
- 	/* Step 1: check sequence number */
- 	reason = tcp_sequence(tp, TCP_SKB_CB(skb)->seq, TCP_SKB_CB(skb)->end_seq);
- 	if (reason) {
+ 	NET_INC_STATS(sock_net(sk), LINUX_MIB_PAWSESTABREJECTED);
+ 	if (!tcp_oow_rate_limited(sock_net(sk), skb,
+ 				  LINUX_MIB_TCPACKSKIPPEDPAWS,
 -- 
 2.47.1.613.gc27f4b7a9f-goog
 
