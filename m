@@ -1,73 +1,55 @@
-Return-Path: <netdev+bounces-157089-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157090-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A09AA08E0B
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 11:30:51 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9612DA08E2E
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 11:39:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 10DC2168DEC
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 10:30:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7206918838D2
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 10:39:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F2E7204F78;
-	Fri, 10 Jan 2025 10:30:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF0A720A5CC;
+	Fri, 10 Jan 2025 10:39:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="MpdxHEIt"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d4z2qi6j"
 X-Original-To: netdev@vger.kernel.org
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39E751B4F14;
-	Fri, 10 Jan 2025 10:30:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99B9A18FC80
+	for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 10:39:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736505047; cv=none; b=bP8gvzmQgrI5LpCtruns3LTOP1blB2scncLVo+QuAFjQYcdeZSGafkgJw7GPh886sqSs7F3SgHlQ3Cqv26wtTUIBDebfSV9JkPms8lg2Sw/q9YzzVbgr4Et9ZL4t4xT0Gn/iSm140tHKwg28ta4h1qhhv2nyibjcbngkPBB5HUE=
+	t=1736505555; cv=none; b=FMR3PIO/9t9jU5jW1oyjazdlZfxz2IT3XpH1q/5nI0CIHtzIksmvIgOVZbHmLN+N3ASTDfrK6SrL1Efs6iN6QHz2IqpMukTsffhs1knVR20Azd5shVXDq9hH6PSqnSiWx9QAwS94JEBifaE7GqlSIjpmgTRQeDYPc98oGvZYZRA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736505047; c=relaxed/simple;
-	bh=VqLS2m0Jp4rELFScyCJzI6NufkdvD35l4P55XysbWOA=;
+	s=arc-20240116; t=1736505555; c=relaxed/simple;
+	bh=liHfGPdEEMc8smElUS4q7f+q7ez5lGK78TNTVuGso4s=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nHaer68zSkcZ8DGk9CVM7ib56vucZoDSKTF7texfh4vl+Gkb+77605tlA9Dq0BS6twLGu/ifj1qZP/ybR2uoQKt6wQaKNsAf52nApUCpZXyCJ7y++91BAdoLKZMntY0xJof83XnwxPmsnnVNbZ22ckM86BsGzfRMhsQmZsf3daU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=MpdxHEIt; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=fPPBrxOFG710mad1JEFyz6crD1/I53BWSyTyxrGq+DI=; b=MpdxHEIt2Dnv6prdqzslLz0Rhk
-	diXqwCYfGo3KuTYMxTzw2c8Aem4e5Mqk2GLtEBVq6FTn4pWBGuKiCTHkpL1sj02fGUf/9b61js22r
-	1qntFve3Im1T/XefyWk707spRQSRpr85XxtvxRtRGTo2b0CxmwY6ehGxvDLLNC/z+st+8hGTi2yXR
-	V1c1SOXuB/T5WijxN7PDYZ0ra481b1p27kX4wC4eL57RCWHHTD8rpPE0O6lH91BeOqF0sbAZw4ew8
-	9tB2W2IFkNGgIUfgeLmEvvO0KCMGRl9tkBcC67bCBOBrGB/jRQcfuEx5umr0/dECdvXPC4Uybel6D
-	FQgowcng==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1tWC4V-007oOG-2u;
-	Fri, 10 Jan 2025 18:30:17 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 10 Jan 2025 18:30:16 +0800
-Date: Fri, 10 Jan 2025 18:30:16 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: David Howells <dhowells@redhat.com>
-Cc: Chuck Lever <chuck.lever@oracle.com>,
-	Trond Myklebust <trond.myklebust@hammerspace.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Marc Dionne <marc.dionne@auristor.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, linux-crypto@vger.kernel.org,
-	linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH 2/8] crypto/krb5: Provide Kerberos 5 crypto through
- AEAD API
-Message-ID: <Z4D2uC-kcSzQJS-H@gondor.apana.org.au>
-References: <Z4Ds9NBiXUti-idl@gondor.apana.org.au>
- <20250110010313.1471063-1-dhowells@redhat.com>
- <20250110010313.1471063-3-dhowells@redhat.com>
- <1485676.1736504798@warthog.procyon.org.uk>
+	 Content-Type:Content-Disposition:In-Reply-To; b=d5grIGqi1CwBleJMdylKboeZJxRCMsE1hWx5cBW9vFoeULLNJCZlqqDeidr4Zrz46pPz/IgCdF+7b4tjwDiK1WLKnYTgUnX/AGLm/tyi4Fhdya3AHUTvK9pNMVdDvTMDqhPwYkWrEVhKuk52P+yOFkqk+L8ySX6AnaYuj7wg/cQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d4z2qi6j; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DEE7FC4CED6;
+	Fri, 10 Jan 2025 10:39:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1736505555;
+	bh=liHfGPdEEMc8smElUS4q7f+q7ez5lGK78TNTVuGso4s=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=d4z2qi6jgCstLrDRl7hJcKlE/YfnHjlCSyX5ET2wE3eXXLz83rJ9dzXNQ18X8iO87
+	 YJ2tKtNPYzTQuKEIcud9AvhHrlVGUdL/ZjCHVpwvZ19WPZ9yC5qWItI21TgEUBuGnW
+	 DDpQGma6WL8HllCDJcHaMH8IFVXzpg+1g5a25Dg3mRqP0WxS+dabc3OBrlqPKa3c0t
+	 sqZEuM2tTjxcEJlqFokMSJvGb+HJscWUbnfusPqo21P9qIemgX34LO5Lu/4H5vngoe
+	 rSifc1LLC6Ue0n8cyQdzSy6utts1MzpdnDHS4MWdwIOQTMLQDA+WuaY90tbGiwIaBY
+	 2LCQPhYQ8lgFg==
+Date: Fri, 10 Jan 2025 10:39:11 +0000
+From: Simon Horman <horms@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, andrew+netdev@lunn.ch
+Subject: Re: [PATCH net-next 1/2] docs: netdev: document requirements for
+ Supported status
+Message-ID: <20250110103911.GW7706@kernel.org>
+References: <20250110005223.3213487-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,24 +58,43 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1485676.1736504798@warthog.procyon.org.uk>
+In-Reply-To: <20250110005223.3213487-1-kuba@kernel.org>
 
-On Fri, Jan 10, 2025 at 10:26:38AM +0000, David Howells wrote:
->
-> However the point of having a library is to abstract those details from the
-> callers.  You wanted me to rewrite the library as AEAD algorithms, which I
-> have done as far as I can.  This makes the object for each kerberos enctype
-> look the same from the PoV of the clients.
+On Thu, Jan 09, 2025 at 04:52:19PM -0800, Jakub Kicinski wrote:
+> As announced back in April, require running upstream tests
+> to maintain Supported status for NIC drivers:
+> 
+>   https://lore.kernel.org/20240425114200.3effe773@kernel.org
+> 
+> Multiple vendors have been "working on it" for months.
+> Let's make it official.
+> 
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+>  Documentation/process/maintainer-netdev.rst | 46 +++++++++++++++++++++
+>  1 file changed, 46 insertions(+)
+> 
+> diff --git a/Documentation/process/maintainer-netdev.rst b/Documentation/process/maintainer-netdev.rst
 
-I think there is some misunderstanding here.  For a library outside
-of the Crypto API you can do whatever you want.
+...
 
-I only suggested AEAD because I thought you wanted to bring this within
-the Crypto API.
+> +The driver maintainer may arrange for someone else to run the test,
+> +there is no requirement for the person listed as maintainer (or their
+> +employer) to be responsible for running the tests. Collaboration between
+> +vendors, hosting GH CI, other repos under linux-netdev, etc. are most welcome.
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+nit: are -> is
+
+> +
+> +See https://github.com/linux-netdev/nipa/wiki for more infromation about
+
+nit: information
+
+> +netdev CI. Feel free to reach out to maintainers or the list with any questions.
+> +
+>  Reviewer guidance
+>  -----------------
+
+Reviewed-by: Simon Horman <horms@kernel.org>
+
 
