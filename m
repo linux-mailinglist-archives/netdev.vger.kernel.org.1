@@ -1,151 +1,220 @@
-Return-Path: <netdev+bounces-156961-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156963-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E9A8A0868C
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 06:33:36 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 54396A086BA
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 06:44:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 58E20160DFE
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 05:33:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 45EBF1692C6
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 05:44:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 292221E2602;
-	Fri, 10 Jan 2025 05:33:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9068F2066C6;
+	Fri, 10 Jan 2025 05:44:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XZeLpnWN"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="mLRbtEG+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-124.freemail.mail.aliyun.com (out30-124.freemail.mail.aliyun.com [115.124.30.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A326746E
-	for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 05:33:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84FBC746E;
+	Fri, 10 Jan 2025 05:43:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736487213; cv=none; b=SzSjPaiX/TipR53LISdAAUouQkMbjyaftbF2bHp+qE/XuOmN9Yeff8Du0HytoEVz0WVCjym2fi72dpgo/RJapQIa8Rr3kb/LBbCKAYSaJ7hI2wbXqqZzsEHzkRoP1NHguO1dX/SoZi3fV1vn/mQQ6Hyoj5pPxo3l96Dzsc8fEZE=
+	t=1736487840; cv=none; b=bmnUlTABkcX6opTIzJYeyulBAV0CDow+S5Zb1gOwSmT6T74K0C55CT0lBkvgAG7En6x8gc4x93FeIcNqJKBly5jagqIzbexOlCZNY8f8NKfHRjuXTUBaaxk/DtWybtENZcjJMaQGW2di+H9ow6OvbvVoI5vFPxQzFoPBmXIM318=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736487213; c=relaxed/simple;
-	bh=hxRTMp4mpwSU8jnHghh6r5i8faflXs6Biek6mneBQ78=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SMKaTgTdlM+o1mGLhjfSjxo+IBl3GIueUV8v0Ci13fhMS/T9qznT/2SEQyW+oFBDrLKmzwM0OyeGS6WeA5ZL9Xq6JQY7XWuG+vur8aJc9d8BuKFLVpynFBVitkx/O0P9j76RnAI/3wTpXhuO8zibwP1K7PGuTUiQ1i3V9Chahhs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XZeLpnWN; arc=none smtp.client-ip=209.85.214.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-2164b662090so25407045ad.1
-        for <netdev@vger.kernel.org>; Thu, 09 Jan 2025 21:33:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736487211; x=1737092011; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=UdP1H6r78BZYoDOcYSzOfB3PzRaCWyLA9wYEqm3AXu4=;
-        b=XZeLpnWNJ9bNrIhnr2UDdzZOe0oq8IQD33+7Kw5CLrhtFKwSakE9E2rhDGNckzAgqm
-         9jsPoRSxc0VL2us4CujHRPQbaPyPOtKDUIWGR0Ey/Z+A99iFD+3HfbZqR4crbbp2U0Ia
-         gRTiXZ1+XcmqFnfN2Y7NMXmqkKCstVAjVWiSLwq2gq+d+TuLl7ha/eW781q4mh8Oa32c
-         XsZgOucD31DIqY+NiA464eIv0eaGIsnoWs/njU/gJ5/47jHjk6BWGhDBRunXsbkONq9d
-         aCiD/cVvAa9uyyn0EgUf/iF9/DQvyTqCtSkKyWjkZmo7lBei2o/WigveoQFq0h63NnJs
-         2zwA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736487211; x=1737092011;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=UdP1H6r78BZYoDOcYSzOfB3PzRaCWyLA9wYEqm3AXu4=;
-        b=xTERdmoyEHBF4c7YiBdNA71S0qQ0gKwdgGSPqifecCk/pzSelNqAYYo9fALoWt+74M
-         UIxCqyXtzZ4pHd2SqBg0CnzxgsJhaQXilMQtG+7zw0R/GI0LeCRj5Daco8vMI9x8wuaX
-         WOt2WP4GONHuwmPf04dQOjoTmVG9I3CCYt8Vj60Tl1+fX4qqdKlrhXfUwVvdm8eZx0AI
-         thK3HIoQG+DSBXj4FPuxIQqLMZENJeR1oPA+eyoGPAzFmOsf4y1kdBuw36RI5ildB5cx
-         sDMgpmlAaqSc5WTbD0lCAmM4t+V8aEDMvE4EAvJnzMNY1BB8B4pwSXGBpBkxrKYJNEc3
-         igDA==
-X-Forwarded-Encrypted: i=1; AJvYcCUE77ap3XF0Oe6lJa7hPQ6PiXb6HwI99rOArTOguurDuiVj9CU5GoY7E8K5p/IrciWle92miig=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy1UekVjgWR3vZeEl0RTVOeM1vLvz+IsMZhHkhPMCu/Gwuf8wpA
-	LBGlHiDwG2GPO78oqA8f6v5rNupTv+py5UgpFFp1sHJpscuY5A34
-X-Gm-Gg: ASbGncsFNabIBJTaKPaukvQhWYCXr1sQxNsWXi7ngcwyFHGT1uw+i6bXvsrUalIhU+k
-	MCOhi1JqDDMVpbF104qSoSLu3kdJ11Brm2LJZ3cjWixW4dwz+soaiOIrBHFt2dYURo+lfGzjRCT
-	U70P8v61Of2KscJDruH8sG/rKxGub/tFGhWyO20Xo1gZ/3dfcY059SXU6gbCfbMETwXq++ZRb6z
-	yKxIqASE7l7delU3pcEJyTWWsAmW5mazeKIQNoCCwVOdUMymuNqZX2LXKnSbDs=
-X-Google-Smtp-Source: AGHT+IGpXFgYx9QBLE5BKejw1lewtZBlVvulP0O6fcBeqATluc3tQ9vdFbitVdliacGQaxfngJHDXg==
-X-Received: by 2002:a17:902:ccc3:b0:216:2bd7:1c27 with SMTP id d9443c01a7336-21a83f72b8cmr144395715ad.33.1736487210762;
-        Thu, 09 Jan 2025 21:33:30 -0800 (PST)
-Received: from localhost ([2601:647:6881:9060:c586:91c7:b7f1:d942])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2f54a26ac5esm4668711a91.5.2025.01.09.21.33.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Jan 2025 21:33:30 -0800 (PST)
-Date: Thu, 9 Jan 2025 21:33:29 -0800
-From: Cong Wang <xiyou.wangcong@gmail.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Jamal Hadi Salim <jhs@mojatatu.com>, Jiri Pirko <jiri@resnulli.us>,
-	netdev@vger.kernel.org, eric.dumazet@gmail.com
-Subject: Re: [PATCH net-next] net: sched: calls synchronize_net() only when
- needed
-Message-ID: <Z4CxKV5AnfDPRfaF@pop-os.localdomain>
-References: <20250109171850.2871194-1-edumazet@google.com>
+	s=arc-20240116; t=1736487840; c=relaxed/simple;
+	bh=9G/L1ZomCQwviZeWuRSudJqgRPVeuQmTot+azaFSyS8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=mvIaAWo/qtsUptZ5F9op1ckfv7+0ZVDdSWEiJLwUTc5uGIuyZQovemy4ikt6EqWHN0ToWe6+DrLuyBrgg7gz8KAcxLdI2V2yPY+BmWqICOIHhIAlXXCjA2lP2ghlGdBhO/AKlkRYWSSXoa0kfu9ZFoMDyMoNhJ4kecUdOgNZZ3A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=mLRbtEG+; arc=none smtp.client-ip=115.124.30.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1736487827; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	bh=xAyuwYq8sl8JF7mbt/6XCIrVbtDcyq2uevTq8dLVNrk=;
+	b=mLRbtEG+7GUMB5zKf6BaeRQCOP42HFvlOEnuOh4oW8nvF4qy52a74gP+z3CuRtwEqOO922pXF7xep5X8Kb5ZglJPDyvnGkthXSfEuoh68hkZQoTvy3bTwk/9hqUfVhR0xG4QkEdgbufUU7ZWq5atH7qjuGtS8Kpche+ffEcN7v4=
+Received: from 30.221.98.188(mailfrom:guangguan.wang@linux.alibaba.com fp:SMTPD_---0WNJnBTV_1736487825 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Fri, 10 Jan 2025 13:43:46 +0800
+Message-ID: <b1053a92-3a3f-4042-9be9-60b94b97747d@linux.alibaba.com>
+Date: Fri, 10 Jan 2025 13:43:44 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250109171850.2871194-1-edumazet@google.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net/smc: use the correct ndev to find pnetid by
+ pnetid table
+To: Halil Pasic <pasic@linux.ibm.com>
+Cc: Paolo Abeni <pabeni@redhat.com>, wenjia@linux.ibm.com,
+ jaka@linux.ibm.com, alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
+ guwen@linux.alibaba.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, horms@kernel.org, linux-rdma@vger.kernel.org,
+ linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Alexandra Winter <wintera@linux.ibm.com>
+References: <20241227040455.91854-1-guangguan.wang@linux.alibaba.com>
+ <1f4a721f-fa23-4f1d-97a9-1b27bdcd1e21@redhat.com>
+ <20250107203218.5787acb4.pasic@linux.ibm.com>
+ <908be351-b4f8-4c25-9171-4f033e11ffc4@linux.alibaba.com>
+ <20250109040429.350fdd60.pasic@linux.ibm.com>
+Content-Language: en-US
+From: Guangguan Wang <guangguan.wang@linux.alibaba.com>
+In-Reply-To: <20250109040429.350fdd60.pasic@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Thu, Jan 09, 2025 at 05:18:50PM +0000, Eric Dumazet wrote:
-> dev_deactivate_many() role is to remove the qdiscs
-> of a network device.
+
+
+On 2025/1/9 11:04, Halil Pasic wrote:
+> On Wed, 8 Jan 2025 12:57:00 +0800
+> Guangguan Wang <guangguan.wang@linux.alibaba.com> wrote:
 > 
-> When/if a qdisc is dismantled, an rcu grace period
-> is needed to make sure all outstanding qdisc enqueue
-> are done before we proceed with a qdisc reset.
+>>> sorry for chiming in late. Wenjia is on vacation and Jan is out sick!
+>>> After some reading and thinking I could not figure out how 890a2cb4a966
+>>> ("net/smc: rework pnet table") is broken.  
+>>
+>> Before commit 890a2cb4a966:
+>> smc_pnet_find_roce_resource
+>>     smc_pnet_find_roce_by_pnetid(ndev, ...) /* lookup via hardware-defined pnetid */
+>>         smc_pnetid_by_dev_port(base_ndev, ...)
+>>     smc_pnet_find_roce_by_table(ndev, ...) /* lookup via SMC PNET table */
+>>     {
+>>         ...
+>>         list_for_each_entry(pnetelem, &smc_pnettable.pnetlist, list) {
+>>                 if (ndev == pnetelem->ndev) { /* notice here, it was ndev to matching pnetid element in pnet table */
+>>         ...
+>>     }
+>>
+>> After commit 890a2cb4a966:
+>> smc_pnet_find_roce_resource
+>>     smc_pnet_find_roce_by_pnetid
+>>     {
+>>         ...
+>>         base_ndev = pnet_find_base_ndev(ndev); /* rename the variable name to base_ndev for better understanding */
+>>         smc_pnetid_by_dev_port(base_ndev, ...)
+>>         smc_pnet_find_ndev_pnetid_by_table(base_ndev, ...)
+>>         {
+>>                 ...
+>>                 list_for_each_entry(pnetelem, &smc_pnettable.pnetlist, list) {
+>>                 if (base_ndev == pnetelem->ndev) { /* notice here, it is base_ndev to matching pnetid element in pnet table */
+>>                 ...
+>>         }
+>>
+>>     }
+>>
+>> The commit 890a2cb4a966 has changed ndev to base_ndev when matching pnetid element in pnet table.
+>> But in the function smc_pnet_add_eth, the pnetid is attached to the ndev itself, not the base_ndev.
+>> smc_pnet_add_eth(...)
+>> {
+>>     ...
+>>     ndev = dev_get_by_name(net, eth_name);
+>>     ...
+>>         if (new_netdev) {
+>>             if (ndev) {
+>>                 new_pe->ndev = ndev;
+>>                 netdev_tracker_alloc(ndev, &new_pe->dev_tracker,
+>>                     GFP_ATOMIC);
+>>             }
+>>             list_add_tail(&new_pe->list, &pnettable->pnetlist);
+>>             mutex_unlock(&pnettable->lock);
+>>         } else {
+>>     ...
+>> }
 > 
-> Most virtual devices do not have a qdisc (if we exclude
-> noqueue ones).
+> I still not understand why do you think that 890a2cb4a966~1 is better
+> than 890a2cb4a966 even if things changed with 890a2cb4a966 which
+> I did not verify for myself but am willing to assume.
+> 
+> Is there some particular setup that you think would benefit from
+> you patch? I.e. going back to the 890a2cb4a966~1 behavior I suppose.
+> 
 
-Such as? To me, most virtual devices use noqueue:
+We want to use SMC in container on cloud environment, and encounter problem
+when using smc_pnet with commit 890a2cb4a966. In container, there have choices
+of different container network, such as directly using host network, virtual
+network IPVLAN, veth, etc. Different choices of container network have different
+netdev hierarchy. Examples of netdev hierarchy show below. (eth0 and eth1 in host
+below is the netdev directly related to the physical device).
+ _______________________________      ________________________________   
+|   _________________           |     |   _________________           |  
+|  |POD              |          |     |  |POD  __________  |          |  
+|  |                 |          |     |  |    |upper_ndev| |          |  
+|  | eth0_________   |          |     |  |eth0|__________| |          |  
+|  |____|         |__|          |     |  |_______|_________|          |  
+|       |         |             |     |          |lower netdev        |  
+|       |         |             |     |        __|______              |  
+|   eth1|base_ndev| eth0_______ |     |   eth1|         | eth0_______ |  
+|       |         |    | RDMA  ||     |       |base_ndev|    | RDMA  ||  
+| host  |_________|    |_______||     | host  |_________|    |_______||  
+———————————————————————————————-      ———————————————————————————————-    
+ netdev hierarchy if directly          netdev hierarchy if using IPVLAN    
+   using host network
+ _______________________________
+|   _____________________       |
+|  |POD        _________ |      |
+|  |          |base_ndev||      |
+|  |eth0(veth)|_________||      |
+|  |____________|________|      |
+|               |pairs          |
+|        _______|_              |
+|       |         | eth0_______ |
+|   veth|base_ndev|    | RDMA  ||
+|       |_________|    |_______||
+|        _________              |
+|   eth1|base_ndev|             |
+| host  |_________|             |
+ ———————————————————————————————
+  netdev hierarchy if using veth
 
-$ git grep IFF_NO_QUEUE -- drivers/net/
-drivers/net/amt.c:      dev->priv_flags         |= IFF_NO_QUEUE;
-drivers/net/bareudp.c:  dev->priv_flags |= IFF_NO_QUEUE;
-drivers/net/bonding/bond_main.c:        bond_dev->priv_flags |= IFF_BONDING | IFF_UNICAST_FLT | IFF_NO_QUEUE;
-drivers/net/caif/caif_serial.c: dev->priv_flags |= IFF_NO_QUEUE;
-drivers/net/dummy.c:    dev->priv_flags |= IFF_LIVE_ADDR_CHANGE | IFF_NO_QUEUE;
-drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c:        dev->priv_flags |= IFF_NO_QUEUE;
-drivers/net/ethernet/netronome/nfp/nfp_net_repr.c:      netdev->priv_flags |= IFF_NO_QUEUE | IFF_DISABLE_NETPOLL;
-drivers/net/geneve.c:   dev->priv_flags |= IFF_LIVE_ADDR_CHANGE | IFF_NO_QUEUE;
-drivers/net/gtp.c:      dev->priv_flags |= IFF_NO_QUEUE;
-drivers/net/ipvlan/ipvlan_main.c:       dev->priv_flags |= IFF_UNICAST_FLT | IFF_NO_QUEUE;
-drivers/net/ipvlan/ipvtap.c:    dev->priv_flags &= ~IFF_NO_QUEUE;
-drivers/net/loopback.c: dev->priv_flags         |= IFF_LIVE_ADDR_CHANGE | IFF_NO_QUEUE;
-drivers/net/macsec.c:   dev->priv_flags |= IFF_NO_QUEUE;
-drivers/net/macvlan.c:  dev->priv_flags |= IFF_NO_QUEUE;
-drivers/net/net_failover.c:     failover_dev->priv_flags |= IFF_UNICAST_FLT | IFF_NO_QUEUE;
-drivers/net/netdevsim/netdev.c:                    IFF_NO_QUEUE;
-drivers/net/netkit.c:   dev->priv_flags |= IFF_NO_QUEUE;
-drivers/net/nlmon.c:    dev->priv_flags |= IFF_NO_QUEUE;
-drivers/net/pfcp.c:     dev->priv_flags |= IFF_NO_QUEUE;
-drivers/net/team/team_core.c:   dev->priv_flags |= IFF_NO_QUEUE;
-drivers/net/veth.c:     dev->priv_flags |= IFF_NO_QUEUE;
-drivers/net/vrf.c:      dev->priv_flags |= IFF_NO_QUEUE;
-drivers/net/vsockmon.c: dev->priv_flags |= IFF_NO_QUEUE;
-drivers/net/vxlan/vxlan_core.c: dev->priv_flags |= IFF_NO_QUEUE;
-drivers/net/wan/hdlc_fr.c:      dev->priv_flags |= IFF_NO_QUEUE;
-drivers/net/wireguard/device.c: dev->priv_flags |= IFF_NO_QUEUE;
-drivers/net/wireless/virtual/mac80211_hwsim.c:  dev->priv_flags |= IFF_NO_QUEUE;
+Due to some reasons, the eth1 in host is not RDMA attached netdevice, pnetid
+is needed to map the eth1(in host) with RDMA device so that POD can do SMC-R.
+Because the eth1(in host) is managed by CNI plugin(such as Terway, network
+management plugin in container environment), and in cloud environment the
+eth(in host) can dynamically be inserted by CNI when POD create and dynamically
+be removed by CNI when POD destroy and no POD related to the eth(in host)
+anymore. It is hard for us to config the pnetid to the eth1(in host). So we
+config the pnetid to the netdevice which can be seen in POD. When do SMC-R, both
+the container directly using host network and the container using veth network
+can successfully match the RDMA device, because the configured pnetid netdev is a
+base_ndev. But the container using IPVLAN can not successfully match the RDMA
+device and 0x03030000 fallback happens, because the configured pnetid netdev is
+not a base_ndev. Additionally, if config pnetid to the eth1(in host) also can not
+work for matching RDMA device when using veth network and doing SMC-R in POD.
+
+My patch can resolve the problem we encountered and also can unify the pnetid setup
+of different network choices list above, assuming the pnetid is not limited to
+config to the base_ndev directly related to the physical device(indeed, the current
+implementation has not limited it yet).
+
+> I think I showed a valid and practical setup that would break with your
+> patch as is. Do you agree with that statement?
+Did you mean
+"
+Now for something like a bond of two OSA
+interfaces, I would expect the two legs of the bond to probably have a
+"HW PNETID", but the netdev representing the bond itself won't have one
+unless the Linux admin defines a software PNETID, which is work, and
+can't have a HW PNETID because it is a software construct within Linux.
+Breaking for example an active-backup bond setup where the legs have
+HW PNETIDs and the admin did not bother to specify a PNETID for the bond
+is not acceptable.
+" ?
+If the legs have HW pnetids, add pnetid to bond netdev will fail as
+smc_pnet_add_eth will check whether the base_ndev already have HW pnetid.
+
+If the legs without HW pnetids, and admin add pnetids to legs through smc_pnet.
+Yes, my patch will break the setup. What Paolo suggests(both checking ndev and
+base_ndev, and replace || by && )can help compatible with the setup.
 
 
-And noqueue_qdisc_ops sets ->enqueue to noop_enqueue():
-
-struct Qdisc_ops noqueue_qdisc_ops __read_mostly = {
-        .id             =       "noqueue",
-        .priv_size      =       0,
-        .init           =       noqueue_init,
-        .enqueue        =       noop_enqueue,
-        .dequeue        =       noop_dequeue,
-        .peek           =       noop_dequeue,
-        .owner          =       THIS_MODULE,
-};
-
-Thanks.
+Thanks,
+Guangguan Wang
+> 
+> Regards,
+> Halil
 
