@@ -1,62 +1,62 @@
-Return-Path: <netdev+bounces-157035-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157036-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3FD7A08C1D
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 10:33:25 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 59A69A08C1E
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 10:33:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9867C1662A3
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 09:32:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DCF7F188BDD1
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 09:32:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFB27207DFC;
-	Fri, 10 Jan 2025 09:31:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82945209F27;
+	Fri, 10 Jan 2025 09:31:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="KtvYipWE"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="a/2LXzW5"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp-fw-52002.amazon.com (smtp-fw-52002.amazon.com [52.119.213.150])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2B24209F31
-	for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 09:31:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B56D51FECB1
+	for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 09:31:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.150
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736501490; cv=none; b=kdgz4P+5VriYPEv33vdaPvXEJGqWLelEn3/2mXU0A9/rKA969mvze9gt7Hcf4skb/la0uoUMS4NcPBToLa+1aCsfyNHVL1dB9zrLWagmHtqI4dnaF6VqR2t3qdjIGQSIl9f6gBoUaBaEHCGfWP1LyzzyXSQklyvB3j2DFUu4+sI=
+	t=1736501517; cv=none; b=m5qLUqHV63BkLgYtqcy+cAk+qGgVu2hQZduVMh+CV9pwIoJaZMyH8GRaZFu1JR2sumDO05N0T+nQgGvRflXXOMLcSwOIVdzaUr1N0LUcyQSdz3B2DjKL+wHtJke8tYgrIf6KgZz9ELn39H+h/WnOjnSDqal6m01MnFdg4lTH918=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736501490; c=relaxed/simple;
-	bh=Nc9wgKHYkq8sTiPEOynTWTtT7mloaNt70oydqUe0PBU=;
+	s=arc-20240116; t=1736501517; c=relaxed/simple;
+	bh=S4zrMgl7NyixYd02n/Q3dyfdZS0DSw1ZjFm9TgSRwpc=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=WhU1IiLFPxY70AeCVeh9zl0YKZlU7rK6rhrJbL24Q0olahGcmgOBZfZ60jncNK6dazQe+OYCDnSuFidev2onPLN0Ro3p6q663W9iwVuqCmlgExVmnKvH4c+LALYDLRz6n+avxcFqto3n2ugLNpsvYkCgIPCmeR/+vQkDOzCYgag=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=KtvYipWE; arc=none smtp.client-ip=52.119.213.150
+	 MIME-Version:Content-Type; b=bv63T+WUOJGaP17MjFM0luv6+vVjYzpw4B9gP1eeH/6FaQtMy5nvTzoztsLUC9VdgFwfCL763iQKJlILY5vmaclH9u3kk36ydV4C11pwUPWudMauH3oeoMD1FWYTOFFJEOqEVg5Ij1laa7Na3qzbKQnOJ6Tm1kONgOYJd2aCWfo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=a/2LXzW5; arc=none smtp.client-ip=52.119.213.150
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1736501489; x=1768037489;
+  t=1736501516; x=1768037516;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=ir1honBL5vaRXaL2ulf1SyE6LQGBYV1ssL0hzSJK4+M=;
-  b=KtvYipWEVyWNI2ZgDtJ8DjHCrHzS6JKLKDYKl366CEdeo/iMdhzdeD1g
-   gBDmFG5FpxvgQHgXnoEthtZGiiRG24sUFVGEEpw6liJ1S7Dhrac3RYzRg
-   T1wSeb2OfikUwq37kQF8aTNMfm4/KG1MRjGV403wasU4vib2R+DfUVTUt
+  bh=VcfmV2krEnkd9vEiozkfxfOtUeg3hiAitDwT1lRHmEc=;
+  b=a/2LXzW5DtQzztXMPHgV+6niSs7vnNAT94TLa0M/OuNhvOXkanqgkZMm
+   1OG3gQWuDymUpTCWeTPACY6afbOS1H5f8iy8htHCdMdfuLwqamggqZGUw
+   5OmiR8S7A8Z6ks8QEayJzEddezwVKhp4QE19F2JjJSKeOBXPuhtVFpCzG
    c=;
 X-IronPort-AV: E=Sophos;i="6.12,303,1728950400"; 
-   d="scan'208";a="688274748"
+   d="scan'208";a="688274840"
 Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-52002.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jan 2025 09:31:26 +0000
-Received: from EX19MTAUWB002.ant.amazon.com [10.0.21.151:53212]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.45.174:2525] with esmtp (Farcaster)
- id d1a24d83-a3e2-443e-aebe-71e2b68b8113; Fri, 10 Jan 2025 09:31:25 +0000 (UTC)
-X-Farcaster-Flow-ID: d1a24d83-a3e2-443e-aebe-71e2b68b8113
+  by smtp-border-fw-52002.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jan 2025 09:31:53 +0000
+Received: from EX19MTAUWB001.ant.amazon.com [10.0.38.20:39259]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.16.12:2525] with esmtp (Farcaster)
+ id dd335672-883a-4fae-b8ca-99b1f6b1b3da; Fri, 10 Jan 2025 09:31:52 +0000 (UTC)
+X-Farcaster-Flow-ID: dd335672-883a-4fae-b8ca-99b1f6b1b3da
 Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
+ EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Fri, 10 Jan 2025 09:31:25 +0000
+ Fri, 10 Jan 2025 09:31:51 +0000
 Received: from 6c7e67c6786f.amazon.com (10.118.252.101) by
  EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Fri, 10 Jan 2025 09:31:21 +0000
+ Fri, 10 Jan 2025 09:31:48 +0000
 From: Kuniyuki Iwashima <kuniyu@amazon.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
@@ -64,9 +64,9 @@ To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 CC: Donald Hunter <donald.hunter@redhat.com>, Kuniyuki Iwashima
 	<kuniyu@amazon.com>, Kuniyuki Iwashima <kuni1840@gmail.com>,
 	<netdev@vger.kernel.org>
-Subject: [PATCH v1 net-next 10/12] af_unix: Set drop reason in unix_stream_read_skb().
-Date: Fri, 10 Jan 2025 18:26:39 +0900
-Message-ID: <20250110092641.85905-11-kuniyu@amazon.com>
+Subject: [PATCH v1 net-next 11/12] af_unix: Set drop reason in unix_dgram_disconnected().
+Date: Fri, 10 Jan 2025 18:26:40 +0900
+Message-ID: <20250110092641.85905-12-kuniyu@amazon.com>
 X-Mailer: git-send-email 2.39.5 (Apple Git-154)
 In-Reply-To: <20250110092641.85905-1-kuniyu@amazon.com>
 References: <20250110092641.85905-1-kuniyu@amazon.com>
@@ -78,46 +78,85 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D036UWC001.ant.amazon.com (10.13.139.233) To
+X-ClientProxiedBy: EX19D041UWB004.ant.amazon.com (10.13.139.143) To
  EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-unix_stream_read_skb() is called when BPF SOCKMAP reads some data
-from a socket in the map.
+unix_dgram_disconnected() is called from two places:
 
-SOCKMAP does not support MSG_OOB, and reading OOB results in a drop.
+  1. when a connect()ed socket disconnect() or re-connect()s to
+     another socket
 
-Let's set drop reasons respectively.
+  2. when sendmsg() fails because the peer socket that the client
+     has connect()ed to has been close()d
 
-  * SOCKET_CLOSE  : the socket in SOCKMAP was close()d
-  * UNIX_SKIP_OOB : OOB was read from the socket in SOCKMAP
+Then, the client's recv queue is purged to remove all messages from
+the old peer socket.
+
+Let's define a new drop reason for that case.
+
+  # echo 1 > /sys/kernel/tracing/events/skb/kfree_skb/enable
+
+  # python3
+  >>> from socket import *
+  >>>
+  >>> # s1 has a message from s2
+  >>> s1, s2 = socketpair(AF_UNIX, SOCK_DGRAM)
+  >>> s2.send(b'hello world')
+  >>>
+  >>> # re-connect() drops the message from s2
+  >>> s3 = socket(AF_UNIX, SOCK_DGRAM)
+  >>> s3.bind('')
+  >>> s1.connect(s3.getsockname())
+
+  # cat /sys/kernel/tracing/trace_pipe
+     python3-250 ... kfree_skb: ... location=skb_queue_purge_reason+0xdc/0x110 reason: UNIX_DISCONNECT
 
 Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 ---
- net/unix/af_unix.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ include/net/dropreason-core.h | 7 +++++++
+ net/unix/af_unix.c            | 4 +++-
+ 2 files changed, 10 insertions(+), 1 deletion(-)
 
+diff --git a/include/net/dropreason-core.h b/include/net/dropreason-core.h
+index 43e20acaa98a..580be34ffa4f 100644
+--- a/include/net/dropreason-core.h
++++ b/include/net/dropreason-core.h
+@@ -11,6 +11,7 @@
+ 	FN(SOCKET_INVALID_STATE)	\
+ 	FN(SOCKET_RCVBUFF)		\
+ 	FN(SOCKET_RCV_SHUTDOWN)		\
++	FN(UNIX_DISCONNECT)		\
+ 	FN(UNIX_INFLIGHT_FD_LIMIT)	\
+ 	FN(UNIX_SKIP_OOB)		\
+ 	FN(PKT_TOO_SMALL)		\
+@@ -152,6 +153,12 @@ enum skb_drop_reason {
+ 	SKB_DROP_REASON_SOCKET_RCVBUFF,
+ 	/** @SKB_DROP_REASON_SOCKET_RCV_SHUTDOWN: socket is shutdown(SHUT_RD) */
+ 	SKB_DROP_REASON_SOCKET_RCV_SHUTDOWN,
++	/**
++	 * @SKB_DROP_REASON_UNIX_DISCONNECT: recv queue is purged when SOCK_DGRAM
++	 * or SOCK_SEQPACKET socket re-connect()s to another socket or notices
++	 * during send() that the peer has been close()d.
++	 */
++	SKB_DROP_REASON_UNIX_DISCONNECT,
+ 	/**
+ 	 * @SKB_DROP_REASON_UNIX_INFLIGHT_FD_LIMIT: too many file descriptors
+ 	 * are passed via SCM_RIGHTS but not yet received, reaching RLIMIT_NOFILE.
 diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
-index 06d90767040e..80c979266d37 100644
+index 80c979266d37..b976f59dbcdd 100644
 --- a/net/unix/af_unix.c
 +++ b/net/unix/af_unix.c
-@@ -2773,7 +2773,7 @@ static int unix_stream_read_skb(struct sock *sk, skb_read_actor_t recv_actor)
+@@ -622,7 +622,9 @@ static void unix_write_space(struct sock *sk)
+ static void unix_dgram_disconnected(struct sock *sk, struct sock *other)
+ {
+ 	if (!skb_queue_empty(&sk->sk_receive_queue)) {
+-		skb_queue_purge(&sk->sk_receive_queue);
++		skb_queue_purge_reason(&sk->sk_receive_queue,
++				       SKB_DROP_REASON_UNIX_DISCONNECT);
++
+ 		wake_up_interruptible_all(&unix_sk(sk)->peer_wait);
  
- 		if (sock_flag(sk, SOCK_DEAD)) {
- 			unix_state_unlock(sk);
--			kfree_skb(skb);
-+			kfree_skb_reason(skb, SKB_DROP_REASON_SOCKET_CLOSE);
- 			return -ECONNRESET;
- 		}
- 
-@@ -2787,7 +2787,7 @@ static int unix_stream_read_skb(struct sock *sk, skb_read_actor_t recv_actor)
- 		unix_state_unlock(sk);
- 
- 		if (drop) {
--			kfree_skb(skb);
-+			kfree_skb_reason(skb, SKB_DROP_REASON_UNIX_SKIP_OOB);
- 			return -EAGAIN;
- 		}
- 	}
+ 		/* If one link of bidirectional dgram pipe is disconnected,
 -- 
 2.39.5 (Apple Git-154)
 
