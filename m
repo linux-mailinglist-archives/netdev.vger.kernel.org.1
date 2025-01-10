@@ -1,81 +1,95 @@
-Return-Path: <netdev+bounces-156932-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156933-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8ADF1A08518
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 03:02:20 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 66846A0852C
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 03:10:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BD4AE3A911D
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 02:02:14 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 25D767A3123
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 02:10:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D26FD2E62B;
-	Fri, 10 Jan 2025 02:02:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 296811487CD;
+	Fri, 10 Jan 2025 02:10:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Rar9Z8ci"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YsUyi2hC"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A857BC2C6;
-	Fri, 10 Jan 2025 02:02:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB2FF18027;
+	Fri, 10 Jan 2025 02:10:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736474535; cv=none; b=RxrPPQt4LXMDSLVnl/i9V2YN+j3CGIjFvRsL5KZFWePb28Q+YPAPM+Bjj8y7YVKYlBouLAX1MF7Pt7VvvPxOc6TQAD//ltzjDIFtWE5Hm/X7EN/eBplu8jBNPucvabEcDR1pe2RcWmtxSWrmd2vRmxldb5rH2x49+PMp3vqKw+M=
+	t=1736475011; cv=none; b=kkXRJYIHtVLB4LDUjABAWCVsA+cKvA95jGkowoUJqksD4Q2Qxd2cSdiP5skgTqnqhzaWEMKVDxgLFBmUyW1QtNNvZBS9R15suqomhNyG3i89OK8NQkP4wU1izqgOy3OPHn4EHkWGD7Df/5Kr9/DpSgVCVOmesoTJT5fpOU8AnOQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736474535; c=relaxed/simple;
-	bh=2Rgjg1zFqD+nWOVgkA/R5GzzOIP7+Ega7WrtK+6psQQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=BOBVFFhDSQCyqlRVtzOdDVx0klsIGmaG8rIB74qe56HsNGBMsWcrcZyEkWBVkvNyfDbblGTdwoOewsqO77kdfwEVYTh3Ag5gPkVM7dPV/KTdjfBBiaJvNx5eS7wTJTFDoKU6rth2XR7yYax6eVqDfnUE6UNvSRckglm6rnA4msI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Rar9Z8ci; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C9A25C4CED2;
-	Fri, 10 Jan 2025 02:02:13 +0000 (UTC)
+	s=arc-20240116; t=1736475011; c=relaxed/simple;
+	bh=FfxQ7rULUpCts0paHtG64aKcRHbsBBRN9hhIv7SNWkk=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=spECQ2ZaSjvxS21Tlyv15qr669CLwkePzFSLDuT/Yt74TPCp3tHYFPGIOMfCxXITA5YTjdWeRVW/5QcmRe20bVSkzLPU0zx28MTl7e5sZ7Dke4AlERxc1NWnm5AkqVMO73WFr2Wx+E+orPKJf2OCh9VOXxIXaU5IuvEWtrkk36U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YsUyi2hC; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6599BC4CED2;
+	Fri, 10 Jan 2025 02:10:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736474534;
-	bh=2Rgjg1zFqD+nWOVgkA/R5GzzOIP7+Ega7WrtK+6psQQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Rar9Z8ci6DktzKFJZHgULmIQHB5P/Lw50nZ4dd/BkLHFqyZL0XNlJNri1EDcbKPlP
-	 ARpU/vVx4VGuE5p6y9s7/zWH3BOBtPTF3Z90nmA1VzMJ3lHP6yP8Fu684GIXwRu2F6
-	 4Uf/kfSdVS9OKrUAb3pKR3DMkWPVTyYsZ3W0xuUZpP3sKbeOeoCK56h37FOmR94HrE
-	 TSpgKc3WqTtyM4+jPHIELZSvEtfXRCM9WmIelSqQH3+Rp86ltTYFeb62ne+e2iv8fr
-	 ujBlDiuxj2m6+wXD5vqx7a7S0e9vhho8vAr6kSfAlsh+ma5Up99Y9WzpU9Q9/NDWPg
-	 QxwWVoqzJG6Uw==
-Date: Thu, 9 Jan 2025 18:02:12 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Yeking@Red54.com
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com,
- wellslutw@gmail.com
-Subject: Re: [net PATCH v2] net: ethernet: sunplus: Switch to ndo_eth_ioctl
-Message-ID: <20250109180212.71e4e53c@kernel.org>
-In-Reply-To: <tencent_E1D1FEF51C599BFD053CC7B4FBFEFC057A0A@qq.com>
-References: <20250108100905.799e6112@kernel.org>
-	<tencent_E1D1FEF51C599BFD053CC7B4FBFEFC057A0A@qq.com>
+	s=k20201202; t=1736475010;
+	bh=FfxQ7rULUpCts0paHtG64aKcRHbsBBRN9hhIv7SNWkk=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=YsUyi2hC/0C2jsPedgbgG96ApmJ1JhSLs/zfjQuwipjqNSt8sHrc4NdiUshezCVip
+	 7KIJBz1juOTiIk+Yg/S16NAsse1NU0z/Ieh34vR7voZC7SsdfP08Eq8wtMWT4FX+3F
+	 RX7sV4XNspObWvVnyZ0u6KzJsZQutOWjscuVzRdyHNKtjNjfzGGs9eirzxurjhjwp5
+	 Dh3Efh9vcbQykI9PpaBKS/Y1plmNIOAB8xPfUQJU0FLLZ4FUvxprSIcEYosu5RNcP3
+	 dUZJKB0SwbTIYz38hT8OjdVbXYYysdp/dlghGOn9o9Atv4iVGOaQTloUHOopjSvbNU
+	 7c9ZeHSzrT+4A==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70D14380A97F;
+	Fri, 10 Jan 2025 02:10:33 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v2 net] net: ethernet: ti: cpsw_ale: Fix cpsw_ale_get_field()
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <173647503227.1577336.13458023393736372807.git-patchwork-notify@kernel.org>
+Date: Fri, 10 Jan 2025 02:10:32 +0000
+References: <20250108172433.311694-1-s-doredla@ti.com>
+In-Reply-To: <20250108172433.311694-1-s-doredla@ti.com>
+To: Sudheer Kumar Doredla <s-doredla@ti.com>
+Cc: s-vadapalli@ti.com, rogerq@kernel.org, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ horms@kernel.org, gnault@redhat.com, linux-omap@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, t-patil@ti.com,
+ j-keerthy@ti.com
 
-On Thu,  9 Jan 2025 02:05:52 +0000 Yeking@Red54.com wrote:
-> From: =E8=B0=A2=E8=87=B4=E9=82=A6 (XIE Zhibang) <Yeking@Red54.com>
->=20
-> ndo_do_ioctl is no longer called by the device ioctl handler,
-> so use ndo_eth_ioctl instead. (found by code inspection)
->=20
-> Fixes: fd3040b9394c ("net: ethernet: Add driver for Sunplus SP7021")
+Hello:
 
-This tag is unnecessary, Fixes tag should point to the commit which
-_broke_ things.
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-> Fixes: a76053707dbf ("dev_ioctl: split out ndo_eth_ioctl")
+On Wed, 8 Jan 2025 22:54:33 +0530 you wrote:
+> CPSW ALE has 75-bit ALE entries stored across three 32-bit words.
+> The cpsw_ale_get_field() and cpsw_ale_set_field() functions support
+> ALE field entries spanning up to two words at the most.
+> 
+> The cpsw_ale_get_field() and cpsw_ale_set_field() functions work as
+> expected when ALE field spanned across word1 and word2, but fails when
+> ALE field spanned across word2 and word3.
+> 
+> [...]
 
-Now that you added this tag you need to run get_maintainer again /
-correctly on the patch and CC the authors.
---=20
-pw-bot: cr
+Here is the summary with links:
+  - [v2,net] net: ethernet: ti: cpsw_ale: Fix cpsw_ale_get_field()
+    https://git.kernel.org/netdev/net/c/03d120f27d05
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
