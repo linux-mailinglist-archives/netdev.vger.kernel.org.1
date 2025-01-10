@@ -1,105 +1,179 @@
-Return-Path: <netdev+bounces-157156-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157171-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43DFCA09178
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 14:07:37 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E25D6A09241
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 14:40:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8CA7F169CAB
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 13:07:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ECC171669E3
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 13:40:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2034A20C472;
-	Fri, 10 Jan 2025 13:07:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA24820E309;
+	Fri, 10 Jan 2025 13:40:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6625520D4FB;
-	Fri, 10 Jan 2025 13:07:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9FD02080DB
+	for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 13:40:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736514451; cv=none; b=R8wopxIw9C4bNTZf5PdK2AFQfCFfuUHgKEgCPPY74GD73i6KmhrzYsRAqGuLSWGhnf6MXsxWLX9qMpc3w1fDyqglWE4/KSdKjJ7tYkbwFzmsmbK5lNFocMVLB8/Bnz7gR5kpdfYTimvIN8K30Pv1OUKO94EWbtIAu0E/e8Dd7EE=
+	t=1736516442; cv=none; b=CoDyFHb2EixqgqprsWGR2gOnc1kmRI9760MDyY+14U8yBcBh1z0tPpwUSvAqi8fqCS8PM53hZsaU9TvnSVK6MPsY9O+YVDgkqVolorCWXJgCSzUXGl1BA4fEq5AG2zg85Og195I681y+guqc9TaiXUJiqAlRsiiuv0loDHKxAxs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736514451; c=relaxed/simple;
-	bh=iGOwrTxp1iwrWsEtxrYr0QhuHVgZQGTuHNCLHmY5KNM=;
+	s=arc-20240116; t=1736516442; c=relaxed/simple;
+	bh=PLerkdNZcgRBNhpGasCoN27kcTo1EYb+lORo5iq5NJc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=szAn+IADfj0W37Lh6KDAidXxIUlyS5Rv3v0d1Sy4OHNqXcckT8dR+xh8YIhSP/qfhMboy9b+tMo1dFGVKlzbrqtYM+UHQQA79HcBa7ZZC5ZqdlLohk+Mv98UG7V68FrFlrfZevLw97iBzhjI0qb40XcvRY36DQx9c3V7seX3tlc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-aaf0f1adef8so413741266b.3;
-        Fri, 10 Jan 2025 05:07:29 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736514448; x=1737119248;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pZTa9SRy8e4uUiU834dj+GSJNNuY8KbOwXWTK1jw6cw=;
-        b=mFLwIinq6mLedflnmdznhe9ZD7E50EBZhwP6n3eoJh6NJc+tN6HwzOA+t4hP59IVmD
-         C3lfXuU6Pch2t0juF314hEl2zcFZQQqHyL6dNS1zBXzeS7Ziiwv+iH2pgYHvHoUtg/+F
-         ThAIqePNkaqeAU4/eZ4cDG7wA16r6U8zMa/3A9mV7YpI+MNXTEMUnYmXLdxb2u8ZRARQ
-         EplYLj2e4VCXw+LZAfIpurvAIgtr05u0z3m0Qyl14zaEZtivBDedjefHVAmNhGLkKafa
-         RV/tKcDP60kh4lke9qSqTZy6DCYYHTIeNREjzvgYcDyRFXrgKkvX8dMRx5SEK1MnC42p
-         zcCA==
-X-Forwarded-Encrypted: i=1; AJvYcCW0sxCfPN75bTiQ8Ez7//ruFsdFIXDLe4exI7Hbv3h9R9kIoQ//SItC6AMRCQjAQNLCbJAK3Ull@vger.kernel.org, AJvYcCWgV+Dfjmhgihb6WgfruZVp39KKHjE0nXPPT2zBSDFYpJyi5YFCc24GtPfxWJG5IP29ldOGN2F3NEMEWRg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxRcF/vcL+QXKeH9AJsNZZyi1lc0zhckMuFxiBdS9uJ2rVRgrR6
-	WXawijcOHPZ2ZATxgxug3alweIWrhVUs4IwHqtNNF1oNuZJ4CdiD
-X-Gm-Gg: ASbGncu2Lv5cB4Pzrwi3PTF8WxEUOammgRz/VgjoskGb1SpxStzFJxr1HOzXL3tkamm
-	uGiDAPcyS7hXWZb9EI0RRKujoQdLG+ikUvA/k38dN4q6ryUJfmHJnZpoGOT+neNzXUqKTAZHzGs
-	6rjXK5topyL1H+SdobJSnC2luouuk3oql4QH1BkeG8TZ7SgBfDds3taRteDVi5C/RZsMzuggwnu
-	aOWjIJodpV/482BzXcURqA06vHgGwRxNUZAdEv3Yzbh1PU=
-X-Google-Smtp-Source: AGHT+IEgvYDEnIPshGw96I+Ux8ECjgHbRJMmCaQ5VDza5/5523KmXoNgYfEXTmdWQufxGFigK3wN3w==
-X-Received: by 2002:a17:907:9691:b0:aaf:ab71:67b6 with SMTP id a640c23a62f3a-ab2ab73c487mr944591066b.31.1736514447434;
-        Fri, 10 Jan 2025 05:07:27 -0800 (PST)
-Received: from gmail.com ([2a03:2880:30ff:9::])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ab2c90db325sm167404666b.65.2025.01.10.05.07.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 Jan 2025 05:07:26 -0800 (PST)
-Date: Fri, 10 Jan 2025 05:07:21 -0800
-From: Breno Leitao <leitao@debian.org>
-To: jsperbeck@google.com
-Cc: John Sperbeck <jsperbeck@google.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, Simon Horman <horms@kernel.org>,
-	linux-kernel@vger.kernel.org, kuba@kernel.org
-Subject: Re: [PATCH] net: netpoll: ensure skb_pool list is always initialized
-Message-ID: <20250110-wildebeest-of-optimal-unity-06c308@leitao>
-References: <20241222012334.249021-1-jsperbeck@google.com>
- <20241230175707.5e18ae96@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=ec0tAHhr1r4WwV6DYX6zqRtAWH7K61XjZLLM7MTe5qFSwRkQmu9DXCJ+k32IWrFW2+43fbQY5AJBWCR+GX10Ys4iqzb4zxetm2Y6I+iCTM0FhBVfYLYFJvIqzaR5aN7CzYfIaAbloBhY0EaJqgoMM4WjVQ1D85vqUc0waIlcIPM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1tWFFX-0000CQ-Hi; Fri, 10 Jan 2025 14:40:31 +0100
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1tWFFW-000Axh-1o;
+	Fri, 10 Jan 2025 14:40:30 +0100
+Received: from pengutronix.de (pd9e59fec.dip0.t-ipconnect.de [217.229.159.236])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id 9E0143A47AE;
+	Fri, 10 Jan 2025 13:10:55 +0000 (UTC)
+Date: Fri, 10 Jan 2025 14:10:55 +0100
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org, 
+	linux-can@vger.kernel.org, kernel@pengutronix.de, Jimmy Assarsson <extja@kvaser.com>
+Subject: Re: [PATCH net-next 15/18] can: kvaser_usb: Update stats and state
+ even if alloc_can_err_skb() fails
+Message-ID: <20250110-notorious-kangaroo-from-atlantis-1645f8-mkl@pengutronix.de>
+References: <20250110112712.3214173-1-mkl@pengutronix.de>
+ <20250110112712.3214173-16-mkl@pengutronix.de>
+ <20250110125803.GF7706@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="cjml7fqyn67m4v2v"
 Content-Disposition: inline
-In-Reply-To: <20241230175707.5e18ae96@kernel.org>
+In-Reply-To: <20250110125803.GF7706@kernel.org>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Hello John,
 
-On Mon, Dec 30, 2024 at 05:57:07PM -0800, Jakub Kicinski wrote:
-> On Sat, 21 Dec 2024 17:23:34 -0800 John Sperbeck wrote:
-> > Move the skb_pool list initialization into __netpoll_setup().  Also,
-> > have netpoll_setup() call this before allocating its initial pool of
-> > packets.
-> > 
-> > Fixes: 6c59f16f1770 ("net: netpoll: flush skb pool during cleanup")
-> 
-> The fixes tag seems to be off by one? Wasn't the problem was introduced
-> by commit 221a9c1df790 ("net: netpoll: Individualize the skb pool") ?
-> 
-> Since __netpoll_setup() can be called by other drivers, shouldn't 
-> we move refill in there? Since the pool is per np?
-> 
-> Optionally, could you extend the netcons tests to exercise netcons over
-> vlan? I think it should be able to trigger the crash you're fixing?
+--cjml7fqyn67m4v2v
+Content-Type: text/plain; protected-headers=v1; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH net-next 15/18] can: kvaser_usb: Update stats and state
+ even if alloc_can_err_skb() fails
+MIME-Version: 1.0
 
-Are you planning to resend this fix with Jakub's suggestion?
+On 10.01.2025 12:58:03, Simon Horman wrote:
+> On Fri, Jan 10, 2025 at 12:04:23PM +0100, Marc Kleine-Budde wrote:
+> > From: Jimmy Assarsson <extja@kvaser.com>
+> >=20
+> > Ensure statistics, error counters, and CAN state are updated consistent=
+ly,
+> > even when alloc_can_err_skb() fails during state changes or error messa=
+ge
+> > frame reception.
+> >=20
+> > Signed-off-by: Jimmy Assarsson <extja@kvaser.com>
+> > Link: https://patch.msgid.link/20241230142645.128244-1-extja@kvaser.com
+> > Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
+>=20
+> ...
+>=20
+> > diff --git a/drivers/net/can/usb/kvaser_usb/kvaser_usb_leaf.c b/drivers=
+/net/can/usb/kvaser_usb/kvaser_usb_leaf.c
+>=20
+> ...
+>=20
+> > @@ -1187,11 +1169,18 @@ static void kvaser_usb_leaf_rx_error(const stru=
+ct kvaser_usb *dev,
+> >  		if (priv->can.restart_ms &&
+> >  		    old_state =3D=3D CAN_STATE_BUS_OFF &&
+> >  		    new_state < CAN_STATE_BUS_OFF) {
+> > -			cf->can_id |=3D CAN_ERR_RESTARTED;
+> > +			if (cf)
+> > +				cf->can_id |=3D CAN_ERR_RESTARTED;
+> >  			netif_carrier_on(priv->netdev);
+> >  		}
+> >  	}
+> > =20
+> > +	if (!skb) {
+> > +		stats->rx_dropped++;
+> > +		netdev_warn(priv->netdev, "No memory left for err_skb\n");
+> > +		return;
+> > +	}
+> > +
+> >  	switch (dev->driver_info->family) {
+> >  	case KVASER_LEAF:
+> >  		if (es->leaf.error_factor) {
+>=20
+> Hi Jimmy and Marc,
+>=20
+> The next line of this function is:
+>=20
+> 			cf->can_id |=3D CAN_ERR_BUSERROR | CAN_ERR_PROT;
+>=20
+> Which dereferences cf. However, the check added at the top of
+> this hunk assumes that cf may be NULL. This doesn't seem consistent.
 
-Thanks
---breno
+The driver allocates the skb with:
+
+	skb =3D alloc_can_err_skb(priv->netdev, &cf);
+
+Which in turn calls alloc_can_skb(), which finally calls:
+
+        *cf =3D skb_put_zero(skb, sizeof(struct can_frame));
+
+To put the cf into the skb.
+
+The newly added check "if (!skb)", takes care of skb allocation errors,
+so that the de-referencing of "cf" is OK after this point.
+
+regards,
+Marc
+
+P.S.:
+IIRC smatch stumbled over the same pattern in another driver a while
+back. Is there anything we can do about it?
+
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+
+--cjml7fqyn67m4v2v
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmeBHFwACgkQKDiiPnot
+vG80LggAjEDGR28sazurzlGbT9gGqqa1ncnBQ78YG2PZ0n/UYeRfQ7aruOozVnkB
+vzNctUW7D6CuCjRIWaZTvDhsRs3tW+fANOKgpad7tMhBrKqyTQguaaeA1zZlipGZ
+M2vDeZx++iwGcEAodiOPVex2uMd0YZR8jNwo11Mv4xrAwH1L2ISYje+ETrFA6yGg
+x0lHKe73FUBGEHRP2B/K0/1u4/XwQupkSsiiVrX48Zddl5Vp7oLEilSUU1dtTCYM
+kKKo9353FE04H5StzVtUMTJu1L2L/IEkMKKuK4jlB7JoaVlVrQKHGRGgKrs9WiBE
+cd9BTCvy8rHvsshubljlLKWsOxbqVw==
+=Iak+
+-----END PGP SIGNATURE-----
+
+--cjml7fqyn67m4v2v--
 
