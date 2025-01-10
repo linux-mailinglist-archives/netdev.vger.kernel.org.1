@@ -1,64 +1,65 @@
-Return-Path: <netdev+bounces-156996-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156994-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88A8CA08A24
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 09:30:07 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8462DA08A1F
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 09:29:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A29893A8B45
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 08:29:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2DECC1885447
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 08:29:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CEF8207DEA;
-	Fri, 10 Jan 2025 08:29:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61463207A34;
+	Fri, 10 Jan 2025 08:29:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="yP+rQ6Z+"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="nJG3CEm5"
 X-Original-To: netdev@vger.kernel.org
-Received: from fllv0015.ext.ti.com (fllv0015.ext.ti.com [198.47.19.141])
+Received: from lelvem-ot02.ext.ti.com (lelvem-ot02.ext.ti.com [198.47.23.235])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 848BD208981;
-	Fri, 10 Jan 2025 08:29:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.141
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FB98207A37;
+	Fri, 10 Jan 2025 08:29:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.235
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736497771; cv=none; b=Sq+MIFrLHov9zKZ39nwLwJ1PxKTC6LOwqrTSL8WjJ9oIwA6gGRoYBSCgiEHqDF/WA4pycDwDlRxmgMWlX3R0G9oSsfNHJocxE2FzjuZ4G3ngG1sHFM/ztNDuzgTNvb+VSiQPdCFhATEo58hph0PWOccgD1O9/qZnk8fiIMqYzE4=
+	t=1736497766; cv=none; b=jENgbbnnRfgf7Xe0ya5qIpAvZvzIX/lU6mq6ZjziGYd6ChN8maT5PPUtBQSvNuM2ZkVoUfBDuq25glGMjsCLYjTTUGkwI0RBwjKxq41EVJ4IFnVkd9MJyhFfeIVT4pcoMoKipdHWVjMzTJRB3Ik1ASIIXjgRR6VjRkRPqumYs7w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736497771; c=relaxed/simple;
-	bh=beaNBMz3UbxcRCzapBTdYZSilu6KbbTQFJp52OF+2wU=;
+	s=arc-20240116; t=1736497766; c=relaxed/simple;
+	bh=TbKtxYr5BAarok+IE2FsFMQDCMd1NHot+cImwDTUiuM=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Xc5Dp29vSB8H8nvzDPD+8MkTnttEurAE989rdfXG7iQqAIoqWGPX+FvKhGeEnnzOR+FmE3PNC0xkZl248dXvUNBY+X1UbYsiKPlouJkIGsNf2UDGzbsbgeyAQn/BkzSmMAW/Ql42f1ZjS6hfLVkQXOz4Cy5RcbeO/3Q2xSDRxUM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=yP+rQ6Z+; arc=none smtp.client-ip=198.47.19.141
+	 MIME-Version:Content-Type; b=Q0XtGZe9+tmiUAHdChK0adTr8c8Lfgry4avpw3BbMPcMZavhTRVS7Wk9pPrqPFNOOG/vssHSZYvea1PQKzPPUQUiz9RA/0OKopn9sY2PnrwBZefuG8tzjvZJczaJ2xJaAnrZwFwUBrClbYGewvx3lp9ZAZxbEGWEb1s7KAeY5v0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=nJG3CEm5; arc=none smtp.client-ip=198.47.23.235
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
 Received: from lelv0265.itg.ti.com ([10.180.67.224])
-	by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id 50A8T3ve046093;
-	Fri, 10 Jan 2025 02:29:03 -0600
+	by lelvem-ot02.ext.ti.com (8.15.2/8.15.2) with ESMTPS id 50A8T6up3390430
+	(version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 10 Jan 2025 02:29:06 -0600
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1736497743;
-	bh=MhV52fembSzHaqyb8w/Apr+wsYo5ic6nZUOPr5ywkgI=;
+	s=ti-com-17Q1; t=1736497746;
+	bh=pAlsVkvjNe/9JvatPE66gMffUnB33UIIOCebIlDB1hA=;
 	h=From:To:CC:Subject:Date:In-Reply-To:References;
-	b=yP+rQ6Z+CgiDfkDdNAfSuJnjsNLxKZDO/Ye/MaNTmb0SHDggKgpVNqoRm4M1fjKMq
-	 s8+zfVTDQgRip5PXLFNbHtM1AWzNkXtTApBwpm1flkahXC4xtEvV1iLq11EvSEd56j
-	 LzIo7+yVF1waShp5humA+guIiLMmF1RNZWguH5XU=
-Received: from DFLE110.ent.ti.com (dfle110.ent.ti.com [10.64.6.31])
-	by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 50A8T3vL007525
+	b=nJG3CEm5vOMKkuad0YIiNYu2g5y6tR/6df94dy4K08x9WPdDW0bwHQuSFmoVCMJGH
+	 jMXkcGVww7qkKb5j5wd3HhNGbEjHycF/420+AjQajOriubAsxnX8RLH6JNL/TIMX/2
+	 RJJaF1334+ZG55ORzIRvbFSTNrdTyWNARIWP7DgA=
+Received: from DLEE104.ent.ti.com (dlee104.ent.ti.com [157.170.170.34])
+	by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 50A8T6xT007587
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Fri, 10 Jan 2025 02:29:03 -0600
-Received: from DFLE103.ent.ti.com (10.64.6.24) by DFLE110.ent.ti.com
- (10.64.6.31) with Microsoft SMTP Server (version=TLS1_2,
+	Fri, 10 Jan 2025 02:29:06 -0600
+Received: from DLEE100.ent.ti.com (157.170.170.30) by DLEE104.ent.ti.com
+ (157.170.170.34) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Fri, 10
- Jan 2025 02:29:03 -0600
-Received: from fllvsmtp7.itg.ti.com (10.64.40.31) by DFLE103.ent.ti.com
- (10.64.6.24) with Microsoft SMTP Server (version=TLS1_2,
+ Jan 2025 02:29:05 -0600
+Received: from fllvsmtp8.itg.ti.com (10.64.41.158) by DLEE100.ent.ti.com
+ (157.170.170.30) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Fri, 10 Jan 2025 02:29:03 -0600
+ Frontend Transport; Fri, 10 Jan 2025 02:29:05 -0600
 Received: from lelv0854.itg.ti.com (lelv0854.itg.ti.com [10.181.64.140])
-	by fllvsmtp7.itg.ti.com (8.15.2/8.15.2) with ESMTP id 50A8T35T007190;
-	Fri, 10 Jan 2025 02:29:03 -0600
+	by fllvsmtp8.itg.ti.com (8.15.2/8.15.2) with ESMTP id 50A8T5de012777;
+	Fri, 10 Jan 2025 02:29:05 -0600
 Received: from localhost (danish-tpc.dhcp.ti.com [10.24.69.25])
-	by lelv0854.itg.ti.com (8.14.7/8.14.7) with ESMTP id 50A8T2o7021283;
-	Fri, 10 Jan 2025 02:29:02 -0600
+	by lelv0854.itg.ti.com (8.14.7/8.14.7) with ESMTP id 50A8T4NO021289;
+	Fri, 10 Jan 2025 02:29:04 -0600
 From: MD Danish Anwar <danishanwar@ti.com>
 To: Jeongjun Park <aha310510@gmail.com>,
         Alexander Lobakin
@@ -83,9 +84,9 @@ CC: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
 	<michal.swiatkowski@linux.intel.com>,
         Larysa Zaremba
 	<larysa.zaremba@intel.com>
-Subject: [PATCH net-next v4 2/4] net: ti: icssg-prueth: Add Multicast Filtering support for VLAN in MAC mode
-Date: Fri, 10 Jan 2025 13:58:50 +0530
-Message-ID: <20250110082852.3899027-3-danishanwar@ti.com>
+Subject: [PATCH net-next v4 3/4] net: hsr: Create and export hsr_get_port_ndev()
+Date: Fri, 10 Jan 2025 13:58:51 +0530
+Message-ID: <20250110082852.3899027-4-danishanwar@ti.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250110082852.3899027-1-danishanwar@ti.com>
 References: <20250110082852.3899027-1-danishanwar@ti.com>
@@ -99,223 +100,111 @@ Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
 
-Add multicast filtering support for VLAN interfaces in dual EMAC mode
-for ICSSG driver.
+Create an API to get the net_device to the slave port of HSR device. The
+API will take hsr net_device and enum hsr_port_type for which we want the
+net_device as arguments.
 
-The driver uses vlan_for_each() API to get the list of available
-vlans. The driver then sync mc addr of vlan interface with a locally
-mainatined list emac->vlan_mcast_list[vid] using __hw_addr_sync_multiple()
-API.
+This API can be used by client drivers who support HSR and want to get
+the net_devcie of slave ports from the hsr device. Export this API for
+the same.
 
-__hw_addr_sync_multiple() is used instead of __hw_addr_sync() to sync
-vdev->mc with local list because the sync_cnt for addresses in vdev->mc
-will already be set by the vlan_dev_set_rx_mode() [net/8021q/vlan_dev.c]
-and __hw_addr_sync() only syncs when the sync_cnt == 0. Whereas
-__hw_addr_sync_multiple() can sync addresses even if sync_cnt is not 0.
-Export __hw_addr_sync_multiple() so that driver can use it.
-
-Once the local list is synced, driver calls __hw_addr_sync_dev() with
-the local list, vdev, sync and unsync callbacks.
-
-__hw_addr_sync_dev() is used with the local maintained list as the list
-to synchronize instead of using __dev_mc_sync() on vdev because
-__dev_mc_sync() on vdev will call __hw_addr_sync_dev() on vdev->mc and
-sync_cnt for addresses in vdev->mc will already be set by the
-vlan_dev_set_rx_mode() [net/8021q/vlan_dev.c] and __hw_addr_sync_dev()
-only syncs if the sync_cnt of addresses in the list (vdev->mc in this case)
-is 0. Whereas __hw_addr_sync_dev() on local list will work fine as the
-sync_cnt for addresses in the local list will still be 0.
-
-Based on change in addresses in the local list, sync / unsync callbacks
-are invoked. In the sync / unsync API in driver, based on whether the ndev
-is vlan or not, driver passes appropriate vid to FDB helper functions.
+This API needs the enum hsr_port_type to be accessible by the drivers using
+hsr. Move the enum hsr_port_type from net/hsr/hsr_main.h to
+include/linux/if_hsr.h for the same.
 
 Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
 ---
- drivers/net/ethernet/ti/icssg/icssg_prueth.c | 67 ++++++++++++++++----
- drivers/net/ethernet/ti/icssg/icssg_prueth.h |  6 ++
- include/linux/netdevice.h                    |  3 +
- net/core/dev_addr_lists.c                    |  7 +-
- 4 files changed, 66 insertions(+), 17 deletions(-)
+ include/linux/if_hsr.h | 17 +++++++++++++++++
+ net/hsr/hsr_device.c   | 13 +++++++++++++
+ net/hsr/hsr_main.h     |  9 ---------
+ 3 files changed, 30 insertions(+), 9 deletions(-)
 
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.c b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-index 1d510c9dabff..b2d0d7b7b6d9 100644
---- a/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-+++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-@@ -561,30 +561,44 @@ const struct icss_iep_clockops prueth_iep_clockops = {
- 
- static int icssg_prueth_add_mcast(struct net_device *ndev, const u8 *addr)
- {
--	struct prueth_emac *emac = netdev_priv(ndev);
--	int port_mask = BIT(emac->port_id);
-+	struct net_device *real_dev;
-+	struct prueth_emac *emac;
-+	int port_mask;
-+	u8 vlan_id;
- 
--	port_mask |= icssg_fdb_lookup(emac, addr, 0);
--	icssg_fdb_add_del(emac, addr, 0, port_mask, true);
--	icssg_vtbl_modify(emac, 0, port_mask, port_mask, true);
-+	vlan_id = is_vlan_dev(ndev) ? vlan_dev_vlan_id(ndev) : PRUETH_DFLT_VLAN_MAC;
-+	real_dev = is_vlan_dev(ndev) ? vlan_dev_real_dev(ndev) : ndev;
-+	emac = netdev_priv(real_dev);
-+
-+	port_mask = BIT(emac->port_id) | icssg_fdb_lookup(emac, addr, vlan_id);
-+	icssg_fdb_add_del(emac, addr, vlan_id, port_mask, true);
-+	icssg_vtbl_modify(emac, vlan_id, port_mask, port_mask, true);
- 
- 	return 0;
- }
- 
- static int icssg_prueth_del_mcast(struct net_device *ndev, const u8 *addr)
- {
--	struct prueth_emac *emac = netdev_priv(ndev);
--	int port_mask = BIT(emac->port_id);
-+	struct net_device *real_dev;
-+	struct prueth_emac *emac;
- 	int other_port_mask;
-+	int port_mask;
-+	u8 vlan_id;
-+
-+	vlan_id = is_vlan_dev(ndev) ? vlan_dev_vlan_id(ndev) : PRUETH_DFLT_VLAN_MAC;
-+	real_dev = is_vlan_dev(ndev) ? vlan_dev_real_dev(ndev) : ndev;
-+	emac = netdev_priv(real_dev);
- 
--	other_port_mask = port_mask ^ icssg_fdb_lookup(emac, addr, 0);
-+	port_mask = BIT(emac->port_id);
-+	other_port_mask = port_mask ^ icssg_fdb_lookup(emac, addr, vlan_id);
- 
--	icssg_fdb_add_del(emac, addr, 0, port_mask, false);
--	icssg_vtbl_modify(emac, 0, port_mask, port_mask, false);
-+	icssg_fdb_add_del(emac, addr, vlan_id, port_mask, false);
-+	icssg_vtbl_modify(emac, vlan_id, port_mask, port_mask, false);
- 
- 	if (other_port_mask) {
--		icssg_fdb_add_del(emac, addr, 0, other_port_mask, true);
--		icssg_vtbl_modify(emac, 0, other_port_mask, other_port_mask, true);
-+		icssg_fdb_add_del(emac, addr, vlan_id, other_port_mask, true);
-+		icssg_vtbl_modify(emac, vlan_id, other_port_mask,
-+				  other_port_mask, true);
- 	}
- 
- 	return 0;
-@@ -620,6 +634,25 @@ static int icssg_prueth_hsr_del_mcast(struct net_device *ndev, const u8 *addr)
- 	return 0;
- }
- 
-+static int icssg_update_vlan_mcast(struct net_device *vdev, int vid,
-+				   void *args)
-+{
-+	struct prueth_emac *emac = args;
-+
-+	if (!vdev || !vid)
-+		return 0;
-+
-+	netif_addr_lock_bh(vdev);
-+	__hw_addr_sync_multiple(&emac->vlan_mcast_list[vid], &vdev->mc,
-+				vdev->addr_len);
-+	netif_addr_unlock_bh(vdev);
-+
-+	__hw_addr_sync_dev(&emac->vlan_mcast_list[vid], vdev,
-+			   icssg_prueth_add_mcast, icssg_prueth_del_mcast);
-+
-+	return 0;
-+}
-+
- /**
-  * emac_ndo_open - EMAC device open
-  * @ndev: network adapter device
-@@ -857,12 +890,17 @@ static void emac_ndo_set_rx_mode_work(struct work_struct *work)
- 		return;
- 	}
- 
--	if (emac->prueth->is_hsr_offload_mode)
-+	if (emac->prueth->is_hsr_offload_mode) {
- 		__dev_mc_sync(ndev, icssg_prueth_hsr_add_mcast,
- 			      icssg_prueth_hsr_del_mcast);
--	else
-+	} else {
- 		__dev_mc_sync(ndev, icssg_prueth_add_mcast,
- 			      icssg_prueth_del_mcast);
-+		if (rtnl_trylock()) {
-+			vlan_for_each(ndev, icssg_update_vlan_mcast, emac);
-+			rtnl_unlock();
-+		}
-+	}
- }
- 
- /**
-@@ -913,6 +951,7 @@ static int emac_ndo_vlan_rx_add_vid(struct net_device *ndev,
- 	if (prueth->is_hsr_offload_mode)
- 		port_mask |= BIT(PRUETH_PORT_HOST);
- 
-+	__hw_addr_init(&emac->vlan_mcast_list[vid]);
- 	netdev_dbg(emac->ndev, "VID add vid:%u port_mask:%X untag_mask %X\n",
- 		   vid, port_mask, untag_mask);
- 
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.h b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
-index 5473315ea204..c8f7a22cb253 100644
---- a/drivers/net/ethernet/ti/icssg/icssg_prueth.h
-+++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
-@@ -83,6 +83,10 @@
- #define ICSS_CMD_ADD_FILTER 0x7
- #define ICSS_CMD_ADD_MAC 0x8
- 
-+/* VLAN Filtering Related MACROs */
-+#define PRUETH_DFLT_VLAN_MAC	0
-+#define MAX_VLAN_ID		256
-+
- /* In switch mode there are 3 real ports i.e. 3 mac addrs.
-  * however Linux sees only the host side port. The other 2 ports
-  * are the switch ports.
-@@ -200,6 +204,8 @@ struct prueth_emac {
- 	/* RX IRQ Coalescing Related */
- 	struct hrtimer rx_hrtimer;
- 	unsigned long rx_pace_timeout_ns;
-+
-+	struct netdev_hw_addr_list vlan_mcast_list[MAX_VLAN_ID];
+diff --git a/include/linux/if_hsr.h b/include/linux/if_hsr.h
+index 0404f5bf4f30..d7941fd88032 100644
+--- a/include/linux/if_hsr.h
++++ b/include/linux/if_hsr.h
+@@ -13,6 +13,15 @@ enum hsr_version {
+ 	PRP_V1,
  };
  
- /**
-diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index 1812564b5204..99265cc864cc 100644
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -4689,6 +4689,9 @@ int devm_register_netdev(struct device *dev, struct net_device *ndev);
- /* General hardware address lists handling functions */
- int __hw_addr_sync(struct netdev_hw_addr_list *to_list,
- 		   struct netdev_hw_addr_list *from_list, int addr_len);
-+int __hw_addr_sync_multiple(struct netdev_hw_addr_list *to_list,
-+			    struct netdev_hw_addr_list *from_list,
-+			    int addr_len);
- void __hw_addr_unsync(struct netdev_hw_addr_list *to_list,
- 		      struct netdev_hw_addr_list *from_list, int addr_len);
- int __hw_addr_sync_dev(struct netdev_hw_addr_list *list,
-diff --git a/net/core/dev_addr_lists.c b/net/core/dev_addr_lists.c
-index 166e404f7c03..90716bd736f3 100644
---- a/net/core/dev_addr_lists.c
-+++ b/net/core/dev_addr_lists.c
-@@ -242,9 +242,9 @@ static void __hw_addr_unsync_one(struct netdev_hw_addr_list *to_list,
- 	__hw_addr_del_entry(from_list, ha, false, false);
- }
- 
--static int __hw_addr_sync_multiple(struct netdev_hw_addr_list *to_list,
--				   struct netdev_hw_addr_list *from_list,
--				   int addr_len)
-+int __hw_addr_sync_multiple(struct netdev_hw_addr_list *to_list,
-+			    struct netdev_hw_addr_list *from_list,
-+			    int addr_len)
++enum hsr_port_type {
++	HSR_PT_NONE = 0,	/* Must be 0, used by framereg */
++	HSR_PT_SLAVE_A,
++	HSR_PT_SLAVE_B,
++	HSR_PT_INTERLINK,
++	HSR_PT_MASTER,
++	HSR_PT_PORTS,	/* This must be the last item in the enum */
++};
++
+ /* HSR Tag.
+  * As defined in IEC-62439-3:2010, the HSR tag is really { ethertype = 0x88FB,
+  * path, LSDU_size, sequence Nr }. But we let eth_header() create { h_dest,
+@@ -32,6 +41,8 @@ struct hsr_tag {
+ #if IS_ENABLED(CONFIG_HSR)
+ extern bool is_hsr_master(struct net_device *dev);
+ extern int hsr_get_version(struct net_device *dev, enum hsr_version *ver);
++struct net_device *hsr_get_port_ndev(struct net_device *ndev,
++				     enum hsr_port_type pt);
+ #else
+ static inline bool is_hsr_master(struct net_device *dev)
  {
- 	int err = 0;
- 	struct netdev_hw_addr *ha, *tmp;
-@@ -260,6 +260,7 @@ static int __hw_addr_sync_multiple(struct netdev_hw_addr_list *to_list,
- 	}
- 	return err;
+@@ -42,6 +53,12 @@ static inline int hsr_get_version(struct net_device *dev,
+ {
+ 	return -EINVAL;
  }
-+EXPORT_SYMBOL(__hw_addr_sync_multiple);
++
++static inline struct net_device *hsr_get_port_ndev(struct net_device *ndev,
++						   enum hsr_port_type pt)
++{
++	return ERR_PTR(-EINVAL);
++}
+ #endif /* CONFIG_HSR */
  
- /* This function only works where there is a strict 1-1 relationship
-  * between source and destination of they synch. If you ever need to
+ #endif /*_LINUX_IF_HSR_H_*/
+diff --git a/net/hsr/hsr_device.c b/net/hsr/hsr_device.c
+index 03eadd6c51fd..b6fb18469439 100644
+--- a/net/hsr/hsr_device.c
++++ b/net/hsr/hsr_device.c
+@@ -663,6 +663,19 @@ bool is_hsr_master(struct net_device *dev)
+ }
+ EXPORT_SYMBOL(is_hsr_master);
+ 
++struct net_device *hsr_get_port_ndev(struct net_device *ndev,
++				     enum hsr_port_type pt)
++{
++	struct hsr_priv *hsr = netdev_priv(ndev);
++	struct hsr_port *port;
++
++	hsr_for_each_port(hsr, port)
++		if (port->type == pt)
++			return port->dev;
++	return NULL;
++}
++EXPORT_SYMBOL(hsr_get_port_ndev);
++
+ /* Default multicast address for HSR Supervision frames */
+ static const unsigned char def_multicast_addr[ETH_ALEN] __aligned(2) = {
+ 	0x01, 0x15, 0x4e, 0x00, 0x01, 0x00
+diff --git a/net/hsr/hsr_main.h b/net/hsr/hsr_main.h
+index 7d7551e6f0b0..7561845b8bf6 100644
+--- a/net/hsr/hsr_main.h
++++ b/net/hsr/hsr_main.h
+@@ -121,15 +121,6 @@ struct hsrv1_ethhdr_sp {
+ 	struct hsr_sup_tag	hsr_sup;
+ } __packed;
+ 
+-enum hsr_port_type {
+-	HSR_PT_NONE = 0,	/* Must be 0, used by framereg */
+-	HSR_PT_SLAVE_A,
+-	HSR_PT_SLAVE_B,
+-	HSR_PT_INTERLINK,
+-	HSR_PT_MASTER,
+-	HSR_PT_PORTS,	/* This must be the last item in the enum */
+-};
+-
+ /* PRP Redunancy Control Trailor (RCT).
+  * As defined in IEC-62439-4:2012, the PRP RCT is really { sequence Nr,
+  * Lan indentifier (LanId), LSDU_size and PRP_suffix = 0x88FB }.
 -- 
 2.34.1
 
