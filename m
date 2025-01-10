@@ -1,62 +1,62 @@
-Return-Path: <netdev+bounces-157032-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157033-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9098A08C0F
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 10:31:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 68261A08C13
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 10:32:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A17AC7A321E
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 09:31:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 92EC77A38B2
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 09:31:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FEB220A5E4;
-	Fri, 10 Jan 2025 09:30:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C2EC20B1EE;
+	Fri, 10 Jan 2025 09:30:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="ex0dNZcl"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="pQ0VOrFi"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80009.amazon.com (smtp-fw-80009.amazon.com [99.78.197.220])
+Received: from smtp-fw-9102.amazon.com (smtp-fw-9102.amazon.com [207.171.184.29])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8485209F38
-	for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 09:30:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.220
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B137E20A5FD
+	for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 09:30:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.184.29
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736501414; cv=none; b=gBPLSyllbxh4Ompt8wFUWcV6Wv6QPzTowD4Q2zVCa0i88jsaZWVoyyL4AU5QASAv7xME5J4Vh4A23ujevwuSvj6wXs2cF2C6w+Qr9ZceIFQw6GYl16ZvX9uDrRIgN3oqEhcQq20Nko/GmaJ/GFrll9GdyOLqKw/Znf686rJweeY=
+	t=1736501439; cv=none; b=kMVBmq2FFveCFeE968c4RnoPqOlKcW98AS2RLxKa957UfXFDOVTzTq6VlBZCBf29HjXxSuxwM90bgVQpFUr34MGKmT6LD4OS1GGZ3i47LFGo380zWHvv1mz27j1Prt/gPC/XK84ZxRU71TVf11ZYrOn1i2jFVRxpLsLSNFoOong=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736501414; c=relaxed/simple;
-	bh=xT4XRrxCb/VGArLZh51hm11TmE5zQ6NNQWzATlNQdwo=;
+	s=arc-20240116; t=1736501439; c=relaxed/simple;
+	bh=VDmivZ+wboA3DQxaMNav2Fu92+VG28LycmwI/CMxZjc=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=nnBv87H2tSYIyB2CiSc90iohjzuoZlJrG4YRmUMWP9Rlc8jA+ldl6PONO/MUkuaf23hLQzWWUF8LYDYnVu3DY3+UpWvtGYMVavZkHCnJPqmV+dLmNyTW35r+JCy6J0h0UPqUCpao+JG3ri1ZspHJ31F8lwampGEuMQOIc+IYzjQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=ex0dNZcl; arc=none smtp.client-ip=99.78.197.220
+	 MIME-Version:Content-Type; b=qDafxEnw5ltNaDktC5pcJxybGV3/bM6h1Gv6MeVr3nHfvsjrujjZiIG0oWWiROnYOEFLq67xNmJ7S/nG36qFP/u+XONUqy+NeV1dAybmk7uRy4aRBUrrkyz6JrCrezrtrihD4ojI8pM3whvynXlMa2BdR2oxO6hmu4F8h8RUfwk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=pQ0VOrFi; arc=none smtp.client-ip=207.171.184.29
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1736501413; x=1768037413;
+  t=1736501438; x=1768037438;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=/PxlOJHunfq5Qyeg2TKAnZcJ1aS74/HChKuENexILO8=;
-  b=ex0dNZcl/t6oZZ8oBzA69XZPnL2BtZCLunz2BarQ8R0i6YmByLbEnLo0
-   CL8z/baCii2kCEaymzXnZ9/XHruaEsTKQIVJOOaoYkmyVjlBfjI3FHav8
-   BQZttFHAAdIPfxb7G9GKiMTyVu8zU5AOyhAXhK6c0iL1YS2tm+Fqr9RVR
-   Y=;
+  bh=PAtZfotiwh0ZHqfa311ORPKXAGdnsz7bqubfYRwOQNU=;
+  b=pQ0VOrFiMTriL6vj7atdCNpKyfJuw65/VQT+lxBMNnhmpZUCcLFcDmKY
+   NPzV0GCEhe/BaRhf3ac3R93RLMWktZyOn/Spo3NeP77To5iLG2XSh95ak
+   Fc/JUSdW9PJBgriVJ6xHDwmK2GDrRcP4vPhYcPvsBbyNc5Lj8xoClJlvi
+   k=;
 X-IronPort-AV: E=Sophos;i="6.12,303,1728950400"; 
-   d="scan'208";a="163180613"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-80009.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jan 2025 09:30:11 +0000
-Received: from EX19MTAUWA002.ant.amazon.com [10.0.21.151:12565]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.0.73:2525] with esmtp (Farcaster)
- id dfa61a1e-d74a-4538-94b1-cd68d97b1151; Fri, 10 Jan 2025 09:30:10 +0000 (UTC)
-X-Farcaster-Flow-ID: dfa61a1e-d74a-4538-94b1-cd68d97b1151
+   d="scan'208";a="485019655"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
+  by smtp-border-fw-9102.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jan 2025 09:30:32 +0000
+Received: from EX19MTAUWB001.ant.amazon.com [10.0.38.20:47667]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.13.17:2525] with esmtp (Farcaster)
+ id 57fc1d94-4316-481b-ba0c-4f9dbe4ee329; Fri, 10 Jan 2025 09:30:31 +0000 (UTC)
+X-Farcaster-Flow-ID: 57fc1d94-4316-481b-ba0c-4f9dbe4ee329
 Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
+ EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Fri, 10 Jan 2025 09:30:04 +0000
+ Fri, 10 Jan 2025 09:30:31 +0000
 Received: from 6c7e67c6786f.amazon.com (10.118.252.101) by
  EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Fri, 10 Jan 2025 09:30:00 +0000
+ Fri, 10 Jan 2025 09:30:27 +0000
 From: Kuniyuki Iwashima <kuniyu@amazon.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
@@ -64,9 +64,9 @@ To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 CC: Donald Hunter <donald.hunter@redhat.com>, Kuniyuki Iwashima
 	<kuniyu@amazon.com>, Kuniyuki Iwashima <kuni1840@gmail.com>,
 	<netdev@vger.kernel.org>
-Subject: [PATCH v1 net-next 07/12] af_unix: Set drop reason in unix_stream_sendmsg().
-Date: Fri, 10 Jan 2025 18:26:36 +0900
-Message-ID: <20250110092641.85905-8-kuniyu@amazon.com>
+Subject: [PATCH v1 net-next 08/12] af_unix: Set drop reason in queue_oob().
+Date: Fri, 10 Jan 2025 18:26:37 +0900
+Message-ID: <20250110092641.85905-9-kuniyu@amazon.com>
 X-Mailer: git-send-email 2.39.5 (Apple Git-154)
 In-Reply-To: <20250110092641.85905-1-kuniyu@amazon.com>
 References: <20250110092641.85905-1-kuniyu@amazon.com>
@@ -78,147 +78,91 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D035UWA001.ant.amazon.com (10.13.139.101) To
+X-ClientProxiedBy: EX19D043UWA001.ant.amazon.com (10.13.139.45) To
  EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-sendmsg() to a SOCK_STREAM socket could fail for various reasons.
+sendmsg(MSG_OOB) to a SOCK_STREAM socket could fail for various
+reasons.
 
 Let's set drop reasons respectively.
 
-  * NOMEM                  : Failed to allocate SCM_RIGHTS-related structs
-  * UNIX_INFLIGHT_FD_LIMIT : The number of inflight fd reached RLIMIT_NOFILE
-  * SKB_UCOPY_FAULT        : Failed to copy data from iov_iter to skb
-  * SOCKET_CLOSE           : The peer socket was close()d
-  * SOCKET_RCV_SHUTDOWN    : The peer socket called shutdown(SHUT_RD)
-
-unix_scm_err_to_reason() will be reused in queue_oob() and
-unix_dgram_sendmsg().
+The drop reasons are exactly the same as in the previous patch.
 
 Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 ---
- include/net/dropreason-core.h |  6 +++++
- net/unix/af_unix.c            | 41 ++++++++++++++++++++++++++++++-----
- 2 files changed, 41 insertions(+), 6 deletions(-)
+ net/unix/af_unix.c | 37 ++++++++++++++++++++++++-------------
+ 1 file changed, 24 insertions(+), 13 deletions(-)
 
-diff --git a/include/net/dropreason-core.h b/include/net/dropreason-core.h
-index 1b5e962f7f33..dea6bbe3ceaa 100644
---- a/include/net/dropreason-core.h
-+++ b/include/net/dropreason-core.h
-@@ -11,6 +11,7 @@
- 	FN(SOCKET_INVALID_STATE)	\
- 	FN(SOCKET_RCVBUFF)		\
- 	FN(SOCKET_RCV_SHUTDOWN)		\
-+	FN(UNIX_INFLIGHT_FD_LIMIT)	\
- 	FN(PKT_TOO_SMALL)		\
- 	FN(TCP_CSUM)			\
- 	FN(UDP_CSUM)			\
-@@ -150,6 +151,11 @@ enum skb_drop_reason {
- 	SKB_DROP_REASON_SOCKET_RCVBUFF,
- 	/** @SKB_DROP_REASON_SOCKET_RCV_SHUTDOWN: socket is shutdown(SHUT_RD) */
- 	SKB_DROP_REASON_SOCKET_RCV_SHUTDOWN,
-+	/**
-+	 * @SKB_DROP_REASON_UNIX_INFLIGHT_FD_LIMIT: too many file descriptors
-+	 * are passed via SCM_RIGHTS but not yet received, reaching RLIMIT_NOFILE.
-+	 */
-+	SKB_DROP_REASON_UNIX_INFLIGHT_FD_LIMIT,
- 	/** @SKB_DROP_REASON_PKT_TOO_SMALL: packet size is too small */
- 	SKB_DROP_REASON_PKT_TOO_SMALL,
- 	/** @SKB_DROP_REASON_TCP_CSUM: TCP checksum error */
 diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
-index 6505eeab9957..17b9e9bce055 100644
+index 17b9e9bce055..1dfe791e8991 100644
 --- a/net/unix/af_unix.c
 +++ b/net/unix/af_unix.c
-@@ -1907,6 +1907,22 @@ static int unix_scm_to_skb(struct scm_cookie *scm, struct sk_buff *skb, bool sen
- 	return err;
- }
+@@ -2216,34 +2216,37 @@ static int queue_oob(struct socket *sock, struct msghdr *msg, struct sock *other
+ 		     struct scm_cookie *scm, bool fds_sent)
+ {
+ 	struct unix_sock *ousk = unix_sk(other);
++	enum skb_drop_reason reason;
+ 	struct sk_buff *skb;
+-	int err = 0;
++	int err;
  
-+static enum skb_drop_reason unix_scm_err_to_reason(int err)
-+{
-+	switch (err) {
-+	case -ENOMEM:
-+		return SKB_DROP_REASON_NOMEM;
-+	case -ETOOMANYREFS:
-+		return SKB_DROP_REASON_UNIX_INFLIGHT_FD_LIMIT;
+ 	skb = sock_alloc_send_skb(sock->sk, 1, msg->msg_flags & MSG_DONTWAIT, &err);
+-
+ 	if (!skb)
+-		return err;
++		goto out;
+ 
+ 	err = unix_scm_to_skb(scm, skb, !fds_sent);
+ 	if (err < 0) {
+-		kfree_skb(skb);
+-		return err;
++		reason = unix_scm_err_to_reason(err);
++		goto out_free;
+ 	}
++
+ 	skb_put(skb, 1);
+ 	err = skb_copy_datagram_from_iter(skb, 0, &msg->msg_iter, 1);
+-
+ 	if (err) {
+-		kfree_skb(skb);
+-		return err;
++		reason = SKB_DROP_REASON_SKB_UCOPY_FAULT;
++		goto out_free;
+ 	}
+ 
+ 	unix_state_lock(other);
+ 
+-	if (sock_flag(other, SOCK_DEAD) ||
+-	    (other->sk_shutdown & RCV_SHUTDOWN)) {
+-		unix_state_unlock(other);
+-		kfree_skb(skb);
+-		return -EPIPE;
++	if (sock_flag(other, SOCK_DEAD)) {
++		reason = SKB_DROP_REASON_SOCKET_CLOSE;
++		goto out_unlock;
 +	}
 +
-+	DEBUG_NET_WARN_ONCE(1,
-+			    "Define a drop reason for %d in unix_scm_to_skb().",
-+			    err);
++	if (other->sk_shutdown & RCV_SHUTDOWN) {
++		reason = SKB_DROP_REASON_SOCKET_RCV_SHUTDOWN;
++		goto out_unlock;
+ 	}
+ 
+ 	maybe_add_creds(skb, sock, other);
+@@ -2258,6 +2261,14 @@ static int queue_oob(struct socket *sock, struct msghdr *msg, struct sock *other
+ 	unix_state_unlock(other);
+ 	other->sk_data_ready(other);
+ 
++	return 0;
 +
-+	return SKB_DROP_REASON_NOT_SPECIFIED;
-+}
-+
- static bool unix_passcred_enabled(const struct socket *sock,
- 				  const struct sock *other)
- {
-@@ -2249,6 +2265,7 @@ static int queue_oob(struct socket *sock, struct msghdr *msg, struct sock *other
- static int unix_stream_sendmsg(struct socket *sock, struct msghdr *msg,
- 			       size_t len)
- {
-+	enum skb_drop_reason reason;
- 	struct sock *sk = sock->sk;
- 	struct sk_buff *skb = NULL;
- 	struct sock *other = NULL;
-@@ -2314,8 +2331,10 @@ static int unix_stream_sendmsg(struct socket *sock, struct msghdr *msg,
- 
- 		/* Only send the fds in the first buffer */
- 		err = unix_scm_to_skb(&scm, skb, !fds_sent);
--		if (err < 0)
-+		if (err < 0) {
-+			reason = unix_scm_err_to_reason(err);
- 			goto out_free;
-+		}
- 
- 		fds_sent = true;
- 
-@@ -2323,8 +2342,10 @@ static int unix_stream_sendmsg(struct socket *sock, struct msghdr *msg,
- 			skb->ip_summed = CHECKSUM_UNNECESSARY;
- 			err = skb_splice_from_iter(skb, &msg->msg_iter, size,
- 						   sk->sk_allocation);
--			if (err < 0)
-+			if (err < 0) {
-+				reason = SKB_DROP_REASON_SKB_UCOPY_FAULT;
- 				goto out_free;
-+			}
- 
- 			size = err;
- 			refcount_add(size, &sk->sk_wmem_alloc);
-@@ -2333,15 +2354,23 @@ static int unix_stream_sendmsg(struct socket *sock, struct msghdr *msg,
- 			skb->data_len = data_len;
- 			skb->len = size;
- 			err = skb_copy_datagram_from_iter(skb, 0, &msg->msg_iter, size);
--			if (err)
-+			if (err) {
-+				reason = SKB_DROP_REASON_SKB_UCOPY_FAULT;
- 				goto out_free;
-+			}
- 		}
- 
- 		unix_state_lock(other);
- 
--		if (sock_flag(other, SOCK_DEAD) ||
--		    (other->sk_shutdown & RCV_SHUTDOWN))
-+		if (sock_flag(other, SOCK_DEAD)) {
-+			reason = SKB_DROP_REASON_SOCKET_CLOSE;
- 			goto out_pipe_unlock;
-+		}
-+
-+		if (other->sk_shutdown & RCV_SHUTDOWN) {
-+			reason = SKB_DROP_REASON_SOCKET_RCV_SHUTDOWN;
-+			goto out_pipe_unlock;
-+		}
- 
- 		maybe_add_creds(skb, sock, other);
- 		scm_stat_add(other, skb);
-@@ -2371,7 +2400,7 @@ static int unix_stream_sendmsg(struct socket *sock, struct msghdr *msg,
- 		send_sig(SIGPIPE, current, 0);
- 	err = -EPIPE;
- out_free:
--	kfree_skb(skb);
++out_unlock:
++	unix_state_unlock(other);
++	err = -EPIPE;
++out_free:
 +	kfree_skb_reason(skb, reason);
- out_err:
- 	scm_destroy(&scm);
- 	return sent ? : err;
++out:
+ 	return err;
+ }
+ #endif
 -- 
 2.39.5 (Apple Git-154)
 
