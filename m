@@ -1,131 +1,184 @@
-Return-Path: <netdev+bounces-157105-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157106-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF384A08EE0
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 12:12:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5BD6FA08EE8
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 12:13:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CB1F6166235
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 11:12:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 579EF1661D5
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 11:13:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC87420A5E9;
-	Fri, 10 Jan 2025 11:12:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62B5B20B7F9;
+	Fri, 10 Jan 2025 11:12:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="MwO3UGQ8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QX6MbU4H"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CFF41E32C5
-	for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 11:12:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87D12204F93;
+	Fri, 10 Jan 2025 11:12:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736507554; cv=none; b=uCPVDYeuXHSOuEtedqoRJATwO8yT2ydFTrqZLcqwyrCB0TxeJ7GbgoX6uuNX4L0XplhoIe4c0albElVniol0wadmfT6VWxy9trFjzDf3EWdrGzz6k1s36OTLziJAAyuyluz9FYH2s4hGlrRg+pvqAHFcfwB5n0d0TaZj97mQuiY=
+	t=1736507572; cv=none; b=owBWu93SNP1DGPFupsSsaaWqXIag6ju5oBJb50RFD5v5bH7y0VyC2rQKZ0RfrewGvn6p+P5I+VCPv7x/Cd5nk/tdEahrXQsB9WeZZFi/N/9xlizYTvF7ejrCrt6l0WdNSkz+mJqJX8sNit8PlVBJ+z2OqEqaIV5Y1Ltm9dlGdro=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736507554; c=relaxed/simple;
-	bh=qXSynCY96TYG7wZ7OASI5Muii12uM+aBd0x+fKz2Q64=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fE82IGeDN61HGtSTUi5Nj9IpYJQU/KdKaxt6NAl0Ewh4n36N+UbtF4GXnQa7ywUrNtqOFtGOqQOm2yyhzr6UFlp81VpriavJ/rfd1XlrIKa8Bjiq8UniVTxFd5iGa4hqWQk02S1fzRBJzE/7RBDAM9JuiXCinc5boAxb6RF72K4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=pass smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=MwO3UGQ8; arc=none smtp.client-ip=209.85.214.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=daynix.com
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-2163dc5155fso33488665ad.0
-        for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 03:12:32 -0800 (PST)
+	s=arc-20240116; t=1736507572; c=relaxed/simple;
+	bh=UeOt5R2P5GeHb8nFPEh954S2nl3+3csDNv4eH/iGYgQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=F5DTFc+VboHQudJHdzNFidJHd5kkec7d0J5Kt/Y7U4FocT0gc0COMaapTBbVl7DJ9o02irhmlTp/MZzCtx8PlciUijQdAiw1WBClTwHroVcOuhP7jrvobyPM8TNcE3iaLgqa0ttrMrJEWIEyWIfpVMx012W1c8eGliFbDVS3EMU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QX6MbU4H; arc=none smtp.client-ip=209.85.221.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-3863494591bso1070745f8f.1;
+        Fri, 10 Jan 2025 03:12:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1736507552; x=1737112352; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=fUI/Gf/iNdZ2kON6E6PSrhEkMNvEUQIh/sL8yMhLamQ=;
-        b=MwO3UGQ8TvdlcnS1Er/wPY9ota4qi9gGOgTNt7g7S6YG1L9H3gqX0ExQeXxKJnXL7X
-         XeAWFpsMp3pjyvWra0SCvqOuqk/80Ss1ztp4HN27fDmWYrpuva407XWMh4/xOAEXA3KJ
-         WuOh5DzuQ4gbLE0fUUS7YS/+tghLtkvK+s5eGulTypBG7qqUOlAMyYF9c7Z+TLIAXXwW
-         UE9+ude3fE3mDWHLqpT9hK6iDDqMJCmdSPQ2vfvJ015wBRsVUBZDs2Tw0Jz3m2fwhswE
-         9BT0HSyyEVIF8eiJ9+cOWEtoHXvBzBFnnCNhJrTMzYH6h9prUzxWAnD2O7WOPlgDTkiH
-         UdzA==
+        d=gmail.com; s=20230601; t=1736507569; x=1737112369; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=y+x9FB8gpRu+ny5JZ4ENzOnNmCE2Q/tjr8cqBXheLDU=;
+        b=QX6MbU4HDVaBbMqHG+hWJSmYFgJmeoPSYLDxSSwj+cqH8BPwCcxc0t6+YyRuBEW0gN
+         o3qpXMgA/6ROBEziDgi5aqXJXq5R2CvcVDQIcHnhL8aW2ti54TDM38qJ9GuK0aM0TSRt
+         9y3DMhulU9eaJrcrC1YIPLrI83V/SPaop710lPwSRbY3ylDOUaAytQS08XykQNIPunZO
+         j1/EdEr7Gge851MrpK5HSxtfAKaW0yV5LDYQ4Hi1MSrc/2Qt6m2Wag+Laq7Xx9X335bE
+         s75Vm/mMVjVViLFe0MtkbTEmwQ7IQLPnpR1BYEIWHpUj5wcPoaUZ3RbmAIMHcCMjKYm1
+         62EA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736507552; x=1737112352;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1736507569; x=1737112369;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=fUI/Gf/iNdZ2kON6E6PSrhEkMNvEUQIh/sL8yMhLamQ=;
-        b=DwQAiAL42/rQ1D/+rwRauR9pr6ThNvcq07KFovsbZHXxyBVbAV4fVKOfdhi1kniDE5
-         ceEtNzpF43L75B/c9hyyS1ThtsVCJW298/lySzJy+cNMg95+7IiY5bdpBvIUvB+tFN1j
-         Gwx5OjAshmFnttACzvN1AFQhF0F4FfJoVJFx2Rp29/or5vtxG3QkvjKAyCPPxATGtJxH
-         amHMkUBDQEGqaYiTI7NzzooN2pqDeauFyRXe1qVJjUFDvEocxC8mzuVvVpLgq7itkur9
-         ptE+KUI5F7A/Q2KJQGFmoSLLlA2nDBU1i9q/Z1bTCjToJyHMiXao8BOTXNJmf8URJUxp
-         OTjA==
-X-Forwarded-Encrypted: i=1; AJvYcCVoiB3tVPbGA4EK51wjppMRqm9TGG04px0WMt9/h4MaM+ePlNnfBIYx7SKHhGXYn1LLwlV5qSw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxDxJUrxdE5GKa8flNw+2MFHY57IsGyGoYhJEVhbnowuqidypRG
-	RMyPbCXcBjelYAJDgDfJvEI88WN7eIErLZCXckluoIguJAqmaWsz9Qel8u9vg2k=
-X-Gm-Gg: ASbGncsbdgg6+VDyWkqUvzt6AQnq179S9ydkDDBdazzzGFvcJOiZXPUo8HmBCK0IdOR
-	MNo+wxSwYH+A02m40mo7D7jFnHUqf/iEfXYUt6fVNIy5xtuvFv5B6uFQuhFc1Z/+HXT8liIbJK3
-	LdOAdGuK96yR/24pDcoi7OHjgZJFAl+qYCzUZUB4syj3sUhCjYHaGc4Tf+loDpXgpKDukd5JVft
-	yiRD3j1B4OfpoOlz+eKy1Wi426V8FP2DxdTB2l6mJKymEo1pQpsXbo8COQg1Lt2iG4=
-X-Google-Smtp-Source: AGHT+IFsisJKA6JOrR0eUj5WfV8wXSlwG+ErpDxaHPAWov6uHn2OYu5jltHENp4vvgdoL273AAhZWg==
-X-Received: by 2002:a05:6a20:244d:b0:1d9:fbc:457c with SMTP id adf61e73a8af0-1e88d0a4770mr18461822637.36.1736507552500;
-        Fri, 10 Jan 2025 03:12:32 -0800 (PST)
-Received: from [157.82.203.37] ([157.82.203.37])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72d4056a2cfsm1373935b3a.51.2025.01.10.03.12.27
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 10 Jan 2025 03:12:32 -0800 (PST)
-Message-ID: <2e015ee6-8a3b-43fb-b119-e1921139c74b@daynix.com>
-Date: Fri, 10 Jan 2025 20:12:25 +0900
+        bh=y+x9FB8gpRu+ny5JZ4ENzOnNmCE2Q/tjr8cqBXheLDU=;
+        b=o7Xhi1q/pZBTiANLHR2UEij8N49G+eMSCIUGplEG0NRjyKleZOfbwK9lD7ZCJK+6fU
+         xRUCESa25ZHjr3eBj3ObIXkSvDam8gVV1gsGeqaQBPXK8tdMdqHvXPwFK4QQFvniYrak
+         Sq2wxreHMJNfyo4S5lw9acmTzwIU5bRXdZhevHYMyPkBiiC/l8JMR6OdxQZsexsG8mRq
+         AUeVhb/W1bWOEtgVbrN+buPz4+6ff7YlebWSGJDfrQenh/ag+jY4Ba/4LiC65NBoRLXE
+         hCmFX8yoIHtf98bzXgA6yGO6Mkx8yktHtRINJXsIx1Xki8YSa9/yDi77JjRNPi7Kovof
+         19Ow==
+X-Forwarded-Encrypted: i=1; AJvYcCU97ksMh2xRLM0NYIjoWEltEKlGgmI3l2c/Oqu8YS4kOAzDmJ99+J01Fd7e6Z5UlMJQ8cEzsY8m@vger.kernel.org, AJvYcCUomSMONhTmf2J/cJVAZ1rFwP9086dXuSloT61eKlcagVHF8uwKx1CUcrRUN3LSEYnZkI+RW49c4LCV/Xb2wPvxOvcTksU=@vger.kernel.org, AJvYcCWI0twDAxHm/ORiQFgrQAbW0hPxfBUz4PS68j5CvfYWJ03O4mOCrx1LTWhee7Z+auYLmNZjgmdehtYoojyIPp4S@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz8NxCLsL67VeketgYsqZWLJ0hQ0CJS3VJgTzkaWZrwfTAVdMFd
+	hD0ji9I16gqlEH+tZMznCCIequHqZl5RjNam2gcPSpmpHfYawauc
+X-Gm-Gg: ASbGncumUGXzpx3AS4tw6UOr8bBGgSzZn8eLdzyuVMDdj6PtwisKXxTjUdEUr+h5b1+
+	0bVbwu7j1YreBf2ZHZdgOwiZ4QO2AB6f3cC4N9k/WeQRBYBoCt2hH99D8q7UZ13fKGMSZ+cKJvm
+	pCH8XzPk/4xMJu39E9+hxVuMMSjHC92Jb48I/a2JGZN89MgxETzYDNCKdROmQdxsQIKPXywH9cy
+	yjgUQllu8FsqFnT5BczrpUNMzQphMYpQwD9e6CeuJdET7Mx91n47GeROA==
+X-Google-Smtp-Source: AGHT+IEgmiSksMHjPRzswCZRI9x/P5xOUcq0e2x7nHHa8Ps+XDO6PG0n5O7zc0nMyxeBvkMf1N/LTg==
+X-Received: by 2002:a5d:5f85:0:b0:387:86cf:4e87 with SMTP id ffacd0b85a97d-38a872deb33mr10369275f8f.15.1736507568637;
+        Fri, 10 Jan 2025 03:12:48 -0800 (PST)
+Received: from localhost ([2a00:79e1:abd:a201:48ff:95d2:7dab:ae81])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-436e9e6251asm51588845e9.40.2025.01.10.03.12.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 10 Jan 2025 03:12:48 -0800 (PST)
+Date: Fri, 10 Jan 2025 12:12:42 +0100
+From: =?iso-8859-1?Q?G=FCnther?= Noack <gnoack3000@gmail.com>
+To: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
+Cc: =?iso-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@digikod.net>,
+	=?iso-8859-1?Q?G=FCnther?= Noack <gnoack@google.com>,
+	willemdebruijn.kernel@gmail.com,
+	linux-security-module@vger.kernel.org, netdev@vger.kernel.org,
+	netfilter-devel@vger.kernel.org, yusongping@huawei.com,
+	artem.kuzin@huawei.com, konstantin.meskhidze@huawei.com
+Subject: Re: [RFC PATCH v3 01/19] landlock: Support socket access-control
+Message-ID: <20250110.2893966a7649@gnoack.org>
+References: <20240904104824.1844082-1-ivanov.mikhail1@huawei-partners.com>
+ <20240904104824.1844082-2-ivanov.mikhail1@huawei-partners.com>
+ <ea026af8-bc29-709c-7e04-e145d01fd825@huawei-partners.com>
+ <Z0DDQKACIRRDRZRE@google.com>
+ <36ac2fde-1344-9055-42e2-db849abf02e0@huawei-partners.com>
+ <20241127.oophah4Ueboo@digikod.net>
+ <eafd855d-2681-8dfd-a2be-9c02fc07050d@huawei-partners.com>
+ <20241128.um9voo5Woo3I@digikod.net>
+ <af72be74-50c7-d251-5df3-a2c63c73296a@huawei-partners.com>
+ <f6b255c9-5a88-fedd-5d25-dd7d09ddc989@huawei-partners.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 3/3] tun: Set num_buffers for virtio 1.0
-To: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>
-Cc: Jonathan Corbet <corbet@lwn.net>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Shuah Khan <shuah@kernel.org>,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, kvm@vger.kernel.org,
- virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org,
- Yuri Benditovich <yuri.benditovich@daynix.com>,
- Andrew Melnychenko <andrew@daynix.com>,
- Stephen Hemminger <stephen@networkplumber.org>, gur.stavi@huawei.com,
- devel@daynix.com
-References: <20250109-tun-v2-0-388d7d5a287a@daynix.com>
- <20250109-tun-v2-3-388d7d5a287a@daynix.com>
- <CACGkMEsm5DCb+n3NYeRjmq3rAANztZz5QmV8rbPNo+cH-=VzDQ@mail.gmail.com>
- <20250110052246-mutt-send-email-mst@kernel.org>
-Content-Language: en-US
-From: Akihiko Odaki <akihiko.odaki@daynix.com>
-In-Reply-To: <20250110052246-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <f6b255c9-5a88-fedd-5d25-dd7d09ddc989@huawei-partners.com>
 
-On 2025/01/10 19:23, Michael S. Tsirkin wrote:
-> On Fri, Jan 10, 2025 at 11:27:13AM +0800, Jason Wang wrote:
->> On Thu, Jan 9, 2025 at 2:59 PM Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
->>>
->>> The specification says the device MUST set num_buffers to 1 if
->>> VIRTIO_NET_F_MRG_RXBUF has not been negotiated.
->>
->> Have we agreed on how to fix the spec or not?
->>
->> As I replied in the spec patch, if we just remove this "MUST", it
->> looks like we are all fine?
->>
->> Thanks
+Happy New Year!
+
+On Tue, Dec 24, 2024 at 07:55:01PM +0300, Mikhail Ivanov wrote:
+> The bitmask approach leads to a complete refactoring of socket rule
+> storage. This shouldn't be a big issue, since we're gonna need
+> multiplexer for insert_rule(), find_rule() with a port range feature
+> anyway [1]. But it seems that the best approach of storing rules
+> composed of bitmasks is to store them in linked list and perform
+> linear scan in landlock_find_rule(). Any other approach is likely to
+> be too heavy and complex.
 > 
-> We should replace MUST with SHOULD but it is not all fine,
-> ignoring SHOULD is a quality of implementation issue.
+> Do you think such refactoring is reasonable?
 > 
+> [1] https://github.com/landlock-lsm/linux/issues/16
 
-Should we really replace it? It would mean that a driver conformant with 
-the current specification may not be compatible with a device conformant 
-with the future specification.
+The way I understood it in your mail from Nov 28th [1], I thought that the
+bitmasks would only exist at the UAPI layer so that users could more
+conveniently specify multiple "types" at the same time.  In other
+words, a rule which is now expressed as
 
-We are going to fix all implementations known to buggy (QEMU and Linux) 
-anyway so I think it's just fine to leave that part of specification as is.
+  {
+    .allowed_access = LANDLOCK_ACCESS_SOCKET_CREATE,
+    .family = AF_INET,
+    .types = 1 << SOCK_STREAM | 1 << SOCK_DGRAM,
+    .protocol = 0,
+  },
+
+used to be expressed like this (without bitmasks):
+
+  {
+    .allowed_access = LANDLOCK_ACCESS_SOCKET_CREATE,
+    .family = AF_INET,
+    .type = SOCK_STREAM,
+    .protocol = 0,
+  },
+  {
+    .allowed_access = LANDLOCK_ACCESS_SOCKET_CREATE,
+    .family = AF_INET,
+    .type = SOCK_DGRAM,
+    .protocol = 0,
+  },
+
+I do not understand why this convenience feature in the UAPI layer
+requires a change to the data structures that Landlock uses
+internally?  As far as I can tell, struct landlock_socket_attr is only
+used in syscalls.c and converted to other data structures already.  I
+would have imagined that we'd "unroll" the specified bitmasks into the
+possible combinations in the add_rule_socket() function and then call
+landlock_append_socket_rule() multiple times with each of these?
+
+
+That being said, I am not a big fan of red-black trees for such simple
+integer lookups either, and I also think there should be something
+better if we make more use of the properties of the input ranges. The
+question is though whether you want to couple that to this socket type
+patch set, or rather do it in a follow up?  (So far we have been doing
+fine with the red black trees, and we are already contemplating the
+possibility of changing these internal structures in [2].  We have
+also used RB trees for the "port" rules with a similar reasoning,
+IIRC.)
+
+Regarding the port range feature, I am also not sure whether the data
+structure for that would even be similar?  Looking for a containment
+in a set of integer ranges is a different task than looking for an
+exact match in a non-contiguous set of integers.
+
+In any case, I feel that for now, an exact look up in the RB tree
+would work fine as a generic solution (especially considering that the
+set of added rules is probably usually small).  IMHO, finding a more
+appropriate data structure might be a can of worms that could further
+delay the patch set and which might better be discussed separately.
+
+WDYT?
+
+–Günther
+
+[1] https://lore.kernel.org/all/eafd855d-2681-8dfd-a2be-9c02fc07050d@huawei-partners.com/
+[2] https://github.com/landlock-lsm/linux/issues/1
 
