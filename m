@@ -1,87 +1,131 @@
-Return-Path: <netdev+bounces-156899-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156900-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 48ACBA08401
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 01:28:42 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 10932A0841B
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 01:39:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1D5E2188C765
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 00:28:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1193816446F
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 00:39:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5952E224D7;
-	Fri, 10 Jan 2025 00:28:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 581BC182D9;
+	Fri, 10 Jan 2025 00:39:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="OB4kyZij"
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="gkHF0mEN"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-181.mta1.migadu.com (out-181.mta1.migadu.com [95.215.58.181])
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A01138DE1
-	for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 00:28:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E216318027;
+	Fri, 10 Jan 2025 00:39:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736468909; cv=none; b=fjjBLj/jHGvXDfHZQAOzLAfTjE18MrtCG1hUuukYtCVE6zC1A7Vi66byFGv4ScjmL61SHPSgOPnrZEGa8HRW7UNqToMjhKqlAA3FtdImsUXtBP5rWWa+wQ3eQYq8xf2+3e5mr3MXHSTIJokCEUZ+chlv9/nNhAMEDgQc0aOnWSI=
+	t=1736469546; cv=none; b=KLnZ6Ky1n1D1IY0DVI5RBawvYhdagYL71rJZtNkdhICtYxCE7/28fnursFJ3VDZGkfNq8WIkCqjK3KWkHiSC4Z4PNP4TnnCCHyocGiCJL71oFyjScMjbs9c+T+PisTWcoOJvia6mCtk+drBOccbiOaZlYffO3jMBH7QZVEo9kQo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736468909; c=relaxed/simple;
-	bh=H7H+E1zQIOwIrg3Sj1sOWdKQeVZ5YLM60Lk74uL/Lso=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=M4cRSq3oQ1zPdyvP8G6R2cjYvgUMBnZPmMXziGBnU1nFi2RFghDm02qJb8n80d4skB0qdfwNVG5Xt2QKFlfqgwmPoNgmpPNRPjO1nD94WrHBdrUg8opXTZnQfM8KUoYkEgCfK9w4YOuPvtwNDTCKTdQ5JcZPzPVSlYxMkc/gUWY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=OB4kyZij; arc=none smtp.client-ip=95.215.58.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <06c1d122-f145-4461-9597-13f5b45367b6@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1736468905;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=SqkvwdFA/zLCFS4qjtqosqWbhjFndiwKtnK3xGz1uXs=;
-	b=OB4kyZijSkPeQJHq8Fl+CEI6PsNnS1bCyJ+EE4KCe1ThlrMMLsvsyfZm9Cq8fCjmACxpq0
-	3nKHNP4QtC++EKZY2rOTRAbC0WD3AJRsVHLiYEoDlJOd45XyOdLeslox23FOCsWv5Mm2Mn
-	ukNwReuHIf/aIEuEpggKjpkkHhqhvyw=
-Date: Thu, 9 Jan 2025 16:28:20 -0800
+	s=arc-20240116; t=1736469546; c=relaxed/simple;
+	bh=USLWQfxpnifDI7bI7LMEAhh96ZN3GcS886bvNQdGPG8=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=lUdK1N7o3jeMydVeu+ZvyEDcGRY2PW9RxDhOm57m/G9C4MIHSqaRXTY73QjaJbga4WJTjX7gb872qx2RJuMaAcMw3BJVo/RxYSIAypMlw+kBWVnKugLhFbFBgdfHmor+5yIJuq6Za/vFmyrx4LsnDebClGgYkAYwfd8+QqJMByQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=gkHF0mEN; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=201702; t=1736469532;
+	bh=+268IEIWqre3m/HtwdeirbBvYpoYdpacccHtch4UCkA=;
+	h=Date:From:To:Cc:Subject:From;
+	b=gkHF0mENxxKQkwiIZq5DYv6Sa/97n1tMXEcQmGuB5+blE+wBVwSJpYbvSf9R+wm6A
+	 8InG54QJ1SXG6F12VNHp4bhVkJJAGlcxs5yW7oneN9/lwE9lAMoTBbVlvzIXUXrsw/
+	 mhkx/ksuP3Yq5nhDKjwPVHiAilxig8KIGy1nOrTZ4nm6gffpP42B6e+2XK/edRoAvt
+	 8VgXSRaNsBzkYYUtOV9HitjCK3tb0mCqcBqrWtufqHVWpUumSukH+pxduY7jQ9RLJb
+	 moQZWCesrTW1Jxkcp23PPKg2IXAn9ng7niFuUIG1wBWLIBxcLIPQ9E5BsYjxb435Be
+	 M9NXEnZab7BLg==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4YTjSq4jT4z4wb5;
+	Fri, 10 Jan 2025 11:38:51 +1100 (AEDT)
+Date: Fri, 10 Jan 2025 11:38:55 +1100
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: Networking <netdev@vger.kernel.org>, Linux Kernel Mailing List
+ <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>, Toke =?UTF-8?B?SMO4aWxhbmQtSsO4cmdlbnNlbg==?=
+ <toke@redhat.com>
+Subject: linux-next: manual merge of the net-next tree with the net tree
+Message-ID: <20250110113855.4332724a@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next v2 05/14] bpf: net_sched: Support implementation
- of Qdisc_ops in bpf
-To: Amery Hung <ameryhung@gmail.com>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, daniel@iogearbox.net,
- andrii@kernel.org, alexei.starovoitov@gmail.com, martin.lau@kernel.org,
- sinquersw@gmail.com, toke@redhat.com, jhs@mojatatu.com, jiri@resnulli.us,
- stfomichev@gmail.com, ekarani.silvestre@ccc.ufcg.edu.br,
- yangpeihao@sjtu.edu.cn, xiyou.wangcong@gmail.com, yepeilin.cs@gmail.com
-References: <20241220195619.2022866-1-amery.hung@gmail.com>
- <20241220195619.2022866-6-amery.hung@gmail.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <20241220195619.2022866-6-amery.hung@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: multipart/signed; boundary="Sig_/vKEcN32l+Ln8y9D/1UzFGCc";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 
-On 12/20/24 11:55 AM, Amery Hung wrote:
-> +static const struct bpf_func_proto *
-> +bpf_qdisc_get_func_proto(enum bpf_func_id func_id,
-> +			 const struct bpf_prog *prog)
-> +{
-> +	switch (func_id) {
-> +	case BPF_FUNC_tail_call:
+--Sig_/vKEcN32l+Ln8y9D/1UzFGCc
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Since it needs a respin, a comment will be useful here to explain why tail_call 
-is excluded.
+Hi all,
 
-> +		return NULL;
-> +	default:
-> +		return bpf_base_func_proto(func_id, prog);
-> +	}
-> +}
+Today's linux-next merge of the net-next tree got a conflict in:
 
+  net/sched/sch_cake.c
+
+between commit:
+
+  737d4d91d35b ("sched: sch_cake: add bounds checks to host bulk flow fairn=
+ess counts")
+
+from the net tree and commit:
+
+  a42d71e322a8 ("net_sched: sch_cake: Add drop reasons")
+
+from the net-next tree.
+
+I fixed it up (see below) and can carry the fix as necessary. This
+is now fixed as far as linux-next is concerned, but any non trivial
+conflicts should be mentioned to your upstream maintainer when your tree
+is submitted for merging.  You may also want to consider cooperating
+with the maintainer of the conflicting tree to minimise any particularly
+complex conflicts.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+diff --cc net/sched/sch_cake.c
+index 2c2e2a67f3b2,deb0925f536d..000000000000
+--- a/net/sched/sch_cake.c
++++ b/net/sched/sch_cake.c
+@@@ -1972,6 -1935,8 +1974,7 @@@ static struct sk_buff *cake_dequeue(str
+  {
+  	struct cake_sched_data *q =3D qdisc_priv(sch);
+  	struct cake_tin_data *b =3D &q->tins[q->cur_tin];
+ -	struct cake_host *srchost, *dsthost;
++ 	enum skb_drop_reason reason;
+  	ktime_t now =3D ktime_get();
+  	struct cake_flow *flow;
+  	struct list_head *head;
+
+--Sig_/vKEcN32l+Ln8y9D/1UzFGCc
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmeAbB8ACgkQAVBC80lX
+0GxPtQf+NMtv8tA9waEkIc+GvofGU8wFBvwTI2F15ZuctRFQs3XYLgx/i2kBF/a5
+9XyEv35ZG45jT+We7sxqxa5hoBfiVV7s6E41cL+DnqD6ABEvHpq/PGgJYd+bnbrl
+QL77lPrYGTK9DEHJ3SZWgEJ/k+AqU8k0gpkJmmYImQnX7OJJj8oi65ft7tuIyDwP
+PmYYedACQVfz+JX9WzwI4oLiwlGfJ80E0MQv68/XrWtZB1Or+bSQw5gxYxorn4wU
+dvIL86jQ1kpmm0vT+gSNDR0dd1JYGESEX27/Z96TVGsjqsAP4K9UrSoJJnmniBmH
+w0vSnEKhWN6sj28w+XbCwPgQY26yVQ==
+=WPs9
+-----END PGP SIGNATURE-----
+
+--Sig_/vKEcN32l+Ln8y9D/1UzFGCc--
 
