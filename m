@@ -1,91 +1,91 @@
-Return-Path: <netdev+bounces-156953-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156954-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76C1BA08613
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 04:55:26 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 491D1A08615
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 04:55:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 217FD188BB96
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 03:55:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 37A443A86A6
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 03:55:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B928F1E22F0;
-	Fri, 10 Jan 2025 03:55:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95C8D1E32BD;
+	Fri, 10 Jan 2025 03:55:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="e0s4Z9Z+"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="WQvZLm1f"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DF5E8BEC
-	for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 03:55:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20DD33FBB3
+	for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 03:55:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736481321; cv=none; b=vAaNmf5eEDhpfMvYWWTNQIvhCokYEgLJ+404H/qBIOVONC+QfUlsxZny5SOI6PzafGExPGMSAF9kA+mlN+EiqhK+7maodt5qeYuKmkQtA+bXrqbIFwgqfZ3y63HHTAX4pgCcxHu1dTVpjLR7Ha1GAGBXlY/IQcP5HYTzXB8oAP0=
+	t=1736481343; cv=none; b=BfEbbOIZsfqUenkb6hvZ1sYgG9gKUK93Clx3eZO3DgLiSmkVx4koo0NVbHcBCIA96i7MI3Hps2YBrco7AUtZSRbrlU6xSf/PElb1jPNJ0STbEp8nfz3IfDdOkrG9WY5nLWoBhgIPFEbvj8a6slG4gFi6gNTZ1i6WeBRlMlT0TfU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736481321; c=relaxed/simple;
-	bh=IwmGTOEOUs1/wx+chiFAEEeO//RxOcp77XVWdF5/T1w=;
+	s=arc-20240116; t=1736481343; c=relaxed/simple;
+	bh=QPoyz6t0yJ/b683zDxr4T/j0stSJ6exkPgUDmPPRsX8=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ObeX0mMrrGQZzorCZBWupMRtOm638rc/HVcfFnDEhVSEs7TCxHuKJ3j+dy30m2K0ET4UCmWZybCji2jRGtTaxaZ/noG14xKBPoCNxP4TcTD5OeUf4OaegDU1Ze8xxKV45lIZ/V52Oj3EQUesfcFj5ikUKn5oIxI9WdnLzVYGeBk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=e0s4Z9Z+; arc=none smtp.client-ip=209.85.214.179
+	 To:Cc:Content-Type; b=rv+KZGHu3VVgVHGSQZPT3ndPJ8IvD4ghvdS5BAKrjZghFqrhD7PrEwcsZihC4kOzpVyF02ga4rXVmnbkYBX7sds33M9s88VxU4uezYbp0OFYIG5VT0VLtHXsOApDu4QX/WX2rJUVDjY19IzAR5Y4Pa2cMdq/gRZ0+T2MuTdAMKc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=WQvZLm1f; arc=none smtp.client-ip=209.85.216.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-215770613dbso19854705ad.2
-        for <netdev@vger.kernel.org>; Thu, 09 Jan 2025 19:55:19 -0800 (PST)
+Received: by mail-pj1-f52.google.com with SMTP id 98e67ed59e1d1-2ee709715d9so2350231a91.3
+        for <netdev@vger.kernel.org>; Thu, 09 Jan 2025 19:55:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1736481319; x=1737086119; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1736481341; x=1737086141; darn=vger.kernel.org;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=IwmGTOEOUs1/wx+chiFAEEeO//RxOcp77XVWdF5/T1w=;
-        b=e0s4Z9Z+6EPD40PzzI2hmaeD7ps1EOIsMZgx89440BwoLydQs2B+HTj7Cv3zQO+Zlr
-         3CROYBDDEbrZL2t7beDKCH+AtrbfRNu/i1hcy4elE81C1Kxxt921p4EkkF+/Z63tVyBS
-         oY/gSeEpe9NwDTysvFXDWpxTG1WuOFwTa/Lbg=
+        bh=QPoyz6t0yJ/b683zDxr4T/j0stSJ6exkPgUDmPPRsX8=;
+        b=WQvZLm1fC3N8U2Qk8mEBowD0XKnf7Q58ZIlKq8XMRwmPigbSXm6eS6RbLzxcNUkZDn
+         PC0mTXzTMrai6gwpAHyEnbM3/GvcKKQNgvlOlTh5ccT7qfaAXiax7VX19QqxNUMWqYiG
+         C5G8CEcAbWRqcmYlaKnIaZes3ebtNEpUN5/w8=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736481319; x=1737086119;
+        d=1e100.net; s=20230601; t=1736481341; x=1737086141;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=IwmGTOEOUs1/wx+chiFAEEeO//RxOcp77XVWdF5/T1w=;
-        b=GpbclT2g/gXJIsOIFvjiVazJDoGPcYihzK+xnxeQImv3Nzb8cs0XZSGb9i/cvWK6ZL
-         CtqgllCggUJg5ITZ+s7WW30RpH8QGufIcBzTu92BxSLJDo76f/78dZrstD5l76HOH99W
-         GwnEPKGYT+92N6oWVk7PPsjplRCEXXih01Y1khCAothjU8TDAc7csDjbZnQu1ggFCKg2
-         NnWZ4mQSm8o2y8R/OP6wMaGLvEfD/tB4eC4R5aV4qdXYh5vvL+MHv8GiCy6R4q78ilMn
-         nudDpOiNv2VqQZ85JESd9OePXvZeS9xec7v7azl6V5WRedFts6VfOPnNQbvpyrgZLYJZ
-         QIPQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXF1dJzqDXrhJxzel5iwGbTsWNVsaovyygFgafjKeu7gJq4AIRsT7ThYRsktuWmDtaEAEg1Cyg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxmBidEEs3yO0QSQxikfZJNWQ22cbuVeztJzf5j+7IKqXg6GV76
-	wyXywjhC3YovTVs/q2E8P+Gsf6Xid/BOLFkAa1E3dsjDOMcwDxQQv1AcbJEe6FxELT5k6VeKtB1
-	qcXE4aXUiCUAhUHcCW0QjLW8CACIIMUsrbW6d
-X-Gm-Gg: ASbGnctyz305srBYMtgxSV8CvHOZZFDVaAAMz5pPXSBKVndojx06atOFD9gi1f2NRX/
-	+R7vLTTD9LQODFG3a5tCoYKxc1Cvjmtla0YXFiG0=
-X-Google-Smtp-Source: AGHT+IHuZ0xWwUUMfDx0TS1ckpImAO/r/A9JGPKCmgr6Ya81tIw750HRwnaHifeUOp/kR5zKM8Xr3B4BxURemJ3WtMw=
-X-Received: by 2002:a05:6a20:43a9:b0:1e1:b727:1801 with SMTP id
- adf61e73a8af0-1e88d15a830mr14144331637.27.1736481319588; Thu, 09 Jan 2025
- 19:55:19 -0800 (PST)
+        bh=QPoyz6t0yJ/b683zDxr4T/j0stSJ6exkPgUDmPPRsX8=;
+        b=If4lRp9h1DdY7ZJnSK95yDglip1Cf9kHKAG+r0FWxGZRmFRW0+MWtXsCgska7pkbpq
+         gu4iydKWZjf2q7DiEsTW1ukAFwgUKNTLnLXR4GkhO7hh1dfwtDYO1wX1N0BlavRuOF9U
+         JURjP6lZr3ZqV5caqVY6fEfO4bohy1Luyu4aNF949B/ISD3qAvpdnkIH/8XcovgEaMkF
+         dA2OSyAzn2z1ta+WIenaSVBJtj6YlHZg6WdaZMZ8W/Q7fvK7aa2+WM9vvAVH0W+PC7TN
+         BNjgBcQET/UBefAKx8/YBDIffCvLPhzisah+IVvgdUps6w3ooj0Jt/BumdqdCEewZT3p
+         fyEA==
+X-Forwarded-Encrypted: i=1; AJvYcCWFiqCl2qiISPzuSH/Lhv80eL4zHRmrXTkC7l8QcM03Th7a+gTjQ3mP0oIIpmNue3XtPebNqyY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxSml8TX/lI8fbQPJVRCX6qIB+pYDaSTlCIxrqPHlDN20ewQ/Te
+	BI5y8C984KvImtNhEJQKoV1JuaOjE9Nkekqo+PSC2+RdaPU9jZ1HW4lx5mqLyPCTbNYRf0hr6eJ
+	xZ9dK0oOegKzEmhfkRMkI+KBxZ4vIBbdUefl1
+X-Gm-Gg: ASbGncvT1DRhge0z6oxnaq0MjbFSUbT7QPqT3VMmBzXavQ1I00JyGTby2rPH04BEMp/
+	M86jBenacBFF+pAIt4vkBH/y0nFXJo49Yyl/KFFQ=
+X-Google-Smtp-Source: AGHT+IEM8AfkrkY9i/I3T+4/423KLWnM9F5yqIsVG9BVwg1K4TLKNfK5hRF2MymysDdCnG2cEG3iEptbLZzJKOoTpHs=
+X-Received: by 2002:a17:90b:538b:b0:2ee:f19b:86e5 with SMTP id
+ 98e67ed59e1d1-2f548eae0eamr14541090a91.14.1736481341569; Thu, 09 Jan 2025
+ 19:55:41 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250109204231.1809851-1-tariqt@nvidia.com> <20250109204231.1809851-2-tariqt@nvidia.com>
-In-Reply-To: <20250109204231.1809851-2-tariqt@nvidia.com>
+References: <20250109204231.1809851-1-tariqt@nvidia.com> <20250109204231.1809851-3-tariqt@nvidia.com>
+In-Reply-To: <20250109204231.1809851-3-tariqt@nvidia.com>
 From: Kalesh Anakkur Purayil <kalesh-anakkur.purayil@broadcom.com>
-Date: Fri, 10 Jan 2025 09:25:06 +0530
-X-Gm-Features: AbW1kvZtHbzIJ5SqEjaH_mfNPV4cQIEXLddV1pctvPJnIBNWWZVKCbI9WE-kylY
-Message-ID: <CAH-L+nPVdcZ5EP0-_rB9MQznfvLyS9dBpNKV+aSXEG9Q+OkJPw@mail.gmail.com>
-Subject: Re: [PATCH mlx5-next 1/4] net/mlx5: Update mlx5_ifc to support FEC
- for 200G per lane link modes
+Date: Fri, 10 Jan 2025 09:25:28 +0530
+X-Gm-Features: AbW1kvbsK0jz-TSNrxQs-xRK8YsiB01D_cKS6GL7Nem_qQe5dBYYlxa4AfPVd_M
+Message-ID: <CAH-L+nMv5Aemo+GxZfnhQu7waDqOT5ni9kjjADWRW83JtL1i3A@mail.gmail.com>
+Subject: Re: [PATCH mlx5-next 2/4] net/mlx5: Add support for MRTCQ register
 To: Tariq Toukan <tariqt@nvidia.com>
 Cc: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>, 
 	Jason Gunthorpe <jgg@nvidia.com>, netdev@vger.kernel.org, linux-rdma@vger.kernel.org, 
 	Jakub Kicinski <kuba@kernel.org>, Gal Pressman <gal@nvidia.com>, Mark Bloch <mbloch@nvidia.com>, 
-	Moshe Shemesh <moshe@nvidia.com>, Jianbo Liu <jianbol@nvidia.com>
+	Moshe Shemesh <moshe@nvidia.com>, Jianbo Liu <jianbol@nvidia.com>, 
+	Dragos Tatulea <dtatulea@nvidia.com>
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="0000000000003a2ec3062b521066"
+	boundary="0000000000008a3596062b5211e0"
 
---0000000000003a2ec3062b521066
+--0000000000008a3596062b5211e0
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
@@ -94,10 +94,11 @@ ote:
 >
 > From: Jianbo Liu <jianbol@nvidia.com>
 >
-> Add FEC admin and override related fields in PPLM, and the bit in PCAM
-> to indicate those fields are supported.
+> Management Real Time Clock Query (MRTCQ) register is used to query
+> hardware clock identity.
 >
 > Signed-off-by: Jianbo Liu <jianbol@nvidia.com>
+> Reviewed-by: Dragos Tatulea <dtatulea@nvidia.com>
 > Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
 
 Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
@@ -107,7 +108,7 @@ Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
 Regards,
 Kalesh AP
 
---0000000000003a2ec3062b521066
+--0000000000008a3596062b5211e0
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -179,14 +180,14 @@ a30CvRuhokNO6Jzh7ZFtjKVMzYas3oo6HXgA+slRszMu4pc+fRPO41FHjeDM76e6P5OnthhnD+NY
 x6xokUN65DN1bn2MkeNs0nQpizDqd0QxggJtMIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYD
 VQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25h
 bFNpZ24gMiBDQSAyMDIwAgw3wUUJsDUiPdpordMwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcN
-AQkEMSIEIFAjzVQCJRRU/eYX+UXh39DIUsMjg8B826TmOMsPPrg9MBgGCSqGSIb3DQEJAzELBgkq
-hkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI1MDExMDAzNTUxOVowaQYJKoZIhvcNAQkPMVwwWjAL
+AQkEMSIEIASKaHRwSbHYXJd+zFPRDfL22Aok6DTuN7S+YiRs7BGeMBgGCSqGSIb3DQEJAzELBgkq
+hkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI1MDExMDAzNTU0MVowaQYJKoZIhvcNAQkPMVwwWjAL
 BglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG
-9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQCFV28tZ2lS
-Tv/xWrf8C2stkH/UBIZQmpz0P4Z1YmEUxTvgD+lqM7skt4pEr12McJKq8r0lFXbM7m3hFRgWAVV8
-TXFPNiVpPAEJzA4uN4myHy5vjwC/71uR/OonuM6zOTsSD3FdunGo+DLdwMN4O/YT/+FR4eKLrrco
-qCCVprUb8ClyFsyBhdnCq/CevP3p5En75uXzaVLXPNcJ1MrCcp9ig946rQjyrQRXteOKXKirZfQP
-n8f3clYzPP4lRCtbzY912/vuXBdQ8soo+qczlpXIbIjH5kOlztca0HGxooc+Y9AimwsQmpKkpLIw
-X+3SIRTdoyxjd4FLhHJrrUJw0a5+
---0000000000003a2ec3062b521066--
+9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQCGn7Lp/UUs
+wsFJVLLwVbXIakPYSDIdH+zVzEJuU7LEVZqPzfRzFkVFr1DFfLR7Wv78E1dAkKwIU8AQKTAijQOS
+vF8ZQNwE6V7NdkWzYggYj1OBgyCE1yfN3UGKP7zmm7afGRgCXeLIpV1N77brJ44J//bxI6UqMKlW
+OTa3MV8AYJIcS5ARI87bjVyMs3F3VK+HdHccSAPY6idxcg0PN512cqV4EH5xEmKstzT82AGql3y1
+BorySOjE8Uykpm32oBWJlGD+cfRMQUaECQnp9I1w6MO7G5qClkly/Clthd6f7HD9+ozspe3s5N42
+d67FLWbej0s33DSnHc+6vK0HWsc6
+--0000000000008a3596062b5211e0--
 
