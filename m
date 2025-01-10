@@ -1,153 +1,140 @@
-Return-Path: <netdev+bounces-156926-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156927-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA6F7A084EB
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 02:38:52 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E876A084FB
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 02:44:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9E5987A208E
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 01:38:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 69F743A6F15
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 01:43:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C56342AB4;
-	Fri, 10 Jan 2025 01:38:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C09A57D3F4;
+	Fri, 10 Jan 2025 01:43:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="whqpLzeZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+Received: from out-181.mta1.migadu.com (out-181.mta1.migadu.com [95.215.58.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E204C2C9D;
-	Fri, 10 Jan 2025 01:38:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1260E38DE1
+	for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 01:43:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736473125; cv=none; b=BAa0/am0SBwIJMJ5WQ5xsNEegt+TetFb5VZcseZWIr8X+oVfYURZCPGeHyZcaiWRbaAMaLpM+kFdaJG4kNynDt/JwN+3EAOP/8nVVCpTBikHlizicJpYXcnLNoUwaYOX3JlVmEO0jBBjHXJWW4le0dVXLRD1MNUHlFllU5kF3tg=
+	t=1736473436; cv=none; b=a8lJyDSaFijJFpR+Ov1bxf+tMhRTPd5CTYOrweYXkwjUWdvATPJuOozwbZ2yhU8GWXKZyi1k0YTSYGwbD1Ea9P5IlUtxhgctQeXAucyLZA3dHssqQ92DWuT3IfJynFc0RgxhoOLNNc4RbCsn6vU6pWH03eu3AK0VDqzzUn+8yDI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736473125; c=relaxed/simple;
-	bh=N/fkSfTpPv525nzBXiPAxWNErjJTrH0nc7ei9Yz/eeM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JtvWZyvHMZH290eZkw9CKzCIFGt46z2YIrPLZbKYS0QLt25HUX4Yt2m5+ABSJjqhvv8YBCk7cMd7Mg64HCcGXB8d07EdH08oBmz011aWsfLw4fTUv48F8SIvw8cjlqqF4FI7yKjkipmkrtgWGDmrz5NdhQycazVbjcSddGmXJHc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.98)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1tW3yk-000000003IH-3Wbj;
-	Fri, 10 Jan 2025 01:38:26 +0000
-Date: Fri, 10 Jan 2025 01:38:22 +0000
-From: Daniel Golle <daniel@makrotopia.org>
-To: Lei Wei <quic_leiwei@quicinc.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org, quic_kkumarcs@quicinc.com,
-	quic_suruchia@quicinc.com, quic_pavir@quicinc.com,
-	quic_linchen@quicinc.com, quic_luoj@quicinc.com,
-	srinivas.kandagatla@linaro.org, bartosz.golaszewski@linaro.org,
-	vsmuthu@qti.qualcomm.com, john@phrozen.org
-Subject: Re: [PATCH net-next v4 3/5] net: pcs: qcom-ipq9574: Add PCS
- instantiation and phylink operations
-Message-ID: <Z4B6DqpZG55aGVh9@makrotopia.org>
-References: <20250108-ipq_pcs_net-next-v4-0-0de14cd2902b@quicinc.com>
- <20250108-ipq_pcs_net-next-v4-3-0de14cd2902b@quicinc.com>
+	s=arc-20240116; t=1736473436; c=relaxed/simple;
+	bh=8JnBP19d9w1bWLjuAow8jNbFkDHO6o1yW3KwujPpU/Q=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=stqPWHLwN9ZmHDvT1JDCgUsCQoNfL22g0vZYxBBOuttuwu87xebKvj7CqHxKDc8YnXSCyTniCpcg+0pGIRGNUFoN9XQCTQNkro+05hUY0oO5eIeXgXaDboY1FwlbTaYQZKXHQvO04S8xY7kinfT64XtUTju7QuJTKQ+vS4TXlSQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=whqpLzeZ; arc=none smtp.client-ip=95.215.58.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <1292dc51-4ca1-45c0-8a7c-78d325530531@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1736473432;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=a8R/Ifde+clfmwPosLqJI0YLaYlt8evsINovbOJnMUI=;
+	b=whqpLzeZ0b3io7r3H8+VPXwqX086ELdKF07/Rg7x0tV8D2X+y54PIx8+djO6aNe2zzKslx
+	1RndiKgkT/ShCAoFVhESctSBFkRR0crg/gNzBb2l6mdckzbYrUZtzxYy4w+8PjQgXC76Ef
+	kkq8IIeLbUBLs7MTO0ONKX1Ilx3nIaE=
+Date: Thu, 9 Jan 2025 17:43:46 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250108-ipq_pcs_net-next-v4-3-0de14cd2902b@quicinc.com>
+Subject: Re: [PATCH bpf-next v2 00/14] bpf qdisc
+To: Amery Hung <ameryhung@gmail.com>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, daniel@iogearbox.net,
+ andrii@kernel.org, alexei.starovoitov@gmail.com, martin.lau@kernel.org,
+ sinquersw@gmail.com, toke@redhat.com, jhs@mojatatu.com, jiri@resnulli.us,
+ stfomichev@gmail.com, ekarani.silvestre@ccc.ufcg.edu.br,
+ yangpeihao@sjtu.edu.cn, xiyou.wangcong@gmail.com, yepeilin.cs@gmail.com
+References: <20241220195619.2022866-1-amery.hung@gmail.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <20241220195619.2022866-1-amery.hung@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-Hi Lei,
+On 12/20/24 11:55 AM, Amery Hung wrote:
+> The implementation of bpf_fq is fairly complex and slightly different from
+> fq so later we only compare the two fifo qdiscs. bpf_fq implements the
+> same fair queueing algorithm in fq, but without flow hash collision
+> avoidance and garbage collection of inactive flows. bpf_fifo uses a single
 
-On Wed, Jan 08, 2025 at 10:50:26AM +0800, Lei Wei wrote:
-> ...
-> +/**
-> + * ipq_pcs_get() - Get the IPQ PCS MII instance
-> + * @np: Device tree node to the PCS MII
-> + *
-> + * Description: Get the phylink PCS instance for the given PCS MII node @np.
-> + * This instance is associated with the specific MII of the PCS and the
-> + * corresponding Ethernet netdevice.
-> + *
-> + * Return: A pointer to the phylink PCS instance or an error-pointer value.
-> + */
-> +struct phylink_pcs *ipq_pcs_get(struct device_node *np)
-> +{
-> +	struct platform_device *pdev;
-> +	struct ipq_pcs_mii *qpcs_mii;
-> +	struct ipq_pcs *qpcs;
-> +	u32 index;
-> +
-> +	if (of_property_read_u32(np, "reg", &index))
-> +		return ERR_PTR(-EINVAL);
-> +
-> +	if (index >= PCS_MAX_MII_NRS)
-> +		return ERR_PTR(-EINVAL);
-> +
-> +	/* Get the parent device */
-> +	pdev = of_find_device_by_node(np->parent);
-> +	if (!pdev)
-> +		return ERR_PTR(-ENODEV);
-> +
-> +	qpcs = platform_get_drvdata(pdev);
+For hash collision, I think you meant >1 tcp_socks having the same hash in patch 
+14? This probably could be detected by adding the sk pointer value to the 
+bpf-map key? not asking to change patch 14 though.
 
-What if the node referenced belongs to another driver?
+For garbage collection, I think patch 14 has it but yes it is iterating the bpf 
+map, so not as quick as doing gc while searching for the sk in the rbtree. I 
+think the only missing piece is being able to iterate the bpf_rb_root, i.e. able 
+to directly search left and right of a bpf_rb_node.
 
-> +	if (!qpcs) {
-> +		put_device(&pdev->dev);
-> +
-> +		/* If probe is not yet completed, return DEFER to
-> +		 * the dependent driver.
-> +		 */
-> +		return ERR_PTR(-EPROBE_DEFER);
-> +	}
-> +
-> +	qpcs_mii = qpcs->qpcs_mii[index];
-> +	if (!qpcs_mii) {
-> +		put_device(&pdev->dev);
-> +		return ERR_PTR(-ENOENT);
-> +	}
-> +
-> +	return &qpcs_mii->pcs;
-> +}
-> +EXPORT_SYMBOL(ipq_pcs_get);
+> bpf_list as a queue instead of three queues for different priorities in
+> pfifo_fast. The time complexity of fifo however should be similar since the
+> queue selection time is negligible.
+> 
+> Test setup:
+> 
+>      client -> qdisc ------------->  server
+>      ~~~~~~~~~~~~~~~                 ~~~~~~
+>      nested VM1 @ DC1               VM2 @ DC2
+> 
+> Throghput: iperf3 -t 600, 5 times
+> 
+>        Qdisc        Average (GBits/sec)
+>      ----------     -------------------
+>      pfifo_fast       12.52 ± 0.26
+>      bpf_fifo         11.72 ± 0.32
+>      fq               10.24 ± 0.13
+>      bpf_fq           11.92 ± 0.64
+> 
+> Latency: sockperf pp --tcp -t 600, 5 times
+> 
+>        Qdisc        Average (usec)
+>      ----------     --------------
+>      pfifo_fast      244.58 ± 7.93
+>      bpf_fifo        244.92 ± 15.22
+>      fq              234.30 ± 19.25
+>      bpf_fq          221.34 ± 10.76
+> 
+> Looking at the two fifo qdiscs, the 6.4% drop in throughput in the bpf
+> implementatioin is consistent with previous observation (v8 throughput
+> test on a loopback device). This should be able to be mitigated by
+> supporting adding skb to bpf_list or bpf_rbtree directly in the future.
+> 
+> * Clean up skb in bpf qdisc during reset *
+> 
+> The current implementation relies on bpf qdisc implementors to correctly
+> release skbs in queues (bpf graphs or maps) in .reset, which might not be
+> a safe thing to do. The solution as Martin has suggested would be
+> supporting private data in struct_ops. This can also help simplifying
+> implementation of qdisc that works with mq. For examples, qdiscs in the
+> selftest mostly use global data. Therefore, even if user add multiple
+> qdisc instances under mq, they would still share the same queue.
 
-All the above seems a bit fragile to me, and most of the comments
-Russell King has made on my series implementing a PCS driver for the
-MediaTek SoCs apply here as well, esp.:
+Although not as nice as priv_data, I think mq setup with a dedicated queue can 
+be done with bpf map-in-map.
 
-"If we are going to have device drivers for PCS, then we need to
-seriously think about how we look up PCS and return the phylink_pcs
-pointer - and also how we handle the PCS device going away. None of that
-should be coded into _any_ PCS driver."
+For the cleanup part, it is similar to how the bpf kptr is cleaned up, either 
+the bpf program frees it or the bpf infra will eventually clean it up during the 
+bpf map destruction.
 
-It would hence be better to implement a generic way to get/put
-phylink_pcs instances from a DT node, and take care of what happens
-if the PCS device goes away.
+For priv_data, I think it could be a useful addition to the bpf_struct_ops. 
+Meaning it should also work for struct_ops other than Qdisc_ops. Then all 
+destruction and free could be done more automatically and seamlessly.
 
-See also
-https://patchwork.kernel.org/comment/25625601/
+imo, the above improvements can be iterated later on top of the core pieces of 
+this set.
 
-I've since (unsucessfully) started to work on such infrastructure.
-In order to avoid repeating the same debate and mistakes, you may want
-to take a look at at:
-
-https://patchwork.kernel.org/project/netdevbpf/patch/ba4e359584a6b3bc4b3470822c42186d5b0856f9.1721910728.git.daniel@makrotopia.org/
-
-
-Cheers
-
-
-Daniel
 
