@@ -1,84 +1,159 @@
-Return-Path: <netdev+bounces-157232-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157233-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F0E1A098FC
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 18:56:38 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 52009A09900
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 19:01:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 119A816B600
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 17:56:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6C1BF3AACD9
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 18:00:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2938F212B15;
-	Fri, 10 Jan 2025 17:56:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6857205AA2;
+	Fri, 10 Jan 2025 18:01:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="zz5N9mNS"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bzCgb0jq"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f179.google.com (mail-yb1-f179.google.com [209.85.219.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73043205E16;
-	Fri, 10 Jan 2025 17:56:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5583F224D7;
+	Fri, 10 Jan 2025 18:00:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736531794; cv=none; b=CU+pmRwO/qJwqaVrmUq43612Q3La9W0gxQ9qFdtEg9vlLjiXH+m1vKsZpox7frSVXjS9+4bdzTslEiBDJ3T3G9lOuvrfKbkHu3/ojbxgSbhYUJg2gJDFs20mQDf5CP367MJC6n+JOs42TWKY9lgDOaUcJZ2FwJV7b1G1teb6U6M=
+	t=1736532060; cv=none; b=l0wi7EKhL4KuhXGjVZwslhSOB6b0hEwxXdScAtFZ4RXIonfperEMOiY2igKf6IcvtZre99qGy1csDl9rZ2TPWonF6Ha9hzqKQ8NkBmYjv/Dia9hybOxof7Lvb2RuRmh4RdOlgp5hXsMuw55Zm/uM7L6Z59TU2xapMBY3HTmNUMY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736531794; c=relaxed/simple;
-	bh=DUbpD/fe1fzj3l8O5fdIW3x+VLqqDCPHIjf5/Ma+P9U=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=byvCZMMVm5rqbaiBON9o7lUp3YWh+PJxfaOEBX3zXj+OCQ4pL7ozLklaBdSNQBS3lceE64cN5RFx+VzqWDgQuC7x+D3w49baw4sZ8Hoda2VMrQkLSNqI5WI3LHupva/fv0GJb229/uYhEMm4eK3s8Pw4RJzl5MxacV1cMf4iZPk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=zz5N9mNS; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=ki5u+x3R93XBYSeGA0hQJwfgtpIuFLE/aegA6enbsGk=; b=zz5N9mNSfZjZRjeSOOxi76sY9R
-	kvGR85XxxIsUwQPDEKQp23Hd9oGNFdsQ/hd+iTbiHIlbDjuIeLzKkd+jCQhUIegDV0hMaIwOcpOtt
-	LXTNt7lBcMja9ApgQlshOoMocU5sTP6SO3NbA8y1yFpqEp+uRL1OmKPjvzN2u+FsL56k=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tWJFA-003JJw-JC; Fri, 10 Jan 2025 18:56:24 +0100
-Date: Fri, 10 Jan 2025 18:56:24 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Dimitri Fedrau <dima.fedrau@gmail.com>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Niklas =?iso-8859-1?Q?S=F6derlund?= <niklas.soderlund+renesas@ragnatech.se>,
-	Gregor Herburger <gregor.herburger@ew.tq-group.com>,
-	Stefan Eichenberger <eichest@gmail.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: phy: marvell-88q2xxx: Add support for PHY LEDs on
- 88q2xxx
-Message-ID: <78af361a-8935-47aa-9114-3cf5c1b8f7dc@lunn.ch>
-References: <20250110-marvell-88q2xxx-leds-v1-1-22e7734941c2@gmail.com>
+	s=arc-20240116; t=1736532060; c=relaxed/simple;
+	bh=jWmGZq/yTVUzsPsRDgWRFPHu7pbFN+46aq8jeS7vP/s=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=VDu8WsYZzu/RQBNKC64h7hrNPxfyTV5bBG/gGd6dzy1YGiMt05IY02qtXyg77TgvxjuZZ2g7N5DLKf8BIxzW8u1QC0TjZv28JnBjDfHSfHl/FrCGdFOFNAKwmExmnioL4vGbecsO9he8OdXos4v3jAnLIb1bhYUR2D8RFS/jXCI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bzCgb0jq; arc=none smtp.client-ip=209.85.219.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yb1-f179.google.com with SMTP id 3f1490d57ef6-e53ef7462b6so3997282276.3;
+        Fri, 10 Jan 2025 10:00:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1736532058; x=1737136858; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0FxFVtu1V78zPcPPY+mV2lhvGlXOTUqXWxxIhWG8ybw=;
+        b=bzCgb0jqLBp8YjsfSttZuFHnCOp4AttvOVWCCwt5QUcUwfzvYaiaEzgVXtlUZBhPSU
+         PsU6Uqa465ftkiw5FGxb0w/1Yvw33eOWE869nUUn6TnKTIPwlpAv9udgQ0b3HwJWSplB
+         Vx1Im4w56Kc9D5Uc6DvEFR58+T0XMqZXgorjz6ywFH7OglPmo+EO8cph7KexphZaS1EV
+         lEf6Zw4CYQHECvz/Od5fetgihrVb8tWmBriMeo/+EEyO1J7ahZW74I6RbvLSDwysnjAf
+         MzjFNfS7CTlMy0We6lsiwxzAP1FSMRDsgeTS1JPnpwgjkwFuVBFrILlqmL5hOm0fDT12
+         OjvQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736532058; x=1737136858;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=0FxFVtu1V78zPcPPY+mV2lhvGlXOTUqXWxxIhWG8ybw=;
+        b=JAtOUA6UOcdW1IJsb354TyaKPfQSFLJHjoWiv0de5BHcYLgVwW1HB53msECtXVT5/x
+         PM/ZnIjToAI68F+7p4iRzxl8Zt9BmS5ylgCQO4O95jClOSYdSZZo0tUD3s18Hv8Nz5MQ
+         fd7Qbi97rgwb4lIIQDqJvjkZnUnMcrBghLYGes6UUL8UH1wmq6Pl9hghPop1xMQDvRRZ
+         mVwBWJClyAwdB/LQbzQai/UTVsC7er37xlnIdw4tyDw3GBDXbCFMi678Ifms0hDVJ3a/
+         FpIgFGmkt18UPZ0MHaWibhvbkseowrRaPXFd9oQM+HUyAy+VWcsc7zY9JHFtBLnkQ5S9
+         RpGQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUDf+7twfpk/mWhbSO9cSFNocVxsB8XQ3Pa1klZddgFJo2FfR752C6AtfBvUVkHeHRGmcGofLg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzyv8UlmkWYs+MSPgPB1GyM/w91J2JTKuwhefCUiUNtvRfDulOv
+	8GZGgmRkPjKqzHk2QEOWyxIITzjK+VhJHHWJRe9eiOXyYtonlaXiUS0qmPYEQjnxW913BRROuz6
+	LkD+S7n43ax4oUV38IRNJ0Y3i+Wg=
+X-Gm-Gg: ASbGnctzotTkk146SROABiLaOPO0+6P9wvJYPHSPWFF8CwZpRFbGx/ak6c/DJdrkuiI
+	YuvqjySAHuwUTxrNCZlkw0idzjSMNYdChU5jSleZvaymsxLboQJSSNg==
+X-Google-Smtp-Source: AGHT+IF2F3C7l16WMw2Alhg43G6MD0kwjDA1rS4sTTLV0C5mBTbCV2vngMFC8GkuYYhTOCl3FV/MAq022dDkqTSSLcQ=
+X-Received: by 2002:a05:690c:7409:b0:6ef:e39f:bbd with SMTP id
+ 00721157ae682-6f5312d6be0mr99896447b3.33.1736532058186; Fri, 10 Jan 2025
+ 10:00:58 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250110-marvell-88q2xxx-leds-v1-1-22e7734941c2@gmail.com>
+References: <20241220195619.2022866-1-amery.hung@gmail.com>
+ <20241220195619.2022866-7-amery.hung@gmail.com> <5e1c5729-9bc0-4cb7-969a-a334fb544595@linux.dev>
+In-Reply-To: <5e1c5729-9bc0-4cb7-969a-a334fb544595@linux.dev>
+From: Amery Hung <ameryhung@gmail.com>
+Date: Fri, 10 Jan 2025 10:00:47 -0800
+X-Gm-Features: AbW1kvbn4166dhIjtUPc7tFdMAai_iZXXiRwJLjZo6A4gJt3TCQ19Ymxoty_Hf4
+Message-ID: <CAMB2axM1qA-+4PYyYJ3AmoKHoKAWwu-8sh1UYdZBsPGURbmh4Q@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v2 06/14] bpf: net_sched: Add basic bpf qdisc kfuncs
+To: Martin KaFai Lau <martin.lau@linux.dev>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, daniel@iogearbox.net, 
+	andrii@kernel.org, alexei.starovoitov@gmail.com, martin.lau@kernel.org, 
+	sinquersw@gmail.com, toke@redhat.com, jhs@mojatatu.com, jiri@resnulli.us, 
+	stfomichev@gmail.com, ekarani.silvestre@ccc.ufcg.edu.br, 
+	yangpeihao@sjtu.edu.cn, xiyou.wangcong@gmail.com, yepeilin.cs@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> +#define MDIO_MMD_PCS_MV_LED_FUNC_CTRL			32790
-> +#define MDIO_MMD_PCS_MV_LED_FUNC_CTRL_GPIO_MASK		GENMASK(7, 4)
-> +#define MDIO_MMD_PCS_MV_LED_FUNC_CTRL_TX_EN_MASK	GENMASK(3, 0)
-> +#define MDIO_MMD_PCS_MV_LED_FUNC_CTRL_LINK		0x0 /* Link established */
-> +#define MDIO_MMD_PCS_MV_LED_FUNC_CTRL_LINK_RX_TX	0x1 /* Link established, blink for rx or tx activity */
-> +#define MDIO_MMD_PCS_MV_LED_FUNC_CTRL_RX_TX		0x4 /* Receive or Transmit activity */
-> +#define MDIO_MMD_PCS_MV_LED_FUNC_CTRL_TX		0x5 /* Transmit activity */
-> +#define MDIO_MMD_PCS_MV_LED_FUNC_CTRL_LINK_1000BT1	0x7 /* 1000BT1 link established */
+On Thu, Jan 9, 2025 at 4:24=E2=80=AFPM Martin KaFai Lau <martin.lau@linux.d=
+ev> wrote:
+>
+> On 12/20/24 11:55 AM, Amery Hung wrote:
+> > +BTF_KFUNCS_START(qdisc_kfunc_ids)
+> > +BTF_ID_FLAGS(func, bpf_skb_get_hash, KF_TRUSTED_ARGS)
+> > +BTF_ID_FLAGS(func, bpf_kfree_skb, KF_RELEASE)
+> > +BTF_ID_FLAGS(func, bpf_qdisc_skb_drop, KF_RELEASE)
+> > +BTF_ID_FLAGS(func, bpf_dynptr_from_skb, KF_TRUSTED_ARGS)
+> > +BTF_KFUNCS_END(qdisc_kfunc_ids)
+> > +
+> > +BTF_SET_START(qdisc_common_kfunc_set)
+> > +BTF_ID(func, bpf_skb_get_hash)
+> > +BTF_ID(func, bpf_kfree_skb)
+>
+> I think bpf_dynptr_from_skb should also be here.
 
-Are 2, 3 and 6 defined? It might be nice to include them just for
-documentation.
+Good catch
 
-	Andrew
+>
+> > +BTF_SET_END(qdisc_common_kfunc_set)
+> > +
+> > +BTF_SET_START(qdisc_enqueue_kfunc_set)
+> > +BTF_ID(func, bpf_qdisc_skb_drop)
+> > +BTF_SET_END(qdisc_enqueue_kfunc_set)
+> > +
+> > +static int bpf_qdisc_kfunc_filter(const struct bpf_prog *prog, u32 kfu=
+nc_id)
+> > +{
+> > +     if (bpf_Qdisc_ops.type !=3D btf_type_by_id(prog->aux->attach_btf,
+> > +                                              prog->aux->attach_btf_id=
+))
+> > +             return 0;
+> > +
+> > +     /* Skip the check when prog->attach_func_name is not yet availabl=
+e
+> > +      * during check_cfg().
+>
+> Instead of using attach_func_name, it is better to directly use the
+> prog->expected_attach_type provided by the user space. It is essentially =
+the
+> member index of the "struct Qdisc_ops". Take a look at the prog_ops_moff(=
+) in
+> bpf_tcp_ca.c.
+
+I will replace all places that use attach_func_name to refer to the
+ops to prog_ops_moff.
+
+Thank,
+Amery
+
+>
+> > +      */
+> > +     if (!btf_id_set8_contains(&qdisc_kfunc_ids, kfunc_id) ||
+> > +         !prog->aux->attach_func_name)
+> > +             return 0;
+> > +
+> > +     if (!strcmp(prog->aux->attach_func_name, "enqueue")) {
+> > +             if (btf_id_set_contains(&qdisc_enqueue_kfunc_set, kfunc_i=
+d))
+> > +                    return 0;
+> > +     }
+> > +
+> > +     return btf_id_set_contains(&qdisc_common_kfunc_set, kfunc_id) ? 0=
+ : -EACCES;
+> > +}
 
