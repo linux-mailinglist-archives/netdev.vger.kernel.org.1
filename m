@@ -1,179 +1,85 @@
-Return-Path: <netdev+bounces-157171-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157157-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E25D6A09241
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 14:40:45 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E4E9A09182
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 14:12:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ECC171669E3
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 13:40:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 684D9188E1CF
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 13:12:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA24820E309;
-	Fri, 10 Jan 2025 13:40:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA0E820DD45;
+	Fri, 10 Jan 2025 13:12:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="chKvc2FV"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9FD02080DB
-	for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 13:40:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F2E61B4248;
+	Fri, 10 Jan 2025 13:12:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736516442; cv=none; b=CoDyFHb2EixqgqprsWGR2gOnc1kmRI9760MDyY+14U8yBcBh1z0tPpwUSvAqi8fqCS8PM53hZsaU9TvnSVK6MPsY9O+YVDgkqVolorCWXJgCSzUXGl1BA4fEq5AG2zg85Og195I681y+guqc9TaiXUJiqAlRsiiuv0loDHKxAxs=
+	t=1736514742; cv=none; b=QBTMoyFqa31k53YpN6HGtE+/QtLPpKb61Qa7zATROQ/zcOTn5twu0WWwTkhUGfubL1FDEPk9RynF1l8O0hs31UByVvjXXhyzXaxQztxkkgzsB0N8Nn+syfvRxc7wq8gbY3QcVe5D7WakxER/5HDEVK+P+CqkpU3Oc95GqSOWRKk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736516442; c=relaxed/simple;
-	bh=PLerkdNZcgRBNhpGasCoN27kcTo1EYb+lORo5iq5NJc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ec0tAHhr1r4WwV6DYX6zqRtAWH7K61XjZLLM7MTe5qFSwRkQmu9DXCJ+k32IWrFW2+43fbQY5AJBWCR+GX10Ys4iqzb4zxetm2Y6I+iCTM0FhBVfYLYFJvIqzaR5aN7CzYfIaAbloBhY0EaJqgoMM4WjVQ1D85vqUc0waIlcIPM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1tWFFX-0000CQ-Hi; Fri, 10 Jan 2025 14:40:31 +0100
-Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1tWFFW-000Axh-1o;
-	Fri, 10 Jan 2025 14:40:30 +0100
-Received: from pengutronix.de (pd9e59fec.dip0.t-ipconnect.de [217.229.159.236])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id 9E0143A47AE;
-	Fri, 10 Jan 2025 13:10:55 +0000 (UTC)
-Date: Fri, 10 Jan 2025 14:10:55 +0100
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org, 
-	linux-can@vger.kernel.org, kernel@pengutronix.de, Jimmy Assarsson <extja@kvaser.com>
-Subject: Re: [PATCH net-next 15/18] can: kvaser_usb: Update stats and state
- even if alloc_can_err_skb() fails
-Message-ID: <20250110-notorious-kangaroo-from-atlantis-1645f8-mkl@pengutronix.de>
-References: <20250110112712.3214173-1-mkl@pengutronix.de>
- <20250110112712.3214173-16-mkl@pengutronix.de>
- <20250110125803.GF7706@kernel.org>
+	s=arc-20240116; t=1736514742; c=relaxed/simple;
+	bh=ffHqRwikKiZdHZpxa8JpRqA1BAgAZPomRbaPIWgD47I=;
+	h=Content-Type:MIME-Version:Subject:From:In-Reply-To:References:To:
+	 Cc:Message-ID:Date; b=ChochX8nWCS/csHV1J3zRyuFmVMsxpwIvHYvB6Vm0YdQLPfFCRx1wXCOgH6W7c0Merk2mJrhHo4br5hApHEp9jIuzmHYiT6nq62smtKOcn4IIPW7eQwHxd8tV1KI3eJ1bd33skIJc02vUurwTE+ZaNCsl4//xIMzzoI9kEhA90E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=chKvc2FV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 364B7C4CED6;
+	Fri, 10 Jan 2025 13:12:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1736514742;
+	bh=ffHqRwikKiZdHZpxa8JpRqA1BAgAZPomRbaPIWgD47I=;
+	h=Subject:From:In-Reply-To:References:To:Cc:Date:From;
+	b=chKvc2FVuSEe62ved5GMZUMCV30YCXdUSfhZjZuDRXXe2426ZwT0iGK/jO8AxYlsP
+	 HYkMQsX/unFkENsvfwSzZhKsLu6s191bqU21Fzz/YUkN9MSHeObaJGz2p7sIfsULsp
+	 55qkKMjiixm55bxwA5pofQNFYP+XLr6UoVcPzH5Nd/NZ8KjcDNIthZZYyeYwaU+rsF
+	 /2qSaEuCTxELeWWp+FV4DvPV5jRzHGjxxrn870JcUGE4ZUb9Ygibl09EdQ+W0nk7a4
+	 DGeCLWkQk5KucDph4knPWHV/SahllFNFwWIi6YbsGS8Paog9fsSg8lmkXfwwflUgRf
+	 GMO6H2FlaTCGg==
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="cjml7fqyn67m4v2v"
-Content-Disposition: inline
-In-Reply-To: <20250110125803.GF7706@kernel.org>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Transfer-Encoding: 7bit
+Subject: Re: [1/2] wifi: rt2x00: Remove unused rfval values
+From: Kalle Valo <kvalo@kernel.org>
+In-Reply-To: <20241221124445.1094460-2-ariel.otilibili-anieli@eurecom.fr>
+References: <20241221124445.1094460-2-ariel.otilibili-anieli@eurecom.fr>
+To: Ariel Otilibili <ariel.otilibili-anieli@eurecom.fr>
+Cc: linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
+ Ariel Otilibili <ariel.otilibili-anieli@eurecom.fr>,
+ Stanislaw Gruszka <stf_xl@wp.pl>
+User-Agent: pwcli/0.1.1-git (https://github.com/kvalo/pwcli/) Python/3.11.2
+Message-ID: <173651473967.72755.9279682035059989986.kvalo@kernel.org>
+Date: Fri, 10 Jan 2025 13:12:21 +0000 (UTC)
 
+Ariel Otilibili <ariel.otilibili-anieli@eurecom.fr> wrote:
 
---cjml7fqyn67m4v2v
-Content-Type: text/plain; protected-headers=v1; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [PATCH net-next 15/18] can: kvaser_usb: Update stats and state
- even if alloc_can_err_skb() fails
-MIME-Version: 1.0
+> The intention here is not clear but as this was already tested and matches
+> vendor driver it's better not to change behavior even if it looks suspicious.
+> So just remove the unused values.
+> 
+> Coverity-ID: 1525307
+> 
+> Signed-off-by: Ariel Otilibili <ariel.otilibili-anieli@eurecom.fr>
+> Acked-by: Stanislaw Gruszka <stf_xl@wp.pl>
+> [kvalo@kernel.org: write commit message]
 
-On 10.01.2025 12:58:03, Simon Horman wrote:
-> On Fri, Jan 10, 2025 at 12:04:23PM +0100, Marc Kleine-Budde wrote:
-> > From: Jimmy Assarsson <extja@kvaser.com>
-> >=20
-> > Ensure statistics, error counters, and CAN state are updated consistent=
-ly,
-> > even when alloc_can_err_skb() fails during state changes or error messa=
-ge
-> > frame reception.
-> >=20
-> > Signed-off-by: Jimmy Assarsson <extja@kvaser.com>
-> > Link: https://patch.msgid.link/20241230142645.128244-1-extja@kvaser.com
-> > Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
->=20
-> ...
->=20
-> > diff --git a/drivers/net/can/usb/kvaser_usb/kvaser_usb_leaf.c b/drivers=
-/net/can/usb/kvaser_usb/kvaser_usb_leaf.c
->=20
-> ...
->=20
-> > @@ -1187,11 +1169,18 @@ static void kvaser_usb_leaf_rx_error(const stru=
-ct kvaser_usb *dev,
-> >  		if (priv->can.restart_ms &&
-> >  		    old_state =3D=3D CAN_STATE_BUS_OFF &&
-> >  		    new_state < CAN_STATE_BUS_OFF) {
-> > -			cf->can_id |=3D CAN_ERR_RESTARTED;
-> > +			if (cf)
-> > +				cf->can_id |=3D CAN_ERR_RESTARTED;
-> >  			netif_carrier_on(priv->netdev);
-> >  		}
-> >  	}
-> > =20
-> > +	if (!skb) {
-> > +		stats->rx_dropped++;
-> > +		netdev_warn(priv->netdev, "No memory left for err_skb\n");
-> > +		return;
-> > +	}
-> > +
-> >  	switch (dev->driver_info->family) {
-> >  	case KVASER_LEAF:
-> >  		if (es->leaf.error_factor) {
->=20
-> Hi Jimmy and Marc,
->=20
-> The next line of this function is:
->=20
-> 			cf->can_id |=3D CAN_ERR_BUSERROR | CAN_ERR_PROT;
->=20
-> Which dereferences cf. However, the check added at the top of
-> this hunk assumes that cf may be NULL. This doesn't seem consistent.
+Patch applied to wireless-next.git, thanks.
 
-The driver allocates the skb with:
+280c8b39050b wifi: rt2x00: Remove unused rfval values
 
-	skb =3D alloc_can_err_skb(priv->netdev, &cf);
+-- 
+https://patchwork.kernel.org/project/linux-wireless/patch/20241221124445.1094460-2-ariel.otilibili-anieli@eurecom.fr/
 
-Which in turn calls alloc_can_skb(), which finally calls:
+https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
 
-        *cf =3D skb_put_zero(skb, sizeof(struct can_frame));
-
-To put the cf into the skb.
-
-The newly added check "if (!skb)", takes care of skb allocation errors,
-so that the de-referencing of "cf" is OK after this point.
-
-regards,
-Marc
-
-P.S.:
-IIRC smatch stumbled over the same pattern in another driver a while
-back. Is there anything we can do about it?
-
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
-
---cjml7fqyn67m4v2v
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmeBHFwACgkQKDiiPnot
-vG80LggAjEDGR28sazurzlGbT9gGqqa1ncnBQ78YG2PZ0n/UYeRfQ7aruOozVnkB
-vzNctUW7D6CuCjRIWaZTvDhsRs3tW+fANOKgpad7tMhBrKqyTQguaaeA1zZlipGZ
-M2vDeZx++iwGcEAodiOPVex2uMd0YZR8jNwo11Mv4xrAwH1L2ISYje+ETrFA6yGg
-x0lHKe73FUBGEHRP2B/K0/1u4/XwQupkSsiiVrX48Zddl5Vp7oLEilSUU1dtTCYM
-kKKo9353FE04H5StzVtUMTJu1L2L/IEkMKKuK4jlB7JoaVlVrQKHGRGgKrs9WiBE
-cd9BTCvy8rHvsshubljlLKWsOxbqVw==
-=Iak+
------END PGP SIGNATURE-----
-
---cjml7fqyn67m4v2v--
 
