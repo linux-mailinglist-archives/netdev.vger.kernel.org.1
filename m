@@ -1,287 +1,161 @@
-Return-Path: <netdev+bounces-156993-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156995-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3048FA08A19
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 09:28:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 31502A08A20
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 09:29:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E3D621884CA7
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 08:28:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 00D9D1887952
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 08:29:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00876207DFB;
-	Fri, 10 Jan 2025 08:28:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68190207DFD;
+	Fri, 10 Jan 2025 08:29:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="ibSmOIFU"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="MjWBKejD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from lelvem-ot02.ext.ti.com (lelvem-ot02.ext.ti.com [198.47.23.235])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A713207A2C
-	for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 08:28:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B46CA207DED;
+	Fri, 10 Jan 2025 08:29:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.235
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736497727; cv=none; b=NbMV+plPzSXq6YjIG+k+ne8Dm6r6/973MMX69yRASPZ18qd9L7pvuFwXq4hf/HjP+9oULKobysBdbBJIf2BxQfSmN+fYdcMzWUky0rg/Vy0uCXktufSHTuAfk0NS5Kzw3+iTBzznBAMht7L7ETWkKgp9bAeYMtcgNscxNXUzHr4=
+	t=1736497766; cv=none; b=DA4XBEBR40uEhRqWWTJXcWgGxTQJjrmRFRExHGJtntXuBKdID04j3og0L3G7Yyup8+XNERtsD8wBrRLxT8XT1GIxhOZZ3bhnBQ0Rtz3GM8e7ZQjbTNSBUnW34Z+uy+9A3ViIWbrYeiRdW7P75pvqE7Iex7lVIkQPUyi/+DEaUi4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736497727; c=relaxed/simple;
-	bh=mpE7hYntObRlHLj2s8ybBavAi+cZh37RwpDamWOgN40=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=IV0n7ND/nXw3GRlHAQMpi/0lDXEzSx/u5J5JDXoLtldfScqADJ6fWAql0wr59PESn+sVvq4G+YVf4RQfFPCzK3yohpkkozCjNQg1em9vQgtlEm160Fd8rYA24bbXJcijoNaN7wRIDSf1sPSM+lAnEF4pm3Ug6CWS/8dzCPUvubE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=pass smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=ibSmOIFU; arc=none smtp.client-ip=209.85.214.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=daynix.com
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-216728b1836so29094585ad.0
-        for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 00:28:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1736497725; x=1737102525; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=fMHAnr47gYJmPF4Dg6UKLdQQ9r7gUgpmT9CNdLeTBRg=;
-        b=ibSmOIFU95uLATydrlyBKwidi+SiBBJLTbHROLEupNuyUdhtsPo3JPxU1iBTcry3Fd
-         Y3sh+sXTQ54mu063/v8sDikWMRzTPNMPlj4T0fMvhzjKyqUQSUnUKDEjOwRrXk0XkVh5
-         zKvEI5+Y2dGpMMXdaXAeddnE08xaeLFOlOlRRV4pXq2xUmzWOZF68D94xeLjfmmgY4cW
-         uNpL4wu2pFrEf5ql8q4QogNgiSzOwwh2j9lfMup4CLPMlqotjagZLNuWj8ViTR8FbM9k
-         jfuveoSIx3pOMk/nzwYvdeDYrp3YWpAe59RktpbQRTv/5tpLtPOtEOj5o8YuI2MYxD9G
-         5ZQA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736497725; x=1737102525;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=fMHAnr47gYJmPF4Dg6UKLdQQ9r7gUgpmT9CNdLeTBRg=;
-        b=nOs4QUQq+1Bf/Fq5UsUykvl3ugI/PZIyosPI1u/3TrgH2UGw5xIM8AKJULEwiOQWHi
-         yLWRlklpFX3FOImgv8kS2HYANH1Y+0Q0YRX5yrSStDqrdUyWfPCMErfI27hMTdN64MzG
-         pwIhS36ZJHzj54+jjLeIpEphO6MF/sG8FwVl8yhLWByyoVnu6iVW5yvDZBFlY3sx5Aby
-         hnFc+mgk2olnCq5A8xvl8KD9IveKjPI4TVE+FllgVeV7KNVoSjztt//96TLf/8y7rE6X
-         xi4Pb+J/zv0t530v/cqW0HkqbL2xJ+1hY60xb2ZliC/tChWpq7176gZWrCVvey7tsU8x
-         8v5Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUQ/gZXwRcDVA1iU2FJh+g3cf/rrLwySjsQjAXWCExDFYHhdafPjXJMrIXx0fHSKK3A5nGGCl8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzibPcCQzR5tktV8KS+nd6wJVL03ntJT3FX20j0kr0h3whfaj/E
-	v/XsNaq4Gc7tvfPYDVW4xfE/UXDBsvt9rgej7lzbpwj/cVmeBeTY7fh3bOyd31Q=
-X-Gm-Gg: ASbGncvUqCGF1mu0h8BZ+irFLDCwt/tVh+sHs+MsZ8c8l4LRf/RUp1pUCfa7l/B67YW
-	L6+QlXr2np6nYg5MZsPksDTqebCkNpCE5i0gfiW/iaWCOt9mGm4U02kIkkDPJiradGNZ2FHVG0M
-	56h7hgBrAgZeIsKn7hYaCOE94XBYG7cwiwcRWddfcHlbYgZIoIFSijPR/kQU5UUogo9oKueXU5a
-	8oOmHOG0mRo2njP+b8gOMXwZOHs6bQy6H2IUTW9TN6ktl0GrbmdZyx7Je4z6uBu04U=
-X-Google-Smtp-Source: AGHT+IF1ZJ34S8wHfK4e0giFWrsLi/td4d5wyPmgupD6AicJN1a26QYSVhI7ULzCco4C0ujTpbXL5A==
-X-Received: by 2002:a05:6a20:c70a:b0:1dc:37a:8dc0 with SMTP id adf61e73a8af0-1e88cfd5b94mr16188605637.21.1736497725427;
-        Fri, 10 Jan 2025 00:28:45 -0800 (PST)
-Received: from [157.82.203.37] ([157.82.203.37])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72d40569fddsm1067441b3a.39.2025.01.10.00.28.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 10 Jan 2025 00:28:44 -0800 (PST)
-Message-ID: <aeb2bd68-f5b9-49b7-81ff-18472bd8b7b0@daynix.com>
-Date: Fri, 10 Jan 2025 17:28:38 +0900
+	s=arc-20240116; t=1736497766; c=relaxed/simple;
+	bh=rx4Uq2BfjafEnCrTfg6HnTRGc55+ethKsRrBHrnlnBE=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=JKxOQilrwgoZzuLJfjB5bkpUSOgv4WRP58gglyF9gzXv00+vS8YCVYv+oE42uDQpk94jbPUZUYeKFwe0EAy0ZBG3OAnWUjej2qjLrpEPYPA+IHKr/fM5xWOOwy+YvLFq6AstdwkSRcTv31A5/sWNNnGONjf+p1xq1lZA2w7WpT8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=MjWBKejD; arc=none smtp.client-ip=198.47.23.235
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from lelv0266.itg.ti.com ([10.180.67.225])
+	by lelvem-ot02.ext.ti.com (8.15.2/8.15.2) with ESMTPS id 50A8T0853390410
+	(version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
+	Fri, 10 Jan 2025 02:29:00 -0600
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1736497740;
+	bh=ksMxIna2SYfvVoK6NlK93Su5ZIo00BAOeJb0FMLTUt0=;
+	h=From:To:CC:Subject:Date;
+	b=MjWBKejDOVQI7xUmJ3Ww28SS1uSe96O+/URvW/VseL39W4IeUgCnE+bYI3rN6B2Z/
+	 5LaRAgoW7YNjHiB03FBSYH4scRoxsVio1j2JgsQYRaeUHlE7rWoqdNdmd2TkuL9wk8
+	 9j9Tf3a/CMXyI292+PgRi4JRR90hV3bGYVw8dFmU=
+Received: from DLEE106.ent.ti.com (dlee106.ent.ti.com [157.170.170.36])
+	by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTP id 50A8T0li023404;
+	Fri, 10 Jan 2025 02:29:00 -0600
+Received: from DLEE113.ent.ti.com (157.170.170.24) by DLEE106.ent.ti.com
+ (157.170.170.36) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Fri, 10
+ Jan 2025 02:28:59 -0600
+Received: from fllvsmtp8.itg.ti.com (10.64.41.158) by DLEE113.ent.ti.com
+ (157.170.170.24) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Fri, 10 Jan 2025 02:28:59 -0600
+Received: from lelv0854.itg.ti.com (lelv0854.itg.ti.com [10.181.64.140])
+	by fllvsmtp8.itg.ti.com (8.15.2/8.15.2) with ESMTP id 50A8Sx4Y012643;
+	Fri, 10 Jan 2025 02:28:59 -0600
+Received: from localhost (danish-tpc.dhcp.ti.com [10.24.69.25])
+	by lelv0854.itg.ti.com (8.14.7/8.14.7) with ESMTP id 50A8SvEo021265;
+	Fri, 10 Jan 2025 02:28:57 -0600
+From: MD Danish Anwar <danishanwar@ti.com>
+To: Jeongjun Park <aha310510@gmail.com>,
+        Alexander Lobakin
+	<aleksander.lobakin@intel.com>,
+        Lukasz Majewski <lukma@denx.de>, Meghana
+ Malladi <m-malladi@ti.com>,
+        Diogo Ivo <diogo.ivo@siemens.com>, Simon Horman
+	<horms@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski
+	<kuba@kernel.org>,
+        Eric Dumazet <edumazet@google.com>,
+        "David S. Miller"
+	<davem@davemloft.net>,
+        Andrew Lunn <andrew+netdev@lunn.ch>,
+        Roger Quadros
+	<rogerq@kernel.org>
+CC: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>, <srk@ti.com>,
+        Vignesh Raghavendra
+	<vigneshr@ti.com>, <danishanwar@ti.com>,
+        Michal Swiatkowski
+	<michal.swiatkowski@linux.intel.com>,
+        Larysa Zaremba
+	<larysa.zaremba@intel.com>
+Subject: [PATCH net-next v4 0/4] Add Multicast Filtering support for VLAN interface
+Date: Fri, 10 Jan 2025 13:58:48 +0530
+Message-ID: <20250110082852.3899027-1-danishanwar@ti.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 1/3] tun: Unify vnet implementation
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- Jonathan Corbet <corbet@lwn.net>, Jason Wang <jasowang@redhat.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Xuan Zhuo
- <xuanzhuo@linux.alibaba.com>, Shuah Khan <shuah@kernel.org>,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, kvm@vger.kernel.org,
- virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org,
- Yuri Benditovich <yuri.benditovich@daynix.com>,
- Andrew Melnychenko <andrew@daynix.com>,
- Stephen Hemminger <stephen@networkplumber.org>, gur.stavi@huawei.com,
- devel@daynix.com
-References: <20250109-tun-v2-0-388d7d5a287a@daynix.com>
- <20250109-tun-v2-1-388d7d5a287a@daynix.com>
- <677fd7d26e090_362bc129432@willemb.c.googlers.com.notmuch>
-Content-Language: en-US
-From: Akihiko Odaki <akihiko.odaki@daynix.com>
-In-Reply-To: <677fd7d26e090_362bc129432@willemb.c.googlers.com.notmuch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
 
-On 2025/01/09 23:06, Willem de Bruijn wrote:
-> Akihiko Odaki wrote:
->> Both tun and tap exposes the same set of virtio-net-related features.
->> Unify their implementations to ease future changes.
->>
->> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
->> ---
->>   MAINTAINERS            |   1 +
->>   drivers/net/Kconfig    |   5 ++
->>   drivers/net/Makefile   |   1 +
->>   drivers/net/tap.c      | 172 ++++++----------------------------------
->>   drivers/net/tun.c      | 208 ++++++++-----------------------------------------
->>   drivers/net/tun_vnet.c | 186 +++++++++++++++++++++++++++++++++++++++++++
->>   drivers/net/tun_vnet.h |  24 ++++++
->>   7 files changed, 273 insertions(+), 324 deletions(-)
->>
->> diff --git a/MAINTAINERS b/MAINTAINERS
->> index 910305c11e8a..1be8a452d11f 100644
->> --- a/MAINTAINERS
->> +++ b/MAINTAINERS
->> @@ -23903,6 +23903,7 @@ F:	Documentation/networking/tuntap.rst
->>   F:	arch/um/os-Linux/drivers/
->>   F:	drivers/net/tap.c
->>   F:	drivers/net/tun.c
->> +F:	drivers/net/tun_vnet.h
->>   
->>   TURBOCHANNEL SUBSYSTEM
->>   M:	"Maciej W. Rozycki" <macro@orcam.me.uk>
->> diff --git a/drivers/net/Kconfig b/drivers/net/Kconfig
->> index 1fd5acdc73c6..255c8f9f1d7c 100644
->> --- a/drivers/net/Kconfig
->> +++ b/drivers/net/Kconfig
->> @@ -395,6 +395,7 @@ config TUN
->>   	tristate "Universal TUN/TAP device driver support"
->>   	depends on INET
->>   	select CRC32
->> +	select TUN_VNET
-> 
-> No need for this new Kconfig
+This series adds Multicast filtering support for VLAN interfaces in dual
+EMAC and HSR offload mode for ICSSG driver.
 
-I will merge tun_vnet.c into TAP.
+Patch 1/4 - Adds support for VLAN in dual EMAC mode
+Patch 2/4 - Adds MC filtering support for VLAN in dual EMAC mode
+Patch 3/4 - Create and export hsr_get_port_ndev() in hsr_device.c
+Patch 4/4 - Adds MC filtering support for VLAN in HSR mode
 
-> 
->>   static struct proto tap_proto = {
->>   	.name = "tap",
->> @@ -641,10 +576,10 @@ static ssize_t tap_get_user(struct tap_queue *q, void *msg_control,
->>   	struct sk_buff *skb;
->>   	struct tap_dev *tap;
->>   	unsigned long total_len = iov_iter_count(from);
->> -	unsigned long len = total_len;
->> +	unsigned long len;
->>   	int err;
->>   	struct virtio_net_hdr vnet_hdr = { 0 };
->> -	int vnet_hdr_len = 0;
->> +	int hdr_len;
->>   	int copylen = 0;
->>   	int depth;
->>   	bool zerocopy = false;
->> @@ -652,38 +587,20 @@ static ssize_t tap_get_user(struct tap_queue *q, void *msg_control,
->>   	enum skb_drop_reason drop_reason;
->>   
->>   	if (q->flags & IFF_VNET_HDR) {
->> -		vnet_hdr_len = READ_ONCE(q->vnet_hdr_sz);
->> -
->> -		err = -EINVAL;
->> -		if (len < vnet_hdr_len)
->> -			goto err;
->> -		len -= vnet_hdr_len;
->> -
->> -		err = -EFAULT;
->> -		if (!copy_from_iter_full(&vnet_hdr, sizeof(vnet_hdr), from))
->> -			goto err;
->> -		iov_iter_advance(from, vnet_hdr_len - sizeof(vnet_hdr));
->> -		if ((vnet_hdr.flags & VIRTIO_NET_HDR_F_NEEDS_CSUM) &&
->> -		     tap16_to_cpu(q, vnet_hdr.csum_start) +
->> -		     tap16_to_cpu(q, vnet_hdr.csum_offset) + 2 >
->> -			     tap16_to_cpu(q, vnet_hdr.hdr_len))
->> -			vnet_hdr.hdr_len = cpu_to_tap16(q,
->> -				 tap16_to_cpu(q, vnet_hdr.csum_start) +
->> -				 tap16_to_cpu(q, vnet_hdr.csum_offset) + 2);
->> -		err = -EINVAL;
->> -		if (tap16_to_cpu(q, vnet_hdr.hdr_len) > len)
->> +		hdr_len = tun_vnet_hdr_get(READ_ONCE(q->vnet_hdr_sz), q->flags, from, &vnet_hdr);
->> +		if (hdr_len < 0) {
->> +			err = hdr_len;
->>   			goto err;
->> +		}
->> +	} else {
->> +		hdr_len = 0;
->>   	}
->>   
->> -	err = -EINVAL;
->> -	if (unlikely(len < ETH_HLEN))
->> -		goto err;
->> -
-> 
-> Is this check removal intentional?
+Changes from v3 to v4:
+*) Added RB tag of Roger Quadros <rogerq@kernel.org> to patch 1/4 and addressed
+his comment on the same patch.
+*) Created a separate patch (Patch 4) for hsr core changes in Patch [3] as
+suggested by Roger Quadros <rogerq@kernel.org>.
+*) Added details on why __hw_addr_sync_multiple() is used and exported instead
+of using __hw_addr_sync() in the commit message of Patch 2/4 as suggested by
+Paolo Abeni <pabeni@redhat.com>
+*) Added details on why __hw_addr_sync_dev() is used on the local list instead
+of using __dev_mc_sync() on the vdev, in the commit message of Patch 2/4 as
+suggested by Paolo Abeni <pabeni@redhat.com>
 
-No, I'm not sure what this check is for, but it is irrlevant with vnet 
-header and shouldn't be modified with this patch. I'll restore the check 
-with the next version.
+Changes from v2 to v3:
+*) Rebased on latest net-next and re-spun the series as net-next is now open.
+*) No functional change.
 
-> 
->> +	len = iov_iter_count(from);
->>   	if (msg_control && sock_flag(&q->sk, SOCK_ZEROCOPY)) {
->>   		struct iov_iter i;
->>   
->> -		copylen = vnet_hdr.hdr_len ?
->> -			tap16_to_cpu(q, vnet_hdr.hdr_len) : GOODCOPY_LEN;
->> +		copylen = hdr_len ? hdr_len : GOODCOPY_LEN;
->>   		if (copylen > good_linear)
->>   			copylen = good_linear;
->>   		else if (copylen < ETH_HLEN)
->> @@ -697,7 +614,7 @@ static ssize_t tap_get_user(struct tap_queue *q, void *msg_control,
->>   
->>   	if (!zerocopy) {
->>   		copylen = len;
->> -		linear = tap16_to_cpu(q, vnet_hdr.hdr_len);
->> +		linear = hdr_len;
->>   		if (linear > good_linear)
->>   			linear = good_linear;
->>   		else if (linear < ETH_HLEN)
->> @@ -732,9 +649,8 @@ static ssize_t tap_get_user(struct tap_queue *q, void *msg_control,
->>   	}
->>   	skb->dev = tap->dev;
->>   
->> -	if (vnet_hdr_len) {
->> -		err = virtio_net_hdr_to_skb(skb, &vnet_hdr,
->> -					    tap_is_little_endian(q));
->> +	if (q->flags & IFF_VNET_HDR) {
->> +		err = tun_vnet_hdr_to_skb(q->flags, skb, &vnet_hdr);
->>   		if (err) {
->>   			rcu_read_unlock();
->>   			drop_reason = SKB_DROP_REASON_DEV_HDR;
->> @@ -797,23 +713,17 @@ static ssize_t tap_put_user(struct tap_queue *q,
->>   	int total;
->>   
->>   	if (q->flags & IFF_VNET_HDR) {
->> -		int vlan_hlen = skb_vlan_tag_present(skb) ? VLAN_HLEN : 0;
->>   		struct virtio_net_hdr vnet_hdr;
->>   
->>   		vnet_hdr_len = READ_ONCE(q->vnet_hdr_sz);
->> -		if (iov_iter_count(iter) < vnet_hdr_len)
->> -			return -EINVAL;
->> -
->> -		if (virtio_net_hdr_from_skb(skb, &vnet_hdr,
->> -					    tap_is_little_endian(q), true,
->> -					    vlan_hlen))
->> -			BUG();
->>   
->> -		if (copy_to_iter(&vnet_hdr, sizeof(vnet_hdr), iter) !=
->> -		    sizeof(vnet_hdr))
->> -			return -EFAULT;
->> +		ret = tun_vnet_hdr_from_skb(q->flags, NULL, skb, &vnet_hdr);
->> +		if (ret < 0)
->> +			goto done;
->>   
->> -		iov_iter_advance(iter, vnet_hdr_len - sizeof(vnet_hdr));
->> +		ret = tun_vnet_hdr_put(vnet_hdr_len, iter, &vnet_hdr);
->> +		if (ret < 0)
->> +			goto done;
-> 
-> Please split this patch in to a series of smaller patches.
-> 
-> If feasible:
-> 
-> 1. one that move the head of tun.c into tun_vnet.[hc].
-> 2. then one that uses that also in tap.c.
-> 3. then a separate patch for the ioctl changes.
-> 4. then introduce tun_vnet_hdr_from_skb, tun_vnet_hdr_put
-> and friends in (a) follow-up patch(es).
+Changes from v1 to v2:
+*) Changed netdev_err to netdev_dbg in emac_ndo_vlan_rx_del_vid() in patch 1/3
+as suggested by Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+*) Dropped patch [1] from previous version as the patch created issue [2].
+Will send out a separate patch to set HSR=m in arch/arm64/configs/defconfig.
+Once the defconfig patch gets merged, I will add `depends on HSR` in Kconfig
+for TI_ICSSG_PRUETH as suggested by Larysa Zaremba <larysa.zaremba@intel.com>
 
-I will do so.
+[1] https://lore.kernel.org/all/20241216100044.577489-2-danishanwar@ti.com/
+[2] https://lore.kernel.org/all/202412210336.BmgcX3Td-lkp@intel.com/#t
+[3] https://lore.kernel.org/all/31bb8a3e-5a1c-4c94-8c33-c0dfd6d643fb@kernel.org/
+v1 https://lore.kernel.org/all/20241216100044.577489-1-danishanwar@ti.com/
+v2 https://lore.kernel.org/all/20241223092557.2077526-1-danishanwar@ti.com/
+v3 https://lore.kernel.org/all/20250103092033.1533374-1-danishanwar@ti.com/
 
-> 
-> This is subtle code. Please report what tests you ran to ensure
-> that it does not introduce behavioral changes / regressions.
 
-I tried:
-- curl on QEMU with macvtap (vhost=on)
-- curl on QEMU with macvtap (vhost=off)
+MD Danish Anwar (4):
+  net: ti: icssg-prueth: Add VLAN support in EMAC mode
+  net: ti: icssg-prueth: Add Multicast Filtering support for VLAN in MAC
+    mode
+  net: hsr: Create and export hsr_get_port_ndev()
+  net: ti: icssg-prueth: Add Support for Multicast filtering with VLAN
+    in HSR mode
+
+ drivers/net/ethernet/ti/icssg/icssg_prueth.c | 175 ++++++++++++++-----
+ drivers/net/ethernet/ti/icssg/icssg_prueth.h |   8 +
+ include/linux/if_hsr.h                       |  17 ++
+ include/linux/netdevice.h                    |   3 +
+ net/core/dev_addr_lists.c                    |   7 +-
+ net/hsr/hsr_device.c                         |  13 ++
+ net/hsr/hsr_main.h                           |   9 -
+ 7 files changed, 173 insertions(+), 59 deletions(-)
+
+
+base-commit: 25cc469d6d344f5772e9fb6a5cf9d82a690afe68
+-- 
+2.34.1
+
 
