@@ -1,73 +1,87 @@
-Return-Path: <netdev+bounces-157194-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157195-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05521A09509
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 16:22:55 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED899A095D3
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 16:36:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DB11B188B175
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 15:22:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EF8E8166632
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 15:36:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C30BE211473;
-	Fri, 10 Jan 2025 15:22:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 373A320E006;
+	Fri, 10 Jan 2025 15:36:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="gXAyPwNT"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="Gh8M9Oqi"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-6001.amazon.com (smtp-fw-6001.amazon.com [52.95.48.154])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f45.google.com (mail-qv1-f45.google.com [209.85.219.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C56BA211466
-	for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 15:22:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.48.154
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0611421146E
+	for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 15:35:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736522571; cv=none; b=WLwRrBl4hwwzFtDxA0INCI7lAfZY1D6BJPX6X9CTswdwYKsrhJ7IWEJZXrobDfCQV0wmScsAm4Wfv4rfo0j1BYziuDc5mbUxEPQKsfgwHwdyJhrO2tH50mZuC93B7En+sRpCSlhf4hFB4vOUxU9fQCb4bAQ0tH6hoStf0bc+hY0=
+	t=1736523362; cv=none; b=DebCq0n7o5m7gOvZ+8WSurtnqiPvjdcO76/W3DJ5FG0Alhvar5YNhpSVctmZrZfUVSZvYaDDNX8vff3+L5PVEgPfhedCH+cvLHYE1bR2kexPqFowJlHTO0WAU88jhNFZaIQ0sMBU1ApgTaR2kGHWXB4TY846+Zjh8b1hxDWa9nI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736522571; c=relaxed/simple;
-	bh=QIjRhOyApHpX7F86Ny7bX200ViZx1QInc3zvK/EFakc=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=iz2viOIW9odZXlKhOaOmE5t94I3abY9bvFyBlM+nyAyOiwgNwt0iv0syFCGC9oTFaDpJc7GxFd/47KLzf4ImQbYthwzcXaiqimn16Kyh2CU+mI782eOZUUkn0nRuF/TCxPWVjU048AfwC+ApZVgHGLdmrUML1MOxr46YZks4SRg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=gXAyPwNT; arc=none smtp.client-ip=52.95.48.154
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+	s=arc-20240116; t=1736523362; c=relaxed/simple;
+	bh=/nGLA/xxwyBAhL/5Pl78hYqr/PETIcG38br6sm2r8s4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=sfYwvUCI48PmpjreoLlhvMlwBQCnkjWu/lIquUdYzUm6O3WYlTkI97Yk5PrKYzbSb/0VsOtlURXEwisoMYHcq0MOlggSF1pVGw8N+5wtLwcvdQtCnrLk/UUNhXPTEf/UuneZ8MqZ3psYbHPWF3XqcURnQLBFhC0MG0fRey2cKJM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=Gh8M9Oqi; arc=none smtp.client-ip=209.85.219.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-qv1-f45.google.com with SMTP id 6a1803df08f44-6d896be3992so13780996d6.1
+        for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 07:35:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1736522570; x=1768058570;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=OPawQPWM87TRkkWFDw4x5GLY47H+yk/ZM+19Hqs0rDQ=;
-  b=gXAyPwNT/ARDMcHrvq0h2+Ka3ebV2f7EXndTiLP/m30lKEiAKQVknLrs
-   92H6YkzLOCV+96In465ue6sdlNptPIL9l3Lc0/9MNs6wkktmj5UpCmcDI
-   iQmip0WmeDGMRtim7qZ0vUryv+tpt5C/HudTuCdVn2ezN+WuwhgapOkLx
-   Y=;
-X-IronPort-AV: E=Sophos;i="6.12,303,1728950400"; 
-   d="scan'208";a="453283103"
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.2])
-  by smtp-border-fw-6001.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jan 2025 15:22:46 +0000
-Received: from EX19MTAUWC001.ant.amazon.com [10.0.38.20:5855]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.29.114:2525] with esmtp (Farcaster)
- id 559f8995-577e-4f36-b85e-8f4ecc4089e9; Fri, 10 Jan 2025 15:22:45 +0000 (UTC)
-X-Farcaster-Flow-ID: 559f8995-577e-4f36-b85e-8f4ecc4089e9
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Fri, 10 Jan 2025 15:22:45 +0000
-Received: from 6c7e67c6786f.amazon.com (10.118.252.101) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Fri, 10 Jan 2025 15:22:41 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <horms@kernel.org>
-CC: <davem@davemloft.net>, <donald.hunter@redhat.com>, <edumazet@google.com>,
-	<kuba@kernel.org>, <kuni1840@gmail.com>, <kuniyu@amazon.com>,
-	<netdev@vger.kernel.org>, <pabeni@redhat.com>
-Subject: Re: [PATCH v1 net-next 06/12] af_unix: Reuse out_pipe label in unix_stream_sendmsg().
-Date: Sat, 11 Jan 2025 00:22:31 +0900
-Message-ID: <20250110152231.38703-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
-In-Reply-To: <20250110114344.GA7706@kernel.org>
-References: <20250110114344.GA7706@kernel.org>
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1736523358; x=1737128158; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=0bX5Z8lyIXtDNposQw2YU4d384p/cMvkAnsqnVsZum0=;
+        b=Gh8M9OqiHFeaIXAv1+CoSApw+nWuUhn3z00A1DgT5GM//5wwekF0S5w39dorL3JZVe
+         Sh5myypY6iaWoh9airgPbx05JtDNUt1PTj/CdGePKIxmnnBPI9cAxfm0Nd2S+GfjAUry
+         opZ5eekmTW6E22v1tPE01u2ghsCLQBo6V/yp4cCJcBQ/yYJ7flkiKVgOejFRNO6iAXva
+         HNpYfFQCu9JtlBpxR0xWCx2Kqy8JXDpknoeGS/b9mcqik+bnP6tYL9Uz35WvmFRl1R9e
+         6uBNU16NHV2bO+YDYbHgGJJOi3qpptgpEJ17KRjLEJ6ZZXByLH2516mJVtuT4w7Bbzoa
+         HepQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736523358; x=1737128158;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=0bX5Z8lyIXtDNposQw2YU4d384p/cMvkAnsqnVsZum0=;
+        b=SvKLOEHI8Z5SuYE4OIvQL/OanAxVwFYHApxEK9MOWen1kAzxPmOsHGAPBjyV6p5nH8
+         3JcIahi07k7RDQ/0bttmdKwu1jhE+YQLEiQCUC3agXj95xy4KIv7kJ2ZMzrNOXBW9q9v
+         XJbMzbKGUElkBUg4hK42wSIGt6xwgqGykvoUplY2liuFikie5k2+AlpcHgB7770AMp2g
+         zhULqGslkiLVFraZmKHC8czkKR1x7oxCQNO7KT/uMelJZE84eWYuVQdsmaeFOdgjjUsu
+         /KDw7YeHachCwzFUprKqamRVnTk6RS9J64vXSdLMuL1tXJEdHX2AginUUo+8WSlZaIQx
+         0c7w==
+X-Gm-Message-State: AOJu0YwHO6pQgfM0wgMJSgWc+ldODi6+6M0WJt9IRjF7NcBWoAv5OVJH
+	6Y/hrqn1XPYudbcYO3IB+fLPG8PNaGFX2sUXZr9oPJ6Ekn9In0M0OkbmnB/UcoUKR7NfAtE16TU
+	=
+X-Gm-Gg: ASbGncvXN5LdyD1iKnSeHN3HPuHgrmgtCjur8PPLz+gAQlUaqSoqM7F8ghY3vlJ4vMf
+	IwLMWyCuJjMnpPU6fWe1C9g4pJGqaBC+YN+3jwya5GruTcQHrQuC1d8HUIpENocOhsdEX9/nWc9
+	WfTODiGESErl0RjtZo6RKDRbsEE/GwFrEqyQxBnvSSDd9WvIaAep8OSkpc721j5qOm9gJ9uMjkI
+	sRHU4YFg7cKSVu+Tv2PcU8LdIU6CHhhsJUmP+2R4dmZbHxy
+X-Google-Smtp-Source: AGHT+IHYS9zMH1q3TJHx8iDhJpDqywGh0z2533eILcB5fwfVhigAfQTty/ZVVg2lHdfbznnRYDaPwg==
+X-Received: by 2002:a05:6214:5290:b0:6d8:9dad:e167 with SMTP id 6a1803df08f44-6df9b1e400amr116616556d6.15.1736523358429;
+        Fri, 10 Jan 2025 07:35:58 -0800 (PST)
+Received: from majuu.waya ([76.64.65.230])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6dfade73223sm10133436d6.85.2025.01.10.07.35.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 10 Jan 2025 07:35:57 -0800 (PST)
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+To: netdev@vger.kernel.org
+Cc: jiri@resnulli.us,
+	xiyou.wangcong@gmail.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	petrm@mellanox.com,
+	security@kernel.org
+Subject: [PATCH net 1/1] net: sched: fix ets qdisc OOB Indexing
+Date: Fri, 10 Jan 2025 10:35:46 -0500
+Message-Id: <20250110153546.41344-1-jhs@mojatatu.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,64 +89,87 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D035UWB001.ant.amazon.com (10.13.138.33) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-From: Simon Horman <horms@kernel.org>
-Date: Fri, 10 Jan 2025 11:43:44 +0000
-> On Fri, Jan 10, 2025 at 06:26:35PM +0900, Kuniyuki Iwashima wrote:
-> > This is a follow-up of commit d460b04bc452 ("af_unix: Clean up
-> > error paths in unix_stream_sendmsg().").
-> > 
-> > If we initialise skb with NULL in unix_stream_sendmsg(), we can
-> > reuse the existing out_pipe label for the SEND_SHUTDOWN check.
-> > 
-> > Let's rename do it and adjust the existing label as out_pipe_lock.
-> > 
-> > While at it, size and data_len are moved to the while loop scope.
-> > 
-> > Suggested-by: Paolo Abeni <pabeni@redhat.com>
-> > Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-> > ---
-> >  net/unix/af_unix.c | 23 +++++++++--------------
-> >  1 file changed, 9 insertions(+), 14 deletions(-)
-> > 
-> > diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
-> > index b190ea8b8e9d..6505eeab9957 100644
-> > --- a/net/unix/af_unix.c
-> > +++ b/net/unix/af_unix.c
-> 
-> ...
-> 
-> > @@ -2285,16 +2283,12 @@ static int unix_stream_sendmsg(struct socket *sock, struct msghdr *msg,
-> >  		}
-> >  	}
-> >  
-> > -	if (READ_ONCE(sk->sk_shutdown) & SEND_SHUTDOWN) {
-> > -		if (!(msg->msg_flags & MSG_NOSIGNAL))
-> > -			send_sig(SIGPIPE, current, 0);
-> > -
-> > -		err = -EPIPE;
-> > -		goto out_err;
-> > -	}
-> > +	if (READ_ONCE(sk->sk_shutdown) & SEND_SHUTDOWN)
-> 
-> Hi Iwashima-san,
-> 
-> I think you need to set reason here.
-> 
-> Flagged by W=1 builds with clang-19.
+Haowei Yan <g1042620637@gmail.com> found that ets_class_from_arg() can
+index an Out-Of-Bound class in ets_class_from_arg() when passed clid of
+0. The overflow may cause local privilege escalation.
 
-Hi Simon,
+ [   18.852298] ------------[ cut here ]------------
+ [   18.853271] UBSAN: array-index-out-of-bounds in net/sched/sch_ets.c:93:20
+ [   18.853743] index 18446744073709551615 is out of range for type 'ets_class [16]'
+ [   18.854254] CPU: 0 UID: 0 PID: 1275 Comm: poc Not tainted 6.12.6-dirty #17
+ [   18.854821] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/2014
+ [   18.856532] Call Trace:
+ [   18.857441]  <TASK>
+ [   18.858227]  dump_stack_lvl+0xc2/0xf0
+ [   18.859607]  dump_stack+0x10/0x20
+ [   18.860908]  __ubsan_handle_out_of_bounds+0xa7/0xf0
+ [   18.864022]  ets_class_change+0x3d6/0x3f0
+ [   18.864322]  tc_ctl_tclass+0x251/0x910
+ [   18.864587]  ? lock_acquire+0x5e/0x140
+ [   18.865113]  ? __mutex_lock+0x9c/0xe70
+ [   18.866009]  ? __mutex_lock+0xa34/0xe70
+ [   18.866401]  rtnetlink_rcv_msg+0x170/0x6f0
+ [   18.866806]  ? __lock_acquire+0x578/0xc10
+ [   18.867184]  ? __pfx_rtnetlink_rcv_msg+0x10/0x10
+ [   18.867503]  netlink_rcv_skb+0x59/0x110
+ [   18.867776]  rtnetlink_rcv+0x15/0x30
+ [   18.868159]  netlink_unicast+0x1c3/0x2b0
+ [   18.868440]  netlink_sendmsg+0x239/0x4b0
+ [   18.868721]  ____sys_sendmsg+0x3e2/0x410
+ [   18.869012]  ___sys_sendmsg+0x88/0xe0
+ [   18.869276]  ? rseq_ip_fixup+0x198/0x260
+ [   18.869563]  ? rseq_update_cpu_node_id+0x10a/0x190
+ [   18.869900]  ? trace_hardirqs_off+0x5a/0xd0
+ [   18.870196]  ? syscall_exit_to_user_mode+0xcc/0x220
+ [   18.870547]  ? do_syscall_64+0x93/0x150
+ [   18.870821]  ? __memcg_slab_free_hook+0x69/0x290
+ [   18.871157]  __sys_sendmsg+0x69/0xd0
+ [   18.871416]  __x64_sys_sendmsg+0x1d/0x30
+ [   18.871699]  x64_sys_call+0x9e2/0x2670
+ [   18.871979]  do_syscall_64+0x87/0x150
+ [   18.873280]  ? do_syscall_64+0x93/0x150
+ [   18.874742]  ? lock_release+0x7b/0x160
+ [   18.876157]  ? do_user_addr_fault+0x5ce/0x8f0
+ [   18.877833]  ? irqentry_exit_to_user_mode+0xc2/0x210
+ [   18.879608]  ? irqentry_exit+0x77/0xb0
+ [   18.879808]  ? clear_bhb_loop+0x15/0x70
+ [   18.880023]  ? clear_bhb_loop+0x15/0x70
+ [   18.880223]  ? clear_bhb_loop+0x15/0x70
+ [   18.880426]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+ [   18.880683] RIP: 0033:0x44a957
+ [   18.880851] Code: ff ff e8 fc 00 00 00 66 2e 0f 1f 84 00 00 00 00 00 66 90 f3 0f 1e fa 64 8b 04 25 18 00 00 00 85 c0 75 10 b8 2e 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 51 c3 48 83 ec 28 89 54 24 1c 48 8974 24 10
+ [   18.881766] RSP: 002b:00007ffcdd00fad8 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+ [   18.882149] RAX: ffffffffffffffda RBX: 00007ffcdd010db8 RCX: 000000000044a957
+ [   18.882507] RDX: 0000000000000000 RSI: 00007ffcdd00fb70 RDI: 0000000000000003
+ [   18.885037] RBP: 00007ffcdd010bc0 R08: 000000000703c770 R09: 000000000703c7c0
+ [   18.887203] R10: 0000000000000080 R11: 0000000000000246 R12: 0000000000000001
+ [   18.888026] R13: 00007ffcdd010da8 R14: 00000000004ca7d0 R15: 0000000000000001
+ [   18.888395]  </TASK>
+ [   18.888610] ---[ end trace ]---
 
-I didn't set it here because skb == NULL and kfree_skb()
-doesn't touch reason, and KMSAN won't complain about uninit.
+Fixes: dcc68b4d8084 ("net: sch_ets: Add a new Qdisc")
+Reported-by: Haowei Yan <g1042620637@gmail.com>
+Suggested-by: Haowei Yan <g1042620637@gmail.com>
+Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
+---
+ net/sched/sch_ets.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-Should I use SKB_NOT_DROPPED_YET or drop patch 6 or leave
-it as is ?
+diff --git a/net/sched/sch_ets.c b/net/sched/sch_ets.c
+index f80bc05d4c5a..f27b50daae58 100644
+--- a/net/sched/sch_ets.c
++++ b/net/sched/sch_ets.c
+@@ -91,6 +91,8 @@ ets_class_from_arg(struct Qdisc *sch, unsigned long arg)
+ {
+ 	struct ets_sched *q = qdisc_priv(sch);
+ 
++	if (arg == 0 || arg >= q->nbands)
++		return NULL;
+ 	return &q->classes[arg - 1];
+ }
+ 
+-- 
+2.34.1
 
-What do you think ?
-
-Thanks!
 
