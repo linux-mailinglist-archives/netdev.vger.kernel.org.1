@@ -1,184 +1,183 @@
-Return-Path: <netdev+bounces-157180-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157181-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96CBCA0938F
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 15:33:37 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8543A0939B
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 15:34:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 03445188BEDF
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 14:33:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BA353188C7E2
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 14:34:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B818B21129C;
-	Fri, 10 Jan 2025 14:33:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37B3C211290;
+	Fri, 10 Jan 2025 14:33:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="G5nHQVAf"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WQ5/5lA1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f202.google.com (mail-qk1-f202.google.com [209.85.222.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F124B211298
-	for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 14:33:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AAD921127F
+	for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 14:33:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736519602; cv=none; b=IyVB5n3UdxKAQUqayY9NHWIpcF97I7k65JJH/T7rOYep8cVCC4FqH/u8n6dZ+Wp0N+sBAjL1WrJ+eBFaLoMa2d/MdBDtFmB2GNmFPxj/0Ao28tFBrINWWHA1ZbBoiCJvCoytgxSGQgXTyAJkbzEZcmSys9ZDPm6uhOb8daWJv08=
+	t=1736519632; cv=none; b=Lf0m7UZIE0mUkZ/upN7vgu5fO0x4YtcQozA930S0mpOH1JiYYV3FEkaz6shXyzNgeprnh5Cbj0TqfQaa4cNfTQDEn8cHd0S6PR92d6ejY+PuUzNIDOoEChOWhGPJhzgWiYI6Xs+i+TcyZwHu4pcOCBYNB0C2dL+CuK6bCAoH3MY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736519602; c=relaxed/simple;
-	bh=1S6qbsBKfTppE9eisub13pjTDPOYeVwUrXKQRjkJgG8=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=lZa9dxpRq363cv8uhP9N3qysk0kdCudHVfiwmkKzagWOzgDfjdPybQQrnTgYGGWO79/0hCnkF1xiUgHf3v60eGPjcUXFcYw3/Bsdm1GA/uyMvkHho447tskDLwf6EMPVglnMHZ0uZrvv2sLlk7gzsOTy291Pc/9mDE9s9utp4uY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=G5nHQVAf; arc=none smtp.client-ip=209.85.222.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qk1-f202.google.com with SMTP id af79cd13be357-7b6e1c50ef1so296348785a.2
-        for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 06:33:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1736519600; x=1737124400; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Vtslpac2oU1C1mFmOo7/eOYL6PrtZjI6ro6i9TjMAzo=;
-        b=G5nHQVAfHOXasVEvI2VxNUZ1MnqSZIvWn1+xzi3maeHIFROlw+DLkk64Hf5Xq+jEtU
-         Wb3o1ffatsCHN/Iy2xNTXcEnP/xXVvQ0OXLrCsiLIPM/2kTVI6O45Bb1S6jh6i/YX9mG
-         v0oplcMLbdHPgMGbR504rBKgJY+6F2fOFf/lb6LUr8KZ5CU8JZqiwSVfcGh1MiYlglE1
-         IAVtrSwMEdPCV8r0iLlBcH3LWqAsCYrserGLnFDIRzlkZ2qw01h6HpyaFY9HaS3Sy+Y1
-         wvj2qlEzLRobaLuUeNRPiGMBN5JqfbgOS14v4US6ZhxXwlRsCkDpdzm5KguPl/xYduRC
-         Sxzg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736519600; x=1737124400;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Vtslpac2oU1C1mFmOo7/eOYL6PrtZjI6ro6i9TjMAzo=;
-        b=SMJ7MyHuA3YaSTnn71MnmwcAF7FG0Zfo3ZdD5QE6fAYoJjSSjbjTOZHI8iCOhsyHwD
-         wgG2Q7mUB9cHe88ZAONYdpgsVyFM7praFPQcBFocvGBi1AIq2GZ3KsRlQSIpwMhG9ia3
-         ymBEu1G/9kUj2rYEW5dkMDCbYHjABkKNT9VOUMnQhU3nzsa7r7cYlrQeEZANGAxdM25v
-         kBZT4qwvBzoK65b5gx4/b9yOEbyr5n1hC6T/3RSb7ygR44hzvpBobaLjEkTbq2pC68tP
-         PBEsTdlYLA5Bq54F+mf5Kuq2RPGtDi4IiOnpE8Li5MboRs47udLGKUnA3AeOfNErwSYR
-         TQDg==
-X-Gm-Message-State: AOJu0Ywy/758AIDedYgA4M5+RBBVs4ojHs1toMgpyTL2qhfPXlzaDzGu
-	w/NUYAH09d2tkT34kLRqfx3+hAGSFkz9bqpHs2/VjjRbetICm6e10GOANJmqo7kIUeaKJWGCG/c
-	Rraoko4TvJA==
-X-Google-Smtp-Source: AGHT+IE03yHvuewdIOj5wSQoNyAjz9GUSLAA83MOwUx+Cfey9Ow5byDQZf9hEyEMkVgYOqJoIPacUaeMSA1Jig==
-X-Received: from qknrb8.prod.google.com ([2002:a05:620a:8d08:b0:7bc:a1f4:3d5f])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:620a:25cd:b0:7b6:de65:9ee7 with SMTP id af79cd13be357-7bcd97ae12fmr1682878585a.43.1736519599957;
- Fri, 10 Jan 2025 06:33:19 -0800 (PST)
-Date: Fri, 10 Jan 2025 14:33:15 +0000
-In-Reply-To: <20250110143315.571872-1-edumazet@google.com>
+	s=arc-20240116; t=1736519632; c=relaxed/simple;
+	bh=sIPxDEapCmOFF0UUJ050CZ52VknWeMjqbJ4QpXvzgJU=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=kstXWmCBbTwuj//ih0NYf0ZdcUTJ4u9VE+GCgqb3OjdP/0WpNC3jzt/iSNigQUup7mSvAYT/svf4SLvIzruKhd7NubhSduCY6cHupYTuqMumuLQmwAfPGC3fT1ppOATUhtyu5oq7lte8xkLxc5n9dw4Xu+pbKCa7KxmQfPm1TA8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WQ5/5lA1; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1736519629;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=h+rt9KmUBZuQERAo92PycxKqQH9U6iO8IHFEaXObSX4=;
+	b=WQ5/5lA1aebvyGHe9PdW+8yKnobz/jwoXSNl2fu1X11S2PaMEkujVngYN3VeXnDzX6e+MZ
+	mZADpBhXWUTC6z/nVeimBCTw2QDa4EHVxQXE/Haah1v4h1QoRekOOMAYicoLh4KDeTrvFB
+	ge9YWQ0qrDnIVd35UKJHhotnh8XYkjc=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-486-Qi0gWsesM1K1XCb9hZkTEg-1; Fri,
+ 10 Jan 2025 09:33:46 -0500
+X-MC-Unique: Qi0gWsesM1K1XCb9hZkTEg-1
+X-Mimecast-MFC-AGG-ID: Qi0gWsesM1K1XCb9hZkTEg
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id AF5A51954194;
+	Fri, 10 Jan 2025 14:33:42 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.12])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 93BE71955BE3;
+	Fri, 10 Jan 2025 14:33:37 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <CAMj1kXE2mhXJaa9uq==Xki3On9ZKYY+KV-oH0ednqWC6b9BTYw@mail.gmail.com>
+References: <CAMj1kXE2mhXJaa9uq==Xki3On9ZKYY+KV-oH0ednqWC6b9BTYw@mail.gmail.com> <20250110010313.1471063-1-dhowells@redhat.com> <20250110010313.1471063-3-dhowells@redhat.com> <20250110055058.GA63811@sol.localdomain> <1478993.1736493228@warthog.procyon.org.uk>
+To: Ard Biesheuvel <ardb@kernel.org>
+Cc: dhowells@redhat.com, Eric Biggers <ebiggers@kernel.org>,
+    Herbert Xu <herbert@gondor.apana.org.au>,
+    Chuck Lever <chuck.lever@oracle.com>,
+    Trond Myklebust <trond.myklebust@hammerspace.com>,
+    "David S. Miller" <davem@davemloft.net>,
+    Marc Dionne <marc.dionne@auristor.com>,
+    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+    Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+    linux-crypto@vger.kernel.org, qat-linux <qat-linux@intel.com>,
+    linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org,
+    linux-fsdevel@vger.kernel.org, netdev@vger.kernel.org,
+    linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH 2/8] crypto/krb5: Provide Kerberos 5 crypto through AEAD API
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250110143315.571872-1-edumazet@google.com>
-X-Mailer: git-send-email 2.47.1.613.gc27f4b7a9f-goog
-Message-ID: <20250110143315.571872-3-edumazet@google.com>
-Subject: [PATCH net-next 2/2] tcp: add TCP_RFC7323_PAWS_ACK drop reason
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, Simon Horman <horms@kernel.org>, 
-	Neal Cardwell <ncardwell@google.com>, Kuniyuki Iwashima <kuniyu@amazon.com>, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <1494599.1736519616.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 10 Jan 2025 14:33:36 +0000
+Message-ID: <1494600.1736519616@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-XPS can cause reorders because of the relaxed OOO
-conditions for pure ACK packets.
+Ard Biesheuvel <ardb@kernel.org> wrote:
 
-For hosts not using RFS, what can happpen is that ACK
-packets are sent on behalf of the cpu processing NIC
-interrupts, selecting TX queue A for ACK packet P1.
+> What is the reason for shoehorning any of this into the crypto API?
 
-Then a subsequent sendmsg() can run on another cpu.
-TX queue selection uses the socket hash and can choose
-another queue B for packets P2 (with payload).
+I was under the impression that that was what Herbert wanted.
 
-If queue A is more congested than queue B,
-the ACK packet P1 could be sent on the wire after
-P2.
+> I agree with Eric here: it seems both the user (Kerberos) and the
+> crypto API are worse off here, due to mutual API incompatibilities
+> that seem rather fundamental.
 
-A linux receiver when processing P2 currently increments
-LINUX_MIB_PAWSESTABREJECTED (TcpExtPAWSEstab)
-and use TCP_RFC7323_PAWS drop reason.
-It might also send a DUPACK if not rate limited.
+My original take on this was to take the sunrpc code and turn it into a
+library, placing that library in the crypto/ directory:
 
-In order to better understand this pattern, this
-patch adds a new drop_reason : TCP_RFC7323_PAWS_ACK.
+	https://lore.kernel.org/linux-crypto/160518586534.2277919.144756386536802=
+31924.stgit@warthog.procyon.org.uk/
 
-For old ACKS like these, we no longer increment
-LINUX_MIB_PAWSESTABREJECTED and no longer sends a DUPACK,
-keeping credit for other more interesting DUPACK.
+The crypto/ dir seems the right home for it (and not net/ or lib/), but th=
+e
+way it's implemented here, it's a user of the crypto API, but does not its=
+elf
+implement it.
 
-perf record -e skb:kfree_skb -a
-perf script
-...
-         swapper       0 [148] 27475.438637: skb:kfree_skb: ... location=tcp_validate_incoming+0x4f0 reason: TCP_RFC7323_PAWS_ACK
-         swapper       0 [208] 27475.438706: skb:kfree_skb: ... location=tcp_validate_incoming+0x4f0 reason: TCP_RFC7323_PAWS_ACK
-         swapper       0 [208] 27475.438908: skb:kfree_skb: ... location=tcp_validate_incoming+0x4f0 reason: TCP_RFC7323_PAWS_ACK
-         swapper       0 [148] 27475.439010: skb:kfree_skb: ... location=tcp_validate_incoming+0x4f0 reason: TCP_RFC7323_PAWS_ACK
-         swapper       0 [148] 27475.439214: skb:kfree_skb: ... location=tcp_validate_incoming+0x4f0 reason: TCP_RFC7323_PAWS_ACK
-         swapper       0 [208] 27475.439286: skb:kfree_skb: ... location=tcp_validate_incoming+0x4f0 reason: TCP_RFC7323_PAWS_ACK
-...
+That said, it would be convenient if if *could* be part of the crypto API =
+in
+some way.  As I outlined in one of my responses to Herbert, there are a nu=
+mber
+of advantages to doing that.
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- include/net/dropreason-core.h |  5 +++++
- net/ipv4/tcp_input.c          | 10 +++++++++-
- 2 files changed, 14 insertions(+), 1 deletion(-)
+> Are you anticipating other, accelerated implementations of the
+> combined algorithms?
 
-diff --git a/include/net/dropreason-core.h b/include/net/dropreason-core.h
-index 3a6602f379783078388eaaad3a9237b11baad534..28555109f9bdf883af2567f74dea86a327beba26 100644
---- a/include/net/dropreason-core.h
-+++ b/include/net/dropreason-core.h
-@@ -36,6 +36,7 @@
- 	FN(TCP_OVERWINDOW)		\
- 	FN(TCP_OFOMERGE)		\
- 	FN(TCP_RFC7323_PAWS)		\
-+	FN(TCP_RFC7323_PAWS_ACK)	\
- 	FN(TCP_OLD_SEQUENCE)		\
- 	FN(TCP_INVALID_SEQUENCE)	\
- 	FN(TCP_INVALID_ACK_SEQUENCE)	\
-@@ -259,6 +260,10 @@ enum skb_drop_reason {
- 	 * LINUX_MIB_PAWSESTABREJECTED, LINUX_MIB_PAWSACTIVEREJECTED
- 	 */
- 	SKB_DROP_REASON_TCP_RFC7323_PAWS,
-+	/**
-+	 * @SKB_DROP_REASON_TCP_RFC7323_PAWS_ACK: PAWS check, old ACK packet.
-+	 */
-+	SKB_DROP_REASON_TCP_RFC7323_PAWS_ACK,
- 	/** @SKB_DROP_REASON_TCP_OLD_SEQUENCE: Old SEQ field (duplicate packet) */
- 	SKB_DROP_REASON_TCP_OLD_SEQUENCE,
- 	/** @SKB_DROP_REASON_TCP_INVALID_SEQUENCE: Not acceptable SEQ field */
-diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
-index 24966dd3e49f698e110f8601e098b65afdf0718a..dc0e88bcc5352dafee38143076f9e4feebdf8be3 100644
---- a/net/ipv4/tcp_input.c
-+++ b/net/ipv4/tcp_input.c
-@@ -4465,7 +4465,9 @@ static enum skb_drop_reason tcp_disordered_ack_check(const struct sock *sk,
- 
- 	/* 2. Is its sequence not the expected one ? */
- 	if (seq != tp->rcv_nxt)
--		return reason;
-+		return before(seq, tp->rcv_nxt) ?
-+			SKB_DROP_REASON_TCP_RFC7323_PAWS_ACK :
-+			reason;
- 
- 	/* 3. Is this not a duplicate ACK ? */
- 	if (ack != tp->snd_una)
-@@ -5967,6 +5969,12 @@ static bool tcp_validate_incoming(struct sock *sk, struct sk_buff *skb,
- 	if (unlikely(th->syn))
- 		goto syn_challenge;
- 
-+	/* Old ACK are common, do not change PAWSESTABREJECTED
-+	 * and do not send a dupack.
-+	 */
-+	if (reason == SKB_DROP_REASON_TCP_RFC7323_PAWS_ACK)
-+		goto discard;
-+
- 	NET_INC_STATS(sock_net(sk), LINUX_MIB_PAWSESTABREJECTED);
- 	if (!tcp_oow_rate_limited(sock_net(sk), skb,
- 				  LINUX_MIB_TCPACKSKIPPEDPAWS,
--- 
-2.47.1.613.gc27f4b7a9f-goog
+I think one can be done with x86 AES and SHA instructions provided there a=
+re
+sufficient registers.
+
+> Isn't it enough to rely on the existing Camellia and AES code?
+
+The problem is that you have to do *two* crypto operations - and that it m=
+ay
+not be possible to parallellise them.  With AES+SHA1 and Camellia, they ca=
+n be
+parallellised as both sides work on the plaintext; but with the AES+SHA2, =
+the
+encryption is done and then the *encrypted* output is checksummed.
+
+Note that "parallellising" might mean launching an async hash request and =
+an
+async skcipher request and then waiting for both to finish.  This can't,
+however, be done unless the output buffer is separate from the input buffe=
+r.
+
+> Mentioning 'something like the Intel QAT' doesn't suggest you have somet=
+hing
+> specific in mind.
+
+I have an Intel QAT card, and under some circumstances I could offload the
+crypto to it...  But the only operations the driver currently makes availa=
+ble
+are:
+
+	authenc(hmac(sha1),cbc(aes))
+	authenc(hmac(sha256),cbc(aes))
+	authenc(hmac(sha512),cbc(aes))
+
+The first one can't be used for kerberos's aes128-cts-hmac-sha1-96 as it
+hashes the ciphertext, not the plain text.  I don't have anything that use=
+s
+the third.  The second is a possibility.  I think that could probably do
+aes128-cts-hmac-sha256-128.
+
+Now, it's possible that the QAT device range can do more than the driver
+offers.  I'm presuming that the driver offers what IPsec wants to support.
+Also, waving these ideas in front of Intel devs might expand the range of =
+what
+future QATs can do ;-)
+
+Mostly, though, by "something like" I was just offering the possibility th=
+at
+other architectures or crypto cards may also offer usable services - but I
+haven't investigated.
+
+> Also, this patch is rather big and therefore hard to review.
+
+Yeah.  Mostly I wanted to wave it in front of Herbert before expending the
+effort to slice it up.  Sadly, it doesn't seem that what I came up with is
+what he wanted.
+
+David
 
 
