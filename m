@@ -1,184 +1,158 @@
-Return-Path: <netdev+bounces-157129-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157130-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E4A4A08F7D
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 12:33:17 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4A41A08F9F
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 12:42:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 99FA2165D43
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 11:33:09 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 181BC7A2F58
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 11:42:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C91720B213;
-	Fri, 10 Jan 2025 11:32:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 649EE20ADFF;
+	Fri, 10 Jan 2025 11:42:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="G/BoXch+"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="WbCJ2gcu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f174.google.com (mail-qt1-f174.google.com [209.85.160.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from lelvem-ot01.ext.ti.com (lelvem-ot01.ext.ti.com [198.47.23.234])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C077204C11;
-	Fri, 10 Jan 2025 11:32:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 440CF20B210
+	for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 11:42:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.234
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736508761; cv=none; b=Tg2bpyy1YZAViULVVxVQct5lND31JpnaYsnXxKSRsepqj+Hn8VyTPTZhjit0t7DBSlQpoiWaVOp6n6DKpF4l1goOcu653k6DVc94IERUiv1obfkb4Qf6mGC9ZnDvCVIII+E+f5h19FX3sND1rL5csa3FHFQ5RT0MPSh5LhtIpOQ=
+	t=1736509351; cv=none; b=IMSoXvLG+/rlr0dlS9t3Lid0kP9bvwnlNVg9N71xFigQcURb/WKBJ0f79voU4R46pu7W0a3e+WCyMRfYG1bPFOKnPIfzRA5G8fcyhV3r5ccbrvqNEwKIDuknVl19g4Vi/GlI73VsOXBflxxqP8xbh9qB9HawxQYddlRvYnx9m9o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736508761; c=relaxed/simple;
-	bh=yLRKiodCpUEkNU747JZ4PBw6mzhLuN0TGC+xkk8hayA=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=CuUDNak/uz2zmvJss1bcOiVUe6XN9+NguzugrXpRns4nOvyhoGkUFkBiEFEeltSZ121VutoXR8NR0l0XJ/mObt3pFUaj324Oi57bLfaGu5kiHPI4rZyl5I/o3a9ulTwNSZ9cNWQ8d1DQP3kcEfl/fv2PsVkASWOtZfBs9Fv9PuE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=G/BoXch+; arc=none smtp.client-ip=209.85.160.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f174.google.com with SMTP id d75a77b69052e-467a3f1e667so11882451cf.0;
-        Fri, 10 Jan 2025 03:32:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736508758; x=1737113558; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bj5hzhLDurnV0Uikx72ybZP+UMepormLzXbaIUCT51w=;
-        b=G/BoXch+vVFX8MZnyP7GJkHDIalM6oxvyavc530/8ycG9cp/9w0g69yOFkhR0T1loe
-         u5H/4XYUxhISbrn6syhXx/jRCqut162mN3JLjBCQ0tr/nV12M5uoJhFzZ7QfnOFo8c3a
-         E4w5jINEYKrYzGKVgIQQYp0fO24aocSoi/WIv2YXcTuE/N4Toblq8XsRL+gVIWEfeqkl
-         B0UJaUpuXOBE43vcol6Drd1NvXGC4iNpVZnYSja/r+dsWpPI7pUSy8kkxOYmQ6q/TDfM
-         LXmejD434RCbvQFXSYgE7egD72ngSfZ0YXV7He1mDboZ+/KRbK5+krEMvpluw98yjaBu
-         pZEg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736508758; x=1737113558;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=bj5hzhLDurnV0Uikx72ybZP+UMepormLzXbaIUCT51w=;
-        b=rxs7INnfWOXebl7A8cJ2lVR93nPmRPK6wlZKEEYs9J0QsXh6mHyv/lWZS36ZwD1Gr3
-         NKbMkV+RCCTQcOClrCA4vR2hhsqhdJD/eqNfMd1LKegSZ9pm5HrriXzr7+lVxni/FqQr
-         HbgsGx8GIMuH42aOF2q4U148M5J6JCh/a1MFUpXK/yah5hhUvMT2ARXwjBasS0v9Qm/H
-         qbwodPEGC+JXfiVtD/i6WKCNe0jJ3/ymV+EarSdDuix4nWkeJzGwVnbiPQGV7VxlAIyc
-         kt91QfuRPmoJJpDa4IdgumCbDEuIhmRze7HXS4bMFC/Jb4dtrP41m60dQcQT9beI92eJ
-         2JjQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU1Sin9hcZIK9GoBwPmfOCP7uDDc5BIW7/ObfIrEG2fXADxjH2BKrDkuh/2QFj/hozbjaSeQZJz3p4BicJI@vger.kernel.org, AJvYcCUFwprI74G/voE34S12ym6M+LWjKgNYRQqtJfBCuyyHDfbvwcZy68wlRiJbUj67p9pWm9U=@vger.kernel.org, AJvYcCV4XiWoGCBnEt/Xa3DcrUJp2GE7CDSrFyL6WEe1dwiQHTcy6TKMuQu8qEoIb8jLgAs31nv62YhezBtaICnHM+xN@vger.kernel.org, AJvYcCWn9X1/7Le1qvgFxwdaM4ov3GgdwQbNvgx6K1aAf3Tk12fb5FwUzeaHxSLtLMVJLAlFIMssyXyA@vger.kernel.org, AJvYcCX4jcLigC2qgJaNhcYMAoisKLAkuoRMfv2fPoMMojkajR4bQIEyIXzJkmq37Y62noC01MiKBmY4/Hps@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywp5Xey5A11wS/kABJIe//HDJvaGkEaHmHZim9wG1ywUixZpWQ/
-	KJRZmbMkbIy1pZW+utZ4eRVXIwwvbyNxpcSfcd05mvb2PkLNkwWs
-X-Gm-Gg: ASbGncstO/rogbWV20Lq+wogBlF5TrQvmly3YoP6ewTxBOXDMJsh9IQie/e/5QepWK/
-	zRoeYDVEpdOLdK94qdqsAYvU4PTdBTh7AHu4x+wBLDbSvLJXAXUUYZpUIqpTLmRGxoe+i1tbyJ6
-	qryD6KpxApVFU4lixVqSJNqDR+ZCvKxe4j15hQk++3XzRpi77BKwkqDGewJVS3R/V6Xd1/0DrIE
-	De4AvN4IxevzPeLqZm8ygrv538miaFrwtMQrsvqZjte59wCpPbdpQR0HGZFx5epjNPPOcFyhDpy
-	2+mEeIeevjK0Pb5LR1rwmJFpDwri
-X-Google-Smtp-Source: AGHT+IEAeRPcXEPZaY0ZiqE+FHD3WXuaK99GAFn6AMFjwlATA6fP06zaeLna0c3A/VPZLWprZOxVFQ==
-X-Received: by 2002:a05:622a:1196:b0:468:fb3c:5e75 with SMTP id d75a77b69052e-46c710e13c5mr151993961cf.38.1736508758327;
-        Fri, 10 Jan 2025 03:32:38 -0800 (PST)
-Received: from localhost (15.60.86.34.bc.googleusercontent.com. [34.86.60.15])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-46c873cd1b0sm8463741cf.49.2025.01.10.03.32.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 Jan 2025 03:32:37 -0800 (PST)
-Date: Fri, 10 Jan 2025 06:32:37 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Akihiko Odaki <akihiko.odaki@daynix.com>, 
- "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- Jonathan Corbet <corbet@lwn.net>, 
- Jason Wang <jasowang@redhat.com>, 
- "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
- Shuah Khan <shuah@kernel.org>, 
- linux-doc@vger.kernel.org, 
- linux-kernel@vger.kernel.org, 
- netdev@vger.kernel.org, 
- kvm@vger.kernel.org, 
- virtualization@lists.linux-foundation.org, 
- linux-kselftest@vger.kernel.org, 
- Yuri Benditovich <yuri.benditovich@daynix.com>, 
- Andrew Melnychenko <andrew@daynix.com>, 
- Stephen Hemminger <stephen@networkplumber.org>, 
- gur.stavi@huawei.com, 
- devel@daynix.com
-Message-ID: <678105555a23f_3fe20a29440@willemb.c.googlers.com.notmuch>
-In-Reply-To: <3a5001b5-9a07-4dfd-8cec-1e5f7180b88a@daynix.com>
-References: <20250109-tun-v2-0-388d7d5a287a@daynix.com>
- <20250109-tun-v2-2-388d7d5a287a@daynix.com>
- <20250109023056-mutt-send-email-mst@kernel.org>
- <571a2d61-5fbe-4e49-b4d1-6bf0c7604a57@daynix.com>
- <677fc517b7b6e_362bc12945@willemb.c.googlers.com.notmuch>
- <5e193a94-8f5a-4a2a-b4c4-3206c21c0b63@daynix.com>
- <20250110033306-mutt-send-email-mst@kernel.org>
- <3a5001b5-9a07-4dfd-8cec-1e5f7180b88a@daynix.com>
-Subject: Re: [PATCH v2 2/3] tun: Pad virtio header with zero
+	s=arc-20240116; t=1736509351; c=relaxed/simple;
+	bh=e85/59QkdtZy0+hmfyYTDy2qjw0Ngd9L6Dg2yAH0R6g=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=j6h5qB/Y++GDsQIciQ1HK+42PKOJobfx2M3DDG2b8/a7zZUPo7n+3I/LOEskpo81mtQyDri7FZ/EYwszisAAOjwlUcMfJPSl19U9qNT7oO6AuWUV/Xv7F4IqqMAMHW97M3E2D4o/gLXcvaChJaHhKoLSRFqx5059OoT1w1SJ6xc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=WbCJ2gcu; arc=none smtp.client-ip=198.47.23.234
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from fllv0035.itg.ti.com ([10.64.41.0])
+	by lelvem-ot01.ext.ti.com (8.15.2/8.15.2) with ESMTPS id 50ABgGtD3111168
+	(version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 10 Jan 2025 05:42:16 -0600
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1736509336;
+	bh=ycDC2CpNWrRJUViUT3opj//rTY04fPjXCUvxsVHWZgs=;
+	h=Date:From:To:CC:Subject:References:In-Reply-To;
+	b=WbCJ2gcuztlRsAZtTGqi4ET2U5cVblCLHP9lPWldqD9M82HnWgTdpd7d0+iZd/EKp
+	 Fhwg+KgOWRT/yZoG18Faw8wZsKtBOgiCm5Yx3V/fjAc3gmYBfFq5nl7tG3SnoHW4ME
+	 3gMv5hE9HyX3oDTjATfC3j35WT33a0fPGstwlsrA=
+Received: from DLEE104.ent.ti.com (dlee104.ent.ti.com [157.170.170.34])
+	by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 50ABgGnY091763
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Fri, 10 Jan 2025 05:42:16 -0600
+Received: from DLEE115.ent.ti.com (157.170.170.26) by DLEE104.ent.ti.com
+ (157.170.170.34) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Fri, 10
+ Jan 2025 05:42:15 -0600
+Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DLEE115.ent.ti.com
+ (157.170.170.26) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Fri, 10 Jan 2025 05:42:15 -0600
+Received: from localhost (uda0492258.dhcp.ti.com [10.24.72.104])
+	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 50ABgECQ025851;
+	Fri, 10 Jan 2025 05:42:15 -0600
+Date: Fri, 10 Jan 2025 17:12:14 +0530
+From: Siddharth Vadapalli <s-vadapalli@ti.com>
+To: "A. Sverdlin" <alexander.sverdlin@siemens.com>
+CC: <netdev@vger.kernel.org>, Siddharth Vadapalli <s-vadapalli@ti.com>,
+        Andrew
+ Lunn <andrew+netdev@lunn.ch>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+        Roger Quadros
+	<rogerq@kernel.org>, Chintan Vankar <c-vankar@ti.com>,
+        Julien Panis
+	<jpanis@baylibre.com>
+Subject: Re: [PATCH net-next v2] net: ethernet: ti: am65-cpsw: VLAN-aware
+ CPSW only if !DSA
+Message-ID: <fgt5mqpmibxjbfd3ae46hxk3m2sowpbxs3ffurwxiqairvlj4d@7ns2gdwh3v7h>
+References: <20250110112725.415094-1-alexander.sverdlin@siemens.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20250110112725.415094-1-alexander.sverdlin@siemens.com>
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
 
-Akihiko Odaki wrote:
-> On 2025/01/10 17:33, Michael S. Tsirkin wrote:
-> > On Fri, Jan 10, 2025 at 01:38:06PM +0900, Akihiko Odaki wrote:
-> >> On 2025/01/09 21:46, Willem de Bruijn wrote:
-> >>> Akihiko Odaki wrote:
-> >>>> On 2025/01/09 16:31, Michael S. Tsirkin wrote:
-> >>>>> On Thu, Jan 09, 2025 at 03:58:44PM +0900, Akihiko Odaki wrote:
-> >>>>>> tun used to simply advance iov_iter when it needs to pad virtio header,
-> >>>>>> which leaves the garbage in the buffer as is. This is especially
-> >>>>>> problematic when tun starts to allow enabling the hash reporting
-> >>>>>> feature; even if the feature is enabled, the packet may lack a hash
-> >>>>>> value and may contain a hole in the virtio header because the packet
-> >>>>>> arrived before the feature gets enabled or does not contain the
-> >>>>>> header fields to be hashed. If the hole is not filled with zero, it is
-> >>>>>> impossible to tell if the packet lacks a hash value.
-> >>>
-> >>> Zero is a valid hash value, so cannot be used as an indication that
-> >>> hashing is inactive.
-> >>
-> >> Zeroing will initialize the hash_report field to
-> >> VIRTIO_NET_HASH_REPORT_NONE, which tells it does not have a hash value.
-> >>
-> >>>
-> >>>>>> In theory, a user of tun can fill the buffer with zero before calling
-> >>>>>> read() to avoid such a problem, but leaving the garbage in the buffer is
-> >>>>>> awkward anyway so fill the buffer in tun.
-> >>>>>>
-> >>>>>> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
-> >>>>>
-> >>>>> But if the user did it, you have just overwritten his value,
-> >>>>> did you not?
-> >>>>
-> >>>> Yes. but that means the user expects some part of buffer is not filled
-> >>>> after read() or recvmsg(). I'm a bit worried that not filling the buffer
-> >>>> may break assumptions others (especially the filesystem and socket
-> >>>> infrastructures in the kernel) may have.
-> >>>
-> >>> If this is user memory that is ignored by the kernel, just reflected
-> >>> back, then there is no need in general to zero it. There are many such
-> >>> instances, also in msg_control.
-> >>
-> >> More specifically, is there any instance of recvmsg() implementation which
-> >> returns N and does not fill the complete N bytes of msg_iter?
-> > 
-> > The one in tun. It was a silly idea but it has been here for years now.
+On Fri, Jan 10, 2025 at 12:27:17PM +0100, A. Sverdlin wrote:
+> From: Alexander Sverdlin <alexander.sverdlin@siemens.com>
 > 
-> Except tun. If there is such an example of recvmsg() implementation and 
-> it is not accidental and people have agreed to keep it functioning, we 
-> can confidently say this construct is safe without fearing pushback from 
-> people maintaining filesystem/networking infrastructure. Ultimately I 
-> want those people decide if this can be supported for the future or not.
+> Only configure VLAN-aware CPSW mode if no port is used as DSA CPU port.
+> VLAN-aware mode interferes with some DSA tagging schemes and makes stacking
+> DSA switches downstream of CPSW impossible. Previous attempts to address
+> the issue linked below.
+> 
+> Link: https://lore.kernel.org/netdev/20240227082815.2073826-1-s-vadapalli@ti.com/
+> Link: https://lore.kernel.org/linux-arm-kernel/4699400.vD3TdgH1nR@localhost/
+> Co-developed-by: Siddharth Vadapalli <s-vadapalli@ti.com>
 
-It seems preferable to write a value.
+A Co-developed-by tag should be followed by a Signed-off-by tag of the
+same individual.
 
-Userspace should have not assumption that whatever it writes there
-will be reflected unmodified. That said, that is the tiny risk of
-changing this in established code.
+> Signed-off-by: Alexander Sverdlin <alexander.sverdlin@siemens.com>
+> ---
+> Changelog:
+> v2: Thanks to Siddharth it does look much clearer now (conditionally clear
+>     AM65_CPSW_CTL_VLAN_AWARE instead of setting)
+> 
+>  drivers/net/ethernet/ti/am65-cpsw-nuss.c | 18 ++++++++++++++----
+>  1 file changed, 14 insertions(+), 4 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.c b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
+> index 5465bf872734..58c840fb7e7e 100644
+> --- a/drivers/net/ethernet/ti/am65-cpsw-nuss.c
+> +++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
+> @@ -32,6 +32,7 @@
+>  #include <linux/dma/ti-cppi5.h>
+>  #include <linux/dma/k3-udma-glue.h>
+>  #include <net/page_pool/helpers.h>
+> +#include <net/dsa.h>
+>  #include <net/switchdev.h>
+>  
+>  #include "cpsw_ale.h"
+> @@ -724,13 +725,22 @@ static int am65_cpsw_nuss_common_open(struct am65_cpsw_common *common)
+>  	u32 val, port_mask;
+>  	struct page *page;
+>  
+> +	/* Control register */
+> +	val = AM65_CPSW_CTL_P0_ENABLE | AM65_CPSW_CTL_P0_TX_CRC_REMOVE |
+> +	      AM65_CPSW_CTL_VLAN_AWARE | AM65_CPSW_CTL_P0_RX_PAD;
+> +	/* VLAN aware CPSW mode is incompatible with some DSA tagging schemes.
+> +	 * Therefore disable VLAN_AWARE mode if any of the ports is a DSA Port.
+> +	 */
+> +	for (port_idx = 0; port_idx < common->port_num; port_idx++)
+> +		if (netdev_uses_dsa(common->ports[port_idx].ndev)) {
+> +			val &= ~AM65_CPSW_CTL_VLAN_AWARE;
+> +			break;
+> +		}
+> +	writel(val, common->cpsw_base + AM65_CPSW_REG_CTL);
+> +
+>  	if (common->usage_count)
+>  		return 0;
 
-If it worked without issue so far, without hashing, then probably the
-change should only go to net-next.
+The changes above should be present HERE, i.e. below the
+"common->usage_count" check, as was the case earlier.
 
-As said, there are examples in msg_control. I don't immediately have
-an example where this is the case in msg_data today. A search for
-iov_iter_advance might show something.
+>  
+> -	/* Control register */
+> -	writel(AM65_CPSW_CTL_P0_ENABLE | AM65_CPSW_CTL_P0_TX_CRC_REMOVE |
+> -	       AM65_CPSW_CTL_VLAN_AWARE | AM65_CPSW_CTL_P0_RX_PAD,
+> -	       common->cpsw_base + AM65_CPSW_REG_CTL);
+>  	/* Max length register */
+>  	writel(AM65_CPSW_MAX_PACKET_SIZE,
+>  	       host_p->port_base + AM65_CPSW_PORT_REG_RX_MAXLEN);
+
+Regards,
+Siddharth.
 
