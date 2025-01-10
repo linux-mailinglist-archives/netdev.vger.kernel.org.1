@@ -1,31 +1,31 @@
-Return-Path: <netdev+bounces-156971-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156972-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 835FCA087F9
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 07:11:38 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C10A0A087FB
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 07:11:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4FBC618803EB
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 06:11:41 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 777F87A34C5
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 06:11:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C1D2207A22;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFF40209669;
 	Fri, 10 Jan 2025 06:05:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9430F207667
-	for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 06:05:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85B9B205E3E
+	for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 06:05:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736489141; cv=none; b=GT5us8QmPyHsH2jnY4x5yMZOfeQTbcwyPyCUlviHL9e58gdPocVWe51vRiZR+ewjsaN5GB10v1LSSIsSTrWKHHPK9oFRp+IlDuaYMaYcosf0QW2XgfGoBR8WLYlRcYci5wVBry8CKD0zodoiiTKpuxOHYknnEgWymPVxaoJjnpk=
+	t=1736489141; cv=none; b=sRvQeB9hlhdVLT3LGg6Ox2Ms5JMPya1gkwXj+KMcjlROVzcbLQ9l4ZveKAnwGh+YZgwtsfsDCpB+H7NkRwAjgPziaa/6EVpsju9dpDevmB4ODJGiC9mHsIDOvUz6IC/VRgmyW51cAkwG8FbFd8iFYBwsuVejRH1nHdz/8Jx5hwc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1736489141; c=relaxed/simple;
-	bh=gImEFlvmkpRbXF7UroFhzQwXwCYkPElBz1uZmIG7Ke8=;
+	bh=1BoGZRkwBssgph5AwNdVsmJWOLS8tgvFw3goGyRbf68=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=lPBfmnZbemPYhTjEUXICII2ws33/lwbnH83xvdRRJHMdUSNrQkK6HDCt04nk75Db22ztMjW8teAxFjm0Vt7/zrdzy0JPAhWLn6cxaxYPg2zVMgmXjpd8hNF46s7B8wU0wjbwjkZp4+VxvNg+pquIZNJjG20JbTMBoVQPVtwzw70=
+	 MIME-Version; b=NVBgFeMoiP+O9rgJayeA5mZR9K4/VYo1okhsFRYf8Y+QDZrDKZjbDu/Rgh6gTElImCggUU7MGHKIlvpZPvCBWtSZnjiB/LBqdxTqrqNkiRBOXhw5bdZet9heVYSiHmxoMyaMCp2azUJBIMftFrAa/FhSaUqzWnnBOzOXTk4BZgc=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
@@ -33,17 +33,17 @@ Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
 	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
 	(Exim 4.92)
 	(envelope-from <ore@pengutronix.de>)
-	id 1tW895-0007oH-Ok; Fri, 10 Jan 2025 07:05:23 +0100
+	id 1tW895-0007oI-Ok; Fri, 10 Jan 2025 07:05:23 +0100
 Received: from dude04.red.stw.pengutronix.de ([2a0a:edc0:0:1101:1d::ac])
 	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <ore@pengutronix.de>)
-	id 1tW892-0006lL-0E;
+	id 1tW892-0006lN-0J;
 	Fri, 10 Jan 2025 07:05:20 +0100
 Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
 	(envelope-from <ore@pengutronix.de>)
-	id 1tW891-002zAG-3B;
-	Fri, 10 Jan 2025 07:05:19 +0100
+	id 1tW892-002zAR-00;
+	Fri, 10 Jan 2025 07:05:20 +0100
 From: Oleksij Rempel <o.rempel@pengutronix.de>
 To: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
@@ -60,9 +60,9 @@ Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
 	Russell King <linux@armlinux.org.uk>,
 	Maxime Chevallier <maxime.chevallier@bootlin.com>,
 	linux-doc@vger.kernel.org
-Subject: [PATCH net-next v7 5/7] net: phy: introduce optional polling interface for PHY statistics
-Date: Fri, 10 Jan 2025 07:05:15 +0100
-Message-Id: <20250110060517.711683-6-o.rempel@pengutronix.de>
+Subject: [PATCH net-next v7 6/7] net: phy: dp83td510: add statistics support
+Date: Fri, 10 Jan 2025 07:05:16 +0100
+Message-Id: <20250110060517.711683-7-o.rempel@pengutronix.de>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250110060517.711683-1-o.rempel@pengutronix.de>
 References: <20250110060517.711683-1-o.rempel@pengutronix.de>
@@ -78,98 +78,168 @@ X-SA-Exim-Mail-From: ore@pengutronix.de
 X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
 X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Add an optional polling interface for PHY statistics to simplify driver
-implementation.
+Add support for reporting PHY statistics in the DP83TD510 driver. This
+includes cumulative tracking of transmit/receive packet counts, and
+error counts. Implemented functions to update and provide statistics via
+ethtool, with optional polling support enabled through `PHY_POLL_STATS`.
 
 Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
 ---
-changes v3:
-- update commit message
+changes v6:
+- drop ethtool_stat_add() support
 changes v2:
-- drop PHY_POLL_STATS
-- add function comments
+- drop use of FIELD_GET
+- add comments
 ---
- drivers/net/phy/phy.c | 20 ++++++++++++++++++++
- include/linux/phy.h   | 21 +++++++++++++++++++++
- 2 files changed, 41 insertions(+)
+ drivers/net/phy/dp83td510.c | 112 ++++++++++++++++++++++++++++++++++++
+ 1 file changed, 112 insertions(+)
 
-diff --git a/drivers/net/phy/phy.c b/drivers/net/phy/phy.c
-index 38bbe01a6073..ca3f24a5f8a7 100644
---- a/drivers/net/phy/phy.c
-+++ b/drivers/net/phy/phy.c
-@@ -1441,6 +1441,23 @@ static int phy_enable_interrupts(struct phy_device *phydev)
- 	return phy_config_interrupt(phydev, PHY_INTERRUPT_ENABLED);
- }
+diff --git a/drivers/net/phy/dp83td510.c b/drivers/net/phy/dp83td510.c
+index 92aa3a2b9744..1abeacca7441 100644
+--- a/drivers/net/phy/dp83td510.c
++++ b/drivers/net/phy/dp83td510.c
+@@ -34,6 +34,29 @@
+ #define DP83TD510E_CTRL_HW_RESET		BIT(15)
+ #define DP83TD510E_CTRL_SW_RESET		BIT(14)
+ 
++/*
++ * DP83TD510E_PKT_STAT_x registers correspond to similarly named registers
++ * in the datasheet (PKT_STAT_1 through PKT_STAT_6). These registers store
++ * 32-bit or 16-bit counters for TX and RX statistics and must be read in
++ * sequence to ensure the counters are cleared correctly.
++ *
++ * - DP83TD510E_PKT_STAT_1: Contains TX packet count bits [15:0].
++ * - DP83TD510E_PKT_STAT_2: Contains TX packet count bits [31:16].
++ * - DP83TD510E_PKT_STAT_3: Contains TX error packet count.
++ * - DP83TD510E_PKT_STAT_4: Contains RX packet count bits [15:0].
++ * - DP83TD510E_PKT_STAT_5: Contains RX packet count bits [31:16].
++ * - DP83TD510E_PKT_STAT_6: Contains RX error packet count.
++ *
++ * Keeping the register names as defined in the datasheet helps maintain
++ * clarity and alignment with the documentation.
++ */
++#define DP83TD510E_PKT_STAT_1			0x12b
++#define DP83TD510E_PKT_STAT_2			0x12c
++#define DP83TD510E_PKT_STAT_3			0x12d
++#define DP83TD510E_PKT_STAT_4			0x12e
++#define DP83TD510E_PKT_STAT_5			0x12f
++#define DP83TD510E_PKT_STAT_6			0x130
++
+ #define DP83TD510E_AN_STAT_1			0x60c
+ #define DP83TD510E_MASTER_SLAVE_RESOL_FAIL	BIT(15)
+ 
+@@ -58,8 +81,16 @@ static const u16 dp83td510_mse_sqi_map[] = {
+ 	0x0000  /* 24dB =< SNR */
+ };
+ 
++struct dp83td510_stats {
++	u64 tx_pkt_cnt;
++	u64 tx_err_pkt_cnt;
++	u64 rx_pkt_cnt;
++	u64 rx_err_pkt_cnt;
++};
++
+ struct dp83td510_priv {
+ 	bool alcd_test_active;
++	struct dp83td510_stats stats;
+ };
+ 
+ /* Time Domain Reflectometry (TDR) Functionality of DP83TD510 PHY
+@@ -177,6 +208,85 @@ struct dp83td510_priv {
+ #define DP83TD510E_ALCD_COMPLETE			BIT(15)
+ #define DP83TD510E_ALCD_CABLE_LENGTH			GENMASK(10, 0)
  
 +/**
-+ * phy_update_stats - Update PHY device statistics if supported.
-+ * @phydev: Pointer to the PHY device structure.
++ * dp83td510_update_stats - Update the PHY statistics for the DP83TD510 PHY.
++ * @phydev: Pointer to the phy_device structure.
 + *
-+ * If the PHY driver provides an update_stats callback, this function
-+ * invokes it to update the PHY statistics. If not, it returns 0.
++ * The function reads the PHY statistics registers and updates the statistics
++ * structure.
 + *
-+ * Return: 0 on success, or a negative error code if the callback fails.
++ * Returns: 0 on success or a negative error code on failure.
 + */
-+static int phy_update_stats(struct phy_device *phydev)
++static int dp83td510_update_stats(struct phy_device *phydev)
 +{
-+	if (!phydev->drv->update_stats)
-+		return 0;
++	struct dp83td510_priv *priv = phydev->priv;
++	u32 count;
++	int ret;
 +
-+	return phydev->drv->update_stats(phydev);
++	/* The DP83TD510E_PKT_STAT registers are divided into two groups:
++	 * - Group 1 (TX stats): DP83TD510E_PKT_STAT_1 to DP83TD510E_PKT_STAT_3
++	 * - Group 2 (RX stats): DP83TD510E_PKT_STAT_4 to DP83TD510E_PKT_STAT_6
++	 *
++	 * Registers in each group are cleared only after reading them in a
++	 * plain sequence (e.g., 1, 2, 3 for Group 1 or 4, 5, 6 for Group 2).
++	 * Any deviation from the sequence, such as reading 1, 2, 1, 2, 3, will
++	 * prevent the group from being cleared. Additionally, the counters
++	 * for a group are frozen as soon as the first register in that group
++	 * is accessed.
++	 */
++	ret = phy_read_mmd(phydev, MDIO_MMD_VEND2, DP83TD510E_PKT_STAT_1);
++	if (ret < 0)
++		return ret;
++	/* tx_pkt_cnt_15_0 */
++	count = ret;
++
++	ret = phy_read_mmd(phydev, MDIO_MMD_VEND2, DP83TD510E_PKT_STAT_2);
++	if (ret < 0)
++		return ret;
++	/* tx_pkt_cnt_31_16 */
++	count |= ret << 16;
++	priv->stats.tx_pkt_cnt += count;
++
++	ret = phy_read_mmd(phydev, MDIO_MMD_VEND2, DP83TD510E_PKT_STAT_3);
++	if (ret < 0)
++		return ret;
++	/* tx_err_pkt_cnt */
++	priv->stats.tx_err_pkt_cnt += ret;
++
++	ret = phy_read_mmd(phydev, MDIO_MMD_VEND2, DP83TD510E_PKT_STAT_4);
++	if (ret < 0)
++		return ret;
++	/* rx_pkt_cnt_15_0 */
++	count = ret;
++
++	ret = phy_read_mmd(phydev, MDIO_MMD_VEND2, DP83TD510E_PKT_STAT_5);
++	if (ret < 0)
++		return ret;
++	/* rx_pkt_cnt_31_16 */
++	count |= ret << 16;
++	priv->stats.rx_pkt_cnt += count;
++
++	ret = phy_read_mmd(phydev, MDIO_MMD_VEND2, DP83TD510E_PKT_STAT_6);
++	if (ret < 0)
++		return ret;
++	/* rx_err_pkt_cnt */
++	priv->stats.rx_err_pkt_cnt += ret;
++
++	return 0;
 +}
 +
- /**
-  * phy_request_interrupt - request and enable interrupt for a PHY device
-  * @phydev: target phy_device struct
-@@ -1510,6 +1527,9 @@ static enum phy_state_work _phy_state_machine(struct phy_device *phydev)
- 	case PHY_RUNNING:
- 		err = phy_check_link_status(phydev);
- 		func = &phy_check_link_status;
++static void dp83td510_get_phy_stats(struct phy_device *phydev,
++				    struct ethtool_eth_phy_stats *eth_stats,
++				    struct ethtool_phy_stats *stats)
++{
++	struct dp83td510_priv *priv = phydev->priv;
 +
-+		if (!err)
-+			err = phy_update_stats(phydev);
- 		break;
- 	case PHY_CABLETEST:
- 		err = phydev->drv->cable_test_get_status(phydev, &finished);
-diff --git a/include/linux/phy.h b/include/linux/phy.h
-index 2fcaf96d3aed..6e368a9fb801 100644
---- a/include/linux/phy.h
-+++ b/include/linux/phy.h
-@@ -1173,6 +1173,24 @@ struct phy_driver {
- 	 */
- 	void (*get_link_stats)(struct phy_device *dev,
- 			       struct ethtool_link_ext_stats *link_stats);
++	stats->tx_packets = priv->stats.tx_pkt_cnt;
++	stats->tx_errors = priv->stats.tx_err_pkt_cnt;
++	stats->rx_packets = priv->stats.rx_pkt_cnt;
++	stats->rx_errors = priv->stats.rx_err_pkt_cnt;
++}
 +
-+	/**
-+	 * @update_stats: Trigger periodic statistics updates.
-+	 * @dev: The PHY device for which statistics updates are triggered.
-+	 *
-+	 * Periodically gathers statistics from the PHY device to update locally
-+	 * maintained 64-bit counters. This is necessary for PHYs that implement
-+	 * reduced-width counters (e.g., 16-bit or 32-bit) which can overflow
-+	 * more frequently compared to 64-bit counters. By invoking this
-+	 * callback, drivers can fetch the current counter values, handle
-+	 * overflow detection, and accumulate the results into local 64-bit
-+	 * counters for accurate reporting through the `get_phy_stats` and
-+	 * `get_link_stats` interfaces.
-+	 *
-+	 * Return: 0 on success or a negative error code on failure.
-+	 */
-+	int (*update_stats)(struct phy_device *dev);
-+
- 	/** @get_sset_count: Number of statistic counters */
- 	int (*get_sset_count)(struct phy_device *dev);
- 	/** @get_strings: Names of the statistic counters */
-@@ -1663,6 +1681,9 @@ static inline bool phy_polling_mode(struct phy_device *phydev)
- 		if (phydev->drv->flags & PHY_POLL_CABLE_TEST)
- 			return true;
+ static int dp83td510_config_intr(struct phy_device *phydev)
+ {
+ 	int ret;
+@@ -599,6 +709,8 @@ static struct phy_driver dp83td510_driver[] = {
+ 	.get_sqi_max	= dp83td510_get_sqi_max,
+ 	.cable_test_start = dp83td510_cable_test_start,
+ 	.cable_test_get_status = dp83td510_cable_test_get_status,
++	.get_phy_stats	= dp83td510_get_phy_stats,
++	.update_stats	= dp83td510_update_stats,
  
-+	if (phydev->drv->update_stats)
-+		return true;
-+
- 	return phydev->irq == PHY_POLL;
- }
- 
+ 	.suspend	= genphy_suspend,
+ 	.resume		= genphy_resume,
 -- 
 2.39.5
 
