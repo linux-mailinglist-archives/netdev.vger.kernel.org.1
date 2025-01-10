@@ -1,147 +1,149 @@
-Return-Path: <netdev+bounces-156948-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156949-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9217FA085DB
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 04:20:59 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A09DFA085E4
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 04:25:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AF6DE3A9BD9
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 03:20:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6F0CA1882431
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 03:25:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7160B3FBB3;
-	Fri, 10 Jan 2025 03:20:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F11E1E2853;
+	Fri, 10 Jan 2025 03:25:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FGoWxuua"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B5BC8BEC;
-	Fri, 10 Jan 2025 03:20:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2BB01A4F1F
+	for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 03:25:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736479254; cv=none; b=f30Z00IYJQzUxIONunpE2/qTWvdyf5xvba5ZAJJKJrqyVyN4P8AiR6RtogqqWnVuqb9Hd4AbItn9xmAY9AeA2NsOZIO6HDMQenvNGl2niGiNlc6XLr6XQfwWvPtDdZ5Aa5W+ZvZn3z5aCAbBU/jOMuLaRDekOOdhpdFdofURBuI=
+	t=1736479503; cv=none; b=baolT/AWcT3sQBPwiPQVcndI9MYm4i78NAbdJRKVCX5otq2B4752bprCJqA+u/A+PELx5MOCo9B/RKrV6AmX3pHABbw6jsrBVyOjcGf7owv/tLbSJwAecqc9z1GLyR2rUUuShArPODHd20ysawcmPyUUtAhKLeCY2OSy6p0uxbY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736479254; c=relaxed/simple;
-	bh=vvfQArFA6uxHHL4X3oy3EG9cO0SMH0NbILBra2IpjGE=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ncJLqei8K1imdh8iycWOIYYus0RonHijAcFpnTPOeNsffLIBql90M3+73/dFu+5gDkee6nxoQZ2QLTSBYzQKfc6hFp24RgYrk9u84qsSmC4bxSHq+sIstLzymn37KlX94MAyeL+W/koomZaUot0YMAqcSiBP1e7Fqcayb/1BAlA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: e1e11844cf0111efa216b1d71e6e1362-20250110
-X-CTIC-Tags:
-	HR_CC_COUNT, HR_CC_DOMAIN_COUNT, HR_CC_NAME, HR_CC_NO_NAME, HR_CTE_8B
-	HR_CTT_MISS, HR_DATE_H, HR_DATE_WKD, HR_DATE_ZONE, HR_FROM_NAME
-	HR_SJ_DIGIT_LEN, HR_SJ_LANG, HR_SJ_LEN, HR_SJ_LETTER, HR_SJ_NOR_SYM
-	HR_SJ_PHRASE, HR_SJ_PHRASE_LEN, HR_SJ_WS, HR_TO_COUNT, HR_TO_DOMAIN_COUNT
-	HR_TO_NAME, IP_TRUSTED, SRC_TRUSTED, DN_TRUSTED, SA_EXISTED
-	SN_EXISTED, SPF_NOPASS, DKIM_NOPASS, DMARC_NOPASS, CIE_BAD
-	CIE_GOOD, CIE_GOOD_SPF, GTI_FG_BS, GTI_RG_INFO, GTI_C_BU
-	AMN_T1, AMN_GOOD, AMN_C_TI, AMN_C_BU, ABX_MISS_RDNS
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.1.45,REQID:52d8fb99-04d3-40b5-be86-1f8e467e7850,IP:10,
-	URL:0,TC:0,Content:-25,EDM:-30,RT:0,SF:-9,FILE:0,BULK:0,RULE:Release_Ham,A
-	CTION:release,TS:-54
-X-CID-INFO: VERSION:1.1.45,REQID:52d8fb99-04d3-40b5-be86-1f8e467e7850,IP:10,UR
-	L:0,TC:0,Content:-25,EDM:-30,RT:0,SF:-9,FILE:0,BULK:0,RULE:EDM_GN8D19FE,AC
-	TION:release,TS:-54
-X-CID-META: VersionHash:6493067,CLOUDID:58ca07b2dcd66cf87246bf81e1ff1c11,BulkI
-	D:250110110243EAKVXNKI,BulkQuantity:2,Recheck:0,SF:17|19|24|38|45|66|78|10
-	2,TC:nil,Content:0|50,EDM:2,IP:-2,URL:0,File:nil,RT:nil,Bulk:40,QS:nil,BEC
-	:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
-X-CID-BVR: 0
-X-CID-BAS: 0,_,0,_
-X-CID-FACTOR: TF_CID_SPAM_FSD,TF_CID_SPAM_FSI,TF_CID_SPAM_SNR,TF_CID_SPAM_FAS
-X-UUID: e1e11844cf0111efa216b1d71e6e1362-20250110
-X-User: zhaochenguang@kylinos.cn
-Received: from localhost.localdomain [(223.70.160.239)] by mailgw.kylinos.cn
-	(envelope-from <zhaochenguang@kylinos.cn>)
-	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
-	with ESMTP id 1476123144; Fri, 10 Jan 2025 11:20:46 +0800
-From: Chenguang Zhao <zhaochenguang@kylinos.cn>
-To: Saeed Mahameed <saeedm@nvidia.com>,
-	Leon Romanovsky <leon@kernel.org>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Moshe Shemesh <moshe@nvidia.com>
-Cc: Chenguang Zhao <zhaochenguang@kylinos.cn>,
-	netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org
-Subject: [PATCH v3] net/mlx5: Fix variable not being completed when function returns
-Date: Fri, 10 Jan 2025 11:20:38 +0800
-Message-Id: <20250110032038.973659-1-zhaochenguang@kylinos.cn>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1736479503; c=relaxed/simple;
+	bh=xiIZOksV9gK8x5lTS+rlahAEFaL/qj64KXL6RVencw0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=XPGVTbJuf8CYb102zwepKJSzBlFyqF1BmSpEFeCEJbmuLo7fXIJJCnwp3lExdR4DyixHDQBb/a/WRK1/4SoNa+xTzuzmn/MH2VOdpOPs3hpm0uHmBOQRtx7on3lAcFmjrxP+Oq6zXTMtT29nuReVsYQ5pdhSkMU1S+frRHc13g0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FGoWxuua; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1736479500;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ux/EFJGUhHtGiPWKsNCatUDg5uRU42FVCWFIHQvV8s8=;
+	b=FGoWxuua4vh9ZGE34vxHBfMXrmAA0IqaqUQSOfBG14Fh7uMn7akli2l2u5ChCY5ZzuQiai
+	o3YzTmCAGJczKmJVWDj/QvsEw8WVVAySuMG3y+UmmTVj+YEtpATcoctzDK/WfsG1GDdbiF
+	EMBAkw/0kZAYfn+UfNrFcYCF29oT4Qs=
+Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com
+ [209.85.216.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-516-mqkrR8yDMNWBLN_dsb4XcQ-1; Thu, 09 Jan 2025 22:24:58 -0500
+X-MC-Unique: mqkrR8yDMNWBLN_dsb4XcQ-1
+X-Mimecast-MFC-AGG-ID: mqkrR8yDMNWBLN_dsb4XcQ
+Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-2eebfd6d065so4203083a91.3
+        for <netdev@vger.kernel.org>; Thu, 09 Jan 2025 19:24:58 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736479498; x=1737084298;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ux/EFJGUhHtGiPWKsNCatUDg5uRU42FVCWFIHQvV8s8=;
+        b=Lqj+GCpjZAB/e0JZ0axWBXBK60EMg1yfTixgYmh3S8zR09IuczygLIQCi6pUD9DBLV
+         zYNl3ZdTLdHkY0D5eaNnqtAUeS4Fa6qSwTnHzyO+yrboDHlrhfX7rNz8eQ6EaMYxmJUQ
+         q1vS/aJUwbBpc7+oHt9AItBIBchzqqRcGJL+YPScMQG1K3IJE9jz0/rDu6Ku+8iVGpco
+         dmNSi7Hu3E/klOFQ/n+CT22pe92txCbP8705HBNXfqg7aVXJ5o12iNsBuVyyDDTqVINm
+         4H3VzioOyIOdRYffd59Nru5HjPKmWjJJNqZyx1PkFQypMNrjQP4QQAIHbciuZKtLJymA
+         0G6A==
+X-Forwarded-Encrypted: i=1; AJvYcCUPo9NiPTf1er0QgyW1RGihmpcjEvWS3neCSpUwqQUrRq9Tl6GkN0vWhidnhFg/KYlamimBykI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyxyrGQt0Ik/gBaclNnYsH4j3bW6niyn2HZXPzNZl6dpl9aexMk
+	H010d78bQIkJd0NHDS/KBDoGRX4SmwBAp2SkcR8BThHwVLv5GxtjdhnxY8aAPnRhy0HSGQiNLOj
+	Z4qBHKJ7eCwGyovQo37uQPIeeJrv7usVARtthS1Y+xl8WA+MFZRJ/z7WU5wb5HNnF88GCHZRcC2
+	J4T1TFrlPEzLoeHWRZ6DhQIe+bR/p5
+X-Gm-Gg: ASbGnctjGJej+2YFK4a2jw40cOZMINO5cR94fknBruEwhxVZAI9Dfm23/GaVtTJBRbg
+	3mOGkL6PwrrmZB1o/xyAbkqOZ/J1TTdG+hRxrhxc=
+X-Received: by 2002:a17:90b:2f45:b0:2ef:2f49:7d7f with SMTP id 98e67ed59e1d1-2f548ece7afmr14119967a91.18.1736479497864;
+        Thu, 09 Jan 2025 19:24:57 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGl4su9kuwxLueN6s9pabolA/u0yv9vnPxFtYkK0ZVCk201Nafu3Va6ZCJu8GUQ/vQJh85IIDkmsOql8mxd8mA=
+X-Received: by 2002:a17:90b:2f45:b0:2ef:2f49:7d7f with SMTP id
+ 98e67ed59e1d1-2f548ece7afmr14119944a91.18.1736479497484; Thu, 09 Jan 2025
+ 19:24:57 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20250109-tun-v2-0-388d7d5a287a@daynix.com> <20250109-tun-v2-1-388d7d5a287a@daynix.com>
+In-Reply-To: <20250109-tun-v2-1-388d7d5a287a@daynix.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Fri, 10 Jan 2025 11:24:45 +0800
+X-Gm-Features: AbW1kvayDbWMw6YuULfNbkLhEoUv0nyH0UVx2PFd5rLWnQcrUga4t_8H0CMLDNk
+Message-ID: <CACGkMEs2S=G-Y077hCeFE57ar0h1A5EaySOOTcvFZUVC0oGdXQ@mail.gmail.com>
+Subject: Re: [PATCH v2 1/3] tun: Unify vnet implementation
+To: Akihiko Odaki <akihiko.odaki@daynix.com>
+Cc: Jonathan Corbet <corbet@lwn.net>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+	Shuah Khan <shuah@kernel.org>, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, kvm@vger.kernel.org, 
+	virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org, 
+	Yuri Benditovich <yuri.benditovich@daynix.com>, Andrew Melnychenko <andrew@daynix.com>, 
+	Stephen Hemminger <stephen@networkplumber.org>, gur.stavi@huawei.com, devel@daynix.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The cmd_work_handler function returns from the child function
-cmd_alloc_index because the allocate command entry fails,
-Before returning, there is no complete ent->slotted.
+On Thu, Jan 9, 2025 at 2:59=E2=80=AFPM Akihiko Odaki <akihiko.odaki@daynix.=
+com> wrote:
+>
+> Both tun and tap exposes the same set of virtio-net-related features.
+> Unify their implementations to ease future changes.
+>
+> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
+> ---
+>  MAINTAINERS            |   1 +
+>  drivers/net/Kconfig    |   5 ++
+>  drivers/net/Makefile   |   1 +
+>  drivers/net/tap.c      | 172 ++++++----------------------------------
+>  drivers/net/tun.c      | 208 ++++++++-----------------------------------=
+------
+>  drivers/net/tun_vnet.c | 186 +++++++++++++++++++++++++++++++++++++++++++
+>  drivers/net/tun_vnet.h |  24 ++++++
+>  7 files changed, 273 insertions(+), 324 deletions(-)
+>
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 910305c11e8a..1be8a452d11f 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -23903,6 +23903,7 @@ F:      Documentation/networking/tuntap.rst
+>  F:     arch/um/os-Linux/drivers/
+>  F:     drivers/net/tap.c
+>  F:     drivers/net/tun.c
+> +F:     drivers/net/tun_vnet.h
+>
+>  TURBOCHANNEL SUBSYSTEM
+>  M:     "Maciej W. Rozycki" <macro@orcam.me.uk>
+> diff --git a/drivers/net/Kconfig b/drivers/net/Kconfig
+> index 1fd5acdc73c6..255c8f9f1d7c 100644
+> --- a/drivers/net/Kconfig
+> +++ b/drivers/net/Kconfig
+> @@ -395,6 +395,7 @@ config TUN
+>         tristate "Universal TUN/TAP device driver support"
+>         depends on INET
+>         select CRC32
+> +       select TUN_VNET
 
-The patch fixes it.
+I don't think we need a dedicated Kconfig option here.
 
-mlx5_core 0000:01:00.0: cmd_work_handler:877:(pid 3880418): failed 
-to allocate command entry
-INFO: task kworker/13:2:4055883 blocked for more than 120 seconds.
-      Not tainted 4.19.90-25.44.v2101.ky10.aarch64 #1
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-kworker/13:2    D    0 4055883      2 0x00000228
-Workqueue: events mlx5e_tx_dim_work [mlx5_core]
-Call trace:
- __switch_to+0xe8/0x150
- __schedule+0x2a8/0x9b8
- schedule+0x2c/0x88
- schedule_timeout+0x204/0x478
- wait_for_common+0x154/0x250
- wait_for_completion+0x28/0x38
- cmd_exec+0x7a0/0xa00 [mlx5_core]
- mlx5_cmd_exec+0x54/0x80 [mlx5_core]
- mlx5_core_modify_cq+0x6c/0x80 [mlx5_core]
- mlx5_core_modify_cq_moderation+0xa0/0xb8 [mlx5_core]
- mlx5e_tx_dim_work+0x54/0x68 [mlx5_core]
- process_one_work+0x1b0/0x448
- worker_thread+0x54/0x468
- kthread+0x134/0x138
- ret_from_fork+0x10/0x18
+Btw, fixes should come first as it simplifies the backporting.
 
-Fixes: 485d65e13571 ("net/mlx5: Add a timeout to acquire the command queue semaphore")
-
-Signed-off-by: Chenguang Zhao <zhaochenguang@kylinos.cn>
-Reviewed-by: Moshe Shemesh <moshe@nvidia.com>
-Acked-by: Tariq Toukan <tariqt@nvidia.com>
----
-RESEND:
- Modify SOB email address format error
----
-v3:
- - Delete commit messsage indentation
- - Add Acked-by tag
----
- drivers/net/ethernet/mellanox/mlx5/core/cmd.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/cmd.c b/drivers/net/ethernet/mellanox/mlx5/core/cmd.c
-index 6bd8a18e3af3..e733b81e18a2 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/cmd.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/cmd.c
-@@ -1013,6 +1013,7 @@ static void cmd_work_handler(struct work_struct *work)
- 				complete(&ent->done);
- 			}
- 			up(&cmd->vars.sem);
-+			complete(&ent->slotted);
- 			return;
- 		}
- 	} else {
--- 
-2.25.1
+Thanks
 
 
