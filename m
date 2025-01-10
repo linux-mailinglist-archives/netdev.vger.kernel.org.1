@@ -1,216 +1,161 @@
-Return-Path: <netdev+bounces-157240-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157241-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 63845A09948
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 19:23:16 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 597B4A0994C
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 19:27:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 60EF81645F6
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 18:23:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 08515188C861
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 18:27:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D81462139CB;
-	Fri, 10 Jan 2025 18:22:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB7782139B6;
+	Fri, 10 Jan 2025 18:26:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="AAjTK68N"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="G76WGXdE"
 X-Original-To: netdev@vger.kernel.org
-Received: from BYAPR05CU005.outbound.protection.outlook.com (mail-westusazolkn19010077.outbound.protection.outlook.com [52.103.2.77])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3181213E77;
-	Fri, 10 Jan 2025 18:22:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.103.2.77
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736533364; cv=fail; b=chHdm4YPA+k1mO93dElq18IXH2kKdJMjkziZtFEOXtuAdFrhU8ObVdp6rNsTVFj7i3zbj6uQrwbgf4SG9c620ArC4qhT7J5ntuau4iKW2Oj55fpnGCWmpfMkcxsSy8bb38nNtuRmyWGnx2X52QYp+u8RTlwy0oxcszF2bSAJ3B0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736533364; c=relaxed/simple;
-	bh=EMu4zoHUDZtnVeMjFBsjoftAo1JJ/SbtE8RCHmZOVVM=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=lgRWvMGFVBOhS5jSi/NZygieOFtR1OUnUu3mB/Pwaxt9cKRXAPQKvLKw9NM7FSNvbSEDaFFkatJXBEgmiIf9TnNAESklIki7U+abP0GfYavAJKrWohuGBOTXM8g3vYZGXI+eLB/2GNJGfe5dZLIqAg/dneNAJAN3ON7cnSA9/8E=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=AAjTK68N; arc=fail smtp.client-ip=52.103.2.77
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=KHuBv5c0zrhw3oekWpQfODpQCYVI2q8aeOkHxe6as7kswcj0okmDuKw8Ynx6+DssNrMYaLfeGBKaHXXIm2SjHYf/6mrC0tQEcl92OD5qe7R9d/kzndfXFwQGMpGq6azLZzGw84b7y+W0s9NLyvTrQYg0fWgteMl+2UJy8PNG9NNxhR270c4IuBJ+7B1a60Bp5kQAnkP9cCxvsppj7lE+SEM8y8T4nm6ZMGhVf/y6lbq+BMVgrYlwpuxUSazr5xJeBhDd2lUNNzuEMczdxp5gEb46pBjqOm9F0JYosVAerrLq5JIl/QVJxTRu+1fb/F5pf1oL1197TG6BlJ2c+1MKtQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=bHOvG1S0f9Ev2PimMw7YkrhiEtew2PFdG7INyLPjFks=;
- b=krdqZzQYk/fiYK2fPbyDUcY79UCJO9HNthL135PMoOHNIWvE77h9DYNflgu1ZWEqpbS7dmTwLsHKH8jHuFzgYlvrxAW8zcd3W48ulGDTjQ22zDFZlQHeXvYtWYvpg2y6UtkwqJ6Xw3bcM/c7s76aU73rOgQaTjaoly9vsi9CdYxSZgVxNRTAgGlDoNM5ql+nAbUo5MLokryV7XxpcSjycUnQaV3/F9O5BaFvIVehCkRw2gx9NTpnOIphw3AUGFXuvnyXD0i0DrBrwwhiZVTg1L/8t6TEIxcsT2IoTq4XRvVN413ykbnZnmfpPPFxQh5pPjdMpp1IUrJSmW+vxYXv6g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=bHOvG1S0f9Ev2PimMw7YkrhiEtew2PFdG7INyLPjFks=;
- b=AAjTK68N50Zs57igmec963jKSTCgF6zAEZXu8gWg4uqpnFWLZKiDXO9sgNVQI0vVbybY7hy/SuQOTKVe7u2AGRhZb2zwKZ5kuha1tGvMtOd6/q/E4jibHIjqrFT79iXKx+wUvQM5ptFjCN7rOVcFUv0ijKTEpL/S4avLcm9SqyNd8hIUS25RjNIk6SEaAFf7qFb4vGXtcLvadbGBB+Nlj4LObNghM7DnOXzQQU7PZ/F/YOzGsD36iGTzwTAL7aYDQAIJ/gj1rsordhRHVp5vDnImgsMtoaasRke35xPCJ710yPc/zkv1RfoglwrTzhHyI3agBNaFlOsFto8gK2y+vA==
-Received: from SN6PR02MB4157.namprd02.prod.outlook.com (2603:10b6:805:33::23)
- by BN0PR02MB8175.namprd02.prod.outlook.com (2603:10b6:408:163::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8335.10; Fri, 10 Jan
- 2025 18:22:40 +0000
-Received: from SN6PR02MB4157.namprd02.prod.outlook.com
- ([fe80::cedd:1e64:8f61:b9df]) by SN6PR02MB4157.namprd02.prod.outlook.com
- ([fe80::cedd:1e64:8f61:b9df%4]) with mapi id 15.20.8335.011; Fri, 10 Jan 2025
- 18:22:40 +0000
-From: Michael Kelley <mhklinux@outlook.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-CC: Breno Leitao <leitao@debian.org>, "saeedm@nvidia.com" <saeedm@nvidia.com>,
-	"tariqt@nvidia.com" <tariqt@nvidia.com>, "linux-hyperv@vger.kernel.org"
-	<linux-hyperv@vger.kernel.org>, Andrew Morton <akpm@linux-foundation.org>,
-	Thomas Graf <tgraf@suug.ch>, Tejun Heo <tj@kernel.org>, Hao Luo
-	<haoluo@google.com>, Josh Don <joshdon@google.com>, Barret Rhoden
-	<brho@google.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: RE: [v2 PATCH] rhashtable: Fix rhashtable_try_insert test
-Thread-Topic: [v2 PATCH] rhashtable: Fix rhashtable_try_insert test
-Thread-Index: AQHbY4R22n8scAonrE6mozAIuLs3n7MQTEjQ
-Date: Fri, 10 Jan 2025 18:22:40 +0000
-Message-ID:
- <SN6PR02MB41570F1F5F4F579B4E8F0CD3D41C2@SN6PR02MB4157.namprd02.prod.outlook.com>
-References: <20241128-scx_lockdep-v1-1-2315b813b36b@debian.org>
- <Z1rYGzEpMub4Fp6i@gondor.apana.org.au> <Z2aFL3dNLYOcmzH3@gondor.apana.org.au>
- <20250102-daffy-vanilla-boar-6e1a61@leitao>
- <SN6PR02MB41572415707F0FA6D9A61247D4132@SN6PR02MB4157.namprd02.prod.outlook.com>
- <20250109-marigold-bandicoot-of-exercise-8ebede@leitao>
- <Z4DoFYQ3ytB-wS3-@gondor.apana.org.au>
- <SN6PR02MB41577C2C4EB260F3D2D4F85FD41C2@SN6PR02MB4157.namprd02.prod.outlook.com>
- <Z4FXs8vAtitHIJyl@gondor.apana.org.au>
-In-Reply-To: <Z4FXs8vAtitHIJyl@gondor.apana.org.au>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SN6PR02MB4157:EE_|BN0PR02MB8175:EE_
-x-ms-office365-filtering-correlation-id: 97f2b04a-e39b-42e0-f59c-08dd31a3c494
-x-microsoft-antispam:
- BCL:0;ARA:14566002|8062599003|8060799006|461199028|15080799006|19110799003|3412199025|102099032|440099028;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?EBgjy+vcsr7bfXr8yT2UUXeX2OjKSsaeKcEEn1vJmG3Z4wmhlh/zU0xWjLru?=
- =?us-ascii?Q?V71QFQyvcX1/ekbQpDi0kAM8OO92xKmIezIpgA+8o54TVQRGQsEs97qOKS3C?=
- =?us-ascii?Q?Rzh99RySJQaiVr0wb4eWMF0P8vAI6WJEU+P074zojIQELx3Ey653HkGzxGcu?=
- =?us-ascii?Q?6jSgjiAs3s/1sRQAhSCUZkSpxNUKgQRj48iR8A/8/qJYsn7yXwdK8gvOjfHC?=
- =?us-ascii?Q?4gQphLhXCPfgnErsGmn7MeRQOkZSzOWf4i5Ro8kxMx4BZLQhMADCptlaHOCZ?=
- =?us-ascii?Q?rV3/q14wc0B1vZ2i6oWYANM9+72vH3XE12TcL1cv8unpVtqSFMfi7qiVrend?=
- =?us-ascii?Q?bPLM6l4DnWofKdbLvUnM5pGX6tl9cfhtAQQ9Otj2oHIkTET4jMxBY1g2iRhl?=
- =?us-ascii?Q?Tp7zXDDRMnwA6KPZ4c8O/Ap7TdfAYW0KNHalY7wKmwjW5a78nt48HafeOREE?=
- =?us-ascii?Q?9DxisO0DUabm1yvscxhs6eRJrqc+kN58RhqGUfOJZFN2hlQ44iYshVtLRwcH?=
- =?us-ascii?Q?LSRYadMSQOl9kVBISIUa5M6Rb9PHhJOD2CpxSSgraZG6K9lU7A7C2yYCrkJg?=
- =?us-ascii?Q?1KNm5R9ns0X6Z82VAADD+Fw3RS4i/wwIQtXTb6giPzKgNOPRB4ao2ftjN0VB?=
- =?us-ascii?Q?N7Qrg4q4Egjf89dfc3MSa0WPmDy7SMqO4ZW3AGwoX6zqMAdx9Fndec/u5Nbq?=
- =?us-ascii?Q?rAFENSGZmPETjMTq9xgtmeAkvlvIfe1gu6Qj0JcXllrQ5dBrHSLLIX1bGZJR?=
- =?us-ascii?Q?56IhWgxqwVNK73ARTaE9+94+CBhCwRWvf0o5Q4CRE4GKLHQ56jh2WlKBXplb?=
- =?us-ascii?Q?6oiSVuDT/jZOEeevMf1pcuUm+VDMhdKNox2W7inaQPlzuAmSptQFCSAl/Owr?=
- =?us-ascii?Q?Q1MJbH7uPSY3pCMj5n0jFMKnQEtADPi+MY2OLG4NobE1lt4azZoQW3SbJBkc?=
- =?us-ascii?Q?Qnw1HD1QREHNPo2iRLtwGvY8zd2vwQTpdGXqtVw3zYIFhG6rK9XC2Y841wBx?=
- =?us-ascii?Q?X2yQpHaifZGcQ5l5G0O4lrZ1vTyrXgdPgYpJ6fd1ewDhFcI=3D?=
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?X9PjO6Il+gnnpFgfwibxAOYK53G6IiJuFOxBWZ4NADkyKDHh0d3wwIx/eRvN?=
- =?us-ascii?Q?LadSarQmCRz3qfXlIH0l/yKyjv7EzRaipeX3H7Z8+ovd5AnB2oIa3pEBHu3e?=
- =?us-ascii?Q?uxsZM/25Qiy3FGPTBfe0ggKwhCmAxTgHeXIAJbry6lRF5nE1KByJFHRoEjQZ?=
- =?us-ascii?Q?yWZ1bzxJwlU/9T58rMeA/ptVf3bmO3tE3gyEMYkE6Es90nuxr48hPFDJLExs?=
- =?us-ascii?Q?rbTnhX5ooNS/GTcP8gPGJwXmJiGzXHa2FjPmPZnNYfeMMXhr6w7Ad0XSgCYZ?=
- =?us-ascii?Q?Ub+grhcEuOBSjxc6qtUHsmChh+hSM1RDp/VkCTOF7X6xAI9HT3rJ3dlr4K0k?=
- =?us-ascii?Q?V7GUX4c7bUxpIKABRhC9gIAvtzTGsRGzeS+hlRGyX/4Uq5lZ//yUjzIwPFG4?=
- =?us-ascii?Q?2gk4SfjKcEWQwZle0w3dSJuwbbzGTvLhFElPUPjwjiZa+EqaR+wr6uk2njrU?=
- =?us-ascii?Q?ZwLGaGnTMn48l11f/FT0hrD/e4UR2KH4Fxd0j5hfaNjC8vW5JXEFTlxj3Mub?=
- =?us-ascii?Q?n5W+pGMdRKj18VvUIg/B6fep0loDIPvTBkgSq8xc1LcjoLdwjnLPKV1AiK87?=
- =?us-ascii?Q?3i9OqzJZ2cIVFYcoi0Gw77qU9m3ORxLcM9IuRX6XIte0hE78h5eRfqA9cc7V?=
- =?us-ascii?Q?6pLbTSLx3U9vt6QR8otlKflIVuZkJA9OfJl22ZRrMiZLlX80NuuM2xDTpDkB?=
- =?us-ascii?Q?AJCGpQm3SeMynJfavH76RFKj38k5s1w/9/nc/edFoWhuIJEPcEdf30YUGW67?=
- =?us-ascii?Q?tkxVXtP8N9U6ru1dfT2H+wqaYvxbd/tWuKWNz5UvC2/jdtxbaoIF6SadJ1++?=
- =?us-ascii?Q?74mbFR82pK3y0NQzOm0zm+0hUBxt+dYQT8lydIkvVNA/c0Q8vJTFb7LGKO4h?=
- =?us-ascii?Q?UmKr4j6pgHpU4eYkPiPsOc0RmV4OEiQ8d1p7ibOkv9hFchkkloSqI78zBrXN?=
- =?us-ascii?Q?kVrJmXytmDn0i0P9Zzl46vt32j1ncWFkIBRDZNoDhOSsaXqB25KlcC8/fjXW?=
- =?us-ascii?Q?MYxrdK4yQT0zVRWyaofpPOSf+jbtc/VVdn10NHuaw+WDkOv7V592Oa9yz+gh?=
- =?us-ascii?Q?tlUoJwaFZGvQy3RwWDBw8l3ZOPQqVRrrD5iiUNeV9Fr2zRgDIXoTfZA5VN8q?=
- =?us-ascii?Q?BtmQpF/uRuhMepufvyBNhIjW9sbYJJrywMUT1PZ7iajRUswgU7HrhxnQ971w?=
- =?us-ascii?Q?KqjCOggOamr3Ve+mijaKXlzrnxV7j7+cyYc0fUEVgszl7R8mosr6mLxZVOM?=
- =?us-ascii?Q?=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 654E4212D93;
+	Fri, 10 Jan 2025 18:26:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1736533617; cv=none; b=m2hBP/g0EAU0nR/YtZmO3/8TGOVyNKdwAlKiWBfjoYi+KjEPUqeF0B9Anh9txBYeyroVqMYWAQxSyJ85EqfKbCFu3T4VJWqXp5PVATTqWQsl1qVrZ5G6J+ScTJI98W0T08ddRCgVr/eK830NeuLp3qkxXdRuNhLJ/cki0w0px3E=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1736533617; c=relaxed/simple;
+	bh=P+PoKVBnCT88eYuSEcYbcKJaMCqbhOgQc9Gcovam0UI=;
+	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AVBQukbhNJIT/i+H3ZEEvMuKzYl3zHRtpYKFvKu1PH6BMxeWv+kkALBa41+FaGdeu8F3NW0Akcx4b23bti8KsUeQwpdw0MUCZ61dBT+Gh7giVoNV5XGTSNqX1oODU8FOCzSQfMcekiLw27bZxzekGQ+WaniiTptgQQB2I2EJiQE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=G76WGXdE; arc=none smtp.client-ip=209.85.214.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-21670dce0a7so49136185ad.1;
+        Fri, 10 Jan 2025 10:26:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1736533615; x=1737138415; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=hNUXV4bI3wEa2jBwi8Bmc1kYBmISkdsHPWTt1ozrnz4=;
+        b=G76WGXdEsR+LCs9zY3ZbBzq8YQzJxOMlovo4nHF7zI3PPHVEw2AvArXCI/42LmYwCg
+         f08hh9ZqeAaE0H6qRzDIzJMwBPaqn9beVM+obBVNQPKCuBnxfWoMnRjiwIqEhIdOzwBI
+         tc6icEddBgYb5OdXHa8I/atAeod9QZxND+ZKdlTAM8q4BPSgAOfP7XPIx24QTvLStVzr
+         O9IYQGQ6uBMyhXYyqilulAkon9zMUyCy6pBtv3mE5heZZSc5CjWSS9GwZDSSqa/i4aUq
+         /xCww3+FvAIs+XJr8eOKvdCOvtN8vsRZo4i2gI6kINVF1bLiHi1LPssIfasOiNQ/YxZh
+         GCOg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736533615; x=1737138415;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hNUXV4bI3wEa2jBwi8Bmc1kYBmISkdsHPWTt1ozrnz4=;
+        b=B1npwT/PdqFjhCI9FzbNlBV02W50gAqtAuC2LsZ4GSs4V03/kcHX/b3h4mNAEjQJ/I
+         b5acoXRnh2G/WcgReasqIeIaOw2jHelU643U+I8YPCNDPgPSu9qO17Bd4n27g29IkNOy
+         3TXzhgb8ycRpEdAFR+vHb8JSsES7iV5gnMUribTxIODl8Z4JUSK3qjsO+yB+RsPX6eLX
+         t4kdhzHNRE5sxHltyHc3dUQpFbhkuO4a/Rsfc90cUvPnTqUcdxvC4/FBLz4AQAxLxyHV
+         SpKxe0zhtoXv3mrjPqZ6LMl2gW04FET3ayHWMGTTBzAxhMymLyavqvSa5Kkl7JxPDSXb
+         CUGg==
+X-Forwarded-Encrypted: i=1; AJvYcCVX0lhYv8DbQSfco+KqHmwmLMcPdACBw7UnskjG3VS+lEXGGR1BaGPafVTJ0EG+muydyKB1XyTM@vger.kernel.org, AJvYcCWpKtX4hIfrVh/GEfJ0OqpUFWxW0SJmWZAMx/LzZ84sGRAlsOQ8fiFF/cD6J+UGXYacnT6HAQe+hGj/og==@vger.kernel.org, AJvYcCXRcT6UCxoJNvsNrBPfM3M3ySoebKVipelML553+nomTsZuoDOK60sBMCVLayi1GHYmi+Y3+CKiAVhTQC8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz8obamE1DzuPBGU/kO9N5gHC0xctZgTY95JFQgC49D3NrntR5x
+	GJRmihWcKTQ984l1OFsUfGc3tlo2Le8V9rmOj8ChgJxCRZMcrgo=
+X-Gm-Gg: ASbGncu0aCGplulptfSIyXTX54szh4x3UPocHlsME7/2x4K7Hqx85jGgyTOSExAvs4+
+	GAuF6KeON7dY5dUFCbnW+WC0zE6Rvpjl6u7C/Sq+Wo9arI10VvOzWJgaPD+U7QP2sHP/6wij4lz
+	3MDAUn+o2pRjw0U6CK2QAr7D6RgLPZrfUxc4kwQgoQfutm/dUpH5pHTByxeAU4OgoVbVjecgFnR
+	DmzSBcah38TMIQ6mBBYvGFbXhwxuiCQ9owoWGnZL7pfQ1MoA4uYbcIl
+X-Google-Smtp-Source: AGHT+IH6riR7C/bTklcBkHQtOXrP5srNDvIpI4+QgXxnW3beJpW5qvbBGQxD5LyRvn4PQ3w7NFe5BQ==
+X-Received: by 2002:a05:6a00:b90:b0:729:597:4fa9 with SMTP id d2e1a72fcca58-72d22032690mr16095602b3a.22.1736533615366;
+        Fri, 10 Jan 2025 10:26:55 -0800 (PST)
+Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72d4056da5fsm1835945b3a.70.2025.01.10.10.26.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 10 Jan 2025 10:26:54 -0800 (PST)
+Date: Fri, 10 Jan 2025 10:26:54 -0800
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Joe Damato <jdamato@fastly.com>, Alex Lazar <alazar@nvidia.com>,
+	"aleksander.lobakin@intel.com" <aleksander.lobakin@intel.com>,
+	"almasrymina@google.com" <almasrymina@google.com>,
+	"bigeasy@linutronix.de" <bigeasy@linutronix.de>,
+	"bjorn@rivosinc.com" <bjorn@rivosinc.com>,
+	Dan Jurgens <danielj@nvidia.com>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"donald.hunter@gmail.com" <donald.hunter@gmail.com>,
+	"dsahern@kernel.org" <dsahern@kernel.org>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"hawk@kernel.org" <hawk@kernel.org>,
+	"jiri@resnulli.us" <jiri@resnulli.us>,
+	"johannes.berg@intel.com" <johannes.berg@intel.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"leitao@debian.org" <leitao@debian.org>,
+	"leon@kernel.org" <leon@kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+	"lorenzo@kernel.org" <lorenzo@kernel.org>,
+	"michael.chan@broadcom.com" <michael.chan@broadcom.com>,
+	"mkarsten@uwaterloo.ca" <mkarsten@uwaterloo.ca>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	"sdf@fomichev.me" <sdf@fomichev.me>,
+	"skhawaja@google.com" <skhawaja@google.com>,
+	"sridhar.samudrala@intel.com" <sridhar.samudrala@intel.com>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	"willemdebruijn.kernel@gmail.com" <willemdebruijn.kernel@gmail.com>,
+	"xuanzhuo@linux.alibaba.com" <xuanzhuo@linux.alibaba.com>,
+	Gal Pressman <gal@nvidia.com>, Nimrod Oren <noren@nvidia.com>,
+	Dror Tennenbaum <drort@nvidia.com>,
+	Dragos Tatulea <dtatulea@nvidia.com>
+Subject: Re: [net-next v6 0/9] Add support for per-NAPI config via netlink
+Message-ID: <Z4FmbseFBQT_g1R9@mini-arch>
+References: <DM8PR12MB5447837576EA58F490D6D4BFAD052@DM8PR12MB5447.namprd12.prod.outlook.com>
+ <Z2MBqrc2FM2rizqP@LQ3V64L9R2>
+ <Z2WsJtaBpBqJFXeO@LQ3V64L9R2>
+ <550af81b-6d62-4fc3-9df3-2d74989f4ca0@nvidia.com>
+ <Z3Kuu44L0ZcnavQF@LQ3V64L9R2>
+ <Z4FkAZkNnySdjdRb@LQ3V64L9R2>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR02MB4157.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-000000000000
-X-MS-Exchange-CrossTenant-Network-Message-Id: 97f2b04a-e39b-42e0-f59c-08dd31a3c494
-X-MS-Exchange-CrossTenant-rms-persistedconsumerorg: 00000000-0000-0000-0000-000000000000
-X-MS-Exchange-CrossTenant-originalarrivaltime: 10 Jan 2025 18:22:40.3605
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN0PR02MB8175
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <Z4FkAZkNnySdjdRb@LQ3V64L9R2>
 
-From: Herbert Xu <herbert@gondor.apana.org.au> Sent: Friday, January 10, 20=
-25 9:24 AM
->=20
-> On Fri, Jan 10, 2025 at 04:59:28PM +0000, Michael Kelley wrote:
-> >
-> > This patch fixes the problem I saw with VMs in the Azure cloud.  Thanks=
-!
->=20
-> Sorry, but the test on data is needed after all (it was just
-> buggy).  Otherwise we will break rhlist.  So please test this
-> patch instead.
->=20
-> ---8<---
-> The test on whether rhashtable_insert_one did an insertion relies
-> on the value returned by rhashtable_lookup_one.  Unfortunately that
-> value is overwritten after rhashtable_insert_one returns.  Fix this
-> by saving the old value.
->=20
-> Also simplify the test as only data =3D=3D NULL matters.
->=20
-> Reported-by: Michael Kelley <mhklinux@outlook.com>
-> Fixes: e1d3422c95f0 ("rhashtable: Fix potential deadlock by moving schedu=
-le_work
-> outside lock")
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
->=20
-> diff --git a/lib/rhashtable.c b/lib/rhashtable.c
-> index bf956b85455a..e36b36f3146d 100644
-> --- a/lib/rhashtable.c
-> +++ b/lib/rhashtable.c
-> @@ -611,17 +611,20 @@ static void *rhashtable_try_insert(struct rhashtabl=
-e *ht,
-> const void *key,
->  			new_tbl =3D rht_dereference_rcu(tbl->future_tbl, ht);
->  			data =3D ERR_PTR(-EAGAIN);
->  		} else {
-> +			void *odata;
-> +
->  			flags =3D rht_lock(tbl, bkt);
->  			data =3D rhashtable_lookup_one(ht, bkt, tbl,
->  						     hash, key, obj);
->  			new_tbl =3D rhashtable_insert_one(ht, bkt, tbl,
->  							hash, obj, data);
-> +			odata =3D data;
->  			if (PTR_ERR(new_tbl) !=3D -EEXIST)
->  				data =3D ERR_CAST(new_tbl);
->=20
->  			rht_unlock(tbl, bkt, flags);
->=20
-> -			if (PTR_ERR(data) =3D=3D -ENOENT && !new_tbl) {
-> +			if (odata && !new_tbl) {
->  				atomic_inc(&ht->nelems);
->  				if (rht_grow_above_75(ht, tbl))
->  					schedule_work(&ht->run_work);
+On 01/10, Joe Damato wrote:
+> On Mon, Dec 30, 2024 at 09:31:23AM -0500, Joe Damato wrote:
+> > On Mon, Dec 23, 2024 at 08:17:08AM +0000, Alex Lazar wrote:
+> > > 
+> 
+> [...]
+> 
+> > > 
+> > > Hi Joe,
+> > > 
+> > > Thanks for the quick response.
+> > > Comments inline, If you need more details or further clarification, 
+> > > please let me know.
+> > 
+> > As mentioned above and in my previous emails: please provide lot
+> > more detail and make it as easy as possible for me to reproduce this
+> > issue with the simplest reproducer possible and a much more detailed
+> > explanation.
+> > 
+> > Please note: I will be out of the office until Jan 9 so my responses
+> > will be limited until then.
+> 
+> Just to follow up on this for anyone who missed the other thread,
+> Stanislav proposed a patch which _might_ fix the issue being hit
+> here.
+> 
+> Please see [1], try that patch, and report back if that patch fixes
+> the issue.
+> 
+> Thanks.
+> 
+> [1]: https://lore.kernel.org/netdev/20250109003436.2829560-1-sdf@fomichev.me/
 
-This patch passes my tests. I'm doing a narrow test to verify that
-the boot failure when opening the Mellanox NIC is no longer occurring.
-I also unloaded/reloaded the mlx5 driver a couple of times. For good
-measure, I then did a full Linux kernel build, and all is good. My testing
-does not broadly verify correct operation of rhashtable except as it
-gets exercised implicitly by these basic tests.
-
-Michael
+Note that it might help only if xsk is using busy-polling. Not sure
+that's the case, it's relatively obscure feature :-)
 
