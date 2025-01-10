@@ -1,209 +1,191 @@
-Return-Path: <netdev+bounces-157155-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157158-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1B67A09162
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 14:02:57 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47579A0918A
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 14:14:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DD00A164B91
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 13:02:55 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EF0E47A3310
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 13:14:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71F9020B80D;
-	Fri, 10 Jan 2025 13:02:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0385220E007;
+	Fri, 10 Jan 2025 13:14:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7D4C20B7FA;
-	Fri, 10 Jan 2025 13:02:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EC1220E005;
+	Fri, 10 Jan 2025 13:14:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736514174; cv=none; b=ZjRMxAnLhytYICV0UDoEWv/0Vyvgk0pz2RG8Q3U+tmZRRYo179EAq8kuuuNPH77zT+lTMtaaL6ZCypmwGjspHFEaZXK1r1kmGuL1k6VN25WNRbdJkb+FxdQosreG5+DOuTchd4OdBhX+NJ2XRRA+LIhh9kU+jqaAL813VINPCzQ=
+	t=1736514851; cv=none; b=brIGrSLNlUioifeXbs6On+OVCF2w13wTX4YNKVVbxw4RlpwOEX96V2muIVGtOF119wJKczgYFRSYmHlksGEKI0dTXQZjwjAqm5vUdSn/Hi98tDvYfU7dY1mJf8RcQFnZPG3MkZQj7NZTd6d1Mz4grkzG/JDK9ywu3P0yEvjYVRI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736514174; c=relaxed/simple;
-	bh=OAImGcKOliVNNhgW+BfQ1xldEUlrGQVka1gB2COieeg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=gK71du1DpzSnJWFrHh6MYuuDwT+1z1Os6Ot05gr7IewW1gJerMzmQvI901/voU0TfpMwnE0KiWMivl8Tvppszfl0xBRtL1PBPd8515jBorJgcrj9k/RkmvCe3Y25HYPsZusF8aTg68uGpfVMuJrTk5+6aEHS8hOhL8Xru6v9uMo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com; spf=pass smtp.mailfrom=huawei-partners.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei-partners.com
-Received: from mail.maildlp.com (unknown [172.18.186.31])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4YV1xm3hCBz6L54Z;
-	Fri, 10 Jan 2025 21:01:32 +0800 (CST)
-Received: from mscpeml500004.china.huawei.com (unknown [7.188.26.250])
-	by mail.maildlp.com (Postfix) with ESMTPS id CC56C14022E;
-	Fri, 10 Jan 2025 21:02:46 +0800 (CST)
-Received: from [10.123.123.159] (10.123.123.159) by
- mscpeml500004.china.huawei.com (7.188.26.250) with Microsoft SMTP Server
+	s=arc-20240116; t=1736514851; c=relaxed/simple;
+	bh=G2AouaBb+qbSO/h+etHLaGmAPXnN0IC/6AFbDgJ8b94=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=XRI1Qiupvb554giJnjLb6M3/IzAkqH5+QbBQlX0RhP49TryM60XYXMaWRo/Z7V/xvyqprmZQwN2jhgm72gjbsbzmNYHQqNM7CcfIHOcqbQQzIZrmwm0ASBVP1sZE1I5ZlXV4QxioXBOLBF454b4ykArIP7z2Vodz+80EIl6QWDo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.44])
+	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4YV28h5lGjz2DkMS;
+	Fri, 10 Jan 2025 21:11:00 +0800 (CST)
+Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id DF7EE1402DE;
+	Fri, 10 Jan 2025 21:14:04 +0800 (CST)
+Received: from localhost.localdomain (10.90.30.45) by
+ dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.34; Fri, 10 Jan 2025 16:02:44 +0300
-Message-ID: <3cdf6001-4ad4-6edc-e436-41a1eaf773f3@huawei-partners.com>
-Date: Fri, 10 Jan 2025 16:02:42 +0300
+ 15.2.1544.11; Fri, 10 Jan 2025 21:14:04 +0800
+From: Yunsheng Lin <linyunsheng@huawei.com>
+To: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>
+CC: <zhangkun09@huawei.com>, <liuyonglong@huawei.com>,
+	<fanghaiqing@huawei.com>, Yunsheng Lin <linyunsheng@huawei.com>, Alexander
+ Lobakin <aleksander.lobakin@intel.com>, Robin Murphy <robin.murphy@arm.com>,
+	Alexander Duyck <alexander.duyck@gmail.com>, Andrew Morton
+	<akpm@linux-foundation.org>, IOMMU <iommu@lists.linux.dev>, MM
+	<linux-mm@kvack.org>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
+	<daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, John
+ Fastabend <john.fastabend@gmail.com>, Matthias Brugger
+	<matthias.bgg@gmail.com>, AngeloGioacchino Del Regno
+	<angelogioacchino.delregno@collabora.com>, <netdev@vger.kernel.org>,
+	<intel-wired-lan@lists.osuosl.org>, <bpf@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+	<linux-mediatek@lists.infradead.org>
+Subject: [PATCH net-next v7 0/8] fix two bugs related to page_pool
+Date: Fri, 10 Jan 2025 21:06:54 +0800
+Message-ID: <20250110130703.3814407-1-linyunsheng@huawei.com>
+X-Mailer: git-send-email 2.30.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v3 01/19] landlock: Support socket access-control
-Content-Language: ru
-To: =?UTF-8?Q?G=C3=BCnther_Noack?= <gnoack3000@gmail.com>
-CC: =?UTF-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>,
-	=?UTF-8?Q?G=C3=BCnther_Noack?= <gnoack@google.com>,
-	<willemdebruijn.kernel@gmail.com>, <linux-security-module@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <netfilter-devel@vger.kernel.org>,
-	<yusongping@huawei.com>, <artem.kuzin@huawei.com>,
-	<konstantin.meskhidze@huawei.com>
-References: <20240904104824.1844082-1-ivanov.mikhail1@huawei-partners.com>
- <20240904104824.1844082-2-ivanov.mikhail1@huawei-partners.com>
- <ea026af8-bc29-709c-7e04-e145d01fd825@huawei-partners.com>
- <Z0DDQKACIRRDRZRE@google.com>
- <36ac2fde-1344-9055-42e2-db849abf02e0@huawei-partners.com>
- <20241127.oophah4Ueboo@digikod.net>
- <eafd855d-2681-8dfd-a2be-9c02fc07050d@huawei-partners.com>
- <20241128.um9voo5Woo3I@digikod.net>
- <af72be74-50c7-d251-5df3-a2c63c73296a@huawei-partners.com>
- <f6b255c9-5a88-fedd-5d25-dd7d09ddc989@huawei-partners.com>
- <20250110.2893966a7649@gnoack.org>
-From: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
-In-Reply-To: <20250110.2893966a7649@gnoack.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: lhrpeml100012.china.huawei.com (7.191.174.184) To
- mscpeml500004.china.huawei.com (7.188.26.250)
+Content-Type: text/plain
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ dggpemf200006.china.huawei.com (7.185.36.61)
 
-On 1/10/2025 2:12 PM, Günther Noack wrote:
-> Happy New Year!
+This patchset fix a possible time window problem for page_pool and
+the dma API misuse problem as mentioned in [1], and try to avoid the
+overhead of the fixing using some optimization.
 
-Happy New Year! Glad to see you :)
+From the below performance data, the overhead is not so obvious
+due to performance variations for time_bench_page_pool01_fast_path()
+and time_bench_page_pool02_ptr_ring, and there is about 20ns overhead
+for time_bench_page_pool03_slow() for fixing the bug.
 
-> 
-> On Tue, Dec 24, 2024 at 07:55:01PM +0300, Mikhail Ivanov wrote:
->> The bitmask approach leads to a complete refactoring of socket rule
->> storage. This shouldn't be a big issue, since we're gonna need
->> multiplexer for insert_rule(), find_rule() with a port range feature
->> anyway [1]. But it seems that the best approach of storing rules
->> composed of bitmasks is to store them in linked list and perform
->> linear scan in landlock_find_rule(). Any other approach is likely to
->> be too heavy and complex.
->>
->> Do you think such refactoring is reasonable?
->>
->> [1] https://github.com/landlock-lsm/linux/issues/16
-> 
-> The way I understood it in your mail from Nov 28th [1], I thought that the
-> bitmasks would only exist at the UAPI layer so that users could more
-> conveniently specify multiple "types" at the same time.  In other
-> words, a rule which is now expressed as
-> 
->    {
->      .allowed_access = LANDLOCK_ACCESS_SOCKET_CREATE,
->      .family = AF_INET,
->      .types = 1 << SOCK_STREAM | 1 << SOCK_DGRAM,
->      .protocol = 0,
->    },
-> 
-> used to be expressed like this (without bitmasks):
-> 
->    {
->      .allowed_access = LANDLOCK_ACCESS_SOCKET_CREATE,
->      .family = AF_INET,
->      .type = SOCK_STREAM,
->      .protocol = 0,
->    },
->    {
->      .allowed_access = LANDLOCK_ACCESS_SOCKET_CREATE,
->      .family = AF_INET,
->      .type = SOCK_DGRAM,
->      .protocol = 0,
->    },
+Before this patchset:
+root@(none)$ insmod bench_page_pool_simple.ko
+[  323.367627] bench_page_pool_simple: Loaded
+[  323.448747] time_bench: Type:for_loop Per elem: 0 cycles(tsc) 0.769 ns (step:0) - (measurement period time:0.076997150 sec time_interval:76997150) - (invoke count:100000000 tsc_interval:7699707)
+[  324.812884] time_bench: Type:atomic_inc Per elem: 1 cycles(tsc) 13.468 ns (step:0) - (measurement period time:1.346855130 sec time_interval:1346855130) - (invoke count:100000000 tsc_interval:134685507)
+[  324.980875] time_bench: Type:lock Per elem: 1 cycles(tsc) 15.010 ns (step:0) - (measurement period time:0.150101270 sec time_interval:150101270) - (invoke count:10000000 tsc_interval:15010120)
+[  325.652195] time_bench: Type:rcu Per elem: 0 cycles(tsc) 6.542 ns (step:0) - (measurement period time:0.654213000 sec time_interval:654213000) - (invoke count:100000000 tsc_interval:65421294)
+[  325.669215] bench_page_pool_simple: time_bench_page_pool01_fast_path(): Cannot use page_pool fast-path
+[  325.974848] time_bench: Type:no-softirq-page_pool01 Per elem: 2 cycles(tsc) 29.633 ns (step:0) - (measurement period time:0.296338200 sec time_interval:296338200) - (invoke count:10000000 tsc_interval:29633814)
+[  325.993517] bench_page_pool_simple: time_bench_page_pool02_ptr_ring(): Cannot use page_pool fast-path
+[  326.576636] time_bench: Type:no-softirq-page_pool02 Per elem: 5 cycles(tsc) 57.391 ns (step:0) - (measurement period time:0.573911820 sec time_interval:573911820) - (invoke count:10000000 tsc_interval:57391174)
+[  326.595307] bench_page_pool_simple: time_bench_page_pool03_slow(): Cannot use page_pool fast-path
+[  328.422661] time_bench: Type:no-softirq-page_pool03 Per elem: 18 cycles(tsc) 181.849 ns (step:0) - (measurement period time:1.818495880 sec time_interval:1818495880) - (invoke count:10000000 tsc_interval:181849581)
+[  328.441681] bench_page_pool_simple: pp_tasklet_handler(): in_serving_softirq fast-path
+[  328.449584] bench_page_pool_simple: time_bench_page_pool01_fast_path(): in_serving_softirq fast-path
+[  328.755031] time_bench: Type:tasklet_page_pool01_fast_path Per elem: 2 cycles(tsc) 29.632 ns (step:0) - (measurement period time:0.296327910 sec time_interval:296327910) - (invoke count:10000000 tsc_interval:29632785)
+[  328.774308] bench_page_pool_simple: time_bench_page_pool02_ptr_ring(): in_serving_softirq fast-path
+[  329.578579] time_bench: Type:tasklet_page_pool02_ptr_ring Per elem: 7 cycles(tsc) 79.523 ns (step:0) - (measurement period time:0.795236560 sec time_interval:795236560) - (invoke count:10000000 tsc_interval:79523650)
+[  329.597769] bench_page_pool_simple: time_bench_page_pool03_slow(): in_serving_softirq fast-path
+[  331.507501] time_bench: Type:tasklet_page_pool03_slow Per elem: 19 cycles(tsc) 190.104 ns (step:0) - (measurement period time:1.901047510 sec time_interval:1901047510) - (invoke count:10000000 tsc_interval:190104743)
 
-Correct, but we also agreed to use bitmasks for "family" field as well:
+After this patchset:
+root@(none)$ insmod bench_page_pool_simple.ko
+[  138.634758] bench_page_pool_simple: Loaded
+[  138.715879] time_bench: Type:for_loop Per elem: 0 cycles(tsc) 0.769 ns (step:0) - (measurement period time:0.076972720 sec time_interval:76972720) - (invoke count:100000000 tsc_interval:7697265)
+[  140.079897] time_bench: Type:atomic_inc Per elem: 1 cycles(tsc) 13.467 ns (step:0) - (measurement period time:1.346735370 sec time_interval:1346735370) - (invoke count:100000000 tsc_interval:134673531)
+[  140.247841] time_bench: Type:lock Per elem: 1 cycles(tsc) 15.005 ns (step:0) - (measurement period time:0.150055080 sec time_interval:150055080) - (invoke count:10000000 tsc_interval:15005497)
+[  140.919072] time_bench: Type:rcu Per elem: 0 cycles(tsc) 6.541 ns (step:0) - (measurement period time:0.654125000 sec time_interval:654125000) - (invoke count:100000000 tsc_interval:65412493)
+[  140.936091] bench_page_pool_simple: time_bench_page_pool01_fast_path(): Cannot use page_pool fast-path
+[  141.246985] time_bench: Type:no-softirq-page_pool01 Per elem: 3 cycles(tsc) 30.159 ns (step:0) - (measurement period time:0.301598160 sec time_interval:301598160) - (invoke count:10000000 tsc_interval:30159812)
+[  141.265654] bench_page_pool_simple: time_bench_page_pool02_ptr_ring(): Cannot use page_pool fast-path
+[  141.976265] time_bench: Type:no-softirq-page_pool02 Per elem: 7 cycles(tsc) 70.140 ns (step:0) - (measurement period time:0.701405780 sec time_interval:701405780) - (invoke count:10000000 tsc_interval:70140573)
+[  141.994933] bench_page_pool_simple: time_bench_page_pool03_slow(): Cannot use page_pool fast-path
+[  144.018945] time_bench: Type:no-softirq-page_pool03 Per elem: 20 cycles(tsc) 201.514 ns (step:0) - (measurement period time:2.015141210 sec time_interval:2015141210) - (invoke count:10000000 tsc_interval:201514113)
+[  144.037966] bench_page_pool_simple: pp_tasklet_handler(): in_serving_softirq fast-path
+[  144.045870] bench_page_pool_simple: time_bench_page_pool01_fast_path(): in_serving_softirq fast-path
+[  144.205045] time_bench: Type:tasklet_page_pool01_fast_path Per elem: 1 cycles(tsc) 15.005 ns (step:0) - (measurement period time:0.150056510 sec time_interval:150056510) - (invoke count:10000000 tsc_interval:15005645)
+[  144.224320] bench_page_pool_simple: time_bench_page_pool02_ptr_ring(): in_serving_softirq fast-path
+[  144.916044] time_bench: Type:tasklet_page_pool02_ptr_ring Per elem: 6 cycles(tsc) 68.269 ns (step:0) - (measurement period time:0.682693070 sec time_interval:682693070) - (invoke count:10000000 tsc_interval:68269300)
+[  144.935234] bench_page_pool_simple: time_bench_page_pool03_slow(): in_serving_softirq fast-path
+[  146.997684] time_bench: Type:tasklet_page_pool03_slow Per elem: 20 cycles(tsc) 205.376 ns (step:0) - (measurement period time:2.053766310 sec time_interval:2053766310) - (invoke count:10000000 tsc_interval:205376624)
 
-https://lore.kernel.org/all/af72be74-50c7-d251-5df3-a2c63c73296a@huawei-partners.com/
+1. https://lore.kernel.org/lkml/8067f204-1380-4d37-8ffd-007fc6f26738@kernel.org/T/
 
-> 
-> I do not understand why this convenience feature in the UAPI layer
-> requires a change to the data structures that Landlock uses
-> internally?  As far as I can tell, struct landlock_socket_attr is only
-> used in syscalls.c and converted to other data structures already.  I
-> would have imagined that we'd "unroll" the specified bitmasks into the
-> possible combinations in the add_rule_socket() function and then call
-> landlock_append_socket_rule() multiple times with each of these?
+CC: Alexander Lobakin <aleksander.lobakin@intel.com>
+CC: Robin Murphy <robin.murphy@arm.com>
+CC: Alexander Duyck <alexander.duyck@gmail.com>
+CC: Andrew Morton <akpm@linux-foundation.org>
+CC: IOMMU <iommu@lists.linux.dev>
+CC: MM <linux-mm@kvack.org>
 
-I thought about unrolling bitmask into multiple entries in rbtree, and
-came up with following possible issue:
+Change log:
+V7:
+  1. Fix a used-after-free bug reported by KASAN as mentioned by Jakub.
+  2. Fix the 'netmem' variable not setting up correctly bug as mentioned
+     by Simon.
 
-Imagine that a user creates a rule that allows to create sockets of all
-possible families and types (with protocol=0 for example):
-{
-	.allowed_access = LANDLOCK_ACCESS_SOCKET_CREATE,
-	.families = INT64_MAX, /* 64 set bits */
-	.types = INT16_MAX, /* 16 set bits */
-	.protocol = 0,
-},
+V6:
+  1. Repost based on latest net-next.
+  2. Rename page_pool_to_pp() to page_pool_get_pp().
 
-This will add 64 x 16 = 1024 entries to the rbtree. Currently, the
-struct landlock_rule, which is used to store rules, weighs 40B. So, it
-will be 40kB by a single rule. Even if we allow rules with only
-"existing" families and types, it will be 46 x 7 = 322 entries and ~12kB
-by a single rule.
+V5:
+  1. Support unlimit inflight pages.
+  2. Add some optimization to avoid the overhead of fixing bug.
 
-I understand that this may be degenerate case and most common rule will
-result in less then 8 (or 4) entries in rbtree, but I think API should
-be as intuitive as possible. User can expect to see the same
-memory usage regardless of the content of the rule.
+V4:
+  1. use scanning to do the unmapping
+  2. spilt dma sync skipping into separate patch
 
-I'm not really sure if this case is really an issue, so I'd be glad
-to hear your opinion on it.
+V3:
+  1. Target net-next tree instead of net tree.
+  2. Narrow the rcu lock as the discussion in v2.
+  3. Check the ummapping cnt against the inflight cnt.
 
-I also initially thought that it would be difficult to handle errors
-when adding rule. But it seems that it's not gonna be an issue with
-correctly implemented removal (this will result in additional method in
-ruleset.c and small wrapper over rule structure that would not affect
-ruleset domain implementation).
+V2:
+  1. Add a item_full stat.
+  2. Use container_of() for page_pool_to_pp().
 
-> 
-> 
-> That being said, I am not a big fan of red-black trees for such simple
-> integer lookups either, and I also think there should be something
-> better if we make more use of the properties of the input ranges. The
-> question is though whether you want to couple that to this socket type
-> patch set, or rather do it in a follow up?  (So far we have been doing
-> fine with the red black trees, and we are already contemplating the
-> possibility of changing these internal structures in [2].  We have
-> also used RB trees for the "port" rules with a similar reasoning,
-> IIRC.)
+Yunsheng Lin (8):
+  page_pool: introduce page_pool_get_pp() API
+  page_pool: fix timing for checking and disabling napi_local
+  page_pool: fix IOMMU crash when driver has already unbound
+  page_pool: support unlimited number of inflight pages
+  page_pool: skip dma sync operation for inflight pages
+  page_pool: use list instead of ptr_ring for ring cache
+  page_pool: batch refilling pages to reduce atomic operation
+  page_pool: use list instead of array for alloc cache
 
-I think it'll be better to have a separate series for [2] if the socket
-restriction can be implemented without rbtree refactoring.
+ drivers/net/ethernet/freescale/fec_main.c     |   8 +-
+ .../ethernet/google/gve/gve_buffer_mgmt_dqo.c |   2 +-
+ drivers/net/ethernet/intel/iavf/iavf_txrx.c   |   6 +-
+ drivers/net/ethernet/intel/idpf/idpf_txrx.c   |  14 +-
+ drivers/net/ethernet/intel/libeth/rx.c        |   2 +-
+ .../net/ethernet/mellanox/mlx5/core/en/xdp.c  |   3 +-
+ drivers/net/netdevsim/netdev.c                |   6 +-
+ drivers/net/wireless/mediatek/mt76/mt76.h     |   2 +-
+ include/linux/mm_types.h                      |   2 +-
+ include/linux/skbuff.h                        |   1 +
+ include/net/libeth/rx.h                       |   3 +-
+ include/net/netmem.h                          |  24 +-
+ include/net/page_pool/helpers.h               |  11 +
+ include/net/page_pool/types.h                 |  64 +-
+ net/core/devmem.c                             |   4 +-
+ net/core/netmem_priv.h                        |   5 +-
+ net/core/page_pool.c                          | 664 ++++++++++++++----
+ net/core/page_pool_priv.h                     |  12 +-
+ 18 files changed, 675 insertions(+), 158 deletions(-)
 
-> 
-> Regarding the port range feature, I am also not sure whether the data
-> structure for that would even be similar?  Looking for a containment
-> in a set of integer ranges is a different task than looking for an
-> exact match in a non-contiguous set of integers.
-It seems like it would be better to have a different structure for
-non-ranged lookups if it results in less memory and lookup duration.
-First, we need to check possible candidates for both cases.
+-- 
+2.33.0
 
-> 
-> In any case, I feel that for now, an exact look up in the RB tree
-> would work fine as a generic solution (especially considering that the
-> set of added rules is probably usually small).  IMHO, finding a more
-> appropriate data structure might be a can of worms that could further
-> delay the patch set and which might better be discussed separately.
-> 
-> WDYT?
-
-I agree if you think that worst case presented above is not a big issue.
-
-> 
-> –Günther
-> 
-> [1] https://lore.kernel.org/all/eafd855d-2681-8dfd-a2be-9c02fc07050d@huawei-partners.com/
-> [2] https://github.com/landlock-lsm/linux/issues/1
 
