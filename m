@@ -1,141 +1,117 @@
-Return-Path: <netdev+bounces-157210-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157211-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8D59A096BE
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 17:07:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B2288A096D6
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 17:11:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B55D7188E63A
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 16:07:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DF895188E886
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 16:11:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 815C7212B29;
-	Fri, 10 Jan 2025 16:07:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 289AB212B29;
+	Fri, 10 Jan 2025 16:11:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I+9hpbaI"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jBwpNDOO"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B7E620551F;
-	Fri, 10 Jan 2025 16:07:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 742D6212B3F
+	for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 16:11:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736525235; cv=none; b=b5TlWG7Vq9p4m69/lUoKsS8forc5tYXi2xETrdxyu0nH+Ss4BKSQhz5HvKO7JPnrH4W4Dzifyx2XCSkEvUIzglOg3QXqtyIye3tLDEGm+DkJpMlK28GTEUQ/6dmTRWdI7M2OGLKhayeGayfiVqoF93sLi5WLKbDgguzXsZiffLs=
+	t=1736525494; cv=none; b=ZNqawxEZWCmF8omsGPk37WcJdyLbHaOInN9sThLdWA68pgPk0IEDKfs6aNokQiVbv1s5JI17ixFYvtOi1zAMUSEtTFBaVsddV5IRnZBOpqmCwg656GqsxHb1ykCsUzSw/ArT11jOFPKdayLSlkd94otzFmnQ60JLxUEYFD/mPxA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736525235; c=relaxed/simple;
-	bh=8ic0fmAFCingqmiYWExc1+9H7U4At02apc1uatdqHJI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RZb4tKdBOg832IsuGT5aTN4kueppmfpq73M7AaPLIGKzLHbKZCiUv5jVQHuVgSn/pxPXbTNyZ0/xYk/x5fgJCgDmT3zC7YgegxXM4HM7ub3TMu0Od+abI893WJ+UgR117A1JVskigfpOytoF//WjnucyuQGFD9xBjOl6YLGOtFY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I+9hpbaI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BA7E1C4CED6;
-	Fri, 10 Jan 2025 16:07:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736525234;
-	bh=8ic0fmAFCingqmiYWExc1+9H7U4At02apc1uatdqHJI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=I+9hpbaIVj0FizWLBTAWdFSqcU/ByW3qkTkX6aDezSm2lBVzZd/sn0qs/9PXrA8Q4
-	 idGoskoWOfDiMrR28hTdGd4EP4GR7tky/OOW0c2RmkLyfK0p4nEdSPYzJw5pUm7Jgs
-	 6+BxOrKW86Yu76GQ+CkNNz9YIaoq7HDmT+0mT/1jrhlUPtZuImUsGli2KVgZDX6GrI
-	 waLjYb0D5kB4O9yeG7i5fZOaHxy5BakYKOaVVr/ibq+qLFIMYwfLPVXfZ9OLLvWq0J
-	 TjlUtV5r97UcbuTVykcU/CeIZKNX9FaGjzHpFrcxhWuLoBzIvHEoYuB7nKsmUZ+wr1
-	 H3pRIN9+Xdmzw==
-Date: Fri, 10 Jan 2025 10:07:13 -0600
-From: Rob Herring <robh@kernel.org>
-To: Ninad Palsule <ninad@linux.ibm.com>
-Cc: minyard@acm.org, krzk+dt@kernel.org, conor+dt@kernel.org,
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, ratbert@faraday-tech.com,
-	openipmi-developer@lists.sourceforge.net, netdev@vger.kernel.org,
-	joel@jms.id.au, andrew@codeconstruct.com.au,
-	devicetree@vger.kernel.org, eajames@linux.ibm.com,
-	linux-arm-kernel@lists.infradead.org, linux-aspeed@lists.ozlabs.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 02/10] bindings: ipmi: Add binding for IPMB device intf
-Message-ID: <20250110160713.GA2952341-robh@kernel.org>
-References: <20250108163640.1374680-1-ninad@linux.ibm.com>
- <20250108163640.1374680-3-ninad@linux.ibm.com>
+	s=arc-20240116; t=1736525494; c=relaxed/simple;
+	bh=5Tgw4awLEmI8N06VmYOIKW/yfAEXB+azJPSoJizFyGw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=uMXYcVQe77LfmcveKrZv/y3yGxhKO1tyggDwQoTtmwdvs/ZUJUaInLOn7Iuj/9w+QBWYrvotnyyZErZS8Blo07Qjfcjvwu+IzwFoZ2cZ7+5CtKdft7Pe8FWoOO5QUPvL7psSL8pxspkNRv0HhJ9rNI3mHVjdV2vqcaqWM5kvI7c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jBwpNDOO; arc=none smtp.client-ip=209.85.160.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-467abce2ef9so265661cf.0
+        for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 08:11:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1736525491; x=1737130291; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kehS/2IeaZHCWvshQCM5tz9TcHb+c8qXioeyt/w3Csg=;
+        b=jBwpNDOOw8sk8OXgJycDby/VeCzbR/lKi/NMIM7+ZeTeitFhzAVrq6RcVeZu/1cgO8
+         Ljuyhhqdft3DVNvrNPJDCsxnauADobh35nEoNuqpdoGHpijGwDikH7KSj0KU0mwiWhK5
+         T03mQodWX6WyanjzlaU1yp77dsRySrceOJ95yYRqILiRtob76p8ZDPWVUgzv84ttnSaO
+         DZW3aHkfcQ769jUIejBUMH6rAF5SgIPw7TyRt0XFDUSw4qPHMIbcU0z1KtDhtwRVjeAz
+         dX3763AYyW/vSz7vmbYQWqbJs8xl27prp3ZzRPRfNxcSQQWDHzhnv3X24gErl2RIMog/
+         u8Iw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736525491; x=1737130291;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=kehS/2IeaZHCWvshQCM5tz9TcHb+c8qXioeyt/w3Csg=;
+        b=nLd4AkA44VKe1U5vc2NnYTm7V2eDJ9zqF4JWPpPpAmYdZwHxY4Bw7/B2fvPuVsCh3D
+         YQAAvrEwevjvQBJzpi8xEfmRcy4JljC5qujCwB6tZkhG0U0fZCvKCPem7nIqD9XWXJTk
+         SqlwFou17smCklSPJaJdnJDQKkGwJte8MQ6L4toLSg8kFWZW8wP+GUQ1v5hi2+xGN9UU
+         JzfsD2P+9+RN1cJLn+SW+l/PF14qGBZeysslCWz7f5PHx0ze/ZDJNz/ex3bCiX1Dq6qS
+         ZWlxRpSFk7xTmR9shocTWmCx/3PLUAGQ0OGgwA/vxd0fpuy0PuG1AvqfKnkYOh+kZ+vv
+         0tbw==
+X-Forwarded-Encrypted: i=1; AJvYcCVynhJ7366fqd9X+48XCrrTvmFCY2Qqp9r0+fN4cGcz3eeFC5AtLELzkiydOE8pT5IXm5PRGYw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz7vTwHCF4F4UdeCCVw8IiShiW57QOBdtNNy6J0kIJmjgyuOsT0
+	rpgAMs/P6cfjjI+0/Nc1swj8D6eBf5KiAYaH+Xbtoh+nevwaJ1BQSqX3LwqhhPwqtJi65EeU4ab
+	nPrK3tBPbOSW1XZKZpTkeWqM++dLi8rpRCMbn
+X-Gm-Gg: ASbGncvwNHbVP9xbN3magxBqYsQIBFx6zd9I3doPCi+0rdFWa78AyrBP5hdAg+EDsti
+	FWRVxxDwUhg7K8ePNTP2dgDZn2n4/c2aybwO8q/1qZyeujMdlL/23VyYjmWWy36GfVVXpbA==
+X-Google-Smtp-Source: AGHT+IGIuO0dExIm5n9EifiPcxMxn+ISKza0NXj8z+BHCIUGpx2U5zliEOTSHGQCKxIkYuFQ5xb2RwRt2AkCSMJ9nGo=
+X-Received: by 2002:a05:622a:108:b0:466:8887:6751 with SMTP id
+ d75a77b69052e-46c89deac26mr2990221cf.23.1736525490994; Fri, 10 Jan 2025
+ 08:11:30 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250108163640.1374680-3-ninad@linux.ibm.com>
+References: <20250110143315.571872-1-edumazet@google.com> <20250110143315.571872-2-edumazet@google.com>
+In-Reply-To: <20250110143315.571872-2-edumazet@google.com>
+From: Neal Cardwell <ncardwell@google.com>
+Date: Fri, 10 Jan 2025 11:11:14 -0500
+X-Gm-Features: AbW1kvZ0WGyMjq4Cc9Dk_qTdLUWNJ_pyyYKEnupHHbWS1v8O-gxVk3gd2dHVNKc
+Message-ID: <CADVnQynrCQzzibTSyoo1uz7eWiTuj7m+cLwL1LSfNp7PZtm+qQ@mail.gmail.com>
+Subject: Re: [PATCH net-next 1/2] tcp: add drop_reason support to tcp_disordered_ack()
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, Simon Horman <horms@kernel.org>, 
+	Kuniyuki Iwashima <kuniyu@amazon.com>, eric.dumazet@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jan 08, 2025 at 10:36:30AM -0600, Ninad Palsule wrote:
-> Add device tree binding document for the IPMB device interface.
-> This device is already in use in both driver and .dts files.
-> 
-> Signed-off-by: Ninad Palsule <ninad@linux.ibm.com>
+On Fri, Jan 10, 2025 at 9:33=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
+wrote:
+>
+> Following patch is adding a new drop_reason to tcp_validate_incoming().
+>
+> Change tcp_disordered_ack() to not return a boolean anymore,
+> but a drop reason.
+>
+> Change its name to tcp_disordered_ack_check()
+>
+> Refactor tcp_validate_incoming() to ease the code
+> review of the following patch, and reduce indentation
+> level.
+>
+> This patch is a refactor, with no functional change.
+>
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
 > ---
->  .../devicetree/bindings/ipmi/ipmb-dev.yaml    | 44 +++++++++++++++++++
->  1 file changed, 44 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/ipmi/ipmb-dev.yaml
-> 
-> diff --git a/Documentation/devicetree/bindings/ipmi/ipmb-dev.yaml b/Documentation/devicetree/bindings/ipmi/ipmb-dev.yaml
-> new file mode 100644
-> index 000000000000..a8f46f1b883e
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/ipmi/ipmb-dev.yaml
-> @@ -0,0 +1,44 @@
-> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-> +%YAML 1.2
-> +---
-> +$id: http://devicetree.org/schemas/ipmi/ipmb-dev.yaml#
-> +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> +
-> +title: IPMB Device
-> +
-> +description: IPMB Device interface to receive request and send response
+>  net/ipv4/tcp_input.c | 79 ++++++++++++++++++++++++--------------------
+>  1 file changed, 44 insertions(+), 35 deletions(-)
+>
 
-IPMB is not defined anywhere.
+Looks great to me. Thanks, Eric!
 
-Which side of the interface does this apply to? How do I know if I have 
-an ipmb-dev?
+Reviewed-by: Neal Cardwell <ncardwell@google.com>
 
-This document needs to stand on its own. Bindings exist in a standalone 
-tree without kernel drivers or docs.
-
-> +
-> +maintainers:
-> +  - Ninad Palsule <ninad@linux.ibm.com>
-> +
-> +properties:
-> +  compatible:
-> +    enum:
-> +      - ipmb-dev
-> +
-> +  reg:
-> +    maxItems: 1
-> +
-> +  i2c-protocol:
-> +    description:
-> +      Use I2C block transfer instead of SMBUS block transfer.
-> +    type: boolean
-> +
-> +required:
-> +  - compatible
-> +  - reg
-> +
-> +additionalProperties: false
-> +
-> +examples:
-> +  - |
-> +    i2c {
-> +        #address-cells = <1>;
-> +        #size-cells = <0>;
-> +
-> +        ipmb-dev@10 {
-> +            compatible = "ipmb-dev";
-> +            reg = <0x10>;
-> +            i2c-protocol;
-> +        };
-> +    };
-> -- 
-> 2.43.0
-> 
+neal
 
