@@ -1,118 +1,111 @@
-Return-Path: <netdev+bounces-156901-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156902-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1BAB1A08421
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 01:44:48 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0798AA08424
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 01:45:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D7635188AF44
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 00:44:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 66206169177
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 00:45:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5DB9199B8;
-	Fri, 10 Jan 2025 00:44:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1A4B38382;
+	Fri, 10 Jan 2025 00:45:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="Fj4BJLv8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hEg7N+L9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 829E81B59A;
-	Fri, 10 Jan 2025 00:44:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B84B31F5FA
+	for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 00:45:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736469882; cv=none; b=rh0IACun7d+tCMTZgsSuyg3moJN0kUmabgr+eGBpSrQgNJKEmK449V/biIsJPtnWHpqqITChwuu8Xc/Vx+5BLJ3dM3pKUmmBrfXv69/2a6jcUvhSdebN1lqqPXqZeIOT5a+PWG5Tmsm/bSlz9KN74uu/dauu4aMv/2pmnWNhPXA=
+	t=1736469907; cv=none; b=FIolUEG8CU+o/LqUXQ65EvatNB5ifVEKYGhc6bcZ6GnoIk8hJHt5emPT35k1mJ9WNU0EclBkPBBqeQdogx+uRiAqrhtlNm6bD2QyYx/JujpWnOl+7DZDCVAz2AGeucLVbc1r4RB3m0WtWV9GhF/KvrwJAwQ7HxZYmqzJGokvPmo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736469882; c=relaxed/simple;
-	bh=v6Ic596ASoGWZRgTRpJL4GCcfWOYMrauwnPGKbcanLY=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=c1hTSqxreaY/G5k0cZB61j6CGKrcV75Yjkl2VAGDEVATdCamSluXROPEEbQ4TVB7+6m6SGLU33ARjxX8s7LLmGils/y2K3AqLvkR7WMLYz5nS9/HHJhyoDXPl9BFRI6tTBoMy2N7opnAUzDf2LD6sDUV7FEwivKEUS1/21tN9kw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=Fj4BJLv8; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=201702; t=1736469871;
-	bh=VAIM6A4Bqpxvsetr2R4A9iIq4Cp5mfGutMn471zS1eM=;
-	h=Date:From:To:Cc:Subject:From;
-	b=Fj4BJLv89f/HscMD4RZSMQqIjCaioy68F8qqv5bTiECSFvkEGsgs6EWZ7hQBLQUN6
-	 Gc9rrd0Drwhq2p5VM4sTUQz71lDFsjTBSGX/Pb0gydyGY7iUgQyi+gFYsOp9fBK8SM
-	 A2yTSmBYho7iuFQ+/xLRLqFsisiBlgmKeyufOAEhgOFUSaLy4bgAP4DXWB0sIoar//
-	 5pURQzJxvOSkBhnEdWEZQQZaFdgd3OMYd9kmzlfZHgttlXPdWKOl9+6+UiyhwVmrZL
-	 IMXS5PKK8RlOtkDfSdFKWrrZsyoS4yU53Qs2mUsXGEW+CtxRUkbleIxV2pUJLHsAUV
-	 ZNr3mqgttvdbg==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4YTjbM5nBmz4wcZ;
-	Fri, 10 Jan 2025 11:44:31 +1100 (AEDT)
-Date: Fri, 10 Jan 2025 11:44:37 +1100
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg
- <johan.hedberg@gmail.com>, David Miller <davem@davemloft.net>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Networking <netdev@vger.kernel.org>, Linux Kernel Mailing List
- <linux-kernel@vger.kernel.org>, Linux Next Mailing List
- <linux-next@vger.kernel.org>
-Subject: linux-next: duplicate patches in the bluetooth tree
-Message-ID: <20250110114437.6cab3acc@canb.auug.org.au>
+	s=arc-20240116; t=1736469907; c=relaxed/simple;
+	bh=UYZHKEanUHLMCHTg1uDK5GieDZgOWRfAtRZmt98BJuc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Ey8e23G9aRh0bdrbiX17jPVmhUv1L6S8IaFue9oJUVDXU1BnCWIo9zjnnaS2aZiXvOZnCrmx87NgtHAYIVWCSafwqz6582oiW/iJNmsbfJ2U71CJSmxMHp7gC42rmEaTpKG4Nv4ZjRPoBeaSZW646m0Lt1kec76Se30anPFo4eY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hEg7N+L9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C3807C4CED2;
+	Fri, 10 Jan 2025 00:45:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1736469907;
+	bh=UYZHKEanUHLMCHTg1uDK5GieDZgOWRfAtRZmt98BJuc=;
+	h=From:To:Cc:Subject:Date:From;
+	b=hEg7N+L9kC3xPnmnprPbpsLkmv6ESOrvih22h3yKeR14FMPpK8gkYmcYNDUIxy/Z+
+	 dPL6fLlXv6pf9c6v4a8VtByXYb5HJkUJD59QkGio8S7tCU/Rf5EL6ypnRjSEMVnVfL
+	 NZ5huED3Z4fQ4W5OZrcjq+5SioojsDnoDM17wEd7Y4qA86QoTgvLpI/wNRMj6rPBpj
+	 390eRbgDkSmc+5NAZUtUhocxH/aoqRj7mrpTY6tjXZA2fihbzWJntG49Gb/AS9stVC
+	 ZQt+kCBbFgRpObPhpZXkI83nA9MuApphcRxQZ09BPday05a2P6hgQyPIFum0KfoPQl
+	 YHFoPUpKAYhPw==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	horms@kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	jdamato@fastly.com,
+	almasrymina@google.com
+Subject: [PATCH net-next] net: warn during dump if NAPI list is not sorted
+Date: Thu,  9 Jan 2025 16:45:04 -0800
+Message-ID: <20250110004505.3210140-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/UXCr4qYjcnwH2e4fOxldImY";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+Content-Transfer-Encoding: 8bit
 
---Sig_/UXCr4qYjcnwH2e4fOxldImY
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Dump continuation depends on the NAPI list being sorted.
+Broken netlink dump continuation may be rare and hard to debug
+so add a warning if we notice the potential problem while walking
+the list.
 
-Hi all,
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+This is really a follow up to commit d6c7b03497ee ("net: make sure
+we retain NAPI ordering on netdev->napi_list") but I had to wait
+for some fixes to make it to net-next.
 
-The following commits are also in the net tree as different commits
-(but the same patches):
+CC: jdamato@fastly.com
+CC: almasrymina@google.com
+---
+ net/core/netdev-genl.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-  0eb19b741e48 ("Bluetooth: btmtk: Fix failed to send func ctrl for MediaTe=
-k devices.")
-  fb966c19be55 ("Bluetooth: btnxpuart: Fix driver sending truncated data")
-  fcd17fe2deb9 ("Bluetooth: MGMT: Fix Add Device to responding before compl=
-eting")
-  e8e5b0502559 ("Bluetooth: hci_sync: Fix not setting Random Address when r=
-equired")
+diff --git a/net/core/netdev-genl.c b/net/core/netdev-genl.c
+index a3bdaf075b6b..c59619a2ec23 100644
+--- a/net/core/netdev-genl.c
++++ b/net/core/netdev-genl.c
+@@ -263,14 +263,21 @@ netdev_nl_napi_dump_one(struct net_device *netdev, struct sk_buff *rsp,
+ 			struct netdev_nl_dump_ctx *ctx)
+ {
+ 	struct napi_struct *napi;
++	unsigned int prev_id;
+ 	int err = 0;
+ 
+ 	if (!(netdev->flags & IFF_UP))
+ 		return err;
+ 
++	prev_id = UINT_MAX;
+ 	list_for_each_entry(napi, &netdev->napi_list, dev_list) {
+ 		if (napi->napi_id < MIN_NAPI_ID)
+ 			continue;
++
++		/* Dump continuation below depends on the list being sorted */
++		WARN_ON_ONCE(napi->napi_id >= prev_id);
++		prev_id = napi->napi_id;
++
+ 		if (ctx->napi_id && napi->napi_id >= ctx->napi_id)
+ 			continue;
+ 
+-- 
+2.47.1
 
-These are commits
-
-  67dba2c28fe0 ("Bluetooth: btmtk: Fix failed to send func ctrl for MediaTe=
-k devices.")
-  8023dd220425 ("Bluetooth: btnxpuart: Fix driver sending truncated data")
-  a182d9c84f9c ("Bluetooth: MGMT: Fix Add Device to responding before compl=
-eting")
-  c2994b008492 ("Bluetooth: hci_sync: Fix not setting Random Address when r=
-equired")
-
-in the net tree.
-
---=20
-Cheers,
-Stephen Rothwell
-
---Sig_/UXCr4qYjcnwH2e4fOxldImY
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmeAbXUACgkQAVBC80lX
-0GxjTAf9HwnRO131p5ZEwdsWaWm8lkf/ynv/SoC3lbza9NYAC09OoApRfkrU/n+z
-9pdAiTHmK0q+HxXWxdF5jL7YmmxAvSuexoxL3kD0Cl8skPpqc61X3nStO6X13q/N
-JOEkfRJwdi6Hq3WHP1xyNmMxPB3dj3YL3hhgZPF5EFFVr5ie0BTN8tSFx2Og4yLi
-QNH5BvSzUHCEaiYlPMUebnvtkChrB+sCJl4zscxVHPcfHbWHAdQlitketE5szkWG
-RxLjvIRwyrCdkbSdANfO5svzOECfH/58p3Zw1b1RIbWuH7Ji6vJws2/lV9TsRTL3
-bvQ6aGOuHtuOtHw6eLk3+hSGeIVVXQ==
-=S9Nf
------END PGP SIGNATURE-----
-
---Sig_/UXCr4qYjcnwH2e4fOxldImY--
 
