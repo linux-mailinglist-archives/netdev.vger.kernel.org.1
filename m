@@ -1,154 +1,189 @@
-Return-Path: <netdev+bounces-156951-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156952-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A478A085F2
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 04:28:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B01AA08612
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 04:54:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 308721882301
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 03:28:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D6044188B979
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 03:55:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEA79204C29;
-	Fri, 10 Jan 2025 03:27:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B1D2193084;
+	Fri, 10 Jan 2025 03:54:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PC20kvAB"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="CABDiKYI"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AE671C75E2
-	for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 03:27:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03F94B661
+	for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 03:54:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736479673; cv=none; b=tUoXjp4SxxYzu5Mo6MgKdJWb9VXAgwSMfhdZqB2tTZx1B/FUWoB2fu4JY7qdOe91nYFFoUIXS3dkN3lMyqVGwBGqM0SRDtUaxhdsqLj1umBSNrrItP5Hud/VHEOqfC/cfTdCViEan8NOieDzjA66BlcalXTOnFrCIMmjj2q8Dbs=
+	t=1736481294; cv=none; b=bQNuYb2K8byB48i7vAmm8GbzzSjuzUN+WBQkKT4BmXA1+/6kNVesmyY66Y3bPEVumjAGJV1Xi1nAkhbBSnAsyfdSHp0E+NcVeE31R3uguKCgjvFsAmRnUvzD5qplIgNHUapbBhhCbY/BOPcMq0Wghc1VG4rpZ/Oi3QnsLzECOY4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736479673; c=relaxed/simple;
-	bh=bvWTIT+RRjRSbxQiao2G4A++ngFStBHKJpnvXhynHk0=;
+	s=arc-20240116; t=1736481294; c=relaxed/simple;
+	bh=Gan6BPP7MK8IqxxGzVr+2bZWHD9tE2wSemaIwm2vt8o=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Dsdb9rGZSRAC8rKeej2h/EBDdDnIUaIYabDZTYJ8HyDyVfZ9nj5Nje+IxoS7P7/0HbMSg1MU0B+tpMyEx3AdM86q+GCSAbrd/7pRNVDeaL5vxRVDElVPy/j9AZXvBBfyxmT9ROj3SYWtDUbVLBXbGv5nhJUmcQnKP3lHg+7rcNU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PC20kvAB; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1736479671;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=iajL1yDgIUIr5hibojx7mafI5SxR1wepNTMSNzOVtuU=;
-	b=PC20kvABsfvfy6Z/+muDX++E9b5N9/eSCbhahHRjoP9miPSAKLG4GFtkR57RMk43jNfWWT
-	GmYvdo51Hj7YPd/Ya5SvNMrNJlnohyESVcOzL9rgibiLZMReJKqoiz5R0wA83FQyxciYE3
-	MUF+0TDS2mgByOh8EW/5A45JP/fkpCg=
-Received: from mail-pj1-f70.google.com (mail-pj1-f70.google.com
- [209.85.216.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-501-E0KLIRd6OeuR0BVajILmIg-1; Thu, 09 Jan 2025 22:27:49 -0500
-X-MC-Unique: E0KLIRd6OeuR0BVajILmIg-1
-X-Mimecast-MFC-AGG-ID: E0KLIRd6OeuR0BVajILmIg
-Received: by mail-pj1-f70.google.com with SMTP id 98e67ed59e1d1-2f2a9f056a8so3002242a91.2
-        for <netdev@vger.kernel.org>; Thu, 09 Jan 2025 19:27:49 -0800 (PST)
+	 To:Cc:Content-Type; b=SiwzpW1Z2meRE5F+PJlJP0MRk/W1hNwHQF8Wq5PlyYt4+WCxmq7qG5+t7kpaXC6Raq9shlZJ6hc9coeVZPgJCtWUi2+kGgfxONILtKKMTsQ8/xDmJZNWp1v6J6fVl1tFMJeyShOa29dzNSTI9H3CV917hQEtjs8C/ElDXOhRpSA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=CABDiKYI; arc=none smtp.client-ip=209.85.216.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-2ee397a82f6so2844789a91.2
+        for <netdev@vger.kernel.org>; Thu, 09 Jan 2025 19:54:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1736481292; x=1737086092; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=Gan6BPP7MK8IqxxGzVr+2bZWHD9tE2wSemaIwm2vt8o=;
+        b=CABDiKYI4Mgo8WK/CedR8N17p83R1IemSJY/Aw0f4KuHJvtq4/cG4YLGBsg4hWTOT8
+         vjm3viKZ3zZcyrrnADapG3ggUsm3zoP9pFnR0c8kqNEPv9lOv1jdB0fVLF+59yGOtiFC
+         AotATCpEp0/ViJ66yramBnvJn+JWYCFdoa5xI=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736479668; x=1737084468;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=iajL1yDgIUIr5hibojx7mafI5SxR1wepNTMSNzOVtuU=;
-        b=gEenwZ46UkhkwooZSHaESDwiSxGIGjJeKiRZS6BxEnygWQyMkANJowGX1+yqFCXTuB
-         Gq7+pxOjSuoKlLDhBuMbbn3ac/yecQ2kDF9222zWk0RsSKhwxUNml2LoVcGPjQpng9lt
-         mpI9RC68nZ1XGZfJ2nLqoY0LEKKv0RCEMSvsYT9fmQcnUR6nvCJpfBc0ANfcmLX7Gj/K
-         INyNWxoA681yUxFDstd4RWylxiL3r7OPEJ0kXVdztyFyq+bTIcsFwY+SzxMFOGNe00vy
-         Y5co4fiNu+vmh+5dq5I+4FZF14t8gL0u+5lq1s+XLOiBPNK4Z9jHtQsTKPFJ0qMc89KA
-         Djgw==
-X-Forwarded-Encrypted: i=1; AJvYcCVtvmCQMxFMC5llHhwwDaac5wBHDu/qImjs459QRwvs3FvvzkP9y2RDq1xVyAERajKCpjBy6YY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwXiv4Qg5zrSPDvr8ZV/QI167JjBO74kS5PFcASFyEn0FPByiq+
-	9TScpfO7tpYraqWZZ1mtAVHMVHSaKmgsXw6r0F2LcJqpJfZZmNot0uBEPpmN6mZa9307XTEYBjw
-	ayPDwV2uFxhxeKfrDhFB/dxmDLUW7j6Dfuw9Lb4kwVFwENliOgRd/Wp3OTdVBNVthZ4Q5nnqA5J
-	ATovxD9jNdGt2ZTw8em6P88fMCDNLt
-X-Gm-Gg: ASbGncsec29VwjgPOQ2ktL3a5vgh7RnZPzIMeJc24zRjEVr5Z1PNXppw5bPTHkLPDft
-	P4207STKDiAWlmsrSifmHHmvF/gaG1eVnYdgTOCY=
-X-Received: by 2002:a17:90b:2f4e:b0:2ee:f550:3848 with SMTP id 98e67ed59e1d1-2f548e98ea9mr13264776a91.5.1736479668663;
-        Thu, 09 Jan 2025 19:27:48 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEM0zVlBA7j66fikaniieFtidBDy2a+ngdaxzHXHvpNz92dgP0y0YBOPXi63aR37F36fwt1W0RporavDwFYaFI=
-X-Received: by 2002:a17:90b:2f4e:b0:2ee:f550:3848 with SMTP id
- 98e67ed59e1d1-2f548e98ea9mr13264741a91.5.1736479668256; Thu, 09 Jan 2025
- 19:27:48 -0800 (PST)
+        d=1e100.net; s=20230601; t=1736481292; x=1737086092;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Gan6BPP7MK8IqxxGzVr+2bZWHD9tE2wSemaIwm2vt8o=;
+        b=XAqWjiVF5Kk1jxTxWAN2RVXKaCkBbWFz1zHg54ifbv2GMgGPHxnPC8fR+upYlwWxbI
+         LTo17ZEfim0fzlJVD9Sv/4VjQqTAXMzTq/+frmsRUal3d6u/drS5Yy1kJPTCIaWh1dqQ
+         0ByGHwYVgRDCzsc7H2nK3f0qhqkzCQxCWJJREMfVvPnRsPlknDfhJNg/NxYdPF6dls+5
+         QSYybEQngmMDpY01XhcW+UkxAeuygmsEnAnIq0nIcWPl8vwbzmWLD7XKf+EzXywOTNpK
+         a5tu/OfDuIQM7Jd0VTMTgwJB5poPG5tGiz2S97/8TbmMYBr0F2b1CsK7BUUzDti5p5iy
+         KSww==
+X-Forwarded-Encrypted: i=1; AJvYcCUurR+/E8ENGOtNF64fatZdhXrf4AoeqVDdJ0iY1IntaDq56wYwBvlt0ARFlWYe5TwdUT6mUEc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx8elWtimmra6TEBVTyLboIeB5NRgYty7jEVueWY3nmdnkrIP6L
+	RmlSVHz8UygcFBKrBo8uh/zwAWU8L9YPou2xuimkIhwwdB8SbdDJ844lQicrzUWCVPuVLRvmiEu
+	P757WqjukE7XAVphD6vDllMRtLiZlXRVrIv5q
+X-Gm-Gg: ASbGncugQxbVwBhFaNV8nuW20Qlk9yumkj7IMLu8iBFQIKMuq/zRH3fPhyTXCL0+AAM
+	ILUXV1OT7Ww4npkVu6LzH4xzcsJKYTu58nhWeIDY=
+X-Google-Smtp-Source: AGHT+IF55DZKTlJCzM5xGNtjjWqf9HCVmfb51x3OdR85sTLf2TiQMT4qRKjXaloGKc5Y6wI/T1WSODMfUhDR+sU4fK0=
+X-Received: by 2002:a05:6a00:944a:b0:725:df1a:27c with SMTP id
+ d2e1a72fcca58-72d21f7bc17mr11886913b3a.14.1736481292222; Thu, 09 Jan 2025
+ 19:54:52 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250109-tun-v2-0-388d7d5a287a@daynix.com> <20250109-tun-v2-2-388d7d5a287a@daynix.com>
-In-Reply-To: <20250109-tun-v2-2-388d7d5a287a@daynix.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Fri, 10 Jan 2025 11:27:23 +0800
-X-Gm-Features: AbW1kvblvM77hJwOCPbcZnQaLsOAKege2X0nqRs93PNDqFsP8xaZKCI_l-JSk84
-Message-ID: <CACGkMEs73Pms5FB3ouzrLsDjAsQ4OhMMDVD2LnO6kVHCsN0A0w@mail.gmail.com>
-Subject: Re: [PATCH v2 2/3] tun: Pad virtio header with zero
-To: Akihiko Odaki <akihiko.odaki@daynix.com>
-Cc: Jonathan Corbet <corbet@lwn.net>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
-	Shuah Khan <shuah@kernel.org>, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, kvm@vger.kernel.org, 
-	virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org, 
-	Yuri Benditovich <yuri.benditovich@daynix.com>, Andrew Melnychenko <andrew@daynix.com>, 
-	Stephen Hemminger <stephen@networkplumber.org>, gur.stavi@huawei.com, devel@daynix.com
+References: <20250110004924.3212260-1-kuba@kernel.org>
+In-Reply-To: <20250110004924.3212260-1-kuba@kernel.org>
+From: Kalesh Anakkur Purayil <kalesh-anakkur.purayil@broadcom.com>
+Date: Fri, 10 Jan 2025 09:24:38 +0530
+X-Gm-Features: AbW1kvYcFhsGJFxbjy9myhtg-aa5a3quuzG8yYOuPqd-ww7DomupKy69EkR1RFk
+Message-ID: <CAH-L+nP+uHnh3BxcKf6Yg0-+1NsydHL725KCCu29V0-av1u13w@mail.gmail.com>
+Subject: Re: [PATCH net-next] net: hide the definition of dev_get_by_napi_id()
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, 
+	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, 
+	jdamato@fastly.com
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="0000000000009b0a9d062b520e8b"
+
+--0000000000009b0a9d062b520e8b
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jan 9, 2025 at 2:59=E2=80=AFPM Akihiko Odaki <akihiko.odaki@daynix.=
-com> wrote:
+On Fri, Jan 10, 2025 at 6:19=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
 >
-> tun used to simply advance iov_iter when it needs to pad virtio header,
-> which leaves the garbage in the buffer as is. This is especially
-> problematic when tun starts to allow enabling the hash reporting
-> feature; even if the feature is enabled, the packet may lack a hash
-> value and may contain a hole in the virtio header because the packet
-> arrived before the feature gets enabled or does not contain the
-> header fields to be hashed. If the hole is not filled with zero, it is
-> impossible to tell if the packet lacks a hash value.
+> There are no module callers of dev_get_by_napi_id(),
+> and commit d1cacd747768 ("netdev: prevent accessing NAPI instances
+> from another namespace") proves that getting NAPI by id
+> needs to be done with care. So hide dev_get_by_napi_id().
+>
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-I'm not sure I will get here, could we do this in the series of hash report=
-ing?
+Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
 
->
-> In theory, a user of tun can fill the buffer with zero before calling
-> read() to avoid such a problem, but leaving the garbage in the buffer is
-> awkward anyway so fill the buffer in tun.
->
-> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
-> ---
->  drivers/net/tun_vnet.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
->
-> diff --git a/drivers/net/tun_vnet.c b/drivers/net/tun_vnet.c
-> index fe842df9e9ef..ffb2186facd3 100644
-> --- a/drivers/net/tun_vnet.c
-> +++ b/drivers/net/tun_vnet.c
-> @@ -138,7 +138,8 @@ int tun_vnet_hdr_put(int sz, struct iov_iter *iter,
->         if (copy_to_iter(hdr, sizeof(*hdr), iter) !=3D sizeof(*hdr))
->                 return -EFAULT;
->
-> -       iov_iter_advance(iter, sz - sizeof(*hdr));
-> +       if (iov_iter_zero(sz - sizeof(*hdr), iter) !=3D sz - sizeof(*hdr)=
-)
-> +               return -EFAULT;
->
->         return 0;
 
-There're various callers of iov_iter_advance(), do we need to fix them all?
+--=20
+Regards,
+Kalesh AP
 
-Thanks
+--0000000000009b0a9d062b520e8b
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
 
->  }
-
->
-> --
-> 2.47.1
->
-
+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
+riBJ/K1AFUjRAjFhGV64l++td7dkmnq/X8ET75ti+w1s4FRpFqkD2m7pg5NxdsZphYIXAgMBAAGj
+QjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSP8Et/qC5FJK5N
+UPpjmove4t0bvDANBgkqhkiG9w0BAQsFAAOCAQEAS0DbwFCq/sgM7/eWVEVJu5YACUGssxOGhigH
+M8pr5nS5ugAtrqQK0/Xx8Q+Kv3NnSoPHRHt44K9ubG8DKY4zOUXDjuS5V2yq/BKW7FPGLeQkbLmU
+Y/vcU2hnVj6DuM81IcPJaP7O2sJTqsyQiunwXUaMld16WCgaLx3ezQA3QY/tRG3XUyiXfvNnBB4V
+14qWtNPeTCekTBtzc3b0F5nCH3oO4y0IrQocLP88q1UOD5F+NuvDV0m+4S4tfGCLw0FREyOdzvcy
+a5QBqJnnLDMfOjsl0oZAzjsshnjJYS8Uuu7bVW/fhO4FCU29KNhyztNiUGUe65KXgzHZs7XKR1g/
+XzCCBWowggRSoAMCAQICDDfBRQmwNSI92mit0zANBgkqhkiG9w0BAQsFADBbMQswCQYDVQQGEwJC
+RTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTExMC8GA1UEAxMoR2xvYmFsU2lnbiBHQ0MgUjMg
+UGVyc29uYWxTaWduIDIgQ0EgMjAyMDAeFw0yMjA5MTAwODI5NTZaFw0yNTA5MTAwODI5NTZaMIGi
+MQswCQYDVQQGEwJJTjESMBAGA1UECBMJS2FybmF0YWthMRIwEAYDVQQHEwlCYW5nYWxvcmUxFjAU
+BgNVBAoTDUJyb2FkY29tIEluYy4xHzAdBgNVBAMTFkthbGVzaCBBbmFra3VyIFB1cmF5aWwxMjAw
+BgkqhkiG9w0BCQEWI2thbGVzaC1hbmFra3VyLnB1cmF5aWxAYnJvYWRjb20uY29tMIIBIjANBgkq
+hkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxnv1Reaeezfr6NEmg3xZlh4cz9m7QCN13+j4z1scrX+b
+JfnV8xITT5yvwdQv3R3p7nzD/t29lTRWK3wjodUd2nImo6vBaH3JbDwleIjIWhDXLNZ4u7WIXYwx
+aQ8lYCdKXRsHXgGPY0+zSx9ddpqHZJlHwcvas3oKnQN9WgzZtsM7A8SJefWkNvkcOtef6bL8Ew+3
+FBfXmtsPL9I2vita8gkYzunj9Nu2IM+MnsP7V/+Coy/yZDtFJHp30hDnYGzuOhJchDF9/eASvE8T
+T1xqJODKM9xn5xXB1qezadfdgUs8k8QAYyP/oVBafF9uqDudL6otcBnziyDBQdFCuAQN7wIDAQAB
+o4IB5DCCAeAwDgYDVR0PAQH/BAQDAgWgMIGjBggrBgEFBQcBAQSBljCBkzBOBggrBgEFBQcwAoZC
+aHR0cDovL3NlY3VyZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvZ3NnY2NyM3BlcnNvbmFsc2lnbjJj
+YTIwMjAuY3J0MEEGCCsGAQUFBzABhjVodHRwOi8vb2NzcC5nbG9iYWxzaWduLmNvbS9nc2djY3Iz
+cGVyc29uYWxzaWduMmNhMjAyMDBNBgNVHSAERjBEMEIGCisGAQQBoDIBKAowNDAyBggrBgEFBQcC
+ARYmaHR0cHM6Ly93d3cuZ2xvYmFsc2lnbi5jb20vcmVwb3NpdG9yeS8wCQYDVR0TBAIwADBJBgNV
+HR8EQjBAMD6gPKA6hjhodHRwOi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjNwZXJzb25hbHNp
+Z24yY2EyMDIwLmNybDAuBgNVHREEJzAlgSNrYWxlc2gtYW5ha2t1ci5wdXJheWlsQGJyb2FkY29t
+LmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNVHSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGP
+zzAdBgNVHQ4EFgQUI3+tdStI+ABRGSqksMsiCmO9uDAwDQYJKoZIhvcNAQELBQADggEBAGfe1o9b
+4wUud0FMjb/FNdc433meL15npjdYWUeioHdlCGB5UvEaMGu71QysfoDOfUNeyO9YKp0h0fm7clvo
+cBqeWe4CPv9TQbmLEtXKdEpj5kFZBGmav69mGTlu1A9KDQW3y0CDzCPG2Fdm4s73PnkwvemRk9E2
+u9/kcZ8KWVeS+xq+XZ78kGTKQ6Wii3dMK/EHQhnDfidadoN/n+x2ySC8yyDNvy81BocnblQzvbuB
+a30CvRuhokNO6Jzh7ZFtjKVMzYas3oo6HXgA+slRszMu4pc+fRPO41FHjeDM76e6P5OnthhnD+NY
+x6xokUN65DN1bn2MkeNs0nQpizDqd0QxggJtMIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYD
+VQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25h
+bFNpZ24gMiBDQSAyMDIwAgw3wUUJsDUiPdpordMwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcN
+AQkEMSIEIM5/aNwldpchVXOArvqO4RWFtiggiRFU2mzZOCEXPgaCMBgGCSqGSIb3DQEJAzELBgkq
+hkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI1MDExMDAzNTQ1MlowaQYJKoZIhvcNAQkPMVwwWjAL
+BglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG
+9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQAsPhSZau6B
+IMHDq1B752B7TGv6CeaaAl8yWwU5ytlpITZIch8jViCXTxLl4IgYWhIQebtA5vaVCy15XZ21GEI5
+DAqL+0EMzZWrEqeG96tvbsT1GVWmTY8uBWEQySsxNgE8PSWjWte+U4mN0Myx5RUcGSDLbhb/JNM6
+pWgKq6hMMmfOh4W5oxsrv+rhAfQwBztyBUaWgxn3C9P9nn4/nDvVrmvC6/dUmgUYNS7LZ6Ukt+rs
+b0OxEgmUFw7k4fDzidIGu7nrUsQ3vAVqEin4lwOy9Ao40mHClao2ISwkWNkXHjk3XUeGvl+44vRt
+KSFhordAsULHBot1+JZsltG1Epin
+--0000000000009b0a9d062b520e8b--
 
