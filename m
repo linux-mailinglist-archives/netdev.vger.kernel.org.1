@@ -1,195 +1,102 @@
-Return-Path: <netdev+bounces-157018-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157019-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49C65A08B8B
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 10:24:21 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5FE89A08BDC
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 10:27:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 156FD18855C4
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 09:24:08 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 57E757A42AE
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 09:27:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0602B20D51C;
-	Fri, 10 Jan 2025 09:21:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="psNjNxqc"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6882A209F23;
+	Fri, 10 Jan 2025 09:23:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D10520A5F2;
-	Fri, 10 Jan 2025 09:21:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD7902594AE;
+	Fri, 10 Jan 2025 09:23:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736500881; cv=none; b=CjgvP3We4U2V+wX+woOypkJ3WfVyYg/apBzZaXS7F7bhxB6AiQaE8pv8bAQzyPPc3mprGjOUG1kHeZuMJqa1GT4BoTZQbPeEdb25GbUMd4zWdKfV65km3+20VoeaWRLKEuadcZGHluwfGaAdifonTXN8okohWIOpBsPzRkYUKW0=
+	t=1736500998; cv=none; b=WFurqdODlmoLsNvuAiVecr+OLbGyIlPuMoDMhpsL5t1F/ofi6u/nnN8B+ZYiukYsWk1kw3CvI83+kcwqmQwh9J9IE55A2TTy2IUE94w5iyIvX2YWthvIAGHrZef5kvWxfhapRH5qogXePgZBa8DxvFIzX3UIMEHUEsDaseaNiLU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736500881; c=relaxed/simple;
-	bh=ZMnS/CCMGGORoqA8raGQG3X5AXSSVNilwAPP5RQlZ4g=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=XCqM3RPxGaxLloy/fXp98cQx+E+ShJqBFrMsVJdlstY068adiYi/PMAc0Rfb4LrPK3mgKICZJ/tGfoeY+FfQjWuU0ZN4Vm9bgML35J/txQkc2W08IevevCzjT8lji0ejZ+Zb80FBVBG+W3btt3ofa3DPHfCOCMpHI1N9pg/Iajc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=psNjNxqc; arc=none smtp.client-ip=217.70.183.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 8620DFF80A;
-	Fri, 10 Jan 2025 09:21:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1736500877;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=2zE3Qj+wzy3/ijSchaBF4BZ78lkkThafbwyvbpr5Xms=;
-	b=psNjNxqcC/vi+Tq2u0jl2omRpGVLlFsehJZb1uVHgcj6v2/laLnSIPAdW32wRG1pxpjAlu
-	RDKt+x6FhAb3mQbCa2S9Gr3MC2J2VbOI0c5s1nhQ3Ne9cLO/SV3zef9Nep4CxuQCFrmDeu
-	81RSEKH6F+3zNqZokII1k+Vy0CrNwLWu2ynLuqHLOX159OU94alVM0JyZIEhiS3DSP8O2r
-	3L6PmiDOTP7BtN6NysV7cB2oHb+7jCuBednQ4vqiAuGsTvorzp4O3Yok6G23zcS5PHQuNM
-	InTehgPjwuw9eduhSY7GUtGhILPyfMYCeuvHUA9djQoLlL7y1LimKH4AIxZzGA==
-From: "Bastien Curutchet (eBPF Foundation)" <bastien.curutchet@bootlin.com>
-Date: Fri, 10 Jan 2025 10:21:11 +0100
-Subject: [PATCH bpf-next v2 3/3] selftests/bpf: Migrate test_xdp_redirect.c
- to test_xdp_do_redirect.c
+	s=arc-20240116; t=1736500998; c=relaxed/simple;
+	bh=fg4/d15PgKSg7hTMCEd07m6T1TMk05AdYUol2uX7yeI=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=XJdZgV6kwWcSQYxkbyuBalPrOEKq+2ZEOMjvfsuMigQ2uU1XnTFVBOjoR5cFpALYCJeSLo5ogqAfHXsAycQzsO7NWXvwAh7IkGz0xiH0hTNyaY6cDvnsD/6LVmEGgpBNjfp+hspAK9XrzHr9UgopsdmpiJyjb+xF6PWefui4Xl8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
+X-UUID: 7fdaa772cf3411efa216b1d71e6e1362-20250110
+X-CID-CACHE: Type:Local,Time:202501101704+08,HitQuantity:1
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.45,REQID:0a8bc4ab-ebbd-485f-9cb8-a5da4300f7f3,IP:0,U
+	RL:0,TC:0,Content:-5,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION
+	:release,TS:-5
+X-CID-META: VersionHash:6493067,CLOUDID:6dae1920d211dbf29c6931e5e6bca202,BulkI
+	D:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:0|50,EDM:-3,IP:nil,UR
+	L:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,S
+	PR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
+X-CID-BVR: 0,NGT
+X-CID-BAS: 0,NGT,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR
+X-UUID: 7fdaa772cf3411efa216b1d71e6e1362-20250110
+Received: from node4.com.cn [(10.44.16.170)] by mailgw.kylinos.cn
+	(envelope-from <zhangxiangqian@kylinos.cn>)
+	(Generic MTA)
+	with ESMTP id 988853032; Fri, 10 Jan 2025 17:23:06 +0800
+Received: from node4.com.cn (localhost [127.0.0.1])
+	by node4.com.cn (NSMail) with SMTP id 020861600810A;
+	Fri, 10 Jan 2025 17:23:06 +0800 (CST)
+X-ns-mid: postfix-6780E6F9-7904211467
+Received: from localhost.localdomain (unknown [172.25.83.26])
+	by node4.com.cn (NSMail) with ESMTPA id 184291600810A;
+	Fri, 10 Jan 2025 09:23:05 +0000 (UTC)
+From: Xiangqian Zhang <zhangxiangqian@kylinos.cn>
+To: andrew+netdev@lunn.ch
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Xiangqian Zhang <zhangxiangqian@kylinos.cn>
+Subject: [PATCH RESEND] net: mii: Fix the Speed display when the network cable is not connected
+Date: Fri, 10 Jan 2025 17:23:02 +0800
+Message-Id: <20250110092302.2717512-1-zhangxiangqian@kylinos.cn>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250110-xdp_redirect-v2-3-b8f3ae53e894@bootlin.com>
-References: <20250110-xdp_redirect-v2-0-b8f3ae53e894@bootlin.com>
-In-Reply-To: <20250110-xdp_redirect-v2-0-b8f3ae53e894@bootlin.com>
-To: Alexei Starovoitov <ast@kernel.org>, 
- Daniel Borkmann <daniel@iogearbox.net>, 
- "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
- Jesper Dangaard Brouer <hawk@kernel.org>, 
- John Fastabend <john.fastabend@gmail.com>, 
- Andrii Nakryiko <andrii@kernel.org>, 
- Martin KaFai Lau <martin.lau@linux.dev>, 
- Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
- Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, 
- Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, 
- Jiri Olsa <jolsa@kernel.org>, Mykola Lysenko <mykolal@fb.com>, 
- Shuah Khan <shuah@kernel.org>
-Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>, 
- Alexis Lothore <alexis.lothore@bootlin.com>, netdev@vger.kernel.org, 
- bpf@vger.kernel.org, linux-kselftest@vger.kernel.org, 
- linux-kernel@vger.kernel.org, 
- "Bastien Curutchet (eBPF Foundation)" <bastien.curutchet@bootlin.com>
-X-Mailer: b4 0.14.2
-X-GND-Sasl: bastien.curutchet@bootlin.com
+Content-Transfer-Encoding: quoted-printable
 
-prog_tests/xdp_do_redirect.c is the only user of the BPF programs
-located in progs/test_xdp_do_redirect.c and progs/test_xdp_redirect.c.
-There is no need to keep both files with such close names.
+Speed should be SPEED_UNKNOWN when the network cable is not connected
 
-Move test_xdp_redirect.c contents to test_xdp_do_redirect.c and remove
-progs/test_xdp_redirect.c
-
-Signed-off-by: Bastien Curutchet (eBPF Foundation) <bastien.curutchet@bootlin.com>
+Signed-off-by: Xiangqian Zhang <zhangxiangqian@kylinos.cn>
 ---
- .../selftests/bpf/prog_tests/xdp_do_redirect.c     |  7 +++---
- .../selftests/bpf/progs/test_xdp_do_redirect.c     | 12 ++++++++++
- .../selftests/bpf/progs/test_xdp_redirect.c        | 26 ----------------------
- 3 files changed, 15 insertions(+), 30 deletions(-)
+ drivers/net/mii.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/tools/testing/selftests/bpf/prog_tests/xdp_do_redirect.c b/tools/testing/selftests/bpf/prog_tests/xdp_do_redirect.c
-index 9052ed0fcf427db9ffc4ff33fbc46ab0ba561b07..16edc83e4da4536cba4ea608f16fa5ae16cb10ba 100644
---- a/tools/testing/selftests/bpf/prog_tests/xdp_do_redirect.c
-+++ b/tools/testing/selftests/bpf/prog_tests/xdp_do_redirect.c
-@@ -11,7 +11,6 @@
- #include <bpf/bpf_endian.h>
- #include <uapi/linux/netdev.h>
- #include "test_xdp_do_redirect.skel.h"
--#include "test_xdp_redirect.skel.h"
- #include "xdp_dummy.skel.h"
- 
- struct udp_packet {
-@@ -324,7 +323,7 @@ static int ping_setup(struct test_data *data)
- 
- static void ping_test(struct test_data *data)
- {
--	struct test_xdp_redirect *skel = NULL;
-+	struct test_xdp_do_redirect *skel = NULL;
- 	struct xdp_dummy *skel_dummy = NULL;
- 	struct nstoken *nstoken = NULL;
- 	int i, ret;
-@@ -351,7 +350,7 @@ static void ping_test(struct test_data *data)
- 		nstoken = NULL;
+diff --git a/drivers/net/mii.c b/drivers/net/mii.c
+index 22680f47385d..297a0cc3682f 100644
+--- a/drivers/net/mii.c
++++ b/drivers/net/mii.c
+@@ -213,6 +213,9 @@ void mii_ethtool_get_link_ksettings(struct mii_if_inf=
+o *mii,
+ 		lp_advertising =3D 0;
  	}
- 
--	skel = test_xdp_redirect__open_and_load();
-+	skel = test_xdp_do_redirect__open_and_load();
- 	if (!ASSERT_OK_PTR(skel, "open and load skeleton"))
- 		goto close;
- 
-@@ -383,7 +382,7 @@ static void ping_test(struct test_data *data)
- close:
- 	close_netns(nstoken);
- 	xdp_dummy__destroy(skel_dummy);
--	test_xdp_redirect__destroy(skel);
-+	test_xdp_do_redirect__destroy(skel);
- }
- 
- 
-diff --git a/tools/testing/selftests/bpf/progs/test_xdp_do_redirect.c b/tools/testing/selftests/bpf/progs/test_xdp_do_redirect.c
-index 3abf068b84464ce0460a671abc4dfb97e1f2be4a..5928ed0911caf4d5a71ef37889d9315bfa6623ae 100644
---- a/tools/testing/selftests/bpf/progs/test_xdp_do_redirect.c
-+++ b/tools/testing/selftests/bpf/progs/test_xdp_do_redirect.c
-@@ -98,6 +98,18 @@ int xdp_count_pkts(struct xdp_md *xdp)
- 	return XDP_DROP;
- }
- 
-+SEC("xdp")
-+int xdp_redirect_to_111(struct xdp_md *xdp)
-+{
-+	return bpf_redirect(111, 0);
-+}
+=20
++	if (!mii_link_ok(mii))
++		cmd->base.speed =3D SPEED_UNKNOWN;
 +
-+SEC("xdp")
-+int xdp_redirect_to_222(struct xdp_md *xdp)
-+{
-+	return bpf_redirect(222, 0);
-+}
-+
- SEC("tc")
- int tc_count_pkts(struct __sk_buff *skb)
- {
-diff --git a/tools/testing/selftests/bpf/progs/test_xdp_redirect.c b/tools/testing/selftests/bpf/progs/test_xdp_redirect.c
-deleted file mode 100644
-index 7025aee08a001cfc42e52174a4acce7869dd331b..0000000000000000000000000000000000000000
---- a/tools/testing/selftests/bpf/progs/test_xdp_redirect.c
-+++ /dev/null
-@@ -1,26 +0,0 @@
--/* Copyright (c) 2017 VMware
-- *
-- * This program is free software; you can redistribute it and/or
-- * modify it under the terms of version 2 of the GNU General Public
-- * License as published by the Free Software Foundation.
-- *
-- * This program is distributed in the hope that it will be useful, but
-- * WITHOUT ANY WARRANTY; without even the implied warranty of
-- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-- * General Public License for more details.
-- */
--#include <linux/bpf.h>
--#include <bpf/bpf_helpers.h>
--
--SEC("xdp")
--int xdp_redirect_to_111(struct xdp_md *xdp)
--{
--	return bpf_redirect(111, 0);
--}
--SEC("xdp")
--int xdp_redirect_to_222(struct xdp_md *xdp)
--{
--	return bpf_redirect(222, 0);
--}
--
--char _license[] SEC("license") = "GPL";
-
--- 
-2.47.1
+ 	mii->full_duplex =3D cmd->base.duplex;
+=20
+ 	ethtool_convert_legacy_u32_to_link_mode(cmd->link_modes.supported,
+--=20
+2.25.1
 
 
