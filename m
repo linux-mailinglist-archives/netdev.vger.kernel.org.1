@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-156934-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156935-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 089D3A0852E
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 03:10:26 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A4D6EA08532
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 03:10:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CE3561661E4
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 02:10:22 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F1A8F7A390A
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 02:10:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 950A31E1C37;
-	Fri, 10 Jan 2025 02:10:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39D6218C01D;
+	Fri, 10 Jan 2025 02:10:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="llYriMYF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h6h4JHaM"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7136E1E1A3B
-	for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 02:10:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09F6D18027;
+	Fri, 10 Jan 2025 02:10:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736475012; cv=none; b=VabdVQ9uULxhTmpTUmfmTWp4PRlj437I/nqy2cT33Z/Pe0UTbu8rKU4LXMzt3dmWsLcSzf4w1NKvcVD7eIsC05MVOqdUCZk6Y02Z5248xtFDtju/TD4m8dCiZqEY/aeSVc7Pc5uV0vuirmzj7mJkvD8xQjJTHDv9XwyFYptyGJY=
+	t=1736475018; cv=none; b=irX4WFFMIwXkAAhQh5b8+faQYHQ5ns2YKmeOjyvi7guTP7ceBbdjPs1ZqmBuPSqyK+kOycegrNZPlRnjkGFS+7ZLI05wMANZoCNcYg6Cs4x1TvbG+Csgo4Ao/T+8EvULQlteI10TKuV54eQcQjH+vbzxEF9RX3fFTuV8q4bti5E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736475012; c=relaxed/simple;
-	bh=mGgZ3O3FpAo4aK2pvb/OrSHlcRbe3wDu2F3zKUWE4pg=;
+	s=arc-20240116; t=1736475018; c=relaxed/simple;
+	bh=dGq6QBk0YpBeEpehS4DGo9EFTFFt+UJp+GJ6VVtWhF0=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=WzXsqZ4rE4flL9z2GR2ESUpJtNu+m85BNiuGuRYCCqwPgTcTbtL2LqKX4VPvX9C9bHUjJ5xyZJHbOIwkUp1m7DoBYdtbKeIm1Qqz+UPFRDHyqgfoLpdDok7ZOWnBLnRIIJmuSQ8xxBtJ/AroOULCQgjOQIGvVGvgmNDgSOfxAzc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=llYriMYF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EF408C4CED6;
-	Fri, 10 Jan 2025 02:10:11 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=lCabht1KEcKeoHw6GI8AvLbuEsBwlKQcl1JS4RcvTwVm8TrmPXVFWtuUDCae0sRNbIxaczq0PHSn2VFfba4x7UPKVOP6GB0mIFRszRLuKR4HXvM5oTuLGa7y7iKB3KNpMycPTxAduKBLRvwhIPqWTJ7R9w5tiEmqJpzGdAdqzwU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h6h4JHaM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 68358C4CED2;
+	Fri, 10 Jan 2025 02:10:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736475012;
-	bh=mGgZ3O3FpAo4aK2pvb/OrSHlcRbe3wDu2F3zKUWE4pg=;
+	s=k20201202; t=1736475016;
+	bh=dGq6QBk0YpBeEpehS4DGo9EFTFFt+UJp+GJ6VVtWhF0=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=llYriMYFb9+mZEMOME5PicltSD7Hq4nSkWmHVnfmlhrKN5VLj1cGzypVgjQgFpq7X
-	 cDVbhzoKeXAoObnxlDqs/07gjPa1DFEvR/DbqzqIjmOKQyRescNrL8vYlXGARUJJTk
-	 gUUEyQdc71o8EcqLIuIYUwfY+aoioaxIri7kVcCvkhCH186v/ySlQFWyAxTZFVbuU/
-	 2gy4YOvQ6CFE7eFjnaotz5Pm+dMME4xwRIm3yMYQk0o7BkL5poMa71CMZlotEsFhnP
-	 c8+gjbM5qKW0s4o1P73Tvt9A3MDno3gglV0uvbsIBf1hAjqxFPHv05pKXjDzFSSdRS
-	 rmzT5508lK85w==
+	b=h6h4JHaMBilwzaY4jRhhRTZkzFvaos0FFhiA8csQGrkjX11w5Fid2N0HUxFWkdx+Y
+	 IOVi+gEOehoYzOKvCdr7fksDN5v0fZmHcRpJ+YiFlOElG276DKp/UCj7LHXoS7Q1Ej
+	 q4quuEnR3Nw+iPw+Oh7QVsOM8HZDAI23FCOSa7Duy7k6+6LaNZbWrOl712n20oxcs9
+	 35zgCa3U9LAeKMiz4+2+A/eA/x809FZOhI2cpICCPs5cBSnmjPphb5MAWHYNZcwAHG
+	 sTw213TnLasa4dmEyVP5Jhkf/iJ9two8GJQzdB0yNc+y4+AY9fxTq2qee9b8RHtza8
+	 pBEXKivvxw7Zw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB163380A97F;
-	Fri, 10 Jan 2025 02:10:34 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 71078380A97F;
+	Fri, 10 Jan 2025 02:10:39 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,47 +52,43 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] ipv4: route: fix drop reason being overridden in
- ip_route_input_slow
+Subject: Re: [PATCH net-next v3 0/4] netconsole: selftest for userdata overflow
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <173647503349.1577336.15772137245517453680.git-patchwork-notify@kernel.org>
-Date: Fri, 10 Jan 2025 02:10:33 +0000
-References: <20250108165725.404564-1-atenart@kernel.org>
-In-Reply-To: <20250108165725.404564-1-atenart@kernel.org>
-To: Antoine Tenart <atenart@kernel.org>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, netdev@vger.kernel.org, sd@queasysnail.net,
- menglong8.dong@gmail.com
+ <173647503798.1577336.1474540791245653756.git-patchwork-notify@kernel.org>
+Date: Fri, 10 Jan 2025 02:10:37 +0000
+References: <20250108-netcons_overflow_test-v3-0-3d85eb091bec@debian.org>
+In-Reply-To: <20250108-netcons_overflow_test-v3-0-3d85eb091bec@debian.org>
+To: Breno Leitao <leitao@debian.org>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, shuah@kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ kernel-team@meta.com, horms@kernel.org
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed,  8 Jan 2025 17:57:15 +0100 you wrote:
-> When jumping to 'martian_destination' a drop reason is always set but
-> that label falls-through the 'e_nobufs' one, overriding the value.
+On Wed, 08 Jan 2025 03:50:24 -0800 you wrote:
+> Implement comprehensive testing for netconsole userdata entry handling,
+> demonstrating correct behavior when creating maximum entries and
+> preventing unauthorized overflow.
 > 
-> The behavior was introduced by the mentioned commit. The logic went
-> from,
-> 
-> 	goto martian_destination;
-> 	...
->   martian_destination:
-> 	...
->   e_inval:
-> 	err = -EINVAL;
-> 	goto out;
->   e_nobufs:
-> 	err = -ENOBUFS;
-> 	goto out;
+> Refactor existing test infrastructure to support modular, reusable
+> helper functions that validate strict entry limit enforcement.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] ipv4: route: fix drop reason being overridden in ip_route_input_slow
-    https://git.kernel.org/netdev/net/c/8c7a6efc017e
+  - [net-next,v3,1/4] netconsole: Warn if MAX_USERDATA_ITEMS limit is exceeded
+    https://git.kernel.org/netdev/net-next/c/e51c7478d23b
+  - [net-next,v3,2/4] netconsole: selftest: Split the helpers from the selftest
+    https://git.kernel.org/netdev/net-next/c/61f51cc6defe
+  - [net-next,v3,3/4] netconsole: selftest: Delete all userdata keys
+    https://git.kernel.org/netdev/net-next/c/7dcb65351b30
+  - [net-next,v3,4/4] netconsole: selftest: verify userdata entry limit
+    https://git.kernel.org/netdev/net-next/c/daea6d23cd2f
 
 You are awesome, thank you!
 -- 
