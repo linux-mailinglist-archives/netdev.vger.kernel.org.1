@@ -1,171 +1,165 @@
-Return-Path: <netdev+bounces-157098-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157099-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E074A08E56
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 11:46:27 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C0860A08E8A
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 11:53:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 45639188B9CC
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 10:46:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BFCC91665A9
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 10:53:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AEE0205AB6;
-	Fri, 10 Jan 2025 10:45:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B121205AAF;
+	Fri, 10 Jan 2025 10:53:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="p+9k1nB1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p0n9mN3T"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E5A7205512
-	for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 10:45:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECF3F1CF5CE;
+	Fri, 10 Jan 2025 10:52:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736505953; cv=none; b=ZVvOjUEVc4TUslyRbkotfns9mov8Z5mUppMbMRzeXvWldjnd4SI0LWIm3hBUPdkSksk6xzO8xm3/cMhvUzdc3QrSA9xev6a9FKIFvPbChe1IkkfVSrRr5WGkvtMg0ALGqRMgPSXt6AyaYAbK4sGjao8qzCDXq7Moe3ZsCqfXGJQ=
+	t=1736506380; cv=none; b=m2OAfne5CddAH9V6K1FSxQ/Lwy/wMRyJk4zWRUFU17T6mFy0jw6rtC3RssOkG1xdHZ/Z5ipsFBkJT8ZUVtBdnHF3ivTH78TXFZDJsyeQoPvKmXmyT52GgeXDi9CxlbKbWmUtkcT0XeCT5qmHobMDCSzfHiw/Mhp5TWOc/WlIcXc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736505953; c=relaxed/simple;
-	bh=xwTt7EqwBQG9jsW/MlOAUi0BI8IrI3gTou3huVPPuY0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=kEOnxYHQ0HipBQFU0SRYAQINefZKfilMxznJ+sddmW4kXfod9KqfSWI+Qun3JTW4bCxHsKi7/ZHDxVq489CqlW6V/QEco6Y1IMdUIH7cnXS+roe+O7C7krPgoak75MFDEAuiUz/Q6TCkhJUsQH0WcXrchN2E3EhXTg/yHuFQcx4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=pass smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=p+9k1nB1; arc=none smtp.client-ip=209.85.214.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=daynix.com
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-21619108a6bso31237115ad.3
-        for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 02:45:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1736505950; x=1737110750; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=lsqFmJrwySuAsgeQ23Hdp8zYfHgcqjGeQVThq/MnWD0=;
-        b=p+9k1nB1y1wLV4WAMd6GxCzPpVGINnfcjx4nS24pw7fZ/hn3Ly9tYIkV5IySy0AbyK
-         aOXcSz4wHFF9tbEmM93KdWsCVwG5WqVjTyWSOk65sD/ojHlm9ICq09k1pWkhKAleJW2Y
-         GTpwiuoMSgAUOr/YqrhWk0gdTtaC6LTn5HtGSjUDFQo8I1HMsLOeti+9umCaqx44hAZc
-         QTyJXAhs//a1i3RM15mcLV/fA+lMeyVQITdrIQtXuahzFtoXTgRyQ4kghTD5jz7Z9KMq
-         0wMQx+ee12Ua1YNIKaehndgJ07Kvrs3dmjzDAheUSpLTmyVK9vJRpmy333GkrjNXUT/F
-         IiAA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736505950; x=1737110750;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=lsqFmJrwySuAsgeQ23Hdp8zYfHgcqjGeQVThq/MnWD0=;
-        b=Il6+4UUmGcqpQ5Fw8bhPQL/EFFsJHqQ6y0/FhYcBMPS+yGdCVEGGauAkEfjSmMHhkk
-         vf1E9RRRlyTj7PwrWsksfLaVJSfMnkNQm9Z7Pvw5OAWQ9YnGsd6OCRXBFw1D1/unRYEG
-         cT1cprACekT/4NSOPWt6df4Wi7eEBO4XZjVwV208fvjhkngth/ikHo9diYOrn593Y+Q/
-         +j9govPTtEqZtKCLHKQaewrMZq1Mwm6pr9tYGS8BUZp/jLVtAokUfJTEsO1FfoXAbIyZ
-         7ZxzcmWAPv7SCQwEyHVWgCXfPCYBGY/JwM1/Fbx6tKv/lBu9FB03VGg3c4aBE4807HwX
-         OEsA==
-X-Forwarded-Encrypted: i=1; AJvYcCVjK730hr0H7fDdv3nznFyPxSck1THJYUZiphWsbw+BiikCzwUYxo1ZWQJyxIeZ3tJ1Uhk4LbE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzWN9LjhVS5uFqEHWZTLzKiTqJr9RUBILJfhV56YXwvnCNdSPcF
-	d383rO9ydY64Maf+z9oPNcglL0WUlEqxBNaFbR8WaZ0GrhdVnKl+uYfNihZvGqc=
-X-Gm-Gg: ASbGncu0y/UYv5fHwXG9bVeOvgHOQOIxoNfMkrXf0jO/r1AkE2Mz4IAe8R85COYQxvy
-	+0qD+jioSP96lx/3p3ZZzvgQCAetstYCxqUedKalp5eEugCSxbPOuoeqvHCChHMIEEptND1yOYc
-	H1Cdx5SUZgm+C6Fo3NaKDzS6uCdfOd6wEO6y5AgSJ8BWQqdSLjGwAm+tbgl1KAWmZ8K5Yw/OHky
-	iLM+gHWW8EjAEBjUy6WLaBL4R0/yR+rwUP7YdspaVrUVVlfspAx4B5J+o2iSr5Sftw=
-X-Google-Smtp-Source: AGHT+IFPsdQcQ1JqLrS7hF+DlyZPpDcSA6WD6jF46cfVg9u5bIjzxZ5xlWPHe2yN4Ld9eivHDLICVA==
-X-Received: by 2002:a17:902:ecc5:b0:216:7cbf:9500 with SMTP id d9443c01a7336-21a83f36df7mr150799945ad.6.1736505950548;
-        Fri, 10 Jan 2025 02:45:50 -0800 (PST)
-Received: from [157.82.203.37] ([157.82.203.37])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21a9f10e0dfsm11714655ad.41.2025.01.10.02.45.45
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 10 Jan 2025 02:45:50 -0800 (PST)
-Message-ID: <3a5001b5-9a07-4dfd-8cec-1e5f7180b88a@daynix.com>
-Date: Fri, 10 Jan 2025 19:45:44 +0900
+	s=arc-20240116; t=1736506380; c=relaxed/simple;
+	bh=Le7iqxPX0SAj4enuHruL9yUr5Hz6fjMftvdwLgFI6Mk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ppNphJpGRiQc+WIo82RSHn91t+P+9MHOhaSOXwMW55oGru6mQUQ25q1kMJCUDXwbGoIBkimpIINjjuKNkv6qctHR1QYyrqJfnXIJyyb3XOyzOST115t2j6raMOFFUwsgJBIU8OmfQqdEMA3HlXmYmRu/ZaYhbBJYr4lmW0MVj00=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=p0n9mN3T; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 14527C4CED6;
+	Fri, 10 Jan 2025 10:52:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1736506379;
+	bh=Le7iqxPX0SAj4enuHruL9yUr5Hz6fjMftvdwLgFI6Mk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=p0n9mN3TTuuhQEyKH9D+BYKZwweCbKmnAV3BQiC1R3SAMPjPu5DJl/QuMrUs7fSky
+	 /O5ydpAGd083kUXB5XLlWwu3+HbBj+CAGvWpUU4yysxvoHWaMVkU/axJSQhGsvvGeQ
+	 4EDZ0kn5vZ2DXJRNga8hR8CXSxIJmzlIYy5ymcMxjpWibkDA5W4u796usN0Q/T0rtI
+	 lYfsvmhHO4u6NumDuRWb1DZaS7xMbxP6ilQxlWNzICm2dJfLi1HFi9rREs/JtWhM3K
+	 lBDt1oidd3nrQ6ukFN4AQaryDJnYGFpx1CW07e9fxTVqd7ovG806RpFfZqLVLSpTo0
+	 xmgGVGviWPOUQ==
+Date: Fri, 10 Jan 2025 10:52:52 +0000
+From: Simon Horman <horms@kernel.org>
+To: Lei Wei <quic_leiwei@quicinc.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org, quic_kkumarcs@quicinc.com,
+	quic_suruchia@quicinc.com, quic_pavir@quicinc.com,
+	quic_linchen@quicinc.com, quic_luoj@quicinc.com,
+	srinivas.kandagatla@linaro.org, bartosz.golaszewski@linaro.org,
+	vsmuthu@qti.qualcomm.com, john@phrozen.org
+Subject: Re: [PATCH net-next v4 3/5] net: pcs: qcom-ipq9574: Add PCS
+ instantiation and phylink operations
+Message-ID: <20250110105252.GY7706@kernel.org>
+References: <20250108-ipq_pcs_net-next-v4-0-0de14cd2902b@quicinc.com>
+ <20250108-ipq_pcs_net-next-v4-3-0de14cd2902b@quicinc.com>
+ <20250108100358.GG2772@kernel.org>
+ <8ac3167c-c8aa-4ddb-948f-758714df7495@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 2/3] tun: Pad virtio header with zero
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- Jonathan Corbet <corbet@lwn.net>, Jason Wang <jasowang@redhat.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Shuah Khan <shuah@kernel.org>,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, kvm@vger.kernel.org,
- virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org,
- Yuri Benditovich <yuri.benditovich@daynix.com>,
- Andrew Melnychenko <andrew@daynix.com>,
- Stephen Hemminger <stephen@networkplumber.org>, gur.stavi@huawei.com,
- devel@daynix.com
-References: <20250109-tun-v2-0-388d7d5a287a@daynix.com>
- <20250109-tun-v2-2-388d7d5a287a@daynix.com>
- <20250109023056-mutt-send-email-mst@kernel.org>
- <571a2d61-5fbe-4e49-b4d1-6bf0c7604a57@daynix.com>
- <677fc517b7b6e_362bc12945@willemb.c.googlers.com.notmuch>
- <5e193a94-8f5a-4a2a-b4c4-3206c21c0b63@daynix.com>
- <20250110033306-mutt-send-email-mst@kernel.org>
-Content-Language: en-US
-From: Akihiko Odaki <akihiko.odaki@daynix.com>
-In-Reply-To: <20250110033306-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <8ac3167c-c8aa-4ddb-948f-758714df7495@quicinc.com>
 
-On 2025/01/10 17:33, Michael S. Tsirkin wrote:
-> On Fri, Jan 10, 2025 at 01:38:06PM +0900, Akihiko Odaki wrote:
->> On 2025/01/09 21:46, Willem de Bruijn wrote:
->>> Akihiko Odaki wrote:
->>>> On 2025/01/09 16:31, Michael S. Tsirkin wrote:
->>>>> On Thu, Jan 09, 2025 at 03:58:44PM +0900, Akihiko Odaki wrote:
->>>>>> tun used to simply advance iov_iter when it needs to pad virtio header,
->>>>>> which leaves the garbage in the buffer as is. This is especially
->>>>>> problematic when tun starts to allow enabling the hash reporting
->>>>>> feature; even if the feature is enabled, the packet may lack a hash
->>>>>> value and may contain a hole in the virtio header because the packet
->>>>>> arrived before the feature gets enabled or does not contain the
->>>>>> header fields to be hashed. If the hole is not filled with zero, it is
->>>>>> impossible to tell if the packet lacks a hash value.
->>>
->>> Zero is a valid hash value, so cannot be used as an indication that
->>> hashing is inactive.
->>
->> Zeroing will initialize the hash_report field to
->> VIRTIO_NET_HASH_REPORT_NONE, which tells it does not have a hash value.
->>
->>>
->>>>>> In theory, a user of tun can fill the buffer with zero before calling
->>>>>> read() to avoid such a problem, but leaving the garbage in the buffer is
->>>>>> awkward anyway so fill the buffer in tun.
->>>>>>
->>>>>> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
->>>>>
->>>>> But if the user did it, you have just overwritten his value,
->>>>> did you not?
->>>>
->>>> Yes. but that means the user expects some part of buffer is not filled
->>>> after read() or recvmsg(). I'm a bit worried that not filling the buffer
->>>> may break assumptions others (especially the filesystem and socket
->>>> infrastructures in the kernel) may have.
->>>
->>> If this is user memory that is ignored by the kernel, just reflected
->>> back, then there is no need in general to zero it. There are many such
->>> instances, also in msg_control.
->>
->> More specifically, is there any instance of recvmsg() implementation which
->> returns N and does not fill the complete N bytes of msg_iter?
+On Thu, Jan 09, 2025 at 09:11:05PM +0800, Lei Wei wrote:
 > 
-> The one in tun. It was a silly idea but it has been here for years now.
+> 
+> On 1/8/2025 6:03 PM, Simon Horman wrote:
+> > On Wed, Jan 08, 2025 at 10:50:26AM +0800, Lei Wei wrote:
+> > > This patch adds the following PCS functionality for the PCS driver
+> > > for IPQ9574 SoC:
+> > > 
+> > > a.) Parses PCS MII DT nodes and instantiate each MII PCS instance.
+> > > b.) Exports PCS instance get and put APIs. The network driver calls
+> > > the PCS get API to get and associate the PCS instance with the port
+> > > MAC.
+> > > c.) PCS phylink operations for SGMII/QSGMII interface modes.
+> > > 
+> > > Signed-off-by: Lei Wei <quic_leiwei@quicinc.com>
+> > 
+> > ...
+> > 
+> > > +static int ipq_pcs_enable(struct phylink_pcs *pcs)
+> > > +{
+> > > +	struct ipq_pcs_mii *qpcs_mii = phylink_pcs_to_qpcs_mii(pcs);
+> > > +	struct ipq_pcs *qpcs = qpcs_mii->qpcs;
+> > > +	int index = qpcs_mii->index;
+> > > +	int ret;
+> > > +
+> > > +	ret = clk_prepare_enable(qpcs_mii->rx_clk);
+> > > +	if (ret) {
+> > > +		dev_err(qpcs->dev, "Failed to enable MII %d RX clock\n", index);
+> > > +		return ret;
+> > > +	}
+> > > +
+> > > +	ret = clk_prepare_enable(qpcs_mii->tx_clk);
+> > > +	if (ret) {
+> > > +		dev_err(qpcs->dev, "Failed to enable MII %d TX clock\n", index);
+> > > +		return ret;
+> > 
+> > Hi Lei Wei,
+> > 
+> > I think you need something like the following to avoid leaking qpcs_mii->rx_clk.
+> > 
+> > 		goto err_disable_unprepare_rx_clk;
+> > 	}
+> > 
+> > 	return 0;
+> > 
+> > err_disable_unprepare_rx_clk:
+> > 	clk_disable_unprepare(qpcs_mii->rx_clk);
+> > 	return ret;
+> > }
+> > 
+> > Flagged by Smatch.
+> > 
+> 
+> We had a conversation with Russell King in v2 that even if the phylink pcs
+> enable sequence encounters an error, it does not unwind the steps it has
+> already done. So we removed the call to unprepare in case of error here,
+> since an error here is essentially fatal in this path with no unwind
+> possibility.
+> 
+> https://lore.kernel.org/all/38d7191f-e4bf-4457-9898-bb2b186ec3c7@quicinc.com/
+> 
+> However to satisfy this smatch warning/error, we may need to revert back to
+> the adding the unprepare call in case of error. Request Russel to comment as
+> well if this is fine.
 
-Except tun. If there is such an example of recvmsg() implementation and 
-it is not accidental and people have agreed to keep it functioning, we 
-can confidently say this construct is safe without fearing pushback from 
-people maintaining filesystem/networking infrastructure. Ultimately I 
-want those people decide if this can be supported for the future or not.
+Thanks, I had missed that.
 
-> 
-> 
->>>
->>> If not zeroing leads to ambiguity with the new feature, that would be
->>> a reason to add it -- it is always safe to do so.
->>>> If we are really confident that it will not cause problems, this
->>>> behavior can be opt-in based on a flag or we can just write some
->>>> documentation warning userspace programmers to initialize the buffer.
-> 
+I don't think there is a need to update the code just to make Smatch happy.
+Only if there is a real problem. Which, with the discussion at the link
+above in mind, does not seem to be the case here.
+
+> Is it possible to share the log/command-options of the smatch failure so
+> that we can reproduce this? Thanks.
+
+Sure, I hope this answers your question.
+
+Smatch can be found here https://github.com/error27/smatch/
+
+And I invoked it like this:
+$ PATH=".../smatch/bin:$PATH" .../smatch/smatch_scripts/kchecker drivers/net/pcs/pcs-qcom-ipq9574.o
+
+Which yields the following warning:
+drivers/net/pcs/pcs-qcom-ipq9574.c:283 ipq_pcs_enable() warn: 'qpcs_mii->rx_clk' from clk_prepare_enable() not released on lines: 280.
+
+
 
 
