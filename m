@@ -1,109 +1,80 @@
-Return-Path: <netdev+bounces-157010-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157011-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C708A08AEA
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 10:07:30 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F2A8A08B08
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 10:14:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E6FC61688C1
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 09:07:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1A925188C029
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 09:14:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F084E209669;
-	Fri, 10 Jan 2025 09:07:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF50B20967C;
+	Fri, 10 Jan 2025 09:14:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sedlak-dev.20230601.gappssmtp.com header.i=@sedlak-dev.20230601.gappssmtp.com header.b="W01zWdKk"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mY4+8LdJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4442C206F06
-	for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 09:07:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAFC7206F06;
+	Fri, 10 Jan 2025 09:14:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736500044; cv=none; b=gKoNKry/DKlwBD1bstFBks7w8etgb6yuRvI6GlUeGpRckzaGIJtSGqrRjw2IM5daImOBF2rdtB5pU+l32aiaznx6F3UsOX4hH1nvZrCY/rQKOd1wbqN91adVNIi1+2YWhIq21DsSRTwjyNLxOxbZMqoIyE3tOU4dA9hmaspe3yQ=
+	t=1736500447; cv=none; b=Fvc0Rj1H1+8ULQLlkYQ5oFLYeDyKKZpUL6sig+GL/t55EoS0d43WaXTbY6rCPc4xtTf9HBHzL3h4Asd8BLwz2C4+/4s+caR5Qd8+x74fdxLh5XJ5Vnw2JVJT6X+jsTqajaT5FlOnrqiV2qTn8U/2icnfOKzgSAXD/1BOmG3gYFo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736500044; c=relaxed/simple;
-	bh=mJqgKsIX8JTRfqDD+I1SI8NjK4HyCThVNrcvwxMcg/M=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Content-Type; b=JQA2QKc+/JkU4f95dwuRapqa0Bs65+O8IEu3iH/27JeoHsI8O/MM1IXOEpj91bHr75Ge3HXQjUe9k1tkfv0tGSto94gm2MfL3L5Z5baZnQF5X9SRqKMX7tY34JFoQyEJIixq5P1a0bZciIBYnfhuDFwpuNwjkjtViOv2vtHhaoU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sedlak.dev; spf=none smtp.mailfrom=sedlak.dev; dkim=pass (2048-bit key) header.d=sedlak-dev.20230601.gappssmtp.com header.i=@sedlak-dev.20230601.gappssmtp.com header.b=W01zWdKk; arc=none smtp.client-ip=209.85.218.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sedlak.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=sedlak.dev
-Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-aaeef97ff02so307864766b.1
-        for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 01:07:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sedlak-dev.20230601.gappssmtp.com; s=20230601; t=1736500039; x=1737104839; darn=vger.kernel.org;
-        h=content-transfer-encoding:to:subject:from:content-language
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bivfEXb0SUuBXZLG0UoLAS1vXjT9WbVPSPb5v7e/O4Q=;
-        b=W01zWdKkw6bIyUFdez0BRxcFwc3a5eo4A9QP5dsJlWTUMe4Of2QCqYTYJgWYunxHSx
-         iVl3KiAJB/jl/0tRwsqLFT2lmXAwLgxTFNV74YM1MQqWS9HhSBS+gK1U4qMG6pcaS5+/
-         Fz9ZmajFuwWna/5rU6G6PexxVPbhzrbxAzGk3cuhI4wiRKbZvJWf9bEnhzuKZ++6PwBO
-         4xOJum5YrzPIwXmOIWDutCLmnv7kkvtgMPuZAKgrHJFpXCPMogO8EccjDj9TyXVny/3O
-         bp1pT6/hp9twzyHei3VFdEanluFTVTPzq2i2Qq1svsS+9icXJ6vT5b5lzkfFSKvPvlZT
-         BrEA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736500039; x=1737104839;
-        h=content-transfer-encoding:to:subject:from:content-language
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=bivfEXb0SUuBXZLG0UoLAS1vXjT9WbVPSPb5v7e/O4Q=;
-        b=Fc/4E/8A10S82onP3sWFetqmsbK5TBDB7Noxur9NxlKmOl5AMfZWoKSt4VFVuE4qoW
-         8CkoktB/MT4PjxS5Zb214iqB2Nq1HMOvCpgFdipVaWTFl/yGeSqRQUc5TDIaINSFzcjz
-         YL+HoWg2cWRlZoeStNtC8hM6UUiAXSZa9x9z8a3a+ZbJ0ZqWzC5boaiB03UgS0l/yPao
-         swN9mxvT9s1zw8FOY6vb3EtU67bybIGykTiTT/c3zaX0ZRZjs4k3nsTfBpS3PTY7cbYc
-         849BC9U4zi4gfI7leykztYwSQQrIdMQ508LmtM7thvE6xgs5SX4GGoEYQ++IDbVE8MWD
-         C8LQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUbLu9WuWrDOQx9dBWBQRcXyT2Lv8Nms5Zdg/cp+HCXXNhe0YE0tU+Hql3znkc8I/rcL3Lf/lo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyF6Ya2KHbLK+JQtnm4U4c+3F2Ep9OkotkiFphe43L60dfljUCI
-	mLTgw2TV0SCmvg6HyHaz8D9GyjPSjDF7wvs7VjQN+bxvP0xPioKRKIASYjOobpQ=
-X-Gm-Gg: ASbGnctcxzGJYXy3/ej9LVCp8jKc6pbDU/ZUzy+yAOGy/IZpefz4DLV4ddrPTzlo/Uj
-	h6jM9dtASVkIKB06lV8D2G0BoqWMCnYUUhSvSfBJXOsiDpnc0PHxwGkQiRzMAwZyfSZ2RCb1hyC
-	y4LsKoRy4Om/fubZmNRjaaPibjEkHH9PrP8nTZ7FaBnKDEktANvQ3aquenR+94tnDIB/LkJM8aK
-	A3Z64KsiSrEK/sA+WcyZfBsOIkWUOfj+vK6RC5hlJe1wm1vBtuTknEsdOvNhGe7/acq0lCZr6Ns
-	mv5/
-X-Google-Smtp-Source: AGHT+IE10SlroKQ5y0Lz/L4dNL2RL1GX1Kf54btjmslD/qSypClq/YVxTwxwh4y/dCEbf7+FbpZqhg==
-X-Received: by 2002:a17:907:94c2:b0:aa6:824c:4ae5 with SMTP id a640c23a62f3a-ab2abc9f6e0mr763522866b.56.1736500039098;
-        Fri, 10 Jan 2025 01:07:19 -0800 (PST)
-Received: from [10.26.3.151] (gumitek-2.superhosting.cz. [80.250.18.198])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ab2c90d7432sm145924566b.49.2025.01.10.01.07.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 10 Jan 2025 01:07:18 -0800 (PST)
-Message-ID: <ca5056ef-0a1a-477c-ac99-d266dea2ff5b@sedlak.dev>
-Date: Fri, 10 Jan 2025 10:07:18 +0100
+	s=arc-20240116; t=1736500447; c=relaxed/simple;
+	bh=bTb+Hv5dd65gTmFTMoGmoxuUTsLgAnIzpNiXYBrn/No=;
+	h=From:To:Cc:Subject:References:Date:In-Reply-To:Message-ID:
+	 MIME-Version:Content-Type; b=VDCWUjBU0CEyI4yQHBgj+SXB+1JP+7YqqxJKYGW4D5UIj7Wkv0d8Wru401RER65js/JPT1rA3U6+GnEGR4q9UTNcpLpaftL/oiHnRddJ4ljS4THtS0hR9PRRfO13ngwVEyvpX/fFE4fJa/ti3cXTKZw/qvaasDOG60zWoxTTK2Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mY4+8LdJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BBB2FC4CEE0;
+	Fri, 10 Jan 2025 09:14:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1736500447;
+	bh=bTb+Hv5dd65gTmFTMoGmoxuUTsLgAnIzpNiXYBrn/No=;
+	h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
+	b=mY4+8LdJ/dLWVYJ/nrLMS/GRbnBhb1f+0H3LKNOJ5KwMUcjF8aR4BpkUE/gwvo+MC
+	 BYecpo4l5Az8XN/tAy4fzue6NC5UZVo0pvFpDrOBHG45N+guiYDOq5UF+Wv/lifuMy
+	 0NnmiR4U+T6cqRz82OF5KGi+3Xpnpygscjx/SBmyqng5jyFBual3Gd8+9pMOy88Lqt
+	 BZxqbdsv4Ix1mhkNDaAb37YuMXhJVYXZVjOBWcBA+lOe4VbqhWSJwoqEYM3Z3hzwAk
+	 aQjRv1m2IgUUR3l80vqVHu4j2HhPyuNhpmLiFwhfJvQHgGDJt0qvEnvSCCpkxaPy8O
+	 ahrFW8GZWcaWA==
+From: Kalle Valo <kvalo@kernel.org>
+To: Catalin Popescu <catalin.popescu@leica-geosystems.com>
+Cc: andrew+netdev@lunn.ch,  davem@davemloft.net,  edumazet@google.com,
+  kuba@kernel.org,  pabeni@redhat.com,  robh@kernel.org,
+  netdev@vger.kernel.org,  devicetree@vger.kernel.org,
+  linux-kernel@vger.kernel.org,  linux-wireless@vger.kernel.org,
+  m.felsch@pengutronix.de,  bsp-development.geo@leica-geosystems.com
+Subject: Re: [PATCH net-next 1/2] dt-bindings: net: rfkill-gpio: enable
+ booting in blocked state
+References: <20250110081902.1846296-1-catalin.popescu@leica-geosystems.com>
+Date: Fri, 10 Jan 2025 11:14:02 +0200
+In-Reply-To: <20250110081902.1846296-1-catalin.popescu@leica-geosystems.com>
+	(Catalin Popescu's message of "Fri, 10 Jan 2025 09:19:01 +0100")
+Message-ID: <87frlrowth.fsf@kernel.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-From: Daniel Sedlak <daniel@sedlak.dev>
-Subject: [Question] Generic way to retrieve IRQ number of Tx/Rx queue
-To: linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 
-Hello,
-I am writing an affinity scheduler in the userspace for network cards's 
-Tx/Rx queues. Is there a generic way to retrieve all IRQ numbers for 
-those queues for each interface?
+Catalin Popescu <catalin.popescu@leica-geosystems.com> writes:
 
-My goal is to get all Tx/Rx queues for a given interface, get the IRQ 
-number of the individual queues, and set an affinity hint for each 
-queue. I have tried to loop over /proc/interrupts to retrieve all queues 
-for an interface in a hope that the last column would contain the 
-interface name however this does not work since the naming is not 
-unified across drivers. My second attempt was to retrieve all registered 
-interrupts by network interface from 
-/sys/class/net/{interface_name}/device/msi_irqs/, but this attempt was 
-also without luck because some drivers request more IRQs than the number 
-of queues (for example i40e driver).
+> By default, rfkill state is set to unblocked. Sometimes, we want to boot
+> in blocked state and let the application unblock the rfkill.
+>
+> Signed-off-by: Catalin Popescu <catalin.popescu@leica-geosystems.com>
 
-Thank you for any help or advice
+Don't rfkill patches go via wireless-next, not net-next?
 
-Daniel
+-- 
+https://patchwork.kernel.org/project/linux-wireless/list/
+
+https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
 
