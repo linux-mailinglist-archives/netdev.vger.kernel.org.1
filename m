@@ -1,158 +1,150 @@
-Return-Path: <netdev+bounces-157185-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157186-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1A1EA09440
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 15:51:48 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id C8AE3A0944B
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 15:52:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2CA4E188E235
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 14:51:34 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E762D7A4936
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 14:52:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D22F92116E1;
-	Fri, 10 Jan 2025 14:47:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0F67212D82;
+	Fri, 10 Jan 2025 14:48:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="PLTC+5mR"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="sO5/Qici"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 234A52116E6;
-	Fri, 10 Jan 2025 14:47:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05CD7212D83
+	for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 14:48:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736520442; cv=none; b=oMZhVj7ivGM6y6Ya3TK2d7lFESp4JdoIHgmp3KL9AnmI6wUILG8oSmWGpZU+SYUlhZWm5jtbQtaeGgPY/DnAQyF2XPjgX14fnb5I58xo3QgIPeOxmyReFC65vJC/GD5+lkoJmrwK0kiwoKKet18P2qNOh4BwS/WVfsvR4lvEF1I=
+	t=1736520497; cv=none; b=VdJ7r4irJnES3913hB76LgRGSAVbgCEix8f4hiXyI5oO2Z9yzwKW2kqoJX3D4929enBX/6M71mv5HGGZW3kVnC8NCjo4GzqiQl1hB6+VDYaZvc8Np/FJoJylCJ09+syzBu6ISTMUOyXVzOAAQJOs6mqsup982yuVeXNj23nk2ZA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736520442; c=relaxed/simple;
-	bh=Nwi9x0KRVUX+HhVnzQQfUW3EJ1pjbVFPSiqj41R7hP8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=sjg+Ka0jcbfUoubFr8CHtXJ+Kf56mMLQnMIxiE8ptpsTw8WYBzNV34Jx4Y1eXIawxPEWa45HudDY8/WOufiTRPiR2diQFgcemPpdlDr6oN9B1McuhsjYHH4sfarJN8ISYVWoOoXGjnIg4k77Ncr/CHX6I80/DzVS8t2OmGzBnVA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=PLTC+5mR; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50AEIQus015062;
-	Fri, 10 Jan 2025 14:47:01 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=ZYbwep
-	TLCOiqF08Tk1K3/9sm1ogW5I4vbVOfFlCfgEM=; b=PLTC+5mR8TgHXUM5beLlTc
-	MI3pCmMBveC/9qyZBMi1TP/1TkmEQ9E6RsddpbLPjL/2R1vLEQ3V5xMj1M4SRiin
-	GADEeS8p2xdHcqGlzGSzb06zzT6/BFVw8iVZvNSCZUGuTs2h/8VU7kc46pXmLDiF
-	qY5yo6950fzySAgGiivynWaoniwZAa8+yf6Bk5cP5Kmw7mYPsjJnzga1yQdVCSsQ
-	87ueJbwqZn6ZIS2xDpeCKuC4mWRSl2mrE3PBmGsyExlNprtKOvLMrM7MsoTcuFh6
-	7LQOwLzPJkg/51zKKvdVdH2aQ+wmTUgnWpLBFujjMVxheC1ytFzvyOkIG3oH2kXQ
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 442v1bthgq-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 10 Jan 2025 14:47:01 +0000 (GMT)
-Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 50AEl0Qn009482;
-	Fri, 10 Jan 2025 14:47:00 GMT
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 442v1bthgk-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 10 Jan 2025 14:47:00 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 50ADgCSV013571;
-	Fri, 10 Jan 2025 14:46:59 GMT
-Received: from smtprelay06.dal12v.mail.ibm.com ([172.16.1.8])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 43ygapanrh-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 10 Jan 2025 14:46:59 +0000
-Received: from smtpav02.dal12v.mail.ibm.com (smtpav02.dal12v.mail.ibm.com [10.241.53.101])
-	by smtprelay06.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 50AEkwSv30868148
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 10 Jan 2025 14:46:58 GMT
-Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 0DF785805A;
-	Fri, 10 Jan 2025 14:46:58 +0000 (GMT)
-Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 8DE8758051;
-	Fri, 10 Jan 2025 14:46:55 +0000 (GMT)
-Received: from [9.171.42.47] (unknown [9.171.42.47])
-	by smtpav02.dal12v.mail.ibm.com (Postfix) with ESMTPS;
-	Fri, 10 Jan 2025 14:46:55 +0000 (GMT)
-Message-ID: <afb5abb3-8060-42ed-bb8f-48fb13d99d0c@linux.ibm.com>
-Date: Fri, 10 Jan 2025 15:46:55 +0100
+	s=arc-20240116; t=1736520497; c=relaxed/simple;
+	bh=Bqpcet7WMI9CpkDWCxsuWJKyvQ/xOt1BTswXzR5yJ7A=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ASMgHtWMENxZC4ZRaNw2zBQspkdU5Oh6zsYA3BxrP5EENsR7fF/ivlw7WKEdNcsEfjRQhCvRJKbt5Wo4rHx9Pm5izQxlntINTz6MMNLy9ayqmwQToTP4JdCEOdKwdqJTbziND3AV3/6K477dMpJ25PcCcC++dhzM0Y1tHOI+hO4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=sO5/Qici; arc=none smtp.client-ip=209.85.214.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-2166360285dso36826065ad.1
+        for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 06:48:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1736520495; x=1737125295; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+NxySisB6G/+j7C6wBPx38Ebyi5TgZquoSriIrcXZPA=;
+        b=sO5/Qicif/sMkfW2b4+u8D2Z2dSUB2P1gVES3WY0Oq9kAbQEK+bEA48E0e8/7DJfK9
+         qchNNCnHgIoLVNhCPdaAZyZUM6YpE0N0ml37VIZvDak2q29UrPsJVGjyjK48+FJAKzlY
+         fZ/bv/7iKl1a8bXCS+GF2B2HezvfxB+HZUfPuw4z70prO+uNL7Qrg9JzSOL/eTTxrWMU
+         TiX/2Mt0jcYv2VKjbWasUPVgf5WuZqJ9d9Dx2mp6E8LmfvqErycz1gUppLGBpsoH4mAf
+         k4P4GlHDSbnuF3dht7hZPFOcJMCWsOHq5yXD7FvO6pAKCfNGA64+k7nPFOWoV2Ec2R6Y
+         0+EQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736520495; x=1737125295;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=+NxySisB6G/+j7C6wBPx38Ebyi5TgZquoSriIrcXZPA=;
+        b=ZRdqGNOBLXceeD6MGOEJf+c4asrQxw7haluFXKAaIa2jLiEuIif3HNFxFzyWzDw545
+         b/5JP+EtcbopyPcTj80qlGfO1eoEiMt9jTjLSM4n6/SyItIsDXkHmvvIClh8x0V1HPMQ
+         JbFcei3orUT0PN1z7K1W/ovznns0vPm2FXWKWgMqa9olWz58zgmUOx4deUK7yZKwJCJq
+         j2xPzM2NzUJJXFohoW9UUkIaLY9JWvS2vDHrkklR14vFc1snSss8EXkMmJB8LlD96eX5
+         HygElU3UfuuDsBteBCOAK7EO54ysmOxBbykeAvoJ6dtCuO1Yj/m0skNLu4WElvCKcLSw
+         OmSw==
+X-Gm-Message-State: AOJu0YwaW9wAJbAAiVrmqVApekELlNsUaYYbiDuzXCGvmWZxVdSEf1yd
+	zEiBuaKSblllj/2DBq33gD/lrRMmGg07KqopzFrcb1IZ5ekyN5omHhxT7r/2OpmCZkyKYja4NGB
+	PpnDjM+oCTsTLcbO8eWirsO3l7knwl3FUHkhj
+X-Gm-Gg: ASbGncs7ivh90jacOo0Cl3WfoTXv2ebkVv0ia1IHigBVPAq9mpbOq9Rlpz/A48Bubag
+	76RpPiUhEn+CgkJz7z1OeKLqMzrMga8+1cCoj
+X-Google-Smtp-Source: AGHT+IF8hC9yT8ft8min+VsLJ0wyx7GnH53pcSnBEYqdacrx/mmyQymMni6YbcAqRzEdaaz2RVIY2mVcuSPwfVA5nS8=
+X-Received: by 2002:a05:6a00:21c4:b0:727:64c8:2c44 with SMTP id
+ d2e1a72fcca58-72d21fc651amr14442443b3a.19.1736520495307; Fri, 10 Jan 2025
+ 06:48:15 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] rhashtable: Fix potential deadlock by moving
- schedule_work outside lock
-To: Herbert Xu <herbert@gondor.apana.org.au>, Breno Leitao <leitao@debian.org>
-Cc: Michael Kelley <mhklinux@outlook.com>,
-        "saeedm@nvidia.com" <saeedm@nvidia.com>,
-        "tariqt@nvidia.com" <tariqt@nvidia.com>,
-        "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>, Thomas Graf <tgraf@suug.ch>,
-        Tejun Heo <tj@kernel.org>, Hao Luo <haoluo@google.com>,
-        Josh Don <joshdon@google.com>, Barret Rhoden <brho@google.com>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>
-References: <20241128-scx_lockdep-v1-1-2315b813b36b@debian.org>
- <Z1rYGzEpMub4Fp6i@gondor.apana.org.au> <Z2aFL3dNLYOcmzH3@gondor.apana.org.au>
- <20250102-daffy-vanilla-boar-6e1a61@leitao>
- <SN6PR02MB41572415707F0FA6D9A61247D4132@SN6PR02MB4157.namprd02.prod.outlook.com>
- <20250109-marigold-bandicoot-of-exercise-8ebede@leitao>
- <Z4DoFYQ3ytB-wS3-@gondor.apana.org.au>
-Content-Language: en-US
-From: Zaslonko Mikhail <zaslonko@linux.ibm.com>
-In-Reply-To: <Z4DoFYQ3ytB-wS3-@gondor.apana.org.au>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: kham6myY7StHcU36gligKTUdQpQnBn5d
-X-Proofpoint-GUID: 1vmhUAfWMifC2MPi-Y80M2IerHttMSQo
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999
- malwarescore=0 spamscore=0 clxscore=1011 impostorscore=0 phishscore=0
- lowpriorityscore=0 bulkscore=0 priorityscore=1501 suspectscore=0
- adultscore=0 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2411120000 definitions=main-2501100114
+References: <20250109143319.26433-1-jhs@mojatatu.com> <20250109102902.3fd9b57d@kernel.org>
+In-Reply-To: <20250109102902.3fd9b57d@kernel.org>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Fri, 10 Jan 2025 09:48:02 -0500
+X-Gm-Features: AbW1kvYNHDz0JSocwGuJ6PsiWb116Lj2OHrtvs3TtGc9H9kOPwA70e5A4O1ZS7M
+Message-ID: <CAM0EoMn7uADZkTQkg48VP7K7KD=ZVHPLfZheAwXSumqFWommNg@mail.gmail.com>
+Subject: Re: [PATCH net 1/1 v2] net: sched: Disallow replacing of child qdisc
+ from one parent to another
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, jiri@resnulli.us, xiyou.wangcong@gmail.com, 
+	davem@davemloft.net, edumazet@google.com, security@kernel.org, 
+	nnamrec@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Herbert and Breno,
+On Thu, Jan 9, 2025 at 1:29=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wro=
+te:
+>
+> On Thu,  9 Jan 2025 09:33:19 -0500 Jamal Hadi Salim wrote:
+> > Lion Ackermann was able to create a UAF which can be abused for privile=
+ge
+> > escalation with the following script
+>
+> Also looks like this upsets tc-mq-visibility.sh :(
 
-On 10.01.2025 10:27, Herbert Xu wrote:
-> On Thu, Jan 09, 2025 at 02:15:17AM -0800, Breno Leitao wrote:
-> 
-> Reported-by: Michael Kelley <mhklinux@outlook.com>
-> Fixes: e1d3422c95f0 ("rhashtable: Fix potential deadlock by moving schedule_work outside lock")
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-> 
-> diff --git a/lib/rhashtable.c b/lib/rhashtable.c
-> index bf956b85455a..e196b6f0e35a 100644
-> --- a/lib/rhashtable.c
-> +++ b/lib/rhashtable.c
-> @@ -621,7 +621,7 @@ static void *rhashtable_try_insert(struct rhashtable *ht, const void *key,
->  
->  			rht_unlock(tbl, bkt, flags);
->  
-> -			if (PTR_ERR(data) == -ENOENT && !new_tbl) {
-> +			if (!new_tbl) {
->  				atomic_inc(&ht->nelems);
->  				if (rht_grow_above_75(ht, tbl))
->  					schedule_work(&ht->run_work);
+Yes, the patch will stop the "graft some" bits. Some first-coffee
+context... Looking at the script, I see this:
 
-I'd like to let you know that I was getting OOM failure on s390 when booting
-the kernel (linux-next20250109) with limited memory (mem=1G kernel parameter).
-Problem took place in both zVM and LPAR environments. Bisecting also revealed
-the commit e1d3422c95f0 ("rhashtable: Fix potential deadlock by moving
-schedule_work outside lock").
-Afterwards, I tried the fix from Herbert above and the error does not appear
-any more. So it seems to resolve the issue.
+# One real one
+... replace parent 100:4 handle 204: pfifo_fast
+Lets dump:
+...qdisc pfifo_fast 204: dev xxx parent 100:4 bands 3 priomap 1 2 2 2
+1 2 0 0 1 1 1 1 1 1 1 1
+Then, this step:
+# Graft some
+...replace parent 100:1 handle 204:
+dump again:
+...qdisc pfifo_fast 204: dev xxx parent 100:4 refcnt 2 bands 3 priomap
+1 2 2 2 1 2 0 0 1 1 1 1 1 1 1 1
 
-Thanks,
-Mikhail
+Observe that  1) parent did not change(there can only be one parent
+and still pointing to 100:4, not 100:1) and
+2) refcount went up
 
+There are two possible intentions/meanings from reading that dump:
+a) the pfifo queue with handle 204: is intended to be shared by both
+parent 100:1 and 100:4 --> refcount of 2 takes care of that. But then
+you can question should the parent have stayed the same or should we
+use the new one? We could keep track of both parents but that is
+another surgery which seemed unnecessary.
+b) We intended "replace" to move the pfifo queue id 204: from 100:4 to
+100:1. In which case we would need to do some other surgery which
+includes getting things pointed to the new parent only.
+
+While #a may be practical it could be achieved by building the proper
+qdisc/class hierarchies. I am not sure of practical use #b. In both
+cases it seemed to me prevention is better than the cure.
+Question for you for that test: Which of these two were you intending?
+ It could be you just wanted to ensure some grafting happened, in
+which case we can adjust the test case.
+
+Like 99.99% of bugs being reported on tc, someone found a clever way
+to use netlink to put kernel state in an awkward position.  And like
+most fixes it just requires more checks against incoming control into
+the kernel.
+
+Thoughts?
+
+cheers,
+jamal
+
+PS:
+Sorry - didnt catch this, i only ran tdc tests which all passed
+And the "Fixes" is from the first git entry - i can send an updated version
+And to Cong - yes, we'll add a new tdc test case for this..
 
