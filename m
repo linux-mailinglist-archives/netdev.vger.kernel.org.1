@@ -1,178 +1,111 @@
-Return-Path: <netdev+bounces-157062-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157064-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7B66A08CB7
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 10:48:18 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CDC5CA08CF6
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 10:52:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1828E3AB2BE
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 09:45:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 128153AD429
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 09:49:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D57C7210F4C;
-	Fri, 10 Jan 2025 09:40:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D23F20C01A;
+	Fri, 10 Jan 2025 09:48:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="ITy8n5S8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KReXlo1E"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AD6B20FA93;
-	Fri, 10 Jan 2025 09:40:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AED7120A5DD;
+	Fri, 10 Jan 2025 09:48:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736502058; cv=none; b=IeKsU2LxC6Zz/RyLr+1t7FoyVDww+8eQf3i2838WqI2+mn8qBydgSU4r5C+MYxW0JNuW4agaoySkKJM8bm+MV0mskaXce6g7v/mLhnY5jbrNn/A6MyaOGsoTkhHK0boBvILu6z1dmGCdqa0xUUx9dg1Cjw2CJSdAsXct71LG5/8=
+	t=1736502488; cv=none; b=jctq9F4wVtn2WV3qr3sPUnhKx7+oa3wLV4T4XrPnXJJbup4HnMIlnihGvvHpxewX3s2W7OkJxKefJzIw1jJYLY4O5dK2cVKaidYOejPW0sEQ2HITlGPBhgO7d8JqeTAm/IzDx+CUdQfeR5YM+G5XOuhMIco2TlDHrmsx7vYNSZE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736502058; c=relaxed/simple;
-	bh=APmCAOzBAsq+BgXufrBmKnvUqJTpSj9rDWj+RyYurps=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=XI4HMn9XmN+5JHl2QHXAvQ2DOa2h71oPX3vKVQQ6ChKoUzkGFBaIEy8La3GyEr7q0nDCWmke+VjFH3ZMGSNUuSWWlR/i0YK1NuK+uCRzARxUXQjJJfb8m/RGJ8tQydm0nRKZAmGlmEGhZWgMznTUO/147aWN3AxD5QR8HPvYEak=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=ITy8n5S8; arc=none smtp.client-ip=217.70.183.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id C0BEC60013;
-	Fri, 10 Jan 2025 09:40:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1736502054;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=pyahIhK6ZnikhrTX1IKvZvnf0u88gIlvhDiD3CqQUVM=;
-	b=ITy8n5S8MaKf7nMpkgymDGcLaM2qWbRgnDVSqkzFduqDy9mgJnm4eGH2pud9qQ3c+bgBLv
-	AetODnXLukwoxVLkMjmIiG4AAfMNR0ojsenN4H2wjhDk7CrYkkQ44/xbEXV+OV/FlOVzKq
-	gBc1OAiZOVpNXZ6Z53tlaGpvS3XL8Qpcpmvr8fe2E2zAutEUfbyxYzGKyQQaVCaJqugMpZ
-	i+cPL2J/bjvth6nmZM7Vc0cXin+XKp/+BYZ5jWhyj+yJMsn9TB8H/zr+0raMGriYDydZBI
-	dWifOhE+VFEGJ7zDgTQnNKgMwlEAynuq06+rvIZ6k7JYaoG/Fgt1T6cP94r2Cg==
-From: Kory Maincent <kory.maincent@bootlin.com>
-Date: Fri, 10 Jan 2025 10:40:31 +0100
-Subject: [PATCH net-next v3 12/12] net: pse-pd: Clean ethtool header of PSE
- structures
+	s=arc-20240116; t=1736502488; c=relaxed/simple;
+	bh=mtBp3AyjCM/ZWQ3Dt+JtvHpf0ZzFbURIvx/WMvyfUuI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=n+RmW4IXMZ+itA7gZo4W3kWKR8QsxNMVLOkbTUgUPnxYL5Ep/Mdb1EMPFxThyOsF77cyNBXnbq3lyPjxUgU6plqWJeaZi0L/cMOAhiQJSjzDjt5KFFyF0ZJYQqsIXJsoZESxKop8JvnDQg3LiUCvrmyXTN+o+1zVY081o/68f+Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KReXlo1E; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3B09FC4CEE1;
+	Fri, 10 Jan 2025 09:48:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1736502487;
+	bh=mtBp3AyjCM/ZWQ3Dt+JtvHpf0ZzFbURIvx/WMvyfUuI=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=KReXlo1El0w8Eap63jMfFIWC4zPSM2kfOrgoj3Jkx31AZjSNdG0fH3RYQ8OfbtH9o
+	 LlsKxxkkVgJ6xAWIWWnqvumXm0B1JceDx7P97H8XmNBwXQnQT5/bSt4N6rTltt/biM
+	 TiuvOPlYJEc0NxoetkPFTIhpKSAL4bCnD5BJc7jZWTXfM3GWJOmRUdFcsek3XU3RXH
+	 EZvpslsTygAb+pwz7iihaBmhmnvuC3dQbyV97ITCqBLLDYYoLsBgB4FH+UChAxiEZQ
+	 Sr7FC2Ky7vKsfHXieyhcF6+1u1fKDCnUFyGCg5Z4P8UNRaApimY4N37hm7UKa3N5Zy
+	 QqjhoEGN2AW1g==
+Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-5401ab97206so1888363e87.3;
+        Fri, 10 Jan 2025 01:48:07 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCUrSYfhjj4VD9dt4YQh7UK+E+7RL+/RYIEoN91zYO+OjTgov4MXX6tkefUzXo7uQEARkyaligjjrN22Yso=@vger.kernel.org, AJvYcCVEBDbvKsrw0A1THKNP8vCSMJyNvOrMkb2HfmtyVtWIvnzW4brnHwzcxYofeQwih4VY8fvVTxiH@vger.kernel.org, AJvYcCVr6ual1KIDaJYTVo4PM47iKIrosqlPqOiKIO0gDe3TnvnJFSvYmUALVJinopqSEcfxqhHVnHK2ppfs+1bvDw==@vger.kernel.org, AJvYcCVtwTUW1ldjezhq2gmdVHB2dlvdV3j8MVCj7vFLxQYx6hW/YoCQ0kQEeWK1mRdjrHNlAmMdCKvS5wzrkgbP@vger.kernel.org, AJvYcCXlc/0KlnIfPUndd8IZ1cfFNS31pN7zUFCmCdVkVpZDiczVpVS/L3t/w513sAGotK+ThbY0mJH8l6Rz@vger.kernel.org
+X-Gm-Message-State: AOJu0YzhBWpKGxbGR87sxMuIJ174bxayl77gnExTaOUmixJgdyvHTti6
+	fUkUnxSQh/l5w7ElJcSdVG7F2o2lLEQOehtKiXbrKWPyY24g+vpYjT1h6gSLb811jFbjqsv+2Vl
+	0xljRbI2rO6x15JynhGN/zTXKz6Q=
+X-Google-Smtp-Source: AGHT+IGw8EE7iwyfzN0h+0xxLtGtpQdXnmrLV+5rsgOpOep915zSvu0wEuCxYBjpYwWkvDsdG3N62lBbWn0iggorhOo=
+X-Received: by 2002:a05:6512:1196:b0:53f:231e:6f92 with SMTP id
+ 2adb3069b0e04-542845491ffmr3512417e87.34.1736502485591; Fri, 10 Jan 2025
+ 01:48:05 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250110-b4-feature_poe_arrange-v3-12-142279aedb94@bootlin.com>
-References: <20250110-b4-feature_poe_arrange-v3-0-142279aedb94@bootlin.com>
-In-Reply-To: <20250110-b4-feature_poe_arrange-v3-0-142279aedb94@bootlin.com>
-To: Oleksij Rempel <o.rempel@pengutronix.de>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>, Donald Hunter <donald.hunter@gmail.com>, 
- Jonathan Corbet <corbet@lwn.net>
-Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>, 
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
- linux-doc@vger.kernel.org, Kyle Swenson <kyle.swenson@est.tech>, 
- Dent Project <dentproject@linuxfoundation.org>, kernel@pengutronix.de, 
- Maxime Chevallier <maxime.chevallier@bootlin.com>, 
- Kory Maincent <kory.maincent@bootlin.com>
-X-Mailer: b4 0.14.1
-X-GND-Sasl: kory.maincent@bootlin.com
+References: <20250110010313.1471063-1-dhowells@redhat.com> <20250110010313.1471063-3-dhowells@redhat.com>
+ <20250110055058.GA63811@sol.localdomain> <1478993.1736493228@warthog.procyon.org.uk>
+In-Reply-To: <1478993.1736493228@warthog.procyon.org.uk>
+From: Ard Biesheuvel <ardb@kernel.org>
+Date: Fri, 10 Jan 2025 10:47:54 +0100
+X-Gmail-Original-Message-ID: <CAMj1kXE2mhXJaa9uq==Xki3On9ZKYY+KV-oH0ednqWC6b9BTYw@mail.gmail.com>
+X-Gm-Features: AbW1kvZNBd0gTj-dTR8eQGzNskVAFPXnGvmvtM6UKqY4sqGaw8a7UTaWuNi-eRE
+Message-ID: <CAMj1kXE2mhXJaa9uq==Xki3On9ZKYY+KV-oH0ednqWC6b9BTYw@mail.gmail.com>
+Subject: Re: [RFC PATCH 2/8] crypto/krb5: Provide Kerberos 5 crypto through
+ AEAD API
+To: David Howells <dhowells@redhat.com>
+Cc: Eric Biggers <ebiggers@kernel.org>, Herbert Xu <herbert@gondor.apana.org.au>, 
+	Chuck Lever <chuck.lever@oracle.com>, Trond Myklebust <trond.myklebust@hammerspace.com>, 
+	"David S. Miller" <davem@davemloft.net>, Marc Dionne <marc.dionne@auristor.com>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, linux-crypto@vger.kernel.org, 
+	linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org, 
+	linux-fsdevel@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-Remove PSE-specific structures from the ethtool header to improve code
-modularity, maintain independent headers, and reduce incremental build
-time.
+On Fri, 10 Jan 2025 at 08:14, David Howells <dhowells@redhat.com> wrote:
+>
+> Eric Biggers <ebiggers@kernel.org> wrote:
+>
+> > It sounds like a lot of workarounds had to be implemented to fit these
+> > protocols into the crypto_aead API.
+> >
+> > It also seems unlikely that there will be other implementations of these
+> > protocols added to the kernel, besides the one you're adding in crypto/krb5/.
+> >
+> > Given that, providing this functionality as library functions instead would be
+> > much simpler.  Take a look at how crypto/kdf_sp800108.c works, for example.
+>
+> Yes.  That's how I did my first implementation.  I basically took the code
+> from net/sunrpc/auth_gss/ and made it more generic.  Herbert wants it done
+> this way, however.  :-/
+>
 
-Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
----
+What is the reason for shoehorning any of this into the crypto API?
 
-Changes in v2:
-- New patch.
----
- drivers/net/pse-pd/pse_core.c |  1 +
- include/linux/ethtool.h       | 20 --------------------
- include/linux/pse-pd/pse.h    | 22 +++++++++++++++++++++-
- 3 files changed, 22 insertions(+), 21 deletions(-)
+I agree with Eric here: it seems both the user (Kerberos) and the
+crypto API are worse off here, due to mutual API incompatibilities
+that seem rather fundamental.
 
-diff --git a/drivers/net/pse-pd/pse_core.c b/drivers/net/pse-pd/pse_core.c
-index b0272616a861..4f2a54afc4d0 100644
---- a/drivers/net/pse-pd/pse_core.c
-+++ b/drivers/net/pse-pd/pse_core.c
-@@ -6,6 +6,7 @@
- //
- 
- #include <linux/device.h>
-+#include <linux/ethtool.h>
- #include <linux/of.h>
- #include <linux/pse-pd/pse.h>
- #include <linux/regulator/driver.h>
-diff --git a/include/linux/ethtool.h b/include/linux/ethtool.h
-index f711bfd75c4d..843e2557a197 100644
---- a/include/linux/ethtool.h
-+++ b/include/linux/ethtool.h
-@@ -1303,24 +1303,4 @@ struct ethtool_forced_speed_map {
- 
- void
- ethtool_forced_speed_maps_init(struct ethtool_forced_speed_map *maps, u32 size);
--
--/* C33 PSE extended state and substate. */
--struct ethtool_c33_pse_ext_state_info {
--	enum ethtool_c33_pse_ext_state c33_pse_ext_state;
--	union {
--		enum ethtool_c33_pse_ext_substate_error_condition error_condition;
--		enum ethtool_c33_pse_ext_substate_mr_pse_enable mr_pse_enable;
--		enum ethtool_c33_pse_ext_substate_option_detect_ted option_detect_ted;
--		enum ethtool_c33_pse_ext_substate_option_vport_lim option_vport_lim;
--		enum ethtool_c33_pse_ext_substate_ovld_detected ovld_detected;
--		enum ethtool_c33_pse_ext_substate_power_not_available power_not_available;
--		enum ethtool_c33_pse_ext_substate_short_detected short_detected;
--		u32 __c33_pse_ext_substate;
--	};
--};
--
--struct ethtool_c33_pse_pw_limit_range {
--	u32 min;
--	u32 max;
--};
- #endif /* _LINUX_ETHTOOL_H */
-diff --git a/include/linux/pse-pd/pse.h b/include/linux/pse-pd/pse.h
-index b5ae3dcee550..c773eeb92d04 100644
---- a/include/linux/pse-pd/pse.h
-+++ b/include/linux/pse-pd/pse.h
-@@ -5,7 +5,6 @@
- #ifndef _LINUX_PSE_CONTROLLER_H
- #define _LINUX_PSE_CONTROLLER_H
- 
--#include <linux/ethtool.h>
- #include <linux/list.h>
- #include <uapi/linux/ethtool.h>
- 
-@@ -16,6 +15,27 @@
- 
- struct phy_device;
- struct pse_controller_dev;
-+struct netlink_ext_ack;
-+
-+/* C33 PSE extended state and substate. */
-+struct ethtool_c33_pse_ext_state_info {
-+	enum ethtool_c33_pse_ext_state c33_pse_ext_state;
-+	union {
-+		enum ethtool_c33_pse_ext_substate_error_condition error_condition;
-+		enum ethtool_c33_pse_ext_substate_mr_pse_enable mr_pse_enable;
-+		enum ethtool_c33_pse_ext_substate_option_detect_ted option_detect_ted;
-+		enum ethtool_c33_pse_ext_substate_option_vport_lim option_vport_lim;
-+		enum ethtool_c33_pse_ext_substate_ovld_detected ovld_detected;
-+		enum ethtool_c33_pse_ext_substate_power_not_available power_not_available;
-+		enum ethtool_c33_pse_ext_substate_short_detected short_detected;
-+		u32 __c33_pse_ext_substate;
-+	};
-+};
-+
-+struct ethtool_c33_pse_pw_limit_range {
-+	u32 min;
-+	u32 max;
-+};
- 
- /**
-  * struct pse_control_config - PSE control/channel configuration.
+Are you anticipating other, accelerated implementations of the
+combined algorithms? Isn't it enough to rely on the existing Camellia
+and AES code? Mentioning 'something like the Intel QAT' doesn't
+suggest you have something specific in mind.
 
--- 
-2.34.1
-
+Also, this patch is rather big and therefore hard to review.
 
