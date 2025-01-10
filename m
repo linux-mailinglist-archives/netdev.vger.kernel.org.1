@@ -1,115 +1,99 @@
-Return-Path: <netdev+bounces-156962-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156964-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F6FEA086B5
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 06:42:47 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D3F1A086BE
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 06:44:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DC17B188C98F
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 05:42:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 26521162290
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 05:44:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 970952063F0;
-	Fri, 10 Jan 2025 05:41:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FC5E2066C0;
+	Fri, 10 Jan 2025 05:44:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="UdkosnMX"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LIQEBeLn"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5F6D205E36;
-	Fri, 10 Jan 2025 05:41:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBED38624B
+	for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 05:44:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736487690; cv=none; b=E8ukaaQuc3wp9SE3PQEA3FsIo5TA1xcqyf6jFzkqfDiiTRw4Mignjy7ZdkAAi0R0mT1PYFjBIeNWMPXwqyvsN94Ruvnawb+Sf1rq2Fei1yTpc2bF0DUlW3N7K6pNudFZhaxRiaWEOp5BZ+XIVGa+eoTr7UH+jF/ReFKwFHL17yU=
+	t=1736487886; cv=none; b=B2NDhsNNVoaywe1Q+VAxT60d5ahgabQhL5x2FLe09z92noMaI6M9sg4WB2bPqBM9MVlsw+D+Iz03Jx7UEJ28ZtQorAPnpyCkXjRpuxL3K9TY70nwqKk3QBzXklNcfrYJ4wRWtLuTmE9ArPrKlQ1aQEWPLs8lQRN+V+e+fUBtvNk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736487690; c=relaxed/simple;
-	bh=1Y7sefoQ0YoJuF1C26LElU/gmvm1zRtYCQDDma8W3tY=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=B1oW0lRIq/EFGpKFXp5uGQrnmCpte/r+2pvW3+vtjNZzXSYTn2z7ykPSNJCIPgmM3SDOpQtOiGcBo2K2okKPpeo1aHF9cJoQq2SVvhG18XSATS8WRj71nPXMWy8EHYLkClrzlT0STOur68l6rCwxp8kkBSNCQeAP6fSfSKR8dEc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=UdkosnMX; arc=none smtp.client-ip=68.232.153.233
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1736487689; x=1768023689;
-  h=from:to:subject:date:message-id:mime-version;
-  bh=1Y7sefoQ0YoJuF1C26LElU/gmvm1zRtYCQDDma8W3tY=;
-  b=UdkosnMXw1WE9+lbkwFmi6cgT0licDP0cDuBKaLhHCfOkPhnofySal3m
-   mXlwfMbNu5I4R9x/Jy4i6yAnzdGOGhJTFjPrch1z07OfE1sT05LKJFCtS
-   TN5XULWHmJjgzJJOQNAwA+bZmEeaxMfQvJB4Tpi3GSKjwWMWNciPlgsqf
-   t3BNy6+dtNB05s27XM8AcS0HgikwkeFuxJoHsNSt8HDasrmUrD+9MRiaR
-   xTSAQ+sGiVHubrtL+b+4oSF8uQjWZLQmvG2el+RfwbZPBpKeakzQVMr8W
-   kSnjKx9gL9JdNB/UKq0bN+muK8tX/6TEq9gXkrNake1rSE7P2i7Yw/HH3
-   g==;
-X-CSE-ConnectionGUID: YaO9AIrEQPOehTjwwOqDvA==
-X-CSE-MsgGUID: NyK4883oTW+tK/aaE4Na+g==
-X-IronPort-AV: E=Sophos;i="6.12,303,1728975600"; 
-   d="scan'208";a="36379889"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa3.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 09 Jan 2025 22:41:28 -0700
-Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
- chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Thu, 9 Jan 2025 22:40:57 -0700
-Received: from training-HP-280-G1-MT-PC.microchip.com (10.10.85.11) by
- chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server id
- 15.1.2507.35 via Frontend Transport; Thu, 9 Jan 2025 22:40:53 -0700
-From: Divya Koppera <divya.koppera@microchip.com>
-To: <andrew@lunn.ch>, <arun.ramadoss@microchip.com>,
-	<UNGLinuxDriver@microchip.com>, <hkallweit1@gmail.com>,
-	<linux@armlinux.org.uk>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <richardcochran@gmail.com>,
-	<vadim.fedorenko@linux.dev>
-Subject: [PATCH net-next v2] net: phy: microchip_t1: depend on PTP_1588_CLOCK_OPTIONAL
-Date: Fri, 10 Jan 2025 11:14:24 +0530
-Message-ID: <20250110054424.16807-1-divya.koppera@microchip.com>
-X-Mailer: git-send-email 2.17.1
+	s=arc-20240116; t=1736487886; c=relaxed/simple;
+	bh=BtslHBnnp5aDKIUm/gUiaf+5YBDSMg58QGXEBd2rDq0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DJsgTVwYkzGtjIUwRjQeDHfweh75lYZDVrdVrL9MU5Ta4bZtKFdqXPVHYjgQ85sJXpugozVsV/+rorKNYr0s3OCpChXp0HFAeTH7o2dwI0yT1iVIhM4pAinRGUh2RNOLfmmphAxFs3FkwOqsa3wytX46HSoIc0xX79q+6OfdPTw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LIQEBeLn; arc=none smtp.client-ip=209.85.214.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-215770613dbso20511885ad.2
+        for <netdev@vger.kernel.org>; Thu, 09 Jan 2025 21:44:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1736487884; x=1737092684; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=BtslHBnnp5aDKIUm/gUiaf+5YBDSMg58QGXEBd2rDq0=;
+        b=LIQEBeLnB2HGk9rNQhree3XS63LMs4IWN8xofPfYTs5I7HKEYKmK9ifO73zSSgaDkR
+         nh2JgV5mig0+ZTBGbp5e07ugHCyV9AdPOPRzhaZEScAqarA2kmd/3kwBrwOBB/oxROIB
+         mDbOJQYD7UlilynRQmUV/ZfLBrTgXqlFOjmglsNnDeVfuKEO4Ez7/h7hDtkc8xRMO4Zq
+         /9W/vWeucD7pmdQS0+v86xQV407+QV2axoAAWITac24PRUcFhk2dzNVZPUMxitUB+Hx4
+         VHTgiTMlraCfXp2OmhaCXTjtlTgtnzlJ5WwghN4uYxqyt+zjKAeYl8G6R9KPSS765/5z
+         OU9A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736487884; x=1737092684;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=BtslHBnnp5aDKIUm/gUiaf+5YBDSMg58QGXEBd2rDq0=;
+        b=l2qieSQqZxhkdXJmQPAkdoNyQeCLxcTF7I2kTd6xh5IgPYderkGGdgv2l/rZZoOgCA
+         p7t3KHKfcIz+b2sG2ApnuAgkj0vhuG2JIv78Y9E7Vl0jgcvTYq2J9sKKfS5sqoeI/88d
+         CPLpFEnS87rDgw9PSI8ezRf3UGNFhor6exY2UYTf1P8/uSqFEzgFAQhGyjE9myvrVGYi
+         E/mPcvvb/DRhw3rfrbpfu77na/QpMW1u1sz12AMy7qDiojy/xEGT3HRWpbJf6afRXD05
+         jmUL8eHwSjWRSrWGTRIr0lhusaYzagQdOyToN6EYVPEeVSIykKEuXKruP3brzLk3WmpY
+         yzdw==
+X-Gm-Message-State: AOJu0YzfmImzmyWS9NOVtvE89dlExkcenRsenSglZAok4UvoHVmSk7A0
+	ISt6dOE6md0nKijXBtltMA0+fgIzO6kAwKMpji6oMRapn6VKErHo
+X-Gm-Gg: ASbGncs4EZeXuh6tIGZkPG+aK1dpBlhbkvRz7idTOoEmMmYUzKoc1cilvYn+FmFPzPi
+	ieA5X2LiPKQqnSw0K/cyKVQKDwyHZ95+HGZiX1ZRrfMQl2NZZIksdaZQvo9jvlMu04MTB+a6o5O
+	JmWLEmC2RaSkrSYakIW0uz4zwGtgyrkSoeCF769PspFa03k4VMH2yK5+cCJ7GQLao5SGIklPVGZ
+	9r6V9VN90/thtlCnbhqZpoHPiebxdy0vxdb+gADHQgoLXjpgOIgEX3b8jwRPYs=
+X-Google-Smtp-Source: AGHT+IHYjl8vjxY4e+4OPzT0qubGJ/k6Zaz+ZrfIB1kpm5n3s+z4i7bAV10+kF8EHfOVPaFUPMkidg==
+X-Received: by 2002:a17:90b:54cb:b0:2ee:b666:d14a with SMTP id 98e67ed59e1d1-2f548ec8a90mr15512206a91.17.1736487884119;
+        Thu, 09 Jan 2025 21:44:44 -0800 (PST)
+Received: from localhost ([2601:647:6881:9060:c586:91c7:b7f1:d942])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21a9f21ada1sm6799575ad.138.2025.01.09.21.44.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 Jan 2025 21:44:43 -0800 (PST)
+Date: Thu, 9 Jan 2025 21:44:42 -0800
+From: Cong Wang <xiyou.wangcong@gmail.com>
+To: Jamal Hadi Salim <jhs@mojatatu.com>
+Cc: netdev@vger.kernel.org, jiri@resnulli.us, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, security@kernel.org,
+	nnamrec@gmail.com
+Subject: Re: [PATCH net 1/1 v2] net: sched: Disallow replacing of child qdisc
+ from one parent to another
+Message-ID: <Z4Czyqq+yrnMkRa2@pop-os.localdomain>
+References: <20250109143319.26433-1-jhs@mojatatu.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250109143319.26433-1-jhs@mojatatu.com>
 
-When microchip_t1_phy is built in and phyptp is module
-facing undefined reference issue. This get fixed when
-microchip_t1_phy made dependent on PTP_1588_CLOCK_OPTIONAL.
+On Thu, Jan 09, 2025 at 09:33:19AM -0500, Jamal Hadi Salim wrote:
+> Lion Ackermann was able to create a UAF which can be abused for privilege
+> escalation with the following script
 
-Reported-by: kernel test robot <lkp@intel.com>
-Closes:
-https://lore.kernel.org/oe-kbuild-all/202501090604.YEoJXCXi-lkp@intel.com
-Fixes: fa51199c5f34 ("net: phy: microchip_rds_ptp : Add rds ptp library for Microchip phys")
-Signed-off-by: Divya Koppera <divya.koppera@microchip.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
-Tested-by: Simon Horman <horms@kernel.org> # build-tested
----
-v1 -> v2
-- Modifed prefix for the patch and subject.
-- Changed target to net-next from net.
----
- drivers/net/phy/Kconfig | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+It would be nice if this can be integrated with TDC (or other selftest).
 
-diff --git a/drivers/net/phy/Kconfig b/drivers/net/phy/Kconfig
-index dc625f2b3ae4..9ad3dbfd2f99 100644
---- a/drivers/net/phy/Kconfig
-+++ b/drivers/net/phy/Kconfig
-@@ -287,8 +287,8 @@ config MICROCHIP_PHY
- 
- config MICROCHIP_T1_PHY
- 	tristate "Microchip T1 PHYs"
--	select MICROCHIP_PHY_RDS_PTP if NETWORK_PHY_TIMESTAMPING && \
--				  PTP_1588_CLOCK_OPTIONAL
-+	select MICROCHIP_PHY_RDS_PTP if NETWORK_PHY_TIMESTAMPING
-+	depends on PTP_1588_CLOCK_OPTIONAL
- 	help
- 	  Supports the LAN8XXX PHYs.
- 
--- 
-2.17.1
-
+Thanks.
 
