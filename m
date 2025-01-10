@@ -1,334 +1,244 @@
-Return-Path: <netdev+bounces-157191-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157192-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19A14A094B5
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 16:10:44 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B1803A094C8
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 16:14:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E22713A5FE6
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 15:10:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EC1FB7A11FC
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 15:14:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C35B211466;
-	Fri, 10 Jan 2025 15:10:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08F91211470;
+	Fri, 10 Jan 2025 15:14:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="frorn55t"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="J3Fyw+PS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B7A3211295;
-	Fri, 10 Jan 2025 15:10:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736521830; cv=none; b=I8Fb+O9QxdHThBKt65o+DcX74buZZR9mz/34NQHYN2Eik2tKzbD8kNzfLEl4voXcHf1SU4dMrWFBdbB//H/oSvx2mzzTeCEQCJ63qgs2+uRxOEb995Ng8SvBeugbQWNibnQaglE5mRsx3U7tX4VmdLKA2W6nzRZGEJ33wQaZ02g=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736521830; c=relaxed/simple;
-	bh=kBtl7uT8CS0A/3FQfgqRqLKLLIgEoRypHpe0pFUO/Ig=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=j29xY5Xq1bnRuso0GOEpCL56B0Iqlh6W1Rh8zAxife/H3ifoZPAfx2vSp0Pfc0rIsTvJgAAti5fUdNTALpkJma1ux3jc3RDFvLvbrJVY+mTq/d0oih9ZeF9/gPZ3GWERY+UOBY4LcdeRGmmJ8oMdc1vAKIyc5dWPxTHfAFZzP78=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=frorn55t; arc=none smtp.client-ip=209.85.128.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-43618283dedso21542605e9.3;
-        Fri, 10 Jan 2025 07:10:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736521827; x=1737126627; darn=vger.kernel.org;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=rrr2KuNOMWQbGCuFChJzePeH9IgtGR4XUrcIYviFjaQ=;
-        b=frorn55t821mxulim4HVNMnzej2mfs20YYDgZg97RWOEQccsP4HiaMBxfhhiwABs0l
-         9sHtH0A5JIQXu3Ks6MZbJvAHnh+IbHATELsPqkrPFBVf2frebglSdVdI7mjuS0IFneaD
-         BW3eD/3+nlNnSY6npg3PwT92t4cjlkkGo20l2tMTDjtRIHcnd+TwNH5/s2RLghfPc48S
-         p81h+KmxvdR29PzRaOyLysn+7W7izmofA0DbQHeZNeDbJNv5guixidlKAawYRANN3aI3
-         jti/eqX5QcByr02ouHeZpxn2TsCXyPrFt9KdEuumiKPxqWIgTNxrUvcLcetQCsJrYcz8
-         eoSA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736521827; x=1737126627;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=rrr2KuNOMWQbGCuFChJzePeH9IgtGR4XUrcIYviFjaQ=;
-        b=EmgyTHavBjBsMJY2VYL13EDeK13hX2hvnzARBojPl8AznCDh8tMUIGHfmOmlRJC8xg
-         crpgCjnpCQWMnr6/pXoum2oQQ40vWeBVser6WWgXZlfowunrxmFnKEJ/m/tIT8XCq5Ta
-         AXELOHm4q+OcvSrhSjeZzrAjTsO5mX4XhD48TeBFOYAG6Z6OfDkaGteB3EVOWXnFz3NO
-         nxZRKEwHeBq0q+50AWHFCOy6Daz8Zfd7w/DQSRcz6G6va94dJmQzpo9bYPkKkt7o+hdf
-         QakormGy4kFSNNgUZosV7DMGMvMHlNnEf2ZsgmMFwUKYZAfPcTCY07OB0UtrYCIjXlt9
-         eFrg==
-X-Forwarded-Encrypted: i=1; AJvYcCWgPInbn4WBjrTLXH7WawKVpvWgFVcOt1dPwtpcpvJ04Su2h55Uv3y+pfp4/+91n+KYEgSRgQ4pzznFY0Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwazwMyma4BLVkIDlEs0JGsc1CuLEcL9jB20SXKERYmGCvYDxev
-	+IR85Xw7MdKWGR9Cqt9O9TxotaNzyKbYKOiMnp72Yuuf0DhqAQn0
-X-Gm-Gg: ASbGncu7ZzgT5QLtflh1iunrJI/OyPQD0z2kMx3OfMcKkNXIl7UDe/xwJOcjX1c15/A
-	vW4jRsW/u0lJ3lIG8ZzYMJZ1gwDy8QW840A461wIQQNDDEUZQzGW0oSRiw4vgLTzLXdZnXdahDS
-	EYjY2D6phopy/a68JhuJwZ5kPY5gnAz+DaO1CPns+8Qvt+5tA1Be//LzI8xoDa/fqK/YSpm9DZJ
-	Cso/70dwB4FMe/jx4Cdng08yidW1GkApuV/CqFyETeSyfSmV+DJLU9ZqIQ=
-X-Google-Smtp-Source: AGHT+IFaXp/cN47vzxc7btkObg72jSd/KMKmUoEBpTJQApo14I1jarTeFXpRHAn10na2lhyS9nQ7xw==
-X-Received: by 2002:a05:600c:5117:b0:434:fe62:28c1 with SMTP id 5b1f17b1804b1-436e26cfe5bmr103411715e9.18.1736521826434;
-        Fri, 10 Jan 2025 07:10:26 -0800 (PST)
-Received: from [127.0.1.1] ([2a00:79c0:6a1:e700:303:6c5b:4b07:6715])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-436e2ddcb5bsm90931235e9.23.2025.01.10.07.10.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 Jan 2025 07:10:25 -0800 (PST)
-From: Dimitri Fedrau <dima.fedrau@gmail.com>
-Date: Fri, 10 Jan 2025 16:10:04 +0100
-Subject: [PATCH] net: phy: marvell-88q2xxx: Add support for PHY LEDs on
- 88q2xxx
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57F38210F5D
+	for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 15:14:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.14
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1736522063; cv=fail; b=p3T7Nypu15qGOyoEmVS1SwXntwgAl1kQRfvZ3Ir0OkGORgKzcYl6D63Ajr075Gta2uOqJEdhLuOCjffoAbKd3e1okhfMNPQr1+nL/BDnfSnxdKh5j8EzTW0FOotbVIiQlc2n9iGBtLliiCwAKqTniBFERVjlHDTsRlDXfqs7Kno=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1736522063; c=relaxed/simple;
+	bh=qihZpse6P0/XzdkvuIwoxgAISdxbMIx/TX7t8Cvvy4U=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=ZX6fB522GhjUdAIvvSl/BeLLqcp5z2Eey6jqGozTyo3sAEGJ5FUIAOF86779gjwcv2D/RerezB7OSFuBYjL+YF+CufgWeWMX6qR2zV9auhz6OT/Ii5rNYeQM0SL43AT3E7cjB/lwK1BXjIGpBljMJTpxjzTTVCa78NxtGEenCqg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=J3Fyw+PS; arc=fail smtp.client-ip=198.175.65.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1736522062; x=1768058062;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=qihZpse6P0/XzdkvuIwoxgAISdxbMIx/TX7t8Cvvy4U=;
+  b=J3Fyw+PSyTauBARywRSMr/PYDTFO9AAFPPYGQsMnabCo1pgXf0fq4EzD
+   4BMaUeJsv4sYyNsLb6PIGrDzuG+xTOo49Xfx0Hc2HT6vN02RhUhbaA0zc
+   F8wakWK42SGtefXM3V/24fjcwtFUZxu7xxW3EtP9EMBLJ78sDLFGcCZKw
+   +o9LuOeXbNKPlp0QxSTChj+B+69czmZSE/C/2jmfRiBzKMs7ZddmWT+52
+   tqfXIay0jZawVx5vhV512oqX1huzASFRGWVMKKlb852buBFZd+kXbbhPu
+   Q/XA9bNDcglrSX0eH4+ukXhPourL9HueCFVekZcBTtewk1y0J7CWAUY2Y
+   w==;
+X-CSE-ConnectionGUID: 1KqZznOdQoOUWiUQoH871g==
+X-CSE-MsgGUID: 6oxsLz0eSYaeLEEp6YCEwA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11311"; a="40583972"
+X-IronPort-AV: E=Sophos;i="6.12,303,1728975600"; 
+   d="scan'208";a="40583972"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jan 2025 07:14:21 -0800
+X-CSE-ConnectionGUID: I8oOEGvHSOG2Df59G+U7Mg==
+X-CSE-MsgGUID: NXj6//kMQASqRhN261GJ6w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="127040924"
+Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
+  by fmviesa002.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 10 Jan 2025 07:14:20 -0800
+Received: from orsmsx603.amr.corp.intel.com (10.22.229.16) by
+ ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44; Fri, 10 Jan 2025 07:14:19 -0800
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44 via Frontend Transport; Fri, 10 Jan 2025 07:14:19 -0800
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.48) by
+ edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Fri, 10 Jan 2025 07:14:18 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=HQ7nzU3HPdSB5WawV8An5I2jsv5GXu9gM4vVnzNEGnCm3TpYY2IeXczgCBg1dg1ogy4rCCU/la5X+ZgqX0Sk2D8nbo0o8ejKkQsgdGZJA/OqunJKXtrJQpD3A2+qb17P5+jnLJPaUazauyqwLXaEvINU9KUJ/wahUquQQj8jPbqMvbsG8pS3PAchosYdQkOyHI6wgJmUSKLvc5sd1/p19ttaSKtL+K98BU3v14n/09pOP5kQ84uolsndeI1yRoDgk6ZEd6PKAYzHBPDHJ4dyKo2OAYseODa6pz7BMW5lVL99gj62neDndr6eFIlaTfJyOmpp7h4VoC32B+G7Ck45Hw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=FmVhkan7aOO4pEW83+6w1zPvhF7qNA64SpZsUR0ZNQs=;
+ b=eqBk1Yq+grMr63qiS8mg7qNRNuXoqzlId1joF9XkajkadOag0ydnB8Dujr76zfegtsP51RHSrLut1+6yOlqbKQ5POtQaliMgZaJwpvK/fWr9PbvrlN1kOGF6me4z4Kyc0rSEXNA/3QMeJONkzGmlJyn5h4Fb0sWSuvFOx82atFy3UwysLw6OJMP+Tms0hlNizdMC10VLNe/2aeGFV7MBm4zllERfdAcq9qv7VvSXVQa/dR8jUHEH5RaIisyMs3l+GMs8LVAdo5Bix35lqBJOXvE2R7pB+wFPipjz3AS6c6kteL/1c25GcCYCHH/L/9aRLeQ/KHxs3tPXadZqn0nS0A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from SN7PR11MB7420.namprd11.prod.outlook.com (2603:10b6:806:328::20)
+ by IA1PR11MB7812.namprd11.prod.outlook.com (2603:10b6:208:3f7::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8335.10; Fri, 10 Jan
+ 2025 15:13:44 +0000
+Received: from SN7PR11MB7420.namprd11.prod.outlook.com
+ ([fe80::b8ba:be35:3903:118f]) by SN7PR11MB7420.namprd11.prod.outlook.com
+ ([fe80::b8ba:be35:3903:118f%7]) with mapi id 15.20.8335.011; Fri, 10 Jan 2025
+ 15:13:43 +0000
+Message-ID: <3456c7b8-058f-4b5d-8a68-b815e561a5f3@intel.com>
+Date: Fri, 10 Jan 2025 08:13:34 -0700
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v4 1/6] net: move ARFS rmap management to core
+To: Simon Horman <horms@kernel.org>
+CC: <netdev@vger.kernel.org>, <intel-wired-lan@lists.osuosl.org>,
+	<andrew+netdev@lunn.ch>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <davem@davemloft.net>, <michael.chan@broadcom.com>,
+	<tariqt@nvidia.com>, <anthony.l.nguyen@intel.com>,
+	<przemyslaw.kitszel@intel.com>, <jdamato@fastly.com>, <shayd@nvidia.com>,
+	<akpm@linux-foundation.org>, <shayagr@amazon.com>,
+	<kalesh-anakkur.purayil@broadcom.com>
+References: <20250109233107.17519-1-ahmed.zaki@intel.com>
+ <20250109233107.17519-2-ahmed.zaki@intel.com>
+ <20250110115924.GC7706@kernel.org>
+Content-Language: en-US
+From: Ahmed Zaki <ahmed.zaki@intel.com>
+In-Reply-To: <20250110115924.GC7706@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MW4PR04CA0299.namprd04.prod.outlook.com
+ (2603:10b6:303:89::34) To SN7PR11MB7420.namprd11.prod.outlook.com
+ (2603:10b6:806:328::20)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250110-marvell-88q2xxx-leds-v1-1-22e7734941c2@gmail.com>
-X-B4-Tracking: v=1; b=H4sIAEs4gWcC/x3MSQqAMAxA0atI1gZsnL2KuKgaNVCnFkpBvLvF5
- Vv8/4BjK+ygSx6w7MXJeUSoNIFp08fKKHM0UEaFIlK4a+vZGGyam0IIaHh2WLW6yPJ6LFVZQ0w
- vy4uEf9sP7/sBxw9z42YAAAA=
-X-Change-ID: 20241221-marvell-88q2xxx-leds-69a4037b5157
-To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
- Russell King <linux@armlinux.org.uk>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- =?utf-8?q?Niklas_S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>, 
- Gregor Herburger <gregor.herburger@ew.tq-group.com>, 
- Stefan Eichenberger <eichest@gmail.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Dimitri Fedrau <dima.fedrau@gmail.com>
-X-Mailer: b4 0.14.2
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN7PR11MB7420:EE_|IA1PR11MB7812:EE_
+X-MS-Office365-Filtering-Correlation-Id: e9aa26db-14ee-4356-4a37-08dd31895f48
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|7416014|1800799024;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?enpaZS93ZklCMmFDMVRHSlNMTUQrWnE5L2ZvWUJCOTEyZ3ByeHBjd1ZXMGk3?=
+ =?utf-8?B?blFuYlFuYVJxRVhXMGV6WTVuS3RaTlBQZ3BrUVZJTmIzbGE1dVduL1cybFd0?=
+ =?utf-8?B?aUZzV1ExVFJCeWZIL0tEa05KZGQrTWt5bEpkajlwREowbWFXdC9pQWJnYUh6?=
+ =?utf-8?B?SU10OW4zV3Z5MTNHSUxhT0RiK1dhNzYwUmRsekNMR0RLVGtjVm1rTkYyN254?=
+ =?utf-8?B?YkRRUDdHK3lxcUdSOUxDZVB4T0E0NTl4K1ZXbFdsdll1aEdNaFJST3RuZDJX?=
+ =?utf-8?B?bDFIZFhNdVZKVHdnTHZhWWRxSm5zM2V2UUUxNFZvMVRnNmtpOUF2azB4VDZI?=
+ =?utf-8?B?cnhjTTBzbUpMMHY0dzJiTmpXM2ppb0NBaGMvdWZZSzJvR3JXUEdRWjlwNlhl?=
+ =?utf-8?B?dGVpQXRrQzVabWYwNkNsVVBIbnllTzF2a2V6OVhDOUJTcSsxS0pkVHg4ZVRz?=
+ =?utf-8?B?b2J3S3NUNkVzRUhRRThxd3VlQm9OUGxub0RDODJKbENZYjNQd3NHK0VxbnZ6?=
+ =?utf-8?B?dnZORisxczhqKzJUT0t5dHB6TjZza3llQ2JUNGdVUTJiMkFtb01aZmJJVmNh?=
+ =?utf-8?B?ZlVab2tuOWVkOGxSVzFsemE2ZE56OVN2NUJ6dUZDZ3h0c3gxUE9UcjYyY3Vh?=
+ =?utf-8?B?RFhWa0FTa2JaOHh6VW9IMVZ5VFlRSzFGWDNIS1NWU0loSzBkNU4rTFRXVDdD?=
+ =?utf-8?B?VnBKOHJUaWJ5U3F4RWQzTVkvNThSVHdva1pDekE5NEtJcGp3ck9ndXRhTWFp?=
+ =?utf-8?B?M2x4cjFBVVhtUUlYRzNGUENyQ21yelhNeTk5T28yNisycW05eUtBcnhvSkZi?=
+ =?utf-8?B?RTlkN2c2K1A5bHhXTHcwUzlxRUpRdENpc0lTWGI4RHNFcjR4b0wrZHBkYnpL?=
+ =?utf-8?B?OENBNUFITXY4Y082MUhxL3dlY2NSWlZWclNkL3dIeTFRVHBNdGgrMmJoZ0ND?=
+ =?utf-8?B?c01WVW9ma1pkNjNNY21BRFpIcEdWMHFZUW1rYi9TdGxZVHVlbXFqaTBTK1Vx?=
+ =?utf-8?B?WHhpZWZOQlRjSHVMemJyaWlteDQyQTZwTWU1aDNsbkJvRTEvYmdJSEpnZ1lr?=
+ =?utf-8?B?OUdFZGxCbTlNWnptak45R3V6Q2FLeUZWbW91OUpkRWVEeTBpWmhvUElvOHdU?=
+ =?utf-8?B?dHp3cUtmeDRZM1pDMVd0Q2ZDVFFhcjFiY3lqRXUycGlnVy9BMmxSdHFNNFNx?=
+ =?utf-8?B?QUVIZzlJeVNJNEU3bXNPSXBHcTN4L2JqUjAwWE9heU95Y0gvL2R0MmNaaHNv?=
+ =?utf-8?B?MFQ2N092N3A1UklIeDUzSHhwTlBUZzFPaDBOWmpKQmg1WDNQQVdNcGMzTWNm?=
+ =?utf-8?B?dFVnQWRZVm5RaGM0NFA3MzRpa3BnSUlQalRrZGpnNEI1TUpMSUQxZlNNWmNK?=
+ =?utf-8?B?ZU5VaTlHREUvMjB0UnhxN3NrNy81V01pYnlyV3ZkdE1VWGlWMUtCNUJtYWNa?=
+ =?utf-8?B?cm44SUVrQjA4U1U5eHdCb2RiZUVJYWFObjlFaEdLMFZ2ZzF5YWMzZ2hycDFr?=
+ =?utf-8?B?cmtGV0lqVzBJTmxDUVBvUjlsbmp5SFV1RGRBYks5VDJUOXdEWHVJNlpEYUZW?=
+ =?utf-8?B?NndkSkhRUDUxTkdoM1JoSUg4WmFSdHIwVFkxM3ZLL1NGUStPTkN5YVpJeURO?=
+ =?utf-8?B?V0JubmZnMXEwRzNWZk82N1FrSDRpbkFuSzJMb00vL01xeGtjalNkc2pURHQ5?=
+ =?utf-8?B?RGpuUEdoNmFPeGdsRmhBWUk3b1VkNS9BSUNwQTh4TmdoR012RERhWEZQNi9B?=
+ =?utf-8?B?LzBlWDdTSVkwUE96K3FoT0ZSdUU5T0YwaWJ5aXNad0psK1dzWUs3a3JFTmtH?=
+ =?utf-8?B?VjBKaFV1TjFQdGh3QXBmOHlpRkp5OGU3UTZYS05lU3ZQOVFlQnc2TUY1dEF0?=
+ =?utf-8?Q?z0u4feZqkrLLg?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN7PR11MB7420.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?UDVUNE04am12b0pGU2I2TlVCWXhBOUl2T2EwQmEwOTE3by85bThQTmlqcnVH?=
+ =?utf-8?B?NGQxN2I2M0t4TXM4YzNBOFp4UlczNEtCMDROendnL1JDY1liWUI0TWNsZnNH?=
+ =?utf-8?B?Yk9EcXJDZHg0M1p5L1gvWFdWMVpYdVQ1anY3eHA2UFFOYmhEMnIwMGdOTUtC?=
+ =?utf-8?B?WkRnY0RLbnRMQXJBUzFQRUVZa3ZiMzRaenNFZnlYK0p5aCt5bWFGaVppY2NL?=
+ =?utf-8?B?OXlaRXVUdERVemJFaENRUmRwWlhRZmdTUE5INFNaczdicHVPVHlZUXVjc0ZV?=
+ =?utf-8?B?T09FcVllbXdTbEw1SFdhRnpRcEVNZlRXQXNEeXZrNlhlMjNEOU1TdEhkREdr?=
+ =?utf-8?B?bWwwa0g1ZDRuRDhxMG00bUlObHU0a2pPUTJRM2RScTIyUjJLVnFtWWhhNkZY?=
+ =?utf-8?B?WVYvS3Zudk16VzVpUFJJY09zRlVZcE43bTRoVmY4emRWRnluOFM1TVhwRWJw?=
+ =?utf-8?B?TEN0Q09pbHRvdFJ6V0NZMHNHdE16RkVzdDFadnAxRjRlbmdqeTdNZEcrbHdz?=
+ =?utf-8?B?Z2xmMVNxUXVjZGYra0k4VGRFWHBYemIxdXNrZW1PR2lsbDhhRG9tU0x1K3R4?=
+ =?utf-8?B?TExjMXhVclNLYW9WR2RuaFFiUzRORSt6MDBZMHdjam82N3VzdGRTWlZkWXRI?=
+ =?utf-8?B?TlpqSkUrSktmbFZnd0xqeVZHSUlXVU1ONDg2WXdSVG9YSXlTZE1pNGRlTkNh?=
+ =?utf-8?B?K1hGcVBRMjdZeThla2lqWXpBaEFaTDVJVndjVDlPRWVtOWsrY0ZHS25zWVdI?=
+ =?utf-8?B?b04zZ2pWemsvUjAwbHdGQWJSRHZ5ak1lV2RXYWk1dVRsaFFHMzluQUI1bVJx?=
+ =?utf-8?B?cjJkMGtWQ3gxOVBFUVk5YVZiYVF2c2RJcXYxSExqcERNb1BTMEZIQ0V0Y0ZW?=
+ =?utf-8?B?cFhnb3lwcExUS0NvdVFrTTVLQmRZMjJqQ0dvTTM2U0kybVdSOFpRNldCMXdE?=
+ =?utf-8?B?c0tsejJmMEZRdlduVG54alBtQjlDbDJTcUl2U2sxQ1FOZGdtNW8vcGtEenFq?=
+ =?utf-8?B?R2RYYXdtV0ZQa2pmYnllY0hrcHF3c1cydm0yRkU5c2lPNnZHUlBRUis3Wk9y?=
+ =?utf-8?B?M0RYMXpoM0s0WkhJNW1TTHFjZjVzYWNQR2dtRUIrTldWeElqRU5TM3lnRGZI?=
+ =?utf-8?B?VEVjMnUvQjVlWGRWd3BSMkFlWFBVd29OdWxFY09ZNCtmVy9kZjM3WEdZd0tT?=
+ =?utf-8?B?MktrOUk1ZXBOckZCTTQ5K0tXWGZZeDc0R2ZuT0Vxd3d6bEFCRlBSQTZnMG5I?=
+ =?utf-8?B?THJ3a2VkWEd4TnhxK05ULzRlc3M0KzgvZUNJV3BFeXZyTzNoRTViMXUxV05U?=
+ =?utf-8?B?em5MbjJ6ZE9TOGZEUi9UdHd6ODgrbk01NitZSk1jS3MzRnpDN0N1YTJKVCtB?=
+ =?utf-8?B?aHdwWXR6YzJWVGIwU1RzblBOemZ1V3RJMHYyM1dLUmxaV0VSNVlOSTUrYXRN?=
+ =?utf-8?B?L0wyOUtTc0lVUWZHaHorMERjc2NUR09vSXFIc0YxYWdFOU5tVFliOGl6Q3Yx?=
+ =?utf-8?B?Mjd0d0k1OGtRWkFEaUxKOE81eEZMZFA3YStDdGFmS2dKcmlvZzdESE13VDZv?=
+ =?utf-8?B?UGVRMEIrQ3JxR2IrWWhENUxtQjhkUzB5ZjNpOGllcTV0NnJwTEljNExDMlZ1?=
+ =?utf-8?B?alhFQ0d5engzYm14bXVRcUY1V012QlVrUW5Ed050K2g5MG9HY3VYcVhIV3VM?=
+ =?utf-8?B?TFpGdlN6ZjV2dFRZdzhZR0srQ1BOSVUvWWRQYjJyWHBrV0lUeVk3M2pXZ2tv?=
+ =?utf-8?B?ZUZGdEt4dlJYSUd3cnBLWTY4Q2ZvYUtDV3N3ZVRNM3FaZlZEclR2aVJReitP?=
+ =?utf-8?B?RDJ6TXQzUXZERHhwVEpBOGQ5TWY3VzNUUTdibE1HcGNIV3NRb3FNbVlzVm9q?=
+ =?utf-8?B?dm1DeEdvSlFIR3N3eUZQNUQ2MVF3VjB0NXVvenJ5S1Flblp1aDFwTXNhdHZE?=
+ =?utf-8?B?dmd6RHlzUzZMWnZkUHpRZ3NPemN4REkzbEJQV1ZFVXBqOGRiQVVCa1R5eWNN?=
+ =?utf-8?B?dktlRmZUb2dnZElRUHJjZXhwVW5YY085a05RV0pCNVp0RUlKZy9DQ0FCU1c2?=
+ =?utf-8?B?YnNaWlk4OGNERlRsdDhlMm83R3RCZnM4SEh4Um5zcXByek90V1owT1FvdzFJ?=
+ =?utf-8?Q?hSdcSpRnvhKM9gGOvytu4vt++?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: e9aa26db-14ee-4356-4a37-08dd31895f48
+X-MS-Exchange-CrossTenant-AuthSource: SN7PR11MB7420.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Jan 2025 15:13:43.7287
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: NK3QEaqCEDp8vaGLDCEyI/FPWd1ce4VyYUWlaO5DuT0+eunJzm6gJaM0GfKKoHTTlRF+Xkf0BXMoiCfkeONQ0g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR11MB7812
+X-OriginatorOrg: intel.com
 
-Marvell 88Q2XXX devices support up to two configurable Light Emitting
-Diode (LED). Add minimal LED controller driver supporting the most common
-uses with the 'netdev' trigger.
 
-Signed-off-by: Dimitri Fedrau <dima.fedrau@gmail.com>
----
- drivers/net/phy/marvell-88q2xxx.c | 161 ++++++++++++++++++++++++++++++++++++++
- 1 file changed, 161 insertions(+)
 
-diff --git a/drivers/net/phy/marvell-88q2xxx.c b/drivers/net/phy/marvell-88q2xxx.c
-index 5107f58338aff4ed6cfea4d91e37282d9bb60ba5..bef3357b9d279fca5d1f86ff0eaa0d45a699e3f9 100644
---- a/drivers/net/phy/marvell-88q2xxx.c
-+++ b/drivers/net/phy/marvell-88q2xxx.c
-@@ -8,6 +8,7 @@
-  */
- #include <linux/ethtool_netlink.h>
- #include <linux/marvell_phy.h>
-+#include <linux/of.h>
- #include <linux/phy.h>
- #include <linux/hwmon.h>
- 
-@@ -27,6 +28,9 @@
- #define MDIO_MMD_AN_MV_STAT2_100BT1		0x2000
- #define MDIO_MMD_AN_MV_STAT2_1000BT1		0x4000
- 
-+#define MDIO_MMD_PCS_MV_RESET_CTRL		32768
-+#define MDIO_MMD_PCS_MV_RESET_CTRL_TX_DISABLE	0x8
-+
- #define MDIO_MMD_PCS_MV_INT_EN			32784
- #define MDIO_MMD_PCS_MV_INT_EN_LINK_UP		0x0040
- #define MDIO_MMD_PCS_MV_INT_EN_LINK_DOWN	0x0080
-@@ -40,6 +44,15 @@
- #define MDIO_MMD_PCS_MV_GPIO_INT_CTRL			32787
- #define MDIO_MMD_PCS_MV_GPIO_INT_CTRL_TRI_DIS		0x0800
- 
-+#define MDIO_MMD_PCS_MV_LED_FUNC_CTRL			32790
-+#define MDIO_MMD_PCS_MV_LED_FUNC_CTRL_GPIO_MASK		GENMASK(7, 4)
-+#define MDIO_MMD_PCS_MV_LED_FUNC_CTRL_TX_EN_MASK	GENMASK(3, 0)
-+#define MDIO_MMD_PCS_MV_LED_FUNC_CTRL_LINK		0x0 /* Link established */
-+#define MDIO_MMD_PCS_MV_LED_FUNC_CTRL_LINK_RX_TX	0x1 /* Link established, blink for rx or tx activity */
-+#define MDIO_MMD_PCS_MV_LED_FUNC_CTRL_RX_TX		0x4 /* Receive or Transmit activity */
-+#define MDIO_MMD_PCS_MV_LED_FUNC_CTRL_TX		0x5 /* Transmit activity */
-+#define MDIO_MMD_PCS_MV_LED_FUNC_CTRL_LINK_1000BT1	0x7 /* 1000BT1 link established */
-+
- #define MDIO_MMD_PCS_MV_TEMP_SENSOR1			32833
- #define MDIO_MMD_PCS_MV_TEMP_SENSOR1_RAW_INT		0x0001
- #define MDIO_MMD_PCS_MV_TEMP_SENSOR1_INT		0x0040
-@@ -95,6 +108,9 @@
- 
- #define MDIO_MMD_PCS_MV_TDR_OFF_CUTOFF			65246
- 
-+#define MV88Q2XXX_LED_INDEX_TX_ENABLE	0
-+#define MV88Q2XXX_LED_INDEX_GPIO	1
-+
- struct mmd_val {
- 	int devad;
- 	u32 regnum;
-@@ -741,8 +757,58 @@ static int mv88q2xxx_hwmon_probe(struct phy_device *phydev)
- }
- #endif
- 
-+#if IS_ENABLED(CONFIG_OF_MDIO)
-+static int mv88q2xxx_leds_probe(struct phy_device *phydev)
-+{
-+	struct device_node *node = phydev->mdio.dev.of_node;
-+	struct device_node *leds;
-+	int ret = 0;
-+	u32 index;
-+
-+	if (!node)
-+		return 0;
-+
-+	leds = of_get_child_by_name(node, "leds");
-+	if (!leds)
-+		return 0;
-+
-+	for_each_available_child_of_node_scoped(leds, led) {
-+		ret = of_property_read_u32(led, "reg", &index);
-+		if (ret)
-+			goto exit;
-+
-+		if (index > MV88Q2XXX_LED_INDEX_GPIO) {
-+			ret = -EINVAL;
-+			goto exit;
-+		}
-+
-+		if (index == MV88Q2XXX_LED_INDEX_TX_ENABLE)
-+			ret = phy_clear_bits_mmd(phydev, MDIO_MMD_PCS,
-+						 MDIO_MMD_PCS_MV_RESET_CTRL,
-+						 MDIO_MMD_PCS_MV_RESET_CTRL_TX_DISABLE);
-+	}
-+
-+exit:
-+	of_node_put(leds);
-+
-+	return ret;
-+}
-+
-+#else
-+static int mv88q2xxx_leds_probe(struct phy_device *phydev)
-+{
-+	return 0;
-+}
-+#endif
-+
- static int mv88q2xxx_probe(struct phy_device *phydev)
- {
-+	int ret;
-+
-+	ret = mv88q2xxx_leds_probe(phydev);
-+	if (ret)
-+		return ret;
-+
- 	return mv88q2xxx_hwmon_probe(phydev);
- }
- 
-@@ -899,6 +965,98 @@ static int mv88q222x_cable_test_get_status(struct phy_device *phydev,
- 	return 0;
- }
- 
-+static int mv88q2xxx_led_mode(u8 index, unsigned long rules)
-+{
-+	switch (rules) {
-+	case BIT(TRIGGER_NETDEV_LINK):
-+		return MDIO_MMD_PCS_MV_LED_FUNC_CTRL_LINK;
-+	case BIT(TRIGGER_NETDEV_LINK_1000):
-+		return MDIO_MMD_PCS_MV_LED_FUNC_CTRL_LINK_1000BT1;
-+	case BIT(TRIGGER_NETDEV_TX):
-+		return MDIO_MMD_PCS_MV_LED_FUNC_CTRL_TX;
-+	case BIT(TRIGGER_NETDEV_TX) | BIT(TRIGGER_NETDEV_RX):
-+		return MDIO_MMD_PCS_MV_LED_FUNC_CTRL_RX_TX;
-+	case BIT(TRIGGER_NETDEV_LINK) | BIT(TRIGGER_NETDEV_TX) | BIT(TRIGGER_NETDEV_RX):
-+		return MDIO_MMD_PCS_MV_LED_FUNC_CTRL_LINK_RX_TX;
-+	default:
-+		return -EOPNOTSUPP;
-+	}
-+}
-+
-+static int mv88q2xxx_led_hw_is_supported(struct phy_device *phydev, u8 index,
-+					 unsigned long rules)
-+{
-+	int mode;
-+
-+	mode = mv88q2xxx_led_mode(index, rules);
-+	if (mode < 0)
-+		return mode;
-+
-+	return 0;
-+}
-+
-+static int mv88q2xxx_led_hw_control_set(struct phy_device *phydev, u8 index,
-+					unsigned long rules)
-+{
-+	int mode;
-+
-+	mode = mv88q2xxx_led_mode(index, rules);
-+	if (mode < 0)
-+		return mode;
-+
-+	if (index == MV88Q2XXX_LED_INDEX_TX_ENABLE)
-+		return phy_modify_mmd(phydev, MDIO_MMD_PCS,
-+				      MDIO_MMD_PCS_MV_LED_FUNC_CTRL,
-+				      MDIO_MMD_PCS_MV_LED_FUNC_CTRL_TX_EN_MASK,
-+				      FIELD_PREP(MDIO_MMD_PCS_MV_LED_FUNC_CTRL_TX_EN_MASK,
-+						 mode));
-+	else
-+		return phy_modify_mmd(phydev, MDIO_MMD_PCS,
-+				      MDIO_MMD_PCS_MV_LED_FUNC_CTRL,
-+				      MDIO_MMD_PCS_MV_LED_FUNC_CTRL_GPIO_MASK,
-+				      FIELD_PREP(MDIO_MMD_PCS_MV_LED_FUNC_CTRL_GPIO_MASK,
-+						 mode));
-+}
-+
-+static int mv88q2xxx_led_hw_control_get(struct phy_device *phydev, u8 index,
-+					unsigned long *rules)
-+{
-+	int val;
-+
-+	val = phy_read_mmd(phydev, MDIO_MMD_PCS, MDIO_MMD_PCS_MV_LED_FUNC_CTRL);
-+	if (val < 0)
-+		return val;
-+
-+	if (index == MV88Q2XXX_LED_INDEX_TX_ENABLE)
-+		val = FIELD_GET(MDIO_MMD_PCS_MV_LED_FUNC_CTRL_TX_EN_MASK, val);
-+	else
-+		val = FIELD_GET(MDIO_MMD_PCS_MV_LED_FUNC_CTRL_GPIO_MASK, val);
-+
-+	switch (val) {
-+	case MDIO_MMD_PCS_MV_LED_FUNC_CTRL_LINK:
-+		*rules = BIT(TRIGGER_NETDEV_LINK);
-+		break;
-+	case MDIO_MMD_PCS_MV_LED_FUNC_CTRL_LINK_1000BT1:
-+		*rules = BIT(TRIGGER_NETDEV_LINK_1000);
-+		break;
-+	case MDIO_MMD_PCS_MV_LED_FUNC_CTRL_TX:
-+		*rules = BIT(TRIGGER_NETDEV_TX);
-+		break;
-+	case MDIO_MMD_PCS_MV_LED_FUNC_CTRL_RX_TX:
-+		*rules = BIT(TRIGGER_NETDEV_TX) | BIT(TRIGGER_NETDEV_RX);
-+		break;
-+	case MDIO_MMD_PCS_MV_LED_FUNC_CTRL_LINK_RX_TX:
-+		*rules = BIT(TRIGGER_NETDEV_LINK) | BIT(TRIGGER_NETDEV_TX) |
-+			 BIT(TRIGGER_NETDEV_RX);
-+		break;
-+	default:
-+		*rules = 0;
-+		break;
-+	}
-+
-+	return 0;
-+}
-+
- static struct phy_driver mv88q2xxx_driver[] = {
- 	{
- 		.phy_id			= MARVELL_PHY_ID_88Q2110,
-@@ -934,6 +1092,9 @@ static struct phy_driver mv88q2xxx_driver[] = {
- 		.get_sqi_max		= mv88q2xxx_get_sqi_max,
- 		.suspend		= mv88q2xxx_suspend,
- 		.resume			= mv88q2xxx_resume,
-+		.led_hw_is_supported	= mv88q2xxx_led_hw_is_supported,
-+		.led_hw_control_set	= mv88q2xxx_led_hw_control_set,
-+		.led_hw_control_get	= mv88q2xxx_led_hw_control_get,
- 	},
- };
- 
+On 2025-01-10 4:59 a.m., Simon Horman wrote:
+> On Thu, Jan 09, 2025 at 04:31:02PM -0700, Ahmed Zaki wrote:
+>> Add a new netdev flag "rx_cpu_rmap_auto". Drivers supporting ARFS should
+>> set the flag via netif_enable_cpu_rmap() and core will allocate and manage
+>> the ARFS rmap. Freeing the rmap is also done by core when the netdev is
+>> freed.
+>>
+>> Signed-off-by: Ahmed Zaki <ahmed.zaki@intel.com>
+> 
+> ...
+> 
+>> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+>> index 1812564b5204..acf20191e114 100644
+>> --- a/include/linux/netdevice.h
+>> +++ b/include/linux/netdevice.h
+>> @@ -2398,6 +2398,9 @@ struct net_device {
+>>   	struct lock_class_key	*qdisc_tx_busylock;
+>>   	bool			proto_down;
+>>   	bool			threaded;
+>> +#ifdef CONFIG_RFS_ACCEL
+>> +	bool			rx_cpu_rmap_auto;
+>> +#endif
+> 
+> nit: rx_cpu_rmap_auto should also be added to the Kernel doc for
+>       struct net_device.
+>
 
----
-base-commit: 3409aa9a349cc1d911c08eff3b265a4db48865c7
-change-id: 20241221-marvell-88q2xxx-leds-69a4037b5157
+Hi Simon,
 
-Best regards,
--- 
-Dimitri Fedrau <dima.fedrau@gmail.com>
-
+Sure. Will also do the same for "rq_affinity_auto" in patch 3.
 
