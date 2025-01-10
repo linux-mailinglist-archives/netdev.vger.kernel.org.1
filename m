@@ -1,205 +1,110 @@
-Return-Path: <netdev+bounces-157102-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157103-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0EEB5A08EAE
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 11:58:01 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3630DA08EC6
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 12:02:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D93513A9DEA
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 10:57:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 624173AA07B
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 11:01:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 962DE1C3BE7;
-	Fri, 10 Jan 2025 10:57:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A67A820C038;
+	Fri, 10 Jan 2025 11:01:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ya5DnIDC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n9qL+GOK"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE98E206F14
-	for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 10:57:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B69E20B207;
+	Fri, 10 Jan 2025 11:01:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736506670; cv=none; b=Znd2hR7kGVMJT3M4IMysvcgcl4A9XLtLKVOdlLy/T+7D9TL+kNkJWQAJxbHxWDayBRXG77X1RTyBUQhDgu6oIX7AcTZEY0TTC5K23Wc2wHysBL4XgDxFe59W1l/CffRXuK2u2J1qdBwrr4QOx8oc/4xrFTCKGZxRtc/JVwbI1fo=
+	t=1736506868; cv=none; b=HBkXVHf/x8Y5S+kptVfPrCYOS2cxgrwDyGq5fOgFSCRQAiApxMg+eOcJKPxQK98z0IynwQ+QhEXJgh+H4oDvLNTW0yIPu2+pYhZV5Gjm++Fz8mrwnCH8WjYDFmOFhKOx0/7S3DZDMB0jk85xX161hxtqIhFQ4VW0vqxeZ50/5Ls=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736506670; c=relaxed/simple;
-	bh=J08jrPV1Tnjsks3FkDNgHe/lPdv6Q0IvGjCXuEqHoGE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=exCEAWSSttaQZZx7H6G9I52wdsAljXAePyrwIHvepW7ywE+i+BrXXnxqle67dP/EpcRJV8lqoqe5IX4RL7BQiWthaO72p/o6q5GD+FpH6CDh8Y5+5lzvGG0YYacypQN+B/dbXxKSdDCmZY9Tsmm92e86dcl86qbgrL+usqwQsDU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ya5DnIDC; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1736506667;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=wTBki0vgAxfifXdgNeBVy0WzwbqroFsqKcMbO7Lm6Oc=;
-	b=Ya5DnIDCPSRTMqHSHaqbFediVvJ04vNPm0FvcEpybFDWL5O2AmQklIF/uLpees45BKg6Bk
-	xEIPusujuHFcehfT4qKyRKo/RpJ+EAq0sxeLRcedt+ydHYugcx+Jk0jAZyF9p9uulqAKRc
-	QwrcCAWupTd2hnauVt/tA8C6/fi7rxs=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-184-QCukUAPVNIShzMzbkZZnsw-1; Fri, 10 Jan 2025 05:57:46 -0500
-X-MC-Unique: QCukUAPVNIShzMzbkZZnsw-1
-X-Mimecast-MFC-AGG-ID: QCukUAPVNIShzMzbkZZnsw
-Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-aa67f18cb95so187854666b.1
-        for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 02:57:45 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736506665; x=1737111465;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wTBki0vgAxfifXdgNeBVy0WzwbqroFsqKcMbO7Lm6Oc=;
-        b=JuTRx7Nfgjz7f/22usa6/OaCvZW0OXDnp5wbY3nBB3yooP56RTRLTu2rek0FHjaanf
-         aLfybA+WSvuWMEkwKJfUf3SOz4Ogl5rjLa8TMyz5oXm3eZXkcEajVrYcEwig++2yhZ9Y
-         yvJRUrnEqnZJnDN2lpos3rtVoPRay/Kw0s117mneG145M9ZVBmN56uP5SqIzuYtR8Bto
-         Th6MYlD76z0rfCFAP2arzQcXnImk3yNAC4MRYa/Hsuo0WaCADH6P9r8PRyeTuM3Ls1s7
-         8QtGlGSwQzUkXh10GENWWBxBrW7ARANrOYy5jf9yk3Fha+wxCe15Ey0OB70QfbYnSKFJ
-         czmg==
-X-Gm-Message-State: AOJu0YxhCFKzPtQ6rGyP5cgz2xRysb+nf0Yxj80Fg+fv6CuNHhpuVbz+
-	xV662Au+RzoAtCgQUcuxyIQQ6B67a1ms1U5QMuf7pOwhA1AEtAA+aQD67y45nzUDo+h+u0TmmNd
-	3VuWvoCeJNFOCbCn7JzoyRAlfRYcuzilkDxziUoqVTX9YSDnEo4fGhA==
-X-Gm-Gg: ASbGncsToSOWEg8nf2ZXBXYNZji7erX8ecwTTR/JE2Ur4irJx+SjfU6fCtervAdZUaT
-	w9Zg0WGq3qDHrr0y0FkpQOBmxKL5nXGScQJ1r/dGnhRcPe5laD5upTQ15jfodWUm9Na5+jzAGHr
-	X8WN08FDo/pnPmGgTR6DOM00/pFIVR3IIMIVzuDniqKuqk0qA6ktsKrE5HH+3gRNaO+nyrwz8C5
-	eg9UHYjafpmwAn6GqbG8cPW18XmFw8lfoBK4eJda/wAOGyJ1o/gbymdVCif
-X-Received: by 2002:a17:907:7b99:b0:aa6:2a17:b54c with SMTP id a640c23a62f3a-ab2ab16b1cbmr782664166b.6.1736506664811;
-        Fri, 10 Jan 2025 02:57:44 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IESv2FtstfmeRfNMDHjG83u1YYQu94Q31j0qdyPPj9UJSPP/WkoIPQIVfa4hgWYpj5Nmu9NKg==
-X-Received: by 2002:a17:907:7b99:b0:aa6:2a17:b54c with SMTP id a640c23a62f3a-ab2ab16b1cbmr782662166b.6.1736506664375;
-        Fri, 10 Jan 2025 02:57:44 -0800 (PST)
-Received: from leonardi-redhat ([176.206.32.19])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ab2c90d7432sm153952766b.49.2025.01.10.02.57.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 Jan 2025 02:57:44 -0800 (PST)
-Date: Fri, 10 Jan 2025 11:57:41 +0100
-From: Luigi Leonardi <leonardi@redhat.com>
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: netdev@vger.kernel.org, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
-	bpf@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	"David S. Miller" <davem@davemloft.net>, Wongi Lee <qwerty@theori.io>, 
-	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
-	Eric Dumazet <edumazet@google.com>, kvm@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>, 
-	Stefan Hajnoczi <stefanha@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	Simon Horman <horms@kernel.org>, Hyunwoo Kim <v4bel@theori.io>, Jakub Kicinski <kuba@kernel.org>, 
-	Michal Luczaj <mhal@rbox.co>, virtualization@lists.linux.dev, 
-	Bobby Eshleman <bobby.eshleman@bytedance.com>, stable@vger.kernel.org
-Subject: Re: [PATCH net v2 3/5] vsock/virtio: cancel close work in the
- destructor
-Message-ID: <f6wv63x75ohn3s3isbbfggnvpfxwx5mbgnpmol4tnw5tthq4nf@wb62fpiplgs4>
-References: <20250110083511.30419-1-sgarzare@redhat.com>
- <20250110083511.30419-4-sgarzare@redhat.com>
+	s=arc-20240116; t=1736506868; c=relaxed/simple;
+	bh=j8da2wEF4Pe5R2H3BFAb4skhJmQUo2Hi4EaYfyKuS94=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=f39HponssXbv/0OVbHSKlqsIIp7ztJi1MP5xyhIwpdJ0ikPWT++UnxvBqxOme8maUQ0m6wo9+ZdKX5/dD3Mcly0XW4rN36fgAuhDWW8NtL4BKQgeZuR+0xp383Wkr4/W2QHd9Cm/TitJXq1eExweKdfV6ziU/DyxKHi8cCNu5rs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n9qL+GOK; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A5105C4CEDF;
+	Fri, 10 Jan 2025 11:01:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1736506868;
+	bh=j8da2wEF4Pe5R2H3BFAb4skhJmQUo2Hi4EaYfyKuS94=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=n9qL+GOKVKL5YQQDFK23UX+/Nlc+IzVQt9brWCZv+UXbE2aqVhBsUbMb3pLrYx2L9
+	 pJLwx7iJktKWA8Ts3l4PDfCi4ljzB1lZovKs1zOiNM0vqXmwZOiZ1J6BXxiU4JLqzR
+	 +T4Lq+nohB86t4mtMXHA1wAow79nQU8TIGRx9Vs1CUD3XWwvB4OoDJXzQK6jptLZKN
+	 UwJ1sXjh90gCGhjjOqUI2zd0O6Ef4sBOKWSkRpN+co2ccyUGaY8N/LWRsorLOWkxKb
+	 gPSgbQJdIQ5eLTrAptmflCb+7TltyYDkyST84sLOrcOqdn+veqY9weNGkldnoFuinP
+	 1z5NL8IB4L2bw==
+From: Christian Brauner <brauner@kernel.org>
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+	Manfred Spraul <manfred@colorfullife.com>,
+	Oleg Nesterov <oleg@redhat.com>
+Cc: Christian Brauner <brauner@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	Pavel Begunkov <asml.silence@gmail.com>,
+	WangYuli <wangyuli@uniontech.com>,
+	linux-kernel@vger.kernel.org,
+	io-uring@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH 0/5] poll_wait: add mb() to fix theoretical race between waitqueue_active() and .poll()
+Date: Fri, 10 Jan 2025 12:00:53 +0100
+Message-ID: <20250110-respekt-mausklick-176ab50a5b7e@brauner>
+X-Mailer: git-send-email 2.45.2
+In-Reply-To: <20250107162649.GA18886@redhat.com>
+References: <20250107162649.GA18886@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20250110083511.30419-4-sgarzare@redhat.com>
+Content-Type: text/plain; charset="utf-8"
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1595; i=brauner@kernel.org; h=from:subject:message-id; bh=j8da2wEF4Pe5R2H3BFAb4skhJmQUo2Hi4EaYfyKuS94=; b=owGbwMvMwCU28Zj0gdSKO4sYT6slMaQ3/H3b6xFy9OgJp8i9veK3bCOFpa6L/ppyet/hD52iv UkfbzZe7ihlYRDjYpAVU2RxaDcJl1vOU7HZKFMDZg4rE8gQBi5OAZhIgDojw///X6ZuVV+/bOd9 d8PgiTu2FyUtOFzOrscicSV4lWm4nxfD/5QTeXeNoz86XzRfXPCMVS7mtpVj/+lAT/3ZmsvDpKV OsgIA
+X-Developer-Key: i=brauner@kernel.org; a=openpgp; fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
+Content-Transfer-Encoding: 8bit
 
-On Fri, Jan 10, 2025 at 09:35:09AM +0100, Stefano Garzarella wrote:
->During virtio_transport_release() we can schedule a delayed work to
->perform the closing of the socket before destruction.
->
->The destructor is called either when the socket is really destroyed
->(reference counter to zero), or it can also be called when we are
->de-assigning the transport.
->
->In the former case, we are sure the delayed work has completed, because
->it holds a reference until it completes, so the destructor will
->definitely be called after the delayed work is finished.
->But in the latter case, the destructor is called by AF_VSOCK core, just
->after the release(), so there may still be delayed work scheduled.
->
->Refactor the code, moving the code to delete the close work already in
->the do_close() to a new function. Invoke it during destruction to make
->sure we don't leave any pending work.
->
->Fixes: c0cfa2d8a788 ("vsock: add multi-transports support")
->Cc: stable@vger.kernel.org
->Reported-by: Hyunwoo Kim <v4bel@theori.io>
->Closes: https://lore.kernel.org/netdev/Z37Sh+utS+iV3+eb@v4bel-B760M-AORUS-ELITE-AX/
->Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
->---
-> net/vmw_vsock/virtio_transport_common.c | 29 ++++++++++++++++++-------
-> 1 file changed, 21 insertions(+), 8 deletions(-)
->
->diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
->index 51a494b69be8..7f7de6d88096 100644
->--- a/net/vmw_vsock/virtio_transport_common.c
->+++ b/net/vmw_vsock/virtio_transport_common.c
->@@ -26,6 +26,9 @@
-> /* Threshold for detecting small packets to copy */
-> #define GOOD_COPY_LEN  128
->
->+static void virtio_transport_cancel_close_work(struct vsock_sock *vsk,
->+					       bool cancel_timeout);
->+
-> static const struct virtio_transport *
-> virtio_transport_get_ops(struct vsock_sock *vsk)
-> {
->@@ -1109,6 +1112,8 @@ void virtio_transport_destruct(struct vsock_sock *vsk)
-> {
-> 	struct virtio_vsock_sock *vvs = vsk->trans;
->
->+	virtio_transport_cancel_close_work(vsk, true);
->+
-> 	kfree(vvs);
-> 	vsk->trans = NULL;
-> }
->@@ -1204,17 +1209,11 @@ static void virtio_transport_wait_close(struct sock *sk, long timeout)
-> 	}
-> }
->
->-static void virtio_transport_do_close(struct vsock_sock *vsk,
->-				      bool cancel_timeout)
->+static void virtio_transport_cancel_close_work(struct vsock_sock *vsk,
->+					       bool cancel_timeout)
-> {
-> 	struct sock *sk = sk_vsock(vsk);
->
->-	sock_set_flag(sk, SOCK_DONE);
->-	vsk->peer_shutdown = SHUTDOWN_MASK;
->-	if (vsock_stream_has_data(vsk) <= 0)
->-		sk->sk_state = TCP_CLOSING;
->-	sk->sk_state_change(sk);
->-
-> 	if (vsk->close_work_scheduled &&
-> 	    (!cancel_timeout || cancel_delayed_work(&vsk->close_work))) {
-> 		vsk->close_work_scheduled = false;
->@@ -1226,6 +1225,20 @@ static void virtio_transport_do_close(struct vsock_sock *vsk,
-> 	}
-> }
->
->+static void virtio_transport_do_close(struct vsock_sock *vsk,
->+				      bool cancel_timeout)
->+{
->+	struct sock *sk = sk_vsock(vsk);
->+
->+	sock_set_flag(sk, SOCK_DONE);
->+	vsk->peer_shutdown = SHUTDOWN_MASK;
->+	if (vsock_stream_has_data(vsk) <= 0)
->+		sk->sk_state = TCP_CLOSING;
->+	sk->sk_state_change(sk);
->+
->+	virtio_transport_cancel_close_work(vsk, cancel_timeout);
->+}
->+
-> static void virtio_transport_close_timeout(struct work_struct *work)
-> {
-> 	struct vsock_sock *vsk =
->-- 
->2.47.1
->
+On Tue, 07 Jan 2025 17:26:49 +0100, Oleg Nesterov wrote:
+> Linus,
+> 
+> I misread fs/eventpoll.c, it has the same problem. And more __pollwait()-like
+> functions, for example p9_pollwait(). So 1/5 adds mb() into poll_wait(), not
+> into __pollwait().
+> 
+> WangYuli, after 1/5 we can reconsider your patch.
+> 
+> [...]
 
-Thanks!
+Applied to the vfs-6.14.poll branch of the vfs/vfs.git tree.
+Patches in the vfs-6.14.poll branch should appear in linux-next soon.
 
-Reviewed-by: Luigi Leonardi <leonardi@redhat.com>
+Please report any outstanding bugs that were missed during review in a
+new review to the original patch series allowing us to drop it.
 
+It's encouraged to provide Acked-bys and Reviewed-bys even though the
+patch has now been applied. If possible patch trailers will be updated.
+
+Note that commit hashes shown below are subject to change due to rebase,
+trailer updates or similar. If in doubt, please check the listed branch.
+
+tree:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git
+branch: vfs-6.14.poll
+
+[1/5] poll_wait: add mb() to fix theoretical race between waitqueue_active() and .poll()
+      https://git.kernel.org/vfs/vfs/c/cacd9ae4bf80
+[2/5] poll_wait: kill the obsolete wait_address check
+      https://git.kernel.org/vfs/vfs/c/10b02a2cfec2
+[3/5] io_uring_poll: kill the no longer necessary barrier after poll_wait()
+      https://git.kernel.org/vfs/vfs/c/4e15fa8305de
+[4/5] sock_poll_wait: kill the no longer necessary barrier after poll_wait()
+      https://git.kernel.org/vfs/vfs/c/b2849867b3a7
+[5/5] poll: kill poll_does_not_wait()
+      https://git.kernel.org/vfs/vfs/c/f005bf18a57a
 
