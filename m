@@ -1,192 +1,144 @@
-Return-Path: <netdev+bounces-156956-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156957-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE03DA0861D
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 04:57:51 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 87255A0861E
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 05:03:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B1E2E7A2518
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 03:57:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8B894169579
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 04:03:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 035DD1FF7DA;
-	Fri, 10 Jan 2025 03:57:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 961F413C80E;
+	Fri, 10 Jan 2025 04:03:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="JEwVuXyb"
+	dkim=pass (1024-bit key) header.d=cisco.com header.i=@cisco.com header.b="IGuztNk+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from alln-iport-3.cisco.com (alln-iport-3.cisco.com [173.37.142.90])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C26880BEC
-	for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 03:57:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A79E9B672
+	for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 04:03:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=173.37.142.90
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736481463; cv=none; b=knZCazISXJqlI3m0e4dY4Tf+uxQLCr5wFiN5lVP9Xv6hbQIXLMgpWJ7UWjQwERtS5WD8n6iiE5lOdy0fXhMi5rQ7KtVkLAx7ykISMD+DPNmU/z8GWv11AzkTXi5P8iCf2Fa3jK2zbkxfnxmI/ZtI88YIubjrx6HRImmuv7bWvyg=
+	t=1736481792; cv=none; b=WWSwUcRaozsMfpmJNNui8bzjph4F68h+0OWytw+nFT+u9HNqDTqr9kqFIR5/iFYTZRkITJzE4W0UNIynh/y4EuT017Ze5cPyQ1sfU1u0YFb4j6gi9bWQHEsKGPbYRNn7P1021i/Zq6Mg+f3HKj8vJFOnChr2R4vety6pW2TMkhY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736481463; c=relaxed/simple;
-	bh=ATQvAG4jl6T1IQa9pGTQNpqr/TZ2WJ9C0GwKsA8Xsjs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=UP+HRI2gwytf1Cr4JG6GXAuylqnijXX5wTYQ2lSlIPqXptov2wESSV2FnVCCFaq0MSIBiD1KkonMTpWAsCz+5kyb6uhFkwd5s4Zfy3SCAtiV34CCzXfQOFF7DqKzmJ486g85DXhyZq3hUi59IzErllZjI4viiin5MNJe0T9XeBw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=JEwVuXyb; arc=none smtp.client-ip=209.85.214.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-2161eb94cceso19574355ad.2
-        for <netdev@vger.kernel.org>; Thu, 09 Jan 2025 19:57:42 -0800 (PST)
+	s=arc-20240116; t=1736481792; c=relaxed/simple;
+	bh=D9PelZ0KlPC1itD9OQ5K8aGNZB+IUrfBMmxpTfNJFmM=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=qVNlA3UbNV0sos9BCD6tab+IG21CyAGbF4Q1Zzrb11gJMxJvsGqZr6dtJeAXPANBMIl+0AsCCisjOvxkMZFsVfjHvGah+/UwuW0pGMnSaO9El1an/eEyaQzncPrDvTqZql3OYvwTRL6c+5mD0vVxY7asc5aThY5gzBARKR6uw1g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cisco.com; spf=pass smtp.mailfrom=cisco.com; dkim=pass (1024-bit key) header.d=cisco.com header.i=@cisco.com header.b=IGuztNk+; arc=none smtp.client-ip=173.37.142.90
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cisco.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cisco.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1736481462; x=1737086262; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=ATQvAG4jl6T1IQa9pGTQNpqr/TZ2WJ9C0GwKsA8Xsjs=;
-        b=JEwVuXybj8NiNeZ+SfXxsAqYrhFVd/dTZM1KrngPmeKmIzKtg8MwA/QPLY+fySSFr2
-         DKuPWqr7uqT/cRV3mamaaGhntBn6cilAQ3LkIRAaQnlhMcJuNPw8QiJXjQEx9GgxXyXQ
-         JieyJTmisi5ejm+iLwKKYgQ0Ux2qiib5dUsvQ=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736481462; x=1737086262;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ATQvAG4jl6T1IQa9pGTQNpqr/TZ2WJ9C0GwKsA8Xsjs=;
-        b=MEKonRjJ4nI7kUgDAiXhoOOxKZcD4T8X9bngWSToctQwVW53+O7ovMQU4gUCf3Avh1
-         +Amw4v09yUFzuJao3z0SOzf163KDxS3CDWLsKl7HYtqKiNuwn5h2EyD6q98HRdSJnTrS
-         xgsMmHIydKH+1sBsZApiddjP79zLR1y/BXh2pPn7qec4HoSDfXBGq6KEvk2Ef1B3vxa8
-         mKwYUfN/mbmpa1qQhNuBzPvZz1fNLNIXDPI3vENCdTtt62o0pbqHmDtbZXd4CMGd/dLQ
-         lboRaZCKWd2WQwY+x6pzwovuKCpVWeNS7+wWrDxAx3ptArS97QHfQBmlz2f3qfxVirSo
-         qdgQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVjabsckEQ+IIzSoUFB7OcYsIJzYZ/70VEf+nSVNBO0A1rECvbO7sjNmvF9+U2D7HYWCvO0rdo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw8jre45WtnIeVYRdfc5X6M12Dh5lf3QDzBpv5DhM80FgldG3HX
-	I2e15CRQslzY5w31gfQsDZS1VwDn9f+dHNivTTjpnDSsVPoCVPGvGzlB+k1uI2AL3mhWpK5v3C5
-	etamr9+AUQ5geR4Jfod102cKai9iRvQSkAeLs
-X-Gm-Gg: ASbGncsIs5lnSgwRVggQpcOTH6hQIbYULEo4nvDdJX/629oSDXwEzUb2+8usgfVeRAL
-	A34eAKovucEPYi0MaWiH6+E3LIdyldHw2qcFd0To=
-X-Google-Smtp-Source: AGHT+IGg9M3nkVk0Pa99bdhlY/I8a6SaRcV+JP7DZw/JIVNRAHEJPuLnRxZXIK8CJPWPrEP4xkhp8ZTfHJSzsRpKS44=
-X-Received: by 2002:a05:6a00:948a:b0:725:f1b1:cbc5 with SMTP id
- d2e1a72fcca58-72d21f7e7c3mr12796158b3a.3.1736481461945; Thu, 09 Jan 2025
- 19:57:41 -0800 (PST)
+  d=cisco.com; i=@cisco.com; l=1686; q=dns/txt; s=iport;
+  t=1736481790; x=1737691390;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=iidphLJV4pLrMO8x2yEUQ27aW3xIngS9Qa3XBdqdtq4=;
+  b=IGuztNk+0/UH9POV6h0kQsF28GXM2aedYmCXuNuv0DCMvgcPifyd01J1
+   GFj0GVVkV5ne6FVXTIEsM2FYrPMo6GFvWfs2sOq2UVYARPuP+nR2Qez6V
+   bmx6kV3erXrC4LpIDHrZ79wWN6a9RFxYBTyByvckwWuwdm21pOdYaXCMb
+   g=;
+X-CSE-ConnectionGUID: +ji68N33Teaxsefzu7yW4g==
+X-CSE-MsgGUID: bO2d1dpWTz6KqDBwmQ77Gg==
+X-IPAS-Result: =?us-ascii?q?A0AwAABFm4Bn/5L/Ja1aHAMDBxYEBIIBBw0BgkqBT0MZL?=
+ =?us-ascii?q?41RiHWeGIElA1YPAQEBD0QEAQGFBwKKdAImNAkOAQIEAQEBAQMCAwEBAQEBA?=
+ =?us-ascii?q?QEBAQEBCwEBBQEBAQIBBwWBDhOGCIZbAQEBAzIBRhALGC4rKxmDAYJlA7M9g?=
+ =?us-ascii?q?iyBAd4zgW2BSAGFaodfcBuEXCcbgUlEhA4xPoFSgkl1hXcEgn6BKoNAnkpIC?=
+ =?us-ascii?q?oEXA1ksAVUTDQoLBwWBKR8rAzgMCzAVJg+BGgU1Cjc6ggxpSTcCDQI1gh58g?=
+ =?us-ascii?q?iuCIYI7hEeEVoVlgheBaAMDFhIBgzUsQAMLGA1IESw3FBsGPm4Hmxs8g2mBM?=
+ =?us-ascii?q?V0upwmhA4QlgWOfYxozqlOYfKRHhGaBZzyBWTMaCBsVgyJSGQ+OWbtjJTI8A?=
+ =?us-ascii?q?gcLAQEDCY8igXwBAQ?=
+IronPort-Data: A9a23:tipTuq6ktYkWv6dmNBGiGQxRtBrGchMFZxGqfqrLsTDasY5as4F+v
+ jMdWmqEb/qNZWWmLot1aonlpEoCsJLWytBrHAVtr38wZn8b8sCt6fZ1gavT04J+CuWZESqLO
+ u1HMoGowPgcFyGa/lH1dOC89RGQ7InQLpLkEunIJyttcgFtTSYlmHpLlvUw6mJSqYDR7zil5
+ 5Wr+aUzBHf/g2QpajtNs/rawP9SlK2aVA0w7wRWic9j5Dcyp1FNZLoDKKe4KWfPQ4U8NoaSW
+ +bZwbilyXjS9hErB8nNuu6TnpoiG+O60aCm0xK6aoD66vRwjnVaPpUTaJLwXXxqZwChxLid/
+ jniWauYEm/FNoWU8AgUvoIx/ytWZcWq85efSZSzXFD6I0DuKxPRL/tS4E4efo8ZpLZRWjpy+
+ PUIMz0DfA3clt3qz+fuIgVsrpxLwMjDJogTvDRkiDreF/tjGcGFSKTR7tge1zA17ixMNa+BP
+ IxCNnw1MUmGOkERUrsUIMpWcOOAhH7/dTFRrF+9rqss6G+Vxwt0uFToGIaPJITVG54MwC50o
+ ErM2D71Wx0CC+CNlxmc3lizg9aQwgz0Ddd6+LqQs6QCbEeo7mAaFhATfVeyv/S8jkmwR5RZJ
+ lB80icisK075kG3Ztb6WBK8rTiPuRt0c9lNGeQS6wyXzKfQpQGDCQAsRzhNctE598k7WTAny
+ HeNgtXvQzdv2JWNQHiQ8La8tz6+OSEJa2QFYEcsSwYZ79T9iJ88gwiJTdt5FqOxyNrvFlnNL
+ yuitiMygfAXyMUMzaj+pQGBiDO3rZ+PRQkwjunKYl+YAspCTNbNT+SVBZLzt56s8K7xooG9g
+ UU5
+IronPort-HdrOrdr: A9a23:h55vtq9ETd45KOQWuuNuk+DfI+orL9Y04lQ7vn2ZhyY7TiX+rb
+ HIoB11737JYVoqNU3I3OrwWpVoIkmskaKdn7NwAV7KZmCP0wGVxcNZnO7fKlbbdREWmNQw6U
+ 4ZSdkcNDU1ZmIK9PoTJ2KDYrAd/OU=
+X-Talos-CUID: 9a23:lnUHw26R/3ZHCMm6ftsst0wVRJADKSbhwX7AOEK2G3s2WYLJRgrF
+X-Talos-MUID: 9a23:qspfAgjCwnsFlcOIjj71cMMpPuAy7/2iEH8xg8slouWuKilJZGiyg2Hi
+X-IronPort-Anti-Spam-Filtered: true
+X-IronPort-AV: E=Sophos;i="6.12,303,1728950400"; 
+   d="scan'208";a="426076316"
+Received: from rcdn-l-core-09.cisco.com ([173.37.255.146])
+  by alln-iport-3.cisco.com with ESMTP/TLS/TLS_AES_256_GCM_SHA384; 10 Jan 2025 04:03:03 +0000
+Received: from cisco.com (savbu-usnic-a.cisco.com [10.193.184.48])
+	by rcdn-l-core-09.cisco.com (Postfix) with ESMTP id 13BCA1800023D;
+	Fri, 10 Jan 2025 04:03:03 +0000 (GMT)
+Received: by cisco.com (Postfix, from userid 392789)
+	id DF13720F2003; Thu,  9 Jan 2025 20:03:02 -0800 (PST)
+From: John Daley <johndale@cisco.com>
+To: johndale@cisco.com
+Cc: andrew+netdev@lunn.ch,
+	benve@cisco.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	neescoba@cisco.com,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	satishkh@cisco.com
+Subject: Re: [PATCH net-next v4 4/6] enic: Use the Page Pool API for RX when MTU is less than page size
+Date: Thu,  9 Jan 2025 20:03:02 -0800
+Message-Id: <20250110040302.14891-1-johndale@cisco.com>
+X-Mailer: git-send-email 2.35.2
+In-Reply-To: <20250107030016.24407-1-johndale@cisco.com>
+References: <20250107030016.24407-1-johndale@cisco.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250109204231.1809851-1-tariqt@nvidia.com> <20250109204231.1809851-5-tariqt@nvidia.com>
-In-Reply-To: <20250109204231.1809851-5-tariqt@nvidia.com>
-From: Kalesh Anakkur Purayil <kalesh-anakkur.purayil@broadcom.com>
-Date: Fri, 10 Jan 2025 09:27:28 +0530
-X-Gm-Features: AbW1kvajPJMiyQ0iIHX9Rc2DERHzCtWAHpdhxXmhdUpnBjpGqVi764phMGr9KUo
-Message-ID: <CAH-L+nO1PdXK6jCkn_fvi3OSjWqKp4aun44+f1fsZuUC1SWJGg@mail.gmail.com>
-Subject: Re: [PATCH mlx5-next 4/4] net/mlx5: Add nic_cap_reg and vhca_icm_ctrl registers
-To: Tariq Toukan <tariqt@nvidia.com>
-Cc: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>, 
-	Jason Gunthorpe <jgg@nvidia.com>, netdev@vger.kernel.org, linux-rdma@vger.kernel.org, 
-	Jakub Kicinski <kuba@kernel.org>, Gal Pressman <gal@nvidia.com>, Mark Bloch <mbloch@nvidia.com>, 
-	Moshe Shemesh <moshe@nvidia.com>, Akiva Goldberger <agoldberger@nvidia.com>
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000b687ef062b521898"
+Content-Transfer-Encoding: 8bit
+X-Outbound-SMTP-Client: 10.193.184.48, savbu-usnic-a.cisco.com
+X-Outbound-Node: rcdn-l-core-09.cisco.com
 
---000000000000b687ef062b521898
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-On Fri, Jan 10, 2025 at 2:14=E2=80=AFAM Tariq Toukan <tariqt@nvidia.com> wr=
-ote:
+On 1/6/25, 7:00 PM, "John Daley" <johndale@cisco.com> wrote:
 >
-> From: Akiva Goldberger <agoldberger@nvidia.com>
+>>> >> The Page Pool API improves bandwidth and CPU overhead by recycling
+>>> >> pages instead of allocating new buffers in the driver. Make use of
+>>> >> page pool fragment allocation for smaller MTUs so that multiple
+>>> >> packets can share a page.  
+>>> >
+>>> >Why the MTU limitation? You can set page_pool_params.order
+>>> >to appropriate value always use the page pool.  
+>>> 
+>>> I thought it might waste memory, e.g. allocating 16K for 9000 mtu.
+>>> But now that you mention it, I see that the added code complexity is
+>>> probably not worth it. I am unclear on what to set pp_params.max_len
+>>> to when MTU > PAGE_SIZE. Order * PAGE_SIZE or MTU size? In this case
+>>> the pages won't be fragmented so isn't only necessary for the MTU sized
+>>> area to be DMA SYNC'ed?
+>>
+>>Good point, once fragmentation is no longer possible you can
+>>set .max_len to the size of the fragment HW may clobber,
+>>and .offset to the reserved headroom.
 >
-> Add nic_cap_reg and vhca_icm_ctrl registers interfaces for exposing ICM
-> consumption.
->
-> Signed-off-by: Akiva Goldberger <agoldberger@nvidia.com>
-> Reviewed-by: Moshe Shemesh <moshe@nvidia.com>
-> Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
+>Ok, testing going good so far, but need another day.
 
-Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
+Testing is OK, but we are concerned about extra memory usage when order
+is greater than 0. Especially for 9000 MTU where order 2 would mean
+allocating an extra unused page per buffer. This could impact scaled up
+installations with memory constraints. For this reason we would like to
+limit the use of page pool to MTU <= PAGE_SIZE for now so that order is
+0.
 
+Our newer hardware supports using multiple 0 order pages for large MTUs
+and we will submit a patch for that in the future.
 
---=20
-Regards,
-Kalesh AP
-
---000000000000b687ef062b521898
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
-
-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
-riBJ/K1AFUjRAjFhGV64l++td7dkmnq/X8ET75ti+w1s4FRpFqkD2m7pg5NxdsZphYIXAgMBAAGj
-QjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSP8Et/qC5FJK5N
-UPpjmove4t0bvDANBgkqhkiG9w0BAQsFAAOCAQEAS0DbwFCq/sgM7/eWVEVJu5YACUGssxOGhigH
-M8pr5nS5ugAtrqQK0/Xx8Q+Kv3NnSoPHRHt44K9ubG8DKY4zOUXDjuS5V2yq/BKW7FPGLeQkbLmU
-Y/vcU2hnVj6DuM81IcPJaP7O2sJTqsyQiunwXUaMld16WCgaLx3ezQA3QY/tRG3XUyiXfvNnBB4V
-14qWtNPeTCekTBtzc3b0F5nCH3oO4y0IrQocLP88q1UOD5F+NuvDV0m+4S4tfGCLw0FREyOdzvcy
-a5QBqJnnLDMfOjsl0oZAzjsshnjJYS8Uuu7bVW/fhO4FCU29KNhyztNiUGUe65KXgzHZs7XKR1g/
-XzCCBWowggRSoAMCAQICDDfBRQmwNSI92mit0zANBgkqhkiG9w0BAQsFADBbMQswCQYDVQQGEwJC
-RTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTExMC8GA1UEAxMoR2xvYmFsU2lnbiBHQ0MgUjMg
-UGVyc29uYWxTaWduIDIgQ0EgMjAyMDAeFw0yMjA5MTAwODI5NTZaFw0yNTA5MTAwODI5NTZaMIGi
-MQswCQYDVQQGEwJJTjESMBAGA1UECBMJS2FybmF0YWthMRIwEAYDVQQHEwlCYW5nYWxvcmUxFjAU
-BgNVBAoTDUJyb2FkY29tIEluYy4xHzAdBgNVBAMTFkthbGVzaCBBbmFra3VyIFB1cmF5aWwxMjAw
-BgkqhkiG9w0BCQEWI2thbGVzaC1hbmFra3VyLnB1cmF5aWxAYnJvYWRjb20uY29tMIIBIjANBgkq
-hkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxnv1Reaeezfr6NEmg3xZlh4cz9m7QCN13+j4z1scrX+b
-JfnV8xITT5yvwdQv3R3p7nzD/t29lTRWK3wjodUd2nImo6vBaH3JbDwleIjIWhDXLNZ4u7WIXYwx
-aQ8lYCdKXRsHXgGPY0+zSx9ddpqHZJlHwcvas3oKnQN9WgzZtsM7A8SJefWkNvkcOtef6bL8Ew+3
-FBfXmtsPL9I2vita8gkYzunj9Nu2IM+MnsP7V/+Coy/yZDtFJHp30hDnYGzuOhJchDF9/eASvE8T
-T1xqJODKM9xn5xXB1qezadfdgUs8k8QAYyP/oVBafF9uqDudL6otcBnziyDBQdFCuAQN7wIDAQAB
-o4IB5DCCAeAwDgYDVR0PAQH/BAQDAgWgMIGjBggrBgEFBQcBAQSBljCBkzBOBggrBgEFBQcwAoZC
-aHR0cDovL3NlY3VyZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvZ3NnY2NyM3BlcnNvbmFsc2lnbjJj
-YTIwMjAuY3J0MEEGCCsGAQUFBzABhjVodHRwOi8vb2NzcC5nbG9iYWxzaWduLmNvbS9nc2djY3Iz
-cGVyc29uYWxzaWduMmNhMjAyMDBNBgNVHSAERjBEMEIGCisGAQQBoDIBKAowNDAyBggrBgEFBQcC
-ARYmaHR0cHM6Ly93d3cuZ2xvYmFsc2lnbi5jb20vcmVwb3NpdG9yeS8wCQYDVR0TBAIwADBJBgNV
-HR8EQjBAMD6gPKA6hjhodHRwOi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjNwZXJzb25hbHNp
-Z24yY2EyMDIwLmNybDAuBgNVHREEJzAlgSNrYWxlc2gtYW5ha2t1ci5wdXJheWlsQGJyb2FkY29t
-LmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNVHSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGP
-zzAdBgNVHQ4EFgQUI3+tdStI+ABRGSqksMsiCmO9uDAwDQYJKoZIhvcNAQELBQADggEBAGfe1o9b
-4wUud0FMjb/FNdc433meL15npjdYWUeioHdlCGB5UvEaMGu71QysfoDOfUNeyO9YKp0h0fm7clvo
-cBqeWe4CPv9TQbmLEtXKdEpj5kFZBGmav69mGTlu1A9KDQW3y0CDzCPG2Fdm4s73PnkwvemRk9E2
-u9/kcZ8KWVeS+xq+XZ78kGTKQ6Wii3dMK/EHQhnDfidadoN/n+x2ySC8yyDNvy81BocnblQzvbuB
-a30CvRuhokNO6Jzh7ZFtjKVMzYas3oo6HXgA+slRszMu4pc+fRPO41FHjeDM76e6P5OnthhnD+NY
-x6xokUN65DN1bn2MkeNs0nQpizDqd0QxggJtMIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYD
-VQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25h
-bFNpZ24gMiBDQSAyMDIwAgw3wUUJsDUiPdpordMwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcN
-AQkEMSIEILHryVuSb6sYZcJIbhM+0GRAORcm4B2YtsFEopG1QlsqMBgGCSqGSIb3DQEJAzELBgkq
-hkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI1MDExMDAzNTc0MlowaQYJKoZIhvcNAQkPMVwwWjAL
-BglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG
-9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQB+B8LT42A1
-T6Dqyno+nfeSa/c2Cu2FYx5ZAT1/0EsCYaC1rfQ79X9P4LMo/IvTzR5wt2wk6tHXZ6NiMjfC3Tdw
-GhBD4fc80qDibBuzx0of9ltnhe6IXDF2W3L+usTNS/+Wc4owgdgt3GwE6KwQ+B5MNrcbbxQOpbom
-+CkzFBInTPsaTLcjDEStNNT5UIDre9KiWuCBCHM5jVX++82iIwo4LJm8TNvlE6JXRKZCYpA995wv
-p8taWzNpGYckZCHGQvn5fu+j6+5WLS2HC2stGDg+a8v4qR9C1Wqw3f/NBxFlSzdwyxEQMsGMziHC
-SNQpJhXKjEax50G1BUszGSsLk4kh
---000000000000b687ef062b521898--
+I will make a v5 patchset with the napi_free_frags and pp_alloc_error
+changes already discussed. Thanks, John
 
