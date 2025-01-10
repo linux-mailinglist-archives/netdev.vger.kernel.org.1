@@ -1,123 +1,97 @@
-Return-Path: <netdev+bounces-157094-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157095-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26D81A08E3D
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 11:42:28 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 999FDA08E3F
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 11:42:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3C689169F80
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 10:42:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6BA2C188A4BC
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 10:42:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF30C20B80B;
-	Fri, 10 Jan 2025 10:42:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54B6220B207;
+	Fri, 10 Jan 2025 10:42:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="ZGhTG4ih"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CB6520B216
-	for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 10:42:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92F5618FC80;
+	Fri, 10 Jan 2025 10:42:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736505730; cv=none; b=oDw1SO9UIrfn8YuVmJB+pegQI/oxMgDBNHjdWpQl1eonsGvgOXdTZzQI/C3oLQp0+R0RzFr/mdOUw3zG1IwmXFrGMU30A13l+CP68kJtD5KSIZB5OR6i1ryjTOIe0PBxKfPQrrTJN0FDtsr3Zg8cSwr55/7fD5DmWlGEYT09PCs=
+	t=1736505764; cv=none; b=PjKKz/5ZeEbbAVoRmKLYPTlHV4OnYsVYcqaPeiB9r99Lisq1gKDdolO9xDiFjeuky4mPZoi0QSI9iHCaDXkutbJomULbYEABedqqL1YPxgae0hcNRVHUBtUsJg8fNKnnELJbKGWea257rY4rU1MQthbrV2Ukeu/IMLovTIyHuv8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736505730; c=relaxed/simple;
-	bh=2t6560ciqPluM5jV4icj76vKmnBYruYYY1iaoWGUwOc=;
+	s=arc-20240116; t=1736505764; c=relaxed/simple;
+	bh=ohoM/SKWkKyFvW6KhIrzfvo2nFEDuXd5GKki5PYWfeE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HYE4r/dzX1L+wYmzv/bdqIpyToyHinw5xrYR8UDAvdEACmwfUMsNN/2StWcHCvIafV0Yl4eoPKaNnzoUHNO9CokXEHS722c7aesNHZX/FLZhh66TqGubh0pmI51SVOlYoms3WGQjQ5tkc8EzolRyEob0IAlG0pUtDUnORu1QbWY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1tWCSd-00010v-9s; Fri, 10 Jan 2025 11:41:51 +0100
-Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1tWCSc-00090F-1b;
-	Fri, 10 Jan 2025 11:41:50 +0100
-Received: from pengutronix.de (pd9e59fec.dip0.t-ipconnect.de [217.229.159.236])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id 216863A4529;
-	Fri, 10 Jan 2025 10:41:50 +0000 (UTC)
-Date: Fri, 10 Jan 2025 11:41:49 +0100
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: Ruffalo Lavoisier <ruffalolavoisier@gmail.com>
-Cc: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>, 
-	Thomas Kopp <thomas.kopp@microchip.com>, Vincent Mailhol <mailhol.vincent@wanadoo.fr>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, linux-can@vger.kernel.org, 
-	netdev@vger.kernel.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] docs: remove duplicate word
-Message-ID: <20250110-screeching-quixotic-tanuki-1e6fa0-mkl@pengutronix.de>
-References: <20241120044014.92375-1-RuffaloLavoisier@gmail.com>
- <20241120-antique-earwig-of-modernism-1fc66e-mkl@pengutronix.de>
+	 Content-Type:Content-Disposition:In-Reply-To; b=TeAzWLBbAOs39az+nShHzspSOKD/5eECfYjgffQuwlF26Viv/9T83pmRO1Acic0fBcC9z8nTkRSkQfO9v6he2P+XCW7NrZCniDfHRdDoWsCrl28cIYFAyt+6YPjCWUfvQpsFnB12zYfOazrS8vkIvNsuTpr4rydQHkpLgLpP7vA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=ZGhTG4ih; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=cK66ALb0EIz2SRdvZooDu5fFKEL9ZHoB4UCgLNPgQRI=; b=ZGhTG4ihUwKFlMQZl0L6kIm3aH
+	c5MjlOcsrQNCfIoo3Zpe94bHe5wbyRwryTzqw/BfIoPb39mRHA2lUb3BZxMl1i7yTkrbUTF3AnpVG
+	b5iDTK9qsm75ZJReBMJVIJjIxkUaWqObetUkAxYqJXKPl7/n4GSqvA2hwC42/BnE/xU//3cJo9lJM
+	yI5sX8mhXBPTlZIkzUqs73bpnWMV7TZOSoKGZagKM8pJFbe1xWJlAtOInRluDVCB+QpW8V96il8vD
+	26UfpGJjW9UhOx1ViWKb+m8Me1mhIK3SqX7udGNeBtp2MLGbwfDilavSQ9TBhR6oGKEKtwJJ6Bpsx
+	FAnFWm3A==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1tWCG6-007oa4-2l;
+	Fri, 10 Jan 2025 18:42:16 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 10 Jan 2025 18:42:15 +0800
+Date: Fri, 10 Jan 2025 18:42:15 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: David Howells <dhowells@redhat.com>
+Cc: Chuck Lever <chuck.lever@oracle.com>,
+	Trond Myklebust <trond.myklebust@hammerspace.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, linux-crypto@vger.kernel.org,
+	linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH 2/8] crypto/krb5: Provide Kerberos 5 crypto through
+ AEAD API
+Message-ID: <Z4D5h_KBvxwmrdQq@gondor.apana.org.au>
+References: <Z4DwNPgLFcfy6jdl@gondor.apana.org.au>
+ <20250110010313.1471063-1-dhowells@redhat.com>
+ <20250110010313.1471063-3-dhowells@redhat.com>
+ <1486113.1736505567@warthog.procyon.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="ip3hmrnf27rnbmsn"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241120-antique-earwig-of-modernism-1fc66e-mkl@pengutronix.de>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+In-Reply-To: <1486113.1736505567@warthog.procyon.org.uk>
 
+On Fri, Jan 10, 2025 at 10:39:27AM +0000, David Howells wrote:
+>
+> Is it?  That's entirely unclear.  The algorithm should deal with inserting the
+> checksum in the appropriate place.  The caller should not need to know about
+> that or where the checksum is or about extra bits of metadata that may need to
+> be inserted (as I think the extra gssapi layer does for sunrpc).
 
---ip3hmrnf27rnbmsn
-Content-Type: text/plain; protected-headers=v1; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [PATCH] docs: remove duplicate word
-MIME-Version: 1.0
+The AEAD interface does not dictate where the authentication
+tag is.  Most algorithms put it at the end, but it really could
+be anywhere.
 
-On 20.11.2024 09:27:22, Marc Kleine-Budde wrote:
-> On 20.11.2024 13:40:13, Ruffalo Lavoisier wrote:
-> > - Remove duplicate word, 'to'.
->=20
-> Can I add your Signed-off-by to the patch?
->=20
-> https://elixir.bootlin.com/linux/v6.12/source/Documentation/process/submi=
-tting-patches.rst#L396
-
-Is it OK to add your Signed-off-by to the patch?
-
-regards,
-Marc
-
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
-
---ip3hmrnf27rnbmsn
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmeA+WoACgkQKDiiPnot
-vG9LlggAlAOvAjXwwTntSfaNIv3HMCQcKByFRx2L9fN9+YOvmAfaAZuwlgi9Qzed
-2Z+XbYsa3t3SOK/5+FbeNu1tWs3mu8cpYpserlakQb7g6V3Bel2LxlqR3W9hCdI4
-Z8y0KbKTTRrWGmIdiOeP6AbZph0H1szaMuP4S0VmTg54HlZX0loblaQ/XCOc0PmS
-KByCbK7C/u3665FnM5PM0BndSGku9kg43FpnENKr3/eExZsSgMj7Ji83ua/7wOKe
-44rBWSCCvG9Ns+eLzepDW5JXqqnGP2ycpTBO3qeEDu/iTVMdP3xqBUbP+9HRqEp4
-YIhdcUlVTIr9G1eSi8SXllPLNg+6Dg==
-=iCBi
------END PGP SIGNATURE-----
-
---ip3hmrnf27rnbmsn--
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
 
