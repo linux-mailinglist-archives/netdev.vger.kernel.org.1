@@ -1,114 +1,127 @@
-Return-Path: <netdev+bounces-157216-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157217-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id EBD77A09743
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 17:25:30 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7520AA09744
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 17:25:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3DD2E1882AE8
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 16:25:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4DE251884635
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 16:25:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CD0A213222;
-	Fri, 10 Jan 2025 16:24:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0458212D97;
+	Fri, 10 Jan 2025 16:25:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FAMbtjfC"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DyLhoPca"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
+Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FAE2212D7C
-	for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 16:24:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E596211A19
+	for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 16:24:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736526271; cv=none; b=j6lCs+efH2tPomNNYk0jYKVKERz+8mSv63DeVcVYe3FxdInqexGIO2G+heweCOcRSbYh7HEMBce1621LzeISkHZS7WEdxzUmlkQIl1o70gxFqV8wFonnOnxnj/FJMB79vplps2sJBtgoLaEJd5ThofSk5cZXtRX20nMK/OitcWw=
+	t=1736526301; cv=none; b=foMtKwsXkAzEqd4ZgEV8EQi6YotwH6+Kv478UqQADgnrJ9PcrYhDQW5MAwL35KIiuZyIVBmMiKXgmcsd4wgn3xAwOYskJk/EoYiWaHa4yD+1IoccZgZlA7Gy4Kujibq79vpF3BZ4iS0QJtTKR8kE80RDJR1qkJSrnI6+nl1/CcI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736526271; c=relaxed/simple;
-	bh=3b6neDEPzsLsN67DAfsV6R9TU5K+HbyGOXc15aFLzEo=;
+	s=arc-20240116; t=1736526301; c=relaxed/simple;
+	bh=dZLD2/RK3nMxdB1/yufmW1ve6pFcEAmvlg4u0n6ZAC0=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=gA1/Xbzgq1GrjMRzMImyWTUj2hgoXPFwR8byULz/AOObW57pmP0CAS/+uhyaEN2oeAcCxLObKgEczrtfcQdZRAWdQTXu7xY5aPYkM0Q48DuuzIW18cG/6XYZB0MqBRhYg+3+wa1EhLWFIp1dKZmMHln7Dtaxpd4DcX2dxl0qixI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=FAMbtjfC; arc=none smtp.client-ip=209.85.218.49
+	 To:Cc:Content-Type; b=TRPOYasfwo87AiNr8eRPWIyg40wwsac2ZPvg7doiV8o7mEHVLGujjtdIu27tmhWjxwcH7mS/jCs8qQ155hczvamSIsKhbUWU/uo2zH08D6zWJLYhqeMR8eYSNe+oQ4f/YZ9KM98nnK6XfmTbI/nuturd2/h/NwAPdclwoAcoVVw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=DyLhoPca; arc=none smtp.client-ip=209.85.160.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-ab2bb0822a4so454163766b.3
-        for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 08:24:29 -0800 (PST)
+Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-467abce2ef9so270591cf.0
+        for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 08:24:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1736526267; x=1737131067; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1736526299; x=1737131099; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=kgvMoDIN18uBOxcv7t4Bfn6DI89FufdUFpiEzLXRHZI=;
-        b=FAMbtjfCI6zLI74fMVI/EMcsX4KwORGLUInXpEFXXYQZUPoHAOzvIP24NAXbQ3QZcI
-         EnVo0+5/APTXmCfrFdqTRRYpE/1PcjdI6MqMOJh8GT5kIdyGf7H19Suu24UBXwA8IcWY
-         LeAwthoUXFjrTZIEKnvzzDX8BzEWluyXl/ChiinbeM+ILndyUDDxErJGhMazsZqFHF27
-         18XrCVUTeGuRSKmKjBUehFBNi0wPrlPf63Aqw89u1RTr28ZNl8XzOi3l9DVJb9URoUSn
-         4kGYYdwKkM9CR7+aqzVvJrPSEW14sJ+6yjC9ZQqNTQGCeSLkXmDzF9P3gnvu8qt8KmW/
-         5PRw==
+        bh=dZLD2/RK3nMxdB1/yufmW1ve6pFcEAmvlg4u0n6ZAC0=;
+        b=DyLhoPcawd8G99363K0uCiHvysbiCgemo8e/D50inn048VkYH1ak+Uh132PrXGhMYW
+         c1V7k9m12gyd0F4p2xVMHctC2gkxka8G5JrIFR2yv50hor6VNiQafuWIhGc6HFGjxQJW
+         EjZRQWMIO9LR22eoo0ZBPdzBllFwa8lCzzlW3gIsonLFT9Y/KShUr0H/mYRJFgnDeKTv
+         hS7hcFV6C3HyOlMEUJ91i79Iu6dLVPeL1m/HntbHBor1+YlKL999cDm55YpiceOMMxoo
+         pOppYDgAhM4MftvmKezQm7BebKZOxtCwj9olNfyr32QhXcq5vv0RObCKCVWp7Wvb0K9e
+         uKqA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736526268; x=1737131068;
+        d=1e100.net; s=20230601; t=1736526299; x=1737131099;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=kgvMoDIN18uBOxcv7t4Bfn6DI89FufdUFpiEzLXRHZI=;
-        b=bQcBBfq4dbImaAuezYQaGbdDxb3lYc1APbeABLYCnzitjGODf47TK8OjOcunsVuXwE
-         rsFtNBWWN3kXV6RpMtR6J20QMGZX5yiGQS39DslCSlg47mt+ZAVWn9ahik6FPhcyA+NC
-         NPXNo/oa7DJIlXdf7fXVmvrYAAcuVhcEMejYEO1njNHbxNAgsmPq0lTIEAGh7CuMZH98
-         IrBQ1KvaKthLbtmRQ163efW6u3O9UNme1n1/CzstH4VmMxIuZw/XnkHDr2Upcxjs2ne+
-         Ed1/GVZ10cDqQ4DBUpOvhnnrKtwTvQG5Pux+q89tAOx5K4yksxmmmZgosnhOZkT+nLZK
-         D+Gg==
-X-Gm-Message-State: AOJu0YyWyMYxuX19djwF/gy/15Uz7knhuDKXKraXS+L4kl/5uglTsg7q
-	2UF1Qu8iAm2SVjBgaloDtmLdemPyjAx8ikWunNQ7f5Z/B3486GJvPe59bJyY2qKVRNrsOEXPK6K
-	b5h5wLK1J1qLTvhiI2a2+ZWCbn0ni9fSLSN1wfGubtHw6usM5MQ==
-X-Gm-Gg: ASbGncuyqMwNPpBsWvfc56rcPioQ7hwvM2F/JSoTZnek89vCsTG0UTg8ri4BbtCkfox
-	LSIqo0Phg4blQIg0aUV2z7bMtJMv1REKPNR/rbg==
-X-Google-Smtp-Source: AGHT+IGJr58LelVfn7xeQ82vHy1ziXpztdR8LRfsa86Qr56JPQMS4Gl7IPmeAALr/UaMCfAmLlH+XU0XLlEmBZ0OYRc=
-X-Received: by 2002:a17:907:6d20:b0:aa6:800a:1291 with SMTP id
- a640c23a62f3a-ab2ab167fb7mr1009168266b.7.1736526267482; Fri, 10 Jan 2025
- 08:24:27 -0800 (PST)
+        bh=dZLD2/RK3nMxdB1/yufmW1ve6pFcEAmvlg4u0n6ZAC0=;
+        b=pHqMlTNmXMNopaneWxZqnnJkqkRoENBgbtbcFIBiMTvdTOlzuogDu6K94K/fv+iWWz
+         erOkb7Ay8PJkxKiYxLl1jhX+4QDsPqg5K8Dyo6MdkTlzrpAVaxCYieZ1r804Jzv6lGH7
+         8AwJZMuiU2v0ndOJ5uuIRXJUGTSfFLcgZ8ykaW4YsZn/uk3tlo8sTugUEocSYoSnkQmJ
+         erUdW2+Gzo/0mIkegcQJBYqTWaVs6NPa0QUuWbR3lV25W0EVjAlwK5qX15r0PcOnao0Y
+         SheGCpw8nCl6ycOTEtzBfAVGSKkb3aPLeWXVfeN7X1oDX62Wt6OMsmtgdH+qHimhKLHU
+         mTCA==
+X-Forwarded-Encrypted: i=1; AJvYcCUxBF1ILLWRGMA89rb9JoNDPuGBe4q3Mc9lk5dZRvljDs0tRqU4KbNXxGbScSOEwXR7mHLaY3g=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxXLTGNh3QNXhCksOj+M02p4t6bXAvv754d0iQgh4ZKxrIRtn9a
+	cMHG/4809/A2CKZ1EaL2m1L2lBUpU9fVLU7+GkSj5n62uI1oohdSXAhrKkdBnZZr/jdltfijEDq
+	5c2HX0YdSgV5CnICNCfiIvvwxKIPkZCwZILMW
+X-Gm-Gg: ASbGncviDu1UHFOaP/ukaJpgey6kCW10jfBM5zMBajBDe01JVuYZ2ZC11ZzY1+/zOaR
+	CD7UkfRwAO5pCQu1J1CQOsj9ypHG4/6grXtUQXo5l2ZPvitgYiHk+WRHmH+hgeWnktiL/bA==
+X-Google-Smtp-Source: AGHT+IHygeqEmy6Ne2CAiAAsOJHi64fj3I9CDqnhJ65axCyiB9rIY/L3TULm33msORs7MRZ2pIYedHE+kmJbQcvlLHk=
+X-Received: by 2002:a05:622a:8e:b0:466:8c23:823a with SMTP id
+ d75a77b69052e-46c89dad596mr2701791cf.17.1736526298867; Fri, 10 Jan 2025
+ 08:24:58 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250110153546.41344-1-jhs@mojatatu.com>
-In-Reply-To: <20250110153546.41344-1-jhs@mojatatu.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 10 Jan 2025 17:24:16 +0100
-X-Gm-Features: AbW1kvb4pwBwpxniRUfqA151SwmXmEPVBn0LrUyt2tqrMgJE-mdFNSoi2WKBOH4
-Message-ID: <CANn89i+-LreZWpQpiNfNBLWN_in58MEtegKz-qqDk64h2i45LQ@mail.gmail.com>
-Subject: Re: [PATCH net 1/1] net: sched: fix ets qdisc OOB Indexing
-To: Jamal Hadi Salim <jhs@mojatatu.com>
-Cc: netdev@vger.kernel.org, jiri@resnulli.us, xiyou.wangcong@gmail.com, 
-	davem@davemloft.net, kuba@kernel.org, petrm@mellanox.com, security@kernel.org
+References: <20250109161802.3599-1-sensor1010@163.com> <CADVnQy=Uy+UxYivkUY1JZ4+c2rDD74VY8=vxmxf=NJxWcXa69Q@mail.gmail.com>
+ <5d5290fb.a567.19450f031bf.Coremail.sensor1010@163.com>
+In-Reply-To: <5d5290fb.a567.19450f031bf.Coremail.sensor1010@163.com>
+From: Neal Cardwell <ncardwell@google.com>
+Date: Fri, 10 Jan 2025 11:24:42 -0500
+X-Gm-Features: AbW1kvZv2K2A0rVn5uezz8CYqXaFdZ7PYXtEDBI1FQK5rSGaemnyOiGXlVLr4VQ
+Message-ID: <CADVnQymirM10M95Hspk2KYrFDE7uBqQSM4PBYRqJJVbqmKCMsg@mail.gmail.com>
+Subject: Re: Re: [PATCH] tcp: Add an extra check for consecutive failed
+ keepalive probes
+To: lizhe <sensor1010@163.com>
+Cc: edumazet@google.com, davem@davemloft.net, dsahern@kernel.org, 
+	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jan 10, 2025 at 4:35=E2=80=AFPM Jamal Hadi Salim <jhs@mojatatu.com>=
- wrote:
+On Fri, Jan 10, 2025 at 10:58=E2=80=AFAM lizhe <sensor1010@163.com> wrote:
 >
-> Haowei Yan <g1042620637@gmail.com> found that ets_class_from_arg() can
-> index an Out-Of-Bound class in ets_class_from_arg() when passed clid of
-> 0. The overflow may cause local privilege escalation.
+> Hi, Neal
 >
->  [   18.852298] ------------[ cut here ]------------
->  [   18.853271] UBSAN: array-index-out-of-bounds in net/sched/sch_ets.c:9=
-3:20
->  [   18.853743] index 18446744073709551615 is out of range for type 'ets_=
-class [16]'
->  [   18.854254] CPU: 0 UID: 0 PID: 1275 Comm: poc Not tainted 6.12.6-dirt=
-y #17
->  [   18.854821] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BI=
-OS 1.15.0-1 04/01/2014
+>
+> If the TCP_USER_TIMEOUT option is not enabled, and attempts to send TCP k=
+eepalive probes continuously fail,
+>
+> then who limits the number of increments to icsk->icsk_probes_out?
 
-> Fixes: dcc68b4d8084 ("net: sch_ets: Add a new Qdisc")
-> Reported-by: Haowei Yan <g1042620637@gmail.com>
-> Suggested-by: Haowei Yan <g1042620637@gmail.com>
-> Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
-> ---
->  net/sched/sch_ets.c | 2 ++
->  1 file changed, 2 insertions(+)
+The code that I pasted in my previous message limits the number of
+increments to icsk->icsk_probes_out. :-)
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+The code is right here in the lines surrounding line 809 of tcp_timer
+in Linux v6.12, which can also be viewed here more conveniently:
+
+https://elixir.bootlin.com/linux/v6.12/source/net/ipv4/tcp_timer.c#L809
+
+> Adding this code is feasible. If not added, the system would continuously=
+ send keepalive probes without any limit.
+>
+> If these probes continually fail, the process would persist indefinitely =
+because there would be no measure in place to restrict the increments of ic=
+sk->icsk_probes_out++.
+
+It's not true that the system would continuously send keepalive probes
+without any limit. The packetdrill test I pasted in my previous
+message verifies that Linux TCP stops sending keepalives after the
+number of probes configured by net.ipv4.tcp_keepalive_probes or
+TCP_KEEPCNT. If you think I'm still missing something, please provide
+a tcpdump trace or packetdrill test showing the behavior you are
+claiming. :-)
+
+thanks,
+neal
 
