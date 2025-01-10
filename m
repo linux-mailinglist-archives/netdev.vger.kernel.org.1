@@ -1,449 +1,219 @@
-Return-Path: <netdev+bounces-157315-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157318-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79E62A09EBB
-	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 00:34:34 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 73FF2A09EC3
+	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 00:38:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 78CAA167E37
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 23:34:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 79ABC3A3B17
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 23:38:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA613222575;
-	Fri, 10 Jan 2025 23:34:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8735F222569;
+	Fri, 10 Jan 2025 23:38:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=cisco.com header.i=@cisco.com header.b="dKC8nGfD"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L4unY5TT"
 X-Original-To: netdev@vger.kernel.org
-Received: from rcdn-iport-7.cisco.com (rcdn-iport-7.cisco.com [173.37.86.78])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AEE4221D86
-	for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 23:34:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=173.37.86.78
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFDF920764C;
+	Fri, 10 Jan 2025 23:38:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736552066; cv=none; b=Ozd5SQjJAPvKlVtxxZz94dAiQEi9m65Eg/T8FmZYwWGGwDw3YNoz5CsAwyvTGdqO6cY2jffOWN2Tum1v/g+JKDm68AilwKCubSWP/2vkep04ILqfUFDF6KJFya2peU7/PbT29mMiPIKe2P+c3jlYmV4DmKjTCdgGr8NVXxC9r0M=
+	t=1736552314; cv=none; b=NHqaWuvD8Vj7so7JO3VrjjqrcYwWiitMESHW54h8R3Ns0O8ZUi54V266F/H4em5bNsrNzW5QaGKo5Pvy1xkV7SyUvkVdfiecmbyt544Adt7XmLddhtK96mErz08ccooEib+FtpMkgKQ6QYcSlOlH1iEm7rt8Al+zYOoi+mVEp0I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736552066; c=relaxed/simple;
-	bh=biBIfFqV7edhp9Ts2kkfDATDLpg2ynqjrtq9Q+z1sH4=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Vo3QrV30jGBs5TiiJ8+c67j3+RObOGhbwH4PZcTleW7bZ9L9V8dHpch0JCbGh7q6sUIjOhg2bSUFihczaErku2y5NQJ7+xm9ezoGW3dIxhuNH6IubofOrlj5LT3tpMrnCG+feMLP2AEadUyfxpIX6CUtqPc6qaxKNXjEDAPoTkc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cisco.com; spf=pass smtp.mailfrom=cisco.com; dkim=pass (1024-bit key) header.d=cisco.com header.i=@cisco.com header.b=dKC8nGfD; arc=none smtp.client-ip=173.37.86.78
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cisco.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cisco.com
+	s=arc-20240116; t=1736552314; c=relaxed/simple;
+	bh=3NKoZhNOgr5iFSLiZ4xbSgnRTMH5vHQGH8A8hKAH1pY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ilXglLzrMEEPSgPYntvhVmcmBBI96tLM1KSi0r0Rzp0TR8/sZKk0AEYpONPYW4xky61QzbNjVEa7SPCxtsSmTBPbYAtQzxvJ+NOvl8xdNprOlkt2QexwUvekySqGc0MrlpGog9F9CsJuWUhwYEpCgDOTU3L9dPHMxt9SU9nHGOU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=L4unY5TT; arc=none smtp.client-ip=209.85.216.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-2efe25558ddso3393871a91.2;
+        Fri, 10 Jan 2025 15:38:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=cisco.com; i=@cisco.com; l=11417; q=dns/txt;
-  s=iport; t=1736552064; x=1737761664;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=UC0WnjeBW6PrMAOR+T/12J3J/Z2IiJpNiyWkLzisbnU=;
-  b=dKC8nGfDD+BRjABp15kETN8bHslU5sDvF1qAyNEqcgEqeepZNPAOtSbT
-   KZjJLdo1bDJEjVIdMlExMxYOluvYVw2U6emLj7OjgtYGoUz6l/1usC4rB
-   WmyBSvDXisIZVL4VfkXFQWnmxZ2NXev4IH9SgC08KSjSHhGmiA8hGWlSb
-   4=;
-X-CSE-ConnectionGUID: 6EN0lzqfR6G9HYsQS5v6FA==
-X-CSE-MsgGUID: 5V5rK67mTYuiT/D0YmG2hw==
-X-IPAS-Result: =?us-ascii?q?A0AnAAD5rYFn/5H/Ja1aHAEBAQEBAQcBARIBAQQEAQGBf?=
- =?us-ascii?q?wcBAQsBgkqBT0NIjHJfpw2BJQNWDwEBAQ9EBAEBhQcCinQCJjQJDgECBAEBA?=
- =?us-ascii?q?QEDAgMBAQEBAQEBAQEBAQsBAQUBAQECAQcFgQ4ThgiGWwIBAycLAUYQUSsrB?=
- =?us-ascii?q?xKDAYJlA7RVgXkzgQHeM4FtgUgBhWqHX3CEdycbgUlEgRWBO4E+b4sHBIdnn?=
- =?us-ascii?q?lRIgSEDWSwBVRMNCgsHBYE4OgMiCwsMCxQcFQIVHgERBhAEbUQ3gkZpSzoCD?=
- =?us-ascii?q?QI1gh4kWIIrhFyER4RUgktVgkeCFHqBGYQDQAMLGA1IESw3Bg4bBj5uB5soP?=
- =?us-ascii?q?INwexSBJoFEoyWCIKEDhCWBY59jGjOqU5h8IqQlhGaBZzyBWTMaCBsVgyJSG?=
- =?us-ascii?q?Q+OKgMWFrxGJTI8AgcLAQEDCZEeAQE?=
-IronPort-Data: A9a23:Cv5ph6NPcBUNk7DvrR2HlsFynXyQoLVcMsEvi/4bfWQNrUomhWQGy
- mRJW2uDPP/ZZWOnedBwPNmxpxtTscKHndE2HHM5pCpnJ55oRWUpJjg4wmPYZX76whjrFRo/h
- ykmQoCeaphyFjmE+0/F3oHJ9RFUzbuPSqf3FNnKMyVwQR4MYCo6gHqPocZh6mJTqYb/WlnlV
- e/a+ZWFZQf8gmYsaQr41orawP9RlKWq0N8nlgRWicBj5Df2i3QTBZQDEqC9R1OQapVUBOOzW
- 9HYx7i/+G7Dlz91Yj9yuu+mGqGiaue60Tmm0hK6aYD76vRxjnBaPpIACRYpQRw/ZwNlMDxG4
- I4lWZSYEW/FN0BX8QgXe0Ew/ypWZcWq9FJbSJSymZT78qHIT5fj66tDKhkyL5QWwLhYUEF/7
- sUjdS5TQDnW0opawJrjIgVtrt4oIM+uOMYUvWttiGmJS/0nWpvEBa7N4Le03h9p2ZsIRqmYP
- ZdEL2MzMXwsYDUXUrsTIJA5nOGkj33yWzZZs1mS46Ew5gA/ySQqiOSyboaEIIDiqcN9w3jFv
- EGYoGHFMwwbCJuzkQuA3Sismbqa9c/8cMdIfFGizdZmiUOew0QfAQMbUF+8r+X/jEOiM/pSJ
- 1ER8zgjsYA980ukStS7VBq9yFaHoxQVc9ldCes37EeK0KW8yw+fCnIJUX1HZcAqudEeQSEs0
- BmCn7vBHTVlvbuUYWiQ+redsXW5Pi19BWkPeSMJUyMb7NT55oI+lBTCSpBkCqHdszHuMSv7z
- zbPqG01gK8eyJZbka665lvAxTmro/AlUzII2+keZUr9hisRWWJvT9fABYTzhRqYELukcw==
-IronPort-HdrOrdr: A9a23:uqiIsq6JCMqwZWFePgPXwM/XdLJyesId70hD6qm+c3Nom6uj5q
- eTdZsgtCMc5Ax9ZJhko6HjBEDiewK5yXcK2+ks1N6ZNWGM0ldAbrsSiLcKqAePJ8SRzIJgPN
- 9bAstD4BmaNykCsS48izPIdeod/A==
-X-Talos-CUID: 9a23:LNQ3x2BhAc13I1r6E3dK0hYQCNkrSCPynVfhOHaDVHg3ZpTAHA==
-X-Talos-MUID: 9a23:7s/sFghbmg5AsJFrNKWxDMMpafk1+YfwV0UxoIgHh46obR11FG2dk2Hi
-X-IronPort-Anti-Spam-Filtered: true
-X-IronPort-AV: E=Sophos;i="6.12,305,1728950400"; 
-   d="scan'208";a="304764924"
-Received: from rcdn-l-core-08.cisco.com ([173.37.255.145])
-  by rcdn-iport-7.cisco.com with ESMTP/TLS/TLS_AES_256_GCM_SHA384; 10 Jan 2025 23:32:53 +0000
-Received: from cisco.com (savbu-usnic-a.cisco.com [10.193.184.48])
-	by rcdn-l-core-08.cisco.com (Postfix) with ESMTP id 23D48180001E8;
-	Fri, 10 Jan 2025 23:32:53 +0000 (GMT)
-Received: by cisco.com (Postfix, from userid 392789)
-	id F07E820F2007; Fri, 10 Jan 2025 15:32:52 -0800 (PST)
-From: John Daley <johndale@cisco.com>
-To: benve@cisco.com,
-	satishkh@cisco.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	netdev@vger.kernel.org
-Cc: John Daley <johndale@cisco.com>,
-	Nelson Escobar <neescoba@cisco.com>
-Subject: [PATCH net-next v5 4/4] enic: Use the Page Pool API for RX when MTU is less than page size
-Date: Fri, 10 Jan 2025 15:32:49 -0800
-Message-Id: <20250110233249.23258-5-johndale@cisco.com>
-X-Mailer: git-send-email 2.35.2
-In-Reply-To: <20250110233249.23258-1-johndale@cisco.com>
-References: <20250110233249.23258-1-johndale@cisco.com>
+        d=gmail.com; s=20230601; t=1736552312; x=1737157112; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=x2+Uo0uj2M05vhwWgf9+wkXJ00BoAN2Uo3Mf7BisOr8=;
+        b=L4unY5TTZUn4UiFceRffMMP1YFzdnsk6jpc0gC72wsC7xAAXDHvLtpC5t7nbcx3QK0
+         0IULU+FLV4HI3yGUNYwqwjPG+fLFst802Mp73v0Zui+enm2AJCGxKE4VFSewzcDyEvUA
+         OE/VNRMiQK2w8TcVXQI7vS57VYSsiX3kf/Q7U/bgHlZOWvkrkIG3FV1N6Rm50WnL9keD
+         0S+sVHiY63gqnKxmXQc3TrHOYjZTIPF7CcebVTl3UB21UvFs8vQXU/3ASvFD7lUqtLVY
+         e3MWZ+c+V/6bO8so5L3hAxtoZqIH/KsRpyReeuDEP9XfrLk8R832XNiq/fIIcqN9hiuy
+         6Sgg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736552312; x=1737157112;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=x2+Uo0uj2M05vhwWgf9+wkXJ00BoAN2Uo3Mf7BisOr8=;
+        b=PA86ljPxK0VuSR7/me84RjWJsYsWntyKSN6hSTROmt9F0XjPYiGoUddXYD0vp+/pHG
+         EqFPoPCJ/DwiavT+4VcTbebaMDg109GOWjCY/mIKodkj3zAw/Jc8ZF0vxwmReKXqo28X
+         1001vF32h65a0nDqQjPfheXg2ZvL6IQ8lEwrhgsbhgTU0qoqkea/V5QAwEcJXfhqxlkF
+         jhVycG5NHPXFbK6MmT2LehnzxDmNKzEkdzNhNTI7KfBEjSfEtW61q6SB/obexvRg8qwD
+         AX37UI092bybRHic8VBZzZPVrBcwh/6EDrwhHHfj7iit0d5tXKJNSY1nwYsIb6OXPUYR
+         HMaA==
+X-Forwarded-Encrypted: i=1; AJvYcCUdNKrNhXMtQwLbTycEqnYd99Ln7dZYI7pXAeXtyn9G3Is7QTk+1EcJhsFy1laQcI3CqGGzQ8xdt6Mnyw==@vger.kernel.org, AJvYcCVnO2h4FSC3HHmHmhgTtSJ+mwn41aieeoBazO0ExjnZW8SpjSIl+3s5pq+s09GnUZwtSYSojRAI7P3ctw==@vger.kernel.org, AJvYcCXRtp6Hk6aj8IOF6MBkCUL7c/2OzND/8XV7guudVWk9Qw1UFk9u/MdCsenzXdv4MhSkEzrduOcr@vger.kernel.org, AJvYcCXrT/yAvbBwef25ul5TP4O0bzZnClhVf7iEutbrjKktd3Rp15EAv1JLf/ovSU6KZUtihV0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzkpqcYufmiyTzQ3VOVX5vpWGLXMYD4vnDpwlCpWvczoXbLvKM8
+	hsx4NNBQZRXg+7H+zAMR3r5sieXxyRDd354pVTnfBMuYJ2u2PdEzWFS1SAP8RytcgjfAYQncHAV
+	KShJUa7C05mNYPRHtl6sQmoH+OEc=
+X-Gm-Gg: ASbGncspR36xiJ3w79Co10DlS9iS83caACHe+8FPcJRdtdq3wSygNimJZVEdo/MocLh
+	jMKNDEDHGUJWIxaEX5Pr2le9M8ufRpkOx23o1zCKy+QREEL2t00NxMQ==
+X-Google-Smtp-Source: AGHT+IHu08nRpxiA1SlM2UtovuESnRCpZ0agU4YUHB3J/Xxa07EK0xE3pcpIGy9h9BnUqKJKuVCF0+Hw7csllIj8eko=
+X-Received: by 2002:a17:90b:4a44:b0:2ea:61de:38f7 with SMTP id
+ 98e67ed59e1d1-2f548f1d420mr18769661a91.29.1736552312160; Fri, 10 Jan 2025
+ 15:38:32 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Outbound-SMTP-Client: 10.193.184.48, savbu-usnic-a.cisco.com
-X-Outbound-Node: rcdn-l-core-08.cisco.com
+References: <20241218024422.23423-1-alibuda@linux.alibaba.com> <20241218024422.23423-5-alibuda@linux.alibaba.com>
+In-Reply-To: <20241218024422.23423-5-alibuda@linux.alibaba.com>
+From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Date: Fri, 10 Jan 2025 15:38:19 -0800
+X-Gm-Features: AbW1kvZfBu24fUaDzr3NwYyzCcTSSYsyF6zLHRqrIfmRcixRNKPuH2nvUx_OIKQ
+Message-ID: <CAEf4Bzas7E4bSFnxiObJysf4hDv2AJVd4B4Q+me1wmGtdHVVbQ@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v3 4/5] libbpf: fix error when st-prefix_ops and
+ ops from differ btf
+To: "D. Wythe" <alibuda@linux.alibaba.com>
+Cc: kgraul@linux.ibm.com, wenjia@linux.ibm.com, jaka@linux.ibm.com, 
+	ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev, 
+	pabeni@redhat.com, song@kernel.org, sdf@google.com, haoluo@google.com, 
+	yhs@fb.com, edumazet@google.com, john.fastabend@gmail.com, kpsingh@kernel.org, 
+	jolsa@kernel.org, guwen@linux.alibaba.com, kuba@kernel.org, 
+	davem@davemloft.net, netdev@vger.kernel.org, linux-s390@vger.kernel.org, 
+	linux-rdma@vger.kernel.org, bpf@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The Page Pool API improves bandwidth and CPU overhead by recycling
-pages instead of allocating new buffers in the driver. Make use of
-page pool fragment allocation for smaller MTUs so that multiple
-packets can share a page.
+On Tue, Dec 17, 2024 at 6:44=E2=80=AFPM D. Wythe <alibuda@linux.alibaba.com=
+> wrote:
+>
+> When a struct_ops named xxx_ops was registered by a module, and
+> it will be used in both built-in modules and the module itself,
+> so that the btf_type of xxx_ops will be present in btf_vmlinux
+> instead of in btf_mod, which means that the btf_type of
+> bpf_struct_ops_xxx_ops and xxx_ops will not be in the same btf.
+>
+> Here are four possible case:
+>
+> +--------+-------------+-------------+---------------------------------+
+> |        | st_opx_xxx  | xxx         |                                 |
+> +--------+-------------+-------------+---------------------------------+
+> | case 0 | btf_vmlinux | bft_vmlinux | be used and reg only in vmlinux |
+> +--------+-------------+-------------+---------------------------------+
+> | case 1 | btf_vmlinux | bpf_mod     | INVALID                         |
+> +--------+-------------+-------------+---------------------------------+
+> | case 2 | btf_mod     | btf_vmlinux | reg in mod but be used both in  |
+> |        |             |             | vmlinux and mod.                |
+> +--------+-------------+-------------+---------------------------------+
+> | case 3 | btf_mod     | btf_mod     | be used and reg only in mod     |
+> +--------+-------------+-------------+---------------------------------+
+>
+> At present, cases 0, 1, and 3 can be correctly identified, because
+> st_ops_xxx is searched from the same btf with xxx. In order to
+> handle case 2 correctly without affecting other cases, we cannot simply
+> change the search method for st_ops_xxx from find_btf_by_prefix_kind()
+> to find_ksym_btf_id(), because in this way, case 1 will not be
+> recognized anymore.
+>
+> To address this issue, if st_ops_xxx cannot be found in the btf with xxx
+> and mod_btf does not exist, do find_ksym_btf_id() again to
+> avoid such issue.
+>
+> Fixes: 590a00888250 ("bpf: libbpf: Add STRUCT_OPS support")
+> Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
+> ---
+>  tools/lib/bpf/libbpf.c | 25 +++++++++++++++++--------
+>  1 file changed, 17 insertions(+), 8 deletions(-)
+>
+> diff --git a/tools/lib/bpf/libbpf.c b/tools/lib/bpf/libbpf.c
+> index 66173ddb5a2d..56bf74894110 100644
+> --- a/tools/lib/bpf/libbpf.c
+> +++ b/tools/lib/bpf/libbpf.c
+> @@ -1005,7 +1005,8 @@ find_struct_ops_kern_types(struct bpf_object *obj, =
+const char *tname_raw,
+>         const struct btf_member *kern_data_member;
+>         struct btf *btf =3D NULL;
+>         __s32 kern_vtype_id, kern_type_id;
+> -       char tname[256];
+> +       char tname[256], stname[256];
+> +       int ret;
+>         __u32 i;
+>
+>         snprintf(tname, sizeof(tname), "%.*s",
+> @@ -1020,17 +1021,25 @@ find_struct_ops_kern_types(struct bpf_object *obj=
+, const char *tname_raw,
+>         }
+>         kern_type =3D btf__type_by_id(btf, kern_type_id);
+>
+> +       ret =3D snprintf(stname, sizeof(stname), "%s%s", STRUCT_OPS_VALUE=
+_PREFIX, tname);
+> +       if (ret < 0 || ret >=3D sizeof(stname))
+> +               return -ENAMETOOLONG;
+> +
+>         /* Find the corresponding "map_value" type that will be used
+>          * in map_update(BPF_MAP_TYPE_STRUCT_OPS).  For example,
+>          * find "struct bpf_struct_ops_tcp_congestion_ops" from the
+>          * btf_vmlinux.
+>          */
+> -       kern_vtype_id =3D find_btf_by_prefix_kind(btf, STRUCT_OPS_VALUE_P=
+REFIX,
+> -                                               tname, BTF_KIND_STRUCT);
+> +       kern_vtype_id =3D btf__find_by_name_kind(btf, stname, BTF_KIND_ST=
+RUCT);
+>         if (kern_vtype_id < 0) {
+> -               pr_warn("struct_ops init_kern: struct %s%s is not found i=
+n kernel BTF\n",
+> -                       STRUCT_OPS_VALUE_PREFIX, tname);
+> -               return kern_vtype_id;
+> +               if (kern_vtype_id =3D=3D -ENOENT && !*mod_btf)
+> +                       kern_vtype_id =3D find_ksym_btf_id(obj, stname, B=
+TF_KIND_STRUCT,
+> +                                                        &btf, mod_btf);
+> +               if (kern_vtype_id < 0) {
+> +                       pr_warn("struct_ops init_kern: struct %s is not f=
+ound in kernel BTF\n",
+> +                               stname);
+> +                       return kern_vtype_id;
+> +               }
 
-Added 'pp_alloc_error' per RQ ethtool statistic to count
-page_pool_dev_alloc() failures.
+purely from the coding perspective, this is unnecessarily nested and
+convoluted. Wouldn't this work the same but be less nested:
 
-Co-developed-by: Nelson Escobar <neescoba@cisco.com>
-Signed-off-by: Nelson Escobar <neescoba@cisco.com>
-Co-developed-by: Satish Kharat <satishkh@cisco.com>
-Signed-off-by: Satish Kharat <satishkh@cisco.com>
-Signed-off-by: John Daley <johndale@cisco.com>
----
- drivers/net/ethernet/cisco/enic/enic.h      |  10 ++
- drivers/net/ethernet/cisco/enic/enic_main.c |  53 ++++++++-
- drivers/net/ethernet/cisco/enic/enic_rq.c   | 123 ++++++++++++++++++++
- drivers/net/ethernet/cisco/enic/enic_rq.h   |   5 +
- drivers/net/ethernet/cisco/enic/vnic_rq.h   |   2 +
- 5 files changed, 187 insertions(+), 6 deletions(-)
+kern_vtype_id =3D btf__find_by_name_kind(btf, stname, BTF_KIND_STRUCT);
+if (kern_vtype_id =3D=3D -ENOENT && !*mod_btf)
+    kern_vtype_id =3D find_ksym_btf_id(...);
+if (kern_vtype_id < 0) {
+    pr_warn(...);
+    return kern_vtype_id;
+}
 
-diff --git a/drivers/net/ethernet/cisco/enic/enic.h b/drivers/net/ethernet/cisco/enic/enic.h
-index 51f80378d928..19e22aba71a8 100644
---- a/drivers/net/ethernet/cisco/enic/enic.h
-+++ b/drivers/net/ethernet/cisco/enic/enic.h
-@@ -17,6 +17,8 @@
- #include "vnic_nic.h"
- #include "vnic_rss.h"
- #include <linux/irq.h>
-+#include <linux/if_vlan.h>
-+#include <net/page_pool/helpers.h>
- 
- #define DRV_NAME		"enic"
- #define DRV_DESCRIPTION		"Cisco VIC Ethernet NIC Driver"
-@@ -158,6 +160,7 @@ struct enic_rq_stats {
- 	u64 pkt_truncated;		/* truncated pkts */
- 	u64 no_skb;			/* out of skbs */
- 	u64 desc_skip;			/* Rx pkt went into later buffer */
-+	u64 pp_alloc_error;		/* page alloc error */
- };
- 
- struct enic_wq {
-@@ -169,6 +172,7 @@ struct enic_wq {
- struct enic_rq {
- 	struct vnic_rq vrq;
- 	struct enic_rq_stats stats;
-+	struct page_pool *pool;
- } ____cacheline_aligned;
- 
- /* Per-instance private data structure */
-@@ -231,8 +235,14 @@ struct enic {
- 			       void *opaque);
- 	int (*rq_alloc_buf)(struct vnic_rq *rq);
- 	void (*rq_free_buf)(struct vnic_rq *rq, struct vnic_rq_buf *buf);
-+	void (*rq_cleanup)(struct enic_rq *rq);
- };
- 
-+static inline unsigned int get_max_pkt_len(struct enic *enic)
-+{
-+	return enic->netdev->mtu + VLAN_ETH_HLEN;
-+}
-+
- static inline struct net_device *vnic_get_netdev(struct vnic_dev *vdev)
- {
- 	struct enic *enic = vdev->priv;
-diff --git a/drivers/net/ethernet/cisco/enic/enic_main.c b/drivers/net/ethernet/cisco/enic/enic_main.c
-index d3319f62ad1b..64f25a5b1507 100644
---- a/drivers/net/ethernet/cisco/enic/enic_main.c
-+++ b/drivers/net/ethernet/cisco/enic/enic_main.c
-@@ -1313,6 +1313,11 @@ static int enic_get_vf_port(struct net_device *netdev, int vf,
- 	return -EMSGSIZE;
- }
- 
-+/* nothing to do for buffers based allocation */
-+static void enic_rq_buf_cleanup(struct enic_rq *rq)
-+{
-+}
-+
- static void enic_free_rq_buf(struct vnic_rq *rq, struct vnic_rq_buf *buf)
- {
- 	struct enic *enic = vnic_dev_priv(rq->vdev);
-@@ -1882,10 +1887,33 @@ static int enic_open(struct net_device *netdev)
- 	struct enic *enic = netdev_priv(netdev);
- 	unsigned int i;
- 	int err, ret;
--
--	enic->rq_buf_service = enic_rq_indicate_buf;
--	enic->rq_alloc_buf = enic_rq_alloc_buf;
--	enic->rq_free_buf = enic_free_rq_buf;
-+	bool use_page_pool;
-+	struct page_pool_params pp_params = { 0 };
-+
-+	/* Use the Page Pool API for MTUs <= PAGE_SIZE */
-+	use_page_pool = (get_max_pkt_len(enic) <= PAGE_SIZE);
-+
-+	if (use_page_pool) {
-+		/* use the page pool API */
-+		pp_params.order = 0;
-+		pp_params.pool_size = enic->config.rq_desc_count;
-+		pp_params.nid = dev_to_node(&enic->pdev->dev);
-+		pp_params.dev = &enic->pdev->dev;
-+		pp_params.dma_dir = DMA_FROM_DEVICE;
-+		pp_params.max_len = PAGE_SIZE;
-+		pp_params.netdev = netdev;
-+		pp_params.flags = PP_FLAG_DMA_MAP | PP_FLAG_DMA_SYNC_DEV;
-+
-+		enic->rq_buf_service = enic_rq_indicate_page;
-+		enic->rq_alloc_buf = enic_rq_alloc_page;
-+		enic->rq_free_buf = enic_rq_free_page;
-+		enic->rq_cleanup = enic_rq_page_cleanup;
-+	} else {
-+		enic->rq_buf_service = enic_rq_indicate_buf;
-+		enic->rq_alloc_buf = enic_rq_alloc_buf;
-+		enic->rq_free_buf = enic_free_rq_buf;
-+		enic->rq_cleanup = enic_rq_buf_cleanup;
-+	}
- 
- 	err = enic_request_intr(enic);
- 	if (err) {
-@@ -1903,6 +1931,13 @@ static int enic_open(struct net_device *netdev)
- 	}
- 
- 	for (i = 0; i < enic->rq_count; i++) {
-+		/* create a page pool for each RQ */
-+		if (use_page_pool) {
-+			pp_params.napi = &enic->napi[i];
-+			pp_params.queue_idx = i;
-+			enic->rq[i].pool = page_pool_create(&pp_params);
-+		}
-+
- 		/* enable rq before updating rq desc */
- 		vnic_rq_enable(&enic->rq[i].vrq);
- 		vnic_rq_fill(&enic->rq[i].vrq, enic->rq_alloc_buf);
-@@ -1943,8 +1978,10 @@ static int enic_open(struct net_device *netdev)
- err_out_free_rq:
- 	for (i = 0; i < enic->rq_count; i++) {
- 		ret = vnic_rq_disable(&enic->rq[i].vrq);
--		if (!ret)
-+		if (!ret) {
- 			vnic_rq_clean(&enic->rq[i].vrq, enic->rq_free_buf);
-+			enic->rq_cleanup(&enic->rq[i]);
-+		}
- 	}
- 	enic_dev_notify_unset(enic);
- err_out_free_intr:
-@@ -2002,8 +2039,10 @@ static int enic_stop(struct net_device *netdev)
- 
- 	for (i = 0; i < enic->wq_count; i++)
- 		vnic_wq_clean(&enic->wq[i].vwq, enic_free_wq_buf);
--	for (i = 0; i < enic->rq_count; i++)
-+	for (i = 0; i < enic->rq_count; i++) {
- 		vnic_rq_clean(&enic->rq[i].vrq, enic->rq_free_buf);
-+		enic->rq_cleanup(&enic->rq[i]);
-+	}
- 	for (i = 0; i < enic->cq_count; i++)
- 		vnic_cq_clean(&enic->cq[i]);
- 	for (i = 0; i < enic->intr_count; i++)
-@@ -2513,6 +2552,7 @@ static void enic_get_queue_stats_rx(struct net_device *dev, int idx,
- 	rxs->hw_drop_overruns = rqstats->pkt_truncated;
- 	rxs->csum_unnecessary = rqstats->csum_unnecessary +
- 				rqstats->csum_unnecessary_encap;
-+	rxs->alloc_fail = rqstats->pp_alloc_error;
- }
- 
- static void enic_get_queue_stats_tx(struct net_device *dev, int idx,
-@@ -2540,6 +2580,7 @@ static void enic_get_base_stats(struct net_device *dev,
- 	rxs->hw_drops = 0;
- 	rxs->hw_drop_overruns = 0;
- 	rxs->csum_unnecessary = 0;
-+	rxs->alloc_fail = 0;
- 	txs->bytes = 0;
- 	txs->packets = 0;
- 	txs->csum_none = 0;
-diff --git a/drivers/net/ethernet/cisco/enic/enic_rq.c b/drivers/net/ethernet/cisco/enic/enic_rq.c
-index ae2ab5af87e9..624a0d05f393 100644
---- a/drivers/net/ethernet/cisco/enic/enic_rq.c
-+++ b/drivers/net/ethernet/cisco/enic/enic_rq.c
-@@ -7,6 +7,7 @@
- #include "enic_rq.h"
- #include "vnic_rq.h"
- #include "cq_enet_desc.h"
-+#include "enic_res.h"
- 
- #define ENIC_LARGE_PKT_THRESHOLD		1000
- 
-@@ -118,3 +119,125 @@ int enic_rq_service(struct vnic_dev *vdev, struct cq_desc *cq_desc,
- 
- 	return 0;
- }
-+
-+void enic_rq_page_cleanup(struct enic_rq *rq)
-+{
-+	page_pool_destroy(rq->pool);
-+}
-+
-+void enic_rq_free_page(struct vnic_rq *vrq, struct vnic_rq_buf *buf)
-+{
-+	struct enic *enic = vnic_dev_priv(vrq->vdev);
-+	struct enic_rq *rq = &enic->rq[vrq->index];
-+
-+	if (!buf->os_buf)
-+		return;
-+
-+	page_pool_put_full_page(rq->pool, (struct page *)buf->os_buf, true);
-+	buf->os_buf = NULL;
-+}
-+
-+int enic_rq_alloc_page(struct vnic_rq *vrq)
-+{
-+	struct enic *enic = vnic_dev_priv(vrq->vdev);
-+	struct enic_rq *rq = &enic->rq[vrq->index];
-+	struct enic_rq_stats *rqstats = &rq->stats;
-+	struct vnic_rq_buf *buf = vrq->to_use;
-+	dma_addr_t dma_addr;
-+	struct page *page;
-+	unsigned int offset = 0;
-+	unsigned int len;
-+	unsigned int truesize;
-+
-+	len = get_max_pkt_len(enic);
-+	truesize = len;
-+
-+	if (buf->os_buf) {
-+		dma_addr = buf->dma_addr;
-+	} else {
-+		page = page_pool_dev_alloc(rq->pool, &offset, &truesize);
-+		if (unlikely(!page)) {
-+			rqstats->pp_alloc_error++;
-+			return -ENOMEM;
-+		}
-+		buf->os_buf = (void *)page;
-+		buf->offset = offset;
-+		buf->truesize = truesize;
-+		dma_addr = page_pool_get_dma_addr(page) + offset;
-+	}
-+
-+	enic_queue_rq_desc(vrq, buf->os_buf, dma_addr, len);
-+
-+	return 0;
-+}
-+
-+void enic_rq_indicate_page(struct vnic_rq *vrq, struct cq_desc *cq_desc,
-+			   struct vnic_rq_buf *buf, int skipped, void *opaque)
-+{
-+	struct enic *enic = vnic_dev_priv(vrq->vdev);
-+	struct sk_buff *skb;
-+	struct enic_rq *rq = &enic->rq[vrq->index];
-+	struct enic_rq_stats *rqstats = &rq->stats;
-+	struct vnic_cq *cq = &enic->cq[enic_cq_rq(enic, vrq->index)];
-+	struct napi_struct *napi;
-+	u8 type, color, eop, sop, ingress_port, vlan_stripped;
-+	u8 fcoe, fcoe_sof, fcoe_fc_crc_ok, fcoe_enc_error, fcoe_eof;
-+	u8 tcp_udp_csum_ok, udp, tcp, ipv4_csum_ok;
-+	u8 ipv6, ipv4, ipv4_fragment, fcs_ok, rss_type, csum_not_calc;
-+	u8 packet_error;
-+	u16 q_number, completed_index, bytes_written, vlan_tci, checksum;
-+	u32 rss_hash;
-+
-+	if (skipped) {
-+		rqstats->desc_skip++;
-+		return;
-+	}
-+
-+	if (!buf || !buf->dma_addr) {
-+		net_warn_ratelimited("%s: !buf || !buf->dma_addr!!\n",
-+				     enic->netdev->name);
-+		return;
-+	}
-+
-+	cq_enet_rq_desc_dec((struct cq_enet_rq_desc *)cq_desc,
-+			    &type, &color, &q_number, &completed_index,
-+			    &ingress_port, &fcoe, &eop, &sop, &rss_type,
-+			    &csum_not_calc, &rss_hash, &bytes_written,
-+			    &packet_error, &vlan_stripped, &vlan_tci, &checksum,
-+			    &fcoe_sof, &fcoe_fc_crc_ok, &fcoe_enc_error,
-+			    &fcoe_eof, &tcp_udp_csum_ok, &udp, &tcp,
-+			    &ipv4_csum_ok, &ipv6, &ipv4, &ipv4_fragment,
-+			    &fcs_ok);
-+
-+	if (enic_rq_pkt_error(vrq, packet_error, fcs_ok, bytes_written))
-+		return;
-+
-+	napi = &enic->napi[vrq->index];
-+	skb = napi_get_frags(napi);
-+	if (unlikely(!skb)) {
-+		net_warn_ratelimited("%s: skb alloc error rq[%d], desc[%d]\n",
-+				     enic->netdev->name, vrq->index,
-+				     completed_index);
-+		rqstats->no_skb++;
-+		return;
-+	}
-+
-+	dma_sync_single_for_cpu(&enic->pdev->dev, buf->dma_addr, bytes_written,
-+				DMA_FROM_DEVICE);
-+	skb_add_rx_frag(skb, skb_shinfo(skb)->nr_frags, (struct page *)buf->os_buf,
-+			buf->offset, bytes_written, buf->truesize);
-+
-+	buf->os_buf = NULL;
-+	buf->dma_addr = 0;
-+	buf = buf->next;
-+
-+	enic_rq_set_skb_flags(vrq, type, rss_hash, rss_type, fcoe, fcoe_fc_crc_ok,
-+			      vlan_stripped, csum_not_calc, tcp_udp_csum_ok, ipv6,
-+			      ipv4_csum_ok, vlan_tci, skb);
-+	if (enic->rx_coalesce_setting.use_adaptive_rx_coalesce)
-+		enic_intr_update_pkt_size(&cq->pkt_size_counter, skb->len);
-+	skb_mark_for_recycle(skb);
-+	skb_record_rx_queue(skb, vrq->index);
-+	napi_gro_frags(napi);
-+	rqstats->packets++;
-+}
-diff --git a/drivers/net/ethernet/cisco/enic/enic_rq.h b/drivers/net/ethernet/cisco/enic/enic_rq.h
-index 46ab75fd74a0..f429f31b6172 100644
---- a/drivers/net/ethernet/cisco/enic/enic_rq.h
-+++ b/drivers/net/ethernet/cisco/enic/enic_rq.h
-@@ -19,4 +19,9 @@ int enic_rq_service(struct vnic_dev *vdev, struct cq_desc *cq_desc,
- 		    u8 type, u16 q_number, u16 completed_index, void *opaque);
- void enic_rq_indicate_buf(struct vnic_rq *rq, struct cq_desc *cq_desc,
- 			  struct vnic_rq_buf *buf, int skipped, void *opaque);
-+void enic_rq_indicate_page(struct vnic_rq *rq, struct cq_desc *cq_desc,
-+			   struct vnic_rq_buf *buf, int skipped, void *opaque);
-+int enic_rq_alloc_page(struct vnic_rq *rq);
-+void enic_rq_free_page(struct vnic_rq *rq, struct vnic_rq_buf *buf);
-+void enic_rq_page_cleanup(struct enic_rq *rq);
- #endif /* _ENIC_RQ_H_ */
-diff --git a/drivers/net/ethernet/cisco/enic/vnic_rq.h b/drivers/net/ethernet/cisco/enic/vnic_rq.h
-index 0bc595abc03b..2ee4be2b9a34 100644
---- a/drivers/net/ethernet/cisco/enic/vnic_rq.h
-+++ b/drivers/net/ethernet/cisco/enic/vnic_rq.h
-@@ -61,6 +61,8 @@ struct vnic_rq_buf {
- 	unsigned int index;
- 	void *desc;
- 	uint64_t wr_id;
-+	unsigned int offset;
-+	unsigned int truesize;
- };
- 
- enum enic_poll_state {
--- 
-2.44.0
 
+>         }
+>         kern_vtype =3D btf__type_by_id(btf, kern_vtype_id);
+>
+> @@ -1046,8 +1055,8 @@ find_struct_ops_kern_types(struct bpf_object *obj, =
+const char *tname_raw,
+>                         break;
+>         }
+>         if (i =3D=3D btf_vlen(kern_vtype)) {
+> -               pr_warn("struct_ops init_kern: struct %s data is not foun=
+d in struct %s%s\n",
+> -                       tname, STRUCT_OPS_VALUE_PREFIX, tname);
+> +               pr_warn("struct_ops init_kern: struct %s data is not foun=
+d in struct %s\n",
+> +                       tname, stname);
+>                 return -EINVAL;
+>         }
+>
+> --
+> 2.45.0
+>
 
