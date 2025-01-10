@@ -1,103 +1,103 @@
-Return-Path: <netdev+bounces-156954-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156955-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 491D1A08615
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 04:55:47 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69CD5A0861B
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 04:57:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 37A443A86A6
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 03:55:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0DDDD188C6FC
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 03:57:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95C8D1E32BD;
-	Fri, 10 Jan 2025 03:55:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FE7D1FECA5;
+	Fri, 10 Jan 2025 03:57:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="WQvZLm1f"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="hA/Z23WC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20DD33FBB3
-	for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 03:55:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA993B661
+	for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 03:56:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736481343; cv=none; b=BfEbbOIZsfqUenkb6hvZ1sYgG9gKUK93Clx3eZO3DgLiSmkVx4koo0NVbHcBCIA96i7MI3Hps2YBrco7AUtZSRbrlU6xSf/PElb1jPNJ0STbEp8nfz3IfDdOkrG9WY5nLWoBhgIPFEbvj8a6slG4gFi6gNTZ1i6WeBRlMlT0TfU=
+	t=1736481420; cv=none; b=tPVsJKTgA/Om/e1SGALmyFNqJXu+vunvgsRBezAeHU5t+rAh8QsShRHC8pTQrUhvXya6KYKxbpr10XLUaTvVKSbJU9HjM0dazIEtDOiOy/Ju7dWjz9M6IG1+pBglnXbHcHHoE02TzCqcuTe8uLc/hDJTaek27VDm2nHXmjx55nQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736481343; c=relaxed/simple;
-	bh=QPoyz6t0yJ/b683zDxr4T/j0stSJ6exkPgUDmPPRsX8=;
+	s=arc-20240116; t=1736481420; c=relaxed/simple;
+	bh=TNBEXC39S5phR5N9tq4wc30hoScTbrNf7iLU5VckSs4=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rv+KZGHu3VVgVHGSQZPT3ndPJ8IvD4ghvdS5BAKrjZghFqrhD7PrEwcsZihC4kOzpVyF02ga4rXVmnbkYBX7sds33M9s88VxU4uezYbp0OFYIG5VT0VLtHXsOApDu4QX/WX2rJUVDjY19IzAR5Y4Pa2cMdq/gRZ0+T2MuTdAMKc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=WQvZLm1f; arc=none smtp.client-ip=209.85.216.52
+	 To:Cc:Content-Type; b=NOlzrSF9z2hNvKGOTA8WzodlDDNXWAYsrW+BkKuA/BtivPaL1BPHQLJU4p+hKrhvgayne8s4z3EsbfFDF/jAhgugR4hgprVVe4zYzGw0JP1hLetuDtHQY7hALMWlJumwv776jmFo0Ym/DN0CoXAUQ83AUuR3NZYnU6LZxqYDRb8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=hA/Z23WC; arc=none smtp.client-ip=209.85.214.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pj1-f52.google.com with SMTP id 98e67ed59e1d1-2ee709715d9so2350231a91.3
-        for <netdev@vger.kernel.org>; Thu, 09 Jan 2025 19:55:41 -0800 (PST)
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-2165cb60719so28540635ad.0
+        for <netdev@vger.kernel.org>; Thu, 09 Jan 2025 19:56:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1736481341; x=1737086141; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1736481417; x=1737086217; darn=vger.kernel.org;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=QPoyz6t0yJ/b683zDxr4T/j0stSJ6exkPgUDmPPRsX8=;
-        b=WQvZLm1fC3N8U2Qk8mEBowD0XKnf7Q58ZIlKq8XMRwmPigbSXm6eS6RbLzxcNUkZDn
-         PC0mTXzTMrai6gwpAHyEnbM3/GvcKKQNgvlOlTh5ccT7qfaAXiax7VX19QqxNUMWqYiG
-         C5G8CEcAbWRqcmYlaKnIaZes3ebtNEpUN5/w8=
+        bh=TNBEXC39S5phR5N9tq4wc30hoScTbrNf7iLU5VckSs4=;
+        b=hA/Z23WCtwxx1tnaUP6lgpgU21tf7tc36LmLo/2Jz5b0yrhpDMz0LrSSvtuTOZXh1e
+         o2diCHYzJkytUjOzxX+y4Kij4QwLzgYINjRjCRVMTTr6TdL4lH5YvIBssT+gIYtJYdVn
+         atHAuH8oTZAM6VjNdeZDVXon+UPWOPs0JNEb0=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736481341; x=1737086141;
+        d=1e100.net; s=20230601; t=1736481417; x=1737086217;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=QPoyz6t0yJ/b683zDxr4T/j0stSJ6exkPgUDmPPRsX8=;
-        b=If4lRp9h1DdY7ZJnSK95yDglip1Cf9kHKAG+r0FWxGZRmFRW0+MWtXsCgska7pkbpq
-         gu4iydKWZjf2q7DiEsTW1ukAFwgUKNTLnLXR4GkhO7hh1dfwtDYO1wX1N0BlavRuOF9U
-         JURjP6lZr3ZqV5caqVY6fEfO4bohy1Luyu4aNF949B/ISD3qAvpdnkIH/8XcovgEaMkF
-         dA2OSyAzn2z1ta+WIenaSVBJtj6YlHZg6WdaZMZ8W/Q7fvK7aa2+WM9vvAVH0W+PC7TN
-         BNjgBcQET/UBefAKx8/YBDIffCvLPhzisah+IVvgdUps6w3ooj0Jt/BumdqdCEewZT3p
-         fyEA==
-X-Forwarded-Encrypted: i=1; AJvYcCWFiqCl2qiISPzuSH/Lhv80eL4zHRmrXTkC7l8QcM03Th7a+gTjQ3mP0oIIpmNue3XtPebNqyY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxSml8TX/lI8fbQPJVRCX6qIB+pYDaSTlCIxrqPHlDN20ewQ/Te
-	BI5y8C984KvImtNhEJQKoV1JuaOjE9Nkekqo+PSC2+RdaPU9jZ1HW4lx5mqLyPCTbNYRf0hr6eJ
-	xZ9dK0oOegKzEmhfkRMkI+KBxZ4vIBbdUefl1
-X-Gm-Gg: ASbGncvT1DRhge0z6oxnaq0MjbFSUbT7QPqT3VMmBzXavQ1I00JyGTby2rPH04BEMp/
-	M86jBenacBFF+pAIt4vkBH/y0nFXJo49Yyl/KFFQ=
-X-Google-Smtp-Source: AGHT+IEM8AfkrkY9i/I3T+4/423KLWnM9F5yqIsVG9BVwg1K4TLKNfK5hRF2MymysDdCnG2cEG3iEptbLZzJKOoTpHs=
-X-Received: by 2002:a17:90b:538b:b0:2ee:f19b:86e5 with SMTP id
- 98e67ed59e1d1-2f548eae0eamr14541090a91.14.1736481341569; Thu, 09 Jan 2025
- 19:55:41 -0800 (PST)
+        bh=TNBEXC39S5phR5N9tq4wc30hoScTbrNf7iLU5VckSs4=;
+        b=uJIUIyg1OCk11HonCYgCvFmXlCeQLiY2NX1iZdVzIuVxDFgLHnt61XGBgunfTQ/2XL
+         jAb3mUzKCJRlktPm38gdhEZyJE3OnizmZLKKeAUzliv6F0HnCKoWdtBLCm/QnCiC56mj
+         1PZkCl9d1a4pUqsCcDO42BCPXWMOZ6PHagFggwJ6vRv7tVMNcqILZ0bmlFmjaLtU1gLb
+         s7hSjzCh4D6MjrLmzFg/omJ6FsQ6vl6HR9rzT4qbMjlZQIOdh/Gg3n6YdWcnKQweP9XG
+         CuNrHQ+EVCBUtkDxfkQmeoHml65e59MUGnFzaOL6XO3GxOC9jQWW02vCbI5zk1wrYuvm
+         IEEg==
+X-Forwarded-Encrypted: i=1; AJvYcCVfqLXRGMrKasvl2CwONTvzYCzN4bDRXf3jvXfAHTZtzcuinmhrO1/Peby2gRTCRzkNPUWdqmA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzhtthr7rmlIgOB+0+A81iPLKsMUqelRJ8hE3IrgO33LDVJhxvq
+	i7Y4QRX+Gnfa9OvAcPuvqKkyjTIH6xv76G4PYUTZKqwqkhQWRFKO79pNyXjszJvtpBq1aEIE/cE
+	qJgQViuOVBsSP6GnJRA9N/8sfztQe2A7u/yx1
+X-Gm-Gg: ASbGncv15fx10EMymEEMsg9GLxtMT38BzgNvksXE/AcCvTYtqbRZDI0cBSez7kz0GrL
+	k1Og0yBaq1rMwx4thE2w4UA1TrT+65cMyEgOfazI=
+X-Google-Smtp-Source: AGHT+IHNx9Y3XVI+mnqNHU+FVaGtFB4OOGelKJfIuukbM3jZ6jbFY01sjharDA0n4kFNgyMuM2KpBk1kbZO8/LcEU1o=
+X-Received: by 2002:a05:6a00:4ac6:b0:727:3cd0:1167 with SMTP id
+ d2e1a72fcca58-72d21fea50emr13852293b3a.21.1736481416755; Thu, 09 Jan 2025
+ 19:56:56 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250109204231.1809851-1-tariqt@nvidia.com> <20250109204231.1809851-3-tariqt@nvidia.com>
-In-Reply-To: <20250109204231.1809851-3-tariqt@nvidia.com>
+References: <20250109204231.1809851-1-tariqt@nvidia.com> <20250109204231.1809851-4-tariqt@nvidia.com>
+In-Reply-To: <20250109204231.1809851-4-tariqt@nvidia.com>
 From: Kalesh Anakkur Purayil <kalesh-anakkur.purayil@broadcom.com>
-Date: Fri, 10 Jan 2025 09:25:28 +0530
-X-Gm-Features: AbW1kvbsK0jz-TSNrxQs-xRK8YsiB01D_cKS6GL7Nem_qQe5dBYYlxa4AfPVd_M
-Message-ID: <CAH-L+nMv5Aemo+GxZfnhQu7waDqOT5ni9kjjADWRW83JtL1i3A@mail.gmail.com>
-Subject: Re: [PATCH mlx5-next 2/4] net/mlx5: Add support for MRTCQ register
+Date: Fri, 10 Jan 2025 09:26:43 +0530
+X-Gm-Features: AbW1kvbhJK9SzyBqE5tQ5eti7fFXgFvD1s2rf9p84pZRVkOD8zjEPZuBgSVLBIk
+Message-ID: <CAH-L+nPPYn0QimQrx3MDer7krmH8ieNLb71jPr4-c32UeZUODw@mail.gmail.com>
+Subject: Re: [PATCH mlx5-next 3/4] net/mlx5: SHAMPO: Introduce new SHAMPO
+ specific HCA caps
 To: Tariq Toukan <tariqt@nvidia.com>
 Cc: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>, 
 	Jason Gunthorpe <jgg@nvidia.com>, netdev@vger.kernel.org, linux-rdma@vger.kernel.org, 
 	Jakub Kicinski <kuba@kernel.org>, Gal Pressman <gal@nvidia.com>, Mark Bloch <mbloch@nvidia.com>, 
-	Moshe Shemesh <moshe@nvidia.com>, Jianbo Liu <jianbol@nvidia.com>, 
-	Dragos Tatulea <dtatulea@nvidia.com>
+	Moshe Shemesh <moshe@nvidia.com>, Dragos Tatulea <dtatulea@nvidia.com>
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="0000000000008a3596062b5211e0"
+	boundary="000000000000052855062b5216c0"
 
---0000000000008a3596062b5211e0
+--000000000000052855062b5216c0
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
 On Fri, Jan 10, 2025 at 2:14=E2=80=AFAM Tariq Toukan <tariqt@nvidia.com> wr=
 ote:
 >
-> From: Jianbo Liu <jianbol@nvidia.com>
+> From: Saeed Mahameed <saeedm@nvidia.com>
 >
-> Management Real Time Clock Query (MRTCQ) register is used to query
-> hardware clock identity.
+> Read and cache SHAMPO specific caps for header data split capabilities.
+> Will be used in downstream patch.
 >
-> Signed-off-by: Jianbo Liu <jianbol@nvidia.com>
+> Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
 > Reviewed-by: Dragos Tatulea <dtatulea@nvidia.com>
 > Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
 
@@ -108,7 +108,7 @@ Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
 Regards,
 Kalesh AP
 
---0000000000008a3596062b5211e0
+--000000000000052855062b5216c0
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -180,14 +180,14 @@ a30CvRuhokNO6Jzh7ZFtjKVMzYas3oo6HXgA+slRszMu4pc+fRPO41FHjeDM76e6P5OnthhnD+NY
 x6xokUN65DN1bn2MkeNs0nQpizDqd0QxggJtMIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYD
 VQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25h
 bFNpZ24gMiBDQSAyMDIwAgw3wUUJsDUiPdpordMwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcN
-AQkEMSIEIASKaHRwSbHYXJd+zFPRDfL22Aok6DTuN7S+YiRs7BGeMBgGCSqGSIb3DQEJAzELBgkq
-hkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI1MDExMDAzNTU0MVowaQYJKoZIhvcNAQkPMVwwWjAL
+AQkEMSIEIFbc1HDNXmOFtWrQVHe6iJmwull0NDTazWtZZ1S0HLwoMBgGCSqGSIb3DQEJAzELBgkq
+hkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI1MDExMDAzNTY1N1owaQYJKoZIhvcNAQkPMVwwWjAL
 BglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG
-9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQCGn7Lp/UUs
-wsFJVLLwVbXIakPYSDIdH+zVzEJuU7LEVZqPzfRzFkVFr1DFfLR7Wv78E1dAkKwIU8AQKTAijQOS
-vF8ZQNwE6V7NdkWzYggYj1OBgyCE1yfN3UGKP7zmm7afGRgCXeLIpV1N77brJ44J//bxI6UqMKlW
-OTa3MV8AYJIcS5ARI87bjVyMs3F3VK+HdHccSAPY6idxcg0PN512cqV4EH5xEmKstzT82AGql3y1
-BorySOjE8Uykpm32oBWJlGD+cfRMQUaECQnp9I1w6MO7G5qClkly/Clthd6f7HD9+ozspe3s5N42
-d67FLWbej0s33DSnHc+6vK0HWsc6
---0000000000008a3596062b5211e0--
+9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQBUMNIFnMpM
+WDElwYo3vjt/iSor1X+usMnKIO8hnw96shwoBnOsup9zs3kUQXbqtmTmVAo8vScNFP4DWBVzF7dq
+boAbEkFLu0GoKDuRYrj7CgqjACPslqALAU8RYtX+XXa2097QLR1R3/TZDiFr8mqFuEqmIB5N6Iej
+z/KE4ZSR5sVF1AuvNOwTyfRAoDhqY8w4X1ua5duEcl3eIxFDekztUHBn13IYIoRZdyZoPYKzr31D
+hlsSvxQanAD1ExNxZfJ7Wpjt9Thr7lX74SGIcyG6NvJx7UL+SjpRCzJfs9XcKqvaZfyPY2QD4zol
+ukV5GmWFplFtmRPeMYn1IzRNjNMk
+--000000000000052855062b5216c0--
 
