@@ -1,175 +1,123 @@
-Return-Path: <netdev+bounces-157093-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157094-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D370A08E38
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 11:41:31 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 26D81A08E3D
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 11:42:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C06C71885FA4
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 10:41:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3C689169F80
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 10:42:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A33EF209F56;
-	Fri, 10 Jan 2025 10:41:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="fJnh7G1Z"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF30C20B80B;
+	Fri, 10 Jan 2025 10:42:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from fllvem-ot03.ext.ti.com (fllvem-ot03.ext.ti.com [198.47.19.245])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5706818FC80
-	for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 10:41:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.245
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CB6520B216
+	for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 10:42:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736505686; cv=none; b=D+jwLEFftR81qwXoLeHXrD44eCMuFXtpPROSHP9BMzMWB3LilbAaOh5gEW5/iAwihs+e2WQG7Yve9+Xuuc109O5rd6syCiGTyQoU12CcwUAfBzbhu9J6y3E8hsxY5HTNFKbkJ4ZrVSuDlEC81MBd4U2buntF869s7j1I4NLIXFU=
+	t=1736505730; cv=none; b=oDw1SO9UIrfn8YuVmJB+pegQI/oxMgDBNHjdWpQl1eonsGvgOXdTZzQI/C3oLQp0+R0RzFr/mdOUw3zG1IwmXFrGMU30A13l+CP68kJtD5KSIZB5OR6i1ryjTOIe0PBxKfPQrrTJN0FDtsr3Zg8cSwr55/7fD5DmWlGEYT09PCs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736505686; c=relaxed/simple;
-	bh=ZGpsDtnWyo3zEMhwPPCSvj86CNgfHjnIjCy3szDAN18=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Pk6B6ie9B2GpafICJQzsjZk9CZ4Jo/lUYGxqoeVaRrsG+xpi0kDpcU3npy5hB+sOGmdDMz79m3LMw8WC/2BFxkbefFxskvHJxIVNfX4Fm5UaH4RyvgVAt2tDJ8q74ZN0gKBSewe8iM8L3Dv4q+/DDx/k+PREz2dwbz6UEpdMEkk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=fJnh7G1Z; arc=none smtp.client-ip=198.47.19.245
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from lelv0265.itg.ti.com ([10.180.67.224])
-	by fllvem-ot03.ext.ti.com (8.15.2/8.15.2) with ESMTPS id 50AAfAQj3021518
-	(version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 10 Jan 2025 04:41:10 -0600
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1736505670;
-	bh=mTolHO0NEoSdz2XwlQPySRMV+3zhIKzK5ZkgGbaKBlY=;
-	h=Date:From:To:CC:Subject:References:In-Reply-To;
-	b=fJnh7G1Z8ObhnRvbOKLabZpvThSz3XagmLwCtlU0lsstWO+znde9zC4H01EYDkVc2
-	 STvs2TUajbXJoagMuubuLweACdvNNU/5EtyU8mv97wfsuPbHJ221CILAsdKmH7u1ZR
-	 fW6gfr3wHs/kURynhwIjqEGj1DGIYc/LV9WyEODA=
-Received: from DFLE114.ent.ti.com (dfle114.ent.ti.com [10.64.6.35])
-	by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 50AAfA75009571
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Fri, 10 Jan 2025 04:41:10 -0600
-Received: from DFLE111.ent.ti.com (10.64.6.32) by DFLE114.ent.ti.com
- (10.64.6.35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Fri, 10
- Jan 2025 04:41:10 -0600
-Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DFLE111.ent.ti.com
- (10.64.6.32) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Fri, 10 Jan 2025 04:41:10 -0600
-Received: from localhost (uda0492258.dhcp.ti.com [10.24.72.104])
-	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 50AAf8av079059;
-	Fri, 10 Jan 2025 04:41:09 -0600
-Date: Fri, 10 Jan 2025 16:11:08 +0530
-From: Siddharth Vadapalli <s-vadapalli@ti.com>
-To: "A. Sverdlin" <alexander.sverdlin@siemens.com>
-CC: Siddharth Vadapalli <s-vadapalli@ti.com>, <netdev@vger.kernel.org>,
-        Andrew
- Lunn <andrew+netdev@lunn.ch>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-        Roger Quadros
-	<rogerq@kernel.org>, Chintan Vankar <c-vankar@ti.com>,
-        Julien Panis
-	<jpanis@baylibre.com>
-Subject: Re: [PATCH net-next] net: ethernet: ti: am65-cpsw: VLAN-aware CPSW
- only if !DSA
-Message-ID: <t34jbpf2dwhuszreyxby3qzvhachu3nt2wsbqiq4fkbw3uoxrb@aq6uqo3kg6ct>
-References: <20250110092624.287209-1-alexander.sverdlin@siemens.com>
+	s=arc-20240116; t=1736505730; c=relaxed/simple;
+	bh=2t6560ciqPluM5jV4icj76vKmnBYruYYY1iaoWGUwOc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HYE4r/dzX1L+wYmzv/bdqIpyToyHinw5xrYR8UDAvdEACmwfUMsNN/2StWcHCvIafV0Yl4eoPKaNnzoUHNO9CokXEHS722c7aesNHZX/FLZhh66TqGubh0pmI51SVOlYoms3WGQjQ5tkc8EzolRyEob0IAlG0pUtDUnORu1QbWY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1tWCSd-00010v-9s; Fri, 10 Jan 2025 11:41:51 +0100
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1tWCSc-00090F-1b;
+	Fri, 10 Jan 2025 11:41:50 +0100
+Received: from pengutronix.de (pd9e59fec.dip0.t-ipconnect.de [217.229.159.236])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id 216863A4529;
+	Fri, 10 Jan 2025 10:41:50 +0000 (UTC)
+Date: Fri, 10 Jan 2025 11:41:49 +0100
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: Ruffalo Lavoisier <ruffalolavoisier@gmail.com>
+Cc: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>, 
+	Thomas Kopp <thomas.kopp@microchip.com>, Vincent Mailhol <mailhol.vincent@wanadoo.fr>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, linux-can@vger.kernel.org, 
+	netdev@vger.kernel.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] docs: remove duplicate word
+Message-ID: <20250110-screeching-quixotic-tanuki-1e6fa0-mkl@pengutronix.de>
+References: <20241120044014.92375-1-RuffaloLavoisier@gmail.com>
+ <20241120-antique-earwig-of-modernism-1fc66e-mkl@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="ip3hmrnf27rnbmsn"
 Content-Disposition: inline
-In-Reply-To: <20250110092624.287209-1-alexander.sverdlin@siemens.com>
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+In-Reply-To: <20241120-antique-earwig-of-modernism-1fc66e-mkl@pengutronix.de>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Fri, Jan 10, 2025 at 10:26:21AM +0100, A. Sverdlin wrote:
-> From: Alexander Sverdlin <alexander.sverdlin@siemens.com>
-> 
-> Only configure VLAN-aware CPSW mode if no port is used as DSA CPU port.
-> VLAN-aware mode interferes with some DSA tagging schemes and makes stacking
-> DSA switches downstream of CPSW impossible. Previous attempts to address
-> the issue linked below.
-> 
-> Link: https://lore.kernel.org/netdev/20240227082815.2073826-1-s-vadapalli@ti.com/
-> Link: https://lore.kernel.org/linux-arm-kernel/4699400.vD3TdgH1nR@localhost/
-> Signed-off-by: Alexander Sverdlin <alexander.sverdlin@siemens.com>
-> ---
->  drivers/net/ethernet/ti/am65-cpsw-nuss.c | 19 +++++++++++++++----
->  1 file changed, 15 insertions(+), 4 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.c b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-> index dcb6662b473d..e445acb29e16 100644
-> --- a/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-> +++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-> @@ -32,6 +32,7 @@
->  #include <linux/dma/ti-cppi5.h>
->  #include <linux/dma/k3-udma-glue.h>
->  #include <net/page_pool/helpers.h>
-> +#include <net/dsa.h>
->  #include <net/switchdev.h>
->  
->  #include "cpsw_ale.h"
-> @@ -724,13 +725,23 @@ static int am65_cpsw_nuss_common_open(struct am65_cpsw_common *common)
->  	u32 val, port_mask;
->  	struct page *page;
->  
-> +	/* Control register */
-> +	val = AM65_CPSW_CTL_P0_ENABLE | AM65_CPSW_CTL_P0_TX_CRC_REMOVE |
-> +	      AM65_CPSW_CTL_P0_RX_PAD;
-> +	for (port_idx = 0; port_idx < common->port_num; port_idx++) {
-> +		struct am65_cpsw_port *port = &common->ports[port_idx];
-> +
-> +		if (netdev_uses_dsa(port->ndev))
-> +			break;
-> +	}
-> +	/* VLAN aware CPSW mode is incompatible with some DSA tagging schemes */
-> +	if (port_idx == common->port_num)
-> +		val |= AM65_CPSW_CTL_VLAN_AWARE;
-> +	writel(val, common->cpsw_base + AM65_CPSW_REG_CTL);
-> +
 
-Though it functionally enables VLAN_AWARE mode only when none of the ports
-are a DSA port, the implementation and the comment appear inconsistent.
-The comment states that VLAN aware CPSW mode is incompatible with DSA
-and the lines following it are enabling VLAN_AWARE mode albeit for the
-case where none of the ports are a DSA port. Since the IF condition
-doesn't indicate that in an obvious manner, the implementation could be
-improved to maintain consistency between what the comment states and what
-the code does.
+--ip3hmrnf27rnbmsn
+Content-Type: text/plain; protected-headers=v1; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH] docs: remove duplicate word
+MIME-Version: 1.0
 
-How about the following?
--------------------------------------------------------------------------
-	/* Control register */
-	val = AM65_CPSW_CTL_P0_ENABLE | AM65_CPSW_CTL_P0_TX_CRC_REMOVE |
-	      AM65_CPSW_CTL_VLAN_AWARE | AM65_CPSW_CTL_P0_RX_PAD;
+On 20.11.2024 09:27:22, Marc Kleine-Budde wrote:
+> On 20.11.2024 13:40:13, Ruffalo Lavoisier wrote:
+> > - Remove duplicate word, 'to'.
+>=20
+> Can I add your Signed-off-by to the patch?
+>=20
+> https://elixir.bootlin.com/linux/v6.12/source/Documentation/process/submi=
+tting-patches.rst#L396
 
-	/* VLAN aware CPSW mode is incompatible with some DSA tagging
-	 * schemes. Therefore disable VLAN_AWARE mode if any of the
-	 * ports is a DSA Port.
-	 */
-	for (port_idx = 0; port_idx < common->port_num; port_idx++)
-		if (netdev_uses_dsa(&common->ports[port_idx]->ndev)) {
-			val &= ~AM65_CPSW_CTL_VLAN_AWARE;
-			break;
-		}
+Is it OK to add your Signed-off-by to the patch?
 
-	writel(val, common->cpsw_base + AM65_CPSW_REG_CTL);
--------------------------------------------------------------------------
+regards,
+Marc
 
->  	if (common->usage_count)
->  		return 0;
->  
-> -	/* Control register */
-> -	writel(AM65_CPSW_CTL_P0_ENABLE | AM65_CPSW_CTL_P0_TX_CRC_REMOVE |
-> -	       AM65_CPSW_CTL_VLAN_AWARE | AM65_CPSW_CTL_P0_RX_PAD,
-> -	       common->cpsw_base + AM65_CPSW_REG_CTL);
->  	/* Max length register */
->  	writel(AM65_CPSW_MAX_PACKET_SIZE,
->  	       host_p->port_base + AM65_CPSW_PORT_REG_RX_MAXLEN);
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
 
-Regards,
-Siddharth.
+--ip3hmrnf27rnbmsn
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmeA+WoACgkQKDiiPnot
+vG9LlggAlAOvAjXwwTntSfaNIv3HMCQcKByFRx2L9fN9+YOvmAfaAZuwlgi9Qzed
+2Z+XbYsa3t3SOK/5+FbeNu1tWs3mu8cpYpserlakQb7g6V3Bel2LxlqR3W9hCdI4
+Z8y0KbKTTRrWGmIdiOeP6AbZph0H1szaMuP4S0VmTg54HlZX0loblaQ/XCOc0PmS
+KByCbK7C/u3665FnM5PM0BndSGku9kg43FpnENKr3/eExZsSgMj7Ji83ua/7wOKe
+44rBWSCCvG9Ns+eLzepDW5JXqqnGP2ycpTBO3qeEDu/iTVMdP3xqBUbP+9HRqEp4
+YIhdcUlVTIr9G1eSi8SXllPLNg+6Dg==
+=iCBi
+-----END PGP SIGNATURE-----
+
+--ip3hmrnf27rnbmsn--
 
