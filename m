@@ -1,166 +1,250 @@
-Return-Path: <netdev+bounces-157125-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157108-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5AD2EA08F53
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 12:29:03 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9451EA08F03
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 12:20:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 982BE3AA2F7
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 11:28:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 909CC166A3F
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 11:20:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DB3520DD6C;
-	Fri, 10 Jan 2025 11:27:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3411F2080D2;
+	Fri, 10 Jan 2025 11:20:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F39220CCD8
-	for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 11:27:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+Received: from pegase2.c-s.fr (pegase2.c-s.fr [93.17.235.10])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26AC5205AC5
+	for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 11:20:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.17.235.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736508447; cv=none; b=QEfrn/sN8NZWnjrBq+sXNkGBSY3bt+s9xWCFEZ60TM3rt8Atx1TCnOwrLGd0iC30qZvfcRLN1qw/aP3Ai5eoJW1fSkOawlzmdxqBwm770dNWXPEUaQokISgqGvjWtyvH0mWrJG+O8lIlFq3SHdiLNVWRaJMdCyskw2CMzYk2JMo=
+	t=1736508007; cv=none; b=A4bufSLvycXnFhQB0JIMhK9KWDdu6N7bsoZyPBEry0VtrsifCD0VRLS68Bq/sJ6sop5Gk2R1mQ3ttCK+I5Xvf3FRKuT1bhLb1yjN/YzHSy+FEvIOui7oiA+/f5T5DGU1pDUOBOmnbF2GlCrsl9eRBUcFyUfaZ4grWUvctOqsePU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736508447; c=relaxed/simple;
-	bh=LKMY+58YuDKopatvbzVpOgVlxOBoe4b7lkKRqONbJdY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=gpG4N6aoE98CBLBZTo0Rx1GMc3X1T7WefgrbTu/81zxFhlA3btoe4rQk/US634PR/FDFqcNg1ujH3wfBwCaNnN0GSGd1OaMGV8KM5rN+VpCL5KUY2mYYpb9Ngvk+XNs4RPdVXqaNYi2W4Y7t54rknodkgB/aKwNu8zSI0BsDf0Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1tWDAg-000561-Fs
-	for netdev@vger.kernel.org; Fri, 10 Jan 2025 12:27:22 +0100
-Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1tWDAe-0009io-02
-	for netdev@vger.kernel.org;
-	Fri, 10 Jan 2025 12:27:20 +0100
-Received: from dspam.blackshift.org (localhost [127.0.0.1])
-	by bjornoya.blackshift.org (Postfix) with SMTP id A9E883A4623
-	for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 11:27:19 +0000 (UTC)
-Received: from hardanger.blackshift.org (unknown [172.20.34.65])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by bjornoya.blackshift.org (Postfix) with ESMTPS id 9FC8A3A45B2;
-	Fri, 10 Jan 2025 11:27:15 +0000 (UTC)
-Received: from blackshift.org (localhost [::1])
-	by hardanger.blackshift.org (OpenSMTPD) with ESMTP id 207bb45c;
-	Fri, 10 Jan 2025 11:27:15 +0000 (UTC)
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	kuba@kernel.org,
-	linux-can@vger.kernel.org,
-	kernel@pengutronix.de,
-	Jimmy Assarsson <extja@kvaser.com>,
-	Alison Below <alisonbelow@gmail.com>,
-	Marc Kleine-Budde <mkl@pengutronix.de>
-Subject: [PATCH net-next 18/18] can: kvaser_pciefd: Add support for CAN_CTRLMODE_BERR_REPORTING
-Date: Fri, 10 Jan 2025 12:04:26 +0100
-Message-ID: <20250110112712.3214173-19-mkl@pengutronix.de>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20250110112712.3214173-1-mkl@pengutronix.de>
-References: <20250110112712.3214173-1-mkl@pengutronix.de>
+	s=arc-20240116; t=1736508007; c=relaxed/simple;
+	bh=kOST9puL5O0lgZgd9dvofPANW6nURYuXcTcPeRY6+nk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=TH4juXJ9s34Nii6E45xb0UffCCvT0Rk/Kp03nBlFacrTu0VdugTJPKthtiE9ZK5DXvkMnXoX5sAXJPAb7RCt2DHfjivHB5J8kEBg+b7lf6ytnphW1Imxd3UiOdHM3VAhP4Hnf7j5E9A4pD+xYvYPvSoWWvbnv6MBDiBQCVGRuhI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu; spf=pass smtp.mailfrom=csgroup.eu; arc=none smtp.client-ip=93.17.235.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csgroup.eu
+Received: from localhost (mailhub3.si.c-s.fr [172.26.127.67])
+	by localhost (Postfix) with ESMTP id 4YTzQ66bMjz9sSN;
+	Fri, 10 Jan 2025 12:07:26 +0100 (CET)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from pegase2.c-s.fr ([172.26.127.65])
+	by localhost (pegase2.c-s.fr [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id 9565rjOLSGr7; Fri, 10 Jan 2025 12:07:26 +0100 (CET)
+Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
+	by pegase2.c-s.fr (Postfix) with ESMTP id 4YTzQ65Z96z9sSL;
+	Fri, 10 Jan 2025 12:07:26 +0100 (CET)
+Received: from localhost (localhost [127.0.0.1])
+	by messagerie.si.c-s.fr (Postfix) with ESMTP id AB26E8B787;
+	Fri, 10 Jan 2025 12:07:26 +0100 (CET)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from messagerie.si.c-s.fr ([127.0.0.1])
+	by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
+	with ESMTP id X1yPG8Y30LGd; Fri, 10 Jan 2025 12:07:26 +0100 (CET)
+Received: from [192.168.235.99] (unknown [192.168.235.99])
+	by messagerie.si.c-s.fr (Postfix) with ESMTP id 31B778B768;
+	Fri, 10 Jan 2025 12:07:26 +0100 (CET)
+Message-ID: <8b080760-c1c7-4d9d-a17b-3c0115392b36@csgroup.eu>
+Date: Fri, 10 Jan 2025 12:07:25 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] freescale: ucc_geth: Remove set but unused
+ variables
+To: Simon Horman <horms@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
+References: <20250110-ucc-unused-var-v1-1-4cf02475b21d@kernel.org>
+Content-Language: fr-FR
+From: Christophe Leroy <christophe.leroy@csgroup.eu>
+In-Reply-To: <20250110-ucc-unused-var-v1-1-4cf02475b21d@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-From: Jimmy Assarsson <extja@kvaser.com>
 
-Add support for CAN_CTRLMODE_BERR_REPORTING,
-allowing Bus Error Reporting to be enabled or disabled.
-Previously, Bus Error Reporting was always active.
 
-Co-developed-by: Alison Below <alisonbelow@gmail.com>
-Signed-off-by: Alison Below <alisonbelow@gmail.com>
-Signed-off-by: Jimmy Assarsson <extja@kvaser.com>
-Link: https://patch.msgid.link/20241230142645.128244-4-extja@kvaser.com
-Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
----
- drivers/net/can/kvaser_pciefd.c | 29 ++++++++++++++++-------------
- 1 file changed, 16 insertions(+), 13 deletions(-)
+Le 10/01/2025 à 11:18, Simon Horman a écrit :
+> Remove set but unused variables. These seem to provide no value.
+> So in the spirit of less being more, remove them.
 
-diff --git a/drivers/net/can/kvaser_pciefd.c b/drivers/net/can/kvaser_pciefd.c
-index e12ff12c4ba3..fa04a7ced02b 100644
---- a/drivers/net/can/kvaser_pciefd.c
-+++ b/drivers/net/can/kvaser_pciefd.c
-@@ -999,7 +999,8 @@ static int kvaser_pciefd_setup_can_ctrls(struct kvaser_pciefd *pcie)
- 		can->can.ctrlmode_supported = CAN_CTRLMODE_LISTENONLY |
- 					      CAN_CTRLMODE_FD |
- 					      CAN_CTRLMODE_FD_NON_ISO |
--					      CAN_CTRLMODE_CC_LEN8_DLC;
-+					      CAN_CTRLMODE_CC_LEN8_DLC |
-+					      CAN_CTRLMODE_BERR_REPORTING;
- 
- 		status = ioread32(can->reg_base + KVASER_PCIEFD_KCAN_STAT_REG);
- 		if (!(status & KVASER_PCIEFD_KCAN_STAT_FD)) {
-@@ -1304,7 +1305,7 @@ static int kvaser_pciefd_rx_error_frame(struct kvaser_pciefd_can *can,
- 	struct can_berr_counter bec;
- 	enum can_state old_state, new_state, tx_state, rx_state;
- 	struct net_device *ndev = can->can.dev;
--	struct sk_buff *skb;
-+	struct sk_buff *skb = NULL;
- 	struct can_frame *cf = NULL;
- 
- 	old_state = can->can.state;
-@@ -1313,7 +1314,8 @@ static int kvaser_pciefd_rx_error_frame(struct kvaser_pciefd_can *can,
- 	bec.rxerr = FIELD_GET(KVASER_PCIEFD_SPACK_RXERR_MASK, p->header[0]);
- 
- 	kvaser_pciefd_packet_to_state(p, &bec, &new_state, &tx_state, &rx_state);
--	skb = alloc_can_err_skb(ndev, &cf);
-+	if (can->can.ctrlmode & CAN_CTRLMODE_BERR_REPORTING)
-+		skb = alloc_can_err_skb(ndev, &cf);
- 	if (new_state != old_state) {
- 		kvaser_pciefd_change_state(can, &bec, cf, new_state, tx_state, rx_state);
- 	}
-@@ -1328,18 +1330,19 @@ static int kvaser_pciefd_rx_error_frame(struct kvaser_pciefd_can *can,
- 	can->bec.txerr = bec.txerr;
- 	can->bec.rxerr = bec.rxerr;
- 
--	if (!skb) {
--		ndev->stats.rx_dropped++;
--		return -ENOMEM;
-+	if (can->can.ctrlmode & CAN_CTRLMODE_BERR_REPORTING) {
-+		if (!skb) {
-+			netdev_warn(ndev, "No memory left for err_skb\n");
-+			ndev->stats.rx_dropped++;
-+			return -ENOMEM;
-+		}
-+		kvaser_pciefd_set_skb_timestamp(can->kv_pcie, skb, p->timestamp);
-+		cf->can_id |= CAN_ERR_BUSERROR | CAN_ERR_CNT;
-+		cf->data[6] = bec.txerr;
-+		cf->data[7] = bec.rxerr;
-+		netif_rx(skb);
- 	}
- 
--	kvaser_pciefd_set_skb_timestamp(can->kv_pcie, skb, p->timestamp);
--	cf->can_id |= CAN_ERR_BUSERROR | CAN_ERR_CNT;
--	cf->data[6] = bec.txerr;
--	cf->data[7] = bec.rxerr;
--
--	netif_rx(skb);
--
- 	return 0;
- }
- 
--- 
-2.45.2
+Would be good to identify when those variables became unused.
 
+There is for instance commit 64a99fe596f9 ("ethernet: ucc_geth: remove 
+bd_mem_part and all associated code")
+
+...
+
+> 
+> Compile tested only.
+> No runtime effect intended.
+> 
+> Signed-off-by: Simon Horman <horms@kernel.org>
+
+As you are playing with that driver, there are also sparse warnings to 
+be fixed, getting plenty when building with C=2
+
+> ---
+>   drivers/net/ethernet/freescale/ucc_geth.c | 39 +++++++------------------------
+>   1 file changed, 8 insertions(+), 31 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/freescale/ucc_geth.c b/drivers/net/ethernet/freescale/ucc_geth.c
+> index 88510f822759..1e3a1cb997c3 100644
+> --- a/drivers/net/ethernet/freescale/ucc_geth.c
+> +++ b/drivers/net/ethernet/freescale/ucc_geth.c
+> @@ -1704,14 +1704,8 @@ static int ugeth_82xx_filtering_clear_addr_in_paddr(struct ucc_geth_private *uge
+>   
+>   static void ucc_geth_free_rx(struct ucc_geth_private *ugeth)
+>   {
+> -	struct ucc_geth_info *ug_info;
+> -	struct ucc_fast_info *uf_info;
+> -	u16 i, j;
+>   	u8 __iomem *bd;
+> -
+> -
+> -	ug_info = ugeth->ug_info;
+> -	uf_info = &ug_info->uf_info;
+> +	u16 i, j;
+
+Why do you need to move this declaration ? Looks like cosmetics. That 
+goes beyond the purpose of this patch which is already big enough and 
+should be avoided. The same applies several times in this patch.
+
+>   
+>   	for (i = 0; i < ucc_geth_rx_queues(ugeth->ug_info); i++) {
+>   		if (ugeth->p_rx_bd_ring[i]) {
+> @@ -1743,16 +1737,11 @@ static void ucc_geth_free_rx(struct ucc_geth_private *ugeth)
+>   
+>   static void ucc_geth_free_tx(struct ucc_geth_private *ugeth)
+>   {
+> -	struct ucc_geth_info *ug_info;
+> -	struct ucc_fast_info *uf_info;
+> -	u16 i, j;
+>   	u8 __iomem *bd;
+> +	u16 i, j;
+>   
+>   	netdev_reset_queue(ugeth->ndev);
+>   
+> -	ug_info = ugeth->ug_info;
+> -	uf_info = &ug_info->uf_info;
+> -
+>   	for (i = 0; i < ucc_geth_tx_queues(ugeth->ug_info); i++) {
+>   		bd = ugeth->p_tx_bd_ring[i];
+>   		if (!bd)
+> @@ -2036,13 +2025,11 @@ static int ucc_struct_init(struct ucc_geth_private *ugeth)
+>   static int ucc_geth_alloc_tx(struct ucc_geth_private *ugeth)
+>   {
+>   	struct ucc_geth_info *ug_info;
+> -	struct ucc_fast_info *uf_info;
+> +	u8 __iomem *bd;
+>   	int length;
+>   	u16 i, j;
+> -	u8 __iomem *bd;
+>   
+>   	ug_info = ugeth->ug_info;
+> -	uf_info = &ug_info->uf_info;
+>   
+>   	/* Allocate Tx bds */
+>   	for (j = 0; j < ucc_geth_tx_queues(ug_info); j++) {
+> @@ -2098,13 +2085,11 @@ static int ucc_geth_alloc_tx(struct ucc_geth_private *ugeth)
+>   static int ucc_geth_alloc_rx(struct ucc_geth_private *ugeth)
+>   {
+>   	struct ucc_geth_info *ug_info;
+> -	struct ucc_fast_info *uf_info;
+> +	u8 __iomem *bd;
+>   	int length;
+>   	u16 i, j;
+> -	u8 __iomem *bd;
+>   
+>   	ug_info = ugeth->ug_info;
+> -	uf_info = &ug_info->uf_info;
+>   
+>   	/* Allocate Rx bds */
+>   	for (j = 0; j < ucc_geth_rx_queues(ug_info); j++) {
+> @@ -2155,7 +2140,6 @@ static int ucc_geth_alloc_rx(struct ucc_geth_private *ugeth)
+>   
+>   static int ucc_geth_startup(struct ucc_geth_private *ugeth)
+>   {
+> -	struct ucc_geth_82xx_address_filtering_pram __iomem *p_82xx_addr_filt;
+>   	struct ucc_geth_init_pram __iomem *p_init_enet_pram;
+>   	struct ucc_fast_private *uccf;
+>   	struct ucc_geth_info *ug_info;
+> @@ -2165,8 +2149,8 @@ static int ucc_geth_startup(struct ucc_geth_private *ugeth)
+>   	int ret_val = -EINVAL;
+>   	u32 remoder = UCC_GETH_REMODER_INIT;
+>   	u32 init_enet_pram_offset, cecr_subblock, command;
+> -	u32 ifstat, i, j, size, l2qt, l3qt;
+>   	u16 temoder = UCC_GETH_TEMODER_INIT;
+> +	u32 i, j, size, l2qt, l3qt;
+>   	u8 function_code = 0;
+>   	u8 __iomem *endOfRing;
+>   	u8 numThreadsRxNumerical, numThreadsTxNumerical;
+> @@ -2260,7 +2244,7 @@ static int ucc_geth_startup(struct ucc_geth_private *ugeth)
+>   	/*                    Set IFSTAT                     */
+>   	/* For more details see the hardware spec.           */
+>   	/* Read only - resets upon read                      */
+> -	ifstat = in_be32(&ug_regs->ifstat);
+> +	in_be32(&ug_regs->ifstat);
+>   
+>   	/*                    Clear UEMPR                    */
+>   	/* For more details see the hardware spec.           */
+> @@ -2651,10 +2635,6 @@ static int ucc_geth_startup(struct ucc_geth_private *ugeth)
+>   		for (j = 0; j < NUM_OF_PADDRS; j++)
+>   			ugeth_82xx_filtering_clear_addr_in_paddr(ugeth, (u8) j);
+>   
+> -		p_82xx_addr_filt =
+> -		    (struct ucc_geth_82xx_address_filtering_pram __iomem *) ugeth->
+> -		    p_rx_glbl_pram->addressfiltering;
+> -
+>   		ugeth_82xx_filtering_clear_all_addr_in_hash(ugeth,
+>   			ENET_ADDR_TYPE_GROUP);
+>   		ugeth_82xx_filtering_clear_all_addr_in_hash(ugeth,
+> @@ -2889,9 +2869,8 @@ static int ucc_geth_rx(struct ucc_geth_private *ugeth, u8 rxQ, int rx_work_limit
+>   	struct sk_buff *skb;
+>   	u8 __iomem *bd;
+>   	u16 length, howmany = 0;
+> -	u32 bd_status;
+> -	u8 *bdBuffer;
+>   	struct net_device *dev;
+> +	u32 bd_status;
+>   
+>   	ugeth_vdbg("%s: IN", __func__);
+>   
+> @@ -2904,7 +2883,7 @@ static int ucc_geth_rx(struct ucc_geth_private *ugeth, u8 rxQ, int rx_work_limit
+>   
+>   	/* while there are received buffers and BD is full (~R_E) */
+>   	while (!((bd_status & (R_E)) || (--rx_work_limit < 0))) {
+> -		bdBuffer = (u8 *) in_be32(&((struct qe_bd __iomem *)bd)->buf);
+> +		in_be32(&((struct qe_bd __iomem *)bd)->buf);
+
+This line should go completely.
+
+>   		length = (u16) ((bd_status & BD_LENGTH_MASK) - 4);
+>   		skb = ugeth->rx_skbuff[rxQ][ugeth->skb_currx[rxQ]];
+>   
+> @@ -3043,14 +3022,12 @@ static irqreturn_t ucc_geth_irq_handler(int irq, void *info)
+>   	struct net_device *dev = info;
+>   	struct ucc_geth_private *ugeth = netdev_priv(dev);
+>   	struct ucc_fast_private *uccf;
+> -	struct ucc_geth_info *ug_info;
+>   	register u32 ucce;
+>   	register u32 uccm;
+>   
+>   	ugeth_vdbg("%s: IN", __func__);
+>   
+>   	uccf = ugeth->uccf;
+> -	ug_info = ugeth->ug_info;
+>   
+>   	/* read and clear events */
+>   	ucce = (u32) in_be32(uccf->p_ucce);
+> 
+> 
 
 
