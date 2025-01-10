@@ -1,208 +1,296 @@
-Return-Path: <netdev+bounces-157218-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157219-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 492FAA09773
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 17:29:39 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3F1EA0977E
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 17:30:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4688616670B
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 16:29:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 624507A2DB2
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 16:30:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A26BC213242;
-	Fri, 10 Jan 2025 16:27:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3E4E2135A9;
+	Fri, 10 Jan 2025 16:28:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PAyKE8cx"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0O57frdn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
+Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AADCC215F40;
-	Fri, 10 Jan 2025 16:27:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05FBA2139B1
+	for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 16:28:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736526431; cv=none; b=tC35jUwJT2N1/rAzkRRfRKpneJtUxLp6VA62KTekhr912iHdM8flVNdxXKJfJqs6t8FqpqI57Ex3ORT0A4lijghJlCR+Y92dI1AhrcGpNTm02DTA9DlvdAUgf5BGMBZ85k+ypJjVsI+h6rsEaglO8DpN6uiXxx/RY9/XQ/mD0CU=
+	t=1736526505; cv=none; b=UFg1lJlM+64P1+5tiA3lRrdrtg3iDpHxRxQKH3sjonXVQ8jFcLtLAcIt+hzQXfS1vCjGxmPcwobud4x9fnA+oq8DdzrkHa3MhBL0EzCyAkLDMZR31VDVYL5jjxeRoaVWhYRC4ClnOBJKH+joQ1Tp403ESJm3DMWn9NZEpP3HNq8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736526431; c=relaxed/simple;
-	bh=ZiPhK5vgQpBvD7RpAFAKT0G97/ZliQjaX7Mkza0GpvY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pVCbWIoG5DgQe8fL0SPbJK7BPO9lpxIYyZTdrw2PIGShJBaSSQ405BIqqcUbFJmSSXADvBXO1CLfWBvETZGW9FvXSJyduJzkVieGB4S2EqyoLEywNrI63xWCcuw282HK2HXICxlYsPTPax6FJN3eCqbYRpY+OXrFS4In9SnNgmY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PAyKE8cx; arc=none smtp.client-ip=209.85.221.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-385e87b25f0so2209316f8f.0;
-        Fri, 10 Jan 2025 08:27:09 -0800 (PST)
+	s=arc-20240116; t=1736526505; c=relaxed/simple;
+	bh=qK+VGFQfGs/M+Kok/pAsvEp4A2HwzBaZMR+luTlmb/Q=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=M5aO7Vr6aNJP2QlK0jzX9O3fH7L0T701kLOBPM+yy7wNp4C4LYoor3voePRLCE3RFeZjakYl2aVPUGuJNmnIxJt7QsZXmClYPaShU+AutrYFc+fGeZO2VkhXUi+cvGQLwKDULuHc613hye9VbWSfXz5DF2ErZFh3GA85WiV/Mb0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=0O57frdn; arc=none smtp.client-ip=209.85.160.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-4678c9310afso235971cf.1
+        for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 08:28:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736526428; x=1737131228; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=yMB9xkNsYE8QzdTKwQ47u8LlJ7axgUiYXav5hpZiRQc=;
-        b=PAyKE8cx1WSgZxy674kDENp94mKZVPC8yqXQNfp9eVEPsnIsDmGsHWUOTaHmmb1XKw
-         /fA2HCyXaMdWvSkrKaUHnNAazvG51gE8VihUau3munNdQfm6f4bUoNedDXmCKzDu+Ujp
-         giHHEVolSeFc6zCev4L8U6NVqiNmPsfjd3pJi4XgNzTgwhAcQl2v2LNCGgwwGMhay1dL
-         M9fOBSTrKstrpRhN5oofz5x/Imgm9t/eerU8kA9bsrc20JSRTAZic1cNwlYl6i4AfTk+
-         5HnLjqot0nLPW+vP/nPdvM9+6YtUCVsZt+VOtEofZ+VWrYKcHQs/DA/vqSMVoG8dNb7K
-         wBMA==
+        d=google.com; s=20230601; t=1736526503; x=1737131303; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=x9ZWv+5A2l7TRwyqZwlMiG7FdbnpPMj+L8zZM6kSnHU=;
+        b=0O57frdnwGCZ2mJyxh/5imysh9ZeniZYmENtqJ5Kll5eGEd7ajvCzPWvn3+R20CvQt
+         NKUXv5VsnoZ2c96IPecFDl1mVOGri3H0CGXCpk71688y8IKw9stam9+GxD6xTMx4rPuT
+         +3k2DbLGP/PZQ4sieiVUs5YW9sRXcP8OiJi+zC7pCwl8rLpRWHHqEzHaKp61w/fR+NIE
+         OpL3H4leBrvwsiqVf222GqAsHpmi/M9zJKqZRMWgBkMUaqE7o+WfFAqVMzu+aMYXk6kF
+         ST3tzgSexTdfvG8e/jh5y/kv6cQJGdYMKjrcJIA58NCyxmBSHw/ssdn18YI1Pm9XxyDD
+         cdWQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736526428; x=1737131228;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=yMB9xkNsYE8QzdTKwQ47u8LlJ7axgUiYXav5hpZiRQc=;
-        b=AHp/SPZDDDjIapqpYk4mvBvtKDNZBpgpOqFqeINLxL8yLoX06pRAgNJEn87gOsTMdd
-         Kx7DRthMoj0E97HXAmXunHSrXqR6yeJvlRgHGJQKVFTNMB6KCRvvvh9sx5dPwITPG28K
-         Gbwb2ZDLP2+yvH6rddOiYVPmHJpxB8h/9pyeTGdIfHhReFyOiDdoaXuKw3C0iaI8bv/I
-         0xEcCaeUCGsYQiz1bTOr+vraF0VAYypEpM30Mi0R+v3rCqPbJKVuKK7tCzrtxWXjzJPp
-         6pXY8KXadKognzrFFHY8uNMS2kMjgJYKsYaVkggFHQEqqxeWecUVzNaJOa6FelTkc0PB
-         eP2A==
-X-Forwarded-Encrypted: i=1; AJvYcCVLEfji+y72/o7RRAvYDsEgWa7Js/bIRc4UI7R04itOHOY6dmaCIhZhFaeQrvkNokxoSw/nwRmrEWdx3t6IJpa7XQCXuFY=@vger.kernel.org, AJvYcCVwE5GlU0QYxcXnWlE4z3NmtMWHInA4LFIkjCMPiQ6OiykColmjHq0OpsFWKX03X0qnfRtW7zZWKpM+6xyq0X7u@vger.kernel.org, AJvYcCXAQ9xnPyzA2OyliyKTixz0HBVYwod7vsgyLUMi6RXGnvn4q1NHnaUGXAlMf+5khJJZwDLwc1Vb@vger.kernel.org
-X-Gm-Message-State: AOJu0YzfLn4B4HWyrJqsryh1CT0hV47nj0eDtjYeTXkUrTK6KpCiheKC
-	8Hnum1V1PT0mjVs2/9XZiXTY428VA4o+ICDLJrswam2zVg6rXh9O
-X-Gm-Gg: ASbGnculIYNZE5t6etyM3IQnJb3L8nv6VKh0Bew4fvKPs3E6vy0+LV01mTifCyUq6eO
-	8JIIbFdCO70Vr7yL8HSCwgOmV/LFpQEAlCVsLv7b6QsrhOBQ+CoZ+A5wVBZjnfnsNmF1aHg3aRJ
-	h3Gfsmgugl4XSqv8fU2t+107tWJgx5UyHC2d/wr61z88bFN6p2hoGkgmVPaqwfrmMk8Y0L1MWDS
-	AtoBHdmrO0sYt5Vg6AggKSj4HPozOJkJW5JEgqkRS4ZF1fx4PqEBtvS/Q==
-X-Google-Smtp-Source: AGHT+IF9lDcXaSKtJXeoW63ZHOlYb6k96KiJt/bfhAjm6GMGd4/IkxLEroQXqdZ6WTXM45XqSm5BoQ==
-X-Received: by 2002:a05:6000:4712:b0:38a:8b34:76b0 with SMTP id ffacd0b85a97d-38a8b3476c0mr6444299f8f.27.1736526427760;
-        Fri, 10 Jan 2025 08:27:07 -0800 (PST)
-Received: from localhost ([2a00:79e1:abd:a201:48ff:95d2:7dab:ae81])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38a8e37d090sm4876192f8f.2.2025.01.10.08.27.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 Jan 2025 08:27:07 -0800 (PST)
-Date: Fri, 10 Jan 2025 17:27:01 +0100
-From: =?iso-8859-1?Q?G=FCnther?= Noack <gnoack3000@gmail.com>
-To: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
-Cc: =?iso-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@digikod.net>,
-	=?iso-8859-1?Q?G=FCnther?= Noack <gnoack@google.com>,
-	willemdebruijn.kernel@gmail.com,
-	linux-security-module@vger.kernel.org, netdev@vger.kernel.org,
-	netfilter-devel@vger.kernel.org, yusongping@huawei.com,
-	artem.kuzin@huawei.com, konstantin.meskhidze@huawei.com
-Subject: Re: [RFC PATCH v3 01/19] landlock: Support socket access-control
-Message-ID: <20250110.8ae6c145948f@gnoack.org>
-References: <ea026af8-bc29-709c-7e04-e145d01fd825@huawei-partners.com>
- <Z0DDQKACIRRDRZRE@google.com>
- <36ac2fde-1344-9055-42e2-db849abf02e0@huawei-partners.com>
- <20241127.oophah4Ueboo@digikod.net>
- <eafd855d-2681-8dfd-a2be-9c02fc07050d@huawei-partners.com>
- <20241128.um9voo5Woo3I@digikod.net>
- <af72be74-50c7-d251-5df3-a2c63c73296a@huawei-partners.com>
- <f6b255c9-5a88-fedd-5d25-dd7d09ddc989@huawei-partners.com>
- <20250110.2893966a7649@gnoack.org>
- <3cdf6001-4ad4-6edc-e436-41a1eaf773f3@huawei-partners.com>
+        d=1e100.net; s=20230601; t=1736526503; x=1737131303;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=x9ZWv+5A2l7TRwyqZwlMiG7FdbnpPMj+L8zZM6kSnHU=;
+        b=MZvp8Bv3JAS0JGIF+50/D//5YWrcFgOLA4SC7ujxxnQYvoGBws4ooqe4jv+EZVMkce
+         r+BT59qFSk6vMWITlHq13KEOumiehcnfw47wbb6rs55mry1XmP8vMAI2K3zn6puTlpLc
+         zRaN0syKHollFRKl1Dk+h6pKJ8/ePf0viYDjCxYwmU6bdWZ2sGbNpBwDLSroYAciHpYz
+         b3JCd4a/1nK5dyIVni6wkZhi2tdtg8AGzU7wYt7DEbiua4REnPneGuH7J9d86FtzRNDy
+         3UFDtYvMGWd4Gqz8gP+uUt928spKGNDBs1gXgWhIOkei0nKK1iYJg2wADNi8d4gI3wKQ
+         K18A==
+X-Forwarded-Encrypted: i=1; AJvYcCVkpkmQDtZiprXMjJCfwXzgg1/eVIuR6f4udCYJVjqTM4AAcGS/DnZwW6Tpv7MRaZdOc/7PlIc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx0cGfV1ooTQuL5jQFCQFwaawE4pVNxwt1VdRxXpzpC8nVlwmuk
+	1GE6SOQBZCMDvUm+UvrhPdKC3McIOckSUjFlRvwGfTYZKv0Zz8Bm4R9BsiqoP7wFNknmPifF1il
+	ecq1kLpT1HVnTeMIXv40jeNVSrFb9ysD4JBg4
+X-Gm-Gg: ASbGnctVztBnHYA9aZoA/J+0tw8mLSluQN8uZfXpP1sIdZlJgVIFXqNnYrtyZeTgC6I
+	Dl5Gn3ouWOTJdTO5ojIU+wHCNlASPYVEBNzbh/WAJvgBXTr/gTX9SDcwDk669cwkWMCVX6w==
+X-Google-Smtp-Source: AGHT+IGqwlsienI+v4dmQSrKRaZcCZu+YyvK8mzFMhb7IJ7zJEwIEiYY6NM6Iv3ALhXVVYUF1ptKGA4yosXccWGwYlk=
+X-Received: by 2002:a05:622a:651:b0:46c:7d66:557f with SMTP id
+ d75a77b69052e-46c87e07eb2mr3839341cf.8.1736526502763; Fri, 10 Jan 2025
+ 08:28:22 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <3cdf6001-4ad4-6edc-e436-41a1eaf773f3@huawei-partners.com>
+References: <20250109161802.3599-1-sensor1010@163.com> <CADVnQy=Uy+UxYivkUY1JZ4+c2rDD74VY8=vxmxf=NJxWcXa69Q@mail.gmail.com>
+ <5d5290fb.a567.19450f031bf.Coremail.sensor1010@163.com> <CANn89iJLg1TKoFFaNtDOjFpyLW+YmxgSBCZQ4oTuJXX=RsKNzA@mail.gmail.com>
+In-Reply-To: <CANn89iJLg1TKoFFaNtDOjFpyLW+YmxgSBCZQ4oTuJXX=RsKNzA@mail.gmail.com>
+From: Neal Cardwell <ncardwell@google.com>
+Date: Fri, 10 Jan 2025 11:28:06 -0500
+X-Gm-Features: AbW1kvbdnB2V2owkSZJ8BTegzxV6OiOd2N3i8Qd5pQSq4nS3zeM7nmaPdtuX2_Q
+Message-ID: <CADVnQykJBub7Fd_dUoNWbROuSgd+KHOr4JpdBDc3DJVLgU2ULg@mail.gmail.com>
+Subject: Re: Re: [PATCH] tcp: Add an extra check for consecutive failed
+ keepalive probes
+To: Eric Dumazet <edumazet@google.com>
+Cc: lizhe <sensor1010@163.com>, davem@davemloft.net, dsahern@kernel.org, 
+	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jan 10, 2025 at 04:02:42PM +0300, Mikhail Ivanov wrote:
-> Correct, but we also agreed to use bitmasks for "family" field as well:
-> 
-> https://lore.kernel.org/all/af72be74-50c7-d251-5df3-a2c63c73296a@huawei-partners.com/
+On Fri, Jan 10, 2025 at 11:22=E2=80=AFAM Eric Dumazet <edumazet@google.com>=
+ wrote:
+>
+>
+>
+> On Fri, Jan 10, 2025 at 4:58=E2=80=AFPM lizhe <sensor1010@163.com> wrote:
+> >
+> > Hi, Neal
+> >
+> >
+> > If the TCP_USER_TIMEOUT option is not enabled, and attempts to send TCP=
+ keepalive probes continuously fail,
+> >
+> > then who limits the number of increments to icsk->icsk_probes_out?
+> >
+> >
+> > Adding this code is feasible. If not added, the system would continuous=
+ly send keepalive probes without any limit.
+> >
+> > If these probes continually fail, the process would persist indefinitel=
+y because there would be no measure in place to restrict the increments of =
+icsk->icsk_probes_out++.
+> >
+> >
+>
+> I think you should provide a packetdrill test, as Neal suggested.
+>
+> If you write a packetdrill test, chances are very high you will see the c=
+ode is currently fine.
 
-OK
+Yes, indeed. :-)
 
+AFAICT we don't even need a new packetdrill test... I provided a
+"repeated keepalive failures" packetdrill test earlier in this thread.
+If folks run that test, they should find that recent Linux kernels
+correctly terminate a connection after the configured number of
+keepalive probes fail.
 
-> On 1/10/2025 2:12 PM, Günther Noack wrote:
-> > I do not understand why this convenience feature in the UAPI layer
-> > requires a change to the data structures that Landlock uses
-> > internally?  As far as I can tell, struct landlock_socket_attr is only
-> > used in syscalls.c and converted to other data structures already.  I
-> > would have imagined that we'd "unroll" the specified bitmasks into the
-> > possible combinations in the add_rule_socket() function and then call
-> > landlock_append_socket_rule() multiple times with each of these?
-> 
-> I thought about unrolling bitmask into multiple entries in rbtree, and
-> came up with following possible issue:
-> 
-> Imagine that a user creates a rule that allows to create sockets of all
-> possible families and types (with protocol=0 for example):
-> {
-> 	.allowed_access = LANDLOCK_ACCESS_SOCKET_CREATE,
-> 	.families = INT64_MAX, /* 64 set bits */
-> 	.types = INT16_MAX, /* 16 set bits */
-> 	.protocol = 0,
-> },
-> 
-> This will add 64 x 16 = 1024 entries to the rbtree. Currently, the
-> struct landlock_rule, which is used to store rules, weighs 40B. So, it
-> will be 40kB by a single rule. Even if we allow rules with only
-> "existing" families and types, it will be 46 x 7 = 322 entries and ~12kB
-> by a single rule.
-> 
-> I understand that this may be degenerate case and most common rule will
-> result in less then 8 (or 4) entries in rbtree, but I think API should
-> be as intuitive as possible. User can expect to see the same
-> memory usage regardless of the content of the rule.
-> 
-> I'm not really sure if this case is really an issue, so I'd be glad
-> to hear your opinion on it.
+If there is some corner case we are missing, then you might want to
+start from that packetdrill test I pasted in, and try to demonstrate
+your corner case that you think the code is missing.
 
-I think there are two separate questions here:
+thanks,
+neal
 
-(a) I think it is OK that it is *possible* to allocate 40kB of kernel
-    memory.  At least, this is already possible today by calling
-    landlock_add_rule() repeatedly.
-
-    I assume that the GFP_KERNEL_ACCOUNT flag is limiting the
-    potential damage to the caller here?  That flag was added in the
-    Landlock v19 patch set [1] ("Account objects to kmemcg.").
-
-(b) I agree it might be counterintuitive when a single
-    landlock_add_rule() call allocates more space than expected.
-
-Mickaël, since it is already possible today (but harder), I assume
-that you have thought about this problem before -- is it a problem
-when users allocate more kernel memory through Landlock than they
-expected?
-
-
-Naive proposal:
-
-If this is an issue, how about we set a low limit to the number of
-families and the number of types that can be used in a single
-landlock_add_rule() invocation?  (It tends to be easier to start with
-a restrictive API and open it up later than the other way around.)
-
-For instance,
-
-* In the families field, at most 2 bits may be set.
-* In the types field, at most 2 bits may be set.
-
-In my understanding, the main use case of the bit vectors is that
-there is a short way to say "all IPv4+v6 stream+dgram sockets", but we
-do not know scenarios where much more than that is needed?  With that,
-we would still keep people from accidentally allocating larger amounts
-of memory, while permitting the main use case.
-
-Having independent limits for the family and type fields is a bit
-easier to understand and document than imposing a limit on the
-multiplication result.
-
-> > That being said, I am not a big fan of red-black trees for such simple
-> > integer lookups either, and I also think there should be something
-> > better if we make more use of the properties of the input ranges. The
-> > question is though whether you want to couple that to this socket type
-> > patch set, or rather do it in a follow up?  (So far we have been doing
-> > fine with the red black trees, and we are already contemplating the
-> > possibility of changing these internal structures in [2].  We have
-> > also used RB trees for the "port" rules with a similar reasoning,
-> > IIRC.)
-> 
-> I think it'll be better to have a separate series for [2] if the socket
-> restriction can be implemented without rbtree refactoring.
-
-Sounds good to me. 👍
-
-–Günther
-
-[1] https://lore.kernel.org/all/20200707180955.53024-2-mic@digikod.net/
+> In any case, you have to provide a Fixes: tag for any bug fix for network=
+ing code,
+> as explained in Documentation/process/maintainer-netdev.rst
+>
+>  Thank you.
+>
+> >
+> > _Lizhe,
+> >
+> > thx
+> >
+> >
+> >
+> >
+> >
+> >
+> >
+> >
+> >
+> > At 2025-01-10 00:31:55, "Neal Cardwell" <ncardwell@google.com> wrote:
+> > >On Thu, Jan 9, 2025 at 11:21=E2=80=AFAM Lizhe <sensor1010@163.com> wro=
+te:
+> > >>
+> > >> Add an additional check to handle situations where consecutive
+> > >> keepalive probe packets are sent without receiving a response.
+> > >>
+> > >> Signed-off-by: Lizhe <sensor1010@163.com>
+> > >> ---
+> > >>  net/ipv4/tcp_timer.c | 6 ++++++
+> > >>  1 file changed, 6 insertions(+)
+> > >>
+> > >> diff --git a/net/ipv4/tcp_timer.c b/net/ipv4/tcp_timer.c
+> > >> index b412ed88ccd9..5a5dee8cd6d3 100644
+> > >> --- a/net/ipv4/tcp_timer.c
+> > >> +++ b/net/ipv4/tcp_timer.c
+> > >> @@ -828,6 +828,12 @@ static void tcp_keepalive_timer (struct timer_l=
+ist *t)
+> > >>                 }
+> > >>                 if (tcp_write_wakeup(sk, LINUX_MIB_TCPKEEPALIVE) <=
+=3D 0) {
+> > >>                         icsk->icsk_probes_out++;
+> > >> +                       if (icsk->icsk_probes_out >=3D keepalive_pro=
+bes(tp)) {
+> > >> +                               tcp_send_active_reset(sk, GFP_ATOMIC=
+,
+> > >> +                                               SK_RST_REASON_TCP_KE=
+EPALIVE_TIMEOUT);
+> > >> +                               tcp_write_err(sk);
+> > >> +                               goto out;
+> > >> +                       }
+> > >>                         elapsed =3D keepalive_intvl_when(tp);
+> > >>                 } else {
+> > >>                         /* If keepalive was lost due to local conges=
+tion,
+> > >> --
+> > >
+> > >Can you please explain the exact motivation for your patch, ideally
+> > >providing either a tcpdump trace or packetdrill test to document the
+> > >scenario you are concerned about?
+> > >
+> > >The Linux TCP keepalive logic in tcp_keepalive_timer() already
+> > >includes logic (a few lines above the spot you propose to patch) that
+> > >ensures that a connection will be closed with ETIMEDOUT if consecutive
+> > >keepalive probes fail:
+> > >
+> > >                if ((user_timeout !=3D 0 &&
+> > >                    elapsed >=3D msecs_to_jiffies(user_timeout) &&
+> > >                    icsk->icsk_probes_out > 0) ||
+> > >                    (user_timeout =3D=3D 0 &&
+> > >                    icsk->icsk_probes_out >=3D keepalive_probes(tp))) =
+{
+> > >                        tcp_send_active_reset(sk, GFP_ATOMIC,
+> > >
+> > >SK_RST_REASON_TCP_KEEPALIVE_TIMEOUT);
+> > >                        tcp_write_err(sk);
+> > >                        goto out;
+> > >                }
+> > >                if (tcp_write_wakeup(sk, LINUX_MIB_TCPKEEPALIVE) <=3D =
+0) {
+> > >                        icsk->icsk_probes_out++;
+> > >                        elapsed =3D keepalive_intvl_when(tp);
+> > >
+> > >AFAICT your patch nearly duplicates the existing logic, but changes
+> > >the application-visible behavior to close the connection after one
+> > >fewer timer expiration, thus breaking the semantics of the
+> > >net.ipv4.tcp_keepalive_probes.
+> > >
+> > >neal
+> > >
+> > >---
+> > >
+> > >ps: For reference, here is a packetdrill test we use to test this
+> > >functionality; this passes on recent Linux kernels:
+> > >
+> > >// Test TCP keepalive behavior without TCP timestamps enabled.
+> > >
+> > >`../common/defaults.sh`
+> > >
+> > >// Create a socket.
+> > >    0 socket(..., SOCK_STREAM, IPPROTO_TCP) =3D 3
+> > >   +0 setsockopt(3, SOL_SOCKET, SO_REUSEADDR, [1], 4) =3D 0
+> > >
+> > >   +0 bind(3, ..., ...) =3D 0
+> > >   +0 listen(3, 1) =3D 0
+> > >
+> > >// Establish a connection.
+> > >   +0 < S 0:0(0) win 20000 <mss 1000,nop,nop,sackOK,nop,wscale 8>
+> > >   +0 > S. 0:0(0) ack 1 <mss 1460,nop,nop,sackOK,nop,wscale 8>
+> > >  +.1 < . 1:1(0) ack 1 win 20000
+> > >   +0 accept(3, ..., ...) =3D 4
+> > >
+> > >// Verify keepalives are disabled by default.
+> > >   +0 getsockopt(4, SOL_SOCKET, SO_KEEPALIVE, [0], [4]) =3D 0
+> > >// Enable keepalives:
+> > >   +0 setsockopt(4, SOL_SOCKET, SO_KEEPALIVE, [1], 4) =3D 0
+> > >
+> > >// Verify default TCP_KEEPIDLE is 7200, from net.ipv4.tcp_keepalive_ti=
+me=3D7200:
+> > >   +0 getsockopt(4, SOL_TCP, TCP_KEEPIDLE, [7200], [4]) =3D 0
+> > >// Start sending keepalive probes after 3 seconds of idle
+> > >   +0 setsockopt(4, SOL_TCP, TCP_KEEPIDLE, [3], 4) =3D 0
+> > >
+> > >// Verify default TCP_KEEPINTVL is 75, from net.ipv4.tcp_keepalive_int=
+vl=3D75:
+> > >   +0 getsockopt(4, SOL_TCP, TCP_KEEPINTVL, [75], [4]) =3D 0
+> > >// Send keepalive probes every 2 seconds.
+> > >   +0 setsockopt(4, SOL_TCP, TCP_KEEPINTVL, [2], 4) =3D 0
+> > >
+> > >// Verify default TCP_KEEPCNT is 9, from net.ipv4.tcp_keepalive_probes=
+=3D9:
+> > >   +0 getsockopt(4, SOL_TCP, TCP_KEEPCNT, [9], [4]) =3D 0
+> > >// Send 4 keepalive probes before giving up.
+> > >   +0 setsockopt(4, SOL_TCP, TCP_KEEPCNT, [4], 4) =3D 0
+> > >
+> > >// Set up an epoll operation to verify that connections terminated by =
+failed
+> > >// keepalives will wake up blocked epoll waiters with EPOLLERR|EPOLLHU=
+P:
+> > >   +0 epoll_create(1) =3D 5
+> > >   +0 epoll_ctl(5, EPOLL_CTL_ADD, 4, {events=3DEPOLLERR, fd=3D4}) =3D =
+0
+> > >   +0...11 epoll_wait(5, {events=3DEPOLLERR|EPOLLHUP, fd=3D4}, 1, 1500=
+0) =3D 1
+> > >
+> > >// Verify keepalive behavior looks correct, given the parameters above=
+:
+> > >
+> > >// Start sending keepalive probes after 3 seconds of idle.
+> > >   +3 > . 0:0(0) ack 1
+> > >// Send keepalive probes every 2 seconds.
+> > >   +2 > . 0:0(0) ack 1
+> > >   +2 > . 0:0(0) ack 1
+> > >   +2 > . 0:0(0) ack 1
+> > >   +2 > R. 1:1(0) ack 1
+> > >// Sent 4 keepalive probes and then gave up and reset the connection.
+> > >
+> > >// Verify that we get the expected error when we try to use the socket=
+:
+> > >   +0 read(4, ..., 1000) =3D -1 ETIMEDOUT (Connection timed out)
 
