@@ -1,65 +1,87 @@
-Return-Path: <netdev+bounces-157261-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157262-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0EC8A09BDF
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 20:28:02 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2EA04A09BFC
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 20:41:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 72D03188EFDB
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 19:28:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 41CE03A95B6
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 19:41:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15752222575;
-	Fri, 10 Jan 2025 19:26:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6132C2144CF;
+	Fri, 10 Jan 2025 19:41:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="T5DIl6vq"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="hWkV/ppm"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-182.mta1.migadu.com (out-182.mta1.migadu.com [95.215.58.182])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0C1921D58F
-	for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 19:26:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E83124B247;
+	Fri, 10 Jan 2025 19:41:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736537199; cv=none; b=NDZbFXIbOy8dcoVzhoZtvLyevxawPHMpjz5ez2OE7GSG34u40nA70yPXnupwG33neqA7uMtab2iuJdOgPehD62HC7uqNYzbnntQ2AP//ZOxA5O0gEY+GD4/+6ZUFpGlZd1xZoKUJyKAnPCOsM30OOpMIfma1IL48XozpnMOcSD0=
+	t=1736538107; cv=none; b=JTO4AazTVnLhZpH8ijWkK1Vnk0BlQRs0nzGtyRu8dvKptJXUh19RCXh5sSGuRq9HmOzrY0SRcXG3J+ONmcszIFEzXDhU/Sn2nta+4q9KY5CCfOpXeS2B86hWgnnOKhMsuwBePTYUaOQlMm1oWXIRt3PL/bDz1uQvkJAYPR4mJek=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736537199; c=relaxed/simple;
-	bh=Ko99saTJ5UUF+V18cayLC/kSiHm+086bmQvXlC4sss4=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=M2TzduT76kdS2DifX1SxpWBKXI37ESNT29WjXjvTmeMJ6DhM+LJyj/ajTMW8RkyKE1EttANheXdEadMuOhmic64LNE5Ji8CS7WDN2OGL9MTv01+9XGIUsnWMo6pUhdl5tTLePBx115O2aH8oz8GDCMpZtyuY569X0/1WYmeNYkQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=T5DIl6vq; arc=none smtp.client-ip=95.215.58.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1736537195;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Zihh8agpEDPO7eBawpCnGlxbtQx/z/z3NLnPCy/Xk/8=;
-	b=T5DIl6vqHA1fk9+FeQ7N+Tdf36tyvjftyz6NM+k1dOsJXaOGLC+6U3p31qCBLpv80ZhPEd
-	LpOE9qMKBBaB7CRacvjRti5vNw2I1oaC+ccLOrA4SDwocGywE1tDbLqSDfg/GI0wEJ5yyF
-	WFUJCpHPpjZT2eTcZdWq/Q8MAo1AoTU=
-From: Sean Anderson <sean.anderson@linux.dev>
-To: "David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
-	netdev@vger.kernel.org
-Cc: linux-arm-kernel@lists.infradead.org,
-	Shannon Nelson <shannon.nelson@amd.com>,
-	Michal Simek <michal.simek@amd.com>,
-	linux-kernel@vger.kernel.org,
-	Sean Anderson <sean.anderson@linux.dev>,
-	Heng Qi <hengqi@linux.alibaba.com>
-Subject: [PATCH net-next v3 6/6] net: xilinx: axienet: Enable adaptive IRQ coalescing with DIM
-Date: Fri, 10 Jan 2025 14:26:16 -0500
-Message-Id: <20250110192616.2075055-7-sean.anderson@linux.dev>
-In-Reply-To: <20250110192616.2075055-1-sean.anderson@linux.dev>
-References: <20250110192616.2075055-1-sean.anderson@linux.dev>
+	s=arc-20240116; t=1736538107; c=relaxed/simple;
+	bh=KlTcZAOphqI+mKXQSHQkBFkp34x/UalfYMYLFIylyYs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=BRAig2c9QBbeVrVdmimATFfjDrQzBzIp16Fiwi74wEoUGv/vThOdx+hGazWAWNusfSqo++oOtlTcNEYu//HzmEuZjDswZz7jvO567Vce9BJ4X75MHENzc552PC5fuOF2iNgy4zyfB7/ioxIPmxTLcYBQe6RfNipIReT8/Kt6Xr4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=hWkV/ppm; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50AE6LuJ025777;
+	Fri, 10 Jan 2025 19:41:38 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=pp1; bh=xqKwkwDxLIeWcu+5+AJmJwxlzjIwVAT1iL166k6cD
+	7A=; b=hWkV/ppmoQJHl4N1qVi2xPoWbsPbCXOeNcVk8IoNFbw3ScYxmTv0T4yAT
+	eMn0hfHTllR0KF4En3rSkWkdLKuv1JccoOZ6ZhECtAQvgYsaCYYVGzgJzR2E5Gsp
+	NFfr/nTrWI0wkhNRxTN3LuKOIrJbkIV4Z8qsIGicx6N0RGntjOU0hLTkfYfgXxu9
+	JrOyrpUYrAJ49gPSNh+8XIaJGSjugL9JsoKLfxLqLljBKdor7peXa2y9NVO9NoUD
+	32JYrXBJ7lLP1R9RSg6FXuDM4X4ffM+p6Va20+zEao9RK+yz4navpdnEDCq5LhnD
+	C21LgQzHNjkabwKlo63uF2aMqo0lg==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4435151g8q-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 10 Jan 2025 19:41:37 +0000 (GMT)
+Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 50AJO3Of004912;
+	Fri, 10 Jan 2025 19:41:37 GMT
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4435151g8m-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 10 Jan 2025 19:41:37 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 50AGU8Eb003614;
+	Fri, 10 Jan 2025 19:41:36 GMT
+Received: from smtprelay03.wdc07v.mail.ibm.com ([172.16.1.70])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 43yfatm2jh-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 10 Jan 2025 19:41:36 +0000
+Received: from smtpav02.wdc07v.mail.ibm.com (smtpav02.wdc07v.mail.ibm.com [10.39.53.229])
+	by smtprelay03.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 50AJfZtX11469498
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 10 Jan 2025 19:41:35 GMT
+Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id CE7C658059;
+	Fri, 10 Jan 2025 19:41:35 +0000 (GMT)
+Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 54C1058058;
+	Fri, 10 Jan 2025 19:41:35 +0000 (GMT)
+Received: from slate16.aus.stglabs.ibm.com (unknown [9.61.130.82])
+	by smtpav02.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Fri, 10 Jan 2025 19:41:35 +0000 (GMT)
+From: Eddie James <eajames@linux.ibm.com>
+To: netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, horms@kernel.org, pabeni@redhat.com,
+        kuba@kernel.org, edumazet@google.com, davem@davemloft.net,
+        sam@mendozajonas.com, Eddie James <eajames@linux.ibm.com>
+Subject: [PATCH] net/ncsi: Fix NULL pointer derefence if CIS arrives before SP
+Date: Fri, 10 Jan 2025 13:41:33 -0600
+Message-ID: <20250110194133.948294-1-eajames@linux.ibm.com>
+X-Mailer: git-send-email 2.43.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,324 +89,120 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: DeXRnO5upH6Fy6siIyIlIdccsQsgeZla
+X-Proofpoint-ORIG-GUID: RgTKoyRG45DUy38PZ9j9A3fpth5TibdA
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 mlxscore=0
+ malwarescore=0 suspectscore=0 priorityscore=1501 bulkscore=0 phishscore=0
+ spamscore=0 clxscore=1011 mlxlogscore=933 lowpriorityscore=0 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2411120000
+ definitions=main-2501100150
 
-The default RX IRQ coalescing settings of one IRQ per packet can represent
-a significant CPU load. However, increasing the coalescing unilaterally
-can result in undesirable latency under low load. Adaptive IRQ
-coalescing with DIM offers a way to adjust the coalescing settings based
-on load.
+If a Clear Initial State response packet is received before the
+Select Package response, then the channel set up will dereference
+the NULL package pointer. Fix this by setting up the package
+in the CIS handler if it's not found.
 
-This device only supports "CQE" mode [1], where each packet resets the
-timer. Therefore, an interrupt is fired either when we receive
-coalesce_count_rx packets or when the interface is idle for
-coalesce_usec_rx. With this in mind, consider the following scenarios:
+[    9.289221] 8<--- cut here ---
+[    9.289244] Unable to handle kernel NULL pointer dereference at virtual address 00000018 when read
+[    9.289306] [00000018] *pgd=00000000
+[    9.289333] Internal error: Oops: 5 [#1] SMP ARM
+[    9.289367] CPU: 0 PID: 35 Comm: kworker/0:2 Not tainted 6.6.69-f1d562d-gf1d562dd8fa4 #1
+[    9.289423] Hardware name: Generic DT based system
+[    9.289457] Workqueue:  0x0 (events)
+[    9.289486] PC is at _raw_spin_lock_irqsave+0x10/0x4c
+[    9.289525] LR is at ncsi_add_channel+0xd0/0x174
+[    9.289561] pc : [<808d1018>]    lr : [<808907bc>]    psr: 40000193
+[    9.289605] sp : b4801e20  ip : 8695e000  fp : 80d6c2a8
+[    9.289642] r10: 80d6c2a8  r9 : 8136a4dc  r8 : 00000018
+[    9.289680] r7 : 00000000  r6 : 00000000  r5 : 8695dc00  r4 : 00000000
+[    9.289725] r3 : 00000005  r2 : 00000018  r1 : 8089202c  r0 : 40000113
+[    9.289770] Flags: nZcv  IRQs off  FIQs on  Mode SVC_32  ISA ARM  Segment none
+[    9.289821] Control: 10c5387d  Table: 81adc06a  DAC: 00000051
+[    9.289861] Register r0 information: non-paged memory
+[    9.289898] Register r1 information: non-slab/vmalloc memory
+[    9.289939] Register r2 information: non-paged memory
+[    9.289976] Register r3 information: non-paged memory
+[    9.290012] Register r4 information: NULL pointer
+[    9.290046] Register r5 information: slab kmalloc-1k start 8695dc00 pointer offset 0 size 1024
+[    9.290111] Register r6 information: NULL pointer
+[    9.290145] Register r7 information: NULL pointer
+[    9.290180] Register r8 information: non-paged memory
+[    9.290216] Register r9 information: non-slab/vmalloc memory
+[    9.290257] Register r10 information: non-slab/vmalloc memory
+[    9.290298] Register r11 information: non-slab/vmalloc memory
+[    9.290339] Register r12 information: slab kmalloc-1k start 8695e000 pointer offset 0 size 1024
+[    9.290404] Process kworker/0:2 (pid: 35, stack limit = 0x401e97d3)
+[    9.290448] Stack: (0xb4801e20 to 0xb4802000)
+[    9.290482] 1e20: 00000000 81099810 81be7150 81368000 00000000 000024a8 81be7150 8088efc4
+[    9.290540] 1e40: 81be7150 00000000 00000000 8ae45185 00000000 00000000 81368000 8088f4fc
+[    9.290598] 1e60: 86337300 806fce18 81368018 0000008a 00000780 00000000 86662dc2 8ae45185
+[    9.290656] 1e80: 00000780 81365800 8088f3e4 0000002a b2c44000 b2c44090 81365800 86337300
+[    9.290714] 1ea0: 00000000 8071c4d8 00000002 86337300 8136c45c 8ae45185 80115aa0 86337300
+[    9.290772] 1ec0: 0000000a 8071c584 b2c44000 b2c44090 00005800 8ae45185 81365dd8 805be000
+[    9.290830] 1ee0: 00000000 805be060 00000040 81365d80 0000002a 00000000 00000036 00000001
+[    9.290888] 1f00: 00000040 81365dd8 b4801f53 ffff8ea7 80d03d00 00000000 81365dd8 8071d010
+[    9.290946] 1f20: 81365dd8 8071d010 49514f00 b3d96100 0000012c b3d962c0 b4801f58 8071d4a4
+[    9.291004] 1f40: b4801f60 81081980 80c4e100 33148000 00c4e100 33148000 b4801f58 b4801f58
+[    9.291062] 1f60: b4801f60 b4801f60 b4801f68 8ae45185 b3d929f0 00000004 00000008 80d0308c
+[    9.291120] 1f80: 81081980 00000100 40000003 0000000c 80d03080 801206d4 80c4c790 b480900c
+[    9.291178] 1fa0: 80d03080 b4801f98 80c493c8 0000000a 00000000 80c4d380 80c4d380 ffff8ea6
+[    9.291237] 1fc0: 80d03d00 04208060 80c4c790 8016c180 80d06094 81081980 80000013 ffffffff
+[    9.291295] 1fe0: b4935f44 61c88647 81081980 81081980 b4935f08 80120c84 80134f4c 808945b8
+[    9.291351]  _raw_spin_lock_irqsave from ncsi_add_channel+0xd0/0x174
+[    9.291402]  ncsi_add_channel from ncsi_rsp_handler_cis+0x98/0xb4
+[    9.291451]  ncsi_rsp_handler_cis from ncsi_rcv_rsp+0x118/0x2c4
+[    9.291498]  ncsi_rcv_rsp from __netif_receive_skb_one_core+0x58/0x7c
+[    9.291547]  __netif_receive_skb_one_core from netif_receive_skb+0x2c/0xc4
+[    9.291597]  netif_receive_skb from ftgmac100_poll+0x350/0x43c
+[    9.291642]  ftgmac100_poll from __napi_poll.constprop.0+0x2c/0x180
+[    9.291690]  __napi_poll.constprop.0 from net_rx_action+0x340/0x3c0
+[    9.291736]  net_rx_action from handle_softirqs+0xf4/0x25c
+[    9.291777]  handle_softirqs from irq_exit+0x80/0xb0
+[    9.291816]  irq_exit from call_with_stack+0x18/0x20
+[    9.291857]  call_with_stack from __irq_svc+0x98/0xb0
+[    9.291898] Exception stack(0xb4935f10 to 0xb4935f58)
+[    9.291935] 5f00:                                     00000007 00000006 80d03d00 00000769
+[    9.291993] 5f20: 85963e80 b3d953c0 80d03d00 b3d953e0 61c88647 85963eac 81081980 b3d953c0
+[    9.292050] 5f40: 00000004 b4935f60 80134f28 80134f4c 80000013 ffffffff
+[    9.292096]  __irq_svc from worker_thread+0x1fc/0x4e8
+[    9.292137]  worker_thread from kthread+0xe0/0xfc
+[    9.292176]  kthread from ret_from_fork+0x14/0x28
+[    9.292213] Exception stack(0xb4935fb0 to 0xb4935ff8)
+[    9.292250] 5fa0:                                     00000000 00000000 00000000 00000000
+[    9.292308] 5fc0: 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+[    9.292365] 5fe0: 00000000 00000000 00000000 00000000 00000013 00000000
+[    9.292413] Code: e1a02000 e10f0000 f10c0080 f592f000 (e1923f9f)
+[    9.292455] ---[ end trace 0000000000000000 ]---
+[    9.295147] Kernel panic - not syncing: Fatal exception in interrupt
 
-Link saturated
-    Here we want to set coalesce_count_rx to a large value, in order to
-    coalesce more packets and reduce CPU load. coalesce_usec_rx should
-    be set to at least the time for one packet. Otherwise the link will
-    be "idle" and we will get an interrupt for each packet anyway.
-
-Bursts of packets
-    Each burst should be coalesced into a single interrupt, although it
-    may be prudent to reduce coalesce_count_rx for better latency.
-    coalesce_usec_rx should be set to at least the time for one packet
-    so bursts are coalesced. However, additional time beyond the packet
-    time will just increase latency at the end of a burst.
-
-Sporadic packets
-    Due to low load, we can set coalesce_count_rx to 1 in order to
-    reduce latency to the minimum. coalesce_usec_rx does not matter in
-    this case.
-
-Based on this analysis, I expected the CQE profiles to look something
-like
-
-	usec =  0, pkts = 1   // Low load
-	usec = 16, pkts = 4
-	usec = 16, pkts = 16
-	usec = 16, pkts = 64
-	usec = 16, pkts = 256 // High load
-
-Where usec is set to 16 to be a few us greater than the 12.3 us packet
-time of a 1500 MTU packet at 1 GBit/s. However, the CQE profile is
-instead
-
-	usec =  2, pkts = 256 // Low load
-	usec =  8, pkts = 128
-	usec = 16, pkts =  64
-	usec = 32, pkts =  64
-	usec = 64, pkts =  64 // High load
-
-I found this very surprising. The number of coalesced packets
-*decreases* as load increases. But as load increases we have more
-opportunities to coalesce packets without affecting latency as much.
-Additionally, the profile *increases* the usec as the load increases.
-But as load increases, the gaps between packets will tend to become
-smaller, making it possible to *decrease* usec for better latency at the
-end of a "burst".
-
-I consider the default CQE profile unsuitable for this NIC. Therefore,
-we use the first profile outlined in this commit instead.
-coalesce_usec_rx is set to 16 by default, but the user can customize it.
-This may be necessary if they are using jumbo frames. I think adjusting
-the profile times based on the link speed/mtu would be good improvement
-for generic DIM.
-
-In addition to the above profile problems, I noticed the following
-additional issues with DIM while testing:
-
-- DIM tends to "wander" when at low load, since the performance gradient
-  is pretty flat. If you only have 10p/ms anyway then adjusting the
-  coalescing settings will not affect throughput very much.
-- DIM takes a long time to adjust back to low indices when load is
-  decreased following a period of high load. This is because it only
-  re-evaluates its settings once every 64 interrupts. However, at low
-  load 64 interrupts can be several seconds.
-
-Finally: performance. This patch increases receive throughput with
-iperf3 from 840 Mbits/sec to 938 Mbits/sec, decreases interrupts from
-69920/sec to 316/sec, and decreases CPU utilization (4x Cortex-A53) from
-43% to 9%.
-
-[1] Who names this stuff?
-
-Signed-off-by: Sean Anderson <sean.anderson@linux.dev>
-Reviewed by: Shannon Nelson <shannon.nelson@amd.com>
+Signed-off-by: Eddie James <eajames@linux.ibm.com>
 ---
-Heng, maybe you have some comments on DIM regarding the above?
+ net/ncsi/ncsi-rsp.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-Changes in v3:
-- Adjust axienet_local doc comment order to match the members
-
-Changes in v2:
-- Don't take the RTNL in axienet_rx_dim_work to avoid deadlock. Instead,
-  calculate a partial cr update that axienet_update_coalesce_rx can
-  perform under a spin lock.
-- Use READ/WRITE_ONCE when accessing/modifying rx_irqs
-
- drivers/net/ethernet/xilinx/Kconfig           |  1 +
- drivers/net/ethernet/xilinx/xilinx_axienet.h  | 10 ++-
- .../net/ethernet/xilinx/xilinx_axienet_main.c | 80 +++++++++++++++++--
- 3 files changed, 82 insertions(+), 9 deletions(-)
-
-diff --git a/drivers/net/ethernet/xilinx/Kconfig b/drivers/net/ethernet/xilinx/Kconfig
-index 35d96c633a33..7502214cc7d5 100644
---- a/drivers/net/ethernet/xilinx/Kconfig
-+++ b/drivers/net/ethernet/xilinx/Kconfig
-@@ -28,6 +28,7 @@ config XILINX_AXI_EMAC
- 	depends on HAS_IOMEM
- 	depends on XILINX_DMA
- 	select PHYLINK
-+	select DIMLIB
- 	help
- 	  This driver supports the 10/100/1000 Ethernet from Xilinx for the
- 	  AXI bus interface used in Xilinx Virtex FPGAs and Soc's.
-diff --git a/drivers/net/ethernet/xilinx/xilinx_axienet.h b/drivers/net/ethernet/xilinx/xilinx_axienet.h
-index 45d8d80dbb1a..5ff742103beb 100644
---- a/drivers/net/ethernet/xilinx/xilinx_axienet.h
-+++ b/drivers/net/ethernet/xilinx/xilinx_axienet.h
-@@ -9,6 +9,7 @@
- #ifndef XILINX_AXIENET_H
- #define XILINX_AXIENET_H
+diff --git a/net/ncsi/ncsi-rsp.c b/net/ncsi/ncsi-rsp.c
+index e28be33bdf2c4..59d0af7183acc 100644
+--- a/net/ncsi/ncsi-rsp.c
++++ b/net/ncsi/ncsi-rsp.c
+@@ -100,6 +100,13 @@ static int ncsi_rsp_handler_cis(struct ncsi_request *nr)
+ 		if (ndp->flags & NCSI_DEV_PROBED)
+ 			return -ENXIO;
  
-+#include <linux/dim.h>
- #include <linux/netdevice.h>
- #include <linux/spinlock.h>
- #include <linux/interrupt.h>
-@@ -123,8 +124,7 @@
- /* Default TX/RX Threshold and delay timer values for SGDMA mode */
- #define XAXIDMA_DFT_TX_THRESHOLD	24
- #define XAXIDMA_DFT_TX_USEC		50
--#define XAXIDMA_DFT_RX_THRESHOLD	1
--#define XAXIDMA_DFT_RX_USEC		50
-+#define XAXIDMA_DFT_RX_USEC		16
- 
- #define XAXIDMA_BD_CTRL_TXSOF_MASK	0x08000000 /* First tx packet */
- #define XAXIDMA_BD_CTRL_TXEOF_MASK	0x04000000 /* Last tx packet */
-@@ -484,6 +484,9 @@ struct skbuf_dma_descriptor {
-  * @regs:	Base address for the axienet_local device address space
-  * @dma_regs:	Base address for the axidma device address space
-  * @napi_rx:	NAPI RX control structure
-+ * @rx_dim:     DIM state for the receive queue
-+ * @rx_dim_enabled: Whether DIM is enabled or not
-+ * @rx_irqs:    Number of interrupts
-  * @rx_cr_lock: Lock protecting @rx_dma_cr, its register, and @rx_dma_started
-  * @rx_dma_cr:  Nominal content of RX DMA control register
-  * @rx_dma_started: Set when RX DMA is started
-@@ -566,6 +569,9 @@ struct axienet_local {
- 	void __iomem *dma_regs;
- 
- 	struct napi_struct napi_rx;
-+	struct dim rx_dim;
-+	bool rx_dim_enabled;
-+	u16 rx_irqs;
- 	spinlock_t rx_cr_lock;
- 	u32 rx_dma_cr;
- 	bool rx_dma_started;
-diff --git a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
-index 8ba42cebffb4..0b0019948198 100644
---- a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
-+++ b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
-@@ -1283,6 +1283,18 @@ static int axienet_rx_poll(struct napi_struct *napi, int budget)
- 		axienet_dma_out_addr(lp, XAXIDMA_RX_TDESC_OFFSET, tail_p);
- 
- 	if (packets < budget && napi_complete_done(napi, packets)) {
-+		if (READ_ONCE(lp->rx_dim_enabled)) {
-+			struct dim_sample sample = {
-+				.time = ktime_get(),
-+				/* Safe because we are the only writer */
-+				.pkt_ctr = u64_stats_read(&lp->rx_packets),
-+				.byte_ctr = u64_stats_read(&lp->rx_bytes),
-+				.event_ctr = READ_ONCE(lp->rx_irqs),
-+			};
-+
-+			net_dim(&lp->rx_dim, &sample);
++		if (!np) {
++			id = NCSI_PACKAGE_INDEX(rsp->rsp.common.channel);
++			np = ncsi_add_package(ndp, id);
++			if (!np)
++				return -ENODEV;
 +		}
 +
- 		/* Re-enable RX completion interrupts. This should
- 		 * cause an immediate interrupt if any RX packets are
- 		 * already pending.
-@@ -1375,6 +1387,7 @@ static irqreturn_t axienet_rx_irq(int irq, void *_ndev)
- 		/* Disable further RX completion interrupts and schedule
- 		 * NAPI receive.
- 		 */
-+		WRITE_ONCE(lp->rx_irqs, READ_ONCE(lp->rx_irqs) + 1);
- 		if (napi_schedule_prep(&lp->napi_rx)) {
- 			u32 cr;
- 
-@@ -1676,6 +1689,7 @@ static int axienet_open(struct net_device *ndev)
- 	if (lp->eth_irq > 0)
- 		free_irq(lp->eth_irq, ndev);
- err_phy:
-+	cancel_work_sync(&lp->rx_dim.work);
- 	cancel_delayed_work_sync(&lp->stats_work);
- 	phylink_stop(lp->phylink);
- 	phylink_disconnect_phy(lp->phylink);
-@@ -1705,6 +1719,7 @@ static int axienet_stop(struct net_device *ndev)
- 		napi_disable(&lp->napi_rx);
+ 		id = NCSI_CHANNEL_INDEX(rsp->rsp.common.channel);
+ 		nc = ncsi_add_channel(np, id);
  	}
- 
-+	cancel_work_sync(&lp->rx_dim.work);
- 	cancel_delayed_work_sync(&lp->stats_work);
- 
- 	phylink_stop(lp->phylink);
-@@ -2077,6 +2092,31 @@ static void axienet_update_coalesce_rx(struct axienet_local *lp, u32 cr,
- 	spin_unlock_irq(&lp->rx_cr_lock);
- }
- 
-+/**
-+ * axienet_dim_coalesce_count_rx() - RX coalesce count for DIM
-+ * @lp: Device private data
-+ */
-+static u32 axienet_dim_coalesce_count_rx(struct axienet_local *lp)
-+{
-+	return min(1 << (lp->rx_dim.profile_ix << 1), 255);
-+}
-+
-+/**
-+ * axienet_rx_dim_work() - Adjust RX DIM settings
-+ * @work: The work struct
-+ */
-+static void axienet_rx_dim_work(struct work_struct *work)
-+{
-+	struct axienet_local *lp =
-+		container_of(work, struct axienet_local, rx_dim.work);
-+	u32 cr = axienet_calc_cr(lp, axienet_dim_coalesce_count_rx(lp), 0);
-+	u32 mask = XAXIDMA_COALESCE_MASK | XAXIDMA_IRQ_IOC_MASK |
-+		   XAXIDMA_IRQ_ERROR_MASK;
-+
-+	axienet_update_coalesce_rx(lp, cr, mask);
-+	lp->rx_dim.state = DIM_START_MEASURE;
-+}
-+
- /**
-  * axienet_update_coalesce_tx() - Set TX CR
-  * @lp: Device private data
-@@ -2127,6 +2167,8 @@ axienet_ethtools_get_coalesce(struct net_device *ndev,
- 	struct axienet_local *lp = netdev_priv(ndev);
- 	u32 cr;
- 
-+	ecoalesce->use_adaptive_rx_coalesce = lp->rx_dim_enabled;
-+
- 	spin_lock_irq(&lp->rx_cr_lock);
- 	cr = lp->rx_dma_cr;
- 	spin_unlock_irq(&lp->rx_cr_lock);
-@@ -2163,7 +2205,9 @@ axienet_ethtools_set_coalesce(struct net_device *ndev,
- 			      struct netlink_ext_ack *extack)
- {
- 	struct axienet_local *lp = netdev_priv(ndev);
--	u32 cr;
-+	bool new_dim = ecoalesce->use_adaptive_rx_coalesce;
-+	bool old_dim = lp->rx_dim_enabled;
-+	u32 cr, mask = ~XAXIDMA_CR_RUNSTOP_MASK;
- 
- 	if (ecoalesce->rx_max_coalesced_frames > 255 ||
- 	    ecoalesce->tx_max_coalesced_frames > 255) {
-@@ -2177,7 +2221,7 @@ axienet_ethtools_set_coalesce(struct net_device *ndev,
- 		return -EINVAL;
- 	}
- 
--	if ((ecoalesce->rx_max_coalesced_frames > 1 &&
-+	if (((ecoalesce->rx_max_coalesced_frames > 1 || new_dim) &&
- 	     !ecoalesce->rx_coalesce_usecs) ||
- 	    (ecoalesce->tx_max_coalesced_frames > 1 &&
- 	     !ecoalesce->tx_coalesce_usecs)) {
-@@ -2186,9 +2230,27 @@ axienet_ethtools_set_coalesce(struct net_device *ndev,
- 		return -EINVAL;
- 	}
- 
--	cr = axienet_calc_cr(lp, ecoalesce->rx_max_coalesced_frames,
--			     ecoalesce->rx_coalesce_usecs);
--	axienet_update_coalesce_rx(lp, cr, ~XAXIDMA_CR_RUNSTOP_MASK);
-+	if (new_dim && !old_dim) {
-+		cr = axienet_calc_cr(lp, axienet_dim_coalesce_count_rx(lp),
-+				     ecoalesce->rx_coalesce_usecs);
-+	} else if (!new_dim) {
-+		if (old_dim) {
-+			WRITE_ONCE(lp->rx_dim_enabled, false);
-+			napi_synchronize(&lp->napi_rx);
-+			flush_work(&lp->rx_dim.work);
-+		}
-+
-+		cr = axienet_calc_cr(lp, ecoalesce->rx_max_coalesced_frames,
-+				     ecoalesce->rx_coalesce_usecs);
-+	} else {
-+		/* Dummy value for count just to calculate timer */
-+		cr = axienet_calc_cr(lp, 2, ecoalesce->rx_coalesce_usecs);
-+		mask = XAXIDMA_DELAY_MASK | XAXIDMA_IRQ_DELAY_MASK;
-+	}
-+
-+	axienet_update_coalesce_rx(lp, cr, mask);
-+	if (new_dim && !old_dim)
-+		WRITE_ONCE(lp->rx_dim_enabled, true);
- 
- 	cr = axienet_calc_cr(lp, ecoalesce->tx_max_coalesced_frames,
- 			     ecoalesce->tx_coalesce_usecs);
-@@ -2430,7 +2492,8 @@ axienet_ethtool_get_rmon_stats(struct net_device *dev,
- 
- static const struct ethtool_ops axienet_ethtool_ops = {
- 	.supported_coalesce_params = ETHTOOL_COALESCE_MAX_FRAMES |
--				     ETHTOOL_COALESCE_USECS,
-+				     ETHTOOL_COALESCE_USECS |
-+				     ETHTOOL_COALESCE_USE_ADAPTIVE_RX,
- 	.get_drvinfo    = axienet_ethtools_get_drvinfo,
- 	.get_regs_len   = axienet_ethtools_get_regs_len,
- 	.get_regs       = axienet_ethtools_get_regs,
-@@ -2973,7 +3036,10 @@ static int axienet_probe(struct platform_device *pdev)
- 
- 	spin_lock_init(&lp->rx_cr_lock);
- 	spin_lock_init(&lp->tx_cr_lock);
--	lp->rx_dma_cr = axienet_calc_cr(lp, XAXIDMA_DFT_RX_THRESHOLD,
-+	INIT_WORK(&lp->rx_dim.work, axienet_rx_dim_work);
-+	lp->rx_dim_enabled = true;
-+	lp->rx_dim.profile_ix = 1;
-+	lp->rx_dma_cr = axienet_calc_cr(lp, axienet_dim_coalesce_count_rx(lp),
- 					XAXIDMA_DFT_RX_USEC);
- 	lp->tx_dma_cr = axienet_calc_cr(lp, XAXIDMA_DFT_TX_THRESHOLD,
- 					XAXIDMA_DFT_TX_USEC);
 -- 
-2.35.1.1320.gc452695387.dirty
+2.43.5
 
 
