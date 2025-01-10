@@ -1,57 +1,76 @@
-Return-Path: <netdev+bounces-157226-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157227-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 664AFA09854
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 18:22:20 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70F4BA09862
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 18:24:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7167D168FF0
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 17:22:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7D0BD16944A
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 17:24:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 457C32135A5;
-	Fri, 10 Jan 2025 17:22:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B6122139DF;
+	Fri, 10 Jan 2025 17:24:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="qvrlM7UP"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="MeFHJktL"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C99A567D;
-	Fri, 10 Jan 2025 17:22:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C088A212B38;
+	Fri, 10 Jan 2025 17:24:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736529736; cv=none; b=J07FwZ1smfn2a+pX9JjEwfSiAwkSenepwZyv3MCByt+ACXOILmhLpSt8ubRkgA5pfT1zJCXRkEplRhymIQPphRtYSo23hWJa7JA9dY/J7cyuTIt8iMLbKhv9ghbYTZus2MEHfg6gIrsO7okHqDcVyTrGIXSjXpc1PouPbhBL55U=
+	t=1736529866; cv=none; b=kaQjk5DvcbnWqX3dGPPlOuyzFd2h3arhRh0sTzpICIuAtZp341jIMCrtgXF0siXG1mXbYifEjtBhlsQSa06oxfPShDMJyBtu24V+4uCPpBKci8WUk/pXLIPw0r5QoVNxMVQrkkK1E4+YIIIPALEc0E+d0tBlIB4AZv8UDhlIDQw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736529736; c=relaxed/simple;
-	bh=giJbSlXAmaCMDsXMV5xkpZaKRsQRX8KIgAZww5PM08I=;
+	s=arc-20240116; t=1736529866; c=relaxed/simple;
+	bh=OswepRMcrJSSxmRNYxTaM/+fG6Zx5l6+HnBopmzdmy8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PraSBALqf6j1hYMz0iJFu1TCWEFS93815lUEVJuWwNQeVVKV/R9EBP1SQGbrE7QfvMQsLRVCTdYvho260WDqXBk1IucpBQv7YyrsQISqP+6MxcdqaSE6VgLWs+p/F7l8r04Ej5U1U7aDN2hfaXwT0l1597fjIwBTXWFrj++Vyag=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=qvrlM7UP; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=Yp5Y6C3cS/h3XVKNmYT6Nex/Fi8rZ2kh7eVEucPl65A=; b=qvrlM7UP2StsaEaDW80BAEyqkE
-	cQz1NJpNYNrjHNnrLqz6R5kVwLfK5214yep3P6l+vBpWcgxgWKOVl+viOgO8MXWMTbC0kOFVqar+p
-	3ZdNk6MoMnVYZL/QpWc1a/2tVrme/4hlbPrM7oj3bTPLSq/6Mu6NWjRga84hw6pUl0js=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tWIhv-003Io2-U5; Fri, 10 Jan 2025 18:22:03 +0100
-Date: Fri, 10 Jan 2025 18:22:03 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Yanteng Si <si.yanteng@linux.dev>
-Cc: kuba@kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
-	edumazet@google.com, pabeni@redhat.com, mcoquelin.stm32@gmail.com,
-	alexandre.torgue@foss.st.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Huacai Chen <chenhuacai@kernel.org>
-Subject: Re: [PATCH] MAINTAINERS: Become the stmmac maintainer
-Message-ID: <5e1c9623-30cb-48c8-865b-cbdc2c08f0f3@lunn.ch>
-References: <20250110144944.32766-1-si.yanteng@linux.dev>
+	 Content-Type:Content-Disposition:In-Reply-To; b=IO1BGj3MxdVO9tfziQByHzTrwYXYff+t6nLf0tGVj84JAY3F1F559hZMCDg6MlQLiiCJD8Z5KFNSZh9VUW2oCfo4GDFrYUaJhQ5fQXlN+sD7RATWdk92h3NHxDbU8wPr9Wwqdiu4/levqG/evabUZerE8fdR3XtSj8g3KV4oE34=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=MeFHJktL; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=RAZ22W760UfI2aICRfMf3Bvtw4l6/sg/OK0TEyz4Vv8=; b=MeFHJktL4b6YInQKsZwMlQnHP+
+	tP+VJuCiN1RbWA/BXmQn1VF2m+ORIR0UO7nZYsjo0Bngl4i+BpT9yuqtANGGkRkrybGaANKzdftv2
+	JVib2YMUw/K+A6pIcq5xbTOa0InKJ3XRTkdV9hwc4P2+8Of4cRDP/IqAaiXGd/lqhd96gOXC7HeMK
+	Ig5iY6tO4AS4DMSYIjwfXDSAunlRsnPFxd2LwIkS4pL2imursc6aoddKabYJyG+6pHhP9wySRiSJ7
+	7AQtibmPCo90Moc0VpK7j7oNJrz3X8KCjqNOlrIAp5Qy1WPhROtWYD37noR6CKx01nBYJaasplqFJ
+	8B/tMq6Q==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1tWIWx-007uiJ-0d;
+	Sat, 11 Jan 2025 01:24:05 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 11 Jan 2025 01:24:03 +0800
+Date: Sat, 11 Jan 2025 01:24:03 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Michael Kelley <mhklinux@outlook.com>
+Cc: Breno Leitao <leitao@debian.org>,
+	"saeedm@nvidia.com" <saeedm@nvidia.com>,
+	"tariqt@nvidia.com" <tariqt@nvidia.com>,
+	"linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Thomas Graf <tgraf@suug.ch>, Tejun Heo <tj@kernel.org>,
+	Hao Luo <haoluo@google.com>, Josh Don <joshdon@google.com>,
+	Barret Rhoden <brho@google.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: [v2 PATCH] rhashtable: Fix rhashtable_try_insert test
+Message-ID: <Z4FXs8vAtitHIJyl@gondor.apana.org.au>
+References: <20241128-scx_lockdep-v1-1-2315b813b36b@debian.org>
+ <Z1rYGzEpMub4Fp6i@gondor.apana.org.au>
+ <Z2aFL3dNLYOcmzH3@gondor.apana.org.au>
+ <20250102-daffy-vanilla-boar-6e1a61@leitao>
+ <SN6PR02MB41572415707F0FA6D9A61247D4132@SN6PR02MB4157.namprd02.prod.outlook.com>
+ <20250109-marigold-bandicoot-of-exercise-8ebede@leitao>
+ <Z4DoFYQ3ytB-wS3-@gondor.apana.org.au>
+ <SN6PR02MB41577C2C4EB260F3D2D4F85FD41C2@SN6PR02MB4157.namprd02.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,36 +79,56 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250110144944.32766-1-si.yanteng@linux.dev>
+In-Reply-To: <SN6PR02MB41577C2C4EB260F3D2D4F85FD41C2@SN6PR02MB4157.namprd02.prod.outlook.com>
 
-On Fri, Jan 10, 2025 at 10:49:43PM +0800, Yanteng Si wrote:
-> I am the author of dwmac-loongson. The patch set was merged several
-> months ago. For a long time hereafter, I don't wish stmmac to remain
-> in an orphan state perpetually. Therefore, if no one is willing to
-> assume the role of the maintainer, I would like to be responsible for
-> the subsequent maintenance of stmmac. Meanwhile, Huacai is willing to
-> become a reviewer.
-> 
-> About myself, I submitted my first kernel patch on January 4th, 2021.
-> I was still reviewing new patches last week, and I will remain active
-> on the mailing list in the future.
-> 
-> Co-developed-by: Huacai Chen <chenhuacai@kernel.org>
-> Signed-off-by: Huacai Chen <chenhuacai@kernel.org>
-> Signed-off-by: Yanteng Si <si.yanteng@linux.dev>
+On Fri, Jan 10, 2025 at 04:59:28PM +0000, Michael Kelley wrote:
+>
+> This patch fixes the problem I saw with VMs in the Azure cloud.  Thanks!
 
-Hi Yanteng
+Sorry, but the test on data is needed after all (it was just
+buggy).  Otherwise we will break rhlist.  So please test this
+patch instead.
 
-Thanks for volunteering for this. Your experience adding loongson
-support will be useful here. But with a driver of this complexity, and
-the number of different vendors using it, i think it would be good if
-you first established a good reputation for doing the work before we
-add you to the Maintainers. There are a number of stmmac patches on
-the list at the moment, please actually do the job of being a
-Maintainer and spend some time review them.
+---8<---
+The test on whether rhashtable_insert_one did an insertion relies
+on the value returned by rhashtable_lookup_one.  Unfortunately that
+value is overwritten after rhashtable_insert_one returns.  Fix this
+by saving the old value.
 
-A Synopsis engineer has also said he would start doing Maintainer
-work. Hopefully in the end we can add you both to MAINTAINERS.
+Also simplify the test as only data == NULL matters.
 
-	Andrew
+Reported-by: Michael Kelley <mhklinux@outlook.com>
+Fixes: e1d3422c95f0 ("rhashtable: Fix potential deadlock by moving schedule_work outside lock")
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+
+diff --git a/lib/rhashtable.c b/lib/rhashtable.c
+index bf956b85455a..e36b36f3146d 100644
+--- a/lib/rhashtable.c
++++ b/lib/rhashtable.c
+@@ -611,17 +611,20 @@ static void *rhashtable_try_insert(struct rhashtable *ht, const void *key,
+ 			new_tbl = rht_dereference_rcu(tbl->future_tbl, ht);
+ 			data = ERR_PTR(-EAGAIN);
+ 		} else {
++			void *odata;
++
+ 			flags = rht_lock(tbl, bkt);
+ 			data = rhashtable_lookup_one(ht, bkt, tbl,
+ 						     hash, key, obj);
+ 			new_tbl = rhashtable_insert_one(ht, bkt, tbl,
+ 							hash, obj, data);
++			odata = data;
+ 			if (PTR_ERR(new_tbl) != -EEXIST)
+ 				data = ERR_CAST(new_tbl);
+ 
+ 			rht_unlock(tbl, bkt, flags);
+ 
+-			if (PTR_ERR(data) == -ENOENT && !new_tbl) {
++			if (odata && !new_tbl) {
+ 				atomic_inc(&ht->nelems);
+ 				if (rht_grow_above_75(ht, tbl))
+ 					schedule_work(&ht->run_work);
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
 
