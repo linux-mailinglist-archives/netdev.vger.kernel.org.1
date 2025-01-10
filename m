@@ -1,76 +1,76 @@
-Return-Path: <netdev+bounces-157070-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157071-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14503A08D0B
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 10:54:56 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF097A08D20
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 10:57:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4A5657A04B7
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 09:54:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 532633A99D2
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 09:54:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F893209F57;
-	Fri, 10 Jan 2025 09:54:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB61B20B21B;
+	Fri, 10 Jan 2025 09:54:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S3j3unXX"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RAQ0A+Se"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47B01207A2A;
-	Fri, 10 Jan 2025 09:54:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2686A20ADCA;
+	Fri, 10 Jan 2025 09:54:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736502861; cv=none; b=Reu2XnMzCCMMVG76JrCEjfsTIa3u2FI/uXwmTO67krBmTjefnrZzAetn3R3ARQG/LjVHkvrrwr/dZ3aV3c4XDw+5TXZncHOunbZS2dUe3ksnjUaUexK0D3UNnZ1k7VoXuQ+Diei2w8IscrSrCyI2LJVWh154XhE/0YK2mxMrIOw=
+	t=1736502863; cv=none; b=Li89YAr34tsbc55wZMscx4hVIcUWlgESuPpSDutn+mYlQfrip+iukgzzl+yeWS/riFVJbUv+CO7mlMAxnH3Y0Ds+tqHBmmPSiH4MrWAeaAazIzH9NG6CORPEJ8/XXr+h/fqfsLoOjkJEZ8FSjnCFs1jKgS9HMgwQE41iwEZeVPM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736502861; c=relaxed/simple;
-	bh=30f2ez8x6hKGpO7dpUM7/KVxepJSM03jK0tXKMas4N4=;
+	s=arc-20240116; t=1736502863; c=relaxed/simple;
+	bh=MDiHtDtCxAKrxu2Y8Tbr5jhnAYSpC+h1/eBK8wy37us=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=AV0j6YU73GELmqEiPo1Yv624lvBPXMAJQF6galnTs+ftbFwvyKmmPmikh00B2hmXvYcE6MX1F4RV1oLyUMC3oykqoIvnEfoc54O8X3b2pYgKSZd8EGM6G+/WXeFBteIp/E8WQfho2pZtXRyCYyO/aMvSVo9cOrpbAa06Ni2BJa8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=S3j3unXX; arc=none smtp.client-ip=209.85.214.174
+	 MIME-Version; b=AMlgtSzQ9QGFk9MlnnRzfQeXlCARvUsHqT9L0sNOJ9J+RFY7+fckSo+iS0dfwLLM3oHDah+jEVpRP0+yHNroCSyURM8WqgPSiNyAVnMrjZmskAHkpUOqnGkIgmijbqwqT4123WiGbYKfiWl7DnCnBC6BvGFIqW1vx71mfL8Bixo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RAQ0A+Se; arc=none smtp.client-ip=209.85.214.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-21628b3fe7dso30898095ad.3;
-        Fri, 10 Jan 2025 01:54:18 -0800 (PST)
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-2165448243fso34107385ad.1;
+        Fri, 10 Jan 2025 01:54:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736502857; x=1737107657; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1736502861; x=1737107661; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=SUq/PWSOM6Jgkh8a1Vg6y06uVsWzXgd/e9CTRW/3aLI=;
-        b=S3j3unXXQGGivR+BiIy6kq77PxlzAqG7CqcuY4i1bF8+Przn3odAAWgbPSH8UIP43o
-         LENsPLoX4xLYS14socGBBONp8R5EHioTZzzmAcXpbudVpRY8GNTFL8EMVzXjfg7McWVs
-         m8ZeHzsUnKT0L2yIBJcHx239l4viGUKQs3AMNOprMcjulRhwlfipCVn40YxhWLVjExAI
-         nwJeag5+9ksmCpnFRDDM5PgQGM++8SA8CV9F8Xe5U9hX/oMEhnNWo37WH71a5nuoDQuO
-         R/W7gUpNLk9wc4ednvp5Z4cfE6GKARhBUhpyFe4GfqFHYOYs3cdWKN4u1j7a8NUdxiqf
-         lGnA==
+        bh=Ion4rvgZVuG6XSBAcwwShmk186Mw8JOkfuQ4D1b8sOM=;
+        b=RAQ0A+SeHPbm03SVc5K/8FQB+wiX+X/5vUqwYdFJAaMIKE/l5qy5l33Mjsc7ztN3XF
+         o9IOFmqA580cq/5sVmVVMDuiANxWxgVlhGg4IykEFqgAqKsVstYwGskICSxY+8c57qGp
+         krKGRYcqwOAgWK8tqJevWBQX1dRpuE8v1wziH8Gvlg83gYHXwF5czZkA/TDswfiUpwTu
+         5jeOBv56gBKn3r3EC9BIldR/jl4jMmqtiOnfgGI86bwqmcBqPflrjEaLcpFjPhB/a7g/
+         tpx+rnYWqxv7ygu3toorxXnbQMmV4ir52UpdkbNmkqJaCAQei0DjAmkS7H0ZBKREl8PA
+         qOfQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736502857; x=1737107657;
+        d=1e100.net; s=20230601; t=1736502861; x=1737107661;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=SUq/PWSOM6Jgkh8a1Vg6y06uVsWzXgd/e9CTRW/3aLI=;
-        b=LQRGHQaoS/7eT4X/3ZSOL/Q+J4SJLzcPJsSXOP+wJyI3fj0AFbGau0QU0rr9zgAWqL
-         Q6nqsB+P8edA/DkOhNnJTkOry80/VMPp2tXYWLt9ydCstNnqHGaAhX/M7w3WihzCDFf/
-         CH3Swat4msFwjMH6iMYwmIXfLR66n368nAkZ3o4SBQDY6qd6HuMMWxBVu0yyOnYUNzTy
-         tkOTVs84B1qtXcUt1oL/qz1z2vrWh89IhqZ7mYQmCccWK54Hvl7FC3QiRWlCnfnbTX2i
-         Uu2/bPvYJy9bl2s+q28jfYMFSVeAQOZl7l0sejBvaHqdk+rUDTL9SHSCSxjtq7iZvWaK
-         UlhA==
-X-Forwarded-Encrypted: i=1; AJvYcCUhJu5ycC+z2hZuaxw+3agLtO81cXBWmansH4I+stznDmkb8g/VyF/8welf+fF7uNRv7chegPtIvC7w2SY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxwMcwOlBtMFtwjtoon6az29LloVKyIQP4aovlQX0DAGDU51X+2
-	GnSsUzJtHEnnC0gj+txijBjqAg0ZBp0VQ+NPyCuqEprFT+V2DMfGxEBhOw==
-X-Gm-Gg: ASbGnctx9TEFoyDcmn75g+kS9SrvMrQydyHvJsa3E8uvQ5iTRkVtZFOLfSasCZUhG8q
-	gPnI4gmYAknIYvofUx/cHQyqb+1tzFX5LP4kJq9nrj4VILaBFoTs8YrtuMhk02JrRMNz6efKPu2
-	BN3eC5NcT7VwRswpHgtTtZ3ZQuw0dN9dCE5vbXOT4ohkqtKc5yRAQn4yr0CLApLtHSOtH9hGCq0
-	zFOYXsU1OhYLzclo1eiL9cTgxZ3G4G07pjtJIn6k4o07GuQZiGUnIvaxbZYluFxe1okcw==
-X-Google-Smtp-Source: AGHT+IHNOyExXpjKEAJvj5VF4TsAcm/8iRdMra6jEOVD+0OivVdVmbGUe1wn2Z9fO5OhUfPCMwcgdA==
-X-Received: by 2002:a05:6a00:91cb:b0:72a:bc54:84a5 with SMTP id d2e1a72fcca58-72d21f296edmr12960201b3a.6.1736502856641;
-        Fri, 10 Jan 2025 01:54:16 -0800 (PST)
+        bh=Ion4rvgZVuG6XSBAcwwShmk186Mw8JOkfuQ4D1b8sOM=;
+        b=ddNr8BO9e4a7DcGN7DfRafk+kOL8obIuV/TJev5QEZiVMXx+sN2ZiB244vYnbtO1X5
+         EnT2EM8m7O6OvMxEZIeB74t4QUKHahOP2v5+L6BmpxRkm4W9AbUuAEXqh9tD5gyGYPfx
+         vJhUA7NDu0mVCHH/qLXs7hbJTep3Qb6Eg69Lnrfwkw7x8yl948ct0WYtgTymmSyOed57
+         foJc6D8BUOV8FyCl1BNd1rE5zlxKOnTSq+1/pOLs7NnjmpgdN+6nXflh0BRfBO4hRJmP
+         sBbjEOu/YZXcQAnGWQbr8mi7hoNXLxjx+wCtpu2qMQnYpHyVHeLZTtRfpc3cqzc4RSaf
+         mnlw==
+X-Forwarded-Encrypted: i=1; AJvYcCWX0FRxlhhh7Ijbf/T33Z3LoCA0wqN4FLnpn5lyW6R2/COh9bce1xJtzI2srRrFGI5xvtRu5VEOY/laJYQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzbtAX6XeecxrApa/t5zSyLY5f99Tg8Gp3JqAQ0gxUcAuKSb349
+	amvuj7Y7sN8bR1KE6VxnKWevBLGVIc1/OlUtBFd6xuhVAgB0l9RqqqKT4g==
+X-Gm-Gg: ASbGncuEstLfvAY7PU0i2MM6+U5SxAt/iYLAElyC6RCrCwDzxYgDjl6O8WK2aj3DJWd
+	tIyqU75q8ZAQ52PnFlF0Y7F/Eu+H1nu0GMRYBy7v684bF24K+j+yllJojYWDAyyK5gO3pMd800Q
+	XzHq0RY1vf9xYdKPNl/YSwY3GFx/W2Fo0y6rizmWzbP+KX1eD1TdfZJBUaI6sdC+NuRldkmRWpR
+	amC4NboIrJkEqHZL+GLapcLSYmvqoP6qRL2ylQ/hPb6Enl/5nJ9CINLJnldWEsFQQdTSw==
+X-Google-Smtp-Source: AGHT+IFujh/KkTTFRhKx5MyKUB6ge9k+IJCqCvJTkEaAIWn/8HcGt05DziMhWszOmGBiewczqCOY1A==
+X-Received: by 2002:a05:6a21:339b:b0:1e8:bd4e:c330 with SMTP id adf61e73a8af0-1e8bd4ec502mr734199637.30.1736502861030;
+        Fri, 10 Jan 2025 01:54:21 -0800 (PST)
 Received: from localhost.localdomain ([129.146.253.192])
-        by smtp.googlemail.com with ESMTPSA id d2e1a72fcca58-72d4069217dsm1186183b3a.151.2025.01.10.01.54.12
+        by smtp.googlemail.com with ESMTPSA id d2e1a72fcca58-72d4069217dsm1186183b3a.151.2025.01.10.01.54.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 Jan 2025 01:54:16 -0800 (PST)
+        Fri, 10 Jan 2025 01:54:20 -0800 (PST)
 From: Furong Xu <0x1207@gmail.com>
 To: netdev@vger.kernel.org,
 	linux-stm32@st-md-mailman.stormreply.com,
@@ -84,9 +84,9 @@ Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
 	xfr@outlook.com,
 	Furong Xu <0x1207@gmail.com>
-Subject: [PATCH net-next v1 2/3] net: stmmac: Set page_pool_params.max_len to a precise size
-Date: Fri, 10 Jan 2025 17:53:58 +0800
-Message-Id: <4bfc67ece5ef615ce65972173f5256f10ea27f9a.1736500685.git.0x1207@gmail.com>
+Subject: [PATCH net-next v1 3/3] net: stmmac: Optimize cache prefetch in RX path
+Date: Fri, 10 Jan 2025 17:53:59 +0800
+Message-Id: <b992690bf7197e4b967ed9f7a0422edae50129f2.1736500685.git.0x1207@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <cover.1736500685.git.0x1207@gmail.com>
 References: <cover.1736500685.git.0x1207@gmail.com>
@@ -98,48 +98,58 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-DMA engine will always write no more than dma_buf_sz bytes of a received
-frame into a page buffer, the remaining spaces are unused or used by CPU
-exclusively.
-Setting page_pool_params.max_len to almost the full size of page(s) helps
-nothing more, but wastes more CPU cycles on cache maintenance.
+Current code prefetches cache lines for the received frame first, and
+then dma_sync_single_for_cpu() against this frame, this is wrong.
+Cache prefetch should be triggered after dma_sync_single_for_cpu().
 
-For a standard MTU of 1500, then dma_buf_sz is assigned to 1536, and this
-patch brings ~16.9% driver performance improvement in a TCP RX
+This patch brings ~2.8% driver performance improvement in a TCP RX
 throughput test with iPerf tool on a single isolated Cortex-A65 CPU
-core, from 2.43 Gbits/sec increased to 2.84 Gbits/sec.
+core, 2.84 Gbits/sec increased to 2.92 Gbits/sec.
 
 Signed-off-by: Furong Xu <0x1207@gmail.com>
 ---
- drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 2 +-
- drivers/net/ethernet/stmicro/stmmac/stmmac_xdp.h  | 1 -
- 2 files changed, 1 insertion(+), 2 deletions(-)
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
 
 diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index 43125a6f8f6b..c1aeaec53b4c 100644
+index c1aeaec53b4c..1b4e8b035b1a 100644
 --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
 +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -2038,7 +2038,7 @@ static int __alloc_dma_rx_desc_resources(struct stmmac_priv *priv,
- 	pp_params.dev = priv->device;
- 	pp_params.dma_dir = xdp_prog ? DMA_BIDIRECTIONAL : DMA_FROM_DEVICE;
- 	pp_params.offset = stmmac_rx_offset(priv);
--	pp_params.max_len = STMMAC_MAX_RX_BUF_SIZE(num_pages);
-+	pp_params.max_len = dma_conf->dma_buf_sz;
+@@ -5497,10 +5497,6 @@ static int stmmac_rx(struct stmmac_priv *priv, int limit, u32 queue)
  
- 	rx_q->page_pool = page_pool_create(&pp_params);
- 	if (IS_ERR(rx_q->page_pool)) {
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_xdp.h b/drivers/net/ethernet/stmicro/stmmac/stmmac_xdp.h
-index 896dc987d4ef..77ce8cfbe976 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_xdp.h
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_xdp.h
-@@ -4,7 +4,6 @@
- #ifndef _STMMAC_XDP_H_
- #define _STMMAC_XDP_H_
+ 		/* Buffer is good. Go on. */
  
--#define STMMAC_MAX_RX_BUF_SIZE(num)	(((num) * PAGE_SIZE) - XDP_PACKET_HEADROOM)
- #define STMMAC_RX_DMA_ATTR	(DMA_ATTR_SKIP_CPU_SYNC | DMA_ATTR_WEAK_ORDERING)
+-		prefetch(page_address(buf->page) + buf->page_offset);
+-		if (buf->sec_page)
+-			prefetch(page_address(buf->sec_page));
+-
+ 		buf1_len = stmmac_rx_buf1_len(priv, p, status, len);
+ 		len += buf1_len;
+ 		buf2_len = stmmac_rx_buf2_len(priv, p, status, len);
+@@ -5522,6 +5518,7 @@ static int stmmac_rx(struct stmmac_priv *priv, int limit, u32 queue)
  
- int stmmac_xdp_setup_pool(struct stmmac_priv *priv, struct xsk_buff_pool *pool,
+ 			dma_sync_single_for_cpu(priv->device, buf->addr,
+ 						buf1_len, dma_dir);
++			prefetch(page_address(buf->page) + buf->page_offset);
+ 
+ 			xdp_init_buff(&ctx.xdp, buf_sz, &rx_q->xdp_rxq);
+ 			xdp_prepare_buff(&ctx.xdp, page_address(buf->page),
+@@ -5596,6 +5593,7 @@ static int stmmac_rx(struct stmmac_priv *priv, int limit, u32 queue)
+ 		} else if (buf1_len) {
+ 			dma_sync_single_for_cpu(priv->device, buf->addr,
+ 						buf1_len, dma_dir);
++			prefetch(page_address(buf->page) + buf->page_offset);
+ 			skb_add_rx_frag(skb, skb_shinfo(skb)->nr_frags,
+ 					buf->page, buf->page_offset, buf1_len,
+ 					priv->dma_conf.dma_buf_sz);
+@@ -5608,6 +5606,7 @@ static int stmmac_rx(struct stmmac_priv *priv, int limit, u32 queue)
+ 		if (buf2_len) {
+ 			dma_sync_single_for_cpu(priv->device, buf->sec_addr,
+ 						buf2_len, dma_dir);
++			prefetch(page_address(buf->sec_page));
+ 			skb_add_rx_frag(skb, skb_shinfo(skb)->nr_frags,
+ 					buf->sec_page, 0, buf2_len,
+ 					priv->dma_conf.dma_buf_sz);
 -- 
 2.34.1
 
