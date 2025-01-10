@@ -1,140 +1,109 @@
-Return-Path: <netdev+bounces-156927-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156928-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E876A084FB
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 02:44:01 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5FC27A08502
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 02:48:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 69F743A6F15
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 01:43:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8A2DF3A8D69
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 01:48:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C09A57D3F4;
-	Fri, 10 Jan 2025 01:43:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8C4E42A80;
+	Fri, 10 Jan 2025 01:48:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="whqpLzeZ"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="HIb7R0Bx"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-181.mta1.migadu.com (out-181.mta1.migadu.com [95.215.58.181])
+Received: from smtp-fw-2101.amazon.com (smtp-fw-2101.amazon.com [72.21.196.25])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1260E38DE1
-	for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 01:43:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFB6618C31
+	for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 01:48:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=72.21.196.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736473436; cv=none; b=a8lJyDSaFijJFpR+Ov1bxf+tMhRTPd5CTYOrweYXkwjUWdvATPJuOozwbZ2yhU8GWXKZyi1k0YTSYGwbD1Ea9P5IlUtxhgctQeXAucyLZA3dHssqQ92DWuT3IfJynFc0RgxhoOLNNc4RbCsn6vU6pWH03eu3AK0VDqzzUn+8yDI=
+	t=1736473695; cv=none; b=DzlhocCJ3qxxtYs2X2xs6IBQRcEZd3O9heR8rq+DKChLJWzYoKblj1VUBw+J6UhkZ0ej9alqN9y3ichBTa06Lxk93DnmI7ff0HFmM5ywF9mZOWBnljlah1IgvXBdmHBzBgvBrXvV0ESyIbxeaAaBWtgt2CgOQuYvmoqdOgmj3cg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736473436; c=relaxed/simple;
-	bh=8JnBP19d9w1bWLjuAow8jNbFkDHO6o1yW3KwujPpU/Q=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=stqPWHLwN9ZmHDvT1JDCgUsCQoNfL22g0vZYxBBOuttuwu87xebKvj7CqHxKDc8YnXSCyTniCpcg+0pGIRGNUFoN9XQCTQNkro+05hUY0oO5eIeXgXaDboY1FwlbTaYQZKXHQvO04S8xY7kinfT64XtUTju7QuJTKQ+vS4TXlSQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=whqpLzeZ; arc=none smtp.client-ip=95.215.58.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <1292dc51-4ca1-45c0-8a7c-78d325530531@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1736473432;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=a8R/Ifde+clfmwPosLqJI0YLaYlt8evsINovbOJnMUI=;
-	b=whqpLzeZ0b3io7r3H8+VPXwqX086ELdKF07/Rg7x0tV8D2X+y54PIx8+djO6aNe2zzKslx
-	1RndiKgkT/ShCAoFVhESctSBFkRR0crg/gNzBb2l6mdckzbYrUZtzxYy4w+8PjQgXC76Ef
-	kkq8IIeLbUBLs7MTO0ONKX1Ilx3nIaE=
-Date: Thu, 9 Jan 2025 17:43:46 -0800
+	s=arc-20240116; t=1736473695; c=relaxed/simple;
+	bh=tEQcEUku0ipBuDMKKOJFn7sPaUeFVIRyEC4lqGE1pd0=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=WIgUjJGk7YUV9ajSZ16LzMX7ar3r3/KGTmknDhejq9Jnl8eXEkHta3R1uqyI/Gn81iXthFG9Q5YIXdSBmneHMGppNZfCuqImUTg6KVPPaypzRmfeudUCYUlRA4XN1CgOuQHVWoYY1yvBzISFcJ+aZvjMLTxZgqUR3gAs+tzvV/s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=HIb7R0Bx; arc=none smtp.client-ip=72.21.196.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1736473694; x=1768009694;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=jQA7gI6vjh4sHEuqpL+jpUDK3hL07hi7aL72TvCw0U8=;
+  b=HIb7R0BxInLYuRVbKY0XrxLiDPJSguvhyYiGbEwcaxeFZJO/FFMK6Cps
+   YtqWJkEe1pX/iEX8ux/cIL0oHBSB5rLoqC4iFxIfzgMOkKRfdG9wFa2o/
+   mDeCTmKMAvtUNFW9i8ppeGLhufw64GYVzG8LKbz+hTVNj7WINTGAvyeY4
+   I=;
+X-IronPort-AV: E=Sophos;i="6.12,302,1728950400"; 
+   d="scan'208";a="457773324"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-2101.iad2.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jan 2025 01:48:10 +0000
+Received: from EX19MTAUWC001.ant.amazon.com [10.0.21.151:43068]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.63.9:2525] with esmtp (Farcaster)
+ id ba9ef0c5-32ca-4266-805f-ebeaa4ecb28e; Fri, 10 Jan 2025 01:48:09 +0000 (UTC)
+X-Farcaster-Flow-ID: ba9ef0c5-32ca-4266-805f-ebeaa4ecb28e
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
+ Fri, 10 Jan 2025 01:48:08 +0000
+Received: from 6c7e67c6786f.amazon.com (10.118.252.101) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
+ Fri, 10 Jan 2025 01:48:05 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>, Simon Horman
+	<horms@kernel.org>
+CC: Xiao Liang <shaw.leon@gmail.com>, Kuniyuki Iwashima <kuniyu@amazon.com>,
+	Kuniyuki Iwashima <kuni1840@gmail.com>, <netdev@vger.kernel.org>
+Subject: [PATCH v2 net 0/3] gtp/pfcp: Fix use-after-free of UDP tunnel socket.
+Date: Fri, 10 Jan 2025 10:47:51 +0900
+Message-ID: <20250110014754.33847-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next v2 00/14] bpf qdisc
-To: Amery Hung <ameryhung@gmail.com>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, daniel@iogearbox.net,
- andrii@kernel.org, alexei.starovoitov@gmail.com, martin.lau@kernel.org,
- sinquersw@gmail.com, toke@redhat.com, jhs@mojatatu.com, jiri@resnulli.us,
- stfomichev@gmail.com, ekarani.silvestre@ccc.ufcg.edu.br,
- yangpeihao@sjtu.edu.cn, xiyou.wangcong@gmail.com, yepeilin.cs@gmail.com
-References: <20241220195619.2022866-1-amery.hung@gmail.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <20241220195619.2022866-1-amery.hung@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D032UWB004.ant.amazon.com (10.13.139.136) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On 12/20/24 11:55 AM, Amery Hung wrote:
-> The implementation of bpf_fq is fairly complex and slightly different from
-> fq so later we only compare the two fifo qdiscs. bpf_fq implements the
-> same fair queueing algorithm in fq, but without flow hash collision
-> avoidance and garbage collection of inactive flows. bpf_fifo uses a single
+Xiao Liang pointed out weird netns usages in ->newlink() of
+gtp and pfcp.
 
-For hash collision, I think you meant >1 tcp_socks having the same hash in patch 
-14? This probably could be detected by adding the sk pointer value to the 
-bpf-map key? not asking to change patch 14 though.
+This series fixes the issues.
 
-For garbage collection, I think patch 14 has it but yes it is iterating the bpf 
-map, so not as quick as doing gc while searching for the sk in the rbtree. I 
-think the only missing piece is being able to iterate the bpf_rb_root, i.e. able 
-to directly search left and right of a bpf_rb_node.
+Link: https://lore.kernel.org/netdev/20250104125732.17335-1-shaw.leon@gmail.com/
 
-> bpf_list as a queue instead of three queues for different priorities in
-> pfifo_fast. The time complexity of fifo however should be similar since the
-> queue selection time is negligible.
-> 
-> Test setup:
-> 
->      client -> qdisc ------------->  server
->      ~~~~~~~~~~~~~~~                 ~~~~~~
->      nested VM1 @ DC1               VM2 @ DC2
-> 
-> Throghput: iperf3 -t 600, 5 times
-> 
->        Qdisc        Average (GBits/sec)
->      ----------     -------------------
->      pfifo_fast       12.52 ± 0.26
->      bpf_fifo         11.72 ± 0.32
->      fq               10.24 ± 0.13
->      bpf_fq           11.92 ± 0.64
-> 
-> Latency: sockperf pp --tcp -t 600, 5 times
-> 
->        Qdisc        Average (usec)
->      ----------     --------------
->      pfifo_fast      244.58 ± 7.93
->      bpf_fifo        244.92 ± 15.22
->      fq              234.30 ± 19.25
->      bpf_fq          221.34 ± 10.76
-> 
-> Looking at the two fifo qdiscs, the 6.4% drop in throughput in the bpf
-> implementatioin is consistent with previous observation (v8 throughput
-> test on a loopback device). This should be able to be mitigated by
-> supporting adding skb to bpf_list or bpf_rbtree directly in the future.
-> 
-> * Clean up skb in bpf qdisc during reset *
-> 
-> The current implementation relies on bpf qdisc implementors to correctly
-> release skbs in queues (bpf graphs or maps) in .reset, which might not be
-> a safe thing to do. The solution as Martin has suggested would be
-> supporting private data in struct_ops. This can also help simplifying
-> implementation of qdisc that works with mq. For examples, qdiscs in the
-> selftest mostly use global data. Therefore, even if user add multiple
-> qdisc instances under mq, they would still share the same queue.
 
-Although not as nice as priv_data, I think mq setup with a dedicated queue can 
-be done with bpf map-in-map.
+Changes:
+  v2:
+    * Patch 1
+      * Fix uninit/unused local var
 
-For the cleanup part, it is similar to how the bpf kptr is cleaned up, either 
-the bpf program frees it or the bpf infra will eventually clean it up during the 
-bpf map destruction.
+  v1: https://lore.kernel.org/netdev/20250108062834.11117-1-kuniyu@amazon.com/
 
-For priv_data, I think it could be a useful addition to the bpf_struct_ops. 
-Meaning it should also work for struct_ops other than Qdisc_ops. Then all 
-destruction and free could be done more automatically and seamlessly.
 
-imo, the above improvements can be iterated later on top of the core pieces of 
-this set.
+Kuniyuki Iwashima (3):
+  gtp: Use for_each_netdev_rcu() in gtp_genl_dump_pdp().
+  gtp: Destroy device along with udp socket's netns dismantle.
+  pfcp: Destroy device along with udp socket's netns dismantle.
+
+ drivers/net/gtp.c  | 26 +++++++++++++++++---------
+ drivers/net/pfcp.c | 15 ++++++++++-----
+ 2 files changed, 27 insertions(+), 14 deletions(-)
+
+-- 
+2.39.5 (Apple Git-154)
 
 
