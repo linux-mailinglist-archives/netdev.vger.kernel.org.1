@@ -1,104 +1,103 @@
-Return-Path: <netdev+bounces-156955-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156956-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69CD5A0861B
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 04:57:05 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE03DA0861D
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 04:57:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0DDDD188C6FC
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 03:57:08 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B1E2E7A2518
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 03:57:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FE7D1FECA5;
-	Fri, 10 Jan 2025 03:57:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 035DD1FF7DA;
+	Fri, 10 Jan 2025 03:57:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="hA/Z23WC"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="JEwVuXyb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA993B661
-	for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 03:56:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C26880BEC
+	for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 03:57:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736481420; cv=none; b=tPVsJKTgA/Om/e1SGALmyFNqJXu+vunvgsRBezAeHU5t+rAh8QsShRHC8pTQrUhvXya6KYKxbpr10XLUaTvVKSbJU9HjM0dazIEtDOiOy/Ju7dWjz9M6IG1+pBglnXbHcHHoE02TzCqcuTe8uLc/hDJTaek27VDm2nHXmjx55nQ=
+	t=1736481463; cv=none; b=knZCazISXJqlI3m0e4dY4Tf+uxQLCr5wFiN5lVP9Xv6hbQIXLMgpWJ7UWjQwERtS5WD8n6iiE5lOdy0fXhMi5rQ7KtVkLAx7ykISMD+DPNmU/z8GWv11AzkTXi5P8iCf2Fa3jK2zbkxfnxmI/ZtI88YIubjrx6HRImmuv7bWvyg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736481420; c=relaxed/simple;
-	bh=TNBEXC39S5phR5N9tq4wc30hoScTbrNf7iLU5VckSs4=;
+	s=arc-20240116; t=1736481463; c=relaxed/simple;
+	bh=ATQvAG4jl6T1IQa9pGTQNpqr/TZ2WJ9C0GwKsA8Xsjs=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=NOlzrSF9z2hNvKGOTA8WzodlDDNXWAYsrW+BkKuA/BtivPaL1BPHQLJU4p+hKrhvgayne8s4z3EsbfFDF/jAhgugR4hgprVVe4zYzGw0JP1hLetuDtHQY7hALMWlJumwv776jmFo0Ym/DN0CoXAUQ83AUuR3NZYnU6LZxqYDRb8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=hA/Z23WC; arc=none smtp.client-ip=209.85.214.175
+	 To:Cc:Content-Type; b=UP+HRI2gwytf1Cr4JG6GXAuylqnijXX5wTYQ2lSlIPqXptov2wESSV2FnVCCFaq0MSIBiD1KkonMTpWAsCz+5kyb6uhFkwd5s4Zfy3SCAtiV34CCzXfQOFF7DqKzmJ486g85DXhyZq3hUi59IzErllZjI4viiin5MNJe0T9XeBw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=JEwVuXyb; arc=none smtp.client-ip=209.85.214.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-2165cb60719so28540635ad.0
-        for <netdev@vger.kernel.org>; Thu, 09 Jan 2025 19:56:57 -0800 (PST)
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-2161eb94cceso19574355ad.2
+        for <netdev@vger.kernel.org>; Thu, 09 Jan 2025 19:57:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1736481417; x=1737086217; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1736481462; x=1737086262; darn=vger.kernel.org;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=TNBEXC39S5phR5N9tq4wc30hoScTbrNf7iLU5VckSs4=;
-        b=hA/Z23WCtwxx1tnaUP6lgpgU21tf7tc36LmLo/2Jz5b0yrhpDMz0LrSSvtuTOZXh1e
-         o2diCHYzJkytUjOzxX+y4Kij4QwLzgYINjRjCRVMTTr6TdL4lH5YvIBssT+gIYtJYdVn
-         atHAuH8oTZAM6VjNdeZDVXon+UPWOPs0JNEb0=
+        bh=ATQvAG4jl6T1IQa9pGTQNpqr/TZ2WJ9C0GwKsA8Xsjs=;
+        b=JEwVuXybj8NiNeZ+SfXxsAqYrhFVd/dTZM1KrngPmeKmIzKtg8MwA/QPLY+fySSFr2
+         DKuPWqr7uqT/cRV3mamaaGhntBn6cilAQ3LkIRAaQnlhMcJuNPw8QiJXjQEx9GgxXyXQ
+         JieyJTmisi5ejm+iLwKKYgQ0Ux2qiib5dUsvQ=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736481417; x=1737086217;
+        d=1e100.net; s=20230601; t=1736481462; x=1737086262;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=TNBEXC39S5phR5N9tq4wc30hoScTbrNf7iLU5VckSs4=;
-        b=uJIUIyg1OCk11HonCYgCvFmXlCeQLiY2NX1iZdVzIuVxDFgLHnt61XGBgunfTQ/2XL
-         jAb3mUzKCJRlktPm38gdhEZyJE3OnizmZLKKeAUzliv6F0HnCKoWdtBLCm/QnCiC56mj
-         1PZkCl9d1a4pUqsCcDO42BCPXWMOZ6PHagFggwJ6vRv7tVMNcqILZ0bmlFmjaLtU1gLb
-         s7hSjzCh4D6MjrLmzFg/omJ6FsQ6vl6HR9rzT4qbMjlZQIOdh/Gg3n6YdWcnKQweP9XG
-         CuNrHQ+EVCBUtkDxfkQmeoHml65e59MUGnFzaOL6XO3GxOC9jQWW02vCbI5zk1wrYuvm
-         IEEg==
-X-Forwarded-Encrypted: i=1; AJvYcCVfqLXRGMrKasvl2CwONTvzYCzN4bDRXf3jvXfAHTZtzcuinmhrO1/Peby2gRTCRzkNPUWdqmA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzhtthr7rmlIgOB+0+A81iPLKsMUqelRJ8hE3IrgO33LDVJhxvq
-	i7Y4QRX+Gnfa9OvAcPuvqKkyjTIH6xv76G4PYUTZKqwqkhQWRFKO79pNyXjszJvtpBq1aEIE/cE
-	qJgQViuOVBsSP6GnJRA9N/8sfztQe2A7u/yx1
-X-Gm-Gg: ASbGncv15fx10EMymEEMsg9GLxtMT38BzgNvksXE/AcCvTYtqbRZDI0cBSez7kz0GrL
-	k1Og0yBaq1rMwx4thE2w4UA1TrT+65cMyEgOfazI=
-X-Google-Smtp-Source: AGHT+IHNx9Y3XVI+mnqNHU+FVaGtFB4OOGelKJfIuukbM3jZ6jbFY01sjharDA0n4kFNgyMuM2KpBk1kbZO8/LcEU1o=
-X-Received: by 2002:a05:6a00:4ac6:b0:727:3cd0:1167 with SMTP id
- d2e1a72fcca58-72d21fea50emr13852293b3a.21.1736481416755; Thu, 09 Jan 2025
- 19:56:56 -0800 (PST)
+        bh=ATQvAG4jl6T1IQa9pGTQNpqr/TZ2WJ9C0GwKsA8Xsjs=;
+        b=MEKonRjJ4nI7kUgDAiXhoOOxKZcD4T8X9bngWSToctQwVW53+O7ovMQU4gUCf3Avh1
+         +Amw4v09yUFzuJao3z0SOzf163KDxS3CDWLsKl7HYtqKiNuwn5h2EyD6q98HRdSJnTrS
+         xgsMmHIydKH+1sBsZApiddjP79zLR1y/BXh2pPn7qec4HoSDfXBGq6KEvk2Ef1B3vxa8
+         mKwYUfN/mbmpa1qQhNuBzPvZz1fNLNIXDPI3vENCdTtt62o0pbqHmDtbZXd4CMGd/dLQ
+         lboRaZCKWd2WQwY+x6pzwovuKCpVWeNS7+wWrDxAx3ptArS97QHfQBmlz2f3qfxVirSo
+         qdgQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVjabsckEQ+IIzSoUFB7OcYsIJzYZ/70VEf+nSVNBO0A1rECvbO7sjNmvF9+U2D7HYWCvO0rdo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw8jre45WtnIeVYRdfc5X6M12Dh5lf3QDzBpv5DhM80FgldG3HX
+	I2e15CRQslzY5w31gfQsDZS1VwDn9f+dHNivTTjpnDSsVPoCVPGvGzlB+k1uI2AL3mhWpK5v3C5
+	etamr9+AUQ5geR4Jfod102cKai9iRvQSkAeLs
+X-Gm-Gg: ASbGncsIs5lnSgwRVggQpcOTH6hQIbYULEo4nvDdJX/629oSDXwEzUb2+8usgfVeRAL
+	A34eAKovucEPYi0MaWiH6+E3LIdyldHw2qcFd0To=
+X-Google-Smtp-Source: AGHT+IGg9M3nkVk0Pa99bdhlY/I8a6SaRcV+JP7DZw/JIVNRAHEJPuLnRxZXIK8CJPWPrEP4xkhp8ZTfHJSzsRpKS44=
+X-Received: by 2002:a05:6a00:948a:b0:725:f1b1:cbc5 with SMTP id
+ d2e1a72fcca58-72d21f7e7c3mr12796158b3a.3.1736481461945; Thu, 09 Jan 2025
+ 19:57:41 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250109204231.1809851-1-tariqt@nvidia.com> <20250109204231.1809851-4-tariqt@nvidia.com>
-In-Reply-To: <20250109204231.1809851-4-tariqt@nvidia.com>
+References: <20250109204231.1809851-1-tariqt@nvidia.com> <20250109204231.1809851-5-tariqt@nvidia.com>
+In-Reply-To: <20250109204231.1809851-5-tariqt@nvidia.com>
 From: Kalesh Anakkur Purayil <kalesh-anakkur.purayil@broadcom.com>
-Date: Fri, 10 Jan 2025 09:26:43 +0530
-X-Gm-Features: AbW1kvbhJK9SzyBqE5tQ5eti7fFXgFvD1s2rf9p84pZRVkOD8zjEPZuBgSVLBIk
-Message-ID: <CAH-L+nPPYn0QimQrx3MDer7krmH8ieNLb71jPr4-c32UeZUODw@mail.gmail.com>
-Subject: Re: [PATCH mlx5-next 3/4] net/mlx5: SHAMPO: Introduce new SHAMPO
- specific HCA caps
+Date: Fri, 10 Jan 2025 09:27:28 +0530
+X-Gm-Features: AbW1kvajPJMiyQ0iIHX9Rc2DERHzCtWAHpdhxXmhdUpnBjpGqVi764phMGr9KUo
+Message-ID: <CAH-L+nO1PdXK6jCkn_fvi3OSjWqKp4aun44+f1fsZuUC1SWJGg@mail.gmail.com>
+Subject: Re: [PATCH mlx5-next 4/4] net/mlx5: Add nic_cap_reg and vhca_icm_ctrl registers
 To: Tariq Toukan <tariqt@nvidia.com>
 Cc: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>, 
 	Jason Gunthorpe <jgg@nvidia.com>, netdev@vger.kernel.org, linux-rdma@vger.kernel.org, 
 	Jakub Kicinski <kuba@kernel.org>, Gal Pressman <gal@nvidia.com>, Mark Bloch <mbloch@nvidia.com>, 
-	Moshe Shemesh <moshe@nvidia.com>, Dragos Tatulea <dtatulea@nvidia.com>
+	Moshe Shemesh <moshe@nvidia.com>, Akiva Goldberger <agoldberger@nvidia.com>
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000052855062b5216c0"
+	boundary="000000000000b687ef062b521898"
 
---000000000000052855062b5216c0
+--000000000000b687ef062b521898
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
 On Fri, Jan 10, 2025 at 2:14=E2=80=AFAM Tariq Toukan <tariqt@nvidia.com> wr=
 ote:
 >
-> From: Saeed Mahameed <saeedm@nvidia.com>
+> From: Akiva Goldberger <agoldberger@nvidia.com>
 >
-> Read and cache SHAMPO specific caps for header data split capabilities.
-> Will be used in downstream patch.
+> Add nic_cap_reg and vhca_icm_ctrl registers interfaces for exposing ICM
+> consumption.
 >
-> Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
-> Reviewed-by: Dragos Tatulea <dtatulea@nvidia.com>
+> Signed-off-by: Akiva Goldberger <agoldberger@nvidia.com>
+> Reviewed-by: Moshe Shemesh <moshe@nvidia.com>
 > Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
 
 Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
@@ -108,7 +107,7 @@ Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
 Regards,
 Kalesh AP
 
---000000000000052855062b5216c0
+--000000000000b687ef062b521898
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -180,14 +179,14 @@ a30CvRuhokNO6Jzh7ZFtjKVMzYas3oo6HXgA+slRszMu4pc+fRPO41FHjeDM76e6P5OnthhnD+NY
 x6xokUN65DN1bn2MkeNs0nQpizDqd0QxggJtMIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYD
 VQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25h
 bFNpZ24gMiBDQSAyMDIwAgw3wUUJsDUiPdpordMwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcN
-AQkEMSIEIFbc1HDNXmOFtWrQVHe6iJmwull0NDTazWtZZ1S0HLwoMBgGCSqGSIb3DQEJAzELBgkq
-hkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI1MDExMDAzNTY1N1owaQYJKoZIhvcNAQkPMVwwWjAL
+AQkEMSIEILHryVuSb6sYZcJIbhM+0GRAORcm4B2YtsFEopG1QlsqMBgGCSqGSIb3DQEJAzELBgkq
+hkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI1MDExMDAzNTc0MlowaQYJKoZIhvcNAQkPMVwwWjAL
 BglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG
-9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQBUMNIFnMpM
-WDElwYo3vjt/iSor1X+usMnKIO8hnw96shwoBnOsup9zs3kUQXbqtmTmVAo8vScNFP4DWBVzF7dq
-boAbEkFLu0GoKDuRYrj7CgqjACPslqALAU8RYtX+XXa2097QLR1R3/TZDiFr8mqFuEqmIB5N6Iej
-z/KE4ZSR5sVF1AuvNOwTyfRAoDhqY8w4X1ua5duEcl3eIxFDekztUHBn13IYIoRZdyZoPYKzr31D
-hlsSvxQanAD1ExNxZfJ7Wpjt9Thr7lX74SGIcyG6NvJx7UL+SjpRCzJfs9XcKqvaZfyPY2QD4zol
-ukV5GmWFplFtmRPeMYn1IzRNjNMk
---000000000000052855062b5216c0--
+9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQB+B8LT42A1
+T6Dqyno+nfeSa/c2Cu2FYx5ZAT1/0EsCYaC1rfQ79X9P4LMo/IvTzR5wt2wk6tHXZ6NiMjfC3Tdw
+GhBD4fc80qDibBuzx0of9ltnhe6IXDF2W3L+usTNS/+Wc4owgdgt3GwE6KwQ+B5MNrcbbxQOpbom
++CkzFBInTPsaTLcjDEStNNT5UIDre9KiWuCBCHM5jVX++82iIwo4LJm8TNvlE6JXRKZCYpA995wv
+p8taWzNpGYckZCHGQvn5fu+j6+5WLS2HC2stGDg+a8v4qR9C1Wqw3f/NBxFlSzdwyxEQMsGMziHC
+SNQpJhXKjEax50G1BUszGSsLk4kh
+--000000000000b687ef062b521898--
 
