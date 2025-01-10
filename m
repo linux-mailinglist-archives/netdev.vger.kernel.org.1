@@ -1,122 +1,98 @@
-Return-Path: <netdev+bounces-156896-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156897-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD4A9A083CC
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 01:08:54 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 57F7AA083DD
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 01:18:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A15071887E31
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 00:08:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 250C97A056F
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 00:18:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBF91621;
-	Fri, 10 Jan 2025 00:08:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B585F9F8;
+	Fri, 10 Jan 2025 00:18:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fH8/HJ/c"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mVGNX4E7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DE1E161;
-	Fri, 10 Jan 2025 00:08:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B8D329CE7;
+	Fri, 10 Jan 2025 00:18:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736467729; cv=none; b=LOmRYvB8sO2FUE9kOf4gACGwhLVgAUXySztb/5j0pWh5fyku2IcpPLWtZCrVrMKDlo3KqFIrfbtPy5lu9EMLNI5wkMfSYbeUdR68RYYBot+DS71k9Xf3Me/95Z7yuHEWxMoxM3Eysssjnqcb945OvoiTZGXegNPDlmHd4tXj6lI=
+	t=1736468308; cv=none; b=MUJ1hSOdWbzRY5tDEZWRnVCSFDA3MERXuJWJk/ch9t5E+mjNDjHmCax+ZBG+yTreToX3/emSaP2w5wgBLIOvkIAytEOld8ZP+kRbR0eJH3X6FHr1480PGdfJLQS7iK+ZfkRsCDVS32+L5pjDs6Zh4JUTi3nrm2EmPW2MfjvHnOc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736467729; c=relaxed/simple;
-	bh=LpU4T6DaL3TYqZnZsYt9+zHKNo+/yDhg0Yk04hh59vU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qPcb8FN8KnI7FAI38piuJRvKn//V6msnbos9yBX3URGF4vPCR/3hbuXrZGnBTcdDvF4hX3pPhnTNIWaC9PvjKXw2GWDBguWa7/VXHYGq0+g9JHPy841pDHt5auT1XjRI+t3o1r0hbSmIqNYu/iOngiTjB2JCSI97+DHIjJZu9jQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fH8/HJ/c; arc=none smtp.client-ip=209.85.218.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-aafc9d75f8bso307203366b.2;
-        Thu, 09 Jan 2025 16:08:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736467726; x=1737072526; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=1gi77FsVTSDY2PGejmDaiqsIfWWJUepdiBPVKpA1a4Q=;
-        b=fH8/HJ/cO+S1bn58kcMMlP9LW1e4p6lryD4jtgxdXknEqvvXbRXduae9uWU9xi622j
-         Ah7B2Pvzkc3blkgWsjH3oXaB7SeQetmYVOl7vKMnpflNUqrwFhc8joQsw0XCbXD5a7DX
-         8dn/mvabJgklzKwMpXbHDYt0SjbYzl8i6/QytmoPGY6jK7Qg68KszOQHiQ53OrjnTwL8
-         SroaAiJSd4nq7vKhSVRC2dgwafbd+xuxEsyy+bOw46bcuwSqfKhzxt6xgArPSHEVFyYR
-         gLgCEM5nz5hPsBJ5jxJDQkFa5i4wnVurU+vqIdphsNIqxYfLAcOuQQ1dUrFp2AXDYFzZ
-         5Z/w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736467726; x=1737072526;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=1gi77FsVTSDY2PGejmDaiqsIfWWJUepdiBPVKpA1a4Q=;
-        b=cST7ym6So+d3xIgW8hwnAp3eG0wFELJB6wGk4DOhbpSfY6OELIzwGIsIwBrxS4wgrI
-         IQDnBmiJDDb5XpnQotHN9Vmr0820B4UqPRWju6eWrC2qitOhmJC+yp/6tPharXmkY+8M
-         tjxkPU2nHI/AcHfQ8I4FrNK7WPppJQQDZCwiMtcTWHr0jYMas2AZX7hIH7NheRVAJLvr
-         g0im4eOltEHOF0xLNVuV37aJTGvCRrOhnY+8uU3XXBU0dOfSP46EDb3IXft8+8fATQpg
-         2Dw8TlUq1jiwWhrPV3lweBGyze7YesisPU7GXaAuf6vxXn8ayQYc+w2H0dS+FB1c+0jy
-         NlTg==
-X-Forwarded-Encrypted: i=1; AJvYcCUn4zE4VQkLceaVaaIv4R+Azd3OpXHpafLL8Jhc/vVptrCpq2CLhRNsVZPrDaA17BhbjELc1PgZ+UFAkzA=@vger.kernel.org, AJvYcCVat448ZcSHy41lPcZDQjP9z1GSUdEdYAkKmdLKDqq5btOpxBCGBdk87HwOmdcc54cNJ8KLtkExeQMCGKvKh4RD@vger.kernel.org, AJvYcCXFjHZZ3C5BVnGD1KHCS0RxzWsicUFH99fh8dwPjulTyNwLPumv7iuvhtvWVHUaDZ7UII81JPmw@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz7Sm/l6oqfkIpz8obx9PgrquIK6s7oeJfHBXGCg25ZeNS3ts5L
-	VpZ7IfLxYbwI53ZzM6UwY9N9473QKTShoAVHx3QsOLzt+avSk40q
-X-Gm-Gg: ASbGnctGGEm9fRR8sbVBrqr/+iFkAW7EkdloLZkcryGi/iKGBmD8r9yxcNB364sQC22
-	Jb9yeWs6UKhRWL1HLmu6+zlSydCw8UQ2DKq6XXqCExMH2GFlrk53mD1ofiO8JWldAdTbgn4CjZ+
-	yhaHcxFVrMx23a8dw0YnNm5DA8cCh64nTzo2tl2JEVisUzJ1KYrp4Xg377SLQpKPeEK1buUcY43
-	nvrYALeI1yPv3lbQ1h+IsVpxyGr/2gbxJ3FMooqsk2f0FKACKYZf2/O8+q4LYPVJDl1Q9wkQTLv
-	FVX6fQPAHupf+xZneD0hIpRH7IRZmUU67JbjS1V3c5Q=
-X-Google-Smtp-Source: AGHT+IH0LN6QHv/PuWuj1kAEYuzbMeSziZOq4c9hDvuDYMGslPC1RtswM1vpV1FdaCivW+ftzY9fLA==
-X-Received: by 2002:a17:906:6a15:b0:aae:8843:9029 with SMTP id a640c23a62f3a-ab2abc91605mr863231766b.48.1736467726100;
-        Thu, 09 Jan 2025 16:08:46 -0800 (PST)
-Received: from alessandro-pc.station (net-2-37-205-162.cust.vodafonedsl.it. [2.37.205.162])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ab2c90638acsm115734466b.20.2025.01.09.16.08.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Jan 2025 16:08:45 -0800 (PST)
-From: Alessandro Zanni <alessandro.zanni87@gmail.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	shuah@kernel.org
-Cc: Alessandro Zanni <alessandro.zanni87@gmail.com>,
-	netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] selftests/net/forwarding: teamd command not found
-Date: Fri, 10 Jan 2025 01:07:44 +0100
-Message-ID: <20250110000752.81062-1-alessandro.zanni87@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1736468308; c=relaxed/simple;
+	bh=XO4//si7CRhEuWaTig7kim5mVTo/v8SrkRAwabOzcQA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=XUuhXnI6BHYQ63rlNl8yFQIyoOQgW4MrCb/nGyL+U8P9n4QbLwqy+KjWfx4qTpdCxZvJvK6ovrVz5Dg2s8uHQxDoAMlLSxZIcgqtU8/eKf8s0ResUqFHWzTHX+nsOFtKhDYFFJ2fiUi6EIdTAo0UtLYaEnMTYleMVdInD5hHZEc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mVGNX4E7; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CE26FC4CED2;
+	Fri, 10 Jan 2025 00:18:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1736468307;
+	bh=XO4//si7CRhEuWaTig7kim5mVTo/v8SrkRAwabOzcQA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=mVGNX4E7JGngZ+ef3EZWmMM7bxIAwsbvifxEcqHbHsqFlhvVAs/tLorLFZnLkKfSf
+	 tZPh+kBA1hgJj1NucTzrhfL3NEEGelBI+9s8d4JzSxknsbL8oOfM5yl2DJP5x81iRs
+	 MMzTlu6duY4dTn/bjfpyk66GLR26p4NA6W7TQ68OwyuRYK5Cokovc6P7xAb5Y1h0zd
+	 rOiI82dEPF7ku0aI9L6U6/nxnIhYk9hRKchtyDdLJBTP8zueIeZQ32sG8Z7HFOKYQW
+	 SSqCqGAwZF6PbWeQ7Vat3fvkOyMW9+kxhPpxASWO7yo+OqKNTsctxzjcCwLvXw8DfI
+	 jZ4H0xrvAWTNg==
+Date: Thu, 9 Jan 2025 16:18:25 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Carlos Llamas <cmllamas@google.com>
+Cc: Li Li <dualli@chromium.org>, dualli@google.com, corbet@lwn.net,
+ davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ donald.hunter@gmail.com, gregkh@linuxfoundation.org, arve@android.com,
+ tkjos@android.com, maco@android.com, joel@joelfernandes.org,
+ brauner@kernel.org, surenb@google.com, arnd@arndb.de, masahiroy@kernel.org,
+ bagasdotme@gmail.com, horms@kernel.org, linux-kernel@vger.kernel.org,
+ linux-doc@vger.kernel.org, netdev@vger.kernel.org, hridya@google.com,
+ smoreland@google.com, kernel-team@android.com
+Subject: Re: [PATCH v11 2/2] binder: report txn errors via generic netlink
+Message-ID: <20250109161825.62b31b18@kernel.org>
+In-Reply-To: <Z4BZjHjfanPi5h9W@google.com>
+References: <20241218203740.4081865-1-dualli@chromium.org>
+	<20241218203740.4081865-3-dualli@chromium.org>
+	<Z32cpF4tkP5hUbgv@google.com>
+	<Z32fhN6yq673YwmO@google.com>
+	<CANBPYPi6O827JiJjEhL_QUztNXHSZA9iVSyzuXPNNgZdOzGk=Q@mail.gmail.com>
+	<Z4Aaz4F_oS-rJ4ij@google.com>
+	<Z4Aj6KqkQGHXAQLK@google.com>
+	<CANBPYPjvFuhi7Pwn_CLArn-iOp=bLjPHKN0sJv+5uoUrDTZHag@mail.gmail.com>
+	<20250109121300.2fc13a94@kernel.org>
+	<Z4BZjHjfanPi5h9W@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Running "make kselftest TARGETS=net/forwarding" results in several
-occurrences of the same error:
- ./lib.sh: line 787: teamd: command not found
+On Thu, 9 Jan 2025 23:19:40 +0000 Carlos Llamas wrote:
+> On Thu, Jan 09, 2025 at 12:13:00PM -0800, Jakub Kicinski wrote:
+> > On Thu, 9 Jan 2025 11:48:24 -0800 Li Li wrote:  
+> > > Cleaning up in the NETLINK_URELEASE notifier is better since we
+> > > register the process with the netlink socket. I'll change the code
+> > > accordingly.  
+> > 
+> > Hm. Thought I already told you this. Maybe I'm mixing up submissions.
+> > 
+> > Please the unbind callback or possibly the sock priv infra
+> > (genl_sk_priv_get, sock_priv_destroy etc).  
+> 
+> Sorry, it was me that suggested NETLINK_URELEASE. BTW, I did try those
+> genl_family callbacks first but I couldn't get them to work right away
+> so I moved on. I'll have a closer look now to figure out what I did
+> wrong. Thanks for the suggestion Jakub!
 
-Since many tests depends on teamd, this fix stops the tests if the
-teamd command is not installed.
-
-Signed-off-by: Alessandro Zanni <alessandro.zanni87@gmail.com>
----
- tools/testing/selftests/net/forwarding/lib.sh | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/tools/testing/selftests/net/forwarding/lib.sh b/tools/testing/selftests/net/forwarding/lib.sh
-index 7337f398f9cc..a6a74a4be4bf 100644
---- a/tools/testing/selftests/net/forwarding/lib.sh
-+++ b/tools/testing/selftests/net/forwarding/lib.sh
-@@ -784,6 +784,7 @@ team_destroy()
- {
- 	local if_name=$1; shift
- 
-+	require_command $TEAMD
- 	$TEAMD -t $if_name -k
- }
- 
--- 
-2.43.0
-
+Hm, that's probably because there is no real multicast group here :(
+genl_sk_priv_get() and co. may work better in that case.
+your suggestion of NETLINK_URELEASE may work too, tho, I think it's 
+the most error prone
 
