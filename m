@@ -1,130 +1,191 @@
-Return-Path: <netdev+bounces-157182-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157183-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D92B9A093A1
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 15:35:32 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A21BEA093B3
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 15:42:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BA2F31882741
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 14:35:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 11810165106
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 14:42:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 000C4211269;
-	Fri, 10 Jan 2025 14:35:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60CBB211283;
+	Fri, 10 Jan 2025 14:42:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K3nviM/P"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e/NoMVKP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
+Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DEF820FABA;
-	Fri, 10 Jan 2025 14:35:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BB5D20E709
+	for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 14:42:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736519728; cv=none; b=mknoa8G5ZCdrpO6Ae9k8J6VI1aQ1wA8YzTfmEuVyXz5luMpV3MKZAj5R3+w1u3eeOvwzL2q3reIuuLf3WT8yK/s3ZCNDR+mESX7UTFUemHXtIqF8yIf8+VH7Y5sqX0//CjJpHfxgy90T+BRzixHKd2cE617eUz4CfC2pgXw7fmo=
+	t=1736520122; cv=none; b=WR+ruAt1lyWq1auwufrScmd7OdcHDhMgpA99hHSWpv/k2CtYE3/HgWY53UQyw8Abz6yr8aWUvNFjLS/bFgO6H2arS39FRuV5qD/6JLRY49kQkPlWJzi2ZGMsumC+uGHvizC2x7ilRumPqq2xoXX8SO/Uy6vbvfq0YHBtE6ED+Xg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736519728; c=relaxed/simple;
-	bh=VwZAwlQ05j9JCSRqtCgH/3hOTx/jyPGLqe03SRJTzpc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=vFu9u8rywIVq3GkoVtTc4cI/2KNlCqNmiVWMxxzQABjqYZ6ChHH6J9R7Depe8tjbZQeXY+otdjiuMXjlyOv4S89Q4wyVP3f4tJCQsvQF7M2svruakdvLOwqTMn3b02eOfFvUxavKz+rQhPvWs6Is3GscJDhmakoPNO1GlvH2PsQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=K3nviM/P; arc=none smtp.client-ip=209.85.221.53
+	s=arc-20240116; t=1736520122; c=relaxed/simple;
+	bh=DB2YuAAcamyIpHI5F3IkHc3Clmkq7ng78Sd28jLZY/s=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=n5RUVuPpRiQOEmASPFHyPGUoDnznZuinur/S4OfxCQS7/pab7Q41WNRMS9fl0R1wVVGbmr+LT4+StSXd0TD7aqseupTeQC3gUPzoI0hea/dkGKWwarvAmw54wsC74kidvX9UqgHgr+N7ZDMgqRxMjzgHP3OonvpVaE9Mc8JgG6A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=e/NoMVKP; arc=none smtp.client-ip=209.85.221.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-3862f32a33eso995602f8f.3;
-        Fri, 10 Jan 2025 06:35:26 -0800 (PST)
+Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-385f06d0c8eso1194722f8f.0
+        for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 06:42:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736519725; x=1737124525; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=nxjyU8yZswI0rAK4YmLu8c0WjZr5aARNDWVbS1xSnog=;
-        b=K3nviM/PqDd124BK3prWBvCZr7xPBSPKVkd52o4Wgm1CTjDud0UMBLCPm1kIFmGxQB
-         EhgKxSkqjascsmqxSDUdYSnMv9+U9EuA9ALpGw2JhEl5iKC+E7vnvjr7hWtgC646EYaj
-         aAwyfqMv4YqdVtALTq8lFQsI+xoBr/QDLORsuAxelQgPSPd7RIo9vWk5OcnXxA+dfb0A
-         DeWChA/xJHJBhaRPqCCsCLGgbk3msmu97R4eDc7RMMLK4dcCwMegKTbS+1Q3XIiAzU7S
-         JXRe1rdaaH0JuC4l44gOIpR6zfE4X6cePNW34CxthKibdxalrxTpGIMhqWqz7PFmwkSA
-         L9dg==
+        d=gmail.com; s=20230601; t=1736520118; x=1737124918; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=6MRiiaRK258ydTWiZWoWPdA3I8IQgxz+CpKKGOYygww=;
+        b=e/NoMVKPb4LXNYzMn66lMxwJ7e5Bzm005Ohet6joWDfVC+AjA8Jx6QxpQ+5maS/s5n
+         BuTrxgnnM0gKnWlokV8nqHY9cMYV0KjFvX9ENcsR5TSbiE+uDEHh5aHGzGGi3qdCmtxH
+         vaDGNeVs42e7KP5+KoAPSZa6CPY5oAr8XThlr2hy+KyeKW/tYNflBLCdBF81t/BH/deu
+         68a3Jgyt8iG8gW5Oz16L4C9HI0ZmdaDyOf2676HDVf05nBUfO5yODn5ZKeDQCLND2u1a
+         8+7zWZyAg0hUsvvo6h/bavYOc1Do7kg7p8JLfn+AMNuRbUb07MEX/FVOKxp2YkBcBHP0
+         cL4w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736519725; x=1737124525;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nxjyU8yZswI0rAK4YmLu8c0WjZr5aARNDWVbS1xSnog=;
-        b=fOYB8W/Du8t06m1tVHoAir8SIOvi2rLW/CXCrkKtQlDpcFm2CZbP0AvjtRJ30jW/4D
-         scE/wFkXQoMKr0G1Of4ZoJq3VxcWgQjAcsfRSJ97o4vjW176JSIk+hsSzFOUMc/oQbZn
-         GNwqTO9Q+d+tMTCd1/D1wXuRBW+iu/TwSFEJMGEv3g9RUAH2liPEyr/nT1k2qnbnared
-         ILcN5a1cBY/pw/jzmsm2XcDLuU2vhpywN/4g3jUJQVNeQgywAyg9Uo7D+ay+4u04yzD/
-         DNuvQnzDodQL/qT4WMBvGawejTmy+T16d5yLrDptBkLM7qjtpaco+5Cav3T2fOuwfmDI
-         9kKg==
-X-Forwarded-Encrypted: i=1; AJvYcCVtR6nLh0ldGU9whDDVQSBWkLJXk1jmoDe4551SnJL7VYJM7VDh4ilMRmRwXr1m6ImUQSuM6eni@vger.kernel.org, AJvYcCVuqMliUi+vxJVg6HRzid6MDcS2R5cmLsJLBYu9QmGLR2NkFsbxrvyXXv3Hv+XC229kbFq2a4FI3BsXiuMspeQW@vger.kernel.org, AJvYcCWLf8FSONWV+w/M6auL0oxQOIY9UMCCu5JZj98zfR7MuqXTy9xvoncwrDwb3/TBb2tZfolDdtDZnqcdhDc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwaXLDecXHSzAkmhUtBzwc37oFclAq3byZWF7m8xWOaKw/6pA2q
-	x43wpGy+nKjuslIPB8Jgh7cgE/3L9W1mlkgIqwIpG/p+8e0vK5UZ
-X-Gm-Gg: ASbGnctBYqD7CyZ5k8OkLGyqr3JUib9sxqY5oo5zqKeBNH9gtgGwuXuwDxSEVhpB0ms
-	toujLMSk0K1UO94nRX4Hs3/fucRZ3DDiNLYJ3Zt2ZziKmpUyB8VqnYRl+kDxEgu6EDrg5WP++0M
-	22snMQajKlQDHC99Yjj3fS++c63nwBb3gZAJXaDmL/Ind6zLU2otC46EANPFDDP4Tw381WM8PVj
-	i1G71Cos7tuOgHjizjZ8+3lQKQg7KcVkkMth3vGieiHFCY8Ul41b4VzTsoraBdvXv9UlTa9qlkC
-	dDZOTgL0NqiNlUP2Idur4B6hP0sgw5HX
-X-Google-Smtp-Source: AGHT+IFzx2a/VwoogHps3IEtSZK03mUfkTAD/RdWr5SZo8aKa+CaHEX1W2HVTzEv2c338yV3wZlXyA==
-X-Received: by 2002:a5d:648b:0:b0:386:3e3c:ef1 with SMTP id ffacd0b85a97d-38a87312f36mr11033177f8f.35.1736519725236;
-        Fri, 10 Jan 2025 06:35:25 -0800 (PST)
-Received: from alessandro-pc (net-2-37-205-162.cust.vodafonedsl.it. [2.37.205.162])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38a8e38c6dbsm4773693f8f.55.2025.01.10.06.35.24
+        d=1e100.net; s=20230601; t=1736520118; x=1737124918;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=6MRiiaRK258ydTWiZWoWPdA3I8IQgxz+CpKKGOYygww=;
+        b=Kkj3zyU8y9r7b+tWOHtlyxI+gg915GYuJcargCLAJnzB6beM9q7NpShH8J5J6XP9nC
+         llWFdR29uVl/4ezCaP8hop95aWYinkKhzYslKDwr+WXODnYruwYv6XfOZIEdVsj6tdrT
+         BA9/5ykPCvATKAjMbgOLrh2Vci0uBOfYiZfgSKZqQrovEUKN8BEI0Lz27bFUjREqeUJb
+         Z3g+K3E+A4tgIgSL2NwJ4P/JADSvih0ul8sEw9NLbhjMhkgidmkwhEHd8m+vfL9+VPQb
+         ItZWFO2Ju1euFmL1qFQNy3tjvcZ19lidm+DxLZZDbX4K/0pMJObsetQgCpcnVE9wRcaD
+         E8NA==
+X-Gm-Message-State: AOJu0Yx5hbHqZU14IApV5CxTrNWDS8C6aLKtZj3acHkcEbUsh/uZJoon
+	r/egKAgAFtOc/lqfHxpsXMi79Ywf+iLbJbrYPBa69Ad30SwN8yXRXwhDvA==
+X-Gm-Gg: ASbGnctdBRtAEkrP0HxVd7cr4yEzfXjP0cVNyqiyEuoNQtwcmdIRN3AazC/p7eVR3SS
+	ghAhLHm/5TeyLNPfaBD8nRC+Z0ZvKlzUbtu76723vmkZQewbnBtkzHyRqvEe9M1UneZatJccUd3
+	gfuFi89xeKWHW6yiZqaopchHKLl6f8NS/Quy7BNCjQk1sX6kem9Z6MfxusEAx1JBlWpOi+Pvx0z
+	ff+mkzddCazCT9MJMLh476WvItG28WehcIKoSnaZVjj7DxpmEinla3d+TZCeC6VrBfDMMAN884=
+X-Google-Smtp-Source: AGHT+IFWOp4k9NyOv9fdHi8spOXPm7cFvPwBISGGLzGHqQlFpd98c/Ow7nwMpxt6+lwkUGfFcG/bYQ==
+X-Received: by 2002:a5d:64cb:0:b0:385:ee40:2d88 with SMTP id ffacd0b85a97d-38a872d2a11mr9545507f8f.3.1736520117903;
+        Fri, 10 Jan 2025 06:41:57 -0800 (PST)
+Received: from imac.lan ([2a02:8010:60a0:0:a9f1:3595:7617:6954])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-436e2ddca2dsm88602265e9.21.2025.01.10.06.41.56
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 Jan 2025 06:35:24 -0800 (PST)
-Date: Fri, 10 Jan 2025 15:35:23 +0100
-From: Alessandro Zanni <alessandro.zanni87@gmail.com>
-To: Hangbin Liu <liuhangbin@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, shuah@kernel.org, netdev@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] selftests/net/forwarding: teamd command not found
-Message-ID: <s564xh7c2xtmjz2cfwqq3zl4krjxiy4hqjeuvjpa6uhabcgvcb@k662t5irg2yi>
-References: <20250110000752.81062-1-alessandro.zanni87@gmail.com>
- <Z4CdYzmSn2cySE_h@fedora>
+        Fri, 10 Jan 2025 06:41:57 -0800 (PST)
+From: Donald Hunter <donald.hunter@gmail.com>
+To: netdev@vger.kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Jan Stancek <jstancek@redhat.com>,
+	Jiri Pirko <jiri@resnulli.us>
+Cc: donald.hunter@redhat.com,
+	Donald Hunter <donald.hunter@gmail.com>
+Subject: [PATCH net-next v1 1/2] tools/net/ynl: add support for --family and --list-families
+Date: Fri, 10 Jan 2025 14:41:44 +0000
+Message-ID: <20250110144145.3493-1-donald.hunter@gmail.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z4CdYzmSn2cySE_h@fedora>
+Content-Transfer-Encoding: 8bit
 
-On Fri, Jan 10, 2025 at 04:09:07AM +0000, Hangbin Liu wrote:
-> On Fri, Jan 10, 2025 at 01:07:44AM +0100, Alessandro Zanni wrote:
-> > Running "make kselftest TARGETS=net/forwarding" results in several
-> > occurrences of the same error:
-> >  ./lib.sh: line 787: teamd: command not found
-> > 
-> > Since many tests depends on teamd, this fix stops the tests if the
-> > teamd command is not installed.
-> > 
-> > Signed-off-by: Alessandro Zanni <alessandro.zanni87@gmail.com>
-> > ---
-> >  tools/testing/selftests/net/forwarding/lib.sh | 1 +
-> >  1 file changed, 1 insertion(+)
-> > 
-> > diff --git a/tools/testing/selftests/net/forwarding/lib.sh b/tools/testing/selftests/net/forwarding/lib.sh
-> > index 7337f398f9cc..a6a74a4be4bf 100644
-> > --- a/tools/testing/selftests/net/forwarding/lib.sh
-> > +++ b/tools/testing/selftests/net/forwarding/lib.sh
-> > @@ -784,6 +784,7 @@ team_destroy()
-> >  {
-> >  	local if_name=$1; shift
-> >  
-> > +	require_command $TEAMD
-> >  	$TEAMD -t $if_name -k
-> >  }
-> 
-> I saw team_create() has `require_command $TEAMD`. Is some test called
-> team_destroy() before team_create()?
+Add a --family option to ynl to specify the spec by family name instead
+of file path, with support for searching in-tree and system install
+location and a --list-families option to show the available families.
 
-Actually, the errors seem to raise in the "cleanup()" method.
+./tools/net/ynl/pyynl/cli.py --family rt_addr --dump getaddr
 
-So, first, during the test preparation the "team_create()" method is called
-and checks if teamd is installed. 
-When it fails and skips the test, the "cleanup()" method calls
-the "team_destroy()" that raises the errors.
+Signed-off-by: Donald Hunter <donald.hunter@gmail.com>
+---
+ tools/net/ynl/pyynl/cli.py | 44 ++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 42 insertions(+), 2 deletions(-)
+
+diff --git a/tools/net/ynl/pyynl/cli.py b/tools/net/ynl/pyynl/cli.py
+index 41d9fa5c818d..70dd8bf7512b 100755
+--- a/tools/net/ynl/pyynl/cli.py
++++ b/tools/net/ynl/pyynl/cli.py
+@@ -3,6 +3,7 @@
+ 
+ import argparse
+ import json
++import os
+ import pathlib
+ import pprint
+ import sys
+@@ -10,6 +11,23 @@ import sys
+ sys.path.append(pathlib.Path(__file__).resolve().parent.as_posix())
+ from lib import YnlFamily, Netlink, NlError
+ 
++sys_schema_dir='/usr/share/ynl'
++relative_schema_dir='../../../../Documentation/netlink'
++
++def schema_dir():
++    script_dir = os.path.dirname(os.path.abspath(__file__))
++    schema_dir = os.path.abspath(f"{script_dir}/{relative_schema_dir}")
++    if not os.path.isdir(schema_dir):
++        schema_dir = sys_schema_dir
++    if not os.path.isdir(schema_dir):
++        raise Exception(f"Schema directory {schema_dir} does not exist")
++    return schema_dir
++
++def spec_dir():
++    spec_dir = schema_dir() + '/specs'
++    if not os.path.isdir(spec_dir):
++        raise Exception(f"Spec directory {spec_dir} does not exist")
++    return spec_dir
+ 
+ class YnlEncoder(json.JSONEncoder):
+     def default(self, obj):
+@@ -32,7 +50,14 @@ def main():
+ 
+     parser = argparse.ArgumentParser(description=description,
+                                      epilog=epilog)
+-    parser.add_argument('--spec', dest='spec', type=str, required=True)
++    spec_group = parser.add_mutually_exclusive_group(required=True)
++    spec_group.add_argument('--family', dest='family', type=str,
++                            help='name of the netlink FAMILY')
++    spec_group.add_argument('--list-families', action='store_true',
++                            help='list all available netlink families')
++    spec_group.add_argument('--spec', dest='spec', type=str,
++                            help='choose the family by SPEC file path')
++
+     parser.add_argument('--schema', dest='schema', type=str)
+     parser.add_argument('--no-schema', action='store_true')
+     parser.add_argument('--json', dest='json_text', type=str)
+@@ -70,6 +95,12 @@ def main():
+         else:
+             pprint.PrettyPrinter().pprint(msg)
+ 
++    if args.list_families:
++        for filename in sorted(os.listdir(spec_dir())):
++            if filename.endswith('.yaml'):
++                print(filename.removesuffix('.yaml'))
++        return
++
+     if args.no_schema:
+         args.schema = ''
+ 
+@@ -77,7 +108,16 @@ def main():
+     if args.json_text:
+         attrs = json.loads(args.json_text)
+ 
+-    ynl = YnlFamily(args.spec, args.schema, args.process_unknown,
++    if args.family:
++        spec = f"{spec_dir()}/{args.family}.yaml"
++        if args.schema is None:
++            args.schema = ''
++    else:
++        spec = args.spec
++    if not os.path.isfile(spec):
++        raise Exception(f"Spec file {spec} does not exist")
++
++    ynl = YnlFamily(spec, args.schema, args.process_unknown,
+                     recv_size=args.dbg_small_recv)
+     if args.dbg_small_recv:
+         ynl.set_recv_dbg(True)
+-- 
+2.47.1
 
 
