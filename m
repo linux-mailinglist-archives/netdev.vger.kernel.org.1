@@ -1,194 +1,104 @@
-Return-Path: <netdev+bounces-157269-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157270-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C1F2BA09C83
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 21:36:31 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 59B33A09CD5
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 22:11:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7F8A8188F69C
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 20:36:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2806C188B945
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 21:11:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B138216394;
-	Fri, 10 Jan 2025 20:36:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6455A2080C7;
+	Fri, 10 Jan 2025 21:11:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="W7WLw5yK"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="ywgPJBKk"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFC1017F4F2
-	for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 20:36:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFA74206F33;
+	Fri, 10 Jan 2025 21:11:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736541382; cv=none; b=gLUa1UYuQOGZbs7ua4gjcsMc/8/6I3OO0il6T1+zqehAnuB4dCec4MC/81bYATocOgMnHuvjkT4e49Xcyt2ZWopLt+Jii5atSLoKVSnbFllxDO3KJmyyGc7RPYMGNPsc6WGGTTzyB9Gha9j0cNHVCm5a2dWzVFo2RI+m3vR3Cn0=
+	t=1736543470; cv=none; b=mapiN7RG481m8qr7PzAxkqLlz044k1rO50pb/1qDB1Z+iQ8dR2w304IoE89aB1N2UacKy+MQYA9smOfeQuiac2TeUoXUWQ1/zPUIOsgZuInU8C2ZpAjqsBegmbIqZvSrXsXiPzXmyyLnWwRBjhdVZJq6I0Lo9fDWu6AL6k8oJww=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736541382; c=relaxed/simple;
-	bh=BZdSok9f0meTDSP3Jg10Byz5VF4Lmr6GW56mmZpWeF8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=t/UxC6JBdfJODM+y4uicjuzyRsxwhnCP5BSR4UVYLwFtF0iAxpBbXNqw87cQYeQVvr8tqsnTLZXnE1rB/m1r3Fhk0kWkF+YgQ4tMgVMQoLDo7Nn5Dpjp97AAb+L3q6xJyZ+ysA2EBvOh3P3L5t7/H1ane6K6eBG0U5OP4naa9o8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=W7WLw5yK; arc=none smtp.client-ip=91.218.175.185
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <13c5a76b-0635-42ed-8dfa-4f656a03a564@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1736541366;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=fwTQN/pQB2BWOlmjlcqzPPtf3JOgHNG/OoTOYZ4cqBk=;
-	b=W7WLw5yK/CAAq5XOdVTYJi+j2GDfTrhP/mfD6We8UgqjoWrc4reXyavXTJJkIg5baCjyit
-	5j8TEmB2EsNQJarD/DJu94gu4+lRTBSU3QW8o9MHbK2kh+La8MkhpLquC4KaGhpBjOLMXC
-	EeVVUukjDCaUWWlL2jGlSm4jI98N2wY=
-Date: Fri, 10 Jan 2025 12:35:57 -0800
+	s=arc-20240116; t=1736543470; c=relaxed/simple;
+	bh=nhyefq/M1I5R1C/jhXDtDdnGJ1jbIukA1QzXV8qJRiM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iFYslEsPR3tTfgGkG4QbuI38nmZaLGK1A/z6f+wI6qDeIs0yoZeNUEfFvqU6BDSMDpVZsA3E8wqtGGqGPF4Ek2F06SDXxdpqJVWp7bF4qnaA+8GkfvWun7XWv2BmMX8SzRfhuZXdaxt76lP52nEAEnfUNtbm5fOV2oMdt03+dts=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=ywgPJBKk; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=A6gCHdvtOPxKY5f3gOlIBM7+RIbHqchd5puNoKZYZRM=; b=ywgPJBKkc5zJIk5ofNkxqcZkH4
+	sBqqdj6xASmrbwNB7aNgGYxpqrlGf6ewpM3IKdK5mMbwpCjFOEOiIerlwSO8Cz7jm2+7lZ9vVlY0o
+	yalMj14CMagdpD45XIwxeDikjskz04wG6AdJsYT5BFVHHl5JDUJsXCLGh+flaC0EbooY=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tWMHR-003Lnm-4b; Fri, 10 Jan 2025 22:10:57 +0100
+Date: Fri, 10 Jan 2025 22:10:57 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Russell King - ARM Linux <linux@armlinux.org.uk>,
+	Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+	David Miller <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-hwmon@vger.kernel.org" <linux-hwmon@vger.kernel.org>,
+	Guenter Roeck <linux@roeck-us.net>,
+	Jean Delvare <jdelvare@suse.com>
+Subject: Re: [PATCH net-next 3/3] net: phy: realtek: add hwmon support for
+ temp sensor on RTL822x
+Message-ID: <8d052f8f-d539-45ba-ba21-0a459057f313@lunn.ch>
+References: <3e2784e3-4670-4d54-932f-b25440747b65@gmail.com>
+ <dbfeb139-808f-4345-afe8-830b7f4da26a@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next v4 10/11] net-timestamp: export the tskey for TCP
- bpf extension
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, dsahern@kernel.org, willemdebruijn.kernel@gmail.com,
- willemb@google.com, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
- eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev,
- john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me,
- haoluo@google.com, jolsa@kernel.org, bpf@vger.kernel.org,
- netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
-References: <20241207173803.90744-1-kerneljasonxing@gmail.com>
- <20241207173803.90744-11-kerneljasonxing@gmail.com>
- <9f5081bb-ed66-4171-acef-786ae02cf69c@linux.dev>
- <CAL+tcoCSrBBaW3Rg1hD0mBAGu_ZTCTfjVBGe_7B=_JB+uJTuYA@mail.gmail.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <CAL+tcoCSrBBaW3Rg1hD0mBAGu_ZTCTfjVBGe_7B=_JB+uJTuYA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <dbfeb139-808f-4345-afe8-830b7f4da26a@gmail.com>
 
-On 1/7/25 8:21 PM, Jason Xing wrote:
-> Hi Martin,
-> 
->>> -     bpf_skops_tx_timestamping(sk, skb, op, 2, args);
->>> +     if (sk_is_tcp(sk))
->>> +             args[2] = skb_shinfo(skb)->tskey;
->>
->> Instead of only passing one info "skb_shinfo(skb)->tskey" of a skb, pass the
->> whole skb ptr to the bpf prog. Take a look at bpf_skops_init_skb. Lets start
->> with end_offset = 0 for now so that the bpf prog won't use it to read the
->> skb->data. It can be revisited later.
->>
->>          bpf_skops_init_skb(&sock_ops, skb, 0);
->>
->> The bpf prog can use bpf_cast_to_kern_ctx() and bpf_core_cast() to get to the
->> skb_shinfo(skb). Take a look at the md_skb example in type_cast.c.
-> 
-> In recent days, I've been working on this part. It turns out to be
-> infeasible to pass "struct __sk_buff *skb" as the second parameter in
-> skops_sockopt() in patch [11/11]. I cannot find a way to acquire the
-> skb itself
+> - over-temp alarm remains set, even if temperature drops below threshold
 
-I didn't mean to pass skb in sock_ops_kern->args[] or pass skb to the bpf prog
-"SEC("sockops") skops_sockopt(struct bpf_sock_ops *skops, struct sk_buff *skb)".
-The bpf prog can only take one ctx argument which is
-"struct bpf_sock_ops *skops" here.
+> +int rtl822x_hwmon_init(struct phy_device *phydev)
+> +{
+> +	struct device *hwdev, *dev = &phydev->mdio.dev;
+> +	const char *name;
+> +
+> +	/* Ensure over-temp alarm is reset. */
+> +	phy_clear_bits_mmd(phydev, MDIO_MMD_VEND2, RTL822X_VND2_TSALRM, 3);
 
-I meant to have kernel initializing the sock_ops_kern->skb by doing
-"bpf_skops_init_skb(&sock_ops, skb, 0);" before running the bpf prog.
+So it is possible to clear the alarm.
 
-The bpf prog can read the skb by using bpf_cast_to_kern_ctx() and bpf_core_cast().
+I know you wanted to experiment with this some more....
 
-Something like the following. I directly change the existing test_tcp_hdr_options.c.
-It has not been changed to use the vmlinux.h, so I need to redefine some parts of
-the sk_buff, skb_shared_info, and bpf_sock_ops_kern. Your new test should directly
-include <vmlinux.h> and no need to redefine them.
+If the alarm is still set, does that prevent the PHY renegotiating the
+higher link speed? If you clear the alarm, does that allow it to
+renegotiate the higher link speed? Or is a down/up still required?
+Does an down/up clear the alarm if the temperature is below the
+threshold?
 
-Untested code:
+Also, does HWMON support clearing alarms? Writing a 0 to the file? Or
+are they supported to self clear on read?
 
-diff --git i/tools/testing/selftests/bpf/progs/test_tcp_hdr_options.c w/tools/testing/selftests/bpf/progs/test_tcp_hdr_options.c
-index 5f4e87ee949a..c98ebe71f6ba 100644
---- i/tools/testing/selftests/bpf/progs/test_tcp_hdr_options.c
-+++ w/tools/testing/selftests/bpf/progs/test_tcp_hdr_options.c
-@@ -12,8 +12,10 @@
-  #include <linux/types.h>
-  #include <bpf/bpf_helpers.h>
-  #include <bpf/bpf_endian.h>
-+#include <bpf/bpf_core_read.h>
-  #define BPF_PROG_TEST_TCP_HDR_OPTIONS
-  #include "test_tcp_hdr_options.h"
-+#include "bpf_kfuncs.h"
-  
-  #ifndef sizeof_field
-  #define sizeof_field(TYPE, MEMBER) sizeof((((TYPE *)0)->MEMBER))
-@@ -348,9 +350,63 @@ static int current_mss_opt_len(struct bpf_sock_ops *skops)
-  	return CG_OK;
-  }
-  
-+struct sk_buff {
-+	unsigned int		end;
-+	unsigned char		*head;
-+} __attribute__((preserve_access_index));
-+
-+struct skb_shared_info {
-+	__u8		flags;
-+	__u8		meta_len;
-+	__u8		nr_frags;
-+	__u8		tx_flags;
-+	unsigned short	gso_size;
-+	unsigned short	gso_segs;
-+	unsigned int	gso_type;
-+	__u32		tskey;
-+} __attribute__((preserve_access_index));
-+
-+struct bpf_sock_ops_kern {
-+	struct	sock *sk;
-+	union {
-+		__u32 args[4];
-+		__u32 reply;
-+		__u32 replylong[4];
-+	};
-+	struct sk_buff	*syn_skb;
-+	struct sk_buff	*skb;
-+	void	*skb_data_end;
-+	__u8	op;
-+	__u8	is_fullsock;
-+	__u8	remaining_opt_len;
-+	__u64	temp;			/* temp and everything after is not
-+					 * initialized to 0 before calling
-+					 * the BPF program. New fields that
-+					 * should be initialized to 0 should
-+					 * be inserted before temp.
-+					 * temp is scratch storage used by
-+					 * sock_ops_convert_ctx_access
-+					 * as temporary storage of a register.
-+					 */
-+} __attribute__((preserve_access_index));
-+
-  static int handle_hdr_opt_len(struct bpf_sock_ops *skops)
-  {
-  	__u8 tcp_flags = skops_tcp_flags(skops);
-+	struct bpf_sock_ops_kern *skops_kern;
-+	struct skb_shared_info *shared_info;
-+	struct sk_buff *skb;
-+
-+	skops_kern = bpf_cast_to_kern_ctx(skops);
-+	skb = skops_kern->skb;
-+
-+	if (skb) {
-+		shared_info = bpf_core_cast(skb->head + skb->end, struct skb_shared_info);
-+		/* printk as an example. don't do that in selftests. */
-+		bpf_printk("tskey %u gso_size %u gso_segs %u gso_type %u flags %x\n",
-+			   shared_info->tskey, shared_info->gso_size,
-+			   shared_info->gso_segs, shared_info->gso_type, shared_info->flags);
-+	}
-  
-  	if ((tcp_flags & TCPHDR_SYNACK) == TCPHDR_SYNACK)
-  		return synack_opt_len(skops);
+I'm wondering if we are heading towards ABI issues? You have defined:
 
+- over-temp alarm remains set, even if temperature drops below threshold
 
+so that kind of eliminates the possibility of implementing self
+clearing any time in the future. Explicit clearing via a write is
+probably O.K, because the user needs to take an explicit action.  Are
+there other ABI issues i have not thought about.
+
+	Andrew
 
