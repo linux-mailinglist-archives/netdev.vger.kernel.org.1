@@ -1,62 +1,62 @@
-Return-Path: <netdev+bounces-156929-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156930-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6149AA08503
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 02:48:44 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4BB0BA08504
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 02:49:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 29F16188C09E
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 01:48:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 277E33A8D57
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 01:49:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3C7713DDAE;
-	Fri, 10 Jan 2025 01:48:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29DBC18C01D;
+	Fri, 10 Jan 2025 01:49:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="YltssnMN"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="rzDomar+"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80009.amazon.com (smtp-fw-80009.amazon.com [99.78.197.220])
+Received: from smtp-fw-80006.amazon.com (smtp-fw-80006.amazon.com [99.78.197.217])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3323442A99
-	for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 01:48:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.220
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09A9E1C5F19
+	for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 01:49:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.217
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736473720; cv=none; b=peWjud25jF8e3dPVUIKgCa8C37b3U7LK3CUiLCaBittV0W4mukbMS8Bio9HobR9wFBuvR0+FysrdMKCbA3Tr1hSkJ4b5yL6lfZhJuak8xXYZS+Z3CUFQkXR11j18SYx7s5WVPdjaV57vTLN5FFvoxu5LMyaxgtAQsMgzlOM7zhA=
+	t=1736473756; cv=none; b=Tm/8UYEE468l3bTZlyl5iETYv2bHdi2H+AZ/Ea4jIWpzDiG6ukm7EzeGNV5rkCbyJCQZTq3IR2md1ajD1UnoGML7loPz1oq2L/Fsmu1zp1E55QtakLIOmELl05ceBaVhUSFWFeYhL0bU/DYVWL6lP3QOnIYT84U+YXLekg2HkcY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736473720; c=relaxed/simple;
-	bh=50m2pC9NuA/0XhngWGXrvw+rDKZyM6Ad/aJ7t6JcUhw=;
+	s=arc-20240116; t=1736473756; c=relaxed/simple;
+	bh=Y9hs8xYXt2yJAOUUVuxK4j5jrtnIvGLJlQUDseUNulw=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=sU3wrTcLVZiyRa0kwJG0DfnMMoFtRTSXt0d21tHAFktyfdK9w/CYqc3kGQ5+LhsPCy7c0orzUpT2NUNhPWJviSTokZNvI6p/awsPfSGHx5ZScGotDkCmH/QSWXhnHGzlXb26RLC+58P9DiVjTW0x19FzfKB0nd9xmXQcsv/GCmg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=YltssnMN; arc=none smtp.client-ip=99.78.197.220
+	 MIME-Version:Content-Type; b=IvfqAMbtiM7royt0UE0jUjjhZrW6J8QgFnVBlo7Yg/VK5yD47T+5h5B8vR/lb+HjGSyyctYm2GeQsRMwLSNWaDJ7TgXCXA7W6bQXE4S+BWjqxY2jckQDMAADjjWHQqMX6hJGWtdToMMgx+p3aekYyq9qUS+RQcdQxGn/lrFzUpA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=rzDomar+; arc=none smtp.client-ip=99.78.197.217
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1736473719; x=1768009719;
+  t=1736473754; x=1768009754;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=3UUFt//l67m4OlxLv2LFPNm5Aug5HU0n9eHT9CMvQfQ=;
-  b=YltssnMNin86L4rP1zbbv5z66k1ukfg9wAhHGLKZcwrdPEw2aseKP3p3
-   2bx9/zNjTXwV1yHMIDFW8K5Hh7gbqWrKq0E+2sdpxf1ys4JE8IRKPBzh3
-   6SVgJstKQpniCV7xJRilw9sHMGb9mhPSQ9bnk9nH2AWCDuSkiAMtEG5Q6
-   c=;
+  bh=T3hGcg7aiH7nuerGyrN4cH/2KmJKS9klWbVnZDUa/wM=;
+  b=rzDomar+hiaI5i+HfyWo+x8GCcoFTx69jm4ZbMkxtYH8OJ39QjlCwW7a
+   fqsg/UTIoQ7EsgPQ//kj+Sa3gMhPWZP3GGmmXvVcJQgCbIelcLZF8rw3M
+   dhxwuBlMiXEl7s60o53u9Z/Xa4nYcP94GX4FGqVinzHvJwI/giNl4TKCU
+   o=;
 X-IronPort-AV: E=Sophos;i="6.12,302,1728950400"; 
-   d="scan'208";a="163107389"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-80009.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jan 2025 01:48:37 +0000
-Received: from EX19MTAUWC002.ant.amazon.com [10.0.7.35:31334]
+   d="scan'208";a="13262271"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
+  by smtp-border-fw-80006.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jan 2025 01:49:10 +0000
+Received: from EX19MTAUWA002.ant.amazon.com [10.0.38.20:25376]
  by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.0.73:2525] with esmtp (Farcaster)
- id fbf35876-19e5-44ac-add9-e3875af74a57; Fri, 10 Jan 2025 01:48:37 +0000 (UTC)
-X-Farcaster-Flow-ID: fbf35876-19e5-44ac-add9-e3875af74a57
+ id 8f1e70da-9358-46af-b832-50067c92a3db; Fri, 10 Jan 2025 01:49:10 +0000 (UTC)
+X-Farcaster-Flow-ID: 8f1e70da-9358-46af-b832-50067c92a3db
 Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Fri, 10 Jan 2025 01:48:36 +0000
+ Fri, 10 Jan 2025 01:49:02 +0000
 Received: from 6c7e67c6786f.amazon.com (10.118.252.101) by
  EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Fri, 10 Jan 2025 01:48:32 +0000
+ Fri, 10 Jan 2025 01:48:58 +0000
 From: Kuniyuki Iwashima <kuniyu@amazon.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
@@ -64,9 +64,9 @@ To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 	<horms@kernel.org>
 CC: Xiao Liang <shaw.leon@gmail.com>, Kuniyuki Iwashima <kuniyu@amazon.com>,
 	Kuniyuki Iwashima <kuni1840@gmail.com>, <netdev@vger.kernel.org>
-Subject: [PATCH v2 net 1/3] gtp: Use for_each_netdev_rcu() in gtp_genl_dump_pdp().
-Date: Fri, 10 Jan 2025 10:47:52 +0900
-Message-ID: <20250110014754.33847-2-kuniyu@amazon.com>
+Subject: [PATCH v2 net 2/3] gtp: Destroy device along with udp socket's netns dismantle.
+Date: Fri, 10 Jan 2025 10:47:53 +0900
+Message-ID: <20250110014754.33847-3-kuniyu@amazon.com>
 X-Mailer: git-send-email 2.39.5 (Apple Git-154)
 In-Reply-To: <20250110014754.33847-1-kuniyu@amazon.com>
 References: <20250110014754.33847-1-kuniyu@amazon.com>
@@ -78,91 +78,120 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D043UWC001.ant.amazon.com (10.13.139.202) To
+X-ClientProxiedBy: EX19D032UWA003.ant.amazon.com (10.13.139.37) To
  EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-gtp_newlink() links the gtp device to a list in dev_net(dev).
+gtp_newlink() links the device to a list in dev_net(dev) instead of
+src_net, where a udp tunnel socket is created.
 
-However, even after the gtp device is moved to another netns,
-it stays on the list but should be invisible.
+Even when src_net is removed, the device stays alive on dev_net(dev).
+Then, removing src_net triggers the splat below. [0]
 
-Let's use for_each_netdev_rcu() for netdev traversal in
-gtp_genl_dump_pdp().
+In this example, gtp0 is created in ns2, and the udp socket is created
+in ns1.
 
-Note that gtp_dev_list is no longer used under RCU, so list
-helpers are converted to the non-RCU variant.
+  ip netns add ns1
+  ip netns add ns2
+  ip -n ns1 link add netns ns2 name gtp0 type gtp role sgsn
+  ip netns del ns1
+
+Let's link the device to the socket's netns instead.
+
+Now, gtp_net_exit_batch_rtnl() needs another netdev iteration to remove
+all gtp devices in the netns.
+
+[0]:
+ref_tracker: net notrefcnt@000000003d6e7d05 has 1/2 users at
+     sk_alloc (./include/net/net_namespace.h:345 net/core/sock.c:2236)
+     inet_create (net/ipv4/af_inet.c:326 net/ipv4/af_inet.c:252)
+     __sock_create (net/socket.c:1558)
+     udp_sock_create4 (net/ipv4/udp_tunnel_core.c:18)
+     gtp_create_sock (./include/net/udp_tunnel.h:59 drivers/net/gtp.c:1423)
+     gtp_create_sockets (drivers/net/gtp.c:1447)
+     gtp_newlink (drivers/net/gtp.c:1507)
+     rtnl_newlink (net/core/rtnetlink.c:3786 net/core/rtnetlink.c:3897 net/core/rtnetlink.c:4012)
+     rtnetlink_rcv_msg (net/core/rtnetlink.c:6922)
+     netlink_rcv_skb (net/netlink/af_netlink.c:2542)
+     netlink_unicast (net/netlink/af_netlink.c:1321 net/netlink/af_netlink.c:1347)
+     netlink_sendmsg (net/netlink/af_netlink.c:1891)
+     ____sys_sendmsg (net/socket.c:711 net/socket.c:726 net/socket.c:2583)
+     ___sys_sendmsg (net/socket.c:2639)
+     __sys_sendmsg (net/socket.c:2669)
+     do_syscall_64 (arch/x86/entry/common.c:52 arch/x86/entry/common.c:83)
+
+WARNING: CPU: 1 PID: 60 at lib/ref_tracker.c:179 ref_tracker_dir_exit (lib/ref_tracker.c:179)
+Modules linked in:
+CPU: 1 UID: 0 PID: 60 Comm: kworker/u16:2 Not tainted 6.13.0-rc5-00147-g4c1224501e9d #5
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org 04/01/2014
+Workqueue: netns cleanup_net
+RIP: 0010:ref_tracker_dir_exit (lib/ref_tracker.c:179)
+Code: 00 00 00 fc ff df 4d 8b 26 49 bd 00 01 00 00 00 00 ad de 4c 39 f5 0f 85 df 00 00 00 48 8b 74 24 08 48 89 df e8 a5 cc 12 02 90 <0f> 0b 90 48 8d 6b 44 be 04 00 00 00 48 89 ef e8 80 de 67 ff 48 89
+RSP: 0018:ff11000009a07b60 EFLAGS: 00010286
+RAX: 0000000000002bd3 RBX: ff1100000f4e1aa0 RCX: 1ffffffff0e40ac6
+RDX: 0000000000000000 RSI: 0000000000000000 RDI: ffffffff8423ee3c
+RBP: ff1100000f4e1af0 R08: 0000000000000001 R09: fffffbfff0e395ae
+R10: 0000000000000001 R11: 0000000000036001 R12: ff1100000f4e1af0
+R13: dead000000000100 R14: ff1100000f4e1af0 R15: dffffc0000000000
+FS:  0000000000000000(0000) GS:ff1100006ce80000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f9b2464bd98 CR3: 0000000005286005 CR4: 0000000000771ef0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe07f0 DR7: 0000000000000400
+PKRU: 55555554
+Call Trace:
+ <TASK>
+ ? __warn (kernel/panic.c:748)
+ ? ref_tracker_dir_exit (lib/ref_tracker.c:179)
+ ? report_bug (lib/bug.c:201 lib/bug.c:219)
+ ? handle_bug (arch/x86/kernel/traps.c:285)
+ ? exc_invalid_op (arch/x86/kernel/traps.c:309 (discriminator 1))
+ ? asm_exc_invalid_op (./arch/x86/include/asm/idtentry.h:621)
+ ? _raw_spin_unlock_irqrestore (./arch/x86/include/asm/irqflags.h:42 ./arch/x86/include/asm/irqflags.h:97 ./arch/x86/include/asm/irqflags.h:155 ./include/linux/spinlock_api_smp.h:151 kernel/locking/spinlock.c:194)
+ ? ref_tracker_dir_exit (lib/ref_tracker.c:179)
+ ? __pfx_ref_tracker_dir_exit (lib/ref_tracker.c:158)
+ ? kfree (mm/slub.c:4613 mm/slub.c:4761)
+ net_free (net/core/net_namespace.c:476 net/core/net_namespace.c:467)
+ cleanup_net (net/core/net_namespace.c:664 (discriminator 3))
+ process_one_work (kernel/workqueue.c:3229)
+ worker_thread (kernel/workqueue.c:3304 kernel/workqueue.c:3391)
+ kthread (kernel/kthread.c:389)
+ ret_from_fork (arch/x86/kernel/process.c:147)
+ ret_from_fork_asm (arch/x86/entry/entry_64.S:257)
+ </TASK>
 
 Fixes: 459aa660eb1d ("gtp: add initial driver for datapath of GPRS Tunneling Protocol (GTP-U)")
 Reported-by: Xiao Liang <shaw.leon@gmail.com>
-Closes: https://lore.kernel.org/netdev/CABAhCOQdBL6h9M2C+kd+bGivRJ9Q72JUxW+-gur0nub_=PmFPA@mail.gmail.com/
+Closes: https://lore.kernel.org/netdev/20250104125732.17335-1-shaw.leon@gmail.com/
 Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 ---
-v2:
-  * Fix uninit variable (gtp) and remove unused var (gn) in gtp_genl_dump_pdp().
-
-v1: https://lore.kernel.org/netdev/20250108062834.11117-2-kuniyu@amazon.com/
----
- drivers/net/gtp.c | 19 +++++++++++--------
- 1 file changed, 11 insertions(+), 8 deletions(-)
+ drivers/net/gtp.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/net/gtp.c b/drivers/net/gtp.c
-index 89a996ad8cd0..0f9cb0c378af 100644
+index 0f9cb0c378af..fbabada7d3ba 100644
 --- a/drivers/net/gtp.c
 +++ b/drivers/net/gtp.c
-@@ -1525,7 +1525,7 @@ static int gtp_newlink(struct net *src_net, struct net_device *dev,
+@@ -1524,7 +1524,7 @@ static int gtp_newlink(struct net *src_net, struct net_device *dev,
+ 		goto out_encap;
  	}
  
- 	gn = net_generic(dev_net(dev), gtp_net_id);
--	list_add_rcu(&gtp->list, &gn->gtp_dev_list);
-+	list_add(&gtp->list, &gn->gtp_dev_list);
+-	gn = net_generic(dev_net(dev), gtp_net_id);
++	gn = net_generic(src_net, gtp_net_id);
+ 	list_add(&gtp->list, &gn->gtp_dev_list);
  	dev->priv_destructor = gtp_destructor;
  
- 	netdev_dbg(dev, "registered new GTP interface\n");
-@@ -1551,7 +1551,7 @@ static void gtp_dellink(struct net_device *dev, struct list_head *head)
- 		hlist_for_each_entry_safe(pctx, next, &gtp->tid_hash[i], hlist_tid)
- 			pdp_context_delete(pctx);
- 
--	list_del_rcu(&gtp->list);
-+	list_del(&gtp->list);
- 	unregister_netdevice_queue(dev, head);
- }
- 
-@@ -2271,16 +2271,19 @@ static int gtp_genl_dump_pdp(struct sk_buff *skb,
- 	struct gtp_dev *last_gtp = (struct gtp_dev *)cb->args[2], *gtp;
- 	int i, j, bucket = cb->args[0], skip = cb->args[1];
- 	struct net *net = sock_net(skb->sk);
-+	struct net_device *dev;
- 	struct pdp_ctx *pctx;
--	struct gtp_net *gn;
--
--	gn = net_generic(net, gtp_net_id);
- 
- 	if (cb->args[4])
- 		return 0;
- 
- 	rcu_read_lock();
--	list_for_each_entry_rcu(gtp, &gn->gtp_dev_list, list) {
-+	for_each_netdev_rcu(net, dev) {
-+		if (dev->rtnl_link_ops != &gtp_link_ops)
-+			continue;
-+
-+		gtp = netdev_priv(dev);
-+
- 		if (last_gtp && last_gtp != gtp)
- 			continue;
- 		else
-@@ -2475,9 +2478,9 @@ static void __net_exit gtp_net_exit_batch_rtnl(struct list_head *net_list,
- 
+@@ -2479,6 +2479,11 @@ static void __net_exit gtp_net_exit_batch_rtnl(struct list_head *net_list,
  	list_for_each_entry(net, net_list, exit_list) {
  		struct gtp_net *gn = net_generic(net, gtp_net_id);
--		struct gtp_dev *gtp;
-+		struct gtp_dev *gtp, *gtp_next;
+ 		struct gtp_dev *gtp, *gtp_next;
++		struct net_device *dev;
++
++		for_each_netdev(net, dev)
++			if (dev->rtnl_link_ops == &gtp_link_ops)
++				gtp_dellink(dev, dev_to_kill);
  
--		list_for_each_entry(gtp, &gn->gtp_dev_list, list)
-+		list_for_each_entry_safe(gtp, gtp_next, &gn->gtp_dev_list, list)
+ 		list_for_each_entry_safe(gtp, gtp_next, &gn->gtp_dev_list, list)
  			gtp_dellink(gtp->dev, dev_to_kill);
- 	}
- }
 -- 
 2.39.5 (Apple Git-154)
 
