@@ -1,166 +1,130 @@
-Return-Path: <netdev+bounces-157109-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157144-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B50C1A08F2F
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 12:26:41 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B877A09004
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 13:09:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6E8C77A3ED8
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 11:26:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7F75E167DBF
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 12:09:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E16B120D500;
-	Fri, 10 Jan 2025 11:25:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07924205E37;
+	Fri, 10 Jan 2025 12:09:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i/hWQFu/"
+	dkim=pass (2048-bit key) header.d=siemens.com header.i=alexander.sverdlin@siemens.com header.b="hc2OrcqO"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mta-64-226.siemens.flowmailer.net (mta-64-226.siemens.flowmailer.net [185.136.64.226])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 453D720C019
-	for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 11:25:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34D1E2063DC
+	for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 12:09:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.136.64.226
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736508324; cv=none; b=K3a6QEp0NWdIz3RdVpqNP34m9b/XddEfY6uiQ8yI9QK9rPH99xT7IaPpoAt1uiLEqUcvCdxyMIr3YoI+JfqMuLBD8z7SyOvpDL0JD2Drx5BV0uYf/JTZdxFSy9gg1Ey3/y2Qelvm7hRfURI2sg0wzOwoJm/YLAvwjuAorMtRcDY=
+	t=1736510958; cv=none; b=dxaggNy97uE52cfeQtEFt6XwQ1V5e2XQlCHSlay/bYyxV3oJj+68SXKvlRstOoShM+DsGuxUKC5hac56hTZQb6dboBO4S0wOz5patlZX3/fx87IbP/Nu5MPNy5xRFhf6AlonWEAdBAonosOmDOnQUcdr5t9LIRp1jSS7weT1Kts=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736508324; c=relaxed/simple;
-	bh=h+3V8Dg/wI18YbTuYBPBYgVfFTOtZGjB+ocTQMzeqlo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aiu6DnJFYxLWXefnkSP19llrOhuXqULV1+OWpJTaqdxYpB1ZiG2L1Exz4p80pQOkRncHB1jn0ndxgA+2C9pWFNM7umX0Y5CzmStjIfLP+M7fPWWqhlR3qcY1uPOvRm/uyyPhZMExZxJVkxMDfp/9FUoG1wPrBccTkvaCnP6148c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=i/hWQFu/; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1736508322;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=4Ef2wLHVQGV1IsoMPeKXi5uZyvCqMew4uoHW3wntJAQ=;
-	b=i/hWQFu/XlsmwkjawqwXRu2SzMhUYO+RllhSxgLCm/PdbijVCwwegj5tJdxhuNz3vjnLra
-	ggXI3LPmSMtXUXjVK4wXemf57wDYuQU8WF1oHp1Tgc6MvpWSwg9O86mosVeSDZ0IB3HdJa
-	ibY7DzglQFglss9gVxkZSfiUmAzDEYw=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-421-N8l43eN_N-iwZ8vNmApwug-1; Fri, 10 Jan 2025 06:25:18 -0500
-X-MC-Unique: N8l43eN_N-iwZ8vNmApwug-1
-X-Mimecast-MFC-AGG-ID: N8l43eN_N-iwZ8vNmApwug
-Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-aa66bc3b46dso150359666b.3
-        for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 03:25:18 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736508318; x=1737113118;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4Ef2wLHVQGV1IsoMPeKXi5uZyvCqMew4uoHW3wntJAQ=;
-        b=QwTQGf9VqRpE39Bdwe3VoFQvtJfjmQ8aNssigprBKJoDhv7mIMxqwTq4ZmQD0BtwON
-         wgnoMcs25DYo63mB5oEnpQNToL9radX6bPcNSUmS950XZ85fX7oRIbouprBoNaZWYLGW
-         II2yE4LdXN8EuMTE4s94RxOwVjkGV4f2nDlmPK4hiAk7b7F6sHNMpJXcduSQGYYyPfHZ
-         2OG/2zDzbEUO9ZErBS4blKsRviaBqGxq2Vy+VgVHsAj5QOWOpnbZcHAqZZi7gYBS6n61
-         4cL3C6JNS/p2sZF5LdLGAGkJjNmTXGVp/w35ADfliR+ITmbYk+limCvdt52UAdV+RoYO
-         2v0A==
-X-Gm-Message-State: AOJu0YxHsEp20dFUh0gNsFHvqOFDf3aSBI8bD8qQEzGnVlB8V7NYPHgN
-	BGfjSt3TtVE0kkn13e8goJ6LK6mKl/mcimcQgZYoSaTtU/ba4aI6ICAiGfpiYk7cHlpQSHBpSXB
-	JX5P9U4LFUwuT1MoO6eRRR/2pTy26s76f+nzcD6E5JxCOo7C0ufiCHQ==
-X-Gm-Gg: ASbGncsS9LQscej2vOAnzTh8JPxE1o7azzn/GaZ+dQcPz1ygMSEU/6KxF7HUO7xQz56
-	cbf7ejd544B5YnPXHIzEhJ01rpCsi5ntLNJCEJpeOrpTAfIZuyOQBmcPx1tBTRj+S3QAeyvqn7H
-	Gc0VH+fPuJJW4L7SYZd+A07PEAO5bbzwugjer+sm3/kcA3qpobZWLqGDokamb0Wtf4pBDsUWrnq
-	2ODm/oARQAYnvNX+UK9/8nQ0JI5chgNVfJ5vCUc+NlcPSG3Z7YJ70S6WFfQX6M=
-X-Received: by 2002:a05:6402:5194:b0:5d0:fb56:3f with SMTP id 4fb4d7f45d1cf-5d972e0e341mr23290978a12.12.1736508317703;
-        Fri, 10 Jan 2025 03:25:17 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IH3mqsKI2idLOS3bFseUHtOVmXbXG31Er639vFwFDT2akA/HfPxaQl8uNFpTeEdJZcPXxQTRg==
-X-Received: by 2002:a05:6402:5194:b0:5d0:fb56:3f with SMTP id 4fb4d7f45d1cf-5d972e0e341mr23290897a12.12.1736508317029;
-        Fri, 10 Jan 2025 03:25:17 -0800 (PST)
-Received: from sgarzare-redhat ([193.207.202.103])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ab2c95af694sm159293266b.144.2025.01.10.03.25.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 Jan 2025 03:25:16 -0800 (PST)
-Date: Fri, 10 Jan 2025 12:25:09 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Luigi Leonardi <leonardi@redhat.com>
-Cc: netdev@vger.kernel.org, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
-	bpf@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	"David S. Miller" <davem@davemloft.net>, Wongi Lee <qwerty@theori.io>, 
-	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
-	Eric Dumazet <edumazet@google.com>, kvm@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>, 
-	Stefan Hajnoczi <stefanha@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	Simon Horman <horms@kernel.org>, Hyunwoo Kim <v4bel@theori.io>, Jakub Kicinski <kuba@kernel.org>, 
-	Michal Luczaj <mhal@rbox.co>, virtualization@lists.linux.dev, 
-	Bobby Eshleman <bobby.eshleman@bytedance.com>, stable@vger.kernel.org
-Subject: Re: [PATCH net v2 4/5] vsock: reset socket state when de-assigning
- the transport
-Message-ID: <fjx4nkajq3cnaxdbvs3dd2sxtc35tkqlqti3h44t3xuefclwar@havkg6jfisxu>
-References: <20250110083511.30419-1-sgarzare@redhat.com>
- <20250110083511.30419-5-sgarzare@redhat.com>
- <esoasx64en34ixiylalt2hldqi5duvvzrpt65xq7nioro7gbbb@rhp6lth5grj4>
+	s=arc-20240116; t=1736510958; c=relaxed/simple;
+	bh=Ykh7RxzEeRrpH0T75KKSsW8N9egAGDRlJfdvLYE5ctA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=MgYPqROc8ISRtmPZ9WoNOD3Gxa4d49OKV+eUDu0AsGu4n3vHPWJPtE91MpDsFQyP6zdPTuFS8m/h4Ve8WC5RlAVOYENJuhb8P4IO2tJJMKbivhtudEa0yMfsJHT9xRENZIOeeUKDgYGDYCtAGlB/hUPdUUo4MYQUcM7vou7MgTo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com; dkim=pass (2048-bit key) header.d=siemens.com header.i=alexander.sverdlin@siemens.com header.b=hc2OrcqO; arc=none smtp.client-ip=185.136.64.226
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com
+Received: by mta-64-226.siemens.flowmailer.net with ESMTPSA id 202501101128585c64dabbd2e0fe9dda
+        for <netdev@vger.kernel.org>;
+        Fri, 10 Jan 2025 12:28:58 +0100
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; s=fm1;
+ d=siemens.com; i=alexander.sverdlin@siemens.com;
+ h=Date:From:Subject:To:Message-ID:MIME-Version:Content-Type:Content-Transfer-Encoding:Cc;
+ bh=IRbabMtbT7WAvxmJ6HVy6JIV44wcam6j1fimOXGYrD0=;
+ b=hc2OrcqOAXXy+Fl7LWewSEAieF0TkUb9SK7QvO4ANdWg2ilRmH9jrl77N4WHUr5OtxxFRS
+ VyywOLtR49dMjUHkdNF5bEwM7sZSrDntQPg9NNuCMzcpCxHFWTxftvjYSOtktsPoh+LQt4c0
+ uJYDT0a0DacsUiKKuYRF/0dUCtGt37hda/1GchvJWQk1V2UCj1n9qJ/vv/hkBBksEISgsNpx
+ yBkHMKEW5kVi4MJDpbx4/BtChUCQKjDgTJh6q/nonCTqlfukf8jBGo6TAVvcsPMk3gKRVklU
+ /40+KnwAA6X3r/LNXQiMuKpoWwkWLpERoWKlYBanejNNiGZMDQYI+YtA==;
+From: "A. Sverdlin" <alexander.sverdlin@siemens.com>
+To: netdev@vger.kernel.org
+Cc: Alexander Sverdlin <alexander.sverdlin@siemens.com>,
+	Siddharth Vadapalli <s-vadapalli@ti.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Roger Quadros <rogerq@kernel.org>,
+	Chintan Vankar <c-vankar@ti.com>,
+	Julien Panis <jpanis@baylibre.com>
+Subject: [PATCH net-next v2] net: ethernet: ti: am65-cpsw: VLAN-aware CPSW only if !DSA
+Date: Fri, 10 Jan 2025 12:27:17 +0100
+Message-ID: <20250110112725.415094-1-alexander.sverdlin@siemens.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <esoasx64en34ixiylalt2hldqi5duvvzrpt65xq7nioro7gbbb@rhp6lth5grj4>
+Content-Transfer-Encoding: 8bit
+X-Flowmailer-Platform: Siemens
+Feedback-ID: 519:519-456497:519-21489:flowmailer
 
-On Fri, Jan 10, 2025 at 11:56:28AM +0100, Luigi Leonardi wrote:
->On Fri, Jan 10, 2025 at 09:35:10AM +0100, Stefano Garzarella wrote:
->>Transport's release() and destruct() are called when de-assigning the
->>vsock transport. These callbacks can touch some socket state like
->>sock flags, sk_state, and peer_shutdown.
->>
->>Since we are reassigning the socket to a new transport during
->>vsock_connect(), let's reset these fields to have a clean state with
->>the new transport.
->>
->>Fixes: c0cfa2d8a788 ("vsock: add multi-transports support")
->>Cc: stable@vger.kernel.org
->>Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
->>---
->>net/vmw_vsock/af_vsock.c | 9 +++++++++
->>1 file changed, 9 insertions(+)
->>
->>diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
->>index 5cf8109f672a..74d35a871644 100644
->>--- a/net/vmw_vsock/af_vsock.c
->>+++ b/net/vmw_vsock/af_vsock.c
->>@@ -491,6 +491,15 @@ int vsock_assign_transport(struct vsock_sock *vsk, struct vsock_sock *psk)
->>		 */
->>		vsk->transport->release(vsk);
->>		vsock_deassign_transport(vsk);
->>+
->>+		/* transport's release() and destruct() can touch some socket
->>+		 * state, since we are reassigning the socket to a new transport
->>+		 * during vsock_connect(), let's reset these fields to have a
->>+		 * clean state.
->>+		 */
->>+		sock_reset_flag(sk, SOCK_DONE);
->>+		sk->sk_state = TCP_CLOSE;
->>+		vsk->peer_shutdown = 0;
->>	}
->>
->>	/* We increase the module refcnt to prevent the transport unloading
->>-- 
->>2.47.1
->>
->
->Hi Stefano,
->I spent some time investigating what would happen if the scheduled work
->ran before `virtio_transport_cancel_close_work`. IIUC that should do 
->no harm and all the fields are reset correctly.
+From: Alexander Sverdlin <alexander.sverdlin@siemens.com>
 
-Yep, after transport->destruct() call, the delayed work should have 
-already finished or canceled.
+Only configure VLAN-aware CPSW mode if no port is used as DSA CPU port.
+VLAN-aware mode interferes with some DSA tagging schemes and makes stacking
+DSA switches downstream of CPSW impossible. Previous attempts to address
+the issue linked below.
 
->
->Thank you,
->Luigi
->
->Reviewed-by: Luigi Leonardi <leonardi@redhat.com>
->
+Link: https://lore.kernel.org/netdev/20240227082815.2073826-1-s-vadapalli@ti.com/
+Link: https://lore.kernel.org/linux-arm-kernel/4699400.vD3TdgH1nR@localhost/
+Co-developed-by: Siddharth Vadapalli <s-vadapalli@ti.com>
+Signed-off-by: Alexander Sverdlin <alexander.sverdlin@siemens.com>
+---
+Changelog:
+v2: Thanks to Siddharth it does look much clearer now (conditionally clear
+    AM65_CPSW_CTL_VLAN_AWARE instead of setting)
 
-Thanks for the review,
-Stefano
+ drivers/net/ethernet/ti/am65-cpsw-nuss.c | 18 ++++++++++++++----
+ 1 file changed, 14 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.c b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
+index 5465bf872734..58c840fb7e7e 100644
+--- a/drivers/net/ethernet/ti/am65-cpsw-nuss.c
++++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
+@@ -32,6 +32,7 @@
+ #include <linux/dma/ti-cppi5.h>
+ #include <linux/dma/k3-udma-glue.h>
+ #include <net/page_pool/helpers.h>
++#include <net/dsa.h>
+ #include <net/switchdev.h>
+ 
+ #include "cpsw_ale.h"
+@@ -724,13 +725,22 @@ static int am65_cpsw_nuss_common_open(struct am65_cpsw_common *common)
+ 	u32 val, port_mask;
+ 	struct page *page;
+ 
++	/* Control register */
++	val = AM65_CPSW_CTL_P0_ENABLE | AM65_CPSW_CTL_P0_TX_CRC_REMOVE |
++	      AM65_CPSW_CTL_VLAN_AWARE | AM65_CPSW_CTL_P0_RX_PAD;
++	/* VLAN aware CPSW mode is incompatible with some DSA tagging schemes.
++	 * Therefore disable VLAN_AWARE mode if any of the ports is a DSA Port.
++	 */
++	for (port_idx = 0; port_idx < common->port_num; port_idx++)
++		if (netdev_uses_dsa(common->ports[port_idx].ndev)) {
++			val &= ~AM65_CPSW_CTL_VLAN_AWARE;
++			break;
++		}
++	writel(val, common->cpsw_base + AM65_CPSW_REG_CTL);
++
+ 	if (common->usage_count)
+ 		return 0;
+ 
+-	/* Control register */
+-	writel(AM65_CPSW_CTL_P0_ENABLE | AM65_CPSW_CTL_P0_TX_CRC_REMOVE |
+-	       AM65_CPSW_CTL_VLAN_AWARE | AM65_CPSW_CTL_P0_RX_PAD,
+-	       common->cpsw_base + AM65_CPSW_REG_CTL);
+ 	/* Max length register */
+ 	writel(AM65_CPSW_MAX_PACKET_SIZE,
+ 	       host_p->port_base + AM65_CPSW_PORT_REG_RX_MAXLEN);
+-- 
+2.47.1
 
 
