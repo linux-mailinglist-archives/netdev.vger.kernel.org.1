@@ -1,191 +1,136 @@
-Return-Path: <netdev+bounces-157167-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157168-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16AB1A091D1
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 14:24:14 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4438DA09227
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 14:35:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2FDE63A70DF
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 13:24:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 728FA16867B
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 13:34:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D69C20DD68;
-	Fri, 10 Jan 2025 13:24:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D912120B80D;
+	Fri, 10 Jan 2025 13:34:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="d4EPS6jg"
+	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="YmVwjpPz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
+Received: from mail1.fiberby.net (mail1.fiberby.net [193.104.135.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74A6A20D4FB;
-	Fri, 10 Jan 2025 13:24:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC9D078C91
+	for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 13:34:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.104.135.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736515450; cv=none; b=jpceA2vAY6sZOcotjfyPcpuqZgR9gl9njBzJvrBz2cdaGgLVhu+x0Ls+zoej5tBn36H0dljopS2vWpRv6zoa7ojcZHjSBSwFHSZgEICmsFdRkACw9zT8Nu86rPQuNxMGscP953NzwZjGIYOBo/Wlrm5gblXFyw4OgNv1dRQB8dM=
+	t=1736516055; cv=none; b=n4h+jrtjUvcBAhvWVx5IrMI9tiU/LzdQlszZLXKzTxrAi5WOSkTXVmX0Qw/z3Q8AD38tNnYOPnhZvitDgNkxqpeo41vCnBDQaBiPThQOrdgO0uIsv2xOQKP7XPRHb93De+8UpBnYCitQ+jH6S5a21g4yfrz9cy/W7h3TZsWKvtU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736515450; c=relaxed/simple;
-	bh=clT/8RxDgjuG9ypKds+RfpuFO31oP95DIkCEURjcrmM=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=j+Nxa499LV4UV1+BdVxPFyC3RSfYa85XuMgPYtfwaud1KKp+zxYhOsACD40jURq9ZmTRvrj/tb5iKqRsnTpgP/cUVYImTWBLjIUUIk3YPzwdPYlWK1tG2j0WnHnNE3BsoogMfzpXYgncCkXi1kQ2KJCN0czue982Pp8kYgrwE38=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=d4EPS6jg; arc=none smtp.client-ip=185.226.149.38
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
-Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
-	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.93)
-	(envelope-from <mhal@rbox.co>)
-	id 1tWEzO-005xC4-Oy; Fri, 10 Jan 2025 14:23:50 +0100
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-	s=selector2; h=Cc:To:Message-Id:Content-Transfer-Encoding:Content-Type:
-	MIME-Version:Subject:Date:From;
-	bh=FcyrAET8neQquEGrAHiIKKnyo+Au3cIC0L4fmdBd8AA=; b=d4EPS6jgaiE0cjc69P/6q7NbF9
-	qdUPQjNwjYcwfS55oe3+sQer3uTb9Obq80zKg9vNB8MfhF0ANiSSba9dQO2Rwfxb5xRbKRgwoFswS
-	7aWxe+Et/w4sMGWkFObjP0jWsOFFx++zN/b7h3yje2y/4G10i3TyF8rKl6mwoS/8DSWhXpBS5DxAO
-	9ob3fvmMSCdzTXZjkgFmrnj5QRsLwaeWiSnqXbhIG9rVj5nmneoXKU3c5/7d3COswiiuA2HSBRtf5
-	Q7Bc67Rw5DNBJTV2TEkD+h28bL6pS8LdccKOKioTRCGu0mzM8gNQaJiotOrvPC+lRNfYG/BfbW0Ep
-	OiHGcwOQ==;
-Received: from [10.9.9.74] (helo=submission03.runbox)
-	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
-	(envelope-from <mhal@rbox.co>)
-	id 1tWEzN-0002wu-MB; Fri, 10 Jan 2025 14:23:49 +0100
-Received: by submission03.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.93)
-	id 1tWEzF-00DQf8-6f; Fri, 10 Jan 2025 14:23:41 +0100
-From: Michal Luczaj <mhal@rbox.co>
-Date: Fri, 10 Jan 2025 14:21:55 +0100
-Subject: [PATCH bpf] bpf: Fix bpf_sk_select_reuseport() memory leak
+	s=arc-20240116; t=1736516055; c=relaxed/simple;
+	bh=z7gz+i2HhxebmfFhhX9sC4FJ/071pLo7SmBEwtibi68=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=uVbrMy+jvNRopkSzKPeZitksNZLpqDLTfhb1jLoHXpbN/dUVoirhjT+mZ6cgoDdYYvaQe/lFppwd28z2yH5UVE1zjregYEHM2WYIMeu4Vc/81kAijOhBnZB7JM1M41MEmg9wbF7JGz3aJjwoZdBnP3DTuf1EGpcjYNrxoGxMFhY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=YmVwjpPz; arc=none smtp.client-ip=193.104.135.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fiberby.net
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fiberby.net;
+	s=202008; t=1736515547;
+	bh=z7gz+i2HhxebmfFhhX9sC4FJ/071pLo7SmBEwtibi68=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=YmVwjpPzj8rpkUIiGhoYTLSt5AnghPaJGqzuPfN/uovxMB3X8lBP4PQkASyZ6oVR8
+	 7krVtXa1Kd7152Ve9jVEEXzeweBoNpCDhcGRLikBcZmzuzlFs7A1ZgZbtxlxcl3STd
+	 9iSGVvSaQxR4ZLrsITqIZeMRWyIgJPQofwy52kK60w6Dl8b2HWYbw69MJmVo1kv59Q
+	 MayV/a4Y+LRu7Rut55jaaF5bH/uFiQ8I7hrY69hTzVFzZYwmVk63RxE+qKSFlqdVNd
+	 gTwXdTdbbhJqsG2EUkXYj1HZemUT5VlDjbj7nuz6IrHq+0iAZVuKzjFzvZ9n8ELbUR
+	 S3oDYzDih/Qbw==
+Received: from x201s (193-104-135-243.ip4.fiberby.net [193.104.135.243])
+	by mail1.fiberby.net (Postfix) with ESMTPSA id D39816000C;
+	Fri, 10 Jan 2025 13:25:22 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1])
+	by x201s (Postfix) with ESMTP id 983D9200473;
+	Fri, 10 Jan 2025 13:25:18 +0000 (UTC)
+Message-ID: <48e9bf0a-3275-4d2c-84ae-9bc1163ab8cb@fiberby.net>
+Date: Fri, 10 Jan 2025 13:25:18 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net: sched: refine software bypass handling in tc_run
+To: Xin Long <lucien.xin@gmail.com>
+Cc: davem@davemloft.net, kuba@kernel.org, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Jamal Hadi Salim <jhs@mojatatu.com>,
+ Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
+ Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+ Shuang Li <shuali@redhat.com>, network dev <netdev@vger.kernel.org>
+References: <b9e81aa97ab8ca62e979b7d55c2ee398790b935b.1736176112.git.lucien.xin@gmail.com>
+Content-Language: en-US
+From: =?UTF-8?Q?Asbj=C3=B8rn_Sloth_T=C3=B8nnesen?= <ast@fiberby.net>
+In-Reply-To: <b9e81aa97ab8ca62e979b7d55c2ee398790b935b.1736176112.git.lucien.xin@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250110-reuseport-memleak-v1-1-fa1ddab0adfe@rbox.co>
-X-B4-Tracking: v=1; b=H4sIAPIegWcC/x3MSwqEMBBF0a1IjQ0kgp/0VhoHUZ9a+AsVFUHcu
- 8HhGdx7U4AwAv2SmwQnB97WCJMm1I5uHaC4i6ZMZ7k2RivBEeA32dWCZYablHVtkVdl01nrKHZ
- e0PP1Pf/U+J7q53kBfo1BTmgAAAA=
-X-Change-ID: 20250110-reuseport-memleak-9ac6587bd99a
-To: Alexei Starovoitov <ast@kernel.org>, 
- Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
- Martin KaFai Lau <martin.lau@linux.dev>, 
- Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
- Yonghong Song <yonghong.song@linux.dev>, 
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, 
- Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, 
- Jiri Olsa <jolsa@kernel.org>, Mykola Lysenko <mykolal@fb.com>, 
- Shuah Khan <shuah@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
- Jakub Sitnicki <jakub@cloudflare.com>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, 
- Michal Luczaj <mhal@rbox.co>
-X-Mailer: b4 0.14.2
 
-As pointed out in the original comment, lookup in sockmap can return a TCP
-ESTABLISHED socket. Such TCP socket may have had SO_ATTACH_REUSEPORT_EBPF
-set before it was ESTABLISHED. In other words, a non-NULL sk_reuseport_cb
-does not imply a non-refcounted socket.
+Sorry for the late response, it has been a busy first week back, too many
+operational issues with devices in our network running crappy vendor images.
 
-Drop sk's reference in both error paths.
+On 1/6/25 3:08 PM, Xin Long wrote:
+> This patch addresses issues with filter counting in block (tcf_block),
+> particularly for software bypass scenarios, by introducing a more
+> accurate mechanism using useswcnt.
+> 
+> Previously, filtercnt and skipswcnt were introduced by:
+> 
+>    Commit 2081fd3445fe ("net: sched: cls_api: add filter counter") and
+>    Commit f631ef39d819 ("net: sched: cls_api: add skip_sw counter")
+> 
+>    filtercnt tracked all tp (tcf_proto) objects added to a block, and
+>    skipswcnt counted tp objects with the skipsw attribute set.
+> 
+> The problem is: a single tp can contain multiple filters, some with skipsw
+> and others without. The current implementation fails in the case:
+> 
+>    When the first filter in a tp has skipsw, both skipswcnt and filtercnt
+>    are incremented, then adding a second filter without skipsw to the same
+>    tp does not modify these counters because tp->counted is already set.
+> 
+>    This results in bypass software behavior based solely on skipswcnt
+>    equaling filtercnt, even when the block includes filters without
+>    skipsw. Consequently, filters without skipsw are inadvertently bypassed.
 
-unreferenced object 0xffff888101911800 (size 2048):
-  comm "test_progs", pid 44109, jiffies 4297131437
-  hex dump (first 32 bytes):
-    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-    80 00 01 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-  backtrace (crc 9336483b):
-    __kmalloc_noprof+0x3bf/0x560
-    __reuseport_alloc+0x1d/0x40
-    reuseport_alloc+0xca/0x150
-    reuseport_attach_prog+0x87/0x140
-    sk_reuseport_attach_bpf+0xc8/0x100
-    sk_setsockopt+0x1181/0x1990
-    do_sock_setsockopt+0x12b/0x160
-    __sys_setsockopt+0x7b/0xc0
-    __x64_sys_setsockopt+0x1b/0x30
-    do_syscall_64+0x93/0x180
-    entry_SYSCALL_64_after_hwframe+0x76/0x7e
+Thank you for tracking it down. I wasn't aware that a tp, could be used by multiple
+filters, and didn't encounter it during my testing.
 
-Fixes: 64d85290d79c ("bpf: Allow bpf_map_lookup_elem for SOCKMAP and SOCKHASH")
-Signed-off-by: Michal Luczaj <mhal@rbox.co>
----
- net/core/filter.c | 30 ++++++++++++++++++------------
- 1 file changed, 18 insertions(+), 12 deletions(-)
+> To address this, the patch introduces useswcnt in block to explicitly count
+> tp objects containing at least one filter without skipsw. Key changes
+> include:
+> 
+>    Whenever a filter without skipsw is added, its tp is marked with usesw
+>    and counted in useswcnt. tc_run() now uses useswcnt to determine software
+>    bypass, eliminating reliance on filtercnt and skipswcnt.
+> 
+>    This refined approach prevents software bypass for blocks containing
+>    mixed filters, ensuring correct behavior in tc_run().
+> 
+> Additionally, as atomic operations on useswcnt ensure thread safety and
+> tp->lock guards access to tp->usesw and tp->counted, the broader lock
+> down_write(&block->cb_lock) is no longer required in tc_new_tfilter(),
+> and this resolves a performance regression caused by the filter counting
+> mechanism during parallel filter insertions.
 
-diff --git a/net/core/filter.c b/net/core/filter.c
-index 834614071727ab92cee759dc788ec2ee6f92284b..2fb45a86f3ddbffa9fd55885d4c4c0d8c3a6c381 100644
---- a/net/core/filter.c
-+++ b/net/core/filter.c
-@@ -11251,6 +11251,7 @@ BPF_CALL_4(sk_select_reuseport, struct sk_reuseport_kern *, reuse_kern,
- 	bool is_sockarray = map->map_type == BPF_MAP_TYPE_REUSEPORT_SOCKARRAY;
- 	struct sock_reuseport *reuse;
- 	struct sock *selected_sk;
-+	int err;
- 
- 	selected_sk = map->ops->map_lookup_elem(map, key);
- 	if (!selected_sk)
-@@ -11258,10 +11259,6 @@ BPF_CALL_4(sk_select_reuseport, struct sk_reuseport_kern *, reuse_kern,
- 
- 	reuse = rcu_dereference(selected_sk->sk_reuseport_cb);
- 	if (!reuse) {
--		/* Lookup in sock_map can return TCP ESTABLISHED sockets. */
--		if (sk_is_refcounted(selected_sk))
--			sock_put(selected_sk);
--
- 		/* reuseport_array has only sk with non NULL sk_reuseport_cb.
- 		 * The only (!reuse) case here is - the sk has already been
- 		 * unhashed (e.g. by close()), so treat it as -ENOENT.
-@@ -11269,24 +11266,33 @@ BPF_CALL_4(sk_select_reuseport, struct sk_reuseport_kern *, reuse_kern,
- 		 * Other maps (e.g. sock_map) do not provide this guarantee and
- 		 * the sk may never be in the reuseport group to begin with.
- 		 */
--		return is_sockarray ? -ENOENT : -EINVAL;
-+		err = is_sockarray ? -ENOENT : -EINVAL;
-+		goto error;
- 	}
- 
- 	if (unlikely(reuse->reuseport_id != reuse_kern->reuseport_id)) {
- 		struct sock *sk = reuse_kern->sk;
- 
--		if (sk->sk_protocol != selected_sk->sk_protocol)
--			return -EPROTOTYPE;
--		else if (sk->sk_family != selected_sk->sk_family)
--			return -EAFNOSUPPORT;
--
--		/* Catch all. Likely bound to a different sockaddr. */
--		return -EBADFD;
-+		if (sk->sk_protocol != selected_sk->sk_protocol) {
-+			err = -EPROTOTYPE;
-+		} else if (sk->sk_family != selected_sk->sk_family) {
-+			err = -EAFNOSUPPORT;
-+		} else {
-+			/* Catch all. Likely bound to a different sockaddr. */
-+			err = -EBADFD;
-+		}
-+		goto error;
- 	}
- 
- 	reuse_kern->selected_sk = selected_sk;
- 
- 	return 0;
-+error:
-+	/* Lookup in sock_map can return TCP ESTABLISHED sockets. */
-+	if (sk_is_refcounted(selected_sk))
-+		sock_put(selected_sk);
-+
-+	return err;
- }
- 
- static const struct bpf_func_proto sk_select_reuseport_proto = {
+You are trying to do two things:
+A) Fix functional defect when filters share a single tp
+B) Improve filter updates performance
 
----
-base-commit: 1f6ff8756091d99b7e5fa556abc0465328302b8b
-change-id: 20250110-reuseport-memleak-9ac6587bd99a
+If you do part A in a minimalistic way, then IMHO it might be suitable
+for net (+ stable), but for part B I agree with Paolo, that it would
+properly be better suited for net-next.
 
-Best regards,
--- 
-Michal Luczaj <mhal@rbox.co>
+I focused my testing on routing performance, not filter update performance,
+I also didn't test it in any multi-CPU setups (as I don't have any).
 
+The static key was added to mitigate concerns, about the impact that the
+bypass check would have for non-offloaded workloads in multi-CPU systems.
+
+https://lore.kernel.org/netdev/28bf1467-b7ce-4e36-a4ef-5445f65edd97@fiberby.net/
+https://lore.kernel.org/netdev/CAM0EoMngVoBcbX7cqTdbW8dG1v_ysc1SZK+4y-9j-5Tbq6gaYw@mail.gmail.com/
 
