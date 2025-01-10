@@ -1,208 +1,237 @@
-Return-Path: <netdev+bounces-157262-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157263-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2EA04A09BFC
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 20:41:52 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 25EB1A09C1D
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 20:58:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 41CE03A95B6
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 19:41:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2E5B2169039
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 19:58:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6132C2144CF;
-	Fri, 10 Jan 2025 19:41:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67304214A91;
+	Fri, 10 Jan 2025 19:58:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="hWkV/ppm"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="bUyCzNek"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2052.outbound.protection.outlook.com [40.107.243.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E83124B247;
-	Fri, 10 Jan 2025 19:41:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736538107; cv=none; b=JTO4AazTVnLhZpH8ijWkK1Vnk0BlQRs0nzGtyRu8dvKptJXUh19RCXh5sSGuRq9HmOzrY0SRcXG3J+ONmcszIFEzXDhU/Sn2nta+4q9KY5CCfOpXeS2B86hWgnnOKhMsuwBePTYUaOQlMm1oWXIRt3PL/bDz1uQvkJAYPR4mJek=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736538107; c=relaxed/simple;
-	bh=KlTcZAOphqI+mKXQSHQkBFkp34x/UalfYMYLFIylyYs=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=BRAig2c9QBbeVrVdmimATFfjDrQzBzIp16Fiwi74wEoUGv/vThOdx+hGazWAWNusfSqo++oOtlTcNEYu//HzmEuZjDswZz7jvO567Vce9BJ4X75MHENzc552PC5fuOF2iNgy4zyfB7/ioxIPmxTLcYBQe6RfNipIReT8/Kt6Xr4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=hWkV/ppm; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50AE6LuJ025777;
-	Fri, 10 Jan 2025 19:41:38 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=pp1; bh=xqKwkwDxLIeWcu+5+AJmJwxlzjIwVAT1iL166k6cD
-	7A=; b=hWkV/ppmoQJHl4N1qVi2xPoWbsPbCXOeNcVk8IoNFbw3ScYxmTv0T4yAT
-	eMn0hfHTllR0KF4En3rSkWkdLKuv1JccoOZ6ZhECtAQvgYsaCYYVGzgJzR2E5Gsp
-	NFfr/nTrWI0wkhNRxTN3LuKOIrJbkIV4Z8qsIGicx6N0RGntjOU0hLTkfYfgXxu9
-	JrOyrpUYrAJ49gPSNh+8XIaJGSjugL9JsoKLfxLqLljBKdor7peXa2y9NVO9NoUD
-	32JYrXBJ7lLP1R9RSg6FXuDM4X4ffM+p6Va20+zEao9RK+yz4navpdnEDCq5LhnD
-	C21LgQzHNjkabwKlo63uF2aMqo0lg==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4435151g8q-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 10 Jan 2025 19:41:37 +0000 (GMT)
-Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 50AJO3Of004912;
-	Fri, 10 Jan 2025 19:41:37 GMT
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4435151g8m-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 10 Jan 2025 19:41:37 +0000 (GMT)
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 50AGU8Eb003614;
-	Fri, 10 Jan 2025 19:41:36 GMT
-Received: from smtprelay03.wdc07v.mail.ibm.com ([172.16.1.70])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 43yfatm2jh-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 10 Jan 2025 19:41:36 +0000
-Received: from smtpav02.wdc07v.mail.ibm.com (smtpav02.wdc07v.mail.ibm.com [10.39.53.229])
-	by smtprelay03.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 50AJfZtX11469498
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 10 Jan 2025 19:41:35 GMT
-Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id CE7C658059;
-	Fri, 10 Jan 2025 19:41:35 +0000 (GMT)
-Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 54C1058058;
-	Fri, 10 Jan 2025 19:41:35 +0000 (GMT)
-Received: from slate16.aus.stglabs.ibm.com (unknown [9.61.130.82])
-	by smtpav02.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 10 Jan 2025 19:41:35 +0000 (GMT)
-From: Eddie James <eajames@linux.ibm.com>
-To: netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, horms@kernel.org, pabeni@redhat.com,
-        kuba@kernel.org, edumazet@google.com, davem@davemloft.net,
-        sam@mendozajonas.com, Eddie James <eajames@linux.ibm.com>
-Subject: [PATCH] net/ncsi: Fix NULL pointer derefence if CIS arrives before SP
-Date: Fri, 10 Jan 2025 13:41:33 -0600
-Message-ID: <20250110194133.948294-1-eajames@linux.ibm.com>
-X-Mailer: git-send-email 2.43.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A40D4213E62;
+	Fri, 10 Jan 2025 19:58:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.52
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1736539088; cv=fail; b=Ks4gT9rKCoGnQAznaV7yZqNGDAHRDS0eD0ZJ0Fmkq/hm4Whel+hRCyqNmAAsuesTQxHEVqisd/MV1gfEAjGKZ4APvQqz5qGyB23Um85l6Ct3/bFTlrMPuKNIDFfjmm9QTIur8SkYO7Ash3346acwZ+D7vptkMs9vi6vjpnRyqqM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1736539088; c=relaxed/simple;
+	bh=1FIlYne9OkhvQAVfhqLS8oYLJgDOkQy618D42u5oSnc=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=ZEOlZRI05laDLKi3XI/kIUYcoaPna20aSW8xbZBNfApzVHmgOcLiR1S9AUF54qwIkIIjCx8sZr2/LtbD+HepNO2W2X0zvzF+Qydf07j+o3sUY5aoBsIu7oa6e1h2KHxEsSC4mcP8+ZnqbGNgAfaQ2UCG1IXqkHEyoLebvWmaY78=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=bUyCzNek; arc=fail smtp.client-ip=40.107.243.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=iXHz1VGYC0fm+oNbzMg4jPuBMXsHs5LBN5yoycCNBucwW848PyKuHAufqOzQ/e63gCXKncOiLsWTS3NuzW4ilzmo1SVVKLVsaPhzfaVsxoNpI8csCj+DmaYzVm8hQ60gMkF8KY1XIhCdH/EsLOIb2MpUsx4F97QZZjoNx3TQ2XrtlahkqIMozkApkFW5oYIBXuLYZOw29eaoJeGlE68K+arrWDlPcc5XB85RFTQYu8d1ouit4YHg/LZU8kqm1uANkAzivtEz+CAR35+w8NXclpSP+23qHDdbrr2LCFa033f7CPUI5Sm7hTP9NRU3YjGkSiRZU4OioXStYCxDBhRneQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=qiuaoMNCaGCXO1852EdU8Z/srMADMVLQoUQLpTkfDdo=;
+ b=RzhFrw1XIw1Lpyc7sZDxZrbbfGbHHVUbWRWFWUUqxnb/0ia6C+R+CJamhBPPQPMskT7ePx5gD4hhq87l56YYLa41r9rUxV7ZKcIitMDfvHXxm8LnZOT/FZusaFpktS9YKtG4ORFNyYo9ev0eNBfWMLSmodLJ6BvZa3zvgzbtAyE5V2V5bRhxnsd7kKhk1BA6tcOSxiEpKB4N8FSByFAaGURgvGgLG7Fyd1cn9PLwfcogqQRla87bWVpJ+p13QE4KGI4pgs6SK/uw1vn3KpHwUjoLIbi6iM61dW+lHwOe4hkaC02GXez+BHXtrObdkekzid+TfIZh1uQMFPDdjJ9WiQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=qiuaoMNCaGCXO1852EdU8Z/srMADMVLQoUQLpTkfDdo=;
+ b=bUyCzNek5sj49jqrs23bsECGLzJH8SZLzfSG2ZRB+VEvcFcJ0PoitRgnEyxzzZtGBcIwF5pUamWeUFlSbmZSiH4LHavmrHuj7d+9JpROnBTwAyZrdPmEtSx7HS0RiR+b1VhSJXKFJiRy5RRHG4XP+xytwUUdHYDGhLOMijgOhOI=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DS0PR12MB6583.namprd12.prod.outlook.com (2603:10b6:8:d1::12) by
+ CH3PR12MB7762.namprd12.prod.outlook.com (2603:10b6:610:151::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8335.10; Fri, 10 Jan
+ 2025 19:58:04 +0000
+Received: from DS0PR12MB6583.namprd12.prod.outlook.com
+ ([fe80::c8a9:4b0d:e1c7:aecb]) by DS0PR12MB6583.namprd12.prod.outlook.com
+ ([fe80::c8a9:4b0d:e1c7:aecb%5]) with mapi id 15.20.8335.010; Fri, 10 Jan 2025
+ 19:58:04 +0000
+Message-ID: <1e6a7cb4-6d56-4350-a4f1-0167a7f377af@amd.com>
+Date: Fri, 10 Jan 2025 11:58:02 -0800
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v4] net: xilinx: axienet: Fix IRQ coalescing packet
+ count overflow
+To: Sean Anderson <sean.anderson@linux.dev>,
+ Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
+Cc: linux-arm-kernel@lists.infradead.org,
+ Daniel Borkmann <daniel@iogearbox.net>, Simon Horman <horms@kernel.org>,
+ Michal Simek <michal.simek@amd.com>, linux-kernel@vger.kernel.org
+References: <20250110190726.2057790-1-sean.anderson@linux.dev>
+Content-Language: en-US
+From: "Nelson, Shannon" <shannon.nelson@amd.com>
+In-Reply-To: <20250110190726.2057790-1-sean.anderson@linux.dev>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: BYAPR08CA0038.namprd08.prod.outlook.com
+ (2603:10b6:a03:117::15) To DS0PR12MB6583.namprd12.prod.outlook.com
+ (2603:10b6:8:d1::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: DeXRnO5upH6Fy6siIyIlIdccsQsgeZla
-X-Proofpoint-ORIG-GUID: RgTKoyRG45DUy38PZ9j9A3fpth5TibdA
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 mlxscore=0
- malwarescore=0 suspectscore=0 priorityscore=1501 bulkscore=0 phishscore=0
- spamscore=0 clxscore=1011 mlxlogscore=933 lowpriorityscore=0 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2411120000
- definitions=main-2501100150
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR12MB6583:EE_|CH3PR12MB7762:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0740ced0-da39-444e-bf7b-08dd31b1181c
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|366016|376014|1800799024|7416014|7053199007;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?M3gyc2J0ZkNvNjd6T0RLRkp1MTRCT2JtOTY5bTJzZHhSQmhBU3ZjWEdqV1RN?=
+ =?utf-8?B?UWJqTHpTdEZJcTBPSHAzUEJIbnNBUUw5cGpaYzZJTmdKNDhrQ3dDY0Rob0J4?=
+ =?utf-8?B?N3Q0UTNLSkErRVBXaHRiQkVaTWFCSnRaMnZUdUUzNVdjK1M0ejY1SGtWbWZ0?=
+ =?utf-8?B?N3MwZ0lGUzF5UndWSHltZVV0enRyU0dFdE1kWWJER0c3NysxOHlJY082MW1k?=
+ =?utf-8?B?RTV4bTlmY2hBb1FLQ0dtSVd2aHA1YjZPK05FVVBjMWdDdmM1eUxHc2FNU2tV?=
+ =?utf-8?B?SFN5SENDYU1oYld5MUZJTU1wZUxTSXpKOVprREN1TVVLY1VRWWhXMG9sL1U5?=
+ =?utf-8?B?TzZnUUJ2UytXd2dPbHc2WDVhcGt6SGQzT0o1a0E5TzkrNnhwMkVtMjlVOUl5?=
+ =?utf-8?B?am9LQjZDTVlYdzQxUFdBV0xtMXdKaSsrZUhmYVFiOXVFN2U0TVJYUlpWbk1v?=
+ =?utf-8?B?M2N5b3M3d2VscUVsMGJZdkpHNjhWZGN3WnFYWkVRVjROandhcE1ZK0ZOcVg0?=
+ =?utf-8?B?YVBQNGVkQnlhR3U0WmpuZHJQVTI4MVYzQ3F4dnlIMFg1NG92YllVekpNQ0VX?=
+ =?utf-8?B?c2IrMVFKdjFsZTQ3K09YcUQyTjBGSXVCYm9uOXNJZUVhK1lFdm9ObGxJRVl3?=
+ =?utf-8?B?ZUJGbWZ6Y1NOTXZZNzltcWU5djQvQ2Q5UnhDdWZ5eEJ3QTNYY0VjOW5OWDVI?=
+ =?utf-8?B?dS9rMWJDTC80RkNmZEJjN1M0WXZrZExWQXBjZmdhTSs1VWpLMTEveHpKR1Ba?=
+ =?utf-8?B?SUQxNjJTSFB6akVwT3J1TzZpK3pPM2pBSXJPYnFOR2tLY3ExWDB0V095YkhI?=
+ =?utf-8?B?T1RjVVE4VzUxRXVzd21xblB4WkRxVmwwNEhtVmZ1M0dFbUQwaE8xMmw2OHhm?=
+ =?utf-8?B?ZXdxWGZDUW9qYnJncnhyMFZ6N0RGc043OTkzMzVPS0p1UVhaNGVHQVZ6Zm41?=
+ =?utf-8?B?U1VmZmJKYS9ZZWFTZmo1amNMRkh5WE1zQjZKelJtd3lvZkxHOHhUQ1IzMTZz?=
+ =?utf-8?B?b0YyM0xFZjdjdE81TTkydm1HMGNubGpjOEdvazgveVpXSlgrV2QrN0hXbU5i?=
+ =?utf-8?B?ZW9BWDQyRUJteGpmVVFSdm5KVnR6bE1Jdk1xY3I5SDVJRnBGREtNL3B6WlMr?=
+ =?utf-8?B?TnFSK2JqTDRKVTg1ZWt1bVhwbTlGdUs2V3pwbXZmLzZQWHdjZE0zYTJhd00v?=
+ =?utf-8?B?cHJjZWx6YWtJcVA4Y3FnNksyTXRyb3BwL080MjFVdEt0VlFuM0FCSHZIa2pG?=
+ =?utf-8?B?eTdBVmJPS1Qzc2RuZjAzckZuNEhDekN5STJJTE41TENGeit6ckhDSi9xUk1u?=
+ =?utf-8?B?bnRxdldzK2NVQmVWcElPK2RheXZSVlJNVXJ5cDJuQUdjUHVkd3NYNkwzdHJk?=
+ =?utf-8?B?WXRqNzQyN0szNVlTeDcyM2Y5aVpsYjRUQklEWlhDdjRxdm9NL0Y4TmprOExL?=
+ =?utf-8?B?YytHY0JYb05kTmNsVy9GZWNKaThUMFRGY3JZZlpKQmN4VTRjSUowU21sdzFX?=
+ =?utf-8?B?Nzc2eC9yTUVuN2dJYkI5NzdYQy9xNU15MWcxTlhyUmhhRjBuVTJ2dUlqV2Mw?=
+ =?utf-8?B?aEF4OFNtS2VJSVNnQlZIWFpOMFdwWXRmYVpjdkp4ei9INWs3dTNacDBxbXpV?=
+ =?utf-8?B?bzEyNGxGMTcrcWpFTHB0KzlOdTUrSW5KWU16U1FUZmNXalZkUG1ic3NyTk1I?=
+ =?utf-8?B?UEZYMlRpWWdmZHpoOStLZ1hFU09YU1MwSzJvY3U2dU11YVpIWXVBNUx4UVZ6?=
+ =?utf-8?B?MWRFcFVpVDJIOEc3Nll4VXlDS0plaHg5OW5CajRsVEsyd0U2Yk1CaGpsRHow?=
+ =?utf-8?B?VWtVa2hkaGNRUFZ1L1RqdmNQTGd1N1pISUYzNXhzTnlKUUd2T3F6Mm5xQXBj?=
+ =?utf-8?Q?78fnw5SPwIW/t?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR12MB6583.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(7416014)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?WHJMSUxESWx3UDNaZWNaYUsycTVtVlVNT3YxRXJzY3FpTk5YZjlnUGFrL3hm?=
+ =?utf-8?B?Tml1a3JWbFlweDFnOVZBZVg5elVZb084Q0xKTXpsQ3J3Njk5OFZrb2U2SHVN?=
+ =?utf-8?B?VjdlS3pDTkZVTitMb2JCQUFHMEJhMlJkMEMydzVBcHdMNjhCcmFjUU1VQ0xw?=
+ =?utf-8?B?OU9EdE12eWIvQ3ZxMHlxZi9Mbng4Znp3RVUzMmlTQzlZdm5HaXVQaXpZVGlX?=
+ =?utf-8?B?cFkxNlNaZnZ1OVF6N0FYL0ZDbkZPaWp3S2RtMmNHYXNIdEhnaHdlcTJhUU1N?=
+ =?utf-8?B?Y0pRM3EzTjdLdDFrTFpWUjZKOTNLamNnZHF5SW5waHNJcEwzZ201NVMyZXB2?=
+ =?utf-8?B?U3kzdmVHQzJTWXNJRnhSV1M1N2lJZUVlcjUwUnhPK2hjRVE0a2ZIMUhlRm4z?=
+ =?utf-8?B?OU5BbTVSVmMrNVlNMmpyRDk3bnN3aHFKNUFCR05iRURqNHl5Z1ZmTzBZNjk2?=
+ =?utf-8?B?SG1TK2QxdUJnSlZ1Z0JaZzlhUDAreWR3VUJIMHdrZUhvU05JczRWVlFaYWtI?=
+ =?utf-8?B?VmtCRDIwbk9teEg5eWU4T0VoZU9DN3VSSE1VMGNoZU1RV1p1Q1RXeWNKOTlV?=
+ =?utf-8?B?UGh1SEE5REJRa2RzNlhJUDVCR2VEWDdUd1cwc3AxZG5Zd2ZUVXdqMldpelU4?=
+ =?utf-8?B?aFl6NjVETGRnYlk5MmxMY0xWSUVVb1l2L0g4VFNXQWgzZDg5VXV1bW9ubnRw?=
+ =?utf-8?B?dHJwVnFmQkN0dWtrRlh0dnRWV25uaHNyZGMzMzNOUnFkeCs2ZEJCVUF5SXYx?=
+ =?utf-8?B?ajNZOVFRcG84RVdlcDVUd3BaeUw1bHB2R0NKOTNuZmxYbzFQa2wwajlLM3dD?=
+ =?utf-8?B?TFliK2xVNDArR3RESStLTVVZUGVCVkY4NlNndzROaHl4eTNsc3A4eG1SV1l1?=
+ =?utf-8?B?M1BrTWRISkcxSmRqRC80NnAvQTV6R3ZKUmpwVzBVZVBvYzg1ZzRXOENzQk1Z?=
+ =?utf-8?B?RWdiUTRZOVcwbHliZE82SDN1MGk0Nml4bWJpR2RKdU1WaFg2ckJmOVZFYUl0?=
+ =?utf-8?B?ZDRiZGwzaEtUcGJaWUF2TmJ0UjhRM3hhR1ZVbE9Kb1FDeXptT2MwVE92blB1?=
+ =?utf-8?B?bHBYWFNUMEZGTFFLVnYwVXhhMTNaMmQycXRid210dG9uK1l5c3A2V1QrK1Z4?=
+ =?utf-8?B?K3hYNGlDRi92YVBCMmQyd2xpeHRnditoOHdaL2lzVWIrWXdnR09BYlRreGdR?=
+ =?utf-8?B?SWF4eFpIek5WZmxDUzZFcWg2Q0lOVUI3YmVmeGtQRDFITU8yb0NTSGs2V3Rx?=
+ =?utf-8?B?ZDJDTW1OTytpd1ZQVllhZEFxSmFtdlFvb3J4b3NJN3h5VEdFZklUMEtnRHVS?=
+ =?utf-8?B?OVZZeWhCUTFkZGlFNnBqVmVtL1ZZRjdMN1RsenJNRG4yaHgyVThsQ3NOQVZZ?=
+ =?utf-8?B?dXRQL25rM0J3UGQzNTNzOGFENnUxL0pTdGYxdTFIM2ZRYUMvR0hLTnNNYTh2?=
+ =?utf-8?B?NUJKc2xPVnZmL0ZwMW1Henplb2xRZGNMOC9wUFZKbm5QNHlVaWhUZDJyVE5L?=
+ =?utf-8?B?Z0pDdFFkbTNuQTh4U2dUL05QSUJvZDZTODZIZDlvMm81T2VlbVdqQWxEdVdP?=
+ =?utf-8?B?bVBKN0hFalQ2QVVKMmVsTTFWVFhmVlVaNjhXT2JJaHB0WGxKU0JYeWhrYk1n?=
+ =?utf-8?B?LzYwcS9lVVRydzNVK0FlU0hoR2lsUiszekp3YVA5eXRZZ1IzdXUyZk9VU2FZ?=
+ =?utf-8?B?K0NENGYvYTFMQ0JMTThpa2lWeXMzeUdrSFVTVEVJSFJNVjZFd1NuV3JGQ2ZH?=
+ =?utf-8?B?N1pnOFFMRnBnZUI2dU5SeDIwUHRTbVdJSHVGaytxY3BNQTZEdGhrbjhOWTBY?=
+ =?utf-8?B?cGozclVDMTlEdHhEK2JWbVQzWTgxejlib1k4L01jUFNjSXBIM1hMRU9YZW5q?=
+ =?utf-8?B?MlFGT1lnRWpmbDQxZXl5UGNmNnZzV2NKUTA1dE8zSFJQeS9rQzM3V28vcjB2?=
+ =?utf-8?B?dExra3FROEQ5RUpEL1o1MHdIZEM5WlV3TkNjSlFTNk1GRFFUdmtrODVIZVVS?=
+ =?utf-8?B?OVlHR3YrUU8xK3JEQXhHbzNiZ1FPeFFvMVhkSy93MDNseGRZbWVsQUQrZVBO?=
+ =?utf-8?B?S000WThENkxwNmN4ZmxGTW9qL1lwMEV0d0FWeU84K3RZL1BvRnFEaGNtUEFW?=
+ =?utf-8?Q?gzktDWtF5a37yIh4Q+ugFUAiE?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0740ced0-da39-444e-bf7b-08dd31b1181c
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR12MB6583.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Jan 2025 19:58:04.1756
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: DjydrV6mc8ap5fVwJVt5ISttbAszXUKNj4VBHlbElSHgj1TJ6Hy+7GPwFzjaQiJaX0pITdqEWY3ObOZfo8Tc1Q==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB7762
 
-If a Clear Initial State response packet is received before the
-Select Package response, then the channel set up will dereference
-the NULL package pointer. Fix this by setting up the package
-in the CIS handler if it's not found.
+On 1/10/2025 11:07 AM, Sean Anderson wrote:
+> 
+> If coalece_count is greater than 255 it will not fit in the register and
 
-[    9.289221] 8<--- cut here ---
-[    9.289244] Unable to handle kernel NULL pointer dereference at virtual address 00000018 when read
-[    9.289306] [00000018] *pgd=00000000
-[    9.289333] Internal error: Oops: 5 [#1] SMP ARM
-[    9.289367] CPU: 0 PID: 35 Comm: kworker/0:2 Not tainted 6.6.69-f1d562d-gf1d562dd8fa4 #1
-[    9.289423] Hardware name: Generic DT based system
-[    9.289457] Workqueue:  0x0 (events)
-[    9.289486] PC is at _raw_spin_lock_irqsave+0x10/0x4c
-[    9.289525] LR is at ncsi_add_channel+0xd0/0x174
-[    9.289561] pc : [<808d1018>]    lr : [<808907bc>]    psr: 40000193
-[    9.289605] sp : b4801e20  ip : 8695e000  fp : 80d6c2a8
-[    9.289642] r10: 80d6c2a8  r9 : 8136a4dc  r8 : 00000018
-[    9.289680] r7 : 00000000  r6 : 00000000  r5 : 8695dc00  r4 : 00000000
-[    9.289725] r3 : 00000005  r2 : 00000018  r1 : 8089202c  r0 : 40000113
-[    9.289770] Flags: nZcv  IRQs off  FIQs on  Mode SVC_32  ISA ARM  Segment none
-[    9.289821] Control: 10c5387d  Table: 81adc06a  DAC: 00000051
-[    9.289861] Register r0 information: non-paged memory
-[    9.289898] Register r1 information: non-slab/vmalloc memory
-[    9.289939] Register r2 information: non-paged memory
-[    9.289976] Register r3 information: non-paged memory
-[    9.290012] Register r4 information: NULL pointer
-[    9.290046] Register r5 information: slab kmalloc-1k start 8695dc00 pointer offset 0 size 1024
-[    9.290111] Register r6 information: NULL pointer
-[    9.290145] Register r7 information: NULL pointer
-[    9.290180] Register r8 information: non-paged memory
-[    9.290216] Register r9 information: non-slab/vmalloc memory
-[    9.290257] Register r10 information: non-slab/vmalloc memory
-[    9.290298] Register r11 information: non-slab/vmalloc memory
-[    9.290339] Register r12 information: slab kmalloc-1k start 8695e000 pointer offset 0 size 1024
-[    9.290404] Process kworker/0:2 (pid: 35, stack limit = 0x401e97d3)
-[    9.290448] Stack: (0xb4801e20 to 0xb4802000)
-[    9.290482] 1e20: 00000000 81099810 81be7150 81368000 00000000 000024a8 81be7150 8088efc4
-[    9.290540] 1e40: 81be7150 00000000 00000000 8ae45185 00000000 00000000 81368000 8088f4fc
-[    9.290598] 1e60: 86337300 806fce18 81368018 0000008a 00000780 00000000 86662dc2 8ae45185
-[    9.290656] 1e80: 00000780 81365800 8088f3e4 0000002a b2c44000 b2c44090 81365800 86337300
-[    9.290714] 1ea0: 00000000 8071c4d8 00000002 86337300 8136c45c 8ae45185 80115aa0 86337300
-[    9.290772] 1ec0: 0000000a 8071c584 b2c44000 b2c44090 00005800 8ae45185 81365dd8 805be000
-[    9.290830] 1ee0: 00000000 805be060 00000040 81365d80 0000002a 00000000 00000036 00000001
-[    9.290888] 1f00: 00000040 81365dd8 b4801f53 ffff8ea7 80d03d00 00000000 81365dd8 8071d010
-[    9.290946] 1f20: 81365dd8 8071d010 49514f00 b3d96100 0000012c b3d962c0 b4801f58 8071d4a4
-[    9.291004] 1f40: b4801f60 81081980 80c4e100 33148000 00c4e100 33148000 b4801f58 b4801f58
-[    9.291062] 1f60: b4801f60 b4801f60 b4801f68 8ae45185 b3d929f0 00000004 00000008 80d0308c
-[    9.291120] 1f80: 81081980 00000100 40000003 0000000c 80d03080 801206d4 80c4c790 b480900c
-[    9.291178] 1fa0: 80d03080 b4801f98 80c493c8 0000000a 00000000 80c4d380 80c4d380 ffff8ea6
-[    9.291237] 1fc0: 80d03d00 04208060 80c4c790 8016c180 80d06094 81081980 80000013 ffffffff
-[    9.291295] 1fe0: b4935f44 61c88647 81081980 81081980 b4935f08 80120c84 80134f4c 808945b8
-[    9.291351]  _raw_spin_lock_irqsave from ncsi_add_channel+0xd0/0x174
-[    9.291402]  ncsi_add_channel from ncsi_rsp_handler_cis+0x98/0xb4
-[    9.291451]  ncsi_rsp_handler_cis from ncsi_rcv_rsp+0x118/0x2c4
-[    9.291498]  ncsi_rcv_rsp from __netif_receive_skb_one_core+0x58/0x7c
-[    9.291547]  __netif_receive_skb_one_core from netif_receive_skb+0x2c/0xc4
-[    9.291597]  netif_receive_skb from ftgmac100_poll+0x350/0x43c
-[    9.291642]  ftgmac100_poll from __napi_poll.constprop.0+0x2c/0x180
-[    9.291690]  __napi_poll.constprop.0 from net_rx_action+0x340/0x3c0
-[    9.291736]  net_rx_action from handle_softirqs+0xf4/0x25c
-[    9.291777]  handle_softirqs from irq_exit+0x80/0xb0
-[    9.291816]  irq_exit from call_with_stack+0x18/0x20
-[    9.291857]  call_with_stack from __irq_svc+0x98/0xb0
-[    9.291898] Exception stack(0xb4935f10 to 0xb4935f58)
-[    9.291935] 5f00:                                     00000007 00000006 80d03d00 00000769
-[    9.291993] 5f20: 85963e80 b3d953c0 80d03d00 b3d953e0 61c88647 85963eac 81081980 b3d953c0
-[    9.292050] 5f40: 00000004 b4935f60 80134f28 80134f4c 80000013 ffffffff
-[    9.292096]  __irq_svc from worker_thread+0x1fc/0x4e8
-[    9.292137]  worker_thread from kthread+0xe0/0xfc
-[    9.292176]  kthread from ret_from_fork+0x14/0x28
-[    9.292213] Exception stack(0xb4935fb0 to 0xb4935ff8)
-[    9.292250] 5fa0:                                     00000000 00000000 00000000 00000000
-[    9.292308] 5fc0: 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
-[    9.292365] 5fe0: 00000000 00000000 00000000 00000000 00000013 00000000
-[    9.292413] Code: e1a02000 e10f0000 f10c0080 f592f000 (e1923f9f)
-[    9.292455] ---[ end trace 0000000000000000 ]---
-[    9.295147] Kernel panic - not syncing: Fatal exception in interrupt
+s/coalece_count/coalesce_count/
 
-Signed-off-by: Eddie James <eajames@linux.ibm.com>
----
- net/ncsi/ncsi-rsp.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+Otherwise looks fine.
 
-diff --git a/net/ncsi/ncsi-rsp.c b/net/ncsi/ncsi-rsp.c
-index e28be33bdf2c4..59d0af7183acc 100644
---- a/net/ncsi/ncsi-rsp.c
-+++ b/net/ncsi/ncsi-rsp.c
-@@ -100,6 +100,13 @@ static int ncsi_rsp_handler_cis(struct ncsi_request *nr)
- 		if (ndp->flags & NCSI_DEV_PROBED)
- 			return -ENXIO;
- 
-+		if (!np) {
-+			id = NCSI_PACKAGE_INDEX(rsp->rsp.common.channel);
-+			np = ncsi_add_package(ndp, id);
-+			if (!np)
-+				return -ENODEV;
-+		}
-+
- 		id = NCSI_CHANNEL_INDEX(rsp->rsp.common.channel);
- 		nc = ncsi_add_channel(np, id);
- 	}
--- 
-2.43.5
+Reviewed-by: Shannon Nelson <shannon.nelson@amd.com>
+
+
+> will overflow. This can be reproduced by running
+> 
+>      # ethtool -C ethX rx-frames 256
+> 
+> which will result in a timeout of 0us instead. Fix this by checking for
+> invalid values and reporting an error.
+> 
+> Signed-off-by: Sean Anderson <sean.anderson@linux.dev>
+> Fixes: 8a3b7a252dca ("drivers/net/ethernet/xilinx: added Xilinx AXI Ethernet driver")
+> ---
+> 
+> Changes in v4:
+> - Fix checking rx twice instead of rx and tx
+> 
+> Changes in v3:
+> - Validate and reject instead of silently clamping
+> 
+> Changes in v2:
+> - Use FIELD_MAX to extract the max value from the mask
+> - Expand the commit message with an example on how to reproduce this
+>    issue
+> 
+>   drivers/net/ethernet/xilinx/xilinx_axienet_main.c | 6 ++++++
+>   1 file changed, 6 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
+> index 0f4b02fe6f85..ae743991117c 100644
+> --- a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
+> +++ b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
+> @@ -2056,6 +2056,12 @@ axienet_ethtools_set_coalesce(struct net_device *ndev,
+>                  return -EBUSY;
+>          }
+> 
+> +       if (ecoalesce->rx_max_coalesced_frames > 255 ||
+> +           ecoalesce->tx_max_coalesced_frames > 255) {
+> +               NL_SET_ERR_MSG(extack, "frames must be less than 256");
+> +               return -EINVAL;
+> +       }
+> +
+>          if (ecoalesce->rx_max_coalesced_frames)
+>                  lp->coalesce_count_rx = ecoalesce->rx_max_coalesced_frames;
+>          if (ecoalesce->rx_coalesce_usecs)
+> --
+> 2.35.1.1320.gc452695387.dirty
+> 
+> 
 
 
