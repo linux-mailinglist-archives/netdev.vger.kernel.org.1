@@ -1,101 +1,109 @@
-Return-Path: <netdev+bounces-157009-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157010-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 462B8A08ADF
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 10:04:25 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C708A08AEA
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 10:07:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 406FB7A2CD4
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 09:04:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E6FC61688C1
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 09:07:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 360701FA15C;
-	Fri, 10 Jan 2025 09:04:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F084E209669;
+	Fri, 10 Jan 2025 09:07:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=sedlak-dev.20230601.gappssmtp.com header.i=@sedlak-dev.20230601.gappssmtp.com header.b="W01zWdKk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31F1119AD8D
-	for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 09:04:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4442C206F06
+	for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 09:07:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736499859; cv=none; b=Z1+XrB47qiYzDueaP+Kz/sYYa8nR2q1CZoaAzkNu7DVXgX2CVW4YIhWO0qIAxdEbFswpj70uL5zXhYB/LFfhbInfG5AS0lrLIaZ4DsAEo5fOTRgm6alz1jozJv8Jmv0SHyocsCZYBJFTAsg5aY2seA0C5L9J9WbOYWe8AdffpkA=
+	t=1736500044; cv=none; b=gKoNKry/DKlwBD1bstFBks7w8etgb6yuRvI6GlUeGpRckzaGIJtSGqrRjw2IM5daImOBF2rdtB5pU+l32aiaznx6F3UsOX4hH1nvZrCY/rQKOd1wbqN91adVNIi1+2YWhIq21DsSRTwjyNLxOxbZMqoIyE3tOU4dA9hmaspe3yQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736499859; c=relaxed/simple;
-	bh=fg4/d15PgKSg7hTMCEd07m6T1TMk05AdYUol2uX7yeI=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ECvTGqV+RTssJ4rn/sU4HFOsUSS1IiTzy9HsVTwLymFpDjiJpijob9B0SYY3PdkUDjqTT/lF380+BK8JrZuzAEmNIXzoecV4jbQye1JihffkdlzVF48JGf742AeEkHwLP/xQUgjeeYj8jMnwHNGVduYJRoXTt2QZL6MzNgN9L4Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: d4c60266cf3111efa216b1d71e6e1362-20250110
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.1.45,REQID:f82cd532-f7dd-4926-a203-e6f6f0df8c0f,IP:0,U
-	RL:0,TC:0,Content:-5,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION
-	:release,TS:-5
-X-CID-META: VersionHash:6493067,CLOUDID:6dae1920d211dbf29c6931e5e6bca202,BulkI
-	D:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:0|50,EDM:-3,IP:nil,UR
-	L:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,S
-	PR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
-X-CID-BVR: 0,NGT
-X-CID-BAS: 0,NGT,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR
-X-UUID: d4c60266cf3111efa216b1d71e6e1362-20250110
-Received: from node4.com.cn [(10.44.16.170)] by mailgw.kylinos.cn
-	(envelope-from <zhangxiangqian@kylinos.cn>)
-	(Generic MTA)
-	with ESMTP id 456099224; Fri, 10 Jan 2025 17:04:00 +0800
-Received: from node4.com.cn (localhost [127.0.0.1])
-	by node4.com.cn (NSMail) with SMTP id A9D8316004ABC;
-	Fri, 10 Jan 2025 17:03:59 +0800 (CST)
-X-ns-mid: postfix-6780E27F-3951181343
-Received: from localhost.localdomain (unknown [172.25.83.26])
-	by node4.com.cn (NSMail) with ESMTPA id 02A3216004ABC;
-	Fri, 10 Jan 2025 09:03:57 +0000 (UTC)
-From: Xiangqian Zhang <zhangxiangqian@kylinos.cn>
-To: andrew+netdev@lunn.ch
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	netdev@vger.kernel.org,
-	inux-kernel@vger.kernel.org,
-	Xiangqian Zhang <zhangxiangqian@kylinos.cn>
-Subject: [PATCH] net: mii: Fix the Speed display when the network cable is not connected
-Date: Fri, 10 Jan 2025 17:03:55 +0800
-Message-Id: <20250110090355.2715002-1-zhangxiangqian@kylinos.cn>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1736500044; c=relaxed/simple;
+	bh=mJqgKsIX8JTRfqDD+I1SI8NjK4HyCThVNrcvwxMcg/M=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Content-Type; b=JQA2QKc+/JkU4f95dwuRapqa0Bs65+O8IEu3iH/27JeoHsI8O/MM1IXOEpj91bHr75Ge3HXQjUe9k1tkfv0tGSto94gm2MfL3L5Z5baZnQF5X9SRqKMX7tY34JFoQyEJIixq5P1a0bZciIBYnfhuDFwpuNwjkjtViOv2vtHhaoU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sedlak.dev; spf=none smtp.mailfrom=sedlak.dev; dkim=pass (2048-bit key) header.d=sedlak-dev.20230601.gappssmtp.com header.i=@sedlak-dev.20230601.gappssmtp.com header.b=W01zWdKk; arc=none smtp.client-ip=209.85.218.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sedlak.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=sedlak.dev
+Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-aaeef97ff02so307864766b.1
+        for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 01:07:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=sedlak-dev.20230601.gappssmtp.com; s=20230601; t=1736500039; x=1737104839; darn=vger.kernel.org;
+        h=content-transfer-encoding:to:subject:from:content-language
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=bivfEXb0SUuBXZLG0UoLAS1vXjT9WbVPSPb5v7e/O4Q=;
+        b=W01zWdKkw6bIyUFdez0BRxcFwc3a5eo4A9QP5dsJlWTUMe4Of2QCqYTYJgWYunxHSx
+         iVl3KiAJB/jl/0tRwsqLFT2lmXAwLgxTFNV74YM1MQqWS9HhSBS+gK1U4qMG6pcaS5+/
+         Fz9ZmajFuwWna/5rU6G6PexxVPbhzrbxAzGk3cuhI4wiRKbZvJWf9bEnhzuKZ++6PwBO
+         4xOJum5YrzPIwXmOIWDutCLmnv7kkvtgMPuZAKgrHJFpXCPMogO8EccjDj9TyXVny/3O
+         bp1pT6/hp9twzyHei3VFdEanluFTVTPzq2i2Qq1svsS+9icXJ6vT5b5lzkfFSKvPvlZT
+         BrEA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736500039; x=1737104839;
+        h=content-transfer-encoding:to:subject:from:content-language
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=bivfEXb0SUuBXZLG0UoLAS1vXjT9WbVPSPb5v7e/O4Q=;
+        b=Fc/4E/8A10S82onP3sWFetqmsbK5TBDB7Noxur9NxlKmOl5AMfZWoKSt4VFVuE4qoW
+         8CkoktB/MT4PjxS5Zb214iqB2Nq1HMOvCpgFdipVaWTFl/yGeSqRQUc5TDIaINSFzcjz
+         YL+HoWg2cWRlZoeStNtC8hM6UUiAXSZa9x9z8a3a+ZbJ0ZqWzC5boaiB03UgS0l/yPao
+         swN9mxvT9s1zw8FOY6vb3EtU67bybIGykTiTT/c3zaX0ZRZjs4k3nsTfBpS3PTY7cbYc
+         849BC9U4zi4gfI7leykztYwSQQrIdMQ508LmtM7thvE6xgs5SX4GGoEYQ++IDbVE8MWD
+         C8LQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUbLu9WuWrDOQx9dBWBQRcXyT2Lv8Nms5Zdg/cp+HCXXNhe0YE0tU+Hql3znkc8I/rcL3Lf/lo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyF6Ya2KHbLK+JQtnm4U4c+3F2Ep9OkotkiFphe43L60dfljUCI
+	mLTgw2TV0SCmvg6HyHaz8D9GyjPSjDF7wvs7VjQN+bxvP0xPioKRKIASYjOobpQ=
+X-Gm-Gg: ASbGnctcxzGJYXy3/ej9LVCp8jKc6pbDU/ZUzy+yAOGy/IZpefz4DLV4ddrPTzlo/Uj
+	h6jM9dtASVkIKB06lV8D2G0BoqWMCnYUUhSvSfBJXOsiDpnc0PHxwGkQiRzMAwZyfSZ2RCb1hyC
+	y4LsKoRy4Om/fubZmNRjaaPibjEkHH9PrP8nTZ7FaBnKDEktANvQ3aquenR+94tnDIB/LkJM8aK
+	A3Z64KsiSrEK/sA+WcyZfBsOIkWUOfj+vK6RC5hlJe1wm1vBtuTknEsdOvNhGe7/acq0lCZr6Ns
+	mv5/
+X-Google-Smtp-Source: AGHT+IE10SlroKQ5y0Lz/L4dNL2RL1GX1Kf54btjmslD/qSypClq/YVxTwxwh4y/dCEbf7+FbpZqhg==
+X-Received: by 2002:a17:907:94c2:b0:aa6:824c:4ae5 with SMTP id a640c23a62f3a-ab2abc9f6e0mr763522866b.56.1736500039098;
+        Fri, 10 Jan 2025 01:07:19 -0800 (PST)
+Received: from [10.26.3.151] (gumitek-2.superhosting.cz. [80.250.18.198])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ab2c90d7432sm145924566b.49.2025.01.10.01.07.18
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 10 Jan 2025 01:07:18 -0800 (PST)
+Message-ID: <ca5056ef-0a1a-477c-ac99-d266dea2ff5b@sedlak.dev>
+Date: Fri, 10 Jan 2025 10:07:18 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+From: Daniel Sedlak <daniel@sedlak.dev>
+Subject: [Question] Generic way to retrieve IRQ number of Tx/Rx queue
+To: linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Speed should be SPEED_UNKNOWN when the network cable is not connected
+Hello,
+I am writing an affinity scheduler in the userspace for network cards's 
+Tx/Rx queues. Is there a generic way to retrieve all IRQ numbers for 
+those queues for each interface?
 
-Signed-off-by: Xiangqian Zhang <zhangxiangqian@kylinos.cn>
----
- drivers/net/mii.c | 3 +++
- 1 file changed, 3 insertions(+)
+My goal is to get all Tx/Rx queues for a given interface, get the IRQ 
+number of the individual queues, and set an affinity hint for each 
+queue. I have tried to loop over /proc/interrupts to retrieve all queues 
+for an interface in a hope that the last column would contain the 
+interface name however this does not work since the naming is not 
+unified across drivers. My second attempt was to retrieve all registered 
+interrupts by network interface from 
+/sys/class/net/{interface_name}/device/msi_irqs/, but this attempt was 
+also without luck because some drivers request more IRQs than the number 
+of queues (for example i40e driver).
 
-diff --git a/drivers/net/mii.c b/drivers/net/mii.c
-index 22680f47385d..297a0cc3682f 100644
---- a/drivers/net/mii.c
-+++ b/drivers/net/mii.c
-@@ -213,6 +213,9 @@ void mii_ethtool_get_link_ksettings(struct mii_if_inf=
-o *mii,
- 		lp_advertising =3D 0;
- 	}
-=20
-+	if (!mii_link_ok(mii))
-+		cmd->base.speed =3D SPEED_UNKNOWN;
-+
- 	mii->full_duplex =3D cmd->base.duplex;
-=20
- 	ethtool_convert_legacy_u32_to_link_mode(cmd->link_modes.supported,
---=20
-2.25.1
+Thank you for any help or advice
 
+Daniel
 
