@@ -1,83 +1,83 @@
-Return-Path: <netdev+bounces-157004-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157005-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF18EA08A64
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 09:36:54 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B93F8A08A79
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 09:38:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EB6461681D8
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 08:36:52 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 70E427A4CA1
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 08:37:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D0ED20A5FB;
-	Fri, 10 Jan 2025 08:35:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AE9420ADF3;
+	Fri, 10 Jan 2025 08:35:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dCqE31qx"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J5MgoYq8"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C6541FF7DA
-	for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 08:35:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2BC220897A
+	for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 08:35:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736498134; cv=none; b=frvCUOcHqB6fAjizK1cj7Q5MOq2C97s5lvkIiecg4MoPX9ybmT8UUcIiyLAMHzwFwB7HwCGQaCnfN78INYMQFDn3R4Q9rdoszJX2CDuRX5zQD1KZ/5qvDPiy+/5OA98Q77AI+LO9GZ0ST/s4olKkoGLF/oXMMz65s0r9OSVeeFg=
+	t=1736498139; cv=none; b=aAZvfQqXEA6+HyZtTRIdxdFK+l+ou2pfwuSTFZBIHQ6RGdbdFMiLaAmMHGVuSyk1Rz4GKKC+k/5k/d1im68ZUZKPoPsMtG/kZyeSdcPeZjtvlBXy70upu9ShVc7i4RchI8AnITElm5G4edcx333hPpXdDYw6VXDihUFHbVNgrEs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736498134; c=relaxed/simple;
-	bh=N7oUWVYpspVtl1b3a9o1m38utpVtuI2HVqr6S2jFP5U=;
+	s=arc-20240116; t=1736498139; c=relaxed/simple;
+	bh=QjfOQgTaUWrmSTlG/geSr55nIlTbnhvRsiGytk5OSls=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=QLABC9MIrY+sJ5gdLtiRQo+ukU1NdIdVIzTRRZExgSE+li2vWllmXTA9ywE96N5yYVA7SSH09jA7DOsf1Pmuhl20Q+GIzzS0EVZnlpM5/GB0cL/056pTXK9dKYZzVrWgC/2nOYy+ZL/iGOBi4frX/G/D5QozaK2ju8wv3KL7u4M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dCqE31qx; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=ul0fhP1aKD1Ov/6TWeywqSnL5G+bWozGtLPx/Sh1eJO7UGsoVpMPrIAN5yii791RWkkFRM0v7SHmifQBBezcku8hXrtfNKOZ29ZCJ8QLZiul0hy7TSr1aw/fkndQOdQxMKBRbkEO2vh9BKG5NvXanrdjgONRGmpMp5gcgyzdLo8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=J5MgoYq8; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1736498130;
+	s=mimecast20190719; t=1736498136;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=jCCvBVF1oU547nRVhmRIMNs6MmiGORia96sQhicKNFk=;
-	b=dCqE31qxSqd1ZwhYVYqf7woY75Jvp9X7cCNr62s2EdBAv0JoIisOj0i+uvqI16/wdsu/fD
-	xggBvm/SSZ4nUvz2C+RLiKDJtp8PaOHxjB0sGqcWQrXpL70g0sLKqBlh9jmB+7csh/yUNW
-	mPRNdrcACrezWQ5AbPk7c0eMM/OVeb4=
+	bh=sBLDY4DTw2zaWMjga9j81VUizG/Z+zQDnv2kJoLZ4eU=;
+	b=J5MgoYq8llsSaZg5DlPTxJmyRn3oqNS4/skVdIZCccbo757hYIE8YcQLjFipsXR7tonn9Z
+	IydwYJ3l41+3kTzuHRQkwx8NJAilGRD8iYVJJS9m+u7MeSuXrGcBHQHSYT0s9JZd+P0Kr4
+	XNfG8ORhMSnQWn51sImr882AYEPkDU0=
 Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
  [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-486-QDpDNhTHOBy7HpNMfZ7hvA-1; Fri, 10 Jan 2025 03:35:29 -0500
-X-MC-Unique: QDpDNhTHOBy7HpNMfZ7hvA-1
-X-Mimecast-MFC-AGG-ID: QDpDNhTHOBy7HpNMfZ7hvA
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-43651b1ba8aso12572885e9.1
-        for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 00:35:29 -0800 (PST)
+ us-mta-360-E5VczT_6OQSt2TwKRByJrg-1; Fri, 10 Jan 2025 03:35:34 -0500
+X-MC-Unique: E5VczT_6OQSt2TwKRByJrg-1
+X-Mimecast-MFC-AGG-ID: E5VczT_6OQSt2TwKRByJrg
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-4361a8fc3bdso9114835e9.2
+        for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 00:35:34 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736498127; x=1737102927;
+        d=1e100.net; s=20230601; t=1736498133; x=1737102933;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=jCCvBVF1oU547nRVhmRIMNs6MmiGORia96sQhicKNFk=;
-        b=XBSD7NEqdEPoNA2Sxm9ZixvUoEJfky6OfB8/bYd7DGRC+tqJFPHQYPCEV8/xneHW0s
-         0eeAgBGf627wgV8x976rUS0/Kl7tLAW/e4sry80vOoOEHcqeCV70cnmQmFmnIeg6rcs9
-         lbAAW1VEypmYzpk1omvjlRE0qJXUv0MO9KKqB+8wkBy+2aGw1UDklqYjXU40myg13Ggf
-         Y/Tf3yU1VbZvNtCQ9Lpzbfk+p6Wffr7vzlKIB7aPeL0KG6UcGK9M0lB6GEk9TRYpIwZq
-         JXQUXuwJyeDB5h+dhmcKJTPk4i53RHdAYEzi36tAybZ3CS+coxDZOhfwER0Ds2YcZrS4
-         b1Og==
-X-Gm-Message-State: AOJu0YzVkMyXjVndPaNZLK0260LBqwC1uYMGvadUIq+p/QQtmyCTOXpZ
-	/PvWBK2wC8rne8bRKmMfuP8gpzsEHdOwIF8oHvOpKkG/r7JA/HiDUFxwp5EZhTARsVnE3xzSSKI
-	wyAWJ8FkNuoMHvGLEYQt1F7H1AO/mbssyJYgLVHv0Zxdp/Ef9Cgj48erZAzYwBkpZFAAM7CX+UL
-	ic79+S3WuVXA3iv3gAoeMILCN7NXcfbkvJXMQRrcww
-X-Gm-Gg: ASbGncvJ33u1bWu68ykHvfVkw2dmNjRNt+uZnFUZfyRF+dN0oUrhSyxqMdo5OHsbx8d
-	xcV0EddhewVtMnA1oauUr1As8xbU1cCwlHAH0qj/aNoouNh5E095OMSePjfby7ZZk9NyGvMTHoL
-	8DbnD72ZDSAkS90txDjTeZ7LAeU9ekIISGD2TnZd3InmHpM9Miz+mx22AafL5wDaoBFLj2HgpJE
-	G4gAEYHyJWMZ369ARNzMVT1iG+Y+RjKOKQh/q8d2KzAbEk=
-X-Received: by 2002:a05:600c:3b08:b0:436:18e5:6917 with SMTP id 5b1f17b1804b1-436e255ffd6mr98683195e9.0.1736498127547;
-        Fri, 10 Jan 2025 00:35:27 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEXYbonID+NCEiPxf2xSK2i1RLGHHOMCpGw+AxBXOdkAZovSc4AvlC1EcoGIJDqTU4Av556Sw==
-X-Received: by 2002:a05:600c:3b08:b0:436:18e5:6917 with SMTP id 5b1f17b1804b1-436e255ffd6mr98682465e9.0.1736498126795;
-        Fri, 10 Jan 2025 00:35:26 -0800 (PST)
+        bh=sBLDY4DTw2zaWMjga9j81VUizG/Z+zQDnv2kJoLZ4eU=;
+        b=eArnc2Ot+Q319rpwNmldmIYUmuCJh+zZYZhfU4swdYkEoSbM7x2brlFqS9aFVUD2L5
+         G0E4tPykYswt4pZsjXO1f7kkwV3CrA1x+fNCbOITOLDMgP6V/Bk8gRyZC8dCeqAtP/1P
+         MGAUVsOIakEBIDgjU9+Y5Ji4aC7yoRILveA0UXM0dmzOgGPi2NSzLbTxu12fVWv4PJA5
+         aYkqZ2hYzaQPEpgEhZ8bG+k52qDBqo2Wc4uY+T7/J7fUwYjpEbRcsTxYTAUDXsPnacAm
+         P9MexxfJZl3fDQcK7vdNa7VOXzFDxTrwj7SsnISS6O88OFoGOR3Bq2AYTy6COwLHLOMf
+         fdwA==
+X-Gm-Message-State: AOJu0YxiC1l8KjG25AI392n5ImdoczJRNc8VmDQTP2OuAEz3YBiT2v/U
+	SIhTwkuog14GHaSt3/eGpJ5Bv4S2znlGyC5SOvheSforJDyVlTl49eno3CtorfD8NiIpzi+bcDR
+	APLAiOkEgQZ+d2OVW2t9g1rsQrsSpBvlojnljl/10SzomDTzNua5ymVfIndPinr098+bLWc2+nO
+	n2cNJv0MksWCo3ADXhEdVPn2TgJq1Vse1gm4chlTHq
+X-Gm-Gg: ASbGncvctzDnbT1DA8qfbQZHhgxK/12hKkmMxpNnjoUpEyzS7u8OSYBOc/B1+heKF9k
+	tBAom/x1YDzRK5vRq9ufniO9rwxmljlNtDuWcWhfFNLKiGeujVk4YCkJ/mDcIGicB/TdcCT1i47
+	vlNEslDBnfbJ2uRs4tfk5UYMKwtyr7VHp0sHBdktdR5cNmirr6RpcgwvBqPTdJyNjXEbaZz+9O4
+	GwPcPFfq35VB2JaFZ5bx2HgUdRPIcHIwlcsQ1PbDsnwJms=
+X-Received: by 2002:a5d:64eb:0:b0:385:ec89:2f07 with SMTP id ffacd0b85a97d-38a87312d2emr8464170f8f.32.1736498133340;
+        Fri, 10 Jan 2025 00:35:33 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEkY+6wyisWu9I5OnlNIAEaCc1RkfYRMe4WOOPOqI9L+4Q6XFHZJA9lRe1HqGdOwc7Z+AC+ww==
+X-Received: by 2002:a5d:64eb:0:b0:385:ec89:2f07 with SMTP id ffacd0b85a97d-38a87312d2emr8464107f8f.32.1736498132691;
+        Fri, 10 Jan 2025 00:35:32 -0800 (PST)
 Received: from step1.. ([5.77.78.183])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38a8e38332asm3858150f8f.23.2025.01.10.00.35.24
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-436dcc8ddddsm73101805e9.0.2025.01.10.00.35.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 Jan 2025 00:35:26 -0800 (PST)
+        Fri, 10 Jan 2025 00:35:31 -0800 (PST)
 From: Stefano Garzarella <sgarzare@redhat.com>
 To: netdev@vger.kernel.org
 Cc: Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
@@ -100,11 +100,10 @@ Cc: Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
 	Michal Luczaj <mhal@rbox.co>,
 	virtualization@lists.linux.dev,
 	Bobby Eshleman <bobby.eshleman@bytedance.com>,
-	stable@vger.kernel.org,
-	syzbot+3affdbfc986ecd9200fd@syzkaller.appspotmail.com
-Subject: [PATCH net v2 2/5] vsock/bpf: return early if transport is not assigned
-Date: Fri, 10 Jan 2025 09:35:08 +0100
-Message-ID: <20250110083511.30419-3-sgarzare@redhat.com>
+	stable@vger.kernel.org
+Subject: [PATCH net v2 3/5] vsock/virtio: cancel close work in the destructor
+Date: Fri, 10 Jan 2025 09:35:09 +0100
+Message-ID: <20250110083511.30419-4-sgarzare@redhat.com>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20250110083511.30419-1-sgarzare@redhat.com>
 References: <20250110083511.30419-1-sgarzare@redhat.com>
@@ -116,81 +115,96 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Some of the core functions can only be called if the transport
-has been assigned.
+During virtio_transport_release() we can schedule a delayed work to
+perform the closing of the socket before destruction.
 
-As Michal reported, a socket might have the transport at NULL,
-for example after a failed connect(), causing the following trace:
+The destructor is called either when the socket is really destroyed
+(reference counter to zero), or it can also be called when we are
+de-assigning the transport.
 
-    BUG: kernel NULL pointer dereference, address: 00000000000000a0
-    #PF: supervisor read access in kernel mode
-    #PF: error_code(0x0000) - not-present page
-    PGD 12faf8067 P4D 12faf8067 PUD 113670067 PMD 0
-    Oops: Oops: 0000 [#1] PREEMPT SMP NOPTI
-    CPU: 15 UID: 0 PID: 1198 Comm: a.out Not tainted 6.13.0-rc2+
-    RIP: 0010:vsock_connectible_has_data+0x1f/0x40
-    Call Trace:
-     vsock_bpf_recvmsg+0xca/0x5e0
-     sock_recvmsg+0xb9/0xc0
-     __sys_recvfrom+0xb3/0x130
-     __x64_sys_recvfrom+0x20/0x30
-     do_syscall_64+0x93/0x180
-     entry_SYSCALL_64_after_hwframe+0x76/0x7e
+In the former case, we are sure the delayed work has completed, because
+it holds a reference until it completes, so the destructor will
+definitely be called after the delayed work is finished.
+But in the latter case, the destructor is called by AF_VSOCK core, just
+after the release(), so there may still be delayed work scheduled.
 
-So we need to check the `vsk->transport` in vsock_bpf_recvmsg(),
-especially for connected sockets (stream/seqpacket) as we already
-do in __vsock_connectible_recvmsg().
+Refactor the code, moving the code to delete the close work already in
+the do_close() to a new function. Invoke it during destruction to make
+sure we don't leave any pending work.
 
-Fixes: 634f1a7110b4 ("vsock: support sockmap")
+Fixes: c0cfa2d8a788 ("vsock: add multi-transports support")
 Cc: stable@vger.kernel.org
-Reported-by: Michal Luczaj <mhal@rbox.co>
-Closes: https://lore.kernel.org/netdev/5ca20d4c-1017-49c2-9516-f6f75fd331e9@rbox.co/
-Tested-by: Michal Luczaj <mhal@rbox.co>
-Reported-by: syzbot+3affdbfc986ecd9200fd@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/netdev/677f84a8.050a0220.25a300.01b3.GAE@google.com/
-Tested-by: syzbot+3affdbfc986ecd9200fd@syzkaller.appspotmail.com
-Reviewed-by: Hyunwoo Kim <v4bel@theori.io>
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
-Reviewed-by: Luigi Leonardi <leonardi@redhat.com>
+Reported-by: Hyunwoo Kim <v4bel@theori.io>
+Closes: https://lore.kernel.org/netdev/Z37Sh+utS+iV3+eb@v4bel-B760M-AORUS-ELITE-AX/
 Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
 ---
- net/vmw_vsock/vsock_bpf.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ net/vmw_vsock/virtio_transport_common.c | 29 ++++++++++++++++++-------
+ 1 file changed, 21 insertions(+), 8 deletions(-)
 
-diff --git a/net/vmw_vsock/vsock_bpf.c b/net/vmw_vsock/vsock_bpf.c
-index 4aa6e74ec295..f201d9eca1df 100644
---- a/net/vmw_vsock/vsock_bpf.c
-+++ b/net/vmw_vsock/vsock_bpf.c
-@@ -77,6 +77,7 @@ static int vsock_bpf_recvmsg(struct sock *sk, struct msghdr *msg,
- 			     size_t len, int flags, int *addr_len)
+diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+index 51a494b69be8..7f7de6d88096 100644
+--- a/net/vmw_vsock/virtio_transport_common.c
++++ b/net/vmw_vsock/virtio_transport_common.c
+@@ -26,6 +26,9 @@
+ /* Threshold for detecting small packets to copy */
+ #define GOOD_COPY_LEN  128
+ 
++static void virtio_transport_cancel_close_work(struct vsock_sock *vsk,
++					       bool cancel_timeout);
++
+ static const struct virtio_transport *
+ virtio_transport_get_ops(struct vsock_sock *vsk)
  {
- 	struct sk_psock *psock;
-+	struct vsock_sock *vsk;
- 	int copied;
+@@ -1109,6 +1112,8 @@ void virtio_transport_destruct(struct vsock_sock *vsk)
+ {
+ 	struct virtio_vsock_sock *vvs = vsk->trans;
  
- 	psock = sk_psock_get(sk);
-@@ -84,6 +85,13 @@ static int vsock_bpf_recvmsg(struct sock *sk, struct msghdr *msg,
- 		return __vsock_recvmsg(sk, msg, len, flags);
- 
- 	lock_sock(sk);
-+	vsk = vsock_sk(sk);
++	virtio_transport_cancel_close_work(vsk, true);
 +
-+	if (!vsk->transport) {
-+		copied = -ENODEV;
-+		goto out;
-+	}
-+
- 	if (vsock_has_data(sk, psock) && sk_psock_queue_empty(psock)) {
- 		release_sock(sk);
- 		sk_psock_put(sk, psock);
-@@ -108,6 +116,7 @@ static int vsock_bpf_recvmsg(struct sock *sk, struct msghdr *msg,
- 		copied = sk_msg_recvmsg(sk, psock, msg, len, flags);
+ 	kfree(vvs);
+ 	vsk->trans = NULL;
+ }
+@@ -1204,17 +1209,11 @@ static void virtio_transport_wait_close(struct sock *sk, long timeout)
  	}
+ }
  
-+out:
- 	release_sock(sk);
- 	sk_psock_put(sk, psock);
+-static void virtio_transport_do_close(struct vsock_sock *vsk,
+-				      bool cancel_timeout)
++static void virtio_transport_cancel_close_work(struct vsock_sock *vsk,
++					       bool cancel_timeout)
+ {
+ 	struct sock *sk = sk_vsock(vsk);
  
+-	sock_set_flag(sk, SOCK_DONE);
+-	vsk->peer_shutdown = SHUTDOWN_MASK;
+-	if (vsock_stream_has_data(vsk) <= 0)
+-		sk->sk_state = TCP_CLOSING;
+-	sk->sk_state_change(sk);
+-
+ 	if (vsk->close_work_scheduled &&
+ 	    (!cancel_timeout || cancel_delayed_work(&vsk->close_work))) {
+ 		vsk->close_work_scheduled = false;
+@@ -1226,6 +1225,20 @@ static void virtio_transport_do_close(struct vsock_sock *vsk,
+ 	}
+ }
+ 
++static void virtio_transport_do_close(struct vsock_sock *vsk,
++				      bool cancel_timeout)
++{
++	struct sock *sk = sk_vsock(vsk);
++
++	sock_set_flag(sk, SOCK_DONE);
++	vsk->peer_shutdown = SHUTDOWN_MASK;
++	if (vsock_stream_has_data(vsk) <= 0)
++		sk->sk_state = TCP_CLOSING;
++	sk->sk_state_change(sk);
++
++	virtio_transport_cancel_close_work(vsk, cancel_timeout);
++}
++
+ static void virtio_transport_close_timeout(struct work_struct *work)
+ {
+ 	struct vsock_sock *vsk =
 -- 
 2.47.1
 
