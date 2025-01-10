@@ -1,86 +1,87 @@
-Return-Path: <netdev+bounces-156960-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156961-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90663A0864A
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 05:49:00 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E9A8A0868C
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 06:33:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B25353A744C
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 04:48:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 58E20160DFE
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 05:33:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53B8115C140;
-	Fri, 10 Jan 2025 04:48:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 292221E2602;
+	Fri, 10 Jan 2025 05:33:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fqIhtraO"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XZeLpnWN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A559290F;
-	Fri, 10 Jan 2025 04:48:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A326746E
+	for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 05:33:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736484536; cv=none; b=IT1hSN88IdcNnYt/ikRbvS5YYmndcyU44RvNTOeodv2j1eKjmSESFhxkT5ymCe7OHyx2GQS0Wi4sT+GMtSIHkOiyDIy4GVMSZf/KDxPv43QUMgCoWhMoD937PD05k0f+CkYan5kRfdV0pTilff4VWH9cunKo1QhNAVuAJkTlxdQ=
+	t=1736487213; cv=none; b=SzSjPaiX/TipR53LISdAAUouQkMbjyaftbF2bHp+qE/XuOmN9Yeff8Du0HytoEVz0WVCjym2fi72dpgo/RJapQIa8Rr3kb/LBbCKAYSaJ7hI2wbXqqZzsEHzkRoP1NHguO1dX/SoZi3fV1vn/mQQ6Hyoj5pPxo3l96Dzsc8fEZE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736484536; c=relaxed/simple;
-	bh=3zkI5LgDvSbJ+KLD1OgbWZlSRH5EJtjzvt9ohL/WQLs=;
+	s=arc-20240116; t=1736487213; c=relaxed/simple;
+	bh=hxRTMp4mpwSU8jnHghh6r5i8faflXs6Biek6mneBQ78=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RguqVK2/eBXm7Rho6nBorifyofHDA9Fj5y+fBNmjv5bWEjSDLaGnmPOsgRbR/SeVuuG6BV6fAMjF/VOtuP/30sVtLa78D7yYJ8HKI/yUZTkB4R/PwrEUJGGM2612Qe/Qc1CPatJVn7Ni2fQVGcToo/wrqov4DHBw4BPB7QTIy+I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fqIhtraO; arc=none smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1736484534; x=1768020534;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=3zkI5LgDvSbJ+KLD1OgbWZlSRH5EJtjzvt9ohL/WQLs=;
-  b=fqIhtraOiq+hUdvBv3b6rU26emDdASV413E8aLLf+VlF7fnJgVLdH4aZ
-   ZXey8TjHuBYA/1U/D1r+qlAIbKGn8SPYvtHL+VYWFkqbXQR4J7yugd8kF
-   C8A7gjKdmfns+noYs0AuYiUiUIzK0fMHrGcwx9JanAnutY3wWfuldRoqM
-   gqCPWyb9mpYbgWQ7XAEfju58CL9DZWT1hobCyz7mfKz2S9JNM1twA+5OI
-   4FX1zYazDlov08VCcaEeZa2f0GSCge7PXXdC2Emwn60qBOQ1p2rqcTTxj
-   H1phHhSaA+cIUGVeSbnc8xivacIpKoXxgHP68tlePWTCA1B598EoofeHO
-   A==;
-X-CSE-ConnectionGUID: GsJnzq5LTR6CgAO+MCiCxQ==
-X-CSE-MsgGUID: 5HM0j1YSQaaGDmgjU2qtnA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11310"; a="54186223"
-X-IronPort-AV: E=Sophos;i="6.12,303,1728975600"; 
-   d="scan'208";a="54186223"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jan 2025 20:48:54 -0800
-X-CSE-ConnectionGUID: xUkcqSAMQGWvhTkU8Aopsw==
-X-CSE-MsgGUID: PSNQbN1CTpOEvOIV6fFK9A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="104501530"
-Received: from lkp-server01.sh.intel.com (HELO d63d4d77d921) ([10.239.97.150])
-  by orviesa008.jf.intel.com with ESMTP; 09 Jan 2025 20:48:50 -0800
-Received: from kbuild by d63d4d77d921 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1tW6wx-000IYF-2x;
-	Fri, 10 Jan 2025 04:48:47 +0000
-Date: Fri, 10 Jan 2025 12:48:21 +0800
-From: kernel test robot <lkp@intel.com>
-To: Oleksij Rempel <o.rempel@pengutronix.de>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=SMKaTgTdlM+o1mGLhjfSjxo+IBl3GIueUV8v0Ci13fhMS/T9qznT/2SEQyW+oFBDrLKmzwM0OyeGS6WeA5ZL9Xq6JQY7XWuG+vur8aJc9d8BuKFLVpynFBVitkx/O0P9j76RnAI/3wTpXhuO8zibwP1K7PGuTUiQ1i3V9Chahhs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XZeLpnWN; arc=none smtp.client-ip=209.85.214.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-2164b662090so25407045ad.1
+        for <netdev@vger.kernel.org>; Thu, 09 Jan 2025 21:33:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1736487211; x=1737092011; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=UdP1H6r78BZYoDOcYSzOfB3PzRaCWyLA9wYEqm3AXu4=;
+        b=XZeLpnWNJ9bNrIhnr2UDdzZOe0oq8IQD33+7Kw5CLrhtFKwSakE9E2rhDGNckzAgqm
+         9jsPoRSxc0VL2us4CujHRPQbaPyPOtKDUIWGR0Ey/Z+A99iFD+3HfbZqR4crbbp2U0Ia
+         gRTiXZ1+XcmqFnfN2Y7NMXmqkKCstVAjVWiSLwq2gq+d+TuLl7ha/eW781q4mh8Oa32c
+         XsZgOucD31DIqY+NiA464eIv0eaGIsnoWs/njU/gJ5/47jHjk6BWGhDBRunXsbkONq9d
+         aCiD/cVvAa9uyyn0EgUf/iF9/DQvyTqCtSkKyWjkZmo7lBei2o/WigveoQFq0h63NnJs
+         2zwA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736487211; x=1737092011;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=UdP1H6r78BZYoDOcYSzOfB3PzRaCWyLA9wYEqm3AXu4=;
+        b=xTERdmoyEHBF4c7YiBdNA71S0qQ0gKwdgGSPqifecCk/pzSelNqAYYo9fALoWt+74M
+         UIxCqyXtzZ4pHd2SqBg0CnzxgsJhaQXilMQtG+7zw0R/GI0LeCRj5Daco8vMI9x8wuaX
+         WOt2WP4GONHuwmPf04dQOjoTmVG9I3CCYt8Vj60Tl1+fX4qqdKlrhXfUwVvdm8eZx0AI
+         thK3HIoQG+DSBXj4FPuxIQqLMZENJeR1oPA+eyoGPAzFmOsf4y1kdBuw36RI5ildB5cx
+         sDMgpmlAaqSc5WTbD0lCAmM4t+V8aEDMvE4EAvJnzMNY1BB8B4pwSXGBpBkxrKYJNEc3
+         igDA==
+X-Forwarded-Encrypted: i=1; AJvYcCUE77ap3XF0Oe6lJa7hPQ6PiXb6HwI99rOArTOguurDuiVj9CU5GoY7E8K5p/IrciWle92miig=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy1UekVjgWR3vZeEl0RTVOeM1vLvz+IsMZhHkhPMCu/Gwuf8wpA
+	LBGlHiDwG2GPO78oqA8f6v5rNupTv+py5UgpFFp1sHJpscuY5A34
+X-Gm-Gg: ASbGncsFNabIBJTaKPaukvQhWYCXr1sQxNsWXi7ngcwyFHGT1uw+i6bXvsrUalIhU+k
+	MCOhi1JqDDMVpbF104qSoSLu3kdJ11Brm2LJZ3cjWixW4dwz+soaiOIrBHFt2dYURo+lfGzjRCT
+	U70P8v61Of2KscJDruH8sG/rKxGub/tFGhWyO20Xo1gZ/3dfcY059SXU6gbCfbMETwXq++ZRb6z
+	yKxIqASE7l7delU3pcEJyTWWsAmW5mazeKIQNoCCwVOdUMymuNqZX2LXKnSbDs=
+X-Google-Smtp-Source: AGHT+IGpXFgYx9QBLE5BKejw1lewtZBlVvulP0O6fcBeqATluc3tQ9vdFbitVdliacGQaxfngJHDXg==
+X-Received: by 2002:a17:902:ccc3:b0:216:2bd7:1c27 with SMTP id d9443c01a7336-21a83f72b8cmr144395715ad.33.1736487210762;
+        Thu, 09 Jan 2025 21:33:30 -0800 (PST)
+Received: from localhost ([2601:647:6881:9060:c586:91c7:b7f1:d942])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2f54a26ac5esm4668711a91.5.2025.01.09.21.33.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 Jan 2025 21:33:30 -0800 (PST)
+Date: Thu, 9 Jan 2025 21:33:29 -0800
+From: Cong Wang <xiyou.wangcong@gmail.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Jonathan Corbet <corbet@lwn.net>
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	Oleksij Rempel <o.rempel@pengutronix.de>, kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org, Simon Horman <horms@kernel.org>,
-	Russell King <linux@armlinux.org.uk>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	linux-doc@vger.kernel.org
-Subject: Re: [PATCH net-next v6 2/7] net: ethtool: plumb PHY stats to PHY
- drivers
-Message-ID: <202501101219.XbI23MZj-lkp@intel.com>
-References: <20250109094457.97466-3-o.rempel@pengutronix.de>
+	Simon Horman <horms@kernel.org>,
+	Jamal Hadi Salim <jhs@mojatatu.com>, Jiri Pirko <jiri@resnulli.us>,
+	netdev@vger.kernel.org, eric.dumazet@gmail.com
+Subject: Re: [PATCH net-next] net: sched: calls synchronize_net() only when
+ needed
+Message-ID: <Z4CxKV5AnfDPRfaF@pop-os.localdomain>
+References: <20250109171850.2871194-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -89,81 +90,62 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250109094457.97466-3-o.rempel@pengutronix.de>
+In-Reply-To: <20250109171850.2871194-1-edumazet@google.com>
 
-Hi Oleksij,
+On Thu, Jan 09, 2025 at 05:18:50PM +0000, Eric Dumazet wrote:
+> dev_deactivate_many() role is to remove the qdiscs
+> of a network device.
+> 
+> When/if a qdisc is dismantled, an rcu grace period
+> is needed to make sure all outstanding qdisc enqueue
+> are done before we proceed with a qdisc reset.
+> 
+> Most virtual devices do not have a qdisc (if we exclude
+> noqueue ones).
 
-kernel test robot noticed the following build warnings:
+Such as? To me, most virtual devices use noqueue:
 
-[auto build test WARNING on net-next/main]
+$ git grep IFF_NO_QUEUE -- drivers/net/
+drivers/net/amt.c:      dev->priv_flags         |= IFF_NO_QUEUE;
+drivers/net/bareudp.c:  dev->priv_flags |= IFF_NO_QUEUE;
+drivers/net/bonding/bond_main.c:        bond_dev->priv_flags |= IFF_BONDING | IFF_UNICAST_FLT | IFF_NO_QUEUE;
+drivers/net/caif/caif_serial.c: dev->priv_flags |= IFF_NO_QUEUE;
+drivers/net/dummy.c:    dev->priv_flags |= IFF_LIVE_ADDR_CHANGE | IFF_NO_QUEUE;
+drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c:        dev->priv_flags |= IFF_NO_QUEUE;
+drivers/net/ethernet/netronome/nfp/nfp_net_repr.c:      netdev->priv_flags |= IFF_NO_QUEUE | IFF_DISABLE_NETPOLL;
+drivers/net/geneve.c:   dev->priv_flags |= IFF_LIVE_ADDR_CHANGE | IFF_NO_QUEUE;
+drivers/net/gtp.c:      dev->priv_flags |= IFF_NO_QUEUE;
+drivers/net/ipvlan/ipvlan_main.c:       dev->priv_flags |= IFF_UNICAST_FLT | IFF_NO_QUEUE;
+drivers/net/ipvlan/ipvtap.c:    dev->priv_flags &= ~IFF_NO_QUEUE;
+drivers/net/loopback.c: dev->priv_flags         |= IFF_LIVE_ADDR_CHANGE | IFF_NO_QUEUE;
+drivers/net/macsec.c:   dev->priv_flags |= IFF_NO_QUEUE;
+drivers/net/macvlan.c:  dev->priv_flags |= IFF_NO_QUEUE;
+drivers/net/net_failover.c:     failover_dev->priv_flags |= IFF_UNICAST_FLT | IFF_NO_QUEUE;
+drivers/net/netdevsim/netdev.c:                    IFF_NO_QUEUE;
+drivers/net/netkit.c:   dev->priv_flags |= IFF_NO_QUEUE;
+drivers/net/nlmon.c:    dev->priv_flags |= IFF_NO_QUEUE;
+drivers/net/pfcp.c:     dev->priv_flags |= IFF_NO_QUEUE;
+drivers/net/team/team_core.c:   dev->priv_flags |= IFF_NO_QUEUE;
+drivers/net/veth.c:     dev->priv_flags |= IFF_NO_QUEUE;
+drivers/net/vrf.c:      dev->priv_flags |= IFF_NO_QUEUE;
+drivers/net/vsockmon.c: dev->priv_flags |= IFF_NO_QUEUE;
+drivers/net/vxlan/vxlan_core.c: dev->priv_flags |= IFF_NO_QUEUE;
+drivers/net/wan/hdlc_fr.c:      dev->priv_flags |= IFF_NO_QUEUE;
+drivers/net/wireguard/device.c: dev->priv_flags |= IFF_NO_QUEUE;
+drivers/net/wireless/virtual/mac80211_hwsim.c:  dev->priv_flags |= IFF_NO_QUEUE;
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Oleksij-Rempel/ethtool-linkstate-migrate-linkstate-functions-to-support-multi-PHY-setups/20250109-174927
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20250109094457.97466-3-o.rempel%40pengutronix.de
-patch subject: [PATCH net-next v6 2/7] net: ethtool: plumb PHY stats to PHY drivers
-config: arc-axs101_defconfig (https://download.01.org/0day-ci/archive/20250110/202501101219.XbI23MZj-lkp@intel.com/config)
-compiler: arc-elf-gcc (GCC) 13.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250110/202501101219.XbI23MZj-lkp@intel.com/reproduce)
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202501101219.XbI23MZj-lkp@intel.com/
+And noqueue_qdisc_ops sets ->enqueue to noop_enqueue():
 
-All warnings (new ones prefixed by >>):
+struct Qdisc_ops noqueue_qdisc_ops __read_mostly = {
+        .id             =       "noqueue",
+        .priv_size      =       0,
+        .init           =       noqueue_init,
+        .enqueue        =       noop_enqueue,
+        .dequeue        =       noop_dequeue,
+        .peek           =       noop_dequeue,
+        .owner          =       THIS_MODULE,
+};
 
->> drivers/net/phy/phy.c:631: warning: expecting prototype for phy_ethtool_get_phy_stats(). Prototype was for __phy_ethtool_get_phy_stats() instead
->> drivers/net/phy/phy.c:650: warning: expecting prototype for phy_ethtool_get_link_ext_stats(). Prototype was for __phy_ethtool_get_link_ext_stats() instead
-
-
-vim +631 drivers/net/phy/phy.c
-
-   617	
-   618	/**
-   619	 * phy_ethtool_get_phy_stats - Retrieve standardized PHY statistics
-   620	 * @phydev: Pointer to the PHY device
-   621	 * @phy_stats: Pointer to ethtool_eth_phy_stats structure
-   622	 * @phydev_stats: Pointer to ethtool_phy_stats structure
-   623	 *
-   624	 * Fetches PHY statistics using a kernel-defined interface for consistent
-   625	 * diagnostics. Unlike phy_ethtool_get_stats(), which allows custom stats,
-   626	 * this function enforces a standardized format for better interoperability.
-   627	 */
-   628	void __phy_ethtool_get_phy_stats(struct phy_device *phydev,
-   629					 struct ethtool_eth_phy_stats *phy_stats,
-   630					 struct ethtool_phy_stats *phydev_stats)
- > 631	{
-   632		if (!phydev->drv || !phydev->drv->get_phy_stats)
-   633			return;
-   634	
-   635		mutex_lock(&phydev->lock);
-   636		phydev->drv->get_phy_stats(phydev, phy_stats, phydev_stats);
-   637		mutex_unlock(&phydev->lock);
-   638	}
-   639	
-   640	/**
-   641	 * phy_ethtool_get_link_ext_stats - Retrieve extended link statistics for a PHY
-   642	 * @phydev: Pointer to the PHY device
-   643	 * @link_stats: Pointer to the structure to store extended link statistics
-   644	 *
-   645	 * Populates the ethtool_link_ext_stats structure with link down event counts
-   646	 * and additional driver-specific link statistics, if available.
-   647	 */
-   648	void __phy_ethtool_get_link_ext_stats(struct phy_device *phydev,
-   649					      struct ethtool_link_ext_stats *link_stats)
- > 650	{
-   651		link_stats->link_down_events = READ_ONCE(phydev->link_down_events);
-   652	
-   653		if (!phydev->drv || !phydev->drv->get_link_stats)
-   654			return;
-   655	
-   656		mutex_lock(&phydev->lock);
-   657		phydev->drv->get_link_stats(phydev, link_stats);
-   658		mutex_unlock(&phydev->lock);
-   659	}
-   660	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Thanks.
 
