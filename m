@@ -1,183 +1,130 @@
-Return-Path: <netdev+bounces-157181-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157182-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8543A0939B
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 15:34:39 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D92B9A093A1
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 15:35:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BA353188C7E2
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 14:34:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BA2F31882741
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 14:35:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37B3C211290;
-	Fri, 10 Jan 2025 14:33:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 000C4211269;
+	Fri, 10 Jan 2025 14:35:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WQ5/5lA1"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K3nviM/P"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AAD921127F
-	for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 14:33:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DEF820FABA;
+	Fri, 10 Jan 2025 14:35:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736519632; cv=none; b=Lf0m7UZIE0mUkZ/upN7vgu5fO0x4YtcQozA930S0mpOH1JiYYV3FEkaz6shXyzNgeprnh5Cbj0TqfQaa4cNfTQDEn8cHd0S6PR92d6ejY+PuUzNIDOoEChOWhGPJhzgWiYI6Xs+i+TcyZwHu4pcOCBYNB0C2dL+CuK6bCAoH3MY=
+	t=1736519728; cv=none; b=mknoa8G5ZCdrpO6Ae9k8J6VI1aQ1wA8YzTfmEuVyXz5luMpV3MKZAj5R3+w1u3eeOvwzL2q3reIuuLf3WT8yK/s3ZCNDR+mESX7UTFUemHXtIqF8yIf8+VH7Y5sqX0//CjJpHfxgy90T+BRzixHKd2cE617eUz4CfC2pgXw7fmo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736519632; c=relaxed/simple;
-	bh=sIPxDEapCmOFF0UUJ050CZ52VknWeMjqbJ4QpXvzgJU=;
-	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=kstXWmCBbTwuj//ih0NYf0ZdcUTJ4u9VE+GCgqb3OjdP/0WpNC3jzt/iSNigQUup7mSvAYT/svf4SLvIzruKhd7NubhSduCY6cHupYTuqMumuLQmwAfPGC3fT1ppOATUhtyu5oq7lte8xkLxc5n9dw4Xu+pbKCa7KxmQfPm1TA8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WQ5/5lA1; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1736519629;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=h+rt9KmUBZuQERAo92PycxKqQH9U6iO8IHFEaXObSX4=;
-	b=WQ5/5lA1aebvyGHe9PdW+8yKnobz/jwoXSNl2fu1X11S2PaMEkujVngYN3VeXnDzX6e+MZ
-	mZADpBhXWUTC6z/nVeimBCTw2QDa4EHVxQXE/Haah1v4h1QoRekOOMAYicoLh4KDeTrvFB
-	ge9YWQ0qrDnIVd35UKJHhotnh8XYkjc=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-486-Qi0gWsesM1K1XCb9hZkTEg-1; Fri,
- 10 Jan 2025 09:33:46 -0500
-X-MC-Unique: Qi0gWsesM1K1XCb9hZkTEg-1
-X-Mimecast-MFC-AGG-ID: Qi0gWsesM1K1XCb9hZkTEg
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id AF5A51954194;
-	Fri, 10 Jan 2025 14:33:42 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.12])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 93BE71955BE3;
-	Fri, 10 Jan 2025 14:33:37 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <CAMj1kXE2mhXJaa9uq==Xki3On9ZKYY+KV-oH0ednqWC6b9BTYw@mail.gmail.com>
-References: <CAMj1kXE2mhXJaa9uq==Xki3On9ZKYY+KV-oH0ednqWC6b9BTYw@mail.gmail.com> <20250110010313.1471063-1-dhowells@redhat.com> <20250110010313.1471063-3-dhowells@redhat.com> <20250110055058.GA63811@sol.localdomain> <1478993.1736493228@warthog.procyon.org.uk>
-To: Ard Biesheuvel <ardb@kernel.org>
-Cc: dhowells@redhat.com, Eric Biggers <ebiggers@kernel.org>,
-    Herbert Xu <herbert@gondor.apana.org.au>,
-    Chuck Lever <chuck.lever@oracle.com>,
-    Trond Myklebust <trond.myklebust@hammerspace.com>,
-    "David S. Miller" <davem@davemloft.net>,
-    Marc Dionne <marc.dionne@auristor.com>,
-    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-    Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-    linux-crypto@vger.kernel.org, qat-linux <qat-linux@intel.com>,
-    linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org,
-    linux-fsdevel@vger.kernel.org, netdev@vger.kernel.org,
-    linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH 2/8] crypto/krb5: Provide Kerberos 5 crypto through AEAD API
+	s=arc-20240116; t=1736519728; c=relaxed/simple;
+	bh=VwZAwlQ05j9JCSRqtCgH/3hOTx/jyPGLqe03SRJTzpc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=vFu9u8rywIVq3GkoVtTc4cI/2KNlCqNmiVWMxxzQABjqYZ6ChHH6J9R7Depe8tjbZQeXY+otdjiuMXjlyOv4S89Q4wyVP3f4tJCQsvQF7M2svruakdvLOwqTMn3b02eOfFvUxavKz+rQhPvWs6Is3GscJDhmakoPNO1GlvH2PsQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=K3nviM/P; arc=none smtp.client-ip=209.85.221.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-3862f32a33eso995602f8f.3;
+        Fri, 10 Jan 2025 06:35:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1736519725; x=1737124525; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=nxjyU8yZswI0rAK4YmLu8c0WjZr5aARNDWVbS1xSnog=;
+        b=K3nviM/PqDd124BK3prWBvCZr7xPBSPKVkd52o4Wgm1CTjDud0UMBLCPm1kIFmGxQB
+         EhgKxSkqjascsmqxSDUdYSnMv9+U9EuA9ALpGw2JhEl5iKC+E7vnvjr7hWtgC646EYaj
+         aAwyfqMv4YqdVtALTq8lFQsI+xoBr/QDLORsuAxelQgPSPd7RIo9vWk5OcnXxA+dfb0A
+         DeWChA/xJHJBhaRPqCCsCLGgbk3msmu97R4eDc7RMMLK4dcCwMegKTbS+1Q3XIiAzU7S
+         JXRe1rdaaH0JuC4l44gOIpR6zfE4X6cePNW34CxthKibdxalrxTpGIMhqWqz7PFmwkSA
+         L9dg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736519725; x=1737124525;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=nxjyU8yZswI0rAK4YmLu8c0WjZr5aARNDWVbS1xSnog=;
+        b=fOYB8W/Du8t06m1tVHoAir8SIOvi2rLW/CXCrkKtQlDpcFm2CZbP0AvjtRJ30jW/4D
+         scE/wFkXQoMKr0G1Of4ZoJq3VxcWgQjAcsfRSJ97o4vjW176JSIk+hsSzFOUMc/oQbZn
+         GNwqTO9Q+d+tMTCd1/D1wXuRBW+iu/TwSFEJMGEv3g9RUAH2liPEyr/nT1k2qnbnared
+         ILcN5a1cBY/pw/jzmsm2XcDLuU2vhpywN/4g3jUJQVNeQgywAyg9Uo7D+ay+4u04yzD/
+         DNuvQnzDodQL/qT4WMBvGawejTmy+T16d5yLrDptBkLM7qjtpaco+5Cav3T2fOuwfmDI
+         9kKg==
+X-Forwarded-Encrypted: i=1; AJvYcCVtR6nLh0ldGU9whDDVQSBWkLJXk1jmoDe4551SnJL7VYJM7VDh4ilMRmRwXr1m6ImUQSuM6eni@vger.kernel.org, AJvYcCVuqMliUi+vxJVg6HRzid6MDcS2R5cmLsJLBYu9QmGLR2NkFsbxrvyXXv3Hv+XC229kbFq2a4FI3BsXiuMspeQW@vger.kernel.org, AJvYcCWLf8FSONWV+w/M6auL0oxQOIY9UMCCu5JZj98zfR7MuqXTy9xvoncwrDwb3/TBb2tZfolDdtDZnqcdhDc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwaXLDecXHSzAkmhUtBzwc37oFclAq3byZWF7m8xWOaKw/6pA2q
+	x43wpGy+nKjuslIPB8Jgh7cgE/3L9W1mlkgIqwIpG/p+8e0vK5UZ
+X-Gm-Gg: ASbGnctBYqD7CyZ5k8OkLGyqr3JUib9sxqY5oo5zqKeBNH9gtgGwuXuwDxSEVhpB0ms
+	toujLMSk0K1UO94nRX4Hs3/fucRZ3DDiNLYJ3Zt2ZziKmpUyB8VqnYRl+kDxEgu6EDrg5WP++0M
+	22snMQajKlQDHC99Yjj3fS++c63nwBb3gZAJXaDmL/Ind6zLU2otC46EANPFDDP4Tw381WM8PVj
+	i1G71Cos7tuOgHjizjZ8+3lQKQg7KcVkkMth3vGieiHFCY8Ul41b4VzTsoraBdvXv9UlTa9qlkC
+	dDZOTgL0NqiNlUP2Idur4B6hP0sgw5HX
+X-Google-Smtp-Source: AGHT+IFzx2a/VwoogHps3IEtSZK03mUfkTAD/RdWr5SZo8aKa+CaHEX1W2HVTzEv2c338yV3wZlXyA==
+X-Received: by 2002:a5d:648b:0:b0:386:3e3c:ef1 with SMTP id ffacd0b85a97d-38a87312f36mr11033177f8f.35.1736519725236;
+        Fri, 10 Jan 2025 06:35:25 -0800 (PST)
+Received: from alessandro-pc (net-2-37-205-162.cust.vodafonedsl.it. [2.37.205.162])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38a8e38c6dbsm4773693f8f.55.2025.01.10.06.35.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 10 Jan 2025 06:35:24 -0800 (PST)
+Date: Fri, 10 Jan 2025 15:35:23 +0100
+From: Alessandro Zanni <alessandro.zanni87@gmail.com>
+To: Hangbin Liu <liuhangbin@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, shuah@kernel.org, netdev@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] selftests/net/forwarding: teamd command not found
+Message-ID: <s564xh7c2xtmjz2cfwqq3zl4krjxiy4hqjeuvjpa6uhabcgvcb@k662t5irg2yi>
+References: <20250110000752.81062-1-alessandro.zanni87@gmail.com>
+ <Z4CdYzmSn2cySE_h@fedora>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <1494599.1736519616.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 10 Jan 2025 14:33:36 +0000
-Message-ID: <1494600.1736519616@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z4CdYzmSn2cySE_h@fedora>
 
-Ard Biesheuvel <ardb@kernel.org> wrote:
+On Fri, Jan 10, 2025 at 04:09:07AM +0000, Hangbin Liu wrote:
+> On Fri, Jan 10, 2025 at 01:07:44AM +0100, Alessandro Zanni wrote:
+> > Running "make kselftest TARGETS=net/forwarding" results in several
+> > occurrences of the same error:
+> >  ./lib.sh: line 787: teamd: command not found
+> > 
+> > Since many tests depends on teamd, this fix stops the tests if the
+> > teamd command is not installed.
+> > 
+> > Signed-off-by: Alessandro Zanni <alessandro.zanni87@gmail.com>
+> > ---
+> >  tools/testing/selftests/net/forwarding/lib.sh | 1 +
+> >  1 file changed, 1 insertion(+)
+> > 
+> > diff --git a/tools/testing/selftests/net/forwarding/lib.sh b/tools/testing/selftests/net/forwarding/lib.sh
+> > index 7337f398f9cc..a6a74a4be4bf 100644
+> > --- a/tools/testing/selftests/net/forwarding/lib.sh
+> > +++ b/tools/testing/selftests/net/forwarding/lib.sh
+> > @@ -784,6 +784,7 @@ team_destroy()
+> >  {
+> >  	local if_name=$1; shift
+> >  
+> > +	require_command $TEAMD
+> >  	$TEAMD -t $if_name -k
+> >  }
+> 
+> I saw team_create() has `require_command $TEAMD`. Is some test called
+> team_destroy() before team_create()?
 
-> What is the reason for shoehorning any of this into the crypto API?
+Actually, the errors seem to raise in the "cleanup()" method.
 
-I was under the impression that that was what Herbert wanted.
-
-> I agree with Eric here: it seems both the user (Kerberos) and the
-> crypto API are worse off here, due to mutual API incompatibilities
-> that seem rather fundamental.
-
-My original take on this was to take the sunrpc code and turn it into a
-library, placing that library in the crypto/ directory:
-
-	https://lore.kernel.org/linux-crypto/160518586534.2277919.144756386536802=
-31924.stgit@warthog.procyon.org.uk/
-
-The crypto/ dir seems the right home for it (and not net/ or lib/), but th=
-e
-way it's implemented here, it's a user of the crypto API, but does not its=
-elf
-implement it.
-
-That said, it would be convenient if if *could* be part of the crypto API =
-in
-some way.  As I outlined in one of my responses to Herbert, there are a nu=
-mber
-of advantages to doing that.
-
-> Are you anticipating other, accelerated implementations of the
-> combined algorithms?
-
-I think one can be done with x86 AES and SHA instructions provided there a=
-re
-sufficient registers.
-
-> Isn't it enough to rely on the existing Camellia and AES code?
-
-The problem is that you have to do *two* crypto operations - and that it m=
-ay
-not be possible to parallellise them.  With AES+SHA1 and Camellia, they ca=
-n be
-parallellised as both sides work on the plaintext; but with the AES+SHA2, =
-the
-encryption is done and then the *encrypted* output is checksummed.
-
-Note that "parallellising" might mean launching an async hash request and =
-an
-async skcipher request and then waiting for both to finish.  This can't,
-however, be done unless the output buffer is separate from the input buffe=
-r.
-
-> Mentioning 'something like the Intel QAT' doesn't suggest you have somet=
-hing
-> specific in mind.
-
-I have an Intel QAT card, and under some circumstances I could offload the
-crypto to it...  But the only operations the driver currently makes availa=
-ble
-are:
-
-	authenc(hmac(sha1),cbc(aes))
-	authenc(hmac(sha256),cbc(aes))
-	authenc(hmac(sha512),cbc(aes))
-
-The first one can't be used for kerberos's aes128-cts-hmac-sha1-96 as it
-hashes the ciphertext, not the plain text.  I don't have anything that use=
-s
-the third.  The second is a possibility.  I think that could probably do
-aes128-cts-hmac-sha256-128.
-
-Now, it's possible that the QAT device range can do more than the driver
-offers.  I'm presuming that the driver offers what IPsec wants to support.
-Also, waving these ideas in front of Intel devs might expand the range of =
-what
-future QATs can do ;-)
-
-Mostly, though, by "something like" I was just offering the possibility th=
-at
-other architectures or crypto cards may also offer usable services - but I
-haven't investigated.
-
-> Also, this patch is rather big and therefore hard to review.
-
-Yeah.  Mostly I wanted to wave it in front of Herbert before expending the
-effort to slice it up.  Sadly, it doesn't seem that what I came up with is
-what he wanted.
-
-David
+So, first, during the test preparation the "team_create()" method is called
+and checks if teamd is installed. 
+When it fails and skips the test, the "cleanup()" method calls
+the "team_destroy()" that raises the errors.
 
 
