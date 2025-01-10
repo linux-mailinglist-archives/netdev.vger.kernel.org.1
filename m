@@ -1,53 +1,54 @@
-Return-Path: <netdev+bounces-157050-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157051-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A78EBA08C71
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 10:42:28 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C7172A08C73
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 10:42:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2027D188DC97
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9B88E164E5C
 	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 09:42:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5657020C470;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8FA920C484;
 	Fri, 10 Jan 2025 09:40:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="QyT0cvwi"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="fr7ZhPgg"
 X-Original-To: netdev@vger.kernel.org
 Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A52F620B819;
-	Fri, 10 Jan 2025 09:40:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DC0F20ADFD;
+	Fri, 10 Jan 2025 09:40:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736502047; cv=none; b=KH0Rcdc35/c3cGJR0EXTLGYgbvJXxj6ltr4ztpnoF0ozS7tJm0XR2rl9av3DZ0H6Z9cmGbAEEJbXmWSxPpbufXj+d+KPcKBKymopOFD1opi8erffZQZwmLcJZdaal/gSRPo9uGzyOLvRB/qb4Az0a+Y5xIAhbtPdEJ4a8oob9sQ=
+	t=1736502047; cv=none; b=dHdepfAivjfz6jEmqd5y9Nr47wl9bX/3VbCCpxguGoevLt4VAIpojMQeKSWzY1WmaxDoM7mx1V97ouxZfyql4iWIMuRYrcmCnNgY1yqb1CZKpsoSJl/XC2PDt30d4/144CLIa+vwCnMzdgKuFYKQ8Qeq4kmGzn+8Lzh8pvIsu6g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1736502047; c=relaxed/simple;
-	bh=otSAI726UPSW5yZP19QT9AMB+lmCMNzhXgqogdXpnXQ=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=p+7x+etJF/BBYQNnNICFgIlI7s0hOrYEjgHCm+03yr1hCads7BQ1uqCxK99QX2QBrO8WxgtYwLW5X7zjsjPtVExTMCINVMECP2gln1n3FBYF2wi8t9KtJUtCeJCzS10kc70xBgPGkUs3CbkdWeB3gSBDRjRiF7g0edQXV0W0pFk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=QyT0cvwi; arc=none smtp.client-ip=217.70.183.195
+	bh=PDl2g7fKJGyD6zAj6RjsXeYUPk2qXfNoXBzZDt3NGPY=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=tgtDBQtnLsoCj25hPRrLaWwKvb8U+J1rCnqZRMOHTO8u0uKX0iVzeB+68cJwV1yVNX3HoNLAoOZ+SvFN8DPtcTPvjPMyyoj5HBqAk2TiXY/5mD77O/9UT94v62TO9i7KUa77We89csJJzs4i52y18xidqyeVMLgItzhL+EBLweM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=fr7ZhPgg; arc=none smtp.client-ip=217.70.183.195
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 44A1260002;
-	Fri, 10 Jan 2025 09:40:40 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id DDFA66000C;
+	Fri, 10 Jan 2025 09:40:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1736502042;
+	t=1736502043;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=KvKxG2m3PbqglKqADysMRddDRGxPmp8YOzbE4c6xDbI=;
-	b=QyT0cvwiee5k0OMA53N8cZOBYeMHe4/NYZIFhQ0GIWGPpmtZ25Ud+4jkluqDFiTV3vG0UX
-	lC99GKaqyOeIZeBopqtuGTg+MZsv9VVy7GhpzrOY8eteedwKScMfE1fLd8tbmeIJAFrxyo
-	Lk9X4ulcIhhhxxkqrn9wympofkHfD7uGTunMXCGpNYnmNW9KYItumkvqR1jZHUEScmBrOf
-	AXY0Y519ArEht5XKS35yg2+1lxAO96ZAcXQtrIJg8H/vIh2UhLzgFrbsor294N6j3F4EX6
-	gkA3R5jJ6i7xW5+Wc+mVntEU6Q6lIJNFsQB7lYCgdcSE0IV56vst0+TCODNptQ==
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ayRV9+l17ONAq1pIr8+GSEltHOMPV9kPPJnrAbxjFVU=;
+	b=fr7ZhPggKZZ/vo1MBxIE8gGZEbYW38rM4YanTf/Hm+6csmeTk/ePDJ+26ljilPiHV0FRUF
+	/m2PRWplGUvyM/WEZElcmEX19y9cak0HWrbbTRJnBwE4/Kwk6SLmQIMhHaTcfkBrLaR14T
+	/OSg8uh+9MUGktbH+ywrKr5J0cN7Cb8ZX0l+dO8tehLCRT6HoZlesv2mvBHWcirG4YqsBh
+	ASXr2AYTNQKaS03BolJE4kyiQ9vyvwBlkr/3o6FSHUgRdYwQOpuXi0FcXtocdu5pZbBeb7
+	e1Y2sLHKXGHPMszyngphVY8EnO7sLEhojio0YfK22rADpCS7qhkkKJu8YGY2Kg==
 From: Kory Maincent <kory.maincent@bootlin.com>
-Subject: [PATCH net-next v3 00/12] Arrange PSE core and update TPS23881
- driver
-Date: Fri, 10 Jan 2025 10:40:19 +0100
-Message-Id: <20250110-b4-feature_poe_arrange-v3-0-142279aedb94@bootlin.com>
+Date: Fri, 10 Jan 2025 10:40:20 +0100
+Subject: [PATCH net-next v3 01/12] net: pse-pd: Remove unused
+ pse_ethtool_get_pw_limit function declaration
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,11 +56,10 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-B4-Tracking: v=1; b=H4sIAAPrgGcC/4XNQQ7CIBAF0KuYWYuhCNa68h7GNFAGS6LQAJKap
- neXsNKFcfnz579ZIGKwGOG0WSBgttF6V8J+u4FhlO6GxOqSgVEmaEM5UZwYlOkZsJ889jKEetV
- KTfmBGSYNQhlPAY2dK3wBh4k4nBNcSzPamHx41Y+5qf0/PDeEko6ZI+VKtxz1WXmf7tbtBv+oa
- GafUPcTYgUSQqPueKtEQ7+hdV3fNAkjohEBAAA=
+Content-Transfer-Encoding: 7bit
+Message-Id: <20250110-b4-feature_poe_arrange-v3-1-142279aedb94@bootlin.com>
+References: <20250110-b4-feature_poe_arrange-v3-0-142279aedb94@bootlin.com>
+In-Reply-To: <20250110-b4-feature_poe_arrange-v3-0-142279aedb94@bootlin.com>
 To: Oleksij Rempel <o.rempel@pengutronix.de>, 
  Andrew Lunn <andrew+netdev@lunn.ch>, 
  "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
@@ -77,67 +77,47 @@ Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
 X-Mailer: b4 0.14.1
 X-GND-Sasl: kory.maincent@bootlin.com
 
-This patch includes several improvements to the PSE core for better
-implementation and maintainability:
+Removed the unused pse_ethtool_get_pw_limit() function declaration from
+pse.h. This function was declared but never implemented or used,
+making the declaration unnecessary.
 
-- Move the conversion between current limit and power limit from the driver
-  to the PSE core.
-- Update power and current limit checks.
-- Split the ethtool_get_status callback into multiple callbacks.
-- Fix PSE PI of_node detection.
-- Clean ethtool header of PSE structures.
-
-Additionally, the TPS23881 driver has been updated to support power
-limit and measurement features, aligning with the new PSE core
-functionalities.
-
-This patch series is the first part of the budget evaluation strategy
-support patch series sent earlier:
-https://lore.kernel.org/netdev/20250104161622.7b82dfdf@kmaincent-XPS-13-7390/T/#t
-
-From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
+Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Acked-by: Oleksij Rempel <o.rempel@pengutronix.de>
+Reviewed-by: Kyle Swenson <kyle.swenson@est.tech>
 Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
 ---
-Changes in v3:
-- Move support for PSE index out of this series
-- Remove regulator patch which gets merged in regulator tree.
-- Link to v2: https://lore.kernel.org/r/20250109-b4-feature_poe_arrange-v2-0-55ded947b510@bootlin.com
+ include/linux/pse-pd/pse.h | 8 --------
+ 1 file changed, 8 deletions(-)
 
-Changes in v2:
-- Add a patch to clean ethtool header of PSE structures
-- Link to v1: https://lore.kernel.org/r/20250104-b4-feature_poe_arrange-v1-0-92f804bd74ed@bootlin.com
+diff --git a/include/linux/pse-pd/pse.h b/include/linux/pse-pd/pse.h
+index 591a53e082e6..85a08c349256 100644
+--- a/include/linux/pse-pd/pse.h
++++ b/include/linux/pse-pd/pse.h
+@@ -184,8 +184,6 @@ int pse_ethtool_set_config(struct pse_control *psec,
+ int pse_ethtool_set_pw_limit(struct pse_control *psec,
+ 			     struct netlink_ext_ack *extack,
+ 			     const unsigned int pw_limit);
+-int pse_ethtool_get_pw_limit(struct pse_control *psec,
+-			     struct netlink_ext_ack *extack);
+ 
+ bool pse_has_podl(struct pse_control *psec);
+ bool pse_has_c33(struct pse_control *psec);
+@@ -222,12 +220,6 @@ static inline int pse_ethtool_set_pw_limit(struct pse_control *psec,
+ 	return -EOPNOTSUPP;
+ }
+ 
+-static inline int pse_ethtool_get_pw_limit(struct pse_control *psec,
+-					   struct netlink_ext_ack *extack)
+-{
+-	return -EOPNOTSUPP;
+-}
+-
+ static inline bool pse_has_podl(struct pse_control *psec)
+ {
+ 	return false;
 
----
-Kory Maincent (12):
-      net: pse-pd: Remove unused pse_ethtool_get_pw_limit function declaration
-      net: pse-pd: Avoid setting max_uA in regulator constraints
-      net: pse-pd: Add power limit check
-      net: pse-pd: tps23881: Simplify function returns by removing redundant checks
-      net: pse-pd: tps23881: Use helpers to calculate bit offset for a channel
-      net: pse-pd: tps23881: Add missing configuration register after disable
-      net: pse-pd: Use power limit at driver side instead of current limit
-      net: pse-pd: Split ethtool_get_status into multiple callbacks
-      net: pse-pd: Remove is_enabled callback from drivers
-      net: pse-pd: tps23881: Add support for power limit and measurement features
-      net: pse-pd: Fix missing PI of_node description
-      net: pse-pd: Clean ethtool header of PSE structures
-
- drivers/net/pse-pd/pd692x0.c       | 224 +++++++++---------
- drivers/net/pse-pd/pse_core.c      | 183 ++++++++++-----
- drivers/net/pse-pd/pse_regulator.c |  23 +-
- drivers/net/pse-pd/tps23881.c      | 449 ++++++++++++++++++++++++++++++-------
- include/linux/ethtool.h            |  20 --
- include/linux/pse-pd/pse.h         | 134 ++++++++---
- net/ethtool/pse-pd.c               |   8 +-
- 7 files changed, 733 insertions(+), 308 deletions(-)
----
-base-commit: 47fcecb5cea2db70aafc8c9757e7fbbdb715db22
-change-id: 20250104-b4-feature_poe_arrange-7ad0462f2afe
-
-Best regards,
 -- 
-Köry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
+2.34.1
 
 
