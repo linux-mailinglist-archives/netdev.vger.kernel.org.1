@@ -1,164 +1,114 @@
-Return-Path: <netdev+bounces-156982-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156983-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1289A08884
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 07:45:46 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 59624A088CE
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 08:14:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 98240168BA2
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 06:45:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 75B1A3A8EF0
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 07:13:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF86915C140;
-	Fri, 10 Jan 2025 06:45:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46436206F04;
+	Fri, 10 Jan 2025 07:14:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TkZR914c"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Yv/mGnw7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D1D91E507
-	for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 06:45:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 639242063CE
+	for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 07:13:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736491542; cv=none; b=aAGUUlyV5pIgjwYmAnp7Gd0JU6DcH++OVcgN5FnguQI+7YddkBD2iuh2GfwpkclGGGlqYa29j+6oREuYfDQ1mqkGZmIS9JIRG03l0UddCR7CYs+jB+xlWsZH+uSVe118vmthjWUnQ7E30/rpPmpOXTTVO+nIHTLWj1Bl2HaJq3k=
+	t=1736493241; cv=none; b=GkBz79zdolDzLPpyitbZIaSIyzX1k9o+gCLr1sNcuXXTFaUBsgPTyAMpNq4+7qm4VBPnKE6YD9Uio8EAgWnB29FXjc43C/f1nOk6uW7Zas/ClYWbAMDJqRMhd0IvVX1LoUOvbBj8dqwl8Et5jTcqXrVXHnwVQhIZj1UdChiQaCw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736491542; c=relaxed/simple;
-	bh=5+JUeDg14IHKaGElS3V+IJadv8HkJidz0WvwNbePGSk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=swGjFYQ0kUK5yXL8TSaXbKRizf1HjRgeBKkASgrB2992O0F6jmjoOX8DyrCiDmu2qLgYP67W3lG83q4sqESJuuCqS+gvaUCy/y4WtIyeOVKr+e1yqjyeyYyRdZN1EjSJmx2UHF8W1vpK640stYfFzq4bgkPJ1Q1YfbV2Cr1dRU8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TkZR914c; arc=none smtp.client-ip=209.85.208.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-5d437235769so2662662a12.2
-        for <netdev@vger.kernel.org>; Thu, 09 Jan 2025 22:45:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736491539; x=1737096339; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=fEkATSgbr9cUiBDGxuMwfLnGYXl+UjyzcKcP4DdtsHE=;
-        b=TkZR914cDXCkBhTdLIFBYxP8s1SbX/qP27hp7vx3h3FRw9h+eZQpvD8BlRNUKRMpI0
-         PHMkre5Tqz2vmLduNtCCRIRxDsHRDUJF1kIIj8WmBcIlx1csGT5lNbBAYdp5DlLCZkPX
-         dQpApWdZVhqG7Gd8iQQtHgJ1b/fCrKEJSFWuEEyTPb7k7Eh/H+Z2KVh61gj64DpKBUNj
-         09b4cCpPUFMOC+VJxfLf2TrrTEW//VlWops6z/VpaFa8VtTCJJpde++qn5w8J6OTW2Na
-         Eftxabrjn8nAiTVkZ172eumsIutohhDGNhguemJjimTwkqgIFBNKacY39u5/FwUf7hax
-         PlnA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736491539; x=1737096339;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fEkATSgbr9cUiBDGxuMwfLnGYXl+UjyzcKcP4DdtsHE=;
-        b=hR45Ryus/RgKUzeEsUm/HmGkcNL0/GaujVjFSMXusRN5t69fNteRIqdK/Hpx2EFszC
-         1VN5Q0vEnIzmD55nWhfU+vx9eyO9KhJftKAviHYY/vq9wKFdaFLrIZIQ3EV13HVmstZR
-         PNhZ1V1SWkZTdIezOuQKRRevJZdXddbKrtQ0+Q6s2gLN6491VvlwGNF0e85USUi+83PX
-         0RxZ/QicymQ52vpnH4XWNpbjuQciAuoz/KPPCyCB63rV38VCPxM/z75O+CgZxFk/6oIW
-         zYeToBlAAPtlFw+/o4NdUmQwOPjfKez67EjCPellhsT2Buc5JNPCB4pvYD2F0oM581iv
-         oIsg==
-X-Gm-Message-State: AOJu0YwwkDeivDGzUXLRUiQ7yt6aHCIXXE4zlHe9R4pneEIcb226HtHg
-	/pShn8plMji2XuNHym6pH+foXPU39jDZAFoxdnCV26WWnFywSo6/
-X-Gm-Gg: ASbGncuKG6d7dY7oYfyzPVAhonvIzEOe0i5CTSw2rS8Qi1Xd0Fm+0OYtY6O6hAEEXIP
-	EJkwLo9fEdeplJdS2wg+YTNFSaqPl8fD6Jx0Y8uzGaXY/jtRQCv3cqc9kcojHFfuhXbqKANe3YM
-	Z74Dlhwmj71oXN6dZR/0CdJcn/L9E5rhIncsB6VyjWsId3/rQAQf0DZBIe7ojD/M6gh8UK64zj2
-	20xe8q2RO3SmUoUjMm6S4wX5NBHpC9aRwbBGlh00qN/QckX2lTBWZ4jhneNsQL/c6oJQ7b63ukI
-	nP8XtEsZIaYlN5SK2lhpvRaFQ9PVkdL63R8SujlZLJMoWoxTc8KF8PVlNHcnUHuIS7Hi7dkImNh
-	gQQ5BjbFLmIuJgpOLKCT02GNNH9LEMSGMmbsCtLFrccJ2UbqZ
-X-Google-Smtp-Source: AGHT+IHXLgbO3dnOT0oxzeuCeY1GUz5m3ChcvWP/80sRCK+5eVmkXzHrVB1CDIjiTbBj8dTH5S2WUA==
-X-Received: by 2002:a17:907:809:b0:aaf:117c:e929 with SMTP id a640c23a62f3a-ab2abcb1440mr852828066b.57.1736491539071;
-        Thu, 09 Jan 2025 22:45:39 -0800 (PST)
-Received: from ?IPV6:2a02:3100:a08a:a100:5dd7:9422:d6ba:12c5? (dynamic-2a02-3100-a08a-a100-5dd7-9422-d6ba-12c5.310.pool.telefonica.de. [2a02:3100:a08a:a100:5dd7:9422:d6ba:12c5])
-        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-ab2c95624c1sm138291266b.131.2025.01.09.22.45.37
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 09 Jan 2025 22:45:37 -0800 (PST)
-Message-ID: <b0d6a4d5-f8ab-4d6d-9b47-e076c5402865@gmail.com>
-Date: Fri, 10 Jan 2025 07:45:38 +0100
+	s=arc-20240116; t=1736493241; c=relaxed/simple;
+	bh=lprOQfulzu8v6KvGdaC/bIeIPCWpKvc6opCkgeRU8p8=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=hIEAW8rMWzwBJkf4mhOkKqhw1RiCyaXdrr62ZBzLDq2LTsIyzPGh/ifbze84ucHbhmclrMLTS0JWSXJCVAQdj6b6BJ2Z+r4RViClLH2+e/Q5suKtlmZt+rp60GgnejpPzObbJPx6jNunOCf2fg3U/87OYrqOWOccsiUUIsmy7/k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Yv/mGnw7; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1736493238;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=rQbXIksEk073+Fi/YrEVMIhtLpzXwHk7tiFH7RnZK5M=;
+	b=Yv/mGnw7bFv2bru2WS2HtNI1nJAa23pdy5ABEV+5iGXXokKa18rEjlWazz/Zut4Urvp4tX
+	D0yz9sBOH5JIvidX5dIsi0GJXHvFzfVKS0NoeXX9zfAb4ab3spOIbtBviIbUFcbOUfkh2D
+	gE7seXFrHtFWTKc2k+vl+qASsDsIrjY=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-270-O0KBR35FP7uFyN5xYPBuug-1; Fri,
+ 10 Jan 2025 02:13:56 -0500
+X-MC-Unique: O0KBR35FP7uFyN5xYPBuug-1
+X-Mimecast-MFC-AGG-ID: O0KBR35FP7uFyN5xYPBuug
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 511911955D64;
+	Fri, 10 Jan 2025 07:13:54 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.12])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 4C52530001BE;
+	Fri, 10 Jan 2025 07:13:49 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <20250110055058.GA63811@sol.localdomain>
+References: <20250110055058.GA63811@sol.localdomain> <20250110010313.1471063-1-dhowells@redhat.com> <20250110010313.1471063-3-dhowells@redhat.com>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: dhowells@redhat.com, Herbert Xu <herbert@gondor.apana.org.au>,
+    Chuck Lever <chuck.lever@oracle.com>,
+    Trond Myklebust <trond.myklebust@hammerspace.com>,
+    "David S. Miller" <davem@davemloft.net>,
+    Marc Dionne <marc.dionne@auristor.com>,
+    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+    Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+    linux-crypto@vger.kernel.org, linux-afs@lists.infradead.org,
+    linux-nfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+    netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH 2/8] crypto/krb5: Provide Kerberos 5 crypto through AEAD API
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 net] r8169: remove redundant hwmon support
-To: Jacob Keller <jacob.e.keller@intel.com>,
- Realtek linux nic maintainers <nic_swsd@realtek.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, Paolo Abeni <pabeni@redhat.com>,
- Jakub Kicinski <kuba@kernel.org>, David Miller <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-References: <afba85f5-987b-4449-83cc-350438af7fe7@gmail.com>
- <c7e6dbfb-b5ae-4953-ad35-899341083723@intel.com>
-Content-Language: en-US
-From: Heiner Kallweit <hkallweit1@gmail.com>
-Autocrypt: addr=hkallweit1@gmail.com; keydata=
- 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
-In-Reply-To: <c7e6dbfb-b5ae-4953-ad35-899341083723@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <1478992.1736493228.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 10 Jan 2025 07:13:48 +0000
+Message-ID: <1478993.1736493228@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-On 10.01.2025 02:14, Jacob Keller wrote:
-> 
-> 
-> On 1/9/2025 2:43 PM, Heiner Kallweit wrote:
->> The temperature sensor is actually part of the integrated PHY and available
->> also on the standalone versions of the PHY. Therefore hwmon support will
->> be added to the Realtek PHY driver and can be removed here.
->>
->> Fixes: 1ffcc8d41306 ("r8169: add support for the temperature sensor being available from RTL8125B")
->> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
->> ---
-> 
-> Can you explain what user-facing issues this fixes? Do we get conflicts
-> when multiple hwmon sensors are registered? I'm not sure this counts as
-> a 'net' fix, unless we can identify the user-facing behavior that is
-> problematic?
+Eric Biggers <ebiggers@kernel.org> wrote:
 
-The same sensor would be exposed twice, by the MAC and the PHY driver.
-Support in the MAC driver was added for 6.13, so it's still in the rc
-version only and not yet part of a released kernel version.
+> It sounds like a lot of workarounds had to be implemented to fit these
+> protocols into the crypto_aead API.
+> =
+
+> It also seems unlikely that there will be other implementations of these
+> protocols added to the kernel, besides the one you're adding in crypto/k=
+rb5/.
+> =
+
+> Given that, providing this functionality as library functions instead wo=
+uld be
+> much simpler.  Take a look at how crypto/kdf_sp800108.c works, for examp=
+le.
+
+Yes.  That's how I did my first implementation.  I basically took the code
+from net/sunrpc/auth_gss/ and made it more generic.  Herbert wants it done
+this way, however.  :-/
+
+David
 
 
