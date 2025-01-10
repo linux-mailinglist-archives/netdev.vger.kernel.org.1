@@ -1,136 +1,121 @@
-Return-Path: <netdev+bounces-157168-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157170-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4438DA09227
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 14:35:03 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CD2B6A0922E
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 14:37:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 728FA16867B
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 13:34:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B60367A1456
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 13:37:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D912120B80D;
-	Fri, 10 Jan 2025 13:34:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8489120E002;
+	Fri, 10 Jan 2025 13:37:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="YmVwjpPz"
+	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="kM3tV0F7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail1.fiberby.net (mail1.fiberby.net [193.104.135.124])
+Received: from out203-205-221-231.mail.qq.com (out203-205-221-231.mail.qq.com [203.205.221.231])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC9D078C91
-	for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 13:34:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.104.135.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D04B93B1A4;
+	Fri, 10 Jan 2025 13:37:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.205.221.231
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736516055; cv=none; b=n4h+jrtjUvcBAhvWVx5IrMI9tiU/LzdQlszZLXKzTxrAi5WOSkTXVmX0Qw/z3Q8AD38tNnYOPnhZvitDgNkxqpeo41vCnBDQaBiPThQOrdgO0uIsv2xOQKP7XPRHb93De+8UpBnYCitQ+jH6S5a21g4yfrz9cy/W7h3TZsWKvtU=
+	t=1736516237; cv=none; b=SSFLTdS8uFr03QhfUp4QhRI6X2HT2jrTsP+vJPDSUkfogH3lBZN7NDo4eazZgUVAi5u9bboCPfqBSihEHttu+j/bH9WpDsGVmazdy8WUhSDzgDvg1q5JbGjYWkW7vgjrSijE0IPOit4D+Fwh5KzeZsP3a5z58duteKGN4P5X9uU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736516055; c=relaxed/simple;
-	bh=z7gz+i2HhxebmfFhhX9sC4FJ/071pLo7SmBEwtibi68=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=uVbrMy+jvNRopkSzKPeZitksNZLpqDLTfhb1jLoHXpbN/dUVoirhjT+mZ6cgoDdYYvaQe/lFppwd28z2yH5UVE1zjregYEHM2WYIMeu4Vc/81kAijOhBnZB7JM1M41MEmg9wbF7JGz3aJjwoZdBnP3DTuf1EGpcjYNrxoGxMFhY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=YmVwjpPz; arc=none smtp.client-ip=193.104.135.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fiberby.net
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fiberby.net;
-	s=202008; t=1736515547;
-	bh=z7gz+i2HhxebmfFhhX9sC4FJ/071pLo7SmBEwtibi68=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=YmVwjpPzj8rpkUIiGhoYTLSt5AnghPaJGqzuPfN/uovxMB3X8lBP4PQkASyZ6oVR8
-	 7krVtXa1Kd7152Ve9jVEEXzeweBoNpCDhcGRLikBcZmzuzlFs7A1ZgZbtxlxcl3STd
-	 9iSGVvSaQxR4ZLrsITqIZeMRWyIgJPQofwy52kK60w6Dl8b2HWYbw69MJmVo1kv59Q
-	 MayV/a4Y+LRu7Rut55jaaF5bH/uFiQ8I7hrY69hTzVFzZYwmVk63RxE+qKSFlqdVNd
-	 gTwXdTdbbhJqsG2EUkXYj1HZemUT5VlDjbj7nuz6IrHq+0iAZVuKzjFzvZ9n8ELbUR
-	 S3oDYzDih/Qbw==
-Received: from x201s (193-104-135-243.ip4.fiberby.net [193.104.135.243])
-	by mail1.fiberby.net (Postfix) with ESMTPSA id D39816000C;
-	Fri, 10 Jan 2025 13:25:22 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1])
-	by x201s (Postfix) with ESMTP id 983D9200473;
-	Fri, 10 Jan 2025 13:25:18 +0000 (UTC)
-Message-ID: <48e9bf0a-3275-4d2c-84ae-9bc1163ab8cb@fiberby.net>
-Date: Fri, 10 Jan 2025 13:25:18 +0000
+	s=arc-20240116; t=1736516237; c=relaxed/simple;
+	bh=m6VUFaR/D7WTEcmJ6jaCbZjzSM1ny8BZP1vfCmkNa6k=;
+	h=Message-ID:From:To:Cc:Subject:Date:MIME-Version:Content-Type; b=XQaabnKMtdGlML+S8EXaQWGnZURI9eivpwrIvEfTcBDig5NVtJ7pbc2aKrwA3FrW+C38Wf6b00j5KiMzvl8ZZtBDk0QUR2jgG6ZEl1eTRsFyj/etglvhRZVOR+l33gQAMRMv1Ww6qJvN27o3cus7dR7qQmpD18qNlxqMJn7jTdE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=Red54.com; spf=pass smtp.mailfrom=red54.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=kM3tV0F7; arc=none smtp.client-ip=203.205.221.231
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=Red54.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=red54.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
+	t=1736516225; bh=rnr34XuBomF9f7/48Lx0eRQBzok2jkeVClqDiRrOUU4=;
+	h=From:To:Cc:Subject:Date;
+	b=kM3tV0F7aninh//ieZeVi3x4L2LyEFZVXHOsxcDPN2ZcjmLvYrZMEf+Npm+z2VP25
+	 8xSjuBBGdcSYVPbwEe08lSU6mhUOOqEms8rzDWeOzZxf34wJCsHNjmZ3Ww1r5eJpoQ
+	 yx0DNtKkOTDVftrQ/Tbn/hSOBZnIn44tyN+xJ0rE=
+Received: from mail.red54.com ([192.42.116.211])
+	by newxmesmtplogicsvrszc16-0.qq.com (NewEsmtp) with SMTP
+	id 92E9CE3B; Fri, 10 Jan 2025 21:36:46 +0800
+X-QQ-mid: xmsmtpt1736516206tohugp5jz
+Message-ID: <tencent_BDD603E969ED7B30ACFBFFBA9EA3DA3D7E09@qq.com>
+X-QQ-XMAILINFO: OQhZ3T0tjf0anjWyCsM5AdhL0tONaeVX0z1ZCM2e6UXPO2V8BXZ6tBK2VU2FAx
+	 h7+wf7n00yNH2+NZ0TX3/Z8l5M7i/uhO7SlDYamRzJ1AiymziFg9rO4gNRa112uPm/EXYN6pQofk
+	 pemtaZQ/zbQ5hVqtOXxR3PrH23hFmpMH6QHTMEtxGGuNu42/6XjcEcTQFFluecIOkQ7K2zh+vbp6
+	 C9UmGMFUp2XfmjTQBYYqNn8scaC9Q6MypCWp1zYumEaS32inpTd0Eo/c/9HO0/ATb8MDZnAN0Bt4
+	 tIOXS0ljsyzF3yAZMZUuWm9Ob65eeTxag1l6gr8OlaGAydpo6A48twEgk2XlSiNuLrcYy+GTD30m
+	 InNaIuA1EenPzVRM19uqbABvf8dVxRDHnxerEwQUP2WiAh/W9iTcUs9lg3VX1JKiRwQjCcdyaSRK
+	 F0o60bzX7qhA7OMddUV3odsvjtStINlWIQqCNAyJu3oGDOLX3gzDPSb+ZWAnO/Mz6QxC0NNwnXjn
+	 zsbmlT5J/H1C5txYMAoi5vvNdrqCemQHZuVOFolu2D17+FwHOJ/yDn5AJK6eQ3/xJtDU1AFrXYsC
+	 0brYKF9gFEtD1ULrnAyrhBmnnz2qXCpEOQPI7/gzmJK0p78YKu0Fz0WFM72wcmTbz102nq2T+hCK
+	 50gTR/G6cpqNmC+5x2IakvpI/51v1tCbm+z2A0ka5KJZn484qnBPBSmYYDUnaI/oCWFHWHS9P90Y
+	 o/6jvHbnK5HtmToQ3tu/dIkUKhdrkNtCltPmWgafFlwrCrVxSLMJj2JmjUas/iPJcrIgMdUBC3Uf
+	 0SNtKsVdYIfPBseLUyEcURLDk5OmbskLKS32WZTD3KvEuctlzaWUsGKW+oA64ZBXKcSTPFfu06GY
+	 uOPvaKL/0gcoM6mhVgF3bYlAs4MvvjRmS6XHgnMVZRnq4kqvnSesqEsDypPPy7FgECaamPOuPhSR
+	 6qGcgYwzLWKxXaE6rbVhyAFhgi92WsAXmgOJv3VkzLkVOnVbewZA==
+X-QQ-XMRINFO: M/715EihBoGSf6IYSX1iLFg=
+Sender: yeking@red54.com
+From: Yeking@Red54.com
+To: netdev@vger.kernel.org
+Cc: =?UTF-8?q?=E8=B0=A2=E8=87=B4=E9=82=A6=20=28XIE=20Zhibang=29?= <Yeking@Red54.com>,
+	Wells Lu <wellslutw@gmail.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>,
+	Arnd Bergmann <arnd@arndb.de>,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net v4] net: ethernet: sunplus: Switch to ndo_eth_ioctl
+Date: Fri, 10 Jan 2025 13:29:21 +0000
+X-OQ-MSGID: <20250110132920.81269-2-Yeking@Red54.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net: sched: refine software bypass handling in tc_run
-To: Xin Long <lucien.xin@gmail.com>
-Cc: davem@davemloft.net, kuba@kernel.org, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Jamal Hadi Salim <jhs@mojatatu.com>,
- Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
- Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
- Shuang Li <shuali@redhat.com>, network dev <netdev@vger.kernel.org>
-References: <b9e81aa97ab8ca62e979b7d55c2ee398790b935b.1736176112.git.lucien.xin@gmail.com>
-Content-Language: en-US
-From: =?UTF-8?Q?Asbj=C3=B8rn_Sloth_T=C3=B8nnesen?= <ast@fiberby.net>
-In-Reply-To: <b9e81aa97ab8ca62e979b7d55c2ee398790b935b.1736176112.git.lucien.xin@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Sorry for the late response, it has been a busy first week back, too many
-operational issues with devices in our network running crappy vendor images.
+From: 谢致邦 (XIE Zhibang) <Yeking@Red54.com>
 
-On 1/6/25 3:08 PM, Xin Long wrote:
-> This patch addresses issues with filter counting in block (tcf_block),
-> particularly for software bypass scenarios, by introducing a more
-> accurate mechanism using useswcnt.
-> 
-> Previously, filtercnt and skipswcnt were introduced by:
-> 
->    Commit 2081fd3445fe ("net: sched: cls_api: add filter counter") and
->    Commit f631ef39d819 ("net: sched: cls_api: add skip_sw counter")
-> 
->    filtercnt tracked all tp (tcf_proto) objects added to a block, and
->    skipswcnt counted tp objects with the skipsw attribute set.
-> 
-> The problem is: a single tp can contain multiple filters, some with skipsw
-> and others without. The current implementation fails in the case:
-> 
->    When the first filter in a tp has skipsw, both skipswcnt and filtercnt
->    are incremented, then adding a second filter without skipsw to the same
->    tp does not modify these counters because tp->counted is already set.
-> 
->    This results in bypass software behavior based solely on skipswcnt
->    equaling filtercnt, even when the block includes filters without
->    skipsw. Consequently, filters without skipsw are inadvertently bypassed.
+The device ioctl handler no longer calls ndo_do_ioctl, but calls
+ndo_eth_ioctl to handle mii ioctls. However, sunplus still used
+ndo_do_ioctl when it was introduced. So switch to ndo_eth_ioctl. (found
+by code inspection)
 
-Thank you for tracking it down. I wasn't aware that a tp, could be used by multiple
-filters, and didn't encounter it during my testing.
+Fixes: fd3040b9394c ("net: ethernet: Add driver for Sunplus SP7021")
+Fixes: a76053707dbf ("dev_ioctl: split out ndo_eth_ioctl")
+Signed-off-by: 谢致邦 (XIE Zhibang) <Yeking@Red54.com>
+---
+V3 -> V4: Change Fixes tag back to old style, due to the objection from
+Greg Kroah-Hartman.
+V2 -> V3: Update commit message again, and add short author date to the
+Fixes tag to make it clear at a glance and reduce misunderstandings.
+V1 -> V2: Update commit message
 
-> To address this, the patch introduces useswcnt in block to explicitly count
-> tp objects containing at least one filter without skipsw. Key changes
-> include:
-> 
->    Whenever a filter without skipsw is added, its tp is marked with usesw
->    and counted in useswcnt. tc_run() now uses useswcnt to determine software
->    bypass, eliminating reliance on filtercnt and skipswcnt.
-> 
->    This refined approach prevents software bypass for blocks containing
->    mixed filters, ensuring correct behavior in tc_run().
-> 
-> Additionally, as atomic operations on useswcnt ensure thread safety and
-> tp->lock guards access to tp->usesw and tp->counted, the broader lock
-> down_write(&block->cb_lock) is no longer required in tc_new_tfilter(),
-> and this resolves a performance regression caused by the filter counting
-> mechanism during parallel filter insertions.
+ drivers/net/ethernet/sunplus/spl2sw_driver.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-You are trying to do two things:
-A) Fix functional defect when filters share a single tp
-B) Improve filter updates performance
+diff --git a/drivers/net/ethernet/sunplus/spl2sw_driver.c b/drivers/net/ethernet/sunplus/spl2sw_driver.c
+index 721d8ed3f302..5e0e4c9ecbb0 100644
+--- a/drivers/net/ethernet/sunplus/spl2sw_driver.c
++++ b/drivers/net/ethernet/sunplus/spl2sw_driver.c
+@@ -199,7 +199,7 @@ static const struct net_device_ops netdev_ops = {
+ 	.ndo_start_xmit = spl2sw_ethernet_start_xmit,
+ 	.ndo_set_rx_mode = spl2sw_ethernet_set_rx_mode,
+ 	.ndo_set_mac_address = spl2sw_ethernet_set_mac_address,
+-	.ndo_do_ioctl = phy_do_ioctl,
++	.ndo_eth_ioctl = phy_do_ioctl,
+ 	.ndo_tx_timeout = spl2sw_ethernet_tx_timeout,
+ };
+ 
+-- 
+2.43.0
 
-If you do part A in a minimalistic way, then IMHO it might be suitable
-for net (+ stable), but for part B I agree with Paolo, that it would
-properly be better suited for net-next.
-
-I focused my testing on routing performance, not filter update performance,
-I also didn't test it in any multi-CPU setups (as I don't have any).
-
-The static key was added to mitigate concerns, about the impact that the
-bypass check would have for non-offloaded workloads in multi-CPU systems.
-
-https://lore.kernel.org/netdev/28bf1467-b7ce-4e36-a4ef-5445f65edd97@fiberby.net/
-https://lore.kernel.org/netdev/CAM0EoMngVoBcbX7cqTdbW8dG1v_ysc1SZK+4y-9j-5Tbq6gaYw@mail.gmail.com/
 
