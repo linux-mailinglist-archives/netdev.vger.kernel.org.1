@@ -1,149 +1,252 @@
-Return-Path: <netdev+bounces-157077-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157078-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4781CA08DB2
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 11:17:18 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A3C1BA08DB7
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 11:18:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E85F318836D0
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 10:17:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C208E3A150B
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 10:18:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35FB72080CB;
-	Fri, 10 Jan 2025 10:17:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11714209F56;
+	Fri, 10 Jan 2025 10:18:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mb0AldzV"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ighEh0r9"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09BD0204F61;
-	Fri, 10 Jan 2025 10:17:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0EBD1C3C04
+	for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 10:18:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736504228; cv=none; b=CmFmBLLP82gkJRhMqQptnxScpcf9O7RmykWdtTSSV9uDQoAtKE9GQznToe3ytuso4SFhElVSHdJoO04JFIDL7DtfNYv0tYe4i7yHkylcw/NnzQRMZ0hzO7vJuYb3C8Fq2hqewPaPwOtCiooIGQF8teolswavTLO8s7TagZByWbc=
+	t=1736504318; cv=none; b=Ey7PmjzrTxIu7SSgy3YD0WSBCI+kybcBHYKwB3XTwFWNxXI0n8E3TwpbAoYKezY1E4PIY9MKTos0tRGQDCfnzsrTCknmoPI6jgJWQZ1yrnnEOqxb+t7yYpug7ijs+8q39Ow02NQg8JCb+ilITkVJoaUCro3I6IPLc/kH478wLaU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736504228; c=relaxed/simple;
-	bh=MUFaxaznto5kRfQFQH+aYzQT8JMNYVK4+BvHtJ5UUos=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cvETzlaXGy8zRxJyg1eV6jPHK60GitWjM613FsV+1KTjhEV6Tqpn4l67n9rj5mSrBnbKnGDhv113j5ieQ8UJcGZQ5nx2VDSmJAyHFWAd6OqAhcXwZpvjy+/hTMfqzY4FbXfPptWbq5uuwOzoOC7gcUrJT6vQvcGNPCs5gjwaS0k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mb0AldzV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 60CE8C4CED6;
-	Fri, 10 Jan 2025 10:17:05 +0000 (UTC)
+	s=arc-20240116; t=1736504318; c=relaxed/simple;
+	bh=oKlq476fY9QM/OujOfwpqryzpqHCumE+M3ptAU9F1uM=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=UNBL833/GFV3o41B8Fckn2grcs+vAR1tIrr/AKBy5Wemt+t8DjWGvll7cmybJiRn2VLjVolu9gdDspHuiBT7Nz/OLN9jyWdz9rJOYgHxFzsE6A23WXOsUaYrjhF2N65IGRsAIHb+uszrlEJzXCdyapgwJPZP46XJYovDpCMyLbU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ighEh0r9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0236AC4CED6;
+	Fri, 10 Jan 2025 10:18:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736504227;
-	bh=MUFaxaznto5kRfQFQH+aYzQT8JMNYVK4+BvHtJ5UUos=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=mb0AldzVEfBWq2aLqVXUWw/fXwd31CEoReoS/H0vfs+63xq/RRcf6xuWjECk9S2I6
-	 2Bt9RcQ9m3gOYyT2ugDvlX7OTYgQNUuGb7q8whef29b23CVRuZgLyItLgr4iAhAqZW
-	 rx7nze6hFxHRIGD6FCW2wIbJi42Ao6Q606Vd5Z5EX2vYLMCRVUhss9K4MbyzAuNHr1
-	 SAg0pN1rzhKJ/X6KdZVUx7Dod3YZcY5Xdv3tXiDONixUaC0gsRGg2vV9F2GHvoB7r8
-	 84bMNALMA/YnDU5iGDZFHiYPcjQsUCUrknCofKRI07ogZ8AM7phva5/lS1LzOKjFGd
-	 LCXb+eUkUsVCQ==
-Date: Fri, 10 Jan 2025 10:17:03 +0000
+	s=k20201202; t=1736504317;
+	bh=oKlq476fY9QM/OujOfwpqryzpqHCumE+M3ptAU9F1uM=;
+	h=From:Date:Subject:To:Cc:From;
+	b=ighEh0r9RCenwY5oVRkBESBSyg2uDQ7vER54rOH8yoUZV44AdsvHYIL1VZ/dQNEox
+	 udfiIztFH/6OwsTjL8O28Y5p55G7ptEBOALldhh4k2flxHpCUwZNUV6kk9TwMN3NX3
+	 gDoE61mYLDynVPGn+z36fuJ0SyqHoDEGv26H4LtBi8MlirpTtRntSq+B+onrhriRSl
+	 pJ8tWejCVztm6d7ntMpSVSU1vLxNFz6uP9rOEIuaOIJIuxDtk18vqUy4Mm06GtsQ3G
+	 2ql+GBVQfTjglmD9NISkf7ixH7TGU1Ik/NNGXOAg2jtn9QHt4yW4KCKVMBCdzr0KiU
+	 FNGcxsD1WPfSQ==
 From: Simon Horman <horms@kernel.org>
-To: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Realtek linux nic maintainers <nic_swsd@realtek.com>,
-	David Miller <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	Jean Delvare <jdelvare@suse.com>, linux-hwmon@vger.kernel.org,
-	linux@roeck-us.net
-Subject: Re: [PATCH net] r8169: remove redundant hwmon support
-Message-ID: <20250110101703.GV7706@kernel.org>
-References: <357e6526-ee3e-4e66-b556-7364fdcb2bfc@gmail.com>
+Date: Fri, 10 Jan 2025 10:18:33 +0000
+Subject: [PATCH net-next] freescale: ucc_geth: Remove set but unused
+ variables
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <357e6526-ee3e-4e66-b556-7364fdcb2bfc@gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20250110-ucc-unused-var-v1-1-4cf02475b21d@kernel.org>
+X-B4-Tracking: v=1; b=H4sIAPjzgGcC/x2MzQqDMBAGX0X23IWsQWh8FelB4le7l23JjwiSd
+ zf0OAwzF2UkRaZ5uCjh0Kxf6yCPgeJntR2sW2ca3Tg5Ecc1Rq5WMzY+1sTh2YWIR/CeevRLeOv
+ 5Hy5kKGw4C71auwELOsi/agAAAA==
+To: Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
+X-Mailer: b4 0.14.0
 
-+ Jean Delvare, linux-hwmon, linux@roeck-us.net
+Remove set but unused variables. These seem to provide no value.
+So in the spirit of less being more, remove them.
 
-On Thu, Jan 09, 2025 at 11:29:09PM +0100, Heiner Kallweit wrote:
-> The temperature sensor is actually part of the integrated PHY and available
-> also on the standalone versions of the PHY. Therefore hwmon support will
-> be added to the Realtek PHY driver and can be removed here.
-> 
-> Fixes: 1ffcc8d41306 ("r8169: add support for the temperature sensor being available from RTL8125B")
-> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+Flagged by gcc-14 as:
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+.../ucc_geth.c: In function 'ucc_geth_free_rx':
+.../ucc_geth.c:1708:31: warning: variable 'uf_info' set but not used [-Wunused-but-set-variable]
+ 1708 |         struct ucc_fast_info *uf_info;
+      |                               ^~~~~~~
+.../ucc_geth.c: In function 'ucc_geth_free_tx':
+.../ucc_geth.c:1747:31: warning: variable 'uf_info' set but not used [-Wunused-but-set-variable]
+ 1747 |         struct ucc_fast_info *uf_info;
+      |                               ^~~~~~~
+.../ucc_geth.c: In function 'ucc_geth_alloc_tx':
+.../ucc_geth.c:2039:31: warning: variable 'uf_info' set but not used [-Wunused-but-set-variable]
+ 2039 |         struct ucc_fast_info *uf_info;
+      |                               ^~~~~~~
+.../ucc_geth.c: In function 'ucc_geth_alloc_rx':
+.../ucc_geth.c:2101:31: warning: variable 'uf_info' set but not used [-Wunused-but-set-variable]
+ 2101 |         struct ucc_fast_info *uf_info;
+      |                               ^~~~~~~
+.../ucc_geth.c: In function 'ucc_geth_startup':
+.../ucc_geth.c:2168:13: warning: variable 'ifstat' set but not used [-Wunused-but-set-variable]
+ 2168 |         u32 ifstat, i, j, size, l2qt, l3qt;
+      |             ^~~~~~
+.../ucc_geth.c:2158:62: warning: variable 'p_82xx_addr_filt' set but not used [-Wunused-but-set-variable]
+ 2158 |         struct ucc_geth_82xx_address_filtering_pram __iomem *p_82xx_addr_filt;
+      |                                                              ^~~~~~~~~~~~~~~~
+.../ucc_geth.c: In function 'ucc_geth_rx':
+.../ucc_geth.c:2893:13: warning: variable 'bdBuffer' set but not used [-Wunused-but-set-variable]
+ 2893 |         u8 *bdBuffer;
+      |             ^~~~~~~~
+.../ucc_geth.c: In function 'ucc_geth_irq_handler':
+.../ucc_geth.c:3046:31: warning: variable 'ug_info' set but not used [-Wunused-but-set-variable]
+ 3046 |         struct ucc_geth_info *ug_info;
+      |                               ^~~~~~~
 
-> ---
->  drivers/net/ethernet/realtek/r8169_main.c | 37 -----------------------
->  1 file changed, 37 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
-> index 5724f650f..7b9ba91c3 100644
-> --- a/drivers/net/ethernet/realtek/r8169_main.c
-> +++ b/drivers/net/ethernet/realtek/r8169_main.c
-> @@ -16,7 +16,6 @@
->  #include <linux/clk.h>
->  #include <linux/delay.h>
->  #include <linux/ethtool.h>
-> -#include <linux/hwmon.h>
->  #include <linux/phy.h>
->  #include <linux/if_vlan.h>
->  #include <linux/in.h>
-> @@ -5338,36 +5337,6 @@ static bool rtl_aspm_is_safe(struct rtl8169_private *tp)
->  	return false;
->  }
->  
-> -static int r8169_hwmon_read(struct device *dev, enum hwmon_sensor_types type,
-> -			    u32 attr, int channel, long *val)
-> -{
-> -	struct rtl8169_private *tp = dev_get_drvdata(dev);
-> -	int val_raw;
-> -
-> -	val_raw = phy_read_paged(tp->phydev, 0xbd8, 0x12) & 0x3ff;
-> -	if (val_raw >= 512)
-> -		val_raw -= 1024;
-> -
-> -	*val = 1000 * val_raw / 2;
-> -
-> -	return 0;
-> -}
-> -
-> -static const struct hwmon_ops r8169_hwmon_ops = {
-> -	.visible = 0444,
-> -	.read = r8169_hwmon_read,
-> -};
-> -
-> -static const struct hwmon_channel_info * const r8169_hwmon_info[] = {
-> -	HWMON_CHANNEL_INFO(temp, HWMON_T_INPUT),
-> -	NULL
-> -};
-> -
-> -static const struct hwmon_chip_info r8169_hwmon_chip_info = {
-> -	.ops = &r8169_hwmon_ops,
-> -	.info = r8169_hwmon_info,
-> -};
-> -
->  static int rtl_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
->  {
->  	struct rtl8169_private *tp;
-> @@ -5547,12 +5516,6 @@ static int rtl_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
->  	if (rc)
->  		return rc;
->  
-> -	/* The temperature sensor is available from RTl8125B */
-> -	if (IS_REACHABLE(CONFIG_HWMON) && tp->mac_version >= RTL_GIGA_MAC_VER_63)
-> -		/* ignore errors */
-> -		devm_hwmon_device_register_with_info(&pdev->dev, "nic_temp", tp,
-> -						     &r8169_hwmon_chip_info,
-> -						     NULL);
->  	rc = register_netdev(dev);
->  	if (rc)
->  		return rc;
-> -- 
-> 2.47.1
-> 
+Compile tested only.
+No runtime effect intended.
+
+Signed-off-by: Simon Horman <horms@kernel.org>
+---
+ drivers/net/ethernet/freescale/ucc_geth.c | 39 +++++++------------------------
+ 1 file changed, 8 insertions(+), 31 deletions(-)
+
+diff --git a/drivers/net/ethernet/freescale/ucc_geth.c b/drivers/net/ethernet/freescale/ucc_geth.c
+index 88510f822759..1e3a1cb997c3 100644
+--- a/drivers/net/ethernet/freescale/ucc_geth.c
++++ b/drivers/net/ethernet/freescale/ucc_geth.c
+@@ -1704,14 +1704,8 @@ static int ugeth_82xx_filtering_clear_addr_in_paddr(struct ucc_geth_private *uge
+ 
+ static void ucc_geth_free_rx(struct ucc_geth_private *ugeth)
+ {
+-	struct ucc_geth_info *ug_info;
+-	struct ucc_fast_info *uf_info;
+-	u16 i, j;
+ 	u8 __iomem *bd;
+-
+-
+-	ug_info = ugeth->ug_info;
+-	uf_info = &ug_info->uf_info;
++	u16 i, j;
+ 
+ 	for (i = 0; i < ucc_geth_rx_queues(ugeth->ug_info); i++) {
+ 		if (ugeth->p_rx_bd_ring[i]) {
+@@ -1743,16 +1737,11 @@ static void ucc_geth_free_rx(struct ucc_geth_private *ugeth)
+ 
+ static void ucc_geth_free_tx(struct ucc_geth_private *ugeth)
+ {
+-	struct ucc_geth_info *ug_info;
+-	struct ucc_fast_info *uf_info;
+-	u16 i, j;
+ 	u8 __iomem *bd;
++	u16 i, j;
+ 
+ 	netdev_reset_queue(ugeth->ndev);
+ 
+-	ug_info = ugeth->ug_info;
+-	uf_info = &ug_info->uf_info;
+-
+ 	for (i = 0; i < ucc_geth_tx_queues(ugeth->ug_info); i++) {
+ 		bd = ugeth->p_tx_bd_ring[i];
+ 		if (!bd)
+@@ -2036,13 +2025,11 @@ static int ucc_struct_init(struct ucc_geth_private *ugeth)
+ static int ucc_geth_alloc_tx(struct ucc_geth_private *ugeth)
+ {
+ 	struct ucc_geth_info *ug_info;
+-	struct ucc_fast_info *uf_info;
++	u8 __iomem *bd;
+ 	int length;
+ 	u16 i, j;
+-	u8 __iomem *bd;
+ 
+ 	ug_info = ugeth->ug_info;
+-	uf_info = &ug_info->uf_info;
+ 
+ 	/* Allocate Tx bds */
+ 	for (j = 0; j < ucc_geth_tx_queues(ug_info); j++) {
+@@ -2098,13 +2085,11 @@ static int ucc_geth_alloc_tx(struct ucc_geth_private *ugeth)
+ static int ucc_geth_alloc_rx(struct ucc_geth_private *ugeth)
+ {
+ 	struct ucc_geth_info *ug_info;
+-	struct ucc_fast_info *uf_info;
++	u8 __iomem *bd;
+ 	int length;
+ 	u16 i, j;
+-	u8 __iomem *bd;
+ 
+ 	ug_info = ugeth->ug_info;
+-	uf_info = &ug_info->uf_info;
+ 
+ 	/* Allocate Rx bds */
+ 	for (j = 0; j < ucc_geth_rx_queues(ug_info); j++) {
+@@ -2155,7 +2140,6 @@ static int ucc_geth_alloc_rx(struct ucc_geth_private *ugeth)
+ 
+ static int ucc_geth_startup(struct ucc_geth_private *ugeth)
+ {
+-	struct ucc_geth_82xx_address_filtering_pram __iomem *p_82xx_addr_filt;
+ 	struct ucc_geth_init_pram __iomem *p_init_enet_pram;
+ 	struct ucc_fast_private *uccf;
+ 	struct ucc_geth_info *ug_info;
+@@ -2165,8 +2149,8 @@ static int ucc_geth_startup(struct ucc_geth_private *ugeth)
+ 	int ret_val = -EINVAL;
+ 	u32 remoder = UCC_GETH_REMODER_INIT;
+ 	u32 init_enet_pram_offset, cecr_subblock, command;
+-	u32 ifstat, i, j, size, l2qt, l3qt;
+ 	u16 temoder = UCC_GETH_TEMODER_INIT;
++	u32 i, j, size, l2qt, l3qt;
+ 	u8 function_code = 0;
+ 	u8 __iomem *endOfRing;
+ 	u8 numThreadsRxNumerical, numThreadsTxNumerical;
+@@ -2260,7 +2244,7 @@ static int ucc_geth_startup(struct ucc_geth_private *ugeth)
+ 	/*                    Set IFSTAT                     */
+ 	/* For more details see the hardware spec.           */
+ 	/* Read only - resets upon read                      */
+-	ifstat = in_be32(&ug_regs->ifstat);
++	in_be32(&ug_regs->ifstat);
+ 
+ 	/*                    Clear UEMPR                    */
+ 	/* For more details see the hardware spec.           */
+@@ -2651,10 +2635,6 @@ static int ucc_geth_startup(struct ucc_geth_private *ugeth)
+ 		for (j = 0; j < NUM_OF_PADDRS; j++)
+ 			ugeth_82xx_filtering_clear_addr_in_paddr(ugeth, (u8) j);
+ 
+-		p_82xx_addr_filt =
+-		    (struct ucc_geth_82xx_address_filtering_pram __iomem *) ugeth->
+-		    p_rx_glbl_pram->addressfiltering;
+-
+ 		ugeth_82xx_filtering_clear_all_addr_in_hash(ugeth,
+ 			ENET_ADDR_TYPE_GROUP);
+ 		ugeth_82xx_filtering_clear_all_addr_in_hash(ugeth,
+@@ -2889,9 +2869,8 @@ static int ucc_geth_rx(struct ucc_geth_private *ugeth, u8 rxQ, int rx_work_limit
+ 	struct sk_buff *skb;
+ 	u8 __iomem *bd;
+ 	u16 length, howmany = 0;
+-	u32 bd_status;
+-	u8 *bdBuffer;
+ 	struct net_device *dev;
++	u32 bd_status;
+ 
+ 	ugeth_vdbg("%s: IN", __func__);
+ 
+@@ -2904,7 +2883,7 @@ static int ucc_geth_rx(struct ucc_geth_private *ugeth, u8 rxQ, int rx_work_limit
+ 
+ 	/* while there are received buffers and BD is full (~R_E) */
+ 	while (!((bd_status & (R_E)) || (--rx_work_limit < 0))) {
+-		bdBuffer = (u8 *) in_be32(&((struct qe_bd __iomem *)bd)->buf);
++		in_be32(&((struct qe_bd __iomem *)bd)->buf);
+ 		length = (u16) ((bd_status & BD_LENGTH_MASK) - 4);
+ 		skb = ugeth->rx_skbuff[rxQ][ugeth->skb_currx[rxQ]];
+ 
+@@ -3043,14 +3022,12 @@ static irqreturn_t ucc_geth_irq_handler(int irq, void *info)
+ 	struct net_device *dev = info;
+ 	struct ucc_geth_private *ugeth = netdev_priv(dev);
+ 	struct ucc_fast_private *uccf;
+-	struct ucc_geth_info *ug_info;
+ 	register u32 ucce;
+ 	register u32 uccm;
+ 
+ 	ugeth_vdbg("%s: IN", __func__);
+ 
+ 	uccf = ugeth->uccf;
+-	ug_info = ugeth->ug_info;
+ 
+ 	/* read and clear events */
+ 	ucce = (u32) in_be32(uccf->p_ucce);
+
 
