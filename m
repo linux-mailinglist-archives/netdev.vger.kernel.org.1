@@ -1,210 +1,164 @@
-Return-Path: <netdev+bounces-157267-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157268-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 713CFA09C67
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 21:27:17 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 87EC0A09C80
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 21:35:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1B37D16B50F
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 20:27:07 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1C40A7A1486
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 20:35:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32B1921CFF4;
-	Fri, 10 Jan 2025 20:26:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF8D3212B06;
+	Fri, 10 Jan 2025 20:35:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="HdN1EntK"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i4fA/o0c"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A83F21B908
-	for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 20:26:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C9EF1E1C01
+	for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 20:35:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736540786; cv=none; b=CLJg6yxU7GUlDblUKedcG8pV9vb3x0SZfCIWlHR+Ym+1aOj9KFE1tV6CDozm+9YGy/FfIs5Y1I2bWYWJnkKkimVo3qmqVuKOxkR1BVxDlBOe6hld3RuZPYLQZ1ovI7q5v2VkmnTDXPxFCAOTSFywoOm5QPzdD9eV5puSUbYoZqg=
+	t=1736541353; cv=none; b=pWV7XTkBkOujLc53jJ7pxFSRB+HvxJHpAlpbVpdl9OglN+od+GBaZ1ZWEAK02LWFbPWjafR0T5Eib93XpPvRw/HeMrzUtBTk2auhzvDcw94rB/VbfaBSqgp79my1CR0QMp35fm1A7HjC/adJokq0s8S6LlySclemlP+8WVTixD8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736540786; c=relaxed/simple;
-	bh=nXNvmseKjVxOB/p5zaC6W1Bj1mcIQTUBPceRSuG8Qpc=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=qJoSgRXb45jEZGlwF4CmOEOJHM9/IZjo/SPFA08qEAIrD1Jt3sScZF/8g6yk+t/bJ9R6OXptmxnnHI6srW5Nx6FH04MHTiAkkwznhg4pewKxjl4lQNi72DLxXdn1m4h0ap14PUUrMzGczwD80OJ74N2hs/N+CpkkXRsNhwtwP78=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=HdN1EntK; arc=none smtp.client-ip=209.85.216.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-2ee709715d9so3508948a91.3
-        for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 12:26:24 -0800 (PST)
+	s=arc-20240116; t=1736541353; c=relaxed/simple;
+	bh=sCdMyqYVfA/Lmz76KMVMOhSB4ZojGfthgSuK8VEIp90=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=rtw/GVN1Vu2pmKleHgLd2zGALWMx/Wuq1l7gSeIl9tk92nIpBuA4AtmzNJxBEVaHw3sKuNg+/hzp0Eob16pnd60iZB9ENSL8yz8M+bzbnyKcoveYaLbUXqYCNBb4s4Zu7AfwzgQaFiqfo76ps1ZV0k4DMgnqPLh37YXoTtDb6Ak=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=i4fA/o0c; arc=none smtp.client-ip=209.85.128.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-43690d4605dso18404265e9.0
+        for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 12:35:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1736540783; x=1737145583; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=X5Wc1BZX0qLlows6HUppLFsWMw9e/cDJxHu3IFsmtDc=;
-        b=HdN1EntKBzkb1cXTgZAYrIJ6FR+5I3pTkOF5vWJK8noPEtwZbxc9hKaH52DqH5LfUI
-         +loYiLY+Ok7H3vynSCZdMJL+nk+cBD7sFKBWChm2PtbTPej3/kukUmrg8NVBUQqbxCu1
-         okIRvaLjWtNJK2s75UoBh710/F1qjILMOokIo=
+        d=gmail.com; s=20230601; t=1736541350; x=1737146150; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=VGDNwmViZBJfXn8pnyCvV0Kf8hGhlN7y7SbLMlSWaH4=;
+        b=i4fA/o0cTH3ocWr8UnlPjvM4VaqcKG/9oRPNN8fze5bXRH2zegoPg4UYptmWT3VLzU
+         As/l8n3S1J1e/akBpEb+gna08EIrc1L4gH6EgubrJfC2tal2v7hwEwkvQZd2U8c+iPDI
+         2mTggRuhl1ll0NK3M5Zkwl65P3IOzvf6JjaqoPc5sP8gqdn29SEy/M5iyOl/e69r3JR+
+         3GUTgNxhSYPDRjHwvHorzIe2i8gICWpwwwrVmSM4mIYnpVZqY7+86alyKgjSs5K+buGr
+         hAg+tAQsnsdbMA0P7j4Mq1uFFCjGmBRpR36EOzwaq4jPq0mE/ybji5aMriYjbAWC9uMb
+         inYg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736540783; x=1737145583;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=X5Wc1BZX0qLlows6HUppLFsWMw9e/cDJxHu3IFsmtDc=;
-        b=CXPo9Uio1orYt4WVwZ/5VY6RVxHGQ3w2fAvJrmJIKpVR57hU1FmF6QHTTngt639DbI
-         WuLCffvrsUt8FdapCoZzbkrdO21vFV/kcnpGWsh1TLhZ+G2ahnY5JA6t6oN0GBJnoPyK
-         w5GB7ZC0YpdGybdevX8ZJdk2wQctm+ZtHpeLQWaYvLVMBybnBsRa8RjpOatJupMe6gpG
-         7TCihe/FmkQ5SzTTwtfuSUWM1S0jzWOP5kcRnWhxTA2uVqWlR7bVQWOtpDVmKC5njJQX
-         Rl/SXLvqleB8Psrc+c7K+mRMciBMa1REe9TTstSdEUgcNeCV83C1wF5E2GsAykeKKMQs
-         uaMA==
-X-Gm-Message-State: AOJu0YyeZ+x4H1hM8s6UEf4uCM5X3nKYIP7XG1u6xmbj1NITI4yUxV+C
-	/hvrF3PrAr3STL9Jij5gAHwt3zza7OI2jlawODfkdgfCy8YDEF+b4M8xfWkgoCDTgIR4u7MUJJ5
-	JBnJiILo02HY/LN9z7qQoZZ+8LMWKZsz8D9ZaitnqQxVw9h8Jq97GfWAfcDFeigDfq+dnfcj071
-	PBYwpNq9oz12TBP/nKUftHcZ1Zsg4KYTXA/us=
-X-Gm-Gg: ASbGnctgjbGKavghhirH5TjG7yBzqBYDGvS7SaP5psgSYgHRxrClgIVQiFOL7wUfCAq
-	luiiyfh4PPZxPUfd7LSFjXbWZKs3X6/DaMzfOlCC43e3a8VQ2wJM5QngX+LNP6+LqzzZpjSiHWf
-	6ZJvwFMC7XtDIQV6ahuGUFxoOTWIZHY+GljRJGj6GRJrG8CrplhNvSOnmNu4WEVD5Xo4ko7CLt+
-	+XxHkrZbkXbpkx6TS85BDT0arA6o1y6SoMt8ykOk+J5R4J6eCJWqPBfMxLhF9GL
-X-Google-Smtp-Source: AGHT+IGIJhOnEc3zWaTR7ImuwsB7dqzjQabiuroM48+nisL8PT0O38c5xZ0k4VU0MQuusWD0teh7Jg==
-X-Received: by 2002:a17:90b:520f:b0:2ee:db8a:29f0 with SMTP id 98e67ed59e1d1-2f548f1b7e6mr16773814a91.27.1736540783484;
-        Fri, 10 Jan 2025 12:26:23 -0800 (PST)
-Received: from localhost.localdomain ([2620:11a:c019:0:65e:3115:2f58:c5fd])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21a9f22eb8esm17091825ad.166.2025.01.10.12.26.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 Jan 2025 12:26:22 -0800 (PST)
-From: Joe Damato <jdamato@fastly.com>
-To: netdev@vger.kernel.org
-Cc: mkarsten@uwaterloo.ca,
-	Joe Damato <jdamato@fastly.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	virtualization@lists.linux.dev (open list:VIRTIO CORE AND NET DRIVERS),
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH net-next 3/3] virtio_net: Map NAPIs to queues
-Date: Fri, 10 Jan 2025 20:26:04 +0000
-Message-Id: <20250110202605.429475-4-jdamato@fastly.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20250110202605.429475-1-jdamato@fastly.com>
-References: <20250110202605.429475-1-jdamato@fastly.com>
+        d=1e100.net; s=20230601; t=1736541350; x=1737146150;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=VGDNwmViZBJfXn8pnyCvV0Kf8hGhlN7y7SbLMlSWaH4=;
+        b=vw4LyKpVh2eO2z7j6CJytgK+wNAny4JC3zBdtYeyqQlDZjc/KL88re7sqvXZDqmK5F
+         c7Tg/WNT5QGkh00ocl7AD49o5Id0uQlXnQQn5IS//6+B1uyLegCG2tiGQfUgZQUUax2+
+         JoBtZF+HjnIMxDzk9B+C6RZalC9pPr72MgXLlJmje8WRFzptxUEWkH7TD1Jv6L/JMe5t
+         7kBjD6rqM7VKnF0GCBLVS9Gb6JAVvYYEMmNBpOJjp+jdWWN+CHNxm+fbx7JgDDaIv03i
+         yiPu11v2P6DAAKSXrianHeBevIF7F8jDp5J61s7g32IGQsEgBzog0Y1qcgP2jv8zwxmO
+         3LMA==
+X-Forwarded-Encrypted: i=1; AJvYcCXF1oWtlWROL8vdTUbGlk9wIDmrHEjDL0PRdOemQVWZHqXenscycFWB3ODhoNzcUSKV2dzGE84=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yymj3cxzEzjfVb/cLbzwvD3ItncsHcwYNbkpnDLE9198xpMXokH
+	Zg6XYw6KYh5aF04IuwKW7TC6Jgjzc3o9jq9j90CPcVz0Y4dC6akR
+X-Gm-Gg: ASbGncsnuJWtQt9m0eh8PmNFWBSo/F9/3kSGOLC5i+4CumLw4KLDlbtkwinAbhREQ4l
+	7f4grtB7q0f0cfBLwQ04gFt3OTnQE3anHZC5hs7xPnXwVzsq71xvKn/+pFygSpujHxdixKMD6W3
+	kjpUo99UonpZgweSDnTagC0Pi/GZDoXo2EAbp6v7lSfLk3H6ebWRn2BmaIKNXsatU8W+TD7pQdu
+	NvTwqQA+GIRAnKiXW9H3W9CnmCImpGfxC5MBCXwPGpP4r8Nws7w0h+RO4Mx0AtpLNTlRYK3phu1
+	2XBMX8UNNc/UrnuPiiyqyoE8O+iXsJkXr5xr9u1FM3R7l58dpyF1kKKDnyjRivg/pkCvMQMqIre
+	4nmA8pHw35MrjMQCxfAf4GO6r2hRpj6nNT6YSLx4Hl49IqA==
+X-Google-Smtp-Source: AGHT+IF30j5h8cCQAry3DpnsnJXNPflLZZtrZLZbfMvdFVhpZ1ZRBiYf6VDsZCtz35uiljo0wzRSYA==
+X-Received: by 2002:a05:600c:354e:b0:431:5aea:95f with SMTP id 5b1f17b1804b1-436e26a175cmr132889395e9.16.1736541349703;
+        Fri, 10 Jan 2025 12:35:49 -0800 (PST)
+Received: from ?IPV6:2a02:3100:a08a:a100:1e8:1877:1b89:d707? (dynamic-2a02-3100-a08a-a100-01e8-1877-1b89-d707.310.pool.telefonica.de. [2a02:3100:a08a:a100:1e8:1877:1b89:d707])
+        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-436e9dc8826sm62758205e9.11.2025.01.10.12.35.48
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 10 Jan 2025 12:35:49 -0800 (PST)
+Message-ID: <f9cb9fe0-da31-4824-b452-3c4cfcc454e9@gmail.com>
+Date: Fri, 10 Jan 2025 21:35:48 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 2/3] net: phy: realtek: rename realtek.c to
+ realtek_main.c
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, Paolo Abeni <pabeni@redhat.com>,
+ Jakub Kicinski <kuba@kernel.org>, David Miller <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+References: <3e2784e3-4670-4d54-932f-b25440747b65@gmail.com>
+ <b67681db-76f2-46fa-9e87-48603b7ee081@gmail.com>
+ <Z4EVLteK6aU10PSr@shell.armlinux.org.uk>
+Content-Language: en-US
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ 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
+In-Reply-To: <Z4EVLteK6aU10PSr@shell.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Use netif_queue_set_napi to map NAPIs to queue IDs so that the mapping
-can be accessed by user apps.
-
-$ ethtool -i ens4 | grep driver
-driver: virtio_net
-
-$ sudo ethtool -L ens4 combined 4
-
-$ ./tools/net/ynl/pyynl/cli.py \
-       --spec Documentation/netlink/specs/netdev.yaml \
-       --dump queue-get --json='{"ifindex": 2}'
-[{'id': 0, 'ifindex': 2, 'napi-id': 8289, 'type': 'rx'},
- {'id': 1, 'ifindex': 2, 'napi-id': 8290, 'type': 'rx'},
- {'id': 2, 'ifindex': 2, 'napi-id': 8291, 'type': 'rx'},
- {'id': 3, 'ifindex': 2, 'napi-id': 8292, 'type': 'rx'},
- {'id': 0, 'ifindex': 2, 'type': 'tx'},
- {'id': 1, 'ifindex': 2, 'type': 'tx'},
- {'id': 2, 'ifindex': 2, 'type': 'tx'},
- {'id': 3, 'ifindex': 2, 'type': 'tx'}]
-
-Note that virtio_net has TX-only NAPIs which do not have NAPI IDs, so
-the lack of 'napi-id' in the above output is expected.
-
-Signed-off-by: Joe Damato <jdamato@fastly.com>
----
- drivers/net/virtio_net.c | 29 ++++++++++++++++++++++++++---
- 1 file changed, 26 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index 4e88d352d3eb..8f0f26cc5a94 100644
---- a/drivers/net/virtio_net.c
-+++ b/drivers/net/virtio_net.c
-@@ -2804,14 +2804,28 @@ static void virtnet_napi_do_enable(struct virtqueue *vq,
- }
- 
- static void virtnet_napi_enable_lock(struct virtqueue *vq,
--				     struct napi_struct *napi)
-+				     struct napi_struct *napi,
-+				     bool need_rtnl)
- {
-+	struct virtnet_info *vi = vq->vdev->priv;
-+	int q = vq2rxq(vq);
-+
- 	virtnet_napi_do_enable(vq, napi);
-+
-+	if (q < vi->curr_queue_pairs) {
-+		if (need_rtnl)
-+			rtnl_lock();
-+
-+		netif_queue_set_napi(vi->dev, q, NETDEV_QUEUE_TYPE_RX, napi);
-+
-+		if (need_rtnl)
-+			rtnl_unlock();
-+	}
- }
- 
- static void virtnet_napi_enable(struct virtqueue *vq, struct napi_struct *napi)
- {
--	virtnet_napi_enable_lock(vq, napi);
-+	virtnet_napi_enable_lock(vq, napi, false);
- }
- 
- static void virtnet_napi_tx_enable(struct virtnet_info *vi,
-@@ -2848,9 +2862,13 @@ static void refill_work(struct work_struct *work)
- 	for (i = 0; i < vi->curr_queue_pairs; i++) {
- 		struct receive_queue *rq = &vi->rq[i];
- 
-+		rtnl_lock();
-+		netif_queue_set_napi(vi->dev, i, NETDEV_QUEUE_TYPE_RX, NULL);
-+		rtnl_unlock();
- 		napi_disable(&rq->napi);
-+
- 		still_empty = !try_fill_recv(vi, rq, GFP_KERNEL);
--		virtnet_napi_enable_lock(rq->vq, &rq->napi);
-+		virtnet_napi_enable_lock(rq->vq, &rq->napi, true);
- 
- 		/* In theory, this can happen: if we don't get any buffers in
- 		 * we will *never* try to fill again.
-@@ -3048,6 +3066,7 @@ static int virtnet_poll(struct napi_struct *napi, int budget)
- static void virtnet_disable_queue_pair(struct virtnet_info *vi, int qp_index)
- {
- 	virtnet_napi_tx_disable(&vi->sq[qp_index].napi);
-+	netif_queue_set_napi(vi->dev, qp_index, NETDEV_QUEUE_TYPE_RX, NULL);
- 	napi_disable(&vi->rq[qp_index].napi);
- 	xdp_rxq_info_unreg(&vi->rq[qp_index].xdp_rxq);
- }
-@@ -3317,8 +3336,10 @@ static netdev_tx_t start_xmit(struct sk_buff *skb, struct net_device *dev)
- static void virtnet_rx_pause(struct virtnet_info *vi, struct receive_queue *rq)
- {
- 	bool running = netif_running(vi->dev);
-+	int q = vq2rxq(rq->vq);
- 
- 	if (running) {
-+		netif_queue_set_napi(vi->dev, q, NETDEV_QUEUE_TYPE_RX, NULL);
- 		napi_disable(&rq->napi);
- 		virtnet_cancel_dim(vi, &rq->dim);
- 	}
-@@ -5943,6 +5964,8 @@ static int virtnet_xdp_set(struct net_device *dev, struct bpf_prog *prog,
- 	/* Make sure NAPI is not using any XDP TX queues for RX. */
- 	if (netif_running(dev)) {
- 		for (i = 0; i < vi->max_queue_pairs; i++) {
-+			netif_queue_set_napi(vi->dev, i, NETDEV_QUEUE_TYPE_RX,
-+					     NULL);
- 			napi_disable(&vi->rq[i].napi);
- 			virtnet_napi_tx_disable(&vi->sq[i].napi);
- 		}
--- 
-2.25.1
-
+On 10.01.2025 13:40, Russell King (Oracle) wrote:
+> On Fri, Jan 10, 2025 at 12:47:39PM +0100, Heiner Kallweit wrote:
+>> In preparation of adding a source file with hwmon support, rename
+>> realtek.c to realtek_main.c.
+>>
+>> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+>> ---
+>>  drivers/net/phy/Makefile                      | 1 +
+>>  drivers/net/phy/{realtek.c => realtek_main.c} | 0
+>>  2 files changed, 1 insertion(+)
+>>  rename drivers/net/phy/{realtek.c => realtek_main.c} (100%)
+> 
+> Is it worth considering a vendor subdirectory when PHYs end up with
+> multiple source files?
+> 
+> We already have aquantia, mediatek, mscc, and qcom. Should we be
+> considering it for this as well?
+> 
+Yes, I think this would make sense. I'll submit a v2.
 
