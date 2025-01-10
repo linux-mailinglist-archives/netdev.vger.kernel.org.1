@@ -1,62 +1,71 @@
-Return-Path: <netdev+bounces-157072-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157073-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B479A08D24
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 10:57:46 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0EB47A08D38
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 11:03:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AE4453AA18B
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 09:55:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2EDC63A35C6
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 10:03:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29BFB209F49;
-	Fri, 10 Jan 2025 09:55:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 971B420ADE5;
+	Fri, 10 Jan 2025 10:02:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QItRPsT0"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="s1YN9F4J"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01E5E18A95A;
-	Fri, 10 Jan 2025 09:55:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2BC320ADD7;
+	Fri, 10 Jan 2025 10:02:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736502917; cv=none; b=FUT1oJUkb/Lpe7iJeiWvaVBTLjx3TY7o8TwmXTNQKfbfHaJWFNZxoMIUbxTSUZbMvIaYfigNyS4fU5aBofcyWNh8GmkixbGn0AHleS4+VHG5dicXjrYxbXGlkPNjT7zgy00AlTpUHUuVxbOm/M+P6Y+erX7fPT0efmqmOAjrN7g=
+	t=1736503378; cv=none; b=It8qc6hny1u4pdZIMXXoGkmj+8yEWES2WCHXOV83PgoQadMLu7NyckGABDG+5O0pDYeUe+fC1C1ZS89961FaDBE1sLEMRIOwUQKxZW0DO0ifMMNsyBNrThJe98vBTqcDaezSOAGk34hLpy4MoakVuDYFe1DSR6KUGOPBmnfrI2Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736502917; c=relaxed/simple;
-	bh=gkpmHwnR8Yh/n2rNCUGtcEYp1sllwOnm/9K7DGRRUzE=;
+	s=arc-20240116; t=1736503378; c=relaxed/simple;
+	bh=tqs0+paK0NvHbEBfE2HlZAXYGEfQUXwFsV6dBotUaxY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oFoLjYR0F+Ci3RJyrTEeABa7PXO+CSgXOTEMTPQ40tpbT7NVDZCbxxPd9+6MMLkM0kG+QPRNcFaVLDHO7i15nn6jrYMH4QGWuc47pYYTKsC2EgL0GANhW+Pae+qhf2cVlfd+WUfITgMVBcxlYQ3hRNJRHFe5lohHh/zjM0zXeUs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QItRPsT0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 26485C4CED6;
-	Fri, 10 Jan 2025 09:55:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736502913;
-	bh=gkpmHwnR8Yh/n2rNCUGtcEYp1sllwOnm/9K7DGRRUzE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=QItRPsT0l45znuNh9ylybQ2raG04cRGacxDaULTQjfASc3ljcAcN3fEPXrtBXqb+p
-	 WxPuyaE0d8IDZ9MAqTXM+ZQTPBfIW21sWkmX9gpzLgaVHsRTX7ks8+rvu9wwOOc9fn
-	 Om5dh2yMYMF+cojubaOPFKgzmpdIxvUz3V5E1yEyi1r9PpA7xSc0oOWcjcMBgCsgYU
-	 RZZMEbBz/DYif8pmzqYtRvpPgEIK5Gku1mEmKYs2bVtTfuxnzcN0FUUWh5RyT2fFWS
-	 MJT5XB4gIOXEBD8ws0bhuFQdxyf+BUzugMTS9xSdJmRPtAHAQ6SK9/fEMHEh9KHYAz
-	 kjva7Qi2GRWTw==
-Date: Fri, 10 Jan 2025 09:55:08 +0000
-From: Simon Horman <horms@kernel.org>
-To: Raphael Gallais-Pou <rgallaispou@gmail.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=j1tv1//2YazckfsI5IzuYwhu6P0eV82fCcF7eXMtHY5Icvw44UqsPXVCa6hhUBXpogHdESddnEZJVyqCy59e8IlbIBztkBu1hI71eerPpMo85fQBpa5scsCWkGGAhZkJTaYzr0prsWFfOcTFqYbiyogwzLQ8b3vDX2N1IWMI1hI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=s1YN9F4J; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=1m1KB9AdbQNDslVOCwIrJ7po0oY3YsOSAHFrY0T0XQ0=; b=s1YN9F4JvRrqu6FDvfABUotkXX
+	egyLmcrPJPZfrXr2UQ5Dyr8p7yDTwePCApUywf6STJ3MAex65qemnLMtVseIPKnMr4Ko5xlz/nQtE
+	OXW1tCi9yDOao/RKEZ3pychAw8U9DFkZ6h3aq6j7pBwRCIAvv3xCIhInMeav290M8K5t5tQJn3vG/
+	X8BKessJ7xqR/J+N03lVm9w8bXBeUoj/NNgqtVLSxJp2g0weFFsxJiMcMTen7RqGIENf1chB6SiO6
+	wxhgy2C8Gm/CoDUZ8rcIADN6yxNTll4YV5nw02Wg1xLyTP0z11hqKHS2nY4YQ5vlnCbRtNC65k3dG
+	1YuMv73Q==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1tWBdb-007npH-15;
+	Fri, 10 Jan 2025 18:02:29 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 10 Jan 2025 18:02:28 +0800
+Date: Fri, 10 Jan 2025 18:02:28 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: David Howells <dhowells@redhat.com>
+Cc: Chuck Lever <chuck.lever@oracle.com>,
+	Trond Myklebust <trond.myklebust@hammerspace.com>,
 	"David S. Miller" <davem@davemloft.net>,
+	Marc Dionne <marc.dionne@auristor.com>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] net: stmmac: sti: Switch from CONFIG_PM_SLEEP guards
- to pm_sleep_ptr()
-Message-ID: <20250110095508.GT7706@kernel.org>
-References: <20250109155842.60798-1-rgallaispou@gmail.com>
+	Simon Horman <horms@kernel.org>, linux-crypto@vger.kernel.org,
+	linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH 2/8] crypto/krb5: Provide Kerberos 5 crypto through
+ AEAD API
+Message-ID: <Z4DwNPgLFcfy6jdl@gondor.apana.org.au>
+References: <20250110010313.1471063-1-dhowells@redhat.com>
+ <20250110010313.1471063-3-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,19 +74,32 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250109155842.60798-1-rgallaispou@gmail.com>
+In-Reply-To: <20250110010313.1471063-3-dhowells@redhat.com>
 
-On Thu, Jan 09, 2025 at 04:58:42PM +0100, Raphael Gallais-Pou wrote:
-> Letting the compiler remove these functions when the kernel is built
-> without CONFIG_PM_SLEEP support is simpler and less error prone than the
-> use of #ifdef based kernel configuration guards.
-> 
-> Signed-off-by: Raphael Gallais-Pou <rgallaispou@gmail.com>
-> ---
-> Changes in v2:
->   - Split serie in single patches
->   - Remove irrelevant 'Link:' from commit log
->   - Link to v1: https://lore.kernel.org/r/20241229-update_pm_macro-v1-5-c7d4c4856336@gmail.com
+On Fri, Jan 10, 2025 at 01:03:04AM +0000, David Howells wrote:
+>
+> Authentication tags are not used at all and should cause EINVAL if used (a
+> later patch does that).
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+What do you mean by this? The authentication tag is the checksum
+that you're referring to and you appear to be using it in the rfc8009
+encrypt/decrypt functions.
+
+> For the moment, the kerberos encryption algorithms use separate hash and
+> cipher algorithms internally, but should really use dual hash+cipher and
+> cipher+hash algorithms if possible to avoid doing these in series.  Offload
+> off this may be possible through something like the Intel QAT.
+
+Please elaborate on what you mean by this.  For IPsec, the main
+benefit with reframing cbc(aes)+hmac as aead is having a single
+code-path that supports both types of algorithms.
+
+So does your use-case support both standard AEAD algorithms such
+as GCM as well as these legacy algorithms?
+
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
 
