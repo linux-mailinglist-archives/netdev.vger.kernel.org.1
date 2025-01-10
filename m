@@ -1,186 +1,122 @@
-Return-Path: <netdev+bounces-156895-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-156896-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E5ADA083C9
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 01:05:35 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id CD4A9A083CC
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 01:08:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 45772166C4D
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 00:05:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A15071887E31
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 00:08:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA180391;
-	Fri, 10 Jan 2025 00:05:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBF91621;
+	Fri, 10 Jan 2025 00:08:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="X4UNZoYb"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fH8/HJ/c"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-179.mta1.migadu.com (out-179.mta1.migadu.com [95.215.58.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C771E624
-	for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 00:05:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DE1E161;
+	Fri, 10 Jan 2025 00:08:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736467530; cv=none; b=OvicPeLK4Tlzi1LzNcPiqVzNlXBUDDhCcA0QNEwV2rfx/qLgzMSdl7jQnNnXQqmq5fGsHEkldOo8PP9gkOtvrr0SGZQSzV+h0go3s284mO5o9PVkp3LHFXhRxnIxyiRqpTwIad8xMwkl4mfmh8g9ez14dzRM1sMN4siCt+HzpZs=
+	t=1736467729; cv=none; b=LOmRYvB8sO2FUE9kOf4gACGwhLVgAUXySztb/5j0pWh5fyku2IcpPLWtZCrVrMKDlo3KqFIrfbtPy5lu9EMLNI5wkMfSYbeUdR68RYYBot+DS71k9Xf3Me/95Z7yuHEWxMoxM3Eysssjnqcb945OvoiTZGXegNPDlmHd4tXj6lI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736467530; c=relaxed/simple;
-	bh=cPb91kdKltJuHbzmH4Nyi7r+xtbsyr+G0tlSic8XaUs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TMXfq4k0YqFHswYmXQHARssd674+LYEyM2gqiNoh/lEmKbH+3/QdF215JGKY7LgxDf+at4B6tIPdsRiYIKeGv1sQkOiRiBPBbyrOWy0BgXRwvsd18oyD9xbBp/YsGoq6AJGqyoMeWE3gNHEitMw0F3UxjabCvovlRMpCvKB55Ok=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=X4UNZoYb; arc=none smtp.client-ip=95.215.58.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <88e9291e-cd67-4fa2-8a91-d475e29ab832@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1736467526;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=4kMqH7y65kuer8GqW8vK5M8fKsAcphbaVfUJaBITA9s=;
-	b=X4UNZoYbSBd6ifQRKhE/vi6qwzU++fObglY8WfQskkSPpblFMk6P2FyewCPdqC5I5rvSlL
-	xm4YqA+KUlQBNAo1qW+Pan+qr9i4bI1gTz4ynqOhD0xQUXCfpBOG/6NbXRtZsMB1tQoo3g
-	nb4mO6onb3xH0+Y2NqdZuCJEl2o882M=
-Date: Thu, 9 Jan 2025 16:05:20 -0800
+	s=arc-20240116; t=1736467729; c=relaxed/simple;
+	bh=LpU4T6DaL3TYqZnZsYt9+zHKNo+/yDhg0Yk04hh59vU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qPcb8FN8KnI7FAI38piuJRvKn//V6msnbos9yBX3URGF4vPCR/3hbuXrZGnBTcdDvF4hX3pPhnTNIWaC9PvjKXw2GWDBguWa7/VXHYGq0+g9JHPy841pDHt5auT1XjRI+t3o1r0hbSmIqNYu/iOngiTjB2JCSI97+DHIjJZu9jQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fH8/HJ/c; arc=none smtp.client-ip=209.85.218.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-aafc9d75f8bso307203366b.2;
+        Thu, 09 Jan 2025 16:08:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1736467726; x=1737072526; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=1gi77FsVTSDY2PGejmDaiqsIfWWJUepdiBPVKpA1a4Q=;
+        b=fH8/HJ/cO+S1bn58kcMMlP9LW1e4p6lryD4jtgxdXknEqvvXbRXduae9uWU9xi622j
+         Ah7B2Pvzkc3blkgWsjH3oXaB7SeQetmYVOl7vKMnpflNUqrwFhc8joQsw0XCbXD5a7DX
+         8dn/mvabJgklzKwMpXbHDYt0SjbYzl8i6/QytmoPGY6jK7Qg68KszOQHiQ53OrjnTwL8
+         SroaAiJSd4nq7vKhSVRC2dgwafbd+xuxEsyy+bOw46bcuwSqfKhzxt6xgArPSHEVFyYR
+         gLgCEM5nz5hPsBJ5jxJDQkFa5i4wnVurU+vqIdphsNIqxYfLAcOuQQ1dUrFp2AXDYFzZ
+         5Z/w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736467726; x=1737072526;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=1gi77FsVTSDY2PGejmDaiqsIfWWJUepdiBPVKpA1a4Q=;
+        b=cST7ym6So+d3xIgW8hwnAp3eG0wFELJB6wGk4DOhbpSfY6OELIzwGIsIwBrxS4wgrI
+         IQDnBmiJDDb5XpnQotHN9Vmr0820B4UqPRWju6eWrC2qitOhmJC+yp/6tPharXmkY+8M
+         tjxkPU2nHI/AcHfQ8I4FrNK7WPppJQQDZCwiMtcTWHr0jYMas2AZX7hIH7NheRVAJLvr
+         g0im4eOltEHOF0xLNVuV37aJTGvCRrOhnY+8uU3XXBU0dOfSP46EDb3IXft8+8fATQpg
+         2Dw8TlUq1jiwWhrPV3lweBGyze7YesisPU7GXaAuf6vxXn8ayQYc+w2H0dS+FB1c+0jy
+         NlTg==
+X-Forwarded-Encrypted: i=1; AJvYcCUn4zE4VQkLceaVaaIv4R+Azd3OpXHpafLL8Jhc/vVptrCpq2CLhRNsVZPrDaA17BhbjELc1PgZ+UFAkzA=@vger.kernel.org, AJvYcCVat448ZcSHy41lPcZDQjP9z1GSUdEdYAkKmdLKDqq5btOpxBCGBdk87HwOmdcc54cNJ8KLtkExeQMCGKvKh4RD@vger.kernel.org, AJvYcCXFjHZZ3C5BVnGD1KHCS0RxzWsicUFH99fh8dwPjulTyNwLPumv7iuvhtvWVHUaDZ7UII81JPmw@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz7Sm/l6oqfkIpz8obx9PgrquIK6s7oeJfHBXGCg25ZeNS3ts5L
+	VpZ7IfLxYbwI53ZzM6UwY9N9473QKTShoAVHx3QsOLzt+avSk40q
+X-Gm-Gg: ASbGnctGGEm9fRR8sbVBrqr/+iFkAW7EkdloLZkcryGi/iKGBmD8r9yxcNB364sQC22
+	Jb9yeWs6UKhRWL1HLmu6+zlSydCw8UQ2DKq6XXqCExMH2GFlrk53mD1ofiO8JWldAdTbgn4CjZ+
+	yhaHcxFVrMx23a8dw0YnNm5DA8cCh64nTzo2tl2JEVisUzJ1KYrp4Xg377SLQpKPeEK1buUcY43
+	nvrYALeI1yPv3lbQ1h+IsVpxyGr/2gbxJ3FMooqsk2f0FKACKYZf2/O8+q4LYPVJDl1Q9wkQTLv
+	FVX6fQPAHupf+xZneD0hIpRH7IRZmUU67JbjS1V3c5Q=
+X-Google-Smtp-Source: AGHT+IH0LN6QHv/PuWuj1kAEYuzbMeSziZOq4c9hDvuDYMGslPC1RtswM1vpV1FdaCivW+ftzY9fLA==
+X-Received: by 2002:a17:906:6a15:b0:aae:8843:9029 with SMTP id a640c23a62f3a-ab2abc91605mr863231766b.48.1736467726100;
+        Thu, 09 Jan 2025 16:08:46 -0800 (PST)
+Received: from alessandro-pc.station (net-2-37-205-162.cust.vodafonedsl.it. [2.37.205.162])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ab2c90638acsm115734466b.20.2025.01.09.16.08.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 Jan 2025 16:08:45 -0800 (PST)
+From: Alessandro Zanni <alessandro.zanni87@gmail.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	shuah@kernel.org
+Cc: Alessandro Zanni <alessandro.zanni87@gmail.com>,
+	netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] selftests/net/forwarding: teamd command not found
+Date: Fri, 10 Jan 2025 01:07:44 +0100
+Message-ID: <20250110000752.81062-1-alessandro.zanni87@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next v2 13/14] selftests: Add a basic fifo qdisc test
-To: Amery Hung <ameryhung@gmail.com>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, daniel@iogearbox.net,
- andrii@kernel.org, alexei.starovoitov@gmail.com, martin.lau@kernel.org,
- sinquersw@gmail.com, toke@redhat.com, jhs@mojatatu.com, jiri@resnulli.us,
- stfomichev@gmail.com, ekarani.silvestre@ccc.ufcg.edu.br,
- yangpeihao@sjtu.edu.cn, xiyou.wangcong@gmail.com, yepeilin.cs@gmail.com
-References: <20241220195619.2022866-1-amery.hung@gmail.com>
- <20241220195619.2022866-14-amery.hung@gmail.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <20241220195619.2022866-14-amery.hung@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
 
-On 12/20/24 11:55 AM, Amery Hung wrote:
-> +static void do_test(char *qdisc)
-> +{
-> +	DECLARE_LIBBPF_OPTS(bpf_tc_hook, hook, .ifindex = LO_IFINDEX,
-> +			    .attach_point = BPF_TC_QDISC,
-> +			    .parent = TC_H_ROOT,
-> +			    .handle = 0x8000000,
-> +			    .qdisc = qdisc);
-> +	struct sockaddr_in6 sa6 = {};
-> +	ssize_t nr_recv = 0, bytes = 0;
-> +	int lfd = -1, fd = -1;
-> +	pthread_t srv_thread;
-> +	socklen_t addrlen = sizeof(sa6);
-> +	void *thread_ret;
-> +	char batch[1500];
-> +	int err;
-> +
-> +	WRITE_ONCE(stop, 0);
-> +
-> +	err = bpf_tc_hook_create(&hook);
-> +	if (!ASSERT_OK(err, "attach qdisc"))
-> +		return;
-> +
-> +	lfd = start_server(AF_INET6, SOCK_STREAM, NULL, 0, 0);
-> +	if (!ASSERT_NEQ(lfd, -1, "socket")) {
+Running "make kselftest TARGETS=net/forwarding" results in several
+occurrences of the same error:
+ ./lib.sh: line 787: teamd: command not found
 
-nit. ASSERT_OK_FD.
+Since many tests depends on teamd, this fix stops the tests if the
+teamd command is not installed.
 
-> +		bpf_tc_hook_destroy(&hook);
-> +		return;
-> +	}
-> +
-> +	fd = socket(AF_INET6, SOCK_STREAM, 0);
-> +	if (!ASSERT_NEQ(fd, -1, "socket")) {
-> +		bpf_tc_hook_destroy(&hook);
-> +		close(lfd);
-> +		return;
-> +	}
-> +
-> +	if (settimeo(lfd, 0) || settimeo(fd, 0))
-> +		goto done;
-> +
-> +	err = getsockname(lfd, (struct sockaddr *)&sa6, &addrlen);
-> +	if (!ASSERT_NEQ(err, -1, "getsockname"))
-> +		goto done;
-> +
-> +	/* connect to server */
-> +	err = connect(fd, (struct sockaddr *)&sa6, addrlen);
+Signed-off-by: Alessandro Zanni <alessandro.zanni87@gmail.com>
+---
+ tools/testing/selftests/net/forwarding/lib.sh | 1 +
+ 1 file changed, 1 insertion(+)
 
-Instead of socket/getsockname/connect, "fd = connect_to_fd(lfd);" from the 
-network_helpers.c should do.
+diff --git a/tools/testing/selftests/net/forwarding/lib.sh b/tools/testing/selftests/net/forwarding/lib.sh
+index 7337f398f9cc..a6a74a4be4bf 100644
+--- a/tools/testing/selftests/net/forwarding/lib.sh
++++ b/tools/testing/selftests/net/forwarding/lib.sh
+@@ -784,6 +784,7 @@ team_destroy()
+ {
+ 	local if_name=$1; shift
+ 
++	require_command $TEAMD
+ 	$TEAMD -t $if_name -k
+ }
+ 
+-- 
+2.43.0
 
-The above settimeo({lfd,fd}) is not needed also. The helpers from 
-network_helpers.c should have already set the default timeout.
-
-> +	if (!ASSERT_NEQ(err, -1, "connect"))
-> +		goto done;
-> +
-> +	err = pthread_create(&srv_thread, NULL, server, (void *)(long)lfd);
-> +	if (!ASSERT_OK(err, "pthread_create"))
-> +		goto done;
-> +
-> +	/* recv total_bytes */
-> +	while (bytes < total_bytes && !READ_ONCE(stop)) {
-> +		nr_recv = recv(fd, &batch,
-> +			       MIN(total_bytes - bytes, sizeof(batch)), 0);
-> +		if (nr_recv == -1 && errno == EINTR)
-> +			continue;
-> +		if (nr_recv == -1)
-> +			break;
-> +		bytes += nr_recv;
-> +	}
-> +
-> +	ASSERT_EQ(bytes, total_bytes, "recv");
-> +
-> +	WRITE_ONCE(stop, 1);
-> +	pthread_join(srv_thread, &thread_ret);
-> +	ASSERT_OK(IS_ERR(thread_ret), "thread_ret");
-> +
-> +done:
-> +	close(lfd);
-> +	close(fd);
-> +
-> +	bpf_tc_hook_destroy(&hook);
-> +	return;
-> +}
-> +
-> +static void test_fifo(void)
-> +{
-> +	struct bpf_qdisc_fifo *fifo_skel;
-> +	struct bpf_link *link;
-> +
-> +	fifo_skel = bpf_qdisc_fifo__open_and_load();
-> +	if (!ASSERT_OK_PTR(fifo_skel, "bpf_qdisc_fifo__open_and_load"))
-> +		return;
-> +
-> +	link = bpf_map__attach_struct_ops(fifo_skel->maps.fifo);
-> +	if (!ASSERT_OK_PTR(link, "bpf_map__attach_struct_ops")) {
-> +		bpf_qdisc_fifo__destroy(fifo_skel);
-> +		return;
-> +	}
-> +
-> +	do_test("bpf_fifo");
-> +
-> +	bpf_link__destroy(link);
-> +	bpf_qdisc_fifo__destroy(fifo_skel);
-> +}
-> +
-> +void test_bpf_qdisc(void)
-> +{
-
-Run the whole test under its own netns. Use netns_new("bpf_qdisc_ns", true) from 
-the test_progs.c should do.
-
-> +	if (test__start_subtest("fifo"))
-> +		test_fifo();
-> +}
 
