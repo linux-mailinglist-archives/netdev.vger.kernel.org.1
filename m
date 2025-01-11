@@ -1,156 +1,113 @@
-Return-Path: <netdev+bounces-157413-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157414-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0DFBFA0A408
-	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 15:05:13 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D3D5A0A40E
+	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 15:11:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5FF59188BB68
-	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 14:05:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 72F0A169591
+	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 14:11:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53B1B1A4F21;
-	Sat, 11 Jan 2025 14:05:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B17191AB6FF;
+	Sat, 11 Jan 2025 14:11:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bxNXuMJ5"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="st1HNpK1"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from out-177.mta1.migadu.com (out-177.mta1.migadu.com [95.215.58.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77DE81DDD1
-	for <netdev@vger.kernel.org>; Sat, 11 Jan 2025 14:05:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8958C197A9F
+	for <netdev@vger.kernel.org>; Sat, 11 Jan 2025 14:11:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736604306; cv=none; b=J+t0752HnY27mInUyhuaUb5KCeujRg8J6hIMU3Gel+0XYMp7nCyiczrL1lXCiAMw98oAw4BupePFDc7G3+GUIBxgZyfA3qLSLJ+7pKAZMnlZ/FlUYZKYGSCeJlO1olhGbylcE6eWTcSJaxWd8lbm7b/RKJz6enCSxmCxNv5E8GY=
+	t=1736604690; cv=none; b=QPME3FSGyo/wcJB2QB6i744gjtrekIaeRCvGJtwYbU51T8YIMm1gMjyofN1pX417BK2q1ivFUjzTj1NNhXwW+EbiifnjXX2Q1KXufcBUG1sUE0r5CLiTu0kik1C8rwEKyARVLfPToKA+uPHN0cJBtmUMhU4NsIKr1BUEMMUA2Pw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736604306; c=relaxed/simple;
-	bh=sYol7A8k/pFys9eYxfpY7noE4Jt/hUO0dik5egIb4Mk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ttGyt3KEHnaoTwtCHnfmpcmRFxqKCxgIK6i+R2rBzPxZPoU2BjfhpcL7Hz8JiF9nhWqLuupHzD8X+tpQsiGRhDd1jgSlZs1ZkPbk9oCFGtjz468rD6YE09+/YxTHo5yGmo3Or1BEwIYtyeK+FoC59WxownGOC3q0/s93A6m1si8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bxNXuMJ5; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1736604303;
+	s=arc-20240116; t=1736604690; c=relaxed/simple;
+	bh=9h4ZD1IDqP9E/vf/akoSSEC99OqdL708QpurCSiFMQQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=oHaM+frqejeFy6G2Eba0GYZlZoeIdz/2SpBXchMjOXmxIU1zlG6A4p8cFQ/9k/YLfd7HUeqICZy9tS8u6sUpC2qHi0kqG7s9DQKKGzg7V0jDKp+zwEN+XDZYVTT18PQQvwmWaI6BOEb3Xai/RL6YlP1P4IBDC0iWsguAdaR8CMY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=st1HNpK1; arc=none smtp.client-ip=95.215.58.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <679e160b-6cab-43d6-990c-d1df0e243995@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1736604685;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=LlFf4NEiSPp/pO4s6/zlHoBfHd6SVprzNJOhJJLaxQ8=;
-	b=bxNXuMJ5dDV7c0VCNbFIoF7ujDDxlByUm9yCh5nl3fGUWjIXvw6FmZc1d8Eq7Md+SvkUd8
-	h3dtfYN9iHiVLSCclw4mdO5paoKTLoltw3nwI8U2o4UwMCuRZPt5x0A+tXN7lxCcjpL3SW
-	qt2hKIjxoAhGYCaDPNQLK5NkXqrHqcs=
-Received: from mail-yb1-f199.google.com (mail-yb1-f199.google.com
- [209.85.219.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-692-Aq9YukfbO5Km3sal0ipFVQ-1; Sat, 11 Jan 2025 09:05:01 -0500
-X-MC-Unique: Aq9YukfbO5Km3sal0ipFVQ-1
-X-Mimecast-MFC-AGG-ID: Aq9YukfbO5Km3sal0ipFVQ
-Received: by mail-yb1-f199.google.com with SMTP id 3f1490d57ef6-e54d9b54500so6377361276.3
-        for <netdev@vger.kernel.org>; Sat, 11 Jan 2025 06:05:01 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736604301; x=1737209101;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=LlFf4NEiSPp/pO4s6/zlHoBfHd6SVprzNJOhJJLaxQ8=;
-        b=kQyHdxU+npx2Pgoz9SPFIdBYqHS8bnnDfziSs/FOGZqQf5rfiysJpJnURB8GnWh8r7
-         RGf949X8Yxbq+qkZejm7IGCBE0CoxaWQneJlwirpnvl3jUIJKqnmnA/jsk5JUJkosLTm
-         Vr/i7rI+a+rVb/Y0z3d4Oyby/1vHXKq5eirhusxLnrbl8gDcFl0SiXqCJEgfvTtuYK4F
-         8KRGNwKgw+/IYUU5Kz8zVAMs5ddPMFEDhLgRDJimExZxCD9U/JJ3t9wFunEIB4XkGMq8
-         JqzF9rKKPIGjJOFGU6QhqOEcdXI5SsVoXmaO4RxqX32srpUUAKHYPZzwTVxkuCrZHQla
-         qe/w==
-X-Forwarded-Encrypted: i=1; AJvYcCWDR1rRsO6TfIcGo9v8EbNmlRsac/LsTop0Y7XHKhPOE9qZdlK5fa3A0VQE18oleoLmQ4Jd43c=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyRgm8YlTQT1aKqXA6CwYu+McGUTWVc5D6uVIApJYwPp/EV2R3z
-	2W0hgv7GSmPpsEXNnSQrJmuE2Zv5Nh5cSrfl+pRTz4aDCZCS82EgqG6QML85gZiOTwOrcgrQLdt
-	Q4Qg+j5apl74i9IbThLhMC/th2uw4t+X9HcUfescQj5YuoFHniFtBAOETfsws5R85+5J7bopD18
-	oQi2L8a3pOwH+3PWcZyosI98iqF8IQ
-X-Gm-Gg: ASbGncsb0lvhPV13cju+UbhRb9tVKFBCP4tZk/SSRLbPDmknx6UAYHUSU/FMb1Oh2iv
-	Km984Jjr19ykqNPijimJpVz4JHT7ssCGnveXjaWsZBSb9k6FbpVgm1/skdD2kpW8+WUU=
-X-Received: by 2002:a05:6902:1b8c:b0:e4e:723f:caca with SMTP id 3f1490d57ef6-e54edf41883mr11882738276.5.1736604301299;
-        Sat, 11 Jan 2025 06:05:01 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IH/DZbwpddKlcSWRAfZFle6MdUL9L6aJFs0FV2I7Vaar9m8a1tzt6ROb+GQLg7pGjvUsqJ6M5OXEkdlbvTn6cY=
-X-Received: by 2002:a05:6902:1b8c:b0:e4e:723f:caca with SMTP id
- 3f1490d57ef6-e54edf41883mr11882716276.5.1736604301006; Sat, 11 Jan 2025
- 06:05:01 -0800 (PST)
+	bh=9h4ZD1IDqP9E/vf/akoSSEC99OqdL708QpurCSiFMQQ=;
+	b=st1HNpK1lKF5h6iJNdadlg66JAbDi/8O40sNUwm5za/QvR50AsnS6PVXYhHmUKDbhl3N0M
+	vOTx5Wqg3omXbJjmBep69VUssRt5hKyaNflItMX8/H3r2Q8RZ5cZMXab1kxSxcfxFP+yGm
+	dMdenXoutdJgzE4pP7lIr5Q1n0/OPyc=
+Date: Sat, 11 Jan 2025 22:10:30 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250110144145.3493-1-donald.hunter@gmail.com> <20250110170840.0990f829@kernel.org>
-In-Reply-To: <20250110170840.0990f829@kernel.org>
-From: Donald Hunter <donald.hunter@redhat.com>
-Date: Sat, 11 Jan 2025 14:04:50 +0000
-X-Gm-Features: AbW1kvY55tTYp2lgCZm6SmMZmOoQzkLlaACVD2hBZztHa8FRGdgoLJxcWPypgW0
-Message-ID: <CAAf2yc=PjJTrrbOY7SM-TEqqLyduaeMjRsdSHNXWV1bFfkU6Fg@mail.gmail.com>
-Subject: Re: [PATCH net-next v1 1/2] tools/net/ynl: add support for --family
- and --list-families
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Donald Hunter <donald.hunter@gmail.com>, netdev@vger.kernel.org, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Jan Stancek <jstancek@redhat.com>, 
-	Jiri Pirko <jiri@resnulli.us>
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [PATCH] MAINTAINERS: Become the stmmac maintainer
+To: Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew@lunn.ch>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com, mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Huacai Chen <chenhuacai@kernel.org>
+References: <20250110144944.32766-1-si.yanteng@linux.dev>
+ <5e1c9623-30cb-48c8-865b-cbdc2c08f0f3@lunn.ch>
+ <20250110165458.43e312bf@kernel.org>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Yanteng Si <si.yanteng@linux.dev>
+In-Reply-To: <20250110165458.43e312bf@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Sat, 11 Jan 2025 at 01:08, Jakub Kicinski <kuba@kernel.org> wrote:
->
-> On Fri, 10 Jan 2025 14:41:44 +0000 Donald Hunter wrote:
-> > Add a --family option to ynl to specify the spec by family name instead
-> > of file path, with support for searching in-tree and system install
-> > location and a --list-families option to show the available families.
->
-> Neat!
->
-> >  class YnlEncoder(json.JSONEncoder):
-> >      def default(self, obj):
-> > @@ -32,7 +50,14 @@ def main():
-> >
-> >      parser = argparse.ArgumentParser(description=description,
-> >                                       epilog=epilog)
-> > -    parser.add_argument('--spec', dest='spec', type=str, required=True)
-> > +    spec_group = parser.add_mutually_exclusive_group(required=True)
-> > +    spec_group.add_argument('--family', dest='family', type=str,
-> > +                            help='name of the netlink FAMILY')
-> > +    spec_group.add_argument('--list-families', action='store_true',
-> > +                            help='list all available netlink families')
->
-> Do we need to indicate that the list families lists the families for
-> which we found specs in the filesystem? As opposed to listing all
-> families currently loaded in the kernel?
+Hi Jakub, Andrew,
 
-That's a good suggestion. I'll update the help to say families that we
-have specs for. Will also try to add something to the help about
-loaded families.
+On 1/11/25 08:54, Jakub Kicinski wrote:
+> On Fri, 10 Jan 2025 18:22:03 +0100 Andrew Lunn wrote:
+>> On Fri, Jan 10, 2025 at 10:49:43PM +0800, Yanteng Si wrote:
+>>> I am the author of dwmac-loongson. The patch set was merged several
+>>> months ago. For a long time hereafter, I don't wish stmmac to remain
+>>> in an orphan state perpetually. Therefore, if no one is willing to
+>>> assume the role of the maintainer, I would like to be responsible for
+>>> the subsequent maintenance of stmmac. Meanwhile, Huacai is willing to
+>>> become a reviewer.
+>>>
+>>> About myself, I submitted my first kernel patch on January 4th, 2021.
+>>> I was still reviewing new patches last week, and I will remain active
+>>> on the mailing list in the future.
+>>>
+>>> Co-developed-by: Huacai Chen <chenhuacai@kernel.org>
+>>> Signed-off-by: Huacai Chen <chenhuacai@kernel.org>
+>>> Signed-off-by: Yanteng Si <si.yanteng@linux.dev>
+>> Thanks for volunteering for this. Your experience adding loongson
+>> support will be useful here. But with a driver of this complexity, and
+>> the number of different vendors using it, i think it would be good if
+>> you first established a good reputation for doing the work before we
+>> add you to the Maintainers. There are a number of stmmac patches on
+>> the list at the moment, please actually do the job of being a
+>> Maintainer and spend some time review them.
+>>
+>> A Synopsis engineer has also said he would start doing Maintainer
+>> work. Hopefully in the end we can add you both to MAINTAINERS.
+> +1, thanks a lot for volunteering! There are 22 patches for stmmac
+> pending review in patchwork, so please don't hesitate and start
+> reviewing and testing.
 
-> Some users may be surprised if they run --list-families, see a family,
-> issue a request and get an exception that family is not found..
->
-> I guess OTOH we also list spec ops in --list-ops, so there's precedent.
->
-> Up to you.
->
-> > +    if args.family:
-> > +        spec = f"{spec_dir()}/{args.family}.yaml"
-> > +        if args.schema is None:
->
-> Could we only do this if spec_dir() startswith sys_schema_dir ?
->
-> We want to make sure schema is always validated during development.
+Okay, thank you for your encouragement.
 
-Yep, makes sense.
+In the following period of time, I will try to review and
 
-> > +            args.schema = ''
-> > +    else:
-> > +        spec = args.spec
-> > +    if not os.path.isfile(spec):
-> > +        raise Exception(f"Spec file {spec} does not exist")
-> > +
-> > +    ynl = YnlFamily(spec, args.schema, args.process_unknown,
-> >                      recv_size=args.dbg_small_recv)
-> >      if args.dbg_small_recv:
-> >          ynl.set_recv_dbg(True)
->
+test the patches of stmmac.
+
+
+Thanks,
+
+Yanteng
 
 
