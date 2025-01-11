@@ -1,150 +1,206 @@
-Return-Path: <netdev+bounces-157383-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157384-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 336BEA0A1D8
-	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 08:37:31 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A7AFEA0A1FB
+	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 09:31:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6BE7E188B36B
-	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 07:37:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 765D216B756
+	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 08:31:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4060524B259;
-	Sat, 11 Jan 2025 07:37:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A1D4156960;
+	Sat, 11 Jan 2025 08:31:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MGbIOqaL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f208.google.com (mail-il1-f208.google.com [209.85.166.208])
+Received: from mail-il1-f172.google.com (mail-il1-f172.google.com [209.85.166.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B12424B226
-	for <netdev@vger.kernel.org>; Sat, 11 Jan 2025 07:37:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.208
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65B4610E9
+	for <netdev@vger.kernel.org>; Sat, 11 Jan 2025 08:31:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736581046; cv=none; b=OwcKDAzqHWKMrTTCTVs//LMLc/eeoYE9sXsvOzBcYX3keK8rJsfsO7Sy1MV3TJyw2cCRtnlOj9CU9TzypdTqrfuSGDbNxGU2UZhVwV1oku7qA10eRDjvaq+6pOdgzH8sKqZQKWowRO9nStgK7W70KDbk1f/gXXj3LBmv7omevKI=
+	t=1736584270; cv=none; b=o91oF0ESHnyy+EKq/86ejg+YnEiQjlZ0f4St2nzmcKHalwYZLVYflUsW5gJNT5VmMkBrhqwsd1z+xrsu6vS2j77reYQijpsTduabn69cCIp+y4eqxBWNkCL5TGUoKSS+Nw+cMVgp2iMnrqoWjAZETgSit6DSfIBYHpIXr+NJdeM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736581046; c=relaxed/simple;
-	bh=uWLwMe3jqvdDdW77L2W6yrwWc8KABM0SMkwPyStqy/k=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=g3IUDgKiZFInsY3df50wWOGrz01IqCOjO0WHHG2N8MGwBiImCcm7pfI02kBP9977LoGR5OqwJ9AlQkNdJoNF1f6vJ41vQtlb5kl4AgxTfK/kt4vfdt+Ayg7XLe/CfnAlXdrqS/dyzQMbwkXls86lWgTpy94ts6HR1z+JvEBh9Yw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.208
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f208.google.com with SMTP id e9e14a558f8ab-3a91a13f63fso22800955ab.3
-        for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 23:37:24 -0800 (PST)
+	s=arc-20240116; t=1736584270; c=relaxed/simple;
+	bh=ucNEuEsqawAm53BJRaIXDyVIUwhyoHZAnELNTjiDAoc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=c9LlO1J+Y3jWGX/ejbrS2P00DhNAfBKKxaWPRjOkbsJhNPM4DOAN+wAR94t2AoKxC+oB+Qu7ZsAmNzSXpbpjOMCk7irqlmtdfYHqeSBuFgI0xOqHsw3PlgqstAbKKNl6XAVwKsEvo6CTDqki8p8vpuXwyo8812t9rIDmJ68me9s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MGbIOqaL; arc=none smtp.client-ip=209.85.166.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f172.google.com with SMTP id e9e14a558f8ab-3a8c7b02d68so17938395ab.3
+        for <netdev@vger.kernel.org>; Sat, 11 Jan 2025 00:31:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1736584268; x=1737189068; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=TBDCDFNtbAjmcOSF7YBQveTbVFnBCaDxZLows1Fg8ZU=;
+        b=MGbIOqaLchk1Ve9H5SHBz2ygUZg8hAGb0L6hMMt9pDaEV0KmYtAPBItSlw7/L+ylAq
+         +iOUiFL4Bt9xO7wmB35bng2xSM5JOZChSJhrMjCo+kvqVtykTUXJGYkIxqgHYQBqTJvJ
+         38HjRc12vSlbH3iuSsMwisT1FVdqZJulIro7bPbrNHxsdZnOdnreyfHGZEhIAIQYuq/F
+         h/kLBHHNHKwnYOir2yoiQrd7875JgAljHCj3AwBYkTfF5tti8Roa7ZTYnb8wyk8m554V
+         +180aFae+TagGD9S1zM9UgKi+lBB+uYAViNgF6Okf+h790KKTXCkV/1CGkyB7/FcqGzk
+         1VNQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736581044; x=1737185844;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=IVOH7tDTP8ZL++lwFRoxsPgQDJutOGJQ9WtGPMYZmxQ=;
-        b=vnvNzffheir9yNckh9sL5sqilap2B97ZV/QV6fMqT0meY03Fd6K5PRrEczKhDGir99
-         CSXMsXLIGpGFb8aN77eZWVylSR1wyJUOC5mEI7bGCmPwnxhF5ToDYxxU3+Eb0JMN7Iwx
-         AZwVbWSbydZdZOQLj5l/oOSy7Agmt283qkJQrdOIcxKDYspwileEDPmv1OPGmRr37HcU
-         6yj93TJaCrYrYAjEQdbIcXjQUmoGpmqmRJ6+gsz0ZBrzqpJJh57lM3ReFmbmCp8ntP5q
-         Qy9iI77cm2cI0jZg5J3jcjtmINbPGJ0LSdTJqpd/j6MxWfhzS4F4wrtm8H5NwjL36/Yn
-         oKTg==
-X-Forwarded-Encrypted: i=1; AJvYcCVNs9vAvF+V0F36ZwTjv5g5uKmX7hna5xQpxt8xZvevJo2lrtyRhxrRm1wnllZeSuHw9REg9WA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzSmrFgyxWKTaMrLzfs4dphNkVYU0F3R8RQAZSDPi7hrHRggiXQ
-	4aPraT+1jH4FSOBLz6UEFhZMi2g4kFytXJmpX3x2VJrUgRI4WsrReo1jpzQaYiVlCJve/CZq56F
-	5K0HyqRf37BHKWP/LGtl+aCjM+bYCJC1h7IOtpRjqVsJF3+Rh0d4oPyU=
-X-Google-Smtp-Source: AGHT+IE9P1EFBLnetNXAkGjLXG316YIdDLRM4OvcX9DSgGuwLL7Vfci+bWxKezN+MnEDDPhfWuQHYn1b0qd2XssrjwP3lCS62DMa
+        d=1e100.net; s=20230601; t=1736584268; x=1737189068;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=TBDCDFNtbAjmcOSF7YBQveTbVFnBCaDxZLows1Fg8ZU=;
+        b=j/pYpvpqfnxzgikHOMA2JkEpoOt5QkmvjNScRaG+Yo2W2cJNvAKp0S/ik0y/P/NXfS
+         EKndRzB6QcXXA1NGVMAOt1+Q+l5ffPagrKwMp8xVaIGZCMxQD8XXCH9jnPE3pSHuhXh1
+         2s0Yrs9oiPK4DB1+901/FG0wOs5D6vcl3tGGEjMQofuYbRH7cvKA8p1SweuSkC9gGf10
+         koluPliXvry0mooZzHoDhdHkidtLCBPu03pM1f2ZbEiGu/glH+Po15MipJeY8uINJcUn
+         mutXUJ1+jweBI5gT2Cs5jsPVK1HRD7V23GpDx/rUqsBo8SvRepyqTsvSu+nSBMlABQ51
+         gfEA==
+X-Forwarded-Encrypted: i=1; AJvYcCVGSTjCbD42WfTlBoOzMSvCwLFPoUNXe847GKZi0HBVdelBgCyIpmhVT7ARY9q1EuwrlkWRq0M=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxaRq4+icvXpM3OpsFa9jgonQHo3K7Y5G35pwLCTRcjGQ+rArUz
+	Fg7FnA3kVGAa9YObdRiXj46xHfAYvpbVYG9Rla4v5gJp9nTFWXosTUe2vgh7Kf9+KwMu9eI4blf
+	qCu/fFldaz/1VzHQ/CJG4NkN5nLM/KLPk
+X-Gm-Gg: ASbGnctJLrWvy+R9o3mie/NnkatY0WWtI8XW8C8HDypbOO78Bnlzq5NmxhzK6wYLRXo
+	YWOiGZ67quWB1IiWhghh5cUksBcwEqwQpmwdH
+X-Google-Smtp-Source: AGHT+IHffGH7TtuwYaSh7k7YKfQTw1Cg3I5epBLO663NCHlUG5RGDhZH7VorCCHgrLthQq5mX83hU0CSYeBPfjTpZVk=
+X-Received: by 2002:a05:6e02:1aad:b0:3ce:6828:896c with SMTP id
+ e9e14a558f8ab-3ce68288e6bmr3605125ab.1.1736584268459; Sat, 11 Jan 2025
+ 00:31:08 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a92:cda3:0:b0:3cd:d02b:d1f3 with SMTP id
- e9e14a558f8ab-3ce3aa5af2fmr86195905ab.17.1736581043908; Fri, 10 Jan 2025
- 23:37:23 -0800 (PST)
-Date: Fri, 10 Jan 2025 23:37:23 -0800
-In-Reply-To: <675021af.050a0220.17bd51.0061.GAE@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <67821fb3.050a0220.216c54.001a.GAE@google.com>
-Subject: Re: [syzbot] [wpan?] WARNING in cfg802154_switch_netns (3)
-From: syzbot <syzbot+bd5829ba3619f08e2341@syzkaller.appspotmail.com>
-To: alex.aring@gmail.com, davem@davemloft.net, edumazet@google.com, 
-	horms@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	linux-wpan@vger.kernel.org, miquel.raynal@bootlin.com, netdev@vger.kernel.org, 
-	pabeni@redhat.com, stefan@datenfreihafen.org, syzkaller-bugs@googlegroups.com
+References: <20250106181219.1075-1-ouster@cs.stanford.edu> <20250106181219.1075-8-ouster@cs.stanford.edu>
+ <20250110092537.GA66547@j66a10360.sqa.eu95> <CAGXJAmyYmizvm350vSGmJqdOt8d+d0soP95FGhBUQ5nr8kNqnw@mail.gmail.com>
+In-Reply-To: <CAGXJAmyYmizvm350vSGmJqdOt8d+d0soP95FGhBUQ5nr8kNqnw@mail.gmail.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Sat, 11 Jan 2025 16:30:32 +0800
+X-Gm-Features: AbW1kvYIEQZdJs7YWcpMjMbe7up0tj1Vg5Rse4C8M-4VS_yQfc6Nicei2SoJKWs
+Message-ID: <CAL+tcoCOSk2ezZ+OnsKBZc_JcO_U01X1q3KmTd6WhObuzbuzsA@mail.gmail.com>
+Subject: Re: [PATCH net-next v5 07/12] net: homa: create homa_sock.h and homa_sock.c
+To: John Ousterhout <ouster@cs.stanford.edu>
+Cc: "D. Wythe" <alibuda@linux.alibaba.com>, netdev@vger.kernel.org, pabeni@redhat.com, 
+	edumazet@google.com, horms@kernel.org, kuba@kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-syzbot has found a reproducer for the following issue on:
+On Sat, Jan 11, 2025 at 8:20=E2=80=AFAM John Ousterhout <ouster@cs.stanford=
+.edu> wrote:
+>
+> On Fri, Jan 10, 2025 at 1:25=E2=80=AFAM D. Wythe <alibuda@linux.alibaba.c=
+om> wrote:
+> >
+> > > +void homa_sock_unlink(struct homa_sock *hsk)
+> > > +{
+> > > +     struct homa_socktab *socktab =3D hsk->homa->port_map;
+> > > +     struct homa_socktab_scan *scan;
+> > > +
+> > > +     /* If any scans refer to this socket, advance them to refer to
+> > > +      * the next socket instead.
+> > > +      */
+> > > +     spin_lock_bh(&socktab->write_lock);
+> > > +     list_for_each_entry(scan, &socktab->active_scans, scan_links) {
+> > > +             if (!scan->next || scan->next->sock !=3D hsk)
+> > > +                     continue;
+> > > +             scan->next =3D (struct homa_socktab_links *)
+> > > +                             rcu_dereference(hlist_next_rcu(&scan->n=
+ext->hash_links));
+> > > +     }
+> >
+> > I can't get it.. Why not just mark this sock as unavailable and skip it
+> > when the iterator accesses it ?
+> >
+> > The iterator was used under rcu and given that your sock has the
+> > SOCK_RCU_FREE flag set, it appears that there should be no concerns
+> > regarding dangling pointers.
+>
+> The RCU lock needn't be held for the entire lifetime of an iterator,
+> but rather only when certain functions are invoked, such as
+> homa_socktab_next. Thus it's possible for a socket to be reclaimed and
+> freed while a scan is in progress. This is described in the comments
+> for homa_socktab_start_scan. This behavior is necessary because of
+> homa_timer, which needs to call schedule in the middle of a scan and
+> that can't be done without releasing the RCU lock. I don't like this
+> complexity but I haven't been able to find a better alternative.
+>
+> > > +     hsk->shutdown =3D true;
+> >
+> > From the actual usage of the shutdown member, I think you should use
+> > sock_set_flag(SOCK_DEAD), and to check it with sock_flag(SOCK_DEAD).
+>
+> I wasn't aware of SOCK_DEAD until your email. After poking around a
+> bit to learn more about SOCK_DEAD, I am nervous about following your
+> advice. I'm still not certain exactly when SOCK_DEAD is set or who is
+> allowed to set it. The best information I could find was from ChatGPT
+> which says this:
+>
+> "The SOCK_DEAD flag indicates that the socket is no longer referenced
+> by any user-space file descriptors or kernel entities. Essentially,
+> the socket is considered "dead" and ready to be cleaned up."
 
-HEAD commit:    7b24f164cf00 Merge tag 'ipsec-next-2025-01-09' of git://gi..
-git tree:       net-next
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=168791df980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=28dc37e0ec0dfc41
-dashboard link: https://syzkaller.appspot.com/bug?extid=bd5829ba3619f08e2341
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=122fef0f980000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=16c9ccb0580000
+Well, I'm surprised that the GPT is becoming more and more intelligent...
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/73892b055b77/disk-7b24f164.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/d6a3f606bee9/vmlinux-7b24f164.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/4d3108a02573/bzImage-7b24f164.xz
+The above is correct as you can see from this call trace
+(__tcp_close()->sk_orphan()). Let me set TCP as an example, when the
+user decides to close a socket or accidently kill/exit the process,
+the socket would enter into __tcp_close(), which indicates that this
+socket has no longer relationship with its owner (application).
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+bd5829ba3619f08e2341@syzkaller.appspotmail.com
+>
+> If ChatGPT isn't hallucinating, this would suggest that Homa shouldn't
+> set SOCK_DEAD, since the conditions above might not yet be true when
+> homa_sock_shutdown is invoked.
 
-RSP: 002b:00007ffe8eee9248 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 00007ffe8eee9260 RCX: 00007f255ac67da9
-RDX: 000000000004c084 RSI: 0000000020000100 RDI: 0000000000000006
-RBP: 0000000000000001 R08: 00007ffe8eee8fe7 R09: 000055556b883610
-R10: 0000000000000001 R11: 0000000000000246 R12: 00007f255acafe7c
-R13: 00007f255acaa10f R14: 0000000000000001 R15: 0000000000000001
- </TASK>
-------------[ cut here ]------------
-WARNING: CPU: 0 PID: 5837 at net/ieee802154/core.c:258 cfg802154_switch_netns+0x3c7/0x3d0 net/ieee802154/core.c:258
-Modules linked in:
-CPU: 0 UID: 0 PID: 5837 Comm: syz-executor125 Not tainted 6.13.0-rc6-syzkaller-00918-g7b24f164cf00 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
-RIP: 0010:cfg802154_switch_netns+0x3c7/0x3d0 net/ieee802154/core.c:258
-Code: e1 07 38 c1 7c 92 48 89 ef e8 35 dd 86 f6 eb 88 e8 9e 79 20 f6 e9 66 fe ff ff e8 94 79 20 f6 e9 5c fe ff ff e8 8a 79 20 f6 90 <0f> 0b 90 e9 4e fe ff ff 90 90 90 90 90 90 90 90 90 90 90 90 90 90
-RSP: 0018:ffffc9000406f3c8 EFLAGS: 00010293
-RAX: ffffffff8b7f0a96 RBX: 00000000fffffff4 RCX: ffff88802e890000
-RDX: 0000000000000000 RSI: 00000000fffffff4 RDI: 0000000000000000
-RBP: ffff88814479e198 R08: ffffffff8b7f08e0 R09: 1ffffffff2858111
-R10: dffffc0000000000 R11: fffffbfff2858112 R12: 0000000000000000
-R13: 0000000000000000 R14: ffff88814479e078 R15: dffffc0000000000
-FS:  000055556b882380(0000) GS:ffff8880b8600000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f255acbe5e7 CR3: 000000007e970000 CR4: 00000000003526f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- nl802154_wpan_phy_netns+0x13d/0x210 net/ieee802154/nl802154.c:1292
- genl_family_rcv_msg_doit net/netlink/genetlink.c:1115 [inline]
- genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
- genl_rcv_msg+0xb14/0xec0 net/netlink/genetlink.c:1210
- netlink_rcv_skb+0x1e3/0x430 net/netlink/af_netlink.c:2543
- genl_rcv+0x28/0x40 net/netlink/genetlink.c:1219
- netlink_unicast_kernel net/netlink/af_netlink.c:1322 [inline]
- netlink_unicast+0x7f6/0x990 net/netlink/af_netlink.c:1348
- netlink_sendmsg+0x8e4/0xcb0 net/netlink/af_netlink.c:1892
- sock_sendmsg_nosec net/socket.c:711 [inline]
- __sock_sendmsg+0x221/0x270 net/socket.c:726
- ____sys_sendmsg+0x52a/0x7e0 net/socket.c:2594
- ___sys_sendmsg net/socket.c:2648 [inline]
- __sys_sendmsg+0x269/0x350 net/socket.c:2680
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f255ac67da9
-Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007ffe8eee9248 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 00007ffe8eee9260 RCX: 00007f255ac67da9
-RDX: 000000000004c084 RSI: 0000000020000100 RDI: 0000000000000006
-RBP: 0000000000000001 R08: 00007ffe8eee8fe7 R09: 000055556b883610
-R10: 0000000000000001 R11: 0000000000000246 R12: 00007f255acafe7c
-R13: 00007f255acaa10f R14: 0000000000000001 R15: 0000000000000001
- </TASK>
+Introducing a common usage about SOCK_DEAD might be a good choice. But
+if it's not that easy to implement, I think we can use the internal
+destruction mechanism instead like you did.
 
+>
+> Moreover, I'm concerned that some other entity might set SOCK_DEAD
+> before homa_sock_shutdown is invoked, in which case homa_sock_shutdown
+> would not cleanup the socket properly.
 
----
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+No need to worry about that. If it happens, it usually means there is
+a bug somewhere and then we will fix it.
+
+Thanks,
+Jason
+
+>
+> Thus, it seems safest to me for Homa to have its own shutdown flag.
+>
+> Let me know if you still think Homa should use SOCK_DEAD.
+>
+> > > +
+> > > +     while (!list_empty(&hsk->dead_rpcs))
+> > > +             homa_rpc_reap(hsk, 1000);
+> >
+> > I take a quick look at homa_rpc_reap, although there is no possibility
+> > of an infinite loop founded currently, it still raises concerns.
+> >
+> > It might be better to let homa_rpc_reap() handle this kind of actions b=
+y itself.
+> > For example, code like that:
+> >
+> > homa_rpc_reap(hsk, 0, flags=3DRPC_FORCE_REAP|RPC_REAP_ALL);
+> >
+> > In this way, anyone making modifications to homa_rpc_reap() in the futu=
+re will
+> > at least be aware that there is such a case that needs to be handled we=
+ll.
+>
+> I have changed the API for homa_rpc_reap to this:
+>
+> int homa_rpc_reap(struct homa_sock *hsk, bool reap_all)
+>
+> The caller can no longer specify a count. When reap_all isn't
+> specified, homa_rpc_reap determines for itself what represents a
+> "small amount of work" to perform; no need for the caller to figure
+> this out.
+>
+> -John-
+>
 
