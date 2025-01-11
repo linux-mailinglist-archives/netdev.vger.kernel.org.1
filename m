@@ -1,176 +1,269 @@
-Return-Path: <netdev+bounces-157410-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157411-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B173AA0A3E9
-	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 14:26:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 579E8A0A3F7
+	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 14:45:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7D85D188BB16
-	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 13:26:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1C2F8188B3BD
+	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 13:45:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC7FA199234;
-	Sat, 11 Jan 2025 13:26:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 997E36FBF;
+	Sat, 11 Jan 2025 13:45:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="ydLpUMiZ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZWqjLJVb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f180.google.com (mail-qk1-f180.google.com [209.85.222.180])
+Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 191C224B22D
-	for <netdev@vger.kernel.org>; Sat, 11 Jan 2025 13:26:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5076524B22A;
+	Sat, 11 Jan 2025 13:45:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736602001; cv=none; b=JpGgRNDzYylXCqMOTu7Sm2ik4IrCu+pK8Nm6vPK5WTHcX0RM+GMoFb5Iwl/qY3xH+p6Q6fZuMAh5r3jsd0nqmgClnJ6UqA0HwV6B7WUstheuz0Svtm7auD6UYuhE6zBmKqYWs6kP7k59gHElGlHJSI0POSoJ5NjG9A3Cl2FUrjo=
+	t=1736603127; cv=none; b=FK/3ccwt5H46lLZJKiYisTkXA1XaI8Em85ZF1MCsL8gGsvx7VlquKIPZ8GlU98kIzUlgUD+upe+odvZw9TXJRT+eEn1YYslV0f9sNT9vPLL8qFiL9tiOYCBpE9Ib5n+4qdybit3OafAcMdxbl3nDVRkv1wqkG5ZsBSRemrcm61I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736602001; c=relaxed/simple;
-	bh=3QBimeCeVgP5Hvw3HzKQR31+qNZ20FXLePnczHGZyFI=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=pmhZzYj4MRd5jW7tBh1cM/JJEUdD8xhJVnHXTQNhGp/f1rtt36hZNhpcGO+YaHS/70gjb3r7eWMUKUGRzqH2b5cGl1uEybvxgiFLsfYk0RoUFXf0LvXUm7OQUfxE8m2ZDVbYm/6CJ5m7At6ixeimwwMgt/kc5erQQtMFdOkzLvE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=ydLpUMiZ; arc=none smtp.client-ip=209.85.222.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-qk1-f180.google.com with SMTP id af79cd13be357-7b6e9317a2aso334116185a.0
-        for <netdev@vger.kernel.org>; Sat, 11 Jan 2025 05:26:39 -0800 (PST)
+	s=arc-20240116; t=1736603127; c=relaxed/simple;
+	bh=plJ5l5dhx6gUE80P4bXSr2/X35gI50O+7t23jOEXrlg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=hwOPj+ZO++1B8MAJz9WuR0ig8CMuf1N80v6FsJRC7AGpl6jQQXlxNHV7o6HZnXPp+fxafCOnR0kLxHWYFToxIcwfLOyOLV4EhSISh2jqjISBAGXzZwl4Z04Dc3MsZOAITnPM3bWRAVYGqiyWomtpVcjgKo6s1QuOjxCOxRjStL4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZWqjLJVb; arc=none smtp.client-ip=209.85.208.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-5d3f57582a2so7665229a12.1;
+        Sat, 11 Jan 2025 05:45:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1736601999; x=1737206799; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=QgSz7CZS7r+4ENro1yRT0+SgQczgHbwuQtQU7YnO8pc=;
-        b=ydLpUMiZtOAIyONbsOtY97rMf+KomKjnt/wUHep+xRl47Pn3LcFxgZ2RSpJQt2Qo1B
-         wDJmiCIYMDHl4boSczAnGMhAnuVApcx1oQuCv6wbHMo+m23sd5L4DAbQpPg14cXNbn/v
-         Ai/AY9TwPjEGq+gjJEvaY+tHfdY8WI/92lUB/JXe90EdIGeS++/bwbmiAPsyTor9GzJS
-         27DBG4DsEexdOHVf7LoQekS2F22aPS510liF+3KebDHmKf12riv5RSTOdy+8QTw2636F
-         zVQdDQTPzlUnGjKm7Tl70lBHmr8gDkQ/ZYS6hCXLmisJZJ2mQa8UHtHkgqAAtPLOUhxn
-         cKtw==
+        d=gmail.com; s=20230601; t=1736603124; x=1737207924; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Y2VkHxnXVvczOiim35DmLDoGGBLm6dk8vE3eitMmdBc=;
+        b=ZWqjLJVbU8tqdFgaZXfySbZje9rT1mb10PIn7bRure0a2xULV4AZeuUKjgPYJJMQo2
+         kS/61FLl+EwFLQ9BmTezglnh3Th+8kkl6vrdFGi3K7Fl1pIUdKEjZH4cTaih1HwY9E0t
+         5farv/UZWeGwa/eM8ZyrjBCqujsOonceELKSDmZQJ0M4BuDnsN9eSQ2VrzFX4OnkFtiw
+         cUOm76gM97QataD85zOjWiHXrcLgOJex9xeMEO9ilHE8ZXjLD2ysTlbEXnxxv5THcFK3
+         3cp13RA7gevSee2AB6WqNkj8fNvAXJgC2ZviYx8LgZkIopcVBYnjbYfFkobwWxiEhRXF
+         roDA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736601999; x=1737206799;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=QgSz7CZS7r+4ENro1yRT0+SgQczgHbwuQtQU7YnO8pc=;
-        b=EOWm6gHccGOEqDXHpQR2XwJYUTIJt3mvJaQ3E/5VY0mqw3fKZCkogXkj8+vtkfFIFq
-         mDHE2M2NXxTN3Dv8C3ySoGlz58Ei789xWaK0JdYlDWvxGi1K2XQZDlaXsbwrZEJDnpFn
-         TQA8gSVDz6L1j+SKDeLa79g52tqLnXfYGGKcmKJo4Gzj6QVqBxf7xHBUHSQvPXTaJAda
-         5PP4Fy2Ph152rT/evuO+tP+2cNHJjgRoM0A5/K825JaCSolNLGLzHIJ2jTlJnivMVlVv
-         RpUQFC4FFFuXzNVnEaigWeuzIc4WO+h/7sHSguoX5IYPO+zab2vdH+3mC/NIrPTBWpjR
-         Ejbw==
-X-Gm-Message-State: AOJu0YyMJbvPEJVBQ52FcCuTDYSLZPZ15pVU4FOeOwVL/Go10ROnRlB/
-	LTkzJH7L8HhEI9NueKQAbwZi47YT2LYRtVPLt4wuGgd2Ys2PC8lNgAT9O4Ep3zctzzy0oTWDLTQ
-	=
-X-Gm-Gg: ASbGncuMJbj6rhMOPEbifu1MJEM/O2p+AB8TP9M4Kx7eieFhnsAG+mjQCcTpEiCSiUU
-	LxLkMdlDE1kG8B53oEv2Xyf+2CUenI/o4pmRVDR9IonfKXPuLvdeScOdIxBV0Be/SX7OQ8vzRdx
-	HnWTM70JQkaAFfgTkEX8HMICDCa00oCCVciHfMYDsCvAvqYyzaZavPngdrpg7e8MREzBK7TwW1C
-	bcTbr7wpZP8WljGnsMvuUAn5vgy9UsqDY6Q6eYU5i99spYR
-X-Google-Smtp-Source: AGHT+IHpchNsWtIlu4snlRvIK3Mdz3bGsn3JT1br4YkY704DSFoXmmF6MZ2eKOdXE43FZTfq3SPU9g==
-X-Received: by 2002:a05:620a:2548:b0:7b7:67d:b57e with SMTP id af79cd13be357-7bcf365d8bcmr325945085a.15.1736601998673;
-        Sat, 11 Jan 2025 05:26:38 -0800 (PST)
-Received: from majuu.waya ([76.64.65.230])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7bce327bedfsm282412885a.65.2025.01.11.05.26.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 11 Jan 2025 05:26:37 -0800 (PST)
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-To: netdev@vger.kernel.org
-Cc: jiri@resnulli.us,
-	xiyou.wangcong@gmail.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	petrm@mellanox.com,
-	security@kernel.org,
-	g1042620637@gmail.com
-Subject: [PATCH net v2 1/1] net: sched: fix ets qdisc OOB Indexing
-Date: Sat, 11 Jan 2025 08:26:26 -0500
-Message-Id: <20250111132626.54018-1-jhs@mojatatu.com>
-X-Mailer: git-send-email 2.34.1
+        d=1e100.net; s=20230601; t=1736603124; x=1737207924;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Y2VkHxnXVvczOiim35DmLDoGGBLm6dk8vE3eitMmdBc=;
+        b=uxd0yUjL4iLJ2ylXV0CoEw/Y7IP5D+N2kJPXvukkLVRNXjp46H8v4h7NbsFTu6dKgr
+         FxrbnnCLAYZpQQVBECP2UJMS/b1+v5g0B9dWvll0uQgx+MJoGd0n9Ld7NWagvdJZ1nVP
+         b37VkLYk9odx0DzajOg2P0NPbJ/rUn25aeFZWV5XF8MAU+Ykqfw3qfeDOoubRMQi2q0C
+         R7nF6Hk8rQTg8GotA+2qb57Z1tkxz4QOLtZsggNxiEhZ2wb/HRXz29I9JZcn1eCN9Zdu
+         Ecue14j3ZzVOxkl+IAyM/iiQLugDg9UguBGgnv3XEI9B1znuKPWAtewCGmqCPWANZhGo
+         DXpQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU5s3+QHpKcNqEf0TmvU/+3HIlV4aaJvuPmt12fhyTTYLjQLWsqVXlT3ZbjzsGVAgXpQQYiA5Iw@vger.kernel.org, AJvYcCXSf7jpnURdDYJaAHl3lTBeBEpDLP3fFvSFj6XMixsk5m/K5Hv7m/PkgtuJh4M2Od0j6GmuWOqkh1Y=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzKrdsiUK/MSz9tqyVA3OS25awq1aojAL+ZBfLegAIhJ06zZV+p
+	snNj/pmhw3UEQgWjTkfuqCg+xfLog4ifIVlo0tOBQn419JUiUdYLfSh8Fw47DaYHCd5TWODQlMP
+	qgaFZNf1Lxw2mtxXIy06mGepDS5M=
+X-Gm-Gg: ASbGncudJL9NpgfwRLWi6IZpiXBJg4iFbeXwiW2XLUm008MSug8StEWZzEKSdYWaqyI
+	wB5mxDTrBNqQmLAoZauBjX6996dMoszliu10cUVs=
+X-Google-Smtp-Source: AGHT+IHBY4UN5s2GFcT273rm7SVawsHEwUksSjTsp7Zq1VGFhu2AfK0FcVpoFHSu8RtmcdCzj0JBiLgR3v7eH2O/O0Q=
+X-Received: by 2002:a05:6402:50d1:b0:5d3:f041:140e with SMTP id
+ 4fb4d7f45d1cf-5d98627dfa5mr9216536a12.13.1736603123353; Sat, 11 Jan 2025
+ 05:45:23 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20250103150325.926031-1-ap420073@gmail.com> <20250103150325.926031-9-ap420073@gmail.com>
+ <Z4FwxI-HcjcP2SIt@JRM7P7Q02P.dhcp.broadcom.net>
+In-Reply-To: <Z4FwxI-HcjcP2SIt@JRM7P7Q02P.dhcp.broadcom.net>
+From: Taehee Yoo <ap420073@gmail.com>
+Date: Sat, 11 Jan 2025 22:45:11 +0900
+X-Gm-Features: AbW1kvb9AXIRqFJ_FFNP8HHqTzF4VRHJLZS2B84xyFtkFbb3FI1Rs9_gz9f-ZLo
+Message-ID: <CAMArcTWCh-z7q0b=p9Q_x3T18xZFP_JSOwyM_ygox0OZwyvmBA@mail.gmail.com>
+Subject: Re: [PATCH net-next v7 08/10] bnxt_en: add support for hds-thresh
+ ethtool command
+To: Andy Gospodarek <andrew.gospodarek@broadcom.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
+	edumazet@google.com, almasrymina@google.com, donald.hunter@gmail.com, 
+	corbet@lwn.net, michael.chan@broadcom.com, andrew+netdev@lunn.ch, 
+	hawk@kernel.org, ilias.apalodimas@linaro.org, ast@kernel.org, 
+	daniel@iogearbox.net, john.fastabend@gmail.com, dw@davidwei.uk, 
+	sdf@fomichev.me, asml.silence@gmail.com, brett.creeley@amd.com, 
+	linux-doc@vger.kernel.org, netdev@vger.kernel.org, kory.maincent@bootlin.com, 
+	maxime.chevallier@bootlin.com, danieller@nvidia.com, hengqi@linux.alibaba.com, 
+	ecree.xilinx@gmail.com, przemyslaw.kitszel@intel.com, hkallweit1@gmail.com, 
+	ahmed.zaki@intel.com, rrameshbabu@nvidia.com, idosch@nvidia.com, 
+	jiri@resnulli.us, bigeasy@linutronix.de, lorenzo@kernel.org, 
+	jdamato@fastly.com, aleksander.lobakin@intel.com, kaiyuanz@google.com, 
+	willemb@google.com, daniel.zahka@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Haowei Yan <g1042620637@gmail.com> found that ets_class_from_arg() can
-index an Out-Of-Bound class in ets_class_from_arg() when passed clid of
-0. The overflow may cause local privilege escalation.
+On Sat, Jan 11, 2025 at 4:11=E2=80=AFAM Andy Gospodarek
+<andrew.gospodarek@broadcom.com> wrote:
+>
 
- [   18.852298] ------------[ cut here ]------------
- [   18.853271] UBSAN: array-index-out-of-bounds in net/sched/sch_ets.c:93:20
- [   18.853743] index 18446744073709551615 is out of range for type 'ets_class [16]'
- [   18.854254] CPU: 0 UID: 0 PID: 1275 Comm: poc Not tainted 6.12.6-dirty #17
- [   18.854821] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/2014
- [   18.856532] Call Trace:
- [   18.857441]  <TASK>
- [   18.858227]  dump_stack_lvl+0xc2/0xf0
- [   18.859607]  dump_stack+0x10/0x20
- [   18.860908]  __ubsan_handle_out_of_bounds+0xa7/0xf0
- [   18.864022]  ets_class_change+0x3d6/0x3f0
- [   18.864322]  tc_ctl_tclass+0x251/0x910
- [   18.864587]  ? lock_acquire+0x5e/0x140
- [   18.865113]  ? __mutex_lock+0x9c/0xe70
- [   18.866009]  ? __mutex_lock+0xa34/0xe70
- [   18.866401]  rtnetlink_rcv_msg+0x170/0x6f0
- [   18.866806]  ? __lock_acquire+0x578/0xc10
- [   18.867184]  ? __pfx_rtnetlink_rcv_msg+0x10/0x10
- [   18.867503]  netlink_rcv_skb+0x59/0x110
- [   18.867776]  rtnetlink_rcv+0x15/0x30
- [   18.868159]  netlink_unicast+0x1c3/0x2b0
- [   18.868440]  netlink_sendmsg+0x239/0x4b0
- [   18.868721]  ____sys_sendmsg+0x3e2/0x410
- [   18.869012]  ___sys_sendmsg+0x88/0xe0
- [   18.869276]  ? rseq_ip_fixup+0x198/0x260
- [   18.869563]  ? rseq_update_cpu_node_id+0x10a/0x190
- [   18.869900]  ? trace_hardirqs_off+0x5a/0xd0
- [   18.870196]  ? syscall_exit_to_user_mode+0xcc/0x220
- [   18.870547]  ? do_syscall_64+0x93/0x150
- [   18.870821]  ? __memcg_slab_free_hook+0x69/0x290
- [   18.871157]  __sys_sendmsg+0x69/0xd0
- [   18.871416]  __x64_sys_sendmsg+0x1d/0x30
- [   18.871699]  x64_sys_call+0x9e2/0x2670
- [   18.871979]  do_syscall_64+0x87/0x150
- [   18.873280]  ? do_syscall_64+0x93/0x150
- [   18.874742]  ? lock_release+0x7b/0x160
- [   18.876157]  ? do_user_addr_fault+0x5ce/0x8f0
- [   18.877833]  ? irqentry_exit_to_user_mode+0xc2/0x210
- [   18.879608]  ? irqentry_exit+0x77/0xb0
- [   18.879808]  ? clear_bhb_loop+0x15/0x70
- [   18.880023]  ? clear_bhb_loop+0x15/0x70
- [   18.880223]  ? clear_bhb_loop+0x15/0x70
- [   18.880426]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
- [   18.880683] RIP: 0033:0x44a957
- [   18.880851] Code: ff ff e8 fc 00 00 00 66 2e 0f 1f 84 00 00 00 00 00 66 90 f3 0f 1e fa 64 8b 04 25 18 00 00 00 85 c0 75 10 b8 2e 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 51 c3 48 83 ec 28 89 54 24 1c 48 8974 24 10
- [   18.881766] RSP: 002b:00007ffcdd00fad8 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
- [   18.882149] RAX: ffffffffffffffda RBX: 00007ffcdd010db8 RCX: 000000000044a957
- [   18.882507] RDX: 0000000000000000 RSI: 00007ffcdd00fb70 RDI: 0000000000000003
- [   18.885037] RBP: 00007ffcdd010bc0 R08: 000000000703c770 R09: 000000000703c7c0
- [   18.887203] R10: 0000000000000080 R11: 0000000000000246 R12: 0000000000000001
- [   18.888026] R13: 00007ffcdd010da8 R14: 00000000004ca7d0 R15: 0000000000000001
- [   18.888395]  </TASK>
- [   18.888610] ---[ end trace ]---
+Hi Andy,
+Thank you so much for your review and testing!
 
-Fixes: dcc68b4d8084 ("net: sch_ets: Add a new Qdisc")
-Reported-by: Haowei Yan <g1042620637@gmail.com>
-Suggested-by: Haowei Yan <g1042620637@gmail.com>
-Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
----
- net/sched/sch_ets.c | 2 ++
- 1 file changed, 2 insertions(+)
+> On Fri, Jan 03, 2025 at 03:03:23PM +0000, Taehee Yoo wrote:
+> > The bnxt_en driver has configured the hds_threshold value automatically
+> > when TPA is enabled based on the rx-copybreak default value.
+> > Now the hds-thresh ethtool command is added, so it adds an
+> > implementation of hds-thresh option.
+> >
+> > Configuration of the hds-thresh is applied only when
+> > the tcp-data-split is enabled. The default value of
+> > hds-thresh is 256, which is the default value of
+> > rx-copybreak, which used to be the hds_thresh value.
+> >
+> > The maximum hds-thresh is 1023.
+> >
+> >    # Example:
+> >    # ethtool -G enp14s0f0np0 tcp-data-split on hds-thresh 256
+> >    # ethtool -g enp14s0f0np0
+> >    Ring parameters for enp14s0f0np0:
+> >    Pre-set maximums:
+> >    ...
+> >    HDS thresh:  1023
+> >    Current hardware settings:
+> >    ...
+> >    TCP data split:         on
+> >    HDS thresh:  256
+> >
+> > Tested-by: Stanislav Fomichev <sdf@fomichev.me>
+> > Tested-by: Andy Gospodarek <gospo@broadcom.com>
+>
+> Still looks good.
 
-diff --git a/net/sched/sch_ets.c b/net/sched/sch_ets.c
-index f80bc05d4c5a..c640f915411f 100644
---- a/net/sched/sch_ets.c
-+++ b/net/sched/sch_ets.c
-@@ -91,6 +91,8 @@ ets_class_from_arg(struct Qdisc *sch, unsigned long arg)
- {
- 	struct ets_sched *q = qdisc_priv(sch);
- 
-+	if (arg == 0 || arg >= TCQ_ETS_MAX_BANDS)
-+		return NULL;
- 	return &q->classes[arg - 1];
- }
- 
--- 
-2.34.1
+I'm going to send v8 patch, and there is a change for bnxt driver.
+Drivers no longer need to set dev->ethtool->hds_thresh by themselves
+instead, the ethtool core sets hds_thresh value.
 
+>
+> > Signed-off-by: Taehee Yoo <ap420073@gmail.com>
+> > ---
+> >
+> > v7:
+> >  - Use dev->ethtool->hds_thresh instead of bp->hds_thresh
+> >
+> > v6:
+> >  - HDS_MAX is changed to 1023.
+> >  - Add Test tag from Andy.
+> >
+> > v5:
+> >  - No changes.
+> >
+> > v4:
+> >  - Reduce hole in struct bnxt.
+> >  - Add ETHTOOL_RING_USE_HDS_THRS to indicate bnxt_en driver support
+> >    header-data-split-thresh option.
+> >  - Add Test tag from Stanislav.
+> >
+> > v3:
+> >  - Drop validation logic tcp-data-split and tcp-data-split-thresh.
+> >
+> > v2:
+> >  - Patch added.
+> >
+> >  drivers/net/ethernet/broadcom/bnxt/bnxt.c         | 4 +++-
+> >  drivers/net/ethernet/broadcom/bnxt/bnxt.h         | 2 ++
+> >  drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c | 7 ++++++-
+> >  3 files changed, 11 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/et=
+hernet/broadcom/bnxt/bnxt.c
+> > index 7198d05cd27b..df03f218a570 100644
+> > --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> > +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> > @@ -4603,6 +4603,7 @@ void bnxt_set_tpa_flags(struct bnxt *bp)
+> >  static void bnxt_init_ring_params(struct bnxt *bp)
+> >  {
+> >       bp->rx_copybreak =3D BNXT_DEFAULT_RX_COPYBREAK;
+> > +     bp->dev->ethtool->hds_thresh =3D BNXT_DEFAULT_RX_COPYBREAK;
+> >  }
+> >
+> >  /* bp->rx_ring_size, bp->tx_ring_size, dev->mtu, BNXT_FLAG_{G|L}RO fla=
+gs must
+> > @@ -6562,6 +6563,7 @@ static void bnxt_hwrm_update_rss_hash_cfg(struct =
+bnxt *bp)
+> >
+> >  static int bnxt_hwrm_vnic_set_hds(struct bnxt *bp, struct bnxt_vnic_in=
+fo *vnic)
+> >  {
+> > +     u16 hds_thresh =3D (u16)bp->dev->ethtool->hds_thresh;
+> >       struct hwrm_vnic_plcmodes_cfg_input *req;
+> >       int rc;
+> >
+> > @@ -6578,7 +6580,7 @@ static int bnxt_hwrm_vnic_set_hds(struct bnxt *bp=
+, struct bnxt_vnic_info *vnic)
+> >                                         VNIC_PLCMODES_CFG_REQ_FLAGS_HDS=
+_IPV6);
+> >               req->enables |=3D
+> >                       cpu_to_le32(VNIC_PLCMODES_CFG_REQ_ENABLES_HDS_THR=
+ESHOLD_VALID);
+> > -             req->hds_threshold =3D cpu_to_le16(bp->rx_copybreak);
+> > +             req->hds_threshold =3D cpu_to_le16(hds_thresh);
+> >       }
+> >       req->vnic_id =3D cpu_to_le32(vnic->fw_vnic_id);
+> >       return hwrm_req_send(bp, req);
+> > diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/et=
+hernet/broadcom/bnxt/bnxt.h
+> > index 7dc06e07bae2..8f481dd9c224 100644
+> > --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+> > +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+> > @@ -2779,6 +2779,8 @@ struct bnxt {
+> >  #define SFF_MODULE_ID_QSFP28                 0x11
+> >  #define BNXT_MAX_PHY_I2C_RESP_SIZE           64
+> >
+> > +#define BNXT_HDS_THRESHOLD_MAX                       1023
+> > +
+> >  static inline u32 bnxt_tx_avail(struct bnxt *bp,
+> >                               const struct bnxt_tx_ring_info *txr)
+> >  {
+> > diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c b/driver=
+s/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
+> > index 413007190f50..829697bfdab3 100644
+> > --- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
+> > +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
+> > @@ -833,6 +833,9 @@ static void bnxt_get_ringparam(struct net_device *d=
+ev,
+> >       ering->rx_pending =3D bp->rx_ring_size;
+> >       ering->rx_jumbo_pending =3D bp->rx_agg_ring_size;
+> >       ering->tx_pending =3D bp->tx_ring_size;
+> > +
+> > +     kernel_ering->hds_thresh =3D dev->ethtool->hds_thresh;
+> > +     kernel_ering->hds_thresh_max =3D BNXT_HDS_THRESHOLD_MAX;
+> >  }
+> >
+> >  static int bnxt_set_ringparam(struct net_device *dev,
+> > @@ -869,6 +872,7 @@ static int bnxt_set_ringparam(struct net_device *de=
+v,
+> >                       bp->flags &=3D ~BNXT_FLAG_HDS;
+> >       }
+> >
+> > +     dev->ethtool->hds_thresh =3D kernel_ering->hds_thresh;
+
+This will be removed and the 2/10 patch includes setting hds_thresh value
+in the ethnl_set_rings().
+
+> >       bp->rx_ring_size =3D ering->rx_pending;
+> >       bp->tx_ring_size =3D ering->tx_pending;
+> >       bnxt_set_ring_params(bp);
+> > @@ -5390,7 +5394,8 @@ const struct ethtool_ops bnxt_ethtool_ops =3D {
+> >                                    ETHTOOL_COALESCE_STATS_BLOCK_USECS |
+> >                                    ETHTOOL_COALESCE_USE_ADAPTIVE_RX |
+> >                                    ETHTOOL_COALESCE_USE_CQE,
+> > -     .supported_ring_params  =3D ETHTOOL_RING_USE_TCP_DATA_SPLIT,
+> > +     .supported_ring_params  =3D ETHTOOL_RING_USE_TCP_DATA_SPLIT |
+> > +                               ETHTOOL_RING_USE_HDS_THRS,
+> >       .get_link_ksettings     =3D bnxt_get_link_ksettings,
+> >       .set_link_ksettings     =3D bnxt_set_link_ksettings,
+> >       .get_fec_stats          =3D bnxt_get_fec_stats,
+> > --
+> > 2.34.1
+> >
+
+Thanks a lot!
+Taehee Yoo
 
