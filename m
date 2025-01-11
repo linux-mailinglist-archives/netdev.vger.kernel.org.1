@@ -1,78 +1,80 @@
-Return-Path: <netdev+bounces-157452-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157453-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 34056A0A5E0
-	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 21:24:21 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 598E0A0A5E1
+	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 21:25:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ADE617A3603
-	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 20:24:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2DF801887EFC
+	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 20:25:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B5571B422A;
-	Sat, 11 Jan 2025 20:24:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 751631B4242;
+	Sat, 11 Jan 2025 20:25:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GFNKsXS2"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dcyJ3Nm0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
+Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC18A1B042E
-	for <netdev@vger.kernel.org>; Sat, 11 Jan 2025 20:24:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2F1A1494CC
+	for <netdev@vger.kernel.org>; Sat, 11 Jan 2025 20:25:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736627054; cv=none; b=gmio8bt8jA87T8ZQfuWoZPacZ5bxGAE+V1tnpdl7RnDEGVhpSw2SlwKJbuGia6izHQ9pda/NhSPmwgyVn+MqgYc4QyqHdPXpxIcDu4vpecnZpCWeUYEVF6OJqDLdGCxpsgd2wx3uVuNHM6LEvt1A7TmwjSXpXX7FD1X0NJEqC00=
+	t=1736627112; cv=none; b=jGjq1JbBEi9b5DrTTCcZ/4BNJbGluswvsOn2fFfvvYRj/bygaFfB/N9AO3UfmOPCEpPFabqzs53AI2RSqlXnLPCtIHMhOg8dMGOvkCnMsg9IP8jwy8ylDFtl8RQQRanPfHESjEV0fxKG9oMukhHxVq8duzX2EvYKEPItXWIqNL0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736627054; c=relaxed/simple;
-	bh=22zk0Gve2q5KDrIp0h/LUWMmETf8pM4yCJEuB0bIlrI=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:Content-Type; b=QBvD0gR3t3z8liQexFe2HN96J8gDkX0fRY6Eu4HyuFvEp53+/qdzkkBi75VfWaMvEhw+jWUXdW7O5HZShWwnzRel5t02iRkrK18gHpC1eBdvfJuzhKw3CH9kWJGOKSs/+iuESXtUmadODvQhRR9IXhd05OGLuQW1jL1pDNaiwLU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GFNKsXS2; arc=none smtp.client-ip=209.85.218.46
+	s=arc-20240116; t=1736627112; c=relaxed/simple;
+	bh=Cf7M+ZMP4gSExHOq6C5BklT7emUjrLT48BvByhJ+frY=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=WlF9N8wstd6AAA1jeM1wbnCfD9xnFagTLIW5miLB6zU/OhIhntQVgURN8/GtxDYkqddM+2zT5W61xqxOIV/i0Wv58ORX8UtSBDPVnPaoWAbwuOF+CbP/kAxsze9Z0UUCI6M0AALyNOPOmDxFeFCt+Ohgiyymklth4/MuQjgK6mQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dcyJ3Nm0; arc=none smtp.client-ip=209.85.218.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-aab6fa3e20eso553970366b.2
-        for <netdev@vger.kernel.org>; Sat, 11 Jan 2025 12:24:12 -0800 (PST)
+Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-aaec61d0f65so578238466b.1
+        for <netdev@vger.kernel.org>; Sat, 11 Jan 2025 12:25:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736627051; x=1737231851; darn=vger.kernel.org;
-        h=content-transfer-encoding:autocrypt:content-language:cc:to:subject
-         :from:user-agent:mime-version:date:message-id:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=y/nwNiEa3wBOaG4xmz9aF5siLZpUX8jzzSv6TNbqnzk=;
-        b=GFNKsXS2kZjAoLRjzdikVp/7KC96B4d9qHHI8V0zk3JmZvCyLRPg6l/zfsKZUIi2vm
-         NOQsqkoyoLMutEMbaaXer+BF7HuGxXtspEP/D3/nFVO6LGzjlI5sq8EZMOAX4R0hRLCV
-         sVNJ9b/H153Nq5PXUMX2kgLUpI9l2RupZ1Lcb55BqgqkMghMwPRuAt6+yj2uI+NcNSA8
-         pftUjHrCZhuerbgG23wO4zN5UA/9vo/336QTBxYvPRGgFoMvuNFh7w8o6rO0yMJ2PYHG
-         ztmHwhsBpaHak6HhQSiwah9RrBoj+yy3sfZ2JSOWPBgRfgMF6F3/xrcF1/aNGvvszl4D
-         Pn+Q==
+        d=gmail.com; s=20230601; t=1736627109; x=1737231909; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :references:cc:to:from:subject:user-agent:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=+CM5019PVqbCfLD5uBLhFM7h6xi0D3irHgnC4Bb8RcA=;
+        b=dcyJ3Nm0A5fv83tibf77P3lcAxnghu57XCiO3ah0cQZcBaPt9vL25IF7ZZ4rGvhSxR
+         524Pz9MFwNQM7MMmvyqMR4XdQRRjpGNy2O8cFwTFIyZWOha/q2FQ3L97hdbe3kdSXF8s
+         8A1PyLZ9P1r7lPK411KCtBVhX5Th9rAWU0778bsZ9xFdJBcXb+h5rFLHkk+UsT3Yx1gI
+         a2WvQRpZymUmWKKCAsaL3rv/mE1A6JT5hHgijeH5LErtvtF6wE/TAn8RI3BzLlmvt+c8
+         KcmivR40edlbrIANQ0AxR+wu2zvGnCy4TyphObSs5k8gNhxHDhcPdL9xz0hgAU0d0JcF
+         CcCw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736627051; x=1737231851;
-        h=content-transfer-encoding:autocrypt:content-language:cc:to:subject
-         :from:user-agent:mime-version:date:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=y/nwNiEa3wBOaG4xmz9aF5siLZpUX8jzzSv6TNbqnzk=;
-        b=lauurbSruWPGoow3gVsnfWPgWGSvX5s1QOuiGe6R4hfhMTRm9ejdoVh+WEaSrsKx2P
-         HgGTn9dbjgwoJkIPfQk8sepx65uAA0J+fUmmf5As8/FmlDlGQILb1BrzLNbNL9mdTEju
-         dV4wj9XOcONJ7//993vgY82q/5OUQrIbU5ZB7kuAKlrV8eTWq2zFMr5jXMSQE8dEN0CE
-         2oXvJoaF3rEoQuMDKPBFPn6Wcn4gWUb5yLTT9qOAMVy8f5Ec2RV7vPRm1ObRYGW3V6z+
-         oVxKhve6D7mr21oxLxopDPAqv2HZJOdGZIq/mRkseyEYhA+Bg0OXzaNS62FgCIYz5Lx8
-         MtOg==
-X-Gm-Message-State: AOJu0YwAbKwonTYnsBUHH7e2GPkpH7AIzDTYHbAYnCSOKiwTa/J9mHqJ
-	0jM+vMoiUMgWdKQMyevWNd3JkJlzZKPCBSSkovNy9zGtNB48gNFz1SJeMg==
-X-Gm-Gg: ASbGnctUoWt4QkaxXP1Q65cTj3IhaV5rDPqIvsG0L5g9mawjKWsfLBpA7mHQVe1xlvq
-	gouQVUiHxloM72T9/hJEz5Tee0G6qQdyg0voSv7BVKg9v6eOANoePzOXuLsNY3Z33MIl9SnIvT1
-	Pywlv0rsixVyJGEy5d3OeudiMGpqjeKSij1WGQUCdZ8tE3GMd7Sb/igwES1bAZau+4d4MsTt0CL
-	Zxxeq/NjxS9zAxUFlNqTHD/N7pOwulD9enTuLrVE51MmqZO2vXzQbk9bpCzmf4nU+mqRWYIH8qo
-	ppEBSV38dTsRpg6WYNIo1o0K7e1mK9hadXks1RrfWKXF8nZ6OpMqYbE+rlMTlggy9xkjvmnL+Xt
-	Gx3tcwpubVikGybnEl1exd+JjfmwZnAFHE8+JYs5Q6WZwaKYH
-X-Google-Smtp-Source: AGHT+IFOhj9JVaz15ENsp8P/Fr/ZbZ9Kg+oZzjYeEXxmT8MNHyj06qXFoh46WR+t/qBrZuRz1CSrAQ==
-X-Received: by 2002:a17:907:3e93:b0:ab3:10c5:9f1 with SMTP id a640c23a62f3a-ab310c5106amr3969966b.18.1736627050649;
-        Sat, 11 Jan 2025 12:24:10 -0800 (PST)
+        d=1e100.net; s=20230601; t=1736627109; x=1737231909;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :references:cc:to:from:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=+CM5019PVqbCfLD5uBLhFM7h6xi0D3irHgnC4Bb8RcA=;
+        b=vPHc/ITDSJmI3hO5IMQYnu4LAMJtZgWDNPa6u08CTEooepxIW5Qc0H0yYhoc6ed6Im
+         32Ryryq+ziA3ngTHKedPmrwLQtdJpuEWXWtdBroafYGUhP6LGBVNwaBHn3UlRHruUXby
+         2V5ldRGNVwyXIZxihiZGK5tuE8s6MRH8+cnuFEpsGvkC/wT3Utjtbc5gY7uG0yqDy2KT
+         HZxjxdDQhYruqv8IE/GcvZOcyQa5G5pSJ4A1iFUktBUno3fcf5264UwMmaHu3GyC9a+Q
+         iKBc5DNMGqvTFvvEibn04U1xJPzmIfu4H/NXW0syKClVUVtQdTt5QussUj1/0c03NiFO
+         u0bQ==
+X-Gm-Message-State: AOJu0YwRiZeZRSsUi2A9LAxhSVfBlbsbVUR0H7OufFxsYttnIH56lCNA
+	kYWlk2Zr7jmEStJkOPsDQPns3wTGvs3WIXyYV8C2GbQ7HTp45TUa
+X-Gm-Gg: ASbGncswgk7VikCWg6gZ07Fqq1Fd+mKNED716khPqcKRsk+xBYDoeq0twY5NeuD3PQd
+	HQjzhlXz3T+1NooYms++ozZ/1+ATBeiVWGkNd+rP0JcbdFpGVDvwJV9XSHBLH2OFi7IJz7Lvyf5
+	7/iAVq/fdZYmBQYTe5S7FLG5JlKlYF3eteuPPGJMv7GBoU82yQqfpIyCMLSBmPHTBL01lGcV0AC
+	K3QT8Em68DCKKpBVcGfSnBQEjUjEYe8Ck3TXldM/Op7QGidr5CaKeLjduixLw2PNb1jJFl4XsD6
+	Ji+0JSlhb2Q7XV2ZgjmTJU/UbekC2hpp2KszIycjNuooVTIq7Z7dv/1FjClOq/YENYxwSOu0LK4
+	RWasoxd2czDCQXm44LfFOGcEGKdTHbd13Lp8hh0V0M5vFr4O+
+X-Google-Smtp-Source: AGHT+IG1s5Q0+FOAVx5unF/PLn5Am0UqPlCagn4vpsbXlMSlulv9sNSCaWQObCgBTrXPbnWKsu37ZQ==
+X-Received: by 2002:a17:906:4c47:b0:ab3:974:3d45 with SMTP id a640c23a62f3a-ab309744224mr95008566b.1.1736627108810;
+        Sat, 11 Jan 2025 12:25:08 -0800 (PST)
 Received: from ?IPV6:2a02:3100:a90d:e100:d8f1:2ffc:4f48:89fd? (dynamic-2a02-3100-a90d-e100-d8f1-2ffc-4f48-89fd.310.pool.telefonica.de. [2a02:3100:a90d:e100:d8f1:2ffc:4f48:89fd])
-        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-ab2c905e2f7sm303490566b.24.2025.01.11.12.24.08
+        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-ab2c90da0d9sm307099166b.67.2025.01.11.12.25.06
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 11 Jan 2025 12:24:10 -0800 (PST)
-Message-ID: <90b3fbda-1cb7-4072-912c-b03bf542dcdb@gmail.com>
-Date: Sat, 11 Jan 2025 21:24:08 +0100
+        Sat, 11 Jan 2025 12:25:07 -0800 (PST)
+Message-ID: <00f74027-a714-4c7b-b94b-dffed49e4315@gmail.com>
+Date: Sat, 11 Jan 2025 21:25:06 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,13 +82,15 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
+Subject: [PATCH net-next v2 01/10] net: phy: rename eee_broken_modes to
+ eee_disabled_modes
 From: Heiner Kallweit <hkallweit1@gmail.com>
-Subject: [PATCH net-next v2 00/10] net: phy: improve phylib EEE handling
 To: Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
  David Miller <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
  Simon Horman <horms@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
  Russell King - ARM Linux <linux@armlinux.org.uk>
 Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+References: <90b3fbda-1cb7-4072-912c-b03bf542dcdb@gmail.com>
 Content-Language: en-US
 Autocrypt: addr=hkallweit1@gmail.com; keydata=
  xsFNBF/0ZFUBEAC0eZyktSE7ZNO1SFXL6cQ4i4g6Ah3mOUIXSB4pCY5kQ6OLKHh0FlOD5/5/
@@ -131,45 +135,92 @@ Autocrypt: addr=hkallweit1@gmail.com; keydata=
  H/0Z53okMykVs3a8tECPHIxnre2UxKdTbCEkjkR4V6JyplTS47oWMw3zyI7zkaadfzVFBxk2
  lo/Tny+FX1Azea3Ce7oOnRUEZtWSsUidtIjmL8YUQFZYm+JUIgfRmSpMFq8JP4VH43GXpB/S
  OCrl+/xujzvoUBFV/cHKjEQYBxo+MaiQa1U54ykM2W4DnHb1UiEf5xDkFd4=
+In-Reply-To: <90b3fbda-1cb7-4072-912c-b03bf542dcdb@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-This series includes improvements for the EEE handling in phylib.
+This bitmap is used also if the MAC doesn't support an EEE mode.
+So the mode isn't necessarily broken in the PHY. Therefore rename
+the bitmap.
 
-v2:
-- add patch 3
-- patch 4:
-  - silently filter out disabled EEE modes
-  - add extack user hint if requested EEE advertisement includes
-    disabled modes
+Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+---
+ drivers/net/phy/phy-c45.c    | 2 +-
+ drivers/net/phy/phy-core.c   | 2 +-
+ drivers/net/phy/phy_device.c | 2 +-
+ include/linux/phy.h          | 6 +++---
+ 4 files changed, 6 insertions(+), 6 deletions(-)
 
-Heiner Kallweit (10):
-  net: phy: rename eee_broken_modes to eee_disabled_modes
-  net: phy: rename phy_set_eee_broken to phy_disable_eee_mode
-  ethtool: allow ethtool op set_eee to set an NL extack message
-  net: phy: c45: improve handling of disabled EEE modes in ethtool
-    functions
-  net: phy: move definition of phy_is_started before
-    phy_disable_eee_mode
-  net: phy: improve phy_disable_eee_mode
-  net: phy: remove disabled EEE modes from advertising in phy_probe
-  net: phy: c45: Don't silently remove disabled EEE modes any longer
-    when writing advertisement register
-  net: phy: c45: use cached EEE advertisement in
-    genphy_c45_ethtool_get_eee
-  net: phy: c45: remove local advertisement parameter from
-    genphy_c45_eee_is_active
-
- drivers/net/ethernet/realtek/r8169_main.c |  6 +--
- drivers/net/phy/phy-c45.c                 | 51 +++++++++--------------
- drivers/net/phy/phy-core.c                |  2 +-
- drivers/net/phy/phy.c                     |  4 +-
- drivers/net/phy/phy_device.c              | 23 +++++-----
- include/linux/ethtool.h                   |  1 +
- include/linux/phy.h                       | 24 ++++++-----
- net/ethtool/eee.c                         |  2 +-
- 8 files changed, 52 insertions(+), 61 deletions(-)
-
+diff --git a/drivers/net/phy/phy-c45.c b/drivers/net/phy/phy-c45.c
+index 0dac08e85..468d24611 100644
+--- a/drivers/net/phy/phy-c45.c
++++ b/drivers/net/phy/phy-c45.c
+@@ -686,7 +686,7 @@ static int genphy_c45_write_eee_adv(struct phy_device *phydev,
+ 	__ETHTOOL_DECLARE_LINK_MODE_MASK(tmp);
+ 	int val, changed = 0;
+ 
+-	linkmode_andnot(tmp, adv, phydev->eee_broken_modes);
++	linkmode_andnot(tmp, adv, phydev->eee_disabled_modes);
+ 
+ 	if (linkmode_intersects(phydev->supported_eee, PHY_EEE_CAP1_FEATURES)) {
+ 		val = linkmode_to_mii_eee_cap1_t(tmp);
+diff --git a/drivers/net/phy/phy-core.c b/drivers/net/phy/phy-core.c
+index 6bf3ec985..beeb0ef2f 100644
+--- a/drivers/net/phy/phy-core.c
++++ b/drivers/net/phy/phy-core.c
+@@ -388,7 +388,7 @@ void of_set_phy_supported(struct phy_device *phydev)
+ void of_set_phy_eee_broken(struct phy_device *phydev)
+ {
+ 	struct device_node *node = phydev->mdio.dev.of_node;
+-	unsigned long *modes = phydev->eee_broken_modes;
++	unsigned long *modes = phydev->eee_disabled_modes;
+ 
+ 	if (!IS_ENABLED(CONFIG_OF_MDIO) || !node)
+ 		return;
+diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
+index bdc997f59..f6a5f986f 100644
+--- a/drivers/net/phy/phy_device.c
++++ b/drivers/net/phy/phy_device.c
+@@ -3016,7 +3016,7 @@ void phy_disable_eee(struct phy_device *phydev)
+ 	phydev->eee_cfg.tx_lpi_enabled = false;
+ 	phydev->eee_cfg.eee_enabled = false;
+ 	/* don't let userspace re-enable EEE advertisement */
+-	linkmode_fill(phydev->eee_broken_modes);
++	linkmode_fill(phydev->eee_disabled_modes);
+ }
+ EXPORT_SYMBOL_GPL(phy_disable_eee);
+ 
+diff --git a/include/linux/phy.h b/include/linux/phy.h
+index 5bc71d599..c5dc2dbf0 100644
+--- a/include/linux/phy.h
++++ b/include/linux/phy.h
+@@ -629,7 +629,7 @@ struct macsec_ops;
+  * @eee_cfg: User configuration of EEE
+  * @lp_advertising: Current link partner advertised linkmodes
+  * @host_interfaces: PHY interface modes supported by host
+- * @eee_broken_modes: Energy efficient ethernet modes which should be prohibited
++ * @eee_disabled_modes: Energy efficient ethernet modes not to be advertised
+  * @autoneg: Flag autoneg being used
+  * @rate_matching: Current rate matching mode
+  * @link: Current link state
+@@ -745,7 +745,7 @@ struct phy_device {
+ 	__ETHTOOL_DECLARE_LINK_MODE_MASK(supported_eee);
+ 	__ETHTOOL_DECLARE_LINK_MODE_MASK(advertising_eee);
+ 	/* Energy efficient ethernet modes which should be prohibited */
+-	__ETHTOOL_DECLARE_LINK_MODE_MASK(eee_broken_modes);
++	__ETHTOOL_DECLARE_LINK_MODE_MASK(eee_disabled_modes);
+ 	bool enable_tx_lpi;
+ 	bool eee_active;
+ 	struct eee_config eee_cfg;
+@@ -1324,7 +1324,7 @@ int phy_speed_down_core(struct phy_device *phydev);
+  */
+ static inline void phy_set_eee_broken(struct phy_device *phydev, u32 link_mode)
+ {
+-	linkmode_set_bit(link_mode, phydev->eee_broken_modes);
++	linkmode_set_bit(link_mode, phydev->eee_disabled_modes);
+ }
+ 
+ /**
 -- 
 2.47.1
 
