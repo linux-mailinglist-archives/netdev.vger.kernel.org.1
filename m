@@ -1,50 +1,72 @@
-Return-Path: <netdev+bounces-157364-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157365-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4453A0A163
-	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 08:00:32 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8CC55A0A16C
+	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 08:12:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E4CC23AAF19
-	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 07:00:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7C8D116A709
+	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 07:12:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69DAF145A0B;
-	Sat, 11 Jan 2025 07:00:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Drh4gB/D"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7676B16F851;
+	Sat, 11 Jan 2025 07:12:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4112C8172A;
-	Sat, 11 Jan 2025 07:00:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07C771114;
+	Sat, 11 Jan 2025 07:12:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736578828; cv=none; b=ME9C5fXrnguZ2OUf39qUNPbhGLoUfurpIYAW/TzzUQeB3+KxBwLe20r3EiFCthqP67FJGCj8jDFub/h3WWf+SaexciQui+GBsRDGYdSdZLte/oLBb4KgM2gIL5L1lMoxj5D36VScxXVUgon9UGwbla442sQd7tJMSyQ8bEgF6os=
+	t=1736579550; cv=none; b=P8+67X7rd990/+PluaKd6XP17RhScs9BRBZhPvRnHQxKZskzQaTlBRij1l5vi7j8t4xQtxcHK7Ptd7yNT5Ucv51wPmGtbjK457V3SmLm/I5pXeYEXNf8JxxwfEVdI99UJTUEjJ9Hcv7Timlfauomtz+hvDVplBSceBUaFiCVa4I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736578828; c=relaxed/simple;
-	bh=cb044/Apa15lPwK9G9VB8pwZ7CbtuU12N98VF2Rg+bo=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=XTg7MADrnehSCEAm9Gej9Tuh6gmTV4S813DlWRagJJcvAjUqNPwpCOCA+3rdAqAV7dj76Gfyn9vp/+8utnFn2fP0c7Y1V7osx4ILjWfIef4dFgmiQpXdm+io43itqrTmDDK/hl7rzWBKJe/1iIA38uvmI6RFN/VJf/+RD790wuA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Drh4gB/D; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA554C4CED2;
-	Sat, 11 Jan 2025 07:00:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736578827;
-	bh=cb044/Apa15lPwK9G9VB8pwZ7CbtuU12N98VF2Rg+bo=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Drh4gB/DNIyHFdABgj0gkvwRKRvDbF25oD1xenkcwvSX6Gdi5hOZ1XZkF/tKI2O/E
-	 Of6ZRZD85/BMLhJasnAk2H7vRBMZf6P3cSWZK3ZieAymyZEYYp6PCHFgzOWtRz8Pmq
-	 jNyU7DOqVEe/+y2UFGK1dNpiaB/02lGTf9oHHun7CcAlVW9iMg6tCZMLZ4KQ3yLC1C
-	 lMHVpVUhobqfe/w6E1ZE3DeABr6p+tDzsf/oafoGg6+/0jU1ACyGUuNfiU+gT0+Cjt
-	 p3X6accotS6EM7MjZDgOQP7QGkL0K6LUi0Qc28IWwBtmBszCm6W2VjPSl6pmTseHCu
-	 S7HtKp6CLYDsQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB7FF380AA57;
-	Sat, 11 Jan 2025 07:00:50 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1736579550; c=relaxed/simple;
+	bh=H2xHhvGHh0LxUT0zK6bublb7RZ7C0uwj4Q2+LPcQSI4=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=KY6rakJUB83GeCtoQUMlbcM87c+rHpP68ciGltQnDoSB9GRGql5ODimUzeuzuvSJyWa3LkZe0S8P/BFYwFE8Qtl9DTjTJwI0u/sL43MEe7FHJjPeTemVJjdFAN4mi0hFPftxL9wdkZukphRrKeWbRzH0FXNjBC0cVdURfwSxF3o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.214])
+	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4YVV4m2cHRz1ky3H;
+	Sat, 11 Jan 2025 15:09:12 +0800 (CST)
+Received: from kwepemh100016.china.huawei.com (unknown [7.202.181.102])
+	by mail.maildlp.com (Postfix) with ESMTPS id 331121A016C;
+	Sat, 11 Jan 2025 15:12:17 +0800 (CST)
+Received: from huawei.com (10.175.113.32) by kwepemh100016.china.huawei.com
+ (7.202.181.102) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Sat, 11 Jan
+ 2025 15:12:13 +0800
+From: Kaixiong Yu <yukaixiong@huawei.com>
+To: <akpm@linux-foundation.org>, <mcgrof@kernel.org>,
+	<joel.granados@kernel.org>
+CC: <ysato@users.sourceforge.jp>, <dalias@libc.org>,
+	<glaubitz@physik.fu-berlin.de>, <luto@kernel.org>, <tglx@linutronix.de>,
+	<mingo@redhat.com>, <bp@alien8.de>, <dave.hansen@linux.intel.com>,
+	<hpa@zytor.com>, <viro@zeniv.linux.org.uk>, <brauner@kernel.org>,
+	<jack@suse.cz>, <kees@kernel.org>, <j.granados@samsung.com>,
+	<willy@infradead.org>, <Liam.Howlett@oracle.com>, <vbabka@suse.cz>,
+	<lorenzo.stoakes@oracle.com>, <trondmy@kernel.org>, <anna@kernel.org>,
+	<chuck.lever@oracle.com>, <jlayton@kernel.org>, <neilb@suse.de>,
+	<okorniev@redhat.com>, <Dai.Ngo@oracle.com>, <tom@talpey.com>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <paul@paul-moore.com>, <jmorris@namei.org>,
+	<linux-sh@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linux-fsdevel@vger.kernel.org>, <linux-mm@kvack.org>,
+	<linux-nfs@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<linux-security-module@vger.kernel.org>, <dhowells@redhat.com>,
+	<haifeng.xu@shopee.com>, <baolin.wang@linux.alibaba.com>,
+	<shikemeng@huaweicloud.com>, <dchinner@redhat.com>, <bfoster@redhat.com>,
+	<souravpanda@google.com>, <hannes@cmpxchg.org>, <rientjes@google.com>,
+	<pasha.tatashin@soleen.com>, <david@redhat.com>, <ryan.roberts@arm.com>,
+	<ying.huang@intel.com>, <yang@os.amperecomputing.com>,
+	<zev@bewilderbeest.net>, <serge@hallyn.com>, <vegard.nossum@oracle.com>,
+	<wangkefeng.wang@huawei.com>
+Subject: [PATCH v5 -next 00/16] sysctl: move sysctls from vm_table into its own files
+Date: Sat, 11 Jan 2025 15:07:35 +0800
+Message-ID: <20250111070751.2588654-1-yukaixiong@huawei.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,79 +74,119 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 01/18] dt-bindings: can: mpfs: add PIC64GX CAN
- compatibility
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173657884987.2317784.6866618632689015212.git-patchwork-notify@kernel.org>
-Date: Sat, 11 Jan 2025 07:00:49 +0000
-References: <20250110112712.3214173-2-mkl@pengutronix.de>
-In-Reply-To: <20250110112712.3214173-2-mkl@pengutronix.de>
-To: Marc Kleine-Budde <mkl@pengutronix.de>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
- linux-can@vger.kernel.org, kernel@pengutronix.de,
- pierre-henry.moussay@microchip.com, conor.dooley@microchip.com
+Content-Type: text/plain
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ kwepemh100016.china.huawei.com (7.202.181.102)
 
-Hello:
+This patch series moves sysctls of vm_table in kernel/sysctl.c to
+places where they actually belong, and do some related code clean-ups.
+After this patch series, all sysctls in vm_table have been moved into its
+own files, meanwhile, delete vm_table.
 
-This series was applied to netdev/net-next.git (main)
-by Marc Kleine-Budde <mkl@pengutronix.de>:
+All the modifications of this patch series base on
+linux-next(tags/next-20250110). To test this patch series, the code was
+compiled with both the CONFIG_SYSCTL enabled and disabled on arm64 and
+x86_64 architectures. After this patch series is applied, all files
+under /proc/sys/vm can be read or written normally.
 
-On Fri, 10 Jan 2025 12:04:09 +0100 you wrote:
-> From: Pierre-Henry Moussay <pierre-henry.moussay@microchip.com>
-> 
-> PIC64GX CAN is compatible with the MPFS CAN, only add a fallback
-> 
-> Signed-off-by: Pierre-Henry Moussay <pierre-henry.moussay@microchip.com>
-> Acked-by: Conor Dooley <conor.dooley@microchip.com>
-> Reviewed-by: Marc Kleine-Budde <mkl@pengutronix.de>
-> Link: https://patch.msgid.link/20240930095449.1813195-2-pierre-henry.moussay@microchip.com
-> Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
-> 
-> [...]
+my test steps as below listed:
 
-Here is the summary with links:
-  - [net-next,01/18] dt-bindings: can: mpfs: add PIC64GX CAN compatibility
-    https://git.kernel.org/netdev/net-next/c/130727c37b7e
-  - [net-next,02/18] dt-bindings: can: convert tcan4x5x.txt to DT schema
-    https://git.kernel.org/netdev/net-next/c/79195755cdeb
-  - [net-next,03/18] dt-bindings: can: tcan4x5x: Document the ti,nwkrq-voltage-vio option
-    https://git.kernel.org/netdev/net-next/c/6495567981be
-  - [net-next,04/18] can: tcan4x5x: add option for selecting nWKRQ voltage
-    https://git.kernel.org/netdev/net-next/c/36131b72fb1c
-  - [net-next,05/18] can: sun4i_can: continue to use likely() to check skb
-    https://git.kernel.org/netdev/net-next/c/bddad4fac9f7
-  - [net-next,06/18] can: tcan4x5x: get rid of false clock errors
-    https://git.kernel.org/netdev/net-next/c/68d426da13fa
-  - [net-next,07/18] dt-bindings: net: can: atmel: Convert to json schema
-    https://git.kernel.org/netdev/net-next/c/2351998fd833
-  - [net-next,08/18] mailmap: add an entry for Oliver Hartkopp
-    https://git.kernel.org/netdev/net-next/c/57769cb9ccba
-  - [net-next,09/18] MAINTAINERS: assign em_canid.c additionally to CAN maintainers
-    https://git.kernel.org/netdev/net-next/c/1263e69a7c47
-  - [net-next,10/18] can: dev: can_get_state_str(): Remove dead code
-    https://git.kernel.org/netdev/net-next/c/d50c837675a9
-  - [net-next,11/18] can: m_can: add deinit callback
-    https://git.kernel.org/netdev/net-next/c/baa8aaf79768
-  - [net-next,12/18] can: tcan4x5x: add deinit callback to set standby mode
-    https://git.kernel.org/netdev/net-next/c/a1366314703a
-  - [net-next,13/18] can: m_can: call deinit/init callback when going into suspend/resume
-    https://git.kernel.org/netdev/net-next/c/ad1ddb3bfb0c
-  - [net-next,14/18] dt-bindings: can: st,stm32-bxcan: fix st,gcan property type
-    https://git.kernel.org/netdev/net-next/c/7e0c2f136d1b
-  - [net-next,15/18] can: kvaser_usb: Update stats and state even if alloc_can_err_skb() fails
-    https://git.kernel.org/netdev/net-next/c/3749637b71b0
-  - [net-next,16/18] can: kvaser_usb: Add support for CAN_CTRLMODE_BERR_REPORTING
-    https://git.kernel.org/netdev/net-next/c/0dfa617c3f77
-  - [net-next,17/18] can: kvaser_pciefd: Update stats and state even if alloc_can_err_skb() fails
-    https://git.kernel.org/netdev/net-next/c/e048c5e55fbc
-  - [net-next,18/18] can: kvaser_pciefd: Add support for CAN_CTRLMODE_BERR_REPORTING
-    https://git.kernel.org/netdev/net-next/c/9d92fda0e2ad
+Step 1: Set CONFIG_SYSCTL to 'n' and compile the Linux kernel on the
+arm64 architecture. The kernel compiles successfully without any errors
+or warnings.
 
-You are awesome, thank you!
+Step 2: Set CONFIG_SYSCTL to 'y' and compile the Linux kernel on the
+arm64 architecture. The kernel compiles successfully without any errors
+or warnings.
+
+Step 3: Use QEMU to boot the kernel compiled in Step 2, then use the
+Linux command |ls -ll /proc/sys/vm/| to check the permissions of all
+sysctls under the |/proc/sys/vm| directory.
+When compared with the kernel version that did not apply this series of
+patches, there is no difference in the sysctl permissions under the
+|/proc/sys/vm| directory between the two kernel versions.
+
+Step 4: Repeat steps 1 to 3 on the x86_64 architecture.
+
+Changes in v5:
+ - add reviewed-by from Lorenzo Stoakes in patch6,8
+ - Accept Brian Gerst's suggestion to reduce the preprocessor
+   condition "#elif (defined(CONFIG_X86_32) && !defined(CONFIG_UML))"
+   in patch13
+ - fix the error discovered by Geert Uytterhoeven in patch14 in V4.
+   Move the call to register_sysctl_init() into its own fs_initcall()
+   as Geert Uytterhoeven's patch does.
+ - take the advice of Joel Granados, separating patch14 in V4 into
+   patch14 and patch15 in V5. patch14 in V5 just moves the vdso_enabled
+   table. patch15 in V5 removes the vm_table.
+ - modify the change log of patch14
+ - clarify test steps.
+
+Changes in v4:
+ - due to my mistake, the previous version sent 15 patches twice.
+   Please ignore that, as this version is the correct one.
+ - change all "static struct ctl_table" type into
+   "static const struct ctl_table" type in patch1~10,12,13,14
+ - simplify result of rpcauth_cache_shrink_count() in patch11
+
+Changes in v3:
+ - change patch1~10, patch14 title suggested by Joel Granados
+ - change sysctl_stat_interval to static type in patch1
+ - add acked-by from Paul Moore in patch7
+ - change dirtytime_expire_interval to static type in patch9
+ - add acked-by from Anna Schumaker in patch11
+
+Changes in v2:
+ - fix sysctl_max_map_count undeclared issue in mm/nommu.c for patch6
+ - update changelog for patch7/12, suggested by Kees/Paul
+ - fix patch8, sorry for wrong changes and forget to built with NOMMU
+ - add reviewed-by from Kees except patch8 since patch8 is wrong in v1
+ - add reviewed-by from Jan Kara, Christian Brauner in patch12
+
+Kaixiong Yu (16):
+  mm: vmstat: move sysctls to mm/vmstat.c
+  mm: filemap: move sysctl to mm/filemap.c
+  mm: swap: move sysctl to mm/swap.c
+  mm: vmscan: move vmscan sysctls to mm/vmscan.c
+  mm: util: move sysctls to mm/util.c
+  mm: mmap: move sysctl to mm/mmap.c
+  security: min_addr: move sysctl to security/min_addr.c
+  mm: nommu: move sysctl to mm/nommu.c
+  fs: fs-writeback: move sysctl to fs/fs-writeback.c
+  fs: drop_caches: move sysctl to fs/drop_caches.c
+  sunrpc: simplify rpcauth_cache_shrink_count()
+  fs: dcache: move the sysctl to fs/dcache.c
+  x86: vdso: move the sysctl to arch/x86/entry/vdso/vdso32-setup.c
+  sh: vdso: move the sysctl to arch/sh/kernel/vsyscall/vsyscall.c
+  sysctl: remove the vm_table
+  sysctl: remove unneeded include
+
+ arch/sh/kernel/vsyscall/vsyscall.c |  20 +++
+ arch/x86/entry/vdso/vdso32-setup.c |  16 ++-
+ fs/dcache.c                        |  21 ++-
+ fs/drop_caches.c                   |  23 ++-
+ fs/fs-writeback.c                  |  30 ++--
+ include/linux/dcache.h             |   7 +-
+ include/linux/mm.h                 |  23 ---
+ include/linux/mman.h               |   2 -
+ include/linux/swap.h               |   9 --
+ include/linux/vmstat.h             |  11 --
+ include/linux/writeback.h          |   4 -
+ kernel/sysctl.c                    | 221 -----------------------------
+ mm/filemap.c                       |  18 ++-
+ mm/internal.h                      |  10 ++
+ mm/mmap.c                          |  54 +++++++
+ mm/nommu.c                         |  15 +-
+ mm/swap.c                          |  16 ++-
+ mm/swap.h                          |   1 +
+ mm/util.c                          |  67 +++++++--
+ mm/vmscan.c                        |  23 +++
+ mm/vmstat.c                        |  44 +++++-
+ net/sunrpc/auth.c                  |   2 +-
+ security/min_addr.c                |  11 ++
+ 23 files changed, 336 insertions(+), 312 deletions(-)
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.34.1
 
 
