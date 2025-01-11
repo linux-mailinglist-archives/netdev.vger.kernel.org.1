@@ -1,59 +1,59 @@
-Return-Path: <netdev+bounces-157350-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157351-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C1D7EA0A059
-	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 03:33:16 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B639BA0A05C
+	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 03:38:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6EA097A44DB
-	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 02:33:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8392C188E038
+	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 02:38:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3D531EB48;
-	Sat, 11 Jan 2025 02:33:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9044F42049;
+	Sat, 11 Jan 2025 02:38:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mckAdPKV"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K2J60q8W"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DA2B12E7E
-	for <netdev@vger.kernel.org>; Sat, 11 Jan 2025 02:33:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65C3123AD;
+	Sat, 11 Jan 2025 02:38:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736562789; cv=none; b=cUEndIwgPwMe5s5egRyo4N7z4CZE1eAS8L11K4eaoPX7MVa8W7xvFyoa8yJWUfhW1bCR+/Ho2VXY5JJ2yaw+n68XI20w/x+Y/JqJQV0lpdh9VIrGmoAfWmP/qffe48dWCpdwNLeWQb0ahEvQT9BoM9PwEnToD6ZMshYEtf1YfB8=
+	t=1736563111; cv=none; b=R1GuBcFtsX9drOlXH95I8HxJzoFws/HJCQWrF/+so2bENVFjKjqHGM3EiaI9jOMhub/IrAtjD08DckVga+Igwh1+0TfR9HMMXjUHMCqYEb0pNecl+kZKKigwAKQOr8aZvrfZw/eUkpFbOR6etvYt2GsQAwAOlStUp+hniRY2sR4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736562789; c=relaxed/simple;
-	bh=Q1+7wgWC9ZRSkCdzhkOrtg88WpQOuJnVIdLv1GGGkVA=;
+	s=arc-20240116; t=1736563111; c=relaxed/simple;
+	bh=WxM5iOIWEzH+FXy9JP80oVNfFIc77UhfwsAVI7ArMaY=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=blk14r0lbn4aAD55qK8fvf9eR3iPbmqPTdqy0pBX8gF9EC0ng6kAnEmRVUiXXoX+Nk/Uho7QxjdoQhyPLe6zyAFxOOKxS+kAaB4OUakRcpruTFj1/OaKctkdXNg8Se+HkE2MmS+rIlHDM6Srw+VIxvDYm5rkrZ0amglJfBJJYKY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mckAdPKV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B95EEC4CED6;
-	Sat, 11 Jan 2025 02:33:08 +0000 (UTC)
+	 MIME-Version:Content-Type; b=cp4xQPHWoRKWeCB3x+w5j0yenzSbRIvAnjCWLPkQCqt6XsO0f/pgF0vMLqB637O3MqJ80epsnLs5qg/OxwYazVpll65tLbl/VDL7z2y54gvN0f2hU6LE6Z7y8cszWj4QmUrWQoVjpyaMhzSi+R5RmpwMtlbzVFEBMFKA7QvVnTs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K2J60q8W; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 856CAC4CED6;
+	Sat, 11 Jan 2025 02:38:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736562789;
-	bh=Q1+7wgWC9ZRSkCdzhkOrtg88WpQOuJnVIdLv1GGGkVA=;
+	s=k20201202; t=1736563110;
+	bh=WxM5iOIWEzH+FXy9JP80oVNfFIc77UhfwsAVI7ArMaY=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=mckAdPKVpAW12tn2ig5hgLOjMQGJSoPUte5fWHFz5J19bfpD3zeg6uH6NBgnkl50W
-	 hZ82kCnScX3/rT5i2r6sLLLtDvS6EClHM1QHZfqHXkAMfYrOJLnkJkKtv5ZGbe/a2j
-	 h5Ram11xAVXfJgZ08YPUNDdK4V8ffAQh1dNHpE+TlFiLB2TmhX9qXNYTNabtBTHzLI
-	 JYJDcLdVFLfwEY+0IACrJex12MDoMzfapduSBweIRQceFsudS/x8ccCvM/LIQkUfnp
-	 EOAbVqFTkyGTkGwiKBoZXdZYVrE2yZRnZN+V1noYFMsPAyUqgMubnT+pzvNVxtzdwH
-	 DOs3J+PvuZVHA==
-Date: Fri, 10 Jan 2025 18:33:07 -0800
+	b=K2J60q8WvXCoxiHVPkLLQMtoiEvUaBTmzteaJ2zpXb1UeZbL8cZ6WhZeTmkc5QU+v
+	 fGt2jBaXqtcdEvR9s9OYvR9CDAYUjc5ib6eWRq6hSbCxvATzeUNTeWjcywTCq8V9pQ
+	 aj22p/uZcIoj047iiM0vRTqE1XQIR1g/R2XXlyqLhNq4YhtxQWG/iGU+78EytqBuAM
+	 JO6GJn2ZWKogQ1ziUHGhJZtoJcBLZwpwasVZWnBqBD5BZbjrhCX1r13V8+q50y2q8M
+	 VNIDiF8RsNBogqcaxI4CNd+bFY7uGZZxRjtGANR3lTNXjzf/IGpD2MQH18ndyg5hLf
+	 3OIkoN0OFN2zA==
+Date: Fri, 10 Jan 2025 18:38:29 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Jamal Hadi Salim <jhs@mojatatu.com>
-Cc: netdev@vger.kernel.org, jiri@resnulli.us, xiyou.wangcong@gmail.com,
- davem@davemloft.net, edumazet@google.com, security@kernel.org,
- nnamrec@gmail.com
-Subject: Re: [PATCH net 1/1 v2] net: sched: Disallow replacing of child
- qdisc from one parent to another
-Message-ID: <20250110183307.4bfba412@kernel.org>
-In-Reply-To: <CAM0EoMn7uADZkTQkg48VP7K7KD=ZVHPLfZheAwXSumqFWommNg@mail.gmail.com>
-References: <20250109143319.26433-1-jhs@mojatatu.com>
-	<20250109102902.3fd9b57d@kernel.org>
-	<CAM0EoMn7uADZkTQkg48VP7K7KD=ZVHPLfZheAwXSumqFWommNg@mail.gmail.com>
+To: Chenguang Zhao <zhaochenguang@kylinos.cn>
+Cc: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
+ Tariq Toukan <tariqt@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Moshe Shemesh
+ <moshe@nvidia.com>, netdev@vger.kernel.org, linux-rdma@vger.kernel.org
+Subject: Re: [PATCH v3] net/mlx5: Fix variable not being completed when
+ function returns
+Message-ID: <20250110183829.5f60867f@kernel.org>
+In-Reply-To: <20250110032038.973659-1-zhaochenguang@kylinos.cn>
+References: <20250110032038.973659-1-zhaochenguang@kylinos.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,30 +63,11 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Fri, 10 Jan 2025 09:48:02 -0500 Jamal Hadi Salim wrote:
-> There are two possible intentions/meanings from reading that dump:
-> a) the pfifo queue with handle 204: is intended to be shared by both
-> parent 100:1 and 100:4 --> refcount of 2 takes care of that. But then
-> you can question should the parent have stayed the same or should we
-> use the new one? We could keep track of both parents but that is
-> another surgery which seemed unnecessary.
-> b) We intended "replace" to move the pfifo queue id 204: from 100:4 to
-> 100:1. In which case we would need to do some other surgery which
-> includes getting things pointed to the new parent only.
-> 
-> While #a may be practical it could be achieved by building the proper
-> qdisc/class hierarchies. I am not sure of practical use #b. In both
-> cases it seemed to me prevention is better than the cure.
-> Question for you for that test: Which of these two were you intending?
->  It could be you just wanted to ensure some grafting happened, in
-> which case we can adjust the test case.
+On Fri, 10 Jan 2025 11:20:38 +0800 Chenguang Zhao wrote:
+> The cmd_work_handler function returns from the child function
+> cmd_alloc_index because the allocate command entry fails,
+> Before returning, there is no complete ent->slotted.
 
-Yes, adjusting the test sounds good. I was testing visibility after
-supported operations. If the operation is no longer supported there's
-nothing to test :)
-
-> Like 99.99% of bugs being reported on tc, someone found a clever way
-> to use netlink to put kernel state in an awkward position.  And like
-> most fixes it just requires more checks against incoming control into
-> the kernel.
+This is already 0e2909c6bec9048f49d0c8e16887c63b50b14647
+in the tree
 
