@@ -1,144 +1,190 @@
-Return-Path: <netdev+bounces-157320-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157321-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D2D4DA09EDB
-	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 00:52:12 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 73CDCA09EF1
+	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 01:08:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 907577A02DB
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 23:52:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 714E316A961
+	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 00:08:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62937222565;
-	Fri, 10 Jan 2025 23:52:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F5F5372;
+	Sat, 11 Jan 2025 00:08:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=cisco.com header.i=@cisco.com header.b="XkbH2s0J"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GGgNwZnI"
 X-Original-To: netdev@vger.kernel.org
-Received: from alln-iport-3.cisco.com (alln-iport-3.cisco.com [173.37.142.90])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0A0721A952
-	for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 23:52:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=173.37.142.90
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CD5653A7;
+	Sat, 11 Jan 2025 00:08:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736553127; cv=none; b=Odr+aTV9pQ32EALnw+Op+wJgHcCW1q+TRZuqivmLZxuDFe2PWYX4N3BZf4xX0rSUHk6Wc9ieVnOqNmoovvE2GEWv7DhfFqphhjZbbZy7NdkJ2vYSw/oeJBYQXTboXtTFw0T8PA4D9kpY4fgFZ4wewjzqTG7gCnU36G4gMbKRbH8=
+	t=1736554093; cv=none; b=kLCNtXsAuuRE3lOkVITwN/dXks1/J9MC6QodVlFdGADl4ysDtSQnKCnNl428kIZrvwtjlkjO/uhn23L5C1/AjEGRCGyUvzLx5YparPPSGkICq32p+DkqpjkbNh1Wp7LcI3AGBpCT7lyP009G496bTLrUVC92DF9qRpaW+YUxc/o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736553127; c=relaxed/simple;
-	bh=G8kYBQWOCBbdkQMMP6AT+pzzzpPL5jZT+ikc3R6HD7E=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=LZadvk582ffkcz+v8CfqhrCYTKQL9gnjmZ0yRxG1glqMog9/2lY2C6u62SCgBC/Z+z7XsgkGm+AHfedyw0KC0/9qu7vEItiLHk6gnWVJoA9sS655vMsnvoll0Z3wqkERSLwzkXcpGuvlC3peizFybLKIiFKnIaT1dBs+pOyo78A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cisco.com; spf=pass smtp.mailfrom=cisco.com; dkim=pass (1024-bit key) header.d=cisco.com header.i=@cisco.com header.b=XkbH2s0J; arc=none smtp.client-ip=173.37.142.90
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cisco.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cisco.com
+	s=arc-20240116; t=1736554093; c=relaxed/simple;
+	bh=/wpudZIiSYVNH4rKj3PRFcOtKnxlfV3UnEbeP8QZ2K8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Ti0OJkcs/cv+ckJiZqHjxs0TygxYEP4XAbc5V0qGETE1axxtDm1SmVeekIDzlVP0O9VZMG/I4+qoIvg6QdTA7wAfaRlBq3kqFYI0Kcl1cD8sPr2N+x7Z9Zy+CylS5oHpUAg/lgSDsYLljk7Q1OAbPNXyrwUqiCCASPws7sVXuyM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GGgNwZnI; arc=none smtp.client-ip=209.85.214.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-21649a7bcdcso43054155ad.1;
+        Fri, 10 Jan 2025 16:08:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=cisco.com; i=@cisco.com; l=1505; q=dns/txt; s=iport;
-  t=1736553125; x=1737762725;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=l4Ny71q6SywhZWGkcrse9Y/cnP1u2sqaD5XJ0/WBlm0=;
-  b=XkbH2s0JUmZ3YrlOvtn/PtZL2QBOXsUVB5KM3y/ru5HBYQk2qR6EKiq0
-   Rq2dw080aUUCLfwo58AVdjLgcKqvzf2Xvo2rAKb0DMCf7XSVPTsvycqwE
-   CqRQ91rJK1lJiHC6ezaGq9eW4suNkKL5AFmbjM8oY6ahaf40N6la2BvtJ
-   E=;
-X-CSE-ConnectionGUID: LvrCcY4LQC+ShBOrMENJQA==
-X-CSE-MsgGUID: rCDsOU6wQT+3XR7PH/7nKA==
-X-IPAS-Result: =?us-ascii?q?A0BuBACAsYFn/47/Ja1aHgEBCxIMgggLgkuBT0NIjVGId?=
- =?us-ascii?q?Z4YgX4PAQEBD0QEAQGFBwKKdAImNgcOAQIEAQEBAQMCAwEBAQEBAQEBAQEBC?=
- =?us-ascii?q?wEBBQEBAQIBBwWBDhOGCIZbAQEBAycLAUYQCxguKysZgwGCZQO0XoF5M4EB3?=
- =?us-ascii?q?jOBbYFIhWuHX3CEdycbgUlEhA4xPoUQhXcEhCeDQJ5XSAqBFwNZLAFVEw0KC?=
- =?us-ascii?q?wcFgSgfKwM4DAswFSYPgRkFNQo3OoIMaUs6Ag0CNYIefIIrgiGCO4RHhFSFZ?=
- =?us-ascii?q?4IUgWUDAxYSAYMyVEADCxgNSBEsNxQbBj5uB5spPINvfIEMLqcJoQOEJYFjn?=
- =?us-ascii?q?2MaM4QEjQaZSZh8pEeEZoFuAjOBWTMaCBsVgyJSGQ+OWbxIJTI8AgcLAQEDC?=
- =?us-ascii?q?ZEeAQE?=
-IronPort-Data: A9a23:B8bWZqkRRZdA/9BgmcYDwL7o5gyjJ0RdPkR7XQ2eYbSJt1+Wr1Gzt
- xIeUG+AMqzeM2WjfI12OYS3oUgBv5LTxoIyQAZkqy41EVtH+JHPbTi7wugcHM8zwunrFh8PA
- xA2M4GYRCwMZiaC4E/rav658CEUOZigHtLUEPTDNj16WThqQSIgjQMLs+Mii+aEu/Dha++2k
- Y20+pe31GONgWYubzpNsvrb83uDgdyr0N8mlg1mDRx0lAe2e0k9VPo3Oay3Jn3kdYhYdsbSb
- /rD1ryw4lTC9B4rDN6/+p6jGqHdauePVeQmoiM+t5mK2nCulARrukoIHKZ0hXNsttm8t4sZJ
- OOhGnCHYVxB0qXkwIzxWvTDes10FfUuFLTveRBTvSEPpqHLWyOE/hlgMK05FakG4M18MD1qz
- NdbEzAnSQqmqsSU+ZvuH4GAhux7RCXqFJkUtnclyXTSCuwrBMieBa7L/tRfmjw3g6iiH96HO
- JFfMmUpNkmdJUQTYD/7C7pm9Ausrnv4cztUoVaYjaE2+GPUigd21dABNfKJIILVFJQJwRnwS
- mTu5U/VGTYnasOm9Xnewkjzvs+IwiXYcddHfFG/3rsw6LGJ/UQfAQMbUHO3qOe0j0q5Vc4ZL
- UEIkgIjobU3/V6mUvHyWBq3pHPCtRkZM/JTDuczwAKA0KzZ50CeHGdsZjdHZMYrq4wwSCAm2
- 0Ghm87vA3pksNW9UXuX+7GVhSm/NSgcMSkJYipsZQ0I/9XuvqktgR/VCNVuCqi4ipvyAz6Y/
- tyRhDI1i7NWiYsA0L+2uAiaxTmtvZPOCAUy4207Q16Y0++wX6b9D6TA1LQRxa8owFqxJrVZg
- EU5pg==
-IronPort-HdrOrdr: A9a23:OwugkKyyPI+6D6U7+NnuKrPwK71zdoMgy1knxilNoNJuHfBw8P
- re+8jzuiWUtN98YhwdcJW7Scu9qBDnhPpICPcqXYtKNTOO0ADDEGgh1/qG/9SKIUPDH4BmuZ
- uIC5IOa+EZyTNB/L/HCM7SKadH/OW6
-X-Talos-CUID: =?us-ascii?q?9a23=3AqKFhnGvfVwgulh8gQYGS8fgj6IsBbGf2x0aMB3a?=
- =?us-ascii?q?TSl1pYpqPbHK22ppNxp8=3D?=
-X-Talos-MUID: 9a23:/tNrWQZzt4xLOOBTrRTAnxZfathR3+f1OHpSqbVB5M+nHHkl
-X-IronPort-Anti-Spam-Filtered: true
-X-IronPort-AV: E=Sophos;i="6.12,305,1728950400"; 
-   d="scan'208";a="426799477"
-Received: from rcdn-l-core-05.cisco.com ([173.37.255.142])
-  by alln-iport-3.cisco.com with ESMTP/TLS/TLS_AES_256_GCM_SHA384; 10 Jan 2025 23:52:04 +0000
-Received: from cisco.com (savbu-usnic-a.cisco.com [10.193.184.48])
-	by rcdn-l-core-05.cisco.com (Postfix) with ESMTP id 92CAA1800022D;
-	Fri, 10 Jan 2025 23:52:04 +0000 (GMT)
-Received: by cisco.com (Postfix, from userid 392789)
-	id 67AB120F2003; Fri, 10 Jan 2025 15:52:04 -0800 (PST)
-From: John Daley <johndale@cisco.com>
-To: kuba@kernel.org
-Cc: andrew+netdev@lunn.ch,
-	benve@cisco.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	johndale@cisco.com,
-	neescoba@cisco.com,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	satishkh@cisco.com
-Subject: Re: [PATCH net-next v4 4/6] enic: Use the Page Pool API for RX when MTU is less than page size
-Date: Fri, 10 Jan 2025 15:52:04 -0800
-Message-Id: <20250110235204.8536-1-johndale@cisco.com>
-X-Mailer: git-send-email 2.35.2
-In-Reply-To: <20250104174152.67e3f687@kernel.org>
-References: <20250104174152.67e3f687@kernel.org>
+        d=gmail.com; s=20230601; t=1736554091; x=1737158891; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:sender:from:to:cc:subject:date:message-id:reply-to;
+        bh=PLxQ2bePhVaVTW2DdEGOaGquer6lWt0Bmgv8Nn2tYPg=;
+        b=GGgNwZnIQJQRDr35iiVPYC2uskHHJ6EoFYQNGpx3ZCGEo4mvW6rioe6041xANsGJ8V
+         EG1YhOTZsTF+b1Q8usJopEEbtIjV2Rg9PAGcCtehxPWbb9wFmvUljvnvhSCE8S99pnuO
+         MzJ/NoWIBisRvC5rWq05zoL7CKUEcJzBo5s/au4gtZ+zXlrVqaMFHUAML11YPGGgndnS
+         Jw+xvaSw1F9e6r6xZyRa6NXJEHNF+vNIdAj++sbE15mULnedov1ihMeWnxkcglAu5iEW
+         /gJzdUS5rtr2XSyX7oSuYcocoCL/B/0+IlPpAMrxL0w3RrnorPmE3vUvCZeFp4Ys61o0
+         JIoQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736554091; x=1737158891;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:sender:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=PLxQ2bePhVaVTW2DdEGOaGquer6lWt0Bmgv8Nn2tYPg=;
+        b=iX4ryWrTdbSgNLF5I0PPDzCY4CCAkrxZNkVkwb+KfkU9ziWHvxWtQgSCIT+RUn+M7T
+         wSP86+lX9fQo9ohVbp5a+CF0jEqKUgZsUSxS9FVeh1XIFOI9ZxLOwo8XXVPxoo3Q79/e
+         0Z4NqzdTFCCRK2/897r3IRDdKB/h/OfbBnxFscMg4sFw/RL1gJKMg2eUR1PbeFfN6hen
+         zbrwarkRUkiwgFF80Quv51VNUZSotsuZL5hVlVLxD8gwKSVUEhjeNcu/ZNDbCbDpA+fY
+         47GTsQwxrk+IR/a+jqtghKzeevn0Voiy63w0CzZvxnQcmzilmPPBMBhATLfCgIO5aRoK
+         6upg==
+X-Forwarded-Encrypted: i=1; AJvYcCVG7tTeZQnHJ0FTUuWzzkCG/InfpLM3pEqIUSO9z0C7tQA9ul1prSCXFs7wAaSsDFUYKGR6eyDY@vger.kernel.org, AJvYcCVVkHDGAB6hwzSayznM18hrOWO8oQ7+rApJvoFxpUnKHm4LGEv5/MS1QesGxjczan2/XTL3fD0vwjybpg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxO5XuanU33I4A6qlNc/fUdNOXeYJuOk4rBd1Q53KJOGe8kD8Gm
+	QtN5jHuDV4IhyZ07o7pEvelLtdybZMtEOKe0xF2mNUztsqLQGjcR
+X-Gm-Gg: ASbGncvFfCEbTbQxPrgn4zjGb5pgKAdvey64rMUGMOqANR5zZndNtVNTx+L03vqd0q+
+	rL/jV3ocnES3DB7hqEufoZvNed40WKqbhix7aKVETbehj462spQaXq3mBvbbbirC/LVbqdQzYJL
+	pKFlYC4b8j+rMEqwYe07jKGALewcNU/JCmYw14982ZZVd8EOzVstAW8V3fsHRjRfifZSFwzj6LM
+	OvBylGDO0D2JMjqdNrXZSzCmfI/BSOKrjhv5IihB2SqSHW5ICVWT+t6urk/f/LqXDwRURqbv9Yq
+	33S+gricqhTS5UiTzHpTCtZcJ2d10A==
+X-Google-Smtp-Source: AGHT+IGxDp01Ajv2UFgUMzDo0bOmhWvoM24WNdV0a+IKbZ8T0t2j23lmfLA8lfGSZy0YR5RN51BixQ==
+X-Received: by 2002:a17:903:4408:b0:216:4e8d:4803 with SMTP id d9443c01a7336-21a83fc02edmr195897455ad.42.1736554091224;
+        Fri, 10 Jan 2025 16:08:11 -0800 (PST)
+Received: from ?IPV6:2600:1700:e321:62f0:da43:aeff:fecc:bfd5? ([2600:1700:e321:62f0:da43:aeff:fecc:bfd5])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21a9f219e65sm18182895ad.140.2025.01.10.16.08.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 10 Jan 2025 16:08:10 -0800 (PST)
+Sender: Guenter Roeck <groeck7@gmail.com>
+Message-ID: <6996e709-ef77-4fc6-ba78-1ccac40c3fb0@roeck-us.net>
+Date: Fri, 10 Jan 2025 16:08:08 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Outbound-SMTP-Client: 10.193.184.48, savbu-usnic-a.cisco.com
-X-Outbound-Node: rcdn-l-core-05.cisco.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 3/3] net: phy: realtek: add hwmon support for
+ temp sensor on RTL822x
+To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Russell King - ARM Linux <linux@armlinux.org.uk>,
+ Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+ David Miller <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Simon Horman <horms@kernel.org>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "linux-hwmon@vger.kernel.org" <linux-hwmon@vger.kernel.org>,
+ Jean Delvare <jdelvare@suse.com>
+References: <3e2784e3-4670-4d54-932f-b25440747b65@gmail.com>
+ <dbfeb139-808f-4345-afe8-830b7f4da26a@gmail.com>
+ <8d052f8f-d539-45ba-ba21-0a459057f313@lunn.ch>
+Content-Language: en-US
+From: Guenter Roeck <linux@roeck-us.net>
+Autocrypt: addr=linux@roeck-us.net; keydata=
+ xsFNBE6H1WcBEACu6jIcw5kZ5dGeJ7E7B2uweQR/4FGxH10/H1O1+ApmcQ9i87XdZQiB9cpN
+ RYHA7RCEK2dh6dDccykQk3bC90xXMPg+O3R+C/SkwcnUak1UZaeK/SwQbq/t0tkMzYDRxfJ7
+ nyFiKxUehbNF3r9qlJgPqONwX5vJy4/GvDHdddSCxV41P/ejsZ8PykxyJs98UWhF54tGRWFl
+ 7i1xvaDB9lN5WTLRKSO7wICuLiSz5WZHXMkyF4d+/O5ll7yz/o/JxK5vO/sduYDIlFTvBZDh
+ gzaEtNf5tQjsjG4io8E0Yq0ViobLkS2RTNZT8ICq/Jmvl0SpbHRvYwa2DhNsK0YjHFQBB0FX
+ IdhdUEzNefcNcYvqigJpdICoP2e4yJSyflHFO4dr0OrdnGLe1Zi/8Xo/2+M1dSSEt196rXaC
+ kwu2KgIgmkRBb3cp2vIBBIIowU8W3qC1+w+RdMUrZxKGWJ3juwcgveJlzMpMZNyM1jobSXZ0
+ VHGMNJ3MwXlrEFPXaYJgibcg6brM6wGfX/LBvc/haWw4yO24lT5eitm4UBdIy9pKkKmHHh7s
+ jfZJkB5fWKVdoCv/omy6UyH6ykLOPFugl+hVL2Prf8xrXuZe1CMS7ID9Lc8FaL1ROIN/W8Vk
+ BIsJMaWOhks//7d92Uf3EArDlDShwR2+D+AMon8NULuLBHiEUQARAQABzTJHdWVudGVyIFJv
+ ZWNrIChMaW51eCBhY2NvdW50KSA8bGludXhAcm9lY2stdXMubmV0PsLBgQQTAQIAKwIbAwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4ACGQEFAlVcphcFCRmg06EACgkQyx8mb86fmYFg0RAA
+ nzXJzuPkLJaOmSIzPAqqnutACchT/meCOgMEpS5oLf6xn5ySZkl23OxuhpMZTVX+49c9pvBx
+ hpvl5bCWFu5qC1jC2eWRYU+aZZE4sxMaAGeWenQJsiG9lP8wkfCJP3ockNu0ZXXAXwIbY1O1
+ c+l11zQkZw89zNgWgKobKzrDMBFOYtAh0pAInZ9TSn7oA4Ctejouo5wUugmk8MrDtUVXmEA9
+ 7f9fgKYSwl/H7dfKKsS1bDOpyJlqhEAH94BHJdK/b1tzwJCFAXFhMlmlbYEk8kWjcxQgDWMu
+ GAthQzSuAyhqyZwFcOlMCNbAcTSQawSo3B9yM9mHJne5RrAbVz4TWLnEaX8gA5xK3uCNCeyI
+ sqYuzA4OzcMwnnTASvzsGZoYHTFP3DQwf2nzxD6yBGCfwNGIYfS0i8YN8XcBgEcDFMWpOQhT
+ Pu3HeztMnF3HXrc0t7e5rDW9zCh3k2PA6D2NV4fews9KDFhLlTfCVzf0PS1dRVVWM+4jVl6l
+ HRIAgWp+2/f8dx5vPc4Ycp4IsZN0l1h9uT7qm1KTwz+sSl1zOqKD/BpfGNZfLRRxrXthvvY8
+ BltcuZ4+PGFTcRkMytUbMDFMF9Cjd2W9dXD35PEtvj8wnEyzIos8bbgtLrGTv/SYhmPpahJA
+ l8hPhYvmAvpOmusUUyB30StsHIU2LLccUPPOwU0ETofVZwEQALlLbQeBDTDbwQYrj0gbx3bq
+ 7kpKABxN2MqeuqGr02DpS9883d/t7ontxasXoEz2GTioevvRmllJlPQERVxM8gQoNg22twF7
+ pB/zsrIjxkE9heE4wYfN1AyzT+AxgYN6f8hVQ7Nrc9XgZZe+8IkuW/Nf64KzNJXnSH4u6nJM
+ J2+Dt274YoFcXR1nG76Q259mKwzbCukKbd6piL+VsT/qBrLhZe9Ivbjq5WMdkQKnP7gYKCAi
+ pNVJC4enWfivZsYupMd9qn7Uv/oCZDYoBTdMSBUblaLMwlcjnPpOYK5rfHvC4opxl+P/Vzyz
+ 6WC2TLkPtKvYvXmdsI6rnEI4Uucg0Au/Ulg7aqqKhzGPIbVaL+U0Wk82nz6hz+WP2ggTrY1w
+ ZlPlRt8WM9w6WfLf2j+PuGklj37m+KvaOEfLsF1v464dSpy1tQVHhhp8LFTxh/6RWkRIR2uF
+ I4v3Xu/k5D0LhaZHpQ4C+xKsQxpTGuYh2tnRaRL14YMW1dlI3HfeB2gj7Yc8XdHh9vkpPyuT
+ nY/ZsFbnvBtiw7GchKKri2gDhRb2QNNDyBnQn5mRFw7CyuFclAksOdV/sdpQnYlYcRQWOUGY
+ HhQ5eqTRZjm9z+qQe/T0HQpmiPTqQcIaG/edgKVTUjITfA7AJMKLQHgp04Vylb+G6jocnQQX
+ JqvvP09whbqrABEBAAHCwWUEGAECAA8CGwwFAlVcpi8FCRmg08MACgkQyx8mb86fmYHNRQ/+
+ J0OZsBYP4leJvQF8lx9zif+v4ZY/6C9tTcUv/KNAE5leyrD4IKbnV4PnbrVhjq861it/zRQW
+ cFpWQszZyWRwNPWUUz7ejmm9lAwPbr8xWT4qMSA43VKQ7ZCeTQJ4TC8kjqtcbw41SjkjrcTG
+ wF52zFO4bOWyovVAPncvV9eGA/vtnd3xEZXQiSt91kBSqK28yjxAqK/c3G6i7IX2rg6pzgqh
+ hiH3/1qM2M/LSuqAv0Rwrt/k+pZXE+B4Ud42hwmMr0TfhNxG+X7YKvjKC+SjPjqp0CaztQ0H
+ nsDLSLElVROxCd9m8CAUuHplgmR3seYCOrT4jriMFBtKNPtj2EE4DNV4s7k0Zy+6iRQ8G8ng
+ QjsSqYJx8iAR8JRB7Gm2rQOMv8lSRdjva++GT0VLXtHULdlzg8VjDnFZ3lfz5PWEOeIMk7Rj
+ trjv82EZtrhLuLjHRCaG50OOm0hwPSk1J64R8O3HjSLdertmw7eyAYOo4RuWJguYMg5DRnBk
+ WkRwrSuCn7UG+qVWZeKEsFKFOkynOs3pVbcbq1pxbhk3TRWCGRU5JolI4ohy/7JV1TVbjiDI
+ HP/aVnm6NC8of26P40Pg8EdAhajZnHHjA7FrJXsy3cyIGqvg9os4rNkUWmrCfLLsZDHD8FnU
+ mDW4+i+XlNFUPUYMrIKi9joBhu18ssf5i5Q=
+In-Reply-To: <8d052f8f-d539-45ba-ba21-0a459057f313@lunn.ch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On 1/4/25, 5:42 PM, "Jakub Kicinski" kuba@kernel.org wrote:
+On 1/10/25 13:10, Andrew Lunn wrote:
+>> - over-temp alarm remains set, even if temperature drops below threshold
+> 
+>> +int rtl822x_hwmon_init(struct phy_device *phydev)
+>> +{
+>> +	struct device *hwdev, *dev = &phydev->mdio.dev;
+>> +	const char *name;
+>> +
+>> +	/* Ensure over-temp alarm is reset. */
+>> +	phy_clear_bits_mmd(phydev, MDIO_MMD_VEND2, RTL822X_VND2_TSALRM, 3);
+> 
+> So it is possible to clear the alarm.
+> 
+> I know you wanted to experiment with this some more....
+> 
+> If the alarm is still set, does that prevent the PHY renegotiating the
+> higher link speed? If you clear the alarm, does that allow it to
+> renegotiate the higher link speed? Or is a down/up still required?
+> Does an down/up clear the alarm if the temperature is below the
+> threshold?
+> 
+> Also, does HWMON support clearing alarms? Writing a 0 to the file? Or
+> are they supported to self clear on read?
+> 
 
->On Thu,  2 Jan 2025 14:24:25 -0800 John Daley wrote:
->> The Page Pool API improves bandwidth and CPU overhead by recycling
->> pages instead of allocating new buffers in the driver. Make use of
->> page pool fragment allocation for smaller MTUs so that multiple
->> packets can share a page.
->
->Why the MTU limitation? You can set page_pool_params.order 
->to appropriate value always use the page pool.
->
->> Added 'pp_alloc_error' per RQ ethtool statistic to count
->> page_pool_dev_alloc() failures.
->
->SG, but please don't report it via ethtool. Add it in 
->enic_get_queue_stats_rx() as alloc_fail (and enic_get_base_stats()).
->As one of the benefits you'll be able to use
->tools/testing/selftests/drivers/net/hw/pp_alloc_fail.py
->to test this stat and error handling in the driver.
+Alarm attributes are supposed to self clear on read unless the condition
+persists.
 
-Fyi, after making suggested change I used pp_alloc_fail.py but no
-errors were injected. I think the path from page_pool_dev_alloc()
-does not call page_pool_alloc_pages()?
+> I'm wondering if we are heading towards ABI issues? You have defined:
+> 
+> - over-temp alarm remains set, even if temperature drops below threshold
+> 
+> so that kind of eliminates the possibility of implementing self
+> clearing any time in the future. Explicit clearing via a write is
+> probably O.K, because the user needs to take an explicit action.  Are
+> there other ABI issues i have not thought about.
+> 
 
-Here is what I beleive the call path is:
-page_pool_dev_alloc(rq->pool, &offset, &truesize)
-  page_pool_alloc(pool, offset, size, gfp)
-    netmem_to_page(page_pool_alloc_netmem(pool, offset, size, gfp));
-      page_pool_alloc_frag_netmem(pool, offset, *size, gfp);
-        page_pool_alloc_netmems(pool, gfp);
-          __page_pool_alloc_pages_slow(pool, gfp);
+Alarm attributes are supposed to be read-only.
 
-If I change the call from page_pool_dev_alloc() to
-page_pool_dev_alloc_pages() in the driver I do see the errors injected.
+Guenter
+
 
