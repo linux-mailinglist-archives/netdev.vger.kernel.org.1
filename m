@@ -1,142 +1,129 @@
-Return-Path: <netdev+bounces-157405-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157406-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6AD6BA0A337
-	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 12:03:09 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 79656A0A33C
+	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 12:13:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 63C65164DDF
-	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 11:03:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 68BA316B070
+	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 11:13:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D5941990A2;
-	Sat, 11 Jan 2025 11:02:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F2721917F9;
+	Sat, 11 Jan 2025 11:13:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E1HDTN4f"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ctgYIKWO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA57F196DB1;
-	Sat, 11 Jan 2025 11:02:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 678361537D4;
+	Sat, 11 Jan 2025 11:13:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736593358; cv=none; b=EzTzbnLzQOhZURNH+BCFl6VTH+wvKma7Je7j4xKMng4Q59QKjDQqB9ze9LpHY3nBGYSdRhmbgsf9zn3wbblWWhQrZEKKS7Vi8541ZmvzUrHaj9Zr5hDk8Z9V3kx5IW4I4KcH0hNEXY0KqBfY+495Lk7cpWJtRCuaG219q+jf2vU=
+	t=1736593985; cv=none; b=YIFelonX6aXJ5Bq5D0MauOg5wF6a3yyI2L0/0hg25mXmikE7jSdzsz/mlhNSvsRJWnMmvnNxI9FDesOt5ZaWYp9xo9/JaPr3IxQ3jfEeJWGEDDjbzu8QsPGivmu+6l5g7nM7y83KXAWSEcwkt+YojTytj9MEifZB2jDPvvcUoyE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736593358; c=relaxed/simple;
-	bh=g1plMfCr/KZ7IBvMVQwPmrzTZcvB3wmnei1/XJFEVUU=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=ctYX79MM87J4sLYED/ZayuDBGNbAixArJX9ZcH7JOiDT8kaUQl4pIN8oM6jLX6BZ5O5hbn543kYsJlFYIgbBFfLuUHNLhXfHwAQad/qtvYi+AJjIa0woN7swoHi4uY1wn2rHZs8fbeNkNn/44wn/XGxSlTAI/eqi62JA2b/8DXQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=E1HDTN4f; arc=none smtp.client-ip=209.85.214.181
+	s=arc-20240116; t=1736593985; c=relaxed/simple;
+	bh=LwnCOp04jxe7ud0+oZDujjSPho7IfoB8cf0lLGGfifQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=pCFevsWNqCToNsmqffa+1Bzr75LQFwepsRYnh2IanSrtNvSp2VDjf/H3z9hG1R4bLXH1N/bW+pw+U++PoIGG6jHAxyCYX0hyqyurJld9S5UieB3tCmXWTxmSqRlYhVPigzmTAexET1Hoq/Cn3pidgTkXJ1JgiRhEcnTyasZTQKk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ctgYIKWO; arc=none smtp.client-ip=209.85.218.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-2165448243fso56401005ad.1;
-        Sat, 11 Jan 2025 03:02:36 -0800 (PST)
+Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-ab2aea81cd8so408508166b.2;
+        Sat, 11 Jan 2025 03:13:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736593356; x=1737198156; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=hznsovtp48mZgcdoUSTo4/nC6MJBeww+RfciQ1pcFtU=;
-        b=E1HDTN4fHmAFSPwFz5BUNZnGzFUhPyaPzp7xsvHB447Yxsn1Hvj9wapGvSgjfnC57N
-         IlSBYXZV2EoqU7sD6ZyArMLNh+PRj4zSAhUWHReU8dgkF+kDKd6w2oD2C2REub6FgG9c
-         dycFzUgNPodyYpOyjIjtPtQbDU1/4i8XpMhuQ0sd3vNT9mqeBU0LHzyJuSRKni1BRZUT
-         HKlYDgHa9RbwN/PbPFuatuQYUESPXa5dvAGKrSOAdoZmNqMZGyjtL2g4tj03Sfkek7Y1
-         YBHovpEgFY1sV02ojT5YikdjzJT+skQjqgD2mhp8o9mdrz/mrxC76Wn5koppZZYbn/i7
-         zeLA==
+        d=gmail.com; s=20230601; t=1736593982; x=1737198782; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=LwnCOp04jxe7ud0+oZDujjSPho7IfoB8cf0lLGGfifQ=;
+        b=ctgYIKWOYNo5p76vyIYROB0zndC5oeYfYImjJp4DUyr0qZqNf8djEzV3Xy7Lwqj96E
+         6LudhSzQk6wGmjbwrnAmuNQS3EWjo5zDdbF9X2fBIkG1s+R5HF8NC1sEgGgwldFBvJ7s
+         qzydD1cpMeJ9f3Cfaflra+2ALJcVtCfOgKPb8rLqf3MmEWFSBOOJbJEhImsh0nnpRowD
+         jyoRHoXsslt/EJcGaPElLivLXrzroMtkQRpOqKkWjU2PNcR0IhOt5reTAA5zib7TbYJi
+         rge36z7ZP09x7WITtS1E52QHjd4zDHZ9RQliZ6o820h4USvvPNW1FPUKcev3jvKfLel3
+         djiQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736593356; x=1737198156;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1736593982; x=1737198782;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=hznsovtp48mZgcdoUSTo4/nC6MJBeww+RfciQ1pcFtU=;
-        b=jdD9X0nakhP7VQZLLyitdSnJe2y2euCam60zGMSAm/8H53ZYvqWbHkFJ+PD4AzH9DT
-         tdkSfvW6SG+hdwtdk23cjDGI7/T2wsecqMcma4t7ZP2UAEONOSKHsJkq2Q63OfHk+aZe
-         +742KeXDzv3PdnjlgR/vXEqQJywdhCFtvotpGbhKIqbM7L15VHFyEkUH7BBJuB+dn9ej
-         27lrRIIgWz97HiVQspYKEKYeUyUul7ph5jdeFNVsBMTWYG2tl1Eb0SyAGmhoqopsVM0i
-         Unn/SUmqrf2AUYCnrYiSKe+XIzOF4PuKcIJ095T0P6XOfLrquSZXJ7Vz12AwaGC4uI32
-         TbjQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUnw5o7a41UwQmI9kHzWpg/bFEnh6urQzcEnShBAsIRJsnTDNGn4AOnN6UgqKIPzzdeY8TuME2VFH3h3dU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzEvpZ0WQgseK4DdZ5g9K1kfWWON/2wgffgbYVqUN2bBYDwIwUG
-	e8gpuDNSIRLrMks7+o79hcTduB/2FHALaS4FKD0UzKwegb6qiFBzFjmQMA==
-X-Gm-Gg: ASbGncvx6FCjgqczF0Xrfg0X1dek766Vird3SllDO+PR9b2aTxuvaXuwlI2yxI1BjIm
-	GOVvlUOtbYxaXujgtw/8lVf1R4tXsnBMdOg2x7ih41KYh9soa7xVd/9Q0vEGwOFuBlylCVz6QMl
-	BdjpM34DYYAjvEOSnXuHPUZ5scQofY4pA/VaLYzd39wk4xL6Q7t4VeZpHju2U3NSircFAo4WYaN
-	/1dRdzsn2gAp7r7dQ0SkUHRSfCjkyFJkSaJtRrZuAhPP123J6ghtOWFoX419ujoc5SwhNBw4cLk
-	iA69JcTwUNfo0zCvLNUowyX+yKAaLu+a1Q==
-X-Google-Smtp-Source: AGHT+IEO1EaHEHKE/A+yERXvHhAh0jP8E2h0S1d3mbQXpZhiG8Q9RA6jWHW1HT93x/lGN/78vwSn7Q==
-X-Received: by 2002:a05:6a00:1909:b0:72a:a7a4:b4cd with SMTP id d2e1a72fcca58-72d220025bcmr21352985b3a.21.1736593355921;
-        Sat, 11 Jan 2025 03:02:35 -0800 (PST)
-Received: from localhost.localdomain (61-220-246-151.hinet-ip.hinet.net. [61.220.246.151])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72d40680e5csm2953826b3a.143.2025.01.11.03.02.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 11 Jan 2025 03:02:35 -0800 (PST)
-From: Potin Lai <potin.lai.pt@gmail.com>
-Date: Sat, 11 Jan 2025 18:59:44 +0800
-Subject: [PATCH v2 2/2] net/ncsi: fix state race during channel probe
- completion
+        bh=LwnCOp04jxe7ud0+oZDujjSPho7IfoB8cf0lLGGfifQ=;
+        b=jBC5CGZzE6QnGTMyze1wUd1wyPGSxdyQFhKyIQE2SbmveGKQyKQEu9rPFYK5d3Kokz
+         dkhasXP8cs3GYx55eJhOKnhqRaD1XmpB0bUqoLJt+7XHWeJTfLBpSN8CVS0m/Z1YIOZ3
+         WqYODPz4bxT/UlSeRp7vktgrdtAHmnEBHBwtApOpxy4kr9lhLYZraSj0SL5fzLv5ZI41
+         itidFgIZCveyaWnNmRN+jR9oFDZMLOUMEmrw3OekScvfp7QTWDJXMJ3I/9JGZiZlpp8m
+         6oWd1+0SEZfvLhps+nM0qqauL4r1ZsN8VyNchISAwrxPlJ0YI9RhZnWn+vAPtFnSRcY4
+         kchQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUoRY84ZZ5nFjrF5oGwK+ehOJIIH0vr/qkfc/T3TeoX4bvBsDxrGRR46CAnyFKGpxThG92u1y3tYzx2Xd8=@vger.kernel.org, AJvYcCX7OlUqSrzf0R7etS1ZqOOFeKJZiRmE4Fynp7mr/w3UJ8lzf5dJj8Z01iZH12KUh/+yJ6mWmXLk@vger.kernel.org, AJvYcCXbaKUg670iN/yTBPWrCxUlhVR5+lhwSYaCYJLHzgwjqml+UmrU5Nh1IBojn6fAduRoeBhfDxdA@vger.kernel.org
+X-Gm-Message-State: AOJu0YzgZGayh4yILya5FvDAspUIr28yg8jaKXi4HXjgLgKmMdsrEcLo
+	9OiRx8GwxHCB1EL4i9H0N4ItrXiQuKry5bQ17a6i+XA4BdgtOPi9eVJOteTxExXZ6eje7b69NzW
+	TE1gGOH0FJKiTT6mlQKJsUnJ1ys4PGSBj
+X-Gm-Gg: ASbGnctdXdm/EI0EoJHAzJpp6TCMXXPgkX90Tm7Dhqyq7psXNCPPONDc8Mbgpv7TzwX
+	U5l0YuRBsd0ZkHVCIWbXVG7WZVeCeOXetZn0Y/W8=
+X-Google-Smtp-Source: AGHT+IF6282MgM1DgwU5iUlWE7vIfL1E+Kry4JlQWVoR+RuoeWnDE/apz2b7KOC+1HpNjRDQujaBIN+72zs8crWyISI=
+X-Received: by 2002:a17:907:7f1e:b0:aa6:7091:1e91 with SMTP id
+ a640c23a62f3a-ab2ab66cf8cmr1310652266b.11.1736593981455; Sat, 11 Jan 2025
+ 03:13:01 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250111-fix-ncsi-mac-v2-2-838e0a1a233a@gmail.com>
-References: <20250111-fix-ncsi-mac-v2-0-838e0a1a233a@gmail.com>
-In-Reply-To: <20250111-fix-ncsi-mac-v2-0-838e0a1a233a@gmail.com>
-To: Samuel Mendoza-Jonas <sam@mendozajonas.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>, Ivan Mikhaylov <fr0st61te@gmail.com>, 
- Paul Fertser <fercerpav@gmail.com>, Patrick Williams <patrick@stwcx.xyz>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Cosmo Chou <cosmo.chou@quantatw.com>, Potin Lai <potin.lai@quantatw.com>, 
- Potin Lai <potin.lai.pt@gmail.com>, Cosmo Chou <chou.cosmo@gmail.com>
-X-Mailer: b4 0.12.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1736593346; l=1082;
- i=potin.lai.pt@gmail.com; s=20240724; h=from:subject:message-id;
- bh=C0KcSY/p42mPHtdSbbuqbciMoVgNxzz4Cv1O0zA8RkU=;
- b=/hyKLPCb91qtlVx4N7/5m7wSmTB718JNnDTAEsWdOw3Ru3OHSrXweQf5Dyid3pU+Ast+CvWu0
- ZZxHFlcFRbdClAX1xFXBVgWbW8dfZg3UnwirlV9DzWgZQEaNv2pE0fs
-X-Developer-Key: i=potin.lai.pt@gmail.com; a=ed25519;
- pk=6Z4H4V4fJwLteH/WzIXSsx6TkuY5FOcBBP+4OflJ5gM=
+References: <20250108192346.2646627-1-kuba@kernel.org> <20250109145054.30925-1-fercerpav@gmail.com>
+ <20250109083311.20f5f802@kernel.org> <TYSPR04MB7868EA6003981521C1B2FDAB8E1C2@TYSPR04MB7868.apcprd04.prod.outlook.com>
+ <20250110181841.61a5bb33@kernel.org>
+In-Reply-To: <20250110181841.61a5bb33@kernel.org>
+From: Potin Lai <potin.lai.pt@gmail.com>
+Date: Sat, 11 Jan 2025 19:12:51 +0800
+X-Gm-Features: AbW1kvb7vYlwuMrCJ4LNPpD4i2XnHdUS01P_Rf6z3H8hOvlMHGCbJq3Pu-BhAhY
+Message-ID: <CAGfYmwVECrisZMhWAddmnczcLqFfNZ2boNAD5=p2HHuOhLy75w@mail.gmail.com>
+Subject: =?UTF-8?B?UmU6IOWbnuimhjogW0V4dGVybmFsXSBSZTogW1BBVENIXSBuZXQvbmNzaTogZml4IGxvYw==?=
+	=?UTF-8?B?a2luZyBpbiBHZXQgTUFDIEFkZHJlc3MgaGFuZGxpbmc=?=
+To: Jakub Kicinski <kuba@kernel.org>, Paul Fertser <fercerpav@gmail.com>
+Cc: =?UTF-8?B?UG90aW4gTGFpICjos7Tmn4/lu7cp?= <Potin.Lai@quantatw.com>, 
+	Samuel Mendoza-Jonas <sam@mendozajonas.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Ivan Mikhaylov <fr0st61te@gmail.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
+	"stable@vger.kernel.org" <stable@vger.kernel.org>, 
+	=?UTF-8?B?Q29zbW8gQ2hvdSAoIOWRqOalt+WfuSk=?= <Cosmo.Chou@quantatw.com>, 
+	"patrick@stwcx.xyz" <patrick@stwcx.xyz>, Cosmo Chou <chou.cosmo@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Cosmo Chou <chou.cosmo@gmail.com>
+On Sat, Jan 11, 2025 at 10:18=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> w=
+rote:
+>
+> On Fri, 10 Jan 2025 06:02:04 +0000 Potin Lai (=E8=B3=B4=E6=9F=8F=E5=BB=B7=
+) wrote:
+> > > Neat!
+> > > Potin, please give this a test ASAP.
+> >
+> > Thanks for the new patch.
+> > I am currently tied up with other tasks, but I=E2=80=99ll make sure to =
+test
+> > it as soon as possible and share the results with you.
+>
+> Understood, would you be able to test it by January 13th?
+> Depending on how long we need to wait we may be better off
+> applying the patch already or waiting with committing..
 
-During channel probing, the last NCSI_PKT_CMD_DP command can trigger
-an unnecessary schedule_work() via ncsi_free_request(). We observed
-that subsequent config states were triggered before the scheduled
-work completed, causing potential state handling issues.
+Hi Jakub & Paul,
 
-Fix this by clearing req_flags when processing the last package.
+I had a test yesterday, the patch is working and the kernel panic does
+not happen any more, but we notice sometimes the config_apply_mac
+state runs before the gma command is handled.
 
-Fixes: 8e13f70be05e ("net/ncsi: Probe single packages to avoid conflict")
-Signed-off-by: Cosmo Chou <chou.cosmo@gmail.com>
----
- net/ncsi/ncsi-manage.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+Cosmo helped me to find a potential state handling issue, and I
+submitted the v2 version.
+Please kindly have a look at v2 version with the link below.
+v2: https://lore.kernel.org/all/20250111-fix-ncsi-mac-v2-0-838e0a1a233a@gma=
+il.com/
 
-diff --git a/net/ncsi/ncsi-manage.c b/net/ncsi/ncsi-manage.c
-index bf276eaf9330..632281816f11 100644
---- a/net/ncsi/ncsi-manage.c
-+++ b/net/ncsi/ncsi-manage.c
-@@ -1491,7 +1491,10 @@ static void ncsi_probe_channel(struct ncsi_dev_priv *ndp)
- 		}
- 		break;
- 	case ncsi_dev_state_probe_dp:
--		ndp->pending_req_num = 1;
-+		if (ndp->package_probe_id + 1 < ndp->max_package)
-+			ndp->pending_req_num = 1;
-+		else
-+			nca.req_flags = 0;
- 
- 		/* Deselect the current package */
- 		nca.type = NCSI_PKT_CMD_DP;
-
--- 
-2.31.1
-
+Best Regards,
+Potin
 
