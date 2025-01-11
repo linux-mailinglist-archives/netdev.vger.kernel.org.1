@@ -1,131 +1,87 @@
-Return-Path: <netdev+bounces-157343-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157344-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id ACA7AA0A03B
-	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 03:10:42 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 42C8BA0A041
+	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 03:18:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B976716AFEB
-	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 02:10:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4A6493AA5DE
+	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 02:18:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1DC1282F4;
-	Sat, 11 Jan 2025 02:10:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3730A2033A;
+	Sat, 11 Jan 2025 02:18:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qJf7OL/s"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ri7AFX2X"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B4634438B
-	for <netdev@vger.kernel.org>; Sat, 11 Jan 2025 02:10:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 092F3610D;
+	Sat, 11 Jan 2025 02:18:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736561423; cv=none; b=QUHUob3C/T0AoQlDdF6pTAmieLTd3g/cRsCuvTdI/yPGbXkzLKeaWXnWzM6SBixbqbkKT5sDY3eqteojWTOxTNxqHBEVXWjF9aJiFziWXIkbSbJmN53pWoIGxZvMvT8PYCJcHta4dAIz0Apz+qKYXbjVE6BawpRkiR9C5f75X9w=
+	t=1736561923; cv=none; b=hcNXNVj4FQZDPKm8VO8SKEpiBX6Tg1XlKprzh/YJuLckeyjskk53x0p/6rosYFcLMB5HoqgOw0se4YVE2rs7GZ7Ric+JdqO2a9I4mwogujAI8lB4T3fz/xEULvXTMY6aGuvEKZb86P1BfusVaom5bu4zCVrl4Ko9ZRV/dluMdaQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736561423; c=relaxed/simple;
-	bh=DEfwp4XBTsdzzsNRV5w7wnpG6wWSu/8qAaGrRyAKc5I=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=ET6kBz+9iSqiDf2raqQCAdXOv92sMM/lzcK1qDrqPo2dDkGoOwjPA3PU8+rbfuoqHlmpbcDbcnknDtIFi/A61gRnJzd4kg7atRubGII/dBkZ0+cqar3g+gRqO/c8gQeWHFEfoYi+dH7Au0umQmeLh1NAt0/oWixU/BXFw17kVgY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qJf7OL/s; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F2990C4CED6;
-	Sat, 11 Jan 2025 02:10:22 +0000 (UTC)
+	s=arc-20240116; t=1736561923; c=relaxed/simple;
+	bh=3e3GyF7H39P+4ZN09Y69FB6KEJg4XcRpXveQM4qKqY8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=SNrBUVwq4QwDQcyGqfTdKwAPBXi3AbgZ3hTsjVOo5w+JhcephgYwZ3pR8sVGNYQ05PIDk2BruGDoVcj8wNMbZPs2secqLlOAPofzIkCz1AmzU0gKp0Y1HyB4tlqHDyN176g9jy8AMs2OTmrsaVh8pwxpx8TQ1H7kCm2EKQhdHqE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ri7AFX2X; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EA511C4CED6;
+	Sat, 11 Jan 2025 02:18:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736561423;
-	bh=DEfwp4XBTsdzzsNRV5w7wnpG6wWSu/8qAaGrRyAKc5I=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=qJf7OL/sLA88XpOeplNMc/0+yDnKglR9KA5yWmzEG+Nl5sT2fSuIK6KhvRAroa/6p
-	 QlctkjG3cK5lGL+ficRQBy8nLWEN3mkxJrUVyuoZFRp58EUCVfsFOBuLtMk6mb2Z1V
-	 pwLz7I+Tr3vp94q7sUbS4presUbVgwvyTsBYc+0JDJnqlepbVEdZ5F9xUtCFGe9wlL
-	 OXTcQjNx2fogkqNzVI+c3NhmKGoXoDRIXrY0qzJUHkJixQoSDRsoQDCk4x7f2s7Wcu
-	 emBvY+6tj5t44/urzVpXdLaQMtwezVL2MzrYioIQn35EzwqqfLm7wn8W1/7K4g3CEL
-	 xn5/csFmZpkdA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33C89380AA57;
-	Sat, 11 Jan 2025 02:10:46 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1736561922;
+	bh=3e3GyF7H39P+4ZN09Y69FB6KEJg4XcRpXveQM4qKqY8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Ri7AFX2X835DnHMH7aaiJ+5ZIPjcCPXYCs4SeIKByZnO2ROwfx9yH3rnfyYtQzrR/
+	 t+1JU6F6/pqr4q40Sj2g7+wyaLsQ2g0FE04IHPUaDqOG+MwyPoMVzveu5Kbvq83wD3
+	 g+VuOHKsBugdqZQn6YoofgxXLqoDxklVsZqOhDprjNhsEmgyitO46+A4kedobogmta
+	 TUUgiacAmFusSuinC5P+M+TabD3MxFs0ilXnr+TjHYN81X+3vj+PNPTh7avu/aWDOK
+	 IWjv6LQnhZ6SVzsp0nMzPEG5Xf00LQjFlfOol0TMPMf1Zg/Iab2LuDrRa+kGUClMtG
+	 3zv3Lwzw9OzSw==
+Date: Fri, 10 Jan 2025 18:18:41 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: "Potin Lai (=?UTF-8?B?6LO05p+P5bu3?=)" <Potin.Lai@quantatw.com>
+Cc: Paul Fertser <fercerpav@gmail.com>, Samuel Mendoza-Jonas
+ <sam@mendozajonas.com>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon
+ Horman <horms@kernel.org>, Ivan Mikhaylov <fr0st61te@gmail.com>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "stable@vger.kernel.org" <stable@vger.kernel.org>, "Cosmo Chou (
+ =?UTF-8?B?5ZGo5qW35Z+5?=)" <Cosmo.Chou@quantatw.com>,
+ "potin.lai.pt@gmail.com" <potin.lai.pt@gmail.com>, "patrick@stwcx.xyz"
+ <patrick@stwcx.xyz>
+Subject: Re: =?UTF-8?B?5Zue6KaGOg==?= [External]  Re: [PATCH] net/ncsi: fix
+ locking in Get MAC Address handling
+Message-ID: <20250110181841.61a5bb33@kernel.org>
+In-Reply-To: <TYSPR04MB7868EA6003981521C1B2FDAB8E1C2@TYSPR04MB7868.apcprd04.prod.outlook.com>
+References: <20250108192346.2646627-1-kuba@kernel.org>
+	<20250109145054.30925-1-fercerpav@gmail.com>
+	<20250109083311.20f5f802@kernel.org>
+	<TYSPR04MB7868EA6003981521C1B2FDAB8E1C2@TYSPR04MB7868.apcprd04.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v4 00/18] net: stmmac: clean up and fix EEE
- implementation
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173656144498.2267647.15302002781849970108.git-patchwork-notify@kernel.org>
-Date: Sat, 11 Jan 2025 02:10:44 +0000
-References: <Z36sHIlnExQBuFJE@shell.armlinux.org.uk>
-In-Reply-To: <Z36sHIlnExQBuFJE@shell.armlinux.org.uk>
-To: Russell King (Oracle) <linux@armlinux.org.uk>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, alexandre.torgue@foss.st.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, joabreu@synopsys.com, linux-arm-kernel@lists.infradead.org,
- linux-stm32@st-md-mailman.stormreply.com, mcoquelin.stm32@gmail.com,
- netdev@vger.kernel.org, pabeni@redhat.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-Hello:
+On Fri, 10 Jan 2025 06:02:04 +0000 Potin Lai (=E8=B3=B4=E6=9F=8F=E5=BB=B7) =
+wrote:
+> > Neat!
+> > Potin, please give this a test ASAP. =20
+>=20
+> Thanks for the new patch.
+> I am currently tied up with other tasks, but I=E2=80=99ll make sure to te=
+st
+> it as soon as possible and share the results with you.
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Wed, 8 Jan 2025 16:47:24 +0000 you wrote:
-> Hi,
-> 
-> This is a rework of stmmac's EEE support in light of the addition of EEE
-> management to phylib. It's slightly more than 15 patches, but I think it
-> makes sense to be so.
-> 
-> Patch 1 adds configuration of the receive clock phy_eee_rx_clock_stop()
-> (which was part of another series, but is necessary for this patch set.)
-> 
-> [...]
-
-Here is the summary with links:
-  - [net-next,v4,01/18] net: phy: add configuration of rx clock stop mode
-    https://git.kernel.org/netdev/net-next/c/cf337105ad38
-  - [net-next,v4,02/18] net: stmmac: move tx_lpi_timer tracking to phylib
-    https://git.kernel.org/netdev/net-next/c/1991819debaa
-  - [net-next,v4,03/18] net: stmmac: use correct type for tx_lpi_timer
-    https://git.kernel.org/netdev/net-next/c/bba9f4765515
-  - [net-next,v4,04/18] net: stmmac: use unsigned int for eee_timer
-    https://git.kernel.org/netdev/net-next/c/7e19a351b22d
-  - [net-next,v4,05/18] net: stmmac: make EEE depend on phy->enable_tx_lpi
-    https://git.kernel.org/netdev/net-next/c/beb1e0148e6d
-  - [net-next,v4,06/18] net: stmmac: remove redundant code from ethtool EEE ops
-    https://git.kernel.org/netdev/net-next/c/80fada6c0d3e
-  - [net-next,v4,07/18] net: stmmac: clean up stmmac_disable_eee_mode()
-    https://git.kernel.org/netdev/net-next/c/e40dd46d2fc5
-  - [net-next,v4,08/18] net: stmmac: remove priv->tx_lpi_enabled
-    https://git.kernel.org/netdev/net-next/c/865ff410a071
-  - [net-next,v4,09/18] net: stmmac: report EEE error statistics if EEE is supported
-    https://git.kernel.org/netdev/net-next/c/517dc0450675
-  - [net-next,v4,10/18] net: stmmac: convert to use phy_eee_rx_clock_stop()
-    https://git.kernel.org/netdev/net-next/c/a3242177d9f2
-  - [net-next,v4,11/18] net: stmmac: remove priv->eee_tw_timer
-    https://git.kernel.org/netdev/net-next/c/2914a5cd811a
-  - [net-next,v4,12/18] net: stmmac: move priv->eee_enabled into stmmac_eee_init()
-    https://git.kernel.org/netdev/net-next/c/0a900ea89a0c
-  - [net-next,v4,13/18] net: stmmac: move priv->eee_active into stmmac_eee_init()
-    https://git.kernel.org/netdev/net-next/c/1797dd4e3e8e
-  - [net-next,v4,14/18] net: stmmac: use boolean for eee_enabled and eee_active
-    https://git.kernel.org/netdev/net-next/c/cfd49e5fc30c
-  - [net-next,v4,15/18] net: stmmac: move setup of eee_ctrl_timer to stmmac_dvr_probe()
-    https://git.kernel.org/netdev/net-next/c/84f2776e3919
-  - [net-next,v4,16/18] net: stmmac: remove unnecessary EEE handling in stmmac_release()
-    https://git.kernel.org/netdev/net-next/c/27af08164247
-  - [net-next,v4,17/18] net: stmmac: split hardware LPI timer control
-    https://git.kernel.org/netdev/net-next/c/17f47da103a6
-  - [net-next,v4,18/18] net: stmmac: remove stmmac_lpi_entry_timer_config()
-    https://git.kernel.org/netdev/net-next/c/1655a2279971
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Understood, would you be able to test it by January 13th?
+Depending on how long we need to wait we may be better off
+applying the patch already or waiting with committing..
 
