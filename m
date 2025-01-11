@@ -1,50 +1,58 @@
-Return-Path: <netdev+bounces-157354-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157355-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6765CA0A064
-	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 03:40:37 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 32B0DA0A066
+	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 03:44:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AD7A516B901
-	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 02:40:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 178C6188AF53
+	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 02:44:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 660E2152166;
-	Sat, 11 Jan 2025 02:40:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59E5976026;
+	Sat, 11 Jan 2025 02:44:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="E3WCraHi"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IkK7wju8"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4209415098A
-	for <netdev@vger.kernel.org>; Sat, 11 Jan 2025 02:40:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3571110E9
+	for <netdev@vger.kernel.org>; Sat, 11 Jan 2025 02:44:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736563215; cv=none; b=Pponf847GBPEW8+uOvzawQ8HrXSor+XaB99qKF0fi3JV0vVlI2YuA5uWNWhUtKqdZ1OH9gODCMrbqHKruvo7BUTxYIWLTRNoboxqfZIDhmDYKxeQV64gSS2v2IgULcfVeg2rW6ZjhvF4CIATLOT5pdttST1fKafo9DS7teYWcTM=
+	t=1736563441; cv=none; b=sUWYbv/oHwwGKDrVl8aji+0QC4wXJu5pIMf9vlhEKFjU/cb6tWzoxrdCYpkuLvni95VFHYcS8q6nk2+GsmqLFDqi2RocdvVte9/mnm6/He4EXYllQostsFPM2f2ZGviXBAzzPcCC+0X1m7Pr1DTmteHoIE0vaGdk+uL/wSsSs0U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736563215; c=relaxed/simple;
-	bh=VIPh7a/khK0mijwbVFGI1sEEWx6GGtyYDW567eFuLSw=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=ikOT/ukzHrJioa+337OdAuoAQl3+50X7swHWfEGE1t+8lWaAJ664c31QnPAE4NNnZYIiauf33dso9yxo6JPWbRg9U3sBXjFWjHi05kMG8UD2V6zulzJ0nca7mi5sq81eugCSyjhKg5P/mq9SC/yOi9Sj8+yxSjA6gfiXqeY74tY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=E3WCraHi; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AE1EEC4CEE1;
-	Sat, 11 Jan 2025 02:40:14 +0000 (UTC)
+	s=arc-20240116; t=1736563441; c=relaxed/simple;
+	bh=KdguJoAGlfTk3pS4ORLjgKmtYV/mysEHm7IJfiv9zUk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UrMD4gVwdqN8wA9FidUkEAoZ167uqXZC0B+Tp7wl9DOZridamwPL7+acl5SXLRGGd4FA0GE39HD7xfwk/GHAtngejaCEHoQ3g75/mX49USgIX8bleqEAjmRkZ+X48bhgkoQFglgHM2ahGtY6SvKShVwAJ3HAzuE3ayFyQw2ZlbA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IkK7wju8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B9A71C4CED6;
+	Sat, 11 Jan 2025 02:44:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736563214;
-	bh=VIPh7a/khK0mijwbVFGI1sEEWx6GGtyYDW567eFuLSw=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=E3WCraHi2DGoGo1TUj1KeMqzlpZpbOnAyxYSQfQ3osq0ALrYkoLZc95BKfClL4BJt
-	 NWx9A9TLgx+DoL3OxOTJE+usuwOFY/4bEMna1yvNLUw7fY9AmEe0mR9msx5sBHdC0V
-	 OodmLlU7wzrVQ7ywgh3GvB95A9TOIdK+/DC0k9FVPGqEBkTLlejNwMBsLVoNp9TG2s
-	 fvLptazV1hDHGtraUWmcsith2mcxT5QuAOA4rtP1ASncpWYB4GyiNjDY0hLOOztdIi
-	 T9BhFD5/k9kbBIa696pa0hK7XsQLLNCYgK8rC8g66HGjYlYRo8Lho/Goc3XkNBXCu5
-	 AQJIpTqrwGvng==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB1D5380AA57;
-	Sat, 11 Jan 2025 02:40:37 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1736563441;
+	bh=KdguJoAGlfTk3pS4ORLjgKmtYV/mysEHm7IJfiv9zUk=;
+	h=From:To:Cc:Subject:Date:From;
+	b=IkK7wju8vLuVsGcgceRKbGQ8RIFFQC1d9/46xpz0puDoEv9GwV0cX2KCtUewla3UT
+	 rxSH2DKdUjgtr7o41q0cg/A+iuY3yKS6Fe+N4B3my+WOyIjX/O1oiGH2QSa2xAgufy
+	 MJzElNW5NTgOiJ0wNMALxHJTQjd9DvoXslLohR3siHJANdIEUcYotYVbESQ28t58i5
+	 MIrch7sOGIEE3JAwuS2zM74leWAWN5uliiyQZxTAoJAFXxEyWOeskqf/7yfX9/FNE5
+	 ays+KHIcvDh6D/hAvsIf3BuE0uPn6AUDWftPbWFcHdH+rmdBPQS1ql6LB8Lz+XeSCN
+	 VRoSSRnSj+RXg==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	horms@kernel.org,
+	aleksander.lobakin@intel.com,
+	Jakub Kicinski <kuba@kernel.org>
+Subject: [PATCH net-next v2 1/2] docs: netdev: document requirements for Supported status
+Date: Fri, 10 Jan 2025 18:43:56 -0800
+Message-ID: <20250111024359.3678956-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,40 +60,82 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] tls: skip setting sk_write_space on rekey
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173656323650.2272951.6013172385562660465.git-patchwork-notify@kernel.org>
-Date: Sat, 11 Jan 2025 02:40:36 +0000
-References: <ffdbe4de691d1c1eead556bbf42e33ae215304a7.1736436785.git.sd@queasysnail.net>
-In-Reply-To: <ffdbe4de691d1c1eead556bbf42e33ae215304a7.1736436785.git.sd@queasysnail.net>
-To: Sabrina Dubroca <sd@queasysnail.net>
-Cc: netdev@vger.kernel.org, borisp@nvidia.com, john.fastabend@gmail.com,
- kuba@kernel.org, syzbot+6ac73b3abf1b598863fa@syzkaller.appspotmail.com
 
-Hello:
+As announced back in April, require running upstream tests
+to maintain Supported status for NIC drivers:
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+  https://lore.kernel.org/20240425114200.3effe773@kernel.org
 
-On Thu,  9 Jan 2025 23:30:54 +0100 you wrote:
-> syzbot reported a problem when calling setsockopt(SO_SNDBUF) after a
-> rekey. SO_SNDBUF calls sk_write_space, ie tls_write_space, which then
-> calls the original socket's sk_write_space, saved in
-> ctx->sk_write_space. Rekeys should skip re-assigning
-> ctx->sk_write_space, so we don't end up with tls_write_space calling
-> itself.
-> 
-> [...]
+Multiple vendors have been "working on it" for months.
+Let's make it official.
 
-Here is the summary with links:
-  - [net-next] tls: skip setting sk_write_space on rekey
-    https://git.kernel.org/netdev/net-next/c/06cc8786516f
+Reviewed-by: Simon Horman <horms@kernel.org>
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+v2: spell
+v1: https://lore.kernel.org/20250110005223.3213487-1-kuba@kernel.org
+---
+ Documentation/process/maintainer-netdev.rst | 46 +++++++++++++++++++++
+ 1 file changed, 46 insertions(+)
 
-You are awesome, thank you!
+diff --git a/Documentation/process/maintainer-netdev.rst b/Documentation/process/maintainer-netdev.rst
+index 1ae71e31591c..e497729525d5 100644
+--- a/Documentation/process/maintainer-netdev.rst
++++ b/Documentation/process/maintainer-netdev.rst
+@@ -470,6 +470,52 @@ in a way which would break what would normally be considered uAPI.
+ new ``netdevsim`` features must be accompanied by selftests under
+ ``tools/testing/selftests/``.
+ 
++Supported status for drivers
++----------------------------
++
++.. note: The following requirements apply only to Ethernet NIC drivers.
++
++Netdev defines additional requirements for drivers which want to acquire
++the ``Supported`` status in the MAINTAINERS file. ``Supported`` drivers must
++be running all upstream driver tests and reporting the results twice a day.
++Drivers which do not comply with this requirement should use the ``Maintained``
++status. There is currently no difference in how ``Supported`` and ``Maintained``
++drivers are treated upstream.
++
++The exact rules a driver must follow to acquire the ``Supported`` status:
++
++1. Must run all tests under ``drivers/net`` and ``drivers/net/hw`` targets
++   of Linux selftests. Running and reporting private / internal tests is
++   also welcome, but upstream tests are a must.
++
++2. The minimum run frequency is once every 12 hours. Must test the
++   designated branch from the selected branch feed. Note that branches
++   are auto-constructed and exposed to intentional malicious patch posting,
++   so the test systems must be isolated.
++
++3. Drivers supporting multiple generations of devices must test at
++   least one device from each generation. A testbed manifest (exact
++   format TBD) should describe the device models tested.
++
++4. The tests must run reliably, if multiple branches are skipped or tests
++   are failing due to execution environment problems the ``Supported``
++   status will be withdrawn.
++
++5. Test failures due to bugs either in the driver or the test itself,
++   or lack of support for the feature the test is targgeting are
++   *not* a basis for losing the ``Supported`` status.
++
++netdev CI will maintain an official page of supported devices, listing their
++recent test results.
++
++The driver maintainer may arrange for someone else to run the test,
++there is no requirement for the person listed as maintainer (or their
++employer) to be responsible for running the tests. Collaboration between
++vendors, hosting GH CI, other repos under linux-netdev, etc. is most welcome.
++
++See https://github.com/linux-netdev/nipa/wiki for more information about
++netdev CI. Feel free to reach out to maintainers or the list with any questions.
++
+ Reviewer guidance
+ -----------------
+ 
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.47.1
 
 
