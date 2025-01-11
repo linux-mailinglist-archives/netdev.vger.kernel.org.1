@@ -1,111 +1,85 @@
-Return-Path: <netdev+bounces-157317-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157324-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 359EBA09EC1
-	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 00:38:23 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 125D6A09F81
+	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 01:35:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 49CAC3A17C1
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 23:38:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7835216AD9C
+	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 00:35:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45D04221DB2;
-	Fri, 10 Jan 2025 23:38:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC50210940;
+	Sat, 11 Jan 2025 00:32:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PhiiZN3l"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KzCQExFe"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0A3720764C
-	for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 23:38:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 872994A1E;
+	Sat, 11 Jan 2025 00:32:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736552299; cv=none; b=HZXtA1O0SLzc66oHPQlLVRLAazDfM0qypHqOxThZCh1MK+z+PPK7S2zHhey1o5n4m0zI71LnEIOvAKOAt2D/L0rwlt1DDRFMqGHR0hIU2CK6q6PYdpTBVHXta1saWDbDBilCEEYezD/mfX8/RyeHRyFjFX2z1vPsnUwiRv9D6O0=
+	t=1736555547; cv=none; b=lRQQKfu7nh1NOMOqnQd2Wdx/7vTWjqoxqtFkgqGW3LWqQ5aM+hf9dDhcXaUIDi24c9SqZE8MibFQtT0VfR+Sx8wM625pkXt6zvE8bI4uyN9fVnA/Z/Y7O2QYvclxinl5vS0uKoifIImChCP/P5I5adqvGGM9NEZpV2lLgejFiAs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736552299; c=relaxed/simple;
-	bh=+vUQF0Ms6rApdjCEWLAUXJx8qXMAxLYASyTa7ZmSe9o=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GkevhsNC9aySE2sY6N1BkiMqKmAPsPW5DqKhTzsvHrUEVByAg6m3hCfjAwssH9bbZnn3JFWFR1G0SShG7b/qKzFy5GxVCUtZFeHNGWKGcBhWlYVlTqq95sIxeNOlLHumRJf643kIF7JP7SEsxGZ8jNBN+Wui/OK4VTJpdAWZYBQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PhiiZN3l; arc=none smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1736552297; x=1768088297;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=+vUQF0Ms6rApdjCEWLAUXJx8qXMAxLYASyTa7ZmSe9o=;
-  b=PhiiZN3ll0lnCs9KtZJcqd3Qwyaxn6oaahf+x44TT236lGYjANmu+jM+
-   krLZzNFa11gpqar3zZnEGamsDPqPsiZW6GC4AIBDWyLPqYLWchaQF7v2x
-   +sze60l1SsCj9QD0iYVzNyyLuai3ZaydjBsY/QswPG2aogYqEs2rjXxhC
-   VxZEwQRdXETq1xUL0Cxt9MBJ+W4dejN+Z9wkc0M1csyUIztVryYY3z397
-   qc6xH5QlUScxW2EBtPySMQfgOZ3Sc9aFDSAVqZFVRAZ0iGDkuBDEf7dHf
-   o4n40lyMHkE2Kx+PZUn1eIE/4HYM3WJuBGJt6wUtoODtMA4YCXLd3XZCb
-   Q==;
-X-CSE-ConnectionGUID: +7PH7rDPQJmpGh/3xudJzQ==
-X-CSE-MsgGUID: kDSxMgy9RR+Zd9d/ct+xKQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11311"; a="40799735"
-X-IronPort-AV: E=Sophos;i="6.12,305,1728975600"; 
-   d="scan'208";a="40799735"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jan 2025 15:38:17 -0800
-X-CSE-ConnectionGUID: mkAyTctXQzm6oZG1RJ8RHA==
-X-CSE-MsgGUID: 4zAoolm/Rj6H3HyaCGzd8g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="107916555"
-Received: from jf3418-16b10-250812-p7.jf.intel.com ([10.166.80.88])
-  by fmviesa003.fm.intel.com with ESMTP; 10 Jan 2025 15:38:16 -0800
-From: "Samudrala, Sridhar" <sridhar.samudrala@intel.com>
-To: intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org
-Cc: Sridhar Samudrala <sridhar.samudrala@intel.com>,
-	Madhu Chittim <madhu.chittim@intel.com>
-Subject: [PATCH iwl-net] idpf: record rx queue in skb for RSC packets
-Date: Fri, 10 Jan 2025 16:29:58 -0800
-Message-ID: <20250111002957.167327-2-sridhar.samudrala@intel.com>
-X-Mailer: git-send-email 2.46.2
+	s=arc-20240116; t=1736555547; c=relaxed/simple;
+	bh=JOFIcvbuJlhifKowMvawmFUkoKsClUIawnqMWiLAFq4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=r+SYA2lMqaKSzGbj7asJiiJu8q7M7MJbO0q8pvkUFeKyobubQn2Q+mjkxW+3eoqX63oFCVCFhI7yZojAiIVHKqDX5rrufeW0B2nWe57LDIubbTAK9pNmWTQV4F2KqBLkjI5QE39uLDWy4LD9e5mQNr5L4UDaeEN6rv6Q+qR6IEo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KzCQExFe; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 56602C4CED6;
+	Sat, 11 Jan 2025 00:32:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1736555547;
+	bh=JOFIcvbuJlhifKowMvawmFUkoKsClUIawnqMWiLAFq4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=KzCQExFeEsTy3SYJkzhG8qaBdMf0eqxSmc/jAqimbUHU7YWtor0UercWiK1RyN2Kk
+	 DRXhTWzU/jWHbSGMcTihMgFqO6v2tKbTK2vXBQMN2NPXH1WNoUNAsDpUvKpuP32vS8
+	 q26hLGAJP3KQ0uXk2KrtFsrL1Hq2H/y1zkQ4jzKsoVBK2Q5Mf8ewbHk/l3qxs3QMww
+	 +xm/v0eMw0nJq9zHa3/f1tbHsIhP6+DtHEXDxWj2DgKh5L22h2IGImQXii8JHXQ/ti
+	 /UakO5n+BYWkAyGDIotO993ZMrG6xn4gE86lkJVntc1ErEyLYWVStLt7souOZvO+xM
+	 7aZ/84MuxSGVQ==
+Date: Fri, 10 Jan 2025 16:32:25 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Simon Horman <horms@kernel.org>, Lei Wei <quic_leiwei@quicinc.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, Krzysztof Kozlowski
+ <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Andrew Lunn
+ <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-msm@vger.kernel.org, quic_kkumarcs@quicinc.com,
+ quic_suruchia@quicinc.com, quic_pavir@quicinc.com,
+ quic_linchen@quicinc.com, quic_luoj@quicinc.com,
+ srinivas.kandagatla@linaro.org, bartosz.golaszewski@linaro.org,
+ vsmuthu@qti.qualcomm.com, john@phrozen.org
+Subject: Re: [PATCH net-next v4 3/5] net: pcs: qcom-ipq9574: Add PCS
+ instantiation and phylink operations
+Message-ID: <20250110163225.43fe8043@kernel.org>
+In-Reply-To: <20250110105252.GY7706@kernel.org>
+References: <20250108-ipq_pcs_net-next-v4-0-0de14cd2902b@quicinc.com>
+	<20250108-ipq_pcs_net-next-v4-3-0de14cd2902b@quicinc.com>
+	<20250108100358.GG2772@kernel.org>
+	<8ac3167c-c8aa-4ddb-948f-758714df7495@quicinc.com>
+	<20250110105252.GY7706@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Move the call to skb_record_rx_queue in idpf_rx_process_skb_fields()
-so that RX queue is recorded for RSC packets too.
+On Fri, 10 Jan 2025 10:52:52 +0000 Simon Horman wrote:
+> I don't think there is a need to update the code just to make Smatch happy.
+> Only if there is a real problem. Which, with the discussion at the link
+> above in mind, does not seem to be the case here.
 
-Fixes: 90912f9f4f2d ("idpf: convert header split mode to libeth + napi_build_skb()")
-Signed-off-by: Sridhar Samudrala <sridhar.samudrala@intel.com>
-Reviewed-by: Madhu Chittim <madhu.chittim@intel.com>
----
- drivers/net/ethernet/intel/idpf/idpf_txrx.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-index c9fcf8f4d736..9be6a6b59c4e 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-@@ -3070,6 +3070,7 @@ idpf_rx_process_skb_fields(struct idpf_rx_queue *rxq, struct sk_buff *skb,
- 	idpf_rx_hash(rxq, skb, rx_desc, decoded);
- 
- 	skb->protocol = eth_type_trans(skb, rxq->netdev);
-+	skb_record_rx_queue(skb, rxq->idx);
- 
- 	if (le16_get_bits(rx_desc->hdrlen_flags,
- 			  VIRTCHNL2_RX_FLEX_DESC_ADV_RSC_M))
-@@ -3078,8 +3079,6 @@ idpf_rx_process_skb_fields(struct idpf_rx_queue *rxq, struct sk_buff *skb,
- 	csum_bits = idpf_rx_splitq_extract_csum_bits(rx_desc);
- 	idpf_rx_csum(rxq, skb, csum_bits, decoded);
- 
--	skb_record_rx_queue(skb, rxq->idx);
--
- 	return 0;
- }
- 
--- 
-2.46.2
-
+Maybe be good to add a one line comment in the code to make it clear
+this is intentional. Chances are we'll get a semi-automated "fixes"
+for this before long.
 
