@@ -1,206 +1,303 @@
-Return-Path: <netdev+bounces-157384-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157386-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A7AFEA0A1FB
-	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 09:31:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8AB2DA0A20C
+	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 09:52:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 765D216B756
-	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 08:31:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8C20716B6C6
+	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 08:52:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A1D4156960;
-	Sat, 11 Jan 2025 08:31:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1CC8189BA2;
+	Sat, 11 Jan 2025 08:52:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MGbIOqaL"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fiAJceEb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f172.google.com (mail-il1-f172.google.com [209.85.166.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65B4610E9
-	for <netdev@vger.kernel.org>; Sat, 11 Jan 2025 08:31:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04B751865EE;
+	Sat, 11 Jan 2025 08:52:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736584270; cv=none; b=o91oF0ESHnyy+EKq/86ejg+YnEiQjlZ0f4St2nzmcKHalwYZLVYflUsW5gJNT5VmMkBrhqwsd1z+xrsu6vS2j77reYQijpsTduabn69cCIp+y4eqxBWNkCL5TGUoKSS+Nw+cMVgp2iMnrqoWjAZETgSit6DSfIBYHpIXr+NJdeM=
+	t=1736585550; cv=none; b=KpREMJlC8Q3+lPu78KuDLayzagtclOgjEeAFrK1WkGtCNYw0T/wQNQ6nTWFGM4Od9VJgJOd5IwNH7bomc/n1Q8cFMKM5kTSeuYh3xlTYxCM/bqCy2V4ZqLGEO46NvErdfB13kSZSnOM2QOCNnaUm+mnEHx/sDzXW3R3a2W6JgpY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736584270; c=relaxed/simple;
-	bh=ucNEuEsqawAm53BJRaIXDyVIUwhyoHZAnELNTjiDAoc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=c9LlO1J+Y3jWGX/ejbrS2P00DhNAfBKKxaWPRjOkbsJhNPM4DOAN+wAR94t2AoKxC+oB+Qu7ZsAmNzSXpbpjOMCk7irqlmtdfYHqeSBuFgI0xOqHsw3PlgqstAbKKNl6XAVwKsEvo6CTDqki8p8vpuXwyo8812t9rIDmJ68me9s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MGbIOqaL; arc=none smtp.client-ip=209.85.166.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f172.google.com with SMTP id e9e14a558f8ab-3a8c7b02d68so17938395ab.3
-        for <netdev@vger.kernel.org>; Sat, 11 Jan 2025 00:31:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736584268; x=1737189068; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=TBDCDFNtbAjmcOSF7YBQveTbVFnBCaDxZLows1Fg8ZU=;
-        b=MGbIOqaLchk1Ve9H5SHBz2ygUZg8hAGb0L6hMMt9pDaEV0KmYtAPBItSlw7/L+ylAq
-         +iOUiFL4Bt9xO7wmB35bng2xSM5JOZChSJhrMjCo+kvqVtykTUXJGYkIxqgHYQBqTJvJ
-         38HjRc12vSlbH3iuSsMwisT1FVdqZJulIro7bPbrNHxsdZnOdnreyfHGZEhIAIQYuq/F
-         h/kLBHHNHKwnYOir2yoiQrd7875JgAljHCj3AwBYkTfF5tti8Roa7ZTYnb8wyk8m554V
-         +180aFae+TagGD9S1zM9UgKi+lBB+uYAViNgF6Okf+h790KKTXCkV/1CGkyB7/FcqGzk
-         1VNQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736584268; x=1737189068;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=TBDCDFNtbAjmcOSF7YBQveTbVFnBCaDxZLows1Fg8ZU=;
-        b=j/pYpvpqfnxzgikHOMA2JkEpoOt5QkmvjNScRaG+Yo2W2cJNvAKp0S/ik0y/P/NXfS
-         EKndRzB6QcXXA1NGVMAOt1+Q+l5ffPagrKwMp8xVaIGZCMxQD8XXCH9jnPE3pSHuhXh1
-         2s0Yrs9oiPK4DB1+901/FG0wOs5D6vcl3tGGEjMQofuYbRH7cvKA8p1SweuSkC9gGf10
-         koluPliXvry0mooZzHoDhdHkidtLCBPu03pM1f2ZbEiGu/glH+Po15MipJeY8uINJcUn
-         mutXUJ1+jweBI5gT2Cs5jsPVK1HRD7V23GpDx/rUqsBo8SvRepyqTsvSu+nSBMlABQ51
-         gfEA==
-X-Forwarded-Encrypted: i=1; AJvYcCVGSTjCbD42WfTlBoOzMSvCwLFPoUNXe847GKZi0HBVdelBgCyIpmhVT7ARY9q1EuwrlkWRq0M=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxaRq4+icvXpM3OpsFa9jgonQHo3K7Y5G35pwLCTRcjGQ+rArUz
-	Fg7FnA3kVGAa9YObdRiXj46xHfAYvpbVYG9Rla4v5gJp9nTFWXosTUe2vgh7Kf9+KwMu9eI4blf
-	qCu/fFldaz/1VzHQ/CJG4NkN5nLM/KLPk
-X-Gm-Gg: ASbGnctJLrWvy+R9o3mie/NnkatY0WWtI8XW8C8HDypbOO78Bnlzq5NmxhzK6wYLRXo
-	YWOiGZ67quWB1IiWhghh5cUksBcwEqwQpmwdH
-X-Google-Smtp-Source: AGHT+IHffGH7TtuwYaSh7k7YKfQTw1Cg3I5epBLO663NCHlUG5RGDhZH7VorCCHgrLthQq5mX83hU0CSYeBPfjTpZVk=
-X-Received: by 2002:a05:6e02:1aad:b0:3ce:6828:896c with SMTP id
- e9e14a558f8ab-3ce68288e6bmr3605125ab.1.1736584268459; Sat, 11 Jan 2025
- 00:31:08 -0800 (PST)
+	s=arc-20240116; t=1736585550; c=relaxed/simple;
+	bh=8N10EQFfGGTCVQQ3mco6DwzMcT9d+LY69SR7ujkHPro=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WHrSJuf2khjK2KfUGe/ClOAjrvAiL7nrxrwNjqM07HY7QpQd1fqWhgYYaqucYkjJaV52NcfJJM1o3odKHP2wyPqCQatJeG1BKYgYOrGTdb/4nuIsq50y22RRjd81U/G095coBdABrEh6888Cgm8r3o+/q7cDwnLirvHsKUlEo2U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fiAJceEb; arc=none smtp.client-ip=192.198.163.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1736585549; x=1768121549;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=8N10EQFfGGTCVQQ3mco6DwzMcT9d+LY69SR7ujkHPro=;
+  b=fiAJceEblbd3FivB01PuyTxoDxpkjjejF/qtd+aEADXWXoFJUhSn+ITK
+   r9D0FpVPf2+oV0yExiblXJYi4xdBG4HFF4VuO3elYnAch+j63sj1SOQ9A
+   88QTn+YbWorne+uXFPMK5WZHDHnzyIXy7h/AWCDKfs4hRzGg042Dvhh4e
+   Ch25dAk9L8VfyL59r211wCHCxSr2dUoIhroW0T+f2sWJYGbpH6NNlWnv/
+   ydIBKlT1xZS3K9uAbqpB3MX9QsM+nSxjzv+XciWKNhtTxTn8rVFCCIIaY
+   u5SaYpickARZF5VXXwbSVo4+Abu5RB1PoOAkiAubHZJ13IzgxqoTB10Un
+   A==;
+X-CSE-ConnectionGUID: juAVFXE3QXSQEaZfQ7Fo8A==
+X-CSE-MsgGUID: KX5y2VM/S1iFXSMwPiOBFw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11311"; a="48297146"
+X-IronPort-AV: E=Sophos;i="6.12,306,1728975600"; 
+   d="scan'208";a="48297146"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jan 2025 00:52:29 -0800
+X-CSE-ConnectionGUID: dQkcDV2BSEe3QdFM38A2CA==
+X-CSE-MsgGUID: gzgOw4fmSA2IEm+R+0aFwQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="104469505"
+Received: from lkp-server01.sh.intel.com (HELO d63d4d77d921) ([10.239.97.150])
+  by orviesa007.jf.intel.com with ESMTP; 11 Jan 2025 00:52:25 -0800
+Received: from kbuild by d63d4d77d921 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1tWXEA-000KPL-09;
+	Sat, 11 Jan 2025 08:52:18 +0000
+Date: Sat, 11 Jan 2025 16:52:14 +0800
+From: kernel test robot <lkp@intel.com>
+To: Heiner Kallweit <hkallweit1@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
+	Russell King - ARM Linux <linux@armlinux.org.uk>,
+	Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+	David Miller <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	"linux-hwmon@vger.kernel.org" <linux-hwmon@vger.kernel.org>,
+	Guenter Roeck <linux@roeck-us.net>,
+	Jean Delvare <jdelvare@suse.com>
+Subject: Re: [PATCH net-next 3/3] net: phy: realtek: add hwmon support for
+ temp sensor on RTL822x
+Message-ID: <202501111618.Lro85HiT-lkp@intel.com>
+References: <dbfeb139-808f-4345-afe8-830b7f4da26a@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250106181219.1075-1-ouster@cs.stanford.edu> <20250106181219.1075-8-ouster@cs.stanford.edu>
- <20250110092537.GA66547@j66a10360.sqa.eu95> <CAGXJAmyYmizvm350vSGmJqdOt8d+d0soP95FGhBUQ5nr8kNqnw@mail.gmail.com>
-In-Reply-To: <CAGXJAmyYmizvm350vSGmJqdOt8d+d0soP95FGhBUQ5nr8kNqnw@mail.gmail.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Sat, 11 Jan 2025 16:30:32 +0800
-X-Gm-Features: AbW1kvYIEQZdJs7YWcpMjMbe7up0tj1Vg5Rse4C8M-4VS_yQfc6Nicei2SoJKWs
-Message-ID: <CAL+tcoCOSk2ezZ+OnsKBZc_JcO_U01X1q3KmTd6WhObuzbuzsA@mail.gmail.com>
-Subject: Re: [PATCH net-next v5 07/12] net: homa: create homa_sock.h and homa_sock.c
-To: John Ousterhout <ouster@cs.stanford.edu>
-Cc: "D. Wythe" <alibuda@linux.alibaba.com>, netdev@vger.kernel.org, pabeni@redhat.com, 
-	edumazet@google.com, horms@kernel.org, kuba@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <dbfeb139-808f-4345-afe8-830b7f4da26a@gmail.com>
 
-On Sat, Jan 11, 2025 at 8:20=E2=80=AFAM John Ousterhout <ouster@cs.stanford=
-.edu> wrote:
->
-> On Fri, Jan 10, 2025 at 1:25=E2=80=AFAM D. Wythe <alibuda@linux.alibaba.c=
-om> wrote:
-> >
-> > > +void homa_sock_unlink(struct homa_sock *hsk)
-> > > +{
-> > > +     struct homa_socktab *socktab =3D hsk->homa->port_map;
-> > > +     struct homa_socktab_scan *scan;
-> > > +
-> > > +     /* If any scans refer to this socket, advance them to refer to
-> > > +      * the next socket instead.
-> > > +      */
-> > > +     spin_lock_bh(&socktab->write_lock);
-> > > +     list_for_each_entry(scan, &socktab->active_scans, scan_links) {
-> > > +             if (!scan->next || scan->next->sock !=3D hsk)
-> > > +                     continue;
-> > > +             scan->next =3D (struct homa_socktab_links *)
-> > > +                             rcu_dereference(hlist_next_rcu(&scan->n=
-ext->hash_links));
-> > > +     }
-> >
-> > I can't get it.. Why not just mark this sock as unavailable and skip it
-> > when the iterator accesses it ?
-> >
-> > The iterator was used under rcu and given that your sock has the
-> > SOCK_RCU_FREE flag set, it appears that there should be no concerns
-> > regarding dangling pointers.
->
-> The RCU lock needn't be held for the entire lifetime of an iterator,
-> but rather only when certain functions are invoked, such as
-> homa_socktab_next. Thus it's possible for a socket to be reclaimed and
-> freed while a scan is in progress. This is described in the comments
-> for homa_socktab_start_scan. This behavior is necessary because of
-> homa_timer, which needs to call schedule in the middle of a scan and
-> that can't be done without releasing the RCU lock. I don't like this
-> complexity but I haven't been able to find a better alternative.
->
-> > > +     hsk->shutdown =3D true;
-> >
-> > From the actual usage of the shutdown member, I think you should use
-> > sock_set_flag(SOCK_DEAD), and to check it with sock_flag(SOCK_DEAD).
->
-> I wasn't aware of SOCK_DEAD until your email. After poking around a
-> bit to learn more about SOCK_DEAD, I am nervous about following your
-> advice. I'm still not certain exactly when SOCK_DEAD is set or who is
-> allowed to set it. The best information I could find was from ChatGPT
-> which says this:
->
-> "The SOCK_DEAD flag indicates that the socket is no longer referenced
-> by any user-space file descriptors or kernel entities. Essentially,
-> the socket is considered "dead" and ready to be cleaned up."
+Hi Heiner,
 
-Well, I'm surprised that the GPT is becoming more and more intelligent...
+kernel test robot noticed the following build errors:
 
-The above is correct as you can see from this call trace
-(__tcp_close()->sk_orphan()). Let me set TCP as an example, when the
-user decides to close a socket or accidently kill/exit the process,
-the socket would enter into __tcp_close(), which indicates that this
-socket has no longer relationship with its owner (application).
+[auto build test ERROR on net-next/main]
 
->
-> If ChatGPT isn't hallucinating, this would suggest that Homa shouldn't
-> set SOCK_DEAD, since the conditions above might not yet be true when
-> homa_sock_shutdown is invoked.
+url:    https://github.com/intel-lab-lkp/linux/commits/Heiner-Kallweit/net-phy-realtek-add-support-for-reading-MDIO_MMD_VEND2-regs-on-RTL8125-RTL8126/20250110-195043
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/dbfeb139-808f-4345-afe8-830b7f4da26a%40gmail.com
+patch subject: [PATCH net-next 3/3] net: phy: realtek: add hwmon support for temp sensor on RTL822x
+config: parisc-randconfig-r072-20250111 (https://download.01.org/0day-ci/archive/20250111/202501111618.Lro85HiT-lkp@intel.com/config)
+compiler: hppa-linux-gcc (GCC) 14.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250111/202501111618.Lro85HiT-lkp@intel.com/reproduce)
 
-Introducing a common usage about SOCK_DEAD might be a good choice. But
-if it's not that easy to implement, I think we can use the internal
-destruction mechanism instead like you did.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202501111618.Lro85HiT-lkp@intel.com/
 
->
-> Moreover, I'm concerned that some other entity might set SOCK_DEAD
-> before homa_sock_shutdown is invoked, in which case homa_sock_shutdown
-> would not cleanup the socket properly.
+All error/warnings (new ones prefixed by >>):
 
-No need to worry about that. If it happens, it usually means there is
-a bug somewhere and then we will fix it.
+>> drivers/net/phy/realtek_hwmon.c:3:10: error: expected '=', ',', ';', 'asm' or '__attribute__' before 'support'
+       3 |  * HWMON support for Realtek PHY's
+         |          ^~~~~~~
+>> drivers/net/phy/realtek_hwmon.c:3:33: warning: missing terminating ' character
+       3 |  * HWMON support for Realtek PHY's
+         |                                 ^
+>> drivers/net/phy/realtek_hwmon.c:3:33: error: missing terminating ' character
+       3 |  * HWMON support for Realtek PHY's
+         |                                 ^~
+>> drivers/net/phy/realtek_hwmon.c:5:39: error: stray '@' in program
+       5 |  * Author: Heiner Kallweit <hkallweit1@gmail.com>
+         |                                       ^
+   In file included from include/uapi/asm-generic/types.h:7,
+                    from ./arch/parisc/include/generated/uapi/asm/types.h:1,
+                    from include/linux/bitops.h:5,
+                    from include/linux/hwmon.h:15,
+                    from drivers/net/phy/realtek_hwmon.c:8:
+>> include/asm-generic/int-ll64.h:16:9: error: unknown type name '__s8'; did you mean '__u8'?
+      16 | typedef __s8  s8;
+         |         ^~~~
+         |         __u8
+   In file included from include/linux/kernel.h:27,
+                    from arch/parisc/include/asm/bug.h:5,
+                    from include/linux/bug.h:5,
+                    from include/linux/thread_info.h:13,
+                    from include/asm-generic/preempt.h:5,
+                    from ./arch/parisc/include/generated/asm/preempt.h:1,
+                    from include/linux/preempt.h:79,
+                    from include/linux/spinlock.h:56,
+                    from include/linux/phy.h:15,
+                    from drivers/net/phy/realtek_hwmon.c:9:
+>> include/linux/math.h:112:9: error: unknown type name '__s8'; did you mean '__u8'?
+     112 |         __##type numerator;                             \
+         |         ^~
+   include/linux/math.h:115:1: note: in expansion of macro '__STRUCT_FRACT'
+     115 | __STRUCT_FRACT(s8)
+         | ^~~~~~~~~~~~~~
+   include/linux/math.h:113:9: error: unknown type name '__s8'; did you mean '__u8'?
+     113 |         __##type denominator;                           \
+         |         ^~
+   include/linux/math.h:115:1: note: in expansion of macro '__STRUCT_FRACT'
+     115 | __STRUCT_FRACT(s8)
+         | ^~~~~~~~~~~~~~
+   In file included from include/linux/quota.h:42,
+                    from include/linux/fs.h:271,
+                    from include/linux/compat.h:17,
+                    from include/linux/ethtool.h:17,
+                    from include/linux/phy.h:16:
+>> include/uapi/linux/dqblk_xfs.h:54:9: error: unknown type name '__s8'; did you mean '__u8'?
+      54 |         __s8            d_version;      /* version of this structure */
+         |         ^~~~
+         |         __u8
+   include/uapi/linux/dqblk_xfs.h:55:9: error: unknown type name '__s8'; did you mean '__u8'?
+      55 |         __s8            d_flags;        /* FS_{USER,PROJ,GROUP}_QUOTA */
+         |         ^~~~
+         |         __u8
+   include/uapi/linux/dqblk_xfs.h:70:9: error: unknown type name '__s8'; did you mean '__u8'?
+      70 |         __s8            d_itimer_hi;    /* upper 8 bits of timer values */
+         |         ^~~~
+         |         __u8
+   include/uapi/linux/dqblk_xfs.h:71:9: error: unknown type name '__s8'; did you mean '__u8'?
+      71 |         __s8            d_btimer_hi;
+         |         ^~~~
+         |         __u8
+   include/uapi/linux/dqblk_xfs.h:72:9: error: unknown type name '__s8'; did you mean '__u8'?
+      72 |         __s8            d_rtbtimer_hi;
+         |         ^~~~
+         |         __u8
+   include/uapi/linux/dqblk_xfs.h:73:9: error: unknown type name '__s8'; did you mean '__u8'?
+      73 |         __s8            d_padding2;     /* padding2 - for future use */
+         |         ^~~~
+         |         __u8
+   include/uapi/linux/dqblk_xfs.h:166:9: error: unknown type name '__s8'; did you mean '__u8'?
+     166 |         __s8            qs_version;     /* version number for future changes */
+         |         ^~~~
+         |         __u8
+   include/uapi/linux/dqblk_xfs.h:168:9: error: unknown type name '__s8'; did you mean '__u8'?
+     168 |         __s8            qs_pad;         /* unused */
+         |         ^~~~
+         |         __u8
+   include/uapi/linux/dqblk_xfs.h:210:9: error: unknown type name '__s8'; did you mean '__u8'?
+     210 |         __s8                    qs_version;     /* version for future changes */
+         |         ^~~~
+         |         __u8
+   In file included from include/linux/ethtool.h:20:
+>> include/uapi/linux/ethtool.h:2523:9: error: unknown type name '__s8'; did you mean '__u8'?
+    2523 |         __s8    link_mode_masks_nwords;
+         |         ^~~~
+         |         __u8
+--
+   realtek_hwmon.c:3:10: error: expected '=', ',', ';', 'asm' or '__attribute__' before 'support'
+       3 |  * HWMON support for Realtek PHY's
+         |          ^~~~~~~
+   realtek_hwmon.c:3:33: warning: missing terminating ' character
+       3 |  * HWMON support for Realtek PHY's
+         |                                 ^
+   realtek_hwmon.c:3:33: error: missing terminating ' character
+       3 |  * HWMON support for Realtek PHY's
+         |                                 ^~
+   realtek_hwmon.c:5:39: error: stray '@' in program
+       5 |  * Author: Heiner Kallweit <hkallweit1@gmail.com>
+         |                                       ^
+   In file included from include/uapi/asm-generic/types.h:7,
+                    from arch/parisc/include/generated/uapi/asm/types.h:1,
+                    from include/linux/bitops.h:5,
+                    from include/linux/hwmon.h:15,
+                    from realtek_hwmon.c:8:
+>> include/asm-generic/int-ll64.h:16:9: error: unknown type name '__s8'; did you mean '__u8'?
+      16 | typedef __s8  s8;
+         |         ^~~~
+         |         __u8
+   In file included from include/linux/kernel.h:27,
+                    from arch/parisc/include/asm/bug.h:5,
+                    from include/linux/bug.h:5,
+                    from include/linux/thread_info.h:13,
+                    from include/asm-generic/preempt.h:5,
+                    from arch/parisc/include/generated/asm/preempt.h:1,
+                    from include/linux/preempt.h:79,
+                    from include/linux/spinlock.h:56,
+                    from include/linux/phy.h:15,
+                    from realtek_hwmon.c:9:
+>> include/linux/math.h:112:9: error: unknown type name '__s8'; did you mean '__u8'?
+     112 |         __##type numerator;                             \
+         |         ^~
+   include/linux/math.h:115:1: note: in expansion of macro '__STRUCT_FRACT'
+     115 | __STRUCT_FRACT(s8)
+         | ^~~~~~~~~~~~~~
+   include/linux/math.h:113:9: error: unknown type name '__s8'; did you mean '__u8'?
+     113 |         __##type denominator;                           \
+         |         ^~
+   include/linux/math.h:115:1: note: in expansion of macro '__STRUCT_FRACT'
+     115 | __STRUCT_FRACT(s8)
+         | ^~~~~~~~~~~~~~
+   In file included from include/linux/quota.h:42,
+                    from include/linux/fs.h:271,
+                    from include/linux/compat.h:17,
+                    from include/linux/ethtool.h:17,
+                    from include/linux/phy.h:16:
+>> include/uapi/linux/dqblk_xfs.h:54:9: error: unknown type name '__s8'; did you mean '__u8'?
+      54 |         __s8            d_version;      /* version of this structure */
+         |         ^~~~
+         |         __u8
+   include/uapi/linux/dqblk_xfs.h:55:9: error: unknown type name '__s8'; did you mean '__u8'?
+      55 |         __s8            d_flags;        /* FS_{USER,PROJ,GROUP}_QUOTA */
+         |         ^~~~
+         |         __u8
+   include/uapi/linux/dqblk_xfs.h:70:9: error: unknown type name '__s8'; did you mean '__u8'?
+      70 |         __s8            d_itimer_hi;    /* upper 8 bits of timer values */
+         |         ^~~~
+         |         __u8
+   include/uapi/linux/dqblk_xfs.h:71:9: error: unknown type name '__s8'; did you mean '__u8'?
+      71 |         __s8            d_btimer_hi;
+         |         ^~~~
+         |         __u8
+   include/uapi/linux/dqblk_xfs.h:72:9: error: unknown type name '__s8'; did you mean '__u8'?
+      72 |         __s8            d_rtbtimer_hi;
+         |         ^~~~
+         |         __u8
+   include/uapi/linux/dqblk_xfs.h:73:9: error: unknown type name '__s8'; did you mean '__u8'?
+      73 |         __s8            d_padding2;     /* padding2 - for future use */
+         |         ^~~~
+         |         __u8
+   include/uapi/linux/dqblk_xfs.h:166:9: error: unknown type name '__s8'; did you mean '__u8'?
+     166 |         __s8            qs_version;     /* version number for future changes */
+         |         ^~~~
+         |         __u8
+   include/uapi/linux/dqblk_xfs.h:168:9: error: unknown type name '__s8'; did you mean '__u8'?
+     168 |         __s8            qs_pad;         /* unused */
+         |         ^~~~
+         |         __u8
+   include/uapi/linux/dqblk_xfs.h:210:9: error: unknown type name '__s8'; did you mean '__u8'?
+     210 |         __s8                    qs_version;     /* version for future changes */
+         |         ^~~~
+         |         __u8
+   In file included from include/linux/ethtool.h:20:
+>> include/uapi/linux/ethtool.h:2523:9: error: unknown type name '__s8'; did you mean '__u8'?
+    2523 |         __s8    link_mode_masks_nwords;
+         |         ^~~~
+         |         __u8
 
-Thanks,
-Jason
 
->
-> Thus, it seems safest to me for Homa to have its own shutdown flag.
->
-> Let me know if you still think Homa should use SOCK_DEAD.
->
-> > > +
-> > > +     while (!list_empty(&hsk->dead_rpcs))
-> > > +             homa_rpc_reap(hsk, 1000);
-> >
-> > I take a quick look at homa_rpc_reap, although there is no possibility
-> > of an infinite loop founded currently, it still raises concerns.
-> >
-> > It might be better to let homa_rpc_reap() handle this kind of actions b=
-y itself.
-> > For example, code like that:
-> >
-> > homa_rpc_reap(hsk, 0, flags=3DRPC_FORCE_REAP|RPC_REAP_ALL);
-> >
-> > In this way, anyone making modifications to homa_rpc_reap() in the futu=
-re will
-> > at least be aware that there is such a case that needs to be handled we=
-ll.
->
-> I have changed the API for homa_rpc_reap to this:
->
-> int homa_rpc_reap(struct homa_sock *hsk, bool reap_all)
->
-> The caller can no longer specify a count. When reap_all isn't
-> specified, homa_rpc_reap determines for itself what represents a
-> "small amount of work" to perform; no need for the caller to figure
-> this out.
->
-> -John-
->
+vim +3 drivers/net/phy/realtek_hwmon.c
+
+   > 3	 * HWMON support for Realtek PHY's
+     4	 *
+   > 5	 * Author: Heiner Kallweit <hkallweit1@gmail.com>
+     6	 */
+     7	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
