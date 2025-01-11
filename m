@@ -1,98 +1,79 @@
-Return-Path: <netdev+bounces-157474-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157475-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D749A0A626
-	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 22:26:34 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 06E51A0A62B
+	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 22:41:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 754FA168D4E
-	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 21:26:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0C464165C0A
+	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 21:41:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 159001BB6A0;
-	Sat, 11 Jan 2025 21:26:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C59BA1B78F3;
+	Sat, 11 Jan 2025 21:41:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tPLJIwdE"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="qurNsf6e"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4CC81B3959
-	for <netdev@vger.kernel.org>; Sat, 11 Jan 2025 21:26:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 321972BAF9
+	for <netdev@vger.kernel.org>; Sat, 11 Jan 2025 21:41:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736630790; cv=none; b=BPQm1gAFcHLHDwZw6IMVhAxYphleW7izS+FCzDWSXOVPa+lUkrSWXHP6WwUcZ3mTYhJ3+GgFKPRg6G4X6W+vGhRQhtU+IMtyDDP7o6SmYyCxKAnKWZWd/0uGbEXBMA43i77z0OT0qgJystGFDkqm7Odi/BdgpA5IH48vH046868=
+	t=1736631708; cv=none; b=mAZXR4H/KEAmoVETNFjFS5If7w+Icq3omdHi+1b92Fs8uoEdCWpjUF5u66ReFfazChZHJRaIfRHVJ+0NqDZmuHrHnGj0zizX/l1hZS2XTAvui1qat3d5wlKP9mn9Z5T8t2ndIs2ERnzqMkEyVgoQzKH3GjziwiBrtOOZH8QgWNk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736630790; c=relaxed/simple;
-	bh=eEosaI2W18qezuS9Vla4XzrGSEHbnt81XoP63o1bUOQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NFGimzVQ/bnd4+/SHDkMBK75nrDr2WVKFaKNIR5c5KARC+xjKd9+euZnY4Qv2mgaoQxrR4GEOM8EFZMl+nT6mmTqdQEP+pqe9E96zQ32IeOdRs9YQa/qrZ8no7HEdkSwVl8BliMCksXBFwTkIZlXGSlQXcXOtvuO4gGNd5fd6PM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tPLJIwdE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1969CC4CED2;
-	Sat, 11 Jan 2025 21:26:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736630789;
-	bh=eEosaI2W18qezuS9Vla4XzrGSEHbnt81XoP63o1bUOQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=tPLJIwdEl4zKPCR2kH9ezOQwldpdwmZIXKikukiH7NLcj4LYFodQzOkOZBNKt3PCv
-	 rplbklodxtJ7hJdbg1bwMvK0YKwj/VKT6PvbZYipTvjMAR44PZWgJMh/rbRFEMtK8U
-	 gm/r+gU6GpNTHfDkatQFIzrBmfd6nFFsAKzkDtB+x+wgX/V10EPz2k8+zA6LIP1mCu
-	 QoiRDUpYBUWLeYrpOQDrEtKu1BgBxdCJSBy3LKIYzbagQPjKTF411X50gkWcoQ5yS6
-	 q6Blk+a95E7Qa2w2vIFJz6+IkJjWgBUr2OIS6kxzcVhPzI++BAtdSvFFaUV5KcRk/1
-	 jNcC0hRbBMxpA==
-Date: Sat, 11 Jan 2025 13:26:28 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Jamal Hadi Salim <jhs@mojatatu.com>
-Cc: netdev@vger.kernel.org, jiri@resnulli.us, xiyou.wangcong@gmail.com,
- davem@davemloft.net, edumazet@google.com, petrm@mellanox.com,
- security@kernel.org, g1042620637@gmail.com
-Subject: Re: [PATCH net v4 1/1] net: sched: fix ets qdisc OOB Indexing
-Message-ID: <20250111132628.0defb969@kernel.org>
-In-Reply-To: <CAM0EoMkRqod-MsMb60krtZ38SszwTR+3jjwE1BHPKe4m6oVArw@mail.gmail.com>
-References: <20250111145740.74755-1-jhs@mojatatu.com>
-	<20250111130154.6fddde00@kernel.org>
-	<CAM0EoMkRqod-MsMb60krtZ38SszwTR+3jjwE1BHPKe4m6oVArw@mail.gmail.com>
+	s=arc-20240116; t=1736631708; c=relaxed/simple;
+	bh=JN2eEwPqZhc+tVys8skUF03G8Z+xqntz/0bC3NN6kkA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dYoi57uGhxyLYXG1S0gc3jvcUor3w5aPcbjEA7ju4fG8LJFMtv1h8MKa55hW/S0P6RDGw4PgYGCIebIVxuV8UjcdlSJADzKQW2HHqZT6XGs7WEVWNDPd3hKp/zDDf4hkoMHPnA1FN0ZVzL6T7mhVzcXATVZnjECOIGahuvE5X1Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=qurNsf6e; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=ybRs8dEAOqsMt+HD8o6qcUbeprh1wp5VZJ/wXhiRSRI=; b=qurNsf6eaH8k1DWcWoS3z0pjcN
+	/ujFEmzQaIt0vjjDmJ2W8Nnogfh2t5I/OXuMxruDXlvtJhW5f9IqgE21ApXQjAwJpWc4lYke7+CU6
+	0W+wby+b6Wf7LFmtrI5QqX+FG7oE/jQnB3t9jbssvnPs+rpyvss7OjHvzkaIxDggqeic=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tWjEe-003dKH-Er; Sat, 11 Jan 2025 22:41:36 +0100
+Date: Sat, 11 Jan 2025 22:41:36 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+	David Miller <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>,
+	Russell King - ARM Linux <linux@armlinux.org.uk>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [PATCH net-next v2 1/3] net: phy: realtek: add support for
+ reading MDIO_MMD_VEND2 regs on RTL8125/RTL8126
+Message-ID: <2907c46a-d248-437d-836b-bdafa7a80587@lunn.ch>
+References: <7319d8f9-2d6f-4522-92e8-a8a4990042fb@gmail.com>
+ <e821b302-5fe6-49ab-aabd-05da500581c0@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e821b302-5fe6-49ab-aabd-05da500581c0@gmail.com>
 
-On Sat, 11 Jan 2025 16:17:45 -0500 Jamal Hadi Salim wrote:
-> > Code is identical to v1 here...
+On Sat, Jan 11, 2025 at 09:49:31PM +0100, Heiner Kallweit wrote:
+> RTL8125/RTL8126 don't support MMD access to the internal PHY, but
+> provide a mechanism to access at least all MDIO_MMD_VEND2 registers.
+> By exposing this mechanism standard MMD access functions can be used
+> to access the MDIO_MMD_VEND2 registers.
 > 
-> The inequality changed > vs >=
+> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
 
-Ah, that works!
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-> > While fixing the code, could you also trim the stack trace?
-> > Like this:
-> >
-> >    UBSAN: array-index-out-of-bounds in net/sched/sch_ets.c:93:20
-> >    index 18446744073709551615 is out of range for type 'ets_class [16]'
-> >    CPU: 0 UID: 0 PID: 1275 Comm: poc Not tainted 6.12.6-dirty #17
-> >    Call Trace:
-> >     <TASK>
-> >     ets_class_change+0x3d6/0x3f0
-> >     tc_ctl_tclass+0x251/0x910
-> >     rtnetlink_rcv_msg+0x170/0x6f0
-> >     netlink_rcv_skb+0x59/0x110
-> >     rtnetlink_rcv+0x15/0x30
-> >     netlink_unicast+0x1c3/0x2b0
-> >     netlink_sendmsg+0x239/0x4b0
-> >     ____sys_sendmsg+0x3e2/0x410
-> >     ___sys_sendmsg+0x88/0xe0
-> >     __sys_sendmsg+0x69/0xd0
-> >
-> > the rest has no value.  
-> 
-> Still want this change?
-
-No, it's good.
--- 
-pw-bot: under-review
+    Andrew
 
