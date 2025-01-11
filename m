@@ -1,76 +1,76 @@
-Return-Path: <netdev+bounces-157419-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157420-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C263A0A436
-	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 15:46:14 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6934EA0A439
+	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 15:46:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 594C316A1AB
-	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 14:46:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CDA8A3A817F
+	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 14:46:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEC411AA1D5;
-	Sat, 11 Jan 2025 14:46:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E138B1AA1D5;
+	Sat, 11 Jan 2025 14:46:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eEEPLAuH"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i2eAHOoq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73ECA374F1;
-	Sat, 11 Jan 2025 14:46:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AB411ACEB3;
+	Sat, 11 Jan 2025 14:46:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736606772; cv=none; b=OgNNjsdemLmc36unGa0t7K4kz+jZhXhSp0wZSUIaaK1xEyxk5Yl8hPH4WcCS/he7BSAy0iE4XNODN7kuOopcB5HS+WyA28ykt7gwcbAo6HgCxEycr9H+Cj2kN8ygqcfMwunHM8jcJrpBRc0cskNhD6nRlJXIGXfpmZjvto6VinI=
+	t=1736606782; cv=none; b=SceSpelx9pezt58aUpKFumIQegrArWwfs3kzTsXV9jLxxsxAsD03B+iwWmha+fxHzuo/BHPXx7h2dbb5qimPdv6W+7Knvp6plbnGxL/Ov2pU62zv8kaekoB9rBvwMq9iF1kwzWxN04dhmXCQxsqME3EjJmLOVyGtwJ5G8BYXrMs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736606772; c=relaxed/simple;
-	bh=gZDxZR6wAyYLXNuCzPTtGo2+1ddGAwssPkoAf/rfU/M=;
+	s=arc-20240116; t=1736606782; c=relaxed/simple;
+	bh=7Hv2+j1gqFRCBBX4Vhrv90cbVH+8CBZGIHZ8eZqUCbc=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=rXsz1W47yeAWfMdyUiwb8bY1tr6qaWydU6VBNQtyd4SEBrovh5VhnU5SWerhiHP27sHa6HhNBMQstQ2CAJFTlqruKLq3djvoDRbH64CwrG8/x9mTQANl6xTf4ebJWwdJGTGMVREpiVEhwFvrVvKAwBRvrDtUKCrIVeHxZswca+s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eEEPLAuH; arc=none smtp.client-ip=209.85.214.179
+	 MIME-Version; b=nPdK0mo4I4HyvwH+JUtlds31tE3Kzlq1F6byqDsTqM5S2PE22pYqGSX2DkSZgyu/quswbDUJHUYsWT4ls7OQMH4u/KnYetMQFmMvjPifufOXDdMBgaFIp2gio7Jg/9ddbv65mfY9C0qSipUdegXeGEqDInITe+GPNaRU7GWAQ2k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=i2eAHOoq; arc=none smtp.client-ip=209.85.214.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-2162c0f6a39so70850325ad.0;
-        Sat, 11 Jan 2025 06:46:11 -0800 (PST)
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-2162c0f6a39so70851595ad.0;
+        Sat, 11 Jan 2025 06:46:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736606771; x=1737211571; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1736606781; x=1737211581; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=XqXP+XBPEy2KO7wvgay//dP2eWiCD52Pp8bYG85Q+tA=;
-        b=eEEPLAuHHMbije7P4sGwrdRgVvwnGQz98eRHmDwu3wrxwpgHolH4PG+Qcsj3/gYvpt
-         aRs4bfKdNCHyd7/ZkJ3jnASXXFvtLkV1GL54yS/xjneEzsr/VjDabva8JURhEP+QKFNa
-         utbW3tfYOdXwKNZyrAaF0NfRauMJ2bAtY1VKisg+LgI1lXIthBXp6lMXx//DIcgSXUZ5
-         WY2njRMD4fKo8q/kTUMR5wgdU7FLhQ9Y2g5z4/yuaAHyvTPzWhnurQxKx+DntAbsmNsF
-         pJidaIQoEwRm+rnTQMHEliCIPlxnDnZivDcx/L+a++r7Dy/AiJsWoAQOPjflAO9J8PaX
-         duQw==
+        bh=ge7d5xxrX8Z1wZ+vMnyLBHwBGoZEYxbK6jsDnmmefh8=;
+        b=i2eAHOoqLUpXmzWEfVzecJqGxpPQjha2ALT2pFjQoCUWiy5LP23GSLAfKXeuXQr7IN
+         bOIe8x/fqr1VF108Vg3wV+TODsWJZi1joUlYCWqkUhAstwsw42prteuCAUxL7mGbXyxY
+         78Ihcan6M+PNRdremOy9LaSA6kZlpTi5rP7GDMP+AwvupP45ypNx2wVJ2v1uZMLfjajo
+         QlI4dcrizWQ2akZvQNfuArdONMg11HtfRBnMtGMJRWyU5QDAtQSqAC0qrEntgwoodhxS
+         89UC14KCfbLKhPDXixfpzzTFQYhqNGJjjmnCOumtRB/E39adsJXhX2ZQ5Ndo8TWy6M1+
+         BK5A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736606771; x=1737211571;
+        d=1e100.net; s=20230601; t=1736606781; x=1737211581;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=XqXP+XBPEy2KO7wvgay//dP2eWiCD52Pp8bYG85Q+tA=;
-        b=R7yqeGTHwDKqy+1GszsWQIbF0TndNpNCRYQZpmGGU5/V8bCEH4c5jFbeFS6eLuA7Uv
-         JkHKoKDaLEmgBDBSQKFwIWQQyiDHg89iXO8sjuxYvMaWditvtC9y+H/TII/KcQJDhiMb
-         9gaOf8D4HoRp+3IIQTG/O7lm78XoSwcro2hfPGQEeAFaThYKIJZU7bT9vBpPThhbIJ1w
-         0c3mZ+nMGoWNgFOAsirwILmuv71BvtsKpxFQp1111xa0vSc7VAtA1JrRQ3Sw6Fml/4cy
-         EDZqrHn5l8PBqDOBFqTtzE6GYoIFqvByxOaCJCwrQLqHH2KRM60Tm9ecfNkGqFXg87Lk
-         Mt2g==
-X-Forwarded-Encrypted: i=1; AJvYcCUy8d4SW22Ap4OrKsbq2eGSaKxMlYnqQBp40GD+ky4OjGNjvWoNNymsbrEJG+3cH2xj5NBgKvMW@vger.kernel.org, AJvYcCXzoQTetlAtMrkrkb3fUw66F22ZR53AsHHQPUvFof/RmmlKoB0WsE2cG+dimr7wx6DOb/ebAa0+ZAY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxnt5Tfb6heksbWxF9BtNCHwUYjI00QdzyBr2uE64rYjvyxASK8
-	Ey5rEZaU3Y7CXHYYYr729vE8ZxLCSbWDvo89A1VSqPuAXaNIGesm
-X-Gm-Gg: ASbGncuaJzkcSxqgwgWZhjezH3P1Wow5l5kWz1ofECVpDEsJvZHoeKwXvsuqLpPIrGX
-	Rr929xVqsIaafSOnJe55DuuPcqm/Hn1z1Doguo176Jr8Doaab1R1oH0Ovq+3OGuoYg+O9w6HyDn
-	AMKiTnfm+QOIOwe8OajIrLe6UqF801YT8sGDaw60//HnH/f/XSB0ANROK6+8NtIrozie1YfTtZ5
-	CZdz9BExzqOeET6XAgFqa13bxJqRoLBFuEn0ZwONhd7OA==
-X-Google-Smtp-Source: AGHT+IHapTVGieGw3Zi0oPDCdclVjWDB1Mointj4VmrN2gRujFZdeVWV20j8x/rJXX03yJpBUYqygA==
-X-Received: by 2002:a05:6a00:170a:b0:725:4915:c0f with SMTP id d2e1a72fcca58-72d32506c6fmr14309817b3a.11.1736606770684;
-        Sat, 11 Jan 2025 06:46:10 -0800 (PST)
+        bh=ge7d5xxrX8Z1wZ+vMnyLBHwBGoZEYxbK6jsDnmmefh8=;
+        b=V4Va8AaJ9mPBxetjgpV7CgZeOSlJK954GTtM1rRQm37x2X2OXbE0vs8Lh9zX9VwpqN
+         iDKxwE2wS2QdVrnPDL0LCfsAiTShJI6o9qRSQ4b2VMU+qJLHh0ZfbOxu33HZbBAGn17K
+         Ql0GhibPL6mcOKWs1C2gYOI+2lf0WZwG/yXa1VBhA6PSjQXljxFQO6scgArVGYdNbOuG
+         KWd84X1VOUROn/Nee6zixt2zXwcDOGvYJT+h4C0xM3Jcw1SglRrGLjxW8o1e7zK6VpVg
+         JU6o0Bf1H5ug6rBbPgJP5Z4laWSRA5aOt+ckTZq4IHgE5w+bNt++f1lEbl6D5kj5Fqz6
+         92Cg==
+X-Forwarded-Encrypted: i=1; AJvYcCUVEtfQSe0WcFL2dZvQ6CofcNHfRh4htepfi6ETuOdz/epTaeP9Ynpv1my2hObi5GolVlPOxtGb@vger.kernel.org, AJvYcCWwW7fb9NtjacwQhCS9G+oOHr2I/t9dWxXcq0bjGoJ3bkOqZLvmbYbqvtq768vix5IcM8QeLwCrtaU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyGzLBiNN08FpDp25miesCLINuisXWO1w6KnRLgOhx8YWmqmvxd
+	lrx/o/sGyxWnU5rvIq/cdkIKTMm/eNtrgbcZFmW4+ibRZUR8GoW4
+X-Gm-Gg: ASbGnct0M498OII0cMpzHnXoEihFl05xjnCS8yob9/NOK2gKxQYVddjP/hDeCDPnSXT
+	hzkT2pmZzNTdarznVsT+Zjq0KPCmdlA9eIUROpgQWqME6ccONYjjzXgp4+bb1VqdWlJGZiK4zaF
+	5LG6A4nNGlCKTq+5yS4z6/jHbLf/K5VJG1gUG0i25bjb1fIGDaLZz9PyEhyf8ksOqCayulhyFVN
+	eZQe6QNS+Yz/tolcPO9+jpXDpj60ibE+izMxE+hnTAoqQ==
+X-Google-Smtp-Source: AGHT+IHfsEL3ThCvlKUXlPsLOpROxWBTv7hhI7qC9cArSzhxPPijVCGDfHFNiAZHbvbTD+w71d82aQ==
+X-Received: by 2002:a05:6a00:4651:b0:728:15fd:dabb with SMTP id d2e1a72fcca58-72d324df33amr15417284b3a.8.1736606780674;
+        Sat, 11 Jan 2025 06:46:20 -0800 (PST)
 Received: from ap.. ([182.213.254.91])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72d40594a06sm3097466b3a.80.2025.01.11.06.46.01
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72d40594a06sm3097466b3a.80.2025.01.11.06.46.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 11 Jan 2025 06:46:10 -0800 (PST)
+        Sat, 11 Jan 2025 06:46:20 -0800 (PST)
 From: Taehee Yoo <ap420073@gmail.com>
 To: davem@davemloft.net,
 	kuba@kernel.org,
@@ -111,9 +111,9 @@ Cc: kory.maincent@bootlin.com,
 	willemb@google.com,
 	daniel.zahka@gmail.com,
 	ap420073@gmail.com
-Subject: [PATCH net-next v8 03/10] net: devmem: add ring parameter filtering
-Date: Sat, 11 Jan 2025 14:45:06 +0000
-Message-Id: <20250111144513.1289403-4-ap420073@gmail.com>
+Subject: [PATCH net-next v8 04/10] net: ethtool: add ring parameter filtering
+Date: Sat, 11 Jan 2025 14:45:07 +0000
+Message-Id: <20250111144513.1289403-5-ap420073@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250111144513.1289403-1-ap420073@gmail.com>
 References: <20250111144513.1289403-1-ap420073@gmail.com>
@@ -125,18 +125,19 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-If driver doesn't support ring parameter or tcp-data-split configuration
-is not sufficient, the devmem should not be set up.
-Before setup the devmem, tcp-data-split should be ON and hds-thresh
-value should be 0.
+While the devmem is running, the tcp-data-split and
+hds-thresh configuration should not be changed.
+If user tries to change tcp-data-split and threshold value while the
+devmem is running, it fails and shows extack message.
 
+Reviewed-by: Jakub Kicinski <kuba@kernel.org>
 Tested-by: Stanislav Fomichev <sdf@fomichev.me>
 Reviewed-by: Mina Almasry <almasrymina@google.com>
 Signed-off-by: Taehee Yoo <ap420073@gmail.com>
 ---
 
 v8:
- - No changes.
+ - Add Review tag from Jakub.
 
 v7:
  - Use dev->ethtool->hds members instead of calling ->get_ring_param().
@@ -155,38 +156,33 @@ v4:
 v3:
  - Patch added.
 
- net/core/devmem.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+ net/ethtool/rings.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
-diff --git a/net/core/devmem.c b/net/core/devmem.c
-index 0b6ed7525b22..c971b8aceac8 100644
---- a/net/core/devmem.c
-+++ b/net/core/devmem.c
-@@ -8,6 +8,7 @@
-  */
- 
- #include <linux/dma-buf.h>
-+#include <linux/ethtool_netlink.h>
- #include <linux/genalloc.h>
- #include <linux/mm.h>
- #include <linux/netdevice.h>
-@@ -140,6 +141,16 @@ int net_devmem_bind_dmabuf_to_queue(struct net_device *dev, u32 rxq_idx,
- 		return -ERANGE;
+diff --git a/net/ethtool/rings.c b/net/ethtool/rings.c
+index a381913a19f0..d8cd4e4d7762 100644
+--- a/net/ethtool/rings.c
++++ b/net/ethtool/rings.c
+@@ -252,6 +252,19 @@ ethnl_set_rings(struct ethnl_req_info *req_info, struct genl_info *info)
+ 		return -EINVAL;
  	}
  
-+	if (dev->ethtool->hds_config != ETHTOOL_TCP_DATA_SPLIT_ENABLED) {
-+		NL_SET_ERR_MSG(extack, "tcp-data-split is disabled");
-+		return -EINVAL;
++	if (dev_get_min_mp_channel_count(dev)) {
++		if (kernel_ringparam.tcp_data_split !=
++		    ETHTOOL_TCP_DATA_SPLIT_ENABLED) {
++			NL_SET_ERR_MSG(info->extack,
++				       "can't disable tcp-data-split while device has memory provider enabled");
++			return -EINVAL;
++		} else if (kernel_ringparam.hds_thresh) {
++			NL_SET_ERR_MSG(info->extack,
++				       "can't set non-zero hds_thresh while device is memory provider enabled");
++			return -EINVAL;
++		}
 +	}
 +
-+	if (dev->ethtool->hds_thresh) {
-+		NL_SET_ERR_MSG(extack, "hds-thresh is not zero");
-+		return -EINVAL;
-+	}
-+
- 	rxq = __netif_get_rx_queue(dev, rxq_idx);
- 	if (rxq->mp_params.mp_priv) {
- 		NL_SET_ERR_MSG(extack, "designated queue already memory provider bound");
+ 	/* ensure new ring parameters are within limits */
+ 	if (ringparam.rx_pending > ringparam.rx_max_pending)
+ 		err_attr = tb[ETHTOOL_A_RINGS_RX];
 -- 
 2.34.1
 
