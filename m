@@ -1,80 +1,80 @@
-Return-Path: <netdev+bounces-157465-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157466-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CA21A0A5FF
-	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 21:49:40 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 152AFA0A600
+	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 21:50:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9170F3A87AC
-	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 20:49:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 083853A879C
+	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 20:50:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 393BB1B86D5;
-	Sat, 11 Jan 2025 20:49:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F6661B87CC;
+	Sat, 11 Jan 2025 20:50:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kyxAQLWh"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eaAypScZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77D911B6CEF
-	for <netdev@vger.kernel.org>; Sat, 11 Jan 2025 20:49:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91A5E1B6CEF
+	for <netdev@vger.kernel.org>; Sat, 11 Jan 2025 20:50:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736628577; cv=none; b=kxMNYCui6VJfVBeFok+ZpEJjY/XsWCFqnFpWR7BrzxK6IrHRxUBOeI7IKNS+ONKjV+ThFdEHTd3xTVk3UeSAtCvhxDs02OUvt/AOoWRdDFESUmjRRiSZhEghkglYC2UFYSyzPr/y4JZFrFvypf+UfJOX1gD1/Dht0FlgpsbiXu8=
+	t=1736628624; cv=none; b=awlmJ8h5eLEda2SaA7LCI9ywWysGKeBj7pjOUwvG3lyjjOPdWJZl7KF5vTaj+9nYye7/kXjzOCdyT3WaHD54Y/TSk0BfPVyuQyGyLcRmVSn3zr9eyFOlXrlW4LQ43BM3bq9EB0ZWX51pMt6Zg+Xhc0qIo6dwHokHkPX+8dT3fdk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736628577; c=relaxed/simple;
-	bh=qP5/M6vseHnnBiZ/lTYidFMd3YWQ51fEwZPovPeFPNU=;
+	s=arc-20240116; t=1736628624; c=relaxed/simple;
+	bh=edpmv2FwTztCD1oIPx8saHsUEOhYhdIvpw5OWKKzrqc=;
 	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=t7C8SYFAS84pk1F6yvumL4sGQTQM3i8GcIisSjtUiCZyZ+Q42/KK6AWvKt3Zi9Nlbx68vKjQ0IZIf6CXIqjlOSREmexQbdGxDhG11s4zoFK8nIZZjsbgYwQEP6Xo988HFa/+AJq9yAhUdQR5wSV/P3AuTcIMBfdCX7lNs5Xq4/E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kyxAQLWh; arc=none smtp.client-ip=209.85.128.42
+	 In-Reply-To:Content-Type; b=tIu9P4XlWu6ad7dWEIe3/sKZYIyILrZln8BK6dRvGVrvdpFUWqOQsSG8QJa6bB99yx275wV89/6gQHB+L1qdtico+xyxweT0n7nYJZD7cFVjWDBV00jlVCsLzHnQjrT+GEHBSSAc+tRiXOFJg/3tK3HqNYU9ILaiUE4gx233wso=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eaAypScZ; arc=none smtp.client-ip=209.85.221.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-436637e8c8dso33454855e9.1
-        for <netdev@vger.kernel.org>; Sat, 11 Jan 2025 12:49:35 -0800 (PST)
+Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-385e06af753so1675931f8f.2
+        for <netdev@vger.kernel.org>; Sat, 11 Jan 2025 12:50:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736628574; x=1737233374; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1736628621; x=1737233421; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :references:cc:to:from:subject:user-agent:mime-version:date
          :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=2Z80OxOIrtkhN3EgoWKZwUPYC+py2jGJPJeNHPUOoGU=;
-        b=kyxAQLWhSG5EZ7p0InLPVzfSAR8C8dpEKWsevB/ttMCDzLZatKsEYz4+lSMZpJuqca
-         D4U8BMOSd1U15akPAGpMV+IzQSfLUpro19O62dy5xloSBk65jdlBklJF5haXEO/ztF9A
-         cL45zT3F4LQnL9h1KnNFOJ578a5GqOj9KPMA+oQ5sAiRhxP7EOKapGSpRV2D2P19WBAr
-         pfmWaTeOk6kue78ZJ3rDVQBYpMhG2PVJ9lR0/y7U5O3afgX2QMHngMvlgM4zeNv9s5A8
-         rpyEul1VF7qt4gFL2wlqEZSrIfiD84jCS0w55tLKggEYzxSpyUUEjSFeJlrDXe32BN/a
-         EtVA==
+        bh=WCw+wb/aBZTJa4PZYVAPx4v9UQv1Is9cJGEhTYrF3YM=;
+        b=eaAypScZ9tpm+R75X1bVQNLQOBfmnAQX/v6+ZiiYmIy+SvL/r7nMdyCWvkLUwGlA2J
+         W17JXg5xhhDKR3lLMoYIZSJtlRyL4HRQxr9CHEmbTN9iZPPoE6fMneQx0qgg3Vx5xyn7
+         O0LIbdNq3AtQFqOjtLXlMH96IfhbVXMFwbOeRz3KXEfhewXXfvOBenQ/1ad+DlHMgSAX
+         tXxcA21mh02IDZT3GESg8w9rKflwGWveK9hLuD+yEnqmsLe+bEUR++jWsfwvNz7XlOfh
+         h17fcSMKegDdDKvi6WQ/nxfmkALZ2S94HE4pa6nL81oPXTBSHbREUZUdmP42gRKOO78k
+         jI3Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736628574; x=1737233374;
+        d=1e100.net; s=20230601; t=1736628621; x=1737233421;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :references:cc:to:from:subject:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=2Z80OxOIrtkhN3EgoWKZwUPYC+py2jGJPJeNHPUOoGU=;
-        b=m4ZKaqv/JTrErhCKApP3N7JV+Y3N/g4jLnD2+VKgLJ4iM1q6fPMAxXT37HdRKAqVqx
-         An19zHs4gjKOsMpQjQtJExULcERHdgDLKRsyIKI3yGWdihqGglCn54MJgn2C+s1QzD6s
-         374kWritVqhleSnT9wsp35z80tjmEn/4OatTBjDfyLgDqKzW2RrL1zFjCpZzqv6YywsK
-         IV3tYCnyxlCAKmLWFEOlrXtP6mW6nd+VTUYTuzDQku7iXNXffQy5QaoF/g9E9AhMZQPS
-         bfq7DfYQdt5fcba+hV9ylns9WEJoY3SqNvoVPCUfZ5EHoaJ2cvrHmGmcYk5FXNP9ZWei
-         fbBw==
-X-Gm-Message-State: AOJu0Yz+kjR33RLXizjYw6uHOYt90w7kd2r4X3podELr1y57GOoJdd3f
-	jc1sGfVADqRkhWlQ2NS92G7W6w9fPLVB/VVnEQ1uBUKmENwwHiXt
-X-Gm-Gg: ASbGnctrjToGY/xPS0wW+k/HcfpS20bY+GrsbmLbybFV7sL1Ti2stnkSZ2uQuYJQ77V
-	3GnmcO6l6V+fw8ouPbwUnaY8g8ymzEqtJ+bT2gqWyxM3XtL1SYOIvWnTNt6gwodh3cZIBKMclbN
-	m4RskM29LJWZvfNrRggZ1JAjeVDaLRBvEf/sXfXfRGxFlMVTlhXVzJKKjPhozj5Siq+RJyCPz7u
-	l8Qwk2wqwTZLt3iKEJHNyZZbUcsoLMwvO4zA5Wn2RPKXGFVPC+tzr9ggML0nzoBWp+HcVFE0Iw2
-	JAGmKZD7sbOIPFoNf08x10oW0FslW0XrN/ExTele8VQxIsldlkALcyckxxMksOpqE5nJj8kz6FN
-	ph/tJDhTzUvtTvLfKZf9T3hqWdF1NV4DFTbrhJaHpI9jRfMC6
-X-Google-Smtp-Source: AGHT+IF4SzHq3sH8G20TxAEFMqdXF54qE0OEkYtbGWw0cG9JiNJrIb2kNNrC9DmRcuelQpjpISmiKA==
-X-Received: by 2002:a05:600c:310c:b0:436:840b:2593 with SMTP id 5b1f17b1804b1-436e26ad50emr150523875e9.15.1736628573707;
-        Sat, 11 Jan 2025 12:49:33 -0800 (PST)
+        bh=WCw+wb/aBZTJa4PZYVAPx4v9UQv1Is9cJGEhTYrF3YM=;
+        b=WIp4Dq/hopy1vgUjXRRmieqB+ktLtkAjwffiWSDkWPnhq+Vve14QKNmMsRS3v3CAVT
+         VvZqwPlSrT55N3LaaLHoOHXJzAvxdIFCmoqmjGkZy5LWy5iQp5erprVFPU4pti4b539B
+         gD9VJ6gVgE7kU044Cl2rDeh0kfyIPVoSdOTL6mkRDPlEKpdHcTFnH+vJ6UJukXm07vwc
+         Iv/dRVLEcIRPltB3dtmWnjB3JjIx/Fgi4vFWEwXre5YN7u3Xsgh4CodiKOsG5uzRppC6
+         jlBlISmSz05ht9gXamJahx1AOXD3Jn32KXE6p/OI2T4KN0MJ0MAuNci4qa2jwv3SLX8Y
+         FqVw==
+X-Gm-Message-State: AOJu0YyT7nLl/Sp01Fhzc/MhmjCyQZEg+5xlbesQ6JQjzwcM3UebPZhr
+	BIoML4qFLb6PePJ/lRtBlqZ7HezSbbahEBDZFc9hYFwlnPAOjaI9
+X-Gm-Gg: ASbGncu+87XxQamniP4DB6ukojBsYeqixNHjrsMugPIiF4RXG5Lx47zknzgvgJGWaUq
+	1fxNY/jp6PEPV/cL5eK1Sg5IZv5PHhTLxIkfHPfcU0rZOHMGvo+GrWDPvVujKJSzJn92wOMC+DO
+	fMBcRBNa/dqXc59iV879SOq6xrGxV4l4m4EOhJmLQ0bGh0VwTD617xMMGkMhyIUsqnk/6aHTsjo
+	RGVzaoTtTzKG9hc3TRr52pVbapSSkTq1uhC87qP4pjN/b0u5+wxFvb3fBbgVzWNo1+e4XApS6pr
+	BaSJDHyiGwZgBcl10byU08dYYx4AeeOHbNjK5XuELCD6YVWSprJnqQZW8toA3HMp1m4ibuWV3gD
+	b1Ro0gXk6suykLkgz4u4JqDTIiM7po7NmPcdX1zHI5vVCp52m
+X-Google-Smtp-Source: AGHT+IF4rmsM6QExNMO/BiyBrvn7TJGX6algQIlJJF68pR1CVBAHX1w4c0FGcp9tBn/o/rrsFGA13w==
+X-Received: by 2002:a5d:6d8a:0:b0:386:4034:f9a8 with SMTP id ffacd0b85a97d-38a8733693fmr15330457f8f.38.1736628620784;
+        Sat, 11 Jan 2025 12:50:20 -0800 (PST)
 Received: from ?IPV6:2a02:3100:a90d:e100:d8f1:2ffc:4f48:89fd? (dynamic-2a02-3100-a90d-e100-d8f1-2ffc-4f48-89fd.310.pool.telefonica.de. [2a02:3100:a90d:e100:d8f1:2ffc:4f48:89fd])
-        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-436e9d8faa5sm94020955e9.1.2025.01.11.12.49.31
+        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-38a8e4c1f2esm8065589f8f.98.2025.01.11.12.50.19
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 11 Jan 2025 12:49:32 -0800 (PST)
-Message-ID: <e821b302-5fe6-49ab-aabd-05da500581c0@gmail.com>
-Date: Sat, 11 Jan 2025 21:49:31 +0100
+        Sat, 11 Jan 2025 12:50:20 -0800 (PST)
+Message-ID: <c566551b-c915-4e34-9b33-129a6ddd6e4c@gmail.com>
+Date: Sat, 11 Jan 2025 21:50:19 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,8 +82,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: [PATCH net-next v2 1/3] net: phy: realtek: add support for reading
- MDIO_MMD_VEND2 regs on RTL8125/RTL8126
+Subject: [PATCH net-next v2 2/3] net: phy: move realtek PHY driver to its own
+ subdirectory
 From: Heiner Kallweit <hkallweit1@gmail.com>
 To: Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
  David Miller <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
@@ -140,46 +140,75 @@ In-Reply-To: <7319d8f9-2d6f-4522-92e8-a8a4990042fb@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-RTL8125/RTL8126 don't support MMD access to the internal PHY, but
-provide a mechanism to access at least all MDIO_MMD_VEND2 registers.
-By exposing this mechanism standard MMD access functions can be used
-to access the MDIO_MMD_VEND2 registers.
+In preparation of adding a source file with hwmon support, move the
+Realtek PHY driver to its own subdirectory and rename realtek.c to
+realtek_main.c.
 
 Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
 ---
- drivers/net/phy/realtek.c | 12 ++++++++++--
- 1 file changed, 10 insertions(+), 2 deletions(-)
+ drivers/net/phy/Kconfig                               | 5 +----
+ drivers/net/phy/Makefile                              | 2 +-
+ drivers/net/phy/realtek/Kconfig                       | 5 +++++
+ drivers/net/phy/realtek/Makefile                      | 3 +++
+ drivers/net/phy/{realtek.c => realtek/realtek_main.c} | 0
+ 5 files changed, 10 insertions(+), 5 deletions(-)
+ create mode 100644 drivers/net/phy/realtek/Kconfig
+ create mode 100644 drivers/net/phy/realtek/Makefile
+ rename drivers/net/phy/{realtek.c => realtek/realtek_main.c} (100%)
 
-diff --git a/drivers/net/phy/realtek.c b/drivers/net/phy/realtek.c
-index f65d7f1f3..af9874143 100644
---- a/drivers/net/phy/realtek.c
-+++ b/drivers/net/phy/realtek.c
-@@ -736,7 +736,11 @@ static int rtlgen_read_mmd(struct phy_device *phydev, int devnum, u16 regnum)
- {
- 	int ret;
+diff --git a/drivers/net/phy/Kconfig b/drivers/net/phy/Kconfig
+index dc625f2b3..e043d3ef1 100644
+--- a/drivers/net/phy/Kconfig
++++ b/drivers/net/phy/Kconfig
+@@ -350,10 +350,7 @@ config QSEMI_PHY
+ 	help
+ 	  Currently supports the qs6612
  
--	if (devnum == MDIO_MMD_PCS && regnum == MDIO_PCS_EEE_ABLE) {
-+	if (devnum == MDIO_MMD_VEND2) {
-+		rtl821x_write_page(phydev, regnum >> 4);
-+		ret = __phy_read(phydev, 0x10 + ((regnum & 0xf) >> 1));
-+		rtl821x_write_page(phydev, 0);
-+	} else if (devnum == MDIO_MMD_PCS && regnum == MDIO_PCS_EEE_ABLE) {
- 		rtl821x_write_page(phydev, 0xa5c);
- 		ret = __phy_read(phydev, 0x12);
- 		rtl821x_write_page(phydev, 0);
-@@ -760,7 +764,11 @@ static int rtlgen_write_mmd(struct phy_device *phydev, int devnum, u16 regnum,
- {
- 	int ret;
+-config REALTEK_PHY
+-	tristate "Realtek PHYs"
+-	help
+-	  Supports the Realtek 821x PHY.
++source "drivers/net/phy/realtek/Kconfig"
  
--	if (devnum == MDIO_MMD_AN && regnum == MDIO_AN_EEE_ADV) {
-+	if (devnum == MDIO_MMD_VEND2) {
-+		rtl821x_write_page(phydev, regnum >> 4);
-+		ret = __phy_write(phydev, 0x10 + ((regnum & 0xf) >> 1), val);
-+		rtl821x_write_page(phydev, 0);
-+	} else if (devnum == MDIO_MMD_AN && regnum == MDIO_AN_EEE_ADV) {
- 		rtl821x_write_page(phydev, 0xa5d);
- 		ret = __phy_write(phydev, 0x10, val);
- 		rtl821x_write_page(phydev, 0);
+ config RENESAS_PHY
+ 	tristate "Renesas PHYs"
+diff --git a/drivers/net/phy/Makefile b/drivers/net/phy/Makefile
+index 39b72b464..c8dac6e92 100644
+--- a/drivers/net/phy/Makefile
++++ b/drivers/net/phy/Makefile
+@@ -95,7 +95,7 @@ obj-$(CONFIG_NXP_CBTX_PHY)	+= nxp-cbtx.o
+ obj-$(CONFIG_NXP_TJA11XX_PHY)	+= nxp-tja11xx.o
+ obj-y				+= qcom/
+ obj-$(CONFIG_QSEMI_PHY)		+= qsemi.o
+-obj-$(CONFIG_REALTEK_PHY)	+= realtek.o
++obj-$(CONFIG_REALTEK_PHY)	+= realtek/
+ obj-$(CONFIG_RENESAS_PHY)	+= uPD60620.o
+ obj-$(CONFIG_ROCKCHIP_PHY)	+= rockchip.o
+ obj-$(CONFIG_SMSC_PHY)		+= smsc.o
+diff --git a/drivers/net/phy/realtek/Kconfig b/drivers/net/phy/realtek/Kconfig
+new file mode 100644
+index 000000000..5b9e6e6db
+--- /dev/null
++++ b/drivers/net/phy/realtek/Kconfig
+@@ -0,0 +1,5 @@
++# SPDX-License-Identifier: GPL-2.0-only
++config REALTEK_PHY
++	tristate "Realtek PHYs"
++	help
++	  Currently supports RTL821x/RTL822x and fast ethernet PHYs
+diff --git a/drivers/net/phy/realtek/Makefile b/drivers/net/phy/realtek/Makefile
+new file mode 100644
+index 000000000..996a80642
+--- /dev/null
++++ b/drivers/net/phy/realtek/Makefile
+@@ -0,0 +1,3 @@
++# SPDX-License-Identifier: GPL-2.0
++realtek-y			+= realtek_main.o
++obj-$(CONFIG_REALTEK_PHY)	+= realtek.o
+diff --git a/drivers/net/phy/realtek.c b/drivers/net/phy/realtek/realtek_main.c
+similarity index 100%
+rename from drivers/net/phy/realtek.c
+rename to drivers/net/phy/realtek/realtek_main.c
 -- 
 2.47.1
 
