@@ -1,50 +1,73 @@
-Return-Path: <netdev+bounces-157359-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157360-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22666A0A06B
-	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 03:50:19 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE45EA0A0B8
+	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 04:44:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C4A07188E1FC
-	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 02:50:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9D0B43A6C83
+	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 03:44:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F8C9148FF9;
-	Sat, 11 Jan 2025 02:50:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FDCB17BB6;
+	Sat, 11 Jan 2025 03:44:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OfBCiapx"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="Li4aAtpz"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-fw-33001.amazon.com (smtp-fw-33001.amazon.com [207.171.190.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 386CE1474A7
-	for <netdev@vger.kernel.org>; Sat, 11 Jan 2025 02:50:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E419F14EC46
+	for <netdev@vger.kernel.org>; Sat, 11 Jan 2025 03:44:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.190.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736563811; cv=none; b=OYbhdL/JBFlOGoGtoZKqWQ+g4ChS3sww98FcQSI3TOof4rTvy1q/pm/WuS6dTqZaKuWm+7FOwhupuUqTn3WVvY1yD0X34dCp3kk6JqL++E7TzRgOAgWeKmV4rSzCvxiRNWT+qEenkPJWIHWYGN+mZMve2HCu1AUTMtrPPYLoQYE=
+	t=1736567055; cv=none; b=dY9jHmSd2d6pguZ1+ssM8daa2TNS6VXZDEbOHNMFbM0erhqso8MGPgvApI7NEuQwSAURqJG/PK/3sd8eLxlhC6KQnVYmsPOnD5BcQN8rPuXqd2lW/fo1X6xqBHqAwKnYZr15JH72eyXerlbqZjCc80APdpcpPcM2yX/z1cFG14g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736563811; c=relaxed/simple;
-	bh=HGZz2Cm9j/hO3JHoG13ROjPnYsxxaimYWUmdVAOnw6A=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=usrJgaImMoA8fo9u85jA1iS84mX7Z/5Dck5EA7RH4QdW/bBmSbrS2OgN1Yl+55Ys2ZEUrhQRgyuB2x/fce20waClsDNdzpKxfIgl8693i32KtxfCZsnnkX7AW/IpA8YrnlJ+LRemvgOTHGXbD/Mt4ouKA1O5r3dChwcFC/8QEHo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OfBCiapx; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B77CEC4CEE2;
-	Sat, 11 Jan 2025 02:50:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736563810;
-	bh=HGZz2Cm9j/hO3JHoG13ROjPnYsxxaimYWUmdVAOnw6A=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=OfBCiapxmNG9IqHtys9t7QY0A7a3nSAd//8PoRQZjx452iuRfQ+zmYWfDHUiMNw3s
-	 QKV4xABibHWSM+q7FqkzGvBI0PP5Hd3sIM2P9TtS7d78XCeh+lDJHB9dXnlz8sx7eY
-	 jquKxssgRhRBGMuc6I0EvwRJlkDbGtXQeATHZc+VzXVoEr1EqU5C5AWW9x0yadnP4u
-	 zq9R8fGJdkzPS7M5bxtx04vwX9Kf0YCRJwUHVFP+ojpNMcEyj9QW6qzPye/o/vEpQu
-	 JjUueuiHHGiTVFX+utNKu+1OoTQbZVu1AkLDP2lm6CeQFOmQak0aasqy+dih/QgNa7
-	 OSbVOKB3siiDQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB40F380AA57;
-	Sat, 11 Jan 2025 02:50:33 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1736567055; c=relaxed/simple;
+	bh=x+0qqG9QwZWVL35ZHMIevNjim+czdYj663VRq0ZZfN0=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=tTDV52wOac6/C59txQqHp5MgtxxXQgSyrMsjY7hysXzNdJ5beRMmD88BNyjhkTOW/hvcEaS4XtdVYIsP43HYVg7hwcgMEGcatWHr3AEJ7O0lxHYMAvd7ZlEpQ5XWSRLWMd6eBlXA2+SAkgNRzUTI6znX3cRZh7/b7cFUHzNmIuM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=Li4aAtpz; arc=none smtp.client-ip=207.171.190.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1736567054; x=1768103054;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=Sn8zRHw6JsEvosRpyglZVO4wxvYM3UM40osZG5XiSMc=;
+  b=Li4aAtpzIqiseY6TGLIkd7mz95Ix0HIIceXS22bYlaqkUkC72/8TJEyL
+   jYN4bBPzqeziguKsKARl8I6Ubmv4My8kM0KGAyYmXEBw1/Wf5yw+QMCaB
+   Kze2Mrf1rE95RNw6OESh6VGUmt7/86wRJOvPOYZZJRx3S+tpdgMY5X8k9
+   U=;
+X-IronPort-AV: E=Sophos;i="6.12,306,1728950400"; 
+   d="scan'208";a="400093011"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-33001.sea14.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jan 2025 03:44:08 +0000
+Received: from EX19MTAUWB001.ant.amazon.com [10.0.21.151:56041]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.58.22:2525] with esmtp (Farcaster)
+ id f1f04095-8c94-4406-b45e-59978379a846; Sat, 11 Jan 2025 03:44:07 +0000 (UTC)
+X-Farcaster-Flow-ID: f1f04095-8c94-4406-b45e-59978379a846
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
+ Sat, 11 Jan 2025 03:44:00 +0000
+Received: from 6c7e67c6786f.amazon.com (10.118.249.35) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
+ Sat, 11 Jan 2025 03:43:56 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <jdamato@fastly.com>
+CC: <davem@davemloft.net>, <donald.hunter@redhat.com>, <edumazet@google.com>,
+	<horms@kernel.org>, <kuba@kernel.org>, <kuni1840@gmail.com>,
+	<kuniyu@amazon.com>, <netdev@vger.kernel.org>, <pabeni@redhat.com>
+Subject: Re: [PATCH v1 net-next 06/12] af_unix: Reuse out_pipe label in unix_stream_sendmsg().
+Date: Sat, 11 Jan 2025 12:43:47 +0900
+Message-ID: <20250111034347.28116-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+In-Reply-To: <Z4GYD_9dqOi7mXOj@LQ3V64L9R2>
+References: <Z4GYD_9dqOi7mXOj@LQ3V64L9R2>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,41 +75,75 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: hide the definition of dev_get_by_napi_id()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173656383275.2274657.14079899348377316703.git-patchwork-notify@kernel.org>
-Date: Sat, 11 Jan 2025 02:50:32 +0000
-References: <20250110004924.3212260-1-kuba@kernel.org>
-In-Reply-To: <20250110004924.3212260-1-kuba@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
- jdamato@fastly.com
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D032UWB001.ant.amazon.com (10.13.139.152) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Thu,  9 Jan 2025 16:49:24 -0800 you wrote:
-> There are no module callers of dev_get_by_napi_id(),
-> and commit d1cacd747768 ("netdev: prevent accessing NAPI instances
-> from another namespace") proves that getting NAPI by id
-> needs to be done with care. So hide dev_get_by_napi_id().
+From: Joe Damato <jdamato@fastly.com>
+Date: Fri, 10 Jan 2025 13:58:39 -0800
+> On Sat, Jan 11, 2025 at 12:22:31AM +0900, Kuniyuki Iwashima wrote:
+> > From: Simon Horman <horms@kernel.org>
+> > Date: Fri, 10 Jan 2025 11:43:44 +0000
+> > > On Fri, Jan 10, 2025 at 06:26:35PM +0900, Kuniyuki Iwashima wrote:
+> > > > This is a follow-up of commit d460b04bc452 ("af_unix: Clean up
+> > > > error paths in unix_stream_sendmsg().").
+> > > > 
+> > > > If we initialise skb with NULL in unix_stream_sendmsg(), we can
+> > > > reuse the existing out_pipe label for the SEND_SHUTDOWN check.
+> > > > 
+> > > > Let's rename do it and adjust the existing label as out_pipe_lock.
+> > > > 
+> > > > While at it, size and data_len are moved to the while loop scope.
+> > > > 
+> > > > Suggested-by: Paolo Abeni <pabeni@redhat.com>
+> > > > Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+> > > > ---
+> > > >  net/unix/af_unix.c | 23 +++++++++--------------
+> > > >  1 file changed, 9 insertions(+), 14 deletions(-)
+> > > > 
+> > > > diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
+> > > > index b190ea8b8e9d..6505eeab9957 100644
+> > > > --- a/net/unix/af_unix.c
+> > > > +++ b/net/unix/af_unix.c
+> > > 
+> > > ...
+> > > 
+> > > > @@ -2285,16 +2283,12 @@ static int unix_stream_sendmsg(struct socket *sock, struct msghdr *msg,
+> > > >  		}
+> > > >  	}
+> > > >  
+> > > > -	if (READ_ONCE(sk->sk_shutdown) & SEND_SHUTDOWN) {
+> > > > -		if (!(msg->msg_flags & MSG_NOSIGNAL))
+> > > > -			send_sig(SIGPIPE, current, 0);
+> > > > -
+> > > > -		err = -EPIPE;
+> > > > -		goto out_err;
+> > > > -	}
+> > > > +	if (READ_ONCE(sk->sk_shutdown) & SEND_SHUTDOWN)
+> > > 
+> > > Hi Iwashima-san,
+> > > 
+> > > I think you need to set reason here.
+> > > 
+> > > Flagged by W=1 builds with clang-19.
+> > 
+> > Hi Simon,
+> > 
+> > I didn't set it here because skb == NULL and kfree_skb()
+> > doesn't touch reason, and KMSAN won't complain about uninit.
+> > 
+> > Should I use SKB_NOT_DROPPED_YET or drop patch 6 or leave
+> > it as is ?
+> > 
+> > What do you think ?
 > 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> My vote is that SKB_NOT_DROPPED_YET is not appropriate here.
+
+Thanks, I felt the same.
+
 > 
-> [...]
+> Maybe SKB_DROP_REASON_SOCKET_CLOSE since it is in SEND_SHUTDOWN
+> state?
 
-Here is the summary with links:
-  - [net-next] net: hide the definition of dev_get_by_napi_id()
-    https://git.kernel.org/netdev/net-next/c/21520e74ba45
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+This will look confusing too, so I'll drop this patch.
 
