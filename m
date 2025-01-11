@@ -1,59 +1,63 @@
-Return-Path: <netdev+bounces-157335-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157336-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1888A09FE7
-	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 02:16:46 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D3B6A0A00C
+	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 02:27:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7FAD7188F904
-	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 01:16:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 509AD7A2E13
+	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 01:26:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BF3710940;
-	Sat, 11 Jan 2025 01:16:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF8E82E403;
+	Sat, 11 Jan 2025 01:25:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mxnZxTRR"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I0WWIKrO"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D8B05C96;
-	Sat, 11 Jan 2025 01:16:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB49828370
+	for <netdev@vger.kernel.org>; Sat, 11 Jan 2025 01:25:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736558200; cv=none; b=brczzx+x+UfXfnz3GDNx5gYb79DIxbm/flr1JbuV0ioCXjI6vxRhTr/b7LW8GMXZMk1j4P0/BfSmreKVUmWU7JvfMiXAKn42SBfxtWCiGEFBxx5WH4VSNsAG0d3pfWjzuDNFJ0xh37Wr6gqUEdACNG6Z0M3730JJn6mM4gDXLTY=
+	t=1736558737; cv=none; b=pAOdKE/sfEa4VnvuEAeqUPxHzrWPDJ3F+nbRFkb1RT1BN7eExT/zvxMLBQxVnMcUvoVgOeHvDDmtsxps1QNgg128Ql/LzruMtQViyS96eOq4BAhjec5kumy1hmETpCXi1uhsRXPpx8jkt6xcU5ormnI65qPr2lC2OJ/VzQDJe6k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736558200; c=relaxed/simple;
-	bh=N//O/4kEjwuDXDFnjwe6re/D/EDYzyDmRFj8C6C5drI=;
+	s=arc-20240116; t=1736558737; c=relaxed/simple;
+	bh=lzbrKQhZYNhaqsce52Nn4TtWDkUtjybvDXHuvA2JmC0=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NmvoA+ZEmr7hIWUkhal9IQ6Jq0LyABT8BONYxWeA4DW5RiH3fd4ns36JyktVHmnqPHnohRqnL1uF9iv/20AJ5EfpQmO7ZQTOGag8sj6LawRI/Z8WKbwIvAVesFhBtzdAq0X0aLWJqz6lqjK3WUDseRQj36WMEteGhhgj7oQIwMA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mxnZxTRR; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7BF89C4CEDF;
-	Sat, 11 Jan 2025 01:16:39 +0000 (UTC)
+	 MIME-Version:Content-Type; b=XtK5ab0mUWNZN+dDI+lx+HlZcC7ekg/W2CtG+dkkMwLM+Q5TNdnzrR+zNYeSC73vTfV8yZxEdnPHjZmnyZA3WQt4eTVmAC1amkqRh0ZOFq/8bBEb6Xydy/HOILorvQUfVCU/bGDnYMpyEISuyRA9bX4GqwOm2+ncr7Qv068c0qk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I0WWIKrO; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1B154C4CEE0;
+	Sat, 11 Jan 2025 01:25:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736558199;
-	bh=N//O/4kEjwuDXDFnjwe6re/D/EDYzyDmRFj8C6C5drI=;
+	s=k20201202; t=1736558737;
+	bh=lzbrKQhZYNhaqsce52Nn4TtWDkUtjybvDXHuvA2JmC0=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=mxnZxTRRGHZfA0fxIsZnreynkVM9sWMseRe2DIN1e4H79Ukol43Hbu/h6B0YoZi3F
-	 lqdAX5YCbOldP7x3yAFnJxguwBVdxTO1j/I77UCFTpHf6gGDvWA3cwJ7Q8b6Jdi4YF
-	 Mns5NVxbWTcaERotFQ67MhkzTLmFQdpe6PBy6U6nEcAL8hfNmeO13zZaVl51TSjqlG
-	 QgEfEZVsVbE85eOemj1vZKQnk78XZQbCWqg9pajC/C1y+yH2HVgjtqrIYgyzCcIQ1/
-	 EwSjNM92RAmIe2ar+Rx0Keoj2nU2HW+9klpZtIlo4TPUts6xpM9t8XPkUOwQDPMPqb
-	 BZSXEnTwppdrQ==
-Date: Fri, 10 Jan 2025 17:16:38 -0800
+	b=I0WWIKrOgyUwc5ZrqExjY3TQZUvRVmjEsUCvWlfrI7eucQjSbnpSiNo/2zvdzQjDm
+	 yUBdnsr/l0c79L64z7EJaiMoUrNilEuc8dCyJnfLV2zgkqlBUHwhtRAgvKy7Gs2U/J
+	 ijP9J9AswhVqlwCObgGpHFEbiVatLBsBxIkf3rpASHaL6BGY31on/8SZZHJQXz6huE
+	 7171FGCKjTW+ee5FpfYKiZ2KIG8dgr5XLGFiFRzBDGyeTr7/oBTtskGJR9funEO7uR
+	 FzAnFccFxc752xodRNgSF0QBtHi7R/pQ0NkHhbCUucvWzMBkvm7rNolJ/Aq3jCT1Ne
+	 OIh0o0R7/XpFA==
+Date: Fri, 10 Jan 2025 17:25:36 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Alessandro Zanni <alessandro.zanni87@gmail.com>, petrm@nvidia.com
-Cc: Hangbin Liu <liuhangbin@gmail.com>, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com, shuah@kernel.org,
- netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] selftests/net/forwarding: teamd command not found
-Message-ID: <20250110171638.58114f75@kernel.org>
-In-Reply-To: <s564xh7c2xtmjz2cfwqq3zl4krjxiy4hqjeuvjpa6uhabcgvcb@k662t5irg2yi>
-References: <20250110000752.81062-1-alessandro.zanni87@gmail.com>
-	<Z4CdYzmSn2cySE_h@fedora>
-	<s564xh7c2xtmjz2cfwqq3zl4krjxiy4hqjeuvjpa6uhabcgvcb@k662t5irg2yi>
+To: Jacob Keller <jacob.e.keller@intel.com>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>, <davem@davemloft.net>,
+ <pabeni@redhat.com>, <edumazet@google.com>, <andrew+netdev@lunn.ch>,
+ <netdev@vger.kernel.org>, <anton.nadezhdin@intel.com>,
+ <przemyslaw.kitszel@intel.com>, <milena.olech@intel.com>,
+ <arkadiusz.kubalewski@intel.com>, <richardcochran@gmail.com>, Karol
+ Kolacinski <karol.kolacinski@intel.com>, Rinitha S <sx.rinitha@intel.com>
+Subject: Re: [PATCH net-next 08/13] ice: use rd32_poll_timeout_atomic in
+ ice_read_phy_tstamp_ll_e810
+Message-ID: <20250110172536.7165c528@kernel.org>
+In-Reply-To: <55655440-71b4-49e0-9fc8-d8b1b4f77ab4@intel.com>
+References: <20250108221753.2055987-1-anthony.l.nguyen@intel.com>
+	<20250108221753.2055987-9-anthony.l.nguyen@intel.com>
+	<20250109182148.398f1cf1@kernel.org>
+	<55655440-71b4-49e0-9fc8-d8b1b4f77ab4@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,48 +67,59 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Fri, 10 Jan 2025 15:35:23 +0100 Alessandro Zanni wrote:
-> On Fri, Jan 10, 2025 at 04:09:07AM +0000, Hangbin Liu wrote:
-> > On Fri, Jan 10, 2025 at 01:07:44AM +0100, Alessandro Zanni wrote:  
-> > > Running "make kselftest TARGETS=net/forwarding" results in several
-> > > occurrences of the same error:
-> > >  ./lib.sh: line 787: teamd: command not found
-> > > 
-> > > Since many tests depends on teamd, this fix stops the tests if the
-> > > teamd command is not installed.
-> > > 
-> > > Signed-off-by: Alessandro Zanni <alessandro.zanni87@gmail.com>
-> > > ---
-> > >  tools/testing/selftests/net/forwarding/lib.sh | 1 +
-> > >  1 file changed, 1 insertion(+)
-> > > 
-> > > diff --git a/tools/testing/selftests/net/forwarding/lib.sh b/tools/testing/selftests/net/forwarding/lib.sh
-> > > index 7337f398f9cc..a6a74a4be4bf 100644
-> > > --- a/tools/testing/selftests/net/forwarding/lib.sh
-> > > +++ b/tools/testing/selftests/net/forwarding/lib.sh
-> > > @@ -784,6 +784,7 @@ team_destroy()
-> > >  {
-> > >  	local if_name=$1; shift
-> > >  
-> > > +	require_command $TEAMD
-> > >  	$TEAMD -t $if_name -k
-> > >  }  
+On Fri, 10 Jan 2025 16:50:44 -0800 Jacob Keller wrote:
+> On 1/9/2025 6:21 PM, Jakub Kicinski wrote:
+> > On Wed,  8 Jan 2025 14:17:45 -0800 Tony Nguyen wrote:  
+> >> --- a/drivers/net/ethernet/intel/ice/ice_osdep.h
+> >> +++ b/drivers/net/ethernet/intel/ice/ice_osdep.h
+> >> @@ -26,6 +26,9 @@
+> >>  
+> >>  #define rd32_poll_timeout(a, addr, val, cond, delay_us, timeout_us) \
+> >>  	read_poll_timeout(rd32, val, cond, delay_us, timeout_us, false, a, addr)
+> >> +#define rd32_poll_timeout_atomic(a, addr, val, cond, delay_us, timeout_us) \
+> >> +	read_poll_timeout_atomic(rd32, val, cond, delay_us, timeout_us, false, \
+> >> +				 a, addr)  
 > > 
-> > I saw team_create() has `require_command $TEAMD`. Is some test called
-> > team_destroy() before team_create()?  
+> > Could you deprecate the use of the osdep header? At the very least don't
+> > add new stuff here. Back in the day "no OS abstraction layers" was 
+> > a pretty hard and fast rule. I don't hear it as much these days, but 
+> > I think it's still valid since this just obfuscates the code for all
+> > readers outside your team.  
 > 
-> Actually, the errors seem to raise in the "cleanup()" method.
+> I assume you are referring to the abstractions in general (rd32,
+> rd32_poll_timeout, etc) and not simply the name of the header (osdep.h)?
+
+I presume the two are causally interlinked.
+
+> I do agree that the layering with the intent to create an OS abstraction
+> is not preferred and that its been pushed back against for years. We
+> have been working to move away from OS abstractions, including several
+> refactors to the ice driver. Use of "rd32_poll_timeout" is in fact one
+> of these refactors: there's no reason to re-implement read polling when
+> its provided by the kernel.
 > 
-> So, first, during the test preparation the "team_create()" method is called
-> and checks if teamd is installed. 
-> When it fails and skips the test, the "cleanup()" method calls
-> the "team_destroy()" that raises the errors.
+> However, I also think there is some value in shorthands for commonly
+> used idioms like "readl(hw->hw_addr + reg_offset)" which make the intent
+> more legible at least to me.
+> 
+> These rd32_* implementations are built in line with the readl* variants
+> in <linux/iopoll.h>
+> 
+> I suppose it is more frustrating for someone on the opposite side who
+> must content with each drivers variation of a register access macro. We
+> could rip the rd32-etc out entirely and replace them with readl and
+> friends directly... But that again feels like a lot of churn.
 
-Actually, maybe we're better off switching the team handling to the way
-REQUIRE_JQ REQUIRE_MZ etc are handled? That way we'll validate and exit 
-when lib is imported / sourced.
+Right, too late for that.
 
-Petr, do you have a preference?
--- 
-pw-bot: cr
+> My goal with these macros was to make it easier for ice developers to
+> use the read_poll_timeout bits within the existing framework, with an
+> attempt to minimize the thrash to existing code.
+> 
+> Glancing through driver/net/ethernet, it appears many drivers to use a
+> straight readl, while others use a rapper like sbus_readl, gem_readl,
+> Intel's rd32, etc.
+
+Ack, and short hands make sense. But both rd32_poll_timeout_atomic and
+the exiting rd32_poll_timeout have a single user.
 
