@@ -1,60 +1,50 @@
-Return-Path: <netdev+bounces-157357-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157358-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 155FAA0A069
-	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 03:47:54 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 07173A0A06A
+	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 03:50:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2306216B899
-	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 02:47:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D94793AB517
+	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 02:50:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAD9880BEC;
-	Sat, 11 Jan 2025 02:47:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47BF712C470;
+	Sat, 11 Jan 2025 02:50:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jdIP+S+l"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g9q/4GXp"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CFA4139D;
-	Sat, 11 Jan 2025 02:47:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22CE1139D
+	for <netdev@vger.kernel.org>; Sat, 11 Jan 2025 02:50:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736563669; cv=none; b=CBCk0jMyduo9vRK9Wd2/zJTY1if+RLUyzvWh98gpnwBz/CUdrImKwTeUSYeVNI9eXVT1CGo78BM20XP5OLuOYtDse+guf2rEO+mbMwi/M1kSgAyzfRqoPR6W1Z05pN6FYtUCUJxTR+0WRN5ieZP9Er53m9ciff9hYa3iWS15uKU=
+	t=1736563810; cv=none; b=ltfVfOMUrJ1ccmDRjzj5iZS9apt5mTl0+L+W5vrS+ZkHz1cI8TEqDfiu5jAzKj3rPEGqgUw9U5LdwMDjvGfBQgt1NR1pzmU0L7u9kKbyVeSyVwjPaZmtDgME+FlpHW9+wC1gsqLRDFoXueFwEFCyNsfaEBFHY/5kloDjtenA0w8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736563669; c=relaxed/simple;
-	bh=8Eymkj3tuckJY/wY4i/3Jszm9EfpEcl02JuSk3Y6ONE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bMaHL9xPBmN4MTYv7SJ+dTbIP8uYDXOJlHKNVjoKEG860yeqXvICjM/lAWM0VHXhmsxLzVY+knaUrj79HCFCLaUzfAEgQb6VZZlZ5odiNxZeBVsnlOjqWVLtjnH10Nl8TaEBDLnP1bH/anMFx3FQZPRoCTHGwt+sl39iw77YYvE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jdIP+S+l; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BF681C4CED6;
-	Sat, 11 Jan 2025 02:47:48 +0000 (UTC)
+	s=arc-20240116; t=1736563810; c=relaxed/simple;
+	bh=aRVh5kOOPO/H1WUCaOBG2PJwhv9Rh/Rpxiha/iYMLy8=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=rF4mo0Edt/+VCr50wrV21wf5cmwowwHnAHxYeEqyfUrRn6xgQmSaHPBzBgRwBgFeBJiTeii7yYiYEJyKxuEjVzSDVht2XP0YkJ1CmKb24CxOGTo87urKgNXMI3PbcRyLaLXq8EvCjXDYB8/4MF85cK8+Gkpu2nEsHChw2rp9vsY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g9q/4GXp; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 94EBAC4CED6;
+	Sat, 11 Jan 2025 02:50:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736563669;
-	bh=8Eymkj3tuckJY/wY4i/3Jszm9EfpEcl02JuSk3Y6ONE=;
-	h=From:To:Cc:Subject:Date:From;
-	b=jdIP+S+lFehhLvAd7WjjniYIEkaIJhkKUK/3c0yhJCdnyPQ3EGmjOQFyC0N/K2FTu
-	 0sMl8g38X+/5WR2d43D1+TZx6b70vmE0/cbOG9MGrJ5lWgS15WtKNL4CFcea9eu8R5
-	 PHekfxPdRrLnVBmtvVauSb/LHCftOgrl7QbvdoMnFA9wiUNRpD0JxW1HDMg5flJ7Xa
-	 asUX7zDG+UzBLiB357NI7KPQ60NRf8zia/seDCa/I7QsbgrHto6tppgurytm+SW/NF
-	 +akqyqtBBU6cAkc0uEVF4nXY19Wq+lbJHSkTz1ru9gcP8gD/DZTn1c5IBZf8WTO1ht
-	 WFdx7/BtAkesA==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	mkl@pengutronix.de,
-	mailhol.vincent@wanadoo.fr,
-	linux-can@vger.kernel.org
-Subject: [PATCH net-next] can: grcan: move napi_enable() from under spin lock
-Date: Fri, 10 Jan 2025 18:47:42 -0800
-Message-ID: <20250111024742.3680902-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.47.1
+	s=k20201202; t=1736563809;
+	bh=aRVh5kOOPO/H1WUCaOBG2PJwhv9Rh/Rpxiha/iYMLy8=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=g9q/4GXpqXhrA8DgD7iI3lxUMdx8ENHJvhXeqw+PI/GtB1DPp3W+4HnrP7usAuqmi
+	 QhS0sjAraqeWbmhmI2vJU1Bcfbyj9A4QFcRvnfcBn1Of8nT69YDXJ7EN/iKZ92FBOi
+	 0suxYg9mRQgx/IVfXCH0P3GTPXBoGFYriIkai/xUnBj1hUZyGZhxlfXvUpntm1irvM
+	 zLm9e0byOPM9bR1jQrd30y+QK9AdG0I9FNIrJJIxf0avsrg/wd1RfFT6gVWBFinCCy
+	 tKsxNpvLuEEdobCzQqsn0N849PUQ+rfRgEpXsPcaal4GwCL9Gkx6ptKZy4qUUubLjN
+	 HlNjibZdq8u/w==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADE86380AA57;
+	Sat, 11 Jan 2025 02:50:32 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,40 +52,41 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next] net: warn during dump if NAPI list is not sorted
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <173656383151.2274657.8449250733088909011.git-patchwork-notify@kernel.org>
+Date: Sat, 11 Jan 2025 02:50:31 +0000
+References: <20250110004505.3210140-1-kuba@kernel.org>
+In-Reply-To: <20250110004505.3210140-1-kuba@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+ jdamato@fastly.com, almasrymina@google.com
 
-I don't see any reason why napi_enable() needs to be under the lock,
-only reason I could think of is if the IRQ also took this lock
-but it doesn't. napi_enable() will soon need to sleep.
+Hello:
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-Marc, if this is correct is it okay for me to take via net-next
-directly? I have a bunch of patches which depend on it.
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-CC: mkl@pengutronix.de
-CC: mailhol.vincent@wanadoo.fr
-CC: linux-can@vger.kernel.org
----
- drivers/net/can/grcan.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+On Thu,  9 Jan 2025 16:45:04 -0800 you wrote:
+> Dump continuation depends on the NAPI list being sorted.
+> Broken netlink dump continuation may be rare and hard to debug
+> so add a warning if we notice the potential problem while walking
+> the list.
+> 
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> 
+> [...]
 
-diff --git a/drivers/net/can/grcan.c b/drivers/net/can/grcan.c
-index cdf0ec9fa7f3..21a61b86f67d 100644
---- a/drivers/net/can/grcan.c
-+++ b/drivers/net/can/grcan.c
-@@ -1073,9 +1073,10 @@ static int grcan_open(struct net_device *dev)
- 	if (err)
- 		goto exit_close_candev;
- 
-+	napi_enable(&priv->napi);
-+
- 	spin_lock_irqsave(&priv->lock, flags);
- 
--	napi_enable(&priv->napi);
- 	grcan_start(dev);
- 	if (!(priv->can.ctrlmode & CAN_CTRLMODE_LISTENONLY))
- 		netif_start_queue(dev);
+Here is the summary with links:
+  - [net-next] net: warn during dump if NAPI list is not sorted
+    https://git.kernel.org/netdev/net-next/c/af3525d41001
+
+You are awesome, thank you!
 -- 
-2.47.1
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
