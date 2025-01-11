@@ -1,108 +1,178 @@
-Return-Path: <netdev+bounces-157428-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157429-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41E9DA0A44C
-	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 15:50:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D82BA0A452
+	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 15:57:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2BC00188AD89
-	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 14:50:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4EDBF188BBB4
+	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 14:58:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 778B31AF0B5;
-	Sat, 11 Jan 2025 14:50:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FFDF1AF0C1;
+	Sat, 11 Jan 2025 14:57:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="zG0t6Mea"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="En4zRCyz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF75F1F16B
-	for <netdev@vger.kernel.org>; Sat, 11 Jan 2025 14:50:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4998B1F16B
+	for <netdev@vger.kernel.org>; Sat, 11 Jan 2025 14:57:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736607003; cv=none; b=D5ljsV/ZCIXJTKiB+TRzB2+cayY8zrXapv2NXqeGtVssZnoFHZa9NL5hWh75cVTBxQKikVr28zEgOST422IocBURG2JCHyAWWNB5HV3W8PIZD7SeMeXM3UwYlrxwIMMVIhLySan15SQz4irH42HFP6J0L3gClfY7pNzeYG361J4=
+	t=1736607476; cv=none; b=aPOLaDjzoGi/eHIvlwZ1IK3zdBzN9BaSO+9nqu/DXjdilNE7lpE8WNxcjYNxqNUHpMCyTUpoun2YYFAK4jE1/RA91r9/wdGBj2rqenZpkbTCq8E38T0dbDSiO2zpFMnFu5s6s2uCHoPHT7Eja8aXlRhIDgMQMNUgCAg1oIeznzA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736607003; c=relaxed/simple;
-	bh=Z2veQnl3GZ0xw7GbPP0M3mkyYPZQKE8ts7WK0672EFs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Vm+6KFlWQtAF4wfwjDqLI/cZYEQStbodY5aR8aC9qp3edXsXXvkYpFfbOUrot8fLQzvgVi+2v9IABmy8xyNtsGGAEgWByPhfc3JnvZJrcKuqowg8fDdeJ4g6sIX8DaQjYja8I/fFjUgpvSCjNiYaUCzh2gJHv8iHLEEOenAV86Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=zG0t6Mea; arc=none smtp.client-ip=209.85.214.178
+	s=arc-20240116; t=1736607476; c=relaxed/simple;
+	bh=TDo3QA988+CKpsptD7dGPNWGlYP6WscEl7BU4t2tuUc=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=dl/3uobQkC4iCeogARWLBOCOsGifl5h4azp1EscDguXeOdoA7ddPAeUTR4e4EKubC83j4l3n5QO/iyZKUTF9OuOQsrkdeQTgrNW+FFsaJ77MWb4IQyq3O2OR94NMcPM8G9KQvUl/inVTOq8AYbpK+IiX6IZ2UBCnOvC50ueicdc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=En4zRCyz; arc=none smtp.client-ip=209.85.160.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-2163b0c09afso52300475ad.0
-        for <netdev@vger.kernel.org>; Sat, 11 Jan 2025 06:50:01 -0800 (PST)
+Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-467725245a2so25539121cf.3
+        for <netdev@vger.kernel.org>; Sat, 11 Jan 2025 06:57:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1736607001; x=1737211801; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OffuVC76PBQtLNst+NoTj3k+WlHStXWK3dUsL9+ew/8=;
-        b=zG0t6Meao1NCEaGK5Cf1xC3c23aa7lndX6YCDasaM6cg2IdfHtZIrXCQ9xeLkfCmjw
-         9iI/E0k4UmawWkU3gRxFV92oLH25Mis4rPRE3b6tR5yhxuTOrvAp04IZ1u2+lhydlYvv
-         Am/3d0BXPtklJLJlfJWSuStibvHHHwAtZ8jbsAG62kzHv/A4Cyi0SiLxQHAu4qkVrtcn
-         0WGj17GTIMFQt2nSerJjFZstmzhPBWo1Hafttw4Jbqwix6LsvufDaRsnysRPWLMGmlhW
-         qsOY0f/RTTW6KSgRRc378QecCvqtK+kkzB27ykQpu34CBiJEJR0LVMCn0Pc5OuWu9iHH
-         mUXg==
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1736607472; x=1737212272; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=/DjW55+ScNx3lYICOA6RixE32ezoqZZ5b9KRRZp2GjE=;
+        b=En4zRCyzP8zKVnCFNDQn2eRS7jrkpHmBEtErET84Q5vsMReD40hnzhgcqmMvdLWI34
+         HdZwLrcKzGNbydRMcyaI34ySQGkE5iG2SuNzRD6zr52lHA315Hn5xZaPlDQ5v1WMwIRG
+         UYhcHJvaNOWPTJZnQHUOUB/B8+M2S6reDTWx1suEcOzymJb0xhxl2k6bxbIg9YEY0bh8
+         nRB734Dnv5p1uG3vRhlaTYAbPRsA4wTgFUJTy4aaqFhp2zrlu3o/oOBWrQ5mCpvJ29U4
+         lk/rZrgieWw4duFHfIcKyohEeS7QGRQUYk8rxqrLGuD0w3yvZUfRJ0Y02/r9eSOZHSL6
+         f6bg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736607001; x=1737211801;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=OffuVC76PBQtLNst+NoTj3k+WlHStXWK3dUsL9+ew/8=;
-        b=JEsT0P8HOjV0ryBEU8Rfu5pVtUlalQGnLxxOJ90OTU5mNRUxJ2bdO6K61GiChWVYuY
-         hqFsyDm2CFHA2KjuqkgUM8guNiOuNoP3gPB+1OWAY1s6rOU5UWHKrA8VHfJfnIQQRPsZ
-         e+OiNiua6mzWL8Lu8RoyL7RKDnSWgBy4tztfbm98z9S1rCZLF68blLk7Wmrc3Cty5lph
-         0YHPmpnqX2z30p8xrTZpcRpEmb0JYy9JXzVpwzLYh/tZZ9a/rlQjAHbj/OwhrhgYz0et
-         X9Al1OkDM+xwQK6l9ZuqxMr0LciPQNoEV+dzSsqjUDBn3HTGcGNOlP0QGoFDarmZDUoX
-         SfDg==
-X-Gm-Message-State: AOJu0YxG2ubbWPoHoXiA0MuDcfJzZDXtCQiHDGaiSuUdmqowMkAHaNSy
-	8aTG5eSpqv9p3dPscUa7dDHmfjs5SjgbwsASVTGoYoP110974/VkQMbmrdbFjD3LRHgtz9EUVbs
-	5iaGenDrZLSeXpnP6TiMzKMenK4phvfiOItMP
-X-Gm-Gg: ASbGnct+g3yrWweH3PXX+rnrgV/5+MXl29cPjzW3vgGbTzNZXcH+u4wBMoI4mED8gHu
-	ivvIYhNtUQVvYo8sG3HP6vpgNxX2Q7+qw70bf
-X-Google-Smtp-Source: AGHT+IEQpgwsdPDnrVjBCw+HDFMGlk0GiZ4b5kDA+ewxPQ2xfg5Pyzhaq8Co/zzApCfFa5tsPxBOkOEnk+uEQPlWR80=
-X-Received: by 2002:a17:903:18a:b0:218:a5a8:431a with SMTP id
- d9443c01a7336-21a83fcc47dmr225437885ad.49.1736607001237; Sat, 11 Jan 2025
- 06:50:01 -0800 (PST)
+        d=1e100.net; s=20230601; t=1736607472; x=1737212272;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=/DjW55+ScNx3lYICOA6RixE32ezoqZZ5b9KRRZp2GjE=;
+        b=CqUXbVupNRH4PN02i3SZTVfJu+BfdslCMMXdCXgga+QYV5y146xf3dbZfxrw+C9qrd
+         xnfdyJaecByYEDYUa7ra8s+SaPtMQfLQ912Gxt53B9EY2Wut83WLKuirDSgLkUIsEkWW
+         tbFRE2y2+GTzkleZrfz+47qqyTxZfdsCL8J/tUBcHryvN1Ii69Mg4Q0tKaGhNdhRVOCT
+         JK0bEYBHYxy+s0ethc/ka/z/wfAqQhOrjafdGundCrB/1G4+i/cLSW9AqdYTrOb35w4x
+         7MRl8IMMzuGVkVO1S0wOY1UjTze0bR2Q78ucvC2pHljP3+j4xWdo669a6CddCuDbwnfK
+         AJFg==
+X-Gm-Message-State: AOJu0YzPq8tFgOI0zUxLewdDH1GcbbMmXdATv267dPyz5EZDyLijAOCY
+	21HOvywZaSDRfByLGdIvlZSsx8eEErtnN+W2oufYZEzJ9ZO507DV2n8wsNk9BqEW44dIxo4O3+U
+	=
+X-Gm-Gg: ASbGncudhA3OhVrqms6TSPlYA0Kfa+Aa5dfjeg08MylgVyZJBXEfkot4htvZ8eik3tY
+	nB6RgXJ8PPcD7xzeKIbjlpgkCyd1CqpPELXD24brJPJijpt/34Y+wnSKKYa38LU/MhwMsxyNKq5
+	KX3Y9WD1KWsVe3e0KtWDZPTh2L8mgxSwNn94nE+eGL97SoSiztZogAsvAzqHsJ9JW0xHPsx0WMy
+	bhjoKkuINMUVfL50nAmRsTCDaCQrW75wHfegZh/d/0lZ1Fg
+X-Google-Smtp-Source: AGHT+IEdtnuQN9F/8ygGmPxLiLiEdANk0+O1gwDhyjVXZOujJdUlrGz75r3lCs4oGTj7FGNEyt6Tew==
+X-Received: by 2002:a05:622a:40f:b0:466:886f:3774 with SMTP id d75a77b69052e-46c70fd3117mr225924451cf.8.1736607471896;
+        Sat, 11 Jan 2025 06:57:51 -0800 (PST)
+Received: from majuu.waya ([76.64.65.230])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-46c873eaf88sm20694831cf.81.2025.01.11.06.57.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 11 Jan 2025 06:57:51 -0800 (PST)
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+To: netdev@vger.kernel.org
+Cc: jiri@resnulli.us,
+	xiyou.wangcong@gmail.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	petrm@mellanox.com,
+	security@kernel.org,
+	g1042620637@gmail.com
+Subject: [PATCH net v4 1/1] net: sched: fix ets qdisc OOB Indexing
+Date: Sat, 11 Jan 2025 09:57:39 -0500
+Message-Id: <20250111145740.74755-1-jhs@mojatatu.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250109143319.26433-1-jhs@mojatatu.com> <20250109102902.3fd9b57d@kernel.org>
- <CAM0EoMn7uADZkTQkg48VP7K7KD=ZVHPLfZheAwXSumqFWommNg@mail.gmail.com> <20250110183307.4bfba412@kernel.org>
-In-Reply-To: <20250110183307.4bfba412@kernel.org>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Sat, 11 Jan 2025 09:49:50 -0500
-X-Gm-Features: AbW1kvZIx23k_wZZ3K2RFkze_p_QQ3v6sXQhVVt4oapU1iF8YCd4KpHklJY35gM
-Message-ID: <CAM0EoMk9jye5Q2Q-3XcFMhwFZ6U9q9UNrUqqU6B+ndwoUstU=g@mail.gmail.com>
-Subject: Re: [PATCH net 1/1 v2] net: sched: Disallow replacing of child qdisc
- from one parent to another
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, jiri@resnulli.us, xiyou.wangcong@gmail.com, 
-	davem@davemloft.net, edumazet@google.com, security@kernel.org, 
-	nnamrec@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Fri, Jan 10, 2025 at 9:33=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-[..]
-> >  It could be you just wanted to ensure some grafting happened, in
-> > which case we can adjust the test case.
->
-> Yes, adjusting the test sounds good. I was testing visibility after
-> supported operations. If the operation is no longer supported there's
-> nothing to test :)
->
+Haowei Yan <g1042620637@gmail.com> found that ets_class_from_arg() can
+index an Out-Of-Bound class in ets_class_from_arg() when passed clid of
+0. The overflow may cause local privilege escalation.
 
-Ok, sending V2 with the Fixes tag, test case fix will follow later
-today after some testing.
+ [   18.852298] ------------[ cut here ]------------
+ [   18.853271] UBSAN: array-index-out-of-bounds in net/sched/sch_ets.c:93:20
+ [   18.853743] index 18446744073709551615 is out of range for type 'ets_class [16]'
+ [   18.854254] CPU: 0 UID: 0 PID: 1275 Comm: poc Not tainted 6.12.6-dirty #17
+ [   18.854821] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/2014
+ [   18.856532] Call Trace:
+ [   18.857441]  <TASK>
+ [   18.858227]  dump_stack_lvl+0xc2/0xf0
+ [   18.859607]  dump_stack+0x10/0x20
+ [   18.860908]  __ubsan_handle_out_of_bounds+0xa7/0xf0
+ [   18.864022]  ets_class_change+0x3d6/0x3f0
+ [   18.864322]  tc_ctl_tclass+0x251/0x910
+ [   18.864587]  ? lock_acquire+0x5e/0x140
+ [   18.865113]  ? __mutex_lock+0x9c/0xe70
+ [   18.866009]  ? __mutex_lock+0xa34/0xe70
+ [   18.866401]  rtnetlink_rcv_msg+0x170/0x6f0
+ [   18.866806]  ? __lock_acquire+0x578/0xc10
+ [   18.867184]  ? __pfx_rtnetlink_rcv_msg+0x10/0x10
+ [   18.867503]  netlink_rcv_skb+0x59/0x110
+ [   18.867776]  rtnetlink_rcv+0x15/0x30
+ [   18.868159]  netlink_unicast+0x1c3/0x2b0
+ [   18.868440]  netlink_sendmsg+0x239/0x4b0
+ [   18.868721]  ____sys_sendmsg+0x3e2/0x410
+ [   18.869012]  ___sys_sendmsg+0x88/0xe0
+ [   18.869276]  ? rseq_ip_fixup+0x198/0x260
+ [   18.869563]  ? rseq_update_cpu_node_id+0x10a/0x190
+ [   18.869900]  ? trace_hardirqs_off+0x5a/0xd0
+ [   18.870196]  ? syscall_exit_to_user_mode+0xcc/0x220
+ [   18.870547]  ? do_syscall_64+0x93/0x150
+ [   18.870821]  ? __memcg_slab_free_hook+0x69/0x290
+ [   18.871157]  __sys_sendmsg+0x69/0xd0
+ [   18.871416]  __x64_sys_sendmsg+0x1d/0x30
+ [   18.871699]  x64_sys_call+0x9e2/0x2670
+ [   18.871979]  do_syscall_64+0x87/0x150
+ [   18.873280]  ? do_syscall_64+0x93/0x150
+ [   18.874742]  ? lock_release+0x7b/0x160
+ [   18.876157]  ? do_user_addr_fault+0x5ce/0x8f0
+ [   18.877833]  ? irqentry_exit_to_user_mode+0xc2/0x210
+ [   18.879608]  ? irqentry_exit+0x77/0xb0
+ [   18.879808]  ? clear_bhb_loop+0x15/0x70
+ [   18.880023]  ? clear_bhb_loop+0x15/0x70
+ [   18.880223]  ? clear_bhb_loop+0x15/0x70
+ [   18.880426]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+ [   18.880683] RIP: 0033:0x44a957
+ [   18.880851] Code: ff ff e8 fc 00 00 00 66 2e 0f 1f 84 00 00 00 00 00 66 90 f3 0f 1e fa 64 8b 04 25 18 00 00 00 85 c0 75 10 b8 2e 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 51 c3 48 83 ec 28 89 54 24 1c 48 8974 24 10
+ [   18.881766] RSP: 002b:00007ffcdd00fad8 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+ [   18.882149] RAX: ffffffffffffffda RBX: 00007ffcdd010db8 RCX: 000000000044a957
+ [   18.882507] RDX: 0000000000000000 RSI: 00007ffcdd00fb70 RDI: 0000000000000003
+ [   18.885037] RBP: 00007ffcdd010bc0 R08: 000000000703c770 R09: 000000000703c7c0
+ [   18.887203] R10: 0000000000000080 R11: 0000000000000246 R12: 0000000000000001
+ [   18.888026] R13: 00007ffcdd010da8 R14: 00000000004ca7d0 R15: 0000000000000001
+ [   18.888395]  </TASK>
+ [   18.888610] ---[ end trace ]---
 
-cheers,
-jamal
+Fixes: dcc68b4d8084 ("net: sch_ets: Add a new Qdisc")
+Reported-by: Haowei Yan <g1042620637@gmail.com>
+Suggested-by: Haowei Yan <g1042620637@gmail.com>
+Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
+Reviewed-by: Eric Dumazet <edumazet@google.com>
+Reviewed-by: Petr Machata <petrm@nvidia.com>
+---
+ net/sched/sch_ets.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/net/sched/sch_ets.c b/net/sched/sch_ets.c
+index f80bc05d4c5a..516038a44163 100644
+--- a/net/sched/sch_ets.c
++++ b/net/sched/sch_ets.c
+@@ -91,6 +91,8 @@ ets_class_from_arg(struct Qdisc *sch, unsigned long arg)
+ {
+ 	struct ets_sched *q = qdisc_priv(sch);
+ 
++	if (arg == 0 || arg > q->nbands)
++		return NULL;
+ 	return &q->classes[arg - 1];
+ }
+ 
+-- 
+2.34.1
+
 
