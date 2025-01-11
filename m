@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-157347-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157348-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D03A9A0A04B
-	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 03:20:48 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 362D7A0A04F
+	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 03:21:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 35426188CA82
-	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 02:20:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 08761188E516
+	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 02:21:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBE8B14F9C4;
-	Sat, 11 Jan 2025 02:20:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64C0212D1F1;
+	Sat, 11 Jan 2025 02:20:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kkAuiUIz"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oEn3Qm6T"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B09982940D;
-	Sat, 11 Jan 2025 02:20:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BF382940D;
+	Sat, 11 Jan 2025 02:20:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736562019; cv=none; b=BEjMXIoyXlF/lHlqnFU17hqPEqruynr0FQVluwfETTVAhTlzQR3g0N9HQipuDknADF9FFxAYWCL7It5VcTUMCb2xXF6b/ETtpiaJBLe93OVv+kyULYkr7W1+STZgF5TBCjGwAE4ahWiYIgcFldVARLT8QEFGpY7jQkx7s4zNzmM=
+	t=1736562025; cv=none; b=iNpT5hmhAxIegNn7QtJ3d9TMpXdrPTmADUKik4HnUFjvLbi6DebI693cLqVJez6/z3zBVgYx7WZETGz7YYBPClbEIsME4q6Jt99i6BwVY6Jbw4D7U5g4r1U/j860qH9Y97+EPLZARRW7btuzqey6dux15XCnYk2ynbUxDTqDgp8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736562019; c=relaxed/simple;
-	bh=H6ve1iXrLszFxC3wnybIX43/wolIv08Y06JZuNk0cwM=;
+	s=arc-20240116; t=1736562025; c=relaxed/simple;
+	bh=WsnWIWx9P4KaEkNMQoqN1oVnPQbPZYxuFdFN47CcONU=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=WzvYHa7HAfvBOR1rwRj6SZWL6lPpohsq4R/dHQiJYeOmlly6MfNFKiwpumGtU1JyQ2rLpAxGGoJMIQ4vS+QosAGPx3zTBRo3RY7TR7rhO8fU2oFxdZr7fBcx88/FJ5KfrBd8dWNFG0RKKUgpMGuqe0cRnrRLhQE33is8GcRhxN0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kkAuiUIz; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 32F83C4CED6;
-	Sat, 11 Jan 2025 02:20:16 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=gtm62VHD+CBBDKCz3P8ZLeiuNCK96CypfokaMU1VTpri4EDcKgFHDwLG0+9N9ANMLDxF2yZozVcgQ9f7sedR//RjwgTdATwD2wEBPaEmR0dcndIIukE/HcYjjgsP6+EOnp4ssPsIq8cadjME+tlH1GgFeN3/x+o//eMqJxl7UeI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oEn3Qm6T; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BA85DC4CED6;
+	Sat, 11 Jan 2025 02:20:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736562016;
-	bh=H6ve1iXrLszFxC3wnybIX43/wolIv08Y06JZuNk0cwM=;
+	s=k20201202; t=1736562024;
+	bh=WsnWIWx9P4KaEkNMQoqN1oVnPQbPZYxuFdFN47CcONU=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=kkAuiUIzPdQZAHWmi4ZtcphSk2d+k2JOMPNG/HkBam69s2Z1JhFOnmn4qQBEI22i8
-	 2VptarsVZHdAIJe/O3heet8kgkcyiLTJLroxClW4QhxaH/VHxzjKXc/krSl9hJElGu
-	 NG2uGabR+qqfRvLdxWip6/wHgVfdTGn5l0rOIQqZSSoR5dbm8tDFnfAzcMhFJkX30q
-	 n8BilV2AUdoSmSDAmOVux1wJ8dGewG03l68k1mdbPUHYEzL63cF11FSXJZNwI3Upxo
-	 PDXb2AaP+TeTG0ECyD/jWa5e5tCxSf1wqqucSrsSjFK3MdwVy0lLELJL2ksOdVSb6R
-	 tkmd90AqSd0lA==
+	b=oEn3Qm6T6fg6aA/6O8bhGjrx6BjCAvP7pwqgRhLGL0NMBiirM0lYG21e8UpwsDFfN
+	 ZJaHSYZYOF9FcGW05npwaY6hnPMzMXeJ5rua0T0K/3RTZdy9qQLU/a5qyzj0NRgGLq
+	 A9TDjqe22bB/2XXbl8ahL9JM3kvFmRllosESdXq6uFBGTnlgVSqncSrhfz43pyzocn
+	 nLampIFBeYEeXilW6nHQjrHWDw0YyjKTMn/+KdahF4YPI13ujgj17F8GQAI2nv7k9+
+	 YVaNfcAgpmRsopCIunUP4MmbIBt3swQzrZsEQaaUZQHB+AgSBy0Cpz7ePhxhTwV7FG
+	 96i/2qMb7qWsA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70CFF380AA57;
-	Sat, 11 Jan 2025 02:20:39 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB4E0380AA57;
+	Sat, 11 Jan 2025 02:20:47 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,40 +52,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] xsk: Bring back busy polling support
+Subject: Re: [PATCH net-next v2 0/2] ipvlan: Support bonding events
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <173656203824.2269660.1465045234305425925.git-patchwork-notify@kernel.org>
-Date: Sat, 11 Jan 2025 02:20:38 +0000
-References: <20250109003436.2829560-1-sdf@fomichev.me>
-In-Reply-To: <20250109003436.2829560-1-sdf@fomichev.me>
-To: Stanislav Fomichev <sdf@fomichev.me>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, linux-kernel@vger.kernel.org,
- bpf@vger.kernel.org, horms@kernel.org, ast@kernel.org, daniel@iogearbox.net,
- hawk@kernel.org, john.fastabend@gmail.com, bjorn@kernel.org,
- magnus.karlsson@intel.com, maciej.fijalkowski@intel.com,
- jonathan.lemon@gmail.com, jdamato@fastly.com, mkarsten@uwaterloo.ca
+ <173656204646.2269660.13108760448307723800.git-patchwork-notify@kernel.org>
+Date: Sat, 11 Jan 2025 02:20:46 +0000
+References: <20250109032819.326528-1-champetier.etienne@gmail.com>
+In-Reply-To: <20250109032819.326528-1-champetier.etienne@gmail.com>
+To: Etienne Champetier <champetier.etienne@gmail.com>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+ linux-kselftest@vger.kernel.org
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed,  8 Jan 2025 16:34:36 -0800 you wrote:
-> Commit 86e25f40aa1e ("net: napi: Add napi_config") moved napi->napi_id
-> assignment to a later point in time (napi_hash_add_with_id). This breaks
-> __xdp_rxq_info_reg which copies napi_id at an earlier time and now
-> stores 0 napi_id. It also makes sk_mark_napi_id_once_xdp and
-> __sk_mark_napi_id_once useless because they now work against 0 napi_id.
-> Since sk_busy_loop requires valid napi_id to busy-poll on, there is no way
-> to busy-poll AF_XDP sockets anymore.
+On Wed,  8 Jan 2025 22:28:17 -0500 you wrote:
+> No changes for first commit.
+> Second commit rework bond_macvlan.sh test to add minimal
+> ipvlan over bond testing (asked by Jakub during v1 review).
+> 
+> Etienne Champetier (2):
+>   ipvlan: Support bonding events
+>   selftests: bonding: add ipvlan over bond testing
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] xsk: Bring back busy polling support
-    https://git.kernel.org/netdev/net/c/5ef44b3cb43b
+  - [net-next,v2,1/2] ipvlan: Support bonding events
+    https://git.kernel.org/netdev/net-next/c/e79a98e68b96
+  - [net-next,v2,2/2] selftests: bonding: add ipvlan over bond testing
+    https://git.kernel.org/netdev/net-next/c/08ac69b24507
 
 You are awesome, thank you!
 -- 
