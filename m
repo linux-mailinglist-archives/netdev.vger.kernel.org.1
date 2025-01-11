@@ -1,80 +1,80 @@
-Return-Path: <netdev+bounces-157392-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157393-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C9ADA0A223
-	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 10:07:51 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F5C5A0A224
+	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 10:09:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 494113A5A10
-	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 09:07:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5793F188C879
+	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 09:09:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE95F185B4C;
-	Sat, 11 Jan 2025 09:07:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC060186615;
+	Sat, 11 Jan 2025 09:09:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KG8d8pZA"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KDAXr1DI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
+Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BAD282899
-	for <netdev@vger.kernel.org>; Sat, 11 Jan 2025 09:07:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 037BB24B22C
+	for <netdev@vger.kernel.org>; Sat, 11 Jan 2025 09:08:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736586467; cv=none; b=EAehYYkmU5qrIGZnDdNaUdP/buPfhyilKucKBntEXyXzpdteyQe/DdYlQMmciAQUSli5K5DtyQQpOpuTbeTQcSGoGerNEuK8f5lo/+5ufAd5UE8V9uKeDTWmVFWhQ4TvS8POpqAZElsJWs85v+f7OqL5nBaBgsGrEoDrb6wmAS4=
+	t=1736586540; cv=none; b=SkIaRE4P25ybGu3WC2I6pqKkj/GC2vGBuuibk6URJYZ4AGbGnm8KJxCZ81v/4Kk1xcdJpR3R2OoGZkw0b7KQZXCWf70aZcI6yUUpIWqHgmp7W0alrW4Xc4YYEoq37DR6e7UQrZRNLQpxh8ecfxdNMpI524TyPPT+y4CEun8ncSA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736586467; c=relaxed/simple;
-	bh=dMnqu2NFxklOsSsinY1qryXx9RuGGQCtBaDejSngLQE=;
+	s=arc-20240116; t=1736586540; c=relaxed/simple;
+	bh=E3x2OQoXJqKkDTmlqFVNtpZpLpsrweRHWHwI3zrKpyA=;
 	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=HoTJ3EdLeE6lETYAuaQqbOc/jR+78IdkOLb6zJX7OdsTGpiWubWLc4xq/85oH2fQk26X+oOAWh8nFCrUz26f/Gv48d73gdE3rtG8ICmcWS8Qe1JuehqEt98U8ackwhGuAvT8aV9kFhTZbPS6lUahCfKDMZLnDx8H/+ngBgIcp+o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KG8d8pZA; arc=none smtp.client-ip=209.85.208.43
+	 In-Reply-To:Content-Type; b=uk9/6kCig9UNmE6sT8/5/zMgDmzoVk0EvWT91LyotjsklN0NmDVMD5m7CGNjr6B+B+WTzaqTAyGGD4UOhJ/V/p/3nsbcKRHsBvnz/cYXJToOB6TnHnoofpPRbpqAzKjz3fyQk1GSiI3GhVPHWz8E1r58x6+rXpBWVn0kRNENCzA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KDAXr1DI; arc=none smtp.client-ip=209.85.218.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-5d3f65844deso4386729a12.0
-        for <netdev@vger.kernel.org>; Sat, 11 Jan 2025 01:07:46 -0800 (PST)
+Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-aafc9d75f8bso540520466b.2
+        for <netdev@vger.kernel.org>; Sat, 11 Jan 2025 01:08:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736586465; x=1737191265; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1736586537; x=1737191337; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :references:cc:to:from:subject:user-agent:mime-version:date
          :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=wBMddhpX1NI1gq7cSA9OWBGZGHoa2QsJ/OhZHRlrOog=;
-        b=KG8d8pZASpf8zkmxd4noN5cJGY+An97/fK/XIrhD1MMKDFIXQt/mXwXpq9ZNK6lz69
-         mMGLamUwrHyRJ+3r0MeN2C3iiQ3DFo3Ci0wEA7NgHzHVABnag554SQc6cCYHbjdPXcke
-         q1VB/Og2S2ecLZYyVc2sUap9KdqEaT9GTvxaDIPT3gwtH5BrYrUl2mAg4o3/YjEDNJ+S
-         Of+kxpXlayngkm4CUr/dWA5pXU6lA+PAdOmk5zDtJpKkNFSGGUwMnrLfcEzznyRKuLBU
-         agyBCOwnhnrNklZzdvQrL8xpgLtiwBCS40Ag3pbwPSfdfvyTwjIK7/mCNZO+pvxEIGWs
-         JSyg==
+        bh=TeDwEnVCu9enUYBZi4CcsChMzu7xhWaZb2+Ok1gyBZ4=;
+        b=KDAXr1DIVjM8cvcy2lYrQtTslVn0ts7/lDi9IJkGhqeMphdY4o17J4gK4VMrhpI0zx
+         cWBMT7jYheSAzP5WdRVz+W8K9gJNnKdLbRWvx6bjSCL+ymWrQw5I02DbpibofqKilLnG
+         7FcTbGVCvF5i+UycN8UHbG20Tw2PptcqiUAIXP3w4Guhco5J4HOoWpuJe3oWnFF8BQmK
+         ADygnnhz+86FM8yZ027M3milPmoSQYRHt4TX/71NaYXhsj74Bo8RQcJ/reIL0miid6fA
+         3OXDbL1ieUtLhIikdgl5vXZ32VkOfEYKXWBPTr/Jo4FyZhwcC7L59vkvceVPswqZmWHi
+         S1Qw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736586465; x=1737191265;
+        d=1e100.net; s=20230601; t=1736586537; x=1737191337;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :references:cc:to:from:subject:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=wBMddhpX1NI1gq7cSA9OWBGZGHoa2QsJ/OhZHRlrOog=;
-        b=ixwon54mn0RcPDS8HDreJyDsdolSCB6uvKAW2kR/mkMCs5xy2X8A/eGRP5v8eToqcS
-         cRvVbth/OM5K2JtKI+a2e+rgWGhc+r0i7t54zap11SckfYc35QIHLNq9NR6044CT0M11
-         CHN8BNAuwU8qzWt651wuwhJ8OjD6EBW8jWE7gIowZiKBOY12XVOJA3U62C4e0ze71/dk
-         dliAjDNYXDDOPXUTQ0fXqXFOhpC2FF8IhV6AppNQK9MNg3hvM1XqCgobIDOW/jhrirbi
-         i+4YqeEENm57o3/cqn4MfyXm2DI3OBOgJLoMpLCVpfh9Y0yDFm/pxFESTMpE+Z85phJ7
-         dvYg==
-X-Gm-Message-State: AOJu0Yz4NrztY4KQAmS6rN6WQkbu3Ngjt12Qc3jBsDg4KI/cNTi+9PYX
-	yd4r+VKmatRZuYaI0lZypFkIGU+vovx0hJEtolJ0W0GK8XnoVGXq
-X-Gm-Gg: ASbGncuYEVQV7AWSXVjZjyF/z26EeFZVOn3xeUxn2Gki/ryqNmAJk1GntipXbbUEU4C
-	zftQc5QL3sIy2HAWm3LV7UC6I0dU5V6Aj/4qTBcOUKk7PZiZtO6oW6Y17GGoTUtSPS9gV4CrUcu
-	/mz8fAptQzYH1SQ6isT1G3NIZn6DNmMDHKKFD1U4QeuIIuAG7mzGONgdUrdS49NnyYMegbKp6NH
-	9cwikkhnTWQtXYnHa5aPNXdDbBsMp9eMM6xjPSUS7GLS8DAl0bRu5UCiaOCvjmEP1su7nVVBYt5
-	5Vcru/uXfbXeboiHMDZHvDIBphBYKr1iQDS6jKToLXnWEXS6qNgMztVt8RDpYpizEib7MxVD62r
-	dP1vvsMm//vL1aVgbR4PLqLCkLlA64fMxa4wNcTOkpfZLWr6F
-X-Google-Smtp-Source: AGHT+IEnwOB9RjQvwIgT3m1N4dmZ606vHBelaQgvlF+dtjNsuak8yelPFUs6R41A7NVEdxABMrqmuw==
-X-Received: by 2002:a05:6402:510d:b0:5d3:e45d:ba91 with SMTP id 4fb4d7f45d1cf-5d972e6e09fmr12793033a12.32.1736586464690;
-        Sat, 11 Jan 2025 01:07:44 -0800 (PST)
+        bh=TeDwEnVCu9enUYBZi4CcsChMzu7xhWaZb2+Ok1gyBZ4=;
+        b=WAaIa/cUKADr/7MTMw1ZjioDvuPJBBpeia/EwCCm5RovYnPGcgYj5Jjh9CaKmJ5JdP
+         P44mLADy0nsV3qG95txlFaN0FATgCGB5fn5ja17dlEjXO18/31j/ZguBBEU1sgeK7H7I
+         I8h8vKwlJ+iGYtVAurorSfdfc4aGHvUnFcw0zFEku4z3/E2shOt2TIyL3jUBFfiP0h/z
+         2xiSUjD4k1iIGX9IpDt6TAmujUL4D6ohvDk5gi9T2Qimeyy1vpt7NUr9/Yar0w0V1bvK
+         hLkA2W+hhOSOPSzcoDIHw/oMAIGvDFvFILUGmYR5ay8WSXZyI/kzxgGfxO5fckCOL54d
+         ZRWg==
+X-Gm-Message-State: AOJu0Yyh9vGPAjqLrhmHLWS0T6/M+jNYfrirqcz5PBsm1GpWvCKXw4us
+	ahu1Chamjg7UbwJuCLEtrqGScz4OqlQf9mFeKVvOyB21i/l13Uka
+X-Gm-Gg: ASbGncubt++n7EKlFnPYW0iqdXBXiMAN1C68+qKHPGIHvqZcq1bWqeRUMwsjeBaTLY7
+	x+QWft3lM5t25qFVRUggxdlgK6An30v9fC1WRTSh6HJhYvfqQe667ivZ2HZ/xWGtnOlTImJvru3
+	sOQ4m+0u8l5AylZZuR/j9xqayjkUuaTd+UcLCE+MUAHsBUob0L8HQa2cKu2V1FZAW9wCvgJo8fc
+	VNJSWXG7BJh1e0AGryKkE9LfzuVcqSlIEQ/cieFjtK3TsQrD3tjqbjLAmtdlP+RKXbWlZCPAk6G
+	7C5Tr0SRJn1NGVCjmGTGbbYggTEXGzvobKeVfAg4o6IsxaGp9eRvLW86PgHy8+yHUlz0AhOEhrm
+	Gwl7Rhe5qQW79gPpK0fSFO8lnMvhWuyzjS4E6fU0/5yX4PGmB
+X-Google-Smtp-Source: AGHT+IGu/5h2tUWjP5b81jTdtOkkkbtn1DcX2IVMS3yUzYCghpBZ26XfT1CABvcS+azvrG9HH7cxWQ==
+X-Received: by 2002:a17:907:36ce:b0:aaf:87e5:4eac with SMTP id a640c23a62f3a-ab2abcb12fdmr1305584466b.54.1736586537231;
+        Sat, 11 Jan 2025 01:08:57 -0800 (PST)
 Received: from ?IPV6:2a02:3100:a90d:e100:d8f1:2ffc:4f48:89fd? (dynamic-2a02-3100-a90d-e100-d8f1-2ffc-4f48-89fd.310.pool.telefonica.de. [2a02:3100:a90d:e100:d8f1:2ffc:4f48:89fd])
-        by smtp.googlemail.com with ESMTPSA id 4fb4d7f45d1cf-5d99008c37csm2494648a12.6.2025.01.11.01.07.41
+        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-ab2c905ecb7sm251483266b.26.2025.01.11.01.08.56
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 11 Jan 2025 01:07:43 -0800 (PST)
-Message-ID: <487d87a1-7268-4ef4-9bde-435e61c7495c@gmail.com>
-Date: Sat, 11 Jan 2025 10:07:43 +0100
+        Sat, 11 Jan 2025 01:08:56 -0800 (PST)
+Message-ID: <19ce7463-46e0-4339-9204-f6a4322d1af6@gmail.com>
+Date: Sat, 11 Jan 2025 10:08:56 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,7 +82,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: [PATCH net-next 5/9] net: phy: improve phy_disable_eee_mode
+Subject: [PATCH net-next 6/9] net: phy: remove disabled EEE modes from
+ advertising in phy_probe
 From: Heiner Kallweit <hkallweit1@gmail.com>
 To: Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
  David Miller <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
@@ -138,30 +139,51 @@ In-Reply-To: <a002914f-8dc7-4284-bc37-724909af9160@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-If a mode is to be disabled, remove it from advertising_eee.
-Disabling EEE modes shall be done before calling phy_start(),
-warn if that's not the case.
+A PHY driver may populate eee_disabled_modes in its probe or get_features
+callback, therefore filter the EEE advertisement read from the PHY.
 
 Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
 ---
- include/linux/phy.h | 3 +++
- 1 file changed, 3 insertions(+)
+ drivers/net/phy/phy_device.c | 21 ++++++++++-----------
+ 1 file changed, 10 insertions(+), 11 deletions(-)
 
-diff --git a/include/linux/phy.h b/include/linux/phy.h
-index ad71d3a3b..fce29aaa9 100644
---- a/include/linux/phy.h
-+++ b/include/linux/phy.h
-@@ -1333,7 +1333,10 @@ static inline bool phy_is_started(struct phy_device *phydev)
-  */
- static inline void phy_disable_eee_mode(struct phy_device *phydev, u32 link_mode)
- {
-+	WARN_ON(phy_is_started(phydev));
-+
- 	linkmode_set_bit(link_mode, phydev->eee_disabled_modes);
-+	linkmode_clear_bit(link_mode, phydev->advertising_eee);
- }
+diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
+index f6a5f986f..ff4b4d42b 100644
+--- a/drivers/net/phy/phy_device.c
++++ b/drivers/net/phy/phy_device.c
+@@ -3613,22 +3613,21 @@ static int phy_probe(struct device *dev)
+ 	if (err)
+ 		goto out;
  
- void phy_resolve_aneg_pause(struct phy_device *phydev);
+-	/* There is no "enabled" flag. If PHY is advertising, assume it is
+-	 * kind of enabled.
+-	 */
+-	phydev->eee_cfg.eee_enabled = !linkmode_empty(phydev->advertising_eee);
++	/* Get the EEE modes we want to prohibit. */
++	of_set_phy_eee_broken(phydev);
+ 
+ 	/* Some PHYs may advertise, by default, not support EEE modes. So,
+-	 * we need to clean them.
++	 * we need to clean them. In addition remove all disabled EEE modes.
+ 	 */
+-	if (phydev->eee_cfg.eee_enabled)
+-		linkmode_and(phydev->advertising_eee, phydev->supported_eee,
+-			     phydev->advertising_eee);
++	linkmode_and(phydev->advertising_eee, phydev->supported_eee,
++		     phydev->advertising_eee);
++	linkmode_andnot(phydev->advertising_eee, phydev->advertising_eee,
++			phydev->eee_disabled_modes);
+ 
+-	/* Get the EEE modes we want to prohibit. We will ask
+-	 * the PHY stop advertising these mode later on
++	/* There is no "enabled" flag. If PHY is advertising, assume it is
++	 * kind of enabled.
+ 	 */
+-	of_set_phy_eee_broken(phydev);
++	phydev->eee_cfg.eee_enabled = !linkmode_empty(phydev->advertising_eee);
+ 
+ 	/* Get master/slave strap overrides */
+ 	of_set_phy_timing_role(phydev);
 -- 
 2.47.1
 
