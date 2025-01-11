@@ -1,127 +1,96 @@
-Return-Path: <netdev+bounces-157470-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157471-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB4E4A0A61C
-	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 22:18:01 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5676FA0A61E
+	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 22:20:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0789916853E
-	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 21:18:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 51972188A0B0
+	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 21:20:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 840F91B87DF;
-	Sat, 11 Jan 2025 21:17:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AC251B982E;
+	Sat, 11 Jan 2025 21:20:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="RU51ey+l"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LKuhullK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04ECA79D2
-	for <netdev@vger.kernel.org>; Sat, 11 Jan 2025 21:17:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 140961B87F0
+	for <netdev@vger.kernel.org>; Sat, 11 Jan 2025 21:20:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736630278; cv=none; b=PmhppTqKVZ6RA0aIl8HsoE4DbKS0I1fJW5H3OTkiRJ8TCZGozQgTbbnlnqAwbw1Bk2yDUEjWC9UjCSIqoqT21zUxKrBg8DhbpwWlgUFh2zCHqFSYrT0CG6sxrc4EZrDI2JPqRL0XHBOOHRpVQKETASUIOBujy2Hff3LF8g+stvw=
+	t=1736630410; cv=none; b=HUhVh9SytvNc0DU5u0/e21D5w/BzyihsQwTVoWeJxy+JWEoFqHK3an7cPS4upXonw/+Iwf8NGkQuq9qWdmXzVhazv7neXfAREEQ0TLKChVuCGeMA6978qR0dLpx0QKrEHLlT2Lvx9ES0XQl1BiPGLwO1gKBqLut1ov9hrUQW1ro=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736630278; c=relaxed/simple;
-	bh=16ABFFdwV90k330EOSd/0E7npNEzoB0e8AenHzI8Av8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=aPqQ3iCoF0Yyz/fEZaUKin3acBox59tzuU5hIN8uMpLvvOG0Lb/8lURfRE0nb9PrIQIgWF7k6IfCzGmLCzP8rb3F074J+jmuCTD/M+U9aDUQQ4iscLlCHuwu7Cdm9KBMT5BzHRxncpubggxfYBhpyBsG7Cc0JJz5eWr/yfTswuc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=RU51ey+l; arc=none smtp.client-ip=209.85.216.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-2ef28f07dbaso4261340a91.2
-        for <netdev@vger.kernel.org>; Sat, 11 Jan 2025 13:17:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1736630276; x=1737235076; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1yE2U4HtS8Jve2u6+efl87IdKIqeye1Ij962QjEm8+k=;
-        b=RU51ey+lMj2eqoCg6aJdPvZO7sbkZmqJmot6R20hoUBB0cCcWx8o6ki463skJOKw0C
-         4zCUXOjfI8bmF1vzvGUSGl5OqBegHzl5XgIsf+wpQJTgpKGjM2p1BQBioW+M+oQcGBGG
-         URLZI7Uc9Coy/bfUSxc3Cs8H5siu55OCwAC8bn0Tj0YOq8hU6u7o3D9YUlasdVC2vkbq
-         nz7r87pzAtfLsbVJhPXIiwYsaMw38QbsnlYAzbkgrh1MmqtfEDgdu9x4YvScE4R1klZa
-         wWPdIP3UU46hex5mXzJz4jUMnGMAHCkkrJb8855Qn11nGR+e/8zL0YU495XwBU3fJyJw
-         wp0Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736630276; x=1737235076;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=1yE2U4HtS8Jve2u6+efl87IdKIqeye1Ij962QjEm8+k=;
-        b=RozoQIFZEn95yM0LRql1bL6+khQWIFgGGlLBS05eNjeo2TEPRgYCP5IUYqkgpByHYo
-         aUpOnkdFx5kNyE6C74QZ7i2yyMknLL21l6g+DDQNMvB7bts2eQSPTWh2L53+xNjQ0gFE
-         MEMhRHfy0bt4fH3W5ZL9EmtjbauZgZfgOxwvK1s0XH8QVGlikWpsIqFBXOiLEsoQSjZe
-         Cw25iX+tKqLYkzDd/c7vxXGfOP+zSphqkAFIeI9ggRbjye2n+Z0LT5CQCFiWKbfQVaxO
-         34oLXXUK9Noi9nq0KzTG/vx+IKViGgMu1c7N12Jh96geKE6m+qZvppXG+9bfnzamhDp4
-         MslQ==
-X-Gm-Message-State: AOJu0YyzZBIZHIwDII/PbIbUERn6PQFb2KqxNZ0CEszuNHEaEfJTHZdo
-	dA4dtGEGz8mz7PxuAMLiSew8ySelfU4MSffKadhadfnI9j/vkvEzUk/pnhe5JzFYztXOjJEj67D
-	2h0XLybOo7vuoHBGHjmlpQrp+rWmCXoV2TVSp
-X-Gm-Gg: ASbGncs8LQhHsKhhFaSschW+l2+uopwZ1drFMd9Ouad603iCvRlxsSsybbgGv1m0cN8
-	IVT9tzAzpmxloTCCKAF+EfYhAw+ra5l1FvOnW
-X-Google-Smtp-Source: AGHT+IEGU/TnpZxEZUaogtofh/+Y8PgCluA8hIG7gVABeW5f3GK4AkQG7gABvnaE9nha1sKIAFIMTca+1+RB2Xhi5Bw=
-X-Received: by 2002:a17:90b:2f0d:b0:2ee:f076:20fa with SMTP id
- 98e67ed59e1d1-2f548f1c518mr22388088a91.25.1736630276379; Sat, 11 Jan 2025
- 13:17:56 -0800 (PST)
+	s=arc-20240116; t=1736630410; c=relaxed/simple;
+	bh=d+CjSnWYenwUHwQ3HAhXwdYz3H2sh3KOtK+AFQLc9Gs=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=iIzIY6xCtrfUlrKni84QVP/aCMLCEUaC4vth7ZMOm0g+mhi9+6BvXQnvZPi4PxQqDxKKjxkfG8KIO5DxJUaxKzi4ZiEfKTGchv2MPx1B4TbcoQ1NPy/7e3vFUAs1tO5kU3zySuHfsqcwYteEU7CA2vRFD3B+EvLxafZuNEttL5Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LKuhullK; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8AE65C4CED2;
+	Sat, 11 Jan 2025 21:20:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1736630409;
+	bh=d+CjSnWYenwUHwQ3HAhXwdYz3H2sh3KOtK+AFQLc9Gs=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=LKuhullKPphx1ny0+ac63nI5jTOPOCf7LO5GCh71ih+T7THXUBcMl1Q48NjtN2D5L
+	 aBGpfuySR3at8Wx0mDQQjfR0wwpwJ0Z04hwGYIg+VE644gHHflwj/Y+Ei/I4/3lGkb
+	 C9CDvR/A91LC3vsbRGtIJ6jcwB6adDuBhmmgLYvXupS38X0T52Ix2rICvTxSMpOLgw
+	 pfW3diLLygbO8LW6Qnj/YfyRyyWnofQvSzvsBbJjVwwhOk6HX7T/z5QUAGS00KkEFd
+	 M4PsUyarW1nh0Ez+p3GPZo4y7WMjVuvpOnY0kGEipulf+SS8A3FGOHGXQbZWBSeZfc
+	 c9RjHZQnAm6eA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB242380AA54;
+	Sat, 11 Jan 2025 21:20:32 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250111145740.74755-1-jhs@mojatatu.com> <20250111130154.6fddde00@kernel.org>
-In-Reply-To: <20250111130154.6fddde00@kernel.org>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Sat, 11 Jan 2025 16:17:45 -0500
-X-Gm-Features: AbW1kvZMPfteJAElFOLDBJDVe57QStwqcgpz1CSkEzlflk-JOSTW30HHkUTFPnA
-Message-ID: <CAM0EoMkRqod-MsMb60krtZ38SszwTR+3jjwE1BHPKe4m6oVArw@mail.gmail.com>
-Subject: Re: [PATCH net v4 1/1] net: sched: fix ets qdisc OOB Indexing
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, jiri@resnulli.us, xiyou.wangcong@gmail.com, 
-	davem@davemloft.net, edumazet@google.com, petrm@mellanox.com, 
-	security@kernel.org, g1042620637@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next] net: airoha: Fix channel configuration for ETS
+ Qdisc
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <173663043176.2451513.12890809036064265655.git-patchwork-notify@kernel.org>
+Date: Sat, 11 Jan 2025 21:20:31 +0000
+References: <20250107-airoha-ets-fix-chan-v1-1-97f66ed3a068@kernel.org>
+In-Reply-To: <20250107-airoha-ets-fix-chan-v1-1-97f66ed3a068@kernel.org>
+To: Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: nbd@nbd.name, sean.wang@mediatek.com, Mark-MC.Lee@mediatek.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, matthias.bgg@gmail.com,
+ angelogioacchino.delregno@collabora.com,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
+ netdev@vger.kernel.org
 
-On Sat, Jan 11, 2025 at 4:01=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Sat, 11 Jan 2025 09:57:39 -0500 Jamal Hadi Salim wrote:
-> > Haowei Yan <g1042620637@gmail.com> found that ets_class_from_arg() can
-> > index an Out-Of-Bound class in ets_class_from_arg() when passed clid of
-> > 0. The overflow may cause local privilege escalation.
->
-> Code is identical to v1 here...
->
+Hello:
 
-The inequality changed > vs >=3D
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-> While fixing the code, could you also trim the stack trace?
-> Like this:
->
->    UBSAN: array-index-out-of-bounds in net/sched/sch_ets.c:93:20
->    index 18446744073709551615 is out of range for type 'ets_class [16]'
->    CPU: 0 UID: 0 PID: 1275 Comm: poc Not tainted 6.12.6-dirty #17
->    Call Trace:
->     <TASK>
->     ets_class_change+0x3d6/0x3f0
->     tc_ctl_tclass+0x251/0x910
->     rtnetlink_rcv_msg+0x170/0x6f0
->     netlink_rcv_skb+0x59/0x110
->     rtnetlink_rcv+0x15/0x30
->     netlink_unicast+0x1c3/0x2b0
->     netlink_sendmsg+0x239/0x4b0
->     ____sys_sendmsg+0x3e2/0x410
->     ___sys_sendmsg+0x88/0xe0
->     __sys_sendmsg+0x69/0xd0
->
-> the rest has no value.
+On Tue, 07 Jan 2025 23:26:28 +0100 you wrote:
+> Limit ETS QoS channel to AIROHA_NUM_QOS_CHANNELS in
+> airoha_tc_setup_qdisc_ets() in order to align the configured channel to
+> the value set in airoha_dev_select_queue().
+> 
+> Fixes: 20bf7d07c956 ("net: airoha: Add sched ETS offload support")
+> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+> 
+> [...]
 
-Still want this change?
+Here is the summary with links:
+  - [net-next] net: airoha: Fix channel configuration for ETS Qdisc
+    https://git.kernel.org/netdev/net-next/c/7d0da8f86234
 
-cheers,
-jamal
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
