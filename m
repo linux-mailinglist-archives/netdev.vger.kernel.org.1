@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-157316-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157317-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 480ABA09EBF
-	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 00:37:55 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 359EBA09EC1
+	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 00:38:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 538CE3A1776
-	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 23:37:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 49CAC3A17C1
+	for <lists+netdev@lfdr.de>; Fri, 10 Jan 2025 23:38:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C802221DB2;
-	Fri, 10 Jan 2025 23:37:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45D04221DB2;
+	Fri, 10 Jan 2025 23:38:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Kn1hKyVl"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PhiiZN3l"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A271A20764C
-	for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 23:37:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0A3720764C
+	for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 23:38:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736552272; cv=none; b=ITcEYow+ky6gsrPXkUUjcNWMZfn1RFtAQy/Y8srcIOK65dSPoHpI55uvNC8/jZ0+fptYzMcGMS7ZFs9ugSmgRczoAcBOFMwxTGIbUy6tbSupRZA07bNfv3LPgzmzbQasGUYQVqGwisYLED4fj08R1v8GUwEq/id+j4ITTK+SQC4=
+	t=1736552299; cv=none; b=HZXtA1O0SLzc66oHPQlLVRLAazDfM0qypHqOxThZCh1MK+z+PPK7S2zHhey1o5n4m0zI71LnEIOvAKOAt2D/L0rwlt1DDRFMqGHR0hIU2CK6q6PYdpTBVHXta1saWDbDBilCEEYezD/mfX8/RyeHRyFjFX2z1vPsnUwiRv9D6O0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736552272; c=relaxed/simple;
-	bh=zHQ4ZLwh1tJvzJXmXebl4aCYAAjrnRovb/kgEIc0LGY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=H20mOMFzLruA3ktcAAnOUNJqcc3/c/MoS8uTIwUYomvcn1f/jrWogYUID1HfVMtt5wsuhyhOqQ7//DD8bzpnYl99dvpSHhpRl7dD+Je/Q6NIe0GUWRvZobwziqq7nnflyvD794vToc9Pc/y+NsjlXy99AmrROIwfI+n5FKt22oY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Kn1hKyVl; arc=none smtp.client-ip=198.175.65.15
+	s=arc-20240116; t=1736552299; c=relaxed/simple;
+	bh=+vUQF0Ms6rApdjCEWLAUXJx8qXMAxLYASyTa7ZmSe9o=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GkevhsNC9aySE2sY6N1BkiMqKmAPsPW5DqKhTzsvHrUEVByAg6m3hCfjAwssH9bbZnn3JFWFR1G0SShG7b/qKzFy5GxVCUtZFeHNGWKGcBhWlYVlTqq95sIxeNOlLHumRJf643kIF7JP7SEsxGZ8jNBN+Wui/OK4VTJpdAWZYBQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PhiiZN3l; arc=none smtp.client-ip=192.198.163.12
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1736552271; x=1768088271;
+  t=1736552297; x=1768088297;
   h=from:to:cc:subject:date:message-id:mime-version:
    content-transfer-encoding;
-  bh=zHQ4ZLwh1tJvzJXmXebl4aCYAAjrnRovb/kgEIc0LGY=;
-  b=Kn1hKyVl2e/09BqtQje7aX6uSaIBrAduyoWlxfDSBrTUcipFU0E3ReBb
-   Ysk0dO5tRK5D+MrmssRmR9maI1oI3/hh5lrJoWPFR5ojWWxM/zIQIA8LN
-   4wn6FgcC4I6EFNf0u1wmlPSqc89/U401agu/su4oIm9ZTkWbPYSGgfma5
-   GDIQXLjjCDCNHkVhwumKRlsPrCha12T547PHK6+aW5fPHyChgVX2ox3Dv
-   vQHBzEGw0B6TfE12GJDQCphr7DCia5kcJ7nRoF7ZN4lB+6thZtJw8AGGN
-   2AeZNltPycY0Us0sf+prNtvXKgpiNzR9BiXlJlRUm3kZKa5B6N9rajSVR
-   w==;
-X-CSE-ConnectionGUID: BByKRyDSRCO4qi7t4++24Q==
-X-CSE-MsgGUID: 7eBdib+/QPiCfAa1ZNCq1w==
-X-IronPort-AV: E=McAfee;i="6700,10204,11311"; a="40542504"
+  bh=+vUQF0Ms6rApdjCEWLAUXJx8qXMAxLYASyTa7ZmSe9o=;
+  b=PhiiZN3ll0lnCs9KtZJcqd3Qwyaxn6oaahf+x44TT236lGYjANmu+jM+
+   krLZzNFa11gpqar3zZnEGamsDPqPsiZW6GC4AIBDWyLPqYLWchaQF7v2x
+   +sze60l1SsCj9QD0iYVzNyyLuai3ZaydjBsY/QswPG2aogYqEs2rjXxhC
+   VxZEwQRdXETq1xUL0Cxt9MBJ+W4dejN+Z9wkc0M1csyUIztVryYY3z397
+   qc6xH5QlUScxW2EBtPySMQfgOZ3Sc9aFDSAVqZFVRAZ0iGDkuBDEf7dHf
+   o4n40lyMHkE2Kx+PZUn1eIE/4HYM3WJuBGJt6wUtoODtMA4YCXLd3XZCb
+   Q==;
+X-CSE-ConnectionGUID: +7PH7rDPQJmpGh/3xudJzQ==
+X-CSE-MsgGUID: kDSxMgy9RR+Zd9d/ct+xKQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11311"; a="40799735"
 X-IronPort-AV: E=Sophos;i="6.12,305,1728975600"; 
-   d="scan'208";a="40542504"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jan 2025 15:37:50 -0800
-X-CSE-ConnectionGUID: FMYMb7IeQWO8Zd+QDusWnQ==
-X-CSE-MsgGUID: 6R6fvFZdSw+OcJ1pcP113g==
+   d="scan'208";a="40799735"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jan 2025 15:38:17 -0800
+X-CSE-ConnectionGUID: mkAyTctXQzm6oZG1RJ8RHA==
+X-CSE-MsgGUID: 4zAoolm/Rj6H3HyaCGzd8g==
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,305,1728975600"; 
-   d="scan'208";a="103673256"
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="107916555"
 Received: from jf3418-16b10-250812-p7.jf.intel.com ([10.166.80.88])
-  by fmviesa006.fm.intel.com with ESMTP; 10 Jan 2025 15:37:49 -0800
+  by fmviesa003.fm.intel.com with ESMTP; 10 Jan 2025 15:38:16 -0800
 From: "Samudrala, Sridhar" <sridhar.samudrala@intel.com>
 To: intel-wired-lan@lists.osuosl.org,
 	netdev@vger.kernel.org
 Cc: Sridhar Samudrala <sridhar.samudrala@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Subject: [PATCH iwl-net] idpf: fix handling rsc packet with a single segment
-Date: Fri, 10 Jan 2025 16:29:22 -0800
-Message-ID: <20250111002921.167301-2-sridhar.samudrala@intel.com>
+	Madhu Chittim <madhu.chittim@intel.com>
+Subject: [PATCH iwl-net] idpf: record rx queue in skb for RSC packets
+Date: Fri, 10 Jan 2025 16:29:58 -0800
+Message-ID: <20250111002957.167327-2-sridhar.samudrala@intel.com>
 X-Mailer: git-send-email 2.46.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -74,33 +74,37 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Handle rsc packet with a single segment same as a multi
-segment rsc packet so that CHECKSUM_PARTIAL is set in the
-skb->ip_summed field. The current code is passing CHECKSUM_NONE
-resulting in TCP GRO layer doing checksum in SW and hiding the
-issue. This will fail when using dmabufs as payload buffers as
-skb frag would be unreadable.
+Move the call to skb_record_rx_queue in idpf_rx_process_skb_fields()
+so that RX queue is recorded for RSC packets too.
 
-Fixes: 3a8845af66ed ("idpf: add RX splitq napi poll support")
+Fixes: 90912f9f4f2d ("idpf: convert header split mode to libeth + napi_build_skb()")
 Signed-off-by: Sridhar Samudrala <sridhar.samudrala@intel.com>
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Reviewed-by: Madhu Chittim <madhu.chittim@intel.com>
 ---
- drivers/net/ethernet/intel/idpf/idpf_txrx.c | 2 --
- 1 file changed, 2 deletions(-)
+ drivers/net/ethernet/intel/idpf/idpf_txrx.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
 diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-index 2fa9c36e33c9..c9fcf8f4d736 100644
+index c9fcf8f4d736..9be6a6b59c4e 100644
 --- a/drivers/net/ethernet/intel/idpf/idpf_txrx.c
 +++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-@@ -3008,8 +3008,6 @@ static int idpf_rx_rsc(struct idpf_rx_queue *rxq, struct sk_buff *skb,
- 		return -EINVAL;
+@@ -3070,6 +3070,7 @@ idpf_rx_process_skb_fields(struct idpf_rx_queue *rxq, struct sk_buff *skb,
+ 	idpf_rx_hash(rxq, skb, rx_desc, decoded);
  
- 	rsc_segments = DIV_ROUND_UP(skb->data_len, rsc_seg_len);
--	if (unlikely(rsc_segments == 1))
--		return 0;
+ 	skb->protocol = eth_type_trans(skb, rxq->netdev);
++	skb_record_rx_queue(skb, rxq->idx);
  
- 	NAPI_GRO_CB(skb)->count = rsc_segments;
- 	skb_shinfo(skb)->gso_size = rsc_seg_len;
+ 	if (le16_get_bits(rx_desc->hdrlen_flags,
+ 			  VIRTCHNL2_RX_FLEX_DESC_ADV_RSC_M))
+@@ -3078,8 +3079,6 @@ idpf_rx_process_skb_fields(struct idpf_rx_queue *rxq, struct sk_buff *skb,
+ 	csum_bits = idpf_rx_splitq_extract_csum_bits(rx_desc);
+ 	idpf_rx_csum(rxq, skb, csum_bits, decoded);
+ 
+-	skb_record_rx_queue(skb, rxq->idx);
+-
+ 	return 0;
+ }
+ 
 -- 
 2.46.2
 
