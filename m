@@ -1,125 +1,103 @@
-Return-Path: <netdev+bounces-157336-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157337-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D3B6A0A00C
-	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 02:27:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 91B55A0A024
+	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 02:41:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 509AD7A2E13
-	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 01:26:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 747847A3155
+	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 01:41:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF8E82E403;
-	Sat, 11 Jan 2025 01:25:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61A7017BB6;
+	Sat, 11 Jan 2025 01:41:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I0WWIKrO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Xk/mzqtO"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB49828370
-	for <netdev@vger.kernel.org>; Sat, 11 Jan 2025 01:25:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A91A5C96;
+	Sat, 11 Jan 2025 01:41:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736558737; cv=none; b=pAOdKE/sfEa4VnvuEAeqUPxHzrWPDJ3F+nbRFkb1RT1BN7eExT/zvxMLBQxVnMcUvoVgOeHvDDmtsxps1QNgg128Ql/LzruMtQViyS96eOq4BAhjec5kumy1hmETpCXi1uhsRXPpx8jkt6xcU5ormnI65qPr2lC2OJ/VzQDJe6k=
+	t=1736559689; cv=none; b=VOi8F+akontjdmYJl4LefRDTgzF+D6q6u5J3bSdV/r0gG93R1UowRYm9tkn/caH3MGEkt1w/ZDy4ZN/PlL6sM2DJJQ/aojuc97HhycUfMOwHGaUOpAKJ8V9X7V14me4iyzNFH6odEoZ6KlHqFRPXIe6dq5c7HURC+2TTZTsA0+A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736558737; c=relaxed/simple;
-	bh=lzbrKQhZYNhaqsce52Nn4TtWDkUtjybvDXHuvA2JmC0=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=XtK5ab0mUWNZN+dDI+lx+HlZcC7ekg/W2CtG+dkkMwLM+Q5TNdnzrR+zNYeSC73vTfV8yZxEdnPHjZmnyZA3WQt4eTVmAC1amkqRh0ZOFq/8bBEb6Xydy/HOILorvQUfVCU/bGDnYMpyEISuyRA9bX4GqwOm2+ncr7Qv068c0qk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I0WWIKrO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1B154C4CEE0;
-	Sat, 11 Jan 2025 01:25:37 +0000 (UTC)
+	s=arc-20240116; t=1736559689; c=relaxed/simple;
+	bh=SaAkLuVh5qeM5RczhYtiRyngltVs9Mjfy/xMJTVOWIs=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=pTlsq1ws6nOscmdgw5Dhjj1zjhuJUIbQE999FmQ4y3Lf4A2CbPH0HCOXy/GrNhUaZqITf3r4lgiIFj+ySXqsz4Q6rZwqd+ANRtu4Nd4j89HSCSwIfRdTV6K+U1AICspsuq2KVFqdX5bPl6rwC0XCCphkjwaw7x2QcsbPe5a5lFU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Xk/mzqtO; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7BAB1C4CED6;
+	Sat, 11 Jan 2025 01:41:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736558737;
-	bh=lzbrKQhZYNhaqsce52Nn4TtWDkUtjybvDXHuvA2JmC0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=I0WWIKrOgyUwc5ZrqExjY3TQZUvRVmjEsUCvWlfrI7eucQjSbnpSiNo/2zvdzQjDm
-	 yUBdnsr/l0c79L64z7EJaiMoUrNilEuc8dCyJnfLV2zgkqlBUHwhtRAgvKy7Gs2U/J
-	 ijP9J9AswhVqlwCObgGpHFEbiVatLBsBxIkf3rpASHaL6BGY31on/8SZZHJQXz6huE
-	 7171FGCKjTW+ee5FpfYKiZ2KIG8dgr5XLGFiFRzBDGyeTr7/oBTtskGJR9funEO7uR
-	 FzAnFccFxc752xodRNgSF0QBtHi7R/pQ0NkHhbCUucvWzMBkvm7rNolJ/Aq3jCT1Ne
-	 OIh0o0R7/XpFA==
-Date: Fri, 10 Jan 2025 17:25:36 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Jacob Keller <jacob.e.keller@intel.com>
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>, <davem@davemloft.net>,
- <pabeni@redhat.com>, <edumazet@google.com>, <andrew+netdev@lunn.ch>,
- <netdev@vger.kernel.org>, <anton.nadezhdin@intel.com>,
- <przemyslaw.kitszel@intel.com>, <milena.olech@intel.com>,
- <arkadiusz.kubalewski@intel.com>, <richardcochran@gmail.com>, Karol
- Kolacinski <karol.kolacinski@intel.com>, Rinitha S <sx.rinitha@intel.com>
-Subject: Re: [PATCH net-next 08/13] ice: use rd32_poll_timeout_atomic in
- ice_read_phy_tstamp_ll_e810
-Message-ID: <20250110172536.7165c528@kernel.org>
-In-Reply-To: <55655440-71b4-49e0-9fc8-d8b1b4f77ab4@intel.com>
-References: <20250108221753.2055987-1-anthony.l.nguyen@intel.com>
-	<20250108221753.2055987-9-anthony.l.nguyen@intel.com>
-	<20250109182148.398f1cf1@kernel.org>
-	<55655440-71b4-49e0-9fc8-d8b1b4f77ab4@intel.com>
+	s=k20201202; t=1736559685;
+	bh=SaAkLuVh5qeM5RczhYtiRyngltVs9Mjfy/xMJTVOWIs=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Xk/mzqtOkZWZ1bUHvh65lktetTPQyhONBxEJYI82Ed1EgCypli7pVEpV3JJGUm8mw
+	 A8XIbZ/KqWanSuFYi5Ywu380X4oTGrN0NmWnT0TQRI4DXC/MRQGz7OQDtIjQdqnLbP
+	 3ZCb7+okz/UmGqKsWY4EAWumje6bupcbRCFjOmxmLpk1R8bvv0vUAI6JnLZZ3XTjOr
+	 jq6vPtk2rcfT6kJSUrZQks0iZWWg8E/Dtn7WCAGWGBHr8ePem5PqlIj8po1XEh7xm/
+	 3mRIQhJzsNVWTcyzKurazP9smQ38f3FXwBsPPeJTj+DGh6nFFZ7R2PHYiKDJLOqSps
+	 NMqN4m/44D3HA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADF93380AA57;
+	Sat, 11 Jan 2025 01:41:48 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH bpf-next v2 0/3] selftests: bpf: Migrate
+ test_xdp_redirect.sh to test_progs
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <173655970751.2262030.14087955659103507101.git-patchwork-notify@kernel.org>
+Date: Sat, 11 Jan 2025 01:41:47 +0000
+References: <20250110-xdp_redirect-v2-0-b8f3ae53e894@bootlin.com>
+In-Reply-To: <20250110-xdp_redirect-v2-0-b8f3ae53e894@bootlin.com>
+To: Bastien Curutchet (eBPF Foundation) <bastien.curutchet@bootlin.com>
+Cc: ast@kernel.org, daniel@iogearbox.net, davem@davemloft.net,
+ kuba@kernel.org, hawk@kernel.org, john.fastabend@gmail.com,
+ andrii@kernel.org, martin.lau@linux.dev, eddyz87@gmail.com, song@kernel.org,
+ yonghong.song@linux.dev, kpsingh@kernel.org, sdf@fomichev.me,
+ haoluo@google.com, jolsa@kernel.org, mykolal@fb.com, shuah@kernel.org,
+ thomas.petazzoni@bootlin.com, alexis.lothore@bootlin.com,
+ netdev@vger.kernel.org, bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
-On Fri, 10 Jan 2025 16:50:44 -0800 Jacob Keller wrote:
-> On 1/9/2025 6:21 PM, Jakub Kicinski wrote:
-> > On Wed,  8 Jan 2025 14:17:45 -0800 Tony Nguyen wrote:  
-> >> --- a/drivers/net/ethernet/intel/ice/ice_osdep.h
-> >> +++ b/drivers/net/ethernet/intel/ice/ice_osdep.h
-> >> @@ -26,6 +26,9 @@
-> >>  
-> >>  #define rd32_poll_timeout(a, addr, val, cond, delay_us, timeout_us) \
-> >>  	read_poll_timeout(rd32, val, cond, delay_us, timeout_us, false, a, addr)
-> >> +#define rd32_poll_timeout_atomic(a, addr, val, cond, delay_us, timeout_us) \
-> >> +	read_poll_timeout_atomic(rd32, val, cond, delay_us, timeout_us, false, \
-> >> +				 a, addr)  
-> > 
-> > Could you deprecate the use of the osdep header? At the very least don't
-> > add new stuff here. Back in the day "no OS abstraction layers" was 
-> > a pretty hard and fast rule. I don't hear it as much these days, but 
-> > I think it's still valid since this just obfuscates the code for all
-> > readers outside your team.  
+Hello:
+
+This series was applied to bpf/bpf-next.git (master)
+by Martin KaFai Lau <martin.lau@kernel.org>:
+
+On Fri, 10 Jan 2025 10:21:08 +0100 you wrote:
+> Hi all,
 > 
-> I assume you are referring to the abstractions in general (rd32,
-> rd32_poll_timeout, etc) and not simply the name of the header (osdep.h)?
-
-I presume the two are causally interlinked.
-
-> I do agree that the layering with the intent to create an OS abstraction
-> is not preferred and that its been pushed back against for years. We
-> have been working to move away from OS abstractions, including several
-> refactors to the ice driver. Use of "rd32_poll_timeout" is in fact one
-> of these refactors: there's no reason to re-implement read polling when
-> its provided by the kernel.
+> This patch series continues the work to migrate the *.sh tests into
+> prog_tests.
 > 
-> However, I also think there is some value in shorthands for commonly
-> used idioms like "readl(hw->hw_addr + reg_offset)" which make the intent
-> more legible at least to me.
+> test_xdp_redirect.sh tests the XDP redirections done through
+> bpf_redirect().
 > 
-> These rd32_* implementations are built in line with the readl* variants
-> in <linux/iopoll.h>
-> 
-> I suppose it is more frustrating for someone on the opposite side who
-> must content with each drivers variation of a register access macro. We
-> could rip the rd32-etc out entirely and replace them with readl and
-> friends directly... But that again feels like a lot of churn.
+> [...]
 
-Right, too late for that.
+Here is the summary with links:
+  - [bpf-next,v2,1/3] selftests/bpf: test_xdp_redirect: Rename BPF sections
+    https://git.kernel.org/bpf/bpf-next/c/2c6c5c7c1ad1
+  - [bpf-next,v2,2/3] selftests/bpf: Migrate test_xdp_redirect.sh to xdp_do_redirect.c
+    (no matching commit)
+  - [bpf-next,v2,3/3] selftests/bpf: Migrate test_xdp_redirect.c to test_xdp_do_redirect.c
+    https://git.kernel.org/bpf/bpf-next/c/3e99fa9fab19
 
-> My goal with these macros was to make it easier for ice developers to
-> use the read_poll_timeout bits within the existing framework, with an
-> attempt to minimize the thrash to existing code.
-> 
-> Glancing through driver/net/ethernet, it appears many drivers to use a
-> straight readl, while others use a rapper like sbus_readl, gem_readl,
-> Intel's rd32, etc.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-Ack, and short hands make sense. But both rd32_poll_timeout_atomic and
-the exiting rd32_poll_timeout have a single user.
+
 
