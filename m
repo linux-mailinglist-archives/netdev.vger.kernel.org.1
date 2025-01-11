@@ -1,86 +1,65 @@
-Return-Path: <netdev+bounces-157438-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157439-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A43FA0A4E8
-	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 17:57:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7DD61A0A4EC
+	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 18:00:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9C811162A92
-	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 16:57:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8DA3D164F0F
+	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 17:00:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45E981B0F11;
-	Sat, 11 Jan 2025 16:56:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D58E14EC60;
+	Sat, 11 Jan 2025 17:00:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F3XDqWl/"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="n/oxGbpi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCB0410F1
-	for <netdev@vger.kernel.org>; Sat, 11 Jan 2025 16:56:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3EE6EBE;
+	Sat, 11 Jan 2025 17:00:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736614619; cv=none; b=WnEdSTwn3LRq/+PvP7PZYATGMhcrQjRFJBqFJoTnIMbvGxcdtd3RVol1+r4NxyOG0OmmTRytfiwsszvDi6Z//HJboNaoJriVeuKbwpduSKjkxJAxY7EdozrYQGPAxtiWQGQ1r4XAVYAgUf/7ZiC+6/II4z7w34H2P0NTZ3fjOSo=
+	t=1736614842; cv=none; b=M1AiOpRXCXgELnGQTyQ4Z3Uh70Ps+W1K/QaTRgwJ978zyL0k3n4xot5lWalqHRJl419/WJ1of+H0aoy/WAO6AavExda6pCcJ3jee7FQ7aAJMy3RqchPaSIuGs2UYdoHXk4AdI2x1K9TxfO28bh81JT57vJSx6p6g/X4Lyv1KH/o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736614619; c=relaxed/simple;
-	bh=HRwtumMcWB5+UKIg0/TtrPC/0CkHOe/h0vSP0PU3oOY=;
+	s=arc-20240116; t=1736614842; c=relaxed/simple;
+	bh=49VSL4D/KPkxJ+eFCXZctSCoxcKqPZ3ZGyi4HsT/uic=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ICrPKJqWDoE7Qbmq16cMMdNeyOF//UoinEuocv8yG5Key9Hsj9oYSMUyHRlMP4gwdkI9fLX0R+jf2HZMX5yg4ivn8h+IxN42j3NU79d3RBxNusI8T2XbtRoU4EJSZ5ocfVofGS3s/PxEzA22HkpD8MDZUukaWoCFUAE29ZNeA2k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=F3XDqWl/; arc=none smtp.client-ip=209.85.214.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-2161eb94cceso36774185ad.2
-        for <netdev@vger.kernel.org>; Sat, 11 Jan 2025 08:56:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736614617; x=1737219417; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=tvb9q+wNjZvuUYt2kF6D/x9omVb/I1IV5uZ8S2Cr+nQ=;
-        b=F3XDqWl/AbcEgRpS4yNxbzoxy+8VP4Q34o29ChIfw3/0rL3lhqQsh1kNGSymmREeZx
-         6qwuwOsrX7SUlkUSBMom8XKi+OUNoAwH4jGCkt5fjtbcKaiay7gAlH63GJy2poN48pgr
-         HS6Vv3pyExjlay12shewvwA+0V1blRVO4QiyVWJMn+Eh+sftEllfSGyE542RQWgbXs+6
-         uPh809fByYHGT2v8xVFnGlmJdCc1JPaLWP6WUI+K0W3c1L5VYnu3qkaDnOR8oKPcQkgx
-         KQraFlNpIfcHXZ/2XEnumLXOBP8Wvz5VJW23YukOVRByyZ81V1Qcl3tbAPbBeUfe/Vfz
-         cxLg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736614617; x=1737219417;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tvb9q+wNjZvuUYt2kF6D/x9omVb/I1IV5uZ8S2Cr+nQ=;
-        b=Pp0lwPmDMbYWqe3suCtz8PXRXyk27G36443Qj87GiO+4PMki6zD6TbuNXAIFTh4/1W
-         PiKXylPlL/mDPkXAKNiYduGHXKeeByMJsSQ5v9xoORS4wZITURiXOqDwSUls4lYcKSpK
-         h0whW5XzYkALSReIzMcWJzt+NIGx/+h1LFb77m1GUnaOrpbE3bn397fhOJC/UBQTA1eJ
-         AVR+Zs55ly6uE6zhjqpFlhloeQwiZXDWO7hjPpK/idOTRL1QF4uS7pQnbUfsLB0V9cca
-         bVnMTZR6Bz6tVna8McIgHFGRUbA1sdWjRZCzGHxEbHwNyLW/AgnYGbtaTzg9Yts2vB/c
-         3X5A==
-X-Forwarded-Encrypted: i=1; AJvYcCWMYTV4YPwuPVkNQTz6TnckdD0OjoJD0UF3XwPWi3EFG7R5O149cRVVt3mZMCSZNcAikETDCSw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwTLFQln+YCsOhRSP/UQgeZk4jOTppHbA10Oer5RJIVe2n3tblh
-	qHwgK0RNbd4ng58bYGPROK4feic6rF72yRfkK55k9GKgUF7rFpvIU71TP58H
-X-Gm-Gg: ASbGncuAVWbcQFemCaIKDN9GHhiZsOurnVN/o9IWH0lxRHBQZoZRSrkW5gfZh1DqBRM
-	GHU5pWI1R09pt4rWELNgN1RRrSB///TUng/M2gqyvfmxFO7aAMMthSpv2mvpfk7b6QpxvggqdSn
-	mSGX37AEoVZBI1cTThbjQ8UuVtzl1Mk4KC2hfeP07qEdb/tDTq0lhTedz7cvnkk4D8xzEljUTrw
-	4t0GLPRdMthykuKPfL0vbF3o7ywQQW366Df2dnXi5GH21hSgLNklMtJklbyZ/mgNNbDFhT3aO1V
-X-Google-Smtp-Source: AGHT+IFxKeTRxNGQUfIuXoSiSb6XAYrjAFoRACf3BUReNSakql00po5u16PL70wappOwngMKDesUig==
-X-Received: by 2002:a17:902:ecc5:b0:216:45eb:5e4d with SMTP id d9443c01a7336-21a83f4b29dmr212876055ad.6.1736614617177;
-        Sat, 11 Jan 2025 08:56:57 -0800 (PST)
-Received: from hoboy.vegasvil.org ([2600:1700:2430:6f6f:e2d5:5eff:fea5:802f])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21a9f10ddbesm29677655ad.2.2025.01.11.08.56.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 11 Jan 2025 08:56:56 -0800 (PST)
-Date: Sat, 11 Jan 2025 08:56:54 -0800
-From: Richard Cochran <richardcochran@gmail.com>
-To: Jiawen Wu <jiawenwu@trustnetic.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, linux@armlinux.org.uk,
-	horms@kernel.org, jacob.e.keller@intel.com, netdev@vger.kernel.org,
-	vadim.fedorenko@linux.dev, mengyuanlou@net-swift.com
-Subject: Re: [PATCH net-next v3 4/4] net: ngbe: Add support for 1PPS and TOD
-Message-ID: <Z4Ki1h1h0OCxHfsb@hoboy.vegasvil.org>
-References: <20250110031716.2120642-1-jiawenwu@trustnetic.com>
- <20250110031716.2120642-5-jiawenwu@trustnetic.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=P7wG5rZnYQIqw2ZxceOrWGXAmqFHTIN1zcUEx4d5ND3RvT6yLSaP/ovjv/eezDFYb3vR7W2tb44S7hs/9fEKOO8w4wAQ9lKY2bPynAy2VUo6LeLy36s3afbFxMIzC8D4D8oJTBcr13MALHg6iwaiXtE8Kn3CzTwrF6yw5SV1iwQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=n/oxGbpi; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=vrAAgUcE8bhk3sZUvhP9sUL9+WDsX+SNiNHu7t+28GA=; b=n/oxGbpi0pgxALvqxRg1NyXt8O
+	7dNoLxgBnG2XN0jjqnAVYGtgsXfogSmpKWQJnI74hZ1XUxb8naXbm7xu73WR32X/PfA8nTOIEW/ey
+	VYSiFtDxxjRbBfaVEWfxmYNsXYuTFhl/kARtKhUI68uitz4WveeEGVME6JJX3ALLWla0=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tWeqM-003Zxs-NO; Sat, 11 Jan 2025 18:00:14 +0100
+Date: Sat, 11 Jan 2025 18:00:14 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Guenter Roeck <linux@roeck-us.net>,
+	Russell King - ARM Linux <linux@armlinux.org.uk>,
+	Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+	David Miller <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-hwmon@vger.kernel.org" <linux-hwmon@vger.kernel.org>,
+	Jean Delvare <jdelvare@suse.com>
+Subject: Re: [PATCH net-next 3/3] net: phy: realtek: add hwmon support for
+ temp sensor on RTL822x
+Message-ID: <0adfb0e4-72b2-48c1-bf65-da75213a5f18@lunn.ch>
+References: <3e2784e3-4670-4d54-932f-b25440747b65@gmail.com>
+ <dbfeb139-808f-4345-afe8-830b7f4da26a@gmail.com>
+ <8d052f8f-d539-45ba-ba21-0a459057f313@lunn.ch>
+ <a0ddf522-e4d0-47c9-b4c0-9fc127c74f11@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -89,27 +68,60 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250110031716.2120642-5-jiawenwu@trustnetic.com>
+In-Reply-To: <a0ddf522-e4d0-47c9-b4c0-9fc127c74f11@gmail.com>
 
-On Fri, Jan 10, 2025 at 11:17:16AM +0800, Jiawen Wu wrote:
+> According to Guenters feedback the alarm attribute must not be written
+> and is expected to be self-clearing on read.
+> If we would clear the alarm in the chip on alarm attribute read, then
+> we can have the following ugly scenario:
+> 
+> 1. Temperature threshold is exceeded and chip reduces speed to 1Gbps
+> 2. Temperature is falling below alarm threshold
+> 3. User uses "sensors" to check the current temperature
+> 4. The implicit alarm attribute read causes the chip to clear the
+>    alarm and re-enable 2.5Gbps speed, resulting in the temperature
+>    alarm threshold being exceeded very soon again.
+> 
+> What isn't nice here is that it's not transparent to the user that
+> a read-only command from his perspective causes the protective measure
+> of the chip to be cancelled.
+> 
+> There's no existing hwmon attribute meant to be used by the user
+> to clear a hw alarm once he took measures to protect the chip
+> from overheating.
 
-> +static void wx_ptp_setup_sdp(struct wx *wx)
-> +{
-> +	struct cyclecounter *cc = &wx->hw_cc;
-> +	u32 tsauxc, rem, tssdp, tssdp1;
-> +	u32 trgttiml0, trgttimh0;
-> +	u32 trgttiml1, trgttimh1;
-> +	unsigned long flags;
-> +	u64 ns = 0;
-> +
-> +	if (wx->pps_width >= WX_NS_PER_SEC) {
-> +		wx_err(wx, "PTP pps width cannot be longer than 1s!\n");
-> +		return;
-> +	}
+It is generally not the kernels job to implement policy. User space
+should be doing that.
 
-Instead of silently doing nothing, the driver should return an error
-if the dialed period cannot be supported.
+I see two different possible policies, and there are maybe others:
 
-Thanks,
-Richard
+1) The user is happy with one second outages every so often as the
+chip cycles between too hot and down shifting, and cool enough to
+upshift back to the higher speeds.
+
+2) The user prefers to have reliable, slower connectivity and needs to
+explicitly do something like down/up the interface to get it back to
+the higher speed.
+
+I personally would say, from a user support view, 2) is better. A one
+time 1 second break in connectivity and a kernel message is going to
+cause less issues.
+
+Maybe the solution is that the hwmon alarm attribute is not directly
+the hardware bit, but a software interpretation of the system state.
+When the alarm fires, copy it into a software alarm state, but leave
+the hardware alarm alone. A hwmon read clears the software state, but
+leaves the hardware alone. A down/up of the interface will then clear
+both the software and hardware alarm state.
+
+Anybody wanting policy 1) would then need a daemon polling the state
+and taking action. 2) would be the default.
+
+How easy is it for you to get into the alarm state? Did you need an
+environment chamber/oven, or is it happening for you with just lots of
+continuous traffic at typical room temperature? Are we talking about
+cheap USB dangles in a sealed plastic case with poor thermal design
+are going to be doing this all the time?
+
+	Andrew
 
