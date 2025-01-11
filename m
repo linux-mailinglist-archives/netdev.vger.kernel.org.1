@@ -1,359 +1,150 @@
-Return-Path: <netdev+bounces-157382-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157383-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA4D6A0A1D2
-	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 08:22:58 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 336BEA0A1D8
+	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 08:37:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 765277A7B87
-	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 07:19:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6BE7E188B36B
+	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 07:37:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54A8718E379;
-	Sat, 11 Jan 2025 07:13:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gyMFXEec"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4060524B259;
+	Sat, 11 Jan 2025 07:37:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f208.google.com (mail-il1-f208.google.com [209.85.166.208])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 309061632F3
-	for <netdev@vger.kernel.org>; Sat, 11 Jan 2025 07:13:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B12424B226
+	for <netdev@vger.kernel.org>; Sat, 11 Jan 2025 07:37:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.208
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736579625; cv=none; b=u8gDh5FKEQzFnnJJNhaPcduVMYc7uPBJP3QVvIxQJvnnVG8dJrSru0hF/FOFjpiONFwCe6mUY6vYB7cFgCjya62oljPKdSODDiB1n8UCfdskl7F342jOKRKr+rYa9xD+vFPBGv9WEcO2ip0fpR53NhXwI/Aa8lV5gx1pPT6luEc=
+	t=1736581046; cv=none; b=OwcKDAzqHWKMrTTCTVs//LMLc/eeoYE9sXsvOzBcYX3keK8rJsfsO7Sy1MV3TJyw2cCRtnlOj9CU9TzypdTqrfuSGDbNxGU2UZhVwV1oku7qA10eRDjvaq+6pOdgzH8sKqZQKWowRO9nStgK7W70KDbk1f/gXXj3LBmv7omevKI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736579625; c=relaxed/simple;
-	bh=tjOQooaPMspwaRUEYfQcXtavHOt+ybzJyw9fTnc+C3w=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Bl/ZXsP8P1HlFENfJ7sRJ0ZlxFEkGhP01qDOmI90ws9d7FNzHj+m9StEhWTe6EIUm0EJGO4S/fcPpZYV4tb7ZrgdVtOhrw9eiZrYcU8fIGOqj/cY7YHmr0vY0WZPaBgvw4HJbIXy+iBA13msfMRWb1Z5KdhkS8NmF7KY/SRwxac=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gyMFXEec; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 42862C4CED2;
-	Sat, 11 Jan 2025 07:13:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736579624;
-	bh=tjOQooaPMspwaRUEYfQcXtavHOt+ybzJyw9fTnc+C3w=;
-	h=From:To:Cc:Subject:Date:From;
-	b=gyMFXEec7+RFPryObAhSPh7hTfy03yiwLbypUuZIxDQLI9in+cgYT8TGoynfMLluh
-	 S2uA6XvV1DU64x55FCDHwAe/E8ilwCNGwMMTGBRFxVIz+4PfprDzfATl04oxvB8QwN
-	 LxO9r456oPlWzT1mINQcBpkJiD5Yq3WSwf/Il8RIvA3K38lKV9qTDR0gqoo0zSGZoG
-	 b6ryGO5iBnG+thTWfHL86GMTw2mWXLS4IDIFoFqiLFvmQnqWfOyOlnTN8wQVB812tO
-	 4n4zy6AG5nqY0dTOnMOA/axrUeSRVLPgzRatrxhJhikV4tHbtCwlvoQdb1GeCWKZOE
-	 kPOQrRik9pPTQ==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	anthony.l.nguyen@intel.com,
-	przemyslaw.kitszel@intel.com,
-	intel-wired-lan@lists.osuosl.org
-Subject: [PATCH net-next] eth: iavf: extend the netdev_lock usage
-Date: Fri, 10 Jan 2025 23:13:39 -0800
-Message-ID: <20250111071339.3709071-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.47.1
+	s=arc-20240116; t=1736581046; c=relaxed/simple;
+	bh=uWLwMe3jqvdDdW77L2W6yrwWc8KABM0SMkwPyStqy/k=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=g3IUDgKiZFInsY3df50wWOGrz01IqCOjO0WHHG2N8MGwBiImCcm7pfI02kBP9977LoGR5OqwJ9AlQkNdJoNF1f6vJ41vQtlb5kl4AgxTfK/kt4vfdt+Ayg7XLe/CfnAlXdrqS/dyzQMbwkXls86lWgTpy94ts6HR1z+JvEBh9Yw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.208
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f208.google.com with SMTP id e9e14a558f8ab-3a91a13f63fso22800955ab.3
+        for <netdev@vger.kernel.org>; Fri, 10 Jan 2025 23:37:24 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736581044; x=1737185844;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=IVOH7tDTP8ZL++lwFRoxsPgQDJutOGJQ9WtGPMYZmxQ=;
+        b=vnvNzffheir9yNckh9sL5sqilap2B97ZV/QV6fMqT0meY03Fd6K5PRrEczKhDGir99
+         CSXMsXLIGpGFb8aN77eZWVylSR1wyJUOC5mEI7bGCmPwnxhF5ToDYxxU3+Eb0JMN7Iwx
+         AZwVbWSbydZdZOQLj5l/oOSy7Agmt283qkJQrdOIcxKDYspwileEDPmv1OPGmRr37HcU
+         6yj93TJaCrYrYAjEQdbIcXjQUmoGpmqmRJ6+gsz0ZBrzqpJJh57lM3ReFmbmCp8ntP5q
+         Qy9iI77cm2cI0jZg5J3jcjtmINbPGJ0LSdTJqpd/j6MxWfhzS4F4wrtm8H5NwjL36/Yn
+         oKTg==
+X-Forwarded-Encrypted: i=1; AJvYcCVNs9vAvF+V0F36ZwTjv5g5uKmX7hna5xQpxt8xZvevJo2lrtyRhxrRm1wnllZeSuHw9REg9WA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzSmrFgyxWKTaMrLzfs4dphNkVYU0F3R8RQAZSDPi7hrHRggiXQ
+	4aPraT+1jH4FSOBLz6UEFhZMi2g4kFytXJmpX3x2VJrUgRI4WsrReo1jpzQaYiVlCJve/CZq56F
+	5K0HyqRf37BHKWP/LGtl+aCjM+bYCJC1h7IOtpRjqVsJF3+Rh0d4oPyU=
+X-Google-Smtp-Source: AGHT+IE9P1EFBLnetNXAkGjLXG316YIdDLRM4OvcX9DSgGuwLL7Vfci+bWxKezN+MnEDDPhfWuQHYn1b0qd2XssrjwP3lCS62DMa
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a92:cda3:0:b0:3cd:d02b:d1f3 with SMTP id
+ e9e14a558f8ab-3ce3aa5af2fmr86195905ab.17.1736581043908; Fri, 10 Jan 2025
+ 23:37:23 -0800 (PST)
+Date: Fri, 10 Jan 2025 23:37:23 -0800
+In-Reply-To: <675021af.050a0220.17bd51.0061.GAE@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <67821fb3.050a0220.216c54.001a.GAE@google.com>
+Subject: Re: [syzbot] [wpan?] WARNING in cfg802154_switch_netns (3)
+From: syzbot <syzbot+bd5829ba3619f08e2341@syzkaller.appspotmail.com>
+To: alex.aring@gmail.com, davem@davemloft.net, edumazet@google.com, 
+	horms@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
+	linux-wpan@vger.kernel.org, miquel.raynal@bootlin.com, netdev@vger.kernel.org, 
+	pabeni@redhat.com, stefan@datenfreihafen.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-iavf uses the netdev->lock already to protect shapers.
-In an upcoming series we'll try to protect NAPI instances
-with netdev->lock.
+syzbot has found a reproducer for the following issue on:
 
-We need to modify the protection a bit. All NAPI related
-calls in the driver need to be consistently under the lock.
-This will allow us to easily switch to a "we already hold
-the lock" NAPI API later.
+HEAD commit:    7b24f164cf00 Merge tag 'ipsec-next-2025-01-09' of git://gi..
+git tree:       net-next
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=168791df980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=28dc37e0ec0dfc41
+dashboard link: https://syzkaller.appspot.com/bug?extid=bd5829ba3619f08e2341
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=122fef0f980000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=16c9ccb0580000
 
-register_netdevice(), OTOH, must not be called under
-the netdev_lock() as we do not intend to have an
-"already locked" version of this call.
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/73892b055b77/disk-7b24f164.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/d6a3f606bee9/vmlinux-7b24f164.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/4d3108a02573/bzImage-7b24f164.xz
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+bd5829ba3619f08e2341@syzkaller.appspotmail.com
+
+RSP: 002b:00007ffe8eee9248 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 00007ffe8eee9260 RCX: 00007f255ac67da9
+RDX: 000000000004c084 RSI: 0000000020000100 RDI: 0000000000000006
+RBP: 0000000000000001 R08: 00007ffe8eee8fe7 R09: 000055556b883610
+R10: 0000000000000001 R11: 0000000000000246 R12: 00007f255acafe7c
+R13: 00007f255acaa10f R14: 0000000000000001 R15: 0000000000000001
+ </TASK>
+------------[ cut here ]------------
+WARNING: CPU: 0 PID: 5837 at net/ieee802154/core.c:258 cfg802154_switch_netns+0x3c7/0x3d0 net/ieee802154/core.c:258
+Modules linked in:
+CPU: 0 UID: 0 PID: 5837 Comm: syz-executor125 Not tainted 6.13.0-rc6-syzkaller-00918-g7b24f164cf00 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
+RIP: 0010:cfg802154_switch_netns+0x3c7/0x3d0 net/ieee802154/core.c:258
+Code: e1 07 38 c1 7c 92 48 89 ef e8 35 dd 86 f6 eb 88 e8 9e 79 20 f6 e9 66 fe ff ff e8 94 79 20 f6 e9 5c fe ff ff e8 8a 79 20 f6 90 <0f> 0b 90 e9 4e fe ff ff 90 90 90 90 90 90 90 90 90 90 90 90 90 90
+RSP: 0018:ffffc9000406f3c8 EFLAGS: 00010293
+RAX: ffffffff8b7f0a96 RBX: 00000000fffffff4 RCX: ffff88802e890000
+RDX: 0000000000000000 RSI: 00000000fffffff4 RDI: 0000000000000000
+RBP: ffff88814479e198 R08: ffffffff8b7f08e0 R09: 1ffffffff2858111
+R10: dffffc0000000000 R11: fffffbfff2858112 R12: 0000000000000000
+R13: 0000000000000000 R14: ffff88814479e078 R15: dffffc0000000000
+FS:  000055556b882380(0000) GS:ffff8880b8600000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f255acbe5e7 CR3: 000000007e970000 CR4: 00000000003526f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ nl802154_wpan_phy_netns+0x13d/0x210 net/ieee802154/nl802154.c:1292
+ genl_family_rcv_msg_doit net/netlink/genetlink.c:1115 [inline]
+ genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
+ genl_rcv_msg+0xb14/0xec0 net/netlink/genetlink.c:1210
+ netlink_rcv_skb+0x1e3/0x430 net/netlink/af_netlink.c:2543
+ genl_rcv+0x28/0x40 net/netlink/genetlink.c:1219
+ netlink_unicast_kernel net/netlink/af_netlink.c:1322 [inline]
+ netlink_unicast+0x7f6/0x990 net/netlink/af_netlink.c:1348
+ netlink_sendmsg+0x8e4/0xcb0 net/netlink/af_netlink.c:1892
+ sock_sendmsg_nosec net/socket.c:711 [inline]
+ __sock_sendmsg+0x221/0x270 net/socket.c:726
+ ____sys_sendmsg+0x52a/0x7e0 net/socket.c:2594
+ ___sys_sendmsg net/socket.c:2648 [inline]
+ __sys_sendmsg+0x269/0x350 net/socket.c:2680
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f255ac67da9
+Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007ffe8eee9248 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 00007ffe8eee9260 RCX: 00007f255ac67da9
+RDX: 000000000004c084 RSI: 0000000020000100 RDI: 0000000000000006
+RBP: 0000000000000001 R08: 00007ffe8eee8fe7 R09: 000055556b883610
+R10: 0000000000000001 R11: 0000000000000246 R12: 00007f255acafe7c
+R13: 00007f255acaa10f R14: 0000000000000001 R15: 0000000000000001
+ </TASK>
+
+
 ---
-Could someone with iavf-capable HW give this a quick whirl?
-It if works for basic traffic test and up/down - it'd be great
-if we could take it directly to net-next.
-
-CC: anthony.l.nguyen@intel.com
-CC: przemyslaw.kitszel@intel.com
-CC: intel-wired-lan@lists.osuosl.org
----
- drivers/net/ethernet/intel/iavf/iavf_main.c | 53 +++++++++++++++++----
- 1 file changed, 45 insertions(+), 8 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/iavf/iavf_main.c b/drivers/net/ethernet/intel/iavf/iavf_main.c
-index a9e54866ae6b..7740f446c73f 100644
---- a/drivers/net/ethernet/intel/iavf/iavf_main.c
-+++ b/drivers/net/ethernet/intel/iavf/iavf_main.c
-@@ -1968,6 +1968,7 @@ static int iavf_reinit_interrupt_scheme(struct iavf_adapter *adapter, bool runni
- static void iavf_finish_config(struct work_struct *work)
- {
- 	struct iavf_adapter *adapter;
-+	bool netdev_released = false;
- 	int pairs, err;
- 
- 	adapter = container_of(work, struct iavf_adapter, finish_config);
-@@ -1988,7 +1989,16 @@ static void iavf_finish_config(struct work_struct *work)
- 
- 	switch (adapter->state) {
- 	case __IAVF_DOWN:
-+		/* Set the real number of queues when reset occurs while
-+		 * state == __IAVF_DOWN
-+		 */
-+		pairs = adapter->num_active_queues;
-+		netif_set_real_num_rx_queues(adapter->netdev, pairs);
-+		netif_set_real_num_tx_queues(adapter->netdev, pairs);
-+
- 		if (adapter->netdev->reg_state != NETREG_REGISTERED) {
-+			mutex_unlock(&adapter->netdev->lock);
-+			netdev_released = true;
- 			err = register_netdevice(adapter->netdev);
- 			if (err) {
- 				dev_err(&adapter->pdev->dev, "Unable to register netdev (%d)\n",
-@@ -2003,11 +2013,7 @@ static void iavf_finish_config(struct work_struct *work)
- 				goto out;
- 			}
- 		}
--
--		/* Set the real number of queues when reset occurs while
--		 * state == __IAVF_DOWN
--		 */
--		fallthrough;
-+		break;
- 	case __IAVF_RUNNING:
- 		pairs = adapter->num_active_queues;
- 		netif_set_real_num_rx_queues(adapter->netdev, pairs);
-@@ -2020,7 +2026,8 @@ static void iavf_finish_config(struct work_struct *work)
- 
- out:
- 	mutex_unlock(&adapter->crit_lock);
--	mutex_unlock(&adapter->netdev->lock);
-+	if (!netdev_released)
-+		mutex_unlock(&adapter->netdev->lock);
- 	rtnl_unlock();
- }
- 
-@@ -2713,12 +2720,16 @@ static void iavf_watchdog_task(struct work_struct *work)
- 	struct iavf_adapter *adapter = container_of(work,
- 						    struct iavf_adapter,
- 						    watchdog_task.work);
-+	struct net_device *netdev = adapter->netdev;
- 	struct iavf_hw *hw = &adapter->hw;
- 	u32 reg_val;
- 
-+	mutex_lock(&netdev->lock);
- 	if (!mutex_trylock(&adapter->crit_lock)) {
--		if (adapter->state == __IAVF_REMOVE)
-+		if (adapter->state == __IAVF_REMOVE) {
-+			mutex_unlock(&netdev->lock);
- 			return;
-+		}
- 
- 		goto restart_watchdog;
- 	}
-@@ -2730,30 +2741,35 @@ static void iavf_watchdog_task(struct work_struct *work)
- 	case __IAVF_STARTUP:
- 		iavf_startup(adapter);
- 		mutex_unlock(&adapter->crit_lock);
-+		mutex_unlock(&netdev->lock);
- 		queue_delayed_work(adapter->wq, &adapter->watchdog_task,
- 				   msecs_to_jiffies(30));
- 		return;
- 	case __IAVF_INIT_VERSION_CHECK:
- 		iavf_init_version_check(adapter);
- 		mutex_unlock(&adapter->crit_lock);
-+		mutex_unlock(&netdev->lock);
- 		queue_delayed_work(adapter->wq, &adapter->watchdog_task,
- 				   msecs_to_jiffies(30));
- 		return;
- 	case __IAVF_INIT_GET_RESOURCES:
- 		iavf_init_get_resources(adapter);
- 		mutex_unlock(&adapter->crit_lock);
-+		mutex_unlock(&netdev->lock);
- 		queue_delayed_work(adapter->wq, &adapter->watchdog_task,
- 				   msecs_to_jiffies(1));
- 		return;
- 	case __IAVF_INIT_EXTENDED_CAPS:
- 		iavf_init_process_extended_caps(adapter);
- 		mutex_unlock(&adapter->crit_lock);
-+		mutex_unlock(&netdev->lock);
- 		queue_delayed_work(adapter->wq, &adapter->watchdog_task,
- 				   msecs_to_jiffies(1));
- 		return;
- 	case __IAVF_INIT_CONFIG_ADAPTER:
- 		iavf_init_config_adapter(adapter);
- 		mutex_unlock(&adapter->crit_lock);
-+		mutex_unlock(&netdev->lock);
- 		queue_delayed_work(adapter->wq, &adapter->watchdog_task,
- 				   msecs_to_jiffies(1));
- 		return;
-@@ -2765,6 +2781,7 @@ static void iavf_watchdog_task(struct work_struct *work)
- 			 * as it can loop forever
- 			 */
- 			mutex_unlock(&adapter->crit_lock);
-+			mutex_unlock(&netdev->lock);
- 			return;
- 		}
- 		if (++adapter->aq_wait_count > IAVF_AQ_MAX_ERR) {
-@@ -2773,6 +2790,7 @@ static void iavf_watchdog_task(struct work_struct *work)
- 			adapter->flags |= IAVF_FLAG_PF_COMMS_FAILED;
- 			iavf_shutdown_adminq(hw);
- 			mutex_unlock(&adapter->crit_lock);
-+			mutex_unlock(&netdev->lock);
- 			queue_delayed_work(adapter->wq,
- 					   &adapter->watchdog_task, (5 * HZ));
- 			return;
-@@ -2780,6 +2798,7 @@ static void iavf_watchdog_task(struct work_struct *work)
- 		/* Try again from failed step*/
- 		iavf_change_state(adapter, adapter->last_state);
- 		mutex_unlock(&adapter->crit_lock);
-+		mutex_unlock(&netdev->lock);
- 		queue_delayed_work(adapter->wq, &adapter->watchdog_task, HZ);
- 		return;
- 	case __IAVF_COMM_FAILED:
-@@ -2792,6 +2811,7 @@ static void iavf_watchdog_task(struct work_struct *work)
- 			iavf_change_state(adapter, __IAVF_INIT_FAILED);
- 			adapter->flags &= ~IAVF_FLAG_PF_COMMS_FAILED;
- 			mutex_unlock(&adapter->crit_lock);
-+			mutex_unlock(&netdev->lock);
- 			return;
- 		}
- 		reg_val = rd32(hw, IAVF_VFGEN_RSTAT) &
-@@ -2811,12 +2831,14 @@ static void iavf_watchdog_task(struct work_struct *work)
- 		adapter->aq_required = 0;
- 		adapter->current_op = VIRTCHNL_OP_UNKNOWN;
- 		mutex_unlock(&adapter->crit_lock);
-+		mutex_unlock(&netdev->lock);
- 		queue_delayed_work(adapter->wq,
- 				   &adapter->watchdog_task,
- 				   msecs_to_jiffies(10));
- 		return;
- 	case __IAVF_RESETTING:
- 		mutex_unlock(&adapter->crit_lock);
-+		mutex_unlock(&netdev->lock);
- 		queue_delayed_work(adapter->wq, &adapter->watchdog_task,
- 				   HZ * 2);
- 		return;
-@@ -2847,6 +2869,7 @@ static void iavf_watchdog_task(struct work_struct *work)
- 	case __IAVF_REMOVE:
- 	default:
- 		mutex_unlock(&adapter->crit_lock);
-+		mutex_unlock(&netdev->lock);
- 		return;
- 	}
- 
-@@ -2858,12 +2881,14 @@ static void iavf_watchdog_task(struct work_struct *work)
- 		dev_err(&adapter->pdev->dev, "Hardware reset detected\n");
- 		iavf_schedule_reset(adapter, IAVF_FLAG_RESET_PENDING);
- 		mutex_unlock(&adapter->crit_lock);
-+		mutex_unlock(&netdev->lock);
- 		queue_delayed_work(adapter->wq,
- 				   &adapter->watchdog_task, HZ * 2);
- 		return;
- 	}
- 
- 	mutex_unlock(&adapter->crit_lock);
-+	mutex_unlock(&netdev->lock);
- restart_watchdog:
- 	if (adapter->state >= __IAVF_DOWN)
- 		queue_work(adapter->wq, &adapter->adminq_task);
-@@ -4340,14 +4365,17 @@ static int iavf_open(struct net_device *netdev)
- 		return -EIO;
- 	}
- 
-+	mutex_lock(&netdev->lock);
- 	while (!mutex_trylock(&adapter->crit_lock)) {
- 		/* If we are in __IAVF_INIT_CONFIG_ADAPTER state the crit_lock
- 		 * is already taken and iavf_open is called from an upper
- 		 * device's notifier reacting on NETDEV_REGISTER event.
- 		 * We have to leave here to avoid dead lock.
- 		 */
--		if (adapter->state == __IAVF_INIT_CONFIG_ADAPTER)
-+		if (adapter->state == __IAVF_INIT_CONFIG_ADAPTER) {
-+			mutex_unlock(&netdev->lock);
- 			return -EBUSY;
-+		}
- 
- 		usleep_range(500, 1000);
- 	}
-@@ -4396,6 +4424,7 @@ static int iavf_open(struct net_device *netdev)
- 	iavf_irq_enable(adapter, true);
- 
- 	mutex_unlock(&adapter->crit_lock);
-+	mutex_unlock(&netdev->lock);
- 
- 	return 0;
- 
-@@ -4408,6 +4437,7 @@ static int iavf_open(struct net_device *netdev)
- 	iavf_free_all_tx_resources(adapter);
- err_unlock:
- 	mutex_unlock(&adapter->crit_lock);
-+	mutex_unlock(&netdev->lock);
- 
- 	return err;
- }
-@@ -4429,10 +4459,12 @@ static int iavf_close(struct net_device *netdev)
- 	u64 aq_to_restore;
- 	int status;
- 
-+	mutex_lock(&netdev->lock);
- 	mutex_lock(&adapter->crit_lock);
- 
- 	if (adapter->state <= __IAVF_DOWN_PENDING) {
- 		mutex_unlock(&adapter->crit_lock);
-+		mutex_unlock(&netdev->lock);
- 		return 0;
- 	}
- 
-@@ -4466,6 +4498,7 @@ static int iavf_close(struct net_device *netdev)
- 	iavf_free_traffic_irqs(adapter);
- 
- 	mutex_unlock(&adapter->crit_lock);
-+	mutex_unlock(&netdev->lock);
- 
- 	/* We explicitly don't free resources here because the hardware is
- 	 * still active and can DMA into memory. Resources are cleared in
-@@ -5342,6 +5375,7 @@ static int iavf_suspend(struct device *dev_d)
- 
- 	netif_device_detach(netdev);
- 
-+	mutex_lock(&netdev->lock);
- 	mutex_lock(&adapter->crit_lock);
- 
- 	if (netif_running(netdev)) {
-@@ -5353,6 +5387,7 @@ static int iavf_suspend(struct device *dev_d)
- 	iavf_reset_interrupt_capability(adapter);
- 
- 	mutex_unlock(&adapter->crit_lock);
-+	mutex_unlock(&netdev->lock);
- 
- 	return 0;
- }
-@@ -5451,6 +5486,7 @@ static void iavf_remove(struct pci_dev *pdev)
- 	if (netdev->reg_state == NETREG_REGISTERED)
- 		unregister_netdev(netdev);
- 
-+	mutex_lock(&netdev->lock);
- 	mutex_lock(&adapter->crit_lock);
- 	dev_info(&adapter->pdev->dev, "Removing device\n");
- 	iavf_change_state(adapter, __IAVF_REMOVE);
-@@ -5487,6 +5523,7 @@ static void iavf_remove(struct pci_dev *pdev)
- 	mutex_destroy(&hw->aq.asq_mutex);
- 	mutex_unlock(&adapter->crit_lock);
- 	mutex_destroy(&adapter->crit_lock);
-+	mutex_unlock(&netdev->lock);
- 
- 	iounmap(hw->hw_addr);
- 	pci_release_regions(pdev);
--- 
-2.47.1
-
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
 
