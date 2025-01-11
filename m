@@ -1,96 +1,86 @@
-Return-Path: <netdev+bounces-157436-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157437-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 74092A0A4CC
-	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 17:35:29 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E0A1A0A4D3
+	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 17:42:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 695AF3A79A8
-	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 16:35:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CDC1C7A3BFF
+	for <lists+netdev@lfdr.de>; Sat, 11 Jan 2025 16:42:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A6191B3958;
-	Sat, 11 Jan 2025 16:35:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 241631B4141;
+	Sat, 11 Jan 2025 16:42:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a0PdG/DV"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mrFD4K9m"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB2F11B393A;
-	Sat, 11 Jan 2025 16:35:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1BD156B81
+	for <netdev@vger.kernel.org>; Sat, 11 Jan 2025 16:42:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736613324; cv=none; b=TDOswXqpwS4jr8JDUSlG98Vdwj/3joLN9UuUJIs8DOGLYdUd4iCaTK4da7CHrwaskfO0tMqYKnvO++TKe8VkQrLuQ1a1c4KUDLHWYx1FsDGifXAiTUveJRQ6qPwvtdAKqcimI5npvMcH8SKxa5lwGiN9fu5eXdiA4g7NC9nRgzk=
+	t=1736613741; cv=none; b=Fz+EdFeZ/QlgT4SAYp1RIXMi7NoDObVHpLOwMA4Rf8jS+GLvtvgKbRcIHe5AqWKboDH7XLp29iVg6+2ClO3Uvvqlqa8XU0Duok6AvB0WifqagTSFitxT2O4i2ATrW169r+WWK2cIv9XBvOUI497sbpSm4aEKTcssd4FP0g5FjuI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736613324; c=relaxed/simple;
-	bh=GJC+MFj2hHEWDd5H4ukPbV2a3QRnUXzE1voqmG5gnc4=;
+	s=arc-20240116; t=1736613741; c=relaxed/simple;
+	bh=dG478TQSZyOL+ABB3bHzMhh0mPdLhhwmWlvYqC1V5oQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lqG+/gPP+Xu+UNA2V2I10sVblpoxDHEc8oochdYrDbayU2CoFIup8ZM2cG6F1qkipSDJDE21ZeoPCPOXZrFnk6RhWLK3lf9iBg4//itI16JYShJsK5RSb+XgjQZg0yIvfemg3I2HEtxXjkyPMRXuZvu0MXh29+1cKyl28XwrjkE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=a0PdG/DV; arc=none smtp.client-ip=209.85.214.170
+	 Content-Type:Content-Disposition:In-Reply-To; b=JJ2C73fE3q0PFFPBm+O7Xi8eW01V/eSok71MRYyyKWhpqoz3ZONm+S3tUS78Y2EKsEiaQGQ+9kSeOGT+jh86uAjfmbWLPLNettqhSNHBC1VCng8ubqlqLsnL7eScmMAdOQnECvfMqtENvyTAFNdJ0x9zyaqQgbR62YrTBpWnDJw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mrFD4K9m; arc=none smtp.client-ip=209.85.216.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-216281bc30fso60674335ad.0;
-        Sat, 11 Jan 2025 08:35:22 -0800 (PST)
+Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-2ef760a1001so4966302a91.0
+        for <netdev@vger.kernel.org>; Sat, 11 Jan 2025 08:42:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736613322; x=1737218122; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1736613738; x=1737218538; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=3QFpAwlhscCSDaqV4J6CvbYoGhHQAUaA0Ln+PXMaf8A=;
-        b=a0PdG/DVaLSw2we9qu+iGocZ6Bko3GWuRdXs0FzfiZ6AZH8QCyXKp8AKaF1t2r8F9n
-         a2+PzyfQ9euM4MWzSU4WLkXlqkSMXJzMxhFn1cSPscoLE6iHvbRMIp2+WhitCy1P+Nl8
-         LXO05R8//2+o7I46mJ7l+uBYGVUpkoepwTPK1Sno8zNOoCI+dAnKHsiUeun2zPbA3jYn
-         4oQwomw3GTc9+gwULwz6CAsAqtf3SyMmJ560n+AP+7EiNHhUwIOvafMBsoDkLlfQ4LHh
-         +4L3WJu9qFMyY7HDHMF9IX70k5q9ZsS7up4EkrEPs5LZ+7LPKqIT3yCLJ2GnAby+VCPU
-         wVZg==
+        bh=ZLc82lqiJ45Cy2RcnrIQ975qa73QpUT0oB9O78o0+j8=;
+        b=mrFD4K9mgaG7QdoduMYT6C2L1xVkSyCW6TdVJ+veq0Wy+sOIzvfOgPxvnrH0kCjnhu
+         sTt2/bsNnvANYn9s6JDnhUWo08AkTRb8UfrffsdXAfruDTOPSToYR+I8WwigeYawkTP7
+         Efs8GfwmPQhxprotlEl3KS4kl4HJ3bNFNxpgDKv69L7x5BDcz/bJ1aufks4Wl+5M+R+J
+         2DsA/NWb+lIUhkVbhHOggHnCQFvXxOS5MHchVTfeh+q8yZOSEv/zT8IC7Ky5PyhxbmrP
+         VLZeuyB5TmFhBKG8HDrU6N20R3zeDTlTWoC86sF0Jigg1RIWFg3Bxt3ZgW96R9LpZn5g
+         TA7w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736613322; x=1737218122;
+        d=1e100.net; s=20230601; t=1736613738; x=1737218538;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=3QFpAwlhscCSDaqV4J6CvbYoGhHQAUaA0Ln+PXMaf8A=;
-        b=Oai7JHD3ksrppUU7Q4KQ/AB99j3F1BmNhlJycCdpuh3Dm1UHkDKBUfVhKO99f9kzLD
-         5879bVtR77/8XWD6j3/uDX5jJQy/eZhfe6O1hPST2zA9SV9h+E9qUuJ9N2+/c1XjHUDw
-         yU/Uozbr1N0S1QfqP11E7wtEHh7GvYV6TaCEX3mgfjyJgKlDdFMF1PGGYDA4caZo5sgM
-         SYfYFgnWn2fPLJu12VvMDF4WRUljDcJOoeFNVyHsMax0MWitOALqUtkhApHABbuFPNL6
-         uKnKk/qDOcQde21LigwwllHst5r6hBiLnVP+cluJzA0o7113hiAXHE0DvksWk8Eg+1/L
-         hkVw==
-X-Forwarded-Encrypted: i=1; AJvYcCW6wkYqadydP9/j6J+c4GeUaDGkPVi8VmeP0iIdh1b4Igmvu53w3ueQLv9WVzzqW+Oqy8FFqDbj@vger.kernel.org, AJvYcCWOJI0HFo5j/wRi/m3kyYyJtym9RkcuF1be67e69hjO4MXbNg/WIqsLT/nno0azcj3b9DRBQZ/WGmSp@vger.kernel.org, AJvYcCXFd/k+2rohxnqocelhvF8okri7kcBfOcEFPQeFb8igoeHEARowo/+Z9WE1riJB8DdIJVrVbxwEW/t2K3gq@vger.kernel.org, AJvYcCXSA+aQtGh2XjvoJkXVsqUTwcE/Dq2vdIrsYAuug3vfcwyR7GYK/2pAL9RoTRdspdO3SLwEKvCpVE+IsA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxVv9+5WKgcPdxvAfRy0KQ6TU3ZBedxmTtxNyKJ+62ozWWtz+mf
-	DtfXQvGtrkW4RyshBMOmGwX3+ziZ8O0u62vCQgHy5lmdn5ivw7+a
-X-Gm-Gg: ASbGncvhlCAx//1AIwbwL8CEGP2kasH8K2uT1UboQtQQpowOU4aEYDhUzcSxYyKeSJG
-	66rs46YfrnJbjp/6UoeH6bj4BY/IDhwDI0t6Tb0MNepvZayzNQLDK9eFc4NjZgFPzizgxLFXZ1b
-	yaQd4JG1SxGTO9vNy3RdCUSvAEnMPEn0arRCUg2Y0g57lsu/p8x6PVqnF1QK6p8YgxWjo4iAckV
-	F8Gszay8aYQGKEfDbMiS7WnUWVPAb/s1eu6V21WranatKo0HtsNtXk76aRNJrt+eU8PtAaEksmb
-X-Google-Smtp-Source: AGHT+IFg0xphykRhQKusjtbwyZ+bfCNk9Lo/GQN5SR+nGcOGfnhtXjaDW/RgazWXKPH9B+cVxv1LDQ==
-X-Received: by 2002:a17:902:ecc7:b0:215:a18f:88a8 with SMTP id d9443c01a7336-21a83fdf379mr199295665ad.51.1736613321903;
-        Sat, 11 Jan 2025 08:35:21 -0800 (PST)
+        bh=ZLc82lqiJ45Cy2RcnrIQ975qa73QpUT0oB9O78o0+j8=;
+        b=Jf0WtudN864RyBYWXGxSA3aRk7mWQKqChnNEkKEzDq47+8m700pkiDMUxpQYvRo4C6
+         N4Y+mmQOz3oFLR5sc7IUnpviPG2dHp4dbtvI4OEP+oeVki/sk2NFrfX0DooKKO0FlEe9
+         1tpW/NZloOw4HMy3sNdRdJHjhamzPglL31WeY2sr+NEbawYgBl8kI0ojUWugvHSG4S3c
+         9UH8aNDt0j9mM9/wragzUuokHSCKepibwFSt7W5GXSrlhYg90COFVRKgE1KGMnvU0Ny0
+         3Jc6/8lSY9mrkrk1QG85ZSXbWJPNXRZeUbwWLC9s9EqILh7f5VuV4tPbufyNmicRY/X0
+         /E8A==
+X-Forwarded-Encrypted: i=1; AJvYcCV/i/aunx6TEQvpw5GHvIxOYlHa2Pm2eV14R0oVDVt/jyUxv6UxO7CRHDiw3YwkMqiUQXCvQyg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw48a33zeFJXS+fday+1J4d+eeSaJpne5CHDmh1QR3xKxAuQ6e3
+	ieSxBFVN8x46t1h+LJZSIF4leU2OC3QZq30Y3PamD3tAgAPIc2Kk
+X-Gm-Gg: ASbGncu7InoPu2750X1dB/vnLnAXMpgtgiCBXQK1vUD9Y3LaOdGGN1N1uewzu2Ch3e5
+	aT1K9ZetweMUa+9er9XMtINflBdrUBp6Nrq3v/PVcr9U+pP2uB8GDwHT2AfZrRmiKK1E771yjOg
+	53ZQH+Uxaq4zcZ1MNFY7h7hIqW0u5Chwz0xWgb6ppMHRz8BNa7TB+9BW9uxb5/gdaKTp2zg5S3D
+	cGvWRsYjXMXswci4UupaBk0nQQlLz4FVA5nLFAy+/wMY/kJI40l+3GpGaTd2SWQjFrl7u7ak2iX
+X-Google-Smtp-Source: AGHT+IEWu1CTBoz+WfW6b6cRmEE2GO340m2QWLAXOHRaVLu91ouXPZrynaDSJliUFMG3h7X7EnUmaA==
+X-Received: by 2002:a17:90b:3502:b0:2ee:59af:a432 with SMTP id 98e67ed59e1d1-2f5490dbcf8mr19310457a91.31.1736613737894;
+        Sat, 11 Jan 2025 08:42:17 -0800 (PST)
 Received: from hoboy.vegasvil.org ([2600:1700:2430:6f6f:e2d5:5eff:fea5:802f])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21a9f259fb5sm29138805ad.239.2025.01.11.08.35.19
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21a9f219de5sm29444425ad.133.2025.01.11.08.42.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 11 Jan 2025 08:35:21 -0800 (PST)
-Date: Sat, 11 Jan 2025 08:35:17 -0800
+        Sat, 11 Jan 2025 08:42:17 -0800 (PST)
+Date: Sat, 11 Jan 2025 08:42:15 -0800
 From: Richard Cochran <richardcochran@gmail.com>
-To: Basharath Hussain Khaja <basharath@couthit.com>
-Cc: danishanwar@ti.com, rogerq@kernel.org, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org,
-	conor+dt@kernel.org, nm@ti.com, ssantosh@kernel.org,
-	tony@atomide.com, parvathi@couthit.com, schnelle@linux.ibm.com,
-	rdunlap@infradead.org, diogo.ivo@siemens.com, m-karicheri2@ti.com,
-	horms@kernel.org, jacob.e.keller@intel.com, m-malladi@ti.com,
-	javier.carrasco.cruz@gmail.com, afd@ti.com, s-anna@ti.com,
-	linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-omap@vger.kernel.org, pratheesh@ti.com, prajith@ti.com,
-	vigneshr@ti.com, praneeth@ti.com, srk@ti.com, rogerq@ti.com,
-	krishna@couthit.com, pmohan@couthit.com, mohan@couthit.com
-Subject: Re: [RFC PATCH 06/10] net: ti: prueth: Adds HW timestamping support
- for PTP using PRU-ICSS IEP module
-Message-ID: <Z4KdxQMBXmkF37KI@hoboy.vegasvil.org>
-References: <20250109105600.41297-1-basharath@couthit.com>
- <20250110055906.65086-7-basharath@couthit.com>
+To: Jiawen Wu <jiawenwu@trustnetic.com>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, linux@armlinux.org.uk,
+	horms@kernel.org, jacob.e.keller@intel.com, netdev@vger.kernel.org,
+	vadim.fedorenko@linux.dev, mengyuanlou@net-swift.com
+Subject: Re: [PATCH net-next v3 4/4] net: ngbe: Add support for 1PPS and TOD
+Message-ID: <Z4KfZwcyraeFUtNr@hoboy.vegasvil.org>
+References: <20250110031716.2120642-1-jiawenwu@trustnetic.com>
+ <20250110031716.2120642-5-jiawenwu@trustnetic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -99,98 +89,41 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250110055906.65086-7-basharath@couthit.com>
+In-Reply-To: <20250110031716.2120642-5-jiawenwu@trustnetic.com>
 
-On Fri, Jan 10, 2025 at 11:29:02AM +0530, Basharath Hussain Khaja wrote:
+On Fri, Jan 10, 2025 at 11:17:16AM +0800, Jiawen Wu wrote:
 
-> @@ -189,12 +190,37 @@ static void icssm_emac_get_regs(struct net_device *ndev,
->  	regs->version = PRUETH_REG_DUMP_GET_VER(prueth);
->  }
->  
-> +static int icssm_emac_get_ts_info(struct net_device *ndev,
-> +				  struct kernel_ethtool_ts_info *info)
+> +static int wx_ptp_feature_enable(struct ptp_clock_info *ptp,
+> +				 struct ptp_clock_request *rq, int on)
 > +{
-> +	struct prueth_emac *emac = netdev_priv(ndev);
+> +	struct wx *wx = container_of(ptp, struct wx, ptp_caps);
 > +
-> +	if ((PRUETH_IS_EMAC(emac->prueth) && !emac->emac_ptp_tx_irq))
-> +		return ethtool_op_get_ts_info(ndev, info);
-> +
-> +	info->so_timestamping =
-> +		SOF_TIMESTAMPING_TX_HARDWARE |
-> +		SOF_TIMESTAMPING_TX_SOFTWARE |
-
-The driver advertises software Transmit time stamping, but where is
-the call to skb_tx_timestamp() ?
-
-I didn't see it in Patch #4.
-
-> +		SOF_TIMESTAMPING_RX_HARDWARE |
-> +		SOF_TIMESTAMPING_RX_SOFTWARE |
-> +		SOF_TIMESTAMPING_SOFTWARE |
-> +		SOF_TIMESTAMPING_RAW_HARDWARE;
-> +
-> +	info->phc_index = icss_iep_get_ptp_clock_idx(emac->prueth->iep);
-> +	info->tx_types = BIT(HWTSTAMP_TX_OFF) | BIT(HWTSTAMP_TX_ON);
-> +	info->rx_filters = BIT(HWTSTAMP_FILTER_NONE) |
-> +				BIT(HWTSTAMP_FILTER_PTP_V2_EVENT);
-> +
-> +	return 0;
-> +}
-
-> @@ -442,6 +482,173 @@ static void icssm_emac_adjust_link(struct net_device *ndev)
->  	spin_unlock_irqrestore(&emac->lock, flags);
->  }
->  
-> +static u8 icssm_prueth_ptp_ts_event_type(struct sk_buff *skb, u8 *ptp_msgtype)
-> +{
-> +	unsigned int ptp_class = ptp_classify_raw(skb);
-> +	struct ptp_header *hdr;
-> +	u8 msgtype, event_type;
-> +
-> +	if (ptp_class == PTP_CLASS_NONE)
-> +		return PRUETH_PTP_TS_EVENTS;
-> +
-> +	hdr = ptp_parse_header(skb, ptp_class);
-> +	if (!hdr)
-> +		return PRUETH_PTP_TS_EVENTS;
-> +
-> +	msgtype = ptp_get_msgtype(hdr, ptp_class);
-> +	/* Treat E2E Delay Req/Resp messages sane as P2P peer delay req/resp
-
-s/sane/in the same way/
-
-> +	 * in driver here since firmware stores timestamps in the same memory
-> +	 * location for either (since they cannot operate simultaneously
-> +	 * anyway)
+> +	/**
+> +	 * When PPS is enabled, unmask the interrupt for the ClockOut
+> +	 * feature, so that the interrupt handler can send the PPS
+> +	 * event when the clock SDP triggers. Clear mask when PPS is
+> +	 * disabled
 > +	 */
-> +	switch (msgtype) {
-> +	case PTP_MSGTYPE_SYNC:
-> +		event_type = PRUETH_PTP_SYNC;
-> +		break;
-> +	case PTP_MSGTYPE_DELAY_REQ:
-> +	case PTP_MSGTYPE_PDELAY_REQ:
-> +		event_type = PRUETH_PTP_DLY_REQ;
-> +		break;
-> +	/* TODO: Check why PTP_MSGTYPE_DELAY_RESP needs timestamp
-> +	 * and need for it.
-> +	 */
-> +	case 0x9:
-
-Delay response messages are PTP "general" messages and not event
-messages, and as such they do not require time stamps.
-
-> +	case PTP_MSGTYPE_PDELAY_RESP:
-> +		event_type = PRUETH_PTP_DLY_RESP;
-> +		break;
-> +	default:
-> +		event_type = PRUETH_PTP_TS_EVENTS;
+> +	if (rq->type != PTP_CLK_REQ_PEROUT || !wx->ptp_setup_sdp)
+> +		return -EOPNOTSUPP;
+> +
+> +	/* Reject requests with unsupported flags */
+> +	if (rq->perout.flags & ~PTP_PEROUT_PHASE)
+> +		return -EOPNOTSUPP;
+> +
+> +	if (rq->perout.index != 0) {
+> +		wx_err(wx, "Perout index must be 0\n");
+> +		return -EINVAL;
 > +	}
-> +
-> +	if (ptp_msgtype)
-> +		*ptp_msgtype = msgtype;
-> +
-> +	return event_type;
-> +}
+
+Why do you need this test?
+
+Framework in drivers/ptp/ptp_chardev.c does:
+
+ 299                 if (req.perout.index >= ops->n_per_out) {
+ 300                         err = -EINVAL;
+ 301                         break;
+ 302                 }
 
 Thanks,
 Richard
