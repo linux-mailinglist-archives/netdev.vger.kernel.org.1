@@ -1,148 +1,119 @@
-Return-Path: <netdev+bounces-157508-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157525-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B63AA0A7FB
-	for <lists+netdev@lfdr.de>; Sun, 12 Jan 2025 10:27:39 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 02B90A0A8E5
+	for <lists+netdev@lfdr.de>; Sun, 12 Jan 2025 13:03:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1990A1659E7
-	for <lists+netdev@lfdr.de>; Sun, 12 Jan 2025 09:27:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E45033A8B71
+	for <lists+netdev@lfdr.de>; Sun, 12 Jan 2025 12:03:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C9F41925AA;
-	Sun, 12 Jan 2025 09:27:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 106581B0F04;
+	Sun, 12 Jan 2025 12:03:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f207.google.com (mail-il1-f207.google.com [209.85.166.207])
+Received: from michel.telenet-ops.be (michel.telenet-ops.be [195.130.137.88])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 586B31922F2
-	for <netdev@vger.kernel.org>; Sun, 12 Jan 2025 09:27:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.207
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE5CC4C9A
+	for <netdev@vger.kernel.org>; Sun, 12 Jan 2025 12:03:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.130.137.88
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736674050; cv=none; b=ENrzgidvxGQfOAp9QNE6JOJcx1gP79S1+wn74GuiLDyUA+YibE9M570vnXtjA/Ds+mC+mWNuJDfAr9oUnODCeYknn67Ojm8DZJj9pF6pJtA0Fu1BKttGIo2A4SVgYaKZDR07DOjNf+cjD1Z3pmb+lF0HuSBmYf75oCBfQiyYEHA=
+	t=1736683411; cv=none; b=ZhjroRGrpEfk6113kTCaYV3ddbf4e0ZK/sRwOdnnGmt4jFs4Z/PJUJYbYD/J8hFPHl6DiHg2tqMvNMadmPKvU/9eptPrgShspKskm3Q1c2+wCQmjF1rqDYJGifY7u09sTmSmzabC3mlQiOdAhDYkCRf+TJg3UfwaORuVYtLQhFQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736674050; c=relaxed/simple;
-	bh=1tsA+WJU02kx9XWJQx1b0jKkCyhsWG1AJcYkLjWL1HY=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=scFbA6oyF6Ws2kcSiix94l0/n5H7tsE2FLSZ+PY+Hk+YAF0Fjcs/A+v2hTGvRmScwCpJL8BtDn3vxclqzxUHyeUCavYpt9bA/meB+NmwlxeA5Of5G8MOS21UHKv4g/LcTi5MAMN51e7IJnDIdz1/dUBUsowrpo0xtqR8W7nYwvE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.207
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f207.google.com with SMTP id e9e14a558f8ab-3a81684bac0so60809135ab.0
-        for <netdev@vger.kernel.org>; Sun, 12 Jan 2025 01:27:28 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736674047; x=1737278847;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=AMmLDaoIPqQOf2zZ+HlQlE4XtrFUMSm5hcpKKRPGPhM=;
-        b=q82ejauPAcu9fwtzz2xjXfWGDrfLyvutfmPRusVFDtnM38PGuLmSIO83uezWojZrQM
-         24H+qQuJj3fgmUiNGH+SpWIZLYxRr8uEBZowXUm4Aa8kowC+VUMcQMdX1mttQlrza5FJ
-         wzWOfYiFaIH04tbQ4U+SFgsDv5p+LWt6QurHBdxJOibYIZnW+NfBp0dOOjYDdEUFcWhq
-         fWnzMmOh5UIl2IhST2QypMeZCXv7WmL9b/EvPJpyWMxw+sEI2nasQ1aqHmDoJ4L+yLXO
-         aqm41IXuiRvYMAS/hu3j7ipqKOY+S03phnqbVxVPKWhQYiA9+zwDoBF/sbcg0lKPD/2M
-         qSBw==
-X-Forwarded-Encrypted: i=1; AJvYcCUEoLebxZSFNW4PoGdnmURWvIp7B5nHj/QgiqOJaljTgb43/zuPWKjAuiN6yoJepdUW/cXLMes=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxqG+YuXwue4OlkghlgSLgEBZNPEXmFvm6oGvZIel7y5fYmo7Fz
-	ih1BiEKg6uzrLLCVldYNwPsk9K/unNv9S6L3gq0QPP1Zh2QGx14mgvJWMk+KtaJyJ9L55H/4GU4
-	F+qpyHSF7xm/HjxAjsQaJclY5Ym5FSnl76bjMvYqkRwxTPMbIUyrS04s=
-X-Google-Smtp-Source: AGHT+IG0PQX3CsxACh8zS+AgP5QZm8RMOwqpa+ejuMsF7w76r+XiMgWWKFUNeT/tYtE1pZvY5xJfgDT5RVcsGxQbd+MIpBSBBjyV
+	s=arc-20240116; t=1736683411; c=relaxed/simple;
+	bh=X2vllrUPWyE4qJGq6kL3ctHerw59PCqTWLtpwbJy6GM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=GpsS/htUviArBpnxC5q60OixxpNeAuOX6vPoQE020Ht+rv5xAZt5ypqFxYVsORZQ+k+A5OxanI8qCghpOeHLxuJH+DtCSCJcwpLjMV/AbOeGWyswnpSILB5gnVUMtkcuTZ+h0yAWoyksfuj+CquoxydcFE1jfl4C7L4OkY7+LaQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=none smtp.mailfrom=linux-m68k.org; arc=none smtp.client-ip=195.130.137.88
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux-m68k.org
+Received: from ramsan.of.borg ([IPv6:2a02:1810:ac12:ed80:f7a6:44d1:35dc:44f6])
+	by michel.telenet-ops.be with cmsmtp
+	id 0C3J2E00123R5sA06C3JXL; Sun, 12 Jan 2025 13:03:18 +0100
+Received: from rox.of.borg ([192.168.97.57])
+	by ramsan.of.borg with esmtp (Exim 4.97)
+	(envelope-from <geert@linux-m68k.org>)
+	id 1tWwgT-0000000Ayx9-3ZHY;
+	Sun, 12 Jan 2025 13:03:17 +0100
+Received: from geert by rox.of.borg with local (Exim 4.97)
+	(envelope-from <geert@linux-m68k.org>)
+	id 1tWtuB-0000000AirA-0I5D;
+	Sun, 12 Jan 2025 10:05:11 +0100
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+To: "David S . Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Geert Uytterhoeven <geert@linux-m68k.org>,
+	kernel test robot <lkp@intel.com>
+Subject: [PATCH] ipv4: ip_gre: Fix set but not used warning in ipgre_err() if IPv4-only
+Date: Sun, 12 Jan 2025 10:05:10 +0100
+Message-ID: <3dc917cf6244ef123aa955b2fbbf02473d13cdb5.1736672666.git.geert@linux-m68k.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:12cd:b0:3a7:7ad4:fe78 with SMTP id
- e9e14a558f8ab-3ce3a8beb7emr128415575ab.19.1736674047482; Sun, 12 Jan 2025
- 01:27:27 -0800 (PST)
-Date: Sun, 12 Jan 2025 01:27:27 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <67838aff.050a0220.216c54.002d.GAE@google.com>
-Subject: [syzbot] [wireless?] WARNING in ieee80211_assoc_success
-From: syzbot <syzbot+54788d96cbf3199014ac@syzkaller.appspotmail.com>
-To: johannes@sipsolutions.net, linux-kernel@vger.kernel.org, 
-	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Hello,
+if CONFIG_NET_IPGRE is enabled, but CONFIG_IPV6 is disabled:
 
-syzbot found the following issue on:
+    net/ipv4/ip_gre.c: In function ‘ipgre_err’:
+    net/ipv4/ip_gre.c:144:22: error: variable ‘data_len’ set but not used [-Werror=unused-but-set-variable]
+      144 |         unsigned int data_len = 0;
+	  |                      ^~~~~~~~
 
-HEAD commit:    09a0fa92e5b4 Merge tag 'selinux-pr-20250107' of git://git...
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=143b5b0f980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=4ef22c4fce5135b4
-dashboard link: https://syzkaller.appspot.com/bug?extid=54788d96cbf3199014ac
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+Fix this by moving all data_len processing inside the IPV6-only section
+that uses its result.
 
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7feb34a89c2a/non_bootable_disk-09a0fa92.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/71243ce2ee80/vmlinux-09a0fa92.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/ff8be47c15fb/bzImage-09a0fa92.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+54788d96cbf3199014ac@syzkaller.appspotmail.com
-
-wlan1: authenticated
-wlan1: associate with 08:02:11:00:00:00 (try 1/3)
-wlan1: RX AssocResp from 08:02:11:00:00:00 (capab=0x4584 status=0 aid=1)
-------------[ cut here ]------------
-WARNING: CPU: 0 PID: 1040 at net/mac80211/mlme.c:5653 ieee80211_assoc_success+0x6878/0x6eb0 net/mac80211/mlme.c:5653
-Modules linked in:
-CPU: 0 UID: 0 PID: 1040 Comm: kworker/u4:8 Not tainted 6.13.0-rc6-syzkaller-00038-g09a0fa92e5b4 #0
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
-Workqueue: events_unbound cfg80211_wiphy_work
-RIP: 0010:ieee80211_assoc_success+0x6878/0x6eb0 net/mac80211/mlme.c:5653
-Code: eb 05 e8 1b cd 4b f6 48 8b 74 24 38 48 81 c6 b8 09 00 00 48 c7 c7 e0 43 28 8d e8 a3 4f b3 f5 e9 e4 e7 ff ff e8 f9 cc 4b f6 90 <0f> 0b 90 e9 e6 e7 ff ff e8 eb cc 4b f6 90 0f 0b 90 e9 a4 fb ff ff
-RSP: 0018:ffffc900026f72c0 EFLAGS: 00010283
-RAX: ffffffff8b53b727 RBX: 0000000000000001 RCX: 0000000000100000
-RDX: ffffc90023007000 RSI: 0000000000000678 RDI: 0000000000000679
-RBP: ffffc900026f75d0 R08: ffffffff901981f7 R09: 1ffffffff203303e
-R10: dffffc0000000000 R11: fffffbfff203303f R12: dffffc0000000000
-R13: ffff88803fe24800 R14: ffff8880440fd000 R15: ffff888040778e40
-FS:  0000000000000000(0000) GS:ffff88801fc00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000020005000 CR3: 00000000425b8000 CR4: 0000000000352ef0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- ieee80211_rx_mgmt_assoc_resp net/mac80211/mlme.c:5972 [inline]
- ieee80211_sta_rx_queued_mgmt+0x2b7b/0x4d40 net/mac80211/mlme.c:7577
- ieee80211_iface_process_skb net/mac80211/iface.c:1610 [inline]
- ieee80211_iface_work+0x762/0xf20 net/mac80211/iface.c:1667
- cfg80211_wiphy_work+0x2db/0x480 net/wireless/core.c:440
- process_one_work kernel/workqueue.c:3229 [inline]
- process_scheduled_works+0xa66/0x1840 kernel/workqueue.c:3310
- worker_thread+0x870/0xd30 kernel/workqueue.c:3391
- kthread+0x2f0/0x390 kernel/kthread.c:389
- ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
- </TASK>
-
-
+Reported-by: kernel test robot <lkp@intel.com>
+Closes: https://lore.kernel.org/oe-kbuild-all/202501121007.2GofXmh5-lkp@intel.com/
+Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+ net/ipv4/ip_gre.c | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+diff --git a/net/ipv4/ip_gre.c b/net/ipv4/ip_gre.c
+index f1f31ebfc7934467..6f871af7bb5772b7 100644
+--- a/net/ipv4/ip_gre.c
++++ b/net/ipv4/ip_gre.c
+@@ -141,7 +141,6 @@ static int ipgre_err(struct sk_buff *skb, u32 info,
+ 	const struct iphdr *iph;
+ 	const int type = icmp_hdr(skb)->type;
+ 	const int code = icmp_hdr(skb)->code;
+-	unsigned int data_len = 0;
+ 	struct ip_tunnel *t;
+ 
+ 	if (tpi->proto == htons(ETH_P_TEB))
+@@ -182,7 +181,6 @@ static int ipgre_err(struct sk_buff *skb, u32 info,
+ 	case ICMP_TIME_EXCEEDED:
+ 		if (code != ICMP_EXC_TTL)
+ 			return 0;
+-		data_len = icmp_hdr(skb)->un.reserved[1] * 4; /* RFC 4884 4.1 */
+ 		break;
+ 
+ 	case ICMP_REDIRECT:
+@@ -191,8 +189,9 @@ static int ipgre_err(struct sk_buff *skb, u32 info,
+ 
+ #if IS_ENABLED(CONFIG_IPV6)
+ 	if (tpi->proto == htons(ETH_P_IPV6) &&
+-	    !ip6_err_gen_icmpv6_unreach(skb, iph->ihl * 4 + tpi->hdr_len,
+-					type, data_len))
++	    !ip6_err_gen_icmpv6_unreach(skb, iph->ihl * 4 + tpi->hdr_len, type,
++		type == ICMP_TIME_EXCEEDED ?
++		icmp_hdr(skb)->un.reserved[1] * 4 /* RFC 4884 4.1 */ : 0))
+ 		return 0;
+ #endif
+ 
+-- 
+2.43.0
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
