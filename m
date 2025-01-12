@@ -1,172 +1,118 @@
-Return-Path: <netdev+bounces-157549-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157550-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C089A0AACD
-	for <lists+netdev@lfdr.de>; Sun, 12 Jan 2025 17:20:35 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E1A2A0AB05
+	for <lists+netdev@lfdr.de>; Sun, 12 Jan 2025 17:47:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 046443A480B
-	for <lists+netdev@lfdr.de>; Sun, 12 Jan 2025 16:20:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 62CFC1886B25
+	for <lists+netdev@lfdr.de>; Sun, 12 Jan 2025 16:47:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5E0D1BD9D2;
-	Sun, 12 Jan 2025 16:20:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAA891BEF70;
+	Sun, 12 Jan 2025 16:47:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="YcPqqP9f"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="d5hw8F+x"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B55731BC9F6;
-	Sun, 12 Jan 2025 16:20:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D259E1BE86A;
+	Sun, 12 Jan 2025 16:47:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736698830; cv=none; b=OSvgBViSJn8W3F4X00bQvzY4aDX24COnq2pEEnNYePuvbA+nY24Bvn7QI63W8IBgiNAy0me/QFDxGSFl/k+MryFrbw5uPPEMZagO3T45u7CCEjxv0DOJnfNEWtmArAWrP2W2DW3f+O3ZF7+RQZiDoTu3ncEnfeMIXTbqHxBN2Kg=
+	t=1736700451; cv=none; b=YMlTVabSJKZXSJo83yALTzFUbA8muhydWKXRxPShZEgFey0iBb7wKqdb/sXkCrstTfxSij6AeuiHmN0QeWspBDoONe6YiWo9gZ/3KWFT10ZTWZFu2eTg2SPfshpeysmwJ6Hb1GYdQswdX926UTaIOTw1V6bBsmpykJvZFZKnekM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736698830; c=relaxed/simple;
-	bh=k3rhOPm+JlLBuJ6F2LQrCCchnXFzlSMT5gVt/z6KXjg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=PNm9Q61ruzw55iImpL1Xw0i6vLUraSGJlRxnuAjmDAMOyCUJHb1LdcdfHKhsqaKimLw6LEawb1DzwK/JgEdr0ghLr30qVbfGsRO2ZRClrljVY+26OQwEnmFfZR0E+CHq8qFghiAjXoaqQtMsMBwbD7PxuefTuIWbth5hvG4EsHo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=YcPqqP9f; arc=none smtp.client-ip=46.235.229.95
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
-	; s=bytemarkmx; h=MIME-Version:Message-ID:Date:Subject:From:Content-Type:From
-	:Subject; bh=xynriCTSwyj3bHiNJJZCR/5Q2eJaiIdOXWz7EYI+upA=; b=YcPqqP9fH4JxUXsl
-	X38cLSdbNgcRqkwFrA6PwlXryXcGFunTyc+ezxmrtoMIsmjC7feTmMOhSX56mGk776XvbrMv0UHpe
-	Bo9O0ktUFJ/g5DkC1wXv61rwAefiXk4335DAqgY3RsUuKUNDIFXEAIz7ts7wBhbCE53QZh+q/Mzjg
-	TLaAKQskw1Ilu70toMcANPgR9Ofn0Ov2QKTJqorKoJSWtzUR5kqt1u5GjcpKRBuG5/CUvyBt7/Ko7
-	tBu4D6n2XbuX9VUy8J1DbGtrDW/53xM2Ror/ovPAslLmryc/pZ1kW8PGth/qImRVBMLtKIoQbxAZO
-	I0ozBmPo6WtRjd+VeQ==;
-Received: from localhost ([127.0.0.1] helo=dalek.home.treblig.org)
-	by mx.treblig.org with esmtp (Exim 4.96)
-	(envelope-from <linux@treblig.org>)
-	id 1tX0hE-009kQH-0L;
-	Sun, 12 Jan 2025 16:20:16 +0000
-From: linux@treblig.org
-To: trondmy@kernel.org,
-	anna@kernel.org,
-	chuck.lever@oracle.com,
-	jlayton@kernel.org,
-	neilb@suse.de,
-	okorniev@redhat.com,
-	Dai.Ngo@oracle.com,
-	tom@talpey.com
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	linux-nfs@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	"Dr. David Alan Gilbert" <linux@treblig.org>
-Subject: [PATCH] SUNRPC: Remove unused krb5_decrypt
-Date: Sun, 12 Jan 2025 16:20:15 +0000
-Message-ID: <20250112162015.454346-1-linux@treblig.org>
-X-Mailer: git-send-email 2.47.1
+	s=arc-20240116; t=1736700451; c=relaxed/simple;
+	bh=LgTd9SnJ5zOCjCSPCwLJ91mVfoh3V6sM4u9uLS0LZrg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WlVKH3Dm6biHsAMddx6eGloHtnFh1VZTLC/cVmhJI1wEPJTd0mGxAdjZVPJCXWwr4CI9P9dSUwL5fmCAhFU231hyf69Yqi0a4GFB95XZqdWDiV7rdRt5vKPoOV1bYArAiHWu+mU7QiieRMcc14/lTzmZgUnosHaOAH89qdeb2r8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=d5hw8F+x; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=4sen/KQvowlVDuXXQp6C1WU9Vh4kdtp0pCZBfFYVlVk=; b=d5hw8F+xTeAqzu4BiYHbCWkGBP
+	atom2+LrfuHb383eByLuiMaRP0Wm8aBJeVo6zhtblFvwIfFHwWNlXyAV/qi1EDOxp8RUxdRkdZERt
+	qDKR8+a5+MSbySi8vPZCqC28vfyssjmkcxal1QH4IJMTmnCB64OV2sj9Vm1dyOcT2Ndc=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tX171-003q0p-8Z; Sun, 12 Jan 2025 17:46:55 +0100
+Date: Sun, 12 Jan 2025 17:46:55 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Cc: Michael Hennerich <michael.hennerich@analog.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Ray Jui <rjui@broadcom.com>, Scott Branden <sbranden@broadcom.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Qingfang Deng <dqfext@gmail.com>,
+	SkyLake Huang <SkyLake.Huang@mediatek.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Neil Armstrong <neil.armstrong@linaro.org>,
+	Kevin Hilman <khilman@baylibre.com>,
+	Jerome Brunet <jbrunet@baylibre.com>,
+	Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
+	Arun Ramadoss <arun.ramadoss@microchip.com>,
+	UNGLinuxDriver@microchip.com, Xu Liang <lxu@maxlinear.com>,
+	Piergiorgio Beruto <piergiorgio.beruto@gmail.com>,
+	Andrei Botila <andrei.botila@oss.nxp.com>,
+	Heiko Stuebner <heiko@sntech.de>, linux-kernel@vger.kernel.org,
+	kernel-janitors@vger.kernel.org, netdev@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org,
+	linux-amlogic@lists.infradead.org, linux-arm-msm@vger.kernel.org,
+	linux-rockchip@lists.infradead.org
+Subject: Re: [PATCH net-next] net: phy: Constify struct mdio_device_id
+Message-ID: <9dfeb860-3c0c-4f16-a150-fdce133281e8@lunn.ch>
+References: <403c381b7d9156b67ad68ffc44b8eee70c5e86a9.1736691226.git.christophe.jaillet@wanadoo.fr>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <403c381b7d9156b67ad68ffc44b8eee70c5e86a9.1736691226.git.christophe.jaillet@wanadoo.fr>
 
-From: "Dr. David Alan Gilbert" <linux@treblig.org>
+On Sun, Jan 12, 2025 at 03:14:50PM +0100, Christophe JAILLET wrote:
+> 'struct mdio_device_id' is not modified in these drivers.
+> 
+> Constifying these structures moves some data to a read-only section, so
+> increase overall security.
+> 
+> On a x86_64, with allmodconfig, as an example:
+> Before:
+> ======
+>    text	   data	    bss	    dec	    hex	filename
+>   27014	  12792	      0	  39806	   9b7e	drivers/net/phy/broadcom.o
+> 
+> After:
+> =====
+>    text	   data	    bss	    dec	    hex	filename
+>   27206	  12600	      0	  39806	   9b7e	drivers/net/phy/broadcom.o
+> 
+> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
 
-The last use of krb5_decrypt() was removed in 2023 by
-commit 2a9893f796a3 ("SUNRPC:
-Remove net/sunrpc/auth_gss/gss_krb5_seqnum.c")
+Seems sensible.
 
-Remove it.
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
----
- net/sunrpc/auth_gss/gss_krb5_crypto.c   | 54 -------------------------
- net/sunrpc/auth_gss/gss_krb5_internal.h |  3 --
- 2 files changed, 57 deletions(-)
+Is the long terms goal to make MODULE_DEVICE_TABLE() enforce the
+const?
 
-diff --git a/net/sunrpc/auth_gss/gss_krb5_crypto.c b/net/sunrpc/auth_gss/gss_krb5_crypto.c
-index 9a27201638e2..7e09b15c5538 100644
---- a/net/sunrpc/auth_gss/gss_krb5_crypto.c
-+++ b/net/sunrpc/auth_gss/gss_krb5_crypto.c
-@@ -138,60 +138,6 @@ krb5_encrypt(
- 	return ret;
- }
- 
--/**
-- * krb5_decrypt - simple decryption of an RPCSEC GSS payload
-- * @tfm: initialized cipher transform
-- * @iv: pointer to an IV
-- * @in: ciphertext to decrypt
-- * @out: OUT: plaintext
-- * @length: length of input and output buffers, in bytes
-- *
-- * @iv may be NULL to force the use of an all-zero IV.
-- * The buffer containing the IV must be as large as the
-- * cipher's ivsize.
-- *
-- * Return values:
-- *   %0: @in successfully decrypted into @out
-- *   negative errno: @in not decrypted
-- */
--u32
--krb5_decrypt(
--     struct crypto_sync_skcipher *tfm,
--     void * iv,
--     void * in,
--     void * out,
--     int length)
--{
--	u32 ret = -EINVAL;
--	struct scatterlist sg[1];
--	u8 local_iv[GSS_KRB5_MAX_BLOCKSIZE] = {0};
--	SYNC_SKCIPHER_REQUEST_ON_STACK(req, tfm);
--
--	if (length % crypto_sync_skcipher_blocksize(tfm) != 0)
--		goto out;
--
--	if (crypto_sync_skcipher_ivsize(tfm) > GSS_KRB5_MAX_BLOCKSIZE) {
--		dprintk("RPC:       gss_k5decrypt: tfm iv size too large %d\n",
--			crypto_sync_skcipher_ivsize(tfm));
--		goto out;
--	}
--	if (iv)
--		memcpy(local_iv, iv, crypto_sync_skcipher_ivsize(tfm));
--
--	memcpy(out, in, length);
--	sg_init_one(sg, out, length);
--
--	skcipher_request_set_sync_tfm(req, tfm);
--	skcipher_request_set_callback(req, 0, NULL, NULL);
--	skcipher_request_set_crypt(req, sg, sg, length, local_iv);
--
--	ret = crypto_skcipher_decrypt(req);
--	skcipher_request_zero(req);
--out:
--	dprintk("RPC:       gss_k5decrypt returns %d\n",ret);
--	return ret;
--}
--
- static int
- checksummer(struct scatterlist *sg, void *data)
- {
-diff --git a/net/sunrpc/auth_gss/gss_krb5_internal.h b/net/sunrpc/auth_gss/gss_krb5_internal.h
-index a47e9ec228a5..0bda0078d7d8 100644
---- a/net/sunrpc/auth_gss/gss_krb5_internal.h
-+++ b/net/sunrpc/auth_gss/gss_krb5_internal.h
-@@ -166,9 +166,6 @@ u32 gss_krb5_checksum(struct crypto_ahash *tfm, char *header, int hdrlen,
- u32 krb5_encrypt(struct crypto_sync_skcipher *key, void *iv, void *in,
- 		 void *out, int length);
- 
--u32 krb5_decrypt(struct crypto_sync_skcipher *key, void *iv, void *in,
--		 void *out, int length);
--
- int xdr_extend_head(struct xdr_buf *buf, unsigned int base,
- 		    unsigned int shiftlen);
- 
--- 
-2.47.1
-
+    Andrew
 
