@@ -1,62 +1,62 @@
-Return-Path: <netdev+bounces-157495-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157496-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44EC1A0A725
-	for <lists+netdev@lfdr.de>; Sun, 12 Jan 2025 05:11:37 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D0D96A0A726
+	for <lists+netdev@lfdr.de>; Sun, 12 Jan 2025 05:12:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 46BA81885F5C
-	for <lists+netdev@lfdr.de>; Sun, 12 Jan 2025 04:11:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D5367165383
+	for <lists+netdev@lfdr.de>; Sun, 12 Jan 2025 04:12:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAF3020322;
-	Sun, 12 Jan 2025 04:11:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70EC325634;
+	Sun, 12 Jan 2025 04:12:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="FOl16amd"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="vZR9Ft/6"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-9106.amazon.com (smtp-fw-9106.amazon.com [207.171.188.206])
+Received: from smtp-fw-80009.amazon.com (smtp-fw-80009.amazon.com [99.78.197.220])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 408E31E517
-	for <netdev@vger.kernel.org>; Sun, 12 Jan 2025 04:11:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.188.206
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEDF86FB0
+	for <netdev@vger.kernel.org>; Sun, 12 Jan 2025 04:12:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.220
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736655093; cv=none; b=p2pevkd69dxRpNPiSQp4hXf1KyJ473xhnEJCAiG/Euobj1EX0nRWOU7M3FFDGuni1psr+moJo21vdQQGfjPBe4sSz3BSw400ghJzIWkhlOq0Jpb3ZVxBLWYCDin9BVlibFtQqcGydBOoHOTMELv9xOp7nvjYX48HYYjGYzJbFUA=
+	t=1736655124; cv=none; b=fd/kdAHlzi43VT3sQyA5zsg7P1ydqX3MBfULqUECrEf4GA72ZHZZZk0GNUTamoKxKFywXMwI0oXsyjQyYhVJjFGP+zLqx6VLsjVqYj6haqk1+RFL1gqnVaHC7vUJ6UbTubSb4Blvpi1/Fdh7e7ZzDDedDU7uwyInXG9CnZqUv/8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736655093; c=relaxed/simple;
-	bh=2SuYl/RkIG9m7kBqVOcg1il7berthmOidtFyNdy2WD4=;
+	s=arc-20240116; t=1736655124; c=relaxed/simple;
+	bh=EW5qHUoHq4YzzUlr9G2dw/sl88BXkj3oSanRFIQpbK0=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=eEl4ehqbwYYAUVb3RS+Wyhlf3bPBIQwc5Y69j655ohGcexjfvM6B11xTZHiw3I+g/LOjy2vyjWnJX5p3KbDGzfdlHWNIJIdc8ga9MmuoOcW1WO48/HHfNKiK9qaaG1ixIHpE6pV1xqg1Qznfny3vORyz6yViYCOW/ss8BHyKVCk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=FOl16amd; arc=none smtp.client-ip=207.171.188.206
+	 MIME-Version:Content-Type; b=o/AeFjYJu83o7SIBqDI5PkvKcW57qQNLy+9m6ZZj9XbvPJX14wQDfCAb1wR1H5HklcncqcbCi8XM4gV53xMS28SqAyrcj24xdsLg8psDjLPt9hIcAshF19CmcDutekZKacC4/g52DIHboYHbKcSEPNJFw5WiVupQo0Wa2NFuST8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=vZR9Ft/6; arc=none smtp.client-ip=99.78.197.220
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1736655093; x=1768191093;
+  t=1736655122; x=1768191122;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=Gxm8kJ8emMVLkb2JWLuQNUyltOYqXwlla4FGOtfGA2A=;
-  b=FOl16amdEWnIKIPf3e59Mp/NVoTlyieO9R57ecgZa99sqkp3kamr65Bm
-   SoegFHHubeBeXywqHiimm5ETTBhgynVDEJsv7jOJHWkgJktdX7XfNZWRS
-   p6V9kgr7rs5+6c/vNamuEwAA9gARc9sI75kHSZ4uXgEq7TrIHMLrVd10E
-   s=;
+  bh=qoHqRzyOsC6QtQIsgxhMnQ4/pXmzLS85a9CGq3xUQ14=;
+  b=vZR9Ft/6MN+7Eb63HyC0eBLYMDvqHjY5EbSpsLg3QC1KZlCkB63cGy1V
+   c5oMn9FlYK6sJEKSLzLLu5e9Tx5X2mo5Z+PwsuLXiYvGdaMG5KMRIYMNU
+   c/tab9DkRhL9wUEVo70+68L4REbK43zR5G/x3WOTpDSIETgSnpslxfEae
+   U=;
 X-IronPort-AV: E=Sophos;i="6.12,308,1728950400"; 
-   d="scan'208";a="790432459"
+   d="scan'208";a="163513194"
 Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-9106.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jan 2025 04:11:32 +0000
-Received: from EX19MTAUWC002.ant.amazon.com [10.0.7.35:49157]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.29.114:2525] with esmtp (Farcaster)
- id 199b919c-2447-47dd-bedd-619ec1c9acd1; Sun, 12 Jan 2025 04:11:31 +0000 (UTC)
-X-Farcaster-Flow-ID: 199b919c-2447-47dd-bedd-619ec1c9acd1
+  by smtp-border-fw-80009.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jan 2025 04:12:01 +0000
+Received: from EX19MTAUWA001.ant.amazon.com [10.0.7.35:60733]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.16.12:2525] with esmtp (Farcaster)
+ id 9026c126-bf3d-4305-9b82-86d83633b86e; Sun, 12 Jan 2025 04:12:00 +0000 (UTC)
+X-Farcaster-Flow-ID: 9026c126-bf3d-4305-9b82-86d83633b86e
 Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
+ EX19MTAUWA001.ant.amazon.com (10.250.64.204) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Sun, 12 Jan 2025 04:11:31 +0000
+ Sun, 12 Jan 2025 04:11:57 +0000
 Received: from 6c7e67c6786f.amazon.com (10.119.14.156) by
  EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Sun, 12 Jan 2025 04:11:27 +0000
+ Sun, 12 Jan 2025 04:11:54 +0000
 From: Kuniyuki Iwashima <kuniyu@amazon.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
@@ -64,9 +64,9 @@ To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 CC: Donald Hunter <donald.hunter@redhat.com>, Kuniyuki Iwashima
 	<kuniyu@amazon.com>, Kuniyuki Iwashima <kuni1840@gmail.com>,
 	<netdev@vger.kernel.org>
-Subject: [PATCH v2 net-next 07/11] af_unix: Set drop reason in queue_oob().
-Date: Sun, 12 Jan 2025 13:08:06 +0900
-Message-ID: <20250112040810.14145-8-kuniyu@amazon.com>
+Subject: [PATCH v2 net-next 08/11] af_unix: Set drop reason in manage_oob().
+Date: Sun, 12 Jan 2025 13:08:07 +0900
+Message-ID: <20250112040810.14145-9-kuniyu@amazon.com>
 X-Mailer: git-send-email 2.39.5 (Apple Git-154)
 In-Reply-To: <20250112040810.14145-1-kuniyu@amazon.com>
 References: <20250112040810.14145-1-kuniyu@amazon.com>
@@ -78,91 +78,77 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D046UWA004.ant.amazon.com (10.13.139.76) To
+X-ClientProxiedBy: EX19D031UWC002.ant.amazon.com (10.13.139.212) To
  EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-sendmsg(MSG_OOB) to a SOCK_STREAM socket could fail for various
-reasons.
+AF_UNIX SOCK_STREAM socket supports MSG_OOB.
 
-Let's set drop reasons respectively.
+When OOB data is sent to a socket, recv() will break at that point.
 
-The drop reasons are exactly the same as in the previous patch.
+If the next recv() does not have MSG_OOB, the normal data following
+the OOB data is returned.
+
+Then, the OOB skb is dropped.
+
+Let's define a new drop reason for that case in manage_oob().
+
+  # echo 1 > /sys/kernel/tracing/events/skb/kfree_skb/enable
+
+  # python3
+  >>> from socket import *
+  >>> s1, s2 = socketpair(AF_UNIX)
+  >>> s1.send(b'a', MSG_OOB)
+  >>> s1.send(b'b')
+  >>> s2.recv(2)
+  b'b'
+
+  # cat /sys/kernel/tracing/trace_pipe
+  ...
+     python3-223 ... kfree_skb: ... location=unix_stream_read_generic+0x59e/0xc20 reason: UNIX_SKIP_OOB
 
 Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 ---
- net/unix/af_unix.c | 37 ++++++++++++++++++++++++-------------
- 1 file changed, 24 insertions(+), 13 deletions(-)
+ include/net/dropreason-core.h | 6 ++++++
+ net/unix/af_unix.c            | 2 +-
+ 2 files changed, 7 insertions(+), 1 deletion(-)
 
+diff --git a/include/net/dropreason-core.h b/include/net/dropreason-core.h
+index dea6bbe3ceaa..43e20acaa98a 100644
+--- a/include/net/dropreason-core.h
++++ b/include/net/dropreason-core.h
+@@ -12,6 +12,7 @@
+ 	FN(SOCKET_RCVBUFF)		\
+ 	FN(SOCKET_RCV_SHUTDOWN)		\
+ 	FN(UNIX_INFLIGHT_FD_LIMIT)	\
++	FN(UNIX_SKIP_OOB)		\
+ 	FN(PKT_TOO_SMALL)		\
+ 	FN(TCP_CSUM)			\
+ 	FN(UDP_CSUM)			\
+@@ -156,6 +157,11 @@ enum skb_drop_reason {
+ 	 * are passed via SCM_RIGHTS but not yet received, reaching RLIMIT_NOFILE.
+ 	 */
+ 	SKB_DROP_REASON_UNIX_INFLIGHT_FD_LIMIT,
++	/**
++	 * @SKB_DROP_REASON_UNIX_SKIP_OOB: Out-Of-Band data is skipped by
++	 * recv() without MSG_OOB so dropped.
++	 */
++	SKB_DROP_REASON_UNIX_SKIP_OOB,
+ 	/** @SKB_DROP_REASON_PKT_TOO_SMALL: packet size is too small */
+ 	SKB_DROP_REASON_PKT_TOO_SMALL,
+ 	/** @SKB_DROP_REASON_TCP_CSUM: TCP checksum error */
 diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
-index 8c8d8fc3cb94..8623e3368c45 100644
+index 8623e3368c45..efd1b83b152a 100644
 --- a/net/unix/af_unix.c
 +++ b/net/unix/af_unix.c
-@@ -2216,34 +2216,37 @@ static int queue_oob(struct socket *sock, struct msghdr *msg, struct sock *other
- 		     struct scm_cookie *scm, bool fds_sent)
- {
- 	struct unix_sock *ousk = unix_sk(other);
-+	enum skb_drop_reason reason;
- 	struct sk_buff *skb;
--	int err = 0;
-+	int err;
+@@ -2748,7 +2748,7 @@ static struct sk_buff *manage_oob(struct sk_buff *skb, struct sock *sk,
+ 	spin_unlock(&sk->sk_receive_queue.lock);
  
- 	skb = sock_alloc_send_skb(sock->sk, 1, msg->msg_flags & MSG_DONTWAIT, &err);
--
- 	if (!skb)
--		return err;
-+		goto out;
+ 	consume_skb(read_skb);
+-	kfree_skb(unread_skb);
++	kfree_skb_reason(unread_skb, SKB_DROP_REASON_UNIX_SKIP_OOB);
  
- 	err = unix_scm_to_skb(scm, skb, !fds_sent);
- 	if (err < 0) {
--		kfree_skb(skb);
--		return err;
-+		reason = unix_scm_err_to_reason(err);
-+		goto out_free;
- 	}
-+
- 	skb_put(skb, 1);
- 	err = skb_copy_datagram_from_iter(skb, 0, &msg->msg_iter, 1);
--
- 	if (err) {
--		kfree_skb(skb);
--		return err;
-+		reason = SKB_DROP_REASON_SKB_UCOPY_FAULT;
-+		goto out_free;
- 	}
- 
- 	unix_state_lock(other);
- 
--	if (sock_flag(other, SOCK_DEAD) ||
--	    (other->sk_shutdown & RCV_SHUTDOWN)) {
--		unix_state_unlock(other);
--		kfree_skb(skb);
--		return -EPIPE;
-+	if (sock_flag(other, SOCK_DEAD)) {
-+		reason = SKB_DROP_REASON_SOCKET_CLOSE;
-+		goto out_unlock;
-+	}
-+
-+	if (other->sk_shutdown & RCV_SHUTDOWN) {
-+		reason = SKB_DROP_REASON_SOCKET_RCV_SHUTDOWN;
-+		goto out_unlock;
- 	}
- 
- 	maybe_add_creds(skb, sock, other);
-@@ -2258,6 +2261,14 @@ static int queue_oob(struct socket *sock, struct msghdr *msg, struct sock *other
- 	unix_state_unlock(other);
- 	other->sk_data_ready(other);
- 
-+	return 0;
-+
-+out_unlock:
-+	unix_state_unlock(other);
-+	err = -EPIPE;
-+out_free:
-+	kfree_skb_reason(skb, reason);
-+out:
- 	return err;
+ 	return skb;
  }
- #endif
 -- 
 2.39.5 (Apple Git-154)
 
