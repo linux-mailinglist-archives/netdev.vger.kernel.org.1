@@ -1,93 +1,148 @@
-Return-Path: <netdev+bounces-157507-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157508-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C327DA0A7D4
-	for <lists+netdev@lfdr.de>; Sun, 12 Jan 2025 09:58:31 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B63AA0A7FB
+	for <lists+netdev@lfdr.de>; Sun, 12 Jan 2025 10:27:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B1DDE18889ED
-	for <lists+netdev@lfdr.de>; Sun, 12 Jan 2025 08:58:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1990A1659E7
+	for <lists+netdev@lfdr.de>; Sun, 12 Jan 2025 09:27:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81658188904;
-	Sun, 12 Jan 2025 08:58:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cmGDvKJZ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C9F41925AA;
+	Sun, 12 Jan 2025 09:27:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f207.google.com (mail-il1-f207.google.com [209.85.166.207])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55790BA3F;
-	Sun, 12 Jan 2025 08:58:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 586B31922F2
+	for <netdev@vger.kernel.org>; Sun, 12 Jan 2025 09:27:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736672306; cv=none; b=gClpV6od14nzUjHV8/jbPxFyjP0limRn+AhsiKCt98TinH6+iaFZm2tMkcCAny6A0SjEVqJaTu3mEv0JR8RvtpWECIufpWesl+PsrCmQIVHg5AX3R+ABlN6+9OApO1LvX3y55VVRGznQwpGtl32H9rDuB90CD6weAfy1Qns+7MU=
+	t=1736674050; cv=none; b=ENrzgidvxGQfOAp9QNE6JOJcx1gP79S1+wn74GuiLDyUA+YibE9M570vnXtjA/Ds+mC+mWNuJDfAr9oUnODCeYknn67Ojm8DZJj9pF6pJtA0Fu1BKttGIo2A4SVgYaKZDR07DOjNf+cjD1Z3pmb+lF0HuSBmYf75oCBfQiyYEHA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736672306; c=relaxed/simple;
-	bh=v0achWYsfTqjctn1My0eZ+7zXEt9WGcj1uKRGMBNaKA=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=pXYTaEGZA/HzGIpMeJ+1HPgmyXzsbBY5bz6gPv0eF5d9j07YWlA2v3zQY40ipbVfuzSlZ75IOFsVBz/5YaqwuQLuCFJRtDcYji3rgN9ac0fcUv8FQI/leRCBlC5Szjg49CNmoZOxHyWNr3viPaXOchihZpRl+5/ohoXHMB3HJLI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cmGDvKJZ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5A130C4CEDF;
-	Sun, 12 Jan 2025 08:58:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736672305;
-	bh=v0achWYsfTqjctn1My0eZ+7zXEt9WGcj1uKRGMBNaKA=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Date:From;
-	b=cmGDvKJZXxwxYwfR7UOSN+/lxdWl/PCWRFuvG51FM3vtR7pULEcXP8ODTItptNaUH
-	 /cHh4cUkIrtB3wLdxvv/G0oNl1TB6mDDZkdD6Bmb1NzPiinhd1/9v6qQ+WAn6bCh1i
-	 urfrLN+DldLyOQG6ldEwBXO/TnpiNAvWCFMsr0GKwsYOh/s8lRVXyCt54H3/fZ9WLE
-	 SpP5DMQuZ/ekWEl/lziHzVDjj8zwPbRQyTdZPlleacfDipFtMEIGWFbK5opu1GibVE
-	 GkuUaKdJH8BOom47LzA+OCTWkuo31jmZ5MNLQbG5JgLB6GQ0wJPOqvpivbUYQodkk2
-	 27SwS1rStQlgA==
-From: Leon Romanovsky <leon@kernel.org>
-To: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, 
- Jason Gunthorpe <jgg@ziepe.ca>, Tariq Toukan <tariqt@nvidia.com>
-Cc: netdev@vger.kernel.org, linux-rdma@vger.kernel.org, 
- Jakub Kicinski <kuba@kernel.org>, Gal Pressman <gal@nvidia.com>, 
- Mark Bloch <mbloch@nvidia.com>, Moshe Shemesh <moshe@nvidia.com>
-In-Reply-To: <20250109204231.1809851-1-tariqt@nvidia.com>
-References: <20250109204231.1809851-1-tariqt@nvidia.com>
-Subject: Re: [PATCH mlx5-next 0/4] mlx5-next updates 2025-01-09
-Message-Id: <173667230255.1013956.8857479733504746208.b4-ty@kernel.org>
-Date: Sun, 12 Jan 2025 03:58:22 -0500
+	s=arc-20240116; t=1736674050; c=relaxed/simple;
+	bh=1tsA+WJU02kx9XWJQx1b0jKkCyhsWG1AJcYkLjWL1HY=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=scFbA6oyF6Ws2kcSiix94l0/n5H7tsE2FLSZ+PY+Hk+YAF0Fjcs/A+v2hTGvRmScwCpJL8BtDn3vxclqzxUHyeUCavYpt9bA/meB+NmwlxeA5Of5G8MOS21UHKv4g/LcTi5MAMN51e7IJnDIdz1/dUBUsowrpo0xtqR8W7nYwvE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.207
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f207.google.com with SMTP id e9e14a558f8ab-3a81684bac0so60809135ab.0
+        for <netdev@vger.kernel.org>; Sun, 12 Jan 2025 01:27:28 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736674047; x=1737278847;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=AMmLDaoIPqQOf2zZ+HlQlE4XtrFUMSm5hcpKKRPGPhM=;
+        b=q82ejauPAcu9fwtzz2xjXfWGDrfLyvutfmPRusVFDtnM38PGuLmSIO83uezWojZrQM
+         24H+qQuJj3fgmUiNGH+SpWIZLYxRr8uEBZowXUm4Aa8kowC+VUMcQMdX1mttQlrza5FJ
+         wzWOfYiFaIH04tbQ4U+SFgsDv5p+LWt6QurHBdxJOibYIZnW+NfBp0dOOjYDdEUFcWhq
+         fWnzMmOh5UIl2IhST2QypMeZCXv7WmL9b/EvPJpyWMxw+sEI2nasQ1aqHmDoJ4L+yLXO
+         aqm41IXuiRvYMAS/hu3j7ipqKOY+S03phnqbVxVPKWhQYiA9+zwDoBF/sbcg0lKPD/2M
+         qSBw==
+X-Forwarded-Encrypted: i=1; AJvYcCUEoLebxZSFNW4PoGdnmURWvIp7B5nHj/QgiqOJaljTgb43/zuPWKjAuiN6yoJepdUW/cXLMes=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxqG+YuXwue4OlkghlgSLgEBZNPEXmFvm6oGvZIel7y5fYmo7Fz
+	ih1BiEKg6uzrLLCVldYNwPsk9K/unNv9S6L3gq0QPP1Zh2QGx14mgvJWMk+KtaJyJ9L55H/4GU4
+	F+qpyHSF7xm/HjxAjsQaJclY5Ym5FSnl76bjMvYqkRwxTPMbIUyrS04s=
+X-Google-Smtp-Source: AGHT+IG0PQX3CsxACh8zS+AgP5QZm8RMOwqpa+ejuMsF7w76r+XiMgWWKFUNeT/tYtE1pZvY5xJfgDT5RVcsGxQbd+MIpBSBBjyV
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.15-dev-37811
+X-Received: by 2002:a05:6e02:12cd:b0:3a7:7ad4:fe78 with SMTP id
+ e9e14a558f8ab-3ce3a8beb7emr128415575ab.19.1736674047482; Sun, 12 Jan 2025
+ 01:27:27 -0800 (PST)
+Date: Sun, 12 Jan 2025 01:27:27 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <67838aff.050a0220.216c54.002d.GAE@google.com>
+Subject: [syzbot] [wireless?] WARNING in ieee80211_assoc_success
+From: syzbot <syzbot+54788d96cbf3199014ac@syzkaller.appspotmail.com>
+To: johannes@sipsolutions.net, linux-kernel@vger.kernel.org, 
+	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+
+Hello,
+
+syzbot found the following issue on:
+
+HEAD commit:    09a0fa92e5b4 Merge tag 'selinux-pr-20250107' of git://git...
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=143b5b0f980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=4ef22c4fce5135b4
+dashboard link: https://syzkaller.appspot.com/bug?extid=54788d96cbf3199014ac
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7feb34a89c2a/non_bootable_disk-09a0fa92.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/71243ce2ee80/vmlinux-09a0fa92.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/ff8be47c15fb/bzImage-09a0fa92.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+54788d96cbf3199014ac@syzkaller.appspotmail.com
+
+wlan1: authenticated
+wlan1: associate with 08:02:11:00:00:00 (try 1/3)
+wlan1: RX AssocResp from 08:02:11:00:00:00 (capab=0x4584 status=0 aid=1)
+------------[ cut here ]------------
+WARNING: CPU: 0 PID: 1040 at net/mac80211/mlme.c:5653 ieee80211_assoc_success+0x6878/0x6eb0 net/mac80211/mlme.c:5653
+Modules linked in:
+CPU: 0 UID: 0 PID: 1040 Comm: kworker/u4:8 Not tainted 6.13.0-rc6-syzkaller-00038-g09a0fa92e5b4 #0
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
+Workqueue: events_unbound cfg80211_wiphy_work
+RIP: 0010:ieee80211_assoc_success+0x6878/0x6eb0 net/mac80211/mlme.c:5653
+Code: eb 05 e8 1b cd 4b f6 48 8b 74 24 38 48 81 c6 b8 09 00 00 48 c7 c7 e0 43 28 8d e8 a3 4f b3 f5 e9 e4 e7 ff ff e8 f9 cc 4b f6 90 <0f> 0b 90 e9 e6 e7 ff ff e8 eb cc 4b f6 90 0f 0b 90 e9 a4 fb ff ff
+RSP: 0018:ffffc900026f72c0 EFLAGS: 00010283
+RAX: ffffffff8b53b727 RBX: 0000000000000001 RCX: 0000000000100000
+RDX: ffffc90023007000 RSI: 0000000000000678 RDI: 0000000000000679
+RBP: ffffc900026f75d0 R08: ffffffff901981f7 R09: 1ffffffff203303e
+R10: dffffc0000000000 R11: fffffbfff203303f R12: dffffc0000000000
+R13: ffff88803fe24800 R14: ffff8880440fd000 R15: ffff888040778e40
+FS:  0000000000000000(0000) GS:ffff88801fc00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000020005000 CR3: 00000000425b8000 CR4: 0000000000352ef0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ ieee80211_rx_mgmt_assoc_resp net/mac80211/mlme.c:5972 [inline]
+ ieee80211_sta_rx_queued_mgmt+0x2b7b/0x4d40 net/mac80211/mlme.c:7577
+ ieee80211_iface_process_skb net/mac80211/iface.c:1610 [inline]
+ ieee80211_iface_work+0x762/0xf20 net/mac80211/iface.c:1667
+ cfg80211_wiphy_work+0x2db/0x480 net/wireless/core.c:440
+ process_one_work kernel/workqueue.c:3229 [inline]
+ process_scheduled_works+0xa66/0x1840 kernel/workqueue.c:3310
+ worker_thread+0x870/0xd30 kernel/workqueue.c:3391
+ kthread+0x2f0/0x390 kernel/kthread.c:389
+ ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+ </TASK>
 
 
-On Thu, 09 Jan 2025 22:42:27 +0200, Tariq Toukan wrote:
-> This series contains mlx5 IFC updates as preparation for upcoming
-> features.
-> 
-> Regards,
-> Tariq
-> 
-> Akiva Goldberger (1):
->   net/mlx5: Add nic_cap_reg and vhca_icm_ctrl registers
-> 
-> [...]
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-Applied, thanks!
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
-[1/4] net/mlx5: Update mlx5_ifc to support FEC for 200G per lane link modes
-      https://git.kernel.org/rdma/rdma/c/387bef82d0b4af
-[2/4] net/mlx5: Add support for MRTCQ register
-      https://git.kernel.org/rdma/rdma/c/e2685ef5f56295
-[3/4] net/mlx5: SHAMPO: Introduce new SHAMPO specific HCA caps
-      https://git.kernel.org/rdma/rdma/c/df75ad562a6f9a
-[4/4] net/mlx5: Add nic_cap_reg and vhca_icm_ctrl registers
-      https://git.kernel.org/rdma/rdma/c/6ca00ec47b70ac
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
 
-Best regards,
--- 
-Leon Romanovsky <leon@kernel.org>
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
 
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
