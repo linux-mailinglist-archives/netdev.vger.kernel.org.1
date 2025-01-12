@@ -1,80 +1,80 @@
-Return-Path: <netdev+bounces-157530-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157531-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0CDAAA0A989
-	for <lists+netdev@lfdr.de>; Sun, 12 Jan 2025 14:27:36 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 28C55A0A98A
+	for <lists+netdev@lfdr.de>; Sun, 12 Jan 2025 14:28:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0DCD01886B4C
-	for <lists+netdev@lfdr.de>; Sun, 12 Jan 2025 13:27:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 062CB3A5A3F
+	for <lists+netdev@lfdr.de>; Sun, 12 Jan 2025 13:28:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97DFA1B4254;
-	Sun, 12 Jan 2025 13:27:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA24C1B4255;
+	Sun, 12 Jan 2025 13:28:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EjDVcuFu"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YE5daTun"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6FCA1B4245
-	for <netdev@vger.kernel.org>; Sun, 12 Jan 2025 13:27:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E35D1B218B
+	for <netdev@vger.kernel.org>; Sun, 12 Jan 2025 13:28:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736688452; cv=none; b=LE/PU78vii8SN3PMchkdP2RwDyeQSiE1EytyqokjzG4mPntE7nf7VY3STrINivj6m1YBkRdeIlAM7HMLFXXDmfvAh/TYHwC7I/VBkCKqa4/jjOkcruF3bWyKnpjZu54TXFKN1Qt5B8mZ+Z4sDDosqY94K/Be8OnNBkD567iO+rc=
+	t=1736688507; cv=none; b=BJWQcpO0Pl4LKvNjtIx2H4J1BbfCNr9btCvwZQ9iHPct9z5uCPChpqsXF8WEM/FxQPfrFtNJVvAh6CPhfwvStzmTwXwVm0dqXSx3JVgFoqXtpVf87wEBL0DItxE1glm9JCuATLaLAr2XQSDCupVUa0SIK6rNc+z8AylA9DfWrDI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736688452; c=relaxed/simple;
-	bh=EWAYERHtUNysaHjwIGobdCdTOhWtkr0aHok8S4aBOnM=;
+	s=arc-20240116; t=1736688507; c=relaxed/simple;
+	bh=YCB34JLlQkpPUu3q4HB+ePRyc7u3+yMm46le00milnw=;
 	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=PYGmcKFlsrGULJuAaLEHzQ+sWQAtU2ja+eoP/UYA8VfptU+Lq96adqMbz5rSWjnx/KUDqMMIlbSE5H4p93pdS1yxvlEJgsTGWG7IEAted5jCNkPJWwNl9C3r8v//9ChMlOrlJ7rA3JgaWGUOfgsuNXsskX+lIg2fxBuMxamTwVk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EjDVcuFu; arc=none smtp.client-ip=209.85.221.44
+	 In-Reply-To:Content-Type; b=YtQRPE2rSnTYwuDQDf3NlkNgOv2RXFUUojGyP1Jh7sRkDxj7xNp68pBIxa9P5q2VYIRN+L+eikKhTos2cj5qX8SaOjtr1GSq5fuqG+Ien/9SztugOKpZwfuq8u/54MsxwFFG/6Hz9KxpObBvIC1yUPW0M4NH2bh2848gIUq6vSw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YE5daTun; arc=none smtp.client-ip=209.85.221.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-385e06af753so1805372f8f.2
-        for <netdev@vger.kernel.org>; Sun, 12 Jan 2025 05:27:30 -0800 (PST)
+Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-385d7f19f20so1792805f8f.1
+        for <netdev@vger.kernel.org>; Sun, 12 Jan 2025 05:28:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736688449; x=1737293249; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1736688504; x=1737293304; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :references:cc:to:from:subject:user-agent:mime-version:date
          :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=1vMWGZGJB0wSpyvnBU07N6sSx7cJJIas5pZC5dMSmqM=;
-        b=EjDVcuFuFw+2uCrt1GuATMn7FotJ4q1GdZq08Zt9hVg04WCpAc5tTUTBsU9KKmAaw3
-         ++c1wwg9A9VNtYAxW+xRR1N0qHbELJBZvz4FtazHKC8IMAwQygs+GxBGNGI6sXvphRPm
-         HEEWajma5lJIeyMiARhuz1/f+/PctiZKi4CzAq2QuX2RrUppSyER2x7EqW/xdBvYnpzp
-         zS8kVyCa1cDQFsJWiMefM4Au9VPX9dDsEk7Dhbc3AX3oW5z6g2yMFnfDshZmiT+8f2kW
-         0xoe56mDropVoEJt6kGMbkKMfW+aeyQpAcGt70zemqd41wXpudaoH2NPlCKXYqiLzQzh
-         nHEg==
+        bh=B/FpL7CmJTe1W7DtWMGgO7HVASN54rPsnRzFSSP0ZVU=;
+        b=YE5daTunx64LwY6XaKDyTFwJWJlgW1IBaJJMqc/ETmygvNgViPaVSGdp1l8zBnFeuW
+         tRkT49wu+CZ47PI1cEQHC/aaXNb3QrsTdw45T6i3sUqjo1uX4m2ajky7AdBJtf0nURn7
+         mI69fzE/TzY7wXReoaLfMUt7LB6Ux2ZVGxv7Bv+fDnE3MgHHotkD8vUDjsJfxNMUZ8Z7
+         ORyt1MJfYptnC82BsCxZpKBkzfd0dvYqR/p8dHOFeMOLlVXS5A/sE04eRf0Kb6O3SjMz
+         qPC+M9ZhtyXdQZ6j/+AHYRMHI/lZdRezs2lfL2QO+eSHJpaIDe/jxNqR/A20zw3QW4m9
+         GJDw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736688449; x=1737293249;
+        d=1e100.net; s=20230601; t=1736688504; x=1737293304;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :references:cc:to:from:subject:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=1vMWGZGJB0wSpyvnBU07N6sSx7cJJIas5pZC5dMSmqM=;
-        b=Sbh7roj2gagENYdIjej6vWNf33Oql0gpxg79y+LTIvmDpiSmUNl81WGKCP+++jsxQc
-         66uZ0KOaad4mj4l6ZHTkpWx4xKegW3SaSpSDavfUS1+J6Qm8RSRWb3Nb5VDKs6XodX0a
-         /5xd7UVBL+QijLSgrGd2p32gv6GH3yq0tPX3w0auRaHd3qa8t+nhk4t8uGN6DctEhHxw
-         ciPlGl566Lyvmc/DFe0jKdZ65BIAqVhcA4phS0dYhvY0lmUnXAWTh4wxhA/yu5qsigFc
-         MSUr1P6V8+/zFchskM/J+xCH+1B9jFh/roFryWwBHZ7M4XFlwWtfuRu5+ORN+DRagpWi
-         oWDA==
-X-Gm-Message-State: AOJu0YwFQNYhA8Nm+XThp7C6oaesisW+LaizzrJuNL4H/6znId/9WT5q
-	9ZZxmy3LRo9Wc2q8wHTkdFTjY0p31BsfNIiOxy0yWGRMWeg2cfFi
-X-Gm-Gg: ASbGnctbFEPfoHxxDkNeldcjlobFk4bfaUR+t/RocQU8mKZa7Fo+nIK8329bPcl+CI1
-	qhWi/4Jt3qFBVd47f+l3RDtjgFeFgttgf9EZGaBBQFgFokYEPKsSale5Qu+A3+8oCV6GslfCHYB
-	UBCx9fXocAacVhCPqO1KB84+pUPSTXt2bsY6kKUwGoIbTdUJNSorrnsgaut9dPJBkFWDD5FXf0c
-	IXWx7XYNFFW9E/wT6gLlWIwt+89z8OkmGqfTUd38V+VJnWTEb5PAogILjd/v2XCcXlgrISlIWI3
-	8mP6+8Hns/fWUoRw3CBCqZuosLL7uRE/eDus0fhaRNcSagw/o3beuN4GSEVT4Cd2O9yU/UalJMN
-	aLnZMDr1/efKPCjRWExdiGBkKpo5T6PfpzOP7+A5L/PcQ7E6G
-X-Google-Smtp-Source: AGHT+IFRjCywQUlh+gniNfaDDfFFshtq2YtQ2b6/h+k9nExpicjcbnfOLOtSA32H1C2uQJ8wXwOuCw==
-X-Received: by 2002:a5d:648b:0:b0:386:3e3c:ef1 with SMTP id ffacd0b85a97d-38a87312f36mr17399474f8f.35.1736688449018;
-        Sun, 12 Jan 2025 05:27:29 -0800 (PST)
+        bh=B/FpL7CmJTe1W7DtWMGgO7HVASN54rPsnRzFSSP0ZVU=;
+        b=G+nert2HJAwgE4ra3Dr2bfI6ev/OMyckOlRWlu9MS3RK04whQGqwW3zz//nF/75vb0
+         lZlc2dhQZPVcruDhEhlS8soNwe9bS8Uv7SVoDgl49s/U3v9rvZW7+P9T2DPIeBvT9XG4
+         JEWRmyzHmh0AqE79wfNVi1b+Uvx6ohGzVs3OT2knhVIrI16VhsKv8g54/dYvse2TzgYJ
+         vUfWZLu5233kbQ/pnG3aTY3T/L280Yenn8Y2EDsp7w2VXrIiXeTxKX7h9PjbiqVcIFpn
+         QLMI82F5eitK+shukKGUd07TN8ZoXViYYR1uQ/YLzFzZEX+e1NiPAPEQBw2u4MWO4nHl
+         swAg==
+X-Gm-Message-State: AOJu0Yzd7hBtvq3xqos9sskAyWLoWjikzWTtQn5WcNCsux4eGo7wYVOv
+	nnVDZCjdKOpV89xssMGS6QdOVxaH4pY5omcMCc9i9LhYKPD9mRhW
+X-Gm-Gg: ASbGncsS9F+kJjIokI0ItqZX4dOVBe2iIoMe1HMfUry8Zs5W5voBBojAPkwhgEIZ9xu
+	SOywJwcP8LmsZKNcnwdXU2JDBMuDePA7UGc2Bc5TdMzlPsSba2Duzv038D/vRejIyLPyCfBrtyM
+	J7mbSD+Z54CTTLr9PoGdD96r8r4bApSz19xF5mAXgDC7L8j0ogpj1wtCcXkMdjH6BbnKgY/kO+3
+	KgKp4yJQRn3ItHeQf7qp2/M6LkOla1XhwX/gx7524x9LeLIpcGXJH1fKpEHwi53OnO0adAhuXyx
+	bhhlWhqArlsHXTJpHN1s/Jx9+HfK1ZcSwJg1yQ9LRoh+0lrkeV5MT7krG149mp+aVr6qFwLqyCz
+	ucoRdNeHpw5chC9wOZc2ft5BtkC5gdUucZgdZby18LTzlEpuB
+X-Google-Smtp-Source: AGHT+IEAOjWp6a57Y3TBXRpKuiVuNK7D6bIkDg18izUMOHGNV7Jrbzq/AmtXn7PRaQuN8ZlAc8TuKQ==
+X-Received: by 2002:a05:6000:1f88:b0:385:fc97:9c63 with SMTP id ffacd0b85a97d-38a872f6915mr12903982f8f.9.1736688504508;
+        Sun, 12 Jan 2025 05:28:24 -0800 (PST)
 Received: from ?IPV6:2a02:3100:b0d5:ab00:44ab:526d:76d3:604a? (dynamic-2a02-3100-b0d5-ab00-44ab-526d-76d3-604a.310.pool.telefonica.de. [2a02:3100:b0d5:ab00:44ab:526d:76d3:604a])
-        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-436e2e89dfesm146376255e9.32.2025.01.12.05.27.26
+        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-38a8e4c3428sm9441688f8f.87.2025.01.12.05.28.22
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 12 Jan 2025 05:27:27 -0800 (PST)
-Message-ID: <95ceba4a-4316-44de-a36d-fdffb8dd8626@gmail.com>
-Date: Sun, 12 Jan 2025 14:27:27 +0100
+        Sun, 12 Jan 2025 05:28:23 -0800 (PST)
+Message-ID: <e3165b27-b627-41dd-be8f-51ab848010eb@gmail.com>
+Date: Sun, 12 Jan 2025 14:28:22 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,15 +82,13 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: [PATCH net-next v3 02/10] net: phy: rename phy_set_eee_broken to
- phy_disable_eee_mode
+Subject: [PATCH net-next v3 03/10] ethtool: allow ethtool op set_eee to set an
+ NL extack message
 From: Heiner Kallweit <hkallweit1@gmail.com>
 To: Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
  David Miller <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
  Simon Horman <horms@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
- Russell King - ARM Linux <linux@armlinux.org.uk>,
- Realtek linux nic maintainers <nic_swsd@realtek.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>
+ Russell King - ARM Linux <linux@armlinux.org.uk>
 Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
 References: <5e36223a-ee52-4dff-93d5-84dbf49187b5@gmail.com>
 Content-Language: en-US
@@ -141,51 +139,41 @@ In-Reply-To: <5e36223a-ee52-4dff-93d5-84dbf49187b5@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-Consider that an EEE mode may not be broken but simply not supported
-by the MAC, and rename function phy_set_eee_broken().
+Disabled EEE modes (e.g. because not supported by the MAC) are silently
+filtered out by phylib's set_eee implementation. For being able to
+present a hint to the user, expose extack as part of struct ethtool_keee.
 
 Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
 ---
- drivers/net/ethernet/realtek/r8169_main.c | 6 +++---
- include/linux/phy.h                       | 6 +++---
- 2 files changed, 6 insertions(+), 6 deletions(-)
+ include/linux/ethtool.h | 1 +
+ net/ethtool/eee.c       | 2 +-
+ 2 files changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
-index 5724f650f..bf368b32c 100644
---- a/drivers/net/ethernet/realtek/r8169_main.c
-+++ b/drivers/net/ethernet/realtek/r8169_main.c
-@@ -5222,9 +5222,9 @@ static int r8169_mdio_register(struct rtl8169_private *tp)
- 
- 	/* mimic behavior of r8125/r8126 vendor drivers */
- 	if (tp->mac_version == RTL_GIGA_MAC_VER_61)
--		phy_set_eee_broken(tp->phydev,
--				   ETHTOOL_LINK_MODE_2500baseT_Full_BIT);
--	phy_set_eee_broken(tp->phydev, ETHTOOL_LINK_MODE_5000baseT_Full_BIT);
-+		phy_disable_eee_mode(tp->phydev,
-+				     ETHTOOL_LINK_MODE_2500baseT_Full_BIT);
-+	phy_disable_eee_mode(tp->phydev, ETHTOOL_LINK_MODE_5000baseT_Full_BIT);
- 
- 	/* PHY will be woken up in rtl_open() */
- 	phy_suspend(tp->phydev);
-diff --git a/include/linux/phy.h b/include/linux/phy.h
-index c5dc2dbf0..7138bb074 100644
---- a/include/linux/phy.h
-+++ b/include/linux/phy.h
-@@ -1318,11 +1318,11 @@ void of_set_phy_timing_role(struct phy_device *phydev);
- int phy_speed_down_core(struct phy_device *phydev);
- 
- /**
-- * phy_set_eee_broken - Mark an EEE mode as broken so that it isn't advertised.
-+ * phy_disable_eee_mode - Don't advertise an EEE mode.
-  * @phydev: The phy_device struct
-- * @link_mode: The broken EEE mode
-+ * @link_mode: The EEE mode to be disabled
-  */
--static inline void phy_set_eee_broken(struct phy_device *phydev, u32 link_mode)
-+static inline void phy_disable_eee_mode(struct phy_device *phydev, u32 link_mode)
+diff --git a/include/linux/ethtool.h b/include/linux/ethtool.h
+index f711bfd75..8ee047747 100644
+--- a/include/linux/ethtool.h
++++ b/include/linux/ethtool.h
+@@ -270,6 +270,7 @@ struct ethtool_keee {
+ 	__ETHTOOL_DECLARE_LINK_MODE_MASK(supported);
+ 	__ETHTOOL_DECLARE_LINK_MODE_MASK(advertised);
+ 	__ETHTOOL_DECLARE_LINK_MODE_MASK(lp_advertised);
++	struct netlink_ext_ack *extack;
+ 	u32	tx_lpi_timer;
+ 	bool	tx_lpi_enabled;
+ 	bool	eee_active;
+diff --git a/net/ethtool/eee.c b/net/ethtool/eee.c
+index bf398973e..6546d7290 100644
+--- a/net/ethtool/eee.c
++++ b/net/ethtool/eee.c
+@@ -129,7 +129,7 @@ ethnl_set_eee(struct ethnl_req_info *req_info, struct genl_info *info)
  {
- 	linkmode_set_bit(link_mode, phydev->eee_disabled_modes);
- }
+ 	struct net_device *dev = req_info->dev;
+ 	struct nlattr **tb = info->attrs;
+-	struct ethtool_keee eee = {};
++	struct ethtool_keee eee = { .extack = info->extack };
+ 	bool mod = false;
+ 	int ret;
+ 
 -- 
 2.47.1
 
