@@ -1,80 +1,80 @@
-Return-Path: <netdev+bounces-157538-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157539-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1CB78A0A998
-	for <lists+netdev@lfdr.de>; Sun, 12 Jan 2025 14:33:18 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E47B6A0A99A
+	for <lists+netdev@lfdr.de>; Sun, 12 Jan 2025 14:33:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ED67118870EA
-	for <lists+netdev@lfdr.de>; Sun, 12 Jan 2025 13:33:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EA8A816708A
+	for <lists+netdev@lfdr.de>; Sun, 12 Jan 2025 13:33:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADE5F1B85CA;
-	Sun, 12 Jan 2025 13:33:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48AC91BAEDC;
+	Sun, 12 Jan 2025 13:33:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qCOZm1Pl"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="IvgEijYQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
+Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0FD31B6D04
-	for <netdev@vger.kernel.org>; Sun, 12 Jan 2025 13:33:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A21E1B81DC
+	for <netdev@vger.kernel.org>; Sun, 12 Jan 2025 13:33:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736688783; cv=none; b=rhUeruC1b71Q4Uj2rLVgoJISQmk32HGvK8l38xP0TApWa1jy0+UL0BW5ht4ikQNGjYkzfguAbKeQYt22SSwE0C3+6YdK8FgOk6HQ93bcrVaIdl+GurVCx163/a2H3/Vr/K5NG1CnFJrC+jS4uJBP2Mj+Cf372iVajJdso4y1AO0=
+	t=1736688785; cv=none; b=TjyZ7qrGe3bVniOPByVS7byi1b+PEfy8XqMyrYM/TAogdOQOGvphhCrkpNJW39uy8DfVxPE4WDwQILXQGUPM+wbWcdhJ1egeMiKIM8aIr4Wwhb1mKmnjAvKJb2esmcPmIGeaWWeV5k9QxHGqZ2FIN0MKwglXhmjTrUNb3KrVbPg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736688783; c=relaxed/simple;
-	bh=/XBAGwsAFpwFBBQSU961+beyZLkCUNZ5sGTLi9rt57I=;
+	s=arc-20240116; t=1736688785; c=relaxed/simple;
+	bh=9S7gVVHLbOOdhmOrgxdeq6yW9GeOcGb38tpUZkh03pU=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=UAz5B+uHpVSPQwiPtcolpEUQKZvNb65psLwaLSY0S5f9jqRW6HjAoN+A7NTWauzVWmgaZJ2/nXoKA7I+QbZ4Byoz4P9OiMS0GsupRRe1RBqiP1zojyBkspVEsifgdlEb7MihyYb82GWbJ5pTzIPnvKFPrdsvyz16ythlwgfRfm8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=qCOZm1Pl; arc=none smtp.client-ip=209.85.208.44
+	 In-Reply-To:To:Cc; b=Y0CiuhKTqTGLpmpdCHtFqaKloYwOLFXzhiwHxyR6KDXVL7PfKeRPmNG5Jo3OQEk8vjbru3Sqg0oKeJ+zbkyN2iM0phM0fhAVAsqKRl15Mc3J+4AG76e54ViRngLDsry4KxDvE3jN2qJe+IO55V53Fl1cjhibzG1mpG/VjnR4Pxk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=IvgEijYQ; arc=none smtp.client-ip=209.85.208.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-5d3c0bd1cc4so553411a12.0
-        for <netdev@vger.kernel.org>; Sun, 12 Jan 2025 05:33:01 -0800 (PST)
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-5d8753e9e1fso631256a12.1
+        for <netdev@vger.kernel.org>; Sun, 12 Jan 2025 05:33:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1736688780; x=1737293580; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1736688782; x=1737293582; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=mRUu7xwt0GOb8hs+BKrBffaLbY4C8ptCLopKQNeTlgY=;
-        b=qCOZm1Ple6su6xubB3aUzkbcGZY5K7MO0zPdNroySwDfBp2vZjced97lXRs20mCMjD
-         TpqNhAYOVSgXEyLUlwSKPK8myR7E4LM7lC0bH/6uVBe64Tw6gbFrweWAezRV31FuqUus
-         ylxA6yfdVHaoAn60GnMlTomzQT83GX65ptlRn9yCLiAH2XouZZROH4/UZ6DND+mRAn3m
-         GUPNcDrglp5bdhdfK13nsmnv2pEJb826beBvVUlt2J8Kq9/ewyIDbouux6zCTx0spjgy
-         Z+S6m7i5vmbAAiB5JBlkomehkCUsVGaTHdlUqfxb7hRqcQ0eLGt/bFrrcX3k8TuXz5i4
-         fTxg==
+        bh=BOVqy08C6GsLjB0sMrq2+YSaSxUnwU9JmLZUrKlTUz0=;
+        b=IvgEijYQvbnrqu88gunNW/qw7wuuVPToGuP+J7nXymG2wkqerx95mZKDC2xdXAFXGg
+         pJrgIJrCX9pSV1cNPummBHm4ikQdf5pgaSNQ/zXrhmw6C0m/z/84Pa+S8NOS8pNzgDO8
+         NeiI/xMEARaNWFbmUebWUglU25zfznu9b95KlqYJbKRsHWjk1iPqIMrJDMNXc4LkgR9A
+         6iHLJcSk1MXo88bBq3JiRSFRpa6BeAQ2A7CDZxbHcCXHOcZFA//V3tQ7MenvISOdDQeu
+         KfEKjcVni2WSxIb3LgUaR6eXf5NEbWJRwN9Yd9SQMr+OJxponSVgCQl+xNvMrKFDNkRy
+         u4nw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736688780; x=1737293580;
+        d=1e100.net; s=20230601; t=1736688782; x=1737293582;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=mRUu7xwt0GOb8hs+BKrBffaLbY4C8ptCLopKQNeTlgY=;
-        b=HVKj/Ca+9Wsoa7sqWsPyIqNXkHjc/mDEsdKiIgLGCQKEd6mLE87BtsBGHokw5JEtWS
-         JQPJgOCblrBqcf0cBbDzvB96P17joZntLPxy8aeo8VZaPE4Y6vQUx+YYS3uc/bCrcQ1Q
-         nUZMMTnYHs1H4lD7l3KDg7qMX9QsvfrZXYuMdjvbNITbM/rfm/EhFqrdEYJ6iQOws4wv
-         fY8zqhqxjQo0bm6QfCbYXXxuco1dpgzRQdFRFVJfoKIrqWxHa4hLL6j+TgBc+MdBkFCN
-         QI6AMmTLYqueubRTKkt+bejF8aehRvhY48SmIvcR/viMNNvB/ae1VI9/xSbDj/lQx6Oe
-         FsQw==
-X-Forwarded-Encrypted: i=1; AJvYcCVw+zwoKgJxav4xsSJZIg82qx6BMwD8T1bJBXmDJoaDOh3KYLR/PeqR8zBz5V/Aa52yZtnHqkM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzi200Rmeiq2u+G7wyFnUxXBh0QyugGI9jh3drlauJEwQfURZIh
-	eZ165HqNM5tAOrinsCHqmuX1ln76qeTSlM6lgOqTMTV7h/ASxNlePPJIxdDVRTI=
-X-Gm-Gg: ASbGncsTdvp6+QNVki8YFad57TUZJZbwSbZB1z+fZKBgzXmu8nVq3hECF4dckukfTp9
-	RFAFXhH0fZN56XF1QfrR4h7AToyd7yVGqDo9CBmZyegohUFIyxet9/uxW46ieqLxtNCNwVIff4p
-	sopcnQsydCIvzj1noaKKLl3iJx/NPAER89IT8vJAF09X6c8CL84gXNUVEo49rMiCzOYL5PWhAEG
-	FAP4H4ohjUDKTq/TwGmFbC17gZhuFQcIconWVLX7B8H0nZIvVxcXSKa0DyLm62YCp29Xlvr
-X-Google-Smtp-Source: AGHT+IHe7/2lTE7/Nj6QfvaBW+C/pcgDJDaV2DeHYFVEZqu1pr4HggBi1zI3dnd6icGke5g9aysmUg==
-X-Received: by 2002:a05:6402:42ca:b0:5d0:eb6b:1a31 with SMTP id 4fb4d7f45d1cf-5d972e1eb67mr5915789a12.5.1736688780172;
-        Sun, 12 Jan 2025 05:33:00 -0800 (PST)
+        bh=BOVqy08C6GsLjB0sMrq2+YSaSxUnwU9JmLZUrKlTUz0=;
+        b=KOZwTbtKfi+3cythMtlAnOL6VRTMZbr7saEBTVQCoWhUB6ZRqUGG/l7upkFCMKxMb5
+         UXaJa4/1k9mKw4nIC6n4ypczo1xB+4naF1f5uNZSXFUNB6mKNcmImLN3uhNRosln3e6O
+         po3e2/IeE3FU4yZv/lJuLkwys2vTVVK1oWEtk5iIWS6LpsO4ui/3xlfi5I0q3yd9FFKs
+         a0eNYKJ+jhmfcRR7Wx1acS5dhuz+9JegsMtDsTLZq3jFcKDZsiGRjhFzadL/CshoUTqn
+         bbRgFC3MxPCf/vI1inYpmfISAxlIAND/iwZ1QDXDYCyzBd3Q+ueaG9QR+CmyG2B5VkBf
+         55iA==
+X-Forwarded-Encrypted: i=1; AJvYcCWEvJMR11K5izc9QBDDvtiupznbTuzngVJc4oGgajJtSusAGAq/0nkXXRZjut8MDWeRNdQam9g=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxyeKgB+7/Npo4hTZjut50zfE+Vd0+E3a2liUPVM+cskiHupLlO
+	APHifFB/n/3nlfOe9len3PSiHUtoK7EHTbyMd5sGddJqEv86kZxTfvW/XVL+UAA=
+X-Gm-Gg: ASbGnctKXLY8hBkXD7W4EsfQe2VfgI8NLwni1ObhnAzLpYCUJ1TYb22UhSl0TZJOT0o
+	PyGrDoPHcNO8K3D+uZy4qSoplMVv1MRVKL87bChGqc3Kz1QHh9UKV/j+8ZWRmjA8oXCczUK1Xec
+	X+PQeWekrDy86tHMLqyv53oL4/icxHtwGulKlm7u/ETbker8UoLoaTC3ueo2e9CCbB94ZMvQpTC
+	9TzmueBEvx2r7FKKUIbLBs/kfJprFDW4o97dT/KPB1i8gtKUJnI7B6seizzZySlXMiiAEo0
+X-Google-Smtp-Source: AGHT+IHAPDDqI1itoMeCFKalJTN43D2b88pk2KL4TDUxwjUyr+2n3z7I5NTnbvxsw1RUzD8twrEPcg==
+X-Received: by 2002:a05:6402:5206:b0:5d3:d747:6496 with SMTP id 4fb4d7f45d1cf-5d972e801dfmr6260298a12.10.1736688781780;
+        Sun, 12 Jan 2025 05:33:01 -0800 (PST)
 Received: from [127.0.1.1] ([178.197.223.165])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5d9903c4477sm3584609a12.51.2025.01.12.05.32.57
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5d9903c4477sm3584609a12.51.2025.01.12.05.33.00
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 12 Jan 2025 05:32:59 -0800 (PST)
+        Sun, 12 Jan 2025 05:33:01 -0800 (PST)
 From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Date: Sun, 12 Jan 2025 14:32:43 +0100
-Subject: [PATCH net-next 1/5] net: ti: icssg-prueth: Do not print physical
- memory addresses
+Date: Sun, 12 Jan 2025 14:32:44 +0100
+Subject: [PATCH net-next 2/5] net: ti: icssg-prueth: Use
+ syscon_regmap_lookup_by_phandle_args
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,7 +83,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250112-syscon-phandle-args-net-v1-1-3423889935f7@linaro.org>
+Message-Id: <20250112-syscon-phandle-args-net-v1-2-3423889935f7@linaro.org>
 References: <20250112-syscon-phandle-args-net-v1-0-3423889935f7@linaro.org>
 In-Reply-To: <20250112-syscon-phandle-args-net-v1-0-3423889935f7@linaro.org>
 To: MD Danish Anwar <danishanwar@ti.com>, Roger Quadros <rogerq@kernel.org>, 
@@ -100,48 +100,61 @@ Cc: linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
  linux-kernel@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
  imx@lists.linux.dev, Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1232;
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1430;
  i=krzysztof.kozlowski@linaro.org; h=from:subject:message-id;
- bh=/XBAGwsAFpwFBBQSU961+beyZLkCUNZ5sGTLi9rt57I=;
- b=owEBbQKS/ZANAwAKAcE3ZuaGi4PXAcsmYgBng8SBqm1C6n54I2y3MlkXEqlfvD/rdrdWXja7l
- F8+5Is0j1KJAjMEAAEKAB0WIQTd0mIoPREbIztuuKjBN2bmhouD1wUCZ4PEgQAKCRDBN2bmhouD
- 17VVD/4qthD2/zGGxdy7/UvqcrbSUvelem2TFjP4otSbOQQWt2FoBYJM9pNa/ia4nDRzVPRxvWp
- AB684QLqy1jsKUV6CGPT3D+zER5yVvYN4twzngQrr02IRwqmYMGieUhT4C5lGveMXOBMmGa2mfU
- udJ4cuPGtlhH3fISl4u+3noNIZKMzIg3tNCkfvRsZDOAxAPyLpaePpjLMBYlgfahKqDSJJ3Ymly
- +xpGJ/hwDta2luGxIuxazAdQWU4lIeXdwHWgMBrdSensqJLq59XmNTDvSvGOYe6RhYYZEOGkBh+
- dowV/JQhEousq+sLQk8Vg6rJ20bAffXxCqMtmMMKK0iPtwmP7eeWQipA3SOUCyoWyqstPFDnJef
- WwaKd5jhJ6isWq6wImBLMXOke7etQoi8jD70/MBSBHYv5utAytgbAPEPSfrKdDyrDKanOHAS3Uw
- 3qfAbOu3ld+3DGyNuxGR9gKUfogV69mX1twFMUXFg01h/7HOcmqFUu4qyW79JH9Fm5zJO/kIneA
- HbwYf3HvIrn7L1rWNCiZIli0eXsOgM6StdpoUZ9ty2Vp8tBg21cFVNlkY77/RG/d4ZAsx89Kw1p
- bp3xe0sin6kUFa1weHxNQaVneoV7PfrWRYHktdBkv66MzEVc9Yneu5Hxr8HS3MmFxNSjVv5cFp0
- Mqd3su6GpsWZLIQ==
+ bh=9S7gVVHLbOOdhmOrgxdeq6yW9GeOcGb38tpUZkh03pU=;
+ b=owEBbQKS/ZANAwAKAcE3ZuaGi4PXAcsmYgBng8SCCW0MlfjlA9K1TjLeHUu3QGRRtM/WgAZoC
+ WMtHJkHeVGJAjMEAAEKAB0WIQTd0mIoPREbIztuuKjBN2bmhouD1wUCZ4PEggAKCRDBN2bmhouD
+ 10+YD/9A02R/3MQQubS4ahQZTK/vIgEnDoLeLOZ2z6ur0SaSsl8P8g2c7riLLdYF92lSsgr7uRd
+ jmeT9wLRxCkXUvDb6BlQcaqDWHzdA8yCfatXJo3i/2gmM28IQU0DZHciCQ9Er059Bd1mWk1TZDp
+ LNC55whGCCGmpzxIn2wGaL7HylIHDR0oWZ2JQ+IBGe4+Iw2oTVS4tPErPl7ysAZCJbqOl8oHjI4
+ ijfACgxQuzSwv72lLqmbXddZZ5BsAbYIfA0ql2sUIVsXx7/dcdo+J+1922mAUQcDtuQ3L8YdsK1
+ nrT2AECb9AT2yQFJUWCFgml36SGT/AAGcCDFhEGrSm5sqmRhO+pbePafGg1SzeB/ykFZP8pbtmI
+ kYyHMLG58LuLSM9wBwV7e230On5UeKDGtoQB2lhdPZqpTAypo/lNglE9T0jBII67mTOsel8rhNY
+ 8eWLdF/Ir8VjBmMK66BDKbEGh5NscM7qzw602iC1Zf4w/xVnMqR/P6ukm9kumXSAueVzXvGHj4P
+ /9tyS3lSciwxAHxVcbKlC5/9XPgtg7i/7Ij3eN0jCdXqwbClXlaRNEYPaQ6bGPpOj4Ozpq7FzLc
+ BDYupKiqx9fiH26x/CdTVFDC0seiQ9ZBJW9cttHi/2Pr2k57jYb1KWuMCQeroyLpY+MEyUYCjfb
+ o98tiqTnTayP/uQ==
 X-Developer-Key: i=krzysztof.kozlowski@linaro.org; a=openpgp;
  fpr=9BD07E0E0C51F8D59677B7541B93437D3B41629B
 
-Debugging messages should not reveal anything about memory addresses.
-This also solves arm compile test warnings:
-
-  drivers/net/ethernet/ti/icssg/icssg_prueth_sr1.c:1034:49: error:
-    format specifies type 'unsigned long long' but the argument has type 'phys_addr_t' (aka 'unsigned int') [-Werror,-Wformat]
+Use syscon_regmap_lookup_by_phandle_args() which is a wrapper over
+syscon_regmap_lookup_by_phandle() combined with getting the syscon
+argument.  Except simpler code this annotates within one line that given
+phandle has arguments, so grepping for code would be easier.
 
 Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 ---
- drivers/net/ethernet/ti/icssg/icssg_prueth_sr1.c | 2 --
- 1 file changed, 2 deletions(-)
+ drivers/net/ethernet/ti/am65-cpsw-nuss.c | 9 ++-------
+ 1 file changed, 2 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth_sr1.c b/drivers/net/ethernet/ti/icssg/icssg_prueth_sr1.c
-index 3dc86397c367d2b195badcf1fcb5f1ef39ffabd6..64a19ff39562fa4a6ba6f7e9de903f689a3d5715 100644
---- a/drivers/net/ethernet/ti/icssg/icssg_prueth_sr1.c
-+++ b/drivers/net/ethernet/ti/icssg/icssg_prueth_sr1.c
-@@ -1031,8 +1031,6 @@ static int prueth_probe(struct platform_device *pdev)
- 						   (unsigned long)prueth->msmcram.va);
- 	prueth->msmcram.size = msmc_ram_size;
- 	memset_io(prueth->msmcram.va, 0, msmc_ram_size);
--	dev_dbg(dev, "sram: pa %llx va %p size %zx\n", prueth->msmcram.pa,
--		prueth->msmcram.va, prueth->msmcram.size);
+diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.c b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
+index 5465bf872734a3fb9e7e481d556eaec3cce30e0e..68f1136e3db725eba239b10f337786ac735030ca 100644
+--- a/drivers/net/ethernet/ti/am65-cpsw-nuss.c
++++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
+@@ -2559,20 +2559,15 @@ static int am65_cpsw_am654_get_efuse_macid(struct device_node *of_node,
+ {
+ 	u32 mac_lo, mac_hi, offset;
+ 	struct regmap *syscon;
+-	int ret;
  
- 	prueth->iep0 = icss_iep_get_idx(np, 0);
- 	if (IS_ERR(prueth->iep0)) {
+-	syscon = syscon_regmap_lookup_by_phandle(of_node, "ti,syscon-efuse");
++	syscon = syscon_regmap_lookup_by_phandle_args(of_node, "ti,syscon-efuse",
++						      1, &offset);
+ 	if (IS_ERR(syscon)) {
+ 		if (PTR_ERR(syscon) == -ENODEV)
+ 			return 0;
+ 		return PTR_ERR(syscon);
+ 	}
+ 
+-	ret = of_property_read_u32_index(of_node, "ti,syscon-efuse", 1,
+-					 &offset);
+-	if (ret)
+-		return ret;
+-
+ 	regmap_read(syscon, offset, &mac_lo);
+ 	regmap_read(syscon, offset + 4, &mac_hi);
+ 
 
 -- 
 2.43.0
