@@ -1,136 +1,183 @@
-Return-Path: <netdev+bounces-157527-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157528-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93256A0A975
-	for <lists+netdev@lfdr.de>; Sun, 12 Jan 2025 14:13:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 569CEA0A987
+	for <lists+netdev@lfdr.de>; Sun, 12 Jan 2025 14:24:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DAB10166C27
-	for <lists+netdev@lfdr.de>; Sun, 12 Jan 2025 13:13:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 31483165ECC
+	for <lists+netdev@lfdr.de>; Sun, 12 Jan 2025 13:24:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A2081B412C;
-	Sun, 12 Jan 2025 13:13:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4856D1B424F;
+	Sun, 12 Jan 2025 13:24:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="Y9v+OTbt"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VXL0Pri9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABDAF224D7;
-	Sun, 12 Jan 2025 13:13:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 833D51B218B
+	for <netdev@vger.kernel.org>; Sun, 12 Jan 2025 13:24:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736687611; cv=none; b=KikH0jeEdUXptIsrcC4rvDomWmATnuzEN93837bXzjGP32qWeg5Vb7uJECX4ZYebSyHZfYE30ohYy1BS2SCPoOsdUKR9NC4MVhDWAb8arI1S5RaLYRfVQcbebJOCWkQEssqkpH+NvSdkXvs4Rbg2UDM9rYtdY1XQh/1zh7JN5eA=
+	t=1736688291; cv=none; b=lBhrUeDETsP4OEaOYKQIPpUCRbIu9covWXPMcdXNNP287RiAHN2Kueqr+Epuroq/+SGgAvu9Nj11xATa5szbdsVltqX9BWHfrmyeivzCI4eR4TqG3x/OCWUyEUA4TdZQxeRYzJnSmlfnQDBIyO2hsCyXcFKtNNUkUGls0vGTsTg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736687611; c=relaxed/simple;
-	bh=DC4WgAfei5Sc4tuX/HQoXJDS5RVZGmDtHFXokff9FEM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=o4fgeuEfTj5l2UCY9EZszIEDKlMSeddtk7MGP2sTmcJTWYrH47bvNyN1FyL9s5uo1kOWxs4B5xv4fg1fGsT9jWmF5vqB8oaprnQX2ZY9lOiG+2zzQYWKH3b/P0647seu7awZTMLxvPDFt78wAU2zSOyR0R9fVlPMg4iUyd9xjuw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=Y9v+OTbt; arc=none smtp.client-ip=46.235.229.95
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
-	; s=bytemarkmx; h=MIME-Version:Message-ID:Date:Subject:From:Content-Type:From
-	:Subject; bh=WYcJqo++ZjMA3tjtoJzxBlObLLUp6of3RrHdqjkdtpQ=; b=Y9v+OTbt5x6cO/YH
-	JTZtMo/ifTWcMd3d8HQR4RxEJah7g1J2R5DKqkOffBY8x+lY9tvKN9oR//AmN/0sRzaMRsKazLTQy
-	m01qtcQkbThNQBjZH0ARHg4bgIXYlC7LLMIOXm9HneuM2zw1t2aGvblGrK19DdbOMMvt42MmoxqEk
-	A15f0MUwJO3oBLg31OuWsjqvKAEM9O7B8g2hPdpY2i99jDZCEpgsr8NwbtXshFbh2Lv49ByO0WiaB
-	xWPmKVprBEkbgWVgD/waMJ2KwpX96765uxCmomHfMKYZP1Hd8NulQgFFuquORUaNprCi4iL7QexMI
-	V+wHKzSPHxceEAtPgA==;
-Received: from localhost ([127.0.0.1] helo=dalek.home.treblig.org)
-	by mx.treblig.org with esmtp (Exim 4.96)
-	(envelope-from <linux@treblig.org>)
-	id 1tWxmJ-009iy0-1G;
-	Sun, 12 Jan 2025 13:13:19 +0000
-From: linux@treblig.org
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	"Dr. David Alan Gilbert" <linux@treblig.org>
-Subject: [PATCH net-next] socket: Remove unused kernel_sendmsg_locked
-Date: Sun, 12 Jan 2025 13:13:18 +0000
-Message-ID: <20250112131318.63753-1-linux@treblig.org>
-X-Mailer: git-send-email 2.47.1
+	s=arc-20240116; t=1736688291; c=relaxed/simple;
+	bh=EigKS/FyslmimcxV4EIL+yYYPQgoAD5coCwX5Cawls4=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:Content-Type; b=tc6M5HJ8CE0bfkMDzzbSKh+U7YXvlwkmM3ygDQe9baV7cDo1JHb1osECUVekGfIWGxCx4LC7QQ1LCXrMr3LoabtikBr/6hp0PVh+gjUjMaDLy943BcFIr/2NFsGYV1/zT3sRa8E34CmJckiWrpWNr86280rFUv4swplzlX0hMOM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VXL0Pri9; arc=none smtp.client-ip=209.85.221.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-385e87b25f0so2853282f8f.0
+        for <netdev@vger.kernel.org>; Sun, 12 Jan 2025 05:24:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1736688288; x=1737293088; darn=vger.kernel.org;
+        h=content-transfer-encoding:autocrypt:content-language:cc:to:subject
+         :from:user-agent:mime-version:date:message-id:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=LfTCDUBVESFb3JvdRruJcga+uReZlqSN1cqBQuvz6cM=;
+        b=VXL0Pri9i1f5eJ1KveDodjJcbde1BufUQTwCUni+n+CR0c4fu9KL73pAG8TC7eqmvC
+         b2X3W1udCr1aqgzMKsX7LJjBcBqGHzIQrkFme/7Uj9c2ugDU7GsqPkyE423Wsl5ZtGb7
+         pKTGYotX2PWfuBhY8gLSTTkhtCiT2ImAAP4VkjTEhzqdURKqrga60XDRudvIXk03f1YF
+         mqx7VVjmfIMxxz9rC3M94Vaj3+Qxi3E1jThy7jRSqDwURjiJ6RxNFHJlkyNlD7rLA4xD
+         DS5o0kdSUn2tuSzdLWKflvqde3GLthQm/RZ99isJguxdItU6s6+Owfg84PUybumTu622
+         8WNg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736688288; x=1737293088;
+        h=content-transfer-encoding:autocrypt:content-language:cc:to:subject
+         :from:user-agent:mime-version:date:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=LfTCDUBVESFb3JvdRruJcga+uReZlqSN1cqBQuvz6cM=;
+        b=v+biTQcgMlRpY2Z0xjPc+MBFukj6HToJU/tzhKsvnuMb4mq1H/xYha7fjcTyrl5931
+         pEuh1dLSV+0lAIK2hdBeSQdWoRLuPNnWKPHgJxunwJrhikb9wZ9QCNdRHRg+w85qXf4f
+         jKO3ru4tEt9A1ASsADXEEeYZv8LLIaSppdSm0qTziGRaERX6I4tXLEIE0slLEZr0iXwG
+         c30ALRJKADCVZFG34FYXkk35dgC/YY1chAcPduaBib4eXGUEIQbs7ahShKKSxDcl8RIW
+         2wnh2CaLqk0XGGc0jDF0pNkzd0O5QmvPBVl7SuATzLIz2vTIOlRbRNfqCFdsyJmD3ZQE
+         m9Rw==
+X-Gm-Message-State: AOJu0YyvkWm9OCXlX82Y7nsGSef4ZOPuyAUN3Q6a49pSxaXGOlfyolB1
+	fr94HwIKI/NjF28CD20k2aHmMPb5DidMBUwZqYRbosZ+s+rh3niM
+X-Gm-Gg: ASbGnctKKZCXPMbFRw7y1nHiw6jTYdspxS0wqU4WZdBTkbTcGZ3g0GWyq0h8X27Ulk7
+	qLlLDcc8g+2X91F6qXO9+uNFAXbOn3QrnoWwzVqr/ynpBKN0V8ZxbDCauI5gs+3cxC6Hxx3IQa0
+	oE4ZUIh7AlCE+LoQpABcJ1CcjAA/ySwKe5/dm8z8fEWLjhd6ZmJd9xVNCcOMDmqqJwswVVejWmm
+	RdPRhI4Cg0yE3AElCpPmd4h2mcLocEvy9w2umaREhOSAp3uAhRyLA3ZiSZ2o4Bn86rZQhmaF1fD
+	aGm6idh6FIl2gMYslKyryqGvWr5R7ulgAT4EaLQt7RfQhwgBZQgC1lgSQU6FC6Tg+J0hA6F0yai
+	/kuk6sEd/Son0FSWpl6cHlOR8/P0ZcVKUIzzA3++PGRyaxxlc
+X-Google-Smtp-Source: AGHT+IEKyWmptU+G1ql0JimOrBGMt12glC3W+wiQGFJaERXAn27NuXMQ7mJH7/QvZm4KmElMON6ZQw==
+X-Received: by 2002:a5d:648a:0:b0:386:42b1:d7e4 with SMTP id ffacd0b85a97d-38a8b0f3158mr11176237f8f.19.1736688287625;
+        Sun, 12 Jan 2025 05:24:47 -0800 (PST)
+Received: from ?IPV6:2a02:3100:b0d5:ab00:44ab:526d:76d3:604a? (dynamic-2a02-3100-b0d5-ab00-44ab-526d-76d3-604a.310.pool.telefonica.de. [2a02:3100:b0d5:ab00:44ab:526d:76d3:604a])
+        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-436e2e92a50sm144462235e9.36.2025.01.12.05.24.46
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 12 Jan 2025 05:24:46 -0800 (PST)
+Message-ID: <5e36223a-ee52-4dff-93d5-84dbf49187b5@gmail.com>
+Date: Sun, 12 Jan 2025 14:24:46 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Subject: [PATCH net-next v3 00/10] net: phy: improve phylib EEE handling
+To: Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+ David Miller <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Simon Horman <horms@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+ Russell King - ARM Linux <linux@armlinux.org.uk>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Content-Language: en-US
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ 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
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-From: "Dr. David Alan Gilbert" <linux@treblig.org>
+This series includes improvements for the EEE handling in phylib.
 
-The last use of kernel_sendmsg_locked() was removed in 2023 by
-commit dc97391e6610 ("sock: Remove ->sendpage*() in favour of
-sendmsg(MSG_SPLICE_PAGES)")
+v2:
+- add patch 3
+- patch 4:
+  - silently filter out disabled EEE modes
+  - add extack user hint if requested EEE advertisement includes
+    disabled modes
 
-Remove it.
+v3:
+- patch4:
+  - remove trailing newline from NL_SET_ERR_MSG message
 
-Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
----
- include/linux/net.h |  2 --
- net/socket.c        | 28 ----------------------------
- 2 files changed, 30 deletions(-)
+Heiner Kallweit (10):
+  net: phy: rename eee_broken_modes to eee_disabled_modes
+  net: phy: rename phy_set_eee_broken to phy_disable_eee_mode
+  ethtool: allow ethtool op set_eee to set an NL extack message
+  net: phy: c45: improve handling of disabled EEE modes in ethtool
+    functions
+  net: phy: move definition of phy_is_started before
+    phy_disable_eee_mode
+  net: phy: improve phy_disable_eee_mode
+  net: phy: remove disabled EEE modes from advertising in phy_probe
+  net: phy: c45: Don't silently remove disabled EEE modes any longer
+    when writing advertisement register
+  net: phy: c45: use cached EEE advertisement in
+    genphy_c45_ethtool_get_eee
+  net: phy: c45: remove local advertisement parameter from
+    genphy_c45_eee_is_active
 
-diff --git a/include/linux/net.h b/include/linux/net.h
-index b75bc534c1b3..0ff950eecc6b 100644
---- a/include/linux/net.h
-+++ b/include/linux/net.h
-@@ -343,8 +343,6 @@ static inline bool sendpages_ok(struct page *page, size_t len, size_t offset)
- 
- int kernel_sendmsg(struct socket *sock, struct msghdr *msg, struct kvec *vec,
- 		   size_t num, size_t len);
--int kernel_sendmsg_locked(struct sock *sk, struct msghdr *msg,
--			  struct kvec *vec, size_t num, size_t len);
- int kernel_recvmsg(struct socket *sock, struct msghdr *msg, struct kvec *vec,
- 		   size_t num, size_t len, int flags);
- 
-diff --git a/net/socket.c b/net/socket.c
-index 9a117248f18f..430b38ed0cb9 100644
---- a/net/socket.c
-+++ b/net/socket.c
-@@ -774,34 +774,6 @@ int kernel_sendmsg(struct socket *sock, struct msghdr *msg,
- }
- EXPORT_SYMBOL(kernel_sendmsg);
- 
--/**
-- *	kernel_sendmsg_locked - send a message through @sock (kernel-space)
-- *	@sk: sock
-- *	@msg: message header
-- *	@vec: output s/g array
-- *	@num: output s/g array length
-- *	@size: total message data size
-- *
-- *	Builds the message data with @vec and sends it through @sock.
-- *	Returns the number of bytes sent, or an error code.
-- *	Caller must hold @sk.
-- */
--
--int kernel_sendmsg_locked(struct sock *sk, struct msghdr *msg,
--			  struct kvec *vec, size_t num, size_t size)
--{
--	struct socket *sock = sk->sk_socket;
--	const struct proto_ops *ops = READ_ONCE(sock->ops);
--
--	if (!ops->sendmsg_locked)
--		return sock_no_sendmsg_locked(sk, msg, size);
--
--	iov_iter_kvec(&msg->msg_iter, ITER_SOURCE, vec, num, size);
--
--	return ops->sendmsg_locked(sk, msg, msg_data_left(msg));
--}
--EXPORT_SYMBOL(kernel_sendmsg_locked);
--
- static bool skb_is_err_queue(const struct sk_buff *skb)
- {
- 	/* pkt_type of skbs enqueued on the error queue are set to
+ drivers/net/ethernet/realtek/r8169_main.c |  6 +--
+ drivers/net/phy/phy-c45.c                 | 51 +++++++++--------------
+ drivers/net/phy/phy-core.c                |  2 +-
+ drivers/net/phy/phy.c                     |  4 +-
+ drivers/net/phy/phy_device.c              | 23 +++++-----
+ include/linux/ethtool.h                   |  1 +
+ include/linux/phy.h                       | 24 ++++++-----
+ net/ethtool/eee.c                         |  2 +-
+ 8 files changed, 52 insertions(+), 61 deletions(-)
+
 -- 
 2.47.1
+
+
+
 
 
