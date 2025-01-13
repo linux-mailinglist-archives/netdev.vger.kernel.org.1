@@ -1,111 +1,123 @@
-Return-Path: <netdev+bounces-157580-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157581-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC733A0AE9E
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 06:08:52 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D5ABDA0AEA5
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 06:10:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0EA0F1660F9
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 05:08:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DF221166475
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 05:10:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C40B8230D2B;
-	Mon, 13 Jan 2025 05:08:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 084C6230D35;
+	Mon, 13 Jan 2025 05:10:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="FZbZrN9x"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Sjez3j9Z"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45A92230D0E
-	for <netdev@vger.kernel.org>; Mon, 13 Jan 2025 05:08:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7FDE230D07
+	for <netdev@vger.kernel.org>; Mon, 13 Jan 2025 05:10:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736744924; cv=none; b=pA91mZqfjd84UQyUu+K/VYOAhPlKRx8Z/zLHq5tiltsE7u5oN9E0R90mY7OQVFAAwwG2joYsizz5pUMOJI0m1FvHUlWpuvy8MPRznXhMKTNdGLzcOsMxPCRIcHRchyFWXHce68q7gEi8hbF8sUCV51krdwadnkezMuxjs1ZHtbs=
+	t=1736745019; cv=none; b=a1S67cTkXiGs2SbenEzfdUMORIz1ZPKa7eJX/OYDk24wqkImNdcTOtCD4kNGWm0PhvGW+udkMlZll0ZeEBJ0cyhDzoEfiW6dAEcEameWrb5fDw34y0teAl9yfuvkC5JcMmhDStNEbsXcmwHRLEyrrcDMVGy3Q8H0kkaGvo2jm4Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736744924; c=relaxed/simple;
-	bh=WXVOkihzQNFkLSZlr4dQ8eLbQxaEMK0MeLjZhfsLUPw=;
+	s=arc-20240116; t=1736745019; c=relaxed/simple;
+	bh=NJKlc738vUvilJIi6X60wH9GtjopvU0NJbpDtTZZ+Lw=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=c0aovpMDipAxhlF6RdqvQ3RVoem61hR1Y4/dEaxQS3DUEItu6v7vudsktv1gZuBGBDfALGNj5NMC4AEBz36wEt4LkU7601P4Q6i5nYvcaiEulbg7024fuyPvsiSMS+nJKYwBMzldplypbCPYlfvHVWoax4tRorIT/+604BqM/rE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=FZbZrN9x; arc=none smtp.client-ip=209.85.216.50
+	 To:Cc:Content-Type; b=PAd/KTJQkgYRoomd4SV7gsCiieWNt1luW/odOuVTqXJg5i8GE+ZiUXlRlpFwaVpK0fUyBHTykC+hUFX4egdPOnMUcKssNLKV+k6Pi719aThW/S3TM47a684IWb0VuFG1+Mrm+Gm2WZ/DfuljRoIzuJNyXttYGaR86s1wpsTQpVg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=Sjez3j9Z; arc=none smtp.client-ip=209.85.214.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-2efded08c79so5187834a91.0
-        for <netdev@vger.kernel.org>; Sun, 12 Jan 2025 21:08:43 -0800 (PST)
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-215770613dbso46083705ad.2
+        for <netdev@vger.kernel.org>; Sun, 12 Jan 2025 21:10:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1736744922; x=1737349722; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1736745017; x=1737349817; darn=vger.kernel.org;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=WXVOkihzQNFkLSZlr4dQ8eLbQxaEMK0MeLjZhfsLUPw=;
-        b=FZbZrN9xdInaEqb9Q9iz+vywG+LfMCBvJKBuCbGogz4cLcEtht8EXF34MawLf7CL0i
-         LG59b8hUHKQdvgRSvXgitYmExmTHwYuda3ywLdKUg+uCZiYAUPsHxAI7sj4Wu3eR2aHd
-         ha0Z/rAnsLEnlLy/EI9aGkRImW7XMvPVK/WtM=
+        bh=NJKlc738vUvilJIi6X60wH9GtjopvU0NJbpDtTZZ+Lw=;
+        b=Sjez3j9ZSqzkWPblwyJDRN677lnrzXtQ7lmMH7NAnSIUQtWmBGRUf8A9NcVVpXtRdp
+         sSxp0JZJTf6rTT9w6r+97SJBgVUW9JHqTe2vD4H5QYduCsA5xTRxjg7Qv7J2R/sXE1rQ
+         JAACOdQISArtn37o8ud+Oyn8Le/+PmCloZt7I=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736744922; x=1737349722;
+        d=1e100.net; s=20230601; t=1736745017; x=1737349817;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=WXVOkihzQNFkLSZlr4dQ8eLbQxaEMK0MeLjZhfsLUPw=;
-        b=n/9iE6E4eZvhve28OASvuthnCEbaylRWsqT34w2AmL7MScdZm4pD25YbFk54ozVZfl
-         vdbnL7Ot9SYO6H7XHEnykMD/rgNPijJthsgkNEB5BAo54TQx/s76MKRZIIuPwK0vcgIJ
-         eUEqLthm4nkPI00BFzM/ePYwOULFEYzkgfzeeaYU09nB8RFQLHzDDinumUG8XLp0//C8
-         pDtZ6P9/EALNzPVxikLH7GU65bzEdJNsmE72MSov73OjPJNMW1beD1u9NsKQOOnmsVwg
-         A6q6W9vjQVnqlHwhLZavnotgkcdIzumY05aHBbLST6tVJOf/tA3TnUbIuDerfWtPld/k
-         hrRg==
-X-Forwarded-Encrypted: i=1; AJvYcCVK/TVCN5Q8UI8BqHX1POwAcgW8E6WhpP0oXnaYYte+StBolNF6VSnjx20oqIiS3QSyNzCB0J0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwtHhVF0yjFVMnQBrJn9P6dg183BS36B2cHaHnrkH5CHHW0FfsG
-	Uv7qquEm3HtPHhec7mlciJLMaOLsxlk2yTBaYP4p1Ozl20ODNPhwvQPo8PRv9Qq7H7LLZW6XTCf
-	ncbrAnJFQkji1mH0owuthjtgAXZFaIBlFxANr
-X-Gm-Gg: ASbGncttTVZOdRojBY6esba1WohvplbGe2+O5s6jzJwztQNj09EsRPzHyC+HT0WTzYg
-	nzmu9rufRybuk3XMAB6SjL6PZxKYfFqMvneBCg/8=
-X-Google-Smtp-Source: AGHT+IE/Hv+sCpKAV3Mbx8MaWNunUlEafRHBNgrhmqEP8PnNohMfMQGTEnmaOGCTx0gB4aQczlPW0mVyfDOZYVXs2QU=
-X-Received: by 2002:a17:90a:d648:b0:2f4:9e8b:6aad with SMTP id
- 98e67ed59e1d1-2f548da4606mr33369916a91.0.1736744921135; Sun, 12 Jan 2025
- 21:08:41 -0800 (PST)
+        bh=NJKlc738vUvilJIi6X60wH9GtjopvU0NJbpDtTZZ+Lw=;
+        b=jR1FaKSHmOfBmDvjrYsUxPelc9I+wH1LIg8KUlfKz6tfk6qMWpXL17HYW8I9Z30azX
+         eMfqqEO0AUpgWKTaKxv7S0fSHQjMGImGQnVdln6tHKNNAvYuytEpbVlwy3q3J7sc09B4
+         pqLRo33gHgzKw6F8dimcKY9WrDPcPllMMCjE5CYodXWc0hKdxuBnD4FaArOGb1Vyc/D2
+         2DbDFhRxkESu5+ZDlVJw0tO3oyoRNgoeWHERzImvI73KkxwBkIvx+PObuvqAnfRKEAkS
+         wz/rvoCgisf1oZiNYwWvI+Layu1O90sPumeBMjudWw8ImC1SEntyt0t+MtNQe7DxnggQ
+         22vw==
+X-Forwarded-Encrypted: i=1; AJvYcCU/xcmDz8pTNE6mbruGcF6JmUp4/hA53go189qR/0TgKG7YQ3MkOA+kkZA9IRcJE2jt1SmewPc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz04WPXCbc+u6ZD/g8Zs7zSx9gcZKmenhMObEJyXE3iJ4TJikMC
+	uVui5SenutaNios2y5h3IDqmSCmu8pfAgcm3ICl/b22bKVck63If+Vn/ywxQ5nHnEIoNLoYEKlg
+	av9xB8Ex1a/hz/h16gkSS1rAWdLE7yvZdVnrD
+X-Gm-Gg: ASbGnctGUWjh1SjAXLguTgcsCRuZHtaZOKjmGSb6UaFo5MySy+Pdq06nBKqhF1PLIUE
+	gjur6Gu6oNICJLsN+d5hMz9Clx5Gu1mb7Ewv782A=
+X-Google-Smtp-Source: AGHT+IGM12nPucziNIwJ3ewGaWvHtohP++DZOO35GmGmbwVCN/TIxMVLxllOCEcUgTLwTtXB+L6hLE0lVeRgtODpIag=
+X-Received: by 2002:a05:6a20:43a9:b0:1e1:b727:1801 with SMTP id
+ adf61e73a8af0-1e88d15a830mr30499651637.27.1736745017369; Sun, 12 Jan 2025
+ 21:10:17 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250112131318.63753-1-linux@treblig.org>
-In-Reply-To: <20250112131318.63753-1-linux@treblig.org>
+References: <20250111070751.2588654-1-yukaixiong@huawei.com> <20250111070751.2588654-17-yukaixiong@huawei.com>
+In-Reply-To: <20250111070751.2588654-17-yukaixiong@huawei.com>
 From: Kalesh Anakkur Purayil <kalesh-anakkur.purayil@broadcom.com>
-Date: Mon, 13 Jan 2025 10:38:28 +0530
-X-Gm-Features: AbW1kvZLL_N-uqWShfW6xguVr22dQQz2OgKLc4hooAWFQpqlGzFzFLyP8LVD-cQ
-Message-ID: <CAH-L+nN2f+X8oHQcFH95YCeSb-HEs5MUOU8XEqH-bDXiLdBWwA@mail.gmail.com>
-Subject: Re: [PATCH net-next] socket: Remove unused kernel_sendmsg_locked
-To: linux@treblig.org
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
+Date: Mon, 13 Jan 2025 10:40:05 +0530
+X-Gm-Features: AbW1kvb15aJAWs4dMA-1O4yfTe_qq6ymGjviDWt2j4MzAI2WDea4KyZDnt0GIcY
+Message-ID: <CAH-L+nMzferXh=P0brckqWGLo06Rg+XG-3ToLZqA5TBObRZimQ@mail.gmail.com>
+Subject: Re: [PATCH v5 -next 16/16] sysctl: remove unneeded include
+To: Kaixiong Yu <yukaixiong@huawei.com>
+Cc: akpm@linux-foundation.org, mcgrof@kernel.org, joel.granados@kernel.org, 
+	ysato@users.sourceforge.jp, dalias@libc.org, glaubitz@physik.fu-berlin.de, 
+	luto@kernel.org, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, 
+	dave.hansen@linux.intel.com, hpa@zytor.com, viro@zeniv.linux.org.uk, 
+	brauner@kernel.org, jack@suse.cz, kees@kernel.org, j.granados@samsung.com, 
+	willy@infradead.org, Liam.Howlett@oracle.com, vbabka@suse.cz, 
+	lorenzo.stoakes@oracle.com, trondmy@kernel.org, anna@kernel.org, 
+	chuck.lever@oracle.com, jlayton@kernel.org, neilb@suse.de, 
+	okorniev@redhat.com, Dai.Ngo@oracle.com, tom@talpey.com, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, paul@paul-moore.com, 
+	jmorris@namei.org, linux-sh@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, linux-nfs@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-security-module@vger.kernel.org, 
+	dhowells@redhat.com, haifeng.xu@shopee.com, baolin.wang@linux.alibaba.com, 
+	shikemeng@huaweicloud.com, dchinner@redhat.com, bfoster@redhat.com, 
+	souravpanda@google.com, hannes@cmpxchg.org, rientjes@google.com, 
+	pasha.tatashin@soleen.com, david@redhat.com, ryan.roberts@arm.com, 
+	ying.huang@intel.com, yang@os.amperecomputing.com, zev@bewilderbeest.net, 
+	serge@hallyn.com, vegard.nossum@oracle.com, wangkefeng.wang@huawei.com
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="0000000000003200df062b8f70aa"
+	boundary="000000000000d79348062b8f75cb"
 
---0000000000003200df062b8f70aa
+--000000000000d79348062b8f75cb
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Sun, Jan 12, 2025 at 6:43=E2=80=AFPM <linux@treblig.org> wrote:
+On Sat, Jan 11, 2025 at 12:49=E2=80=AFPM Kaixiong Yu <yukaixiong@huawei.com=
+> wrote:
 >
-> From: "Dr. David Alan Gilbert" <linux@treblig.org>
+> Removing unneeded mm includes in kernel/sysctl.c.
 >
-> The last use of kernel_sendmsg_locked() was removed in 2023 by
-> commit dc97391e6610 ("sock: Remove ->sendpage*() in favour of
-> sendmsg(MSG_SPLICE_PAGES)")
->
-> Remove it.
->
-> Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
-
+> Signed-off-by: Kaixiong Yu <yukaixiong@huawei.com>
+> Reviewed-by: Kees Cook <kees@kernel.org>
 Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
+
 
 --=20
 Regards,
 Kalesh AP
 
---0000000000003200df062b8f70aa
+--000000000000d79348062b8f75cb
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -177,14 +189,14 @@ a30CvRuhokNO6Jzh7ZFtjKVMzYas3oo6HXgA+slRszMu4pc+fRPO41FHjeDM76e6P5OnthhnD+NY
 x6xokUN65DN1bn2MkeNs0nQpizDqd0QxggJtMIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYD
 VQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25h
 bFNpZ24gMiBDQSAyMDIwAgw3wUUJsDUiPdpordMwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcN
-AQkEMSIEIFsq1Sud8egJFNvtwOPN30Ol6RhUgjsShDIC2tp0HqG2MBgGCSqGSIb3DQEJAzELBgkq
-hkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI1MDExMzA1MDg0MlowaQYJKoZIhvcNAQkPMVwwWjAL
+AQkEMSIEIM2TOP9TtJ2BdQjXIc94PqF/qqG6PokycjwG8VMAQtDLMBgGCSqGSIb3DQEJAzELBgkq
+hkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI1MDExMzA1MTAxN1owaQYJKoZIhvcNAQkPMVwwWjAL
 BglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG
-9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQAWC6sNBLQX
-xwxsUa7rJnXZmy+JpBrlsVSwBigOjYFBkBy7ynw4TMQsPt2jx9icGQR6NZMD9KK5q5SMosLltPyH
-CJW7gKrmJjzKLIiJ2TL1mOtcs5wTLGoD81qJ0rEG+5Qwl4GrD4DtLNnHBFavGkiC98a9vLjGRQ5e
-g9eBj3TzCgDU5kfmMkJ3s2DCme7vcY4WbzU9hNbR+rLvWwA7VWhwOJY5lDo0cUjxVKXntd4NAdXp
-POtT0xSQ8JA9YayCq8doiKH7V9n2FFebI75cAC5OoiOoV+el27pT7968imSFTprmHBwJ09KX+fO6
-PRosIHSTxNJGEjb2CqeXh/PZNY+W
---0000000000003200df062b8f70aa--
+9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQATWJeIQzo3
+YTKVVMtMXwgyKiHUSHJ9UHNOvPVPa8tBatC9JG46LvgEvLbK6I7seMbKeOWoCX1wIwBfVgJ/Ouyi
+8pHe7Jx74+7Ryi05nsyscFsKaXwCLwtQZUzlUTN68agd+ZBg+frBhvoIFOJ42xYPdgbXY6EECKJB
+HRtvbFHwWIJNqHZRPd9ijdzIHTiFA/kIff5HL5wqoj4LfYVOTZrKvA/1/nIBXQD77xCRFRadQsEi
+beoU0uXtAVxHq7IerJqjj+tw6ni29atkqUC4LZM+pqTBQnYu6tGotDVTpLu7fxIo1Fiv4TFU9PDT
+tMD8ijVVWxnAbZ5EbTM3KcbzeMWm
+--000000000000d79348062b8f75cb--
 
