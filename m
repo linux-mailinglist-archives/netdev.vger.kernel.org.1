@@ -1,279 +1,441 @@
-Return-Path: <netdev+bounces-157561-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157562-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9605EA0ACC6
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 01:16:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 99636A0ACD0
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 01:29:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 82F0618866F1
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 00:16:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7FDD21886509
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 00:29:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29BB7BA4B;
-	Mon, 13 Jan 2025 00:16:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8F458F77;
+	Mon, 13 Jan 2025 00:29:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="YRC+CPJZ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gNKV+flh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.denx.de (mx.denx.de [89.58.32.78])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f171.google.com (mail-il1-f171.google.com [209.85.166.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87D3846B5;
-	Mon, 13 Jan 2025 00:16:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=89.58.32.78
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 058788493;
+	Mon, 13 Jan 2025 00:28:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736727368; cv=none; b=OO2sy5Ty3cXzesqDcHUFUvr5slckM+ykaCzO+KrVC/MicWNLEpzH60qEammchtsmBuqofQRDFGclYDZ1lAxCwxBtZWFfuWZkc8gbWZJZyGWW5GAk2nUYfBcftpiaW5RNn3XUauAnv9PgyNFI28ouPT0dc/FUv7/NxOu+1GGllAw=
+	t=1736728141; cv=none; b=LDsJ/R+crQLEHQID7WCbp1AoHvFwbVkj7jPJoWyXQA8HJEytdfDAUKY+zGlirUnj3xEsvlMAWt/4Rdg3dUvAlUKT7dMtUwgUQRZSbre3rXlJ1ptxrg3K7v0PAi+AJm8NEas86mamEksBQFhzAL9poclwre1DvdmAvkjLRxKTPAU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736727368; c=relaxed/simple;
-	bh=3ssiZM8JV+NIxO+SQfkDid7Ncucx1gZRgYr4/uu0SUs=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=RGybpYNRRdMa24XVhKPfDC3tq8isQQG7SalU9WI4FQnvbu63xwv8b508NBrhtz+4+2Wim629WiVk3hJQcz530fUyn81CMPZmlLAgYqQQWh12OMNRxkyMQOJxOKyQq3h/SBQ/63ZbL4fScEuE2nQnrlPEtOF2IxEUTBqMDG77Wks=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=YRC+CPJZ; arc=none smtp.client-ip=89.58.32.78
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id CBA8710A334D3;
-	Mon, 13 Jan 2025 01:15:59 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de; s=mx-20241105;
-	t=1736727360;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=mQjhPYFc/jf3F6SO4i0n9ie3+8Yag/Cz0g9fvVHNRAc=;
-	b=YRC+CPJZxcyg89aLjqLMa61QhqPD8ZuPM46z9cqvuUjcey9K0L2NQG0+dBZSZUl4dQ2MKZ
-	0hTUCqEQqOax2R29a5OMpLnm/AxX1nuPLa/lBvaXXqLUV1Kf/W04Q9fpXNKrx8gg3UBxMB
-	babjf983OqDmn1fQAov3K1dKU9tLZruUV/e6S85fcQcBM3QMLtDyRZrdOS8Of6WIM+JURw
-	SQtDI67vh/z+cOqGIVIeYnjN3+GW4M4qh/k7fm+S8GfxNwK1P1SiXdC6hjNtShSfGq8XfR
-	k9q9lvk3ZMDALAI96ZkEjqsUx3U+6cNJ9+Ky7iYItimpXoxfXNSz3/5bD+Njfg==
-From: Marek Vasut <marex@denx.de>
-To: netdev@vger.kernel.org
-Cc: Marek Vasut <marex@denx.de>,
-	"David S. Miller" <davem@davemloft.net>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Eric Dumazet <edumazet@google.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Tristram Ha <tristram.ha@microchip.com>,
-	UNGLinuxDriver@microchip.com,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Woojung Huh <woojung.huh@microchip.com>,
-	linux-kernel@vger.kernel.org
-Subject: [net-next,PATCH 2/2] net: phy: micrel: Add KSZ87XX Switch LED control
-Date: Mon, 13 Jan 2025 01:15:36 +0100
-Message-ID: <20250113001543.296510-2-marex@denx.de>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20250113001543.296510-1-marex@denx.de>
-References: <20250113001543.296510-1-marex@denx.de>
+	s=arc-20240116; t=1736728141; c=relaxed/simple;
+	bh=zUSPp3Hj/TjNZyXxqb8EAXhc1jPbu3S7uH04LyhF3Cg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=olhtEsTFiKC9YoP7CINb32JJQoKh9Sa+dJwwg/0nQdynYBRUdu0iiRJ0i+mD2UOOODi46WGVHFw/BWOH2SgspMRKNRubz3YZTOHQ6hFBKm408HQAMdET/WI1f43IRKACjCv+SmoSYTQAbFkFRrk9Ys1opf6sGobTmKbikCyw8KQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gNKV+flh; arc=none smtp.client-ip=209.85.166.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f171.google.com with SMTP id e9e14a558f8ab-3a9caa3726fso12275535ab.1;
+        Sun, 12 Jan 2025 16:28:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1736728138; x=1737332938; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=k1xOA/SQ8iALm8MjEJqxz2Y25Nhzv2dANUJoHZQZb/w=;
+        b=gNKV+flhgKYyY6VnRK5TTd0KyoVJXOuGC+Q7GZB0SwRoTQ1dyHvkCIGlwqTsy9NNas
+         qfJFztiCfiOZmco5tmpstN+RCPD2eD7XX+/0W4hFy/1iML9dbL7NgZjdVjyG/5uLXWD8
+         iciIsVFwHPcYq9V9PTwExjYTlROiipn/grUmHAOGxqE/z4DAnVpdDLtzaXDF+e5H+Gxh
+         ArCF+ORbI6KWHJLtawwDH8ZfYbA54HgDMrpWnfQBRU2OvCjc12z/vQX2vU9rqm6Sh4//
+         /rBdJ4fVR6rLLpu45SqJKglXJJbqyt7z5piIDHAr5Yxh84QV2r3Ec5IGDHLKtlTYYpRO
+         GHzw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736728138; x=1737332938;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=k1xOA/SQ8iALm8MjEJqxz2Y25Nhzv2dANUJoHZQZb/w=;
+        b=r0V7pqgmU6oSwuqSBFjRSTY+RYOj6LZAog9udjBjiUiTjHR1bDraF5JhN1+eHXvW+L
+         cCi4DE9JjZA1Dsd+7JLkRSU1jRiCUpPq8ysZWo2K1WUqxC8PwvOSWgu6gMMZiyeYCkyX
+         6llGh86VW582gjGi8ZNGl/y9SSFXZCRalD4BvGEJWHnsHAYGt6OYQHg2AIHek5FvCRQ8
+         eZmr6cd6oUyrjWTHgNA9MeecIwzzP50go+qK+f+wuAQSbmXj+WTGwdPPeVDJTvgC+YOn
+         V5un9xkACigi4SHpz/HltHdsxvQQG1SF386zxNmjOd7gYWQUj7Yp1eZ8wGpVE3I2bWPj
+         219w==
+X-Forwarded-Encrypted: i=1; AJvYcCUEw+vky4lTBdR5S3mqRGpL1FF/pAwEy3d0H8U02dHvhuUmCtkbyIEPhzI9Zvim9+SQK2w=@vger.kernel.org, AJvYcCUMn3O0r5UN0uI+6gQkZZulbMcbhuGC9n8da7iVMjAsdKwDxkq2JUHWEij0xl2PN/Sk77RK11aK@vger.kernel.org
+X-Gm-Message-State: AOJu0YzJt7OrnKlrkz8N4fRI43vyr0jR7DIn5hffSQmTwASQdx85b0Uw
+	7/JmGw8aTrbTa81EW/kDTaIzzDY5nDvjGqBcJkKK0C9tqdxDKeSNtDk/e3xVvgZEJ9nWsEq1rov
+	jJYsPpv95Bh/7ajWkee7iG9CFmfI=
+X-Gm-Gg: ASbGnctmk6N6nlR83dp8CSmJy9JQTjYRXRSoBrh1DPGMj7vbVQjMk2GIWKQ8b8AU3L+
+	iiXuDfwPpr0/vEMipgOeKx51jQ+cajAtrzxNSTA==
+X-Google-Smtp-Source: AGHT+IEBNwkThVQXNyg9t9dnefMlcVeyifbI2RGhIl71J54yeFuYTxlozCIKeOOetDZW2NlY+QchIanD/FJsU4Ujs84=
+X-Received: by 2002:a05:6e02:1605:b0:3ce:3395:f7b1 with SMTP id
+ e9e14a558f8ab-3ce475fbc60mr98031725ab.9.1736728138047; Sun, 12 Jan 2025
+ 16:28:58 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Last-TLS-Session-Version: TLSv1.3
+References: <20250112113748.73504-6-kerneljasonxing@gmail.com> <202501122251.7G2Wsbzx-lkp@intel.com>
+In-Reply-To: <202501122251.7G2Wsbzx-lkp@intel.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Mon, 13 Jan 2025 08:28:21 +0800
+X-Gm-Features: AbW1kvYvkS3KXWZNdtH7afWFQTdG2PQEkkdIbiXvr1BeLeScoU4dex_Q61iCRjk
+Message-ID: <CAL+tcoDJfy+SjVKF==fKLVVdr8qE0mJ2WWzGozN4f=OLX6ip1A@mail.gmail.com>
+Subject: Re: [PATCH net-next v5 05/15] net-timestamp: add strict check in some
+ BPF calls
+To: kernel test robot <lkp@intel.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, dsahern@kernel.org, willemdebruijn.kernel@gmail.com, 
+	willemb@google.com, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, 
+	martin.lau@linux.dev, eddyz87@gmail.com, song@kernel.org, 
+	yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org, 
+	sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, horms@kernel.org, 
+	llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev, bpf@vger.kernel.org, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The KSZ87xx switch contains LED control registers. There is one shared
-global control register bitfield which affects behavior of all LEDs on
-all ports, the Register 11 (0x0B): Global Control 9 bitfield [5:4].
-There is also one per-port Register 29/45/61 (0x1D/0x2D/0x3D): Port 1/2/3
-Control 10 bit 7 which controls enablement of both LEDs on each port
-separately.
+On Sun, Jan 12, 2025 at 10:39=E2=80=AFPM kernel test robot <lkp@intel.com> =
+wrote:
+>
+> Hi Jason,
+>
+> kernel test robot noticed the following build warnings:
+>
+> [auto build test WARNING on net-next/main]
+>
+> url:    https://github.com/intel-lab-lkp/linux/commits/Jason-Xing/net-tim=
+estamp-add-support-for-bpf_setsockopt/20250112-194115
+> base:   net-next/main
+> patch link:    https://lore.kernel.org/r/20250112113748.73504-6-kerneljas=
+onxing%40gmail.com
+> patch subject: [PATCH net-next v5 05/15] net-timestamp: add strict check =
+in some BPF calls
+> config: i386-buildonly-randconfig-006-20250112 (https://download.01.org/0=
+day-ci/archive/20250112/202501122251.7G2Wsbzx-lkp@intel.com/config)
+> compiler: clang version 19.1.3 (https://github.com/llvm/llvm-project ab51=
+eccf88f5321e7c60591c5546b254b6afab99)
+> reproduce (this is a W=3D1 build): (https://download.01.org/0day-ci/archi=
+ve/20250112/202501122251.7G2Wsbzx-lkp@intel.com/reproduce)
+>
+> If you fix the issue in a separate patch/commit (i.e. not just a new vers=
+ion of
+> the same patch/commit), kindly add following tags
+> | Reported-by: kernel test robot <lkp@intel.com>
+> | Closes: https://lore.kernel.org/oe-kbuild-all/202501122251.7G2Wsbzx-lkp=
+@intel.com/
+>
+> All warnings (new ones prefixed by >>):
+>
+>          |                           ~~~~~~~~~~~~~~ ^ ~~~~~~~~~~
+>    net/core/filter.c:4863:30: warning: bitwise operation between differen=
+t enumeration types ('enum bpf_arg_type' and 'enum bpf_type_flag') [-Wenum-=
+enum-conversion]
+>     4863 |         .arg2_type      =3D ARG_PTR_TO_MEM | MEM_RDONLY,
+>          |                           ~~~~~~~~~~~~~~ ^ ~~~~~~~~~~
+>    net/core/filter.c:4891:30: warning: bitwise operation between differen=
+t enumeration types ('enum bpf_arg_type' and 'enum bpf_type_flag') [-Wenum-=
+enum-conversion]
+>     4891 |         .arg2_type      =3D ARG_PTR_TO_MEM | MEM_RDONLY,
+>          |                           ~~~~~~~~~~~~~~ ^ ~~~~~~~~~~
+>    net/core/filter.c:5063:30: warning: bitwise operation between differen=
+t enumeration types ('enum bpf_arg_type' and 'enum bpf_type_flag') [-Wenum-=
+enum-conversion]
+>     5063 |         .arg4_type      =3D ARG_PTR_TO_MEM | MEM_RDONLY,
+>          |                           ~~~~~~~~~~~~~~ ^ ~~~~~~~~~~
+>    net/core/filter.c:5077:30: warning: bitwise operation between differen=
+t enumeration types ('enum bpf_arg_type' and 'enum bpf_type_flag') [-Wenum-=
+enum-conversion]
+>     5077 |         .arg4_type      =3D ARG_PTR_TO_MEM | MEM_RDONLY,
+>          |                           ~~~~~~~~~~~~~~ ^ ~~~~~~~~~~
+>    net/core/filter.c:5126:45: warning: bitwise operation between differen=
+t enumeration types ('enum bpf_arg_type' and 'enum bpf_type_flag') [-Wenum-=
+enum-conversion]
+>     5126 |         .arg1_type      =3D ARG_PTR_TO_BTF_ID_SOCK_COMMON | PT=
+R_MAYBE_NULL,
+>          |                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ^ ~~~~=
+~~~~~~~~~~
+>    net/core/filter.c:5592:30: warning: bitwise operation between differen=
+t enumeration types ('enum bpf_arg_type' and 'enum bpf_type_flag') [-Wenum-=
+enum-conversion]
+>     5592 |         .arg4_type      =3D ARG_PTR_TO_MEM | MEM_RDONLY,
+>          |                           ~~~~~~~~~~~~~~ ^ ~~~~~~~~~~
+>    net/core/filter.c:5626:30: warning: bitwise operation between differen=
+t enumeration types ('enum bpf_arg_type' and 'enum bpf_type_flag') [-Wenum-=
+enum-conversion]
+>     5626 |         .arg4_type      =3D ARG_PTR_TO_MEM | MEM_RDONLY,
+>          |                           ~~~~~~~~~~~~~~ ^ ~~~~~~~~~~
+>    net/core/filter.c:5660:30: warning: bitwise operation between differen=
+t enumeration types ('enum bpf_arg_type' and 'enum bpf_type_flag') [-Wenum-=
+enum-conversion]
+>     5660 |         .arg4_type      =3D ARG_PTR_TO_MEM | MEM_RDONLY,
+>          |                           ~~~~~~~~~~~~~~ ^ ~~~~~~~~~~
+>    net/core/filter.c:5703:30: warning: bitwise operation between differen=
+t enumeration types ('enum bpf_arg_type' and 'enum bpf_type_flag') [-Wenum-=
+enum-conversion]
+>     5703 |         .arg4_type      =3D ARG_PTR_TO_MEM | MEM_RDONLY,
+>          |                           ~~~~~~~~~~~~~~ ^ ~~~~~~~~~~
+>    net/core/filter.c:5880:30: warning: bitwise operation between differen=
+t enumeration types ('enum bpf_arg_type' and 'enum bpf_type_flag') [-Wenum-=
+enum-conversion]
+>     5880 |         .arg2_type      =3D ARG_PTR_TO_MEM | MEM_RDONLY,
+>          |                           ~~~~~~~~~~~~~~ ^ ~~~~~~~~~~
+>    net/core/filter.c:6417:46: warning: bitwise operation between differen=
+t enumeration types ('enum bpf_arg_type' and 'enum bpf_type_flag') [-Wenum-=
+enum-conversion]
+>     6417 |         .arg3_type      =3D ARG_PTR_TO_FIXED_SIZE_MEM | MEM_WR=
+ITE | MEM_ALIGNED,
+>          |                           ~~~~~~~~~~~~~~~~~~~~~~~~~ ^ ~~~~~~~~=
+~
+>    net/core/filter.c:6429:46: warning: bitwise operation between differen=
+t enumeration types ('enum bpf_arg_type' and 'enum bpf_type_flag') [-Wenum-=
+enum-conversion]
+>     6429 |         .arg3_type      =3D ARG_PTR_TO_FIXED_SIZE_MEM | MEM_WR=
+ITE | MEM_ALIGNED,
+>          |                           ~~~~~~~~~~~~~~~~~~~~~~~~~ ^ ~~~~~~~~=
+~
+>    net/core/filter.c:6515:30: warning: bitwise operation between differen=
+t enumeration types ('enum bpf_arg_type' and 'enum bpf_type_flag') [-Wenum-=
+enum-conversion]
+>     6515 |         .arg3_type      =3D ARG_PTR_TO_MEM | MEM_RDONLY,
+>          |                           ~~~~~~~~~~~~~~ ^ ~~~~~~~~~~
+>    net/core/filter.c:6525:30: warning: bitwise operation between differen=
+t enumeration types ('enum bpf_arg_type' and 'enum bpf_type_flag') [-Wenum-=
+enum-conversion]
+>     6525 |         .arg3_type      =3D ARG_PTR_TO_MEM | MEM_RDONLY,
+>          |                           ~~~~~~~~~~~~~~ ^ ~~~~~~~~~~
+>    net/core/filter.c:6569:30: warning: bitwise operation between differen=
+t enumeration types ('enum bpf_arg_type' and 'enum bpf_type_flag') [-Wenum-=
+enum-conversion]
+>     6569 |         .arg3_type      =3D ARG_PTR_TO_MEM | MEM_RDONLY,
+>          |                           ~~~~~~~~~~~~~~ ^ ~~~~~~~~~~
+>    net/core/filter.c:6658:30: warning: bitwise operation between differen=
+t enumeration types ('enum bpf_arg_type' and 'enum bpf_type_flag') [-Wenum-=
+enum-conversion]
+>     6658 |         .arg3_type      =3D ARG_PTR_TO_MEM | MEM_RDONLY,
+>          |                           ~~~~~~~~~~~~~~ ^ ~~~~~~~~~~
+>    net/core/filter.c:6902:30: warning: bitwise operation between differen=
+t enumeration types ('enum bpf_arg_type' and 'enum bpf_type_flag') [-Wenum-=
+enum-conversion]
+>     6902 |         .arg2_type      =3D ARG_PTR_TO_MEM | MEM_RDONLY,
+>          |                           ~~~~~~~~~~~~~~ ^ ~~~~~~~~~~
+>    net/core/filter.c:6921:30: warning: bitwise operation between differen=
+t enumeration types ('enum bpf_arg_type' and 'enum bpf_type_flag') [-Wenum-=
+enum-conversion]
+>     6921 |         .arg2_type      =3D ARG_PTR_TO_MEM | MEM_RDONLY,
+>          |                           ~~~~~~~~~~~~~~ ^ ~~~~~~~~~~
+>    net/core/filter.c:6940:30: warning: bitwise operation between differen=
+t enumeration types ('enum bpf_arg_type' and 'enum bpf_type_flag') [-Wenum-=
+enum-conversion]
+>     6940 |         .arg2_type      =3D ARG_PTR_TO_MEM | MEM_RDONLY,
+>          |                           ~~~~~~~~~~~~~~ ^ ~~~~~~~~~~
+>    net/core/filter.c:6964:30: warning: bitwise operation between differen=
+t enumeration types ('enum bpf_arg_type' and 'enum bpf_type_flag') [-Wenum-=
+enum-conversion]
+>     6964 |         .arg2_type      =3D ARG_PTR_TO_MEM | MEM_RDONLY,
+>          |                           ~~~~~~~~~~~~~~ ^ ~~~~~~~~~~
+>    net/core/filter.c:6988:30: warning: bitwise operation between differen=
+t enumeration types ('enum bpf_arg_type' and 'enum bpf_type_flag') [-Wenum-=
+enum-conversion]
+>     6988 |         .arg2_type      =3D ARG_PTR_TO_MEM | MEM_RDONLY,
+>          |                           ~~~~~~~~~~~~~~ ^ ~~~~~~~~~~
+>    net/core/filter.c:7012:30: warning: bitwise operation between differen=
+t enumeration types ('enum bpf_arg_type' and 'enum bpf_type_flag') [-Wenum-=
+enum-conversion]
+>     7012 |         .arg2_type      =3D ARG_PTR_TO_MEM | MEM_RDONLY,
+>          |                           ~~~~~~~~~~~~~~ ^ ~~~~~~~~~~
+>    net/core/filter.c:7029:45: warning: bitwise operation between differen=
+t enumeration types ('enum bpf_arg_type' and 'enum bpf_type_flag') [-Wenum-=
+enum-conversion]
+>     7029 |         .arg1_type      =3D ARG_PTR_TO_BTF_ID_SOCK_COMMON | OB=
+J_RELEASE,
+>          |                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ^ ~~~~=
+~~~~~~~
+>    net/core/filter.c:7050:35: warning: bitwise operation between differen=
+t enumeration types ('enum bpf_arg_type' and 'enum bpf_type_flag') [-Wenum-=
+enum-conversion]
+>     7050 |         .arg2_type      =3D ARG_PTR_TO_MEM | MEM_RDONLY,
+>          |                           ~~~~~~~~~~~~~~ ^ ~~~~~~~~~~
+>    net/core/filter.c:7074:35: warning: bitwise operation between differen=
+t enumeration types ('enum bpf_arg_type' and 'enum bpf_type_flag') [-Wenum-=
+enum-conversion]
+>     7074 |         .arg2_type      =3D ARG_PTR_TO_MEM | MEM_RDONLY,
+>          |                           ~~~~~~~~~~~~~~ ^ ~~~~~~~~~~
+>    net/core/filter.c:7098:35: warning: bitwise operation between differen=
+t enumeration types ('enum bpf_arg_type' and 'enum bpf_type_flag') [-Wenum-=
+enum-conversion]
+>     7098 |         .arg2_type      =3D ARG_PTR_TO_MEM | MEM_RDONLY,
+>          |                           ~~~~~~~~~~~~~~ ^ ~~~~~~~~~~
+>    net/core/filter.c:7118:30: warning: bitwise operation between differen=
+t enumeration types ('enum bpf_arg_type' and 'enum bpf_type_flag') [-Wenum-=
+enum-conversion]
+>     7118 |         .arg2_type      =3D ARG_PTR_TO_MEM | MEM_RDONLY,
+>          |                           ~~~~~~~~~~~~~~ ^ ~~~~~~~~~~
+>    net/core/filter.c:7137:30: warning: bitwise operation between differen=
+t enumeration types ('enum bpf_arg_type' and 'enum bpf_type_flag') [-Wenum-=
+enum-conversion]
+>     7137 |         .arg2_type      =3D ARG_PTR_TO_MEM | MEM_RDONLY,
+>          |                           ~~~~~~~~~~~~~~ ^ ~~~~~~~~~~
+>    net/core/filter.c:7156:30: warning: bitwise operation between differen=
+t enumeration types ('enum bpf_arg_type' and 'enum bpf_type_flag') [-Wenum-=
+enum-conversion]
+>     7156 |         .arg2_type      =3D ARG_PTR_TO_MEM | MEM_RDONLY,
+>          |                           ~~~~~~~~~~~~~~ ^ ~~~~~~~~~~
+>    net/core/filter.c:7474:30: warning: bitwise operation between differen=
+t enumeration types ('enum bpf_arg_type' and 'enum bpf_type_flag') [-Wenum-=
+enum-conversion]
+>     7474 |         .arg2_type      =3D ARG_PTR_TO_MEM | MEM_RDONLY,
+>          |                           ~~~~~~~~~~~~~~ ^ ~~~~~~~~~~
+>    net/core/filter.c:7476:30: warning: bitwise operation between differen=
+t enumeration types ('enum bpf_arg_type' and 'enum bpf_type_flag') [-Wenum-=
+enum-conversion]
+>     7476 |         .arg4_type      =3D ARG_PTR_TO_MEM | MEM_RDONLY,
+>          |                           ~~~~~~~~~~~~~~ ^ ~~~~~~~~~~
+>    net/core/filter.c:7543:30: warning: bitwise operation between differen=
+t enumeration types ('enum bpf_arg_type' and 'enum bpf_type_flag') [-Wenum-=
+enum-conversion]
+>     7543 |         .arg2_type      =3D ARG_PTR_TO_MEM | MEM_RDONLY,
+>          |                           ~~~~~~~~~~~~~~ ^ ~~~~~~~~~~
+>    net/core/filter.c:7545:30: warning: bitwise operation between differen=
+t enumeration types ('enum bpf_arg_type' and 'enum bpf_type_flag') [-Wenum-=
+enum-conversion]
+>     7545 |         .arg4_type      =3D ARG_PTR_TO_MEM | MEM_RDONLY,
+>          |                           ~~~~~~~~~~~~~~ ^ ~~~~~~~~~~
+> >> net/core/filter.c:7631:19: warning: result of comparison of constant '=
+SK_BPF_CB_FLAGS' (1009) with expression of type 'u8' (aka 'unsigned char') =
+is always true [-Wtautological-constant-out-of-range-compare]
+>     7631 |         if (bpf_sock->op !=3D SK_BPF_CB_FLAGS)
+>          |             ~~~~~~~~~~~~ ^  ~~~~~~~~~~~~~~~
+>    net/core/filter.c:7777:30: warning: bitwise operation between differen=
+t enumeration types ('enum bpf_arg_type' and 'enum bpf_type_flag') [-Wenum-=
+enum-conversion]
+>     7777 |         .arg2_type      =3D ARG_PTR_TO_MEM | MEM_RDONLY,
+>          |                           ~~~~~~~~~~~~~~ ^ ~~~~~~~~~~
+>    41 warnings generated.
+>
+>
+> vim +7631 net/core/filter.c
+>
+>   7622
+>   7623  BPF_CALL_4(bpf_sock_ops_load_hdr_opt, struct bpf_sock_ops_kern *,=
+ bpf_sock,
+>   7624             void *, search_res, u32, len, u64, flags)
+>   7625  {
+>   7626          bool eol, load_syn =3D flags & BPF_LOAD_HDR_OPT_TCP_SYN;
+>   7627          const u8 *op, *opend, *magic, *search =3D search_res;
+>   7628          u8 search_kind, search_len, copy_len, magic_len;
+>   7629          int ret;
+>   7630
+> > 7631          if (bpf_sock->op !=3D SK_BPF_CB_FLAGS)
 
-Expose LED brightness control and HW offload support for both of the two
-programmable LEDs on this KSZ87XX Switch. Note that on KSZ87xx there are
-three or more instances of simple KSZ87XX Switch PHY, one for each port,
-however, the registers which control the LED behavior are mostly shared.
+Oops, I realized that SK_BPF_CB_FLAGS cannot be used by "op". I'll
+aggregate all the callbacks used by timestamping and use to test them
+here like the following patch to avoid calling these helpers in the
+context of timestamping callback.
 
-Introduce LED brightness control using Register 29/45/61 (0x1D/0x2D/0x3D):
-Port 1/2/3 Control 10 bit 7. This bit selects between LEDs disabled and
-LEDs set to Function mode. In case LED brightness is set to 0, both LEDs
-are turned off, otherwise both LEDs are configured to Function mode which
-follows the global Register 11 (0x0B): Global Control 9 bitfield [5:4]
-setting.
+diff --git a/include/uapi/linux/bpf.h b/include/uapi/linux/bpf.h
+index 87420c0f2235..9e6a782b4042 100644
+--- a/include/uapi/linux/bpf.h
++++ b/include/uapi/linux/bpf.h
+@@ -7022,6 +7022,10 @@ enum {
+                                         * by the kernel or the
+                                         * earlier bpf-progs.
+                                         */
++#define BPF_SOCK_OPTS_TS               (BPF_SOCK_OPS_TS_SCHED_OPT_CB | \
++                                        BPF_SOCK_OPS_TS_SW_OPT_CB | \
++                                        BPF_SOCK_OPS_TS_ACK_OPT_CB | \
++                                        BPF_SOCK_OPS_TS_TCP_SND_CB)
+        BPF_SOCK_OPS_TS_SCHED_OPT_CB,   /* Called when skb is passing throu=
+gh
+                                         * dev layer when SO_TIMESTAMPING
+                                         * feature is on. It indicates the
+diff --git a/net/core/filter.c b/net/core/filter.c
+index 517f09aabc92..1fcd88b558f4 100644
+--- a/net/core/filter.c
++++ b/net/core/filter.c
+@@ -7628,7 +7628,7 @@ BPF_CALL_4(bpf_sock_ops_load_hdr_opt, struct
+bpf_sock_ops_kern *, bpf_sock,
+        u8 search_kind, search_len, copy_len, magic_len;
+        int ret;
 
-Note that while two LEDs are registered per port, and each expose a matching
-sysfs directory which contains a brightness attribute, a write into either
-brightness attribute does reconfigure the same bit 7 in Register 29/45/61
-(0x1D/0x2D/0x3D): Port 1/2/3 Control 10 for that particular port . The two
-brightness attributes can also be out of sync which is not great.
+-       if (bpf_sock->op !=3D SK_BPF_CB_FLAGS)
++       if (bpf_sock->op !=3D BPF_SOCK_OPTS_TS)
+                return -EINVAL;
 
-Introduce LED mode configuration using Register 11 (0x0B): Global Control
-9 bitfield [5:4]. This bitfield can be set to 1 of 4 non-orthogonal mode
-settings which affects both LEDs on the port. Use a look up table to find
-out whether setting one LED on the port is compatible with current setting
-of the other LED and if not, reject the configuration until both LEDs are
-configured to one of the four valid modes.
+        /* 2 byte is the minimal option len except TCPOPT_NOP and
 
-Note that while there are two LEDs per port, and there are multiple ports,
-each with matching sysfs directory which contains netdev trigger attributes,
-a write into either attribute does reconfigure the same shared Register 11
-(0x0B): Global Control 9 bitfield [5:4] and the sysfs attributes can be out
-of sync which is not great.
+Thanks,
+Jason
 
-Signed-off-by: Marek Vasut <marex@denx.de>
----
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Andrew Lunn <andrew@lunn.ch>
-Cc: Eric Dumazet <edumazet@google.com>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>
-Cc: Russell King <linux@armlinux.org.uk>
-Cc: Tristram Ha <tristram.ha@microchip.com>
-Cc: UNGLinuxDriver@microchip.com
-Cc: Vladimir Oltean <olteanv@gmail.com>
-Cc: Woojung Huh <woojung.huh@microchip.com>
-Cc: linux-kernel@vger.kernel.org
-Cc: netdev@vger.kernel.org
----
- drivers/net/phy/micrel.c | 112 +++++++++++++++++++++++++++++++++++++++
- 1 file changed, 112 insertions(+)
-
-diff --git a/drivers/net/phy/micrel.c b/drivers/net/phy/micrel.c
-index eeb33eb181ac9..08eda25852048 100644
---- a/drivers/net/phy/micrel.c
-+++ b/drivers/net/phy/micrel.c
-@@ -434,6 +434,7 @@ struct kszphy_priv {
- 	const struct kszphy_type *type;
- 	struct clk *clk;
- 	int led_mode;
-+	unsigned long led_rules[2];
- 	u16 vct_ctrl1000;
- 	bool rmii_ref_clk_sel;
- 	bool rmii_ref_clk_sel_val;
-@@ -891,6 +892,112 @@ static int ksz8795_match_phy_device(struct phy_device *phydev)
- 	return ksz8051_ksz8795_match_phy_device(phydev, false);
- }
- 
-+#define KSZ8795_LED_COUNT	2
-+
-+static const unsigned long ksz8795_led_rules_map[4][2] = {
-+	{
-+		/* Control Bits = 2'b00 => LEDx_0=Link/ACT LEDx_1=Speed */
-+		BIT(TRIGGER_NETDEV_LINK) | BIT(TRIGGER_NETDEV_RX) |
-+		BIT(TRIGGER_NETDEV_TX),
-+		BIT(TRIGGER_NETDEV_LINK_100)
-+	}, {
-+		/* Control Bits = 2'b01 => LEDx_0=Link     LEDx_1=ACT */
-+		BIT(TRIGGER_NETDEV_LINK),
-+		BIT(TRIGGER_NETDEV_RX) | BIT(TRIGGER_NETDEV_TX)
-+	}, {
-+		/* Control Bits = 2'b10 => LEDx_0=Link/ACT LEDx_1=Duplex */
-+		BIT(TRIGGER_NETDEV_LINK) | BIT(TRIGGER_NETDEV_RX) |
-+		BIT(TRIGGER_NETDEV_TX),
-+		BIT(TRIGGER_NETDEV_FULL_DUPLEX)
-+	}, {
-+		/* Control Bits = 2'b11 => LEDx_0=Link     LEDx_1=Duplex */
-+		BIT(TRIGGER_NETDEV_LINK),
-+		BIT(TRIGGER_NETDEV_FULL_DUPLEX)
-+	}
-+};
-+
-+static int ksz8795_led_brightness_set(struct phy_device *phydev, u8 index,
-+				      enum led_brightness value)
-+{
-+	/* Turn all LEDs on this port on or off */
-+	/* Emulated rmw of Register 29/45/61 (0x1D/0x2D/0x3D): Port 1/2/3 Control 10 */
-+	return phy_modify(phydev, 0x0d00, BIT(7), (value == LED_OFF) ? BIT(7) : 0);
-+}
-+
-+static int ksz8795_led_hw_is_supported(struct phy_device *phydev, u8 index,
-+				       unsigned long rules)
-+{
-+	const unsigned long mask[2] = {
-+		BIT(TRIGGER_NETDEV_LINK) | BIT(TRIGGER_NETDEV_RX) |
-+		BIT(TRIGGER_NETDEV_TX),
-+		BIT(TRIGGER_NETDEV_LINK_100) | BIT(TRIGGER_NETDEV_RX) |
-+		BIT(TRIGGER_NETDEV_TX) | BIT(TRIGGER_NETDEV_FULL_DUPLEX)
-+	};
-+
-+	if (index >= KSZ8795_LED_COUNT)
-+		return -EINVAL;
-+
-+	/* Filter out any other unsupported triggers. */
-+	if (rules & ~mask[index])
-+		return -EOPNOTSUPP;
-+
-+	/* RX and TX are not differentiated, either both are set or not set. */
-+	if (!(rules & BIT(TRIGGER_NETDEV_RX)) ^ !(rules & BIT(TRIGGER_NETDEV_TX)))
-+		return -EOPNOTSUPP;
-+
-+	return 0;
-+}
-+
-+static int ksz8795_led_hw_control_get(struct phy_device *phydev, u8 index,
-+				      unsigned long *rules)
-+{
-+	int val;
-+
-+	if (index >= KSZ8795_LED_COUNT)
-+		return -EINVAL;
-+
-+	/* Emulated read of Register 11 (0x0B): Global Control 9 */
-+	val = phy_read(phydev, 0x0b00);
-+	if (val < 0)
-+		return val;
-+
-+	/* Extract bits [5:4] and look up matching LED configuration */
-+	*rules = ksz8795_led_rules_map[(val >> 4) & 0x3][index];
-+
-+	return 0;
-+}
-+
-+static int ksz8795_led_hw_control_set(struct phy_device *phydev, u8 index,
-+				      unsigned long rules)
-+{
-+	struct kszphy_priv *priv = phydev->priv;
-+	unsigned long other_rules;
-+	int i;
-+
-+	if (index >= KSZ8795_LED_COUNT)
-+		return -EINVAL;
-+
-+	/*
-+	 * Cache the rules for this LED for future use when setting up the
-+	 * other LED and looking up compatible configuration of the global
-+	 * control 9 register bitfield [5:4].
-+	 */
-+	priv->led_rules[index] = rules;
-+
-+	/* Use cached configuration of the other LED. */
-+	other_rules = priv->led_rules[!index];
-+
-+	/* Update this LED configuration if compatible with the other LED */
-+	for (i = 0; i < 4; i++) {
-+		if (ksz8795_led_rules_map[i][index] == rules &&
-+		    ksz8795_led_rules_map[i][!index] == other_rules) {
-+			return phy_modify(phydev, 0x0b00, 0x30, i << 4);
-+		}
-+	}
-+
-+	return -EINVAL;
-+}
-+
- static int ksz9021_load_values_from_of(struct phy_device *phydev,
- 				       const struct device_node *of_node,
- 				       u16 reg,
-@@ -5666,10 +5773,15 @@ static struct phy_driver ksphy_driver[] = {
- }, {
- 	.name		= "Micrel KSZ87XX Switch",
- 	/* PHY_BASIC_FEATURES */
-+	.probe		= kszphy_probe,
- 	.config_init	= kszphy_config_init,
- 	.match_phy_device = ksz8795_match_phy_device,
- 	.suspend	= genphy_suspend,
- 	.resume		= genphy_resume,
-+	.led_brightness_set = ksz8795_led_brightness_set,
-+	.led_hw_is_supported = ksz8795_led_hw_is_supported,
-+	.led_hw_control_get = ksz8795_led_hw_control_get,
-+	.led_hw_control_set = ksz8795_led_hw_control_set,
- }, {
- 	.phy_id		= PHY_ID_KSZ9477,
- 	.phy_id_mask	= MICREL_PHY_ID_MASK,
--- 
-2.45.2
-
+>   7632                  return -EINVAL;
+>   7633
+>   7634          /* 2 byte is the minimal option len except TCPOPT_NOP and
+>   7635           * TCPOPT_EOL which are useless for the bpf prog to learn
+>   7636           * and this helper disallow loading them also.
+>   7637           */
+>   7638          if (len < 2 || flags & ~BPF_LOAD_HDR_OPT_TCP_SYN)
+>   7639                  return -EINVAL;
+>   7640
+>   7641          search_kind =3D search[0];
+>   7642          search_len =3D search[1];
+>   7643
+>   7644          if (search_len > len || search_kind =3D=3D TCPOPT_NOP ||
+>   7645              search_kind =3D=3D TCPOPT_EOL)
+>   7646                  return -EINVAL;
+>   7647
+>   7648          if (search_kind =3D=3D TCPOPT_EXP || search_kind =3D=3D 2=
+53) {
+>   7649                  /* 16 or 32 bit magic.  +2 for kind and kind leng=
+th */
+>   7650                  if (search_len !=3D 4 && search_len !=3D 6)
+>   7651                          return -EINVAL;
+>   7652                  magic =3D &search[2];
+>   7653                  magic_len =3D search_len - 2;
+>   7654          } else {
+>   7655                  if (search_len)
+>   7656                          return -EINVAL;
+>   7657                  magic =3D NULL;
+>   7658                  magic_len =3D 0;
+>   7659          }
+>   7660
+>   7661          if (load_syn) {
+>   7662                  ret =3D bpf_sock_ops_get_syn(bpf_sock, TCP_BPF_SY=
+N, &op);
+>   7663                  if (ret < 0)
+>   7664                          return ret;
+>   7665
+>   7666                  opend =3D op + ret;
+>   7667                  op +=3D sizeof(struct tcphdr);
+>   7668          } else {
+>   7669                  if (!bpf_sock->skb ||
+>   7670                      bpf_sock->op =3D=3D BPF_SOCK_OPS_HDR_OPT_LEN_=
+CB)
+>   7671                          /* This bpf_sock->op cannot call this hel=
+per */
+>   7672                          return -EPERM;
+>   7673
+>   7674                  opend =3D bpf_sock->skb_data_end;
+>   7675                  op =3D bpf_sock->skb->data + sizeof(struct tcphdr=
+);
+>   7676          }
+>   7677
+>   7678          op =3D bpf_search_tcp_opt(op, opend, search_kind, magic, =
+magic_len,
+>   7679                                  &eol);
+>   7680          if (IS_ERR(op))
+>   7681                  return PTR_ERR(op);
+>   7682
+>   7683          copy_len =3D op[1];
+>   7684          ret =3D copy_len;
+>   7685          if (copy_len > len) {
+>   7686                  ret =3D -ENOSPC;
+>   7687                  copy_len =3D len;
+>   7688          }
+>   7689
+>   7690          memcpy(search_res, op, copy_len);
+>   7691          return ret;
+>   7692  }
+>   7693
+>
+> --
+> 0-DAY CI Kernel Test Service
+> https://github.com/intel/lkp-tests/wiki
 
