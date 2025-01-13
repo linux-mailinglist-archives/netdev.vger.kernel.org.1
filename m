@@ -1,234 +1,166 @@
-Return-Path: <netdev+bounces-157578-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157579-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C6D4A0AE15
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 05:06:20 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B273A0AE1F
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 05:11:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5F380188674B
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 04:06:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2140418865CF
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 04:11:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7569814A4E1;
-	Mon, 13 Jan 2025 04:06:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7980F14A629;
+	Mon, 13 Jan 2025 04:11:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="G95jvfEy"
+	dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b="nCYwFgsb"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sonic313-15.consmr.mail.bf2.yahoo.com (sonic313-15.consmr.mail.bf2.yahoo.com [74.6.133.125])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F6F02AF09
-	for <netdev@vger.kernel.org>; Mon, 13 Jan 2025 04:06:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9213E14A0B7
+	for <netdev@vger.kernel.org>; Mon, 13 Jan 2025 04:11:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.6.133.125
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736741170; cv=none; b=g4QzUmcnbJAa+w3fmkHExb6VxPaGebM0l9rr4IoU5C9kKMw4BmmO13thJtDHWA1i4csysHYzrehdkIG/hwhYuKXk8it63Cued6urHCEymHPUvVct/e8+BmEw+AeS3Mxj9lHfcfCcbbPVt8m/OWJxAMrA8a9q9pknkuBe0ft0vy4=
+	t=1736741478; cv=none; b=rrD0OQMHCERooIavYQk5ChVkqOK/BV2gzbsZEEf2MTuE/mERnadGCVX1VNidgO9xub7LmzVXwuEdyUu1rzZhiwTRyklV6o56xnJ9BS8JM3mTDy36VZ4PE/qV/rzCvQNvc+aqVlnyDFoJGgj5KNKW/WM/ZTU4XCueEmDuuhNNsrc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736741170; c=relaxed/simple;
-	bh=YZZ9I+l3G7qr3EMipQUJR0fSHci2HaxgX7ZkbidFbrA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=gA643ex4WZQbc2qtEkMO8g7wIOsLMVrZBiEc0On901k6+J8PhGgpTGlrykvwR+xRtDui8qges2gKOQlPXLD/T7WzCHqpYHvgh5TpabJJ+kfJihwXVX5tpkjDfY1XiVd67ih4KGBC5a3Bw2sqEjg3pk1lHAjOOH+wq/TGPn7kTe4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=G95jvfEy; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1736741166;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=TZ9KVJCNW1gWH14rRZNf+IonExJW3H1qiVrWM9RW4co=;
-	b=G95jvfEyKW2e8/Bxsw37AJGdLLAsiadCx7fkf1dWMhu0cX/cwekBWKCGTtGUC4OoExX7mw
-	sAg8JzO4V2jwinAIDyNnk9mgv4A3dKfml6NJsM9qbBYvR/0YFxmlRb0TZBMaROEKMw8tCY
-	z/LMg7MqCdsF8FVu44WJAH7JflxVASc=
-Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
- [209.85.216.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-282-t6bCvC1sMW-qpHGvHvN9hw-1; Sun, 12 Jan 2025 23:06:04 -0500
-X-MC-Unique: t6bCvC1sMW-qpHGvHvN9hw-1
-X-Mimecast-MFC-AGG-ID: t6bCvC1sMW-qpHGvHvN9hw
-Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-2ee6dccd3c9so6582437a91.3
-        for <netdev@vger.kernel.org>; Sun, 12 Jan 2025 20:06:04 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736741163; x=1737345963;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=TZ9KVJCNW1gWH14rRZNf+IonExJW3H1qiVrWM9RW4co=;
-        b=w820q8to+LyBF61FjltDaYVwCFvDTo33CdeVpDynsQSrBjfKdlkOa2U7/5kA9eWf2U
-         h4Fg4C0JNxs+e4C1X7/rDnJ+dCEZlv+5vy6wsQlqeV9B7J1R717enomStRlyNVycpTBA
-         A+TMIGIMHhKrjMh+OGRSTQRbRbRmLlVILNCpJgVU7B1HpbjRHSjezznV0mpvsidB4Vqq
-         wb61elD5HRBpwV1ekBBuGSKhKm3qt3HvfdXOh0oxwqQM/82BZVk1gXtLvKRGzK8YyRYN
-         cNLESw2g+0Hns1SpIWtUjR6uY/INUWtXeviL3RLjlRQeZAWdhPFQkbIUeFmowuEBL5Kt
-         nrew==
-X-Gm-Message-State: AOJu0YxOYX7NwCqJd+A3D0oR2eycpzG7+G0nsCKirvGwtjneY3hymkSX
-	yPl8DDwqQHZpsr5AdhQEflrzS3FHN44clSwpYYZ9827af/rOBqwFwTHFXUvvpKeqGa8EkxTRtK+
-	03G144zQuvFStBBzobi+l+343TIRMjaRbWLnGw8IILQ7ZzVcHPFrOYd8NK9lE/JBXI3g5UnVodc
-	SoiFEKG5SPZexSwZSIde8LtsHcXGNj
-X-Gm-Gg: ASbGncv/QgDYQ67KZ3+DwgyrRypzJT+WkmLytmFKn2lc3+8qILgSYbEQhhZHoYV9b3g
-	D9a1JDmVdCIt0uvryBmvdpo8U1Q/tWS4PeseawhI=
-X-Received: by 2002:a17:90b:51cb:b0:2ef:3192:d280 with SMTP id 98e67ed59e1d1-2f548f162acmr26190264a91.5.1736741163604;
-        Sun, 12 Jan 2025 20:06:03 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IF1A+G5TTiOBCTRJzQQc8LlM21qz/pIEYJLiWzPbeMHcvlPcNaP8l/WEchbVIhmKLEDwqkhau6vUzNiW09UCBo=
-X-Received: by 2002:a17:90b:51cb:b0:2ef:3192:d280 with SMTP id
- 98e67ed59e1d1-2f548f162acmr26190231a91.5.1736741163106; Sun, 12 Jan 2025
- 20:06:03 -0800 (PST)
+	s=arc-20240116; t=1736741478; c=relaxed/simple;
+	bh=VeVFsBj2QxdME0VrZ3xMek5E7CUQuGFqZj1EtNu9urA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:References; b=AWMYy0ys1yzbE3WHSo/iDu7It+3Cp2AmQdb8acHulQHM1/u359nZKDA5T22fQc9SntR689VpnpmpFd9DWnVGz4AhLNKRIznz6TJz0W0qxBmCnotQx8+yq6LfRlmMigY85m+waifVHbPhw2adG6J84+OmPdHsH/g70O9HsGJnSy8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com; spf=pass smtp.mailfrom=yahoo.com; dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b=nCYwFgsb; arc=none smtp.client-ip=74.6.133.125
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yahoo.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1736741475; bh=QPt8HIeVJh8dcP5TCaQXUGbNj0NCzNHfAkHXujytotc=; h=From:To:Cc:Subject:Date:References:From:Subject:Reply-To; b=nCYwFgsb6jWKis3fgqgucGnA3Ds/mM93WwS3aqjQzW5AX0TAgP3YqfXQ3DVtdzgtKW/Q24gUADZdENsAglDW7kOaUYwSpbIBgzMvzMav0GcoylOptMbp8LnH6D0qeGt3CGM7waO7gSJYu9vhMB5zszseOLc7JuycJktwfzfPWQ6m2hF/65m4ZSK6vwR8SQrJ6mtB5Oukkao6g4riNmAZBahhlbLCLzFKaBcHRK/RHstzJlv2K0Mt9R0oUNl89iitUIdJaqtHwbNcNPwnFNZmU+cLmgMVLq/RNN4wcFW2BiNIE6AWLrRLND3f+E/YPl/sPh+XVMdZmkSNnpf1NYMMWQ==
+X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1736741475; bh=LvmMg1dHcd3n4yAEpjWfZAj0x5TmTFUgIe2yLIibXZa=; h=X-Sonic-MF:From:To:Subject:Date:From:Subject; b=IFGAuw72HgEZIeLziOyvYMM1zxUFfcP2Di+bCVVivqXx90lmQfz/KKYdtaaClGUQG1l+8D2nOfZ7TWb6aNOnhyLQNiyZJVBra4vyWXEpjShUYHb92i/lP+BmzuEUDnAroCo2qIoTtz6IJ8Uc21NPPi5s+6tLyVEabV0B8zTYzb68kSfpGOMKanI3vjVuW5H9VIZ2JIddPUIDuFVEhMhfNXmIOVMOGeVcVrYCtcRicW9rt6tWPg934K9UjF4l7EqA/KXJp3iaIqQ+5U5lOY7jZO6Vi26gEajgW4o1hORERWRjQoO5HmxRbfBowO2+1Km8/U0UjkmOKHiss5yI5YfWlA==
+X-YMail-OSG: r3olDncVM1nNX9vNYnhTSUVYqgElgpVztTjCLQNJcmnmUcG4u2lIg4rpRN5MNLe
+ 4WNrWoiFAK9DTpoHfyulb8rq5_KX8wdxnpRQOuCdpTU4h3znEJG07s_4VISWcT0MzF3gGIvNF7v7
+ JsSz4sz49Mbk0z..83izwz_Jny0L4pXwCdlGHG92GZgDaCd4JxPr7vZaapWXHoeBP9Y5WkuIFuf2
+ AcymHDTLEy39BPiXY_Y4PRzYmEMJo33o8klcHEOFLp.xJveih15YSebwroywJ9TJMGL0IBb8PtBg
+ 5OcCXybJJ_zNH8HylzItXFWSL73WZQSdaszuisMaMOA1u1q.6SimMJfBOIlEibcc91mOTBJDNGwL
+ hVVmhfMT4rk6Ffz1Kcxg2Hv01ZHt0TgK8W9oCrCKRFiXxxWRhxlOnH3Wl0pOnMQvbNZgz7tul6Dk
+ 3Vl.xViFa8UpW.J4FS17KhxmGoDTw5me5KKcH3YFWzCpySf7Yt1C__WwWsWXxQYZqnZdd0tq65Rn
+ anw3OsD8Rb9v3kAcwkeKwM.QRawaQH4WodWEqPZ4NjoSI9Wsb5anbvyme_xIz0H3oybaBdMr0FzP
+ zh6dNgqKorxLGOMEOLHx3Q.FXbaOV7CHfskOa2WbHy8Z7MmkAj1S1dMQfyx4i6luYu2lOCFLIYdw
+ q6xOeT4XeEc9ujBz6jj2ujaO67fG_k_XXsKSfcPpBFbJ8uc3FcAjBcrQ0ihIMBhrSo8c_7.EqO5Z
+ ZBFkcNiDbWtYWpg_fZlx1RVUqgflYyk8KJ8rHCMJ7n820bmRdOWObLPadM64CsoX1rfkTRfJpk2t
+ tc5I5J86jSjmP0bG3ggUxMucVEIgHFp5ELReOd1dMTAqpr_5Dc5Puk0xKtJ2kxA1YpA8p8VMGTy3
+ khvK1wPJMzajcXY8BqhCSYeEyGFuBKiz8X2bjxOF8GF9S7mnZ5ta9mbKg4_sl_ASm9XeF6yjRMKU
+ j.V1AOClLQzIlS3UqU0o9Ek.0z.VH_5BxfqNWkoJbi.3OtQM8VYkaskTKMgm_HtCVoiaDeQDVErC
+ hkK4_YbeycRDxHmiNHmaop5MVAEhpoTxW4qDh7xTAIPm8E0lsrT4DqWEXn68fvHDa8buGoECfdWC
+ SK5TyGP.0Pxbw4zc9tulnkslamGvHivbEXI.Q649IO0obZRzb1..74Od.esaZjjJw9t4Si_Fs0Lg
+ ia3SKuoQzIqxoz__qckyR.g1..ky1kr3.3qPxzc8OY.gtkFIWoYsW1ISiOPE0fBACQ_qqdbmNJQu
+ UlTIN9mh3JGfBPOWCkolQ.lovJ_Utaw159.7s9hnNhUljYjStayJ60v0hYZPmm.7C24DQo_FdTH5
+ oY5zLb_9Zzigc4O.FLKQi87QMf1QTUKk4cE7JNPPDMpHE6gB3MVSTrsbp65Y.aF_.9G7Uy11xXox
+ dBx8trfSkheBzxlY5twH_7uDnSbf8n64152Gxyc8d3HP8IiljQxfS0Qh8y6GLzATjy7OJFcmZSnH
+ TEQOFUxK1qm8psIUWJRvSLwdScizdbO8ZCzqbnWX989feZ7rJyA0o3j87GxTTVFttjiOqd1ktdSc
+ p7XB35_wxCYv73M5SPvCPJ4ZSGJZHx3yPjxZy2TDcLBKsTNBK9rxie5lL1WZbENIEOmhZ5vSiHcg
+ 1WrwDcOqhNWLTrX6bUgrubCXzDjYL9XFOICnpc1uo9VqCWHvRnSfK1nnlBfqss8OsiCfe_IXggHy
+ 7KFRTlseScrNgibaD5OTrw6iow_TL3Da0LPVuvYwMhzHq96W1nTGr5u04_xHn8YGxmKlcP7YsQ0e
+ qafOWxIHNBL_KZGvOMBaMoQFX5HiQXkoCCOH4fj_mOE6sV_i1NiGZuXM7qW415zuAQ.L85n5M_V4
+ P2dDRX4yC6r0l_GSObo_opgqFRjufLgHbikmURmUULSLNfNivl8d5Uo8DtVa7isEIJYN8ZplydzE
+ ZgBaLraEf2lrucfYdYyh_TkmCskaoITZC4RI.McdQ37cEu7rNLktx1pyZCPlvRbkEKPwWWgbIdKT
+ rGnzh2124oSkfJTdCxMyPxTl2TpMSSPu0MsaO8KYtU4BC0b5IReud7OqYkqCyuBicAC5HIIrthTL
+ o66l28hcvbWt3Q3ziG2nETxzTa1jkaukLZ6yp3AUno5H5ymoKOTSD_w5lyZvuDiRus1D7eYPYOfm
+ E2Dtzv12TmsBj5kywPJsIWZhdmEQjohecmo77oFFEP2APwnEhjzo2VPQgJiHremcWTTgpjzKlIuH
+ KOXxr6YIQaizdWJKXnL6uu1kF1YBtncVB_w0WQMiS3Ml8U5BkzCbyvIPCGg--
+X-Sonic-MF: <ma.arghavani@yahoo.com>
+X-Sonic-ID: f0b441b7-9587-487c-ac7c-c03144fe67ee
+Received: from sonic.gate.mail.ne1.yahoo.com by sonic313.consmr.mail.bf2.yahoo.com with HTTP; Mon, 13 Jan 2025 04:11:15 +0000
+Received: by hermes--production-gq1-5dd4b47f46-5kxd4 (Yahoo Inc. Hermes SMTP Server) with ESMTPA ID 38b48d2bb23278eba059861bb4d63b73;
+          Mon, 13 Jan 2025 04:11:10 +0000 (UTC)
+From: Mahdi Arghavani <ma.arghavani@yahoo.com>
+To: netdev@vger.kernel.org
+Cc: ncardwell@google.com,
+	edumazet@google.com,
+	haibo.zhang@otago.ac.nz,
+	david.eyers@otago.ac.nz,
+	abbas.arghavani@mdu.se,
+	Mahdi Arghavani <ma.arghavani@yahoo.com>
+Subject: [PATCH net] Fixes: 4e1fddc98d25 ("tcp_cubic: fix spurious Hystart ACK train detections for not-cwnd-limited flows")
+Date: Mon, 13 Jan 2025 04:06:56 +0000
+Message-ID: <20250113040656.3195-1-ma.arghavani@yahoo.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250110202605.429475-1-jdamato@fastly.com> <20250110202605.429475-4-jdamato@fastly.com>
-In-Reply-To: <20250110202605.429475-4-jdamato@fastly.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Mon, 13 Jan 2025 12:05:51 +0800
-X-Gm-Features: AbW1kvbJjBsqd5MxoROEXNyf-c5A5BV1qq0kCSqjUPSk4kLtr3sC7nlacQgsc78
-Message-ID: <CACGkMEtjERF72zkLzDn2OKz3OGkJOQ+FCJS3MRscJqakEz9FYA@mail.gmail.com>
-Subject: Re: [PATCH net-next 3/3] virtio_net: Map NAPIs to queues
-To: Joe Damato <jdamato@fastly.com>
-Cc: netdev@vger.kernel.org, mkarsten@uwaterloo.ca, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
-	=?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	"open list:VIRTIO CORE AND NET DRIVERS" <virtualization@lists.linux.dev>, open list <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+References: <20250113040656.3195-1-ma.arghavani.ref@yahoo.com>
 
-On Sat, Jan 11, 2025 at 4:26=E2=80=AFAM Joe Damato <jdamato@fastly.com> wro=
-te:
->
-> Use netif_queue_set_napi to map NAPIs to queue IDs so that the mapping
-> can be accessed by user apps.
->
-> $ ethtool -i ens4 | grep driver
-> driver: virtio_net
->
-> $ sudo ethtool -L ens4 combined 4
->
-> $ ./tools/net/ynl/pyynl/cli.py \
->        --spec Documentation/netlink/specs/netdev.yaml \
->        --dump queue-get --json=3D'{"ifindex": 2}'
-> [{'id': 0, 'ifindex': 2, 'napi-id': 8289, 'type': 'rx'},
->  {'id': 1, 'ifindex': 2, 'napi-id': 8290, 'type': 'rx'},
->  {'id': 2, 'ifindex': 2, 'napi-id': 8291, 'type': 'rx'},
->  {'id': 3, 'ifindex': 2, 'napi-id': 8292, 'type': 'rx'},
->  {'id': 0, 'ifindex': 2, 'type': 'tx'},
->  {'id': 1, 'ifindex': 2, 'type': 'tx'},
->  {'id': 2, 'ifindex': 2, 'type': 'tx'},
->  {'id': 3, 'ifindex': 2, 'type': 'tx'}]
->
-> Note that virtio_net has TX-only NAPIs which do not have NAPI IDs, so
-> the lack of 'napi-id' in the above output is expected.
->
-> Signed-off-by: Joe Damato <jdamato@fastly.com>
-> ---
->  drivers/net/virtio_net.c | 29 ++++++++++++++++++++++++++---
->  1 file changed, 26 insertions(+), 3 deletions(-)
->
-> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> index 4e88d352d3eb..8f0f26cc5a94 100644
-> --- a/drivers/net/virtio_net.c
-> +++ b/drivers/net/virtio_net.c
-> @@ -2804,14 +2804,28 @@ static void virtnet_napi_do_enable(struct virtque=
-ue *vq,
->  }
->
->  static void virtnet_napi_enable_lock(struct virtqueue *vq,
-> -                                    struct napi_struct *napi)
-> +                                    struct napi_struct *napi,
-> +                                    bool need_rtnl)
->  {
-> +       struct virtnet_info *vi =3D vq->vdev->priv;
-> +       int q =3D vq2rxq(vq);
-> +
->         virtnet_napi_do_enable(vq, napi);
-> +
-> +       if (q < vi->curr_queue_pairs) {
-> +               if (need_rtnl)
-> +                       rtnl_lock();
+I noticed that HyStart incorrectly marks the start of rounds,
+resulting in inaccurate measurements of ACK train lengths.
+Since HyStart relies on ACK train lengths as one of two thresholds
+to terminate exponential cwnd growth during Slow-Start, this
+inaccuracy renders that threshold ineffective, potentially degrading
+TCP performance.
 
-Can we tweak the caller to call rtnl_lock() instead to avoid this trick?
+The issue arises because the changes introduced in commit
+4e1fddc98d25 ("tcp_cubic: fix spurious Hystart ACK train detections for not-cwnd-limited flows")
+move the caller of the `bictcp_hystart_reset` function inside the `hystart_update` function.
 
-> +
-> +               netif_queue_set_napi(vi->dev, q, NETDEV_QUEUE_TYPE_RX, na=
-pi);
-> +
-> +               if (need_rtnl)
-> +                       rtnl_unlock();
-> +       }
->  }
->
->  static void virtnet_napi_enable(struct virtqueue *vq, struct napi_struct=
- *napi)
->  {
-> -       virtnet_napi_enable_lock(vq, napi);
-> +       virtnet_napi_enable_lock(vq, napi, false);
->  }
->
->  static void virtnet_napi_tx_enable(struct virtnet_info *vi,
-> @@ -2848,9 +2862,13 @@ static void refill_work(struct work_struct *work)
->         for (i =3D 0; i < vi->curr_queue_pairs; i++) {
->                 struct receive_queue *rq =3D &vi->rq[i];
->
-> +               rtnl_lock();
-> +               netif_queue_set_napi(vi->dev, i, NETDEV_QUEUE_TYPE_RX, NU=
-LL);
-> +               rtnl_unlock();
->                 napi_disable(&rq->napi);
+This modification adds an additional condition for triggering the caller,
+requiring that (tcp_snd_cwnd(tp) >= hystart_low_window) must also
+be satisfied before invoking `bictcp_hystart_reset`.
 
-I wonder if it's better to have a helper to do set napi to NULL as
-well as napi_disable().
+The proposed fix ensures that `bictcp_hystart_reset` is correctly called
+at the start of a new round, regardless of the congestion window size.
+This is achieved by moving the condition
+(tcp_snd_cwnd(tp) >= hystart_low_window)
+from before calling bictcp_hystart_reset to after it.
 
-> +
->                 still_empty =3D !try_fill_recv(vi, rq, GFP_KERNEL);
-> -               virtnet_napi_enable_lock(rq->vq, &rq->napi);
-> +               virtnet_napi_enable_lock(rq->vq, &rq->napi, true);
->
->                 /* In theory, this can happen: if we don't get any buffer=
-s in
->                  * we will *never* try to fill again.
-> @@ -3048,6 +3066,7 @@ static int virtnet_poll(struct napi_struct *napi, i=
-nt budget)
->  static void virtnet_disable_queue_pair(struct virtnet_info *vi, int qp_i=
-ndex)
->  {
->         virtnet_napi_tx_disable(&vi->sq[qp_index].napi);
-> +       netif_queue_set_napi(vi->dev, qp_index, NETDEV_QUEUE_TYPE_RX, NUL=
-L);
->         napi_disable(&vi->rq[qp_index].napi);
->         xdp_rxq_info_unreg(&vi->rq[qp_index].xdp_rxq);
->  }
-> @@ -3317,8 +3336,10 @@ static netdev_tx_t start_xmit(struct sk_buff *skb,=
- struct net_device *dev)
->  static void virtnet_rx_pause(struct virtnet_info *vi, struct receive_que=
-ue *rq)
->  {
->         bool running =3D netif_running(vi->dev);
-> +       int q =3D vq2rxq(rq->vq);
->
->         if (running) {
-> +               netif_queue_set_napi(vi->dev, q, NETDEV_QUEUE_TYPE_RX, NU=
-LL);
->                 napi_disable(&rq->napi);
->                 virtnet_cancel_dim(vi, &rq->dim);
->         }
-> @@ -5943,6 +5964,8 @@ static int virtnet_xdp_set(struct net_device *dev, =
-struct bpf_prog *prog,
->         /* Make sure NAPI is not using any XDP TX queues for RX. */
->         if (netif_running(dev)) {
->                 for (i =3D 0; i < vi->max_queue_pairs; i++) {
-> +                       netif_queue_set_napi(vi->dev, i, NETDEV_QUEUE_TYP=
-E_RX,
-> +                                            NULL);
->                         napi_disable(&vi->rq[i].napi);
->                         virtnet_napi_tx_disable(&vi->sq[i].napi);
->                 }
-> --
-> 2.25.1
->
+Signed-off-by: Mahdi Arghavani <ma.arghavani@yahoo.com>
+Cc: Neal Cardwell <ncardwell@google.com>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Haibo Zhang <haibo.zhang@otago.ac.nz>
+Cc: David Eyers <david.eyers@otago.ac.nz>
+Cc: Abbas Arghavani <abbas.arghavani@mdu.se>
+---
+ Makefile             | 2 +-
+ net/ipv4/tcp_cubic.c | 8 +++++---
+ 2 files changed, 6 insertions(+), 4 deletions(-)
 
-Thanks
+diff --git a/Makefile b/Makefile
+index 7904d5d88088..e20a62ad397f 100644
+--- a/Makefile
++++ b/Makefile
+@@ -2,7 +2,7 @@
+ VERSION = 6
+ PATCHLEVEL = 13
+ SUBLEVEL = 0
+-EXTRAVERSION = -rc6
++EXTRAVERSION = -rc7
+ NAME = Baby Opossum Posse
+ 
+ # *DOCUMENTATION*
+diff --git a/net/ipv4/tcp_cubic.c b/net/ipv4/tcp_cubic.c
+index 5dbed91c6178..76c23675ae50 100644
+--- a/net/ipv4/tcp_cubic.c
++++ b/net/ipv4/tcp_cubic.c
+@@ -392,6 +392,10 @@ static void hystart_update(struct sock *sk, u32 delay)
+ 	if (after(tp->snd_una, ca->end_seq))
+ 		bictcp_hystart_reset(sk);
+ 
++	/* hystart triggers when cwnd is larger than some threshold */
++	if (tcp_snd_cwnd(tp) < hystart_low_window)
++		return;
++
+ 	if (hystart_detect & HYSTART_ACK_TRAIN) {
+ 		u32 now = bictcp_clock_us(sk);
+ 
+@@ -467,9 +471,7 @@ __bpf_kfunc static void cubictcp_acked(struct sock *sk, const struct ack_sample
+ 	if (ca->delay_min == 0 || ca->delay_min > delay)
+ 		ca->delay_min = delay;
+ 
+-	/* hystart triggers when cwnd is larger than some threshold */
+-	if (!ca->found && tcp_in_slow_start(tp) && hystart &&
+-	    tcp_snd_cwnd(tp) >= hystart_low_window)
++	if (!ca->found && tcp_in_slow_start(tp) && hystart)
+ 		hystart_update(sk, delay);
+ }
+ 
+-- 
+2.45.2
 
 
