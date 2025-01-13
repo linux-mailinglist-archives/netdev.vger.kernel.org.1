@@ -1,143 +1,106 @@
-Return-Path: <netdev+bounces-157726-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157727-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C5CEA0B609
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 12:49:59 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 30A63A0B61B
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 12:52:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1D47A1884FD8
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 11:50:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4A4DF18846B6
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 11:53:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 495541CAA83;
-	Mon, 13 Jan 2025 11:49:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4222E1CAA78;
+	Mon, 13 Jan 2025 11:52:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="fkrzWApx"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="a2NOQAPf"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-124.freemail.mail.aliyun.com (out30-124.freemail.mail.aliyun.com [115.124.30.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9854B1B4154;
-	Mon, 13 Jan 2025 11:49:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 997BA1BF33F
+	for <netdev@vger.kernel.org>; Mon, 13 Jan 2025 11:52:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736768993; cv=none; b=eAsFCNvc1QFAzmFSQGWj91RBO7VOSluSz2zpxRx13e5n/FCOxImpa8HyMQj1iOxsuICAxQsMhLfNrIrNBwJRzirGTuLKAVqBZmINcsiFKIGpoxJFnyItjZyOUxNJ1mSHucxFr3AFgyM42wojHLIkrBqvEfoSJRseqOp2BQfEWEM=
+	t=1736769174; cv=none; b=SAkIWV9DCpn58RsCQTUX56Au9Dv0JTJY+UOds+jy8VRdyfToK9U7gpaxawdmRjLBw+zGPU+sBtevQyuPrycaOk+ZFOWVnhCVLezZX4PI7vRYYHjsQ3iAPxiZAdC7KctHeeVQwNzAOcrXr6Ff05ac+geYNcXd33+rfYfNN0vaEeg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736768993; c=relaxed/simple;
-	bh=u/3TiRKpp8tpJXx8+txBRBPg+Fjpk1lHw0jz/n8kUag=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TDeUGNMHoFoszz/Dg86qHkxsO2mUO5Akvn3cXB39XtFB7mvWdrkjm7zRxK88SMNpnhyvJxZp6l6xAvuCDQ1GgnHlXrX73wqyy+pn3sdiHh1BP3HHA837fFp+ehquz5GDGFR+aMhBlh8hfzuAvphk/MiVqugyzgG1ZzAqlZQlqzE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=fkrzWApx; arc=none smtp.client-ip=115.124.30.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1736768987; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
-	bh=Oi4ACboGMGTa1BXAPOx4mOpHd0ImIOeMSXF78X60dq4=;
-	b=fkrzWApxJG2o3AqkMTK+3tTOcTBfE2dqGPKrAhTEXwq7QN+9hoRhu17gmaECAVGdtySJ2HoiJ5WzVe6QphbE/WEdfDYRnusatFCOn0WqO+FQw/ALbP+EarrZH49k81De/idXa6aqKO0/D1ilduGIOo+dhOoU3eOru8RWmiN2me8=
-Received: from localhost(mailfrom:dust.li@linux.alibaba.com fp:SMTPD_---0WNY6mku_1736768984 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Mon, 13 Jan 2025 19:49:45 +0800
-Date: Mon, 13 Jan 2025 19:49:44 +0800
-From: Dust Li <dust.li@linux.alibaba.com>
-To: "D. Wythe" <alibuda@linux.alibaba.com>, kgraul@linux.ibm.com,
-	wenjia@linux.ibm.com, jaka@linux.ibm.com, ast@kernel.org,
-	daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev,
-	pabeni@redhat.com, song@kernel.org, sdf@google.com,
-	haoluo@google.com, yhs@fb.com, edumazet@google.com,
-	john.fastabend@gmail.com, kpsingh@kernel.org, jolsa@kernel.org,
-	guwen@linux.alibaba.com
-Cc: kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
-	linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org,
-	bpf@vger.kernel.org
-Subject: Re: [PATCH bpf-next v5 2/5] net/smc: Introduce generic hook smc_ops
-Message-ID: <20250113114944.GB89233@linux.alibaba.com>
-Reply-To: dust.li@linux.alibaba.com
-References: <20250107041715.98342-1-alibuda@linux.alibaba.com>
- <20250107041715.98342-3-alibuda@linux.alibaba.com>
+	s=arc-20240116; t=1736769174; c=relaxed/simple;
+	bh=tDKe/1gGfkfsCPDcW8MYrgfkhfdunQAtI4Aw7VyGzaE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ZekcA2ZsD01iZ39WGL4Nc8bakzx6jZG9ZL5hMh+oItLme/BzLVOz9aoIN/Ei3zQuLdYV+Lr6qCIaVatRJNtibgRnYaq1QlC3Zgs+GtphvyICz2LdUpF51SuWcc07C6pAaEJaknohHqC3fL9x4DIYfulBEVWmeoKiXftXBaJ0C4U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=a2NOQAPf; arc=none smtp.client-ip=209.85.214.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-216728b1836so70530645ad.0
+        for <netdev@vger.kernel.org>; Mon, 13 Jan 2025 03:52:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1736769172; x=1737373972; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tDKe/1gGfkfsCPDcW8MYrgfkhfdunQAtI4Aw7VyGzaE=;
+        b=a2NOQAPfrLtUrtGWxcpYyU8ReTvftSXcCBXCoGANZO02HbxVIEShb+4sTe39Yda3uq
+         d6N1a1kaE4tBatCcMCrlkHwRCjD8s5WVnANNz/0ulqd0faniDhx/7OCDNbVVfNiV8eOb
+         orF6YCk8XlNehDrwAaDJtceeeoQ4b1pqDKVa5C2L2Ai0o+PF99BaJUGGcoYbK+383w+s
+         xa/nCQaAQ06mPHiBA3tkRuyKsfXPPSTXIbESXD6aj21Dx6+OegWNNNi/pc2VkqXsYCL2
+         LozPB87O/B4PBSNsi/MqNHSwmAVyvTGazlnZ8VdS4eqsgMz71VRUIjpsXbEQAQ7uaiNB
+         iA7A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736769172; x=1737373972;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=tDKe/1gGfkfsCPDcW8MYrgfkhfdunQAtI4Aw7VyGzaE=;
+        b=LZFmKml4UKPADeppI+S2tua7XzLjxxz1JQJ6iTl18jFYsVO6fy8FIBXQEXPBaV20Bb
+         FCX1rbgGqoAvbBO+Y5cDHx7UNgJjCDeGIML7YgSYdjBHjY+tL5FZoO+ZFRGsMdF2g38C
+         4DqEj5uE7i5An1W96g0oW6WKqY9XD1iZAbkroWA6YxRVbD0HpaoflGIvG+4ZaJ9TY4jm
+         GQRsGWuSOTZJD49rffNk3mbi9NX3gjgUFZ6eq7m+j3REoxL4nOoGoVzYPjTGeOLJVwzs
+         sGA/Z2ZT0DQbU+vkmXpZag7BY+AoHb3uVMEYLqNOCvMm7YevKWgYETJdtUfUrKxamG41
+         nScQ==
+X-Gm-Message-State: AOJu0YzZjOFnYDgDdbScYb4/0JacpPw79alRQPRfgc7AZdAFh9sTkLVr
+	SicsrfC5EeZQpYUqPBC2E6r4xQWVN5aZTPzznWNtL4Bazfc5rcQFREKLs7WB8uIokPT8KuOfsfx
+	3R5+w8Ke5ZBaVHwvg0bcINkfyvHkdvhxSLLFT
+X-Gm-Gg: ASbGncv8qs9IsZqdd/Tq5bpf9o5W/jZBd9+onZrVbOLW3oHdKHIOrkwf4rqFprL2dsj
+	J0BfQ8QjYVUzBAK+rinAVnYlhErafsZrSTenZ
+X-Google-Smtp-Source: AGHT+IE/BCgpictah3ZkeTexpW7sCCkw4LFRWV3Q55KazxDV063npNwQOEdQ2JG/9aTWi6hRXkVPCs8SCN9dhNmUzsY=
+X-Received: by 2002:a05:6a00:39a7:b0:728:e382:5f14 with SMTP id
+ d2e1a72fcca58-72d21f314e9mr23751191b3a.9.1736769171999; Mon, 13 Jan 2025
+ 03:52:51 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250107041715.98342-3-alibuda@linux.alibaba.com>
+References: <20250111144658.74249-1-jhs@mojatatu.com> <87msfvq6ko.fsf@nvidia.com>
+In-Reply-To: <87msfvq6ko.fsf@nvidia.com>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Mon, 13 Jan 2025 06:52:38 -0500
+X-Gm-Features: AbW1kvYxIOtUVx2TgA-XU4L8cokDt66y-8yN46GbPompiu8TLpRzoUnDpR3vcwo
+Message-ID: <CAM0EoMnw01vbHoicYk-vFcWYuiUnG9PB2KrExSiPU8Cn2_2a9w@mail.gmail.com>
+Subject: Re: [PATCH net v3 1/1] net: sched: fix ets qdisc OOB Indexing
+To: Petr Machata <petrm@nvidia.com>
+Cc: netdev@vger.kernel.org, jiri@resnulli.us, xiyou.wangcong@gmail.com, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, petrm@mellanox.com, 
+	security@kernel.org, g1042620637@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 2025-01-07 12:17:12, D. Wythe wrote:
->The introduction of IPPROTO_SMC enables eBPF programs to determine
->whether to use SMC based on the context of socket creation, such as
->network namespaces, PID and comm name, etc.
+On Mon, Jan 13, 2025 at 6:47=E2=80=AFAM Petr Machata <petrm@nvidia.com> wro=
+te:
 >
->As a subsequent enhancement, to introduce a new generic hook that
->allows decisions on whether to use SMC or not at runtime, including
->but not limited to local/remote IP address or ports.
 >
->Moreover, in the future, we can achieve more complex extensions to the
->protocol stack by extending this ops.
+> Jamal Hadi Salim <jhs@mojatatu.com> writes:
 >
->Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
->---
-> include/net/netns/smc.h |  3 ++
-> include/net/smc.h       | 51 ++++++++++++++++++++++
-> net/ipv4/tcp_output.c   | 15 +++++--
-> net/smc/Kconfig         | 12 ++++++
-> net/smc/Makefile        |  1 +
-> net/smc/smc_ops.c       | 51 ++++++++++++++++++++++
-> net/smc/smc_ops.h       | 25 +++++++++++
-> net/smc/smc_sysctl.c    | 95 +++++++++++++++++++++++++++++++++++++++++
-> 8 files changed, 249 insertions(+), 4 deletions(-)
-> create mode 100644 net/smc/smc_ops.c
-> create mode 100644 net/smc/smc_ops.h
+> > Fixes: dcc68b4d8084 ("net: sch_ets: Add a new Qdisc")
+> > Reported-by: Haowei Yan <g1042620637@gmail.com>
+> > Suggested-by: Haowei Yan <g1042620637@gmail.com>
+> > Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
 >
->diff --git a/include/net/netns/smc.h b/include/net/netns/smc.h
->index fc752a50f91b..59d069f56b2d 100644
->--- a/include/net/netns/smc.h
->+++ b/include/net/netns/smc.h
->@@ -17,6 +17,9 @@ struct netns_smc {
-> #ifdef CONFIG_SYSCTL
-> 	struct ctl_table_header		*smc_hdr;
-> #endif
->+#if IS_ENABLED(CONFIG_SMC_OPS)
->+	struct smc_ops __rcu *ops;
->+#endif /* CONFIG_SMC_OPS */
-> 	unsigned int			sysctl_autocorking_size;
-> 	unsigned int			sysctl_smcr_buf_type;
-> 	int				sysctl_smcr_testlink_time;
->diff --git a/include/net/smc.h b/include/net/smc.h
->index db84e4e35080..326a217001d4 100644
->--- a/include/net/smc.h
->+++ b/include/net/smc.h
->@@ -18,6 +18,8 @@
-> #include "linux/ism.h"
-> 
-> struct sock;
->+struct tcp_sock;
->+struct inet_request_sock;
-> 
-> #define SMC_MAX_PNETID_LEN	16	/* Max. length of PNET id */
-> 
->@@ -97,4 +99,53 @@ struct smcd_dev {
-> 	u8 going_away : 1;
-> };
-> 
->+#define  SMC_OPS_NAME_MAX 16
->+
->+enum {
->+	/* ops can be inherit from init_net */
->+	SMC_OPS_FLAG_INHERITABLE = 0x1,
->+
->+	SMC_OPS_ALL_FLAGS = SMC_OPS_FLAG_INHERITABLE,
->+};
->+
->+struct smc_ops {
+> Reviewed-by: Petr Machata <petrm@nvidia.com>
 
-One more thing.
-Can we call it smc_bpf_ops ? I think smc_ops is a bit ambiguous.
-Same for smc_ops.h/c source file.
+I sent v4 with your reviewedby..
 
-Best regards,
-Dust
+cheers,
+jamal
 
