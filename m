@@ -1,215 +1,202 @@
-Return-Path: <netdev+bounces-157586-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157587-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB958A0AEE2
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 06:48:29 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CBCFFA0AEF2
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 06:56:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 36FCA7A1F2F
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 05:48:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A24913A43AA
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 05:56:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D16581C3306;
-	Mon, 13 Jan 2025 05:48:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5386A230D3E;
+	Mon, 13 Jan 2025 05:56:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="XCBndu84"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jDAEIQVX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vk1-f181.google.com (mail-vk1-f181.google.com [209.85.221.181])
+Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F1A610E0
-	for <netdev@vger.kernel.org>; Mon, 13 Jan 2025 05:48:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7EB5231A21;
+	Mon, 13 Jan 2025 05:56:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736747303; cv=none; b=ZXxRbFJQjoNd6GobCcZta10Defj1OHgpnPE+Tjhqv5+0Lxl5fIrXRy6AEyuIYd5lxbP9bzZ1qktwunSDmKsSX2D8VFNKbPhV3AEsUK/ItYwfIOvnL9j9KHMO5/lQu+E8REIjrCaucl7j8wArAQPX9TMXwSLgYpgb43HnObpflQk=
+	t=1736747777; cv=none; b=cCkWsuB4iSpz7hnlFoIFqYpyaFomESqbzDIMSZZv29CR/QclMeBZbfs89vLMO1QmyOnorGapJ61zu29DZq1upbRtB7zN81qKPbamlLAvfakd246xdk6RLk02UxYhB5ZCuP5vGQFaxOsE/PbXFk/emXSPft2WPW+x9J0jQ+DpbBA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736747303; c=relaxed/simple;
-	bh=+hENPcZehMB/wbmaOPZAq9lKN6Z251GDBXeE9+tJGNQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rWZjVqIGqgPp2jHimIX5gMui/HBTtCsFegRN8EYBK6mLUYF/hpzpUpyO8U8xB1WxU9+JyZtc0QDqcMShhP+ncozy9PotBpgqnQyrVVCzUZ1akzwxeMCyoIe2hxX2CvcvFzLwEvQ6VhjE5cGp43dIYEj+7/gq8n6UYSG3teaBa8o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=XCBndu84; arc=none smtp.client-ip=209.85.221.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-vk1-f181.google.com with SMTP id 71dfb90a1353d-518799f2828so2076271e0c.0
-        for <netdev@vger.kernel.org>; Sun, 12 Jan 2025 21:48:21 -0800 (PST)
+	s=arc-20240116; t=1736747777; c=relaxed/simple;
+	bh=NoZTOLI0Jqi9bqOBRnp6rMReokednWOQjHoLJHtOBGY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=sU7urlqauNJz6RSh7F3FL+LYwsBKBlLTxBypljX+dUOY64MpvOqE3Rfqh6syQw9CWejaH38xHkkwKoPw4Py/CkyiGdlEKr1xFO3X2dgLqRLvozhJ6nnr82IiD80uKcekcUTw013Ya5O5XwdBM9MrvgCvW0fDIcROzmJnESmHeQY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jDAEIQVX; arc=none smtp.client-ip=209.85.216.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-2f44353649aso5189607a91.0;
+        Sun, 12 Jan 2025 21:56:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1736747301; x=1737352101; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=HhSorsZlNgQSkY1IODbRLyGquygI1YDv41GHFcfOVc8=;
-        b=XCBndu84/EyUB75StPpD3TuaaGgOcyTk8TWp7j/hxBltjDECmjseC2djEtJZGCBMW8
-         EjrVidJau/xy9zsZZuku+xorrsIMGSlBlgloqBB+EQOSuJDcVimFKXj0vFjNfG8LBo3N
-         wmcALVoU55intTTc+l+IhwjRm/sLmBdLi+Hzg=
+        d=gmail.com; s=20230601; t=1736747774; x=1737352574; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=B5kSRwp/LQmi9TB9FOxDQuTUZ2FNweKukw5dyy4zYRQ=;
+        b=jDAEIQVXLH5Pl/m8RKN1U08AnAhozghYqw+eA5waI5wIHtUel0wa+DwszGKF8HzLU0
+         2n0+lDr1FmZHR6Aa7j3DzT7zyfkMiqgbhwyUoSSie/iUSbJBY6xdKUF/5fe/vDfhGbIx
+         t3hN7+v4TvJdXIsE9j4ETLPG2mToO3QMI6Bsyn+1Rkni32eKvedl4c0V2zwZ0hjRjYde
+         oHcjahiFDX86ABQN5WEG3IFe8U13L2tExWIiKsqBB4HGcXFtHP9am383YMlS32NwOU6q
+         27kiRLB5tJhrV93kNaQ1VzFbFzanbFaiOUhpoLijoozeuMm878GTh2hh7VtyGcGrsKAL
+         LTXA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736747301; x=1737352101;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1736747774; x=1737352574;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=HhSorsZlNgQSkY1IODbRLyGquygI1YDv41GHFcfOVc8=;
-        b=xGlsM7AfhIBTkbDcCU0/3ZrIaMKTeyBhFpIDULP3voMjXhvSD0Nixg2CqY+C7m6gYl
-         aPs7LyfTjYqIXhdxlcqfKwVVWJowWMGDzQhEGdyXmTnscYAWOQejSQAtLPYmaRopsPog
-         QzAb9YDM17N404WEmKumv7PX4VREEyOX51onCaCUFsyirnf3xatpik7q6IompFOkUfDH
-         r4T42/3LBu+HQCr6hKaXzr02UqmPpvQr5v1qEENjAaGz7UogHe+57hxLbFhgOxKJvf3+
-         ZoQkVrE4htFW6jtdeTZ8eGehlvamkH+PVs3ABjgt9XCq0ytjIgF2vyTbhDVkqMaa6OHH
-         jR0g==
-X-Forwarded-Encrypted: i=1; AJvYcCVqszwTtyICAcg4pJvejRo/FNFdCk637FvAsbkhDCmO1nzXy7RpK1DQXd1BkO3Yt/RC3EXAxrU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzOef/2pWboRYpkGr6WT08wuDnINOn8WdThE28RJ0rIoBcn1b4C
-	dr/+sPoIFw2ixaiC3nv4SCKrnDx/ct8QaZdkGsxrCeXKfPZS3L0sF3EtoVdV+gLwzibMk2QVjoa
-	3hMTPX9+FO/UCAuAknD5kOVSaLDt+2J6culp2
-X-Gm-Gg: ASbGncv/L4vzzY9IJ3VHzyLbGev//ZJSZ7HgGAPIgBfPj89KGEJhArc5dcbOb9ZdjFK
-	OIdEfAHZBlInHeqg3Sz6pPnuKsUaUwyT6PI+gPCA=
-X-Google-Smtp-Source: AGHT+IEVptP9JMqCwZipPoI7yeRJcw45a18VhAUj+TVUTdF4/PZKvJd+L4IfJ3ZdLqJBigTH4oY/0VrUxuXLwwNcPGY=
-X-Received: by 2002:a05:6122:a0e:b0:515:d230:f2c6 with SMTP id
- 71dfb90a1353d-51c7c872ae5mr13884868e0c.7.1736747301068; Sun, 12 Jan 2025
- 21:48:21 -0800 (PST)
+        bh=B5kSRwp/LQmi9TB9FOxDQuTUZ2FNweKukw5dyy4zYRQ=;
+        b=AwL/VZlNkC0Oi5X1iDZr0JseCXzPM5CXq0R771HiDEhjoAsxgaA//aAeZdGNRjhEz1
+         us9OV+ik+JxU3rPDyTbxOqN0SyK5MgGfGSlpQ/lEIZeY4bx0+XEI+a1JewIydZjS/qXt
+         HyUgoRUFRJX/MNbaWnTHPRj0B7shjgObg45lfiPZ7Sw+XZyzXw9gasLeeXcW76WibwwE
+         QkUusCefazQMEBLzJWE4NFe7JxtngoUWZEGFxfeQsJQMur4hIgKeybUcNcrzOlRee0x+
+         0709RwBs4pOSPlCF6AfCMXSqRAtfo3XyzfwnrvgH/dxy+6gMLyiPGuorxFF9tSPJbvVI
+         DzEQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWL/98ddmxUZy+EWK1O9mlGGsInJwdOPU4X81phlkbCDX2uKdCfvcSdA7TeTXIaYP8b/ef5u/DfaC0+@vger.kernel.org, AJvYcCXfBGY+5x0TcvDhfs6XjHeyQ1wIUEs05qZNrqcVujQbkit9uzEf6s5NwTuAUI5tYyy4h2XXRuOSWsmtXIKU@vger.kernel.org, AJvYcCXu+Nnic17J8HfA44ZvTAGMu5q370XbgNfFnzzZ5BDDbRonNbk8i1O4Y6ktj37lpW+ou5Kx16U9@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw24xAYG9jUMa5B3oeZkynW9zoQkZCnWzsWlE26o0oqkFgvBz/r
+	gz6nLNppkhszgXbMnn8Zlk/wJNRmau8W6rQ+SNDZ4dyV2fi+Lk6v
+X-Gm-Gg: ASbGnctVVvCafhO2B2S/syAV4kYLUC3kHj3Pp2qODTyGyqQOINA2PCivcpoCYFBS5rJ
+	d+zlKVeXVhYqXwsGyet+vcO75QNDQ/jNBHsgooobrlzmGBedk1Be1VzypFclX0ndU7DxrDtC3sz
+	M9OyJnLXRS+W/8YkyizE/GhGTI9YIyQ5FrNHVmJWKgUGY6jClrR+5jbRLDwjgKq3XZngCM8/6w4
+	211xRgWmfpnFDC8/VfkSGaSxwyUzybO1vIYhofWX2tD1CC0NdxEYozRpt+ozZQDIPWFPLMR4KMp
+	qn1im6y47wQ4mIYpdMt28g==
+X-Google-Smtp-Source: AGHT+IFmIR9Ae+L9E2pmOyCcc+X8PWxnJne3SU6MtRQ2xXHY6ezLUBmNIufZB6pkQGPkrrzXMSDgtQ==
+X-Received: by 2002:a17:90b:51d1:b0:2ea:7fd8:9dc1 with SMTP id 98e67ed59e1d1-2f548edf181mr30621775a91.18.1736747773860;
+        Sun, 12 Jan 2025 21:56:13 -0800 (PST)
+Received: from yclu-ubuntu.. (60-250-196-139.hinet-ip.hinet.net. [60.250.196.139])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2f55942188csm7768806a91.23.2025.01.12.21.56.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 12 Jan 2025 21:56:13 -0800 (PST)
+From: Joey Lu <a0987203069@gmail.com>
+To: andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	robh@kernel.org,
+	krzk+dt@kernel.org,
+	conor+dt@kernel.org,
+	mcoquelin.stm32@gmail.com,
+	richardcochran@gmail.com
+Cc: alexandre.torgue@foss.st.com,
+	joabreu@synopsys.com,
+	ychuang3@nuvoton.com,
+	schung@nuvoton.com,
+	yclu4@nuvoton.com,
+	peppe.cavallaro@st.com,
+	linux-arm-kernel@lists.infradead.org,
+	netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	openbmc@lists.ozlabs.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Joey Lu <a0987203069@gmail.com>
+Subject: [PATCH net-next v7 0/3] Add support for Nuvoton MA35D1 GMAC
+Date: Mon, 13 Jan 2025 13:54:31 +0800
+Message-Id: <20250113055434.3377508-1-a0987203069@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250111065955.3698801-1-kuba@kernel.org> <CAH-L+nNX-3ervNe-P-a+CA8=nuYkt88QfRbpXsTtpvgXqqzZtA@mail.gmail.com>
-In-Reply-To: <CAH-L+nNX-3ervNe-P-a+CA8=nuYkt88QfRbpXsTtpvgXqqzZtA@mail.gmail.com>
-From: Kalesh Anakkur Purayil <kalesh-anakkur.purayil@broadcom.com>
-Date: Mon, 13 Jan 2025 11:18:07 +0530
-X-Gm-Features: AbW1kvbERTXMf9xGEy4708n3yDQarzg82s_RRDumdwAqEcqriBdiVW87YSJ7NFk
-Message-ID: <CAH-L+nNKsOrTuZT+0=TREAXXRVzzgdzgduHPdXA8oZiHLD8CPw@mail.gmail.com>
-Subject: Re: [PATCH net-next 1/2] net: un-export init_dummy_netdev()
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, 
-	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000f55b6c062b8ffd8a"
+Content-Transfer-Encoding: 8bit
 
---000000000000f55b6c062b8ffd8a
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+This patch series is submitted to add GMAC support for Nuvoton MA35D1
+SoC platform. This work involves implementing a GMAC driver glue layer
+based on Synopsys DWMAC driver framework to leverage MA35D1's dual GMAC
+interface capabilities.
 
-My bad, missed the V2 of the series. Please ignore my comment.
+Overview:
+  1. Added a GMAC driver glue layer for MA35D1 SoC, providing support for
+  the platform's two GMAC interfaces.
+  2. Added device tree settings, with specific configurations for our
+  development boards:
+    a. SOM board: Configured for two RGMII interfaces.
+    b. IoT board: Configured with one RGMII and one RMII interface.
+  3. Added dt-bindings for the GMAC interfaces.
 
-On Mon, Jan 13, 2025 at 10:44=E2=80=AFAM Kalesh Anakkur Purayil
-<kalesh-anakkur.purayil@broadcom.com> wrote:
->
-> On Sat, Jan 11, 2025 at 12:30=E2=80=AFPM Jakub Kicinski <kuba@kernel.org>=
- wrote:
-> >
-> > There are no in-tree module callers of init_dummy_netdev(), AFAICT.
-> >
-> > Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> > ---
-> >  net/core/dev.c | 1 -
-> >  1 file changed, 1 deletion(-)
-> >
-> > diff --git a/net/core/dev.c b/net/core/dev.c
-> > index 1a90ed8cc6cc..23e7f6a3925b 100644
-> > --- a/net/core/dev.c
-> > +++ b/net/core/dev.c
-> > @@ -10782,7 +10782,6 @@ void init_dummy_netdev(struct net_device *dev)
-> >         memset(dev, 0, sizeof(struct net_device));
-> >         init_dummy_netdev_core(dev);
-> >  }
-> > -EXPORT_SYMBOL_GPL(init_dummy_netdev);
-> >
-> >  /**
-> >   *     register_netdev - register a network device
-> > --
-> > 2.47.1
-> >
-> >
-> I can see that "net/xfrm/xfrm_input.c" and "net/mptcp/protocol.c" are
-> invoking init_dummy_netdev() in the init routines.
->
-> --
-> Regards,
-> Kalesh AP
+v7:
+  - Update dwmac-nuvoton driver
+    - Update probe function to use stmmac_pltfr_probe instead.
 
+v6:
+  - Update dwmac-nuvoton driver
+    - Use NVT as the previx for all functions, structs, and defines.
+    - Remove unnecessary comments.
 
+v5:
+  - Update yaml
+    - Remove the properties already defined in snps dwmac.
+  - Update dwmac-nuvoton driver
+    - Add a comment to explain the override of PMT flag.
 
---=20
-Regards,
-Kalesh AP
+v4:
+  - Update yaml
+    - Remove unnecessary property 'select'.
+    - Remove unnecessary compatible entries and fix items.
+    - Specify number of entries for 'reg'.
+    - Remove already defined property 'phy-handle'.
+    - Update example.
+    - Modify the property internal path delay to match the driver.
+  - Update dtsi
+    - Move 'status' to be the last property.
+  - Update dwmac-nuvoton driver
+    - Use remove instead of remove_new.
+    - Use dev_err_probe instead.
 
---000000000000f55b6c062b8ffd8a
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
+v3:
+  - Update yaml
+    - Fix for dt_binding_check warnings & errors.
+    - Add compatible in snps dwmac.
+  - Update dtsi
+    - Update dtsi to follow examples in yaml.
+  - Update dwmac-nuvoton driver
+    - Fix for auto build test warnings.
+    - Invalid path delay arguments will be returned.
 
-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
-riBJ/K1AFUjRAjFhGV64l++td7dkmnq/X8ET75ti+w1s4FRpFqkD2m7pg5NxdsZphYIXAgMBAAGj
-QjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSP8Et/qC5FJK5N
-UPpjmove4t0bvDANBgkqhkiG9w0BAQsFAAOCAQEAS0DbwFCq/sgM7/eWVEVJu5YACUGssxOGhigH
-M8pr5nS5ugAtrqQK0/Xx8Q+Kv3NnSoPHRHt44K9ubG8DKY4zOUXDjuS5V2yq/BKW7FPGLeQkbLmU
-Y/vcU2hnVj6DuM81IcPJaP7O2sJTqsyQiunwXUaMld16WCgaLx3ezQA3QY/tRG3XUyiXfvNnBB4V
-14qWtNPeTCekTBtzc3b0F5nCH3oO4y0IrQocLP88q1UOD5F+NuvDV0m+4S4tfGCLw0FREyOdzvcy
-a5QBqJnnLDMfOjsl0oZAzjsshnjJYS8Uuu7bVW/fhO4FCU29KNhyztNiUGUe65KXgzHZs7XKR1g/
-XzCCBWowggRSoAMCAQICDDfBRQmwNSI92mit0zANBgkqhkiG9w0BAQsFADBbMQswCQYDVQQGEwJC
-RTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTExMC8GA1UEAxMoR2xvYmFsU2lnbiBHQ0MgUjMg
-UGVyc29uYWxTaWduIDIgQ0EgMjAyMDAeFw0yMjA5MTAwODI5NTZaFw0yNTA5MTAwODI5NTZaMIGi
-MQswCQYDVQQGEwJJTjESMBAGA1UECBMJS2FybmF0YWthMRIwEAYDVQQHEwlCYW5nYWxvcmUxFjAU
-BgNVBAoTDUJyb2FkY29tIEluYy4xHzAdBgNVBAMTFkthbGVzaCBBbmFra3VyIFB1cmF5aWwxMjAw
-BgkqhkiG9w0BCQEWI2thbGVzaC1hbmFra3VyLnB1cmF5aWxAYnJvYWRjb20uY29tMIIBIjANBgkq
-hkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxnv1Reaeezfr6NEmg3xZlh4cz9m7QCN13+j4z1scrX+b
-JfnV8xITT5yvwdQv3R3p7nzD/t29lTRWK3wjodUd2nImo6vBaH3JbDwleIjIWhDXLNZ4u7WIXYwx
-aQ8lYCdKXRsHXgGPY0+zSx9ddpqHZJlHwcvas3oKnQN9WgzZtsM7A8SJefWkNvkcOtef6bL8Ew+3
-FBfXmtsPL9I2vita8gkYzunj9Nu2IM+MnsP7V/+Coy/yZDtFJHp30hDnYGzuOhJchDF9/eASvE8T
-T1xqJODKM9xn5xXB1qezadfdgUs8k8QAYyP/oVBafF9uqDudL6otcBnziyDBQdFCuAQN7wIDAQAB
-o4IB5DCCAeAwDgYDVR0PAQH/BAQDAgWgMIGjBggrBgEFBQcBAQSBljCBkzBOBggrBgEFBQcwAoZC
-aHR0cDovL3NlY3VyZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvZ3NnY2NyM3BlcnNvbmFsc2lnbjJj
-YTIwMjAuY3J0MEEGCCsGAQUFBzABhjVodHRwOi8vb2NzcC5nbG9iYWxzaWduLmNvbS9nc2djY3Iz
-cGVyc29uYWxzaWduMmNhMjAyMDBNBgNVHSAERjBEMEIGCisGAQQBoDIBKAowNDAyBggrBgEFBQcC
-ARYmaHR0cHM6Ly93d3cuZ2xvYmFsc2lnbi5jb20vcmVwb3NpdG9yeS8wCQYDVR0TBAIwADBJBgNV
-HR8EQjBAMD6gPKA6hjhodHRwOi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjNwZXJzb25hbHNp
-Z24yY2EyMDIwLmNybDAuBgNVHREEJzAlgSNrYWxlc2gtYW5ha2t1ci5wdXJheWlsQGJyb2FkY29t
-LmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNVHSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGP
-zzAdBgNVHQ4EFgQUI3+tdStI+ABRGSqksMsiCmO9uDAwDQYJKoZIhvcNAQELBQADggEBAGfe1o9b
-4wUud0FMjb/FNdc433meL15npjdYWUeioHdlCGB5UvEaMGu71QysfoDOfUNeyO9YKp0h0fm7clvo
-cBqeWe4CPv9TQbmLEtXKdEpj5kFZBGmav69mGTlu1A9KDQW3y0CDzCPG2Fdm4s73PnkwvemRk9E2
-u9/kcZ8KWVeS+xq+XZ78kGTKQ6Wii3dMK/EHQhnDfidadoN/n+x2ySC8yyDNvy81BocnblQzvbuB
-a30CvRuhokNO6Jzh7ZFtjKVMzYas3oo6HXgA+slRszMu4pc+fRPO41FHjeDM76e6P5OnthhnD+NY
-x6xokUN65DN1bn2MkeNs0nQpizDqd0QxggJtMIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYD
-VQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25h
-bFNpZ24gMiBDQSAyMDIwAgw3wUUJsDUiPdpordMwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcN
-AQkEMSIEIM8DDz/GVDUl40kKBJecsuu9rkcDIFC0MMCrGe/N+7DaMBgGCSqGSIb3DQEJAzELBgkq
-hkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI1MDExMzA1NDgyMVowaQYJKoZIhvcNAQkPMVwwWjAL
-BglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG
-9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQC8IYmOwdkj
-2Y2V4Sp/yg58Joli0+WrDC46f4mTWDEUpuUu3pUGtNqn+Nm3PVH8WM9TXun5UyLTOpHpa0n7VkgG
-R1dKv8kZbZ1x5Dq1xaCsdZKjE7aC6k1eN0eNbO4BRVfr7ZjA29sGn3HunNfSUKFoS0b2suaBkkJi
-KuQMVfiAO1HdGH28zclQza3e7w7SZCi6PUP2lHAV2aG+qv9g2wu7JvV3Z22QqJC0buXgrEHuwPDi
-akuDRyPd1qmvLu/f+gyxE9Fbnr0OawQEHKcIepIM2wk4pKb02mVpKVM1jpQWzFjJBIyfx9rWAyqX
-QveZ820fY9ea62fOS7PP7gTRlDDN
---000000000000f55b6c062b8ffd8a--
+v2:
+  - Update yaml
+    - Rename file to align with the compatible property.
+    - Add an argument to syscon to replace mac-id,
+      with corresponding descriptions.
+    - Use tx-internal-delay-ps and rx-internal-delay-ps properties for
+      configurable path delay with corresponding descriptions,
+      allowing selection between GMAC internal and PHY.
+    - Add all supported phy-mode options.
+    - Remove unused properties.
+  - Update dtsi
+    - Modify syscon configuration to include an argument for
+      GMAC interface selection.
+  - Update dwmac-nuvoton driver
+    - Remove redundant device information print statements.
+    - Remove non-global parameters.
+    - Retrieve GMAC interface selection from the syscon argument.
+    - Parse Tx and Rx path delays by correct properties.
+    - Update configurations to support Wake-on-LAN.
+
+Joey Lu (3):
+  dt-bindings: net: nuvoton: Add schema for Nuvoton MA35 family GMAC
+  arm64: dts: nuvoton: Add Ethernet nodes
+  net: stmmac: dwmac-nuvoton: Add dwmac glue for Nuvoton MA35 family
+
+ .../bindings/net/nuvoton,ma35d1-dwmac.yaml    | 126 ++++++++++++
+ .../devicetree/bindings/net/snps,dwmac.yaml   |   1 +
+ .../boot/dts/nuvoton/ma35d1-iot-512m.dts      |  12 ++
+ .../boot/dts/nuvoton/ma35d1-som-256m.dts      |  10 +
+ arch/arm64/boot/dts/nuvoton/ma35d1.dtsi       |  54 ++++++
+ drivers/net/ethernet/stmicro/stmmac/Kconfig   |  11 ++
+ drivers/net/ethernet/stmicro/stmmac/Makefile  |   1 +
+ .../ethernet/stmicro/stmmac/dwmac-nuvoton.c   | 179 ++++++++++++++++++
+ 8 files changed, 394 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/net/nuvoton,ma35d1-dwmac.yaml
+ create mode 100644 drivers/net/ethernet/stmicro/stmmac/dwmac-nuvoton.c
+
+-- 
+2.34.1
+
 
