@@ -1,106 +1,121 @@
-Return-Path: <netdev+bounces-157900-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157901-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 425A6A0C441
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 22:55:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A1CFA0C442
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 22:56:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CE2EB3A6097
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 21:55:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 34FE33A4AEC
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 21:56:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D02D71EE7A4;
-	Mon, 13 Jan 2025 21:55:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A02AC1CDFCE;
+	Mon, 13 Jan 2025 21:56:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="3fWmC2Vz"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n8TBvCBL"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAE441D516B
-	for <netdev@vger.kernel.org>; Mon, 13 Jan 2025 21:55:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B79B17CA12
+	for <netdev@vger.kernel.org>; Mon, 13 Jan 2025 21:56:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736805318; cv=none; b=JOmT3QHfHIfkSKTIM+29sJ3fy+EBfC7UQT5y2zQzdvQW0DkQq2rgzK3FTJbqVQOysNMmXTxI6ahCDus9ynFg9o9qI+2rKrmZqd9a02/ePV0zonXlS0vhwyNVbuzEajN4qgjvN55Lf1ZN14LEYiGNKIHcka1GYGYVtyneOj5A6os=
+	t=1736805371; cv=none; b=gCLNwyvLz5ZVH0Z9S1hyfZB0ysBpvpWyPTZvuG1rXfpxNKKObWuoxZ/Ck9sCZIeb2fnuUL99iKJrNkYcTyHrCtf1zU1x80RNDM/4Dq+n3/+llH+uVDhJ8jmQ/tAM6b1cP2Yi9lYb3Gxk2R8WNfTJVX9jdP4D+Lip1mc0DGsNkPY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736805318; c=relaxed/simple;
-	bh=aioBIw2lz9UNxqwy0AAeKAA4ioCpRgh1gLOu16AbwsU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=I0TJwRRdDWjUQkroHMXC+faNndOETg3nmG18JruQyoc7ljdRedAAlCRhpjExPT/rudg3fjbBxHHLdB9CZKkhCDEt3Ce5qaHRsED06FYYVHtc7+ukvVI/Akl4kunTSR8iB2KaRC6Enwnk/ZUtSGZF2xe+kj+PqMjPwXRzhIM6CVQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=3fWmC2Vz; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=owvIEjbr3lOaoUZhQ/FPVwO5w8OjfmtceaTIahkDBFY=; b=3fWmC2VzWeEFxYRMQK3ssOSBMd
-	4462/rwkuEi/3xpGtkSdv1AX8GEGokUreflcEGRsjk6h7lyGjdlB25SDAVVCQ+04lKic8ad5a/jmT
-	dGcCKLcKh8jnyjifPsnEEkbW1IwqTMx7X0NhCSTkktohlrCOe8+n/IH9kgjQw5Z+BuVM=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tXSOm-004EO4-BP; Mon, 13 Jan 2025 22:55:04 +0100
-Date: Mon, 13 Jan 2025 22:55:04 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Gerhard Engleder <gerhard@engleder-embedded.com>
-Cc: hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v2 3/5] net: phy: micrel: Add loopback support
-Message-ID: <e92b60fa-b3d0-4f45-b9a1-90bc9bb3ec7c@lunn.ch>
-References: <20250110144828.4943-1-gerhard@engleder-embedded.com>
- <20250110144828.4943-4-gerhard@engleder-embedded.com>
+	s=arc-20240116; t=1736805371; c=relaxed/simple;
+	bh=LlFdz3sSHr8Mig3a5a+nDARMgJIO2APz9lV+DFGzGMI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=bFW/UOAQ8GwBYJhjQ1LvAf56xu62PY+FgYmFNDR578iuq+J2MOMRpnjq5tjShlSrmSnIWn+CLUELj/msIjd/uNDWlrj6HgEK5Ykay/ovn1tBUBVU9TaeiTx4L2YWeBFesnQ5LDwrovTLU7Rea0J+sMVEgcTW8elCmZp6f7Fwq9U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n8TBvCBL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A5A7EC4CED6;
+	Mon, 13 Jan 2025 21:56:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1736805371;
+	bh=LlFdz3sSHr8Mig3a5a+nDARMgJIO2APz9lV+DFGzGMI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=n8TBvCBLuTAxjrYFxq7G6CmqTHJJXntoNQ1oPwIgZsaunpqa5sRcObaXgsqvvsB3M
+	 fxOvQSBN7nw+NUE+luaI8AtiXaUKLUcGUuoJnwquVALm+vh2eZPNSdJRAIQvnBYuRA
+	 aSSR0H+BLHek1LQOfy+PGfoLUXQxpmV2YR1XMlPYAyU8mMfB1nQ3e7iLrab7nyPnX0
+	 Zq1NLlgibUZmBj4pfzhtJre4E8v0AqGsKCxwonUHRBfx8EvmZqPwXcs1eWh13gEvDT
+	 4PGAh9w9vu4axFN+sNfKncBjk/mOIYkCQVHp1rYwhJj0/A4qdZRg6TMQbuycIyzdG3
+	 w3cZMP/C7Pn3A==
+Date: Mon, 13 Jan 2025 13:56:09 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Joe Damato <jdamato@fastly.com>
+Cc: Gerhard Engleder <gerhard@engleder-embedded.com>,
+ magnus.karlsson@intel.com, andrew@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next] tsnep: Link queues to NAPIs
+Message-ID: <20250113135609.13883897@kernel.org>
+In-Reply-To: <Z4WKHnDG9VSMe5OD@LQ3V64L9R2>
+References: <20250110223939.37490-1-gerhard@engleder-embedded.com>
+	<Z4VwrhhXU4uKqYGR@LQ3V64L9R2>
+	<91fc249e-c11a-47a1-aafe-fef833c3bafa@engleder-embedded.com>
+	<Z4WKHnDG9VSMe5OD@LQ3V64L9R2>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250110144828.4943-4-gerhard@engleder-embedded.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-> @@ -1030,6 +1030,33 @@ static int ksz9021_config_init(struct phy_device *phydev)
->  #define MII_KSZ9031RN_EDPD		0x23
->  #define MII_KSZ9031RN_EDPD_ENABLE	BIT(0)
->  
-> +static int ksz9031_set_loopback(struct phy_device *phydev, bool enable,
-> +				int speed)
-> +{
-> +	u16 ctl = BMCR_LOOPBACK;
-> +	int ret, val;
-> +
-> +	if (!enable)
-> +		return genphy_loopback(phydev, enable, 0);
-> +
-> +	if (speed == SPEED_10 || speed == SPEED_100 || speed == SPEED_1000)
-> +		phydev->speed = speed;
-> +	else if (speed)
-> +		return -EINVAL;
-> +	phydev->duplex = DUPLEX_FULL;
-> +
-> +	ctl |= mii_bmcr_encode_fixed(phydev->speed, phydev->duplex);
-> +
-> +	phy_modify(phydev, MII_BMCR, ~0, ctl);
-> +
-> +	ret = phy_read_poll_timeout(phydev, MII_BMSR, val, val & BMSR_LSTATUS,
-> +				    5000, 500000, true);
-> +	if (ret)
-> +		return ret;
-> +
-> +	return 0;
-> +}
+On Mon, 13 Jan 2025 13:48:14 -0800 Joe Damato wrote:
+> > > The changes generally look OK to me (it seems RTNL is held on all
+> > > paths where this code can be called from as far as I can tell), but
+> > > there was one thing that stood out to me.
+> > > 
+> > > AFAIU, drivers avoid marking XDP queues as NETDEV_QUEUE_TYPE_RX
+> > > or NETDEV_QUEUE_TYPE_TX. I could be wrong, but that was my
+> > > understanding and I submit patches to several drivers with this
+> > > assumption.
+> > > 
+> > > For example, in commit b65969856d4f ("igc: Link queues to NAPI
+> > > instances"), I unlinked/linked the NAPIs and queue IDs when XDP was
+> > > enabled/disabled. Likewise, in commit 64b62146ba9e ("net/mlx4: link
+> > > NAPI instances to queues and IRQs"), I avoided the XDP queues.
+> > > 
+> > > If drivers are to avoid marking XDP queues as NETDEV_QUEUE_TYPE_RX
+> > > or NETDEV_QUEUE_TYPE_TX, perhaps tsnep needs to be modified
+> > > similarly?  
+> > 
+> > With 5ef44b3cb4 ("xsk: Bring back busy polling support") the linking of
+> > the NAPIs is required for XDP/XSK. So it is strange to me if for XDP/XSK
+> > the NAPIs should be unlinked. But I'm not an expert, so maybe there is
+> > a reason why.
+> > 
+> > I added Magnus, maybe he knows if XSK queues shall still be linked to
+> > NAPIs.  
+> 
+> OK, so I think I was probably just wrong?
+> 
+> I looked at bnxt and it seems to mark XDP queues, which means
+> probably my patches for igc, ena, and mlx4 need to be fixed and the
+> proposed patch I have for virtio_net needs to be adjusted.
+> 
+> I can't remember now why I thought XDP queues should be avoided. I
+> feel like I read that or got that as feedback at some point, but I
+> can't remember now. Maybe it was just one driver or something I was
+> working on and I accidentally thought it should be avoided
+> everywhere? Not sure.
+> 
+> Hopefully some one can give a definitive answer on this one before I
+> go through and try to fix all the drivers I modified :|
 
-As far as i can see, the marvell PHY is the only other one you can
-specify the speed? I think it would be better if the marvell
-set_loopback and this one looked similar. Either clearing the loopback
-bit and configuring aneg should be here, or the marvell driver should
-be modified to use genphy_loopback to disable loopback.
+XDP and AF_XDP are different things. The XDP part of AF_XDP is to some
+extent for advertising purposes :) If memory serves me well:
 
-    Andrew
-
----
-pw-bot: cr
+XDP Tx -> these are additional queues automatically allocated for
+          in-kernel XDP, allocated when XDP is attached on Rx.
+          These should _not_ be listed in netlink queue, or NAPI;
+          IOW should not be linked to NAPI instances.
+XDP Rx -> is not a thing, XDP attaches to stack queues, there are no
+          dedicated XDP Rx queues
+AF_XDP -> AF_XDP "takes over" stack queues. It's a bit of a gray area.
+          I don't recall if we made a call on these being linked, but
+          they could probably be listed like devmem as a queue with
+          an extra attribute, not a completely separate queue type.
 
