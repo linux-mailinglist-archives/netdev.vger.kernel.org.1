@@ -1,150 +1,177 @@
-Return-Path: <netdev+bounces-157806-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157807-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6CF65A0BCE2
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 17:08:18 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E528FA0BCE3
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 17:08:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 408FF3A78C9
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 16:08:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F2523163497
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 16:08:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F20381C5D54;
-	Mon, 13 Jan 2025 16:08:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB90B1FBBE8;
+	Mon, 13 Jan 2025 16:08:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kFPw+A+u"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="thc/ses8"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C692B240222;
-	Mon, 13 Jan 2025 16:08:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0A4825760
+	for <netdev@vger.kernel.org>; Mon, 13 Jan 2025 16:08:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736784494; cv=none; b=TavPW/3TcqKewioHOeuX0Jo3ffA24u1qfjM6dybMecqfXZgOhxvEmIjmsRobrirri6FFdOYCCxS8dbl4WU1ltnmOE/xk33iaxn3hfX10UiFH5KwB0bmRuX+c8qKqTcdtvnrpiNr+CBXWY+vjEgLa7NgoFF0ok0bSypwmOyR0wUU=
+	t=1736784534; cv=none; b=VJtMYKk20irwuPDn8YH2IEOVETEDTy8AvTHR1SptmxV652mHdHZmL/Ejm5Asm2xFb4R2wElOClB0DgeWl9WCkdNFyqVca4L6wYb7lMYseGCF6iHqt81+6H4GPgURKTTMNk9a0/WqEPwcgWMairyxOJkKAzuvMHi+TgTCEl6DbpA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736784494; c=relaxed/simple;
-	bh=dgerstlTpopGh/q8qWlcYF6PwZJwD8pfm+3tMjFphkc=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=dEVUVhFkj7J+AuY2zOoJ6ZzA58TH7QP422Cg9HN6xmPMAkPClis1uC8bTgO/ZUgZj3Jeu1gFsnzEEBbpMNj1Qq8IxMd3NaW7rs/wmKDKXfArzb6YT6sBwF4cuhGy5TAO0/UiBCEsjrO/fALzvo7GR4u7MDfft+jAN8ABxuk0Xgk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kFPw+A+u; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 46556C4CED6;
-	Mon, 13 Jan 2025 16:08:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736784494;
-	bh=dgerstlTpopGh/q8qWlcYF6PwZJwD8pfm+3tMjFphkc=;
-	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
-	b=kFPw+A+uHIzKGjirxoXPYyClS1zzQB078/prUEqdE2keKVSlRWNMp8g8MODeVCCFs
-	 ONruqIPLz9fzHZHPVoGbWmHdI7R0sVd8ER1U8lAFl5LDo7hOp8IbjrzwkRtXwWXPuY
-	 53tBVD/qq6XzZUihTRJIWwvHRAZd3LdbwWmniwEe/uF1sHtUHhPDYHQlHtZkygupua
-	 ZfJyKs+XiOYxvtjLp8BKZJoW6CbbpNA9AtL5qGHt/BibY3r0FAevqA21PuORX4kN6d
-	 P73nF8+qGnnpNi3LQTdm30gC5wGP6zfg8G2qmXwS3cj9TYQyvGT+ow/DFFpk7k9zUF
-	 R8Gdm4KpofeLg==
-Message-ID: <22a1d42b-3015-47cf-b3d9-46d0ceb63ebc@kernel.org>
-Date: Mon, 13 Jan 2025 17:08:02 +0100
+	s=arc-20240116; t=1736784534; c=relaxed/simple;
+	bh=O923iFCRgHrd9/+yWUHb0K5kHroswxaz6CTJ9H7dM1w=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Rd1p3fTG6A3ZHeIXLuwm9+nAzRJTzG3cKD3WYtHfD3CPY6wzAeeD8smycS7tKfsytpkPs1vgaB3ZJsDWpHigI5D3BnN3XMtxcfTZhrguq+whp5xbLUh8qC0279hylgqmz4OeNV/J6PFQSf7qyY9EC7kNVhBd72RuxvUKqdT4M9g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=thc/ses8; arc=none smtp.client-ip=209.85.208.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-5d3bbb0f09dso8074684a12.2
+        for <netdev@vger.kernel.org>; Mon, 13 Jan 2025 08:08:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1736784531; x=1737389331; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=sSFbXPk7vYE+bxaCX2zLgvfp1hvdqNrA4z367H7Bxic=;
+        b=thc/ses8h7P2w5W5mzgPgJzrjJ8txeiZZx3H8r2IWoR9Mj+Da5v4i+zo9cWZTTigNO
+         +uCCjvoAA4rWgmULASADlCPaf0S4DTnZ/fEJzne+QJteMLJJCEFUgjGF91KQolM6CDEx
+         xhQL6Y231AMpzdG240ocmt9BPZNOUKI5Lr4UmE72UT2qp3669WoXNNzVl0LVHLF0amlF
+         nRsBtNdQMlHxoiFLTl97EHNdsn9/LSCLB98WHy3lGmbqfKKSqHUez2HPpWbuax6gNOxT
+         4wvbeYsuB8XeOJ2j7filLSWgEWehsyEVkbN4QzwmrJAqbBVBFh8gARavl8AJtZf4Bzkt
+         0zIA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736784531; x=1737389331;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=sSFbXPk7vYE+bxaCX2zLgvfp1hvdqNrA4z367H7Bxic=;
+        b=GvxHZFyew+Mo+Uvbmxcoc0py+oXZT9+6thQEa3KQc51rKE+NJYMpw9/DmrvL2Xh1LL
+         Fur34pGQp3z8H8WEgC5m6Bq1yNgBC35lkEf1Q4pg5bcVwkOrpuNQK9wXRZi/ezTAVuTj
+         xc01EPmM8aSO60rWAdv2dqJlNUcqbmN/4nox4AFw9HniMmvlwWy4AIZsik1ZRfPIBnrp
+         gUMcsiO78xypDdTP21CI04o3KcnR1EY6I3zb0KENinxVh6jOi0GmJvAg70RfqzZ0vHo4
+         ZobxKUJryFgdoTJkD8PUJIe6k16w9j9mLHFX/OOkwP7YcNoQHCQo9NjwFZWp3PBl/GYM
+         rxiw==
+X-Forwarded-Encrypted: i=1; AJvYcCVhxsReydCjYzY4zhT8LMOX+y8F6oLs9uStoaY+HQbrHfLN/Q2G5JTkJG7J51AurFUI3DPsf8o=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwmrUUFGfN/t+UAFQjfjsScI1rwmWZWWHt4qHfV/1OcUkVIyF9X
+	X4Qt5pvt20FGdabtCUpM86Tv9DHBjt28RUJMi0OUxYX9l5xxn6styzcl0OWIvpc1HVIv2ye6aLH
+	NJCGAp6FyM3kSihHDRSI9FmYZ6HIrB62aYisF
+X-Gm-Gg: ASbGncvm90Kh/kvFkNCXy7pPI6C+uHuAlM5jEHVrfl5QHP1y2F4kPiKN243eH6SJzV6
+	1R06ZNq5hvnqCPUBK567LvN0UoC8k9L6MeggpjQ==
+X-Google-Smtp-Source: AGHT+IE92IiIlxZe/vCbz1W3l+/D7/t7cX8hEkGueYRWyivh8yBVqVe2h8k0ttxlFNJrFQcUv3qqRiIoMO3DK6S/vZg=
+X-Received: by 2002:a05:6402:388d:b0:5d0:d91d:c195 with SMTP id
+ 4fb4d7f45d1cf-5d972e708dcmr20528956a12.32.1736784531154; Mon, 13 Jan 2025
+ 08:08:51 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [TEST] mptcp-connect
-From: Matthieu Baerts <matttbe@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Netdev <netdev@vger.kernel.org>, MPTCP Linux <mptcp@lists.linux.dev>
-References: <20250107131845.5e5de3c5@kernel.org>
- <1ac62b6e-ee3d-499a-8817-f7cdfd2f2db5@kernel.org>
-Content-Language: en-GB
-Autocrypt: addr=matttbe@kernel.org; keydata=
- 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
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-In-Reply-To: <1ac62b6e-ee3d-499a-8817-f7cdfd2f2db5@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20250109171850.2871194-1-edumazet@google.com> <Z4CxKV5AnfDPRfaF@pop-os.localdomain>
+ <CANn89iK7PzN6C4GXfwSasszdF1PyupR9xd7wsvoRiYrm0ARwtQ@mail.gmail.com>
+In-Reply-To: <CANn89iK7PzN6C4GXfwSasszdF1PyupR9xd7wsvoRiYrm0ARwtQ@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 13 Jan 2025 17:08:40 +0100
+X-Gm-Features: AbW1kvZ2pFcE30ZGSSKB-px7JqTxfSj88QNNkodvCsj-ulS3Xqfcn9vTNnjCEUQ
+Message-ID: <CANn89i+ioYk6_n1E5Y+vpsNR0Uxd5_foLpM9UCEQ_c05Sray7Q@mail.gmail.com>
+Subject: Re: [PATCH net-next] net: sched: calls synchronize_net() only when needed
+To: Cong Wang <xiyou.wangcong@gmail.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Jamal Hadi Salim <jhs@mojatatu.com>, Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Jakub,
+On Fri, Jan 10, 2025 at 6:49=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
+wrote:
+>
+> On Fri, Jan 10, 2025 at 6:33=E2=80=AFAM Cong Wang <xiyou.wangcong@gmail.c=
+om> wrote:
+> >
+> > On Thu, Jan 09, 2025 at 05:18:50PM +0000, Eric Dumazet wrote:
+> > > dev_deactivate_many() role is to remove the qdiscs
+> > > of a network device.
+> > >
+> > > When/if a qdisc is dismantled, an rcu grace period
+> > > is needed to make sure all outstanding qdisc enqueue
+> > > are done before we proceed with a qdisc reset.
+> > >
+> > > Most virtual devices do not have a qdisc (if we exclude
+> > > noqueue ones).
+> >
+> > Such as? To me, most virtual devices use noqueue:
+> >
+> > $ git grep IFF_NO_QUEUE -- drivers/net/
+> > drivers/net/amt.c:      dev->priv_flags         |=3D IFF_NO_QUEUE;
+> > drivers/net/bareudp.c:  dev->priv_flags |=3D IFF_NO_QUEUE;
+> > drivers/net/bonding/bond_main.c:        bond_dev->priv_flags |=3D IFF_B=
+ONDING | IFF_UNICAST_FLT | IFF_NO_QUEUE;
+> > drivers/net/caif/caif_serial.c: dev->priv_flags |=3D IFF_NO_QUEUE;
+> > drivers/net/dummy.c:    dev->priv_flags |=3D IFF_LIVE_ADDR_CHANGE | IFF=
+_NO_QUEUE;
+> > drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c:        dev->priv_flags=
+ |=3D IFF_NO_QUEUE;
+> > drivers/net/ethernet/netronome/nfp/nfp_net_repr.c:      netdev->priv_fl=
+ags |=3D IFF_NO_QUEUE | IFF_DISABLE_NETPOLL;
+> > drivers/net/geneve.c:   dev->priv_flags |=3D IFF_LIVE_ADDR_CHANGE | IFF=
+_NO_QUEUE;
+> > drivers/net/gtp.c:      dev->priv_flags |=3D IFF_NO_QUEUE;
+> > drivers/net/ipvlan/ipvlan_main.c:       dev->priv_flags |=3D IFF_UNICAS=
+T_FLT | IFF_NO_QUEUE;
+> > drivers/net/ipvlan/ipvtap.c:    dev->priv_flags &=3D ~IFF_NO_QUEUE;
+> > drivers/net/loopback.c: dev->priv_flags         |=3D IFF_LIVE_ADDR_CHAN=
+GE | IFF_NO_QUEUE;
+> > drivers/net/macsec.c:   dev->priv_flags |=3D IFF_NO_QUEUE;
+> > drivers/net/macvlan.c:  dev->priv_flags |=3D IFF_NO_QUEUE;
+> > drivers/net/net_failover.c:     failover_dev->priv_flags |=3D IFF_UNICA=
+ST_FLT | IFF_NO_QUEUE;
+> > drivers/net/netdevsim/netdev.c:                    IFF_NO_QUEUE;
+> > drivers/net/netkit.c:   dev->priv_flags |=3D IFF_NO_QUEUE;
+> > drivers/net/nlmon.c:    dev->priv_flags |=3D IFF_NO_QUEUE;
+> > drivers/net/pfcp.c:     dev->priv_flags |=3D IFF_NO_QUEUE;
+> > drivers/net/team/team_core.c:   dev->priv_flags |=3D IFF_NO_QUEUE;
+> > drivers/net/veth.c:     dev->priv_flags |=3D IFF_NO_QUEUE;
+> > drivers/net/vrf.c:      dev->priv_flags |=3D IFF_NO_QUEUE;
+> > drivers/net/vsockmon.c: dev->priv_flags |=3D IFF_NO_QUEUE;
+> > drivers/net/vxlan/vxlan_core.c: dev->priv_flags |=3D IFF_NO_QUEUE;
+> > drivers/net/wan/hdlc_fr.c:      dev->priv_flags |=3D IFF_NO_QUEUE;
+> > drivers/net/wireguard/device.c: dev->priv_flags |=3D IFF_NO_QUEUE;
+> > drivers/net/wireless/virtual/mac80211_hwsim.c:  dev->priv_flags |=3D IF=
+F_NO_QUEUE;
+> >
+> >
+> > And noqueue_qdisc_ops sets ->enqueue to noop_enqueue():
+> >
+> > struct Qdisc_ops noqueue_qdisc_ops __read_mostly =3D {
+> >         .id             =3D       "noqueue",
+> >         .priv_size      =3D       0,
+> >         .init           =3D       noqueue_init,
+> >         .enqueue        =3D       noop_enqueue,
+> >         .dequeue        =3D       noop_dequeue,
+> >         .peek           =3D       noop_dequeue,
+> >         .owner          =3D       THIS_MODULE,
+> > };
+>
+> Sure, but please a look at :
+>
+> static int noqueue_init(struct Qdisc *qdisc, struct nlattr *opt,
+> struct netlink_ext_ack *extack)
+> {
+>         /* register_qdisc() assigns a default of noop_enqueue if unset,
+>         * but __dev_queue_xmit() treats noqueue only as such
+>         * if this is NULL - so clear it here. */
+>         qdisc->enqueue =3D NULL;
+>         return 0;
+> }
 
-On 08/01/2025 11:07, Matthieu Baerts wrote:
-> Hi Jakub,
-> 
-> (+cc MPTCP list)
-> 
-> On 07/01/2025 22:18, Jakub Kicinski wrote:
->> Unfortunately mptcp_connect.sh has started flaking again :(
->> Looks like it started around Dec 30th, so one of the recent PRs
-> 
-> Thank you for the heads-up!
-> 
-> After the last PR, I was focussing on monitoring simult_flows.sh -- the
-> recent behaviour changes could have affected it -- and forgot to look at
-> the others, sorry about that...
-> 
-> It looks like our CI doesn't have this issue, but the builds are less
-> frequent [1]. I'm going to investigate that ASAP.
+How can we proceed on this patch ?
 
-It was not easy to reproduce it, but Paolo managed to find a fix for it [1]!
-
-Out of curiosity, is the netdev CI not too overloaded? To reproduce this
-issue on my side, the host had to be quite busy: not dying with
-stress-ng using all resources, but still competing with many other
-processes, e.g. a kernel compilation running in parallel. I'm not
-complaining here, because this situation helped finding this important
-issue, but just curious about what to expect, especially for more
-"sensitive" tests :)
-
-On the MPTCP CI, some unessarry KConfig are disabled and ccache is used
-to reduce the build time. Also, RETPOLINE is disabled (+ vng --append
-mitigations=off) to save some CPU cycles during the tests.
-
-[1]
-https://lore.kernel.org/netdev/20250113-net-mptcp-connect-st-flakes-v1-0-0d986ee7b1b6@kernel.org/T/
-
-Cheers,
-Matt
--- 
-Sponsored by the NGI0 Core fund.
-
+I can remove the "(if we exclude noqueue ones)" part if this is confusing.
 
