@@ -1,86 +1,150 @@
-Return-Path: <netdev+bounces-157805-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157806-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DFF42A0BCC8
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 17:01:18 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6CF65A0BCE2
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 17:08:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9F709166BD7
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 16:01:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 408FF3A78C9
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 16:08:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 202C41FBBCE;
-	Mon, 13 Jan 2025 16:01:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F20381C5D54;
+	Mon, 13 Jan 2025 16:08:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l6UNLdeY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kFPw+A+u"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEC5314A0A3
-	for <netdev@vger.kernel.org>; Mon, 13 Jan 2025 16:01:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C692B240222;
+	Mon, 13 Jan 2025 16:08:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736784068; cv=none; b=qd731ITBo59pY7vBK5ELSg9MrrMIfsRRAX1kpT571hOPDV9R3ZJ1IV2pSQqCMDW7zbAv77fe/xxzDcPCwwFIPnQbia1Na03dnMepmav5CCiKyInR/lT391g/23L++rnAMB7vpRVUsFHfQuj7qoo/HduJ9xq6Vl3G8WFKpIPVhvc=
+	t=1736784494; cv=none; b=TavPW/3TcqKewioHOeuX0Jo3ffA24u1qfjM6dybMecqfXZgOhxvEmIjmsRobrirri6FFdOYCCxS8dbl4WU1ltnmOE/xk33iaxn3hfX10UiFH5KwB0bmRuX+c8qKqTcdtvnrpiNr+CBXWY+vjEgLa7NgoFF0ok0bSypwmOyR0wUU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736784068; c=relaxed/simple;
-	bh=WQ7M7LXL7bpX6VtWtK+NmePRtg5JA7Lifi4147tgL88=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=M0zZ1635KsFJhjZvloL6uiuzM01q9vfMEg1KTR+5RhkecjvIwTY/Xb9r6hmtjhm5Y50AGCful9KN0xV/6ZTsGR3wXt8E65/IVq17oGnjgFiURZbSjAsymDniKgOjHF2sVFzYFHurxrgrweLSg2nL1FyUzCNoSaMk9UeBT5vJjIo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l6UNLdeY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 53E89C4CED6;
-	Mon, 13 Jan 2025 16:01:07 +0000 (UTC)
+	s=arc-20240116; t=1736784494; c=relaxed/simple;
+	bh=dgerstlTpopGh/q8qWlcYF6PwZJwD8pfm+3tMjFphkc=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=dEVUVhFkj7J+AuY2zOoJ6ZzA58TH7QP422Cg9HN6xmPMAkPClis1uC8bTgO/ZUgZj3Jeu1gFsnzEEBbpMNj1Qq8IxMd3NaW7rs/wmKDKXfArzb6YT6sBwF4cuhGy5TAO0/UiBCEsjrO/fALzvo7GR4u7MDfft+jAN8ABxuk0Xgk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kFPw+A+u; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 46556C4CED6;
+	Mon, 13 Jan 2025 16:08:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736784067;
-	bh=WQ7M7LXL7bpX6VtWtK+NmePRtg5JA7Lifi4147tgL88=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:From;
-	b=l6UNLdeYnt6DGRG+7E6QvOHvzcFRJzr4BtH4QA+npqvcMDpCLxpVibZmHeRCGkkW+
-	 4w92N1r2zIkFt+oUT+ePc2zGFi+mZkdEwte5AIfw8wViFZkn/htfLT2qfWTKVYYt+3
-	 qDh6JMWssIQdDwmtMQL1gO79STFw1C7uhm2S4Ekczqz+n1nVkdkExxafU6IL7cXzRB
-	 +E21IqyXISYdwK9TG1yV1iDvCgIAlk+1y5WOkHp20/8ekVlYlR3rMFuNUwAYL7STZP
-	 +J9eTBWqDke3uE4nHVFUnh5xhlJFEmHFZGqX0u19N+CfKO9/2dHGwPsETRUKjNXw5I
-	 w3t+FTEbBMY9w==
-Date: Mon, 13 Jan 2025 10:01:05 -0600
-From: Bjorn Helgaas <helgaas@kernel.org>
-To: Michael Chan <michael.chan@broadcom.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, andrew+netdev@lunn.ch,
-	pavan.chebbi@broadcom.com, andrew.gospodarek@broadcom.com,
-	somnath.kotur@broadcom.com,
-	Ajit Khaparde <ajit.khaparde@broadcom.com>,
-	David Wei <dw@davidwei.uk>
-Subject: Re: [PATCH net-next 09/10] bnxt_en: Extend queue stop/start for Tx
- rings
-Message-ID: <20250113160105.GA404075@bhelgaas>
+	s=k20201202; t=1736784494;
+	bh=dgerstlTpopGh/q8qWlcYF6PwZJwD8pfm+3tMjFphkc=;
+	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
+	b=kFPw+A+uHIzKGjirxoXPYyClS1zzQB078/prUEqdE2keKVSlRWNMp8g8MODeVCCFs
+	 ONruqIPLz9fzHZHPVoGbWmHdI7R0sVd8ER1U8lAFl5LDo7hOp8IbjrzwkRtXwWXPuY
+	 53tBVD/qq6XzZUihTRJIWwvHRAZd3LdbwWmniwEe/uF1sHtUHhPDYHQlHtZkygupua
+	 ZfJyKs+XiOYxvtjLp8BKZJoW6CbbpNA9AtL5qGHt/BibY3r0FAevqA21PuORX4kN6d
+	 P73nF8+qGnnpNi3LQTdm30gC5wGP6zfg8G2qmXwS3cj9TYQyvGT+ow/DFFpk7k9zUF
+	 R8Gdm4KpofeLg==
+Message-ID: <22a1d42b-3015-47cf-b3d9-46d0ceb63ebc@kernel.org>
+Date: Mon, 13 Jan 2025 17:08:02 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250113063927.4017173-10-michael.chan@broadcom.com>
+User-Agent: Mozilla Thunderbird Beta
+Subject: Re: [TEST] mptcp-connect
+From: Matthieu Baerts <matttbe@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Netdev <netdev@vger.kernel.org>, MPTCP Linux <mptcp@lists.linux.dev>
+References: <20250107131845.5e5de3c5@kernel.org>
+ <1ac62b6e-ee3d-499a-8817-f7cdfd2f2db5@kernel.org>
+Content-Language: en-GB
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ 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
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <1ac62b6e-ee3d-499a-8817-f7cdfd2f2db5@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Sun, Jan 12, 2025 at 10:39:26PM -0800, Michael Chan wrote:
-> From: Somnath Kotur <somnath.kotur@broadcom.com>
+Hi Jakub,
+
+On 08/01/2025 11:07, Matthieu Baerts wrote:
+> Hi Jakub,
 > 
-> In order to use queue_stop/queue_start to support the new Steering
-> Tags, we need to free the TX ring and TX completion ring if it is a
-> combined channel with TX/RX sharing the same NAPI.  Otherwise
-> TX completions will not have the updated Steering Tag.  With that
-> we can now add napi_disable() and napi_enable() during queue_stop()/
-> queue_start().  This will guarantee that NAPI will stop processing
-> the completion entries in case there are additional pending entries
-> in the completion rings after queue_stop().
+> (+cc MPTCP list)
 > 
-> There could be some NQEs sitting unprocessed while NAPI is disabled
-> thereby leaving the NQ unarmed.  Explictily Re-arm the NQ after
-> napi_enable() in queue start so that NAPI will resume properly.
+> On 07/01/2025 22:18, Jakub Kicinski wrote:
+>> Unfortunately mptcp_connect.sh has started flaking again :(
+>> Looks like it started around Dec 30th, so one of the recent PRs
+> 
+> Thank you for the heads-up!
+> 
+> After the last PR, I was focussing on monitoring simult_flows.sh -- the
+> recent behaviour changes could have affected it -- and forgot to look at
+> the others, sorry about that...
+> 
+> It looks like our CI doesn't have this issue, but the builds are less
+> frequent [1]. I'm going to investigate that ASAP.
 
-s/Explictily Re-arm/Explicitly re-arm/ (typo + capitalization)
+It was not easy to reproduce it, but Paolo managed to find a fix for it [1]!
 
-There's a mix of "TX/RX" vs "Tx/Rx" styles in the subjects and commit
-logs of this series.
+Out of curiosity, is the netdev CI not too overloaded? To reproduce this
+issue on my side, the host had to be quite busy: not dying with
+stress-ng using all resources, but still competing with many other
+processes, e.g. a kernel compilation running in parallel. I'm not
+complaining here, because this situation helped finding this important
+issue, but just curious about what to expect, especially for more
+"sensitive" tests :)
+
+On the MPTCP CI, some unessarry KConfig are disabled and ccache is used
+to reduce the build time. Also, RETPOLINE is disabled (+ vng --append
+mitigations=off) to save some CPU cycles during the tests.
+
+[1]
+https://lore.kernel.org/netdev/20250113-net-mptcp-connect-st-flakes-v1-0-0d986ee7b1b6@kernel.org/T/
+
+Cheers,
+Matt
+-- 
+Sponsored by the NGI0 Core fund.
+
 
