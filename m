@@ -1,195 +1,189 @@
-Return-Path: <netdev+bounces-157788-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157789-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3DFE8A0BB9A
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 16:19:57 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97B43A0BBA0
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 16:20:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A9E191882ACE
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 15:17:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 175C7188024D
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 15:19:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2A1F1C5D4A;
-	Mon, 13 Jan 2025 15:17:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B293D24023C;
+	Mon, 13 Jan 2025 15:19:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="rD84PlDU"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bCKGVgIx"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-176.mta0.migadu.com (out-176.mta0.migadu.com [91.218.175.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f182.google.com (mail-il1-f182.google.com [209.85.166.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5C0924025E;
-	Mon, 13 Jan 2025 15:17:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 119AA240224
+	for <netdev@vger.kernel.org>; Mon, 13 Jan 2025 15:19:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736781453; cv=none; b=evmo1H+OrAhZdI81eOcBHdoJJdaSTmXgEbvto2UsG8el1DBLHp4qE/3hVKyZ1K3HCoWjhM6J8aIvk5ztChZUcxKsMDXLrymPdnspTpeqI/yRaLwaomGacHanh9O1x3bqEb8t6UWNE76wtrp5RLK1O8lrxD0Q19NQow3bBBCVmv0=
+	t=1736781555; cv=none; b=bH9m1D2NgN7MTgYFJVV1oFvp5SAEVspKXmol7fkld6bWelwYj70g2gjEWuAO9RaGjtidYdZPZguo4XamHm/s8+aexX1+tfiqNEpVP1V+repTTJn8sHPgANQ2jkEaHfqXXCCPjY8tQ0BTWbx66HXvP9AfDwaBVQlNjTtDAJDILWo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736781453; c=relaxed/simple;
-	bh=mv1aFzCM6p1GcIXtSyVgeJbq6qiLQQKQdKw5UyFxxNE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=lkV+BzUyFD7rHJWe22sRL8a/tD+Cgar2NAHcUGQmEiz9dzoFJE0bTQn/shVcPtYAII0LebeRG7r0+Y87ie/MgqhIpn7V625x99BBIvBqKXgo+4mBHhr3nfDfspQJTxoYyP2h6WwJ4ik8+S9XELrImUumT73NWPsnkUyWNIEI3ro=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=rD84PlDU; arc=none smtp.client-ip=91.218.175.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <8d6303f1-37f1-4298-b377-d2bd55ac01de@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1736781445;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=LKOrjtOEkYBN2Y2LO0sJXjsSTOuS88NhX+jEyFyuLf4=;
-	b=rD84PlDUF7tV0r+jkJkCgDrEoNeOaEMHi608IRg8N81+ci74WGf0OKgNh24HHbN4Sph+1N
-	hTfzeEEUvRJ2ZB9UaseGrbhcdEB3h93gQu/S18Ld/hslY7OehFIPg/wryHw4BsEigAc9qe
-	ZeqMUjaMTnzYv4+6LVyWmvq2bvDky64=
-Date: Mon, 13 Jan 2025 23:16:31 +0800
+	s=arc-20240116; t=1736781555; c=relaxed/simple;
+	bh=d3N9DCLGRvuIuT1enKfcCum1GV0sfPJFJ62i0hf/rz0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=GA7tHZV48ahXLOZj+9V/1m/L5zDQ6MIFyW+8oyfvufouhPgsKjVAGsXcBuBKTMvxbiyoyoZz8DVafc1YoAypLfVpI8INgyFkkKFAFo3Wv5233NDmsuRykOyTZFf1kH8xq8hzqY851yOm9TTGO13p+4yYXTJP36ShQHejJTO5ySg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bCKGVgIx; arc=none smtp.client-ip=209.85.166.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f182.google.com with SMTP id e9e14a558f8ab-3ce4b009465so16540835ab.0
+        for <netdev@vger.kernel.org>; Mon, 13 Jan 2025 07:19:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1736781553; x=1737386353; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QwXLgSNPXup/7eo0cZ1oQzwJKpL3dcZz0IHNeR1MukY=;
+        b=bCKGVgIx+53S6VTKHC5e9AAeOAKbsXzpmNnJvNhY2GXBbg4+3bKSegx/9n0qyDTPdg
+         nB09+2DKvfIZ5Yqmev09J2sEataNoX0gVkewoxNgGho7ivF1ceelyA4OseM0vm8qz8/Y
+         LpmtJUqYS0iHKlXRyH52O9YHqr7egyOdhcT1uKq8aMPj/8DJrFta4023HWh0bs044iIo
+         XI0TtRELFa7nCgBRM50sd7ZgSdtqRlBcOWC0ze5KuCCHMvSZ9gzD3L5wlKMxchQGZt5p
+         LfbVh0kdQlRMrCicmJeBWkCBOFM7PmmgAnuEH61ttJFqxfO3JkmncXsRqSgLayZxkLX6
+         xKRQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736781553; x=1737386353;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=QwXLgSNPXup/7eo0cZ1oQzwJKpL3dcZz0IHNeR1MukY=;
+        b=lga8a0NgIdY1WDJgOzDPRHyXu2IcSUsiWmtcB+gDNFpJGJtgT0Fg3sYByLJvSIhQnh
+         iARklTPJrMMZgS7fYCiDf4JZQZcYNzzuIuGc1MSR/bOwZdP8k7BvseIdmM84rke/JLgh
+         LjDV8wNarv5cjeLAKk1fwvBeM2vf7n4y5/2IfDnAS39lNAc5D1YVj+8BkydU3/5RfchX
+         L7LIP0hd2Zr59qudRwRYKJ/SAmRt/E4EJIvh3B6F+7decyZgF2O8sLAg/0WhL+2bZwJ0
+         ViIsbPa7/MdoXnFaaN2ish4PdoPgLAaUDhVSlzAPaEcIs1mKJhV7JZmGD+1tCL+eIxlx
+         FBjw==
+X-Forwarded-Encrypted: i=1; AJvYcCWTY4nrcFEQU2BhWUOjc7pd8/NkAOekVl1vPK3b2ednnXsMRGmbIiwIlLX+LW4a8Mh6XbxP2TE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw5M9bfk/HnyFC33HCw26C+k3NThSYxG5bTS45bf7gvxwpw6/RI
+	FB/Ac5LQ9MSaMX5NKAuM5b8OX/YMBRtueOXrBjrcuhV4bHU14A77iSqa/5wDgdlL2GeWZ38+kx0
+	zIVw/XgVS0vQdymY7KOjaGzYNpVfoRcN7
+X-Gm-Gg: ASbGncvfIHfNkTheO+e+zZVpcJEycpLH2fH5TWZlyPEvGOxmw4bMUuA3Dgwt10uqlqT
+	IPbjqE2hFJdewDCzyZ+Tz15pPpp9mQwi8jThRCg==
+X-Google-Smtp-Source: AGHT+IHReHn8upgTC8nonYxi5eJw6RZigfqwF4/ryJ2D8WL4NKosg6ugw+sylH+blzjtfFBHrRovhFWgUUOZLkqOW38=
+X-Received: by 2002:a05:6e02:509:b0:3ce:46e2:429b with SMTP id
+ e9e14a558f8ab-3ce46e24583mr90079825ab.10.1736781552910; Mon, 13 Jan 2025
+ 07:19:12 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next v1 1/3] net: stmmac: Switch to zero-copy in
- non-XDP RX path
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: Furong Xu <0x1207@gmail.com>, netdev@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>, xfr@outlook.com
-References: <cover.1736500685.git.0x1207@gmail.com>
- <600c76e88b6510f6a4635401ec1e224b3bbb76ec.1736500685.git.0x1207@gmail.com>
- <f1062d1c-f39d-4c9e-9b50-f6ae0bcf27d5@linux.dev>
- <054ae4bf-37a8-4e4e-8631-dedded8f30f1@intel.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Yanteng Si <si.yanteng@linux.dev>
-In-Reply-To: <054ae4bf-37a8-4e4e-8631-dedded8f30f1@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+References: <b9e81aa97ab8ca62e979b7d55c2ee398790b935b.1736176112.git.lucien.xin@gmail.com>
+ <48e9bf0a-3275-4d2c-84ae-9bc1163ab8cb@fiberby.net>
+In-Reply-To: <48e9bf0a-3275-4d2c-84ae-9bc1163ab8cb@fiberby.net>
+From: Xin Long <lucien.xin@gmail.com>
+Date: Mon, 13 Jan 2025 10:19:01 -0500
+X-Gm-Features: AbW1kvZ0D8TqIsXl_pY05_hbyEnI4M0FLFmUOARhx5GnHQ67Nr6HxT7kgbPuGco
+Message-ID: <CADvbK_cBD_JW5_x0HWY7f4uM7cgyfCvzBSyu_EL=XX7m7VJwhw@mail.gmail.com>
+Subject: Re: [PATCH net] net: sched: refine software bypass handling in tc_run
+To: =?UTF-8?B?QXNiasO4cm4gU2xvdGggVMO4bm5lc2Vu?= <ast@fiberby.net>
+Cc: davem@davemloft.net, kuba@kernel.org, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Jamal Hadi Salim <jhs@mojatatu.com>, 
+	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, 
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, Shuang Li <shuali@redhat.com>, 
+	network dev <netdev@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Fri, Jan 10, 2025 at 8:25=E2=80=AFAM Asbj=C3=B8rn Sloth T=C3=B8nnesen <a=
+st@fiberby.net> wrote:
+>
+> Sorry for the late response, it has been a busy first week back, too many
+> operational issues with devices in our network running crappy vendor imag=
+es.
+>
+> On 1/6/25 3:08 PM, Xin Long wrote:
+> > This patch addresses issues with filter counting in block (tcf_block),
+> > particularly for software bypass scenarios, by introducing a more
+> > accurate mechanism using useswcnt.
+> >
+> > Previously, filtercnt and skipswcnt were introduced by:
+> >
+> >    Commit 2081fd3445fe ("net: sched: cls_api: add filter counter") and
+> >    Commit f631ef39d819 ("net: sched: cls_api: add skip_sw counter")
+> >
+> >    filtercnt tracked all tp (tcf_proto) objects added to a block, and
+> >    skipswcnt counted tp objects with the skipsw attribute set.
+> >
+> > The problem is: a single tp can contain multiple filters, some with ski=
+psw
+> > and others without. The current implementation fails in the case:
+> >
+> >    When the first filter in a tp has skipsw, both skipswcnt and filterc=
+nt
+> >    are incremented, then adding a second filter without skipsw to the s=
+ame
+> >    tp does not modify these counters because tp->counted is already set=
+.
+> >
+> >    This results in bypass software behavior based solely on skipswcnt
+> >    equaling filtercnt, even when the block includes filters without
+> >    skipsw. Consequently, filters without skipsw are inadvertently bypas=
+sed.
+>
+> Thank you for tracking it down. I wasn't aware that a tp, could be used b=
+y multiple
+> filters, and didn't encounter it during my testing.
+>
+> > To address this, the patch introduces useswcnt in block to explicitly c=
+ount
+> > tp objects containing at least one filter without skipsw. Key changes
+> > include:
+> >
+> >    Whenever a filter without skipsw is added, its tp is marked with use=
+sw
+> >    and counted in useswcnt. tc_run() now uses useswcnt to determine sof=
+tware
+> >    bypass, eliminating reliance on filtercnt and skipswcnt.
+> >
+> >    This refined approach prevents software bypass for blocks containing
+> >    mixed filters, ensuring correct behavior in tc_run().
+> >
+> > Additionally, as atomic operations on useswcnt ensure thread safety and
+> > tp->lock guards access to tp->usesw and tp->counted, the broader lock
+> > down_write(&block->cb_lock) is no longer required in tc_new_tfilter(),
+> > and this resolves a performance regression caused by the filter countin=
+g
+> > mechanism during parallel filter insertions.
+>
+> You are trying to do two things:
+> A) Fix functional defect when filters share a single tp
+> B) Improve filter updates performance
+>
+> If you do part A in a minimalistic way, then IMHO it might be suitable
+> for net (+ stable), but for part B I agree with Paolo, that it would
+> properly be better suited for net-next.
+>
+> I focused my testing on routing performance, not filter update performanc=
+e,
+> I also didn't test it in any multi-CPU setups (as I don't have any).
+>
+> The static key was added to mitigate concerns, about the impact that the
+> bypass check would have for non-offloaded workloads in multi-CPU systems.
+>
+> https://lore.kernel.org/netdev/28bf1467-b7ce-4e36-a4ef-5445f65edd97@fiber=
+by.net/
+> https://lore.kernel.org/netdev/CAM0EoMngVoBcbX7cqTdbW8dG1v_ysc1SZK+4y-9j-=
+5Tbq6gaYw@mail.gmail.com/
+Hi, Asbj=C3=B8rn, thanks for the comment.
 
-在 1/13/25 20:03, Alexander Lobakin 写道:
-> From: Yanteng Si <si.yanteng@linux.dev>
-> Date: Mon, 13 Jan 2025 17:41:41 +0800
->
->> 在 2025/1/10 17:53, Furong Xu 写道:
->>> Avoid memcpy in non-XDP RX path by marking all allocated SKBs to
->>> be recycled in the upper network stack.
->>>
->>> This patch brings ~11.5% driver performance improvement in a TCP RX
->>> throughput test with iPerf tool on a single isolated Cortex-A65 CPU
->>> core, from 2.18 Gbits/sec increased to 2.43 Gbits/sec.
->>>
->>> Signed-off-by: Furong Xu <0x1207@gmail.com>
->>> ---
->>>    drivers/net/ethernet/stmicro/stmmac/stmmac.h  |  1 +
->>>    .../net/ethernet/stmicro/stmmac/stmmac_main.c | 23 +++++++++++--------
->>>    2 files changed, 15 insertions(+), 9 deletions(-)
->>>
->>> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac.h b/drivers/
->>> net/ethernet/stmicro/stmmac/stmmac.h
->>> index 548b28fed9b6..5c39292313de 100644
->>> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac.h
->>> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
->>> @@ -126,6 +126,7 @@ struct stmmac_rx_queue {
->>>        unsigned int cur_rx;
->>>        unsigned int dirty_rx;
->>>        unsigned int buf_alloc_num;
->>> +    unsigned int napi_skb_frag_size;
->>>        dma_addr_t dma_rx_phy;
->>>        u32 rx_tail_addr;
->>>        unsigned int state_saved;
->>> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/
->>> drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
->>> index 038df1b2bb58..43125a6f8f6b 100644
->>> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
->>> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
->>> @@ -1320,7 +1320,7 @@ static unsigned int stmmac_rx_offset(struct
->>> stmmac_priv *priv)
->>>        if (stmmac_xdp_is_enabled(priv))
->>>            return XDP_PACKET_HEADROOM;
->>>    -    return 0;
->>> +    return NET_SKB_PAD;
->>>    }
->>>      static int stmmac_set_bfsize(int mtu, int bufsize)
->>> @@ -2019,17 +2019,21 @@ static int
->>> __alloc_dma_rx_desc_resources(struct stmmac_priv *priv,
->>>        struct stmmac_channel *ch = &priv->channel[queue];
->>>        bool xdp_prog = stmmac_xdp_is_enabled(priv);
->>>        struct page_pool_params pp_params = { 0 };
->>> -    unsigned int num_pages;
->>> +    unsigned int dma_buf_sz_pad, num_pages;
->>>        unsigned int napi_id;
->>>        int ret;
->>>    +    dma_buf_sz_pad = stmmac_rx_offset(priv) + dma_conf->dma_buf_sz +
->>> +             SKB_DATA_ALIGN(sizeof(struct skb_shared_info));
->>> +    num_pages = DIV_ROUND_UP(dma_buf_sz_pad, PAGE_SIZE);
->>> +
->>>        rx_q->queue_index = queue;
->>>        rx_q->priv_data = priv;
->>> +    rx_q->napi_skb_frag_size = num_pages * PAGE_SIZE;
->>>          pp_params.flags = PP_FLAG_DMA_MAP | PP_FLAG_DMA_SYNC_DEV;
->>>        pp_params.pool_size = dma_conf->dma_rx_size;
->>> -    num_pages = DIV_ROUND_UP(dma_conf->dma_buf_sz, PAGE_SIZE);
->>> -    pp_params.order = ilog2(num_pages);
->>> +    pp_params.order = order_base_2(num_pages);
->>>        pp_params.nid = dev_to_node(priv->device);
->>>        pp_params.dev = priv->device;
->>>        pp_params.dma_dir = xdp_prog ? DMA_BIDIRECTIONAL : DMA_FROM_DEVICE;
->>> @@ -5574,19 +5578,20 @@ static int stmmac_rx(struct stmmac_priv *priv,
->>> int limit, u32 queue)
->>>                /* XDP program may expand or reduce tail */
->>>                buf1_len = ctx.xdp.data_end - ctx.xdp.data;
->>>    -            skb = napi_alloc_skb(&ch->rx_napi, buf1_len);
->>> +            skb = napi_build_skb(page_address(buf->page),
->>> +                         rx_q->napi_skb_frag_size);
->>>                if (!skb) {
->>> +                page_pool_recycle_direct(rx_q->page_pool,
->>> +                             buf->page);
->>>                    rx_dropped++;
->>>                    count++;
->>>                    goto drain_data;
->>>                }
->>>                  /* XDP program may adjust header */
->>> -            skb_copy_to_linear_data(skb, ctx.xdp.data, buf1_len);
->>> +            skb_reserve(skb, ctx.xdp.data - ctx.xdp.data_hard_start);
->> The network subsystem still requires that the length
->> of each line of code should not exceed 80 characters.
->> So let's silence the warning:
->>
->> WARNING: line length of 81 exceeds 80 columns
->> #87: FILE: drivers/net/ethernet/stmicro/stmmac/stmmac_main.c:5592:
->> +            skb_reserve(skb, ctx.xdp.data - ctx.xdp.data_hard_start);
-> I agree that &ctx.xdp could be made an onstack pointer to shorten these
-> lines, but please don't spam with the checkpatch output.
->
-> 1. It's author's responsibility to read netdev CI output on Patchwork,
->     reviewers shouldn't copy its logs.
-Sorry, I shouldn't have made noise on the mailing list.
-> 2. The only alternative without making a shortcut for &ctx.xdp is
->
-> 			skb_reserve(skb,
-> 				    ctx.xdp.data - ctx.xdp.data_hard_start);
->
-> This looks really ugly and does more harm than good.
-Agree!
->
-> If you really want to help, pls come with good propositions how to avoid
-> such warnings in an elegant way.
+I will keep the static key, and not touch the code in tc_run() in
+net/core/dev.c, and we can make it without holding the block->cb_lock
+by atomic_inc/dec_return():
 
-Simple. Just do as with buf1_len.
+        if (atomic_inc_return(&block->useswcnt) =3D=3D 1)
+                static_branch_inc(&tcf_bypass_check_needed_key);
 
-Thanks,
+        if (!atomic_dec_return(&tp->chain->block->useswcnt))
+                static_branch_dec(&tcf_bypass_check_needed_key);
 
-Yanteng
+It doesn't look good to split this patch into two, I will post v2 on
+net.git with these changes.
 
->
->> Thanks,
->> Yanteng
-> Thanks,
-> Olek
+Let me know if there are any other concerns.
 
