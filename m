@@ -1,131 +1,154 @@
-Return-Path: <netdev+bounces-157700-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157704-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 27C87A0B429
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 11:10:12 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 584B6A0B440
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 11:13:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4020A161C4D
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 10:10:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 67CE118888C8
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 10:13:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97A7121ADA4;
-	Mon, 13 Jan 2025 10:09:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1180A2045B8;
+	Mon, 13 Jan 2025 10:13:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="ja5p8TTx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B49D72045A3;
-	Mon, 13 Jan 2025 10:09:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34BE8235C07;
+	Mon, 13 Jan 2025 10:13:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736762998; cv=none; b=ZMooa7aJIBSem04hdrZhxM9H5lvdQvRnmbcz82I7QgAaZSvXTJt7q+prImkdlmFi5qg339//GPbN8/W3rn70qeqmSo8l4M52BnxyrM5KuoDUrphp1km/kisqNAdNR4aocXC/eYTTPcwd8yAIIvTJobStao1FRl+rFaNS8ghkeTY=
+	t=1736763208; cv=none; b=GS+qstBP/T2w2GuwF25eVQuXmLyGGj5IqI5p1SjrxJ/hRTvQoPOm+wSOzDiam+CPOzrzEvae8brlq32OoWgWeXYbKMbmr9GniP4H4hAa+p/NNmF1VAreOz9j88qlohGsxmIaX1fc2IwesznwHakFSDSbxM0VwDkgj1fhafFoXXI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736762998; c=relaxed/simple;
-	bh=argc1vQqGDFEyiqXT3Vw5Py4XgDHTBchhf8XHbvpeLs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mv7BswzZrxDHRhq8VEt0cinzvualsaZQK3+t5XTecLtrTWqpHPrkNEoK6OZyUmy7VjNeIpipw1cOsK4IYITktHlou1SWqX0kBRtILnnn4ujmrD068UQ5jXqZGYYhZCPaXIPDcY685YNbee9wIMPD9PeHvvIhQMqVl59EU5uGW48=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-5d3e8f64d5dso7946775a12.3;
-        Mon, 13 Jan 2025 02:09:56 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736762995; x=1737367795;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=v325B9y3nJnj/l5Wu+V3MROqhu0jcsoi8BysPUS2rbU=;
-        b=Q9wxHX5pK83XC/yhzUtIUTJ34Cp6sf0PlDN51OUDsHbCoxTCSVotmUENWESZtEiU+y
-         YTjxlP+SMCSdtX+4tpSU0VO5PuGIP21vm+a8ObdoxiJJ/6Rz0U0P1ozC/hfpqhtW1X5J
-         ChofW5IT6759LRq8FxrLIMtMurGHW89dTAt+hiYkLuHwTFAtVe9QDDzovA39PNfaP4GM
-         bD10z/i7YpfK/Rio0OSYi3r9hekDWQZCbaXeb2G//yvOKh6TFuoUhBen8CpYj7EEAkNc
-         kfg1zTWklcJ1Gfxf/c+uzXo10nARlnj4u0d1X5kfMu87SRYIO/emK5uXWPe96whHPDSZ
-         6Hww==
-X-Forwarded-Encrypted: i=1; AJvYcCVDNADVNY5hy44bN1TP0kKSpJcDLJIzb6dIqJ0h+Ih0yZT6M31kTexRpVXEWYGKYcPdmDswCxiDz8wdkfw=@vger.kernel.org, AJvYcCVVntb6TgENuhn32HZ8OmP0VLPg2dNnA5t894ps7KKil8Fvwm/h7zGEOMehK7zfPFrCMGm9GzEx@vger.kernel.org
-X-Gm-Message-State: AOJu0YyjTaaB13qjEoGJ0qb/Q+iucTLMopZN07JTy+ae23HEoxwpGEga
-	CZzhHnk9rgtdzHVkfD6Y/2L6nzyRLMC+p4+Pxvwy9NmNo8hd5w11
-X-Gm-Gg: ASbGncvxvD6UCan0+WQeTpnXcqQ6JIXOf022jJ2vpRSFPJqfGXCHZ2h8nk1YvXJjNpx
-	BiONHdxzWeuVvmVcwFYQxnZIQBDFpo1i0qVgqQAnOIXhPhruaK/wa3HHEPE55EIDt4SXbPDM1VS
-	PhANt2+zuK0WNih0QLkzVggDE/udXUanSaDSZ6Ig7thyrV8jl67Ca3wc+s/XmDm3D2XQyS7Pv3W
-	j6ANXAk3ylKoosqzKtjnxhxMowcG7CrgG0/H43edhdvTcPG
-X-Google-Smtp-Source: AGHT+IEOyaJ5u8WNUWUgI2hxaxPEdiy3zc9nvfy5Nnc7sOwFQT8dED7MB9NXNirXnPXwPYn2XYl9lQ==
-X-Received: by 2002:a05:6402:4023:b0:5d0:e2c8:dc8d with SMTP id 4fb4d7f45d1cf-5d972e1b962mr18026426a12.20.1736762994652;
-        Mon, 13 Jan 2025 02:09:54 -0800 (PST)
-Received: from gmail.com ([2a03:2880:30ff:73::])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5d9900c4b56sm4597578a12.32.2025.01.13.02.09.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 Jan 2025 02:09:53 -0800 (PST)
-Date: Mon, 13 Jan 2025 02:09:51 -0800
-From: Breno Leitao <leitao@debian.org>
-To: John Sperbeck <jsperbeck@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, Simon Horman <horms@kernel.org>,
-	linux-kernel@vger.kernel.org, kuba@kernel.org
-Subject: Re: [PATCH v2] net: netpoll: ensure skb_pool list is always
- initialized
-Message-ID: <20250113-spotted-independent-kittiwake-309cab@leitao>
-References: <20250110-wildebeest-of-optimal-unity-06c308@leitao>
- <20250111003238.2669538-1-jsperbeck@google.com>
+	s=arc-20240116; t=1736763208; c=relaxed/simple;
+	bh=AbEypxldcB557r7ML3RWblxFpClAAQjKh+mk6I/n4hI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Wlg15qLr+UOUOqCIm8CG13U/8Jaag9WN5yqCIk4WbpxkgYt3hcwXnd0nH88mya5YJ0rwPZkkJPRjv6hMZb1NHj0mVfX+aZWm+MoKjjECR+tzlO++Cmc3CSSeQUejxJYG9B4Dzr9DtCMdkFMo+XHlzaLzB3t/qvQ0Uo23/9dYYqE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=ja5p8TTx; arc=none smtp.client-ip=185.226.149.38
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
+Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
+	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.93)
+	(envelope-from <mhal@rbox.co>)
+	id 1tXHRa-00DhCO-Tc; Mon, 13 Jan 2025 11:13:14 +0100
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+	s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
+	References:Cc:To:Subject:MIME-Version:Date:Message-ID;
+	bh=XmtGPnPvH6It0GR990T2qwUAKTVPIjKO4lymK4SpZf0=; b=ja5p8TTx11VmfSU8AkwM9xXOmC
+	R0HlPnuhaO1aaA7LAjGwUBgO0aROIcDCW4554r3UreeZMe+JNAeN6PwYZdoPIeZ/a9Ltr0v6pqZk1
+	pfgzT/3Cx6JtLcVuSP1PyMhcWVrhxendX5WNGukCBli1xObGZmO3AYDtBF4RaWeQH0hyrsaoDmXM5
+	ctWBMBsU6CeUXHU/QRGCyegPn52elUhgWOvbCK3wwso/sAASLSTVO/V6u2dsF0xAxNy4nqza65VKJ
+	o6G7pBxsDYS7UQt2L858VXvhHpMHcEgoILEFvv0/wl/CqRDS2y5sJxMQgal2aQkRXYRIjmhDq40nM
+	mI39Dq5Q==;
+Received: from [10.9.9.73] (helo=submission02.runbox)
+	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
+	(envelope-from <mhal@rbox.co>)
+	id 1tXHRZ-00030N-L5; Mon, 13 Jan 2025 11:13:13 +0100
+Received: by submission02.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.93)
+	id 1tXHRG-00DToB-7D; Mon, 13 Jan 2025 11:12:54 +0100
+Message-ID: <cccb1a4f-5495-4db1-801e-eca211b757c3@rbox.co>
+Date: Mon, 13 Jan 2025 11:12:52 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250111003238.2669538-1-jsperbeck@google.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v2 1/5] vsock/virtio: discard packets if the transport
+ changes
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: netdev@vger.kernel.org, Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+ bpf@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Luigi Leonardi <leonardi@redhat.com>, "David S. Miller"
+ <davem@davemloft.net>, Wongi Lee <qwerty@theori.io>,
+ =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Eric Dumazet <edumazet@google.com>,
+ kvm@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Simon Horman <horms@kernel.org>, Hyunwoo Kim <v4bel@theori.io>,
+ Jakub Kicinski <kuba@kernel.org>, virtualization@lists.linux.dev,
+ Bobby Eshleman <bobby.eshleman@bytedance.com>, stable@vger.kernel.org
+References: <20250110083511.30419-1-sgarzare@redhat.com>
+ <20250110083511.30419-2-sgarzare@redhat.com>
+ <1aa83abf-6baa-4cf1-a108-66b677bcfd93@rbox.co>
+ <nedvcylhjxrkmkvgugsku2lpdjgjpo5exoke4o6clxcxh64s3i@jkjnvngazr5v>
+ <CAGxU2F7BoMNi-z=SHsmCV5+99=CxHo4dxFeJnJ5=q9X=CM3QMA@mail.gmail.com>
+Content-Language: pl-PL, en-GB
+From: Michal Luczaj <mhal@rbox.co>
+In-Reply-To: <CAGxU2F7BoMNi-z=SHsmCV5+99=CxHo4dxFeJnJ5=q9X=CM3QMA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, Jan 10, 2025 at 04:32:38PM -0800, John Sperbeck wrote:
-> When __netpoll_setup() is called directly, instead of through
-> netpoll_setup(), the np->skb_pool list head isn't initialized.
-> If skb_pool_flush() is later called, then we hit a NULL pointer
-> in skb_queue_purge_reason().  This can be seen with this repro,
-> when CONFIG_NETCONSOLE is enabled as a module:
+On 1/13/25 10:07, Stefano Garzarella wrote:
+> On Mon, 13 Jan 2025 at 09:57, Stefano Garzarella <sgarzare@redhat.com> wrote:
+>> On Sun, Jan 12, 2025 at 11:42:30PM +0100, Michal Luczaj wrote:
 > 
->     ip tuntap add mode tap tap0
->     ip link add name br0 type bridge
->     ip link set dev tap0 master br0
->     modprobe netconsole netconsole=4444@10.0.0.1/br0,9353@10.0.0.2/
->     rmmod netconsole
+> [...]
 > 
-> The backtrace is:
+>>>
+>>> So, if I get this right:
+>>> 1. vsock_create() (refcnt=1) calls vsock_insert_unbound() (refcnt=2)
+>>> 2. transport->release() calls vsock_remove_bound() without checking if sk
+>>>   was bound and moved to bound list (refcnt=1)
+>>> 3. vsock_bind() assumes sk is in unbound list and before
+>>>   __vsock_insert_bound(vsock_bound_sockets()) calls
+>>>   __vsock_remove_bound() which does:
+>>>      list_del_init(&vsk->bound_table); // nop
+>>>      sock_put(&vsk->sk);               // refcnt=0
+>>>
+>>> The following fixes things for me. I'm just not certain that's the only
+>>> place where transport destruction may lead to an unbound socket being
+>>> removed from the unbound list.
+>>>
+>>> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+>>> index 7f7de6d88096..0fe807c8c052 100644
+>>> --- a/net/vmw_vsock/virtio_transport_common.c
+>>> +++ b/net/vmw_vsock/virtio_transport_common.c
+>>> @@ -1303,7 +1303,8 @@ void virtio_transport_release(struct vsock_sock *vsk)
+>>>
+>>>       if (remove_sock) {
+>>>               sock_set_flag(sk, SOCK_DONE);
+>>> -              virtio_transport_remove_sock(vsk);
+>>> +              if (vsock_addr_bound(&vsk->local_addr))
+>>> +                      virtio_transport_remove_sock(vsk);
+>>
+>> I don't get this fix, virtio_transport_remove_sock() calls
+>>    vsock_remove_sock()
+>>      vsock_remove_bound()
+>>        if (__vsock_in_bound_table(vsk))
+>>            __vsock_remove_bound(vsk);
+>>
+>>
+>> So, should already avoid this issue, no?
 > 
->     BUG: kernel NULL pointer dereference, address: 0000000000000008
->     #PF: supervisor write access in kernel mode
->     #PF: error_code(0x0002) - not-present page
->     ... ... ...
->     Call Trace:
->      <TASK>
->      __netpoll_free+0xa5/0xf0
->      br_netpoll_cleanup+0x43/0x50 [bridge]
->      do_netpoll_cleanup+0x43/0xc0
->      netconsole_netdev_event+0x1e3/0x300 [netconsole]
->      unregister_netdevice_notifier+0xd9/0x150
->      cleanup_module+0x45/0x920 [netconsole]
->      __se_sys_delete_module+0x205/0x290
->      do_syscall_64+0x70/0x150
->      entry_SYSCALL_64_after_hwframe+0x76/0x7e
+> I got it wrong, I see now what are you trying to do, but I don't think
+> we should skip virtio_transport_remove_sock() entirely, it also purge
+> the rx_queue.
+
+Isn't rx_queue empty-by-definition in case of !__vsock_in_bound_table(vsk)?
+
+>> Can the problem be in vsock_bind() ?
+
+Well, I wouldn't say so.
+
+>> Is this issue pre-existing or introduced by this series?
 > 
-> Move the skb_pool list setup and initial skb fill into __netpoll_setup().
-> 
-> Fixes: 221a9c1df790 ("net: netpoll: Individualize the skb pool")
-> Signed-off-by: John Sperbeck <jsperbeck@google.com>
+> I think this is pre-existing, can you confirm?
 
-Reviewed-by: Breno Leitao <leitao@debian.org>
+Yup, I agree, pre-existing.
 
-You didn't specify the network tree you are sending this patch for.
-Since this patch fixes a commit in 'net' tree (also on Linus' tree), you
-want to send it against 'net'.
+> In that case, I'd not stop this series, and fix it in another patch/series.
 
-Something as:
-	# git format-patch --subject-prefix='PATCH net'
+Yeah, sure thing.
 
-https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html#indicating-target-tree
+Thanks,
+Michal
 
-Thanks for the fix.
---breno
 
