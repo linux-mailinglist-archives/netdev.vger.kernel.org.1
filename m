@@ -1,168 +1,399 @@
-Return-Path: <netdev+bounces-157849-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157850-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 130C0A0C088
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 19:47:17 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8CFEEA0C0AC
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 19:50:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A8E637A21C6
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 18:47:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9D17F163F4D
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 18:50:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FA901D45EA;
-	Mon, 13 Jan 2025 18:36:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8640B1CAA8C;
+	Mon, 13 Jan 2025 18:43:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VXP3Qm/d"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GTg7qysl"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f43.google.com (mail-qv1-f43.google.com [209.85.219.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4368A1D417B;
-	Mon, 13 Jan 2025 18:36:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79A1C1C549F
+	for <netdev@vger.kernel.org>; Mon, 13 Jan 2025 18:42:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736793399; cv=none; b=HBxqigzd20F8Tfn1G50f5w/ZnJ+QS9euCky4eeqibk7W8rQ6OG4OF2M34ZKcyURJ6DToU3dQ9MoIKUWyn+2xVldZon9vDeugJclFY8fkqGXTrAhkIyT4mpYEiSjIeEBZV2AWydi5532KG++i2O3aM3Y59IIqUkNG8L9zCIN9wuc=
+	t=1736793780; cv=none; b=U6qYoKU8YF4nbBZgIEVUcPvGf6OEhsRwKf4K1SEKqRUVZeME0LunezRnG8jEs23zHVQlfsUPBdMyxxJrKFFmjcPDOrqxK6cLdgYh+04l6p4pf3QjhfzOMCfvyo2PcdYBNJVNwigiGPP6D9S8NDMs4/bnxNdPsq0yoe2Pc3g033g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736793399; c=relaxed/simple;
-	bh=u1P41QJuzQbMJl1DNKfanFr1JkI8JdcxmczMYl5SzOk=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=J3XHUYg4rZau7SvbbgBaH6KlYBFiJJ6WJNvB4O5CuEkW+jYkPIlie7P3ylrfWzSei9HT+wwmwope6jgGsb+IBkhBKPC+Lqe1fiU+NTZlnoF7DRKdoEdbov7ByF+0w8rdfSaLPKrYozgK1ymb66aBi9C/Y8U9IQt9Xntxqe94HII=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VXP3Qm/d; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A687FC4CED6;
-	Mon, 13 Jan 2025 18:36:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736793399;
-	bh=u1P41QJuzQbMJl1DNKfanFr1JkI8JdcxmczMYl5SzOk=;
-	h=From:To:Cc:Subject:Date:From;
-	b=VXP3Qm/dxMmf5yu+FJGcF6PglDj1jL+47RX1Gg6FCEZtXu4CTrAODjXA7guCE0Vg3
-	 Rjp86qjg4fMO9u6cWMl2dyn2vusLBQDWkPh6EE6dR0w7Z8dGA3FqGdNcOXNZSJOHSP
-	 o+wYVvPLu00U6WdDI9d2+WODAa5fUZ3l1JknY955Fgn7qtKRZb4Yw+G/zyDm7L6dGs
-	 Uo4SuaH8SDJJtwxysCyy991BykwulstHKg7sg+ag1zmktF9mYCzt4WielA3azy25HA
-	 HghcVvgDddlYWrvgqSFbKE8oweXekzNwHelzhd1MyfcluwXPVxE/OVmQ0l7C/QndSj
-	 AAN2q/95Virqw==
-From: Sasha Levin <sashal@kernel.org>
-To: linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Cc: Lizhi Xu <lizhi.xu@windriver.com>,
-	syzbot+985f827280dc3a6e7e92@syzkaller.appspotmail.com,
-	Miquel Raynal <miquel.raynal@bootlin.com>,
-	Stefan Schmidt <stefan@datenfreihafen.org>,
-	Sasha Levin <sashal@kernel.org>,
-	alex.aring@gmail.com,
-	davem@davemloft.net,
-	edumazet@google.com,
+	s=arc-20240116; t=1736793780; c=relaxed/simple;
+	bh=DKUXRbGnNWOgsMJiD6f//aFt6/3FsdsdcDPxA1plMpg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=vD08hijy8SQv9IDLoKmnjMy+SjT8GAD4uq7dvymwLOXDAwq2V7E5PmzyGKtqLO6ujkYG7DsF0m2iaVstiydvqs2rTnlWfRRfUEv8dw3//bAVmjeS/8pFE9NFAQ1uFbYNKScm1ruY2Qxb1ONuMnw8uqR+nA0wGM4fDhkqWpWVWC4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GTg7qysl; arc=none smtp.client-ip=209.85.219.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f43.google.com with SMTP id 6a1803df08f44-6d8f65ef5abso35208706d6.3
+        for <netdev@vger.kernel.org>; Mon, 13 Jan 2025 10:42:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1736793777; x=1737398577; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=N/tfEGZD/3Cd70fKSjf2Kp5dWOTNqs/4tHEivQfF5pc=;
+        b=GTg7qyslQNvH+ZI+CemGfLAzx4QzQVZv8Z4Gn6RY1iXKGy20HfRgakDiOjANJ0MeBE
+         ic2eWehK24gyuOJjLsQL/ixFOtOiw3GKG19njAoNZCsP92HdC4/7dZEGA0vqFZU4am7r
+         WWcJb0MIkpQlAVECdj30An1pHNZE4eIwdL817MV0hohNG3sQfvY1q6dx4MoVruDtJfJd
+         lxZjq/QVsQSx/hR3rgDGkb5kRVrJKfbthUvtHqj+P9zbCnY1Hc/lX5oi/HL556PuZA5G
+         mROlyiBvljqz78WYWcmW3jsT56mWfcD4bLfRgKtCC21VhomM+en1+GTk4VnrIXKxxvgW
+         vO+A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736793777; x=1737398577;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=N/tfEGZD/3Cd70fKSjf2Kp5dWOTNqs/4tHEivQfF5pc=;
+        b=cKKpQ90jP9K9YQf6zWGHZjAPNUujfTrKZQZ7K6FiVty3cqP3VP19NCZq4XECptIhpV
+         0wBtY7KanBrjcbYw2FvMlPZb+CkQVEz6ti5GuR9J3HBFT8E4AF7K+fDHcwDr3pQAcKRE
+         b3mAl2ZjFG3p+dFXOdN2RJexv1w/AbZVtO0yr5sUCvFW5HObpZzC+aXLckpNFX3z4KyY
+         QOLci0vh1KeDPl6XdUOWMCITaFRNWJY6qblqFqXTrQd0eFt26n7uvJrovGz5L1HavfPs
+         5CvRR6IAqBi7cqKUZ6a61QxqYL+Lj/gozSQod1gS0eXy1avWHW8krjTqJqhYn8nmAvKq
+         6sHA==
+X-Gm-Message-State: AOJu0YzhZAlOpKYx/ZeDLJLOzrZ2w85v+GQTaao5egMof6AE8ZwtDZUh
+	4v3sfJHVbZgAXMrmLVIa0GehjD8PQnlJsX9h5L/2bam2WXYn0TnbAfW8HQ==
+X-Gm-Gg: ASbGncuITQDdCLl8WUxrWY65puezMN/QBIj2gCIZjHIeiNQNGRTTy+wqJFFFxPMcd0g
+	BFT6TX7gdHE8dQKGeKcRl0k/aCpdj6j50fl7y8aRiMZBvPVgkYOuxjTk9p3LS2edFeGttNMMRTf
+	mFjQC47fIlnrmvUWRNpIz2A6ccGWB0GV2D+w1JtM7I2SrM09fvXeqJ50DesRU9kr/9f3KQW8Gik
+	6nyzsuoAqsSVIth08PndP84pVNny9q+PAxON9LX31peLzNyCUbhZKpedY3iZUWVnE112ISEdjH/
+	9JDHPbh/oKRdiakW
+X-Google-Smtp-Source: AGHT+IET+raO9ehqB/GlbbzpJKLJxr792LrSZh+HsNXwPla/onoOpK7GYcipDANZC6pzxiZaTqnotw==
+X-Received: by 2002:ad4:5ccd:0:b0:6d8:8a01:64e2 with SMTP id 6a1803df08f44-6df9b308659mr324024846d6.43.1736793776993;
+        Mon, 13 Jan 2025 10:42:56 -0800 (PST)
+Received: from wsfd-netdev15.anl.eng.rdu2.dc.redhat.com ([66.187.232.140])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6dfad886c1bsm44027546d6.45.2025.01.13.10.42.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 13 Jan 2025 10:42:56 -0800 (PST)
+From: Xin Long <lucien.xin@gmail.com>
+To: network dev <netdev@vger.kernel.org>
+Cc: davem@davemloft.net,
 	kuba@kernel.org,
-	pabeni@redhat.com,
-	linux-wpan@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.4 1/4] mac802154: check local interfaces before deleting sdata list
-Date: Mon, 13 Jan 2025 13:36:30 -0500
-Message-Id: <20250113183633.1784590-1-sashal@kernel.org>
-X-Mailer: git-send-email 2.39.5
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Jamal Hadi Salim <jhs@mojatatu.com>,
+	Cong Wang <xiyou.wangcong@gmail.com>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+	ast@fiberby.net,
+	Shuang Li <shuali@redhat.com>
+Subject: [PATCHv2 net] net: sched: refine software bypass handling in tc_run
+Date: Mon, 13 Jan 2025 13:42:55 -0500
+Message-ID: <17d459487b61c5d0276a01a3bc1254c6432b5d12.1736793775.git.lucien.xin@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 5.4.289
 Content-Transfer-Encoding: 8bit
 
-From: Lizhi Xu <lizhi.xu@windriver.com>
+This patch addresses issues with filter counting in block (tcf_block),
+particularly for software bypass scenarios, by introducing a more
+accurate mechanism using useswcnt.
 
-[ Upstream commit eb09fbeb48709fe66c0d708aed81e910a577a30a ]
+Previously, filtercnt and skipswcnt were introduced by:
 
-syzkaller reported a corrupted list in ieee802154_if_remove. [1]
+  Commit 2081fd3445fe ("net: sched: cls_api: add filter counter") and
+  Commit f631ef39d819 ("net: sched: cls_api: add skip_sw counter")
 
-Remove an IEEE 802.15.4 network interface after unregister an IEEE 802.15.4
-hardware device from the system.
+  filtercnt tracked all tp (tcf_proto) objects added to a block, and
+  skipswcnt counted tp objects with the skipsw attribute set.
 
-CPU0					CPU1
-====					====
-genl_family_rcv_msg_doit		ieee802154_unregister_hw
-ieee802154_del_iface			ieee802154_remove_interfaces
-rdev_del_virtual_intf_deprecated	list_del(&sdata->list)
-ieee802154_if_remove
-list_del_rcu
+The problem is: a single tp can contain multiple filters, some with skipsw
+and others without. The current implementation fails in the case:
 
-The net device has been unregistered, since the rcu grace period,
-unregistration must be run before ieee802154_if_remove.
+  When the first filter in a tp has skipsw, both skipswcnt and filtercnt
+  are incremented, then adding a second filter without skipsw to the same
+  tp does not modify these counters because tp->counted is already set.
 
-To avoid this issue, add a check for local->interfaces before deleting
-sdata list.
+  This results in bypass software behavior based solely on skipswcnt
+  equaling filtercnt, even when the block includes filters without
+  skipsw. Consequently, filters without skipsw are inadvertently bypassed.
 
-[1]
-kernel BUG at lib/list_debug.c:58!
-Oops: invalid opcode: 0000 [#1] PREEMPT SMP KASAN PTI
-CPU: 0 UID: 0 PID: 6277 Comm: syz-executor157 Not tainted 6.12.0-rc6-syzkaller-00005-g557329bcecc2 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
-RIP: 0010:__list_del_entry_valid_or_report+0xf4/0x140 lib/list_debug.c:56
-Code: e8 a1 7e 00 07 90 0f 0b 48 c7 c7 e0 37 60 8c 4c 89 fe e8 8f 7e 00 07 90 0f 0b 48 c7 c7 40 38 60 8c 4c 89 fe e8 7d 7e 00 07 90 <0f> 0b 48 c7 c7 a0 38 60 8c 4c 89 fe e8 6b 7e 00 07 90 0f 0b 48 c7
-RSP: 0018:ffffc9000490f3d0 EFLAGS: 00010246
-RAX: 000000000000004e RBX: dead000000000122 RCX: d211eee56bb28d00
-RDX: 0000000000000000 RSI: 0000000080000000 RDI: 0000000000000000
-RBP: ffff88805b278dd8 R08: ffffffff8174a12c R09: 1ffffffff2852f0d
-R10: dffffc0000000000 R11: fffffbfff2852f0e R12: dffffc0000000000
-R13: dffffc0000000000 R14: dead000000000100 R15: ffff88805b278cc0
-FS:  0000555572f94380(0000) GS:ffff8880b8600000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000056262e4a3000 CR3: 0000000078496000 CR4: 00000000003526f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- __list_del_entry_valid include/linux/list.h:124 [inline]
- __list_del_entry include/linux/list.h:215 [inline]
- list_del_rcu include/linux/rculist.h:157 [inline]
- ieee802154_if_remove+0x86/0x1e0 net/mac802154/iface.c:687
- rdev_del_virtual_intf_deprecated net/ieee802154/rdev-ops.h:24 [inline]
- ieee802154_del_iface+0x2c0/0x5c0 net/ieee802154/nl-phy.c:323
- genl_family_rcv_msg_doit net/netlink/genetlink.c:1115 [inline]
- genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
- genl_rcv_msg+0xb14/0xec0 net/netlink/genetlink.c:1210
- netlink_rcv_skb+0x1e3/0x430 net/netlink/af_netlink.c:2551
- genl_rcv+0x28/0x40 net/netlink/genetlink.c:1219
- netlink_unicast_kernel net/netlink/af_netlink.c:1331 [inline]
- netlink_unicast+0x7f6/0x990 net/netlink/af_netlink.c:1357
- netlink_sendmsg+0x8e4/0xcb0 net/netlink/af_netlink.c:1901
- sock_sendmsg_nosec net/socket.c:729 [inline]
- __sock_sendmsg+0x221/0x270 net/socket.c:744
- ____sys_sendmsg+0x52a/0x7e0 net/socket.c:2607
- ___sys_sendmsg net/socket.c:2661 [inline]
- __sys_sendmsg+0x292/0x380 net/socket.c:2690
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
+To address this, the patch introduces useswcnt in block to explicitly count
+tp objects containing at least one filter without skipsw. Key changes
+include:
 
-Reported-and-tested-by: syzbot+985f827280dc3a6e7e92@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=985f827280dc3a6e7e92
-Signed-off-by: Lizhi Xu <lizhi.xu@windriver.com>
-Reviewed-by: Miquel Raynal <miquel.raynal@bootlin.com>
-Link: https://lore.kernel.org/20241113095129.1457225-1-lizhi.xu@windriver.com
-Signed-off-by: Stefan Schmidt <stefan@datenfreihafen.org>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
+  Whenever a filter without skipsw is added, its tp is marked with usesw
+  and counted in useswcnt. tc_run() now uses useswcnt to determine software
+  bypass, eliminating reliance on filtercnt and skipswcnt.
+
+  This refined approach prevents software bypass for blocks containing
+  mixed filters, ensuring correct behavior in tc_run().
+
+Additionally, as atomic operations on useswcnt ensure thread safety and
+tp->lock guards access to tp->usesw and tp->counted, the broader lock
+down_write(&block->cb_lock) is no longer required in tc_new_tfilter(),
+and this resolves a performance regression caused by the filter counting
+mechanism during parallel filter insertions.
+
+  The improvement can be demonstrated using the following script:
+
+  # cat insert_tc_rules.sh
+
+    tc qdisc add dev ens1f0np0 ingress
+    for i in $(seq 16); do
+        taskset -c $i tc -b rules_$i.txt &
+    done
+    wait
+
+  Each of rules_$i.txt files above includes 100000 tc filter rules to a
+  mlx5 driver NIC ens1f0np0.
+
+  Without this patch:
+
+  # time sh insert_tc_rules.sh
+
+    real    0m50.780s
+    user    0m23.556s
+    sys	    4m13.032s
+
+  With this patch:
+
+  # time sh insert_tc_rules.sh
+
+    real    0m17.718s
+    user    0m7.807s
+    sys     3m45.050s
+
+Fixes: 047f340b36fc ("net: sched: make skip_sw actually skip software")
+Reported-by: Shuang Li <shuali@redhat.com>
+Signed-off-by: Xin Long <lucien.xin@gmail.com>
+Acked-by: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
 ---
- net/mac802154/iface.c | 4 ++++
- 1 file changed, 4 insertions(+)
+v2:
+  - keep tcf_bypass_check_needed_key and not touch the code in tc_run().
+  - add the missing call to tcf_proto_update_usesw() for existing rule
+    update, as Paolo noticed.
+---
+ include/net/pkt_cls.h     | 11 +++++++-
+ include/net/sch_generic.h |  5 ++--
+ net/sched/cls_api.c       | 54 ++++++++++-----------------------------
+ net/sched/cls_bpf.c       |  2 ++
+ net/sched/cls_flower.c    |  2 ++
+ net/sched/cls_matchall.c  |  2 ++
+ net/sched/cls_u32.c       |  4 +++
+ 7 files changed, 35 insertions(+), 45 deletions(-)
 
-diff --git a/net/mac802154/iface.c b/net/mac802154/iface.c
-index a08240fe68a7..22514ab060f8 100644
---- a/net/mac802154/iface.c
-+++ b/net/mac802154/iface.c
-@@ -688,6 +688,10 @@ void ieee802154_if_remove(struct ieee802154_sub_if_data *sdata)
- 	ASSERT_RTNL();
+diff --git a/include/net/pkt_cls.h b/include/net/pkt_cls.h
+index cf199af85c52..e4fea1decca1 100644
+--- a/include/net/pkt_cls.h
++++ b/include/net/pkt_cls.h
+@@ -79,7 +79,7 @@ DECLARE_STATIC_KEY_FALSE(tcf_bypass_check_needed_key);
  
- 	mutex_lock(&sdata->local->iflist_mtx);
-+	if (list_empty(&sdata->local->interfaces)) {
-+		mutex_unlock(&sdata->local->iflist_mtx);
+ static inline bool tcf_block_bypass_sw(struct tcf_block *block)
+ {
+-	return block && block->bypass_wanted;
++	return block && !atomic_read(&block->useswcnt);
+ }
+ #endif
+ 
+@@ -760,6 +760,15 @@ tc_cls_common_offload_init(struct flow_cls_common_offload *cls_common,
+ 		cls_common->extack = extack;
+ }
+ 
++static inline void tcf_proto_update_usesw(struct tcf_proto *tp, u32 flags)
++{
++	if (tp->usesw)
 +		return;
-+	}
- 	list_del_rcu(&sdata->list);
- 	mutex_unlock(&sdata->local->iflist_mtx);
++	if (tc_skip_sw(flags) && tc_in_hw(flags))
++		return;
++	tp->usesw = true;
++}
++
+ #if IS_ENABLED(CONFIG_NET_TC_SKB_EXT)
+ static inline struct tc_skb_ext *tc_skb_ext_alloc(struct sk_buff *skb)
+ {
+diff --git a/include/net/sch_generic.h b/include/net/sch_generic.h
+index 5d74fa7e694c..1e6324f0d4ef 100644
+--- a/include/net/sch_generic.h
++++ b/include/net/sch_generic.h
+@@ -425,6 +425,7 @@ struct tcf_proto {
+ 	spinlock_t		lock;
+ 	bool			deleting;
+ 	bool			counted;
++	bool			usesw;
+ 	refcount_t		refcnt;
+ 	struct rcu_head		rcu;
+ 	struct hlist_node	destroy_ht_node;
+@@ -474,9 +475,7 @@ struct tcf_block {
+ 	struct flow_block flow_block;
+ 	struct list_head owner_list;
+ 	bool keep_dst;
+-	bool bypass_wanted;
+-	atomic_t filtercnt; /* Number of filters */
+-	atomic_t skipswcnt; /* Number of skip_sw filters */
++	atomic_t useswcnt;
+ 	atomic_t offloadcnt; /* Number of oddloaded filters */
+ 	unsigned int nooffloaddevcnt; /* Number of devs unable to do offload */
+ 	unsigned int lockeddevcnt; /* Number of devs that require rtnl lock. */
+diff --git a/net/sched/cls_api.c b/net/sched/cls_api.c
+index 7578e27260c9..358b66dfdc83 100644
+--- a/net/sched/cls_api.c
++++ b/net/sched/cls_api.c
+@@ -390,6 +390,7 @@ static struct tcf_proto *tcf_proto_create(const char *kind, u32 protocol,
+ 	tp->protocol = protocol;
+ 	tp->prio = prio;
+ 	tp->chain = chain;
++	tp->usesw = !tp->ops->reoffload;
+ 	spin_lock_init(&tp->lock);
+ 	refcount_set(&tp->refcnt, 1);
  
+@@ -410,48 +411,17 @@ static void tcf_proto_get(struct tcf_proto *tp)
+ 	refcount_inc(&tp->refcnt);
+ }
+ 
+-static void tcf_maintain_bypass(struct tcf_block *block)
+-{
+-	int filtercnt = atomic_read(&block->filtercnt);
+-	int skipswcnt = atomic_read(&block->skipswcnt);
+-	bool bypass_wanted = filtercnt > 0 && filtercnt == skipswcnt;
+-
+-	if (bypass_wanted != block->bypass_wanted) {
+-#ifdef CONFIG_NET_CLS_ACT
+-		if (bypass_wanted)
+-			static_branch_inc(&tcf_bypass_check_needed_key);
+-		else
+-			static_branch_dec(&tcf_bypass_check_needed_key);
+-#endif
+-		block->bypass_wanted = bypass_wanted;
+-	}
+-}
+-
+-static void tcf_block_filter_cnt_update(struct tcf_block *block, bool *counted, bool add)
+-{
+-	lockdep_assert_not_held(&block->cb_lock);
+-
+-	down_write(&block->cb_lock);
+-	if (*counted != add) {
+-		if (add) {
+-			atomic_inc(&block->filtercnt);
+-			*counted = true;
+-		} else {
+-			atomic_dec(&block->filtercnt);
+-			*counted = false;
+-		}
+-	}
+-	tcf_maintain_bypass(block);
+-	up_write(&block->cb_lock);
+-}
+-
+ static void tcf_chain_put(struct tcf_chain *chain);
+ 
+ static void tcf_proto_destroy(struct tcf_proto *tp, bool rtnl_held,
+ 			      bool sig_destroy, struct netlink_ext_ack *extack)
+ {
+ 	tp->ops->destroy(tp, rtnl_held, extack);
+-	tcf_block_filter_cnt_update(tp->chain->block, &tp->counted, false);
++	if (tp->usesw && tp->counted) {
++		if (!atomic_dec_return(&tp->chain->block->useswcnt))
++			static_branch_dec(&tcf_bypass_check_needed_key);
++		tp->counted = false;
++	}
+ 	if (sig_destroy)
+ 		tcf_proto_signal_destroyed(tp->chain, tp);
+ 	tcf_chain_put(tp->chain);
+@@ -2409,7 +2379,13 @@ static int tc_new_tfilter(struct sk_buff *skb, struct nlmsghdr *n,
+ 		tfilter_notify(net, skb, n, tp, block, q, parent, fh,
+ 			       RTM_NEWTFILTER, false, rtnl_held, extack);
+ 		tfilter_put(tp, fh);
+-		tcf_block_filter_cnt_update(block, &tp->counted, true);
++		spin_lock(&tp->lock);
++		if (tp->usesw && !tp->counted) {
++			if (atomic_inc_return(&block->useswcnt) == 1)
++				static_branch_inc(&tcf_bypass_check_needed_key);
++			tp->counted = true;
++		}
++		spin_unlock(&tp->lock);
+ 		/* q pointer is NULL for shared blocks */
+ 		if (q)
+ 			q->flags &= ~TCQ_F_CAN_BYPASS;
+@@ -3532,8 +3508,6 @@ static void tcf_block_offload_inc(struct tcf_block *block, u32 *flags)
+ 	if (*flags & TCA_CLS_FLAGS_IN_HW)
+ 		return;
+ 	*flags |= TCA_CLS_FLAGS_IN_HW;
+-	if (tc_skip_sw(*flags))
+-		atomic_inc(&block->skipswcnt);
+ 	atomic_inc(&block->offloadcnt);
+ }
+ 
+@@ -3542,8 +3516,6 @@ static void tcf_block_offload_dec(struct tcf_block *block, u32 *flags)
+ 	if (!(*flags & TCA_CLS_FLAGS_IN_HW))
+ 		return;
+ 	*flags &= ~TCA_CLS_FLAGS_IN_HW;
+-	if (tc_skip_sw(*flags))
+-		atomic_dec(&block->skipswcnt);
+ 	atomic_dec(&block->offloadcnt);
+ }
+ 
+diff --git a/net/sched/cls_bpf.c b/net/sched/cls_bpf.c
+index 1941ebec23ff..7fbe42f0e5c2 100644
+--- a/net/sched/cls_bpf.c
++++ b/net/sched/cls_bpf.c
+@@ -509,6 +509,8 @@ static int cls_bpf_change(struct net *net, struct sk_buff *in_skb,
+ 	if (!tc_in_hw(prog->gen_flags))
+ 		prog->gen_flags |= TCA_CLS_FLAGS_NOT_IN_HW;
+ 
++	tcf_proto_update_usesw(tp, prog->gen_flags);
++
+ 	if (oldprog) {
+ 		idr_replace(&head->handle_idr, prog, handle);
+ 		list_replace_rcu(&oldprog->link, &prog->link);
+diff --git a/net/sched/cls_flower.c b/net/sched/cls_flower.c
+index 1008ec8a464c..03505673d523 100644
+--- a/net/sched/cls_flower.c
++++ b/net/sched/cls_flower.c
+@@ -2503,6 +2503,8 @@ static int fl_change(struct net *net, struct sk_buff *in_skb,
+ 	if (!tc_in_hw(fnew->flags))
+ 		fnew->flags |= TCA_CLS_FLAGS_NOT_IN_HW;
+ 
++	tcf_proto_update_usesw(tp, fnew->flags);
++
+ 	spin_lock(&tp->lock);
+ 
+ 	/* tp was deleted concurrently. -EAGAIN will cause caller to lookup
+diff --git a/net/sched/cls_matchall.c b/net/sched/cls_matchall.c
+index 9f1e62ca508d..f03bf5da39ee 100644
+--- a/net/sched/cls_matchall.c
++++ b/net/sched/cls_matchall.c
+@@ -228,6 +228,8 @@ static int mall_change(struct net *net, struct sk_buff *in_skb,
+ 	if (!tc_in_hw(new->flags))
+ 		new->flags |= TCA_CLS_FLAGS_NOT_IN_HW;
+ 
++	tcf_proto_update_usesw(tp, new->flags);
++
+ 	*arg = head;
+ 	rcu_assign_pointer(tp->root, new);
+ 	return 0;
+diff --git a/net/sched/cls_u32.c b/net/sched/cls_u32.c
+index d3a03c57545b..2a1c00048fd6 100644
+--- a/net/sched/cls_u32.c
++++ b/net/sched/cls_u32.c
+@@ -951,6 +951,8 @@ static int u32_change(struct net *net, struct sk_buff *in_skb,
+ 		if (!tc_in_hw(new->flags))
+ 			new->flags |= TCA_CLS_FLAGS_NOT_IN_HW;
+ 
++		tcf_proto_update_usesw(tp, new->flags);
++
+ 		u32_replace_knode(tp, tp_c, new);
+ 		tcf_unbind_filter(tp, &n->res);
+ 		tcf_exts_get_net(&n->exts);
+@@ -1164,6 +1166,8 @@ static int u32_change(struct net *net, struct sk_buff *in_skb,
+ 		if (!tc_in_hw(n->flags))
+ 			n->flags |= TCA_CLS_FLAGS_NOT_IN_HW;
+ 
++		tcf_proto_update_usesw(tp, n->flags);
++
+ 		ins = &ht->ht[TC_U32_HASH(handle)];
+ 		for (pins = rtnl_dereference(*ins); pins;
+ 		     ins = &pins->next, pins = rtnl_dereference(*ins))
 -- 
-2.39.5
+2.43.0
 
 
