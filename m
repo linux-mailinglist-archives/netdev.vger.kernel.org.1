@@ -1,239 +1,225 @@
-Return-Path: <netdev+bounces-157734-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157735-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53526A0B6D0
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 13:25:43 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A6EEAA0B6FF
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 13:32:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5CA261889E9C
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 12:25:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6DB963A4925
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 12:32:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36DEB22A4EB;
-	Mon, 13 Jan 2025 12:25:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DFE122A4EA;
+	Mon, 13 Jan 2025 12:32:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="cS0lsI9w"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f208.google.com (mail-il1-f208.google.com [209.85.166.208])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 241AC204581
-	for <netdev@vger.kernel.org>; Mon, 13 Jan 2025 12:25:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.208
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736771131; cv=none; b=eFADgrSaJ/3EJqUVdCY/YO8Wns4bcnthGKa5FzHmM629x0z+nM0fbOjBWYl66435D06j4VcJ1+v75zXGuiBBysQHlI5nfJ0W3ubhuRiO1BUwURJh/aBMody0RD2tNzwO50otdtApqMX/FxIYTvsCEniuLLUsZQRf/P+/7Z3zkHs=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736771131; c=relaxed/simple;
-	bh=wk6Be8Rzoltg/X/rxu+04rAKF1RCNnxpNvlvXmovYq4=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=JWyi5XzStnDIyI9CJXcHXKF5HgQEPp7+67V/rnUM9LcrPG+mnJ4UmvIfYJUWALCg2cPK+80ngUANgi11Jc8qShW0MX2E+VHsJPXvIg8f6WcbSQPXa+NPH4zrCV12tTORZ/0uEROSM5FtENJv1lu+JDMNUYTXZfO9Vz55fc1fvEA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.208
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f208.google.com with SMTP id e9e14a558f8ab-3a819a4e83dso39212095ab.1
-        for <netdev@vger.kernel.org>; Mon, 13 Jan 2025 04:25:29 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736771129; x=1737375929;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=XlKlMGa3zAnMBI/+QCYv2Q2QQ45YDo0HW/RLvV58LG8=;
-        b=qguHm+RcvxLA5IHcj5Im6L1TIMUTdluINKxNSZRK3Tp4r19EKPQnapo2mLt6Kmj8kB
-         i50vxKymM/Pan9U1VfWeNsfV8Nx3oTHMXZrE7A+lvBXDtCoxp57qHINVmYYCLNXeDZIf
-         XNAVd4RkN4lQfUBm3T1IyYblzSGr8U1WykZnXc33Qas64gFl9ktx6elOlXJPTKmUyLE9
-         7ACB2y6egV6w58ifz1Q3hqin7YCOApb1mbTH5EJuCN89z+NsErwObQG4pSoLlceHTDjn
-         8HtgcPy4OERqngo8Yzyp5ZOnAtVV0jW9mf7Kis91hAFJZByjlJ6x6M871fd/syk0pTwT
-         tMRw==
-X-Forwarded-Encrypted: i=1; AJvYcCWLFLyELE27dd5LPwh8sl+TqNlO3ZeRfhDYa5RmiLkzgEZ1EejcPMi2HXa4quINEQzzfWhepcc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwOU5zddseHPRBEehPKM5KLtIlHvTdLyZFtd2BNXmZ8pZxInXMO
-	Vd92C+cYQ8zMbNFbImPtq5k6hUhLX9ZFfkBwHv4oUkvq4f54UHZvotkYpajXq5zEftd9exfsOqv
-	GiFCHP9o3R2vK/z8RAnGV/7w2Splk5P9TTf7ByWMCdz2LYgg9xj5MDSY=
-X-Google-Smtp-Source: AGHT+IF2NvZ1BRMFx7ZHQ4buguv70ui5XOgr4S7wznRGZdEytm0f4H6+j68zj/7vwrS7iXt6RxH6g8cvicd9Un43WFknvWNnmRO/
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F29E174040;
+	Mon, 13 Jan 2025 12:32:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.16
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1736771557; cv=fail; b=BstVXRFzroXkF/QlzTuXGmUnOEZ5wXtnQ6V27KGEi2jrFPRwCNZmdUvdMIsUzpY4Kx1c3emvcM/oMQyEb1ovIsnPe/ewz+ThCvQfT5UXqIjBq2u69tvmWWpMh1fLNHnkVwPYxy95JfagkAin1t8irbaIHZRiO9oIhrGvj4ugisA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1736771557; c=relaxed/simple;
+	bh=Sp8Vl3ouixEa4OAqZMzUcS1rfvgoQxsgYBgca8HvSfg=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=RNnqJBWskUsz7iTllYFHPJ70ET1s8qTrqkG+RJsd0vRrRoij1a7hKnAToYS9UpUlp1s+ujA682uf6PK6jeaGH0RwvL5EE5OcTFWev7u3K0m+rFlhIuK1YFJxTCRn1vKnEObmm5ZwgDRUbG5LINcdHicfGZgjwoQ2S6KTq0OT8xs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=cS0lsI9w; arc=fail smtp.client-ip=198.175.65.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1736771555; x=1768307555;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=Sp8Vl3ouixEa4OAqZMzUcS1rfvgoQxsgYBgca8HvSfg=;
+  b=cS0lsI9wClbGr1IKQilNvHHpas6qHhEHnWC2KeHbx9ww1gpGt7yjxBy/
+   CpThgWBSMmQ3pMkyTd+TgnCAP6B47NkCsuFGvTqgCLD1S661+MHBHGmlu
+   +uR3y7y36AjVhMa+MCY9Wnn17PSbgQm/W43AGH+ajVd17M7kr5wTM374r
+   DI9RbgrO+ekARhXwSwcumhtlOFLjpZhQRQPSKDEGsa98m1rkxrpsmyMf6
+   2zBnEHt5TjfW8ORTSQeA2GFK2eYd+a8/6K5/8gLbMJC1xEubQ4zmD3baV
+   gkxmdpGGoUQ86IDWeYEqg0mS0QVOWm6wQib/0p9Gi0vL1h52eJTa/L0MX
+   g==;
+X-CSE-ConnectionGUID: s7YLrZBQQDWafttG2hLdhw==
+X-CSE-MsgGUID: nUDdXmgHQbm/NT/3g9F8lw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11314"; a="37192280"
+X-IronPort-AV: E=Sophos;i="6.12,310,1728975600"; 
+   d="scan'208";a="37192280"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jan 2025 04:32:24 -0800
+X-CSE-ConnectionGUID: K/zOgKHWRoeL3vTfzWXcKw==
+X-CSE-MsgGUID: N4s3Um31RaSN4UHc6U9/JA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="109608987"
+Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
+  by orviesa005.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 13 Jan 2025 04:32:21 -0800
+Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
+ ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44; Mon, 13 Jan 2025 04:32:20 -0800
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44 via Frontend Transport; Mon, 13 Jan 2025 04:32:20 -0800
+Received: from NAM02-BN1-obe.outbound.protection.outlook.com (104.47.51.44) by
+ edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Mon, 13 Jan 2025 04:32:20 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=fS1Vc1TiTL8PrsJEb9R6rnTxyAb99cb28ItkTTjbryijT/AOsnWxfd5CmMaaN6tqoo1SkUYbYmi+JsN5mWGESt3DMuzQW8ewQy2VVB4q/fKA6x9iQFQb/+vJnDv/I8SQjDwaNKtvrwxqPZFhqXpTIeET1AC8R459zCd0sX3kAI1OBJVH1aCl6VnHnROYMWbDODNIxNRmkmmtlZrQ8BSAmaohCdGexZC+UJMMIgirZdYVUaTkp4Ly2er4I7UvHxKabkey6hXnUbeG0GAibJ0wVC1O8aDTwdRhkXYmu/Qzswd8gpptaMbt81Nr+5VbOrv1L9AH2rdXesK06bZllVyhIA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=F+w6Q/v7KZ51nrJiTQEesxh8xMCD2WxtPflCVDDM3Ys=;
+ b=RUKJGjOPVUtDhMQiE6p/9yEE6fk4yw6BWldJbKjnkJsDe8rVu1YCvinFiZ4GAkh82jazgMRgCED72ayUQJIz5E54tnUUYWtkIekXcsKs3ykXbs9c8ZD0e+qwpu6rpySkg2N+DE1L0/Hj7hRmdn3O1/FkZR/PxYYbm1Soz8H+xWbsGz91Et3d3v/g03pXZP5IjtcbpOhUKD0e8aWndDf/xMrg5+5e4q4BCuUWhlNKhXJAXYyHtiEVaViLWEOeqqPjMbfy27bNA5mEISUgy6Gn7/TRIfYsTcg4rFkJq2h0bexeJi+vjngwI7rA9hW81vRnb0+nJAEUN/Iyi5mLvqWncA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS0PR11MB8718.namprd11.prod.outlook.com (2603:10b6:8:1b9::20)
+ by CY8PR11MB6985.namprd11.prod.outlook.com (2603:10b6:930:57::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8335.17; Mon, 13 Jan
+ 2025 12:32:18 +0000
+Received: from DS0PR11MB8718.namprd11.prod.outlook.com
+ ([fe80::4b3b:9dbe:f68c:d808]) by DS0PR11MB8718.namprd11.prod.outlook.com
+ ([fe80::4b3b:9dbe:f68c:d808%4]) with mapi id 15.20.8335.017; Mon, 13 Jan 2025
+ 12:32:18 +0000
+Message-ID: <1ba87a40-5851-4877-a539-e065c3a8a433@intel.com>
+Date: Mon, 13 Jan 2025 13:32:11 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] nfp: bpf: prevent integer overflow in
+ nfp_bpf_event_output()
+To: Dan Carpenter <dan.carpenter@linaro.org>
+CC: Jakub Kicinski <kuba@kernel.org>, Louis Peens <louis.peens@corigine.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, "Quentin
+ Monnet" <qmo@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+	<bpf@vger.kernel.org>, <oss-drivers@corigine.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <kernel-janitors@vger.kernel.org>
+References: <6074805b-e78d-4b8a-bf05-e929b5377c28@stanley.mountain>
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+Content-Language: en-US
+In-Reply-To: <6074805b-e78d-4b8a-bf05-e929b5377c28@stanley.mountain>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: WA2P291CA0003.POLP291.PROD.OUTLOOK.COM
+ (2603:10a6:1d0:1e::7) To DS0PR11MB8718.namprd11.prod.outlook.com
+ (2603:10b6:8:1b9::20)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:13ae:b0:3a7:c5ca:5f58 with SMTP id
- e9e14a558f8ab-3ce3a9b5404mr138741435ab.7.1736771129252; Mon, 13 Jan 2025
- 04:25:29 -0800 (PST)
-Date: Mon, 13 Jan 2025 04:25:29 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <67850639.050a0220.216c54.0050.GAE@google.com>
-Subject: [syzbot] [net?] WARNING: locking bug in netpoll_poll_disable (2)
-From: syzbot <syzbot+54f9a6de31e425e46ace@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR11MB8718:EE_|CY8PR11MB6985:EE_
+X-MS-Office365-Filtering-Correlation-Id: 449b4298-1ef8-4a3b-2e83-08dd33ce5198
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|7416014|366016|7053199007;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?R1EyQWlTUmdGRWxXa3pzcndrRS8wVW5EQVlOZUY1TWl5SjJtdFNGb2lneGZ1?=
+ =?utf-8?B?Z1ZrVEZXYllVTUdCNUhudldlRVo3aVpPL0NseHd0b29SQ25oeFFJcVVnaUYz?=
+ =?utf-8?B?YlA1MUVMWnkvWUdBTnBSZTlaL2hHQlR2TkNxcjNiMUplYWhvbTJVYXBJVUp3?=
+ =?utf-8?B?ZkVtOXZhV3doQjVocHRuUlRldkJFVEg3TUhzVEhPWVhwdWloRnQ1clBheElW?=
+ =?utf-8?B?MDNsODJLRDE0TWUrdUVWWElDRWVQdUNvNjNrMXRUT1Z0N0llMk9aUHljRnph?=
+ =?utf-8?B?bWVIeUcyRDlVRzcwc2tDeDVkVXpSdHAzZnp0WHBDaHluQkl0eXU4TTNxTlNB?=
+ =?utf-8?B?bDZuRnRjTkFCSmMralZkQ1VjQks2SUk2NXlmN1JBNkF6c3FnVG04dFZKZ1VZ?=
+ =?utf-8?B?RS9INjNDTUVTMW5Sejh4aG53cjJYQmlKdUk1dGJnejJWVDRiMFh5K09aMmJQ?=
+ =?utf-8?B?MUpwZTJUcFl1ajBYb21TS3gxelZoQVVoT1lkUXFxbjRrYXFqRHlkQ1h3K2pZ?=
+ =?utf-8?B?OUZmQ01GNG85RTBrcEt6djk3S2t1VXFRSVlLUEJTU3BHOUhYVFpHZlpFWDFx?=
+ =?utf-8?B?NDZMbkNKSVN2VXFMSXl2K3JHaEc0d0d0R0lpbWZFYkdjRlp4eWxWaUpNVzhV?=
+ =?utf-8?B?VWNaUll1TE1jVVJIK0JBbjNUTzQyRGRtM1huQjdPa0U1ZFhBUW90RDlDWGdZ?=
+ =?utf-8?B?SFN5dENaOTF2eEJOaWsrdmdNZ1dTN3NLaXdZcVF6RzFvMEQ5VC9VY1ExcTJ3?=
+ =?utf-8?B?V0VRekN3UC9XNVI1SEUxRHZlRnEwTENGRmM5Z09neGhhdjBHOFIvTHFReHU2?=
+ =?utf-8?B?TFpmeWU2dVVtcjluMXhvNU42b2hTbWd0ZVdkdUpTY1d4M29nV1JUeEFUQVFm?=
+ =?utf-8?B?Y1h1elJyVFdlaGpNT0RiaFFSWWtISWtibTJ3eTBjR3F4WlpBZXd1QU1jYWFZ?=
+ =?utf-8?B?djAvWkpZWGE3N3A5K0hSWXZwODRkVzhsMGdwak1MdEMwYWNHSVg2Q3p4WmFQ?=
+ =?utf-8?B?SnVHUjFYVTdCTVBUL2RLK0JoOTN5WWE3Z0RtWklyUEVoWU1CTkVGSmxyTVow?=
+ =?utf-8?B?TXNsSVNJbGV3M1pFMUR3QnUxNWpwRzh1QmpnSHFnZ3IrdUU1TEFLeVpkcHpV?=
+ =?utf-8?B?eHJ3dnNPN01lWEhwdGNOdWdJSGJXWlFPSkpzcWpma3l1NXFFOHVsckEwMTZG?=
+ =?utf-8?B?NENzU0d1V0ZqLysyQUYwTHhlMVhxcXF4YTFLaGlFaUVXKzhJcVZSNk1qcFdk?=
+ =?utf-8?B?aU11RmZ1K0N1ZXVmUjJmTmFDai9XRU8yWjZOSjVzNEpScHZZL09FanhKVTFt?=
+ =?utf-8?B?MUU3cE43K2JSY21Vb0VsTlhjUS9EOTdYejVLZGVHbzdRWm05MDNkL1BybUxZ?=
+ =?utf-8?B?NExlbDBWY0tHNkRtMVdkWCtGY0FYeHg3T1oxM3V1SmhlZVIyR2IyQ2U1RW9Y?=
+ =?utf-8?B?NHA1aGR0U3ZWYmZNbjc0NXh3MERNRXJmbTE3L2lDQml6aVRyZFhiZXZPeVdN?=
+ =?utf-8?B?aHFTY3VTZ0hBNWRaZlJRdDdEZFlMRTU5OURNcyt3d1V1ZkpVNnNwdCtTK0dp?=
+ =?utf-8?B?MXlSNXkwR2QzRDNIQUxhcFhTSUJTajR2ODF0dFB3OXZIdkFiaHVCVmhFWVBr?=
+ =?utf-8?B?c3V6bUs1Zmc4OExQSi84eTlKSThSQWVoSlduTDE3U2pROEhhUm9kaHhkZmNv?=
+ =?utf-8?B?dG5KbkttVkhCMFduQVNFUFMxdHozS0lhNlFRTVVPSDAvemd5QytPeDRPbEFj?=
+ =?utf-8?B?WXdKKzNLemJHRlNITVJ2WU1HM3JnU3RhS0N1TGNVb1NLUGdrdmV0bTNzTGRj?=
+ =?utf-8?B?ZEVJVnN5N1ZvUTRubEY4VXk3bWs1cWVER2hQT3A0djlWaHdPa0JQaExjU1I2?=
+ =?utf-8?Q?YQYN9RN3pHHgM?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB8718.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(366016)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?MHZaVjI5VWsyTS91NlFXa1k2UGNqY0JncVdTQ1N4akhqeGlIMnVWb1VaVDZx?=
+ =?utf-8?B?a2tVSEF5UE5ackczNm9QL0QxSGVzZndWWVBncURoT0w2ZlJuVHpOOWhHRkcv?=
+ =?utf-8?B?K3dOcTVCb0N0VHlNNmhmcXFTSUEzTFRrbUVQT0EzQjJPQlFlejBnZ2poODM0?=
+ =?utf-8?B?S3I4U2d5MDFkUk9nOU9Ra0NHSllvR1UwWnVKTXBGMTE4YTd1bmlma2V0bjhS?=
+ =?utf-8?B?Y3RKRjYvQzVSZHAvbHF3UjJnbUFuMGozQkdGZ3ZDYm5keHhXbzRuZlFIZ083?=
+ =?utf-8?B?eUtrWlRvM0hVWndhdzFBZDd4Q09BZzFsUnppWE8yTENReUlKTUN3SzV2TXJh?=
+ =?utf-8?B?bnJMaldDaFdLeGZLb2IwNVVwVUJuK2lZRkEwa3RlekhnMEM4Uk0wa2lRR0xS?=
+ =?utf-8?B?ZHBUV1Ezb3FHNFFjS041QmM1Y0JnQXNJRDdKVW9qM1loWm56Q0poZWJCKzho?=
+ =?utf-8?B?eDFtdE5HcktqYzlieDQyaXNkTERUWkNhSzVieEtySnlYMU5Fckx6OG9YYzh3?=
+ =?utf-8?B?UC90YkdkSEtraVhPWlF5anBOUTNFTm93endocmcwQmduOExib1o2SXU3QTh3?=
+ =?utf-8?B?cTk1dDZQbGlIVXUzR01ERlBmL3lQVnRrZkFUQ1FJaytRUW1LaHpGa2duajNw?=
+ =?utf-8?B?Nmc1Sm9meWlWQjVKUjRtM0ZOYTdsTFJTMDZmNDdGbnMrbi9QdWtFaWVlYVBz?=
+ =?utf-8?B?U1hSREdDTXB1ZFA3MCtsQlU1RVZhcVVCODljelpYN21kN3Fjb0t4bHZYUEh2?=
+ =?utf-8?B?SVhnYzhwallGcDJZYld3QkNld0dlN09lV2dncTAzMjJVRlNoZlhNbU5uQTFt?=
+ =?utf-8?B?YmhMc1RZYnBpQ2xzVTBSTDN4WHRjdFB3QjJkWmE0YVBXYTdIR1lCNHdiNmNz?=
+ =?utf-8?B?YllzZ3Y4V2k3R3VmaSttTFN4enVrTWt1ZUdNWVV6QTFneG1reDZjUmMvM2pD?=
+ =?utf-8?B?eDZLb2tDS0RoWUsxK2VVR01KMUU5aUQ3L0VoYlFRNWhkdmsvYnpwYUF2Uitv?=
+ =?utf-8?B?Q1dycHlQUEQzakpBa1VLUm1NZEZYUnl3Q2d6bExNdEZQMG5pVzFGNm9Db1gr?=
+ =?utf-8?B?Z3E4eTBpdUxuNUZRencrbDNXa2lTN3lqcUJYMEpqR3hvbUVmT2hIRmJiaW9a?=
+ =?utf-8?B?TndveFFhNXJSWDVkTVQrcW1MMFNzNmpxQTdWUWdUWEdDdTF4Qm1qclZsc2kv?=
+ =?utf-8?B?anZuVXVYdjFBZ09vSlcvN0lGTnlDcjJZSFJPSXh0RFV5dGU4ZUtvdmgzT2R5?=
+ =?utf-8?B?ekF6WHJxMUFuVkNLSXd5RENzM0JKcVlWSDhGN2V5cGJnRUFaVVgxMmVqWExk?=
+ =?utf-8?B?UEdZOHhMeTBZanV6VlFsZjlyWlY4SXdjSnlzV3EyUXBoK0pmZ05vUmF0SnYz?=
+ =?utf-8?B?WlFRYzg1OXdJUm5iS1F4bUNqa2o0QUYrZCtIN09ENU5sb1kzazZQN0RUS1dV?=
+ =?utf-8?B?MGxRamIva2dnQjNxUDBMMFFIL0RYUFpxUCtOQjNkUzNMWURmai8yOEJlL1F6?=
+ =?utf-8?B?YUtoc252d0Z0R2lSVFQwTXFEYmxDNGE0SFVGM09TS1N1eTV0MUhkaEJpV0Zo?=
+ =?utf-8?B?eVBISzJGemFsQk5Fa2dSYXNhMGdsUnBiTzVBM0RoeGVscW4xN2lJM1lIaEZt?=
+ =?utf-8?B?WVovWURMYnEzNkVlVUh3Q1UzblJqWTdxd1Z3QTlSOTBJcWpCREdKWDlaRVdB?=
+ =?utf-8?B?ODZJT1cwMzZhQzhLMTBrUWU1TjQxQlo2NC9mNmxBU29zd3BqaHFmOUZCTWpB?=
+ =?utf-8?B?NzIxMmp3TjdvZVRrVmp1VFZySTlEZVFURzZoOWZLYlNXdVlOV0x2TVJFSktZ?=
+ =?utf-8?B?L09oZmhQNk1RYm1iYnVDVVAwVDRCMSt6aFZiNDZ3dUJ1NDVQUFMvV2s0NldV?=
+ =?utf-8?B?aCtwV2dkR0dIUzhQOEZhT2lkWXdCUVNqL01jUTMrWGM2YlB4MkR2RjRUNnc0?=
+ =?utf-8?B?d2c2MGtsT3cxSnVxaFNHU293dUkxMlFHRUxBMU9rTFBZTW5neDUvcDl6UHQ2?=
+ =?utf-8?B?RXpGTUZ0cGwzbUowOUhFd0NPK2FLMFVWM1Bsb1l0cDFMZVpNWWpWbHQrKzRs?=
+ =?utf-8?B?cmhrV1dzaUtvREl1TGJBRnB6OFZjM21IK3dNUXd2dHh1Q3p0cEIxQmtXaXh4?=
+ =?utf-8?B?ajFYWCtwUFpCVWgrUlNyMXplZStNS1VlSzY0TzBLc2t1aG1KdEloRkF4b0oz?=
+ =?utf-8?B?cXc9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 449b4298-1ef8-4a3b-2e83-08dd33ce5198
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB8718.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Jan 2025 12:32:18.4403
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: pRXW9DjMFNwg3PgkD4ePQyKzgp2O5s0Os1T6vmMdz4mIeGbqQ+WUEW/oM3uwZhxAVboJ6ogyfigEUNQpBhylT7nbTUWvQEK3jwllG4awZTY=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR11MB6985
+X-OriginatorOrg: intel.com
 
-Hello,
+From: Dan Carpenter <dan.carpenter@linaro.org>
+Date: Mon, 13 Jan 2025 09:18:39 +0300
 
-syzbot found the following issue on:
+> The "sizeof(struct cmsg_bpf_event) + pkt_size + data_size" math could
+> potentially have an integer wrapping bug on 32bit systems.  Check for
 
-HEAD commit:    577490b6abb9 Merge branches 'for-next/core' and 'for-next/..
-git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git for-kernelci
-console output: https://syzkaller.appspot.com/x/log.txt?x=134b270f980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=5408fc4cf982e2c4
-dashboard link: https://syzkaller.appspot.com/bug?extid=54f9a6de31e425e46ace
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-userspace arch: arm64
+Not in practice I suppose? Do we need to fix "never" bugs?
 
-Unfortunately, I don't have any reproducer for this issue yet.
+> this and return an error.
+> 
+> Fixes: 9816dd35ecec ("nfp: bpf: perf event output helpers support")
+> Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/f9a89a276c80/disk-577490b6.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/6c19133a4de5/vmlinux-577490b6.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/0dde1fa5fad3/Image-577490b6.gz.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+54f9a6de31e425e46ace@syzkaller.appspotmail.com
-
-bridge0: port 1(bridge_slave_0) entered disabled state
-------------[ cut here ]------------
-DEBUG_LOCKS_WARN_ON(1)
-WARNING: CPU: 0 PID: 7557 at kernel/locking/lockdep.c:232 check_wait_context kernel/locking/lockdep.c:4850 [inline]
-WARNING: CPU: 0 PID: 7557 at kernel/locking/lockdep.c:232 __lock_acquire+0x7b0/0x7904 kernel/locking/lockdep.c:5176
-Modules linked in:
-CPU: 0 UID: 0 PID: 7557 Comm: kworker/u8:12 Tainted: G        W          6.13.0-rc6-syzkaller-g577490b6abb9 #0
-Tainted: [W]=WARN
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
-Workqueue: netns cleanup_net
-pstate: 604000c5 (nZCv daIF +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
-pc : check_wait_context kernel/locking/lockdep.c:4850 [inline]
-pc : __lock_acquire+0x7b0/0x7904 kernel/locking/lockdep.c:5176
-lr : hlock_class kernel/locking/lockdep.c:232 [inline]
-lr : check_wait_context kernel/locking/lockdep.c:4850 [inline]
-lr : __lock_acquire+0x7a4/0x7904 kernel/locking/lockdep.c:5176
-sp : ffff80009eff7040
-x29: ffff80009eff7300 x28: ffff0000d7a60000 x27: ffff0000d7a60b40
-x26: 1fffe0001af4c168 x25: 0000000000000000 x24: 0000000000000001
-x23: ffff0000d7a60a78 x22: ffff0000d7a60b20 x21: ffff0000d7a60b44
-x20: 00000000000015c5 x19: ffff8000931c7a78 x18: ffff80009eff6738
-x17: 0000000000000000 x16: ffff8000803b4180 x15: 0000000000000001
-x14: 1ffff00011f49f9c x13: dfff800000000000 x12: 0000000000000000
-x11: 0000000000000003 x10: 0000000000ff0100 x9 : 0c98272ec0943100
-x8 : 0000000000000000 x7 : 4e5241575f534b43 x6 : ffff8000804a69fc
-x5 : 0000000000000000 x4 : 0000000000000001 x3 : ffff80008047cc34
-x2 : 0000000000000001 x1 : 0000000100000001 x0 : 0000000000000000
-Call trace:
- check_wait_context kernel/locking/lockdep.c:4850 [inline] (P)
- __lock_acquire+0x7b0/0x7904 kernel/locking/lockdep.c:5176 (P)
- lock_acquire+0x23c/0x724 kernel/locking/lockdep.c:5849
- __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:110 [inline]
- _raw_spin_lock_irqsave+0x5c/0x7c kernel/locking/spinlock.c:162
- down+0x3c/0xe8 kernel/locking/semaphore.c:59
- netpoll_poll_disable+0xe8/0x100 net/core/netpoll.c:222
- __dev_close_many+0x104/0x3c8 net/core/dev.c:1532
- dev_close_many+0x1e0/0x474 net/core/dev.c:1585
- unregister_netdevice_many_notify+0x454/0x1c6c net/core/dev.c:11502
- unregister_netdevice_many+0x28/0x38 net/core/dev.c:11592
- cleanup_net+0x5c8/0xa34 net/core/net_namespace.c:643
- process_one_work+0x7a8/0x15cc kernel/workqueue.c:3229
- process_scheduled_works kernel/workqueue.c:3310 [inline]
- worker_thread+0x97c/0xeec kernel/workqueue.c:3391
- kthread+0x288/0x310 kernel/kthread.c:389
- ret_from_fork+0x10/0x20 arch/arm64/kernel/entry.S:862
-irq event stamp: 489272
-hardirqs last  enabled at (489271): [<ffff80008030e224>] __local_bh_enable_ip+0x224/0x44c kernel/softirq.c:394
-hardirqs last disabled at (489272): [<ffff80008b6c638c>] __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:108 [inline]
-hardirqs last disabled at (489272): [<ffff80008b6c638c>] _raw_spin_lock_irqsave+0x2c/0x7c kernel/locking/spinlock.c:162
-softirqs last  enabled at (489270): [<ffff8000861788ac>] pppoe_flush_dev drivers/net/ppp/pppoe.c:327 [inline]
-softirqs last  enabled at (489270): [<ffff8000861788ac>] pppoe_device_event+0x464/0x4a0 drivers/net/ppp/pppoe.c:346
-softirqs last disabled at (489268): [<ffff800086178530>] pppoe_flush_dev drivers/net/ppp/pppoe.c:279 [inline]
-softirqs last disabled at (489268): [<ffff800086178530>] pppoe_device_event+0xe8/0x4a0 drivers/net/ppp/pppoe.c:346
----[ end trace 0000000000000000 ]---
-Unable to handle kernel paging request at virtual address dfff800000000018
-KASAN: null-ptr-deref in range [0x00000000000000c0-0x00000000000000c7]
-Mem abort info:
-  ESR = 0x0000000096000005
-  EC = 0x25: DABT (current EL), IL = 32 bits
-  SET = 0, FnV = 0
-  EA = 0, S1PTW = 0
-  FSC = 0x05: level 1 translation fault
-Data abort info:
-  ISV = 0, ISS = 0x00000005, ISS2 = 0x00000000
-  CM = 0, WnR = 0, TnD = 0, TagAccess = 0
-  GCS = 0, Overlay = 0, DirtyBit = 0, Xs = 0
-[dfff800000000018] address between user and kernel address ranges
-Internal error: Oops: 0000000096000005 [#1] PREEMPT SMP
-Modules linked in:
-
-CPU: 0 UID: 0 PID: 7557 Comm: kworker/u8:12 Tainted: G        W          6.13.0-rc6-syzkaller-g577490b6abb9 #0
-Tainted: [W]=WARN
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
-Workqueue: netns cleanup_net
-pstate: 604000c5 (nZCv daIF +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
-pc : check_wait_context kernel/locking/lockdep.c:4850 [inline]
-pc : __lock_acquire+0x574/0x7904 kernel/locking/lockdep.c:5176
-lr : hlock_class kernel/locking/lockdep.c:232 [inline]
-lr : check_wait_context kernel/locking/lockdep.c:4850 [inline]
-lr : __lock_acquire+0x7a4/0x7904 kernel/locking/lockdep.c:5176
-sp : ffff80009eff7040
-x29: ffff80009eff7300 x28: ffff0000d7a60000 x27: ffff0000d7a60b40
-x26: 1fffe0001af4c168 x25: 0000000000000000 x24: 0000000000000001
-x23: ffff0000d7a60a78 x22: ffff0000d7a60b20 x21: 00000000000000c4
-x20: 00000000000015c5 x19: ffff8000931c7a78 x18: ffff80009eff6738
-
-x17: 0000000000000000
- x16: ffff8000803b4180
- x15: 0000000000000001
-x14: 1ffff00011f49f9c x13: dfff800000000000 x12: 0000000000000000
-x11: 0000000000000003 x10: 0000000000ff0100 x9 : 0c98272ec0943100
-
-x8 : 0000000000000018
- x7 : 4e5241575f534b43
- x6 : ffff8000804a69fc
-
-x5 : 0000000000000000 x4 : 0000000000000001 x3 : ffff80008047cc34
-x2 : 0000000000000001 x1 : 0000000100000001 x0 : 0000000000000000
-
-Call trace:
- check_wait_context kernel/locking/lockdep.c:4850 [inline] (P)
- __lock_acquire+0x574/0x7904 kernel/locking/lockdep.c:5176 (P)
- lock_acquire+0x23c/0x724 kernel/locking/lockdep.c:5849
- __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:110 [inline]
- _raw_spin_lock_irqsave+0x5c/0x7c kernel/locking/spinlock.c:162
- down+0x3c/0xe8 kernel/locking/semaphore.c:59
- netpoll_poll_disable+0xe8/0x100 net/core/netpoll.c:222
- __dev_close_many+0x104/0x3c8 net/core/dev.c:1532
- dev_close_many+0x1e0/0x474 net/core/dev.c:1585
- unregister_netdevice_many_notify+0x454/0x1c6c net/core/dev.c:11502
- unregister_netdevice_many+0x28/0x38 net/core/dev.c:11592
- cleanup_net+0x5c8/0xa34 net/core/net_namespace.c:643
- process_one_work+0x7a8/0x15cc kernel/workqueue.c:3229
- process_scheduled_works kernel/workqueue.c:3310 [inline]
- worker_thread+0x97c/0xeec kernel/workqueue.c:3391
- kthread+0x288/0x310 kernel/kthread.c:389
- ret_from_fork+0x10/0x20 arch/arm64/kernel/entry.S:862
-Code: 34000fa8 aa1f03e8 91031115 d343fea8 (38ed6908) 
----[ end trace 0000000000000000 ]---
-----------------
-Code disassembly (best guess):
-   0:	34000fa8 	cbz	w8, 0x1f4
-   4:	aa1f03e8 	mov	x8, xzr
-   8:	91031115 	add	x21, x8, #0xc4
-   c:	d343fea8 	lsr	x8, x21, #3
-* 10:	38ed6908 	ldrsb	w8, [x8, x13] <-- trapping instruction
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+Thanks,
+Olek
 
