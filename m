@@ -1,132 +1,123 @@
-Return-Path: <netdev+bounces-157757-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157758-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5ED0DA0B940
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 15:18:40 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F996A0B947
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 15:20:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 77E1A167481
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 14:18:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 92E611883156
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 14:21:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 553B52327AE;
-	Mon, 13 Jan 2025 14:18:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9174422AE7B;
+	Mon, 13 Jan 2025 14:20:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UEuBWui8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fAP7cAvd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 974761CAA6A;
-	Mon, 13 Jan 2025 14:18:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2593A1CAA80;
+	Mon, 13 Jan 2025 14:20:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736777915; cv=none; b=AoABY95a7u4M5UdgsIKTXo6OHZeL3M1RfKR1zDScvMRYNNKEn4q9fcI+Hs/wEHBjPRO6O+9/nLyiKM+pVaRzBYaocQfL3cYox20KlNF3zMIGYEtU+sr5zsGRK85/P5VdrPm+dSfkKuZyieyH00vwJU+/jvfcya4TuQJ4uW3guG4=
+	t=1736778054; cv=none; b=Dd9JEHGDcqsAvlZ3tg/JMtCnpeK3IfrV1Lh3WWsT3YwxNpsH8kt/OfP3VCjLV76B8yPPGa23kpvWazVgwB3wR+INPMe1vRD6JwACt/iDZ+wXLOA6f3mFEu9XUx0O8WAi69Ku18eP9OASu0KQOOEwlJxD/IIkV+68/F8sVsVMWiI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736777915; c=relaxed/simple;
-	bh=7YimBG3LQ3J6ndU/hvJ1ZvNEDHgvt22mDIjip1m80mA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LxcmOe7zjItsbxrrWzCrAhgkkuWGV+tocTvlh2s0dSoS6/JQq23zsMJpwpbRPe7NGOO0dmi4kZq+bZdywsmuxs/mAZRkkxdxSWZi81yRYdYhq+a8rQ8Ln4SAAieFNgmX9vvZJ7Zs7MhrsI3zEhjShUOh9BhzWgyNXNW8liC0Mzs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UEuBWui8; arc=none smtp.client-ip=209.85.128.43
+	s=arc-20240116; t=1736778054; c=relaxed/simple;
+	bh=VZOQqvFfIH3zxCowIb6BFNpEQKyR34JN72u7g8qIRVI=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Zp/NklDZ8FARWbEtCoFAmEcVZFnw+R1Wf4vHJ71CO+l3b6kzjjlPJ8Pv1qvi6SrhW0bHxsD+8/7Za6Vta0MkRxbuV//fDNFNPLls/cbra0kX4/4D3G8aDNLngfT3ClZegE0OIAT7cAncJsdHN4h9LnGDU8iFDb5AfE3vX1QroZM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fAP7cAvd; arc=none smtp.client-ip=209.85.214.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-435f8f29f8aso31144865e9.2;
-        Mon, 13 Jan 2025 06:18:33 -0800 (PST)
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-21bc1512a63so11942855ad.1;
+        Mon, 13 Jan 2025 06:20:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736777912; x=1737382712; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=U2es6yriLWnAabX2QUZDG1SzGg71ZT0n2Mtutr6FZ6g=;
-        b=UEuBWui8GTlEkaUHq+vd64sFZtIPNvwwSorOGuHejuZACqYfbQ2eXa6cad9YpBHnzX
-         ZMFHLzRbLt0lrYKiappEdEYb/djVC5vGULhHIXhCzaRLzLtSYep6qTdXHBB/c20gKLi+
-         srw/2t3ylm+w5KjCGQ5ECuLZdyoNvaeNyhMmO547cYvZCZvXxoWd60140QvTIjwZevs5
-         U0aoC1AK9m+hdBmWqr3MgtShDr5o/K3c7wVuimEsYNKKreNiFRbf03l3kyox7Ux2I9zz
-         hJqQAqXesXPFxyK6ridKa0ldtJxOzoxxbYt4KlT7FtssZN+YBeuRsInPrt+8qJAKuv8p
-         vHqg==
+        d=gmail.com; s=20230601; t=1736778051; x=1737382851; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=yjgJEm+zsHpgnh6MvvlrOCLzGs3HMBzj7m6xU9nO/zQ=;
+        b=fAP7cAvdrBPYVYHjRK/QFLX65EPVl+pW1jOLQocjxA7i7NO5OQaoGzgxpM/abFyBD1
+         QT+nYyEZy+IqwtVfPjGzLbL9twnu5MdZE6cftwn6fidHqTY3PLlxu5XhtKpt6FMgeOQ/
+         PXx5ZnmFBiEmWoHIOwzB4+0lwHtCTyce+Z8+nxuTZ/ebhKA2wB9oO7dFxghWLi59YBMR
+         o0kVz5OSVwOmoc3PCUVRTdShxRAymJ+aEJrjOgNq76SHqDrRNRrdYc+28dsYXySUKVX+
+         MvYVdG62oeZtWMBBdloPPPMU7HRrSDPNH74MBjDCA81RQlTRRktoSQkXQ+vCscsltNZL
+         W9uA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736777912; x=1737382712;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=U2es6yriLWnAabX2QUZDG1SzGg71ZT0n2Mtutr6FZ6g=;
-        b=ZGSavs+aVY2YG0e8F7f7szNCjEIuA1aC+Jth7J4vEvdHVJefCPIo/VwWDsFD365JPm
-         7mCeV/sz55s9+tp772mJjeLD91uzNvSfT/PuXPqzQB5iLhbGag6r1i7Sf/hL3oZtlShK
-         q5nXhnwF854J36PZXmpV32RtcvUxvwpd0N+bT4fV7KvPwjXbmNLrBl/d3n4H10aFHJ4l
-         E0rzzwtE7FxNpTAFLGzuKIsRxjq2dY/176whTYL7w5KcvoiOsvH8i38BoaCTx96fYcs2
-         YHU5Ah05nBh0k6k4pHAsZzQNEhqQ2s4pBS7sACUUV22PO8KTePbWO7Rn5pAp5EqG4vlo
-         2yaw==
-X-Forwarded-Encrypted: i=1; AJvYcCUdZrC/o5CkFltz1pvty6boYj9bahMbIMg/UrSw4Bcg9Mxyxm6WRl4kCppJQYWryNDjq8SLzxzTOFvf@vger.kernel.org, AJvYcCWxlyOxUiccL/kwn6FBRGXpKwSOpVwIVurShJ+jZDvlIP0xQqR2HwLsUSO2ezxozeQ44cLlBBWhX667VXOk@vger.kernel.org, AJvYcCX5ow73aWgFEnBFCJbK1LgbXxkUoRnD4dQNhyRf13jIbWpI8TatZ6t1nY+vP8v25H72e30CR5GZ@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx+tXpTmJaDP9Sqb8QsLb7fDrV56UdJMLGJSWVuh6tqE8g+S6Z3
-	7uM5YmcaeHHUXUvhVlkCHi6u3k+5xUhYn0B2e1ItzRvqqV/5o5gM
-X-Gm-Gg: ASbGncshbQQamNjj+T6RhEPJkTgmS+yNiWKmrsD3WUBd3G/8nV3yAc6DePjSaSjrMi4
-	GVthSOLUDP1DtxwroXtSdsYP+6GufYErqJc3G7RRep/il7067UfzTu84woobddu8MHFuTQS9vdQ
-	HucUuofQdXtoT3miT/xYBDdEyV1bLo9sOy7dncW4mFgv6wj5oSjcUOrJldREdrOzTO/UQn2dNCd
-	iAeMKFFmHs41dV6PrNep17ohA4Wu3/GaggBJekibhvc2YOcS6Gd
-X-Google-Smtp-Source: AGHT+IG04VKJi+ixrAU4Wm0abXxVfnfxurgCJ8NE/rCLyxx5AgLs1/IbR4L9IAmuCdNEQSKmle4V1g==
-X-Received: by 2002:a05:600c:5486:b0:434:f131:1e64 with SMTP id 5b1f17b1804b1-436e2696d1fmr188716265e9.9.1736777911548;
-        Mon, 13 Jan 2025 06:18:31 -0800 (PST)
-Received: from debian ([2a00:79c0:620:b000:303:6c5b:4b07:6715])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-436e2da7768sm182271275e9.5.2025.01.13.06.18.30
+        d=1e100.net; s=20230601; t=1736778051; x=1737382851;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=yjgJEm+zsHpgnh6MvvlrOCLzGs3HMBzj7m6xU9nO/zQ=;
+        b=quRV4NEnXwrvJ+O5Yo7ns0k81zQi3PPCBtBdroO4d2BFwzvHgVeyzROGBp4K3l4hu2
+         LcPIbnn5KZWvAJ1cSTaq11/m3aCagy9BPwx+n64oxlDfAdtZnLLSYqgxs6q45k2GJUfE
+         VikRRcOvCS/L2GvOYWF5Dtpm/eP2tD/xIJOlT3QNAjMC97ZIP6kLfIPiGUnPbc/WalE4
+         k5EJGEPVOMG9enTC7DJ2XDn+6J7Wxd41kF31pgSsgaDHfip7Xh1S6NKHnNn+aLsOgC9b
+         qf1Lby+3xsQ9YGiRqFZvmOXgaVFxAtaQxov6s12Z81m50PgzOc9zjyQ4G8oItLMTHrKm
+         UY4w==
+X-Forwarded-Encrypted: i=1; AJvYcCWPFAwU4LJ89Mb6i9G9ax513qeiGbppLw0E+x/CxhTEuFTYVYscTcedgwFRBFVFob0uRWLxP1opzE2D2F0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw3CI2f8iLrTgr3aN3jspWe35+ll9MZ9L4C3aWKPESW+3SUfjoP
+	Y0mtVQTf2mKr8B1wbTWUZRsaJeOOIBSimrY8lAn7m4qyC6yXv0J+eWQRxA==
+X-Gm-Gg: ASbGncsCpZRoG2crYS5ZRS+KwiTVUp+kySBcCTMohgYOILSUQbn564meItOye/mg9/7
+	aQd/BFI1W48wnE7hWu3SOcCRDDETRMkV6LsquFMMs8bksr5VWIn91a1ypQm/XHTFy9OmlsVpBtR
+	/U2BD1ZHdoT5bRK6Mg7VHIPmxFAnw20I3n9FP1g+mgubLZlMX8NtysMMQrdpH8JkbuFuBEbU3JC
+	N8wCCP4TCyS4RIBTelQvcxSc8Iybyk8EdzmztrCvqxbPp20gFGRXdMqC2qjcg7fL0bZSQ==
+X-Google-Smtp-Source: AGHT+IGOgpQygxHN474HH35BO8I0IxWuOevbbQ53X03NN01ieJAvLtEHwfIjUcmb+msVKrMaDxXj3A==
+X-Received: by 2002:a05:6a00:3c83:b0:71e:4296:2e with SMTP id d2e1a72fcca58-72d21f4bc9emr28805500b3a.11.1736778051319;
+        Mon, 13 Jan 2025 06:20:51 -0800 (PST)
+Received: from localhost.localdomain ([129.146.253.192])
+        by smtp.googlemail.com with ESMTPSA id d2e1a72fcca58-72d4067f0d1sm6089222b3a.136.2025.01.13.06.20.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 Jan 2025 06:18:31 -0800 (PST)
-Date: Mon, 13 Jan 2025 15:18:28 +0100
-From: Dimitri Fedrau <dima.fedrau@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: dimitri.fedrau@liebherr.com, Andrew Lunn <andrew+netdev@lunn.ch>,
+        Mon, 13 Jan 2025 06:20:50 -0800 (PST)
+From: Furong Xu <0x1207@gmail.com>
+To: netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, Andrew Davis <afd@ti.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 0/2] net: phy: dp83822: Add support for changing
- the transmit amplitude voltage
-Message-ID: <20250113141828.GA4250@debian>
-References: <20250113-dp83822-tx-swing-v1-0-7ed5a9d80010@liebherr.com>
- <fcffef06-c8d1-4398-bc20-30d252cd2fd2@lunn.ch>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	xfr@outlook.com,
+	Furong Xu <0x1207@gmail.com>
+Subject: [PATCH net-next v2 0/3] net: stmmac: RX performance improvement
+Date: Mon, 13 Jan 2025 22:20:28 +0800
+Message-Id: <cover.1736777576.git.0x1207@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <fcffef06-c8d1-4398-bc20-30d252cd2fd2@lunn.ch>
+Content-Transfer-Encoding: 8bit
 
-Hi Andrew,
+This series improves RX performance a lot, ~34% TCP RX throughput boost
+has been observed with DWXGMAC CORE 3.20a running on Cortex-A65 CPUs:
+from 2.18 Gbits/sec increased to 2.92 Gbits/sec.
 
-Am Mon, Jan 13, 2025 at 02:54:28PM +0100 schrieb Andrew Lunn:
-> On Mon, Jan 13, 2025 at 06:40:11AM +0100, Dimitri Fedrau via B4 Relay wrote:
-> > Add support for changing the transmit amplitude voltage in 100BASE-TX mode.
-> > Add support for configuration via DT.
-> 
-> The commit message is supposed to answer the question "Why?". Isn't
-> reducing the voltage going to make the device non conforming? Why
-> would i want to break it? I could understand setting it a bit higher
-> than required to handle losses on the PCB and connector, so the
-> voltages measured on the RJ45 pins are conforming.
->
-- Will add the "Why?" to the commit description. You already answered it.
-- Yes you are right.
-- I don't want to break it, the PHY just provides these settings. And I
-  just wanted to reflect this in the code, although it probably doesn't
-  make sense.
-- In my case I want to set it a bit higher to be conforming.
+---
+Changes in v2:
+  1. No cache prefetch for frags (Alexander Lobakin)
+  2. Fix code style warning reported by netdev CI on Patchwork
 
-> Also, what makes the dp8382 special? I know other PHYs can actually do
-> this. So why are we adding some vendor specific property just for
-> 100base-tx?
->
-I don't think that the dp83822 is special in this case. I just didn't
-know better. Would be removing the vendor specific property enough ?
-Or is there already a defined property describing this. Didn't found
-anything.
+  v1: https://patchwork.kernel.org/project/netdevbpf/list/?series=924103&state=%2A&archive=both
+---
 
-Best regards,
-Dimitri
+Furong Xu (3):
+  net: stmmac: Switch to zero-copy in non-XDP RX path
+  net: stmmac: Set page_pool_params.max_len to a precise size
+  net: stmmac: Optimize cache prefetch in RX path
+
+ drivers/net/ethernet/stmicro/stmmac/stmmac.h  |  1 +
+ .../net/ethernet/stmicro/stmmac/stmmac_main.c | 33 +++++++++++--------
+ .../net/ethernet/stmicro/stmmac/stmmac_xdp.h  |  1 -
+ 3 files changed, 20 insertions(+), 15 deletions(-)
+
+-- 
+2.34.1
+
 
