@@ -1,135 +1,120 @@
-Return-Path: <netdev+bounces-157887-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157888-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3EA21A0C2B9
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 21:47:11 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1587CA0C2BE
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 21:48:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 07F4E3A8079
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 20:47:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2F48616834D
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 20:48:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0384A1C07C9;
-	Mon, 13 Jan 2025 20:47:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18FA71CEAAC;
+	Mon, 13 Jan 2025 20:48:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e1iBCJxN"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b="ike3IMQ6"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp1.cs.Stanford.EDU (smtp1.cs.stanford.edu [171.64.64.25])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C98224023B
-	for <netdev@vger.kernel.org>; Mon, 13 Jan 2025 20:47:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 861B11C9B62
+	for <netdev@vger.kernel.org>; Mon, 13 Jan 2025 20:48:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=171.64.64.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736801227; cv=none; b=rHY+2G4y1AfDbAR/11pkuDy6dFT5X/vMvj9yO8oQIK9NxAIyXrZv+rRtQWX2ebChuj2Yx5EmSqtJWlT7JiFb5Rv6PafWQOI3wWLK7MLSODx2CSEUSYU27lhIClr1ADrmalYHYTS3vBnLkp24z44hBsx9pzz2rtt52tAp0rOcCZE=
+	t=1736801310; cv=none; b=WwvJkiv2wEr+lCpVdiiTQRgxoeoW6Jbvb2W8I8dxKooCXbOHxa2IdiMudMN02JpUKHK3mOiafrrIkCftMSwnvwAkaCcsOw5Ty9KvbYa9SFxjOZ90sr8eA8mUQ3s7j4TfpqD7A3OD1atFIWdlrD0t3yz6gRAN6WNqw0qGbfUzjbI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736801227; c=relaxed/simple;
-	bh=8cJD4unik2sXWZa4E2sdL+wD00JTOrDo2G7UPHH3Rjo=;
+	s=arc-20240116; t=1736801310; c=relaxed/simple;
+	bh=90zcy6qhbSgU8cmRVjafWRdr0cYIUm4MqsbDWeQxGHo=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=lGmE/llYIDAVp/Xe4KgZtTCq2HjUqoyo7e43gczbH+fb5yssMf4LuRRAEJicwVClxn/MXNyOiT6EJN80S+EXQ1mTmMzIkFf142/JnV52unpKFg//h9o96wcdjVmunyxa/PfpajyLj4vbC76eWQGAAapUG+CLc6RhxfqlRkd6D7s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=e1iBCJxN; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1736801224;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=X5FBGFo628NG7TIukXYV94iAzpBm3+Gg1mQf+wAPfMI=;
-	b=e1iBCJxNg4pOkAjIFjL8XR4O7W/YpkfbafVe7u6sBWQIR+d8MMP3lt/LGX7TSX7JqG5QJZ
-	5+STXb+OhnbKadrvNjcgU3XhPyD9NN2Uzi8Q7b0l/5fSIF2yiZiCXXaTAV8WR9+4Dzy0y/
-	oPe5xsUGy8Q2B0rEVJKZSQStWpdn8VY=
-Received: from mail-ot1-f71.google.com (mail-ot1-f71.google.com
- [209.85.210.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-228-9e2f2y5qO_GdHDeJh2Vh5A-1; Mon, 13 Jan 2025 15:47:03 -0500
-X-MC-Unique: 9e2f2y5qO_GdHDeJh2Vh5A-1
-X-Mimecast-MFC-AGG-ID: 9e2f2y5qO_GdHDeJh2Vh5A
-Received: by mail-ot1-f71.google.com with SMTP id 46e09a7af769-71e1158c92eso381613a34.1
-        for <netdev@vger.kernel.org>; Mon, 13 Jan 2025 12:47:02 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736801222; x=1737406022;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=X5FBGFo628NG7TIukXYV94iAzpBm3+Gg1mQf+wAPfMI=;
-        b=d+ChsEU+NsD549GRZ/bCqN0vvPlu00jpn0sHAyKdNaNiiNsg7lcYEk+ORmOcnCjXZJ
-         B2hMcluuE2/IhrbRUuhem3i2FjREaA0ZrZ2cxI26zlxXrQ/NNHQ3YJbTim9YJbsQI8sm
-         kOCvPcIbuk5e38Qnpn6sP3251G65geoSaXOAIMhn8eyGcNYlw7YVUSyDDarvO+Jxvq/j
-         jRXDyGPSqDzfPGeUPaL0rDzby0K2czGGPgizmN2olqzZMUCgGw+AK8IufQPqUPfavISs
-         rkusVe3yGT3RuDlWK/0fgxZgo+VrDO4qJ7vVhPCRG7nHrR0bND+WFa2Cwkoi4vfDMXPC
-         FUlQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV9YOsyIsitdzoosdRFVz4HybPLbognTI+20gIt+FlL2Txn1o6NwAa2oBqySc4DSxWrRmWic4Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwTCe5mdZ4A/scjHWHZb3Hdp1mYtj+Yc3KvRGfdgslyeTjSVnND
-	1pmzb5yjcazRpIhJccTdBmVras/ZX2lfubDhFASo2pmjcAKnQfFoToAnlFYho/TG/cdR6XXk4zY
-	pzMey85dStxZpO83kl9Qz9qnFbFbr8Y19aNuLlqghtARywN1N1c4d/p6UwVyk449jlokG1gW0EG
-	6zh1b9d+4yBlC5MwD3gNnXxBUW869I
-X-Gm-Gg: ASbGnctlPuus2dXNDnR8ZsQ8nWeUy4oLb15BPbghgZdOg9hhx3gR004MQNT9JM5oNl8
-	KqieBnsV67aGEd3Xgarf1avOP5du7LzWz/13CDw==
-X-Received: by 2002:a05:6871:4608:b0:29e:4e50:378b with SMTP id 586e51a60fabf-2aa0664827dmr4505008fac.1.1736801222156;
-        Mon, 13 Jan 2025 12:47:02 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEH/K80PGj/4rYYdObdzYPWQ4q9v+6dCZlU4/pdy0hUxKSVk0uQSz1OhcSCuSdSyUD96ErXxTItHv00mK70yi8=
-X-Received: by 2002:a05:6871:4608:b0:29e:4e50:378b with SMTP id
- 586e51a60fabf-2aa0664827dmr4505003fac.1.1736801221848; Mon, 13 Jan 2025
- 12:47:01 -0800 (PST)
+	 To:Cc:Content-Type; b=FJO+7YT6d3eiGjlUROv5RrT8XU3EA6LeSbAS2BkfLprz5/Qw2Lskpj9HLRbPta8O1j7EbNYuepLyb0U4pijrKVmxqJ5GeIP9cSIsPdoYCESviiM7XGwHJjt1aEbgV6x+RtqnfxYzTO3PmOdLnPcwwO8cFc0ByVmhWYcJaTqXp5Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu; spf=pass smtp.mailfrom=cs.stanford.edu; dkim=pass (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b=ike3IMQ6; arc=none smtp.client-ip=171.64.64.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cs.stanford.edu
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=cs.stanford.edu; s=cs2308; h=Content-Transfer-Encoding:Content-Type:Cc:To:
+	Subject:Message-ID:Date:From:In-Reply-To:References:MIME-Version:Sender:
+	Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender
+	:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=90zcy6qhbSgU8cmRVjafWRdr0cYIUm4MqsbDWeQxGHo=; t=1736801308; x=1737665308; 
+	b=ike3IMQ6zqCXcSfQFsYqQkp8L4EMM7AXZfDISbxfz1m1rJyL0D1tD1LVYZXWsdZfGHn6HkLuq8c
+	WNYH1JOkckRi7r4cNzeZX8e0Jwcf7rPoVTdNbadwiROo/6AyKM19ORypS9PoEUgooP3Jb/r7qntcD
+	GYJxZWVideodVpqOztMJQkbuOzU+u9QQMOpA6GsoA+FlWH5bPckJnThCilbTHYy+xfEAgTxx4qkk9
+	W7cqtIwefXgEJCso7vgd/FunRl0EGuRjXTrph+gxd7TsGGJyC7gGsKSFK3o6d/4OZBwftw1tJxQOX
+	q2EGRfTmlSuqIkkHcrvv0sSmiYkM2UOf/AUg==;
+Received: from mail-oo1-f46.google.com ([209.85.161.46]:60640)
+	by smtp1.cs.Stanford.EDU with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.94.2)
+	(envelope-from <ouster@cs.stanford.edu>)
+	id 1tXRMH-0002VE-SS
+	for netdev@vger.kernel.org; Mon, 13 Jan 2025 12:48:27 -0800
+Received: by mail-oo1-f46.google.com with SMTP id 006d021491bc7-5f33ad7d6faso3370852eaf.0
+        for <netdev@vger.kernel.org>; Mon, 13 Jan 2025 12:48:25 -0800 (PST)
+X-Gm-Message-State: AOJu0Yy8zSoSYHVXqyc08ZWt+PIkmb+qVHQdA61MurnLJpdZQncS9eMZ
+	ysyKnMlO2J5usAXQdn2TMC5q5+cVN6Euxvo5HXGzqh6Y998AyhFOcLjZdihPAi336+vOl/7kOPV
+	e2WgzGOT0/0hthxIN0lAdxVQDPdA=
+X-Google-Smtp-Source: AGHT+IGc5DOuVszfphTiq5xBX/ZOxbHPsP38qqq0RaUuBcXGN0yl2Bshh7QNmYBBEMMz/+P+EVojy7oBXgAB/gU1PNs=
+X-Received: by 2002:a05:6870:2f0b:b0:29e:5e7b:dc0f with SMTP id
+ 586e51a60fabf-2aa06998858mr11968128fac.38.1736801305307; Mon, 13 Jan 2025
+ 12:48:25 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250108221753.2055987-1-anthony.l.nguyen@intel.com>
- <20250108221753.2055987-13-anthony.l.nguyen@intel.com> <20250109181823.77f44c69@kernel.org>
- <961f010f-4c53-4bb6-a625-289b6a52525a@intel.com>
-In-Reply-To: <961f010f-4c53-4bb6-a625-289b6a52525a@intel.com>
-From: Michal Schmidt <mschmidt@redhat.com>
-Date: Mon, 13 Jan 2025 21:46:50 +0100
-X-Gm-Features: AbW1kvYmyqpBgQBX3k0ubqMH59Kfkc3o0Ie-qmbgpkGOJ1IgrwXR88uLvPF4OSU
-Message-ID: <CADEbmW3As4t9LbZqvjKe0CyWQkYMOVKMzQgtmJdcqkQbyayP1w@mail.gmail.com>
-Subject: Re: [PATCH net-next 12/13] ice: implement low latency PHY timer updates
-To: Jacob Keller <jacob.e.keller@intel.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, Tony Nguyen <anthony.l.nguyen@intel.com>, davem@davemloft.net, 
-	pabeni@redhat.com, edumazet@google.com, andrew+netdev@lunn.ch, 
-	netdev@vger.kernel.org, anton.nadezhdin@intel.com, 
-	przemyslaw.kitszel@intel.com, milena.olech@intel.com, 
-	arkadiusz.kubalewski@intel.com, richardcochran@gmail.com, 
-	Karol Kolacinski <karol.kolacinski@intel.com>, Rinitha S <sx.rinitha@intel.com>
+References: <20250106181219.1075-1-ouster@cs.stanford.edu> <CAGXJAmxyNRfJp9UemEdVpxegf1bnK5eBMYe5etmUoS-kZd98vg@mail.gmail.com>
+ <24e75641-ad78-4ceb-a42a-c61c1ea5b367@lunn.ch>
+In-Reply-To: <24e75641-ad78-4ceb-a42a-c61c1ea5b367@lunn.ch>
+From: John Ousterhout <ouster@cs.stanford.edu>
+Date: Mon, 13 Jan 2025 12:47:48 -0800
+X-Gmail-Original-Message-ID: <CAGXJAmxKsVwJ3Ty0jhQ3s5geOMD1WWBhBQK-9DcnH519xUV3Hg@mail.gmail.com>
+X-Gm-Features: AbW1kvY1qK32DYm_7_pIlS8wJGH0YBIKTxaBDh9ZIXnCAmlG69mkBD03wn0gpWc
+Message-ID: <CAGXJAmxKsVwJ3Ty0jhQ3s5geOMD1WWBhBQK-9DcnH519xUV3Hg@mail.gmail.com>
+Subject: Re: [PATCH net-next v5 00/12] Begin upstreaming Homa transport protocol
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com, edumazet@google.com, 
+	horms@kernel.org, kuba@kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
+X-Spam-Score: 1.7
+X-Spam-Level: *
+X-Scan-Signature: 67f4a389e065da33eb5969ecb4726704
 
-On Mon, Jan 13, 2025 at 7:51=E2=80=AFPM Jacob Keller <jacob.e.keller@intel.=
-com> wrote:
-> On 1/9/2025 6:18 PM, Jakub Kicinski wrote:
-> > On Wed,  8 Jan 2025 14:17:49 -0800 Tony Nguyen wrote:
-> >> +    spin_lock_irqsave(&params->atqbal_wq.lock, flags);
-> >> +
-> >> +    /* Wait for any pending in-progress low latency interrupt */
-> >> +    err =3D wait_event_interruptible_locked_irq(params->atqbal_wq,
-> >
-> > Don't you need an irqsave() flavor of
-> > wait_event_interruptible_locked_irq() for this to work correctly? =F0=
-=9F=A4=94=EF=B8=8F
+On Mon, Jan 13, 2025 at 12:06=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote=
+:
 >
-> My understanding was that spin_lock_irqsave saves the IRQ state, where
-> as spin_lock_irq doesn't save the state and assumes the interrupts
-> should always be enabled.
+> On Mon, Jan 13, 2025 at 09:27:34AM -0800, John Ousterhout wrote:
+> > The Patchwork Web page for this patch set
+> > (https://patchwork.kernel.org/project/netdevbpf/list/?series=3D922654&s=
+tate=3D*)
+> > is showing errors for the "netdev/contest" context for each of the
+> > patches in the series. The errors are the same for each patch, and
+> > they seem to be coming from places other than Homa.
 >
-> In this case, we lock with irqsave, keeping track of the interrupt state
-> before, then wait_event_interruptible_locked_irq would enable interrupts
-> when it unlocks to sleep.. Hm
+> Hi John
+>
+> The tests take too long to run for each patchset, so i _think_ all
+> patches in a 3 hour window are tested in a batch. So it could well be
+> some other patchset in the batch broke something.
+>
+> You should be able to run the test yourself, on your own build.
+> https://netdev-3.bots.linux.dev/vmksft-net-dbg/results/937341/60-bpf-offl=
+oad-py/stdout
+> shows you the command line. However, the test environment, what tools
+> you need installed etc, is less clear.
+>
+> To me, it does seem unlikely that HOMA would cause:
+>
+> cat: /sys/kernel/debug/netdevsim/netdevsim20347//ports/0//queue_reset:
+> Invalid argument
+>
+> So i would not worry about it too much. However, if the next
+> submission has the same issues....
 
-Do you even need spin_lock_irqsave() here? It seems to me that all the
-functions where you're adding the
-wait_event_interruptible_locked_irq() calls are always entered with
-interrupts enabled, so it should be safe to just use spin_lock_irq().
+Thanks for the information; I'll take your advice and see if the
+problem goes away with the next submission.
 
-Michal
-
-> So this code will correctly restore the interrupt state at the end after
-> we call spin_unlock_irqrestore, but there is a window within the
-> wait_event_interruptible_locked_irq where interrupts will be enabled
-> when they potentially shouldn't be..
-
+-John-
 
