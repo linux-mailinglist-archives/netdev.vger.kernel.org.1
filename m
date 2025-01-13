@@ -1,123 +1,125 @@
-Return-Path: <netdev+bounces-157581-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157582-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5ABDA0AEA5
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 06:10:29 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 31C9AA0AEA9
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 06:14:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DF221166475
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 05:10:27 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 987357A36F6
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 05:14:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 084C6230D35;
-	Mon, 13 Jan 2025 05:10:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2022F230D09;
+	Mon, 13 Jan 2025 05:14:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Sjez3j9Z"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="QhV8J9Qw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7FDE230D07
-	for <netdev@vger.kernel.org>; Mon, 13 Jan 2025 05:10:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A7713C1F
+	for <netdev@vger.kernel.org>; Mon, 13 Jan 2025 05:14:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736745019; cv=none; b=a1S67cTkXiGs2SbenEzfdUMORIz1ZPKa7eJX/OYDk24wqkImNdcTOtCD4kNGWm0PhvGW+udkMlZll0ZeEBJ0cyhDzoEfiW6dAEcEameWrb5fDw34y0teAl9yfuvkC5JcMmhDStNEbsXcmwHRLEyrrcDMVGy3Q8H0kkaGvo2jm4Q=
+	t=1736745292; cv=none; b=HLFGh/gdtJIOEz5HyDz6oytc7IYvs/IY6yvmcIr5Y2FyRz754avEtHHvuXI0qWPpQhS/1kjdFNHUSDMGjYXUatLhdT8wu9vhE98+QFENxrxyyFnm39s+UqDkcZGz/b8+kZPJ+6RvRxHfhd6OrUGsis50xq+p+4nvr4T4NV+g7/Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736745019; c=relaxed/simple;
-	bh=NJKlc738vUvilJIi6X60wH9GtjopvU0NJbpDtTZZ+Lw=;
+	s=arc-20240116; t=1736745292; c=relaxed/simple;
+	bh=XXD+e0X4pPIFXHErIte6RAI78mSu9GArqqZPOWPHdiM=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=PAd/KTJQkgYRoomd4SV7gsCiieWNt1luW/odOuVTqXJg5i8GE+ZiUXlRlpFwaVpK0fUyBHTykC+hUFX4egdPOnMUcKssNLKV+k6Pi719aThW/S3TM47a684IWb0VuFG1+Mrm+Gm2WZ/DfuljRoIzuJNyXttYGaR86s1wpsTQpVg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=Sjez3j9Z; arc=none smtp.client-ip=209.85.214.171
+	 To:Cc:Content-Type; b=Kfhr6YnigjpF7Su5ACJx+nCnVGtK0i10s9lqge9pxP/OCe3fs9AS+XFv0WmaySsu3X3G2TEhW3YygC7FsFAP7PVNyuAQgveREJgZ2+Ptm1lNhHYVIZnlRjkdzBCCgrNRKYd5h54PkmGxCSp8y3Cg9RUJ3BXsfVPVSut1NRm+j40=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=QhV8J9Qw; arc=none smtp.client-ip=209.85.216.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-215770613dbso46083705ad.2
-        for <netdev@vger.kernel.org>; Sun, 12 Jan 2025 21:10:17 -0800 (PST)
+Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-2ee86a1a92dso5294293a91.1
+        for <netdev@vger.kernel.org>; Sun, 12 Jan 2025 21:14:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1736745017; x=1737349817; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1736745290; x=1737350090; darn=vger.kernel.org;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=NJKlc738vUvilJIi6X60wH9GtjopvU0NJbpDtTZZ+Lw=;
-        b=Sjez3j9ZSqzkWPblwyJDRN677lnrzXtQ7lmMH7NAnSIUQtWmBGRUf8A9NcVVpXtRdp
-         sSxp0JZJTf6rTT9w6r+97SJBgVUW9JHqTe2vD4H5QYduCsA5xTRxjg7Qv7J2R/sXE1rQ
-         JAACOdQISArtn37o8ud+Oyn8Le/+PmCloZt7I=
+        bh=ne8Au6Y087TyITaG5i1cUWumOGI+JT9oxlVH9DNStmo=;
+        b=QhV8J9QwuXJ0tcdNWAYUGqF4sCQOFNVRyFo/aXA/lfUvAywdeQ1K9c8jHFwt1zg82/
+         iyP8wLJRE9he6hd37tVz4HkgkqjvRtFyGohC4CxOHHiYZV88XJjVo+fFwHTikFLb9zYp
+         gX0HjuG6XDNpy83P3PM779VdDLQSAct0nDBkI=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736745017; x=1737349817;
+        d=1e100.net; s=20230601; t=1736745290; x=1737350090;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=NJKlc738vUvilJIi6X60wH9GtjopvU0NJbpDtTZZ+Lw=;
-        b=jR1FaKSHmOfBmDvjrYsUxPelc9I+wH1LIg8KUlfKz6tfk6qMWpXL17HYW8I9Z30azX
-         eMfqqEO0AUpgWKTaKxv7S0fSHQjMGImGQnVdln6tHKNNAvYuytEpbVlwy3q3J7sc09B4
-         pqLRo33gHgzKw6F8dimcKY9WrDPcPllMMCjE5CYodXWc0hKdxuBnD4FaArOGb1Vyc/D2
-         2DbDFhRxkESu5+ZDlVJw0tO3oyoRNgoeWHERzImvI73KkxwBkIvx+PObuvqAnfRKEAkS
-         wz/rvoCgisf1oZiNYwWvI+Layu1O90sPumeBMjudWw8ImC1SEntyt0t+MtNQe7DxnggQ
-         22vw==
-X-Forwarded-Encrypted: i=1; AJvYcCU/xcmDz8pTNE6mbruGcF6JmUp4/hA53go189qR/0TgKG7YQ3MkOA+kkZA9IRcJE2jt1SmewPc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz04WPXCbc+u6ZD/g8Zs7zSx9gcZKmenhMObEJyXE3iJ4TJikMC
-	uVui5SenutaNios2y5h3IDqmSCmu8pfAgcm3ICl/b22bKVck63If+Vn/ywxQ5nHnEIoNLoYEKlg
-	av9xB8Ex1a/hz/h16gkSS1rAWdLE7yvZdVnrD
-X-Gm-Gg: ASbGnctGUWjh1SjAXLguTgcsCRuZHtaZOKjmGSb6UaFo5MySy+Pdq06nBKqhF1PLIUE
-	gjur6Gu6oNICJLsN+d5hMz9Clx5Gu1mb7Ewv782A=
-X-Google-Smtp-Source: AGHT+IGM12nPucziNIwJ3ewGaWvHtohP++DZOO35GmGmbwVCN/TIxMVLxllOCEcUgTLwTtXB+L6hLE0lVeRgtODpIag=
-X-Received: by 2002:a05:6a20:43a9:b0:1e1:b727:1801 with SMTP id
- adf61e73a8af0-1e88d15a830mr30499651637.27.1736745017369; Sun, 12 Jan 2025
- 21:10:17 -0800 (PST)
+        bh=ne8Au6Y087TyITaG5i1cUWumOGI+JT9oxlVH9DNStmo=;
+        b=k5A8847BSsNif3Ie2NxccblLwPXdUdPjeHhEuwCm6lBkxlBfrniZW43teB5xaeuyYM
+         0CiOJGvTLBdiAjncShsW+NkPgmUzSJduMIj39X/5BdCQ7+7EW6Hxl6DU7RkEnN8m5wzZ
+         OtxrF6hjo+w/UDewTOVNwKpcu/qCPwM2Qs2NSTV+pvBppVy/Y1WU8mJsO9r74SF9Zz+Y
+         akGh83iQiDygaznftqsK38qNII1M536qWaKTPusYbJCvp2n5mNym7Yf2qUowTx2dHmU4
+         CIeLbZXn6jbCNRFhJ7au6hAI/KxcwH2su23pi6i5eivSfiSI9JDpLEwO7xg3WcxmBq+u
+         R07Q==
+X-Forwarded-Encrypted: i=1; AJvYcCXhUpR0Sa0GI0GghTIjv1kbC9RU12hWwkB4g/KKnerLuXaRTzk2YRr/3CtUCZ0M3m2Izyf/Dmo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzojshMJGkIrhmTkRbZXVgk3Kn3IsqjQZVDegx8FLTWWUGu7Juq
+	rs8IanIJqxSoBibXZ2UWy3n4WGMYc7VVU8HYOcix4ELF7eUkNjNLQMDDbUk0ylcyLBHknUykFX+
+	UYB/zxZUrC4WdwmOwdkDDV4zU6EsMEhpqRygs
+X-Gm-Gg: ASbGncvf5xAk4/fbLb9WGRMAOwq0+BGzl5N4/qmucvRjmUsQvs+l2ZLSwCLV/KyIRV4
+	EgVfPc4WJ1+QGHYiKUbpcLlRlaFtClfmkpJYYNEQ=
+X-Google-Smtp-Source: AGHT+IHIiuXHIEZ6bXDJ4vGL364/S0FLENY4s+KzjElAnjiFMVBlQ6uuMeNXHjJu5t1g8Hrskdc5ZhwomrxDQVjMp7Y=
+X-Received: by 2002:a17:90a:d00c:b0:2ee:c5ea:bd91 with SMTP id
+ 98e67ed59e1d1-2f548f1d783mr27966143a91.29.1736745289902; Sun, 12 Jan 2025
+ 21:14:49 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250111070751.2588654-1-yukaixiong@huawei.com> <20250111070751.2588654-17-yukaixiong@huawei.com>
-In-Reply-To: <20250111070751.2588654-17-yukaixiong@huawei.com>
+References: <20250111065955.3698801-1-kuba@kernel.org>
+In-Reply-To: <20250111065955.3698801-1-kuba@kernel.org>
 From: Kalesh Anakkur Purayil <kalesh-anakkur.purayil@broadcom.com>
-Date: Mon, 13 Jan 2025 10:40:05 +0530
-X-Gm-Features: AbW1kvb15aJAWs4dMA-1O4yfTe_qq6ymGjviDWt2j4MzAI2WDea4KyZDnt0GIcY
-Message-ID: <CAH-L+nMzferXh=P0brckqWGLo06Rg+XG-3ToLZqA5TBObRZimQ@mail.gmail.com>
-Subject: Re: [PATCH v5 -next 16/16] sysctl: remove unneeded include
-To: Kaixiong Yu <yukaixiong@huawei.com>
-Cc: akpm@linux-foundation.org, mcgrof@kernel.org, joel.granados@kernel.org, 
-	ysato@users.sourceforge.jp, dalias@libc.org, glaubitz@physik.fu-berlin.de, 
-	luto@kernel.org, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, 
-	dave.hansen@linux.intel.com, hpa@zytor.com, viro@zeniv.linux.org.uk, 
-	brauner@kernel.org, jack@suse.cz, kees@kernel.org, j.granados@samsung.com, 
-	willy@infradead.org, Liam.Howlett@oracle.com, vbabka@suse.cz, 
-	lorenzo.stoakes@oracle.com, trondmy@kernel.org, anna@kernel.org, 
-	chuck.lever@oracle.com, jlayton@kernel.org, neilb@suse.de, 
-	okorniev@redhat.com, Dai.Ngo@oracle.com, tom@talpey.com, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, paul@paul-moore.com, 
-	jmorris@namei.org, linux-sh@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, linux-nfs@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-security-module@vger.kernel.org, 
-	dhowells@redhat.com, haifeng.xu@shopee.com, baolin.wang@linux.alibaba.com, 
-	shikemeng@huaweicloud.com, dchinner@redhat.com, bfoster@redhat.com, 
-	souravpanda@google.com, hannes@cmpxchg.org, rientjes@google.com, 
-	pasha.tatashin@soleen.com, david@redhat.com, ryan.roberts@arm.com, 
-	ying.huang@intel.com, yang@os.amperecomputing.com, zev@bewilderbeest.net, 
-	serge@hallyn.com, vegard.nossum@oracle.com, wangkefeng.wang@huawei.com
+Date: Mon, 13 Jan 2025 10:44:37 +0530
+X-Gm-Features: AbW1kvYvhjEP-vtm1h27M4OWDk-Q9Ikr0YSER_3cjPQXZg9YczMA1kM2zMkSSuI
+Message-ID: <CAH-L+nNX-3ervNe-P-a+CA8=nuYkt88QfRbpXsTtpvgXqqzZtA@mail.gmail.com>
+Subject: Re: [PATCH net-next 1/2] net: un-export init_dummy_netdev()
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, 
+	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000d79348062b8f75cb"
+	boundary="00000000000015f1a8062b8f8696"
 
---000000000000d79348062b8f75cb
+--00000000000015f1a8062b8f8696
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Sat, Jan 11, 2025 at 12:49=E2=80=AFPM Kaixiong Yu <yukaixiong@huawei.com=
-> wrote:
+On Sat, Jan 11, 2025 at 12:30=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> w=
+rote:
 >
-> Removing unneeded mm includes in kernel/sysctl.c.
+> There are no in-tree module callers of init_dummy_netdev(), AFAICT.
 >
-> Signed-off-by: Kaixiong Yu <yukaixiong@huawei.com>
-> Reviewed-by: Kees Cook <kees@kernel.org>
-Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
-
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+>  net/core/dev.c | 1 -
+>  1 file changed, 1 deletion(-)
+>
+> diff --git a/net/core/dev.c b/net/core/dev.c
+> index 1a90ed8cc6cc..23e7f6a3925b 100644
+> --- a/net/core/dev.c
+> +++ b/net/core/dev.c
+> @@ -10782,7 +10782,6 @@ void init_dummy_netdev(struct net_device *dev)
+>         memset(dev, 0, sizeof(struct net_device));
+>         init_dummy_netdev_core(dev);
+>  }
+> -EXPORT_SYMBOL_GPL(init_dummy_netdev);
+>
+>  /**
+>   *     register_netdev - register a network device
+> --
+> 2.47.1
+>
+>
+I can see that "net/xfrm/xfrm_input.c" and "net/mptcp/protocol.c" are
+invoking init_dummy_netdev() in the init routines.
 
 --=20
 Regards,
 Kalesh AP
 
---000000000000d79348062b8f75cb
+--00000000000015f1a8062b8f8696
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -189,14 +191,14 @@ a30CvRuhokNO6Jzh7ZFtjKVMzYas3oo6HXgA+slRszMu4pc+fRPO41FHjeDM76e6P5OnthhnD+NY
 x6xokUN65DN1bn2MkeNs0nQpizDqd0QxggJtMIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYD
 VQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25h
 bFNpZ24gMiBDQSAyMDIwAgw3wUUJsDUiPdpordMwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcN
-AQkEMSIEIM2TOP9TtJ2BdQjXIc94PqF/qqG6PokycjwG8VMAQtDLMBgGCSqGSIb3DQEJAzELBgkq
-hkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI1MDExMzA1MTAxN1owaQYJKoZIhvcNAQkPMVwwWjAL
+AQkEMSIEIIya+Uff9gtjRYa8Fvmx5sR63f+cKIKJJDcJTHqYjQUNMBgGCSqGSIb3DQEJAzELBgkq
+hkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI1MDExMzA1MTQ1MFowaQYJKoZIhvcNAQkPMVwwWjAL
 BglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG
-9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQATWJeIQzo3
-YTKVVMtMXwgyKiHUSHJ9UHNOvPVPa8tBatC9JG46LvgEvLbK6I7seMbKeOWoCX1wIwBfVgJ/Ouyi
-8pHe7Jx74+7Ryi05nsyscFsKaXwCLwtQZUzlUTN68agd+ZBg+frBhvoIFOJ42xYPdgbXY6EECKJB
-HRtvbFHwWIJNqHZRPd9ijdzIHTiFA/kIff5HL5wqoj4LfYVOTZrKvA/1/nIBXQD77xCRFRadQsEi
-beoU0uXtAVxHq7IerJqjj+tw6ni29atkqUC4LZM+pqTBQnYu6tGotDVTpLu7fxIo1Fiv4TFU9PDT
-tMD8ijVVWxnAbZ5EbTM3KcbzeMWm
---000000000000d79348062b8f75cb--
+9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQAyaGDTJ1D2
+MwHkkSvE6ORO7qghabV9GTheNKpIiEYcuS887dAZmbJRGhQsTKOBg+dHX5sa1/LBwUiLq3ppVG59
+IwCnmis7c2MrvnmtCzFxONt4gHYxoQRDX80/DdLqJh89cXEXYKQXml0npKFNIZa9jz7t57CrFkLa
+e1Q51j5EtoirGDermoWEELEH/1PGHcdbd9B85dGmubpWA/R70iZdRraWOnetT9T0tp1cGvyDGuUQ
+ZaRlC0D8NTT+Xr9bxReZfrXwGVlhu6LJz2Jz7g+TEFLDeNf89OkviqccRq8PEO2Eln20Za1cFVVF
+glXwgZBt60jHasUWLCTS26TKc5Jk
+--00000000000015f1a8062b8f8696--
 
