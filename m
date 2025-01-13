@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-157816-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157817-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41367A0BE04
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 17:52:08 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6CD76A0BE3A
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 18:02:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 51538162560
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 16:52:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 668E91882825
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 17:02:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99B741C5D42;
-	Mon, 13 Jan 2025 16:52:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43D9870807;
+	Mon, 13 Jan 2025 17:01:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="OHxc4Yrt"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="f8iBETVc"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1255E24023A
-	for <netdev@vger.kernel.org>; Mon, 13 Jan 2025 16:52:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA815240243;
+	Mon, 13 Jan 2025 17:01:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736787124; cv=none; b=Su2AksjTMUGOYffRqTeeLcPZqbMUKNTxRNACN6/lpov+TqEDLuCR1c/mBu/OmgXE0EPPerC8vS/ZbAIuGzoq/hLgUUF7Yfp/+hkABcGO+5BjcBGK3RKFH63Mcx7iDxiTLlBrnt0fYenUHG7YKFApwL0vI5iPlqmR+P+LpqBgpEg=
+	t=1736787717; cv=none; b=flBnTNUY/r3eQKvO0vUmKKVjgYLRvPY9nfrwuBB62EWjScfkbB363CzGWuUHPNJN7nQKZ8gH97O2oF1rBQZGNntfpgm3yny/V+yTJ0UWcKyy1LK+4puNizpiHEZXmxhP3ZgPsPduzNDNdravLc2x46ly07At3XpQ9vvHPqN8N1c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736787124; c=relaxed/simple;
-	bh=26EkaQyZl23pUVsSDpbfvxGnfrHNU7wWOuPnb+FIWeQ=;
+	s=arc-20240116; t=1736787717; c=relaxed/simple;
+	bh=3p8GtCHTj/BY7sgQySkaxArgCN3QMRE8FLDEVnwJS/E=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BzyX35PbNV368NQlp0ZNav+4oDqn6mG6ay/CLuIO205d8Gx71zMCROjgLddUKe3lnLOtd5J24KnPa7QYsg+vejPLG9jHMYO7dQO1cTWA+k9iOBNlR3w3DMxlglnT/DLTo//B7VUvPbEUr0+lvbnEJZkxELqaplhVFdVQ33gLYEQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=OHxc4Yrt; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=dvq3lQgDPdFW3I85bRhWIjRsU6MZKPpAh7ayaFfjh9v4dN7bdDC4ynLp7bB8xNOxUGYhzDoO2cF4/nJnxONxEf4IdLK4E3QDnrcFqy1NTnv06TNoiS8EDzJ3NSL5DltRKopYf5F8JYLFhc1xWJZz2BLWW1up/QuJ44WtHv+WoYQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=f8iBETVc; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,23 +36,39 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
 	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
 	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=9xV20OW1k2dshuInbdTyeA45/OSpWdw6oAgA56YLhYM=; b=OH
-	xc4Yrt5k/8e0/tzCH7QgaQfIXXKXZrp2A8386CzrDXJ25w2dwX6Ww6BNib/BYs/TRgg+Nbr+VsCoi
-	YDdWUFS453/p607MfJYhz2mbF5bDArY4i9PQvGl7U/D2wVLqtfim5UkFq+x/k4cqT1+UVLZHHBvM9
-	reG7Fu6dSI/QS0E=;
+	In-Reply-To:References; bh=258ufSRhmAKCNH7ZmIiFnUQr7BuMTzRbL7O6cvZOqdU=; b=f8
+	iBETVcZeENe2KuK9+Iy18jnMuirgQ/hRPCOx2rLaLlicuMaOXL8rdhDRoW1J3quvkUQKdiLu1YWeV
+	YGTl1z0lCXqNWsCoGTCykYSkg5wl8hkOkkrX04qPOoRlQH8xIGw6S3hbgdVKClW2y1BsZNomObUrY
+	reA/JawS4XnvhSs=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1tXNfT-0049p4-Eh; Mon, 13 Jan 2025 17:51:59 +0100
-Date: Mon, 13 Jan 2025 17:51:59 +0100
+	id 1tXNol-0049xb-4Q; Mon, 13 Jan 2025 18:01:35 +0100
+Date: Mon, 13 Jan 2025 18:01:35 +0100
 From: Andrew Lunn <andrew@lunn.ch>
-To: Kalesh Anakkur Purayil <kalesh-anakkur.purayil@broadcom.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
-	netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
-	andrew+netdev@lunn.ch, horms@kernel.org
-Subject: Re: [PATCH net-next 1/2] net: un-export init_dummy_netdev()
-Message-ID: <2bbeb160-789e-4465-90fd-7e69d348188d@lunn.ch>
-References: <20250111065955.3698801-1-kuba@kernel.org>
- <CAH-L+nNX-3ervNe-P-a+CA8=nuYkt88QfRbpXsTtpvgXqqzZtA@mail.gmail.com>
+To: Yanteng Si <si.yanteng@linux.dev>
+Cc: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+	MD Danish Anwar <danishanwar@ti.com>,
+	Roger Quadros <rogerq@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Shawn Guo <shawnguo@kernel.org>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Fabio Estevam <festevam@gmail.com>,
+	linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com, imx@lists.linux.dev
+Subject: Re: [PATCH net-next 5/5] net: stmmac: stm32: Use
+ syscon_regmap_lookup_by_phandle_args
+Message-ID: <c4714984-8250-4bf2-9ac1-5a9204d3aca8@lunn.ch>
+References: <20250112-syscon-phandle-args-net-v1-0-3423889935f7@linaro.org>
+ <20250112-syscon-phandle-args-net-v1-5-3423889935f7@linaro.org>
+ <5d97dd34-f293-4403-b605-c0ae7b5490fd@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,39 +78,51 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAH-L+nNX-3ervNe-P-a+CA8=nuYkt88QfRbpXsTtpvgXqqzZtA@mail.gmail.com>
+In-Reply-To: <5d97dd34-f293-4403-b605-c0ae7b5490fd@linux.dev>
 
-On Mon, Jan 13, 2025 at 10:44:37AM +0530, Kalesh Anakkur Purayil wrote:
-> On Sat, Jan 11, 2025 at 12:30 PM Jakub Kicinski <kuba@kernel.org> wrote:
-> >
-> > There are no in-tree module callers of init_dummy_netdev(), AFAICT.
-> >
-> > Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+On Mon, Jan 13, 2025 at 04:05:13PM +0800, Yanteng Si wrote:
+> 在 2025/1/12 21:32, Krzysztof Kozlowski 写道:
+> > Use syscon_regmap_lookup_by_phandle_args() which is a wrapper over
+> > syscon_regmap_lookup_by_phandle() combined with getting the syscon
+> > argument.  Except simpler code this annotates within one line that given
+> > phandle has arguments, so grepping for code would be easier.
+> > 
+> > There is also no real benefit in printing errors on missing syscon
+> > argument, because this is done just too late: runtime check on
+> > static/build-time data.  Dtschema and Devicetree bindings offer the
+> > static/build-time check for this already.
+> > 
+> > Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 > > ---
-> >  net/core/dev.c | 1 -
-> >  1 file changed, 1 deletion(-)
-> >
-> > diff --git a/net/core/dev.c b/net/core/dev.c
-> > index 1a90ed8cc6cc..23e7f6a3925b 100644
-> > --- a/net/core/dev.c
-> > +++ b/net/core/dev.c
-> > @@ -10782,7 +10782,6 @@ void init_dummy_netdev(struct net_device *dev)
-> >         memset(dev, 0, sizeof(struct net_device));
-> >         init_dummy_netdev_core(dev);
-> >  }
-> > -EXPORT_SYMBOL_GPL(init_dummy_netdev);
-> >
-> >  /**
-> >   *     register_netdev - register a network device
-> > --
-> > 2.47.1
-> >
-> >
-> I can see that "net/xfrm/xfrm_input.c" and "net/mptcp/protocol.c" are
-> invoking init_dummy_netdev() in the init routines.
+> >   drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c | 9 ++-------
+> >   1 file changed, 2 insertions(+), 7 deletions(-)
+> > 
+> > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c
+> > index 1e8bac665cc9bc95c3aa96e87a8e95d9c63ba8e1..1fcb74e9e3ffacdc7581b267febb55d015a83aed 100644
+> > --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c
+> > +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c
+> > @@ -419,16 +419,11 @@ static int stm32_dwmac_parse_data(struct stm32_dwmac *dwmac,
+> >   	}
+> >   	/* Get mode register */
+> > -	dwmac->regmap = syscon_regmap_lookup_by_phandle(np, "st,syscon");
+> > +	dwmac->regmap = syscon_regmap_lookup_by_phandle_args(np, "st,syscon",
+> > +							     1, &dwmac->mode_reg);
+> The network subsystem still requires that the length of
+> each line of code should not exceed 80 characters.
+> So, let's silence the warning:
+> 
+> WARNING: line length of 83 exceeds 80 columns
+> #33: FILE: drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c:307:
+> +							     &dwmac->intf_reg_off);
 
-I thought that initially. And then i checked that they can only be
-built in. You only need exports for modules.
+checkpatch should be considered a guide, not a strict conformance
+tool. You often need to look at its output and consider does what it
+suggest really make the code better? In this case, i would disagree
+with checkpatch and allow this code.
 
-      Andrew
+If the code had all been on one long line, then i would suggest to
+wrap it. But as it is, it keeps with the spirit of 80 characters, even
+if it is technically not.
+
+	Andrew
 
