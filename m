@@ -1,291 +1,162 @@
-Return-Path: <netdev+bounces-157827-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157828-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E725A0BEB4
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 18:15:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C7F1A0BED5
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 18:28:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7DD0F16432D
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 17:15:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6BF66164980
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 17:28:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDE58192D8B;
-	Mon, 13 Jan 2025 17:15:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B91B11AB6FF;
+	Mon, 13 Jan 2025 17:28:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RXWw7dFA"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b="atSiwkqL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f202.google.com (mail-qk1-f202.google.com [209.85.222.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp1.cs.Stanford.EDU (smtp1.cs.stanford.edu [171.64.64.25])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D99DD1BD9C6
-	for <netdev@vger.kernel.org>; Mon, 13 Jan 2025 17:15:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C34C4D8CE
+	for <netdev@vger.kernel.org>; Mon, 13 Jan 2025 17:28:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=171.64.64.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736788514; cv=none; b=Fjpsnmb7wsHzz/tiRU7wzwfiYnqyI1aJ3R5uR1OUpxpojBUrIX6PFT9kZsquOBEPm8NfOABthrqBvNxsNVKe5bIIJ0VB66iywYD7DrLdcfqS2rZf3Wk/EOnzo+fOp4Pv/KvrXAW1686ZcokVxUMmuLB3M0iusc75oM43ytGAhrQ=
+	t=1736789293; cv=none; b=JB1MJkzIWioUcXeCsYTWgziXi3BVvMEKV578+zqeQy7D05W4Y2E7wAe18+y27jb3CbaUgVMK0Z6NNORresE43hK/stOhYfOC6U8/WLk8zblgZ2DEigTy/2Oq7m/xBsaSMrG6Tb+pCQT+iDaM/1rmfd922aj9oE46EajTC+eaYvs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736788514; c=relaxed/simple;
-	bh=QxHYq11v0GPmv07J5rZKycSL21t9qzWQyUMjeo36l8I=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=WSWAQsyiFosDQ6sGx8K41nfTzvAWPQUlgAMbSI0vVGIjhJmlrDCizMPGsCReRIK689CcFXm//nvast7FuwAoSzk67N7vfUTK1oonIwwdtk09unGvg6RhyLhmuxDTSCl6/lk/I8SVkoM+o73HqIAb+KFgUiGckLBFR89beijGeJs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=RXWw7dFA; arc=none smtp.client-ip=209.85.222.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qk1-f202.google.com with SMTP id af79cd13be357-7b6c6429421so710967585a.0
-        for <netdev@vger.kernel.org>; Mon, 13 Jan 2025 09:15:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1736788512; x=1737393312; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=St5jy7jF6LFZ+72s60cKWVoQFCGimnvb7U/CKETQ1Jw=;
-        b=RXWw7dFACk61qaR31m/Aon8F1rk/f6a6aqXkWHUqmP9pKHnGjwCa99H7VoYGiboNFr
-         AbYq8vhX8FkMyM0zIo/HmqSiQlCi1jtXQjliuDxDjGDFrNSrASrWgftpnn4NpOsa3RpO
-         or5IvLNeucSq9hssqcQr+NYVD2Jxmy4Aarw8QC1cmFvGucvYshRxQSi/gW6w9Q/j5pBO
-         6YB4UcB3Mrz5VpyFUWlY6XaIfaQ0QWWA6HCiTf6dyh//8+oVqsgnDGQrIyqOxsQVTfvZ
-         31fr6QGED5kms7hMlgtK8gJEgbVp7igAiKl4atIUddcJ8qTNEKmSJmf+WLfJtqrdlJ+p
-         flPw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736788512; x=1737393312;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=St5jy7jF6LFZ+72s60cKWVoQFCGimnvb7U/CKETQ1Jw=;
-        b=HDv4KvlRt1nLplj946DE6uyc5jqk9I1wN5+Y3vZuSxiehYUCTjCcwWcaMtR75guGiX
-         s1Gywu90p1LMQVlVcwccxHLUNStIaQOc4tvRYGB8wuoqHUMtOWpFEaCgWuScl/hIDP7/
-         q3Z8vxRvKRBzWGfXJBRQW0M9CcsMbXD4y/K3VHXscUr4WvkfC3Q1UcmluFKzXcEQC7h4
-         s376TEOdtnzPFT9Lxz58L1Hvz3v9SOfz4ni+af5/h+XCn5Uf/BFgk5s8MZ98aVf0bScu
-         gnToN9LQL7LqcYC7AA8y5IF3yTODHajSvemTbI590qONfyLKL0fz5ST4WtqbU/Ogq076
-         MI0Q==
-X-Gm-Message-State: AOJu0Yx4chMX7aGFPawSYLnWZ+I9vKkIsiMztJ86Sd2x4gNnUk5iPxzu
-	D2glTUuYjpS48iZLn0iCnB96+fwmtQ93/IdIqRRzol2sAMXEWwzvGOcay/Fm90s945lSiqiSyV1
-	B0NaoQrTEEg==
-X-Google-Smtp-Source: AGHT+IHq/AXv+1J6e3npvquUzYYQn8XgiVr90W8AuMT2ud2EARHMo9C98Uqa/FkyN09Pm2a17XgAucWCikGCmg==
-X-Received: from qkhn17.prod.google.com ([2002:a05:620a:2231:b0:7b6:cb86:dc0d])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:620a:1729:b0:7b7:142d:53a9 with SMTP id af79cd13be357-7bcd9773145mr3499684285a.51.1736788511847;
- Mon, 13 Jan 2025 09:15:11 -0800 (PST)
-Date: Mon, 13 Jan 2025 17:15:09 +0000
+	s=arc-20240116; t=1736789293; c=relaxed/simple;
+	bh=4R6OOO//kkfqkVHz3WEENUnudyIxc1CTzdel0y44qHM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=YOVD/gfD73Aj0Esk26Sw5HY9jBa5c3XolifH932NRjJGAWfDq8tIJv7c8oNpDlq+rSi/T0TO4aBcsIVld7Ym+3mO0RSPr+AoYu0T3JSuXI7KKlywbKNGAA2+RdJSrQqZoGzqezznuCiwar9SDMUtOQfio2WbFgfbnRb9139Iy2w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu; spf=pass smtp.mailfrom=cs.stanford.edu; dkim=pass (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b=atSiwkqL; arc=none smtp.client-ip=171.64.64.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cs.stanford.edu
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=cs.stanford.edu; s=cs2308; h=Content-Type:Cc:To:Subject:Message-ID:Date:
+	From:In-Reply-To:References:MIME-Version:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=6k1DxuH6hSLLcJ0dw0v09Xr5Gq1ZDfGWeotRSpHG7Gc=; t=1736789292; x=1737653292; 
+	b=atSiwkqLbSiKc9z5FUJpZJo2d4opbCWJ2pEnRRrPkGo+S7CwO+IZscsWrsTbPKoZoTD3CWGccGz
+	Z1jt8FIKLnFSqRcuiBAcecDrxdf2ODK5VEE5TgQuBO6O6pwIoBg1IpFhn017Gy4hGP15wHwVIY81i
+	1A87hor9ZIw/IYeDsvU+1lAsuexeK2aENA1z+HYhtd6utm8EuT0RcmOkgNbvxwlyEYeu/AySAiR2+
+	8169myx8nt81fgNVB+ZGNJBFr7Yk5KuTMhvGDGFNv3be6s9nWI/MExPBhEA6uxfpkTGbzELZAgVSz
+	1ylM+a2ZQ4VM93rea8TJRrwb5zYv1MXvvdNQ==;
+Received: from mail-oa1-f49.google.com ([209.85.160.49]:50558)
+	by smtp1.cs.Stanford.EDU with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.94.2)
+	(envelope-from <ouster@cs.stanford.edu>)
+	id 1tXOEU-00051c-5C
+	for netdev@vger.kernel.org; Mon, 13 Jan 2025 09:28:11 -0800
+Received: by mail-oa1-f49.google.com with SMTP id 586e51a60fabf-2adc2b6837eso612208fac.1
+        for <netdev@vger.kernel.org>; Mon, 13 Jan 2025 09:28:10 -0800 (PST)
+X-Gm-Message-State: AOJu0Ywfy87vNGlF6zK8jDFHwCx978fJmwLkyFAK4EDcik0HG2FpDu4Z
+	H/HTMKaipdsPtEk5Yfu4CsCw7wTNl2POWE0ml+lJEzL93flz7pSBIb3EnraiEAh5sEKbNOD/w/t
+	sx09f/UULGqwTz4TbFC+btgKS7KM=
+X-Google-Smtp-Source: AGHT+IG9FqU5LIu4AnJall3UKfzx+B2cKQuqiI6C0G5QDw6JKenvjKc/YcJptViM162FpmMIkGODfcGCw7Yv8+NfL3E=
+X-Received: by 2002:a05:6870:5488:b0:29e:76d1:db4b with SMTP id
+ 586e51a60fabf-2aa06668ff8mr13815111fac.6.1736789289572; Mon, 13 Jan 2025
+ 09:28:09 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.47.1.613.gc27f4b7a9f-goog
-Message-ID: <20250113171509.3491883-1-edumazet@google.com>
-Subject: [PATCH net-next] inet: ipmr: fix data-races
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, Simon Horman <horms@kernel.org>, 
-	David Ahern <dsahern@kernel.org>, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
+MIME-Version: 1.0
+References: <20250106181219.1075-1-ouster@cs.stanford.edu>
+In-Reply-To: <20250106181219.1075-1-ouster@cs.stanford.edu>
+From: John Ousterhout <ouster@cs.stanford.edu>
+Date: Mon, 13 Jan 2025 09:27:34 -0800
+X-Gmail-Original-Message-ID: <CAGXJAmxyNRfJp9UemEdVpxegf1bnK5eBMYe5etmUoS-kZd98vg@mail.gmail.com>
+X-Gm-Features: AbW1kvZ8qpKYS4Ql366sE0k8OqijAWZwa1XxhTnVNXmB0sdPTt8_LPSo2RmoeGM
+Message-ID: <CAGXJAmxyNRfJp9UemEdVpxegf1bnK5eBMYe5etmUoS-kZd98vg@mail.gmail.com>
+Subject: Re: [PATCH net-next v5 00/12] Begin upstreaming Homa transport protocol
+To: netdev@vger.kernel.org
+Cc: pabeni@redhat.com, edumazet@google.com, horms@kernel.org, kuba@kernel.org
 Content-Type: text/plain; charset="UTF-8"
+X-Spam-Score: -1.0
+X-Spam-Level: 
+X-Scan-Signature: 3912120d3a1bcf28d29a6770933a4e79
 
-Following fields of 'struct mr_mfc' can be updated
-concurrently (no lock protection) from ip_mr_forward()
-and ip6_mr_forward()
+The Patchwork Web page for this patch set
+(https://patchwork.kernel.org/project/netdevbpf/list/?series=922654&state=*)
+is showing errors for the "netdev/contest" context for each of the
+patches in the series. The errors are the same for each patch, and
+they seem to be coming from places other than Homa. For example, I am
+including below the error output for the bpf-offload-py test; I can't
+find anything related to Homa in the test output. Is there something I
+need to worry about here? BTW, one of the tests (coccicheck) did
+produce a warning about Homa unnecessarily casting the output of a
+kmalloc call; I have fixed that one.
 
-- bytes
-- pkt
-- wrong_if
-- lastuse
-
-They also can be read from other functions.
-
-Convert bytes, pkt and wrong_if to atomic_long_t,
-and use READ_ONCE()/WRITE_ONCE() for lastuse.
-
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- include/linux/mroute_base.h |  6 +++---
- net/ipv4/ipmr.c             | 28 ++++++++++++++--------------
- net/ipv4/ipmr_base.c        |  6 +++---
- net/ipv6/ip6mr.c            | 28 ++++++++++++++--------------
- 4 files changed, 34 insertions(+), 34 deletions(-)
-
-diff --git a/include/linux/mroute_base.h b/include/linux/mroute_base.h
-index 9dd4bf1572553ffbf41bade97393fac091797a8d..58a2401e4b551bad0eadb9c5d4c341ddad48b39b 100644
---- a/include/linux/mroute_base.h
-+++ b/include/linux/mroute_base.h
-@@ -146,9 +146,9 @@ struct mr_mfc {
- 			unsigned long last_assert;
- 			int minvif;
- 			int maxvif;
--			unsigned long bytes;
--			unsigned long pkt;
--			unsigned long wrong_if;
-+			atomic_long_t bytes;
-+			atomic_long_t pkt;
-+			atomic_long_t wrong_if;
- 			unsigned long lastuse;
- 			unsigned char ttls[MAXVIFS];
- 			refcount_t refcount;
-diff --git a/net/ipv4/ipmr.c b/net/ipv4/ipmr.c
-index 99d8faa508e5325c653c920855a52f24b661618c..21ae7594a8525a0df01ce01b801d0075dada0959 100644
---- a/net/ipv4/ipmr.c
-+++ b/net/ipv4/ipmr.c
-@@ -831,7 +831,7 @@ static void ipmr_update_thresholds(struct mr_table *mrt, struct mr_mfc *cache,
- 				cache->mfc_un.res.maxvif = vifi + 1;
- 		}
- 	}
--	cache->mfc_un.res.lastuse = jiffies;
-+	WRITE_ONCE(cache->mfc_un.res.lastuse, jiffies);
- }
- 
- static int vif_add(struct net *net, struct mr_table *mrt,
-@@ -1681,9 +1681,9 @@ int ipmr_ioctl(struct sock *sk, int cmd, void *arg)
- 		rcu_read_lock();
- 		c = ipmr_cache_find(mrt, sr->src.s_addr, sr->grp.s_addr);
- 		if (c) {
--			sr->pktcnt = c->_c.mfc_un.res.pkt;
--			sr->bytecnt = c->_c.mfc_un.res.bytes;
--			sr->wrong_if = c->_c.mfc_un.res.wrong_if;
-+			sr->pktcnt = atomic_long_read(&c->_c.mfc_un.res.pkt);
-+			sr->bytecnt = atomic_long_read(&c->_c.mfc_un.res.bytes);
-+			sr->wrong_if = atomic_long_read(&c->_c.mfc_un.res.wrong_if);
- 			rcu_read_unlock();
- 			return 0;
- 		}
-@@ -1753,9 +1753,9 @@ int ipmr_compat_ioctl(struct sock *sk, unsigned int cmd, void __user *arg)
- 		rcu_read_lock();
- 		c = ipmr_cache_find(mrt, sr.src.s_addr, sr.grp.s_addr);
- 		if (c) {
--			sr.pktcnt = c->_c.mfc_un.res.pkt;
--			sr.bytecnt = c->_c.mfc_un.res.bytes;
--			sr.wrong_if = c->_c.mfc_un.res.wrong_if;
-+			sr.pktcnt = atomic_long_read(&c->_c.mfc_un.res.pkt);
-+			sr.bytecnt = atomic_long_read(&c->_c.mfc_un.res.bytes);
-+			sr.wrong_if = atomic_long_read(&c->_c.mfc_un.res.wrong_if);
- 			rcu_read_unlock();
- 
- 			if (copy_to_user(arg, &sr, sizeof(sr)))
-@@ -1988,9 +1988,9 @@ static void ip_mr_forward(struct net *net, struct mr_table *mrt,
- 	int vif, ct;
- 
- 	vif = c->_c.mfc_parent;
--	c->_c.mfc_un.res.pkt++;
--	c->_c.mfc_un.res.bytes += skb->len;
--	c->_c.mfc_un.res.lastuse = jiffies;
-+	atomic_long_inc(&c->_c.mfc_un.res.pkt);
-+	atomic_long_add(skb->len, &c->_c.mfc_un.res.bytes);
-+	WRITE_ONCE(c->_c.mfc_un.res.lastuse, jiffies);
- 
- 	if (c->mfc_origin == htonl(INADDR_ANY) && true_vifi >= 0) {
- 		struct mfc_cache *cache_proxy;
-@@ -2021,7 +2021,7 @@ static void ip_mr_forward(struct net *net, struct mr_table *mrt,
- 			goto dont_forward;
- 		}
- 
--		c->_c.mfc_un.res.wrong_if++;
-+		atomic_long_inc(&c->_c.mfc_un.res.wrong_if);
- 
- 		if (true_vifi >= 0 && mrt->mroute_do_assert &&
- 		    /* pimsm uses asserts, when switching from RPT to SPT,
-@@ -3029,9 +3029,9 @@ static int ipmr_mfc_seq_show(struct seq_file *seq, void *v)
- 
- 		if (it->cache != &mrt->mfc_unres_queue) {
- 			seq_printf(seq, " %8lu %8lu %8lu",
--				   mfc->_c.mfc_un.res.pkt,
--				   mfc->_c.mfc_un.res.bytes,
--				   mfc->_c.mfc_un.res.wrong_if);
-+				   atomic_long_read(&mfc->_c.mfc_un.res.pkt),
-+				   atomic_long_read(&mfc->_c.mfc_un.res.bytes),
-+				   atomic_long_read(&mfc->_c.mfc_un.res.wrong_if));
- 			for (n = mfc->_c.mfc_un.res.minvif;
- 			     n < mfc->_c.mfc_un.res.maxvif; n++) {
- 				if (VIF_EXISTS(mrt, n) &&
-diff --git a/net/ipv4/ipmr_base.c b/net/ipv4/ipmr_base.c
-index f0af12a2f70bcdf5ba54321bf7ebebe798318abb..03b6eee407a24117612d2254c5eb72e78f39c196 100644
---- a/net/ipv4/ipmr_base.c
-+++ b/net/ipv4/ipmr_base.c
-@@ -263,9 +263,9 @@ int mr_fill_mroute(struct mr_table *mrt, struct sk_buff *skb,
- 	lastuse = READ_ONCE(c->mfc_un.res.lastuse);
- 	lastuse = time_after_eq(jiffies, lastuse) ? jiffies - lastuse : 0;
- 
--	mfcs.mfcs_packets = c->mfc_un.res.pkt;
--	mfcs.mfcs_bytes = c->mfc_un.res.bytes;
--	mfcs.mfcs_wrong_if = c->mfc_un.res.wrong_if;
-+	mfcs.mfcs_packets = atomic_long_read(&c->mfc_un.res.pkt);
-+	mfcs.mfcs_bytes = atomic_long_read(&c->mfc_un.res.bytes);
-+	mfcs.mfcs_wrong_if = atomic_long_read(&c->mfc_un.res.wrong_if);
- 	if (nla_put_64bit(skb, RTA_MFC_STATS, sizeof(mfcs), &mfcs, RTA_PAD) ||
- 	    nla_put_u64_64bit(skb, RTA_EXPIRES, jiffies_to_clock_t(lastuse),
- 			      RTA_PAD))
-diff --git a/net/ipv6/ip6mr.c b/net/ipv6/ip6mr.c
-index 578ff1336afeff7a9f468d54c8fc47fddcaedbbb..535e9f72514c06ad655e46d3200c14298f584d99 100644
---- a/net/ipv6/ip6mr.c
-+++ b/net/ipv6/ip6mr.c
-@@ -520,9 +520,9 @@ static int ipmr_mfc_seq_show(struct seq_file *seq, void *v)
- 
- 		if (it->cache != &mrt->mfc_unres_queue) {
- 			seq_printf(seq, " %8lu %8lu %8lu",
--				   mfc->_c.mfc_un.res.pkt,
--				   mfc->_c.mfc_un.res.bytes,
--				   mfc->_c.mfc_un.res.wrong_if);
-+				   atomic_long_read(&mfc->_c.mfc_un.res.pkt),
-+				   atomic_long_read(&mfc->_c.mfc_un.res.bytes),
-+				   atomic_long_read(&mfc->_c.mfc_un.res.wrong_if));
- 			for (n = mfc->_c.mfc_un.res.minvif;
- 			     n < mfc->_c.mfc_un.res.maxvif; n++) {
- 				if (VIF_EXISTS(mrt, n) &&
-@@ -884,7 +884,7 @@ static void ip6mr_update_thresholds(struct mr_table *mrt,
- 				cache->mfc_un.res.maxvif = vifi + 1;
- 		}
- 	}
--	cache->mfc_un.res.lastuse = jiffies;
-+	WRITE_ONCE(cache->mfc_un.res.lastuse, jiffies);
- }
- 
- static int mif6_add(struct net *net, struct mr_table *mrt,
-@@ -1945,9 +1945,9 @@ int ip6mr_ioctl(struct sock *sk, int cmd, void *arg)
- 		c = ip6mr_cache_find(mrt, &sr->src.sin6_addr,
- 				     &sr->grp.sin6_addr);
- 		if (c) {
--			sr->pktcnt = c->_c.mfc_un.res.pkt;
--			sr->bytecnt = c->_c.mfc_un.res.bytes;
--			sr->wrong_if = c->_c.mfc_un.res.wrong_if;
-+			sr->pktcnt = atomic_long_read(&c->_c.mfc_un.res.pkt);
-+			sr->bytecnt = atomic_long_read(&c->_c.mfc_un.res.bytes);
-+			sr->wrong_if = atomic_long_read(&c->_c.mfc_un.res.wrong_if);
- 			rcu_read_unlock();
- 			return 0;
- 		}
-@@ -2017,9 +2017,9 @@ int ip6mr_compat_ioctl(struct sock *sk, unsigned int cmd, void __user *arg)
- 		rcu_read_lock();
- 		c = ip6mr_cache_find(mrt, &sr.src.sin6_addr, &sr.grp.sin6_addr);
- 		if (c) {
--			sr.pktcnt = c->_c.mfc_un.res.pkt;
--			sr.bytecnt = c->_c.mfc_un.res.bytes;
--			sr.wrong_if = c->_c.mfc_un.res.wrong_if;
-+			sr.pktcnt = atomic_long_read(&c->_c.mfc_un.res.pkt);
-+			sr.bytecnt = atomic_long_read(&c->_c.mfc_un.res.bytes);
-+			sr.wrong_if = atomic_long_read(&c->_c.mfc_un.res.wrong_if);
- 			rcu_read_unlock();
- 
- 			if (copy_to_user(arg, &sr, sizeof(sr)))
-@@ -2142,9 +2142,9 @@ static void ip6_mr_forward(struct net *net, struct mr_table *mrt,
- 	int true_vifi = ip6mr_find_vif(mrt, dev);
- 
- 	vif = c->_c.mfc_parent;
--	c->_c.mfc_un.res.pkt++;
--	c->_c.mfc_un.res.bytes += skb->len;
--	c->_c.mfc_un.res.lastuse = jiffies;
-+	atomic_long_inc(&c->_c.mfc_un.res.pkt);
-+	atomic_long_add(skb->len, &c->_c.mfc_un.res.bytes);
-+	WRITE_ONCE(c->_c.mfc_un.res.lastuse, jiffies);
- 
- 	if (ipv6_addr_any(&c->mf6c_origin) && true_vifi >= 0) {
- 		struct mfc6_cache *cache_proxy;
-@@ -2162,7 +2162,7 @@ static void ip6_mr_forward(struct net *net, struct mr_table *mrt,
- 	 * Wrong interface: drop packet and (maybe) send PIM assert.
- 	 */
- 	if (rcu_access_pointer(mrt->vif_table[vif].dev) != dev) {
--		c->_c.mfc_un.res.wrong_if++;
-+		atomic_long_inc(&c->_c.mfc_un.res.wrong_if);
- 
- 		if (true_vifi >= 0 && mrt->mroute_do_assert &&
- 		    /* pimsm uses asserts, when switching from RPT to SPT,
--- 
-2.47.1.613.gc27f4b7a9f-goog
-
+make -C tools/testing/selftests TARGETS="net"
+TEST_PROGS=bpf_offload.py TEEST_GEN_PROGS="" run_tests
+make: Entering directory '/home/virtme/testing-3/tools/testing/selftests'
+make[1]: Entering directory '/home/virtme/testing-3/tools/testing/selftests/net'
+make[1]: Nothing to be done for 'all'.
+make[1]: Leaving directory '/home/virtme/testing-3/tools/testing/selftests/net'
+make[1]: Entering directory '/home/virtme/testing-3/tools/testing/selftests/net'
+TAP version 13
+1..1
+# overriding timeout to 7200
+# selftests: net: bpf_offload.py
+# 12.84 [+12.84] Test destruction of generic XDP...
+# 12.84 [+0.00] Traceback (most recent call last):
+# 12.85 [+0.00]   File
+"/home/virtme/testing-3/tools/testing/selftests/net/./bpf_offload.py",
+line 749, in <module>
+# 12.85 [+0.00]     simdev = BpfNetdevSimDev()
+# 12.85 [+0.00]   File
+"/home/virtme/testing-3/tools/testing/selftests/net/./bpf_offload.py",
+line 347, in __init__
+# 12.86 [+0.01]     super().__init__(port_count, ns=ns)
+# 12.86 [+0.00]   File
+"/home/virtme/testing-3/tools/testing/selftests/net/lib/py/nsim.py",
+line 87, in __init__
+# 12.86 [+0.00]     self.nsims.append(self._make_port(port_index,
+ifnames[port_index]))
+# 12.87 [+0.00]   File
+"/home/virtme/testing-3/tools/testing/selftests/net/./bpf_offload.py",
+line 351, in _make_port
+# 12.87 [+0.00]     return BpfNetdevSim(self, port_index, ifname, self.ns)
+# 12.87 [+0.00]   File
+"/home/virtme/testing-3/tools/testing/selftests/net/./bpf_offload.py",
+line 380, in __init__
+# 12.88 [+0.00]     self.dfs_refresh()
+# 12.88 [+0.00]   File
+"/home/virtme/testing-3/tools/testing/selftests/net/./bpf_offload.py",
+line 389, in dfs_refresh
+# 12.88 [+0.00]     self.dfs = DebugfsDir(self.dfs_dir)
+# 12.88 [+0.00]   File
+"/home/virtme/testing-3/tools/testing/selftests/net/./bpf_offload.py",
+line 290, in __init__
+# 12.89 [+0.00]     self._dict = self._debugfs_dir_read(path)
+# 12.89 [+0.00]   File
+"/home/virtme/testing-3/tools/testing/selftests/net/./bpf_offload.py",
+line 329, in _debugfs_dir_read
+# 12.89 [+0.00]     _, out = cmd('cat %s/%s' % (path, f))
+# 12.89 [+0.00]   File
+"/home/virtme/testing-3/tools/testing/selftests/net/./bpf_offload.py",
+line 112, in cmd
+# 12.89 [+0.00]     return cmd_result(proc,
+include_stderr=include_stderr, fail=fail)
+# 12.90 [+0.00]   File
+"/home/virtme/testing-3/tools/testing/selftests/net/./bpf_offload.py",
+line 134, in cmd_result
+# 12.90 [+0.00]     raise Exception("Command failed: %s\n%s" %
+(proc.args, stderr))
+# 12.90 [+0.00] Exception: Command failed: cat
+/sys/kernel/debug/netdevsim/netdevsim22122//ports/0//queue_reset
+# 12.90 [+0.00]
+# 12.90 [+0.00] cat:
+/sys/kernel/debug/netdevsim/netdevsim22122//ports/0//queue_reset:
+Invalid argument
+not ok 1 selftests: net: bpf_offload.py # exit=1
+make[1]: Leaving directory '/home/virtme/testing-3/tools/testing/selftests/net'
+make: Leaving directory '/home/virtme/testing-3/tools/testing/selftests'
+xx__-> echo $?
+0
+xx__-> echo scan > /sys/kernel/debug/kmemleak && cat /sys/kernel/debug/kmemleak
+xx__->
 
