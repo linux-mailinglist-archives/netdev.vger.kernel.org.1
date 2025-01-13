@@ -1,123 +1,123 @@
-Return-Path: <netdev+bounces-157566-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157567-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8FA7A0AD32
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 02:49:10 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E9451A0AD39
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 03:01:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7CC003A6115
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 01:49:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B76573A54F3
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 02:01:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0C9F1E4AE;
-	Mon, 13 Jan 2025 01:49:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=pen.gy header.i=@pen.gy header.b="FnCk3Ei4"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7556B3EA98;
+	Mon, 13 Jan 2025 02:01:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from ci74p00im-qukt09090102.me.com (ci74p00im-qukt09090102.me.com [17.57.156.19])
+Received: from smtpbgsg1.qq.com (smtpbgsg1.qq.com [54.254.200.92])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3FB23EA98
-	for <netdev@vger.kernel.org>; Mon, 13 Jan 2025 01:49:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=17.57.156.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC51317591
+	for <netdev@vger.kernel.org>; Mon, 13 Jan 2025 02:01:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.254.200.92
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736732946; cv=none; b=gEW2QQfnebo8Ga8os5PLPTzBj6BVN6lW+sgbZet7V0rutHUpoy2xYAv4+MKGecjwJLCrMNWCw8hqfk39op4HDl0X5C21pdm9JfcqH70juM6SX9cRktXLaNqWTqBS7x6eKWFsHXTdEC3Acu4MY3Q8erUJq3iMl9fy7DqZEjMuZfI=
+	t=1736733674; cv=none; b=sJGyYNxqLen45Alj8PxEK/Aib8MCkoW/Oe+dgTPu8BKzAm+KWRXYDjrAiNcyfWM+BBtz3DdA4cXhwqZu009j4t06nETyHkl7Zcy0rmbORuRWCESm7X/1mK7FdWswnWNyXAWCHNH9NS9pBbqDN1dXsKEpo2KurAW0mCapzBueT/0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736732946; c=relaxed/simple;
-	bh=DN4Eafqk1ZL9ZfUWt5fy7x6y7IgAdhcUAPuhV29g0Tw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Zrjwf8dkMJeOHErB7B3/TJk+uRSb8e+VhwL+DgDfd33KhwzX6CgpEaO/zFOTuShVf3+29B3UxGjZVN5C9GsmXA/WK+slp0n7b6jn9BxfS2JPQgYcIR964kl2Y8gtcgt8/frMExGsa8chGAS85BQ0bskn3Fl1ExEk/4syqTmTwfc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=pen.gy; spf=pass smtp.mailfrom=pen.gy; dkim=pass (2048-bit key) header.d=pen.gy header.i=@pen.gy header.b=FnCk3Ei4; arc=none smtp.client-ip=17.57.156.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=pen.gy
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pen.gy
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=pen.gy; s=sig1;
-	t=1736732943; bh=p2phnRoAUTIIMG7w40hYdxNRr8NZCByf9y79pH3BDgg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type:
-	 x-icloud-hme;
-	b=FnCk3Ei4dNrskglEPZ7fUpVycX28eK0m0AXYqPlgdxq3WcbA11/PQftEreMRhSoLC
-	 zV4mNdKIl74f3I9TZD0mK/0oPLuXRXYjr443RIKpLxgjjbMMNwWPJnz+gZEkA7qu2J
-	 53JR6Gf0+I7hsb/ZYbnbzCuuqkF1qj86PgJMPSsAUQHE2T+QQviqJO0nP9AL3Jb00e
-	 AehHHTKNxMXpf8q15EFWtXmTkfFADq5qGyPYt9o1/ZOK1MFCFrv97iMANkXqA8zoYK
-	 6DKAAKnUrvZkU1JNI8KGcWICUQ/CNqV9LWit58POKX0XOBzTPWJ1F2QFf/CW5qc8L8
-	 mHvWGjSDtvu2Q==
-Received: from [192.168.40.3] (ci77p00im-dlb-asmtp-mailmevip.me.com [17.57.156.26])
-	by ci74p00im-qukt09090102.me.com (Postfix) with ESMTPSA id 3A5C33C00341;
-	Mon, 13 Jan 2025 01:49:00 +0000 (UTC)
-Message-ID: <e587e1c7-a2ff-4e28-9e25-b57f68545134@pen.gy>
-Date: Mon, 13 Jan 2025 02:48:58 +0100
+	s=arc-20240116; t=1736733674; c=relaxed/simple;
+	bh=rx/08yE8yVMTMxKE3scvmCh8OcClSwLI1Z1x7DDPeXA=;
+	h=From:To:Cc:References:In-Reply-To:Subject:Date:Message-ID:
+	 MIME-Version:Content-Type; b=h4GVqoubTwIe2O9ic4RW3AHnSrooeMgUUwfbVaaeGH2YsMnhd7rfBe2v6UDgKNQzgl7pq+W263zDaQ7ctNvUpxCjiklAKFjjV76+EoHs/CCkdamLPotRof7nlxSh+Pe0adpQmOX+FtSOtwGJzxpflexxrsj8EWL2NuG5U8T6vmI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=54.254.200.92
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
+X-QQ-mid:Yeas2t1736733575t583t63501
+Received: from 3DB253DBDE8942B29385B9DFB0B7E889 (jiawenwu@trustnetic.com [36.20.58.48])
+X-QQ-SSF:0000000000000000000000000000000
+From: =?utf-8?b?Smlhd2VuIFd1?= <jiawenwu@trustnetic.com>
+X-BIZMAIL-ID: 1278653723033852028
+To: "'Simon Horman'" <horms@kernel.org>
+Cc: <andrew+netdev@lunn.ch>,
+	<davem@davemloft.net>,
+	<edumazet@google.com>,
+	<kuba@kernel.org>,
+	<pabeni@redhat.com>,
+	<linux@armlinux.org.uk>,
+	<netdev@vger.kernel.org>,
+	<mengyuanlou@net-swift.com>
+References: <20250110084249.2129839-1-jiawenwu@trustnetic.com> <20250110120357.GD7706@kernel.org>
+In-Reply-To: <20250110120357.GD7706@kernel.org>
+Subject: RE: [PATCH net-next 1/2] net: txgbe: Add basic support for new AML devices
+Date: Mon, 13 Jan 2025 09:59:34 +0800
+Message-ID: <051401db655e$cb1c91e0$6155b5a0$@trustnetic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [PATCH net v4 0/7] usbnet: ipheth: prevent OoB reads of NDP16
-Content-Language: en-GB
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Georgi Valkov <gvalkov@gmail.com>, Simon Horman <horms@kernel.org>,
- Oliver Neukum <oneukum@suse.com>, netdev@vger.kernel.org,
- linux-usb@vger.kernel.org
-References: <20250105010121.12546-1-forst@pen.gy>
- <dkrN8SbAXULmhNyPVFbHHs81wY3NqXPW7EVHB7o56ZQOvuzVkCH6ge0QWIGRDH5DvMOzaqFfljNXyqs1RPgHXg==@protonmail.internalid>
- <20250107173117.66606e57@kernel.org>
-From: Foster Snowhill <forst@pen.gy>
-In-Reply-To: <20250107173117.66606e57@kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain;
+	charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-X-Proofpoint-GUID: GJftM6FGuSlwVz5REm5-IuhjVVSuMbK3
-X-Proofpoint-ORIG-GUID: GJftM6FGuSlwVz5REm5-IuhjVVSuMbK3
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-01-12_12,2025-01-10_03,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=3 phishscore=0 malwarescore=0 mlxscore=3
- spamscore=3 bulkscore=0 clxscore=1030 suspectscore=0 adultscore=0
- mlxlogscore=150 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2308100000 definitions=main-2501130014
+X-Mailer: Microsoft Outlook 16.0
+Content-Language: zh-cn
+Thread-Index: AQJ61aqJnOw37UQr++/HgZp4qqxfaQJUQSOjscJt/AA=
+X-QQ-SENDSIZE: 520
+Feedback-ID: Yeas:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz8a-1
+X-QQ-XMAILINFO: N/EN6P+BmEafEnz7fmjJsF75OQkIeO9GFyOvUjsAze4DmBdqLDJniXk5
+	8hM3FOxMF4Ux38wQ3PguIKIw9FCO4I8nJQsCsx6YVS1BNOpqzfKIuKIeP2o1N+cfJpPHX5p
+	cHlbfPCfzQrSLnjX9Z7xFn3QLrhFDlOpnMnWevoFn0OW5LeHuVKqRqQjEnwhu+5n2+XLoAD
+	OL9corllMJfqNCpk0Djb7b8YjbGcVu3Iuftl6CXgiqmCn9oCcDkIvbfZ3ljOS1QReAEriKB
+	AMcLh9xcruqISXB1HkwcWKlOFjSIBo9XMjsE+IRxDYvMElwGLxN5yPi8Dn0/kcs8eZJ54E5
+	jZBtdaqWFLZXDucmqBObypfY7YaO+/5TwV583HE4rdIrqLnPI/PA9LqBr20+EyX/vOlb7Ya
+	fKxG3BD7FVVYdQgws+IAag7D3R9assW5MSLVsQELrNHo/uoaE1Zgf2FgKu+EcvMziyQlTAF
+	V30/A0emfBasUM6O50VXljO17IZHODlXFafD0ben29OdvAMTCHfVnkOPK2/VafyuDkYHZYQ
+	/6SqCgh8A5IdV+Gqxndpdb1wiUP3Saz6Jbizf38toINztbCztlg3KKje4j8ypVpfVdKyE9R
+	46e5IRFNllYptSZeWMAYA2MguR05KoAckHsUado4Uv7GxmUr66xLeg3ENTbCyyQv4PGwLT/
+	JzJRRAJGsyRmk1eu4s59l2Niv6LstvUcr0KEaAfkcrLgeUFdkZZ5MpIggR1CHtaXnR7wrN5
+	7oJz073QRZRxsCn4dIGya8RyvzRDv9cs7OwajKKUWa99IUIbZdypW6/SWVO0KenBNkFRfXT
+	yryT5JCZj/xShuM/LXTOR9az+dcRkhy5VmCoGWlFVuEcSA189HqQ8kAav0QZJkPAQNSz1VV
+	57lPDWKawjXog3zX/IGLf8xCLzUqw1psUfgzSIrjz6RdcsdERVR0HGcDzEUhRr1jUe1ZDm1
+	TnpctNg4WogWRX0Z8bzMnLeLyT8O2GHv59Uc=
+X-QQ-XMRINFO: Mp0Kj//9VHAxr69bL5MkOOs=
+X-QQ-RECHKSPAM: 0
 
-Hello Jakub,
-
-> Reviewed-by: Jakub Kicinski <kuba@kernel.org>
+On Fri, Jan 10, 2025 8:04 PM, Simon Horman wrote:
+> On Fri, Jan 10, 2025 at 04:42:48PM +0800, Jiawen Wu wrote:
+> > There is a new 25/10 Gigabit Ethernet device.
+> >
+> > To support basic functions, PHYLINK is temporarily skipped as it is
+> > intended to implement these configurations in the firmware. And the
+> > associated link IRQ is also skipped.
+> >
+> > And Implement the new SW-FW interaction interface, which use 64 Byte
+> > message buffer.
+> >
+> > Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
 > 
-> Please add that to each patch, address Greg's comment, and repost.
+> ...
+> 
+> > @@ -2719,7 +2730,7 @@ int wx_set_features(struct net_device *netdev, netdev_features_t features)
+> >
+> >  	netdev->features = features;
+> >
+> > -	if (wx->mac.type == wx_mac_sp && changed & NETIF_F_HW_VLAN_CTAG_RX)
+> > +	if (changed & NETIF_F_HW_VLAN_CTAG_RX && wx->do_reset)
+> >  		wx->do_reset(netdev);
+> 
+> Hi Jiawen Wu,
+> 
+> Here it is assumed that wx->do_reset may be NULL.  But there is an existing
+> call to wx->do_reset(), near the end of this function, that is not
+> conditional on wx->do_reset being non-NULL.  This does not seem consistent.
+> 
+> Flagged by Smatch.
 
-Thank you very much for the review!
+That is conditional on WX_FLAG_FDIR_CAPABLE, which is set by txgbe (SP/AML).
+Its condition is the same as wx->do_reset being non-NULL.
 
-I went through the series again, noticed a couple minor things I think
-I should fix:
+	if (!(test_bit(WX_FLAG_FDIR_CAPABLE, wx->flags)))
+		return 0;
 
-* Patch 1/7 ("usbnet: ipheth: break up NCM header size computation")
-  [p1] introduces two new preprocessor constants. Only one of them is
-  used (the other one is intermediate, for clarity), and the usage is
-  all the way in patch 6/7 ("usbnet: ipheth: fix DPE OoB read") [p6].
-  I'd like to move the constant introduction patch right before the
-  patch that uses one of them. There's no good reason they're spread
-  out like they are in v4.
-* Commit message in patch 5/7 ("usbnet: ipheth: refactor NCM datagram
-  loop") [p5] has a stray paragraph starting with "Fix an out-of-bounds
-  DPE read...". This needs to be removed.
-
-I'd like to get this right. I'll make the changes above, add Cc stable,
-re-test all patches in sequence, and submit v5 soon. As this will be
-a different revision, I figure I can't formally apply your "Reviewed-by"
-anymore, the series may need another look once I post v5.
-
-Also I have some doubts about patch 7/7 [p7] with regards to its
-applicability to backporting to older stable releases. This only adds a
-documentation comment, without fixing any particular issue. Doesn't
-sound like something that should go into stable. But maybe fine if it's
-part of a series? I can also add that text in a commit message rather
-than the source code of the driver itself, or even just keep it in the
-cover letter. Do you have any opinion on this?
-
-Thank you!
+For ease of reading, I'll add "if (wx->do_reset)" near the end of this function.
 
 
-[p1]: https://lore.kernel.org/netdev/20250105010121.12546-2-forst@pen.gy/
-[p5]: https://lore.kernel.org/netdev/20250105010121.12546-6-forst@pen.gy/
-[p6]: https://lore.kernel.org/netdev/20250105010121.12546-7-forst@pen.gy/
-[p7]: https://lore.kernel.org/netdev/20250105010121.12546-8-forst@pen.gy/
 
