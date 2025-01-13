@@ -1,163 +1,125 @@
-Return-Path: <netdev+bounces-157696-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157698-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05E6FA0B38D
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 10:49:39 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 77FA0A0B394
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 10:51:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 12C6C3AD7EB
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 09:44:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 88D433A4DF3
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 09:47:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F5EC21ADB6;
-	Mon, 13 Jan 2025 09:42:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7B7F235C01;
+	Mon, 13 Jan 2025 09:47:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="FSvBoOR/"
+	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="gYt8ejXX"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-173.mta0.migadu.com (out-173.mta0.migadu.com [91.218.175.173])
+Received: from out203-205-221-239.mail.qq.com (out203-205-221-239.mail.qq.com [203.205.221.239])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2AD421ADB2
-	for <netdev@vger.kernel.org>; Mon, 13 Jan 2025 09:42:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECFFC235BE1;
+	Mon, 13 Jan 2025 09:47:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.205.221.239
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736761365; cv=none; b=ODgICJVBvN/Ced3+CQpvfUwPH0OaV/Gma2ln3sQq9yrr83jk9r7hNhp3Qnv4X1DC7YbIzTPuNcMSJP+TfxDbG6XXm1TO8DHXRe7UR1GaqNWIzOqIGtYmYy+53OGfetEnFXiKtzAEsjNmFWecquwZdmoZyUokDXB40gofUR7/5is=
+	t=1736761665; cv=none; b=SgoivqC1kqJ90Q2l09PtRy/PwnXKHO9Uwq/uaX0tICW3jEz7AuJ2Qj/DKBuBohRSDwXabDKdgfWdrR/ziI2O11jvJTB39G7cVRALZ6pPO9xqmj95/g12NsLLqSu0JUtj1tOL9LNzRiggi4tis/VngtOVLl1yYZGPfBkbmxVZp44=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736761365; c=relaxed/simple;
-	bh=lhmxskbqGmXej7W9jkDId4T2R4B5O0rubVPO9ENh8cs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=sB0Ut5oPYQGJtceVRvswHjSTQ56Cguz3r1Em+o7taivxlMNpJ4aG3/cAAL2Ca9u3/Y7FAmSJfTsLpu3pvs6BWPvDmIPKY79w/IaUsF/dknSa+c52wRFag/D26hj1pcMdktZKmluK6fcovGjdWtCXwRPuyZp2QZwfFIr+kUbuGKA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=FSvBoOR/; arc=none smtp.client-ip=91.218.175.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <f1062d1c-f39d-4c9e-9b50-f6ae0bcf27d5@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1736761355;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=RjB6WK0e1BonkXyM1rzb2pTfxLH0vAZTTZRJAaWMzIU=;
-	b=FSvBoOR/2lGsPOrxt2XCfKh4xJt4s9aq0Soaqo+ujJeGo1zgsSoFjz/dbxC0X6Wt6Wzm1h
-	gUnPg9mGmD2dnliNDp+r/yXxQpGllafOGvKp2C9uQVepdcAO9uVnIchrJHbE1UMid6zH6e
-	feKvgHJ/zRi0H+1a5Gyl3/QcoKX+jIY=
-Date: Mon, 13 Jan 2025 17:41:41 +0800
+	s=arc-20240116; t=1736761665; c=relaxed/simple;
+	bh=r+T1p5CixKbGFH66eBDxjVN1xnclKueAwN2x9vZhbso=;
+	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Jb5VHnxs1FNy43QA/uglpY4DS9X4QsiFay9ZC4rwwZ4SC2wBFk+42pFYPGdS83FVQJvMsE6OQFI+NR7AH1QNzkaHbXsnGx94cTwSS0HSPyaCJDwyGx6X8G4SXJcj4WalzwjB+8Mo5ct9M2lTpCSYyetMzC95p0HLnU6IcSws97Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=Red54.com; spf=pass smtp.mailfrom=red54.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=gYt8ejXX; arc=none smtp.client-ip=203.205.221.239
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=Red54.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=red54.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
+	t=1736761353; bh=2UvtDxOV+5yVrrcHRwHZxj+kVtZRPaDDdFm5rO5bOBQ=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=gYt8ejXX6R2uylUT5Ap+3f4q3Rb/R80zMzH0YRRuQEHWShSvRcekvxv7GmiKJZ3vf
+	 hTigW15a7jPZDDfgboy12uC4a2zPI9F/1mvVQX4RotQxLaJqabod1TFDtmIb7cqiSQ
+	 R2raJ6YJ2VrKixlQ/7UpCRWezQ8lpu1yJpxGXfGY=
+Received: from mail.red54.com ([171.25.193.79])
+	by newxmesmtplogicsvrszb21-0.qq.com (NewEsmtp) with SMTP
+	id A8F8D474; Mon, 13 Jan 2025 17:42:15 +0800
+X-QQ-mid: xmsmtpt1736761335tah1uxfxe
+Message-ID: <tencent_8CF8A72C708E96B9C7DC1AF96FEE19AF3D05@qq.com>
+X-QQ-XMAILINFO: NcC2/Q4ACKgy5h67QW8b3z8fwpmZnCfTBTIJC2GVLbOGaw4qQy4bwI8G/DgKcU
+	 NvBjPsoTIL11xsTeRMfp7swXCL5KYg7dSww+Wvqm/laSj3C6iincIGfI3BuU3k5PdkU/xuG2wsMd
+	 Zjx1VOieCI9EG0YiLFhXLf4T3hcgj6G8DTk35P4h5Y5uFSFsAtdeL3PUJjvqqSFop64tMlGAwGec
+	 v180jcWhC5ArwtWKXVH5Nh13V9Bn0Jv0CfV8IOXpupYY8HfA6TBuSYl23pF2NtHkLOy6Vf04VkoL
+	 aEg8O7Q5SWiAjlSxsKotr6tvVA/kWaFYheuOQVjzmWknD8eJl5CNsQkFTP222g5Bq6xyPiMTvQoC
+	 Rb+QHK4MR9LcFWfchu/jQeMN0koYJxjS+j6xO+4hbZdtweCTzily8o9p6mhiYh1I5TVhGHdgHukc
+	 GcBYgapy8p+YWlBUOEBwp3Vnm/Y5Y3I9HRWcNo3xI7FZjgrGApWmaUEySV3NlBstHAxETAdn9+ix
+	 3JY0+0JmJpdLfa9WymYUHH3xTu+HoHvUyWh84QFwkaRXS60tNAL1kSOppg8WIEtQZI37NMtJ3Csq
+	 DevFYLmfW3zVGJilCIiq7H/oVa1oeo/TBOAjwjZuIPhSJSNp2roaw3ht+FcS7/wbI2IuyCAy5Yag
+	 eKnR4V5A8ErUWxEGJyYyCPLS1ZOj35r7DOc+TYkYM5NO9+HaJGbN/mM1QyJlgKxTN25oiJgL+K57
+	 qhPBWK/o7MjCcnI6Y5Syl5WMAF3cTgZyGS/6O2mCc9TuHU0F3tQDAVIo1/oYJA92a33YHImYQxeO
+	 diJM0Dg7HJlm1e8MG7m87Z77igEny0DAemjLmzmXxeXG7rU4c14ROdLUDxfla6NlxK7MU7nw6t1s
+	 aYGiH6YWIE+oJarVqr0acFxjBKPzXSHzraZh++6o9e8w2/baW0VDCR4YmuKbxxUuLuwKe2Kd6CNj
+	 QDYu9zl5DOpZwraJa246TMYaikCfP8xcEGm7bmkQA=
+X-QQ-XMRINFO: NI4Ajvh11aEj8Xl/2s1/T8w=
+Sender: yeking@red54.com
+From: Yeking@Red54.com
+To: kuba@kernel.org
+Cc: Yeking@Red54.com,
+	andrew+netdev@lunn.ch,
+	arnd@arndb.de,
+	davem@davemloft.net,
+	edumazet@google.com,
+	jgg@ziepe.ca,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	wellslutw@gmail.com
+Subject: [PATCH net v5] net: ethernet: sunplus: Switch to ndo_eth_ioctl
+Date: Mon, 13 Jan 2025 09:41:56 +0000
+X-OQ-MSGID: <20250113094156.141741-1-Yeking@Red54.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20250110175737.7535f4e7@kernel.org>
+References: <20250110175737.7535f4e7@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next v1 1/3] net: stmmac: Switch to zero-copy in
- non-XDP RX path
-To: Furong Xu <0x1207@gmail.com>, netdev@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>, xfr@outlook.com
-References: <cover.1736500685.git.0x1207@gmail.com>
- <600c76e88b6510f6a4635401ec1e224b3bbb76ec.1736500685.git.0x1207@gmail.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Yanteng Si <si.yanteng@linux.dev>
-In-Reply-To: <600c76e88b6510f6a4635401ec1e224b3bbb76ec.1736500685.git.0x1207@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
 
-在 2025/1/10 17:53, Furong Xu 写道:
-> Avoid memcpy in non-XDP RX path by marking all allocated SKBs to
-> be recycled in the upper network stack.
-> 
-> This patch brings ~11.5% driver performance improvement in a TCP RX
-> throughput test with iPerf tool on a single isolated Cortex-A65 CPU
-> core, from 2.18 Gbits/sec increased to 2.43 Gbits/sec.
-> 
-> Signed-off-by: Furong Xu <0x1207@gmail.com>
-> ---
->   drivers/net/ethernet/stmicro/stmmac/stmmac.h  |  1 +
->   .../net/ethernet/stmicro/stmmac/stmmac_main.c | 23 +++++++++++--------
->   2 files changed, 15 insertions(+), 9 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac.h b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-> index 548b28fed9b6..5c39292313de 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-> @@ -126,6 +126,7 @@ struct stmmac_rx_queue {
->   	unsigned int cur_rx;
->   	unsigned int dirty_rx;
->   	unsigned int buf_alloc_num;
-> +	unsigned int napi_skb_frag_size;
->   	dma_addr_t dma_rx_phy;
->   	u32 rx_tail_addr;
->   	unsigned int state_saved;
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> index 038df1b2bb58..43125a6f8f6b 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> @@ -1320,7 +1320,7 @@ static unsigned int stmmac_rx_offset(struct stmmac_priv *priv)
->   	if (stmmac_xdp_is_enabled(priv))
->   		return XDP_PACKET_HEADROOM;
->   
-> -	return 0;
-> +	return NET_SKB_PAD;
->   }
->   
->   static int stmmac_set_bfsize(int mtu, int bufsize)
-> @@ -2019,17 +2019,21 @@ static int __alloc_dma_rx_desc_resources(struct stmmac_priv *priv,
->   	struct stmmac_channel *ch = &priv->channel[queue];
->   	bool xdp_prog = stmmac_xdp_is_enabled(priv);
->   	struct page_pool_params pp_params = { 0 };
-> -	unsigned int num_pages;
-> +	unsigned int dma_buf_sz_pad, num_pages;
->   	unsigned int napi_id;
->   	int ret;
->   
-> +	dma_buf_sz_pad = stmmac_rx_offset(priv) + dma_conf->dma_buf_sz +
-> +			 SKB_DATA_ALIGN(sizeof(struct skb_shared_info));
-> +	num_pages = DIV_ROUND_UP(dma_buf_sz_pad, PAGE_SIZE);
-> +
->   	rx_q->queue_index = queue;
->   	rx_q->priv_data = priv;
-> +	rx_q->napi_skb_frag_size = num_pages * PAGE_SIZE;
->   
->   	pp_params.flags = PP_FLAG_DMA_MAP | PP_FLAG_DMA_SYNC_DEV;
->   	pp_params.pool_size = dma_conf->dma_rx_size;
-> -	num_pages = DIV_ROUND_UP(dma_conf->dma_buf_sz, PAGE_SIZE);
-> -	pp_params.order = ilog2(num_pages);
-> +	pp_params.order = order_base_2(num_pages);
->   	pp_params.nid = dev_to_node(priv->device);
->   	pp_params.dev = priv->device;
->   	pp_params.dma_dir = xdp_prog ? DMA_BIDIRECTIONAL : DMA_FROM_DEVICE;
-> @@ -5574,19 +5578,20 @@ static int stmmac_rx(struct stmmac_priv *priv, int limit, u32 queue)
->   			/* XDP program may expand or reduce tail */
->   			buf1_len = ctx.xdp.data_end - ctx.xdp.data;
->   
-> -			skb = napi_alloc_skb(&ch->rx_napi, buf1_len);
-> +			skb = napi_build_skb(page_address(buf->page),
-> +					     rx_q->napi_skb_frag_size);
->   			if (!skb) {
-> +				page_pool_recycle_direct(rx_q->page_pool,
-> +							 buf->page);
->   				rx_dropped++;
->   				count++;
->   				goto drain_data;
->   			}
->   
->   			/* XDP program may adjust header */
-> -			skb_copy_to_linear_data(skb, ctx.xdp.data, buf1_len);
-> +			skb_reserve(skb, ctx.xdp.data - ctx.xdp.data_hard_start);
-The network subsystem still requires that the length
-of each line of code should not exceed 80 characters.
-So let's silence the warning:
+From: 谢致邦 (XIE Zhibang) <Yeking@Red54.com>
 
-WARNING: line length of 81 exceeds 80 columns
-#87: FILE: drivers/net/ethernet/stmicro/stmmac/stmmac_main.c:5592:
-+			skb_reserve(skb, ctx.xdp.data - ctx.xdp.data_hard_start);
+The device ioctl handler no longer calls ndo_do_ioctl, but calls
+ndo_eth_ioctl to handle mii ioctls since commit a76053707dbf
+("dev_ioctl: split out ndo_eth_ioctl"). However, sunplus still used
+ndo_do_ioctl when it was introduced. So switch to ndo_eth_ioctl. (found
+by code inspection)
 
-Thanks,
-Yanteng
+Fixes: fd3040b9394c ("net: ethernet: Add driver for Sunplus SP7021")
+Signed-off-by: 谢致邦 (XIE Zhibang) <Yeking@Red54.com>
+---
+V4 -> V5: Update commit message again
+V3 -> V4: Change Fixes tag back to old style, due to the objection from
+Greg Kroah-Hartman.
+V2 -> V3: Update commit message again, and add short author date to the
+Fixes tag to make it clear at a glance and reduce misunderstandings.
+V1 -> V2: Update commit message
+
+ drivers/net/ethernet/sunplus/spl2sw_driver.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/sunplus/spl2sw_driver.c b/drivers/net/ethernet/sunplus/spl2sw_driver.c
+index 721d8ed3f302..5e0e4c9ecbb0 100644
+--- a/drivers/net/ethernet/sunplus/spl2sw_driver.c
++++ b/drivers/net/ethernet/sunplus/spl2sw_driver.c
+@@ -199,7 +199,7 @@ static const struct net_device_ops netdev_ops = {
+ 	.ndo_start_xmit = spl2sw_ethernet_start_xmit,
+ 	.ndo_set_rx_mode = spl2sw_ethernet_set_rx_mode,
+ 	.ndo_set_mac_address = spl2sw_ethernet_set_mac_address,
+-	.ndo_do_ioctl = phy_do_ioctl,
++	.ndo_eth_ioctl = phy_do_ioctl,
+ 	.ndo_tx_timeout = spl2sw_ethernet_tx_timeout,
+ };
+ 
+-- 
+2.43.0
+
 
