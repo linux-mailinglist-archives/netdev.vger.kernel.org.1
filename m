@@ -1,92 +1,76 @@
-Return-Path: <netdev+bounces-157622-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157626-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79FBDA0B07C
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 09:05:30 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E444A0B0AB
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 09:09:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 84116165F83
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 08:05:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5CA143A0357
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 08:09:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43F92231CB9;
-	Mon, 13 Jan 2025 08:05:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9566231A50;
+	Mon, 13 Jan 2025 08:09:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dGeROT6T"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Nq5XMahF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 667E83C1F;
-	Mon, 13 Jan 2025 08:05:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AB663C1F
+	for <netdev@vger.kernel.org>; Mon, 13 Jan 2025 08:09:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736755527; cv=none; b=CmTxdBMbcE0R5RduhkITS4GhQIijyD43XckutEYOmTTNEjNFUt7T4rjHdVLhU7F0Yz68/rsmH83tZLK1MYxTUwUTXB1oAlmptRzfMMFswdSJwdkM0O6WrEKYzGGehpKu79Sw+cMk0BmuObST9k1OMt8ht8352ztN7Q8ZuOtox5s=
+	t=1736755784; cv=none; b=TE0RNlh8HukB59tSzaP2aU9UCt0mtxeHEmphgmB5qLh6wTPfAS1L+zRfWswFzRz3Fx60knThtd5YLoqXclJ3TNE/i9Ez3k8U4aNysVQXd1KZdm3hPsydNj0JovosKCQrd3I1URqMlB7BIBx1TtjqjpT67Jt8QVjnP+KFmlJpp2I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736755527; c=relaxed/simple;
-	bh=nSXak/o9xZoZKmtCzqjYTadfTrNAh/ghXphoJiaU1No=;
+	s=arc-20240116; t=1736755784; c=relaxed/simple;
+	bh=feiiVMD0NY3ia9GjmU318WGLIvVwUwSw2bxmJQ52C9Y=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iWW26uANz/sJmhD7F0znfg2IO5u/4tXNdT/+Qq84821IwOufLyQh7eCF/eMpqu1kY7ReXpGBe+GcGvj6IuUXZBojWc6fcEc1tK1rp7AXDt0fxUbyvCVcEbhgcQW2gLrthbz1iRjNFS5yYfyx361vtC3FYFhVln2V1MX0Vw1oaxk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dGeROT6T; arc=none smtp.client-ip=209.85.221.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-385dece873cso1891505f8f.0;
-        Mon, 13 Jan 2025 00:05:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736755524; x=1737360324; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=/KMj101DNBN+joaD4kWwCkvCG1/KgOEjYa6KLLnGnmc=;
-        b=dGeROT6TNq1hyBxBA1NCZRW23tFp06cjhvq5IgWd+gLFIG/tyJR5amrzyFweqKrvuM
-         sShUDWXZTHq966GnMU2WSGmrffPXyqo1COc776XoS01ZJWkSoP5xg8EUU+j8/t1313DG
-         ZvbUi+1qVMuIOgqEzRT6rqRxDC3eK6waFcGKX5u+H73f92iQlAbRqQlIxo4ffiwVScdF
-         KZJ2QxL8th2qp+96di1MlVM3BM0q7UIf+QnHGYuPASVcKLXpGMHhfBNXXZdwnP6G8doB
-         Mvlw9IxvgyJghh2kOAXaoj9xR5gefaBcYidwOXTzHbjACg1B3T8ROojUbhuRmLoqfAmg
-         iHng==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736755524; x=1737360324;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/KMj101DNBN+joaD4kWwCkvCG1/KgOEjYa6KLLnGnmc=;
-        b=iBHumF5nqRBMg55VJeosT4PRDq7O9Q8/2iBo0+EELF0vNkkEldD+eZlXHh5Y04/Y3p
-         A/+3uxUFJy6Kw4J+n1fnsvfaoLlG5Z7UK2SUFOKJzBXgYC/iIHf3f7skC45dweqoODwn
-         lon8jaFRzR8ZhRL4DACnzbKr83QoE2DMnA7h1vflL5bAl62WjBth7ltqtMCNS7OHr3fy
-         CC51VgndP0ZJzMu1zp1uwzj7bdI+FX4dXVV/wHAT/NeRFFuGOWSLj58nPZuSshgPCu4z
-         6vpFjpbzdLfUDLvGbeKfhH184TComarAN1IIPsKhfTbJp3W6vpe4rF3H6fDIOyHJAd2e
-         99+A==
-X-Forwarded-Encrypted: i=1; AJvYcCVKGwm5wOIg0+LOBbpATCjpBCs9QyIpgbpy75gyaUyDwBtJDQnEfBfYKvZZCa1hHmsAyGzEK4jTS7QOHUo=@vger.kernel.org, AJvYcCWyNrElWCCWd2AVTIHIYbro82mTvapfeQukQkR+ylktffZ9sGr50zz3WayagBCDgQ2uhTt2Iy5T@vger.kernel.org
-X-Gm-Message-State: AOJu0YxO6VAbk05/+A1jLKqzhVc9idW4xWOfDvOFnyQjAdVQO0BfD8FI
-	OtmNAVVok6dLL0x1FKBWnMbMlwmPiWVZ+hqm87O0D1/JLqh7JScy
-X-Gm-Gg: ASbGnctyiS7zrmxfj7IH/QEfu/oAod55iD6+2yXH62KXgqoiUVNat8gd6TmiEKEu1hb
-	Z5/gGthVotWJIXqk8pbW6w+XIcWhml3zBts8FSLWtBdUOoT4ldR3ZbYieDholM1NiVu1NNd1/AP
-	EgH2saCwao3/fF0UiEke/PxKopxfL5eO+EhvGuTsFABsSooLkkUzHfw5A6QraFVUuB3uWsrPkkm
-	TiXLoGfdrE7XrLTFXUqQ4DLWTfU2A9ThAbwftwPJ0A6cOhS6ufqbIYk
-X-Google-Smtp-Source: AGHT+IEHS50BSFFmRg7mgcmrBYvLFucS4wGm19oollRoDc5VgYes/e7yaE5v4Kl6BGlsxDPD7NIGCg==
-X-Received: by 2002:a05:6000:709:b0:386:3803:bbd5 with SMTP id ffacd0b85a97d-38a8733a1f9mr18622260f8f.45.1736755523638;
-        Mon, 13 Jan 2025 00:05:23 -0800 (PST)
-Received: from eichest-laptop ([2a02:168:af72:0:a5a1:302a:fcf7:c337])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38a8e4c1b2asm11193969f8f.89.2025.01.13.00.05.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 Jan 2025 00:05:23 -0800 (PST)
-Date: Mon, 13 Jan 2025 09:05:21 +0100
-From: Stefan Eichenberger <eichest@gmail.com>
-To: Dimitri Fedrau <dima.fedrau@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Niklas =?iso-8859-1?Q?S=F6derlund?= <niklas.soderlund+renesas@ragnatech.se>,
-	Gregor Herburger <gregor.herburger@ew.tq-group.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: phy: marvell-88q2xxx: Add support for PHY LEDs on
- 88q2xxx
-Message-ID: <Z4TJQSPlA_s6lbkS@eichest-laptop>
-References: <20250110-marvell-88q2xxx-leds-v1-1-22e7734941c2@gmail.com>
- <Z4FYjw596FQE4RMP@eichest-laptop>
- <20250110183058.GA208903@debian>
+	 Content-Type:Content-Disposition:In-Reply-To; b=DqHaTZTtGkGVj3uPrhShvQz8UUr/wtnd2sa4z2x3GIzGLxtI3BJv3YJx75Ij40CoIUY6KOCbGGM/gS8PlBk0BKWDkcD4DaEPaRiPMdGmBsi0lvmENOq/mrf8zkrTM06lZXrhe08MRZC9DncAu2BfDGjQySkhgiOJZQgurxLt0dI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Nq5XMahF; arc=none smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1736755783; x=1768291783;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=feiiVMD0NY3ia9GjmU318WGLIvVwUwSw2bxmJQ52C9Y=;
+  b=Nq5XMahFfZ24kC/YbZyll+hhFqEIysF+Mb0ji6xiI4YoUfSB8g6E8nw6
+   Ne0ECSBUAwbPiglrk/+Arx+lJwwIKgXNw8ReHQa3ialSjI7gAP1425TAM
+   V5lay3G2CUg+8klTIL+UTUrzxF9JKr3OnK7ji6rkUeIt0HvyNE3XiOB0H
+   qqE3Z79VjOm/TkC1cfZtBasi7PoNAMDv4EEYUA5Xiz60SJlQf38Q4zSy6
+   QiC3w332dCEqejwTrpl1kos6lX9GDiZanjrkjheDdt8g98eMNvyD485OF
+   4wmxI1OyHO2aUhD/TIM4lwVGmP4MDxW7gmf1cepD8q7YTr2VRyEEerAkH
+   A==;
+X-CSE-ConnectionGUID: ap7fup04QH6UjYP5fIQGPw==
+X-CSE-MsgGUID: GgDwIIECScOBKk2EZmdQXg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11313"; a="47494342"
+X-IronPort-AV: E=Sophos;i="6.12,310,1728975600"; 
+   d="scan'208";a="47494342"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jan 2025 00:09:43 -0800
+X-CSE-ConnectionGUID: XDL/N15pSaOIpDalmv0N7w==
+X-CSE-MsgGUID: TGJxXP4zQsWbKG5PDAP+8w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,310,1728975600"; 
+   d="scan'208";a="104556001"
+Received: from mev-dev.igk.intel.com ([10.237.112.144])
+  by fmviesa008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jan 2025 00:09:37 -0800
+Date: Mon, 13 Jan 2025 09:06:19 +0100
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+To: Michael Chan <michael.chan@broadcom.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, andrew+netdev@lunn.ch,
+	pavan.chebbi@broadcom.com, andrew.gospodarek@broadcom.com,
+	somnath.kotur@broadcom.com,
+	Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
+Subject: Re: [PATCH net-next 04/10] bnxt_en: Refactor completion ring free
+ routine
+Message-ID: <Z4TJe66l3H8DkizD@mev-dev.igk.intel.com>
+References: <20250113063927.4017173-1-michael.chan@broadcom.com>
+ <20250113063927.4017173-5-michael.chan@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -95,95 +79,68 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250110183058.GA208903@debian>
+In-Reply-To: <20250113063927.4017173-5-michael.chan@broadcom.com>
 
-On Fri, Jan 10, 2025 at 07:30:58PM +0100, Dimitri Fedrau wrote:
-> Hi Stefan,
+On Sun, Jan 12, 2025 at 10:39:21PM -0800, Michael Chan wrote:
+> From: Somnath Kotur <somnath.kotur@broadcom.com>
 > 
-> Am Fri, Jan 10, 2025 at 06:27:43PM +0100 schrieb Stefan Eichenberger:
-> > Hi Dimitri ,
-> > 
-> > On Fri, Jan 10, 2025 at 04:10:04PM +0100, Dimitri Fedrau wrote:
-> > > Marvell 88Q2XXX devices support up to two configurable Light Emitting
-> > > Diode (LED). Add minimal LED controller driver supporting the most common
-> > > uses with the 'netdev' trigger.
-> > > 
-> > > Signed-off-by: Dimitri Fedrau <dima.fedrau@gmail.com>
-> > > ---
-> > >  drivers/net/phy/marvell-88q2xxx.c | 161 ++++++++++++++++++++++++++++++++++++++
-> > >  1 file changed, 161 insertions(+)
-> > > 
-> > > diff --git a/drivers/net/phy/marvell-88q2xxx.c b/drivers/net/phy/marvell-88q2xxx.c
-> > > index 5107f58338aff4ed6cfea4d91e37282d9bb60ba5..bef3357b9d279fca5d1f86ff0eaa0d45a699e3f9 100644
-> > > --- a/drivers/net/phy/marvell-88q2xxx.c
-> > > +++ b/drivers/net/phy/marvell-88q2xxx.c
-> > > @@ -8,6 +8,7 @@
-> > >   */
-> > >  #include <linux/ethtool_netlink.h>
-> > >  #include <linux/marvell_phy.h>
-> > > +#include <linux/of.h>
-> > >  #include <linux/phy.h>
-> > >  #include <linux/hwmon.h>
-> > >  
-> > > @@ -27,6 +28,9 @@
-> > >  #define MDIO_MMD_AN_MV_STAT2_100BT1		0x2000
-> > >  #define MDIO_MMD_AN_MV_STAT2_1000BT1		0x4000
-> > >  
-> > > +#define MDIO_MMD_PCS_MV_RESET_CTRL		32768
-> > > +#define MDIO_MMD_PCS_MV_RESET_CTRL_TX_DISABLE	0x8
-> > > +
-> > >  #define MDIO_MMD_PCS_MV_INT_EN			32784
-> > >  #define MDIO_MMD_PCS_MV_INT_EN_LINK_UP		0x0040
-> > >  #define MDIO_MMD_PCS_MV_INT_EN_LINK_DOWN	0x0080
-> > > @@ -40,6 +44,15 @@
-> > >  #define MDIO_MMD_PCS_MV_GPIO_INT_CTRL			32787
-> > >  #define MDIO_MMD_PCS_MV_GPIO_INT_CTRL_TRI_DIS		0x0800
-> > >  
-> > > +#define MDIO_MMD_PCS_MV_LED_FUNC_CTRL			32790
-> > > +#define MDIO_MMD_PCS_MV_LED_FUNC_CTRL_GPIO_MASK		GENMASK(7, 4)
-> > > +#define MDIO_MMD_PCS_MV_LED_FUNC_CTRL_TX_EN_MASK	GENMASK(3, 0)
-> > > +#define MDIO_MMD_PCS_MV_LED_FUNC_CTRL_LINK		0x0 /* Link established */
-> > > +#define MDIO_MMD_PCS_MV_LED_FUNC_CTRL_LINK_RX_TX	0x1 /* Link established, blink for rx or tx activity */
-> > > +#define MDIO_MMD_PCS_MV_LED_FUNC_CTRL_RX_TX		0x4 /* Receive or Transmit activity */
-> > > +#define MDIO_MMD_PCS_MV_LED_FUNC_CTRL_TX		0x5 /* Transmit activity */
-> > > +#define MDIO_MMD_PCS_MV_LED_FUNC_CTRL_LINK_1000BT1	0x7 /* 1000BT1 link established */
-> > > +
-> > >  #define MDIO_MMD_PCS_MV_TEMP_SENSOR1			32833
-> > >  #define MDIO_MMD_PCS_MV_TEMP_SENSOR1_RAW_INT		0x0001
-> > >  #define MDIO_MMD_PCS_MV_TEMP_SENSOR1_INT		0x0040
-> > > @@ -95,6 +108,9 @@
-> > >  
-> > >  #define MDIO_MMD_PCS_MV_TDR_OFF_CUTOFF			65246
-> > >  
-> > > +#define MV88Q2XXX_LED_INDEX_TX_ENABLE	0
-> > > +#define MV88Q2XXX_LED_INDEX_GPIO	1
-> > 
-> > Not sure if I understand this. TX_ENABLE would be LED0 and GPIO would be
-> > LED1? In my datasheet the 88Q222x only has a GPIO pin (which is also
-> > TX_ENABLE), is this a problem? Would we need a led_count variable per
-> > chip? 
-> > 
-> Yes you understand it correctly.
-> Looking at the datasheets for 88Q212x, 88Q211x and 88Q222x, they have all
-> TX_ENABLE and GPIO pin. Registers are also the same. Did I miss anything ?
-> For which device GPIO pin and TX_ENABLE are the same ?
+> Add a wrapper routine to free L2 completion rings.  This will be
+> useful later in the series.
 > 
-> > In the 88Q2110 I can see that there is a TX_ENABLE (0) and a GPIO (1)
-> > pin. In the register description they just call it LED [0] Control and
-> > LED [1] Control. Maybe calling it LED_0 and LED_1 would be easier to
-> > understand? Same for MDIO_MMD_PCS_MV_LED_FUNC_CTRL_GPIO_MASK and
-> > MDIO_MMD_PCS_MV_LED_FUNC_CTRL_TX_EN_MASK.
-> > 
-> I named them just as the pin. Probably it would be easier to understand,
-> but the mapping between pin and index would be lost. What do you think ?
+> Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
+> Signed-off-by: Somnath Kotur <somnath.kotur@broadcom.com>
+> Signed-off-by: Michael Chan <michael.chan@broadcom.com>
+> ---
+>  drivers/net/ethernet/broadcom/bnxt/bnxt.c | 26 ++++++++++++++---------
+>  1 file changed, 16 insertions(+), 10 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> index e9a2e30c1537..4c5cb4dd7420 100644
+> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> @@ -7378,6 +7378,20 @@ static void bnxt_hwrm_rx_agg_ring_free(struct bnxt *bp,
+>  	bp->grp_info[grp_idx].agg_fw_ring_id = INVALID_HW_RING_ID;
+>  }
+>  
+> +static void bnxt_hwrm_cp_ring_free(struct bnxt *bp,
+> +				   struct bnxt_cp_ring_info *cpr)
+> +{
+> +	struct bnxt_ring_struct *ring;
+> +
+> +	ring = &cpr->cp_ring_struct;
+> +	if (ring->fw_ring_id == INVALID_HW_RING_ID)
+> +		return;
+> +
+> +	hwrm_ring_free_send_msg(bp, ring, RING_FREE_REQ_RING_TYPE_L2_CMPL,
+> +				INVALID_HW_RING_ID);
+> +	ring->fw_ring_id = INVALID_HW_RING_ID;
+> +}
+> +
+>  static void bnxt_hwrm_ring_free(struct bnxt *bp, bool close_path)
+>  {
+>  	u32 type;
+> @@ -7423,17 +7437,9 @@ static void bnxt_hwrm_ring_free(struct bnxt *bp, bool close_path)
+>  		struct bnxt_ring_struct *ring;
+>  		int j;
+>  
+> -		for (j = 0; j < cpr->cp_ring_count && cpr->cp_ring_arr; j++) {
+> -			struct bnxt_cp_ring_info *cpr2 = &cpr->cp_ring_arr[j];
+> +		for (j = 0; j < cpr->cp_ring_count && cpr->cp_ring_arr; j++)
+> +			bnxt_hwrm_cp_ring_free(bp, &cpr->cp_ring_arr[j]);
+>  
+> -			ring = &cpr2->cp_ring_struct;
+> -			if (ring->fw_ring_id == INVALID_HW_RING_ID)
+> -				continue;
+> -			hwrm_ring_free_send_msg(bp, ring,
+> -						RING_FREE_REQ_RING_TYPE_L2_CMPL,
+> -						INVALID_HW_RING_ID);
+> -			ring->fw_ring_id = INVALID_HW_RING_ID;
+> -		}
+>  		ring = &cpr->cp_ring_struct;
+>  		if (ring->fw_ring_id != INVALID_HW_RING_ID) {
+>  			hwrm_ring_free_send_msg(bp, ring, type,
+> -- 
+> 2.30.1
 
-I missed this one in the previous mail, sorry. I personally would name
-it LED_0_CONTROL_MASK and LED_1_CONTROL_MASK because the description of
-the register is "3:0 LED [0] Control". As index I would probably also
-call it LED_0_INDEX and LED_1_INDEX because it is not directly related
-to the pin functionality. But that's just my personal preference not
-sure if it is really better.
-
-Regards,
-Stefan
+Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 
