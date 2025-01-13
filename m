@@ -1,150 +1,117 @@
-Return-Path: <netdev+bounces-157623-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157621-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BDC0FA0B08C
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 09:06:11 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3F4DA0B075
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 09:04:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 35AA71887356
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 08:06:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D018E165FF0
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 08:04:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14B3C233127;
-	Mon, 13 Jan 2025 08:05:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3235F23236D;
+	Mon, 13 Jan 2025 08:04:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dvG+eOg0"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="THf2oCBc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
+Received: from fllv0015.ext.ti.com (fllv0015.ext.ti.com [198.47.19.141])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 811072327A8
-	for <netdev@vger.kernel.org>; Mon, 13 Jan 2025 08:05:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D13D14A629;
+	Mon, 13 Jan 2025 08:04:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.141
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736755553; cv=none; b=agCcg2UMMP4CDbS2OoBRlUoSNpGnR5EIcLhY9Kx6eN9wuzeddhZm8qjBXARVSuWFdIJji77W76hBG0S0nX4uIhtNTMD6xO/Z4GFrl7Y5xUMX8LquCti2CW+zxF2BMTxmpi+mLb96B/4MPQzpoiDG7Z8lU17S/auvEuFNLHa68qo=
+	t=1736755459; cv=none; b=SJb6y8ft45QyjKVLw9hPs77CA1anpUsD0vUglnComkA2FR7+Ah3RdCNOLg/FPl4ZyJFMde54zJJRrSRtwKMhcpeoKAipEoDpM33DmY+60RbYKdMy9OsTqaAlbX7HrbyKZwZb3z+Bfis3zwZs/N9TVgiFlM8p6QLxN8o5z3MFCSA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736755553; c=relaxed/simple;
-	bh=aqg36jRtK67Lr2t9WAJ7JSCc+dBPvqV+4LJ9BWPAL/I=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=knfvSWfSPtYS55SYXWRAquNJX98pdAiMXvMURTS6o3mI7GxELMqqv38+qjaRWNjRjgERRD6sV2/xydPlmGYQ6XNuVifqt1XPMXKquP62Xo/9by5optvqT0yANe0CbqIu1W7vZqi2cUuBcqqEPQPEpzMkqQdicaekLTU0r55FoXw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dvG+eOg0; arc=none smtp.client-ip=198.175.65.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1736755551; x=1768291551;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=aqg36jRtK67Lr2t9WAJ7JSCc+dBPvqV+4LJ9BWPAL/I=;
-  b=dvG+eOg0cAKV9/NX1i1KF4y7vx+CgOuzZgkG5Vl6usNC6fAtxHcj+guj
-   DnAhN17wbIrLXeozD69Eyv6deMXamuVYB225lfyYmYJs0ALmqMM9RBQNj
-   1wtXhS7i39GV+thKdvWs7HH1TwPa6AUWA7e1dSMuSnJBb0OMf7zO+zrnj
-   +u6ZgON5MS5Wu0caN6K5iHp1R0UjxiBj/rO1BEHSCNtVj1iORJx81ikd9
-   ds/h3+P9hM5kJLhyS90a0ML2MKy0Bw1EQXV29SQvkUrvPZf+yh0uxlDbz
-   nSjoZ83RN5pk35vd1MzbyB9Ga3e4BD+gDKnCiAHOVj97LYmBY0rAb49Bl
-   A==;
-X-CSE-ConnectionGUID: Wy8dYYabSNOGjiwH+0z2UQ==
-X-CSE-MsgGUID: Rij8tp3BScKU8P3q9aFHBw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11313"; a="48000894"
-X-IronPort-AV: E=Sophos;i="6.12,310,1728975600"; 
-   d="scan'208";a="48000894"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jan 2025 00:05:51 -0800
-X-CSE-ConnectionGUID: 04bbFbo3SPmtq8wwU2MISQ==
-X-CSE-MsgGUID: W3gQ/7JdRyGRoSTVq4i4JQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
-   d="scan'208";a="109430846"
-Received: from mev-dev.igk.intel.com ([10.237.112.144])
-  by ORVIESA003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jan 2025 00:05:48 -0800
-Date: Mon, 13 Jan 2025 09:02:29 +0100
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: Michael Chan <michael.chan@broadcom.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, andrew+netdev@lunn.ch,
-	pavan.chebbi@broadcom.com, andrew.gospodarek@broadcom.com,
-	somnath.kotur@broadcom.com,
-	Ajit Khaparde <ajit.khaparde@broadcom.com>
-Subject: Re: [PATCH net-next 03/10] bnxt_en: Refactor TX ring allocation logic
-Message-ID: <Z4TIcj8ICN5WkNXf@mev-dev.igk.intel.com>
-References: <20250113063927.4017173-1-michael.chan@broadcom.com>
- <20250113063927.4017173-4-michael.chan@broadcom.com>
+	s=arc-20240116; t=1736755459; c=relaxed/simple;
+	bh=Rfrp9lOHU4M0RZg8njtneTcHVAWTXMYTfADOMni+x90=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=rsu/kfxSct1HEjzWmwOcm+nFBqcyThm7jGh5i0eylBIhivJX83eMasCEKQMhO121pLrBDM6ks7RlF83oVl44lw+VwerxeWl3FscEh0GeqNUVw1yKHbLPzR+N8/YAjsVQPRXO6tRkpQEzIjLzaS1ljcnH7Ievd0Q6pMmMYoyswz0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=THf2oCBc; arc=none smtp.client-ip=198.47.19.141
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from lelv0266.itg.ti.com ([10.180.67.225])
+	by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id 50D83ZXR026475;
+	Mon, 13 Jan 2025 02:03:35 -0600
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1736755415;
+	bh=qSW8VsRMXbq3sSb57eaX0dEK1UpZGs9dyfJAciyuhos=;
+	h=Date:Subject:To:CC:References:From:In-Reply-To;
+	b=THf2oCBc+cWD9sEwWiOq1EUoUG8XfBSDFs/vyyq450/w+4ZLTXiJJacNZ+2oYF/t9
+	 zGZhDIIlUj7wtZ+heIDz8YamomhQ18Wd6alisu5dxljAgRSA4lPfUIZhL+aTk9lZZ1
+	 oa6MaYRMQsC49E+lsW4eYnOgAMqPSWHmMFWw9CJk=
+Received: from DLEE105.ent.ti.com (dlee105.ent.ti.com [157.170.170.35])
+	by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTP id 50D83Z2V045615;
+	Mon, 13 Jan 2025 02:03:35 -0600
+Received: from DLEE103.ent.ti.com (157.170.170.33) by DLEE105.ent.ti.com
+ (157.170.170.35) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Mon, 13
+ Jan 2025 02:03:34 -0600
+Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DLEE103.ent.ti.com
+ (157.170.170.33) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Mon, 13 Jan 2025 02:03:34 -0600
+Received: from [10.24.69.25] (danish-tpc.dhcp.ti.com [10.24.69.25])
+	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 50D83T2u113090;
+	Mon, 13 Jan 2025 02:03:29 -0600
+Message-ID: <e08733fc-3dca-43e8-bcb6-c7d86c9f0982@ti.com>
+Date: Mon, 13 Jan 2025 13:33:28 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250113063927.4017173-4-michael.chan@broadcom.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 1/5] net: ti: icssg-prueth: Do not print physical
+ memory addresses
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+        Roger Quadros
+	<rogerq@kernel.org>,
+        Andrew Lunn <andrew+netdev@lunn.ch>,
+        "David S. Miller"
+	<davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Alexandre Torgue
+	<alexandre.torgue@foss.st.com>,
+        Jose Abreu <joabreu@synopsys.com>,
+        Maxime
+ Coquelin <mcoquelin.stm32@gmail.com>,
+        Shawn Guo <shawnguo@kernel.org>,
+        Sascha
+ Hauer <s.hauer@pengutronix.de>,
+        Pengutronix Kernel Team
+	<kernel@pengutronix.de>,
+        Fabio Estevam <festevam@gmail.com>
+CC: <linux-arm-kernel@lists.infradead.org>, <netdev@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>,
+        <linux-stm32@st-md-mailman.stormreply.com>, <imx@lists.linux.dev>
+References: <20250112-syscon-phandle-args-net-v1-0-3423889935f7@linaro.org>
+ <20250112-syscon-phandle-args-net-v1-1-3423889935f7@linaro.org>
+Content-Language: en-US
+From: MD Danish Anwar <danishanwar@ti.com>
+In-Reply-To: <20250112-syscon-phandle-args-net-v1-1-3423889935f7@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
 
-On Sun, Jan 12, 2025 at 10:39:20PM -0800, Michael Chan wrote:
-> Add a new bnxt_hwrm_tx_ring_alloc() function to handle allocating
-> a transmit ring.  This will be useful later in the series.
+
+
+On 12/01/25 7:02 pm, Krzysztof Kozlowski wrote:
+> Debugging messages should not reveal anything about memory addresses.
+> This also solves arm compile test warnings:
 > 
-> Reviewed-by: Ajit Khaparde <ajit.khaparde@broadcom.com>
-> Signed-off-by: Michael Chan <michael.chan@broadcom.com>
-> ---
->  drivers/net/ethernet/broadcom/bnxt/bnxt.c | 22 +++++++++++++++-------
->  1 file changed, 15 insertions(+), 7 deletions(-)
+>   drivers/net/ethernet/ti/icssg/icssg_prueth_sr1.c:1034:49: error:
+>     format specifies type 'unsigned long long' but the argument has type 'phys_addr_t' (aka 'unsigned int') [-Werror,-Wformat]
 > 
-> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-> index d364a707664b..e9a2e30c1537 100644
-> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-> @@ -7191,6 +7191,20 @@ static int bnxt_hwrm_cp_ring_alloc_p5(struct bnxt *bp,
->  	return 0;
->  }
->  
-> +static int bnxt_hwrm_tx_ring_alloc(struct bnxt *bp,
-> +				   struct bnxt_tx_ring_info *txr, u32 tx_idx)
-> +{
-> +	struct bnxt_ring_struct *ring = &txr->tx_ring_struct;
-> +	u32 type = HWRM_RING_ALLOC_TX;
-Nit as previous, can be const
+> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 
-> +	int rc;
-> +
-> +	rc = hwrm_ring_alloc_send_msg(bp, ring, type, tx_idx);
-> +	if (rc)
-> +		return rc;
-> +	bnxt_set_db(bp, &txr->tx_db, type, tx_idx, ring->fw_ring_id);
-> +	return 0;
-> +}
-> +
->  static int bnxt_hwrm_ring_alloc(struct bnxt *bp)
->  {
->  	bool agg_rings = !!(bp->flags & BNXT_FLAG_AGG_RINGS);
-> @@ -7227,23 +7241,17 @@ static int bnxt_hwrm_ring_alloc(struct bnxt *bp)
->  		}
->  	}
->  
-> -	type = HWRM_RING_ALLOC_TX;
->  	for (i = 0; i < bp->tx_nr_rings; i++) {
->  		struct bnxt_tx_ring_info *txr = &bp->tx_ring[i];
-> -		struct bnxt_ring_struct *ring;
-> -		u32 map_idx;
->  
->  		if (bp->flags & BNXT_FLAG_CHIP_P5_PLUS) {
->  			rc = bnxt_hwrm_cp_ring_alloc_p5(bp, txr->tx_cpr);
->  			if (rc)
->  				goto err_out;
->  		}
-> -		ring = &txr->tx_ring_struct;
-> -		map_idx = i;
-> -		rc = hwrm_ring_alloc_send_msg(bp, ring, type, map_idx);
-> +		rc = bnxt_hwrm_tx_ring_alloc(bp, txr, i);
->  		if (rc)
->  			goto err_out;
-> -		bnxt_set_db(bp, &txr->tx_db, type, map_idx, ring->fw_ring_id);
->  	}
->  
->  	for (i = 0; i < bp->rx_nr_rings; i++) {
-> -- 
-> 2.30.1
+Reviewed-by: MD Danish Anwar <danishanwar@ti.com>
 
-Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-
+-- 
+Thanks and Regards,
+Danish
 
