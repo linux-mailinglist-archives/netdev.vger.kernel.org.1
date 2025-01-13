@@ -1,168 +1,88 @@
-Return-Path: <netdev+bounces-157751-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157752-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8DB8A0B8BC
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 14:52:33 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 984CDA0B8D1
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 14:54:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 724767A349C
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 13:52:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B05D01644AB
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 13:54:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 831F9231CA4;
-	Mon, 13 Jan 2025 13:52:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14437235C1D;
+	Mon, 13 Jan 2025 13:54:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="BQxT0AMO"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="p+SA+9Jv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7114125B2;
-	Mon, 13 Jan 2025 13:52:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CFD822AE7B;
+	Mon, 13 Jan 2025 13:54:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736776344; cv=none; b=MrY8adHkjiKaPrh7uOooSZH6l9roYcelTZVU0Oz6ZdVeRsUqm1QKT1gTueCUP9NkAMg+UvSWD4uHaurMRK1oAzm6LcL2fej2cMxJdqozn2UDOjwEXzhL1u1OYeghBblxzr1WCiSrGZJqvWhDcF1W/Db0cdksso7LLaxIppiDnQI=
+	t=1736776482; cv=none; b=Xrixc3c6BiSZEyXt9XX3hOGGbAqRUVTK9D+y2R382ZHJac0Se+aS3DBEMHgNjCXzFDwowd2cOCx2vuznqvtZOtWUZlTWmMaoo01YYzGeuS2ERmgaPiPBXZewbCde+8PlcDQYktuCJQoBIhjmNdhfS6SNnt4qKOFDZeDSzbe9hgE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736776344; c=relaxed/simple;
-	bh=9AbuImX+qUA5xUGc1nAF+CP836w8rcdl4nd/P5mYNKc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BsHSpdNxA85HsidK1EA5fV32dS1cgvVowM18DBmJxdMJkvyWQUh3c3UpeHYKWMgZ8si+TGr/uU6eTJkFnJSEgre/k72iTn/NagBTny39p4bvPY4/CWP45IMUN2DTZsQxJx6r3LJI4x+mCfmpG2WClzzglpdMDnl9zLxS/U4i9XU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=BQxT0AMO; arc=none smtp.client-ip=185.226.149.38
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
-Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
-	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.93)
-	(envelope-from <mhal@rbox.co>)
-	id 1tXKrW-00E7vS-Nb; Mon, 13 Jan 2025 14:52:14 +0100
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-	s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
-	References:Cc:To:Subject:MIME-Version:Date:Message-ID;
-	bh=9/mNvCKWR3TaBBy6qMKu0clHap35DZ0yxeGdHeDIU+A=; b=BQxT0AMOkcYl2agGwxfQIklx5t
-	+UVjYUoTV345uqtF1mDnoA69p0ZoilmYpBzkKKvj5/HPPlE+qzxWjSAby3Xqnhv9jDfI9q31yYuub
-	kP7OZNP9NKRBx+ttcWU8Je0PyscOrPAl9zEHyz6U3ugP6mJH/F6i/wZL76LatX58KH4UgisKWd0Zx
-	1unwFlLzHRRvybI4JRkhmvXxMlUrPXZp0dDFf0kr+uUAR1Bmet8yDRWjN84onV0u6z5Cuvkef56o+
-	SF2T033rLm9SL932pDhMzky/K+C32AFv69sYKsCu+v2KNwSAkxOn8l0cf85p/IQvX1Nf3PueYdzTM
-	Yt1O7cuQ==;
-Received: from [10.9.9.73] (helo=submission02.runbox)
-	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
-	(envelope-from <mhal@rbox.co>)
-	id 1tXKrV-0004mn-8Z; Mon, 13 Jan 2025 14:52:13 +0100
-Received: by submission02.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.93)
-	id 1tXKrI-00EPet-Dj; Mon, 13 Jan 2025 14:52:00 +0100
-Message-ID: <903dd624-44e5-4792-8aac-0eaaf1e675c5@rbox.co>
-Date: Mon, 13 Jan 2025 14:51:58 +0100
+	s=arc-20240116; t=1736776482; c=relaxed/simple;
+	bh=QSVu8ikpHRb83it9rPy9aw1cOh86UzMbxnfwSuF8dhs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=p/WdqyUDQyoE4l/5p6Yqk/OUwLPRCYdPlWz7/NzTUW7BchdZ2sU4GcgjhJ2I0hoFZ6Xq9zYgE7Yvpsvi22LWiAtfQL/e3oA3mr5WTmty1zMpQIcrlYW1O8pk7upqi57icV3adhWBtbxN37GS0umuSKdu9Jco6evYuj4TJFmw3dc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=p+SA+9Jv; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=w4s9MNfcI/MKbZctTiFjwWHOsRoPFtm/qaeRJ0Cqt18=; b=p+SA+9JvlaxeeRgn67DfWkJcaZ
+	USiTK9q+9huYjt/BNdoJGfdT4H3sKKEuf9BelxBg7xigOmTh35nApg7KEhXDHkxpf9GvHxzqKIMNb
+	uvnq82WDn14mVTIU+9hcaAawdTDDFwyOoS9SU00321tWtjsD+GdNclzy0n7xLebY2iN8=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tXKtg-0046kJ-LT; Mon, 13 Jan 2025 14:54:28 +0100
+Date: Mon, 13 Jan 2025 14:54:28 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: dimitri.fedrau@liebherr.com
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, Andrew Davis <afd@ti.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Dimitri Fedrau <dima.fedrau@gmail.com>
+Subject: Re: [PATCH net-next 0/2] net: phy: dp83822: Add support for changing
+ the transmit amplitude voltage
+Message-ID: <fcffef06-c8d1-4398-bc20-30d252cd2fd2@lunn.ch>
+References: <20250113-dp83822-tx-swing-v1-0-7ed5a9d80010@liebherr.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2 1/5] vsock/virtio: discard packets if the transport
- changes
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: netdev@vger.kernel.org, Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
- bpf@vger.kernel.org, linux-kernel@vger.kernel.org,
- Luigi Leonardi <leonardi@redhat.com>, "David S. Miller"
- <davem@davemloft.net>, Wongi Lee <qwerty@theori.io>,
- =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Eric Dumazet <edumazet@google.com>,
- kvm@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, Jason Wang <jasowang@redhat.com>,
- Simon Horman <horms@kernel.org>, Hyunwoo Kim <v4bel@theori.io>,
- Jakub Kicinski <kuba@kernel.org>, virtualization@lists.linux.dev,
- Bobby Eshleman <bobby.eshleman@bytedance.com>, stable@vger.kernel.org
-References: <20250110083511.30419-1-sgarzare@redhat.com>
- <20250110083511.30419-2-sgarzare@redhat.com>
- <1aa83abf-6baa-4cf1-a108-66b677bcfd93@rbox.co>
- <nedvcylhjxrkmkvgugsku2lpdjgjpo5exoke4o6clxcxh64s3i@jkjnvngazr5v>
- <CAGxU2F7BoMNi-z=SHsmCV5+99=CxHo4dxFeJnJ5=q9X=CM3QMA@mail.gmail.com>
- <cccb1a4f-5495-4db1-801e-eca211b757c3@rbox.co>
- <nzpj4hc6m4jlqhcwv6ngmozl3hcoxr6kehoia4dps7jytxf6df@iqglusiqrm5n>
-Content-Language: pl-PL, en-GB
-From: Michal Luczaj <mhal@rbox.co>
-In-Reply-To: <nzpj4hc6m4jlqhcwv6ngmozl3hcoxr6kehoia4dps7jytxf6df@iqglusiqrm5n>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250113-dp83822-tx-swing-v1-0-7ed5a9d80010@liebherr.com>
 
-On 1/13/25 12:05, Stefano Garzarella wrote:
-> On Mon, Jan 13, 2025 at 11:12:52AM +0100, Michal Luczaj wrote:
->> On 1/13/25 10:07, Stefano Garzarella wrote:
->>> On Mon, 13 Jan 2025 at 09:57, Stefano Garzarella <sgarzare@redhat.com> wrote:
->>>> On Sun, Jan 12, 2025 at 11:42:30PM +0100, Michal Luczaj wrote:
->>>
->>> [...]
->>>
->>>>>
->>>>> So, if I get this right:
->>>>> 1. vsock_create() (refcnt=1) calls vsock_insert_unbound() (refcnt=2)
->>>>> 2. transport->release() calls vsock_remove_bound() without checking if sk
->>>>>   was bound and moved to bound list (refcnt=1)
->>>>> 3. vsock_bind() assumes sk is in unbound list and before
->>>>>   __vsock_insert_bound(vsock_bound_sockets()) calls
->>>>>   __vsock_remove_bound() which does:
->>>>>      list_del_init(&vsk->bound_table); // nop
->>>>>      sock_put(&vsk->sk);               // refcnt=0
->>>>>
->>>>> The following fixes things for me. I'm just not certain that's the only
->>>>> place where transport destruction may lead to an unbound socket being
->>>>> removed from the unbound list.
->>>>>
->>>>> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
->>>>> index 7f7de6d88096..0fe807c8c052 100644
->>>>> --- a/net/vmw_vsock/virtio_transport_common.c
->>>>> +++ b/net/vmw_vsock/virtio_transport_common.c
->>>>> @@ -1303,7 +1303,8 @@ void virtio_transport_release(struct vsock_sock *vsk)
->>>>>
->>>>>       if (remove_sock) {
->>>>>               sock_set_flag(sk, SOCK_DONE);
->>>>> -              virtio_transport_remove_sock(vsk);
->>>>> +              if (vsock_addr_bound(&vsk->local_addr))
->>>>> +                      virtio_transport_remove_sock(vsk);
->>>>
->>>> I don't get this fix, virtio_transport_remove_sock() calls
->>>>    vsock_remove_sock()
->>>>      vsock_remove_bound()
->>>>        if (__vsock_in_bound_table(vsk))
->>>>            __vsock_remove_bound(vsk);
->>>>
->>>>
->>>> So, should already avoid this issue, no?
->>>
->>> I got it wrong, I see now what are you trying to do, but I don't think
->>> we should skip virtio_transport_remove_sock() entirely, it also purge
->>> the rx_queue.
->>
->> Isn't rx_queue empty-by-definition in case of !__vsock_in_bound_table(vsk)?
-> 
-> It could be.
-> 
-> But I see some other issues:
-> - we need to fix also in the other transports, since they do the same
+On Mon, Jan 13, 2025 at 06:40:11AM +0100, Dimitri Fedrau via B4 Relay wrote:
+> Add support for changing the transmit amplitude voltage in 100BASE-TX mode.
+> Add support for configuration via DT.
 
-Ahh, yes, VMCI and Hyper-V would need that, too.
+The commit message is supposed to answer the question "Why?". Isn't
+reducing the voltage going to make the device non conforming? Why
+would i want to break it? I could understand setting it a bit higher
+than required to handle losses on the PCB and connector, so the
+voltages measured on the RJ45 pins are conforming.
 
-> - we need to check delayed cancel work too that call 
->    virtio_transport_remove_sock()
+Also, what makes the dp8382 special? I know other PHYs can actually do
+this. So why are we adding some vendor specific property just for
+100base-tx?
 
-That's the "I'm just not certain" part. As with rx_queue, I though delayed
-cancel can only happen for a bound socket. So, per architecture, no need to
-deal with that here, right?
-
-> An alternative approach, which would perhaps allow us to avoid all this, 
-> is to re-insert the socket in the unbound list after calling release() 
-> when we deassign the transport.
-> 
-> WDYT?
-
-If we can't keep the old state (sk_state, transport, etc) on failed
-re-connect() then reverting back to initial state sounds, uhh, like an
-option :) I'm not sure how well this aligns with (user's expectations of)
-good ol' socket API, but maybe that train has already left.
-
-Another possibility would be to simply brick the socket on failed (re)connect.
-
+	Andrew
 
