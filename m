@@ -1,78 +1,136 @@
-Return-Path: <netdev+bounces-157917-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157918-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB688A0C4CD
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 23:36:21 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E5A0A0C4CE
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 23:36:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 016EF188D1C6
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 22:32:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E6D9E3A68BC
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 22:36:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4B171F942D;
-	Mon, 13 Jan 2025 22:32:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C99781CEEB4;
+	Mon, 13 Jan 2025 22:36:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WvbXXGes"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="eCC/GgNA"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D0721EBFE8;
-	Mon, 13 Jan 2025 22:32:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 435261E572F
+	for <netdev@vger.kernel.org>; Mon, 13 Jan 2025 22:36:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736807540; cv=none; b=VjsbIq7Gkhhpd0DOJdBdoIyZ++d76NcVQnTkk128zcbG++seoeevQ/ch3BmEqP/V3pM0TFO9owPUGc1PmG8s073C6pk3ewCdGKe7y++GnsO+IOfh5ZHcKYd7iGr58fN4BdQodGD3PRxPrBTwWsFnbChELOVXn7BGCHcUKIkX0+8=
+	t=1736807800; cv=none; b=NB42yD0ExZA6jzwjj4Unx1UT99zaaU9MQbYzvvJ1vcE8txMqP9ygJX+nD8RWp1kHblQ+kKfC2X74GVQ82+xZlbCNbugWnKWB7SWdeK0dwgaHbXrrAmBX4VZuaGbvtu7xF2JGkly51GYqwaJQ51Fa3gn22cqKbSUBqfev16aOwYA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736807540; c=relaxed/simple;
-	bh=x88EzDw3NJRj/aIEKD9illgKlUUXFrhPe8z423CWFEI=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=dCz/dDN5+EY92C85wMeOTZHTIum/4bzqU41/GuHF1sh234t9uxV+C96/WrjfXQ8Bu3HO/dymV5flwcJic9/RPCImfK9p2b6XvMWNxmCs5KGDoQTYJQUoan1lmhQWbPvts5XE1x2zZ3jUDcrImmS49G1/1FJoCmJM3SZVnoJH1To=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WvbXXGes; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9DC63C4CED6;
-	Mon, 13 Jan 2025 22:32:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736807540;
-	bh=x88EzDw3NJRj/aIEKD9illgKlUUXFrhPe8z423CWFEI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=WvbXXGesTB6yvhHWWQcq1psNBnVrf+lL7ZOkuB6m7RvZxHxwmyzbyEuazjXaGghM9
-	 s+0BQOL2T1ySEtu5teyiOe4byds73bkC6J7JchEandJ7EtNoW3/FeU9kggJaHK9O41
-	 1aTRm0+nkgaXcdDI3ZmABf1+UV+wIQcFxk2kIJElFCgZZYZslyvo9OuA+Tw3E9Opnq
-	 nydJhWOnswxEiuVbG2RPDK497JByQlQp+dYbfpX0Er1z+RwtTZ8AJplqXrHTlzxOUC
-	 +AudtAXbAdQBF6xmWqwQq0EcZi3b1UYye8hxCtQjPShPbGnNxxWOOuSIAR4n0D2QtX
-	 84z5rIu7X77gA==
-Date: Mon, 13 Jan 2025 14:32:18 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Joe Damato <jdamato@fastly.com>
-Cc: Jason Wang <jasowang@redhat.com>, netdev@vger.kernel.org,
- mkarsten@uwaterloo.ca, "Michael S. Tsirkin" <mst@redhat.com>, Xuan Zhuo
- <xuanzhuo@linux.alibaba.com>, Eugenio =?UTF-8?B?UMOpcmV6?=
- <eperezma@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, "open list:VIRTIO CORE AND NET DRIVERS"
- <virtualization@lists.linux.dev>, open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next 3/3] virtio_net: Map NAPIs to queues
-Message-ID: <20250113143218.68c75f88@kernel.org>
-In-Reply-To: <Z4WSfER6O6n3hxXh@LQ3V64L9R2>
-References: <20250110202605.429475-1-jdamato@fastly.com>
-	<20250110202605.429475-4-jdamato@fastly.com>
-	<CACGkMEtjERF72zkLzDn2OKz3OGkJOQ+FCJS3MRscJqakEz9FYA@mail.gmail.com>
-	<Z4VNrAI794LixEXt@LQ3V64L9R2>
-	<20250113140446.12d7b7d3@kernel.org>
-	<Z4WSfER6O6n3hxXh@LQ3V64L9R2>
+	s=arc-20240116; t=1736807800; c=relaxed/simple;
+	bh=9SR7vcS8B5h+PYLLSEhJhCdGfpu0OTgltdF73F2+NtQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=m8xUctdfhq/Ne2bd8so9RQsDibThnIB7wlnfe3s/EQK0KfhZMCZ78BPVaWlEEd658BOkJZk0tNrtm1aYM4Y85KILTOY8/AlZb8fQIeVa17pFKOl7WaeZygc/brXb085NLGoTmBKZTAQ/EJAasf2BER2TLv4mRqsMIgRYXWwAgJk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=eCC/GgNA; arc=none smtp.client-ip=209.85.214.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-21654fdd5daso82081275ad.1
+        for <netdev@vger.kernel.org>; Mon, 13 Jan 2025 14:36:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fastly.com; s=google; t=1736807798; x=1737412598; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=fAuEFnTGIGKNLJ/+VElR82ZjfYlASQtpd5BqQly9RxE=;
+        b=eCC/GgNAxlgM8FPmEEFyQ+y1SQak5i63ikJ1Dz2U9aAKqAAM2uTgYT4sjYRPebAmH+
+         PzjlEiLnFmGzcudHFHZOh+xEqoP2nWZUn2Dd32nCVtiXFfHh5iNu+Hc06ph48Vt2sfkK
+         D1MVlLAvIWc6sbW3G5XkryeLJwv2mqfciV6Ts=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736807798; x=1737412598;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=fAuEFnTGIGKNLJ/+VElR82ZjfYlASQtpd5BqQly9RxE=;
+        b=VVD9qnYVEM0pshKuHzWohlxKoNtD0TIKEa7dqeo8WbG7TS29Q8EnrA1XkWpVQKsxvL
+         CmmNL34eTiD0snCC1Lo4njZ3EIxIKHufAehAR/5yrb/kztG9WGFD5D0mWZi3SD74KwrK
+         YjrZhgUyE1iPEHnS7D83LdsKB3EXyjGKfDddaGjV/Tq9Poq7y5YL7atOj1hFnYY/4a/5
+         cBBlug+jgo1elY+/4sBAwQE9pM7s5qIOmOvNHwNDdaEix7qXx3ou+DOv94iDMmui1Amm
+         TZsePHR2zY3V23C+xhj7+tr6J7zwTElHB6aM8eA59Ryeq8XyZH9se4rGuEcYKDK3ywqK
+         FGMg==
+X-Forwarded-Encrypted: i=1; AJvYcCUciZEFTjip8IuJo69Fe/YboLHuROn1WA5lPoZE/HWw2WXRpeTP+kl9WpJPynFjlzRygDsBen0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxrCZDV8BAo+WaHJ+cgSPJaTZg8h8uxnG95D98y9q1fT1ff0Rpu
+	flh3PIbZxOFf/83l/DnMLTflc4wqZpJJuu19pPebw/s5l72DLC2qgJ3aFQl+LNM=
+X-Gm-Gg: ASbGncv3/BIjQ4NPUY/ouEUjDtPl5MxnldiSHa2G4KEb5atL4sEe+jBDvYM+6onY9/k
+	GFy+nDTvkHWVArXRkbnoH8dobH3dv11pMPjCDNR8onf9ZusGvSwJakMLqhdLIKKpHi4Wfre146p
+	iyBXbvqwhe6iIyj1ReAAZoh7mu57L4W7MSVVrV9a8xD3dgRpQcCe89eGgDLaEWWdc0iHyuaD+bp
+	RhhBaely6MgnuTo56sF8AuAfOGZOHtYdx7oJ4eg/mCBJdJ5tle6dkz1+2icjGVGrvRTGzb70HHq
+	mEt0opovY7svWRC50pIjcuM=
+X-Google-Smtp-Source: AGHT+IFi3zHEG8+mHeLMQnIF0agAlRlP4URjl9MXFjr93uOSBwzPzS/NZEKJ8GMG9wEVBCq1Q9nGMg==
+X-Received: by 2002:a05:6a20:c88d:b0:1dc:e8d:c8f0 with SMTP id adf61e73a8af0-1e88d0bfd48mr37648469637.29.1736807798510;
+        Mon, 13 Jan 2025 14:36:38 -0800 (PST)
+Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72d40681065sm6563545b3a.146.2025.01.13.14.36.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 13 Jan 2025 14:36:38 -0800 (PST)
+Date: Mon, 13 Jan 2025 14:36:35 -0800
+From: Joe Damato <jdamato@fastly.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Gerhard Engleder <gerhard@engleder-embedded.com>,
+	magnus.karlsson@intel.com, andrew@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, pabeni@redhat.com, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next] tsnep: Link queues to NAPIs
+Message-ID: <Z4WVc_PzmCDagWFy@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Gerhard Engleder <gerhard@engleder-embedded.com>,
+	magnus.karlsson@intel.com, andrew@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, pabeni@redhat.com, netdev@vger.kernel.org
+References: <20250110223939.37490-1-gerhard@engleder-embedded.com>
+ <Z4VwrhhXU4uKqYGR@LQ3V64L9R2>
+ <91fc249e-c11a-47a1-aafe-fef833c3bafa@engleder-embedded.com>
+ <Z4WKHnDG9VSMe5OD@LQ3V64L9R2>
+ <20250113135609.13883897@kernel.org>
+ <Z4WRyI-_f9J4wPVL@LQ3V64L9R2>
+ <20250113143109.60afa59a@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250113143109.60afa59a@kernel.org>
 
-On Mon, 13 Jan 2025 14:23:56 -0800 Joe Damato wrote:
-> Please CC me on that series so I can take a look and I'll adjust the
-> v2 of this series to avoid the locking once your series is merged.
+On Mon, Jan 13, 2025 at 02:31:09PM -0800, Jakub Kicinski wrote:
+> On Mon, 13 Jan 2025 14:20:56 -0800 Joe Damato wrote:
+> > > XDP and AF_XDP are different things. The XDP part of AF_XDP is to some
+> > > extent for advertising purposes :) If memory serves me well:
+> > > 
+> > > XDP Tx -> these are additional queues automatically allocated for
+> > >           in-kernel XDP, allocated when XDP is attached on Rx.
+> > >           These should _not_ be listed in netlink queue, or NAPI;
+> > >           IOW should not be linked to NAPI instances.
+> > > XDP Rx -> is not a thing, XDP attaches to stack queues, there are no
+> > >           dedicated XDP Rx queues
+> > > AF_XDP -> AF_XDP "takes over" stack queues. It's a bit of a gray area.
+> > >           I don't recall if we made a call on these being linked, but
+> > >           they could probably be listed like devmem as a queue with
+> > >           an extra attribute, not a completely separate queue type.  
+> > 
+> > Sorry to be an annoyance, but could this be added to docs somewhere?
+> > 
+> > I think I did the AF_XDP case I did two different ways; exported for
+> > mlx5, but (iiuc) not exporter for igc.
+> 
+> Yes, I think netdev.yaml is the best place to document the meaning of
+> rx and tx queue type. Are you going to take a stab at it?
 
-Will do! I'll send the first chunk as soon as Comcast restores 
-the internet at my home :|
+I'll give it a try, why not.
+
+> > I don't want to hijack Gerhard's thread; maybe I should start a new
+> > thread to double check that the drivers I modified are right?
+> 
+> Ideally we'd have a test for this. How is your Python?
+> tools/testing/selftests/drivers/net/queues.py
+
+Good idea. My python is non-existent, but since I'm the one who
+submit all the driver patches...
 
