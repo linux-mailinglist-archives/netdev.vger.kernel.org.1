@@ -1,201 +1,245 @@
-Return-Path: <netdev+bounces-157667-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157668-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1CAC6A0B2AB
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 10:25:35 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id F259BA0B2D3
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 10:31:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 274B41885DAF
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 09:25:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D6E007A2189
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 09:31:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4FF82397A0;
-	Mon, 13 Jan 2025 09:25:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFA7E23A583;
+	Mon, 13 Jan 2025 09:31:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SDqKew56"
+	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="CYu1EGWw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C44022F19;
-	Mon, 13 Jan 2025 09:25:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 899A223874A
+	for <netdev@vger.kernel.org>; Mon, 13 Jan 2025 09:31:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736760330; cv=none; b=fE2yiO9HV5dhkPKv+NpadMU18t7lGjsl49173nipWqE8yhIZbTiSgY5JEhmL9/sbaEI6PU0Ejsru3aTKz/78tI2PkyQKbCxnvpVL18vXom0nHF5oU4Xp5JtVfaiaCuzIHtl58n26rxbK6v+Be+BE6KdgxXDqH2lGX+KNbV7TDwI=
+	t=1736760666; cv=none; b=Bk8OS2NaX1ulJHX2I4kbFxbq3EETCXEHHZFQTGCwM38dHC3R+sZCsIYHm0/zqtH+/5A77SFh5hrKdmAtIKDeN2lr/ENstCmuD+oiXJvjkWJH1qG+ZO7Yllp5usmYCuIfMlxSGii7oqOnjg+eX4+DcK6UbtQDxlCNNvDdKXE+Uus=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736760330; c=relaxed/simple;
-	bh=yzqjGcECBwk2qE43hAZ1dkKoWmfTRxi6yO5BUV8HmOE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Zbyft/Gr9dl1XunZ8Aahl9bx/qsaUj1QhAmpWvUPSOPC74SA4tNZg3CCQtdaufdm8N3i9ZSqjc0n3bSFSgedMV7YbH9+yNS8qhnSoB8rFaixeyb6cosMRAywj+J4h2pvM8ujVUwgDsZlgZLfNpO50B2UTpGzDTiBFQ33XGZMJZo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SDqKew56; arc=none smtp.client-ip=209.85.128.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-4361b6f9faeso24508495e9.1;
-        Mon, 13 Jan 2025 01:25:28 -0800 (PST)
+	s=arc-20240116; t=1736760666; c=relaxed/simple;
+	bh=7APpdEA4jr7ps1b8VWTegxDhvEoR42BTlzwB5PRlvl0=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=HS2Xcs8FxkeUFCFi8Uhdb6oxGfRAtVqdvjQ0Gows8l+F9RLtei6r7MCH3vJPkYcHqKy+h4S8l0TXmN++sTqbBk+PoCX6lIodxVA9geHIDhP9bb9XV1e2KDwSWswSAxnI2F/c3gLgly/WOKKNqPZaftnP4VHfDYsoOBFnxTvJVl4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=CYu1EGWw; arc=none smtp.client-ip=209.85.221.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
+Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-385dece873cso1941105f8f.0
+        for <netdev@vger.kernel.org>; Mon, 13 Jan 2025 01:31:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736760327; x=1737365127; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=2OYmtAl30kQ/2nJJEP2ZBeiKHoYyxBa0D2RY41NXCGI=;
-        b=SDqKew56mvlKH4a7tsSpxEOh1z6wocfIICc0BxlXzxmU5il4ib6brhb5AR7Iu4Dx/7
-         GeBjmK7F+UJmvBgzW2UDhZSAmxE6aKUOUA7e+v0nHEvN/OLjuMA1kLcYJ1UK4HcUGKc9
-         bI8iNreHHCOM/7Dzr47fDIrCVUgOgILyuMh9RQt0qWsJQdiI9n32xQ5n+4HtAEobu9nq
-         bUq6H6GZ1e2yR8GwjgOeWXrviJ/WOh/16JmxSBd+u4LjrY/abqmJdJTbypenHG8Eeanj
-         LedVWN35/A0JGAeZyAJf/NFP1GBFKL9AP1juvH0gEKhhEziTN4C2ZykvZqi77aHDR4xJ
-         ffkQ==
+        d=openvpn.net; s=google; t=1736760663; x=1737365463; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Qc5Zf1W00VNHW+KjirMIPMombgAnhdag4FiwQVcWPXU=;
+        b=CYu1EGWw+Sexo6JzQu9HyoI8VLGzQTKf6WYK8Naibsd8GK6bP0GUQ8U8Ha9CKwECmp
+         HTzW2Bb4fyyEqKhs/K7K+6lWA6680TWyurKQg69izFj07DMPNyD3BPrAsZ5MzSxkBVlb
+         CL7O34VtgAkN5Rf9P9rLgpPV9jG7C2pWfZ+5oJX82jURFkO+VjsCrMH4ILUs0O3YaK+0
+         Skh4Fdivui/s2Ar8G9Jyh09Xnk11uh1rVd8phqXW/nJ/0Pc6tr4MEvK3h/K2v5p2y0Er
+         UVqvrp9Oqpnlt9Lw8w42XhamYUSkE3cxcMnM/BZqMXWeq/P/8sm7KBvSCITmeTG7ZnDz
+         O9Kg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736760327; x=1737365127;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2OYmtAl30kQ/2nJJEP2ZBeiKHoYyxBa0D2RY41NXCGI=;
-        b=fqD77FWz6Delz6m+noUkyr1cHAQOe9NldkbAwhW1lm0b24d7+sLNeZ6EgXaXcxQ0U9
-         KT1wpSf/G+8EJnbCFmbUlEXQlGlYqq3M3wy7C0WTSxvpcP/BYVY+tWq2nSZaQQbu/bYP
-         0J8Uk6dcZ5HI9+Hpm7ApZ4XT5Sct8ORduUrZBf6gqtF3oJsb/+aDNRljwprsFAsGKvap
-         hWpUuGGOjgpc2HDGuZH1ZFqrkk3U4ap85mnFFjiwmYWlFVvs22at3ybIfMUw9stTwyNH
-         hN1EBgNvJhknSOgxKQVGH6JuPejSyUCVvAo0crSC/jieEAEKkV82ORZFC+aLlP53A915
-         Axww==
-X-Forwarded-Encrypted: i=1; AJvYcCVeOkDkHcYb8f4s6wv6QC0XmQLNRBi0O/N2qMwh73xUYPNzYnIoMSPXBGV9Hr/7yqMpSIbZ9b9m@vger.kernel.org, AJvYcCVpcD9UKqmyCJN4kxuC/zavH+oVnxWuFXcvrW1iXVNqB6KWlNsYcbRyZeewbsp39YLSUmHdGvYQW3vy3Pk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw6XxzFtMxeJQzhzzWOaoah6aeCKwnf87cMWhORUQcJ+iXv+GY/
-	gAd5C3FOLr1bUUfiotUTYVW33dSG8gTZ2tYv5IXz02JvnAypRRUi
-X-Gm-Gg: ASbGncu1YJB4C75KifGsUoKrB56mTElnzoIxhpnKMVoWS04SG72bSB7vWsiwuBFcuvF
-	KDEvJ/11uD3WNuvUIGkO5ZBTOpF68FM6/9Tkf8YR5I0O2DiXQV1eskZ8/QhQEX8LKjyvy5wZzCM
-	O8etH9reiYzs5AT2S0LlB7o59rNkZD6OAMKJoPG0bhF2zqgfzBc8d2dxFhCtW3iyhOjrYK13+BO
-	4lFc6QBhQlkJz/eviVHDI91e2d8SrmVIyerFspjm4UjEGmTQgkwtg==
-X-Google-Smtp-Source: AGHT+IFRjLLEqfDLhBDOZyeVa4XghBTKNTXetxj9EVY6FpAPofIIF5fOClCqsYh2rOhokjEe2MDqHA==
-X-Received: by 2002:a7b:c40c:0:b0:436:2155:be54 with SMTP id 5b1f17b1804b1-436e880fcc0mr130172685e9.1.1736760326994;
-        Mon, 13 Jan 2025 01:25:26 -0800 (PST)
-Received: from debian ([2a00:79c0:620:b000:ad44:c8fd:4a6a:52bf])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-436e2df3610sm170917835e9.20.2025.01.13.01.25.25
+        d=1e100.net; s=20230601; t=1736760663; x=1737365463;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Qc5Zf1W00VNHW+KjirMIPMombgAnhdag4FiwQVcWPXU=;
+        b=vni7/mIJ7RvTZmOd+YrE7/HJ4bemB56BDLhBOInjkie1iOrcXVrzEn/fBVc4JcZyLg
+         dpAx3vxCVydCxKit4A7myCAgWMNNtcGPivpiRUU/ZtYyughQB8m0wrXmEWNeY9ee388Y
+         q0FvzSJmjiMh4qnRbf3nJ29JaYJI2kUeA5q2p74MlsYhFJBOuoHZr/o9wZWJcJ+sta9G
+         yaomTaj9RGP0BMTGDaXJnEDrDYYYKN6gy8RsQGUFmT6nVwdbvacFlBGQ8y1qR23rZDjF
+         JR+WqLecJoEqFAOGFpsW92btceza6VbB42la/I5l2y+5GWVVc1GQO+VkN7zctV6BCcvd
+         us+g==
+X-Gm-Message-State: AOJu0YwNQt2SIbcsyOJrq4eUitfaN0PAIfmOOZ81S/iBQJCSY306ZhFY
+	53enOWTp1jGOZhxPVBj05F0ZcA640i6d241G3B9tVIbHtcXpnuBhY4mnQHS29xI=
+X-Gm-Gg: ASbGncvJFcTETDOt404ItIOrWfjUM7kZfa1t6j30IXcGpcA+hxjb3qnx/cepp6vC8xF
+	X5XJlreehRh+SYICh7skBVaSb2baiXG9eNORtD4p2aJOfQFWYV95KnYajHFoVTz1C54n9dTdJ6O
+	PG6qNPXd1wOa+ooL7krOAOZQhuIn6nGnnqahN8Tn8Pb1/G30ktQZh+IlHJPniXZfU+z3a+/dxsy
+	LRelsFEnaKXSprC9SfVuOezWDgk/k4BvA4Z024uwiTuXN2J82f3DPWrKR+ffS2O2mr4
+X-Google-Smtp-Source: AGHT+IFQfk85cLlsOAwzvB9LsrBPxxUaxLijNlenjeYIFXR9Ee1wVy9vyI3gO6fw7g9Y/b7FRD93ZQ==
+X-Received: by 2002:a05:6000:719:b0:385:e879:45cc with SMTP id ffacd0b85a97d-38a873045d9mr15294245f8f.19.1736760662737;
+        Mon, 13 Jan 2025 01:31:02 -0800 (PST)
+Received: from serenity.mandelbit.com ([2001:67c:2fbc:1:8305:bf37:3bbd:ed1d])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38a8e4b8124sm11528446f8f.81.2025.01.13.01.31.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 Jan 2025 01:25:26 -0800 (PST)
-Date: Mon, 13 Jan 2025 10:25:24 +0100
-From: Dimitri Fedrau <dima.fedrau@gmail.com>
-To: Stefan Eichenberger <eichest@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Niklas =?utf-8?Q?S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>,
-	Gregor Herburger <gregor.herburger@ew.tq-group.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: phy: marvell-88q2xxx: Add support for PHY LEDs on
- 88q2xxx
-Message-ID: <20250113092524.GB4290@debian>
-References: <20250110-marvell-88q2xxx-leds-v1-1-22e7734941c2@gmail.com>
- <Z4FYjw596FQE4RMP@eichest-laptop>
- <20250110183058.GA208903@debian>
- <Z4TJQSPlA_s6lbkS@eichest-laptop>
+        Mon, 13 Jan 2025 01:31:02 -0800 (PST)
+From: Antonio Quartulli <antonio@openvpn.net>
+Subject: [PATCH net-next v18 00/25] Introducing OpenVPN Data Channel
+ Offload
+Date: Mon, 13 Jan 2025 10:31:19 +0100
+Message-Id: <20250113-b4-ovpn-v18-0-1f00db9c2bd6@openvpn.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z4TJQSPlA_s6lbkS@eichest-laptop>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAGjdhGcC/23QzW7DIAwH8FepOI8Nm6+w095j2gESZ+UwEiVV1
+ Knqu8/N1BVNcAPz899wESstmVbxeriIhba85qnwBrqng+iPsXySzAMfCFRoQCmUychpm4skXtr
+ 2LpiIgm/PC435vLd6F4VOstD5JD64kuJKMi2x9Mdbp3vt5SvmcpPHvJ6m5XufYQu7/00D95e2B
+ alkjInCgGjjYN+mmQpXnrndnrKBqijaBwXFNnXeauW9T+QbFmobKgtsBzIudL3XEVu5+LBYfRA
+ X2KIO4+i1TmNo5eraVs8Fzdb5MZlEzjnChjW1rWc2bCmi0f0IzkAr11aW3/iwlq0GQ9jHQTnoG
+ tbVts51N0taKQCrXacb1t+t5Uuqsp6t8Qm192Qd/LPX6/UHe9V8MKsCAAA=
+X-Change-ID: 20241002-b4-ovpn-eeee35c694a2
+To: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Donald Hunter <donald.hunter@gmail.com>, 
+ Antonio Quartulli <antonio@openvpn.net>, Shuah Khan <shuah@kernel.org>, 
+ sd@queasysnail.net, ryazanov.s.a@gmail.com, 
+ Andrew Lunn <andrew+netdev@lunn.ch>
+Cc: Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org, Xiao Liang <shaw.leon@gmail.com>, 
+ steffen.klassert@secunet.com, antony.antony@secunet.com, 
+ willemdebruijn.kernel@gmail.com, David Ahern <dsahern@kernel.org>, 
+ Andrew Lunn <andrew@lunn.ch>, Shuah Khan <skhan@linuxfoundation.org>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=openpgp-sha256; l=6542; i=antonio@openvpn.net;
+ h=from:subject:message-id; bh=7APpdEA4jr7ps1b8VWTegxDhvEoR42BTlzwB5PRlvl0=;
+ b=owEBbQGS/pANAwAIAQtw5TqgONWHAcsmYgBnhN2A6+0VNKx9H7gk5suENobFMy2b+YYzOg8v7
+ 0PBqMNVfaWJATMEAAEIAB0WIQSZq9xs+NQS5N5fwPwLcOU6oDjVhwUCZ4TdgAAKCRALcOU6oDjV
+ hydMB/9DvAdG0+pShJ4O3fl6TCLBcp4slhWXBTr2VKtEXvnZOk9hvjeIaNmB8Uij+b/Y/Oy+/3a
+ EV266eJ5b0s79KHM4Ysi+I+821v7c0S4VNgTfwrV/hFK8s1k5y2t1RbPYaC6RiY7z5r1pbZQ5N5
+ KhuB6MFW/8d4YwI4kve4f2CpdkdvzpPEiBJFtRQxgKU4pSQa1xwN7kZ9kYDTMeUhyJJ0M7mFR3d
+ sIujOcfnroL587yTzl5jB2TVu1UgMz1h+lGlNOVHWe2nDUyT6IpYfgER+SXVMfDJnslskt0QFau
+ lqk/Xurm1OWvfV6GUEbZTkLuQ9y2MBF3wMBHDLolXiwRNJYl
+X-Developer-Key: i=antonio@openvpn.net; a=openpgp;
+ fpr=CABDA1282017C267219885C748F0CCB68F59D14C
 
-Hi Stefan,
+Notable changes since v17:
+* fixed netdevice_tracker pointer assignment in netlink post_doit
+  (triggered by kernel test robot on m86k)
+* renamed nla_get_uint() to ovpn_nla_get_uint() in ovpn-cli.c to avoid
+  clashes with libnl-3.11.0
 
-Am Mon, Jan 13, 2025 at 09:05:21AM +0100 schrieb Stefan Eichenberger:
-> On Fri, Jan 10, 2025 at 07:30:58PM +0100, Dimitri Fedrau wrote:
-> > Hi Stefan,
-> > 
-> > Am Fri, Jan 10, 2025 at 06:27:43PM +0100 schrieb Stefan Eichenberger:
-> > > Hi Dimitri ,
-> > > 
-> > > On Fri, Jan 10, 2025 at 04:10:04PM +0100, Dimitri Fedrau wrote:
-> > > > Marvell 88Q2XXX devices support up to two configurable Light Emitting
-> > > > Diode (LED). Add minimal LED controller driver supporting the most common
-> > > > uses with the 'netdev' trigger.
-> > > > 
-> > > > Signed-off-by: Dimitri Fedrau <dima.fedrau@gmail.com>
-> > > > ---
-> > > >  drivers/net/phy/marvell-88q2xxx.c | 161 ++++++++++++++++++++++++++++++++++++++
-> > > >  1 file changed, 161 insertions(+)
-> > > > 
-> > > > diff --git a/drivers/net/phy/marvell-88q2xxx.c b/drivers/net/phy/marvell-88q2xxx.c
-> > > > index 5107f58338aff4ed6cfea4d91e37282d9bb60ba5..bef3357b9d279fca5d1f86ff0eaa0d45a699e3f9 100644
-> > > > --- a/drivers/net/phy/marvell-88q2xxx.c
-> > > > +++ b/drivers/net/phy/marvell-88q2xxx.c
-> > > > @@ -8,6 +8,7 @@
-> > > >   */
-> > > >  #include <linux/ethtool_netlink.h>
-> > > >  #include <linux/marvell_phy.h>
-> > > > +#include <linux/of.h>
-> > > >  #include <linux/phy.h>
-> > > >  #include <linux/hwmon.h>
-> > > >  
-> > > > @@ -27,6 +28,9 @@
-> > > >  #define MDIO_MMD_AN_MV_STAT2_100BT1		0x2000
-> > > >  #define MDIO_MMD_AN_MV_STAT2_1000BT1		0x4000
-> > > >  
-> > > > +#define MDIO_MMD_PCS_MV_RESET_CTRL		32768
-> > > > +#define MDIO_MMD_PCS_MV_RESET_CTRL_TX_DISABLE	0x8
-> > > > +
-> > > >  #define MDIO_MMD_PCS_MV_INT_EN			32784
-> > > >  #define MDIO_MMD_PCS_MV_INT_EN_LINK_UP		0x0040
-> > > >  #define MDIO_MMD_PCS_MV_INT_EN_LINK_DOWN	0x0080
-> > > > @@ -40,6 +44,15 @@
-> > > >  #define MDIO_MMD_PCS_MV_GPIO_INT_CTRL			32787
-> > > >  #define MDIO_MMD_PCS_MV_GPIO_INT_CTRL_TRI_DIS		0x0800
-> > > >  
-> > > > +#define MDIO_MMD_PCS_MV_LED_FUNC_CTRL			32790
-> > > > +#define MDIO_MMD_PCS_MV_LED_FUNC_CTRL_GPIO_MASK		GENMASK(7, 4)
-> > > > +#define MDIO_MMD_PCS_MV_LED_FUNC_CTRL_TX_EN_MASK	GENMASK(3, 0)
-> > > > +#define MDIO_MMD_PCS_MV_LED_FUNC_CTRL_LINK		0x0 /* Link established */
-> > > > +#define MDIO_MMD_PCS_MV_LED_FUNC_CTRL_LINK_RX_TX	0x1 /* Link established, blink for rx or tx activity */
-> > > > +#define MDIO_MMD_PCS_MV_LED_FUNC_CTRL_RX_TX		0x4 /* Receive or Transmit activity */
-> > > > +#define MDIO_MMD_PCS_MV_LED_FUNC_CTRL_TX		0x5 /* Transmit activity */
-> > > > +#define MDIO_MMD_PCS_MV_LED_FUNC_CTRL_LINK_1000BT1	0x7 /* 1000BT1 link established */
-> > > > +
-> > > >  #define MDIO_MMD_PCS_MV_TEMP_SENSOR1			32833
-> > > >  #define MDIO_MMD_PCS_MV_TEMP_SENSOR1_RAW_INT		0x0001
-> > > >  #define MDIO_MMD_PCS_MV_TEMP_SENSOR1_INT		0x0040
-> > > > @@ -95,6 +108,9 @@
-> > > >  
-> > > >  #define MDIO_MMD_PCS_MV_TDR_OFF_CUTOFF			65246
-> > > >  
-> > > > +#define MV88Q2XXX_LED_INDEX_TX_ENABLE	0
-> > > > +#define MV88Q2XXX_LED_INDEX_GPIO	1
-> > > 
-> > > Not sure if I understand this. TX_ENABLE would be LED0 and GPIO would be
-> > > LED1? In my datasheet the 88Q222x only has a GPIO pin (which is also
-> > > TX_ENABLE), is this a problem? Would we need a led_count variable per
-> > > chip? 
-> > > 
-> > Yes you understand it correctly.
-> > Looking at the datasheets for 88Q212x, 88Q211x and 88Q222x, they have all
-> > TX_ENABLE and GPIO pin. Registers are also the same. Did I miss anything ?
-> > For which device GPIO pin and TX_ENABLE are the same ?
-> > 
-> > > In the 88Q2110 I can see that there is a TX_ENABLE (0) and a GPIO (1)
-> > > pin. In the register description they just call it LED [0] Control and
-> > > LED [1] Control. Maybe calling it LED_0 and LED_1 would be easier to
-> > > understand? Same for MDIO_MMD_PCS_MV_LED_FUNC_CTRL_GPIO_MASK and
-> > > MDIO_MMD_PCS_MV_LED_FUNC_CTRL_TX_EN_MASK.
-> > > 
-> > I named them just as the pin. Probably it would be easier to understand,
-> > but the mapping between pin and index would be lost. What do you think ?
-> 
-> I missed this one in the previous mail, sorry. I personally would name
-> it LED_0_CONTROL_MASK and LED_1_CONTROL_MASK because the description of
-> the register is "3:0 LED [0] Control". As index I would probably also
-> call it LED_0_INDEX and LED_1_INDEX because it is not directly related
-> to the pin functionality. But that's just my personal preference not
-> sure if it is really better.
->
-I think you are right, since the datasheet for 88Q222x is a bit messy
-and datasheets for 88Q212x and 88Q211x name them "LED [0] Control" and
-"LED [1] Control" I will do as you suggest. Thanks for pointing out.
+FTR, here are the notable changes since v16:
+* fixed usage of netdev tracker by removing dev_tracker member from
+  ovpn_priv and adding it to ovpn_peer and ovpn_socket as those are the
+  objects really holding a ref to the netdev
+* switched ovpn_get_dev_from_attrs() to GFP_ATOMIC to prevent sleep under
+  rcu_read_lock
+* allocated netdevice_tracker in ovpn_nl_pre_doit() [stored in
+  user_ptr[1]] to keep track of the netdev reference held during netlink
+  handler calls
+* moved whole socket detaching routine to worker. This way the code is
+  allowed to sleep and in turn it can be executed under lock_sock. This
+  lock allows us to happily coordinate concurrent attach/detach calls.
+  (note: lock is acquired everytime the refcnt for the socket is
+  decremented, because this guarantees us that setting the refcnt to 0
+  and detaching the socket will happen atomically)
+* dropped kref_put_sock()/refcount handler as it's not required anymore,
+  thanks to the point above
+* re-arranged ovpn_socket_new() in order to simplify error path by first
+  allocating the new ovpn_sock and then attaching
 
-I would stick to the index because you assign functionality when you
-configure DT to do so. How should one know which pins belongs to which led
-index, there is no documentation on this.
+Please note that some patches were already reviewed/tested by a few
+people. iThese patches have retained the tags as they have hardly been
+touched.
+
+The latest code can also be found at:
+
+https://github.com/OpenVPN/linux-kernel-ovpn
+
+Thanks a lot!
+Best Regards,
+
+Antonio Quartulli
+OpenVPN Inc.
+
+---
+Antonio Quartulli (25):
+      net: introduce OpenVPN Data Channel Offload (ovpn)
+      ovpn: add basic netlink support
+      ovpn: add basic interface creation/destruction/management routines
+      ovpn: keep carrier always on for MP interfaces
+      ovpn: introduce the ovpn_peer object
+      ovpn: introduce the ovpn_socket object
+      ovpn: implement basic TX path (UDP)
+      ovpn: implement basic RX path (UDP)
+      ovpn: implement packet processing
+      ovpn: store tunnel and transport statistics
+      ipv6: export inet6_stream_ops via EXPORT_SYMBOL_GPL
+      ovpn: implement TCP transport
+      skb: implement skb_send_sock_locked_with_flags()
+      ovpn: add support for MSG_NOSIGNAL in tcp_sendmsg
+      ovpn: implement multi-peer support
+      ovpn: implement peer lookup logic
+      ovpn: implement keepalive mechanism
+      ovpn: add support for updating local UDP endpoint
+      ovpn: add support for peer floating
+      ovpn: implement peer add/get/dump/delete via netlink
+      ovpn: implement key add/get/del/swap via netlink
+      ovpn: kill key and notify userspace in case of IV exhaustion
+      ovpn: notify userspace when a peer is deleted
+      ovpn: add basic ethtool support
+      testing/selftests: add test tool and scripts for ovpn module
+
+ Documentation/netlink/specs/ovpn.yaml              |  372 +++
+ Documentation/netlink/specs/rt_link.yaml           |   16 +
+ MAINTAINERS                                        |   11 +
+ drivers/net/Kconfig                                |   15 +
+ drivers/net/Makefile                               |    1 +
+ drivers/net/ovpn/Makefile                          |   22 +
+ drivers/net/ovpn/bind.c                            |   55 +
+ drivers/net/ovpn/bind.h                            |  101 +
+ drivers/net/ovpn/crypto.c                          |  211 ++
+ drivers/net/ovpn/crypto.h                          |  145 ++
+ drivers/net/ovpn/crypto_aead.c                     |  382 ++++
+ drivers/net/ovpn/crypto_aead.h                     |   33 +
+ drivers/net/ovpn/io.c                              |  446 ++++
+ drivers/net/ovpn/io.h                              |   34 +
+ drivers/net/ovpn/main.c                            |  350 +++
+ drivers/net/ovpn/main.h                            |   14 +
+ drivers/net/ovpn/netlink-gen.c                     |  213 ++
+ drivers/net/ovpn/netlink-gen.h                     |   41 +
+ drivers/net/ovpn/netlink.c                         | 1183 ++++++++++
+ drivers/net/ovpn/netlink.h                         |   18 +
+ drivers/net/ovpn/ovpnstruct.h                      |   54 +
+ drivers/net/ovpn/peer.c                            | 1269 +++++++++++
+ drivers/net/ovpn/peer.h                            |  164 ++
+ drivers/net/ovpn/pktid.c                           |  129 ++
+ drivers/net/ovpn/pktid.h                           |   87 +
+ drivers/net/ovpn/proto.h                           |  118 +
+ drivers/net/ovpn/skb.h                             |   60 +
+ drivers/net/ovpn/socket.c                          |  204 ++
+ drivers/net/ovpn/socket.h                          |   49 +
+ drivers/net/ovpn/stats.c                           |   21 +
+ drivers/net/ovpn/stats.h                           |   47 +
+ drivers/net/ovpn/tcp.c                             |  565 +++++
+ drivers/net/ovpn/tcp.h                             |   33 +
+ drivers/net/ovpn/udp.c                             |  421 ++++
+ drivers/net/ovpn/udp.h                             |   22 +
+ include/linux/skbuff.h                             |    2 +
+ include/uapi/linux/if_link.h                       |   15 +
+ include/uapi/linux/ovpn.h                          |  111 +
+ include/uapi/linux/udp.h                           |    1 +
+ net/core/skbuff.c                                  |   18 +-
+ net/ipv6/af_inet6.c                                |    1 +
+ tools/testing/selftests/Makefile                   |    1 +
+ tools/testing/selftests/net/ovpn/.gitignore        |    2 +
+ tools/testing/selftests/net/ovpn/Makefile          |   17 +
+ tools/testing/selftests/net/ovpn/config            |   10 +
+ tools/testing/selftests/net/ovpn/data64.key        |    5 +
+ tools/testing/selftests/net/ovpn/ovpn-cli.c        | 2367 ++++++++++++++++++++
+ tools/testing/selftests/net/ovpn/tcp_peers.txt     |    5 +
+ .../testing/selftests/net/ovpn/test-chachapoly.sh  |    9 +
+ tools/testing/selftests/net/ovpn/test-float.sh     |    9 +
+ tools/testing/selftests/net/ovpn/test-tcp.sh       |    9 +
+ tools/testing/selftests/net/ovpn/test.sh           |  185 ++
+ tools/testing/selftests/net/ovpn/udp_peers.txt     |    5 +
+ 53 files changed, 9673 insertions(+), 5 deletions(-)
+---
+base-commit: 7d0da8f862340c5f42f0062b8560b8d0971a6ac4
+change-id: 20241002-b4-ovpn-eeee35c694a2
 
 Best regards,
-Dimitri
+-- 
+Antonio Quartulli <antonio@openvpn.net>
+
 
