@@ -1,194 +1,195 @@
-Return-Path: <netdev+bounces-157884-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157885-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF3C0A0C223
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 20:54:28 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE53FA0C248
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 20:59:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 20F4B7A3B29
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 19:54:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AC4411699DD
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 19:59:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F2A01D0B8E;
-	Mon, 13 Jan 2025 19:52:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDB031C549F;
+	Mon, 13 Jan 2025 19:59:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="B5LUh+Vg"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="lcfJcXnN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E55831C760A;
-	Mon, 13 Jan 2025 19:52:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4144D1BD504
+	for <netdev@vger.kernel.org>; Mon, 13 Jan 2025 19:59:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736797979; cv=none; b=iKuzBYiMF+0bOABbZrBrl/D8b6D8XtGz6zjkpZlBJmdR2KKxXY9ODpFLgjQ3FkCw2x6HNKrVU+6CkdbSCeDpq5iMFneRYN0y3lgMFukRjzjVu26x5WsWU+9LLz0l+R1xxGbQsIlxIxKCbhcSJvJRuX+RNyilRmC1bjp5qeDeiDA=
+	t=1736798387; cv=none; b=Lv6e1V/LBYAPt2IPIZ2+fYMNzNFHd5H/wKhwNYAR8OB0P143W+/diZpt44gBOXTRP/O2pr7fSxvvtWNGCu8xxpnNxTxljeqoB0c7LOnCA2XRw96nVc4bzh1ZYQZLWkjPGWAWuzJ9mNQQe5tFzpZxsVqOqLgbDToICYX5nhPLjhU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736797979; c=relaxed/simple;
-	bh=06GZhc/VkQq++5gRIdPFs5q0JjB601nTRNvV+qE8zLY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=SalReuJvzcCR2cEAfzDPombGT+TlKYX+NSgI1v0DIIYE6PJZy/VPAgHxxdOPlSnPp3oWxE4Q25eQ8WowBr9UBkiTqVjAqamFpuVavV33SrMMsp2m4/ka9SH3Afc3NPIeb+L1z+VQC4yBjjKhdfpnw6KYJ6Q5ve6O7r61LQI4gjY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=B5LUh+Vg; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50DBwHMp024143;
-	Mon, 13 Jan 2025 19:52:06 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=gxfl05
-	rEtPi8TykQ9QWVEg0MU5uCG4bE8pKLfbkmBoM=; b=B5LUh+VgN3WK/GxgMfApyL
-	zDK2JB86xVFtqkh2cISfja7SdVtOsIfkGleQzynw6Piylorb/2us6xzEeoukuQot
-	dAFLlcFPUq1Dy4nmJN3LwWPknBMPu5XagwtLREWveMQ8Ja5OVu7SogufvkYi8w1l
-	r93va9nGzztbSiS+6nSIEy3MiVOTLcHqBQyWAU3peLOp5LcyOOT74MNka5aZKhT+
-	pY3A1y/SdCxh3cPB/jbMtSDqplAF1ENBHzsX9sLyZFrgMN93Yn5jthXy+DnLG2We
-	uombPBbmzmebvuAtrUsPTfV2bdOLDT7qGqBK6A2esZdY9TuHPYmiYNMuBnWtf3vQ
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 444qjameav-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 13 Jan 2025 19:52:05 +0000 (GMT)
-Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 50DJcxT5031944;
-	Mon, 13 Jan 2025 19:52:05 GMT
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 444qjameaq-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 13 Jan 2025 19:52:05 +0000 (GMT)
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 50DGREZB016991;
-	Mon, 13 Jan 2025 19:52:04 GMT
-Received: from smtprelay05.wdc07v.mail.ibm.com ([172.16.1.72])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4444fjyrwn-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 13 Jan 2025 19:52:04 +0000
-Received: from smtpav02.dal12v.mail.ibm.com (smtpav02.dal12v.mail.ibm.com [10.241.53.101])
-	by smtprelay05.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 50DJq3p520972040
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 13 Jan 2025 19:52:04 GMT
-Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id AFB9A5805E;
-	Mon, 13 Jan 2025 19:52:03 +0000 (GMT)
-Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 2274F5805A;
-	Mon, 13 Jan 2025 19:52:02 +0000 (GMT)
-Received: from [9.61.105.40] (unknown [9.61.105.40])
-	by smtpav02.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Mon, 13 Jan 2025 19:52:01 +0000 (GMT)
-Message-ID: <a8893ef1-251d-447c-b42f-8f1ebc9623bb@linux.ibm.com>
-Date: Mon, 13 Jan 2025 13:52:01 -0600
+	s=arc-20240116; t=1736798387; c=relaxed/simple;
+	bh=jxdOtjVau7wxxIy/ggw0jOnsKz8D4quYfM9PbMZxI9M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=IfirslZUDE2pBMLyVhWbIekD8MzZN0Idq0jqjPN+VgLxvrXddUOIC2Vj7k09V8+EbEs2lyqY2jZYtMba5pEwANkeZCKyyqugRtrP/S8QGLSoR6sRCQFTxuRm+27ZOFyg05iwOR74AueQG6W1ccjuRmpkdAIkBticZ+JcerpqMkk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=lcfJcXnN; arc=none smtp.client-ip=209.85.214.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-21a7ed0155cso80978445ad.3
+        for <netdev@vger.kernel.org>; Mon, 13 Jan 2025 11:59:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fastly.com; s=google; t=1736798385; x=1737403185; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=FP1OLQq2oO6+heCmpR67enJ+J1EfH0SdobFPZeoQmDs=;
+        b=lcfJcXnNLdKU8YMjgbinYCuIPGfvrR+FwlqLP8dBowKYPhjJTrNZBmCztf8a3+VP/h
+         j6n43RxV7lXY4NqFR1pXEXx0bX0vwKjKGYW9MtCj43M0ETgG3zMbIH7d5ZT1wJhfgost
+         VeIBVReIPygu/hoZ60Sqt6QhS3tqrr6sOyS7Q=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736798385; x=1737403185;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=FP1OLQq2oO6+heCmpR67enJ+J1EfH0SdobFPZeoQmDs=;
+        b=Tnc8koeTeWVt609gbvAYqgajD1xR9banySb78m/yrWmKE17gPRMBNhuK9M8Jrw7goB
+         fDr18yK6r4cQS112mSlWzzI2fzQuDmtUYGzR6o/4juazVg8kZXlOIWZgB+jUj8Np4bOW
+         njxIpL/n56/3XGE1yadymwcTCSVPQ9swam0X48ZpJPjyVgfG0W22ACj+lPwvp5ts65Al
+         VHgAwQhYdrye7Fs5wnqhtLmDapm1wD6GqZi40CPP/KpKtnI0TAo5PHc3A86KyYNwzn1U
+         DzaZEx+qrP/pmGD/s7+Y8GhN+nxWZC7XmsHnqpPSKmSUzbXfUEvzFXpeRIaAfyujMVSn
+         kQFw==
+X-Forwarded-Encrypted: i=1; AJvYcCVVIX3+bFME/jg6C9tUGp9Y9OnvTApeZCgFkYYIREWe5gFSo/1l0Hv1hbt7LWDrpRFkbrTH6Cg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw9XbuYruVhhBCQza+LVsZqPHdtt/iEcGUFqs/DCNuGmHEknY+H
+	ZFqccQB2sbWypRz/q0o3hKe/0WQpItYQSY7O5wX9CdA6UMiZ/Mq/S5bdFms8snY=
+X-Gm-Gg: ASbGnct/W0riqyvdvhxJBZvsNhoKTN86De17O7m5eY01zAPdvOLUbdAVGL7eoMuGA6V
+	oH2BZ6IAtcDhljhbTQ1N1vNj0eg7iUFvo3kPvy/3MaU9VrSLugOHYozLnjidVHQTHpO8Lra7EKy
+	nA+onfDMWHYGAOySDy2UL9oYNFd9WIbYHYnzi5UuxLXWiGAdSPJoZN0EjLAQVimCaj64G7fs9AB
+	kBckpbNgI9t0cEov/LclMvNLwtYp/X0aKD/LxXp3/PjR2CsK+0/6Z/wFipVS3ENhXVaG4Md6arX
+	t2RKuyytmWZSeT52iS3n+LQ=
+X-Google-Smtp-Source: AGHT+IHYi/GggO/c1HSyoNoXXYasnNL3u761pIvDa8DXpWCEAy845VjsiQJlM7fewUKs1Y8aYvRKHQ==
+X-Received: by 2002:a05:6a21:33a6:b0:1e8:bff6:8356 with SMTP id adf61e73a8af0-1e8bff68643mr17786546637.20.1736798385469;
+        Mon, 13 Jan 2025 11:59:45 -0800 (PST)
+Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72d40658a73sm6261116b3a.119.2025.01.13.11.59.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 13 Jan 2025 11:59:45 -0800 (PST)
+Date: Mon, 13 Jan 2025 11:59:42 -0800
+From: Joe Damato <jdamato@fastly.com>
+To: Gerhard Engleder <gerhard@engleder-embedded.com>
+Cc: andrew@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next] tsnep: Link queues to NAPIs
+Message-ID: <Z4VwrhhXU4uKqYGR@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	Gerhard Engleder <gerhard@engleder-embedded.com>, andrew@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, netdev@vger.kernel.org
+References: <20250110223939.37490-1-gerhard@engleder-embedded.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 00/10] DTS updates for system1 BMC
-To: "Rob Herring (Arm)" <robh@kernel.org>
-Cc: linux-aspeed@lists.ozlabs.org, davem@davemloft.net, edumazet@google.com,
-        andrew@codeconstruct.com.au, netdev@vger.kernel.org, kuba@kernel.org,
-        joel@jms.id.au, linux-arm-kernel@lists.infradead.org,
-        openipmi-developer@lists.sourceforge.net, conor+dt@kernel.org,
-        linux-kernel@vger.kernel.org, pabeni@redhat.com,
-        ratbert@faraday-tech.com, eajames@linux.ibm.com,
-        devicetree@vger.kernel.org, andrew+netdev@lunn.ch, minyard@acm.org,
-        krzk+dt@kernel.org
-References: <20250108163640.1374680-1-ninad@linux.ibm.com>
- <173637565834.1164228.2385240280664730132.robh@kernel.org>
-Content-Language: en-US
-From: Ninad Palsule <ninad@linux.ibm.com>
-In-Reply-To: <173637565834.1164228.2385240280664730132.robh@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: PvzTUGLChZmlLTohpy8SLvK47px5mEq9
-X-Proofpoint-ORIG-GUID: slslK2Na7MpzUMJx3_V1bJjHIgILrmix
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 malwarescore=0
- mlxlogscore=886 mlxscore=0 spamscore=0 lowpriorityscore=0 adultscore=0
- priorityscore=1501 suspectscore=0 impostorscore=0 bulkscore=0 phishscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2411120000
- definitions=main-2501130156
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250110223939.37490-1-gerhard@engleder-embedded.com>
 
-Hello,
+On Fri, Jan 10, 2025 at 11:39:39PM +0100, Gerhard Engleder wrote:
+> Use netif_queue_set_napi() to link queues to NAPI instances so that they
+> can be queried with netlink.
+> 
+> $ ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/netdev.yaml \
+>                          --dump queue-get --json='{"ifindex": 11}'
+> [{'id': 0, 'ifindex': 11, 'napi-id': 9, 'type': 'rx'},
+>  {'id': 1, 'ifindex': 11, 'napi-id': 10, 'type': 'rx'},
+>  {'id': 0, 'ifindex': 11, 'napi-id': 9, 'type': 'tx'},
+>  {'id': 1, 'ifindex': 11, 'napi-id': 10, 'type': 'tx'}]
+> 
+> Additionally use netif_napi_set_irq() to also provide NAPI interrupt
+> number to userspace.
+> 
+> $ ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/netdev.yaml \
+>                          --do napi-get --json='{"id": 9}'
+> {'defer-hard-irqs': 0,
+>  'gro-flush-timeout': 0,
+>  'id': 9,
+>  'ifindex': 11,
+>  'irq': 42,
+>  'irq-suspend-timeout': 0}
+> 
+> Providing information about queues to userspace makes sense as APIs like
+> XSK provide queue specific access. Also XSK busy polling relies on
+> queues linked to NAPIs.
+> 
+> Signed-off-by: Gerhard Engleder <gerhard@engleder-embedded.com>
+> ---
+>  drivers/net/ethernet/engleder/tsnep_main.c | 28 ++++++++++++++++++----
+>  1 file changed, 23 insertions(+), 5 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/engleder/tsnep_main.c b/drivers/net/ethernet/engleder/tsnep_main.c
+> index 45b9f5780902..71e950e023dc 100644
+> --- a/drivers/net/ethernet/engleder/tsnep_main.c
+> +++ b/drivers/net/ethernet/engleder/tsnep_main.c
+> @@ -1984,23 +1984,41 @@ static int tsnep_queue_open(struct tsnep_adapter *adapter,
+>  
+>  static void tsnep_queue_enable(struct tsnep_queue *queue)
+>  {
+> +	struct tsnep_adapter *adapter = queue->adapter;
+> +
+> +	netif_napi_set_irq(&queue->napi, queue->irq);
+>  	napi_enable(&queue->napi);
+> -	tsnep_enable_irq(queue->adapter, queue->irq_mask);
+> +	tsnep_enable_irq(adapter, queue->irq_mask);
+>  
+> -	if (queue->tx)
+> +	if (queue->tx) {
+> +		netif_queue_set_napi(adapter->netdev, queue->tx->queue_index,
+> +				     NETDEV_QUEUE_TYPE_TX, &queue->napi);
+>  		tsnep_tx_enable(queue->tx);
+> +	}
+>  
+> -	if (queue->rx)
+> +	if (queue->rx) {
+> +		netif_queue_set_napi(adapter->netdev, queue->rx->queue_index,
+> +				     NETDEV_QUEUE_TYPE_RX, &queue->napi);
+>  		tsnep_rx_enable(queue->rx);
+> +	}
+>  }
+>  
+>  static void tsnep_queue_disable(struct tsnep_queue *queue)
+A>  {
+> -	if (queue->tx)
+> +	struct tsnep_adapter *adapter = queue->adapter;
+> +
+> +	if (queue->rx)
+> +		netif_queue_set_napi(adapter->netdev, queue->rx->queue_index,
+> +				     NETDEV_QUEUE_TYPE_RX, NULL);
+> +
+> +	if (queue->tx) {
+>  		tsnep_tx_disable(queue->tx, &queue->napi);
+> +		netif_queue_set_napi(adapter->netdev, queue->tx->queue_index,
+> +				     NETDEV_QUEUE_TYPE_TX, NULL);
+> +	}
+>  
+>  	napi_disable(&queue->napi);
+> -	tsnep_disable_irq(queue->adapter, queue->irq_mask);
+> +	tsnep_disable_irq(adapter, queue->irq_mask);
+>  
+>  	/* disable RX after NAPI polling has been disabled, because RX can be
+>  	 * enabled during NAPI polling
 
-On 1/8/25 16:34, Rob Herring (Arm) wrote:
-> On Wed, 08 Jan 2025 10:36:28 -0600, Ninad Palsule wrote:
->> Hello,
->>
->> Please review the patch set.
->>
->> V3:
->> ---
->>    - Fixed dt_binding_check warnings in ipmb-dev.yaml
->>    - Updated title and description in ipmb-dev.yaml file.
->>    - Updated i2c-protocol description in ipmb-dev.yaml file.
->>
->> V2:
->> ---
->>    Fixed CHECK_DTBS errors by
->>      - Using generic node names
->>      - Documenting phy-mode rgmii-rxid in ftgmac100.yaml
->>      - Adding binding documentation for IPMB device interface
->>
->> NINAD PALSULE (7):
->>    ARM: dts: aspeed: system1: Add IPMB device
->>    ARM: dts: aspeed: system1: Add GPIO line name
->>    ARM: dts: aspeed: system1: Add RGMII support
->>    ARM: dts: aspeed: system1: Reduce sgpio speed
->>    ARM: dts: aspeed: system1: Update LED gpio name
->>    ARM: dts: aspeed: system1: Remove VRs max8952
->>    ARM: dts: aspeed: system1: Mark GPIO line high/low
->>
->> Ninad Palsule (3):
->>    dt-bindings: net: faraday,ftgmac100: Add phys mode
->>    bindings: ipmi: Add binding for IPMB device intf
->>    ARM: dts: aspeed: system1: Disable gpio pull down
->>
->>   .../devicetree/bindings/ipmi/ipmb-dev.yaml    |  44 +++++
->>   .../bindings/net/faraday,ftgmac100.yaml       |   3 +
->>   .../dts/aspeed/aspeed-bmc-ibm-system1.dts     | 177 ++++++++++++------
->>   3 files changed, 165 insertions(+), 59 deletions(-)
->>   create mode 100644 Documentation/devicetree/bindings/ipmi/ipmb-dev.yaml
->>
->> --
->> 2.43.0
->>
->>
->>
->
-> My bot found new DTB warnings on the .dts files added or changed in this
-> series.
->
-> Some warnings may be from an existing SoC .dtsi. Or perhaps the warnings
-> are fixed by another series. Ultimately, it is up to the platform
-> maintainer whether these warnings are acceptable or not. No need to reply
-> unless the platform maintainer has comments.
->
-> If you already ran DT checks and didn't see these error(s), then
-> make sure dt-schema is up to date:
->
->    pip3 install dtschema --upgrade
->
->
-> New warnings running 'make CHECK_DTBS=y aspeed/aspeed-bmc-ibm-system1.dtb' for 20250108163640.1374680-1-ninad@linux.ibm.com:
->
-> arch/arm/boot/dts/aspeed/aspeed-bmc-ibm-system1.dtb: gpio@1e780000: 'hog-0', 'hog-1', 'hog-2', 'hog-3' do not match any of the regexes: 'pinctrl-[0-9]+'
-> 	from schema $id: http://devicetree.org/schemas/gpio/aspeed,ast2400-gpio.yaml#
+The changes generally look OK to me (it seems RTNL is held on all
+paths where this code can be called from as far as I can tell), but
+there was one thing that stood out to me.
 
-This is a false positive. So ignoring it.
+AFAIU, drivers avoid marking XDP queues as NETDEV_QUEUE_TYPE_RX
+or NETDEV_QUEUE_TYPE_TX. I could be wrong, but that was my
+understanding and I submit patches to several drivers with this
+assumption.
 
-Regards,
+For example, in commit b65969856d4f ("igc: Link queues to NAPI
+instances"), I unlinked/linked the NAPIs and queue IDs when XDP was
+enabled/disabled. Likewise, in commit 64b62146ba9e ("net/mlx4: link
+NAPI instances to queues and IRQs"), I avoided the XDP queues.
 
-Ninad
-
->
->
->
->
->
->
+If drivers are to avoid marking XDP queues as NETDEV_QUEUE_TYPE_RX
+or NETDEV_QUEUE_TYPE_TX, perhaps tsnep needs to be modified
+similarly?
 
