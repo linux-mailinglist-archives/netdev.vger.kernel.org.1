@@ -1,157 +1,119 @@
-Return-Path: <netdev+bounces-157811-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157812-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16149A0BD2C
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 17:23:11 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A67CA0BD97
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 17:31:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DF6C83A9EAA
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 16:23:04 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1DD9B7A489E
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 16:31:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B98C725760;
-	Mon, 13 Jan 2025 16:23:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B912D22BAB5;
+	Mon, 13 Jan 2025 16:30:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="U6sya9U8"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="goFtUNsy"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
+Received: from out-182.mta1.migadu.com (out-182.mta1.migadu.com [95.215.58.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CEB01CAA87
-	for <netdev@vger.kernel.org>; Mon, 13 Jan 2025 16:23:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B23D22BACE
+	for <netdev@vger.kernel.org>; Mon, 13 Jan 2025 16:30:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736785386; cv=none; b=mWclad5BDljSu6c5F6vfjUw2+GsL+wicLm+9Wz2EYGvL08Z9gpnL8vSzg1VWLuFgqU4LqKAvFqHvTi1tj7eAs4QRpD8eFrbVvxsfjJtfpwye9DXtlfslSFB9nPeuFJfheYpekpjQ8TiO7C0S4iegUdQn0US4NDmKSyOsQeAXgnE=
+	t=1736785830; cv=none; b=odVd8JURacMcEFM2LlcA34V2vfSuVvPq0ML276ecRbNE0bviOfP3/dtyZr581PHTjQQAl2Erq63AcvGeEqRAo91pxpA97GLMbpRsNate3wxu/L0cE/8aDfHcenjyn2CVcG7FIkemL/wugAjbAxe2vgVSKD911PmKFbdujBTcjDA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736785386; c=relaxed/simple;
-	bh=LoZ1Pqh9Di665toUrGLlNS9e5AwJ/aKbGnrZXNG+3EE=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=pLpnGDRnk892YALpBCMLoaAUCPJSyFYnYAkeRqVhkcBQ52jJ9YA8a8YT8chLbCnYYDZ7NeP2+pjc78JbHlhSpbiejau1GKKzimOO3zBjtZpNpniKzQ2HG2QT9SKCGxJWEeQgthfVF7lc7kMdYF0zdl+6DuF9oU/1f+NuLBfpuP4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=U6sya9U8; arc=none smtp.client-ip=217.70.183.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id BEFF41C0008;
-	Mon, 13 Jan 2025 16:22:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1736785382;
+	s=arc-20240116; t=1736785830; c=relaxed/simple;
+	bh=vn17tQTRifoU70IvEay/XlrsOY6DOtxSrwCeMLSZhpY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=YWh5+Hh043nZTk17JsryRxkM7QkWRHUUVOn6iNx3L3zDWXAy3ilogEJaJ2ReYzO7e34pM+6Nnrhzx9jX7cuoj9avPN+Umuv5xpjRWG2Zhbsfkig8D091SfwRpcvtnULao544zO+cc3w6GglNr8nAvq5vJTBKlEk8bHZUo9PgW9M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=goFtUNsy; arc=none smtp.client-ip=95.215.58.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1736785815;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=rUDw3kvKolhpUjOdJ7XwzQnmZAdNK5carUKXfz4URKw=;
-	b=U6sya9U8Jron8CxjyT1kKNFV7NYolRM3yYla103nP9LRuqaLt/3HGsXiNATsmbsCfw8IAE
-	0qS4C224oZwjsCidXCYCGZ41qIuW6RKg/LopwQuKINAhjes+h6T5l0XgwQmzDGzWiQikDQ
-	nI5u7+E6VinhnKUhj14BSgOp/QS7Sm+4V960HB4VBGL94ASbS6LQuhZJGrlvLrsd8pVr60
-	5iTs5Hfi+88+Z4ARtyMs1mdltQ4YgoKtaYye2xuTjmC8sVqkRqGiKcKRTBLp7dSWp8p4Cj
-	y5CiEwY3gbG81sI8SHyFQ54JTFyGwBoqvvqzZ4hw377JxlGZvcTTaJnShfm99Q==
-Date: Mon, 13 Jan 2025 17:22:55 +0100
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
- Alexander Couzens <lynxis@fe80.eu>, Alexander Duyck
- <alexanderduyck@fb.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>, Claudiu Beznea
- <claudiu.beznea@tuxon.dev>, Daniel Golle <daniel@makrotopia.org>, Daniel
- Machon <daniel.machon@microchip.com>, "David S. Miller"
- <davem@davemloft.net>, DENG Qingfang <dqfext@gmail.com>, Eric Dumazet
- <edumazet@google.com>, Eric Woudstra <ericwouds@gmail.com>, Florian
- Fainelli <florian.fainelli@broadcom.com>, Horatiu Vultur
- <horatiu.vultur@microchip.com>, Ioana Ciornei <ioana.ciornei@nxp.com>,
- Jakub Kicinski <kuba@kernel.org>, Jose Abreu <Jose.Abreu@synopsys.com>,
- kernel-team@meta.com, Lars Povlsen <lars.povlsen@microchip.com>,
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
- Madalin Bucur <madalin.bucur@nxp.com>, Marcin Wojtas
- <marcin.s.wojtas@gmail.com>, Matthias Brugger <matthias.bgg@gmail.com>,
- Michal Simek <michal.simek@amd.com>, netdev@vger.kernel.org, Nicolas Ferre
- <nicolas.ferre@microchip.com>, Paolo Abeni <pabeni@redhat.com>, Radhey
- Shyam Pandey <radhey.shyam.pandey@amd.com>, Sean Anderson
- <sean.anderson@seco.com>, Sean Wang <sean.wang@mediatek.com>, Steen
- Hegelund <Steen.Hegelund@microchip.com>, Taras Chornyi
- <taras.chornyi@plvision.eu>, UNGLinuxDriver@microchip.com, Vladimir Oltean
- <olteanv@gmail.com>
-Subject: Re: [PATCH net-next v2 0/5] net: phylink: fix PCS without autoneg
-Message-ID: <20250113172255.3772dd6a@fedora.home>
-In-Reply-To: <Z4TbR93B-X8A8iHe@shell.armlinux.org.uk>
-References: <Z4TbR93B-X8A8iHe@shell.armlinux.org.uk>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=pl+wZ2x+ZdqTG0lEglmVegKw0Hhj58CtH64CcDGmvHU=;
+	b=goFtUNsyFKOML04zHS6B/aG6lQPGVAgvkHREkRd2ONO2kArsAR7tInmmevzqhWY7ZgLB0p
+	qj2BwfUGVQtBR2KQBzOMycMYLcIVBaKzWuFp0SRU4pNkNUo3I2Fuefx9NpdXGEL+H6AWu3
+	TK6FoJ+cChKKcMoOIWi3B7rC1oB5+S4=
+From: Sean Anderson <sean.anderson@linux.dev>
+To: Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
+	Shannon Nelson <shannon.nelson@amd.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org
+Cc: linux-arm-kernel@lists.infradead.org,
+	Simon Horman <horms@kernel.org>,
+	Michal Simek <michal.simek@amd.com>,
+	linux-kernel@vger.kernel.org,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Sean Anderson <sean.anderson@linux.dev>
+Subject: [PATCH net v5] net: xilinx: axienet: Fix IRQ coalescing packet count overflow
+Date: Mon, 13 Jan 2025 11:30:00 -0500
+Message-Id: <20250113163001.2335235-1-sean.anderson@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-GND-Sasl: maxime.chevallier@bootlin.com
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-Hello Russell,
+If coalesce_count is greater than 255 it will not fit in the register and
+will overflow. This can be reproduced by running
 
-On Mon, 13 Jan 2025 09:22:15 +0000
-"Russell King (Oracle)" <linux@armlinux.org.uk> wrote:
+    # ethtool -C ethX rx-frames 256
 
-> Hi,
-> 
-> Eric Woudstra reported that a PCS attached using 2500base-X does not
-> see link when phylink is using in-band mode, but autoneg is disabled,
-> despite there being a valid 2500base-X signal being received. We have
-> these settings:
-> 
-> 	act_link_an_mode = MLO_AN_INBAND
-> 	pcs_neg_mode = PHYLINK_PCS_NEG_INBAND_DISABLED
-> 
-> Eric diagnosed it to phylink_decode_c37_word() setting state->link
-> false because the full-duplex bit isn't set in the non-existent link
-> partner advertisement word (which doesn't exist because in-band
-> autoneg is disabled!)
-> 
-> The test in phylink_mii_c22_pcs_decode_state() is supposed to catch
-> this state, but since we converted PCS to use neg_mode, testing the
-> Autoneg in the local advertisement is no longer sufficient - we need
-> to be looking at the neg_mode, which currently isn't provided.
-> 
-> We need to provide this via the .pcs_get_state() method, and this
-> will require modifying all PCS implementations to add the extra
-> argument to this method.
-> 
-> Patch 1 uses the PCS neg_mode in phylink_mac_pcs_get_state() to correct
-> the now obsolute usage of the Autoneg bit in the advertisement.
-> 
-> Patch 2 passes neg_mode into the .pcs_get_state() method, and updates
-> all users.
-> 
-> Patch 3 adds neg_mode as an argument to the various clause 22 state
-> decoder functions in phylink, modifying drivers to pass the neg_mode
-> through.
-> 
-> Patch 4 makes use of phylink_mii_c22_pcs_decode_state() rather than
-> using the Autoneg bit in the advertising field.
-> 
-> Patch 5 may be required for Eric's case - it ensures that we report
-> the correct state for interface types that we support only one set
-> of modes for when autoneg is disabled.
-> 
-> Changes in v2:
-> - Add test for NULL pcs in patch 1
-> 
-> I haven't added Eric's t-b because I used a different fix in patch 1.
+which will result in a timeout of 0us instead. Fix this by checking for
+invalid values and reporting an error.
 
-I stumbled on that issue last friday as well, with a MCBin and a
-device I'm working on, using 1000BaseX with autoneg disabled. I didn't
-get time to investigate back then, but reading this series it was
-definitely that exact problem I was facing.
+Fixes: 8a3b7a252dca ("drivers/net/ethernet/xilinx: added Xilinx AXI Ethernet driver")
+Signed-off-by: Sean Anderson <sean.anderson@linux.dev>
+Reviewed-by: Shannon Nelson <shannon.nelson@amd.com>
+---
 
-I missed your V1 and I just tested that V2, the problem is gone :)
-Thanks !
+Changes in v5:
+- Fix typo in commit message
 
-The code LGTM to the best of my knowledge, so
+Changes in v4:
+- Fix checking rx twice instead of rx and tx
 
-Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Tested-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Changes in v3:
+- Validate and reject instead of silently clamping
 
-Thanks,
+Changes in v2:
+- Use FIELD_MAX to extract the max value from the mask
+- Expand the commit message with an example on how to reproduce this
+  issue
 
-Maxime
+ drivers/net/ethernet/xilinx/xilinx_axienet_main.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
+index 0f4b02fe6f85..ae743991117c 100644
+--- a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
++++ b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
+@@ -2056,6 +2056,12 @@ axienet_ethtools_set_coalesce(struct net_device *ndev,
+ 		return -EBUSY;
+ 	}
+ 
++	if (ecoalesce->rx_max_coalesced_frames > 255 ||
++	    ecoalesce->tx_max_coalesced_frames > 255) {
++		NL_SET_ERR_MSG(extack, "frames must be less than 256");
++		return -EINVAL;
++	}
++
+ 	if (ecoalesce->rx_max_coalesced_frames)
+ 		lp->coalesce_count_rx = ecoalesce->rx_max_coalesced_frames;
+ 	if (ecoalesce->rx_coalesce_usecs)
+-- 
+2.35.1.1320.gc452695387.dirty
+
 
