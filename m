@@ -1,127 +1,87 @@
-Return-Path: <netdev+bounces-157839-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157840-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A86FA0BFD4
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 19:32:17 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A2971A0BFDA
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 19:33:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 97553168AB5
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 18:32:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B9A2B1888C11
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 18:33:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25EDE1C07C9;
-	Mon, 13 Jan 2025 18:32:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E80E1C54A7;
+	Mon, 13 Jan 2025 18:33:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="E45S/juY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i62wOox8"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7F0A1865E5;
-	Mon, 13 Jan 2025 18:32:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39D921C5496
+	for <netdev@vger.kernel.org>; Mon, 13 Jan 2025 18:33:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736793132; cv=none; b=mNTMMOL3E3THEUxqjfObh3ORAIP/vJq7mSacDZ1ONkU3H5kcseZES9heeBisz8CsdCjEchBQntN8Eb4wdDs7NoDnQoJgBhejZ0afwNaim5LeGzNWd+OQu0qgXelPIymWu0k5MSZov7MtMbIM0qDhpgLNubMoHAVD7v9KevpRnfc=
+	t=1736793188; cv=none; b=SnzCQPIeD7sNi8yxaH4B5xcf8DetAlrZIfjd5+P23ptqb11pMcZtaA7WFceF6NrwPpidM78JSBHsuZvTemBpZBm44owHMRz7pqkDOePHNG6yL15IWwFBhmrUqLARp5MRm1wHn1LoYMltE7IzHaS7s1YTvyhBvj3Oyft6qmORDos=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736793132; c=relaxed/simple;
-	bh=ChatsE/2ZwoToNESr2wfZSXK7J1h+JSx79alnmHkTEA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MUsUluFnw5DDJv19/sPhV0uxVXBfN4EB1VsQLXSSutA80JsATIhlne2Xug6OAipz4WXP1byue5T+N4MYrzjhnb33Qp/9p0pIoAEdEqxKhLMpvKo2l2zIjdHHTgUWCXE+zd8Z20ayq1dqpL/YYv6r6oAjkIUfDrCPC0H3dCQKnec=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=E45S/juY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DBA22C4CED6;
-	Mon, 13 Jan 2025 18:32:08 +0000 (UTC)
+	s=arc-20240116; t=1736793188; c=relaxed/simple;
+	bh=ftuGto6o0TyZO6bCqv7JLGst0izHcOC60PbCmGiNDYM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=GaOq6sBM8kNllVFWPt8QrB89s+BSb8PWtHzFHezTBExFm3YEhPykgDEOsdSOb4p+X+YK08H3FtkVh0/NzulaEYrp/cGtaq6+JTglJIksjnR37AsscrpAj7RFoj5vKy6ycYYCjdVHGO5EY93rQ248q6wUIcFjmWHlkSpPlXX2pow=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i62wOox8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 536F5C4CED6;
+	Mon, 13 Jan 2025 18:33:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736793131;
-	bh=ChatsE/2ZwoToNESr2wfZSXK7J1h+JSx79alnmHkTEA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=E45S/juYtSzPs6KuAbowE5vvW5IMM44ewkoQDCk4T+EG9Gy9nzL/iJMZdsjaBWG2V
-	 pJu1+oOG+Kvw08ZSDDzpcL/DxGZv0E89O7EXR9qOC7T6oJpSzAfXRpoaPngqG5X4aP
-	 lbC1CmEz+s6cYt0sJK7E/+Gr+/qj5nhkzdcjDQbOKkaZrOJrRJuohhu/mCk6HGwuEW
-	 hF3WKnQfg757d/5KV62NkqZal3lhKdf+PgWwbPh737zRa7HyC/UXyepz2bEs5HwWRY
-	 rW8wqfvc+VHywt7G8RGBZZgyI8K/jFgwZ6Xmy1Mf5xKVUz/Q0obMUyEdPoQ/4y1T3n
-	 wg04yEdcaQLGQ==
-Date: Mon, 13 Jan 2025 18:32:06 +0000
-From: Conor Dooley <conor@kernel.org>
-To: Catalin Popescu <catalin.popescu@leica-geosystems.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, robh@kernel.org,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org,
-	m.felsch@pengutronix.de, bsp-development.geo@leica-geosystems.com
-Subject: Re: [PATCH net-next 1/2] dt-bindings: net: rfkill-gpio: enable
- booting in blocked state
-Message-ID: <20250113-skater-surrogate-4c72df770dbf@spud>
-References: <20250110081902.1846296-1-catalin.popescu@leica-geosystems.com>
+	s=k20201202; t=1736793187;
+	bh=ftuGto6o0TyZO6bCqv7JLGst0izHcOC60PbCmGiNDYM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=i62wOox8MniqsjtQT9Hq6aGo5XuV8xP9s5ba2+LMgJHKnSvPA3hRONomqBADIKvIO
+	 ydYt8aMMyV9fIvD6W0lE53JFfltBL+RwyBfod5AKvWaWkjLJOJ40zyFuLLAh8eWanS
+	 31u2dQ/OfOP8t5Ywb3Lfor8ip2k2xGUo5EeQcdeKcIPpggCUqBrrdN3Xn0iGTQTnIo
+	 HsPaX1f4KPZ3ZnO3C6rw0ovlrKtrOwqHhkXYE9SH+aOGGNI16g2xeM1f9wgrBplFzH
+	 3Mzsahxc0NjTYpKsFk/ykn5JfwSYFwZPJsnqC1VBPk3bGS+bfXAs1y/dwYRFfp2zTq
+	 RoVV+qtMkmAMA==
+Date: Mon, 13 Jan 2025 10:33:06 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jacob Keller <jacob.e.keller@intel.com>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>, <davem@davemloft.net>,
+ <pabeni@redhat.com>, <edumazet@google.com>, <andrew+netdev@lunn.ch>,
+ <netdev@vger.kernel.org>, <anton.nadezhdin@intel.com>,
+ <przemyslaw.kitszel@intel.com>, <milena.olech@intel.com>,
+ <arkadiusz.kubalewski@intel.com>, <richardcochran@gmail.com>, "Karol
+ Kolacinski" <karol.kolacinski@intel.com>, Rinitha S <sx.rinitha@intel.com>
+Subject: Re: [PATCH net-next 08/13] ice: use rd32_poll_timeout_atomic in
+ ice_read_phy_tstamp_ll_e810
+Message-ID: <20250113103306.5b4f8f86@kernel.org>
+In-Reply-To: <a0b535bd-3569-4d36-9752-ec8dcdc23aaf@intel.com>
+References: <20250108221753.2055987-1-anthony.l.nguyen@intel.com>
+	<20250108221753.2055987-9-anthony.l.nguyen@intel.com>
+	<20250109182148.398f1cf1@kernel.org>
+	<55655440-71b4-49e0-9fc8-d8b1b4f77ab4@intel.com>
+	<20250110172536.7165c528@kernel.org>
+	<a0b535bd-3569-4d36-9752-ec8dcdc23aaf@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="Dt87A4u3Gm4vB2U0"
-Content-Disposition: inline
-In-Reply-To: <20250110081902.1846296-1-catalin.popescu@leica-geosystems.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
+On Mon, 13 Jan 2025 10:18:05 -0800 Jacob Keller wrote:
+> > Ack, and short hands make sense. But both rd32_poll_timeout_atomic and
+> > the exiting rd32_poll_timeout have a single user.  
+> 
+> The intention with introducing these is to help make it easier for other
+> developers to use poll_timeout and friends throughout the driver.
+> There's only one user now, but my intention had been that we'd see more
+> as it becomes more known and is easier to use.
 
---Dt87A4u3Gm4vB2U0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+IMHO the ease of use gain is equal to the loss of generality (driver
+local flavor of a common function will make contributing outside the
+driver harder).
 
-On Fri, Jan 10, 2025 at 09:19:01AM +0100, Catalin Popescu wrote:
-> By default, rfkill state is set to unblocked. Sometimes, we want to boot
-> in blocked state and let the application unblock the rfkill.
->=20
-> Signed-off-by: Catalin Popescu <catalin.popescu@leica-geosystems.com>
-> ---
->  Documentation/devicetree/bindings/net/rfkill-gpio.yaml | 5 +++++
->  1 file changed, 5 insertions(+)
->=20
-> diff --git a/Documentation/devicetree/bindings/net/rfkill-gpio.yaml b/Doc=
-umentation/devicetree/bindings/net/rfkill-gpio.yaml
-> index 9630c8466fac..22f26f1a3856 100644
-> --- a/Documentation/devicetree/bindings/net/rfkill-gpio.yaml
-> +++ b/Documentation/devicetree/bindings/net/rfkill-gpio.yaml
-> @@ -32,6 +32,10 @@ properties:
->    shutdown-gpios:
->      maxItems: 1
-> =20
-> +  default-blocked:
-> +    description: configure rfkill state as blocked at boot
-> +    type: boolean
-
-type here should be flag, not boolean.
-
-> +
->  required:
->    - compatible
->    - radio-type
-> @@ -48,4 +52,5 @@ examples:
->          label =3D "rfkill-pcie-wlan";
->          radio-type =3D "wlan";
->          shutdown-gpios =3D <&gpio2 25 GPIO_ACTIVE_HIGH>;
-> +        default-blocked;
->      };
->=20
-> base-commit: 25cc469d6d344f5772e9fb6a5cf9d82a690afe68
-> prerequisite-patch-id: 0000000000000000000000000000000000000000
-> --=20
-> 2.34.1
->=20
->=20
-
---Dt87A4u3Gm4vB2U0
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZ4VcJgAKCRB4tDGHoIJi
-0rF3AQCM/r9pxHi+so72DkY+Xwx5EGfUKpRnJ7wVsCHV1iYzzwEA+m9whbZwaGtp
-wE3gnhkwa6VfYNEMn9om0jw4Y93S2Aw=
-=uxlE
------END PGP SIGNATURE-----
-
---Dt87A4u3Gm4vB2U0--
+To be clear it's not a blocker, I'm only complaining because there was
+a bug in the other patch.
 
