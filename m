@@ -1,191 +1,197 @@
-Return-Path: <netdev+bounces-157711-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157712-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D56B7A0B5AA
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 12:30:03 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE8C1A0B5B6
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 12:30:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C99441883723
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 11:30:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8F8963AA017
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 11:30:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BB6122F175;
-	Mon, 13 Jan 2025 11:26:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F04B2343A1;
+	Mon, 13 Jan 2025 11:28:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GxieR594"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="qpeMCG+P";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="Zl7iOry9";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="qpeMCG+P";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="Zl7iOry9"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4535122A4DF;
-	Mon, 13 Jan 2025 11:26:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57EF522F168;
+	Mon, 13 Jan 2025 11:28:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736767570; cv=none; b=V/4g66WVRKxduCJgDhr0bJme3i3r3vnPtvzFonUkXax9cSRZTTmY/1eKJepwhrVURn4UVNyqhK+IcrX0vbkCywGJ3jE/KbyGtYZ/eEBByXHfOHymr46/FVRbBZ5MsAvWNVZTBDuZF+bP0yF5eCHBF3KJ0ZjsoI89fmK6K9fTpdg=
+	t=1736767702; cv=none; b=Whn1gcjbNKar7+s5WYfwnZ9rfbmx2w9ASKZs3dpNQKF9wKHK3zmiZgP99ThCn4CLOD2gq08lVu/FEPOOIt+4J4b871pgyclVg+L1ZubYiB/vS1jXu+hFjgj7Wvq0RaOEkp2lh7+yakDemH8LuHCbk6RnEuWQVWE2om+Qn1Rguyk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736767570; c=relaxed/simple;
-	bh=XcLozn4zX9P4PK+jgJPOpEix1IEYh5jHwJQNST5Qp5U=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BmzTzpNgAwQO6MCP6i69JqIevlWY28HfZTSQAKd1mTdbOUBuV0P4MB7rn7eGS31nRhgIYSUqqxaUlZstvyTtrGgjUb9rqZ+IPGegQUgW4qvzMeCcOjUdXuTks63sWDBIlnPMeHNJEMPC3fbQJaVDW70UeBgbHx/26qWcj7S3nkw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GxieR594; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 94A87C4CED6;
-	Mon, 13 Jan 2025 11:26:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736767568;
-	bh=XcLozn4zX9P4PK+jgJPOpEix1IEYh5jHwJQNST5Qp5U=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=GxieR594U5Pc8sXylVWalAObd8c+jbAoRK5gbMR2gsLe7CV6WpQv9+d/16k+5gj0C
-	 M3dbGszsAfYn2iWtPA0CFWKJILeJV5hQiopJnFRy6fHKpDKpZg0SjWcEfvrgVcwD4c
-	 BA5NN9Ff1VIeo9thjlkM5C9CGBTv32MMlbBmtMi/YNKJCMfOrZvz+F5KK9fCJpMKV5
-	 6wO3lnR7rJrBHXxnhUNGLRN8pwEevkQWXAwwrewj+q6Lh4pQ+oGkuM1i/OYeBLSS7j
-	 1ouAmqiA8dfq6MOu3XSHkuQf8CDdKA+3RVqqXXIt5C3IWUjs3oNfcMnQXXGtd3jyDQ
-	 uZLZXiIxBpd7Q==
-Message-ID: <0d2ebb1c-be69-45ca-8a66-4e4a8ca59513@kernel.org>
-Date: Mon, 13 Jan 2025 12:26:00 +0100
+	s=arc-20240116; t=1736767702; c=relaxed/simple;
+	bh=R3SAXDUv9oT3MyZPXevWumvmiS39zz0xqnqnQlUcCF4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=JcYxhGHQmseJK8JILcnh8qKCRR2+cPK9JcxhdTSqYzANkvPcd8LRfdwIbkBCAojhLbA2rZ6YOPw0SBvSIhxv5wBmF/iLsa/YWOh2zEIdpVAXZY6hMeD+k/xrLgUW3OcjQiWroYuuHUV5cX3/TLzsdkCBjg5jJSktaKDe9qF4beY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=qpeMCG+P; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=Zl7iOry9; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=qpeMCG+P; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=Zl7iOry9; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 8E4C11F37C;
+	Mon, 13 Jan 2025 11:28:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1736767699; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=7JB8L3khgZ7943Mv0Y6c8ojhdJ/p5YtisxZKCWLf9ro=;
+	b=qpeMCG+PHU/jvSYNB+2rqeHd7e3xz9gpkEAoHTOu0XVS4vIAvDMevhBeuUmL/vzrslx8Wf
+	nLV3YZqwnbLqmkGanR2Q7ogT4pQVnPY3ktskequfYzA+O3svdcsf88z0c2zXDvKkm7SCTT
+	nCb6R2m67lPbjkR8q8y8fkLroBUBOcw=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1736767699;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=7JB8L3khgZ7943Mv0Y6c8ojhdJ/p5YtisxZKCWLf9ro=;
+	b=Zl7iOry9gLRfksbxyLQW8mt7eFMEWu501X+DebCe8PbP9q4b6/TzVEJhW/h1A26/Hq/bJ1
+	62g+eQERkBi/tJCQ==
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=qpeMCG+P;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=Zl7iOry9
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1736767699; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=7JB8L3khgZ7943Mv0Y6c8ojhdJ/p5YtisxZKCWLf9ro=;
+	b=qpeMCG+PHU/jvSYNB+2rqeHd7e3xz9gpkEAoHTOu0XVS4vIAvDMevhBeuUmL/vzrslx8Wf
+	nLV3YZqwnbLqmkGanR2Q7ogT4pQVnPY3ktskequfYzA+O3svdcsf88z0c2zXDvKkm7SCTT
+	nCb6R2m67lPbjkR8q8y8fkLroBUBOcw=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1736767699;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=7JB8L3khgZ7943Mv0Y6c8ojhdJ/p5YtisxZKCWLf9ro=;
+	b=Zl7iOry9gLRfksbxyLQW8mt7eFMEWu501X+DebCe8PbP9q4b6/TzVEJhW/h1A26/Hq/bJ1
+	62g+eQERkBi/tJCQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 656D213310;
+	Mon, 13 Jan 2025 11:28:19 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id f6a9F9P4hGchfQAAD6G6ig
+	(envelope-from <tbogendoerfer@suse.de>); Mon, 13 Jan 2025 11:28:19 +0000
+Date: Mon, 13 Jan 2025 12:28:18 +0100
+From: Thomas Bogendoerfer <tbogendoerfer@suse.de>
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+ <horms@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] gro_cells: Avoid packet re-ordering for cloned skbs
+Message-ID: <20250113122818.2e6292a9@samweis>
+In-Reply-To: <CANn89iKY1x11hHgQDsVtTYe6L_FtN4SKpzFhPk-8fYPp5Wp4ng@mail.gmail.com>
+References: <20250109142724.29228-1-tbogendoerfer@suse.de>
+	<CANn89iKY1x11hHgQDsVtTYe6L_FtN4SKpzFhPk-8fYPp5Wp4ng@mail.gmail.com>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.34; x86_64-suse-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/3] net: stmmac: qcom-ethqos: Enable RX programmable swap
- on qcs615
-To: Yijie Yang <quic_yijiyang@quicinc.com>, Vinod Koul <vkoul@kernel.org>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, Bjorn Andersson <andersson@kernel.org>,
- Konrad Dybcio <konradybcio@kernel.org>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Jose Abreu <joabreu@synopsys.com>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>
-Cc: netdev@vger.kernel.org, linux-arm-msm@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org
-References: <20241225-support_10m100m-v1-0-4b52ef48b488@quicinc.com>
- <20241225-support_10m100m-v1-2-4b52ef48b488@quicinc.com>
- <4b4ef1c1-a20b-4b65-ad37-b9aabe074ae1@kernel.org>
- <278de6e8-de8f-458a-a4b9-92b3eb81fa77@quicinc.com>
- <df1e2fbd-7fae-4910-9908-10fdb78e4299@kernel.org>
- <e2625cfd-128c-4b56-a1c5-c0256db5c486@quicinc.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 fv0=
-In-Reply-To: <e2625cfd-128c-4b56-a1c5-c0256db5c486@quicinc.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
+X-Rspamd-Queue-Id: 8E4C11F37C
+X-Spam-Score: -4.01
+X-Rspamd-Action: no action
+X-Spamd-Result: default: False [-4.01 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_RHS_NOT_FQDN(0.50)[];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	RCVD_TLS_ALL(0.00)[];
+	ASN(0.00)[asn:25478, ipnet:::/0, country:RU];
+	ARC_NA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	RCVD_COUNT_TWO(0.00)[2];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email,suse.de:dkim,imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	DKIM_TRACE(0.00)[suse.de:+]
+X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
+X-Spam-Flag: NO
+X-Spam-Level: 
 
-On 08/01/2025 11:33, Yijie Yang wrote:
-> 
-> 
-> On 2024-12-27 15:03, Krzysztof Kozlowski wrote:
->> On 26/12/2024 03:29, Yijie Yang wrote:
->>>
->>>
->>> On 2024-12-25 19:37, Krzysztof Kozlowski wrote:
->>>> On 25/12/2024 11:04, Yijie Yang wrote:
->>>>
->>>>>    static int qcom_ethqos_probe(struct platform_device *pdev)
->>>>>    {
->>>>> -	struct device_node *np = pdev->dev.of_node;
->>>>> +	struct device_node *np = pdev->dev.of_node, *root;
->>>>>    	const struct ethqos_emac_driver_data *data;
->>>>>    	struct plat_stmmacenet_data *plat_dat;
->>>>>    	struct stmmac_resources stmmac_res;
->>>>> @@ -810,6 +805,15 @@ static int qcom_ethqos_probe(struct platform_device *pdev)
->>>>>    	ret = of_get_phy_mode(np, &ethqos->phy_mode);
->>>>>    	if (ret)
->>>>>    		return dev_err_probe(dev, ret, "Failed to get phy mode\n");
->>>>> +
->>>>> +	root = of_find_node_by_path("/");
->>>>> +	if (root && of_device_is_compatible(root, "qcom,sa8540p-ride"))
->>>>
->>>>
->>>> Nope, your drivers are not supposed to poke root compatibles. Drop and
->>>> fix your driver to behave correctly for all existing devices.
->>>>
->>>
->>> Since this change introduces a new flag in the DTS, we must maintain ABI
->>> compatibility with the kernel. The new flag is specific to the board, so
->>
->> It's not, I don't see it specific to the board in the bindings.
-> 
-> I'm sorry for the confusion. This feature is not board-specific but 
-> rather a tunable option. All RGMII boards can choose whether to enable 
-> this bit in the DTS, so there are no restrictions in the binding.
+On Thu, 9 Jan 2025 15:56:24 +0100
+Eric Dumazet <edumazet@google.com> wrote:
 
-If it is not specific to the board, I don't see why this cannot be
-implied by compatible.
+> On Thu, Jan 9, 2025 at 3:27=E2=80=AFPM Thomas Bogendoerfer
+> <tbogendoerfer@suse.de> wrote:
+> >
+> > gro_cells_receive() passes a cloned skb directly up the stack and
+> > could cause re-ordering against segments still in GRO. To avoid
+> > this copy the skb and let GRO do it's work.
+> >
+> > Fixes: c9e6bc644e55 ("net: add gro_cells infrastructure")
+> > Signed-off-by: Thomas Bogendoerfer <tbogendoerfer@suse.de>
+> > ---
+> >  net/core/gro_cells.c | 11 ++++++++++-
+> >  1 file changed, 10 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/net/core/gro_cells.c b/net/core/gro_cells.c
+> > index ff8e5b64bf6b..2f8d688f9d82 100644
+> > --- a/net/core/gro_cells.c
+> > +++ b/net/core/gro_cells.c
+> > @@ -20,11 +20,20 @@ int gro_cells_receive(struct gro_cells *gcells, str=
+uct sk_buff *skb)
+> >         if (unlikely(!(dev->flags & IFF_UP)))
+> >                 goto drop;
+> >
+> > -       if (!gcells->cells || skb_cloned(skb) || netif_elide_gro(dev)) {
+> > +       if (!gcells->cells || netif_elide_gro(dev)) {
+> > +netif_rx:
+> >                 res =3D netif_rx(skb);
+> >                 goto unlock;
+> >         }
+> > +       if (skb_cloned(skb)) {
+> > +               struct sk_buff *n;
+> >
+> > +               n =3D skb_copy(skb, GFP_KERNEL); =20
+>=20
+> I do not think we want this skb_copy(). This is going to fail too often.
 
-> 
->>
->>> I need to ensure root nodes are matched to allow older boards to
->>> continue functioning as before. I'm happy to adopt that approach if
->>> there are any more elegant solutions.
->>
->> I don't think you understood the problem. Why you are not handling this
->> for my board, sa8775p-rideX and sa8225-pre-ride-yellow-shrimp?
->>
-> 
-> This feature is specifically for RGMII boards. The driver won't enable 
+ok
 
-So board specific?
+> Can you remind us why we have this skb_cloned() check here ?
 
-> this bit if the DTS doesn't specify it. To handle compatibility, we need 
+some fields of the ip/tcp header are going to be changed in the first gro
+segment
 
-Do not describe us how drivers and DTS work. We all know.
-
-> to identify legacy RGMII boards with MAC versions greater or equal to 3 
-> which require this bit to be enabled.
-> According to my knowledge, the SA8775P is of the SGMII type.
+Thomas.
 
 
-Best regards,
-Krzysztof
+--=20
+SUSE Software Solutions Germany GmbH
+HRB 36809 (AG N=C3=BCrnberg)
+Gesch=C3=A4ftsf=C3=BChrer: Ivo Totev, Andrew McDonald, Werner Knoblich
 
