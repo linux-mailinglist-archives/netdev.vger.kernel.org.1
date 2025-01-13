@@ -1,101 +1,177 @@
-Return-Path: <netdev+bounces-157609-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157610-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51BFEA0AF87
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 08:00:14 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 32BAFA0AF94
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 08:03:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6A1D51886FE5
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 07:00:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 48D3016488B
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 07:03:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 613FD231C8E;
-	Mon, 13 Jan 2025 07:00:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 375231BD038;
+	Mon, 13 Jan 2025 07:03:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="h9oYIPNr"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga07-in.huawei.com (szxga07-in.huawei.com [45.249.212.35])
+Received: from smtpbguseast2.qq.com (smtpbguseast2.qq.com [54.204.34.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94F201BEF98;
-	Mon, 13 Jan 2025 07:00:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.35
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D647713AD0;
+	Mon, 13 Jan 2025 07:03:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.204.34.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736751609; cv=none; b=HOANHqwb/vFsjYQWzcpiFphiKjiKq3TMqPtKdFxw9lWIk5U7qAtaAXWCegFmvNazdjstqpGKBZIEODMUiYnBbfVAatPC+q+TBFl+TpDxUHPYpMiWZh0WsAs24BDo5XLbFHDlQRdnC3X7bbatqucip2Om+UxWKjcslc3Z4Ad3+j0=
+	t=1736751824; cv=none; b=FPPgo+qjzmIQwWRmZwTYxP4glHfbNHYb+N6xwW5FDaOJTdkFujXK2km3D1EczK7ak6dyPAqOiyTUqLWZxzMWm9ZGfbOvuIzNRkG6us2OSFA6TfB+BlxoUqv4MwzmiPBXG5Jm2X2vkR+UZasaUbGNmbM+O2BNGZ0bzDQGTrmfIgk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736751609; c=relaxed/simple;
-	bh=zyTJryMb4Pwvm7MW308t5mbQy9Y4vwlSaVb3uyc6/oI=;
-	h=Subject:To:References:CC:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=CvoLbbVEJpWoRJ0V/cz3m3BhWo+PX7ww7xZifDQWFwVBf+heIJaUickKNTGiD2Hvw+6G2rd3IPM7Xj+axTixzmhNH42T7c3fOf9oDe4ctZsblJ93gj0XixS2GhR1HjeBE/glyFLPj4BRbc1a70j6eFxs9jVFxkujDkx5lpJYI60=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.35
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.162.112])
-	by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4YWjjS0n7Wz1V4Mt;
-	Mon, 13 Jan 2025 14:56:44 +0800 (CST)
-Received: from kwepemh100016.china.huawei.com (unknown [7.202.181.102])
-	by mail.maildlp.com (Postfix) with ESMTPS id 3A6E41402E0;
-	Mon, 13 Jan 2025 14:59:52 +0800 (CST)
-Received: from [10.174.179.93] (10.174.179.93) by
- kwepemh100016.china.huawei.com (7.202.181.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Mon, 13 Jan 2025 14:59:48 +0800
-Subject: Re: [PATCH v5 -next 16/16] sysctl: remove unneeded include
-To: Kalesh Anakkur Purayil <kalesh-anakkur.purayil@broadcom.com>
-References: <20250111070751.2588654-1-yukaixiong@huawei.com>
- <20250111070751.2588654-17-yukaixiong@huawei.com>
- <CAH-L+nMzferXh=P0brckqWGLo06Rg+XG-3ToLZqA5TBObRZimQ@mail.gmail.com>
-CC: <akpm@linux-foundation.org>, <mcgrof@kernel.org>,
-	<joel.granados@kernel.org>, <ysato@users.sourceforge.jp>, <dalias@libc.org>,
-	<glaubitz@physik.fu-berlin.de>, <luto@kernel.org>, <tglx@linutronix.de>,
-	<mingo@redhat.com>, <bp@alien8.de>, <dave.hansen@linux.intel.com>,
-	<hpa@zytor.com>, <viro@zeniv.linux.org.uk>, <brauner@kernel.org>,
-	<jack@suse.cz>, <kees@kernel.org>, <j.granados@samsung.com>,
-	<willy@infradead.org>, <Liam.Howlett@oracle.com>, <vbabka@suse.cz>,
-	<lorenzo.stoakes@oracle.com>, <trondmy@kernel.org>, <anna@kernel.org>,
-	<chuck.lever@oracle.com>, <jlayton@kernel.org>, <neilb@suse.de>,
-	<okorniev@redhat.com>, <Dai.Ngo@oracle.com>, <tom@talpey.com>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <paul@paul-moore.com>, <jmorris@namei.org>,
-	<linux-sh@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-fsdevel@vger.kernel.org>, <linux-mm@kvack.org>,
-	<linux-nfs@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<linux-security-module@vger.kernel.org>, <dhowells@redhat.com>,
-	<haifeng.xu@shopee.com>, <baolin.wang@linux.alibaba.com>,
-	<shikemeng@huaweicloud.com>, <dchinner@redhat.com>, <bfoster@redhat.com>,
-	<souravpanda@google.com>, <hannes@cmpxchg.org>, <rientjes@google.com>,
-	<pasha.tatashin@soleen.com>, <david@redhat.com>, <ryan.roberts@arm.com>,
-	<ying.huang@intel.com>, <yang@os.amperecomputing.com>,
-	<zev@bewilderbeest.net>, <serge@hallyn.com>, <vegard.nossum@oracle.com>,
-	<wangkefeng.wang@huawei.com>
-From: yukaixiong <yukaixiong@huawei.com>
-Message-ID: <d6875a12-d5d8-2040-1653-c2d927e17273@huawei.com>
-Date: Mon, 13 Jan 2025 14:59:47 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
- Thunderbird/45.7.1
+	s=arc-20240116; t=1736751824; c=relaxed/simple;
+	bh=vpUAIzxZENNDv58atj4xHgNfohrgiFakzpLmpvVC2AM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Eb7raI42QPtlbBnqCsY73aIQlJfDP8p5UW9Etf9nZcIc/1wRR0kBzcuC1aqJ+krR+T+LxdhZbawwn6HLzGouAakybSIsRh3sR3wTJAw0CXsqzGm7azGECf3rKJ6WngzAWbE3Izuj3kWNZx20LoR5vbTEGjasJsFWmmeiTWbbs64=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=h9oYIPNr; arc=none smtp.client-ip=54.204.34.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
+	s=onoh2408; t=1736751781;
+	bh=NqfFf4fv96alvmAhC70OVRBAMo6UG+0b5So5mFEFih0=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version;
+	b=h9oYIPNr8VTOIaZg0lQ6jY/J0s5u2uloGOtLNe2Sks6gJPYa/yZwP5ELxhx4/VffW
+	 t8uq+T8+DiERceRd0ZEL7mxe5VUk9Oa/gAHVzyLKAKFYecADuuhO99lPCAT5amG6L3
+	 S6zLVw8XpTRNjZ33jX5tZE1lSz8W6lm/4qtSCVOE=
+X-QQ-mid: bizesmtpip3t1736751767tk1inzv
+X-QQ-Originating-IP: LJtxmZbB0DRaJHg91pmdGdfDROe6I8rMwyDT1D/Zhos=
+Received: from localhost.localdomain ( [localhost])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Mon, 13 Jan 2025 15:02:44 +0800 (CST)
+X-QQ-SSF: 0002000000000000000000000000000
+X-QQ-GoodBg: 1
+X-BIZMAIL-ID: 12665532747322616285
+From: WangYuli <wangyuli@uniontech.com>
+To: nbd@nbd.name,
+	lorenzo@kernel.org,
+	ryder.lee@mediatek.com,
+	shayne.chen@mediatek.com,
+	sean.wang@mediatek.com,
+	kvalo@kernel.org,
+	matthias.bgg@gmail.com,
+	angelogioacchino.delregno@collabora.com,
+	deren.wu@mediatek.com,
+	mingyen.hsieh@mediatek.com,
+	chui-hao.chiu@mediatek.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: linux-wireless@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org,
+	netdev@vger.kernel.org,
+	raoxu@uniontech.com,
+	guanwentao@uniontech.com,
+	chenlinxuan@uniontech.com,
+	zhanjun@uniontech.com,
+	cug_yangyuancong@hotmail.com,
+	lorenzo.bianconi@redhat.com,
+	kvalo@codeaurora.org,
+	aleksander.lobakin@intel.com,
+	michal.pecio@gmail.com,
+	dzm91@hust.edu.cn,
+	jiefeng_li@hust.edu.cn,
+	wangyuli@uniontech.com
+Subject: [PATCH v3] wifi: mt76: mt76u_vendor_request: Do not print error messages when -EPROTO
+Date: Mon, 13 Jan 2025 15:02:41 +0800
+Message-ID: <9DD7DE7AAB497CB7+20250113070241.63590-1-wangyuli@uniontech.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CAH-L+nMzferXh=P0brckqWGLo06Rg+XG-3ToLZqA5TBObRZimQ@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggpeml100002.china.huawei.com (7.185.36.130) To
- kwepemh100016.china.huawei.com (7.202.181.102)
+X-QQ-SENDSIZE: 520
+Feedback-ID: bizesmtpip:uniontech.com:qybglogicsvrgz:qybglogicsvrgz8a-1
+X-QQ-XMAILINFO: MkkqBHH+kTJApwBfI5ai0tNbU/b+Bo4APgoiwSBXiUcXzTESdO8YSkPA
+	tHKYM1fzrLZJ/N64UdfTtbNk/hmICamhrOrNE/CeuMB3/ItB7pPKvq5MGXWFTqZy06xlN9Z
+	jb45Gry4ejYodSNCJOR6rhgeuaCZVtRlQNJJ0pz/bDW7GaYqMBESUbkbJt/kdhGpxlEqD8D
+	c4SqvkFsTOnXHESpCH8yl6YLSdR4pIxWT+qgEOsLzH4KfzvyoCVpcfk1tSNCEOTu7b7nNbv
+	tkVvb0FkvCaEljuLXwFtjH4cHRHFlCtdaRJB33LRq+7+kqkIKAlQlvD+kG/usNbV5AS3Axy
+	k+810IBRZJ4bJabZUVih4ooXpxV9fP1MYlGpYkHdFudTgLLJTv0mKAkKnG0uCDzj4MyS9Xw
+	Ipd/B26ZTLKqAROA1IE4eiRaY4h4JZBmZ00fWxuE370WWnIHFzSsQ1In6wQpNUuiZDvjSBg
+	oIy2/m2RzArg3ZeY7UaI8o5QSlhyIiIv4Elz9Xxje5CnRLnZDCjLionoAi/1AlE+qDT61ly
+	W4yABzQ/WDBr2cXgUS2OOXe1kzu/nOrTLXVbXDIKXxjg2M/CFaln9fxen2gYi5hVSddAWhk
+	ezIUiAQNQpmeBr/VL8c0fwUmGdUXtlfx8VyvQBjvF/MEr/58eulYKTbK6Z4UoXm3hlCPH6d
+	7Eq9Uz8lo7yeb72koKKvn2gPf3i1tOA2u7zxd0jWtUq9GA5DoExMaETpCW/I10oRCsyeQ43
+	Ogp2jrJ0HINFQke8A5M7oMfC2dRnTkki1j8VtsPIm3KcR4MbUw0PmMt6aqVQ7nZVWEcJIOw
+	99KWyfgnQsgzD4lIDMR+MTRskVwNtGrjL+P3H+ltm5cPsSg/FSh3P5VymrSJHVbXUgFj5ez
+	cUQ4308s0/RNcKA0uL9LgWKjhVRdj0UWpyexzWPmNlMhZxbn+jCfA/VUCkbSNs0UZe84/9t
+	ro4PsJ2fjaCmHEysiA75t97psg5wQy93Kb1N+Yvmi2Zhif2IQuWT/b5Hh0jHhX3PSNfeXrr
+	0qgZTBdDytKJw6BJe7
+X-QQ-XMRINFO: M/715EihBoGSf6IYSX1iLFg=
+X-QQ-RECHKSPAM: 0
 
+When initializing the network card, unplugging the device will
+trigger an -EPROTO error, resulting in a flood of error messages
+being printed frantically.
 
+The exception is printed as follows：
 
-On 2025/1/13 13:10, Kalesh Anakkur Purayil wrote:
-> On Sat, Jan 11, 2025 at 12:49 PM Kaixiong Yu <yukaixiong@huawei.com> wrote:
->> Removing unneeded mm includes in kernel/sysctl.c.
->>
->> Signed-off-by: Kaixiong Yu <yukaixiong@huawei.com>
->> Reviewed-by: Kees Cook <kees@kernel.org>
-> Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
->
-Thanks for your review!
+         mt76x2u 2-2.4:1.0: vendor request req:47 off:9018 failed:-71
+         mt76x2u 2-2.4:1.0: vendor request req:47 off:9018 failed:-71
+         ...
 
-Best ...
+It will continue to print more than 2000 times for about 5 minutes,
+causing the usb device to be unable to be disconnected. During this
+period, the usb port cannot recognize the new device because the old
+device has not disconnected.
+
+There may be other operating methods that cause -EPROTO, but -EPROTO is
+a low-level hardware error. It is unwise to repeat vendor requests
+expecting to read correct data. It is a better choice to treat -EPROTO
+and -ENODEV the same way.
+
+Similar to commit 9b0f100c1970 ("mt76: usb: process URBs with status
+EPROTO properly") do no schedule rx_worker for urb marked with status
+set  -EPROTO. I also reproduced this situation when plugging and
+unplugging the device, and this patch is effective.
+
+Just do not vendor request again for urb marked with status set -EPROTO.
+
+Link: https://lore.kernel.org/all/531681bd-30f5-4a70-a156-bf8754b8e072@intel.com/
+Link: https://lore.kernel.org/all/D4B9CC1FFC0CBAC3+20250105040607.154706-1-wangyuli@uniontech.com/
+Fixes: b40b15e1521f ("mt76: add usb support to mt76 layer")
+Co-developed-by: Xu Rao <raoxu@uniontech.com>
+Signed-off-by: Xu Rao <raoxu@uniontech.com>
+Signed-off-by: WangYuli <wangyuli@uniontech.com>
+---
+Changlog:
+ *v1 -> v2: Modify the commit title and message to provide a more
+comprehensive description of the changes made. Additionally, append
+a "Fixes" tag to accurately categorize the commit as a bug fix.
+  v2 -> v3: Add the changelog and fix a typo in the commit message.
+---
+ drivers/net/wireless/mediatek/mt76/usb.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/wireless/mediatek/mt76/usb.c b/drivers/net/wireless/mediatek/mt76/usb.c
+index 58ff06823389..f9e67b8c3b3c 100644
+--- a/drivers/net/wireless/mediatek/mt76/usb.c
++++ b/drivers/net/wireless/mediatek/mt76/usb.c
+@@ -33,9 +33,9 @@ int __mt76u_vendor_request(struct mt76_dev *dev, u8 req, u8 req_type,
+ 
+ 		ret = usb_control_msg(udev, pipe, req, req_type, val,
+ 				      offset, buf, len, MT_VEND_REQ_TOUT_MS);
+-		if (ret == -ENODEV)
++		if (ret == -ENODEV || ret == -EPROTO)
+ 			set_bit(MT76_REMOVED, &dev->phy.state);
+-		if (ret >= 0 || ret == -ENODEV)
++		if (ret >= 0 || ret == -ENODEV || ret == -EPROTO)
+ 			return ret;
+ 		usleep_range(5000, 10000);
+ 	}
+-- 
+2.47.1
 
 
