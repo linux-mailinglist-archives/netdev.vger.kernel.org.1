@@ -1,207 +1,144 @@
-Return-Path: <netdev+bounces-157784-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157785-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D210A0BB2E
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 16:08:17 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 509AAA0BB47
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 16:11:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DD10516AE0C
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 15:05:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A7EE11886AE3
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 15:08:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A1541FBBD8;
-	Mon, 13 Jan 2025 15:01:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FDEB246331;
+	Mon, 13 Jan 2025 15:03:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LzoGvqvW"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mwV0spQ7"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f54.google.com (mail-io1-f54.google.com [209.85.166.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88DDA1FBBD2
-	for <netdev@vger.kernel.org>; Mon, 13 Jan 2025 15:01:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B862D23D3CC
+	for <netdev@vger.kernel.org>; Mon, 13 Jan 2025 15:03:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736780498; cv=none; b=F/9hkarxAOrndU9uIg/LiVRHhupTL8Kqlhb5RibUn/mZQH+wffknffa0tCl96pyU3z0OobBZjYjB1ulR+VZfw+pyv0aPOVOnT5a+LCaGVcaqjYN+WT4x+Ds6jKZMcS7iACa+0l4ArwPK2GCisAboq0uuyywQ9+x1xYyEnONzsHw=
+	t=1736780594; cv=none; b=GZHdiWJ/I9Kc32SjwUgRqi2Jjo1rIJf3EtB6atlu/9uzmulisoLkwNDDHTlYyERkMYvIhfoMF1ngwTx/q/a63GvQYWETcjU2X5ewSIUmuG6xn/dIdkCugbxkXvdWTlyLzPP0RcwZKzbV9qtgQE/otoIEj8vpFSo0nM3PH3BH5tw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736780498; c=relaxed/simple;
-	bh=kRR1+QzVmvo3iRgs0Rx+6BPBHxGoHd17FoeRkxQMy60=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JI9/wMKouYDg/zOyZBOYnQv/4bY9IZpYA7pb0ND7krMyNvY/YlG4UPtDxKB77ovrf9QoKET0rqzUP5n7J2B/f3sCuXZquSCJb3EZLyOATsaOx9rRXZ8aWem178JpIZJ9YlgU6YtGVlgD91B1noSsM9EJsv54McEgnsSU2eVEq70=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LzoGvqvW; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1736780494;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=3yf80rtmCXKEEVXHQYDbWk5EecSmCyvTI8cS1zfM35E=;
-	b=LzoGvqvW82P0FiOIWJUZRkf7xjr0L3yCyYHBG4tsPgofIc3K6rsvSUsQM99K1bu8aLthcd
-	UGkxyjg1KOOKp7/TC6YnOTfG98QEIdG9BzZaUVZ1zgFubGq6UMoJ+Qvbdplm60+A/eOsu+
-	9OF5mvWUxkU1fdcmHwE+pIU1Vhj/IXk=
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
- [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-477-Za2mGRTXPiSONWdOOgODfQ-1; Mon, 13 Jan 2025 10:01:31 -0500
-X-MC-Unique: Za2mGRTXPiSONWdOOgODfQ-1
-X-Mimecast-MFC-AGG-ID: Za2mGRTXPiSONWdOOgODfQ
-Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-7b6e1b0373bso695324685a.2
-        for <netdev@vger.kernel.org>; Mon, 13 Jan 2025 07:01:31 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736780490; x=1737385290;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+	s=arc-20240116; t=1736780594; c=relaxed/simple;
+	bh=oR/7FlIj/E8fdQ4Zv56ZK8AJLDEtu+zE3mVa5RMvY3Q=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=mo6pN5LYenjLW7WubahXOLhDmiWG7POIjnb3o+tZt6IDLIuGXU0QgwPtCPCAaC8ITyxIHcZkXkGmeMBO6i1pYMztPPUG0DC4uIV0/omyxUazRJw9nMtfGfYZnTWer+dC3L+QEXIAYGHRrK/OoTBy1xV2f5wEOQcU6FxX9K7BPe0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mwV0spQ7; arc=none smtp.client-ip=209.85.166.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-io1-f54.google.com with SMTP id ca18e2360f4ac-84ceaf2667aso224122139f.3
+        for <netdev@vger.kernel.org>; Mon, 13 Jan 2025 07:03:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1736780592; x=1737385392; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=3yf80rtmCXKEEVXHQYDbWk5EecSmCyvTI8cS1zfM35E=;
-        b=YoXsqXQmmIa7cl0bM/HQsztRZHCRMQ6I9yPKwCoqeWw9unWpbMJ9A98yD+OSoaJQU6
-         7NZzoN6y5n4GRbOqkce38MAJBM9wFQ2KwHhOjfJ3H1Mk/JpfauqHLBLw1GPmJLgOOKhH
-         3ezc8ea2GtuEPhuRPJOaoeXVgLNxXmlz2rSSdBiOSMKJ67+QHth6bcsAOo8dK3cuM0tG
-         13vjnjZ/D6/y+to46T58zgRNBt95d2z9LGc6HCpEGWjP6EPFEoBBNKWnpxa+c7Pudn0g
-         xNwuNbfu1R5Azw/nYJm++s6JkRa03qUrVb71ilUn7Ao/YFOotqpUxFLYbu+4SOQ59BZ5
-         r6TQ==
-X-Gm-Message-State: AOJu0YzzyctV7ecEUKbJ00IdiVEZ/hOrHWHvqulOLYlLbCgMcn/zGd9z
-	XIv8vVSpXrsKzU6crPzRIoStr2tka3dt+bTcXmhUIk+KMDmodJVHLQQZGmiJopk5S2KXCpQJYBP
-	z9DJndsbCnFm/D+a1DCRBsjsO2ugBvOxURnri6XCAn3V5uJqwYGsvRg==
-X-Gm-Gg: ASbGnctgBAMiHfn3Edqtltf172nTYxplj/jz+aEP/luw+bLEzEmWToTPQBvcwnt0TZF
-	rAeL3rYKmW1O2mM1DucJ1FNllynM5rPbx458eP1gjUKfsRzPVA40d/aGc1mzfRYMreel2b3enxj
-	IUwvbr2wIwEbpJxoSMAQuYbFyCv/wdPAYBgisY79YxgvhoTJT0f6B7aGBqIBBSx29Xly39l65i9
-	OdL+BIvpAdiZh+Z7Ac/jzCX1vLKbikmU1WE6LfNgdu4gvbb1wWZp6TpV9SJCuUT3xHaJ5xIusu1
-	4js9KcNrLWWfpQkzI0Q+B3yK3p1EVmgp
-X-Received: by 2002:a05:620a:3726:b0:7b1:880c:5805 with SMTP id af79cd13be357-7bcd9759b5cmr3148821985a.45.1736780490414;
-        Mon, 13 Jan 2025 07:01:30 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGmhCA+6joXrA0wKVaaHTe7fd/trt2RKjBSiBo73zD2W/+WWXHhQD1dIWKITENXxjV/Gx6S4g==
-X-Received: by 2002:a05:620a:3726:b0:7b1:880c:5805 with SMTP id af79cd13be357-7bcd9759b5cmr3148813685a.45.1736780489785;
-        Mon, 13 Jan 2025 07:01:29 -0800 (PST)
-Received: from sgarzare-redhat (host-82-53-134-100.retail.telecomitalia.it. [82.53.134.100])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7bce35042eesm496383085a.86.2025.01.13.07.01.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 Jan 2025 07:01:29 -0800 (PST)
-Date: Mon, 13 Jan 2025 16:01:19 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Michal Luczaj <mhal@rbox.co>
-Cc: netdev@vger.kernel.org, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
-	bpf@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Luigi Leonardi <leonardi@redhat.com>, "David S. Miller" <davem@davemloft.net>, 
-	Wongi Lee <qwerty@theori.io>, Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Eric Dumazet <edumazet@google.com>, kvm@vger.kernel.org, 
-	Paolo Abeni <pabeni@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, 
-	Jason Wang <jasowang@redhat.com>, Simon Horman <horms@kernel.org>, Hyunwoo Kim <v4bel@theori.io>, 
-	Jakub Kicinski <kuba@kernel.org>, virtualization@lists.linux.dev, 
-	Bobby Eshleman <bobby.eshleman@bytedance.com>, stable@vger.kernel.org
-Subject: Re: [PATCH net v2 1/5] vsock/virtio: discard packets if the
- transport changes
-Message-ID: <5nkibw33isxiw57jmoaadizo3m2p76ve6zioumlu2z2nh5lwck@xodwiv56zrou>
-References: <20250110083511.30419-1-sgarzare@redhat.com>
- <20250110083511.30419-2-sgarzare@redhat.com>
- <1aa83abf-6baa-4cf1-a108-66b677bcfd93@rbox.co>
- <nedvcylhjxrkmkvgugsku2lpdjgjpo5exoke4o6clxcxh64s3i@jkjnvngazr5v>
- <CAGxU2F7BoMNi-z=SHsmCV5+99=CxHo4dxFeJnJ5=q9X=CM3QMA@mail.gmail.com>
- <cccb1a4f-5495-4db1-801e-eca211b757c3@rbox.co>
- <nzpj4hc6m4jlqhcwv6ngmozl3hcoxr6kehoia4dps7jytxf6df@iqglusiqrm5n>
- <903dd624-44e5-4792-8aac-0eaaf1e675c5@rbox.co>
+        bh=QhI8lwzo961F7JHQtMov9XyaE8Gkm65/Ly8TNDtQyGc=;
+        b=mwV0spQ7dC0/9cWzVgxuLiF61OXh6xsZWgc/cr8xXpsbNVNX48b7QnvkpTu7v3TiJz
+         V1y0qOCi2mAb8WhzwDl1giSq3VVsSfl6/FulIS+dU0kveZsYFLCen3BnTGYpRO/AFfWI
+         /aL6TDXCrouhmzO9tpHvWAywcWkIC5a+6GnR9XDB8Gd7AtF/NMaZE3C4nKj50LkggcRH
+         pilqIenKamZc527uQ1gfP2bgY0HKick9qBwQYu1Rfc3V+2FpjkBLrolo1hWFW78poUfR
+         WPR805/kUyRYTzzZpeBv6Qx1jcdENrofpoDuCJfo8FF3RIb0OW0UOoZkFqjTozAnp8Kx
+         BDSA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736780592; x=1737385392;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=QhI8lwzo961F7JHQtMov9XyaE8Gkm65/Ly8TNDtQyGc=;
+        b=af0lCE5rjE2RCojG38LyTdtkZqt/BsGPhK9JDRGFT2K/IymoEJni6Fdu9qBX+RgTmC
+         2e1nBYfwHJwfH3Pw4KDNhgoYLbM5Y/GA5CHKBBRHf51XYR/uYitD0nWXmH+DCH4pI7F3
+         rY3q3a7AyS2RrhC33YDHZqvTE/lypwvLRc9zBL2agkh7k8AcqA4YrBsEPG0x3exXT9Jn
+         8riLj3F98HKs8b2dKWwldMtFM1K5txIH3Yjp0STTjLhTuLBTzyOYVn6IA5d7CrqZvsyp
+         8Xjmt4yzRQYVsIqiksZjT5iYkPJ4lbEKntVb5HZyENrEO8bHnqm1LGrkWtYO1m+G+Jco
+         F9Kw==
+X-Forwarded-Encrypted: i=1; AJvYcCUVyA6tSoAris0i9Qeqkt89v2OO1RwqAoT+mBvWo/gvxhewq/6AyuPk7yFxezqDmmzsfOCnibw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwoUsMca57Iq/zjmrckLPY4qrv8BpGMvDf0a+8KZq8783AAlm1Z
+	bqho8HHzeGOxfEOhoXnVIgMlH1v5ixeo5zR8vscggWqdDBR5c65z+SOLL/U5dvrOeBs7Oc7Wes2
+	tgFJeLZvTVCibYZ5aMv2ciZPUuec=
+X-Gm-Gg: ASbGncsyqQiiWDnkVbmwQh8c8UtNVWExRpaTxRD3eSj16rNaseNVUVyiobje2lD937b
+	UjJvi+q06knLIxGLJ3My0E7V2NKF6aXlm+NYYTA==
+X-Google-Smtp-Source: AGHT+IF7TakiqIIMDLYBqaIBqq2006p6aJQquQ3pzJBsLqRco32J6j8Qgg7UBM8Z+5n4eEZrfnCrqcUv7Tw/BkM7wi0=
+X-Received: by 2002:a92:cda7:0:b0:3a3:b5ba:bfba with SMTP id
+ e9e14a558f8ab-3ce3aa71eb7mr166742925ab.15.1736780591770; Mon, 13 Jan 2025
+ 07:03:11 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <903dd624-44e5-4792-8aac-0eaaf1e675c5@rbox.co>
+References: <20250113135558.3180360-1-edumazet@google.com> <20250113135558.3180360-3-edumazet@google.com>
+In-Reply-To: <20250113135558.3180360-3-edumazet@google.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Mon, 13 Jan 2025 23:02:35 +0800
+X-Gm-Features: AbW1kvY8lXztUEgeY0oTxt-57T82IvTv5rt8txiuyF2Z64mAJhyVoeDdfF_BRLk
+Message-ID: <CAL+tcoC4SqNZZ1tw3RHkMe1e2kdtwXK8_-=NFpiCAT9m3Ukm6Q@mail.gmail.com>
+Subject: Re: [PATCH v2 net-next 2/3] tcp: add TCP_RFC7323_PAWS_ACK drop reason
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, Simon Horman <horms@kernel.org>, 
+	Neal Cardwell <ncardwell@google.com>, Kuniyuki Iwashima <kuniyu@amazon.com>, eric.dumazet@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jan 13, 2025 at 02:51:58PM +0100, Michal Luczaj wrote:
->On 1/13/25 12:05, Stefano Garzarella wrote:
->> On Mon, Jan 13, 2025 at 11:12:52AM +0100, Michal Luczaj wrote:
->>> On 1/13/25 10:07, Stefano Garzarella wrote:
->>>> On Mon, 13 Jan 2025 at 09:57, Stefano Garzarella <sgarzare@redhat.com> wrote:
->>>>> On Sun, Jan 12, 2025 at 11:42:30PM +0100, Michal Luczaj wrote:
->>>>
->>>> [...]
->>>>
->>>>>>
->>>>>> So, if I get this right:
->>>>>> 1. vsock_create() (refcnt=1) calls vsock_insert_unbound() (refcnt=2)
->>>>>> 2. transport->release() calls vsock_remove_bound() without checking if sk
->>>>>>   was bound and moved to bound list (refcnt=1)
->>>>>> 3. vsock_bind() assumes sk is in unbound list and before
->>>>>>   __vsock_insert_bound(vsock_bound_sockets()) calls
->>>>>>   __vsock_remove_bound() which does:
->>>>>>      list_del_init(&vsk->bound_table); // nop
->>>>>>      sock_put(&vsk->sk);               // refcnt=0
->>>>>>
->>>>>> The following fixes things for me. I'm just not certain that's the only
->>>>>> place where transport destruction may lead to an unbound socket being
->>>>>> removed from the unbound list.
->>>>>>
->>>>>> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
->>>>>> index 7f7de6d88096..0fe807c8c052 100644
->>>>>> --- a/net/vmw_vsock/virtio_transport_common.c
->>>>>> +++ b/net/vmw_vsock/virtio_transport_common.c
->>>>>> @@ -1303,7 +1303,8 @@ void virtio_transport_release(struct vsock_sock *vsk)
->>>>>>
->>>>>>       if (remove_sock) {
->>>>>>               sock_set_flag(sk, SOCK_DONE);
->>>>>> -              virtio_transport_remove_sock(vsk);
->>>>>> +              if (vsock_addr_bound(&vsk->local_addr))
->>>>>> +                      virtio_transport_remove_sock(vsk);
->>>>>
->>>>> I don't get this fix, virtio_transport_remove_sock() calls
->>>>>    vsock_remove_sock()
->>>>>      vsock_remove_bound()
->>>>>        if (__vsock_in_bound_table(vsk))
->>>>>            __vsock_remove_bound(vsk);
->>>>>
->>>>>
->>>>> So, should already avoid this issue, no?
->>>>
->>>> I got it wrong, I see now what are you trying to do, but I don't think
->>>> we should skip virtio_transport_remove_sock() entirely, it also purge
->>>> the rx_queue.
->>>
->>> Isn't rx_queue empty-by-definition in case of !__vsock_in_bound_table(vsk)?
->>
->> It could be.
->>
->> But I see some other issues:
->> - we need to fix also in the other transports, since they do the same
+On Mon, Jan 13, 2025 at 9:56=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
+wrote:
 >
->Ahh, yes, VMCI and Hyper-V would need that, too.
+> XPS can cause reorders because of the relaxed OOO
+> conditions for pure ACK packets.
 >
->> - we need to check delayed cancel work too that call
->>    virtio_transport_remove_sock()
+> For hosts not using RFS, what can happpen is that ACK
+> packets are sent on behalf of the cpu processing NIC
+> interrupts, selecting TX queue A for ACK packet P1.
 >
->That's the "I'm just not certain" part. As with rx_queue, I though delayed
->cancel can only happen for a bound socket. So, per architecture, no need to
->deal with that here, right?
-
-I think so.
-
+> Then a subsequent sendmsg() can run on another cpu.
+> TX queue selection uses the socket hash and can choose
+> another queue B for packets P2 (with payload).
 >
->> An alternative approach, which would perhaps allow us to avoid all this,
->> is to re-insert the socket in the unbound list after calling release()
->> when we deassign the transport.
->>
->> WDYT?
+> If queue A is more congested than queue B,
+> the ACK packet P1 could be sent on the wire after
+> P2.
 >
->If we can't keep the old state (sk_state, transport, etc) on failed
->re-connect() then reverting back to initial state sounds, uhh, like an
->option :) I'm not sure how well this aligns with (user's expectations of)
->good ol' socket API, but maybe that train has already left.
-
-We really want to behave as similar as possible with the other sockets,
-like AF_INET, so I would try to continue toward that train.
-
+> A linux receiver when processing P1 (after P2) currently increments
+> LINUX_MIB_PAWSESTABREJECTED (TcpExtPAWSEstab)
+> and use TCP_RFC7323_PAWS drop reason.
+> It might also send a DUPACK if not rate limited.
 >
->Another possibility would be to simply brick the socket on failed (re)connect.
+> In order to better understand this pattern, this
+> patch adds a new drop_reason : TCP_RFC7323_PAWS_ACK.
 >
+> For old ACKS like these, we no longer increment
+> LINUX_MIB_PAWSESTABREJECTED and no longer sends a DUPACK,
+> keeping credit for other more interesting DUPACK.
+>
+> perf record -e skb:kfree_skb -a
+> perf script
+> ...
+>          swapper       0 [148] 27475.438637: skb:kfree_skb: ... location=
+=3Dtcp_validate_incoming+0x4f0 reason: TCP_RFC7323_PAWS_ACK
+>          swapper       0 [208] 27475.438706: skb:kfree_skb: ... location=
+=3Dtcp_validate_incoming+0x4f0 reason: TCP_RFC7323_PAWS_ACK
+>          swapper       0 [208] 27475.438908: skb:kfree_skb: ... location=
+=3Dtcp_validate_incoming+0x4f0 reason: TCP_RFC7323_PAWS_ACK
+>          swapper       0 [148] 27475.439010: skb:kfree_skb: ... location=
+=3Dtcp_validate_incoming+0x4f0 reason: TCP_RFC7323_PAWS_ACK
+>          swapper       0 [148] 27475.439214: skb:kfree_skb: ... location=
+=3Dtcp_validate_incoming+0x4f0 reason: TCP_RFC7323_PAWS_ACK
+>          swapper       0 [208] 27475.439286: skb:kfree_skb: ... location=
+=3Dtcp_validate_incoming+0x4f0 reason: TCP_RFC7323_PAWS_ACK
+> ...
+>
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> Reviewed-by: Neal Cardwell <ncardwell@google.com>
+> Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 
-I see, though, this is not the behavior of AF_INET for example, right?
+Thank you, Eric.
 
-Do you have time to investigate/fix this problem?
-If not, I'll try to look into it in the next few days, maybe next week.
-
-Thanks,
-Stefano
-
+Reviewed-by: Jason Xing <kerneljasonxing@gmail.com>
 
