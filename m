@@ -1,227 +1,187 @@
-Return-Path: <netdev+bounces-157824-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157825-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3CFEBA0BE92
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 18:12:22 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 23BF3A0BEAA
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 18:14:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E26223A452A
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 17:12:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E6A4C3A9C69
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 17:13:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B0D22297FB;
-	Mon, 13 Jan 2025 17:11:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB9FC1FBBE8;
+	Mon, 13 Jan 2025 17:12:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="foG0ymGa"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b="WRAY7N9+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+Received: from smtp1.cs.Stanford.EDU (smtp1.cs.stanford.edu [171.64.64.25])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6E1D1C5D42
-	for <netdev@vger.kernel.org>; Mon, 13 Jan 2025 17:11:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00C661FBBD3
+	for <netdev@vger.kernel.org>; Mon, 13 Jan 2025 17:12:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=171.64.64.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736788304; cv=none; b=pbg5qOuv1kQRTlkT6v/LdU7U95p7a/YlAKY66lQmGL2eLZbm1ZvvC7Ktkg24P8UhxFNrFyaBZXEnhyP2ITMWuyck8JkdVBZ/JCK73RgBAGoDOkYzw9Eg6hjM7muq+iaH7XPTGG1lNJB2pzCVI5+SxIu1BYmSs9m1jgJ6fT1B+gU=
+	t=1736788356; cv=none; b=Qj3ANbuwBqBzaZc2HNjY+LYweBfRrDxA4vf693h7ros3H1X19ERNE4a64MyWNCPebg4Reau5RY9qMIsNnkyDsMNmI3F7foQxsRANdDt5p+SiagwoLNPDa5y4k+XR65V02kqa/RtZFxnyC1HwECp5Uk5DGaBX8Hx5xEyteRgoXLY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736788304; c=relaxed/simple;
-	bh=dYpk1spwEtlOomeBT9dQvdbxt/f+PnNZTwRIWbezKxM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Tx6feUeF5jV0c7ijnnCIM2NkheD1atl4mWX7YBhZAtSoHrV34a8aDLqsmSZ88Zfy5r3ydoCuRyvJTVBgLiLyr4Q5zn3eAUfL673jdaJ2uO64T9plMJVebTgZdomu/A74ISlUG/wZ/gvgKonMKZuDKfaG7dn1NcCT/IfU1JrC7AM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=foG0ymGa; arc=none smtp.client-ip=198.175.65.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1736788303; x=1768324303;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=dYpk1spwEtlOomeBT9dQvdbxt/f+PnNZTwRIWbezKxM=;
-  b=foG0ymGaV+aK0IAXJt2NnzMHhVnqikC8HjJenapHUTjqksB1GZngVbyn
-   rxpmgZ8kAP+TccXb+mSEfqrRKdEsPbuGdCkDokCmKYjW802sFrELy2EjK
-   5Q33r4lsTn1zXHl6iyp+WNkTS9loiWbY1+glzrpdQhtImdGg9miFj4sZg
-   +AaBu/7vj8s8KxxyALDCKJDA2hJgooxt2xSFmmHigoDJIl8oNgTA2mAeW
-   CpY2nDOX8U+kVY7nnH2XV0ptMmLU5gCELSS+DxfuRamzkv1vxL90W8bXC
-   bn3A3pqlPHfJcmI8SPJSOF5B92xSx9GAgQkVJMH4hojHh9szRPiWLlLwE
-   w==;
-X-CSE-ConnectionGUID: rR30l+rCSVmwU4ndbMbbDw==
-X-CSE-MsgGUID: wPuGHeZZS1iV99Ze7w0Bzg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11314"; a="36748959"
-X-IronPort-AV: E=Sophos;i="6.12,310,1728975600"; 
-   d="scan'208";a="36748959"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jan 2025 09:11:43 -0800
-X-CSE-ConnectionGUID: j9wAMdoARHqr9Cm1dLyGLQ==
-X-CSE-MsgGUID: KOK3/k+wRbqS4LkOcL1cPA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,310,1728975600"; 
-   d="scan'208";a="104499817"
-Received: from jdoman-mobl3.amr.corp.intel.com (HELO azaki-desk1.intel.com) ([10.125.108.26])
-  by fmviesa007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jan 2025 09:11:35 -0800
-From: Ahmed Zaki <ahmed.zaki@intel.com>
-To: netdev@vger.kernel.org
-Cc: intel-wired-lan@lists.osuosl.org,
-	andrew+netdev@lunn.ch,
-	edumazet@google.com,
-	kuba@kernel.org,
-	horms@kernel.org,
-	pabeni@redhat.com,
-	davem@davemloft.net,
-	michael.chan@broadcom.com,
-	tariqt@nvidia.com,
-	anthony.l.nguyen@intel.com,
-	przemyslaw.kitszel@intel.com,
-	jdamato@fastly.com,
-	shayd@nvidia.com,
-	akpm@linux-foundation.org,
-	shayagr@amazon.com,
-	kalesh-anakkur.purayil@broadcom.com,
-	pavan.chebbi@broadcom.com,
-	yury.norov@gmail.com,
-	darinzon@amazon.com,
-	Ahmed Zaki <ahmed.zaki@intel.com>
-Subject: [PATCH net-next v5 6/6] idpf: use napi's irq affinity
-Date: Mon, 13 Jan 2025 10:10:42 -0700
-Message-ID: <20250113171042.158123-7-ahmed.zaki@intel.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250113171042.158123-1-ahmed.zaki@intel.com>
-References: <20250113171042.158123-1-ahmed.zaki@intel.com>
+	s=arc-20240116; t=1736788356; c=relaxed/simple;
+	bh=bn2X/31DeTAdZIPRs+q67hQscMz0ehP2bu3W+277cMI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=VFLmjwxzQ8Fu+UD1lmAFbNZNovyOP0IPyOhX+cIFSCIbqqQSruNmDXlN7b0ZNqLLxwQs/ibYGnBt6x5qLoWZuvh1uaJzoPyqATVJmR3XwxmaA5xTeqgOR8UNJwPwoffo/NgJHWQya2r39nPU8mn2wR9+fUXNZYZ+mv1s8HmnbJ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu; spf=pass smtp.mailfrom=cs.stanford.edu; dkim=pass (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b=WRAY7N9+; arc=none smtp.client-ip=171.64.64.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cs.stanford.edu
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=cs.stanford.edu; s=cs2308; h=Content-Transfer-Encoding:Content-Type:Cc:To:
+	Subject:Message-ID:Date:From:In-Reply-To:References:MIME-Version:Sender:
+	Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender
+	:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=8sPk5RBIpSmdCcv4pVL7PlKrQ4PtyrleBXQmVe4hAtQ=; t=1736788355; x=1737652355; 
+	b=WRAY7N9+FTdFE6SWO6MMfQ444Au7FibqtHz09xmwNj9TKAHHO631KSyZqg59VEpheEEqJ12utTm
+	mIR3+bttIhgwtnI2v8brwo3o5vGpQzpkTBuLoW3AUgkHa+uVzyGMtQ/qCJWeffcUKx1AlT+5F7ZqL
+	qOXz7O7OZ5VZ304ngBoDiKSdMGrfW2ThQ9Mpt57P8YGw0L/7GnMJMhOVj/XPPE4VjqChiJUCRlrJX
+	tn5VVFG+buNqBXMxshbOl8RftgmFZpFoMlnbMTX9WdSVQuwc8phbIlFT1wIqUoF48VfqprJ49NLP1
+	NsxaEzYJ+uJnqv5H8cAXSdW+ukr1aTLAi4hw==;
+Received: from mail-oo1-f48.google.com ([209.85.161.48]:61587)
+	by smtp1.cs.Stanford.EDU with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.94.2)
+	(envelope-from <ouster@cs.stanford.edu>)
+	id 1tXNzH-0001vo-AD
+	for netdev@vger.kernel.org; Mon, 13 Jan 2025 09:12:28 -0800
+Received: by mail-oo1-f48.google.com with SMTP id 006d021491bc7-5f2efd94787so2752279eaf.2
+        for <netdev@vger.kernel.org>; Mon, 13 Jan 2025 09:12:27 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCVLXyFpMhPpe/AOn1Qmf8pMTLNwOgzA2gJ4qqa6292/OftaHELMkjBrlTMZ7xb7q+n+zS2FkYY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxt8RRSejgvG6k3uZK+xwSx0t/NQ2p/sOVBt/z+1mytSkXn679+
+	fek3K6tUXsAlirs8JEnZ18Sk4qD7+INmgxdwIyyvveVXcEIUyCK7Xf6nEqjynuTCEA9ifTZ7SEp
+	pwhmgamMWl4BcEUrzJxW0iYlKyNE=
+X-Google-Smtp-Source: AGHT+IFV2dSPyQUeOXgo1+IUM8e3n2rWRXTrpQ4GujBi5IptrdWRSrBaBpdbCmODi5Rk1DBi3J2gVRY2RNtLVNrNRZA=
+X-Received: by 2002:a05:6870:ae0c:b0:297:274d:1c38 with SMTP id
+ 586e51a60fabf-2aa066b202bmr11172776fac.18.1736788346749; Mon, 13 Jan 2025
+ 09:12:26 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20250106181219.1075-1-ouster@cs.stanford.edu> <20250106181219.1075-8-ouster@cs.stanford.edu>
+ <20250110092537.GA66547@j66a10360.sqa.eu95> <CAGXJAmyYmizvm350vSGmJqdOt8d+d0soP95FGhBUQ5nr8kNqnw@mail.gmail.com>
+ <CAL+tcoCOSk2ezZ+OnsKBZc_JcO_U01X1q3KmTd6WhObuzbuzsA@mail.gmail.com>
+In-Reply-To: <CAL+tcoCOSk2ezZ+OnsKBZc_JcO_U01X1q3KmTd6WhObuzbuzsA@mail.gmail.com>
+From: John Ousterhout <ouster@cs.stanford.edu>
+Date: Mon, 13 Jan 2025 09:11:51 -0800
+X-Gmail-Original-Message-ID: <CAGXJAmzCx6NJGeHrW+CB6+Uc0_DDBMJRMzfCbCs3FNGcdBtX3w@mail.gmail.com>
+X-Gm-Features: AbW1kvZ-8nIbxImVNsCRZm6B0JsiCnm3ja1uUiF4n1phXBGlA886Zus3q2twH2k
+Message-ID: <CAGXJAmzCx6NJGeHrW+CB6+Uc0_DDBMJRMzfCbCs3FNGcdBtX3w@mail.gmail.com>
+Subject: Re: [PATCH net-next v5 07/12] net: homa: create homa_sock.h and homa_sock.c
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: "D. Wythe" <alibuda@linux.alibaba.com>, netdev@vger.kernel.org, pabeni@redhat.com, 
+	edumazet@google.com, horms@kernel.org, kuba@kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Score: -1.0
+X-Spam-Level: 
+X-Scan-Signature: dfe9a19d2d5d3f4658608889c96f7beb
 
-Delete the driver CPU affinity info and use the core's napi config
-instead.
-
-Signed-off-by: Ahmed Zaki <ahmed.zaki@intel.com>
----
- drivers/net/ethernet/intel/idpf/idpf_lib.c  |  1 +
- drivers/net/ethernet/intel/idpf/idpf_txrx.c | 22 +++++++--------------
- drivers/net/ethernet/intel/idpf/idpf_txrx.h |  6 ++----
- 3 files changed, 10 insertions(+), 19 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_lib.c b/drivers/net/ethernet/intel/idpf/idpf_lib.c
-index b4fbb99bfad2..d54be068f53f 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_lib.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_lib.c
-@@ -814,6 +814,7 @@ static int idpf_cfg_netdev(struct idpf_vport *vport)
- 	netdev->hw_features |= dflt_features | offloads;
- 	netdev->hw_enc_features |= dflt_features | offloads;
- 	idpf_set_ethtool_ops(netdev);
-+	netif_enable_irq_affinity(netdev);
- 	SET_NETDEV_DEV(netdev, &adapter->pdev->dev);
- 
- 	/* carrier off on init to avoid Tx hangs */
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-index 2fa9c36e33c9..f6b5b45a061c 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-@@ -3554,8 +3554,6 @@ void idpf_vport_intr_rel(struct idpf_vport *vport)
- 		q_vector->tx = NULL;
- 		kfree(q_vector->rx);
- 		q_vector->rx = NULL;
--
--		free_cpumask_var(q_vector->affinity_mask);
- 	}
- 
- 	kfree(vport->q_vectors);
-@@ -3582,8 +3580,6 @@ static void idpf_vport_intr_rel_irq(struct idpf_vport *vport)
- 		vidx = vport->q_vector_idxs[vector];
- 		irq_num = adapter->msix_entries[vidx].vector;
- 
--		/* clear the affinity_mask in the IRQ descriptor */
--		irq_set_affinity_hint(irq_num, NULL);
- 		kfree(free_irq(irq_num, q_vector));
- 	}
- }
-@@ -3771,8 +3767,6 @@ static int idpf_vport_intr_req_irq(struct idpf_vport *vport)
- 				   "Request_irq failed, error: %d\n", err);
- 			goto free_q_irqs;
- 		}
--		/* assign the mask for this irq */
--		irq_set_affinity_hint(irq_num, q_vector->affinity_mask);
- 	}
- 
- 	return 0;
-@@ -4184,7 +4178,8 @@ static int idpf_vport_intr_init_vec_idx(struct idpf_vport *vport)
- static void idpf_vport_intr_napi_add_all(struct idpf_vport *vport)
+On Sat, Jan 11, 2025 at 12:31=E2=80=AFAM Jason Xing <kerneljasonxing@gmail.=
+com> wrote:
+>
+> On Sat, Jan 11, 2025 at 8:20=E2=80=AFAM John Ousterhout <ouster@cs.stanfo=
+rd.edu> wrote:
+> >
+> > On Fri, Jan 10, 2025 at 1:25=E2=80=AFAM D. Wythe <alibuda@linux.alibaba=
+.com> wrote:
+> > >
+> > > > +void homa_sock_unlink(struct homa_sock *hsk)
+> > > > +{
+> > > > +     struct homa_socktab *socktab =3D hsk->homa->port_map;
+> > > > +     struct homa_socktab_scan *scan;
+> > > > +
+> > > > +     /* If any scans refer to this socket, advance them to refer t=
+o
+> > > > +      * the next socket instead.
+> > > > +      */
+> > > > +     spin_lock_bh(&socktab->write_lock);
+> > > > +     list_for_each_entry(scan, &socktab->active_scans, scan_links)=
  {
- 	int (*napi_poll)(struct napi_struct *napi, int budget);
--	u16 v_idx;
-+	u16 v_idx, qv_idx;
-+	int irq_num;
- 
- 	if (idpf_is_queue_model_split(vport->txq_model))
- 		napi_poll = idpf_vport_splitq_napi_poll;
-@@ -4193,12 +4188,12 @@ static void idpf_vport_intr_napi_add_all(struct idpf_vport *vport)
- 
- 	for (v_idx = 0; v_idx < vport->num_q_vectors; v_idx++) {
- 		struct idpf_q_vector *q_vector = &vport->q_vectors[v_idx];
-+		qv_idx = vport->q_vector_idxs[v_idx];
-+		irq_num = vport->adapter->msix_entries[qv_idx].vector;
- 
--		netif_napi_add(vport->netdev, &q_vector->napi, napi_poll);
--
--		/* only set affinity_mask if the CPU is online */
--		if (cpu_online(v_idx))
--			cpumask_set_cpu(v_idx, q_vector->affinity_mask);
-+		netif_napi_add_config(vport->netdev, &q_vector->napi,
-+				      napi_poll, v_idx);
-+		netif_napi_set_irq(&q_vector->napi, irq_num);
- 	}
- }
- 
-@@ -4242,9 +4237,6 @@ int idpf_vport_intr_alloc(struct idpf_vport *vport)
- 		q_vector->rx_intr_mode = IDPF_ITR_DYNAMIC;
- 		q_vector->rx_itr_idx = VIRTCHNL2_ITR_IDX_0;
- 
--		if (!zalloc_cpumask_var(&q_vector->affinity_mask, GFP_KERNEL))
--			goto error;
--
- 		q_vector->tx = kcalloc(txqs_per_vector, sizeof(*q_vector->tx),
- 				       GFP_KERNEL);
- 		if (!q_vector->tx)
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.h b/drivers/net/ethernet/intel/idpf/idpf_txrx.h
-index 0f71a6f5557b..13251f63c7c3 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_txrx.h
-+++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.h
-@@ -401,7 +401,6 @@ struct idpf_intr_reg {
-  * @rx_intr_mode: Dynamic ITR or not
-  * @rx_itr_idx: RX ITR index
-  * @v_idx: Vector index
-- * @affinity_mask: CPU affinity mask
-  */
- struct idpf_q_vector {
- 	__cacheline_group_begin_aligned(read_mostly);
-@@ -438,13 +437,12 @@ struct idpf_q_vector {
- 	__cacheline_group_begin_aligned(cold);
- 	u16 v_idx;
- 
--	cpumask_var_t affinity_mask;
- 	__cacheline_group_end_aligned(cold);
- };
- libeth_cacheline_set_assert(struct idpf_q_vector, 120,
- 			    24 + sizeof(struct napi_struct) +
- 			    2 * sizeof(struct dim),
--			    8 + sizeof(cpumask_var_t));
-+			    8);
- 
- struct idpf_rx_queue_stats {
- 	u64_stats_t packets;
-@@ -940,7 +938,7 @@ static inline int idpf_q_vector_to_mem(const struct idpf_q_vector *q_vector)
- 	if (!q_vector)
- 		return NUMA_NO_NODE;
- 
--	cpu = cpumask_first(q_vector->affinity_mask);
-+	cpu = cpumask_first(&q_vector->napi.config->affinity_mask);
- 
- 	return cpu < nr_cpu_ids ? cpu_to_mem(cpu) : NUMA_NO_NODE;
- }
--- 
-2.43.0
+> > > > +             if (!scan->next || scan->next->sock !=3D hsk)
+> > > > +                     continue;
+> > > > +             scan->next =3D (struct homa_socktab_links *)
+> > > > +                             rcu_dereference(hlist_next_rcu(&scan-=
+>next->hash_links));
+> > > > +     }
+> > >
+> > > I can't get it.. Why not just mark this sock as unavailable and skip =
+it
+> > > when the iterator accesses it ?
+> > >
+> > > The iterator was used under rcu and given that your sock has the
+> > > SOCK_RCU_FREE flag set, it appears that there should be no concerns
+> > > regarding dangling pointers.
+> >
+> > The RCU lock needn't be held for the entire lifetime of an iterator,
+> > but rather only when certain functions are invoked, such as
+> > homa_socktab_next. Thus it's possible for a socket to be reclaimed and
+> > freed while a scan is in progress. This is described in the comments
+> > for homa_socktab_start_scan. This behavior is necessary because of
+> > homa_timer, which needs to call schedule in the middle of a scan and
+> > that can't be done without releasing the RCU lock. I don't like this
+> > complexity but I haven't been able to find a better alternative.
+> >
+> > > > +     hsk->shutdown =3D true;
+> > >
+> > > From the actual usage of the shutdown member, I think you should use
+> > > sock_set_flag(SOCK_DEAD), and to check it with sock_flag(SOCK_DEAD).
+> >
+> > I wasn't aware of SOCK_DEAD until your email. After poking around a
+> > bit to learn more about SOCK_DEAD, I am nervous about following your
+> > advice. I'm still not certain exactly when SOCK_DEAD is set or who is
+> > allowed to set it. The best information I could find was from ChatGPT
+> > which says this:
+> >
+> > "The SOCK_DEAD flag indicates that the socket is no longer referenced
+> > by any user-space file descriptors or kernel entities. Essentially,
+> > the socket is considered "dead" and ready to be cleaned up."
+>
+> Well, I'm surprised that the GPT is becoming more and more intelligent...
+>
+> The above is correct as you can see from this call trace
+> (__tcp_close()->sk_orphan()). Let me set TCP as an example, when the
+> user decides to close a socket or accidently kill/exit the process,
+> the socket would enter into __tcp_close(), which indicates that this
+> socket has no longer relationship with its owner (application).
+>
+> >
+> > If ChatGPT isn't hallucinating, this would suggest that Homa shouldn't
+> > set SOCK_DEAD, since the conditions above might not yet be true when
+> > homa_sock_shutdown is invoked.
+>
+> Introducing a common usage about SOCK_DEAD might be a good choice. But
+> if it's not that easy to implement, I think we can use the internal
+> destruction mechanism instead like you did.
+>
+> >
+> > Moreover, I'm concerned that some other entity might set SOCK_DEAD
+> > before homa_sock_shutdown is invoked, in which case homa_sock_shutdown
+> > would not cleanup the socket properly.
+>
+> No need to worry about that. If it happens, it usually means there is
+> a bug somewhere and then we will fix it.
 
+I'm not quite sure what you are recommending in your comments above
+(i.e. should Homa try to use SOCK_DEAD or stick with the current
+approach of having a separate Homa-specific flag indicating that the
+socket has been shutdown). Based on what I've heard so far I still
+prefer having a separate flag because it eliminates any possibility of
+confusion between Homa's use of SOCK_DEAD and the rest of Linux's use
+of it.
+
+I see now that SOCK_DEAD gets set (indirectly) by Homa when homa_close
+calls sk_common_release. However, this only happens when the fd is
+closed; hsk->shutdown gets set by homa_sock_shutdown, which can happen
+before the fd is closed. This seems to argue for a separate state bit
+for Homa's shutdown.
+
+-John-
 
