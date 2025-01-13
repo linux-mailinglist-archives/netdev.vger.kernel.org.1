@@ -1,74 +1,73 @@
-Return-Path: <netdev+bounces-157607-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157608-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C190A0AF6A
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 07:40:58 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 108AEA0AF6B
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 07:41:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B144B166241
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 06:40:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 73E301661C3
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 06:41:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EE1A23313B;
-	Mon, 13 Jan 2025 06:40:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAFAD231C9F;
+	Mon, 13 Jan 2025 06:40:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="NaBjXi0O"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="PYGW4cn7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC6D3231A2B
-	for <netdev@vger.kernel.org>; Mon, 13 Jan 2025 06:40:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9D31233144
+	for <netdev@vger.kernel.org>; Mon, 13 Jan 2025 06:40:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736750420; cv=none; b=I7Zls6EbMO0kVQWxAVHXAP+aG3tOi81hTBUVlB/cVQWiZqGS9O4lj6Qu0XWK0OykXYmBTIFa9gHFLDd8WaA/o24ag9Dv32JlqK2NgTUp2nYDfhgPtmDqgfaBIiQJnbgMBCZQMOI0L47g0rGYlVsKlE1SQV+8HUK759tzi0oyeNE=
+	t=1736750423; cv=none; b=KkQSPRuT1Qwe2VSIuipHMhAJWDcxXlwZQc3wk/20Mvr1kw8n5OkfJgxKn1ZMkqBfQzwWciULCISX8E4VUS4OshtbK0JkmFNmZBq9wN/qVjoOehNl3ImBeF6P8lrfZ9Kv4VStuslA4lOXwLF3TtPMyM5JFfdPlSrSzQD64x5kRto=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736750420; c=relaxed/simple;
-	bh=qtM4+neR5uKJIfJVuviqqJmsdus8dBgLjhKWXjtgA3o=;
+	s=arc-20240116; t=1736750423; c=relaxed/simple;
+	bh=mnedUmr9IljE/hJC4fKm2q61/HXseTzHXW4pQkrn7vI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Lj7UxPr++Rdr2fYkVoyDbLUm9PKHKaqYsPuoqI31L4nXrCg9dY8lli7/nLskrW+g/dyUD3kAgiOUt9quS5E+v2DFh3obC7qThYcPt+f0MI8wkpPhNOcscVxHMTuyVbmQAx+A33vEvg33TptuJ/KmVFtRtKcYm9OCCGRyqKrELAM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=NaBjXi0O; arc=none smtp.client-ip=209.85.214.177
+	 MIME-Version; b=iloYNQOjlncaM/PzwMghbPSMn5sj80q9EQ/hsmjaZbL5sYVUdJx3f79KZPmAsWjG6g2RJQKEbbmZPbqC76q7OnrSmmjavhOeW2NlO2/jUpd2xsDsut2jX9XU1uFGEUyKey4pV8uICe5Gj12zKIXLoDCLAps4Bkf7RrVAjGpSEYM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=PYGW4cn7; arc=none smtp.client-ip=209.85.214.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-2163b0c09afso68258695ad.0
-        for <netdev@vger.kernel.org>; Sun, 12 Jan 2025 22:40:18 -0800 (PST)
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-21669fd5c7cso68094415ad.3
+        for <netdev@vger.kernel.org>; Sun, 12 Jan 2025 22:40:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1736750418; x=1737355218; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1736750421; x=1737355221; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=UBdYDp1JAUZJh0QPIMS3gD47vLzzKNVdhhPpNOWc8To=;
-        b=NaBjXi0OyH67JwCUMdD9knL/yPKq2aCTHf0RqgdwXr62Ctl9Zz4Du9bPk+MEoSnJaT
-         U7Qu2Kl2GVxlXyKMhLEmtK0hNyF+Nm4DMB5CHU4rPObPC+xl4Lf6B3NPPVJwblX+IklP
-         XJiRc67XHlOfEhP3n05Ft4KO1vaUFWpIrYA8o=
+        bh=vA/WKiwKiQZNmXyvLp7Dbup9U3dRaWdy45DN8g4yOEA=;
+        b=PYGW4cn7b33kKrNfVjmG/B21x7YgOJZLqrFnUT4FG4i0WDjBHl638PmcPhPV3Iz4BM
+         dH+6bFnsywiF7J4Tl6jle7Kdifg/kl6sSP9o6gIs7efMf8Mz7B7mQ6S0XBrIgcbQq6V4
+         vbcaBkXi6ojMBnzdCYvIHDOnxNg2jhMKTxJpQ=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736750418; x=1737355218;
+        d=1e100.net; s=20230601; t=1736750421; x=1737355221;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=UBdYDp1JAUZJh0QPIMS3gD47vLzzKNVdhhPpNOWc8To=;
-        b=FiLOGOcYiP050fxRYWtH0P7p3E8POilTOnLf+yXAWHD0hOau3hxwkaJztng2evNTLF
-         XaxwaB7MKq2yVtTAdGo19MdBcz/mjhGkf48aa8zSsnzpDNjSNggPfh3sj4MERVn6AFJY
-         /xwGWCgD2wmz5yC/BaGRyk8BRwpBUrenLpgmQEVJafCjcU41l7M2n3hrSBNEVKWtXMEA
-         kzOtT0Hcv/weZsP9A7LZuG6qfZkWZJveDqq3pKVMSAk3ihwo4I5/tbC1QKsDalz27fsO
-         28/fqXJh7aC87T6IzLGKhraqfwysB+gr+3OIxCIiDyZBzxMuvNfJxOjriqQg5xdxcEWx
-         Eugw==
-X-Gm-Message-State: AOJu0Yykrz8LTOWPSYiL2WBp/q25pjkVh3FOrtJ0TOo/Lzf3fbTlT14H
-	t0ftvQJOSxPwOnscQiPx078vhEsma6wHbemi2v2CzkMQGuP9NDGO0IPm4OkNXnExhMSUJWEwRvw
-	=
-X-Gm-Gg: ASbGncs7xvT55Tv5HIjJeQ1LdjBth6yZGEXaHVGxPhyd8FTI7I7S9XqUqqQZ0FVZe4f
-	4BZWKEJbOjzsRZQpNtbvxASJKx0/bP+tN/Y/BpC8UwRjavEDrSgfR6oPg9uvfbK7dMNM1OBD8gE
-	mMhyz3pAOmiXqLLe6J01SfW9nkn6IuNwvQcF1XffOWO2p15/j0uB4eRMisMXEvKt8eZZzxdARPJ
-	cHhQYTiJC/ZUJab6LTlPEeVy94YJI6wbbMTmP+WXmANB8knX87eq2/ylPBMt14PyIi1E7e4G4M1
-	1RZqZR+etL76Vl8knTJPe84Wf00w3Gbb
-X-Google-Smtp-Source: AGHT+IELI5ZjyUM0oy+fb6Ac44tkvh2dvLKAawewN8YVf8mq9w+RjQ1xf9MBNUI8FSlAxhsiC7hPYw==
-X-Received: by 2002:a17:902:cecd:b0:215:6995:1ef3 with SMTP id d9443c01a7336-21a83f3469cmr267171935ad.3.1736750418327;
-        Sun, 12 Jan 2025 22:40:18 -0800 (PST)
+        bh=vA/WKiwKiQZNmXyvLp7Dbup9U3dRaWdy45DN8g4yOEA=;
+        b=oN6hP3idzg2sm978pUG6CS2ev+Z8/0rrUHKeapJRjqcLjjnkFJEs0Jqc8IPenrlyn4
+         blWnHieFdBdgrFshKnFTPqglUpUzAcoPvA2Q49Vn12QmNB/x1WmIBa+CZbLUlxUCIrdG
+         yIhoVZv15urG+FagOR+DSO9pxPvkYXFn35R68/Y3NbpfgV0jE8MUPEdZMG9Vgvgf0byy
+         Idlkl5Nk4IXaHSOtHBkGnCzEVf5Uu4P9VBoTalRsbQmuJk4k5OQgwz+zlTJD3Tblh7Wz
+         FyW98vLhqWiyRa5iaoa5jKDV7Wc+dMSwrGR3lt8HZ5CBLkdKHp4hAu33Cz2LHianS+la
+         LcVA==
+X-Gm-Message-State: AOJu0YwL2FI5e98IGXZ1QMBZ/QHVxgyjEv7Nl4bGm8Xo/RGMhKnX2d8y
+	f//2XrGsqDR9XHUYB2tL+hbZScUoXo5A1PDF083Lv1faeuOc6s6yn/P04karSg==
+X-Gm-Gg: ASbGncvL/Z3UdGDGGIGKBzTimTWANo5fqNTxzcQRYRvY0fPyWl6vNMaaYo+cy+AXBTG
+	eDxXzqKTIAiXf9AiimlGzpll9WfGJNGa4VbkXBfPYgPbdzq5TbggYxepGvjxXrO2UsxQn+bI7vs
+	Ee5yzlCRHZAIvhD7kLOGPfPIxQxmQhCyyJeE/AlGUoMIZKiN+4CPJgkmCwcG31rfPyQRlg0hNND
+	85EIv8UVohIASXd79lwroq86AkF0UYtLqc+X8qcLCqa3PC1wGxN3Nwo/Z/NeyV9sPn5u1OBjTTU
+	UJlVuh68kWyo7KrrbbrMEK718pHqMCWG
+X-Google-Smtp-Source: AGHT+IHsZzeOkmVV7zInYnWyUChuf43zF1VwwSXgxvtpQ1SVDNOAdZMX4rOEYW0riGwT2QtNN2MKOQ==
+X-Received: by 2002:a17:902:ec83:b0:215:7ce4:57bc with SMTP id d9443c01a7336-21a83f54a5cmr284780155ad.16.1736750419683;
+        Sun, 12 Jan 2025 22:40:19 -0800 (PST)
 Received: from lvnvda3289.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21a9f254264sm46488165ad.233.2025.01.12.22.40.17
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21a9f254264sm46488165ad.233.2025.01.12.22.40.18
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 12 Jan 2025 22:40:17 -0800 (PST)
+        Sun, 12 Jan 2025 22:40:19 -0800 (PST)
 From: Michael Chan <michael.chan@broadcom.com>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -79,11 +78,13 @@ Cc: netdev@vger.kernel.org,
 	pavan.chebbi@broadcom.com,
 	andrew.gospodarek@broadcom.com,
 	somnath.kotur@broadcom.com,
+	Manoj Panicker <manoj.panicker2@amd.com>,
+	Wei Huang <wei.huang2@amd.com>,
 	Ajit Khaparde <ajit.khaparde@broadcom.com>,
-	David Wei <dw@davidwei.uk>
-Subject: [PATCH net-next 09/10] bnxt_en: Extend queue stop/start for Tx rings
-Date: Sun, 12 Jan 2025 22:39:26 -0800
-Message-ID: <20250113063927.4017173-10-michael.chan@broadcom.com>
+	Bjorn Helgaas <helgaas@kernel.org>
+Subject: [PATCH net-next 10/10] bnxt_en: Add TPH support in BNXT driver
+Date: Sun, 12 Jan 2025 22:39:27 -0800
+Message-ID: <20250113063927.4017173-11-michael.chan@broadcom.com>
 X-Mailer: git-send-email 2.43.4
 In-Reply-To: <20250113063927.4017173-1-michael.chan@broadcom.com>
 References: <20250113063927.4017173-1-michael.chan@broadcom.com>
@@ -95,180 +96,225 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Somnath Kotur <somnath.kotur@broadcom.com>
+From: Manoj Panicker <manoj.panicker2@amd.com>
 
-In order to use queue_stop/queue_start to support the new Steering
-Tags, we need to free the TX ring and TX completion ring if it is a
-combined channel with TX/RX sharing the same NAPI.  Otherwise
-TX completions will not have the updated Steering Tag.  With that
-we can now add napi_disable() and napi_enable() during queue_stop()/
-queue_start().  This will guarantee that NAPI will stop processing
-the completion entries in case there are additional pending entries
-in the completion rings after queue_stop().
+Add TPH support to the Broadcom BNXT device driver. This allows the
+driver to utilize TPH functions for retrieving and configuring Steering
+Tags when changing interrupt affinity. With compatible NIC firmware,
+network traffic will be tagged correctly with Steering Tags, resulting
+in significant memory bandwidth savings and other advantages as
+demonstrated by real network benchmarks on TPH-capable platforms.
 
-There could be some NQEs sitting unprocessed while NAPI is disabled
-thereby leaving the NQ unarmed.  Explictily Re-arm the NQ after
-napi_enable() in queue start so that NAPI will resume properly.
-
-Reviewed-by: Ajit Khaparde <ajit.khaparde@broadcom.com>
+Co-developed-by: Somnath Kotur <somnath.kotur@broadcom.com>
 Signed-off-by: Somnath Kotur <somnath.kotur@broadcom.com>
-Reviewed-by: Michael Chan <michael.chan@broadcom.com>
+Co-developed-by: Wei Huang <wei.huang2@amd.com>
+Signed-off-by: Wei Huang <wei.huang2@amd.com>
+Signed-off-by: Manoj Panicker <manoj.panicker2@amd.com>
+Reviewed-by: Ajit Khaparde <ajit.khaparde@broadcom.com>
+Reviewed-by: Andy Gospodarek <andrew.gospodarek@broadcom.com>
+Signed-off-by: Michael Chan <michael.chan@broadcom.com>
 ---
-Cc: David Wei <dw@davidwei.uk>
+Cc: Bjorn Helgaas <helgaas@kernel.org>
 
-Discussion about adding napi_disable()/napi_enable():
+Previous driver series fixing rtnl_lock and empty release function:
 
-https://lore.kernel.org/netdev/5336d624-8d8b-40a6-b732-b020e4a119a2@davidwei.uk/#t
+https://lore.kernel.org/netdev/20241115200412.1340286-1-wei.huang2@amd.com/
+
+v5 of the PCI series using netdev_rx_queue_restart():
+
+https://lore.kernel.org/netdev/20240916205103.3882081-5-wei.huang2@amd.com/
+
+v1 of the PCI series using open/close:
+
+https://lore.kernel.org/netdev/20240509162741.1937586-9-wei.huang2@amd.com/
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt.c | 99 ++++++++++++++++++++++-
- 1 file changed, 98 insertions(+), 1 deletion(-)
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c | 105 ++++++++++++++++++++++
+ drivers/net/ethernet/broadcom/bnxt/bnxt.h |   7 ++
+ 2 files changed, 112 insertions(+)
 
 diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index fe350d0ba99c..eddb4de959c6 100644
+index eddb4de959c6..8ca73da801a3 100644
 --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
 +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -7341,6 +7341,22 @@ static int hwrm_ring_free_send_msg(struct bnxt *bp,
+@@ -55,6 +55,8 @@
+ #include <net/page_pool/helpers.h>
+ #include <linux/align.h>
+ #include <net/netdev_queues.h>
++#include <net/netdev_rx_queue.h>
++#include <linux/pci-tph.h>
+ 
+ #include "bnxt_hsi.h"
+ #include "bnxt.h"
+@@ -11326,6 +11328,83 @@ static int bnxt_tx_queue_start(struct bnxt *bp, int idx)
  	return 0;
  }
  
-+static void bnxt_hwrm_tx_ring_free(struct bnxt *bp, struct bnxt_tx_ring_info *txr,
-+				   bool close_path)
++static void bnxt_irq_affinity_notify(struct irq_affinity_notify *notify,
++				     const cpumask_t *mask)
 +{
-+	struct bnxt_ring_struct *ring = &txr->tx_ring_struct;
-+	u32 cmpl_ring_id;
++	struct bnxt_irq *irq;
++	u16 tag;
++	int err;
 +
-+	if (ring->fw_ring_id == INVALID_HW_RING_ID)
++	irq = container_of(notify, struct bnxt_irq, affinity_notify);
++
++	if (!irq->bp->tph_mode)
 +		return;
 +
-+	cmpl_ring_id = close_path ? bnxt_cp_ring_for_tx(bp, txr) :
-+		       INVALID_HW_RING_ID;
-+	hwrm_ring_free_send_msg(bp, ring, RING_FREE_REQ_RING_TYPE_TX,
-+				cmpl_ring_id);
-+	ring->fw_ring_id = INVALID_HW_RING_ID;
++	cpumask_copy(irq->cpu_mask, mask);
++
++	if (irq->ring_nr >= irq->bp->rx_nr_rings)
++		return;
++
++	if (pcie_tph_get_cpu_st(irq->bp->pdev, TPH_MEM_TYPE_VM,
++				cpumask_first(irq->cpu_mask), &tag))
++		return;
++
++	if (pcie_tph_set_st_entry(irq->bp->pdev, irq->msix_nr, tag))
++		return;
++
++	rtnl_lock();
++	if (netif_running(irq->bp->dev)) {
++		err = netdev_rx_queue_restart(irq->bp->dev, irq->ring_nr);
++		if (err)
++			netdev_err(irq->bp->dev,
++				   "RX queue restart failed: err=%d\n", err);
++	}
++	rtnl_unlock();
 +}
 +
- static void bnxt_hwrm_rx_ring_free(struct bnxt *bp,
- 				   struct bnxt_rx_ring_info *rxr,
- 				   bool close_path)
-@@ -11247,6 +11263,69 @@ int bnxt_reserve_rings(struct bnxt *bp, bool irq_re_init)
- 	return 0;
- }
- 
-+static void bnxt_tx_queue_stop(struct bnxt *bp, int idx)
++static void bnxt_irq_affinity_release(struct kref *ref)
 +{
-+	struct bnxt_tx_ring_info *txr;
-+	struct netdev_queue *txq;
-+	struct bnxt_napi *bnapi;
-+	int i;
++	struct irq_affinity_notify *notify =
++		container_of(ref, struct irq_affinity_notify, kref);
++	struct bnxt_irq *irq;
 +
-+	bnapi = bp->bnapi[idx];
-+	bnxt_for_each_napi_tx(i, bnapi, txr) {
-+		WRITE_ONCE(txr->dev_state, BNXT_DEV_STATE_CLOSING);
-+		synchronize_net();
++	irq = container_of(notify, struct bnxt_irq, affinity_notify);
 +
-+		if (!(bnapi->flags & BNXT_NAPI_FLAG_XDP)) {
-+			txq = netdev_get_tx_queue(bp->dev, txr->txq_index);
-+			if (txq) {
-+				__netif_tx_lock_bh(txq);
-+				netif_tx_stop_queue(txq);
-+				__netif_tx_unlock_bh(txq);
-+			}
-+		}
-+		bnxt_hwrm_tx_ring_free(bp, txr, true);
-+		bnxt_hwrm_cp_ring_free(bp, txr->tx_cpr);
-+		bnxt_free_one_tx_ring_skbs(bp, txr, txr->txq_index);
-+		bnxt_clear_one_cp_ring(bp, txr->tx_cpr);
++	if (!irq->bp->tph_mode)
++		return;
++
++	if (pcie_tph_set_st_entry(irq->bp->pdev, irq->msix_nr, 0)) {
++		netdev_err(irq->bp->dev,
++			   "Setting ST=0 for MSIX entry %d failed\n",
++			   irq->msix_nr);
++		return;
 +	}
 +}
 +
-+static int bnxt_tx_queue_start(struct bnxt *bp, int idx)
++static void bnxt_release_irq_notifier(struct bnxt_irq *irq)
 +{
-+	struct bnxt_tx_ring_info *txr;
-+	struct netdev_queue *txq;
-+	struct bnxt_napi *bnapi;
-+	int rc, i;
++	irq_set_affinity_notifier(irq->vector, NULL);
++}
 +
-+	bnapi = bp->bnapi[idx];
-+	bnxt_for_each_napi_tx(i, bnapi, txr) {
-+		rc = bnxt_hwrm_cp_ring_alloc_p5(bp, txr->tx_cpr);
-+		if (rc)
-+			return rc;
++static void bnxt_register_irq_notifier(struct bnxt *bp, struct bnxt_irq *irq)
++{
++	struct irq_affinity_notify *notify;
 +
-+		rc = bnxt_hwrm_tx_ring_alloc(bp, txr, false);
-+		if (rc) {
-+			bnxt_hwrm_cp_ring_free(bp, txr->tx_cpr);
-+			return rc;
-+		}
-+		txr->tx_prod = 0;
-+		txr->tx_cons = 0;
-+		txr->tx_hw_cons = 0;
++	irq->bp = bp;
 +
-+		WRITE_ONCE(txr->dev_state, 0);
-+		synchronize_net();
++	/* Nothing to do if TPH is not enabled */
++	if (!bp->tph_mode)
++		return;
 +
-+		if (bnapi->flags & BNXT_NAPI_FLAG_XDP)
-+			continue;
++	/* Register IRQ affinity notifier */
++	notify = &irq->affinity_notify;
++	notify->irq = irq->vector;
++	notify->notify = bnxt_irq_affinity_notify;
++	notify->release = bnxt_irq_affinity_release;
 +
-+		txq = netdev_get_tx_queue(bp->dev, txr->txq_index);
-+		if (txq)
-+			netif_tx_start_queue(txq);
-+	}
-+
-+	return 0;
++	irq_set_affinity_notifier(irq->vector, notify);
 +}
 +
  static void bnxt_free_irq(struct bnxt *bp)
  {
  	struct bnxt_irq *irq;
-@@ -15647,6 +15726,16 @@ static int bnxt_queue_start(struct net_device *dev, void *qmem, int idx)
- 	cpr = &rxr->bnapi->cp_ring;
- 	cpr->sw_stats->rx.rx_resets++;
- 
-+	if (bp->flags & BNXT_FLAG_SHARED_RINGS) {
-+		rc = bnxt_tx_queue_start(bp, idx);
-+		if (rc)
-+			netdev_warn(bp->dev,
-+				    "tx queue restart failed: rc=%d\n", rc);
-+	}
+@@ -11348,11 +11427,18 @@ static void bnxt_free_irq(struct bnxt *bp)
+ 				free_cpumask_var(irq->cpu_mask);
+ 				irq->have_cpumask = 0;
+ 			}
 +
-+	napi_enable(&rxr->bnapi->napi);
-+	bnxt_db_nq_arm(bp, &cpr->cp_db, cpr->cp_raw_cons);
++			bnxt_release_irq_notifier(irq);
 +
- 	for (i = 0; i <= BNXT_VNIC_NTUPLE; i++) {
- 		vnic = &bp->vnic_info[i];
+ 			free_irq(irq->vector, bp->bnapi[i]);
+ 		}
  
-@@ -15675,6 +15764,7 @@ static int bnxt_queue_stop(struct net_device *dev, void *qmem, int idx)
- 	struct bnxt *bp = netdev_priv(dev);
- 	struct bnxt_rx_ring_info *rxr;
- 	struct bnxt_vnic_info *vnic;
-+	struct bnxt_napi *bnapi;
- 	int i;
- 
- 	for (i = 0; i <= BNXT_VNIC_NTUPLE; i++) {
-@@ -15686,15 +15776,22 @@ static int bnxt_queue_stop(struct net_device *dev, void *qmem, int idx)
- 	/* Make sure NAPI sees that the VNIC is disabled */
- 	synchronize_net();
- 	rxr = &bp->rx_ring[idx];
--	cancel_work_sync(&rxr->bnapi->cp_ring.dim.work);
-+	bnapi = rxr->bnapi;
-+	cancel_work_sync(&bnapi->cp_ring.dim.work);
- 	bnxt_hwrm_rx_ring_free(bp, rxr, false);
- 	bnxt_hwrm_rx_agg_ring_free(bp, rxr, false);
- 	page_pool_disable_direct_recycling(rxr->page_pool);
- 	if (bnxt_separate_head_pool())
- 		page_pool_disable_direct_recycling(rxr->head_pool);
- 
-+	if (bp->flags & BNXT_FLAG_SHARED_RINGS)
-+		bnxt_tx_queue_stop(bp, idx);
+ 		irq->requested = 0;
+ 	}
 +
-+	napi_disable(&bnapi->napi);
-+
- 	bnxt_hwrm_cp_ring_free(bp, rxr->rx_cpr);
- 	bnxt_clear_one_cp_ring(bp, rxr->rx_cpr);
-+	bnxt_db_nq(bp, &cpr->cp_db, cpr->cp_raw_cons);
++	/* Disable TPH support */
++	pcie_disable_tph(bp->pdev);
++	bp->tph_mode = 0;
+ }
  
- 	memcpy(qmem, rxr, sizeof(*rxr));
- 	bnxt_init_rx_ring_struct(bp, qmem);
+ static int bnxt_request_irq(struct bnxt *bp)
+@@ -11372,6 +11458,12 @@ static int bnxt_request_irq(struct bnxt *bp)
+ #ifdef CONFIG_RFS_ACCEL
+ 	rmap = bp->dev->rx_cpu_rmap;
+ #endif
++
++	/* Enable TPH support as part of IRQ request */
++	rc = pcie_enable_tph(bp->pdev, PCI_TPH_ST_IV_MODE);
++	if (!rc)
++		bp->tph_mode = PCI_TPH_ST_IV_MODE;
++
+ 	for (i = 0, j = 0; i < bp->cp_nr_rings; i++) {
+ 		int map_idx = bnxt_cp_num_to_irq_num(bp, i);
+ 		struct bnxt_irq *irq = &bp->irq_tbl[map_idx];
+@@ -11395,8 +11487,11 @@ static int bnxt_request_irq(struct bnxt *bp)
+ 
+ 		if (zalloc_cpumask_var(&irq->cpu_mask, GFP_KERNEL)) {
+ 			int numa_node = dev_to_node(&bp->pdev->dev);
++			u16 tag;
+ 
+ 			irq->have_cpumask = 1;
++			irq->msix_nr = map_idx;
++			irq->ring_nr = i;
+ 			cpumask_set_cpu(cpumask_local_spread(i, numa_node),
+ 					irq->cpu_mask);
+ 			rc = irq_update_affinity_hint(irq->vector, irq->cpu_mask);
+@@ -11406,6 +11501,16 @@ static int bnxt_request_irq(struct bnxt *bp)
+ 					    irq->vector);
+ 				break;
+ 			}
++
++			bnxt_register_irq_notifier(bp, irq);
++
++			/* Init ST table entry */
++			if (pcie_tph_get_cpu_st(irq->bp->pdev, TPH_MEM_TYPE_VM,
++						cpumask_first(irq->cpu_mask),
++						&tag))
++				continue;
++
++			pcie_tph_set_st_entry(irq->bp->pdev, irq->msix_nr, tag);
+ 		}
+ 	}
+ 	return rc;
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+index a634ad76177d..7069d7f6f90b 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+@@ -1231,6 +1231,11 @@ struct bnxt_irq {
+ 	u8		have_cpumask:1;
+ 	char		name[IFNAMSIZ + BNXT_IRQ_NAME_EXTRA];
+ 	cpumask_var_t	cpu_mask;
++
++	struct bnxt	*bp;
++	int		msix_nr;
++	int		ring_nr;
++	struct irq_affinity_notify affinity_notify;
+ };
+ 
+ #define HWRM_RING_ALLOC_TX	0x1
+@@ -2226,6 +2231,8 @@ struct bnxt {
+ 	struct net_device	*dev;
+ 	struct pci_dev		*pdev;
+ 
++	u8			tph_mode;
++
+ 	atomic_t		intr_sem;
+ 
+ 	u32			flags;
 -- 
 2.30.1
 
