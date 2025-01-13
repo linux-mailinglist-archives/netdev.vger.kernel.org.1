@@ -1,231 +1,218 @@
-Return-Path: <netdev+bounces-157611-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157612-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42088A0AFE8
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 08:17:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id AA837A0AFFF
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 08:23:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 252B818820E4
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 07:17:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8C58E188436E
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 07:23:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 631A3188721;
-	Mon, 13 Jan 2025 07:17:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49F551BD9FF;
+	Mon, 13 Jan 2025 07:23:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mZB9QrCG"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgbr2.qq.com (smtpbgbr2.qq.com [54.207.22.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f180.google.com (mail-il1-f180.google.com [209.85.166.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75E65166F0C
-	for <netdev@vger.kernel.org>; Mon, 13 Jan 2025 07:17:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.207.22.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3B0628FD
+	for <netdev@vger.kernel.org>; Mon, 13 Jan 2025 07:22:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736752637; cv=none; b=mg7RIyfsFBLSwESXIig2AzGXr3YWrxwlggzkP44bxgyB34zKKtiF9W7H3XGGuyNLW94xJ2RsP6zfZobjlNucg84kOAqxx8qM2WN/YfRMCtL+wCYe13qdq6nbyLPKF/o4z7qZ/X7LNCsBrLZ7KRxMkEadT2B34xwPhigbR/3v8QA=
+	t=1736752980; cv=none; b=mOAAXyjgSsQiqjSzMthtm+KNKR510fF7FMT+DR2+0E3TYRd0JQC1neLYZC6ZW+EJ58aI2+8Zf8mUT99pU3MLMUdcjMZOhXD2YmV6RB8bXbHGPwmloLwBvcDPJDc27TviCQL4/+vv/a9VmUbMLsF1UkDFDqmN+JKzRnJH5S09ERY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736752637; c=relaxed/simple;
-	bh=TTJRMV3QkPJCJz4bQSuLp7XeszZyWtVlm7PMRYjlFAw=;
-	h=From:To:Cc:References:In-Reply-To:Subject:Date:Message-ID:
-	 MIME-Version:Content-Type; b=uOpagKAN1FfSwDRZld89lZAoTJ3oTkBAr55Pzg+cDC/a9hrMSYBQHC8DdMRfxay28JWQUK2Ttc25jnTPT47GgTXNQwW4wetd0Azhdp+5IbysdN2yKBZ8x2xMESRj/t3DMHKMVJ+VmZrCy88GEOdBqLJa0kGGRNSUOKYHnzAtJpQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=54.207.22.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
-X-QQ-mid:Yeas1t1736752613t189t65490
-Received: from 3DB253DBDE8942B29385B9DFB0B7E889 (jiawenwu@trustnetic.com [36.20.58.48])
-X-QQ-SSF:0000000000000000000000000000000
-From: =?utf-8?b?Smlhd2VuIFd1?= <jiawenwu@trustnetic.com>
-X-BIZMAIL-ID: 11983999118323814274
-To: "'Vadim Fedorenko'" <vadim.fedorenko@linux.dev>,
-	<andrew+netdev@lunn.ch>,
-	<davem@davemloft.net>,
-	<edumazet@google.com>,
-	<kuba@kernel.org>,
-	<pabeni@redhat.com>,
-	<richardcochran@gmail.com>,
-	<linux@armlinux.org.uk>,
-	<horms@kernel.org>,
-	<jacob.e.keller@intel.com>,
-	<netdev@vger.kernel.org>
-Cc: <mengyuanlou@net-swift.com>
-References: <20250110031716.2120642-1-jiawenwu@trustnetic.com> <20250110031716.2120642-2-jiawenwu@trustnetic.com> <c0228210-4991-48ad-8e2d-69b176c1d79d@linux.dev>
-In-Reply-To: <c0228210-4991-48ad-8e2d-69b176c1d79d@linux.dev>
-Subject: RE: [PATCH net-next v3 1/4] net: wangxun: Add support for PTP clock
-Date: Mon, 13 Jan 2025 15:16:51 +0800
-Message-ID: <057c01db658b$1e6f45f0$5b4dd1d0$@trustnetic.com>
+	s=arc-20240116; t=1736752980; c=relaxed/simple;
+	bh=E9jpIYWMM+gYObNUmWkWmPqP84q0SgkIZFJS+GUm8yQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Z55w0AdhiPykti/fYqnp3s2VBNqGIvpv+UDGj/c2/EB8ZioZpCp3YeKaYxTCd4Yl1g6DC34QTmN7YbjhrSRzBzFm71eD+bfQwvaaK9fyWxQSJP6VJ8o09JUr8Q0KGp5BI8INNAW4mTX4xDdOwFlmvmApqIrId61/79kjBG2hsD0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mZB9QrCG; arc=none smtp.client-ip=209.85.166.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f180.google.com with SMTP id e9e14a558f8ab-3a813899384so12118085ab.1
+        for <netdev@vger.kernel.org>; Sun, 12 Jan 2025 23:22:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1736752978; x=1737357778; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=WmSbruqFvBBgQ1KelJd7b54TfWhRNIUaY4Eg8+z2tUU=;
+        b=mZB9QrCGDuN1TY8HxnhW3MObhU/uLCyz/rgmrbjNVhjtiQsJ/BH35J4gykB9BGJrKR
+         //oXt1hIcDg4FMfv25YjRrD6IyllSd20uB0aU290YSxEY+w36jF6oNUsWme9y9pHOvTu
+         u2qwNuzo65Km6dQspvfPpbYPgs+roA+9aHkDSh9WGECHIQikkB/JdmM3JizN2/3EN/m/
+         MV/Ki7J7dgrelWaGLCQEqjHT62J2VqvDQPqawP4hZOQBZVQEeKK8pT24bhvqQxU++bCP
+         vt296Exle9MWkJTIXt/F2NhRscwLT4D54E02vDqHQrsfcmY1GjUEe9kpubRo2l1IxVn+
+         246w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736752978; x=1737357778;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=WmSbruqFvBBgQ1KelJd7b54TfWhRNIUaY4Eg8+z2tUU=;
+        b=ESqeF7X/VFnXas3O3REeYjJmIL3tJ2eQ4KYDNHAqHsuK2TZMnWxFdUJcUY1TEJ4v5a
+         npGWQ7XtUZrMIZ9M85Y8UKvNeFvSFF8MYdChOAlDmHvDE3egivu4DwzBhgtjHROdcCWb
+         5UnPMVNpmt5DhP5UNuhgmk9CR7CV5dImjzkmv7l6p6cQmNC5o4BwUe3XYLLzKFyVrzWH
+         ZLsPiKY7OIuw/CZjLJ3PGfSlaavXtLa2pNd1zCh5OkuCdI7ZzlKk1Q4YfS53qyISeahY
+         GW0xv+5ClWA109u/qhYCiVqsOdWXsDPki5wCpZwB+ApjndqSKEk2dO3BG72ZwZ4IXgeB
+         9XeQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXBvUm1RYj7Qgwh/HQM3HRgahhQ/0Zh4TdNaFmBLNohmyibrXEsOjwp4LpW75Vlu31ZdEwNtiA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywkea+/hvedxMEsgJuYGL4576EQb0Zb6uE9LzMpzOb+4RaulV4j
+	2UMet2lDG1NNxNt3mg7UAJj3KGkEbEBRVM9nFbYEvfk3Jxm9aiLWFE8yqBV1UR9bnHfuBycN81R
+	UZVgR4pUksBp+yZglY3o3uUHN7ic=
+X-Gm-Gg: ASbGncugGdalKp7nwdffVt6MxR5Sv2X/YmSc1OGhXgzGbQG4dalZ8J92NMPXjdF86/5
+	q8NTaGpuXoZXipTq22GY4zi5ta7f0zZ0WSnF8Fg==
+X-Google-Smtp-Source: AGHT+IHfRDbWC4XSu+3Mowc49oS2oD9Fq5uAVCtSE3eIHk5LRL8o4BjK6ZQ3WSVMLI/sI1xX9QfL7qKQMehQAb3A3sk=
+X-Received: by 2002:a05:6e02:3891:b0:3bc:be0f:edcd with SMTP id
+ e9e14a558f8ab-3ce3a96da56mr121701025ab.11.1736752977657; Sun, 12 Jan 2025
+ 23:22:57 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: Microsoft Outlook 16.0
-Content-Language: zh-cn
-Thread-Index: AQIn7G+o1Szt10K74NpdpmE6uZiDNwKM2ZV6AjC9LdSyVQn7IA==
-X-QQ-SENDSIZE: 520
-Feedback-ID: Yeas:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz8a-1
-X-QQ-XMAILINFO: NvGGTAUhB2iWaJRRr46fkvqoXSC5u3G8Oigqe/0/gIhM5Vcdo24MGV/L
-	y4cVVKTzhINYdI2sh6lv2KbVoJv5/qA049GS3iLy/RXiMjPZfsmPW459SucvmwoXl/uwMN7
-	Xses66fVV8uG1YOlrGdCc0jqMABAafvC8ZBVA3HfWeeKiIo8EbIhLMTskjacFc3mNyBg4+s
-	U+euDj5dS1qHONdawUWGjnl8rFPNlLBmK1Wh8GAdIANap6c4VA3M825DB1H+xXl350iK4Zo
-	EiDy62uClaKPD4wvmpuFd9zUii06kxJB/n0bLV8v3DNmo1AB0mu79OD06i5XgnFZSiyM+Y0
-	nsH/M2/aSfwUmreW8TItlSYYKegvHYcof5cv6/90Do/YpGity7uV1EC6mE6sB61qBEJah20
-	qCgvtrGgvA+zk4nwOk6K/KK4nFQVvbchh9/dT2pRwxo76B5kTJdCbDUx2DnqaWOdjGtZbx1
-	heR//3/hNJHCsCnv0hRtvykhXWpSMT2mipAb79mpD/Yv1PWeixY8busbfTCarZOuckmuyzn
-	/1KOVbI4SxqW16LajfaF8vcMDBiXXYAFUPmI1r45xNyhjmVXQ5V+pXJO6je+0Bte63e3DbJ
-	b+eMnFKzRlE+6uLedjd5QwullTa+t+4lmuCUUNR8DXBhzBXDgGVrZQvEW74tNqSDC9MMV9z
-	ZlZa/5slkCCyoGsheRC1oYKRtCOggh9xKggBVfEY37WCsRHXzTrmzW8ryI/aEx5+kG7BeiV
-	U5rtuIyInQYYuceexvrTP5yQTIaWXIOvg/twkrgnu460GDByWRMG2pEwdi93Gl6P9Stb640
-	Zz7toPOiUI8SRG420JmXRE3salKLl2voDh8K0klHReds6J3S+B2l5AodrkTto1bVVz1HfVo
-	UEo55xLKcFd/3iszwoj8M+qbWjboNeSjI6fCUx/JGjmiE9nbVRSnNxL3QuHeObfwoXA2Pvw
-	ZmUlTl/5pLngv2dO9cBmqvgssHH2pm0kLqj1rWD/eNHko+4ON1OdKzPqt
-X-QQ-XMRINFO: M/715EihBoGSf6IYSX1iLFg=
-X-QQ-RECHKSPAM: 0
+References: <20250110143315.571872-1-edumazet@google.com> <20250110143315.571872-3-edumazet@google.com>
+In-Reply-To: <20250110143315.571872-3-edumazet@google.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Mon, 13 Jan 2025 15:22:21 +0800
+X-Gm-Features: AbW1kvbCd3JIM5drzCcK-M26nZFXnPxuldXVRzlnWvafO6JoXYIHR2U0h3D1mnk
+Message-ID: <CAL+tcoDit2HQ9r-keyZjkSJF4esj-tB2rBAtFX7QBPueCaA8NA@mail.gmail.com>
+Subject: Re: [PATCH net-next 2/2] tcp: add TCP_RFC7323_PAWS_ACK drop reason
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, Simon Horman <horms@kernel.org>, 
+	Neal Cardwell <ncardwell@google.com>, Kuniyuki Iwashima <kuniyu@amazon.com>, eric.dumazet@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> > @@ -1501,12 +1535,19 @@ static netdev_tx_t wx_xmit_frame_ring(struct sk_buff *skb,
-> >   	if (test_bit(WX_FLAG_FDIR_CAPABLE, wx->flags) && tx_ring->atr_sample_rate)
-> >   		wx->atr(tx_ring, first, ptype);
-> >
-> > -	wx_tx_map(tx_ring, first, hdr_len);
-> > +	if (wx_tx_map(tx_ring, first, hdr_len))
-> > +		goto cleanup_tx_tstamp;
-> >
-> >   	return NETDEV_TX_OK;
-> >   out_drop:
-> >   	dev_kfree_skb_any(first->skb);
-> >   	first->skb = NULL;
-> > +cleanup_tx_tstamp:
-> > +	if (unlikely(tx_flags & WX_TX_FLAGS_TSTAMP)) {
-> > +		dev_kfree_skb_any(wx->ptp_tx_skb);
-> > +		wx->ptp_tx_skb = NULL;
-> > +		clear_bit_unlock(WX_STATE_PTP_TX_IN_PROGRESS, wx->state);
-> > +	}
-> 
-> This is error path of dma mapping, means TX timestamp will be missing
-> because the packet was not sent. But the error/missing counter is not
-> bumped. I think it needs to be indicated.
+Hello Eric,
 
-I'll count it as 'err' in ethtool_ts_stats.
+On Fri, Jan 10, 2025 at 10:33=E2=80=AFPM Eric Dumazet <edumazet@google.com>=
+ wrote:
+>
+> XPS can cause reorders because of the relaxed OOO
+> conditions for pure ACK packets.
+>
+> For hosts not using RFS, what can happpen is that ACK
+> packets are sent on behalf of the cpu processing NIC
+> interrupts, selecting TX queue A for ACK packet P1.
+>
+> Then a subsequent sendmsg() can run on another cpu.
+> TX queue selection uses the socket hash and can choose
+> another queue B for packets P2 (with payload).
+>
+> If queue A is more congested than queue B,
+> the ACK packet P1 could be sent on the wire after
+> P2.
+>
+> A linux receiver when processing P2 currently increments
+> LINUX_MIB_PAWSESTABREJECTED (TcpExtPAWSEstab)
+> and use TCP_RFC7323_PAWS drop reason.
+> It might also send a DUPACK if not rate limited.
+>
+> In order to better understand this pattern, this
+> patch adds a new drop_reason : TCP_RFC7323_PAWS_ACK.
+>
+> For old ACKS like these, we no longer increment
+> LINUX_MIB_PAWSESTABREJECTED and no longer sends a DUPACK,
 
-> > +static int wx_ptp_set_timestamp_mode(struct wx *wx,
-> > +				     struct kernel_hwtstamp_config *config)
-> > +{
-> > +	u32 tsync_tx_ctl = WX_TSC_1588_CTL_ENABLED;
-> > +	u32 tsync_rx_ctl = WX_PSR_1588_CTL_ENABLED;
-> > +	DECLARE_BITMAP(flags, WX_PF_FLAGS_NBITS);
-> > +	u32 tsync_rx_mtrl = PTP_EV_PORT << 16;
-> > +	bool is_l2 = false;
-> > +	u32 regval;
-> > +
-> > +	memcpy(flags, wx->flags, sizeof(wx->flags));
-> > +
-> > +	switch (config->tx_type) {
-> > +	case HWTSTAMP_TX_OFF:
-> > +		tsync_tx_ctl = 0;
-> > +		break;
-> > +	case HWTSTAMP_TX_ON:
-> > +		break;
-> > +	default:
-> > +		return -ERANGE;
-> > +	}
-> > +
-> > +	switch (config->rx_filter) {
-> > +	case HWTSTAMP_FILTER_NONE:
-> > +		tsync_rx_ctl = 0;
-> > +		tsync_rx_mtrl = 0;
-> > +		clear_bit(WX_FLAG_RX_HWTSTAMP_ENABLED, flags);
-> > +		clear_bit(WX_FLAG_RX_HWTSTAMP_IN_REGISTER, flags);
-> > +		break;
-> > +	case HWTSTAMP_FILTER_PTP_V1_L4_SYNC:
-> > +		tsync_rx_ctl |= WX_PSR_1588_CTL_TYPE_L4_V1;
-> > +		tsync_rx_mtrl |= WX_PSR_1588_MSG_V1_SYNC;
-> > +		set_bit(WX_FLAG_RX_HWTSTAMP_ENABLED, flags);
-> > +		set_bit(WX_FLAG_RX_HWTSTAMP_IN_REGISTER, flags);
-> > +		break;
-> > +	case HWTSTAMP_FILTER_PTP_V1_L4_DELAY_REQ:
-> > +		tsync_rx_ctl |= WX_PSR_1588_CTL_TYPE_L4_V1;
-> > +		tsync_rx_mtrl |= WX_PSR_1588_MSG_V1_DELAY_REQ;
-> > +		set_bit(WX_FLAG_RX_HWTSTAMP_ENABLED, flags);
-> > +		set_bit(WX_FLAG_RX_HWTSTAMP_IN_REGISTER, flags);
-> > +		break;
-> > +	case HWTSTAMP_FILTER_PTP_V2_EVENT:
-> > +	case HWTSTAMP_FILTER_PTP_V2_L2_EVENT:
-> > +	case HWTSTAMP_FILTER_PTP_V2_L4_EVENT:
-> > +	case HWTSTAMP_FILTER_PTP_V2_SYNC:
-> > +	case HWTSTAMP_FILTER_PTP_V2_L2_SYNC:
-> > +	case HWTSTAMP_FILTER_PTP_V2_L4_SYNC:
-> > +	case HWTSTAMP_FILTER_PTP_V2_DELAY_REQ:
-> > +	case HWTSTAMP_FILTER_PTP_V2_L2_DELAY_REQ:
-> > +	case HWTSTAMP_FILTER_PTP_V2_L4_DELAY_REQ:
-> > +		tsync_rx_ctl |= WX_PSR_1588_CTL_TYPE_EVENT_V2;
-> > +		is_l2 = true;
-> > +		config->rx_filter = HWTSTAMP_FILTER_PTP_V2_EVENT;
-> > +		set_bit(WX_FLAG_RX_HWTSTAMP_ENABLED, flags);
-> > +		set_bit(WX_FLAG_RX_HWTSTAMP_IN_REGISTER, flags);
-> > +		break;
-> > +	default:
-> > +		/* register RXMTRL must be set in order to do V1 packets,
-> > +		 * therefore it is not possible to time stamp both V1 Sync and
-> > +		 * Delay_Req messages unless hardware supports timestamping all
-> > +		 * packets => return error
-> > +		 */
-> > +		clear_bit(WX_FLAG_RX_HWTSTAMP_ENABLED, wx->flags);
-> > +		clear_bit(WX_FLAG_RX_HWTSTAMP_IN_REGISTER, wx->flags);
-> > +		config->rx_filter = HWTSTAMP_FILTER_NONE;
-> > +		return -ERANGE;
-> 
-> looks like this code is a bit tricky and leads to out-of-sync
-> configuration. Imagine the situation when HWTSTAMP_FILTER_PTP_V2_EVENT
-> was configured first, the hardware was properly set up and timestamps
-> are coming. wx->flags will have bits WX_FLAG_RX_HWTSTAMP_ENABLED and
-> WX_FLAG_RX_HWTSTAMP_IN_REGISTER set. Then the user asks to enable
-> HWTSTAMP_FILTER_ALL, which is not supported. wx->flags will have bits
-> mentioned above cleared, but the hardware will still continue to
-> timestamp some packets.
+I'm afraid that not all the hosts enable the XPS feature. In this way,
+this patch will lead the hosts that don't enable XPS not sending
+DUPACK any more if OOO happens.
 
-You are right. I'll remove the bit clears in the default case.
+So I wonder if it would affect those non XPS cases?
 
-> > +void wx_ptp_reset(struct wx *wx)
-> > +{
-> > +	unsigned long flags;
-> > +
-> > +	/* reset the hardware timestamping mode */
-> > +	wx_ptp_set_timestamp_mode(wx, &wx->tstamp_config);
-> > +	wx_ptp_reset_cyclecounter(wx);
-> > +
-> > +	wr32ptp(wx, WX_TSC_1588_SYSTIML, 0);
-> > +	wr32ptp(wx, WX_TSC_1588_SYSTIMH, 0);
-> > +	WX_WRITE_FLUSH(wx);
-> 
-> writes to WX_TSC_1588_SYSTIML/WX_TSC_1588_SYSTIMH are not protected by
-> tmreg_lock, while reads are protected in wx_ptp_read() and in
-> wx_ptp_gettimex64()
+Thanks,
+Jason
 
-No need to protect it. See below.
-
-> > @@ -1133,6 +1168,21 @@ struct wx {
-> >   	void (*atr)(struct wx_ring *ring, struct wx_tx_buffer *first, u8 ptype);
-> >   	void (*configure_fdir)(struct wx *wx);
-> >   	void (*do_reset)(struct net_device *netdev);
-> > +
-> > +	u32 base_incval;
-> > +	u32 tx_hwtstamp_pkts;
-> > +	u32 tx_hwtstamp_timeouts;
-> > +	u32 tx_hwtstamp_skipped;
-> > +	u32 rx_hwtstamp_cleared;
-> > +	unsigned long ptp_tx_start;
-> > +	spinlock_t tmreg_lock; /* spinlock for ptp */
-> 
-> Could you please explain what this lock protects exactly? According to
-> the name, it should serialize access to tm(?) registers, but there is
-> a mix of locked and unlocked accesses in the code ...
-> If this lock protects cyclecounter/timecounter then it might be better
-> to use another name, like hw_cc_lock. And in this case it's even better
-> to use seqlock_t with reader/writer accessors according to the code path.
-
-It is for struct timecounter. The registers are read only to update the cycle
-counter. I think  it's better to  name it hw_tc_lock.
- 
-
+> keeping credit for other more interesting DUPACK.
+>
+> perf record -e skb:kfree_skb -a
+> perf script
+> ...
+>          swapper       0 [148] 27475.438637: skb:kfree_skb: ... location=
+=3Dtcp_validate_incoming+0x4f0 reason: TCP_RFC7323_PAWS_ACK
+>          swapper       0 [208] 27475.438706: skb:kfree_skb: ... location=
+=3Dtcp_validate_incoming+0x4f0 reason: TCP_RFC7323_PAWS_ACK
+>          swapper       0 [208] 27475.438908: skb:kfree_skb: ... location=
+=3Dtcp_validate_incoming+0x4f0 reason: TCP_RFC7323_PAWS_ACK
+>          swapper       0 [148] 27475.439010: skb:kfree_skb: ... location=
+=3Dtcp_validate_incoming+0x4f0 reason: TCP_RFC7323_PAWS_ACK
+>          swapper       0 [148] 27475.439214: skb:kfree_skb: ... location=
+=3Dtcp_validate_incoming+0x4f0 reason: TCP_RFC7323_PAWS_ACK
+>          swapper       0 [208] 27475.439286: skb:kfree_skb: ... location=
+=3Dtcp_validate_incoming+0x4f0 reason: TCP_RFC7323_PAWS_ACK
+> ...
+>
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> ---
+>  include/net/dropreason-core.h |  5 +++++
+>  net/ipv4/tcp_input.c          | 10 +++++++++-
+>  2 files changed, 14 insertions(+), 1 deletion(-)
+>
+> diff --git a/include/net/dropreason-core.h b/include/net/dropreason-core.=
+h
+> index 3a6602f379783078388eaaad3a9237b11baad534..28555109f9bdf883af2567f74=
+dea86a327beba26 100644
+> --- a/include/net/dropreason-core.h
+> +++ b/include/net/dropreason-core.h
+> @@ -36,6 +36,7 @@
+>         FN(TCP_OVERWINDOW)              \
+>         FN(TCP_OFOMERGE)                \
+>         FN(TCP_RFC7323_PAWS)            \
+> +       FN(TCP_RFC7323_PAWS_ACK)        \
+>         FN(TCP_OLD_SEQUENCE)            \
+>         FN(TCP_INVALID_SEQUENCE)        \
+>         FN(TCP_INVALID_ACK_SEQUENCE)    \
+> @@ -259,6 +260,10 @@ enum skb_drop_reason {
+>          * LINUX_MIB_PAWSESTABREJECTED, LINUX_MIB_PAWSACTIVEREJECTED
+>          */
+>         SKB_DROP_REASON_TCP_RFC7323_PAWS,
+> +       /**
+> +        * @SKB_DROP_REASON_TCP_RFC7323_PAWS_ACK: PAWS check, old ACK pac=
+ket.
+> +        */
+> +       SKB_DROP_REASON_TCP_RFC7323_PAWS_ACK,
+>         /** @SKB_DROP_REASON_TCP_OLD_SEQUENCE: Old SEQ field (duplicate p=
+acket) */
+>         SKB_DROP_REASON_TCP_OLD_SEQUENCE,
+>         /** @SKB_DROP_REASON_TCP_INVALID_SEQUENCE: Not acceptable SEQ fie=
+ld */
+> diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
+> index 24966dd3e49f698e110f8601e098b65afdf0718a..dc0e88bcc5352dafee3814307=
+6f9e4feebdf8be3 100644
+> --- a/net/ipv4/tcp_input.c
+> +++ b/net/ipv4/tcp_input.c
+> @@ -4465,7 +4465,9 @@ static enum skb_drop_reason tcp_disordered_ack_chec=
+k(const struct sock *sk,
+>
+>         /* 2. Is its sequence not the expected one ? */
+>         if (seq !=3D tp->rcv_nxt)
+> -               return reason;
+> +               return before(seq, tp->rcv_nxt) ?
+> +                       SKB_DROP_REASON_TCP_RFC7323_PAWS_ACK :
+> +                       reason;
+>
+>         /* 3. Is this not a duplicate ACK ? */
+>         if (ack !=3D tp->snd_una)
+> @@ -5967,6 +5969,12 @@ static bool tcp_validate_incoming(struct sock *sk,=
+ struct sk_buff *skb,
+>         if (unlikely(th->syn))
+>                 goto syn_challenge;
+>
+> +       /* Old ACK are common, do not change PAWSESTABREJECTED
+> +        * and do not send a dupack.
+> +        */
+> +       if (reason =3D=3D SKB_DROP_REASON_TCP_RFC7323_PAWS_ACK)
+> +               goto discard;
+> +
+>         NET_INC_STATS(sock_net(sk), LINUX_MIB_PAWSESTABREJECTED);
+>         if (!tcp_oow_rate_limited(sock_net(sk), skb,
+>                                   LINUX_MIB_TCPACKSKIPPEDPAWS,
+> --
+> 2.47.1.613.gc27f4b7a9f-goog
+>
+>
 
