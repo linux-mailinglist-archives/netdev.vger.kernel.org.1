@@ -1,211 +1,147 @@
-Return-Path: <netdev+bounces-157574-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157575-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 32765A0ADA5
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 04:00:29 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0007A0ADB8
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 04:04:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0C61C3A600D
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 03:00:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 05273164830
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 03:04:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69BEA136E3B;
-	Mon, 13 Jan 2025 03:00:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC1A413AD26;
+	Mon, 13 Jan 2025 03:04:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="msrmVdeE"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Qq2SX+ww"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f172.google.com (mail-yb1-f172.google.com [209.85.219.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C52C279E1;
-	Mon, 13 Jan 2025 03:00:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FAFA4315A
+	for <netdev@vger.kernel.org>; Mon, 13 Jan 2025 03:04:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736737222; cv=none; b=rWGLD+Ik/ca036BVBdCx88tt91VWpGZS7Y+8s8b4RMTsFTiQ4jyxNzcL2lC0g3Ancgu4qVFuIwOHZiGkRUHcaZHBJgARK5q8RfU4nwcHM3do0AfX0zBWu9zJaWIgTxbAHuBIwcAF1IFn3MudHDb52M3yPGzWZMDDLS9hPBq3k8w=
+	t=1736737481; cv=none; b=n+Xw/NI3Rgxyv7QYJafSjLZW0NdSr9Fn6EsUwod1UqQBuwnuMVVY+L9anZg/neA6+zwJVk1YVBtBtpsaisxRg50oDefVBvkcF/FS2eSe2UJ/JK8Bc5p6rSxS3hqlsENezxS8qlFO8TpRytTE8QuHhjiXF7vzQG5vWTpXFov1nWc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736737222; c=relaxed/simple;
-	bh=vWDv9c+Hb5NFBDqnLC3anS0jUC4B07QypVbhZL/BxTk=;
+	s=arc-20240116; t=1736737481; c=relaxed/simple;
+	bh=yRJfycwjDy0VxrwiaDvig/uV5jBkPvBFTkhNp60TiSo=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=pmf+eAJtbIH/LRS8V24RLS3He/IwgfqZL506ztWHylZCrB4fqg/SgCTwMuMrCtb8UqXLm2a2njhg0oVVqYt+7B0Lp0S+QIq73hrZKFXldmyZSsqrhgUQA2V0rRRo9bY5GkvZNtpDiUlUJnWcBwy2FtlLvLbYMqhX8qTPJPBOCJQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=msrmVdeE; arc=none smtp.client-ip=209.85.219.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f172.google.com with SMTP id 3f1490d57ef6-e3983426f80so5878731276.1;
-        Sun, 12 Jan 2025 19:00:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736737219; x=1737342019; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7vHUyb9eNg2JqWHIeEtx4JxxlaEahhQgvricUcB0kaU=;
-        b=msrmVdeEXhgI6OED5WasaszCm5FJkvfwO3V8oini06lN/Mojp3sV8ykJybQRGFQWuS
-         Ew4rAU1R1AUK5pgbno5Nb9RR+bIkn0OW4uJHmQ7s4+rWo6lPX85smR7wyx5j77HZ9aMq
-         twY7tS0SH6tJqpETq5PeX0L7Kg+L3Gvn6n6nY3cNWnkgziJiZ/GHE427Oj8YzvkBuyz/
-         GVJY80AGg0t+ybgFyfDcoiM6yi5Tt089NLddd9HtHC2v4QDZ3BKyQjQZiPwTRSDOxO0H
-         pn6tFJ8vrNY7+q0LNx/aAirs4YN6unnNSLhHvcsZXTepPJAN2MAPfpXycAhj4NpfjnXN
-         Pvug==
+	 To:Cc:Content-Type; b=h9jMUt1SQ/ZT/ilBBzBYsJX47BbbuOthWyHsn3uppuex6EqezVBYgQdJrwGvkAGq3J9LHrxADCDd4o0U4rNtgpkhojWQIWHJ+b2t9XUeC82dXdW8JfWguCWqoGvTUlsOWkH+NUZnmm2N0jS7TIIkrJ/UXALO3Z74BHRTWThaDqI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Qq2SX+ww; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1736737478;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=yRJfycwjDy0VxrwiaDvig/uV5jBkPvBFTkhNp60TiSo=;
+	b=Qq2SX+wwaCR2FbJ9dtiK2KIA9IBWMPykQoxaekGeb1I+QDy2/6sU5RZ2RBXC07sUOc31fr
+	fzC2zoPxPZ923NuTWxUw+69zULPx5O+dApy9wTaD31cvpeZCT3CGVlSJVoRLhIEjah56px
+	64sWZSy08ABE2bCJE17CPKP/TR8OvKs=
+Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
+ [209.85.216.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-684-3_EZ5md0NumUAPSg4DgXlQ-1; Sun, 12 Jan 2025 22:04:37 -0500
+X-MC-Unique: 3_EZ5md0NumUAPSg4DgXlQ-1
+X-Mimecast-MFC-AGG-ID: 3_EZ5md0NumUAPSg4DgXlQ
+Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-2ee9f66cb12so6904354a91.1
+        for <netdev@vger.kernel.org>; Sun, 12 Jan 2025 19:04:37 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736737219; x=1737342019;
+        d=1e100.net; s=20230601; t=1736737476; x=1737342276;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=7vHUyb9eNg2JqWHIeEtx4JxxlaEahhQgvricUcB0kaU=;
-        b=qTHphbfIIT1Iq8UwDKRHQ574R1okZ5Z2hcmXyK/XKLbBxk293ek3NIvwHiYEZkdrkV
-         mDKlYRl7iwi15/lr4/bfr2t2f3OAh1SjXJMMIU7lfylitsgKmYZZcdTX0KiRrUojYn+m
-         ZsLR8sAgP8VXyitGejHPZrPve5gDE7o4aS4g7nbqR1ubSAoa3dNUa9Y9ZZ4B4oQuxRDV
-         KUbzrdwi8ugQyHhO/lOrR3cJ/r9KUr3kAM5h4o5HAJW1l2rE53rs0OfjaFl17Whtubse
-         jqrTWs+YEPqegIF3irgAaWl3c1h1xH368c9mc0SGfFBxO8MKyCQVuoxpE3Qj4PsGmoAx
-         UYhQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUK0CiXomYykw0fdYj25dDmuoz/DZ4uJO3K2AxyvWTU8flJhvikoOuw9IBPC0ybs/6dyjgORcr/@vger.kernel.org, AJvYcCW0ApG1ciJhKM3IKFIVaRBORJuiwNEbF8++CiaFhPEizgTZcR3fwFxpmu/v0dYxgiQYQ08bJBfXlXlZ+H83@vger.kernel.org, AJvYcCW6EaLrO+tG32JQ0cue501tXWsg4XFhspq3VfT/Kba979fUmpClYRfKlTIk4gl7RifjG5EGhYqreHj+@vger.kernel.org, AJvYcCWMmIrFgET8eIEZlM1xmwg7b73IWmYEzR5ajuUQLOtuqeKNwdaFddDaEDpuhyJEFDRo1SpLo1rufE7Dk536ZAg=@vger.kernel.org, AJvYcCWO+oeLv2sCLPYF6YY2NyFoJfy9kMEMoJ3RejC7We6Ihj74u8nqlX9Slin68afjb0DV87ogDvkEZVwW@vger.kernel.org, AJvYcCWTdxm8p1omKnHHmheTqjL4KsjoQFY/8u3ZWOhgQh24MxzIABD6NgS2ZYgHIV9On3utXfGl9F5cK99sreA=@vger.kernel.org, AJvYcCX20F3YL8xNuL17QBGXdtMQBbKB0AYtjkbbvA+2M78HpK1rqJ5godFBk/fGSYflfzYWfL9oa7XPc3YftA==@vger.kernel.org, AJvYcCXcKAb20c0Lj9IQ0urOd6JsQ3dDTXJbz/FVxlUt5o4TuGW2GWcY3PkPA4U5GJ+ptk9WTukgx65oTCA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyxobPcfGrskszvDhj9vf0VjY4IUM9aypLXs2avVgcBTYruQ9wj
-	LxtFSMwhhUXvo4qZIPdlv1kWHt3wMZ3vUbgBuyRqYYJDJxzSIUOrOFe2ZGEwUh3hZL4Zd1BEVPd
-	haJYYAgbSONTloICF8jkoCr0T/qo=
-X-Gm-Gg: ASbGncubp5jZFm15NToKBfk87nrjcXQn9k0H3umDmqmj2WsUvn7eB3GNyJggPD3RGxW
-	cPsN4i9M5JtDr0qFhlTPPD8k4sXoiJDcUX2XkNd85rJHDD4/0ni8b+HDHxdYf3w/5Dkr+M08=
-X-Google-Smtp-Source: AGHT+IGsfoH84Emy/3VAy+2ciT/LDM53GHF7kLpSuNtlkY+mcbIYtSqMBLpJAo2tp5wPRRi4KWOuDrwlzY99kXjwbZU=
-X-Received: by 2002:a25:2104:0:b0:e47:f4e3:87e3 with SMTP id
- 3f1490d57ef6-e54edf25ca4mr10429337276.11.1736737218579; Sun, 12 Jan 2025
- 19:00:18 -0800 (PST)
+        bh=yRJfycwjDy0VxrwiaDvig/uV5jBkPvBFTkhNp60TiSo=;
+        b=pom2scAgIvCjk0eRFy0Nq1tkSLTL5Id32YrUI211tHoUJ8xefD6iHwdrwMLWtgFuBd
+         lrRljtLnsqPKNJg9xvLA5Cplu/znCg8ZHd8oaqvnHS7uBvKMSk7tmInrjSvdpe+UJ2nC
+         Onp8M9zQrITR2F3aYHEUh9zo5JC8XTYiflTZ/ACSMlkBcB6WDnlRN4MxCAn3zKqd5I9H
+         qv4MTbGWqa4SDeaSDvDYUrND0HQinLSr802YjNiIeqinZQ2mSVNocEPhZ6mcxOmmlWj7
+         jkng8oCqjaEXj4epUoyqiOSII3T4wTcp/lBFqbR3zr4/5HcuwbBDZ0I1XFzil2jRBqaa
+         fhKg==
+X-Forwarded-Encrypted: i=1; AJvYcCV0mmQBXj9hbqdJpv9SFbxkfvBnInmaaXI6Yqrs9CKHiRG4zhhzlAOZh+q9ceNCA3FHPcR7+mo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwJvxz7AMmDsxDOEYu2llrllX4j/7Z8qpvcgl9M3rt/cl0X4Qfj
+	CFJryiMBWa2wFTHTRpW0bSnAdu4yToxtfn+6JGvOPOA4PXqzHgAlQefzGpy9HJPu8iiq5xAWzRK
+	jRwkAbYPAqL4rj78t/I/1cVKef/+3pqloH1CMp4DRZTswH9QnIpn4tYhqvE017YnIwDESaSQLxH
+	WWCN3auLBub3iISNkiUmcYxo3gYf27
+X-Gm-Gg: ASbGncuMvFDzEIoAgNxgpLaVTanjmZHN7j4enpjAxbH/H4qJLFQDYeWoHke4WGCoVyI
+	OEEF4kDSqTLDiSiTCfn8pd9eg18R7ZalibAyRoMM=
+X-Received: by 2002:a17:90b:5145:b0:2ea:37b4:5373 with SMTP id 98e67ed59e1d1-2f548eac588mr28389810a91.10.1736737476520;
+        Sun, 12 Jan 2025 19:04:36 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IE3vQ4vRdPBx0guyoTg5ZpyZUQ/sA/eheHAAs75pTrkZhjd2AbRMvv82RBzJBTsua8lQjGaRuJEc2TbijFE4yM=
+X-Received: by 2002:a17:90b:5145:b0:2ea:37b4:5373 with SMTP id
+ 98e67ed59e1d1-2f548eac588mr28389757a91.10.1736737476052; Sun, 12 Jan 2025
+ 19:04:36 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241227095727.2401257-1-a0282524688@gmail.com>
- <20241227095727.2401257-7-a0282524688@gmail.com> <20250106135135.GN4068@kernel.org>
-In-Reply-To: <20250106135135.GN4068@kernel.org>
-From: Ming Yu <a0282524688@gmail.com>
-Date: Mon, 13 Jan 2025 11:00:07 +0800
-X-Gm-Features: AbW1kvZmveBm_1ZsSzbrQ6SCqOa0J-Y9vxXUkcqQ9J4x_X6pa8sZdwCwcoEMWQw
-Message-ID: <CAOoeyxWvRzHRVLW-U=nemfUpoF5pcO_bDmvg4U-wVqkFp=V=Yg@mail.gmail.com>
-Subject: Re: [PATCH v4 6/7] hwmon: Add Nuvoton NCT6694 HWMON support
-To: Simon Horman <horms@kernel.org>
-Cc: tmyu0@nuvoton.com, lee@kernel.org, linus.walleij@linaro.org, brgl@bgdev.pl, 
-	andi.shyti@kernel.org, mkl@pengutronix.de, mailhol.vincent@wanadoo.fr, 
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, wim@linux-watchdog.org, 
-	linux@roeck-us.net, jdelvare@suse.com, alexandre.belloni@bootlin.com, 
-	linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org, 
-	linux-i2c@vger.kernel.org, linux-can@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org, 
-	linux-rtc@vger.kernel.org
+References: <20250109-tun-v2-0-388d7d5a287a@daynix.com> <20250109-tun-v2-3-388d7d5a287a@daynix.com>
+ <CACGkMEsm5DCb+n3NYeRjmq3rAANztZz5QmV8rbPNo+cH-=VzDQ@mail.gmail.com>
+ <20250110052246-mutt-send-email-mst@kernel.org> <2e015ee6-8a3b-43fb-b119-e1921139c74b@daynix.com>
+In-Reply-To: <2e015ee6-8a3b-43fb-b119-e1921139c74b@daynix.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Mon, 13 Jan 2025 11:04:24 +0800
+X-Gm-Features: AbW1kvZHQU9iIwkWwKeABYuwHLZExY2G4KWx_BvVBrd2ec7v_BAcbnTLlgvVmZE
+Message-ID: <CACGkMEuiyfH-QitiiKJ__-8NiTjoOfc8Nx5BwLM-GOfPpVEitA@mail.gmail.com>
+Subject: Re: [PATCH v2 3/3] tun: Set num_buffers for virtio 1.0
+To: Akihiko Odaki <akihiko.odaki@daynix.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Shuah Khan <shuah@kernel.org>, linux-doc@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, kvm@vger.kernel.org, 
+	virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org, 
+	Yuri Benditovich <yuri.benditovich@daynix.com>, Andrew Melnychenko <andrew@daynix.com>, 
+	Stephen Hemminger <stephen@networkplumber.org>, gur.stavi@huawei.com, devel@daynix.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Dear Simon,
+On Fri, Jan 10, 2025 at 7:12=E2=80=AFPM Akihiko Odaki <akihiko.odaki@daynix=
+.com> wrote:
+>
+> On 2025/01/10 19:23, Michael S. Tsirkin wrote:
+> > On Fri, Jan 10, 2025 at 11:27:13AM +0800, Jason Wang wrote:
+> >> On Thu, Jan 9, 2025 at 2:59=E2=80=AFPM Akihiko Odaki <akihiko.odaki@da=
+ynix.com> wrote:
+> >>>
+> >>> The specification says the device MUST set num_buffers to 1 if
+> >>> VIRTIO_NET_F_MRG_RXBUF has not been negotiated.
+> >>
+> >> Have we agreed on how to fix the spec or not?
+> >>
+> >> As I replied in the spec patch, if we just remove this "MUST", it
+> >> looks like we are all fine?
+> >>
+> >> Thanks
+> >
+> > We should replace MUST with SHOULD but it is not all fine,
+> > ignoring SHOULD is a quality of implementation issue.
+> >
 
-Thank you for your comments,
+So is this something that the driver should notice?
 
-Simon Horman <horms@kernel.org> =E6=96=BC 2025=E5=B9=B41=E6=9C=886=E6=97=A5=
- =E9=80=B1=E4=B8=80 =E4=B8=8B=E5=8D=889:51=E5=AF=AB=E9=81=93=EF=BC=9A
 >
-...
-> > +static int nct6694_pwm_read(struct device *dev, u32 attr, int channel,
-> > +                         long *val)
-> > +{
-> > +     struct nct6694_hwmon_data *data =3D dev_get_drvdata(dev);
-> > +     unsigned char pwm_en;
-> > +     int ret;
-> > +
-> > +     guard(mutex)(&data->lock);
-> > +
-> > +     switch (attr) {
-> > +     case hwmon_pwm_enable:
-> > +             pwm_en =3D data->hwmon_en.pwm_en[channel / 8];
-> > +             *val =3D !!(pwm_en & BIT(channel % 8));
-> > +
-> > +             return 0;
-> > +     case hwmon_pwm_input:
-> > +             ret =3D nct6694_read_msg(data->nct6694, NCT6694_RPT_MOD,
-> > +                                    NCT6694_PWM_IDX(channel),
-> > +                                    sizeof(data->rpt->fin),
-> > +                                    &data->rpt->fin);
-> > +             if (ret)
-> > +                     return ret;
-> > +
-> > +             *val =3D data->rpt->fin;
->
-> Hi Ming Yu,
->
-> *val is host byte order, but fin is big endian.
-> Elsewhere in this patch this seems to be handled using,
-> which looks correct to me:
->
->                 *val =3D be16_to_cpu(data->rpt->fin);
->
-> Flagged by Sparse.
->
+> Should we really replace it? It would mean that a driver conformant with
+> the current specification may not be compatible with a device conformant
+> with the future specification.
 
-Yes, it needs to be fixed to be16_to_cpu(). I'll make the modification
-in the next patch.
+I don't get this. We are talking about devices and we want to relax so
+it should compatibile.
 
-> > +
-> > +             return 0;
-> > +     case hwmon_pwm_freq:
-> > +             *val =3D NCT6694_FREQ_FROM_REG(data->hwmon_en.pwm_freq[ch=
-annel]);
-> > +
-> > +             return 0;
-> > +     default:
-> > +             return -EOPNOTSUPP;
-> > +     }
-> > +}
 >
-> ...
->
-> > +static int nct6694_fan_write(struct device *dev, u32 attr, int channel=
-,
-> > +                          long val)
-> > +{
-> > +     struct nct6694_hwmon_data *data =3D dev_get_drvdata(dev);
-> > +     int ret;
-> > +
-> > +     guard(mutex)(&data->lock);
-> > +
-> > +     switch (attr) {
-> > +     case hwmon_fan_enable:
-> > +             if (val =3D=3D 0)
-> > +                     data->hwmon_en.fin_en[channel / 8] &=3D ~BIT(chan=
-nel % 8);
-> > +             else if (val =3D=3D 1)
-> > +                     data->hwmon_en.fin_en[channel / 8] |=3D BIT(chann=
-el % 8);
-> > +             else
-> > +                     return -EINVAL;
-> > +
-> > +             return nct6694_write_msg(data->nct6694, NCT6694_HWMON_MOD=
-,
-> > +                                      NCT6694_HWMON_CONTROL,
-> > +                                      sizeof(data->msg->hwmon_ctrl),
-> > +                                      &data->hwmon_en);
-> > +     case hwmon_fan_min:
-> > +             ret =3D nct6694_read_msg(data->nct6694, NCT6694_HWMON_MOD=
-,
-> > +                                    NCT6694_HWMON_ALARM,
-> > +                                    sizeof(data->msg->hwmon_alarm),
-> > +                                    &data->msg->hwmon_alarm);
-> > +             if (ret)
-> > +                     return ret;
-> > +
-> > +             val =3D clamp_val(val, 1, 65535);
-> > +             data->msg->hwmon_alarm.fin_ll[channel] =3D (u16)cpu_to_be=
-16(val);
->
-> cpu_to_be16() returns a 16bit big endian value.
-> And, AFAIKT, the type of data->msg->hwmon_alarm.fin_ll[channel] is __be16=
-.
->
-> So the cast above seems both unnecessary and misleading.
->
-> Also flagged by Sparse,
+> We are going to fix all implementations known to buggy (QEMU and Linux)
+> anyway so I think it's just fine to leave that part of specification as i=
+s.
+
+I don't think we can fix it all.
+
+Thanks
+
 >
 
-Understood. Fix it in v5.
-
-> ...
-
-Best regards,
-Ming
 
