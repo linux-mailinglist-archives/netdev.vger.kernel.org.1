@@ -1,73 +1,73 @@
-Return-Path: <netdev+bounces-157605-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157606-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57DE1A0AF68
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 07:40:52 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6157DA0AF69
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 07:40:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4F1943A6F72
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 06:40:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 59F771886C47
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 06:40:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B423233124;
-	Mon, 13 Jan 2025 06:40:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66EAE233130;
+	Mon, 13 Jan 2025 06:40:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="RNJI4KQ0"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="U8KivjuI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D39D232780
-	for <netdev@vger.kernel.org>; Mon, 13 Jan 2025 06:40:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C152F231C85
+	for <netdev@vger.kernel.org>; Mon, 13 Jan 2025 06:40:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736750418; cv=none; b=l8A+PATxCkOmV0V/lwB7deFwFwIiXdkQCapOonuyd6xerl/3GhlN403TBjcYXQFsWhcwdMre6vU5Nzx4zZD2EjkCNPEqoipisftRZ3VV5P0IYi9IssA0HRbR12KCFStaiIhD3IAbrurDy246Yse/ZDOO0iPanD0hPqSq24z4Fek=
+	t=1736750419; cv=none; b=SzQNELjz7yT5Rv5hfeWg6Ay/qE7jSQFVyaYr1TkPaZnw0Vg9iz+As3Jd92WzFQ0Jf1yvuUBPekxxJHSitHEnXOiK7Bcm3db5V65ztTInWkk70r3yboBEgJl3mIBTd8LcEuPDaxky5DtvilJF9fttrbtSIfrFBZlFIVh5o/MLZ74=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736750418; c=relaxed/simple;
-	bh=LtGLFlZCuLB26h0C57Xbpxchpfd0yGdBnyNXqg4zol0=;
+	s=arc-20240116; t=1736750419; c=relaxed/simple;
+	bh=OW/EhcPAALkMHONpotvVdmf9I2szxk8QJccSlFm+e0g=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=JbIYIJWJhfTbUL+u6+6kZqs94QeM2VWABljlgO/tsdDGKurmMksJ0VpgtIPPwzpTG5I3PmHuKW8z/GDe2PZC6WpA32vPfTdD5q+MkuAWvhZCfWSywvusJhAf13mfs02jC1VJ5ZsrsWPlEneUOWblhVU8wowC+1KpjscdJYQePN4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=RNJI4KQ0; arc=none smtp.client-ip=209.85.214.181
+	 MIME-Version; b=pwOvUdRLpYkhmEpMNCqKFKDx3V/LK8GWRujLoqmRwXxER2xn5yz1/5OK8mSjE3pRYQcBMy9BoOY+JrQd/kGpCvYJh6Pz5aJPsY0u/nxDvoNJUgt87t4Q+awsZuhAxn+ZrZif/BI/GIJ4KSrE/GMNsb/kERbJfmq0iC2bEqihQNg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=U8KivjuI; arc=none smtp.client-ip=209.85.214.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-216728b1836so66289335ad.0
-        for <netdev@vger.kernel.org>; Sun, 12 Jan 2025 22:40:16 -0800 (PST)
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-21619108a6bso65446645ad.3
+        for <netdev@vger.kernel.org>; Sun, 12 Jan 2025 22:40:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1736750416; x=1737355216; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1736750417; x=1737355217; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Do9Y7F8ta8tI4xzuwVHlG3rrw+vbCLlsnA7GtVLEL10=;
-        b=RNJI4KQ0ty8HFZ206OvkgOjik8Vwt0ueAXJQ365SF5TSfMjOYtuSCDT9cSh+laRkyX
-         CPSSgsMfU8jlaPSWiz+8usophPSGHlLzgqzpi7P8i1VnqgkXblzjFliZD20ayWOCMyVI
-         3AAwcq8DtANONilEn6qlWf0SzyQHi2h87tUYc=
+        bh=SR5XWqzcjY8ThcvEtHL1qDDCuhjPAi88uUlx04yuMF8=;
+        b=U8KivjuIkCMTIMWD8FrRy3FTCMeNx/6kloQF9ShNtWmEqWm8kwVUSv2YDGbL4kCO6v
+         59MnTwgeVbouo51oKQaji7itQxMRGy+ef5iqmRPZLuRTroUdIC8F8TmFM9lWGJB4vGtA
+         Te/pwHlGNUt7B0P8E+eQHW1dK7R8t/johIct0=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736750416; x=1737355216;
+        d=1e100.net; s=20230601; t=1736750417; x=1737355217;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Do9Y7F8ta8tI4xzuwVHlG3rrw+vbCLlsnA7GtVLEL10=;
-        b=UeeFiF2/mE4Nko09avu8HTZh5QiO/uwy/KSO6duOdo21bb/IQaT8fmxD0kpfjW1jcs
-         Y2u6WnynBDnX0tbOU1elw7rLIGKvyb+GRqROu+4vrPXCHeztjY4n3DY1r8plD6rJ/tMo
-         9M41mqjl/88zYQCXflMAfokC6e+3/wlC7+jCwhxVWImKSl1Lb9wIzU2k6N/RPhI7OMTh
-         D8M43sYF9q5Bl3NVMo+hR85gr8r2qpOeNI3zUR2fkOlF9Qaum+wK7Z36twT8byiG0w5+
-         mPc91nviX4ZNh0amnE3xHtQGHTr5uJXRWAwysPumZDN/MJfOrQ4IJVhgLAPdCprXWsCP
-         ykyg==
-X-Gm-Message-State: AOJu0YzdnXD0Fa41x4Y1w7KcWZcjAdp0af9AM2NVTn1b+G6DRa+oRNMP
-	0oiAtGEl+UeU5jGdVteH4VEUxQpmBk6ICLg7m7Rn8ueWTlY5ltEflK+NQsKvcQ==
-X-Gm-Gg: ASbGncuPUrO/wBCloBqUqqTOH2sWuz0zT7xnBkC6wIPO+7dl97g6A+zAddqOjeGcQMT
-	sXTwtwMXdDsDVC5enI6aPTIzueNBseXqgIhohLxbhkEB/CdZV8Ex7zBvo24irwDUcwwxWHyzVVS
-	XCEMZSEY7oyzm+1arTLlX4UIQ3YGgguaC8w1IOwC0OKY4ua+P7tCdvVKUI+iS+kgQhaUMxK+FeV
-	9Fu3L8OJgjRxsN/RBzw6HOIE5lr34+r0PCkWxbEVzWaztxJ+dc+bCaeF/bzkznteudpVHkrSaEY
-	HDnWOzbuiZK1DKRJPgDq/YiY7RDzX7nu
-X-Google-Smtp-Source: AGHT+IE3To7RMKSvdFJ2fKWLq+sjEZMMshsBW6o8iiJJtXxBeh58DLdd5gTevfoz8VgtWMOgeIY3kA==
-X-Received: by 2002:a17:902:db0e:b0:216:725c:a11a with SMTP id d9443c01a7336-21a83f43b7amr330127465ad.10.1736750415882;
-        Sun, 12 Jan 2025 22:40:15 -0800 (PST)
+        bh=SR5XWqzcjY8ThcvEtHL1qDDCuhjPAi88uUlx04yuMF8=;
+        b=vZ4rwUK5/FDH3gqKlEAi1+Pcl4apvFwXbcpU2otrKlsJxVHHAD00cTq8BXy6giR1mE
+         SxW2edf/tkL/SZFSQXTNguKqP1ZH60mKaav2zMjan1CIt9o7hY4ipgPAD783KncrGiKv
+         TCK7NtECWw15L7Y2O8hzu4NAEBrqsF2aK+RBNp2X/sAXzkqtvaoqTtarBFLnfdXkVZcS
+         Um1oYFc0Vlo2amhT9nBaA64K5crx094i5LU+dVnEuJvQHc1l7FABdBRZw4rsa1Zj544B
+         PfNxMF0IBWrOlFLHjeZwGkrdiQEXS/dz+/MFYFgt+hjTM7NbMU8CiNBXv+HRTQcAsk2a
+         CtqA==
+X-Gm-Message-State: AOJu0YzfkPIf5ZZEauLVdMv0NpjJyZHfmvbEpBZz9ETJ3XhMj+SoBx7m
+	FdIkWO/VrhOI7o0RZVax2eTEx56L0beO7Rsv1mZ3vSgCEB37408Rn5GwRi7N3A==
+X-Gm-Gg: ASbGncvwT7SXcRFKZ2pTgGlMkzU8pmTjjbv5V7Id06fmHmv93K8CY4e76EMLl0KreWg
+	iKvKS0HfFDv2Ez+GaZ0ThMfOXiKhCWlz8ZVsIm7pUxMeY7R+K8dF7APt1eVe6x9+w+H0nVlsio3
+	ojVpNXwEPhO3N/zgtoaDoA7umUyyIUi0xEsDATFeFEUflncIjFWUWe46D+FH+Va1zVfZbnYW5lK
+	oW8h3hlh6uDo7S4Me16sBYlORP65wLCkmvxJGJ7Jj7iFJkseOFRXWyzRKVwpEOlBTq8dq9SnFFm
+	fVYrVM2xhMm981oerdny2ymQwtFVsrMj
+X-Google-Smtp-Source: AGHT+IE6YTmjpi6iZTgNPfCubCJBN2Hv9p/lNrM8qetcwJ2IDS1FUW+prG8VnIqGV1cDrtoxn/Jh+g==
+X-Received: by 2002:a17:902:f54e:b0:215:8809:b3b7 with SMTP id d9443c01a7336-21a83f36de7mr281085705ad.7.1736750417114;
+        Sun, 12 Jan 2025 22:40:17 -0800 (PST)
 Received: from lvnvda3289.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21a9f254264sm46488165ad.233.2025.01.12.22.40.14
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21a9f254264sm46488165ad.233.2025.01.12.22.40.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 12 Jan 2025 22:40:15 -0800 (PST)
+        Sun, 12 Jan 2025 22:40:16 -0800 (PST)
 From: Michael Chan <michael.chan@broadcom.com>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -78,11 +78,10 @@ Cc: netdev@vger.kernel.org,
 	pavan.chebbi@broadcom.com,
 	andrew.gospodarek@broadcom.com,
 	somnath.kotur@broadcom.com,
-	Hongguang Gao <hongguang.gao@broadcom.com>,
-	Ajit Khaparde <ajit.khaparde@broadcom.com>
-Subject: [PATCH net-next 07/10] bnxt_en: Pass NQ ID to the FW when allocating RX/RX AGG rings
-Date: Sun, 12 Jan 2025 22:39:24 -0800
-Message-ID: <20250113063927.4017173-8-michael.chan@broadcom.com>
+	David Wei <dw@davidwei.uk>
+Subject: [PATCH net-next 08/10] bnxt_en: Reallocate Rx completion ring for TPH support
+Date: Sun, 12 Jan 2025 22:39:25 -0800
+Message-ID: <20250113063927.4017173-9-michael.chan@broadcom.com>
 X-Mailer: git-send-email 2.43.4
 In-Reply-To: <20250113063927.4017173-1-michael.chan@broadcom.com>
 References: <20250113063927.4017173-1-michael.chan@broadcom.com>
@@ -94,43 +93,85 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Newer firmware can use the NQ ring ID associated with each RX/RX AGG
-ring to enable PCIe Steering Tags on P5_PLUS chips.  When allocating
-RX/RX AGG rings, pass along NQ ring ID for the firmware to use.  This
-information helps optimize DMA writes by directing them to the cache
-closer to the CPU consuming the data, potentially improving the
-processing speed.  This change is backward-compatible with older
-firmware, which will simply disregard the information.
+From: Somnath Kotur <somnath.kotur@broadcom.com>
 
-Reviewed-by: Hongguang Gao <hongguang.gao@broadcom.com>
-Reviewed-by: Ajit Khaparde <ajit.khaparde@broadcom.com>
-Signed-off-by: Andy Gospodarek <andrew.gospodarek@broadcom.com>
-Signed-off-by: Michael Chan <michael.chan@broadcom.com>
+In order to program the correct Steering Tag during an IRQ affinity
+change, we need to free/re-allocate the Rx completion ring during
+queue_restart.  Call FW to free the Rx completion ring and clear the
+ring entries in queue_stop().  Re-allocate it in queue_start().
+
+Signed-off-by: Somnath Kotur <somnath.kotur@broadcom.com>
+Reviewed-by: Michael Chan <michael.chan@broadcom.com>
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+Cc: David Wei <dw@davidwei.uk>
+---
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c | 26 +++++++++++++++++++++--
+ 1 file changed, 24 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index c862250d3b77..30a57bbc407c 100644
+index 30a57bbc407c..fe350d0ba99c 100644
 --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
 +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -6922,7 +6922,8 @@ static void bnxt_set_rx_ring_params_p5(struct bnxt *bp, u32 ring_type,
- 				       struct bnxt_ring_struct *ring)
- {
- 	struct bnxt_ring_grp_info *grp_info = &bp->grp_info[ring->grp_idx];
--	u32 enables = RING_ALLOC_REQ_ENABLES_RX_BUF_SIZE_VALID;
-+	u32 enables = RING_ALLOC_REQ_ENABLES_RX_BUF_SIZE_VALID |
-+		      RING_ALLOC_REQ_ENABLES_NQ_RING_ID_VALID;
- 
- 	if (ring_type == HWRM_RING_ALLOC_AGG) {
- 		req->ring_type = RING_ALLOC_REQ_RING_TYPE_RX_AGG;
-@@ -6936,6 +6937,7 @@ static void bnxt_set_rx_ring_params_p5(struct bnxt *bp, u32 ring_type,
- 				cpu_to_le16(RING_ALLOC_REQ_FLAGS_RX_SOP_PAD);
- 	}
- 	req->stat_ctx_id = cpu_to_le32(grp_info->fw_stats_ctx);
-+	req->nq_ring_id = cpu_to_le16(grp_info->cp_fw_ring_id);
- 	req->enables |= cpu_to_le32(enables);
+@@ -7399,6 +7399,19 @@ static void bnxt_hwrm_cp_ring_free(struct bnxt *bp,
+ 	ring->fw_ring_id = INVALID_HW_RING_ID;
  }
+ 
++static void bnxt_clear_one_cp_ring(struct bnxt *bp, struct bnxt_cp_ring_info *cpr)
++{
++	struct bnxt_ring_struct *ring = &cpr->cp_ring_struct;
++	int i, size = ring->ring_mem.page_size;
++
++	cpr->cp_raw_cons = 0;
++	cpr->toggle = 0;
++
++	for (i = 0; i < bp->cp_nr_pages; i++)
++		if (cpr->cp_desc_ring[i])
++			memset(cpr->cp_desc_ring[i], 0, size);
++}
++
+ static void bnxt_hwrm_ring_free(struct bnxt *bp, bool close_path)
+ {
+ 	u32 type;
+@@ -15618,10 +15631,15 @@ static int bnxt_queue_start(struct net_device *dev, void *qmem, int idx)
+ 	rc = bnxt_hwrm_rx_ring_alloc(bp, rxr);
+ 	if (rc)
+ 		return rc;
+-	rc = bnxt_hwrm_rx_agg_ring_alloc(bp, rxr);
++
++	rc = bnxt_hwrm_cp_ring_alloc_p5(bp, rxr->rx_cpr);
+ 	if (rc)
+ 		goto err_free_hwrm_rx_ring;
+ 
++	rc = bnxt_hwrm_rx_agg_ring_alloc(bp, rxr);
++	if (rc)
++		goto err_free_hwrm_cp_ring;
++
+ 	bnxt_db_write(bp, &rxr->rx_db, rxr->rx_prod);
+ 	if (bp->flags & BNXT_FLAG_AGG_RINGS)
+ 		bnxt_db_write(bp, &rxr->rx_agg_db, rxr->rx_agg_prod);
+@@ -15645,6 +15663,8 @@ static int bnxt_queue_start(struct net_device *dev, void *qmem, int idx)
+ 
+ 	return 0;
+ 
++err_free_hwrm_cp_ring:
++	bnxt_hwrm_cp_ring_free(bp, rxr->rx_cpr);
+ err_free_hwrm_rx_ring:
+ 	bnxt_hwrm_rx_ring_free(bp, rxr, false);
+ 	return rc;
+@@ -15669,11 +15689,13 @@ static int bnxt_queue_stop(struct net_device *dev, void *qmem, int idx)
+ 	cancel_work_sync(&rxr->bnapi->cp_ring.dim.work);
+ 	bnxt_hwrm_rx_ring_free(bp, rxr, false);
+ 	bnxt_hwrm_rx_agg_ring_free(bp, rxr, false);
+-	rxr->rx_next_cons = 0;
+ 	page_pool_disable_direct_recycling(rxr->page_pool);
+ 	if (bnxt_separate_head_pool())
+ 		page_pool_disable_direct_recycling(rxr->head_pool);
+ 
++	bnxt_hwrm_cp_ring_free(bp, rxr->rx_cpr);
++	bnxt_clear_one_cp_ring(bp, rxr->rx_cpr);
++
+ 	memcpy(qmem, rxr, sizeof(*rxr));
+ 	bnxt_init_rx_ring_struct(bp, qmem);
  
 -- 
 2.30.1
