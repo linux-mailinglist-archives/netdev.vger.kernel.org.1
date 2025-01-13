@@ -1,123 +1,177 @@
-Return-Path: <netdev+bounces-157558-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157559-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B030A0ACBC
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 00:54:04 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD375A0ACC1
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 01:12:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1FF8D3A4324
-	for <lists+netdev@lfdr.de>; Sun, 12 Jan 2025 23:53:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9DC9F18861C3
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 00:12:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 269F01C2DA2;
-	Sun, 12 Jan 2025 23:54:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9047A139E;
+	Mon, 13 Jan 2025 00:12:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QGVt2SNx"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cGgbedJv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+Received: from mail-io1-f54.google.com (mail-io1-f54.google.com [209.85.166.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7E401C1F1F
-	for <netdev@vger.kernel.org>; Sun, 12 Jan 2025 23:53:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D294136A;
+	Mon, 13 Jan 2025 00:12:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736726040; cv=none; b=ApSBN7zgNQp/yAsyinu6w8327Vp9O32va3o0HNcpthxTZD6UlHWQsoTwpVLaYrsVrxQyvCkGR+1Bo5Htsa5WBXtMU5QV4ipleyOMtQkMb8OSJhpWWIgmk9GGX2RhvhIn3ekbc8Bzyc1iaWy2kY2QuKXKarKU9C2DKj/H6TrU224=
+	t=1736727135; cv=none; b=h1T7+lsxPqdfbu8lxWWnOhMnN9UGe1vpE5gwY3xPTKM1Pba+QyifGk8U7dXJplsy1UrPKn+07HVVfMhZ5EenIols19CoqrzFM966GGYHEtVRG5vwMNNm6XTRYsDpC77PSJQqPKARyskMHz9eTuSKPDUXyDKHtiXVnDeiUMYYqC8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736726040; c=relaxed/simple;
-	bh=YooeH+p001XhcAqW6rPDW99RIi5/w3DdvKLz8wIxN3E=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ICo7q70VIxutJFWFrV0SN/UzPvz9K0aAehtqqaMeDZAkY4Ki7M3DZLOeWonR8SkWK8VLwJA8bFjMpH9042gktCKCt87IbiGQOjFyiNsRjjai32UNIbeeXoJ6oE0sRtttMLAwRUFrm8P6hJz8MLs/SuMjsy/43EBqVF5ddqOGGww=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QGVt2SNx; arc=none smtp.client-ip=209.85.214.169
+	s=arc-20240116; t=1736727135; c=relaxed/simple;
+	bh=TMlTbizgnR+xTCZnuoTxQWuoOkPGbMGynCYA2mYCmRg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Gc0t6fej90IPcI18hPttf9d/O5vYggwFztBxMyQgzbH3rBOVMBGqKsf2GeO7cfMdS8WsEFPXrVqpqzMn5n7AfwxDWdRX9cFUr+vs2hX/H1sthlHsKvmcvrRFAmSk1VN35/350aQ9m0kJc0lLWaX+I6R1kBz6KOarxqHnghPYa68=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cGgbedJv; arc=none smtp.client-ip=209.85.166.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-2167141dfa1so64116015ad.1
-        for <netdev@vger.kernel.org>; Sun, 12 Jan 2025 15:53:58 -0800 (PST)
+Received: by mail-io1-f54.google.com with SMTP id ca18e2360f4ac-84a012f7232so154195739f.0;
+        Sun, 12 Jan 2025 16:12:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736726038; x=1737330838; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=rENg5OIo++0a6KsxYANDprd4hMcZ7i23K5ieWTnEaNk=;
-        b=QGVt2SNxy589bcgMDN4cgV35K4HjCrzb77nfm9E1A4wjsbaAcVQVdgI64JosUBEfj7
-         4TUIGX2A9kPSe7DKGD3UrYIlOBAQ1LwZqHFG7hITiLH/kcH+ZgOTlp+xAMcScUZV5GLb
-         Z3naqaTQ+5wCzDhBeaFil6EnTMlPIiJ80BY/KdI61Wa4jOz3TpsqGTI2WLSb+OpnolUE
-         FEwVaKC68xbnt3Nzkq8TCqaG7IYJ9VX9ibxMCKENa3n7reoFi8kgHcB4PUwq9Wh3qKDg
-         RNy15nVx1HKx6ECPwA9RJDbLu1I50oTvuO9whnhdZPiQ9DHQlPEQX8/ynucMcWPWgvIQ
-         pj4Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736726038; x=1737330838;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1736727133; x=1737331933; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=rENg5OIo++0a6KsxYANDprd4hMcZ7i23K5ieWTnEaNk=;
-        b=aoAh1mvZewEcopCH+1GkEvkMBInHK615zmx/9xQFqopv5ZeLt3KKhOH7Apsg6hIYwJ
-         dYvVbxz09Iyt03g/ok8xzegWgeKRoh99zoh3kUFGzyv3zwJN7MhnC6qTrasxJbyrSqIz
-         KT+NYg4XByv0uSQRn2yfMQRQg5auR0tlx99qt00jivlxk8VJeC70GFezAX01yBZPG2sy
-         chLo+FtVvJrVTA6qkY3XMYu7nYqiiPNGCgpOJtiYc1fZ6DCSnPkM2jrS9R3bvfvHtRdJ
-         fKk6nw7Xp2shuaWSWM7wUlxTKP+I204Ww27kXMDVwfnSeTPPd+PXE6TQwJdoKhLILXz+
-         LXRg==
-X-Gm-Message-State: AOJu0YyrhD7CLlIJFPiU8NlpBwIb3gPmQJFPWVT0kOC6VPjX4vrLOYzR
-	gQHqhM1IRdupVSLV0N9zgLW9aOI51wiTCZYAwGbCWEz/Bpu5B0/y
-X-Gm-Gg: ASbGncusfh/JC9bb9dkbATifXK4154OpY9OdPqd/s0pNAfVqGOmHf/DW1Ijex1Py5a0
-	cOqeS13ekuObLH0y0vF/VOB1QiUwLFCqYoZXjHe+7ab6V1hayPYMxI4GqwP+2y/fEUmEt7OEp5F
-	tI+Vyt6AuIB31KN+oQ1dtSS08/nM0IHs0tI5js9pbUs4uspelCXLzPa4303USQ/fUqY0NIwyzul
-	v2bTVPNVcZ+7qlv/zun1BawgCro9lN/T0b/MS4wtwhGTzj3s+7BqbX2KErhR+M=
-X-Google-Smtp-Source: AGHT+IFZHeTI5fWXwgLXF7QD3I23TZijErZyTZ2T+Uq5GrRn7UkTOD8S18xG6TB7M3Mrpq+33VPNOw==
-X-Received: by 2002:a17:902:db09:b0:215:b18d:ca with SMTP id d9443c01a7336-21a8d6c7b35mr236215215ad.18.1736726037945;
-        Sun, 12 Jan 2025 15:53:57 -0800 (PST)
-Received: from localhost ([2601:647:6881:9060:4b69:8566:fc48:9d6b])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-a317a07ccd6sm5840700a12.8.2025.01.12.15.53.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 12 Jan 2025 15:53:57 -0800 (PST)
-Date: Sun, 12 Jan 2025 15:53:56 -0800
-From: Cong Wang <xiyou.wangcong@gmail.com>
-To: Jamal Hadi Salim <jhs@mojatatu.com>
-Cc: netdev@vger.kernel.org, jiri@resnulli.us, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, petrm@mellanox.com,
-	security@kernel.org, g1042620637@gmail.com
-Subject: Re: [PATCH net v4 1/1] net: sched: fix ets qdisc OOB Indexing
-Message-ID: <Z4RWFNIvS31kVhvA@pop-os.localdomain>
-References: <20250111145740.74755-1-jhs@mojatatu.com>
+        bh=9cnJ53oIhTglfaz80ugv/pgKzPSiLe7spK70sPzYX4E=;
+        b=cGgbedJvacOENm1BrxBDlMuoqjyecYNCEX8HVP6dmE6w/H2SyRV6MFC5rAYRBOlHBQ
+         VWNd+x9qJUxEclYQHF77HcPJIlkTyBj84C6KReDNhIoDFWfmP9EDud6JWYx+DaOJDj+6
+         ssMDWcYlTifLgSfZtvNgpqJegIpBfjdqa++A8xGQqq57UOSnq1bsn6rkYt/VSyYjWZ6o
+         GN+lsEhX+Zg32EpQHvtGaRON5mTqx3aR3D1P/yFY0Cpq/RTK+kmkpPHRGEkQy0g7aQSZ
+         NvWv4uSEMshGDWSKBJ0+HJZKjjMeDJKfkTs3yZRnVWea6wmmhwgTDEPSMTj6xdAp/vtA
+         AVCg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736727133; x=1737331933;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=9cnJ53oIhTglfaz80ugv/pgKzPSiLe7spK70sPzYX4E=;
+        b=VCnW/ntp1Q1KZDZQeExxVBc2ku+36iqbociNfbcpMxeDE/ipF/CRCI6Q5mXM3ibl/+
+         4ntHaevULmXJI7YEOSI2SETS3muBCuiBe9tnjU7+ViYjQJmgjElVTdEacHJG61R5DKaX
+         Mc3Z5f5X3XylTA8mSbz0/IAw/Tjg98XzHjH0dod1OMyiIu2CYDdCIX3aGPfyv8Nu4D/w
+         4HDbGpM81t8F5lb4gm4tO74rCwR/1jN6zYp2yptCn2MHwM0A4lnLLtD5WyBR/munxNRj
+         kb5ScT/a+ID2bDzMesvzUOpFYphU0++hUmzD0EiaWST1pyB8o0/p10XGAqo07e5mI9F0
+         xdIg==
+X-Forwarded-Encrypted: i=1; AJvYcCURfCuYbb1hDFJt9MGO4cvuhQxIfCn+NRqHPoMQrJWE+bteMv8AMpi8OYdri00ImW5Nw+I=@vger.kernel.org, AJvYcCV0qp1t0LEQy/ykr5973nafdCHYYbEkZiMxEdJ7+nSweuAF4mmlkwLGUFZkv1CQugB8pen5irRU@vger.kernel.org
+X-Gm-Message-State: AOJu0YyXdPUFvKbii1reB3WwQZUHtlo5L9wOPETTDA4dGfmvEit6rce+
+	7uMP7A8V4yxJGouaYBQ2wRFzUoo2n8HFxCxl6K3bSGgBny7K7LZXnuaaBJB8cg13GFB5Rlovbch
+	DHmSAxdG/7LqYL05IR7ncMLkgdPw=
+X-Gm-Gg: ASbGncubAi0QSsIB7yKv3T+4eutabMtxPFCx6cPuDpvN84SzYDxQNAruSXlaXFrKlAS
+	GzBLWH7qE7jfDQc6Zd79lxYMOjtzWoUyCpiP3Hw==
+X-Google-Smtp-Source: AGHT+IGk8dqDNQZ+mjNd6puxoUiqimP8vd2vEum9Ue7CkZ1G4OHaDEjH5RRs6SCz0wf9/v01BbY3JYfjAXvcG/l1jwk=
+X-Received: by 2002:a05:6e02:1a8a:b0:3cd:d14c:be69 with SMTP id
+ e9e14a558f8ab-3ce4b212f1dmr96833635ab.11.1736727133078; Sun, 12 Jan 2025
+ 16:12:13 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250111145740.74755-1-jhs@mojatatu.com>
+References: <20250112113748.73504-2-kerneljasonxing@gmail.com> <202501122252.dqEPb1Wd-lkp@intel.com>
+In-Reply-To: <202501122252.dqEPb1Wd-lkp@intel.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Mon, 13 Jan 2025 08:11:37 +0800
+X-Gm-Features: AbW1kvbp1NkkMKbd-_UYgUVRy7aU5R7K_OeYQ0U2gfRHv-CnaHRd4pm1sdL37Sw
+Message-ID: <CAL+tcoCvO8xapF55_TKj-rs8jJvSRRQ=EQHiZZvrwSPYoVFc_w@mail.gmail.com>
+Subject: Re: [PATCH net-next v5 01/15] net-timestamp: add support for bpf_setsockopt()
+To: kernel test robot <lkp@intel.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, dsahern@kernel.org, willemdebruijn.kernel@gmail.com, 
+	willemb@google.com, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, 
+	martin.lau@linux.dev, eddyz87@gmail.com, song@kernel.org, 
+	yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org, 
+	sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, horms@kernel.org, 
+	oe-kbuild-all@lists.linux.dev, bpf@vger.kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Sat, Jan 11, 2025 at 09:57:39AM -0500, Jamal Hadi Salim wrote:
-> diff --git a/net/sched/sch_ets.c b/net/sched/sch_ets.c
-> index f80bc05d4c5a..516038a44163 100644
-> --- a/net/sched/sch_ets.c
-> +++ b/net/sched/sch_ets.c
-> @@ -91,6 +91,8 @@ ets_class_from_arg(struct Qdisc *sch, unsigned long arg)
->  {
->  	struct ets_sched *q = qdisc_priv(sch);
->  
-> +	if (arg == 0 || arg > q->nbands)
-> +		return NULL;
->  	return &q->classes[arg - 1];
->  }
+Thanks for the report.
 
-I must miss something here. Some callers of this function don't handle
-NULL at all, so are you sure it is safe to return NULL for all the
-callers here??
+On Sun, Jan 12, 2025 at 10:50=E2=80=AFPM kernel test robot <lkp@intel.com> =
+wrote:
+>
+> Hi Jason,
+>
+> kernel test robot noticed the following build warnings:
+>
+> [auto build test WARNING on net-next/main]
+>
+> url:    https://github.com/intel-lab-lkp/linux/commits/Jason-Xing/net-tim=
+estamp-add-support-for-bpf_setsockopt/20250112-194115
+> base:   net-next/main
+> patch link:    https://lore.kernel.org/r/20250112113748.73504-2-kerneljas=
+onxing%40gmail.com
+> patch subject: [PATCH net-next v5 01/15] net-timestamp: add support for b=
+pf_setsockopt()
+> config: i386-buildonly-randconfig-005-20250112 (https://download.01.org/0=
+day-ci/archive/20250112/202501122252.dqEPb1Wd-lkp@intel.com/config)
+> compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
+> reproduce (this is a W=3D1 build): (https://download.01.org/0day-ci/archi=
+ve/20250112/202501122252.dqEPb1Wd-lkp@intel.com/reproduce)
+>
+> If you fix the issue in a separate patch/commit (i.e. not just a new vers=
+ion of
+> the same patch/commit), kindly add following tags
+> | Reported-by: kernel test robot <lkp@intel.com>
+> | Closes: https://lore.kernel.org/oe-kbuild-all/202501122252.dqEPb1Wd-lkp=
+@intel.com/
+>
+> All warnings (new ones prefixed by >>):
+>
+>    net/core/filter.c: In function 'sk_bpf_set_cb_flags':
+>    net/core/filter.c:5237:11: error: 'struct sock' has no member named 's=
+k_bpf_cb_flags'
+>     5237 |         sk->sk_bpf_cb_flags =3D sk_bpf_cb_flags;
+>          |           ^~
 
-For one quick example:
+Strange. In this series, I've already ensured that the caller of
+sk_bpf_set_cb_flags is protected under CONFIG_BPF_SYSCALL, which is
+the same as sk_bpf_cb_flags.
 
-322 static int ets_class_dump_stats(struct Qdisc *sch, unsigned long arg,
-323                                 struct gnet_dump *d)
-324 {
-325         struct ets_class *cl = ets_class_from_arg(sch, arg);
-326         struct Qdisc *cl_q = cl->qdisc;
+I wonder how it accesses the sk_bpf_cb_flags field if the function it
+belongs to is not used, see more details as below (like "defined but
+not used").
 
-'cl' is not checked against NULL before dereferencing it.
+Thanks,
+Jason
 
-There are other cases too, please ensure _all_ of them handle NULL
-correctly.
-
-Thanks!
+>    net/core/filter.c: At top level:
+> >> net/core/filter.c:5225:12: warning: 'sk_bpf_set_cb_flags' defined but =
+not used [-Wunused-function]
+>     5225 | static int sk_bpf_set_cb_flags(struct sock *sk, char *optval, =
+bool getopt)
+>          |            ^~~~~~~~~~~~~~~~~~~
+>
+>
+> vim +/sk_bpf_set_cb_flags +5225 net/core/filter.c
+>
+>   5224
+> > 5225  static int sk_bpf_set_cb_flags(struct sock *sk, char *optval, boo=
+l getopt)
+>   5226  {
+>   5227          u32 sk_bpf_cb_flags;
+>   5228
+>   5229          if (getopt)
+>   5230                  return -EINVAL;
+>   5231
+>   5232          sk_bpf_cb_flags =3D *(u32 *)optval;
+>   5233
+>   5234          if (sk_bpf_cb_flags & ~SK_BPF_CB_MASK)
+>   5235                  return -EINVAL;
+>   5236
+> > 5237          sk->sk_bpf_cb_flags =3D sk_bpf_cb_flags;
+>   5238
+>   5239          return 0;
+>   5240  }
+>   5241
+>
+> --
+> 0-DAY CI Kernel Test Service
+> https://github.com/intel/lkp-tests/wiki
 
