@@ -1,189 +1,191 @@
-Return-Path: <netdev+bounces-157789-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157790-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 97B43A0BBA0
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 16:20:29 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 46EECA0BC3F
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 16:42:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 175C7188024D
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 15:19:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CF6293A4C54
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 15:42:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B293D24023C;
-	Mon, 13 Jan 2025 15:19:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A24141C5D4F;
+	Mon, 13 Jan 2025 15:42:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bCKGVgIx"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="hVFC5zql"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f182.google.com (mail-il1-f182.google.com [209.85.166.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2074.outbound.protection.outlook.com [40.107.237.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 119AA240224
-	for <netdev@vger.kernel.org>; Mon, 13 Jan 2025 15:19:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.182
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736781555; cv=none; b=bH9m1D2NgN7MTgYFJVV1oFvp5SAEVspKXmol7fkld6bWelwYj70g2gjEWuAO9RaGjtidYdZPZguo4XamHm/s8+aexX1+tfiqNEpVP1V+repTTJn8sHPgANQ2jkEaHfqXXCCPjY8tQ0BTWbx66HXvP9AfDwaBVQlNjTtDAJDILWo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736781555; c=relaxed/simple;
-	bh=d3N9DCLGRvuIuT1enKfcCum1GV0sfPJFJ62i0hf/rz0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=GA7tHZV48ahXLOZj+9V/1m/L5zDQ6MIFyW+8oyfvufouhPgsKjVAGsXcBuBKTMvxbiyoyoZz8DVafc1YoAypLfVpI8INgyFkkKFAFo3Wv5233NDmsuRykOyTZFf1kH8xq8hzqY851yOm9TTGO13p+4yYXTJP36ShQHejJTO5ySg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bCKGVgIx; arc=none smtp.client-ip=209.85.166.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f182.google.com with SMTP id e9e14a558f8ab-3ce4b009465so16540835ab.0
-        for <netdev@vger.kernel.org>; Mon, 13 Jan 2025 07:19:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736781553; x=1737386353; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QwXLgSNPXup/7eo0cZ1oQzwJKpL3dcZz0IHNeR1MukY=;
-        b=bCKGVgIx+53S6VTKHC5e9AAeOAKbsXzpmNnJvNhY2GXBbg4+3bKSegx/9n0qyDTPdg
-         nB09+2DKvfIZ5Yqmev09J2sEataNoX0gVkewoxNgGho7ivF1ceelyA4OseM0vm8qz8/Y
-         LpmtJUqYS0iHKlXRyH52O9YHqr7egyOdhcT1uKq8aMPj/8DJrFta4023HWh0bs044iIo
-         XI0TtRELFa7nCgBRM50sd7ZgSdtqRlBcOWC0ze5KuCCHMvSZ9gzD3L5wlKMxchQGZt5p
-         LfbVh0kdQlRMrCicmJeBWkCBOFM7PmmgAnuEH61ttJFqxfO3JkmncXsRqSgLayZxkLX6
-         xKRQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736781553; x=1737386353;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=QwXLgSNPXup/7eo0cZ1oQzwJKpL3dcZz0IHNeR1MukY=;
-        b=lga8a0NgIdY1WDJgOzDPRHyXu2IcSUsiWmtcB+gDNFpJGJtgT0Fg3sYByLJvSIhQnh
-         iARklTPJrMMZgS7fYCiDf4JZQZcYNzzuIuGc1MSR/bOwZdP8k7BvseIdmM84rke/JLgh
-         LjDV8wNarv5cjeLAKk1fwvBeM2vf7n4y5/2IfDnAS39lNAc5D1YVj+8BkydU3/5RfchX
-         L7LIP0hd2Zr59qudRwRYKJ/SAmRt/E4EJIvh3B6F+7decyZgF2O8sLAg/0WhL+2bZwJ0
-         ViIsbPa7/MdoXnFaaN2ish4PdoPgLAaUDhVSlzAPaEcIs1mKJhV7JZmGD+1tCL+eIxlx
-         FBjw==
-X-Forwarded-Encrypted: i=1; AJvYcCWTY4nrcFEQU2BhWUOjc7pd8/NkAOekVl1vPK3b2ednnXsMRGmbIiwIlLX+LW4a8Mh6XbxP2TE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw5M9bfk/HnyFC33HCw26C+k3NThSYxG5bTS45bf7gvxwpw6/RI
-	FB/Ac5LQ9MSaMX5NKAuM5b8OX/YMBRtueOXrBjrcuhV4bHU14A77iSqa/5wDgdlL2GeWZ38+kx0
-	zIVw/XgVS0vQdymY7KOjaGzYNpVfoRcN7
-X-Gm-Gg: ASbGncvfIHfNkTheO+e+zZVpcJEycpLH2fH5TWZlyPEvGOxmw4bMUuA3Dgwt10uqlqT
-	IPbjqE2hFJdewDCzyZ+Tz15pPpp9mQwi8jThRCg==
-X-Google-Smtp-Source: AGHT+IHReHn8upgTC8nonYxi5eJw6RZigfqwF4/ryJ2D8WL4NKosg6ugw+sylH+blzjtfFBHrRovhFWgUUOZLkqOW38=
-X-Received: by 2002:a05:6e02:509:b0:3ce:46e2:429b with SMTP id
- e9e14a558f8ab-3ce46e24583mr90079825ab.10.1736781552910; Mon, 13 Jan 2025
- 07:19:12 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02E3017BA3
+	for <netdev@vger.kernel.org>; Mon, 13 Jan 2025 15:42:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.74
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1736782926; cv=fail; b=M0zxjmbTGfUJnpx+bx35z+5FdpoT7J4HwLVQdiCt3uUjypr02huH6BsNCU1JJDfxPgedXtHcjm6EwM01GyQGc3NZfKlpSBvyEEx4j1O+bPri1SkOp4AzFZudKljMZraJ3VKj5bKu5a6dol+P//yfKTQPs+6kmNv/g8IqjVPwq2A=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1736782926; c=relaxed/simple;
+	bh=uM/K3fd9emwf79rsEUw+sgjub0HTLBsKKmoaCTHtG5A=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=QoInk/N1GhM3st7mYDUWGwYI6F/CzgL+O8yu2K29JePVTOF3b7RLIgf2/HqOhBxX/QMF7AinPkcngucj72njesL7MNG0WIV4VNhM0sOX1+CJil8JkZl1ppbd2Z4aPjxUwvdzVrso6xTv78bpQ/CuEHZdiVUxJ/Yb1t/PnftlJek=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=hVFC5zql; arc=fail smtp.client-ip=40.107.237.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=hjEIJw0Gu5yURf9bQRWV6MIlXaCLNt7Rt/yCeuXZUcjPX1wyQaHEy5OaDpOH+80HvCWxkVco83s1z3E/nTNmT0ohIi6oSQ7uK4mKODAUfE6h7UF+C+KA9fYyAAtOm1o4QSrrdbn/1kKKdP4NE6TUiIucxjrW3A3qDgj59fnUBSs2GU+exrbd70ky8nDc2ZkZxUgMPQt78YQLlYRResYpzfPZPSxHdyOC2AsMvYZuq4pDb6qQal1MNKxHv6J6c17ouO6VB6JV5ho9r/j0os2v4HdQbmSikHaGvmd8nLCsYmEmCynnpHEWqeKoBZ3O+qCu4bApPhSTkMMah4QyaYEGWA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=xlVhj+3tcSCouisoSut9ojv1+C8SS6/FXdAdngmeBXI=;
+ b=gS2N1COd9Mp7QBNxbM84wA4BcYFe/g9DmTRLSFyf6+LbCIpNndtMiV9zFl2rJUNX3jWujVGK4AepX1f2eYsj22isepjsqumd/KcJHoZEOSU5liyK+YvrQzZDd9EIh66avBIhqtlsoxuLBPes9K1CgbA3LlnxzUC8gD3d2JKE0MHEiL+90SW5VNyxLI8V+aaApLXvyIlzCWYEReTK5i+9SQuwBCUd6irMR2YE4pVHStxupA4cE+TY55G8QSr/IESAo1blEEpjLLxbgDpwCDnkkYVXXQlFKSnAemo2ErcQG5bQr7nnfFotEm4TetsCqXugnClTOEcJetRCrNWDZa9J7A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=xlVhj+3tcSCouisoSut9ojv1+C8SS6/FXdAdngmeBXI=;
+ b=hVFC5zqlWWBVl7NhSbfyj49fQjT5esvEa0qIhzQ53zUf70ZDluvm84nvVONMW1rb85JmOgBrHkKM5OPnbcD0HS8LVFnvgxgS5qBMGeGqTw9L7lQpn+uXlfStnazSokPzGQqN60nD3Dxzzft/8Bp0ZNNI0HSD6F5XAaKSDwljI7nwdPZPi6YJ1DNm+AQUcg8krQg43xziajuavusYd6CAAgiZ2Dx/9kzIxcPnLh1mE6CSYf3pL2ducJss8deq53euNg3SGZlE3rEFzCPztSIeIfFl1gRneJ24RIdVzW5scphQ5SvlvRkoLl8epdPRUt9jQHrsojq3EONB132SgfTdgw==
+Received: from SA9PR13CA0013.namprd13.prod.outlook.com (2603:10b6:806:21::18)
+ by DS0PR12MB8220.namprd12.prod.outlook.com (2603:10b6:8:f5::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8335.18; Mon, 13 Jan
+ 2025 15:41:57 +0000
+Received: from SA2PEPF00003F65.namprd04.prod.outlook.com
+ (2603:10b6:806:21:cafe::88) by SA9PR13CA0013.outlook.office365.com
+ (2603:10b6:806:21::18) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8356.10 via Frontend Transport; Mon,
+ 13 Jan 2025 15:41:57 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ SA2PEPF00003F65.mail.protection.outlook.com (10.167.248.40) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8356.11 via Frontend Transport; Mon, 13 Jan 2025 15:41:57 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Mon, 13 Jan
+ 2025 07:41:43 -0800
+Received: from rnnvmail205.nvidia.com (10.129.68.10) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Mon, 13 Jan
+ 2025 07:41:42 -0800
+Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com (10.129.68.10)
+ with Microsoft SMTP Server id 15.2.1544.4 via Frontend Transport; Mon, 13 Jan
+ 2025 07:41:40 -0800
+From: Tariq Toukan <tariqt@nvidia.com>
+To: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, "Andrew
+ Lunn" <andrew+netdev@lunn.ch>
+CC: <netdev@vger.kernel.org>, Saeed Mahameed <saeedm@nvidia.com>, Gal Pressman
+	<gal@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>, Mark Bloch
+	<mbloch@nvidia.com>, Moshe Shemesh <moshe@nvidia.com>, Tariq Toukan
+	<tariqt@nvidia.com>
+Subject: [PATCH net 0/8] mlx5 misc fixes 2025-01-13
+Date: Mon, 13 Jan 2025 17:40:46 +0200
+Message-ID: <20250113154055.1927008-1-tariqt@nvidia.com>
+X-Mailer: git-send-email 2.45.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <b9e81aa97ab8ca62e979b7d55c2ee398790b935b.1736176112.git.lucien.xin@gmail.com>
- <48e9bf0a-3275-4d2c-84ae-9bc1163ab8cb@fiberby.net>
-In-Reply-To: <48e9bf0a-3275-4d2c-84ae-9bc1163ab8cb@fiberby.net>
-From: Xin Long <lucien.xin@gmail.com>
-Date: Mon, 13 Jan 2025 10:19:01 -0500
-X-Gm-Features: AbW1kvZ0D8TqIsXl_pY05_hbyEnI4M0FLFmUOARhx5GnHQ67Nr6HxT7kgbPuGco
-Message-ID: <CADvbK_cBD_JW5_x0HWY7f4uM7cgyfCvzBSyu_EL=XX7m7VJwhw@mail.gmail.com>
-Subject: Re: [PATCH net] net: sched: refine software bypass handling in tc_run
-To: =?UTF-8?B?QXNiasO4cm4gU2xvdGggVMO4bm5lc2Vu?= <ast@fiberby.net>
-Cc: davem@davemloft.net, kuba@kernel.org, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Jamal Hadi Salim <jhs@mojatatu.com>, 
-	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, 
-	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, Shuang Li <shuali@redhat.com>, 
-	network dev <netdev@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-NV-OnPremToCloud: AnonymousSubmission
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SA2PEPF00003F65:EE_|DS0PR12MB8220:EE_
+X-MS-Office365-Filtering-Correlation-Id: 11459ccc-65e9-4437-2cea-08dd33e8d030
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|82310400026|36860700013|376014|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?WkqtTh1guF9ktma1PmQDMhp+oMRzgosIbdcOTuEbOvWUtFXhh43vT8l1cTZV?=
+ =?us-ascii?Q?Ioajbr/ql1FhV4XmVU13FS1qa+0uL+60LoI37o2H7RjDty4uZs+GGkr8BT0j?=
+ =?us-ascii?Q?cBXA4yOJnmNLyyLppalZuVfSvoz16dCJbWrJEoWG019xqsTE+MECnsnzn+Nt?=
+ =?us-ascii?Q?bSbWF3+WUq0RDAkyGERUHjmlxaXtMECgLG2Hhuuwk5GMeck00nvzVKD9BTWK?=
+ =?us-ascii?Q?uh2M+/4DqXwLBm135hRrfir0x3Q+x1JcsynJFGKc5jQ4E+wwRHgNglTEa4/x?=
+ =?us-ascii?Q?VikBagXTRDElxYOuVT48BoSGl0B6Q72I1yb9ukTOR/ARtMRluPQD6ZKDMo9g?=
+ =?us-ascii?Q?AwZ0EMzrAO/FIgBzztfD+uQSBq0t8qxfBqBJ/wxIyLl92hEQW7gjTrDqKTYi?=
+ =?us-ascii?Q?oanPNZkJPrjjAnn7XPHJXZGrdYg/q6rxUFlcZdnw2R92DX/iOX/Z9pZYc3j6?=
+ =?us-ascii?Q?Mf6c1H7vyGX+nKUChWXxE9lcU8nzdK2sXP2AOUbdqxYUg7zTWdj2v2NM/IX2?=
+ =?us-ascii?Q?9rMD7eSd0g9PNciVyjhzPsPAD5L8BFEqA36JNhqnQt56J25Tw2LquEHFU3C0?=
+ =?us-ascii?Q?DGTcIfoWp0toR5RH50HlQGaoeqELgbsLWNiiTvfEGUaAUcM6uh+I/Gp6xw7r?=
+ =?us-ascii?Q?qlRhv+/MCXG//gqumJOtrf8l/09T/MIJM5eqmoVmUejDTWgAIfmXQH7Dq5db?=
+ =?us-ascii?Q?Mlzb7/DS32u6EpmlrpJooKQTdmFLUzkor8dEPElQK89FQ/WhZM/3hmFziQo+?=
+ =?us-ascii?Q?+fHUITEN3XCWyXRC49f6qTZ7e3Z3Ek/cE5JLMS2YS/8DbLdrayu9tweYewB0?=
+ =?us-ascii?Q?Mz4B8AwxUnnI05hUodD72P07qP8Xl4WIF9LKy65nVk93SQZ/olWJKmOJ4Imx?=
+ =?us-ascii?Q?EoSse0Dc5SB4bilKtm3rX/5qQ8e++wJZeysUHOFfkMFB9x+oF5MZ8b7un2Sd?=
+ =?us-ascii?Q?yiE3UCM3lwnva0KaFvAlLb8YZmT2cmP+LinBwkTIcOR3vGDfbEuYEttED1e0?=
+ =?us-ascii?Q?Zd00329jj27mirPa5FJ47o8YbkrI8wNCX0ufWhOJPl5vV7cFuy8sBis93oE3?=
+ =?us-ascii?Q?ZZVqocbvMolysWlRpMUiRJjM3eAzFUF2Yl/+osjvxtjB+qBPaZTz6+Ah7Tnt?=
+ =?us-ascii?Q?RulrWfT9TG5WKlRf21XIW+FUF5eJRvaUKejPhRpouzFZAO0mi3Si+Q26CIk8?=
+ =?us-ascii?Q?KKi47PYWHdfUgyrFiRGSrsGd7yrbNEyHiUBNrzx5eT9XHldTd7pXbEdWWSUK?=
+ =?us-ascii?Q?bnL9Odp/lPOtx1GXjN5jOW9DUWR+Yo3rtebRJSWFFtwzZ8VZANVq//GjLaYn?=
+ =?us-ascii?Q?fJ+ilVYQ9XoIcZHYlTwoTPxe4BiumEV3n7SkdMRQVqL8UzwFdcfd2DolYep5?=
+ =?us-ascii?Q?ANaEAtbtwBj049MvMJ1/dlSYCE9HQy4q91MJqiB0+SL6tTuK7vRYA6JBC/Sr?=
+ =?us-ascii?Q?dR4wwDMjRtA+ddUu/kROLN9i8/gvy43XdtKadpwfVLfWfbtygg7JHfTCMANY?=
+ =?us-ascii?Q?337BhNKr7EaQPOk=3D?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(36860700013)(376014)(1800799024);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Jan 2025 15:41:57.3319
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 11459ccc-65e9-4437-2cea-08dd33e8d030
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SA2PEPF00003F65.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB8220
 
-On Fri, Jan 10, 2025 at 8:25=E2=80=AFAM Asbj=C3=B8rn Sloth T=C3=B8nnesen <a=
-st@fiberby.net> wrote:
->
-> Sorry for the late response, it has been a busy first week back, too many
-> operational issues with devices in our network running crappy vendor imag=
-es.
->
-> On 1/6/25 3:08 PM, Xin Long wrote:
-> > This patch addresses issues with filter counting in block (tcf_block),
-> > particularly for software bypass scenarios, by introducing a more
-> > accurate mechanism using useswcnt.
-> >
-> > Previously, filtercnt and skipswcnt were introduced by:
-> >
-> >    Commit 2081fd3445fe ("net: sched: cls_api: add filter counter") and
-> >    Commit f631ef39d819 ("net: sched: cls_api: add skip_sw counter")
-> >
-> >    filtercnt tracked all tp (tcf_proto) objects added to a block, and
-> >    skipswcnt counted tp objects with the skipsw attribute set.
-> >
-> > The problem is: a single tp can contain multiple filters, some with ski=
-psw
-> > and others without. The current implementation fails in the case:
-> >
-> >    When the first filter in a tp has skipsw, both skipswcnt and filterc=
-nt
-> >    are incremented, then adding a second filter without skipsw to the s=
-ame
-> >    tp does not modify these counters because tp->counted is already set=
-.
-> >
-> >    This results in bypass software behavior based solely on skipswcnt
-> >    equaling filtercnt, even when the block includes filters without
-> >    skipsw. Consequently, filters without skipsw are inadvertently bypas=
-sed.
->
-> Thank you for tracking it down. I wasn't aware that a tp, could be used b=
-y multiple
-> filters, and didn't encounter it during my testing.
->
-> > To address this, the patch introduces useswcnt in block to explicitly c=
-ount
-> > tp objects containing at least one filter without skipsw. Key changes
-> > include:
-> >
-> >    Whenever a filter without skipsw is added, its tp is marked with use=
-sw
-> >    and counted in useswcnt. tc_run() now uses useswcnt to determine sof=
-tware
-> >    bypass, eliminating reliance on filtercnt and skipswcnt.
-> >
-> >    This refined approach prevents software bypass for blocks containing
-> >    mixed filters, ensuring correct behavior in tc_run().
-> >
-> > Additionally, as atomic operations on useswcnt ensure thread safety and
-> > tp->lock guards access to tp->usesw and tp->counted, the broader lock
-> > down_write(&block->cb_lock) is no longer required in tc_new_tfilter(),
-> > and this resolves a performance regression caused by the filter countin=
-g
-> > mechanism during parallel filter insertions.
->
-> You are trying to do two things:
-> A) Fix functional defect when filters share a single tp
-> B) Improve filter updates performance
->
-> If you do part A in a minimalistic way, then IMHO it might be suitable
-> for net (+ stable), but for part B I agree with Paolo, that it would
-> properly be better suited for net-next.
->
-> I focused my testing on routing performance, not filter update performanc=
-e,
-> I also didn't test it in any multi-CPU setups (as I don't have any).
->
-> The static key was added to mitigate concerns, about the impact that the
-> bypass check would have for non-offloaded workloads in multi-CPU systems.
->
-> https://lore.kernel.org/netdev/28bf1467-b7ce-4e36-a4ef-5445f65edd97@fiber=
-by.net/
-> https://lore.kernel.org/netdev/CAM0EoMngVoBcbX7cqTdbW8dG1v_ysc1SZK+4y-9j-=
-5Tbq6gaYw@mail.gmail.com/
-Hi, Asbj=C3=B8rn, thanks for the comment.
+Hi,
 
-I will keep the static key, and not touch the code in tc_run() in
-net/core/dev.c, and we can make it without holding the block->cb_lock
-by atomic_inc/dec_return():
+This patchset provides misc bug fixes from the team to the mlx5 core and
+Eth drivers.
 
-        if (atomic_inc_return(&block->useswcnt) =3D=3D 1)
-                static_branch_inc(&tcf_bypass_check_needed_key);
+Thanks,
+Tariq.
 
-        if (!atomic_dec_return(&tp->chain->block->useswcnt))
-                static_branch_dec(&tcf_bypass_check_needed_key);
+Chris Mi (1):
+  net/mlx5: SF, Fix add port error handling
 
-It doesn't look good to split this patch into two, I will post v2 on
-net.git with these changes.
+Leon Romanovsky (4):
+  net/mlx5e: Fix inversion dependency warning while enabling IPsec
+    tunnel
+  net/mlx5e: Properly match IPsec subnet addresses
+  net/mlx5e: Rely on reqid in IPsec tunnel mode
+  net/mlx5e: Always start IPsec sequence number from 1
 
-Let me know if there are any other concerns.
+Mark Zhang (1):
+  net/mlx5: Clear port select structure when fail to create
+
+Patrisious Haddad (1):
+  net/mlx5: Fix RDMA TX steering prio
+
+Yishai Hadas (1):
+  net/mlx5: Fix a lockdep warning as part of the write combining test
+
+ .../mellanox/mlx5/core/en_accel/ipsec.c       | 22 ++++----
+ .../mellanox/mlx5/core/en_accel/ipsec_fs.c    | 53 +++++++++++++------
+ .../mlx5/core/en_accel/ipsec_offload.c        | 11 ++--
+ .../net/ethernet/mellanox/mlx5/core/fs_core.c |  1 +
+ .../mellanox/mlx5/core/lag/port_sel.c         |  4 +-
+ .../ethernet/mellanox/mlx5/core/sf/devlink.c  |  1 +
+ drivers/net/ethernet/mellanox/mlx5/core/wc.c  | 24 ++++-----
+ 7 files changed, 75 insertions(+), 41 deletions(-)
+
+
+base-commit: 76201b5979768500bca362871db66d77cb4c225e
+-- 
+2.45.0
+
 
