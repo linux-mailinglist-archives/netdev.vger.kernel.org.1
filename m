@@ -1,66 +1,66 @@
-Return-Path: <netdev+bounces-157866-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157861-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A2186A0C1A8
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 20:37:49 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE09AA0C19B
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 20:36:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 065611658F7
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 19:37:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 718EE188B1F9
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 19:36:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D783B1CD213;
-	Mon, 13 Jan 2025 19:36:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 227B41C5F0B;
+	Mon, 13 Jan 2025 19:36:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="Ufr3NXF0"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="QgpfM2a9"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A3BB1CBE94;
-	Mon, 13 Jan 2025 19:36:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C49618CC1D;
+	Mon, 13 Jan 2025 19:36:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736797013; cv=none; b=Fw+utkNciXSv4YjjKRl9l6MqEIHJiK37SDkGu0XhlRe0Vr8CtATcFkOv858viSwzTyFxymnlyhRHkmdx1EPr7ZrjIal+d60u5NW4Dspgxxlloj67+exoEnK7iP/8Hbwefrjb3l14Wh9ng616u9SrUQfuzJl9iqW3/d0tjU/2ECI=
+	t=1736796994; cv=none; b=QvP63VZFDY78ipfjWKz7Dsj399ZpSat4WEKk7mXT7UzwthFJagmPVone3oDaFFuJEIvubFTJrL6yA29vACfdoh00YUJW8RvvHmk32Ne7dht1lEYvXZgQYyV9J4LDgRtl2WrXN+jWjf2bVxkhZ8iBlVmurWLKc17TXELuOlAwKAE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736797013; c=relaxed/simple;
-	bh=ZBgcmgeXhqAq+4It4G7OLJFKW5gmvl7N+d8m/V4d8qg=;
-	h=From:Subject:Date:Message-ID:MIME-Version:Content-Type:To:CC; b=EnbGSjhJzt8N6+0fdYY+6wxY0kk0jVBZTKxaouaBvepXpd0GbdnDBN36Ml8vdpvpuin4M+6Qvb/Sl6FHM8sU34rmZX2zGy1KrHmXR6ZCErq1b1PtG4cKZu72lvya66D0KPFTZVb+oB9dzKOs/vDofwk0q3xzMnLMdqXlq0u1YCo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=Ufr3NXF0; arc=none smtp.client-ip=68.232.153.233
+	s=arc-20240116; t=1736796994; c=relaxed/simple;
+	bh=RWp3FTdHXsv0g7oH1Wf6zDIDMJuYWwCvt1vaU7Vp7Bo=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:References:
+	 In-Reply-To:To:CC; b=WsNMqbypaIstge/RhPQJ7WNlYdwjwXCzHDP9QpqUQDq7Mh137DKS/YQhFUqRj3zpg2H6Da7XZpjsKfWDyvgvDr8DTG6yMMbEaA/dc9He4UZm/g3AWmBiJ8DtCC6nrSn9aqJCbJGEoWwsLw2L++wxOuK7HZAbwSJlquUk8o5aD1E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=QgpfM2a9; arc=none smtp.client-ip=68.232.154.123
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1736797012; x=1768333012;
-  h=from:subject:date:message-id:mime-version:
-   content-transfer-encoding:to:cc;
-  bh=ZBgcmgeXhqAq+4It4G7OLJFKW5gmvl7N+d8m/V4d8qg=;
-  b=Ufr3NXF03Cv6J0ZzyRvYu8xD41/o2rM8FZEore0ajj50F3gFBU7baRHy
-   XmHsR5t/8giEF9DG7IzGzfP68QrGfzdbLwmO2DWbXbEgnR1JLxjmqssXo
-   EJHxIgYPYr6J50XedjS9Yxn2lke2PK88beRgs2A2egvp9EXgTmvTZFDNA
-   PanOoN8Ig9TUhTNm0aRAmr+92ARrBNL3AVvEfggxKHO79uOS8JT3S4Hv4
-   D4Q14SEdq3PttuWnBXaIXJeyXiFyGSYwzo/uRm4XbvEImiCd6+jUHrf9z
-   QficYrrL9SkkYPA5Tu0iIWvqrhrgRHhiIabnt67ToeIS3uB/r6TAe4m2B
-   w==;
-X-CSE-ConnectionGUID: 4DuCEr1pTqyIbpjtrGnA+g==
-X-CSE-MsgGUID: 7KULwLI4Qqa/5V2pjNyVxg==
+  t=1736796992; x=1768332992;
+  h=from:date:subject:mime-version:content-transfer-encoding:
+   message-id:references:in-reply-to:to:cc;
+  bh=RWp3FTdHXsv0g7oH1Wf6zDIDMJuYWwCvt1vaU7Vp7Bo=;
+  b=QgpfM2a9fgAqP1S/DDchsFgXgkm3NjyDl1C8eb37T2o1KZgNWth+/8tS
+   tj0SloDXs4R1rJ8ldiFoyymrrKQ31f4NUIcC/8xJ6z4QiXcrSY01cwAhq
+   SowCYkEgnN5ZDNFOPS43mu4URnnRplgPvL9lwpUSdGZkkqTWXSHblVxFh
+   X25CXQQN3KgJZ4VsV1x/f0/sRSQQSCTlsFIfTrK/mspUrro6NOtlHQXWH
+   cZS8+Nv5ZsVYjdOSoFUzfo7xkdZLmer0BegMalNmjHAY19Ob+2xp+TlEm
+   pJ8FCWOcD6PU2fvAe13wxrm1F659BwhpnYi5GkuxjHH+TfkQNT/Sy9eXO
+   A==;
+X-CSE-ConnectionGUID: Fja7+Z77S3CaoQEzhBU3bA==
+X-CSE-MsgGUID: VaI5AklMQXSpnmIMZ0+v6g==
 X-IronPort-AV: E=Sophos;i="6.12,312,1728975600"; 
-   d="scan'208";a="267757600"
+   d="scan'208";a="203970673"
 X-Amp-Result: SKIPPED(no attachment in message)
 Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa5.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 13 Jan 2025 12:36:51 -0700
+  by esa6.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 13 Jan 2025 12:36:31 -0700
 Received: from chn-vm-ex02.mchp-main.com (10.10.85.144) by
- chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
+ chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Mon, 13 Jan 2025 12:36:19 -0700
+ 15.1.2507.35; Mon, 13 Jan 2025 12:36:22 -0700
 Received: from DEN-DL-M70577.microchip.com (10.10.85.11) by
  chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server id
- 15.1.2507.35 via Frontend Transport; Mon, 13 Jan 2025 12:36:16 -0700
+ 15.1.2507.35 via Frontend Transport; Mon, 13 Jan 2025 12:36:19 -0700
 From: Daniel Machon <daniel.machon@microchip.com>
-Subject: [PATCH net-next v2 0/5] net: lan969x: add FDMA support
-Date: Mon, 13 Jan 2025 20:36:04 +0100
-Message-ID: <20250113-sparx5-lan969x-switch-driver-5-v2-0-c468f02fd623@microchip.com>
+Date: Mon, 13 Jan 2025 20:36:05 +0100
+Subject: [PATCH net-next v2 1/5] net: sparx5: enable FDMA on lan969x
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,10 +69,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIACRrhWcC/4WOwQ6CMBBEf8Xs2TUUaAOe/A/DoZTVbiKFbAliC
- P9uId49TiZv3qwQSZgiXE8rCM0ceQgp5OcTOG/Dk5C7lCHPcp2pzGAcrSwaXzbUpl4wvnlyHjv
- hmQQ16tyWhlyry6qCNDIKPXg5BHcINGGgZYImNa2NhK3Y4Pwu6C2HHfAcp0E+x6FZHdjPXf9zz
- wozVEVnuqrUikxx69nJ4DyPFzf00Gzb9gWMCa0v8QAAAA==
+Message-ID: <20250113-sparx5-lan969x-switch-driver-5-v2-1-c468f02fd623@microchip.com>
+References: <20250113-sparx5-lan969x-switch-driver-5-v2-0-c468f02fd623@microchip.com>
+In-Reply-To: <20250113-sparx5-lan969x-switch-driver-5-v2-0-c468f02fd623@microchip.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
 	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Andrew Lunn
@@ -85,84 +84,35 @@ CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
 	<linux-arm-kernel@lists.infradead.org>
 X-Mailer: b4 0.14-dev
 
-== Description:
+In a previous series, we made sure that FDMA was not initialized and
+started on lan969x. Now that we are going to support it, undo that
+change. In addition, make sure the chip ID check is only applicable on
+Sparx5, as this is a check that is only relevant on this platform.
 
-This series is the last of a multi-part series, that prepares and adds
-support for the new lan969x switch driver.
-
-The upstreaming efforts has been split into multiple series:
-
-        1) Prepare the Sparx5 driver for lan969x (merged)
-
-        2) Add support for lan969x (same basic features as Sparx5
-           provides excl. FDMA and VCAP, merged).
-
-        3) Add lan969x VCAP functionality (merged).
-
-        4) Add RGMII support (merged).
-
-    --> 5) Add FDMA support.
-
-== FDMA support:
-
-The lan969x switch device uses the same FDMA engine as the Sparx5 switch
-device, with the same number of channels etc. This means we can utilize
-the newly added FDMA library, that is already in use by the lan966x and
-sparx5 drivers.
-
-As previous lan969x series, the FDMA implementation will hook into the
-Sparx5 implementation where possible, however both RX and TX handling
-will be done differently on lan969x and therefore requires a separate
-implementation of the RX and TX path.
-
-Details are in the commit description of the individual patches
-
-== Patch breakdown:
-
-Patch #1: Enable FDMA support on lan969x
-Patch #2: Split start()/stop() functions
-Patch #3: Activate TX FDMA in start()
-Patch #4: Ops out a few functions that differ on the two platforms
-Patch #5: Add FDMA implementation for lan969x
-
+Reviewed-by: Steen Hegelund <Steen.Hegelund@microchip.com>
 Signed-off-by: Daniel Machon <daniel.machon@microchip.com>
 ---
-Changes in v2:
-- Dropped patch 4/6. Added a conditional check in 5/5 instead. This
-  check makes sure SKB's are not freed in xmit() on lan969x, but rather
-  the TX completion loop.
+ drivers/net/ethernet/microchip/sparx5/sparx5_main.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-- Added 'struct net_device' to xmit() prototypes.
+diff --git a/drivers/net/ethernet/microchip/sparx5/sparx5_main.c b/drivers/net/ethernet/microchip/sparx5/sparx5_main.c
+index e68277c38adc..340fedd1d897 100644
+--- a/drivers/net/ethernet/microchip/sparx5/sparx5_main.c
++++ b/drivers/net/ethernet/microchip/sparx5/sparx5_main.c
+@@ -784,8 +784,9 @@ static int sparx5_start(struct sparx5 *sparx5)
+ 
+ 	/* Start Frame DMA with fallback to register based INJ/XTR */
+ 	err = -ENXIO;
+-	if (sparx5->fdma_irq >= 0 && is_sparx5(sparx5)) {
+-		if (GCB_CHIP_ID_REV_ID_GET(sparx5->chip_id) > 0)
++	if (sparx5->fdma_irq >= 0) {
++		if (GCB_CHIP_ID_REV_ID_GET(sparx5->chip_id) > 0 ||
++		    !is_sparx5(sparx5))
+ 			err = devm_request_irq(sparx5->dev,
+ 					       sparx5->fdma_irq,
+ 					       sparx5_fdma_handler,
 
-- Removed duplicate dcb_reload in NAPI poll loop 
-
-- Link to v1:
-  https://lore.kernel.org/r/20250109-sparx5-lan969x-switch-driver-5-v1-0-13d6d8451e63@microchip.com
-
----
-Daniel Machon (5):
-      net: sparx5: enable FDMA on lan969x
-      net: sparx5: split sparx5_fdma_{start(),stop()}
-      net: sparx5: activate FDMA tx in start()
-      net: sparx5: ops out certain FDMA functions
-      net: lan969x: add FDMA implementation
-
- drivers/net/ethernet/microchip/sparx5/Kconfig      |   1 +
- drivers/net/ethernet/microchip/sparx5/Makefile     |   3 +-
- .../ethernet/microchip/sparx5/lan969x/lan969x.c    |   4 +
- .../ethernet/microchip/sparx5/lan969x/lan969x.h    |   7 +
- .../microchip/sparx5/lan969x/lan969x_fdma.c        | 406 +++++++++++++++++++++
- .../net/ethernet/microchip/sparx5/sparx5_fdma.c    |  68 ++--
- .../net/ethernet/microchip/sparx5/sparx5_main.c    |  19 +-
- .../net/ethernet/microchip/sparx5/sparx5_main.h    |  32 +-
- .../net/ethernet/microchip/sparx5/sparx5_packet.c  |  11 +-
- 9 files changed, 518 insertions(+), 33 deletions(-)
----
-base-commit: 7d0da8f862340c5f42f0062b8560b8d0971a6ac4
-change-id: 20250106-sparx5-lan969x-switch-driver-5-52a46ecb5488
-
-Best regards,
 -- 
-Daniel Machon <daniel.machon@microchip.com>
+2.34.1
 
 
