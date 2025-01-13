@@ -1,206 +1,251 @@
-Return-Path: <netdev+bounces-157802-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157803-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1CDFDA0BC69
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 16:46:24 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A173CA0BC93
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 16:49:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 018DB3A0259
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 15:46:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B3D89160FD1
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 15:49:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 130872297E3;
-	Mon, 13 Jan 2025 15:45:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73FAF1C5D7C;
+	Mon, 13 Jan 2025 15:48:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g8Oh+Mr/"
+	dkim=pass (1024-bit key) header.d=lenbrook.com header.i=@lenbrook.com header.b="FPayzdCW"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from YT3PR01CU008.outbound.protection.outlook.com (mail-canadacentralazon11020073.outbound.protection.outlook.com [52.101.189.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D13DC1C5D6F;
-	Mon, 13 Jan 2025 15:45:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736783135; cv=none; b=frnROQccvq0ZCf2G7gtLGraqgmSUbIgV6mqyXL1rHUPGWgwogUN03PSka67uvJFRvF8yllMWShJySH8KrnYwAtElSRzwpmUy81e1zoj+uJkC2jbiM5fOWd2lTVY+DmNBPKFYy1Y6e45Lr8JyCQqDJg3MGm7fE7FE/sq4nXKSZA4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736783135; c=relaxed/simple;
-	bh=fG3xbLFjUW12Ssjew7xsKuz4ojI9yBcQdAaajeXFMiA=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=RgfUnBnU7IT7U4uChYjXZ9bfR9dXYost2O94g7payw0G/z4P0+IIn5fPOj6ClEMN/pXEfSIFxYfoHA8JBwe4Tfp5+dwy7sdKUlNsWZN3V7vq+SpLC6OkdVfdGLnSCvV//sa5vK1Z/99WGLJMaGQJW6Bm1WgcC1ZtmyEPT0uEhpI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g8Oh+Mr/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A3FFEC4CEE6;
-	Mon, 13 Jan 2025 15:45:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736783134;
-	bh=fG3xbLFjUW12Ssjew7xsKuz4ojI9yBcQdAaajeXFMiA=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=g8Oh+Mr/gkIFvtlPbXrpyQpfAWVcsTuEPqSyORHj0kRRPPcL2zGammKerln6n8Syp
-	 AhLTQFqW+Rb9crrhFN7tcKDjh11l99aq7cEjtn1R9SoZwinyBBeEhsz8NIBBDVe4C/
-	 W5nZz3rBpOFBgG5GS5acCUCTzTVlkq91BcBuLEjPdUTRzJBfbQ3SJJh1DIAhhPIUNU
-	 WPwwukh29Tg3CmzZh2FEdWKxcGXP83XHi1lzxrEh6CbLwUXrW3FZCak4dYGdY/7Gyy
-	 KdM80xUVz+AwOzDMZD21lZ4NruhNoilGNjU+px+cOnpLkTKzl2TpFhollZEPc3X7J+
-	 /W/GggQY4XPGA==
-From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-Date: Mon, 13 Jan 2025 16:44:58 +0100
-Subject: [PATCH net 3/3] selftests: mptcp: avoid spurious errors on
- disconnect
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E56FF1C5D6F;
+	Mon, 13 Jan 2025 15:48:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.189.73
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1736783339; cv=fail; b=BVoER1UwzgNI4mCkg7qrriuA5JS4VC5hn/lhnXd/uXFDRWVJVyIxxQt2yMKmXsEkJSBFARxqPhckkFKBOyM+reMwI5SIQoG2Q0GiMA7LuGx8eq6G3/ojxhmyNd5lRFCmXonchH2kybV/dD2bwhultsEBs9bpIpinA4G8+6vUX+k=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1736783339; c=relaxed/simple;
+	bh=11MaUkbWorjGTKq5EPT2u6Zt9Ji7vCgtDxcy78Xf3go=;
+	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=F2Fz4Xu+a/wFqgbvZ03YKyK/6anXXduz3QNK/EL0wFxwCFJOIjqJHMLTdzkhegMEVY7pl8M6WLPRKCgYD3cYUDzPjyKwq3LLKA9ANKkvpclNFV/y+SpFSFRl+sTHu+AgQih55AK6urIegRXqFKtg3lqsq6EDQi14OJq2/tzQ+BY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lenbrook.com; spf=pass smtp.mailfrom=lenbrook.com; dkim=pass (1024-bit key) header.d=lenbrook.com header.i=@lenbrook.com header.b=FPayzdCW; arc=fail smtp.client-ip=52.101.189.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lenbrook.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lenbrook.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=c599gW29Sw0d5olgCHNXmHUOW5zmtzgLmgPjAQ8OiH16Ie0hJriV7Pu3NV9AsHFICEqxmQX6xDUSxXWxOAj3z3nJH9iAPGK/18/YRRiHhBYczfQMutozgBpbs1YwOj1ofh7ZMyoKgZEs/YheKgb1RpLzPnhamsiZvrSmVZ3dNhK2WkseYQ8PkG2WqteOktxdfYcuCjXBe/TinhM37UzxGYkuPDwyqZxHwISwIe1zjxe/a7DS+9Qoaa74AUasusgXPvazGJERaTJOZB53gyVQMMA+f6K7aP3gAES84IoDBPX2FdXn7nEQJo1L2EOjkRbsGXRAHYfjKcjiGxbzOGO8BQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=dA2vd8/rN4O45KmLUMmyAjsXsBcvGfAA1ChpJhXOPmw=;
+ b=s3LJPjdJtZjMYwaOU3Lv6s9cHK8YMA3+RwIbw/x+sEgG+We92H5Y51xP0Tz7ze5hZ3L1V8TO7vXOQEaq+bTcU55R4RijtjZlH8SygTG463gXDcJvla4NUlHWjOE5YUoGpVYZHl/dK00KYzOEmurwUErpuu65MGwGJpHAFj4ikshnXGhWKioyWSu8P/pVIiKlMbCpWVrW619o0esn0KA0V7tAibGz1LcpsSeAkK5RUD7itn3rKv7EJoLVX+4IEG3fTXdcXLCqLOVIW+5P3T+YoddAwmXrKeeenv/yNFJhKwvV2jz6JtQzCVN9kJNTrJtlT01y1AwTyTgQsHGRN4LTug==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=lenbrook.com; dmarc=pass action=none header.from=lenbrook.com;
+ dkim=pass header.d=lenbrook.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=lenbrook.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=dA2vd8/rN4O45KmLUMmyAjsXsBcvGfAA1ChpJhXOPmw=;
+ b=FPayzdCWCb9qY5zQ5LNo+k9kv1ZPtEIPXT6i6m+jylHvKHp8uJQc99fBnIAeAUu5Ft5HJu1zcL9noe6NMX/mFjd6u9kLVFk/OHmJBqBcRXbLmk+d8RTB+51IZezi+1j4pXMdDfpW43mHxsUr826HZuJ2JEZakbeK9zQ14ITnnU0=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=lenbrook.com;
+Received: from YT2PR01MB5632.CANPRD01.PROD.OUTLOOK.COM (2603:10b6:b01:54::18)
+ by YT3PR01MB10701.CANPRD01.PROD.OUTLOOK.COM (2603:10b6:b01:99::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8335.18; Mon, 13 Jan
+ 2025 15:48:54 +0000
+Received: from YT2PR01MB5632.CANPRD01.PROD.OUTLOOK.COM
+ ([fe80::9def:1c97:2f04:5541]) by YT2PR01MB5632.CANPRD01.PROD.OUTLOOK.COM
+ ([fe80::9def:1c97:2f04:5541%6]) with mapi id 15.20.8335.017; Mon, 13 Jan 2025
+ 15:48:54 +0000
+From: Kevin Groeneveld <kgroeneveld@lenbrook.com>
+To: Wei Fang <wei.fang@nxp.com>,
+	Shenwei Wang <shenwei.wang@nxp.com>,
+	Clark Wang <xiaoning.wang@nxp.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	imx@lists.linux.dev,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Kevin Groeneveld <kgroeneveld@lenbrook.com>
+Subject: [PATCH v2 1/1] net: fec: handle page_pool_dev_alloc_pages error
+Date: Mon, 13 Jan 2025 10:48:45 -0500
+Message-ID: <20250113154846.1765414-1-kgroeneveld@lenbrook.com>
+X-Mailer: git-send-email 2.43.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: YT2PR01CA0012.CANPRD01.PROD.OUTLOOK.COM
+ (2603:10b6:b01:38::17) To YT2PR01MB5632.CANPRD01.PROD.OUTLOOK.COM
+ (2603:10b6:b01:54::18)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Message-Id: <20250113-net-mptcp-connect-st-flakes-v1-3-0d986ee7b1b6@kernel.org>
-References: <20250113-net-mptcp-connect-st-flakes-v1-0-0d986ee7b1b6@kernel.org>
-In-Reply-To: <20250113-net-mptcp-connect-st-flakes-v1-0-0d986ee7b1b6@kernel.org>
-To: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, 
- Geliang Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
- Shuah Khan <shuah@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-kselftest@vger.kernel.org, 
- "Matthieu Baerts (NGI0)" <matttbe@kernel.org>, stable@vger.kernel.org
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=4147; i=matttbe@kernel.org;
- h=from:subject:message-id; bh=HMHeFU265RAxalmgcayy5V/AECiL0u4m+mFxhLobykU=;
- b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBnhTURBAOsIDulk//XDrXyUSJcoyUUjSFRGmb/K
- UVDDnIhkJeJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZ4U1EQAKCRD2t4JPQmmg
- c2fvD/sEwmb7hidlUYjFsi6wPM/OgR3K2AKH1DZVqqJtUPwcKMwXtwhvcZwWNiTtU7BvrKviAJx
- busvpoil/J759if16tF53QGvt5CYymBFWqCfaVfJc6a0xOztX83rRoTVRgxtDspsMV27o9SOH6K
- Ru1CUONYrWMaqxR0+nTPJjaPVEj+I4K+1PiJz/knNox59or+KPLLg26zSpybz4JoSE7O/ojMMrh
- n2DHwQpSaAXmlkABEQnWVlVBsKDjFu30RjH+jrO6BnPKoX/6pgmewdhWtIFCe6nrDIfFKieBJ+N
- rcFjl/afog8F9De/bblTI+okWDqEuwhoe7uKz1nUs9zUXGMQpotMhijzl/TT4z9qQST2jDN+P/X
- uM+de6+HV+1Dw6SaS4R12/cQv/7uMsE0/Wjm8Cwc5N8FaK1kKSIZqckfhybRzLdN5PgF3elgZIY
- 6BtpVSla4LJzN7OjBJByLrDcvbNeyNOmIg20bGhGMCCTH+nsplkBVwp25GAJrBL5YhJiePwYHXL
- ZB9vou1RpZO79GZ3GDY4czi7NJUkKkuTriljc/3Rp7ljvyVaKi6ZOzcMAbiF2cZV0D7jI6GBr8J
- q8VVxnxTTFNqz2lAL4XUX7ZJcXgRTqv1McTcoPRNIkK1/3kfxEvLmcx5yOwl5jWOC1FZjl6uvk6
- FErQ++6RuDxT/Aw==
-X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
- fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: YT2PR01MB5632:EE_|YT3PR01MB10701:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8798f192-ce25-4a36-826e-08dd33e9c895
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|366016|1800799024|7416014|376014|921020;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?UQmiQAASweqbFiUFK0as+ZNa6p96oiebHJPIU09wxWsHy4r7ttOX9nyCRlr0?=
+ =?us-ascii?Q?6DF30WpPELiIuxazf/Z0H7RrA9mH5MkCpkwAgMTidPfH+5+Q68eZRGKLige4?=
+ =?us-ascii?Q?Jf9j/OoVEj/1F3IjKc8AOud0F3jNLmyYQPjsBYSa2fd9LbddcLD1e75dXvU5?=
+ =?us-ascii?Q?Z6D2oILld5wzV2RRx8Mjl4gMS2mH1xP41/eRc8d8uMqKFW/tbZJW16wIuB6m?=
+ =?us-ascii?Q?joKZWFwh3146wO7DVJ7pVC2E1zA+4jxvUmkHVTrdsBcAa3R6WbJ7pINVz/e3?=
+ =?us-ascii?Q?Hh0z2B0mhuL8vQrSKOwriq39c0ZjDe4PK5zZePs9KrmdEj3BpKYMtl/fTJYN?=
+ =?us-ascii?Q?zCYjneaqcaGU6TEjnf0qUGJxWVzvy+A2vzR/p4qeJ/VgWvmidM93UbR18iV9?=
+ =?us-ascii?Q?//tmALur4Kkx9Nu3d9IJvDjj1VWwzCDlNcuzhBOp3Z4sONF6lqCyeY+bIRYM?=
+ =?us-ascii?Q?/dy2JZbFloiRPUO7OiO4FpX6hv+NEjgMHQnFM0xn7VvFXe8VBzqE9wFnPKFh?=
+ =?us-ascii?Q?S9B32NA1U7pKHcf76oixcIRnP9+ZTEJKXPBlcB4jgIUuuOhum+OZ2adwA1ro?=
+ =?us-ascii?Q?56qk5VDCFW7Teo1/fBZIlReXWj/Yp/3Z7M4StvrWpgiMeuxXiwpJ2iCnDW7U?=
+ =?us-ascii?Q?B9p6pDiux3L+f8LcpqRDr4AbBBiuLFmbR0DiiJ7b8CAI9GZaCQqlwtXrqH9R?=
+ =?us-ascii?Q?YekaabvRVdsfRF1v9ixw9cGIW9gCNuRKHl97EP6BDDD2jYM0vQkI3fgiE6ve?=
+ =?us-ascii?Q?omHpvkvxYopZwPhV4feAsHoTnSRKu5BLGXS1hog24ceFBk+SMgo7JtQXwQPu?=
+ =?us-ascii?Q?5haoxKfO9K89dXjYdEb5+VrLpYaLb1aArV37+nwb2vKqPU4ZGITosziLn8Gg?=
+ =?us-ascii?Q?w09NGGCh3Lf+5mGQ05vEXqOW/lzFHED/1e6dNKxNKVpFaEGHaZ0j5rfytX7i?=
+ =?us-ascii?Q?gO/uw09E2a61+d7UTCXjcSCtNknHku20NaZnUgDBOWN+d284tn/gK3zZN20P?=
+ =?us-ascii?Q?v36znMFylV8arK5VY3m9NP2gvbbw3mDzQ9MpO83aelGQfTQmOwpfwMasCCj8?=
+ =?us-ascii?Q?d7ZFpt1sUMYrzi2nbbtHRMVJOMfPKWJFX8BDB9bHe6U/TLHuxmmocTTqxbdq?=
+ =?us-ascii?Q?mbnM9E7dp8AAcyk6AQqnIRU7VKw1xTswJjSMX0ylK7x0K8ohNa/ApNjZDxGv?=
+ =?us-ascii?Q?mpNQB5OmG5YZt2DJCb6KaGVPDPLEv5f4fwGMmuCanaMxXQFL0K1aHr5+mmjM?=
+ =?us-ascii?Q?6TArx5Sqlfc9rVFik3Ms97uaZMbBvGcF02adz2xqJ7YRWldeqAgyRgNZ564m?=
+ =?us-ascii?Q?Mg2Bq46EVr9MGpoMsCKL7bKRnt322s8ljuOPpc3YHjPjsZDw9qFn4fFJ4NTS?=
+ =?us-ascii?Q?SI2K0uNN4/liQ6NpYZuvtgR6hZ3DM86k/EFRPUfOwduHCtyt4McWNHMR7Uwk?=
+ =?us-ascii?Q?tva6KlVLXa0=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:YT2PR01MB5632.CANPRD01.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014)(921020);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?gcHdV9Bxom/iIvquuOGEyAEI78xXqv9dXH7gL/8yEKLSFwyoMxnahwLYer5p?=
+ =?us-ascii?Q?EuHt3GZ7Hdnr+fxG8QxEh1FjR3l9QE265uvM/OLQ9g5VmUZxHxGJPFRennJz?=
+ =?us-ascii?Q?IKS9HFyN1TGUe3YWZpgFlm7G4xW+gINImCulXbiquRTxTMf5Afz0F0m7XXGp?=
+ =?us-ascii?Q?0ivUCx3Ez4GyId+ZuzCtwiZlW6lG06g1YNBDEDQ62gCh2WZGYmZMB4iQlsTO?=
+ =?us-ascii?Q?5C1IChIFix6KztSOojaVu77cdbVCRVsNYnkO6yE7+9/CS0E2lolEXZ5gF9qZ?=
+ =?us-ascii?Q?mFHHNLo7gggxFmgM39u7sRPV3pDyPtMTp6JUssf0WNgZkaDdIc8N6z9JW/mm?=
+ =?us-ascii?Q?0sJgiMDgoW2dXeQiuho/dq2LLj6/8X3Oj0ZS2HThewPE7s497Hv3HY6Xx9Md?=
+ =?us-ascii?Q?lXijTQPlWqn0Kgil0JSjPgCxbMEZnjBMOoMDsb/goyJhrX0+jjKVzPTmw0zl?=
+ =?us-ascii?Q?qSAAsUXnZLr87w37aiBy3yj+Ea0ubOf4SEFAz7xVH51KrKBJV1GNgInKoT6j?=
+ =?us-ascii?Q?pKPXZ0ZwWky8tHfD5rHiu/8xrJsnqStlMkIYPB3pme/k6gtBfHwPyLX/yQI8?=
+ =?us-ascii?Q?Dh7GjYKSh3ffkrEwfKwn67N0qTts7+RLJ9TTPv9lZIq5OISJ/x06DB/bo8R5?=
+ =?us-ascii?Q?GCdzgs0t7VKBlT/Gys9cWdd0hSoKHWrC1q2mFSwfAwrrCKiQZAzzMJAvCJao?=
+ =?us-ascii?Q?Eh4cLi0MvvxwPprUIj5mkqP7vSZWGxbCpq4rsVFidwWHBAHKxWCqwFB3sSCT?=
+ =?us-ascii?Q?dgvPP7QoHcz3iooMLurVtP8+SVIxnesDMcKjpjdw4MJLQoeupVqcTUTXgC7b?=
+ =?us-ascii?Q?5TzUzhjbH/8augvJGUwN0vqsvYVBFiajyIoXUdVdyEVrNpZgFusgG+dT0KZS?=
+ =?us-ascii?Q?pVkiWJfZcAtSz2uaMzfjoyw/q4Zk80qP5VwVVH4MV5f9+6cL6DixKwRkkv9l?=
+ =?us-ascii?Q?nMaSiP7sMUWScGSYX/xu+wXu27Clpnbm5Xe0r0fmndmBXje70wRXcfOKMj0E?=
+ =?us-ascii?Q?AqCWf/wa3Qyh8zMbLgDUbsC8fdfVW8NWxtEViZvuhcwBLhXWZAcskVjk3Ef5?=
+ =?us-ascii?Q?OjJJaNU/WTyMyNTAXaFZJGH/grkmDyrtRNzNzMGWZmFCpSk1jh7e+V3NCYOT?=
+ =?us-ascii?Q?YKp0k/i6tQaZm5bNJ5tjre6gMUbn7qDWj/Rle9X2mjX808JBSs6+qiUIQ+Kj?=
+ =?us-ascii?Q?I9oIGPV7cqIdBNv0wapGCepEzsW1ZCLKjsmVHKVPDcmBJqfAIpR+cEoW0aD9?=
+ =?us-ascii?Q?KMvg3fLnyqeEef/AOZHWrotc9k3L18RtAegRxgRkP+TmzXSTFp6lQ5/R4Mbd?=
+ =?us-ascii?Q?PPaY0g8vPIILx7D1OS40ZHBHM7nfHY3ejYozxRPjAMjMRnlLhkabXSUrLsXO?=
+ =?us-ascii?Q?22JCgJuBvvXpAQTni/NQy++Q9g5yyWx5I29PZHAwRG4BnktM1gFQQvQPxx9K?=
+ =?us-ascii?Q?q98imT0OvDcdAC6/ba5nLdDMnkoCRLCZ2wzlgiRlSgbjyJYkOU+ZDXTwhZ9j?=
+ =?us-ascii?Q?rvkqW+oeQBI9UGw3+eVgcyZyKrSAr+cpnqvsK/NWA2Wgl4q13eXTyvTApH7X?=
+ =?us-ascii?Q?ZOEqMaYvDln4QCSWgRVKH/EBOrhnTGOYNrqhjk2sjMCBG1unTWv5qC37ZyPc?=
+ =?us-ascii?Q?3Q=3D=3D?=
+X-OriginatorOrg: lenbrook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8798f192-ce25-4a36-826e-08dd33e9c895
+X-MS-Exchange-CrossTenant-AuthSource: YT2PR01MB5632.CANPRD01.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Jan 2025 15:48:54.4926
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3089fb55-f9f3-4ac8-ba44-52ac0e467cb6
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: V4AOcKo9zNIozC60dOAza9gWHh762gULI10046sw6SF7p8MUeZny0NVoj8O0wMHVuARAGILMTcyz+7JoaJjRnesCLQc+5nyhpLBD2evM45Y=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: YT3PR01MB10701
 
-From: Paolo Abeni <pabeni@redhat.com>
+The fec_enet_update_cbd function calls page_pool_dev_alloc_pages but did
+not handle the case when it returned NULL. There was a WARN_ON(!new_page)
+but it would still proceed to use the NULL pointer and then crash.
 
-The disconnect test-case generates spurious errors:
+This case does seem somewhat rare but when the system is under memory
+pressure it can happen. One case where I can duplicate this with some
+frequency is when writing over a smbd share to a SATA HDD attached to an
+imx6q.
 
-  INFO: disconnect
-  INFO: extra options: -I 3 -i /tmp/tmp.r43niviyoI
-  01 ns1 MPTCP -> ns1 (10.0.1.1:10000      ) MPTCP (duration 140ms) [FAIL]
-  file received by server does not match (in, out):
-  Unexpected revents: POLLERR/POLLNVAL(19)
-  -rw-r--r-- 1 root root 10028676 Jan 10 10:47 /tmp/tmp.r43niviyoI.disconnect
-  Trailing bytes are:
-  ��\����R���!8��u2��5N%
-  -rw------- 1 root root 9992290 Jan 10 10:47 /tmp/tmp.Os4UbnWbI1
-  Trailing bytes are:
-  ��\����R���!8��u2��5N%
-  02 ns1 MPTCP -> ns1 (dead:beef:1::1:10001) MPTCP (duration 206ms) [ OK ]
-  03 ns1 MPTCP -> ns1 (dead:beef:1::1:10002) TCP   (duration  31ms) [ OK ]
-  04 ns1 TCP   -> ns1 (dead:beef:1::1:10003) MPTCP (duration  26ms) [ OK ]
-  [FAIL] Tests of the full disconnection have failed
-  Time: 2 seconds
+Setting /proc/sys/vm/min_free_kbytes to higher values also seems to solve
+the problem for my test case. But it still seems wrong that the fec driver
+ignores the memory allocation error and can crash.
 
-The root cause is actually in the user-space bits: the test program
-currently disconnects as soon as all the pending data has been spooled,
-generating an FASTCLOSE. If such option reaches the peer before the
-latter has reached the closed status, the msk socket will report an
-error to the user-space, as per protocol specification, causing the
-above failure.
+This commit handles the allocation error by dropping the current packet.
 
-Address the issue explicitly waiting for all the relevant sockets to
-reach a closed status before performing the disconnect.
-
-Fixes: 05be5e273c84 ("selftests: mptcp: add disconnect tests")
-Cc: stable@vger.kernel.org
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
-Reviewed-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
-Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+Fixes: 95698ff6177b5 ("net: fec: using page pool to manage RX buffers")
+Signed-off-by: Kevin Groeneveld <kgroeneveld@lenbrook.com>
 ---
- tools/testing/selftests/net/mptcp/mptcp_connect.c | 43 +++++++++++++++++------
- 1 file changed, 32 insertions(+), 11 deletions(-)
+v1 -> v2:
+- Simplify commit message.
+- As suggested by and based on partial patch from Wei Fang, re-write to
+  drop packet instead of trying to return from fec_enet_rx_napi early.
 
-diff --git a/tools/testing/selftests/net/mptcp/mptcp_connect.c b/tools/testing/selftests/net/mptcp/mptcp_connect.c
-index 4209b95690394b7565f330a37606bf39b6d2d228..414addef9a4514c489ecd09249143fe0ce2af649 100644
---- a/tools/testing/selftests/net/mptcp/mptcp_connect.c
-+++ b/tools/testing/selftests/net/mptcp/mptcp_connect.c
-@@ -25,6 +25,8 @@
- #include <sys/types.h>
- #include <sys/mman.h>
- 
-+#include <arpa/inet.h>
-+
- #include <netdb.h>
- #include <netinet/in.h>
- 
-@@ -1211,23 +1213,42 @@ static void parse_setsock_options(const char *name)
- 	exit(1);
+ drivers/net/ethernet/freescale/fec_main.c | 19 ++++++++++++++-----
+ 1 file changed, 14 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/net/ethernet/freescale/fec_main.c b/drivers/net/ethernet/freescale/fec_main.c
+index 1b55047c0237..4566848e1d7c 100644
+--- a/drivers/net/ethernet/freescale/fec_main.c
++++ b/drivers/net/ethernet/freescale/fec_main.c
+@@ -1591,19 +1591,22 @@ static void fec_enet_tx(struct net_device *ndev, int budget)
+ 		fec_enet_tx_queue(ndev, i, budget);
  }
  
--void xdisconnect(int fd, int addrlen)
-+void xdisconnect(int fd)
+-static void fec_enet_update_cbd(struct fec_enet_priv_rx_q *rxq,
++static int fec_enet_update_cbd(struct fec_enet_priv_rx_q *rxq,
+ 				struct bufdesc *bdp, int index)
  {
--	struct sockaddr_storage empty;
-+	socklen_t addrlen = sizeof(struct sockaddr_storage);
-+	struct sockaddr_storage addr, empty;
- 	int msec_sleep = 10;
--	int queued = 1;
--	int i;
-+	void *raw_addr;
-+	int i, cmdlen;
-+	char cmd[128];
+ 	struct page *new_page;
+ 	dma_addr_t phys_addr;
+ 
+ 	new_page = page_pool_dev_alloc_pages(rxq->page_pool);
+-	WARN_ON(!new_page);
+-	rxq->rx_skb_info[index].page = new_page;
++	if (unlikely(!new_page))
++		return -ENOMEM;
+ 
++	rxq->rx_skb_info[index].page = new_page;
+ 	rxq->rx_skb_info[index].offset = FEC_ENET_XDP_HEADROOM;
+ 	phys_addr = page_pool_get_dma_addr(new_page) + FEC_ENET_XDP_HEADROOM;
+ 	bdp->cbd_bufaddr = cpu_to_fec32(phys_addr);
 +
-+	/* get the local address and convert it to string */
-+	if (getsockname(fd, (struct sockaddr *)&addr, &addrlen) < 0)
-+		xerror("getsockname");
++	return 0;
+ }
+ 
+ static u32
+@@ -1698,6 +1701,7 @@ fec_enet_rx_queue(struct net_device *ndev, int budget, u16 queue_id)
+ 	int cpu = smp_processor_id();
+ 	struct xdp_buff xdp;
+ 	struct page *page;
++	__fec32 cbd_bufaddr;
+ 	u32 sub_len = 4;
+ 
+ #if !defined(CONFIG_M5272)
+@@ -1766,12 +1770,17 @@ fec_enet_rx_queue(struct net_device *ndev, int budget, u16 queue_id)
+ 
+ 		index = fec_enet_get_bd_index(bdp, &rxq->bd);
+ 		page = rxq->rx_skb_info[index].page;
++		cbd_bufaddr = bdp->cbd_bufaddr;
++		if (fec_enet_update_cbd(rxq, bdp, index)) {
++			ndev->stats.rx_dropped++;
++			goto rx_processing_done;
++		}
 +
-+	if (addr.ss_family == AF_INET)
-+		raw_addr = &(((struct sockaddr_in *)&addr)->sin_addr);
-+	else if (addr.ss_family == AF_INET6)
-+		raw_addr = &(((struct sockaddr_in6 *)&addr)->sin6_addr);
-+	else
-+		xerror("bad family");
-+
-+	strcpy(cmd, "ss -M | grep -q ");
-+	cmdlen = strlen(cmd);
-+	if (!inet_ntop(addr.ss_family, raw_addr, &cmd[cmdlen],
-+		       sizeof(cmd) - cmdlen))
-+		xerror("inet_ntop");
+ 		dma_sync_single_for_cpu(&fep->pdev->dev,
+-					fec32_to_cpu(bdp->cbd_bufaddr),
++					fec32_to_cpu(cbd_bufaddr),
+ 					pkt_len,
+ 					DMA_FROM_DEVICE);
+ 		prefetch(page_address(page));
+-		fec_enet_update_cbd(rxq, bdp, index);
  
- 	shutdown(fd, SHUT_WR);
- 
--	/* while until the pending data is completely flushed, the later
-+	/*
-+	 * wait until the pending data is completely flushed and all
-+	 * the MPTCP sockets reached the closed status.
- 	 * disconnect will bypass/ignore/drop any pending data.
- 	 */
- 	for (i = 0; ; i += msec_sleep) {
--		if (ioctl(fd, SIOCOUTQ, &queued) < 0)
--			xerror("can't query out socket queue: %d", errno);
--
--		if (!queued)
-+		/* closed socket are not listed by 'ss' */
-+		if (system(cmd) != 0)
- 			break;
- 
- 		if (i > poll_timeout)
-@@ -1281,9 +1302,9 @@ int main_loop(void)
- 		return ret;
- 
- 	if (cfg_truncate > 0) {
--		xdisconnect(fd, peer->ai_addrlen);
-+		xdisconnect(fd);
- 	} else if (--cfg_repeat > 0) {
--		xdisconnect(fd, peer->ai_addrlen);
-+		xdisconnect(fd);
- 
- 		/* the socket could be unblocking at this point, we need the
- 		 * connect to be blocking
-
+ 		if (xdp_prog) {
+ 			xdp_buff_clear_frags_flag(&xdp);
 -- 
-2.47.1
+2.43.0
 
 
