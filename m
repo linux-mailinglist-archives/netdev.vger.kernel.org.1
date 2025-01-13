@@ -1,128 +1,169 @@
-Return-Path: <netdev+bounces-157817-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157818-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6CD76A0BE3A
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 18:02:02 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C2ED8A0BE78
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 18:11:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 668E91882825
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 17:02:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D6ECB18867C6
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 17:11:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43D9870807;
-	Mon, 13 Jan 2025 17:01:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6AB720F078;
+	Mon, 13 Jan 2025 17:11:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="f8iBETVc"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WDzqAvY2"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA815240243;
-	Mon, 13 Jan 2025 17:01:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7497F1C5D77
+	for <netdev@vger.kernel.org>; Mon, 13 Jan 2025 17:11:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736787717; cv=none; b=flBnTNUY/r3eQKvO0vUmKKVjgYLRvPY9nfrwuBB62EWjScfkbB363CzGWuUHPNJN7nQKZ8gH97O2oF1rBQZGNntfpgm3yny/V+yTJ0UWcKyy1LK+4puNizpiHEZXmxhP3ZgPsPduzNDNdravLc2x46ly07At3XpQ9vvHPqN8N1c=
+	t=1736788262; cv=none; b=oBn8+ucCU5T/yN1S+vNR7VguRtHNPQbBSATU1k32Yhq/G4p4/rdJIuLScuBoNlLQTWqjpB7Xwb2osc54OgFRjfh6b9+Bum+rjDKMww0itwRHLCPC6JfZZj4yZVypDXmRd/Wz6jNpJ+wxqCV9/CN7RnJ33mQjtBLb5R/zDOaWMr0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736787717; c=relaxed/simple;
-	bh=3p8GtCHTj/BY7sgQySkaxArgCN3QMRE8FLDEVnwJS/E=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dvq3lQgDPdFW3I85bRhWIjRsU6MZKPpAh7ayaFfjh9v4dN7bdDC4ynLp7bB8xNOxUGYhzDoO2cF4/nJnxONxEf4IdLK4E3QDnrcFqy1NTnv06TNoiS8EDzJ3NSL5DltRKopYf5F8JYLFhc1xWJZz2BLWW1up/QuJ44WtHv+WoYQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=f8iBETVc; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=258ufSRhmAKCNH7ZmIiFnUQr7BuMTzRbL7O6cvZOqdU=; b=f8
-	iBETVcZeENe2KuK9+Iy18jnMuirgQ/hRPCOx2rLaLlicuMaOXL8rdhDRoW1J3quvkUQKdiLu1YWeV
-	YGTl1z0lCXqNWsCoGTCykYSkg5wl8hkOkkrX04qPOoRlQH8xIGw6S3hbgdVKClW2y1BsZNomObUrY
-	reA/JawS4XnvhSs=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tXNol-0049xb-4Q; Mon, 13 Jan 2025 18:01:35 +0100
-Date: Mon, 13 Jan 2025 18:01:35 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Yanteng Si <si.yanteng@linux.dev>
-Cc: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
-	MD Danish Anwar <danishanwar@ti.com>,
-	Roger Quadros <rogerq@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Shawn Guo <shawnguo@kernel.org>,
-	Sascha Hauer <s.hauer@pengutronix.de>,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	Fabio Estevam <festevam@gmail.com>,
-	linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com, imx@lists.linux.dev
-Subject: Re: [PATCH net-next 5/5] net: stmmac: stm32: Use
- syscon_regmap_lookup_by_phandle_args
-Message-ID: <c4714984-8250-4bf2-9ac1-5a9204d3aca8@lunn.ch>
-References: <20250112-syscon-phandle-args-net-v1-0-3423889935f7@linaro.org>
- <20250112-syscon-phandle-args-net-v1-5-3423889935f7@linaro.org>
- <5d97dd34-f293-4403-b605-c0ae7b5490fd@linux.dev>
+	s=arc-20240116; t=1736788262; c=relaxed/simple;
+	bh=15JdyYSaKi30v601K2OvHWk5bNjotLlY0cBEC/OW20I=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=optPPqpqjfcP3qS4pYVM3Zridm47ypzaw8blAmnXajO4nizxVl4vhF20RJsegFRdZ49BoaUPfdQN6xJpvtTxhOYyEUgObs4w6kWTy0ZvS+aqYPYaQGgHLzTlx+83MuBr4JS+mvEsYvCnSh+uEZbQOBVVgpHAjh8TrUVE/S6ec3U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WDzqAvY2; arc=none smtp.client-ip=198.175.65.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1736788261; x=1768324261;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=15JdyYSaKi30v601K2OvHWk5bNjotLlY0cBEC/OW20I=;
+  b=WDzqAvY2npTk6U56P7DyGsHKa/IDLQlARw+VZs/vzlcdXcRhOoSbqumK
+   QtOTTArW5InpqLsHGEEFDlCG2LpdPjiPGzk2N72TCH5jOWnnZtjw9zYpU
+   sOAkrYJinWkANl++kqiToMlx2Hn/Q/QsqSBB9r0udKEMfVb/cEZw27V0a
+   bPimDo8CSBfQxuBuUM7IdCrPgSUuXqT34aDxvK+R/Kii5GCRWixMgLuCH
+   Xv58O6EJvDAKb82wRq9nMqWUYKdimjX2+dS/2+gpf9UzbVfKO91hA4LZv
+   5BuHU/EzkEyPbrZsfhuN9yJLmRnvE452cJchnrPcmajcoYISQfqanWcXr
+   w==;
+X-CSE-ConnectionGUID: L6gcr48cST+4Om2K2XSyDg==
+X-CSE-MsgGUID: WOA5foKmTjWhtQtnOOS3BQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11314"; a="36748789"
+X-IronPort-AV: E=Sophos;i="6.12,310,1728975600"; 
+   d="scan'208";a="36748789"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jan 2025 09:10:58 -0800
+X-CSE-ConnectionGUID: 0s/t8HvGTFCJsFPzeaMzBw==
+X-CSE-MsgGUID: d2XKZX1qSwa49Bm73J7XWQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,310,1728975600"; 
+   d="scan'208";a="104499532"
+Received: from jdoman-mobl3.amr.corp.intel.com (HELO azaki-desk1.intel.com) ([10.125.108.26])
+  by fmviesa007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jan 2025 09:10:50 -0800
+From: Ahmed Zaki <ahmed.zaki@intel.com>
+To: netdev@vger.kernel.org
+Cc: intel-wired-lan@lists.osuosl.org,
+	andrew+netdev@lunn.ch,
+	edumazet@google.com,
+	kuba@kernel.org,
+	horms@kernel.org,
+	pabeni@redhat.com,
+	davem@davemloft.net,
+	michael.chan@broadcom.com,
+	tariqt@nvidia.com,
+	anthony.l.nguyen@intel.com,
+	przemyslaw.kitszel@intel.com,
+	jdamato@fastly.com,
+	shayd@nvidia.com,
+	akpm@linux-foundation.org,
+	shayagr@amazon.com,
+	kalesh-anakkur.purayil@broadcom.com,
+	pavan.chebbi@broadcom.com,
+	yury.norov@gmail.com,
+	darinzon@amazon.com,
+	Ahmed Zaki <ahmed.zaki@intel.com>
+Subject: [PATCH net-next v5 0/6] net: napi: add CPU affinity to napi->config
+Date: Mon, 13 Jan 2025 10:10:36 -0700
+Message-ID: <20250113171042.158123-1-ahmed.zaki@intel.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <5d97dd34-f293-4403-b605-c0ae7b5490fd@linux.dev>
 
-On Mon, Jan 13, 2025 at 04:05:13PM +0800, Yanteng Si wrote:
-> 在 2025/1/12 21:32, Krzysztof Kozlowski 写道:
-> > Use syscon_regmap_lookup_by_phandle_args() which is a wrapper over
-> > syscon_regmap_lookup_by_phandle() combined with getting the syscon
-> > argument.  Except simpler code this annotates within one line that given
-> > phandle has arguments, so grepping for code would be easier.
-> > 
-> > There is also no real benefit in printing errors on missing syscon
-> > argument, because this is done just too late: runtime check on
-> > static/build-time data.  Dtschema and Devicetree bindings offer the
-> > static/build-time check for this already.
-> > 
-> > Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-> > ---
-> >   drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c | 9 ++-------
-> >   1 file changed, 2 insertions(+), 7 deletions(-)
-> > 
-> > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c
-> > index 1e8bac665cc9bc95c3aa96e87a8e95d9c63ba8e1..1fcb74e9e3ffacdc7581b267febb55d015a83aed 100644
-> > --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c
-> > +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c
-> > @@ -419,16 +419,11 @@ static int stm32_dwmac_parse_data(struct stm32_dwmac *dwmac,
-> >   	}
-> >   	/* Get mode register */
-> > -	dwmac->regmap = syscon_regmap_lookup_by_phandle(np, "st,syscon");
-> > +	dwmac->regmap = syscon_regmap_lookup_by_phandle_args(np, "st,syscon",
-> > +							     1, &dwmac->mode_reg);
-> The network subsystem still requires that the length of
-> each line of code should not exceed 80 characters.
-> So, let's silence the warning:
-> 
-> WARNING: line length of 83 exceeds 80 columns
-> #33: FILE: drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c:307:
-> +							     &dwmac->intf_reg_off);
+Drivers usually need to re-apply the user-set IRQ affinity to their IRQs
+after reset. However, since there can be only one IRQ affinity notifier
+for each IRQ, registering IRQ notifiers conflicts with the ARFS rmap
+management in the core (which also registers separate IRQ affinity
+notifiers).   
 
-checkpatch should be considered a guide, not a strict conformance
-tool. You often need to look at its output and consider does what it
-suggest really make the code better? In this case, i would disagree
-with checkpatch and allow this code.
+Move the IRQ affinity management to the napi struct. This way we can have
+a unified IRQ notifier to re-apply the user-set affinity and also manage
+the ARFS rmaps. Patches 1 and 2 move the ARFS rmap management to CORE.
+Patch 3 adds the IRQ affinity mask to napi_config and re-applies the mask
+after reset. Patches 4-6 use the new API for bnxt, ice and idpf drivers.
 
-If the code had all been on one long line, then i would suggest to
-wrap it. But as it is, it keeps with the spirit of 80 characters, even
-if it is technically not.
+Tested on bnxt, ice and idpf.
 
-	Andrew
+V5:
+    - Add kernel doc for new netdev flags (Simon).
+    - Remove defensive (if !napi) check in napi_irq_cpu_rmap_add()
+      (patch 2) since caller is already dereferencing the pointer (Simon).
+    - Fix build error when CONFIG_ARFS_ACCEL is not defined (patch 3).
+
+v4:
+    - https://lore.kernel.org/netdev/20250109233107.17519-1-ahmed.zaki@intel.com/
+    - Better introduction in the cover letter.
+    - Fix Kernel build errors in ena_init_rx_cpu_rmap() (Patch 1)
+    - Fix kernel test robot warnings reported by Dan Carpenter:
+      https://lore.kernel.org/all/202501050625.nY1c97EX-lkp@intel.com/
+    - Remove unrelated empty line in patch 4 (Kalesh Anakkur Purayil)
+    - Fix a memleak (rmap was not freed) by calling cpu_rmap_put() in
+      netif_napi_affinity_release() (patch 2).
+
+v3:
+    - https://lore.kernel.org/netdev/20250104004314.208259-1-ahmed.zaki@intel.com/
+    - Assign one cpu per mask starting from local NUMA node (Shay Drori).
+    - Keep the new ARFS and Affinity flags per nedev (Jakub).
+
+v2:
+    - https://lore.kernel.org/netdev/202412190454.nwvp3hU2-lkp@intel.com/T/
+    - Also move the ARFS IRQ affinity management from drivers to core. Via
+      netif_napi_set_irq(), drivers can ask the core to add the IRQ to the
+      ARFS rmap (already allocated by the driver).
+
+RFC -> v1:
+    - https://lore.kernel.org/netdev/20241210002626.366878-1-ahmed.zaki@intel.com/
+    - move static inline affinity functions to net/dev/core.c
+    - add the new napi->irq_flags (patch 1)
+    - add code changes to bnxt, mlx4 and ice.
+
+Ahmed Zaki (6):
+  net: move ARFS rmap management to core
+  net: napi: add internal ARFS rmap management
+  net: napi: add CPU affinity to napi_config
+  bnxt: use napi's irq affinity
+  ice: use napi's irq affinity
+  idpf: use napi's irq affinity
+
+ drivers/net/ethernet/amazon/ena/ena_netdev.c |  38 +----
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c    |  52 +------
+ drivers/net/ethernet/broadcom/bnxt/bnxt.h    |   2 -
+ drivers/net/ethernet/intel/ice/ice.h         |   3 -
+ drivers/net/ethernet/intel/ice/ice_arfs.c    |  17 +--
+ drivers/net/ethernet/intel/ice/ice_base.c    |   7 +-
+ drivers/net/ethernet/intel/ice/ice_lib.c     |   6 -
+ drivers/net/ethernet/intel/ice/ice_main.c    |  47 +-----
+ drivers/net/ethernet/intel/idpf/idpf_lib.c   |   1 +
+ drivers/net/ethernet/intel/idpf/idpf_txrx.c  |  22 +--
+ drivers/net/ethernet/intel/idpf/idpf_txrx.h  |   6 +-
+ include/linux/cpu_rmap.h                     |   1 +
+ include/linux/netdevice.h                    |  31 +++-
+ lib/cpu_rmap.c                               |   2 +-
+ net/core/dev.c                               | 151 ++++++++++++++++++-
+ 15 files changed, 205 insertions(+), 181 deletions(-)
+
+-- 
+2.43.0
+
 
