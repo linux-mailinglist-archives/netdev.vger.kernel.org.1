@@ -1,241 +1,211 @@
-Return-Path: <netdev+bounces-157630-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157628-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C1D2A0B0EC
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 09:21:33 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2949DA0B0E1
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 09:20:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3C6EB7A3573
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 08:21:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0F8CB1887745
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 08:20:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF897233135;
-	Mon, 13 Jan 2025 08:20:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF788233142;
+	Mon, 13 Jan 2025 08:20:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="IbGZVbOB"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="mkubaI8I"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27EEB23DE
-	for <netdev@vger.kernel.org>; Mon, 13 Jan 2025 08:20:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14E4B231A56;
+	Mon, 13 Jan 2025 08:20:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736756458; cv=none; b=nSyRnLmoZVd91p1tF6ArjZlJ/iNxCW5YtJbwr8d0osZHjoTzwZDve5MdMSMb0JFyDVp6xygOUyKfrR5KKI4t0uxseld9BmvBpet19jCCtvMghqtZZaeEXgXkgEo8QH0D9wYwXRZCBy7HLDqOouPcTS85vEoZo5K0eg7Oj3AEKEg=
+	t=1736756430; cv=none; b=omyllWWxwfS2OA5CDZ+pQsV38G2sdcdeOHD40qyxqOJ3k9N13gqK/P6PPd0x2ZTY4OYKxKaDh/+HKki05XIe9sG2xs425puV3GtudP0cQwgFoegEpXYcw3BdTJdK1NtpQMCKSXKWcRrfyKNd5JnzAQBN1Thdb/fkFxGNi0AXoZc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736756458; c=relaxed/simple;
-	bh=EcpH4rtyXynVuHAZzQlAPEj/KCxAWwyoDGiub7E8gkk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=G4/ejBGZ6dl/avRDP9vbcNHTw2eTl2+oRUcl7NIXtgDBSu/OuiyfTqyiZhFa8fANcpZG5NBBNnjdqivmllgppxzSm4IXkhiQrtctxn6Q1LIa9/1hg3AV1++0g2FpnJ6e1uxr4pHvaCb2ALPH9YyQa46kCHaRb5YNGRAj8L0d02c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=IbGZVbOB; arc=none smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1736756457; x=1768292457;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=EcpH4rtyXynVuHAZzQlAPEj/KCxAWwyoDGiub7E8gkk=;
-  b=IbGZVbOBnjoBC6Ilf+XzWEw2d3K0JJEATqbTF6QibR0sg5Dah7rjePSk
-   k2hnXyqkujtWIxBETavlihIXxCq3pLqaGReQD6LIN115zo/CV78/RzcXy
-   gO7sN1IXLXTaysgN4bxDjj9/7XONiuFm+Wb3b3w0CkjAdY8koTysQQ4jc
-   kLfNB4R3u5pQGTWn6t1b+kCKz4VoxSdSO1rWMqRu7njkR0tKImOhGl3ZQ
-   wVyb6cnDs5NYf9x+IZhyqQkrhy9G8cQlXA2Hzcro2WLpSJpa44fjKWuzP
-   69ICqvoUyeDOKt3UFa0j6x2vAte9NWpoye7I41PU4DHbtdKIQTPQysAQT
-   g==;
-X-CSE-ConnectionGUID: OEOom4F5REKPKN2Vh3ObAg==
-X-CSE-MsgGUID: OUan5i07TmqMOdTFgwrx6w==
-X-IronPort-AV: E=McAfee;i="6700,10204,11313"; a="48379602"
-X-IronPort-AV: E=Sophos;i="6.12,310,1728975600"; 
-   d="scan'208";a="48379602"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jan 2025 00:20:57 -0800
-X-CSE-ConnectionGUID: vTW6YC88TGCB+eNTz651xQ==
-X-CSE-MsgGUID: tGWvH3umR5+WA2i/3RZASw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,310,1728975600"; 
-   d="scan'208";a="104194047"
-Received: from mev-dev.igk.intel.com ([10.237.112.144])
-  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jan 2025 00:20:54 -0800
-Date: Mon, 13 Jan 2025 09:17:35 +0100
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: Michael Chan <michael.chan@broadcom.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, andrew+netdev@lunn.ch,
-	pavan.chebbi@broadcom.com, andrew.gospodarek@broadcom.com,
-	somnath.kotur@broadcom.com
-Subject: Re: [PATCH net-next 05/10] bnxt_en: Refactor bnxt_free_tx_rings() to
- free per Tx ring
-Message-ID: <Z4TMH1lQWiZWP5h0@mev-dev.igk.intel.com>
-References: <20250113063927.4017173-1-michael.chan@broadcom.com>
- <20250113063927.4017173-6-michael.chan@broadcom.com>
+	s=arc-20240116; t=1736756430; c=relaxed/simple;
+	bh=4+chX1jsbW61op44SlDeuJje9hKl94J6pDz8yqfyt3Q=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=A4/rGOjOVLW/eHxsOVQGqaOd7bEV9bleDF6YkPN8nC7bKKstObFkjhw85aDLnm3IEMjWNkZkLNwnETvOyEzgnOcYKnegwPtyBgkd3vRTF/QQsRSSGPhK3VbDVVd+GvLOFu52bC9QUDdgwrjjH3TkR0U+1V691Hf2zU5Wff+8DOI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=mkubaI8I; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50D4sdvw001454;
+	Mon, 13 Jan 2025 08:20:04 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	PgTDnGsNKXJLy6fZXS3tEtI7+FhqPIzJUmiGDgsJesU=; b=mkubaI8I5ym0gxjL
+	dXimjiGjOnYdOSxVp42/7vfL57uzFjP22fk50mYo7TMpzJlq8nKhbbbdPh5R49/F
+	kJPl1vEoyNy9cjcTqDikK+uaw4QPEox3GuSzS5MydyuEQSsJKeRbv1exXu6Ul5yQ
+	j1KgouwDdWYYWphNouqmG+PFIEhf0jdbLu5TYr6L5gqrOqECBPgti+GawY5aj1BR
+	XgBErqwN7y8xbEWy7qRIN3oyfBIjILDVRUCbyLjtnFCGD1RM1IgN5npf74hHkDve
+	TYu++yh03rZnq9mQkH0W1Ifprdqt74CZGmnwDsPesSLiTCkIdmALrYP40cNSYzZt
+	IB2qAg==
+Received: from nasanppmta04.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 444v728e1s-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 13 Jan 2025 08:20:04 +0000 (GMT)
+Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
+	by NASANPPMTA04.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 50D8K35W030308
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 13 Jan 2025 08:20:03 GMT
+Received: from [10.253.33.98] (10.80.80.8) by nasanex01a.na.qualcomm.com
+ (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Mon, 13 Jan
+ 2025 00:19:57 -0800
+Message-ID: <44e82323-b40d-41ea-86ee-57c4872a46e8@quicinc.com>
+Date: Mon, 13 Jan 2025 16:19:54 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250113063927.4017173-6-michael.chan@broadcom.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v4 3/5] net: pcs: qcom-ipq9574: Add PCS
+ instantiation and phylink operations
+To: Simon Horman <horms@kernel.org>
+CC: Andrew Lunn <andrew+netdev@lunn.ch>,
+        "David S. Miller"
+	<davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Rob Herring
+	<robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley
+	<conor+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+        Heiner Kallweit
+	<hkallweit1@gmail.com>,
+        Russell King <linux@armlinux.org.uk>, <netdev@vger.kernel.org>,
+        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-arm-msm@vger.kernel.org>, <quic_kkumarcs@quicinc.com>,
+        <quic_suruchia@quicinc.com>, <quic_pavir@quicinc.com>,
+        <quic_linchen@quicinc.com>, <quic_luoj@quicinc.com>,
+        <srinivas.kandagatla@linaro.org>, <bartosz.golaszewski@linaro.org>,
+        <vsmuthu@qti.qualcomm.com>, <john@phrozen.org>
+References: <20250108-ipq_pcs_net-next-v4-0-0de14cd2902b@quicinc.com>
+ <20250108-ipq_pcs_net-next-v4-3-0de14cd2902b@quicinc.com>
+ <20250108100358.GG2772@kernel.org>
+ <8ac3167c-c8aa-4ddb-948f-758714df7495@quicinc.com>
+ <20250110105252.GY7706@kernel.org>
+Content-Language: en-US
+From: Lei Wei <quic_leiwei@quicinc.com>
+In-Reply-To: <20250110105252.GY7706@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nasanex01a.na.qualcomm.com (10.52.223.231)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: ppbTE0bSAqDDpyLkLjeisu1cD4C7AiqM
+X-Proofpoint-ORIG-GUID: ppbTE0bSAqDDpyLkLjeisu1cD4C7AiqM
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 adultscore=0
+ suspectscore=0 mlxscore=0 clxscore=1015 bulkscore=0 phishscore=0
+ impostorscore=0 priorityscore=1501 malwarescore=0 lowpriorityscore=0
+ mlxlogscore=822 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2411120000 definitions=main-2501130070
 
-On Sun, Jan 12, 2025 at 10:39:22PM -0800, Michael Chan wrote:
-> From: Somnath Kotur <somnath.kotur@broadcom.com>
-> 
-> Modify bnxt_free_tx_rings() to free the skbs per Tx ring.
-> This will be useful later in the series.
-> 
-> Signed-off-by: Somnath Kotur <somnath.kotur@broadcom.com>
-> Signed-off-by: Michael Chan <michael.chan@broadcom.com>
-> ---
->  drivers/net/ethernet/broadcom/bnxt/bnxt.c | 115 ++++++++++++----------
->  1 file changed, 61 insertions(+), 54 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-> index 4c5cb4dd7420..4336a5b54289 100644
-> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-> @@ -3314,74 +3314,81 @@ static int bnxt_poll_p5(struct napi_struct *napi, int budget)
->  	return work_done;
->  }
->  
-> -static void bnxt_free_tx_skbs(struct bnxt *bp)
-> +static void bnxt_free_one_tx_ring_skbs(struct bnxt *bp,
-> +				       struct bnxt_tx_ring_info *txr, int idx)
->  {
->  	int i, max_idx;
->  	struct pci_dev *pdev = bp->pdev;
->  
-> -	if (!bp->tx_ring)
-> -		return;
-> -
->  	max_idx = bp->tx_nr_pages * TX_DESC_CNT;
-> -	for (i = 0; i < bp->tx_nr_rings; i++) {
-> -		struct bnxt_tx_ring_info *txr = &bp->tx_ring[i];
-> -		int j;
->  
-> -		if (!txr->tx_buf_ring)
-> +	for (i = 0; i < max_idx;) {
-> +		struct bnxt_sw_tx_bd *tx_buf = &txr->tx_buf_ring[i];
-> +		struct sk_buff *skb;
-> +		int j, last;
-> +
-> +		if (idx  < bp->tx_nr_rings_xdp &&
-> +		    tx_buf->action == XDP_REDIRECT) {
-> +			dma_unmap_single(&pdev->dev,
-> +					 dma_unmap_addr(tx_buf, mapping),
-> +					 dma_unmap_len(tx_buf, len),
-> +					 DMA_TO_DEVICE);
-> +			xdp_return_frame(tx_buf->xdpf);
-> +			tx_buf->action = 0;
-> +			tx_buf->xdpf = NULL;
-> +			i++;
->  			continue;
-> +		}
->  
-> -		for (j = 0; j < max_idx;) {
-> -			struct bnxt_sw_tx_bd *tx_buf = &txr->tx_buf_ring[j];
-> -			struct sk_buff *skb;
-> -			int k, last;
-> -
-> -			if (i < bp->tx_nr_rings_xdp &&
-> -			    tx_buf->action == XDP_REDIRECT) {
-> -				dma_unmap_single(&pdev->dev,
-> -					dma_unmap_addr(tx_buf, mapping),
-> -					dma_unmap_len(tx_buf, len),
-> -					DMA_TO_DEVICE);
-> -				xdp_return_frame(tx_buf->xdpf);
-> -				tx_buf->action = 0;
-> -				tx_buf->xdpf = NULL;
-> -				j++;
-> -				continue;
-> -			}
-> +		skb = tx_buf->skb;
-> +		if (!skb) {
-> +			i++;
-> +			continue;
-> +		}
->  
-> -			skb = tx_buf->skb;
-> -			if (!skb) {
-> -				j++;
-> -				continue;
-> -			}
-> +		tx_buf->skb = NULL;
->  
-> -			tx_buf->skb = NULL;
-> +		if (tx_buf->is_push) {
-> +			dev_kfree_skb(skb);
-> +			i += 2;
-> +			continue;
-> +		}
->  
-> -			if (tx_buf->is_push) {
-> -				dev_kfree_skb(skb);
-> -				j += 2;
-> -				continue;
-> -			}
-> +		dma_unmap_single(&pdev->dev,
-> +				 dma_unmap_addr(tx_buf, mapping),
-> +				 skb_headlen(skb),
-> +				 DMA_TO_DEVICE);
->  
-> -			dma_unmap_single(&pdev->dev,
-> -					 dma_unmap_addr(tx_buf, mapping),
-> -					 skb_headlen(skb),
-> -					 DMA_TO_DEVICE);
-> +		last = tx_buf->nr_frags;
-> +		i += 2;
-> +		for (j = 0; j < last; j++, i++) {
-> +			int ring_idx = i & bp->tx_ring_mask;
-> +			skb_frag_t *frag = &skb_shinfo(skb)->frags[j];
->  
-> -			last = tx_buf->nr_frags;
-> -			j += 2;
-> -			for (k = 0; k < last; k++, j++) {
-> -				int ring_idx = j & bp->tx_ring_mask;
-> -				skb_frag_t *frag = &skb_shinfo(skb)->frags[k];
-> -
-> -				tx_buf = &txr->tx_buf_ring[ring_idx];
-> -				dma_unmap_page(
-> -					&pdev->dev,
-> -					dma_unmap_addr(tx_buf, mapping),
-> -					skb_frag_size(frag), DMA_TO_DEVICE);
-> -			}
-> -			dev_kfree_skb(skb);
-> +			tx_buf = &txr->tx_buf_ring[ring_idx];
-> +			dma_unmap_page(&pdev->dev,
-> +				       dma_unmap_addr(tx_buf, mapping),
-> +				       skb_frag_size(frag), DMA_TO_DEVICE);
->  		}
-> -		netdev_tx_reset_queue(netdev_get_tx_queue(bp->dev, i));
-> +		dev_kfree_skb(skb);
-> +	}
-> +	netdev_tx_reset_queue(netdev_get_tx_queue(bp->dev, idx));
-> +}
-> +
-> +static void bnxt_free_tx_skbs(struct bnxt *bp)
-> +{
-> +	int i;
-> +
-> +	if (!bp->tx_ring)
-> +		return;
-> +
-> +	for (i = 0; i < bp->tx_nr_rings; i++) {
-> +		struct bnxt_tx_ring_info *txr = &bp->tx_ring[i];
-> +
-> +		if (!txr->tx_buf_ring)
-> +			continue;
-> +
-> +		bnxt_free_one_tx_ring_skbs(bp, txr, i);
->  	}
->  }
 
-Looks fine, I didn't find any functional changes from previous version.
-Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 
->  
-> -- 
-> 2.30.1
+On 1/10/2025 6:52 PM, Simon Horman wrote:
+> On Thu, Jan 09, 2025 at 09:11:05PM +0800, Lei Wei wrote:
+>>
+>>
+>> On 1/8/2025 6:03 PM, Simon Horman wrote:
+>>> On Wed, Jan 08, 2025 at 10:50:26AM +0800, Lei Wei wrote:
+>>>> This patch adds the following PCS functionality for the PCS driver
+>>>> for IPQ9574 SoC:
+>>>>
+>>>> a.) Parses PCS MII DT nodes and instantiate each MII PCS instance.
+>>>> b.) Exports PCS instance get and put APIs. The network driver calls
+>>>> the PCS get API to get and associate the PCS instance with the port
+>>>> MAC.
+>>>> c.) PCS phylink operations for SGMII/QSGMII interface modes.
+>>>>
+>>>> Signed-off-by: Lei Wei <quic_leiwei@quicinc.com>
+>>>
+>>> ...
+>>>
+>>>> +static int ipq_pcs_enable(struct phylink_pcs *pcs)
+>>>> +{
+>>>> +	struct ipq_pcs_mii *qpcs_mii = phylink_pcs_to_qpcs_mii(pcs);
+>>>> +	struct ipq_pcs *qpcs = qpcs_mii->qpcs;
+>>>> +	int index = qpcs_mii->index;
+>>>> +	int ret;
+>>>> +
+>>>> +	ret = clk_prepare_enable(qpcs_mii->rx_clk);
+>>>> +	if (ret) {
+>>>> +		dev_err(qpcs->dev, "Failed to enable MII %d RX clock\n", index);
+>>>> +		return ret;
+>>>> +	}
+>>>> +
+>>>> +	ret = clk_prepare_enable(qpcs_mii->tx_clk);
+>>>> +	if (ret) {
+>>>> +		dev_err(qpcs->dev, "Failed to enable MII %d TX clock\n", index);
+>>>> +		return ret;
+>>>
+>>> Hi Lei Wei,
+>>>
+>>> I think you need something like the following to avoid leaking qpcs_mii->rx_clk.
+>>>
+>>> 		goto err_disable_unprepare_rx_clk;
+>>> 	}
+>>>
+>>> 	return 0;
+>>>
+>>> err_disable_unprepare_rx_clk:
+>>> 	clk_disable_unprepare(qpcs_mii->rx_clk);
+>>> 	return ret;
+>>> }
+>>>
+>>> Flagged by Smatch.
+>>>
+>>
+>> We had a conversation with Russell King in v2 that even if the phylink pcs
+>> enable sequence encounters an error, it does not unwind the steps it has
+>> already done. So we removed the call to unprepare in case of error here,
+>> since an error here is essentially fatal in this path with no unwind
+>> possibility.
+>>
+>> https://lore.kernel.org/all/38d7191f-e4bf-4457-9898-bb2b186ec3c7@quicinc.com/
+>>
+>> However to satisfy this smatch warning/error, we may need to revert back to
+>> the adding the unprepare call in case of error. Request Russel to comment as
+>> well if this is fine.
+> 
+> Thanks, I had missed that.
+> 
+> I don't think there is a need to update the code just to make Smatch happy.
+> Only if there is a real problem. Which, with the discussion at the link
+> above in mind, does not seem to be the case here.
+> 
+
+OK.
+
+>> Is it possible to share the log/command-options of the smatch failure so
+>> that we can reproduce this? Thanks.
+> 
+> Sure, I hope this answers your question.
+> 
+> Smatch can be found here https://github.com/error27/smatch/
+> 
+> And I invoked it like this:
+> $ PATH=".../smatch/bin:$PATH" .../smatch/smatch_scripts/kchecker drivers/net/pcs/pcs-qcom-ipq9574.o
+> 
+> Which yields the following warning:
+> drivers/net/pcs/pcs-qcom-ipq9574.c:283 ipq_pcs_enable() warn: 'qpcs_mii->rx_clk' from clk_prepare_enable() not released on lines: 280.
+>
+
+Thanks for sharing this information.
+
+> 
+> 
+
 
