@@ -1,69 +1,142 @@
-Return-Path: <netdev+bounces-157782-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157783-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2EDD1A0BA5B
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 15:52:21 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 32A7FA0BB35
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 16:08:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0B7D27A47BB
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 14:50:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E2FD33AD784
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 15:04:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00DB423A11E;
-	Mon, 13 Jan 2025 14:49:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8B7820AF61;
+	Mon, 13 Jan 2025 14:59:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KyNBon9P"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ZNjVCbYB"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA1FC23A0F3;
-	Mon, 13 Jan 2025 14:49:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0B1A243351
+	for <netdev@vger.kernel.org>; Mon, 13 Jan 2025 14:59:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736779740; cv=none; b=Irw6/urlhYsEwt+KPbg4QdntlamlOdifhYCO9MhxJVC6bb3Cyl49CTk03uUDky9u9uRwcCwMqmLM9ArMUxeedH/DdCEwPUPEWNaKdV9mOmzKhpvXJcZGO0pVZAgJf1ZkA00hVDw4C6EsSrQQI9LZ2HU8ZRXG8lSbmgSW7v/KswA=
+	t=1736780378; cv=none; b=DXnsL9KQ+fX5LoiAT/+e+16i1OwhJU39JOUOVtFPG7dsO5kcVGCKkr7AA5aWu+4B8XAEPwjLk62LZezqL5IsfgfN+3Cly1vVHZj7rSBk6ouJw9aZKAzzU1XbCjBuA4a2GSLWUaIxTDRS68MFHxVsg/GTf9fh9ez/hFdlAieq//I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736779740; c=relaxed/simple;
-	bh=k6m+Zjs0JkU/HMbs7jXDMQvbnjou5/iptW1HXs90IJM=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type; b=gPu4ddQppVZRAAMcv95FsaLOfs9neR+7mv3NwWhrKZuzMG4giUiLWHqLkhQzyVP9z9APIoyoNS9ZWS8PG8QlWXOF78Dv9rR7VIt68DYg2l5BwcvNiH9swFRg100PfV7NwIpwwoxRRAwM44eMJ6NokTdz1AOY/gb8WImkXGMSNJ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KyNBon9P; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3A434C4CEE3;
-	Mon, 13 Jan 2025 14:49:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736779740;
-	bh=k6m+Zjs0JkU/HMbs7jXDMQvbnjou5/iptW1HXs90IJM=;
-	h=Date:From:To:Subject:From;
-	b=KyNBon9PBWGIref7qR1qGDuUyhVL4bIfhuYQJKAzXa8GUxbTQkVvbwxfemmYIWIUz
-	 00MuqDjklxn2KGaD7Yg2IpFge6L77dwXI+8+5lOgGde5LpToEEVm4U4QrC0p0lf5r3
-	 Da2s4CssTKkJf4LqsOl6eHzoa8+8HIOweKRmaFxFo8zx6J/3B1UW5/M8AlrOAO24Uy
-	 N7B8E8bLAuQYhN/H2sme3Lc0xk83Z5gQbUF/rC7HxpFlDaz4kmiGoW+nKVIfIVmMQK
-	 kE0fAki7ja25jODe7qoGwjDTHZsc/dzflGM0ulNBhbmXGJVhXXDXKhEHPTdLDjVmmq
-	 FH60uw1ZUOymA==
-Date: Mon, 13 Jan 2025 06:48:59 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "netdev-driver-reviewers@vger.kernel.org"
- <netdev-driver-reviewers@vger.kernel.org>
-Subject: [ANN] netdev call - Jan 14th
-Message-ID: <20250113064859.47a99f5e@kernel.org>
+	s=arc-20240116; t=1736780378; c=relaxed/simple;
+	bh=5BNLW1HlfBXlUzg5l7iSk1P1DIOdUsBXprwKqRgIWlQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=pUvuVtIPuK28rOILUQg1EFnVF/7ekVNCq4xWywKI25dTbMdpoHig+RTdXzUw9WDFDHGqqUWssW7rh1hj6adJl3uZRj5FSY+2xVPfLSCQCo55bjrI5JA5pY5P1F2f3M9CU23fxsb1I3uC0+QaGLKd5QsrLVlBPCM3Ze6C2QTQ2+4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=ZNjVCbYB; arc=none smtp.client-ip=209.85.208.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-30613802a59so19016361fa.0
+        for <netdev@vger.kernel.org>; Mon, 13 Jan 2025 06:59:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1736780375; x=1737385175; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=UdUjo4kNCNAUx2CihbgFTiI1+JwoKMH0cDUWp6eUG48=;
+        b=ZNjVCbYBz+uL+YjrScbxaKJgWUFiDu6mQKjw2z0auecAb2IRQ7UxOysTdXvTbznslL
+         x6sbSbYwo+8G5Iz/6qxaMxKn4cVAPdi4EY3yQejuU77ux4WlwFycjPisBzYu9xFTgiOM
+         SRgnRAy34aGRYyD4MjhlCDx4yWkgIE7OM5CLF83hhxGpocbPFQDYcpoO/jyq3DI/rM8V
+         6gX1OJaWW26UeT8JztM71Ikssz2+reSuDxKTu+nA5yTvc/IMv93Tdpk+IxGio+pD//SI
+         OgIRM4YE9KUSdUXHr+1KAkxrtSzlZbo7YnP1srz8YJl1zOhGUU5VMfSc/Ov7toAt/oxb
+         g/NQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736780375; x=1737385175;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=UdUjo4kNCNAUx2CihbgFTiI1+JwoKMH0cDUWp6eUG48=;
+        b=wNUbIEfvF9pEU8H+tTt2VWfKxnNqcR869+KBBdvaWcCH4S7qlUdZrwRGzh962etyPJ
+         i6td2IeQbKckcijvK19zXMuG6m8KlPVn1b7ut9U8yyvv17pqm5pKwlVYpqOypFkBwY/7
+         7BA8APOrX363ihe3r5k36yJNCqgMvk7Pz9DX9qLiUm6WcRZuEJLypvMw5O7/yahwizT5
+         PYtERWLZ9gP4YIGNEfhUUzO1+nFl1W9JdIQ3zyPanb3s2XT/tcDWF2GG4ca8tKMUjdxS
+         5unRt1MjRCq3E+/XIC3x9hr/kA8s/AK0zTRtosd5Dt9lvmSSD6Knn+pBnzLX7e3W4rfL
+         TmvA==
+X-Forwarded-Encrypted: i=1; AJvYcCXYuZTaFn53xJjzdnej9gIjUmCv62Uz6lR8JvcEeyW+ZQS54i2Z20Z8CU0x1VrLP+FStS85G+k=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyqfHnQ+GQqW4G7gG0hLKh8HAM4lI6v8w9XUsWi0s/LkUHabUk8
+	zS+OYUUN+B++D1/BeVJOtiA55iDzw5OiMOTsCYSZJnLqNlbrX2Z5T1Efr6rI+uhE9xdObtBzMte
+	PDhZiHNBCBSjMG2OH85jO2tzgNnyLdRph1aVd/A==
+X-Gm-Gg: ASbGnculRpxoNncDQmdsKZdN4J3cFwWtuYRC7+cuxkUpkUzDMQnHlKKJ4UdUGfNAloi
+	VJtWp3yb9VBCpuISTHdxGF99tdQSbXw1rC+bo
+X-Google-Smtp-Source: AGHT+IEmD70M4UnRSIfsVFDJz0yx7Fsx8vxCsqnqPHiGw7baPCyGLZoQldsbVIvm7yG0Cho03+v1B2rrjdmnO9FPgbw=
+X-Received: by 2002:a05:651c:1415:b0:304:9de0:7d9 with SMTP id
+ 38308e7fff4ca-305f45a0f1fmr51506441fa.21.1736780375061; Mon, 13 Jan 2025
+ 06:59:35 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20241220-net-mac-nvmem-offset-v1-0-e9d1da2c1681@linaro.org>
+ <20241220-net-mac-nvmem-offset-v1-1-e9d1da2c1681@linaro.org> <20241231133533.GA50130-robh@kernel.org>
+In-Reply-To: <20241231133533.GA50130-robh@kernel.org>
+From: Linus Walleij <linus.walleij@linaro.org>
+Date: Mon, 13 Jan 2025 15:59:24 +0100
+X-Gm-Features: AbW1kvb39DjeK5SqO311_iFkJDqeTCRJdc67NxpNkW0HceKwPqSdOxvFj8fL5HY
+Message-ID: <CACRpkdbF9ezSg0qR=RwFpHJNf5P7i4cS+CmRkReNScKk5mxB0g@mail.gmail.com>
+Subject: Re: [PATCH 1/2] dt-bindings: net: ethernet-controller: Add mac offset option
+To: Rob Herring <robh@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>, 
+	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
+	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi!
+On Tue, Dec 31, 2024 at 2:35=E2=80=AFPM Rob Herring <robh@kernel.org> wrote=
+:
+> On Fri, Dec 20, 2024 at 08:17:06PM +0100, Linus Walleij wrote:
 
-The bi-weekly call is scheduled for tomorrow at 8:30 am (PT) / 
-5:30 pm (~EU), at https://bbb.lwn.net/rooms/ldm-chf-zxx-we7/join
+> > In practice (as found in the OpenWrt project) many devices
+> > with multiple ethernet interfaces just store a base MAC
+> > address in NVMEM and increase the lowermost byte with one for
+> > each interface, so as to occupy less NVMEM.
+> >
+> > Support this with a per-interface offset so we can encode
+> > this in a predictable way for each interface sharing the
+> > same NVMEM cell.
+>
+> This has come up several times before[1][2][3]. Based on those I know
+> this is not sufficient with the different variations of how MAC
+> addresses are shared. OTOH, I don't think a bunch of properties to deal
+> with all the possible transforms works either. It will be one of those
+> cases of properties added one-by-one where we end up with something
+> poorly designed. I think probably we want to just enumerate different
+> schemes and leave it to code to deal with each scheme.
 
-There's been some progress with Linux Foundation, and I posted
-the CI requirement officially downgrading drivers:
-https://lore.kernel.org/all/20250111024359.3678956-1-kuba@kernel.org/
-So there's a bit of an agenda but please suggest / come with other
-topics.
+The problem here is that the code needs some handle on which
+ethernet instance we are dealing with so the bindings need some
+way to pass that along from the consumer.
+
+What about a third, implementation-defined nvmem cell?
+#mac-index-cells =3D <1>; or however we best deal with
+this.
+
+If it really is per-machine then maybe this is simply one of those
+cases where the kernel should:
+
+if (IS_ENABLED(CONFIG_ARCH_FOO) &&
+   of_machine_is_compatible("foo,bar-machine)) {
+    // Read third cell if present
+    // Add to minor mac address
+}
+
+> Or we could just say it is the bootloader's problem to figure this out
+> and populate the DT using the existing properties for MAC addresses.
+> Though bootloaders want to use DT too...
+
+In my current case it's so fantastically organized that if the bootloader
+goes into TFTP boot it will use *another* unique MAC address.
+(Yes, it's fantastic.)
+
+Yours,
+Linus Walleij
 
