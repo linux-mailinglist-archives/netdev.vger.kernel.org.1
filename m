@@ -1,109 +1,123 @@
-Return-Path: <netdev+bounces-157565-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157566-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0CC44A0AD18
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 02:06:26 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8FA7A0AD32
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 02:49:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2245B165C0D
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 01:06:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7CC003A6115
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 01:49:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6F821A29A;
-	Mon, 13 Jan 2025 01:06:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0C9F1E4AE;
+	Mon, 13 Jan 2025 01:49:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h3A4bnum"
+	dkim=pass (2048-bit key) header.d=pen.gy header.i=@pen.gy header.b="FnCk3Ei4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f174.google.com (mail-il1-f174.google.com [209.85.166.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from ci74p00im-qukt09090102.me.com (ci74p00im-qukt09090102.me.com [17.57.156.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FA88125D5
-	for <netdev@vger.kernel.org>; Mon, 13 Jan 2025 01:06:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3FB23EA98
+	for <netdev@vger.kernel.org>; Mon, 13 Jan 2025 01:49:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=17.57.156.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736730382; cv=none; b=Ni0Sl+1bomF2msZaxvayIT5sNmI9xEFrmeuiKMz8aKEaQ6vdXcuXELWws/kgwSi8QXEc+PcyxAcroTtIWQPYVYnK9OjtEuUfEwxcnZH3AT1VgNVi5/P6goJNDVteMpZ6PzZUS0AYUrf3t5c1L9uOXJbOb5KEuzG4mN8v/qmqYf0=
+	t=1736732946; cv=none; b=gEW2QQfnebo8Ga8os5PLPTzBj6BVN6lW+sgbZet7V0rutHUpoy2xYAv4+MKGecjwJLCrMNWCw8hqfk39op4HDl0X5C21pdm9JfcqH70juM6SX9cRktXLaNqWTqBS7x6eKWFsHXTdEC3Acu4MY3Q8erUJq3iMl9fy7DqZEjMuZfI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736730382; c=relaxed/simple;
-	bh=BpGq9jeasvfbEQ4rSYiSaC53HE8oynJpeDP9Jk48dFY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=IRB9/Gd/nLCzipCgrT0t71AK4OzbzesQtlbEt4rZqOf1auP0IQ487KPXgF8D9p/9WTnvxryrfWG4OFMhDD6IPrr52hw2MR5YrynIMXDhtTJjkTCUMscnl15DbAfcZy0X/thKh4d77uMMhVWtYEJPQQ4NHTXYPa3CHW9HgYXeU1E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=h3A4bnum; arc=none smtp.client-ip=209.85.166.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f174.google.com with SMTP id e9e14a558f8ab-3ce301bc718so29037725ab.0
-        for <netdev@vger.kernel.org>; Sun, 12 Jan 2025 17:06:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736730380; x=1737335180; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=BpGq9jeasvfbEQ4rSYiSaC53HE8oynJpeDP9Jk48dFY=;
-        b=h3A4bnumgNxxE+HFY866WALKP3OZfHbZkscneAn/PnPeZh/3QbVsRboAgKDel9Iq3v
-         85vniGE4nfqwgd43jXiXNVGUmYo7eXw+O0IRvpwSjCGww7qOKxEu8u7VjOMaz6COAIEF
-         y5+uVZ27O1BBd9Nj0tfJZ+Hm7UURqadWpwSQCUeOrPmiayskYisDM12TXoF9RFaY6tdm
-         2XLATKm2xL/HmmzkWyLlPdAg8M09bV/fhzSgtCXA0/1/Bx5jQP0wK3SrHhYgiZQW+E6W
-         GqgzUiL5QKsw4ktHY8ag2v8KXbKaqXfnAobEivmqqQw3p9WgV97O6NKri85q2UxbcHm5
-         uLCA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736730380; x=1737335180;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=BpGq9jeasvfbEQ4rSYiSaC53HE8oynJpeDP9Jk48dFY=;
-        b=EAy+dTnn+JQI4IUTP0nxy3GLn8W4I3Ltf1jJfxo09iQ/QJOHQriu2wOCFD4OZk5Yrz
-         yTJe9mJ1HreqczEaETvSUR/pVfkCuXo2wMFtcp5+rlOygLThCDiwN49X810/7HwAWmsO
-         B/EA6gh5So+sNhcuMdPRArkKf0vbjuvGsl5cfPU0gVC1zjSJg/H6at401UeY1t3zEQvc
-         0XvdZwd4C9Av5xR42tX2xpFv3wDVbuYMerqA0I98AvYmVVSt7bZppRk9jUI9G/XFrYRq
-         BSiyCQm+Y/98f+jo3o0nPjybAV7nuPl6jfYcUrslIx6HM0eN0b5PRIKr6kSHpQwlZnKh
-         s6OQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVlveO17qbMtweOAb3K4TsHlEONqpFqODrEGW5PEQjmCgFx/xSMNi54Eyi1IPLpDRCOscDN+LA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzLltNStlZIIpto1KczWV1Xw/myNY8ym8PI2DYvXI3ycCYgdvy4
-	+4ZGJF8v046IVld4nmZplQtusR1VFRmW5ucn1XK7ziGwflAt3TjVdaOu2kqIbbmaqAV1ILHj9zx
-	G45YE4KOOYGYjydJ82eLA0Fha9Ng=
-X-Gm-Gg: ASbGncsA27lIheKF/rB/VTjeMDavwMGC7SSG752WwL9BtzmjnO6elxCc0NPRca+2SUw
-	7jh/jVfZsxxDPANK8paKHzavgd2xrGyz4IZ3r
-X-Google-Smtp-Source: AGHT+IELSeEbc1aHaUsRB1E33Ba7GGu66fTyr2d2lSPPm2zHK7NxVDr7YiAmrv3NNZS4tuW8QfwWAhA9w+KX7ry5Nl4=
-X-Received: by 2002:a05:6e02:1d06:b0:3ce:647f:82c3 with SMTP id
- e9e14a558f8ab-3ce647f8730mr51150245ab.7.1736730380581; Sun, 12 Jan 2025
- 17:06:20 -0800 (PST)
+	s=arc-20240116; t=1736732946; c=relaxed/simple;
+	bh=DN4Eafqk1ZL9ZfUWt5fy7x6y7IgAdhcUAPuhV29g0Tw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Zrjwf8dkMJeOHErB7B3/TJk+uRSb8e+VhwL+DgDfd33KhwzX6CgpEaO/zFOTuShVf3+29B3UxGjZVN5C9GsmXA/WK+slp0n7b6jn9BxfS2JPQgYcIR964kl2Y8gtcgt8/frMExGsa8chGAS85BQ0bskn3Fl1ExEk/4syqTmTwfc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=pen.gy; spf=pass smtp.mailfrom=pen.gy; dkim=pass (2048-bit key) header.d=pen.gy header.i=@pen.gy header.b=FnCk3Ei4; arc=none smtp.client-ip=17.57.156.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=pen.gy
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pen.gy
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=pen.gy; s=sig1;
+	t=1736732943; bh=p2phnRoAUTIIMG7w40hYdxNRr8NZCByf9y79pH3BDgg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type:
+	 x-icloud-hme;
+	b=FnCk3Ei4dNrskglEPZ7fUpVycX28eK0m0AXYqPlgdxq3WcbA11/PQftEreMRhSoLC
+	 zV4mNdKIl74f3I9TZD0mK/0oPLuXRXYjr443RIKpLxgjjbMMNwWPJnz+gZEkA7qu2J
+	 53JR6Gf0+I7hsb/ZYbnbzCuuqkF1qj86PgJMPSsAUQHE2T+QQviqJO0nP9AL3Jb00e
+	 AehHHTKNxMXpf8q15EFWtXmTkfFADq5qGyPYt9o1/ZOK1MFCFrv97iMANkXqA8zoYK
+	 6DKAAKnUrvZkU1JNI8KGcWICUQ/CNqV9LWit58POKX0XOBzTPWJ1F2QFf/CW5qc8L8
+	 mHvWGjSDtvu2Q==
+Received: from [192.168.40.3] (ci77p00im-dlb-asmtp-mailmevip.me.com [17.57.156.26])
+	by ci74p00im-qukt09090102.me.com (Postfix) with ESMTPSA id 3A5C33C00341;
+	Mon, 13 Jan 2025 01:49:00 +0000 (UTC)
+Message-ID: <e587e1c7-a2ff-4e28-9e25-b57f68545134@pen.gy>
+Date: Mon, 13 Jan 2025 02:48:58 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250110143315.571872-1-edumazet@google.com> <20250110143315.571872-2-edumazet@google.com>
-In-Reply-To: <20250110143315.571872-2-edumazet@google.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Mon, 13 Jan 2025 09:05:44 +0800
-X-Gm-Features: AbW1kvYGvSbYUCs7Qr2Cawzgc--XcW6BjDesvJIDZSi1vF1UlomtsdlgUuvK-QQ
-Message-ID: <CAL+tcoCifAeP2Eodva8AqA==P3oGZj7ropCmQAOfM4Hc_v4JCQ@mail.gmail.com>
-Subject: Re: [PATCH net-next 1/2] tcp: add drop_reason support to tcp_disordered_ack()
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, Simon Horman <horms@kernel.org>, 
-	Neal Cardwell <ncardwell@google.com>, Kuniyuki Iwashima <kuniyu@amazon.com>, eric.dumazet@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird Beta
+Subject: Re: [PATCH net v4 0/7] usbnet: ipheth: prevent OoB reads of NDP16
+Content-Language: en-GB
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Georgi Valkov <gvalkov@gmail.com>, Simon Horman <horms@kernel.org>,
+ Oliver Neukum <oneukum@suse.com>, netdev@vger.kernel.org,
+ linux-usb@vger.kernel.org
+References: <20250105010121.12546-1-forst@pen.gy>
+ <dkrN8SbAXULmhNyPVFbHHs81wY3NqXPW7EVHB7o56ZQOvuzVkCH6ge0QWIGRDH5DvMOzaqFfljNXyqs1RPgHXg==@protonmail.internalid>
+ <20250107173117.66606e57@kernel.org>
+From: Foster Snowhill <forst@pen.gy>
+In-Reply-To: <20250107173117.66606e57@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-GUID: GJftM6FGuSlwVz5REm5-IuhjVVSuMbK3
+X-Proofpoint-ORIG-GUID: GJftM6FGuSlwVz5REm5-IuhjVVSuMbK3
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-01-12_12,2025-01-10_03,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=3 phishscore=0 malwarescore=0 mlxscore=3
+ spamscore=3 bulkscore=0 clxscore=1030 suspectscore=0 adultscore=0
+ mlxlogscore=150 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2308100000 definitions=main-2501130014
 
-On Fri, Jan 10, 2025 at 10:33=E2=80=AFPM Eric Dumazet <edumazet@google.com>=
- wrote:
->
-> Following patch is adding a new drop_reason to tcp_validate_incoming().
->
-> Change tcp_disordered_ack() to not return a boolean anymore,
-> but a drop reason.
->
-> Change its name to tcp_disordered_ack_check()
->
-> Refactor tcp_validate_incoming() to ease the code
-> review of the following patch, and reduce indentation
-> level.
->
-> This patch is a refactor, with no functional change.
->
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
+Hello Jakub,
 
-Reviewed-by: Jason Xing <kerneljasonxing@gmail.com>
+> Reviewed-by: Jakub Kicinski <kuba@kernel.org>
+> 
+> Please add that to each patch, address Greg's comment, and repost.
+
+Thank you very much for the review!
+
+I went through the series again, noticed a couple minor things I think
+I should fix:
+
+* Patch 1/7 ("usbnet: ipheth: break up NCM header size computation")
+  [p1] introduces two new preprocessor constants. Only one of them is
+  used (the other one is intermediate, for clarity), and the usage is
+  all the way in patch 6/7 ("usbnet: ipheth: fix DPE OoB read") [p6].
+  I'd like to move the constant introduction patch right before the
+  patch that uses one of them. There's no good reason they're spread
+  out like they are in v4.
+* Commit message in patch 5/7 ("usbnet: ipheth: refactor NCM datagram
+  loop") [p5] has a stray paragraph starting with "Fix an out-of-bounds
+  DPE read...". This needs to be removed.
+
+I'd like to get this right. I'll make the changes above, add Cc stable,
+re-test all patches in sequence, and submit v5 soon. As this will be
+a different revision, I figure I can't formally apply your "Reviewed-by"
+anymore, the series may need another look once I post v5.
+
+Also I have some doubts about patch 7/7 [p7] with regards to its
+applicability to backporting to older stable releases. This only adds a
+documentation comment, without fixing any particular issue. Doesn't
+sound like something that should go into stable. But maybe fine if it's
+part of a series? I can also add that text in a commit message rather
+than the source code of the driver itself, or even just keep it in the
+cover letter. Do you have any opinion on this?
+
+Thank you!
+
+
+[p1]: https://lore.kernel.org/netdev/20250105010121.12546-2-forst@pen.gy/
+[p5]: https://lore.kernel.org/netdev/20250105010121.12546-6-forst@pen.gy/
+[p6]: https://lore.kernel.org/netdev/20250105010121.12546-7-forst@pen.gy/
+[p7]: https://lore.kernel.org/netdev/20250105010121.12546-8-forst@pen.gy/
 
