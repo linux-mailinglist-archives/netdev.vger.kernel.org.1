@@ -1,121 +1,128 @@
-Return-Path: <netdev+bounces-157901-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157902-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A1CFA0C442
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 22:56:15 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BA07CA0C448
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 22:58:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 34FE33A4AEC
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 21:56:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C0C72166FE5
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 21:58:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A02AC1CDFCE;
-	Mon, 13 Jan 2025 21:56:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 882731EE021;
+	Mon, 13 Jan 2025 21:58:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n8TBvCBL"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="XUpoBOLA"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B79B17CA12
-	for <netdev@vger.kernel.org>; Mon, 13 Jan 2025 21:56:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07A523232
+	for <netdev@vger.kernel.org>; Mon, 13 Jan 2025 21:58:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736805371; cv=none; b=gCLNwyvLz5ZVH0Z9S1hyfZB0ysBpvpWyPTZvuG1rXfpxNKKObWuoxZ/Ck9sCZIeb2fnuUL99iKJrNkYcTyHrCtf1zU1x80RNDM/4Dq+n3/+llH+uVDhJ8jmQ/tAM6b1cP2Yi9lYb3Gxk2R8WNfTJVX9jdP4D+Lip1mc0DGsNkPY=
+	t=1736805532; cv=none; b=ujNoV51QHlopvKR+dsfhI9B2L9E/6tW6gh46eGk1RLVI8MRWP8r9s9EfxsUzRyQHKgmhKjF4N7jTopJegYPSlMyLEJnl+VXZvs/C3/yfC4v5bo3nbW6ywqiNAFoj3P8P3kvRYixtf+cwrEQMnfbAr/fwUW88GXrKyZOEZPJMPmU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736805371; c=relaxed/simple;
-	bh=LlFdz3sSHr8Mig3a5a+nDARMgJIO2APz9lV+DFGzGMI=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bFW/UOAQ8GwBYJhjQ1LvAf56xu62PY+FgYmFNDR578iuq+J2MOMRpnjq5tjShlSrmSnIWn+CLUELj/msIjd/uNDWlrj6HgEK5Ykay/ovn1tBUBVU9TaeiTx4L2YWeBFesnQ5LDwrovTLU7Rea0J+sMVEgcTW8elCmZp6f7Fwq9U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n8TBvCBL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A5A7EC4CED6;
-	Mon, 13 Jan 2025 21:56:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736805371;
-	bh=LlFdz3sSHr8Mig3a5a+nDARMgJIO2APz9lV+DFGzGMI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=n8TBvCBLuTAxjrYFxq7G6CmqTHJJXntoNQ1oPwIgZsaunpqa5sRcObaXgsqvvsB3M
-	 fxOvQSBN7nw+NUE+luaI8AtiXaUKLUcGUuoJnwquVALm+vh2eZPNSdJRAIQvnBYuRA
-	 aSSR0H+BLHek1LQOfy+PGfoLUXQxpmV2YR1XMlPYAyU8mMfB1nQ3e7iLrab7nyPnX0
-	 Zq1NLlgibUZmBj4pfzhtJre4E8v0AqGsKCxwonUHRBfx8EvmZqPwXcs1eWh13gEvDT
-	 4PGAh9w9vu4axFN+sNfKncBjk/mOIYkCQVHp1rYwhJj0/A4qdZRg6TMQbuycIyzdG3
-	 w3cZMP/C7Pn3A==
-Date: Mon, 13 Jan 2025 13:56:09 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Joe Damato <jdamato@fastly.com>
-Cc: Gerhard Engleder <gerhard@engleder-embedded.com>,
- magnus.karlsson@intel.com, andrew@lunn.ch, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next] tsnep: Link queues to NAPIs
-Message-ID: <20250113135609.13883897@kernel.org>
-In-Reply-To: <Z4WKHnDG9VSMe5OD@LQ3V64L9R2>
-References: <20250110223939.37490-1-gerhard@engleder-embedded.com>
-	<Z4VwrhhXU4uKqYGR@LQ3V64L9R2>
-	<91fc249e-c11a-47a1-aafe-fef833c3bafa@engleder-embedded.com>
-	<Z4WKHnDG9VSMe5OD@LQ3V64L9R2>
+	s=arc-20240116; t=1736805532; c=relaxed/simple;
+	bh=YT7tw+yLpBD8mm51eiJecrgQMxOp6GEumiwHGuJ2WQE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=crS8Rwc1bYAp23G9SocO22wL3YrVa0Q6C30THR2kaHDxuit2KoHQbtzWkyB/C6UhE6UTXp/a8hizmuqwYwCaLOvgIa+xLJny6uLma7eSv9z3NxZxX50JhnGJ8ts3Vs6jM/WYP7nxtCMHBvBcSeakhv593OUGwMxDJZCyxlTkTnE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=XUpoBOLA; arc=none smtp.client-ip=209.85.214.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-2166360285dso83870835ad.1
+        for <netdev@vger.kernel.org>; Mon, 13 Jan 2025 13:58:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fastly.com; s=google; t=1736805530; x=1737410330; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=1twCwD/6lZcYLaRpkR8mPmSDuI0NT9StKcevPHbSPFc=;
+        b=XUpoBOLA6q3sVNocyS1ezcEP4+cYOSFFHLw9oKdPVyWy1/HctPThMR/j7OFVBrWNHR
+         ZSFrix29dXq5QpxsYClaGk6ZUdfGrq716hNHXeFay+CSUPFUHgw+vJdg0x4xcifiCgFv
+         zKDVZRs8y0YmVo2z+4Q6sT1Dgz/KagOo5qeAg=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736805530; x=1737410330;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=1twCwD/6lZcYLaRpkR8mPmSDuI0NT9StKcevPHbSPFc=;
+        b=Qowwj/D96w6eaVo7+Ahjko85cuHCSWUzWZGZnRdzy14jqYHw2GzF7/+TjD+3zRN0YE
+         Yf9yyX2fn1J6EIj1/8ovnUelP2ZfkpkkufODEqvDmBt4WsJzGrP5BUfr+15mjcllpxY5
+         WCDSaVFPweOCt5+MP5tEOCnSmZski6MJDraqnICKNTgB0KQ4Bpu3tHRjSg6wOHUckqkM
+         hyxKPBGNCd/11WvzlUq7X2BuYdWJama36LegzIninyWUMy0spSMOxKyTUfIUGH9laD1C
+         +QQ6ITFi1c546zEtPlnWFxn6oYa1R4idAjjcyBCIgZ0cgiaZU4JQ5caamd2h8eRPUu6U
+         ra1Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVZVL/6yVGGScDiokxpLRURL9Kn/MnG2rw0DhyXf0d8GCY/4f4fnmJhWmjcMnPtayX17qepH4U=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxqgAnTSXRsI/rvQ/z7eacJ7lFpoE6274n3byIHK0px+tdsWgt1
+	2bwJ3zT5OQKVQtqzlWWi24O+6qD4yaqX5NBjxlJ0rqJJPrd7WyOk+2GEDcqCam8=
+X-Gm-Gg: ASbGncuFIGvGo6lwygI7Gg8oNynJY1JtrRVoQVaSLCug/nyrq5PSa9xhpHS1/yhw7+v
+	lJ9f94Fsbo2+Qsq2FaTcyMyCsan0WEq1kfnSXs5ozF9qOHyuNv18Evj+b1i3NtAKGXUqdbVAdNv
+	930HldeCl5qf9pOYLT/r1qgl9pU2RCIcwPkLrltpjk4WgjXNLo5MIr+Se/WGNvdoPPdhwMYfoJC
+	u6u5/llzf6jolFY8cvUNtmunSsW4xksG4LSlhsstYgWE11DwEe5qZuDwI2JDd183Zw7bx/lD2FN
+	srh9xOjCC/4eJjg9POQqQKU=
+X-Google-Smtp-Source: AGHT+IEy4a+fqtFSueZzVtc2SRzJuoPJNIUP7MY1bj0DO6uOAeEg/SwVA9O4cbddmsDMAe+fWeCj2g==
+X-Received: by 2002:a17:903:244a:b0:211:fcad:d6ea with SMTP id d9443c01a7336-21a83fcf7a9mr342201385ad.45.1736805530337;
+        Mon, 13 Jan 2025 13:58:50 -0800 (PST)
+Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21a9f22ecf2sm58329325ad.192.2025.01.13.13.58.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 13 Jan 2025 13:58:49 -0800 (PST)
+Date: Mon, 13 Jan 2025 13:58:47 -0800
+From: Joe Damato <jdamato@fastly.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+	matttbe@kernel.org, martineau@kernel.org, geliang@kernel.org,
+	steffen.klassert@secunet.com, herbert@gondor.apana.org.au,
+	mptcp@lists.linux.dev
+Subject: Re: [PATCH net-next v2 1/2] net: remove init_dummy_netdev()
+Message-ID: <Z4WMl6PvgRFRQEMm@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
+	netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
+	andrew+netdev@lunn.ch, horms@kernel.org, matttbe@kernel.org,
+	martineau@kernel.org, geliang@kernel.org,
+	steffen.klassert@secunet.com, herbert@gondor.apana.org.au,
+	mptcp@lists.linux.dev
+References: <20250113003456.3904110-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250113003456.3904110-1-kuba@kernel.org>
 
-On Mon, 13 Jan 2025 13:48:14 -0800 Joe Damato wrote:
-> > > The changes generally look OK to me (it seems RTNL is held on all
-> > > paths where this code can be called from as far as I can tell), but
-> > > there was one thing that stood out to me.
-> > > 
-> > > AFAIU, drivers avoid marking XDP queues as NETDEV_QUEUE_TYPE_RX
-> > > or NETDEV_QUEUE_TYPE_TX. I could be wrong, but that was my
-> > > understanding and I submit patches to several drivers with this
-> > > assumption.
-> > > 
-> > > For example, in commit b65969856d4f ("igc: Link queues to NAPI
-> > > instances"), I unlinked/linked the NAPIs and queue IDs when XDP was
-> > > enabled/disabled. Likewise, in commit 64b62146ba9e ("net/mlx4: link
-> > > NAPI instances to queues and IRQs"), I avoided the XDP queues.
-> > > 
-> > > If drivers are to avoid marking XDP queues as NETDEV_QUEUE_TYPE_RX
-> > > or NETDEV_QUEUE_TYPE_TX, perhaps tsnep needs to be modified
-> > > similarly?  
-> > 
-> > With 5ef44b3cb4 ("xsk: Bring back busy polling support") the linking of
-> > the NAPIs is required for XDP/XSK. So it is strange to me if for XDP/XSK
-> > the NAPIs should be unlinked. But I'm not an expert, so maybe there is
-> > a reason why.
-> > 
-> > I added Magnus, maybe he knows if XSK queues shall still be linked to
-> > NAPIs.  
+On Sun, Jan 12, 2025 at 04:34:55PM -0800, Jakub Kicinski wrote:
+> init_dummy_netdev() can initialize statically declared or embedded
+> net_devices. Such netdevs did not come from alloc_netdev_mqs().
+> After recent work by Breno, there are the only two cases where
+> we have do that.
 > 
-> OK, so I think I was probably just wrong?
+> Switch those cases to alloc_netdev_mqs() and delete init_dummy_netdev().
+> Dealing with static netdevs is not worth the maintenance burden.
 > 
-> I looked at bnxt and it seems to mark XDP queues, which means
-> probably my patches for igc, ena, and mlx4 need to be fixed and the
-> proposed patch I have for virtio_net needs to be adjusted.
-> 
-> I can't remember now why I thought XDP queues should be avoided. I
-> feel like I read that or got that as feedback at some point, but I
-> can't remember now. Maybe it was just one driver or something I was
-> working on and I accidentally thought it should be avoided
-> everywhere? Not sure.
-> 
-> Hopefully some one can give a definitive answer on this one before I
-> go through and try to fix all the drivers I modified :|
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+> v2: change of plan, delete init_dummy_netdev() completely
+> v1: https://lore.kernel.org/20250111065955.3698801-1-kuba@kernel.org
+> ---
+> CC: matttbe@kernel.org
+> CC: martineau@kernel.org
+> CC: geliang@kernel.org
+> CC: steffen.klassert@secunet.com
+> CC: herbert@gondor.apana.org.au
+> CC: mptcp@lists.linux.dev
+> ---
+>  include/linux/netdevice.h |  1 -
+>  net/core/dev.c            | 22 ----------------------
+>  net/mptcp/protocol.c      |  8 +++++---
+>  net/xfrm/xfrm_input.c     |  9 ++++++---
+>  4 files changed, 11 insertions(+), 29 deletions(-)
 
-XDP and AF_XDP are different things. The XDP part of AF_XDP is to some
-extent for advertising purposes :) If memory serves me well:
-
-XDP Tx -> these are additional queues automatically allocated for
-          in-kernel XDP, allocated when XDP is attached on Rx.
-          These should _not_ be listed in netlink queue, or NAPI;
-          IOW should not be linked to NAPI instances.
-XDP Rx -> is not a thing, XDP attaches to stack queues, there are no
-          dedicated XDP Rx queues
-AF_XDP -> AF_XDP "takes over" stack queues. It's a bit of a gray area.
-          I don't recall if we made a call on these being linked, but
-          they could probably be listed like devmem as a queue with
-          an extra attribute, not a completely separate queue type.
+Reviewed-by: Joe Damato <jdamato@fastly.com>
 
