@@ -1,265 +1,197 @@
-Return-Path: <netdev+bounces-157648-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157649-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15237A0B17C
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 09:44:09 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id EBE72A0B1A2
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 09:49:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 463E8188344C
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 08:44:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D3AC618863BF
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 08:49:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 867DF23315B;
-	Mon, 13 Jan 2025 08:43:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 696582343AE;
+	Mon, 13 Jan 2025 08:49:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="RQHtEaWL"
+	dkim=pass (2048-bit key) header.d=sigma-star.at header.i=@sigma-star.at header.b="LBs4KqeJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE4FF233D85
-	for <netdev@vger.kernel.org>; Mon, 13 Jan 2025 08:43:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BCB3233153
+	for <netdev@vger.kernel.org>; Mon, 13 Jan 2025 08:49:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736757805; cv=none; b=bzIUvOjuJwDP5QahXzdBfNEpyFbVoR/cOXOnc1se+mXiIIbC1WzvGd1dG9CEq13iLXXV2PhhPQ9jtDHjR5I9O7kogT4YYm9XfRs1NJHwSeCXKwtA87zwrVQqfsdPoW0wHLma5SNtq/Y+N1EJAAsFrOmRT+x6jJ1ogMR4KolrB7o=
+	t=1736758167; cv=none; b=rUCV4dPLtmSVsOVzaP0TE7XKJl8OIJagVD0vAtEbKcGVkmOfADs0+Yafm/FdXIjfEj6Q+WAH/7UW/JT8UDrxyjOf0ljKBLrkkq+3lQdBAvH3OeFvthZYxCpkQHbETyYfNPjORYHSd7LEn1AbDOvFT0zZySjdFhNItNsXuPDrO+g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736757805; c=relaxed/simple;
-	bh=qK1Vk6wvBPeEhxJyHy70I+pDdjWlzvYHobBu3c9nWZw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=apel9GHvowwhHNIY3+9KtyNBp+T07CN/Yj6NIE8O645nlj4O4rCrycTe+QPV24tFTdd63SHjGEbOvwtRFkx+tn/rSPHIZyRLaWUW2gdwP583EeFOCEMwtQaUV0jvYto3WqCnY+9WpreTEJtdzn68XCAVgmA9/PelbXLIBLFlWzo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=RQHtEaWL; arc=none smtp.client-ip=192.198.163.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1736757804; x=1768293804;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=qK1Vk6wvBPeEhxJyHy70I+pDdjWlzvYHobBu3c9nWZw=;
-  b=RQHtEaWLmDOKDUe10ciRGPVwTt3kqvXIXB29jaftLNuYs2MjW0kUv8xx
-   IRpIEh0WeXiD0TLXXrIecjMrb4qLuJ02lbcqrOmE04gbAMSM98rbB5mgE
-   MuoN5jlx6em/B/6KIw1Q5jEt7EIyIBTHpslcgt6bh4+zhu9JttHCsawCf
-   MPkTEUi1P1LdC/k/QipoZJd20Uv6mkDcP+XNxIJS8WH5s97K4fj9svpLg
-   I57o2cWfbbrpAX2KCix1M3QVAIHJgmyuPFWEe9pBa7DFF7oWlMuu9UKG9
-   +VBVtchR/d0vy2naI8oDZ7iXmFp1pu2cI/LmifnP9vMN5aQBdI0N5aPPF
-   A==;
-X-CSE-ConnectionGUID: HZuN6gbAQ8OLLYQKCgEnyA==
-X-CSE-MsgGUID: tG/VMtZkQyyIiSM8ZHLHhw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11313"; a="54549594"
-X-IronPort-AV: E=Sophos;i="6.12,310,1728975600"; 
-   d="scan'208";a="54549594"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jan 2025 00:43:23 -0800
-X-CSE-ConnectionGUID: oXUpXpB+S++XwSl/euicAw==
-X-CSE-MsgGUID: wmvcn1BiQMWtiNOdUmSCqQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="108468333"
-Received: from mev-dev.igk.intel.com ([10.237.112.144])
-  by fmviesa003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jan 2025 00:43:20 -0800
-Date: Mon, 13 Jan 2025 09:40:01 +0100
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: Michael Chan <michael.chan@broadcom.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, andrew+netdev@lunn.ch,
-	pavan.chebbi@broadcom.com, andrew.gospodarek@broadcom.com,
-	somnath.kotur@broadcom.com,
-	Ajit Khaparde <ajit.khaparde@broadcom.com>,
-	David Wei <dw@davidwei.uk>
-Subject: Re: [PATCH net-next 09/10] bnxt_en: Extend queue stop/start for Tx
- rings
-Message-ID: <Z4TRYfno5jCz84KD@mev-dev.igk.intel.com>
-References: <20250113063927.4017173-1-michael.chan@broadcom.com>
- <20250113063927.4017173-10-michael.chan@broadcom.com>
+	s=arc-20240116; t=1736758167; c=relaxed/simple;
+	bh=vCkDacTWZvcuafWH2kjulsf3aX2Vk3dmsFF092eXKBQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=iXBI3X9ZGnFNmP+lucqoZD4qMaPFTSbzZlnPzFVedcVWrWs5w4mUoMxY8m79cj146j9nsmogDmJYa7hJ+gZwzDp//vT84/3cIUBMWYpMeXKw+wWtqGMbGozcdis4dZS+C+bdmDnVVBdAsqgHIKw4tnUsoITTHRIIfgN4rglkpb0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sigma-star.at; spf=pass smtp.mailfrom=sigma-star.at; dkim=pass (2048-bit key) header.d=sigma-star.at header.i=@sigma-star.at header.b=LBs4KqeJ; arc=none smtp.client-ip=209.85.128.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sigma-star.at
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sigma-star.at
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-43618283dedso38394005e9.3
+        for <netdev@vger.kernel.org>; Mon, 13 Jan 2025 00:49:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=sigma-star.at; s=google; t=1736758162; x=1737362962; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Gnnl0VwLJeV2gkqDwbC1b2CdoHjgb3H7tibMthkFU6U=;
+        b=LBs4KqeJ9tbqT2QtgZWhL6WKL0qB0FRtypV1xtIWqkKypw4ZVN1fPR6UiUnC7UJasQ
+         TQE9m32Wa+mW1OaO5dq4LmpcTHDm4B88vV74+Nw5vP6dGNFhfteKBXjXlYwsS88ILLTr
+         qGxXGoYAcnbYWWpzTqwHIUqypQkz6lB9s5NVGKcCWHvQ0Df60+NKYhkFlwVauo1xo+HY
+         IfFYEojY8qk7baKCbUlOb3N2N2xaE9T2TTnpr2mbI4wr3arO3s+c1EPfmHybferDw8E4
+         U/MY9z9qpQOZJ9NPgdVYe6hjOh2IJNe20v+AlNTjg6Q7nMp2Yigg/RgH4W6biV1kszbN
+         OD8w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736758162; x=1737362962;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Gnnl0VwLJeV2gkqDwbC1b2CdoHjgb3H7tibMthkFU6U=;
+        b=i+u4D9uqmhfjoJSy3hwC4z4BMDM0W9sr+6+DbKh4tic/I8B0iOETIexQpSMNvGGKGU
+         lmocbcsdDHKSDf6+ceCeJtVfVr3fr/ULogtb170MNkCeJswq9Q7SV24gpG1bumajmSBN
+         IR+aae+xauSuoIPjW9SCGtvyfMrov1u2dDM05GPihwQLj/YE9PddCSaO5R+PEMKOMxUW
+         23cHmqZx0HGWS1h2WHa7I8RBTvswcRS3//i4FqC4pmakGXiw6sqEx/TTBJAPt7cJtb+f
+         +c+yQXdIb/L46NQud2FgBXkSlaSia/bEWXMg3XYEyTM3qzOjYE/e89eNBUEI+zD5tNR4
+         M3vQ==
+X-Gm-Message-State: AOJu0YxfycQJmHOzbCsjP6Q10pA+81w7UERmDgUUyNfrssgpFztRRRvr
+	whLtFtfA+W1bZYo6k2DzIAYkuUj26R8t5Zn0q/Hiy5D7kpZii3C7Qk8piObl5YgHcwBuiztTJs7
+	Z+PE=
+X-Gm-Gg: ASbGnctXeA2Hcrfg9w4YtgqtCAvbIfsTYDx5hxPu61IfXwuGwens9zOtHNJoehAfM0l
+	JUqTEtCjM7ldHT4ujXCqOnvMLfP3cZl9FaFPbYrOCGNcu1ghQatHOYYMBb74wyfAxHRLJ+k+75E
+	ua9IsCNeqzwN06Mr177VB2aXG7D5Oj1LWqTmbGksM7cEABTWheVZFw+F97XkMSWgm+W9x4p2RMU
+	ikyykrvphUCRxyu2O1epuaD63r/Z0yyB6Y5q/pmJy74rkU5Iy3ANEUaw6K721zk3kXoIhVENMSr
+	H4egmtIZDx6UF4GsVABs
+X-Google-Smtp-Source: AGHT+IFBijnZ0WjmXifiseTgCnAunx2NxiPja28AwiOTHT/QqLpzFwAOQAkeKW+0V1Wumd0RGJ6NuQ==
+X-Received: by 2002:a05:600c:b55:b0:435:1b:65ee with SMTP id 5b1f17b1804b1-436e2707f2cmr148478835e9.24.1736758161975;
+        Mon, 13 Jan 2025 00:49:21 -0800 (PST)
+Received: from localtoast.corp.sigma-star.at ([82.150.214.1])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-436e2df2faesm171830825e9.26.2025.01.13.00.49.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 13 Jan 2025 00:49:21 -0800 (PST)
+From: David Oberhollenzer <david.oberhollenzer@sigma-star.at>
+To: netdev@vger.kernel.org,
+	andrew@lunn.ch
+Cc: Julian.FRIEDRICH@frequentis.com,
+	f.fainelli@gmail.com,
+	olteanv@gmail.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux-kernel@vger.kernel.org,
+	upstream+netdev@sigma-star.at,
+	David Oberhollenzer <david.oberhollenzer@sigma-star.at>
+Subject: [PATCH v3] net: dsa: mv88e6xxx: propperly shutdown PPU re-enable timer on destroy
+Date: Mon, 13 Jan 2025 09:49:12 +0100
+Message-ID: <20250113084912.16245-1-david.oberhollenzer@sigma-star.at>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250113063927.4017173-10-michael.chan@broadcom.com>
+Content-Transfer-Encoding: 8bit
 
-On Sun, Jan 12, 2025 at 10:39:26PM -0800, Michael Chan wrote:
-> From: Somnath Kotur <somnath.kotur@broadcom.com>
-> 
-> In order to use queue_stop/queue_start to support the new Steering
-> Tags, we need to free the TX ring and TX completion ring if it is a
-> combined channel with TX/RX sharing the same NAPI.  Otherwise
-> TX completions will not have the updated Steering Tag.  With that
-> we can now add napi_disable() and napi_enable() during queue_stop()/
-> queue_start().  This will guarantee that NAPI will stop processing
-> the completion entries in case there are additional pending entries
-> in the completion rings after queue_stop().
-> 
-> There could be some NQEs sitting unprocessed while NAPI is disabled
-> thereby leaving the NQ unarmed.  Explictily Re-arm the NQ after
-> napi_enable() in queue start so that NAPI will resume properly.
-> 
-> Reviewed-by: Ajit Khaparde <ajit.khaparde@broadcom.com>
-> Signed-off-by: Somnath Kotur <somnath.kotur@broadcom.com>
-> Reviewed-by: Michael Chan <michael.chan@broadcom.com>
-> ---
-> Cc: David Wei <dw@davidwei.uk>
-> 
-> Discussion about adding napi_disable()/napi_enable():
-> 
-> https://lore.kernel.org/netdev/5336d624-8d8b-40a6-b732-b020e4a119a2@davidwei.uk/#t
-> ---
->  drivers/net/ethernet/broadcom/bnxt/bnxt.c | 99 ++++++++++++++++++++++-
->  1 file changed, 98 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-> index fe350d0ba99c..eddb4de959c6 100644
-> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-> @@ -7341,6 +7341,22 @@ static int hwrm_ring_free_send_msg(struct bnxt *bp,
->  	return 0;
->  }
->  
-> +static void bnxt_hwrm_tx_ring_free(struct bnxt *bp, struct bnxt_tx_ring_info *txr,
-> +				   bool close_path)
-> +{
-> +	struct bnxt_ring_struct *ring = &txr->tx_ring_struct;
-> +	u32 cmpl_ring_id;
-> +
-> +	if (ring->fw_ring_id == INVALID_HW_RING_ID)
-> +		return;
-> +
-> +	cmpl_ring_id = close_path ? bnxt_cp_ring_for_tx(bp, txr) :
-> +		       INVALID_HW_RING_ID;
-> +	hwrm_ring_free_send_msg(bp, ring, RING_FREE_REQ_RING_TYPE_TX,
-> +				cmpl_ring_id);
-> +	ring->fw_ring_id = INVALID_HW_RING_ID;
-> +}
-> +
->  static void bnxt_hwrm_rx_ring_free(struct bnxt *bp,
->  				   struct bnxt_rx_ring_info *rxr,
->  				   bool close_path)
-> @@ -11247,6 +11263,69 @@ int bnxt_reserve_rings(struct bnxt *bp, bool irq_re_init)
->  	return 0;
->  }
->  
-> +static void bnxt_tx_queue_stop(struct bnxt *bp, int idx)
-> +{
-> +	struct bnxt_tx_ring_info *txr;
-> +	struct netdev_queue *txq;
-> +	struct bnxt_napi *bnapi;
-> +	int i;
-> +
-> +	bnapi = bp->bnapi[idx];
-> +	bnxt_for_each_napi_tx(i, bnapi, txr) {
-> +		WRITE_ONCE(txr->dev_state, BNXT_DEV_STATE_CLOSING);
-> +		synchronize_net();
-> +
-> +		if (!(bnapi->flags & BNXT_NAPI_FLAG_XDP)) {
-> +			txq = netdev_get_tx_queue(bp->dev, txr->txq_index);
-> +			if (txq) {
-> +				__netif_tx_lock_bh(txq);
-> +				netif_tx_stop_queue(txq);
-> +				__netif_tx_unlock_bh(txq);
-> +			}
-> +		}
-> +		bnxt_hwrm_tx_ring_free(bp, txr, true);
-> +		bnxt_hwrm_cp_ring_free(bp, txr->tx_cpr);
-> +		bnxt_free_one_tx_ring_skbs(bp, txr, txr->txq_index);
-> +		bnxt_clear_one_cp_ring(bp, txr->tx_cpr);
-> +	}
-> +}
-> +
-> +static int bnxt_tx_queue_start(struct bnxt *bp, int idx)
-> +{
-> +	struct bnxt_tx_ring_info *txr;
-> +	struct netdev_queue *txq;
-> +	struct bnxt_napi *bnapi;
-> +	int rc, i;
-> +
-> +	bnapi = bp->bnapi[idx];
-> +	bnxt_for_each_napi_tx(i, bnapi, txr) {
-> +		rc = bnxt_hwrm_cp_ring_alloc_p5(bp, txr->tx_cpr);
-> +		if (rc)
-> +			return rc;
-> +
-> +		rc = bnxt_hwrm_tx_ring_alloc(bp, txr, false);
-> +		if (rc) {
-> +			bnxt_hwrm_cp_ring_free(bp, txr->tx_cpr);
-What about ring allocated in previous steps? Don't you need to free them
-too?
+The mv88e6xxx has an internal PPU that polls PHY state. If we want to
+access the internal PHYs, we need to disable it. Because enable/disable
+of the PPU is a slow operation, a 10ms timer is used to re-enable it,
+canceled with every access, so bulk operations effectively only disable
+it once and re-enable it some 10ms after the last access.
 
-> +			return rc;
-> +		}
-> +		txr->tx_prod = 0;
-> +		txr->tx_cons = 0;
-> +		txr->tx_hw_cons = 0;
-> +
-> +		WRITE_ONCE(txr->dev_state, 0);
-> +		synchronize_net();
-> +
-> +		if (bnapi->flags & BNXT_NAPI_FLAG_XDP)
-> +			continue;
-> +
-> +		txq = netdev_get_tx_queue(bp->dev, txr->txq_index);
-> +		if (txq)
-> +			netif_tx_start_queue(txq);
-> +	}
-> +
-> +	return 0;
-> +}
-> +
->  static void bnxt_free_irq(struct bnxt *bp)
->  {
->  	struct bnxt_irq *irq;
-> @@ -15647,6 +15726,16 @@ static int bnxt_queue_start(struct net_device *dev, void *qmem, int idx)
->  	cpr = &rxr->bnapi->cp_ring;
->  	cpr->sw_stats->rx.rx_resets++;
->  
-> +	if (bp->flags & BNXT_FLAG_SHARED_RINGS) {
-> +		rc = bnxt_tx_queue_start(bp, idx);
-> +		if (rc)
-> +			netdev_warn(bp->dev,
-> +				    "tx queue restart failed: rc=%d\n", rc);
-> +	}
-> +
-> +	napi_enable(&rxr->bnapi->napi);
-> +	bnxt_db_nq_arm(bp, &cpr->cp_db, cpr->cp_raw_cons);
-> +
->  	for (i = 0; i <= BNXT_VNIC_NTUPLE; i++) {
->  		vnic = &bp->vnic_info[i];
->  
-> @@ -15675,6 +15764,7 @@ static int bnxt_queue_stop(struct net_device *dev, void *qmem, int idx)
->  	struct bnxt *bp = netdev_priv(dev);
->  	struct bnxt_rx_ring_info *rxr;
->  	struct bnxt_vnic_info *vnic;
-> +	struct bnxt_napi *bnapi;
->  	int i;
->  
->  	for (i = 0; i <= BNXT_VNIC_NTUPLE; i++) {
-> @@ -15686,15 +15776,22 @@ static int bnxt_queue_stop(struct net_device *dev, void *qmem, int idx)
->  	/* Make sure NAPI sees that the VNIC is disabled */
->  	synchronize_net();
->  	rxr = &bp->rx_ring[idx];
-> -	cancel_work_sync(&rxr->bnapi->cp_ring.dim.work);
-> +	bnapi = rxr->bnapi;
-> +	cancel_work_sync(&bnapi->cp_ring.dim.work);
->  	bnxt_hwrm_rx_ring_free(bp, rxr, false);
->  	bnxt_hwrm_rx_agg_ring_free(bp, rxr, false);
->  	page_pool_disable_direct_recycling(rxr->page_pool);
->  	if (bnxt_separate_head_pool())
->  		page_pool_disable_direct_recycling(rxr->head_pool);
->  
-> +	if (bp->flags & BNXT_FLAG_SHARED_RINGS)
-> +		bnxt_tx_queue_stop(bp, idx);
-> +
-> +	napi_disable(&bnapi->napi);
-> +
->  	bnxt_hwrm_cp_ring_free(bp, rxr->rx_cpr);
->  	bnxt_clear_one_cp_ring(bp, rxr->rx_cpr);
-> +	bnxt_db_nq(bp, &cpr->cp_db, cpr->cp_raw_cons);
->  
->  	memcpy(qmem, rxr, sizeof(*rxr));
->  	bnxt_init_rx_ring_struct(bp, qmem);
-> -- 
-> 2.30.1
+If a PHY is accessed and then the mv88e6xxx module is removed before
+the 10ms are up, the PPU re-enable ends up accessing a dangling pointer.
+
+This especially affects probing during bootup. The MDIO bus and PHY
+registration may succeed, but registration with the DSA framework
+may fail later on (e.g. because the CPU port depends on another,
+very slow device that isn't done probing yet, returning -EPROBE_DEFER).
+In this case, probe() fails, but the MDIO subsystem may already have
+accessed the MIDO bus or PHYs, arming timer.
+
+This is fixed as follows:
+ - If probe fails after mv88e6xxx_phy_init(), make sure we also call
+   mv88e6xxx_phy_destroy() before returning
+ - In mv88e6xxx_phy_destroy(), grab the ppu_mutex to make sure the work
+   function either has already exited, or (should it run) cannot do
+   anything, mutex_trylock() in the worker function fails to grab the
+   mutex and returns.
+ - In addition to destroying the timer, also destroy the work item, in
+   case the timer has already fired.
+ - Do all of this synchronously, to make sure timer & work item are
+   destroyed and none of the callbacks are running.
+ - Because of the nesting of the timer & work item, cancel_work_sync()
+   alone is not sufficient and the order of the cancellation steps matters.
+
+Fixes: 2e5f032095ff ("dsa: add support for the Marvell 88E6131 switch chip")
+Signed-off-by: David Oberhollenzer <david.oberhollenzer@sigma-star.at>
+---
+FWIW, this is a forward port of a patch I'm using on v6.6.
+
+Thanks,
+
+David
+---
+ drivers/net/dsa/mv88e6xxx/chip.c | 8 +++++---
+ drivers/net/dsa/mv88e6xxx/phy.c  | 3 +++
+ 2 files changed, 8 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/net/dsa/mv88e6xxx/chip.c b/drivers/net/dsa/mv88e6xxx/chip.c
+index 284270a4ade1..c2af69bed660 100644
+--- a/drivers/net/dsa/mv88e6xxx/chip.c
++++ b/drivers/net/dsa/mv88e6xxx/chip.c
+@@ -7264,13 +7264,13 @@ static int mv88e6xxx_probe(struct mdio_device *mdiodev)
+ 	err = mv88e6xxx_switch_reset(chip);
+ 	mv88e6xxx_reg_unlock(chip);
+ 	if (err)
+-		goto out;
++		goto out_phy;
+ 
+ 	if (np) {
+ 		chip->irq = of_irq_get(np, 0);
+ 		if (chip->irq == -EPROBE_DEFER) {
+ 			err = chip->irq;
+-			goto out;
++			goto out_phy;
+ 		}
+ 	}
+ 
+@@ -7289,7 +7289,7 @@ static int mv88e6xxx_probe(struct mdio_device *mdiodev)
+ 	mv88e6xxx_reg_unlock(chip);
+ 
+ 	if (err)
+-		goto out;
++		goto out_phy;
+ 
+ 	if (chip->info->g2_irqs > 0) {
+ 		err = mv88e6xxx_g2_irq_setup(chip);
+@@ -7323,6 +7323,8 @@ static int mv88e6xxx_probe(struct mdio_device *mdiodev)
+ 		mv88e6xxx_g1_irq_free(chip);
+ 	else
+ 		mv88e6xxx_irq_poll_free(chip);
++out_phy:
++	mv88e6xxx_phy_destroy(chip);
+ out:
+ 	if (pdata)
+ 		dev_put(pdata->netdev);
+diff --git a/drivers/net/dsa/mv88e6xxx/phy.c b/drivers/net/dsa/mv88e6xxx/phy.c
+index 8bb88b3d900d..ee9e5d7e5277 100644
+--- a/drivers/net/dsa/mv88e6xxx/phy.c
++++ b/drivers/net/dsa/mv88e6xxx/phy.c
+@@ -229,7 +229,10 @@ static void mv88e6xxx_phy_ppu_state_init(struct mv88e6xxx_chip *chip)
+ 
+ static void mv88e6xxx_phy_ppu_state_destroy(struct mv88e6xxx_chip *chip)
+ {
++	mutex_lock(&chip->ppu_mutex);
+ 	del_timer_sync(&chip->ppu_timer);
++	cancel_work_sync(&chip->ppu_work);
++	mutex_unlock(&chip->ppu_mutex);
+ }
+ 
+ int mv88e6185_phy_ppu_read(struct mv88e6xxx_chip *chip, struct mii_bus *bus,
+-- 
+2.47.1
+
 
