@@ -1,87 +1,168 @@
-Return-Path: <netdev+bounces-157840-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157841-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A2971A0BFDA
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 19:33:25 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A434A0BFE4
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 19:34:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B9A2B1888C11
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 18:33:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0C7BC3A4CF7
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 18:34:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E80E1C54A7;
-	Mon, 13 Jan 2025 18:33:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 523761C3F30;
+	Mon, 13 Jan 2025 18:34:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i62wOox8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SkFBd4/V"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39D921C5496
-	for <netdev@vger.kernel.org>; Mon, 13 Jan 2025 18:33:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EF901C2457;
+	Mon, 13 Jan 2025 18:34:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736793188; cv=none; b=SnzCQPIeD7sNi8yxaH4B5xcf8DetAlrZIfjd5+P23ptqb11pMcZtaA7WFceF6NrwPpidM78JSBHsuZvTemBpZBm44owHMRz7pqkDOePHNG6yL15IWwFBhmrUqLARp5MRm1wHn1LoYMltE7IzHaS7s1YTvyhBvj3Oyft6qmORDos=
+	t=1736793272; cv=none; b=Ru+5f2hC7bERH4n5nTUW/R9cTZ/8TcQBzoiQUxLhbSKHw55+2iryM0vFAVwb/Ol5urTXmUvPGuSBCgzbARYAm/Dnk2ijpDE2AEkLop6F/HRCk8bd0/LMzoK7KyrEHmg2dnXb7GlB2jGceASOgADCFnbyiKDcIrN1nGjNzfwZ+uo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736793188; c=relaxed/simple;
-	bh=ftuGto6o0TyZO6bCqv7JLGst0izHcOC60PbCmGiNDYM=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=GaOq6sBM8kNllVFWPt8QrB89s+BSb8PWtHzFHezTBExFm3YEhPykgDEOsdSOb4p+X+YK08H3FtkVh0/NzulaEYrp/cGtaq6+JTglJIksjnR37AsscrpAj7RFoj5vKy6ycYYCjdVHGO5EY93rQ248q6wUIcFjmWHlkSpPlXX2pow=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i62wOox8; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 536F5C4CED6;
-	Mon, 13 Jan 2025 18:33:07 +0000 (UTC)
+	s=arc-20240116; t=1736793272; c=relaxed/simple;
+	bh=kQRZmjgXyx0pLE1ZhNfiAV93WPz/Kxd2lUA0pD7TF9k=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=i1sOqQXCrkiOWstSGdxWEzkOENJP6FA4AHxQudmaWUUFYxvGw1m5xkURXwrdqcLjePMBos6JNvHhPbI77RGeHhP8qdEtY3xm5pSBQAz1DVbbWoID7mXbVWbVozhargQnQvFJREIAjigd2UQuYj2uEtDWlz3ZbCC7IWCcJW95NLE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SkFBd4/V; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 24D66C4CED6;
+	Mon, 13 Jan 2025 18:34:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736793187;
-	bh=ftuGto6o0TyZO6bCqv7JLGst0izHcOC60PbCmGiNDYM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=i62wOox8MniqsjtQT9Hq6aGo5XuV8xP9s5ba2+LMgJHKnSvPA3hRONomqBADIKvIO
-	 ydYt8aMMyV9fIvD6W0lE53JFfltBL+RwyBfod5AKvWaWkjLJOJ40zyFuLLAh8eWanS
-	 31u2dQ/OfOP8t5Ywb3Lfor8ip2k2xGUo5EeQcdeKcIPpggCUqBrrdN3Xn0iGTQTnIo
-	 HsPaX1f4KPZ3ZnO3C6rw0ovlrKtrOwqHhkXYE9SH+aOGGNI16g2xeM1f9wgrBplFzH
-	 3Mzsahxc0NjTYpKsFk/ykn5JfwSYFwZPJsnqC1VBPk3bGS+bfXAs1y/dwYRFfp2zTq
-	 RoVV+qtMkmAMA==
-Date: Mon, 13 Jan 2025 10:33:06 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Jacob Keller <jacob.e.keller@intel.com>
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>, <davem@davemloft.net>,
- <pabeni@redhat.com>, <edumazet@google.com>, <andrew+netdev@lunn.ch>,
- <netdev@vger.kernel.org>, <anton.nadezhdin@intel.com>,
- <przemyslaw.kitszel@intel.com>, <milena.olech@intel.com>,
- <arkadiusz.kubalewski@intel.com>, <richardcochran@gmail.com>, "Karol
- Kolacinski" <karol.kolacinski@intel.com>, Rinitha S <sx.rinitha@intel.com>
-Subject: Re: [PATCH net-next 08/13] ice: use rd32_poll_timeout_atomic in
- ice_read_phy_tstamp_ll_e810
-Message-ID: <20250113103306.5b4f8f86@kernel.org>
-In-Reply-To: <a0b535bd-3569-4d36-9752-ec8dcdc23aaf@intel.com>
-References: <20250108221753.2055987-1-anthony.l.nguyen@intel.com>
-	<20250108221753.2055987-9-anthony.l.nguyen@intel.com>
-	<20250109182148.398f1cf1@kernel.org>
-	<55655440-71b4-49e0-9fc8-d8b1b4f77ab4@intel.com>
-	<20250110172536.7165c528@kernel.org>
-	<a0b535bd-3569-4d36-9752-ec8dcdc23aaf@intel.com>
+	s=k20201202; t=1736793271;
+	bh=kQRZmjgXyx0pLE1ZhNfiAV93WPz/Kxd2lUA0pD7TF9k=;
+	h=From:To:Cc:Subject:Date:From;
+	b=SkFBd4/V6rPJNCWNIluT4QflNNNEyZnKpRcRdpdeoBejnv9bw446kCBmhEtNsGAeH
+	 +6GYjjVMPCdH5nG4TpQbm87M4Q1yivMPQR3Gm6VeYwSp2l4xrEVfV3Q5pvpdEWQEfb
+	 N/WqUpvFt6zXuvQb3VQ3IuJM5Wy83AupxeRz0d1ukCX53ZsHC7Jn2fA6tGEs2pwFEY
+	 n1zus4U9upyTcLmhHN5XEHOATXfXysgAjs+bUDLeyzsjxkcjzq8HOAzcagGJuiz0qr
+	 cbUL+GzDb7j4cWdOVGbr7cg8zOcLkz8wtHZG00AOkFzywKLRTp/GiWuhwmCmWTvgAL
+	 TzFQ9kXFYDpQA==
+From: Sasha Levin <sashal@kernel.org>
+To: linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Cc: Lizhi Xu <lizhi.xu@windriver.com>,
+	syzbot+985f827280dc3a6e7e92@syzkaller.appspotmail.com,
+	Miquel Raynal <miquel.raynal@bootlin.com>,
+	Stefan Schmidt <stefan@datenfreihafen.org>,
+	Sasha Levin <sashal@kernel.org>,
+	alex.aring@gmail.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux-wpan@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.12 01/20] mac802154: check local interfaces before deleting sdata list
+Date: Mon, 13 Jan 2025 13:34:06 -0500
+Message-Id: <20250113183425.1783715-1-sashal@kernel.org>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.12.9
+Content-Transfer-Encoding: 8bit
 
-On Mon, 13 Jan 2025 10:18:05 -0800 Jacob Keller wrote:
-> > Ack, and short hands make sense. But both rd32_poll_timeout_atomic and
-> > the exiting rd32_poll_timeout have a single user.  
-> 
-> The intention with introducing these is to help make it easier for other
-> developers to use poll_timeout and friends throughout the driver.
-> There's only one user now, but my intention had been that we'd see more
-> as it becomes more known and is easier to use.
+From: Lizhi Xu <lizhi.xu@windriver.com>
 
-IMHO the ease of use gain is equal to the loss of generality (driver
-local flavor of a common function will make contributing outside the
-driver harder).
+[ Upstream commit eb09fbeb48709fe66c0d708aed81e910a577a30a ]
 
-To be clear it's not a blocker, I'm only complaining because there was
-a bug in the other patch.
+syzkaller reported a corrupted list in ieee802154_if_remove. [1]
+
+Remove an IEEE 802.15.4 network interface after unregister an IEEE 802.15.4
+hardware device from the system.
+
+CPU0					CPU1
+====					====
+genl_family_rcv_msg_doit		ieee802154_unregister_hw
+ieee802154_del_iface			ieee802154_remove_interfaces
+rdev_del_virtual_intf_deprecated	list_del(&sdata->list)
+ieee802154_if_remove
+list_del_rcu
+
+The net device has been unregistered, since the rcu grace period,
+unregistration must be run before ieee802154_if_remove.
+
+To avoid this issue, add a check for local->interfaces before deleting
+sdata list.
+
+[1]
+kernel BUG at lib/list_debug.c:58!
+Oops: invalid opcode: 0000 [#1] PREEMPT SMP KASAN PTI
+CPU: 0 UID: 0 PID: 6277 Comm: syz-executor157 Not tainted 6.12.0-rc6-syzkaller-00005-g557329bcecc2 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
+RIP: 0010:__list_del_entry_valid_or_report+0xf4/0x140 lib/list_debug.c:56
+Code: e8 a1 7e 00 07 90 0f 0b 48 c7 c7 e0 37 60 8c 4c 89 fe e8 8f 7e 00 07 90 0f 0b 48 c7 c7 40 38 60 8c 4c 89 fe e8 7d 7e 00 07 90 <0f> 0b 48 c7 c7 a0 38 60 8c 4c 89 fe e8 6b 7e 00 07 90 0f 0b 48 c7
+RSP: 0018:ffffc9000490f3d0 EFLAGS: 00010246
+RAX: 000000000000004e RBX: dead000000000122 RCX: d211eee56bb28d00
+RDX: 0000000000000000 RSI: 0000000080000000 RDI: 0000000000000000
+RBP: ffff88805b278dd8 R08: ffffffff8174a12c R09: 1ffffffff2852f0d
+R10: dffffc0000000000 R11: fffffbfff2852f0e R12: dffffc0000000000
+R13: dffffc0000000000 R14: dead000000000100 R15: ffff88805b278cc0
+FS:  0000555572f94380(0000) GS:ffff8880b8600000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 000056262e4a3000 CR3: 0000000078496000 CR4: 00000000003526f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ __list_del_entry_valid include/linux/list.h:124 [inline]
+ __list_del_entry include/linux/list.h:215 [inline]
+ list_del_rcu include/linux/rculist.h:157 [inline]
+ ieee802154_if_remove+0x86/0x1e0 net/mac802154/iface.c:687
+ rdev_del_virtual_intf_deprecated net/ieee802154/rdev-ops.h:24 [inline]
+ ieee802154_del_iface+0x2c0/0x5c0 net/ieee802154/nl-phy.c:323
+ genl_family_rcv_msg_doit net/netlink/genetlink.c:1115 [inline]
+ genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
+ genl_rcv_msg+0xb14/0xec0 net/netlink/genetlink.c:1210
+ netlink_rcv_skb+0x1e3/0x430 net/netlink/af_netlink.c:2551
+ genl_rcv+0x28/0x40 net/netlink/genetlink.c:1219
+ netlink_unicast_kernel net/netlink/af_netlink.c:1331 [inline]
+ netlink_unicast+0x7f6/0x990 net/netlink/af_netlink.c:1357
+ netlink_sendmsg+0x8e4/0xcb0 net/netlink/af_netlink.c:1901
+ sock_sendmsg_nosec net/socket.c:729 [inline]
+ __sock_sendmsg+0x221/0x270 net/socket.c:744
+ ____sys_sendmsg+0x52a/0x7e0 net/socket.c:2607
+ ___sys_sendmsg net/socket.c:2661 [inline]
+ __sys_sendmsg+0x292/0x380 net/socket.c:2690
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+Reported-and-tested-by: syzbot+985f827280dc3a6e7e92@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=985f827280dc3a6e7e92
+Signed-off-by: Lizhi Xu <lizhi.xu@windriver.com>
+Reviewed-by: Miquel Raynal <miquel.raynal@bootlin.com>
+Link: https://lore.kernel.org/20241113095129.1457225-1-lizhi.xu@windriver.com
+Signed-off-by: Stefan Schmidt <stefan@datenfreihafen.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ net/mac802154/iface.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/net/mac802154/iface.c b/net/mac802154/iface.c
+index c0e2da5072be..9e4631fade90 100644
+--- a/net/mac802154/iface.c
++++ b/net/mac802154/iface.c
+@@ -684,6 +684,10 @@ void ieee802154_if_remove(struct ieee802154_sub_if_data *sdata)
+ 	ASSERT_RTNL();
+ 
+ 	mutex_lock(&sdata->local->iflist_mtx);
++	if (list_empty(&sdata->local->interfaces)) {
++		mutex_unlock(&sdata->local->iflist_mtx);
++		return;
++	}
+ 	list_del_rcu(&sdata->list);
+ 	mutex_unlock(&sdata->local->iflist_mtx);
+ 
+-- 
+2.39.5
+
 
