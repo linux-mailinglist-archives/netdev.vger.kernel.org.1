@@ -1,139 +1,139 @@
-Return-Path: <netdev+bounces-157597-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157598-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3657BA0AF53
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 07:33:53 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 23DAEA0AF60
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 07:40:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DA6A71882C08
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 06:33:52 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CD94A7A037F
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 06:40:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5530C191F99;
-	Mon, 13 Jan 2025 06:33:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C844231A2A;
+	Mon, 13 Jan 2025 06:40:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="DL/68LbB"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgsg2.qq.com (smtpbgsg2.qq.com [54.254.200.128])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1F1E231C87
-	for <netdev@vger.kernel.org>; Mon, 13 Jan 2025 06:33:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.254.200.128
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC47D1B4236
+	for <netdev@vger.kernel.org>; Mon, 13 Jan 2025 06:40:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736750022; cv=none; b=jT6VcFh8SrVKwPp5AZAmZpNALGRoKVBonP9NSYeuYzuSPzD9qx8wfr3TL3zEE4fMXQmuA8oDXFr/oZEuWIFRvbQMzXNR4IieBAgbl2ZMJn5PSRswF5O+s2qx1i8jwuMbFHlIVNSJ2Ww+W2eV4AsjN9QW4BoLYNGtIAJwA2CtvRM=
+	t=1736750409; cv=none; b=WdIihgFtXYatgesse/VqeYgIvNeEK1p5wAP3yomXvsq6X15jq7Zy0G/lJOGDLNNW3sS6akq+099cYBcdd4tLsTV4MmLPQKrgH1HA8vxIZ4G+M7XOwl3KQ7oeMO6xzK/HkNsUXzR77+5nsBGnrOMm5URjG6XuuydnU9YT/bh5HWc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736750022; c=relaxed/simple;
-	bh=x9smgKVqAYh2y8P63mcNURtLx1yHuQbec9dJArr4ds0=;
-	h=From:To:Cc:References:In-Reply-To:Subject:Date:Message-ID:
-	 MIME-Version:Content-Type; b=RMreWEesf8xTX5lvZjfTf5EySvVGwwF/9uXN47C8vfDMzBD41sp8D+4tUOQ4pcISVHu9jjKD3Ye9tG3THtCJe6lISats9gtP3LyacoNaOhky6vQ+puXou9RR2/tJ/Vc7BBomzGnR+JFpxjWOaqoCQD8KiNfzwjINhaZsQCGdjRY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=54.254.200.128
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
-X-QQ-mid:Yeas1t1736749826t140t11739
-Received: from 3DB253DBDE8942B29385B9DFB0B7E889 (jiawenwu@trustnetic.com [36.20.58.48])
-X-QQ-SSF:0000000000000000000000000000000
-From: =?utf-8?b?Smlhd2VuIFd1?= <jiawenwu@trustnetic.com>
-X-BIZMAIL-ID: 15171270368929639658
-To: "'Richard Cochran'" <richardcochran@gmail.com>
-Cc: <andrew+netdev@lunn.ch>,
-	<davem@davemloft.net>,
-	<edumazet@google.com>,
-	<kuba@kernel.org>,
-	<pabeni@redhat.com>,
-	<linux@armlinux.org.uk>,
-	<horms@kernel.org>,
-	<jacob.e.keller@intel.com>,
-	<netdev@vger.kernel.org>,
-	<vadim.fedorenko@linux.dev>,
-	<mengyuanlou@net-swift.com>
-References: <20250110031716.2120642-1-jiawenwu@trustnetic.com> <20250110031716.2120642-5-jiawenwu@trustnetic.com> <Z4KnPlCtlhHjFI6z@hoboy.vegasvil.org>
-In-Reply-To: <Z4KnPlCtlhHjFI6z@hoboy.vegasvil.org>
-Subject: RE: [PATCH net-next v3 4/4] net: ngbe: Add support for 1PPS and TOD
-Date: Mon, 13 Jan 2025 14:30:24 +0800
-Message-ID: <057b01db6584$a13a69d0$e3af3d70$@trustnetic.com>
+	s=arc-20240116; t=1736750409; c=relaxed/simple;
+	bh=5Td0hp06syJ4rpz2cZ9RxmKi48CjPprOPE04rsJVaDk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=FnPCP9ujC7KIE6udDfKq+kooAqRrROAFdqpN/EYW6yuFC4umn+7iNcOn6+7Iog2hs9jcFB+a3i+8mU68g5/WjPWCqIQkrPaS9YvbFbjfj5/pUQftJqMcmljim6/VpPx1N9UmYQ0lvCfGGHMh5S+8AEYVYeaAYR2Z4GGdMXU2HPg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=DL/68LbB; arc=none smtp.client-ip=209.85.214.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-21669fd5c7cso68090385ad.3
+        for <netdev@vger.kernel.org>; Sun, 12 Jan 2025 22:40:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1736750407; x=1737355207; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=1PFSpJU2Fd4B+ey1jAHF1zHrQS16tsPSfz0Xl8SwtoM=;
+        b=DL/68LbBd6nWxSUncCYbzLxIqMgwo2LFwJ5H7YSvqFMcIfAVRrNCEV6C/IsBwYJqoX
+         Dq2SsdKP8QPUj2e2GIIfLdzFkiNP6u3D6PMaw+PxWKQihL+SjPA9nPZhwCsbcr/uy8p8
+         8MeY9mLeNDUO5OSwCfKSt27I6l0YXu4z+B2xk=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736750407; x=1737355207;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=1PFSpJU2Fd4B+ey1jAHF1zHrQS16tsPSfz0Xl8SwtoM=;
+        b=YyoUCihZyVTeQ24kL2Bt4dISnp32rUkLxm8oYBlS5JbhEhhgto1yJB8HIvgrPNjQ1h
+         JWh/ohfZQsWhMFkt4N/b3ROtMAve6bVyiXsaBkwP5iYHO2Qss7hO/j7eUqRA1b2TPgVh
+         lcDwrxBrPWyV9bTRJuLxiyfMr1p40OjN+MSrbBbfm8xq1U56I5EzgtGXZ7PQCkFdgwCa
+         R94V3CazIZXRRRdzkBYRaIZPAYo2LYSjKTgspSlrxyLF37cFkgntgUxN5BwY0Z9RrJ08
+         dJ5G9d/GPtMWTznt14ji3rMd8X9lW8VhX+zSRw3c5MIlqbBGAISIUBuT98+ePaNkrDPZ
+         Aq3A==
+X-Gm-Message-State: AOJu0YyXJiraTUVZg9TJ9mCcYKSHxWTyy0NxlALW+CcHSN1qadIrcZ3/
+	VYO+/witxQ5zC2UAwuK0MUBPs/d70quH71eUhcsEB3CcMn52fN7qYRmfPzDqKLhuXBB39P7Ymew
+	=
+X-Gm-Gg: ASbGncs9TcMzD161dT0xCvH3lRDusfBHqqy003KizroTjUSHB6Ku+bE9grg4NlZ8ZC1
+	rIyFKKNm0BmIy/uAGdP1wcVuCj/Xeani8TOLgGC5ZbXFOk0uAJYgltPjFPqF1WflGwx3P8YROKU
+	7keE1D4sNkDRDc1f0wuuA1dOHVsKHkxQRIBjXzTXecENxuZ+pUWTEwKLp35YYhhEUMkBsFKlyZr
+	95BVV4PX65vrDBD79kL97orpchCB5moCQXWNfKmicOGaq3vbGSfSgYOI5ioWMBOjJnCJHJweR5D
+	86l0DKRiA1K2goiyt1D9aTpfppxQwpi9
+X-Google-Smtp-Source: AGHT+IGLu93+Nl0whKdj+mMgJG60zpKdpOvNOWoKCgS7kdWU4RIdU+XWrOc1i6brxeBo9gEuoM5f8w==
+X-Received: by 2002:a17:903:22c1:b0:216:554a:2127 with SMTP id d9443c01a7336-21a83fde33fmr283965205ad.41.1736750407117;
+        Sun, 12 Jan 2025 22:40:07 -0800 (PST)
+Received: from lvnvda3289.lvn.broadcom.net ([192.19.161.250])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21a9f254264sm46488165ad.233.2025.01.12.22.40.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 12 Jan 2025 22:40:06 -0800 (PST)
+From: Michael Chan <michael.chan@broadcom.com>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	pavan.chebbi@broadcom.com,
+	andrew.gospodarek@broadcom.com,
+	somnath.kotur@broadcom.com
+Subject: [PATCH net-next 00/10] bnxt_en: Add NPAR 1.2 and TPH support
+Date: Sun, 12 Jan 2025 22:39:17 -0800
+Message-ID: <20250113063927.4017173-1-michael.chan@broadcom.com>
+X-Mailer: git-send-email 2.43.4
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-X-Mailer: Microsoft Outlook 16.0
-Content-Language: zh-cn
-Thread-Index: AQIn7G+o1Szt10K74NpdpmE6uZiDNwH01nhwA2bf3ayyUFApIA==
-X-QQ-SENDSIZE: 520
-Feedback-ID: Yeas:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz8a-1
-X-QQ-XMAILINFO: N4WhQbLQyIqS3p1meRUnJy365UkE+Xli06R4QH68GK/g+WY6HOWqgLmd
-	n8ez7THFZOwGnmh1tK5QVslCa3EtUBdnC0re5+j8p62StczJLiq8j1XtasBw7tQTqJwiCtO
-	Qi1/IKzV0R0+pQDxDdXqnnugip9DBrvq7mHJxT1OOF9KIbCHHn3TI9qNpXqGKFL0nGvDKkK
-	uS7xlU1UM0NQU/dTXW/n9QwfQ9OBF7+Fs9X/kQJDg1bTGK/osEWZRWnptYHeFFwuwW1FGgb
-	xlkDEuiq2EIICEdRJqZqzUQqkyqHmYCE/RXxFPmKZMQeECFYhzEqSDvYPNB9YnNG3+9iUau
-	WXKKZtfIwP6X4saV8OhqfjHnH21KzdkdBpLfWPmabci28iGeyWcR4aj2CFGcMF9VZwOMDBE
-	pyVAeAhWTmxymsUW/nA3JHmxMOvBOXw8aK/SD2CjOSq7eKZajLWsOTY6rXTu42AJx+t9t8s
-	4+Un9OyR3G8XwcwIdHZzC+Dgj+skpEvzey3FCPoV9/PDjC7v/RNt5KbwkX4n5b3KzCVLpur
-	I9xAR8t/BscFzVwzYHASGu8MEMHsxkL5o6e5Cn26scJOdBLuGL91mF7WaYQ33TgAxjGVvT2
-	yRiUpX3DoS3SDZwh/tY9j7jQko6HB9uEFMHbK6jWzff/ex0AJIAUcGAiltKUgoWr2PQFQzi
-	OgGajXTNsnT6QivSScAmeRugAfd0AW5r5gzJnWORKWHBv2mA/MjAGBmc66/SltDdtsKod8g
-	+HlIbrRgvoKKqUmPmPtPvY45yPbRT2lnlXUJqZJpezkDiUqXRKMbivPFOk/Ou4KH4BbB+CD
-	K3LEhvlLhzvpS4L7yiFWOKzzoiBPERmeUNh34VBgWbZC8KFgpsCqphATIywhqKeF/noLrEM
-	QJsWBd66sUYen2dtcntc0c3orgOi17GiAaeEbd5vtGuLk/eDuQRal6ZtVErH6VcYZZw8eDK
-	MfmkYQA9toB4/AiFsShnL8nhlfBMp5p8HW3LxBzk7Y+Jmog==
-X-QQ-XMRINFO: NI4Ajvh11aEj8Xl/2s1/T8w=
-X-QQ-RECHKSPAM: 0
+Content-Transfer-Encoding: 8bit
 
-On Sun, Jan 12, 2025 1:16 AM, Richard Cochran wrote:
-> On Fri, Jan 10, 2025 at 11:17:16AM +0800, Jiawen Wu wrote:
-> 
-> When I quickly scan the logic here...
-> 
-> > +	/* Figure out how far past the next second we are */
-> > +	div_u64_rem(ns, WX_NS_PER_SEC, &rem);
-> > +
-> > +	/* Figure out how many nanoseconds to add to round the clock edge up
-> > +	 * to the next full second
-> > +	 */
-> > +	rem = (WX_NS_PER_SEC - rem);
-> > +
-> > +	/* Adjust the clock edge to align with the next full second. */
-> > +	wx->pps_edge_start += div_u64(((u64)rem << cc->shift), cc->mult);
-> > +	trgttiml0 = (u32)wx->pps_edge_start;
-> > +	trgttimh0 = (u32)(wx->pps_edge_start >> 32);
-> > +
-> > +	wx_set_pps(wx, wx->pps_enabled, ns + rem, wx->pps_edge_start);
-> > +
-> > +	rem += wx->pps_width;
-> > +	wx->pps_edge_end += div_u64(((u64)rem << cc->shift), cc->mult);
-> > +	trgttiml1 = (u32)wx->pps_edge_end;
-> > +	trgttimh1 = (u32)(wx->pps_edge_end >> 32);
-> > +
-> > +	wr32ptp(wx, WX_TSC_1588_TRGT_L(0), trgttiml0);
-> > +	wr32ptp(wx, WX_TSC_1588_TRGT_H(0), trgttimh0);
-> > +	wr32ptp(wx, WX_TSC_1588_TRGT_L(1), trgttiml1);
-> > +	wr32ptp(wx, WX_TSC_1588_TRGT_H(1), trgttimh1);
-> > +	wr32ptp(wx, WX_TSC_1588_SDP(0), tssdp);
-> > +	wr32ptp(wx, WX_TSC_1588_SDP(1), tssdp1);
-> > +	wr32ptp(wx, WX_TSC_1588_AUX_CTL, tsauxc);
-> > +	wr32ptp(wx, WX_TSC_1588_INT_EN, WX_TSC_1588_INT_EN_TT1);
-> > +	WX_WRITE_FLUSH(wx);
-> > +
-> > +	rem = WX_NS_PER_SEC;
-> > +	/* Adjust the clock edge to align with the next full second. */
-> > +	wx->sec_to_cc = div_u64(((u64)rem << cc->shift), cc->mult);
-> 
-> ... that appears to be hard coding a period of one second?
+The first patch adds NPAR 1.2 support.  Patches 2 to 10 add TPH
+(TLP Processing Hints) support.  These TPH driver patches are new
+revisions originally posted as part of the TPH PCI patch series.
+Additional driver refactoring has been done so that we can free
+and allocate RX completion ring and the TX rings if the channel is
+a combined channel.  We also add napi_disable() and napi_enable()
+during queue_stop() and queue_start() respectively.
 
-Yes. We only want to support 1pps functionality.
+Discussion about adding napi_disable()/napi_enable():
 
-> 
-> > +	wx->pps_width = rq->perout.period.nsec;
-> > +	wx->ptp_setup_sdp(wx);
-> 
-> And this ^^^ is taking the dialed period and turning into the duty
-> cycle?
+https://lore.kernel.org/netdev/5336d624-8d8b-40a6-b732-b020e4a119a2@davidwei.uk/#t
 
-We try to use "width",  which means the time from the rising edge to the falling edge.
+Previous driver series fixing rtnl_lock and empty release function:
 
+https://lore.kernel.org/netdev/20241115200412.1340286-1-wei.huang2@amd.com/
+
+v5 of the PCI series using netdev_rx_queue_restart():
+
+https://lore.kernel.org/netdev/20240916205103.3882081-5-wei.huang2@amd.com/
+
+v1 of the PCI series using open/close:
+
+https://lore.kernel.org/netdev/20240509162741.1937586-9-wei.huang2@amd.com/
+
+Manoj Panicker (1):
+  bnxt_en: Add TPH support in BNXT driver
+
+Michael Chan (5):
+  bnxt_en: Set NAPR 1.2 support when registering with firmware
+  bnxt_en Refactor completion ring allocation logic for P5_PLUS chips
+  bnxt_en: Refactor TX ring allocation logic
+  bnxt_en: Refactor RX/RX AGG ring parameters setup for P5_PLUS
+  bnxt_en: Pass NQ ID to the FW when allocating RX/RX AGG rings
+
+Somnath Kotur (4):
+  bnxt_en: Refactor completion ring free routine
+  bnxt_en: Refactor bnxt_free_tx_rings() to free per Tx ring
+  bnxt_en: Reallocate Rx completion ring for TPH support
+  bnxt_en: Extend queue stop/start for Tx rings
+
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c | 502 ++++++++++++++++------
+ drivers/net/ethernet/broadcom/bnxt/bnxt.h |   8 +
+ 2 files changed, 383 insertions(+), 127 deletions(-)
+
+-- 
+2.30.1
 
 
