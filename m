@@ -1,220 +1,177 @@
-Return-Path: <netdev+bounces-157576-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157577-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18150A0ADC2
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 04:09:34 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ACD76A0ADFB
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 04:40:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 129E9164806
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 03:09:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 367A67A2DDA
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 03:40:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D5C01386C9;
-	Mon, 13 Jan 2025 03:09:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AC8714A09E;
+	Mon, 13 Jan 2025 03:40:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TuPh54Ai"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="Oaja9uwC"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B26D3C1F
-	for <netdev@vger.kernel.org>; Mon, 13 Jan 2025 03:09:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70A0B1465AE;
+	Mon, 13 Jan 2025 03:40:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736737770; cv=none; b=iDnh50rW3uzoTDfJOvohIAa0xktMoHB7s2RT9apQE2oRO8tRRHnpE6pbtRTm56mo77Oc+fvjlJqkehqrNKBHFndeiblQBFjx+A8q5Durd1oKgBag8FSeyo3yLt2TT3iCUpwxZQYUp2xkUwP4mHoplapbZiqNu18IW/N0/p/2dIQ=
+	t=1736739605; cv=none; b=Rb7S4o/y1IZ/Fff/+rbAPoTMiCnJyEE/YFrXzSPNd72QdGxY66N2n/xA+dJqZwqnOoi+UGfk29ZO5KnMsAkQVIPFywKcK/4VcgRiNUvraDerdGGxVhvkq45H7a55zOIPV/agOX8anZqnQROVcUIwQas5nqAhxz4GAOrMcCgK/oU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736737770; c=relaxed/simple;
-	bh=DEmsliNdq5xOag2xI3ibIDh1W5iQhPZ8XezFY/pQJFU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=sbc3PEjOBUku60NjeVzV273E8V+5x1HpMrHTraUY3TW7olqQYXF7x+CS2xeCS3Ah3YI3BEgRg+KsYGuMaSrFEV0iaHYE+g0iKYzQ7KrKSOgUg6jjeG/wqE3yHdA2cRUHpGqEMdSPyoooDLEq50VmLExFBcTylEMVb6n7eRlOLTk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TuPh54Ai; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1736737767;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=4oyhgO+Y+dGyeymACnXpTGA+/wZIqJR9I06xr+q/V18=;
-	b=TuPh54AibJ6tg9UdxiNrHdzklH2IxiIA/jqDW4Nx5/2hPPVVYXl4tqhHNa29J5b1rPlFEd
-	U8p4eOtvMLxIiLZeZ0Bz/jqoZptyy9ijOsPwKSz2/D8wwABYlx1F+KaMAoUhviq/p8Thqh
-	zYFPvFeWtkpWQr/19Z4FbTKtk6KEaL8=
-Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
- [209.85.216.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-631-lDs2ebyaPzmhNa7gqFBfmQ-1; Sun, 12 Jan 2025 22:09:25 -0500
-X-MC-Unique: lDs2ebyaPzmhNa7gqFBfmQ-1
-X-Mimecast-MFC-AGG-ID: lDs2ebyaPzmhNa7gqFBfmQ
-Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-2ef79403c5eso11200662a91.0
-        for <netdev@vger.kernel.org>; Sun, 12 Jan 2025 19:09:25 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736737765; x=1737342565;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=4oyhgO+Y+dGyeymACnXpTGA+/wZIqJR9I06xr+q/V18=;
-        b=Xpu8rOoAlH1IvAENI9SBamKmbpRKxN3MEYtDdVNphnP98SL8OhQ1J8Z9656KpjWvE6
-         zOeoZYVVLJsX3XWAjKMCR6CtIF0L70bMAXtUiY42PJAhr70oPdtyh6kD3TEnoZc1F8MI
-         nnwgdrEmC2CMPOcT5DrJd2l3t04ZAVfLzVCcCk2c/5nNHlHgt+nqAOl7CJi2KD2H/TEF
-         GQfOhT0GH+CvodjcBh+ld52vGR1cmrsFSEPpSFdzdsf/zNOfH729kfVcbrfi8aaKgLc1
-         48MNMQDQxMIXHdyH9OUvUWAfeYqcH7uXI6EmPty5tgJSCHski1ZUBuXKjY1Slfy7qOro
-         x7jg==
-X-Forwarded-Encrypted: i=1; AJvYcCWEUA1rV+5T1/2H01ZlJ10GUiDTk7KCoPET78uBNMQVELYh3OZa4vv2qSL2k7G8KPZsv3EPT/Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzWA/UHiElKi9ClkfF0PTg+/zguh5JWIo+pfqlRrCFLtzsLzMhi
-	S61OB92yhlqIwaZyTMkgizEOL0rjdFstYloPY/jraU9KAxU1oIJIhR46oM0yJQxfBlQjJEpM16Y
-	Vk0FSfUaR22kTX4332Wyk9w3T2gWAm38r9Yg4EucdE3/LEy2gT0ENjXJ7lYb7t3N73nIxBpi7oW
-	bsDRBk9HCAd7pHJBrRJoOAHYYmNtO1
-X-Gm-Gg: ASbGnctVaFz9Q/qLuVPoZDbSUhHHJrCTF2/w9ltIz92w3qapdubPZj3amCdLOyAs6k4
-	RrLpDzU7wfPSYv719LQidFWK/OeRlq2/Jocgch6c=
-X-Received: by 2002:a17:90a:f94b:b0:2f6:d266:f45c with SMTP id 98e67ed59e1d1-2f6d266fa1dmr9941328a91.2.1736737764863;
-        Sun, 12 Jan 2025 19:09:24 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGohapCCDXR2L+ZpUh6iRr3Bw3OXaBXas3XBlaBBL6vXp8bpmWOnOAEMGsKxTXRiiS5FRgfDDtEjErspybbiQ8=
-X-Received: by 2002:a17:90a:f94b:b0:2f6:d266:f45c with SMTP id
- 98e67ed59e1d1-2f6d266fa1dmr9941297a91.2.1736737764407; Sun, 12 Jan 2025
- 19:09:24 -0800 (PST)
+	s=arc-20240116; t=1736739605; c=relaxed/simple;
+	bh=OkYu8QtfWeI2FUHB8uxRKxkCO8XUDTF2vmK5MmhwTfs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=p3sCPzZ22aSVpAZWKhhjNXZPy1NYeu0fW8UsGasOOnbrDNk1iRw85f9mFKnlV8H/YxM5v+4qhlFQ22dQnjc4t6+ObKToWDwqgXiq6DEKJi33fPE+f0HBPJ1dPHAvQeaqn73PzXs7iUCk/yZCnBYfq1u95yseKob9pNcGMzR2iBg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=Oaja9uwC; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50CLxcBR000968;
+	Mon, 13 Jan 2025 03:39:46 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	G41VudNhZOLNdv9BEzJMaOPngvyidLagxXgJb6Cu6BM=; b=Oaja9uwC+b9EKbRY
+	2iEJc8hd//Co9TapGM/Yb4CqenRw962hBRKmMapvSOykbtMm06rEgqZibfHxFt/e
+	kPXTt66qmqtukM0jh3BlZD5Gfoic4yvMhpe+kJ9XjsHKG7MIYaumwAeUMsxC4H6r
+	Pwg+C0E/8f5yK6tFJs+1iItfDiaVCXyFy70v3BtjK78B88/Y+btTUO1+NtvUpmPY
+	aH3XBy47GeLkVnapZzexKD2ikaQC9sUmLWn5/OOaYS9XEfezcRDif1lo76hMsbZj
+	N3xS6PEaj5PYMJ0w/OKqn9MOovuD/XtOdXXU22fKiPAQlPXNBG6O3oO0/peBqyST
+	mLOxTQ==
+Received: from nasanppmta04.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 443hkfk2f9-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 13 Jan 2025 03:39:45 +0000 (GMT)
+Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
+	by NASANPPMTA04.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 50D3di6v003653
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 13 Jan 2025 03:39:44 GMT
+Received: from [10.253.33.98] (10.80.80.8) by nasanex01a.na.qualcomm.com
+ (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Sun, 12 Jan
+ 2025 19:39:38 -0800
+Message-ID: <c67f4510-e71b-4211-8fe2-35dabfc7b44e@quicinc.com>
+Date: Mon, 13 Jan 2025 11:39:09 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241210164456.925060-1-lulu@redhat.com> <20241210164456.925060-8-lulu@redhat.com>
- <20250108071107-mutt-send-email-mst@kernel.org> <CACLfguUffb-kTZgUoBnJAJxhpxh-xq8xBM-Hv5CZeWzDoha6tA@mail.gmail.com>
-In-Reply-To: <CACLfguUffb-kTZgUoBnJAJxhpxh-xq8xBM-Hv5CZeWzDoha6tA@mail.gmail.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Mon, 13 Jan 2025 11:09:13 +0800
-X-Gm-Features: AbW1kvYpKg5bc48boHvJUONg_Pla6QVv4Otx4hHwhyndxlFNHaTavvyqRkE_aXk
-Message-ID: <CACGkMEsDjFgyFFxz9Gdi2dFbk+JHP6cr7e1xGnLYuPBce-aLHw@mail.gmail.com>
-Subject: Re: [PATCH v4 7/8] vhost: Add new UAPI to support change to task mode
-To: Cindy Lu <lulu@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, michael.christie@oracle.com, sgarzare@redhat.com, 
-	linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 12/14] net: ethernet: qualcomm: Initialize PPE
+ L2 bridge settings
+To: Andrew Lunn <andrew@lunn.ch>, Luo Jie <quic_luoj@quicinc.com>
+CC: Andrew Lunn <andrew+netdev@lunn.ch>,
+        "David S. Miller"
+	<davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Rob Herring
+	<robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley
+	<conor+dt@kernel.org>,
+        Suruchi Agarwal <quic_suruchia@quicinc.com>,
+        "Pavithra
+ R" <quic_pavir@quicinc.com>,
+        Simon Horman <horms@kernel.org>, Jonathan Corbet
+	<corbet@lwn.net>,
+        Kees Cook <kees@kernel.org>,
+        "Gustavo A. R. Silva"
+	<gustavoars@kernel.org>,
+        Philipp Zabel <p.zabel@pengutronix.de>,
+        <linux-arm-msm@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-doc@vger.kernel.org>, <linux-hardening@vger.kernel.org>,
+        <quic_kkumarcs@quicinc.com>, <quic_linchen@quicinc.com>,
+        <srinivas.kandagatla@linaro.org>, <bartosz.golaszewski@linaro.org>,
+        <john@phrozen.org>
+References: <20250108-qcom_ipq_ppe-v2-0-7394dbda7199@quicinc.com>
+ <20250108-qcom_ipq_ppe-v2-12-7394dbda7199@quicinc.com>
+ <4dbf1550-32e9-4cce-bf0c-8b92dbd49b50@lunn.ch>
+Content-Language: en-US
+From: Lei Wei <quic_leiwei@quicinc.com>
+In-Reply-To: <4dbf1550-32e9-4cce-bf0c-8b92dbd49b50@lunn.ch>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nasanex01a.na.qualcomm.com (10.52.223.231)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: B5LmC5PjFOmfpkabMs1GkQGiUwhPzDJ0
+X-Proofpoint-ORIG-GUID: B5LmC5PjFOmfpkabMs1GkQGiUwhPzDJ0
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ phishscore=0 mlxscore=0 adultscore=0 clxscore=1011 bulkscore=0
+ mlxlogscore=999 impostorscore=0 priorityscore=1501 spamscore=0
+ malwarescore=0 suspectscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.19.0-2411120000 definitions=main-2501130029
 
-On Mon, Jan 13, 2025 at 10:36=E2=80=AFAM Cindy Lu <lulu@redhat.com> wrote:
->
-> On Wed, Jan 8, 2025 at 8:13=E2=80=AFPM Michael S. Tsirkin <mst@redhat.com=
-> wrote:
-> >
-> > On Wed, Dec 11, 2024 at 12:41:46AM +0800, Cindy Lu wrote:
-> > > Add a new UAPI to enable setting the vhost device to task mode.
-> > > The userspace application can use VHOST_SET_INHERIT_FROM_OWNER
-> > > to configure the mode if necessary.
-> > > This setting must be applied before VHOST_SET_OWNER, as the worker
-> > > will be created in the VHOST_SET_OWNER function
-> > >
-> > > Signed-off-by: Cindy Lu <lulu@redhat.com>
-> >
-> > Good.  I would like to see an option to allow/block this ioctl,
-> > to prevent exceeding nproc limits.
 
-VHOST_SET_INHERIT_FROM_OWNER is for fork() alike behaviour. Without
-this ioctl we will go for kthread.
 
-> A Kconfig option is probably
-> > sufficient.  "allow legacy threading mode" and default to yes?
+On 1/9/2025 12:59 AM, Andrew Lunn wrote:
+> On Wed, Jan 08, 2025 at 09:47:19PM +0800, Luo Jie wrote:
+>> From: Lei Wei <quic_leiwei@quicinc.com>
+>>
+>> Configure the default L2 bridge settings for the PPE ports to
+>> enable L2 frame forwarding between CPU port and PPE Ethernet
+>> ports.
+> 
+> It would be good to have an 'only' in there:
+> 
+>> to _only_
+>> enable L2 frame forwarding between CPU port and PPE Ethernet
+>> ports
+> 
+> That makes it clear there is no port to port forwarding, the ports are
+> isolated.
+> 
 
-How could we block legacy threading mode in this case?
+Sure, I will add 'only' to make it clear.
 
-> >
-> sure I will add this in the new version, the legacy thread mode here
-> is  kthread mode
-> I will change these commit comments and make it more clear
-> Thanks
-> Cindy
+>> The per-port L2 bridge settings are initialized as follows:
+>> For PPE CPU port, the PPE bridge TX is enabled and FDB learn is
+>> disabled. For PPE physical port, the PPE bridge TX is disabled
+>> and FDB learn is enabled by default and the L2 forward action
+>> is initialized as forward to CPU port.
+> 
+> Why is learning needed on physical ports? In general, switches forward
+> unknown destination addresses to the CPU. Which is what you want when
+> the ports are isolated from each other. Everything goes to the
+> CPU. But maybe this switch does not work like this?
+> 
 
-Thanks
+L2 forwarding can be disabled in PPE in two ways:
 
->
-> >
-> > > ---
-> > >  drivers/vhost/vhost.c      | 22 +++++++++++++++++++++-
-> > >  include/uapi/linux/vhost.h | 18 ++++++++++++++++++
-> > >  2 files changed, 39 insertions(+), 1 deletion(-)
-> > >
-> > > diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
-> > > index 3e9cb99da1b5..12c3bf3d1ed4 100644
-> > > --- a/drivers/vhost/vhost.c
-> > > +++ b/drivers/vhost/vhost.c
-> > > @@ -2257,15 +2257,35 @@ long vhost_dev_ioctl(struct vhost_dev *d, uns=
-igned int ioctl, void __user *argp)
-> > >  {
-> > >       struct eventfd_ctx *ctx;
-> > >       u64 p;
-> > > -     long r;
-> > > +     long r =3D 0;
-> > >       int i, fd;
-> > > +     u8 inherit_owner;
-> > >
-> > >       /* If you are not the owner, you can become one */
-> > >       if (ioctl =3D=3D VHOST_SET_OWNER) {
-> > >               r =3D vhost_dev_set_owner(d);
-> > >               goto done;
-> > >       }
-> > > +     if (ioctl =3D=3D VHOST_SET_INHERIT_FROM_OWNER) {
-> > > +             /*inherit_owner can only be modified before owner is se=
-t*/
-> > > +             if (vhost_dev_has_owner(d)) {
-> > > +                     r =3D -EBUSY;
-> > > +                     goto done;
-> > > +             }
-> > > +             if (copy_from_user(&inherit_owner, argp, sizeof(u8))) {
-> > > +                     r =3D -EFAULT;
-> > > +                     goto done;
-> > > +             }
-> > > +             /* Validate the inherit_owner value, ensuring it is eit=
-her 0 or 1 */
-> > > +             if (inherit_owner > 1) {
-> > > +                     r =3D -EINVAL;
-> > > +                     goto done;
-> > > +             }
-> > > +
-> > > +             d->inherit_owner =3D (bool)inherit_owner;
-> > >
-> > > +             goto done;
-> > > +     }
-> > >       /* You must be the owner to do anything else */
-> > >       r =3D vhost_dev_check_owner(d);
-> > >       if (r)
-> > > diff --git a/include/uapi/linux/vhost.h b/include/uapi/linux/vhost.h
-> > > index b95dd84eef2d..d7564d62b76d 100644
-> > > --- a/include/uapi/linux/vhost.h
-> > > +++ b/include/uapi/linux/vhost.h
-> > > @@ -235,4 +235,22 @@
-> > >   */
-> > >  #define VHOST_VDPA_GET_VRING_SIZE    _IOWR(VHOST_VIRTIO, 0x82,      =
- \
-> > >                                             struct vhost_vring_state)
-> > > +
-> > > +/**
-> > > + * VHOST_SET_INHERIT_FROM_OWNER - Set the inherit_owner flag for the=
- vhost device
-> > > + *
-> > > + * @param inherit_owner: An 8-bit value that determines the vhost th=
-read mode
-> > > + *
-> > > + * When inherit_owner is set to 1:
-> > > + *   - The VHOST worker threads inherit its values/checks from
-> > > + *     the thread that owns the VHOST device, The vhost threads will
-> > > + *     be counted in the nproc rlimits.
-> > > + *
-> > > + * When inherit_owner is set to 0:
-> > > + *   - The VHOST worker threads will use the traditional kernel thre=
-ad (kthread)
-> > > + *     implementation, which may be preferred by older userspace app=
-lications that
-> > > + *     do not utilize the newer vhost_task concept.
-> > > + */
-> > > +#define VHOST_SET_INHERIT_FROM_OWNER _IOW(VHOST_VIRTIO, 0x83, __u8)
-> > > +
-> > >  #endif
-> > > --
-> > > 2.45.0
-> >
->
+1.) Keep the learning enabled (which is the default HW setting) and
+configure the FDB-miss-action to redirect to CPU.
+
+This works because even if FDB learning is enabled, we need to represent
+the bridge and the physical ports using their 'virtual switch instance'
+(VSI) in the PPE HW, and create the 'port membership' for the bridge VSI
+(the list of slave ports), before FDB based forwarding can take place. 
+Since we do not yet support switchdev, these VSI are not created and 
+packets are always forwarded to CPU due to FDB miss.
+
+(or)
+
+2.) Explicitly disable learning either globally or on the ports.
+
+With method 1 we can achieve packet forwarding to CPU without explicitly
+disabling learning. When switchdev is enabled later, L2 forwarding can 
+be enabled as a natural extension on top of this configuration. So we 
+have chosen the first approach.
+
+> 	Andrew
+> 
 
 
