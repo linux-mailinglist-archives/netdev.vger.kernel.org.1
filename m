@@ -1,92 +1,57 @@
-Return-Path: <netdev+bounces-157902-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157903-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA07CA0C448
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 22:58:55 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 88B6DA0C449
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 22:59:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C0C72166FE5
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 21:58:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A35C9167089
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 21:59:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 882731EE021;
-	Mon, 13 Jan 2025 21:58:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D2A01DACAA;
+	Mon, 13 Jan 2025 21:59:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="XUpoBOLA"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="EpmPMcu4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07A523232
-	for <netdev@vger.kernel.org>; Mon, 13 Jan 2025 21:58:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0AF31CDFCE
+	for <netdev@vger.kernel.org>; Mon, 13 Jan 2025 21:59:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736805532; cv=none; b=ujNoV51QHlopvKR+dsfhI9B2L9E/6tW6gh46eGk1RLVI8MRWP8r9s9EfxsUzRyQHKgmhKjF4N7jTopJegYPSlMyLEJnl+VXZvs/C3/yfC4v5bo3nbW6ywqiNAFoj3P8P3kvRYixtf+cwrEQMnfbAr/fwUW88GXrKyZOEZPJMPmU=
+	t=1736805554; cv=none; b=oykqTrwdYcdw3R1TF+kveW59VNn/KMKUr2Jqh0ZzrniAalrlljjSqPJTovvTUQmVaT9pvcwtYlY1uaR+VL56VEbxaBy6M8lq63O964JikeODCWJhBjXM7wZ+k4AxEq2i6ger5gtui9Xokrzl0rx0XvZpynIm39o+EYQhi80ls7A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736805532; c=relaxed/simple;
-	bh=YT7tw+yLpBD8mm51eiJecrgQMxOp6GEumiwHGuJ2WQE=;
+	s=arc-20240116; t=1736805554; c=relaxed/simple;
+	bh=joIHzGRTnVheagIpMpylCfW8uvI18v6OovtJWYYsHpg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=crS8Rwc1bYAp23G9SocO22wL3YrVa0Q6C30THR2kaHDxuit2KoHQbtzWkyB/C6UhE6UTXp/a8hizmuqwYwCaLOvgIa+xLJny6uLma7eSv9z3NxZxX50JhnGJ8ts3Vs6jM/WYP7nxtCMHBvBcSeakhv593OUGwMxDJZCyxlTkTnE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=XUpoBOLA; arc=none smtp.client-ip=209.85.214.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-2166360285dso83870835ad.1
-        for <netdev@vger.kernel.org>; Mon, 13 Jan 2025 13:58:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1736805530; x=1737410330; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=1twCwD/6lZcYLaRpkR8mPmSDuI0NT9StKcevPHbSPFc=;
-        b=XUpoBOLA6q3sVNocyS1ezcEP4+cYOSFFHLw9oKdPVyWy1/HctPThMR/j7OFVBrWNHR
-         ZSFrix29dXq5QpxsYClaGk6ZUdfGrq716hNHXeFay+CSUPFUHgw+vJdg0x4xcifiCgFv
-         zKDVZRs8y0YmVo2z+4Q6sT1Dgz/KagOo5qeAg=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736805530; x=1737410330;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=1twCwD/6lZcYLaRpkR8mPmSDuI0NT9StKcevPHbSPFc=;
-        b=Qowwj/D96w6eaVo7+Ahjko85cuHCSWUzWZGZnRdzy14jqYHw2GzF7/+TjD+3zRN0YE
-         Yf9yyX2fn1J6EIj1/8ovnUelP2ZfkpkkufODEqvDmBt4WsJzGrP5BUfr+15mjcllpxY5
-         WCDSaVFPweOCt5+MP5tEOCnSmZski6MJDraqnICKNTgB0KQ4Bpu3tHRjSg6wOHUckqkM
-         hyxKPBGNCd/11WvzlUq7X2BuYdWJama36LegzIninyWUMy0spSMOxKyTUfIUGH9laD1C
-         +QQ6ITFi1c546zEtPlnWFxn6oYa1R4idAjjcyBCIgZ0cgiaZU4JQ5caamd2h8eRPUu6U
-         ra1Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVZVL/6yVGGScDiokxpLRURL9Kn/MnG2rw0DhyXf0d8GCY/4f4fnmJhWmjcMnPtayX17qepH4U=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxqgAnTSXRsI/rvQ/z7eacJ7lFpoE6274n3byIHK0px+tdsWgt1
-	2bwJ3zT5OQKVQtqzlWWi24O+6qD4yaqX5NBjxlJ0rqJJPrd7WyOk+2GEDcqCam8=
-X-Gm-Gg: ASbGncuFIGvGo6lwygI7Gg8oNynJY1JtrRVoQVaSLCug/nyrq5PSa9xhpHS1/yhw7+v
-	lJ9f94Fsbo2+Qsq2FaTcyMyCsan0WEq1kfnSXs5ozF9qOHyuNv18Evj+b1i3NtAKGXUqdbVAdNv
-	930HldeCl5qf9pOYLT/r1qgl9pU2RCIcwPkLrltpjk4WgjXNLo5MIr+Se/WGNvdoPPdhwMYfoJC
-	u6u5/llzf6jolFY8cvUNtmunSsW4xksG4LSlhsstYgWE11DwEe5qZuDwI2JDd183Zw7bx/lD2FN
-	srh9xOjCC/4eJjg9POQqQKU=
-X-Google-Smtp-Source: AGHT+IEy4a+fqtFSueZzVtc2SRzJuoPJNIUP7MY1bj0DO6uOAeEg/SwVA9O4cbddmsDMAe+fWeCj2g==
-X-Received: by 2002:a17:903:244a:b0:211:fcad:d6ea with SMTP id d9443c01a7336-21a83fcf7a9mr342201385ad.45.1736805530337;
-        Mon, 13 Jan 2025 13:58:50 -0800 (PST)
-Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21a9f22ecf2sm58329325ad.192.2025.01.13.13.58.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 Jan 2025 13:58:49 -0800 (PST)
-Date: Mon, 13 Jan 2025 13:58:47 -0800
-From: Joe Damato <jdamato@fastly.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
-	matttbe@kernel.org, martineau@kernel.org, geliang@kernel.org,
-	steffen.klassert@secunet.com, herbert@gondor.apana.org.au,
-	mptcp@lists.linux.dev
-Subject: Re: [PATCH net-next v2 1/2] net: remove init_dummy_netdev()
-Message-ID: <Z4WMl6PvgRFRQEMm@LQ3V64L9R2>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
-	netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
-	andrew+netdev@lunn.ch, horms@kernel.org, matttbe@kernel.org,
-	martineau@kernel.org, geliang@kernel.org,
-	steffen.klassert@secunet.com, herbert@gondor.apana.org.au,
-	mptcp@lists.linux.dev
-References: <20250113003456.3904110-1-kuba@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=fK5QDQdmCb4JrtwX/c/KgJJMcVXYiIUb8chgowkSV/l9sVWNJSeEZQL0e1XUUMIEb7Ia0s6HxOoMVJalRJ/AXCCfpayhWKVcwyeLNLt/Cy7KUHqCKCB0jWzJefDWrfLS0nEZSovmOipZrNmuokXxaVPnCxdZz5qrkvNf3t2glQw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=EpmPMcu4; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=KX8KB3eq+JWdbo9PbA8f3sh/r1iF4YYElJg7JWpJhS4=; b=EpmPMcu4S03j9PA/GW6a3mkDw/
+	UpNS5hsZwM45cIKoPqmAKviVh+hp907MZBPWpF0rVXJnWhDhwalLKgz+Go/Bx1RiRb1MVThsvEVc0
+	vAAyVlHvSckTNvdJQkMCkYfWRFdaXg4C18tmleWhwaif/ZSs4lcl/lYMquDfEEMSEmaw=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tXSSf-004EVS-NN; Mon, 13 Jan 2025 22:59:05 +0100
+Date: Mon, 13 Jan 2025 22:59:05 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Gerhard Engleder <gerhard@engleder-embedded.com>
+Cc: hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v2 4/5] tsnep: Select speed for loopback
+Message-ID: <65db2d1b-10aa-4bf6-8205-3ede6726d87b@lunn.ch>
+References: <20250110144828.4943-1-gerhard@engleder-embedded.com>
+ <20250110144828.4943-5-gerhard@engleder-embedded.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -95,34 +60,43 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250113003456.3904110-1-kuba@kernel.org>
+In-Reply-To: <20250110144828.4943-5-gerhard@engleder-embedded.com>
 
-On Sun, Jan 12, 2025 at 04:34:55PM -0800, Jakub Kicinski wrote:
-> init_dummy_netdev() can initialize statically declared or embedded
-> net_devices. Such netdevs did not come from alloc_netdev_mqs().
-> After recent work by Breno, there are the only two cases where
-> we have do that.
+On Fri, Jan 10, 2025 at 03:48:27PM +0100, Gerhard Engleder wrote:
+> Use 100 Mbps only if the PHY is configured to this speed. Otherwise use
+> always the maximum speed of 1000 Mbps.
 > 
-> Switch those cases to alloc_netdev_mqs() and delete init_dummy_netdev().
-> Dealing with static netdevs is not worth the maintenance burden.
+> Signed-off-by: Gerhard Engleder <gerhard@engleder-embedded.com>
+> ---
+>  drivers/net/ethernet/engleder/tsnep_main.c | 13 ++++++++++++-
+>  1 file changed, 12 insertions(+), 1 deletion(-)
 > 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
-> v2: change of plan, delete init_dummy_netdev() completely
-> v1: https://lore.kernel.org/20250111065955.3698801-1-kuba@kernel.org
-> ---
-> CC: matttbe@kernel.org
-> CC: martineau@kernel.org
-> CC: geliang@kernel.org
-> CC: steffen.klassert@secunet.com
-> CC: herbert@gondor.apana.org.au
-> CC: mptcp@lists.linux.dev
-> ---
->  include/linux/netdevice.h |  1 -
->  net/core/dev.c            | 22 ----------------------
->  net/mptcp/protocol.c      |  8 +++++---
->  net/xfrm/xfrm_input.c     |  9 ++++++---
->  4 files changed, 11 insertions(+), 29 deletions(-)
+> diff --git a/drivers/net/ethernet/engleder/tsnep_main.c b/drivers/net/ethernet/engleder/tsnep_main.c
+> index 5c501e4f9e3e..45b9f5780902 100644
+> --- a/drivers/net/ethernet/engleder/tsnep_main.c
+> +++ b/drivers/net/ethernet/engleder/tsnep_main.c
+> @@ -229,8 +229,19 @@ static void tsnep_phy_link_status_change(struct net_device *netdev)
+>  static int tsnep_phy_loopback(struct tsnep_adapter *adapter, bool enable)
+>  {
+>  	int retval;
+> +	int speed;
+>  
+> -	retval = phy_loopback(adapter->phydev, enable, 0);
+> +	if (enable) {
+> +		if (adapter->phydev->autoneg == AUTONEG_DISABLE &&
+> +		    adapter->phydev->speed == SPEED_100)
+> +			speed = SPEED_100;
+> +		else
+> +			speed = SPEED_1000;
+> +	} else {
+> +		speed = 0;
+> +	}
+> +
+> +	retval = phy_loopback(adapter->phydev, enable, speed);
 
-Reviewed-by: Joe Damato <jdamato@fastly.com>
+If phy_loopback() returns -EOPNOTSUPP, don't you want to retry without
+a speed? There is no guarantee the PHY paired with this MAC does
+support setting the loopback speed.
+
+	Andrew
 
