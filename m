@@ -1,63 +1,89 @@
-Return-Path: <netdev+bounces-157659-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157658-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0FE8A0B288
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 10:17:06 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 684BFA0B281
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 10:16:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 744653A12FF
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 09:17:00 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C426F7A1C01
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 09:16:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBE93237A3D;
-	Mon, 13 Jan 2025 09:17:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D661F239790;
+	Mon, 13 Jan 2025 09:16:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="UEi1T877"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e2P/67+P"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 379FF188906;
-	Mon, 13 Jan 2025 09:17:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26B4423875A;
+	Mon, 13 Jan 2025 09:15:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736759822; cv=none; b=Mgr5eYItueceDUqgdMfDmPuO72JQ2JJZpHlBHMz1w6vy+jHhFILSkFO/6CfmrXQqmTCT/B+7TlR51xnnodQWHANoi57knkuK4JiUPEsXyqITVu9R+Z3C6ML7roOHmr1HeA/yq2eqB+C3trGb1VnB4JdwJ52ZoHutGSso5bcOmdg=
+	t=1736759761; cv=none; b=bszUnBpE94F6lU8rc+P5q2RkJFBbr8TIGGCn6gLvrcTXxVQ3QN0rQWoscqmo6x0wKet71AAh+KB4YQcIBoaEheQOWLOtBTXIydUDoAA5AiE0IJdofIoBIDwvgi9qYuLZzgExGIYb1iRYpKNXYqqiWFvogfJbRtA8LbgGaN4pY6M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736759822; c=relaxed/simple;
-	bh=7UnmyNdVe+32W2vUPO1zCBjs8r1y7uMlO2y0GncJoaM=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:To:CC; b=jKDeAAimS1D6ouwjPDbrh8Lt9dNeDj4wtK9WS9irrVFJfxAlLRg4bunFRqBJLJd74PHv9ZeREw6Vct7RmJipBL6Ek+H+gcWiUZPAkumKcFSE+PMH5l6+sX+hap+91COVBcbHKpp/qS8G0tn4JuUA6vXMutP1mvCODflqW1MmT2w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=UEi1T877; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50D2IePB022963;
-	Mon, 13 Jan 2025 09:16:51 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=qcppdkim1; bh=3uxgE4idQR38GT/Gb14Ckn
-	TFHWfCRtOUTFCc7UH8QKE=; b=UEi1T877f2Z18gLc0A+J2zUyAxxVjAfElutp1j
-	9p/q9aBJMPPeioYwhzwURVWNsXkVq2bSoM0BYwGOpE+AKSiDkS96gGc09PHQ3nrN
-	7i/h+RDOzaoAMkOLxEPTQNF+HDNE8BpsRnHxuB/DGb39sKlR9oWzG9CbKQPLkWIB
-	N39ZWLxz+aShsgFWDrWtLOhb3fNwbe+Pil/ErtPhbsFkWQT3aBqsfkYXnk6bUv/M
-	+euarL2FQcfOVv3aUjTaUu2cuJ1kU7g/eAdawxl1rzK28luybtcxbJfo2xnt9ytU
-	wx1Cu97R+n7Efr7y9QBHWYRXWDS35QoPx05lzOqebsFBFn4w==
-Received: from nalasppmta05.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 444swy8v24-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 13 Jan 2025 09:16:51 +0000 (GMT)
-Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
-	by NALASPPMTA05.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 50D9GoWa003237
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 13 Jan 2025 09:16:50 GMT
-Received: from yijiyang-gv.ap.qualcomm.com (10.80.80.8) by
- nalasex01c.na.qualcomm.com (10.47.97.35) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.9; Mon, 13 Jan 2025 01:16:46 -0800
-From: Yijie Yang <quic_yijiyang@quicinc.com>
-Date: Mon, 13 Jan 2025 17:15:39 +0800
-Subject: [PATCH v3] dt-bindings: net: qcom,ethqos: Correct fallback
- compatible for qcom,qcs615-ethqos
+	s=arc-20240116; t=1736759761; c=relaxed/simple;
+	bh=2upNpvYvkCawsHSbcv9E7oJy4xTvN7h6IJpVbivirN0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=SprTqexOAkKfetMkhFGxTF2NvpHR7q+qLoOJr9aOekPiaIBR8Yy0bHAiLvmW8eEtM4z9fXf5nWbzm7Qq89hErgTLZaTOqwY0gM0vJndSYwtxAX4gMcxWGz71CUFWNMV4T+ea/w20c3V9/yYKol6UnmhD48QwvHxCx+VxzVNFWaM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=e2P/67+P; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-4361f664af5so46301875e9.1;
+        Mon, 13 Jan 2025 01:15:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1736759758; x=1737364558; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=s2ygkQJ95X1g7NdQpmB1nFBFWpKiLZIqDirXmvA8hQQ=;
+        b=e2P/67+PV6JiHLtVTH8ZZPJQTThYaVXYK9S/TEtsV54RnmRyZTDfbZiJxLQpMA4Tko
+         1k/DHFUPrRa8otU5UtQ90q6TAsDAFkxmLSG0KI5AXkGJBaYQWBbbNzRv8DRU9IUsREHh
+         ssQm24ReB2JtdSyia8/fA6eyr6j4EbpbPFUbP4sVj+dFjVGwKmcDRp5bQRTdJBZMOMNO
+         /PrcerwQmEgDN/V51P/i2lPtwIIDbYIJ6wsP4ECsXchxNW3FixbuXaISXDjGb6mGK6uC
+         GO34pS3NoXPQsurW5dVruQgjysW90XMaLpNiEOs1b3ZGwVxf8Lc0aqRW/PdIHRbCSmBM
+         GrgA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736759758; x=1737364558;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=s2ygkQJ95X1g7NdQpmB1nFBFWpKiLZIqDirXmvA8hQQ=;
+        b=EDqlAGbF964miv4bIpjlJrS8i2X3n+/lT2CocWPYcrWeos/1gvvUFg0viouzgt2qcH
+         bFN9ZJSbXVZ4xUniWpWi1xzs+QNYd+bD/lHzEvxmLWCw58wNJ9t+H4TV/gzuOfNmGvw7
+         2oO58ornGrM+/qHPLB1FWQ6Y6XWa8K4bx7y2xlgWDd7cr0b7egiyveSWO4TKfNE1kIWa
+         XZrss8WjnO9odtaBxwVP4Brme8hfe7oMIWfKfi+kktpfQY5tfxyCHCAMXUfGkKpafY88
+         +aK1cjCHUXyyC9q/UOgEvAaTW9OSlB9Jqr5/1Gbu+tCRTyjvW1ywYMmvOFeaff1fenRC
+         r9Yw==
+X-Forwarded-Encrypted: i=1; AJvYcCWX19R1+jBbk+jWdyhGOcTkhG6ymFEn9Us/KpSuRY/MPDcatSM1KerrOKn6XOTa3vJpe5ALENBM@vger.kernel.org, AJvYcCX014s1BCrfStjXnnMSsah69MdKbg8qgVt6RTI4TPl6wXL94ZY6y/n7YfiqbF1debyslBtxYJZi1hRIBNU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwsrvGCYDRY3t/fUX3ZJ+aEZ/1mH65r000oAqQPHK3eenZuUhL+
+	lyCgMLhcw+OvfnYqUF6pN5xl3xQnOM0jACoQ3YZvaOKL5xTduI0B
+X-Gm-Gg: ASbGncv2mAsLsVFhfgaLJhx/2gc2bA5G9kuvVmhkpDnGQUSqpvI0XPsqOCJTjEYk/tu
+	nwlFYEHCM6lusv5rIwYp8Y6gIKHQbLPQ7mjJEU6fc+N2zxJoP1Mp3eTphDlpEVVDIyo8W7Nb0wS
+	ed7CMHIKSyPQcKPGyLxXOdxIWU1+LWvKIPaJcwJVakU9LbPq6SyImWBPzMHY/kEFaHG/+s9WWM5
+	O2Yx042gPTNlbtTc57dfdyT8aojCrlMhRzj1Fb7tKk+Lzcgm4QbNMJaog==
+X-Google-Smtp-Source: AGHT+IF0tIfGxR4xSSK7aYKVgCXjjGxJs/CrL7Ts/43gR4yqeZ8CBQo7W+fSBsIeceUleYBPCxNjhA==
+X-Received: by 2002:a05:6000:4714:b0:386:3752:b28c with SMTP id ffacd0b85a97d-38a8732bb23mr16193342f8f.41.1736759758185;
+        Mon, 13 Jan 2025 01:15:58 -0800 (PST)
+Received: from localhost ([194.120.133.72])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-436e9e03f8bsm135849445e9.23.2025.01.13.01.15.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 13 Jan 2025 01:15:57 -0800 (PST)
+From: Colin Ian King <colin.i.king@gmail.com>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org
+Cc: kernel-janitors@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH][next] net: phy: dp83822: Fix typo "outout" -> "output"
+Date: Mon, 13 Jan 2025 09:15:55 +0000
+Message-ID: <20250113091555.23594-1-colin.i.king@gmail.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,103 +91,29 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-ID: <20250113-schema_qcs615-v3-1-d5bbf0ee8cb7@quicinc.com>
-X-B4-Tracking: v=1; b=H4sIALvZhGcC/1WPzU7EMAyEX6XKGSPHTYHuifdACCWuS31oupuUa
- tFq351ky484ju1vZnwxWZJKNofmYpJsmnWJRbR3jeHJx3cBHYo2hNShtS1knmT2byfOD7aDMDy
- GdngiptGbwhyTjHq++b28Fh18FgjJR56qyw7Xw0nzuqTPW+5m63mNcBap/46ArQULYxiks734E
- fH59KGske95mU113+gPJHK/IAECIorv0Tl2/X/wuvdMUqZZ173s3rTsZ10PTZTzCj8vF+L6BR4
- bsL0oAQAA
-X-Change-ID: 20250113-schema_qcs615-bd7b3d82c2fa
-To: Vinod Koul <vkoul@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
-        "David
- S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        "Jakub
- Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-        Rob Herring
-	<robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley
-	<conor+dt@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio
-	<konradybcio@kernel.org>
-CC: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
-        <netdev@vger.kernel.org>, <linux-arm-msm@vger.kernel.org>,
-        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        Yijie Yang
-	<quic_yijiyang@quicinc.com>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1736759806; l=1888;
- i=quic_yijiyang@quicinc.com; s=20240408; h=from:subject:message-id;
- bh=7UnmyNdVe+32W2vUPO1zCBjs8r1y7uMlO2y0GncJoaM=;
- b=B3nb3Mn3UmXhfXYL+TDx8mkmaKJCeumdmMZ/TR2FBQpLC3jAyvZSknTWiOUU/gfeViW5H5vBQ
- dqmCc/n4R6zB67B6vn7vH3IjKphJbaQJKRDTFB4WwVYtMQrgPJQFXed
-X-Developer-Key: i=quic_yijiyang@quicinc.com; a=ed25519;
- pk=XvMv0rxjrXLYFdBXoFjTdOdAwDT5SPbQ5uAKGESDihk=
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01c.na.qualcomm.com (10.47.97.35)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: WSQ9bUlJ1OFMUT1n9Dnrj5DIwUKwR77t
-X-Proofpoint-ORIG-GUID: WSQ9bUlJ1OFMUT1n9Dnrj5DIwUKwR77t
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 spamscore=0
- clxscore=1015 mlxscore=0 bulkscore=0 mlxlogscore=999 impostorscore=0
- phishscore=0 priorityscore=1501 lowpriorityscore=0 adultscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2411120000 definitions=main-2501130078
+Content-Transfer-Encoding: 8bit
 
-The qcs615-ride utilizes the same EMAC as the qcs404, rather than the
-sm8150.
-The current fallback could lead to package loss, and the ethernet on
-qcs615-ride was not utilized by anyone. Therefore, it needs to be revised,
-and there is no need to worry about the ABI impact.
+There is a typo in a phydev_err message. Fix it.
 
-Fixes: 32535b9410b8 ("dt-bindings: net: qcom,ethqos: add description for qcs615")
-Signed-off-by: Yijie Yang <quic_yijiyang@quicinc.com>
+Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
 ---
-Changes in v3:
-- Fallback the Ethernet compatible of qcs615 to that of qcs404.
-- Remove unnecessary patches.
-- Enrich the commit description to clarify the ABI impact.
-- Update the base commit to next-20250113.
-- Link to v2: https://lore.kernel.org/r/20241224-schema-v2-0-000ea9044c49@quicinc.com
----
- Documentation/devicetree/bindings/net/qcom,ethqos.yaml | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ drivers/net/phy/dp83822.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/Documentation/devicetree/bindings/net/qcom,ethqos.yaml b/Documentation/devicetree/bindings/net/qcom,ethqos.yaml
-index f117471fb06fb3b507df811d55d41d0b610ac15f..e7ee0d9efed8330f5cf62e6c0ea41066572415aa 100644
---- a/Documentation/devicetree/bindings/net/qcom,ethqos.yaml
-+++ b/Documentation/devicetree/bindings/net/qcom,ethqos.yaml
-@@ -22,12 +22,12 @@ properties:
-     oneOf:
-       - items:
-           - enum:
--              - qcom,qcs8300-ethqos
--          - const: qcom,sa8775p-ethqos
-+              - qcom,qcs615-ethqos
-+          - const: qcom,qcs404-ethqos
-       - items:
-           - enum:
--              - qcom,qcs615-ethqos
--          - const: qcom,sm8150-ethqos
-+              - qcom,qcs8300-ethqos
-+          - const: qcom,sa8775p-ethqos
-       - enum:
-           - qcom,qcs404-ethqos
-           - qcom,sa8775p-ethqos
-
----
-base-commit: 12d614e5293b74345f6d0ed93620f8f10ce0f8b9
-change-id: 20250113-schema_qcs615-bd7b3d82c2fa
-
-Best regards,
+diff --git a/drivers/net/phy/dp83822.c b/drivers/net/phy/dp83822.c
+index 4262bc31503b..f89e742281d1 100644
+--- a/drivers/net/phy/dp83822.c
++++ b/drivers/net/phy/dp83822.c
+@@ -762,7 +762,7 @@ static int dp83822_of_init_leds(struct phy_device *phydev)
+ 
+ 	if (dp83822->led_pin_enable[DP83822_LED_INDEX_COL_GPIO2] &&
+ 	    dp83822->set_gpio2_clk_out) {
+-		phydev_err(phydev, "COL(GPIO2) cannot be used as LED outout, already used as clock output\n");
++		phydev_err(phydev, "COL(GPIO2) cannot be used as LED output, already used as clock output\n");
+ 		return -EINVAL;
+ 	}
+ 
 -- 
-Yijie Yang <quic_yijiyang@quicinc.com>
+2.47.1
 
 
