@@ -1,166 +1,143 @@
-Return-Path: <netdev+bounces-157569-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157571-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F20CA0AD68
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 03:32:55 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F48BA0AD74
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 03:37:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 87F2F162559
-	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 02:32:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 45B883A64BC
+	for <lists+netdev@lfdr.de>; Mon, 13 Jan 2025 02:37:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7231C433C8;
-	Mon, 13 Jan 2025 02:32:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EAA14D8D1;
+	Mon, 13 Jan 2025 02:37:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hz4M6JW7"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z0SyIWr5"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC67ACA6F
-	for <netdev@vger.kernel.org>; Mon, 13 Jan 2025 02:32:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B16D443AA8;
+	Mon, 13 Jan 2025 02:37:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736735570; cv=none; b=mho1+1ojcd/sOM4MzwJzlQj5VYYJqqO4hFl+eveoTSPrCvUnN4zmzRKLnh++xLKE4djkFT74NMoMtAYzPE+nswYvTMSTqkuOYGi+lbl8o2L2s0ekh87WxkVhEOfXonXQ5HlGV+CeEkMz8O+s256VYdL+crQFAYkp4XDPTBuKOGE=
+	t=1736735849; cv=none; b=hT7yOynpKNn4uis7wIHBF2mnygu71QdGQizTpmvwjH64Cr8CsTyWEqDqPTes6YyZgPcPpf2ncCyJJmG002eKOE4fDQiJPlsDmmUlCloRYzeNPerIRl9gHqY7UWLYUHKZWFgq7ei+y0+cUOeosGfKRRkISY0fgY9OwKrykhrrMaw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736735570; c=relaxed/simple;
-	bh=iJBXhSEUXil9nzcleAa3rLf5fXsjKbI4577NtFmRmCw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=XyWRoZOvdh402S1KEK0lrhl2M4ltuiekes34ohxDRuxcXI5V2ogSmn0lQfnJGfsfPkiyq8Dq3hYAAqJDxOJEX61WEGFm6gdfDeTFgnh0u8GEYMipmRw0/BIlKyryirsDmbeGsr9F78EVrFI1sh643nLmLoKFe8DrWE3VB1VGbtM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hz4M6JW7; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1736735567;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Ogh4yUdSverGfA2nr1La7HZqI96ihmOqtA9BI3+NwGU=;
-	b=hz4M6JW7wa76o8tvgod+oT8vgtsnW13n5pgAabGXr90ARYwppmk+7ERsX7czVAQyMLvZtv
-	FeyLcaebcc7W77CFVIRgWQNj09G6KeRwYzGShEgjjJlvDX9lBKYuj0YN8JwySziG1HnBvQ
-	rmh9M3QUd3fxQfJgI8Db0DIN5QynUpg=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-70-ZKdVfpLkMsuNhid08lwAig-1; Sun, 12 Jan 2025 21:32:46 -0500
-X-MC-Unique: ZKdVfpLkMsuNhid08lwAig-1
-X-Mimecast-MFC-AGG-ID: ZKdVfpLkMsuNhid08lwAig
-Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-aa67fcbb549so482730366b.0
-        for <netdev@vger.kernel.org>; Sun, 12 Jan 2025 18:32:46 -0800 (PST)
+	s=arc-20240116; t=1736735849; c=relaxed/simple;
+	bh=UIxfsTwqEIBdcQvZJkRmJ4MdX3kwQJLrA5Opg+OvUZY=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=aXLJYc5wTo1HUM34NGFMSz/+kl+XYN63tXz5b6VeGRPk/GYtMs3/EMHefnAoQE7LA06B4mkDKe7VI0W0Ktj/1bnpFIbnvodFK8Wq1uUpZrm/2LvbAD/OePkA9BFRQK+Ex/je84E4f9w5OQG3J1kCK4rgL55BfphLtiulBDYKzp4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Z0SyIWr5; arc=none smtp.client-ip=209.85.214.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-2163dc5155fso67771865ad.0;
+        Sun, 12 Jan 2025 18:37:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1736735847; x=1737340647; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=L/J8PrmwWc4g1mmb+aK/IpQZdIBa7MQhNVsZGDeANEQ=;
+        b=Z0SyIWr5Duz4SH8NU6CcMiEk3NCcaWMOB9TC6XoN8I1mXVdDYUtFzPHcF/bagbQzQ4
+         +Ws63BLERcY2rr7I2KFtvSSzbI5xzex9pVSEsnkk1tlRR+OMzQqmiqXE540MqIFifMlr
+         ENk1PRr8/lziE8xvanA6G0JB6JVyrUxNZWVCG9bk77zqOp8gAYz4qa9POGOgTAUjhbvh
+         NMgJWn2VjQX6NBCEZ8FCqc4dQktK4SBuxmeSFeQfrrS4kiW9ZcEijqpYwqV+YRQdYU78
+         R5EhUn+DQ6TVMPKxOP/uu3qW631NqCyyHoyDGH+LfLhP/B1ciUcJtu9ZXmTcleEf8BXR
+         j59w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736735564; x=1737340364;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Ogh4yUdSverGfA2nr1La7HZqI96ihmOqtA9BI3+NwGU=;
-        b=JuHt85j33/Ibmc+Z8mQnSV965kN5jmWnpxS4+5P1T89euzdqWbwtLkSxyAzpGimhwt
-         TeXmDGH3fR4hEOzEHRsa6xf+9/3CEhDQnxrisFdaI6PaGVK6bCWplp8an94sJohk1jbz
-         vnxgmzph3pvhHDTWOgiEOSCcbQgqs4hAyGbt2/lPN+r9OlQc1c/FN0pX6HFHsv/T/+R+
-         0ZZeYnnwtYATmjtvBzhDTt5ZTKr3y+ZNesOgc7POm9HYbmf7vsUdDyxVl/UV8borUqeP
-         l1dwF9FECSylhnx2CJ4jjG3cul8puPl5xodJCrrmex2zULErcQVW1Bevw2Ci3wKblhX6
-         EjeA==
-X-Forwarded-Encrypted: i=1; AJvYcCXJ6d6h9Mox5e5FqRdOTHbj7zVlNfNhmCKe578bB78Lj5wSSTYadGEC4qqG+IzSCgzRTldMHrc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx35kmr5WdrBWKFPFZ7ETGmOYrlCV7VWgRQl3knjxAdV3zjBe1T
-	egIOjIp2pCKnhAjz58jbIIi1doboGiNr2L0VET5wMnAtKTClMk8eG+Hlx6TekfXwFiy31uKxmSA
-	sQjP6j3XGhbaeIdsqH/wJBHlitv5mkGTKvbouklII3FYRnvsJsPYzio4yumfbHkhiZvSnRoluQr
-	FxebMkbyiSLAN9urkHU6SXNyzhn7WJHHQQdf6/
-X-Gm-Gg: ASbGnctl+neZTxw4WJSxS7dKEGsvdOMHxXQxmAZpUArkpDOZLt7DvmvKDWllSrO3o8r
-	O7ujFy4T8Ka18ftFu5Lxy1memJR+1eoIhTgboKEE=
-X-Received: by 2002:a17:907:7288:b0:aa6:73ae:b3b3 with SMTP id a640c23a62f3a-ab2ab5f6f1cmr1637286066b.32.1736735564389;
-        Sun, 12 Jan 2025 18:32:44 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFnuGt8CxE+gRSzYVi8MUlepoHGla7JG4/2R+e3nAiZqyvY650WJaTCzM5NsO1xJzfzWq/2khQ/lBupx9fZUEI=
-X-Received: by 2002:a17:907:7288:b0:aa6:73ae:b3b3 with SMTP id
- a640c23a62f3a-ab2ab5f6f1cmr1637285266b.32.1736735564092; Sun, 12 Jan 2025
- 18:32:44 -0800 (PST)
+        d=1e100.net; s=20230601; t=1736735847; x=1737340647;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=L/J8PrmwWc4g1mmb+aK/IpQZdIBa7MQhNVsZGDeANEQ=;
+        b=sima3urFlvk/a67h0W0GwChxgkA05FCZUk1xKTL4Ymg5x3BDP38u33CxNMpIKJahze
+         XBI1koy+5Fs4ppz/9QmsuY9FeRnx8m1TGY8frxxWIFqqq2I6zTDiDqqcKNSp8INEtZMP
+         gbyd+cQrh0vG7GEtXMbVRUH87AdU399uJENYXK6bVeRfcoVzBj++phljVs+7uEpyMJmO
+         ramssR61xCVq55tQ767VPaf5r6iGVTu4eh7b/dafE6cNtSUhmuBX4xYhoyVfWuREhc9d
+         hyHfSoOp/xY8yEjcpDtBv/yau7AYZP/62aE6a5G/Jo49rsxnliNN/2ExZ5sm8q6ZUfiY
+         P88A==
+X-Forwarded-Encrypted: i=1; AJvYcCWYn4ok6V9ofrjKTeOIX1GSMPZ85RJ/jpeO+TqOqKGGhC75XIx1EZtpjHtwAEZwjPyUxHKwNgs2@vger.kernel.org, AJvYcCXEFq23Wy8t0sOb+gQ1fsxe+uVxLnCNCnqB/0oalgcyDxxMG+k0UYReoOodQKeojpT/nKHXxxpMdbQYhD0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzT8CLVFoA00WdkKMQFjBJT3VdXK+vDpDDE54R6692tdcHN6AkP
+	odVAtXsuEhDUlEw8/4k5mJ4JnI/jtxl/o6xhNpmWiUoGf9CGhspy
+X-Gm-Gg: ASbGncs7i4MUjdFRHHXK0mGuA1lLuje8hKms+1eg4wf+wPnBdSsimbdQu9GKUFWFdJn
+	OPmVYlpHCifoijIb+mVOQdKxRzxyC6OfNkc+Uxrqjyrng4ThIY/HHafhQhCb0CRzKvQ/8OD6OXm
+	y1NFdLugFFhxxhofuZiD8rUMpXPmHb601acQ4USpF2cEE+Y6yN2g2FHdX1zabkfHupnlZ2Rpc1r
+	Hc5pCrNvI6Pbkvi8NUpVa3i+Q8GH4yVIqrwL+fpr8mGvCznh4/5rM1WfmKVeN/gZB5KeRHkEdwG
+	H6D94SA54iq60RGH+XWDAR/PU9+SZ1pZiw==
+X-Google-Smtp-Source: AGHT+IHlQz0mBc3CaxiLiwZpvKmkXsqTAr5MAfY8mkqHMCMWaZlILVtddhKOciiElVdCyFISb1811A==
+X-Received: by 2002:a17:902:f545:b0:216:4499:b836 with SMTP id d9443c01a7336-21a83f70dd1mr171648975ad.26.1736735846929;
+        Sun, 12 Jan 2025 18:37:26 -0800 (PST)
+Received: from localhost.localdomain (61-220-246-151.hinet-ip.hinet.net. [61.220.246.151])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21a9f22d2dasm44639045ad.172.2025.01.12.18.37.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 12 Jan 2025 18:37:26 -0800 (PST)
+From: Potin Lai <potin.lai.pt@gmail.com>
+Subject: [PATCH v3 0/2] net/ncsi: fix oem gma command handling and state
+ race issue
+Date: Mon, 13 Jan 2025 10:34:46 +0800
+Message-Id: <20250113-fix-ncsi-mac-v3-0-564c8277eb1d@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241230124445.1850997-1-lulu@redhat.com> <20250108072229-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20250108072229-mutt-send-email-mst@kernel.org>
-From: Cindy Lu <lulu@redhat.com>
-Date: Mon, 13 Jan 2025 10:32:07 +0800
-X-Gm-Features: AbW1kvZSxc6vxEyyMbRsiKZHQLXzHErZjYxUy89i7uHx6o2XOjUFvAUYnAHvGsE
-Message-ID: <CACLfguUjnJxvv2iuu2ASX7ZKiWbk48wWQTAVoOfZegLXJij=9w@mail.gmail.com>
-Subject: Re: [PATCH v5 0/6] vhost: Add support of kthread API
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: jasowang@redhat.com, michael.christie@oracle.com, sgarzare@redhat.com, 
-	linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAMZ7hGcC/3WMQQrCMBBFr1Jm7UgmqVBceQ/pIqaTdsCkkpSgl
+ Nzd2L3L9z/v7ZA5CWe4djskLpJljQ3MqQO32DgzytQYtNIXRUTo5Y3RZcFgHRL3DzP53pAnaMo
+ rcfuP3H1svEje1vQ56kX/1j+holHhYAZWlqw2xt7mYOV5dmuAsdb6BYwsO2KoAAAA
+To: Samuel Mendoza-Jonas <sam@mendozajonas.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, Ivan Mikhaylov <fr0st61te@gmail.com>, 
+ Paul Fertser <fercerpav@gmail.com>, Patrick Williams <patrick@stwcx.xyz>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Cosmo Chou <cosmo.chou@quantatw.com>, Potin Lai <potin.lai@quantatw.com>, 
+ Potin Lai <potin.lai.pt@gmail.com>, stable@vger.kernel.org, 
+ Cosmo Chou <chou.cosmo@gmail.com>
+X-Mailer: b4 0.12.3
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1736735843; l=1174;
+ i=potin.lai.pt@gmail.com; s=20240724; h=from:subject:message-id;
+ bh=UIxfsTwqEIBdcQvZJkRmJ4MdX3kwQJLrA5Opg+OvUZY=;
+ b=IRl33z4FT55EDEYU0VPK06IXcDng0gkeBMajy9YeN1eX5bvZcXGuE1dCtrom2rlVluZneT3KH
+ cmT1KBuAgn5A5KCysGsSFARoocZjZ+M2FrI3v3M0ARnGxtpoYl5Ta6J
+X-Developer-Key: i=potin.lai.pt@gmail.com; a=ed25519;
+ pk=6Z4H4V4fJwLteH/WzIXSsx6TkuY5FOcBBP+4OflJ5gM=
 
-On Wed, Jan 8, 2025 at 8:23=E2=80=AFPM Michael S. Tsirkin <mst@redhat.com> =
-wrote:
->
-> On Mon, Dec 30, 2024 at 08:43:47PM +0800, Cindy Lu wrote:
-> > In commit 6e890c5d5021 ("vhost: use vhost_tasks for worker threads"),
-> > the vhost now uses vhost_task and operates as a child of the
-> > owner thread. This aligns with containerization principles.
-> > However, this change has caused confusion for some legacy
-> > userspace applications. Therefore, we are reintroducing
-> > support for the kthread API.
->
->
-> I briefly applied this, but there seem to be a bit too
-> many nits. So I will wait for v6 with everything addressed.
->
-> Thanks!
->
-sure, I will rebase this to the latest kernel, Thanks
-Thanks
-Cindy
-> > In this series, a new UAPI is implemented to allow
-> > userspace applications to configure their thread mode.
-> >
-> > Changelog v2:
-> >  1. Change the module_param's name to enforce_inherit_owner, and the de=
-fault value is true.
-> >  2. Change the UAPI's name to VHOST_SET_INHERIT_FROM_OWNER.
-> >
-> > Changelog v3:
-> >  1. Change the module_param's name to inherit_owner_default, and the de=
-fault value is true.
-> >  2. Add a structure for task function; the worker will select a differe=
-nt mode based on the value inherit_owner.
-> >  3. device will have their own inherit_owner in struct vhost_dev
-> >  4. Address other comments
-> >
-> > Changelog v4:
-> >  1. remove the module_param, only keep the UAPI
-> >  2. remove the structure for task function; change to use the function =
-pointer in vhost_worker
-> >  3. fix the issue in vhost_worker_create and vhost_dev_ioctl
-> >  4. Address other comments
-> >
-> > Changelog v5:
-> >  1. Change wakeup and stop function pointers in struct vhost_worker to =
-void.
-> >  2. merging patches 4, 5, 6 in a single patch
-> >  3. Fix spelling issues and address other comments.
-> >
-> > Tested with QEMU with kthread mode/task mode/kthread+task mode
-> >
-> > Cindy Lu (6):
-> >   vhost: Add a new parameter in vhost_dev to allow user select kthread
-> >   vhost: Add the vhost_worker to support kthread
-> >   vhost: Add the cgroup related function
-> >   vhost: Add worker related functions to support kthread
-> >   vhost: Add new UAPI to support change to task mode
-> >   vhost_scsi: Add check for inherit_owner status
-> >
-> >  drivers/vhost/scsi.c       |   8 ++
-> >  drivers/vhost/vhost.c      | 178 +++++++++++++++++++++++++++++++++----
-> >  drivers/vhost/vhost.h      |   4 +
-> >  include/uapi/linux/vhost.h |  19 ++++
-> >  4 files changed, 192 insertions(+), 17 deletions(-)
-> >
-> > --
-> > 2.45.0
->
+We are seeing kernel panic when enabling two NCSI interfaces at same
+time. It looks like mutex lock is being used in softirq caused the
+issue.
+
+This patch series try to fix oem gma command handling issue by adding a
+new state, also fix a potential state handling issue. 
+
+Signed-off-by: Potin Lai <potin.lai.pt@gmail.com>
+---
+Changes in v3:
+- Fix compile error by removing non-exist variable.
+- Link to v2: https://lore.kernel.org/r/20250111-fix-ncsi-mac-v2-0-838e0a1a233a@gmail.com
+
+Changes in v2:
+- Add second patch for fixing state handling issue.
+- Link to v1: https://lore.kernel.org/all/20250109145054.30925-1-fercerpav@gmail.com/
+
+---
+Cosmo Chou (1):
+      net/ncsi: fix state race during channel probe completion
+
+Paul Fertser (1):
+      net/ncsi: fix locking in Get MAC Address handling
+
+ net/ncsi/internal.h    |  2 ++
+ net/ncsi/ncsi-manage.c | 21 ++++++++++++++++++---
+ net/ncsi/ncsi-rsp.c    | 19 ++++++-------------
+ 3 files changed, 26 insertions(+), 16 deletions(-)
+---
+base-commit: fc033cf25e612e840e545f8d5ad2edd6ba613ed5
+change-id: 20250111-fix-ncsi-mac-1e4b3df431f1
+
+Best regards,
+-- 
+Potin Lai <potin.lai.pt@gmail.com>
 
 
