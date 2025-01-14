@@ -1,205 +1,136 @@
-Return-Path: <netdev+bounces-157940-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157941-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 32A3FA0FE4F
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 02:52:29 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C7783A0FE54
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 02:56:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3FA591698CE
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 01:52:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AF5191888D94
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 01:56:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB96A224B1A;
-	Tue, 14 Jan 2025 01:52:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07B6D22FE02;
+	Tue, 14 Jan 2025 01:56:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="YgQLqRFB"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H1GWAZIM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FC241EB2E;
-	Tue, 14 Jan 2025 01:52:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 441991C54A7;
+	Tue, 14 Jan 2025 01:56:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736819543; cv=none; b=CKhHIAFWt8J9x6KgZ+lxrnye7YCCCtMYkS+WGvJz9OlxHyUmF1nWHPHzlraw/weU8rMwo39hh8Usu/S7t4/ihHwMFzF6HDiicbxeLOD9yN7tsSZWHEGdlxcjdvYUnH0wujcmwOYo2MsYKji57fJxpu+1CKUSNIQsM789nd8Z9oA=
+	t=1736819787; cv=none; b=kPgPat3+BL3PyCj2P57GjiwIMh0+05MEpX0H0FC8yNdCdv083lHhFLH0H9UonkfgKSwF5WWAIUihA1cWvJv5XCaaYfq5xcN/R1tFAFSA1QDZonzQao+3gS7GvVeP9CqTHNIloBN8+W80GQEdus6peElDUhkRlX04LOpFf0vuqhw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736819543; c=relaxed/simple;
-	bh=3CCevYT+/bbbRH5gglOO94RRhrdLIoEsNiEuUDoFDAU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=R07i+zL5idq22VAHSNpyp6+w6Y4ZXIMCL6YyKZclBuFBNzpfJQmhBSLjUZS0HedppWigyuehJk7dNcUscs7Vzq0YcuvWBpE+mmzuSnVmATXDl4hhCJs+jKaBOtwqbpcpH1P341Eebmr9hWEM3UB0X26EeBmhmiz13vifYfWKjmA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=YgQLqRFB; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50DErXaX021602;
-	Tue, 14 Jan 2025 01:52:03 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	jpVAiiC29GD6GRICsgtfevCjVsE+CyffzHyHWhR0W2E=; b=YgQLqRFBKBU/UvMR
-	HvFLlqkfO8mSF+2Vj73niBQAo3BqnVEsSIsOFdFNgL9mYHC8yZhp6q+zjyvYV3xs
-	fvn50iJOmg7nd8OZR94if+ESUwoh0qFzQ3M/DyXeCtDmf7ijz9FJYIIviNcPP97H
-	B1+3XT4cJVtMVFI3VHqpefIr9iV6KmWc/+LxAvR1wSuDXKkrytaKBjrOI+d13/VZ
-	xmJ4yWuJm/EYXzEKBjHeakpbY8GJCWCGPv5ixlhzkGKOwnIqtB/wMnlGSlo71LaW
-	I7gGAmLwc3E9+h9w9mR+thv7WuC/tRmjQfjHT/UbZ1gPmJy5Gu9/bTlBZCaewQi9
-	9gaHyA==
-Received: from nalasppmta01.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 44550ahcv2-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 14 Jan 2025 01:52:02 +0000 (GMT)
-Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
-	by NALASPPMTA01.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 50E1q1lx005840
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 14 Jan 2025 01:52:01 GMT
-Received: from [10.253.75.207] (10.80.80.8) by nalasex01c.na.qualcomm.com
- (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Mon, 13 Jan
- 2025 17:51:46 -0800
-Message-ID: <482e62d3-d1c6-460d-8371-9c46f0ff09bf@quicinc.com>
-Date: Tue, 14 Jan 2025 09:51:40 +0800
+	s=arc-20240116; t=1736819787; c=relaxed/simple;
+	bh=3M3MZYN7Sj4EH0969yosQdu1K2pz/j995ISyaaDQTys=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=teQQ/I6ZyCwJ9jT1RntkKEUnBTKhrMOkp5Xib0yZyzy5SNun6xh2UxH1gLSMF6qN3Fq7bOug37NY/C+2LsLuu3WGuOO3KBp71an3TgxBlzWdRV65SStvvMmDB+uBXW39j4HPZGhenjtG4zF0LJcZszkBIcQLAWjpLGwB0KSNxno=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=H1GWAZIM; arc=none smtp.client-ip=209.85.218.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-aaee2c5ee6eso877676966b.1;
+        Mon, 13 Jan 2025 17:56:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1736819784; x=1737424584; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3M3MZYN7Sj4EH0969yosQdu1K2pz/j995ISyaaDQTys=;
+        b=H1GWAZIM8ApVN7+RZRKxShcBionWOnK14hSw9DkIezviT/aJybZBkjpZjVa7yX7t9h
+         tcwkca+G/5CH9Nko343kOELNXghxeP29Urvy+NUsXww7GcV5k2xB1oKCI4XXjQPBE7Km
+         TN96xTKnZN4WRWhJDkGCQk6HIOQ7rOfSqsg3aSpQLgaBLkG+ZidJObGchU/KpgMlY89o
+         Q6s5v4tFUYilX4dzZCgS6XGbMjmmMZlp318kdrPDsmWoHBLv7/yR5wpC9yKPlk/kYJbm
+         jC9AnA3EAgD9N05/kaEglktNAhrMMaOP2A20e5/9g/gTwKHxbH6ouPT/3KU/fjt1pl9B
+         f/9w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736819784; x=1737424584;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=3M3MZYN7Sj4EH0969yosQdu1K2pz/j995ISyaaDQTys=;
+        b=TtFHAJNwlVD6QowI9Yu0z9l6fTtrQWsxPrOzYbUNWwBqGWvBEquWICjY95zAIzjB0l
+         eKIBvdqqWK4CGJlwGSeHqDoMe6fDYAmH9XdHFaLe/gIr4wnvSW4r7hfyaZopE12x0a1G
+         AzSv1KKiop2nRYVPgq2VQWSQStU6gUQUTGeX4DB66AwsDNxGk01hYLl53GGF39lbdEth
+         htWv71pMeP/tYED9k2YxWW4ZlTvHxq582bmcwDzjxPMVpeJVgq4LM8aA5SnGS27xp+Jr
+         SiWfv9Hw5Ltl5GB834XAQ/fB9nXznBOIATwmvHX+ItH+gNJObjl+9IofY+mShpW8YErP
+         mExw==
+X-Forwarded-Encrypted: i=1; AJvYcCUU4nl4HQ7DSPR+JffGOhHmdI+xLeL2YFNJC7sVaiE+IAlaUTCeSg7MSPqa8mfE7eiauI7NORDj@vger.kernel.org, AJvYcCUdZLXCZjGmpaa4AmEbv7RV9n49Jio8QZoGduR9nPaK1alK3XuSV0P4E4Ql9gGUgpELpwYUdEsarMORyqY=@vger.kernel.org, AJvYcCX8p3zpifK9qhr79ousEU4oGvaoW9/oMEI8xgQre8NSWViC7KUZizR1JlLLWGejgnutPzasMjmz@vger.kernel.org
+X-Gm-Message-State: AOJu0YwSm943TvcJUpQXW60bogsPjYJORaodySGKqTonLhp1ptOsWFrM
+	GENKR39MdSzs+WYkt4m2jw8s8bktyub0q8oJ21myMtZ/fllGt7a3E5SrB6J5PHkyt//08Ui6S9+
+	mJTUBnpkmS+Q3bkuQaidqQPh2ILeEzAkh
+X-Gm-Gg: ASbGncs/xxA+yagx+LItuqzh43DS86ZeoPKP0Vmac5LsNP9+yFOtdrgQupiYOhFlwA2
+	59TmwN+Dfp3jD4jiVGAZ91JYJ9PERq02SDZ58pwU=
+X-Google-Smtp-Source: AGHT+IGFRcQRHulYo39QzcVokskq7ULXOs64DOSqsgLEBDN8VNb4jyHVDzfe2oaia4l5+ro0WhqdfMZda9BrZzKd94g=
+X-Received: by 2002:a17:907:9722:b0:aa6:89b9:e9c6 with SMTP id
+ a640c23a62f3a-ab2ab6bfa44mr2099934066b.21.1736819784335; Mon, 13 Jan 2025
+ 17:56:24 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/3] net: stmmac: qcom-ethqos: Enable RX programmable swap
- on qcs615
-To: Krzysztof Kozlowski <krzk@kernel.org>, Vinod Koul <vkoul@kernel.org>,
-        Andrew Lunn <andrew+netdev@lunn.ch>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo
- Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
-        Krzysztof Kozlowski
-	<krzk+dt@kernel.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Bjorn Andersson
-	<andersson@kernel.org>,
-        Konrad Dybcio <konradybcio@kernel.org>,
-        Alexandre
- Torgue <alexandre.torgue@foss.st.com>,
-        Jose Abreu <joabreu@synopsys.com>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>
-CC: <netdev@vger.kernel.org>, <linux-arm-msm@vger.kernel.org>,
-        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>
-References: <20241225-support_10m100m-v1-0-4b52ef48b488@quicinc.com>
- <20241225-support_10m100m-v1-2-4b52ef48b488@quicinc.com>
- <4b4ef1c1-a20b-4b65-ad37-b9aabe074ae1@kernel.org>
- <278de6e8-de8f-458a-a4b9-92b3eb81fa77@quicinc.com>
- <df1e2fbd-7fae-4910-9908-10fdb78e4299@kernel.org>
- <e2625cfd-128c-4b56-a1c5-c0256db5c486@quicinc.com>
- <0d2ebb1c-be69-45ca-8a66-4e4a8ca59513@kernel.org>
-Content-Language: en-US
-From: Yijie Yang <quic_yijiyang@quicinc.com>
-In-Reply-To: <0d2ebb1c-be69-45ca-8a66-4e4a8ca59513@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01c.na.qualcomm.com (10.47.97.35)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: baoGFiavzHlsv08ViAduGfEuLlVpWf_s
-X-Proofpoint-GUID: baoGFiavzHlsv08ViAduGfEuLlVpWf_s
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 priorityscore=1501
- suspectscore=0 mlxlogscore=999 adultscore=0 impostorscore=0 spamscore=0
- clxscore=1015 malwarescore=0 bulkscore=0 phishscore=0 lowpriorityscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2411120000
- definitions=main-2501140013
+References: <20250108192346.2646627-1-kuba@kernel.org> <20250109145054.30925-1-fercerpav@gmail.com>
+ <20250109083311.20f5f802@kernel.org> <TYSPR04MB7868EA6003981521C1B2FDAB8E1C2@TYSPR04MB7868.apcprd04.prod.outlook.com>
+ <20250110181841.61a5bb33@kernel.org> <CAGfYmwVECrisZMhWAddmnczcLqFfNZ2boNAD5=p2HHuOhLy75w@mail.gmail.com>
+ <20250113131934.5566be67@kernel.org>
+In-Reply-To: <20250113131934.5566be67@kernel.org>
+From: Potin Lai <potin.lai.pt@gmail.com>
+Date: Tue, 14 Jan 2025 09:56:13 +0800
+X-Gm-Features: AbW1kvZnUmbmr_6IRQgW51L1dj6t_nP3oXmByqhN6P48o_UCS6Kh-2_Tv9RPFzM
+Message-ID: <CAGfYmwXKyWrWm5z1Lra0_wX8iVfT8p9BHd3SWZPSvkZ1qfKqLA@mail.gmail.com>
+Subject: =?UTF-8?B?UmU6IOWbnuimhjogW0V4dGVybmFsXSBSZTogW1BBVENIXSBuZXQvbmNzaTogZml4IGxvYw==?=
+	=?UTF-8?B?a2luZyBpbiBHZXQgTUFDIEFkZHJlc3MgaGFuZGxpbmc=?=
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Paul Fertser <fercerpav@gmail.com>, =?UTF-8?B?UG90aW4gTGFpICjos7Tmn4/lu7cgKQ==?= <Potin.Lai@quantatw.com>, 
+	Samuel Mendoza-Jonas <sam@mendozajonas.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Ivan Mikhaylov <fr0st61te@gmail.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
+	"stable@vger.kernel.org" <stable@vger.kernel.org>, 
+	=?UTF-8?B?Q29zbW8gQ2hvdSAoIOWRqOalt+WfuSk=?= <Cosmo.Chou@quantatw.com>, 
+	"patrick@stwcx.xyz" <patrick@stwcx.xyz>, Cosmo Chou <chou.cosmo@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Tue, Jan 14, 2025 at 5:19=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> On Sat, 11 Jan 2025 19:12:51 +0800 Potin Lai wrote:
+> > > > Thanks for the new patch.
+> > > > I am currently tied up with other tasks, but I=E2=80=99ll make sure=
+ to test
+> > > > it as soon as possible and share the results with you.
+> > >
+> > > Understood, would you be able to test it by January 13th?
+> > > Depending on how long we need to wait we may be better off
+> > > applying the patch already or waiting with committing..
+> >
+> > Hi Jakub & Paul,
+> >
+> > I had a test yesterday, the patch is working and the kernel panic does
+> > not happen any more, but we notice sometimes the config_apply_mac
+> > state runs before the gma command is handled.
+> >
+> > Cosmo helped me to find a potential state handling issue, and I
+> > submitted the v2 version.
+> > Please kindly have a look at v2 version with the link below.
+> > v2: https://lore.kernel.org/all/20250111-fix-ncsi-mac-v2-0-838e0a1a233a=
+@gmail.com/
+>
+> Is there any reason why you reposted Paul's patch?
+> Patch 2 looks like a fix for a separate issue (but for the same
+> use case), am I wrong?
+Sorry, I thought the second patch needs to be followed by the first patch.
+Yes, these 2 patches are fixing different issues, I will remove Paul's
+patch in the next version (v3).
 
+>
+> Also one thing you have not done is to provide the Tested-by: tag
+> on Paul's patch :)
 
-On 2025-01-13 19:26, Krzysztof Kozlowski wrote:
-> On 08/01/2025 11:33, Yijie Yang wrote:
->>
->>
->> On 2024-12-27 15:03, Krzysztof Kozlowski wrote:
->>> On 26/12/2024 03:29, Yijie Yang wrote:
->>>>
->>>>
->>>> On 2024-12-25 19:37, Krzysztof Kozlowski wrote:
->>>>> On 25/12/2024 11:04, Yijie Yang wrote:
->>>>>
->>>>>>     static int qcom_ethqos_probe(struct platform_device *pdev)
->>>>>>     {
->>>>>> -	struct device_node *np = pdev->dev.of_node;
->>>>>> +	struct device_node *np = pdev->dev.of_node, *root;
->>>>>>     	const struct ethqos_emac_driver_data *data;
->>>>>>     	struct plat_stmmacenet_data *plat_dat;
->>>>>>     	struct stmmac_resources stmmac_res;
->>>>>> @@ -810,6 +805,15 @@ static int qcom_ethqos_probe(struct platform_device *pdev)
->>>>>>     	ret = of_get_phy_mode(np, &ethqos->phy_mode);
->>>>>>     	if (ret)
->>>>>>     		return dev_err_probe(dev, ret, "Failed to get phy mode\n");
->>>>>> +
->>>>>> +	root = of_find_node_by_path("/");
->>>>>> +	if (root && of_device_is_compatible(root, "qcom,sa8540p-ride"))
->>>>>
->>>>>
->>>>> Nope, your drivers are not supposed to poke root compatibles. Drop and
->>>>> fix your driver to behave correctly for all existing devices.
->>>>>
->>>>
->>>> Since this change introduces a new flag in the DTS, we must maintain ABI
->>>> compatibility with the kernel. The new flag is specific to the board, so
->>>
->>> It's not, I don't see it specific to the board in the bindings.
->>
->> I'm sorry for the confusion. This feature is not board-specific but
->> rather a tunable option. All RGMII boards can choose whether to enable
->> this bit in the DTS, so there are no restrictions in the binding.
-> 
-> If it is not specific to the board, I don't see why this cannot be
-> implied by compatible.
-> 
-
-Whether this bit should be enabled should be determined on a per-board 
-basis, but it should be available for all RGMII-type boards. It should 
-be left to the users to decide whether to enable this bit in the DTS 
-file, rather than controlling its existence in the binding file, 
-shouldn't it?
-
->>
->>>
->>>> I need to ensure root nodes are matched to allow older boards to
->>>> continue functioning as before. I'm happy to adopt that approach if
->>>> there are any more elegant solutions.
->>>
->>> I don't think you understood the problem. Why you are not handling this
->>> for my board, sa8775p-rideX and sa8225-pre-ride-yellow-shrimp?
->>>
->>
->> This feature is specifically for RGMII boards. The driver won't enable
-> 
-> So board specific?
-
-It is 'phy-mode' specific, to be more precise.
-
-> 
->> this bit if the DTS doesn't specify it. To handle compatibility, we need
-> 
-> Do not describe us how drivers and DTS work. We all know.
-
-Sure, I will take care of it.
-
-> 
->> to identify legacy RGMII boards with MAC versions greater or equal to 3
->> which require this bit to be enabled.
->> According to my knowledge, the SA8775P is of the SGMII type.
-> 
-> 
-> Best regards,
-> Krzysztof
-
--- 
-Best Regards,
-Yijie
-
+Tested-by: Potin Lai <potin.lai.pt@gmail.com>
 
