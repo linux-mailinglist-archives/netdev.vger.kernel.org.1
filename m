@@ -1,154 +1,139 @@
-Return-Path: <netdev+bounces-157958-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157959-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C0E6A0FF22
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 04:20:12 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A98FA0FF24
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 04:20:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 98FCA7A1388
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 03:20:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E73DC3A1645
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 03:20:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46FD7230D07;
-	Tue, 14 Jan 2025 03:20:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6E662309B9;
+	Tue, 14 Jan 2025 03:20:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j8kK5r+I"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hTDRf8Nb"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B1ED2309A4;
-	Tue, 14 Jan 2025 03:20:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E23B21E535;
+	Tue, 14 Jan 2025 03:20:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736824805; cv=none; b=h8i0skX7ZHfinytmBEuhXXG+81a+mpHdn6xBoavZJZexQoqXHu3wMMxZyM+jEMO6DYepb6/p2PNY4HiQtZdiBbhW76Hs2/k9xGy7VrGd9qB7lh05emoy+Oom7XelGVQKig4vPeFCM4K9GWvtsSwKTyOCa8gEqG4v5um+nxPt964=
+	t=1736824850; cv=none; b=GgTBx/9cT3KRwqZv0Y7iVgBsKJrEhJE9NxiuJhTAHNvu8YTmiOi4JKtCHvcK4ZYg95ucl4wRyiAmAd+6DZtAzUJeZySJLe7YtP3apS4aEgibntusSoocsSMXDwYmXsXghaa+QynApCUbGE0r0wvaV6B30UJQBOoz7mZCZPE2buQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736824805; c=relaxed/simple;
-	bh=QB8d+k+zAe20PnFNHeo6Jxr1OZ7yn2eqc1z/NBHfckI=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ubgcaf511ZjZuHTVgXHGEmlPTHV9N/2FuUsixRXAOQMUrOswsCNotOVUzxNNbt5qyQASsDRvJo44Wk2iI2++t9a34zUEt1rBetwSlK8Pht5sNQl9GVyZBQA+jm2NfPGbmA/wmq3bkdLky5rnS4iwdZdXwVu4AY3AWYNs1ldMw8Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j8kK5r+I; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C1E66C4CEE1;
-	Tue, 14 Jan 2025 03:20:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736824804;
-	bh=QB8d+k+zAe20PnFNHeo6Jxr1OZ7yn2eqc1z/NBHfckI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=j8kK5r+Ibx7RlfTRmW7X/evsF6cSiBVtxGvTCm8d1+5u/7pfIQ3lWmkd0jmYZjxGo
-	 YUZN1W8gCdMpj2FDf5AgZ+A6gYK8MOv7VLjU0gsBj0z6UVK8TMoc1gRz5jv4jqmci/
-	 D8ZcYLUT2OVFgibAvA4G53YmMxwH2GTQ6+1q2PSbbd6agobZvPZAYFqIwVgsg+nuPC
-	 +ph9aQkJ+CXwSla65qsCGSpKqajj2w84Ok5bgQ+hkJn3I+7Fh9mpL1//YtJkyBASlF
-	 +cEU/p6GIwDN08Xqhd3d5cs20HqVKejK3CII9MVJQnSN3nNUbmIBuOigQ+ppCuc9/N
-	 CYGRA2cr8RNNw==
-Date: Mon, 13 Jan 2025 19:20:02 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Divya Koppera <divya.koppera@microchip.com>
-Cc: <andrew@lunn.ch>, <arun.ramadoss@microchip.com>,
- <UNGLinuxDriver@microchip.com>, <hkallweit1@gmail.com>,
- <linux@armlinux.org.uk>, <davem@davemloft.net>, <edumazet@google.com>,
- <pabeni@redhat.com>, <netdev@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, <richardcochran@gmail.com>,
- <vadim.fedorenko@linux.dev>
-Subject: Re: [PATCH net-next v2 3/3] net: phy: microchip_rds_ptp : Add
- PEROUT feature library for RDS PTP supported phys
-Message-ID: <20250113192002.39dda2c2@kernel.org>
-In-Reply-To: <20250109102533.15621-4-divya.koppera@microchip.com>
-References: <20250109102533.15621-1-divya.koppera@microchip.com>
-	<20250109102533.15621-4-divya.koppera@microchip.com>
+	s=arc-20240116; t=1736824850; c=relaxed/simple;
+	bh=Oj268A4xi+IKftY/audnlMRxg7UoULqF6B3v8phaVG8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=GRCPtGHBCC48x+bi7uxRN8NyxHKJceAYTp1xM23sSN4+wOcdRclhS7eEPV7mfMYYkUnSWKKy5bjUz0+iPC98D3VB2BySTzb6WjOUbvRITAR/rKw+526OeNjjMLNNkCL2J5/GKUrdThd1HUauPO/oDJBbiJeLSX4XOEV7Aw2pTG4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hTDRf8Nb; arc=none smtp.client-ip=209.85.208.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-5d7e3f1fdafso10244310a12.0;
+        Mon, 13 Jan 2025 19:20:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1736824847; x=1737429647; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=CR6Yc5zBHeV1nQKHSgI++L0E9NIg0cDkHCvlCkHXgwg=;
+        b=hTDRf8NbKpBhLZmSBw6HxoFFQodVIL0hfboS2HVQt0vpnQY/a/TdJasQlMAauQGDun
+         h598guw82RK6jo3MEkcT0BV08EO8KvIwSL4MpRkddxw30Kaf15vVBDYcwIn1M7Bc0kv1
+         ZcQUF16VyufYavXU69MNfR20XfVi+7/PYZkCdE0xNNEhBFvt2cpp6lda4N19Qu+zNsWL
+         6Qpr4eUzFOzTRLSygn4BkszCMSnPB2XYm2L/pkGp35udNy8QHTNqygsKfTW6S9ImhYli
+         yM1sj8TKGzSTIiia8WVrJ2nYm6szLBpJTnEaw46zcV4ofmWPMYZauAE3LsFl6Kyuambz
+         lp4A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736824847; x=1737429647;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=CR6Yc5zBHeV1nQKHSgI++L0E9NIg0cDkHCvlCkHXgwg=;
+        b=rlrhxRbqf/B/bIb9p4IjQWhmWwDwEWvHKg4dk38uSgQYZeOaG10i/du7AkFYleE2LN
+         CTbiDSV7/pvvNcYr9Sbo1LCZDLPoovTqzMe38e2N6yEbysT4NnLicHrHirQPNeT0cQ/N
+         e01KC+XSYlNYMgfkoUdFxz9avscrztr9zmobSvIJiBbxgcbtwv0DhoP2aJT0RkltbrUU
+         s4x6Jcg/HHMeWGctyToQWG0a2H/qeb3ZWfTDsKO2OQiTVCJbpQ9EkwkRBghc5CFEW9SI
+         bbTvH+ZO1Zbv1vQCK6OU+dGO+s84r9cORMr2X6XncIP9bEl7qhjQaf0/fO/S113sxJvv
+         Rhvw==
+X-Forwarded-Encrypted: i=1; AJvYcCVF35KXYQXzDE/G2srFKD6T3t6F0zRHLIMRIyrZEkuWaSELMdw/OKsBcFnBjVk4N9GnSKDMS7gzuDY=@vger.kernel.org, AJvYcCW41JICwVeTOMG73MSgTD4UG1RbSykuju4P1xQLnbMuPOZlGzUtSJiC4HbSqMCP3mQ+OAbEevX5@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw6AEjKBjCQfu5zn7Tzq5KaSM5x0/ZepPW3MsWz2BPR4evwX0dC
+	aC3lzTHw6S1Ig8Bk/Hsaxp5emQ7pcJOJeNzBqhV/SBV+lL3AyemlY31kpl9+WAC6HCEZt+z5w7x
+	1BGVElh9fMxd/sxYo7GFtPhUXjeA=
+X-Gm-Gg: ASbGncsrIzUjvGX7LXCLGcT3gF+b0d6w/8Hh5trW42BZdLtoOxqJ1rVi2gAqrnWhLFB
+	xIL3YTZeyWY1vtP72AW4Jiq5xoRwYv0ipa9CPERtl
+X-Google-Smtp-Source: AGHT+IGmNw+iI5ASqebYMej/XhNoiOp6kuGH4xlsSUgj4d8iyk+ErK5urioQlrCsCqT+kO7WFEsICrSDHjsq0DxPeho=
+X-Received: by 2002:a05:6402:3604:b0:5d3:cfd0:8d46 with SMTP id
+ 4fb4d7f45d1cf-5d972e6ade1mr22982841a12.30.1736824847009; Mon, 13 Jan 2025
+ 19:20:47 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20250111144513.1289403-1-ap420073@gmail.com> <20250113150834.729de40d@kernel.org>
+In-Reply-To: <20250113150834.729de40d@kernel.org>
+From: Taehee Yoo <ap420073@gmail.com>
+Date: Tue, 14 Jan 2025 12:20:35 +0900
+X-Gm-Features: AbW1kvZvzea8zsqaaioytTwT8637fMYt4XkvKsusryQf0wlAFhkXFOM4TlZtrHk
+Message-ID: <CAMArcTXUNVw2wGcUjS+bfW47K0Yd88G478QwEk3yW2f9b=Kvjw@mail.gmail.com>
+Subject: Re: [PATCH net-next v8 0/10] bnxt_en: implement tcp-data-split and
+ thresh option
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, pabeni@redhat.com, edumazet@google.com, 
+	netdev@vger.kernel.org, almasrymina@google.com, donald.hunter@gmail.com, 
+	corbet@lwn.net, michael.chan@broadcom.com, andrew+netdev@lunn.ch, 
+	hawk@kernel.org, ilias.apalodimas@linaro.org, ast@kernel.org, 
+	daniel@iogearbox.net, john.fastabend@gmail.com, dw@davidwei.uk, 
+	sdf@fomichev.me, asml.silence@gmail.com, brett.creeley@amd.com, 
+	linux-doc@vger.kernel.org, kory.maincent@bootlin.com, 
+	maxime.chevallier@bootlin.com, danieller@nvidia.com, hengqi@linux.alibaba.com, 
+	ecree.xilinx@gmail.com, przemyslaw.kitszel@intel.com, hkallweit1@gmail.com, 
+	ahmed.zaki@intel.com, rrameshbabu@nvidia.com, idosch@nvidia.com, 
+	jiri@resnulli.us, bigeasy@linutronix.de, lorenzo@kernel.org, 
+	jdamato@fastly.com, aleksander.lobakin@intel.com, kaiyuanz@google.com, 
+	willemb@google.com, daniel.zahka@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, 9 Jan 2025 15:55:33 +0530 Divya Koppera wrote:
-> +	switch (ts_on_nsec) {
-> +	case 200000000:
-> +		*pulse_width = MCHP_RDS_PTP_GEN_CFG_LTC_EVT_200MS_;
-> +		break;
-> +	case 100000000:
-> +		*pulse_width = MCHP_RDS_PTP_GEN_CFG_LTC_EVT_100MS_;
-> +		break;
-> +	case 50000000:
-> +		*pulse_width = MCHP_RDS_PTP_GEN_CFG_LTC_EVT_50MS_;
-> +		break;
-> +	case 10000000:
-> +		*pulse_width = MCHP_RDS_PTP_GEN_CFG_LTC_EVT_10MS_;
-> +		break;
-> +	case 5000000:
-> +		*pulse_width = MCHP_RDS_PTP_GEN_CFG_LTC_EVT_5MS_;
-> +		break;
-> +	case 1000000:
-> +		*pulse_width = MCHP_RDS_PTP_GEN_CFG_LTC_EVT_1MS_;
-> +		break;
-> +	case 500000:
-> +		*pulse_width = MCHP_RDS_PTP_GEN_CFG_LTC_EVT_500US_;
-> +		break;
-> +	case 100000:
-> +		*pulse_width = MCHP_RDS_PTP_GEN_CFG_LTC_EVT_100US_;
-> +		break;
-> +	case 50000:
-> +		*pulse_width = MCHP_RDS_PTP_GEN_CFG_LTC_EVT_50US_;
-> +		break;
-> +	case 10000:
-> +		*pulse_width = MCHP_RDS_PTP_GEN_CFG_LTC_EVT_10US_;
-> +		break;
-> +	case 5000:
-> +		*pulse_width = MCHP_RDS_PTP_GEN_CFG_LTC_EVT_5US_;
-> +		break;
-> +	case 1000:
-> +		*pulse_width = MCHP_RDS_PTP_GEN_CFG_LTC_EVT_1US_;
-> +		break;
-> +	case 500:
-> +		*pulse_width = MCHP_RDS_PTP_GEN_CFG_LTC_EVT_500NS_;
-> +		break;
-> +	case 100:
-> +		*pulse_width = MCHP_RDS_PTP_GEN_CFG_LTC_EVT_100NS_;
-> +		break;
-> +	default:
-> +		phydev_warn(phydev, "Using default pulse width of 200ms\n");
-> +		*pulse_width = MCHP_RDS_PTP_GEN_CFG_LTC_EVT_200MS_;
-> +		break;
+On Tue, Jan 14, 2025 at 8:08=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> On Sat, 11 Jan 2025 14:45:03 +0000 Taehee Yoo wrote:
+> > This series implements hds-thresh ethtool command.
+> > This series also implements backend of tcp-data-split and
+> > hds-thresh ethtool command for bnxt_en driver.
+> > These ethtool commands are mandatory options for device memory TCP.
+>
+> Patch 9 doesn't apply cleanly, could you rebase and repost?
 
-+#define MCHP_RDS_PTP_GEN_CFG_LTC_EVT_200MS_	13
-+#define MCHP_RDS_PTP_GEN_CFG_LTC_EVT_100MS_	12
-+#define MCHP_RDS_PTP_GEN_CFG_LTC_EVT_50MS_	11
-+#define MCHP_RDS_PTP_GEN_CFG_LTC_EVT_10MS_	10
-+#define MCHP_RDS_PTP_GEN_CFG_LTC_EVT_5MS_	9
-+#define MCHP_RDS_PTP_GEN_CFG_LTC_EVT_1MS_	8
-+#define MCHP_RDS_PTP_GEN_CFG_LTC_EVT_500US_	7
-+#define MCHP_RDS_PTP_GEN_CFG_LTC_EVT_100US_	6
-+#define MCHP_RDS_PTP_GEN_CFG_LTC_EVT_50US_	5
-+#define MCHP_RDS_PTP_GEN_CFG_LTC_EVT_10US_	4
-+#define MCHP_RDS_PTP_GEN_CFG_LTC_EVT_5US_	3
-+#define MCHP_RDS_PTP_GEN_CFG_LTC_EVT_1US_	2
-+#define MCHP_RDS_PTP_GEN_CFG_LTC_EVT_500NS_	1
-+#define MCHP_RDS_PTP_GEN_CFG_LTC_EVT_100NS_	0
+Hi Jakub,
+Oh sorry for that, I will send v9 after rebase.
 
-1) seems a bit weird to me that you go to 200ms whenever user asks for
-   a value that couldn't be provided exactly. Why not go to the next
-   good value?
-2) this is not very well coded up, given that the values you're
-   translating to are a just natural numbers you can use a table
+>
+> Applying: net: ethtool: add hds_config member in
+> ethtool_netdev_state Applying: net: ethtool: add support for configuring =
+hds-thresh
+> Applying: net: devmem: add ring parameter filtering
+> Applying: net: ethtool: add ring parameter filtering
+> Applying: net: disallow setup single buffer XDP when tcp-data-split is en=
+abled.
+> Applying: bnxt_en: add support for rx-copybreak ethtool command
+> Applying: bnxt_en: add support for tcp-data-split ethtool command
+> Applying: bnxt_en: add support for hds-thresh ethtool command
+> Applying: netdevsim: add HDS feature
+> Using index info to reconstruct a base tree...
+> M       drivers/net/netdevsim/netdev.c
+> M       drivers/net/netdevsim/netdevsim.h
+> Falling back to patching base and 3-way merge...
+> Auto-merging drivers/net/netdevsim/netdevsim.h
+> Auto-merging drivers/net/netdevsim/netdev.c
+> Applying: selftest: net-drv: hds: add test for HDS feature
+> --
+> pw-bot: cr
 
-static const sup_on_necs[] = {
-	100,		/* 100ns */
-	500,		/* 500ns */
-	1000,		/* 1us */
-	5000,		/* 5us */
-	...
-};
-
-for (i = 0; i < ARRAY_SIZE(sup_on_necs); i++) {
-	if (ts_on_nsec <= sup_on_necs[i]) {
-		*pulse_width = i;
-		break;
-	}
-}
--- 
-pw-bot: cr
+Thanks a lot!
+Taehee Yoo
 
