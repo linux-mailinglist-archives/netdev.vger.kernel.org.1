@@ -1,161 +1,91 @@
-Return-Path: <netdev+bounces-158225-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158232-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D8CBAA111F4
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 21:29:43 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5666EA11293
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 21:56:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6FD87169B29
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 20:29:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 323981642AD
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 20:55:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A2CB20E01E;
-	Tue, 14 Jan 2025 20:29:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA20820F96E;
+	Tue, 14 Jan 2025 20:55:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b="F2iErM87";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="dtGSZwuF"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=engleder-embedded.com header.i=@engleder-embedded.com header.b="bZqoH/M8"
 X-Original-To: netdev@vger.kernel.org
-Received: from flow-b6-smtp.messagingengine.com (flow-b6-smtp.messagingengine.com [202.12.124.141])
+Received: from mx13lb.world4you.com (mx13lb.world4you.com [81.19.149.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9471720D50A;
-	Tue, 14 Jan 2025 20:29:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.141
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 095C920F074
+	for <netdev@vger.kernel.org>; Tue, 14 Jan 2025 20:55:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=81.19.149.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736886553; cv=none; b=pDOx0c8ZbQxKjuNEf9psexCd9ObgcvOMP5Mos0e6Xd4oIGaKOCN2Rz78cCYlC1vWUkPxxou4LLYQQ3egSXMxt0/sGBsVP6GASXSll79LGKDZDx12Y0OXPNQrbsu+2DlR7YaorgY4FXsRWDS/dEay3vUBlcur7fPeP4klHMiwbmE=
+	t=1736888142; cv=none; b=uPVvC2gScL1eSB/ghZTOUjk9etUJo2XM8s5B324PZAbOG+KJm8f/Of+1m5F6gzP1euzI7kZEZn8bkdA4TF7mJ3vW6tQKqEsvpNuKz5Vti0cMbPB02W+JulkfCKSpKXTt3cFfw+tsCOVqroi+AIB8m2aPVABUCySnTbEPLFmOL1Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736886553; c=relaxed/simple;
-	bh=M3sPUnOlMOUEjIyxNXS7N0GciZ/ZSrap+cHlJvyandE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=EC+sR3PMYALVCPVgcvSggPP4YeWhbOMw1M/pR9AaTr3Wpdy6sBvrAPy8Qou2B2y3w5JU+Dajo/3kSIerG0IMWfkMcDr3KPjwt05fSKg7oOsXTspNfxhDGLEEpCQXawsbcM5YEy2+0DBhEwp6TvN0AgM0BaKvDyFJwayszCQGYcI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dxuuu.xyz; spf=pass smtp.mailfrom=dxuuu.xyz; dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b=F2iErM87; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=dtGSZwuF; arc=none smtp.client-ip=202.12.124.141
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dxuuu.xyz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dxuuu.xyz
-Received: from phl-compute-09.internal (phl-compute-09.phl.internal [10.202.2.49])
-	by mailflow.stl.internal (Postfix) with ESMTP id 285311D40AD4;
-	Tue, 14 Jan 2025 15:29:10 -0500 (EST)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-09.internal (MEProxy); Tue, 14 Jan 2025 15:29:10 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dxuuu.xyz; h=cc
-	:cc:content-transfer-encoding:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm1; t=1736886550; x=
-	1736893750; bh=YxyPwDN5jF3WrYeLfnPg62rlODl4h0Cotdz5rtDrqTA=; b=F
-	2iErM87+ojy4AaRSDXpLJeiS9EocxjEFjkBTqf5bRZSPZPXTtAL26KtZJl+OJDoD
-	3w9ZgPNHfZhz/uzzUpK+oGN0Vof11egaXS8OEsvySdQtdygy4akfDTAAfhtKX93f
-	QkKDjgKp8ZrJzkPnMEX85ITo4tVkEDUYyIULYOdUTSn5QksGKqTv+HbszjySiPFu
-	WwEEXsw1MFCbJK+vMklqZkvO9FAqwY0wR2kNFetAhz0Py4WMvdHcxbVxGBH3Zv07
-	ybTm0sSLj+snLN/XFXW8smw3dyizwr/wjxoSPFBUCEOy3m20bbtFGhDGfHrkOC/r
-	js2EizrsMbcSoin69DFIg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:date:date:feedback-id:feedback-id:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to:x-me-proxy:x-me-sender
-	:x-me-sender:x-sasl-enc; s=fm2; t=1736886550; x=1736893750; bh=Y
-	xyPwDN5jF3WrYeLfnPg62rlODl4h0Cotdz5rtDrqTA=; b=dtGSZwuFpXaRsDDbK
-	CNksfSaz5FfyCg99LTf4LqnIJBAL1GFvW4gOXRqGAdetto09bDowKghV9X/TgZlh
-	8xOc00LJ2dqHqZmvty9lZY56QID/+pDQ1ZrTjshU84M5kJPsAvJ8maHTVYs5iCO9
-	SnoUCGxsWCELb784F+MPs2UtMh4L9nKdWjZBKIHCGFVHbVl4BGJ3BHKKxu7LLlWa
-	EyxmLAvTBwglenh8MPPh/hw+wfO84OMAOvWl3lJgtWAKsr8r2k7ts1e6UzVbF4Yk
-	A/ETcBZN+Zhl/mCjAiE9/YcPdaGAVWgtQaO36fT030tude12gCfVyaPjYAIXYAau
-	yXr6A==
-X-ME-Sender: <xms:FcmGZ3zSNt8-IRUzsZhzDgzbOmU5O4706V4NqFosCtJQVL7YoOmmbA>
-    <xme:FcmGZ_QiuSUVSlBzfXyZv-4cMIy2a-cgtLmRg6drBUsZYCkrSoPWqTZ_ONCuUuw0a
-    hNdBNmgpAYtDTedug>
-X-ME-Received: <xmr:FcmGZxVyiy0wk0KHl_x5AwuoW5SBNC_nlogFVvMpnWVa_uVCtT6UePOzNLElP-vjs307wbP3X9QYm4-E153oOkBwrR9nLhL-Gu8VB9Z7_nTP7VeGWTWa>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrudehiedgudefjecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdp
-    uffrtefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivg
-    hnthhsucdlqddutddtmdenfghrlhcuvffnffculdejtddmnecujfgurhephffvvefufffk
-    ofgjfhgggfestdekredtredttdenucfhrhhomhepffgrnhhivghlucgiuhcuoegugihuse
-    gugihuuhhurdighiiiqeenucggtffrrghtthgvrhhnpefgfefggeejhfduieekvdeuteff
-    leeifeeuvdfhheejleejjeekgfffgefhtddtteenucevlhhushhtvghrufhiiigvpedtne
-    curfgrrhgrmhepmhgrihhlfhhrohhmpegugihusegugihuuhhurdighiiipdhnsggprhgt
-    phhtthhopedvvddpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepuggrvhgvmhesug
-    grvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgv
-    rdgtohhmpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtth
-    hopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtoheprghstheskhgvrhhnvghl
-    rdhorhhgpdhrtghpthhtohepmhgrrhhtihhnrdhlrghusehlihhnuhigrdguvghvpdhrtg
-    hpthhtohepmhgvmhigohhrsehgmhgrihhlrdgtohhmpdhrtghpthhtohepuggrnhhivghl
-    sehiohhgvggrrhgsohigrdhnvghtpdhrtghpthhtoheprghnughrihhisehkvghrnhgvlh
-    drohhrgh
-X-ME-Proxy: <xmx:FcmGZxjdHVNpRR74YfMsPNvn86QcnnUAEbsQIKg2AE4ifPSdBVCUcA>
-    <xmx:FcmGZ5B3vhZGB_WX5EzmDcxduhMjD1UGAREDRToHuFcE1W24xEkiiQ>
-    <xmx:FcmGZ6LkKmigffSTzq-xAUih4-H1i_-m19MRWzlIvakxmaReGtrPgA>
-    <xmx:FcmGZ4B2opdmX_5J9WgSXJtWAqNx5FaO3xjLD_vGG_GZlhgi60TA6g>
-    <xmx:FcmGZ4UPJMZe3ZjIWR660X65DIfWK-SVnnXf3X_h92EqztsdLwq-b1A5>
-Feedback-ID: i6a694271:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 14 Jan 2025 15:29:07 -0500 (EST)
-From: Daniel Xu <dxu@dxuuu.xyz>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	kuba@kernel.org,
-	ast@kernel.org,
-	martin.lau@linux.dev,
-	memxor@gmail.com,
-	daniel@iogearbox.net,
-	andrii@kernel.org,
-	eddyz87@gmail.com
-Cc: john.fastabend@gmail.com,
-	song@kernel.org,
-	yonghong.song@linux.dev,
-	kpsingh@kernel.org,
-	sdf@fomichev.me,
-	haoluo@google.com,
-	jolsa@kernel.org,
-	horms@kernel.org,
-	bpf@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Martin KaFai Lau <martin.lau@kernel.org>
-Subject: [PATCH bpf-next v7 2/5] bpf: tcp: Mark bpf_load_hdr_opt() arg2 as read-write
-Date: Tue, 14 Jan 2025 13:28:43 -0700
-Message-ID: <730e45f8c39be2a5f3d8c4406cceca9d574cbf14.1736886479.git.dxu@dxuuu.xyz>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <cover.1736886479.git.dxu@dxuuu.xyz>
-References: <cover.1736886479.git.dxu@dxuuu.xyz>
+	s=arc-20240116; t=1736888142; c=relaxed/simple;
+	bh=pzmadhYkTMkI43WUW3G5FN3Fe8070BhaK2gYuDHGRKI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=jN6PsVZm3JXldiHmL6cxOYL0zPlK16P5jymMFpuvcN6sF4uSj2hfC5B6PuwUXFRuepbD4OGHAekuIVhxt0qfGW0Bc0Jegea2kboEBqtuOIAShaXScCtmMzrQwOQaRUsUbZ8DnJZSdmsmk/rITUo9Nhpk85Os0EMyWHHbElJZ34s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=engleder-embedded.com; spf=pass smtp.mailfrom=engleder-embedded.com; dkim=pass (1024-bit key) header.d=engleder-embedded.com header.i=@engleder-embedded.com header.b=bZqoH/M8; arc=none smtp.client-ip=81.19.149.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=engleder-embedded.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=engleder-embedded.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=engleder-embedded.com; s=dkim11; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=XB4WmD9WM9aCEc4XLwdCD379fnzOyzeI69BYBP/Dsh4=; b=bZqoH/M87k5WguX71njxQiNdN3
+	Z7JbinRz3d29MrGBUuztWIxvUYZlEwVoMzgiJPdV8CHo3bnbc8oz+T4i7Q1iQ5kWB+4UzMDVASQjT
+	JCsdWDjF4l43BLHSO+T6UPnsvKqRs7YhNEcv6Te4PImVI02z3PDMvsb/XzO+/FrVtZg0=;
+Received: from [88.117.60.28] (helo=[10.0.0.160])
+	by mx13lb.world4you.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.97.1)
+	(envelope-from <gerhard@engleder-embedded.com>)
+	id 1tXndw-000000001A6-2edz;
+	Tue, 14 Jan 2025 21:36:08 +0100
+Message-ID: <8944a472-7cfe-4f20-8da3-75ae5737ff94@engleder-embedded.com>
+Date: Tue, 14 Jan 2025 21:36:07 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 5/5] tsnep: Add PHY loopback selftests
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org
+References: <20250110144828.4943-1-gerhard@engleder-embedded.com>
+ <20250110144828.4943-6-gerhard@engleder-embedded.com>
+ <b9ba6dd0-a978-421f-8d63-3366ea5e3991@lunn.ch>
+Content-Language: en-US
+From: Gerhard Engleder <gerhard@engleder-embedded.com>
+In-Reply-To: <b9ba6dd0-a978-421f-8d63-3366ea5e3991@lunn.ch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-AV-Do-Run: Yes
 
-MEM_WRITE attribute is defined as: "Non-presence of MEM_WRITE means that
-MEM is only being read". bpf_load_hdr_opt() both reads and writes from
-its arg2 - void *search_res.
+On 13.01.25 23:08, Andrew Lunn wrote:
+> On Fri, Jan 10, 2025 at 03:48:28PM +0100, Gerhard Engleder wrote:
+>> Add loopback selftests on PHY level. This enables quick testing of
+>> loopback functionality to ensure working loopback for testing.
+> 
+> You don't appear to be sending any packets. So how do you know
+> loopback is actually working? I'm not sure this is a useful test.
 
-This matters a lot for the next commit where we more precisely track
-stack accesses. Without this annotation, the verifier will make false
-assumptions about the contents of memory written to by helpers and
-possibly prune valid branches.
+Yes with sending packets it would be a better test. This test would
+detect if loopback link is not established with the requested speed
+as it is the case since 6ff3cddc365b ("net: phylib: do not disable
+autoneg for fixed speeds >= 1G").
 
-Fixes: 6fad274f06f0 ("bpf: Add MEM_WRITE attribute")
-Acked-by: Martin KaFai Lau <martin.lau@kernel.org>
-Signed-off-by: Daniel Xu <dxu@dxuuu.xyz>
----
- net/core/filter.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+I will check if sending packets can be added.
 
-diff --git a/net/core/filter.c b/net/core/filter.c
-index 21131ec25f24..713d6f454df3 100644
---- a/net/core/filter.c
-+++ b/net/core/filter.c
-@@ -7643,7 +7643,7 @@ static const struct bpf_func_proto bpf_sock_ops_load_hdr_opt_proto = {
- 	.gpl_only	= false,
- 	.ret_type	= RET_INTEGER,
- 	.arg1_type	= ARG_PTR_TO_CTX,
--	.arg2_type	= ARG_PTR_TO_MEM,
-+	.arg2_type	= ARG_PTR_TO_MEM | MEM_WRITE,
- 	.arg3_type	= ARG_CONST_SIZE,
- 	.arg4_type	= ARG_ANYTHING,
- };
--- 
-2.47.1
+Thank you for the review!
 
+Gerhard
 
