@@ -1,126 +1,96 @@
-Return-Path: <netdev+bounces-158050-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158051-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40EECA10418
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 11:30:09 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 04CA1A10419
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 11:30:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BECCE1670D6
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 10:30:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7E67218829BD
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 10:30:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEE15229639;
-	Tue, 14 Jan 2025 10:30:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 474B4284A72;
+	Tue, 14 Jan 2025 10:30:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="jwbL0GKC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o9ecJzq1"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-175.mta0.migadu.com (out-175.mta0.migadu.com [91.218.175.175])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E843229612
-	for <netdev@vger.kernel.org>; Tue, 14 Jan 2025 10:30:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E1F422DC34
+	for <netdev@vger.kernel.org>; Tue, 14 Jan 2025 10:30:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736850603; cv=none; b=UrJH2kroKsfOJT3W2REHR1b53jYLicW5sV0sbG0zFa7oxequCIoG5Z09eldZRjfZOk1ZdfnBbFTGBCk9V+zIBpDLrrV3bdMZtN62Zkihb/6sw+EgPmwX9mcLbY/34Nr6WlwKVlaUyYOW8TCSsHgD3tT7xiLf9ZKwOGHIhWQAAYo=
+	t=1736850610; cv=none; b=YghIbUoL7nYB4CXdgAKzckBgHV/YmwPvu0eYL9fVf78/Q5sAHiRX8buAYC7qgNoZeXlHbIGr66V/aEA2/ehKxbo65Walogga0cnRRb3D/PFSB3fZHOjNRGsU2nXbMRj5CFeJQ3qmQTVCamdsZDQEvbDR3jWveJI0LpheNR4DVGU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736850603; c=relaxed/simple;
-	bh=JRmWpskUgFJC6TG3hbr+G20f5YLx+ZyrDyQJbdez9Sk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Ulv+gHHsKrVN/EpZ7zxZio5l1P48etcpQimnNgm+QISNiDSIGfkPW5rQguHvXGDtoX+ITwiLbN3uljjSPQfMsZ2V68RxThhTU9NSlFTTVZRfHv65He9R1MiWAwNA45585ZNAWlovcvxKk6cKM5YbNpAkH9MSsU79EQXJC4E9qfQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=jwbL0GKC; arc=none smtp.client-ip=91.218.175.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <52dab677-6ec9-4ae2-803f-1a2a34c32007@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1736850599;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=GA/Tg/7baXnKm3SwQ55FP1056nxIRWPWVHxeGnzfrOw=;
-	b=jwbL0GKCIehF3M3xckD3cBWjbhPRCEMzEavXLyL4y5L/V94tF6HT1FTrRQweF3EOUCan/A
-	I0YTwI/haTiPydzelWmoiRk98CTdR5v6/A0FuXJWBHVFOuU12WncAKnqTr1P9VhNwz8t3r
-	8yED/ivhpv/jPtwP6yHQnDJynDt7+jw=
-Date: Tue, 14 Jan 2025 18:29:47 +0800
+	s=arc-20240116; t=1736850610; c=relaxed/simple;
+	bh=TR7G6bpHHpt8BZkZv7Q3ZcpKfHl3xoFzd61tjYlNims=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=B8fzzxVGnQGxV4GQIKs/0Q9X5hZrkdeEvZ77ogTRq1ov1/5r324bl0dodCP4q+mmQf5xVQ/mc3gbQnDj9kBDrD2CKfjfh0VwY6U4vQNIUE9ybUCfgQ0NoraZQsvwENr/pVLSLW8OyPSUTT/kpqovCMtYInHphV3pp9AamRjgHhg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o9ecJzq1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8F683C4CEDD;
+	Tue, 14 Jan 2025 10:30:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1736850609;
+	bh=TR7G6bpHHpt8BZkZv7Q3ZcpKfHl3xoFzd61tjYlNims=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=o9ecJzq1rzr8kGvOH1OviOejxtQz/DSOh6qsHPfu4fc76hv6szcOUa8XO9CDTNM83
+	 8X/jo7tD9stNZ6I5MZYf4Io6W0+W0ASM8K9O13xDT3B7oZxConGUai5SfOZaI4VwFK
+	 6pbtWO48Wsvsilq7HG7eSysg31zqJpZG9Cvm2uYgaA2E5oQ33sTvNGK9wEkAMmwOgS
+	 sSbiyX0o6tL61S9EzZdytqyW5tea0V9hgu5xnwivhnVNQDlrlHJtMeCcsO6sNVRoUD
+	 dXGmRszH7FwWC1/dKoSR/GoUj35/PjRhXuSnrkrIWu8BN0RajUl+ONNk0E4RQD2Rht
+	 AjnXI87YyhoyA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 71045380AA5F;
+	Tue, 14 Jan 2025 10:30:33 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next v7 3/3] net: stmmac: dwmac-nuvoton: Add dwmac
- glue for Nuvoton MA35 family
-To: Paul Menzel <pmenzel@molgen.mpg.de>, Andrew Lunn <andrew@lunn.ch>
-Cc: Joey Lu <a0987203069@gmail.com>, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
- mcoquelin.stm32@gmail.com, richardcochran@gmail.com,
- devicetree@vger.kernel.org, ychuang3@nuvoton.com, netdev@vger.kernel.org,
- openbmc@lists.ozlabs.org, alexandre.torgue@foss.st.com,
- linux-kernel@vger.kernel.org, joabreu@synopsys.com, schung@nuvoton.com,
- peppe.cavallaro@st.com, yclu4@nuvoton.com,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org
-References: <20250113055434.3377508-1-a0987203069@gmail.com>
- <20250113055434.3377508-4-a0987203069@gmail.com>
- <a30b338f-0a6f-47e7-922b-c637a6648a6d@molgen.mpg.de>
- <e7041d36-9bc7-482a-877d-6d8f549c0ada@lunn.ch>
- <d9fc5212-9710-449e-90b9-a195305d990f@molgen.mpg.de>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Yanteng Si <si.yanteng@linux.dev>
-In-Reply-To: <d9fc5212-9710-449e-90b9-a195305d990f@molgen.mpg.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Subject: Re: [PATCH v2 net 0/3] gtp/pfcp: Fix use-after-free of UDP tunnel socket.
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <173685063227.4128008.14965771716621799592.git-patchwork-notify@kernel.org>
+Date: Tue, 14 Jan 2025 10:30:32 +0000
+References: <20250110014754.33847-1-kuniyu@amazon.com>
+In-Reply-To: <20250110014754.33847-1-kuniyu@amazon.com>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+ shaw.leon@gmail.com, kuni1840@gmail.com, netdev@vger.kernel.org
 
-在 2025/1/14 10:21, Paul Menzel 写道:
-> Dear Andrew,
+Hello:
+
+This series was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
+
+On Fri, 10 Jan 2025 10:47:51 +0900 you wrote:
+> Xiao Liang pointed out weird netns usages in ->newlink() of
+> gtp and pfcp.
 > 
+> This series fixes the issues.
 > 
-> Thank you for your quick reply.
+> Link: https://lore.kernel.org/netdev/20250104125732.17335-1-shaw.leon@gmail.com/
 > 
-> 
-> Am 14.01.25 um 21:16 schrieb Andrew Lunn:
->>>> +#define NVT_MISCR_RMII          BIT(0)
->>>> +
->>>> +/* 2000ps is mapped to 0x0 ~ 0xF */
->>>
->>> Excuse my ignorance: What is ps?
->>
->> picoseconds. An RGMII link needs a 2ns delay between the clock line
->> and the data lines. Some MACs allow you to tune the delay they can
->> insert, in this case in steps of 2ns / 16.
-> 
-> Thank you for the clarification. Maybe it’s my English, but I didn’t 
-> deduce this from how the comment is worded. I do not have a better idea 
-> either.
+> [...]
 
-Hmmm, how about:
+Here is the summary with links:
+  - [v2,net,1/3] gtp: Use for_each_netdev_rcu() in gtp_genl_dump_pdp().
+    https://git.kernel.org/netdev/net/c/46841c7053e6
+  - [v2,net,2/3] gtp: Destroy device along with udp socket's netns dismantle.
+    https://git.kernel.org/netdev/net/c/eb28fd76c0a0
+  - [v2,net,3/3] pfcp: Destroy device along with udp socket's netns dismantle.
+    https://git.kernel.org/netdev/net/c/ffc90e9ca61b
 
-2000 ps is xxxx
-
-I checked the kernel code and it looks like
-folks usually put a space between the number
-and the unit.
-
-I looked into the rules of a bunch of publishers
-again. It seems like there's a rule about putting
-a space between a number and a unit, but when the
-unit is a symbol, that's an exception:
-
-space:
-
-10 kg
-10 ℃
-10 h
-
-no space:
-
-22°36′48″N, 114°10′10″E
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-Thanks,
-Yanteng
 
