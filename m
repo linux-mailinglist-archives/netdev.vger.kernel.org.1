@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-158301-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158302-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68E0BA115BB
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 00:58:00 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B9944A115C2
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 00:58:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7F257161B5C
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 23:57:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C1CB83A5312
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 23:58:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB73F21420F;
-	Tue, 14 Jan 2025 23:57:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49FFC22331C;
+	Tue, 14 Jan 2025 23:57:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jxngMlvI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YR4jv4Vq"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96A07222565;
-	Tue, 14 Jan 2025 23:57:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CA2D222594;
+	Tue, 14 Jan 2025 23:57:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736899077; cv=none; b=vBbO7FnJdy28S+iIwtkdmK6GdoBW0AJYR/MxYHRwq0zmTSkHlqKHofZ1470Fl/xkj/FJVSTHsaxb/I1nwG9sXo1pnvggoyBj6stoYR11gWExI25xH9NFddfJzSahUYLNZNfpF8QaKUobWhtCN9QY5QunRX3O4N0JqHz8QtPl2q0=
+	t=1736899079; cv=none; b=fjQ8l7fPogsjglre3x2VRKdH9gfBle1O1zlgUFVuhxbfc80FMlcD/PdguIrujND/1R9HJa94cgT5/3KwIyA89cnZADPIhZMwct6awCqg6PHaLVrSk4a6Z5p6NnK2COhNMprQ0y84r9BurY8LiAnFEynsbeC9GM68RAzu0X6vjMo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736899077; c=relaxed/simple;
-	bh=qYcadH5zTVf6YXQcR12gkpEXX8NXXimDRL8MXEYl88I=;
+	s=arc-20240116; t=1736899079; c=relaxed/simple;
+	bh=tpzPtlhfSg1oMQzL2Ct27bJY5cpUAeZYKUcwY61RUAs=;
 	h=Date:Content-Type:MIME-Version:From:Cc:To:In-Reply-To:References:
-	 Message-Id:Subject; b=lS+01i0ZdShYHEEoAvbxpWT45yF1l2xdF6D1D8AKzoh1sk/UvVFfkAsxfeff2oY6OarCMmnNs74xPMdmlNlS6FA6iiueD++K8ydvSAgd9qXiBymVHYM3TUgwjZ0LKrUPMSgFSY6F835K8NJQ/x87n7uD1m5TLQzfRJ0/cnu7nF8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jxngMlvI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E29BAC4CEDD;
-	Tue, 14 Jan 2025 23:57:56 +0000 (UTC)
+	 Message-Id:Subject; b=jqsh214T6v2YZk7REcgdIb5D58B+jMx4MWQcqGPO7aSXHCHOf2jQg/FPexVxbfTe+Sjnv42O+Amm5O9kcj6PlT0PC5KtQpM6ZJl2oIODg5SPrasFh1X66dK+DNne8mJ+RRSWp5kvSGG6jZMfO2ZGjUh4ez90IHhU6hs2w7Y1JvA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YR4jv4Vq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66EA0C4CEDF;
+	Tue, 14 Jan 2025 23:57:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736899077;
-	bh=qYcadH5zTVf6YXQcR12gkpEXX8NXXimDRL8MXEYl88I=;
+	s=k20201202; t=1736899078;
+	bh=tpzPtlhfSg1oMQzL2Ct27bJY5cpUAeZYKUcwY61RUAs=;
 	h=Date:From:Cc:To:In-Reply-To:References:Subject:From;
-	b=jxngMlvI1aMH7uwkSNtEMSo14UCuU2hwadYpy8TGifVRhFKGYRXkjD8bHJaeDuGjp
-	 AeuWNlEeSkWvTVqZZHSyoVuIEOfWATWVpJfr1CTZkPcPUqxjNsTEQhSov8/KnowEL5
-	 CvQg9E8qJCtw9Il4ZjD2H2I9Cqly4JEQPTspsZBthQy65l6WPXtta9EFp6hG+9UKnI
-	 m9DFyGiLnsMunIEMMhHIEgusMkuF1M6leSBraIeKhJCHqf92d865JChCjeNBvTyU4f
-	 cdFhJabsFOTtH0IsfqAktwOWynpwEd9PBgziJ0YRbPkQaTNAXtDIM5zA+LO6T1/lM/
-	 pTET4Szz1XfIQ==
-Date: Tue, 14 Jan 2025 17:57:55 -0600
+	b=YR4jv4VqMwHB30SIKNMX6+CkulB9Ga/HxazCKrQ9IEhW3b/hkvOihD10wmNx5Zwep
+	 xgfu+TfRDvQSNWzq+8nyUNAmlBR4NBhplr8wvhekLzglPGcNjTNu9GPdn6wVp4yCMJ
+	 cB+8b70SUbUZECxB/C9SOvcS993DDbrPCKVhNekVJsEnDJ23Rywpi2j2yI8IRb8KSi
+	 ndbzYFzP7E/ezdJa8n1pRKj9+3TwSEnWczBn2EHciN9COm2PPFSXlCg3fUbT5VkQIs
+	 t4uAsa9uobHF8IBR1P+LB6GGxx3R0XxsgDAoDKZjatJ1Nc5cGFNhYhFuvAIUy2jqGB
+	 FVzZJOsLOGrOQ==
+Date: Tue, 14 Jan 2025 17:57:57 -0600
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -51,31 +51,30 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 From: "Rob Herring (Arm)" <robh@kernel.org>
-Cc: kuba@kernel.org, netdev@vger.kernel.org, andrew@codeconstruct.com.au, 
- davem@davemloft.net, edumazet@google.com, 
- openipmi-developer@lists.sourceforge.net, linux-kernel@vger.kernel.org, 
- joel@jms.id.au, linux-aspeed@lists.ozlabs.org, devicetree@vger.kernel.org, 
- conor+dt@kernel.org, pabeni@redhat.com, andrew+netdev@lunn.ch, 
- minyard@acm.org, eajames@linux.ibm.com, 
- linux-arm-kernel@lists.infradead.org, krzk+dt@kernel.org
+Cc: andrew+netdev@lunn.ch, pabeni@redhat.com, 
+ linux-arm-kernel@lists.infradead.org, edumazet@google.com, joel@jms.id.au, 
+ krzk+dt@kernel.org, linux-kernel@vger.kernel.org, 
+ andrew@codeconstruct.com.au, devicetree@vger.kernel.org, 
+ davem@davemloft.net, kuba@kernel.org, 
+ openipmi-developer@lists.sourceforge.net, netdev@vger.kernel.org, 
+ linux-aspeed@lists.ozlabs.org, conor+dt@kernel.org, eajames@linux.ibm.com, 
+ minyard@acm.org
 To: Ninad Palsule <ninad@linux.ibm.com>
-In-Reply-To: <20250114220147.757075-3-ninad@linux.ibm.com>
+In-Reply-To: <20250114220147.757075-4-ninad@linux.ibm.com>
 References: <20250114220147.757075-1-ninad@linux.ibm.com>
- <20250114220147.757075-3-ninad@linux.ibm.com>
-Message-Id: <173689894057.1969633.10540050942005147267.robh@kernel.org>
-Subject: Re: [PATCH v5 02/10] bindings: ipmi: Add binding for IPMB device
- intf
+ <20250114220147.757075-4-ninad@linux.ibm.com>
+Message-Id: <173689907575.1972841.5521973699547085746.robh@kernel.org>
+Subject: Re: [PATCH v5 03/10] dt-bindings: gpio: ast2400-gpio: Add hogs
+ parsing
 
 
-On Tue, 14 Jan 2025 16:01:36 -0600, Ninad Palsule wrote:
-> Add device tree binding document for the IPMB device interface.
-> This device is already in use in both driver and .dts files.
+On Tue, 14 Jan 2025 16:01:37 -0600, Ninad Palsule wrote:
+> Allow parsing GPIO controller children nodes with GPIO hogs.
 > 
 > Signed-off-by: Ninad Palsule <ninad@linux.ibm.com>
 > ---
->  .../devicetree/bindings/ipmi/ipmb-dev.yaml    | 55 +++++++++++++++++++
->  1 file changed, 55 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/ipmi/ipmb-dev.yaml
+>  .../devicetree/bindings/gpio/aspeed,ast2400-gpio.yaml       | 6 ++++++
+>  1 file changed, 6 insertions(+)
 > 
 
 My bot found errors running 'make dt_binding_check' on your patch:
@@ -83,16 +82,11 @@ My bot found errors running 'make dt_binding_check' on your patch:
 yamllint warnings/errors:
 
 dtschema/dtc warnings/errors:
-Error: Documentation/devicetree/bindings/ipmi/ipmb-dev.example.dts:24.32-33 syntax error
-FATAL ERROR: Unable to parse input tree
-make[2]: *** [scripts/Makefile.dtbs:131: Documentation/devicetree/bindings/ipmi/ipmb-dev.example.dtb] Error 1
-make[2]: *** Waiting for unfinished jobs....
-make[1]: *** [/builds/robherring/dt-review-ci/linux/Makefile:1506: dt_binding_check] Error 2
-make: *** [Makefile:251: __sub-make] Error 2
+
 
 doc reference errors (make refcheckdocs):
 
-See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20250114220147.757075-3-ninad@linux.ibm.com
+See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20250114220147.757075-4-ninad@linux.ibm.com
 
 The base for the series is generally the latest rc1. A different dependency
 should be noted in *this* patch.
