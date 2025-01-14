@@ -1,91 +1,139 @@
-Return-Path: <netdev+bounces-158237-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158238-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C127FA112EF
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 22:22:32 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B1E9BA112F7
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 22:23:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EE0F11888728
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 21:22:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D0B29167552
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 21:23:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A5A32080DF;
-	Tue, 14 Jan 2025 21:22:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFCB120F09D;
+	Tue, 14 Jan 2025 21:23:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VT0IMeVH"
+	dkim=pass (1024-bit key) header.d=cisco.com header.i=@cisco.com header.b="XB4om/fh"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from rcdn-iport-7.cisco.com (rcdn-iport-7.cisco.com [173.37.86.78])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA3578493
-	for <netdev@vger.kernel.org>; Tue, 14 Jan 2025 21:22:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E36BE20CCCE
+	for <netdev@vger.kernel.org>; Tue, 14 Jan 2025 21:23:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=173.37.86.78
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736889748; cv=none; b=DjpWgHmKGGNfeTdlKXKrZAi2ozEfn9bgskvsqI9OUiMn81s1zg//+jpZs84btJvYPGWYUzbovjp7GoJXulB28k028pPg8htgWxu5gD/zHfvN3J1KTvB3GZh404HgYB19RIsE8u+6j/I/hV9X1T+o8/ywDcCQ87oshfqIeXNMHGA=
+	t=1736889805; cv=none; b=LlPRPwKQ58h3zlzfnp0Qo8o1uGnbH2kNxAbxT0pQlzKmEgBzJiaz1Uc1EiO896vrke7IyrS7r2iri5q9UpY9ep7FjDMLoWCtK9oUhjr6tIMn2Wx5Kv5JMpryRV1f8ZTpUvc9WxhzRzFIJ9XKcryaSkuzn1qXEi6MIHItVPThpFM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736889748; c=relaxed/simple;
-	bh=cA9UpQA5vQNclqhiWhCD2JNyh9dbcM+WuIXsYGOB078=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=S2gHocHUdy0Oe7NU6+/4RbewZuXs95xRueLaHJDlqNSHqCsQ9fQXUoseOTHksM9vzuQulXfUBudHrcUXFKcsT07bAOSGrRFdqwY4uQVtyN5eSQciXvybAG+tZoLNiklFKSM00iD497xj0yFp5rFRJBlfZSsMu0jq3F+/DbE+OSs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VT0IMeVH; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0C92FC4CEDD;
-	Tue, 14 Jan 2025 21:22:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736889748;
-	bh=cA9UpQA5vQNclqhiWhCD2JNyh9dbcM+WuIXsYGOB078=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=VT0IMeVHUg+JC8/4uc0F6OTUOxUcYF79LFrSlhC7bblb/rp04yXl4JvfS4vQD/H+l
-	 7xN4L+rAczRy+ZDaVAiCooNXh2oIuQHyzBbUkyBcwkvVflPrd2UsTftWYJChsRInRB
-	 jU0sDUd+PGlY00gRwAE8FXNq9XF1yG0UcC+Ck2pYybj1C9D/hg118/vo0gD/hIe8GZ
-	 Bc1mvO5gZQvaS8qU663Wk7/pHACzu6M8f1qF2FP0g8aD1BQOUqgCfRTfEeJ48r1LZ9
-	 kXICoqlloE+OzBpQq2KzBSN0qm7ZWIDhStXUU+RWZ6dU2jr8imXFPhQ+7xip74h2qg
-	 E7RZlOq5ugqqQ==
-Date: Tue, 14 Jan 2025 13:22:26 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Gerhard Engleder <gerhard@engleder-embedded.com>
-Cc: Joe Damato <jdamato@fastly.com>, magnus.karlsson@intel.com,
- andrew@lunn.ch, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next] tsnep: Link queues to NAPIs
-Message-ID: <20250114132226.3f0fdc31@kernel.org>
-In-Reply-To: <fa737740-7cd0-4109-8712-09f2cb8dbef0@engleder-embedded.com>
-References: <20250110223939.37490-1-gerhard@engleder-embedded.com>
-	<Z4VwrhhXU4uKqYGR@LQ3V64L9R2>
-	<91fc249e-c11a-47a1-aafe-fef833c3bafa@engleder-embedded.com>
-	<Z4WKHnDG9VSMe5OD@LQ3V64L9R2>
-	<20250113135609.13883897@kernel.org>
-	<fa737740-7cd0-4109-8712-09f2cb8dbef0@engleder-embedded.com>
+	s=arc-20240116; t=1736889805; c=relaxed/simple;
+	bh=wXjHT7ZVz1Cmfq9AxZ28+DLgwSbCt3XuRM3MF/oNe1g=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=fPu62B/8fAIlFhSGt9f+mZsem7I2OQgh/XN6/KNGC3BcXLYotzP8+hc8b4RmfhgXCbgKFh+ruNkHSqlda8vbbx6wDrIGoZPOCOMH7rfYUqzBt2aq6PLjb936gWPfiHaK8/3AlADUT39GJo9cG78qoogeAZ7E933Iwec6KLxHW1Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cisco.com; spf=pass smtp.mailfrom=cisco.com; dkim=pass (1024-bit key) header.d=cisco.com header.i=@cisco.com header.b=XB4om/fh; arc=none smtp.client-ip=173.37.86.78
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cisco.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cisco.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=cisco.com; i=@cisco.com; l=1452; q=dns/txt; s=iport;
+  t=1736889803; x=1738099403;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=P+xBtBmlGL1Ztzdb3+rbtNMMdpkm47jewl2TfY6noug=;
+  b=XB4om/fhxM603yGo0Z3+zCef9VUWsUNAfwguyYikSf9X5ToIqlATtsnp
+   wxWkZohACy6/wBhOq96/H3s5u62yeyT/VaSUkXedE8GF9ycWGsdnot8xB
+   6mX3VBK9zn3IIL9QomfmazBnoOvakrLJfbfXqhK6j/a0QssEn1PIuq10p
+   4=;
+X-CSE-ConnectionGUID: FevFPWaVSF+RHZqxdE3ODg==
+X-CSE-MsgGUID: Tv7Xy3/eR4i/oC66jDmYgA==
+X-IPAS-Result: =?us-ascii?q?A0A8AACi1IZn/47/Ja1aHQEBAQEJARIBBQUBgX8IAQsBg?=
+ =?us-ascii?q?kqBT0NIjHJfiHWeGIF+DwEBAQ9EBAEBhQcCinQCJjQJDgECBAEBAQEDAgMBA?=
+ =?us-ascii?q?QEBAQEBAQEBAQsBAQUBAQECAQcFgQ4ThgiGWgEBAQECATIBRhALGC4rKxmDA?=
+ =?us-ascii?q?YJCIwOzJIIsgQHeM4FtgUgBhWqHX3AbhFwnG4FJRIEVgnkxPoQbCmuFdwSCe?=
+ =?us-ascii?q?IEog0CeeUgKgRcDWSwBVRMNCgsHBYEkHysDOAwLMBUlD4EYBTUKNzqCDGlJN?=
+ =?us-ascii?q?wINAjWCHnyCK4IhgjuER4RVhWKCFIFlAwMWEAGDKIEOQAMLGA1IESw3FBsGP?=
+ =?us-ascii?q?m4Hmzg8hRyBC6cJoQOEJYFjn2MaM6pTmHykR4RmgWc8gVkzGggbFYMiUhkPj?=
+ =?us-ascii?q?lnDAyUyPAIHCwEBAwmPV4F8AQE?=
+IronPort-Data: A9a23:X4LNAKNiNSFF4prvrR2HlsFynXyQoLVcMsEvi/4bfWQNrUon32BTz
+ mofCzzQafiDY2fxc99xYY2xphwOu5LVxodqTHM5pCpnJ55oRWUpJjg4wmPYZX76whjrFRo/h
+ ykmQoCeaphyFjmE+0/F3oHJ9RFUzbuPSqf3FNnKMyVwQR4MYCo6gHqPocZh6mJTqYb/WlnlV
+ e/a+ZWFZQf8gmIsaQr41orawP9RlKWq0N8nlgRWicBj5Df2i3QTBZQDEqC9R1OQapVUBOOzW
+ 9HYx7i/+G7Dlz91Yj9yuu+mGqGiaue60Tmm0hK6aYD76vRxjnBaPpIACRYpQRw/ZwNlMDxG4
+ I4lWZSYEW/FN0BX8QgXe0Ew/ypWZcWq9FJbSJSymZT78qHIT5fj69tjEm8OAoQmwcg0O0F87
+ OwUBWsqQh/W0opawJrjIgVtrt4oIM+uOMYUvWttiGmES/0nWpvEBa7N4Le03h9p2ZsIRqmYP
+ ZdEL2MzNnwsYDUXUrsTIJA5nOGkj33yWzZZs1mS46Ew5gA/ySQqiOa1b4OIJYbiqcN9oljHl
+ nOduGnDXhBdM/fBlzip90Ojr7qa9c/8cMdIfFGizdZmiUOew0QfAQMbUF+8r+X/jEOiM/pSJ
+ 1ER8zgjsYA980ukStS7VBq9yFaHoxQVc9ldCes37EeK0KW8yw+fCnIJUX1HZcAqudEeQSEs0
+ BmCn7vBHTVlvbuUYWiQ+redsXW5Pi19BWkPeSMJUyMb7NT55oI+lBTCSpBkCqHdszHuMSv7z
+ zbPqG01gK8eyJZWka665lvAxTmro/AlUzII2+keZUr9hisRWWJvT9XABYTzhRqYELukcw==
+IronPort-HdrOrdr: A9a23:XR/M/6p/S+uyuPBWLIopelYaV5oseYIsimQD101hICG9vPb2qy
+ nIpoV96faaslcssR0b9OxofZPwI080lqQFhbX5Q43DYOCOggLBR+tfBMnZsljd8kbFmNK1u5
+ 0NT0EHMqySMbC/5vyKmTVR1L0bsb+6zJw=
+X-Talos-CUID: 9a23:FTP4LmOmPngpL+5DdiR52nYrE/4eXD7n7EXJM0OVUkFFR+jA
+X-Talos-MUID: 9a23:BjAr6gaqGcPfJOBTiyGztCA5c8pSv6XpD2tTz5cqvviLHHkl
+X-IronPort-Anti-Spam-Filtered: true
+X-IronPort-AV: E=Sophos;i="6.12,315,1728950400"; 
+   d="scan'208";a="306071572"
+Received: from rcdn-l-core-05.cisco.com ([173.37.255.142])
+  by rcdn-iport-7.cisco.com with ESMTP/TLS/TLS_AES_256_GCM_SHA384; 14 Jan 2025 21:23:17 +0000
+Received: from cisco.com (savbu-usnic-a.cisco.com [10.193.184.48])
+	by rcdn-l-core-05.cisco.com (Postfix) with ESMTP id 4553718000225;
+	Tue, 14 Jan 2025 21:23:17 +0000 (GMT)
+Received: by cisco.com (Postfix, from userid 392789)
+	id 1C98820F2003; Tue, 14 Jan 2025 13:23:17 -0800 (PST)
+From: John Daley <johndale@cisco.com>
+To: kuba@kernel.org
+Cc: andrew+netdev@lunn.ch,
+	benve@cisco.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	johndale@cisco.com,
+	neescoba@cisco.com,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	satishkh@cisco.com
+Subject: Re: [PATCH net-next v4 4/6] enic: Use the Page Pool API for RX when MTU is less than page size
+Date: Tue, 14 Jan 2025 13:23:17 -0800
+Message-Id: <20250114212317.26218-1-johndale@cisco.com>
+X-Mailer: git-send-email 2.35.2
+In-Reply-To: <20250110163844.39f8efb3@kernel.org>
+References: <20250110163844.39f8efb3@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Outbound-SMTP-Client: 10.193.184.48, savbu-usnic-a.cisco.com
+X-Outbound-Node: rcdn-l-core-05.cisco.com
 
-On Tue, 14 Jan 2025 21:58:24 +0100 Gerhard Engleder wrote:
-> > XDP and AF_XDP are different things. The XDP part of AF_XDP is to some
-> > extent for advertising purposes :) If memory serves me well:
-> > 
-> > XDP Tx -> these are additional queues automatically allocated for
-> >            in-kernel XDP, allocated when XDP is attached on Rx.
-> >            These should _not_ be listed in netlink queue, or NAPI;
-> >            IOW should not be linked to NAPI instances.
-> > XDP Rx -> is not a thing, XDP attaches to stack queues, there are no
-> >            dedicated XDP Rx queues
-> > AF_XDP -> AF_XDP "takes over" stack queues. It's a bit of a gray area.
-> >            I don't recall if we made a call on these being linked, but
-> >            they could probably be listed like devmem as a queue with
-> >            an extra attribute, not a completely separate queue type.  
-> 
-> For tsnep if have no additional XDP Tx queues, only the netdev queues
-> are used. For AF_XDP/XSK I would keep the linking, as the stack queues
-> still exist and are operated still with NAPI. Maybe queues taken over
-> by AF_XDP/XSK get an extra attribute in the future. So I can keep the
-> permanent linking to NAPI while interface is up no matter if XDP or
-> AF_XDP/XSK is used or not. Did I understand it right?
+>On 1/10/25, 4:38 PM, "Jakub Kicinski" kuba@kernel.org wrote:
+>
+>On Thu,  9 Jan 2025 20:03:02 -0800 John Daley wrote:
+>> >>Good point, once fragmentation is no longer possible you can
+>> >>set .max_len to the size of the fragment HW may clobber,
+>> >>and .offset to the reserved headroom.  
+>> >
+>> >Ok, testing going good so far, but need another day.  
+>> 
+>> Testing is OK, but we are concerned about extra memory usage when order
+>> is greater than 0. Especially for 9000 MTU where order 2 would mean
+>> allocating an extra unused page per buffer. This could impact scaled up
+>> installations with memory constraints. For this reason we would like to
+>> limit the use of page pool to MTU <= PAGE_SIZE for now so that order is
+>> 0.
+>
+>And if you don't use the page pool what would be the allocation size
+>for 9k MTU if you don't have scatter? I think you're allocating linear
+>skbs, which IIRC will round up to the next power of 2...
 
-I think so.
+Right, I now realize the linear skb allocation does round up so it is
+using the same amount of memory as page pool for MTU 9000. I am spinning
+a new patch set where only page pool is used since the code will be less
+complicated. Thanks!
+
+>
+>> Our newer hardware supports using multiple 0 order pages for large MTUs
+>> and we will submit a patch for that in the future.
+>> 
+>> I will make a v5 patchset with the napi_free_frags and pp_alloc_error
+>> changes already discussed. Thanks, John
 
