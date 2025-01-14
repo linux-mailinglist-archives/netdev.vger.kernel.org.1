@@ -1,101 +1,156 @@
-Return-Path: <netdev+bounces-158112-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158116-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2DE70A107A0
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 14:21:16 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7DDE0A107B6
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 14:25:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DD1853A1A4B
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 13:21:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8B0773A63EB
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 13:25:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCE14234CEA;
-	Tue, 14 Jan 2025 13:21:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1162A28EC65;
+	Tue, 14 Jan 2025 13:25:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BkweZc9r"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="EMDhdoUL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10FBD234CE0
-	for <netdev@vger.kernel.org>; Tue, 14 Jan 2025 13:21:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.3])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D580236EA7;
+	Tue, 14 Jan 2025 13:25:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.3
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736860872; cv=none; b=Vg55IWowXziM+swCgt722JAexu28kAy6yEudweHPWO63x+QIRZinGFMKgKjOeUE5vHIg6cMsf5lRYTRroRDeTWIMflEa4QTsgBd7nJrQuIAgqhxQa39tymj0SRVReXyAVw2IEfhZ6c+spk/hCuqQoKx0iBiA3URPvsyzzZuaf9Q=
+	t=1736861136; cv=none; b=Ueigp8DlyTM+tTR+S2sDBmVKEzNdruD0820k7xRwuAB/nh53EdAuz9DxenKVzoPuggus5arPuEhwCFm5qulLdz47OSTQEW069scTAoJ/uWLnw45kxWl18jKY+Z6Nnm2V7MWz8NEiuQGUQ6tPJkv7sYU5+tBYHLNnkMuD86Nn35M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736860872; c=relaxed/simple;
-	bh=D09UgQ0bZg0HONkOUNbwz69PyeuMH3Qjhg/IicOODnQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=YulvTv/FAsRt/aCe3KlMcKGVsEnyxZUYR61k67YBUBX4Fya+jyZJS1w8qmBXcBax1dJNfwoutzW8ZJe9xzWaWkuNkQmc8UpzG9iRTu+vLIsveT3saglbZe/EA/yq2BGE3C5d0pRYJPthVWWkHi/ASTfx0nue9EVG1CBp8wdMTIA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=BkweZc9r; arc=none smtp.client-ip=209.85.218.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-aa679ad4265so174236266b.0
-        for <netdev@vger.kernel.org>; Tue, 14 Jan 2025 05:21:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1736860869; x=1737465669; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=D09UgQ0bZg0HONkOUNbwz69PyeuMH3Qjhg/IicOODnQ=;
-        b=BkweZc9r9v/cTN6uPmscZD45gQv9t4yOH8484oUwxgmvbMe6tj6oclgGWr2fGlvs/5
-         R/TxtfhWchnH6bXp4RmobGiIOB8NmLpr8oO70C9x2xY3LfmNlvru6w04XetvDDO/Prd2
-         uFVTimLKjK7UT/YwO4otMHdP4P2iDRfE5iUWLSs34L+TSK+zh5Awn5TVmLTGBLAxHKmQ
-         4uiax4blWj2j0PH0lQZgTD7VSb0EmcPPfwAer3WtuFblG66iCCHSO7mZhbxn4Pi+nEp/
-         GNv0lwvEui73/rnKXDzsAv66pyyhl5q15ypeZ/SQK4pGjtZ/FFFyd4wKotkJJ5131Nqm
-         oItQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736860869; x=1737465669;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=D09UgQ0bZg0HONkOUNbwz69PyeuMH3Qjhg/IicOODnQ=;
-        b=L2O5VVWeI6xrJvVXyJwYPGJuFFc19fMEyI9nifSJwRhEZx5u3MRK5GWxHoKBa9rYBL
-         nK3b6f3vgYivhp+02QpndYrRmGk6adT16m3uwjG8tse6HEZXS7gbGOazGMo3Cdo6uJw/
-         zCDh3tE4n4ZGLCmBoLL2smY/jI7Cc3lAnU6cZrKvA9tV45hV0zoo/9ngajRMTf2xd2s7
-         JXQ2cP9rEj+7bXwFD7bgY1zqdoPXg7j/H48rOHV1rpjZ0OlApMT7/DbIPEzoTNbwfqUI
-         BLsTQkpS5/w++yql7L3uBxIp5oOMBZB1R/eDBLTCsawG/RjKRmnXaM6OiDO5NP3BsT6d
-         Nojw==
-X-Forwarded-Encrypted: i=1; AJvYcCX9W+sUHdNja4FvoIyZryZu7Gwv0SNrHhvBPHCRJGN3FGPhuLJLkyzqhkkR9ofK/d9p+NFekys=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzzIpe3clDT1Hal8yovm18UKJG8iS1KShKTeDMMK637bmDkpZ2s
-	qi8GLVxrno7oIoTgiFCfiVnnvlyrLxCBxuoX+G/eDOvE71TNylvu81DJiEbizfRQNPidsYGNFdl
-	pBwI6JM2fWpK7zHL5YqqGh5rM7KJTgEbMrkW2
-X-Gm-Gg: ASbGnctqMKQHGUmvKVgpUBQ6eMyOaTX6gGJpGIWtGeoT6ZEmsAB6mWDEfc0PBqCciM5
-	f5y1Hb6DaXdkzs4Ru8hIFmPOIMUpfFmBUaIx0rA==
-X-Google-Smtp-Source: AGHT+IFSjz1Ho5cAyXJJpz9JDzV5rjyLk7VN4wuZIQ4LpUQLdLN1hr13bNT9S7JvpUalO2wZy1HXS3SAtXpOTFhsXAw=
-X-Received: by 2002:a17:907:9447:b0:aa5:b1bb:10db with SMTP id
- a640c23a62f3a-ab2c3c2833bmr1711849566b.1.1736860869179; Tue, 14 Jan 2025
- 05:21:09 -0800 (PST)
+	s=arc-20240116; t=1736861136; c=relaxed/simple;
+	bh=n2AzDWonAYwOKLO8ylv2VcNlw6AmQ0C+qfIbvQL/okU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=H1ILRSuJ83MB0+EQoEoB5ZBMD9kp5mwBf4B/MtE2TW08SJn0uBTKNpSDtqoHwKDX1lram6RsZp82eNBqhoCsM9cBTwBEvYOXiYL97yPDOYVG03aoqUJRsbS09/6B16xOWjPYlFyMNPyoN2IstjUhDLJzqGKCmN3iOQ/gUeuNy5E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=EMDhdoUL; arc=none smtp.client-ip=117.135.210.3
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:Subject:Date:Message-ID:MIME-Version; bh=qL454
+	SbW0mXAyAJzaI/Sx5ya8UOqFy/+uOgDo0q8WoA=; b=EMDhdoULd1Gt5CODbNGbF
+	UQzLi0+76G2tJ8CfM3AaaFELBWUUipbuHtQd/I66sLjOy+3OYtCs0qI0gBW8pSai
+	LYxEga62+Pr34prqu5zECGlJOfenx8dPbayWjfX66eSIyqS01QRDVwsmaI9RbV+m
+	jRvpW7XYAnEjNzhdC1qyz0=
+Received: from localhost.localdomain (unknown [])
+	by gzsmtp1 (Coremail) with SMTP id PCgvCgCn_E1RZYZnl71AAw--.33013S2;
+	Tue, 14 Jan 2025 21:23:40 +0800 (CST)
+From: Jiayuan Chen <mrpre@163.com>
+To: bpf@vger.kernel.org,
+	jakub@cloudflare.com,
+	john.fastabend@gmail.com
+Cc: netdev@vger.kernel.org,
+	martin.lau@linux.dev,
+	ast@kernel.org,
+	edumazet@google.com,
+	davem@davemloft.net,
+	dsahern@kernel.org,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux-kernel@vger.kernel.org,
+	song@kernel.org,
+	andrii@kernel.org,
+	mhal@rbox.co,
+	yonghong.song@linux.dev,
+	daniel@iogearbox.net,
+	xiyou.wangcong@gmail.com,
+	horms@kernel.org,
+	corbet@lwn.net,
+	eddyz87@gmail.com,
+	cong.wang@bytedance.com,
+	shuah@kernel.org,
+	mykolal@fb.com,
+	jolsa@kernel.org,
+	haoluo@google.com,
+	sdf@fomichev.me,
+	kpsingh@kernel.org,
+	linux-doc@vger.kernel.org,
+	Jiayuan Chen <mrpre@163.com>
+Subject: [PATCH bpf v6 0/3] bpf: fix wrong copied_seq calculation and add tests
+Date: Tue, 14 Jan 2025 21:23:08 +0800
+Message-ID: <20250114132312.49407-1-mrpre@163.com>
+X-Mailer: git-send-email 2.43.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250114035118.110297-1-kuba@kernel.org> <20250114035118.110297-10-kuba@kernel.org>
-In-Reply-To: <20250114035118.110297-10-kuba@kernel.org>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 14 Jan 2025 14:20:56 +0100
-X-Gm-Features: AbW1kvbv2voDdSqmQJ0TQe-69LF8wy2EbI8_qvaWjTFxbFpV1J7qYsOH6yBcr54
-Message-ID: <CANn89iLvnvfh_MfOCqVFYbiWXt4WdbuD1Ewr_hy3GOZeBT7eKw@mail.gmail.com>
-Subject: Re: [PATCH net-next 09/11] net: protect napi->irq with netdev_lock()
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, pabeni@redhat.com, 
-	andrew+netdev@lunn.ch, horms@kernel.org, jdamato@fastly.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:PCgvCgCn_E1RZYZnl71AAw--.33013S2
+X-Coremail-Antispam: 1Uf129KBjvJXoWxWFyrGFyfXw4kuryDAFyxKrg_yoW5Wr4xpF
+	WkC34rGr47tFyxZws7A3yIgF4Fgw4rCayUGr1Sq3yfZr4jkryYyrs29ayaqrn8GrWfZF1j
+	9r15Wrn0934DZFDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0z_pnQ7UUUUU=
+X-CM-SenderInfo: xpus2vi6rwjhhfrp/xtbBDwXUp2eGZBAZbgAAsb
 
-On Tue, Jan 14, 2025 at 4:51=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> Take netdev_lock() in netif_napi_set_irq(). All NAPI "control fields"
-> are now protected by that lock (most of the other ones are set during
-> napi add/del). The napi_hash_node is fully protected by the hash
-> spin lock, but close enough for the kdoc...
->
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
+A previous commit described in this topic
+http://lore.kernel.org/bpf/20230523025618.113937-9-john.fastabend@gmail.com
+directly updated 'sk->copied_seq' in the tcp_eat_skb() function when the
+action of a BPF program was SK_REDIRECT. For other actions, like SK_PASS,
+the update logic for 'sk->copied_seq' was moved to
+tcp_bpf_recvmsg_parser() to ensure the accuracy of the 'fionread' feature.
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+That commit works for a single stream_verdict scenario, as it also
+modified 'sk_data_ready->sk_psock_verdict_data_ready->tcp_read_skb'
+to remove updating 'sk->copied_seq'.
+
+However, for programs where both stream_parser and stream_verdict are
+active(strparser purpose), tcp_read_sock() was used instead of
+tcp_read_skb() (sk_data_ready->strp_data_ready->tcp_read_sock)
+tcp_read_sock() now still update 'sk->copied_seq', leading to duplicated
+updates.
+
+In summary, for strparser + SK_PASS, copied_seq is redundantly calculated
+in both tcp_read_sock() and tcp_bpf_recvmsg_parser().
+
+The issue causes incorrect copied_seq calculations, which prevent
+correct data reads from the recv() interface in user-land.
+
+Also we added test cases for bpf + strparser and separated them from
+sockmap_basic, as strparser has more encapsulation and parsing
+capabilities compared to sockmap.
+
+Fixes: e5c6de5fa025 ("bpf, sockmap: Incorrectly handling copied_seq")
+
+---
+V3 -> V6:
+https://lore.kernel.org/bpf/20250109094402.50838-1-mrpre@163.com/
+https://lore.kernel.org/bpf/20241218053408.437295-1-mrpre@163.com/
+Avoid introducing new proto_ops. (Daniel Borkmann).
+Add more edge test cases for strparser + bpf.
+Fix patchwork fail of test cases code.
+Fix psock fetch without rcu lock.
+Move code of modifying to tcp_bpf.c.
+
+V1 -> V3:
+https://lore.kernel.org/bpf/20241209152740.281125-1-mrpre@163.com/
+Fix patchwork fail by adding Fixes tag.
+Save skb data offset for ENOMEM. (John Fastabend)
+---
+Jiayuan Chen (3):
+  bpf: fix wrong copied_seq calculation
+  selftests/bpf: add strparser test for bpf
+  strparser, docs: Add new callback
+
+ Documentation/networking/strparser.rst        |  11 +-
+ include/linux/skmsg.h                         |   2 +
+ include/net/strparser.h                       |   2 +
+ include/net/tcp.h                             |   8 +
+ net/core/skmsg.c                              |  22 +-
+ net/ipv4/tcp.c                                |  29 +-
+ net/ipv4/tcp_bpf.c                            |  41 ++
+ net/strparser/strparser.c                     |  11 +-
+ .../selftests/bpf/prog_tests/sockmap_basic.c  |  53 --
+ .../selftests/bpf/prog_tests/sockmap_strp.c   | 452 ++++++++++++++++++
+ .../selftests/bpf/progs/test_sockmap_strp.c   |  53 ++
+ 11 files changed, 622 insertions(+), 62 deletions(-)
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/sockmap_strp.c
+ create mode 100644 tools/testing/selftests/bpf/progs/test_sockmap_strp.c
+
+-- 
+2.43.5
+
 
