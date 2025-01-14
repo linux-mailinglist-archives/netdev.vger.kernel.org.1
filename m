@@ -1,88 +1,87 @@
-Return-Path: <netdev+bounces-158286-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158288-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA965A11519
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 00:11:08 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D9B9AA1153E
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 00:19:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6E37D3A3213
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 23:11:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3265C3A2394
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 23:19:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34515213245;
-	Tue, 14 Jan 2025 23:10:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B15CA2135BC;
+	Tue, 14 Jan 2025 23:19:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="Qkgbge2C"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="Titk9AUu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CED1216394
-	for <netdev@vger.kernel.org>; Tue, 14 Jan 2025 23:10:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 195CA1C3BEB
+	for <netdev@vger.kernel.org>; Tue, 14 Jan 2025 23:19:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736896257; cv=none; b=S/AO7Ns1kURI5TsbZgZf9shqIfWfzcH9S1GYzmf2EWOvFSqmVf9vsgHNijta40N6DaDgvpK4fXu8xeY18ZzgiDlxKliCnMoEYWD99ZttA/Mw6WNsQtQKlegIkMQ+9e9Hh08aD7O2nPv9PuOPZStbt+G/12Zp+4S8F/0Tdp+6VPQ=
+	t=1736896765; cv=none; b=i9bkno9xaB0qAtSDTbsaBdyyfKI05GE/X3E0Pp265CrY99Wn9l3ZJjXg3G7IwzChX37hvDziudzlrlEHrrzfMT3tkofrNeIQrgmQ2J2sfn6NelCJAqklyi6DsK/Wc0wPVXelw/Y9Bdeoe99hbl9vLtJdBavIx2EyLqeJJNUm5xg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736896257; c=relaxed/simple;
-	bh=Hmm0NRWTgTEaKP+6VEgBu42rzF3JLKrrc3b9MMvgjx4=;
+	s=arc-20240116; t=1736896765; c=relaxed/simple;
+	bh=oW3Jl1eIZZ7xy6597Shv3w9NGNA648r1kNJb71xiCbY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OuPRH8QX/MjFWv6bC6JlE3XxSASTP2Sm0KvNL2ph9vhUO9ZUpqXIU1GwxmCR6wakM7OZP52SucCnwl4EKvbMVEElxa+SMtUwPmyw42UH/ZsWGH2g6UaeZ1F2d1ufawX5VAXmwROWylsK+L3AJAbmmKhxFloZMoof5GEuDCFv4Ro=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=Qkgbge2C; arc=none smtp.client-ip=209.85.214.174
+	 Content-Type:Content-Disposition:In-Reply-To; b=ohUPQbjHlIjmsi4djnUP1ppLs097/LR3O3+fLfzUEUK4D1Ak4MAzx0SiiqActtWxcLKqVMKu4l6afx1q3c0jVx6agHfIOgZ92Gb9v5Z/a2GyBFR2RyTtg5Rs0hFvtwkdAkpTNWhABLApUjxuVELPiues3TPFmzrEJP0WavqPeds=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=Titk9AUu; arc=none smtp.client-ip=209.85.216.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-21669fd5c7cso111138265ad.3
-        for <netdev@vger.kernel.org>; Tue, 14 Jan 2025 15:10:55 -0800 (PST)
+Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-2eec9b3a1bbso8092990a91.3
+        for <netdev@vger.kernel.org>; Tue, 14 Jan 2025 15:19:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1736896255; x=1737501055; darn=vger.kernel.org;
+        d=fastly.com; s=google; t=1736896763; x=1737501563; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references
          :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=00PKn3LgO/rO7pjDL757XYluDL9dW1lAljtlB/rtyus=;
-        b=Qkgbge2C8KpoLFYWwZvZVYcTszEmD4HbdHqh8cxwmpR21r5yZTyfl2M8i2FyFIl2+i
-         tnGhB4OMiUgdQr/D9MQo8/vbnO1T7yOTiC8Ek7cmV7nIx3eqgamgd5ESw9WVmT0xp7hW
-         q+S3Dw3N7BXIowQ8rUdg5tm4NQNsBNrczceZk=
+        bh=JbvYctdrGd1fMR1YU0UDT9rZXrxXW/NPmAnjaYjCXGE=;
+        b=Titk9AUubJpYd12pr7qqvAH1oKqtEeXoOTxtjo8hFR8Muci9h7K9hkpElC1FDGz73R
+         sZBeQHzdF58VXYd/EoevcKOJ7mGT7fBNnPZa9tIw+JKyrv7BktdNoPDMODNhGFhgrUqJ
+         6BqQHWoo+9x9F7Bw87uSBfmyjxwGaQDvZCrVI=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736896255; x=1737501055;
+        d=1e100.net; s=20230601; t=1736896763; x=1737501563;
         h=in-reply-to:content-disposition:mime-version:references
          :mail-followup-to:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=00PKn3LgO/rO7pjDL757XYluDL9dW1lAljtlB/rtyus=;
-        b=QG5r712k7oNC/qfXcWpTp5bYyqyBR3W6q1+XFJChO+Zra48o2anvlSYyLSTq1crgPs
-         Xu94qbnaBWnkuuFBu7JYDJ0OZ5MSAU9cye7Q/pc121Yz5jdUaTd3NKlbY9w5t2E2Hkgu
-         LPaRGesUP/WJAnz/1YcQKN+c/Hulzgj2DWczhA8uAQoIINHI4Wnt5GLCYBN3LIlaJcB5
-         V1qGZcbXNAcha+5fBEsPmdpbivFzCfWVL24SyuPYx6ip57wOa1/13aDi+sF9bKXEzxVE
-         0cfAsN/UCnyGmFA0o9Wt7cjeZuWEDL5fzaP38gZ4jxwpHZFBkF2A3YHVY4kOoI3TzBuU
-         0+aw==
-X-Forwarded-Encrypted: i=1; AJvYcCXdJDXuB+ZfPy3rUGPFxKPR2bQ/YVOqkwb8Qp/UokeKaWUTTXwzkhBJzPb+bLKJuhPrUMKtT7k=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxM7t0xSOb2m2HCdWu8wg+EtixMks85EMxjCgyHHvMW9fvFepLK
-	/nrRCggIYP+WLM8Wel+EAE9LjvG4GotEz5U7BVb5xzeYeBwYTMDWnvJGX7iipNw=
-X-Gm-Gg: ASbGnctfwnmfmdOLN7tCgQccCG6sMw9066Bq7rzwZUWTrXdG7vX2vSEnvb3As7hxljX
-	xTzuU7yCSLwdyCeo/oW2ZpET4oOvqr8hl9ldMnDVyUl9uCZ/wDE/gwgLCNF7YWKQUnbIt9xCCFL
-	Qqi9u/SXBxfoAOeDX73LOgbRBMls/b5m8/1OvafjUQdiWhtZrWEaHtTp7sKoNoXceSZhS4xysAa
-	rJqb2mnuDDpx/VHZSSgIxgsewD15kSFPy954dFBw27g8Zw37QrPbYor4SUiUrvgwfB3m+4A0GIc
-	crEfYzN9/YwQviz5DdRv8+Y=
-X-Google-Smtp-Source: AGHT+IEovD7WstLOv8Ou2S/si78C4mlnxGE6nnbPNZ/DcN7m3B0i6tSiOJwpk9hRNwEpbhMaiWbmDg==
-X-Received: by 2002:a17:903:2308:b0:216:779a:d5f3 with SMTP id d9443c01a7336-21a83f546c3mr451933985ad.14.1736896254998;
-        Tue, 14 Jan 2025 15:10:54 -0800 (PST)
+        bh=JbvYctdrGd1fMR1YU0UDT9rZXrxXW/NPmAnjaYjCXGE=;
+        b=N011mvrkrNQEXWUjAzVVGINTWkw4j4Emfxb0Ur7WBjTUDqc6arNPyKBzWM6GBurNz3
+         KclYfMTNRN56wdk1HFSDoLC3dCqqAnBqmBVlDfC9NEywpCEE0V7amFgrkX6Qei/wjRz2
+         6pbrX6q9BkJOQm5AjC+cyfCTn7xLfgQBo7/29qB9370Sc/CL/wfxp2D+4tCTtNvPtliM
+         m6T0+At7bGYXbvdFspSutlK9ufkbByNXm+ZCqMaOZhWJDIZDfhyEgtE27ouRilPAj5ws
+         OTzZtIbZei99EekDRsoSQtlW7G8EZIS+G5UYqFZQWEWGVZVKv2p+xqzncgUQ2Pz2jbA7
+         PRAw==
+X-Forwarded-Encrypted: i=1; AJvYcCVPFv4oQs2KhdXlEIbL8oAqJ9IimF0HaLvsmBpRejfW3ga6OGZN34Rz3RvObCbWG7cEmdgBJg8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx4hDqRB3VkuN5Qa5ZbAwMMrHRpRZg6thTega642skFXPTB3gx5
+	hKAJGvTgMm0lhgRORrptNiCI3WXbxzrFDioxX9IwDaSfhM3qeT2qF/w/EELqdNU=
+X-Gm-Gg: ASbGncsst1SJQkwIcbSzVaSEbip61HCAe4ADP2Ldlr3Vk6JnqF7d8z2Ihw4JFiEFdeh
+	QKpdIUHvThqy9qemcqpqO5tUX6mDOBboKHlc9LvSix2CeZKTNYAQA8JwLsCG1K2DJbyzLVFZq91
+	dlvwea0BpvRYA39wvoYDt+imrH9Iugdo7n+4oL1V3opgRFEdII7paR/K+ZYOrjDYL0m2OPNLzmH
+	P93peThMJJngzRWTk2/lEswh2OWt52oFIaCfkBgKUEsgz+UqmahkIiTqoTNdK36WZJkkTAJJga7
+	rhczAOZ0DM9HajF0Nwl3OHE=
+X-Google-Smtp-Source: AGHT+IHFi96ZW3/FlOq6X21nV+AE31+5XhD2kjVGg+hmUGkASSLpTCq/52bYiK6IFby7uzRfV70YKw==
+X-Received: by 2002:a17:90b:2e41:b0:2ee:96a5:721e with SMTP id 98e67ed59e1d1-2f548eb25cfmr46358849a91.12.1736896763372;
+        Tue, 14 Jan 2025 15:19:23 -0800 (PST)
 Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21a9f21bb48sm71604655ad.144.2025.01.14.15.10.53
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2f72c2f673esm80109a91.46.2025.01.14.15.19.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Jan 2025 15:10:54 -0800 (PST)
-Date: Tue, 14 Jan 2025 15:10:52 -0800
+        Tue, 14 Jan 2025 15:19:22 -0800 (PST)
+Date: Tue, 14 Jan 2025 15:19:20 -0800
 From: Joe Damato <jdamato@fastly.com>
 To: Jakub Kicinski <kuba@kernel.org>
 Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
 	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org
-Subject: Re: [PATCH net-next 05/11] net: protect netdev->napi_list with
- netdev_lock()
-Message-ID: <Z4bu_FxxmOZutPp-@LQ3V64L9R2>
+Subject: Re: [PATCH net-next 09/11] net: protect napi->irq with netdev_lock()
+Message-ID: <Z4bw-LRerFnH6gIA@LQ3V64L9R2>
 Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
 	Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
 	netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
 	andrew+netdev@lunn.ch, horms@kernel.org
 References: <20250114035118.110297-1-kuba@kernel.org>
- <20250114035118.110297-6-kuba@kernel.org>
+ <20250114035118.110297-10-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -91,23 +90,19 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250114035118.110297-6-kuba@kernel.org>
+In-Reply-To: <20250114035118.110297-10-kuba@kernel.org>
 
-On Mon, Jan 13, 2025 at 07:51:11PM -0800, Jakub Kicinski wrote:
-> Hold netdev->lock when NAPIs are getting added or removed.
-> This will allow safe access to NAPI instances of a net_device
-> without rtnl_lock.
-> 
-> Create a family of helpers which assume the lock is already taken.
-> Switch iavf to them, as it makes extensive use of netdev->lock,
-> already.
+On Mon, Jan 13, 2025 at 07:51:15PM -0800, Jakub Kicinski wrote:
+> Take netdev_lock() in netif_napi_set_irq(). All NAPI "control fields"
+> are now protected by that lock (most of the other ones are set during
+> napi add/del). The napi_hash_node is fully protected by the hash
+> spin lock, but close enough for the kdoc...
 > 
 > Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 > ---
->  include/linux/netdevice.h                   | 54 ++++++++++++++++++---
->  drivers/net/ethernet/intel/iavf/iavf_main.c |  6 +--
->  net/core/dev.c                              | 15 ++++--
->  3 files changed, 60 insertions(+), 15 deletions(-)
+>  include/linux/netdevice.h | 10 +++++++++-
+>  net/core/dev.c            |  2 +-
+>  2 files changed, 10 insertions(+), 2 deletions(-)
 
 Reviewed-by: Joe Damato <jdamato@fastly.com>
 
