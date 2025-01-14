@@ -1,93 +1,88 @@
-Return-Path: <netdev+bounces-158166-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158167-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9BE9BA10BEA
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 17:12:35 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA35EA10C1B
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 17:21:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C7CE01881E6D
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 16:12:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 643503A044A
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 16:21:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB2A61AA1DC;
-	Tue, 14 Jan 2025 16:12:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C77C7170A1A;
+	Tue, 14 Jan 2025 16:21:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Th1PaURR"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bd351PHo"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 377641ACE12
-	for <netdev@vger.kernel.org>; Tue, 14 Jan 2025 16:12:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61B211552FC
+	for <netdev@vger.kernel.org>; Tue, 14 Jan 2025 16:21:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736871143; cv=none; b=A+tT6QlY2TlcD5Jt5I/iOOzZiv/8PQdY+MiyU5HeLQU9bnnB+e7O+iSQmPh1TKUtqF6cHFZN9MrhakF2Rqf+azCBrjh6VHhTT52bghv7dVBh6XHsiCLcKPtQftLnBI/PPhiTirPSqcNQ/Y1Ky325ETvmH8Ohuvi34xI68GmcsEs=
+	t=1736871667; cv=none; b=hQ7drD8bsvR3dXHh3A0YR72lq41sDqEc8lscHGuSayOt5f32Z8fr0w8md8ASuyNY5EQKGkvBbt3pKUrtVlxHUNBeWHb7iurBmTyMv0otUfZFl1amdSUBrjDyaifJvg7vso4O/2QS0Kne7d4yG/ZQskweDhF4XXMUB82b8A4Gdkk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736871143; c=relaxed/simple;
-	bh=j0FDoSD8HO6TEBhTTlviQxAXmJiRe/O5zaE/xSH57TI=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=LWgHs5HPUMljxzHkrqedYn88/iwRQm2TE4yi9mPrWTINu29k6byY6iuPwc+Rn1exYYorciioNbOZm+qjd2HxcNaVbAltsX6TewUyBWKeyjX4BDgVdL2AWPMU8gT5OK8SwuruHIlEuJvHho3mtz/xIyWzSK3SaaoRINFAmfrHtnM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Th1PaURR; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1736871139;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-	bh=8btiJW7dqUtyD2YSECzK0dDtA2i6mSiTTCgf6xt85PQ=;
-	b=Th1PaURRpaEgYmPFnkAOCVaFue6yLOB9uBB9Cn2euNInpHXbwlJdIA+z3wY07sLJPFGteR
-	5Alt6qKJ1uRrz/g/JPG4GKWzw7te2AmnNEtcyotVATG1lADrybfqq9KQZgrenJor1zagBx
-	gc2CSigB3gzeEGBTaO7BLNFHsS+bnfM=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-48-OzRWLlVBOJGq-NfrGZ7CDw-1; Tue, 14 Jan 2025 11:12:17 -0500
-X-MC-Unique: OzRWLlVBOJGq-NfrGZ7CDw-1
-X-Mimecast-MFC-AGG-ID: OzRWLlVBOJGq-NfrGZ7CDw
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4362552ce62so30232335e9.0
-        for <netdev@vger.kernel.org>; Tue, 14 Jan 2025 08:12:16 -0800 (PST)
+	s=arc-20240116; t=1736871667; c=relaxed/simple;
+	bh=jo7uy5756GericWGxChvJXldjNERQtsO0Y8w82Aqg/g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ikt7qhV40IIl1F8D1Gcv4L1HtO8LsqCWXo84CsRojbq7oKOg1fdaoSuRs2/RPar8aZs9HJN7BfDjkcrnkueVplMZ4W+HjHiBYbZGP0D0iINkA+jxFjUXRHaAeaBJd6x5RzxRp//qly2mlxYJ0UN9b7YCAePuav1swkpJxUK5LhM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bd351PHo; arc=none smtp.client-ip=209.85.214.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-216281bc30fso121172255ad.0
+        for <netdev@vger.kernel.org>; Tue, 14 Jan 2025 08:21:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1736871666; x=1737476466; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=9X2SSvDnLxI9c2kcCXzMVKuky5eQD6NGK+K32MV0EH4=;
+        b=bd351PHozPDE8ea4fIZXLu3fdjV24jPpWsZDIPThDIH1kcGjUP/HFXgg6SLDeFIxCU
+         shEtqBdVnXfGm0hHU/4Z+6wlvwcYHx9Ck/u8m6xpkVbH3EDOH/xAF+uyLgCiLVobcBxR
+         EHGPlaG94EPvF80TmzmxeCtWfIMIlh4+olUPZSdazPz9pRhnLcj0Rq0h6CWFmIad8WD8
+         3N6cSaL6RU33GrSCOqjxN4mgxHbdyxUWmgD686ZTHCE1Y84GJbJ063rhZ734dGrvg99a
+         RzQrPGCRftGei5sg0QYQNJ4l4P4a9yiAc4tTF90RdbvmJTnUnqemz05xY9vcSwm6V+ND
+         ecbQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736871135; x=1737475935;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8btiJW7dqUtyD2YSECzK0dDtA2i6mSiTTCgf6xt85PQ=;
-        b=ISdgG/Y81WHzilWe500aeMbW1WsvuUDwniRuzjCyMuE62trudTOnfPgBJlgDViBRHe
-         w+5T+EkCqzD1Ju2nLFkyP5paRNqqFW7JJP8JufcfM9fF+XLdmBZsny416QJXv5985wId
-         f3EJAZlBudJl4E4RINaNXeSDqeEUbQaZ6OVxRijTFcSCInLnL0qZoAmLFVUaj+uhfdwz
-         5h0v70kWz5CGq3akKbT0pzeTCj0dhmgzIKjYTl0HOzb0/H42v0hBuowEnlz2c6aCf2Ck
-         mFa7c5F4PdYLCqBfUj6dTVRlvXaUOvylc8oJgN5i3CORafDgeAZly4DhA/XRZhKgH39g
-         T8pA==
-X-Gm-Message-State: AOJu0YzWFHRD0lETcrZFS8zl5wxdnImWZbefdLV0Z9YsFQeYpscvlwbX
-	bVugHRxwx4x9Nlsqm7ih0UI/D1Iv7s7vplT0rruV3Qd2QVhQJoDG0atdZ/GG3W3yj5JFXlspkyn
-	1oJh1ZHFXuPEsckskSzvYXzO9tVs2l0vmqZOhmHKrSa/gD3AfXxnG8g==
-X-Gm-Gg: ASbGncuefaIZ11Uu43A6YVdstFJgPWY55sRhLNXjcKnucSsNyDXEVRYQsPt5QV1z93y
-	pvwlO3LDX7p9hLgnDS3MsJ8K+SafL6uzixEMykpyeUx9YVoMGGOo6dYuU3U52+moE85dWIXdPoH
-	FBSAD5/VWaMAgxWWqKGkR+ACv3n2r5nzDMn8v4Ee1yMs6y/wv0ywq/F2xJ7lV2+Xp0SWOscfUn2
-	KuByG/y3dEfNXeMSdOQbOfbkOxriI4QPQdKEswcfHTf5+GfmCVn+5vbfdYPBdvqvnW13Dox6KD+
-	nmvFGIbiBm+OfxOttYxNCk2rr8AKo9hqWXU=
-X-Received: by 2002:a05:600c:3ca2:b0:434:9499:9e87 with SMTP id 5b1f17b1804b1-436e26e5159mr201807655e9.25.1736871134781;
-        Tue, 14 Jan 2025 08:12:14 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IF8vgZLrLq/RIce+Qd4DKIYTgVlfrT4M5xHfXhSzNWPnuLbJHLUdj8sxyqyQEvWyFmxwX3KRg==
-X-Received: by 2002:a05:600c:3ca2:b0:434:9499:9e87 with SMTP id 5b1f17b1804b1-436e26e5159mr201807305e9.25.1736871134418;
-        Tue, 14 Jan 2025 08:12:14 -0800 (PST)
-Received: from debian (2a01cb058d23d60010f10d4cace4e3dd.ipv6.abo.wanadoo.fr. [2a01:cb05:8d23:d600:10f1:d4c:ace4:e3dd])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-436e9d8fd03sm185866225e9.6.2025.01.14.08.12.13
+        d=1e100.net; s=20230601; t=1736871666; x=1737476466;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9X2SSvDnLxI9c2kcCXzMVKuky5eQD6NGK+K32MV0EH4=;
+        b=Y9B9J0AqcBtmKGwFnPupkfffROvfWWRCKA2sp/UIWc4Nwpq6porm9axPKavrtAzTsb
+         C91N4GE0ZhYilmtli96qmcTGRsj8ux5xVM+ZvivEzCpNBNTnhUaDgM3tv2PTZZ1w5RqT
+         cmKNejHK9to9Ez6CpVO9dojJgGKgtVvwppIuRKAsluTMK9G3HpMMXYUBYKjCPm7g+jsZ
+         /yBM4Lh6E1VOPlBwntuBllOJF2m/Ttis0assGI3mVAF/LZ2WVY/mFap8Nn2w4yf1LvZs
+         W893OGlUpg6Pxw3pmNbQt3446L+IYyCSyulolTpu6osa74IAGV9w9Mdy6qBLwCGmvNxC
+         ICjQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWrxq6gkNkXJ3UHTlXCEz2Q2DE6DpPLa+0DJEbc3CUgkdYSkiJRAzLjQ6GSdGylJB+S67x2EOM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyoYoTDdjuzJyAQhbqjSyWzefSU0D8c0OLMABJsd7XL2mpyRMXw
+	FWeU++/3duSBX0ceGdiFArqtWijFPj/B4Iq8SMh760gxdEV2b7Rl
+X-Gm-Gg: ASbGnct2JwEWbXMWc7KX0eEg/ViiaaLLssETWwITELYGM+9yqYPotQoTEoKS1dbKZqB
+	b8M+QqzlX7Uz+WK4BpOuLKyDng443oFz0NHyqZPVDW7sPRp7mqwOn9LDjggkeoCVX+2h/bXjXmB
+	HyrivAOqVtDzhyhsoR2wrrPYwJLanpMt/VpFXhxCEeSucprEhmgBZ/NaOJoKcybbxQDeM2SoQ7Y
+	/eUMiAF73/Dva4Zu32gjJ30PMcxId4fdmylzrRTKJIWbEYtGNP7QjacYIv+Y56Eg0vR6BFe+R0U
+X-Google-Smtp-Source: AGHT+IFCdngPYYfyVCOpKs7OdCzhj4Iw+aeCN4r8kuk3t3wZCRpNj52Y79me9kuJaAUJFYrCe0yAMg==
+X-Received: by 2002:a05:6a00:3912:b0:72a:8cc8:34aa with SMTP id d2e1a72fcca58-72d21df2fb5mr40737210b3a.0.1736871665582;
+        Tue, 14 Jan 2025 08:21:05 -0800 (PST)
+Received: from hoboy.vegasvil.org ([2600:1700:2430:6f6f:e2d5:5eff:fea5:802f])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72d40548916sm7599818b3a.36.2025.01.14.08.21.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Jan 2025 08:12:13 -0800 (PST)
-Date: Tue, 14 Jan 2025 17:12:12 +0100
-From: Guillaume Nault <gnault@redhat.com>
-To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>
-Cc: netdev@vger.kernel.org, Simon Horman <horms@kernel.org>,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	Harald Welte <laforge@gnumonks.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	osmocom-net-gprs@lists.osmocom.org,
-	Ido Schimmel <idosch@nvidia.com>
-Subject: [PATCH net-next] gtp: Prepare ip4_route_output_gtp() to .flowi4_tos
- conversion.
-Message-ID: <bcb279c6946a5f584bc9adbe90b05f6b1997fde0.1736871011.git.gnault@redhat.com>
+        Tue, 14 Jan 2025 08:21:05 -0800 (PST)
+Date: Tue, 14 Jan 2025 08:21:02 -0800
+From: Richard Cochran <richardcochran@gmail.com>
+To: Jiawen Wu <jiawenwu@trustnetic.com>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, linux@armlinux.org.uk,
+	horms@kernel.org, jacob.e.keller@intel.com, netdev@vger.kernel.org,
+	vadim.fedorenko@linux.dev, mengyuanlou@net-swift.com
+Subject: Re: [PATCH net-next v3 4/4] net: ngbe: Add support for 1PPS and TOD
+Message-ID: <Z4aO7v0NFe-aYaFk@hoboy.vegasvil.org>
+References: <20250110031716.2120642-1-jiawenwu@trustnetic.com>
+ <20250110031716.2120642-5-jiawenwu@trustnetic.com>
+ <Z4KnPlCtlhHjFI6z@hoboy.vegasvil.org>
+ <057b01db6584$a13a69d0$e3af3d70$@trustnetic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -96,40 +91,26 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <057b01db6584$a13a69d0$e3af3d70$@trustnetic.com>
 
-Use inet_sk_dscp() to get the socket DSCP value as dscp_t, instead of
-ip_sock_rt_tos() which returns a __u8. This will ease the conversion
-of fl4->flowi4_tos to dscp_t, as it will just require to drop the
-inet_dscp_to_dsfield() call.
+On Mon, Jan 13, 2025 at 02:30:24PM +0800, Jiawen Wu wrote:
+> On Sun, Jan 12, 2025 1:16 AM, Richard Cochran wrote:
+> > ... that appears to be hard coding a period of one second?
+> 
+> Yes. We only want to support 1pps functionality.
 
-Signed-off-by: Guillaume Nault <gnault@redhat.com>
----
- drivers/net/gtp.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+Ok, then you need to check the value of `perout.period`.
 
-diff --git a/drivers/net/gtp.c b/drivers/net/gtp.c
-index 89a996ad8cd0..03d886014f5a 100644
---- a/drivers/net/gtp.c
-+++ b/drivers/net/gtp.c
-@@ -23,6 +23,8 @@
- 
- #include <net/net_namespace.h>
- #include <net/protocol.h>
-+#include <net/inet_dscp.h>
-+#include <net/inet_sock.h>
- #include <net/ip.h>
- #include <net/ipv6.h>
- #include <net/udp.h>
-@@ -350,7 +352,7 @@ static struct rtable *ip4_route_output_gtp(struct flowi4 *fl4,
- 	fl4->flowi4_oif		= sk->sk_bound_dev_if;
- 	fl4->daddr		= daddr;
- 	fl4->saddr		= saddr;
--	fl4->flowi4_tos		= ip_sock_rt_tos(sk);
-+	fl4->flowi4_tos		= inet_dscp_to_dsfield(inet_sk_dscp(inet_sk((sk))));
- 	fl4->flowi4_scope	= ip_sock_rt_scope(sk);
- 	fl4->flowi4_proto	= sk->sk_protocol;
- 
--- 
-2.39.2
+> > > +	wx->pps_width = rq->perout.period.nsec;
+> > > +	wx->ptp_setup_sdp(wx);
+> > 
+> > And this ^^^ is taking the dialed period and turning into the duty
+> > cycle?
+> 
+> We try to use "width",  which means the time from the rising edge to the falling edge.
 
+You should use the passed duty cycle for that.
+
+Thanks,
+Richard
 
