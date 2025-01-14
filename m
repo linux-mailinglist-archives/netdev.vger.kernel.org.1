@@ -1,114 +1,109 @@
-Return-Path: <netdev+bounces-158084-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158073-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22785A10669
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 13:16:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 796EDA10644
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 13:12:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 46396169D17
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 12:16:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8CD161616A4
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 12:12:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF7361C2337;
-	Tue, 14 Jan 2025 12:16:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBF34236EB2;
+	Tue, 14 Jan 2025 12:12:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gbNYOxxX"
+	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="f68S+rd2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D80C236EC3
-	for <netdev@vger.kernel.org>; Tue, 14 Jan 2025 12:16:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B522A236EB3
+	for <netdev@vger.kernel.org>; Tue, 14 Jan 2025 12:12:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736856966; cv=none; b=a8auNuvn8D1FAOSGSRcEW0SJAK7RqewJ8Zv9MmMW7KELst3TWstqq1sZS13TpHeE+wVMjAUMsu8QdoiAvDS1dDS5rtrVdjNY11kfX4pkUZIXg9qUmcWHvLCRmgL+jxzAz26gsQ/rPxkb9uxoURhFMi/uJfILYQcnWFWSI7SLpD4=
+	t=1736856742; cv=none; b=OVPDiw0LvXifE1Q6xK5hbYXya/nHt8pLqbLM/0rKsWCL7IL3U7IOeCDYKpm81rRrRwK/Q788wOiJe22S6FM+zLj46ykksyY+vMN3nfTVCW8DnCSSCZiKK1gBGj6Ct9EckCJc8XC83kN/f6vNWsAub2XnznnJ14R+gHL1mokKYT8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736856966; c=relaxed/simple;
-	bh=lO44xu74L9hP8teUnj4QEYpRhlSZ+ynqWFZz1/lGBeM=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=H8BNDBIrbhJxLBZlKU83iGrJoaiNrJjNBv5twyJFLdJkn99UGdKuCJTVKCRkBvZ3ClQFsOUV/tSV4eUqx14pAbunZig3pfwWYXgToJhez/Nbo5EZRcNVdR8Jn6Rzsm06gqgX0ClTCgJxTtuFgpLUHX5VDBAm7kQSYEjMVzy6jz8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gbNYOxxX; arc=none smtp.client-ip=198.175.65.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1736856966; x=1768392966;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=lO44xu74L9hP8teUnj4QEYpRhlSZ+ynqWFZz1/lGBeM=;
-  b=gbNYOxxXeka+YiKROrwoQLkogW1ebx3sJneTplnLE0GR2jZg818A/9I+
-   fxhK2yYI5scJ8PlXZhuOV7CQHoBGBPr3r3KyUXTl97li7eidzTK3wZIG1
-   RtK6ouaktn6JtpdEK2j8oookNfjigddkahIy16uh8tIdkUtTRTbJ1NGS0
-   8XAKmx2MDirmZtYMqokxzUScm3UDgATLTOtRTEWuLYnJ29ROthqdn4T++
-   k5u2aoaYU3crrZVzUsolEDFMSs2JYCh34bwp04/rqT23WafJ/GW1k6Dj7
-   DBYJGwMkiVLyDuFaypgmAhReWle3MeS4s3xTuLYboJloYSeJJPiNRIs2Y
-   Q==;
-X-CSE-ConnectionGUID: eJ57KmxdS4O3w2QC0iovtQ==
-X-CSE-MsgGUID: lmO/S83OQ26iAxzmcmpE6g==
-X-IronPort-AV: E=McAfee;i="6700,10204,11314"; a="59632214"
-X-IronPort-AV: E=Sophos;i="6.12,314,1728975600"; 
-   d="scan'208";a="59632214"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jan 2025 04:16:02 -0800
-X-CSE-ConnectionGUID: GeZJJfpZRpqFfjmUHvCfFw==
-X-CSE-MsgGUID: EPpvYxebRi2DdBngBUzTwg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="104642148"
-Received: from unknown (HELO localhost.igk.intel.com) ([10.102.22.54])
-  by orviesa010.jf.intel.com with ESMTP; 14 Jan 2025 04:15:59 -0800
-From: Milena Olech <milena.olech@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	anthony.l.nguyen@intel.com,
-	przemyslaw.kitszel@intel.com,
-	Milena Olech <milena.olech@intel.com>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>
-Subject: [PATCH v4 iwl-next 10/10] idpf: change the method for mailbox workqueue allocation
-Date: Tue, 14 Jan 2025 13:11:17 +0100
-Message-Id: <20250114121103.605288-11-milena.olech@intel.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20250114121103.605288-1-milena.olech@intel.com>
-References: <20250114121103.605288-1-milena.olech@intel.com>
+	s=arc-20240116; t=1736856742; c=relaxed/simple;
+	bh=K6oz2DS94f8jy21SzXh52ZGsk7kmXvUL4fauuKsYHSA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=h8m/AbsVH/PU9WkYVjC02NjZi6MqNuh1fx/NxUr+zRtgsXxspSRaAHM/Xa5vuYvcF8Qm1u0qRytiZAP+/cqh4iVO8ueUmNSnjpJgvt5RIWSfZXQ4fC9hoqEGmgsJWGJJfkbLArvpeYEBbkoL4W47CwqKKAKoYYeOlgOJGdxKpog=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=f68S+rd2; arc=none smtp.client-ip=209.85.208.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
+Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-3061513d353so26688981fa.2
+        for <netdev@vger.kernel.org>; Tue, 14 Jan 2025 04:12:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1736856739; x=1737461539; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=K6oz2DS94f8jy21SzXh52ZGsk7kmXvUL4fauuKsYHSA=;
+        b=f68S+rd2H2M+mTqpHL+RyKBn+6j9nrOVdFgEMefWySkKUAzP9y9mjuA6H0Ro66sBjM
+         FCXYXkG4Lcg5tb8jEqGt4CbD58xensbZNXE5Pbmq2LtOZIbez4+69aj4vauoxAXkTgTy
+         z6B1BSnHVTcPJ0q4kbHbJBN2xST9NIbHGqmkpCC8t6cBjS2olv3XycARQFl/Uo5WlRvV
+         FOnoRwUGqxCx91jKhvi0O0oPFHQpTZZWyz5B0CLpORzWhxOfMr1B283BdubODqySHg2+
+         tyzPDiJH777Ux4/Ar26YyhGNMjmIVyK5aJX69sAKH+0KRzFgg9irk2ishhA11kwkgKIR
+         GidQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736856739; x=1737461539;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=K6oz2DS94f8jy21SzXh52ZGsk7kmXvUL4fauuKsYHSA=;
+        b=amYnYy0cHA4Nkek02obmTHmaQK+vSaGEwr1G46jFmgnX8S14jcyAdE1+kO05FJ9ivA
+         sZp6KpeSfx79HQbYr+ZkGW+Grl4v6RoTvvU4i5Aqhf4WMEg0e8KvHayGZIBoQKWlQFOn
+         LSXqxm8ooEiR/74fW8COyx3EnmKRqKaW0n/s1RHjol+YbVLzYyE8cMHJVtf33ozMGvG/
+         jdkibh1oB/SnJRWk5LKnRPeLsSI2dEWQ/9aHmnZzfgepKJRFDTb6hwbt7IAuEsC6DL/b
+         sBtRu7gH2ASczBhTOwkHOwLgCf1SeT9dDaVnOm4S0pS+paMAh1GnTLSFRF/xQ8lcKazk
+         0vDw==
+X-Forwarded-Encrypted: i=1; AJvYcCWwaUXqdKdL7XRFgiWGzz+4BXolZRgt6A9WRthYKhNsI2SFdQkKf3vp+bUctkHut6wYMfCUKs4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwxxlG6WYPWO04pVE1FsdY4uUXT46AvUSFXqr47jE98FO4B+4ZE
+	PCfJ2VoN+6UtJWGHx7weHMk6FbumcPSxlTxs3YmGF2H5tWYzJlqgJGQAMGfTDSvEAfSAouDtfub
+	gi6me5TPmUafr3wzUhlLulibenfE/i/LJWo5OcA==
+X-Gm-Gg: ASbGncs/8Flgx7cNnDG7qxs6dRKvZMkavHzrSBHCcOPaB8VnD7Lr362CO+UkhMzFl4k
+	slV1BSwYO1AHDXmksij4ruPFjFl/SbtqKa9WCGLGOFVpnhNXXlWDMYsH84xeM2i6BExXLow==
+X-Google-Smtp-Source: AGHT+IENAzQOWIqeBcjNLCeAWZHXeOZ644Mso77ytYMGJJwc3A78vETSt+TEx++AZVkXjYF397/HELxPeWd4tKYdKto=
+X-Received: by 2002:a2e:a587:0:b0:300:3a15:8f2a with SMTP id
+ 38308e7fff4ca-305f459aaddmr69824011fa.2.1736856738634; Tue, 14 Jan 2025
+ 04:12:18 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20250114033010.2445925-1-a0282524688@gmail.com> <20250114033010.2445925-3-a0282524688@gmail.com>
+In-Reply-To: <20250114033010.2445925-3-a0282524688@gmail.com>
+From: Bartosz Golaszewski <brgl@bgdev.pl>
+Date: Tue, 14 Jan 2025 13:12:07 +0100
+X-Gm-Features: AbW1kvZqlT9ZQof5_cPsRoDpTSEUzbcfgE_gPvPzrdmIRQZ45w8iL14wP2FIYK8
+Message-ID: <CAMRc=MeEye9i2Z=Y8bHt2ruCS6JJRxmGiLvAUt6E7BJ2K4wosg@mail.gmail.com>
+Subject: Re: [PATCH v5 2/7] gpio: Add Nuvoton NCT6694 GPIO support
+To: Ming Yu <a0282524688@gmail.com>
+Cc: tmyu0@nuvoton.com, lee@kernel.org, linus.walleij@linaro.org, 
+	andi.shyti@kernel.org, mkl@pengutronix.de, mailhol.vincent@wanadoo.fr, 
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, wim@linux-watchdog.org, 
+	linux@roeck-us.net, jdelvare@suse.com, alexandre.belloni@bootlin.com, 
+	linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org, 
+	linux-i2c@vger.kernel.org, linux-can@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org, 
+	linux-rtc@vger.kernel.org, linux-usb@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Since workqueues are created per CPU, the works scheduled to this
-workqueues are run on the CPU they were assigned. It may result in
-overloaded CPU that is not able to handle virtchnl messages in
-relatively short time. Allocating workqueue with WQ_UNBOUND and
-WQ_HIGHPRI flags allows scheduler to queue virtchl messages on less loaded
-CPUs, what eliminates delays.
+On Tue, Jan 14, 2025 at 4:30=E2=80=AFAM Ming Yu <a0282524688@gmail.com> wro=
+te:
+>
+> This driver supports GPIO and IRQ functionality for NCT6694 MFD
+> device based on USB interface.
+>
+> Signed-off-by: Ming Yu <a0282524688@gmail.com>
+> ---
 
-Reviewed-by: Alexander Lobakin <aleksander.lobakin@intel.com>
-Signed-off-by: Milena Olech <milena.olech@intel.com>
----
- drivers/net/ethernet/intel/idpf/idpf_main.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+Please pick up review tags when resending.
 
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_main.c b/drivers/net/ethernet/intel/idpf/idpf_main.c
-index 85c65c2145f7..66f9e4633e3a 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_main.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_main.c
-@@ -222,9 +222,8 @@ static int idpf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 		goto err_serv_wq_alloc;
- 	}
- 
--	adapter->mbx_wq = alloc_workqueue("%s-%s-mbx",
--					  WQ_UNBOUND | WQ_MEM_RECLAIM, 0,
--					  dev_driver_string(dev),
-+	adapter->mbx_wq = alloc_workqueue("%s-%s-mbx", WQ_UNBOUND | WQ_HIGHPRI,
-+					  0, dev_driver_string(dev),
- 					  dev_name(dev));
- 	if (!adapter->mbx_wq) {
- 		dev_err(dev, "Failed to allocate mailbox workqueue\n");
--- 
-2.31.1
-
+Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
+Acked-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 
