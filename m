@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-158128-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158129-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2EC19A10864
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 15:03:53 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2339BA10865
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 15:04:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 78EA8168E51
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E6FAA3A2A27
 	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 14:03:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D366130E58;
-	Tue, 14 Jan 2025 14:02:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8006C7DA84;
+	Tue, 14 Jan 2025 14:03:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="HiXq8HH1"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="0GXKuHue"
 X-Original-To: netdev@vger.kernel.org
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D413913BAD5
-	for <netdev@vger.kernel.org>; Tue, 14 Jan 2025 14:02:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D07B913C67E
+	for <netdev@vger.kernel.org>; Tue, 14 Jan 2025 14:03:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736863379; cv=none; b=YgVQ+t2DKQbZTU+NZCtrFS7g4EjRl6T8vPzlFez6M9jsWKTmxTP6ivOKxScqddkom5UIoxfSVj6efv68os9/z+b4QICD5AqU/OoV3C0pWxpRMJBkZuwNRWkf0mWlcTysStoYpZaXAkfkWZpOtoaxhxlRzK0eHiNpVdbcV9XBeT0=
+	t=1736863386; cv=none; b=ulTE7u6xcdsMLTcfv2Ml2+Ypv+JRWLpvDro+esmzPxD1EJujmeUyCoN3LlYjWYqYW+Na1cgkuLkw3UoKetpTrwrfxzFcF5bueBuaem+nPEd9en35EH04Vij/B9Vfy9uw5y23/tQ3zlxusjQHZ9n2LjzgOCOP6gcTaqGn/V4GeOU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736863379; c=relaxed/simple;
-	bh=Eadc3HOPydMVOuSkjXo430yhpawxIz55xyvLdubKJmM=;
+	s=arc-20240116; t=1736863386; c=relaxed/simple;
+	bh=RwBpNhDTxbL0EDbsUykxhLfFb/kb3Gf+Pc2ahz1koPI=;
 	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
-	 Content-Disposition:Content-Type:Message-Id:Date; b=NSa8unqytH8eUC4F/xkXmCSRPswFzA+kzdVb+2qUneAi7Pmchg2RJoQpgPFv6GqTwsRe1bI7OhXbLlb+h7s3nGGEsgP9rnq3pHXelHjte6tgTmo8QWNzYX5l+K4/kOiE3+40o1zGYcwQXuEhjOvDbQ7a/Zhfs9zmsTfZcMWLvbI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=HiXq8HH1; arc=none smtp.client-ip=78.32.30.218
+	 Content-Disposition:Content-Type:Message-Id:Date; b=aM+I+ewUkC1xy2RYyd3jIcn9w2MZq733Ct45Omay0PSm09KtnBAEZX9Q9q87C8kK+v8N1uY2MsBp2zTsgLjKVsJCV65OfxEK4AmkxzIuBQIUr5o7pj3eRNT0puKpuEK1uDT1s1332Dw08iILNbNXO7Kgv/9Tfad9ypWh4Y+mpKQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=0GXKuHue; arc=none smtp.client-ip=78.32.30.218
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
@@ -37,21 +37,21 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
 	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
 	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=FL2U0Clxtz2qYMYqsJRHm49aBAz5FuraBvr2pDpbB9w=; b=HiXq8HH1Iabdy2eJxGJyLdozMq
-	k8tDJO+aMZh6F5gsvfyISLk7VkHwUyyhUA7pJ4Lkt6bcQTumJZUjuvE29h5qdJF9ILtHW3Pph1xYT
-	6t/kLN5Qf3yXHsWHPC5YK2AJwgvuMyRTnlS3SBZVQK5AOdTJZd+6zf/B/Mu/Rjz1gGv2GnXhcHPqZ
-	LWi0YSdY5Hzi7uGufZBCd04tYVAygss/qiE9KJZBl8zEV761JgPgQPxhyv0HFEqx2hhUxgDY1nT6d
-	wCV4djQa0/Bk/Ag5hUys4nwRw3gv0l7QRyepfiWWx8Kbvnd61udcnZNN+wgguvZM9w+h2ME1bP9mX
-	DF60xh/w==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:49798 helo=rmk-PC.armlinux.org.uk)
+	bh=BMwZqYMExIOn36De5aHwt8X+eNPnw8Db/HdEs1fJA6I=; b=0GXKuHueZx/5xrO6yxWbwAcsuI
+	tJnwz+jq/enF2snYl7Cfd4ofhb5nxlJHZ1gIq7DgF31tav4EYPe9obbdeLEUiMLGqgbacPenA9o7v
+	QotbQ4vgl4qzslVSl0G/DFR3DoldKoJIdQfRwxEeMk9v+KqgGSceYPssdjDvQ/JpMAr+XTid+gsRT
+	RPk0tWmLO5sjOVbWhXOpyXX3OCdN9ddD2MvXXTL8kV9BZ1h58Qj5LB6zK0L8jchjwK5bWVwE1gYND
+	vMimLfB7vYQnATVMIaAsF/1LJaGsyH8UNdlTGbZ56nNqry13qWgODwIWC4IDHrp5IpYvN8bk3VO7b
+	uCPMjEGQ==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:42216 helo=rmk-PC.armlinux.org.uk)
 	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <rmk@armlinux.org.uk>)
-	id 1tXhVI-0008AE-2a;
-	Tue, 14 Jan 2025 14:02:48 +0000
+	id 1tXhVN-0008AY-2W;
+	Tue, 14 Jan 2025 14:02:54 +0000
 Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
 	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1tXhUz-000n0k-IY; Tue, 14 Jan 2025 14:02:29 +0000
+	id 1tXhV4-000n0q-LU; Tue, 14 Jan 2025 14:02:34 +0000
 In-Reply-To: <Z4ZtoeeHIXPucjUv@shell.armlinux.org.uk>
 References: <Z4ZtoeeHIXPucjUv@shell.armlinux.org.uk>
 From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
@@ -72,7 +72,8 @@ Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
 	Simon Horman <horms@kernel.org>,
 	UNGLinuxDriver@microchip.com,
 	Vladimir Oltean <olteanv@gmail.com>
-Subject: [PATCH RFC net-next 06/10] net: mvpp2: add EEE implementation
+Subject: [PATCH RFC net-next 07/10] net: lan743x: use netdev in
+ lan743x_phylink_mac_link_down()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,175 +83,31 @@ MIME-Version: 1.0
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1tXhUz-000n0k-IY@rmk-PC.armlinux.org.uk>
+Message-Id: <E1tXhV4-000n0q-LU@rmk-PC.armlinux.org.uk>
 Sender: Russell King <rmk@armlinux.org.uk>
-Date: Tue, 14 Jan 2025 14:02:29 +0000
+Date: Tue, 14 Jan 2025 14:02:34 +0000
 
-Add EEE support for mvpp2, using phylink's EEE implementation, which
-means we just need to implement the two methods for LPI control, and
-with the initial configuration. Only SGMII mode is supported, so only
-100M and 1G speeds.
+Use the netdev that we already have in lan743x_phylink_mac_link_down().
 
-Disabling LPI requires clearing a single bit. Enabling LPI needs a full
-configuration of several values, as the timer values are dependent on
-the MAC operating speed.
-
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
---
-v3: split LPI timer limit and validation into separate patches
 ---
- drivers/net/ethernet/marvell/mvpp2/mvpp2.h    |  5 ++
- .../net/ethernet/marvell/mvpp2/mvpp2_main.c   | 86 +++++++++++++++++++
- 2 files changed, 91 insertions(+)
+ drivers/net/ethernet/microchip/lan743x_main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/marvell/mvpp2/mvpp2.h b/drivers/net/ethernet/marvell/mvpp2/mvpp2.h
-index 9e02e4367bec..364d038da7ea 100644
---- a/drivers/net/ethernet/marvell/mvpp2/mvpp2.h
-+++ b/drivers/net/ethernet/marvell/mvpp2/mvpp2.h
-@@ -481,6 +481,11 @@
- #define MVPP22_GMAC_INT_SUM_MASK		0xa4
- #define     MVPP22_GMAC_INT_SUM_MASK_LINK_STAT	BIT(1)
- #define	    MVPP22_GMAC_INT_SUM_MASK_PTP	BIT(2)
-+#define MVPP2_GMAC_LPI_CTRL0			0xc0
-+#define     MVPP2_GMAC_LPI_CTRL0_TS_MASK	GENMASK(8, 8)
-+#define MVPP2_GMAC_LPI_CTRL1			0xc4
-+#define     MVPP2_GMAC_LPI_CTRL1_REQ_EN		BIT(0)
-+#define     MVPP2_GMAC_LPI_CTRL1_TW_MASK	GENMASK(15, 4)
+diff --git a/drivers/net/ethernet/microchip/lan743x_main.c b/drivers/net/ethernet/microchip/lan743x_main.c
+index 4dc5adcda6a3..8d7ad021ac70 100644
+--- a/drivers/net/ethernet/microchip/lan743x_main.c
++++ b/drivers/net/ethernet/microchip/lan743x_main.c
+@@ -3029,7 +3029,7 @@ static void lan743x_phylink_mac_link_down(struct phylink_config *config,
+ 	struct net_device *netdev = to_net_dev(config->dev);
+ 	struct lan743x_adapter *adapter = netdev_priv(netdev);
  
- /* Per-port XGMAC registers. PPv2.2 and PPv2.3, only for GOP port 0,
-  * relative to port->base.
-diff --git a/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c b/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
-index f85229a30844..a8c33417bb3e 100644
---- a/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
-+++ b/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
-@@ -5757,6 +5757,28 @@ static int mvpp2_ethtool_set_rxfh(struct net_device *dev,
- 	return mvpp2_modify_rxfh_context(dev, NULL, rxfh, extack);
+-	netif_tx_stop_all_queues(to_net_dev(config->dev));
++	netif_tx_stop_all_queues(netdev);
+ 	lan743x_mac_eee_enable(adapter, false);
  }
  
-+static int mvpp2_ethtool_get_eee(struct net_device *dev,
-+				 struct ethtool_keee *eee)
-+{
-+	struct mvpp2_port *port = netdev_priv(dev);
-+
-+	if (!port->phylink)
-+		return -EOPNOTSUPP;
-+
-+	return phylink_ethtool_get_eee(port->phylink, eee);
-+}
-+
-+static int mvpp2_ethtool_set_eee(struct net_device *dev,
-+				 struct ethtool_keee *eee)
-+{
-+	struct mvpp2_port *port = netdev_priv(dev);
-+
-+	if (!port->phylink)
-+		return -EOPNOTSUPP;
-+
-+	return phylink_ethtool_set_eee(port->phylink, eee);
-+}
-+
- /* Device ops */
- 
- static const struct net_device_ops mvpp2_netdev_ops = {
-@@ -5802,6 +5824,8 @@ static const struct ethtool_ops mvpp2_eth_tool_ops = {
- 	.create_rxfh_context	= mvpp2_create_rxfh_context,
- 	.modify_rxfh_context	= mvpp2_modify_rxfh_context,
- 	.remove_rxfh_context	= mvpp2_remove_rxfh_context,
-+	.get_eee		= mvpp2_ethtool_get_eee,
-+	.set_eee		= mvpp2_ethtool_set_eee,
- };
- 
- /* Used for PPv2.1, or PPv2.2 with the old Device Tree binding that
-@@ -6672,6 +6696,55 @@ static void mvpp2_mac_link_down(struct phylink_config *config,
- 	mvpp2_port_disable(port);
- }
- 
-+static void mvpp2_mac_disable_tx_lpi(struct phylink_config *config)
-+{
-+	struct mvpp2_port *port = mvpp2_phylink_to_port(config);
-+
-+	mvpp2_modify(port->base + MVPP2_GMAC_LPI_CTRL1,
-+		     MVPP2_GMAC_LPI_CTRL1_REQ_EN, 0);
-+}
-+
-+static int mvpp2_mac_enable_tx_lpi(struct phylink_config *config, u32 timer,
-+				   bool tx_clk_stop)
-+{
-+	struct mvpp2_port *port = mvpp2_phylink_to_port(config);
-+	u32 ts, tw, lpi1, status;
-+
-+	status = readl(port->base + MVPP2_GMAC_STATUS0);
-+	if (status & MVPP2_GMAC_STATUS0_GMII_SPEED) {
-+		/* At 1G speeds, the timer resolution are 1us, and
-+		 * 802.3 says tw is 16.5us. Round up to 17us.
-+		 */
-+		tw = 17;
-+		ts = timer;
-+	} else {
-+		/* At 100M speeds, the timer resolutions are 10us, and
-+		 * 802.3 says tw is 30us.
-+		 */
-+		tw = 3;
-+		ts = DIV_ROUND_UP(timer, 10);
-+	}
-+
-+	if (ts > 255)
-+		ts = 255;
-+
-+	/* Configure ts */
-+	mvpp2_modify(port->base + MVPP2_GMAC_LPI_CTRL0,
-+		     MVPP2_GMAC_LPI_CTRL0_TS_MASK,
-+		     FIELD_PREP(MVPP2_GMAC_LPI_CTRL0_TS_MASK, ts));
-+
-+	lpi1 = readl(port->base + MVPP2_GMAC_LPI_CTRL1);
-+
-+	/* Configure tw */
-+	lpi1 = u32_replace_bits(lpi1, tw, MVPP2_GMAC_LPI_CTRL1_TW_MASK);
-+
-+	/* Enable LPI generation */
-+	writel(lpi1 | MVPP2_GMAC_LPI_CTRL1_REQ_EN,
-+	       port->base + MVPP2_GMAC_LPI_CTRL1);
-+
-+	return 0;
-+}
-+
- static const struct phylink_mac_ops mvpp2_phylink_ops = {
- 	.mac_select_pcs = mvpp2_select_pcs,
- 	.mac_prepare = mvpp2_mac_prepare,
-@@ -6679,6 +6752,8 @@ static const struct phylink_mac_ops mvpp2_phylink_ops = {
- 	.mac_finish = mvpp2_mac_finish,
- 	.mac_link_up = mvpp2_mac_link_up,
- 	.mac_link_down = mvpp2_mac_link_down,
-+	.mac_enable_tx_lpi = mvpp2_mac_enable_tx_lpi,
-+	.mac_disable_tx_lpi = mvpp2_mac_disable_tx_lpi,
- };
- 
- /* Work-around for ACPI */
-@@ -6957,6 +7032,15 @@ static int mvpp2_port_probe(struct platform_device *pdev,
- 		port->phylink_config.mac_capabilities =
- 			MAC_2500FD | MAC_1000FD | MAC_100 | MAC_10;
- 
-+		__set_bit(PHY_INTERFACE_MODE_SGMII,
-+			  port->phylink_config.lpi_interfaces);
-+
-+		port->phylink_config.lpi_capabilities = MAC_1000FD | MAC_100FD;
-+
-+		/* Setup EEE.  Choose 250us idle. */
-+		port->phylink_config.lpi_timer_default = 250;
-+		port->phylink_config.eee_enabled_default = true;
-+
- 		if (port->priv->global_tx_fc)
- 			port->phylink_config.mac_capabilities |=
- 				MAC_SYM_PAUSE | MAC_ASYM_PAUSE;
-@@ -7031,6 +7115,8 @@ static int mvpp2_port_probe(struct platform_device *pdev,
- 			goto err_free_port_pcpu;
- 		}
- 		port->phylink = phylink;
-+
-+		mvpp2_mac_disable_tx_lpi(&port->phylink_config);
- 	} else {
- 		dev_warn(&pdev->dev, "Use link irqs for port#%d. FW update required\n", port->id);
- 		port->phylink = NULL;
 -- 
 2.30.2
 
