@@ -1,224 +1,106 @@
-Return-Path: <netdev+bounces-158180-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158181-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 55557A10CB4
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 17:51:30 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A0EAA10CBC
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 17:53:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A9793167E5D
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 16:51:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A6078168540
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 16:53:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 567C91B6CFB;
-	Tue, 14 Jan 2025 16:51:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A3A21D63DC;
+	Tue, 14 Jan 2025 16:53:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="EdQOTFCc"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Mv7tXBHR"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79F45232459
-	for <netdev@vger.kernel.org>; Tue, 14 Jan 2025 16:51:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B5EA23245F;
+	Tue, 14 Jan 2025 16:53:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736873484; cv=none; b=KLaEBtO0ACn21xn4ztXI16pLk+lsyQf8F+UslEkhMi2jS3oG9LJrMy3U2WkPLR5A568cvf8Dy++S19G7bTc6fr/nAlwao5QPoB38FJ+2aTnnBMweCwBUDJqNv2UVT1drToJRXxRR4/Wcustq8mcxK8lTZO/eC/lHX9RjajBAf2s=
+	t=1736873599; cv=none; b=rRAH+K8nNYrSJxKYDDeWEo4P2LRb30C8AJ4lC1gv3CI6S7favBDoF8HEOmWWNUcN3ACnO4j4v7Zhl1EN3as7E6yCEwq3sgaU33/xlRdtjiS62G/Y0deOd031znj6AokZrubAwb3OyEtv/RyztDTk2K6ou22Ucc6xf66e/o7aD9A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736873484; c=relaxed/simple;
-	bh=sS0SNPUTBZCONHd/3nmbyQ70JqGsNVfOp+hf+q5fd5E=;
-	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
-	 Content-Disposition:Content-Type:Message-Id:Date; b=N9JqOvEIOP8wnjnkdRNBfpyxOfQ94MNw4gyDIA/IyZI6DNC6XxspjWmjlJGERVgcx5G8NHHGg/m/ZNf1dykJ+/iLrA9m/FsTWi+on/GRlkkeNjDdZqJIue3aJiC4TSrOMoV/8OaWNVorA6X3fhxJT9XJ979LQTqHVOU4qA7C260=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=EdQOTFCc; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
-	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:References:
-	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=oenY17GSf8f8EXzY6YS/3Oz03Km0J1tQZHiPenN9SJA=; b=EdQOTFCcpVQqJL9SbFTXjDlfow
-	ydKYKjYnd9HevwZDOpEePzwsVzWzRC+tPQNZ7fK7GSQTwYNv7Y4+z837NdR9f8mtnWCfUXTu0ljOw
-	LNvr1S2CtvzR4yFEii1UTpneUjnNrKY8f4R5rTcKfBMj3Foo9jB3GCyFyaFXoTG7L53SBNkQ/CNxp
-	sFM6CM0zhsrafqsJLeipqGP15yUje5a6bCM8LZ9UlfVJe7KNYqSj1zsGCM4xpKsaoks6ZnaF4GeJX
-	lUwkZC3bB1eIRuR8th9XBqj6N8CubGhWVa9uSGDG2sdYhuF9qBLnL7LeR/du5FmcO8a32Vh8bTr46
-	LmghgCjg==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:60496 helo=rmk-PC.armlinux.org.uk)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <rmk@armlinux.org.uk>)
-	id 1tXk8L-0008OK-0R;
-	Tue, 14 Jan 2025 16:51:17 +0000
-Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1tXk81-000r4x-TS; Tue, 14 Jan 2025 16:50:57 +0000
-In-Reply-To: <Z4aV3RmSZJ1WS3oR@shell.armlinux.org.uk>
-References: <Z4aV3RmSZJ1WS3oR@shell.armlinux.org.uk>
-From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	bcm-kernel-feedback-list@broadcom.com,
+	s=arc-20240116; t=1736873599; c=relaxed/simple;
+	bh=vu1/lKO4P2wk17+PTFiRBH88bLbNcFY6EKVCKaANTpM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=arszkd5KP1jICWFW494uDivU6+oQEqD292S+ARi20G1yo6jRD6wE1gB4Se2ecKhr40oJY21qZyyFiDN+bdg48mIGfBuv80SYTvsu8J9mfUODv2mvEfnPehnpN+KpfaSNunX/C0slgW3DnFvn2xRTJhg8n/DvAFq4OEEqObs1Zv0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Mv7tXBHR; arc=none smtp.client-ip=209.85.128.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-43658c452f5so5073125e9.0;
+        Tue, 14 Jan 2025 08:53:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1736873596; x=1737478396; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=vu1/lKO4P2wk17+PTFiRBH88bLbNcFY6EKVCKaANTpM=;
+        b=Mv7tXBHRP6D69T84J2F/FPwEgAPut09/VhN2JiK+tCyv7gxe/NpMnsYLQqeUy3B2An
+         1mBbA3O4lDs6qv8poFXSZ7j3hI59sMmkyVeKySN9KQvKmtRjZOzFsUlTeCpEES2+GmhP
+         jx4YJ2lgNPgybje6rvTjeTANOmz91HdqTfmtnyo36Jm1mrkPc4OSLYUBe1Xw/cT8eGWU
+         wZ3U9n5YY1Ne5oIm9wC2FyuP3tsW06HgFZez9hnI6/67NaXFrTUz5jciW04MNkcHapUm
+         Up+LUOVALeA329I2qYleFvq3dhPdf5J+zS91sYUE2SrnXoyPVrhM9t/KQA/IlVYU1qo1
+         aoKA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736873596; x=1737478396;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vu1/lKO4P2wk17+PTFiRBH88bLbNcFY6EKVCKaANTpM=;
+        b=gGOb+UuZTwhytnXTQEDEEZfF+f6ZWHtpkVwuvktUksKYenllOrCKLA4K9H3W8w0MqT
+         tOIGFo/3bAFbYsEVpeYVri00intELtHTG1qlyb+yne52IE8eksnN1SfSRXs4pfVfgrzK
+         yqhvuWHIOvJghefJwTsKyI1J/6mR8oKUcTWY625/3vZ2JaUd/L7zARJtKnrCbV+jJg5m
+         MHXjxNjiUPTliJX4qAyh3HXC4baIWesSU9CVddUEHM+cIszT0suAjVxO1aDV4rc5CTZ/
+         FpHVbwNc6Fnwv0f6Tu5ClAlfMat68phJS4b+ADqpx03fOwyrQY569okHNnP4kbOJmZoh
+         sv+Q==
+X-Forwarded-Encrypted: i=1; AJvYcCU8+GO4X/Wc4n6DeKqG3eTvUymc1rNwnwR+JBmZIvp4sL3qn0ZRmK983arrzubgS8FVBf2RMtzJ@vger.kernel.org, AJvYcCWvl4WQ9ZTb6MPgpwtLnirBZ0Wyc0zw+a6FjjtF9CjJbSUYEN8OyvGY5frTOzKoWPdIvUeZhOTZ2At4AyE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwRy7bmEGF3P8BVB9QBCLJCrCOwiSfZSMdXlnWUYPnkTIzeqC0P
+	CRUtk92PWDVEk5kxfbbujE03+KifYiKCB/t21gApAc5PogEDPuDi
+X-Gm-Gg: ASbGncvRzAgJLs8R8BpIKa4QXfAG3xhElFdprfL5uHiTlr45ROOndq7/YX6noZMm8JR
+	UQIfVgzOYruW5F/49dV47hVHTY9/ZXI5gsMBEiDtyrtIohlYLndbpQPP+G6z1qFEeymvr64LvkG
+	FBHbsJfuou8DJVrEE9x03tlqkXDukRvgjuAZap6ydN5CmZV5jyVd5YiRicaX5bs2l4+pHJLWqtn
+	RSnJ3oSQXU3HT4IZde0ep+D4GznNUQq2gptzcPMhOb0
+X-Google-Smtp-Source: AGHT+IG5kfIyOEwl1MjdXLkyW8M7Sfqc9SY00TNDKu9nE6rTRdfeIvsXv85CXElHhPxjXBpffhJ0Ew==
+X-Received: by 2002:a05:6000:2a9:b0:382:4e5c:5c96 with SMTP id ffacd0b85a97d-38a87303e57mr8516976f8f.8.1736873595484;
+        Tue, 14 Jan 2025 08:53:15 -0800 (PST)
+Received: from skbuf ([86.127.124.81])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-436e9d8fc51sm183317915e9.7.2025.01.14.08.53.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 14 Jan 2025 08:53:14 -0800 (PST)
+Date: Tue, 14 Jan 2025 18:53:12 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Tristram.Ha@microchip.com
+Cc: Woojung Huh <woojung.huh@microchip.com>, Andrew Lunn <andrew@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Justin Chen <justin.chen@broadcom.com>,
-	netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net-next 3/3] net: bcm: asp2: convert to phylib managed EEE
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	UNGLinuxDriver@microchip.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v2] net: dsa: microchip: Add SGMII port support
+ to KSZ9477 switch
+Message-ID: <20250114165312.zfsozrtud5wqjn5s@skbuf>
+References: <20250114024704.36972-1-Tristram.Ha@microchip.com>
+ <20250114160908.les2vsq42ivtrvqe@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1tXk81-000r4x-TS@rmk-PC.armlinux.org.uk>
-Sender: Russell King <rmk@armlinux.org.uk>
-Date: Tue, 14 Jan 2025 16:50:57 +0000
+In-Reply-To: <20250114160908.les2vsq42ivtrvqe@skbuf>
 
-Convert the Broadcom ASP2 driver to use phylib managed EEE support.
+On Tue, Jan 14, 2025 at 06:09:08PM +0200, Vladimir Oltean wrote:
+> There is way too much that seems unjustifiably complex at this stage,
+> including this. I would like to see a v3 using xpcs + the remaining
+> required delta for ksz9477, ideally with no internal PHY simulation.
+> Then we can go from there.
 
-Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
----
- drivers/net/ethernet/broadcom/asp2/bcmasp.h   |  3 --
- .../ethernet/broadcom/asp2/bcmasp_ethtool.c   | 31 -------------------
- .../net/ethernet/broadcom/asp2/bcmasp_intf.c  | 19 ++++++------
- 3 files changed, 10 insertions(+), 43 deletions(-)
-
-diff --git a/drivers/net/ethernet/broadcom/asp2/bcmasp.h b/drivers/net/ethernet/broadcom/asp2/bcmasp.h
-index f93cb3da44b0..8fc75bcedb70 100644
---- a/drivers/net/ethernet/broadcom/asp2/bcmasp.h
-+++ b/drivers/net/ethernet/broadcom/asp2/bcmasp.h
-@@ -348,8 +348,6 @@ struct bcmasp_intf {
- 	/* Used if per intf wol irq */
- 	int				wol_irq;
- 	unsigned int			wol_irq_enabled:1;
--
--	struct ethtool_keee		eee;
- };
- 
- #define NUM_NET_FILTERS				32
-@@ -601,5 +599,4 @@ int bcmasp_netfilt_get_all_active(struct bcmasp_intf *intf, u32 *rule_locs,
- 
- void bcmasp_netfilt_suspend(struct bcmasp_intf *intf);
- 
--void bcmasp_eee_enable_set(struct bcmasp_intf *intf, bool enable);
- #endif
-diff --git a/drivers/net/ethernet/broadcom/asp2/bcmasp_ethtool.c b/drivers/net/ethernet/broadcom/asp2/bcmasp_ethtool.c
-index 5e04cd1839c0..a537c121d3e2 100644
---- a/drivers/net/ethernet/broadcom/asp2/bcmasp_ethtool.c
-+++ b/drivers/net/ethernet/broadcom/asp2/bcmasp_ethtool.c
-@@ -348,20 +348,6 @@ static int bcmasp_get_rxnfc(struct net_device *dev, struct ethtool_rxnfc *cmd,
- 	return err;
- }
- 
--void bcmasp_eee_enable_set(struct bcmasp_intf *intf, bool enable)
--{
--	u32 reg;
--
--	reg = umac_rl(intf, UMC_EEE_CTRL);
--	if (enable)
--		reg |= EEE_EN;
--	else
--		reg &= ~EEE_EN;
--	umac_wl(intf, reg, UMC_EEE_CTRL);
--
--	intf->eee.eee_enabled = enable;
--}
--
- static int bcmasp_get_eee(struct net_device *dev, struct ethtool_keee *e)
- {
- 	if (!dev->phydev)
-@@ -372,26 +358,9 @@ static int bcmasp_get_eee(struct net_device *dev, struct ethtool_keee *e)
- 
- static int bcmasp_set_eee(struct net_device *dev, struct ethtool_keee *e)
- {
--	struct bcmasp_intf *intf = netdev_priv(dev);
--	struct ethtool_keee *p = &intf->eee;
--	int ret;
--
- 	if (!dev->phydev)
- 		return -ENODEV;
- 
--	if (!p->eee_enabled) {
--		bcmasp_eee_enable_set(intf, false);
--	} else {
--		ret = phy_init_eee(dev->phydev, 0);
--		if (ret) {
--			netif_err(intf, hw, dev,
--				  "EEE initialization failed: %d\n", ret);
--			return ret;
--		}
--
--		bcmasp_eee_enable_set(intf, true);
--	}
--
- 	return phy_ethtool_set_eee(dev->phydev, e);
- }
- 
-diff --git a/drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c b/drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c
-index 62861a454a27..45ec1a9214a2 100644
---- a/drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c
-+++ b/drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c
-@@ -619,7 +619,6 @@ static void bcmasp_adj_link(struct net_device *dev)
- 	struct phy_device *phydev = dev->phydev;
- 	u32 cmd_bits = 0, reg;
- 	int changed = 0;
--	bool active;
- 
- 	if (intf->old_link != phydev->link) {
- 		changed = 1;
-@@ -678,9 +677,12 @@ static void bcmasp_adj_link(struct net_device *dev)
- 		umac_wl(intf, reg, UMC_CMD);
- 
- 		umac_wl(intf, phydev->eee_cfg.tx_lpi_timer, UMC_EEE_LPI_TIMER);
--
--		active = phy_init_eee(phydev, 0) >= 0;
--		bcmasp_eee_enable_set(intf, active);
-+		reg = umac_rl(intf, UMC_EEE_CTRL);
-+		if (phydev->enable_tx_lpi)
-+			reg |= EEE_EN;
-+		else
-+			reg &= ~EEE_EN;
-+		umac_wl(intf, reg, UMC_EEE_CTRL);
- 	}
- 
- 	reg = rgmii_rl(intf, RGMII_OOB_CNTRL);
-@@ -1336,7 +1338,8 @@ static void bcmasp_suspend_to_wol(struct bcmasp_intf *intf)
- 				     ASP_WAKEUP_INTR2_MASK_CLEAR);
- 	}
- 
--	if (intf->eee.eee_enabled && intf->parent->eee_fixup)
-+	if (ndev->phydev && ndev->phydev->eee_cfg.eee_enabled &&
-+	    intf->parent->eee_fixup)
- 		intf->parent->eee_fixup(intf, true);
- 
- 	netif_dbg(intf, wol, ndev, "entered WOL mode\n");
-@@ -1378,7 +1381,8 @@ static void bcmasp_resume_from_wol(struct bcmasp_intf *intf)
- {
- 	u32 reg;
- 
--	if (intf->eee.eee_enabled && intf->parent->eee_fixup)
-+	if (intf->ndev->phydev && intf->ndev->phydev->eee_cfg.eee_enabled &&
-+	    intf->parent->eee_fixup)
- 		intf->parent->eee_fixup(intf, false);
- 
- 	reg = umac_rl(intf, UMC_MPD_CTRL);
-@@ -1409,9 +1413,6 @@ int bcmasp_interface_resume(struct bcmasp_intf *intf)
- 
- 	bcmasp_resume_from_wol(intf);
- 
--	if (intf->eee.eee_enabled)
--		bcmasp_eee_enable_set(intf, true);
--
- 	netif_device_attach(dev);
- 
- 	return 0;
--- 
-2.30.2
-
+You might stumble upon this issue on net-next, which you've helped me
+remember I should upstream, so I posted 2 patches just now:
+https://lore.kernel.org/netdev/20250114164721.2879380-1-vladimir.oltean@nxp.com/
 
