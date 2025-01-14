@@ -1,111 +1,152 @@
-Return-Path: <netdev+bounces-158030-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158031-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D6BBA1023B
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 09:39:18 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F6D8A10245
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 09:40:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AA0AD164671
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 08:39:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1BC813A9CD6
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 08:40:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31E7E284A40;
-	Tue, 14 Jan 2025 08:39:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46457284A63;
+	Tue, 14 Jan 2025 08:40:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jzu0WGFI"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="JbHQFKHN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DE291CDA19;
-	Tue, 14 Jan 2025 08:38:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8022E24024E;
+	Tue, 14 Jan 2025 08:40:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736843941; cv=none; b=fyJNvqMiTzA6UcQfJeDCN66hNuNfd7IFwQxHEMXb/tP5nJ3nKVQ3rF5awploYeP9oJtVxnMzL9Da9vXPkU7dHiS1JrVAHSxlrR+VUD36HE9dvR6YBEHqEYQ8xsCUbQqr6TV2fkvtqOqBP2xd3nzHbHJh0BXg58pNO9WYR7ycYDU=
+	t=1736844005; cv=none; b=kBiG7SUSDD5O1P6JckZfTiAY0Imn1seZ73BQIQ/r/XV/UI3NmSWUjOBhKkYkuQr2TMzhpjuNzFfdIRnx8Mq5oEn5HUJ7mZ4dhkrZ3RftaSGlFjjiK1e/66BgjhOsB1vOjAM7UXAf334de8F/jpgZpEuADPFKyxotTwu/tTIUbiE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736843941; c=relaxed/simple;
-	bh=yjGa/XOca+kr7ntzRGUA8aW3yZEFIEKkisZvNDZ1fYE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=f3JJ+HvZcWcD6CpBLsMKhYRYkcibjfrT8UTC6pzVc+pALGH5zNq8h1ZYoQLR8Ph5jeiI9malvQK8w/KHv3Z3lYFu7/4CgqSfjSWaIfq0CP9ZLV9nPPvkdowHI7fKhkRenXCZK2I6iklT8RAh0AebzHwH5/8QjxeYkD274KU4n3Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jzu0WGFI; arc=none smtp.client-ip=192.198.163.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1736843939; x=1768379939;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=yjGa/XOca+kr7ntzRGUA8aW3yZEFIEKkisZvNDZ1fYE=;
-  b=jzu0WGFIDBUwtWSo6boo8aF9xsfO/rjP+OCbuQAKG6HB/MZA60kottPE
-   lJThLM1Krjhapek9lwis0bquEHkzmTzdQqxawrQ4kmx17xGWIITtfUDfC
-   DfsIbl0D3MNPexQFGZyd2VOEHfni+2G8goLc0NfT2Llx5d7bZOArq+QL0
-   e316pfZQq/G8iObRrYyIOf9yIPI4sLHCVHcM3f1Hl27MyAhlxefCKBUx9
-   phxNd/evWoV9MFAKnUlGS20gKSvEwC1b8hUy3p5X+0Z3qhn1qdQE+G4S1
-   G+SY3YXexllxhcgOc7Y7T1VOt++YmqPMBQtTQ9zD7SJi4b3AWLOSPS1E6
-   A==;
-X-CSE-ConnectionGUID: 5NJUdpxKTOWIazBsJygw6w==
-X-CSE-MsgGUID: Tt4QNg7+QgeC2AFAVynOOw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11314"; a="37359031"
-X-IronPort-AV: E=Sophos;i="6.12,313,1728975600"; 
-   d="scan'208";a="37359031"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jan 2025 00:38:58 -0800
-X-CSE-ConnectionGUID: GOn1L+FSSJ602cTCsmYN7g==
-X-CSE-MsgGUID: dErzu0uiSk+QpPDsPklT8Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="135617278"
-Received: from mev-dev.igk.intel.com ([10.237.112.144])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jan 2025 00:38:55 -0800
-Date: Tue, 14 Jan 2025 09:35:36 +0100
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: Sanman Pradhan <sanman.p211993@gmail.com>
-Cc: netdev@vger.kernel.org, alexanderduyck@fb.com, kuba@kernel.org,
-	kernel-team@meta.com, andrew+netdev@lunn.ch, davem@davemloft.net,
-	edumazet@google.com, pabeni@redhat.com,
-	kalesh-anakkur.purayil@broadcom.com, linux@roeck-us.net,
-	mohsin.bashr@gmail.com, jdelvare@suse.com, horms@kernel.org,
-	suhui@nfschina.com, linux-kernel@vger.kernel.org,
-	vadim.fedorenko@linux.dev, linux-hwmon@vger.kernel.org,
-	sanmanpradhan@meta.com
-Subject: Re: [PATCH net-next 3/3] eth: fbnic: Add hardware monitoring support
- via HWMON interface
-Message-ID: <Z4Yh2EgkymBLE+hy@mev-dev.igk.intel.com>
-References: <20250114000705.2081288-1-sanman.p211993@gmail.com>
- <20250114000705.2081288-4-sanman.p211993@gmail.com>
+	s=arc-20240116; t=1736844005; c=relaxed/simple;
+	bh=+Nv2NBrwmCCZ1xgruSVVyKBPVnNh9HXjMKgk4WydGHE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=RG5EZTJT8lgHUqdJ6t62mVQ6TSIKtd2veUUjMDsRtA3XW047ABrbgYlOXcSttfcS9lkdZqbSBzYrar6wMxyKQz8y9sTemUgLevaD6kPAW38chM0xS2I2NWkFWwWGC/Za9Wb0JSCP0/rgQ1c9Pk4Z+8oDv7Tj2wtUJl4V1YrA2Jo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=JbHQFKHN; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50E2roq3008802;
+	Tue, 14 Jan 2025 08:39:51 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	NHQaAstEqNv45AdrcWHch1WADxggkaEEPu1wSZb46fg=; b=JbHQFKHNDxSDFkTk
+	oKv+L74+wIr6bWfXZEf6N9CrdOgV0lpEL+UmubyaFTFJJ/5+h4k8kTAAwhR8F3CA
+	4AfHWgg5qQpc1B1Peffcr51CU4ZxBqX4yLP4mEztCfssSpHJSTGvTPHZbaMnYBml
+	Wmw7tFvr1d6sW7lsgLa5tUHDjVkj0ZoD4jon4FHoN2j6PIciV4XkiQgv+ktPN8P5
+	74OkcvCnuouYEt426gKfCk41NfutKFp6OJ1KKw6OZoZA6uGQj+OlL/HeYzM1bC7D
+	BU+AMuvzOTatzoN5YYbCAdfRd7zV5CfsiKaPfNJD+KzRwwWKlpM+jZDUO8gq8RxC
+	9L4PjQ==
+Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 445fhtrnfe-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 14 Jan 2025 08:39:50 +0000 (GMT)
+Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
+	by NALASPPMTA03.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 50E8dnMT004055
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 14 Jan 2025 08:39:49 GMT
+Received: from [10.253.75.207] (10.80.80.8) by nalasex01c.na.qualcomm.com
+ (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Tue, 14 Jan
+ 2025 00:39:44 -0800
+Message-ID: <87423e4e-a766-49b5-8ca8-5a79329a7bfc@quicinc.com>
+Date: Tue, 14 Jan 2025 16:39:41 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250114000705.2081288-4-sanman.p211993@gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3] dt-bindings: net: qcom,ethqos: Correct fallback
+ compatible for qcom,qcs615-ethqos
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+CC: Vinod Koul <vkoul@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+        "David
+ S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Rob Herring
+	<robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley
+	<conor+dt@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio
+	<konradybcio@kernel.org>, <netdev@vger.kernel.org>,
+        <linux-arm-msm@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+References: <20250113-schema_qcs615-v3-1-d5bbf0ee8cb7@quicinc.com>
+ <d3i5hmkft77xm5jxcpfapnjmodsbmpyeklvcxtrqfvk2fqnonx@ajoc7pguzr36>
+Content-Language: en-US
+From: Yijie Yang <quic_yijiyang@quicinc.com>
+In-Reply-To: <d3i5hmkft77xm5jxcpfapnjmodsbmpyeklvcxtrqfvk2fqnonx@ajoc7pguzr36>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01c.na.qualcomm.com (10.47.97.35)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: 1Ed3In4mdJ-1VaekFLBzeMp8wg8oDHvr
+X-Proofpoint-ORIG-GUID: 1Ed3In4mdJ-1VaekFLBzeMp8wg8oDHvr
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 phishscore=0
+ impostorscore=0 clxscore=1015 mlxscore=0 mlxlogscore=395
+ priorityscore=1501 malwarescore=0 spamscore=0 bulkscore=0
+ lowpriorityscore=0 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.19.0-2411120000 definitions=main-2501140071
 
-On Mon, Jan 13, 2025 at 04:07:05PM -0800, Sanman Pradhan wrote:
-> This patch adds support for hardware monitoring to the fbnic driver,
-> allowing for temperature and voltage sensor data to be exposed to
-> userspace via the HWMON interface. The driver registers a HWMON device
-> and provides callbacks for reading sensor data, enabling system
-> admins to monitor the health and operating conditions of fbnic.
+
+
+On 2025-01-14 16:03, Krzysztof Kozlowski wrote:
+> On Mon, Jan 13, 2025 at 05:15:39PM +0800, Yijie Yang wrote:
+>> The qcs615-ride utilizes the same EMAC as the qcs404, rather than the
+>> sm8150.
+>> The current fallback could lead to package loss, and the ethernet on
 > 
-> Signed-off-by: Sanman Pradhan <sanman.p211993@gmail.com>
-> ---
->  drivers/net/ethernet/meta/fbnic/Makefile      |  1 +
->  drivers/net/ethernet/meta/fbnic/fbnic.h       |  4 +
->  drivers/net/ethernet/meta/fbnic/fbnic_hwmon.c | 81 +++++++++++++++++++
->  drivers/net/ethernet/meta/fbnic/fbnic_pci.c   |  3 +
->  4 files changed, 89 insertions(+)
->  create mode 100644 drivers/net/ethernet/meta/fbnic/fbnic_hwmon.c
+> Packet? Package?
+
+I made an error in word usage, and I will correct it.
+
 > 
-> diff --git a/drivers/net/ethernet/meta/fbnic/Makefile b/drivers/net/ethernet/meta/fbnic/Makefile
-> index ea6214ca48e7..239b2258ec65 100644
+>> qcs615-ride was not utilized by anyone.
+> 
+> I don't get how this part of sentence is connected to previous part. I
+> see the "and" but what do you want to say here? Packages with qcs615
+> board were lost, therefore the ethernet was not used by anyone? Or
+> packets could be lost and this means ethernet cannot be used?
+> 
 
-[...]
+The word 'and' represents two independent facts without implying a 
+logical relationship between them. The two facts correspondingly lead to 
+the two conclusions in the next sentence.
 
-Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+>> Therefore, it needs to be revised,
+>> and there is no need to worry about the ABI impact.
+> 
+> Again, Oxford comma of joining entirely independent claues. Can you
+> filter this via someone / ChatGPT / Google grammar / Outlook grammar?
 
-> 2.43.5
+All the sentences here have been polished by Copilot. I will reorganize 
+them for better understanding.
+
+> 
+> Best regards,
+> Krzysztof
+> 
+> 
+
+-- 
+Best Regards,
+Yijie
+
 
