@@ -1,71 +1,71 @@
-Return-Path: <netdev+bounces-158016-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158017-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8648DA101C0
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 09:08:53 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF49CA101C1
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 09:09:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B5357188386C
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 08:08:56 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 185E47A1024
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 08:09:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69137246327;
-	Tue, 14 Jan 2025 08:08:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF8E32500A8;
+	Tue, 14 Jan 2025 08:09:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="Ys5PRgUp"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="CFxPJXbm"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-33001.amazon.com (smtp-fw-33001.amazon.com [207.171.190.10])
+Received: from smtp-fw-52004.amazon.com (smtp-fw-52004.amazon.com [52.119.213.154])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D255024635B
-	for <netdev@vger.kernel.org>; Tue, 14 Jan 2025 08:08:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.190.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30EA22309BD
+	for <netdev@vger.kernel.org>; Tue, 14 Jan 2025 08:09:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.154
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736842129; cv=none; b=XvPM8ibC0fJhV5dNl1qj+tGott9+g8mWT/GZRW+zAvhHZrGNF+SLKRteJjgpcp0s8JN2tmEa/GMbl8lt/R8d1XUAI6V7MznpWXQG+l10OIOsyp0BlY9b5XvtZHq1FvVqt795Y+GQm7CKMwe3J79AfGoEL5ogOwf5yE6PcGy7xW8=
+	t=1736842158; cv=none; b=g2IZE1Oh4XLb5L61l5ZHkszkM6zGG8AnyAlYSJJvDokFiROIN+JzmIErOQ6y184IOiL2r9rtJfTHBeF3w2ETJD5CoM7+XeQBge8pbpcq0daN/jiDnEyD4/Ge6ce90dEKVAQcjU7V7D2RhMb9hOeSO0nRNEBHe/ssT3c8sQAy+EY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736842129; c=relaxed/simple;
-	bh=BhKq9Jtvpd7UlsIEqqewKZuyT5TRXRMdGJUs0D6rwAU=;
+	s=arc-20240116; t=1736842158; c=relaxed/simple;
+	bh=IUPx/iOlGPY8zdkOotnjyvph0D5YrhEbnSNrqCqJOA4=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=I/GNNJMHajUEquhyy0HfB9LQTdht3GJlUTPj7ATr+z6LKh0RcxJkA3w1TY/AMaQ5XuAYWoog6KPdujad2JD7wJ61hBEK+uyFAuSrGUnZf5aeptGZxvm0ZC8tf73CNpmjKRbViD69Ju4WS5/Wc092qshPiSihQ+n2bo4rKXmH5CM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=Ys5PRgUp; arc=none smtp.client-ip=207.171.190.10
+	 MIME-Version:Content-Type; b=D7EqRcKxpuJPENpiDklhOVDF1rfrycKMpKZ4jgaoKenMPgBH80AjAYuNoPtztOgoCtpAYXh29WaRw0+Aju7y9luQNMrjIq9GKjTDKmbQA4OJtn7RcGpsjiUEtYgqutDS5npBcKlEGZtSKR8hFWiRTXYoReEjOKkeAnOMJgcHUzs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=CFxPJXbm; arc=none smtp.client-ip=52.119.213.154
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1736842128; x=1768378128;
+  t=1736842158; x=1768378158;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=SLoW25UkqWbVDZs5glu4nZZda0wirZl96FdfKOEHjbA=;
-  b=Ys5PRgUpRHshHEkbZnJSB3f18ZKAYSUD2ywabrU8BWiKOHbd3mdQaDB1
-   xWXqGCTX6LE/igf5tt7N8V/VVgmf7PSq2u8e+jkNmTHXOXIZT+6FwGcU5
-   RzHAO2jrjPh053RGc8BSJdHiIQHeERbIg3Nl2U1njcubPOQRnv39d377M
-   o=;
+  bh=nAUiPmmwVYhYv/4YvrgqIHgkr2rKGI9Squ8jrHh3dwI=;
+  b=CFxPJXbmM0HVpszl6EGV8v90j32Gjx5RM8+XVK8PV2fav7xyjqktbu/g
+   agqbHCSHl/Bey0rCInfOvIQaH19EGGUToKq4K+ok7lup5+YOFiN6TlWij
+   6Q8rgGlupYD7HQNJmPM2Xe4gSQKB7xXKaRdZG7v+NvhvaYFtNOtd6Uvx5
+   U=;
 X-IronPort-AV: E=Sophos;i="6.12,313,1728950400"; 
-   d="scan'208";a="400676163"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-33001.sea14.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jan 2025 08:08:48 +0000
-Received: from EX19MTAUWC001.ant.amazon.com [10.0.21.151:37035]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.47.5:2525] with esmtp (Farcaster)
- id 8f0deb36-63ca-40a4-aaf6-b587883d563d; Tue, 14 Jan 2025 08:08:47 +0000 (UTC)
-X-Farcaster-Flow-ID: 8f0deb36-63ca-40a4-aaf6-b587883d563d
+   d="scan'208";a="262895249"
+Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.2])
+  by smtp-border-fw-52004.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jan 2025 08:09:16 +0000
+Received: from EX19MTAUWC002.ant.amazon.com [10.0.7.35:15383]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.19.219:2525] with esmtp (Farcaster)
+ id d1dbb130-f294-4cf2-a5ff-c1a1ae87304d; Tue, 14 Jan 2025 08:09:14 +0000 (UTC)
+X-Farcaster-Flow-ID: d1dbb130-f294-4cf2-a5ff-c1a1ae87304d
 Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
+ EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Tue, 14 Jan 2025 08:08:46 +0000
+ Tue, 14 Jan 2025 08:09:14 +0000
 Received: from 6c7e67c6786f.amazon.com (10.119.11.99) by
  EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Tue, 14 Jan 2025 08:08:42 +0000
+ Tue, 14 Jan 2025 08:09:09 +0000
 From: Kuniyuki Iwashima <kuniyu@amazon.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
 	<pabeni@redhat.com>, David Ahern <dsahern@kernel.org>
 CC: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@amazon.com>,
 	Kuniyuki Iwashima <kuni1840@gmail.com>, <netdev@vger.kernel.org>
-Subject: [PATCH v1 net-next 07/11] ipv6: Set cfg.ifa_flags before device lookup in inet6_rtm_newaddr().
-Date: Tue, 14 Jan 2025 17:05:12 +0900
-Message-ID: <20250114080516.46155-8-kuniyu@amazon.com>
+Subject: [PATCH v1 net-next 08/11] ipv6: Pass dev to inet6_addr_add().
+Date: Tue, 14 Jan 2025 17:05:13 +0900
+Message-ID: <20250114080516.46155-9-kuniyu@amazon.com>
 X-Mailer: git-send-email 2.39.5 (Apple Git-154)
 In-Reply-To: <20250114080516.46155-1-kuniyu@amazon.com>
 References: <20250114080516.46155-1-kuniyu@amazon.com>
@@ -77,52 +77,101 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D044UWA003.ant.amazon.com (10.13.139.43) To
+X-ClientProxiedBy: EX19D036UWB003.ant.amazon.com (10.13.139.172) To
  EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-We will convert inet6_rtm_newaddr() to per-netns RTNL.
+inet6_addr_add() is called from inet6_rtm_newaddr() and
+addrconf_add_ifaddr().
 
-Except for IFA_F_OPTIMISTIC, cfg.ifa_flags can be set before
-__dev_get_by_index().
+inet6_addr_add() looks up dev by __dev_get_by_index(), but
+it's already done in inet6_rtm_newaddr().
 
-Let's move __dev_get_by_index() down so that we can set
-ifa_flags without RTNL.
+Let's move the 2nd lookup to addrconf_add_ifaddr() and pass
+dev to inet6_addr_add().
 
 Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 ---
- net/ipv6/addrconf.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ net/ipv6/addrconf.c | 20 ++++++++++----------
+ 1 file changed, 10 insertions(+), 10 deletions(-)
 
 diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
-index 9c7257b28a84..0daea381d541 100644
+index 0daea381d541..3a2f4501b302 100644
 --- a/net/ipv6/addrconf.c
 +++ b/net/ipv6/addrconf.c
-@@ -5032,12 +5032,6 @@ inet6_rtm_newaddr(struct sk_buff *skb, struct nlmsghdr *nlh,
- 		cfg.preferred_lft = ci->ifa_prefered;
+@@ -3007,13 +3007,12 @@ static int ipv6_mc_config(struct sock *sk, bool join,
+ /*
+  *	Manual configuration of address on an interface
+  */
+-static int inet6_addr_add(struct net *net, int ifindex,
++static int inet6_addr_add(struct net *net, struct net_device *dev,
+ 			  struct ifa6_config *cfg,
+ 			  struct netlink_ext_ack *extack)
+ {
+ 	struct inet6_ifaddr *ifp;
+ 	struct inet6_dev *idev;
+-	struct net_device *dev;
+ 	unsigned long timeout;
+ 	clock_t expires;
+ 	u32 flags;
+@@ -3036,10 +3035,6 @@ static int inet6_addr_add(struct net *net, int ifindex,
+ 		return -EINVAL;
  	}
  
--	dev =  __dev_get_by_index(net, ifm->ifa_index);
--	if (!dev) {
--		NL_SET_ERR_MSG_MOD(extack, "Unable to find the interface");
+-	dev = __dev_get_by_index(net, ifindex);
+-	if (!dev)
 -		return -ENODEV;
--	}
 -
- 	cfg.ifa_flags = nla_get_u32_default(tb[IFA_FLAGS], ifm->ifa_flags);
+ 	idev = addrconf_add_dev(dev);
+ 	if (IS_ERR(idev)) {
+ 		NL_SET_ERR_MSG_MOD(extack, "IPv6 is disabled on this device");
+@@ -3048,7 +3043,7 @@ static int inet6_addr_add(struct net *net, int ifindex,
  
- 	/* We ignore other flags so far. */
-@@ -5045,6 +5039,12 @@ inet6_rtm_newaddr(struct sk_buff *skb, struct nlmsghdr *nlh,
- 			 IFA_F_MANAGETEMPADDR | IFA_F_NOPREFIXROUTE |
- 			 IFA_F_MCAUTOJOIN | IFA_F_OPTIMISTIC;
+ 	if (cfg->ifa_flags & IFA_F_MCAUTOJOIN) {
+ 		int ret = ipv6_mc_config(net->ipv6.mc_autojoin_sk,
+-					 true, cfg->pfx, ifindex);
++					 true, cfg->pfx, dev->ifindex);
  
-+	dev =  __dev_get_by_index(net, ifm->ifa_index);
-+	if (!dev) {
-+		NL_SET_ERR_MSG_MOD(extack, "Unable to find the interface");
-+		return -ENODEV;
-+	}
-+
- 	idev = ipv6_find_idev(dev);
- 	if (IS_ERR(idev))
- 		return PTR_ERR(idev);
+ 		if (ret < 0) {
+ 			NL_SET_ERR_MSG_MOD(extack, "Multicast auto join failed");
+@@ -3103,7 +3098,7 @@ static int inet6_addr_add(struct net *net, int ifindex,
+ 		return 0;
+ 	} else if (cfg->ifa_flags & IFA_F_MCAUTOJOIN) {
+ 		ipv6_mc_config(net->ipv6.mc_autojoin_sk, false,
+-			       cfg->pfx, ifindex);
++			       cfg->pfx, dev->ifindex);
+ 	}
+ 
+ 	return PTR_ERR(ifp);
+@@ -3169,6 +3164,7 @@ int addrconf_add_ifaddr(struct net *net, void __user *arg)
+ 		.preferred_lft = INFINITY_LIFE_TIME,
+ 		.valid_lft = INFINITY_LIFE_TIME,
+ 	};
++	struct net_device *dev;
+ 	struct in6_ifreq ireq;
+ 	int err;
+ 
+@@ -3182,7 +3178,11 @@ int addrconf_add_ifaddr(struct net *net, void __user *arg)
+ 	cfg.plen = ireq.ifr6_prefixlen;
+ 
+ 	rtnl_net_lock(net);
+-	err = inet6_addr_add(net, ireq.ifr6_ifindex, &cfg, NULL);
++	dev = __dev_get_by_index(net, ireq.ifr6_ifindex);
++	if (dev)
++		err = inet6_addr_add(net, dev, &cfg, NULL);
++	else
++		err = -ENODEV;
+ 	rtnl_net_unlock(net);
+ 	return err;
+ }
+@@ -5064,7 +5064,7 @@ inet6_rtm_newaddr(struct sk_buff *skb, struct nlmsghdr *nlh,
+ 		 * It would be best to check for !NLM_F_CREATE here but
+ 		 * userspace already relies on not having to provide this.
+ 		 */
+-		return inet6_addr_add(net, ifm->ifa_index, &cfg, extack);
++		return inet6_addr_add(net, dev, &cfg, extack);
+ 	}
+ 
+ 	if (nlh->nlmsg_flags & NLM_F_EXCL ||
 -- 
 2.39.5 (Apple Git-154)
 
