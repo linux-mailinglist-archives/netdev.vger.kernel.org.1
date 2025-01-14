@@ -1,264 +1,173 @@
-Return-Path: <netdev+bounces-158053-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158054-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DCBC2A1042B
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 11:31:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C20E4A1046B
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 11:38:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 00528168DA0
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 10:31:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 63DFE169274
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 10:38:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF7A01ADC63;
-	Tue, 14 Jan 2025 10:30:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F5621ADC9F;
+	Tue, 14 Jan 2025 10:38:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E7XeDEs3"
+	dkim=pass (2048-bit key) header.d=bonusplay.pl header.i=@bonusplay.pl header.b="Nxv7a7F6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.bonusplay.pl (unknown [132.226.202.90])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18B3B229612
-	for <netdev@vger.kernel.org>; Tue, 14 Jan 2025 10:30:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13EF322F19
+	for <netdev@vger.kernel.org>; Tue, 14 Jan 2025 10:38:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=132.226.202.90
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736850658; cv=none; b=VD1Gw4gUFu9e9dTEWC1ZM5QBAgjB1GoZ9cCQEpp8kh8eKjg/ZgTY4Nkt25nR4YvEjD3OtQBixhJcmwyWIexzjC9eYfJyLljSPIBlkXpwNR9FRqR/VKaoc7s/TIrSSorhpSq3jtzOcy/mhM6k8s6kTn/er6Xw1agDibphYIkSf3g=
+	t=1736851133; cv=none; b=jjd0Ln/yHJQgs1bBAh7/k7hthZ94IbDX5bJLLq1+QyZLm70/u8CjEE/fE6e2gPlQQ2wzRbyr8CwSFATCI3m6bnCxPpX92PXea+tnPffMCM5TvRQFVXuYbxRtEmOGl5m6uDvu181qDvtjC8lSzz7Tjg0vDumpJDkEYwu8aaE47B0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736850658; c=relaxed/simple;
-	bh=zhSlYWEnl8HbDc8zjE9o5ACVrQ4wzDKSCOjvzcKLKKs=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=FLvKi+Rg/PJ+JYq6qLq0nMi0wZDLtU57Fr0I/lP6iJlLIOMHGmO+L0LpfC8gXyVJ9kbnjKGDRg5GGRsGXY9i/Ru7powXeIzLXe2dkeo7BkcEgaNMk+LE8hah9CWV6P1i98jQfalLPs0K6F4ELvV2zliLrEkefwvyv0QVnHpuB58=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=E7XeDEs3; arc=none smtp.client-ip=209.85.160.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-467838e75ffso67797411cf.3
-        for <netdev@vger.kernel.org>; Tue, 14 Jan 2025 02:30:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736850656; x=1737455456; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=v/4EbrSOAJuIZk8J336Lg0KE8WAdSupSpKD+eDZUg64=;
-        b=E7XeDEs3lfVQj8tpIbkw6vldz2m9p4Rzo3NTNjDFYcR+KigXQ+NujSYKpPOn49pK39
-         S5aPaTqHjYyduivTKkgFDLWNNngXhC/R2BlvI36OCRfxH61v4NVP08ZFx6dKR51QT+Iu
-         Ww0y4mgSCwzCn9SGKyEootdT52Jh1PoUD2iXPzWXIy4nlWPjdCqzH5RrG2x43GVk3D5W
-         erAQTire355lS5uBPL/G9a1ysl+mkoIOJFazzUJiz5/lgrJUyeZo0i1KSJIxXEPFl/Jb
-         keW52XYRCG9Ji73Eqiih27pc+7g5Lq4O7u2rkUZy9AsONIXXlFFZBvYt6zrfvYo3ptGj
-         49lQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736850656; x=1737455456;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=v/4EbrSOAJuIZk8J336Lg0KE8WAdSupSpKD+eDZUg64=;
-        b=Eu6qdGBAd7PO/UBJoKE8QxpyaBsZYQ4ezYdSCxPhzzaxHBJBKK9d9whtHmigIzowk4
-         Sc//PBD0ZK7YnsPYnHUEs1T3B5wG71iPMAcJVKv66HFqaU4TVel+5hWqqejC/YqVxkiB
-         G3XnxXY+gh9SHperJ7NvIXIPwNzO8LRbtZYFdVuyA6NUKh4S16KpElp7UwI9i5aVjLt7
-         EG8KweiabgDieb88frevDP7GsxSiYmsJAy9iKCEMecvHyBo37nZkVsuKWzLBUhi7TXGn
-         knqUEUN0LWWpeKEYUMhf/VBMM3Pt5CACp4veF9GKbMYFbDzmkDwWSMzz+2gb9i+dc6mw
-         raJA==
-X-Gm-Message-State: AOJu0YybGHGroKbVojEL/uiNjANvF/K6TcxHM4DivR2e+5NwebaBU4pB
-	o1itE8ZcZZhRBftqa1cG2iOtNeb+9cRxASez0AvtBHuamiI6ZhZzMBUeOw==
-X-Gm-Gg: ASbGncsV4pBGaqEp5rPmfxwVJuDwmY9HN5W0HvCRuWiwazvpUTZXN3rA2g7CmvsFWUw
-	oTZ0aoPE/J4zibfnP+HuO9Tba+jT1Bd0aFMlcEhRw74scWV9Wpacsf4FqM7AQa5Ieb8QUK4YaKV
-	zGpbgiQggy5VFYfQNn14r7qTayq/hPmtOIDovsvN3loBDwjdlI1qkM9qBOTJRhHVAylIA+b/YZp
-	Dlz9Db/9yxyJbR/1Jzi3CsX5lrBmEcHvubUDxlRnaYzWRdg+ED5RCV03jOsmmglG43xunBruw7d
-	JmoFrzHKR1YrsbCVolJ3ZrSer5ax
-X-Google-Smtp-Source: AGHT+IGKcw3Ff7Jh3eUNUtLu+QxKCy5Q809X88yQe8ynUKKWz6XASkFOWN6HpUOp3ZMx+3z2EPZy4w==
-X-Received: by 2002:a05:622a:1a06:b0:466:9824:16ef with SMTP id d75a77b69052e-46c70fd2960mr401622621cf.3.1736850655833;
-        Tue, 14 Jan 2025 02:30:55 -0800 (PST)
-Received: from localhost (15.60.86.34.bc.googleusercontent.com. [34.86.60.15])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6dfad88142asm51579396d6.27.2025.01.14.02.30.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Jan 2025 02:30:54 -0800 (PST)
-Date: Tue, 14 Jan 2025 05:30:54 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: "Olech, Milena" <milena.olech@intel.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
- "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>, 
- "Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>, 
- "Hay, Joshua A" <joshua.a.hay@intel.com>
-Message-ID: <67863cde6f20b_231a7929448@willemb.c.googlers.com.notmuch>
-In-Reply-To: <MW4PR11MB5889B67F0F83D75AC91DE9B78E1F2@MW4PR11MB5889.namprd11.prod.outlook.com>
-References: <20241219094411.110082-1-milena.olech@intel.com>
- <20241219094411.110082-9-milena.olech@intel.com>
- <677d4042a293e_25382b2948@willemb.c.googlers.com.notmuch>
- <MW4PR11MB58891AC5F86EFECEA76B58D38E1C2@MW4PR11MB5889.namprd11.prod.outlook.com>
- <67819233d3382_34732294ca@willemb.c.googlers.com.notmuch>
- <MW4PR11MB5889B67F0F83D75AC91DE9B78E1F2@MW4PR11MB5889.namprd11.prod.outlook.com>
-Subject: RE: [PATCH v3 iwl-next 08/10] idpf: add Tx timestamp flows
+	s=arc-20240116; t=1736851133; c=relaxed/simple;
+	bh=EAjnoKhSvgH8erVkFzl8Pt4T6T7ANueknhSi8x6DCSs=;
+	h=Message-ID:Date:MIME-Version:To:From:Cc:Subject:Content-Type; b=kM1bXLAmzVFVWVGm7UFQ94aDERkpHRszg7toh9aS38yOvUSafRuW8eyRO1LdR1V4Zv4HKA5SZMkikpcMswFEPsLEmjWZFe69QxBkgpGPLmeKKvBaxC5gz6swVP8L877FkdTh+Aqz68s8hfJjJR25zStJf9dW1Fitc6p51eVICq4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bonusplay.pl; spf=pass smtp.mailfrom=bonusplay.pl; dkim=pass (2048-bit key) header.d=bonusplay.pl header.i=@bonusplay.pl header.b=Nxv7a7F6; arc=none smtp.client-ip=132.226.202.90
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bonusplay.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bonusplay.pl
+Authentication-Results: mail.bonusplay.pl;
+	auth=pass (plain)
+Message-ID: <515516c7-e6e9-450a-9a74-685a60d64497@bonusplay.pl>
+Date: Tue, 14 Jan 2025 11:37:36 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
+MIME-Version: 1.0
+Content-Language: en-US
+To: Ajit Khaparde <ajit.khaparde@broadcom.com>,
+ Sriharsha Basavapatna <sriharsha.basavapatna@broadcom.com>,
+ Somnath Kotur <somnath.kotur@broadcom.com>
+From: Bonus <kernel@bonusplay.pl>
+Cc: netdev@vger.kernel.org
+Subject: be2net: oops due to RCU context switch
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+Received: from localhost (Unknown [127.0.0.1])
+	by mail.bonusplay.pl (Haraka) with ESMTPSA id 359F6B3A-7A17-4596-953D-C7EC904BABB4.1
+	envelope-from <kernel@bonusplay.pl>
+	tls TLS_AES_256_GCM_SHA384 (authenticated bits=0);
+	Tue, 14 Jan 2025 10:37:36 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bonusplay.pl;
+ h=Content-Transfer-Encoding: Content-Type: Subject: Cc: From: To:
+ MIME-Version: Date: Message-ID; q=dns/txt; s=s20211118323; t=1736851057;
+ bh=aPbJjbAXr60hPreQ6wJaNWNZx+zRJQtMGKz6ClcLd8w=;
+ b=Nxv7a7F6ON3Ef2ntogzdqM1sDz/uvIH4HGgT0WEDt2Fo2vmL1kS8NJ+11DzhMMwLozsfq7JJS
+ ZSVJVUGZ7DC6ZJ3/8Mn3p/wbMqhS8QMCrWMOdYySw5UjGgxB50S+yFDOOxq8SthNLSpsscdXSiq
+ SlukRPXO7Zd21YnBd6d4+aWHOD4LCrRUPw3jF8KTfTK0E8H1ifb/Bd4PSzX8b39obFUVcBgAvR9
+ xGLbAwrf+VY7JhPUr23IFaAFWNLX+cfKXV9l6XhNWaRsrgroIuKNkMRRnya2qZrTqFwl+pnEXeB
+ aLIz3LSrYeHMorqGZzdNZ70PpAzW43m5Aa5F0i63pQ1A==
 
-Olech, Milena wrote:
-> On 01/10/2025 10:34PM Willem de Bruijn wrote:
-> 
-> > > > > Add functions to request Tx timestamp for the PTP packets, read the Tx
-> > > > > timestamp when the completion tag for that packet is being received,
-> > > > > extend the Tx timestamp value and set the supported timestamping modes.
-> > > > > 
-> > > > > Tx timestamp is requested for the PTP packets by setting a TSYN bit and
-> > > > > index value in the Tx context descriptor. The driver assumption is that
-> > > > > the Tx timestamp value is ready to be read when the completion tag is
-> > > > > received. Then the driver schedules delayed work and the Tx timestamp
-> > > > > value read is requested through virtchnl message. At the end, the Tx
-> > > > > timestamp value is extended to 64-bit and provided back to the skb.
-> > > > > 
-> > > > > Co-developed-by: Josh Hay <joshua.a.hay@intel.com>
-> > > > > Signed-off-by: Josh Hay <joshua.a.hay@intel.com>
-> > > > > Signed-off-by: Milena Olech <milena.olech@intel.com>
-> > > > > ---
-> > > > > v2 -> v3: change get_timestamp_filter function name, split stats
-> > > > > into vport-based and tx queue-based
-> > > > > v1 -> v2: add timestamping stats, use ndo_hwtamp_get/ndo_hwstamp_set
-> > > > > 
-> > > > >  drivers/net/ethernet/intel/idpf/idpf.h        |  20 ++
-> > > > >  .../net/ethernet/intel/idpf/idpf_ethtool.c    |  69 ++++-
-> > > > >  .../net/ethernet/intel/idpf/idpf_lan_txrx.h   |  13 +-
-> > > > >  drivers/net/ethernet/intel/idpf/idpf_lib.c    |  47 ++++
-> > > > >  drivers/net/ethernet/intel/idpf/idpf_ptp.c    | 236 +++++++++++++++++-
-> > > > >  drivers/net/ethernet/intel/idpf/idpf_ptp.h    |  52 ++++
-> > > > >  drivers/net/ethernet/intel/idpf/idpf_txrx.c   | 139 ++++++++++-
-> > > > >  drivers/net/ethernet/intel/idpf/idpf_txrx.h   |  11 +-
-> > > > >  .../net/ethernet/intel/idpf/idpf_virtchnl.c   |   6 +-
-> > > > >  .../ethernet/intel/idpf/idpf_virtchnl_ptp.c   | 235 +++++++++++++++++
-> > > > >  10 files changed, 814 insertions(+), 14 deletions(-)
-> > > > > 
-> > > > 
-> > > > > +/**
-> > > > > + * idpf_get_timestamp_filters - Get the supported timestamping mode
-> > > > > + * @vport: Virtual port structure
-> > > > > + * @info: ethtool timestamping info structure
-> > > > > + *
-> > > > > + * Get the Tx/Rx timestamp filters.
-> > > > > + */
-> > > > > +static void idpf_get_timestamp_filters(const struct idpf_vport *vport,
-> > > > > +				       struct kernel_ethtool_ts_info *info)
-> > > > > +{
-> > > > > +	if (!vport->tx_tstamp_caps ||
-> > > > > +	    vport->adapter->ptp->tx_tstamp_access == IDPF_PTP_NONE)
-> > > > > +		return;
-> > > > 
-> > > > Is making SOF_TIMESTAMPING_RX_HARDWARE and SOF_TIMESTAMPING_RAW_HARDWARE
-> > > > conditional on tx_tstamp_access intentional?
-> > > 
-> > > Hmmm, good catch.
-> > > I guess I will change the SOF_TIMESTAMPING_RX_HARDWARE to be not
-> > > conditional.
-> > > 
-> > > About the SOF_TIMESTAMPING_RAW_HARDWARE - it should rely on the
-> > > tx_statmp_access.
-> >
-> > For Tx, but it also applies to Rx.
-> 
-> Right, there was a misunderstanding because the documentation says:
-> "Report hardware timestamps as generated by
->  SOF_TIMESTAMPING_TX_HARDWARE when available."
-> 
-> So I assumed that it's Tx only.
+Hello,
 
-Indeed. This was fixed fairly recently in commit e503f82e304b. It now
-reads
+I've encountered a regression with kernel 6.12 immediately after 
+booting. I don't encounter it on 6.6. If required i can try to bisect 
+it, as it is very easy to reproduce.
 
-"
-SOF_TIMESTAMPING_RAW_HARDWARE:
-  Report hardware timestamps as generated by
-  SOF_TIMESTAMPING_TX_HARDWARE or SOF_TIMESTAMPING_RX_HARDWARE
-  when available.
-"
+Stack trace below:
 
- 
-> > > > > +
-> > > > > +	info->so_timestamping = SOF_TIMESTAMPING_TX_SOFTWARE |
-> > > > > +				SOF_TIMESTAMPING_TX_HARDWARE |
-> > > > > +				SOF_TIMESTAMPING_RX_HARDWARE |
-> > > > > +				SOF_TIMESTAMPING_RAW_HARDWARE;
-> > > > > +
-> > > > > +	info->tx_types = BIT(HWTSTAMP_TX_OFF) | BIT(HWTSTAMP_TX_ON);
-> > > > > +}
-> > > > > +
-> > > > > +
-> > > > > +static int idpf_hwtstamp_get(struct net_device *netdev,
-> > > > > +			     struct kernel_hwtstamp_config *config)
-> > > > > +{
-> > > > > +	struct idpf_adapter *adapter = idpf_netdev_to_adapter(netdev);
-> > > > > +	struct idpf_vport *vport;
-> > > > > +
-> > > > > +	idpf_vport_cfg_lock(adapter);
-> > > > > +	vport = idpf_netdev_to_vport(netdev);
-> > > > > +
-> > > > > +	if (!idpf_ptp_get_vport_tstamp_capability(vport)) {
-> > > > > +		idpf_vport_cfg_unlock(adapter);
-> > > > > +		return -EOPNOTSUPP;
-> > > > 
-> > > > Should this return an empty config and return 0, rather than return
-> > > > error?
-> > > > 
-> > > 
-> > > I'd prefer to return NOTSUPP, as the feature itself relies on the CP
-> > > policy.
-> > 
-> > Does that make ethtool -T $DEV fail? It should ideally succeed while
-> > only advertising software receive timestamping (which is implemented
-> > device independent).
-> 
-> Ok, I'll change then.
+[ 17.106889] ------------[ cut here ]------------ [ 17.106892] Voluntary 
+context switch within RCU read-side critical section! [ 17.106895] 
+WARNING: CPU: 2 PID: 1276 at kernel/rcu/tree_plugin.h:331 
+rcu_note_context_switch+0x656/0x6e0 [ 17.106899] Modules linked in: 
+cfg80211 rfkill msr xt_conntrack ip6t_rpfilter ipt_rpfilter xt_pkttype 
+xt_LOG nf_log_syslog xt_tcpudp nft_compat nf_tables sch_fq_codel uinput 
+nvidia_drm(PO) nvidia_modeset(PO) nls_iso8859_1 nls_cp437 vfat fat 
+nvidia_uvm(PO) snd_soc_avs snd_soc_hda_codec snd_hda_codec_realtek 
+snd_hda_ext_core snd_hda_codec_generic snd_hda_scodec_component 
+snd_soc_core mei_hdcp snd_hda_codec_hdmi snd_compress intel_rapl_msr 
+ac97_bus iTCO_wdt mei_pxp intel_pmc_bxt snd_pcm_dmaengine watchdog 
+ee1004 snd_hda_intel intel_rapl_common snd_intel_dspcfg 
+snd_intel_sdw_acpi snd_usb_audio mxm_wmi intel_uncore_frequency 
+snd_hda_codec intel_uncore_frequency_common intel_tcc_cooling 
+x86_pkg_temp_thermal intel_powerclamp snd_usbmidi_lib snd_hda_core 
+snd_ump coretemp snd_rawmidi snd_hwdep crct10dif_pclmul snd_seq_device 
+crc32_pclmul polyval_clmulni polyval_generic ghash_clmulni_intel snd_pcm 
+battery e1000e snd_timer drm_ttm_helper rapl mei_me i2c_i801 snd ttm 
+intel_cstate ptp i2c_mux intel_uncore pps_core be2net i2c_smbus [ 
+17.106944] mei mc soundcore fan thermal video tpm_crb backlight wmi 
+tiny_power_button tpm_tis tpm_tis_core intel_pmc_core nvidia(PO) 
+intel_vsec acpi_pad button joydev pmt_telemetry pmt_class edac_core 
+mousedev evdev mac_hid atkbd libps2 serio vivaldi_fmap loop 
+cpufreq_powersave xt_nat nf_nat nf_conntrack nf_defrag_ipv6 
+nf_defrag_ipv4 br_netfilter veth tun tap macvlan bridge stp llc 
+kvm_intel kvm fuse efi_pstore configfs nfnetlink efivarfs dmi_sysfs 
+ip_tables x_tables autofs4 dm_crypt cbc encrypted_keys trusted 
+asn1_encoder tee tpm rng_core libaescfb ecdh_generic ecc input_leds 
+led_class hid_generic usbhid hid sd_mod ahci libahci libata nvme 
+sha512_ssse3 sha256_ssse3 xhci_pci sha1_ssse3 scsi_mod aesni_intel 
+nvme_core xhci_hcd gf128mul crypto_simd cryptd nvme_auth scsi_common 
+rtc_cmos btrfs blake2b_generic libcrc32c crc32c_generic crc32c_intel xor 
+raid6_pq dm_snapshot dm_bufio dm_mod dax [ 17.106998] CPU: 2 UID: 152 
+PID: 1276 Comm: systemd-network Tainted: P O 6.12.8 #1-NixOS [ 
+17.107001] Tainted: [P]=PROPRIETARY_MODULE, [O]=OOT_MODULE [ 17.107002] 
+Hardware name: Micro-Star International Co., Ltd. MS-7B47/Z370 TOMAHAWK 
+(MS-7B47), BIOS 1.00 09/12/2017 [ 17.107003] RIP: 
+0010:rcu_note_context_switch+0x656/0x6e0 [ 17.107005] Code: 00 00 00 0f 
+85 30 fd ff ff 49 89 8d a8 00 00 00 e9 24 fd ff ff c6 05 a5 b4 e7 01 01 
+90 48 c7 c7 30 e2 5e b9 e8 fb b3 f1 ff 90 <0f> 0b 90 90 e9 fa f9 ff ff 
+49 83 bd a0 00 00 00 00 49 8b 85 a8 00 [ 17.107007] RSP: 
+0018:ffffa8d7c053b7d8 EFLAGS: 00010046 [ 17.107008] RAX: 
+0000000000000000 RBX: ffff97d32a448000 RCX: 0000000000000000 [ 
+17.107009] RDX: 0000000000000000 RSI: 0000000000000000 RDI: 
+0000000000000000 [ 17.107010] RBP: ffff97d65eb369c0 R08: 
+0000000000000000 R09: 0000000000000000 [ 17.107011] R10: 
+0000000000000000 R11: 0000000000000000 R12: 0000000000000000 [ 
+17.107012] R13: ffff97d32a448000 R14: ffff97d30ea58814 R15: 
+ffff97d301800af0 [ 17.107013] FS: 00007f90e82515c0(0000) 
+GS:ffff97d65eb00000(0000) knlGS:0000000000000000 [ 17.107015] CS: 0010 
+DS: 0000 ES: 0000 CR0: 0000000080050033 [ 17.107016] CR2: 
+0000560b0481c360 CR3: 00000001243a0003 CR4: 00000000003726f0 [ 
+17.107017] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 
+0000000000000000 [ 17.107018] DR3: 0000000000000000 DR6: 
+00000000fffe0ff0 DR7: 0000000000000400 [ 17.107019] Call Trace: [ 
+17.107021] <TASK> [ 17.107023] ? __warn+0x89/0x130 [ 17.107027] ? 
+rcu_note_context_switch+0x656/0x6e0 [ 17.107029] ? 
+report_bug+0x172/0x1a0 [ 17.107032] ? handle_bug+0x61/0xb0 [ 17.107034] 
+? exc_invalid_op+0x17/0x80 [ 17.107036] ? asm_exc_invalid_op+0x1a/0x20 [ 
+17.107040] ? rcu_note_context_switch+0x656/0x6e0 [ 17.107042] ? 
+rcu_note_context_switch+0x655/0x6e0 [ 17.107044] __schedule+0xca/0x12d0 
+[ 17.107046] ? get_nohz_timer_target+0x2a/0x140 [ 17.107049] ? 
+timerqueue_add+0x66/0xd0 [ 17.107052] ? 
+hrtimer_start_range_ns+0x258/0x380 [ 17.107055] schedule+0x27/0xf0 [ 
+17.107056] schedule_hrtimeout_range_clock+0xe2/0x140 [ 17.107060] ? 
+__pfx_hrtimer_wakeup+0x10/0x10 [ 17.107063] ? 
+be_mcc_notify_wait+0x6c/0x150 [be2net] [ 17.107070] 
+usleep_range_state+0x63/0xa0 [ 17.107073] be_mcc_notify_wait+0xbe/0x150 
+[be2net] [ 17.107080] be_cmd_get_hsw_config+0x17c/0x1a0 [be2net] [ 
+17.107088] be_ndo_bridge_getlink+0xf0/0x110 [be2net] [ 17.107094] 
+rtnl_bridge_getlink+0x12a/0x1d0 [ 17.107098] ? 
+__pfx_rtnl_bridge_getlink+0x10/0x10 [ 17.107101] rtnl_dumpit+0x85/0xb0 [ 
+17.107103] netlink_dump+0x138/0x370 [ 17.107108] 
+__netlink_dump_start+0x1e7/0x2b0 [ 17.107111] ? 
+__pfx_rtnl_bridge_getlink+0x10/0x10 [ 17.107113] 
+rtnetlink_rcv_msg+0x2b8/0x400 [ 17.107115] ? __pfx_rtnl_dumpit+0x10/0x10 
+[ 17.107117] ? __pfx_rtnl_bridge_getlink+0x10/0x10 [ 17.107120] ? 
+__pfx_rtnetlink_rcv_msg+0x10/0x10 [ 17.107122] 
+netlink_rcv_skb+0x58/0x110 [ 17.107125] netlink_unicast+0x1a3/0x290 [ 
+17.107127] netlink_sendmsg+0x222/0x4b0 [ 17.107129] 
+__sys_sendto+0x1ee/0x200 [ 17.107134] __x64_sys_sendto+0x24/0x40 [ 
+17.107136] do_syscall_64+0xb7/0x210 [ 17.107138] 
+entry_SYSCALL_64_after_hwframe+0x77/0x7f [ 17.107141] RIP: 
+0033:0x7f90e7d19df7 [ 17.107150] Code: 0d 00 f7 d8 64 89 02 48 c7 c0 ff 
+ff ff ff eb 98 0f 1f 00 f3 0f 1e fa 80 3d 75 f2 0d 00 00 41 89 ca 74 30 
+b8 2c 00 00 00 0f 05 <48> 3d 00 f0 ff ff 0f 87 9d 00 00 00 31 d2 31 c9 
+31 f6 31 ff 45 31 [ 17.107151] RSP: 002b:00007ffe3ad3e3e8 EFLAGS: 
+00000202 ORIG_RAX: 000000000000002c [ 17.107153] RAX: ffffffffffffffda 
+RBX: 0000560b047eebd0 RCX: 00007f90e7d19df7 [ 17.107154] RDX: 
+0000000000000020 RSI: 0000560b04805bb0 RDI: 0000000000000003 [ 
+17.107155] RBP: 0000560b0481bff0 R08: 00007ffe3ad3e3f0 R09: 
+0000000000000080 [ 17.107156] R10: 0000000000000000 R11: 
+0000000000000202 R12: 00007ffe3ad3e4b4 [ 17.107157] R13: 
+00007ffe3ad3e4f0 R14: 0000560ae711c650 R15: 0000560ae71dbc78 [ 
+17.107159] </TASK> [ 17.107160] ---[ end trace 0000000000000000 ]---
 
-I did not actually check whether it would return in failure at the
-application layer, to be clear. Just saying that if that would be the
-consequence, then that would not be good.
+Kind Regards, Bonus
 
-> > > > > +/**
-> > > > > + * idpf_ptp_tstamp_extend_32b_to_64b - Convert a 32b nanoseconds Tx timestamp
-> > > > > + *				       to 64b.
-> > > > > + * @cached_phc_time: recently cached copy of PHC time
-> > > > > + * @in_timestamp: Ingress/egress 32b nanoseconds timestamp value
-> > > > > + *
-> > > > > + * Hardware captures timestamps which contain only 32 bits of nominal
-> > > > > + * nanoseconds, as opposed to the 64bit timestamps that the stack expects.
-> > > > > + *
-> > > > > + * Return: Tx timestamp value extended to 64 bits based on cached PHC time.
-> > > > > + */
-> > > > > +u64 idpf_ptp_tstamp_extend_32b_to_64b(u64 cached_phc_time, u32 in_timestamp)
-> > > > > +{
-> > > > > +	u32 delta, phc_lo;
-> > > > > +	u64 ns;
-> > > > > +
-> > > > > +	phc_lo = lower_32_bits(cached_phc_time);
-> > > > > +	delta = in_timestamp - phc_lo;
-> > > > > +
-> > > > > +	if (delta > S32_MAX) {
-> > > > > +		delta = phc_lo - in_timestamp;
-> > > > > +		ns = cached_phc_time - delta;
-> > > > > +	} else {
-> > > > > +		ns = cached_phc_time + delta;
-> > > > > +	}
-> > > > 
-> > > > If using s64 delta and ns, no need for branch?
-> > > 
-> > > To make it more readable, I'll change the condition in v4.
-> > > I'll check if the phc_lo is greater than in_stamp.
-> > > 
-> > > If phc_lo is bigger, then tx tstamp value was captured before
-> > > caching PHC time and case 1 will be applicable.
-> > 
-> > My point is that with signed arithmetic there is no need to
-> > invert delta and switch from addition to deletion.
-> 
-> This ns value is used - at the end of the day - in ns_to_ktime function,
-> which requires u64, so IMO it is easier to differentiate at this point,
-> rather than introducing new logic in f.e. idpf_ptp_extend_ts.
-> 
-> But to remove this condition signed delta is enough, and it may work.
-
-Just a suggestion. Feel free to leave as is if you prefer.
 
