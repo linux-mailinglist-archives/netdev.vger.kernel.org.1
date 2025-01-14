@@ -1,76 +1,76 @@
-Return-Path: <netdev+bounces-158148-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158149-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67139A10959
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 15:30:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id EBE71A10962
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 15:31:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 69A1718879CD
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 14:30:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id ECD9F188772B
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 14:31:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 534A6146D55;
-	Tue, 14 Jan 2025 14:30:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BDF315250F;
+	Tue, 14 Jan 2025 14:31:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jPPh6gsh"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AUIg2GjV"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA2B141C94;
-	Tue, 14 Jan 2025 14:30:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B170114A4F3;
+	Tue, 14 Jan 2025 14:30:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736865050; cv=none; b=SjRd8ePgI6ZlILCTFEbaRVyvbVkA4vsSXMV1QBfSDkC29TFObcrQ2HNjevqcuZ4zpXE2SycmM9p9oHEB399ym/ljlDdDCiWgcz30FAEXdazMuWw8+eIs1l8YK+E93cbJH1hCGRNvlL36Ih/gGdEFGblxwVVOZAFXE1ubZ5uolTQ=
+	t=1736865060; cv=none; b=nio2Ks/MZmtZwmSQFBPOb+5j1Eu4w6MuSrqaIL0ULDKEIRnnmIdYJd+vAzrFGAKJlaPBC1d7/c+J79IrxQPpjtLtH/c6CftcS+B/vE7ShG28hIBngH7Lsla6CatRG5Dn2Ug5GqMkYfeBjY4N7ayb8kd1beuzODeO82W4zvuzX/U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736865050; c=relaxed/simple;
-	bh=oOB7HKtxl6QmCAq8bPzGbVc17RCOUI2Sl+ygJjUnoKI=;
+	s=arc-20240116; t=1736865060; c=relaxed/simple;
+	bh=kH19/8G+ARXVXxG3Zsmf98ZfHUHinE6g2lyahxlFMK0=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=LPf2lTKncauwCOydzyuPP8Ea+Akq5VQjTLrDGhZY2EbHh1tDVtgCwR7fiAjAp8ATY1L9jKTU96lqIJf7EkoLVI97mHlRpV3vrig0h+9uJ23bkramDPB/STojFOtdPvZk0NdBFKlzhCpNVX20jBq7DpJ6rhPHVcaZ7/fWWrfSp1Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jPPh6gsh; arc=none smtp.client-ip=209.85.214.173
+	 MIME-Version; b=jeJcSVYQatxjIBkfSABNDeMoflWmcWl+gYWMl3nj7dxASNbFzsX2ONtbwJ/sOzOY6NohRA5/oxFvSPCGsOwWjpcDSeGcpJ7ueSTDpNSUj7EkTzGL70XaihUuOQHTkUHowPQrZTC7V0LX7GOGGjDmciAECS9astQ9AOPYjlYYGnE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AUIg2GjV; arc=none smtp.client-ip=209.85.214.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-2167141dfa1so97934135ad.1;
-        Tue, 14 Jan 2025 06:30:48 -0800 (PST)
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-2166f1e589cso117940745ad.3;
+        Tue, 14 Jan 2025 06:30:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736865048; x=1737469848; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1736865058; x=1737469858; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=vhVCWNrslkm6iZIefrpS3RD/DxTmVQixP75EKnHEJTk=;
-        b=jPPh6gshjnWNB6nyeycPzZT+cePeUI9Irm2/+e/IUS9eHcxkh9ftjsBNj4itbaCmad
-         TyLyokCg8NJl2DMUwfiC0p6pWUKmY8A5K0lP3/7+5UPrOW3WwUXAB52FskjseK6MCNCM
-         7C5v4Ho4Ra+6WYF04Z3tJ7QkknEc6aWGwgdT3BmuPm7L17EllhPioK0HM3ByOM2+Dj71
-         yxHi+5Wh4M0QoJGaX/Zfl7tN2FY2cl+q7nqJYxnytbUzhhBiZX0cBmrLhwrhAndVu4g1
-         tN8QInmPIbuIsfPPnmVCefMt2uR2V+a4myppgxDP1iI+ChXbqS18i5J6t1xSFBH5aAqW
-         hwHQ==
+        bh=HmzLiqs3xurRkTvn6Vaf/B5i5AaWeH3iqyiYXY3lnJc=;
+        b=AUIg2GjVFC/Y/FKM8nqnKxyvc2elMLG35MZz+2dC5Oi5E0BXpNcWPL2BkZ9/zy4EI9
+         MgDWe76sv1lxaDqS8N0zGdOTsupKByR302JZMDrVbt9PwNI0EhoM9Lpv6lE3eYI9o2/e
+         EF9mzgcNrNp8G7WLPDoQI0pKlAC4N91pUsrJPzokJ39P/vKvo57TIciM+VaD9FZFIk1q
+         qD2UIcu0YPAhkXHqfS78BU2cdkvJOv9oysZ5UBxYHfDFp8QPXjfgadvFd849Ir4uSS9P
+         Rvd3jQ3+/JdFMxTo2LUYrE7Vz2qLxUUdwNIjChoQNY1nF3CGCpq2C/H6kTq/D6lU72re
+         vcdA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736865048; x=1737469848;
+        d=1e100.net; s=20230601; t=1736865058; x=1737469858;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=vhVCWNrslkm6iZIefrpS3RD/DxTmVQixP75EKnHEJTk=;
-        b=H4PBuOLM05Pahiy39r+ne4MoNwkm3eTFgOda34n+UHptU/cCUmiXqjRwikB/72eg8f
-         VFMQBE+4byxVTNSHXDsjxcZHR3zlBzcGfaUf+Br5pahwn6pSfuP3LniK5ckAJ25f8ygF
-         m4ReqWbUwBeN2UiZiriPpF0iZy97jYI6rZBbnxkoinRnwtjHIEPekivQ4k/Es8YJ4FCF
-         QqSiygbvnXcLxpMTKwKk2i+sW7kRh1xOcnQMjqdPLcIehyDDlTTAaKCP4OCQk00sMCi3
-         01lWfOlLvTcLu0TeocOuDZ5CUMyQMNZxWJa8Fa4AzySEugFhUl0g8gjm8JbfWpo4iXRF
-         JrKw==
-X-Forwarded-Encrypted: i=1; AJvYcCUaRH0EnvE0KZ9rqsB0Rpy4cVKGbe1VWedmfO7Cxpt6/0nHWv8zFT1yhs8/KbxwDeKTUoKW+fKBlNE=@vger.kernel.org, AJvYcCVEDRikDHN6WyN8Y/wawm3H+xLd6Mkl/qdzp5KwFTI2fVOZtdLXWFkXDD3r66ztzsYPhxPdck8B@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy5Crlmy3VIE9zh8vKKK+B2G9674g7tUpDNCsnpg2Rur3rAl0BS
-	p3wwEFlyiHJJ1ndz+enGFkMcAQK6eAfxQk0WYPzXMGd/LtxfO+iu
-X-Gm-Gg: ASbGnctj7JRTtTwK65jVYj008BiEl0oQNolFLjENtj7jxjnrLMn1QoG+55bwg7MgjyH
-	5fhboXg+l12u16/6VtHqoCuH7cYZIspDIphPK1cnZyMNdv1bGxneZ/Ha1xwmGbzO/0K/5Jnh9Tg
-	37Cc6TTONAN9cWppXkMG5KlMN7DS29NA1T/DQKqZBFPGKITJKKyBAt46nVh5Wb4fppo/62FJn4C
-	2ABBYr2W3cmH8T96ykxUQNWgM5pRG9s3olPluZCJHgnPg==
-X-Google-Smtp-Source: AGHT+IEsCQchocuKWGOo5d0GSwKE3iy2BBC2w8Tum2vsnQSqh6An2Nfj/aT9mR7oqQA3eR6tVsH/Iw==
-X-Received: by 2002:a05:6a21:8805:b0:1e0:cc01:43da with SMTP id adf61e73a8af0-1e8b0af29b8mr21600280637.0.1736865047913;
-        Tue, 14 Jan 2025 06:30:47 -0800 (PST)
+        bh=HmzLiqs3xurRkTvn6Vaf/B5i5AaWeH3iqyiYXY3lnJc=;
+        b=Q42vgi6TkuoAzjauZ5hI2hj4zDcSiulLZ2RUfzjf7JVH7l+SB1UyaalXVUWZFTTZRN
+         lWonq9WEeV0UtM+k9p/UqKh9QFM4ZxZt1ciaOVhPM7zKkIrYuxwoRbxm+hacaYdYASya
+         hmsI7/menl7wtpGyQmzZh/H1Jdd0hFLMEskz5nD630rcK28/Yecbl5WdhV7FClS9Ih3D
+         i+/vD/RE5jGSQd8CuLvF01ebb3eOfSKG3aYG5ajFAOaIb/tGc40aTrqqvhm/jmQi4NP+
+         AEw0QhVgjEggngha4QC1r0qOilntTDiDZLwltZVFtW8y5HNMJxx1W0CPvnbS9ul0/guE
+         DzWw==
+X-Forwarded-Encrypted: i=1; AJvYcCWaq+1kQLYYnBWzhSF4qLJ4BcZE5A2iICiE+Dq7UmwB2svQJGwsJA08e8NGdBwZVBwihf/ZvPa+V4o=@vger.kernel.org, AJvYcCWe8iaaFy6UzLAjYRBYkv5FbBZv0jjHh494Ln0DV2/ZvbY9P3/Rv3D68Le9H3MrXx2umpqBIbwC@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw5q7Arigb9y/RRMRvBFIpHJOxxBKtoUc30FsF4HL4Gr70trtQS
+	L530Eke9xNt8LTH79DMrnZfAODreJ5UMc0x9nhX4ImRoorcuS9fR
+X-Gm-Gg: ASbGncu2kf0kRgeP5Zto986HUXhIGK24hIqrc+aYB/q3ODzheKjxO1HkzfEw77FXDYz
+	M2gLyIOZ/8K6j/rqQCowEjKlZ2W94gGB27mW8zzAjY/P2QFbjJXsCu9nkfRH1qkcWDSZpOZSZX4
+	N5Mh4v6QUesjlnneMk12n/KI9Ox8XGYKq35Bbt+KTttITAfSO+GeAIP9XqBP1UTg57P97XIt9Th
+	YAvM5mgXp9oRP9xhhvbdx/X9a0ECE82pWTkh8OL+08p/g==
+X-Google-Smtp-Source: AGHT+IGYSckeLtY6LvPnxNoHRuEEag34sM1JW1zzC+Q67vRnk5HpMTDgqip4uX0kaYvGw4IDrB1Afw==
+X-Received: by 2002:a05:6a00:170a:b0:725:d64c:f113 with SMTP id d2e1a72fcca58-72d21f18064mr38564183b3a.3.1736865057673;
+        Tue, 14 Jan 2025 06:30:57 -0800 (PST)
 Received: from ap.. ([182.213.254.91])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72d406a4dfesm7474582b3a.156.2025.01.14.06.30.38
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72d406a4dfesm7474582b3a.156.2025.01.14.06.30.48
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Jan 2025 06:30:47 -0800 (PST)
+        Tue, 14 Jan 2025 06:30:57 -0800 (PST)
 From: Taehee Yoo <ap420073@gmail.com>
 To: davem@davemloft.net,
 	kuba@kernel.org,
@@ -111,9 +111,9 @@ Cc: kory.maincent@bootlin.com,
 	willemb@google.com,
 	daniel.zahka@gmail.com,
 	ap420073@gmail.com
-Subject: [PATCH net-next v9 09/10] netdevsim: add HDS feature
-Date: Tue, 14 Jan 2025 14:28:51 +0000
-Message-Id: <20250114142852.3364986-10-ap420073@gmail.com>
+Subject: [PATCH net-next v9 10/10] selftest: net-drv: hds: add test for HDS feature
+Date: Tue, 14 Jan 2025 14:28:52 +0000
+Message-Id: <20250114142852.3364986-11-ap420073@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250114142852.3364986-1-ap420073@gmail.com>
 References: <20250114142852.3364986-1-ap420073@gmail.com>
@@ -125,157 +125,171 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-HDS options(tcp-data-split, hds-thresh) have dependencies between other
-features like XDP. Basic dependencies are checked in the core API.
-netdevsim is very useful to check basic dependencies.
+HDS/HDS-thresh features were updated/implemented. so add some tests for
+these features.
 
-The default tcp-data-split mode is UNKNOWN but netdevsim driver
-returns ENABLED when ethtool dumps tcp-data-split mode.
-The default value of HDS threshold is 0 and the maximum value is 1024.
+HDS tests are the same with `ethtool -G eth0 tcp-data-split <on | off |
+auto >` but `auto` depends on driver specification.
+So, it doesn't include `auto` case.
 
-ethtool shows like this.
-
-ethtool -g eni1np1
-Ring parameters for eni1np1:
-Pre-set maximums:
-...
-HDS thresh:             1024
-Current hardware settings:
-...
-TCP data split:         on
-HDS thresh:             0
-
-ethtool -G eni1np1 tcp-data-split on hds-thresh 1024
-ethtool -g eni1np1
-Ring parameters for eni1np1:
-Pre-set maximums:
-...
-HDS thresh:             1024
-Current hardware settings:
-...
-TCP data split:         on
-HDS thresh:             1024
+HDS-thresh tests are same with `ethtool -G eth0 hds-thresh <0 - MAX>`
+It includes both 0 and MAX cases. It also includes exceed case, MAX + 1.
 
 Signed-off-by: Taehee Yoo <ap420073@gmail.com>
 ---
 
 v9:
- - Rebase on the top of net-next.
+ - No changes.
 
 v8:
- - Do not set hds_config and hds_thresh in the nsim_set_ringparam.
+ - Use ksft_raises.
 
 v7:
- - Add datapath implementation.
- - Remove kernel_ethtool_ringparam in the struct nsim_ethtool.
-
-v6:
  - Patch added.
 
- drivers/net/netdevsim/ethtool.c   | 12 +++++++++++-
- drivers/net/netdevsim/netdev.c    |  9 +++++++++
- drivers/net/netdevsim/netdevsim.h |  3 +++
- 3 files changed, 23 insertions(+), 1 deletion(-)
+ tools/testing/selftests/drivers/net/Makefile |   1 +
+ tools/testing/selftests/drivers/net/hds.py   | 120 +++++++++++++++++++
+ 2 files changed, 121 insertions(+)
+ create mode 100755 tools/testing/selftests/drivers/net/hds.py
 
-diff --git a/drivers/net/netdevsim/ethtool.c b/drivers/net/netdevsim/ethtool.c
-index 5fe1eaef99b5..9e0df40c71e1 100644
---- a/drivers/net/netdevsim/ethtool.c
-+++ b/drivers/net/netdevsim/ethtool.c
-@@ -2,7 +2,6 @@
- // Copyright (c) 2020 Facebook
+diff --git a/tools/testing/selftests/drivers/net/Makefile b/tools/testing/selftests/drivers/net/Makefile
+index 469179c18935..137470bdee0c 100644
+--- a/tools/testing/selftests/drivers/net/Makefile
++++ b/tools/testing/selftests/drivers/net/Makefile
+@@ -12,6 +12,7 @@ TEST_PROGS := \
+ 	queues.py \
+ 	stats.py \
+ 	shaper.py \
++	hds.py \
+ # end of TEST_PROGS
  
- #include <linux/debugfs.h>
--#include <linux/ethtool.h>
- #include <linux/random.h>
- 
- #include "netdevsim.h"
-@@ -72,6 +71,12 @@ static void nsim_get_ringparam(struct net_device *dev,
- 	struct netdevsim *ns = netdev_priv(dev);
- 
- 	memcpy(ring, &ns->ethtool.ring, sizeof(ns->ethtool.ring));
-+	kernel_ring->tcp_data_split = dev->ethtool->hds_config;
-+	kernel_ring->hds_thresh = dev->ethtool->hds_thresh;
-+	kernel_ring->hds_thresh_max = NSIM_HDS_THRESHOLD_MAX;
+ include ../../lib.mk
+diff --git a/tools/testing/selftests/drivers/net/hds.py b/tools/testing/selftests/drivers/net/hds.py
+new file mode 100755
+index 000000000000..394971b25c0b
+--- /dev/null
++++ b/tools/testing/selftests/drivers/net/hds.py
+@@ -0,0 +1,120 @@
++#!/usr/bin/env python3
++# SPDX-License-Identifier: GPL-2.0
 +
-+	if (kernel_ring->tcp_data_split == ETHTOOL_TCP_DATA_SPLIT_UNKNOWN)
-+		kernel_ring->tcp_data_split = ETHTOOL_TCP_DATA_SPLIT_ENABLED;
- }
- 
- static int nsim_set_ringparam(struct net_device *dev,
-@@ -161,6 +166,8 @@ static int nsim_get_ts_info(struct net_device *dev,
- 
- static const struct ethtool_ops nsim_ethtool_ops = {
- 	.supported_coalesce_params	= ETHTOOL_COALESCE_ALL_PARAMS,
-+	.supported_ring_params		= ETHTOOL_RING_USE_TCP_DATA_SPLIT |
-+					  ETHTOOL_RING_USE_HDS_THRS,
- 	.get_pause_stats	        = nsim_get_pause_stats,
- 	.get_pauseparam		        = nsim_get_pauseparam,
- 	.set_pauseparam		        = nsim_set_pauseparam,
-@@ -182,6 +189,9 @@ static void nsim_ethtool_ring_init(struct netdevsim *ns)
- 	ns->ethtool.ring.rx_jumbo_max_pending = 4096;
- 	ns->ethtool.ring.rx_mini_max_pending = 4096;
- 	ns->ethtool.ring.tx_max_pending = 4096;
++import errno
++from lib.py import ksft_run, ksft_exit, ksft_eq, ksft_raises, KsftSkipEx
++from lib.py import EthtoolFamily, NlError
++from lib.py import NetDrvEnv
 +
-+	ns->netdev->ethtool->hds_config = ETHTOOL_TCP_DATA_SPLIT_UNKNOWN;
-+	ns->netdev->ethtool->hds_thresh = 0;
- }
- 
- void nsim_ethtool_init(struct netdevsim *ns)
-diff --git a/drivers/net/netdevsim/netdev.c b/drivers/net/netdevsim/netdev.c
-index d013b6498539..f92b05ccdca9 100644
---- a/drivers/net/netdevsim/netdev.c
-+++ b/drivers/net/netdevsim/netdev.c
-@@ -15,6 +15,7 @@
- 
- #include <linux/debugfs.h>
- #include <linux/etherdevice.h>
-+#include <linux/ethtool_netlink.h>
- #include <linux/kernel.h>
- #include <linux/module.h>
- #include <linux/netdevice.h>
-@@ -54,6 +55,7 @@ static int nsim_forward_skb(struct net_device *dev, struct sk_buff *skb,
- static netdev_tx_t nsim_start_xmit(struct sk_buff *skb, struct net_device *dev)
- {
- 	struct netdevsim *ns = netdev_priv(dev);
-+	struct ethtool_netdev_state *ethtool;
- 	struct net_device *peer_dev;
- 	unsigned int len = skb->len;
- 	struct netdevsim *peer_ns;
-@@ -74,6 +76,13 @@ static netdev_tx_t nsim_start_xmit(struct sk_buff *skb, struct net_device *dev)
- 		rxq = rxq % peer_dev->num_rx_queues;
- 	rq = peer_ns->rq[rxq];
- 
-+	ethtool = peer_dev->ethtool;
-+	if (skb_is_nonlinear(skb) &&
-+	    (ethtool->hds_config != ETHTOOL_TCP_DATA_SPLIT_ENABLED ||
-+	     (ethtool->hds_config == ETHTOOL_TCP_DATA_SPLIT_ENABLED &&
-+	      ethtool->hds_thresh > len)))
-+		skb_linearize(skb);
++def get_hds(cfg, netnl) -> None:
++    try:
++        rings = netnl.rings_get({'header': {'dev-index': cfg.ifindex}})
++    except NlError as e:
++        raise KsftSkipEx('ring-get not supported by device')
++    if 'tcp-data-split' not in rings:
++        raise KsftSkipEx('tcp-data-split not supported by device')
 +
- 	skb_tx_timestamp(skb);
- 	if (unlikely(nsim_forward_skb(peer_dev, skb, rq) == NET_RX_DROP))
- 		goto out_drop_cnt;
-diff --git a/drivers/net/netdevsim/netdevsim.h b/drivers/net/netdevsim/netdevsim.h
-index a70f62af4c88..dcf073bc4802 100644
---- a/drivers/net/netdevsim/netdevsim.h
-+++ b/drivers/net/netdevsim/netdevsim.h
-@@ -16,6 +16,7 @@
- #include <linux/debugfs.h>
- #include <linux/device.h>
- #include <linux/ethtool.h>
-+#include <linux/ethtool_netlink.h>
- #include <linux/kernel.h>
- #include <linux/list.h>
- #include <linux/netdevice.h>
-@@ -36,6 +37,8 @@
- #define NSIM_IPSEC_VALID		BIT(31)
- #define NSIM_UDP_TUNNEL_N_PORTS		4
- 
-+#define NSIM_HDS_THRESHOLD_MAX		1024
++def get_hds_thresh(cfg, netnl) -> None:
++    try:
++        rings = netnl.rings_get({'header': {'dev-index': cfg.ifindex}})
++    except NlError as e:
++        raise KsftSkipEx('ring-get not supported by device')
++    if 'hds-thresh' not in rings:
++        raise KsftSkipEx('hds-thresh not supported by device')
 +
- struct nsim_sa {
- 	struct xfrm_state *xs;
- 	__be32 ipaddr[4];
++def set_hds_enable(cfg, netnl) -> None:
++    try:
++        netnl.rings_set({'header': {'dev-index': cfg.ifindex}, 'tcp-data-split': 'enabled'})
++    except NlError as e:
++        if e.error == errno.EINVAL:
++            raise KsftSkipEx("disabling of HDS not supported by the device")
++        elif e.error == errno.EOPNOTSUPP:
++            raise KsftSkipEx("ring-set not supported by the device")
++    try:
++        rings = netnl.rings_get({'header': {'dev-index': cfg.ifindex}})
++    except NlError as e:
++        raise KsftSkipEx('ring-get not supported by device')
++    if 'tcp-data-split' not in rings:
++        raise KsftSkipEx('tcp-data-split not supported by device')
++
++    ksft_eq('enabled', rings['tcp-data-split'])
++
++def set_hds_disable(cfg, netnl) -> None:
++    try:
++        netnl.rings_set({'header': {'dev-index': cfg.ifindex}, 'tcp-data-split': 'disabled'})
++    except NlError as e:
++        if e.error == errno.EINVAL:
++            raise KsftSkipEx("disabling of HDS not supported by the device")
++        elif e.error == errno.EOPNOTSUPP:
++            raise KsftSkipEx("ring-set not supported by the device")
++    try:
++        rings = netnl.rings_get({'header': {'dev-index': cfg.ifindex}})
++    except NlError as e:
++        raise KsftSkipEx('ring-get not supported by device')
++    if 'tcp-data-split' not in rings:
++        raise KsftSkipEx('tcp-data-split not supported by device')
++
++    ksft_eq('disabled', rings['tcp-data-split'])
++
++def set_hds_thresh_zero(cfg, netnl) -> None:
++    try:
++        netnl.rings_set({'header': {'dev-index': cfg.ifindex}, 'hds-thresh': 0})
++    except NlError as e:
++        if e.error == errno.EINVAL:
++            raise KsftSkipEx("hds-thresh-set not supported by the device")
++        elif e.error == errno.EOPNOTSUPP:
++            raise KsftSkipEx("ring-set not supported by the device")
++    try:
++        rings = netnl.rings_get({'header': {'dev-index': cfg.ifindex}})
++    except NlError as e:
++        raise KsftSkipEx('ring-get not supported by device')
++    if 'hds-thresh' not in rings:
++        raise KsftSkipEx('hds-thresh not supported by device')
++
++    ksft_eq(0, rings['hds-thresh'])
++
++def set_hds_thresh_max(cfg, netnl) -> None:
++    try:
++        rings = netnl.rings_get({'header': {'dev-index': cfg.ifindex}})
++    except NlError as e:
++        raise KsftSkipEx('ring-get not supported by device')
++    if 'hds-thresh' not in rings:
++        raise KsftSkipEx('hds-thresh not supported by device')
++    try:
++        netnl.rings_set({'header': {'dev-index': cfg.ifindex}, 'hds-thresh': rings['hds-thresh-max']})
++    except NlError as e:
++        if e.error == errno.EINVAL:
++            raise KsftSkipEx("hds-thresh-set not supported by the device")
++        elif e.error == errno.EOPNOTSUPP:
++            raise KsftSkipEx("ring-set not supported by the device")
++    rings = netnl.rings_get({'header': {'dev-index': cfg.ifindex}})
++    ksft_eq(rings['hds-thresh'], rings['hds-thresh-max'])
++
++def set_hds_thresh_gt(cfg, netnl) -> None:
++    try:
++        rings = netnl.rings_get({'header': {'dev-index': cfg.ifindex}})
++    except NlError as e:
++        raise KsftSkipEx('ring-get not supported by device')
++    if 'hds-thresh' not in rings:
++        raise KsftSkipEx('hds-thresh not supported by device')
++    if 'hds-thresh-max' not in rings:
++        raise KsftSkipEx('hds-thresh-max not defined by device')
++    hds_gt = rings['hds-thresh-max'] + 1
++    with ksft_raises(NlError) as e:
++        netnl.rings_set({'header': {'dev-index': cfg.ifindex}, 'hds-thresh': hds_gt})
++    ksft_eq(e.exception.nl_msg.error, -errno.EINVAL)
++
++def main() -> None:
++    with NetDrvEnv(__file__, queue_count=3) as cfg:
++        ksft_run([get_hds,
++                  get_hds_thresh,
++                  set_hds_disable,
++                  set_hds_enable,
++                  set_hds_thresh_zero,
++                  set_hds_thresh_max,
++                  set_hds_thresh_gt],
++                 args=(cfg, EthtoolFamily()))
++    ksft_exit()
++
++if __name__ == "__main__":
++    main()
 -- 
 2.34.1
 
