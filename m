@@ -1,745 +1,200 @@
-Return-Path: <netdev+bounces-158058-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158059-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC077A10494
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 11:47:01 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 25A79A1049D
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 11:49:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B39451885CC3
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 10:47:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 028EF18889B5
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 10:49:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DA6322DC30;
-	Tue, 14 Jan 2025 10:46:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D358922DC2C;
+	Tue, 14 Jan 2025 10:49:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CVQiBLdQ"
+	dkim=pass (2048-bit key) header.d=bonusplay.pl header.i=@bonusplay.pl header.b="o7MSR1l4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f179.google.com (mail-yb1-f179.google.com [209.85.219.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.bonusplay.pl (unknown [132.226.202.90])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E056F22F19;
-	Tue, 14 Jan 2025 10:46:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 988962040AF
+	for <netdev@vger.kernel.org>; Tue, 14 Jan 2025 10:49:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=132.226.202.90
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736851615; cv=none; b=LO9SfFaSRWlQCray9W05WJY6PxD3+RQPsu53Bz2GLWY1K/uxxJnfd98ZyFshSgIl40PLt2ee6o+au13OsIVUdOvvS8aHmA89csgsTmrYi0p5H6Led47aqipRy8e9/UtXN3ptPZ+fXStXZ/+v6OdxkGos5itlueturby7ZVnXsro=
+	t=1736851780; cv=none; b=IDtyAFB+IiqeY/seKpeuX3LvoYB3DdweyVafGMhZUFy+F65lgukZDLCNt1Ek+K1QgiXac1UnKFg4GX7f6t9bNsM7XaTrryUp+IGYCuM3NEl1+lxNUKRdgtepgEH04uck+b2TvQtLZ+T4h7qNbou/wbBqoyk2HmyAuCHS1E3fejM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736851615; c=relaxed/simple;
-	bh=rjMV+L+goG7e6VBb7CfH5F2xhbiQQQXITZA+TJsEAB0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=a4V5zGI48md+aM1aq0vvA5hE3xwyDPmkZCU0UXPw5Cq8HHt8fntDm7EIsDcINYnTtZaMPYLa9+h0pVx2JYzskPsVF4xcbw6JeLp/ksoIt5/Uwl55Erti9CbXbW/mhAGckkK0/HbaUTHgA3ncB4Z+gV5Bo9RPWq7u5bSTXYcSKpo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CVQiBLdQ; arc=none smtp.client-ip=209.85.219.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f179.google.com with SMTP id 3f1490d57ef6-e46ebe19489so7755083276.2;
-        Tue, 14 Jan 2025 02:46:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736851612; x=1737456412; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4du5YEVf29pRGLSWaY50G/+K955C6Kw1M/OKwC+b8GM=;
-        b=CVQiBLdQQHIS8JkbmLP1bgBDd5gl1PvadiT5cmhPdTNkT/85dAfMiUOoH0GDeJlT+5
-         /Ik8N3T4hA+E+mb0DJNy00Q5/UyZFiE7PqITnTmSZf+wr+1mtpaJUPSICmydPlUUY1U9
-         00geKOV8UfaikyMade/9NxhL9UiQ2Mo8oBCmWfzenMOP6fSbd/Bwdg5SYhDRlve/dqez
-         fM3Og2jUccDKdtnhImUfqBawJg4UJYDkXolsbdj1xtKYRGrYwAKyVFT6Zkq81+Ue4C1l
-         SbpspnfIju8cpLeyyLA/4QYEMjy6TNtOEPXkY1ddstfuIJzKdfUR77iuL5MfnlwKMU0k
-         OAdw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736851612; x=1737456412;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=4du5YEVf29pRGLSWaY50G/+K955C6Kw1M/OKwC+b8GM=;
-        b=uMNlkztovaHwr5xNUItmm3Q2eJOKku5SRK2VzSaXJJpmzi4MwRrV/MCIIOacea0HvY
-         VuEOKGHqXyYVl9H9nz/vtoQ+wJuNmpVPC9/sduu2bLxe2DElybO7So2s9qETslp0rYO1
-         gNAmcYTsG4HYhyX22RgRTXvFghA8MXGJNU0k5DXid/gl/tzEJc9n3Kkoq6NMOxF8siCa
-         ILNAW0zHLY0XFmEUFrlcKM+dlqb7owdWP3yKpsE0xXsLYgF4TT9PPWx2MGc3lWn76ZIm
-         lWt54IGEHDwvmVRW0JekBZQm1BFcs1YUQEidxCJpvZ+cxTxyJxCoW+kpn92ylSinf3lR
-         eqDw==
-X-Forwarded-Encrypted: i=1; AJvYcCUBJpaIAEMF59QdMcaYFmIApH7A7IBSPn5I3IhtqNH8ZHIYfj5Goztcy0H1qr08SW+6yaxF5aBg3yUp@vger.kernel.org, AJvYcCVDglhc/GB6HCaUsej0WWc2CX4AQW8waLAOdirmdTiTEdFCb8kaOVzUQ1Bh8Vf8FqzG/9tgNZJZSgt2@vger.kernel.org, AJvYcCVINrpYC+H+UCh5DE318+vdaPfubSw0avsk3y4CzGSS5P9L2984sbpAXVcbrpKZ70+jrQ+NFOJPM/vUqKE=@vger.kernel.org, AJvYcCVasdrOqDbuXAIW02amQVhOlLofNJ5F2VQYCCotseYW0fO5I8fVeILZOrwOvCiG6qvFQ8fT4+H/tC7cuWq7@vger.kernel.org, AJvYcCWNh/UyNlRfboNPNuHVNeayJspj12GM3krKfZ6zZZZE5gTgg0e0wpJz3zU3QmiPrtkyfLFIribw5iw=@vger.kernel.org, AJvYcCWsDhdxvWUKL+HpXCGv4XWnsrIotfAajy8qhT9O7SZoJqHKkke7vrVNSBdSyfDSARpOXDDDts9ypydU@vger.kernel.org, AJvYcCX5LLgRF5l3aoBKYdmH9ruVynwSmWgHyOs5zY90le/ZmiTjwwj8uc6ko9SEIksxBqCVUvELG+Uq@vger.kernel.org, AJvYcCXas/dx22RbETfDgrDiJqY76azr5Aoc39S2rsdRRwYjI5jPq9/E+3n1yzja/cYZI7go+9YI6STz/zfOUA==@vger.kernel.org, AJvYcCXkOGdD2/HXpw11oWHTlxLPxpSaAUTSO+QMuE8LTRe3OHsRGT9PEc9MOwaTyNYjGPn6Z/sxvt8cTbe/VaYz+v8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzhxnLfNnB/eUbPpv4muBJsEp/O+BD/g8Xy1RbEqO1z3ru0qDts
-	62s1M0QK0sDJta6yk3DBcqoMnDMK2nX1RVbyJjPXTkE18+Z+24dHZpJWqgTQobHD2ySSIJjiSPb
-	p36NRzvWr0XL/s36Uo3KCfkOK6po=
-X-Gm-Gg: ASbGncv++VeeMoMO+60HJopzhBsNcszg0VSC4c3eVXn3DOYQyrqwRMnzbS8PPK/eJbx
-	k8lIZ72ZTbRy7lVTR/TUiNroX19RGI/+fKMhUedZzXEy3Q6baCRrShRcgo36HMAvIR7ZOIa3F
-X-Google-Smtp-Source: AGHT+IEdmGLeYOyRSUVFmPnIYdpnXhkvam4YWGRAPVz0dgXVlkyjCFV0ykP/lQVIS/cIfZizKL4EzfjBPT5lgfX14e0=
-X-Received: by 2002:a05:6902:a84:b0:e57:4b07:66c2 with SMTP id
- 3f1490d57ef6-e574b076871mr6708426276.38.1736851611527; Tue, 14 Jan 2025
- 02:46:51 -0800 (PST)
+	s=arc-20240116; t=1736851780; c=relaxed/simple;
+	bh=klXV4UttY4eYTV7jUjEz267jPS6nGu+sRMClWy2G9k0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ndB3DEklB5uDNjIZSJzcUz5W/f+kej75nWIyBsMKJOdEdyyoc9Jv9HNSpWTZyqGoENdWPSOyZ3dVj0l/RET+eHjJ7UWFYDI3HX+BSQRBCiGnP2r/MuAsZlscKXyTl4gLO9DL/oQrqMYONwP312SoSXAPURc1snFPO67C0E16dh0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bonusplay.pl; spf=pass smtp.mailfrom=bonusplay.pl; dkim=pass (2048-bit key) header.d=bonusplay.pl header.i=@bonusplay.pl header.b=o7MSR1l4; arc=none smtp.client-ip=132.226.202.90
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bonusplay.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bonusplay.pl
+Authentication-Results: mail.bonusplay.pl;
+	auth=pass (plain)
+Message-ID: <b4cba2d8-ac2d-47ca-a761-f81da6908c17@bonusplay.pl>
+Date: Tue, 14 Jan 2025 11:49:36 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250114033010.2445925-1-a0282524688@gmail.com>
- <20250114033010.2445925-5-a0282524688@gmail.com> <CAMZ6RqLHEoukxDfV33iDWXjM1baK922QnWSkOP01VzZ0S_9H8g@mail.gmail.com>
-In-Reply-To: <CAMZ6RqLHEoukxDfV33iDWXjM1baK922QnWSkOP01VzZ0S_9H8g@mail.gmail.com>
-From: Ming Yu <a0282524688@gmail.com>
-Date: Tue, 14 Jan 2025 18:46:40 +0800
-X-Gm-Features: AbW1kvagzYOqEv5YC4IV09sOV_gUTnUbNHtHLRFiOVszossazo-YoasJxs9FlY0
-Message-ID: <CAOoeyxW=k35-bkeqNmhyZwUxjy=g3irTBS5mbXLxqp1Stx-Zfg@mail.gmail.com>
-Subject: Re: [PATCH v5 4/7] can: Add Nuvoton NCT6694 CAN support
-To: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
-Cc: tmyu0@nuvoton.com, lee@kernel.org, linus.walleij@linaro.org, brgl@bgdev.pl, 
-	andi.shyti@kernel.org, mkl@pengutronix.de, andrew+netdev@lunn.ch, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	wim@linux-watchdog.org, linux@roeck-us.net, jdelvare@suse.com, 
-	alexandre.belloni@bootlin.com, linux-kernel@vger.kernel.org, 
-	linux-gpio@vger.kernel.org, linux-i2c@vger.kernel.org, 
-	linux-can@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org, 
-	linux-rtc@vger.kernel.org, linux-usb@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: be2net: oops due to RCU context switch
+To: Ajit Khaparde <ajit.khaparde@broadcom.com>,
+ Sriharsha Basavapatna <sriharsha.basavapatna@broadcom.com>,
+ Somnath Kotur <somnath.kotur@broadcom.com>
+Cc: netdev@vger.kernel.org
+References: <515516c7-e6e9-450a-9a74-685a60d64497@bonusplay.pl>
+Content-Language: en-US
+From: Bonus <kernel@bonusplay.pl>
+In-Reply-To: <515516c7-e6e9-450a-9a74-685a60d64497@bonusplay.pl>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
+Received: from localhost (Unknown [127.0.0.1])
+	by mail.bonusplay.pl (Haraka) with ESMTPSA id 0B45C5FF-7B4B-4B89-8C3D-5B105F5816C5.1
+	envelope-from <kernel@bonusplay.pl>
+	tls TLS_AES_256_GCM_SHA384 (authenticated bits=0);
+	Tue, 14 Jan 2025 10:49:36 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bonusplay.pl;
+ h=Content-Transfer-Encoding: Content-Type: In-Reply-To: From: References:
+ Cc: To: Subject: MIME-Version: Date: Message-ID; q=dns/txt;
+ s=s20211118323; t=1736851777;
+ bh=klXV4UttY4eYTV7jUjEz267jPS6nGu+sRMClWy2G9k0=;
+ b=o7MSR1l4lGRkbbfhqZ96Pr8lItHInIVYcsLqRQdjVkzV/+XDoIxj6/pJ+VJH7aB+Cq159rUTR
+ VKPCi1C/dhsQlOhmxqsv66FoGf3cjcCCtomWFubzvSoDeAp2qEZp7OhgmgX6XaDeNlxRgm2Pgvx
+ 19uDmBCs8Menbn93A/x/b3c83ROEj6XQjqo/M3bAwS3L1nDcCLXRq0erkuFMVw733vIxN6TDWm9
+ xF7XVyqPZGvO0W/4kF87n21aQRuPQ4rrZoz42h6sucdfDIoaMpVYYIcqVwAofobg0/Er9N7WhOH
+ hWvNCEO1zibnZHnJihLb46Uzew1a9fwTm0kB/hfIKADA==
 
-Dear Vincent,
+Thunderbird managed to mangle my oops trace, but I think this time it sho=
+uld work.
 
-Thank you for your reply,
-I'll add comments to describe these locks in the next patch,
+[=C2=A0=C2=A0 17.106889] ------------[ cut here ]------------
+[=C2=A0=C2=A0 17.106892] Voluntary context switch within RCU read-side cr=
+itical section!
+[=C2=A0=C2=A0 17.106895] WARNING: CPU: 2 PID: 1276 at kernel/rcu/tree_plu=
+gin.h:331 rcu_note_context_switch+0x656/0x6e0
+[=C2=A0=C2=A0 17.106899] Modules linked in: cfg80211 rfkill msr xt_conntr=
+ack ip6t_rpfilter ipt_rpfilter xt_pkttype xt_LOG nf_log_syslog xt_tcpudp =
+nft_compat nf_tables sch_fq_codel uinput nvidia_drm(PO) nvidia_modeset(PO=
+) nls_iso8859_1 nls_cp437 vfat fat nvidia_uvm(PO) snd_soc_avs snd_soc_hda=
+_codec snd_hda_codec_realtek snd_hda_ext_core snd_hda_codec_generic snd_h=
+da_scodec_component snd_soc_core mei_hdcp snd_hda_codec_hdmi snd_compress=
+ intel_rapl_msr ac97_bus iTCO_wdt mei_pxp intel_pmc_bxt snd_pcm_dmaengine=
+ watchdog ee1004 snd_hda_intel intel_rapl_common snd_intel_dspcfg snd_int=
+el_sdw_acpi snd_usb_audio mxm_wmi intel_uncore_frequency snd_hda_codec in=
+tel_uncore_frequency_common intel_tcc_cooling x86_pkg_temp_thermal intel_=
+powerclamp snd_usbmidi_lib snd_hda_core snd_ump coretemp snd_rawmidi snd_=
+hwdep crct10dif_pclmul snd_seq_device crc32_pclmul polyval_clmulni polyva=
+l_generic ghash_clmulni_intel snd_pcm battery e1000e snd_timer drm_ttm_he=
+lper rapl mei_me i2c_i801 snd ttm intel_cstate ptp
+i2c_mux intel_uncore pps_core be2net i2c_smbus
+[=C2=A0=C2=A0 17.106944]=C2=A0 mei mc soundcore fan thermal video tpm_crb=
+ backlight wmi tiny_power_button tpm_tis tpm_tis_core intel_pmc_core nvid=
+ia(PO) intel_vsec acpi_pad button joydev pmt_telemetry pmt_class edac_cor=
+e mousedev evdev mac_hid atkbd libps2 serio vivaldi_fmap loop cpufreq_pow=
+ersave xt_nat nf_nat nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4 br_netfil=
+ter veth tun tap macvlan bridge stp llc kvm_intel kvm fuse efi_pstore con=
+figfs nfnetlink efivarfs dmi_sysfs ip_tables x_tables autofs4 dm_crypt cb=
+c encrypted_keys trusted asn1_encoder tee tpm rng_core libaescfb ecdh_gen=
+eric ecc input_leds led_class hid_generic usbhid hid sd_mod ahci libahci =
+libata nvme sha512_ssse3 sha256_ssse3 xhci_pci sha1_ssse3 scsi_mod aesni_=
+intel nvme_core xhci_hcd gf128mul crypto_simd cryptd nvme_auth scsi_commo=
+n rtc_cmos btrfs blake2b_generic libcrc32c crc32c_generic crc32c_intel xo=
+r raid6_pq dm_snapshot dm_bufio dm_mod dax
+[=C2=A0=C2=A0 17.106998] CPU: 2 UID: 152 PID: 1276 Comm: systemd-network =
+Tainted: P=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 O=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 6.12.8 #1-NixOS
+[=C2=A0=C2=A0 17.107001] Tainted: [P]=3DPROPRIETARY_MODULE, [O]=3DOOT_MOD=
+ULE
+[=C2=A0=C2=A0 17.107002] Hardware name: Micro-Star International Co., Ltd=
+=2E MS-7B47/Z370 TOMAHAWK (MS-7B47), BIOS 1.00 09/12/2017
+[=C2=A0=C2=A0 17.107003] RIP: 0010:rcu_note_context_switch+0x656/0x6e0
+[=C2=A0=C2=A0 17.107005] Code: 00 00 00 0f 85 30 fd ff ff 49 89 8d a8 00 =
+00 00 e9 24 fd ff ff c6 05 a5 b4 e7 01 01 90 48 c7 c7 30 e2 5e b9 e8 fb b=
+3 f1 ff 90 <0f> 0b 90 90 e9 fa f9 ff ff 49 83 bd a0 00 00 00 00 49 8b 85 =
+a8 00
+[=C2=A0=C2=A0 17.107007] RSP: 0018:ffffa8d7c053b7d8 EFLAGS: 00010046
+[=C2=A0=C2=A0 17.107008] RAX: 0000000000000000 RBX: ffff97d32a448000 RCX:=
+ 0000000000000000
+[=C2=A0=C2=A0 17.107009] RDX: 0000000000000000 RSI: 0000000000000000 RDI:=
+ 0000000000000000
+[=C2=A0=C2=A0 17.107010] RBP: ffff97d65eb369c0 R08: 0000000000000000 R09:=
+ 0000000000000000
+[=C2=A0=C2=A0 17.107011] R10: 0000000000000000 R11: 0000000000000000 R12:=
+ 0000000000000000
+[=C2=A0=C2=A0 17.107012] R13: ffff97d32a448000 R14: ffff97d30ea58814 R15:=
+ ffff97d301800af0
+[=C2=A0=C2=A0 17.107013] FS:=C2=A0 00007f90e82515c0(0000) GS:ffff97d65eb0=
+0000(0000) knlGS:0000000000000000
+[=C2=A0=C2=A0 17.107015] CS:=C2=A0 0010 DS: 0000 ES: 0000 CR0: 0000000080=
+050033
+[=C2=A0=C2=A0 17.107016] CR2: 0000560b0481c360 CR3: 00000001243a0003 CR4:=
+ 00000000003726f0
+[=C2=A0=C2=A0 17.107017] DR0: 0000000000000000 DR1: 0000000000000000 DR2:=
+ 0000000000000000
+[=C2=A0=C2=A0 17.107018] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7:=
+ 0000000000000400
+[=C2=A0=C2=A0 17.107019] Call Trace:
+[=C2=A0=C2=A0 17.107021]=C2=A0 <TASK>
+[=C2=A0=C2=A0 17.107023]=C2=A0 ? __warn+0x89/0x130
+[=C2=A0=C2=A0 17.107027]=C2=A0 ? rcu_note_context_switch+0x656/0x6e0
+[=C2=A0=C2=A0 17.107029]=C2=A0 ? report_bug+0x172/0x1a0
+[=C2=A0=C2=A0 17.107032]=C2=A0 ? handle_bug+0x61/0xb0
+[=C2=A0=C2=A0 17.107034]=C2=A0 ? exc_invalid_op+0x17/0x80
+[=C2=A0=C2=A0 17.107036]=C2=A0 ? asm_exc_invalid_op+0x1a/0x20
+[=C2=A0=C2=A0 17.107040]=C2=A0 ? rcu_note_context_switch+0x656/0x6e0
+[=C2=A0=C2=A0 17.107042]=C2=A0 ? rcu_note_context_switch+0x655/0x6e0
+[=C2=A0=C2=A0 17.107044]=C2=A0 __schedule+0xca/0x12d0
+[=C2=A0=C2=A0 17.107046]=C2=A0 ? get_nohz_timer_target+0x2a/0x140
+[=C2=A0=C2=A0 17.107049]=C2=A0 ? timerqueue_add+0x66/0xd0
+[=C2=A0=C2=A0 17.107052]=C2=A0 ? hrtimer_start_range_ns+0x258/0x380
+[=C2=A0=C2=A0 17.107055]=C2=A0 schedule+0x27/0xf0
+[=C2=A0=C2=A0 17.107056]=C2=A0 schedule_hrtimeout_range_clock+0xe2/0x140
+[=C2=A0=C2=A0 17.107060]=C2=A0 ? __pfx_hrtimer_wakeup+0x10/0x10
+[=C2=A0=C2=A0 17.107063]=C2=A0 ? be_mcc_notify_wait+0x6c/0x150 [be2net]
+[=C2=A0=C2=A0 17.107070]=C2=A0 usleep_range_state+0x63/0xa0
+[=C2=A0=C2=A0 17.107073]=C2=A0 be_mcc_notify_wait+0xbe/0x150 [be2net]
+[=C2=A0=C2=A0 17.107080]=C2=A0 be_cmd_get_hsw_config+0x17c/0x1a0 [be2net]=
 
-Vincent Mailhol <mailhol.vincent@wanadoo.fr> =E6=96=BC 2025=E5=B9=B41=E6=9C=
-=8814=E6=97=A5 =E9=80=B1=E4=BA=8C =E4=B8=8B=E5=8D=884:06=E5=AF=AB=E9=81=93=
-=EF=BC=9A
->
-...
-> > +config CAN_NCT6694
-> > +       tristate "Nuvoton NCT6694 Socket CANfd support"
-> > +       depends on MFD_NCT6694
->
-> Your driver uses the CAN rx offload. You need to select it here.
->
->           select CAN_RX_OFFLOAD
->
+[=C2=A0=C2=A0 17.107088]=C2=A0 be_ndo_bridge_getlink+0xf0/0x110 [be2net]
+[=C2=A0=C2=A0 17.107094]=C2=A0 rtnl_bridge_getlink+0x12a/0x1d0
+[=C2=A0=C2=A0 17.107098]=C2=A0 ? __pfx_rtnl_bridge_getlink+0x10/0x10
+[=C2=A0=C2=A0 17.107101]=C2=A0 rtnl_dumpit+0x85/0xb0
+[=C2=A0=C2=A0 17.107103]=C2=A0 netlink_dump+0x138/0x370
+[=C2=A0=C2=A0 17.107108]=C2=A0 __netlink_dump_start+0x1e7/0x2b0
+[=C2=A0=C2=A0 17.107111]=C2=A0 ? __pfx_rtnl_bridge_getlink+0x10/0x10
+[=C2=A0=C2=A0 17.107113]=C2=A0 rtnetlink_rcv_msg+0x2b8/0x400
+[=C2=A0=C2=A0 17.107115]=C2=A0 ? __pfx_rtnl_dumpit+0x10/0x10
+[=C2=A0=C2=A0 17.107117]=C2=A0 ? __pfx_rtnl_bridge_getlink+0x10/0x10
+[=C2=A0=C2=A0 17.107120]=C2=A0 ? __pfx_rtnetlink_rcv_msg+0x10/0x10
+[=C2=A0=C2=A0 17.107122]=C2=A0 netlink_rcv_skb+0x58/0x110
+[=C2=A0=C2=A0 17.107125]=C2=A0 netlink_unicast+0x1a3/0x290
+[=C2=A0=C2=A0 17.107127]=C2=A0 netlink_sendmsg+0x222/0x4b0
+[=C2=A0=C2=A0 17.107129]=C2=A0 __sys_sendto+0x1ee/0x200
+[=C2=A0=C2=A0 17.107134]=C2=A0 __x64_sys_sendto+0x24/0x40
+[=C2=A0=C2=A0 17.107136]=C2=A0 do_syscall_64+0xb7/0x210
+[=C2=A0=C2=A0 17.107138]=C2=A0 entry_SYSCALL_64_after_hwframe+0x77/0x7f
+[=C2=A0=C2=A0 17.107141] RIP: 0033:0x7f90e7d19df7
+[=C2=A0=C2=A0 17.107150] Code: 0d 00 f7 d8 64 89 02 48 c7 c0 ff ff ff ff =
+eb 98 0f 1f 00 f3 0f 1e fa 80 3d 75 f2 0d 00 00 41 89 ca 74 30 b8 2c 00 0=
+0 00 0f 05 <48> 3d 00 f0 ff ff 0f 87 9d 00 00 00 31 d2 31 c9 31 f6 31 ff =
+45 31
+[=C2=A0=C2=A0 17.107151] RSP: 002b:00007ffe3ad3e3e8 EFLAGS: 00000202 ORIG=
+_RAX: 000000000000002c
+[=C2=A0=C2=A0 17.107153] RAX: ffffffffffffffda RBX: 0000560b047eebd0 RCX:=
+ 00007f90e7d19df7
+[=C2=A0=C2=A0 17.107154] RDX: 0000000000000020 RSI: 0000560b04805bb0 RDI:=
+ 0000000000000003
+[=C2=A0=C2=A0 17.107155] RBP: 0000560b0481bff0 R08: 00007ffe3ad3e3f0 R09:=
+ 0000000000000080
+[=C2=A0=C2=A0 17.107156] R10: 0000000000000000 R11: 0000000000000202 R12:=
+ 00007ffe3ad3e4b4
+[=C2=A0=C2=A0 17.107157] R13: 00007ffe3ad3e4f0 R14: 0000560ae711c650 R15:=
+ 0000560ae71dbc78
+[=C2=A0=C2=A0 17.107159]=C2=A0 </TASK>
+[=C2=A0=C2=A0 17.107160] ---[ end trace 0000000000000000 ]---
 
-Understood! I'll add it in v6.
-
-> > +       help
-> > +         If you say yes to this option, support will be included for N=
-uvoton
-> > +         NCT6694, a USB device to socket CANfd controller.
-> > +
-> > +         This driver can also be built as a module. If so, the module =
-will
-> > +         be called nct6694_canfd.
->
-> Here, the name is nct6694_canfd...
->
-> >  config CAN_PEAK_USB
-> >         tristate "PEAK PCAN-USB/USB Pro interfaces for CAN 2.0b/CAN-FD"
-> >         help
-> > diff --git a/drivers/net/can/usb/Makefile b/drivers/net/can/usb/Makefil=
-e
-> > index 8b11088e9a59..fcafb1ac262e 100644
-> > --- a/drivers/net/can/usb/Makefile
-> > +++ b/drivers/net/can/usb/Makefile
-> > @@ -11,5 +11,6 @@ obj-$(CONFIG_CAN_F81604) +=3D f81604.o
-> >  obj-$(CONFIG_CAN_GS_USB) +=3D gs_usb.o
-> >  obj-$(CONFIG_CAN_KVASER_USB) +=3D kvaser_usb/
-> >  obj-$(CONFIG_CAN_MCBA_USB) +=3D mcba_usb.o
-> > +obj-$(CONFIG_CAN_NCT6694) +=3D nct6694_canfd.o
-> >  obj-$(CONFIG_CAN_PEAK_USB) +=3D peak_usb/
-> >  obj-$(CONFIG_CAN_UCAN) +=3D ucan.o
-> > diff --git a/drivers/net/can/usb/nct6694_canfd.c b/drivers/net/can/usb/=
-nct6694_canfd.c
-> > new file mode 100644
-> > index 000000000000..7a15c39021ff
-> > --- /dev/null
-> > +++ b/drivers/net/can/usb/nct6694_canfd.c
-> > @@ -0,0 +1,856 @@
-> > +// SPDX-License-Identifier: GPL-2.0
-> > +/*
-> > + * Nuvoton NCT6694 Socket CANfd driver based on USB interface.
-> > + *
-> > + * Copyright (C) 2024 Nuvoton Technology Corp.
-> > + */
-> > +
-> > +#include <linux/can/dev.h>
-> > +#include <linux/can/rx-offload.h>
-> > +#include <linux/ethtool.h>
-> > +#include <linux/irqdomain.h>
-> > +#include <linux/kernel.h>
-> > +#include <linux/mfd/core.h>
-> > +#include <linux/mfd/nct6694.h>
-> > +#include <linux/module.h>
-> > +#include <linux/netdevice.h>
-> > +#include <linux/platform_device.h>
-> > +
-> > +#define DRVNAME "nct6694-can"
->
-> ... but here, it is nct6694-can.
->
-> Use a consistent name between the module name and the driver name.
->
-
-Okay, Fix it in v6.
-
-> > +/*
-> > + * USB command module type for NCT6694 CANfd controller.
-> > + * This defines the module type used for communication with the NCT669=
-4
-> > + * CANfd controller over the USB interface.
-> > + */
-> > +#define NCT6694_CAN_MOD                        0x05
-> > +
-> > +/* Command 00h - CAN Setting and Initialization */
-> > +#define NCT6694_CAN_SETTING            0x00
-> > +#define NCT6694_CAN_SETTING_SEL(idx)   (idx ? 0x01 : 0x00)
->
-> What are the possible values for idx? Isn't it only 0 or 1? If so, no
-> need for this NCT6694_CAN_SETTING_SEL() macro. Directly assign the
-> channel index to the selector field.
->
-
-Okay, Fix it in v6.
-
-> > +#define NCT6694_CAN_SETTING_CTRL1_MON  BIT(0)
-> > +#define NCT6694_CAN_SETTING_CTRL1_NISO BIT(1)
-> > +#define NCT6694_CAN_SETTING_CTRL1_LBCK BIT(2)
-> > +
-> > +/* Command 01h - CAN Information */
-> > +#define NCT6694_CAN_INFORMATION                0x01
-> > +#define NCT6694_CAN_INFORMATION_SEL    0x00
-> > +
-> > +/* Command 02h - CAN Event */
-> > +#define NCT6694_CAN_EVENT              0x02
-> > +#define NCT6694_CAN_EVENT_SEL(idx, mask)       \
-> > +       ((idx ? 0x80 : 0x00) | ((mask) & 0xFF))
->
-> Can idx and mask really overlap? Shouldn't this be:
->
->   #define NCT6694_CAN_EVENT_SEL(idx, mask)  \
->           ((idx ? 0x80 : 0x00) | ((mask) & 0x7F))
->
-
-Sorry, you're right, I'll fix it in v6.
-
-> > +#define NCT6694_CAN_EVENT_ERR          BIT(0)
-> > +#define NCT6694_CAN_EVENT_STATUS       BIT(1)
-> > +#define NCT6694_CAN_EVENT_TX_EVT       BIT(2)
-> > +#define NCT6694_CAN_EVENT_RX_EVT       BIT(3)
-> > +#define NCT6694_CAN_EVENT_REC          BIT(4)
-> > +#define NCT6694_CAN_EVENT_TEC          BIT(5)
-> > +#define NCT6694_CAN_EVENT_MASK         GENMASK(3, 0)
-> > +#define NCT6694_CAN_EVT_TX_FIFO_EMPTY  BIT(7)  /* Read-clear */
-> > +#define NCT6694_CAN_EVT_RX_DATA_LOST   BIT(5)  /* Read-clear */
-> > +#define NCT6694_CAN_EVT_RX_HALF_FULL   BIT(6)  /* Read-clear */
-> > +#define NCT6694_CAN_EVT_RX_DATA_IN     BIT(7)  /* Read-clear*/
->
-> Some of those macro are not used:
->
->   drivers/net/can/usb/nct6694_canfd.c:52: warning: macro
-> "NCT6694_CAN_EVT_RX_HALF_FULL" is not used [-Wunused-macros]
->      52 | #define NCT6694_CAN_EVT_RX_HALF_FULL BIT(6) /* Read-clear */
->         |
->   drivers/net/can/usb/nct6694_canfd.c:43: warning: macro
-> "NCT6694_CAN_EVENT_ERR" is not used [-Wunused-macros]
->      43 | #define NCT6694_CAN_EVENT_ERR  BIT(0)
->         |
->   drivers/net/can/usb/nct6694_canfd.c:44: warning: macro
-> "NCT6694_CAN_EVENT_STATUS" is not used [-Wunused-macros]
->      44 | #define NCT6694_CAN_EVENT_STATUS BIT(1)
->         |
->   drivers/net/can/usb/nct6694_canfd.c:46: warning: macro
-> "NCT6694_CAN_EVENT_RX_EVT" is not used [-Wunused-macros]
->      46 | #define NCT6694_CAN_EVENT_RX_EVT BIT(3)
->         |
->   drivers/net/can/usb/nct6694_canfd.c:45: warning: macro
-> "NCT6694_CAN_EVENT_TX_EVT" is not used [-Wunused-macros]
->      45 | #define NCT6694_CAN_EVENT_TX_EVT BIT(2)
->         |
->
-> Is this OK?
->
-
-Yes, these macros are replaced by  NCT6694_CAN_EVENT_MASK, I'll drop
-them in the next patch.
-
-> > +/* Command 10h - CAN Deliver */
-> > +#define NCT6694_CAN_DELIVER            0x10
-> > +#define NCT6694_CAN_DELIVER_SEL(buf_cnt)       \
-> > +       ((buf_cnt) & 0xFF)
-> > +
-> > +/* Command 11h - CAN Receive */
-> > +#define NCT6694_CAN_RECEIVE            0x11
-> > +#define NCT6694_CAN_RECEIVE_SEL(idx, buf_cnt)  \
-> > +       ((idx ? 0x80 : 0x00) | ((buf_cnt) & 0xFF))
->
-> Can idx and buf_cnt really overlap? Shouldn't this be:
->
->   #define NCT6694_CAN_RECEIVE_SEL(idx, buf_cnt)  \
->           ((idx ? 0x80 : 0x00) | ((buf_cnt) & 0x7F))
->
-
-Fix it in v6.
-
-> > +#define NCT6694_CAN_FRAME_TAG_CAN0     0xC0
-> > +#define NCT6694_CAN_FRAME_TAG_CAN1     0xC1
-> > +#define NCT6694_CAN_FRAME_FLAG_EFF     BIT(0)
-> > +#define NCT6694_CAN_FRAME_FLAG_RTR     BIT(1)
-> > +#define NCT6694_CAN_FRAME_FLAG_FD      BIT(2)
-> > +#define NCT6694_CAN_FRAME_FLAG_BRS     BIT(3)
-> > +#define NCT6694_CAN_FRAME_FLAG_ERR     BIT(4)
-> > +
-> > +#define NCT6694_NAPI_WEIGHT            32
-> > +
-> > +enum nct6694_event_err {
-> > +       NCT6694_CAN_EVT_ERR_NO_ERROR =3D 0,
-> > +       NCT6694_CAN_EVT_ERR_CRC_ERROR,
-> > +       NCT6694_CAN_EVT_ERR_STUFF_ERROR,
-> > +       NCT6694_CAN_EVT_ERR_ACK_ERROR,
-> > +       NCT6694_CAN_EVT_ERR_FORM_ERROR,
-> > +       NCT6694_CAN_EVT_ERR_BIT_ERROR,
-> > +       NCT6694_CAN_EVT_ERR_TIMEOUT_ERROR,
-> > +       NCT6694_CAN_EVT_ERR_UNKNOWN_ERROR,
-> > +};
-> > +
-> > +enum nct6694_event_status {
-> > +       NCT6694_CAN_EVT_STS_ERROR_ACTIVE =3D 0,
-> > +       NCT6694_CAN_EVT_STS_ERROR_PASSIVE,
-> > +       NCT6694_CAN_EVT_STS_BUS_OFF,
-> > +       NCT6694_CAN_EVT_STS_WARNING,
-> > +};
-> > +
-> > +struct __packed nct6694_can_setting {
-> > +       __le32 nbr;
-> > +       __le32 dbr;
-> > +       u8 active;
-> > +       u8 reserved[3];
-> > +       __le16 ctrl1;
-> > +       __le16 ctrl2;
-> > +       __le32 nbtp;
-> > +       __le32 dbtp;
-> > +};
-> > +
-> > +struct __packed nct6694_can_information {
-> > +       u8 tx_fifo_cnt;
-> > +       u8 rx_fifo_cnt;
-> > +       u8 reserved[2];
-> > +       __le32 can_clk;
-> > +};
-> > +
-> > +struct __packed nct6694_can_event {
-> > +       u8 err;
-> > +       u8 status;
-> > +       u8 tx_evt;
-> > +       u8 rx_evt;
-> > +       u8 rec;
-> > +       u8 tec;
-> > +       u8 reserved[2];
-> > +};
-> > +
-> > +struct __packed nct6694_can_frame {
-> > +       u8 tag;
-> > +       u8 flag;
-> > +       u8 reserved;
-> > +       u8 length;
-> > +       __le32 id;
-> > +       u8 data[64];
->
-> Nitpick, use CANFD_MAX_DLEN here:
->
->           u8 data[CANFD_MAX_DLEN];
->
-
-Fix it in v6.
-
-> > +};
-> > +
-...
-> > +static void nct6694_can_rx(struct net_device *ndev, u8 rx_evt)
-> > +{
-> > +       struct nct6694_can_priv *priv =3D netdev_priv(ndev);
-> > +       struct nct6694_can_frame *frame =3D &priv->rx->frame;
-> > +       struct nct6694_cmd_header cmd_hd =3D {
-> > +               .mod =3D NCT6694_CAN_MOD,
-> > +               .cmd =3D NCT6694_CAN_RECEIVE,
-> > +               .sel =3D NCT6694_CAN_RECEIVE_SEL(priv->can_idx, 1),
-> > +               .len =3D cpu_to_le16(sizeof(*frame))
-> > +       };
-> > +       struct canfd_frame *cfd;
-> > +       struct can_frame *cf;
-> > +       struct sk_buff *skb;
-> > +       int ret;
-> > +
-> > +       ret =3D nct6694_read_msg(priv->nct6694, &cmd_hd, frame);
-> > +       if (ret)
-> > +               return;
-> > +
-> > +       if (frame->flag & NCT6694_CAN_FRAME_FLAG_FD) {
->
-> Reduce scope of variable when possible: move declaration of cfd here:
->
->                 struct canfd_frame *cfd;
->
-
-Okay! Fix it in v6.
-
-> > +               skb =3D alloc_canfd_skb(priv->ndev, &cfd);
-> > +               if (!skb)
-> > +                       return;
-> > +
-> > +               cfd->can_id =3D le32_to_cpu(frame->id);
-> > +               cfd->len =3D frame->length;
->
-> No. I asked you to sanitize the length in this message:
->
->   https://lore.kernel.org/linux-can/8d66cf66-5564-4272-8c3e-51b715c3d785@=
-wanadoo.fr/
->
-> Never use the length as is.
->
-
-Sorry! I misunderstood your meaning.
-I'll Fix it to cfd->len =3D canfd_sanitize_len(frame->length).
-
-> > +               if (frame->flag & NCT6694_CAN_FRAME_FLAG_EFF)
-> > +                       cfd->can_id |=3D CAN_EFF_FLAG;
-> > +               if (frame->flag & NCT6694_CAN_FRAME_FLAG_BRS)
-> > +                       cfd->flags |=3D CANFD_BRS;
-> > +               if (frame->flag & NCT6694_CAN_FRAME_FLAG_ERR)
-> > +                       cfd->flags |=3D CANFD_ESI;
-> > +
-> > +               memcpy(cfd->data, frame->data, cfd->len);
-> > +       } else {
->
-> Reduce scope of variable when possible: move declaration of cf here:
->
->                 struct canfd_frame *cf;
->
-
-Fix it in v6.
-
-> > +               skb =3D alloc_can_skb(priv->ndev, &cf);
-> > +               if (!skb)
-> > +                       return;
-> > +
-> > +               cf->can_id =3D le32_to_cpu(frame->id);
-> > +               cf->len =3D frame->length;
->
-> Ditto, sanitize the length.
->
-
-Fix it in v6.
-
-> > +               if (frame->flag & NCT6694_CAN_FRAME_FLAG_EFF)
-> > +                       cf->can_id |=3D CAN_EFF_FLAG;
-> > +               if (frame->flag & NCT6694_CAN_FRAME_FLAG_RTR)
-> > +                       cf->can_id |=3D CAN_RTR_FLAG;
-> > +
-> > +               memcpy(cf->data, frame->data, cf->len);
->
-> Only copy can data if the frame is not an RTR frame.
->
->                   if (frame->flag & NCT6694_CAN_FRAME_FLAG_RTR)
->                           cf->can_id |=3D CAN_RTR_FLAG;
->                   else
->                           memcpy(cf->data, frame->data, cf->len);
->
-> I already asked you to do this in below comment:
->
->   https://lore.kernel.org/linux-can/a25ea362-142f-4e27-8194-787d9829f607@=
-wanadoo.fr/
->
-
-Sorry for forgetting the part, I'll fix it in the next patch.
-
-> > +       }
-> > +
-> > +       nct6694_can_rx_offload(&priv->offload, skb);
-> > +}
-> > +
-> > +static void nct6694_can_clean(struct net_device *ndev)
-> > +{
-> > +       struct nct6694_can_priv *priv =3D netdev_priv(ndev);
-> > +
-> > +       if (priv->tx_skb || netif_queue_stopped(ndev))
-> > +               ndev->stats.tx_errors++;
-> > +       dev_kfree_skb(priv->tx_skb);
-> > +       priv->tx_skb =3D NULL;
-> > +}
-> > +
-> > +static int nct6694_can_get_berr_counter(const struct net_device *ndev,
-> > +                                       struct can_berr_counter *bec)
-> > +{
-> > +       struct nct6694_can_priv *priv =3D netdev_priv(ndev);
-> > +       struct nct6694_can_event *evt =3D priv->rx->event;
-> > +       struct nct6694_cmd_header cmd_hd;
-> > +       u8 mask =3D NCT6694_CAN_EVENT_REC | NCT6694_CAN_EVENT_TEC;
-> > +       int ret;
-> > +
-> > +       guard(mutex)(&priv->lock);
-> > +
-> > +       cmd_hd =3D (struct nct6694_cmd_header) {
-> > +               .mod =3D NCT6694_CAN_MOD,
-> > +               .cmd =3D NCT6694_CAN_EVENT,
-> > +               .sel =3D NCT6694_CAN_EVENT_SEL(priv->can_idx, mask),
-> > +               .len =3D cpu_to_le16(sizeof(priv->rx->event))
-> > +       };
-> > +
-> > +       ret =3D nct6694_read_msg(priv->nct6694, &cmd_hd, evt);
-> > +       if (ret < 0)
-> > +               return ret;
->
-> You are holding the priv->lock mutex before calling
-> nct6694_read_msg(). But nct6694_read_msg() then holds the
-> nct6694->access_lock mutex. Why do you need a double mutex here? What
-> kind of race scenario are you trying to prevent here?
->
-
-I think priv->lock need to be placed here to prevent priv->rx from
-being assigned by other functions, and nct6694->access_lock ensures
-that the nct6694_read_msg() transaction is completed.
-But in this case, cmd_hd does not need to be in priv->lock's scope.
-
-> > +       bec->rxerr =3D evt[priv->can_idx].rec;
-> > +       bec->txerr =3D evt[priv->can_idx].tec;
-> > +
-> > +       return 0;
-> > +}
-> > +
-> > +static void nct6694_can_handle_state_change(struct net_device *ndev,
-> > +                                           u8 status)
-> > +{
-> > +       struct nct6694_can_priv *priv =3D netdev_priv(ndev);
-> > +       enum can_state new_state =3D priv->can.state;
-> > +       enum can_state rx_state, tx_state;
-> > +       struct can_berr_counter bec;
-> > +       struct can_frame *cf;
-> > +       struct sk_buff *skb;
-> > +
-> > +       nct6694_can_get_berr_counter(ndev, &bec);
-> > +       can_state_get_by_berr_counter(ndev, &bec, &tx_state, &rx_state)=
-;
->
-> Here, you set up tx_state and rx_state...
->
-> > +       switch (status) {
-> > +       case NCT6694_CAN_EVT_STS_ERROR_ACTIVE:
-> > +               new_state =3D CAN_STATE_ERROR_ACTIVE;
-> > +               break;
-> > +       case NCT6694_CAN_EVT_STS_ERROR_PASSIVE:
-> > +               new_state =3D CAN_STATE_ERROR_PASSIVE;
-> > +               break;
-> > +       case NCT6694_CAN_EVT_STS_BUS_OFF:
-> > +               new_state =3D CAN_STATE_BUS_OFF;
-> > +               break;
-> > +       case NCT6694_CAN_EVT_STS_WARNING:
-> > +               new_state =3D CAN_STATE_ERROR_WARNING;
-> > +               break;
-> > +       default:
-> > +               netdev_err(ndev, "Receive unknown CAN status event.\n")=
-;
-> > +               return;
-> > +       }
-> > +
-> > +       /* state hasn't changed */
-> > +       if (new_state =3D=3D priv->can.state)
-> > +               return;
-> > +
-> > +       skb =3D alloc_can_err_skb(ndev, &cf);
-> > +
-> > +       tx_state =3D bec.txerr >=3D bec.rxerr ? new_state : 0;
-> > +       rx_state =3D bec.txerr <=3D bec.rxerr ? new_state : 0;
->
-> ... but you never used the values returned by
-> can_state_get_by_berr_counter() and just overwrote the tx and rx
-> state.
->
-> What is the logic here? Why do you need to manually adjust those two
-> values? Isn't the logic in can_change_state() sufficient?
->
-> > +       can_change_state(ndev, cf, tx_state, rx_state);
-> > +
-> > +       if (new_state =3D=3D CAN_STATE_BUS_OFF) {
->
-> Same for the new_state. The function can_change_state() calculate the
-> new state from tx_state and rx_state and save it under
-> can_priv->state. But here, you do your own calculation.
->
-> Only keep one of the two. If your device already tells you the state,
-> then fine! Just use the information from your device and do not use
-> can_change_state(). Here, you are doing double work resulting in a
-> weird mix.
->
-
-Okay! I will revert nct6694_can_handle_state_change() back to the v3 versio=
-n.
-
-> > +               can_bus_off(ndev);
-> > +       } else if (skb) {
-> > +               cf->can_id |=3D CAN_ERR_CNT;
-> > +               cf->data[6] =3D bec.txerr;
-> > +               cf->data[7] =3D bec.rxerr;
-> > +       }
-> > +
-> > +       nct6694_can_rx_offload(&priv->offload, skb);
-> > +}
-> > +
-...
-> > +static irqreturn_t nct6694_can_irq(int irq, void *data)
-> > +{
-> > +       struct net_device *ndev =3D data;
-> > +       struct nct6694_can_priv *priv =3D netdev_priv(ndev);
-> > +       struct nct6694_can_event *evt =3D priv->rx->event;
-> > +       struct nct6694_cmd_header cmd_hd;
-> > +       u8 tx_evt, rx_evt, bus_err, can_status;
-> > +       u8 mask_sts =3D NCT6694_CAN_EVENT_MASK;
->
-> No need for the mask_sts variable. Directly use NCT6694_CAN_EVENT_MASK.
->
-
-Okay! Fix it in v6.
-
-> > +       irqreturn_t handled =3D IRQ_NONE;
-> > +       int can_idx =3D priv->can_idx;
-> > +       int ret;
-> > +
-> > +       scoped_guard(mutex, &priv->lock) {
->
-> Reduce scope of variable when possible: move the declarations of
-> cmd_hd and ret here.
->
-
-Okay! Fix it in v6.
-
-> > +               cmd_hd =3D (struct nct6694_cmd_header) {
-> > +                       .mod =3D NCT6694_CAN_MOD,
-> > +                       .cmd =3D NCT6694_CAN_EVENT,
-> > +                       .sel =3D NCT6694_CAN_EVENT_SEL(priv->can_idx, m=
-ask_sts),
-> > +                       .len =3D cpu_to_le16(sizeof(priv->rx->event))
-> > +               };
-> > +
-...
-> > +static void nct6694_can_tx(struct net_device *ndev)
-> > +{
-> > +       struct nct6694_can_priv *priv =3D netdev_priv(ndev);
-> > +       struct nct6694_can_frame *frame =3D &priv->tx->frame;
-> > +       struct nct6694_cmd_header cmd_hd =3D {
-> > +               .mod =3D NCT6694_CAN_MOD,
-> > +               .cmd =3D NCT6694_CAN_DELIVER,
-> > +               .sel =3D NCT6694_CAN_DELIVER_SEL(1),
-> > +               .len =3D cpu_to_le16(sizeof(*frame))
-> > +       };
-> > +       struct net_device_stats *stats =3D &ndev->stats;
-> > +       struct sk_buff *skb =3D priv->tx_skb;
-> > +       struct canfd_frame *cfd;
-> > +       struct can_frame *cf;
-> > +       u32 txid;
-> > +       int err;
-> > +
-> > +       memset(frame, 0, sizeof(*frame));
-> > +
-> > +       if (priv->can_idx =3D=3D 0)
-> > +               frame->tag =3D NCT6694_CAN_FRAME_TAG_CAN0;
-> > +       else
-> > +               frame->tag =3D NCT6694_CAN_FRAME_TAG_CAN1;
-> > +
-> > +       if (can_is_canfd_skb(skb)) {
->
-> Reduce scope of variable when possible: move declaration of cfd here:
->
->                 struct canfd_frame *cfd;
->
-
-Okay! Fix it in v6.
-
-> > +               cfd =3D (struct canfd_frame *)priv->tx_skb->data;
-> > +
-> > +               if (cfd->flags & CANFD_BRS)
-> > +                       frame->flag |=3D NCT6694_CAN_FRAME_FLAG_BRS;
-> > +
-> > +               if (cfd->can_id & CAN_EFF_FLAG) {
-> > +                       txid =3D cfd->can_id & CAN_EFF_MASK;
-> > +                       frame->flag |=3D NCT6694_CAN_FRAME_FLAG_EFF;
-> > +               } else {
-> > +                       txid =3D cfd->can_id & CAN_SFF_MASK;
-> > +               }
-> > +               frame->flag |=3D NCT6694_CAN_FRAME_FLAG_FD;
-> > +               frame->id =3D cpu_to_le32(txid);
-> > +               frame->length =3D cfd->len;
-> > +
-> > +               memcpy(frame->data, cfd->data, cfd->len);
-> > +       } else {
->
-> Reduce scope of variable when possible: move declaration of cf here:
->
->                 struct canfd_frame *cf;
->
-
-Okay! Fix it in v6.
-
-> > +               cf =3D (struct can_frame *)priv->tx_skb->data;
-> > +
-> > +               if (cf->can_id & CAN_RTR_FLAG)
-> > +                       frame->flag |=3D NCT6694_CAN_FRAME_FLAG_RTR;
-> > +
-> > +               if (cf->can_id & CAN_EFF_FLAG) {
-> > +                       txid =3D cf->can_id & CAN_EFF_MASK;
-> > +                       frame->flag |=3D NCT6694_CAN_FRAME_FLAG_EFF;
-> > +               } else {
-> > +                       txid =3D cf->can_id & CAN_SFF_MASK;
-> > +               }
-> > +               frame->id =3D cpu_to_le32(txid);
-> > +               frame->length =3D cf->len;
-> > +
-> > +               memcpy(frame->data, cf->data, cf->len);
->
-> Don't copy cf->data if the can frame is a RTR frame.
->
-
-Okay! Fix it in v6.
-
-> > +       }
-> > +
-> > +       err =3D nct6694_write_msg(priv->nct6694, &cmd_hd, frame);
-> > +       if (err) {
-> > +               netdev_err(ndev, "%s: Tx FIFO full!\n", __func__);
-> > +               can_free_echo_skb(ndev, 0, NULL);
-> > +               stats->tx_dropped++;
-> > +               stats->tx_errors++;
-> > +               netif_wake_queue(ndev);
-> > +       }
-> > +}
-> > +
-...
-> > +static int nct6694_can_probe(struct platform_device *pdev)
-> > +{
-> > +       const struct mfd_cell *cell =3D mfd_get_cell(pdev);
-> > +       struct nct6694 *nct6694 =3D dev_get_drvdata(pdev->dev.parent);
-> > +       struct nct6694_can_priv *priv;
-> > +       struct net_device *ndev;
-> > +       int ret, irq, can_clk;
-> > +
-> > +       irq =3D irq_create_mapping(nct6694->domain,
-> > +                                NCT6694_IRQ_CAN1 + cell->id);
-> > +       if (!irq)
-> > +               return irq;
-> > +
-> > +       ndev =3D alloc_candev(sizeof(struct nct6694_can_priv), 1);
-> > +       if (!ndev)
-> > +               return -ENOMEM;
-> > +
-> > +       ndev->irq =3D irq;
-> > +       ndev->flags |=3D IFF_ECHO;
-> > +       ndev->netdev_ops =3D &nct6694_can_netdev_ops;
-> > +       ndev->ethtool_ops =3D &nct6694_can_ethtool_ops;
->
-> Your device has two CAN interfaces, right? Do not forget to populate
-> netdev->dev_port.
->
->           netdev->dev_port =3D cell->id;
->
-
-Okay! I'll add it in v6.
-
-> > +       priv =3D netdev_priv(ndev);
-> > +       priv->nct6694 =3D nct6694;
-> > +       priv->ndev =3D ndev;
-> > +
-
-Best regards,
-Ming
 
