@@ -1,123 +1,106 @@
-Return-Path: <netdev+bounces-158098-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158099-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA8B5A10750
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 14:04:03 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C39C0A1075F
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 14:06:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 731423A6D24
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 13:03:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D6F45168616
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 13:06:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C43E2361C5;
-	Tue, 14 Jan 2025 13:03:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D162234D0A;
+	Tue, 14 Jan 2025 13:05:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pAFFyXfB"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDF62230272;
-	Tue, 14 Jan 2025 13:03:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 742CC243328
+	for <netdev@vger.kernel.org>; Tue, 14 Jan 2025 13:05:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736859836; cv=none; b=hyN2UXbsaKUh05GZ8/onMqDLZqcouiI+8sYHBlXPKvy56TVwnL0xetg0uVRy4Ua/cV9CCt7c7FCl9rikSntKmS3chJKrrstws2WO94y9hoNQVoJyzgss7HrOjBMOJYOFWoPS2Eggf6xhbEZ06p1h0e4yRUyrVUf+KyVvw9d0RjE=
+	t=1736859951; cv=none; b=ndc+QGr3WTDxx22Rf3wy4tXXWn8T3ea9895flexORz5fWKDdh26XLWt4JY4Kt8bw5Jtdvp+jPfuI4RkP3YAX5WXJBU795jowwv6Nz5bCG/1zt4EpFstBdcFTNFRhavCbKvmOioDuZ8DL9XcR6n12E1B4CNUwpEoLYG4xv0y7b3U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736859836; c=relaxed/simple;
-	bh=+HFRCUbiPhyGEI7iFLSXTQRL82WcpVAq8LE+o9azY/0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=sVuYoeEQL89PLmd1EYn1nJK8KqVebXvVPS+OR3aiENPeTnOHCWSKv5QveDYtg2Kw5+kSNo4jo8zxZuIUkNO/tkQwVKlnEvVZt5kVXqHdg3pTShrvv6W3lOTw/80svtWkDi4SBFDHBBqv9akgN1Ihjt5FE9L1KmUWHewha07n7FA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.252])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4YXTkr369Kzbk5j;
-	Tue, 14 Jan 2025 21:00:36 +0800 (CST)
-Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id 5A7A2180216;
-	Tue, 14 Jan 2025 21:03:44 +0800 (CST)
-Received: from [10.67.120.129] (10.67.120.129) by
- dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Tue, 14 Jan 2025 21:03:44 +0800
-Message-ID: <22de6033-744e-486e-bbd9-8950249cd018@huawei.com>
-Date: Tue, 14 Jan 2025 21:03:43 +0800
+	s=arc-20240116; t=1736859951; c=relaxed/simple;
+	bh=DljJxNqz4rAgV/3YmFb7ej8BfAE9L119q6FzMUilKo4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=lndu2aaSuUhDTzH8s4l06sTG8ZtNhrnFVF7uLsAbQR2RR4bZOZX59X5GfHNt/rL+nh2XiG53LPqB4N86WvoUl7ZNzGqcRks6kAn8HB8G/zP85KCPPgNV+NWNeaCHYCGZnAcIWLlvEgEPYwzItNZEfwYwYtUrPaKf1D8/CwT2brw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pAFFyXfB; arc=none smtp.client-ip=209.85.208.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-5d88c355e0dso9579711a12.0
+        for <netdev@vger.kernel.org>; Tue, 14 Jan 2025 05:05:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1736859948; x=1737464748; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=DljJxNqz4rAgV/3YmFb7ej8BfAE9L119q6FzMUilKo4=;
+        b=pAFFyXfBJC+i8a8+DEpZgyQtng1sERPPvDNgB+p8GmRopJ6ADu4m4vzGfH6CRyPgyR
+         UFBOcE1VHgllDtx63Ptd+Ck2Jgcl4zPIdXbxaFfqnmuOVaRAdtBQs8UaySbaE24d8wFU
+         pSKmFp+oy+bw9Kt76iKcd1GgHcLZR6Xh9baBm/6dqfiFXgVMsnrHL98gx/pV+xhq4+tq
+         OF5Nx5autaKZSNxD+09L4G6WRJPARe4dcSj3TlWu0un+hKpHJurISG75FsdfR/3YQXd+
+         uy6Mx2wVRSZ4nLfc9aOcX1BKbpAyXCw/Vq5TCpNtzouB5jvcW9vG4IG68w7cGbBjWQwO
+         GUFw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736859948; x=1737464748;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=DljJxNqz4rAgV/3YmFb7ej8BfAE9L119q6FzMUilKo4=;
+        b=L7jbbTo1kc4Kw+erZiqVlVU1IEo6e4TNRc1bSefpzdQyYOnOc43Q09WeOejRPU9P8t
+         MysVkKqWqrg5RjQbhdg6JzzMZE2DuteoZFJhmDKH7arxhVHzXqylOqb3yvY8tzqqhqcB
+         7QnS4sihjpSz+NYyX1beSrby8wVevx8OvwRjFnqSTRvUM+PjcIi4dOYm9mM6vrh8t0yh
+         MMzroi+VJlpI1v/M+3wNRmU2lea31fDJFO7Rins0ZSy7Y74GNAs4zsWHLJtSHcWor4wp
+         PfFA5qYdHN77+58/vPARWYsQM08TJE794mNbFnufSuNTDd25aqZ8gFwH0vUsRBwoeqTA
+         mnuQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVcV4Y6fIEEkeTESJpSDtLguigfz57GDdexb2rterM3UdfM0RwTdnEe+R5pwd4SHzLVenOnOlE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz71tT6GsxUSsMUa+FmWHmM5ULZXNMYkpTRyugolNv+bo2dZ+po
+	UPMNj6CSJN3/KrJCJw4/Pha5CzF8LTseuBT7fvEhvAgzPhAt5UjX/xT7zVTQ8kVNtPweufG3+JV
+	UrWeUJoqUuUzf2wF7Z316rfdV8abcfBKfiKTA
+X-Gm-Gg: ASbGncsAB/lCDmgC+uPolM1+2w/ekzJ1NUaKDr4ER8JfudwZN95T0xMA76En5N+q8Tn
+	4ERq55rjd5dw7+DMV4zf7RaKGNP6ek3+PbH55ng==
+X-Google-Smtp-Source: AGHT+IG1mrzfl/mCpiWN86nTDGPJCeOWpWvpg66ZEfU+aAWNszH31ik3CGTDrtqwjmQaikYFaKqGSZnWny7ldrg8X5U=
+X-Received: by 2002:a05:6402:4416:b0:5cf:c33c:34cf with SMTP id
+ 4fb4d7f45d1cf-5d972e1c42amr23297010a12.15.1736859947587; Tue, 14 Jan 2025
+ 05:05:47 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v7 2/8] page_pool: fix timing for checking and
- disabling napi_local
-To: Yunsheng Lin <yunshenglin0825@gmail.com>,
-	=?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
-	<davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>
-CC: <zhangkun09@huawei.com>, <liuyonglong@huawei.com>,
-	<fanghaiqing@huawei.com>, Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Jesper Dangaard Brouer
-	<hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, Eric
- Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-References: <20250110130703.3814407-1-linyunsheng@huawei.com>
- <20250110130703.3814407-3-linyunsheng@huawei.com> <87sepqhe3n.fsf@toke.dk>
- <5059df11-a85b-4404-8c24-a9ccd76924f3@gmail.com>
-Content-Language: en-US
-From: Yunsheng Lin <linyunsheng@huawei.com>
-In-Reply-To: <5059df11-a85b-4404-8c24-a9ccd76924f3@gmail.com>
+References: <20250114035118.110297-1-kuba@kernel.org> <20250114035118.110297-4-kuba@kernel.org>
+In-Reply-To: <20250114035118.110297-4-kuba@kernel.org>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 14 Jan 2025 14:05:36 +0100
+X-Gm-Features: AbW1kvY_x3BgN8yx_65m-XzC4BxFs0Ao_PXyV8lJ-iubESwOYdnTMD7MsNb_PCs
+Message-ID: <CANn89iK_2YSXGU=A6RyyDHaHQg4-tFYjP+3u=uR0aJDn5EiyLA@mail.gmail.com>
+Subject: Re: [PATCH net-next 03/11] net: make netdev_lock() protect netdev->reg_state
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, pabeni@redhat.com, 
+	andrew+netdev@lunn.ch, horms@kernel.org, jdamato@fastly.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- dggpemf200006.china.huawei.com (7.185.36.61)
+Content-Transfer-Encoding: quoted-printable
 
-On 2025/1/11 13:24, Yunsheng Lin wrote:
+On Tue, Jan 14, 2025 at 4:51=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> Protect writes to netdev->reg_state with netdev_lock().
+> From now on holding netdev_lock() is sufficient to prevent
+> the net_device from getting unregistered, so code which
+> wants to hold just a single netdev around no longer needs
+> to hold rtnl_lock.
+>
+> We do not protect the NETREG_UNREGISTERED -> NETREG_RELEASED
+> transition. We'd need to move mutex_destroy(netdev->lock)
+> to .release, but the real reason is that trying to stop
+> the unregistration process mid-way would be unsafe / crazy.
+> Taking references on such devices is not safe, either.
+> So the intended semantics are to lock REGISTERED devices.
 
-...
-
->>>   }
->>>     void page_pool_put_unrefed_netmem(struct page_pool *pool, netmem_ref netmem,
->>> @@ -1165,6 +1172,12 @@ void page_pool_destroy(struct page_pool *pool)
->>>       if (!page_pool_release(pool))
->>>           return;
->>>   +    /* Paired with rcu lock in page_pool_napi_local() to enable clearing
->>> +     * of pool->p.napi in page_pool_disable_direct_recycling() is seen
->>> +     * before returning to driver to free the napi instance.
->>> +     */
->>> +    synchronize_rcu();
->>
->> Most drivers call page_pool_destroy() in a loop for each RX queue, so
->> now you're introducing a full synchronize_rcu() wait for each queue.
->> That can delay tearing down the device significantly, so I don't think
->> this is a good idea.
-> 
-> synchronize_rcu() is called after page_pool_release(pool), which means
-> it is only called when there are some inflight pages, so there is not
-> necessarily a full synchronize_rcu() wait for each queue.
-> 
-> Anyway, it seems that there are some cases that need explicit
-> synchronize_rcu() and some cases depending on the other API providing
-> synchronize_rcu() semantics, maybe we provide two diffferent API for
-> both cases like the netif_napi_del()/__netif_napi_del() APIs do?
-
-As the synchronize_rcu() is also needed to fix the DMA API misuse problem,
-we can not really handle it like netif_napi_del()/__netif_napi_del() APIs
-do, the best I can think is something like below:
-
-bool need_sync = false;
-
-for (each queue)
-	need_sync |= page_pool_destroy_prepare(queue->pool);
-
-if (need_sync)
-	synchronize_rcu()
-
-for (each queue)
-	page_pool_destroy_commit(queue->pool);
-
-But I am not sure if the above worth the effort or not for now as the
-synchronize_rcu() is only called for the inflight page case.
-Any better idea? If not, maybe we can optimize the above later if
-the synchronize_rcu() does turn out to be a problem.
-
-> 
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
