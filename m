@@ -1,169 +1,326 @@
-Return-Path: <netdev+bounces-158201-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158203-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 268B3A10FCB
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 19:20:23 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D0B9FA11005
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 19:26:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 662913A247E
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 18:18:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EF3B6188B61B
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 18:26:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 764D5207DE0;
-	Tue, 14 Jan 2025 18:17:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="grbEg9HZ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 683231FBE9A;
+	Tue, 14 Jan 2025 18:26:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f208.google.com (mail-il1-f208.google.com [209.85.166.208])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4523A2063FF;
-	Tue, 14 Jan 2025 18:17:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58275232458
+	for <netdev@vger.kernel.org>; Tue, 14 Jan 2025 18:26:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.208
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736878620; cv=none; b=GDQCwT6udBfnwd0QyW7R4Q1c1gy7QgDoWervTVaQf4NypVR4qKNh88zPfRpMIj53lcZpFvULiCn18Gs9wd1fYVYDBi6cLHrvVOrYaI6CIWYB1Tm5+VUNqMYUx1uz8Ds/a/Pyi28xXrfs+W0ELLR8PNRVqcCaoH1KMhWMF341Fpg=
+	t=1736879188; cv=none; b=EttI9Ns07mCDs1oteW8PIYbE0lEygXq4S26rJbEviaB8SVmSKLRI/FBbRxn4IwN53XUQQxgg8k91X81TrQ5mIYkZZvYpNovV4d/OPhX5yH9gH/LoFa/0izNc/wgSwsP9wbpIaGxHk4/vE7nnTiMH0sPBR45ffkW1JEFgSo8iIrw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736878620; c=relaxed/simple;
-	bh=D/SHSgsiMa7Rb7nwePwpbtlLjnB91paCMmxG3twAM0U=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=j9IKEpiklcKGHSrrYpC4aX2FuGbg+CmQoTi08MWb15D31z+W1wsema2fIHl9jwqqe0C0oEp5B/dSIabfgQOtq8SqNgDld+II+N+E7khgAZSX3Hwa8TGRFGHOHTIW7Qk/DxtKyI6PQiym+Rpsvwq1eMd42m/Z/ZMqdwtuizf3wZo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=grbEg9HZ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 42B0CC4CEDD;
-	Tue, 14 Jan 2025 18:16:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736878620;
-	bh=D/SHSgsiMa7Rb7nwePwpbtlLjnB91paCMmxG3twAM0U=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=grbEg9HZFr7ic23HcKgcX38W0WpdUNeWm4A4ldc8lnNCc4kCFJSoldtNdzPcBUnIT
-	 7NwtszrgHzsaVarRiraZlO6HmxshtdEevhYBwMSo9zg1QsIib3uo5ycjgzJFyv/lUz
-	 JFDv3EMZ4N5THpqFqQEhfrnLgRcd84xPn16L79BpEg0ZCa0BXEi2CCzX3cyt6drOW7
-	 ecIdI8mC1ePpRFXm0wtGwjFEzZnzea4UbXGz5KpsSvssGkioBLfk+pQfztcNLah1Yf
-	 rpJBKCpayU2M0q4R83tRFHRsDyIRU4BJ8358WWuordQdjjmGsbexqAwOQRUwVj98SC
-	 TP7rs4DvGmksg==
-Message-ID: <5e2058ea-2292-4403-a7b9-ace4b21dc9c1@kernel.org>
-Date: Tue, 14 Jan 2025 19:16:46 +0100
+	s=arc-20240116; t=1736879188; c=relaxed/simple;
+	bh=8P6BI/6sBHQUdpG7fhCrmYdmBt6P8klWaXgb82/3eOg=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=TqI3DoKWJniFfc8yiSgcl6cupe0OICqYnur1ECDUTTrJq7yap2JDq+tdqAq7ggt+BgBUaeVXxvdqo1HXm92U0WJFMVcIszSmbEca/0BVjgQTztq3O7GdWX/5adtG1Xq5tqcAOX+pKcxSUfN9T5xM/erkmmAIRFfkrRm+EV1Jw6g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.208
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f208.google.com with SMTP id e9e14a558f8ab-3a814bfb77bso712455ab.0
+        for <netdev@vger.kernel.org>; Tue, 14 Jan 2025 10:26:26 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736879185; x=1737483985;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=1D8aK1A7Z418bn3I21gw6DavuVLyHCqgXcJgH3V9Joo=;
+        b=JlU4lvQEYfRLEapIXpqPQQQlDIx4verD/WERvCoplTWMeCO5pVAe2gYdqkc0DxDY6g
+         sqqsda7GMUnQvs1TD+/zsbZuB9eHfNHj9u1TM2UyfKbU9BkgC7JP1ZkqJEoDKQ4G8oqZ
+         P/AxCloIYIrjbmLWiiG4pMcTnN458m1iYo5Waqn3FFn4HxY9CDpvgIjypwDHQZh6d/uD
+         FF1H7sBlPNPW813vXAsAI+20KLWZR12+Rg65TB4iH8Yq7anIa9F9nqYssOhOFFJkIZoQ
+         DveSnR8N2mh+bJfBZMbRXY2o45ud8EIuIlGq4OyZLsvS/ochZxDq9w402PrHhmVVUGa7
+         2ViA==
+X-Forwarded-Encrypted: i=1; AJvYcCUaEukkqwVkhW5aDnr7mCQNcw9Qqnh9KqB+KFZ+TtMCJ/75n7o0mtbK67v7Fnuth8dOnZKn2Vg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzpEG97ghQ8RpyT5mmjKZEdWPYdkrvL+AAyzoIeVfFmJH1PGq8g
+	tPSGPZ3r4vqWNfrXEj8DT/DnURxCQ8xNuRoXaIHscz1o03iJcVZSsMfB3ainRVrCoFSa9TMUjh8
+	LXR9i886jpTHpQvdzqROoAGMZ/2GHTdMsfk9YULY8Go9xZgq6Vu5UxOM=
+X-Google-Smtp-Source: AGHT+IFA5G87C2kPQegv1gwxKpvd6orcbgVIUYx/84q34oFDg+sY4ud4zjpC1tPg0NYzH9SdHJQ8fSbP5/+4f3FKHq2SXxVl84HJ
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [PATCH 0/3] selftests: mptcp: Fix various issues in main_loop
-Content-Language: en-GB
-To: Cong Liu <liucong2@kylinos.cn>, Mat Martineau <martineau@kernel.org>,
- Geliang Tang <geliang@kernel.org>, "'David S . Miller'"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>
-Cc: netdev@vger.kernel.org, mptcp@lists.linux.dev,
- linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20250113085228.121778-1-liucong2@kylinos.cn>
-From: Matthieu Baerts <matttbe@kernel.org>
-Autocrypt: addr=matttbe@kernel.org; keydata=
- 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
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-In-Reply-To: <20250113085228.121778-1-liucong2@kylinos.cn>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-Received: by 2002:a05:6e02:1547:b0:3ce:793e:2766 with SMTP id
+ e9e14a558f8ab-3ce793e284cmr41606245ab.8.1736879185436; Tue, 14 Jan 2025
+ 10:26:25 -0800 (PST)
+Date: Tue, 14 Jan 2025 10:26:25 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6786ac51.050a0220.216c54.00a7.GAE@google.com>
+Subject: [syzbot] [mptcp?] KMSAN: uninit-value in mptcp_incoming_options (2)
+From: syzbot <syzbot+23728c2df58b3bd175ad@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, geliang@kernel.org, 
+	horms@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
+	martineau@kernel.org, matttbe@kernel.org, mptcp@lists.linux.dev, 
+	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Cong Liu,
+Hello,
 
-On 13/01/2025 09:52, Cong Liu wrote:
-> Fix several issues in the mptcp connect test's main_loop function.
-> 
->  - Fix a bug where the wrong file descriptor was being checked for errors
->  - Fix the input file descriptor lifecycle in the reconnection loop to
->    prevent use of invalid fd
->  - Add proper resource cleanup in error paths
+syzbot found the following issue on:
 
-Thank you for these fixes!
+HEAD commit:    5bc55a333a2f Linux 6.13-rc7
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=16f67ef8580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=b9c31a1485dceb8e
+dashboard link: https://syzkaller.appspot.com/bug?extid=23728c2df58b3bd175ad
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
 
-Please note that when sending patches to the Netdev mailing list, it is
-asked to follow some specific rules, e.g.
+Unfortunately, I don't have any reproducer for this issue yet.
 
-- designate your patch to a tree - [PATCH net] or [PATCH net-next]
-- for fixes the Fixes: tag is required, regardless of the tree
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/37805bb86a68/disk-5bc55a33.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/ad56bb400987/vmlinux-5bc55a33.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/f5be0f4a3084/bzImage-5bc55a33.xz
 
-https://docs.kernel.org/process/maintainer-netdev.html
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+23728c2df58b3bd175ad@syzkaller.appspotmail.com
 
-If I'm not mistaken, it looks like you have here fixes for net, and the
-Fixes tag is missing.
+=====================================================
+BUG: KMSAN: uninit-value in __mptcp_expand_seq net/mptcp/options.c:1030 [inline]
+BUG: KMSAN: uninit-value in mptcp_expand_seq net/mptcp/protocol.h:864 [inline]
+BUG: KMSAN: uninit-value in ack_update_msk net/mptcp/options.c:1060 [inline]
+BUG: KMSAN: uninit-value in mptcp_incoming_options+0x2036/0x3d30 net/mptcp/options.c:1209
+ __mptcp_expand_seq net/mptcp/options.c:1030 [inline]
+ mptcp_expand_seq net/mptcp/protocol.h:864 [inline]
+ ack_update_msk net/mptcp/options.c:1060 [inline]
+ mptcp_incoming_options+0x2036/0x3d30 net/mptcp/options.c:1209
+ tcp_data_queue+0xb4/0x7be0 net/ipv4/tcp_input.c:5233
+ tcp_rcv_established+0x1061/0x2510 net/ipv4/tcp_input.c:6264
+ tcp_v4_do_rcv+0x7f3/0x11a0 net/ipv4/tcp_ipv4.c:1916
+ tcp_v4_rcv+0x51df/0x5750 net/ipv4/tcp_ipv4.c:2351
+ ip_protocol_deliver_rcu+0x2a3/0x13d0 net/ipv4/ip_input.c:205
+ ip_local_deliver_finish+0x336/0x500 net/ipv4/ip_input.c:233
+ NF_HOOK include/linux/netfilter.h:314 [inline]
+ ip_local_deliver+0x21f/0x490 net/ipv4/ip_input.c:254
+ dst_input include/net/dst.h:460 [inline]
+ ip_rcv_finish+0x4a2/0x520 net/ipv4/ip_input.c:447
+ NF_HOOK include/linux/netfilter.h:314 [inline]
+ ip_rcv+0xcd/0x380 net/ipv4/ip_input.c:567
+ __netif_receive_skb_one_core net/core/dev.c:5704 [inline]
+ __netif_receive_skb+0x319/0xa00 net/core/dev.c:5817
+ process_backlog+0x4ad/0xa50 net/core/dev.c:6149
+ __napi_poll+0xe7/0x980 net/core/dev.c:6902
+ napi_poll net/core/dev.c:6971 [inline]
+ net_rx_action+0xa5a/0x19b0 net/core/dev.c:7093
+ handle_softirqs+0x1a0/0x7c0 kernel/softirq.c:561
+ __do_softirq+0x14/0x1a kernel/softirq.c:595
+ do_softirq+0x9a/0x100 kernel/softirq.c:462
+ __local_bh_enable_ip+0x9f/0xb0 kernel/softirq.c:389
+ local_bh_enable include/linux/bottom_half.h:33 [inline]
+ rcu_read_unlock_bh include/linux/rcupdate.h:919 [inline]
+ __dev_queue_xmit+0x2758/0x57d0 net/core/dev.c:4493
+ dev_queue_xmit include/linux/netdevice.h:3168 [inline]
+ neigh_hh_output include/net/neighbour.h:523 [inline]
+ neigh_output include/net/neighbour.h:537 [inline]
+ ip_finish_output2+0x187c/0x1b70 net/ipv4/ip_output.c:236
+ __ip_finish_output+0x287/0x810
+ ip_finish_output+0x4b/0x600 net/ipv4/ip_output.c:324
+ NF_HOOK_COND include/linux/netfilter.h:303 [inline]
+ ip_output+0x15f/0x3f0 net/ipv4/ip_output.c:434
+ dst_output include/net/dst.h:450 [inline]
+ ip_local_out net/ipv4/ip_output.c:130 [inline]
+ __ip_queue_xmit+0x1f2a/0x20d0 net/ipv4/ip_output.c:536
+ ip_queue_xmit+0x60/0x80 net/ipv4/ip_output.c:550
+ __tcp_transmit_skb+0x3cea/0x4900 net/ipv4/tcp_output.c:1468
+ tcp_transmit_skb net/ipv4/tcp_output.c:1486 [inline]
+ tcp_write_xmit+0x3b90/0x9070 net/ipv4/tcp_output.c:2829
+ __tcp_push_pending_frames+0xc4/0x380 net/ipv4/tcp_output.c:3012
+ tcp_send_fin+0x9f6/0xf50 net/ipv4/tcp_output.c:3618
+ __tcp_close+0x140c/0x1550 net/ipv4/tcp.c:3130
+ __mptcp_close_ssk+0x74e/0x16f0 net/mptcp/protocol.c:2496
+ mptcp_close_ssk+0x26b/0x2c0 net/mptcp/protocol.c:2550
+ mptcp_pm_nl_rm_addr_or_subflow+0x635/0xd10 net/mptcp/pm_netlink.c:889
+ mptcp_pm_nl_rm_subflow_received net/mptcp/pm_netlink.c:924 [inline]
+ mptcp_pm_flush_addrs_and_subflows net/mptcp/pm_netlink.c:1688 [inline]
+ mptcp_nl_flush_addrs_list net/mptcp/pm_netlink.c:1709 [inline]
+ mptcp_pm_nl_flush_addrs_doit+0xe10/0x1630 net/mptcp/pm_netlink.c:1750
+ genl_family_rcv_msg_doit net/netlink/genetlink.c:1115 [inline]
+ genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
+ genl_rcv_msg+0x1214/0x12c0 net/netlink/genetlink.c:1210
+ netlink_rcv_skb+0x375/0x650 net/netlink/af_netlink.c:2542
+ genl_rcv+0x40/0x60 net/netlink/genetlink.c:1219
+ netlink_unicast_kernel net/netlink/af_netlink.c:1321 [inline]
+ netlink_unicast+0xf52/0x1260 net/netlink/af_netlink.c:1347
+ netlink_sendmsg+0x10da/0x11e0 net/netlink/af_netlink.c:1891
+ sock_sendmsg_nosec net/socket.c:711 [inline]
+ __sock_sendmsg+0x30f/0x380 net/socket.c:726
+ ____sys_sendmsg+0x877/0xb60 net/socket.c:2583
+ ___sys_sendmsg+0x28d/0x3c0 net/socket.c:2637
+ __sys_sendmsg net/socket.c:2669 [inline]
+ __do_sys_sendmsg net/socket.c:2674 [inline]
+ __se_sys_sendmsg net/socket.c:2672 [inline]
+ __x64_sys_sendmsg+0x212/0x3c0 net/socket.c:2672
+ x64_sys_call+0x2ed6/0x3c30 arch/x86/include/generated/asm/syscalls_64.h:47
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xcd/0x1e0 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
-Do you mind sending a v2 with this being fixed please? Because these
-fixes are not urgent, do you mind sending them only to the MPTCP ML for
-the moment, and not to the other ones (and no other people in CC).
+Uninit was stored to memory at:
+ mptcp_get_options+0x2c0f/0x2f20 net/mptcp/options.c:397
+ mptcp_incoming_options+0x19a/0x3d30 net/mptcp/options.c:1150
+ tcp_data_queue+0xb4/0x7be0 net/ipv4/tcp_input.c:5233
+ tcp_rcv_established+0x1061/0x2510 net/ipv4/tcp_input.c:6264
+ tcp_v4_do_rcv+0x7f3/0x11a0 net/ipv4/tcp_ipv4.c:1916
+ tcp_v4_rcv+0x51df/0x5750 net/ipv4/tcp_ipv4.c:2351
+ ip_protocol_deliver_rcu+0x2a3/0x13d0 net/ipv4/ip_input.c:205
+ ip_local_deliver_finish+0x336/0x500 net/ipv4/ip_input.c:233
+ NF_HOOK include/linux/netfilter.h:314 [inline]
+ ip_local_deliver+0x21f/0x490 net/ipv4/ip_input.c:254
+ dst_input include/net/dst.h:460 [inline]
+ ip_rcv_finish+0x4a2/0x520 net/ipv4/ip_input.c:447
+ NF_HOOK include/linux/netfilter.h:314 [inline]
+ ip_rcv+0xcd/0x380 net/ipv4/ip_input.c:567
+ __netif_receive_skb_one_core net/core/dev.c:5704 [inline]
+ __netif_receive_skb+0x319/0xa00 net/core/dev.c:5817
+ process_backlog+0x4ad/0xa50 net/core/dev.c:6149
+ __napi_poll+0xe7/0x980 net/core/dev.c:6902
+ napi_poll net/core/dev.c:6971 [inline]
+ net_rx_action+0xa5a/0x19b0 net/core/dev.c:7093
+ handle_softirqs+0x1a0/0x7c0 kernel/softirq.c:561
+ __do_softirq+0x14/0x1a kernel/softirq.c:595
 
-> Cong Liu (3):
->   selftests: mptcp: Fix incorrect file descriptor check in main_loop
->   selftests: mptcp: Fix input fd lifecycle in reconnection loop
->   selftests: mptcp: Clean up resources properly in main_loop
-> 
->  .../selftests/net/mptcp/mptcp_connect.c        | 18 +++++++++---------
->  1 file changed, 9 insertions(+), 9 deletions(-)
-> 
-> 
-> base-commit: 2b88851f583d3c4e40bcd40cfe1965241ec229dd
+Uninit was stored to memory at:
+ put_unaligned_be32 include/linux/unaligned.h:68 [inline]
+ mptcp_write_options+0x17f9/0x3100 net/mptcp/options.c:1417
+ mptcp_options_write net/ipv4/tcp_output.c:465 [inline]
+ tcp_options_write+0x6d9/0xe90 net/ipv4/tcp_output.c:759
+ __tcp_transmit_skb+0x294b/0x4900 net/ipv4/tcp_output.c:1414
+ tcp_transmit_skb net/ipv4/tcp_output.c:1486 [inline]
+ tcp_write_xmit+0x3b90/0x9070 net/ipv4/tcp_output.c:2829
+ __tcp_push_pending_frames+0xc4/0x380 net/ipv4/tcp_output.c:3012
+ tcp_send_fin+0x9f6/0xf50 net/ipv4/tcp_output.c:3618
+ __tcp_close+0x140c/0x1550 net/ipv4/tcp.c:3130
+ __mptcp_close_ssk+0x74e/0x16f0 net/mptcp/protocol.c:2496
+ mptcp_close_ssk+0x26b/0x2c0 net/mptcp/protocol.c:2550
+ mptcp_pm_nl_rm_addr_or_subflow+0x635/0xd10 net/mptcp/pm_netlink.c:889
+ mptcp_pm_nl_rm_subflow_received net/mptcp/pm_netlink.c:924 [inline]
+ mptcp_pm_flush_addrs_and_subflows net/mptcp/pm_netlink.c:1688 [inline]
+ mptcp_nl_flush_addrs_list net/mptcp/pm_netlink.c:1709 [inline]
+ mptcp_pm_nl_flush_addrs_doit+0xe10/0x1630 net/mptcp/pm_netlink.c:1750
+ genl_family_rcv_msg_doit net/netlink/genetlink.c:1115 [inline]
+ genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
+ genl_rcv_msg+0x1214/0x12c0 net/netlink/genetlink.c:1210
+ netlink_rcv_skb+0x375/0x650 net/netlink/af_netlink.c:2542
+ genl_rcv+0x40/0x60 net/netlink/genetlink.c:1219
+ netlink_unicast_kernel net/netlink/af_netlink.c:1321 [inline]
+ netlink_unicast+0xf52/0x1260 net/netlink/af_netlink.c:1347
+ netlink_sendmsg+0x10da/0x11e0 net/netlink/af_netlink.c:1891
+ sock_sendmsg_nosec net/socket.c:711 [inline]
+ __sock_sendmsg+0x30f/0x380 net/socket.c:726
+ ____sys_sendmsg+0x877/0xb60 net/socket.c:2583
+ ___sys_sendmsg+0x28d/0x3c0 net/socket.c:2637
+ __sys_sendmsg net/socket.c:2669 [inline]
+ __do_sys_sendmsg net/socket.c:2674 [inline]
+ __se_sys_sendmsg net/socket.c:2672 [inline]
+ __x64_sys_sendmsg+0x212/0x3c0 net/socket.c:2672
+ x64_sys_call+0x2ed6/0x3c30 arch/x86/include/generated/asm/syscalls_64.h:47
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xcd/0x1e0 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
-Note that this base-commit doesn't seem to exist. Because of that, our
-MPTCP CI was not able to automatically apply this commit.
+Uninit was stored to memory at:
+ mptcp_pm_add_addr_signal+0x3d7/0x4c0
+ mptcp_established_options_add_addr net/mptcp/options.c:666 [inline]
+ mptcp_established_options+0x1b9b/0x3a00 net/mptcp/options.c:884
+ tcp_established_options+0x2c4/0x7d0 net/ipv4/tcp_output.c:1012
+ __tcp_transmit_skb+0x5b7/0x4900 net/ipv4/tcp_output.c:1333
+ tcp_transmit_skb net/ipv4/tcp_output.c:1486 [inline]
+ tcp_write_xmit+0x3b90/0x9070 net/ipv4/tcp_output.c:2829
+ __tcp_push_pending_frames+0xc4/0x380 net/ipv4/tcp_output.c:3012
+ tcp_send_fin+0x9f6/0xf50 net/ipv4/tcp_output.c:3618
+ __tcp_close+0x140c/0x1550 net/ipv4/tcp.c:3130
+ __mptcp_close_ssk+0x74e/0x16f0 net/mptcp/protocol.c:2496
+ mptcp_close_ssk+0x26b/0x2c0 net/mptcp/protocol.c:2550
+ mptcp_pm_nl_rm_addr_or_subflow+0x635/0xd10 net/mptcp/pm_netlink.c:889
+ mptcp_pm_nl_rm_subflow_received net/mptcp/pm_netlink.c:924 [inline]
+ mptcp_pm_flush_addrs_and_subflows net/mptcp/pm_netlink.c:1688 [inline]
+ mptcp_nl_flush_addrs_list net/mptcp/pm_netlink.c:1709 [inline]
+ mptcp_pm_nl_flush_addrs_doit+0xe10/0x1630 net/mptcp/pm_netlink.c:1750
+ genl_family_rcv_msg_doit net/netlink/genetlink.c:1115 [inline]
+ genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
+ genl_rcv_msg+0x1214/0x12c0 net/netlink/genetlink.c:1210
+ netlink_rcv_skb+0x375/0x650 net/netlink/af_netlink.c:2542
+ genl_rcv+0x40/0x60 net/netlink/genetlink.c:1219
+ netlink_unicast_kernel net/netlink/af_netlink.c:1321 [inline]
+ netlink_unicast+0xf52/0x1260 net/netlink/af_netlink.c:1347
+ netlink_sendmsg+0x10da/0x11e0 net/netlink/af_netlink.c:1891
+ sock_sendmsg_nosec net/socket.c:711 [inline]
+ __sock_sendmsg+0x30f/0x380 net/socket.c:726
+ ____sys_sendmsg+0x877/0xb60 net/socket.c:2583
+ ___sys_sendmsg+0x28d/0x3c0 net/socket.c:2637
+ __sys_sendmsg net/socket.c:2669 [inline]
+ __do_sys_sendmsg net/socket.c:2674 [inline]
+ __se_sys_sendmsg net/socket.c:2672 [inline]
+ __x64_sys_sendmsg+0x212/0x3c0 net/socket.c:2672
+ x64_sys_call+0x2ed6/0x3c30 arch/x86/include/generated/asm/syscalls_64.h:47
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xcd/0x1e0 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
-Talking about our CI, it looks like that 'mptcp_connect' now crashes in
-some cases with:
+Uninit was stored to memory at:
+ mptcp_pm_add_addr_received+0x95f/0xdd0 net/mptcp/pm.c:235
+ mptcp_incoming_options+0x2983/0x3d30 net/mptcp/options.c:1169
+ tcp_data_queue+0xb4/0x7be0 net/ipv4/tcp_input.c:5233
+ tcp_rcv_state_process+0x2a38/0x49d0 net/ipv4/tcp_input.c:6972
+ tcp_v4_do_rcv+0xbf9/0x11a0 net/ipv4/tcp_ipv4.c:1939
+ tcp_v4_rcv+0x51df/0x5750 net/ipv4/tcp_ipv4.c:2351
+ ip_protocol_deliver_rcu+0x2a3/0x13d0 net/ipv4/ip_input.c:205
+ ip_local_deliver_finish+0x336/0x500 net/ipv4/ip_input.c:233
+ NF_HOOK include/linux/netfilter.h:314 [inline]
+ ip_local_deliver+0x21f/0x490 net/ipv4/ip_input.c:254
+ dst_input include/net/dst.h:460 [inline]
+ ip_rcv_finish+0x4a2/0x520 net/ipv4/ip_input.c:447
+ NF_HOOK include/linux/netfilter.h:314 [inline]
+ ip_rcv+0xcd/0x380 net/ipv4/ip_input.c:567
+ __netif_receive_skb_one_core net/core/dev.c:5704 [inline]
+ __netif_receive_skb+0x319/0xa00 net/core/dev.c:5817
+ process_backlog+0x4ad/0xa50 net/core/dev.c:6149
+ __napi_poll+0xe7/0x980 net/core/dev.c:6902
+ napi_poll net/core/dev.c:6971 [inline]
+ net_rx_action+0xa5a/0x19b0 net/core/dev.c:7093
+ handle_softirqs+0x1a0/0x7c0 kernel/softirq.c:561
+ __do_softirq+0x14/0x1a kernel/softirq.c:595
 
-  free(): double free detected in tcache 2
+Local variable mp_opt created at:
+ mptcp_incoming_options+0x119/0x3d30 net/mptcp/options.c:1127
+ tcp_data_queue+0xb4/0x7be0 net/ipv4/tcp_input.c:5233
 
-Do you mind checking this please?
+CPU: 1 UID: 0 PID: 7183 Comm: syz.2.410 Not tainted 6.13.0-rc7-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
+=====================================================
 
-https://github.com/multipath-tcp/mptcp_net-next/actions/runs/12751035845
 
-pw-bot: cr
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-Cheers,
-Matt
--- 
-Sponsored by the NGI0 Core fund.
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
