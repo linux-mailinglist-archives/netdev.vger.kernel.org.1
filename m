@@ -1,106 +1,138 @@
-Return-Path: <netdev+bounces-158099-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158108-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C39C0A1075F
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 14:06:21 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 38470A1077D
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 14:12:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D6F45168616
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 13:06:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B13C23A1E1D
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 13:12:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D162234D0A;
-	Tue, 14 Jan 2025 13:05:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEB23236EC3;
+	Tue, 14 Jan 2025 13:12:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pAFFyXfB"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="VqCz16pu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 742CC243328
-	for <netdev@vger.kernel.org>; Tue, 14 Jan 2025 13:05:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21853236A6E;
+	Tue, 14 Jan 2025 13:12:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736859951; cv=none; b=ndc+QGr3WTDxx22Rf3wy4tXXWn8T3ea9895flexORz5fWKDdh26XLWt4JY4Kt8bw5Jtdvp+jPfuI4RkP3YAX5WXJBU795jowwv6Nz5bCG/1zt4EpFstBdcFTNFRhavCbKvmOioDuZ8DL9XcR6n12E1B4CNUwpEoLYG4xv0y7b3U=
+	t=1736860336; cv=none; b=dVQ3HbytEPquI0UQ+WVGZBUXeIPah36uaiw/laBpPZFtHtLAnRu6lt4FiVgJXgl2U5v47pBp5Hf2eHetg4ml9ri9mXxtY4qLrihrQOqFrJCPgnBt8YIGbvSD/tF7SaKJYuCAcENCcJn1DHt2DDC7rQqOcd8jIRFszx1hHNARgUM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736859951; c=relaxed/simple;
-	bh=DljJxNqz4rAgV/3YmFb7ej8BfAE9L119q6FzMUilKo4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=lndu2aaSuUhDTzH8s4l06sTG8ZtNhrnFVF7uLsAbQR2RR4bZOZX59X5GfHNt/rL+nh2XiG53LPqB4N86WvoUl7ZNzGqcRks6kAn8HB8G/zP85KCPPgNV+NWNeaCHYCGZnAcIWLlvEgEPYwzItNZEfwYwYtUrPaKf1D8/CwT2brw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pAFFyXfB; arc=none smtp.client-ip=209.85.208.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-5d88c355e0dso9579711a12.0
-        for <netdev@vger.kernel.org>; Tue, 14 Jan 2025 05:05:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1736859948; x=1737464748; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=DljJxNqz4rAgV/3YmFb7ej8BfAE9L119q6FzMUilKo4=;
-        b=pAFFyXfBJC+i8a8+DEpZgyQtng1sERPPvDNgB+p8GmRopJ6ADu4m4vzGfH6CRyPgyR
-         UFBOcE1VHgllDtx63Ptd+Ck2Jgcl4zPIdXbxaFfqnmuOVaRAdtBQs8UaySbaE24d8wFU
-         pSKmFp+oy+bw9Kt76iKcd1GgHcLZR6Xh9baBm/6dqfiFXgVMsnrHL98gx/pV+xhq4+tq
-         OF5Nx5autaKZSNxD+09L4G6WRJPARe4dcSj3TlWu0un+hKpHJurISG75FsdfR/3YQXd+
-         uy6Mx2wVRSZ4nLfc9aOcX1BKbpAyXCw/Vq5TCpNtzouB5jvcW9vG4IG68w7cGbBjWQwO
-         GUFw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736859948; x=1737464748;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=DljJxNqz4rAgV/3YmFb7ej8BfAE9L119q6FzMUilKo4=;
-        b=L7jbbTo1kc4Kw+erZiqVlVU1IEo6e4TNRc1bSefpzdQyYOnOc43Q09WeOejRPU9P8t
-         MysVkKqWqrg5RjQbhdg6JzzMZE2DuteoZFJhmDKH7arxhVHzXqylOqb3yvY8tzqqhqcB
-         7QnS4sihjpSz+NYyX1beSrby8wVevx8OvwRjFnqSTRvUM+PjcIi4dOYm9mM6vrh8t0yh
-         MMzroi+VJlpI1v/M+3wNRmU2lea31fDJFO7Rins0ZSy7Y74GNAs4zsWHLJtSHcWor4wp
-         PfFA5qYdHN77+58/vPARWYsQM08TJE794mNbFnufSuNTDd25aqZ8gFwH0vUsRBwoeqTA
-         mnuQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVcV4Y6fIEEkeTESJpSDtLguigfz57GDdexb2rterM3UdfM0RwTdnEe+R5pwd4SHzLVenOnOlE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz71tT6GsxUSsMUa+FmWHmM5ULZXNMYkpTRyugolNv+bo2dZ+po
-	UPMNj6CSJN3/KrJCJw4/Pha5CzF8LTseuBT7fvEhvAgzPhAt5UjX/xT7zVTQ8kVNtPweufG3+JV
-	UrWeUJoqUuUzf2wF7Z316rfdV8abcfBKfiKTA
-X-Gm-Gg: ASbGncsAB/lCDmgC+uPolM1+2w/ekzJ1NUaKDr4ER8JfudwZN95T0xMA76En5N+q8Tn
-	4ERq55rjd5dw7+DMV4zf7RaKGNP6ek3+PbH55ng==
-X-Google-Smtp-Source: AGHT+IG1mrzfl/mCpiWN86nTDGPJCeOWpWvpg66ZEfU+aAWNszH31ik3CGTDrtqwjmQaikYFaKqGSZnWny7ldrg8X5U=
-X-Received: by 2002:a05:6402:4416:b0:5cf:c33c:34cf with SMTP id
- 4fb4d7f45d1cf-5d972e1c42amr23297010a12.15.1736859947587; Tue, 14 Jan 2025
- 05:05:47 -0800 (PST)
+	s=arc-20240116; t=1736860336; c=relaxed/simple;
+	bh=cbmjE2PSEunAuNySolt8zxZt/sZG95k82p7mRlm1UVM=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=uVUFYMGW/99/dqIIVCLooe/KDZJ6LvbkK2EL9eJ0UEFkYWCmmFLP9ENtQyAx8FCrCRveg0RMNAjmsinQ/WPEu17pvYC6zkXksNOE7r+T0ucr9YXU360A7GBww+DoZsjJNaJzy0CGixnba+/q7gN3iVNYMSvGsXyu4phfDZ4q+yM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=VqCz16pu; arc=none smtp.client-ip=67.231.148.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50EBYbSw004153;
+	Tue, 14 Jan 2025 04:51:27 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pfpt0220; bh=GzEFN4a2DP60p1mr2wqi6vo
+	QOKd0TnEgYmCpVVxoUIU=; b=VqCz16puq+8TnHiWy61y9wjNnr0H9PTx9/tMEak
+	jMuALCQFP7wX3ODHOJWNmn8OX721cREy9TiPNx/GzAHlaWqI9oVme931gkhSvP0n
+	HZbKiJlgvYw9tpwNRazBPAfG/AsuvK1dP1WD3YQCqwPwkyG8H8VpzRfNGGl3bQEd
+	Z8i9CF5FcHXW6Uqt54+AdMw4rNtIliEmYlpMbayqcwy0K+ZsAu5AiIJtMXAq2RKQ
+	ZBO/YFWyYxX2gPfjMdeWg2FzuJiDskQu5/JdBZww/e1BeV3cgqkVPvd0HTOykVjG
+	UO57jq3Edq5nxEMqRxVStcLEsnxmgmUJccgPmCRkPrc+4Zg==
+Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 445q60r3ty-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 14 Jan 2025 04:51:27 -0800 (PST)
+Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
+ DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Tue, 14 Jan 2025 04:51:26 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
+ (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Tue, 14 Jan 2025 04:51:26 -0800
+Received: from ubuntu-PowerEdge-T110-II.sclab.marvell.com (unknown [10.106.27.86])
+	by maili.marvell.com (Postfix) with ESMTP id 058415B6927;
+	Tue, 14 Jan 2025 04:51:26 -0800 (PST)
+From: Shinas Rasheed <srasheed@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <hgani@marvell.com>, <sedara@marvell.com>, <vimleshk@marvell.com>,
+        <thaller@redhat.com>, <wizhao@redhat.com>, <kheib@redhat.com>,
+        <konguyen@redhat.com>, <horms@kernel.org>, <einstein.xue@synaxg.com>,
+        "Shinas
+ Rasheed" <srasheed@marvell.com>
+Subject: [PATCH net v7 0/4] Fix race conditions in ndo_get_stats64
+Date: Tue, 14 Jan 2025 04:51:20 -0800
+Message-ID: <20250114125124.2570660-1-srasheed@marvell.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250114035118.110297-1-kuba@kernel.org> <20250114035118.110297-4-kuba@kernel.org>
-In-Reply-To: <20250114035118.110297-4-kuba@kernel.org>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 14 Jan 2025 14:05:36 +0100
-X-Gm-Features: AbW1kvY_x3BgN8yx_65m-XzC4BxFs0Ao_PXyV8lJ-iubESwOYdnTMD7MsNb_PCs
-Message-ID: <CANn89iK_2YSXGU=A6RyyDHaHQg4-tFYjP+3u=uR0aJDn5EiyLA@mail.gmail.com>
-Subject: Re: [PATCH net-next 03/11] net: make netdev_lock() protect netdev->reg_state
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, pabeni@redhat.com, 
-	andrew+netdev@lunn.ch, horms@kernel.org, jdamato@fastly.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-GUID: XA4fCpNaMCkcb3zmMdBrGJBJ_h4yrfgo
+X-Proofpoint-ORIG-GUID: XA4fCpNaMCkcb3zmMdBrGJBJ_h4yrfgo
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
 
-On Tue, Jan 14, 2025 at 4:51=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> Protect writes to netdev->reg_state with netdev_lock().
-> From now on holding netdev_lock() is sufficient to prevent
-> the net_device from getting unregistered, so code which
-> wants to hold just a single netdev around no longer needs
-> to hold rtnl_lock.
->
-> We do not protect the NETREG_UNREGISTERED -> NETREG_RELEASED
-> transition. We'd need to move mutex_destroy(netdev->lock)
-> to .release, but the real reason is that trying to stop
-> the unregistration process mid-way would be unsafe / crazy.
-> Taking references on such devices is not safe, either.
-> So the intended semantics are to lock REGISTERED devices.
+Fix race conditions in ndo_get_stats64 by storing tx/rx stats
+locally and not availing per queue resources which could be torn
+down during interface stop. Also remove stats fetch from
+firmware which is currently unnecessary
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+Changes:
+V7:
+  - Updated octep_get_stats64() to be reentrant
+
+V6: https://lore.kernel.org/all/20250110122730.2551863-1-srasheed@marvell.com/
+  - Corrected patch 2/4 which was not applying properly
+
+V5: https://lore.kernel.org/all/20250109103221.2544467-1-srasheed@marvell.com/
+  - Store tx/rx stats locally and avail use stats in ndo_get_stats64()
+    instead of availing per queue resources there.
+
+V4: https://lore.kernel.org/all/20250102112246.2494230-1-srasheed@marvell.com/
+  - Check if netdev is running, as decision for accessing resources
+    rather than availing lock implementations, in ndo_get_stats64()
+
+V3: https://lore.kernel.org/all/20241218115111.2407958-1-srasheed@marvell.com/
+  - Added warn log that happened due to rcu_read_lock in commit message
+
+V2: https://lore.kernel.org/all/20241216075842.2394606-1-srasheed@marvell.com/
+  - Changed sync mechanism to fix race conditions from using an atomic
+    set_bit ops to a much simpler synchronize_net()
+
+V1: https://lore.kernel.org/all/20241203072130.2316913-1-srasheed@marvell.com/
+
+Shinas Rasheed (4):
+  octeon_ep: update tx/rx stats locally for persistence
+  octeon_ep: remove firmware stats fetch in ndo_get_stats64
+  octeon_ep_vf: update tx/rx stats locally for persistence
+  octeon_ep_vf: remove firmware stats fetch in ndo_get_stats64
+
+ .../marvell/octeon_ep/octep_ethtool.c         | 41 ++++++++-----------
+ .../ethernet/marvell/octeon_ep/octep_main.c   | 30 ++++----------
+ .../ethernet/marvell/octeon_ep/octep_main.h   | 11 +++++
+ .../net/ethernet/marvell/octeon_ep/octep_rx.c | 12 +++---
+ .../net/ethernet/marvell/octeon_ep/octep_rx.h |  4 +-
+ .../net/ethernet/marvell/octeon_ep/octep_tx.c |  7 ++--
+ .../net/ethernet/marvell/octeon_ep/octep_tx.h |  4 +-
+ .../marvell/octeon_ep_vf/octep_vf_ethtool.c   | 29 +++++--------
+ .../marvell/octeon_ep_vf/octep_vf_main.c      | 25 ++++-------
+ .../marvell/octeon_ep_vf/octep_vf_main.h      | 11 +++++
+ .../marvell/octeon_ep_vf/octep_vf_rx.c        | 10 +++--
+ .../marvell/octeon_ep_vf/octep_vf_rx.h        |  2 +-
+ .../marvell/octeon_ep_vf/octep_vf_tx.c        |  7 ++--
+ .../marvell/octeon_ep_vf/octep_vf_tx.h        |  2 +-
+ 14 files changed, 93 insertions(+), 102 deletions(-)
+
+-- 
+2.25.1
+
 
