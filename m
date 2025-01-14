@@ -1,108 +1,211 @@
-Return-Path: <netdev+bounces-158288-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158289-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D9B9AA1153E
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 00:19:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 60EC5A11544
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 00:21:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3265C3A2394
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 23:19:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0B8613A059E
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 23:20:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B15CA2135BC;
-	Tue, 14 Jan 2025 23:19:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D06D120AF65;
+	Tue, 14 Jan 2025 23:20:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="Titk9AUu"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="tYSwb+MQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-178.mta1.migadu.com (out-178.mta1.migadu.com [95.215.58.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 195CA1C3BEB
-	for <netdev@vger.kernel.org>; Tue, 14 Jan 2025 23:19:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38C57232429;
+	Tue, 14 Jan 2025 23:20:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736896765; cv=none; b=i9bkno9xaB0qAtSDTbsaBdyyfKI05GE/X3E0Pp265CrY99Wn9l3ZJjXg3G7IwzChX37hvDziudzlrlEHrrzfMT3tkofrNeIQrgmQ2J2sfn6NelCJAqklyi6DsK/Wc0wPVXelw/Y9Bdeoe99hbl9vLtJdBavIx2EyLqeJJNUm5xg=
+	t=1736896857; cv=none; b=QBXwXTLU/mQGHeVRsd7NBDvxDQOALJueafmdPWKXvQ4pHOFAW2TsbJnJ8mZWDi5+N/NW2X4yVWg8JSl+hLpubWU38659CAqeIsYbK+iELcoBAo3V7au4TAAC7x9Wv8lkrWA7ro63IirZfMpdMq3OBLZUsva7ehJ2ULunrtDrksQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736896765; c=relaxed/simple;
-	bh=oW3Jl1eIZZ7xy6597Shv3w9NGNA648r1kNJb71xiCbY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ohUPQbjHlIjmsi4djnUP1ppLs097/LR3O3+fLfzUEUK4D1Ak4MAzx0SiiqActtWxcLKqVMKu4l6afx1q3c0jVx6agHfIOgZ92Gb9v5Z/a2GyBFR2RyTtg5Rs0hFvtwkdAkpTNWhABLApUjxuVELPiues3TPFmzrEJP0WavqPeds=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=Titk9AUu; arc=none smtp.client-ip=209.85.216.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-2eec9b3a1bbso8092990a91.3
-        for <netdev@vger.kernel.org>; Tue, 14 Jan 2025 15:19:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1736896763; x=1737501563; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=JbvYctdrGd1fMR1YU0UDT9rZXrxXW/NPmAnjaYjCXGE=;
-        b=Titk9AUubJpYd12pr7qqvAH1oKqtEeXoOTxtjo8hFR8Muci9h7K9hkpElC1FDGz73R
-         sZBeQHzdF58VXYd/EoevcKOJ7mGT7fBNnPZa9tIw+JKyrv7BktdNoPDMODNhGFhgrUqJ
-         6BqQHWoo+9x9F7Bw87uSBfmyjxwGaQDvZCrVI=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736896763; x=1737501563;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=JbvYctdrGd1fMR1YU0UDT9rZXrxXW/NPmAnjaYjCXGE=;
-        b=N011mvrkrNQEXWUjAzVVGINTWkw4j4Emfxb0Ur7WBjTUDqc6arNPyKBzWM6GBurNz3
-         KclYfMTNRN56wdk1HFSDoLC3dCqqAnBqmBVlDfC9NEywpCEE0V7amFgrkX6Qei/wjRz2
-         6pbrX6q9BkJOQm5AjC+cyfCTn7xLfgQBo7/29qB9370Sc/CL/wfxp2D+4tCTtNvPtliM
-         m6T0+At7bGYXbvdFspSutlK9ufkbByNXm+ZCqMaOZhWJDIZDfhyEgtE27ouRilPAj5ws
-         OTzZtIbZei99EekDRsoSQtlW7G8EZIS+G5UYqFZQWEWGVZVKv2p+xqzncgUQ2Pz2jbA7
-         PRAw==
-X-Forwarded-Encrypted: i=1; AJvYcCVPFv4oQs2KhdXlEIbL8oAqJ9IimF0HaLvsmBpRejfW3ga6OGZN34Rz3RvObCbWG7cEmdgBJg8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx4hDqRB3VkuN5Qa5ZbAwMMrHRpRZg6thTega642skFXPTB3gx5
-	hKAJGvTgMm0lhgRORrptNiCI3WXbxzrFDioxX9IwDaSfhM3qeT2qF/w/EELqdNU=
-X-Gm-Gg: ASbGncsst1SJQkwIcbSzVaSEbip61HCAe4ADP2Ldlr3Vk6JnqF7d8z2Ihw4JFiEFdeh
-	QKpdIUHvThqy9qemcqpqO5tUX6mDOBboKHlc9LvSix2CeZKTNYAQA8JwLsCG1K2DJbyzLVFZq91
-	dlvwea0BpvRYA39wvoYDt+imrH9Iugdo7n+4oL1V3opgRFEdII7paR/K+ZYOrjDYL0m2OPNLzmH
-	P93peThMJJngzRWTk2/lEswh2OWt52oFIaCfkBgKUEsgz+UqmahkIiTqoTNdK36WZJkkTAJJga7
-	rhczAOZ0DM9HajF0Nwl3OHE=
-X-Google-Smtp-Source: AGHT+IHFi96ZW3/FlOq6X21nV+AE31+5XhD2kjVGg+hmUGkASSLpTCq/52bYiK6IFby7uzRfV70YKw==
-X-Received: by 2002:a17:90b:2e41:b0:2ee:96a5:721e with SMTP id 98e67ed59e1d1-2f548eb25cfmr46358849a91.12.1736896763372;
-        Tue, 14 Jan 2025 15:19:23 -0800 (PST)
-Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2f72c2f673esm80109a91.46.2025.01.14.15.19.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Jan 2025 15:19:22 -0800 (PST)
-Date: Tue, 14 Jan 2025 15:19:20 -0800
-From: Joe Damato <jdamato@fastly.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org
-Subject: Re: [PATCH net-next 09/11] net: protect napi->irq with netdev_lock()
-Message-ID: <Z4bw-LRerFnH6gIA@LQ3V64L9R2>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
-	netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
-	andrew+netdev@lunn.ch, horms@kernel.org
-References: <20250114035118.110297-1-kuba@kernel.org>
- <20250114035118.110297-10-kuba@kernel.org>
+	s=arc-20240116; t=1736896857; c=relaxed/simple;
+	bh=l81c8zEzf/BUOHgqBmE29NV0oLDlQ+HkTkgBB3Iu/dQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=sF6aZgH/u32b4oRLo0qR4ceAHiTJCXW31oAZWyOZ6o5Ybw4WHCV/dp6qqN+/XAiTail8IlBMX/TLtdNxjZnsKmYFGJ9LXQwkD584PHzXprlnUVLWX2K2Th2kwOObbicrKqJqhFYFJmbcqz/pIUGEIpM3EBGB/F47yxja/5rnY/8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=tYSwb+MQ; arc=none smtp.client-ip=95.215.58.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <6bb42e9b-83ff-497d-8052-27ac609a2af7@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1736896853;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=xwDAHSKCfoIYfiftlZsT41jVy2VlUYoZ1+GX2Wio6DU=;
+	b=tYSwb+MQdWzw2aLVqT+zXp/vbimkc326U3PexbG0kgwuT6JUMIcsIyqPtRf5FIpjrRZvTT
+	a24EQ6irgvWJsRkphdcrIG65Y8686CbWrJm5Me/UFOn8ZfmGfTkLeJc9UlhQS8t1kO/bIK
+	0halBv0cSlzh2HfkFbZupmWndGUfC5s=
+Date: Tue, 14 Jan 2025 15:20:40 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250114035118.110297-10-kuba@kernel.org>
+Subject: Re: [PATCH net-next v5 01/15] net-timestamp: add support for
+ bpf_setsockopt()
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, dsahern@kernel.org,
+ willemdebruijn.kernel@gmail.com, willemb@google.com, ast@kernel.org,
+ daniel@iogearbox.net, andrii@kernel.org, eddyz87@gmail.com, song@kernel.org,
+ yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org,
+ sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, horms@kernel.org
+References: <20250112113748.73504-1-kerneljasonxing@gmail.com>
+ <20250112113748.73504-2-kerneljasonxing@gmail.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+Content-Language: en-US
+In-Reply-To: <20250112113748.73504-2-kerneljasonxing@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Mon, Jan 13, 2025 at 07:51:15PM -0800, Jakub Kicinski wrote:
-> Take netdev_lock() in netif_napi_set_irq(). All NAPI "control fields"
-> are now protected by that lock (most of the other ones are set during
-> napi add/del). The napi_hash_node is fully protected by the hash
-> spin lock, but close enough for the kdoc...
+On 1/12/25 3:37 AM, Jason Xing wrote:
+> Users can write the following code to enable the bpf extension:
+> bpf_setsockopt(skops, SOL_SOCKET, SK_BPF_CB_FLAGS, &flags, sizeof(flags));
 > 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> Signed-off-by: Jason Xing <kerneljasonxing@gmail.com>
 > ---
->  include/linux/netdevice.h | 10 +++++++++-
->  net/core/dev.c            |  2 +-
->  2 files changed, 10 insertions(+), 2 deletions(-)
+>   include/net/sock.h             |  7 +++++++
+>   include/uapi/linux/bpf.h       |  8 ++++++++
+>   net/core/filter.c              | 25 +++++++++++++++++++++++++
+>   tools/include/uapi/linux/bpf.h |  1 +
+>   4 files changed, 41 insertions(+)
+> 
+> diff --git a/include/net/sock.h b/include/net/sock.h
+> index ccf86c8a7a8a..f5447b4b78fd 100644
+> --- a/include/net/sock.h
+> +++ b/include/net/sock.h
+> @@ -303,6 +303,7 @@ struct sk_filter;
+>     *	@sk_stamp: time stamp of last packet received
+>     *	@sk_stamp_seq: lock for accessing sk_stamp on 32 bit architectures only
+>     *	@sk_tsflags: SO_TIMESTAMPING flags
+> +  *	@sk_bpf_cb_flags: used for bpf_setsockopt
+>     *	@sk_use_task_frag: allow sk_page_frag() to use current->task_frag.
+>     *			   Sockets that can be used under memory reclaim should
+>     *			   set this to false.
+> @@ -445,6 +446,12 @@ struct sock {
+>   	u32			sk_reserved_mem;
+>   	int			sk_forward_alloc;
+>   	u32			sk_tsflags;
+> +#ifdef CONFIG_BPF_SYSCALL
 
-Reviewed-by: Joe Damato <jdamato@fastly.com>
+The CONFIG_BPF is used instead in the existing "u8 bpf_sock_ops_cb_flags;" in 
+tcp_sock. afaik, CONFIG_BPF is selected by CONFIG_NET. It is why the test bot 
+fails when CONFIG_BPF_SYSCALL is used here but not with the existing 
+bpf_sock_ops_cb_flags. Considering CONFIG_BPF is also mostly useless here 
+because of CONFIG_NET, I would remove this ifdef usage altogether. If there is 
+really a need to distinguish CONFIG_BPF_SYSCALL is enabled or not, this can be 
+improved together with the existing bpf_sock_ops_cb_flags.
+
+> +#define SK_BPF_CB_FLAG_TEST(SK, FLAG) ((SK)->sk_bpf_cb_flags & (FLAG))
+> +	u32			sk_bpf_cb_flags;
+> +#else
+> +#define SK_BPF_CB_FLAG_TEST(SK, FLAG) 0
+> +#endif
+>   	__cacheline_group_end(sock_write_rxtx);
+>   
+>   	__cacheline_group_begin(sock_write_tx);
+> diff --git a/include/uapi/linux/bpf.h b/include/uapi/linux/bpf.h
+> index 4162afc6b5d0..e629e09b0b31 100644
+> --- a/include/uapi/linux/bpf.h
+> +++ b/include/uapi/linux/bpf.h
+> @@ -6903,6 +6903,13 @@ enum {
+>   	BPF_SOCK_OPS_ALL_CB_FLAGS       = 0x7F,
+>   };
+>   
+> +/* Definitions for bpf_sk_cb_flags */
+> +enum {
+> +	SK_BPF_CB_TX_TIMESTAMPING	= 1<<0,
+> +	SK_BPF_CB_MASK			= (SK_BPF_CB_TX_TIMESTAMPING - 1) |
+> +					   SK_BPF_CB_TX_TIMESTAMPING
+> +};
+> +
+>   /* List of known BPF sock_ops operators.
+>    * New entries can only be added at the end
+>    */
+> @@ -7081,6 +7088,7 @@ enum {
+>   	TCP_BPF_SYN_IP		= 1006, /* Copy the IP[46] and TCP header */
+>   	TCP_BPF_SYN_MAC         = 1007, /* Copy the MAC, IP[46], and TCP header */
+>   	TCP_BPF_SOCK_OPS_CB_FLAGS = 1008, /* Get or Set TCP sock ops flags */
+> +	SK_BPF_CB_FLAGS		= 1009, /* Used to set socket bpf flags */
+>   };
+>   
+>   enum {
+> diff --git a/net/core/filter.c b/net/core/filter.c
+> index b957cf57299e..c6dd2d2e44c8 100644
+> --- a/net/core/filter.c
+> +++ b/net/core/filter.c
+> @@ -5222,6 +5222,23 @@ static const struct bpf_func_proto bpf_get_socket_uid_proto = {
+>   	.arg1_type      = ARG_PTR_TO_CTX,
+>   };
+>   
+> +static int sk_bpf_set_cb_flags(struct sock *sk, char *optval, bool getopt)
+> +{
+> +	u32 sk_bpf_cb_flags;
+> +
+> +	if (getopt)
+
+I may have this in my earlier sample code? This is probably because of my 
+laziness for a quick example. getopt should also be supported, similar to the 
+existing TCP_BPF_SOCK_OPS_CB_FLAGS.
+
+> +		return -EINVAL;
+> +
+> +	sk_bpf_cb_flags = *(u32 *)optval;
+> +
+> +	if (sk_bpf_cb_flags & ~SK_BPF_CB_MASK)
+> +		return -EINVAL;
+> +
+> +	sk->sk_bpf_cb_flags = sk_bpf_cb_flags;
+> +
+> +	return 0;
+> +}
+> +
+>   static int sol_socket_sockopt(struct sock *sk, int optname,
+>   			      char *optval, int *optlen,
+>   			      bool getopt)
+> @@ -5238,6 +5255,7 @@ static int sol_socket_sockopt(struct sock *sk, int optname,
+>   	case SO_MAX_PACING_RATE:
+>   	case SO_BINDTOIFINDEX:
+>   	case SO_TXREHASH:
+> +	case SK_BPF_CB_FLAGS:
+>   		if (*optlen != sizeof(int))
+>   			return -EINVAL;
+>   		break;
+> @@ -5247,6 +5265,13 @@ static int sol_socket_sockopt(struct sock *sk, int optname,
+>   		return -EINVAL;
+>   	}
+>   
+> +	if (optname == SK_BPF_CB_FLAGS)
+> +#ifdef CONFIG_BPF_SYSCALL
+> +		return sk_bpf_set_cb_flags(sk, optval, getopt);
+> +#else
+> +		return -EINVAL;
+> +#endif
+> +
+>   	if (getopt) {
+>   		if (optname == SO_BINDTODEVICE)
+>   			return -EINVAL;
+> diff --git a/tools/include/uapi/linux/bpf.h b/tools/include/uapi/linux/bpf.h
+> index 4162afc6b5d0..6b0a5b787b12 100644
+> --- a/tools/include/uapi/linux/bpf.h
+> +++ b/tools/include/uapi/linux/bpf.h
+> @@ -7081,6 +7081,7 @@ enum {
+>   	TCP_BPF_SYN_IP		= 1006, /* Copy the IP[46] and TCP header */
+>   	TCP_BPF_SYN_MAC         = 1007, /* Copy the MAC, IP[46], and TCP header */
+>   	TCP_BPF_SOCK_OPS_CB_FLAGS = 1008, /* Get or Set TCP sock ops flags */
+> +	SK_BPF_CB_FLAGS		= 1009, /* Used to set socket bpf flags */
+>   };
+>   
+>   enum {
+
 
