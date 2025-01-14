@@ -1,74 +1,76 @@
-Return-Path: <netdev+bounces-157922-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157923-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F5B0A0F55E
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 01:07:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id CFC0BA0F560
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 01:07:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B7BB5164498
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 00:07:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C5FB2164C2B
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 00:07:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F37FC46B8;
-	Tue, 14 Jan 2025 00:07:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49A9EF9D9;
+	Tue, 14 Jan 2025 00:07:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IB5O6oPR"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RdwrA5Ix"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C7E51C01;
-	Tue, 14 Jan 2025 00:07:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D0F429B0;
+	Tue, 14 Jan 2025 00:07:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736813229; cv=none; b=JesnlvezDAFGbNrMkdawSsC5630RTtWzyT36kjBhicFWAlQVKrtmmBgFUH9uZKbV00/TXINmnuxlnVTpQUlrDsCQPlVibRfXcS/ZKZVnt8lsAiOpFqwdiNiMSchbZJa2S8NuW+Zgq4QFUG/WmMicf95gDRT1oKcxAYV7VyNtZZg=
+	t=1736813231; cv=none; b=G/vkdMkOF7uOWbY4yN+RA1h7dxGxEcktpRWLgVXbnH+DvWQM9jM0VGdg+uNOz8yXqGK3ZK7qYhyoOfZNcdJgEWPC8J0DRVET29IQABwg3EMr6t6D+Kanok3a3btA/wc8j/CFTIE4louXIM6jmIb+q8kISBscxhQgIgCsjmJrXxs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736813229; c=relaxed/simple;
-	bh=NQ+8DRtiyyq2CQ4DSIvmBSfGnbyi+Hnp8OBhHM7xuXs=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=U7BTb+/vK7HgunHP2XpUyUo+38CyCz9ntbgpejebgnou09ig4R4L8t0gTcs0xORKJP8AJbEjmReHpwWQ4X1Aby7l7MW6XQN3vwnOg6dv8BebdIHsy9z9ICwNwNN91kvsMtbjpVWLTEdut66/IfzLSVDQMnArHyDJcwBBrBuLp0M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IB5O6oPR; arc=none smtp.client-ip=209.85.214.169
+	s=arc-20240116; t=1736813231; c=relaxed/simple;
+	bh=jDz1AqHy9kVmzlLThGksZio6MPDBnKohThpfVT77dtY=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=tGFzfHzEvYd8zXWwQlOCTdKaKi/cYY/jhJLXywhuuF30GtbHAuUGnfGquKud2C5hG7YQahfYayrtwSbD/fMH870Oxh6ZNEl9v4QtOh1MsXX4jeI0HaBicIy1qpqEX5BG2YQz4Tv5bAHteFZvsjzbTc3XP+/7txGb9K7xNwrm2VM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RdwrA5Ix; arc=none smtp.client-ip=209.85.214.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-21631789fcdso74486765ad.1;
-        Mon, 13 Jan 2025 16:07:07 -0800 (PST)
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-21669fd5c7cso87870725ad.3;
+        Mon, 13 Jan 2025 16:07:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736813226; x=1737418026; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=ImyW9GEO4TLqoyiL4yNNlcnjnBG615AP7taZqEjFzEc=;
-        b=IB5O6oPRKUYfDKRcVl7JGNfecw5oChTss+3zXhxDLwRHluQMYuYeDiTrQuvkKFhDUI
-         BiVpMtRSet66MAJ4PKBk97pThWNlGtfQsLP4f8tzUG+Pg8bZIf3uPaa6WTELxXclmfnp
-         LGeeL8UWe1+4Q6Nr7vTz9CE7DimMAW6llLQgmeg2OmNIXu13/ZYhwaxmUJXn9SnouVGs
-         fXPFYm4EdiJ+StUWSE/zsqVI/TUL+ivJIop8ulqHNyAjxnA1U6e99mxnfOUZRMR5uLgp
-         XSQXu2C3waKOlJsCiSozZJE0GnmUfLMlImrjk7Th/BgrdzgpaLPZmmyQIQvzEddCEGfN
-         A+OA==
+        d=gmail.com; s=20230601; t=1736813228; x=1737418028; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=UqinG5bc4R8mduD4J0r80sXRxbkZhRD0K6VLj/i18Zs=;
+        b=RdwrA5Ix7Rv7l59ohC5fyKyxPAtWSHWREjFuAkX/eagi8SbVLt+S5aAtGJZDPGZY/5
+         NX7JnShYpdKg49jyYdo/3hlNa0wfUbAKkHN/kBD5CDa1fW8SrCuu5ginzYLqu/f++0Dm
+         Vfwv8WlSOgyRo0amZCjyyrNeizN7IOgElnMM9j6qoPj8zieNG0pj/ocDJgFcCfQ7poS6
+         ZPaK417ExkZAz+0gAOw49v4BQX3eQ51kbFYoGXkJCQ+kdhXd6Cji7AzyxKjEbs4z/nL7
+         5PLsQHOIr4YoGbM5kg37nKPW77iBlAjwN/ouVWkOTbItkILH6Fpyg4WxR8W2lrZ1BXxY
+         G4NQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736813226; x=1737418026;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ImyW9GEO4TLqoyiL4yNNlcnjnBG615AP7taZqEjFzEc=;
-        b=rcqWOmy9dEvpsRk9f65s0O3RBJjh18JJvXfvj1oMuMa7HuvgQNptCi/LQt24peDdru
-         hWBD9dr8Nw7z7K9itvnoiSc4676eeeyvulol+GtlSt9sPjDaK0BkWV+zXdYqSBHdBzuW
-         Q+m9+T+om0so+uVndr8489NWdXqczY8Pq7ARDKdI1ywlVPuEegCs8kAqZDt5++YIdIyo
-         hYAH4SmJTAZsh7QVYZ6xaABv0F0x1dz/BKOz46u0TmFBqvS6hlszFvuvlTxfZAtlRKkq
-         Rf4TiH64BmqyVTL14PsBiShni+HaZm9F6U1o6gW4lPt5aixHK9v3Booi0VlWArs1+eOp
-         HmOQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWRLAehJEmAu67AlLf5hexfumIL+TKY0kso7RAeY5BBm7fCJ+6Z5VxXf0uiYQ2BdNA7EgeevcoJhZEo66YB@vger.kernel.org, AJvYcCXvVBLt7zXJoDcelyLENR0zWrJwi5A1iZqkZqF+93VTkZlLBbjt3gkWGUEWdctgGeRm4YrkNqkG8xZ9NA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzBR2u36ihHIASxXAwSq6rzKPvrICCWizI2/aL0Fn7XnKSDI5jH
-	U0XRJtBHk03mnAcgTxNDmouLBcq0M7+mbz8SaD2JMguOI0R0gS/k5qw2kNX1InY=
-X-Gm-Gg: ASbGncv5+sgBIbqhIDMGXi1GlWi55LPUzsyuVVMADmGoC7WXdxvWlzIjFfGtM5/Q7IU
-	xZfa0UI68z9IPB421kG2SrL7wauo1Zd/S0tTHh0RRESXkf/ByUsRT/2WDlyH+o7jFiIDS1Fy5zO
-	4f9O0WfFr1Sc5q7MMRNveDRZxz1s7yWp7oacy0+zFxi93gBX/ife0j8mNSF80GwoBpQDvdwj6nL
-	vx6BmXkOmAvERh+KPvOQlFrH7qHiMfXsNsYhbVT/V0LjEjcjzuQlZM=
-X-Google-Smtp-Source: AGHT+IGWc7Z2AAsRONkqLBa0Ng1MSRzuG9BJPo4NBLRGnsrLF3Fh0nJ/wDanFL+vpKld+SYgOFm5Yg==
-X-Received: by 2002:a05:6a00:392a:b0:725:d64c:f122 with SMTP id d2e1a72fcca58-72d30303802mr27864997b3a.2.1736813226468;
-        Mon, 13 Jan 2025 16:07:06 -0800 (PST)
-Received: from localhost ([2a03:2880:ff:11::])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72d405493acsm6382475b3a.28.2025.01.13.16.07.05
+        d=1e100.net; s=20230601; t=1736813228; x=1737418028;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=UqinG5bc4R8mduD4J0r80sXRxbkZhRD0K6VLj/i18Zs=;
+        b=mSLBMin0UqtSW13lnOKdAkPpDMXi++ac0TRMGhS7TdssaMG0vXsT5B1u50LuCr7qzr
+         SAJgW9keeVYYBGOCQx17ALGkQ4SNe2gbGLnL32zGLwdTTrwdcSOinAqNJfhDjkMHTZes
+         Rm6mQeDv3wGnBCPR2Vv5CZ/osVUHQUlYJzOcD86ltOgv3RHGGyVP5m0esoiVM1t+pOoc
+         pDQP9RXWHKJR8yKaoBrA5KB3ffjbDS75bsktzk0+vX0SE7z7nZGMx46VMQ6JXMd0OYM8
+         mwcc+LXr2FKfrQ9mFMcjretNdqCXPVUd7uO8q8LiaFXpFOqdyF9vkmQa2Yg8ZRkApK/G
+         0DMw==
+X-Forwarded-Encrypted: i=1; AJvYcCUZM28IfgveX5o/z1Xuk7CdDeAc6eVVvioD4YiZe1ot5yiy0/5b5TgC81b6LlUulzOn6mHN+YXu0JGhCQ==@vger.kernel.org, AJvYcCXfUDtP7XywF0XB7ByrBu1oODL/2SHreeRk0uP9dDeOuPjP48xMuVgC2JkOOBgXrOJ+In7BrLoNJm+oV87D@vger.kernel.org
+X-Gm-Message-State: AOJu0YzJbFO3qrrFUu4Vn7Qkd9y6sgEPdMM8cc6ngfU6lLCWaov+4hkq
+	RZ0SGEcpCqErrwoQ0rXU6SlGxtpzaJIhYOy/aulECWWaXXGW8z0hWBh2QeN6F50=
+X-Gm-Gg: ASbGncsqblLj0MoGR7eyKGMs68dV+2w+I+Tn3ugSb6Y1g8/Sejd1xEeNxFzZFCG5gni
+	WYBhYGCYl3NSo97h7q90B8zJcOBrCCtHATrGVdNM/ntlNyvWqmRtL4hhuta0dtbaGfEzHPZh9rm
+	kN/79n1undBa/fFEL4l6nh8nkLLg+z20Jlsmn/khfvhlWOr7p8xR6UbxFPBz3PsVUKIyOWSgW01
+	V5uLbhzQa+2Cui5lNjs57CDunkQW6T1UA6GjCipZ4nfKWy6z9n2JuU=
+X-Google-Smtp-Source: AGHT+IH9zalTXeJ5JjdVaMZ5kxZTumblylYHR0fnxBZeWPJquezB/aW+7gRC0IReJeHb2JcssgwZ2g==
+X-Received: by 2002:a05:6a20:2453:b0:1e1:9662:a6f2 with SMTP id adf61e73a8af0-1e88d0bffe4mr41203169637.35.1736813227661;
+        Mon, 13 Jan 2025 16:07:07 -0800 (PST)
+Received: from localhost ([2a03:2880:ff:4a::])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72d406a5a32sm6717682b3a.173.2025.01.13.16.07.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 Jan 2025 16:07:06 -0800 (PST)
+        Mon, 13 Jan 2025 16:07:07 -0800 (PST)
 From: Sanman Pradhan <sanman.p211993@gmail.com>
 To: netdev@vger.kernel.org
 Cc: alexanderduyck@fb.com,
@@ -89,10 +91,12 @@ Cc: alexanderduyck@fb.com,
 	linux-hwmon@vger.kernel.org,
 	sanmanpradhan@meta.com,
 	sanman.p211993@gmail.com
-Subject: [PATCH net-next 0/3] eth: fbnic: Add hardware monitoring support
-Date: Mon, 13 Jan 2025 16:07:02 -0800
-Message-ID: <20250114000705.2081288-1-sanman.p211993@gmail.com>
+Subject: [PATCH net-next 1/3] eth: fbnic: hwmon: Add completion infrastructure for firmware requests
+Date: Mon, 13 Jan 2025 16:07:03 -0800
+Message-ID: <20250114000705.2081288-2-sanman.p211993@gmail.com>
 X-Mailer: git-send-email 2.43.5
+In-Reply-To: <20250114000705.2081288-1-sanman.p211993@gmail.com>
+References: <20250114000705.2081288-1-sanman.p211993@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -101,47 +105,157 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This patch series adds hardware monitoring support to the fbnic driver.
-It implements support for reading temperature and voltage sensors via
-firmware requests, and exposes this data through the HWMON interface.
+Add infrastructure to support firmware request/response handling with
+completions. Add a completion structure to track message state including
+message type for matching, completion for waiting for response, and
+result for error propagation. Use existing spinlock to protect the writes.
+The data from the various response types will be added to the "union u"
+by subsequent commits.
 
-The series is structured as follows:
+Signed-off-by: Sanman Pradhan <sanman.p211993@gmail.com>
+---
+ drivers/net/ethernet/meta/fbnic/fbnic.h    |  1 +
+ drivers/net/ethernet/meta/fbnic/fbnic_fw.c | 79 ++++++++++++++++++++++
+ drivers/net/ethernet/meta/fbnic/fbnic_fw.h | 13 ++++
+ 3 files changed, 93 insertions(+)
 
-Patch 1: Adds completion infrastructure for firmware requests
-Patch 2: Implements TSENE sensor message handling
-Patch 3: Adds HWMON interface support
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic.h b/drivers/net/ethernet/meta/fbnic/fbnic.h
+index 50f97f5399ff..ad8ac5ac7be9 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic.h
++++ b/drivers/net/ethernet/meta/fbnic/fbnic.h
+@@ -41,6 +41,7 @@ struct fbnic_dev {
 
-Output:
-$ ls -l /sys/class/hwmon/hwmon1/
-total 0
-lrwxrwxrwx 1 root root    0 Sep 10 00:00 device -> ../../../0000:01:00.0
--r--r--r-- 1 root root 4096 Sep 10 00:00 in0_input
--r--r--r-- 1 root root 4096 Sep 10 00:00 name
-lrwxrwxrwx 1 root root    0 Sep 10 00:00 subsystem -> ../../../../../../class/hwmon
--r--r--r-- 1 root root 4096 Sep 10 00:00 temp1_input
--rw-r--r-- 1 root root 4096 Sep 10 00:00 uevent
-$ cat /sys/class/hwmon/hwmon1/temp1_input
-40480
-$ cat /sys/class/hwmon/hwmon1/in0_input
-750
+ 	struct fbnic_fw_mbx mbx[FBNIC_IPC_MBX_INDICES];
+ 	struct fbnic_fw_cap fw_cap;
++	struct fbnic_fw_completion *cmpl_data;
+ 	/* Lock protecting Tx Mailbox queue to prevent possible races */
+ 	spinlock_t fw_tx_lock;
 
-Sanman Pradhan (3):
-  eth: fbnic: hwmon: Add completion infrastructure for firmware requests
-  eth: fbnic: hwmon: Add support for reading temperature and voltage
-    sensors
-  eth: fbnic: Add hardware monitoring support via HWMON interface
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_fw.c b/drivers/net/ethernet/meta/fbnic/fbnic_fw.c
+index 8f7a2a19ddf8..320615a122e4 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic_fw.c
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_fw.c
+@@ -228,6 +228,63 @@ static void fbnic_mbx_process_tx_msgs(struct fbnic_dev *fbd)
+ 	tx_mbx->head = head;
+ }
 
- drivers/net/ethernet/meta/fbnic/Makefile      |   1 +
- drivers/net/ethernet/meta/fbnic/fbnic.h       |   5 +
- drivers/net/ethernet/meta/fbnic/fbnic_fw.c    | 154 ++++++++++++++++++
- drivers/net/ethernet/meta/fbnic/fbnic_fw.h    |  28 ++++
- drivers/net/ethernet/meta/fbnic/fbnic_hwmon.c |  80 +++++++++
- drivers/net/ethernet/meta/fbnic/fbnic_mac.c   |  72 ++++++++
- drivers/net/ethernet/meta/fbnic/fbnic_mac.h   |   7 +
- drivers/net/ethernet/meta/fbnic/fbnic_pci.c   |   3 +
- 8 files changed, 350 insertions(+)
- create mode 100644 drivers/net/ethernet/meta/fbnic/fbnic_hwmon.c
++static __maybe_unused int fbnic_mbx_map_req_w_cmpl(struct fbnic_dev *fbd,
++						   struct fbnic_tlv_msg *msg,
++						   struct fbnic_fw_completion *cmpl_data)
++{
++	unsigned long flags;
++	int err;
++
++	spin_lock_irqsave(&fbd->fw_tx_lock, flags);
++
++	/* If we are already waiting on a completion then abort */
++	if (cmpl_data && fbd->cmpl_data) {
++		err = -EBUSY;
++		goto unlock_mbx;
++	}
++
++	/* Record completion location and submit request */
++	if (cmpl_data)
++		fbd->cmpl_data = cmpl_data;
++
++	err = fbnic_mbx_map_msg(fbd, FBNIC_IPC_MBX_TX_IDX, msg,
++				le16_to_cpu(msg->hdr.len) * sizeof(u32), 1);
++
++	/* If msg failed then clear completion data for next caller */
++	if (err && cmpl_data)
++		fbd->cmpl_data = NULL;
++
++unlock_mbx:
++	spin_unlock_irqrestore(&fbd->fw_tx_lock, flags);
++
++	return err;
++}
++
++static void fbnic_fw_release_cmpl_data(struct kref *kref)
++{
++	struct fbnic_fw_completion *cmpl_data;
++
++	cmpl_data = container_of(kref, struct fbnic_fw_completion,
++				 ref_count);
++	kfree(cmpl_data);
++}
++
++static __maybe_unused struct fbnic_fw_completion *
++fbnic_fw_get_cmpl_by_type(struct fbnic_dev *fbd, u32 msg_type)
++{
++	struct fbnic_fw_completion *cmpl_data = NULL;
++	unsigned long flags;
++
++	spin_lock_irqsave(&fbd->fw_tx_lock, flags);
++	if (fbd->cmpl_data && fbd->cmpl_data->msg_type == msg_type) {
++		cmpl_data = fbd->cmpl_data;
++		kref_get(&fbd->cmpl_data->ref_count);
++	}
++	spin_unlock_irqrestore(&fbd->fw_tx_lock, flags);
++
++	return cmpl_data;
++}
++
+ /**
+  * fbnic_fw_xmit_simple_msg - Transmit a simple single TLV message w/o data
+  * @fbd: FBNIC device structure
+@@ -802,3 +859,25 @@ void fbnic_get_fw_ver_commit_str(struct fbnic_dev *fbd, char *fw_version,
+ 	fbnic_mk_full_fw_ver_str(mgmt->version, delim, mgmt->commit,
+ 				 fw_version, str_sz);
+ }
++
++void fbnic_fw_init_cmpl(struct fbnic_fw_completion *fw_cmpl,
++			u32 msg_type)
++{
++	fw_cmpl->msg_type = msg_type;
++	init_completion(&fw_cmpl->done);
++	kref_init(&fw_cmpl->ref_count);
++}
++
++void fbnic_fw_clear_compl(struct fbnic_dev *fbd)
++{
++	unsigned long flags;
++
++	spin_lock_irqsave(&fbd->fw_tx_lock, flags);
++	fbd->cmpl_data = NULL;
++	spin_unlock_irqrestore(&fbd->fw_tx_lock, flags);
++}
++
++void fbnic_fw_put_cmpl(struct fbnic_fw_completion *fw_cmpl)
++{
++	kref_put(&fw_cmpl->ref_count, fbnic_fw_release_cmpl_data);
++}
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_fw.h b/drivers/net/ethernet/meta/fbnic/fbnic_fw.h
+index 221faf8c6756..ff304baade91 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic_fw.h
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_fw.h
+@@ -44,6 +44,15 @@ struct fbnic_fw_cap {
+ 	u8	link_fec;
+ };
 
++struct fbnic_fw_completion {
++	u32 msg_type;
++	struct completion done;
++	struct kref ref_count;
++	int result;
++	union {
++	} u;
++};
++
+ void fbnic_mbx_init(struct fbnic_dev *fbd);
+ void fbnic_mbx_clean(struct fbnic_dev *fbd);
+ void fbnic_mbx_poll(struct fbnic_dev *fbd);
+@@ -52,6 +61,10 @@ void fbnic_mbx_flush_tx(struct fbnic_dev *fbd);
+ int fbnic_fw_xmit_ownership_msg(struct fbnic_dev *fbd, bool take_ownership);
+ int fbnic_fw_init_heartbeat(struct fbnic_dev *fbd, bool poll);
+ void fbnic_fw_check_heartbeat(struct fbnic_dev *fbd);
++void fbnic_fw_init_cmpl(struct fbnic_fw_completion *cmpl_data,
++			u32 msg_type);
++void fbnic_fw_clear_compl(struct fbnic_dev *fbd);
++void fbnic_fw_put_cmpl(struct fbnic_fw_completion *cmpl_data);
+
+ #define fbnic_mk_full_fw_ver_str(_rev_id, _delim, _commit, _str, _str_sz) \
+ do {									\
 --
 2.43.5
 
