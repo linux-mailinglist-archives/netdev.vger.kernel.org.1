@@ -1,111 +1,197 @@
-Return-Path: <netdev+bounces-158134-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158135-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B90BDA108D9
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 15:14:49 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id F1832A108EB
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 15:17:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5EEA31884028
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 14:14:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 206E21884A88
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 14:17:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B75113E3F5;
-	Tue, 14 Jan 2025 14:14:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4AE27E105;
+	Tue, 14 Jan 2025 14:16:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UnPGRp3Z"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cohrFAPM"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E442A13D619;
-	Tue, 14 Jan 2025 14:14:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1ABA23244E
+	for <netdev@vger.kernel.org>; Tue, 14 Jan 2025 14:16:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736864084; cv=none; b=AVwCgd2xPwytt+n4taWBUsHpccMk8xdIbSZQTLta+pk2UK/VcthwUYsGHKgZDU92qHEGH5e9Bsn56Nz7r1hWhvafW6Z2YOzPsIlnoOZH1F+Ad/pnwgCqRMNTm29ddHhwgJgJAMWVixeMhWY/iJEpIlu/u8JOpwNb59Kld0pVo7Y=
+	t=1736864217; cv=none; b=OrKImeXu5FoPZE3wWJvH3JDwrjHvrvF453yShqzX1HHNR334FV2Og+CkqdPhCewOLgtWyAVj/3y0Q6TNu2dkcRTxWMUO8MnkW4mjxhteYGmSqJvXebSvF5wNiscsZKedk/0QScyoSbPG7JwDX9WrGOgJ9G/PI6Jafvez3yIgRJc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736864084; c=relaxed/simple;
-	bh=lVsjLtMr3iTOzVYmXmNqm0j3L/lDg64orY2BEiVHyGE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=H/DoNHIxidTbZiDDDeVttBFFZaP6Z9EW9O0Wofdk9AYLyaBpdjW6Gdl6FSQgv1SVeXPpOk8NQEOqjBUMFdIS5FQAPTQp0GBMX+bPqY8CO0EUamERMFmA2bKQiQiVubczATBPK7+8yLkOCqqUSjj1/Mohj8ETyTLaBalYwyfzwN4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UnPGRp3Z; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3EA3DC4CEDD;
-	Tue, 14 Jan 2025 14:14:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736864083;
-	bh=lVsjLtMr3iTOzVYmXmNqm0j3L/lDg64orY2BEiVHyGE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=UnPGRp3ZUaL518G+5mTsSKqMKXuPIvk2Pzod+WD3/vJMHgUcF/t66PSt+CJPgK1G6
-	 uUcQyMBgull816sX8XdcMjMEU/GG+6JvPoUu+ChEMjlAoGpssQMe8XChUc63CzmSzh
-	 qyxiNXLt1/AHuXo27LqFcLzB+1lnFYWeYkpvSy1jVg32GUvhl2d+nhdOMmzuoU8sa/
-	 hF21g/epss+fqa7iUbYjsqY6Vnyk11ghG9zNAvdYVMueC/GVyPlguvwi1ytCnI1Z4c
-	 oDpeSxNrWKePmdIW7w4O3UaY6zDf0EBDUL32q6R1i/V170Ay6nG87iLy/Irvz6yazl
-	 8ZpYBw8TDPWhw==
-Date: Tue, 14 Jan 2025 14:14:39 +0000
-From: Simon Horman <horms@kernel.org>
-To: Sean Anderson <sean.anderson@linux.dev>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
-	netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	Shannon Nelson <shannon.nelson@amd.com>,
-	Michal Simek <michal.simek@amd.com>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v3 5/6] net: xilinx: axienet: Get coalesce
- parameters from driver state
-Message-ID: <20250114141439.GH5497@kernel.org>
-References: <20250110192616.2075055-1-sean.anderson@linux.dev>
- <20250110192616.2075055-6-sean.anderson@linux.dev>
- <20250113173910.GF5497@kernel.org>
- <14d13d7e-ef1d-4dcc-bd18-7a6709616678@linux.dev>
+	s=arc-20240116; t=1736864217; c=relaxed/simple;
+	bh=5etmMSFaNroOZ0H16WZ8hvo9Fv0af24VNmWvvi7Z9PU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=GzNLWlMzolpeUryVQWA9Yfg1sILIZatuUhTbH79JClUxMBDOepKdIpHl7WERdoHifuslcAfTSdRB8FeBb9j2LuoZkru0KEJGtaP7hFCG47Q3hq0MF52Gs65DrowzasFh+pd3yHEae8cnOKdzEythRwyg3mlxXHIJdN+EdXYS9fw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cohrFAPM; arc=none smtp.client-ip=209.85.160.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-4678c9310afso187291cf.1
+        for <netdev@vger.kernel.org>; Tue, 14 Jan 2025 06:16:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1736864215; x=1737469015; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=iJjhO2/G8D7kaH4mvqN35RKWShRj2YA1s6DjrPp/blY=;
+        b=cohrFAPMEFr60BfHvEEGB6TIqw/UaqEK2D158wZLR/86nmYevWlnVXMRmyYdhRfP5i
+         fy/PH5BB+G1iiXQWHlr6tLTRxjaGr6Ku2EiM5pFVWGSUQ9BfcV59dFPgFtD3DgRSa/ej
+         jSdveArhi9SdZ4swoG9EibQs6ez1S0GEN4TWogr1BA8YqFvmruwF0RQ7drzs4frvfAVn
+         +iokMw7H3HBQ8+PMn2pHvifHEnUly7/XrwFv9ELw8hAOatb3qQ0G5/hGFWxfoF53aGj3
+         CvC0P1/V23CHT6eWZ5nDSjgqdpdZE6qcMgWxsbJFxHvZH0e+RVkYw+DdqMwfJxZxz99B
+         PmwQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736864215; x=1737469015;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=iJjhO2/G8D7kaH4mvqN35RKWShRj2YA1s6DjrPp/blY=;
+        b=Zjlf0wH95yIkBWBgParUkuTgvRSk/cqfPQzFue4ScNfBhBs1lEuE8tqlypISqPX74J
+         ywJjYV6e46P7JMaETFupYfeiXuRJbe66j2kzIxYTog0woww0ZjGb2goIdrXe3qvPgdeI
+         pFbZvW8+vyKVUsI26R2lSMdgGpmhwvnz/wfW+NPSdv6MWZTegOspj/8sgg7Y0EQLyR1d
+         gEUJip/v6pGnd2XlctILjzmKY/9oWJEG7bAh8pNSczMC8RXgLT9AhGNKr0j/0+4krI0a
+         EFrYVlzjaBaCvftUK2LOzDJs+VtV8ajwdfnva0JvKmjIJriYb9KQ2gIOKx3paMzY1gAC
+         w3Jw==
+X-Gm-Message-State: AOJu0YxCd/1oRzIrBJ9Q8nRHiev0BefXijXjiK0NO/k7R1OxDGaqqVUS
+	6b+IMFt/XPVwGwZpW7H/M6avDW2DA1GLMyDq8Aa0+STaEhbVzD6eql4PwK2Nso2sARei6T+KK36
+	LIvcoSZba28vW8pPTNmD2k8YHvNc1V2h5FKW1pCAyv5KFGfNcqjE/ee0=
+X-Gm-Gg: ASbGncvGxnnEwXdSVeoECT0BxQ7jnROIVe2qqF6b9x6mCYlt81o7MJANA1pPMnZCIHW
+	w8XlEh9nbBjdlBtQzo6hFlO0S+7k4nlEkB+iH1engGiiDvB99RJ4NZdF0NpdJHht8X+aN16o=
+X-Google-Smtp-Source: AGHT+IGoesQ9QFM9eK/F4CkTzeJv1wnpeqkSK8Ku1JwrEG7zr+Gj7O569HjpwNHxN6lbOC3OmnLuSJgGpSPZFznOnzw=
+X-Received: by 2002:ac8:5e07:0:b0:465:c590:ed18 with SMTP id
+ d75a77b69052e-46dea8f93c4mr2704861cf.9.1736864214578; Tue, 14 Jan 2025
+ 06:16:54 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <14d13d7e-ef1d-4dcc-bd18-7a6709616678@linux.dev>
+References: <20250114043131.2035-1-ma.arghavani.ref@yahoo.com> <20250114043131.2035-1-ma.arghavani@yahoo.com>
+In-Reply-To: <20250114043131.2035-1-ma.arghavani@yahoo.com>
+From: Neal Cardwell <ncardwell@google.com>
+Date: Tue, 14 Jan 2025 09:16:38 -0500
+X-Gm-Features: AbW1kvbVZkNuqLxxf64E8Iywv0eu1LOo3axhYRh01qq3JMksupmgIWwahPiecqg
+Message-ID: <CADVnQy=n8VvNONU74GqB9a8HbbPxGj-C3KO=nREEKrTf+p+hYg@mail.gmail.com>
+Subject: Re: [PATCH net] tcp_cubic: fix incorrect HyStart round start detection
+To: Mahdi Arghavani <ma.arghavani@yahoo.com>
+Cc: netdev@vger.kernel.org, edumazet@google.com, haibo.zhang@otago.ac.nz, 
+	david.eyers@otago.ac.nz, abbas.arghavani@mdu.se
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jan 13, 2025 at 12:45:24PM -0500, Sean Anderson wrote:
-> Hi Simon,
-> 
-> On 1/13/25 12:39, Simon Horman wrote:
-> > On Fri, Jan 10, 2025 at 02:26:15PM -0500, Sean Anderson wrote:
-> >> The cr variables now contain the same values as the control registers
-> >> themselves. Extract/calculate the values from the variables instead of
-> >> saving the user-specified values. This allows us to remove some
-> >> bookeeping, and also lets the user know what the actual coalesce
-> >> settings are.
-> >> 
-> >> Signed-off-by: Sean Anderson <sean.anderson@linux.dev>
-> >> Reviewed by: Shannon Nelson <shannon.nelson@amd.com>
-> > 
-> > Hi Sean,
-> > 
-> > Unfortunately this series does not appear to apply cleanly to net-next.
-> > Which is our CI is currently unable to cope with :(
-> > 
-> > Please consider rebasing and reposting.
-> 
-> As noted in the cover letter, this series depends on [1] (now [2]). It
-> will apply cleanly without rebasing once that patch is applied. So maybe
-> you can re-run the CI at that time.
+On Mon, Jan 13, 2025 at 11:31=E2=80=AFPM Mahdi Arghavani <ma.arghavani@yaho=
+o.com> wrote:
+>
+> I noticed that HyStart incorrectly marks the start of rounds,
+> resulting in inaccurate measurements of ACK train lengths.
+> Since HyStart relies on ACK train lengths as one of two thresholds
+> to terminate exponential cwnd growth during Slow-Start, this
+> inaccuracy renders that threshold ineffective, potentially degrading
+> TCP performance.
+>
+> The issue arises because the changes introduced in commit 4e1fddc98d25
+> ("tcp_cubic: fix spurious Hystart ACK train detections for not-cwnd-limit=
+ed flows")
+> moved the caller of the `bictcp_hystart_reset` function inside the `hysta=
+rt_update` function.
+> This modification added an additional condition for triggering the caller=
+,
+> requiring that (tcp_snd_cwnd(tp) >=3D hystart_low_window) must also
+> be satisfied before invoking `bictcp_hystart_reset`.
+>
+> This fix ensures that `bictcp_hystart_reset` is correctly called
+> at the start of a new round, regardless of the congestion window size.
+> This is achieved by moving the condition
+> (tcp_snd_cwnd(tp) >=3D hystart_low_window)
+> from before calling `bictcp_hystart_reset` to after it.
+>
+> Fixes: 4e1fddc98d25 ("tcp_cubic: fix spurious Hystart ACK train detection=
+s for not-cwnd-limited flows")
+>
+> Signed-off-by: Mahdi Arghavani <ma.arghavani@yahoo.com>
+> Cc: Neal Cardwell <ncardwell@google.com>
+> Cc: Eric Dumazet <edumazet@google.com>
+> Cc: Haibo Zhang <haibo.zhang@otago.ac.nz>
+> Cc: David Eyers <david.eyers@otago.ac.nz>
+> Cc: Abbas Arghavani <abbas.arghavani@mdu.se>
+> ---
 
-Thanks Sean,
+Thanks for the patch!
 
-Sorry that I did miss the dependencies.
+To comply with Linux commit description policy, please remove the
+empty line between the Fixes: footer and Signed-off-by footer, so
+tools and readers can be sure to correctly parse all the footers.
 
-Unfortunately we don't have a way to re-run the CI at this time,
-so it would probably be best to repost once the dependencies
-are present in net-next.
+Note that this page:
 
-> 
-> --Sean
-> 
-> [1] https://lore.kernel.org/netdev/20250110190726.2057790-1-sean.anderson@linux.dev/
-> [2] https://lore.kernel.org/netdev/20250113163001.2335235-1-sean.anderson@linux.dev
+https://patchwork.kernel.org/project/netdevbpf/patch/20250114043131.2035-1-=
+ma.arghavani@yahoo.com/
 
-...
+...highlights that issue in the "netdev/verify_fixesfailProblems with
+Fixes tag: 1" row:
+
+https://netdev.bots.linux.dev/static/nipa/925140/13938399/verify_fixes/summ=
+ary
+
+Commit: 08181a887689 ("tcp_cubic: fix incorrect HyStart round start detecti=
+on")
+Fixes tag: Fixes: 4e1fddc98d25 ("tcp_cubic: fix spurious Hystart ACK
+train detections for not-cwnd-limited flows")
+Has these problem(s):
+- empty lines surround the Fixes tag
+
+To help maintainers understand the relationship between your next post
+of the patch, and the current one, can you please use the following to
+apply a "v2" in your git format-patch command line:
+  --subject-prefix=3D'PATCH net v2'
+
+Also, can you please either (a) respond in the other email thread on
+this topic, attaching your updated packetdrill tests, or (b) post a
+pull request on the packetdrill github repo at
+https://github.com/google/packetdrill with your updated tests?
+
+thanks,
+neal
+
+
+>  net/ipv4/tcp_cubic.c | 8 +++++---
+>  1 file changed, 5 insertions(+), 3 deletions(-)
+>
+> diff --git a/net/ipv4/tcp_cubic.c b/net/ipv4/tcp_cubic.c
+> index 5dbed91c6178..76c23675ae50 100644
+> --- a/net/ipv4/tcp_cubic.c
+> +++ b/net/ipv4/tcp_cubic.c
+> @@ -392,6 +392,10 @@ static void hystart_update(struct sock *sk, u32 dela=
+y)
+>         if (after(tp->snd_una, ca->end_seq))
+>                 bictcp_hystart_reset(sk);
+>
+> +       /* hystart triggers when cwnd is larger than some threshold */
+> +       if (tcp_snd_cwnd(tp) < hystart_low_window)
+> +               return;
+> +
+>         if (hystart_detect & HYSTART_ACK_TRAIN) {
+>                 u32 now =3D bictcp_clock_us(sk);
+>
+> @@ -467,9 +471,7 @@ __bpf_kfunc static void cubictcp_acked(struct sock *s=
+k, const struct ack_sample
+>         if (ca->delay_min =3D=3D 0 || ca->delay_min > delay)
+>                 ca->delay_min =3D delay;
+>
+> -       /* hystart triggers when cwnd is larger than some threshold */
+> -       if (!ca->found && tcp_in_slow_start(tp) && hystart &&
+> -           tcp_snd_cwnd(tp) >=3D hystart_low_window)
+> +       if (!ca->found && tcp_in_slow_start(tp) && hystart)
+>                 hystart_update(sk, delay);
+>  }
+>
+> --
+> 2.45.2
+>
 
