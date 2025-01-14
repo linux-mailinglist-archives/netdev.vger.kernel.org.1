@@ -1,136 +1,142 @@
-Return-Path: <netdev+bounces-157941-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157942-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7783A0FE54
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 02:56:32 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 187CAA0FE59
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 02:58:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AF5191888D94
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 01:56:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 453471888DE6
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 01:58:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07B6D22FE02;
-	Tue, 14 Jan 2025 01:56:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3769A22FE08;
+	Tue, 14 Jan 2025 01:58:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H1GWAZIM"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="F+yGNX+E"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-170.mta0.migadu.com (out-170.mta0.migadu.com [91.218.175.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 441991C54A7;
-	Tue, 14 Jan 2025 01:56:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61B1C1EB2E
+	for <netdev@vger.kernel.org>; Tue, 14 Jan 2025 01:58:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736819787; cv=none; b=kPgPat3+BL3PyCj2P57GjiwIMh0+05MEpX0H0FC8yNdCdv083lHhFLH0H9UonkfgKSwF5WWAIUihA1cWvJv5XCaaYfq5xcN/R1tFAFSA1QDZonzQao+3gS7GvVeP9CqTHNIloBN8+W80GQEdus6peElDUhkRlX04LOpFf0vuqhw=
+	t=1736819908; cv=none; b=m00hDG8E9bcB2kwf7WiEL0sPUD52IKT9+HYBuRLtMVuP34zjbPlwOBGg6Swkz0XssAF5PczvgjlK8a4+18nwuDcEjDI4Er9k0/YfzijqM0JV0qiR4zyBenjuIdPTaiOB/5JNRvA87MxP0/nLdXp7u0DqcbaY50Tp3P7/r6tOlR4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736819787; c=relaxed/simple;
-	bh=3M3MZYN7Sj4EH0969yosQdu1K2pz/j995ISyaaDQTys=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=teQQ/I6ZyCwJ9jT1RntkKEUnBTKhrMOkp5Xib0yZyzy5SNun6xh2UxH1gLSMF6qN3Fq7bOug37NY/C+2LsLuu3WGuOO3KBp71an3TgxBlzWdRV65SStvvMmDB+uBXW39j4HPZGhenjtG4zF0LJcZszkBIcQLAWjpLGwB0KSNxno=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=H1GWAZIM; arc=none smtp.client-ip=209.85.218.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-aaee2c5ee6eso877676966b.1;
-        Mon, 13 Jan 2025 17:56:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736819784; x=1737424584; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3M3MZYN7Sj4EH0969yosQdu1K2pz/j995ISyaaDQTys=;
-        b=H1GWAZIM8ApVN7+RZRKxShcBionWOnK14hSw9DkIezviT/aJybZBkjpZjVa7yX7t9h
-         tcwkca+G/5CH9Nko343kOELNXghxeP29Urvy+NUsXww7GcV5k2xB1oKCI4XXjQPBE7Km
-         TN96xTKnZN4WRWhJDkGCQk6HIOQ7rOfSqsg3aSpQLgaBLkG+ZidJObGchU/KpgMlY89o
-         Q6s5v4tFUYilX4dzZCgS6XGbMjmmMZlp318kdrPDsmWoHBLv7/yR5wpC9yKPlk/kYJbm
-         jC9AnA3EAgD9N05/kaEglktNAhrMMaOP2A20e5/9g/gTwKHxbH6ouPT/3KU/fjt1pl9B
-         f/9w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736819784; x=1737424584;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=3M3MZYN7Sj4EH0969yosQdu1K2pz/j995ISyaaDQTys=;
-        b=TtFHAJNwlVD6QowI9Yu0z9l6fTtrQWsxPrOzYbUNWwBqGWvBEquWICjY95zAIzjB0l
-         eKIBvdqqWK4CGJlwGSeHqDoMe6fDYAmH9XdHFaLe/gIr4wnvSW4r7hfyaZopE12x0a1G
-         AzSv1KKiop2nRYVPgq2VQWSQStU6gUQUTGeX4DB66AwsDNxGk01hYLl53GGF39lbdEth
-         htWv71pMeP/tYED9k2YxWW4ZlTvHxq582bmcwDzjxPMVpeJVgq4LM8aA5SnGS27xp+Jr
-         SiWfv9Hw5Ltl5GB834XAQ/fB9nXznBOIATwmvHX+ItH+gNJObjl+9IofY+mShpW8YErP
-         mExw==
-X-Forwarded-Encrypted: i=1; AJvYcCUU4nl4HQ7DSPR+JffGOhHmdI+xLeL2YFNJC7sVaiE+IAlaUTCeSg7MSPqa8mfE7eiauI7NORDj@vger.kernel.org, AJvYcCUdZLXCZjGmpaa4AmEbv7RV9n49Jio8QZoGduR9nPaK1alK3XuSV0P4E4Ql9gGUgpELpwYUdEsarMORyqY=@vger.kernel.org, AJvYcCX8p3zpifK9qhr79ousEU4oGvaoW9/oMEI8xgQre8NSWViC7KUZizR1JlLLWGejgnutPzasMjmz@vger.kernel.org
-X-Gm-Message-State: AOJu0YwSm943TvcJUpQXW60bogsPjYJORaodySGKqTonLhp1ptOsWFrM
-	GENKR39MdSzs+WYkt4m2jw8s8bktyub0q8oJ21myMtZ/fllGt7a3E5SrB6J5PHkyt//08Ui6S9+
-	mJTUBnpkmS+Q3bkuQaidqQPh2ILeEzAkh
-X-Gm-Gg: ASbGncs/xxA+yagx+LItuqzh43DS86ZeoPKP0Vmac5LsNP9+yFOtdrgQupiYOhFlwA2
-	59TmwN+Dfp3jD4jiVGAZ91JYJ9PERq02SDZ58pwU=
-X-Google-Smtp-Source: AGHT+IGFRcQRHulYo39QzcVokskq7ULXOs64DOSqsgLEBDN8VNb4jyHVDzfe2oaia4l5+ro0WhqdfMZda9BrZzKd94g=
-X-Received: by 2002:a17:907:9722:b0:aa6:89b9:e9c6 with SMTP id
- a640c23a62f3a-ab2ab6bfa44mr2099934066b.21.1736819784335; Mon, 13 Jan 2025
- 17:56:24 -0800 (PST)
+	s=arc-20240116; t=1736819908; c=relaxed/simple;
+	bh=PFy9CgnBqqJNB/6aK4MKFrwZ+j/F3X6PjicIez+5qDI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=qxDlQAcLzBKzdKHNY1eQp0g8H/fVoa8AVXIzNgP5QUb9SLV0+c8YO34XZ+Eb9sFZ1iVMAD1nEgMbMIKNHAcp3VZzkQKqPY6AC8dIhSAnF041jUay7gqFOlH5aPS3dJoxS4pF4/dvthIYbzwNIJVtBpot2pDPSdsgtw61/k23BGg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=F+yGNX+E; arc=none smtp.client-ip=91.218.175.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <e48f70bd-bb2b-4443-bb76-1b3511700043@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1736819898;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=P1DH/dRPY0Nuv7rtnJpzenWYHpKBr5t8Ih4nWX4KnGc=;
+	b=F+yGNX+EtQuMGlvoRx0cEcpciJ9enfIt5EaNKn6B6+JuXPjh0SxIMd7/fpqz1spYD3oTjD
+	bNMwUbsGPaQhWVE2B9NdjxMqqkYWVpXNjOkeHWI0JGrv5g8zl3uQiSMWaYv+hOA5gqPcwp
+	X50P45HGDhNCF2i2HNQQY3B6FjCuqC0=
+Date: Tue, 14 Jan 2025 09:58:08 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250108192346.2646627-1-kuba@kernel.org> <20250109145054.30925-1-fercerpav@gmail.com>
- <20250109083311.20f5f802@kernel.org> <TYSPR04MB7868EA6003981521C1B2FDAB8E1C2@TYSPR04MB7868.apcprd04.prod.outlook.com>
- <20250110181841.61a5bb33@kernel.org> <CAGfYmwVECrisZMhWAddmnczcLqFfNZ2boNAD5=p2HHuOhLy75w@mail.gmail.com>
- <20250113131934.5566be67@kernel.org>
-In-Reply-To: <20250113131934.5566be67@kernel.org>
-From: Potin Lai <potin.lai.pt@gmail.com>
-Date: Tue, 14 Jan 2025 09:56:13 +0800
-X-Gm-Features: AbW1kvZnUmbmr_6IRQgW51L1dj6t_nP3oXmByqhN6P48o_UCS6Kh-2_Tv9RPFzM
-Message-ID: <CAGfYmwXKyWrWm5z1Lra0_wX8iVfT8p9BHd3SWZPSvkZ1qfKqLA@mail.gmail.com>
-Subject: =?UTF-8?B?UmU6IOWbnuimhjogW0V4dGVybmFsXSBSZTogW1BBVENIXSBuZXQvbmNzaTogZml4IGxvYw==?=
-	=?UTF-8?B?a2luZyBpbiBHZXQgTUFDIEFkZHJlc3MgaGFuZGxpbmc=?=
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Paul Fertser <fercerpav@gmail.com>, =?UTF-8?B?UG90aW4gTGFpICjos7Tmn4/lu7cgKQ==?= <Potin.Lai@quantatw.com>, 
-	Samuel Mendoza-Jonas <sam@mendozajonas.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Ivan Mikhaylov <fr0st61te@gmail.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-	"stable@vger.kernel.org" <stable@vger.kernel.org>, 
-	=?UTF-8?B?Q29zbW8gQ2hvdSAoIOWRqOalt+WfuSk=?= <Cosmo.Chou@quantatw.com>, 
-	"patrick@stwcx.xyz" <patrick@stwcx.xyz>, Cosmo Chou <chou.cosmo@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH net-next 5/5] net: stmmac: stm32: Use
+ syscon_regmap_lookup_by_phandle_args
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+ MD Danish Anwar <danishanwar@ti.com>, Roger Quadros <rogerq@kernel.org>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Jose Abreu <joabreu@synopsys.com>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>, Shawn Guo
+ <shawnguo@kernel.org>, Sascha Hauer <s.hauer@pengutronix.de>,
+ Pengutronix Kernel Team <kernel@pengutronix.de>,
+ Fabio Estevam <festevam@gmail.com>, linux-arm-kernel@lists.infradead.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com, imx@lists.linux.dev
+References: <20250112-syscon-phandle-args-net-v1-0-3423889935f7@linaro.org>
+ <20250112-syscon-phandle-args-net-v1-5-3423889935f7@linaro.org>
+ <5d97dd34-f293-4403-b605-c0ae7b5490fd@linux.dev>
+ <c4714984-8250-4bf2-9ac1-5a9204d3aca8@lunn.ch>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Yanteng Si <si.yanteng@linux.dev>
+In-Reply-To: <c4714984-8250-4bf2-9ac1-5a9204d3aca8@lunn.ch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, Jan 14, 2025 at 5:19=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Sat, 11 Jan 2025 19:12:51 +0800 Potin Lai wrote:
-> > > > Thanks for the new patch.
-> > > > I am currently tied up with other tasks, but I=E2=80=99ll make sure=
- to test
-> > > > it as soon as possible and share the results with you.
-> > >
-> > > Understood, would you be able to test it by January 13th?
-> > > Depending on how long we need to wait we may be better off
-> > > applying the patch already or waiting with committing..
-> >
-> > Hi Jakub & Paul,
-> >
-> > I had a test yesterday, the patch is working and the kernel panic does
-> > not happen any more, but we notice sometimes the config_apply_mac
-> > state runs before the gma command is handled.
-> >
-> > Cosmo helped me to find a potential state handling issue, and I
-> > submitted the v2 version.
-> > Please kindly have a look at v2 version with the link below.
-> > v2: https://lore.kernel.org/all/20250111-fix-ncsi-mac-v2-0-838e0a1a233a=
-@gmail.com/
->
-> Is there any reason why you reposted Paul's patch?
-> Patch 2 looks like a fix for a separate issue (but for the same
-> use case), am I wrong?
-Sorry, I thought the second patch needs to be followed by the first patch.
-Yes, these 2 patches are fixing different issues, I will remove Paul's
-patch in the next version (v3).
 
->
-> Also one thing you have not done is to provide the Tested-by: tag
-> on Paul's patch :)
 
-Tested-by: Potin Lai <potin.lai.pt@gmail.com>
+
+在 2025/1/14 01:01, Andrew Lunn 写道:
+> On Mon, Jan 13, 2025 at 04:05:13PM +0800, Yanteng Si wrote:
+>> 在 2025/1/12 21:32, Krzysztof Kozlowski 写道:
+>>> Use syscon_regmap_lookup_by_phandle_args() which is a wrapper over
+>>> syscon_regmap_lookup_by_phandle() combined with getting the syscon
+>>> argument.  Except simpler code this annotates within one line that given
+>>> phandle has arguments, so grepping for code would be easier.
+>>>
+>>> There is also no real benefit in printing errors on missing syscon
+>>> argument, because this is done just too late: runtime check on
+>>> static/build-time data.  Dtschema and Devicetree bindings offer the
+>>> static/build-time check for this already.
+>>>
+>>> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+>>> ---
+>>>    drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c | 9 ++-------
+>>>    1 file changed, 2 insertions(+), 7 deletions(-)
+>>>
+>>> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c
+>>> index 1e8bac665cc9bc95c3aa96e87a8e95d9c63ba8e1..1fcb74e9e3ffacdc7581b267febb55d015a83aed 100644
+>>> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c
+>>> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c
+>>> @@ -419,16 +419,11 @@ static int stm32_dwmac_parse_data(struct stm32_dwmac *dwmac,
+>>>    	}
+>>>    	/* Get mode register */
+>>> -	dwmac->regmap = syscon_regmap_lookup_by_phandle(np, "st,syscon");
+>>> +	dwmac->regmap = syscon_regmap_lookup_by_phandle_args(np, "st,syscon",
+>>> +							     1, &dwmac->mode_reg);
+>> The network subsystem still requires that the length of
+>> each line of code should not exceed 80 characters.
+>> So, let's silence the warning:
+>>
+>> WARNING: line length of 83 exceeds 80 columns
+>> #33: FILE: drivers/net/ethernet/stmicro/stmmac/dwmac-imx.c:307:
+>> +							     &dwmac->intf_reg_off);
+> checkpatch should be considered a guide, not a strict conformance
+> tool. You often need to look at its output and consider does what it
+> suggest really make the code better? In this case, i would disagree
+> with checkpatch and allow this code.
+>
+> If the code had all been on one long line, then i would suggest to
+> wrap it. But as it is, it keeps with the spirit of 80 characters, even
+> if it is technically not.
+Oh, I got it! Thanks for explaining. You cleared up my confusion.
+
+I made those comments based on my past experience. Actually, I
+hesitated for ages before hitting the send button. I couldn't
+figure out a better way other than refactoring the function.
+I guess I might have come across as a bit unreasonable. But
+now I understand the reasoning behind the ‘80 - character’
+thing. I'll be more confident when dealing with this kind
+of situation in the future.
+
+
+Thanks，
+Yanteng
+
+> 	Andrew
+
 
