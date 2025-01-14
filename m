@@ -1,115 +1,129 @@
-Return-Path: <netdev+bounces-158021-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158028-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D53AA101D4
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 09:14:19 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4BE99A10219
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 09:33:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 27DF13A7536
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 08:14:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7A83418859AD
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 08:34:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EBD12500C3;
-	Tue, 14 Jan 2025 08:14:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AAF9246327;
+	Tue, 14 Jan 2025 08:33:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="PPdB/VNL"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mUaNKl7k"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-6001.amazon.com (smtp-fw-6001.amazon.com [52.95.48.154])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B22342500C8
-	for <netdev@vger.kernel.org>; Tue, 14 Jan 2025 08:14:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.48.154
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D10BE24024E;
+	Tue, 14 Jan 2025 08:33:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736842455; cv=none; b=gE4lIiR/0P+LfrDYHP9Ht7qQdQCKQklmajYXDEMafcqko6WQ17S3+iPLpJHQI3Du3sZXUzp8pWspavz+w2mSPRHM85kIh7yeJbrEMxnyKB7XvtOS9X+4Renu+ftUCBdqUeogdGLzjS6tVhcM9Pt9Cw6JNK4d2VYRCFBfsmtTAi0=
+	t=1736843634; cv=none; b=NmDGbX1O12wCbOsGvwjy4qprGdOQ8rZb/U1aiZohh9VL+MJwnkQiQTd2uPyn9QH4nfE+rxZD5XUMo4fLSi4Piba+ug21fvbCXtn2sEH8GeRu9itb8OMkypGNuQeG/7QWN/XaE77HTPzmsjzk47aDm4T5V5igXiaddw2zv895HUE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736842455; c=relaxed/simple;
-	bh=QoCdRlCUyzkAPnuiLvluoUZrJph8le4qX279QshU7Jo=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Ef/jwbqXljaixKWDqPIfMKqaAjh18emcDNN80v9sf/AG7OnThQs5V4EfH35LJgsFrb99rgTRYsmlH6/axTsCQKXQrB6tEzVTdp0cnxyaG/Q1bobhGBkm53lAr27EMrx9HONlgBu8e7vqy87GeuObVDcI/DR+78rnM4ZKKLoBa8Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=PPdB/VNL; arc=none smtp.client-ip=52.95.48.154
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1736842454; x=1768378454;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=lf/QlJkTcHOKSledkrOyDbAVS6vKRGaDlVYqVjWTuqs=;
-  b=PPdB/VNLTKMov3w5AUH84rSnxJ18WDh9AUhokjsjLlBLedtNjXcyoaTi
-   nDMjB0O+l1+cE0Jos8R1skOs/5I0rcw0qpAzqha++j592vxNoS0CkPH4+
-   4fq7Ngd0iD5EuZ1XnPvo48GpIFMUUMM6T/vssIlPYq288GeYH58vGMcLH
-   M=;
-X-IronPort-AV: E=Sophos;i="6.12,313,1728950400"; 
-   d="scan'208";a="454038485"
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.2])
-  by smtp-border-fw-6001.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jan 2025 08:14:12 +0000
-Received: from EX19MTAUWA001.ant.amazon.com [10.0.38.20:27829]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.58.70:2525] with esmtp (Farcaster)
- id 054f0fa6-67f0-48f8-b59d-98e4564abf55; Tue, 14 Jan 2025 08:14:11 +0000 (UTC)
-X-Farcaster-Flow-ID: 054f0fa6-67f0-48f8-b59d-98e4564abf55
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA001.ant.amazon.com (10.250.64.217) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Tue, 14 Jan 2025 08:14:05 +0000
-Received: from 6c7e67c6786f.amazon.com (10.119.11.99) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Tue, 14 Jan 2025 08:14:01 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>
-CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
-	<kuni1840@gmail.com>, <netdev@vger.kernel.org>
-Subject: [PATCH v1 net-next] net: loopback: Hold rtnl_net_lock() in blackhole_netdev_init().
-Date: Tue, 14 Jan 2025 17:13:52 +0900
-Message-ID: <20250114081352.47404-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+	s=arc-20240116; t=1736843634; c=relaxed/simple;
+	bh=mRyUb7Ff3YbSTGrXqXvusDymcKq6lNrGUWgRP1Fzq24=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lW08KlVwZcAtGMQCZ5lRX98e5zqTz/ev02cdo2EkAiW4qYVNHAarv7kzgMQCCUZn8A0sffFgFPB2WFaSjqM9oGGJj+KNcIHkKBJY3HNzuk2bLmECbzUWgv+hgVWklm9VtvdLKsFeNK1CjBcuP8vGQlgPt7qSH5+ibC8O4ud+rMI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mUaNKl7k; arc=none smtp.client-ip=198.175.65.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1736843633; x=1768379633;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=mRyUb7Ff3YbSTGrXqXvusDymcKq6lNrGUWgRP1Fzq24=;
+  b=mUaNKl7knXifi1G5gJhXgG6aQZouAv+noTuUUU/y8Ragl0Hm7TEUSfg5
+   PLDoWKEs8v2HDb4z2IBmgRcqv53KoWjYQlBKSdk5IPK+rsM0UseBhJNvH
+   OAIfEc26NNHsaehDdPXZfgMTUKaDe7oBBtf4RvY3tYoUyjlDtIUyzraqL
+   ZLR1/+G7NSB61oz0ejphkJ3Z8RoOisgsQQDjvyMGYC3Ec/ej09iqxNqLV
+   HW+yPG7ebFbPauKEvMB/6yF/Gg1PMHxc/U/kpqwp1vhpRU4EygYk1S7FN
+   +BRNIEH43RovY2rKLE3+ki1eC7V/Sl50kmoQfLL8tq6DhLFi3UQ9IQaBn
+   A==;
+X-CSE-ConnectionGUID: gTjQABmZRb27FtGtvzNCoQ==
+X-CSE-MsgGUID: IaIFEfb/QPm2hle2J8CyKg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11314"; a="40809258"
+X-IronPort-AV: E=Sophos;i="6.12,313,1728975600"; 
+   d="scan'208";a="40809258"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jan 2025 00:33:52 -0800
+X-CSE-ConnectionGUID: r+EGSRCgTzCXktYzbJkyLA==
+X-CSE-MsgGUID: mkq+NfL7R+Kq8q7XwvNfyA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,313,1728975600"; 
+   d="scan'208";a="104909414"
+Received: from mev-dev.igk.intel.com ([10.237.112.144])
+  by fmviesa008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jan 2025 00:33:48 -0800
+Date: Tue, 14 Jan 2025 09:30:29 +0100
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+To: Sanman Pradhan <sanman.p211993@gmail.com>
+Cc: netdev@vger.kernel.org, alexanderduyck@fb.com, kuba@kernel.org,
+	kernel-team@meta.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, pabeni@redhat.com,
+	kalesh-anakkur.purayil@broadcom.com, linux@roeck-us.net,
+	mohsin.bashr@gmail.com, jdelvare@suse.com, horms@kernel.org,
+	suhui@nfschina.com, linux-kernel@vger.kernel.org,
+	vadim.fedorenko@linux.dev, linux-hwmon@vger.kernel.org,
+	sanmanpradhan@meta.com
+Subject: Re: [PATCH net-next 1/3] eth: fbnic: hwmon: Add completion
+ infrastructure for firmware requests
+Message-ID: <Z4YgpZ+QgV6w7BYR@mev-dev.igk.intel.com>
+References: <20250114000705.2081288-1-sanman.p211993@gmail.com>
+ <20250114000705.2081288-2-sanman.p211993@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D041UWB003.ant.amazon.com (10.13.139.176) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250114000705.2081288-2-sanman.p211993@gmail.com>
 
-blackhole_netdev is the global device in init_net.
+On Mon, Jan 13, 2025 at 04:07:03PM -0800, Sanman Pradhan wrote:
+> Add infrastructure to support firmware request/response handling with
+> completions. Add a completion structure to track message state including
+> message type for matching, completion for waiting for response, and
+> result for error propagation. Use existing spinlock to protect the writes.
+> The data from the various response types will be added to the "union u"
+> by subsequent commits.
+> 
+> Signed-off-by: Sanman Pradhan <sanman.p211993@gmail.com>
+> ---
+>  drivers/net/ethernet/meta/fbnic/fbnic.h    |  1 +
+>  drivers/net/ethernet/meta/fbnic/fbnic_fw.c | 79 ++++++++++++++++++++++
+>  drivers/net/ethernet/meta/fbnic/fbnic_fw.h | 13 ++++
+>  3 files changed, 93 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/meta/fbnic/fbnic.h b/drivers/net/ethernet/meta/fbnic/fbnic.h
+> index 50f97f5399ff..ad8ac5ac7be9 100644
+> --- a/drivers/net/ethernet/meta/fbnic/fbnic.h
+> +++ b/drivers/net/ethernet/meta/fbnic/fbnic.h
+> @@ -41,6 +41,7 @@ struct fbnic_dev {
+> 
+>  	struct fbnic_fw_mbx mbx[FBNIC_IPC_MBX_INDICES];
+>  	struct fbnic_fw_cap fw_cap;
+> +	struct fbnic_fw_completion *cmpl_data;
+>  	/* Lock protecting Tx Mailbox queue to prevent possible races */
+>  	spinlock_t fw_tx_lock;
+> 
+> diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_fw.c b/drivers/net/ethernet/meta/fbnic/fbnic_fw.c
+> index 8f7a2a19ddf8..320615a122e4 100644
+> --- a/drivers/net/ethernet/meta/fbnic/fbnic_fw.c
+> +++ b/drivers/net/ethernet/meta/fbnic/fbnic_fw.c
+> @@ -228,6 +228,63 @@ static void fbnic_mbx_process_tx_msgs(struct fbnic_dev *fbd)
+>  	tx_mbx->head = head;
+>  }
+> 
 
-Let's hold rtnl_net_lock(&init_net) in blackhole_netdev_init().
+[...]
 
-While at it, the unnecessary dev_net_set() call is removed, which
-is done in alloc_netdev_mqs().
+Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 
-Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
----
- drivers/net/loopback.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/net/loopback.c b/drivers/net/loopback.c
-index 1993b90b1a5f..c8840c3b9a1b 100644
---- a/drivers/net/loopback.c
-+++ b/drivers/net/loopback.c
-@@ -264,13 +264,12 @@ static int __init blackhole_netdev_init(void)
- 	if (!blackhole_netdev)
- 		return -ENOMEM;
- 
--	rtnl_lock();
-+	rtnl_net_lock(&init_net);
- 	dev_init_scheduler(blackhole_netdev);
- 	dev_activate(blackhole_netdev);
--	rtnl_unlock();
-+	rtnl_net_unlock(&init_net);
- 
- 	blackhole_netdev->flags |= IFF_UP | IFF_RUNNING;
--	dev_net_set(blackhole_netdev, &init_net);
- 
- 	return 0;
- }
--- 
-2.39.5 (Apple Git-154)
-
+> --
+> 2.43.5
 
