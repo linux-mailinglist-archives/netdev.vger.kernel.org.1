@@ -1,96 +1,95 @@
-Return-Path: <netdev+bounces-157967-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157975-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7EADA0FF40
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 04:31:05 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0033A0FF93
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 04:37:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D49DF1886726
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 03:31:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B5F3C3A59F2
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 03:36:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1F7A234981;
-	Tue, 14 Jan 2025 03:30:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EA2B230279;
+	Tue, 14 Jan 2025 03:36:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fOPx17qL"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RdxFD+L2"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BA5D22BAA0
-	for <netdev@vger.kernel.org>; Tue, 14 Jan 2025 03:30:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7507E24024E;
+	Tue, 14 Jan 2025 03:36:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736825428; cv=none; b=eMkPLYOpm3kZJalNyu3RgY1c/cd2qxRfz54ePYNUSysTASVlgzAi4P3Bomy6kXfArON0L0OyJtgLT2BcCc9is3XneYRBWGVrX/1qg7AA5Eb7jhSsBtNhes3i2Rk8+AlM6ioa2fYcbdHLUpFXO5RlOnm97jTJdWhrBRAEAa+iqKA=
+	t=1736825813; cv=none; b=tCk+6oCSo7Lxw1RQto+QkceW80p6zKkaUDI3L4VcPMtllSG32+sl2pxZOC9sX+b//17la0Ig3WYjdbKOtuyuh1DYE0vjF2ukq9WZeQnPZHS8zWPoK2XKi4IlmfeFeM6i7wt6GVu+f2j/gQRGltb4qL9l1+A+IomlNhkTVjw7Jpo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736825428; c=relaxed/simple;
-	bh=cwc3dcffJGInXONOar1Kuy9lN0C96GLk31pK+e98ju4=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=oURnrOkNG/22huLqDlo3Wzj5KVGYCwhgK6dA1gRM4oNCQpwfWgIWygm9bqIYJ12H6DzD5GmcDLC6+UEsHcFELHJixn41eIqqFaYhjJsGIqIw5da+60dpPcYIcUiipZkfFliuIJhayS7RB7sm0w6a+gtokmIzU5FOpeuVVWdCWVE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fOPx17qL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 25206C4CEE5;
-	Tue, 14 Jan 2025 03:30:26 +0000 (UTC)
+	s=arc-20240116; t=1736825813; c=relaxed/simple;
+	bh=4qdP3cgBGyskS82WWQ8M3enm+es99peUyXTL1zCJlPM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=PWJRuA0IeY+1DAxUe2X4upuogjQWuchB9+fHCAVOP8qKg8xDmT+EYd8nx54tJO2CkJNvm7eeEJFiFggKBiOG2zwbqYa3rqOp/d9vyXt3zIEpnLE93gjMfe00zcSY4EVru4rLel4uMNj85G2qWDO/mY/0eg2dHoWL5Y0WnldbkHM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RdxFD+L2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E78ACC4CEE1;
+	Tue, 14 Jan 2025 03:36:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736825426;
-	bh=cwc3dcffJGInXONOar1Kuy9lN0C96GLk31pK+e98ju4=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=fOPx17qLeoua4ly2UDQxX829SQKnjZgCl1lchHbdtNSGWCfBa8Z0nAJKa+pVrTaH6
-	 n7oiwytBcrB2jRWjvk/d+Kp8+rfhDaMdxflxIbbYmYhE7TvU2v15T6/PIaj1CeLdem
-	 84SvRlrOZU5PLPt0JULCa9EgCpexWDGTEbOGBtKC9IpOSC8531C8j1+aGAShYTxECb
-	 glqUDNHrx60wQk6LnVTbLZCr+S1Z2p2JYKNBsUFO8XDJLhH5co+vP+Epj4Cl8OILLw
-	 T0zkciXYFPpE4ZPB3oY8uFkmAd7diKxPLv7D7DrUXEL3Lx6QwUATgTEMnt2B+95pp1
-	 5PyqWHDLy5zGA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAE85380AA5F;
-	Tue, 14 Jan 2025 03:30:49 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1736825812;
+	bh=4qdP3cgBGyskS82WWQ8M3enm+es99peUyXTL1zCJlPM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=RdxFD+L2TwL7/YscB1yS+FmHFnt6gkVkjT9h8WXlKsvBTAYepaj+o6kl8jEvg16rF
+	 SKg6xiMqk+0/yes9LhiHlfP3yKZRFsRv2KHBeY20nfnC2etqORJ74NJkmz014kSI0E
+	 hCxXa5gtD1x3JkE1Yqh4ctJtU0nJ95/P268SvF9I/Zh1RcaSujwJXvTsuOjTrVsuFw
+	 v9hR5mGwnFixDDfATT91HrOsrSR7DH02aYH+hpFsBcrayT2NjMRmTt1+A+aBZMNlKG
+	 Iuy8L+3ENGxNVuGxa8i3MZQWf1X250/1OV90aMZBQwPS4iTqV+lfIALy7fVrukVKax
+	 TaAueWhPJSW1A==
+Date: Mon, 13 Jan 2025 19:36:50 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Shinas Rasheed <srasheed@marvell.com>
+Cc: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+ <hgani@marvell.com>, <sedara@marvell.com>, <vimleshk@marvell.com>,
+ <thaller@redhat.com>, <wizhao@redhat.com>, <kheib@redhat.com>,
+ <konguyen@redhat.com>, <horms@kernel.org>, <einstein.xue@synaxg.com>,
+ Veerasenareddy Burru <vburru@marvell.com>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, "Paolo Abeni" <pabeni@redhat.com>
+Subject: Re: [PATCH net v6 1/4] octeon_ep: update tx/rx stats locally for
+ persistence
+Message-ID: <20250113193650.1b3d6f55@kernel.org>
+In-Reply-To: <20250110122730.2551863-2-srasheed@marvell.com>
+References: <20250110122730.2551863-1-srasheed@marvell.com>
+	<20250110122730.2551863-2-srasheed@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2 1/2] tools/net/ynl: add support for --family and
- --list-families
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173682544851.3721274.8403975394235475360.git-patchwork-notify@kernel.org>
-Date: Tue, 14 Jan 2025 03:30:48 +0000
-References: <20250111154803.7496-1-donald.hunter@gmail.com>
-In-Reply-To: <20250111154803.7496-1-donald.hunter@gmail.com>
-To: Donald Hunter <donald.hunter@gmail.com>
-Cc: netdev@vger.kernel.org, kuba@kernel.org, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com, horms@kernel.org,
- jstancek@redhat.com, jiri@resnulli.us, donald.hunter@redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Fri, 10 Jan 2025 04:27:27 -0800 Shinas Rasheed wrote:
+> @@ -991,33 +991,30 @@ static netdev_tx_t octep_start_xmit(struct sk_buff *skb,
+>  static void octep_get_stats64(struct net_device *netdev,
+>  			      struct rtnl_link_stats64 *stats)
+>  {
+> -	u64 tx_packets, tx_bytes, rx_packets, rx_bytes;
+>  	struct octep_device *oct = netdev_priv(netdev);
+>  	int q;
+>  
+> +	oct->iface_tx_stats.pkts = 0;
+> +	oct->iface_tx_stats.octs = 0;
+> +	oct->iface_rx_stats.pkts = 0;
+> +	oct->iface_rx_stats.octets = 0;
+> +	for (q = 0; q < oct->num_ioq_stats; q++) {
+> +		oct->iface_tx_stats.pkts += oct->stats_iq[q].instr_completed;
+> +		oct->iface_tx_stats.octs += oct->stats_iq[q].bytes_sent;
+> +		oct->iface_rx_stats.pkts += oct->stats_oq[q].packets;
+> +		oct->iface_rx_stats.octets += oct->stats_oq[q].bytes;
+> +	}
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Sat, 11 Jan 2025 15:48:02 +0000 you wrote:
-> Add a --family option to ynl to specify the spec by family name instead
-> of file path, with support for searching in-tree and system install
-> location and a --list-families option to show the available families.
-> 
-> ./tools/net/ynl/pyynl/cli.py --family rt_addr --dump getaddr
-> 
-> Signed-off-by: Donald Hunter <donald.hunter@gmail.com>
-> 
-> [...]
-
-Here is the summary with links:
-  - [net-next,v2,1/2] tools/net/ynl: add support for --family and --list-families
-    https://git.kernel.org/netdev/net-next/c/2ff80cefb77b
-  - [net-next,v2,2/2] tools/net/ynl: ethtool: support spec load from install location
-    https://git.kernel.org/netdev/net-next/c/b1b62d6d332e
-
-You are awesome, thank you!
+The new approach is much better, but you can't use oct->iface_* as
+intermediate storage. There is no exclusive locking on this function,
+multiple processes can be executing this function in parallel.
+Overwriting each others updates to oct->iface_tx_stats etc.
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+pw-bot: cr
 
