@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-157953-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157954-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47FBBA0FF06
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 04:10:18 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D79E3A0FF0B
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 04:10:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 253D91887D6E
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 03:10:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 993E616864D
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 03:10:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6229D2309A4;
-	Tue, 14 Jan 2025 03:10:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 953D5232792;
+	Tue, 14 Jan 2025 03:10:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mrCRFEz/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VAim8GkZ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33BAA3596A;
-	Tue, 14 Jan 2025 03:10:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61CCA3596A;
+	Tue, 14 Jan 2025 03:10:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736824212; cv=none; b=euookOxi5rxRX+Mta90eQh2Ja+fcU8AkBiwg8nmVNmfmWNsQtWWoY9/nnZ15gHRKpUMSb91RNzyvmFiWr7QPqyEgYo2v4XN/20hatDFtqtk5sVyJTL5DU19GV/P0PCuKSUzeZj39rP2ytEg4BWoiBvrjtFHvqN7FenLSEoMJgB8=
+	t=1736824215; cv=none; b=nW1mU7n2xQoJKs3K5Z+WJ/aDp1arhUU1xoofBNbm7wtKdnlf03bsSoo3xsPIl5SWvrDbGAT8okcpl/zsTEx73zOExI+hcv04iCa0v/mwp66/IkGZpjEN57n+cmjBPZyIxcgE5M+JEnvsiSs1f2mvNlrMFvPja3aTvxkisRKOMfw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736824212; c=relaxed/simple;
-	bh=fDzyCyzKCDVgpzSiEGjWrvIDGXFGqgWeQPjefwmLb+U=;
+	s=arc-20240116; t=1736824215; c=relaxed/simple;
+	bh=wtiqlRNAijPwFZxttNbA9gPDMRele86XZmih4s3L2aQ=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=aq8p4oCqiK3nuixc5S4/4pI0tMv855PAi0whpDl9WWToQV9OzJVxeBfoSvRGEVXplSsYLICqhLF6zDMfmcXon7kgFWKxzeLR0dlrSrzmXW1oU4EuKmGcCOmSG/zgSKq1qcp0CIDMQapdaRvKjkKrNOvKmfjI7oYz52dMyx7t+oo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mrCRFEz/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A232BC4CEDF;
-	Tue, 14 Jan 2025 03:10:10 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=VMJE7rjvv3ZDnCromx2ZC12AMkMzXm3o32OZl2IyUQPP3Jaew7Por2zr4G0h+ncexJTEY2V9z84zf5nS70xuHswOgBJn/PoqYxOV2Hjyf8LUi4Ux4GrvZYH6TS6EaCbBoCpuw1drFOjTcMHnGXrxJ0r+oHif4KmcFB0ASEICSRw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VAim8GkZ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D9D94C4CEE5;
+	Tue, 14 Jan 2025 03:10:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736824210;
-	bh=fDzyCyzKCDVgpzSiEGjWrvIDGXFGqgWeQPjefwmLb+U=;
+	s=k20201202; t=1736824213;
+	bh=wtiqlRNAijPwFZxttNbA9gPDMRele86XZmih4s3L2aQ=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=mrCRFEz/h1L1RK8fSIIq2HlY72RmFoyX+MAcbyJDfXeGS7Orit9vz3nPkQhyI7DVL
-	 /92gvBO9t+KOtoUcPZmbDzh8vjacPsfsZcigkHaSbnWUpwZB8ng6kgF/rX6J3z54mN
-	 F0p51KPeV7nUAUjZPlDdzKVntAxBuCqTPTjtavygzShtpmmwvSRhh6AVts+4hSyvgu
-	 KY+P/+LRDMv3bUJ1eox/hJZMyomyE2znkxNfi/p+CfX2lUjoIyPul0Y3pNtxAtHoOG
-	 k9wUUtE0a38JFxWKgfR2q95RaGW+GTNroczYBHmDBU4vPEHyAr8iyG+fdSoYlFtlKl
-	 ++7USiKqIvz7w==
+	b=VAim8GkZh/aQqBoaFlLQwWeoAw550NavRJtAAdPyInHO/U6DbVE4MXR2FQkdwOjnx
+	 64LzrZk+3llFe8FuZ0MH/GCdYAr0dyj/x8Tf7X3itOgtRpUbIS3/uQtEHZFGEA6wh6
+	 T4/HWZjuT/2Zz/nGV7/wXsjkrpFtlMZCGL6YzkQP9DXXq/6lsxOHTj/0iAG67Y09Cq
+	 9W0DHnuGnURxUIVVBKWerKlLzGAJbRKslHVv9kfikuE5M4Cy5B4Jsz4vIL2CY+DEjv
+	 4BvD7zbcG4/ahhpW2r/HtxETrCYOpaFbnqT9EjkGvcE7BV3ahQwuUdTeUNHu45gJ2r
+	 ODKufr3CfJUsg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 71F39380AA5F;
-	Tue, 14 Jan 2025 03:10:34 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE4EC380AA5F;
+	Tue, 14 Jan 2025 03:10:37 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,40 +52,47 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] net/ncsi: fix locking in Get MAC Address handling
+Subject: Re: [PATCH RESEND net] net/smc: fix data error when recvmsg with MSG_PEEK
+ flag
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <173682423325.3717681.7541247264915641463.git-patchwork-notify@kernel.org>
-Date: Tue, 14 Jan 2025 03:10:33 +0000
-References: <20250109145054.30925-1-fercerpav@gmail.com>
-In-Reply-To: <20250109145054.30925-1-fercerpav@gmail.com>
-To: Paul Fertser <fercerpav@gmail.com>
-Cc: potin.lai@quantatw.com, sam@mendozajonas.com, davem@davemloft.net,
+ <173682423623.3717681.3711335962362031005.git-patchwork-notify@kernel.org>
+Date: Tue, 14 Jan 2025 03:10:36 +0000
+References: <20250104143201.35529-1-guangguan.wang@linux.alibaba.com>
+In-Reply-To: <20250104143201.35529-1-guangguan.wang@linux.alibaba.com>
+To: Guangguan Wang <guangguan.wang@linux.alibaba.com>
+Cc: wenjia@linux.ibm.com, jaka@linux.ibm.com, alibuda@linux.alibaba.com,
+ tonylu@linux.alibaba.com, guwen@linux.alibaba.com, davem@davemloft.net,
  edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- fr0st61te@gmail.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- stable@vger.kernel.org
+ linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu,  9 Jan 2025 17:50:54 +0300 you wrote:
-> Obtaining RTNL lock in a response handler is not allowed since it runs
-> in an atomic softirq context. Postpone setting the MAC address by adding
-> a dedicated step to the configuration FSM.
-> 
-> Fixes: 790071347a0a ("net/ncsi: change from ndo_set_mac_address to dev_set_mac_address")
-> Cc: stable@vger.kernel.org
-> Cc: Potin Lai <potin.lai@quantatw.com>
-> Link: https://lore.kernel.org/20241129-potin-revert-ncsi-set-mac-addr-v1-1-94ea2cb596af@gmail.com
-> Signed-off-by: Paul Fertser <fercerpav@gmail.com>
+On Sat,  4 Jan 2025 22:32:01 +0800 you wrote:
+> When recvmsg with MSG_PEEK flag, the data will be copied to
+> user's buffer without advancing consume cursor and without
+> reducing the length of rx available data. Once the expected
+> peek length is larger than the value of bytes_to_rcv, in the
+> loop of do while in smc_rx_recvmsg, the first loop will copy
+> bytes_to_rcv bytes of data from the position local_tx_ctrl.cons,
+> the second loop will copy the min(bytes_to_rcv, read_remaining)
+> bytes from the position local_tx_ctrl.cons again because of the
+> lacking of process with advancing consume cursor and reducing
+> the length of available data. So do the subsequent loops. The
+> data copied in the second loop and the subsequent loops will
+> result in data error, as it should not be copied if no more data
+> arrives and it should be copied from the position advancing
+> bytes_to_rcv bytes from the local_tx_ctrl.cons if more data arrives.
 > 
 > [...]
 
 Here is the summary with links:
-  - net/ncsi: fix locking in Get MAC Address handling
-    https://git.kernel.org/netdev/net/c/9e2bbab94b88
+  - [RESEND,net] net/smc: fix data error when recvmsg with MSG_PEEK flag
+    https://git.kernel.org/netdev/net-next/c/a4b6539038c1
 
 You are awesome, thank you!
 -- 
