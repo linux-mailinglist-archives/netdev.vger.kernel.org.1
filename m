@@ -1,1011 +1,162 @@
-Return-Path: <netdev+bounces-157950-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157951-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2413AA0FEEA
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 03:47:30 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 53324A0FEF5
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 03:54:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0463818807AC
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 02:47:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1790A3A6F67
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 02:54:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4F0343AA1;
-	Tue, 14 Jan 2025 02:47:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F68E2309BA;
+	Tue, 14 Jan 2025 02:54:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="Nto1FJHX"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="If/gV0r9"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41B931BDC3;
-	Tue, 14 Jan 2025 02:47:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C15E2309AD;
+	Tue, 14 Jan 2025 02:54:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736822845; cv=none; b=CGs69QUpsUkI7QLHkLyPdxK7KCysVi5CJWrMYghQKsRCdUW9l3NdePYZUO9S/zz9f3HSsxA6yxv+vr6SVE0GWgX4vKYOIpAtWEKw84ftcIkrU3Qies4xuyksl/ohTR1YgO7OLoKzA3QhS6HRAEVzarbuxa84EALfL/tZSdlN6PE=
+	t=1736823246; cv=none; b=ni6AAaBszKWSSPjA+Kwxjx7Ul3g6XsqOjSRRr7h7rVJWgN5G/YgqA2vvkkIRdHBd78DpHyC62xdr3Ic9hsObTda1qVJ0k5O8NmMun5/L9kfesiQKV51Ss8rz8nDmq7nJ9VIj9N6JGrBpsZhTOHiqczxt33yKCUunX8WiLsT+Tbg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736822845; c=relaxed/simple;
-	bh=yYlWYuKft1TZ8UnDuRrBryTrOMf410VkzYA1C53sK+k=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=PkvRYx9oINUPxTagUqf/Gku12UDWM6tH3qwJsgU4GEtitWifbgxTm+RY+0/Kofj2RfcVitD7U3SUshlSY6VZF3ANuSjCUWvhxHptNrzGXN5IoCYW0EWTWQ9JXd9awUJBMWCWLIzKAxIRzJONqvckOCFroRumP5qWmV5ORvynZrc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=Nto1FJHX; arc=none smtp.client-ip=68.232.153.233
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1736822843; x=1768358843;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=yYlWYuKft1TZ8UnDuRrBryTrOMf410VkzYA1C53sK+k=;
-  b=Nto1FJHXr9x6543x8s19m5TuZMNOdXT37sZYF9p9uu1+Kls69BMMBf/9
-   hpekb5WnBMPTvkvWUaY+DgIqTMjAN5F70Zi3QHYi4wZKU5zWmyJ1E/DbB
-   glJikS7p+SrMtn7fbiqW//m7o5vdETjytZ/KTRO9/hVJT3S5pn+jaFghl
-   GxwRylMKf5DoaWdHXCq30QB+g5G5NJKL+667OzlfwQQXt/OQ9MaratRU3
-   2rMaaCxnTNJnkG6/NTEDSiWeoI8FMnzMR4lTl/LxLqyLOw/Sp6L9zkdBU
-   PxiGPkqlyq2Gb03/e0uLiQFkvFYxulsPhXK+isZUVMdxZoAqnaBJNmJ2P
-   w==;
-X-CSE-ConnectionGUID: 3H/3aTmFT+ORqeWeDEmzMA==
-X-CSE-MsgGUID: DojnOr7HRPezjJix763ROw==
-X-IronPort-AV: E=Sophos;i="6.12,313,1728975600"; 
-   d="scan'208";a="267771916"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa5.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 13 Jan 2025 19:47:22 -0700
-Received: from chn-vm-ex02.mchp-main.com (10.10.85.144) by
- chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Mon, 13 Jan 2025 19:46:59 -0700
-Received: from pop-os.microchip.com (10.10.85.11) by chn-vm-ex02.mchp-main.com
- (10.10.85.144) with Microsoft SMTP Server id 15.1.2507.35 via Frontend
- Transport; Mon, 13 Jan 2025 19:46:59 -0700
-From: <Tristram.Ha@microchip.com>
-To: Woojung Huh <woojung.huh@microchip.com>, Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>
-CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, <UNGLinuxDriver@microchip.com>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Tristram Ha
-	<tristram.ha@microchip.com>
-Subject: [PATCH net-next v2] net: dsa: microchip: Add SGMII port support to KSZ9477 switch
-Date: Mon, 13 Jan 2025 18:47:04 -0800
-Message-ID: <20250114024704.36972-1-Tristram.Ha@microchip.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1736823246; c=relaxed/simple;
+	bh=ElFUXp9q6iljQmtBw+whzCi2DF/JKgqDdFuOpjmLPlk=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=luWfrC8P5YRD7rE4DbKm6btkk2cVkFQmNaR4Oi5Yo199qWj3ZOEZEA4vt0RMIBJguxtOXMdLV+ksFQXYwh6mc/9EdufwG6ImGcAV1l1GAoJD+OPlwRgowfx18++2lCEE4FKV+eIFec7tElxCMNGmJ3BtogBQaK0WA2w3iXGRKOk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=If/gV0r9; arc=none smtp.client-ip=209.85.214.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-21654fdd5daso84556615ad.1;
+        Mon, 13 Jan 2025 18:54:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1736823244; x=1737428044; darn=vger.kernel.org;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ok/IQOa62Tbl3GwEmS+ObXXdpQRIUD7e0K9z851aND4=;
+        b=If/gV0r9hnmFVZmn8zo41I1+TwtLfTHdet4BpeYJfWgnbvL/AaWkI3SLk1RiUL5t1g
+         lY9jaErj2/PJZh4yk96tRZ6BkqMkCxELs4x9efX33ryT00/XeK1dQY6FnMRXYiWHUqr0
+         hTHbXiGpOMUmD5Tg5gSZEhuu7TwRbewdWsyhTVnmORLpFLWc3eERNZwwQQjm1LL90ISo
+         bTpQWEhVkGUjoCk1R7v1gYmZEGaaQLvuH3QIqu8GOmkpZpT9n7l4BeXriErkuzwZruua
+         opeQaWEJoTKQb4s2UNfDP2pSKswCuUfURUbrIco419BEmNqwloD5qrRQRkbauNjGhNRw
+         yBsQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736823244; x=1737428044;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Ok/IQOa62Tbl3GwEmS+ObXXdpQRIUD7e0K9z851aND4=;
+        b=jsRsn/3xbtVnMQ7qR6Mo+BPpc4GzocAOI9Mv1AEIULi8d1LpRIOiUYa4NdcOe/hrTW
+         uNv2soZROc1hH9rBK//rI88GyWN/9oNxHGpV3qverN0LhXoVXdKsonggvv4uc/i7wwoP
+         G44h9zPWwCiyBBIDDLcg1Rlkg+bUnO2rDneAQRt4KNXIZGrJzxwUoIufdb+iLPcuURDF
+         ac7ugj1wFoZJllJDuQacDA5HE0Qmi0ndbLXI27ozs4UwgscnkQnVamWJZ7oOXhWXwNBt
+         Q6IiP3NTYSoczUvFbr42VmIigOfpuodGz2SmaB7Pdp3SVibZ91fIZzW8JCuVGM/goRAb
+         VGWQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVKLic8ZFTyHIXUAViOLG/4tTBFujgBY38/yr6p7JDXx2zrdrMvWXoWik9N94gNPdE4tlPE8jr/CxGPH8s=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw0A48sD16ChBB02TBUdQCbmnHELKpU+Zx2aHondTou09q5C9bJ
+	1W2g/UZLl8XsDh5AoXHUOsN8sKPyBPQ4NZsnzbpbNUJOngnvYbsp/u4ssg==
+X-Gm-Gg: ASbGncuAxrt4kIkrgxviagxWEhCaiBNZ/N4V0P9AX97q48W7yh0ZRNonf+4ehsdnPk2
+	KcN+cIOyrrU2z8svnZlQMb7XBIHwwDpZYtoDesuUtn84ph+3BIVIPIdb9C0fHa0jnzAcJQ/LEd6
+	BRHXnccY07Ey8ucizSUHJ7irfpAEgeoWZw4ypn7L/OdcT0N0RPu81mEEWZQwFR9MMF0ggAB+tzo
+	x8VWrs68wa2iK4sGXO/zZSj8Fb8FIYeRkZo9ucMjcUHLBOwseURQlSJTuFxJk/b4Q8l05nh0DVf
+	IuRTyAf/+lQF8h+d7Sq2yf4xj6lk3Pv4sw==
+X-Google-Smtp-Source: AGHT+IGmL9Dd5TUeCazV5GKwdIsgzKGZZGJ9BA38deHTplGttA8ARLAWXTjE0QTXgue/f7Zool4QCg==
+X-Received: by 2002:a05:6a00:9294:b0:72a:a7a4:9b21 with SMTP id d2e1a72fcca58-72d21f16046mr29342692b3a.5.1736823244130;
+        Mon, 13 Jan 2025 18:54:04 -0800 (PST)
+Received: from localhost.localdomain (61-220-246-151.hinet-ip.hinet.net. [61.220.246.151])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72d405484bbsm6584671b3a.31.2025.01.13.18.54.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 13 Jan 2025 18:54:03 -0800 (PST)
+From: Potin Lai <potin.lai.pt@gmail.com>
+Date: Tue, 14 Jan 2025 10:51:39 +0800
+Subject: [PATCH v4] net/ncsi: fix state race during channel probe
+ completion
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20250114-fix-ncsi-mac-v4-1-4f058b7f8a99@gmail.com>
+X-B4-Tracking: v=1; b=H4sIADrRhWcC/3WMQQ6CMBBFr2JmbU2nU4S48h7GRSkDTCJgWtNoC
+ He3sCImLt//eW+GyEE4wuUwQ+AkUaYxgz0ewPdu7FhJkxmMNoVGRNXKW40+ihqcV8i2pqa1hC1
+ CVp6B87/lbvfMvcTXFD5bPZl1/RNKRmlVUcXaoTNE7toNTh4nPw2whhLtZfqRKcvF2frKlCXX2
+ OzlZVm+SLLcluUAAAA=
+To: Samuel Mendoza-Jonas <sam@mendozajonas.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, Patrick Williams <patrick@stwcx.xyz>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Cosmo Chou <cosmo.chou@quantatw.com>, Potin Lai <potin.lai@quantatw.com>, 
+ Cosmo Chou <chou.cosmo@gmail.com>, Potin Lai <potin.lai.pt@gmail.com>
+X-Mailer: b4 0.12.3
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1736823241; l=1830;
+ i=potin.lai.pt@gmail.com; s=20240724; h=from:subject:message-id;
+ bh=N2jwPUsQAaCf0uIqCMxFZmX+1mFiNUqK3aMSPOy7nUU=;
+ b=0TqDIto+QJaR5Z/Zs0toELo28tbLSKThV+MM/xGCGAiyDmrNmvCzcAyumFlhEjq+ac8+YuGI2
+ ZlHbK3gqPt8Co5Fm9Es59AA25f01FuBVSZkMYxavWmO7ibU+Ion2w19
+X-Developer-Key: i=potin.lai.pt@gmail.com; a=ed25519;
+ pk=6Z4H4V4fJwLteH/WzIXSsx6TkuY5FOcBBP+4OflJ5gM=
 
-From: Tristram Ha <tristram.ha@microchip.com>
+From: Cosmo Chou <chou.cosmo@gmail.com>
 
-The SGMII module of KSZ9477 switch can be setup in 3 ways: direct connect
-without using any SFP, SGMII mode with 10/100/1000Base-T SFP, and SerDes
-mode with 1000BaseX SFP, which can be fiber or copper.  Note some
-1000Base-T copper SFPs advertise themselves as SGMII but start in
-1000BaseX mode, and the PHY driver of the PHY inside will change it to
-SGMII mode.
+During channel probing, the last NCSI_PKT_CMD_DP command can trigger
+an unnecessary schedule_work() via ncsi_free_request(). We observed
+that subsequent config states were triggered before the scheduled
+work completed, causing potential state handling issues.
 
-The SGMII module can only support basic link status of the SFP, so the
-port can be simulated as having a regular internal PHY when SFP cage
-logic is not present.  The original KSZ9477 evaluation board operates in
-this way and so requires the simulation code.
+Fix this by clearing req_flags when processing the last package.
 
-A PCS driver for the SGMII port is provided to support the SFP cage
-logic used in the phylink code.  It is used to confirm the link is up
-and process the SGMII interrupt.
-
-One issue for the 1000BaseX SFP is there is no link down interrupt, so
-the driver has to use polling to detect link off when the link is up.
-
-Note the SGMII interrupt cannot be masked in hardware.  Also the module
-is not reset when the switch is reset.  It is important to reset the
-module properly to make sure interrupt is not triggered prematurely.
-
-One side effect is the SGMII interrupt is triggered when an internal PHY
-is powered down and powered up.  This happens when a port using internal
-PHY is turned off and then turned on.
-
-Signed-off-by: Tristram Ha <tristram.ha@microchip.com>
+Fixes: 8e13f70be05e ("net/ncsi: Probe single packages to avoid conflict")
+Signed-off-by: Cosmo Chou <chou.cosmo@gmail.com>
 ---
-v2
- - use standard MDIO names when programming MMD registers
- - use pcs_config API to setup SGMII module
- - remove the KSZ9477 device tree example as it was deemed unnecessary
+Fix state race during channel probe completion.
 
- drivers/net/dsa/microchip/ksz9477.c     | 455 +++++++++++++++++++++++-
- drivers/net/dsa/microchip/ksz9477.h     |   9 +-
- drivers/net/dsa/microchip/ksz9477_reg.h |   1 +
- drivers/net/dsa/microchip/ksz_common.c  | 111 +++++-
- drivers/net/dsa/microchip/ksz_common.h  |  23 +-
- 5 files changed, 588 insertions(+), 11 deletions(-)
+Signed-off-by: Potin Lai <potin.lai.pt@gmail.com>
+---
+Changes in v4:
+- Remove Paul's patch due to two patches are solving different issues.
+- Link to v3: https://lore.kernel.org/r/20250113-fix-ncsi-mac-v3-0-564c8277eb1d@gmail.com
 
-diff --git a/drivers/net/dsa/microchip/ksz9477.c b/drivers/net/dsa/microchip/ksz9477.c
-index 29fe79ea74cd..3613eea1e3fb 100644
---- a/drivers/net/dsa/microchip/ksz9477.c
-+++ b/drivers/net/dsa/microchip/ksz9477.c
-@@ -2,7 +2,7 @@
- /*
-  * Microchip KSZ9477 switch driver main logic
-  *
-- * Copyright (C) 2017-2024 Microchip Technology Inc.
-+ * Copyright (C) 2017-2025 Microchip Technology Inc.
-  */
- 
- #include <linux/kernel.h>
-@@ -12,6 +12,8 @@
- #include <linux/phy.h>
- #include <linux/if_bridge.h>
- #include <linux/if_vlan.h>
-+#include <linux/irqdomain.h>
-+#include <linux/phylink.h>
- #include <net/dsa.h>
- #include <net/switchdev.h>
- 
-@@ -161,6 +163,415 @@ static int ksz9477_wait_alu_sta_ready(struct ksz_device *dev)
- 					10, 1000);
- }
- 
-+static void port_sgmii_s(struct ksz_device *dev, uint port, u16 devid, u16 reg,
-+			 u16 len)
-+{
-+	u32 data;
-+
-+	data = (devid & MII_MMD_CTRL_DEVAD_MASK) << 16;
-+	data |= reg;
-+	if (len > 1)
-+		data |= PORT_SGMII_AUTO_INCR;
-+	ksz_pwrite32(dev, port, REG_PORT_SGMII_ADDR__4, data);
-+}
-+
-+static void port_sgmii_r(struct ksz_device *dev, uint port, u16 devid, u16 reg,
-+			 u16 *buf, u16 len)
-+{
-+	u32 data;
-+
-+	mutex_lock(&dev->sgmii_mutex);
-+	port_sgmii_s(dev, port, devid, reg, len);
-+	while (len) {
-+		ksz_pread32(dev, port, REG_PORT_SGMII_DATA__4, &data);
-+		*buf++ = (u16)data;
-+		len--;
-+	}
-+	mutex_unlock(&dev->sgmii_mutex);
-+}
-+
-+static void port_sgmii_w(struct ksz_device *dev, uint port, u16 devid, u16 reg,
-+			 u16 *buf, u16 len)
-+{
-+	u32 data;
-+
-+	mutex_lock(&dev->sgmii_mutex);
-+	port_sgmii_s(dev, port, devid, reg, len);
-+	while (len) {
-+		data = *buf++;
-+		ksz_pwrite32(dev, port, REG_PORT_SGMII_DATA__4, data);
-+		len--;
-+	}
-+	mutex_unlock(&dev->sgmii_mutex);
-+}
-+
-+static void port_sgmii_reset(struct ksz_device *dev, uint p)
-+{
-+	u16 ctrl = BMCR_RESET;
-+
-+	port_sgmii_w(dev, p, MDIO_MMD_VEND2, MII_BMCR, &ctrl, 1);
-+}
-+
-+static phy_interface_t port_sgmii_detect(struct ksz_device *dev, uint p)
-+{
-+	phy_interface_t interface = PHY_INTERFACE_MODE_1000BASEX;
-+	u16 buf[6];
-+	int i = 0;
-+
-+	/* Read all 6 registers to spend more time waiting for valid result. */
-+	do {
-+		port_sgmii_r(dev, p, MDIO_MMD_VEND2, MII_BMCR, buf, 6);
-+		i++;
-+	} while (!buf[5] && i < 10);
-+	if ((buf[5] & LPA_LPACK) &&
-+	    (!(buf[5] & (LPA_1000XHALF | LPA_1000XFULL))))
-+		interface = PHY_INTERFACE_MODE_SGMII;
-+	return interface;
-+}
-+
-+static void port_sgmii_setup(struct ksz_device *dev, uint p, bool pcs,
-+			     bool master, bool autoneg, bool intr, int speed,
-+			     int duplex)
-+{
-+	u16 ctrl;
-+	u16 cfg;
-+	u16 adv;
-+
-+	cfg = 0;
-+	if (pcs)
-+		cfg |= SR_MII_PCS_SGMII << SR_MII_PCS_MODE_S;
-+	if (master) {
-+		cfg |= SR_MII_TX_CFG_PHY_MASTER;
-+		cfg |= SR_MII_SGMII_LINK_UP;
-+	}
-+	port_sgmii_w(dev, p, MDIO_MMD_VEND2, MMD_SR_MII_AUTO_NEG_CTRL, &cfg, 1);
-+
-+	/* Need to write to advertise register to send correct signal. */
-+	/* Default value is 0x0020. */
-+	adv = ADVERTISE_1000XPSE_ASYM | ADVERTISE_1000XPAUSE;
-+	adv |= (duplex == DUPLEX_FULL) ?
-+	       ADVERTISE_1000XFULL : ADVERTISE_1000XHALF;
-+	port_sgmii_w(dev, p, MDIO_MMD_VEND2, MII_ADVERTISE, &adv, 1);
-+	port_sgmii_r(dev, p, MDIO_MMD_VEND2, MII_BMCR, &ctrl, 1);
-+	if (master || !autoneg) {
-+		ctrl &= ~(BMCR_SPEED1000 | BMCR_SPEED100 | BMCR_FULLDPLX);
-+		switch (speed) {
-+		case SPEED_100:
-+			ctrl |= BMCR_SPEED100;
-+			break;
-+		case SPEED_1000:
-+			ctrl |= BMCR_SPEED1000;
-+			break;
-+		}
-+		if (duplex == DUPLEX_FULL)
-+			ctrl |= BMCR_FULLDPLX;
-+	}
-+	if (!autoneg) {
-+		ctrl &= ~BMCR_ANENABLE;
-+		port_sgmii_w(dev, p, MDIO_MMD_VEND2, MII_BMCR, &ctrl, 1);
-+		goto sgmii_setup_last;
-+	} else if (!(ctrl & BMCR_ANENABLE)) {
-+		ctrl |= BMCR_ANENABLE;
-+		port_sgmii_w(dev, p, MDIO_MMD_VEND2, MII_BMCR, &ctrl, 1);
-+	}
-+	if (master && autoneg) {
-+		ctrl |= BMCR_ANRESTART;
-+		port_sgmii_w(dev, p, MDIO_MMD_VEND2, MII_BMCR, &ctrl, 1);
-+	}
-+
-+sgmii_setup_last:
-+	if (intr) {
-+		cfg |= SR_MII_AUTO_NEG_COMPLETE_INTR;
-+		port_sgmii_w(dev, p, MDIO_MMD_VEND2, MMD_SR_MII_AUTO_NEG_CTRL,
-+			     &cfg, 1);
-+	}
-+}
-+
-+#define PORT_LINK_UP		BIT(0)
-+#define PORT_LINK_CHANGE	BIT(1)
-+#define PORT_LINK_INVALID	BIT(2)
-+
-+static int sgmii_port_get_speed(struct ksz_device *dev, uint p)
-+{
-+	struct ksz_port *info = &dev->ports[p];
-+	struct ksz_pcs *priv = info->pcs_priv;
-+	int ret = 0;
-+	u16 status;
-+	u16 speed;
-+	u16 data;
-+	u8 link;
-+
-+	port_sgmii_r(dev, p, MDIO_MMD_VEND2, MII_BMSR, &status, 1);
-+	port_sgmii_r(dev, p, MDIO_MMD_VEND2, MII_BMSR, &status, 1);
-+	port_sgmii_r(dev, p, MDIO_MMD_VEND2, MMD_SR_MII_AUTO_NEG_STATUS, &data,
-+		     1);
-+
-+	/* Typical register values with different SFPs.
-+	 * 10/100/1000: 1f0001 = 01ad  1f0005 = 4000  1f8002 = 0008
-+	 *              1f0001 = 01bd  1f0005 = d000  1f8002 = 001a
-+	 * 1000:        1f0001 = 018d  1f0005 = 0000  1f8002 = 0000
-+	 *              1f0001 = 01ad  1f0005 = 40a0  1f8002 = 0001
-+	 *              1f0001 = 01ad  1f0005 = 41a0  1f8002 = 0001
-+	 * fiber:       1f0001 = 0189  1f0005 = 0000  1f8002 = 0000
-+	 *              1f0001 = 01ad  1f0005 = 41a0  1f8002 = 0001
-+	 */
-+
-+	if (data & SR_MII_AUTO_NEG_COMPLETE_INTR) {
-+		data &= ~SR_MII_AUTO_NEG_COMPLETE_INTR;
-+		port_sgmii_w(dev, p, MDIO_MMD_VEND2, MMD_SR_MII_AUTO_NEG_STATUS,
-+			     &data, 1);
-+	}
-+
-+	/* Not running in SGMII mode where data indicates link status. */
-+	if (info->interface != PHY_INTERFACE_MODE_SGMII && !data) {
-+		u16 link_up = BMSR_LSTATUS;
-+
-+		if (info->interface == PHY_INTERFACE_MODE_1000BASEX)
-+			link_up |= BMSR_ANEGCOMPLETE;
-+		if ((status & link_up) == link_up)
-+			data = SR_MII_STAT_LINK_UP |
-+			       (SR_MII_STAT_1000_MBPS << SR_MII_STAT_S) |
-+			       SR_MII_STAT_FULL_DUPLEX;
-+	}
-+	if (data & SR_MII_STAT_LINK_UP)
-+		ret = PORT_LINK_UP;
-+
-+	link = (data & ~SR_MII_AUTO_NEG_COMPLETE_INTR);
-+	if (priv->link == link)
-+		return ret;
-+
-+	if (data & SR_MII_STAT_LINK_UP) {
-+		u16 ctrl = 0;
-+
-+		/* Need to update control register with same link setting. */
-+		if (info->interface != PHY_INTERFACE_MODE_INTERNAL)
-+			ctrl = BMCR_ANENABLE;
-+		speed = (data >> SR_MII_STAT_S) & SR_MII_STAT_M;
-+		if (speed == SR_MII_STAT_1000_MBPS)
-+			ctrl |= BMCR_SPEED1000;
-+		else if (speed == SR_MII_STAT_100_MBPS)
-+			ctrl |= BMCR_SPEED100;
-+		if (data & SR_MII_STAT_FULL_DUPLEX)
-+			ctrl |= BMCR_FULLDPLX;
-+		port_sgmii_w(dev, p, MDIO_MMD_VEND2, MII_BMCR, &ctrl, 1);
-+
-+		info->phydev.speed = SPEED_10;
-+		if (speed == SR_MII_STAT_1000_MBPS)
-+			info->phydev.speed = SPEED_1000;
-+		else if (speed == SR_MII_STAT_100_MBPS)
-+			info->phydev.speed = SPEED_100;
-+
-+		info->phydev.duplex = 0;
-+		if (data & SR_MII_STAT_FULL_DUPLEX)
-+			info->phydev.duplex = 1;
-+	}
-+	ret |= PORT_LINK_CHANGE;
-+	priv->link = link;
-+	info->phydev.link = (ret & PORT_LINK_UP);
-+	return ret;
-+}
-+
-+static bool sgmii_need_polling(struct ksz_device *dev, struct ksz_port *p)
-+{
-+	struct ksz_pcs *priv = p->pcs_priv;
-+
-+	/* SGMII mode has link up and link down interrupts. */
-+	if (p->interface == PHY_INTERFACE_MODE_SGMII && priv->has_intr)
-+		return false;
-+
-+	/* SerDes mode has link up interrupt but not link down interrupt. */
-+	if (p->interface == PHY_INTERFACE_MODE_1000BASEX && priv->has_intr &&
-+	    !p->phydev.link)
-+		return false;
-+
-+	/* Direct connect mode has no link change. */
-+	if (p->interface == PHY_INTERFACE_MODE_INTERNAL)
-+		return false;
-+	return true;
-+}
-+
-+static void ksz9477_sgmii_setup(struct ksz_device *dev, int port,
-+				phy_interface_t intf)
-+{
-+	struct ksz_port *p = &dev->ports[port];
-+	struct ksz_pcs *priv = p->pcs_priv;
-+	struct phy_device *phydev = NULL;
-+	bool autoneg, master, pcs;
-+
-+	if (!priv->using_sfp && dev->ds->user_mii_bus)
-+		phydev = mdiobus_get_phy(dev->ds->user_mii_bus, port);
-+	if (phydev || p->interface == PHY_INTERFACE_MODE_INTERNAL)
-+		intf = p->interface;
-+
-+	/* PHY driver can change the mode to PHY_INTERFACE_MODE_SGMII from
-+	 * PHY_INTERFACE_MODE_1000BASEX, so this function can be called again
-+	 * after the interface is changed.
-+	 */
-+	if (intf != p->interface) {
-+		dev_info(dev->dev, "switching to %s after %s was detected.\n",
-+			 phy_modes(intf), phy_modes(p->interface));
-+		p->interface = intf;
-+	}
-+	switch (p->interface) {
-+	case PHY_INTERFACE_MODE_SGMII:
-+		autoneg = true;
-+		master = false;
-+		pcs = true;
-+		break;
-+	case PHY_INTERFACE_MODE_1000BASEX:
-+		autoneg = true;
-+		master = true;
-+		pcs = false;
-+		break;
-+	default:
-+		autoneg = false;
-+		master = true;
-+		pcs = true;
-+		break;
-+	}
-+	port_sgmii_setup(dev, port, pcs, master, autoneg, priv->has_intr,
-+			 SPEED_1000, DUPLEX_FULL);
-+
-+	sgmii_port_get_speed(dev, port);
-+
-+	/* Need to check link down if using 1000BASEX SFP. */
-+	if (sgmii_need_polling(dev, p))
-+		schedule_delayed_work(&dev->sgmii_check,
-+				      msecs_to_jiffies(500));
-+}
-+
-+static void sgmii_update_link(struct ksz_device *dev)
-+{
-+	u8 port = dev->info->sgmii_port - 1;
-+	struct ksz_port *p = &dev->ports[port];
-+	int ret;
-+
-+	ret = sgmii_port_get_speed(dev, port);
-+	if (ret & PORT_LINK_CHANGE) {
-+		struct phy_device *phydev;
-+
-+		/* When simulating PHY. */
-+		p->phydev.interrupts = PHY_INTERRUPT_ENABLED;
-+		phydev = mdiobus_get_phy(dev->ds->user_mii_bus, port);
-+		if (phydev)
-+			phy_trigger_machine(phydev);
-+
-+		/* When using SFP code. */
-+		dsa_port_phylink_mac_change(dev->ds, port, p->phydev.link);
-+	}
-+
-+	/* No interrupt for link down. */
-+	if (sgmii_need_polling(dev, p))
-+		schedule_delayed_work(&dev->sgmii_check,
-+				      msecs_to_jiffies(500));
-+}
-+
-+static void sgmii_check_work(struct work_struct *work)
-+{
-+	struct ksz_device *dev = container_of(work, struct ksz_device,
-+					      sgmii_check.work);
-+
-+	sgmii_update_link(dev);
-+}
-+
-+static irqreturn_t ksz9477_sgmii_irq_thread_fn(int irq, void *dev_id)
-+{
-+	struct ksz_pcs *priv = dev_id;
-+	struct ksz_device *dev = priv->dev;
-+	u8 port = priv->port;
-+	u16 data16 = 0;
-+
-+	port_sgmii_w(dev, port, SR_MII, MMD_SR_MII_AUTO_NEG_STATUS, &data16, 1);
-+	sgmii_update_link(dev);
-+	return IRQ_HANDLED;
-+}
-+
-+static void sgmii_initial_setup(struct ksz_device *dev, int port)
-+{
-+	struct ksz_port *p = &dev->ports[port];
-+	struct ksz_pcs *priv = p->pcs_priv;
-+	int irq, ret;
-+
-+	irq = irq_find_mapping(p->pirq.domain, PORT_SGMII_INT_LOC);
-+	if (irq > 0) {
-+		ret = request_threaded_irq(irq, NULL,
-+					   ksz9477_sgmii_irq_thread_fn,
-+					   IRQF_ONESHOT, "SGMII", priv);
-+		if (!ret)
-+			priv->has_intr = 1;
-+	}
-+
-+	/* Make invalid so the correct value is set. */
-+	priv->link = 0xff;
-+
-+	INIT_DELAYED_WORK(&dev->sgmii_check, sgmii_check_work);
-+}
-+
-+int ksz9477_pcs_create(struct ksz_device *dev)
-+{
-+	/* This chip has a SGMII port. */
-+	if (dev->info->sgmii_port > 0) {
-+		int port = dev->info->sgmii_port - 1;
-+		struct ksz_port *p = &dev->ports[port];
-+		struct ksz_pcs *pcs_priv;
-+
-+		pcs_priv = devm_kzalloc(dev->dev, sizeof(struct ksz_pcs),
-+					GFP_KERNEL);
-+		if (!pcs_priv)
-+			return -ENOMEM;
-+		p->pcs_priv = pcs_priv;
-+		pcs_priv->dev = dev;
-+		pcs_priv->port = port;
-+		pcs_priv->pcs.neg_mode = true;
-+
-+		/* Switch reset does not reset SGMII module. */
-+		port_sgmii_reset(dev, port);
-+
-+		/* Detect which mode to use if not using direct connect. */
-+		if (p->interface != PHY_INTERFACE_MODE_INTERNAL)
-+			p->interface = port_sgmii_detect(dev, port);
-+	}
-+	return 0;
-+}
-+
-+int ksz9477_pcs_config(struct phylink_pcs *pcs, unsigned int neg_mode,
-+		       phy_interface_t interface,
-+		       const unsigned long *advertising)
-+{
-+	struct ksz_pcs *priv = container_of(pcs, struct ksz_pcs, pcs);
-+	struct ksz_device *dev = priv->dev;
-+	struct ksz_port *p = &dev->ports[priv->port];
-+
-+	if (neg_mode == PHYLINK_PCS_NEG_INBAND_ENABLED)
-+		p->pcs_priv->using_sfp = 1;
-+	ksz9477_sgmii_setup(dev, priv->port, interface);
-+	return 0;
-+}
-+
-+void ksz9477_pcs_get_state(struct phylink_pcs *pcs,
-+			   struct phylink_link_state *state)
-+{
-+	struct ksz_pcs *priv = container_of(pcs, struct ksz_pcs, pcs);
-+	struct ksz_device *dev = priv->dev;
-+	struct ksz_port *p = &dev->ports[priv->port];
-+	u8 status;
-+	int ret;
-+
-+	ksz_pread8(dev, priv->port, REG_PORT_STATUS_0, &status);
-+	ret = sgmii_port_get_speed(dev, priv->port);
-+	if (!(ret & PORT_LINK_UP))
-+		state->link = false;
-+	state->duplex = p->phydev.duplex;
-+	state->speed = p->phydev.speed;
-+	state->pause &= ~(MLO_PAUSE_RX | MLO_PAUSE_TX);
-+	if (status & PORT_RX_FLOW_CTRL)
-+		state->pause |= MLO_PAUSE_RX;
-+	if (status & PORT_TX_FLOW_CTRL)
-+		state->pause |= MLO_PAUSE_TX;
-+	if (state->interface == PHY_INTERFACE_MODE_SGMII)
-+		state->an_complete = state->link;
-+}
-+
- int ksz9477_reset_switch(struct ksz_device *dev)
- {
- 	u8 data8;
-@@ -345,7 +756,7 @@ int ksz9477_r_phy(struct ksz_device *dev, u16 addr, u16 reg, u16 *data)
- 	 * A fixed PHY can be setup in the device tree, but this function is
- 	 * still called for that port during initialization.
- 	 * For RGMII PHY there is no way to access it so the fixed PHY should
--	 * be used.  For SGMII PHY the supporting code will be added later.
-+	 * be used.  SGMII PHY is simulated as a regular PHY.
- 	 */
- 	if (!dev->info->internal_phy[addr]) {
- 		struct ksz_port *p = &dev->ports[addr];
-@@ -355,7 +766,10 @@ int ksz9477_r_phy(struct ksz_device *dev, u16 addr, u16 reg, u16 *data)
- 			val = 0x1140;
- 			break;
- 		case MII_BMSR:
--			val = 0x796d;
-+			if (p->phydev.link)
-+				val = 0x796d;
-+			else
-+				val = 0x7949;
- 			break;
- 		case MII_PHYSID1:
- 			val = 0x0022;
-@@ -368,6 +782,10 @@ int ksz9477_r_phy(struct ksz_device *dev, u16 addr, u16 reg, u16 *data)
- 			break;
- 		case MII_LPA:
- 			val = 0xc5e1;
-+			if (p->phydev.speed == SPEED_10)
-+				val &= ~0x0180;
-+			if (p->phydev.duplex == 0)
-+				val &= ~0x0140;
- 			break;
- 		case MII_CTRL1000:
- 			val = 0x0700;
-@@ -378,6 +796,24 @@ int ksz9477_r_phy(struct ksz_device *dev, u16 addr, u16 reg, u16 *data)
- 			else
- 				val = 0;
- 			break;
-+		case MII_ESTATUS:
-+			val = 0x3000;
-+			break;
-+
-+		/* This register holds the PHY interrupt status. */
-+		case MII_TPISTATUS:
-+			val = (LINK_DOWN_INT | LINK_UP_INT) << 8;
-+			if (p->phydev.interrupts == PHY_INTERRUPT_ENABLED) {
-+				if (p->phydev.link)
-+					val |= LINK_UP_INT;
-+				else
-+					val |= LINK_DOWN_INT;
-+			}
-+			p->phydev.interrupts = 0;
-+			break;
-+		default:
-+			val = 0;
-+			break;
+Changes in v3:
+- Fix compile error by removing non-exist variable.
+- Link to v2: https://lore.kernel.org/r/20250111-fix-ncsi-mac-v2-0-838e0a1a233a@gmail.com
+
+Changes in v2:
+- Add second patch for fixing state handling issue.
+- Link to v1: https://lore.kernel.org/all/20250109145054.30925-1-fercerpav@gmail.com/
+---
+ net/ncsi/ncsi-manage.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/net/ncsi/ncsi-manage.c b/net/ncsi/ncsi-manage.c
+index 5cf55bde366d..2feff885eeff 100644
+--- a/net/ncsi/ncsi-manage.c
++++ b/net/ncsi/ncsi-manage.c
+@@ -1479,7 +1479,10 @@ static void ncsi_probe_channel(struct ncsi_dev_priv *ndp)
  		}
- 	} else {
- 		ret = ksz_pread16(dev, addr, 0x100 + (reg << 1), &val);
-@@ -978,6 +1414,13 @@ void ksz9477_get_caps(struct ksz_device *dev, int port,
+ 		break;
+ 	case ncsi_dev_state_probe_dp:
+-		ndp->pending_req_num = 1;
++		if (ndp->package_probe_id + 1 < 8)
++			ndp->pending_req_num = 1;
++		else
++			nca.req_flags = 0;
  
- 	if (dev->info->gbit_capable[port])
- 		config->mac_capabilities |= MAC_1000FD;
-+
-+	if (dev->info->sgmii_port == port + 1) {
-+		__set_bit(PHY_INTERFACE_MODE_1000BASEX,
-+			  config->supported_interfaces);
-+		__set_bit(PHY_INTERFACE_MODE_SGMII,
-+			  config->supported_interfaces);
-+	}
- }
- 
- int ksz9477_set_ageing_time(struct ksz_device *dev, unsigned int msecs)
-@@ -1079,6 +1522,9 @@ void ksz9477_port_setup(struct ksz_device *dev, int port, bool cpu_port)
- 		     PORT_FORCE_TX_FLOW_CTRL | PORT_FORCE_RX_FLOW_CTRL,
- 		     !dev->info->internal_phy[port]);
- 
-+	if (dev->info->sgmii_port == port + 1)
-+		sgmii_initial_setup(dev, port);
-+
- 	if (cpu_port)
- 		member = dsa_user_ports(ds);
- 	else
-@@ -1348,6 +1794,9 @@ int ksz9477_switch_init(struct ksz_device *dev)
- 
- void ksz9477_switch_exit(struct ksz_device *dev)
- {
-+	if (dev->info->sgmii_port > 0 &&
-+	    delayed_work_pending(&dev->sgmii_check))
-+		cancel_delayed_work_sync(&dev->sgmii_check);
- 	ksz9477_reset_switch(dev);
- }
- 
-diff --git a/drivers/net/dsa/microchip/ksz9477.h b/drivers/net/dsa/microchip/ksz9477.h
-index d2166b0d881e..cf9f9e4d7d41 100644
---- a/drivers/net/dsa/microchip/ksz9477.h
-+++ b/drivers/net/dsa/microchip/ksz9477.h
-@@ -2,7 +2,7 @@
- /*
-  * Microchip KSZ9477 series Header file
-  *
-- * Copyright (C) 2017-2022 Microchip Technology Inc.
-+ * Copyright (C) 2017-2025 Microchip Technology Inc.
-  */
- 
- #ifndef __KSZ9477_H
-@@ -97,4 +97,11 @@ void ksz9477_acl_match_process_l2(struct ksz_device *dev, int port,
- 				  u16 ethtype, u8 *src_mac, u8 *dst_mac,
- 				  unsigned long cookie, u32 prio);
- 
-+int ksz9477_pcs_create(struct ksz_device *dev);
-+int ksz9477_pcs_config(struct phylink_pcs *pcs, unsigned int neg_mode,
-+		       phy_interface_t interface,
-+		       const unsigned long *advertising);
-+void ksz9477_pcs_get_state(struct phylink_pcs *pcs,
-+			   struct phylink_link_state *state);
-+
- #endif
-diff --git a/drivers/net/dsa/microchip/ksz9477_reg.h b/drivers/net/dsa/microchip/ksz9477_reg.h
-index ff579920078e..db646b97a2ff 100644
---- a/drivers/net/dsa/microchip/ksz9477_reg.h
-+++ b/drivers/net/dsa/microchip/ksz9477_reg.h
-@@ -803,6 +803,7 @@
- #define REG_PORT_INT_STATUS		0x001B
- #define REG_PORT_INT_MASK		0x001F
- 
-+#define PORT_SGMII_INT_LOC		3
- #define PORT_SGMII_INT			BIT(3)
- #define PORT_PTP_INT			BIT(2)
- #define PORT_PHY_INT			BIT(1)
-diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
-index 89f0796894af..0101a706bdd6 100644
---- a/drivers/net/dsa/microchip/ksz_common.c
-+++ b/drivers/net/dsa/microchip/ksz_common.c
-@@ -2,7 +2,7 @@
- /*
-  * Microchip switch driver main logic
-  *
-- * Copyright (C) 2017-2024 Microchip Technology Inc.
-+ * Copyright (C) 2017-2025 Microchip Technology Inc.
-  */
- 
- #include <linux/delay.h>
-@@ -354,10 +354,26 @@ static void ksz9477_phylink_mac_link_up(struct phylink_config *config,
- 					int speed, int duplex, bool tx_pause,
- 					bool rx_pause);
- 
-+static struct phylink_pcs *
-+ksz_phylink_mac_select_pcs(struct phylink_config *config,
-+			   phy_interface_t interface)
-+{
-+	struct dsa_port *dp = dsa_phylink_to_port(config);
-+	struct ksz_device *dev = dp->ds->priv;
-+	struct ksz_port *p = &dev->ports[dp->index];
-+
-+	if (dev->info->sgmii_port == dp->index + 1 &&
-+	    (interface == PHY_INTERFACE_MODE_SGMII ||
-+	    interface == PHY_INTERFACE_MODE_1000BASEX))
-+		return &p->pcs_priv->pcs;
-+	return NULL;
-+}
-+
- static const struct phylink_mac_ops ksz9477_phylink_mac_ops = {
- 	.mac_config	= ksz_phylink_mac_config,
- 	.mac_link_down	= ksz_phylink_mac_link_down,
- 	.mac_link_up	= ksz9477_phylink_mac_link_up,
-+	.mac_select_pcs	= ksz_phylink_mac_select_pcs,
- };
- 
- static const struct ksz_dev_ops ksz9477_dev_ops = {
-@@ -395,6 +411,9 @@ static const struct ksz_dev_ops ksz9477_dev_ops = {
- 	.reset = ksz9477_reset_switch,
- 	.init = ksz9477_switch_init,
- 	.exit = ksz9477_switch_exit,
-+	.pcs_create = ksz9477_pcs_create,
-+	.pcs_config = ksz9477_pcs_config,
-+	.pcs_get_state = ksz9477_pcs_get_state,
- };
- 
- static const struct phylink_mac_ops lan937x_phylink_mac_ops = {
-@@ -1035,8 +1054,7 @@ static const struct regmap_range ksz9477_valid_regs[] = {
- 	regmap_reg_range(0x701b, 0x701b),
- 	regmap_reg_range(0x701f, 0x7020),
- 	regmap_reg_range(0x7030, 0x7030),
--	regmap_reg_range(0x7200, 0x7203),
--	regmap_reg_range(0x7206, 0x7207),
-+	regmap_reg_range(0x7200, 0x7207),
- 	regmap_reg_range(0x7300, 0x7301),
- 	regmap_reg_range(0x7400, 0x7401),
- 	regmap_reg_range(0x7403, 0x7403),
-@@ -1552,6 +1570,7 @@ const struct ksz_chip_data ksz_switch_chips[] = {
- 				   true, false, false},
- 		.gbit_capable	= {true, true, true, true, true, true, true},
- 		.ptp_capable = true,
-+		.sgmii_port = 7,
- 		.wr_table = &ksz9477_register_set,
- 		.rd_table = &ksz9477_register_set,
- 	},
-@@ -1944,6 +1963,7 @@ const struct ksz_chip_data ksz_switch_chips[] = {
- 		.internal_phy	= {true, true, true, true,
- 				   true, false, false},
- 		.gbit_capable	= {true, true, true, true, true, true, true},
-+		.sgmii_port = 7,
- 		.wr_table = &ksz9477_register_set,
- 		.rd_table = &ksz9477_register_set,
- 	},
-@@ -2018,6 +2038,40 @@ static void ksz_phylink_get_caps(struct dsa_switch *ds, int port,
- 		dev->dev_ops->get_caps(dev, port, config);
- }
- 
-+static int ksz_pcs_config(struct phylink_pcs *pcs, unsigned int neg_mode,
-+			  phy_interface_t interface,
-+			  const unsigned long *advertising,
-+			  bool permit_pause_to_mac)
-+{
-+	struct ksz_pcs *priv = container_of(pcs, struct ksz_pcs, pcs);
-+	struct ksz_device *dev = priv->dev;
-+
-+	if (dev->dev_ops->pcs_config)
-+		return dev->dev_ops->pcs_config(pcs, neg_mode, interface,
-+						advertising);
-+	return 0;
-+}
-+
-+static void ksz_pcs_get_state(struct phylink_pcs *pcs,
-+			      struct phylink_link_state *state)
-+{
-+	struct ksz_pcs *priv = container_of(pcs, struct ksz_pcs, pcs);
-+	struct ksz_device *dev = priv->dev;
-+
-+	if (dev->dev_ops->pcs_get_state)
-+		dev->dev_ops->pcs_get_state(pcs, state);
-+}
-+
-+static void ksz_pcs_an_restart(struct phylink_pcs *pcs)
-+{
-+}
-+
-+static const struct phylink_pcs_ops ksz_pcs_ops = {
-+	.pcs_config = ksz_pcs_config,
-+	.pcs_an_restart = ksz_pcs_an_restart,
-+	.pcs_get_state = ksz_pcs_get_state,
-+};
-+
- void ksz_r_mib_stats64(struct ksz_device *dev, int port)
- {
- 	struct ethtool_pause_stats *pstats;
-@@ -2067,7 +2121,7 @@ void ksz_r_mib_stats64(struct ksz_device *dev, int port)
- 
- 	spin_unlock(&mib->stats64_lock);
- 
--	if (dev->info->phy_errata_9477) {
-+	if (dev->info->phy_errata_9477 && dev->info->sgmii_port != port + 1) {
- 		ret = ksz9477_errata_monitor(dev, port, raw->tx_late_col);
- 		if (ret)
- 			dev_err(dev->dev, "Failed to monitor transmission halt\n");
-@@ -2342,7 +2396,9 @@ static int ksz_phy_addr_to_port(struct ksz_device *dev, int addr)
- 	struct dsa_port *dp;
- 
- 	dsa_switch_for_each_user_port(dp, ds) {
--		if (dev->info->internal_phy[dp->index] &&
-+		/* Allow SGMII port to act as having a PHY. */
-+		if ((dev->info->internal_phy[dp->index] ||
-+		     dev->info->sgmii_port == dp->index + 1) &&
- 		    dev->phy_addr_map[dp->index] == addr)
- 			return dp->index;
- 	}
-@@ -2434,11 +2490,15 @@ static int ksz_parse_dt_phy_config(struct ksz_device *dev, struct mii_bus *bus,
- 	int ret;
- 
- 	dsa_switch_for_each_user_port(dp, dev->ds) {
--		if (!dev->info->internal_phy[dp->index])
-+		/* Allow SGMII port to act as having a PHY. */
-+		if (!dev->info->internal_phy[dp->index] &&
-+		    dev->info->sgmii_port != dp->index + 1)
- 			continue;
- 
- 		phy_node = of_parse_phandle(dp->dn, "phy-handle", 0);
- 		if (!phy_node) {
-+			if (dev->info->sgmii_port == dp->index + 1)
-+				continue;
- 			dev_err(dev->dev, "failed to parse phy-handle for port %d.\n",
- 				dp->index);
- 			phys_are_valid = false;
-@@ -2775,6 +2835,17 @@ static int ksz_setup(struct dsa_switch *ds)
- 	if (ret)
- 		return ret;
- 
-+	if (dev->info->sgmii_port > 0) {
-+		if (dev->dev_ops->pcs_create) {
-+			ret = dev->dev_ops->pcs_create(dev);
-+			if (ret)
-+				return ret;
-+			p = &dev->ports[dev->info->sgmii_port - 1];
-+			if (p->pcs_priv)
-+				p->pcs_priv->pcs.ops = &ksz_pcs_ops;
-+		}
-+	}
-+
- 	/* set broadcast storm protection 10% rate */
- 	regmap_update_bits(ksz_regmap_16(dev), regs[S_BROADCAST_CTRL],
- 			   BROADCAST_STORM_RATE,
-@@ -3613,6 +3684,10 @@ static void ksz_phylink_mac_config(struct phylink_config *config,
- 	if (dev->info->internal_phy[port])
- 		return;
- 
-+	/* No need to configure XMII control register when using SGMII. */
-+	if (dev->info->sgmii_port == port + 1)
-+		return;
-+
- 	if (phylink_autoneg_inband(mode)) {
- 		dev_err(dev->dev, "In-band AN not supported!\n");
- 		return;
-@@ -4595,6 +4670,9 @@ static int ksz_suspend(struct dsa_switch *ds)
- 	struct ksz_device *dev = ds->priv;
- 
- 	cancel_delayed_work_sync(&dev->mib_read);
-+	if (dev->info->sgmii_port > 0 &&
-+	    delayed_work_pending(&dev->sgmii_check))
-+		cancel_delayed_work_sync(&dev->sgmii_check);
- 	return 0;
- }
- 
-@@ -4604,6 +4682,9 @@ static int ksz_resume(struct dsa_switch *ds)
- 
- 	if (dev->mib_read_interval)
- 		schedule_delayed_work(&dev->mib_read, dev->mib_read_interval);
-+	if (dev->info->sgmii_port > 0)
-+		schedule_delayed_work(&dev->sgmii_check,
-+				      msecs_to_jiffies(100));
- 	return 0;
- }
- 
-@@ -4755,6 +4836,22 @@ static void ksz_parse_rgmii_delay(struct ksz_device *dev, int port_num,
- 	dev->ports[port_num].rgmii_tx_val = tx_delay;
- }
- 
-+static void ksz_parse_sgmii(struct ksz_device *dev, int port,
-+			    struct device_node *dn)
-+{
-+	const char *managed;
-+
-+	if (dev->info->sgmii_port != port + 1)
-+		return;
-+	/* SGMII port can be used without using SFP.
-+	 * The sfp declaration is returned as being a fixed link so need to
-+	 * check the managed string to know the port is not using sfp.
-+	 */
-+	if (of_phy_is_fixed_link(dn) &&
-+	    of_property_read_string(dn, "managed", &managed))
-+		dev->ports[port].interface = PHY_INTERFACE_MODE_INTERNAL;
-+}
-+
- /**
-  * ksz_drive_strength_to_reg() - Convert drive strength value to corresponding
-  *				 register value.
-@@ -5021,6 +5118,7 @@ int ksz_switch_register(struct ksz_device *dev)
- 	mutex_init(&dev->regmap_mutex);
- 	mutex_init(&dev->alu_mutex);
- 	mutex_init(&dev->vlan_mutex);
-+	mutex_init(&dev->sgmii_mutex);
- 
- 	ret = ksz_switch_detect(dev);
- 	if (ret)
-@@ -5097,6 +5195,7 @@ int ksz_switch_register(struct ksz_device *dev)
- 						&dev->ports[port_num].interface);
- 
- 				ksz_parse_rgmii_delay(dev, port_num, port);
-+				ksz_parse_sgmii(dev, port_num, port);
- 			}
- 			of_node_put(ports);
- 		}
-diff --git a/drivers/net/dsa/microchip/ksz_common.h b/drivers/net/dsa/microchip/ksz_common.h
-index af17a9c030d4..962bba382556 100644
---- a/drivers/net/dsa/microchip/ksz_common.h
-+++ b/drivers/net/dsa/microchip/ksz_common.h
-@@ -1,7 +1,7 @@
- /* SPDX-License-Identifier: GPL-2.0 */
- /* Microchip switch driver common header
-  *
-- * Copyright (C) 2017-2024 Microchip Technology Inc.
-+ * Copyright (C) 2017-2025 Microchip Technology Inc.
-  */
- 
- #ifndef __KSZ_COMMON_H
-@@ -93,6 +93,7 @@ struct ksz_chip_data {
- 	bool internal_phy[KSZ_MAX_NUM_PORTS];
- 	bool gbit_capable[KSZ_MAX_NUM_PORTS];
- 	bool ptp_capable;
-+	u8 sgmii_port;
- 	const struct regmap_access_table *wr_table;
- 	const struct regmap_access_table *rd_table;
- };
-@@ -121,6 +122,15 @@ struct ksz_switch_macaddr {
- 	refcount_t refcount;
- };
- 
-+struct ksz_pcs {
-+	struct phylink_pcs pcs;
-+	struct ksz_device *dev;
-+	u8 port;
-+	u32 has_intr:1;
-+	u32 link:8;
-+	u32 using_sfp:1;
-+};
-+
- struct ksz_port {
- 	bool remove_tag;		/* Remove Tag flag set, for ksz8795 only */
- 	bool learning;
-@@ -141,6 +151,7 @@ struct ksz_port {
- 	void *acl_priv;
- 	struct ksz_irq pirq;
- 	u8 num;
-+	struct ksz_pcs *pcs_priv;
- #if IS_ENABLED(CONFIG_NET_DSA_MICROCHIP_KSZ_PTP)
- 	struct hwtstamp_config tstamp_config;
- 	bool hwts_tx_en;
-@@ -162,6 +173,8 @@ struct ksz_device {
- 	struct mutex regmap_mutex;	/* regmap access */
- 	struct mutex alu_mutex;		/* ALU access */
- 	struct mutex vlan_mutex;	/* vlan access */
-+	struct mutex sgmii_mutex;	/* SGMII access */
-+	const struct phylink_pcs_ops *pcs_ops;
- 	const struct ksz_dev_ops *dev_ops;
- 
- 	struct device *dev;
-@@ -188,6 +201,7 @@ struct ksz_device {
- 	struct ksz_port *ports;
- 	struct delayed_work mib_read;
- 	unsigned long mib_read_interval;
-+	struct delayed_work sgmii_check;
- 	u16 mirror_rx;
- 	u16 mirror_tx;
- 	u16 port_mask;
-@@ -440,6 +454,13 @@ struct ksz_dev_ops {
- 	int (*reset)(struct ksz_device *dev);
- 	int (*init)(struct ksz_device *dev);
- 	void (*exit)(struct ksz_device *dev);
-+
-+	int (*pcs_create)(struct ksz_device *dev);
-+	int (*pcs_config)(struct phylink_pcs *pcs, unsigned int neg_mode,
-+			  phy_interface_t interface,
-+			  const unsigned long *advertising);
-+	void (*pcs_get_state)(struct phylink_pcs *pcs,
-+			      struct phylink_link_state *state);
- };
- 
- struct ksz_device *ksz_switch_alloc(struct device *base, void *priv);
+ 		/* Deselect the current package */
+ 		nca.type = NCSI_PKT_CMD_DP;
+
+---
+base-commit: 56e6a3499e14716b9a28a307bb6d18c10e95301e
+change-id: 20250111-fix-ncsi-mac-1e4b3df431f1
+
+Best regards,
 -- 
-2.34.1
+Potin Lai <potin.lai.pt@gmail.com>
 
 
