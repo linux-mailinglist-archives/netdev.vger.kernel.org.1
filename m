@@ -1,151 +1,142 @@
-Return-Path: <netdev+bounces-158004-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158005-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A358A1012F
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 08:12:19 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E171DA1014D
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 08:31:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ADEA11887F9D
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 07:12:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 09F7C168131
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 07:31:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42D3D24333D;
-	Tue, 14 Jan 2025 07:12:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="RCXLwQ2I"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D82FE19F411;
+	Tue, 14 Jan 2025 07:31:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out199-3.us.a.mail.aliyun.com (out199-3.us.a.mail.aliyun.com [47.90.199.3])
+Received: from smtpbgau2.qq.com (smtpbgau2.qq.com [54.206.34.216])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B948E224D6;
-	Tue, 14 Jan 2025 07:12:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=47.90.199.3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 684EA2343BE
+	for <netdev@vger.kernel.org>; Tue, 14 Jan 2025 07:31:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.206.34.216
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736838734; cv=none; b=hoy/XNOVy85KWqwlKbtTLfIFpca+3oY8s7gEsBXfoHEXDMSaDTtGCR6cnrsBshCuY/OnPzbP20X61IAA0zjb/+FvA6uTNh0XOJnvMGRyIw7a/89JF5GGhlsYBZrV6ukxdlhBW80lBqBaH8ikLm7n/CZof3OPvyh8KsG4w9El1KQ=
+	t=1736839872; cv=none; b=nr7Cb9VrmDcDu0swRB4NcNYp1bZzkqWf20Ms7CiNF1/QO5JC7CPQInmqK/XtMgK288FQyk5rk9vQYUL3+Yao4IZD/TgtJ/BgviwJz8VBZoy6VUCt4OVkh4g/oCA6v1Z3WLJX7q7ZpsXGBwyycysyRcXL5EzIu36FHB4qkr96vZ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736838734; c=relaxed/simple;
-	bh=/jTiEukBk4OXr0oz4YiAlGU6iQIdT0wI4GSysHcmIvg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CyrEKW0l69iMz0hjJwIHzpveqP3xVXXnmJNNvgdRrQlLfK9PNpKijpTPSC9S3aoCofJPxKuVyO7Q3ZDYdkrB2ggQgZ12jhw7O0SaNs5OXTpgunhDwWAZitIQ1bjfA19QTATGVm0GW0F60/dqU78gO+8vbsGlBEt6JM/JLxzAPgM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=RCXLwQ2I; arc=none smtp.client-ip=47.90.199.3
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1736838711; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
-	bh=g27TgMLSSWDA6rh7dbNBUqwtZ6V1tqrqcoJ1TbS5P1w=;
-	b=RCXLwQ2IOdQJjr2AfLeAMRLw0f01qDq72ivynUb1Ad9i/WKHtuXlxmZ1zcsN5atUBUFf5yooDhH6wmvjXYHIieb4iL7OJlAYfcLKuFyNIviDlkouEXibyWfctVUBo4chj+suWYsd04uGNXiP5KhTaK5vRblkZUJ2JC4pQcX2pGE=
-Received: from localhost(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0WNeEgmT_1736838709 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Tue, 14 Jan 2025 15:11:49 +0800
-Date: Tue, 14 Jan 2025 15:11:49 +0800
-From: "D. Wythe" <alibuda@linux.alibaba.com    >
-To: Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Cc: "D. Wythe" <alibuda@linux.alibaba.com>, kgraul@linux.ibm.com,
-	wenjia@linux.ibm.com, jaka@linux.ibm.com, ast@kernel.org,
-	daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev,
-	pabeni@redhat.com, song@kernel.org, sdf@google.com,
-	haoluo@google.com, yhs@fb.com, edumazet@google.com,
-	john.fastabend@gmail.com, kpsingh@kernel.org, jolsa@kernel.org,
-	guwen@linux.alibaba.com, kuba@kernel.org, davem@davemloft.net,
-	netdev@vger.kernel.org, linux-s390@vger.kernel.org,
-	linux-rdma@vger.kernel.org, bpf@vger.kernel.org
-Subject: Re: [PATCH bpf-next v3 4/5] libbpf: fix error when st-prefix_ops and
- ops from differ btf
-Message-ID: <20250114071149.GA106114@j66a10360.sqa.eu95>
-References: <20241218024422.23423-1-alibuda@linux.alibaba.com>
- <20241218024422.23423-5-alibuda@linux.alibaba.com>
- <CAEf4Bzas7E4bSFnxiObJysf4hDv2AJVd4B4Q+me1wmGtdHVVbQ@mail.gmail.com>
+	s=arc-20240116; t=1736839872; c=relaxed/simple;
+	bh=/ofsY16RxV1lB598N5qb89iT357S5JKt9DNIvmRBTDc=;
+	h=From:To:Cc:References:In-Reply-To:Subject:Date:Message-ID:
+	 MIME-Version:Content-Type; b=lpAeLN9hUZCqi6hQ6HHePud36elVQSr2Rn3UZEosUoZhw7aLQ9wbCk4KwcaEMzwt2qzj1I20MXNk+qaShjgz9Xqg/585dETYSO+9S3FoDrHwcnE+3bfsxx2QKUCBHk8uFmZeFTiJyayGO4HEp3bTN+DC3m0bbgkpdu23GLks5I8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=54.206.34.216
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
+X-QQ-mid:Yeas2t1736839763t316t14003
+Received: from 3DB253DBDE8942B29385B9DFB0B7E889 (jiawenwu@trustnetic.com [36.20.58.48])
+X-QQ-SSF:0001000000000000000000000000000
+From: =?utf-8?b?Smlhd2VuIFd1?= <jiawenwu@trustnetic.com>
+X-BIZMAIL-ID: 15896848793313366868
+To: "'Przemek Kitszel'" <przemyslaw.kitszel@intel.com>
+Cc: <mengyuanlou@net-swift.com>,
+	<andrew+netdev@lunn.ch>,
+	<davem@davemloft.net>,
+	<edumazet@google.com>,
+	<kuba@kernel.org>,
+	<pabeni@redhat.com>,
+	<linux@armlinux.org.uk>,
+	<horms@kernel.org>,
+	<netdev@vger.kernel.org>
+References: <20250113103102.2185782-1-jiawenwu@trustnetic.com> <0be63e70-74bb-465a-a933-0258a45033a8@intel.com>
+In-Reply-To: <0be63e70-74bb-465a-a933-0258a45033a8@intel.com>
+Subject: RE: [PATCH net-next v2 1/2] net: txgbe: Add basic support for new AML devices
+Date: Tue, 14 Jan 2025 15:29:21 +0800
+Message-ID: <059d01db6656$07f4dcb0$17de9610$@trustnetic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAEf4Bzas7E4bSFnxiObJysf4hDv2AJVd4B4Q+me1wmGtdHVVbQ@mail.gmail.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+Content-Type: text/plain;
+	charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-Mailer: Microsoft Outlook 16.0
+Content-Language: zh-cn
+Thread-Index: AQKq9eOD9bLG7Mwu6gJPC9cEGkVpxgKu/t8ksWD07aA=
+X-QQ-SENDSIZE: 520
+Feedback-ID: Yeas:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz8a-1
+X-QQ-XMAILINFO: M+0YV038q5N1J7A6m5Nep3yt0WYraanu9hgy8rAuzIo01VganfI3hCoS
+	4J/Il1eac9AE8ofNHIuxf7T2v6FQ0Eow/n20vh7ZOoQmC6BaVbSICGvkOq4GqVPkr8+T6yC
+	zWoJXSe/z/K5J59eJhZgTM7JU4nssnD3d5qMqMFr/rGURG+uji64xWMnltyOXSMAXvXQq5z
+	ZheHl3FeEv6shGLk4Vt7emIPORmkwHx8uVtyVJT68C2Py4UjwiSR8FoAZ37J76a0JmbZ+xg
+	jNzVxx+zJnRj+QPJRiGTLIqKqCjs4FhoUTM0nNGZkMVluCHeRMkJ+vOvF0zZvDSdIv5HjWP
+	4equQLf+pmjItHNmXE/cOdPGj9DW0nwhR0VK0eZjKm380C2OJfSzBQRntJDI98S6mJgVTQ+
+	QN3QT3WWr9Z/kqQpr2oc2+VvoLCMHsvRFWrIX8ENev5Zl2bDtGt1EG1O3091RlXazmLBpbD
+	idTZMCyDNzON4oS0TcG8hxNG/5OJSeV89tG3aAKGTpCL3blWRfAfuGJoWREDh3DZo0Ze7yK
+	Ucgt+goNt5uvCUrhSkZneNyZNNQClWW6aSMX5Q7lDQ/nK8K/nORStdi1ogHkotQ+BBCTLJA
+	YoURduL7H182lUsfC9M9ZjN/w0nK+7N2xFahsSfPZV9zmPWWxI8J6I4xoGdXxZBO/1oalBL
+	y9D/ZG8IQqbtEmkgoZJCFLa12luqlZYsUb3EaQ4pS0C2G8oBsFo2ikROKCptLCOW/1newxt
+	Ct6VQ0PRPS8V01sUx33AwlLUA65BMI7l+iROJvhyoWlsbKfmf8+jK9k+TaKGIBmVyDOUM/E
+	ymGz+83wfZWJ2IY607e7897Wkjwf33pjvqAUcLzZuS1HQ/jnXxFvaJxMVHorANFdG3ZiYtT
+	6Sq5cyrfP2ZKrFkRjL0joDn1WLz8+XB/v3ZcuNHUPIPQEWW+KXy9dRKiJijan/2SbcJhy5B
+	8zzXWX+AYwBXF+SsA/LeIf7++Lu0ro7J5GaBiI7RhCuCoE82DPnyVpmjiU0QAzMP5Qr0=
+X-QQ-XMRINFO: Nq+8W0+stu50PRdwbJxPCL0=
+X-QQ-RECHKSPAM: 0
 
-On Fri, Jan 10, 2025 at 03:38:19PM -0800, Andrii Nakryiko wrote:
-> On Tue, Dec 17, 2024 at 6:44 PM D. Wythe <alibuda@linux.alibaba.com> wrote:
-> >
-> > When a struct_ops named xxx_ops was registered by a module, and
-> > it will be used in both built-in modules and the module itself,
-> > so that the btf_type of xxx_ops will be present in btf_vmlinux
-> > instead of in btf_mod, which means that the btf_type of
-> > bpf_struct_ops_xxx_ops and xxx_ops will not be in the same btf.
-> >
-> > Here are four possible case:
-> >
-> > +--------+-------------+-------------+---------------------------------+
-> > |        | st_opx_xxx  | xxx         |                                 |
-> > +--------+-------------+-------------+---------------------------------+
-> > | case 0 | btf_vmlinux | bft_vmlinux | be used and reg only in vmlinux |
-> > +--------+-------------+-------------+---------------------------------+
-> > | case 1 | btf_vmlinux | bpf_mod     | INVALID                         |
-> > +--------+-------------+-------------+---------------------------------+
-> > | case 2 | btf_mod     | btf_vmlinux | reg in mod but be used both in  |
-> > |        |             |             | vmlinux and mod.                |
-> > +--------+-------------+-------------+---------------------------------+
-> > | case 3 | btf_mod     | btf_mod     | be used and reg only in mod     |
-> > +--------+-------------+-------------+---------------------------------+
-> >
-> > At present, cases 0, 1, and 3 can be correctly identified, because
-> > st_ops_xxx is searched from the same btf with xxx. In order to
-> > handle case 2 correctly without affecting other cases, we cannot simply
-> > change the search method for st_ops_xxx from find_btf_by_prefix_kind()
-> > to find_ksym_btf_id(), because in this way, case 1 will not be
-> > recognized anymore.
-> >
-> > To address this issue, if st_ops_xxx cannot be found in the btf with xxx
-> > and mod_btf does not exist, do find_ksym_btf_id() again to
-> > avoid such issue.
-> > +               }
+> > +	/* index to unique seq id for each mbox message */
+> > +	send_hdr->index = wx->swfw_index;
+> > +	send_cmd = send_hdr->cmd;
+> > +
+> > +	dword_len = length >> 2;
+> > +	/* write data to SW-FW mbox array */
+> > +	for (i = 0; i < dword_len; i++) {
+> > +		wr32a(wx, WX_SW2FW_MBOX, i, (__force u32)cpu_to_le32(buffer[i]));
+> > +		/* write flush */
+> > +		rd32a(wx, WX_SW2FW_MBOX, i);
 > 
-> purely from the coding perspective, this is unnecessarily nested and
-> convoluted. Wouldn't this work the same but be less nested:
-> 
-> kern_vtype_id = btf__find_by_name_kind(btf, stname, BTF_KIND_STRUCT);
-> if (kern_vtype_id == -ENOENT && !*mod_btf)
->     kern_vtype_id = find_ksym_btf_id(...);
-> if (kern_vtype_id < 0) {
->     pr_warn(...);
->     return kern_vtype_id;
-> }
+> do you really need to flush all registers?
 
-Hi Andrii,
-
-It's indeed more concise with your code. Thanks very much for your suggestion.
-And Martin has provided us with another suggestion to address this issue,
-and according to his plan, there shall be no such complex conditional
-checks too.
-
-Anyway, I will keep my code concise in the next version. Thank you for
-the reminder.
-
-Best wishes,
-D. Wythe
+Yes, hardware requires this.
 
 > 
+> > +	}
+> > +
+> > +	/* generate interrupt to notify FW */
+> > +	wr32m(wx, WX_SW2FW_MBOX_CMD, WX_SW2FW_MBOX_CMD_VLD, 0);
+> > +	wr32m(wx, WX_SW2FW_MBOX_CMD, WX_SW2FW_MBOX_CMD_VLD, WX_SW2FW_MBOX_CMD_VLD);
+> > +
+> > +	dword_len = hdr_size >> 2;
+> > +
+> > +	/* polling reply from FW */
+> > +	timeout = 50;
+> > +	do {
+> > +		timeout--;
+> > +		usleep_range(1000, 2000);
+> > +
+> > +		/* read hdr */
+> > +		for (bi = 0; bi < dword_len; bi++)
+> > +			buffer[bi] = rd32a(wx, WX_FW2SW_MBOX, bi);
 > 
-> >         }
-> >         kern_vtype = btf__type_by_id(btf, kern_vtype_id);
-> >
-> > @@ -1046,8 +1055,8 @@ find_struct_ops_kern_types(struct bpf_object *obj, const char *tname_raw,
-> >                         break;
-> >         }
-> >         if (i == btf_vlen(kern_vtype)) {
-> > -               pr_warn("struct_ops init_kern: struct %s data is not found in struct %s%s\n",
-> > -                       tname, STRUCT_OPS_VALUE_PREFIX, tname);
-> > +               pr_warn("struct_ops init_kern: struct %s data is not found in struct %s\n",
-> > +                       tname, stname);
-> >                 return -EINVAL;
-> >         }
-> >
-> > --
-> > 2.45.0
-> >
+> no need for le32_to_cpu()?
+> (if so, reexamine whole patch)
+
+Indeed need.
+
+> > +/**
+> > + *  wx_host_interface_command - Issue command to manageability block
+> > + *  @wx: pointer to the HW structure
+> > + *  @buffer: contains the command to write and where the return status will
+> > + *   be placed
+> > + *  @length: length of buffer, must be multiple of 4 bytes
+> > + *  @timeout: time in ms to wait for command completion
+> > + *  @return_data: read and return data from the buffer (true) or not (false)
+> > + *   Needed because FW structures are big endian and decoding of
+> 
+> In other places you were using cpu_to_le32(), this comment seems to
+> contradict that
+
+FW structures are big endian, and we agreed to transfer in the mailbox registers
+according to 32-bit little endian. However, buffers contain 8 bits or 16 bits field
+which is composed using CPU byte order. So we use cpu_to_le32() and le32_to_cpu()
+in this driver.
+ 
+
 
