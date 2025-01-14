@@ -1,132 +1,105 @@
-Return-Path: <netdev+bounces-158115-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158113-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8FD0DA107B1
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 14:25:40 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 100EFA107AB
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 14:23:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C4408188813B
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 13:25:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BE1193A2123
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 13:23:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23154236ED4;
-	Tue, 14 Jan 2025 13:25:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49ECB2361EC;
+	Tue, 14 Jan 2025 13:23:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="jxOejWNy"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bP3R6fkU"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.4])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A53FE234D0B;
-	Tue, 14 Jan 2025 13:25:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.4
+Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EEE0236A91
+	for <netdev@vger.kernel.org>; Tue, 14 Jan 2025 13:23:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736861136; cv=none; b=g+Va4qCFDbd0EvfDx5UPFuNzCgRLy8OrqoftbfsWh6XVX+JX+MU4QF8JuUON439TbEkCKyyslcnUUsFm6J5fPCbVlFkiiex+jf6dny2Iq9TGZLqH5RrOnhatfsKUy4kZ5gSGrBQ9ccJY4F+nTt09Zttz+x93DkSOsRbmgJs7Hbw=
+	t=1736861028; cv=none; b=aNW5Khe6aabsPUSGJE9cI2LzqYnxAyi6DCNZnPHRPVUrZMkWMyis+nxXYrnfCc8Mo1lHABF1tND5Y+bgI0m0Lo9KDhDs8AFAGGeLVxVU+a8nQ9RMRGyvmXwgGDgnBULhLA5ofKZvquA6iaf57ZqV8waA47Zic+MgcPhmvk1LZ+Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736861136; c=relaxed/simple;
-	bh=RJmrHncmAiYfQZgHBbGZ9N6pX/NJqX1TU++10eqVLQ4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ukBUYIuvDRbwHYLiPY5pU93H4pHi37rXWCaTJF6q/7QauzvqViTjU0VgVoa8zCVyC4R8OuRcVL+ABsUMMpoxtbHOC7fZjXKcFnF5Co1FELK4M5zSOKhE4mr0gejC1rkkxtWD3VDcj2advT23AAw+W3tO3ldg6tolEobFC61+SBI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=jxOejWNy; arc=none smtp.client-ip=117.135.210.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:Subject:Date:Message-ID:MIME-Version; bh=W1HRi
-	UHKkNK4KFvLch5WDTwcRDvo+NOPbJJW0YrzMOo=; b=jxOejWNyRUUQNiDaTtAGO
-	Ek5cxsEvB6UG1cF9+OQgqPX/W/A18Ad1puBOeT9Vn5JN6EezsXfI011poKU9PmuX
-	4DqqzC88n+oXWS93RlqwYa1ZuHftTGkgIkjO8qtyDBHrUEdmKiV9vBu23YRdtiSK
-	8VikMwRjCNSZg9BI3ZGkIQ=
-Received: from localhost.localdomain (unknown [])
-	by gzsmtp1 (Coremail) with SMTP id PCgvCgCn_E1RZYZnl71AAw--.33013S5;
-	Tue, 14 Jan 2025 21:24:15 +0800 (CST)
-From: Jiayuan Chen <mrpre@163.com>
-To: bpf@vger.kernel.org,
-	jakub@cloudflare.com,
-	john.fastabend@gmail.com
-Cc: netdev@vger.kernel.org,
-	martin.lau@linux.dev,
-	ast@kernel.org,
-	edumazet@google.com,
-	davem@davemloft.net,
-	dsahern@kernel.org,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	linux-kernel@vger.kernel.org,
-	song@kernel.org,
-	andrii@kernel.org,
-	mhal@rbox.co,
-	yonghong.song@linux.dev,
-	daniel@iogearbox.net,
-	xiyou.wangcong@gmail.com,
-	horms@kernel.org,
-	corbet@lwn.net,
-	eddyz87@gmail.com,
-	cong.wang@bytedance.com,
-	shuah@kernel.org,
-	mykolal@fb.com,
-	jolsa@kernel.org,
-	haoluo@google.com,
-	sdf@fomichev.me,
-	kpsingh@kernel.org,
-	linux-doc@vger.kernel.org,
-	Jiayuan Chen <mrpre@163.com>
-Subject: [PATCH bpf v6 3/3] strparser, docs: Add new callback
-Date: Tue, 14 Jan 2025 21:23:11 +0800
-Message-ID: <20250114132312.49407-4-mrpre@163.com>
-X-Mailer: git-send-email 2.43.5
-In-Reply-To: <20250114132312.49407-1-mrpre@163.com>
-References: <20250114132312.49407-1-mrpre@163.com>
+	s=arc-20240116; t=1736861028; c=relaxed/simple;
+	bh=zUt2z/v+xYXYU6CurSPflaIbiSHerUVbIV31vtMrv04=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=jnhIpB0D2IVoDcmQuX4Te97wKY69OlMdAh4ohpZgb/t9nydZAy6ZNP14lQ/v35V0G//Dqg29q0AoxxAC/CoNE9x3LxHPUnGOu9jYWIPWBirfaAFVEZCX8Q0aTvZHmghFGZePiO5+1ZHPAWjrGZqz5xCRRuXWyOvAIt5aUArXy6o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bP3R6fkU; arc=none smtp.client-ip=209.85.208.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-5d3e9a88793so9162700a12.1
+        for <netdev@vger.kernel.org>; Tue, 14 Jan 2025 05:23:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1736861025; x=1737465825; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=uw0ZgqtZUw3HomhdvzacQGq5HfrmisK01+KsYPwFWiQ=;
+        b=bP3R6fkUzpRRiRe0TGBhy3+iEY02BFpMwjFI2FKsE9mlh6mjW/POwjZPLLYpdtrqQ7
+         UB5jWIz6zM6s1a3kMOJL7w3G74rxFQeBpSHRtZl6as/JDIGy7s8d4V7OTrB7yAMrSzFg
+         YYYl4rvCLKcpUz9DtVl8x/3eqfliBfWWAHZzxKWslp3QNNDDqx77SIUUz0RFuMjxcnjy
+         wpZjauYV2+g4Je93wp7DK35xtbqvY61cSUOQNE6AgYLaXYX5XUzwPL4/6UgmyxQuxejb
+         c07RpYI3P6XiLdXS9Hbq5naivo6fjQ7Q7Effhju/rzORpa+xr1g4qiFd66dZX07knV7j
+         prPg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736861025; x=1737465825;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=uw0ZgqtZUw3HomhdvzacQGq5HfrmisK01+KsYPwFWiQ=;
+        b=L7nAc5MQiZ46pGH6yWrjuUcakwbarDqd5iH9BFdhzRZajtsABlGthtwvILGBBnNpJg
+         ELIeDcvzYy5X9rz7XG99dgJIAosilHEgfe+TrFwG1yAruC4d7vdRL5CZUoeUOEaPlVXl
+         FlRXTAlHbrMQn9+o0sHs4OFR46fPZNzwzogRWAr6HSbOTGsmSvoVRPKNkIrvSfMWxA2N
+         vJfrygbrt4uUEkIzfed9D+bnw5hGVgmk1up2sT0v8IJ8i7q8R5haEWYHehb3PmNrz5HI
+         GEwN2NM9ftYf598QoG6olNI4R7R+LRL/JpJ8vQq+wpUCinZSrv0Vc4XCA7zxhnVlSWyg
+         TCMw==
+X-Forwarded-Encrypted: i=1; AJvYcCUafl+w74hOdTOUj0WfLNtb3KSOA+Dxg6TMktNFXkWxXtNGK+CZgkltH4Bc+BNp2eYyP99dc4s=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwIg/R8hQvouej5Zir/BHhDkchlSYdqbLUfjgqAruq791hiNKHc
+	6yHpd1tCnNmy6I2Mp0HABPJuluoyZJYsZ7rtxwNqC32l+xdLGZX/7yNzqtmLjAh2lUrLjp8ucry
+	YJ2Pv01Af7BVvInsOKhgfmpS7M7YAvsBDmpJV
+X-Gm-Gg: ASbGncuKhwmq3ZwqRBTiLwqhDppGFokSSTTPxKW/qgd2n1ylB2DFGtlK+G0DezGeUdp
+	es+bW/XK9vdJ+4SfhfXAxTckAbKfx/chLqsFetQ==
+X-Google-Smtp-Source: AGHT+IE6djphQjL1MEwOnkEEvrvDrmMlU23zKRKNABMyX7EgjtISUfRVcUG7GMQHabQ3Hu6qLpyGTacqHTsW+Po9nLc=
+X-Received: by 2002:a05:6402:4402:b0:5d3:ba42:e9d5 with SMTP id
+ 4fb4d7f45d1cf-5d972e06b36mr22872241a12.9.1736861024709; Tue, 14 Jan 2025
+ 05:23:44 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:PCgvCgCn_E1RZYZnl71AAw--.33013S5
-X-Coremail-Antispam: 1Uf129KBjvdXoWrKryDXFyruFy5GF4rAw17trb_yoWkCrcEka
-	yS9Fs5GFykZF43KayUua1kWr93GrWI9r18ZF4rtFZxC348XrykXF95Jrn5Zr18WrW3ury3
-	K3s5JFyfJr129jkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7xRNsjj7UUUUU==
-X-CM-SenderInfo: xpus2vi6rwjhhfrp/1tbiDxfUp2eGWhbp4gABsM
+References: <20250114035118.110297-1-kuba@kernel.org> <20250114035118.110297-11-kuba@kernel.org>
+In-Reply-To: <20250114035118.110297-11-kuba@kernel.org>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 14 Jan 2025 14:23:33 +0100
+X-Gm-Features: AbW1kvYGmxwyNT37MSeXX6xiufm5ebasol5YbUWH97AMmMgZcLxEO6geCttS4Gk
+Message-ID: <CANn89iLJtrMaoHY4td71x30O_s-FO-HNRhvUHBV-MWvb=uB6iw@mail.gmail.com>
+Subject: Re: [PATCH net-next 10/11] net: protect NAPI config fields with netdev_lock()
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, pabeni@redhat.com, 
+	andrew+netdev@lunn.ch, horms@kernel.org, jdamato@fastly.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-sockmap with strparser need customized read operations to fix copied_seq
-error.
+On Tue, Jan 14, 2025 at 4:51=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> Protect the following members of netdev and napi by netdev_lock:
+>  - defer_hard_irqs,
+>  - gro_flush_timeout,
+>  - irq_suspend_timeout.
+>
+> The first two are written via sysfs (which this patch switches
+> to new lock), and netdev genl which holds both netdev and rtnl locks.
+>
+> irq_suspend_timeout is only written by netdev genl.
+>
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-Signed-off-by: Jiayuan Chen <mrpre@163.com>
----
- Documentation/networking/strparser.rst | 11 ++++++++++-
- 1 file changed, 10 insertions(+), 1 deletion(-)
-
-diff --git a/Documentation/networking/strparser.rst b/Documentation/networking/strparser.rst
-index 6cab1f74ae05..e41c18eee2f4 100644
---- a/Documentation/networking/strparser.rst
-+++ b/Documentation/networking/strparser.rst
-@@ -112,7 +112,7 @@ Functions
- Callbacks
- =========
- 
--There are six callbacks:
-+There are seven callbacks:
- 
-     ::
- 
-@@ -182,6 +182,15 @@ There are six callbacks:
-     the length of the message. skb->len - offset may be greater
-     then full_len since strparser does not trim the skb.
- 
-+    ::
-+
-+	int (*read_sock)(struct strparser *strp, read_descriptor_t *desc,
-+                     sk_read_actor_t recv_actor);
-+
-+    read_sock is called when the user specify it, allowing for customized
-+    read operations. If the callback is not set (NULL in strp_init) native
-+    read_sock operation of the socket is used.
-+
-     ::
- 
- 	int (*read_sock_done)(struct strparser *strp, int err);
--- 
-2.43.5
-
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
