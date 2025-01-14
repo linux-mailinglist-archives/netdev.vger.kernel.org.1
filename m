@@ -1,206 +1,187 @@
-Return-Path: <netdev+bounces-157929-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157930-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE960A0FD55
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 01:20:56 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D9791A0FD56
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 01:23:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 84BCF3A1480
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 00:20:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C9B3B1888B63
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 00:23:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFCE9F9C1;
-	Tue, 14 Jan 2025 00:20:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C34C84A3E;
+	Tue, 14 Jan 2025 00:23:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I3pAENvZ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RUOxkzJg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f173.google.com (mail-il1-f173.google.com [209.85.166.173])
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 412615695
-	for <netdev@vger.kernel.org>; Tue, 14 Jan 2025 00:20:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16CB4EC5;
+	Tue, 14 Jan 2025 00:22:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736814052; cv=none; b=Poi0kCM/sShpXCmYUD/x+lnATC1P7BjJNlgLYOfDkBee7pI9NqhrUBHoKt15qbI/akk/TrNjEUdm9gZTirg9mSZrMopOkUKozVdEB0vipYtno0Ar3wQbenA0BMpevXMNNku/pdtDqcwm/MOqtB7DFllGTnU/TVgIkN9sfnCAlag=
+	t=1736814180; cv=none; b=f23iRk3478x2n03OWsAzjUBLnYUF48KNWSrWuDi86hEV4//qxQZ21KfrFkdNyApDrA+2CX2oIw+yxaSr++UKCTn9dtEyI3ZW9dhR2HTeSo98CEM/yxxddrKg40qBATkQ3iorMPhXkvVHX2lS18WCy/Ee5js6qC5sm7sQh/Qq0HQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736814052; c=relaxed/simple;
-	bh=i9AuLtJMqZF9D9n0r0umZkbbJ+/h2JvNMDbbUFGXlvg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mXfAA/tz/Dy39haTG1v0bqWD4pNKeoRUBD9sHjVKM5jMPsX26HcbQZJcQEZEtnNYy28zrm5Z6ee9TgbFU+cQ4C37nvnS61FQ9cSzJQyftxmNT9Srsrm1qiz7WuV8deIO2qmwjLv2mJd/g38XBjtsgJlmen5wySH4/ZjCFOz23A8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=I3pAENvZ; arc=none smtp.client-ip=209.85.166.173
+	s=arc-20240116; t=1736814180; c=relaxed/simple;
+	bh=4Mdgo5HAHEnkKUSS9HMfqB/lmKPdV/Lc/405dapH6ss=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YhWbgcyeiQo+Ops8Yg25jywVmQ6VV/8I7vKvhC3bmxcEx/C16n+qj1DtRmeyc6TaM5Y1/QSsM1CIRLMi9dsGT0qo5A6uRgjjPGEfHqZDgg2VKs6+hq4vk58XWee9tIl6ZOl/6T9Rhxdy2kPDb9wN9LdYkIPUc1Po5X2aWsm5KCM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RUOxkzJg; arc=none smtp.client-ip=209.85.214.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f173.google.com with SMTP id e9e14a558f8ab-3ce4b009465so18621885ab.0
-        for <netdev@vger.kernel.org>; Mon, 13 Jan 2025 16:20:50 -0800 (PST)
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-21636268e43so114133125ad.2;
+        Mon, 13 Jan 2025 16:22:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736814050; x=1737418850; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=FMfKKOquvY6HOEZToorLOFGY/Zv6qMN+WRRzroLexa8=;
-        b=I3pAENvZ9onk4yLc6jj78bdS5s2+o80iiY5LkRN46zWR9HWslh1jfqUcoNT4sTCQju
-         DfZJN6eKhns834EZq1E2BrwBknbpjqtRFvcF68/JssiuoYF+FFGQU0TtxqCr84y8TZYO
-         3ncUbLIkri/+Rahbu9vFn2hPxRJZnWuJidG+M9m8FNRHnc8PPBOIQDMKQUlajIkk73fR
-         sQNgZRNszv2EhO0LbyQoBE3qEtd00heTvJQlScH8nkNBhM3BywGKnW7fMr4WsjXKsMG/
-         boQOJkzh0uNzcq/2DoCL2Gv/u/K3PlcIGGSrXMFNvHwiwaHQRhCaecQYGQxy9Gxh51wQ
-         pnwg==
+        d=gmail.com; s=20230601; t=1736814178; x=1737418978; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=/UiYLFlLwTk2sQjZg8A3ILqtZiVXnyupyxwDjYITKXo=;
+        b=RUOxkzJg2U0iM19CfjhuAUIIkMCw3HvUvcFHaIT8gqqS+HVilLxddr0Nq8wY46KiN+
+         30pjIdYhF+jm0EzIwszkTIB/BjubvQJ/wSuRodFb7H7RYhIFYNhfyikGqAknFxYeHTeU
+         RGy1mqnlfllZpWPUY1tUVyqXnvdBuiTNoVzWKymnliyCnkFIi6uTXdptAJXQX6YmmbvM
+         PZjTipoDHzxsdfmXZVGgSNcwt4OtfRhy4upfNZjobVkf6tWeY7WxR+tKkM0HgCnNo8S5
+         LdHPhVZIeleUBvXtuikywUnbGWWj8h03EqXfLHS8+WY09V/jVJdF3yiQ4esP65yxZht7
+         G7sg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736814050; x=1737418850;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=FMfKKOquvY6HOEZToorLOFGY/Zv6qMN+WRRzroLexa8=;
-        b=cZI2FcbCg57ENuDs3itA+R4A++PV+3imaWcy9A577RkWXlStwuOZ1q2iuPVuU7bc7m
-         GkzHLK70K831fzBq6HSwfE0R4tqNnP3yVXOniI3419wctYKc9Rqygc0QTJhJiot3MBK0
-         qSfl8qvvKtz/9+8+5sSgwHfOUVa+upGh/BPcaPM6LBVvSmO3I2CvWyZzVeZNjmrtFr+F
-         qV34rcY989IDzvIU0JaAmW8ZQcA+sG0REOnA7reb0nFWJqRW8Hy7Qv3b9ZXsi3GlM1a+
-         jA6mMpq/KVCNu6xaR1U3Bk32UX53t8Qm4srco3qjxJjuDOBbzIqjPZl9lbt3ZmMrLrdr
-         Vlrw==
-X-Forwarded-Encrypted: i=1; AJvYcCVh8ohDRUJ43Rh0LBRLv/KXoUTN49nJ9UmQ7aE/RpTJem3M/N23T4v8igz8TgMtAEkheGGOanU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxGHhyUzkMTqvO1GBdDXNjIVpZtQulOPBj9cX/BCjFyTGRgMqi1
-	HmyTHZuulI4W50jn6FncseV+HI6qN0tOsnilQPoWj+e3cIDXb4HvIXpOSXfP6jC0ahWKALSPv0G
-	tPu3+85ruvFF+rRFtqgqVrZr9OeU=
-X-Gm-Gg: ASbGncsZtMtbka16q8sePx72ancBkWOGUpentCtfgTGEezxejgdgVuOBeGeNWlDlHrP
-	yf0xGsVrGKcIy4BKe43w44vM8wjJ+oFHf8J6T
-X-Google-Smtp-Source: AGHT+IGzH7RVAki2c1xn+I079wY6RUsqHc418QWljueYPlLH2Ry1CDs04GOnuQTU85XuotSTbsb/l4LsEmAzS6voZ6Y=
-X-Received: by 2002:a92:c9c6:0:b0:3ce:64a4:4c44 with SMTP id
- e9e14a558f8ab-3ce64a44e2cmr56566205ab.1.1736814050215; Mon, 13 Jan 2025
- 16:20:50 -0800 (PST)
+        d=1e100.net; s=20230601; t=1736814178; x=1737418978;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/UiYLFlLwTk2sQjZg8A3ILqtZiVXnyupyxwDjYITKXo=;
+        b=MJj/4wcOnfr+hla8ro7IFRBG0URCcS/pWo6IZ5wQSKPOA4T58Kvywro1qNIuTCEJJS
+         AtiCnrWieZcRyR+jn7APIDjrAx7aFahxPhDulZKup6iJAMFyMAjMAh5kzx8ubX2TXCRT
+         OzQBy0bplpn9hFbyCKD2OAI/bc3ZVoQpNTV3nGRwo1oPPArMmSsdVXXvhWr0mV0/vgwq
+         oLTIgqIkGyB3JbI3CbTH/LQUGt8a7ADHg4iWE7h3alMI9QAi4MoXmRPYO670BA2N9UzJ
+         x6eqj4Rsw0xQ1usT7s11FuB3KJOYFxj063L4nAihiRgbeFUiqh8aexrQPjoFttJZavDB
+         XeBg==
+X-Forwarded-Encrypted: i=1; AJvYcCX7+tw2rNbtIUtGU6qR3UHjJ1/pck0xWszhA0zD0AY/dtxWMalefXpEhumrswfOlRlg/9U09GFbGV6msYE=@vger.kernel.org, AJvYcCXU9VbDf4w2CU//4jC35PPF/eg+8FRfXW77NC1TRAiVkOf44fMe+fjvABfGLdtmNA+rNW3YFrg8@vger.kernel.org
+X-Gm-Message-State: AOJu0YzVY5mtUoBbz40KbZRgM0Dn97yGbsRvRLhOcyUjkeVuO6TEUGOp
+	xgL6XKD00kiKTWk3TbAOxqASgyaIMWwO5SdziRu7BWE5atsoeEyvclb7Mkt3
+X-Gm-Gg: ASbGncv4sSBXI0ZXibireUA2kgq6mhJviAgspldsz+b/KBIKA4fRxDnR+OEFr+o0M3n
+	T7QY8kY3Uj3cZqo6Fp0s57FLLQ2cfdkWX+P40ltzGpca4/g+Nh6d9X/ohE5irtSimp1Wnu6rtgl
+	rFTx/C1O4iK7ZvKIDR4yiaIWcM5S8csZDoX3Tiiof/1ShksWhsfIFIR/JdcHw1dXUidolFlFn52
+	5dKmXQHp/KGn2YpiPwPwODXV/+Iiyzf+3IgWfGnkhu6NdBf8k/fBQ4A/6uS
+X-Google-Smtp-Source: AGHT+IE7mGmM4vmR+GJnT0a75lDlxZQQHp4cimm6gmSSjGqwJ+CfPeXRXhxxFjJBkLKQuY8yyE12KQ==
+X-Received: by 2002:a17:902:ecc5:b0:215:bf1b:a894 with SMTP id d9443c01a7336-21a83f76704mr351058565ad.24.1736814178141;
+        Mon, 13 Jan 2025 16:22:58 -0800 (PST)
+Received: from HOME-PC ([223.185.133.12])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21a9f10dddfsm59304825ad.23.2025.01.13.16.22.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 13 Jan 2025 16:22:57 -0800 (PST)
+Date: Tue, 14 Jan 2025 05:52:54 +0530
+From: Dheeraj Reddy Jonnalagadda <dheeraj.linuxdev@gmail.com>
+To: "Kwapulinski, Piotr" <piotr.kwapulinski@intel.com>
+Cc: "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+	"Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>,
+	"Swiatkowski, Michal" <michal.swiatkowski@intel.com>
+Subject: Re: [Intel-wired-lan] [PATCH net-next] ixgbe: Remove redundant
+ self-assignments in ACI command execution
+Message-ID: <Z4WuXmWcOwlNAZUt@HOME-PC>
+References: <DM6PR11MB4610108A2FA01B48969501D8F31F2@DM6PR11MB4610.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250106181219.1075-1-ouster@cs.stanford.edu> <20250106181219.1075-8-ouster@cs.stanford.edu>
- <20250110092537.GA66547@j66a10360.sqa.eu95> <CAGXJAmyYmizvm350vSGmJqdOt8d+d0soP95FGhBUQ5nr8kNqnw@mail.gmail.com>
- <CAL+tcoCOSk2ezZ+OnsKBZc_JcO_U01X1q3KmTd6WhObuzbuzsA@mail.gmail.com> <CAGXJAmzCx6NJGeHrW+CB6+Uc0_DDBMJRMzfCbCs3FNGcdBtX3w@mail.gmail.com>
-In-Reply-To: <CAGXJAmzCx6NJGeHrW+CB6+Uc0_DDBMJRMzfCbCs3FNGcdBtX3w@mail.gmail.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Tue, 14 Jan 2025 08:20:14 +0800
-X-Gm-Features: AbW1kvahszfA7wbvyW7-2D8BwPT7ZiWjTzxu3ouqAEKpR3VZYgiSii1RXYrdUpk
-Message-ID: <CAL+tcoAOwxqQVrj3P7AcaB0FOtJZNwSM9iwwpFtic_RGrU8B2A@mail.gmail.com>
-Subject: Re: [PATCH net-next v5 07/12] net: homa: create homa_sock.h and homa_sock.c
-To: John Ousterhout <ouster@cs.stanford.edu>
-Cc: "D. Wythe" <alibuda@linux.alibaba.com>, netdev@vger.kernel.org, pabeni@redhat.com, 
-	edumazet@google.com, horms@kernel.org, kuba@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <DM6PR11MB4610108A2FA01B48969501D8F31F2@DM6PR11MB4610.namprd11.prod.outlook.com>
 
-On Tue, Jan 14, 2025 at 1:12=E2=80=AFAM John Ousterhout <ouster@cs.stanford=
-.edu> wrote:
+On Mon, Jan 13, 2025 at 03:23:31PM +0000, Kwapulinski, Piotr wrote:
+> >[Intel-wired-lan] [PATCH net-next] ixgbe: Remove redundant self-assignments in ACI command execution
+> >@ 2025-01-08  5:36 Dheeraj Reddy Jonnalagadda
+> >  2025-01-08  6:29 ` Michal Swiatkowski
+> >  0 siblings, 1 reply; 2+ messages in thread
+> >From: Dheeraj Reddy Jonnalagadda @ 2025-01-08  5:36 UTC (permalink / raw)
+> >  To: anthony.l.nguyen, przemyslaw.kitszel
+> >  Cc: andrew+netdev, davem, edumazet, kuba, pabeni, intel-wired-lan,
+> >             netdev, linux-kernel, Dheeraj Reddy Jonnalagadda
+> >
+> >Remove redundant statements in ixgbe_aci_send_cmd_execute() where
+> >raw_desc[i] is assigned to itself. These self-assignments have no
+> >effect and can be safely removed.
+> >
+> >Fixes: 46761fd52a88 ("ixgbe: Add support for E610 FW Admin Command Interface")
+> >Closes: https://scan7.scan.coverity.com/#/project-view/52337/11354?selectedIssue=1602757
+> >Signed-off-by: Dheeraj Reddy Jonnalagadda dheeraj.linuxdev@gmail.com<mailto:dheeraj.linuxdev@gmail.com>
+> >---
+> > drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c | 2 --
+> > 1 file changed, 2 deletions(-)
+> >
+> >diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
+> >index 683c668672d6..408c0874cdc2 100644
+> >--- a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
+> >+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
+> >@@ -145,7 +145,6 @@ static int ixgbe_aci_send_cmd_execute(struct ixgbe_hw *hw,
+> >             if ((hicr & IXGBE_PF_HICR_SV)) {
+> >                            for (i = 0; i < IXGBE_ACI_DESC_SIZE_IN_DWORDS; i++) {
+> >                                           raw_desc[i] = IXGBE_READ_REG(hw, IXGBE_PF_HIDA(i));
+> >-                                         raw_desc[i] = raw_desc[i];
+> >                            }
+> >             }
+> >
+> >@@ -153,7 +152,6 @@ static int ixgbe_aci_send_cmd_execute(struct ixgbe_hw *hw,
+> >             if ((hicr & IXGBE_PF_HICR_EV) && !(hicr & IXGBE_PF_HICR_C)) {
+> >                            for (i = 0; i < IXGBE_ACI_DESC_SIZE_IN_DWORDS; i++) {
+> >                                           raw_desc[i] = IXGBE_READ_REG(hw, IXGBE_PF_HIDA_2(i));
+> >-                                         raw_desc[i] = raw_desc[i];
+> >                            }
+> >             }
+> >
+> 
+> Hello,
+> Possible solution may be as follows. I may also prepare the fix myself. Please let me know.
+> Thanks,
+> Piotr
+> 
+> diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
+> index e0f773c..af51e5a 100644
+> --- a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
+> +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
+> @@ -113,7 +113,8 @@ static int ixgbe_aci_send_cmd_execute(struct ixgbe_hw *hw,
+> 
+>         /* Descriptor is written to specific registers */
+>         for (i = 0; i < IXGBE_ACI_DESC_SIZE_IN_DWORDS; i++)
+> -               IXGBE_WRITE_REG(hw, IXGBE_PF_HIDA(i), raw_desc[i]);
+> +               IXGBE_WRITE_REG(hw, IXGBE_PF_HIDA(i),
+> +                               le32_to_cpu(raw_desc[i]));
+> 
+>         /* SW has to set PF_HICR.C bit and clear PF_HICR.SV and
+>          * PF_HICR_EV
+> @@ -145,7 +146,7 @@ static int ixgbe_aci_send_cmd_execute(struct ixgbe_hw *hw,
+>         if ((hicr & IXGBE_PF_HICR_SV)) {
+>                 for (i = 0; i < IXGBE_ACI_DESC_SIZE_IN_DWORDS; i++) {
+>                         raw_desc[i] = IXGBE_READ_REG(hw, IXGBE_PF_HIDA(i));
+> -                       raw_desc[i] = raw_desc[i];
+> +                       raw_desc[i] = cpu_to_le32(raw_desc[i]);
+>                 }
+>         }
+> 
+> @@ -153,7 +154,7 @@ static int ixgbe_aci_send_cmd_execute(struct ixgbe_hw *hw,
+>         if ((hicr & IXGBE_PF_HICR_EV) && !(hicr & IXGBE_PF_HICR_C)) {
+>                 for (i = 0; i < IXGBE_ACI_DESC_SIZE_IN_DWORDS; i++) {
+>                         raw_desc[i] = IXGBE_READ_REG(hw, IXGBE_PF_HIDA_2(i));
+> -                       raw_desc[i] = raw_desc[i];
+> +                       raw_desc[i] = cpu_to_le32(raw_desc[i]);
+>                 }
+>         }
 >
-> On Sat, Jan 11, 2025 at 12:31=E2=80=AFAM Jason Xing <kerneljasonxing@gmai=
-l.com> wrote:
-> >
-> > On Sat, Jan 11, 2025 at 8:20=E2=80=AFAM John Ousterhout <ouster@cs.stan=
-ford.edu> wrote:
-> > >
-> > > On Fri, Jan 10, 2025 at 1:25=E2=80=AFAM D. Wythe <alibuda@linux.aliba=
-ba.com> wrote:
-> > > >
-> > > > > +void homa_sock_unlink(struct homa_sock *hsk)
-> > > > > +{
-> > > > > +     struct homa_socktab *socktab =3D hsk->homa->port_map;
-> > > > > +     struct homa_socktab_scan *scan;
-> > > > > +
-> > > > > +     /* If any scans refer to this socket, advance them to refer=
- to
-> > > > > +      * the next socket instead.
-> > > > > +      */
-> > > > > +     spin_lock_bh(&socktab->write_lock);
-> > > > > +     list_for_each_entry(scan, &socktab->active_scans, scan_link=
-s) {
-> > > > > +             if (!scan->next || scan->next->sock !=3D hsk)
-> > > > > +                     continue;
-> > > > > +             scan->next =3D (struct homa_socktab_links *)
-> > > > > +                             rcu_dereference(hlist_next_rcu(&sca=
-n->next->hash_links));
-> > > > > +     }
-> > > >
-> > > > I can't get it.. Why not just mark this sock as unavailable and ski=
-p it
-> > > > when the iterator accesses it ?
-> > > >
-> > > > The iterator was used under rcu and given that your sock has the
-> > > > SOCK_RCU_FREE flag set, it appears that there should be no concerns
-> > > > regarding dangling pointers.
-> > >
-> > > The RCU lock needn't be held for the entire lifetime of an iterator,
-> > > but rather only when certain functions are invoked, such as
-> > > homa_socktab_next. Thus it's possible for a socket to be reclaimed an=
-d
-> > > freed while a scan is in progress. This is described in the comments
-> > > for homa_socktab_start_scan. This behavior is necessary because of
-> > > homa_timer, which needs to call schedule in the middle of a scan and
-> > > that can't be done without releasing the RCU lock. I don't like this
-> > > complexity but I haven't been able to find a better alternative.
-> > >
-> > > > > +     hsk->shutdown =3D true;
-> > > >
-> > > > From the actual usage of the shutdown member, I think you should us=
-e
-> > > > sock_set_flag(SOCK_DEAD), and to check it with sock_flag(SOCK_DEAD)=
-.
-> > >
-> > > I wasn't aware of SOCK_DEAD until your email. After poking around a
-> > > bit to learn more about SOCK_DEAD, I am nervous about following your
-> > > advice. I'm still not certain exactly when SOCK_DEAD is set or who is
-> > > allowed to set it. The best information I could find was from ChatGPT
-> > > which says this:
-> > >
-> > > "The SOCK_DEAD flag indicates that the socket is no longer referenced
-> > > by any user-space file descriptors or kernel entities. Essentially,
-> > > the socket is considered "dead" and ready to be cleaned up."
-> >
-> > Well, I'm surprised that the GPT is becoming more and more intelligent.=
-..
-> >
-> > The above is correct as you can see from this call trace
-> > (__tcp_close()->sk_orphan()). Let me set TCP as an example, when the
-> > user decides to close a socket or accidently kill/exit the process,
-> > the socket would enter into __tcp_close(), which indicates that this
-> > socket has no longer relationship with its owner (application).
-> >
-> > >
-> > > If ChatGPT isn't hallucinating, this would suggest that Homa shouldn'=
-t
-> > > set SOCK_DEAD, since the conditions above might not yet be true when
-> > > homa_sock_shutdown is invoked.
-> >
-> > Introducing a common usage about SOCK_DEAD might be a good choice. But
-> > if it's not that easy to implement, I think we can use the internal
-> > destruction mechanism instead like you did.
-> >
-> > >
-> > > Moreover, I'm concerned that some other entity might set SOCK_DEAD
-> > > before homa_sock_shutdown is invoked, in which case homa_sock_shutdow=
-n
-> > > would not cleanup the socket properly.
-> >
-> > No need to worry about that. If it happens, it usually means there is
-> > a bug somewhere and then we will fix it.
->
-> I'm not quite sure what you are recommending in your comments above
-> (i.e. should Homa try to use SOCK_DEAD or stick with the current
-> approach of having a separate Homa-specific flag indicating that the
 
-I didn't suggest specifically as I still need some time to take a deep
-look into the implementation, only having offered some information
-that you may be interested in. I will get back to you on this point
-later.
+Hello Piotr,
 
-> socket has been shutdown). Based on what I've heard so far I still
-> prefer having a separate flag because it eliminates any possibility of
-> confusion between Homa's use of SOCK_DEAD and the rest of Linux's use
-> of it.
->
-> I see now that SOCK_DEAD gets set (indirectly) by Homa when homa_close
-> calls sk_common_release. However, this only happens when the fd is
-> closed; hsk->shutdown gets set by homa_sock_shutdown, which can happen
-> before the fd is closed. This seems to argue for a separate state bit
-> for Homa's shutdown.
->
-> -John-
+Thank you for suggesting the fix. I will prepare the new patch and send
+it over.
+
+-Dheeraj
 
