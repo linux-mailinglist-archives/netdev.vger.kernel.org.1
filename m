@@ -1,95 +1,99 @@
-Return-Path: <netdev+bounces-157975-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157976-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0033A0FF93
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 04:37:03 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8FC44A0FFBC
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 04:51:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B5F3C3A59F2
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 03:36:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A50E0162075
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 03:51:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EA2B230279;
-	Tue, 14 Jan 2025 03:36:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 886C8849C;
+	Tue, 14 Jan 2025 03:51:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RdxFD+L2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k0gcht45"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7507E24024E;
-	Tue, 14 Jan 2025 03:36:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63C1C1E871
+	for <netdev@vger.kernel.org>; Tue, 14 Jan 2025 03:51:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736825813; cv=none; b=tCk+6oCSo7Lxw1RQto+QkceW80p6zKkaUDI3L4VcPMtllSG32+sl2pxZOC9sX+b//17la0Ig3WYjdbKOtuyuh1DYE0vjF2ukq9WZeQnPZHS8zWPoK2XKi4IlmfeFeM6i7wt6GVu+f2j/gQRGltb4qL9l1+A+IomlNhkTVjw7Jpo=
+	t=1736826690; cv=none; b=oYejLAZRLh2MU43hxnkQgNnnrTOKCizBG8YB61pnHT3PuJaXc+4q4K3LtG/pCe3D/IwI+MzPM5PQEgu0Rbq/ryYHZMyp54aa8j0s4AcG8QUbBVuw4+5++6HMPvyzIEf19/aqU30X13d+TyQdSC7dbT7tGPPscRJ9yNbRTgDqEX0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736825813; c=relaxed/simple;
-	bh=4qdP3cgBGyskS82WWQ8M3enm+es99peUyXTL1zCJlPM=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=PWJRuA0IeY+1DAxUe2X4upuogjQWuchB9+fHCAVOP8qKg8xDmT+EYd8nx54tJO2CkJNvm7eeEJFiFggKBiOG2zwbqYa3rqOp/d9vyXt3zIEpnLE93gjMfe00zcSY4EVru4rLel4uMNj85G2qWDO/mY/0eg2dHoWL5Y0WnldbkHM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RdxFD+L2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E78ACC4CEE1;
-	Tue, 14 Jan 2025 03:36:51 +0000 (UTC)
+	s=arc-20240116; t=1736826690; c=relaxed/simple;
+	bh=C0a9xGiYVwpJtHtwpr8XmurEK94aHO1Pd8qxwhw+u7g=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=o6KBO92swFrkWGTtp3OSuG8tTzcpKaMyn62tOrEXvXDV9vJleC3duXip422tTdicVZJuivef0c9nimhp8gMOE7kzoa9uZ67eWGX0ee30zaHJ/6rk/jV4pQqE0QiLK9ZXJzNP5snMyUp5pCdesIO+3GI7vmP+62ba71bRj0OdDWE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k0gcht45; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 58D2DC4CEE1;
+	Tue, 14 Jan 2025 03:51:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736825812;
-	bh=4qdP3cgBGyskS82WWQ8M3enm+es99peUyXTL1zCJlPM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=RdxFD+L2TwL7/YscB1yS+FmHFnt6gkVkjT9h8WXlKsvBTAYepaj+o6kl8jEvg16rF
-	 SKg6xiMqk+0/yes9LhiHlfP3yKZRFsRv2KHBeY20nfnC2etqORJ74NJkmz014kSI0E
-	 hCxXa5gtD1x3JkE1Yqh4ctJtU0nJ95/P268SvF9I/Zh1RcaSujwJXvTsuOjTrVsuFw
-	 v9hR5mGwnFixDDfATT91HrOsrSR7DH02aYH+hpFsBcrayT2NjMRmTt1+A+aBZMNlKG
-	 Iuy8L+3ENGxNVuGxa8i3MZQWf1X250/1OV90aMZBQwPS4iTqV+lfIALy7fVrukVKax
-	 TaAueWhPJSW1A==
-Date: Mon, 13 Jan 2025 19:36:50 -0800
+	s=k20201202; t=1736826689;
+	bh=C0a9xGiYVwpJtHtwpr8XmurEK94aHO1Pd8qxwhw+u7g=;
+	h=From:To:Cc:Subject:Date:From;
+	b=k0gcht45GJIS6ezZbwbKYkNrEFzD3N2RgjI8ym9cWGX9n/dOsrAomnsKK7S/5SxNd
+	 BUBLjP21/xOPeHTdqB5ZVLJXbMhH+NpLGRz9zVzk/IFedNkQ3PXBGPVJg85qvIj2Ri
+	 OVT2u7l5YNuA5ca6bU4YX96pmXdpXVMb08OH9a+hBYYJVQ/RL968YTWHwCe/FJPsWH
+	 XpVRcOJEhygv+XS29Cu2vBkOcolImIwML6aWRZEH1G0KW17Ga9p4fS1bNq1unNI+I9
+	 yEZj58vXXfrUi9SjM/q8rBLfCMsge+FSicDAqJTDlHo/iPmn2Hqlz4CdkIUfkjQeau
+	 QSe+bYTA4ET/g==
 From: Jakub Kicinski <kuba@kernel.org>
-To: Shinas Rasheed <srasheed@marvell.com>
-Cc: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
- <hgani@marvell.com>, <sedara@marvell.com>, <vimleshk@marvell.com>,
- <thaller@redhat.com>, <wizhao@redhat.com>, <kheib@redhat.com>,
- <konguyen@redhat.com>, <horms@kernel.org>, <einstein.xue@synaxg.com>,
- Veerasenareddy Burru <vburru@marvell.com>, Andrew Lunn
- <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, "Paolo Abeni" <pabeni@redhat.com>
-Subject: Re: [PATCH net v6 1/4] octeon_ep: update tx/rx stats locally for
- persistence
-Message-ID: <20250113193650.1b3d6f55@kernel.org>
-In-Reply-To: <20250110122730.2551863-2-srasheed@marvell.com>
-References: <20250110122730.2551863-1-srasheed@marvell.com>
-	<20250110122730.2551863-2-srasheed@marvell.com>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	horms@kernel.org,
+	jdamato@fastly.com,
+	Jakub Kicinski <kuba@kernel.org>
+Subject: [PATCH net-next 00/11] net: use netdev->lock to protect NAPI
+Date: Mon, 13 Jan 2025 19:51:06 -0800
+Message-ID: <20250114035118.110297-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On Fri, 10 Jan 2025 04:27:27 -0800 Shinas Rasheed wrote:
-> @@ -991,33 +991,30 @@ static netdev_tx_t octep_start_xmit(struct sk_buff *skb,
->  static void octep_get_stats64(struct net_device *netdev,
->  			      struct rtnl_link_stats64 *stats)
->  {
-> -	u64 tx_packets, tx_bytes, rx_packets, rx_bytes;
->  	struct octep_device *oct = netdev_priv(netdev);
->  	int q;
->  
-> +	oct->iface_tx_stats.pkts = 0;
-> +	oct->iface_tx_stats.octs = 0;
-> +	oct->iface_rx_stats.pkts = 0;
-> +	oct->iface_rx_stats.octets = 0;
-> +	for (q = 0; q < oct->num_ioq_stats; q++) {
-> +		oct->iface_tx_stats.pkts += oct->stats_iq[q].instr_completed;
-> +		oct->iface_tx_stats.octs += oct->stats_iq[q].bytes_sent;
-> +		oct->iface_rx_stats.pkts += oct->stats_oq[q].packets;
-> +		oct->iface_rx_stats.octets += oct->stats_oq[q].bytes;
-> +	}
+We recently added a lock member to struct net_device, with a vague
+plan to start using it to protect netdev-local state, removing
+the need to take rtnl_lock for new configuration APIs.
 
-The new approach is much better, but you can't use oct->iface_* as
-intermediate storage. There is no exclusive locking on this function,
-multiple processes can be executing this function in parallel.
-Overwriting each others updates to oct->iface_tx_stats etc.
+Lay some groundwork and use this lock for protecting NAPI APIs.
+
+Jakub Kicinski (11):
+  net: add netdev_lock() / netdev_unlock() helpers
+  net: add helpers for lookup and walking netdevs under netdev_lock()
+  net: make netdev_lock() protect netdev->reg_state
+  net: add netdev->up protected by netdev_lock()
+  net: protect netdev->napi_list with netdev_lock()
+  net: protect NAPI enablement with netdev_lock()
+  net: make netdev netlink ops hold netdev_lock()
+  net: protect threaded status of NAPI with netdev_lock()
+  net: protect napi->irq with netdev_lock()
+  net: protect NAPI config fields with netdev_lock()
+  netdev-genl: remove rtnl_lock protection from NAPI ops
+
+ include/linux/netdevice.h                   | 117 +++++++++++--
+ net/core/dev.h                              |  29 +++-
+ drivers/net/ethernet/amd/pcnet32.c          |  11 +-
+ drivers/net/ethernet/intel/iavf/iavf_main.c |  84 ++++-----
+ drivers/net/ethernet/marvell/mvneta.c       |   5 +-
+ drivers/net/ethernet/via/via-velocity.c     |   4 +-
+ drivers/net/netdevsim/ethtool.c             |   4 +-
+ net/core/dev.c                              | 183 ++++++++++++++++++--
+ net/core/net-sysfs.c                        |  37 +++-
+ net/core/netdev-genl.c                      |  56 +++---
+ net/shaper/shaper.c                         |   6 +-
+ 11 files changed, 417 insertions(+), 119 deletions(-)
+
 -- 
-pw-bot: cr
+2.47.1
+
 
