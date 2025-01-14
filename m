@@ -1,92 +1,114 @@
-Return-Path: <netdev+bounces-158043-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158044-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D4ECA1034B
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 10:50:18 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C8D2A10376
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 10:57:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2BCF33A7D98
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 09:50:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id ACDCE188979C
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 09:57:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C094A243328;
-	Tue, 14 Jan 2025 09:50:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21C5D1ADC7B;
+	Tue, 14 Jan 2025 09:57:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Juh4vZOW"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="o3f9nXid"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out30-100.freemail.mail.aliyun.com (out30-100.freemail.mail.aliyun.com [115.124.30.100])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CEAE22DC44
-	for <netdev@vger.kernel.org>; Tue, 14 Jan 2025 09:50:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E9AF1ADC73;
+	Tue, 14 Jan 2025 09:57:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.100
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736848211; cv=none; b=V3DUOeethKBoW90jP5hN15HE+IiWR5sf43vfto7kesQuHpZ1xlxl68Nmy4tdTs7UgR47YZex6QeeoyC7X4GrOUicZWuA8V3d6aqJIF5+n9BMXYskKdb/pSxuoF0FZ2pj1dUgtNnKbTA1FP/xE6/sQ/YWcglYrW1XehS68SQ3Leg=
+	t=1736848633; cv=none; b=nOsC4lO0T7bV4PneOLiAgWnPe4HrxKU/5TbnZKMsmvMDObmroUF6OhrMza0/5xzUPwczqTApNW4wHk1C1kOOaAQEZ8Hszz3rEoq1hRrwgGNuSzHU9vR72E6DlE1AKrpjoqmtFSXPPZkyiybmMV7Ev7XfvcC2r7ncAAcnrzUlyPw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736848211; c=relaxed/simple;
-	bh=G+QhnUfJCIWBYVa/pI461qo/brbWyvOM6zV9Khb/Uuw=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=YiCGXrEWq9ynFMSzaQmJuSwkE0EqdAJBiJYFccSlGb+4KkPI0pdxYpDRe1G4BD1jGySt+wWT/MUz4tgbAMe7y5hn2tANGiqy1LxtoU0jdYzbUCF1rYjyXuMfsrHGOABPYFalFMrVG4Udkiv5ym904UG0EXW5dcHenn+Zk7KI9vM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Juh4vZOW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C7820C4CEE1;
-	Tue, 14 Jan 2025 09:50:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736848210;
-	bh=G+QhnUfJCIWBYVa/pI461qo/brbWyvOM6zV9Khb/Uuw=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Juh4vZOWicANbwwhzYOtXVIHoqBgFSoupC6uU0WkIns4H7ZLx8c6uPwbMn1OWT8lg
-	 D89Zc82FN21uPUEzckcMi/7NHGyZJC41qAeVBL3C9hQNr2sigZP3HyGux2miKFdfAO
-	 S41zjyfN6XDK7cv0dk3HMcuI0xcHgRN0Lj+te+QoOwf6cKjNzHdM/6eEm1DHC4in3H
-	 GDaPpwNRZXKPe9cHIDQVbDmMlbPBhGR0FN20FobAJmNqJVGxysFJPMlef4kMJjNSgK
-	 WN0ef2J0HvZ8AQN9rayfGewmy2+T2kxH0AWqdd9ehxdZTv1IpS9Hy2FpvtIHGTeYMS
-	 QUmMn8TrjZuPA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADE0F380AA5F;
-	Tue, 14 Jan 2025 09:50:34 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1736848633; c=relaxed/simple;
+	bh=p2S7cQjHwtKfXhux3t3TqEpA73IACmKf3QU7Jnt5v3c=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=geZ6N6Lr75BcPDCkm7aTPcK4JQfq89cbmpY2+x1HhOWHdmtYlkakvWeFucBe4DYBnLe/4IG5FsSZ1ohgaxODp5joV3Md149mOwq8ifhstQV/mQwVxFcbFza9X4hoHLfKMqUkXHZ+fpfOyTaC5BdEMy+WdLcWy+66Mau9BGDSQyI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=o3f9nXid; arc=none smtp.client-ip=115.124.30.100
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1736848621; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
+	bh=iNcP2KCOX9JtWeJDFiPz7AMgXEFC4KxUVa/PMlGFmbs=;
+	b=o3f9nXidq61dcOlOV5YzbkcyWvSKvPj0w4pLh7wVZ6mVLbP89n57IVFcd5nT4dt/kkAh7oWL9qxDEboCPsr75DxqzP4Dch/Rdnd71cGS+uDS8Wf86DXpHjrjvFVZNBAxCf2ZptEfFj9eLXO9pCIeodejMUXeQGQkb+NsnhrFkVM=
+Received: from localhost(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0WNevIV4_1736848295 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Tue, 14 Jan 2025 17:51:36 +0800
+Date: Tue, 14 Jan 2025 17:51:35 +0800
+From: "D. Wythe" <alibuda@linux.alibaba.com    >
+To: Dust Li <dust.li@linux.alibaba.com>
+Cc: "D. Wythe" <alibuda@linux.alibaba.com>, kgraul@linux.ibm.com,
+	wenjia@linux.ibm.com, jaka@linux.ibm.com, ast@kernel.org,
+	daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev,
+	pabeni@redhat.com, song@kernel.org, sdf@google.com,
+	haoluo@google.com, yhs@fb.com, edumazet@google.com,
+	john.fastabend@gmail.com, kpsingh@kernel.org, jolsa@kernel.org,
+	guwen@linux.alibaba.com, kuba@kernel.org, davem@davemloft.net,
+	netdev@vger.kernel.org, linux-s390@vger.kernel.org,
+	linux-rdma@vger.kernel.org, bpf@vger.kernel.org
+Subject: Re: [PATCH bpf-next v5 2/5] net/smc: Introduce generic hook smc_ops
+Message-ID: <20250114095135.GB16797@j66a10360.sqa.eu95>
+References: <20250107041715.98342-1-alibuda@linux.alibaba.com>
+ <20250107041715.98342-3-alibuda@linux.alibaba.com>
+ <20250113114944.GB89233@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: sched: calls synchronize_net() only when needed
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173684823353.4114903.1861011495450506175.git-patchwork-notify@kernel.org>
-Date: Tue, 14 Jan 2025 09:50:33 +0000
-References: <20250109171850.2871194-1-edumazet@google.com>
-In-Reply-To: <20250109171850.2871194-1-edumazet@google.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- jhs@mojatatu.com, xiyou.wangcong@gmail.com, jiri@resnulli.us,
- netdev@vger.kernel.org, eric.dumazet@gmail.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250113114944.GB89233@linux.alibaba.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Thu,  9 Jan 2025 17:18:50 +0000 you wrote:
-> dev_deactivate_many() role is to remove the qdiscs
-> of a network device.
+On Mon, Jan 13, 2025 at 07:49:44PM +0800, Dust Li wrote:
+> On 2025-01-07 12:17:12, D. Wythe wrote:
+> >The introduction of IPPROTO_SMC enables eBPF programs to determine
+> >whether to use SMC based on the context of socket creation, such as
+> >network namespaces, PID and comm name, etc.
+> >
+> >As a subsequent enhancement, to introduce a new generic hook that
+> >allows decisions on whether to use SMC or not at runtime, including
+> >but not limited to local/remote IP address or ports.
+> >
+> >Moreover, in the future, we can achieve more complex extensions to the
+> >protocol stack by extending this ops.
+> >
+> >Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
+> >---
+> > include/net/netns/smc.h |  3 ++
+> > include/net/smc.h       | 51 ++++++++++++++++++++++
+> > net/ipv4/tcp_output.c   | 15 +++++--
+> > net/smc/Kconfig         | 12 ++++++
+> > net/smc/Makefile        |  1 +
+> > net/smc/smc_ops.c       | 51 ++++++++++++++++++++++
+> > net/smc/smc_ops.h       | 25 +++++++++++
+> > net/smc/smc_sysctl.c    | 95 +++++++++++++++++++++++++++++++++++++++++
+> > 8 files changed, 249 insertions(+), 4 deletions(-)
+> > create mode 100644 net/smc/smc_ops.c
+> > create mode 100644 net/smc/smc_ops.h
+> >
+> >+
+> >+struct smc_ops {
 > 
-> When/if a qdisc is dismantled, an rcu grace period
-> is needed to make sure all outstanding qdisc enqueue
-> are done before we proceed with a qdisc reset.
+> One more thing.
+> Can we call it smc_bpf_ops ? I think smc_ops is a bit ambiguous.
+> Same for smc_ops.h/c source file.
+
+I don't think smc_bpf_ops is a good idea. BPF is just a way to implement
+smc_ops. Similarly, we can also implement this ops within the kernel module,
+just like tcp_congestion_ops dose. If you think this is ambiguous, perhaps
+we can call it as smc_handshake_ops ? This should eliminate the ambiguity.
+
+Best wishes,
+D. Wythe
 > 
-> [...]
-
-Here is the summary with links:
-  - [net-next] net: sched: calls synchronize_net() only when needed
-    https://git.kernel.org/netdev/net-next/c/88df16f851ad
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+> Best regards,
+> Dust
 
