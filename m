@@ -1,72 +1,71 @@
-Return-Path: <netdev+bounces-157947-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157948-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D2EFA0FECF
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 03:30:32 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8601AA0FED2
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 03:33:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B40E2188950B
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 02:30:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 907BD164B07
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 02:33:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6BAF23027D;
-	Tue, 14 Jan 2025 02:30:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EC0D22FE19;
+	Tue, 14 Jan 2025 02:33:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fOO0TsYJ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Xhz/myaP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f43.google.com (mail-io1-f43.google.com [209.85.166.43])
+Received: from mail-io1-f54.google.com (mail-io1-f54.google.com [209.85.166.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35A8523099A
-	for <netdev@vger.kernel.org>; Tue, 14 Jan 2025 02:30:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE4A41FC0EB
+	for <netdev@vger.kernel.org>; Tue, 14 Jan 2025 02:33:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736821822; cv=none; b=KWLThZQhHdrzPaDpLtFebMEFDeb/tT026lHTG9naOPQrGAEpd83aGhcPOc4m8RqYrfkuZAGlEboWlxBc7bVkscD/+FL9HWklI82VpqMXlGG/Rw5ynpiF25FLjl55lm412ADNyZmv8isbQFCsvh41a8lO3MLge60OkWmpVCVLJkc=
+	t=1736821986; cv=none; b=qxUOBDf6uKCwNbjbbSnIktjDUyrK7q3qO+Nftv6XcJuyuU7tr9IaAfdVX9CfiRAdSbsrIlnMh98DyXSAzDlFjDlFNQEMjQo2MBqiTw9Ey+eM1FVAKAtcWZFfp8KqBKTVO5rIknWT2A1xzsWCBPcM8xjjNIVXVOoBB0wPsvKVgJw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736821822; c=relaxed/simple;
-	bh=1JGxDPlVJKwJ2pOm0AYyOTwzDG6j5Rq9cVKC/n6+X1U=;
+	s=arc-20240116; t=1736821986; c=relaxed/simple;
+	bh=8A9Ek7/CsE4wAUBHvh1FhM/xzMSEkdF9qkH3JOEeSUI=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=hj4w8/nGSypN4T/Q2S2H5BLDgHGb/Pz3KhMs5dkZJ1sDVc4x2xdRFqgK4wYaxTj5Hk+H0Lb/a3gxgjJ5QqE6zKj8Nw07bcm//zN+jFxtSafWUei61bHQ+fQwVU1dstaLI0qLBuc1Y6RK5kD9Cc1JAQ8rUhPsVys8/vHpbe6VygY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fOO0TsYJ; arc=none smtp.client-ip=209.85.166.43
+	 To:Cc:Content-Type; b=J0KJpjtbc/FkcNL6B6L+iQ1H21bdp0tpNRHl6ScD1suz0JCfrvg+Y73KW39ObEwsSIPhYWpsTAIEEi+M6jHclD4qgGEj3wnVpah9O7t6wKT18UJZOjlPFLkLv23SRJPxElrAYgUOvjJrN3CZYXj5O+n9sNPbtinR7osSgmAoEDg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Xhz/myaP; arc=none smtp.client-ip=209.85.166.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-io1-f43.google.com with SMTP id ca18e2360f4ac-844e6d1283aso194656339f.1
-        for <netdev@vger.kernel.org>; Mon, 13 Jan 2025 18:30:20 -0800 (PST)
+Received: by mail-io1-f54.google.com with SMTP id ca18e2360f4ac-844e10ef3cfso384371239f.2
+        for <netdev@vger.kernel.org>; Mon, 13 Jan 2025 18:33:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736821819; x=1737426619; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1736821984; x=1737426784; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Wi4nx1sWNXbvZ3D5K/fRFrFHiw+XD+GO1PsMwT5Ekks=;
-        b=fOO0TsYJKAqmq35xZPAd5254VdDN6P3gOJykqvLmDcY6tSD9MwlkK/WGjQcjic+84P
-         uHhDRnDjgLOQmnuNNcbQj2f8R7RxHQ8mCO5Pg8V9d+ilI4FMXrGlWZ8Mdly68qzed+SP
-         /IXZaopiOyBXnONkM0VGQj4tf4DLk+e8JZ/2xwf4M1a4nqfG1jsIcbq0Wn2ezbEGvA67
-         Lcodva13fwW4VudhJh8kG4lRGDk+GzgspTHVXLnM4vABzy/n2pr36jAK5nhhchH15INn
-         RU85+6fx621wgwUwdPxytcGW5O5+PQ81lfQ3U4BVsgBYZxshFfo8lBDZ/SN+LaKtEjEv
-         XnkA==
+        bh=As+RiFzHkmcgTrR5YFBKCEwC7EaYyEaJNiSSsfkrMJk=;
+        b=Xhz/myaPf0nTz216zzvOPUiOfrl0sJj7Opa6rhXZEqi3pN4VG3QNLlKk48e15pm74d
+         FIoZuS8oRynTB9y4TRy5GKNFWlVGUdqoC56emXJsiWoY0w/9FTHc45LetMFL0k4IyXS6
+         JvzBa1vqDkRAzP6362lnyBOATzJcowxIVy6BbcC+2+H1E+RgiR/dnW/1E4wkOkWFCJ3H
+         /drkF91zMTJkOiYz53Bb0A68Gr5YQxgegXcvjz8S0ZZAUSWVPKkori/x82IC5RcIxlP/
+         wvbh8OgRWmDSWCZa9+PeUkUocUE0oraBZ0eVYxlvqWS/KlZQWYsOqQGTsAoFrPS1duxi
+         EmVw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736821819; x=1737426619;
+        d=1e100.net; s=20230601; t=1736821984; x=1737426784;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Wi4nx1sWNXbvZ3D5K/fRFrFHiw+XD+GO1PsMwT5Ekks=;
-        b=a9ChrZKFp/TGOIKcYpS3wCU67Gv6cn2Xt7/2tcCyMxxHnJk7zf44WtPRw/ye3NyTA7
-         lwYZVvVZeOMmJG1WX5G6QZvWneXxpGLd6UXlUUn1k0d268KaWCr5jSK8MSI7jUbKMWVi
-         lURs3uGnhxWYo8pD9WYJ+mUE1Tt8dhcVv+BMrm48XHCUaPVMf0c5hoTDLmyriUtlgr/0
-         vtgbzQvRNQSX/eJeaeqEjrNhfrV3NIm7pkK3Ur181+YJExxVrUyywogK4sPxiQHaKsJb
-         Jn1OhrBuf8zxsfKBKMeNgy/9mFc8PEm/tWH42anFqLlpM/AOy7yHZOLQKsVhOpYLr8Dw
-         aBSQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWvBjPDiSSF3r3Q9XH2exYvtHF3+C8EstCYlgg5c5XpAWAQNJWZiM3Sn1A9qyGNuUWib5yEWjE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyXDF/Ng41iAZSBeNqUTqwTRmjOh5Qe6M2C9EogswDJ5tBAH48R
-	8lKXm7xip0gQszKbN8My78BeIZlw/SCugP+yFzmtdiasyjJeWhPKVhB8U6SCjq2/9OBWa7cgyqv
-	Z6tU7HjnhFeAn9Uqim0ym9MR5IZI=
-X-Gm-Gg: ASbGnctU7Mex+F5OmyeXRPRl+T7kMZ+MFg1cHPKnNhJO4Z5T1zgq2VLnE3CJukaKY1S
-	yA/lwtu0YLsvVSRwCidR8W9+vVs5ca+kbNSJMQbr/
-X-Google-Smtp-Source: AGHT+IF1V1F3d+zIryz+B4ybxxhH50JwzGeXSKZlUlWyxsM7eaQtJMqML1bnrLwpV2ctDAx7JFoJInB+X2PBNgSt+7M=
-X-Received: by 2002:a05:6e02:13a6:b0:3cd:bcbf:1091 with SMTP id
- e9e14a558f8ab-3ce4b21610amr152770125ab.10.1736821819236; Mon, 13 Jan 2025
- 18:30:19 -0800 (PST)
+        bh=As+RiFzHkmcgTrR5YFBKCEwC7EaYyEaJNiSSsfkrMJk=;
+        b=jqnT03qWVtGCwbYyFtpBFI/C2KcYV630pFQpr1j7HdZ82vSfFh2PTT8lOqO8xvznLa
+         9zoRduEzNnRqM3cOEbJiAiQt5wwBpzQ19XP9qMfhMaGED0fTtd/QOIWkQawTfSbjPa8U
+         cjgzSTNJ3GQt9FXbWctgvJgHd2TkdhvxdQGxDxj/6t+U5IZiEk3hFx2MasvMOL5thKPS
+         GaDBqa2jnd1835taK5BeDPZuE6AuM0AXLe/3Vpeyre6Z1a7sLLsf6xYAZUaLkMhV+vGQ
+         uokXVXM4QZMmFh+WKig38SeLBCgl6q2Z4zrwdV8xgEt4mkEBrLw4PW+2Xdp+ON5iYI8M
+         mMlw==
+X-Gm-Message-State: AOJu0YzuY+vj24s6JtcQ00LUSWAf0itV9HlmAHaF66w/LPGHA/6KA9Wy
+	2S0uEmXZi5J9awUi0UqjFwoeuVdjEDxMNNZtXcM/m+qdWgSRdi40SL/D9hpkHSSsy3/mlwdWSqX
+	oXHvXC7bEjle3qJc6AhrISjupedY=
+X-Gm-Gg: ASbGncsP9GC1AgI/98UVKSgB6n4TXiEIJ0P46PH83OSc3LaXfGrJQkomC1XBcdOVvka
+	UvKGWrtMMdMLgr5zSujfAyx6mr7Q7Rr/gC+UNQzMC
+X-Google-Smtp-Source: AGHT+IH9K/vpDUpJeClqagetkKP/eQgM3Faj/ZmZal7KA4J8z3aojPxUBwsqTZkX/sGMND2jrZUam48Ufs7qZ0x5WjQ=
+X-Received: by 2002:a05:6e02:1fe1:b0:3a7:70a4:6872 with SMTP id
+ e9e14a558f8ab-3ce3a9c1f00mr187095705ab.9.1736821984000; Mon, 13 Jan 2025
+ 18:33:04 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,161 +73,121 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 References: <17d459487b61c5d0276a01a3bc1254c6432b5d12.1736793775.git.lucien.xin@gmail.com>
- <8cf44ce9-e117-46fe-8bef-21200db97d0f@fiberby.net>
-In-Reply-To: <8cf44ce9-e117-46fe-8bef-21200db97d0f@fiberby.net>
+ <20250113142600.6712511f@kernel.org>
+In-Reply-To: <20250113142600.6712511f@kernel.org>
 From: Xin Long <lucien.xin@gmail.com>
-Date: Mon, 13 Jan 2025 21:30:08 -0500
-X-Gm-Features: AbW1kvaYlyrOesiepOgV7EdfHrBKhmiUCmAPbXgvE242g3EVR4-bQ9P7sdTpPas
-Message-ID: <CADvbK_dYKMvZ8iUS-CvzNYYue1qxTsWXDpvcETyBD+sWOJcaSA@mail.gmail.com>
+Date: Mon, 13 Jan 2025 21:32:53 -0500
+X-Gm-Features: AbW1kvZ9J7915HU85-HahsuyrMQYnolM8sBF4diQoKqqWM4RGEHq0OGdtdLw_jQ
+Message-ID: <CADvbK_d50y-9f_n6XtLYt=5mi3QA+TNYydux+O7Y=PJGgJhOAA@mail.gmail.com>
 Subject: Re: [PATCHv2 net] net: sched: refine software bypass handling in tc_run
-To: =?UTF-8?B?QXNiasO4cm4gU2xvdGggVMO4bm5lc2Vu?= <ast@fiberby.net>
-Cc: davem@davemloft.net, kuba@kernel.org, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Jamal Hadi Salim <jhs@mojatatu.com>, 
-	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, 
-	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, Shuang Li <shuali@redhat.com>, 
-	network dev <netdev@vger.kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: network dev <netdev@vger.kernel.org>, davem@davemloft.net, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, 
+	Jiri Pirko <jiri@resnulli.us>, Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, ast@fiberby.net, 
+	Shuang Li <shuali@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jan 13, 2025 at 4:41=E2=80=AFPM Asbj=C3=B8rn Sloth T=C3=B8nnesen <a=
-st@fiberby.net> wrote:
+On Mon, Jan 13, 2025 at 5:26=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
 >
-> Hi Xin,
+> On Mon, 13 Jan 2025 13:42:55 -0500 Xin Long wrote:
+> > This patch addresses issues with filter counting in block (tcf_block),
+> > particularly for software bypass scenarios, by introducing a more
+> > accurate mechanism using useswcnt.
 >
-> With the concept turned on it's head, we properly shouldn't call it a byp=
-ass
-> anymore? Now that software processing is only enabled, if there are any r=
-ules
-> that needs it.
-cool, I missed that.
+> I think this is causing:
+>
+> [   35.565404][  T350] BUG: sleeping function called from invalid context=
+ at ./include/linux/percpu-rwsem.h:49
+> [   35.565956][  T350] in_atomic(): 1, irqs_disabled(): 0, non_block: 0, =
+pid: 350, name: tc
+> [   35.566288][  T350] preempt_count: 1, expected: 0
+> [   35.566529][  T350] RCU nest depth: 0, expected: 0
+> [   35.566753][  T350] 2 locks held by tc/350:
+> [   35.566922][  T350]  #0: ffffffff9d1e7e88 (rtnl_mutex){+.+.}-{4:4}, at=
+: tc_new_tfilter+0x902/0x1c90
+> [   35.567325][  T350]  #1: ffff88800a377b90 (&tp->lock){+.+.}-{3:3}, at:=
+ tc_new_tfilter+0x9d1/0x1c90
+> [   35.567707][  T350] CPU: 2 UID: 0 PID: 350 Comm: tc Not tainted 6.13.0=
+-rc7-virtme #1
+> [   35.568006][  T350] Hardware name: Bochs Bochs, BIOS Bochs 01/01/2011
+> [   35.568259][  T350] Call Trace:
+> [   35.568414][  T350]  <TASK>
+> [   35.568520][  T350]  dump_stack_lvl+0xb0/0xd0
+> [   35.568745][  T350]  __might_resched+0x2f8/0x530
+> [   35.568945][  T350]  ? tc_new_tfilter+0x9d1/0x1c90
+> [   35.569151][  T350]  cpus_read_lock+0x1b/0xe0
+> [   35.569349][  T350]  static_key_slow_inc+0x13/0x30
+> [   35.569547][  T350]  tc_new_tfilter+0x1523/0x1c90
+> [   35.569757][  T350]  ? mark_lock+0x38/0x3e0
+> [   35.569918][  T350]  ? __pfx_tc_new_tfilter+0x10/0x10
+> [   35.570142][  T350]  ? __pfx_lock_acquire.part.0+0x10/0x10
+> [   35.570555][  T350]  ? rtnetlink_rcv_msg+0x6ef/0xc10
+> [   35.570767][  T350]  ? __pfx_tc_new_tfilter+0x10/0x10
+> [   35.570968][  T350]  rtnetlink_rcv_msg+0x712/0xc10
+> [   35.571174][  T350]  ? __pfx_rtnetlink_rcv_msg+0x10/0x10
+> [   35.571393][  T350]  ? hlock_class+0x4e/0x130
+> [   35.571591][  T350]  ? mark_lock+0x38/0x3e0
+> [   35.571749][  T350]  ? __lock_acquire+0xb9a/0x1680
+> [   35.571951][  T350]  netlink_rcv_skb+0x130/0x360
+> [   35.572153][  T350]  ? __pfx_rtnetlink_rcv_msg+0x10/0x10
+> [   35.572353][  T350]  ? __pfx_netlink_rcv_skb+0x10/0x10
+> [   35.572571][  T350]  ? netlink_deliver_tap+0x13e/0x340
+> [   35.572772][  T350]  ? netlink_deliver_tap+0xc3/0x340
+> [   35.572982][  T350]  netlink_unicast+0x44b/0x710
+> [   35.573188][  T350]  ? __pfx_netlink_unicast+0x10/0x10
+> [   35.573387][  T350]  ? find_held_lock+0x2c/0x110
+> [   35.573591][  T350]  netlink_sendmsg+0x723/0xbe0
+> [   35.573796][  T350]  ? __pfx_netlink_sendmsg+0x10/0x10
+> [   35.574006][  T350]  ____sys_sendmsg+0x7ac/0xa10
+> [   35.574207][  T350]  ? __pfx_____sys_sendmsg+0x10/0x10
+> [   35.574407][  T350]  ? __pfx_copy_msghdr_from_user+0x10/0x10
+> [   35.574668][  T350]  ___sys_sendmsg+0xee/0x170
+> [   35.574866][  T350]  ? __debug_check_no_obj_freed+0x253/0x520
+> [   35.575114][  T350]  ? __pfx____sys_sendmsg+0x10/0x10
+> [   35.575318][  T350]  ? __pfx___debug_check_no_obj_freed+0x10/0x10
+> [   35.575565][  T350]  ? __pfx_free_object_rcu+0x10/0x10
+> [   35.575766][  T350]  ? trace_rcu_segcb_stats+0x36/0x1e0
+> [   35.575973][  T350]  ? lockdep_hardirqs_on_prepare+0x275/0x410
+> [   35.576225][  T350]  ? kmem_cache_free+0xf8/0x330
+> [   35.576423][  T350]  ? do_sys_openat2+0x141/0x160
+> [   35.576620][  T350]  ? do_sys_openat2+0x10a/0x160
+> [   35.576821][  T350]  ? do_sys_openat2+0x10a/0x160
+> [   35.577027][  T350]  __sys_sendmsg+0x109/0x1a0
+> [   35.577226][  T350]  ? __pfx___sys_sendmsg+0x10/0x10
+> [   35.577448][  T350]  do_syscall_64+0xc1/0x1d0
+> [   35.577648][  T350]  entry_SYSCALL_64_after_hwframe+0x77/0x7f
+> [   35.577892][  T350] RIP: 0033:0x7f539e60b9a7
+> [   35.578106][  T350] Code: Unable to access opcode bytes at 0x7f539e60b=
+97d.
+> [   35.578359][  T350] RSP: 002b:00007ffd917a3fc8 EFLAGS: 00000246 ORIG_R=
+AX: 000000000000002e
+> [   35.578670][  T350] RAX: ffffffffffffffda RBX: 000000000047dbc0 RCX: 0=
+0007f539e60b9a7
+> [   35.578979][  T350] RDX: 0000000000000000 RSI: 00007ffd917a4030 RDI: 0=
+000000000000005
+> [   35.579271][  T350] RBP: 000000000000dd86 R08: 0000000000000000 R09: 0=
+000000000000000
+> [   35.579567][  T350] R10: 00007f539e4c4708 R11: 0000000000000246 R12: 0=
+0007ffd917a9973
+> [   35.579862][  T350] R13: 00000000678583dc R14: 0000000000483b60 R15: 0=
+0007ffd917a9977
+> [   35.580179][  T350]  </TASK>
+> --
+Thanks for catching this.
 
->
-> s/PATCHv2 net/PATCH v2 net/g, but I think my patch below pushes it
-> firmly into net-next territory, unless you can convince the maintainers t=
-hat
-> usesw is always set correctly.
-yeah, it's now changing the code tc_run() in  net/core/dev.c.
+I will try moving the call to static_branch_inc() out of
+spin_lock(&tp->lock), like:
 
->
-> I will run it through some tests tomorrow with my patch applied.
-That will be great. :-)
-
-Thanks.
->
-> On 1/13/25 6:42 PM, Xin Long wrote:
-> > [...]
-> > @@ -410,48 +411,17 @@ static void tcf_proto_get(struct tcf_proto *tp)
-> >       refcount_inc(&tp->refcnt);
-> >   }
-> >
-> > -static void tcf_maintain_bypass(struct tcf_block *block)
-> > -{
-> > -     int filtercnt =3D atomic_read(&block->filtercnt);
-> > -     int skipswcnt =3D atomic_read(&block->skipswcnt);
-> > -     bool bypass_wanted =3D filtercnt > 0 && filtercnt =3D=3D skipswcn=
-t;
-> > -
-> > -     if (bypass_wanted !=3D block->bypass_wanted) {
-> > -#ifdef CONFIG_NET_CLS_ACT
-> > -             if (bypass_wanted)
-> > -                     static_branch_inc(&tcf_bypass_check_needed_key);
->
-> This enabled the global sw bypass checking static key, when sw was NOT us=
-ed.
->
-> > [...]
-> > @@ -2409,7 +2379,13 @@ static int tc_new_tfilter(struct sk_buff *skb, s=
-truct nlmsghdr *n,
-> >               tfilter_notify(net, skb, n, tp, block, q, parent, fh,
-> >                              RTM_NEWTFILTER, false, rtnl_held, extack);
-> >               tfilter_put(tp, fh);
-> > -             tcf_block_filter_cnt_update(block, &tp->counted, true);
-> > +             spin_lock(&tp->lock);
-> > +             if (tp->usesw && !tp->counted) {
-> > +                     if (atomic_inc_return(&block->useswcnt) =3D=3D 1)
-> > +                             static_branch_inc(&tcf_bypass_check_neede=
-d_key);
->
-> This enables the global sw bypass checking static key, when sw IS used.
->
-> I think you are missing the below patch (not tested in anyway, yet):
->
-> This patch:
-> - Renames the static key, as it's use has changed.
-> - Fixes tc_run() to the new way to use the static key.
->
-> ---
-> diff --git a/include/net/pkt_cls.h b/include/net/pkt_cls.h
-> index e4fea1decca1..4eb0ebb9e76c 100644
-> --- a/include/net/pkt_cls.h
-> +++ b/include/net/pkt_cls.h
-> @@ -75,7 +75,7 @@ static inline bool tcf_block_non_null_shared(struct tcf=
-_block *block)
->   }
->
->   #ifdef CONFIG_NET_CLS_ACT
-> -DECLARE_STATIC_KEY_FALSE(tcf_bypass_check_needed_key);
-> +DECLARE_STATIC_KEY_FALSE(tcf_sw_enabled_key);
->
->   static inline bool tcf_block_bypass_sw(struct tcf_block *block)
->   {
-> diff --git a/net/core/dev.c b/net/core/dev.c
-> index a9f62f5aeb84..3ec89165296f 100644
-> --- a/net/core/dev.c
-> +++ b/net/core/dev.c
-> @@ -2134,8 +2134,8 @@ EXPORT_SYMBOL_GPL(net_dec_egress_queue);
->   #endif
->
->   #ifdef CONFIG_NET_CLS_ACT
-> -DEFINE_STATIC_KEY_FALSE(tcf_bypass_check_needed_key);
-> -EXPORT_SYMBOL(tcf_bypass_check_needed_key);
-> +DEFINE_STATIC_KEY_FALSE(tcf_sw_enabled_key);
-> +EXPORT_SYMBOL(tcf_sw_enabled_key);
->   #endif
->
->   DEFINE_STATIC_KEY_FALSE(netstamp_needed_key);
-> @@ -4030,10 +4030,13 @@ static int tc_run(struct tcx_entry *entry, struct=
- sk_buff *skb,
->         if (!miniq)
->                 return ret;
->
-> -       if (static_branch_unlikely(&tcf_bypass_check_needed_key)) {
-> -               if (tcf_block_bypass_sw(miniq->block))
-> -                       return ret;
-> -       }
-> +       /* Global bypass */
-> +       if (!static_branch_likely(&tcf_sw_enabled_key))
-> +               return ret;
-> +
-> +       /* Block-wise bypass */
-> +       if (tcf_block_bypass_sw(miniq->block))
-> +               return ret;
->
->         tc_skb_cb(skb)->mru =3D 0;
->         tc_skb_cb(skb)->post_ct =3D false;
-> diff --git a/net/sched/cls_api.c b/net/sched/cls_api.c
-> index 358b66dfdc83..617fcb682209 100644
-> --- a/net/sched/cls_api.c
-> +++ b/net/sched/cls_api.c
-> @@ -419,7 +419,7 @@ static void tcf_proto_destroy(struct tcf_proto *tp, b=
-ool rtnl_held,
->         tp->ops->destroy(tp, rtnl_held, extack);
->         if (tp->usesw && tp->counted) {
->                 if (!atomic_dec_return(&tp->chain->block->useswcnt))
-> -                       static_branch_dec(&tcf_bypass_check_needed_key);
-> +                       static_branch_dec(&tcf_sw_enabled_key);
->                 tp->counted =3D false;
->         }
->         if (sig_destroy)
-> @@ -2382,7 +2382,7 @@ static int tc_new_tfilter(struct sk_buff *skb, stru=
-ct nlmsghdr *n,
->                 spin_lock(&tp->lock);
->                 if (tp->usesw && !tp->counted) {
->                         if (atomic_inc_return(&block->useswcnt) =3D=3D 1)
-> -                               static_branch_inc(&tcf_bypass_check_neede=
-d_key);
-> +                               static_branch_inc(&tcf_sw_enabled_key);
->                         tp->counted =3D true;
->                 }
->                 spin_unlock(&tp->lock);
+                spin_lock(&tp->lock);
+                if (tp->usesw && !tp->counted) {
+                        tp->counted =3D true;
+                        tp_counted =3D 1;
+                }
+                spin_unlock(&tp->lock);
+                if (tp_counted && atomic_inc_return(&block->useswcnt) =3D=
+=3D 1)
+                        static_branch_inc(&tcf_sw_enabled_key);
 
