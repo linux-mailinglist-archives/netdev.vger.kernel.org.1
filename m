@@ -1,139 +1,86 @@
-Return-Path: <netdev+bounces-157959-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157960-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A98FA0FF24
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 04:20:54 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D50BA0FF29
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 04:24:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E73DC3A1645
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 03:20:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3C67F3A484C
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 03:24:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6E662309B9;
-	Tue, 14 Jan 2025 03:20:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A2782309A4;
+	Tue, 14 Jan 2025 03:24:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hTDRf8Nb"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="XVo4zAoi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E23B21E535;
-	Tue, 14 Jan 2025 03:20:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91C86231A48;
+	Tue, 14 Jan 2025 03:24:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736824850; cv=none; b=GgTBx/9cT3KRwqZv0Y7iVgBsKJrEhJE9NxiuJhTAHNvu8YTmiOi4JKtCHvcK4ZYg95ucl4wRyiAmAd+6DZtAzUJeZySJLe7YtP3apS4aEgibntusSoocsSMXDwYmXsXghaa+QynApCUbGE0r0wvaV6B30UJQBOoz7mZCZPE2buQ=
+	t=1736825053; cv=none; b=sCdoEpBEPZA5MhJRAATSmQFb+eG2WbARYvobeNW78rT+kR5+ScUwn7rizqt66XVjvXTEd78E4fIwBx8jioIx68rXS9VeRA/h7+OpyelI/j0CY0NsrDPityJtbU/tp7ZB4psrgJ2M7UDp/GTfCIkuYZ0M4UAYpStnyOg1+NsGKgA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736824850; c=relaxed/simple;
-	bh=Oj268A4xi+IKftY/audnlMRxg7UoULqF6B3v8phaVG8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=GRCPtGHBCC48x+bi7uxRN8NyxHKJceAYTp1xM23sSN4+wOcdRclhS7eEPV7mfMYYkUnSWKKy5bjUz0+iPC98D3VB2BySTzb6WjOUbvRITAR/rKw+526OeNjjMLNNkCL2J5/GKUrdThd1HUauPO/oDJBbiJeLSX4XOEV7Aw2pTG4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hTDRf8Nb; arc=none smtp.client-ip=209.85.208.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-5d7e3f1fdafso10244310a12.0;
-        Mon, 13 Jan 2025 19:20:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736824847; x=1737429647; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=CR6Yc5zBHeV1nQKHSgI++L0E9NIg0cDkHCvlCkHXgwg=;
-        b=hTDRf8NbKpBhLZmSBw6HxoFFQodVIL0hfboS2HVQt0vpnQY/a/TdJasQlMAauQGDun
-         h598guw82RK6jo3MEkcT0BV08EO8KvIwSL4MpRkddxw30Kaf15vVBDYcwIn1M7Bc0kv1
-         ZcQUF16VyufYavXU69MNfR20XfVi+7/PYZkCdE0xNNEhBFvt2cpp6lda4N19Qu+zNsWL
-         6Qpr4eUzFOzTRLSygn4BkszCMSnPB2XYm2L/pkGp35udNy8QHTNqygsKfTW6S9ImhYli
-         yM1sj8TKGzSTIiia8WVrJ2nYm6szLBpJTnEaw46zcV4ofmWPMYZauAE3LsFl6Kyuambz
-         lp4A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736824847; x=1737429647;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=CR6Yc5zBHeV1nQKHSgI++L0E9NIg0cDkHCvlCkHXgwg=;
-        b=rlrhxRbqf/B/bIb9p4IjQWhmWwDwEWvHKg4dk38uSgQYZeOaG10i/du7AkFYleE2LN
-         CTbiDSV7/pvvNcYr9Sbo1LCZDLPoovTqzMe38e2N6yEbysT4NnLicHrHirQPNeT0cQ/N
-         e01KC+XSYlNYMgfkoUdFxz9avscrztr9zmobSvIJiBbxgcbtwv0DhoP2aJT0RkltbrUU
-         s4x6Jcg/HHMeWGctyToQWG0a2H/qeb3ZWfTDsKO2OQiTVCJbpQ9EkwkRBghc5CFEW9SI
-         bbTvH+ZO1Zbv1vQCK6OU+dGO+s84r9cORMr2X6XncIP9bEl7qhjQaf0/fO/S113sxJvv
-         Rhvw==
-X-Forwarded-Encrypted: i=1; AJvYcCVF35KXYQXzDE/G2srFKD6T3t6F0zRHLIMRIyrZEkuWaSELMdw/OKsBcFnBjVk4N9GnSKDMS7gzuDY=@vger.kernel.org, AJvYcCW41JICwVeTOMG73MSgTD4UG1RbSykuju4P1xQLnbMuPOZlGzUtSJiC4HbSqMCP3mQ+OAbEevX5@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw6AEjKBjCQfu5zn7Tzq5KaSM5x0/ZepPW3MsWz2BPR4evwX0dC
-	aC3lzTHw6S1Ig8Bk/Hsaxp5emQ7pcJOJeNzBqhV/SBV+lL3AyemlY31kpl9+WAC6HCEZt+z5w7x
-	1BGVElh9fMxd/sxYo7GFtPhUXjeA=
-X-Gm-Gg: ASbGncsrIzUjvGX7LXCLGcT3gF+b0d6w/8Hh5trW42BZdLtoOxqJ1rVi2gAqrnWhLFB
-	xIL3YTZeyWY1vtP72AW4Jiq5xoRwYv0ipa9CPERtl
-X-Google-Smtp-Source: AGHT+IGmNw+iI5ASqebYMej/XhNoiOp6kuGH4xlsSUgj4d8iyk+ErK5urioQlrCsCqT+kO7WFEsICrSDHjsq0DxPeho=
-X-Received: by 2002:a05:6402:3604:b0:5d3:cfd0:8d46 with SMTP id
- 4fb4d7f45d1cf-5d972e6ade1mr22982841a12.30.1736824847009; Mon, 13 Jan 2025
- 19:20:47 -0800 (PST)
+	s=arc-20240116; t=1736825053; c=relaxed/simple;
+	bh=5eB+v5y7a0S7ozASMJhJBZW6/n1IaNxrt/MFjsqxWJE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=T14Sf8Kf4eFXCbu7WXM+l6NjZA3K6fbndOPEE73WJ5jqm0OcPYw1+Ek+ARcR0488503+dGonOzVyBbKFz7eNImGjvwIl6Lb5Bs58+8P6c7JGiG8pjLUN2pnNC16jtPT57QyCEjjFZiG2o5UhQgrRJ2dwtCPxg+nNKgH+GpqE9Nc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=XVo4zAoi; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=m/L7P+qbDs+wGT6qC6Jzb9UGmeaK50Kc/N50docTS6E=; b=XVo4zAoiyt9SieJM+3CKhNVidz
+	2tVB6liBKtWp65ucOvXT172qF7Wenh4uIh3G/LRb16mHg7fCt0934Cbt6TcgZeddN20wYvmiqOMfb
+	m3Of1ogSPvMaX4pORktaUUzIomZcBVY5xNWlW6FinuhvizMMUtRzcillYAKsZ87Wx2pgQWQZ3OaRK
+	Ew9T9mqdHyYK+F24OP2hkrpZsFjvY3FbivSBMzMLxuV7XIy5XOOryhwkAUUkcEN+Nzoolp4y6l0qj
+	NGNartVZfCz8qNWcO901ND4A/U3Bsm4CVFQAmDixPdHURlgWPHWbBxU2Eg4ZAdZVenHQqN60xCe6L
+	aZRx/lyA==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1tXXJv-008xH2-1d;
+	Tue, 14 Jan 2025 11:23:45 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 14 Jan 2025 11:23:44 +0800
+Date: Tue, 14 Jan 2025 11:23:44 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Guenter Roeck <linux@roeck-us.net>
+Cc: Breno Leitao <leitao@debian.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Thomas Graf <tgraf@suug.ch>, Tejun Heo <tj@kernel.org>,
+	Hao Luo <haoluo@google.com>, Josh Don <joshdon@google.com>,
+	Barret Rhoden <brho@google.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] rhashtable: Fix potential deadlock by moving
+ schedule_work outside lock
+Message-ID: <Z4XYwOeZv8dexDm5@gondor.apana.org.au>
+References: <20241128-scx_lockdep-v1-1-2315b813b36b@debian.org>
+ <6a0b432d-284a-45eb-991a-c7bba2c93e0b@roeck-us.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250111144513.1289403-1-ap420073@gmail.com> <20250113150834.729de40d@kernel.org>
-In-Reply-To: <20250113150834.729de40d@kernel.org>
-From: Taehee Yoo <ap420073@gmail.com>
-Date: Tue, 14 Jan 2025 12:20:35 +0900
-X-Gm-Features: AbW1kvZvzea8zsqaaioytTwT8637fMYt4XkvKsusryQf0wlAFhkXFOM4TlZtrHk
-Message-ID: <CAMArcTXUNVw2wGcUjS+bfW47K0Yd88G478QwEk3yW2f9b=Kvjw@mail.gmail.com>
-Subject: Re: [PATCH net-next v8 0/10] bnxt_en: implement tcp-data-split and
- thresh option
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, pabeni@redhat.com, edumazet@google.com, 
-	netdev@vger.kernel.org, almasrymina@google.com, donald.hunter@gmail.com, 
-	corbet@lwn.net, michael.chan@broadcom.com, andrew+netdev@lunn.ch, 
-	hawk@kernel.org, ilias.apalodimas@linaro.org, ast@kernel.org, 
-	daniel@iogearbox.net, john.fastabend@gmail.com, dw@davidwei.uk, 
-	sdf@fomichev.me, asml.silence@gmail.com, brett.creeley@amd.com, 
-	linux-doc@vger.kernel.org, kory.maincent@bootlin.com, 
-	maxime.chevallier@bootlin.com, danieller@nvidia.com, hengqi@linux.alibaba.com, 
-	ecree.xilinx@gmail.com, przemyslaw.kitszel@intel.com, hkallweit1@gmail.com, 
-	ahmed.zaki@intel.com, rrameshbabu@nvidia.com, idosch@nvidia.com, 
-	jiri@resnulli.us, bigeasy@linutronix.de, lorenzo@kernel.org, 
-	jdamato@fastly.com, aleksander.lobakin@intel.com, kaiyuanz@google.com, 
-	willemb@google.com, daniel.zahka@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6a0b432d-284a-45eb-991a-c7bba2c93e0b@roeck-us.net>
 
-On Tue, Jan 14, 2025 at 8:08=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
+On Mon, Jan 13, 2025 at 11:50:36AM -0800, Guenter Roeck wrote:
 >
-> On Sat, 11 Jan 2025 14:45:03 +0000 Taehee Yoo wrote:
-> > This series implements hds-thresh ethtool command.
-> > This series also implements backend of tcp-data-split and
-> > hds-thresh ethtool command for bnxt_en driver.
-> > These ethtool commands are mandatory options for device memory TCP.
->
-> Patch 9 doesn't apply cleanly, could you rebase and repost?
+> With this patch in linux-next, I get some unit test errors.
 
-Hi Jakub,
-Oh sorry for that, I will send v9 after rebase.
+Thanks! This patch should fix the problem.
 
->
-> Applying: net: ethtool: add hds_config member in
-> ethtool_netdev_state Applying: net: ethtool: add support for configuring =
-hds-thresh
-> Applying: net: devmem: add ring parameter filtering
-> Applying: net: ethtool: add ring parameter filtering
-> Applying: net: disallow setup single buffer XDP when tcp-data-split is en=
-abled.
-> Applying: bnxt_en: add support for rx-copybreak ethtool command
-> Applying: bnxt_en: add support for tcp-data-split ethtool command
-> Applying: bnxt_en: add support for hds-thresh ethtool command
-> Applying: netdevsim: add HDS feature
-> Using index info to reconstruct a base tree...
-> M       drivers/net/netdevsim/netdev.c
-> M       drivers/net/netdevsim/netdevsim.h
-> Falling back to patching base and 3-way merge...
-> Auto-merging drivers/net/netdevsim/netdevsim.h
-> Auto-merging drivers/net/netdevsim/netdev.c
-> Applying: selftest: net-drv: hds: add test for HDS feature
-> --
-> pw-bot: cr
-
-Thanks a lot!
-Taehee Yoo
+https://patchwork.kernel.org/project/linux-crypto/patch/Z4XWx5X0doetOJni@gondor.apana.org.au/
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
 
