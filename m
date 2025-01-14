@@ -1,120 +1,164 @@
-Return-Path: <netdev+bounces-158243-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158244-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A2E7CA1138F
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 22:59:32 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 18DF8A113A2
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 23:02:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CED261889FB6
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 21:59:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2C742162FE0
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 22:02:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18648212B0B;
-	Tue, 14 Jan 2025 21:59:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E311D20A5CD;
+	Tue, 14 Jan 2025 22:02:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wVpZU2/d"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="lVlMw0YI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50D38211278
-	for <netdev@vger.kernel.org>; Tue, 14 Jan 2025 21:59:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E01B13C695;
+	Tue, 14 Jan 2025 22:02:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736891968; cv=none; b=YLwN70CLnCB/mFjCqJ0VmYhVUAO9++RbvjPPmdo3Ii3RkI8aObZxxihqv9hCeMSqBEp97puU/XclkoFROKafIoRzMwLxIPRf6IOqRG1hveZzzI08HSrb0Vvw4v7kUTON/hetD78auXhNtucS05EO7x0suqb7e/F7T3awrd09rJw=
+	t=1736892157; cv=none; b=lhLqzERWPjV+CJHjL1YamfcoEbw7ktp9Wy6adPSNw5h3IsxFa81d8el+nVGipVPwURyHcfl2I4UYfgd/sRtxJn+9wglfuUt+A9TaEBhf22Jq/nsv/roXzBZ3T41WeUZRg7imBwXVoZwkNzsh4mHtB8CRKx6KRWY0v4kToiZ8p0I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736891968; c=relaxed/simple;
-	bh=zAdJhi0EI4DSgCLvkfLMz61d8vkKWIg/klTwTYfDWFA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ZVZF2J3dskzVU8AmTotDRmsiqtfWtE0WLT39JYt5+GVQYkRtHZZs6cUffGC4ZujZ8E+R5g3Uk2EjJ/YpCQwbPuKaicLpncV1VE4s2R3gxh8w8A+opuOaMC6TnN7KQr8JY/W80ohGl72KKI/dYhWzRGAN6qXizubYeCkdsLOCbE4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wVpZU2/d; arc=none smtp.client-ip=209.85.208.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-5d4e2aa7ea9so11865899a12.2
-        for <netdev@vger.kernel.org>; Tue, 14 Jan 2025 13:59:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1736891964; x=1737496764; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6WjjekFXncfCFBue3MsiK/kEiypPJdZR/OHfV73Kcms=;
-        b=wVpZU2/dEUyhoBZez+DiNlvriByrb75WYNLTp7I+ANfCM9e4DpeEhK/D6LEIwuLv14
-         KbZAhLKjvyZjmuHsKQkaVSN3m9MyZD3cWsaumz3/5XPLxluG0YZYNOfIfwCgSMpi96sX
-         KQGghzF+Apl0xPG3/oDuXHekYkdvq4ItR0PSOaZmgpFx1vBWp0yEHG21Xe38S3zfjAKz
-         0s/S2NId4UPG7+fJFyW4qnQ3ClCQrs6gO8cdnQw2IVMv5Xfm5ll+UoZVhWUULeSQHbfY
-         CazPqG4vgJ+7vk2Xm5xft31J96Pp4oxDPFyTSdr4v2nIMd55XpYupE6YRmSD2GehAlmr
-         kQJQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736891964; x=1737496764;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=6WjjekFXncfCFBue3MsiK/kEiypPJdZR/OHfV73Kcms=;
-        b=vQsY76mYk2E0iF6Dq8MQIjvwBXNohi+FSc6nMi6llmdDrJ2xEHXV0Vu7ZVDBwfdcVc
-         DS8+PzD3h73DcRNTq3NUfmn5LXyfpfqxIVJDOdgrKQyAFR6PPGv7xBK0j0KG12T7g34S
-         irXZVa0LikDLD8m0DcsmR+QmniWi5a/Y0ihqZ3zWfzI1CVHcPAmVznTzt6nIhVOm5TZk
-         N9c8KMIoCiRoX3P49h80ucHeSqHCo+0uoTILDv3aMektpZVdqtyujmdf40uhRso1UGtZ
-         jpR92KHfrgf0NY015H9QZiJZLpGmE2wRaa3t7KsCuPwixgmd7L4s88VUr7/7D5x1HlLd
-         TVEQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUe3QjZhQXuKmMPq098vkZkdO+ilFlR9UO4zNDR7K1moW4r0yxzmQM77rHQxFKJtZmGKIyuddQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwGJdDWb0Frz5naRTivwBolB0JMaWPGHqFjSdTyaLjreJKb3/8V
-	5fbp1JMBnON+sA2RpcCYTgxfQ4WrOfkMjNGYcYPAw3zWa2kflRhSEAehxOeg3xa3gCoLKDav+Zl
-	/XUWKMYcinKdlg/B2nTxE0n/XUt6CUOjR+U4F
-X-Gm-Gg: ASbGncv99ubboTC1HPPQPSGmDU2KHuPxj1VWrhIdilulL+EYMZtotNaLWFaXu1mnhwK
-	JxltCZB+jllTS1ngLqVYkyJhX/gvCpclYyKWaTQ==
-X-Google-Smtp-Source: AGHT+IHO/D5nGE0bNMT49v4j047gGPPXUv4kVtDIzDxc/DxZMriA7ICnz2tGGjwyolTyapLUqfQZ1/0wB17Ymu5m6z0=
-X-Received: by 2002:a05:6402:538d:b0:5d3:d7ae:a893 with SMTP id
- 4fb4d7f45d1cf-5d972e48691mr23734588a12.25.1736891964471; Tue, 14 Jan 2025
- 13:59:24 -0800 (PST)
+	s=arc-20240116; t=1736892157; c=relaxed/simple;
+	bh=YWjWWm9kdGtbXqK/2s22rqEGqCUHWpuSFPwhrESbPus=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=n02yOswUTqsqB9NxHc5bqpXBpX4KdzE8Fd+rh9vyVb5GLdSUO73+KKP4jn/2H03NIkbRwr4HM95oKNi+9QD1QR7v5eBHrKVCguaV20lCEz9D5E52+yN0nyC6oF+fe72YZ2bbuzAF+gSkaY9oP31lZJM5J+7fgRV1A7VhC5vTVZQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=lVlMw0YI; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50EGvTDU003544;
+	Tue, 14 Jan 2025 22:01:53 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=pp1; bh=i88C74jSo/aTmHueJGHweAPFpChFgk6GalTy595l8
+	J4=; b=lVlMw0YIMqNBq260JoLTVA4/LZB6QvW4lTjx8nC86j6/iGOx+N62llqP+
+	AAVkmM7Sonq6Rq8dfZ1/x0Al9+n7B9b6zs/fkpYUuHkd3wctxB7dkjz1Tcy20c0v
+	T0Zz3vCmpThE85N9f2bPw8UqO+b12O26Jn/UHvlqwzO4WmLLMwFPtSCNfvpJP+z4
+	SG5pJx7xG5ar23tVVf19WO84QGQXyQaDlrgyqitUQXiFiRwZGAetZG6QVIe47M5j
+	0LPnF5XuT5bGz7X0b8TmaErf3fBpcmxfY7YnsbvLOV60Se1DFoRPFlfYXi24xewg
+	OEtL/tudzL38K281qbRIsC4o5tCSw==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 445gdjm80s-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 14 Jan 2025 22:01:53 +0000 (GMT)
+Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 50EM1qOO006844;
+	Tue, 14 Jan 2025 22:01:52 GMT
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 445gdjm80k-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 14 Jan 2025 22:01:52 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 50EIwW3l016490;
+	Tue, 14 Jan 2025 22:01:51 GMT
+Received: from smtprelay03.wdc07v.mail.ibm.com ([172.16.1.70])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 4445p1my7b-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 14 Jan 2025 22:01:51 +0000
+Received: from smtpav06.dal12v.mail.ibm.com (smtpav06.dal12v.mail.ibm.com [10.241.53.105])
+	by smtprelay03.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 50EM1neT17236690
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 14 Jan 2025 22:01:49 GMT
+Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id AB1EE58055;
+	Tue, 14 Jan 2025 22:01:49 +0000 (GMT)
+Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 6FA8958043;
+	Tue, 14 Jan 2025 22:01:49 +0000 (GMT)
+Received: from gfwa153.aus.stglabs.ibm.com (unknown [9.3.84.127])
+	by smtpav06.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Tue, 14 Jan 2025 22:01:49 +0000 (GMT)
+From: Ninad Palsule <ninad@linux.ibm.com>
+To: minyard@acm.org, robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
+        andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+        kuba@kernel.org, pabeni@redhat.com,
+        openipmi-developer@lists.sourceforge.net, netdev@vger.kernel.org,
+        joel@jms.id.au, andrew@codeconstruct.com.au,
+        devicetree@vger.kernel.org, eajames@linux.ibm.com,
+        linux-arm-kernel@lists.infradead.org, linux-aspeed@lists.ozlabs.org,
+        linux-kernel@vger.kernel.org
+Cc: Ninad Palsule <ninad@linux.ibm.com>
+Subject: [PATCH v5 00/10] DTS updates for system1 BMC
+Date: Tue, 14 Jan 2025 16:01:34 -0600
+Message-ID: <20250114220147.757075-1-ninad@linux.ibm.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250113171509.3491883-1-edumazet@google.com> <20250114133648.36702172@kernel.org>
-In-Reply-To: <20250114133648.36702172@kernel.org>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 14 Jan 2025 22:59:13 +0100
-X-Gm-Features: AbW1kvZU_26wk6DItbf6sCy7t-sz0xkO0wdiwzmIeeeSYmWT8kfwnA5NVXu4xWI
-Message-ID: <CANn89i+G_GfMCYwbYEq7+XHbqjxPWDrA9dRJ35pTQji1xuB+Rw@mail.gmail.com>
-Subject: Re: [PATCH net-next] inet: ipmr: fix data-races
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: "David S . Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
-	Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>, eric.dumazet@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: wMweHgpYcygAHAK9Al8SAGN43NxuvTVV
+X-Proofpoint-ORIG-GUID: eJyNvlDh1DmgOK4g74-aeS1-axpkIZ-I
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-01-14_07,2025-01-13_02,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=591
+ suspectscore=0 malwarescore=0 bulkscore=0 clxscore=1015 phishscore=0
+ priorityscore=1501 adultscore=0 impostorscore=0 spamscore=0 mlxscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2411120000 definitions=main-2501140166
 
-On Tue, Jan 14, 2025 at 10:36=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> w=
-rote:
->
-> On Mon, 13 Jan 2025 17:15:09 +0000 Eric Dumazet wrote:
-> > Following fields of 'struct mr_mfc' can be updated
-> > concurrently (no lock protection) from ip_mr_forward()
-> > and ip6_mr_forward()
-> >
-> > - bytes
-> > - pkt
-> > - wrong_if
-> > - lastuse
-> >
-> > They also can be read from other functions.
-> >
-> > Convert bytes, pkt and wrong_if to atomic_long_t,
-> > and use READ_ONCE()/WRITE_ONCE() for lastuse.
->
-> Drivers poke into this:
->
-> drivers/net/ethernet/mellanox/mlxsw/spectrum_mr.c:1006:43: error: invalid=
- operands to binary !=3D (have =E2=80=98atomic_long_t=E2=80=99 {aka =E2=80=
-=98atomic64_t=E2=80=99} and =E2=80=98u64=E2=80=99 {aka =E2=80=98long long u=
-nsigned int=E2=80=99})
-> + 1006 |         if (mr_route->mfc->mfc_un.res.pkt !=3D packets)
-> +      |             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ^~
-> +      |                                      |
-> +      |                                      atomic_long_t {aka atomic64=
-_t}
+Hello,
 
-Oops, oh well, thanks, I will send a V2.
+Please review the patch set version 5.
+
+V5:
+---
+  - Improved IPBM device documentation.
+  - Added the hog parsing in ast2400-gpio
+
+V4:
+---
+  - Removed "Add RGMII support" patch as it needs some work from the
+    driver side.
+  - Improved IPBM device documentation.
+  - There is a new warning in CHECK_DTBS which are false positive so
+    ignored them.
+    arch/arm/boot/dts/aspeed/aspeed-bmc-ibm-system1.dtb: gpio@1e780000: 'hog-0', 'hog-1', 'hog-2', 'hog-3' do not match any of the regexes: 'pinctrl-[0-9]+'
+
+V3:
+---
+  - Fixed dt_binding_check warnings in ipmb-dev.yaml
+  - Updated title and description in ipmb-dev.yaml file.
+  - Updated i2c-protocol description in ipmb-dev.yaml file.
+
+V2:
+---
+  Fixed CHECK_DTBS errors by
+    - Using generic node names
+    - Documenting phy-mode rgmii-rxid in ftgmac100.yaml
+    - Adding binding documentation for IPMB device interface
+
+NINAD PALSULE (6):
+  ARM: dts: aspeed: system1: Add IPMB device
+  ARM: dts: aspeed: system1: Add GPIO line name
+  ARM: dts: aspeed: system1: Reduce sgpio speed
+  ARM: dts: aspeed: system1: Update LED gpio name
+  ARM: dts: aspeed: system1: Remove VRs max8952
+  ARM: dts: aspeed: system1: Mark GPIO line high/low
+
+Ninad Palsule (4):
+  dt-bindings: net: faraday,ftgmac100: Add phys mode
+  bindings: ipmi: Add binding for IPMB device intf
+  dt-bindings: gpio: ast2400-gpio: Add hogs parsing
+  ARM: dts: aspeed: system1: Disable gpio pull down
+
+ .../bindings/gpio/aspeed,ast2400-gpio.yaml    |   6 +
+ .../devicetree/bindings/ipmi/ipmb-dev.yaml    |  55 +++++++
+ .../bindings/net/faraday,ftgmac100.yaml       |   3 +
+ .../dts/aspeed/aspeed-bmc-ibm-system1.dts     | 139 +++++++++++-------
+ 4 files changed, 149 insertions(+), 54 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/ipmi/ipmb-dev.yaml
+
+-- 
+2.43.0
+
 
