@@ -1,179 +1,78 @@
-Return-Path: <netdev+bounces-158138-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158152-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71EDBA10944
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 15:28:29 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DDB03A109AB
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 15:45:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 10AFC3A2AF3
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 14:28:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CAE2C169A0F
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 14:45:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C95C1428F3;
-	Tue, 14 Jan 2025 14:28:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A399785626;
+	Tue, 14 Jan 2025 14:45:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o5WnpL2V"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BABDA14AD0E;
-	Tue, 14 Jan 2025 14:28:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EF218615A
+	for <netdev@vger.kernel.org>; Tue, 14 Jan 2025 14:45:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736864906; cv=none; b=VlGeFoCGELjN5fPgS0XT6BDS40Fo3S++A+XPEr0uHAzkRKl+ybt1hTaDjp1Rp7xp0nXtb5agLYAEHAMcz6PBVlGHwKmwmeUasTfgq+b3uGxpTkBovE1oRRoNWT+lSZ840klx9NMfHyhGPfasmIQ3feRvD6Dm6gQvmmtrLBC3NmM=
+	t=1736865940; cv=none; b=IM/U0Oul7YtcAbDpXjas8mU/OX7xmWveNuLvPKfWp5MMV7b80Z8T49OMx3a/6CC9v/xlVgSHAhQOSPISmlZ/n2iPOl3LRG4Dr7GHaK7lqavxEG0o4uiNogqlp2rE3Mq1ugXE1Gox2plwZMXjSvNaFUr29D7YYw6QfBy0UUKcDsE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736864906; c=relaxed/simple;
-	bh=oM7NzRJJN/8EUgwpdktZfnTOKbasx76P5FUuF4NtChg=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=iYCcYM/7YXc+4I2VYn9e8HPEIf0XaAFXfmR9mgyit24FzsGCtBlPZ+R12t4UV2ar91C7McNBFtPeh7fgYJ7NHaMDRbHAIPvqXojLI2JNePpG3mpJcAi72HP73KBtn/0+uHAelQeSQsAlTAo03lxQLnhH+nTdvsq1OiSjoiMcfCc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.194])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4YXWf71wHfzrSLl;
-	Tue, 14 Jan 2025 22:26:39 +0800 (CST)
-Received: from kwepemg500017.china.huawei.com (unknown [7.202.181.81])
-	by mail.maildlp.com (Postfix) with ESMTPS id 9B2EE1402C4;
-	Tue, 14 Jan 2025 22:28:19 +0800 (CST)
-Received: from huawei.com (10.175.127.227) by kwepemg500017.china.huawei.com
- (7.202.181.81) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Tue, 14 Jan
- 2025 22:28:18 +0800
-From: Li Lingfeng <lilingfeng3@huawei.com>
-To: <trondmy@kernel.org>, <anna@kernel.org>, <chuck.lever@oracle.com>,
-	<jlayton@kernel.org>, <neilb@suse.de>, <okorniev@redhat.com>,
-	<Dai.Ngo@oracle.com>, <tom@talpey.com>, <davem@davemloft.net>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<horms@kernel.org>
-CC: <linux-nfs@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <yukuai1@huaweicloud.com>, <houtao1@huawei.com>,
-	<yi.zhang@huawei.com>, <yangerkun@huawei.com>, <lilingfeng@huaweicloud.com>,
-	<lilingfeng3@huawei.com>
-Subject: [PATCH] SUNRPC: Set tk_rpc_status when RPC_TASK_SIGNALLED is detected
-Date: Tue, 14 Jan 2025 22:41:01 +0800
-Message-ID: <20250114144101.2511043-1-lilingfeng3@huawei.com>
-X-Mailer: git-send-email 2.31.1
+	s=arc-20240116; t=1736865940; c=relaxed/simple;
+	bh=2uIoKQURXiUt+OZoxi828kd+F5HpY1IlIEjQ7K1mYH8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=MwrxG61umH4m1eAARqjevwnbOIWGkvr40hO6SIO3Vmua1oHi7jznA6Z7L/7CitBohV2tv1d4f7+D69LNeYIRD/nNWF32QZq8Lt5frr9EQbAOkAkZneHwWfIvGQ+Xogde2O6A0cp7lPKrWamYfuXfz0Odx26CncmcSIZgZakD02k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o5WnpL2V; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BBB42C4CEDD;
+	Tue, 14 Jan 2025 14:45:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1736865940;
+	bh=2uIoKQURXiUt+OZoxi828kd+F5HpY1IlIEjQ7K1mYH8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=o5WnpL2VjMJxFitA+iFm00wF7MCUfQCnZEcfqb0BYAeSeFKNUdXaNpD4McbfYjRMU
+	 +3CYPn85da4bIJdvtSRPrm5Zp+C6wG+EYQncovKHpoF2EbXasDmoL4mMQLmTGHNir2
+	 +AVQg5qbqvkpcgYO4dMUlaLTHpz07aB/Sg+EriEK4YNSLH6O8SV9EJ9+xA6FDq9HYZ
+	 JLk7xA51v4qHi5sLzzRnYzF6FWYjVTv5EqaViOF5Jd/Z1nJtjx7iqlr6SXj6+hv09K
+	 lHlWr090pCLg/bwQs4EX0OnTgelK/xqJfjyVkql1UxLZXNxjcCsMFf8sqJVVs1Ia91
+	 GKa4hgC7lekgA==
+Date: Tue, 14 Jan 2025 06:45:38 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, pabeni@redhat.com,
+ andrew+netdev@lunn.ch, horms@kernel.org, jdamato@fastly.com
+Subject: Re: [PATCH net-next 02/11] net: add helpers for lookup and walking
+ netdevs under netdev_lock()
+Message-ID: <20250114064538.7f47e587@kernel.org>
+In-Reply-To: <CANn89iKo4k7PaUof+qjiUGT+-25WNed-1+UkWadnASBAMcZ2Bw@mail.gmail.com>
+References: <20250114035118.110297-1-kuba@kernel.org>
+	<20250114035118.110297-3-kuba@kernel.org>
+	<CANn89iKo4k7PaUof+qjiUGT+-25WNed-1+UkWadnASBAMcZ2Bw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- kwepemg500017.china.huawei.com (7.202.181.81)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Commit 39494194f93b("SUNRPC: Fix races with rpc_killall_tasks()") adds
-rpc_task_set_rpc_status before setting RPC_TASK_SIGNALLED in
-rpc_signal_task, ensuring that rpc_status is definitely set when
-RPC_TASK_SIGNALLED is set.
-Therefore, it seems unnecessary to set rpc_status again after detecting
-RPC_TASK_SIGNALLED in rpc_check_timeout.
+On Tue, 14 Jan 2025 14:03:35 +0100 Eric Dumazet wrote:
+> > +struct net_device *__netdev_put_lock(struct net_device *dev)
+> > +{
+> > +       netdev_lock(dev);
+> > +       if (dev->reg_state > NETREG_REGISTERED) {  
+> 
+> I presume the netdev lock will be held at some point in
+> netdev_run_todo and/or unregister_netdevice_many_notify
+> so no need for a READ_ONCE() here.
 
-However, in some exceptional cases, invalid and endlessly looping
-rpc_tasks may be generated. The rpc_call_rpcerror in rpc_check_timeout can
-timely terminate such rpc_tasks. Removing rpc_call_rpcerror may cause the
-rpc_task to fall into an infinite loop.
-
-For example, in the following situation:
-nfs4_close_done
- // get err from server
- nfs4_async_handle_exception
- // goto out_restart
-                            // umount -f
-                            nfs_umount_begin
-                             rpc_killall_tasks
-                              rpc_signal_task
-                               rpc_task_set_rpc_status
-                                task->tk_rpc_status = -ERESTARTSYS
-                                set_bit
-                                // set RPC_TASK_SIGNALLED to tk_runstate
- rpc_restart_call_prepare
-  __rpc_restart_call
-   task->tk_rpc_status = 0
-   // clear tk_rpc_status
-  ...
-  rpc_prepare_task
-   nfs4_close_prepare
-    nfs4_setup_sequence
-     rpc_call_start
-      task->tk_action = call_start
-
-At this point, an rpc_task with RPC_TASK_SIGNALLED set but tk_rpc_status
-as 0 will be generated. This rpc_task will fall into the following loop:
-call_encode --> call_transmit --> call_transmit_status --> call_status
---> call_encode.
-
-Since RPC_TASK_SIGNALLED is set, no request will be sent in call_transmit.
-Similarly, since RPC_TASK_SIGNALLED is set, rq_majortimeo will not be
-updated in call_status --> rpc_check_timeout, which will cause -ETIMEDOUT
-to be directly set to tk_status in call_transmit_status -->
-xprt_request_wait_receive --> xprt_wait_for_reply_request_def -->
-rpc_sleep_on_timeout --> __rpc_sleep_on_priority_timeout.
-
-Here is the state and loop process of the rpc_task:
-tk_runstate:
-RPC_TASK_RUNNING RPC_TASK_ACTIVE RPC_TASK_NEED_RECV RPC_TASK_SIGNALLED
-tk_xprt->state:
-XPRT_CONNECTED XPRT_BOUND
-tk_flags
-RPC_TASK_ASYNC RPC_TASK_MOVEABLE RPC_TASK_DYNAMIC RPC_TASK_SOFT
-RPC_TASK_NO_RETRANS_TIMEOUT RPC_TASK_CRED_NOREF
-
-call_encode
- xprt_request_enqueue_transmit
-  set_bit // RPC_TASK_NEED_XMIT
- task->tk_action = call_transmit
-
-call_transmit
- task->tk_action = call_transmit_status
- xprt_transmit
-  xprt_request_transmit
-   // check RPC_TASK_SIGNALLED and goto out_dequeue
-   xprt_request_dequeue_transmit
-    xprt_request_dequeue_transmit_locked
-     test_and_clear_bit // RPC_TASK_NEED_XMIT
-
-call_transmit_status
- task->tk_action = call_status
- xprt_request_wait_receive
-  xprt_wait_for_reply_request_def
-   xprt_request_timeout // get timeout
-    req->rq_majortimeo // rq_majortimeo will not be updated
-   rpc_sleep_on_timeout
-    __rpc_sleep_on_priority_timeout
-     task->tk_status = -ETIMEDOUT // set ETIMEDOUT
-
-call_status
- task->tk_action = call_encode
- rpc_check_timeout
-  // check RPC_TASK_SIGNALLED and skip xprt_reset_majortimeo
-
-Fix it by adding rpc_call_rpcerror back.
-
-Fixes: 39494194f93b ("SUNRPC: Fix races with rpc_killall_tasks()")
-Signed-off-by: Li Lingfeng <lilingfeng3@huawei.com>
----
- net/sunrpc/clnt.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
-
-diff --git a/net/sunrpc/clnt.c b/net/sunrpc/clnt.c
-index 0090162ee8c3..0acdff19a37c 100644
---- a/net/sunrpc/clnt.c
-+++ b/net/sunrpc/clnt.c
-@@ -2509,8 +2509,10 @@ rpc_check_timeout(struct rpc_task *task)
- {
- 	struct rpc_clnt	*clnt = task->tk_client;
- 
--	if (RPC_SIGNALLED(task))
-+	if (RPC_SIGNALLED(task)) {
-+		rpc_call_rpcerror(task, -ERESTARTSYS);
- 		return;
-+	}
- 
- 	if (xprt_adjust_timeout(task->tk_rqstp) == 0)
- 		return;
--- 
-2.31.1
-
+Yes, the only unprotected write is in free_netdev(), but we're holding
+a reference here so if we get to free there's a bug somewhere else.
+I'll reorder patches 2 and 3.
 
