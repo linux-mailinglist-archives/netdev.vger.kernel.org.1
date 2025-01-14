@@ -1,102 +1,187 @@
-Return-Path: <netdev+bounces-158064-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158065-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D6C0A10529
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 12:20:23 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 76537A1053E
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 12:23:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DEA743A718C
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 11:20:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 83C861618C4
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 11:23:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0A7D284A5A;
-	Tue, 14 Jan 2025 11:20:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E530229623;
+	Tue, 14 Jan 2025 11:23:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FhX2sWbJ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="agEV5Td9"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 875A71DA632;
-	Tue, 14 Jan 2025 11:20:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A151F20F972
+	for <netdev@vger.kernel.org>; Tue, 14 Jan 2025 11:23:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736853610; cv=none; b=FkqxgEKzQ5dqD2hjHHLJK9mQguHvEq2tZvKLpbAyRq/NutxiI4eJhQqjCfdf+U39H9kKShhWq6iR+HdTDnIVOl58LIwAmG8ZD0i6xSFTijqfNtuvATD1za+tQhX/5CP3WX4kX6SdhSWHCra/qym/o/JnBQDHTHJy8HV3u3LeLPI=
+	t=1736853821; cv=none; b=WKyLGZ9EOHHgPxgKfKIP2YrMV3CzonaiF6vR5IFui7PHFSXtBHTCdZA0aiJPEk8ho0OdKYe9mygzFJoo7PfpKVeIYT4rFVYxXfT5mpWm9OXdtNN2GcytWwfv+A4vU0POdwWr0uUeUN5CLZXhV9n7hb0/pC1NetHrDNzduoycla0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736853610; c=relaxed/simple;
-	bh=rtSuoYZ8+u7cOPC1UoChNdOz/UVNmfAvyoY+o51ePSE=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=ZpYa6iMld/4vgacNT0+B+1USvPnKImy99jGVzdlqxGS3MBVS8mV2xKwEBSVhqNDmr4xKeYHD07ExG0peRjnYkff10jSGVLfBJFWbyh/MEto74epunXup09wbX2M1PPDt1A23t35zN+z87xs1torVLmMmhW/E2g5vmoCwpIVIhvA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FhX2sWbJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 13CF1C4CEDD;
-	Tue, 14 Jan 2025 11:20:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736853610;
-	bh=rtSuoYZ8+u7cOPC1UoChNdOz/UVNmfAvyoY+o51ePSE=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=FhX2sWbJtWbJfYBiw/KcDzcX04xoU3PvKVpm2Lu3vMwfQpxywRaPgwDviRxTvTryB
-	 B6BPWUjDFFw5WEeYvIUQM2VQyVdHKxum+BFDLGsXuwnIW4bxzDSWqEgLqyVH9qqBp8
-	 yQWxbjrL46KUoMVxa1g8LU0ACsjpqw2TAc1V1Z98k8tnTzMcNkhcRAn1TgvMcY2UwL
-	 3BPfIIf2M+W1ZM458fG4vjRH9rAd6DkwV+4TVv+sBNBH+0mGCEsx07KdGEdCt5u0nE
-	 QvD1Vk0rWN83vMUNgKXl6f0J4FnVUXqolR+8Zhs7Wz7ONJ0pV3xOwqPp1wA+tfzYTg
-	 502/DQisXZF5g==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB192380AA5F;
-	Tue, 14 Jan 2025 11:20:33 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1736853821; c=relaxed/simple;
+	bh=AMgHmuYLU3sfm4NIVKVeA2B4Vt/7KevOgpIWmmuPztc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jlbgA2Uc2UrGxBXmaZKDH93kNZ5lGiYp0NB90nuDN+6H/bO7euzFSqOr+hfo33Po+dfqwwVddTzpf7EgFKAP3/gTD1RmuY4O9pac3MiQnLep1aaHIhHLAKpE1w4dZZ6ly4odbmh3+61EcyjB5bOdUmUjREZt/72KxgwFpCarGSk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=agEV5Td9; arc=none smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1736853820; x=1768389820;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=AMgHmuYLU3sfm4NIVKVeA2B4Vt/7KevOgpIWmmuPztc=;
+  b=agEV5Td9kNKYBQPQnGQyPfPFcn/lgP86PIk6hHnqZksJGz6URg5HitF6
+   EwvGnRFYEw5xKDyOIXkErVYWSIzZuo7bVK8zs4xTd6JrGzJdOQ6PX+7m6
+   bWkEjW3MTLk+BlwLFwItGSWV1/gqbmqls7NiQtJRtJ8sFjMoYZ0stpb/O
+   mW6ApndhoU36H5ZjvnqtP48ketnkfcGLGMNrwUYnA2jVkhUS/4214mO82
+   ilPai2l+D0u6opcX9XWZn6XVIHBkkQW1Ig88ciGcBj84LtdJhOK7m0OKt
+   n8DSTLWFlCEUEl0LJ/IxfJHW+FWIalqa+I6RRP7Wvj1XXkAC5PkC+9oRT
+   A==;
+X-CSE-ConnectionGUID: Fwr3NspbT4W85kCRg015gQ==
+X-CSE-MsgGUID: PfHgbiFXQaKTQvOnRr01EQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11314"; a="62514159"
+X-IronPort-AV: E=Sophos;i="6.12,314,1728975600"; 
+   d="scan'208";a="62514159"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jan 2025 03:23:39 -0800
+X-CSE-ConnectionGUID: 5REfNi11RhagbA71HCmRew==
+X-CSE-MsgGUID: VPw9X9xtQW6V2sZfI77D5g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,314,1728975600"; 
+   d="scan'208";a="109761414"
+Received: from lkp-server01.sh.intel.com (HELO d63d4d77d921) ([10.239.97.150])
+  by orviesa004.jf.intel.com with ESMTP; 14 Jan 2025 03:23:36 -0800
+Received: from kbuild by d63d4d77d921 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1tXf1B-000OSh-0t;
+	Tue, 14 Jan 2025 11:23:33 +0000
+Date: Tue, 14 Jan 2025 19:23:29 +0800
+From: kernel test robot <lkp@intel.com>
+To: Michael Chan <michael.chan@broadcom.com>, davem@davemloft.net
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	netdev@vger.kernel.org, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, andrew+netdev@lunn.ch, pavan.chebbi@broadcom.com,
+	andrew.gospodarek@broadcom.com, somnath.kotur@broadcom.com,
+	Ajit Khaparde <ajit.khaparde@broadcom.com>,
+	David Wei <dw@davidwei.uk>
+Subject: Re: [PATCH net-next 09/10] bnxt_en: Extend queue stop/start for Tx
+ rings
+Message-ID: <202501141828.3alxlzbA-lkp@intel.com>
+References: <20250113063927.4017173-10-michael.chan@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 1/4] netfilter: nf_tables: remove the genmask
- parameter
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173685363276.4143472.17608678538687236861.git-patchwork-notify@kernel.org>
-Date: Tue, 14 Jan 2025 11:20:32 +0000
-References: <20250111230800.67349-2-pablo@netfilter.org>
-In-Reply-To: <20250111230800.67349-2-pablo@netfilter.org>
-To: Pablo Neira Ayuso <pablo@netfilter.org>
-Cc: netfilter-devel@vger.kernel.org, davem@davemloft.net,
- netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, fw@strlen.de, kadlec@netfilter.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250113063927.4017173-10-michael.chan@broadcom.com>
 
-Hello:
+Hi Michael,
 
-This series was applied to netdev/net-next.git (main)
-by Pablo Neira Ayuso <pablo@netfilter.org>:
+kernel test robot noticed the following build errors:
 
-On Sun, 12 Jan 2025 00:07:57 +0100 you wrote:
-> From: tuqiang <tu.qiang35@zte.com.cn>
-> 
-> The genmask parameter is not used within the nf_tables_addchain function
->  body. It should be removed to simplify the function parameter list.
-> 
-> Signed-off-by: tuqiang <tu.qiang35@zte.com.cn>
-> Signed-off-by: Jiang Kun <jiang.kun2@zte.com.cn>
-> Reviewed-by: Simon Horman <horms@kernel.org>
-> Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
-> 
-> [...]
+[auto build test ERROR on net-next/main]
 
-Here is the summary with links:
-  - [net-next,1/4] netfilter: nf_tables: remove the genmask parameter
-    https://git.kernel.org/netdev/net-next/c/da0a090a3c62
-  - [net-next,2/4] ipvs: speed up reads from ip_vs_conn proc file
-    https://git.kernel.org/netdev/net-next/c/178883fd039d
-  - [net-next,3/4] netfilter: xt_hashlimit: htable_selective_cleanup() optimization
-    https://git.kernel.org/netdev/net-next/c/95f1c1e98db3
-  - [net-next,4/4] netfilter: conntrack: add conntrack event timestamp
-    https://git.kernel.org/netdev/net-next/c/601731fc7c61
+url:    https://github.com/intel-lab-lkp/linux/commits/Michael-Chan/bnxt_en-Set-NAPR-1-2-support-when-registering-with-firmware/20250113-144205
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20250113063927.4017173-10-michael.chan%40broadcom.com
+patch subject: [PATCH net-next 09/10] bnxt_en: Extend queue stop/start for Tx rings
+config: s390-allmodconfig (https://download.01.org/0day-ci/archive/20250114/202501141828.3alxlzbA-lkp@intel.com/config)
+compiler: clang version 19.1.3 (https://github.com/llvm/llvm-project ab51eccf88f5321e7c60591c5546b254b6afab99)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250114/202501141828.3alxlzbA-lkp@intel.com/reproduce)
 
-You are awesome, thank you!
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202501141828.3alxlzbA-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   In file included from drivers/net/ethernet/broadcom/bnxt/bnxt.c:11:
+   In file included from include/linux/module.h:19:
+   In file included from include/linux/elf.h:6:
+   In file included from arch/s390/include/asm/elf.h:181:
+   In file included from arch/s390/include/asm/mmu_context.h:11:
+   In file included from arch/s390/include/asm/pgalloc.h:18:
+   In file included from include/linux/mm.h:2224:
+   include/linux/vmstat.h:504:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
+     504 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
+         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
+     505 |                            item];
+         |                            ~~~~
+   include/linux/vmstat.h:511:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
+     511 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
+         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
+     512 |                            NR_VM_NUMA_EVENT_ITEMS +
+         |                            ~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/vmstat.h:524:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
+     524 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
+         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
+     525 |                            NR_VM_NUMA_EVENT_ITEMS +
+         |                            ~~~~~~~~~~~~~~~~~~~~~~
+>> drivers/net/ethernet/broadcom/bnxt/bnxt.c:15794:18: error: use of undeclared identifier 'cpr'
+    15794 |         bnxt_db_nq(bp, &cpr->cp_db, cpr->cp_raw_cons);
+          |                         ^
+   drivers/net/ethernet/broadcom/bnxt/bnxt.c:15794:30: error: use of undeclared identifier 'cpr'
+    15794 |         bnxt_db_nq(bp, &cpr->cp_db, cpr->cp_raw_cons);
+          |                                     ^
+   3 warnings and 2 errors generated.
+
+
+vim +/cpr +15794 drivers/net/ethernet/broadcom/bnxt/bnxt.c
+
+ 15761	
+ 15762	static int bnxt_queue_stop(struct net_device *dev, void *qmem, int idx)
+ 15763	{
+ 15764		struct bnxt *bp = netdev_priv(dev);
+ 15765		struct bnxt_rx_ring_info *rxr;
+ 15766		struct bnxt_vnic_info *vnic;
+ 15767		struct bnxt_napi *bnapi;
+ 15768		int i;
+ 15769	
+ 15770		for (i = 0; i <= BNXT_VNIC_NTUPLE; i++) {
+ 15771			vnic = &bp->vnic_info[i];
+ 15772			vnic->mru = 0;
+ 15773			bnxt_hwrm_vnic_update(bp, vnic,
+ 15774					      VNIC_UPDATE_REQ_ENABLES_MRU_VALID);
+ 15775		}
+ 15776		/* Make sure NAPI sees that the VNIC is disabled */
+ 15777		synchronize_net();
+ 15778		rxr = &bp->rx_ring[idx];
+ 15779		bnapi = rxr->bnapi;
+ 15780		cancel_work_sync(&bnapi->cp_ring.dim.work);
+ 15781		bnxt_hwrm_rx_ring_free(bp, rxr, false);
+ 15782		bnxt_hwrm_rx_agg_ring_free(bp, rxr, false);
+ 15783		page_pool_disable_direct_recycling(rxr->page_pool);
+ 15784		if (bnxt_separate_head_pool())
+ 15785			page_pool_disable_direct_recycling(rxr->head_pool);
+ 15786	
+ 15787		if (bp->flags & BNXT_FLAG_SHARED_RINGS)
+ 15788			bnxt_tx_queue_stop(bp, idx);
+ 15789	
+ 15790		napi_disable(&bnapi->napi);
+ 15791	
+ 15792		bnxt_hwrm_cp_ring_free(bp, rxr->rx_cpr);
+ 15793		bnxt_clear_one_cp_ring(bp, rxr->rx_cpr);
+ 15794		bnxt_db_nq(bp, &cpr->cp_db, cpr->cp_raw_cons);
+ 15795	
+ 15796		memcpy(qmem, rxr, sizeof(*rxr));
+ 15797		bnxt_init_rx_ring_struct(bp, qmem);
+ 15798	
+ 15799		return 0;
+ 15800	}
+ 15801	
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
