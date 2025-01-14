@@ -1,116 +1,143 @@
-Return-Path: <netdev+bounces-158029-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158027-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0ED49A10224
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 09:35:11 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 102BAA10210
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 09:32:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2AF3316A7AD
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 08:35:09 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 765837A4410
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 08:32:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E94332500D1;
-	Tue, 14 Jan 2025 08:35:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F8FB1CDA19;
+	Tue, 14 Jan 2025 08:32:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="G4oD8puY"
+	dkim=pass (2048-bit key) header.d=sedlak-dev.20230601.gappssmtp.com header.i=@sedlak-dev.20230601.gappssmtp.com header.b="diiM6KCv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68C902500B4;
-	Tue, 14 Jan 2025 08:35:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 269131C5F2A
+	for <netdev@vger.kernel.org>; Tue, 14 Jan 2025 08:32:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736843707; cv=none; b=lUzuCvQvqsS08+9k6+YzZMcDIVjFxx1YDYzpIGLGZKOH3eyCrOtkaA/GFnlUkWvZh/wqRb3GiLHBtjrei1Whc59XJJCB4qU5xXjgQEl1edkIFtw0C7aP4rqNvHzNydHcHfHS7TgTU8782dwjUkYUb9OxeZE0sNhzOjWSSWQ7zNE=
+	t=1736843552; cv=none; b=s9zpynn/ORnIgK2t8XddbPNSAZNSbyJtwsDcU3NA+cM70KBI9RgtU+a7TpicMyynX7PkO90lZhmsMg6nsTzIEiF+IT6ZJJGAbzCzqyP0G+xq6YyuLafspLZfm0vK+BD0TK8t22e92EQHJ2HqDAZaJ769HaWoLcAsyVI577friyw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736843707; c=relaxed/simple;
-	bh=5Az6JReYG84QRZTtJ9fIk51QZVN4wnnJD/GoPG7m00s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=K8IhZWlP3ymWVuK8Yg9MoyqMKEyG9rDxMB2WyYelA2nglrZk6QK0dRxezAta/k8QLjZtGa8bIhPb+opyVDEOUQh2B3W1fxHdHiPLk+X2OE48ChZf4SOBnYQDN3J4WW+YOwsnZf3zkZpsDhedFRsSjMkozIM2/hOO3ENktAhFZt8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=G4oD8puY; arc=none smtp.client-ip=198.175.65.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1736843707; x=1768379707;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=5Az6JReYG84QRZTtJ9fIk51QZVN4wnnJD/GoPG7m00s=;
-  b=G4oD8puYIdElMsZhSYQXRSFtrNaAxMUMYgkCl/g18BnzOR53sxFWekzH
-   WulVovV1iKpO8bMRaMDfitQhnldzrKQPgW/f5hzitZmlu5bbbAgNMuNEW
-   2qkEsB7YteKTSj0YSlwyqgM8tQAT9eah3ieCNscMsA5hcsxDwpFJeG0vl
-   wWVLqgT32wBY5gGLXZyoPL2oQmhLXtWgRupIJ1vSYuXFB+YT91lEPncRc
-   YRTPIfzOjhfUbWXse96BZpsz9QvQcoIEniVvQD88/WWV08Vgo9rvi8Ng4
-   o3dLrXBOS58axJXkB5Hh7BhYW8BY7ELUj32Q6aUESvS7soVkwAFREiBg2
-   Q==;
-X-CSE-ConnectionGUID: +sLLUek6TA6zePDJt5wnrQ==
-X-CSE-MsgGUID: htjbxNg0SPO30Ie7GIw15A==
-X-IronPort-AV: E=McAfee;i="6700,10204,11314"; a="40809353"
-X-IronPort-AV: E=Sophos;i="6.12,313,1728975600"; 
-   d="scan'208";a="40809353"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jan 2025 00:35:06 -0800
-X-CSE-ConnectionGUID: VmRVBZe7SjioxGa7fnhNTA==
-X-CSE-MsgGUID: jhB7wHLxRnmGsw0aM6JVlg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,313,1728975600"; 
-   d="scan'208";a="104909576"
-Received: from mev-dev.igk.intel.com ([10.237.112.144])
-  by fmviesa008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jan 2025 00:35:02 -0800
-Date: Tue, 14 Jan 2025 09:31:43 +0100
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: Sanman Pradhan <sanman.p211993@gmail.com>
-Cc: netdev@vger.kernel.org, alexanderduyck@fb.com, kuba@kernel.org,
-	kernel-team@meta.com, andrew+netdev@lunn.ch, davem@davemloft.net,
-	edumazet@google.com, pabeni@redhat.com,
-	kalesh-anakkur.purayil@broadcom.com, linux@roeck-us.net,
-	mohsin.bashr@gmail.com, jdelvare@suse.com, horms@kernel.org,
-	suhui@nfschina.com, linux-kernel@vger.kernel.org,
-	vadim.fedorenko@linux.dev, linux-hwmon@vger.kernel.org,
-	sanmanpradhan@meta.com
-Subject: Re: [PATCH net-next 2/3] eth: fbnic: hwmon: Add support for reading
- temperature and voltage sensors
-Message-ID: <Z4Yg79d4KoBrNGFG@mev-dev.igk.intel.com>
-References: <20250114000705.2081288-1-sanman.p211993@gmail.com>
- <20250114000705.2081288-3-sanman.p211993@gmail.com>
+	s=arc-20240116; t=1736843552; c=relaxed/simple;
+	bh=/0l7iHb7VE3RNMs4qZVkW1iR2byrT52a/j55VuaJ6Iw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=JvXxTe9xXtVieUkLacXXH+R1s9F9iJKXjjdtKhqdRV6in8D1YMy5w2sQ+YDtBmqdmbaJAHOlmxYouCHZoqjGfLufw69A4asCUnRODcNa6oCtvqN9XGW8unP1/UDfPeq2fMERLFyXTc3GAaIFW/aKGZFDZG3OpOn609Cciowe7Hw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sedlak.dev; spf=none smtp.mailfrom=sedlak.dev; dkim=pass (2048-bit key) header.d=sedlak-dev.20230601.gappssmtp.com header.i=@sedlak-dev.20230601.gappssmtp.com header.b=diiM6KCv; arc=none smtp.client-ip=209.85.208.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sedlak.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=sedlak.dev
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-5d90a5581fcso8816621a12.1
+        for <netdev@vger.kernel.org>; Tue, 14 Jan 2025 00:32:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=sedlak-dev.20230601.gappssmtp.com; s=20230601; t=1736843548; x=1737448348; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=viLJXrRON3LuId3kJGF63clQ3P8ymoENgh5ioS2JxAM=;
+        b=diiM6KCvz/0423dr/4+K64F2501nyc+oTakWc7+olQlBDIKPGND+55qcieoJVKByp5
+         5uVxUUjt/6HXCK3VRS24uiZXtqAHw2fu2gAif8lcBeFQHPIj8sGYbvGhUC9Lc+MUFQ6Z
+         myT9JPFSFHnacRINaiGyyB4oZVc8ltH6QN/uW2JjwCNS1jH3MOMbY8/CLsdnnWh8EY24
+         KpgD7l1Bo98J2dAHw5pNwAW/CQMgL5fOWUUmy2OcYIjN3Yz4gFxKTZ+wnAlbUFkXx5s+
+         HsTrMQrRp72+NFYw6FoBQJ+KWD7+tkABcAWlzl92pUfcoSkYQEV+iosHzc/p9Igdmfss
+         8jyQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736843548; x=1737448348;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=viLJXrRON3LuId3kJGF63clQ3P8ymoENgh5ioS2JxAM=;
+        b=rpb7+FWZCOKvdeaSTfAKaax3xNJ5LjC3LxP0arkM38NrDDSYbnayknrhJq0v9XpTcX
+         VqPvO9QqRhgjI72FJGYKRc+vgKbEVWWkMAKpvjDDwxKoZwpmGaE9h+5Xu9zrmoLyws16
+         wYCqsQNGwo57iJ/drR9nKNBHjAbVLwHuLmQWiWWBjG3yGYgzk43MREp8KfK0aW/xDWCB
+         lnfZbpM9cIhUO9wQv15Ytd2PwRIdybATzbZbD52DESosBcI7ax+KUr2Fsi9bIGKYqT/u
+         YBnwGji35WsxAmLUHJpFnbI61mttg0vc+EkILuKKYaBFbyee0AKJW+qn1TVmTjt7eoEC
+         hH/Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWFiOMf193W28loknYu9N1SRrFFpADLEO/KLTbHnRavQB+0XgpaXb40FDpZGfxD6yEdKBCDCX8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzrUFsVpai1R45GvSwToREe4rEV7nthm083peXJCnjSxbPMWhBh
+	dFqVoBHO3UIOR2bpQAhnpCPjeGLwq9NNyuzSeUG9FDnjtDSYI8ZAqYdiPqMAsMjVzpv70eVT9RZ
+	N
+X-Gm-Gg: ASbGncvVi68MdBmGK91p+cHzjjoKfZUpQGJOOFK3+TVFAEKhJwCNH4f/Mejug++qWbd
+	MnTaXeGYaExtDBVuwlvTFyFEuXwh4yxOikdYsRaXdKAsOXWZ2PsC7VXGtKlCQb3xNDd0CDd2VEB
+	AO0XHYMRorVcUWZk90BVfW/J3Q0oxSpr9H9l/tvqMizA5AWNjpEJUb57+B5X23I6iYx8hVIFxX3
+	EzXfBk50zEQdP1U3+UZLw8FBfekecj81rmiF7Mfjix6gOfhuN0jd1EqEXCsm0ms8po=
+X-Google-Smtp-Source: AGHT+IEoAu/bHC6PMPvHq2cBmT5tImWGnk5L4zFRS9n/NANKyF0/dMSpnJNaS5yxIlE07gPl4SJLNQ==
+X-Received: by 2002:a17:907:1b03:b0:aa6:86d1:c3fe with SMTP id a640c23a62f3a-ab2ab6705b8mr2506074766b.4.1736843547977;
+        Tue, 14 Jan 2025 00:32:27 -0800 (PST)
+Received: from [10.0.5.196] (remote.cdn77.com. [95.168.203.222])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ab2c95b299dsm597600166b.160.2025.01.14.00.32.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 14 Jan 2025 00:32:27 -0800 (PST)
+Message-ID: <adf7c053-ffde-4df8-bc24-99740906410d@sedlak.dev>
+Date: Tue, 14 Jan 2025 09:32:26 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250114000705.2081288-3-sanman.p211993@gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Question] Generic way to retrieve IRQ number of Tx/Rx queue
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ intel-wired-lan@lists.osuosl.org
+References: <ca5056ef-0a1a-477c-ac99-d266dea2ff5b@sedlak.dev>
+ <20250113131508.79c8511a@kernel.org>
+Content-Language: en-US
+From: Daniel Sedlak <daniel@sedlak.dev>
+In-Reply-To: <20250113131508.79c8511a@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Mon, Jan 13, 2025 at 04:07:04PM -0800, Sanman Pradhan wrote:
-> Add support for reading temperature and voltage sensor data from firmware
-> by implementing a new TSENE message type and response parsing. This adds
-> message handler infrastructure to transmit sensor read requests and parse
-> responses. The sensor data will be exposed through the driver's hwmon interface.
+
+
+On 1/13/25 10:15 PM, Jakub Kicinski wrote:
+> On Fri, 10 Jan 2025 10:07:18 +0100 Daniel Sedlak wrote:
+>> Hello,
+>> I am writing an affinity scheduler in the userspace for network cards's
+>> Tx/Rx queues. Is there a generic way to retrieve all IRQ numbers for
+>> those queues for each interface?
+>>
+>> My goal is to get all Tx/Rx queues for a given interface, get the IRQ
+>> number of the individual queues, and set an affinity hint for each
+>> queue. I have tried to loop over /proc/interrupts to retrieve all queues
+>> for an interface in a hope that the last column would contain the
+>> interface name however this does not work since the naming is not
+>> unified across drivers. My second attempt was to retrieve all registered
+>> interrupts by network interface from
+>> /sys/class/net/{interface_name}/device/msi_irqs/, but this attempt was
+>> also without luck because some drivers request more IRQs than the number
+>> of queues (for example i40e driver).
 > 
-> Signed-off-by: Sanman Pradhan <sanman.p211993@gmail.com>
-> ---
->  drivers/net/ethernet/meta/fbnic/fbnic_fw.c  | 89 ++++++++++++++++++++-
->  drivers/net/ethernet/meta/fbnic/fbnic_fw.h  | 15 ++++
->  drivers/net/ethernet/meta/fbnic/fbnic_mac.c | 72 +++++++++++++++++
->  drivers/net/ethernet/meta/fbnic/fbnic_mac.h |  7 ++
->  4 files changed, 179 insertions(+), 4 deletions(-)
+> We do have an API for that
+> https://docs.kernel.org/next/networking/netlink_spec/netdev.html#napi
+> but unfortunately the driver needs to support it, and i40e currently
+> doesn't:
+
+Thank you for the link, I somehow missed that part of netlink…
+
+> $ git grep --files-with-matches  netif_napi_set_irq
+> drivers/net/ethernet/amazon/ena/ena_netdev.c
+> drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> drivers/net/ethernet/broadcom/tg3.c
+> drivers/net/ethernet/google/gve/gve_utils.c
+> drivers/net/ethernet/intel/e1000/e1000_main.c
+> drivers/net/ethernet/intel/e1000e/netdev.c
+> drivers/net/ethernet/intel/ice/ice_lib.c
+> drivers/net/ethernet/intel/igc/igc_main.c
+> drivers/net/ethernet/mellanox/mlx4/en_cq.c
+> drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+> drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
 > 
-> diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_fw.c b/drivers/net/ethernet/meta/fbnic/fbnic_fw.c
-> index 320615a122e4..bbc7c1c0c37e 100644
-> --- a/drivers/net/ethernet/meta/fbnic/fbnic_fw.c
-> +++ b/drivers/net/ethernet/meta/fbnic/fbnic_fw.c
-> @@ -228,9 +228,9 @@ static void fbnic_mbx_process_tx_msgs(struct fbnic_dev *fbd)
->  	tx_mbx->head = head;
->  }
-> 
+> Should be easy to add. Let me CC the Intel list in case they already
+> have a relevant change queued for i40e..
 
-[...]
+Thank you for directions, will check Intel's mailing list and poke 
+around with implementing that.
 
-Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-
-> --
-> 2.43.5
+Daniel
 
