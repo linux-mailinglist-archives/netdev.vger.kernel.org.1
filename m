@@ -1,114 +1,116 @@
-Return-Path: <netdev+bounces-158044-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158045-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C8D2A10376
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 10:57:30 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F05FA103A9
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 11:09:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ACDCE188979C
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 09:57:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3C6DA166A78
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 10:09:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21C5D1ADC7B;
-	Tue, 14 Jan 2025 09:57:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27CF92309AC;
+	Tue, 14 Jan 2025 10:09:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="o3f9nXid"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ne0ksYq6"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-100.freemail.mail.aliyun.com (out30-100.freemail.mail.aliyun.com [115.124.30.100])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E9AF1ADC73;
-	Tue, 14 Jan 2025 09:57:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CE7F1ADC91
+	for <netdev@vger.kernel.org>; Tue, 14 Jan 2025 10:09:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736848633; cv=none; b=nOsC4lO0T7bV4PneOLiAgWnPe4HrxKU/5TbnZKMsmvMDObmroUF6OhrMza0/5xzUPwczqTApNW4wHk1C1kOOaAQEZ8Hszz3rEoq1hRrwgGNuSzHU9vR72E6DlE1AKrpjoqmtFSXPPZkyiybmMV7Ev7XfvcC2r7ncAAcnrzUlyPw=
+	t=1736849352; cv=none; b=f11CEMTnhK0yK5alB5k/Gc4LPw9G+ws0rLtR0As/kWyserDxsqr4Ok9xDvrGpAiW2t1XzjICTAOBZQqV7tLLbpEHPA++1hKc+Npm3Ye4lT52yEHguTb3mML/HVyW/KKDt9UI1e70yAmm8FykZZ+nZ1fsRrFObxSjX7WJMyCzXPI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736848633; c=relaxed/simple;
-	bh=p2S7cQjHwtKfXhux3t3TqEpA73IACmKf3QU7Jnt5v3c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=geZ6N6Lr75BcPDCkm7aTPcK4JQfq89cbmpY2+x1HhOWHdmtYlkakvWeFucBe4DYBnLe/4IG5FsSZ1ohgaxODp5joV3Md149mOwq8ifhstQV/mQwVxFcbFza9X4hoHLfKMqUkXHZ+fpfOyTaC5BdEMy+WdLcWy+66Mau9BGDSQyI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=o3f9nXid; arc=none smtp.client-ip=115.124.30.100
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1736848621; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
-	bh=iNcP2KCOX9JtWeJDFiPz7AMgXEFC4KxUVa/PMlGFmbs=;
-	b=o3f9nXidq61dcOlOV5YzbkcyWvSKvPj0w4pLh7wVZ6mVLbP89n57IVFcd5nT4dt/kkAh7oWL9qxDEboCPsr75DxqzP4Dch/Rdnd71cGS+uDS8Wf86DXpHjrjvFVZNBAxCf2ZptEfFj9eLXO9pCIeodejMUXeQGQkb+NsnhrFkVM=
-Received: from localhost(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0WNevIV4_1736848295 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Tue, 14 Jan 2025 17:51:36 +0800
-Date: Tue, 14 Jan 2025 17:51:35 +0800
-From: "D. Wythe" <alibuda@linux.alibaba.com    >
-To: Dust Li <dust.li@linux.alibaba.com>
-Cc: "D. Wythe" <alibuda@linux.alibaba.com>, kgraul@linux.ibm.com,
-	wenjia@linux.ibm.com, jaka@linux.ibm.com, ast@kernel.org,
-	daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev,
-	pabeni@redhat.com, song@kernel.org, sdf@google.com,
-	haoluo@google.com, yhs@fb.com, edumazet@google.com,
-	john.fastabend@gmail.com, kpsingh@kernel.org, jolsa@kernel.org,
-	guwen@linux.alibaba.com, kuba@kernel.org, davem@davemloft.net,
-	netdev@vger.kernel.org, linux-s390@vger.kernel.org,
-	linux-rdma@vger.kernel.org, bpf@vger.kernel.org
-Subject: Re: [PATCH bpf-next v5 2/5] net/smc: Introduce generic hook smc_ops
-Message-ID: <20250114095135.GB16797@j66a10360.sqa.eu95>
-References: <20250107041715.98342-1-alibuda@linux.alibaba.com>
- <20250107041715.98342-3-alibuda@linux.alibaba.com>
- <20250113114944.GB89233@linux.alibaba.com>
+	s=arc-20240116; t=1736849352; c=relaxed/simple;
+	bh=XcSIevRn1/EjW1X8ukzXZDS3TrhR5umTaWKSdNYpZRk=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=Y/5jfhamQQFAFjtHc5EyubToeJNrJsxKXI33U86WjUC79HOANa4vguyw0bHwzyEAG8XVyngZUn35X2QGtY6m78+tnazy++F7nUvIm0L6SD+Lte9c1YIZQYECW/Y7w3VftsZULY0j5h2cMYlf0MmezN5DNcE92aqX4siyy16bUC4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ne0ksYq6; arc=none smtp.client-ip=209.85.128.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-4361f65ca01so50394625e9.1
+        for <netdev@vger.kernel.org>; Tue, 14 Jan 2025 02:09:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1736849349; x=1737454149; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=s04pYJOuT/V48BFocXvcRd3UH18Id1C6p/Sv3sRqQH4=;
+        b=ne0ksYq63diG+QJUic9PORXcoyU1kAXZsyxxDPGqyvytr4dYIiXj6PvAtUlFcX4AtI
+         gbjNQHn6jYBmAz3CcnImZRtu7wn8gs/M8PouC5udElgb5EwqQ/24pokCLTG/lYsepnxM
+         UiUcWG2sTpwozVfN73njpDE+QCZPYiMjSoyucoLW/DUgvzKEaWtcGaxrI1ekt/THaUuI
+         aYLwxJKvQceMkFiAMAuosun4Jy4I29T5gtPCN1YVEYWDPa5qGiEHNIXA+0IYoASZVVMJ
+         /BiFNZMzLmashh7nUtUas12DMjjF+AXmAwsD9QZoIQ/EW6hMowfMZj/d+R/MVR9rIrGL
+         smSg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736849349; x=1737454149;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=s04pYJOuT/V48BFocXvcRd3UH18Id1C6p/Sv3sRqQH4=;
+        b=bk47fsAEyVU8C9ochzNowHFx5yUE/i2Nu/55mvhnoUWhP7iathnsd0d9MQwmmOnLZ6
+         QaLasfzTfY1I9F6cCqRy1Eetxh0TmKOPv2weyqPoNoYvqidpiRt4GQWJJW71xj0sxchC
+         /U+mKxCI3ghJOwHB5wffykrolJSarY8G0sgVnhlTPmzx3DEgJJbv5rl8VmkL48WaZ9J4
+         blaBOPgiGUc1Yek+hJMEz068mMzoA3os72JiWb6yETwmdmjuwMdI72h+yGQ+n+HFIUVy
+         HFmjHnY4Pz3NoTUMUMyyVZC5x9cmUwEUtWvunpfFs8piLn8H3uPwiLK8FAd5lheZ9HOK
+         g0qA==
+X-Gm-Message-State: AOJu0YyWWiX89BThrk9W4Miff0sr62au8pziF01KrtMAHLRTQKI2kVpt
+	MywJOCdjOae1sZ17UgVUxWpfv7xaa1DtBQ7XcNt6bGCVoJYEw4kpdOA8Jg==
+X-Gm-Gg: ASbGncu17xydBXY7r1tnyOKxguKfj4ltr7XstQg071Lr5vJlgSbi7RxyHG2SOhLVZLT
+	G4XCrIrIAmrKwyQxTsSp5PY53SnlSKoP4FufiVviln7v4v1WY+JOPVOMzOGwdivB0XhIhadBqUR
+	BtF6S5igZtQ0GVCsBpgDzFWLHmHFHOmpzAygodLvLhqHUUiGI0CfL6AlfnUZ+gyxQwDyJb8qAdz
+	07JqpWTx7uQlK/sOlKJUm0MkrOwP0c7vt/IGeGHOJ4v9+b8XNTmXoB1LobW6NlLZWBaavSxTleJ
+	lizAmGesg5ORmWRxE+TnO5A/IxRLROzz0uPRhAsdMkn3
+X-Google-Smtp-Source: AGHT+IHzO163od/zKZCudB8ElSIOI0K1lL9z64fXkWgVrK6gHz2ERtJqDlTszntgPT7i6XbUYhMJIg==
+X-Received: by 2002:a05:600c:1d1f:b0:434:f99e:a5b5 with SMTP id 5b1f17b1804b1-436e271cf4amr179466685e9.28.1736849348354;
+        Tue, 14 Jan 2025 02:09:08 -0800 (PST)
+Received: from [192.168.1.122] (cpc159313-cmbg20-2-0-cust161.5-4.cable.virginm.net. [82.0.78.162])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-436e9df958dsm169154425e9.17.2025.01.14.02.09.07
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 14 Jan 2025 02:09:08 -0800 (PST)
+Subject: Re: [PATCH net] net: avoid race between device unregistration and
+ set_channels
+To: Antoine Tenart <atenart@kernel.org>, davem@davemloft.net,
+ kuba@kernel.org, pabeni@redhat.com, edumazet@google.com
+Cc: netdev@vger.kernel.org
+References: <20250113161842.134350-1-atenart@kernel.org>
+From: Edward Cree <ecree.xilinx@gmail.com>
+Message-ID: <8a1835db-b72c-4e9d-64e8-0bfffae2d8c8@gmail.com>
+Date: Tue, 14 Jan 2025 10:09:07 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250113114944.GB89233@linux.alibaba.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+In-Reply-To: <20250113161842.134350-1-atenart@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
 
-On Mon, Jan 13, 2025 at 07:49:44PM +0800, Dust Li wrote:
-> On 2025-01-07 12:17:12, D. Wythe wrote:
-> >The introduction of IPPROTO_SMC enables eBPF programs to determine
-> >whether to use SMC based on the context of socket creation, such as
-> >network namespaces, PID and comm name, etc.
-> >
-> >As a subsequent enhancement, to introduce a new generic hook that
-> >allows decisions on whether to use SMC or not at runtime, including
-> >but not limited to local/remote IP address or ports.
-> >
-> >Moreover, in the future, we can achieve more complex extensions to the
-> >protocol stack by extending this ops.
-> >
-> >Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
-> >---
-> > include/net/netns/smc.h |  3 ++
-> > include/net/smc.h       | 51 ++++++++++++++++++++++
-> > net/ipv4/tcp_output.c   | 15 +++++--
-> > net/smc/Kconfig         | 12 ++++++
-> > net/smc/Makefile        |  1 +
-> > net/smc/smc_ops.c       | 51 ++++++++++++++++++++++
-> > net/smc/smc_ops.h       | 25 +++++++++++
-> > net/smc/smc_sysctl.c    | 95 +++++++++++++++++++++++++++++++++++++++++
-> > 8 files changed, 249 insertions(+), 4 deletions(-)
-> > create mode 100644 net/smc/smc_ops.c
-> > create mode 100644 net/smc/smc_ops.h
-> >
-> >+
-> >+struct smc_ops {
+On 13/01/2025 16:18, Antoine Tenart wrote:
+> This is because unregister_netdevice_many_notify might run before
+> set_channels (both are under rtnl). When that happens, the rss lock is
+> being destroyed before being used again. Fix this by destroying the rss
+> lock in run_todo, outside an rtnl lock section and after all references
+> to net devices are gone.
+
+The latter (refs gone) being the important part?  Doesn't seem
+ particularly relevant that we've dropped rtnl, this wording had me
+ confused for a little while as to why this closed the race.
+
+> Note that allowing to run set_channels after the rtnl section of the
+> unregistration path should be fine as it still runs before the
+> destructors (thanks to refcount). This patch does not change that.
 > 
-> One more thing.
-> Can we call it smc_bpf_ops ? I think smc_ops is a bit ambiguous.
-> Same for smc_ops.h/c source file.
+> Fixes: 87925151191b ("net: ethtool: add a mutex protecting RSS contexts")
+> Cc: Edward Cree <ecree.xilinx@gmail.com>
+> Signed-off-by: Antoine Tenart <atenart@kernel.org>
 
-I don't think smc_bpf_ops is a good idea. BPF is just a way to implement
-smc_ops. Similarly, we can also implement this ops within the kernel module,
-just like tcp_congestion_ops dose. If you think this is ambiguous, perhaps
-we can call it as smc_handshake_ops ? This should eliminate the ambiguity.
-
-Best wishes,
-D. Wythe
-> 
-> Best regards,
-> Dust
+Reviewed-by: Edward Cree <ecree.xilinx@gmail.com>
 
