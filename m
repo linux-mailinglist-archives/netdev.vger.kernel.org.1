@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-157979-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157980-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94690A0FFBF
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 04:51:53 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8E2AA0FFC0
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 04:51:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5F8817A24D3
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 03:51:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C4B241633BF
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 03:51:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4EC82327BA;
-	Tue, 14 Jan 2025 03:51:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D55F233547;
+	Tue, 14 Jan 2025 03:51:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BtQg1U2Q"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uNmC0tSu"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF0FE232398
-	for <netdev@vger.kernel.org>; Tue, 14 Jan 2025 03:51:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 677CE23353C
+	for <netdev@vger.kernel.org>; Tue, 14 Jan 2025 03:51:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736826692; cv=none; b=W+EehN6zjki4wRbGFp5P4Zpup253rKcF0V6IswOXE1oNeEw6vTy0AAlioyEf+7xPrxjaSwLq4wl76cSNWBQIB+DGkIMOyyiu9bHOXEJSI+mJvhpktsgDH1EGxZfa0MzKEA7E2zFxosHAUzsyCWlaMWBioMh9c5ojMtpMECqIQ5Q=
+	t=1736826693; cv=none; b=ApUtL1scGXJfNgXFce78eBqzOw4bKYeu9TsgEjPfVNslu89AwGIH60vWmKnyzdsQ8D7tw/UCDI2gzGUvHi0b80r77HHbweQHuzQI9QpTZcpp1aGo1QWpWrkQsE7nt6BIh8sX0swOTJpe+0T0PQOOSuIu+8wb9IimSL+e92COUXw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736826692; c=relaxed/simple;
-	bh=5vpu9qlahrUJSP6WRQw6I7jtoO5NnZf0ODNBYcg1qy8=;
+	s=arc-20240116; t=1736826693; c=relaxed/simple;
+	bh=o9GEh7JWbKmRqO6sblRDoE/qu3xXdfDzYkpbWQC0itI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=NMm3mQeT62NBnqFG2TyA0LFQxK/RMur1lrBzrfRL7HSRTMDg/KNFaYnfuYHrAO878o/lbPl8IyD/p/JV6YIIVuyvKJJyEPeh8KTR1Yp/GP1ue1Gig5VZT4dr1MEZL/N+IrXfCjESCdGnjtKY8Uho08iM2evXdpaVauWp4notIWk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BtQg1U2Q; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AF361C4CEDF;
-	Tue, 14 Jan 2025 03:51:31 +0000 (UTC)
+	 MIME-Version; b=lYFLG03MbZiNCUiApEgimH2ebqR9Dt0FmCg/4ehB5+RVd4sf8e8DFJo752U6JW+YpHO3Flf5j8LgNClBm6vb5iWPYGvVOZuGNPgqJHsef2VqtncLAqRnvrhk9L7mj3OFz8x/5HRo2PJ4w1SktF1ce6HJdzG1KhjnZB0b6BtyNdQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uNmC0tSu; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66459C4CEE1;
+	Tue, 14 Jan 2025 03:51:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1736826692;
-	bh=5vpu9qlahrUJSP6WRQw6I7jtoO5NnZf0ODNBYcg1qy8=;
+	bh=o9GEh7JWbKmRqO6sblRDoE/qu3xXdfDzYkpbWQC0itI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=BtQg1U2Q0jl/0AUPDHFYu3wZK2izZACg6XRd9SUTKAbeGFTlkD+f/jOvTFRMXj+1h
-	 xbyIqQ95l2ESuoDuAlSEm6LdJPncz+SEtWAfpnnxRXp1musetS1JXZJtsP4HfGOSWK
-	 QN6u7ChWfAzs4dXjd87KviRknfue94LHRZ43upMcoNeDI5mWTKkOCems4wfk6Gqh7S
-	 HJnMPQPdVuofi4RL9HzkEza8Ofb8w7SGehIB/Axjqvlintyt8O5FarYhuicHmgkZDZ
-	 27imBOn7MMQj33Ics9uY/O+mgG5vQoft6liwYjdEdkbO+BUfENQsBtAte15R5/ESKE
-	 3kfaBrwyjk8PQ==
+	b=uNmC0tSugOSFYtTJkdGCHTsj2CKV5Y11g+FjE7q31w6a2z1oB82/yu+T9AbQZaTKd
+	 h7Wp2OdH6jeYdKF4TMAaxZStUfi1To5R8MU1hnn/QBpNHF+9nQA1NeoUuLMwA/9gMO
+	 Ej0cLRAyoc8jvD4hFf1ze5CEfo1OGH4juOGt03/b4z1rvBNfM+YCd8Er5izD2PnEXF
+	 cLMfOlNdOi04tPZaXbnZIp4SpU8GdxKy/+uoFzgSwQn7sKIxVIcrVwIZ0gG78Mevz7
+	 WqiOUalYpLGWgpy9aMoEyjlQNGemC5Jn/y3LMP0UWXzq+0MVrOtL1X2UHamOqWFzL2
+	 6NTleg1v0mUhQ==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -50,9 +50,9 @@ Cc: netdev@vger.kernel.org,
 	horms@kernel.org,
 	jdamato@fastly.com,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next 03/11] net: make netdev_lock() protect netdev->reg_state
-Date: Mon, 13 Jan 2025 19:51:09 -0800
-Message-ID: <20250114035118.110297-4-kuba@kernel.org>
+Subject: [PATCH net-next 04/11] net: add netdev->up protected by netdev_lock()
+Date: Mon, 13 Jan 2025 19:51:10 -0800
+Message-ID: <20250114035118.110297-5-kuba@kernel.org>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20250114035118.110297-1-kuba@kernel.org>
 References: <20250114035118.110297-1-kuba@kernel.org>
@@ -64,72 +64,105 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Protect writes to netdev->reg_state with netdev_lock().
-From now on holding netdev_lock() is sufficient to prevent
-the net_device from getting unregistered, so code which
-wants to hold just a single netdev around no longer needs
-to hold rtnl_lock.
+Some uAPI (netdev netlink) hide net_device's sub-objects while
+the interface is down to ensure uniform behavior across drivers.
+To remove the rtnl_lock dependency from those uAPIs we need a way
+to safely tell if the device is down or up.
 
-We do not protect the NETREG_UNREGISTERED -> NETREG_RELEASED
-transition. We'd need to move mutex_destroy(netdev->lock)
-to .release, but the real reason is that trying to stop
-the unregistration process mid-way would be unsafe / crazy.
-Taking references on such devices is not safe, either.
-So the intended semantics are to lock REGISTERED devices.
+Add an indication of whether device is open or closed, protected
+by netdev->lock. The semantics are the same as IFF_UP, but taking
+netdev_lock around every write to ->flags would be a lot of code
+churn.
+
+We don't want to blanket the entire open / close path by netdev_lock,
+because it will prevent us from applying it to specific structures -
+core helpers won't be able to take that lock from any function
+called by the drivers on open/close paths.
+
+So the state of the flag is "pessimistic", as in it may report false
+negatives, but never false positives.
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- include/linux/netdevice.h | 2 +-
- net/core/dev.c            | 6 ++++++
- 2 files changed, 7 insertions(+), 1 deletion(-)
+ include/linux/netdevice.h | 13 ++++++++++++-
+ net/core/dev.h            | 12 ++++++++++++
+ net/core/dev.c            |  4 ++--
+ 3 files changed, 26 insertions(+), 3 deletions(-)
 
 diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index 0e008ce9d5ee..bdbc5849469c 100644
+index bdbc5849469c..565dfeb78774 100644
 --- a/include/linux/netdevice.h
 +++ b/include/linux/netdevice.h
-@@ -2448,7 +2448,7 @@ struct net_device {
+@@ -2443,12 +2443,23 @@ struct net_device {
+ 	unsigned long		gro_flush_timeout;
+ 	u32			napi_defer_hard_irqs;
+ 
++	/**
++	 * @up: copy of @state's IFF_UP, but safe to read with just @lock.
++	 *	May report false negatives while the device is being opened
++	 *	or closed (@lock does not protect .ndo_open, or .ndo_close).
++	 */
++	bool			up;
++
+ 	/**
+ 	 * @lock: netdev-scope lock, protects a small selection of fields.
  	 * Should always be taken using netdev_lock() / netdev_unlock() helpers.
  	 * Drivers are free to use it for other protection.
  	 *
--	 * Protects: @net_shaper_hierarchy.
-+	 * Protects: @reg_state, @net_shaper_hierarchy.
+-	 * Protects: @reg_state, @net_shaper_hierarchy.
++	 * Protects:
++	 *	@net_shaper_hierarchy, @reg_state
++	 * Partially protects (readers hold either @lock or rtnl_lock,
++	 * writers must hold both for registered devices):
++	 *	@up
  	 * Ordering: take after rtnl_lock.
  	 */
  	struct mutex		lock;
+diff --git a/net/core/dev.h b/net/core/dev.h
+index 25ae732c0775..ef37e2dd44f4 100644
+--- a/net/core/dev.h
++++ b/net/core/dev.h
+@@ -128,6 +128,18 @@ void __dev_notify_flags(struct net_device *dev, unsigned int old_flags,
+ void unregister_netdevice_many_notify(struct list_head *head,
+ 				      u32 portid, const struct nlmsghdr *nlh);
+ 
++static inline void netif_set_up(struct net_device *dev, bool value)
++{
++	if (value)
++		dev->flags |= IFF_UP;
++	else
++		dev->flags &= ~IFF_UP;
++
++	netdev_lock(dev);
++	dev->up = value;
++	netdev_unlock(dev);
++}
++
+ static inline void netif_set_gso_max_size(struct net_device *dev,
+ 					  unsigned int size)
+ {
 diff --git a/net/core/dev.c b/net/core/dev.c
-index 5c1e71afbe1c..2ded6eedb4cc 100644
+index 2ded6eedb4cc..1a05ad60b89f 100644
 --- a/net/core/dev.c
 +++ b/net/core/dev.c
-@@ -10778,7 +10778,9 @@ int register_netdevice(struct net_device *dev)
- 
- 	ret = netdev_register_kobject(dev);
- 
-+	netdev_lock(dev);
- 	WRITE_ONCE(dev->reg_state, ret ? NETREG_UNREGISTERED : NETREG_REGISTERED);
-+	netdev_unlock(dev);
- 
+@@ -1618,7 +1618,7 @@ static int __dev_open(struct net_device *dev, struct netlink_ext_ack *extack)
  	if (ret)
- 		goto err_uninit_notify;
-@@ -11052,7 +11054,9 @@ void netdev_run_todo(void)
- 			continue;
- 		}
+ 		clear_bit(__LINK_STATE_START, &dev->state);
+ 	else {
+-		dev->flags |= IFF_UP;
++		netif_set_up(dev, true);
+ 		dev_set_rx_mode(dev);
+ 		dev_activate(dev);
+ 		add_device_randomness(dev->dev_addr, dev->addr_len);
+@@ -1697,7 +1697,7 @@ static void __dev_close_many(struct list_head *head)
+ 		if (ops->ndo_stop)
+ 			ops->ndo_stop(dev);
  
-+		netdev_lock(dev);
- 		WRITE_ONCE(dev->reg_state, NETREG_UNREGISTERED);
-+		netdev_unlock(dev);
- 		linkwatch_sync_dev(dev);
+-		dev->flags &= ~IFF_UP;
++		netif_set_up(dev, false);
+ 		netpoll_poll_enable(dev);
  	}
- 
-@@ -11658,7 +11662,9 @@ void unregister_netdevice_many_notify(struct list_head *head,
- 	list_for_each_entry(dev, head, unreg_list) {
- 		/* And unlink it from device chain. */
- 		unlist_netdevice(dev);
-+		netdev_lock(dev);
- 		WRITE_ONCE(dev->reg_state, NETREG_UNREGISTERING);
-+		netdev_unlock(dev);
- 	}
- 	flush_all_backlogs();
- 
+ }
 -- 
 2.47.1
 
