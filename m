@@ -1,108 +1,142 @@
-Return-Path: <netdev+bounces-158184-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158185-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A137BA10D41
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 18:14:11 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DDB43A10D58
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 18:17:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EBEAC18886BC
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 17:14:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1F1021884B9D
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 17:17:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C00B41F8EF3;
-	Tue, 14 Jan 2025 17:13:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78D1E1CF2B7;
+	Tue, 14 Jan 2025 17:17:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E4+Q4RzF"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Ht63IOGl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57A3013C3D3
-	for <netdev@vger.kernel.org>; Tue, 14 Jan 2025 17:13:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E03014A609
+	for <netdev@vger.kernel.org>; Tue, 14 Jan 2025 17:17:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736874837; cv=none; b=AaURPIH7TqzoNDVbxsUYUj6bnU3BWuIduyqM7JBWvmol3JIEoyGpnZ1lRjmq7/i2+vNyVZiU4NJN+gNExY8FIilgI8E8iAKpL6WZAWRHCLIGvcJJ+rGcZivqC+ses+MPcnF09HHfO+wUKtL0IFuiGlyb5ICDGIu46Oe6iANIkwQ=
+	t=1736875049; cv=none; b=qlUobXteuIRsNrhTYWaercbE2+BsGqDzOwZGDvreqTRnLhHeS0rsGeT3RG6O1ErKv9SZG7Fn4qCLs06kPZrxY2Je0QgKElkx/NkBWq/No+WwrrsEkzJ3X1iVk6uYwyWlRc0iLnTnMbA4n/763RcyoHV6EMirap+Ie9bo5udZJxU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736874837; c=relaxed/simple;
-	bh=6MarksYsmBV3hYGbkkbZg4JyuiXpS8i8d8u/lyfpqO0=;
+	s=arc-20240116; t=1736875049; c=relaxed/simple;
+	bh=U5JjmE7PtmCm8nJEk9tVTmqsXLSCNFXiXPuKAm5dVuU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=F/3BXexFkSwNPZKKpxfths52DYwJ4xG+jLgKUA9SVimZNvaiG5ow3JuJQDU5Gcat0Usa3OyRW8a67vKRUgASb5AlB0lhoiy1U7KTPE0kq4WS3g0dSE1H1cEveRKowYRHNwCovIkOqr2wMbN6evlpMj4BLohxu6i2HqNCb9tcegE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=E4+Q4RzF; arc=none smtp.client-ip=209.85.214.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-21680814d42so85963765ad.2
-        for <netdev@vger.kernel.org>; Tue, 14 Jan 2025 09:13:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736874836; x=1737479636; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=6MarksYsmBV3hYGbkkbZg4JyuiXpS8i8d8u/lyfpqO0=;
-        b=E4+Q4RzF9+lqUThIxIvCegqVaW4Lv4psTR8nssPC9heMdFM5RX55SiTe/cuZU+NCtK
-         920vq/4GsacbLINeWCa3wptEoaz9FyLN6lPcjFOTAhkxlfvsufG7ZDHHrwDhlqMBovq5
-         lmp25kwSG5euknSa5vP3ZE2/q073PYPiWRY2ckOXWgjjj6fSg7SUbq4Uki7hh3mn6gTU
-         VQfI0CjI8J2F/XFXfFif8DHUbrQDsAtWepvwWl8pB41Hmle5dVWALwyCEwCfVtXx6xW3
-         8Qhg+9w9u4gWeGinPbmnJ+kZ4sTvuNzjjR917f83WzqXRFvtJiYcaPU69JbWSbXC8Fgb
-         XipQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736874836; x=1737479636;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6MarksYsmBV3hYGbkkbZg4JyuiXpS8i8d8u/lyfpqO0=;
-        b=K2VtBgE4nHdOvpnTGHqiO2zGssno/16IldpGdfk69Hw6/U9Q+p0N5YWzNoq50wuu07
-         TxO+hHWy8fjcMi4Ez2tiTKxeDzsf6cVOhcVuHgNZTg0GKwr6fjYmWb/iZKrHt4N6Wtip
-         aIWl9PYxzNCkWIXz2d4q++RhUPMY2E9XFvh1x0f1G81qsFocD4dqyeLKyQcwydRIbUBA
-         tKA3NaQHearhxtcadHFMkbaw6ykSes2Drv8zErc4uHqJd4Xhg5uI7CMu1nn2hX7IN+c9
-         GkVgKt5fDjEzFfkBrQYZMFDupkfqSsGz8fiZz4QMXpJLJ3/85viMOwB5jfoFArzZZ8XD
-         MyWw==
-X-Forwarded-Encrypted: i=1; AJvYcCV7r+JjVCeW/wu1KWz3Mk8dgZcDGWgSBYurJK6ivNwR0EzDyL6UImrAfWhTvR7g98ZnIIs5IVw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx98wN6OvplYCnH9/Pp9Kt2/glP6M0JcXHV5/N1HvLMQ7PKCw0j
-	Y4OR8hoCCTZ8xkbrYc41dKoDtkHelzaV4ATDb6OExb7VoMIDz44=
-X-Gm-Gg: ASbGncuQxLrX4lYU+o4bWLk8/SXH9Pk14SxidJW4pdWjzxegslF+Uv4tezNG/zGSuT2
-	PsAgta6/AkQ6sdgoPVF/8MnN5Sr7UwOMpINE3CS3zX5bkJBncccFJLt/Vwn+Mg1m85fi7yqRiPy
-	P4W5U0dbja6OlsCcbb9nNhGc37HE5w+GL+/PWocxjNKZm8ELnvh+RUqehMpGNAK5+0EsYT+t09m
-	oC7SFBOVHogVZMlbsCcjVsxgiDz/pagCc8Qof1wOQZsyjfgAk8YyNcA
-X-Google-Smtp-Source: AGHT+IHkQ52d0kN5lBo6Q7id8TqO11nHe8Y0wNa4XDyhXKgJiORZLstgEOfv5U/Z+xVUD/tnVybpKA==
-X-Received: by 2002:aa7:88cc:0:b0:71e:4930:162c with SMTP id d2e1a72fcca58-72d21f4ac63mr36902229b3a.6.1736874834060;
-        Tue, 14 Jan 2025 09:13:54 -0800 (PST)
-Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72d4056a75bsm7911396b3a.66.2025.01.14.09.13.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Jan 2025 09:13:53 -0800 (PST)
-Date: Tue, 14 Jan 2025 09:13:52 -0800
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	David Ahern <dsahern@kernel.org>, Simon Horman <horms@kernel.org>,
-	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
-Subject: Re: [PATCH v1 net-next 00/11] ipv6: Convert RTM_{NEW,DEL}ADDR and
- more to per-netns RTNL.
-Message-ID: <Z4abUFyLfalEFCfz@mini-arch>
-References: <20250114080516.46155-1-kuniyu@amazon.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=NmvIdvppCJoU5DFah8R/BOll1nGC03BPJk7iM1HzcW1P9lHSzdEHSi5ryHYHrcKhjoVTQjmcMTzh331oMjtEcnkofEsdNW3iDIZN4ImGXdaE+lqlNF15cpbYS34yGvguREyvEbTZ4zDkcFFXsj5mVm2cDwS1MTjdIROI7OaB0Y8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Ht63IOGl; arc=none smtp.client-ip=192.198.163.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1736875048; x=1768411048;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=U5JjmE7PtmCm8nJEk9tVTmqsXLSCNFXiXPuKAm5dVuU=;
+  b=Ht63IOGl77VkDp9+sAaIbYTDtv79mxBB3TaKqmvwLzVRfPRh0E2zSvDC
+   7FuJfiYN6rsWkWztvGgyH/q4rxnB5/SMjltE3MpXCWP9BBiGrVsEI0Qd+
+   D1y9+jb3vsDGe1LuL4sYzPb14mirKGGK424Lxjs4+st8PXWTv8q+jsLbY
+   uvpeKota2BO3hAyffJc69TI/+wA3jyCaibU8vQhhG6xI8za0AtwklUhK8
+   w75Ko1Rp/PnIgybfDLKFsM76TdlixkIH6hh2ZqLlSnktu/sb6dQRbb32B
+   JoQ0vI7/fV5b1fRn9zcfmS9Ulxg0kdJWs34fdaGrJgul0UHPFCxUj/yNn
+   w==;
+X-CSE-ConnectionGUID: rQZ3LRbgTwajW6N1O5jniQ==
+X-CSE-MsgGUID: ZEqapRmESMmE4k8yRKFXJA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11315"; a="37338566"
+X-IronPort-AV: E=Sophos;i="6.12,314,1728975600"; 
+   d="scan'208";a="37338566"
+Received: from fmviesa006.fm.intel.com ([10.60.135.146])
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jan 2025 09:17:27 -0800
+X-CSE-ConnectionGUID: GaB4D4N5TsyoBtOwLpxvcA==
+X-CSE-MsgGUID: 0sjUhexdSkq9xK5YWneOeQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,314,1728975600"; 
+   d="scan'208";a="104699422"
+Received: from lkp-server01.sh.intel.com (HELO d63d4d77d921) ([10.239.97.150])
+  by fmviesa006.fm.intel.com with ESMTP; 14 Jan 2025 09:17:23 -0800
+Received: from kbuild by d63d4d77d921 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1tXkXZ-000Onj-1K;
+	Tue, 14 Jan 2025 17:17:21 +0000
+Date: Wed, 15 Jan 2025 01:17:05 +0800
+From: kernel test robot <lkp@intel.com>
+To: Xin Long <lucien.xin@gmail.com>, network dev <netdev@vger.kernel.org>
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	davem@davemloft.net, kuba@kernel.org,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Jamal Hadi Salim <jhs@mojatatu.com>,
+	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+	ast@fiberby.net, Shuang Li <shuali@redhat.com>
+Subject: Re: [PATCHv2 net] net: sched: refine software bypass handling in
+ tc_run
+Message-ID: <202501150119.PO2Xlm4u-lkp@intel.com>
+References: <17d459487b61c5d0276a01a3bc1254c6432b5d12.1736793775.git.lucien.xin@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250114080516.46155-1-kuniyu@amazon.com>
+In-Reply-To: <17d459487b61c5d0276a01a3bc1254c6432b5d12.1736793775.git.lucien.xin@gmail.com>
 
-On 01/14, Kuniyuki Iwashima wrote:
-> This series converts RTM_NEWADDR/RTM_DELADDR and some more
-> RTNL users in addrconf.c to per-netns RTNL.
+Hi Xin,
 
-This makes a lot of tests unhappy:
-https://netdev.bots.linux.dev/contest.html?pw-n=0&branch=net-next-2025-01-14--15-00&pw-n=0&pass=0
+kernel test robot noticed the following build errors:
 
-I have confirmed with a single one (drivers/net/ping.py) on my side,
-fails with:
-STDERR: b'ping: connect: Network is unreachable\n'
+[auto build test ERROR on net/main]
 
----
-pw-bot: cr
+url:    https://github.com/intel-lab-lkp/linux/commits/Xin-Long/net-sched-refine-software-bypass-handling-in-tc_run/20250114-025301
+base:   net/main
+patch link:    https://lore.kernel.org/r/17d459487b61c5d0276a01a3bc1254c6432b5d12.1736793775.git.lucien.xin%40gmail.com
+patch subject: [PATCHv2 net] net: sched: refine software bypass handling in tc_run
+config: i386-buildonly-randconfig-005-20250114 (https://download.01.org/0day-ci/archive/20250115/202501150119.PO2Xlm4u-lkp@intel.com/config)
+compiler: clang version 19.1.3 (https://github.com/llvm/llvm-project ab51eccf88f5321e7c60591c5546b254b6afab99)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250115/202501150119.PO2Xlm4u-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202501150119.PO2Xlm4u-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+>> net/sched/cls_api.c:422:23: error: use of undeclared identifier 'tcf_bypass_check_needed_key'
+     422 |                         static_branch_dec(&tcf_bypass_check_needed_key);
+         |                                            ^
+   net/sched/cls_api.c:2385:24: error: use of undeclared identifier 'tcf_bypass_check_needed_key'
+    2385 |                                 static_branch_inc(&tcf_bypass_check_needed_key);
+         |                                                    ^
+   2 errors generated.
+
+
+vim +/tcf_bypass_check_needed_key +422 net/sched/cls_api.c
+
+   415	
+   416	static void tcf_proto_destroy(struct tcf_proto *tp, bool rtnl_held,
+   417				      bool sig_destroy, struct netlink_ext_ack *extack)
+   418	{
+   419		tp->ops->destroy(tp, rtnl_held, extack);
+   420		if (tp->usesw && tp->counted) {
+   421			if (!atomic_dec_return(&tp->chain->block->useswcnt))
+ > 422				static_branch_dec(&tcf_bypass_check_needed_key);
+   423			tp->counted = false;
+   424		}
+   425		if (sig_destroy)
+   426			tcf_proto_signal_destroyed(tp->chain, tp);
+   427		tcf_chain_put(tp->chain);
+   428		module_put(tp->ops->owner);
+   429		kfree_rcu(tp, rcu);
+   430	}
+   431	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
