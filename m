@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-158241-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158242-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6F2AA11365
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 22:50:17 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7AEE4A11367
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 22:50:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 03AFE188A5CA
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 21:50:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6D6F83A6B4A
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 21:50:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E35A21CDFC1;
-	Tue, 14 Jan 2025 21:50:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8496212D95;
+	Tue, 14 Jan 2025 21:50:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kKmBrfVs"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W+b9rxbQ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF65026AC3
-	for <netdev@vger.kernel.org>; Tue, 14 Jan 2025 21:50:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D9D426AC3;
+	Tue, 14 Jan 2025 21:50:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736891413; cv=none; b=jswE47Zfg+g9kZguHdY6YB7WaJh0RdwdWB55rI84SUde3S/BGOxnGgpFYNq8aSTRGoZGLnY7jasiZ+Qnv7YQR3bMuKs5CjTo320PcipSYUCq4DCjQJjHzAoaOndaG8YIhar+qqIKKoktj5Jvrcn3sKSSh64YEI1wYOPm/lyKSU8=
+	t=1736891416; cv=none; b=lciXdYsYGLygAUXZp8Y0Pkvgn3+uhpSOB5Elh/DhEjYsDY1agn17zjA2kpwJxfBaemHybEdpwylG2VBSzDmGjjyumqKn93Y3FvmTlKREypV1XncaoEzJjh3yy8r7euosS11sW4UGUoQ53qU9rSqaJ96r4iutLms5LUQm3XYemBk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736891413; c=relaxed/simple;
-	bh=c62X6Lxfoj2f5TfKrhdxhpys1UFRLa0Bk9h2OW5hzc4=;
+	s=arc-20240116; t=1736891416; c=relaxed/simple;
+	bh=n9o5EzyAGrGOU/dkLi1GSw6IOzp5Q2e5sfX8rhM9nwo=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Bx/g83q/XwP9FhzL+b9giD5DC1XzOmF3+eZssNMNMlp1Sa+RJ5qJDiev+D2JwiM1aXWnHxgf9f847Ia5jg3X/VCzylOgHeYsrx/YR3YR1DwWqNWMfD2Qper3pZyBEk3vWM+CI7NqjuVemNOJl5wjh356k7rd9DZVF2xrxR08cZQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kKmBrfVs; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 33006C4CEDD;
-	Tue, 14 Jan 2025 21:50:13 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=Zr4pL+1ULlzbLsP+amTnr83ozVxbsR55TKkpGedmScE43n/7K2DVlKqfttvkEJodu31QiEANs1RBj9C6eLlk3mpt96BHkmzs4zYTRN4JXUvv2TKLppBqM+Y6wzrTXQ6s9e2roaOUsLRYthTKTbv0kpIjFE61F0UAVoTkwexnaNg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W+b9rxbQ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B52ECC4CEE3;
+	Tue, 14 Jan 2025 21:50:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736891413;
-	bh=c62X6Lxfoj2f5TfKrhdxhpys1UFRLa0Bk9h2OW5hzc4=;
+	s=k20201202; t=1736891414;
+	bh=n9o5EzyAGrGOU/dkLi1GSw6IOzp5Q2e5sfX8rhM9nwo=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=kKmBrfVsgj+LfTY39yrx3Nk3Nd8zpaCvKlya4uYUpREszuF9+5bdWFV2ms0XWTJUY
-	 0/aeevAkIYslMcTwLtQQMmbnqgdpCGFIWJLjJ8Sjn6QxrzzovC4fKG7KmdThLRJIky
-	 j14p+uknXkekZppfx2Kdfsyv5Fz0JSB+cuDjzVCsE7ynhpXhsZhUbLvJltuDrOgbUD
-	 a4oTFD4fltLtaz4zjjx5nfd2ViGG5xtVti5CgT4cCV4XHSG9s8hcu+d+yaUASzX+68
-	 +BVKp9DUtysu/oZ/WWMh8DMhHvfAS0R2sWmkQpTXIurOMTpw36+URBY9b5lFo2X7iy
-	 difP10HXnThbQ==
+	b=W+b9rxbQIFK95J4NaPExaPSOJOsrF+ldKDr+dX8HYSEK7x7me+iF460KSisnA1hqJ
+	 hfO30z1oCKr9u4WHVHEoW0NVR/uk73fOtnOXCw63aRAX/9gj9G77pu4foB07gSDaPs
+	 yz5OOtQL8OMd5xGpRSmZTrHgZY5cKlibrbWJND1B9M3KfyOh81dFsv01PXwqQZec+3
+	 NnkZ07Zm/ceoA79VKiSg3pnrv2RL0jHZyXHVW68OFPS8sCI+p0koEmpxqO5lIKX8oC
+	 65Wy45sQhKtrdWJ7oVyTVhktR/bLvn7pZL9AO8aIMoN5qtItt5Lt0eCDCRUV0QP1pU
+	 v7LVuoFe9cM5Q==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33B1D380AA5F;
-	Tue, 14 Jan 2025 21:50:37 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 71462380AA5F;
+	Tue, 14 Jan 2025 21:50:38 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,46 +52,45 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2 0/4][pull request] Fix E825 initialization
+Subject: Re: [PATCH net 0/3] mptcp: fixes for connect selftest flakes
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <173689143602.152273.9636273491319560685.git-patchwork-notify@kernel.org>
-Date: Tue, 14 Jan 2025 21:50:36 +0000
-References: <20250113182840.3564250-1-anthony.l.nguyen@intel.com>
-In-Reply-To: <20250113182840.3564250-1-anthony.l.nguyen@intel.com>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, andrew+netdev@lunn.ch, netdev@vger.kernel.org,
- grzegorz.nitka@intel.com, richardcochran@gmail.com,
- arkadiusz.kubalewski@intel.com, przemyslaw.kitszel@intel.com,
- horms@kernel.org
+ <173689143724.152273.8430157856789895479.git-patchwork-notify@kernel.org>
+Date: Tue, 14 Jan 2025 21:50:37 +0000
+References: <20250113-net-mptcp-connect-st-flakes-v1-0-0d986ee7b1b6@kernel.org>
+In-Reply-To: <20250113-net-mptcp-connect-st-flakes-v1-0-0d986ee7b1b6@kernel.org>
+To: Matthieu Baerts <matttbe@kernel.org>
+Cc: mptcp@lists.linux.dev, martineau@kernel.org, geliang@kernel.org,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ horms@kernel.org, shuah@kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ stable@vger.kernel.org
 
 Hello:
 
 This series was applied to netdev/net.git (main)
-by Tony Nguyen <anthony.l.nguyen@intel.com>:
+by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon, 13 Jan 2025 10:28:32 -0800 you wrote:
-> Grzegorz Nitka says:
+On Mon, 13 Jan 2025 16:44:55 +0100 you wrote:
+> Last week, Jakub reported [1] that the MPTCP Connect selftest was
+> unstable. It looked like it started after the introduction of some fixes
+> [2]. After analysis from Paolo, these patches revealed existing bugs,
+> that should be fixed by the following patches.
 > 
-> E825 products have incorrect initialization procedure, which may lead to
-> initialization failures and register values.
-> 
-> Fix E825 products initialization by adding correct sync delay, checking
-> the PHY revision only for current PHY and adding proper destination
-> device when reading port/quad.
+> - Patch 1: Make sure ACK are sent when MPTCP-level window re-opens. In
+>   some corner cases, the other peer was not notified when more data
+>   could be sent. A fix for v5.11, but depending on a feature introduced
+>   in v5.19.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,v2,1/4] ice: Fix E825 initialization
-    https://git.kernel.org/netdev/net/c/d79c304c76e9
-  - [net,v2,2/4] ice: Fix quad registers read on E825
-    https://git.kernel.org/netdev/net/c/dc26548d729e
-  - [net,v2,3/4] ice: Fix ETH56G FC-FEC Rx offset value
-    https://git.kernel.org/netdev/net/c/2e60560f1ec9
-  - [net,v2,4/4] ice: Add correct PHY lane assignment
-    https://git.kernel.org/netdev/net/c/258f5f905815
+  - [net,1/3] mptcp: be sure to send ack when mptcp-level window re-opens
+    https://git.kernel.org/netdev/net/c/2ca06a2f6531
+  - [net,2/3] mptcp: fix spurious wake-up on under memory pressure
+    https://git.kernel.org/netdev/net/c/e226d9259dc4
+  - [net,3/3] selftests: mptcp: avoid spurious errors on disconnect
+    https://git.kernel.org/netdev/net/c/218cc166321f
 
 You are awesome, thank you!
 -- 
