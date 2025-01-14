@@ -1,91 +1,119 @@
-Return-Path: <netdev+bounces-158232-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158226-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5666EA11293
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 21:56:06 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D7AFA1128C
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 21:55:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 323981642AD
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 20:55:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 37FB13A0524
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 20:55:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA20820F96E;
-	Tue, 14 Jan 2025 20:55:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E45A207643;
+	Tue, 14 Jan 2025 20:55:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=engleder-embedded.com header.i=@engleder-embedded.com header.b="bZqoH/M8"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GJO+tqDY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx13lb.world4you.com (mx13lb.world4you.com [81.19.149.123])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f202.google.com (mail-qk1-f202.google.com [209.85.222.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 095C920F074
-	for <netdev@vger.kernel.org>; Tue, 14 Jan 2025 20:55:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=81.19.149.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93A9D8493
+	for <netdev@vger.kernel.org>; Tue, 14 Jan 2025 20:55:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736888142; cv=none; b=uPVvC2gScL1eSB/ghZTOUjk9etUJo2XM8s5B324PZAbOG+KJm8f/Of+1m5F6gzP1euzI7kZEZn8bkdA4TF7mJ3vW6tQKqEsvpNuKz5Vti0cMbPB02W+JulkfCKSpKXTt3cFfw+tsCOVqroi+AIB8m2aPVABUCySnTbEPLFmOL1Y=
+	t=1736888136; cv=none; b=rbQ0/Qx/dXuPsYBXYoRRak7i0BkawjOXlBXzeC9pIB9HqHaFWCBCqxHBc5FnWqL1JmgEfcI9QuaCxpJc2FtlQwMnqhmO6MJNuYlIquzzGzmcC6mDLf0NoRb34jw0Pd1m69WcrcdTydoSlsFZXQKeKVg1tl+XX4eRr9c6ksSdbVk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736888142; c=relaxed/simple;
-	bh=pzmadhYkTMkI43WUW3G5FN3Fe8070BhaK2gYuDHGRKI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jN6PsVZm3JXldiHmL6cxOYL0zPlK16P5jymMFpuvcN6sF4uSj2hfC5B6PuwUXFRuepbD4OGHAekuIVhxt0qfGW0Bc0Jegea2kboEBqtuOIAShaXScCtmMzrQwOQaRUsUbZ8DnJZSdmsmk/rITUo9Nhpk85Os0EMyWHHbElJZ34s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=engleder-embedded.com; spf=pass smtp.mailfrom=engleder-embedded.com; dkim=pass (1024-bit key) header.d=engleder-embedded.com header.i=@engleder-embedded.com header.b=bZqoH/M8; arc=none smtp.client-ip=81.19.149.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=engleder-embedded.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=engleder-embedded.com
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=engleder-embedded.com; s=dkim11; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=XB4WmD9WM9aCEc4XLwdCD379fnzOyzeI69BYBP/Dsh4=; b=bZqoH/M87k5WguX71njxQiNdN3
-	Z7JbinRz3d29MrGBUuztWIxvUYZlEwVoMzgiJPdV8CHo3bnbc8oz+T4i7Q1iQ5kWB+4UzMDVASQjT
-	JCsdWDjF4l43BLHSO+T6UPnsvKqRs7YhNEcv6Te4PImVI02z3PDMvsb/XzO+/FrVtZg0=;
-Received: from [88.117.60.28] (helo=[10.0.0.160])
-	by mx13lb.world4you.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.97.1)
-	(envelope-from <gerhard@engleder-embedded.com>)
-	id 1tXndw-000000001A6-2edz;
-	Tue, 14 Jan 2025 21:36:08 +0100
-Message-ID: <8944a472-7cfe-4f20-8da3-75ae5737ff94@engleder-embedded.com>
-Date: Tue, 14 Jan 2025 21:36:07 +0100
+	s=arc-20240116; t=1736888136; c=relaxed/simple;
+	bh=KX3NtLSoeOmqoU8HSnDC/LBmYDxM5bH0yG8ECMwyuNA=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=SyzbqISrJth0Dj3l2t6q4fqX+syNMZyQikcSumYGf5zRwuhUB/EqcHl8aNvF6ZbDsA8Jb4uVqUGRGrE1MqhetFfMiDs48v4AC8ocVmVDeMTGmCdBNEZeXh5led+BkNUjcN8X2Umi4J7XIK7v6orlTt8uKV430LYVnl/ATOZW2i4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GJO+tqDY; arc=none smtp.client-ip=209.85.222.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qk1-f202.google.com with SMTP id af79cd13be357-7b6e1b036e9so574410285a.1
+        for <netdev@vger.kernel.org>; Tue, 14 Jan 2025 12:55:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1736888133; x=1737492933; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=PIcaoj1b/M8RTWFI+8LrXUSw6foRHqsYs1+F+EdLI/w=;
+        b=GJO+tqDYOtwczSOM7UOhe83yukfDwLP4uS7BawbD6jFkXvlKclwpsyDEGQ3BIqpWxG
+         E0sFrGD2ECCamwyv3UY197NDpQWlf4k0c18aP0VCTZTEUZU6QSYzdw2H/mS3UBvTR6lO
+         gaRw+N+uD3SVEzieLrgOblPZJUNasMFdv8YuoMzMli0SV9VY11YyTgczW8Y3aD63qs/i
+         FeA80c+yl2DGjBMFE4K6mFwTqNtPMF4qIIiqsgsnK8Uq9twPcxHpL7k8kQfYbyqfiZXl
+         aN5tT2nYj9QLpMG16ZUXolSJvjn7cQ/Mi1piWUNPRJCE3/8O+bGEs4Qrc3vvvgw+uzWn
+         xGIw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736888133; x=1737492933;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=PIcaoj1b/M8RTWFI+8LrXUSw6foRHqsYs1+F+EdLI/w=;
+        b=UQ3z3HI/x3x281+lF/XeUWbs0MMjt0Hg8epncdmt44RVLKFpt4SwLyVovAp3mKYVAv
+         facFAlnRZ5ptUDglQDhV1bGYsL1Pcm4ZHwbWfQS7wAbB+SD5sgqosCJABMT8I+yyoKAy
+         maxkR/GrEaf7cPPixViqmXoVfoGXF6/gCPDk8GQGK86X3b22dXSqay9TAIz2JfPpPbh5
+         qP8CZIAaXcMRQfb89Q5Guk96gGc7e95Oe4C9SUzl0bbVw7Kzj88rE6T5G++abis+40W2
+         hVBEyN5d84wdAOgiYhP78PRg42mp2WozFcbSpvq0XnOYDfA0uK2BAvTnbXiqJKIohI73
+         wrhw==
+X-Gm-Message-State: AOJu0YwpnZQUQlFWcvVaFJxOvRTgV1mvVJUFNXZA94Aiu86pDfk+5qy6
+	ZZidQq2ERaswbT33LRvmuEyBpwNQmZCylPBpbiDydCPeRrbUa5fegyf0yuFvGBgSVa4A6NTFNeW
+	PPib8lHUl4A==
+X-Google-Smtp-Source: AGHT+IG/iobBx6KARzmXuTrLdOMNN5/KcgJ6DJXwZOjsX54hrIC5WZFQ0yzykimimG/xncEr7dZbKV/KtlZPZA==
+X-Received: from qknyf6.prod.google.com ([2002:a05:620a:3bc6:b0:7be:3b14:3089])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:620a:3723:b0:7b1:549b:b992 with SMTP id af79cd13be357-7bcd970aa94mr4208688685a.23.1736888133412;
+ Tue, 14 Jan 2025 12:55:33 -0800 (PST)
+Date: Tue, 14 Jan 2025 20:55:26 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 5/5] tsnep: Add PHY loopback selftests
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org
-References: <20250110144828.4943-1-gerhard@engleder-embedded.com>
- <20250110144828.4943-6-gerhard@engleder-embedded.com>
- <b9ba6dd0-a978-421f-8d63-3366ea5e3991@lunn.ch>
-Content-Language: en-US
-From: Gerhard Engleder <gerhard@engleder-embedded.com>
-In-Reply-To: <b9ba6dd0-a978-421f-8d63-3366ea5e3991@lunn.ch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-AV-Do-Run: Yes
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.48.0.rc2.279.g1de40edade-goog
+Message-ID: <20250114205531.967841-1-edumazet@google.com>
+Subject: [PATCH v3 net-next 0/5] net: reduce RTNL pressure in unregister_netdevice()
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, Simon Horman <horms@kernel.org>, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On 13.01.25 23:08, Andrew Lunn wrote:
-> On Fri, Jan 10, 2025 at 03:48:28PM +0100, Gerhard Engleder wrote:
->> Add loopback selftests on PHY level. This enables quick testing of
->> loopback functionality to ensure working loopback for testing.
-> 
-> You don't appear to be sending any packets. So how do you know
-> loopback is actually working? I'm not sure this is a useful test.
+One major source of RTNL contention resides in unregister_netdevice()
 
-Yes with sending packets it would be a better test. This test would
-detect if loopback link is not established with the requested speed
-as it is the case since 6ff3cddc365b ("net: phylib: do not disable
-autoneg for fixed speeds >= 1G").
+Due to RCU protection of various network structures, and
+unregister_netdevice() being a synchronous function,
+it is calling potentially slow functions while holding RTNL.
 
-I will check if sending packets can be added.
+I think we can release RTNL in two points, so that three
+slow functions are called while RTNL can be used
+by other threads.
 
-Thank you for the review!
+v3: Deal with CONFIG_NET_NS=n
+    Use net_todo_list_for_cleanup_net in third patch.
+    Split the last patch in two parts for future bisections.
 
-Gerhard
+v2: Only temporarily release RTNL from cleanup_net()
+
+v1: https://lore.kernel.org/netdev/20250107130906.098fc8d6@kernel.org/T/#m398c95f5778e1ff70938e079d3c4c43c050ad2a6
+
+
+
+Eric Dumazet (5):
+  net: expedite synchronize_net() for cleanup_net()
+  net: no longer assume RTNL is held in flush_all_backlogs()
+  net: no longer hold RTNL while calling flush_all_backlogs()
+  net: reduce RTNL hold duration in unregister_netdevice_many_notify()
+    (part 1)
+  net: reduce RTNL hold duration in unregister_netdevice_many_notify()
+    (part 2)
+
+ include/net/net_namespace.h |  2 +
+ net/core/dev.c              | 97 ++++++++++++++++++++++++++++---------
+ net/core/net_namespace.c    |  5 ++
+ 3 files changed, 82 insertions(+), 22 deletions(-)
+
+-- 
+2.48.0.rc2.279.g1de40edade-goog
+
 
