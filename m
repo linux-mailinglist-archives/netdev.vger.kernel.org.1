@@ -1,156 +1,154 @@
-Return-Path: <netdev+bounces-157957-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157958-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F196A0FF1A
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 04:16:01 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C0E6A0FF22
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 04:20:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D7FE03A3EB3
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 03:15:54 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 98FCA7A1388
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 03:20:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BF8D230986;
-	Tue, 14 Jan 2025 03:15:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46FD7230D07;
+	Tue, 14 Jan 2025 03:20:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="YcISjwvO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j8kK5r+I"
 X-Original-To: netdev@vger.kernel.org
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6437D22FE18;
-	Tue, 14 Jan 2025 03:15:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B1ED2309A4;
+	Tue, 14 Jan 2025 03:20:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736824556; cv=none; b=n/9MouDcpbZ6SGr4QjYY07y2n05Xi1uePjxityi/wOPzpFkA9gO725IRYEbpOUKENx+SFX2R+vbWNjKsfPvjVoCNS8LtHqzT+aNhGNReZrPnz4vAF/vml41SxKz8SxMOO0FIj7bEhN7dNB0U/prSZXpeuk2/bBAmEwiwUd66Lhc=
+	t=1736824805; cv=none; b=h8i0skX7ZHfinytmBEuhXXG+81a+mpHdn6xBoavZJZexQoqXHu3wMMxZyM+jEMO6DYepb6/p2PNY4HiQtZdiBbhW76Hs2/k9xGy7VrGd9qB7lh05emoy+Oom7XelGVQKig4vPeFCM4K9GWvtsSwKTyOCa8gEqG4v5um+nxPt964=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736824556; c=relaxed/simple;
-	bh=4yc6DCaNOTYnsKJUos1Hkpf5XjS/EBMVKnw64Rx11WU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ef3h7dz0Cqe4CMkUfS+LQyCdp2IMR5Z2VhSXSPuJSDCjwL2ALEm3eiMtVoJHXgw+D//4TLzp/fSOm77UZpkUN2IWdG/qlbt7xrpVG+r+ZyswwoasI6d5/iY7AeGq+DEkn4gLLJXWyIEv+yyiQZjWPw5bEzGoJxLg+kbqsYQJLBU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=YcISjwvO; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=x89DqMLsnBNYRk0lxnHKXt48yEh+m9UWLjc0+56gCq4=; b=YcISjwvOnernJmKD4HEMkPBhej
-	U3QrrKSNnMV4u7sszt2ZFd82BbrIsHKc+c8xtKrdPBLaElJzAC0/tUQS+xuqMhqQGNky2wD+w6dwD
-	Gj/yllS0MREADT5G6mtaYEalxgtZw2yUvsN6YbxJ+DzIOyQXaAutNe49SCQ6Lw5zNrN0q+kHc2wIK
-	0KhGhiYsWHEyTCcx20gHu+6aFgFJzi6uHT8mx5Nv8GokeO3Sxtsooe3BDCfE8H7coCwBsEFPVfnwN
-	FugTfBETEtl7Rk75mrCSkGGXx/6tl/frtibc1hE5gp3sXlzoTNM4HltKhjXa2cTSMZmitNWAAR0qn
-	4ECSpm0g==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1tXXBm-008x7z-1l;
-	Tue, 14 Jan 2025 11:15:20 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 14 Jan 2025 11:15:19 +0800
-Date: Tue, 14 Jan 2025 11:15:19 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Michael Kelley <mhklinux@outlook.com>
-Cc: Breno Leitao <leitao@debian.org>,
-	"saeedm@nvidia.com" <saeedm@nvidia.com>,
-	"tariqt@nvidia.com" <tariqt@nvidia.com>,
-	"linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Thomas Graf <tgraf@suug.ch>, Tejun Heo <tj@kernel.org>,
-	Hao Luo <haoluo@google.com>, Josh Don <joshdon@google.com>,
-	Barret Rhoden <brho@google.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: [v3 PATCH] rhashtable: Fix rhashtable_try_insert test
-Message-ID: <Z4XWx5X0doetOJni@gondor.apana.org.au>
-References: <20241128-scx_lockdep-v1-1-2315b813b36b@debian.org>
- <Z1rYGzEpMub4Fp6i@gondor.apana.org.au>
- <Z2aFL3dNLYOcmzH3@gondor.apana.org.au>
- <20250102-daffy-vanilla-boar-6e1a61@leitao>
- <SN6PR02MB41572415707F0FA6D9A61247D4132@SN6PR02MB4157.namprd02.prod.outlook.com>
- <20250109-marigold-bandicoot-of-exercise-8ebede@leitao>
- <Z4DoFYQ3ytB-wS3-@gondor.apana.org.au>
- <SN6PR02MB41577C2C4EB260F3D2D4F85FD41C2@SN6PR02MB4157.namprd02.prod.outlook.com>
- <Z4FXs8vAtitHIJyl@gondor.apana.org.au>
- <SN6PR02MB41570F1F5F4F579B4E8F0CD3D41C2@SN6PR02MB4157.namprd02.prod.outlook.com>
+	s=arc-20240116; t=1736824805; c=relaxed/simple;
+	bh=QB8d+k+zAe20PnFNHeo6Jxr1OZ7yn2eqc1z/NBHfckI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ubgcaf511ZjZuHTVgXHGEmlPTHV9N/2FuUsixRXAOQMUrOswsCNotOVUzxNNbt5qyQASsDRvJo44Wk2iI2++t9a34zUEt1rBetwSlK8Pht5sNQl9GVyZBQA+jm2NfPGbmA/wmq3bkdLky5rnS4iwdZdXwVu4AY3AWYNs1ldMw8Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j8kK5r+I; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C1E66C4CEE1;
+	Tue, 14 Jan 2025 03:20:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1736824804;
+	bh=QB8d+k+zAe20PnFNHeo6Jxr1OZ7yn2eqc1z/NBHfckI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=j8kK5r+Ibx7RlfTRmW7X/evsF6cSiBVtxGvTCm8d1+5u/7pfIQ3lWmkd0jmYZjxGo
+	 YUZN1W8gCdMpj2FDf5AgZ+A6gYK8MOv7VLjU0gsBj0z6UVK8TMoc1gRz5jv4jqmci/
+	 D8ZcYLUT2OVFgibAvA4G53YmMxwH2GTQ6+1q2PSbbd6agobZvPZAYFqIwVgsg+nuPC
+	 +ph9aQkJ+CXwSla65qsCGSpKqajj2w84Ok5bgQ+hkJn3I+7Fh9mpL1//YtJkyBASlF
+	 +cEU/p6GIwDN08Xqhd3d5cs20HqVKejK3CII9MVJQnSN3nNUbmIBuOigQ+ppCuc9/N
+	 CYGRA2cr8RNNw==
+Date: Mon, 13 Jan 2025 19:20:02 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Divya Koppera <divya.koppera@microchip.com>
+Cc: <andrew@lunn.ch>, <arun.ramadoss@microchip.com>,
+ <UNGLinuxDriver@microchip.com>, <hkallweit1@gmail.com>,
+ <linux@armlinux.org.uk>, <davem@davemloft.net>, <edumazet@google.com>,
+ <pabeni@redhat.com>, <netdev@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, <richardcochran@gmail.com>,
+ <vadim.fedorenko@linux.dev>
+Subject: Re: [PATCH net-next v2 3/3] net: phy: microchip_rds_ptp : Add
+ PEROUT feature library for RDS PTP supported phys
+Message-ID: <20250113192002.39dda2c2@kernel.org>
+In-Reply-To: <20250109102533.15621-4-divya.koppera@microchip.com>
+References: <20250109102533.15621-1-divya.koppera@microchip.com>
+	<20250109102533.15621-4-divya.koppera@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <SN6PR02MB41570F1F5F4F579B4E8F0CD3D41C2@SN6PR02MB4157.namprd02.prod.outlook.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Fri, Jan 10, 2025 at 06:22:40PM +0000, Michael Kelley wrote:
->
-> This patch passes my tests. I'm doing a narrow test to verify that
-> the boot failure when opening the Mellanox NIC is no longer occurring.
-> I also unloaded/reloaded the mlx5 driver a couple of times. For good
-> measure, I then did a full Linux kernel build, and all is good. My testing
-> does not broadly verify correct operation of rhashtable except as it
-> gets exercised implicitly by these basic tests.
+On Thu, 9 Jan 2025 15:55:33 +0530 Divya Koppera wrote:
+> +	switch (ts_on_nsec) {
+> +	case 200000000:
+> +		*pulse_width = MCHP_RDS_PTP_GEN_CFG_LTC_EVT_200MS_;
+> +		break;
+> +	case 100000000:
+> +		*pulse_width = MCHP_RDS_PTP_GEN_CFG_LTC_EVT_100MS_;
+> +		break;
+> +	case 50000000:
+> +		*pulse_width = MCHP_RDS_PTP_GEN_CFG_LTC_EVT_50MS_;
+> +		break;
+> +	case 10000000:
+> +		*pulse_width = MCHP_RDS_PTP_GEN_CFG_LTC_EVT_10MS_;
+> +		break;
+> +	case 5000000:
+> +		*pulse_width = MCHP_RDS_PTP_GEN_CFG_LTC_EVT_5MS_;
+> +		break;
+> +	case 1000000:
+> +		*pulse_width = MCHP_RDS_PTP_GEN_CFG_LTC_EVT_1MS_;
+> +		break;
+> +	case 500000:
+> +		*pulse_width = MCHP_RDS_PTP_GEN_CFG_LTC_EVT_500US_;
+> +		break;
+> +	case 100000:
+> +		*pulse_width = MCHP_RDS_PTP_GEN_CFG_LTC_EVT_100US_;
+> +		break;
+> +	case 50000:
+> +		*pulse_width = MCHP_RDS_PTP_GEN_CFG_LTC_EVT_50US_;
+> +		break;
+> +	case 10000:
+> +		*pulse_width = MCHP_RDS_PTP_GEN_CFG_LTC_EVT_10US_;
+> +		break;
+> +	case 5000:
+> +		*pulse_width = MCHP_RDS_PTP_GEN_CFG_LTC_EVT_5US_;
+> +		break;
+> +	case 1000:
+> +		*pulse_width = MCHP_RDS_PTP_GEN_CFG_LTC_EVT_1US_;
+> +		break;
+> +	case 500:
+> +		*pulse_width = MCHP_RDS_PTP_GEN_CFG_LTC_EVT_500NS_;
+> +		break;
+> +	case 100:
+> +		*pulse_width = MCHP_RDS_PTP_GEN_CFG_LTC_EVT_100NS_;
+> +		break;
+> +	default:
+> +		phydev_warn(phydev, "Using default pulse width of 200ms\n");
+> +		*pulse_width = MCHP_RDS_PTP_GEN_CFG_LTC_EVT_200MS_;
+> +		break;
 
-Thanks for testing! The patch needs one more change though as
-moving the atomic_inc outside of the lock was a bad idea on my
-part.  This could cause atomic_inc/atomic_dec to be reordered
-thus resulting in an underflow.
++#define MCHP_RDS_PTP_GEN_CFG_LTC_EVT_200MS_	13
++#define MCHP_RDS_PTP_GEN_CFG_LTC_EVT_100MS_	12
++#define MCHP_RDS_PTP_GEN_CFG_LTC_EVT_50MS_	11
++#define MCHP_RDS_PTP_GEN_CFG_LTC_EVT_10MS_	10
++#define MCHP_RDS_PTP_GEN_CFG_LTC_EVT_5MS_	9
++#define MCHP_RDS_PTP_GEN_CFG_LTC_EVT_1MS_	8
++#define MCHP_RDS_PTP_GEN_CFG_LTC_EVT_500US_	7
++#define MCHP_RDS_PTP_GEN_CFG_LTC_EVT_100US_	6
++#define MCHP_RDS_PTP_GEN_CFG_LTC_EVT_50US_	5
++#define MCHP_RDS_PTP_GEN_CFG_LTC_EVT_10US_	4
++#define MCHP_RDS_PTP_GEN_CFG_LTC_EVT_5US_	3
++#define MCHP_RDS_PTP_GEN_CFG_LTC_EVT_1US_	2
++#define MCHP_RDS_PTP_GEN_CFG_LTC_EVT_500NS_	1
++#define MCHP_RDS_PTP_GEN_CFG_LTC_EVT_100NS_	0
 
-Thanks,
+1) seems a bit weird to me that you go to 200ms whenever user asks for
+   a value that couldn't be provided exactly. Why not go to the next
+   good value?
+2) this is not very well coded up, given that the values you're
+   translating to are a just natural numbers you can use a table
 
----8<---
-The test on whether rhashtable_insert_one did an insertion relies
-on the value returned by rhashtable_lookup_one.  Unfortunately that
-value is overwritten after rhashtable_insert_one returns.  Fix this
-by moving the test before data gets overwritten.
+static const sup_on_necs[] = {
+	100,		/* 100ns */
+	500,		/* 500ns */
+	1000,		/* 1us */
+	5000,		/* 5us */
+	...
+};
 
-Simplify the test as only data == NULL matters.
-
-Finally move atomic_inc back within the lock as otherwise it may
-be reordered with the atomic_dec on the removal side, potentially
-leading to an underflow.
-
-Reported-by: Michael Kelley <mhklinux@outlook.com>
-Fixes: e1d3422c95f0 ("rhashtable: Fix potential deadlock by moving schedule_work outside lock")
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-
-diff --git a/lib/rhashtable.c b/lib/rhashtable.c
-index bf956b85455a..0e9a1d4cf89b 100644
---- a/lib/rhashtable.c
-+++ b/lib/rhashtable.c
-@@ -611,21 +611,23 @@ static void *rhashtable_try_insert(struct rhashtable *ht, const void *key,
- 			new_tbl = rht_dereference_rcu(tbl->future_tbl, ht);
- 			data = ERR_PTR(-EAGAIN);
- 		} else {
-+			bool inserted;
-+
- 			flags = rht_lock(tbl, bkt);
- 			data = rhashtable_lookup_one(ht, bkt, tbl,
- 						     hash, key, obj);
- 			new_tbl = rhashtable_insert_one(ht, bkt, tbl,
- 							hash, obj, data);
-+			inserted = data && !new_tbl;
-+			if (inserted)
-+				atomic_inc(&ht->nelems);
- 			if (PTR_ERR(new_tbl) != -EEXIST)
- 				data = ERR_CAST(new_tbl);
- 
- 			rht_unlock(tbl, bkt, flags);
- 
--			if (PTR_ERR(data) == -ENOENT && !new_tbl) {
--				atomic_inc(&ht->nelems);
--				if (rht_grow_above_75(ht, tbl))
--					schedule_work(&ht->run_work);
--			}
-+			if (inserted && rht_grow_above_75(ht, tbl))
-+				schedule_work(&ht->run_work);
- 		}
- 	} while (!IS_ERR_OR_NULL(new_tbl));
- 
+for (i = 0; i < ARRAY_SIZE(sup_on_necs); i++) {
+	if (ts_on_nsec <= sup_on_necs[i]) {
+		*pulse_width = i;
+		break;
+	}
+}
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+pw-bot: cr
 
