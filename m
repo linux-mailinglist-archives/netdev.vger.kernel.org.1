@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-158178-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158179-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67FA7A10CB2
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 17:51:19 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF7F4A10CB3
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 17:51:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 102BF3A3799
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 16:51:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D70C51889C2B
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 16:51:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C7571ADC79;
-	Tue, 14 Jan 2025 16:51:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E28C81CDFAC;
+	Tue, 14 Jan 2025 16:51:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="uJQScRrF"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="sQyC6mG6"
 X-Original-To: netdev@vger.kernel.org
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5A40232459
-	for <netdev@vger.kernel.org>; Tue, 14 Jan 2025 16:51:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB005232459
+	for <netdev@vger.kernel.org>; Tue, 14 Jan 2025 16:51:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736873475; cv=none; b=nKRtI0S43zgdoGcl5hPGdHLvWTfCy5CeGjTGV/a6FqnrxXS1I7udMSxavK4AUB131f/6dXn9OJ7PfsMO0afehVxcFc8NYFQwRlEv+t6ZzxXH72EnMxWEVjTfmqDEZJk1Tuht0x+AELy9XR23J58RseMNCKNj01y9GmpbaLXEl/M=
+	t=1736873479; cv=none; b=S4aHWeZhepyAIX9QvGDzsiV/PdWfbESxHneXVVj7BB3oqBJNnKGSju6LfYCuo7X1kYauQXVbWU8m57LKYiTT91KVtCKt8sSg+0qebhVnpF21XjhsPi6ThBpW/s68fJGzsPYpF3iZH7Mh4+t+o7JFWaskONXwKNAr5NAj16TU2RI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736873475; c=relaxed/simple;
-	bh=RcVSz5A7WTX07UZH0a3d61vsaNjL9w6wB09GU+odVGI=;
+	s=arc-20240116; t=1736873479; c=relaxed/simple;
+	bh=kxwJ6ZLf1F2kRoZrAiF1HSoEtcU5OHUSCywmpVYXh9M=;
 	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
-	 Content-Disposition:Content-Type:Message-Id:Date; b=E5oMR63nNWeoLW9imGipykDksj2/mqsaCsNw9WRDsF8OzQrSxQCR5Voxqli568FudxURJgS+EHBQ9DMaawBHZLOjw9MSkeUs3TVG3d8vKK59s8yO12D2l2fkkcYEvlyCmpZPq6jRmV2uJLLIwmTz9Eu6WDa6IZUnRm6sxKZDJsA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=uJQScRrF; arc=none smtp.client-ip=78.32.30.218
+	 Content-Disposition:Content-Type:Message-Id:Date; b=Xk1pgFEm0D2e86oqazSejly1+iBwUH22Vn+HKXh6nNvzyYI4TC1fji+ZvPnTtxxXuK0usNdOGKOjS6+dCTnoPg09A7NguN/9t8AknqekCJKNbDwI6Cb5jgdI9yKEdNy7Kx9A5SliOhngPq0ZoLMueTaTxxWg8SdN5UL0ERvyQ5M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=sQyC6mG6; arc=none smtp.client-ip=78.32.30.218
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
@@ -37,21 +37,21 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
 	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
 	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=fMDPibTGVutVnoUV7xjLJg1ugDt9ePaw7m06y1uj5gw=; b=uJQScRrF22OwgBKkXrcgJx8pMw
-	KgqhDM9jlafpk/fwbNqBd7N0z9qx1r+tCCXdSQYzohuvj9LKMt71VHP/7C+mVrDRY8rN3GXFhGJXw
-	IpzOQQ+9y8mSGS5xWDDYV0+WKlWr/h5agTCYjeWtiTDfSxjzBSrweXyH4UrScLa4c2uLycsmlJw45
-	kGcqc/k54VAYZnWt2uiG+Qq6TdhrZcPCrstUKsDgJAMjgn0ZL7kqbUrLuNheM/L1QUv0u1au48P8Q
-	SnW9IOewZ1Q7S/WRbkRGSRBt94GrbhbBzcvX3c8wF5xFEaeDsvePBbfmJM/ceL95hrgiAGyc0dKnI
-	jQ+Pl3sQ==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:58802 helo=rmk-PC.armlinux.org.uk)
+	bh=OaAYO4ab4fITs7juBW/FSfIp2nYrOC6gWB66JY5AddA=; b=sQyC6mG6GYkQpMQJCf3tH3J2qu
+	0bmlYAeqFJV56qZFSx5sFae82oaTOpFYZBbJ+RKILWO9DsR3eUvWNEkSCDkMpNeJyBXVx06E22SHV
+	mCROmSLv/eRrYGL5JqYZqRQgMETl8nAKDIt+C4EDyKH6moTECilzVAwT8lH+iFK7u/+7lKfmz5u84
+	YRj6vI74B4pL7WEf1/QjH2xDSk4P7yAuJGfeIwn0aM1RCLzlvU3Qp8NT5SldDuNLH860z212FpuJE
+	/4lCcJX/4hw9G8dmpWKNadAQZ4frmaAL1hVkXAe5Q8nd1clH/lqxMWq6GDPw3OmZ5jGriNbMbzCZS
+	5rjH5I+g==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:60486 helo=rmk-PC.armlinux.org.uk)
 	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <rmk@armlinux.org.uk>)
-	id 1tXk8A-0008Nr-2U;
-	Tue, 14 Jan 2025 16:51:06 +0000
+	id 1tXk8G-0008O4-0P;
+	Tue, 14 Jan 2025 16:51:12 +0000
 Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
 	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1tXk7r-000r4l-Li; Tue, 14 Jan 2025 16:50:47 +0000
+	id 1tXk7w-000r4r-Pq; Tue, 14 Jan 2025 16:50:52 +0000
 In-Reply-To: <Z4aV3RmSZJ1WS3oR@shell.armlinux.org.uk>
 References: <Z4aV3RmSZJ1WS3oR@shell.armlinux.org.uk>
 From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
@@ -66,7 +66,7 @@ Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	Justin Chen <justin.chen@broadcom.com>,
 	netdev@vger.kernel.org,
 	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net-next 1/3] net: bcm: asp2: fix LPI timer handling
+Subject: [PATCH net-next 2/3] net: bcm: asp2: remove tx_lpi_enabled
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,62 +76,48 @@ MIME-Version: 1.0
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1tXk7r-000r4l-Li@rmk-PC.armlinux.org.uk>
+Message-Id: <E1tXk7w-000r4r-Pq@rmk-PC.armlinux.org.uk>
 Sender: Russell King <rmk@armlinux.org.uk>
-Date: Tue, 14 Jan 2025 16:50:47 +0000
+Date: Tue, 14 Jan 2025 16:50:52 +0000
 
-Fix the LPI timer handling in Broadcom ASP2 driver after the phylib
-managed EEE patches were merged.
+Phylib maintains a copy of tx_lpi_enabled, which will be used to
+populate the member when phy_ethtool_get_eee(). Therefore, writing to
+this member before phy_ethtool_get_eee() will have no effect. Remove
+it. Also remove setting our copy of info->eee.tx_lpi_enabled which
+becomes write-only.
 
 Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 ---
- drivers/net/ethernet/broadcom/asp2/bcmasp_ethtool.c | 2 --
- drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c    | 5 +++++
- 2 files changed, 5 insertions(+), 2 deletions(-)
+ drivers/net/ethernet/broadcom/asp2/bcmasp_ethtool.c | 6 ------
+ 1 file changed, 6 deletions(-)
 
 diff --git a/drivers/net/ethernet/broadcom/asp2/bcmasp_ethtool.c b/drivers/net/ethernet/broadcom/asp2/bcmasp_ethtool.c
-index 9da5ae29a105..139058a0dbbb 100644
+index 139058a0dbbb..5e04cd1839c0 100644
 --- a/drivers/net/ethernet/broadcom/asp2/bcmasp_ethtool.c
 +++ b/drivers/net/ethernet/broadcom/asp2/bcmasp_ethtool.c
-@@ -371,7 +371,6 @@ static int bcmasp_get_eee(struct net_device *dev, struct ethtool_keee *e)
+@@ -364,14 +364,9 @@ void bcmasp_eee_enable_set(struct bcmasp_intf *intf, bool enable)
+ 
+ static int bcmasp_get_eee(struct net_device *dev, struct ethtool_keee *e)
+ {
+-	struct bcmasp_intf *intf = netdev_priv(dev);
+-	struct ethtool_keee *p = &intf->eee;
+-
+ 	if (!dev->phydev)
  		return -ENODEV;
  
- 	e->tx_lpi_enabled = p->tx_lpi_enabled;
--	e->tx_lpi_timer = umac_rl(intf, UMC_EEE_LPI_TIMER);
- 
+-	e->tx_lpi_enabled = p->tx_lpi_enabled;
+-
  	return phy_ethtool_get_eee(dev->phydev, e);
  }
-@@ -395,7 +394,6 @@ static int bcmasp_set_eee(struct net_device *dev, struct ethtool_keee *e)
+ 
+@@ -394,7 +389,6 @@ static int bcmasp_set_eee(struct net_device *dev, struct ethtool_keee *e)
  			return ret;
  		}
  
--		umac_wl(intf, e->tx_lpi_timer, UMC_EEE_LPI_TIMER);
- 		intf->eee.tx_lpi_enabled = e->tx_lpi_enabled;
+-		intf->eee.tx_lpi_enabled = e->tx_lpi_enabled;
  		bcmasp_eee_enable_set(intf, true);
  	}
-diff --git a/drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c b/drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c
-index cfd50efbdbc0..62861a454a27 100644
---- a/drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c
-+++ b/drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c
-@@ -677,6 +677,8 @@ static void bcmasp_adj_link(struct net_device *dev)
- 		}
- 		umac_wl(intf, reg, UMC_CMD);
  
-+		umac_wl(intf, phydev->eee_cfg.tx_lpi_timer, UMC_EEE_LPI_TIMER);
-+
- 		active = phy_init_eee(phydev, 0) >= 0;
- 		bcmasp_eee_enable_set(intf, active);
- 	}
-@@ -1055,6 +1057,9 @@ static int bcmasp_netif_init(struct net_device *dev, bool phy_connect)
- 
- 		/* Indicate that the MAC is responsible for PHY PM */
- 		phydev->mac_managed_pm = true;
-+
-+		/* Set phylib's copy of the LPI timer */
-+		phydev->eee_cfg.tx_lpi_timer = umac_rl(intf, UMC_EEE_LPI_TIMER);
- 	}
- 
- 	umac_reset(intf);
 -- 
 2.30.2
 
