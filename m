@@ -1,69 +1,69 @@
-Return-Path: <netdev+bounces-158228-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158229-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6305BA1128E
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 21:55:51 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 452E4A1128F
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 21:55:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C90A63A183B
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 20:55:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 94127163D83
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 20:55:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3615120DD42;
-	Tue, 14 Jan 2025 20:55:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A29E20E6EA;
+	Tue, 14 Jan 2025 20:55:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jTWq1smH"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KshQJXnl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f202.google.com (mail-qt1-f202.google.com [209.85.160.202])
+Received: from mail-qk1-f202.google.com (mail-qk1-f202.google.com [209.85.222.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8154620C47F
-	for <netdev@vger.kernel.org>; Tue, 14 Jan 2025 20:55:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B78020D4F7
+	for <netdev@vger.kernel.org>; Tue, 14 Jan 2025 20:55:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736888139; cv=none; b=q4m38cxcwTJm/v0tyVwchijp4k9FSDhw85MupxcTMXOXlFiHYT5+LamT5k16j59bkyqKF628XmXe7/vlZVSZI3Zn/lwHu+bTwWWvzWs8MvldgFNTJtdH987trXlGiozKYlxeQKm5+C1gABdOz2PiUIj6FBJMputr3oUkSoMut+8=
+	t=1736888140; cv=none; b=UhKSl19Oi14yo9UZTPz5nsHG+odSq6zt2psjJYWczS7p5FKppUblS7rUum0eD2l/OiWMNBha5noRwACk3mxtwOaIta7w5irgZ0EzhndPy3QOEiM3RV4+N+pthQd4q0evhJIUkBsJ6HOZ1f8p5BirmpdeGA+Ft0NlprP4iIorT1Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736888139; c=relaxed/simple;
-	bh=kE6Ol122z9shZe0ALiEEiiN0Fxw+ppJCaKhQ7pRqGws=;
+	s=arc-20240116; t=1736888140; c=relaxed/simple;
+	bh=5QT1SwStzSyi+YNhhlTqVLWEfrv2zApNwOucVt1F6Yw=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Ert+/GC3UHYr3LYwtpvsPOXDmhyedULK4E7P0qGElPEdfQDu3Ehzgdv+moElCMLQlB4geNtLQ5TaHtFSWhBBp/TOim9YfqQjSSMhEgim/y+B7NbDijo/0SZJoORDDmklnaAmSxAvD2Ndwy6+asE6DiIsPldx2uAyRDBMYPffSeY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jTWq1smH; arc=none smtp.client-ip=209.85.160.202
+	 To:Cc:Content-Type; b=L0495AgiF+5F9Q1p6RcyZnZ7pRxwYhFu1exqY3ogmrUyLDPVgdJThWdiglwNCUV67xM//zk+vIDtbDtjnaBt8JbGwz8d5NXdGfq3mZ3yQ2UFw0l8+2Pz0IN6SdDxfGryF+VcwCz3WllguImvL5VVFLTjAeWUSg71O2jWOgw1ixY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KshQJXnl; arc=none smtp.client-ip=209.85.222.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qt1-f202.google.com with SMTP id d75a77b69052e-46790c5b1a5so148995641cf.2
-        for <netdev@vger.kernel.org>; Tue, 14 Jan 2025 12:55:37 -0800 (PST)
+Received: by mail-qk1-f202.google.com with SMTP id af79cd13be357-7b9e433351dso847687185a.3
+        for <netdev@vger.kernel.org>; Tue, 14 Jan 2025 12:55:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1736888136; x=1737492936; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1736888137; x=1737492937; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=umZ8c1cXwPdHXyHK5U4mqkUbZzV6gnO5gDr3Vw2yphM=;
-        b=jTWq1smH9A8+EY+42EagmYDOpf6LkuwiBoUyNMqFmAC96J0TSfBbmmykcpNjqWHUIT
-         tMC7WnzUuSVFLq1pNqS9odADnVCOJLrjEpI20T6WhyQSzF6IiugBoPoZoMSMKtw16Ut6
-         BeGY/E8zxs/ezzg0TlJZDbJUeLyZLQYYSVCp24/e2Q7gF1CZxvnHQTt3PEl69mLOeDTO
-         tZXHpwjX1IyGUYZKsOeSL15UafivQIEFpwL+GZKDRaXOrultwBtIP2QetkgFpuGM6LlT
-         HQLsc7Te/9ouDgaXyRQ80eEYt3lX6Vqi2VLW5Eh5tela8tRdFWnqQPA5eCU9KqaU5qvd
-         TWFQ==
+        bh=9dKCl1aYvxo7o5A/HIHfWMpJChOiFK8BNQYQtUV/oww=;
+        b=KshQJXnlp5XImBZ/9U1CVsWf1SBZrvAxOwZCjhjtVtTROPylrJOxeeXS77t26ZMFHf
+         plc5I+aLCmJ/Q+p9XP2x48/rltwKsCutsgniwDh84FyXszMbPxVPynE42+2sNHL0IkaN
+         JmrFM8eF2qYzLp21hn/Xr8nj0DQ8TK2aUBLXXpElfm/axhL4IekL74AdqGQpFxsmB0/Z
+         id7uCjoWcMgx48amvaFHpYaOuOIxX/UsSUprK/eKwgt1HS1KXXBqqjv04qg1VFkHG8R5
+         Xc7e/2fQUxm2olAxb1TGpvg3foSgh1MjaH06U2WbCjYTQ0lMfjJWpDKbJqW/lDw/fylq
+         aLiw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736888136; x=1737492936;
+        d=1e100.net; s=20230601; t=1736888137; x=1737492937;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=umZ8c1cXwPdHXyHK5U4mqkUbZzV6gnO5gDr3Vw2yphM=;
-        b=fEWcIRk/S24N/gRW8XfNVyxvKG/4XOEjqv1KMWnEy/3vj1mVikxf/j6kp+BrOnOpVM
-         xuVOrzzrwGZYuq2u5J3LH59ZX/jp8M3TzG0/sHOU86RzsCYdwrJlkIQF9bA8ETL8UCB+
-         vetGvVyW/6xvlAkY9lHgF/rWQ9eox+y7RosLXCImEiAJrbvq0dcuv3NrchurrPza4j3K
-         K+e+5z04D4YTVleR7xvsm+kgf6B5APz+8nftUQhdxpYjspSmJBOinkaDwK6yfiiF95Cr
-         YXAiRMk/1hg/5znlkXmmqCnJjR1PhHuFqD+UMiVU6CTAMoW8mz4uZH9AdpTT1XIjuBTN
-         uF4g==
-X-Gm-Message-State: AOJu0YwpwL6hCabq+F3XfCehlkk/PdH897D6R2or1jZvJ3TSJ0tiHszc
-	qUzJQAAs9iSV1pV2ealWeGlm1+1RASe8rNMEeE2kXyNO1M0TSWu0XSu42mvqUTNYyf2iSpIYFLa
-	mPjUHR+WtUQ==
-X-Google-Smtp-Source: AGHT+IHZb8FjDrSKYsKTBOOsJGQ/sz3/O9gAwZTKJIFYgaapyiksM3yX466gULZHwF1AewuZiJCajY5B+u0Hew==
-X-Received: from qtbbq15.prod.google.com ([2002:a05:622a:1c0f:b0:46c:9f17:12ee])
+        bh=9dKCl1aYvxo7o5A/HIHfWMpJChOiFK8BNQYQtUV/oww=;
+        b=VrAJ6MTW5hZSgs7mcObfo9AMuDGNrzRVJEKG+ljFNtvtNt/sTf/gsQN+NWI9ndhAYr
+         /z1Zf/Y0ugbo8P7wse9EDuUmllyi+ojgjtudLDO/wHBJRnQ5FZ473FHbjXHcIthCB7hW
+         52PLhq3lc/u/5mr1D8q5HMkIaeEnLihxPWWPJyKW+dgn9ppId0BFbzHiuAN3hRWU+vG+
+         AtnqUbWwetxijhRoVZR9qMmg/ef8WcPz20TlHeo76d41jw+rPYddgZe/1886+e9R8PAt
+         4BKLBqDP7X1N1Sg1yEDGpi11emY0cqbf9OkEuwVQ+Ry8PsRyAQT1MO0+P7tqKot97pcG
+         +2aA==
+X-Gm-Message-State: AOJu0Yy3sxuLp1q/GcJEi+/4yZSQGxK4B7lm15esXXZhvKPdoXoVcrW/
+	z5v0FDYZGq0mvH1e+FHskT7H0puOhDb9NHNDdhlKQrfl9T9m6PfrXewKuWscOXURpxsUwY8AVkB
+	K+CmX63BkpA==
+X-Google-Smtp-Source: AGHT+IGzXMrVgkYfLQ9kC2i05J6xA0Cc2RmVMuXE4QQT8TkUyprXdr6XKWZiP+iiXxEa/mD/p7LjWD/JLtV52A==
+X-Received: from qknrb5.prod.google.com ([2002:a05:620a:8d05:b0:7b6:e209:1c29])
  (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:ac8:58c4:0:b0:467:87f4:a29f with SMTP id d75a77b69052e-46c7108f7acmr412157281cf.45.1736888136441;
- Tue, 14 Jan 2025 12:55:36 -0800 (PST)
-Date: Tue, 14 Jan 2025 20:55:28 +0000
+ 2002:a05:620a:841:b0:7be:3f22:2d99 with SMTP id af79cd13be357-7be3f222e8dmr1076319085a.31.1736888137491;
+ Tue, 14 Jan 2025 12:55:37 -0800 (PST)
+Date: Tue, 14 Jan 2025 20:55:29 +0000
 In-Reply-To: <20250114205531.967841-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -73,8 +73,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250114205531.967841-1-edumazet@google.com>
 X-Mailer: git-send-email 2.48.0.rc2.279.g1de40edade-goog
-Message-ID: <20250114205531.967841-3-edumazet@google.com>
-Subject: [PATCH v3 net-next 2/5] net: no longer assume RTNL is held in flush_all_backlogs()
+Message-ID: <20250114205531.967841-4-edumazet@google.com>
+Subject: [PATCH v3 net-next 3/5] net: no longer hold RTNL while calling flush_all_backlogs()
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -82,120 +82,89 @@ Cc: netdev@vger.kernel.org, Simon Horman <horms@kernel.org>, eric.dumazet@gmail.
 	Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-flush_all_backlogs() uses per-cpu and static data to hold its
-temporary data, on the assumption it is called under RTNL
-protection.
+flush_all_backlogs() is called from unregister_netdevice_many_notify()
+as part of netdevice dismantles.
 
-Following patch in the series will break this assumption.
+This is currently called under RTNL, and can last up to 50 ms
+on busy hosts.
 
-Use instead a dynamically allocated piece of memory.
+There is no reason to hold RTNL at this stage, if our caller
+is cleanup_net() : netns are no more visible, devices
+are in NETREG_UNREGISTERING state and no other thread
+could mess our state while RTNL is temporarily released.
 
-In the unlikely case the allocation fails,
-use a boot-time allocated memory.
+In order to provide isolation, this patch provides a separate
+'net_todo_list' for cleanup_net().
 
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- net/core/dev.c | 53 +++++++++++++++++++++++++++++++++-----------------
- 1 file changed, 35 insertions(+), 18 deletions(-)
+ net/core/dev.c | 31 ++++++++++++++++++++++++++++---
+ 1 file changed, 28 insertions(+), 3 deletions(-)
 
 diff --git a/net/core/dev.c b/net/core/dev.c
-index 0542346a403c2602f94d8bc61f7be0ea0c64c33a..b0e05e44d771bee2721d054ddbd03166cc676680 100644
+index b0e05e44d771bee2721d054ddbd03166cc676680..f4dd92bed2223269053b6576e4954fcce218a2e5 100644
 --- a/net/core/dev.c
 +++ b/net/core/dev.c
-@@ -6012,8 +6012,6 @@ void netif_receive_skb_list(struct list_head *head)
- }
- EXPORT_SYMBOL(netif_receive_skb_list);
- 
--static DEFINE_PER_CPU(struct work_struct, flush_works);
--
- /* Network device is going away, flush any packets still pending */
- static void flush_backlog(struct work_struct *work)
- {
-@@ -6070,36 +6068,54 @@ static bool flush_required(int cpu)
- 	return true;
+@@ -10097,14 +10097,37 @@ static bool from_cleanup_net(void)
+ #endif
  }
  
-+struct flush_backlogs {
-+	cpumask_t		flush_cpus;
-+	struct work_struct	w[];
-+};
-+
-+static struct flush_backlogs *flush_backlogs_alloc(void)
++static void rtnl_drop_if_cleanup_net(void)
 +{
-+	return kmalloc(struct_size_t(struct flush_backlogs, w, nr_cpu_ids),
-+		       GFP_KERNEL);
++	if (from_cleanup_net())
++		__rtnl_unlock();
 +}
 +
-+static struct flush_backlogs *flush_backlogs_fallback;
-+static DEFINE_MUTEX(flush_backlogs_mutex);
++static void rtnl_acquire_if_cleanup_net(void)
++{
++	if (from_cleanup_net())
++		rtnl_lock();
++}
 +
- static void flush_all_backlogs(void)
+ /* Delayed registration/unregisteration */
+ LIST_HEAD(net_todo_list);
++static LIST_HEAD(net_todo_list_for_cleanup_net);
++
++/* TODO: net_todo_list/net_todo_list_for_cleanup_net should probably
++ * be provided by callers, instead of being static, rtnl protected.
++ */
++static struct list_head *todo_list(void)
++{
++	return from_cleanup_net() ? &net_todo_list_for_cleanup_net :
++				    &net_todo_list;
++}
++
+ DECLARE_WAIT_QUEUE_HEAD(netdev_unregistering_wq);
+ atomic_t dev_unreg_count = ATOMIC_INIT(0);
+ 
+ static void net_set_todo(struct net_device *dev)
  {
--	static cpumask_t flush_cpus;
-+	struct flush_backlogs *ptr = flush_backlogs_alloc();
- 	unsigned int cpu;
- 
--	/* since we are under rtnl lock protection we can use static data
--	 * for the cpumask and avoid allocating on stack the possibly
--	 * large mask
--	 */
--	ASSERT_RTNL();
-+	if (!ptr) {
-+		mutex_lock(&flush_backlogs_mutex);
-+		ptr = flush_backlogs_fallback;
-+	}
-+	cpumask_clear(&ptr->flush_cpus);
- 
- 	cpus_read_lock();
- 
--	cpumask_clear(&flush_cpus);
- 	for_each_online_cpu(cpu) {
- 		if (flush_required(cpu)) {
--			queue_work_on(cpu, system_highpri_wq,
--				      per_cpu_ptr(&flush_works, cpu));
--			cpumask_set_cpu(cpu, &flush_cpus);
-+			INIT_WORK(&ptr->w[cpu], flush_backlog);
-+			queue_work_on(cpu, system_highpri_wq, &ptr->w[cpu]);
-+			__cpumask_set_cpu(cpu, &ptr->flush_cpus);
- 		}
- 	}
- 
- 	/* we can have in flight packet[s] on the cpus we are not flushing,
- 	 * synchronize_net() in unregister_netdevice_many() will take care of
--	 * them
-+	 * them.
- 	 */
--	for_each_cpu(cpu, &flush_cpus)
--		flush_work(per_cpu_ptr(&flush_works, cpu));
-+	for_each_cpu(cpu, &ptr->flush_cpus)
-+		flush_work(&ptr->w[cpu]);
- 
- 	cpus_read_unlock();
-+
-+	if (ptr != flush_backlogs_fallback)
-+		kfree(ptr);
-+	else
-+		mutex_unlock(&flush_backlogs_mutex);
+-	list_add_tail(&dev->todo_list, &net_todo_list);
++	list_add_tail(&dev->todo_list, todo_list());
  }
  
- static void net_rps_send_ipi(struct softnet_data *remsd)
-@@ -12286,12 +12302,13 @@ static int __init net_dev_init(void)
- 	 *	Initialise the packet receive queues.
- 	 */
+ static netdev_features_t netdev_sync_upper_features(struct net_device *lower,
+@@ -10952,7 +10975,7 @@ void netdev_run_todo(void)
+ #endif
  
-+	flush_backlogs_fallback = flush_backlogs_alloc();
-+	if (!flush_backlogs_fallback)
-+		goto out;
-+
- 	for_each_possible_cpu(i) {
--		struct work_struct *flush = per_cpu_ptr(&flush_works, i);
- 		struct softnet_data *sd = &per_cpu(softnet_data, i);
+ 	/* Snapshot list, allow later requests */
+-	list_replace_init(&net_todo_list, &list);
++	list_replace_init(todo_list(), &list);
  
--		INIT_WORK(flush, flush_backlog);
--
- 		skb_queue_head_init(&sd->input_pkt_queue);
- 		skb_queue_head_init(&sd->process_queue);
- #ifdef CONFIG_XFRM_OFFLOAD
+ 	__rtnl_unlock();
+ 
+@@ -11575,8 +11598,10 @@ void unregister_netdevice_many_notify(struct list_head *head,
+ 		unlist_netdevice(dev);
+ 		WRITE_ONCE(dev->reg_state, NETREG_UNREGISTERING);
+ 	}
+-	flush_all_backlogs();
+ 
++	rtnl_drop_if_cleanup_net();
++	flush_all_backlogs();
++	rtnl_acquire_if_cleanup_net();
+ 	synchronize_net();
+ 
+ 	list_for_each_entry(dev, head, unreg_list) {
 -- 
 2.48.0.rc2.279.g1de40edade-goog
 
