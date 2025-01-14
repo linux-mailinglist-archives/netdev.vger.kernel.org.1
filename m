@@ -1,144 +1,177 @@
-Return-Path: <netdev+bounces-157926-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157927-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F7AEA0F7FE
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 01:08:28 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2991FA0FD30
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 01:10:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 39AB73A7E40
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 00:08:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 51A961885657
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 00:10:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADA625234;
-	Tue, 14 Jan 2025 00:07:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B01584A23;
+	Tue, 14 Jan 2025 00:09:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gOTFj0wR"
+	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="K6PlnWJ9"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CA0A1361;
-	Tue, 14 Jan 2025 00:07:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B4C017C91;
+	Tue, 14 Jan 2025 00:09:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736813249; cv=none; b=VoI0iEz/e5tKZPKLcmzHfTgy+s+DLYc0yC3Nzf4NVqoEmbTFCmhsSDjFrMOjNkD85iB9y7rK7gl+8vx728OIzRMDFgAQW8e9+9DwlsInuayxtx3sWX7gCOY6t6OnEuVpbXYI1TkAyYuX/N+rRkTvzbwy35I3CR5grNRerWvJVbg=
+	t=1736813399; cv=none; b=B8LpQu/DvatSZKOngrYxOmdzxBk8MT4607KnLDlGROuGpfLOuSZTaOYtv0tnTyUfP9g6SBlwl2GNvZUqsFk0lBUtC7ZW26gm9UGKNcwUxgG9vL61VR/l+LonrU5xfxpdBI6d8PcSTjaJglYDj0vnS8BtJ2XB/zfUWYJzkDbt/nY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736813249; c=relaxed/simple;
-	bh=YFHHVZRBvQPdmgWH/zLMVMHmLYNVEI8tzbQwTlW2Ih0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=shlGn5xXtL4FVnUVkxjtUwk2I0/5rx+xmjI3q2/S1TuxAPiedjT09y4lxDb3Nh+K0nQVgqOJQSGlLJKwt7ks12QQuBKV+pv5KH/yTvrFSzFhwcY4HKCSe2PHpCxxfHMWUohJDjELtl+p08ACD9N3UD5aVoYsEmDFl2iT4WFXeFc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gOTFj0wR; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CC8A6C4CED6;
-	Tue, 14 Jan 2025 00:07:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736813249;
-	bh=YFHHVZRBvQPdmgWH/zLMVMHmLYNVEI8tzbQwTlW2Ih0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=gOTFj0wRO1DfGUp6+VPCpqUafTsi7L81Xr/N1PyvWv1a0wb1I4O86uruKRYFwp/yb
-	 igPuym1uXdVCyaO46OsTWZUuJAeWGwjtlxxC8TFV3UYQ7vSkFlpWbKNa+ttNjOZmS8
-	 DqED6du4VBtXZGo24cMncrjO+hPNftFqjQ2ivI/4lO/jbzA89ZglO+T2AL/lgVeyl+
-	 ri9/TJeJp7GMU4FOlVQfq5iRNAJHTgDVY59qI3DaMhQXZ6DWnW+B3v2AiqX+EF7MvC
-	 xzTniRwae/Ojf+PxOth+YwBTUMArkHFSH4ZpuPDAh+QcNg4CK4BoHzKC4ZKB/x+ki5
-	 M53UnNGvTfAmQ==
-Date: Mon, 13 Jan 2025 18:07:27 -0600
-From: Rob Herring <robh@kernel.org>
-To: Ninad Palsule <ninad@linux.ibm.com>
-Cc: linux-aspeed@lists.ozlabs.org, davem@davemloft.net, edumazet@google.com,
-	andrew@codeconstruct.com.au, netdev@vger.kernel.org,
-	kuba@kernel.org, joel@jms.id.au,
-	linux-arm-kernel@lists.infradead.org,
-	openipmi-developer@lists.sourceforge.net, conor+dt@kernel.org,
-	linux-kernel@vger.kernel.org, pabeni@redhat.com,
-	ratbert@faraday-tech.com, eajames@linux.ibm.com,
-	devicetree@vger.kernel.org, andrew+netdev@lunn.ch, minyard@acm.org,
-	krzk+dt@kernel.org
-Subject: Re: [PATCH v3 00/10] DTS updates for system1 BMC
-Message-ID: <20250114000727.GA3693942-robh@kernel.org>
-References: <20250108163640.1374680-1-ninad@linux.ibm.com>
- <173637565834.1164228.2385240280664730132.robh@kernel.org>
- <a8893ef1-251d-447c-b42f-8f1ebc9623bb@linux.ibm.com>
+	s=arc-20240116; t=1736813399; c=relaxed/simple;
+	bh=OsKFXtMineW8sNVrB+luwXdbjpxNtb5UUqOWpJzquZs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=a232ziLqUv/R3a10GhW0bd2wCAYgLcuZmIptR0897UjH9lotOiGalvftsqViles+41qm7emLrBASpP7H8PTbuKTfEROEVKsXvrbkCRb14rktYY4ExccDRFOCiGReKzvMaxJJktJACip0nvxvdz9TAaxlcYI/5mt3B46Eyvl/yiI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=K6PlnWJ9; arc=none smtp.client-ip=185.226.149.38
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
+Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
+	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.93)
+	(envelope-from <mhal@rbox.co>)
+	id 1tXUV0-00FOKw-Tk; Tue, 14 Jan 2025 01:09:38 +0100
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+	s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
+	References:Cc:To:Subject:MIME-Version:Date:Message-ID;
+	bh=ItYetxWsSzgRvLHc8dKmyCADQfPIZfMQ4g/EMKUfjZA=; b=K6PlnWJ9JeqtlI+A2SE03zEl5v
+	t0nhZB9327vqImvtuPI90q8kXl3d74poC3e/F3u7e+OIz2gZ38jkJlSBDpHQz4K2MvLP51v95AbtX
+	WZqKZrqBjmk/Fe1arTJCLNAoMjcSkIDU0h53HoVNldRtaHcQ+7OaKXmoLyM8jVyYsPOmEPLpvt6Dn
+	aFnPE1jYDUK04SeFQbc+8UK5WMn+jTB2XEUxgHyWSp+zxdCfVsTGB3CZjQDFi+73Dlb1Y4OBEaqZJ
+	kXBunvm2DK1lqTBFIoQGGazJKgzMubUR9lTSP8HLwlV0v2DCUcKd/+/xnSjdMeVaQWabfhJcZM6wn
+	zQJgWm4A==;
+Received: from [10.9.9.73] (helo=submission02.runbox)
+	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
+	(envelope-from <mhal@rbox.co>)
+	id 1tXUUx-0005Z5-Fa; Tue, 14 Jan 2025 01:09:37 +0100
+Received: by submission02.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.93)
+	id 1tXUUn-00GzIz-OP; Tue, 14 Jan 2025 01:09:25 +0100
+Message-ID: <7de34054-10cf-45d0-a869-adebb77ad913@rbox.co>
+Date: Tue, 14 Jan 2025 01:09:24 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a8893ef1-251d-447c-b42f-8f1ebc9623bb@linux.ibm.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v2 1/5] vsock/virtio: discard packets if the transport
+ changes
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: netdev@vger.kernel.org, Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+ bpf@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Luigi Leonardi <leonardi@redhat.com>, "David S. Miller"
+ <davem@davemloft.net>, Wongi Lee <qwerty@theori.io>,
+ =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Eric Dumazet <edumazet@google.com>,
+ kvm@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Simon Horman <horms@kernel.org>, Hyunwoo Kim <v4bel@theori.io>,
+ Jakub Kicinski <kuba@kernel.org>, virtualization@lists.linux.dev,
+ stable@vger.kernel.org
+References: <20250110083511.30419-1-sgarzare@redhat.com>
+ <20250110083511.30419-2-sgarzare@redhat.com>
+ <1aa83abf-6baa-4cf1-a108-66b677bcfd93@rbox.co>
+ <nedvcylhjxrkmkvgugsku2lpdjgjpo5exoke4o6clxcxh64s3i@jkjnvngazr5v>
+ <CAGxU2F7BoMNi-z=SHsmCV5+99=CxHo4dxFeJnJ5=q9X=CM3QMA@mail.gmail.com>
+ <cccb1a4f-5495-4db1-801e-eca211b757c3@rbox.co>
+ <nzpj4hc6m4jlqhcwv6ngmozl3hcoxr6kehoia4dps7jytxf6df@iqglusiqrm5n>
+ <903dd624-44e5-4792-8aac-0eaaf1e675c5@rbox.co>
+ <5nkibw33isxiw57jmoaadizo3m2p76ve6zioumlu2z2nh5lwck@xodwiv56zrou>
+From: Michal Luczaj <mhal@rbox.co>
+Content-Language: pl-PL, en-GB
+In-Reply-To: <5nkibw33isxiw57jmoaadizo3m2p76ve6zioumlu2z2nh5lwck@xodwiv56zrou>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Jan 13, 2025 at 01:52:01PM -0600, Ninad Palsule wrote:
-> Hello,
+On 1/13/25 16:01, Stefano Garzarella wrote:
+> On Mon, Jan 13, 2025 at 02:51:58PM +0100, Michal Luczaj wrote:
+>> On 1/13/25 12:05, Stefano Garzarella wrote:
+>>> ...
+>>> An alternative approach, which would perhaps allow us to avoid all this,
+>>> is to re-insert the socket in the unbound list after calling release()
+>>> when we deassign the transport.
+>>>
+>>> WDYT?
+>>
+>> If we can't keep the old state (sk_state, transport, etc) on failed
+>> re-connect() then reverting back to initial state sounds, uhh, like an
+>> option :) I'm not sure how well this aligns with (user's expectations of)
+>> good ol' socket API, but maybe that train has already left.
 > 
-> On 1/8/25 16:34, Rob Herring (Arm) wrote:
-> > On Wed, 08 Jan 2025 10:36:28 -0600, Ninad Palsule wrote:
-> > > Hello,
-> > > 
-> > > Please review the patch set.
-> > > 
-> > > V3:
-> > > ---
-> > >    - Fixed dt_binding_check warnings in ipmb-dev.yaml
-> > >    - Updated title and description in ipmb-dev.yaml file.
-> > >    - Updated i2c-protocol description in ipmb-dev.yaml file.
-> > > 
-> > > V2:
-> > > ---
-> > >    Fixed CHECK_DTBS errors by
-> > >      - Using generic node names
-> > >      - Documenting phy-mode rgmii-rxid in ftgmac100.yaml
-> > >      - Adding binding documentation for IPMB device interface
-> > > 
-> > > NINAD PALSULE (7):
-> > >    ARM: dts: aspeed: system1: Add IPMB device
-> > >    ARM: dts: aspeed: system1: Add GPIO line name
-> > >    ARM: dts: aspeed: system1: Add RGMII support
-> > >    ARM: dts: aspeed: system1: Reduce sgpio speed
-> > >    ARM: dts: aspeed: system1: Update LED gpio name
-> > >    ARM: dts: aspeed: system1: Remove VRs max8952
-> > >    ARM: dts: aspeed: system1: Mark GPIO line high/low
-> > > 
-> > > Ninad Palsule (3):
-> > >    dt-bindings: net: faraday,ftgmac100: Add phys mode
-> > >    bindings: ipmi: Add binding for IPMB device intf
-> > >    ARM: dts: aspeed: system1: Disable gpio pull down
-> > > 
-> > >   .../devicetree/bindings/ipmi/ipmb-dev.yaml    |  44 +++++
-> > >   .../bindings/net/faraday,ftgmac100.yaml       |   3 +
-> > >   .../dts/aspeed/aspeed-bmc-ibm-system1.dts     | 177 ++++++++++++------
-> > >   3 files changed, 165 insertions(+), 59 deletions(-)
-> > >   create mode 100644 Documentation/devicetree/bindings/ipmi/ipmb-dev.yaml
-> > > 
-> > > --
-> > > 2.43.0
-> > > 
-> > > 
-> > > 
-> > 
-> > My bot found new DTB warnings on the .dts files added or changed in this
-> > series.
-> > 
-> > Some warnings may be from an existing SoC .dtsi. Or perhaps the warnings
-> > are fixed by another series. Ultimately, it is up to the platform
-> > maintainer whether these warnings are acceptable or not. No need to reply
-> > unless the platform maintainer has comments.
-> > 
-> > If you already ran DT checks and didn't see these error(s), then
-> > make sure dt-schema is up to date:
-> > 
-> >    pip3 install dtschema --upgrade
-> > 
-> > 
-> > New warnings running 'make CHECK_DTBS=y aspeed/aspeed-bmc-ibm-system1.dtb' for 20250108163640.1374680-1-ninad@linux.ibm.com:
-> > 
-> > arch/arm/boot/dts/aspeed/aspeed-bmc-ibm-system1.dtb: gpio@1e780000: 'hog-0', 'hog-1', 'hog-2', 'hog-3' do not match any of the regexes: 'pinctrl-[0-9]+'
-> > 	from schema $id: http://devicetree.org/schemas/gpio/aspeed,ast2400-gpio.yaml#
+> We really want to behave as similar as possible with the other sockets,
+> like AF_INET, so I would try to continue toward that train.
+
+I was worried that such connect()/transport error handling may have some
+user visible side effects, but I guess I was wrong. I mean you can still
+reach a sk_state=TCP_LISTEN with a transport assigned[1], but perhaps
+that's a different issue.
+
+I've tried your suggestion on top of this series. Passes the tests.
+
+diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
+index fa9d1b49599b..4718fe86689d 100644
+--- a/net/vmw_vsock/af_vsock.c
++++ b/net/vmw_vsock/af_vsock.c
+@@ -492,6 +492,10 @@ int vsock_assign_transport(struct vsock_sock *vsk, struct vsock_sock *psk)
+ 		vsk->transport->release(vsk);
+ 		vsock_deassign_transport(vsk);
+ 
++		vsock_addr_unbind(&vsk->local_addr);
++		vsock_addr_unbind(&vsk->remote_addr);
++		vsock_insert_unbound(vsk);
++
+ 		/* transport's release() and destruct() can touch some socket
+ 		 * state, since we are reassigning the socket to a new transport
+ 		 * during vsock_connect(), let's reset these fields to have a
+
+>> Another possibility would be to simply brick the socket on failed (re)connect.
 > 
-> This is a false positive. So ignoring it.
+> I see, though, this is not the behavior of AF_INET for example, right?
 
-No, it is not. You need to define hog nodes in aspeed,ast2400-gpio.yaml. 
-See other GPIO controller bindings that do this.
+Right.
 
-Rob
+> Do you have time to investigate/fix this problem?
+> If not, I'll try to look into it in the next few days, maybe next week.
+
+I'm happy to help, but it's not like I have any better ideas.
+
+Michal
+
+[1]: E.g. this way:
+```
+from socket import *
+
+MAX_PORT_RETRIES = 24 # net/vmw_vsock/af_vsock.c
+VMADDR_CID_LOCAL = 1
+VMADDR_PORT_ANY = -1
+hold = []
+
+def take_port(port):
+	s = socket(AF_VSOCK, SOCK_SEQPACKET)
+	s.bind((VMADDR_CID_LOCAL, port))
+	hold.append(s)
+	return s
+
+s = take_port(VMADDR_PORT_ANY)
+_, port = s.getsockname()
+for _ in range(MAX_PORT_RETRIES):
+	port += 1
+	take_port(port);
+
+s = socket(AF_VSOCK, SOCK_SEQPACKET)
+err = s.connect_ex((VMADDR_CID_LOCAL, port))
+assert err != 0
+print("ok, connect failed; transport set")
+
+s.bind((VMADDR_CID_LOCAL, port+1))
+s.listen(16)
+```
+
 
