@@ -1,105 +1,335 @@
-Return-Path: <netdev+bounces-157939-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-157943-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 871AFA0FE35
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 02:39:42 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 67B12A0FE5C
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 03:00:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 993C01699DD
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 01:39:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 67DE5169C74
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 02:00:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0852D230262;
-	Tue, 14 Jan 2025 01:39:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="WUFS1kKx"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8B3923027B;
+	Tue, 14 Jan 2025 02:00:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-2101.amazon.com (smtp-fw-2101.amazon.com [72.21.196.25])
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5545C224B0D;
-	Tue, 14 Jan 2025 01:39:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=72.21.196.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BBAB230277;
+	Tue, 14 Jan 2025 02:00:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736818775; cv=none; b=r2KKtRrRxFz3HBVVbtDSm3B9N3eMbh3zqD1lYB368z34abTFrAImoHH3vHsldyGDiS5P8Xvk/iflGPk3ncz/5ni1Tl2P956lk5tXE4wSkPFHZG/qUN5b9KgywkQOWdvf1/TO93iNcngIheT3kQgyM56VQOlin7HlQEdZgT8NiOQ=
+	t=1736820011; cv=none; b=qtT6PYBdb/za2kVBQ1QxWE1frgLP3VtyduuYo6cRtuzF261NPRjr+MR6qwaph3VG/20IgjJ2Wureaeoo69Wa5aH3gzvbMyLwAikFkXHwNLBpNM9MuABR5NX5m2tDWQXppET3a3B9TDrfOVDpZu7k93blf1W/g+QQ4vLr4vkw0fw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736818775; c=relaxed/simple;
-	bh=fvsXsSG3rvQldIY/85wzJ0AHdohJOHv8n5QAPKehmcM=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=DiqVNV7VfOo+9yVWhGe3xbwyrLrmex0Ez7ljioPbXrDaETbjUsogfXd9K07CIny2mJy437Kdd37GPPuV7JV/xQS7WduHOjnb8BqkhFozZvob9vb4lr0RSK6TBZmVIlaByUn7DOLmgjnIfYXzVmN7cwlqswIn2ZSyDkbviXNeopU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=WUFS1kKx; arc=none smtp.client-ip=72.21.196.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1736818774; x=1768354774;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=0cedPuJPQkStIGe+OXyB1F52+EDOiClOdRu6CBFc8ew=;
-  b=WUFS1kKx08w53QWvUM8u1Z75DHg3d3VMxWl/1Bq6I+AF1lwc7CnBvm5G
-   9TpPIwJsz8P/bRTdyQy54QvIPIXVgxSebFL1BEaenLLz8x/uUPvVxpf+D
-   S143HXX4DgXw+fUA57hCf4RciOAfESxcqwESW5XhRCK6j7slfnnB3NOtp
-   I=;
-X-IronPort-AV: E=Sophos;i="6.12,312,1728950400"; 
-   d="scan'208";a="458589578"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-2101.iad2.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jan 2025 01:39:28 +0000
-Received: from EX19MTAUWA001.ant.amazon.com [10.0.7.35:58030]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.14.236:2525] with esmtp (Farcaster)
- id 86aea7c8-dd91-44b2-aaf7-7a7eff52786e; Tue, 14 Jan 2025 01:39:28 +0000 (UTC)
-X-Farcaster-Flow-ID: 86aea7c8-dd91-44b2-aaf7-7a7eff52786e
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA001.ant.amazon.com (10.250.64.217) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Tue, 14 Jan 2025 01:39:27 +0000
-Received: from 6c7e67c6786f.amazon.com (10.119.11.99) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Tue, 14 Jan 2025 01:39:19 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <shaw.leon@gmail.com>
-CC: <alex.aring@gmail.com>, <andrew+netdev@lunn.ch>,
-	<b.a.t.m.a.n@lists.open-mesh.org>, <bpf@vger.kernel.org>,
-	<bridge@lists.linux.dev>, <davem@davemloft.net>, <donald.hunter@gmail.com>,
-	<dsahern@kernel.org>, <edumazet@google.com>, <herbert@gondor.apana.org.au>,
-	<horms@kernel.org>, <kuba@kernel.org>, <kuniyu@amazon.com>,
-	<linux-can@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-kselftest@vger.kernel.org>, <linux-ppp@vger.kernel.org>,
-	<linux-rdma@vger.kernel.org>, <linux-wireless@vger.kernel.org>,
-	<linux-wpan@vger.kernel.org>, <miquel.raynal@bootlin.com>,
-	<netdev@vger.kernel.org>, <osmocom-net-gprs@lists.osmocom.org>,
-	<pabeni@redhat.com>, <shuah@kernel.org>, <stefan@datenfreihafen.org>,
-	<steffen.klassert@secunet.com>, <wireguard@lists.zx2c4.com>
-Subject: Re: [PATCH net-next v8 01/11] rtnetlink: Lookup device in target netns when creating link
-Date: Tue, 14 Jan 2025 10:39:09 +0900
-Message-ID: <20250114013909.7102-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
-In-Reply-To: <20250113143719.7948-2-shaw.leon@gmail.com>
-References: <20250113143719.7948-2-shaw.leon@gmail.com>
+	s=arc-20240116; t=1736820011; c=relaxed/simple;
+	bh=tZcYR4ElbxoN5FjdE2e7V8PpIbm3cW/Dpnr6AgbFpuo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=FONSvVcjP9qGsdAqQ0YaZg1YxXU3Q1EXM/ZJBDsN0YKe8wqRRBToSNRCeSGEPfrrGXX7aU27Wl7FGw9T7T7znBsyANY9igtXgNX1zc+G6fEp8FPd/rEqMfYNiYdUaFvdJ66fgLBpgwWKtG0Ce2GuiH9zVFv86pphRSEoPIbXwig=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [192.168.0.224] (ip5f5ae8ae.dynamic.kabel-deutschland.de [95.90.232.174])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 7F0A661E64780;
+	Tue, 14 Jan 2025 02:49:37 +0100 (CET)
+Message-ID: <a30b338f-0a6f-47e7-922b-c637a6648a6d@molgen.mpg.de>
+Date: Tue, 14 Jan 2025 02:49:31 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v7 3/3] net: stmmac: dwmac-nuvoton: Add dwmac
+ glue for Nuvoton MA35 family
+To: Joey Lu <a0987203069@gmail.com>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org,
+ conor+dt@kernel.org, mcoquelin.stm32@gmail.com, richardcochran@gmail.com,
+ devicetree@vger.kernel.org, ychuang3@nuvoton.com, netdev@vger.kernel.org,
+ openbmc@lists.ozlabs.org, alexandre.torgue@foss.st.com,
+ linux-kernel@vger.kernel.org, joabreu@synopsys.com,
+ Andrew Lunn <andrew@lunn.ch>, schung@nuvoton.com, peppe.cavallaro@st.com,
+ yclu4@nuvoton.com, linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org
+References: <20250113055434.3377508-1-a0987203069@gmail.com>
+ <20250113055434.3377508-4-a0987203069@gmail.com>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20250113055434.3377508-4-a0987203069@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D045UWA004.ant.amazon.com (10.13.139.91) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-From: Xiao Liang <shaw.leon@gmail.com>
-Date: Mon, 13 Jan 2025 22:37:09 +0800
-> When creating link, lookup for existing device in target net namespace
-> instead of current one.
-> For example, two links created by:
-> 
->   # ip link add dummy1 type dummy
->   # ip link add netns ns1 dummy1 type dummy
-> 
-> should have no conflict since they are in different namespaces.
-> 
-> Signed-off-by: Xiao Liang <shaw.leon@gmail.com>
+Dear Joey,
 
-Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+
+Thank you for your patch.
+
+Am 13.01.25 um 00:54 schrieb Joey Lu:
+> Add support for Gigabit Ethernet on Nuvoton MA35 series using dwmac driver.
+
+It’d be great if you added the datasheet name and revision to the commit 
+message.
+
+Also, please document how tested the driver. Maybe even paste new log 
+messages.
+
+> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+> Signed-off-by: Joey Lu <a0987203069@gmail.com>
+
+As you use your company email address in the AUTHOR line below, please 
+also add that email address to the commit message (and maybe even as the 
+author).
+
+> ---
+>   drivers/net/ethernet/stmicro/stmmac/Kconfig   |  11 ++
+>   drivers/net/ethernet/stmicro/stmmac/Makefile  |   1 +
+>   .../ethernet/stmicro/stmmac/dwmac-nuvoton.c   | 179 ++++++++++++++++++
+>   3 files changed, 191 insertions(+)
+>   create mode 100644 drivers/net/ethernet/stmicro/stmmac/dwmac-nuvoton.c
+> 
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/Kconfig b/drivers/net/ethernet/stmicro/stmmac/Kconfig
+> index 4cc85a36a1ab..2b424544cf6f 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/Kconfig
+> +++ b/drivers/net/ethernet/stmicro/stmmac/Kconfig
+> @@ -121,6 +121,17 @@ config DWMAC_MESON
+>   	  the stmmac device driver. This driver is used for Meson6,
+>   	  Meson8, Meson8b and GXBB SoCs.
+>   
+> +config DWMAC_NUVOTON
+> +	tristate "Nuvoton MA35 dwmac support"
+> +	default ARCH_MA35
+> +	depends on OF && (ARCH_MA35 || COMPILE_TEST)
+> +	select MFD_SYSCON
+> +	help
+> +	  Support for Ethernet controller on Nuvoton MA35 series SoC.
+> +
+> +	  This selects the Nuvoton MA35 series SoC glue layer support
+> +	  for the stmmac device driver.
+
+Also mention the module name `dwmac-nuvoton`?
+
+> +
+>   config DWMAC_QCOM_ETHQOS
+>   	tristate "Qualcomm ETHQOS support"
+>   	default ARCH_QCOM
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/Makefile b/drivers/net/ethernet/stmicro/stmmac/Makefile
+> index b26f0e79c2b3..48e25b85ea06 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/Makefile
+> +++ b/drivers/net/ethernet/stmicro/stmmac/Makefile
+> @@ -19,6 +19,7 @@ obj-$(CONFIG_DWMAC_IPQ806X)	+= dwmac-ipq806x.o
+>   obj-$(CONFIG_DWMAC_LPC18XX)	+= dwmac-lpc18xx.o
+>   obj-$(CONFIG_DWMAC_MEDIATEK)	+= dwmac-mediatek.o
+>   obj-$(CONFIG_DWMAC_MESON)	+= dwmac-meson.o dwmac-meson8b.o
+> +obj-$(CONFIG_DWMAC_NUVOTON)	+= dwmac-nuvoton.o
+>   obj-$(CONFIG_DWMAC_QCOM_ETHQOS)	+= dwmac-qcom-ethqos.o
+>   obj-$(CONFIG_DWMAC_ROCKCHIP)	+= dwmac-rk.o
+>   obj-$(CONFIG_DWMAC_RZN1)	+= dwmac-rzn1.o
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-nuvoton.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-nuvoton.c
+> new file mode 100644
+> index 000000000000..edf1b88ce1cd
+> --- /dev/null
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-nuvoton.c
+> @@ -0,0 +1,179 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + * Nuvoton DWMAC specific glue layer
+> + *
+> + * Copyright (C) 2024 Nuvoton Technology Corp.
+> + *
+> + * Author: Joey Lu <yclu4@nuvoton.com>
+> + */
+> +
+> +#include <linux/mfd/syscon.h>
+> +#include <linux/of_device.h>
+> +#include <linux/of_net.h>
+> +#include <linux/platform_device.h>
+> +#include <linux/regmap.h>
+> +#include <linux/stmmac.h>
+> +
+> +#include "stmmac.h"
+> +#include "stmmac_platform.h"
+> +
+> +#define NVT_REG_SYS_GMAC0MISCR  0x108
+> +#define NVT_REG_SYS_GMAC1MISCR  0x10C
+> +
+> +#define NVT_MISCR_RMII          BIT(0)
+> +
+> +/* 2000ps is mapped to 0x0 ~ 0xF */
+
+Excuse my ignorance: What is ps?
+
+> +#define NVT_PATH_DELAY_DEC      134
+> +#define NVT_TX_DELAY_MASK       GENMASK(19, 16)
+> +#define NVT_RX_DELAY_MASK       GENMASK(23, 20)
+> +
+> +struct nvt_priv_data {
+> +	struct platform_device *pdev;
+> +	struct regmap *regmap;
+> +};
+> +
+> +static struct nvt_priv_data *
+> +nvt_gmac_setup(struct platform_device *pdev, struct plat_stmmacenet_data *plat)
+> +{
+> +	struct device *dev = &pdev->dev;
+> +	struct nvt_priv_data *bsp_priv;
+> +	phy_interface_t phy_mode;
+> +	u32 tx_delay, rx_delay;
+
+Please append the unit to the variable name.
+
+> +	u32 macid, arg, reg;
+> +
+> +	bsp_priv = devm_kzalloc(dev, sizeof(*bsp_priv), GFP_KERNEL);
+> +	if (!bsp_priv)
+> +		return ERR_PTR(-ENOMEM);
+> +
+> +	bsp_priv->regmap =
+> +		syscon_regmap_lookup_by_phandle_args(dev->of_node, "nuvoton,sys", 1, &macid);
+> +	if (IS_ERR(bsp_priv->regmap)) {
+> +		dev_err_probe(dev, PTR_ERR(bsp_priv->regmap), "Failed to get sys register\n");
+> +		return ERR_PTR(-ENODEV);
+> +	}
+> +	if (macid > 1) {
+> +		dev_err_probe(dev, -EINVAL, "Invalid sys arguments\n");
+> +		return ERR_PTR(-EINVAL);
+> +	}
+> +
+> +	if (of_property_read_u32(dev->of_node, "tx-internal-delay-ps", &arg)) {
+> +		tx_delay = 0;
+> +	} else {
+> +		if (arg <= 2000) {
+> +			tx_delay = (arg == 2000) ? 0xF : (arg / NVT_PATH_DELAY_DEC);
+
+Write hexcharacters lowercase?
+
+> +			dev_dbg(dev, "Set Tx path delay to 0x%x\n", tx_delay);
+> +		} else {
+> +			dev_err(dev, "Invalid Tx path delay argument.\n");
+> +			return ERR_PTR(-EINVAL);
+> +		}
+> +	}
+> +	if (of_property_read_u32(dev->of_node, "rx-internal-delay-ps", &arg)) {
+> +		rx_delay = 0;
+> +	} else {
+> +		if (arg <= 2000) {
+> +			rx_delay = (arg == 2000) ? 0xF : (arg / NVT_PATH_DELAY_DEC);
+> +			dev_dbg(dev, "Set Rx path delay to 0x%x\n", rx_delay);
+> +		} else {
+> +			dev_err(dev, "Invalid Rx path delay argument.\n");
+> +			return ERR_PTR(-EINVAL);
+> +		}
+> +	}
+> +
+> +	regmap_read(bsp_priv->regmap,
+> +		    macid == 0 ? NVT_REG_SYS_GMAC0MISCR : NVT_REG_SYS_GMAC1MISCR, &reg);
+> +	reg &= ~(NVT_TX_DELAY_MASK | NVT_RX_DELAY_MASK);
+> +
+> +	if (of_get_phy_mode(pdev->dev.of_node, &phy_mode)) {
+> +		dev_err(dev, "missing phy mode property\n");
+> +		return ERR_PTR(-EINVAL);
+> +	}
+> +
+> +	switch (phy_mode) {
+> +	case PHY_INTERFACE_MODE_RGMII:
+> +	case PHY_INTERFACE_MODE_RGMII_ID:
+> +	case PHY_INTERFACE_MODE_RGMII_RXID:
+> +	case PHY_INTERFACE_MODE_RGMII_TXID:
+> +		reg &= ~NVT_MISCR_RMII;
+> +		break;
+> +	case PHY_INTERFACE_MODE_RMII:
+> +		reg |= NVT_MISCR_RMII;
+> +		break;
+> +	default:
+> +		dev_err(dev, "Unsupported phy-mode (%d)\n", phy_mode);
+> +		return ERR_PTR(-EINVAL);
+> +	}
+> +
+> +	if (!(reg & NVT_MISCR_RMII)) {
+> +		reg |= FIELD_PREP(NVT_TX_DELAY_MASK, tx_delay);
+> +		reg |= FIELD_PREP(NVT_RX_DELAY_MASK, rx_delay);
+> +	}
+> +
+> +	regmap_write(bsp_priv->regmap,
+> +		     macid == 0 ? NVT_REG_SYS_GMAC0MISCR : NVT_REG_SYS_GMAC1MISCR, reg);
+> +
+> +	bsp_priv->pdev = pdev;
+> +
+> +	return bsp_priv;
+> +}
+> +
+> +static int nvt_gmac_probe(struct platform_device *pdev)
+> +{
+> +	struct plat_stmmacenet_data *plat_dat;
+> +	struct stmmac_resources stmmac_res;
+> +	struct nvt_priv_data *priv_data;
+> +	int ret;
+> +
+> +	ret = stmmac_get_platform_resources(pdev, &stmmac_res);
+> +	if (ret)
+> +		return ret;
+> +
+> +	plat_dat = devm_stmmac_probe_config_dt(pdev, stmmac_res.mac);
+> +	if (IS_ERR(plat_dat))
+> +		return PTR_ERR(plat_dat);
+> +
+> +	/* Nuvoton DWMAC configs */
+> +	plat_dat->has_gmac = 1;
+> +	plat_dat->tx_fifo_size = 2048;
+> +	plat_dat->rx_fifo_size = 4096;
+> +	plat_dat->multicast_filter_bins = 0;
+> +	plat_dat->unicast_filter_entries = 8;
+> +	plat_dat->flags &= ~STMMAC_FLAG_USE_PHY_WOL;
+> +
+> +	priv_data = nvt_gmac_setup(pdev, plat_dat);
+> +	if (IS_ERR(priv_data))
+> +		return PTR_ERR(priv_data);
+> +
+> +	ret = stmmac_pltfr_probe(pdev, plat_dat, &stmmac_res);
+> +	if (ret)
+> +		return ret;
+> +
+> +	/* The PMT flag is determined by the RWK property.
+> +	 * However, our hardware is configured to support only MGK.
+> +	 * This is an override on PMT to enable WoL capability.
+> +	 */
+> +	plat_dat->pmt = 1;
+> +	device_set_wakeup_capable(&pdev->dev, 1);
+> +
+> +	return 0;
+> +}
+> +
+> +static const struct of_device_id nvt_dwmac_match[] = {
+> +	{ .compatible = "nuvoton,ma35d1-dwmac"},
+> +	{ }
+> +};
+> +MODULE_DEVICE_TABLE(of, nvt_dwmac_match);
+> +
+> +static struct platform_driver nvt_dwmac_driver = {
+> +	.probe  = nvt_gmac_probe,
+> +	.remove = stmmac_pltfr_remove,
+> +	.driver = {
+> +		.name           = "nuvoton-dwmac",
+> +		.pm		= &stmmac_pltfr_pm_ops,
+> +		.of_match_table = nvt_dwmac_match,
+> +	},
+> +};
+> +module_platform_driver(nvt_dwmac_driver);
+> +
+> +MODULE_AUTHOR("Joey Lu <yclu4@nuvoton.com>");
+
+Maybe Nuvoton can set up a generic address?
+
+> +MODULE_DESCRIPTION("Nuvoton DWMAC specific glue layer");
+> +MODULE_LICENSE("GPL v2");
+
+
+Kind regards,
+
+Paul
 
