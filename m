@@ -1,127 +1,139 @@
-Return-Path: <netdev+bounces-158231-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158233-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F9BBA11294
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 21:56:09 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D5EEA1129C
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 21:58:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4713A188AED7
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 20:56:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BBA8F1614EC
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 20:58:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B879720F09D;
-	Tue, 14 Jan 2025 20:55:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CB5C20A5D2;
+	Tue, 14 Jan 2025 20:58:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zxXi4D28"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=engleder-embedded.com header.i=@engleder-embedded.com header.b="onRPpZX/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f74.google.com (mail-qv1-f74.google.com [209.85.219.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx18lb.world4you.com (mx18lb.world4you.com [81.19.149.128])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E92C20F077
-	for <netdev@vger.kernel.org>; Tue, 14 Jan 2025 20:55:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D5B18493
+	for <netdev@vger.kernel.org>; Tue, 14 Jan 2025 20:58:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=81.19.149.128
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736888142; cv=none; b=LhWGmy1iYDjNxvF0kYusz35pk1RWyDiwMhrslaJ70GEeOhNg0iWrocNIFptUu7ER/KRjnYaRAZ1Mfld+Vf7lb4MxlT4uITrWkC7L/+LMy+jZo9chf6fJizdu9TzJcSx1GTGbEL8h9LrDYgYziOp3i3rd/kU06R3bLJXRzL92F4c=
+	t=1736888318; cv=none; b=ncOMIuYBnQsonwbCXPBJEOrPwZOxLtxeQg8E/Xgh+tQXyfANXK9pVzbryXDaGkEQ6rfmPm8YHv6GacbzR3jP3m7qSJF9P44ipMSpjLmOU4ADu3nb/1v9ipwcTS4vAM6m2PC9Nkat1uA7Jhkx5BpYemJPqrNv9zn6hgKfVGCTF9w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736888142; c=relaxed/simple;
-	bh=tT/u3IIvDrQGFqxuwLN9DETqDeVfLw9jgy72mii2fk8=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=t7axUzyEoIu5w5mYBR+ZqUhrTDIN7CTOgxbx5cOVsRWBSaRO/z5Ejnc/1+rsd8rq5d/W1tThEwwsP8+CtYGnwQbXCevFfUyA145DWPBERUp5w6gaV7KHeVZSi6yJM5DgWR8HAmnOIyYVFVSUm30SUTNFkKeO8Ayvr/CkrWt4e+k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zxXi4D28; arc=none smtp.client-ip=209.85.219.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qv1-f74.google.com with SMTP id 6a1803df08f44-6d89a389ee9so130017286d6.2
-        for <netdev@vger.kernel.org>; Tue, 14 Jan 2025 12:55:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1736888140; x=1737492940; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=UdRt2MenkusSF76OGzgxiaoJEpU/B6XIKvkKO5Wni2c=;
-        b=zxXi4D28vWuVR2sfGWT1oNhoeqdXWcidWmmK37fLO0Me0unmioGiO8Fdsop66ALMP+
-         yvtiY3DpdAHI7AhxOJRg4EsAlIyBWRP2gOrxwnGsYDoWLfIusjrz1p6Pf9UnRub4UHsN
-         1sT0/ENxz/yHLKtxmRFyBbUeT/iZz5Kjxvk+EYjw2jXAuXUsSf7EjmyxqHhzTWSchm+E
-         ph6/E5dTYLTSC/XnAwla8PZ27tXmj2k6PFZXJeVbrrx+VYDTnBIlcMCmpzbhUGuKItBM
-         /qWQTe5UAnmFUrWqr/TlW+43uME5yVI7TyN2dQFuvzDtgJx1M8KZJFQiEdeSVkGxXiV0
-         5sYA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736888140; x=1737492940;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=UdRt2MenkusSF76OGzgxiaoJEpU/B6XIKvkKO5Wni2c=;
-        b=bATXwwi0cj9altu9UrJ5XdGfz5gIdJ66jfMMNQxwqlWcpMcL/wH7bBf/vjbAZvoo9w
-         /QRpIjkMmhLD9LfRqKeHN7U/jdiKOawwL0QZQsUAWLX7VrWriOs0tiGpJIn3ZSlOscli
-         gkRDl6Mz4CRtEEsNhaCxoj3Xp1fFoh8IXr7ciJPQelybOoY3VJBDQyo2tqylZfw3JUZu
-         q8DYRdbdBlwg0FYPNGEAOqyyiaWEyrvSq+LPbdbaJNgd5P+f//8qch9B9oDLLHFby/Dr
-         F845kVY1HxI31eOwZGmb5V/kqTfM1zbIojb+TjjKutGYQ4ZTNslf0UYX8XaHcgS3qCWm
-         38mw==
-X-Gm-Message-State: AOJu0YyOcSvRWYkJHEHYWSRFigcq07v/MEtQj3SU+xs+nxZYonDJL4nV
-	pjNIqo+IyI91THtgqczWv3s+GGxQBdb1hHoRfsfmW95KJIvfu889G/ewOHq1ou2sEdiGTMl177O
-	/EmBHI0xrsw==
-X-Google-Smtp-Source: AGHT+IFhzDvDEuef4XgbiDkCrEpXZ3fOyfaYxd12cBEQbBPPUf2wKyKOFKyFiRs6DqSFe7O1/LcHxu4kzovhvg==
-X-Received: from qvbow4.prod.google.com ([2002:a05:6214:3f84:b0:6d8:aa06:d4bf])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6214:400d:b0:6d8:7d63:f424 with SMTP id 6a1803df08f44-6df9b1ea89amr387929836d6.12.1736888140030;
- Tue, 14 Jan 2025 12:55:40 -0800 (PST)
-Date: Tue, 14 Jan 2025 20:55:31 +0000
-In-Reply-To: <20250114205531.967841-1-edumazet@google.com>
+	s=arc-20240116; t=1736888318; c=relaxed/simple;
+	bh=OUi0lX2e6gO5Kt7Bjit8x8TE07I6n5KYT/bojzuEN40=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=h/XA9QyIyIZDBja1y2uyuq6y6MSs2EXwOydf0gngG1riT+ebDuM/z1I0hdG/YEi+dBkBU7fD7s7RbPzmX8ipQvmUaDHXVVaPAevApaFG/f45Esa40C0X8AX0w3JUPy7ulipjkawDTSQ40qnTzxY0bis6PnRhDNs4GqcorzCJpmo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=engleder-embedded.com; spf=pass smtp.mailfrom=engleder-embedded.com; dkim=pass (1024-bit key) header.d=engleder-embedded.com header.i=@engleder-embedded.com header.b=onRPpZX/; arc=none smtp.client-ip=81.19.149.128
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=engleder-embedded.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=engleder-embedded.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=engleder-embedded.com; s=dkim11; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=5m5pN36IYEDBasqiks1GekDtp65vm+4a8cuKemKZq9M=; b=onRPpZX/ziaaRYEZpy+cNxkkDZ
+	pyTfRBbyzKdthGlunGx1ADV41Jg44zoGOwVoZ/do+ZrM0XSMDlGd+5MZTnaH1ZjcM0iMh4ziTFP7r
+	PM3maIUGQ7DvXt/6ee4twffBT/wdR9F9GcVonCJO9Yit9Z/JQPzmcAooM0bolastWkis=;
+Received: from [88.117.60.28] (helo=[10.0.0.160])
+	by mx18lb.world4you.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.97.1)
+	(envelope-from <gerhard@engleder-embedded.com>)
+	id 1tXnzV-000000007YR-44xH;
+	Tue, 14 Jan 2025 21:58:26 +0100
+Message-ID: <fa737740-7cd0-4109-8712-09f2cb8dbef0@engleder-embedded.com>
+Date: Tue, 14 Jan 2025 21:58:24 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250114205531.967841-1-edumazet@google.com>
-X-Mailer: git-send-email 2.48.0.rc2.279.g1de40edade-goog
-Message-ID: <20250114205531.967841-6-edumazet@google.com>
-Subject: [PATCH v3 net-next 5/5] net: reduce RTNL hold duration in
- unregister_netdevice_many_notify() (part 2)
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, Simon Horman <horms@kernel.org>, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] tsnep: Link queues to NAPIs
+To: Jakub Kicinski <kuba@kernel.org>, Joe Damato <jdamato@fastly.com>
+Cc: magnus.karlsson@intel.com, andrew@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, netdev@vger.kernel.org
+References: <20250110223939.37490-1-gerhard@engleder-embedded.com>
+ <Z4VwrhhXU4uKqYGR@LQ3V64L9R2>
+ <91fc249e-c11a-47a1-aafe-fef833c3bafa@engleder-embedded.com>
+ <Z4WKHnDG9VSMe5OD@LQ3V64L9R2> <20250113135609.13883897@kernel.org>
+Content-Language: en-US
+From: Gerhard Engleder <gerhard@engleder-embedded.com>
+In-Reply-To: <20250113135609.13883897@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-AV-Do-Run: Yes
 
-One synchronize_net() call is currently done while holding RTNL.
+On 13.01.25 22:56, Jakub Kicinski wrote:
+> On Mon, 13 Jan 2025 13:48:14 -0800 Joe Damato wrote:
+>>>> The changes generally look OK to me (it seems RTNL is held on all
+>>>> paths where this code can be called from as far as I can tell), but
+>>>> there was one thing that stood out to me.
+>>>>
+>>>> AFAIU, drivers avoid marking XDP queues as NETDEV_QUEUE_TYPE_RX
+>>>> or NETDEV_QUEUE_TYPE_TX. I could be wrong, but that was my
+>>>> understanding and I submit patches to several drivers with this
+>>>> assumption.
+>>>>
+>>>> For example, in commit b65969856d4f ("igc: Link queues to NAPI
+>>>> instances"), I unlinked/linked the NAPIs and queue IDs when XDP was
+>>>> enabled/disabled. Likewise, in commit 64b62146ba9e ("net/mlx4: link
+>>>> NAPI instances to queues and IRQs"), I avoided the XDP queues.
+>>>>
+>>>> If drivers are to avoid marking XDP queues as NETDEV_QUEUE_TYPE_RX
+>>>> or NETDEV_QUEUE_TYPE_TX, perhaps tsnep needs to be modified
+>>>> similarly?
+>>>
+>>> With 5ef44b3cb4 ("xsk: Bring back busy polling support") the linking of
+>>> the NAPIs is required for XDP/XSK. So it is strange to me if for XDP/XSK
+>>> the NAPIs should be unlinked. But I'm not an expert, so maybe there is
+>>> a reason why.
+>>>
+>>> I added Magnus, maybe he knows if XSK queues shall still be linked to
+>>> NAPIs.
+>>
+>> OK, so I think I was probably just wrong?
+>>
+>> I looked at bnxt and it seems to mark XDP queues, which means
+>> probably my patches for igc, ena, and mlx4 need to be fixed and the
+>> proposed patch I have for virtio_net needs to be adjusted.
+>>
+>> I can't remember now why I thought XDP queues should be avoided. I
+>> feel like I read that or got that as feedback at some point, but I
+>> can't remember now. Maybe it was just one driver or something I was
+>> working on and I accidentally thought it should be avoided
+>> everywhere? Not sure.
+>>
+>> Hopefully some one can give a definitive answer on this one before I
+>> go through and try to fix all the drivers I modified :|
+> 
+> XDP and AF_XDP are different things. The XDP part of AF_XDP is to some
+> extent for advertising purposes :) If memory serves me well:
+> 
+> XDP Tx -> these are additional queues automatically allocated for
+>            in-kernel XDP, allocated when XDP is attached on Rx.
+>            These should _not_ be listed in netlink queue, or NAPI;
+>            IOW should not be linked to NAPI instances.
+> XDP Rx -> is not a thing, XDP attaches to stack queues, there are no
+>            dedicated XDP Rx queues
+> AF_XDP -> AF_XDP "takes over" stack queues. It's a bit of a gray area.
+>            I don't recall if we made a call on these being linked, but
+>            they could probably be listed like devmem as a queue with
+>            an extra attribute, not a completely separate queue type.
 
-This is source of RTNL contention in workloads adding and deleting
-many network namespaces per second, because synchronize_rcu()
-and synchronize_rcu_expedited() can use 60+ ms in some cases.
+For tsnep if have no additional XDP Tx queues, only the netdev queues
+are used. For AF_XDP/XSK I would keep the linking, as the stack queues
+still exist and are operated still with NAPI. Maybe queues taken over
+by AF_XDP/XSK get an extra attribute in the future. So I can keep the
+permanent linking to NAPI while interface is up no matter if XDP or
+AF_XDP/XSK is used or not. Did I understand it right?
 
-For cleanup_net() use, temporarily release RTNL
-while calling the last synchronize_net().
-
-This should be safe, because devices are no longer visible
-to other threads after unlist_netdevice() call
-and setting dev->reg_state to NETREG_UNREGISTERING.
-
-In any case, the new netdev_lock() / netdev_unlock()
-infrastructure that we are adding should allow
-to fix potential issues, with a combination
-of a per-device mutex and dev->reg_state awareness.
-
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- net/core/dev.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
-
-diff --git a/net/core/dev.c b/net/core/dev.c
-index 574bd40f3a2bfcc6e43300fad669b1579d48039a..0bb97bb392dcdfa82292fe1ae2ee8290b036df60 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -11601,9 +11601,8 @@ void unregister_netdevice_many_notify(struct list_head *head,
- 
- 	rtnl_drop_if_cleanup_net();
- 	flush_all_backlogs();
--	rtnl_acquire_if_cleanup_net();
--	/* TODO: move this before the prior rtnl_acquire_if_cleanup_net() */
- 	synchronize_net();
-+	rtnl_acquire_if_cleanup_net();
- 
- 	list_for_each_entry(dev, head, unreg_list) {
- 		struct sk_buff *skb = NULL;
--- 
-2.48.0.rc2.279.g1de40edade-goog
+Gerhard
 
 
