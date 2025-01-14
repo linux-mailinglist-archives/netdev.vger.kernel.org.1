@@ -1,117 +1,171 @@
-Return-Path: <netdev+bounces-158266-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158267-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB0B1A11452
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 23:45:21 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 140D0A11463
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 23:49:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C1B8B167B68
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 22:45:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1D7DB18876DF
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 22:49:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FCF420E6E7;
-	Tue, 14 Jan 2025 22:45:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C48B51D47BD;
+	Tue, 14 Jan 2025 22:49:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="ahyDEiFF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HAYo2Io4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C78C2135B9
-	for <netdev@vger.kernel.org>; Tue, 14 Jan 2025 22:45:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BC18215047;
+	Tue, 14 Jan 2025 22:49:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736894718; cv=none; b=PO1LxmhwN2qBenyW8ECkLYoDwxR2CvVPS7XJ3sqO0toEBtxpiZ42InJmPAdSvg8XIUAT5QRqkNfWf50EZ67sPze1EHWMoGu+iKvCKsWi21H2RxGdasebKxY50QN9Ue/FhOxt8mB03oxFlQOf9fmu3wQNA5NdOMFpF4Rz+udpAwg=
+	t=1736894975; cv=none; b=mgGy0heN48HDoxoBz9kpzyGDPjgmvZPQhzFsQwSVKTVygXlkSQhDGxwgnnGpruoHP87Bz+M3u8O6n+DXQ3bM+a45roAvOS1ekz5V1qpISAGdQEaiXxTvX/Ede3LwEn+vRU+F337UO10xNt2UTUHZDbCTJsOSfxPS59wzMtHu8ak=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736894718; c=relaxed/simple;
-	bh=D2H+/P+jspEXBn4ZPJvywvQQVm62afclDDQi8aIUkDo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UjEpr3XwZXZdPH0/zeH4+0xJyB4RRNWWbJrBtOGLFD6/p5lw1tiSUTBnbPKoJEHELnxLpaKq/BpqTHpv1ftdcd/ChREZ3ypuQCZU35rCaIXzgMk0asizsRC1ABjD74HQwX9hmQyjWY5B9lHecg78JKi9erp4wj5OUQlaRvlxsXc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=ahyDEiFF; arc=none smtp.client-ip=209.85.214.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-21628b3fe7dso103549025ad.3
-        for <netdev@vger.kernel.org>; Tue, 14 Jan 2025 14:45:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1736894712; x=1737499512; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=VpgGy1rlvkFZUFKTF+Tyu4oueF8ZyKknNe7RhMva3Cw=;
-        b=ahyDEiFFav6vsxZ/Qe8VQ0rri3cZwqtGv6kvf+X1QZL3kOCWb13k9nhd9YplU+Tag+
-         pldFsP1TDRacYwdjaUNiShvOcvmWZANk9hRLcA/VluW54cUAO0NU/Eu9BefNYupzmAwH
-         XLMFurucmXBruqStn9qhO4XaNs+pOEoK1kWFo=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736894712; x=1737499512;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=VpgGy1rlvkFZUFKTF+Tyu4oueF8ZyKknNe7RhMva3Cw=;
-        b=YFVM/niIbuAo1mmFueIqRDkJE+ATigRJdhScl49fIf7NtRgKSR5avyt5HSaCl7hhtI
-         15mgfv0/fKCbOwpYvnOom94dT+u9n1KVcTH0dSg0GZz5hzbXqdf90Ai7sVnahXNwkNMP
-         xIs3ZuhfiWclsTH0NS6YEHVmGs/tvTPAgD/emSYwHipjQmwCQHmIdyNauX86Zi7BZVyB
-         Ee27pC7uyvd6MpN+YJXdWi6vAfEAHn0NZGZWsC11NCkZ+CHVHiabp0Aptrjag5zQjREq
-         Qi1IxIoZDOdFJ6GLY5PUbPws7XWxGBQ7Rd1iVnBML7lDOjEOSUa3EPsWu3XM+f1+/F7z
-         jPKA==
-X-Forwarded-Encrypted: i=1; AJvYcCUnW8YCJuuZXLygZ0Czge/X1QPqZ2Nr698pFhld3uArXnkxMKQxrmlhDNv7PmgTbhCYcKovO08=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyFK1+DDnQmAGqkZNJQ8Wd3mextfQzDhtkPWRqsXzAIB+aixUOE
-	H4wcmgwuopmlbznQUjFgeVNWpd1QX0dw2hPRoSnS7t7GHiRKZsGT9sOrhv6Q8FY=
-X-Gm-Gg: ASbGncuTMujkxKi6aVyjOrmPZrgiB8FvKfI2MndnUQBTjctZnunmzjmPl3cYmVeX9oL
-	Q1VDn0AL65kp9C3JQp4ORA7V1W9HLyhy230Txc1QfYNAppjIyLLv8aoZzZGA4lwASnYAjsbppGA
-	7yEoLeiy2cRx+99RecnF1eDlLWFp7zsGU0Pg5V46cAEAsKDSvmaWL+fDlccHFOlzqL1ZsS+fRaO
-	d+6GHY1N871gpOPYlNTGU6auZ0f+XIjVVSHID1qMrnGQ8H31r4A+4EiTcY21XhenrDqsb5WXu3U
-	a2qwJVXm2gwWni0o0KYoz2o=
-X-Google-Smtp-Source: AGHT+IH6NJUCQ+W2v3EI0n9imKTXWaYcU87DBVaFkoUUA3YYyskKcY9tPvxx3a9GML+cG/CyDoqkYw==
-X-Received: by 2002:a05:6a00:368d:b0:727:99a8:cd31 with SMTP id d2e1a72fcca58-72d21f47fc5mr36631352b3a.14.1736894711912;
-        Tue, 14 Jan 2025 14:45:11 -0800 (PST)
-Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72d4067e5d8sm7932454b3a.122.2025.01.14.14.45.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Jan 2025 14:45:11 -0800 (PST)
-Date: Tue, 14 Jan 2025 14:45:08 -0800
-From: Joe Damato <jdamato@fastly.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
-	anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
-	jiri@resnulli.us
-Subject: Re: [PATCH net-next 01/11] net: add netdev_lock() / netdev_unlock()
- helpers
-Message-ID: <Z4bo9O5gGG2OBNXJ@LQ3V64L9R2>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
-	netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
-	andrew+netdev@lunn.ch, horms@kernel.org, anthony.l.nguyen@intel.com,
-	przemyslaw.kitszel@intel.com, jiri@resnulli.us
-References: <20250114035118.110297-1-kuba@kernel.org>
- <20250114035118.110297-2-kuba@kernel.org>
+	s=arc-20240116; t=1736894975; c=relaxed/simple;
+	bh=8G9eiYdqmeN+gGauNNgAJ+WJ26bUkQzuCsmvGwJ8llc=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Y9tCfgqdv9qMfHLsSxcvfAnnEAh2Ly1hU5U11ws6D873wOY8i0Q4qwFhMzoE2voqjivMXoNn+YhxakFwHHckF36IWKsKJEAKLcg9Tw+djtO5EutRGUqNfOA+7eHlkJD3hW7/fdoSz+4Ee5TpNaE1KffqGDCbdnlPe0+NpGmg0jw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HAYo2Io4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D24B3C4CEDD;
+	Tue, 14 Jan 2025 22:49:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1736894974;
+	bh=8G9eiYdqmeN+gGauNNgAJ+WJ26bUkQzuCsmvGwJ8llc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=HAYo2Io4+aCiSlxhnX2zXhlQo4sqEVQgVL1MOQOx/AfVZkg2RBp1w5EHE9BRWx8fm
+	 leM8SSHUvGFtlxQR9raQEzcg3/9AgqWbe7PUw5jaGgjOKzDcN6sqaki+jn2ctoeTlZ
+	 Ym40ANrWGAq5HXS2JBhuITsbUZty1kkeCplGYnbKv3qVV4raXW90o/5Lft1aA9UtzR
+	 4farhy5/N7Ztmx8Czq8QfiruULFeicW96xK903KlNj/D7EWyF7540HNqZaGs9iBRGA
+	 E384l2ankYuILVWvoe+yDhivK98KdRRAeProxdxfN/top7TJ4QyP1XtEzlLvKPr4HZ
+	 zFe0uufPxhCQA==
+Date: Tue, 14 Jan 2025 14:49:32 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Paul Fertser <fercerpav@gmail.com>
+Cc: Eddie James <eajames@linux.ibm.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, horms@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, davem@davemloft.net, sam@mendozajonas.com
+Subject: Re: [PATCH] net/ncsi: Fix NULL pointer derefence if CIS arrives
+ before SP
+Message-ID: <20250114144932.7d2ba3c9@kernel.org>
+In-Reply-To: <20250110194133.948294-1-eajames@linux.ibm.com>
+References: <20250110194133.948294-1-eajames@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250114035118.110297-2-kuba@kernel.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Mon, Jan 13, 2025 at 07:51:07PM -0800, Jakub Kicinski wrote:
-> Add helpers for locking the netdev instance and use it in drivers
-> and the shaper code. This will make grepping for the lock usage
-> much easier, as we extend the lock to cover more fields.
+Hi Paul!
+
+Any thoughts on this fix?
+
+On Fri, 10 Jan 2025 13:41:33 -0600 Eddie James wrote:
+> If a Clear Initial State response packet is received before the
+> Select Package response, then the channel set up will dereference
+> the NULL package pointer. Fix this by setting up the package
+> in the CIS handler if it's not found.
 > 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> [    9.289221] 8<--- cut here ---
+> [    9.289244] Unable to handle kernel NULL pointer dereference at virtual address 00000018 when read
+> [    9.289306] [00000018] *pgd=00000000
+> [    9.289333] Internal error: Oops: 5 [#1] SMP ARM
+> [    9.289367] CPU: 0 PID: 35 Comm: kworker/0:2 Not tainted 6.6.69-f1d562d-gf1d562dd8fa4 #1
+> [    9.289423] Hardware name: Generic DT based system
+> [    9.289457] Workqueue:  0x0 (events)
+> [    9.289486] PC is at _raw_spin_lock_irqsave+0x10/0x4c
+> [    9.289525] LR is at ncsi_add_channel+0xd0/0x174
+> [    9.289561] pc : [<808d1018>]    lr : [<808907bc>]    psr: 40000193
+> [    9.289605] sp : b4801e20  ip : 8695e000  fp : 80d6c2a8
+> [    9.289642] r10: 80d6c2a8  r9 : 8136a4dc  r8 : 00000018
+> [    9.289680] r7 : 00000000  r6 : 00000000  r5 : 8695dc00  r4 : 00000000
+> [    9.289725] r3 : 00000005  r2 : 00000018  r1 : 8089202c  r0 : 40000113
+> [    9.289770] Flags: nZcv  IRQs off  FIQs on  Mode SVC_32  ISA ARM  Segment none
+> [    9.289821] Control: 10c5387d  Table: 81adc06a  DAC: 00000051
+> [    9.289861] Register r0 information: non-paged memory
+> [    9.289898] Register r1 information: non-slab/vmalloc memory
+> [    9.289939] Register r2 information: non-paged memory
+> [    9.289976] Register r3 information: non-paged memory
+> [    9.290012] Register r4 information: NULL pointer
+> [    9.290046] Register r5 information: slab kmalloc-1k start 8695dc00 pointer offset 0 size 1024
+> [    9.290111] Register r6 information: NULL pointer
+> [    9.290145] Register r7 information: NULL pointer
+> [    9.290180] Register r8 information: non-paged memory
+> [    9.290216] Register r9 information: non-slab/vmalloc memory
+> [    9.290257] Register r10 information: non-slab/vmalloc memory
+> [    9.290298] Register r11 information: non-slab/vmalloc memory
+> [    9.290339] Register r12 information: slab kmalloc-1k start 8695e000 pointer offset 0 size 1024
+> [    9.290404] Process kworker/0:2 (pid: 35, stack limit = 0x401e97d3)
+> [    9.290448] Stack: (0xb4801e20 to 0xb4802000)
+> [    9.290482] 1e20: 00000000 81099810 81be7150 81368000 00000000 000024a8 81be7150 8088efc4
+> [    9.290540] 1e40: 81be7150 00000000 00000000 8ae45185 00000000 00000000 81368000 8088f4fc
+> [    9.290598] 1e60: 86337300 806fce18 81368018 0000008a 00000780 00000000 86662dc2 8ae45185
+> [    9.290656] 1e80: 00000780 81365800 8088f3e4 0000002a b2c44000 b2c44090 81365800 86337300
+> [    9.290714] 1ea0: 00000000 8071c4d8 00000002 86337300 8136c45c 8ae45185 80115aa0 86337300
+> [    9.290772] 1ec0: 0000000a 8071c584 b2c44000 b2c44090 00005800 8ae45185 81365dd8 805be000
+> [    9.290830] 1ee0: 00000000 805be060 00000040 81365d80 0000002a 00000000 00000036 00000001
+> [    9.290888] 1f00: 00000040 81365dd8 b4801f53 ffff8ea7 80d03d00 00000000 81365dd8 8071d010
+> [    9.290946] 1f20: 81365dd8 8071d010 49514f00 b3d96100 0000012c b3d962c0 b4801f58 8071d4a4
+> [    9.291004] 1f40: b4801f60 81081980 80c4e100 33148000 00c4e100 33148000 b4801f58 b4801f58
+> [    9.291062] 1f60: b4801f60 b4801f60 b4801f68 8ae45185 b3d929f0 00000004 00000008 80d0308c
+> [    9.291120] 1f80: 81081980 00000100 40000003 0000000c 80d03080 801206d4 80c4c790 b480900c
+> [    9.291178] 1fa0: 80d03080 b4801f98 80c493c8 0000000a 00000000 80c4d380 80c4d380 ffff8ea6
+> [    9.291237] 1fc0: 80d03d00 04208060 80c4c790 8016c180 80d06094 81081980 80000013 ffffffff
+> [    9.291295] 1fe0: b4935f44 61c88647 81081980 81081980 b4935f08 80120c84 80134f4c 808945b8
+> [    9.291351]  _raw_spin_lock_irqsave from ncsi_add_channel+0xd0/0x174
+> [    9.291402]  ncsi_add_channel from ncsi_rsp_handler_cis+0x98/0xb4
+> [    9.291451]  ncsi_rsp_handler_cis from ncsi_rcv_rsp+0x118/0x2c4
+> [    9.291498]  ncsi_rcv_rsp from __netif_receive_skb_one_core+0x58/0x7c
+> [    9.291547]  __netif_receive_skb_one_core from netif_receive_skb+0x2c/0xc4
+> [    9.291597]  netif_receive_skb from ftgmac100_poll+0x350/0x43c
+> [    9.291642]  ftgmac100_poll from __napi_poll.constprop.0+0x2c/0x180
+> [    9.291690]  __napi_poll.constprop.0 from net_rx_action+0x340/0x3c0
+> [    9.291736]  net_rx_action from handle_softirqs+0xf4/0x25c
+> [    9.291777]  handle_softirqs from irq_exit+0x80/0xb0
+> [    9.291816]  irq_exit from call_with_stack+0x18/0x20
+> [    9.291857]  call_with_stack from __irq_svc+0x98/0xb0
+> [    9.291898] Exception stack(0xb4935f10 to 0xb4935f58)
+> [    9.291935] 5f00:                                     00000007 00000006 80d03d00 00000769
+> [    9.291993] 5f20: 85963e80 b3d953c0 80d03d00 b3d953e0 61c88647 85963eac 81081980 b3d953c0
+> [    9.292050] 5f40: 00000004 b4935f60 80134f28 80134f4c 80000013 ffffffff
+> [    9.292096]  __irq_svc from worker_thread+0x1fc/0x4e8
+> [    9.292137]  worker_thread from kthread+0xe0/0xfc
+> [    9.292176]  kthread from ret_from_fork+0x14/0x28
+> [    9.292213] Exception stack(0xb4935fb0 to 0xb4935ff8)
+> [    9.292250] 5fa0:                                     00000000 00000000 00000000 00000000
+> [    9.292308] 5fc0: 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+> [    9.292365] 5fe0: 00000000 00000000 00000000 00000000 00000013 00000000
+> [    9.292413] Code: e1a02000 e10f0000 f10c0080 f592f000 (e1923f9f)
+> [    9.292455] ---[ end trace 0000000000000000 ]---
+> [    9.295147] Kernel panic - not syncing: Fatal exception in interrupt
+> 
+> Signed-off-by: Eddie James <eajames@linux.ibm.com>
 > ---
-> CC: anthony.l.nguyen@intel.com
-> CC: przemyslaw.kitszel@intel.com
-> CC: jiri@resnulli.us
-> ---
->  include/linux/netdevice.h                   | 23 ++++++-
->  drivers/net/ethernet/intel/iavf/iavf_main.c | 74 ++++++++++-----------
->  drivers/net/netdevsim/ethtool.c             |  4 +-
->  net/shaper/shaper.c                         |  6 +-
->  4 files changed, 63 insertions(+), 44 deletions(-)
+>  net/ncsi/ncsi-rsp.c | 7 +++++++
+>  1 file changed, 7 insertions(+)
+> 
+> diff --git a/net/ncsi/ncsi-rsp.c b/net/ncsi/ncsi-rsp.c
+> index e28be33bdf2c4..59d0af7183acc 100644
+> --- a/net/ncsi/ncsi-rsp.c
+> +++ b/net/ncsi/ncsi-rsp.c
+> @@ -100,6 +100,13 @@ static int ncsi_rsp_handler_cis(struct ncsi_request *nr)
+>  		if (ndp->flags & NCSI_DEV_PROBED)
+>  			return -ENXIO;
+>  
+> +		if (!np) {
+> +			id = NCSI_PACKAGE_INDEX(rsp->rsp.common.channel);
+> +			np = ncsi_add_package(ndp, id);
+> +			if (!np)
+> +				return -ENODEV;
+> +		}
+> +
+>  		id = NCSI_CHANNEL_INDEX(rsp->rsp.common.channel);
+>  		nc = ncsi_add_channel(np, id);
+>  	}
 
-Reviewed-by: Joe Damato <jdamato@fastly.com>
 
