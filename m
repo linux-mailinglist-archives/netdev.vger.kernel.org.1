@@ -1,89 +1,135 @@
-Return-Path: <netdev+bounces-158189-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158190-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 528AAA10DD7
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 18:33:43 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C2307A10E02
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 18:43:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 086D63A10CB
-	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 17:33:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E0166167417
+	for <lists+netdev@lfdr.de>; Tue, 14 Jan 2025 17:43:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D2DD1C1F0C;
-	Tue, 14 Jan 2025 17:33:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE6C61FA14A;
+	Tue, 14 Jan 2025 17:43:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="O9qqOlO9"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WOCaVblg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail1.fiberby.net (mail1.fiberby.net [193.104.135.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7A71232456
-	for <netdev@vger.kernel.org>; Tue, 14 Jan 2025 17:33:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.104.135.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F41DB1DFD8B
+	for <netdev@vger.kernel.org>; Tue, 14 Jan 2025 17:43:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736876018; cv=none; b=KKm7URTCiBFHZUQsgAdiNFNEhX8gyUSugnIE8XvhTLMmjnr2gYtAzFPKUfHIvxBAV6eLr5rjfslsmObQO/uCoqRo0ODacrMRKVjRzJEjiuprFmafcbk1sqOGC3EDF6RFSDaRfS2B9vFSrvsqbB36exIHPFSy1Jv0ESgyIx+ipIk=
+	t=1736876609; cv=none; b=lF/uEIXSUJe/f0gotQa+3kNbH+NrE7RIyhSG8B9EUKqx4mS7hMUx5T7qdLaXc7NMqKLJaSXiagOwhLjHFZfVZCMP0qe9UfHWC+pBDyfHjcLFkzAYBhosp39X/Jr+cUa9gdqCaO2KlJCT7og9yRdJr6jlh1HZGg8gCjyUa8o5tOM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736876018; c=relaxed/simple;
-	bh=jM8gdSYXRKXhordHJODptLgNuTaaddMsQI/iwDzh/5g=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Pag9mYV3JtXtiYVNS891wC5oEgojOEGLg2N7/A+4SuSZY+qwCnRZL2v5wV8UiAm1BL1XVQKpmpstUX1AJUJtO3O4lfw3lgheT5phEpbmorlkU4WlwbIs14uFwVfpqa+GQDxFw7umq020AB+8Cr4YvYX9xa69wb0g03jdWhAlhPg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=O9qqOlO9; arc=none smtp.client-ip=193.104.135.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fiberby.net
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fiberby.net;
-	s=202008; t=1736876012;
-	bh=jM8gdSYXRKXhordHJODptLgNuTaaddMsQI/iwDzh/5g=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=O9qqOlO9paxheGouF3PnxSWHL9U/FQNfQhCg1ZKHwNhnAVTG6VMwFJn/ISr7od3e/
-	 V5a25P8ngmVD21AF8+gwQ232s+Mt/pKTGQJ62EEDQ9GlQMwazGap4OmSbuXOJ5GPID
-	 sAZxcICBxJaYCsGjqQP6aKA6NGUUrNHbUUVdq2JhtpxvpCTBQ+/CqsgxZIMXeldsEo
-	 5bo9KlXr06urtw19RSMd3bUZTacHqPUfaNE3JgoyF3uAi9awgI+L8GwyKidoMHGu68
-	 hjAfcf/kl2KWOC96aXNeUkNLM2n5g6JgNjVS1rVUrFy810QYDQmHaanfbLEUJKQTTt
-	 sr3+hooDnRIOg==
-Received: from x201s (193-104-135-243.ip4.fiberby.net [193.104.135.243])
-	by mail1.fiberby.net (Postfix) with ESMTPSA id CF80D60078;
-	Tue, 14 Jan 2025 17:33:31 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1])
-	by x201s (Postfix) with ESMTP id 44EDD200B39;
-	Tue, 14 Jan 2025 17:33:27 +0000 (UTC)
-Message-ID: <b7b144d9-7099-42b1-b057-f6101b4580eb@fiberby.net>
-Date: Tue, 14 Jan 2025 17:33:27 +0000
+	s=arc-20240116; t=1736876609; c=relaxed/simple;
+	bh=g3RSz4tvQ+K8kYL7EDIG9hyMf9wv0irpaIEFqf7Zn+w=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=VQN90rskK4BC/L4zIWegpxz8b9AE6cyB37rHsU4D6jVOzSdy6H9OmIeNlfMq9JAWCZd6FYi6NsKdfWnex61B1nGPjV5wV+suK6FjDcC3ZhhPodKv4Dt9jCh1a91Pws2YiOKxHuv0qUZeKr/9rFtn0iuTDoMxWq3Br5HUtJng8JE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WOCaVblg; arc=none smtp.client-ip=209.85.208.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-5d7e527becaso9580015a12.3
+        for <netdev@vger.kernel.org>; Tue, 14 Jan 2025 09:43:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1736876606; x=1737481406; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=pNTVUbPev2Susw6wdu2cyGHrOMaUb0OBH3JWwwciS6A=;
+        b=WOCaVblgMUyP/pmpvBWG52jBpIqtdwrKwtIMmrM0LJXKMa35c7WtXO4N5MjwxEnZzl
+         oQajoro2cdUNe8dYi20Uf8ol9fSwNmCQxQp3PKzKHn/h+uzUz5NENErhZhgP6Cz08+Fa
+         QrsLy7nJCwD5c4AtO7Gf6MRsKoca8R/N/nQedxELfRErVfoL5KdTZhmHf5moGfN7dzgu
+         ZP+VsS2yXDJ1BpBd/x20GBV/cTjaSUw1zdeLm1Ch9g+q+Bjvi8VRvOv+f7t0AjmmdM+J
+         /YvvvCjAjzh1mETYt1ou3SbETG2iIMaT3x/2fcCXEZMKg5GlE71mEvmsrp9muE89LPyd
+         Rntg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736876606; x=1737481406;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=pNTVUbPev2Susw6wdu2cyGHrOMaUb0OBH3JWwwciS6A=;
+        b=B4QHZb/4rXPjxHNXlaZEEIGrK3orjbk5goCjIbzT0hxOnPkXUBs2mrVz/FLeouHGQE
+         gbhPOXk7pU5/UJ1OvI4dnnzDE7eWJxwixlyd7x0cu6KJVdE1jcU5pQ5ut61ZigUiroRV
+         9vaE0AUj0W9K3Ops0aSSqAWLrKFqwgpXTqWNVcaP8MXvq1XCyfJrujlntkglQH46M+JR
+         60ulInNkZGtP8DLxt0kg9tgyE4TxpAmyE8jGPcheCUIxlB7sj0Ny6/7d0BUywRuBWKnH
+         TTSeBSke148AAJQvea89OLy8EsoObO902AF35Hb1rrmzi7pKzEIAbDqjW58lk0PJ5Ui1
+         JJhw==
+X-Forwarded-Encrypted: i=1; AJvYcCU8x8EsCdDy5SYd5dAmOOUAz+ToNgNvNIG46JBqlgsKIh3my4vC38i/YEcO6pkPl26ES2wFNdA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxp7ZR58KfnzWpVUaqsWi0ISV3rdnwO5l92HbjMiCJbm/iVlWub
+	2cCx3GCQuqHJtrLbq/sBTU7lc8q/0y+jgVJUvWHOE6joK0OLX+JKud2jej/g3rVmza8e3k4+rZ7
+	ckkZDludHnAn8FNUfYunWzW3iTflodFGMcZB9
+X-Gm-Gg: ASbGncut2qUan5OZSFSvsK+V6MG8GviQ0tKH5zyzu9GTZxCpVdFe0TpvVZcuAUdGHwR
+	1jLgrZ+mJ0yeH604cw8nvq5itEm9PdtnedaKufQ==
+X-Google-Smtp-Source: AGHT+IFzTWI62UvqCB5IdmtsIaLJLBkThu6h1KkwDfNMS0U5jS0EWO8wF3L9m6Rj6WOPwj6CnnraA+RdB+SsYxlHrA8=
+X-Received: by 2002:a05:6402:50d4:b0:5d0:9054:b119 with SMTP id
+ 4fb4d7f45d1cf-5d972e63dd4mr56979803a12.21.1736876606178; Tue, 14 Jan 2025
+ 09:43:26 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCHv2 net] net: sched: refine software bypass handling in
- tc_run
-To: Xin Long <lucien.xin@gmail.com>
-Cc: davem@davemloft.net, kuba@kernel.org, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Jamal Hadi Salim <jhs@mojatatu.com>,
- Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
- Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
- Shuang Li <shuali@redhat.com>, network dev <netdev@vger.kernel.org>
-References: <17d459487b61c5d0276a01a3bc1254c6432b5d12.1736793775.git.lucien.xin@gmail.com>
- <8cf44ce9-e117-46fe-8bef-21200db97d0f@fiberby.net>
- <CADvbK_dYKMvZ8iUS-CvzNYYue1qxTsWXDpvcETyBD+sWOJcaSA@mail.gmail.com>
-Content-Language: en-US
-From: =?UTF-8?Q?Asbj=C3=B8rn_Sloth_T=C3=B8nnesen?= <ast@fiberby.net>
-In-Reply-To: <CADvbK_dYKMvZ8iUS-CvzNYYue1qxTsWXDpvcETyBD+sWOJcaSA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <ed399406a6ffad5097fa618c3bc7a4ac59546c62.1736869543.git.gnault@redhat.com>
+In-Reply-To: <ed399406a6ffad5097fa618c3bc7a4ac59546c62.1736869543.git.gnault@redhat.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 14 Jan 2025 18:43:15 +0100
+X-Gm-Features: AbW1kvZeC67blwoiBPqZHrEQE5Xccb5vHPa0Wzmu4PYZWSG7h3tJf1ebn1aW8gQ
+Message-ID: <CANn89iJQus-pqLta39df06DJLES8KgytN5iaVz9xv_HAz3F6Vw@mail.gmail.com>
+Subject: Re: [PATCH net-next] dccp: Prepare dccp_v4_route_skb() to .flowi4_tos conversion.
+To: Guillaume Nault <gnault@redhat.com>
+Cc: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, Simon Horman <horms@kernel.org>, 
+	dccp@vger.kernel.org, Ido Schimmel <idosch@nvidia.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 1/14/25 2:30 AM, Xin Long wrote:
-> On Mon, Jan 13, 2025 at 4:41 PM Asbjørn Sloth Tønnesen <ast@fiberby.net> wrote:
->> I will run it through some tests tomorrow with my patch applied.
-> That will be great. :-)
+On Tue, Jan 14, 2025 at 4:46=E2=80=AFPM Guillaume Nault <gnault@redhat.com>=
+ wrote:
+>
+> Use inet_sk_dscp() to get the socket DSCP value as dscp_t, instead of
+> ip_sock_rt_tos() which returns a __u8. This will ease the conversion
+> of fl4->flowi4_tos to dscp_t, as it will just require to drop the
+> inet_dscp_to_dsfield() call.
+>
+> Signed-off-by: Guillaume Nault <gnault@redhat.com>
+> ---
+>  net/dccp/ipv4.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+>
+> diff --git a/net/dccp/ipv4.c b/net/dccp/ipv4.c
+> index 5926159a6f20..9e64dbd38cd7 100644
+> --- a/net/dccp/ipv4.c
+> +++ b/net/dccp/ipv4.c
+> @@ -15,6 +15,7 @@
+>
+>  #include <net/icmp.h>
+>  #include <net/inet_common.h>
+> +#include <net/inet_dscp.h>
+>  #include <net/inet_hashtables.h>
+>  #include <net/inet_sock.h>
+>  #include <net/protocol.h>
+> @@ -473,7 +474,7 @@ static struct dst_entry* dccp_v4_route_skb(struct net=
+ *net, struct sock *sk,
+>                 .flowi4_oif =3D inet_iif(skb),
+>                 .daddr =3D iph->saddr,
+>                 .saddr =3D iph->daddr,
+> -               .flowi4_tos =3D ip_sock_rt_tos(sk),
+> +               .flowi4_tos =3D inet_dscp_to_dsfield(inet_sk_dscp((inet_s=
+k(sk)))),
 
-Hi Xin,
+You probably can replace ((X)) with (X) ?
+->
+ .flowi4_tos =3D inet_dscp_to_dsfield(inet_sk_dscp(inet_sk(sk))),
 
-Given the already posted changes, when I rerun the benchmark tests from my
-original patch last year, I don't see any significant differences in the
-forwarding performance. (single 8-core CPU, no parallel rule updates)
 
-The test code is linked in my original patch:
-https://lore.kernel.org/netdev/20240325204740.1393349-4-ast@fiberby.net/
+>                 .flowi4_scope =3D ip_sock_rt_scope(sk),
+>                 .flowi4_proto =3D sk->sk_protocol,
+>                 .fl4_sport =3D dccp_hdr(skb)->dccph_dport,
+> --
+> 2.39.2
+>
 
