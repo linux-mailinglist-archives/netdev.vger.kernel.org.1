@@ -1,128 +1,103 @@
-Return-Path: <netdev+bounces-158509-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158510-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08082A12475
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 14:10:54 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D072A1249E
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 14:21:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9CD923A4B9D
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 13:10:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6B44D188A41D
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 13:21:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 936832416AB;
-	Wed, 15 Jan 2025 13:10:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84ECC241690;
+	Wed, 15 Jan 2025 13:21:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bio6JrVC"
+	dkim=pass (2048-bit key) header.d=systec-electronic.com header.i=@systec-electronic.com header.b="e5IC6Let"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.systec-electronic.com (mail.systec-electronic.com [77.220.239.22])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 147982459A0;
-	Wed, 15 Jan 2025 13:10:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84C4A27726
+	for <netdev@vger.kernel.org>; Wed, 15 Jan 2025 13:21:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=77.220.239.22
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736946651; cv=none; b=puiC3ccuM8H3U9RIyMmipNFzhEHA/JczwIVPYd3QbkuKpCDthXN14AORZCcfG7M2w96hFdr6pFFHaeasK8nfCqLHOWBVTSniXtO3m9D5JVp2hDW8hZdcZeSCURN8wcEniH6iK+BkVyQdmmu15fuqq4ZGnru+9JyQYJyTRG4Yn9A=
+	t=1736947291; cv=none; b=CY1yAdi+d2o36wHelZyZ9ewC53AdXE0Bjwaa76C9PYlwDnCX+lTipRO09huUO29lpEyowR2l0hXWck5PM9C2x4OrdUpP2epe6ZzBFYR2id7sV80r7Py2h4VlfQ57yoWHl2CDY9wHCwn/NRRqRGEBzZUE6YJq8r77kppOsIM6kl4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736946651; c=relaxed/simple;
-	bh=UEc5yLBXuBeYvxSw1si8V2wt5oyjKizUIPkah6yqmLM=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=s5/lnDphcI5sKQbchy2uf6H2wv/45r2P7XeZw1QIkPxGvFXSNzHn+BnjH8JzqIn2r+19i4VGihkfZVoJgB9/ft2XzWFMp+IaHrZNRKM/2ecS7HFDpNRubWPOwUsXMDldN5bEOOs14J9T23bB2q1y+BEuzVISUPwkYCDFHad0kgA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bio6JrVC; arc=none smtp.client-ip=209.85.214.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-2164b662090so116842255ad.1;
-        Wed, 15 Jan 2025 05:10:49 -0800 (PST)
+	s=arc-20240116; t=1736947291; c=relaxed/simple;
+	bh=CFeAQQr6u5irfjBJM3EZI4AfC4FbP4kEbXHv7HgdrzE=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type; b=fh4FvMuz1drLGQG6I59ejQOFm0XfRSR6B3YLGFJQWcyrGy3wLdsYzgVkEEHowpJx5751nHUySjEYBz8VPLswPRleHcoVXIKTBrqQhPRbdt2jl858+4/Vsc4SzLdbXzWUw+a2czI1z7kxCJFezHDQ+eFb51owquBlEp69CSDe73w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=systec-electronic.com; spf=pass smtp.mailfrom=systec-electronic.com; dkim=pass (2048-bit key) header.d=systec-electronic.com header.i=@systec-electronic.com header.b=e5IC6Let; arc=none smtp.client-ip=77.220.239.22
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=systec-electronic.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=systec-electronic.com
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.systec-electronic.com (Postfix) with ESMTP id 4BB92941A5C4;
+	Wed, 15 Jan 2025 14:21:23 +0100 (CET)
+Received: from mail.systec-electronic.com ([127.0.0.1])
+ by localhost (mail.systec-electronic.com [127.0.0.1]) (amavis, port 10032)
+ with ESMTP id 5ymA2LUC3e9l; Wed, 15 Jan 2025 14:21:23 +0100 (CET)
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.systec-electronic.com (Postfix) with ESMTP id 1CBD9941A5C5;
+	Wed, 15 Jan 2025 14:21:23 +0100 (CET)
+DKIM-Filter: OpenDKIM Filter v2.10.3 mail.systec-electronic.com 1CBD9941A5C5
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736946649; x=1737551449; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=TCDMt69gV/RVlnL9GMTBlumJ/KvFBRBtbeV56hYCYnE=;
-        b=bio6JrVCB115afswXFHBVZSpE0ICJGDB3wt8wQMANzy6687kZnqsB8Z8RNIecPBZ1d
-         xEN5dt1vGgT1Sq2838YW7m5rloFoxgqWIwE8SEIVo80+p3BA7pqKhF7+/toexgXnczMi
-         pElAOO3mlUMqjWXOJWrfejBQDjO1bbTl/p3FOWcg1lnTvxZytR6AP2CUCz2WAM9SBLiS
-         49gNFq4+7wRPi49k/Wv9mwl+H5/W78xFIt6ej/oOuSraTKLiVJcMRZWdEzwTB1/asqTb
-         OobY6O35ZcCjjbl1t+jw+UK9A5mzsBlqod6QJwzYNOZ7A4KpgEhETOhA2xBa+KbHwipO
-         BxAQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736946649; x=1737551449;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=TCDMt69gV/RVlnL9GMTBlumJ/KvFBRBtbeV56hYCYnE=;
-        b=BaHdlfu/04bJCHbY67OT4wX/pI2PN+OkwOemSczCXWHIEax2yBxjptCZNY0hVOZGzm
-         gNHYZhdd7RS3b472zIdjdCb4QuVgESbJnUZ0epNluGkOrHM+soiOYpTnXjJlC77wzMBX
-         t1pDkw50FdR3M5wXxvIqE0bg6ItINGsIVB/9ZPaFNLILwrU653TnNSGypp1Ahh4GeiHJ
-         74Ce7FLSsHgRS+6jSWxMFF59swKb1Ap91/xwr+oP2DqTxNgj2kicx56SM/prsGZRTPQi
-         8h1aS7vOAT6gCgBpZLMdz0yONLP6Eteen0q0k4BtmxkIm8sC2lwB+4RWlFPCP3vozm8L
-         AbKA==
-X-Forwarded-Encrypted: i=1; AJvYcCV236r5R0i5GV216JUPeAUIfH3abWA/d4KTay1DKcE7XIjMAwaRQQIX3htpiNa704cxIpu60bHNdkr/j1c=@vger.kernel.org, AJvYcCWPG+5oT9TPVexMwXFVg678kGwgEpPKWcjEO3HVyYgNp8gSV8vZqKl3hJpKCLBeicYyfNfww6Xt@vger.kernel.org, AJvYcCWPfdGa5XrPdQsfnI7d//4JGIefaDEKEnbGHLgptSZqIWsyYq1Ix39Rmg1P3AQxsGrvTLA69rNI@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw1YfQNhZB1pow1Kn6lZ3F+ANoByxlknD+N6W81rYTjK5mz+mMF
-	HLxQdKSRfO48VeKxrjkplrg94OWkebu108hZG4x7FVl3TAruximl
-X-Gm-Gg: ASbGncsITO4XTJNet+YGx7aMduhEYCVgq/Pg9Qkp1yztwkSevdN09cxTw3uWHQa6iwY
-	sGnfz3lTw7aoQlmTFA+9MD9QAhSV6FTurXYqbjBIuS4JUYQPND8a2aONcNKsBfJ1EJ7PLFRrK5h
-	w0ClbvE+YTVMuIPpOi6TKY/cHJA02Czvk8zselznm6KZZwBiLuUYFM3CjJ43kkMg0GVnBmLJ/dK
-	7EhvHrjD83UFnkkhhOrQIrf6ZiRL0mo7XiMqWJ6m65/oa08Y2Z+mDZSKxQE91Hxl/NLZA==
-X-Google-Smtp-Source: AGHT+IHdIu6QK5qwWI4+QiGsGKyR7oWb+dGK5ujmT/1KWO3Eu+5Q5xOffSmsTG04OzXUdGVYWG1iyg==
-X-Received: by 2002:a17:90b:5245:b0:2ea:5e0c:2847 with SMTP id 98e67ed59e1d1-2f548edf16amr35020666a91.22.1736946649327;
-        Wed, 15 Jan 2025 05:10:49 -0800 (PST)
-Received: from localhost.localdomain ([124.127.236.5])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21a9f10ddbesm82863175ad.2.2025.01.15.05.10.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Jan 2025 05:10:48 -0800 (PST)
-From: Gui-Dong Han <2045gemini@gmail.com>
-To: 3chas3@gmail.com
-Cc: linux-atm-general@lists.sourceforge.net,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	baijiaju1990@gmail.com,
-	Gui-Dong Han <2045gemini@gmail.com>,
-	stable@vger.kernel.org
-Subject: [PATCH] atm/fore200e: Fix possible data race in fore200e_open()
-Date: Wed, 15 Jan 2025 13:10:06 +0000
-Message-Id: <20250115131006.364530-1-2045gemini@gmail.com>
-X-Mailer: git-send-email 2.25.1
+	d=systec-electronic.com; s=B34D3B04-5DC7-11EE-83E3-4D8CAB78E8CD;
+	t=1736947283; bh=JSIrwnxacDPodmvPMEG4J36AYzJxVWxAkxBv2rPi11c=;
+	h=Date:From:To:Message-ID:MIME-Version;
+	b=e5IC6LetpWsBBtrXtfew8KwFrhz7AYEDYIx1L32+AHrEKTsxpZOtc6V3wL7meoffF
+	 iPYR2P95bW8XIkjtxht9IYL1Pw+tBwDSU/+ELCDDI/mqs96rPKssZEIg2rdi9oXAfb
+	 jbxuorJq6Q5C+Vp05YVU9TQaXWPk3xkjgYdxis2eylYSinWFB6AtPfBJH66WHJxFXq
+	 jlF9YDJ5bDd0QWstC6PRjI71x4l1+wc5PMukAWaAZrueuJsF1RBL4AeSoOSZkz0OXa
+	 R/aKMsjsGoLl2F4RSuPVF6zcBSqqQ/FGkNSRIxOSre81YiXPFWcjgDZC8SuVZfntPF
+	 BnCalurJNaJ8g==
+X-Virus-Scanned: amavis at systec-electronic.com
+Received: from mail.systec-electronic.com ([127.0.0.1])
+ by localhost (mail.systec-electronic.com [127.0.0.1]) (amavis, port 10026)
+ with ESMTP id xhWrME2EW52w; Wed, 15 Jan 2025 14:21:23 +0100 (CET)
+Received: from lt-278851.systec.local (unknown [212.185.67.148])
+	by mail.systec-electronic.com (Postfix) with ESMTPSA id DD407941A5C4;
+	Wed, 15 Jan 2025 14:21:22 +0100 (CET)
+Date: Wed, 15 Jan 2025 14:21:22 +0100 (CET)
+From: Andre Werner <andre.werner@systec-electronic.com>
+Reply-To: Andre Werner <andre.werner@systec-electronic.com>
+To: bridge@lists.linux.dev, netdev@vger.kernel.org, linux-net@vger.kernel.org
+Subject: Redundancy Network Monitoring - How To?
+Message-ID: <d4752eb8-3d21-fe4b-a0d2-06b311724d8c@systec-electronic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/mixed; boundary="-1463794929-1843351374-1736947282=:17662"
 
-Protect access to fore200e->available_cell_rate with rate_mtx lock to
-prevent potential data race.
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
 
-The field fore200e.available_cell_rate is generally protected by the lock
-fore200e.rate_mtx when accessed. In all other read and write cases, this
-field is consistently protected by the lock, except for this case and
-during initialization.
+---1463794929-1843351374-1736947282=:17662
+Content-Type: text/plain; charset=ISO-8859-15
+Content-Transfer-Encoding: quoted-printable
 
-This potential bug was detected by our experimental static analysis tool,
-which analyzes locking APIs and paired functions to identify data races
-and atomicity violations.
+Dear Readers,
 
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Cc: stable@vger.kernel.org
-Signed-off-by: Gui-Dong Han <2045gemini@gmail.com>
----
- drivers/atm/fore200e.c | 2 ++
- 1 file changed, 2 insertions(+)
+I face a problem where I have not found an appropriate answer, yet.
+I have a dedicated ring topology in a network. To simply manage opening
+the ring we can use STP and its derivatives (e.g. mstpd). I also found th=
+at
+there is support for Media Redundancy Protocol (MRP) in the Linux kernel
+which may fit my needs better. However, I'm wondering how to use it since
+the bridge commands mentioned in the Patch have not been implemented yet,
+although the first patch set was more than 3 years back. Moreover, in add=
+ition
+to automatic rerouting via other nodes in case of topology changes,
+I need information about changes in the topology itself, even if the rout=
+e
+is currently not used. Is there any option provided in SW or even in the =
+Kernel to
+achieve this goal. It is a kind of predictive maintenance.
 
-diff --git a/drivers/atm/fore200e.c b/drivers/atm/fore200e.c
-index 4fea1149e003..f62e38571440 100644
---- a/drivers/atm/fore200e.c
-+++ b/drivers/atm/fore200e.c
-@@ -1374,7 +1374,9 @@ fore200e_open(struct atm_vcc *vcc)
- 
- 	vcc->dev_data = NULL;
- 
-+	mutex_lock(&fore200e->rate_mtx);
- 	fore200e->available_cell_rate += vcc->qos.txtp.max_pcr;
-+	mutex_unlock(&fore200e->rate_mtx);
- 
- 	kfree(fore200e_vcc);
- 	return -EINVAL;
--- 
-2.25.1
+Thanks in advance.
 
+Andr=E9
+---1463794929-1843351374-1736947282=:17662--
 
