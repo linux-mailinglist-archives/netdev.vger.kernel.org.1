@@ -1,76 +1,56 @@
-Return-Path: <netdev+bounces-158555-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158556-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C229BA1275B
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 16:25:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 407FBA12771
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 16:30:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D82EE163B3A
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 15:25:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 63795162641
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 15:30:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3C88155330;
-	Wed, 15 Jan 2025 15:25:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61994144304;
+	Wed, 15 Jan 2025 15:29:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Agsd3yOT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i/8ApA+w"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D77571DA21
-	for <netdev@vger.kernel.org>; Wed, 15 Jan 2025 15:25:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E30B1514F6
+	for <netdev@vger.kernel.org>; Wed, 15 Jan 2025 15:29:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736954738; cv=none; b=gdEcAxENXJk67g452XoLZX2TK49kJtm801TOsFxmvEl1amWWOVT+1ts8mWmaYNHjXxWleTGZArVz4+g6BrKZYCn50m8f+FU16T4XHJSMzFz4OIb7KWBiU2ApHOxfA9M9D4xG/tEY3Zr090NmHLdm5sZkRBIo649ztKeDYLrjsO0=
+	t=1736954995; cv=none; b=RrlI8nfReagWZlvwwT6k5vridD0tbi9yVkxCiQMglp0KhrzRuTKtVLDloMU3Za9ykNh2joVFKT/udnydPyE8Bcbi7YC95fWyYzZBCJ6q1Ls69HWwY/hSLVsyxY8heW2GAjW6koSVKihBxH731k0lNOloXOJh+G3AvnfAMdx+5oU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736954738; c=relaxed/simple;
-	bh=SnplJKaPZ+REAWqhWtUICv0j6UY525fstIyGktGRDng=;
+	s=arc-20240116; t=1736954995; c=relaxed/simple;
+	bh=dvCKF1yfIjbcxWxfj+dDO8xQmJ6jPPh6U/Msz3gPCQw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CxP5p8lKXFLeFczNc7u2BKOEHiYzePG1v6J1R31nLBCGzl7cjDorsZGuf8seWL2ALJ5FXCZE/JnOyeN3Iig0ppeZvOG+3xVRk3+Oc2NDM62GKywOYyGfNPCoy3fvQZYe7nTltpoXtIRZfMS/SnvjG2xOBloaHbHGbo/2Q8qYboA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Agsd3yOT; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1736954735;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=tWbRFdGx2+KJM9JmXd2E8lk3lOfEDDiv0qxeii/8VHM=;
-	b=Agsd3yOTjDKNSIaOoHGCk7B+Pblwe2KV4Iftw3uCuygCz0ZUCl4FLBoFdv5zjKt88jrPDj
-	0tOD1nivUCVpqgUogLpOq69FK/3qJbqfKr7nBXGxoqmSUZJIE7ccH7p5wBrE9NJdiAs63h
-	4vwoH3Ws60/fS6h+DCS0EVXPfvv1QOE=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-650-u_wTsRI8MlORUfqJ0hXFIw-1; Wed,
- 15 Jan 2025 10:25:32 -0500
-X-MC-Unique: u_wTsRI8MlORUfqJ0hXFIw-1
-X-Mimecast-MFC-AGG-ID: u_wTsRI8MlORUfqJ0hXFIw
-Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id ED52E195606A;
-	Wed, 15 Jan 2025 15:25:28 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.23])
-	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 44F4319560AA;
-	Wed, 15 Jan 2025 15:25:16 +0000 (UTC)
-Date: Wed, 15 Jan 2025 23:25:11 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Amery Hung <ameryhung@gmail.com>
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, daniel@iogearbox.net,
-	andrii@kernel.org, alexei.starovoitov@gmail.com,
-	martin.lau@kernel.org, sinquersw@gmail.com, toke@redhat.com,
-	jhs@mojatatu.com, jiri@resnulli.us, stfomichev@gmail.com,
-	ekarani.silvestre@ccc.ufcg.edu.br, yangpeihao@sjtu.edu.cn,
-	xiyou.wangcong@gmail.com, yepeilin.cs@gmail.com,
-	amery.hung@bytedance.com
-Subject: Re: [PATCH bpf-next v2 03/14] bpf: Allow struct_ops prog to return
- referenced kptr
-Message-ID: <Z4fTVwa3W9zRrEjU@fedora>
-References: <20241220195619.2022866-1-amery.hung@gmail.com>
- <20241220195619.2022866-4-amery.hung@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=J2ihz8Wzz83l/Z+zSHLx/tJUXoi9wB99OTyi/Ni3sb+xqr3/tY1OP1jz6aKt8P7DM1uHBnBkds3+0oIQdBmAx+GqEG6F9k7X4PPJlcYkJIKpdXsIms1lzCP8RW/3m4fKoeHT/qeNdIDQya4d1JQjwHfIPyK91tZbsKj0dQROmWI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i/8ApA+w; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EF3D2C4AF09;
+	Wed, 15 Jan 2025 15:29:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1736954994;
+	bh=dvCKF1yfIjbcxWxfj+dDO8xQmJ6jPPh6U/Msz3gPCQw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=i/8ApA+w7Yx+7j1h+/280+106TnwjiHidjw7YGvnRQGhFfQsAps6Pndj8xKpL3MzW
+	 Zk4RwAGqyWrgwZ4MKpV0WeArzfvfwIMvY4+IXxRxyfg6hvbBfWMoqITcFrYxLnYIkA
+	 TRvq8AKb9s0AEeGjmJ8qDVsTBsEdoCgM84A6KiBWWHNDPzaG2GojTRhYFk4ItL8Qsb
+	 6S2Pebw+6f1NkqskttaJkxswfleb+Vz8DlTpsf2TJwBhpF91ySVDwTKLZvosUmQVsF
+	 TsKki9zco4z2PSpaeawDZni7TVdJUqAsBdVOSRIHyzqz+XQn4ENEyliPHrrGYzPBi3
+	 Qpes9q32zY1XQ==
+Date: Wed, 15 Jan 2025 15:29:50 +0000
+From: Simon Horman <horms@kernel.org>
+To: Jiawen Wu <jiawenwu@trustnetic.com>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, linux@armlinux.org.uk,
+	netdev@vger.kernel.org, mengyuanlou@net-swift.com
+Subject: Re: [PATCH net-next v3 1/2] net: txgbe: Add basic support for new
+ AML devices
+Message-ID: <20250115152950.GO5497@kernel.org>
+References: <20250115102408.2225055-1-jiawenwu@trustnetic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -79,85 +59,136 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241220195619.2022866-4-amery.hung@gmail.com>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
+In-Reply-To: <20250115102408.2225055-1-jiawenwu@trustnetic.com>
 
-Hello Amery,
-
-On Fri, Dec 20, 2024 at 11:55:29AM -0800, Amery Hung wrote:
-> From: Amery Hung <amery.hung@bytedance.com>
+On Wed, Jan 15, 2025 at 06:24:07PM +0800, Jiawen Wu wrote:
+> There is a new 40/25/10 Gigabit Ethernet device.
 > 
-> Allow a struct_ops program to return a referenced kptr if the struct_ops
-> operator's return type is a struct pointer. To make sure the returned
-> pointer continues to be valid in the kernel, several constraints are
-> required:
+> To support basic functions, PHYLINK is temporarily skipped as it is
+> intended to implement these configurations in the firmware. And the
+> associated link IRQ is also skipped.
 > 
-> 1) The type of the pointer must matches the return type
-> 2) The pointer originally comes from the kernel (not locally allocated)
-> 3) The pointer is in its unmodified form
+> And Implement the new SW-FW interaction interface, which use 64 Byte
+> message buffer.
 > 
-> Implementation wise, a referenced kptr first needs to be allowed to _leak_
-> in check_reference_leak() if it is in the return register. Then, in
-> check_return_code(), constraints 1-3 are checked. During struct_ops
-> registration, a check is also added to warn about operators with
-> non-struct pointer return.
-> 
-> In addition, since the first user, Qdisc_ops::dequeue, allows a NULL
-> pointer to be returned when there is no skb to be dequeued, we will allow
-> a scalar value with value equals to NULL to be returned.
-> 
-> In the future when there is a struct_ops user that always expects a valid
-> pointer to be returned from an operator, we may extend tagging to the
-> return value. We can tell the verifier to only allow NULL pointer return
-> if the return value is tagged with MAY_BE_NULL.
-> 
-> Signed-off-by: Amery Hung <amery.hung@bytedance.com>
+> Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
 
-I feel this patchset is very useful, as Alexei shared, it can help to
-mark two ublk bpf aio kfunc[1] as KF_ACQ/REL for avoiding bpf aio leak.
+...
 
-[1] https://lore.kernel.org/linux-block/20250107120417.1237392-1-tom.leiming@gmail.com/
+> diff --git a/drivers/net/ethernet/wangxun/libwx/wx_hw.c b/drivers/net/ethernet/wangxun/libwx/wx_hw.c
 
-So I try to test it with ublk bpf patchset, however, looks it fails ublk
-bpf selftests. And the test does succeed without applying this patch,
-and ublk is built as module.
+...
 
-- apply the 1st and the 3rd(this one) patch
-- apply ublk bpf patchset[1]
-- build kernel & reboot
-- make -C tools/testing/selftests TARGETS=ublk run_tests
+> +static bool wx_poll_fw_reply(struct wx *wx, u32 *buffer,
+> +			     struct wx_hic_hdr *recv_hdr, u8 send_cmd)
+> +{
+> +	u32 dword_len = sizeof(struct wx_hic_hdr) >> 2;
+> +	u32 i;
+> +
+> +	/* read hdr */
+> +	for (i = 0; i < dword_len; i++) {
+> +		buffer[i] = rd32a(wx, WX_FW2SW_MBOX, i);
+> +		le32_to_cpus(&buffer[i]);
+> +	}
+> +
+> +	/* check hdr */
+> +	recv_hdr = (struct wx_hic_hdr *)buffer;
+> +	if (recv_hdr->cmd == send_cmd &&
+> +	    recv_hdr->index == wx->swfw_index)
+> +		return true;
 
-make: Entering directory '/root/git/linux/tools/testing/selftests'
-make[1]: Entering directory '/root/git/linux/tools/testing/selftests/ublk'
-  GEN      vmlinux.h
-  CLNG-BPF ublk_loop.bpf.o
-  GEN-SKEL ublk_loop.skel.h
-  CLNG-BPF ublk_null.bpf.o
-  GEN-SKEL ublk_null.skel.h
-  CLNG-BPF ublk_stripe.bpf.o
-  GEN-SKEL ublk_stripe.skel.h
-  CC       ublk_bpf.o
-  BINARY   ublk_bpf
-rm /root/git/linux/tools/testing/selftests/ublk/ublk_bpf.o
-make[1]: Leaving directory '/root/git/linux/tools/testing/selftests/ublk'
-make[1]: Entering directory '/root/git/linux/tools/testing/selftests/ublk'
-TAP version 13
-1..8
-# timeout set to 45
-# selftests: ublk: test_null_01.sh
-# null_01 : [PASS]
-ok 1 selftests: ublk: test_null_01.sh
-# timeout set to 45
-# selftests: ublk: test_null_02.sh
-# libbpf: struct_ops init_kern: struct ublk_bpf_ops data is not found in struct bpf_struct_ops_ublk_bpf_ops
-# libbpf: failed to load object 'ublk_null.bpf.o'
-# fail to load bpf obj from ublk_null.bpf.o
-# fail to register bpf prog null ublk_null.bpf.o
-not ok 2 selftests: ublk: test_null_02.sh # exit=255
+Hi Jiawen Wu,
 
+Maybe I am misreading this but, given the way that recv_hdr is
+passed to this function, it seems that the same result would
+he achieved if recv_hdr was a local variable...
 
+> +
+> +	return false;
+> +}
+> +
+> +static int wx_host_interface_command_r(struct wx *wx, u32 *buffer,
+> +				       u32 length, u32 timeout, bool return_data)
+> +{
+> +	struct wx_hic_hdr *send_hdr = (struct wx_hic_hdr *)buffer;
+> +	u32 hdr_size = sizeof(struct wx_hic_hdr);
+> +	struct wx_hic_hdr *recv_hdr;
+> +	bool busy, reply;
+> +	u32 dword_len;
+> +	u16 buf_len;
+> +	int err = 0;
+> +	u8 send_cmd;
+> +	u32 i;
+> +
+> +	/* wait to get lock */
+> +	might_sleep();
+> +	err = read_poll_timeout(test_and_set_bit, busy, !busy, 1000, timeout * 1000,
+> +				false, WX_STATE_SWFW_BUSY, wx->state);
+> +	if (err)
+> +		return err;
+> +
+> +	/* index to unique seq id for each mbox message */
+> +	send_hdr->index = wx->swfw_index;
+> +	send_cmd = send_hdr->cmd;
+> +
+> +	dword_len = length >> 2;
+> +	/* write data to SW-FW mbox array */
+> +	for (i = 0; i < dword_len; i++) {
+> +		wr32a(wx, WX_SW2FW_MBOX, i, (__force u32)cpu_to_le32(buffer[i]));
+> +		/* write flush */
+> +		rd32a(wx, WX_SW2FW_MBOX, i);
+> +	}
+> +
+> +	/* generate interrupt to notify FW */
+> +	wr32m(wx, WX_SW2FW_MBOX_CMD, WX_SW2FW_MBOX_CMD_VLD, 0);
+> +	wr32m(wx, WX_SW2FW_MBOX_CMD, WX_SW2FW_MBOX_CMD_VLD, WX_SW2FW_MBOX_CMD_VLD);
+> +
+> +	/* polling reply from FW */
+> +	err = read_poll_timeout(wx_poll_fw_reply, reply, reply, 1000, 50000,
+> +				true, wx, buffer, recv_hdr, send_cmd);
+> +	if (err) {
+> +		wx_err(wx, "Polling from FW messages timeout, cmd: 0x%x, index: %d\n",
+> +		       send_cmd, wx->swfw_index);
+> +		goto rel_out;
+> +	}
+> +
+> +	/* expect no reply from FW then return */
+> +	if (!return_data)
+> +		goto rel_out;
+> +
+> +	/* If there is any thing in data position pull it in */
+> +	buf_len = recv_hdr->buf_len;
 
-Thanks,
-Ming
+... and most likely related, recv_hdr appears to be uninitialised here.
 
+This part is flagged by W=1 builds with clang-19, and my Smatch.
+
+> +	if (buf_len == 0)
+> +		goto rel_out;
+> +
+> +	if (length < buf_len + hdr_size) {
+> +		wx_err(wx, "Buffer not large enough for reply message.\n");
+> +		err = -EFAULT;
+> +		goto rel_out;
+> +	}
+> +
+> +	/* Calculate length in DWORDs, add 3 for odd lengths */
+> +	dword_len = (buf_len + 3) >> 2;
+> +	for (i = hdr_size >> 2; i <= dword_len; i++) {
+> +		buffer[i] = rd32a(wx, WX_FW2SW_MBOX, i);
+> +		le32_to_cpus(&buffer[i]);
+> +	}
+> +
+> +rel_out:
+> +	/* index++, index replace wx_hic_hdr.checksum */
+> +	if (send_hdr->index == WX_HIC_HDR_INDEX_MAX)
+> +		wx->swfw_index = 0;
+> +	else
+> +		wx->swfw_index = send_hdr->index + 1;
+> +
+> +	clear_bit(WX_STATE_SWFW_BUSY, wx->state);
+> +	return err;
+> +}
+
+...
 
