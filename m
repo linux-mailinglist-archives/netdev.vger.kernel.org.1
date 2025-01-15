@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-158651-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158652-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43FA0A12DB7
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 22:30:37 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 15AA5A12DB9
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 22:30:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A78B87A2572
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 21:30:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 30DB116632E
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 21:30:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60BA51DBB03;
-	Wed, 15 Jan 2025 21:30:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 295441DC99C;
+	Wed, 15 Jan 2025 21:30:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QuPs0veq"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="P8yxRWF1"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FC691DB375;
-	Wed, 15 Jan 2025 21:30:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0232D1DC996
+	for <netdev@vger.kernel.org>; Wed, 15 Jan 2025 21:30:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736976624; cv=none; b=sOd74vOXBaevi4+IkQtn7ZdYUd7ehRWB7JwljWwsyA5JqzrCuCXWCupja3kJclTe6vHideYAXA6d+pmUBRb7bpi3Bd4W8hOuOr6oKradu6wf9m8ibpmj+f2NFYYsHMdhU06t7k7pA2Ud72KrceMdV0FtzsAJoTzK5WuWJrtzhYw=
+	t=1736976626; cv=none; b=hd2cDP0fG7GAA8hUE06Ry8tW47VxIhBwbmj8h4lYiihAQ72A1etcCigcXyBj9vmcSXNmQDhnG77KTEc7BYdMJfKLQSPwYL11xHO8t4WTTirv8sUQp6Ih01jojK0nQPCVA/MAvTgaWyf3ElBzAS6U14GrXqQPimIwOuu/PnTShVg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736976624; c=relaxed/simple;
-	bh=+Qle6uQadHWaIm6pp9CUrsXp+ZxOu7gfPtu2P0KyXyQ=;
+	s=arc-20240116; t=1736976626; c=relaxed/simple;
+	bh=LE8fA2hAMhhDI5KwgEq05/0LGmnaeWzG7l9oulZaTgk=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=gYkf8hzm5r7dx09moF1H4UyoNCimwzjx/8mCwA0rX2ssaRWfU8D7cpXmrg40nEJmeaiy0o0/E3eMWUVujbfrPJazSolKdBd1k3/+9C/Drk5VJRMD0LivYC+eMJMi17eheM7DHgiLF+sF/aGjeQyiNjWkeN0uq1CPcLt+ipOncWs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QuPs0veq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D628C4CED1;
-	Wed, 15 Jan 2025 21:30:24 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=dqXO8Z9S16K2lDsKcg2VTp1QRwDxzwSnePA1RY8P82sMYp4pqP+sSuTEav2ST0UD2iLj2rmjxFinZV9x1oCVbdd4UvPSyy08eQ7a9xcOFJui/b7xPv5oj6o8JUmjS7JGXraHGC4tK90PAAlW6KnaqrUxBBqxGK2KbBSf9BVLKBI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=P8yxRWF1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C9D10C4CED1;
+	Wed, 15 Jan 2025 21:30:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736976624;
-	bh=+Qle6uQadHWaIm6pp9CUrsXp+ZxOu7gfPtu2P0KyXyQ=;
+	s=k20201202; t=1736976625;
+	bh=LE8fA2hAMhhDI5KwgEq05/0LGmnaeWzG7l9oulZaTgk=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=QuPs0veqSN6hBMQv3L1aVEiBlxyXwUdOE2s2BV7EkuaS/J02RL2/hcYWYm7nCZ3so
-	 ArJB5S/UkjkseagD5RmmvfmirXwSOC7KrMCC7SVyDaocg4ITA7NyQyZRpiSWTk351C
-	 1mHiyfaZxD54PGdgQmzJtoXP2rJq08MIq4W5t9CZ05VKx5CJ54hGYMIUTLMuTSe7md
-	 frLLiWWm6nidu7/SM+XsaW+xeToGRvCfdm/jvK0LxmLbMbm9jNcy6UsIF3PxInt8Lr
-	 t26LTBui3POxAEL4Io5Jea05pIoX3YtlfjtFt1n9um4SUD+gIywMuakC93npAgfI2E
-	 ADoX/BVdKUYNw==
+	b=P8yxRWF12yA+CipCEyGIzKRv4g5Vac+F7zE50cg22snFi5j0Jzw+R0LlAaq7GM8xs
+	 0hu70OOCza20MDg9Of2KKGaLlUIACrqeaG3dSmH8T2fUWUgdGI2Iy6pw44BjTcpQbC
+	 7ake8LkLQaVusqCkJ9FjYGLYm+II0P9kFKI8qIk0FDtqcTEB1JByFtJvyhl2RM3aJS
+	 Y4auUQTxemzxvGUjmo1AvO7xaIlxNxhcfWTgyNML3LK3Y/DPZJF0XSyw8Wg9bHPKwC
+	 qTSmNipXmZ7rIe0Lr1a6A1zv13pgAW+vwBoqI0MFRmJbcS9kG4N7KFtV7Un/8Bi+MU
+	 q9j2EyvkM0Mmg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3421C380AA5F;
-	Wed, 15 Jan 2025 21:30:48 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAEB7380AA5F;
+	Wed, 15 Jan 2025 21:30:49 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,49 +52,55 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 0/6] mptcp: selftests: more debug in case of
- errors
+Subject: Re: [PATCH net-next v2 0/5] net: phylink: fix PCS without autoneg
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <173697664689.885620.11280936137681114654.git-patchwork-notify@kernel.org>
-Date: Wed, 15 Jan 2025 21:30:46 +0000
-References: <20250114-net-next-mptcp-st-more-debug-err-v1-0-2ffb16a6cf35@kernel.org>
-In-Reply-To: <20250114-net-next-mptcp-st-more-debug-err-v1-0-2ffb16a6cf35@kernel.org>
-To: Matthieu Baerts <matttbe@kernel.org>
-Cc: mptcp@lists.linux.dev, martineau@kernel.org, geliang@kernel.org,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- horms@kernel.org, shuah@kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+ <173697664846.885620.3750328889492102157.git-patchwork-notify@kernel.org>
+Date: Wed, 15 Jan 2025 21:30:48 +0000
+References: <Z4TbR93B-X8A8iHe@shell.armlinux.org.uk>
+In-Reply-To: <Z4TbR93B-X8A8iHe@shell.armlinux.org.uk>
+To: Russell King (Oracle) <linux@armlinux.org.uk>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, lynxis@fe80.eu,
+ alexanderduyck@fb.com, andrew+netdev@lunn.ch,
+ angelogioacchino.delregno@collabora.com, arinc.unal@arinc9.com,
+ claudiu.beznea@tuxon.dev, daniel@makrotopia.org, daniel.machon@microchip.com,
+ davem@davemloft.net, dqfext@gmail.com, edumazet@google.com,
+ ericwouds@gmail.com, florian.fainelli@broadcom.com,
+ horatiu.vultur@microchip.com, ioana.ciornei@nxp.com, kuba@kernel.org,
+ Jose.Abreu@synopsys.com, kernel-team@meta.com, lars.povlsen@microchip.com,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
+ madalin.bucur@nxp.com, marcin.s.wojtas@gmail.com, matthias.bgg@gmail.com,
+ michal.simek@amd.com, netdev@vger.kernel.org, nicolas.ferre@microchip.com,
+ pabeni@redhat.com, radhey.shyam.pandey@amd.com, sean.anderson@seco.com,
+ sean.wang@mediatek.com, Steen.Hegelund@microchip.com,
+ taras.chornyi@plvision.eu, UNGLinuxDriver@microchip.com, olteanv@gmail.com
 
 Hello:
 
 This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 14 Jan 2025 19:03:10 +0100 you wrote:
-> Here are just a bunch of small improvements for the MPTCP selftests:
+On Mon, 13 Jan 2025 09:22:15 +0000 you wrote:
+> Hi,
 > 
-> Patch 1: Unify errors messages in simult_flows: print MIB and 'ss -Me'.
-> 
-> Patch 2: Unify errors messages in sockopt: print MIB.
-> 
-> Patch 3: Move common code to print debug info to mptcp_lib.sh.
+> Eric Woudstra reported that a PCS attached using 2500base-X does not
+> see link when phylink is using in-band mode, but autoneg is disabled,
+> despite there being a valid 2500base-X signal being received. We have
+> these settings:
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,1/6] selftests: mptcp: simult_flows: unify errors msgs
-    https://git.kernel.org/netdev/net-next/c/894dae026bf6
-  - [net-next,2/6] selftests: mptcp: sockopt: save nstat infos
-    https://git.kernel.org/netdev/net-next/c/3257d4cb8d5c
-  - [net-next,3/6] selftests: mptcp: move stats info in case of errors to lib.sh
-    https://git.kernel.org/netdev/net-next/c/8c6bb011e188
-  - [net-next,4/6] selftests: mptcp: add -m with ss in case of errors
-    https://git.kernel.org/netdev/net-next/c/5fbea888f8aa
-  - [net-next,5/6] selftests: mptcp: connect: remove unused variable
-    https://git.kernel.org/netdev/net-next/c/b265c5a17423
-  - [net-next,6/6] selftests: mptcp: connect: better display the files size
-    https://git.kernel.org/netdev/net-next/c/540d3f8f1dac
+  - [net-next,v2,1/5] net: phylink: use pcs_neg_mode in phylink_mac_pcs_get_state()
+    https://git.kernel.org/netdev/net-next/c/0f1396d24658
+  - [net-next,v2,2/5] net: phylink: pass neg_mode into .pcs_get_state() method
+    https://git.kernel.org/netdev/net-next/c/c6739623c91b
+  - [net-next,v2,3/5] net: phylink: pass neg_mode into c22 state decoder
+    https://git.kernel.org/netdev/net-next/c/7e3cb4e874ab
+  - [net-next,v2,4/5] net: phylink: use neg_mode in phylink_mii_c22_pcs_decode_state()
+    https://git.kernel.org/netdev/net-next/c/60a331fff5e8
+  - [net-next,v2,5/5] net: phylink: provide fixed state for 1000base-X and 2500base-X
+    https://git.kernel.org/netdev/net-next/c/e432ffc14b17
 
 You are awesome, thank you!
 -- 
