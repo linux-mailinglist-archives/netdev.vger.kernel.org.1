@@ -1,97 +1,288 @@
-Return-Path: <netdev+bounces-158455-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158456-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C277A11EEF
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 11:07:53 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D743A11EF6
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 11:10:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6C5BA16493E
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 10:07:51 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7F90D7A1EF0
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 10:10:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5266220896C;
-	Wed, 15 Jan 2025 10:07:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C57E120C494;
+	Wed, 15 Jan 2025 10:10:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="sQ5UBkzG"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="IO3Hs72R"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-175.mta1.migadu.com (out-175.mta1.migadu.com [95.215.58.175])
+Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC9F520AF91
-	for <netdev@vger.kernel.org>; Wed, 15 Jan 2025 10:07:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 803C51E7C16;
+	Wed, 15 Jan 2025 10:10:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736935669; cv=none; b=tiCJIhpklYjbDorD9gC+vaaNDBFq1ueHpL/L9Fe2V6HVpjnnXJtCSoUoE0azpls5A+qzZdB6H0AtHoawbHxYWKtQCgDyL10O2ELOvlxI5N84J0IEEtC8ObZIgwGJwggI9nA1nVwLky8itTqJXIekLAyG9eXeC+2a/woTvgV6MN4=
+	t=1736935849; cv=none; b=gy5dCcEi9fdFzAEXvrEv74tT685uuDgqvwDXlJnHa9RvS0R4SF7TB5u/L7EjZDmeyVWrqvitrqT/WLlt76vH+Atlu3PenWIp0zLGQU2WJquDhh74caGWk2PJQnnr8CFbRnY/xFtiEYgJNn65ctEsOUB454F3Y8ASnJhbtVjyh8Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736935669; c=relaxed/simple;
-	bh=FAtZ0mm29jZ50IwyJ7GC4BVJeuSrY3btO825CGXEjrQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=t3MhZnd2r8Xv9COUuzLaaBI+xiIlSKnh0yCaErOmkWEkHVqfZIaiDBQGcPdnkZSWYOM6Ucw1QXfEeE4CfEqWhTvZaJW2YEsuVCXWdl5G1B0KbklYfLivTTZTBD6nJGamIjs0pGMbjprVczX2rFSThcTgD6CYtOt5y8Dv/oqbiXQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=sQ5UBkzG; arc=none smtp.client-ip=95.215.58.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <7b6acdc1-5151-427a-ac84-a6cb666f53ca@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1736935663;
+	s=arc-20240116; t=1736935849; c=relaxed/simple;
+	bh=tvTeILdfos0P+9+6ndT0QgzV4TqOucUzpN83r2pLhvo=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ZtTjWPQ/FtW9josXhZnw4OxryyN6zO4UTIw/kG5Ph5pF+mxqfLWZLRw2/fzFtRCDjbsNH10jzQ0GBIuIUSbIGYzTsaY3sKcHcvRshNEwqS9NMDy1QMKWe5mWdyhZN0WHOYYKdtu2nrZi6C8J/ohB7DLR+Kg9Yyir+LMINlexRs8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=IO3Hs72R; arc=none smtp.client-ip=217.70.183.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id EE393C000A;
+	Wed, 15 Jan 2025 10:10:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1736935844;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=+ryMO4/DGARz6dpCLQgFlxwCCK8jbknJTAtU+Z1iluM=;
-	b=sQ5UBkzG6Sa3qwVPFnRjJjSi78MlbdlIdHnotUb3Krv0djZP3ulfjNYrnAvnejXn9nljQU
-	SvZ+0x2kBc/MdnUJ3aGiOIqMwLFJVYJUtFNSTWSgld9Cfw7zvgM3nDN7uL4BSNBcKXVIVO
-	ZkT9vGUEOC1SEqDw/a7zktPocbQc8Pk=
-Date: Wed, 15 Jan 2025 18:07:32 +0800
+	bh=RH0xQl/B/xeO7ErLCj9NnlCwyJbeaN+T3r5JJvmXnns=;
+	b=IO3Hs72RJHXBrDm9LMNhh/bPqEAIDVGtBfSWmkT8lsv4JFa4PExlSjFF0Orfw0lZE1POC1
+	ovrtIETX3uLm8G1KLQ3gL/2McH32S3Jn7mAHSsBZOt6L9XsBtjT8WkD381LLoHRsjpkQ/k
+	YY1L5u6unBRwqomshxvcewMi51v96akHrjmYv4x2dxoIiMoRkvb5Tzq2CR8Ez498HeKwh/
+	K7Htb9hS+8kExL0OJpZOlphtHFNC6uSm0/9VHw7FtBqv8EmxQODF1zKaeWevJPOtBR2VYV
+	9kxBjnR9Wa+qVQ1nYxd85ZHY0Fbl+99FuiUCGeogoly2/SHsFxW3o+Ffle0rdg==
+Date: Wed, 15 Jan 2025 11:10:42 +0100
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: Tristram.Ha@microchip.com, Woojung Huh <woojung.huh@microchip.com>,
+ Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, UNGLinuxDriver@microchip.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v2] net: dsa: microchip: Add SGMII port support
+ to KSZ9477 switch
+Message-ID: <20250115111042.2bf22b61@fedora.home>
+In-Reply-To: <20250114160908.les2vsq42ivtrvqe@skbuf>
+References: <20250114024704.36972-1-Tristram.Ha@microchip.com>
+	<20250114160908.les2vsq42ivtrvqe@skbuf>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next v3 2/4] net: stmmac: Set page_pool_params.max_len
- to a precise size
-To: Furong Xu <0x1207@gmail.com>, netdev@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
- Joe Damato <jdamato@fastly.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>, xfr@outlook.com
-References: <cover.1736910454.git.0x1207@gmail.com>
- <538f87c8bdd0ba9e2b9cb5cd0e2964511c001890.1736910454.git.0x1207@gmail.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Yanteng Si <si.yanteng@linux.dev>
-In-Reply-To: <538f87c8bdd0ba9e2b9cb5cd0e2964511c001890.1736910454.git.0x1207@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-在 2025/1/15 11:27, Furong Xu 写道:
-> DMA engine will always write no more than dma_buf_sz bytes of a received
-> frame into a page buffer, the remaining spaces are unused or used by CPU
-> exclusively.
-> Setting page_pool_params.max_len to almost the full size of page(s) helps
-> nothing more, but wastes more CPU cycles on cache maintenance.
+Hello Vlad, Tristram,
+
+I'm replying to Vlad's review as he correctly points that this looks
+very much like XPCS :)
+
+On Tue, 14 Jan 2025 18:09:08 +0200
+Vladimir Oltean <olteanv@gmail.com> wrote:
+
+> On Mon, Jan 13, 2025 at 06:47:04PM -0800, Tristram.Ha@microchip.com wrote:
+> > From: Tristram Ha <tristram.ha@microchip.com>
+> > 
+> > The SGMII module of KSZ9477 switch can be setup in 3 ways: direct connect
+> > without using any SFP, SGMII mode with 10/100/1000Base-T SFP, and SerDes
+> > mode with 1000BaseX SFP, which can be fiber or copper.  Note some
+> > 1000Base-T copper SFPs advertise themselves as SGMII but start in
+> > 1000BaseX mode, and the PHY driver of the PHY inside will change it to
+> > SGMII mode.
+> > 
+> > The SGMII module can only support basic link status of the SFP, so the
+> > port can be simulated as having a regular internal PHY when SFP cage
+> > logic is not present.  The original KSZ9477 evaluation board operates in
+> > this way and so requires the simulation code.  
 > 
-> For a standard MTU of 1500, then dma_buf_sz is assigned to 1536, and this
-> patch brings ~16.9% driver performance improvement in a TCP RX
-> throughput test with iPerf tool on a single isolated Cortex-A65 CPU
-> core, from 2.43 Gbits/sec increased to 2.84 Gbits/sec.
+> I don't follow what you are saing here. What is the basic link status of
+> the SFP? It is expected of a SGMII PCS to be able to report:
+> - the "link up" indication
+> - the "autoneg complete" indication
+> - for SGMII: the speed and duplex communicated by the PHY, if in-band
+>   mode is selected and enabled
+> - for 1000Base-X: the duplex and pause bits communicated by the link
+>   partner, if in-band mode is selected and enabled.
 > 
-> Signed-off-by: Furong Xu <0x1207@gmail.com>
-> Reviewed-by: Alexander Lobakin <aleksander.lobakin@intel.com>
-Reviewed-by: Yanteng Si <si.yanteng@linux.dev>
+> What, out of these, is missing? I'm mostly confused about the reference
+> to the SFP here. The SGMII PCS shouldn't care whether the link goes
+> through an SFP module or not. It just reports the above things. Higher
+> layer code (the SFP bus driver) determines if the SFP module wants to
+> use SGMII or 1000Base-X, based on its EEPROM contents.
+> 
+> Essentially I don't understand the justification for simulating an
+> internal phylib phy. Why would the SFP cage logic (I assume you mean
+> CONFIG_SFP) be missing? If you have a phylink-based driver, you have to
+> have that enabled if you have SFP cages on your board.
+> 
+> > A PCS driver for the SGMII port is provided to support the SFP cage
+> > logic used in the phylink code.  It is used to confirm the link is up
+> > and process the SGMII interrupt.
+> > 
+> > One issue for the 1000BaseX SFP is there is no link down interrupt, so
+> > the driver has to use polling to detect link off when the link is up.
+> > 
+> > Note the SGMII interrupt cannot be masked in hardware.  Also the module
+> > is not reset when the switch is reset.  It is important to reset the
+> > module properly to make sure interrupt is not triggered prematurely.
+> > 
+> > One side effect is the SGMII interrupt is triggered when an internal PHY
+> > is powered down and powered up.  This happens when a port using internal
+> > PHY is turned off and then turned on.
+> > 
+> > Signed-off-by: Tristram Ha <tristram.ha@microchip.com>
+> > ---
+> > v2
+> >  - use standard MDIO names when programming MMD registers
+> >  - use pcs_config API to setup SGMII module
+> >  - remove the KSZ9477 device tree example as it was deemed unnecessary
+> > 
+> >  drivers/net/dsa/microchip/ksz9477.c     | 455 +++++++++++++++++++++++-
+> >  drivers/net/dsa/microchip/ksz9477.h     |   9 +-
+> >  drivers/net/dsa/microchip/ksz9477_reg.h |   1 +
+> >  drivers/net/dsa/microchip/ksz_common.c  | 111 +++++-
+> >  drivers/net/dsa/microchip/ksz_common.h  |  23 +-
+> >  5 files changed, 588 insertions(+), 11 deletions(-)
+> > 
+> > diff --git a/drivers/net/dsa/microchip/ksz9477.c b/drivers/net/dsa/microchip/ksz9477.c
+> > index 29fe79ea74cd..3613eea1e3fb 100644
+> > --- a/drivers/net/dsa/microchip/ksz9477.c
+> > +++ b/drivers/net/dsa/microchip/ksz9477.c
+> > @@ -2,7 +2,7 @@
+> >  /*
+> >   * Microchip KSZ9477 switch driver main logic
+> >   *
+> > - * Copyright (C) 2017-2024 Microchip Technology Inc.
+> > + * Copyright (C) 2017-2025 Microchip Technology Inc.
+> >   */
+> >  
+> >  #include <linux/kernel.h>
+> > @@ -12,6 +12,8 @@
+> >  #include <linux/phy.h>
+> >  #include <linux/if_bridge.h>
+> >  #include <linux/if_vlan.h>
+> > +#include <linux/irqdomain.h>
+> > +#include <linux/phylink.h>
+> >  #include <net/dsa.h>
+> >  #include <net/switchdev.h>
+> >  
+> > @@ -161,6 +163,415 @@ static int ksz9477_wait_alu_sta_ready(struct ksz_device *dev)
+> >  					10, 1000);
+> >  }
+> >  
+> > +static void port_sgmii_s(struct ksz_device *dev, uint port, u16 devid, u16 reg,
+> > +			 u16 len)
+> > +{
+> > +	u32 data;
+> > +
+> > +	data = (devid & MII_MMD_CTRL_DEVAD_MASK) << 16;
+> > +	data |= reg;
+> > +	if (len > 1)
+> > +		data |= PORT_SGMII_AUTO_INCR;
+> > +	ksz_pwrite32(dev, port, REG_PORT_SGMII_ADDR__4, data);
+> > +}
+> > +
+> > +static void port_sgmii_r(struct ksz_device *dev, uint port, u16 devid, u16 reg,
+> > +			 u16 *buf, u16 len)
+> > +{
+> > +	u32 data;
+> > +
+> > +	mutex_lock(&dev->sgmii_mutex);
+> > +	port_sgmii_s(dev, port, devid, reg, len);
+> > +	while (len) {
+> > +		ksz_pread32(dev, port, REG_PORT_SGMII_DATA__4, &data);
+> > +		*buf++ = (u16)data;
+> > +		len--;
+> > +	}
+> > +	mutex_unlock(&dev->sgmii_mutex);
+> > +}
+> > +
+> > +static void port_sgmii_w(struct ksz_device *dev, uint port, u16 devid, u16 reg,
+> > +			 u16 *buf, u16 len)
+> > +{
+> > +	u32 data;
+> > +
+> > +	mutex_lock(&dev->sgmii_mutex);
+> > +	port_sgmii_s(dev, port, devid, reg, len);
+> > +	while (len) {
+> > +		data = *buf++;
+> > +		ksz_pwrite32(dev, port, REG_PORT_SGMII_DATA__4, data);
+> > +		len--;
+> > +	}
+> > +	mutex_unlock(&dev->sgmii_mutex);
+> > +}
+
+These helpers can be converted into mii_bus read_c45/write_c45 mdio
+accessors, which would be the first step towards using xpcs here.
+
+[...]
+  
+> > +static void ksz_parse_sgmii(struct ksz_device *dev, int port,
+> > +			    struct device_node *dn)
+> > +{
+> > +	const char *managed;
+> > +
+> > +	if (dev->info->sgmii_port != port + 1)
+> > +		return;
+> > +	/* SGMII port can be used without using SFP.
+> > +	 * The sfp declaration is returned as being a fixed link so need to
+> > +	 * check the managed string to know the port is not using sfp.
+> > +	 */
+> > +	if (of_phy_is_fixed_link(dn) &&
+> > +	    of_property_read_string(dn, "managed", &managed))
+> > +		dev->ports[port].interface = PHY_INTERFACE_MODE_INTERNAL;
+> > +}  
+> 
+> There is way too much that seems unjustifiably complex at this stage,
+> including this. I would like to see a v3 using xpcs + the remaining
+> required delta for ksz9477, ideally with no internal PHY simulation.
+> Then we can go from there.
+> 
+> Also please make sure to keep linux@armlinux.org.uk in cc for future
+> submissions of this feature.
+
+I mentionned on the previous iteration that there's indeed a DW XPCS in
+there :
+https://lore.kernel.org/netdev/20241129135919.57d59c90@fedora.home/
+
+I have access to a platform with a KSZ9477, and indeed the PHY id
+register for the PCS mdio device show the DW XPCS id.
+
+I've been able to get this serdes port working with the XPCS driver
+(although on 6.1 due to project constraints), although I couldn't get
+1000BaseX autoneg to work.
+
+So all in all I agree with Vlad's comments here, there's a lot of logic
+in this series to detect the phy_interface_mode, detect SFP or not,
+most of which isn't needed.
+
+The logic should boil down to :
+
+ - Create some helpers to access the PCS through a virtual mdio bus
+(basically the current port_sgmii_w/r)
+
+ - Register a virtual mdio bus to access the PCS, hooked in
+ksz9477_port_setup() for the serdes port. That would look something
+like this :
+
++       bus = devm_mdiobus_alloc(ds->dev);
+(...)
++       bus->read_c45 = ksz9477_sgmii_read;
++       bus->write_c45 = ksz9477_sgmii_write;
+(...)
++       ret = devm_mdiobus_register(ds->dev, bus);
++       if (ret)
++               (...)
++
++       port->xpcs = xpcs_create_mdiodev(bus, 0, <iface>);
+
+- Make sure that .phylink_select_pcs() returns a ref to that xpcs
+
+- Write the necessary ksz9477-specific glue logic (adjust the phylink capabilities,
+make sure the virual MDIO registers are un the regmap area, etc.)
+
+I will be happy to test any further iterations :)
 
 Thanks,
-Yanteng
 
-> ---
->   drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 2 +-
->   drivers/net/ethernet/stmicro/stmmac/stmmac_xdp.h  | 1 -
->   2 files changed, 1 insertion(+), 2 deletions(-)
-
-
+Maxime
 
