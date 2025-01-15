@@ -1,358 +1,737 @@
-Return-Path: <netdev+bounces-158564-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158565-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B86D7A12805
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 17:02:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id DB701A12815
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 17:04:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B62D3161CD7
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 16:02:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EC7F1167422
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 16:04:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9365C14658F;
-	Wed, 15 Jan 2025 16:02:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8239165F18;
+	Wed, 15 Jan 2025 16:04:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="rwaCa7o5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XHmTxIF8"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2081.outbound.protection.outlook.com [40.107.243.81])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F345136E37;
-	Wed, 15 Jan 2025 16:02:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.81
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736956925; cv=fail; b=m4R2MMe2sYQhkf3FXH+I5sflIHmjIytRUF/xg/MZ1eoE5dwucwMcBW/Onwhu9jed5/ZKw3K6znmLpDJLPY4CvNxt4rbHAEfRDfsXDIUCP6rKN7SeG/v/oDPx/JGNB/q2bDAFaeFS8rQwtzhmfTjtg20KvLJPRizjqp9D3DB4rQI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736956925; c=relaxed/simple;
-	bh=xMLExBJh1cJ7RTC/sIAJF0gWNq6j17VffNG7AOXYIrQ=;
-	h=Message-ID:Date:Subject:To:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=Xa0xv5FIuvsxQOgmEsvJcJ//keXxpVlNZtQhRQuLWeEHxN82GdUbUugWVhc8w5tQRBmNkrsSa4Q+Ds1hamlV+dghgqwDO8r8AawujbD8uAVnRsrkzMWaLlWnm4L5pxuU41LsYbTldTnm9iv13brWTnTetGjPuIyITdNR9v0CNRU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=rwaCa7o5; arc=fail smtp.client-ip=40.107.243.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=pOAy4lWA4mO7g392D4WXuZqi0mofl1Qq0m/uc7l1JLtjChdbJKgicRjy5gW6DjdnmwbZZUU1TW7FXpVq0NHmommGoS0Np3UKiillGwUvAGPBbkPLlMkSgJylCR+vslZoWiv3zOhp8UAUhKGgFcjvJJca7U57J6ec+IGlHuX5fbZeSkZ0AKCIARd2nEta4wDIasYrgUjNWQWbJt+cxNz4tiXEWTZfioKBCNHytzzC3Nrpza6V1+HryHOsVrq67JAZEIcQckSrlPn3JeE7mO/Xh9AL69Ak+Nj0azh/9xlYR2ZHGdCj8mTEZ4s1dV2LHLfU2BD1IgD3XVQtlGkX86Q/dQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=OaT+kdC+x/d+/Bs4eFvkGQkcSvtS4fTphO7bZdC53Dc=;
- b=SbO17O/y//tcOHzOTSiG+f39iEBG8Dg0aw81oEaQxyL7FG4Pnz0Qix8aqxn3VDs7iuKt13Rs3iP6Z5XgEZh0evsJT9ox/0MYuSZ9kDnQzJJFprtcFUFXag51SyZhqvsMKo9KPP+6psQoP3EL9GrEyGIQ0gAwQoqzIRKg4U1HcHUsC5DozEyZhlJYQVXcJrLHHyOPaILEA4FTY6mP6AltiG5Idqb/3EWfckPmbs3QKzjMELv7Mx9Jd9mlCLtFN3bywqQiO6Me8v74bmR1Njy1x+6C8Kjc3MVBwlYM2iUeqFwwrUx38FIO8VqnZnheJmGmUoBuQD1IcS42nRTflwoS3Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=OaT+kdC+x/d+/Bs4eFvkGQkcSvtS4fTphO7bZdC53Dc=;
- b=rwaCa7o5HeWlqA8xJpyghNLUurAEc3//3CnfsFgwxr0RDaFx/aa8jVdIXUFYRbo1AKIXIYqqk/iC1V4++doNxPufrj9278rOZRgznsKa7zsKxMRwPpBedPhEp9cNhzJ9BBufhjqrPJl5ezKnmY6f3ww6NqwWtzx1A9/bld97RJw=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DM6PR12MB4202.namprd12.prod.outlook.com (2603:10b6:5:219::22)
- by CH3PR12MB9148.namprd12.prod.outlook.com (2603:10b6:610:19d::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8356.13; Wed, 15 Jan
- 2025 16:02:00 +0000
-Received: from DM6PR12MB4202.namprd12.prod.outlook.com
- ([fe80::f943:600c:2558:af79]) by DM6PR12MB4202.namprd12.prod.outlook.com
- ([fe80::f943:600c:2558:af79%7]) with mapi id 15.20.8335.017; Wed, 15 Jan 2025
- 16:02:00 +0000
-Message-ID: <7fc0b153-9eea-af2c-cd42-c66a2d4087bc@amd.com>
-Date: Wed, 15 Jan 2025 16:01:54 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH v8 01/27] cxl: add type2 device basic support
-Content-Language: en-US
-To: Dan Williams <dan.j.williams@intel.com>, alejandro.lucero-palau@amd.com,
- linux-cxl@vger.kernel.org, netdev@vger.kernel.org, martin.habets@xilinx.com,
- edward.cree@amd.com, davem@davemloft.net, kuba@kernel.org,
- pabeni@redhat.com, edumazet@google.com, dave.jiang@intel.com
-References: <20241216161042.42108-1-alejandro.lucero-palau@amd.com>
- <20241216161042.42108-2-alejandro.lucero-palau@amd.com>
- <677dbbd46e630_2aff42944@dwillia2-xfh.jf.intel.com.notmuch>
- <677dd5ea832e6_f58f29444@dwillia2-xfh.jf.intel.com.notmuch>
- <c3812ef0-dd17-a6f5-432a-93d98aff70b7@amd.com>
- <92e3b256-b660-5074-f3aa-c8ab158fcb8b@amd.com>
- <6786eab3a124c_20f3294f4@dwillia2-xfh.jf.intel.com.notmuch>
-From: Alejandro Lucero Palau <alucerop@amd.com>
-In-Reply-To: <6786eab3a124c_20f3294f4@dwillia2-xfh.jf.intel.com.notmuch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: FR0P281CA0099.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:a9::17) To DM6PR12MB4202.namprd12.prod.outlook.com
- (2603:10b6:5:219::22)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6757F146D40;
+	Wed, 15 Jan 2025 16:04:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1736957049; cv=none; b=uGkAepoQBBNd/GWEtwf1zNmf0yvhw53Rl7h8aE+d8eqP05kvt2InxwdIwhGOr6ZXXbqkWTCCzPyVz9m0WjE5F2DHFqxAdaXoxcxnHjzLqZaxVZQH8aPMI3AYbljwPxJ+tY9Oq9G2Oi0zqbf93Jfjz/HfpLfYk6dPr9yXCzpm5Lc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1736957049; c=relaxed/simple;
+	bh=bBvIAc/ofzfuAZ2biCK8SOcIqkb30675D+1kYFAZUwk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TKMWc8QxixnwQUwq7m7Yq0wSFWwvFEOuQ1DuA8K0UIyPN+8GMkKwC3pfcVeGg3f/v2I4tsWZV9OeN1avzu0AQr3N9hovcmwztAKlXpsGoIkjDQV82OQwxadEBFcDSVGo8PJ8/HVzUDcEeH4op7VFahOUGqTYgui/LvE/K7JydDg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XHmTxIF8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 47791C4CED1;
+	Wed, 15 Jan 2025 16:04:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1736957048;
+	bh=bBvIAc/ofzfuAZ2biCK8SOcIqkb30675D+1kYFAZUwk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=XHmTxIF81w3r5FZycyxOSmbwXFN8XCsXeNVIi/nWyuJMmm9nfUpdp4YTcSDVAiqYp
+	 hRz7OMd6iO+yJeO+lRnzkCv2I3s25mJRWQBEJovL36Gfghck3NbakTRBSAgZbDpIRv
+	 UV9MMgfKAGWS+GSzXkVrgD6NDpYWm9wwrRS8RqJeful607vRF6iHIYmDCQq2mQBRBO
+	 txCi7ZjNQKfT6rf/1+3Nb01hFZeO9upQxX6ipPW5OcE2xRXI0r5lq29aJ7Rov+1ON8
+	 IvYrHi2k32PN7lHSA2GYYrzoH1Au4us9WVyNrHc77sM0N2lwvqS9LVrCeAhyy6OqTS
+	 WHrEpqM1UCCyw==
+Date: Wed, 15 Jan 2025 16:04:01 +0000
+From: Lee Jones <lee@kernel.org>
+To: Ming Yu <a0282524688@gmail.com>
+Cc: tmyu0@nuvoton.com, linus.walleij@linaro.org, brgl@bgdev.pl,
+	andi.shyti@kernel.org, mkl@pengutronix.de,
+	mailhol.vincent@wanadoo.fr, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, wim@linux-watchdog.org, linux@roeck-us.net,
+	jdelvare@suse.com, alexandre.belloni@bootlin.com,
+	linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org,
+	linux-i2c@vger.kernel.org, linux-can@vger.kernel.org,
+	netdev@vger.kernel.org, linux-watchdog@vger.kernel.org,
+	linux-hwmon@vger.kernel.org, linux-rtc@vger.kernel.org,
+	linux-usb@vger.kernel.org
+Subject: Re: [PATCH v5 1/7] mfd: Add core driver for Nuvoton NCT6694
+Message-ID: <20250115160401.GL6763@google.com>
+References: <20250114033010.2445925-1-a0282524688@gmail.com>
+ <20250114033010.2445925-2-a0282524688@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6PR12MB4202:EE_|CH3PR12MB9148:EE_
-X-MS-Office365-Filtering-Correlation-Id: 5539c7f8-9c0f-4090-235d-08dd357df1b7
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|376014|1800799024|7053199007|921020;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?bTM0SlB5SGMxREdRUG1US01vZmpNMGY4dUVMMjhGdHFKdTl4WmIzSG5CQWht?=
- =?utf-8?B?eVk0UWNTZHlib2plVTVoTURKZTV0U3RNSGZmREFuREJxcUpKMUt6QVUwdjI5?=
- =?utf-8?B?Q1h1SDJHeEF6UnA4REhpaCsyR0dlTTRmZldaUHk0dWFTT1NkWkNKZk13ZFFO?=
- =?utf-8?B?eVFha1dvNytkNkhsamk5WWhkVGhnOFBpd2U0elU4czVNa1N4UGVYVUs1RC94?=
- =?utf-8?B?N1lTSFRNWWVSUVhram5JSWFsZ25KeE1waVV6b29KVUdPN3pvUmo3UmwzM1Ix?=
- =?utf-8?B?TmRncERvTkd0L1ZFeU8xcng2c0o2R0lUWk40aW9GVWduejl1ZUdVaHdBcU1E?=
- =?utf-8?B?OXo2YjVxeitVTFFKdi9WRjZNcjJHWDRtUFkrTUY4MVpjT0JwdWh5TURoV2R0?=
- =?utf-8?B?WnNXRCtVUFFONHZPRGdSR1ZpS0lGRlRSYkhyMW54bnRueXR5UUREU3FpdkFK?=
- =?utf-8?B?aUpGZGNCTUxLUkJINU00ZmlWMXUxZDJ5aFJrclFhWS9kQy8vNTBXL2NhL3g4?=
- =?utf-8?B?UTRZUjBYSE01MndXSnZESnRSV244QUI2SWljQkNaMGE0ZmRyZzk5dHdvTlhD?=
- =?utf-8?B?Z3o4Z1VGZ05scC9xbHU5L3NVaHV0RENPMXIzOStmVERxVThJYklOUks1UWx6?=
- =?utf-8?B?My9OK1VFOGtQMmg4N3I2Y2ZRT2t0OTA4K25XeXc5V3VzWlNaMyt5U1pXNExu?=
- =?utf-8?B?ZURqSkJHOUltdm1BeU1VV2tqZGw1YnowMWNlcU8yc2NnL3BRNEUyMXM3dkZI?=
- =?utf-8?B?NGVuQmhWSGhlUHJ2ZTdKQU84eUoyTDdVNG0zczB1WGxxN0JOSzREUGpXck1x?=
- =?utf-8?B?UDFES3I2S0xYUTlKN2VROERsclNjSDZ1bmxXbjNNdVZkQXRKeVUvRlIxTnR0?=
- =?utf-8?B?U25tQmJBTnNtOUZZckpMeGV3eTBPSkkzZXNqNHNDbGEwc0E0NWtLSHBZTGI0?=
- =?utf-8?B?Z0dNOFB4S090aTBaTklJS3BsZzArUWZ0RGNHNzFoYkxJRGxjNXZBNTdGaXRY?=
- =?utf-8?B?Smd6YTNBVVA2RFFqRHhGczNsNXQxSlBkeW9uMkpWMUJab0x0enJBcU4yQ05J?=
- =?utf-8?B?YzQrVi9MUHJ6bVkrMWdGSDY1dGw2VXgrSm1WeFVaay8yck1wejVnK25nMHAv?=
- =?utf-8?B?NGR4QzdCcmhGV0dnSWJBSllvaDIrbjEzNVEyWHFocnZwYzV6Tkw1WXhTVzBP?=
- =?utf-8?B?ZldndEloeE5XeG5pdUw5WU9FN3BHVE8wRW91bmtLTC8rVTdqSzRBem5PNUZq?=
- =?utf-8?B?bVJ3ays1bDRXVjZFM2l3UVNWN2VjNktzbkd6MlA2VE1yL2VBYUFWUFZvRGNW?=
- =?utf-8?B?dEFFWWxkTW5HLzhsVDVyRzhCSlV4dlRuTGFhZzRoYmFiVzJhcU5ld2lhNElo?=
- =?utf-8?B?alczTTRnSll5SkRMbk82aE5VRlBrcVpaNG9YMWVybnJPVnZUbjZkN1JIQmYz?=
- =?utf-8?B?NkhqeDBsWnpTZDh1UWZ1SmJaSndUQjJ6eU1VSXpYRUpxR1VJeUxrQnVnNjVj?=
- =?utf-8?B?ZERxMENQZVNqNXhiUFAxalIwSmp6Q3Z1aEo0YTV6VDN5bEZsUmFxTGpwakdE?=
- =?utf-8?B?TEZrTUNzR1ZCd05JL2VSNjcraW52ZzNXOVJtcmFnMWVCUTF1Rk1ydWZENEdj?=
- =?utf-8?B?YnYwWWo3Vm84ZXhNWU1CbWlRS2xYcFdqcEZVd2tQRFRvK1dzNEFYWHhUWGV0?=
- =?utf-8?B?aXFSdVpVOWJkbFF0c29QblVaVjRlV2JCT09ueks4Q0ZhLzE4aXVjWHBCd1ZO?=
- =?utf-8?B?UjMzK0t5czY4SW9Iei9qYk00YlFuYVJuaXVTM0lEVGowbkhrWVFLb0dDbzdv?=
- =?utf-8?B?K2V5Rzg2enliOVZPSjMrM1N2TVVHQnR0dkF5S3ZDc2ZLSUZhVlkwS0pMNFdn?=
- =?utf-8?B?ZEROWTlTejVQbjI5ck13NlljSDBRcElYMXJsMHNJK0pSWkpPejd5NlhYYy90?=
- =?utf-8?Q?paR0hvEW8JhX42PrpOxj3a7UDWnIYEd/?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB4202.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(7053199007)(921020);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?a0kvVklkaENJSXM1amZSVGVkemxLSHdvRlZaR3VpRG95U1EweVBRVG9vYXJj?=
- =?utf-8?B?VEczNmNDWEc1V2h3S0FpMFlEVUJWektBNmJEaE5sdHVBd1JWQkh1cGpORmdN?=
- =?utf-8?B?SFN0MTI2a3RmN01rTkdZRWFQSTRxUzI3Ui9xVDczNTJTaEdOdGsvVU5RcFhB?=
- =?utf-8?B?NjFBby9pNnBvMHkyYUxtbG1ienczQmdaa0RxMVMwVDEzRFhEUlh2OHUxR3lY?=
- =?utf-8?B?QjVPaHpHK3pqYmxIRkI1MXZwZjV4V1lDSHFoRm5lQ0ZVNUpWZmVPckk3K1di?=
- =?utf-8?B?RC9MVTY5SFhtdWphVDRGVG1PTzJDaHFaV3dvM0h6RXhXQllxLyszczJ0Z2sy?=
- =?utf-8?B?cVcwcjRsU2N5dUZZU25lRHYxL0ovQ29Od25aei93ZTJzdEl5YVRZNE9jTnly?=
- =?utf-8?B?Uk5qKzBrdTlIYTN0OFJrMnA0dXVOblhmVmcrN0dWcWZWcUk5QWNkR0tsSFcr?=
- =?utf-8?B?ZVN1aGUvbXU3N212K3lOMVZjV0xjY01yZkdma1JyQ3pWNlRPOU5YZjAwMlc0?=
- =?utf-8?B?emh6dXhlbGhqTERNQjRITFhCUlV0Umd6Qm0zSU5sSE8wSEt0NW9IbU5nL3RD?=
- =?utf-8?B?ZUx1bS9PRkdCdU1tTHN2RFg1a3B6S2xXOWNoQVNac0gxM2szV0ZsOU1QL2Ey?=
- =?utf-8?B?V3ZUcG1raTR1aTlHcUhxNTltTHh3Wi9uVlplc3B1OEMvNlFFWTRCbllyYTRK?=
- =?utf-8?B?YzA4cFRxM05CVkp0Uk5NS3ptUnFPQXM5VWw5Sm9meVhmU3B0dHUvWU5HU1Vw?=
- =?utf-8?B?RWdvQ3U0NXJzMHJSNGwvQzYxSHMyNU5Tck9oeHEzbkp4Mi9Hb1ZPbkFjdWZx?=
- =?utf-8?B?R21mTFhBZDZzVHQ1d2dKaWNBSFBqSjNtWWYzcnFuRk1ldWp0SVlOeStDWTJ1?=
- =?utf-8?B?ajRhYmhmVmtRRGxveFJnOTNSckVBUXRzejZzVmVMVlJKdU14eExndEhMNzk1?=
- =?utf-8?B?UVNrOFl5Rk1uNzYrUG1sN2U5eTBlaVBlNEVZYUMxcE9lZithUnJudVJ3QVpq?=
- =?utf-8?B?UzhBN256alJ5Y0gxakh5MGdKakg0b29EYVlhRnhpaDc3SktxQlpRMys4N2VM?=
- =?utf-8?B?VU1hRWVZYzRrU3pUTXlDZ1V1K25OSmltQVA1M2Q4dStQbnVabUM2ak9XYWwr?=
- =?utf-8?B?STQ0TlM5VVFuU3BQTUhNYUZzbzVUTFVpZnZFMUpLN0tOVE00L1JtaGVBRlBF?=
- =?utf-8?B?WTZCNmN0ZGhmKzVIRXRYODhuK2NQVW8rcmxWT01xR0V0S0NVamdMa0FrekN0?=
- =?utf-8?B?UWxHakNUTWduU0FOVXFFSkxjbXdBTmZkWE5XNnhmdVZtcm1TUVZaSG1zaFYv?=
- =?utf-8?B?dFpvMG1ub3E1R1NiYjUrSjd0b2lCYVJDWHhZWEVObW9sU255NzMrUFc5RGx0?=
- =?utf-8?B?MXFLZXpUdUVNeWhsbTNMRmJ5NWRML2tTc2VtbFNhM2ZwTGxrWUxIcHFhWDI3?=
- =?utf-8?B?YlBNU1JJbHhwUjBZcWc2SGJ3VGtLWFZWbE9JSWtOYnZPalpob0t3T3g1MGw4?=
- =?utf-8?B?OXJsQStwMXdDclFpMUMvd0YwbnhCQUhDNmJpcTNSbVdRRzdzbWg0L1A4TS82?=
- =?utf-8?B?THBzazZoc3ZjMUp6UUJoSlZnOERDanRwOUdGTVpQL0QrSGluMDNWNENPYkVR?=
- =?utf-8?B?WFVLMm0yVUYrRm82bE1uNk50Tmo5WjB3WTFxcXJTUkdaQktvVTM1cm02UTIz?=
- =?utf-8?B?dGRDNmVDS214MVlXRUt5NWRJa2h6K2tuQkVUSnJHM3UybHJ2dHQ4dHc4MUF3?=
- =?utf-8?B?WEx1N1B4RGNOclExeFAyT3lCQzNPV1RlYnBwN1ZmZWRXNTNmT2o1Z3F3S09o?=
- =?utf-8?B?WmZjNjdsUHhMQ1U3V3g4RCs0Q2hLRFBsemZSeFJ5TEpMbzBLVXpveWdHeS94?=
- =?utf-8?B?NnhMUmdEZmh4TnJqdTZkMWFUb1hUaStmSEk0cW92RDEvT0FjRzZDeXFqV3My?=
- =?utf-8?B?Kyt2SkRDREdnUG5FT1IzV1psVG5rWVVzM3ZQQ01vc25GdTRubllSNzJ0ZU5X?=
- =?utf-8?B?Z2xaZk93c084MFlybi9XK21XdEl0Y2x5cmtYV0JJaU85aTV3b0RmYUVTWWFw?=
- =?utf-8?B?dUpkLytkcWFlZm50dzFNWGZudGFFWFZrNG5jWjVzSkZNNFVVRjBmTnl3NjdJ?=
- =?utf-8?Q?1x9s9wNUZ5uS/i33cnwVsiVhn?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5539c7f8-9c0f-4090-235d-08dd357df1b7
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB4202.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Jan 2025 16:02:00.1928
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: GEQEMk5RL/TYCxdcjIhurx8CwgGdJX1gturNjO2ZgyickaLf9lIBXdzEVMmamnmsCkH0H9pkMlw9DQ/L8dmgYg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB9148
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250114033010.2445925-2-a0282524688@gmail.com>
 
+On Tue, 14 Jan 2025, Ming Yu wrote:
 
-On 1/14/25 22:52, Dan Williams wrote:
-> Alejandro Lucero Palau wrote:
->> On 1/8/25 14:32, Alejandro Lucero Palau wrote:
->>> On 1/8/25 01:33, Dan Williams wrote:
->>>> Dan Williams wrote:
->>>>> alejandro.lucero-palau@ wrote:
->>>>>> From: Alejandro Lucero <alucerop@amd.com>
->>>>>>
->>>>>> Differentiate CXL memory expanders (type 3) from CXL device
->>>>>> accelerators
->>>>>> (type 2) with a new function for initializing cxl_dev_state.
->>>>>>
->>>>>> Create accessors to cxl_dev_state to be used by accel drivers.
->>>>>>
->>>>>> Based on previous work by Dan Williams [1]
->>>>>>
->>>>>> Link: [1]
->>>>>> https://lore.kernel.org/linux-cxl/168592160379.1948938.12863272903570476312.stgit@dwillia2-xfh.jf.intel.com/
->>>>>> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
->>>>>> Co-developed-by: Dan Williams <dan.j.williams@intel.com>
->>>>>> Reviewed-by: Dave Jiang <dave.jiang@intel.com>
->>>>>> Reviewed-by: Fan Ni <fan.ni@samsung.com>
->>>>> This patch causes
->>>> Whoops, forgot to complete this thought. Someting in this series causes:
->>>>
->>>> depmod: ERROR: Cycle detected: ecdh_generic
->>>> depmod: ERROR: Cycle detected: tpm
->>>> depmod: ERROR: Cycle detected: cxl_mock -> cxl_core -> cxl_mock
->>>> depmod: ERROR: Cycle detected: encrypted_keys
->>>> depmod: ERROR: Found 2 modules in dependency cycles!
->>>>
->>>> I think the non CXL ones are false likely triggered by the CXL causing
->>>> depmod to exit early.
->>>>
->>>> Given cxl-test is unfamiliar territory to many submitters I always offer
->>>> to fix up the breakage. I came up with the below incremental patch to
->>>> fold in that also addresses my other feedback.
->>>>
->>>> Now the depmod error is something Alison saw too, and while I can also
->>>> see it on patch1 if I do:
->>>>
->>>> - apply whole series
->>>> - build => see the error
->>>> - rollback patch1
->>>> - build => see the error
->>>>
->>>> ...a subsequent build the error goes away, so I think that transient
->>>> behavior is a quirk of how cxl-test is built, but some later patch in
->>>> that series makes the failure permanent.
->>>>
->>>> In any event I figured that out after creating the below fixup and
->>>> realizing that it does not fix the cxl-test build issue:
->>>
->>> Ok. but it is a good way of showing what you had in your mind about
->>> the suggested changes.
->>>
->>> I'll use it for v10.
->>>
->>> Thanks
->>>
->> Hi Dan,
->>
->>
->> There's a problem with this approach and it is the need of the driver
->> having access to internal cxl structs like cxl_dev_state.
-> Apologies for stepping away for a few days, there was a chance to get
-> the long pending DAX page reference count series into v6.14 that I
-> needed to devote some review cycles.
+> The Nuvoton NCT6694 is a peripheral expander with 16 GPIO chips,
+> 6 I2C controllers, 2 CANfd controllers, 2 Watchdog timers, ADC,
+> PWM, and RTC.
+> 
+> This driver implements USB device functionality and shares the
+> chip's peripherals as a child device.
+> 
+> Each child device can use the USB functions nct6694_read_msg()
+> and nct6694_write_msg() to issue a command. They can also request
+> interrupt that will be called when the USB device receives its
+> interrupt pipe.
+> 
+> Signed-off-by: Ming Yu <a0282524688@gmail.com>
+> ---
+>  MAINTAINERS                 |   7 +
+>  drivers/mfd/Kconfig         |  10 +
+>  drivers/mfd/Makefile        |   2 +
+>  drivers/mfd/nct6694.c       | 388 ++++++++++++++++++++++++++++++++++++
+>  include/linux/mfd/nct6694.h | 109 ++++++++++
+>  5 files changed, 516 insertions(+)
+>  create mode 100644 drivers/mfd/nct6694.c
+>  create mode 100644 include/linux/mfd/nct6694.h
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index a87ddad78e26..79568f82b98a 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -16717,6 +16717,13 @@ F:	drivers/nubus/
+>  F:	include/linux/nubus.h
+>  F:	include/uapi/linux/nubus.h
+>  
+> +NUVOTON NCT6694 MFD DRIVER
+> +M:	Ming Yu <tmyu0@nuvoton.com>
+> +L:	linux-kernel@vger.kernel.org
+> +S:	Supported
+> +F:	drivers/mfd/nct6694.c
+> +F:	include/linux/mfd/nct6694.h
+> +
+>  NVIDIA (rivafb and nvidiafb) FRAMEBUFFER DRIVER
+>  M:	Antonino Daplas <adaplas@gmail.com>
+>  L:	linux-fbdev@vger.kernel.org
+> diff --git a/drivers/mfd/Kconfig b/drivers/mfd/Kconfig
+> index ae23b317a64e..3e641bfeeb38 100644
+> --- a/drivers/mfd/Kconfig
+> +++ b/drivers/mfd/Kconfig
+> @@ -1045,6 +1045,16 @@ config MFD_MENF21BMC
+>  	  This driver can also be built as a module. If so the module
+>  	  will be called menf21bmc.
+>  
+> +config MFD_NCT6694
+> +	tristate "Nuvoton NCT6694 support"
+> +	select MFD_CORE
+> +	depends on USB
+> +	help
+> +	  This adds support for Nuvoton USB device NCT6694 sharing peripherals
 
+Missing full stop.
 
-No worries.
+> +	  This includes the USB device driver and core APIs.
+> +	  Additional drivers must be enabled in order to use the functionality
 
+New sentences do not have to be on new lines.
 
->> Your patch does not cover it but for an accel driver that struct needs
->> to be allocated before using the new cxl_dev_state_init.
-> Why does the cxl core need to wrap malloc on behalf of the driver?
->
->> I think we reached an agreement in initial discussions about avoiding
->> this need through an API for accel drivers indirectly doing whatever is
->> needed regarding internal CXL structs. Initially it was stated this
->> being necessary for avoiding drivers doing wrong things but Jonathan
->> pointed out the main concern being changing those internal structs in
->> the future could benefit from this approach. Whatever the reason, that
->> was the assumption.
-> I think there is a benefit from a driver being able to do someting like:
->
-> struct my_cxl_accelerator_context {
->      ...
->      struct cxl_dev_state cxlds;
->      ...
-> };
->
-> Even if the rule is that direct consumption of 'struct cxl_dev_state'
-> outside of the cxl core is unwanted.
->
-> C does not make this easy, so it is either make the definition of
-> 'struct cxl_dev_state' public to CXL accelerator drivers so that they
-> know the size, or add an allocation API that takes in the extra size
-> that accelerator needs to allocate the core CXL context.
->
-> Unless and until we run into a real life problem of accelerator drivers
-> misusing 'struct cxl_dev_state' I think I prefer the explicit approach
-> of make the data structure embeddable and only require the core to do
-> the initialization.
+> +	  of the device.
 
+Please explain what this functionality is.
 
-Ok then. I'll make cxl_dev_state public in v10 and do the allocation by 
-the driver.
+> +
+>  config MFD_OCELOT
+>  	tristate "Microsemi Ocelot External Control Support"
+>  	depends on SPI_MASTER
+> diff --git a/drivers/mfd/Makefile b/drivers/mfd/Makefile
+> index e057d6d6faef..3c902d3704dc 100644
+> --- a/drivers/mfd/Makefile
+> +++ b/drivers/mfd/Makefile
+> @@ -121,6 +121,8 @@ obj-$(CONFIG_MFD_MC13XXX)	+= mc13xxx-core.o
+>  obj-$(CONFIG_MFD_MC13XXX_SPI)	+= mc13xxx-spi.o
+>  obj-$(CONFIG_MFD_MC13XXX_I2C)	+= mc13xxx-i2c.o
+>  
+> +obj-$(CONFIG_MFD_NCT6694)	+= nct6694.o
+> +
+>  obj-$(CONFIG_MFD_CORE)		+= mfd-core.o
+>  
+>  ocelot-soc-objs			:= ocelot-core.o ocelot-spi.o
+> diff --git a/drivers/mfd/nct6694.c b/drivers/mfd/nct6694.c
+> new file mode 100644
+> index 000000000000..294b6b7a902e
+> --- /dev/null
+> +++ b/drivers/mfd/nct6694.c
+> @@ -0,0 +1,388 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * Nuvoton NCT6694 MFD driver based on USB interface.
 
+No such thing as an MFD driver.  What is this device?
 
->> I could add a function for accel drivers doing the allocation as with
->> current v9 code, and then using your changes for having common code.
-> Let me go look at what you have there, but the design principle of the
-> CXL core is a library and enabling (but not requiring) users to have a container_of()
-> relationship between the core context and their local context feels the
-> most maintainable at this point.
->
->> Also, I completely agree with merging the serial and dvsec
->> initializations through arguments to cxl_dev_state_init, but we need the
->> cxl_set_resource function for accel drivers. The current code for adding
->> resources with memdev is relying on mbox commands, and although we could
->> change that code for supporting accel drivers without an mbox, I would
->> say the function/code added is simple enough for not requiring that
->> effort. Note my goal is for an accel device without an mbox, but we will
->> see devices with one in the future, so I bet for leaving any change
->> there to that moment.
-> ...but the way it was adding those resources was just wrong. This also
-> collides with some of the changes proposed for DCD partition management.
-> I needs a rethink in terms of a data structure and API to describe the
-> DPA address map of a CXL.mem capable device to the core and the core
-> should not be hard-coding a memory-expander-class device definition to
-> that layout.
+> + *
+> + * Copyright (C) 2024 Nuvoton Technology Corp.
+> + */
+> +
+> +#include <linux/bits.h>
+> +#include <linux/interrupt.h>
+> +#include <linux/irq.h>
+> +#include <linux/irqdomain.h>
+> +#include <linux/kernel.h>
+> +#include <linux/mfd/core.h>
+> +#include <linux/mfd/nct6694.h>
+> +#include <linux/module.h>
+> +#include <linux/slab.h>
+> +#include <linux/usb.h>
+> +
+> +#define MFD_DEV_SIMPLE(_name)				\
+> +{							\
+> +	.name = NCT6694_DEV_##_name,			\
 
+Device names are usually lower case.
 
-I think you say is wrong because you did not look at patch 8 where the 
-resources are requested based on the parent resource (dpa).
+> +}							\
 
+MFD_CELL_NAME()
 
-After seeing Ira's DCD patchset regarding the resources allocation 
-changes, and your comment there, I think I know that you have in mind. 
-But for Type2 the way resources information is obtained changes, at 
-least for the case of one without mailbox. In our case we are hardcoding 
-the resource definitions, although in the future (and likely other 
-drivers) we will use an internal/firmware path for obtaining the 
-information. So we have two cases:
+> +#define MFD_DEV_WITH_ID(_name, _id)			\
+> +{							\
+> +	.name = NCT6694_DEV_##_name,			\
+> +	.id = _id,					\
+> +}
 
+MFD_CELL_BASIC()
 
-1) accel driver with mailbox: an additional API function should allow 
-such accel driver to obtain the info or trigger the resource allocation 
-based on that command.
+Or add a new one to include/linux/mfd/core.h.
 
-2) accel driver without mailbox: a function for allocating the resources 
-based on hardcoded or driver-dependent dynamically-obtained data.
+> +/* MFD device resources */
 
+This comment is superfluous.
 
-The current patchset is supporting the second one, and with the linked 
-use case, the first one should be delayed until some accel driver 
-requires it.
+> +static const struct mfd_cell nct6694_dev[] = {
+> +	MFD_DEV_WITH_ID(GPIO, 0x0),
 
+Why doesn't PLATFORM_DEVID_AUTO work for you?
 
-I can adapt the current API for using the resource array exposed by 
-DCD's patches, and use  add_dpa_res function instead of current patchset 
-code.
+> +	MFD_DEV_WITH_ID(GPIO, 0x1),
+> +	MFD_DEV_WITH_ID(GPIO, 0x2),
+> +	MFD_DEV_WITH_ID(GPIO, 0x3),
+> +	MFD_DEV_WITH_ID(GPIO, 0x4),
+> +	MFD_DEV_WITH_ID(GPIO, 0x5),
+> +	MFD_DEV_WITH_ID(GPIO, 0x6),
+> +	MFD_DEV_WITH_ID(GPIO, 0x7),
+> +	MFD_DEV_WITH_ID(GPIO, 0x8),
+> +	MFD_DEV_WITH_ID(GPIO, 0x9),
+> +	MFD_DEV_WITH_ID(GPIO, 0xA),
+> +	MFD_DEV_WITH_ID(GPIO, 0xB),
+> +	MFD_DEV_WITH_ID(GPIO, 0xC),
+> +	MFD_DEV_WITH_ID(GPIO, 0xD),
+> +	MFD_DEV_WITH_ID(GPIO, 0xE),
+> +	MFD_DEV_WITH_ID(GPIO, 0xF),
+> +
+> +	MFD_DEV_WITH_ID(I2C, 0x0),
+> +	MFD_DEV_WITH_ID(I2C, 0x1),
+> +	MFD_DEV_WITH_ID(I2C, 0x2),
+> +	MFD_DEV_WITH_ID(I2C, 0x3),
+> +	MFD_DEV_WITH_ID(I2C, 0x4),
+> +	MFD_DEV_WITH_ID(I2C, 0x5),
+> +
+> +	MFD_DEV_WITH_ID(CAN, 0x0),
+> +	MFD_DEV_WITH_ID(CAN, 0x1),
+> +
+> +	MFD_DEV_WITH_ID(WDT, 0x0),
+> +	MFD_DEV_WITH_ID(WDT, 0x1),
+> +
+> +	MFD_DEV_SIMPLE(HWMON),
+> +	MFD_DEV_SIMPLE(RTC),
+> +};
+> +
+> +static int nct6694_response_err_handling(struct nct6694 *nct6694,
+> +					 unsigned char err_status)
+> +{
+> +	struct device *dev = &nct6694->udev->dev;
+> +
+> +	switch (err_status) {
+> +	case NCT6694_NO_ERROR:
+> +		return err_status;
+> +	case NCT6694_NOT_SUPPORT_ERROR:
+> +		dev_dbg(dev, "%s: Command is not supported!\n", __func__);
 
+These should be dev_warns().
 
-> I am imagining something similar to the way that resource range
-> resources are transmitted to platform device registration.
+__func__ shouldn't be used in production code.
 
+Users don't care about functions.
 
-I guess you mean to have  static/dynamic resource array with __init flag 
-for freeing the data after initialization, a CXL core function for 
-processing the array and calling add_dpa_res and aware of DCD patch 
-needs, and the resources linked to the device and released automatically 
-when unloading the driver.
+> +		break;
+> +	case NCT6694_NO_RESPONSE_ERROR:
+> +		dev_dbg(dev, "%s: Command received no response!\n", __func__);
+> +		break;
+> +	case NCT6694_TIMEOUT_ERROR:
+> +		dev_dbg(dev, "%s: Command timed out!\n", __func__);
+> +		break;
+> +	case NCT6694_PENDING:
+> +		dev_dbg(dev, "%s: Command is pending!\n", __func__);
+> +		break;
+> +	default:
+> +		return -EINVAL;
+> +	}
+> +
+> +	return -EIO;
+> +}
+> +
+> +int nct6694_read_msg(struct nct6694 *nct6694,
+> +		     struct nct6694_cmd_header *cmd_hd,
+> +		     void *buf)
+> +{
+> +	union nct6694_usb_msg *msg = nct6694->usb_msg;
+> +	int tx_len, rx_len, ret;
+> +
+> +	guard(mutex)(&nct6694->access_lock);
+> +
+> +	/* Send command packet to USB device */
+> +	memcpy(&msg->cmd_header, cmd_hd, sizeof(*cmd_hd));
+> +	msg->cmd_header.hctrl = NCT6694_HCTRL_GET;
+> +
+> +	ret = usb_bulk_msg(nct6694->udev,
+> +			   usb_sndbulkpipe(nct6694->udev, NCT6694_BULK_OUT_EP),
+> +			   &msg->cmd_header, sizeof(*msg), &tx_len,
+> +			   nct6694->timeout);
+> +	if (ret)
+> +		return ret;
+> +
+> +	/* Receive response packet from USB device */
+> +	ret = usb_bulk_msg(nct6694->udev,
+> +			   usb_rcvbulkpipe(nct6694->udev, NCT6694_BULK_IN_EP),
+> +			   &msg->response_header, sizeof(*msg), &rx_len,
+> +			   nct6694->timeout);
+> +	if (ret)
+> +		return ret;
+> +
+> +	/* Receive data packet from USB device */
+> +	ret = usb_bulk_msg(nct6694->udev,
+> +			   usb_rcvbulkpipe(nct6694->udev, NCT6694_BULK_IN_EP),
+> +			   buf, le16_to_cpu(cmd_hd->len), &rx_len,
+> +			   nct6694->timeout);
+> +	if (ret)
+> +		return ret;
+> +
+> +	if (rx_len != le16_to_cpu(cmd_hd->len)) {
+> +		dev_dbg(&nct6694->udev->dev, "%s: Received length is not match!\n",
 
+"does not match <something>"
+
+> +			__func__);
+
+This should be dev_err().
+
+> +		return -EIO;
+> +	}
+> +
+> +	return nct6694_response_err_handling(nct6694, msg->response_header.sts);
+> +}
+> +EXPORT_SYMBOL(nct6694_read_msg);
+> +
+> +int nct6694_write_msg(struct nct6694 *nct6694, struct nct6694_cmd_header *cmd_hd,
+> +		      void *buf)
+> +{
+> +	union nct6694_usb_msg *msg = nct6694->usb_msg;
+> +	int tx_len, rx_len, ret;
+> +
+> +	guard(mutex)(&nct6694->access_lock);
+> +
+> +	/* Send command packet to USB device */
+> +	memcpy(&msg->cmd_header, cmd_hd, sizeof(*cmd_hd));
+> +	msg->cmd_header.hctrl = NCT6694_HCTRL_SET;
+> +
+> +	ret = usb_bulk_msg(nct6694->udev,
+> +			   usb_sndbulkpipe(nct6694->udev, NCT6694_BULK_OUT_EP),
+> +			   &msg->cmd_header, sizeof(*msg), &tx_len,
+> +			   nct6694->timeout);
+> +	if (ret)
+> +		return ret;
+> +
+> +	/* Send data packet to USB device */
+> +	ret = usb_bulk_msg(nct6694->udev,
+> +			   usb_sndbulkpipe(nct6694->udev, NCT6694_BULK_OUT_EP),
+> +			   buf, le16_to_cpu(cmd_hd->len), &tx_len,
+> +			   nct6694->timeout);
+> +	if (ret)
+> +		return ret;
+> +
+> +	/* Receive response packet from USB device */
+> +	ret = usb_bulk_msg(nct6694->udev,
+> +			   usb_rcvbulkpipe(nct6694->udev, NCT6694_BULK_IN_EP),
+> +			   &msg->response_header, sizeof(*msg), &rx_len,
+> +			   nct6694->timeout);
+> +	if (ret)
+> +		return ret;
+> +
+> +	/* Receive data packet from USB device */
+> +	ret = usb_bulk_msg(nct6694->udev,
+> +			   usb_rcvbulkpipe(nct6694->udev, NCT6694_BULK_IN_EP),
+> +			   buf, le16_to_cpu(cmd_hd->len), &rx_len,
+> +			   nct6694->timeout);
+> +	if (ret)
+> +		return ret;
+> +
+> +	if (rx_len != le16_to_cpu(cmd_hd->len)) {
+> +		dev_dbg(&nct6694->udev->dev, "%s: Sent length is not match!\n",
+> +			__func__);
+
+This should be dev_err().
+
+> +		return -EIO;
+> +	}
+> +
+> +	return nct6694_response_err_handling(nct6694, msg->response_header.sts);
+> +}
+> +EXPORT_SYMBOL(nct6694_write_msg);
+> +
+> +static void usb_int_callback(struct urb *urb)
+> +{
+> +	struct nct6694 *nct6694 = urb->context;
+> +	struct device *dev = &nct6694->udev->dev;
+> +	unsigned int *int_status = urb->transfer_buffer;
+> +	int ret;
+> +
+> +	switch (urb->status) {
+> +	case 0:
+> +		break;
+> +	case -ECONNRESET:
+> +	case -ENOENT:
+> +	case -ESHUTDOWN:
+> +		return;
+> +	default:
+> +		goto resubmit;
+> +	}
+> +
+> +	while (*int_status) {
+> +		int irq = __ffs(*int_status);
+> +
+> +		generic_handle_irq_safe(irq_find_mapping(nct6694->domain, irq));
+> +		*int_status &= ~BIT(irq);
+> +	}
+> +
+> +resubmit:
+> +	ret = usb_submit_urb(urb, GFP_ATOMIC);
+> +	if (ret)
+> +		dev_dbg(dev, "%s: Failed to resubmit urb, status %pe",
+> +			__func__, ERR_PTR(ret));
+> +}
+> +
+> +static void nct6694_irq_lock(struct irq_data *data)
+> +{
+> +	struct nct6694 *nct6694 = irq_data_get_irq_chip_data(data);
+> +
+> +	mutex_lock(&nct6694->irq_lock);
+> +}
+> +
+> +static void nct6694_irq_sync_unlock(struct irq_data *data)
+> +{
+> +	struct nct6694 *nct6694 = irq_data_get_irq_chip_data(data);
+> +
+> +	mutex_unlock(&nct6694->irq_lock);
+> +}
+> +
+> +static void nct6694_irq_enable(struct irq_data *data)
+> +{
+> +	struct nct6694 *nct6694 = irq_data_get_irq_chip_data(data);
+> +	irq_hw_number_t hwirq = irqd_to_hwirq(data);
+> +
+> +	nct6694->irq_enable |= BIT(hwirq);
+
+Changing a bit mask doesn't actually {en,dis}able an IRQ, right?
+
+> +}
+> +
+> +static void nct6694_irq_disable(struct irq_data *data)
+> +{
+> +	struct nct6694 *nct6694 = irq_data_get_irq_chip_data(data);
+> +	irq_hw_number_t hwirq = irqd_to_hwirq(data);
+> +
+> +	nct6694->irq_enable &= ~BIT(hwirq);
+> +}
+> +
+> +static struct irq_chip nct6694_irq_chip = {
+> +	.name = "nct6694-irq",
+> +	.flags = IRQCHIP_SKIP_SET_WAKE,
+> +	.irq_bus_lock = nct6694_irq_lock,
+> +	.irq_bus_sync_unlock = nct6694_irq_sync_unlock,
+> +	.irq_enable = nct6694_irq_enable,
+> +	.irq_disable = nct6694_irq_disable,
+> +};
+> +
+> +static int nct6694_irq_domain_map(struct irq_domain *d, unsigned int irq,
+> +				  irq_hw_number_t hw)
+> +{
+> +	struct nct6694 *nct6694 = d->host_data;
+> +
+> +	irq_set_chip_data(irq, nct6694);
+> +	irq_set_chip_and_handler(irq, &nct6694_irq_chip, handle_simple_irq);
+> +
+> +	return 0;
+> +}
+> +
+> +static void nct6694_irq_domain_unmap(struct irq_domain *d, unsigned int irq)
+> +{
+> +	irq_set_chip_and_handler(irq, NULL, NULL);
+> +	irq_set_chip_data(irq, NULL);
+> +}
+> +
+> +static const struct irq_domain_ops nct6694_irq_domain_ops = {
+> +	.map	= nct6694_irq_domain_map,
+> +	.unmap	= nct6694_irq_domain_unmap,
+> +};
+> +
+> +static int nct6694_usb_probe(struct usb_interface *iface,
+> +			     const struct usb_device_id *id)
+> +{
+> +	struct usb_device *udev = interface_to_usbdev(iface);
+> +	struct usb_endpoint_descriptor *int_endpoint;
+> +	struct usb_host_interface *interface;
+> +	struct device *dev = &udev->dev;
+> +	struct nct6694 *nct6694;
+> +	int pipe, maxp;
+> +	int ret;
+> +
+> +	interface = iface->cur_altsetting;
+
+Initialise this during allocation.
+
+> +	int_endpoint = &interface->endpoint[0].desc;
+> +	if (!usb_endpoint_is_int_in(int_endpoint))
+> +		return -ENODEV;
+> +
+> +	nct6694 = devm_kzalloc(dev, sizeof(*nct6694), GFP_KERNEL);
+> +	if (!nct6694)
+> +		return -ENOMEM;
+> +
+> +	pipe = usb_rcvintpipe(udev, NCT6694_INT_IN_EP);
+> +	maxp = usb_maxpacket(udev, pipe);
+> +
+> +	nct6694->usb_msg = devm_kzalloc(dev, sizeof(union nct6694_usb_msg),
+> +					GFP_KERNEL);
+
+Unwrap this - you can use up to 100-chars.
+
+> +	if (!nct6694->usb_msg)
+> +		return -ENOMEM;
+> +
+> +	nct6694->int_buffer = devm_kzalloc(dev, maxp, GFP_KERNEL);
+> +	if (!nct6694->int_buffer)
+> +		return -ENOMEM;
+> +
+> +	nct6694->int_in_urb = usb_alloc_urb(0, GFP_KERNEL);
+> +	if (!nct6694->int_in_urb)
+> +		return -ENOMEM;
+> +
+> +	nct6694->domain = irq_domain_add_simple(NULL, NCT6694_NR_IRQS, 0,
+> +						&nct6694_irq_domain_ops,
+> +						nct6694);
+> +	if (!nct6694->domain) {
+> +		ret = -ENODEV;
+> +		goto err_urb;
+> +	}
+> +
+> +	nct6694->udev = udev;
+> +	nct6694->timeout = NCT6694_URB_TIMEOUT;	/* Wait until urb complete */
+
+"URB completes"?
+
+> +
+> +	devm_mutex_init(dev, &nct6694->access_lock);
+> +	devm_mutex_init(dev, &nct6694->irq_lock);
+> +
+> +	usb_fill_int_urb(nct6694->int_in_urb, udev, pipe,
+> +			 nct6694->int_buffer, maxp, usb_int_callback,
+> +			 nct6694, int_endpoint->bInterval);
+> +	ret = usb_submit_urb(nct6694->int_in_urb, GFP_KERNEL);
+> +	if (ret)
+> +		goto err_urb;
+> +
+> +	dev_set_drvdata(dev, nct6694);
+> +	usb_set_intfdata(iface, nct6694);
+
+These two do the same thing.  You don't need both.
+
+> +	ret = mfd_add_hotplug_devices(dev, nct6694_dev, ARRAY_SIZE(nct6694_dev));
+> +	if (ret)
+> +		goto err_mfd;
+> +
+> +	return 0;
+> +
+> +err_mfd:
+> +	usb_kill_urb(nct6694->int_in_urb);
+> +err_urb:
+> +	usb_free_urb(nct6694->int_in_urb);
+> +	return ret;
+> +}
+> +
+> +static void nct6694_usb_disconnect(struct usb_interface *iface)
+> +{
+> +	struct usb_device *udev = interface_to_usbdev(iface);
+> +	struct nct6694 *nct6694 = usb_get_intfdata(iface);
+> +
+> +	mfd_remove_devices(&udev->dev);
+
+Does devm_* work here?
+
+> +	usb_kill_urb(nct6694->int_in_urb);
+> +	usb_free_urb(nct6694->int_in_urb);
+> +}
+> +
+> +static const struct usb_device_id nct6694_ids[] = {
+> +	{ USB_DEVICE_AND_INTERFACE_INFO(NCT6694_VENDOR_ID,
+> +					NCT6694_PRODUCT_ID,
+> +					0xFF, 0x00, 0x00)},
+> +	{}
+> +};
+> +MODULE_DEVICE_TABLE(usb, nct6694_ids);
+> +
+> +static struct usb_driver nct6694_usb_driver = {
+> +	.name	= "nct6694",
+> +	.id_table = nct6694_ids,
+> +	.probe = nct6694_usb_probe,
+> +	.disconnect = nct6694_usb_disconnect,
+> +};
+> +
+> +module_usb_driver(nct6694_usb_driver);
+> +
+> +MODULE_DESCRIPTION("USB-MFD driver for NCT6694");
+
+Remove all references to MFD.
+
+> +MODULE_AUTHOR("Ming Yu <tmyu0@nuvoton.com>");
+> +MODULE_LICENSE("GPL");
+> diff --git a/include/linux/mfd/nct6694.h b/include/linux/mfd/nct6694.h
+> new file mode 100644
+> index 000000000000..67ca835589ad
+> --- /dev/null
+> +++ b/include/linux/mfd/nct6694.h
+> @@ -0,0 +1,109 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +/*
+> + * Nuvoton NCT6694 USB transaction and data structure.
+> + *
+> + * Copyright (C) 2024 Nuvoton Technology Corp.
+> + */
+> +
+> +#ifndef __MFD_NCT6694_H
+> +#define __MFD_NCT6694_H
+> +
+> +#define NCT6694_DEV_GPIO	"nct6694-gpio"
+> +#define NCT6694_DEV_I2C		"nct6694-i2c"
+> +#define NCT6694_DEV_CAN		"nct6694-can"
+> +#define NCT6694_DEV_WDT		"nct6694-wdt"
+> +#define NCT6694_DEV_HWMON	"nct6694-hwmon"
+> +#define NCT6694_DEV_RTC		"nct6694-rtc"
+
+Use raw strings in place please.
+
+> +#define NCT6694_VENDOR_ID	0x0416
+> +#define NCT6694_PRODUCT_ID	0x200B
+> +#define NCT6694_INT_IN_EP	0x81
+> +#define NCT6694_BULK_IN_EP	0x02
+> +#define NCT6694_BULK_OUT_EP	0x03
+> +
+> +#define NCT6694_HCTRL_SET	0x40
+> +#define NCT6694_HCTRL_GET	0x80
+> +
+> +#define NCT6694_URB_TIMEOUT	1000
+> +
+> +enum nct6694_irq_id {
+
+These are never used.
+
+> +	NCT6694_IRQ_GPIO0 = 0,
+> +	NCT6694_IRQ_GPIO1,
+> +	NCT6694_IRQ_GPIO2,
+> +	NCT6694_IRQ_GPIO3,
+> +	NCT6694_IRQ_GPIO4,
+> +	NCT6694_IRQ_GPIO5,
+> +	NCT6694_IRQ_GPIO6,
+> +	NCT6694_IRQ_GPIO7,
+> +	NCT6694_IRQ_GPIO8,
+> +	NCT6694_IRQ_GPIO9,
+> +	NCT6694_IRQ_GPIOA,
+> +	NCT6694_IRQ_GPIOB,
+> +	NCT6694_IRQ_GPIOC,
+> +	NCT6694_IRQ_GPIOD,
+> +	NCT6694_IRQ_GPIOE,
+> +	NCT6694_IRQ_GPIOF,
+> +	NCT6694_IRQ_CAN1,
+> +	NCT6694_IRQ_CAN2,
+> +	NCT6694_IRQ_RTC,
+> +	NCT6694_NR_IRQS,
+> +};
+> +
+> +enum nct6694_response_err_status {
+> +	NCT6694_NO_ERROR = 0,
+> +	NCT6694_FORMAT_ERROR,
+> +	NCT6694_RESERVED1,
+> +	NCT6694_RESERVED2,
+> +	NCT6694_NOT_SUPPORT_ERROR,
+> +	NCT6694_NO_RESPONSE_ERROR,
+> +	NCT6694_TIMEOUT_ERROR,
+> +	NCT6694_PENDING,
+> +};
+> +
+> +struct __packed nct6694_cmd_header {
+> +	u8 rsv1;
+> +	u8 mod;
+> +	union __packed {
+> +		__le16 offset;
+> +		struct __packed {
+> +			u8 cmd;
+> +			u8 sel;
+> +		};
+> +	};
+> +	u8 hctrl;
+> +	u8 rsv2;
+> +	__le16 len;
+> +};
+> +
+> +struct __packed nct6694_response_header {
+> +	u8 sequence_id;
+> +	u8 sts;
+> +	u8 reserved[4];
+> +	__le16 len;
+> +};
+> +
+> +union __packed nct6694_usb_msg {
+> +	struct nct6694_cmd_header cmd_header;
+> +	struct nct6694_response_header response_header;
+> +};
+> +
+> +struct nct6694 {
+
+Do all of these values need to be stored?
+
+> +	struct usb_device *udev;
+> +	struct urb *int_in_urb;
+> +	struct irq_domain *domain;
+> +	struct mutex access_lock;
+> +	struct mutex irq_lock;
+> +	union nct6694_usb_msg *usb_msg;
+> +	unsigned char *int_buffer;
+> +	unsigned int irq_enable;
+> +	/* time in msec to wait for the urb to the complete */
+
+"Time"  "URB"
+> +	long timeout;
+> +};
+> +
+> +int nct6694_read_msg(struct nct6694 *nct6694, struct nct6694_cmd_header *cmd_hd,
+> +		     void *buf);
+> +
+> +int nct6694_write_msg(struct nct6694 *nct6694, struct nct6694_cmd_header *cmd_hd,
+> +		      void *buf);
+> +
+> +#endif
+> -- 
+> 2.34.1
+> 
+
+-- 
+Lee Jones [李琼斯]
 
