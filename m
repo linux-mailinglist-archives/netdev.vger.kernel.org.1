@@ -1,77 +1,147 @@
-Return-Path: <netdev+bounces-158647-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158648-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 78835A12D9C
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 22:21:49 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 88295A12D9F
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 22:22:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CC1CD1887893
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 21:21:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 20B343A40BB
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 21:22:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9F1A1D9A42;
-	Wed, 15 Jan 2025 21:21:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37DFC1DA103;
+	Wed, 15 Jan 2025 21:22:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QoNlwnOi"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ZJkAF7az"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-176.mta0.migadu.com (out-176.mta0.migadu.com [91.218.175.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89EB74D599;
-	Wed, 15 Jan 2025 21:21:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CDE31D79A9
+	for <netdev@vger.kernel.org>; Wed, 15 Jan 2025 21:22:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736976104; cv=none; b=ap7x4u6IC/hlXm72HlVytQ4pC2UslWpoqY2d84UZYJRIMhox7mBNCaaYDC4Yk/VokPRlUCiWqEdThBSqr2M/jPDX6wS4mXxK0gWCwqWi84Ith/P8KPkiIjmqv1tZFEcz110xnoh7iFja9Zk3BNMwdPMXgfsCgDb8LFbE3Swtbnk=
+	t=1736976156; cv=none; b=Q/0fc0M1ylBJZuC67E/zIReRy8jT/D+x+eVBfqPkzL6hWAThhc3A9gVNjYE0jEXIndH2lRS5Sfv3GQ2rbPjxqpdwH3C6aypk2Vr3ddGzWl7F7iCojIjfkSbdoSknjFhEq8Ek8dY4cV4Zwy7jcauxHG2cMpRNorDIqWLkadEtotE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736976104; c=relaxed/simple;
-	bh=9TWMahBJxv0Fx7tGkIPVI77bNHYo41nONeIt3qjqxbE=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=QK2mqfeVgQp8sYbnLvKZitZh7n8uWhsijc+kUvSwuWZSi3FDa0HK0aEQ8CUtA9fTKFETBfjnV8JKhMy5y8xhwV32H97Fof3NWzMm0Oq9uN4rmy8RdqOLUBZ5nxTIyF+TwmRPqv1cK4aR1Vjw97jaGkGBhJJd/HEyoNEqP7qvu8o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QoNlwnOi; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AD7CEC4CED1;
-	Wed, 15 Jan 2025 21:21:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736976104;
-	bh=9TWMahBJxv0Fx7tGkIPVI77bNHYo41nONeIt3qjqxbE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=QoNlwnOiPqfSlE8B3jdrtQ6z0dNj+TBZVwaz1RQzJB22Hx5VMKwrarrpfefcpGAT2
-	 IypN47XCBrXLOYKSNXUsymQwkTyqMKq2e+aLAeST389haEhwlvoKnZqf3mBYOP0Qh6
-	 M7v4mw2ImDAkx0UiZlmCgOkLikiSl9xlqUdXcztzWZpSDkIUS/5DjNpe3o5R4eOMka
-	 0Zpb2GUKJRsyLB1acfubOobtyJ8v7tXFPFFRbog0+yQa5DKpa2ZAnbogBLkjKm7K6l
-	 PFUecXPgOZfPLeCVZVViOnGlYc7J5L5eo52lFqUrMXTXqb7/lAmef2EMKyEcIPJkuB
-	 U6G86UhClS4Uw==
-Date: Wed, 15 Jan 2025 13:21:42 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-Cc: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, Geliang
- Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon
- Horman <horms@kernel.org>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] mptcp: fix for setting remote ipv4mapped
- address
-Message-ID: <20250115132142.53db10b2@kernel.org>
-In-Reply-To: <20250114-net-next-mptcp-fix-remote-addr-v1-1-debcd84ea86f@kernel.org>
-References: <20250114-net-next-mptcp-fix-remote-addr-v1-1-debcd84ea86f@kernel.org>
+	s=arc-20240116; t=1736976156; c=relaxed/simple;
+	bh=uraepEbQJnaWY3X4oH+bHhZuel7YSuPlB/L4bjCLQwc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ogMKdT9CkvaILt+UVw8VX2o/L3/FNK4d0JHgJ5QQpBZGMBWdp97Phpf1LBvnGG2UQu5pV8WTFI8QoViTUPMK2GF9G6lgoYP8UFelCRCnmGGljGU+crGgagZi3pUEGvCm91Vn1AmDb66gZAqbyaRiW7UaebL5c2M4J6DqrB32CWI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ZJkAF7az; arc=none smtp.client-ip=91.218.175.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <80309f62-0900-4946-bb2c-d73a2b724739@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1736976137;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=e0Bgm5lCM/3V2FVS63iTi2McfY+jsPoi84BVnDZHNH4=;
+	b=ZJkAF7azXjdAaWgHQrqGQ5hfnYBRhjUmIXiplGGVuLtFFKn+OL9C3oFLjhIH0gaVdZwcuq
+	e5LBrowv2EYsx/Wo5ljGCNcZ7/2KrthA+kzDNaN8FfORHZNsL7tCUL28UghILR1+iyh9nc
+	5Q6uzabsV4+lzo9lplO+WRRsbfNPnF4=
+Date: Wed, 15 Jan 2025 13:22:10 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Subject: Re: [PATCH net-next v5 04/15] net-timestamp: support SK_BPF_CB_FLAGS
+ only in bpf_sock_ops_setsockopt
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, dsahern@kernel.org, willemdebruijn.kernel@gmail.com,
+ willemb@google.com, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
+ eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev,
+ john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me,
+ haoluo@google.com, jolsa@kernel.org, horms@kernel.org, bpf@vger.kernel.org,
+ netdev@vger.kernel.org
+References: <20250112113748.73504-1-kerneljasonxing@gmail.com>
+ <20250112113748.73504-5-kerneljasonxing@gmail.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+Content-Language: en-US
+In-Reply-To: <20250112113748.73504-5-kerneljasonxing@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, 14 Jan 2025 19:06:22 +0100 Matthieu Baerts (NGI0) wrote:
-> From: Geliang Tang <tanggeliang@kylinos.cn>
+On 1/12/25 3:37 AM, Jason Xing wrote:
+> We will allow both TCP and UDP sockets to use this helper to
+> enable this feature. So let SK_BPF_CB_FLAGS pass the check:
+> 1. skip is_fullsock check
+> 2. skip owned by me check
 > 
-> Commit 1c670b39cec7 ("mptcp: change local addr type of subflow_destroy")
-> introduced a bug in mptcp_pm_nl_subflow_destroy_doit().
+> Signed-off-by: Jason Xing <kerneljasonxing@gmail.com>
+> ---
+>   net/core/filter.c | 27 +++++++++++++++++++++------
+>   1 file changed, 21 insertions(+), 6 deletions(-)
 > 
-> ipv6_addr_set_v4mapped() should be called to set the remote ipv4 address
-> 'addr_r.addr.s_addr' to the remote ipv6 address 'addr_r.addr6', not
-> 'addr_l.addr.addr6', which is the local ipv6 address.
+> diff --git a/net/core/filter.c b/net/core/filter.c
+> index 1ac996ec5e0f..0e915268db5f 100644
+> --- a/net/core/filter.c
+> +++ b/net/core/filter.c
+> @@ -5507,12 +5507,9 @@ static int sol_ipv6_sockopt(struct sock *sk, int optname,
+>   					      KERNEL_SOCKPTR(optval), *optlen);
+>   }
+>   
+> -static int __bpf_setsockopt(struct sock *sk, int level, int optname,
+> -			    char *optval, int optlen)
+> +static int ___bpf_setsockopt(struct sock *sk, int level, int optname,
+> +			     char *optval, int optlen)
+>   {
+> -	if (!sk_fullsock(sk))
+> -		return -EINVAL;
+> -
+>   	if (level == SOL_SOCKET)
+>   		return sol_socket_sockopt(sk, optname, optval, &optlen, false);
+>   	else if (IS_ENABLED(CONFIG_INET) && level == SOL_IP)
+> @@ -5525,6 +5522,15 @@ static int __bpf_setsockopt(struct sock *sk, int level, int optname,
+>   	return -EINVAL;
+>   }
+>   
+> +static int __bpf_setsockopt(struct sock *sk, int level, int optname,
+> +			    char *optval, int optlen)
+> +{
+> +	if (!sk_fullsock(sk))
+> +		return -EINVAL;
+> +
+> +	return ___bpf_setsockopt(sk, level, optname, optval, optlen);
+> +}
+> +
+>   static int _bpf_setsockopt(struct sock *sk, int level, int optname,
+>   			   char *optval, int optlen)
+>   {
+> @@ -5675,7 +5681,16 @@ static const struct bpf_func_proto bpf_sock_addr_getsockopt_proto = {
+>   BPF_CALL_5(bpf_sock_ops_setsockopt, struct bpf_sock_ops_kern *, bpf_sock,
+>   	   int, level, int, optname, char *, optval, int, optlen)
+>   {
+> -	return _bpf_setsockopt(bpf_sock->sk, level, optname, optval, optlen);
+> +	struct sock *sk = bpf_sock->sk;
+> +
+> +	if (optname != SK_BPF_CB_FLAGS) {
+> +		if (sk_fullsock(sk))
+> +			sock_owned_by_me(sk);
+> +		else if (optname != SK_BPF_CB_FLAGS)
 
-Wasn't there a syzbot report for this? Just curious.
+This is redundant considering the outer "if" has the same check.
+
+Regardless, "optname != SK_BPF_CB_FLAGS" is not the right check. The new 
+callback (e.g. BPF_SOCK_OPS_TS_SCHED_OPT_CB) can still call 
+bpf_setsockopt(TCP_*) which will be broken without a lock.
+
+It needs to check for bpf_sock->op. I saw patch 5 has the bpf_sock->op check but 
+that check is also incorrect. I will comment in there together.
+
+> +			return -EINVAL;
+> +	}
+> +
+> +	return ___bpf_setsockopt(sk, level, optname, optval, optlen);
+>   }
+>   
+>   static const struct bpf_func_proto bpf_sock_ops_setsockopt_proto = {
+
 
