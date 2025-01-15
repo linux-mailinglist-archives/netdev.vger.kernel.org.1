@@ -1,100 +1,99 @@
-Return-Path: <netdev+bounces-158599-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158600-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ECD50A12A29
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 18:52:36 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E8CB4A12A41
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 18:54:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 09526165710
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 17:52:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 37C33188AD47
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 17:54:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1876F1CEE86;
-	Wed, 15 Jan 2025 17:52:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADFB8189F5C;
+	Wed, 15 Jan 2025 17:53:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="J0XThA8G"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DqkLEpP0"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE51F155C96;
-	Wed, 15 Jan 2025 17:52:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8968B5223
+	for <netdev@vger.kernel.org>; Wed, 15 Jan 2025 17:53:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736963549; cv=none; b=HeVrhWcy5T7nx7Xx4FEYpCPe7GWMMQeBrtb+PcpOq0dR8mj03eWkoWQ3YUt3g+9BWZ2L0lr0Fg7vZVMQ7OB3RO2hiTv9wNezvqgEQhBV6dM6Xw65LeZV7AaGKP7R3a8W3MqCR8IIpXQp7FsZZUIbx36meVtK2irNhNmkjROQ/yk=
+	t=1736963636; cv=none; b=ZbtsvPvtCDurL8HQ0DCS/sUJvv2JDIxPRji/69oRq2htUq+isGy8PVS0E1vKyyt+PjGRJNxDQYSqNBRc+hOGrFpjnWbR2UMH0TO8rOUDBLawBc8HYbRlDANRHCQke0DLwTlUplAfzc6c37xWkKadcFe0IMTpbvd/9vGh1LPUzg0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736963549; c=relaxed/simple;
-	bh=VYcycM89HGad3xDeQXmDWnM4z4M/2xtJvbd4aqls6q8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZzDehLOiuN4IJTqlnHQeEGWzjjdqRPqEsyi9MwjBJ4OFQTMiaZ5O7RfjbZlzzCLxOkdZunLWM8c/IMO5h2soKEiMlk9ZU4kU96JHtwXFub6JfLcn0BqN+Nh02qjknsXw0x9XmpNWqIFCjc0fedogVNC2BdOgk16JZqSg/Ldzq74=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=J0XThA8G; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CE1C9C4CED1;
-	Wed, 15 Jan 2025 17:52:21 +0000 (UTC)
+	s=arc-20240116; t=1736963636; c=relaxed/simple;
+	bh=MxM1f4F929uFKL3kH0qwfcmWJtgy9V/Xe2D6XWlWZQY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ZVd4GiBiX/sZddMixTIvo+qykJueZ6MfvnWnx4SUwKpfRRfEGb538G7rY/i/7IL45Kr9NeT++YPCtVi8XeLlfubp4S3tH+3lou2pdffuEBU5ga1sBF2hZlaRuxP0WBgKSxEsqVK/aAFZFegfzK+zadjuGmlo3TPxiQqfPwIqHVs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DqkLEpP0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CCB20C4CED1;
+	Wed, 15 Jan 2025 17:53:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736963546;
-	bh=VYcycM89HGad3xDeQXmDWnM4z4M/2xtJvbd4aqls6q8=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=J0XThA8GhIn92jHD/chbppU4szGH2PiJ+zvJVREsZKA4heQ5oTZbfCiu8xCbTtT8Q
-	 UnIXxU8q85HuAO7rInDWdlcmQW+WHoPQOgK2rmCaS9VA/RGUmnwurxdMzYYMebKAkv
-	 jx7zLNT72b9XaxhoXdKPpKrv0F/TAO7wA4RYFwddNuHnHKb+02BvpeitMhJEda39Mn
-	 ZN1pEsGpCkg+KTqxJOm/cPByiwYRHcXtxzFvw2SmuTfuovoC8gQe0Zw0vNhwIf4tQ9
-	 +NppnlnGVGwq5pBsKy81s+8zhYrEZUZU711k1q+t45+pxiStzaJd4GFZih0UOZKwXX
-	 7OLghYx51w53w==
-Message-ID: <5445fb43-a9c1-42df-874b-71dd51f1e848@kernel.org>
-Date: Wed, 15 Jan 2025 18:52:19 +0100
+	s=k20201202; t=1736963635;
+	bh=MxM1f4F929uFKL3kH0qwfcmWJtgy9V/Xe2D6XWlWZQY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=DqkLEpP0AdBqDn0+nwtn2lc1nYZboN7lSRuhuyZ/1od/+ndqHp5kPszu52q5JIxFL
+	 PahS3/cwZEyyjBHFGx1pqpmJlL+zjXm0+YBpP40e3SnfqCeETEbjGXpVFFqDgQWsYN
+	 pCW2IgY4WpoA7DjuCVWcWkdsij2NKymCfJMie9yMOXuVa2O1dNOYxCDxD7X01Ba4mR
+	 kxFAAA0/6tU+mNgaj6EmPO0gEFswFSq9tk5WnORL2Uu6hNGIHXP8tZlEbNvdQCVRMD
+	 yX2WwiQswzHW9eRfaVADMAdaK5ThHaV4wSuhjMzaz55FxCf01jXUUjJACJRc7JmTBZ
+	 S3eROr+AQedww==
+Date: Wed, 15 Jan 2025 09:53:53 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Paolo Abeni <pabeni@redhat.com>, David Miller <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>, Andrew
+ Lunn <andrew@lunn.ch>, Russell King - ARM Linux <linux@armlinux.org.uk>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [PATCH net-next v3 03/10] ethtool: allow ethtool op set_eee to
+ set an NL extack message
+Message-ID: <20250115095353.32a4f7e3@kernel.org>
+In-Reply-To: <545f25c5-a497-4896-8763-fe17568599ef@gmail.com>
+References: <5e36223a-ee52-4dff-93d5-84dbf49187b5@gmail.com>
+	<e3165b27-b627-41dd-be8f-51ab848010eb@gmail.com>
+	<20250114150043.222e1eb5@kernel.org>
+	<545f25c5-a497-4896-8763-fe17568599ef@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 3/8] bpf: cpumap: switch to GRO from
- netif_receive_skb_list()
-To: Alexander Lobakin <aleksander.lobakin@intel.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Lorenzo Bianconi <lorenzo@kernel.org>, Daniel Xu <dxu@dxuuu.xyz>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Andrii Nakryiko <andrii@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@kernel.org>,
- Martin KaFai Lau <martin.lau@linux.dev>, netdev@vger.kernel.org,
- bpf@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20250115151901.2063909-1-aleksander.lobakin@intel.com>
- <20250115151901.2063909-4-aleksander.lobakin@intel.com>
-Content-Language: en-US
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <20250115151901.2063909-4-aleksander.lobakin@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-
-
-On 15/01/2025 16.18, Alexander Lobakin wrote:
-> cpumap has its own BH context based on kthread. It has a sane batch
-> size of 8 frames per one cycle.
-> GRO can be used here on its own. Adjust cpumap calls to the upper stack
-> to use GRO API instead of netif_receive_skb_list() which processes skbs
-> by batches, but doesn't involve GRO layer at all.
-> In plenty of tests, GRO performs better than listed receiving even
-> given that it has to calculate full frame checksums on the CPU.
-> As GRO passes the skbs to the upper stack in the batches of
-> @gro_normal_batch, i.e. 8 by default, and skb->dev points to the
-> device where the frame comes from, it is enough to disable GRO
-> netdev feature on it to completely restore the original behaviour:
-> untouched frames will be being bulked and passed to the upper stack
-> by 8, as it was with netif_receive_skb_list().
+On Wed, 15 Jan 2025 18:46:35 +0100 Heiner Kallweit wrote:
+> On 15.01.2025 00:00, Jakub Kicinski wrote:
+> > On Sun, 12 Jan 2025 14:28:22 +0100 Heiner Kallweit wrote:  
+> >> diff --git a/include/linux/ethtool.h b/include/linux/ethtool.h
+> >> index f711bfd75..8ee047747 100644
+> >> --- a/include/linux/ethtool.h
+> >> +++ b/include/linux/ethtool.h
+> >> @@ -270,6 +270,7 @@ struct ethtool_keee {
+> >>  	__ETHTOOL_DECLARE_LINK_MODE_MASK(supported);
+> >>  	__ETHTOOL_DECLARE_LINK_MODE_MASK(advertised);
+> >>  	__ETHTOOL_DECLARE_LINK_MODE_MASK(lp_advertised);
+> >> +	struct netlink_ext_ack *extack;
+> >>  	u32	tx_lpi_timer;
+> >>  	bool	tx_lpi_enabled;
+> >>  	bool	eee_active;  
+> > 
+> > :S I don't think we have a precedent for passing extack inside 
+> > the paramter struct. I see 25 .set_eee callbacks, not crazy many.
+> > Could you plumb this thru as a separate argument, please?  
 > 
-> Signed-off-by: Alexander Lobakin<aleksander.lobakin@intel.com>
-> Tested-by: Daniel Xu<dxu@dxuuu.xyz>
-> ---
->   kernel/bpf/cpumap.c | 45 ++++++++++++++++++++++++++++++++++++++++++---
->   1 file changed, 42 insertions(+), 3 deletions(-)
+> I see your point regarding calling convention consistency.
+> Drawback of passing extack as a separate argument is that we would
+> have to do the same extension also to functions in phylib.
+> Affected are phy_ethtool_set_eee and genphy_c45_ethtool_set_eee,
+> because extack is to be used in the latter.
+> Passing extack within struct ethtool_keee we don't have to change
+> the functions in the call chain. So passing extack separately
+> comes at a cost. Is it worth it?
 
-Nice and clean code, I like it! :-)
-
-Acked-by: Jesper Dangaard Brouer <hawk@kernel.org>
+I doubt it will be uglier than stuffing transient pointers into a config
+struct. But we will only know for sure once the code is written..
 
