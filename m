@@ -1,142 +1,166 @@
-Return-Path: <netdev+bounces-158386-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158387-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E826A118B7
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 06:07:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6375DA118BA
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 06:07:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 186073A730D
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 05:07:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0894C3A726D
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 05:07:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C003522E3F7;
-	Wed, 15 Jan 2025 05:07:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1891B22F3BD;
+	Wed, 15 Jan 2025 05:07:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="ojNFcQ6q"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C5514C6C;
-	Wed, 15 Jan 2025 05:07:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A00B22E40A
+	for <netdev@vger.kernel.org>; Wed, 15 Jan 2025 05:07:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736917656; cv=none; b=aod4zhrsaixi54AEKBTTZ3QxUM3L/EX0POt9YHyv5xgQq+/w3Uq1Z5oSYnF73OZmOMTJEWX+e5w4pRPtyCANClxOtemwMGuFqrQTdAQJSvkZGkHrL98C8A1Z2urbO5zea7l+QIHHpfSdB0HU5mTpsfnflgXz517zaluh6xkEJTk=
+	t=1736917663; cv=none; b=HjVhGvROt8JzppisWiORK0Q14eaB0iP5axVFY+bOYLAZyQKrNQE6nGfng9B1k+1NYVqCDVwqBhKDpJASIvYT7CAXZvHNrFuJ7Zy8JquQariqRPUBkfmpP+fa+0wkF1747BsRdbtg18DQ1F06Qru+fAVGdqmbIjUduxxV8El6+PY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736917656; c=relaxed/simple;
-	bh=gGhcTfxRbAcekrj1K5nAiEt1uTYwmJGCNFmFwJ9Pyi0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BMVXR4c/aghy1YYqbEyfrf6CKj976HWrXtzEhHDJqZ+708oA2vYIJsZ6KdfddIzqewbertJBhXApSGOxushmlpwAjAWU/AIuor90kbxx1Ce5qkDMwD3o8O2P5M6pXdZmC4uprTXpEu5WBEpM574b5sbwIlPiE3hQoF5UIm6p334=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.98)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1tXvck-000000006yc-0TuA;
-	Wed, 15 Jan 2025 05:07:26 +0000
-Date: Wed, 15 Jan 2025 05:07:22 +0000
-From: Daniel Golle <daniel@makrotopia.org>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net] net: phy: realtek: clear status if link is down
-Message-ID: <Z4dCig1kd-BhSHqD@makrotopia.org>
-References: <229e077bad31d1a9086426f60c3a4f4ac20d2c1a.1736901813.git.daniel@makrotopia.org>
- <7dd12859-dd20-4ce1-a877-4c93b335b911@lunn.ch>
+	s=arc-20240116; t=1736917663; c=relaxed/simple;
+	bh=t4dXpTZmsRI2k2NZ4xiQUhN5dBPeJttIl5lhtigwHU8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Ko0ykkN1hkZofWitJid9NxC4EsxQTNzzv5PTeX4hLAjtMTREFhQsNbE5e8OcVFnLnU1xsGZ1yaHg8kl7cvBIkzvqCw6MuUXDeDI+ImYwf/rahi5kowUmBaYGttOYM8dsUEEADQgqDnMqmI8gfg6adhjzqBfnSgjIFOciT/SM040=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=pass smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=ojNFcQ6q; arc=none smtp.client-ip=209.85.214.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=daynix.com
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-2163bd70069so114563145ad.0
+        for <netdev@vger.kernel.org>; Tue, 14 Jan 2025 21:07:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1736917660; x=1737522460; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=tJj2ax30G5cYMMuz85Qw6SCJDIZ/bbwOrDlSPLFGRgM=;
+        b=ojNFcQ6qbQMsuh63BrZPD2cg5u7/AjaUXt9B7ekVeZhZM8dOXf3eAAuYd+TBljvKwK
+         JtNVSsZSxxxJMsHDenuRv66Q+3LiW/CEFkGmFZ15GfcB1tGh258PdjinToYMY6fN5CT9
+         yLK/AIBtJTJJwU1XATwHLqPmqX6dv8V9mBOPQ6Rx1Sfri9vVUE/+dgN+cKHNzxg2ivhk
+         m7ysgpWjGkfKAPQDfwx20th4mSNaYEPeGZwe/pPtPrlYgMFWu6FprvmzyPayoSWQys1k
+         2nGX8N5IF/6m1UIIXjlIlqdAOoj5xaQRHCPESiDfRHfQYqYL7WKNb6iJHI4t1rnWxhjb
+         XD/g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736917660; x=1737522460;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=tJj2ax30G5cYMMuz85Qw6SCJDIZ/bbwOrDlSPLFGRgM=;
+        b=GUyjQGDZxd+A8HWUBYXilpSaEEy/192r2ZNjYZGJm81R2tZtklchh15aa0RudZgtJb
+         ZWOpAH4dEow9f8wTmdV8yIPoT5tF/Z2CLuGq8BzS7jksntK+an7Uk8XUAP/2V4cC9Kr0
+         v1pQDwDPLo1tYfig8BVZJR0gDuBjyrdkTb6z0R8WH81N1hTJm57tIuTrQp68VCHnqpEH
+         2DszSQWLLb6gqYCPBl5VSFDvBbpPKq+9n5obYVbAEP7EKJhj6/I1E5qIQBuD+Lr0weAK
+         ys0+2Z0WpSaz9DVtMAIttmPHQLsRxccTX8evhOKfB8NvH3Mtp1s1A23BJtlAUDfAoELw
+         YdaQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVQLJ/w56t0UK2/6a77NB3TC0Ql/4fGaLc7y+9Mk6ZI7kI3JowdepPGQQsQTnLrI16ItqZGenw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwHIV4J3jLpy74iuMoUTSmSxhisABvJWeUmsVobyIuauVwX5652
+	5t1T94p0t6Fr6UcYA8CiTsaWciNxC0kUr+MwzHqJAAaEfcUOcOcsV8CBmU8d+CM=
+X-Gm-Gg: ASbGncsyBzpE3FJm7Oh6WwNYp5cGWsty9OsvgXjXpM7ATe28HUQXCts+djbMudHyam0
+	ygb71rrWRIFgbN6kgXc7kxq6JfmxGuLj5tCb1K5LxXQxZ29VbLgMhPnvcJZ0Osv+LSXqkCg1ucn
+	FWq34ff02xDZx2YC0kNNch3NNpIgVHRFGSX7WGv1lxd4lmm61CB2hHqy8gWuW9kPxYI7KNqwO9e
+	MHZpSAJVg+QFk4XPHx2AzWoYxIRGhFJ2SH9UpLE1VUqKrDFNxtsmSVqki68viLUlBA=
+X-Google-Smtp-Source: AGHT+IH85/A6RLxL+2rEhiloGI8TMEvrvGtTvROtv7Pjqakmsz8YgZ7ly7fq+kIggy8KHNzrf4rkjg==
+X-Received: by 2002:a17:902:ea0a:b0:216:3083:d03d with SMTP id d9443c01a7336-21a83ffc447mr470885135ad.44.1736917659024;
+        Tue, 14 Jan 2025 21:07:39 -0800 (PST)
+Received: from [157.82.203.37] ([157.82.203.37])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21a9f10e41csm73994625ad.11.2025.01.14.21.07.33
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 14 Jan 2025 21:07:38 -0800 (PST)
+Message-ID: <fcb301e8-c808-4e20-92dd-2e3b83998d18@daynix.com>
+Date: Wed, 15 Jan 2025 14:07:32 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7dd12859-dd20-4ce1-a877-4c93b335b911@lunn.ch>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 3/3] tun: Set num_buffers for virtio 1.0
+To: Jason Wang <jasowang@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Shuah Khan <shuah@kernel.org>,
+ linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, kvm@vger.kernel.org,
+ virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org,
+ Yuri Benditovich <yuri.benditovich@daynix.com>,
+ Andrew Melnychenko <andrew@daynix.com>,
+ Stephen Hemminger <stephen@networkplumber.org>, gur.stavi@huawei.com,
+ devel@daynix.com
+References: <20250109-tun-v2-0-388d7d5a287a@daynix.com>
+ <20250109-tun-v2-3-388d7d5a287a@daynix.com>
+ <CACGkMEsm5DCb+n3NYeRjmq3rAANztZz5QmV8rbPNo+cH-=VzDQ@mail.gmail.com>
+ <20250110052246-mutt-send-email-mst@kernel.org>
+ <2e015ee6-8a3b-43fb-b119-e1921139c74b@daynix.com>
+ <CACGkMEuiyfH-QitiiKJ__-8NiTjoOfc8Nx5BwLM-GOfPpVEitA@mail.gmail.com>
+Content-Language: en-US
+From: Akihiko Odaki <akihiko.odaki@daynix.com>
+In-Reply-To: <CACGkMEuiyfH-QitiiKJ__-8NiTjoOfc8Nx5BwLM-GOfPpVEitA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Hi Andrew,
-
-On Wed, Jan 15, 2025 at 03:50:33AM +0100, Andrew Lunn wrote:
-> On Wed, Jan 15, 2025 at 12:46:11AM +0000, Daniel Golle wrote:
-> > Clear speed, duplex and master/slave status in case the link is down
-> > to avoid reporting bogus link(-partner) properties.
-> > 
-> > Fixes: 5cb409b3960e ("net: phy: realtek: clear 1000Base-T link partner advertisement")
-> > Signed-off-by: Daniel Golle <daniel@makrotopia.org>
-> > ---
-> >  drivers/net/phy/realtek.c | 20 ++++++++++++++------
-> >  1 file changed, 14 insertions(+), 6 deletions(-)
-> > 
-> > diff --git a/drivers/net/phy/realtek.c b/drivers/net/phy/realtek.c
-> > index f65d7f1f348e..3f0e03e2abce 100644
-> > --- a/drivers/net/phy/realtek.c
-> > +++ b/drivers/net/phy/realtek.c
-> > @@ -720,8 +720,12 @@ static int rtlgen_read_status(struct phy_device *phydev)
-> >  	if (ret < 0)
-> >  		return ret;
-> >  
-> > -	if (!phydev->link)
-> > +	if (!phydev->link) {
-> > +		phydev->duplex = DUPLEX_UNKNOWN;
-> > +		phydev->master_slave_state = MASTER_SLAVE_STATE_UNKNOWN;
-> > +		phydev->speed = SPEED_UNKNOWN;
-> >  		return 0;
-> > +	}
-> >  
+On 2025/01/13 12:04, Jason Wang wrote:
+> On Fri, Jan 10, 2025 at 7:12 PM Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
+>>
+>> On 2025/01/10 19:23, Michael S. Tsirkin wrote:
+>>> On Fri, Jan 10, 2025 at 11:27:13AM +0800, Jason Wang wrote:
+>>>> On Thu, Jan 9, 2025 at 2:59 PM Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
+>>>>>
+>>>>> The specification says the device MUST set num_buffers to 1 if
+>>>>> VIRTIO_NET_F_MRG_RXBUF has not been negotiated.
+>>>>
+>>>> Have we agreed on how to fix the spec or not?
+>>>>
+>>>> As I replied in the spec patch, if we just remove this "MUST", it
+>>>> looks like we are all fine?
+>>>>
+>>>> Thanks
+>>>
+>>> We should replace MUST with SHOULD but it is not all fine,
+>>> ignoring SHOULD is a quality of implementation issue.
+>>>
 > 
-> I must be missing something here...
+> So is this something that the driver should notice?
 > 
+>>
+>> Should we really replace it? It would mean that a driver conformant with
+>> the current specification may not be compatible with a device conformant
+>> with the future specification.
 > 
-> rtlgen_read_status() first calls genphy_read_status(phydev);
-> [...]
-> Why is that not sufficient ?
+> I don't get this. We are talking about devices and we want to relax so
+> it should compatibile.
 
-The problem are the stale NBase-T link-partner advertisement bits and the
-subsequent call to phy_resolve_aneg_linkmode(), which results in bogus
-speed and duplex, based on previously connected link partner advertising
-2500Base-T, 5GBase-T or 10GBase-T modes.
 
-The more elegant solution I found by now is to just always call
-mii_10gbt_stat_mod_linkmode_lpa_t(phydev->lp_advertising, 0);
-before calling rtlgen_read_status().
-In case the link is up, rtlgen_decode_physr() will anyway set speed and
-duplex.
+The problem is:
+1) On the device side, the num_buffers can be left uninitialized due to bugs
+2) On the driver side, the specification allows assuming the num_buffers 
+is set to one.
 
-> > @@ -1041,8 +1045,12 @@ static int rtl822x_c45_read_status(struct phy_device *phydev)
-> >  		mii_stat1000_mod_linkmode_lpa_t(phydev->lp_advertising, val);
-> >  	}
-> >  
-> > -	if (!phydev->link)
-> > +	if (!phydev->link) {
-> > +		phydev->duplex = DUPLEX_UNKNOWN;
-> > +		phydev->master_slave_state = MASTER_SLAVE_STATE_UNKNOWN;
-> > +		phydev->speed = SPEED_UNKNOWN;
-> >  		return 0;
-> > +	}
+Relaxing the device requirement will replace "due to bugs" with 
+"according to the specification" in 1). It still contradicts with 2) so 
+does not fix compatibility.
+
+Instead, we should make the driver requirement stricter to change 2). 
+That is what "[PATCH v3] virtio-net: Ignore num_buffers when unused" does:
+https://lore.kernel.org/r/20250110-reserved-v3-1-2ade0a5d2090@daynix.com
+
 > 
+>>
+>> We are going to fix all implementations known to buggy (QEMU and Linux)
+>> anyway so I think it's just fine to leave that part of specification as is.
 > 
-> rtl822x_c45_read_status() calls genphy_c45_read_link() which again
-> clears state from phydev.
+> I don't think we can fix it all.
 
-rtl822x_c45_read_status() calls genphy_c45_read_status(), which calls
-genphy_c45_read_lpa(), and that doesn't clear either
-ETHTOOL_LINK_MODE_1000baseT_Half_BIT nor ETHTOOL_LINK_MODE_1000baseT_Full_BIT
-as there is no generic handling for 1000Base-T in Clause-45.
+It essentially only requires storing 16 bits. There are details we need 
+to work out, but it should be possible to fix.
 
-So also in the Clause-45 case, the subsequent call to
-phy_resolve_aneg_linkmode() may then wrongly populate speed and duplex, this
-time according to the stale 1000baseT bits.
-
-Moving the call to rtl822x_c45_read_status() in rtl822x_c45_read_status() to
-after the 1000baseT lpa bits have been taken care of fixes that part of the
-issue.
-
-Clearing master_slave_state in the C45 case is still necessary because it isn't
-done by genphy_c45_read_status().
-
-I will post a series replacing this patch for all 3 described changes.
+Regards,
+Akihiko Odaki
 
