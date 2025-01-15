@@ -1,157 +1,160 @@
-Return-Path: <netdev+bounces-158592-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158593-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB246A129D1
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 18:26:18 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 81B85A129D4
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 18:28:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0D48E1676DE
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 17:26:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1F8653A0F9E
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 17:27:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA6FA1C07EE;
-	Wed, 15 Jan 2025 17:25:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51B0719DF5B;
+	Wed, 15 Jan 2025 17:27:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="SOPkBzoe";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="Gf0Z5MB3"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="WMRWc7am"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-a3-smtp.messagingengine.com (fhigh-a3-smtp.messagingengine.com [103.168.172.154])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 616A543ACB;
-	Wed, 15 Jan 2025 17:25:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.154
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB2591791F4
+	for <netdev@vger.kernel.org>; Wed, 15 Jan 2025 17:27:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736961950; cv=none; b=C7jTR72YtTVxs/F4kTe0dWqt77b5CDhoKdHoKN5+W0QKCOxQUgthAtPXcffklVQER8zwdU9/FAONSuKuR3QjG+zN8ySyC7NMWLKage4Z1+Pv2kNDwGiITVZQ3BZIHS9mvhksAdl/ulZLvXwARSs7loI+knDWC4XJ120psbpl204=
+	t=1736962079; cv=none; b=VaHCnqudzAtp54920zNLjcH/RI7VRqwqGZ+w3ucN/KYGKkWC4VflVobTAaFNaFzfbrYJCweb22DGmClOTb4xVQrwOFo3gRFkAksXYX9oN/B2vr8VvGMwdgLlbF2wF6P6jutg5cfL7r88NSZRYYcxMl7NG4aQ+0DnSYt7EkjZbPY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736961950; c=relaxed/simple;
-	bh=L/y/gio9PHgozPJQ5DdFgec3HVA+WmVn2Yosa/ULK/M=;
+	s=arc-20240116; t=1736962079; c=relaxed/simple;
+	bh=f/xxnvYf1WfyPjbaimC3LeW5A2HjNMbGHsQX1VteAd8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=h+Ov6yhHEGIgRzLU3/Ga2auY4uOzrFxd+YRdnAvhY1ZeCetu10mewSaIMg6doM6rJMcqMrLT6fj2pwcDcFKbu3zuSN4jSaf/bXXZEyrLPVE9d85imqnXPopRwItXzJAjxCH0nJtalYfSxvcimsk96NnWxP05oqWamxoU9fTGqfw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=SOPkBzoe; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=Gf0Z5MB3; arc=none smtp.client-ip=103.168.172.154
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-09.internal (phl-compute-09.phl.internal [10.202.2.49])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id 53A75114017A;
-	Wed, 15 Jan 2025 12:25:46 -0500 (EST)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-09.internal (MEProxy); Wed, 15 Jan 2025 12:25:46 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm3; t=1736961946; x=
-	1737048346; bh=yj/IsjT0ULiPtO76mLIqcNBspRAdw74njWDzregRk4A=; b=S
-	OPkBzoeR3sU0W8SJW0BxpdupLdfVxNkLTzq3D4PhITXJzWPYxy56UiQLIqD+KwLB
-	wzx4yd8JZQcrOO8tVkKcaVxPFbltNXRu4oM/G1DbmOTpbn9bpDklzJmhbsxlJ3G1
-	oIw/VuguGPmASTE2RpqukqavwT4MYYtx0WPoZikZEFvNQAt5kqgTy4lKnTM59YGj
-	JFUojxw24DHZEtjMZyuKfQ4Po1TGM+NSI9DrbYeD7SlpyGdRXa9YKgmwvsg3jmUC
-	D8QndnLVJMEl+ybkBdTZ2+6Vj5jP8Zgf9DvUSC2pJ0+BSYtHnuY3GvxlCL65iVuM
-	oiWD8fBs4d92ina1m4Umg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
-	1736961946; x=1737048346; bh=yj/IsjT0ULiPtO76mLIqcNBspRAdw74njWD
-	zregRk4A=; b=Gf0Z5MB34TFHCZstZpWY6QPp/MNd2/Lmqtyeb4MEvRtdyZpqbXi
-	jnzT0CtsFbMBtIF5fnRHKq2EZBlAdIkWTGLF4JdA21A2PDbP0B+8m2hpbV2dIsK0
-	H6MFjrpWUHZ2N8SfIJTGXgXwqUWBKm+tPRaOHCekL48WzCk1OuS8SBZiRbsGMEld
-	qpFvodyD47mwj3iEYRD+gJxX2a8BN0QC+FtyreGamgkR007Xz/q/w9YtmMIx8Ere
-	CEhdo82WWvHKdkAC3ux1dmWSrYV7eaH1GfhQXJ8RXplbDeDgRWSnkZaQJxIJYgkt
-	S1uXefX/nsZJT3j7YYAUQckg/zvmJ9K1swA==
-X-ME-Sender: <xms:me-HZwXv2Het-Bo3gDp8ev62BLDNt3dE5d7AQ_2E0ZqZbsPQQEdC_g>
-    <xme:me-HZ0lfruSFtiUT-T3-tO-vU-u9CQOmWvl1clXlDPp5Fp2JOE1bnOluLK4wDBkMK
-    qRjdZAZIkT7nivRDSA>
-X-ME-Received: <xmr:me-HZ0aAhiS5ScO2S-DQqSA9Bv5r2XQHvS62tKqFk7VqYBw8nrWX-Qvy8Op1>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrudehledgjeegucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
-    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
-    htshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtredttddtjeen
-    ucfhrhhomhepufgrsghrihhnrgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrg
-    hilhdrnhgvtheqnecuggftrfgrthhtvghrnhepuefhhfffgfffhfefueeiudegtdefhfek
-    geetheegheeifffguedvuefffefgudffnecuvehluhhsthgvrhfuihiivgeptdenucfrrg
-    hrrghmpehmrghilhhfrhhomhepshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggp
-    rhgtphhtthhopedufedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtoheprghnthhonh
-    hiohesohhpvghnvhhpnhdrnhgvthdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdho
-    rhhgpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhope
-    hnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopegvughumhgr
-    iigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepughonhgrlhgurdhhuhhnthgvrh
-    esghhmrghilhdrtghomhdprhgtphhtthhopehshhhurghhsehkvghrnhgvlhdrohhrghdp
-    rhgtphhtthhopehrhigriigrnhhovhdrshdrrgesghhmrghilhdrtghomhdprhgtphhtth
-    hopegrnhgurhgvfidonhgvthguvghvsehluhhnnhdrtghh
-X-ME-Proxy: <xmx:me-HZ_Xt7p0hoWuLpl70YZQhEYNrXrZQSjap42s3l9LXQiX9cPzBfw>
-    <xmx:me-HZ6kzpfjlNneShT473xgNo1G7qvEl80JQXwQQ6xhRt7R6JEUs6g>
-    <xmx:me-HZ0dxc_nPDJrglcLVqYahmghfz0ow8Ry7hkehvLbQffSu5cqjQA>
-    <xmx:me-HZ8GW_l9VkDELXHtAuKh-Pj-ds14DD1NrRIfpXb4NxlwJC3Wo1w>
-    <xmx:mu-HZwmT09v6y9uvrbBdUdGC9VMzDjEE-kEtNDT347prHvsMlR_IxkRZ>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 15 Jan 2025 12:25:45 -0500 (EST)
-Date: Wed, 15 Jan 2025 18:25:43 +0100
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Antonio Quartulli <antonio@openvpn.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Shuah Khan <shuah@kernel.org>, ryazanov.s.a@gmail.com,
+	 Content-Type:Content-Disposition:In-Reply-To; b=MhcvfMkK2WzOmDiRphTcJbZS9PfAbr4+64fbdmoMORcdp+jU7NPDoVdgWBX204ssI3p2YSbJigdTN0Apc6QaPgIoSSKUn59jmNymo09lBG1Fx+0DJd5gVJeY0abW0eg3z23sLGHumO3lyi+yLUBpr00C6nZqg8rIi0xJSgrTS78=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=WMRWc7am; arc=none smtp.client-ip=209.85.214.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-2166651f752so159516455ad.3
+        for <netdev@vger.kernel.org>; Wed, 15 Jan 2025 09:27:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fastly.com; s=google; t=1736962077; x=1737566877; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=X/tOyA1p7QjHDsifRN5k+/Gb8kyRYOVF0Azt3OIzzyw=;
+        b=WMRWc7am3w1CVgd1NdD3Sta5iNOY7Loi4qude8FMJaR5Tv8wvH0GaEgEcLKisNTylV
+         c7yKpoIjiL1H63qjUANHmkvCehMeH8ChvgWZ5CicRO5StS+50KunHNqz9GpaAhbkz1ww
+         QkhiN5IbawLZlyFaSaXuhtSIuKOuNUgqZc9aw=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736962077; x=1737566877;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=X/tOyA1p7QjHDsifRN5k+/Gb8kyRYOVF0Azt3OIzzyw=;
+        b=mI9HwlQ/b/ss/6/pQbJ2SjHpw+dR5vdstcB8AXBlP0Vnmh47ZMn9JUGSCqDsgm8nrK
+         DRJlGr31VNBdRuIDgFK8dkC8wJsiMhVLqPDYQBUm9WcLSUZIE8SifZPIvgQgQGQ5SYRF
+         851H/3LL8MceZRs3J1tO6w6A0n9OyUZYZil1CXi1/xmGZJCU1+DfPwVLSqho8mhkUm7i
+         fz+I3W74rcNWx0jDBIH+2VqjUb95tRy2ddsP/jFKklg//8Y6ijhm4ZrAHSyvWp9ukpE+
+         TWr9BVWJoy4jVWVkC72Dx3m2GbmYpp++Kcq3FR6xzzVIF298SQFoQUFiAl1hTpxVQZj7
+         9ilw==
+X-Gm-Message-State: AOJu0YxZWsTeh/E1JDD7hoviXrJXHGJDyJ0BYpi7zuxjofvmuVFtNVVY
+	nzFBThlQrIw7MbYDQXrLoq0oGuj+FwgJEI+Zi/Op4XQhjngXxaTeztyKdccUimw=
+X-Gm-Gg: ASbGncvKSrJrHrTaNGhXxeWNcGfkmPyh8RLoRtqfL2bgeMtS6ntsqidaln1afZ6SIql
+	RbMzeIzbh5f/0uRbrIhUX75KjZNf8VE6c64pBb7SHvCyn3BVqA0R5Cy/Y+0jPdPtx9STdcWL5kX
+	zKJbrccatSBG/8EVttoFchM9YfXEAaEHIwT/1IhJoVAbxBunCx6GSKIwXZadrIXlitgLST6Xonm
+	Dkv4nnA8zUp1JiO90EsQqAGp//9TXdk2i1qEXGmFduhnchWVRfGh6FOdadVeXEBmXfJ/uS+j6wH
+	77YfjwJ8eAlxyrHPzLHuYd0=
+X-Google-Smtp-Source: AGHT+IGksVKSylJkV0LbwF+RW3gakMaxvSakIRb83Rj9Zk5r6cV3J0tIrcgSWtS1CavXnppBEpmgAQ==
+X-Received: by 2002:a05:6a00:1906:b0:72a:bc6a:3a85 with SMTP id d2e1a72fcca58-72d22007a0emr30575531b3a.22.1736962076898;
+        Wed, 15 Jan 2025 09:27:56 -0800 (PST)
+Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72d405485b7sm9320991b3a.2.2025.01.15.09.27.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 15 Jan 2025 09:27:56 -0800 (PST)
+Date: Wed, 15 Jan 2025 09:27:53 -0800
+From: Joe Damato <jdamato@fastly.com>
+To: Furong Xu <0x1207@gmail.com>
+Cc: netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, Xiao Liang <shaw.leon@gmail.com>
-Subject: Re: [PATCH net-next v18 12/25] ovpn: implement TCP transport
-Message-ID: <Z4fvl9Rk1tuD7Oq7@hog>
-References: <20250113-b4-ovpn-v18-0-1f00db9c2bd6@openvpn.net>
- <20250113-b4-ovpn-v18-12-1f00db9c2bd6@openvpn.net>
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, xfr@outlook.com
+Subject: Re: [PATCH net-next v2 3/3] net: stmmac: Optimize cache prefetch in
+ RX path
+Message-ID: <Z4fwGc50mAfrMmYJ@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	Furong Xu <0x1207@gmail.com>, netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, xfr@outlook.com
+References: <cover.1736777576.git.0x1207@gmail.com>
+ <668cfa117e41a0f1325593c94f6bb739c3bb38da.1736777576.git.0x1207@gmail.com>
+ <Z4bzuToquRAMfvvu@LQ3V64L9R2>
+ <20250115103358.00005b57@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250113-b4-ovpn-v18-12-1f00db9c2bd6@openvpn.net>
+In-Reply-To: <20250115103358.00005b57@gmail.com>
 
-@maintainers could I get another day or two to poke at the new socket
-release mechanism? I haven't had time to look at it in depth yet.
+On Wed, Jan 15, 2025 at 10:33:58AM +0800, Furong Xu wrote:
+> On Tue, 14 Jan 2025 15:31:05 -0800, Joe Damato <jdamato@fastly.com> wrote:
+> 
+> > On Mon, Jan 13, 2025 at 10:20:31PM +0800, Furong Xu wrote:
+> > > Current code prefetches cache lines for the received frame first, and
+> > > then dma_sync_single_for_cpu() against this frame, this is wrong.
+> > > Cache prefetch should be triggered after dma_sync_single_for_cpu().
+> > > 
+> > > This patch brings ~2.8% driver performance improvement in a TCP RX
+> > > throughput test with iPerf tool on a single isolated Cortex-A65 CPU
+> > > core, 2.84 Gbits/sec increased to 2.92 Gbits/sec.
+> > > 
+> > > Signed-off-by: Furong Xu <0x1207@gmail.com>
+> > > ---
+> > >  drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 5 +----
+> > >  1 file changed, 1 insertion(+), 4 deletions(-)
+> > > 
+> > > diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> > > index ca340fd8c937..b60f2f27140c 100644
+> > > --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> > > +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> > > @@ -5500,10 +5500,6 @@ static int stmmac_rx(struct stmmac_priv *priv, int limit, u32 queue)
+> > >  
+> > >  		/* Buffer is good. Go on. */
+> > >  
+> > > -		prefetch(page_address(buf->page) + buf->page_offset);
+> > > -		if (buf->sec_page)
+> > > -			prefetch(page_address(buf->sec_page));
+> > > -
+> > >  		buf1_len = stmmac_rx_buf1_len(priv, p, status, len);
+> > >  		len += buf1_len;
+> > >  		buf2_len = stmmac_rx_buf2_len(priv, p, status, len);
+> > > @@ -5525,6 +5521,7 @@ static int stmmac_rx(struct stmmac_priv *priv, int limit, u32 queue)
+> > >  
+> > >  			dma_sync_single_for_cpu(priv->device, buf->addr,
+> > >  						buf1_len, dma_dir);
+> > > +			prefetch(page_address(buf->page) + buf->page_offset);  
+> > 
+> > Minor nit: I've seen in other drivers authors using net_prefetch.
+> > Probably not worth a re-roll just for something this minor.
+> 
+> After switch to net_prefetch(), I get another 4.5% throughput improvement :)
+> Thanks! This definitely worth a v3 of this series.q
 
+No worries. For what it's worth, it looks like there are a few other
+instances in this driver where net_prefetch or net_prefetchw can be
+used instead. That might be better as a followup / cleanup and
+separate from this series though.
 
-Just a small thing I saw on this patch:
-
-2025-01-13, 10:31:31 +0100, Antonio Quartulli wrote:
-> +int ovpn_tcp_socket_attach(struct socket *sock, struct ovpn_peer *peer)
-> +{
-> +	struct strp_callbacks cb = {
-> +		.rcv_msg = ovpn_tcp_rcv,
-> +		.parse_msg = ovpn_tcp_parse,
-> +	};
-> +	int ret;
-> +
-> +	/* make sure no pre-existing encapsulation handler exists */
-> +	if (sock->sk->sk_user_data)
-> +		return -EBUSY;
-> +
-> +	/* only a fully connected socket is expected. Connection should be
-> +	 * handled in userspace
-> +	 */
-> +	if (sock->sk->sk_state != TCP_ESTABLISHED) {
-> +		net_err_ratelimited("%s: provided TCP socket is not in ESTABLISHED state: %d\n",
-> +				    netdev_name(peer->ovpn->dev),
-> +				    sock->sk->sk_state);
-> +		return -EINVAL;
-> +	}
-> +
-> +	ret = strp_init(&peer->tcp.strp, sock->sk, &cb);
-> +	if (ret < 0) {
-> +		DEBUG_NET_WARN_ON_ONCE(1);
-> +		release_sock(sock->sk);
-
-Leftover from the old locking scheme. Could probably get snipped when
-applying if we decide this version is good otherwise.
-
-> +		return ret;
-> +	}
-
--- 
-Sabrina
+Just thought I'd mention it as you have a way to test the
+improvements and I, unfortunately, do not have one of these devices.
 
