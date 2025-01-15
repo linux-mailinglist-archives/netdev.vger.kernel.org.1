@@ -1,243 +1,220 @@
-Return-Path: <netdev+bounces-158645-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158646-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3484FA12CE3
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 21:43:45 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC142A12D0C
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 21:55:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6161E3A5CFC
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 20:43:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C1C8E165ABA
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 20:55:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BF401D9A42;
-	Wed, 15 Jan 2025 20:43:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="LDbFJ4Qk"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D93901DA103;
+	Wed, 15 Jan 2025 20:55:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from GBR01-CWX-obe.outbound.protection.outlook.com (mail-cwxgbr01on2120.outbound.protection.outlook.com [40.107.121.120])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A3C51D7E50
-	for <netdev@vger.kernel.org>; Wed, 15 Jan 2025 20:43:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736973817; cv=none; b=nadoTV/S/XEe3wp3Nu/oiNwv0U6Y1resNV1qEUhGZ31tAQCh2OTOSY101Wp94lVBj4MrtycQN8OE5MEzGXcs+ULjRzRvSJb2AhKHnb7f02IlDA8p3OVRSHbroxs/nax5Orpuu09HqYCX4DvU9E7HuQNfHxwBoGEurJ3KwLYhZuM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736973817; c=relaxed/simple;
-	bh=6T1js98y0EX55b/RcgrFuX9l3OI/wKBvW5tSE5twV7U=;
-	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
-	 Content-Disposition:Content-Type:Message-Id:Date; b=Ll+G3LAEL69sXXk4NmyYafAKn61h5V33QQ8JzDTApqj5xoLuSSUU57xNsJYlPq0v890yi5P+sjikI3NwCUPHQVHhMqVZHNE3zbFBTT1DkzfNLh63VURycArYUSqTj/1lTsDuXq/ylbmOj5vq8ZejbAW5klHdnDwamBNEbRg9v8g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=LDbFJ4Qk; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
-	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:References:
-	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=7jcj0txGAoHtohXQbAt4zFKAwHo8/26e2bsJp7vmIqw=; b=LDbFJ4Qkq3ba/gJmHwfnyWAbPV
-	oRg5PUD4IVGx3uIrQK8hvE+rOve95NR0QOMBHeBuFk2V6kijNo6O9N2iwZ0wRU1hw2dYTyrgL4r+r
-	BYnnwN3rAZrtpuE/Zr13aBFEdzPOsBNwIHekMC8QqqkxasZf8G9n7a+y6nSfz3feJXnvDhg4BL/uV
-	iPJQAOBCizeNKfN//KnYIf8kuEISEm7ADuTeNGAz/ewckTlvVDCUS3xzSoAS/8ezjtPsxQ+1vlLZd
-	7GNdNNt07Za0g+8ZnoGv8a9RAczu37HOqF00XaSNY7+W9sIawoinBlUjuj1lQgZtKVYd23t55YIRV
-	2YhFZ8LA==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:56070 helo=rmk-PC.armlinux.org.uk)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <rmk@armlinux.org.uk>)
-	id 1tYAEZ-0001kX-24;
-	Wed, 15 Jan 2025 20:43:27 +0000
-Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1tYAEG-0014QH-9O; Wed, 15 Jan 2025 20:43:08 +0000
-In-Reply-To: <Z4gdtOaGsBhQCZXn@shell.armlinux.org.uk>
-References: <Z4gdtOaGsBhQCZXn@shell.armlinux.org.uk>
-From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Bryan Whitehead <bryan.whitehead@microchip.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Marcin Wojtas <marcin.s.wojtas@gmail.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>,
-	UNGLinuxDriver@microchip.com
-Subject: [PATCH net-next 9/9] net: stmmac: convert to phylink managed EEE
- support
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2CC21D88BE;
+	Wed, 15 Jan 2025 20:55:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.121.120
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1736974515; cv=fail; b=ctt+8di1x/thTiAEzSibMayz/QMNfTXUaotgQa4iG/MJZNRmAa56Ol3DFJ+rQzwfNhOZHSO+YdKzBWg6cUqYbnOT/y8srJfGM4k3GcZ/HLOQK7ucaky/RGE5BgQ5bb89sK2RUTka75OEHgXv32Tx/SB0PUYxDBKaKI+6dpWGbS4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1736974515; c=relaxed/simple;
+	bh=Noc/615wnGhOX6tnLjQaPH+EnWvpGmFGYuboeAix6+w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=oJW9j9RBJAKGD9PLhZ77uVJP15NIPkvi3meZ4S9aeDTxQP3xwpuUKFHAK31enZ6PnjmJ57yKdaUvl3y0mXcYCAfjVVYsg+CGZW9ocpiB1R4mhTWHffAiPSiEJSN7+BV0WfEJj1XosEcuYgJvjQFlBHVAHIhcAIeaZw4JLVWKL6g=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=atomlin.com; spf=pass smtp.mailfrom=atomlin.com; arc=fail smtp.client-ip=40.107.121.120
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=atomlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=atomlin.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=WKPL/rrsHn4IIlmqIH+zPU/UUWCE4xHEcaeFjxhrMpMcKCNVKi0p1SOkhKPcVdqWHnwGbF1luWuUvt+O+Kx19LsU2z1Xqqd+iey1ZDlcWjJzCbuevNIMMu/z2Y9AF8+M4KX3ypmYa/sHi8ymdPgmQ8XnxJR+fVdHXO8eog6qt73ZA2p+ZeJNInmI7x7K9PWDC+44k57knlu7M/cnFpyXwbkP4qlEtbW1aCXofNsYp0XjKtoqXMfvAa4NywB1jLCtdSEpR3sx7wWAHXeQcH3BGMp3QvhyZ2vm5EzI//+IhsmF7AA8gQxr0NFrZynw+eHYCwoJa4pUWDXTeDvVh+LKbQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=8Q9P1n+f2/c9d5rGPcBQlfcg7Mj3pLavAWyUfN04OBo=;
+ b=PWWB08F456uMHK2cn8qOTL+/rPB7WJkigYjY2lCVd+k5ncP+wQXNktdVvKmz2jdM9XGzVRvIZf1PUsp1FUAW3VJy0WUn6/iCikrpnddYFYkOgihOn/m76iIvMin9m61HV5eGBxwDOh+N4rj+VjtJdFwrHmkf9BZhcFXoS7qoWIUmmc1O+cU0+JarEsiA2YJQeZHBJrZq2qVTUD3panCfk8a5OPWZpvzfjiA9nD6i4xvvV0XvqhhZEO4jQtrb2CUlCavmIq0URGRU4bU5BYlwWhvZSwUPc3oiEgaWZ7Zk/H6DTudGEeyr3cwp4HaRYyUoaWZ592NmXgaTnsm9g/lr4Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=atomlin.com; dmarc=pass action=none header.from=atomlin.com;
+ dkim=pass header.d=atomlin.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=atomlin.com;
+Received: from CWLP123MB3523.GBRP123.PROD.OUTLOOK.COM (2603:10a6:400:70::10)
+ by CWXP123MB5761.GBRP123.PROD.OUTLOOK.COM (2603:10a6:400:19a::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8356.14; Wed, 15 Jan
+ 2025 20:55:10 +0000
+Received: from CWLP123MB3523.GBRP123.PROD.OUTLOOK.COM
+ ([fe80::5352:7866:8b0f:21f6]) by CWLP123MB3523.GBRP123.PROD.OUTLOOK.COM
+ ([fe80::5352:7866:8b0f:21f6%7]) with mapi id 15.20.8356.010; Wed, 15 Jan 2025
+ 20:55:10 +0000
+Date: Wed, 15 Jan 2025 20:55:08 +0000
+From: Aaron Tomlin <atomlin@atomlin.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Florian Fainelli <florian.fainelli@broadcom.com>, 
+	ronak.doshi@broadcom.com, andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
+	pabeni@redhat.com, bcm-kernel-feedback-list@broadcom.com, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH 0/1] vmxnet3: Adjust maximum Rx ring buffer size
+Message-ID: <ncpborfj3l7nksueickn7e6vjk55kxddaybvluq24d5rbjvgm7@46rjwzvlkztr>
+References: <20250105213036.288356-1-atomlin@atomlin.com>
+ <20250106154741.23902c1a@kernel.org>
+ <031eafb1-4fa6-4008-92c3-0f6ecec7ce63@broadcom.com>
+ <20250106165732.3310033e@kernel.org>
+ <2f127a6d-7fa2-5e99-093f-40ab81ece5b1@atomlin.com>
+ <20250107154647.4bcbae3c@kernel.org>
+ <71e6ab28-be0d-b85c-900b-537295bc81d1@atomlin.com>
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <71e6ab28-be0d-b85c-900b-537295bc81d1@atomlin.com>
+X-ClientProxiedBy: LO4P265CA0071.GBRP265.PROD.OUTLOOK.COM
+ (2603:10a6:600:2af::13) To CWLP123MB3523.GBRP123.PROD.OUTLOOK.COM
+ (2603:10a6:400:70::10)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1tYAEG-0014QH-9O@rmk-PC.armlinux.org.uk>
-Sender: Russell King <rmk@armlinux.org.uk>
-Date: Wed, 15 Jan 2025 20:43:08 +0000
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CWLP123MB3523:EE_|CWXP123MB5761:EE_
+X-MS-Office365-Filtering-Correlation-Id: 4015037e-359a-407a-7f9d-08dd35a6e60d
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014|7416014;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?TkZXUkNVRFFiUGt6MWd2L2NSNENzdnZnMSs3UlB6TFdWNTlweE0yRStGYkdF?=
+ =?utf-8?B?bU1pYkVIM0ZFSm5EOGJrNkk2U3NCU3dkQjJVSGxNZ3R3dTY3RUFGR1czMkhn?=
+ =?utf-8?B?NVlaeE9YOTRxMWNNTUQrWW1hdU9tTkxpV0t1R2YzWUJObHRsbFhMNy9XRHg0?=
+ =?utf-8?B?MXpxWlFxQ3h0V1VQTUVFZFJYOG9HbThzTmw1YmNyUis0cVJvaVNOeXBGVTE2?=
+ =?utf-8?B?cUtCdkR3UE5CWnNjSUFXSk9kRWpPTytUVHJESXhOWFhlVlFLZ2tvbWEwNmh4?=
+ =?utf-8?B?M2F5aUpMZWpUTDNoYng0Y3FYSkg5cDFrdDNHRHQ2QnUyaTJhV1BDMVBmRWpr?=
+ =?utf-8?B?TWZzaFJhUndxQmc5M2djTWJvaVR5MDBEN2pYMkJvSkdmOTJCTTFpcFNlZWZu?=
+ =?utf-8?B?eVdoa0twTjJpMk8zTEIwSGhtT0dldFljcEh1T3lIOE8yZVFkendqQ1MxZEpW?=
+ =?utf-8?B?WWw3eC9BZ05aUkx0cHhCL1QyWmk0QkxrajVGTVNaR3E0d240WG9JdmNJc3Yy?=
+ =?utf-8?B?NFFxSkQ0bXY1WEZVcFliYkpwdHhjVHpzcEcyd0grVzhnekVuTkZOeVVQdSts?=
+ =?utf-8?B?MmY3L0J2Vm1qbDJ3aFNlalZYOWtBNGREVGhoRVM0MlVoeFNRMTFvMXZjNHFx?=
+ =?utf-8?B?V0MzejNlRU1CZGgrZzZZRWhNaVpTMHova041ME83eE1lY1Nlbllrc3ZyKzcz?=
+ =?utf-8?B?dHptOUp1K2hISXZFQS9YYnBGRm02a1JWREhqMlBjYzlPU0tHVW9vdVBEaEJE?=
+ =?utf-8?B?RDNSNVdsa2ZnMjBYeitvaGNNWjltZjd2SXZGWW5qUkg4REFBZG01K3VTOEJV?=
+ =?utf-8?B?RWZsOWxwZHBzTC8wNHdwY1F2SERvUWkzQWdSY2xuMUoxdGVFeFRCZ3lhSGlS?=
+ =?utf-8?B?NEE3bU9hc0ZQWmZBYmVqdmQ3eXlNYjVoRWpjS3VtaGk5WjdTemljUlVyN2dy?=
+ =?utf-8?B?MnJZZUFNRkpLZyswMzE5Zm85bjlWUitveEYyTnpPdTBBUDVuM3RmYVhOYWcw?=
+ =?utf-8?B?S3UwbitVSkRTRVBLSGN0SFJIWlQ5eUtmaGtCRTRhanZuOUdaTWV3MVR6K1g1?=
+ =?utf-8?B?aEJoNm9JVTVoU1NPNi82MW1RUXc0MW43OWN4QTRXV3dOV3NJeFJMbVRWdEtT?=
+ =?utf-8?B?YWJsbDhpMFlwZ1JxclhEQlRIaThUVDRkcHkwWngzd3U2enFhelIxbGEvS0ZG?=
+ =?utf-8?B?TWhWU1Z0M0dVTW0xNTFKZlQ2RWo5SmJPWDR6QUxnSHpGWEVNTjBDRmZGalVu?=
+ =?utf-8?B?enBoT1lYUzdVWXJldnZnQ1N6OFVmNDlZVkE0N2Zsd0w1M3J5Y0RFRkhEUmxY?=
+ =?utf-8?B?R0swQ0d5WUFmRnlUemZlaFN4UHhSR2h0VURUZ1VaclQ1ZUJKcWV3SU1IbGdD?=
+ =?utf-8?B?Z1hCQ1BRbkw5bWIzKzRlbXNXaHpnS0kyVU1rRGl6K2c2dUFFNFNqMXZGZVQ5?=
+ =?utf-8?B?NlRHYUx3VVdkbjE4YTFGUzhFOFJRb01pUW9TamxYL0ZsY0hBOEt2dW80ZDVv?=
+ =?utf-8?B?M3RzL0dwSjliR1lUZkxWQmlUUVI3M3lpazZHYlBoVTJoOUE3M2RNYUtlT0dk?=
+ =?utf-8?B?UmRtSTNBa2l3S2d1UGM4aDlxUXMxU3F5UG1BQVFiTlFpZktKV0ovb1FyRTZB?=
+ =?utf-8?B?MEpkUEx6U0RrbUcvdTZ0Zy9SNkdCNXFodUtoWjlNSEJZVEc1VENmS21FVFpx?=
+ =?utf-8?B?ZEZZaXpBbjZwa2RTeDc4aXlFNjd1cW5tZThsaDhKQkRySjE1cnZGR3BnWFN4?=
+ =?utf-8?B?UlFxUzJSMGNFazFSUndMcTZBVG56L2lUUDdxbjlka2puZXdESCtSTjhsclVB?=
+ =?utf-8?B?RmpYTEtqVlNMQ1cvdldrVGhuM2FyeWV6UVhMNFZ6SSswZ0dVNXFWdGczTEZt?=
+ =?utf-8?Q?qrHJzhHrPW50t?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CWLP123MB3523.GBRP123.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?enBNRXE1S2RDRGF5TDRDOGYzMDVyd0lEUVIxU3BlUDFYaHpYcGpoQjBvandp?=
+ =?utf-8?B?S1drY3FIU2pjYW5ZOGYrNEtLZFQ4WEVwenE1aEhwWDJONEFxOE52WWtZY1Yr?=
+ =?utf-8?B?ZVJYT2NTUVFhdytnWkVSRWNMYlRsRDdsdFgrTFJVVTdSeHZZeTh5OWtpUnMx?=
+ =?utf-8?B?azNaN2R5ODhkTy9MR204MlhJTDRQbHBzVHRYbk4rQmpRK2JsSmo1QWc1cy9k?=
+ =?utf-8?B?S0RkYUpVWklnVFBjUVFkRm9PMC9sRUVkUE9CVnZGNGQ4Tkh2RDIxTk5YNTB0?=
+ =?utf-8?B?VkdMRTN5Zm1JYnVCVG1ZR2gwZ2hrSHlhMkpnRVhhMFBpaEF0VHNQemNLQXdK?=
+ =?utf-8?B?Q1BMQ0tLck45eUhVblJCbDZCUUIyZWxsdCtIUGtVSjhmaDgyUmlHSHBUV05V?=
+ =?utf-8?B?VTM2SUFaVGRWQWpXQWZPbW0xaWpWZ1kwdWxMVmZiMjVNOEdCR3NRSGZ0QmV2?=
+ =?utf-8?B?dU9OdGlBd0Y2R1dLdDczd1ZmUWpIcHkyOGdOMGlqejd5ZzJielZuRWpjMHgx?=
+ =?utf-8?B?V0RXQWdSVzR4TjRaWTExalQ5dUpvcEI2UnllTjJaNnVtTUxqd09na3JKb0JS?=
+ =?utf-8?B?MWxqSmkzUEJIc2VrOTk1Qy9sM3lCcjRjQmdTZVM0RHFrZWFleER0bXd4b0lD?=
+ =?utf-8?B?ckdoMWszbGc2dFlZMklFOWtxME5yTmpnWmh4V0RBbDB1R3F2a3I1a2xyb09O?=
+ =?utf-8?B?SzgyYUZ6SXFqWUV0eXpnVmlLckQzYlRnTVRCSDI2eHZFWDlGMUZZUmNkbUda?=
+ =?utf-8?B?dTF4U0ZRTEN2WWthSGJqRmhwUG52SWhaVVJaYm1jbWhMSVRvSWdhUHJaMFdZ?=
+ =?utf-8?B?OGtNZUVrMVpXNHRTREczSVludzZseEorMUNTT0RLM21XRExiQi9SNEZRTU5R?=
+ =?utf-8?B?WFdpNTM5VThVKzZ6VzBldDgvMnhSTzJKZjVqMFZmUXR1My91Z1ZtQWlhZXVa?=
+ =?utf-8?B?NTZzcldnazhZUm9veHZTU3k0bnUvaWs4Q0d4OTJ2ek02WlB6Sy8xdm1nMXJP?=
+ =?utf-8?B?NEJNWFdRWmVWOUlMTnI1L2txV3FHRHhDamxQazArMDM3TjhGOXFHU0tNa0RO?=
+ =?utf-8?B?bCs0ZEorSGIvNSt2MGlqOWgvUXNEZldBKzVuRTNsT1hNbmZLdnZiWVVmYmdJ?=
+ =?utf-8?B?Z3p6TGswcVNGNkhEd0kvczdBQnRhN3RKQlBRR2x6dzJwSUVpOXA5bUhETXo2?=
+ =?utf-8?B?ajNSZ2gwOENSR3VCVnowMUV0RzZyaEpZRGJxdWh4Q0tlVytDMkZkaDM2VU1T?=
+ =?utf-8?B?OC9YVzRqRU1LTWdxb3lMRlFiZkVNYVhyMDFGNkhTZ3dQWXZtbnVFNjJra2VH?=
+ =?utf-8?B?cXV0aEpjOGpJOHRXdXZlL0cwOGgzNjlmWDJiUUtqV05GWllCUnAwM2tYTVgz?=
+ =?utf-8?B?WGw2aE1ZRWJIaUo2Mk5PTjNiR0c2WlU3eHJDd2RmSGNkL0tKbEorcUFuaytp?=
+ =?utf-8?B?OHYyai9xNWpxRjBJMFo0UFZnc1o3UkdFRXYzNDl0NGJ4ZU1uUWhYSjlZWjln?=
+ =?utf-8?B?NTFqYVZJZ3orb2x4cXZOT1NvQW5YaXd1d256QWZRT2ZUSmRLbXd0SXlWQzR4?=
+ =?utf-8?B?NUFMYXFoUXlhaFBENnd2czBiYjR0UGlyMzRCSXZpS1pyVXhMT2RxL2h2aEpM?=
+ =?utf-8?B?bTZJZ0EzNGR4SHpNOHVva3VFRlJFaWo4OUhObFVCY2xBYXJsN2tVeFgxTHpC?=
+ =?utf-8?B?SkdsMjhGMithdDVTQk91YklyblJDSVZtZGI5cGVJM21WV2svZzdZL1JzT3VD?=
+ =?utf-8?B?b1ZDWjR5UHk3S0pBT0dDTk5GMXcrTnNrQmJxY2hmdGZLSVlvL28vYzFteWlI?=
+ =?utf-8?B?d3ZpTGVPNHR0RGptWlpwTVlmUEg0UG9uOXA1Wmt1Uit0dVdneVViVit6TERq?=
+ =?utf-8?B?dlZtWlF0THBDcDJmd1MyOVVqbWtPMDNuYjlvaFR6UXBBKzI3a1ZJMDlMcU9Z?=
+ =?utf-8?B?aWUxZE42QzYrVVFtVnBzODgvUFJmUXJHL0ZEelVjVkc0OEVYajFTK3pjMnZn?=
+ =?utf-8?B?YXZKK3lpNllQVTdlRXVnUStHTFA2U2l1U1d1dnVNblhFOWhPYmczNGJRK1M5?=
+ =?utf-8?B?QlZISlYrdkpTaVZnN0l5ZGhaeTVGQnhBT3lTQm5CZ0JYQURabHIyeFZkNFBo?=
+ =?utf-8?Q?om+vKw28Hg6U8Mpl+fKIRyWS9?=
+X-OriginatorOrg: atomlin.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4015037e-359a-407a-7f9d-08dd35a6e60d
+X-MS-Exchange-CrossTenant-AuthSource: CWLP123MB3523.GBRP123.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Jan 2025 20:55:10.3679
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: e6a32402-7d7b-4830-9a2b-76945bbbcb57
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: NMqnLHkRxmrsVarQbDgpEk4yQk2TnQgyMJ8A3xWXyD+0hkAvRXxrPZvXkgYKlPEgTetXVsX/lKR/C9CVgj20ew==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CWXP123MB5761
 
-Convert stmmac to use phylink managed EEE support rather than delving
-into phylib:
+On Wed, Jan 08, 2025 at 09:05:15PM +0000, Aaron Tomlin wrote:
+> On Tue, 7 Jan 2025, Jakub Kicinski wrote:
+> > This is a bit of a weird driver. But we should distinguish the default
+> > ring size, which yes, should not be too large, and max ring size which
+> > can be large but user setting a large size risks the fact the
+> > allocations will fail and device will not open.
+> >
+> > This driver seems to read the default size from the hypervisor, is that
+> > the value that is too large in your case? Maybe we should min() it with
+> > something reasonable? The max allowed to be set via ethtool can remain
+> > high IMO
+> >
+> 
+> See vmxnet3_get_ringparam(). If I understand correctly, since commit
+> 50a5ce3e7116a ("vmxnet3: add receive data ring support"), if the specified
+> VMXNET3 adapter has support for the Rx Data ring feature then the maximum
+> Rx Data buffer size is reported as VMXNET3_RXDATA_DESC_MAX_SIZE (i.e. 2048)
+> by 'ethtool'. Furthermore, See vmxnet3_set_ringparam(). A user specified Rx
+> mini value cannot be more than VMXNET3_RXDATA_DESC_MAX_SIZE. Indeed the Rx
+> mini value in the context of VMXNET3 would be the size of the Rx Data ring
+> buffer. See the following excerpt from vmxnet3_set_ringparam(). As far as I
+> can tell, the Rx Data buffer cannot be more than
+> VMXNET3_RXDATA_DESC_MAX_SIZE:
+> 
+>  686 static int
+>  687 vmxnet3_set_ringparam(struct net_device *netdev,
+>  688                       struct ethtool_ringparam *param,
+>  689                       struct kernel_ethtool_ringparam *kernel_param,
+>  690                       struct netlink_ext_ack *extack)
+>  691 {
+>   :
+>  760         new_rxdata_desc_size =
+>  761                 (param->rx_mini_pending + VMXNET3_RXDATA_DESC_SIZE_MASK) &
+>  762                 ~VMXNET3_RXDATA_DESC_SIZE_MASK;
+>  763         new_rxdata_desc_size = min_t(u16, new_rxdata_desc_size,
+>  764                                      VMXNET3_RXDATA_DESC_MAX_SIZE);
+> 
+> 
+> Have I missed something?
 
-1. Move the stmmac_eee_init() calls out of mac_link_down() and
-   mac_link_up() methods into the new mac_{enable,disable}_lpi()
-   methods. We leave the calls to stmmac_set_eee_pls() in place as
-   these change bits which tell the EEE hardware when the link came
-   up or down, and is used for a separate hardware timer. However,
-   symmetrically conditionalise this with priv->dma_cap.eee.
+Any thoughts?
 
-2. Update the current LPI timer each time LPI is enabled - which we
-   need for software-timed LPI.
 
-3. With phylink managed EEE, phylink manages the receive clock stop
-   configuration via phylink_config.eee_rx_clk_stop_enable. Set this
-   appropriately which makes the call to phy_eee_rx_clock_stop()
-   redundant.
 
-4. From what I can work out, all supported interfaces support LPI
-   signalling on stmmac (there's no restriction implemented.) It
-   also appears to support LPI at all full duplex speeds at or over
-   100M. Set these capabilities.
+Kind regards,
 
-5. The default timer appears to be derived from a module parameter.
-   Set this the same, although we keep code that reconfigures the
-   timer in stmmac_init_phy().
-
-6. Remove the direct call to phy_support_eee(), which phylink will do
-   on the drivers behalf if phylink_config.eee_enabled_default is set.
-
-Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
----
- .../net/ethernet/stmicro/stmmac/stmmac_main.c | 57 +++++++++++++++----
- 1 file changed, 45 insertions(+), 12 deletions(-)
-
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index acd6994c1764..c5d293be8ab9 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -988,8 +988,8 @@ static void stmmac_mac_link_down(struct phylink_config *config,
- 	struct stmmac_priv *priv = netdev_priv(to_net_dev(config->dev));
- 
- 	stmmac_mac_set(priv, priv->ioaddr, false);
--	stmmac_eee_init(priv, false);
--	stmmac_set_eee_pls(priv, priv->hw, false);
-+	if (priv->dma_cap.eee)
-+		stmmac_set_eee_pls(priv, priv->hw, false);
- 
- 	if (stmmac_fpe_supported(priv))
- 		stmmac_fpe_link_state_handle(priv, false);
-@@ -1096,13 +1096,8 @@ static void stmmac_mac_link_up(struct phylink_config *config,
- 		writel(ctrl, priv->ioaddr + MAC_CTRL_REG);
- 
- 	stmmac_mac_set(priv, priv->ioaddr, true);
--	if (phy && priv->dma_cap.eee) {
--		phy_eee_rx_clock_stop(phy, !(priv->plat->flags &
--					     STMMAC_FLAG_RX_CLK_RUNS_IN_LPI));
--		priv->tx_lpi_timer = phy->eee_cfg.tx_lpi_timer;
--		stmmac_eee_init(priv, phy->enable_tx_lpi);
-+	if (priv->dma_cap.eee)
- 		stmmac_set_eee_pls(priv, priv->hw, true);
--	}
- 
- 	if (stmmac_fpe_supported(priv))
- 		stmmac_fpe_link_state_handle(priv, true);
-@@ -1111,12 +1106,32 @@ static void stmmac_mac_link_up(struct phylink_config *config,
- 		stmmac_hwtstamp_correct_latency(priv, priv);
- }
- 
-+static void stmmac_mac_disable_tx_lpi(struct phylink_config *config)
-+{
-+	struct stmmac_priv *priv = netdev_priv(to_net_dev(config->dev));
-+
-+	stmmac_eee_init(priv, false);
-+}
-+
-+static int stmmac_mac_enable_tx_lpi(struct phylink_config *config, u32 timer,
-+				    bool tx_clk_stop)
-+{
-+	struct stmmac_priv *priv = netdev_priv(to_net_dev(config->dev));
-+
-+	priv->tx_lpi_timer = timer;
-+	stmmac_eee_init(priv, true);
-+
-+	return 0;
-+}
-+
- static const struct phylink_mac_ops stmmac_phylink_mac_ops = {
- 	.mac_get_caps = stmmac_mac_get_caps,
- 	.mac_select_pcs = stmmac_mac_select_pcs,
- 	.mac_config = stmmac_mac_config,
- 	.mac_link_down = stmmac_mac_link_down,
- 	.mac_link_up = stmmac_mac_link_up,
-+	.mac_disable_tx_lpi = stmmac_mac_disable_tx_lpi,
-+	.mac_enable_tx_lpi = stmmac_mac_enable_tx_lpi,
- };
- 
- /**
-@@ -1189,9 +1204,6 @@ static int stmmac_init_phy(struct net_device *dev)
- 			return -ENODEV;
- 		}
- 
--		if (priv->dma_cap.eee)
--			phy_support_eee(phydev);
--
- 		ret = phylink_connect_phy(priv->phylink, phydev);
- 	} else {
- 		fwnode_handle_put(phy_fwnode);
-@@ -1201,7 +1213,12 @@ static int stmmac_init_phy(struct net_device *dev)
- 	if (ret == 0) {
- 		struct ethtool_keee eee;
- 
--		/* Configure phylib's copy of the LPI timer */
-+		/* Configure phylib's copy of the LPI timer. Normally,
-+		 * phylink_config.lpi_timer_default would do this, but there is
-+		 * a chance that userspace could change the eee_timer setting
-+		 * via sysfs before the first open. Thus, preserve existing
-+		 * behaviour.
-+		 */
- 		if (!phylink_ethtool_get_eee(priv->phylink, &eee)) {
- 			eee.tx_lpi_timer = priv->tx_lpi_timer;
- 			phylink_ethtool_set_eee(priv->phylink, &eee);
-@@ -1234,6 +1251,9 @@ static int stmmac_phy_setup(struct stmmac_priv *priv)
- 	/* Stmmac always requires an RX clock for hardware initialization */
- 	priv->phylink_config.mac_requires_rxc = true;
- 
-+	if (!(priv->plat->flags & STMMAC_FLAG_RX_CLK_RUNS_IN_LPI))
-+		priv->phylink_config.eee_rx_clk_stop_enable = true;
-+
- 	mdio_bus_data = priv->plat->mdio_bus_data;
- 	if (mdio_bus_data)
- 		priv->phylink_config.default_an_inband =
-@@ -1255,6 +1275,19 @@ static int stmmac_phy_setup(struct stmmac_priv *priv)
- 				 priv->phylink_config.supported_interfaces,
- 				 pcs->supported_interfaces);
- 
-+	if (priv->dma_cap.eee) {
-+		/* Assume all supported interfaces also support LPI */
-+		memcpy(priv->phylink_config.lpi_interfaces,
-+		       priv->phylink_config.supported_interfaces,
-+		       sizeof(priv->phylink_config.lpi_interfaces));
-+
-+		/* All full duplex speeds above 100Mbps are supported */
-+		priv->phylink_config.lpi_capabilities = ~(MAC_1000FD - 1) |
-+							MAC_100FD;
-+		priv->phylink_config.lpi_timer_default = eee_timer * 1000;
-+		priv->phylink_config.eee_enabled_default = true;
-+	}
-+
- 	fwnode = priv->plat->port_node;
- 	if (!fwnode)
- 		fwnode = dev_fwnode(priv->device);
 -- 
-2.30.2
-
+Aaron Tomlin
 
