@@ -1,87 +1,129 @@
-Return-Path: <netdev+bounces-158521-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158522-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E272A12599
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 15:08:58 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE1CDA125B6
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 15:15:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 237AC167DE5
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 14:08:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6E6903A6D9A
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 14:15:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 170013596F;
-	Wed, 15 Jan 2025 14:08:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7B9C24A7CC;
+	Wed, 15 Jan 2025 14:15:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="irzahDcP"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="inlTyU4/"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E52FD2BB04
-	for <netdev@vger.kernel.org>; Wed, 15 Jan 2025 14:08:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC8FA7080A
+	for <netdev@vger.kernel.org>; Wed, 15 Jan 2025 14:15:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736950135; cv=none; b=j6iV5xytZ8cmvkpB2sQCLQY1AJ0+JFIT32KnIVcWDRcKg/k/Gu+agtvq9G4JzeBRBfAfK5U1BHTsq3usvG0wqlYKGnrgYJ9b7N3s4GWShAr+YGz0vsXfWqkPzU5tKXqrD/QaqWMrpSu5J0y67pbbkJzm+MPAzK7T6AOsxCj4gyQ=
+	t=1736950546; cv=none; b=X6b9ddUNGYPSUA+LLBpbBIUN1LO8BGd9aRSd5lB75PG/aMPdETiLTeO/jBKAGS3pQ9vlsvpxNH4XkdSyelkUMDoIIUYiMpqhSNeLMUpUlry7vIeJBLhCIto35kcqUszjAW+s9pk+6acRmOVXSb0utDjYVNz1SQQAU4yhzGQppT8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736950135; c=relaxed/simple;
-	bh=0A4vE5y/i+GEpN1PHegU9wS46NVDEpUOqXd4+Q/0Hww=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=lIlcC8Es/83ACT2R+CGB+M1r3IUBmvG4fZUGRwtrJ1wN16109Upg45GBFH7Lys17x1OnoZCcLfuyzdPHLeZ0ciL6dbYVgiwGbVJeWBmN2yQZ9A1c5Ima1q7it1gPyk59DSycQrNa/gdijR1OWcWHm0p3Zp3RZkDhV1/ihosjF9A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=irzahDcP; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 01F87C4CEE5;
-	Wed, 15 Jan 2025 14:08:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736950134;
-	bh=0A4vE5y/i+GEpN1PHegU9wS46NVDEpUOqXd4+Q/0Hww=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=irzahDcPakl18KvZYOWGTdCFx54eXlTi1neQEoZ4ndvhGJsI5ztP7hRdDHAgsmw8m
-	 JPRFiFic+t5iyQlJyxK/SMIYa73q/JcxcQhHSl8kL2imi+GFuQpXXHa/EXP4WKSuSm
-	 P4MirFCzm6L8FQavY2PpzIaUPDsQ/zx7PtkyGaNbUjxRT7y6Ozq/+jO1EOqN6+rU2b
-	 /ItoT1siulBU5H8UfMOfIu1q4M795+5rQx6VW6D5przduLRySYkiKdNQ0eKWtU027f
-	 XKo/g3MuB8bjai59XV7S3b91w7aD8zfzEvkMeyAkWFefD1sGU/ZOl1+jKThYcnMAl/
-	 munLvgxr+fgbg==
-Date: Wed, 15 Jan 2025 06:08:53 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Cc: <netdev@vger.kernel.org>, <jiri@resnulli.us>,
- <anthony.l.nguyen@intel.com>, <edumazet@google.com>, <pabeni@redhat.com>,
- <andrew+netdev@lunn.ch>, <horms@kernel.org>, <jdamato@fastly.com>,
- <davem@davemloft.net>
-Subject: Re: [PATCH net-next v2 01/11] net: add netdev_lock() /
- netdev_unlock() helpers
-Message-ID: <20250115060853.0f592332@kernel.org>
-In-Reply-To: <e7479c79-525d-4796-b9ed-7ae2ddb5435b@intel.com>
-References: <20250115035319.559603-1-kuba@kernel.org>
-	<20250115035319.559603-2-kuba@kernel.org>
-	<e7479c79-525d-4796-b9ed-7ae2ddb5435b@intel.com>
+	s=arc-20240116; t=1736950546; c=relaxed/simple;
+	bh=Q/i/v9U55no1KQfEEpVduGhXnPWBxbrnCijI3XF9e58=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=AFvEdQFRzNJ6FxfTC24I81SoiZkXH9sfQ5iplxLEy5Yc9uw5KVBLCNb8S59eXtzolNousM5r+5nvzNDDl3Gf6KZWMuV8lwNYa8H+0N0lITctRNIhwXa60Ln9ukWFM6cWeOomafH7wZRBSOhKCWU9Ae3GN+mqu01tKpOj3X2h6dQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=inlTyU4/; arc=none smtp.client-ip=209.85.216.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-2ef89dbd8eeso8566089a91.0
+        for <netdev@vger.kernel.org>; Wed, 15 Jan 2025 06:15:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1736950544; x=1737555344; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tYV90okWPUcLQ/pVorEB3PZZCDoVqaWjVNjkYn8/+DA=;
+        b=inlTyU4/tN8Ns2AnphHt2maEUk9QXy9FL4GbqTeKb6geakkhPukT4F0OHbhz2MThXy
+         9SnCuj5uyhzBYRWlzMjWFAXfjMvwTjNRC1dDy4xPt7GigdNbtG+HT9f4dTd6r+ee1RRb
+         5uLIZLhbKBi0h9yG0DW2eyPOrC68v0LdUEXbgwFvGAZ4etFym4OVrfhuDdB9EPlIfG6X
+         Fr1T7AEj13NCyoxRWmnN66AG3JcBxepLE95uIxfVYk3Opw0XM+OC4WtlXODOS2ZrRGIZ
+         9av17COWYMAGfhw6DeP6nI+EDeVLrAYiTioPoRco75RxBFtVKok+KUr51LeGqmUEhZ49
+         7o8A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736950544; x=1737555344;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=tYV90okWPUcLQ/pVorEB3PZZCDoVqaWjVNjkYn8/+DA=;
+        b=vsV6zF/buvJRY4glQsaTeuWrRMrh+4X97LUgVD7757tPYoRLMrRzUm7bavQ8jr/jqb
+         5wjS3y+4JQrxBqbWmZ+zyn+rDLg6m8sscdMYIZ7dAVNVI1m2n40LpMLgokEy6OSwfu2l
+         AdQ6u8t7YCvF86ud82b0yKuovB12PI4D6Z2lQiuHVPbjHs2j9sKVBjKHUdVQKwLXCjm4
+         ZHHx++YzV6GMLiah2bpGEcRDBWshP3VajcPVzogLpNWdVRJA32qP/rZaIhDTv+F206Zu
+         T+YBAaSSK5fDRrOHq4UGiNcUoWtHj5TZE8DCnxlOfF7GDa4+0FW+uo6+BAsmmoEXCJ84
+         TcSg==
+X-Gm-Message-State: AOJu0Yzc8/1plmMMgPLDxvik2t0WrJON4w2/OwzSGrldMzU+l5evnYAT
+	hu4Z4Ya1pTbfmsfBdtwP5kTbW6xygMLltbYGh0tbgU5Rkau70SexVWrEJXlZvmfnT+ePK6n2dCs
+	7VkgGRM+FbNRsumhFmXgaO95udOxUp+Iq1XwfMmVUEHMsJsiddw==
+X-Gm-Gg: ASbGncvqibzYbvXfFVpZFgKts9akM87RvKAeIknW2M32om1juHuGkBXYDsguhZqeycs
+	tV9u0Zr6yBbN+/UBno+4Pj2TIB/TFHAn0gmOC
+X-Google-Smtp-Source: AGHT+IHi7GwKvh7gqN6187Skddxfc/YKq2SZVG/E53dI16R8Yys4QvMYqtLvu/BWJLmVP1TMSdcEpjYKI2rmBjC3XtU=
+X-Received: by 2002:a17:90b:2dc2:b0:2ee:863e:9ffc with SMTP id
+ 98e67ed59e1d1-2f548ee5378mr38038650a91.21.1736950542539; Wed, 15 Jan 2025
+ 06:15:42 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20250111151455.75480-1-jhs@mojatatu.com> <20250114172620.7e7e97b4@kernel.org>
+In-Reply-To: <20250114172620.7e7e97b4@kernel.org>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Wed, 15 Jan 2025 09:15:31 -0500
+X-Gm-Features: AbW1kva_EsSp8ds8o6RbQ6lZ2L4LNxlWI6TJbkUym0feaFyM-Z8sb_D43oLjTSs
+Message-ID: <CAM0EoMnYi3JBPS7KyPoW5-St-xAaJ8Xa1tEp8JH9483Z5k8cLg@mail.gmail.com>
+Subject: Re: [PATCH net 1/1 v3] net: sched: Disallow replacing of child qdisc
+ from one parent to another
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, jiri@resnulli.us, xiyou.wangcong@gmail.com, 
+	davem@davemloft.net, edumazet@google.com, security@kernel.org, 
+	nnamrec@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, 15 Jan 2025 09:36:11 +0100 Przemek Kitszel wrote:
-> > diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-> > index bced03fb349e..891c5bdb894c 100644
-> > --- a/include/linux/netdevice.h
-> > +++ b/include/linux/netdevice.h
-> > @@ -2444,8 +2444,12 @@ struct net_device {
-> >   	u32			napi_defer_hard_irqs;
-> >   
-> >   	/**
-> > -	 * @lock: protects @net_shaper_hierarchy, feel free to use for other
-> > -	 * netdev-scope protection. Ordering: take after rtnl_lock.
-> > +	 * @lock: netdev-scope lock, protects a small selection of fields.
-> > +	 * Should always be taken using netdev_lock() / netdev_unlock() helpers.
-> > +	 * Drivers are free to use it for other protection.  
-> 
-> As with devl_lock(), would be good to specify the ordering for those who
-> happen to take both. My guess is that devl_lock() is after netdev_lock()
+On Tue, Jan 14, 2025 at 8:26=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> On Sat, 11 Jan 2025 10:14:55 -0500 Jamal Hadi Salim wrote:
+> > The semantics of "replace" is for a del/add _on the same node_ and not
+> > a delete from one node(3:1) and add to another node (1:3) as in step10.
+> > While we could "fix" with a more complex approach there could be
+> > consequences to expectations so the patch takes the preventive approach=
+ of
+> > "disallow such config".
+>
+> Your explanation reads like you want to prevent a qdisc changing
+> from one parent to another.
+>
 
-The ordering is transitive, since devl_ is before rtnl_ there is 
-no ambiguity. Or so I think :)
+Yes.
+
+> > +                             if (leaf_q && leaf_q->parent !=3D q->pare=
+nt) {
+> > +                                     NL_SET_ERR_MSG(extack, "Invalid P=
+arent for operation");
+> > +                                     return -EINVAL;
+> > +                             }
+>
+> But this test looks at the full parent path, not the major.
+> So the only case you allow is replacing the node.. with itself?
+>
+
+Yes.
+
+> Did you mean to wrap these in TC_H_MAJ() || the parent comparison
+> is redundant || I misunderstand?
+
+I may be missing something - what does TC_H_MAJ() provide?
+The 3:1 and 1:3 in that example are both descendants of the same
+parent. It could have been 1:3 vs 1:2 and the same rules would apply.
+
+cheers,
+jamal
 
