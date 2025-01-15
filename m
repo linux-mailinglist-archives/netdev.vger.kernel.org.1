@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-158375-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158376-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 20CC1A11819
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 04:53:55 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9BD85A1181D
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 04:54:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 943E27A369E
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 03:53:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7DCA2188A68A
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 03:54:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C33922F152;
-	Wed, 15 Jan 2025 03:53:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 421C922F389;
+	Wed, 15 Jan 2025 03:53:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lv/rlPfI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iIyNeoRt"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53DFE22E41D
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C67F22F384
 	for <netdev@vger.kernel.org>; Wed, 15 Jan 2025 03:53:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736913219; cv=none; b=n6ygpK9ZRQ47RstB0wtYnwZfEX7JGwyZggPQ8/XGv4lF1PZQVvZdZLS2kqlcdaoPx9gMgJ2LpB+y5x8T3fSHmYwrEyg9La04cccOZ0K4CMFapYEN4Ru2Mlo9Vcr9UPLcaeSOn4bSYoOMMNg6vIMJUWC/F3eqlBbdi9qzEo3oS3Q=
+	t=1736913220; cv=none; b=hJl82UyNQCwjmMdTPHub88yYvl8LeYWmXfYzstVF/+xxfhcrXyVVC9Cw8dqJr9GSCftyBvwXew/1/LjQA9pc7D9fSIRaGBoS6gEq/qizSSO/DF2GHY/BbfA7Z13Nh7AjCJ7NtF6yqowbGzUHr8nEznIPDchEKOWUL2W7k0Y92R8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736913219; c=relaxed/simple;
-	bh=0s2TaLPITNZgbrpX6AdtBSLUabw5dyWkhwRq5Z93L7o=;
+	s=arc-20240116; t=1736913220; c=relaxed/simple;
+	bh=YU5BJr5+AhcU+7nxIPi6zQfeg2hjxzOYzMVdeA1MHpM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=j/IIgktajU5+ZgQ2zOh7DZSNTi5ae7AM2hgZVhHgAjgb9vY8jQB4AFSTPLxlDs+xitNcplNXg6wwbNqoKzBFumGqQdkX/XhUD+CrptNMHw9gQYRYUBq6EaFu4G/zDXzY/4FKd9stRiFmG95KT5H5nJp/Qrs10kQaFkfRraTM4G0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lv/rlPfI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D3AF9C4CEE2;
-	Wed, 15 Jan 2025 03:53:38 +0000 (UTC)
+	 MIME-Version; b=abyBJjMlGwiHaMAhhIrstHhSdlHq+tVl1mexKjEmGogveOs2UirHtIDw0tFAAb5BVDzCm1hYqiVUeQ1+hkGcVwcdXbEMox2q2M1FuqVgpXwfWDGObBXTk35tPovZ1xnoiASMxoZwnY2lgi+hgeiNEbpjCC2x730oN+XUHYZjyzU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iIyNeoRt; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 58F21C4CEE5;
+	Wed, 15 Jan 2025 03:53:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1736913219;
-	bh=0s2TaLPITNZgbrpX6AdtBSLUabw5dyWkhwRq5Z93L7o=;
+	bh=YU5BJr5+AhcU+7nxIPi6zQfeg2hjxzOYzMVdeA1MHpM=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=lv/rlPfI/N89JdyYF7Cd+upntyCzbNeT5JcCmmPBv5Bl5w03f+RU1BLp4dcjZttsk
-	 YYQYSpymziP5YBNk33GVULTuhOKAuC71HKdrBBDZNK0sojbYRGiJe8wACYYZ1Ekyw3
-	 4oR6+djdU1KgfCeBwhR0GmoGmbEQcs9E10y05WMHP5c6+sZgEHJ+q2jBmJeOb4KBux
-	 ra+eizzOevrKP945SIXf0crYGuWqKpRqOFPZKGmKhx40SJnKEbnv8j5Nr9fHvB8Rsk
-	 oZJII9vsT0k0+1MrgIZdzbokr4H8J5tXEml6Ys6+gWwRRtFZ1FFkpq2nAsqqPXlSJi
-	 kTY2q2PUB6b9A==
+	b=iIyNeoRtvtKOWld4LblK/EvtREqfdrjq+4DaolrEwkRTQ9J/S2h4EXtt2na28azdv
+	 y8pkI4NqcxivrYkIeVXpqMCy7fhqaUlqthreOrXRv7fBU3stePMhGFdZnK5KG9A/rp
+	 jkLRmXPjhh5HQnJkOOk6vp5HTMel5iQRzbFrGWyvGipEeQKnX+msu5htLhjp3zA5We
+	 sZn5Z0/vAlBdV8XAvzbHOSWAVLi5bitibTUe52jkLThuVHM03wiVRg2xarL0GBJ9hC
+	 0eldhJfokwFoihItTycOQnZUhSqClTYdRTY4STkJ/a37/FtG7c0oGjALvqsHIz/cRR
+	 uWufz0IiMIjkw==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -50,9 +50,9 @@ Cc: netdev@vger.kernel.org,
 	horms@kernel.org,
 	jdamato@fastly.com,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next v2 04/11] net: add netdev->up protected by netdev_lock()
-Date: Tue, 14 Jan 2025 19:53:12 -0800
-Message-ID: <20250115035319.559603-5-kuba@kernel.org>
+Subject: [PATCH net-next v2 05/11] net: protect netdev->napi_list with netdev_lock()
+Date: Tue, 14 Jan 2025 19:53:13 -0800
+Message-ID: <20250115035319.559603-6-kuba@kernel.org>
 X-Mailer: git-send-email 2.48.0
 In-Reply-To: <20250115035319.559603-1-kuba@kernel.org>
 References: <20250115035319.559603-1-kuba@kernel.org>
@@ -64,112 +64,203 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Some uAPI (netdev netlink) hide net_device's sub-objects while
-the interface is down to ensure uniform behavior across drivers.
-To remove the rtnl_lock dependency from those uAPIs we need a way
-to safely tell if the device is down or up.
+Hold netdev->lock when NAPIs are getting added or removed.
+This will allow safe access to NAPI instances of a net_device
+without rtnl_lock.
 
-Add an indication of whether device is open or closed, protected
-by netdev->lock. The semantics are the same as IFF_UP, but taking
-netdev_lock around every write to ->flags would be a lot of code
-churn.
-
-We don't want to blanket the entire open / close path by netdev_lock,
-because it will prevent us from applying it to specific structures -
-core helpers won't be able to take that lock from any function
-called by the drivers on open/close paths.
-
-So the state of the flag is "pessimistic", as in it may report false
-negatives, but never false positives.
+Create a family of helpers which assume the lock is already taken.
+Switch iavf to them, as it makes extensive use of netdev->lock,
+already.
 
 Reviewed-by: Joe Damato <jdamato@fastly.com>
 Reviewed-by: Eric Dumazet <edumazet@google.com>
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
-v2:
- - rework the kdoc to please Sphinx
-v1:  https://lore.kernel.org/20250114035118.110297-5-kuba@kernel.org
----
- include/linux/netdevice.h | 14 +++++++++++++-
- net/core/dev.h            | 12 ++++++++++++
- net/core/dev.c            |  4 ++--
- 3 files changed, 27 insertions(+), 3 deletions(-)
+ include/linux/netdevice.h                   | 54 ++++++++++++++++++---
+ drivers/net/ethernet/intel/iavf/iavf_main.c |  6 +--
+ net/core/dev.c                              | 15 ++++--
+ 3 files changed, 60 insertions(+), 15 deletions(-)
 
 diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index 30963c5d409b..fdf3a8d93185 100644
+index fdf3a8d93185..e8c8a5ea7326 100644
 --- a/include/linux/netdevice.h
 +++ b/include/linux/netdevice.h
-@@ -2443,12 +2443,24 @@ struct net_device {
- 	unsigned long		gro_flush_timeout;
- 	u32			napi_defer_hard_irqs;
- 
-+	/**
-+	 * @up: copy of @state's IFF_UP, but safe to read with just @lock.
-+	 *	May report false negatives while the device is being opened
-+	 *	or closed (@lock does not protect .ndo_open, or .ndo_close).
-+	 */
-+	bool			up;
-+
- 	/**
- 	 * @lock: netdev-scope lock, protects a small selection of fields.
- 	 * Should always be taken using netdev_lock() / netdev_unlock() helpers.
+@@ -2456,7 +2456,7 @@ struct net_device {
  	 * Drivers are free to use it for other protection.
  	 *
--	 * Protects: @reg_state, @net_shaper_hierarchy.
-+	 * Protects:
-+	 *	@net_shaper_hierarchy, @reg_state
-+	 *
-+	 * Partially protects (writers must hold both @lock and rtnl_lock):
-+	 *	@up
-+	 *
- 	 * Ordering: take after rtnl_lock.
- 	 */
- 	struct mutex		lock;
-diff --git a/net/core/dev.h b/net/core/dev.h
-index 25ae732c0775..ef37e2dd44f4 100644
---- a/net/core/dev.h
-+++ b/net/core/dev.h
-@@ -128,6 +128,18 @@ void __dev_notify_flags(struct net_device *dev, unsigned int old_flags,
- void unregister_netdevice_many_notify(struct list_head *head,
- 				      u32 portid, const struct nlmsghdr *nlh);
+ 	 * Protects:
+-	 *	@net_shaper_hierarchy, @reg_state
++	 *	@napi_list, @net_shaper_hierarchy, @reg_state
+ 	 *
+ 	 * Partially protects (writers must hold both @lock and rtnl_lock):
+ 	 *	@up
+@@ -2712,8 +2712,19 @@ static inline void netif_napi_set_irq(struct napi_struct *napi, int irq)
+  */
+ #define NAPI_POLL_WEIGHT 64
  
-+static inline void netif_set_up(struct net_device *dev, bool value)
-+{
-+	if (value)
-+		dev->flags |= IFF_UP;
-+	else
-+		dev->flags &= ~IFF_UP;
+-void netif_napi_add_weight(struct net_device *dev, struct napi_struct *napi,
+-			   int (*poll)(struct napi_struct *, int), int weight);
++void netif_napi_add_weight_locked(struct net_device *dev,
++				  struct napi_struct *napi,
++				  int (*poll)(struct napi_struct *, int),
++				  int weight);
 +
++static inline void
++netif_napi_add_weight(struct net_device *dev, struct napi_struct *napi,
++		      int (*poll)(struct napi_struct *, int), int weight)
++{
 +	netdev_lock(dev);
-+	dev->up = value;
++	netif_napi_add_weight_locked(dev, napi, poll, weight);
 +	netdev_unlock(dev);
 +}
+ 
+ /**
+  * netif_napi_add() - initialize a NAPI context
+@@ -2731,6 +2742,13 @@ netif_napi_add(struct net_device *dev, struct napi_struct *napi,
+ 	netif_napi_add_weight(dev, napi, poll, NAPI_POLL_WEIGHT);
+ }
+ 
++static inline void
++netif_napi_add_locked(struct net_device *dev, struct napi_struct *napi,
++		      int (*poll)(struct napi_struct *, int))
++{
++	netif_napi_add_weight_locked(dev, napi, poll, NAPI_POLL_WEIGHT);
++}
 +
- static inline void netif_set_gso_max_size(struct net_device *dev,
- 					  unsigned int size)
+ static inline void
+ netif_napi_add_tx_weight(struct net_device *dev,
+ 			 struct napi_struct *napi,
+@@ -2741,6 +2759,15 @@ netif_napi_add_tx_weight(struct net_device *dev,
+ 	netif_napi_add_weight(dev, napi, poll, weight);
+ }
+ 
++static inline void
++netif_napi_add_config_locked(struct net_device *dev, struct napi_struct *napi,
++			     int (*poll)(struct napi_struct *, int), int index)
++{
++	napi->index = index;
++	napi->config = &dev->napi_config[index];
++	netif_napi_add_weight_locked(dev, napi, poll, NAPI_POLL_WEIGHT);
++}
++
+ /**
+  * netif_napi_add_config - initialize a NAPI context with persistent config
+  * @dev: network device
+@@ -2752,9 +2779,9 @@ static inline void
+ netif_napi_add_config(struct net_device *dev, struct napi_struct *napi,
+ 		      int (*poll)(struct napi_struct *, int), int index)
  {
+-	napi->index = index;
+-	napi->config = &dev->napi_config[index];
+-	netif_napi_add_weight(dev, napi, poll, NAPI_POLL_WEIGHT);
++	netdev_lock(dev);
++	netif_napi_add_config_locked(dev, napi, poll, index);
++	netdev_unlock(dev);
+ }
+ 
+ /**
+@@ -2774,6 +2801,8 @@ static inline void netif_napi_add_tx(struct net_device *dev,
+ 	netif_napi_add_tx_weight(dev, napi, poll, NAPI_POLL_WEIGHT);
+ }
+ 
++void __netif_napi_del_locked(struct napi_struct *napi);
++
+ /**
+  *  __netif_napi_del - remove a NAPI context
+  *  @napi: NAPI context
+@@ -2782,7 +2811,18 @@ static inline void netif_napi_add_tx(struct net_device *dev,
+  * containing @napi. Drivers might want to call this helper to combine
+  * all the needed RCU grace periods into a single one.
+  */
+-void __netif_napi_del(struct napi_struct *napi);
++static inline void __netif_napi_del(struct napi_struct *napi)
++{
++	netdev_lock(napi->dev);
++	__netif_napi_del_locked(napi);
++	netdev_unlock(napi->dev);
++}
++
++static inline void netif_napi_del_locked(struct napi_struct *napi)
++{
++	__netif_napi_del_locked(napi);
++	synchronize_net();
++}
+ 
+ /**
+  *  netif_napi_del - remove a NAPI context
+diff --git a/drivers/net/ethernet/intel/iavf/iavf_main.c b/drivers/net/ethernet/intel/iavf/iavf_main.c
+index ab908d620285..2db97c5d9f9e 100644
+--- a/drivers/net/ethernet/intel/iavf/iavf_main.c
++++ b/drivers/net/ethernet/intel/iavf/iavf_main.c
+@@ -1800,8 +1800,8 @@ static int iavf_alloc_q_vectors(struct iavf_adapter *adapter)
+ 		q_vector->v_idx = q_idx;
+ 		q_vector->reg_idx = q_idx;
+ 		cpumask_copy(&q_vector->affinity_mask, cpu_possible_mask);
+-		netif_napi_add(adapter->netdev, &q_vector->napi,
+-			       iavf_napi_poll);
++		netif_napi_add_locked(adapter->netdev, &q_vector->napi,
++				      iavf_napi_poll);
+ 	}
+ 
+ 	return 0;
+@@ -1827,7 +1827,7 @@ static void iavf_free_q_vectors(struct iavf_adapter *adapter)
+ 	for (q_idx = 0; q_idx < num_q_vectors; q_idx++) {
+ 		struct iavf_q_vector *q_vector = &adapter->q_vectors[q_idx];
+ 
+-		netif_napi_del(&q_vector->napi);
++		netif_napi_del_locked(&q_vector->napi);
+ 	}
+ 	kfree(adapter->q_vectors);
+ 	adapter->q_vectors = NULL;
 diff --git a/net/core/dev.c b/net/core/dev.c
-index c871e2697fb6..4cba553a4742 100644
+index 4cba553a4742..7511207057e5 100644
 --- a/net/core/dev.c
 +++ b/net/core/dev.c
-@@ -1618,7 +1618,7 @@ static int __dev_open(struct net_device *dev, struct netlink_ext_ack *extack)
- 	if (ret)
- 		clear_bit(__LINK_STATE_START, &dev->state);
- 	else {
--		dev->flags |= IFF_UP;
-+		netif_set_up(dev, true);
- 		dev_set_rx_mode(dev);
- 		dev_activate(dev);
- 		add_device_randomness(dev->dev_addr, dev->addr_len);
-@@ -1697,7 +1697,7 @@ static void __dev_close_many(struct list_head *head)
- 		if (ops->ndo_stop)
- 			ops->ndo_stop(dev);
+@@ -6909,9 +6909,12 @@ netif_napi_dev_list_add(struct net_device *dev, struct napi_struct *napi)
+ 	list_add_rcu(&napi->dev_list, higher); /* adds after higher */
+ }
  
--		dev->flags &= ~IFF_UP;
-+		netif_set_up(dev, false);
- 		netpoll_poll_enable(dev);
+-void netif_napi_add_weight(struct net_device *dev, struct napi_struct *napi,
+-			   int (*poll)(struct napi_struct *, int), int weight)
++void netif_napi_add_weight_locked(struct net_device *dev,
++				  struct napi_struct *napi,
++				  int (*poll)(struct napi_struct *, int),
++				  int weight)
+ {
++	netdev_assert_locked(dev);
+ 	if (WARN_ON(test_and_set_bit(NAPI_STATE_LISTED, &napi->state)))
+ 		return;
+ 
+@@ -6952,7 +6955,7 @@ void netif_napi_add_weight(struct net_device *dev, struct napi_struct *napi,
+ 		dev->threaded = false;
+ 	netif_napi_set_irq(napi, -1);
+ }
+-EXPORT_SYMBOL(netif_napi_add_weight);
++EXPORT_SYMBOL(netif_napi_add_weight_locked);
+ 
+ void napi_disable(struct napi_struct *n)
+ {
+@@ -7023,8 +7026,10 @@ static void flush_gro_hash(struct napi_struct *napi)
+ }
+ 
+ /* Must be called in process context */
+-void __netif_napi_del(struct napi_struct *napi)
++void __netif_napi_del_locked(struct napi_struct *napi)
+ {
++	netdev_assert_locked(napi->dev);
++
+ 	if (!test_and_clear_bit(NAPI_STATE_LISTED, &napi->state))
+ 		return;
+ 
+@@ -7044,7 +7049,7 @@ void __netif_napi_del(struct napi_struct *napi)
+ 		napi->thread = NULL;
  	}
  }
+-EXPORT_SYMBOL(__netif_napi_del);
++EXPORT_SYMBOL(__netif_napi_del_locked);
+ 
+ static int __napi_poll(struct napi_struct *n, bool *repoll)
+ {
 -- 
 2.48.0
 
