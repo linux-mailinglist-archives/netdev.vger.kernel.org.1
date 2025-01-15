@@ -1,81 +1,81 @@
-Return-Path: <netdev+bounces-158627-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158625-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A65CA12C11
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 20:56:02 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A37EBA12C0F
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 20:55:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 582A63A3227
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 19:55:54 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EE73E7A1102
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 19:55:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47F871D90A9;
-	Wed, 15 Jan 2025 19:55:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C1BD1D89F1;
+	Wed, 15 Jan 2025 19:55:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="LJJEwUug"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="U8bWHOnk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F087C1D86F2;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67C681D86ED;
 	Wed, 15 Jan 2025 19:55:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736970944; cv=none; b=aZoZKjNIBfW0P5FYzo6ycnkx+wT0vfjB9IyoOO1v0iub9ejAkIsLaXUR3RBVGsvv3g1sLLgXBIBIN/q5iFYCHChWJn6ozOa30akFb+sf+XU0rzjdG53OF2xSErdygXejJvW8O7JeitJIwUVe3uvtm0VgWUUrWSAmcmLlp3RUvVU=
+	t=1736970943; cv=none; b=Z7zjf9xIot05Pj8D/q7D5GVgNITYGhS41nuNhlXyckxGWpCwvxuRd5Kr6qM2bFdK/nRFPZHys/qu5+oMbTIMmJw4x4gus+XidX/RXNsPXj3GuApc9dv8/l0XWlb2ch2pjffb9F8FpbIraiq8rDbGN+CdHB38Q/tA9TExQ9dcUOI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736970944; c=relaxed/simple;
-	bh=hCjK59icEPJgQHXN30wyFrnd90eWmotLxsKPmA4AWhI=;
+	s=arc-20240116; t=1736970943; c=relaxed/simple;
+	bh=0xIbJg6ktBGbg8LQpYCIlByVKbE247d+Z8EHLMt3Ccw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=eB4F4JCvsEk9fay3MRhitRjnKfG6mAWMw9i3RiVbc88vyvynQCblOp+urzivusyw34G02mSK4DM/ZnFxYIaD97NngG/bX8zkaoJ2RZv5V3B3c0B+OjXDiQkhkng9DN5DmVwnZZPIyt2m6sKaed2hckYSgDug+Pnz7aQ1hojjt48=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=LJJEwUug; arc=none smtp.client-ip=148.163.156.1
+	 MIME-Version; b=ex40dfB0fpCvebgYvFCCnWsl1sOeC4VfClyFa/tQ6ak6dzrLc6KATW36Ti3ET1tPHhosSeO9dAZSbzilr0EFRAIrhoDiLP04ArCDFEV6NVmouZK8LyR25uZsj/iQpuYlF5Zyq789ROzJVZOFwc1XdXXHDd1QECMx/jnf6A7w7J4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=U8bWHOnk; arc=none smtp.client-ip=148.163.158.5
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50FHX5DG024451;
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50FHX4fp024067;
 	Wed, 15 Jan 2025 19:55:33 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
 	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=pp1; bh=o9Bod7I6wEirlR+0z
-	c2JpYns0G5mDBKkE489MdQ45rk=; b=LJJEwUug/yb6YQGaWa6V80N0hOM2Cs9HY
-	IudnXuJO4DcuR7ERCv2n2TlT3h3js7oICer+kdQp8lazJs60KkliMI4hKzqzaRCO
-	98DZBhz1Jjcf7h7IZkZFmr7+DjBmfThID2VAKF0dpv6+pKvf9zySnOFqa/Bi3U4o
-	D+zhKhdxIr4EJnic4oYRhsJ2Evg4vpWYRxIaLAHOHQ9XMMaj9fze1N+i8KwxQ+FT
-	2X8hL8vDFjJo4yMPxmWrsnAn7WO/r1+050uetXyXLuInmh2XR+ot0/0D0xHOuscT
-	1f40Xm0cJDV3HyqQ43XW3zs7LNbsT6FTzf9A1JpVh65EDXosiO1Kg==
+	:mime-version:references:subject:to; s=pp1; bh=z6lUahnBOLW6mWPDB
+	+99h59uUIwQEQOGhnQTZ92akko=; b=U8bWHOnk6BZoycUPzQXCOGvj7+ETGdThp
+	lLHISqXWUfBykD+pM6Ft0FTeD16OrQ61YN90ThhrfOeu/OWGuBON1D+Q7xzywRin
+	VsJRIxA/7sQTcVKSyYUII/J3hBKBt5Ew15VD7FHLkpct+1dOSLCfVtdd16v2qr7K
+	5qqb2uvSPxEstPbEVCIuV5aIQZ/WbvjLspO01a+CR9e1DIzRo6ILBS7yTaFUqNJv
+	mPNtIK47uTUI4H9/IueGVMI+r51M0HVulZEttSentJhxM1TVE6qSqzAthJZocLPE
+	EDIjXRnQyCH/fxH0TV8QXgQe3MeGm49pTC8g3TY1ZR/q8ctDWkGJA==
 Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44622hw1qx-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 15 Jan 2025 19:55:33 +0000 (GMT)
-Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 50FJjvQk017712;
-	Wed, 15 Jan 2025 19:55:32 GMT
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44622hw1qr-1
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4469733c40-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
 	Wed, 15 Jan 2025 19:55:32 +0000 (GMT)
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 50FIqLZp016490;
+Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 50FJpqHk030708;
+	Wed, 15 Jan 2025 19:55:32 GMT
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4469733c3v-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 15 Jan 2025 19:55:32 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 50FIi3YT001330;
 	Wed, 15 Jan 2025 19:55:31 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 4445p1su9d-1
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 44456k1xbm-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
 	Wed, 15 Jan 2025 19:55:31 +0000
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 50FJtRB035782996
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 50FJtRxZ56820008
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
 	Wed, 15 Jan 2025 19:55:27 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id A28362004B;
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id AC2DD2004F;
 	Wed, 15 Jan 2025 19:55:27 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 7A97320040;
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 8B37A2004B;
 	Wed, 15 Jan 2025 19:55:27 +0000 (GMT)
 Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTPS;
 	Wed, 15 Jan 2025 19:55:27 +0000 (GMT)
 Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 55271)
-	id 48ECAE0D81; Wed, 15 Jan 2025 20:55:27 +0100 (CET)
+	id 4BB95E0D82; Wed, 15 Jan 2025 20:55:27 +0100 (CET)
 From: Alexandra Winter <wintera@linux.ibm.com>
 To: Wenjia Zhang <wenjia@linux.ibm.com>, Jan Karcher <jaka@linux.ibm.com>,
         Gerd Bayer <gbayer@linux.ibm.com>,
@@ -95,9 +95,9 @@ Cc: Julian Ruess <julianr@linux.ibm.com>,
         Alexander Gordeev <agordeev@linux.ibm.com>,
         Christian Borntraeger <borntraeger@linux.ibm.com>,
         Sven Schnelle <svens@linux.ibm.com>, Simon Horman <horms@kernel.org>
-Subject: [RFC net-next 2/7] net/ism: Remove dependencies between ISM_VPCI and SMC
-Date: Wed, 15 Jan 2025 20:55:22 +0100
-Message-ID: <20250115195527.2094320-3-wintera@linux.ibm.com>
+Subject: [RFC net-next 3/7] net/ism: Use uuid_t for ISM GID
+Date: Wed, 15 Jan 2025 20:55:23 +0100
+Message-ID: <20250115195527.2094320-4-wintera@linux.ibm.com>
 X-Mailer: git-send-email 2.45.2
 In-Reply-To: <20250115195527.2094320-1-wintera@linux.ibm.com>
 References: <20250115195527.2094320-1-wintera@linux.ibm.com>
@@ -109,823 +109,301 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: S46kHLk4hUyUIJ6M_-Mlscp471qKswDG
-X-Proofpoint-ORIG-GUID: Tz712k5wofPJ9Hv6BLPoU8DCjOmORGwN
+X-Proofpoint-ORIG-GUID: wuVzr37PZmx3A4zghoqmOg1YOekFppic
+X-Proofpoint-GUID: I6TvsXNnODiI5tIOD_mL6c69h3bRzsbC
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
  definitions=2025-01-15_09,2025-01-15_02,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 clxscore=1015
- impostorscore=0 bulkscore=0 lowpriorityscore=0 phishscore=0 suspectscore=0
- priorityscore=1501 mlxlogscore=876 malwarescore=0 adultscore=0 mlxscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2411120000
- definitions=main-2501150142
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 bulkscore=0
+ malwarescore=0 adultscore=0 priorityscore=1501 phishscore=0 clxscore=1015
+ suspectscore=0 spamscore=0 impostorscore=0 lowpriorityscore=0
+ mlxlogscore=523 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2411120000 definitions=main-2501150142
 
-The modules ISM_VPCI and SMC should not depend on each other,
-instead they should both depend on the ISM layer module.
+SMC uses 64 Bit and 128 Bit Global Identifiers (GIDs)
+that need to be sent via the SMC protocol.
+When integers are used network endianness and host endianness
+need to be considered.
 
-use only ism_dmb:
-Now that SMC depends on ISM, we can safely remove the
-duplicate declaration of smcd_dmb and use only ism_dmb.
+Avoid this in the ISM layer by using uuid_t byte arrays.
+Follow on patches could do the same change for SMC, for now
+conversion helper functions are introduced.
 
-Move smcd_ops away from ism_drv:
-move smcd_ops from drivers/s390/net/ism_drv.c to net/smc/smc_ism.c
-Less exported functions, no more dependencies between ISM_VPCI and SMC.
-Once ism_loopback is also moved to ism layer, a follow on patch can use
-ism_ops directly and remove smcd_ops.
+ISM-vPCI devices provide 64 Bit GIDs. Map them to ISM uuid_t GIDs
+like this:
+ _________________________________________
+| 64 Bit ISM-vPCI GID | 00000000_00000000 |
+ -----------------------------------------
+If interpreted as UUID, this would be interpreted as th UIID variant,
+that is reserved for NCS backward compatibility. So it will not collide
+with UUIDs that were generated according to the standard.
 
-Now the ISM_VPCI module no longer needs to imply SMC.
+Future ISM devices, shall use real UUIDs as 128 Bit GIDs.
 
 Note:
-- This patch temporarily moves smcd_gid to ism.h,
-a follow on patch (uuid_t gid) will restore this.
-- Added a comment that vlan handling in ism_drv.c and smc
-is incomplete. Should be fixed by a follow-on patch.
+- In this RFC patch smcd_gid is now moved back to smc.h,
+  future patchset should avoid that.
+- ism_dmb and ism_event structs still contain 64 Bit rgid and info
+  fields. A future patch could change them to uuid_t gids. This
+  does not break anything, because ism_loopback does not use them.
 
 Signed-off-by: Alexandra Winter <wintera@linux.ibm.com>
 ---
- drivers/s390/net/Kconfig   |   1 -
- drivers/s390/net/ism.h     |   1 -
- drivers/s390/net/ism_drv.c | 236 +++++++++++++------------------------
- include/linux/ism.h        | 146 +++++++++++++++++------
- include/net/smc.h          |  31 ++---
- net/smc/smc_ism.c          | 123 ++++++++++++++++++-
- net/smc/smc_loopback.c     |   6 +-
- 7 files changed, 319 insertions(+), 225 deletions(-)
+ drivers/s390/net/ism.h     |  9 +++++++++
+ drivers/s390/net/ism_drv.c | 16 ++++++++--------
+ include/linux/ism.h        | 16 ++++++----------
+ include/net/smc.h          | 12 ++++++------
+ net/smc/smc_ism.c          | 13 ++++++++-----
+ net/smc/smc_ism.h          | 21 +++++++++++++++++++++
+ 6 files changed, 58 insertions(+), 29 deletions(-)
 
-diff --git a/drivers/s390/net/Kconfig b/drivers/s390/net/Kconfig
-index 2e900d3087d4..9bb3cc186510 100644
---- a/drivers/s390/net/Kconfig
-+++ b/drivers/s390/net/Kconfig
-@@ -103,7 +103,6 @@ config CCWGROUP
- config ISM_VPCI
- 	tristate "Support for ISM vPCI Adapter"
- 	depends on PCI && ISM
--	imply SMC
- 	default y
- 	help
- 	  Select this option if you want to use the Internal Shared Memory
 diff --git a/drivers/s390/net/ism.h b/drivers/s390/net/ism.h
-index 047fa6101555..8b56e1d82e6b 100644
+index 8b56e1d82e6b..61cf10334170 100644
 --- a/drivers/s390/net/ism.h
 +++ b/drivers/s390/net/ism.h
-@@ -6,7 +6,6 @@
- #include <linux/types.h>
- #include <linux/pci.h>
- #include <linux/ism.h>
--#include <net/smc.h>
- #include <asm/pci_insn.h>
+@@ -64,6 +64,15 @@ union ism_reg_ieq {
+ 	} response;
+ } __aligned(16);
  
- #define UTIL_STR_LEN	16
++/* ISM-vPCI devices provide 64 Bit GIDs
++ * Map them to ISM UUID GIDs like this:
++ *  _________________________________________
++ * | 64 Bit ISM-vPCI GID | 00000000_00000000 |
++ *  -----------------------------------------
++ * This will be interpreted as a UIID variant, that is reserved
++ * for NCS backward compatibility. So it will not collide with
++ * proper UUIDs.
++ */
+ union ism_read_gid {
+ 	struct {
+ 		struct ism_req_hdr hdr;
 diff --git a/drivers/s390/net/ism_drv.c b/drivers/s390/net/ism_drv.c
-index 2eeccf5ef48d..112e0d67cdd6 100644
+index 112e0d67cdd6..ab70debbdd9d 100644
 --- a/drivers/s390/net/ism_drv.c
 +++ b/drivers/s390/net/ism_drv.c
-@@ -191,11 +191,28 @@ static int ism_read_local_gid(struct ism_dev *ism)
+@@ -191,14 +191,14 @@ static int ism_read_local_gid(struct ism_dev *ism)
  	if (ret)
  		goto out;
  
--	ism->local_gid = cmd.response.gid;
-+	ism->gid.gid = cmd.response.gid;
-+	ism->gid.gid_ext = 0;
+-	ism->gid.gid = cmd.response.gid;
+-	ism->gid.gid_ext = 0;
++	memset(&ism->gid, 0, sizeof(ism->gid));
++	memcpy(&ism->gid, &cmd.response.gid, sizeof(cmd.response.gid));
  out:
  	return ret;
  }
  
-+static int ism_query_rgid(struct ism_dev *ism, struct smcd_gid *rgid,
-+			  u32 vid_valid, u32 vid)
-+{
-+	union ism_query_rgid cmd;
-+
-+	memset(&cmd, 0, sizeof(cmd));
-+	cmd.request.hdr.cmd = ISM_QUERY_RGID;
-+	cmd.request.hdr.len = sizeof(cmd.request);
-+
-+	cmd.request.rgid = rgid->gid;
-+	cmd.request.vlan_valid = vid_valid;
-+	cmd.request.vlan_id = vid;
-+
-+	return ism_cmd(ism, &cmd);
-+}
-+
- static void ism_free_dmb(struct ism_dev *ism, struct ism_dmb *dmb)
+-static int ism_query_rgid(struct ism_dev *ism, struct smcd_gid *rgid,
+-			  u32 vid_valid, u32 vid)
++static int ism_query_rgid(struct ism_dev *ism, uuid_t *rgid, u32 vid_valid,
++			  u32 vid)
  {
- 	clear_bit(dmb->sba_idx, ism->sba_bitmap);
-@@ -251,8 +268,8 @@ static int ism_alloc_dmb(struct ism_dev *ism, struct ism_dmb *dmb)
- 	return rc;
+ 	union ism_query_rgid cmd;
+ 
+@@ -206,7 +206,7 @@ static int ism_query_rgid(struct ism_dev *ism, struct smcd_gid *rgid,
+ 	cmd.request.hdr.cmd = ISM_QUERY_RGID;
+ 	cmd.request.hdr.len = sizeof(cmd.request);
+ 
+-	cmd.request.rgid = rgid->gid;
++	memcpy(&cmd.request.rgid, rgid, sizeof(cmd.request.rgid));
+ 	cmd.request.vlan_valid = vid_valid;
+ 	cmd.request.vlan_id = vid;
+ 
+@@ -364,8 +364,8 @@ static int ism_reset_vlan_required(struct ism_dev *ism)
+ 	return ism_cmd_simple(ism, ISM_RESET_VLAN);
  }
  
--int ism_register_dmb(struct ism_dev *ism, struct ism_dmb *dmb,
--		     struct ism_client *client)
-+static int ism_register_dmb(struct ism_dev *ism, struct ism_dmb *dmb,
-+			    struct ism_client *client)
+-static int ism_signal_ieq(struct ism_dev *ism, struct smcd_gid *rgid,
+-			  u32 trigger_irq, u32 event_code, u64 info)
++static int ism_signal_ieq(struct ism_dev *ism, uuid_t *rgid, u32 trigger_irq,
++			  u32 event_code, u64 info)
  {
- 	union ism_reg_dmb cmd;
- 	unsigned long flags;
-@@ -285,9 +302,8 @@ int ism_register_dmb(struct ism_dev *ism, struct ism_dmb *dmb,
- out:
- 	return ret;
- }
--EXPORT_SYMBOL_GPL(ism_register_dmb);
+ 	union ism_sig_ieq cmd;
  
--int ism_unregister_dmb(struct ism_dev *ism, struct ism_dmb *dmb)
-+static int ism_unregister_dmb(struct ism_dev *ism, struct ism_dmb *dmb)
- {
- 	union ism_unreg_dmb cmd;
- 	unsigned long flags;
-@@ -311,7 +327,6 @@ int ism_unregister_dmb(struct ism_dev *ism, struct ism_dmb *dmb)
- out:
- 	return ret;
- }
--EXPORT_SYMBOL_GPL(ism_unregister_dmb);
+@@ -373,7 +373,7 @@ static int ism_signal_ieq(struct ism_dev *ism, struct smcd_gid *rgid,
+ 	cmd.request.hdr.cmd = ISM_SIGNAL_IEQ;
+ 	cmd.request.hdr.len = sizeof(cmd.request);
  
- static int ism_add_vlan_id(struct ism_dev *ism, u64 vlan_id)
- {
-@@ -339,14 +354,42 @@ static int ism_del_vlan_id(struct ism_dev *ism, u64 vlan_id)
- 	return ism_cmd(ism, &cmd);
- }
- 
-+static int ism_set_vlan_required(struct ism_dev *ism)
-+{
-+	return ism_cmd_simple(ism, ISM_SET_VLAN);
-+}
-+
-+static int ism_reset_vlan_required(struct ism_dev *ism)
-+{
-+	return ism_cmd_simple(ism, ISM_RESET_VLAN);
-+}
-+
-+static int ism_signal_ieq(struct ism_dev *ism, struct smcd_gid *rgid,
-+			  u32 trigger_irq, u32 event_code, u64 info)
-+{
-+	union ism_sig_ieq cmd;
-+
-+	memset(&cmd, 0, sizeof(cmd));
-+	cmd.request.hdr.cmd = ISM_SIGNAL_IEQ;
-+	cmd.request.hdr.len = sizeof(cmd.request);
-+
-+	cmd.request.rgid = rgid->gid;
-+	cmd.request.trigger_irq = trigger_irq;
-+	cmd.request.event_code = event_code;
-+	cmd.request.info = info;
-+
-+	return ism_cmd(ism, &cmd);
-+}
-+
- static unsigned int max_bytes(unsigned int start, unsigned int len,
- 			      unsigned int boundary)
- {
- 	return min(boundary - (start & (boundary - 1)), len);
- }
- 
--int ism_move(struct ism_dev *ism, u64 dmb_tok, unsigned int idx, bool sf,
--	     unsigned int offset, void *data, unsigned int size)
-+static int ism_move(struct ism_dev *ism, u64 dmb_tok, unsigned int idx,
-+		    bool sf, unsigned int offset, void *data,
-+		    unsigned int size)
- {
- 	unsigned int bytes;
- 	u64 dmb_req;
-@@ -368,7 +411,19 @@ int ism_move(struct ism_dev *ism, u64 dmb_tok, unsigned int idx, bool sf,
- 
- 	return 0;
- }
--EXPORT_SYMBOL_GPL(ism_move);
-+
-+static int ism_supports_v2(void)
-+{
-+	return ism_v2_capable;
-+}
-+
-+static u16 ism_get_chid(struct ism_dev *ism)
-+{
-+	if (!ism || !ism->pdev)
-+		return 0;
-+
-+	return to_zpci(ism->pdev)->pchid;
-+}
- 
- static void ism_handle_event(struct ism_dev *ism)
- {
-@@ -428,6 +483,20 @@ static irqreturn_t ism_handle_irq(int irq, void *data)
- 	return IRQ_HANDLED;
- }
- 
-+static const struct ism_ops ism_vp_ops = {
-+	.query_remote_gid = ism_query_rgid,
-+	.register_dmb = ism_register_dmb,
-+	.unregister_dmb = ism_unregister_dmb,
-+	.add_vlan_id = ism_add_vlan_id,
-+	.del_vlan_id = ism_del_vlan_id,
-+	.set_vlan_required = ism_set_vlan_required,
-+	.reset_vlan_required = ism_reset_vlan_required,
-+	.signal_event = ism_signal_ieq,
-+	.move_data = ism_move,
-+	.supports_v2 = ism_supports_v2,
-+	.get_chid = ism_get_chid,
-+};
-+
- static int ism_dev_init(struct ism_dev *ism)
- {
- 	struct pci_dev *pdev = ism->pdev;
-@@ -465,6 +534,8 @@ static int ism_dev_init(struct ism_dev *ism)
- 	else
- 		ism_v2_capable = false;
- 
-+	ism->ops = &ism_vp_ops;
-+
- 	ism_dev_register(ism);
- 	query_info(ism);
- 	return 0;
-@@ -603,150 +674,3 @@ static void __exit ism_exit(void)
- 
- module_init(ism_init);
- module_exit(ism_exit);
--
--/*************************** SMC-D Implementation *****************************/
--
--#if IS_ENABLED(CONFIG_SMC) // needed to avoid unused functions
--static int ism_query_rgid(struct ism_dev *ism, u64 rgid, u32 vid_valid,
--			  u32 vid)
--{
--	union ism_query_rgid cmd;
--
--	memset(&cmd, 0, sizeof(cmd));
--	cmd.request.hdr.cmd = ISM_QUERY_RGID;
--	cmd.request.hdr.len = sizeof(cmd.request);
--
--	cmd.request.rgid = rgid;
--	cmd.request.vlan_valid = vid_valid;
--	cmd.request.vlan_id = vid;
--
--	return ism_cmd(ism, &cmd);
--}
--
--static int smcd_query_rgid(struct smcd_dev *smcd, struct smcd_gid *rgid,
--			   u32 vid_valid, u32 vid)
--{
--	return ism_query_rgid(smcd->priv, rgid->gid, vid_valid, vid);
--}
--
--static int smcd_register_dmb(struct smcd_dev *smcd, struct smcd_dmb *dmb,
--			     void *client)
--{
--	return ism_register_dmb(smcd->priv, (struct ism_dmb *)dmb, client);
--}
--
--static int smcd_unregister_dmb(struct smcd_dev *smcd, struct smcd_dmb *dmb)
--{
--	return ism_unregister_dmb(smcd->priv, (struct ism_dmb *)dmb);
--}
--
--static int smcd_add_vlan_id(struct smcd_dev *smcd, u64 vlan_id)
--{
--	return ism_add_vlan_id(smcd->priv, vlan_id);
--}
--
--static int smcd_del_vlan_id(struct smcd_dev *smcd, u64 vlan_id)
--{
--	return ism_del_vlan_id(smcd->priv, vlan_id);
--}
--
--static int smcd_set_vlan_required(struct smcd_dev *smcd)
--{
--	return ism_cmd_simple(smcd->priv, ISM_SET_VLAN);
--}
--
--static int smcd_reset_vlan_required(struct smcd_dev *smcd)
--{
--	return ism_cmd_simple(smcd->priv, ISM_RESET_VLAN);
--}
--
--static int ism_signal_ieq(struct ism_dev *ism, u64 rgid, u32 trigger_irq,
--			  u32 event_code, u64 info)
--{
--	union ism_sig_ieq cmd;
--
--	memset(&cmd, 0, sizeof(cmd));
--	cmd.request.hdr.cmd = ISM_SIGNAL_IEQ;
--	cmd.request.hdr.len = sizeof(cmd.request);
--
--	cmd.request.rgid = rgid;
--	cmd.request.trigger_irq = trigger_irq;
--	cmd.request.event_code = event_code;
--	cmd.request.info = info;
--
--	return ism_cmd(ism, &cmd);
--}
--
--static int smcd_signal_ieq(struct smcd_dev *smcd, struct smcd_gid *rgid,
--			   u32 trigger_irq, u32 event_code, u64 info)
--{
--	return ism_signal_ieq(smcd->priv, rgid->gid,
--			      trigger_irq, event_code, info);
--}
--
--static int smcd_move(struct smcd_dev *smcd, u64 dmb_tok, unsigned int idx,
--		     bool sf, unsigned int offset, void *data,
--		     unsigned int size)
--{
--	return ism_move(smcd->priv, dmb_tok, idx, sf, offset, data, size);
--}
--
--static int smcd_supports_v2(void)
--{
--	return ism_v2_capable;
--}
--
--static u64 ism_get_local_gid(struct ism_dev *ism)
--{
--	return ism->local_gid;
--}
--
--static void smcd_get_local_gid(struct smcd_dev *smcd,
--			       struct smcd_gid *smcd_gid)
--{
--	smcd_gid->gid = ism_get_local_gid(smcd->priv);
--	smcd_gid->gid_ext = 0;
--}
--
--static u16 ism_get_chid(struct ism_dev *ism)
--{
--	if (!ism || !ism->pdev)
--		return 0;
--
--	return to_zpci(ism->pdev)->pchid;
--}
--
--static u16 smcd_get_chid(struct smcd_dev *smcd)
--{
--	return ism_get_chid(smcd->priv);
--}
--
--static inline struct device *smcd_get_dev(struct smcd_dev *dev)
--{
--	struct ism_dev *ism = dev->priv;
--
--	return &ism->dev;
--}
--
--static const struct smcd_ops ism_ops = {
--	.query_remote_gid = smcd_query_rgid,
--	.register_dmb = smcd_register_dmb,
--	.unregister_dmb = smcd_unregister_dmb,
--	.add_vlan_id = smcd_add_vlan_id,
--	.del_vlan_id = smcd_del_vlan_id,
--	.set_vlan_required = smcd_set_vlan_required,
--	.reset_vlan_required = smcd_reset_vlan_required,
--	.signal_event = smcd_signal_ieq,
--	.move_data = smcd_move,
--	.supports_v2 = smcd_supports_v2,
--	.get_local_gid = smcd_get_local_gid,
--	.get_chid = smcd_get_chid,
--	.get_dev = smcd_get_dev,
--};
--
--const struct smcd_ops *ism_get_smcd_ops(void)
--{
--	return &ism_ops;
--}
--EXPORT_SYMBOL_GPL(ism_get_smcd_ops);
--#endif
+-	cmd.request.rgid = rgid->gid;
++	memcpy(&cmd.request.rgid, rgid, sizeof(cmd.request.rgid));
+ 	cmd.request.trigger_irq = trigger_irq;
+ 	cmd.request.event_code = event_code;
+ 	cmd.request.info = info;
 diff --git a/include/linux/ism.h b/include/linux/ism.h
-index 1462296e8ba7..ede1a40b408e 100644
+index ede1a40b408e..50975847248f 100644
 --- a/include/linux/ism.h
 +++ b/include/linux/ism.h
-@@ -12,6 +12,7 @@
+@@ -11,6 +11,7 @@
+ 
  #include <linux/device.h>
  #include <linux/workqueue.h>
++#include <linux/uuid.h>
  
-+/* The remote peer rgid can use dmb_tok to write into this buffer. */
+ /* The remote peer rgid can use dmb_tok to write into this buffer. */
  struct ism_dmb {
- 	u64 dmb_tok;
- 	u64 rgid;
-@@ -23,30 +24,9 @@ struct ism_dmb {
+@@ -24,11 +25,6 @@ struct ism_dmb {
  	dma_addr_t dma_addr;
  };
- 
--/* Unless we gain unexpected popularity, this limit should hold for a while */
--#define MAX_CLIENTS		8
--#define NO_CLIENT		0xff		/* must be >= MAX_CLIENTS */
--#define ISM_NR_DMBS		1920
--
--struct ism_dev {
--	spinlock_t lock; /* protects the ism device */
--	struct list_head list;
--	struct pci_dev *pdev;
--
--	struct ism_sba *sba;
--	dma_addr_t sba_dma_addr;
--	DECLARE_BITMAP(sba_bitmap, ISM_NR_DMBS);
--	u8 *sba_client_arr;	/* entries are indices into 'clients' array */
--	void *priv[MAX_CLIENTS];
--
--	struct ism_eq *ieq;
--	dma_addr_t ieq_dma_addr;
--
--	struct device dev;
--	u64 local_gid;
--	int ieq_idx;
--
--	struct ism_client *subs[MAX_CLIENTS];
-+struct smcd_gid {
-+	u64	gid;
-+	u64	gid_ext;
- };
- 
- struct ism_event {
-@@ -57,6 +37,12 @@ struct ism_event {
- 	u64 info;
- };
- 
-+#define ISM_EVENT_DMB	0
-+#define ISM_EVENT_GID	1
-+#define ISM_EVENT_SWR	2
-+
-+struct ism_dev;
-+
- struct ism_client {
- 	const char *name;
- 	void (*add)(struct ism_dev *dev);
-@@ -73,28 +59,116 @@ struct ism_client {
- 
- int ism_register_client(struct ism_client *client);
- int  ism_unregister_client(struct ism_client *client);
--static inline void *ism_get_priv(struct ism_dev *dev,
--				 struct ism_client *client) {
--	return dev->priv[client->id];
--}
-+
-+/* Mandatory operations for all ism devices:
-+ * int (*query_remote_gid)(struct ism_dev *dev, struct smcd_gid *rgid,
-+ *	                   u32 vid_valid, u32 vid);
-+ *	Query whether remote GID rgid is reachable via this device and this
-+ *	vlan id. Vlan id is only checked if vid_valid != 0.
-+ *
-+ * int (*register_dmb)(struct ism_dev *dev, struct ism_dmb *dmb,
-+ *			    void *client);
-+ *	Register an ism_dmb buffer for this device and this client.
-+ *
-+ * int (*unregister_dmb)(struct ism_dev *dev, struct ism_dmb *dmb);
-+ *	Unregister an ism_dmb buffer
-+ *
-+ * int (*move_data)(struct ism_dev *dev, u64 dmb_tok, unsigned int idx,
-+ *			 bool sf, unsigned int offset, void *data,
-+ *			 unsigned int size);
-+ *	Use dev to write data of size at offset into a remote dmb
-+ *	identified by dmb_tok and idx. If signal flag (sf) then signal
-+ *	the remote peer that data has arrived in this dmb.
-+ *
-+ * int (*supports_v2)(void);
-+ *
-+ * u16 (*get_chid)(struct ism_dev *dev);
-+ *	Returns ism fabric identifier (channel id) of this device.
-+ *	Only devices on the same ism fabric can communicate.
-+ *	chid is unique per HW system, except for 0xFFFF, which denotes
-+ *	an ism_loopback device that can only communicate with itself.
-+ *	Use chid for fast negative checks, but only query_remote_gid()
-+ *	can give a reliable positive answer.
-+ *
-+ * struct device* (*get_dev)(struct ism_dev *dev);
-+ *
-+ * Optional operations:
-+ * int (*add_vlan_id)(struct ism_dev *dev, u64 vlan_id);
-+ * int (*del_vlan_id)(struct ism_dev *dev, u64 vlan_id);
-+ * int (*set_vlan_required)(struct ism_dev *dev);
-+ * int (*reset_vlan_required)(struct ism_dev *dev);
-+ *	VLAN handling is broken - don't use it
-+ *	Ability to assign dmbs to VLANs is missing
-+ *	- do we really want / need this?
-+ *
-+ * int (*signal_event)(struct ism_dev *dev, struct smcd_gid *rgid,
-+ *			    u32 trigger_irq, u32 event_code, u64 info);
-+ *	Send a control event into the event queue of a remote gid (rgid)
-+ *	with (1) or without (0) triggering an interrupt at the remote gid.
-+ */
-+
-+struct ism_ops {
-+	int (*query_remote_gid)(struct ism_dev *dev, struct smcd_gid *rgid,
-+				u32 vid_valid, u32 vid);
-+	int (*register_dmb)(struct ism_dev *dev, struct ism_dmb *dmb,
-+			    struct ism_client *client);
-+	int (*unregister_dmb)(struct ism_dev *dev, struct ism_dmb *dmb);
-+	int (*move_data)(struct ism_dev *dev, u64 dmb_tok, unsigned int idx,
-+			 bool sf, unsigned int offset, void *data,
-+			 unsigned int size);
-+	int (*supports_v2)(void);
-+	u16 (*get_chid)(struct ism_dev *dev);
-+	struct device* (*get_dev)(struct ism_dev *dev);
-+
-+	/* optional operations */
-+	int (*add_vlan_id)(struct ism_dev *dev, u64 vlan_id);
-+	int (*del_vlan_id)(struct ism_dev *dev, u64 vlan_id);
-+	int (*set_vlan_required)(struct ism_dev *dev);
-+	int (*reset_vlan_required)(struct ism_dev *dev);
-+	int (*signal_event)(struct ism_dev *dev, struct smcd_gid *rgid,
-+			    u32 trigger_irq, u32 event_code, u64 info);
-+};
-+
-+/* Unless we gain unexpected popularity, this limit should hold for a while */
-+#define MAX_CLIENTS		8
-+#define NO_CLIENT		0xff		/* must be >= MAX_CLIENTS */
-+#define ISM_NR_DMBS		1920
-+
-+struct ism_dev {
-+	const struct ism_ops *ops;
-+	spinlock_t lock; /* protects the ism device */
-+	struct list_head list;
-+	struct pci_dev *pdev;
-+
-+	struct ism_sba *sba;
-+	dma_addr_t sba_dma_addr;
-+	DECLARE_BITMAP(sba_bitmap, ISM_NR_DMBS);
-+	u8 *sba_client_arr;	/* entries are indices into 'clients' array */
-+	void *priv[MAX_CLIENTS];
-+
-+	struct ism_eq *ieq;
-+	dma_addr_t ieq_dma_addr;
-+
-+	struct device dev;
-+	struct smcd_gid gid;
-+	int ieq_idx;
-+
-+	struct ism_client *subs[MAX_CLIENTS];
-+};
- 
- int ism_dev_register(struct ism_dev *ism);
- void ism_dev_unregister(struct ism_dev *ism);
- 
-+static inline void *ism_get_priv(struct ism_dev *dev,
-+				 struct ism_client *client) {
-+	return dev->priv[client->id];
-+}
- static inline void ism_set_priv(struct ism_dev *dev, struct ism_client *client,
- 				void *priv) {
- 	dev->priv[client->id] = priv;
- }
- 
--int  ism_register_dmb(struct ism_dev *dev, struct ism_dmb *dmb,
--		      struct ism_client *client);
--int  ism_unregister_dmb(struct ism_dev *dev, struct ism_dmb *dmb);
--int  ism_move(struct ism_dev *dev, u64 dmb_tok, unsigned int idx, bool sf,
--	      unsigned int offset, void *data, unsigned int size);
--
- #define ISM_RESERVED_VLANID	0x1FFF
- #define ISM_ERROR	0xFFFF
- 
--const struct smcd_ops *ism_get_smcd_ops(void);
--
- #endif	/* _ISM_H */
-diff --git a/include/net/smc.h b/include/net/smc.h
-index ab732b286f91..3d20c6c05056 100644
---- a/include/net/smc.h
-+++ b/include/net/smc.h
-@@ -27,35 +27,20 @@ struct smc_hashinfo {
- };
- 
- /* SMCD/ISM device driver interface */
--struct smcd_dmb {
--	u64 dmb_tok;
--	u64 rgid;
--	u32 dmb_len;
--	u32 sba_idx;
--	u32 vlan_valid;
--	u32 vlan_id;
--	void *cpu_addr;
--	dma_addr_t dma_addr;
--};
--
--#define ISM_EVENT_DMB	0
--#define ISM_EVENT_GID	1
--#define ISM_EVENT_SWR	2
--
- 
- struct smcd_dev;
  
 -struct smcd_gid {
 -	u64	gid;
 -	u64	gid_ext;
 -};
 -
-+//struct smcd_gid {
-+//	u64	gid;
-+//	u64	gid_ext;
-+//};
-+//
+ struct ism_event {
+ 	u32 type;
+ 	u32 code;
+@@ -61,7 +57,7 @@ int ism_register_client(struct ism_client *client);
+ int  ism_unregister_client(struct ism_client *client);
+ 
+ /* Mandatory operations for all ism devices:
+- * int (*query_remote_gid)(struct ism_dev *dev, struct smcd_gid *rgid,
++ * int (*query_remote_gid)(struct ism_dev *dev, uuid_t *rgid,
+  *	                   u32 vid_valid, u32 vid);
+  *	Query whether remote GID rgid is reachable via this device and this
+  *	vlan id. Vlan id is only checked if vid_valid != 0.
+@@ -101,14 +97,14 @@ int  ism_unregister_client(struct ism_client *client);
+  *	Ability to assign dmbs to VLANs is missing
+  *	- do we really want / need this?
+  *
+- * int (*signal_event)(struct ism_dev *dev, struct smcd_gid *rgid,
++ * int (*signal_event)(struct ism_dev *dev, uuid_t *rgid,
+  *			    u32 trigger_irq, u32 event_code, u64 info);
+  *	Send a control event into the event queue of a remote gid (rgid)
+  *	with (1) or without (0) triggering an interrupt at the remote gid.
+  */
+ 
+ struct ism_ops {
+-	int (*query_remote_gid)(struct ism_dev *dev, struct smcd_gid *rgid,
++	int (*query_remote_gid)(struct ism_dev *dev, uuid_t *rgid,
+ 				u32 vid_valid, u32 vid);
+ 	int (*register_dmb)(struct ism_dev *dev, struct ism_dmb *dmb,
+ 			    struct ism_client *client);
+@@ -125,7 +121,7 @@ struct ism_ops {
+ 	int (*del_vlan_id)(struct ism_dev *dev, u64 vlan_id);
+ 	int (*set_vlan_required)(struct ism_dev *dev);
+ 	int (*reset_vlan_required)(struct ism_dev *dev);
+-	int (*signal_event)(struct ism_dev *dev, struct smcd_gid *rgid,
++	int (*signal_event)(struct ism_dev *dev, uuid_t *rgid,
+ 			    u32 trigger_irq, u32 event_code, u64 info);
+ };
+ 
+@@ -150,7 +146,7 @@ struct ism_dev {
+ 	dma_addr_t ieq_dma_addr;
+ 
+ 	struct device dev;
+-	struct smcd_gid gid;
++	uuid_t gid;
+ 	int ieq_idx;
+ 
+ 	struct ism_client *subs[MAX_CLIENTS];
+diff --git a/include/net/smc.h b/include/net/smc.h
+index 3d20c6c05056..91aab1d44166 100644
+--- a/include/net/smc.h
++++ b/include/net/smc.h
+@@ -15,7 +15,7 @@
+ #include <linux/spinlock.h>
+ #include <linux/types.h>
+ #include <linux/wait.h>
+-#include "linux/ism.h"
++#include <linux/ism.h>
+ 
+ struct sock;
+ 
+@@ -30,11 +30,11 @@ struct smc_hashinfo {
+ 
+ struct smcd_dev;
+ 
+-//struct smcd_gid {
+-//	u64	gid;
+-//	u64	gid_ext;
+-//};
+-//
++struct smcd_gid {
++	u64	gid;
++	u64	gid_ext;
++};
++
  struct smcd_ops {
  	int (*query_remote_gid)(struct smcd_dev *dev, struct smcd_gid *rgid,
  				u32 vid_valid, u32 vid);
--	int (*register_dmb)(struct smcd_dev *dev, struct smcd_dmb *dmb,
-+	int (*register_dmb)(struct smcd_dev *dev, struct ism_dmb *dmb,
- 			    void *client);
--	int (*unregister_dmb)(struct smcd_dev *dev, struct smcd_dmb *dmb);
-+	int (*unregister_dmb)(struct smcd_dev *dev, struct ism_dmb *dmb);
- 	int (*move_data)(struct smcd_dev *dev, u64 dmb_tok, unsigned int idx,
- 			 bool sf, unsigned int offset, void *data,
- 			 unsigned int size);
-@@ -72,7 +57,7 @@ struct smcd_ops {
- 	int (*signal_event)(struct smcd_dev *dev, struct smcd_gid *rgid,
- 			    u32 trigger_irq, u32 event_code, u64 info);
- 	int (*support_dmb_nocopy)(struct smcd_dev *dev);
--	int (*attach_dmb)(struct smcd_dev *dev, struct smcd_dmb *dmb);
-+	int (*attach_dmb)(struct smcd_dev *dev, struct ism_dmb *dmb);
- 	int (*detach_dmb)(struct smcd_dev *dev, u64 token);
- };
- 
 diff --git a/net/smc/smc_ism.c b/net/smc/smc_ism.c
-index 84f98e18c7db..6fbacad02f23 100644
+index 6fbacad02f23..a49da16bafd5 100644
 --- a/net/smc/smc_ism.c
 +++ b/net/smc/smc_ism.c
-@@ -207,7 +207,7 @@ int smc_ism_put_vlan(struct smcd_dev *smcd, unsigned short vlanid)
- 
- int smc_ism_unregister_dmb(struct smcd_dev *smcd, struct smc_buf_desc *dmb_desc)
+@@ -485,8 +485,10 @@ static int smcd_query_rgid(struct smcd_dev *smcd, struct smcd_gid *rgid,
+ 			   u32 vid_valid, u32 vid)
  {
--	struct smcd_dmb dmb;
-+	struct ism_dmb dmb;
- 	int rc = 0;
+ 	struct ism_dev *ism = smcd->priv;
++	uuid_t ism_rgid;
  
- 	if (!dmb_desc->dma_addr)
-@@ -231,7 +231,7 @@ int smc_ism_unregister_dmb(struct smcd_dev *smcd, struct smc_buf_desc *dmb_desc)
- int smc_ism_register_dmb(struct smc_link_group *lgr, int dmb_len,
- 			 struct smc_buf_desc *dmb_desc)
- {
--	struct smcd_dmb dmb;
-+	struct ism_dmb dmb;
- 	int rc;
- 
- 	memset(&dmb, 0, sizeof(dmb));
-@@ -263,7 +263,7 @@ bool smc_ism_support_dmb_nocopy(struct smcd_dev *smcd)
- int smc_ism_attach_dmb(struct smcd_dev *dev, u64 token,
- 		       struct smc_buf_desc *dmb_desc)
- {
--	struct smcd_dmb dmb;
-+	struct ism_dmb dmb;
- 	int rc = 0;
- 
- 	if (!dev->ops->attach_dmb)
-@@ -481,9 +481,122 @@ static struct smcd_dev *smcd_alloc_dev(struct device *parent, const char *name,
- 	return smcd;
+-	return ism->ops->query_remote_gid(ism, rgid, vid_valid, vid);
++	copy_to_ismgid(&ism_rgid, rgid);
++	return ism->ops->query_remote_gid(ism, &ism_rgid, vid_valid, vid);
  }
  
-+static int smcd_query_rgid(struct smcd_dev *smcd, struct smcd_gid *rgid,
-+			   u32 vid_valid, u32 vid)
-+{
-+	struct ism_dev *ism = smcd->priv;
-+
-+	return ism->ops->query_remote_gid(ism, rgid, vid_valid, vid);
-+}
-+
-+static int smcd_register_dmb(struct smcd_dev *smcd, struct ism_dmb *dmb,
-+			     void *client)
-+{
-+	struct ism_dev *ism = smcd->priv;
-+
-+	return ism->ops->register_dmb(ism, dmb, (struct ism_client *)client);
-+}
-+
-+static int smcd_unregister_dmb(struct smcd_dev *smcd, struct ism_dmb *dmb)
-+{
-+	struct ism_dev *ism = smcd->priv;
-+
-+	return ism->ops->unregister_dmb(ism, dmb);
-+}
-+
-+static int smcd_add_vlan_id(struct smcd_dev *smcd, u64 vlan_id)
-+{
-+	struct ism_dev *ism = smcd->priv;
-+
-+	return ism->ops->add_vlan_id(ism, vlan_id);
-+}
-+
-+static int smcd_del_vlan_id(struct smcd_dev *smcd, u64 vlan_id)
-+{
-+	struct ism_dev *ism = smcd->priv;
-+
-+	return ism->ops->del_vlan_id(ism, vlan_id);
-+}
-+
-+static int smcd_set_vlan_required(struct smcd_dev *smcd)
-+{
-+	struct ism_dev *ism = smcd->priv;
-+
-+	return ism->ops->set_vlan_required(ism);
-+}
-+
-+static int smcd_reset_vlan_required(struct smcd_dev *smcd)
-+{
-+	struct ism_dev *ism = smcd->priv;
-+
-+	return ism->ops->reset_vlan_required(ism);
-+}
-+
-+static int smcd_signal_ieq(struct smcd_dev *smcd, struct smcd_gid *rgid,
-+			   u32 trigger_irq, u32 event_code, u64 info)
-+{
-+	struct ism_dev *ism = smcd->priv;
-+
-+	return ism->ops->signal_event(ism, rgid,
-+			      trigger_irq, event_code, info);
-+}
-+
-+static int smcd_move(struct smcd_dev *smcd, u64 dmb_tok, unsigned int idx,
-+		     bool sf, unsigned int offset, void *data,
-+		     unsigned int size)
-+{
-+	struct ism_dev *ism = smcd->priv;
-+
-+	return ism->ops->move_data(ism, dmb_tok, idx, sf, offset, data, size);
-+}
-+
-+static int smcd_supports_v2(void)
-+{
-+	return smc_ism_v2_capable;
-+}
-+
-+static void smcd_get_local_gid(struct smcd_dev *smcd,
-+			       struct smcd_gid *smcd_gid)
-+{
-+	struct ism_dev *ism = smcd->priv;
-+
-+	smcd_gid->gid = ism->gid.gid;
-+	smcd_gid->gid_ext = ism->gid.gid_ext;
-+}
-+
-+static u16 smcd_get_chid(struct smcd_dev *smcd)
-+{
-+	struct ism_dev *ism = smcd->priv;
-+
-+	return ism->ops->get_chid(ism);
-+}
-+
-+static inline struct device *smcd_get_dev(struct smcd_dev *dev)
-+{
-+	struct ism_dev *ism = dev->priv;
-+
-+	return &ism->dev;
-+}
-+
-+static const struct smcd_ops ism_smcd_ops = {
-+	.query_remote_gid = smcd_query_rgid,
-+	.register_dmb = smcd_register_dmb,
-+	.unregister_dmb = smcd_unregister_dmb,
-+	.add_vlan_id = smcd_add_vlan_id,
-+	.del_vlan_id = smcd_del_vlan_id,
-+	.set_vlan_required = smcd_set_vlan_required,
-+	.reset_vlan_required = smcd_reset_vlan_required,
-+	.signal_event = smcd_signal_ieq,
-+	.move_data = smcd_move,
-+	.supports_v2 = smcd_supports_v2,
-+	.get_local_gid = smcd_get_local_gid,
-+	.get_chid = smcd_get_chid,
-+	.get_dev = smcd_get_dev,
-+};
-+
- static void smcd_register_dev(struct ism_dev *ism)
+ static int smcd_register_dmb(struct smcd_dev *smcd, struct ism_dmb *dmb,
+@@ -536,9 +538,11 @@ static int smcd_signal_ieq(struct smcd_dev *smcd, struct smcd_gid *rgid,
+ 			   u32 trigger_irq, u32 event_code, u64 info)
  {
--	const struct smcd_ops *ops = ism_get_smcd_ops();
-+	const struct smcd_ops *ops = &ism_smcd_ops;
- 	struct smcd_dev *smcd, *fentry;
+ 	struct ism_dev *ism = smcd->priv;
++	uuid_t ism_rgid;
  
- 	if (!ops)
-@@ -499,7 +612,7 @@ static void smcd_register_dev(struct ism_dev *ism)
- 	if (smc_pnetid_by_dev_port(&ism->pdev->dev, 0, smcd->pnetid))
- 		smc_pnetid_by_table_smcd(smcd);
- 
--	if (smcd->ops->supports_v2())
-+	if (ism->ops->supports_v2())
- 		smc_ism_set_v2_capable();
- 	mutex_lock(&smcd_dev_list.mutex);
- 	/* sort list:
-diff --git a/net/smc/smc_loopback.c b/net/smc/smc_loopback.c
-index 3c5f64ca4115..c4020653ae20 100644
---- a/net/smc/smc_loopback.c
-+++ b/net/smc/smc_loopback.c
-@@ -51,7 +51,7 @@ static int smc_lo_query_rgid(struct smcd_dev *smcd, struct smcd_gid *rgid,
- 	return 0;
+-	return ism->ops->signal_event(ism, rgid,
+-			      trigger_irq, event_code, info);
++	copy_to_ismgid(&ism_rgid, rgid);
++	return ism->ops->signal_event(ism, &ism_rgid, trigger_irq,
++				      event_code, info);
  }
  
--static int smc_lo_register_dmb(struct smcd_dev *smcd, struct smcd_dmb *dmb,
-+static int smc_lo_register_dmb(struct smcd_dev *smcd, struct ism_dmb *dmb,
- 			       void *client_priv)
+ static int smcd_move(struct smcd_dev *smcd, u64 dmb_tok, unsigned int idx,
+@@ -560,8 +564,7 @@ static void smcd_get_local_gid(struct smcd_dev *smcd,
  {
- 	struct smc_lo_dmb_node *dmb_node, *tmp_node;
-@@ -129,7 +129,7 @@ static void __smc_lo_unregister_dmb(struct smc_lo_dev *ldev,
- 		wake_up(&ldev->ldev_release);
+ 	struct ism_dev *ism = smcd->priv;
+ 
+-	smcd_gid->gid = ism->gid.gid;
+-	smcd_gid->gid_ext = ism->gid.gid_ext;
++	copy_to_smcdgid(smcd_gid, &ism->gid);
  }
  
--static int smc_lo_unregister_dmb(struct smcd_dev *smcd, struct smcd_dmb *dmb)
-+static int smc_lo_unregister_dmb(struct smcd_dev *smcd, struct ism_dmb *dmb)
- {
- 	struct smc_lo_dmb_node *dmb_node = NULL, *tmp_node;
- 	struct smc_lo_dev *ldev = smcd->priv;
-@@ -158,7 +158,7 @@ static int smc_lo_support_dmb_nocopy(struct smcd_dev *smcd)
- 	return SMC_LO_SUPPORT_NOCOPY;
+ static u16 smcd_get_chid(struct smcd_dev *smcd)
+diff --git a/net/smc/smc_ism.h b/net/smc/smc_ism.h
+index 6763133dd8d0..d041e5a7c459 100644
+--- a/net/smc/smc_ism.h
++++ b/net/smc/smc_ism.h
+@@ -12,6 +12,7 @@
+ #include <linux/uio.h>
+ #include <linux/types.h>
+ #include <linux/mutex.h>
++#include <linux/ism.h>
+ 
+ #include "smc.h"
+ 
+@@ -94,4 +95,24 @@ static inline bool smc_ism_is_loopback(struct smcd_dev *smcd)
+ 	return (smcd->ops->get_chid(smcd) == 0xFFFF);
  }
  
--static int smc_lo_attach_dmb(struct smcd_dev *smcd, struct smcd_dmb *dmb)
-+static int smc_lo_attach_dmb(struct smcd_dev *smcd, struct ism_dmb *dmb)
- {
- 	struct smc_lo_dmb_node *dmb_node = NULL, *tmp_node;
- 	struct smc_lo_dev *ldev = smcd->priv;
++static inline void copy_to_smcdgid(struct smcd_gid *sgid, uuid_t *igid)
++{
++	__be64 temp;
++
++	memcpy(&temp, igid, sizeof(sgid->gid));
++	sgid->gid = ntohll(temp);
++	memcpy(&temp, igid + sizeof(sgid->gid), sizeof(sgid->gid_ext));
++	sgid->gid_ext = ntohll(temp);
++}
++
++static inline void copy_to_ismgid(uuid_t *igid, struct smcd_gid *sgid)
++{
++	__be64 temp;
++
++	temp = htonll(sgid->gid);
++	memcpy(igid, &temp, sizeof(sgid->gid));
++	temp = htonll(sgid->gid_ext);
++	memcpy(igid + sizeof(sgid->gid), &temp, sizeof(sgid->gid_ext));
++}
++
+ #endif
 -- 
 2.45.2
 
