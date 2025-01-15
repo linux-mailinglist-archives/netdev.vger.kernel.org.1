@@ -1,160 +1,133 @@
-Return-Path: <netdev+bounces-158593-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158594-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81B85A129D4
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 18:28:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A8C8A129D7
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 18:29:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1F8653A0F9E
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 17:27:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 26CF53A07FF
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 17:29:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51B0719DF5B;
-	Wed, 15 Jan 2025 17:27:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 559A619DF5B;
+	Wed, 15 Jan 2025 17:29:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="WMRWc7am"
+	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="TRIUlqMJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+Received: from mail-yb1-f175.google.com (mail-yb1-f175.google.com [209.85.219.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB2591791F4
-	for <netdev@vger.kernel.org>; Wed, 15 Jan 2025 17:27:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84B1243ACB
+	for <netdev@vger.kernel.org>; Wed, 15 Jan 2025 17:29:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736962079; cv=none; b=VaHCnqudzAtp54920zNLjcH/RI7VRqwqGZ+w3ucN/KYGKkWC4VflVobTAaFNaFzfbrYJCweb22DGmClOTb4xVQrwOFo3gRFkAksXYX9oN/B2vr8VvGMwdgLlbF2wF6P6jutg5cfL7r88NSZRYYcxMl7NG4aQ+0DnSYt7EkjZbPY=
+	t=1736962154; cv=none; b=WMoi9lmyPweW0TdnZ8i4hmsDHIRqnal1b1BsGrG61Cb9q0gFwvx8VhxIRk+oioTGSU3GW7PHE+3vbB9IXuTaNlwxm/NGm5G3PcrMrHT1T9F0YYqXz07OZfNN+B4Xr99kC/pJDedTKkdmjsY8p5MRWZisRA1kQnzr07mukEWFy/o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736962079; c=relaxed/simple;
-	bh=f/xxnvYf1WfyPjbaimC3LeW5A2HjNMbGHsQX1VteAd8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MhcvfMkK2WzOmDiRphTcJbZS9PfAbr4+64fbdmoMORcdp+jU7NPDoVdgWBX204ssI3p2YSbJigdTN0Apc6QaPgIoSSKUn59jmNymo09lBG1Fx+0DJd5gVJeY0abW0eg3z23sLGHumO3lyi+yLUBpr00C6nZqg8rIi0xJSgrTS78=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=WMRWc7am; arc=none smtp.client-ip=209.85.214.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-2166651f752so159516455ad.3
-        for <netdev@vger.kernel.org>; Wed, 15 Jan 2025 09:27:57 -0800 (PST)
+	s=arc-20240116; t=1736962154; c=relaxed/simple;
+	bh=3Z1wSVgu9DX6AWGrnMgDcHJwzXFHWiHjrrJ4Z85mw/k=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=JSDepodudEPUV0VDS+iYtDxh+YYWEIWAokD8arRa1A9ZpfAOzIih2fGWFc8iM5Ge/qaMTKaCmJJFP6LYf7rWHWooAO+iYUxBHB7e4ca1eywTs0YwRNYckNAFtz4IuXsjqQAct/msDOR+1gkdh/xZ1SaLyAGzTv5dLFuC0hSOJNE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=TRIUlqMJ; arc=none smtp.client-ip=209.85.219.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
+Received: by mail-yb1-f175.google.com with SMTP id 3f1490d57ef6-e46ebe19489so10321888276.2
+        for <netdev@vger.kernel.org>; Wed, 15 Jan 2025 09:29:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1736962077; x=1737566877; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=X/tOyA1p7QjHDsifRN5k+/Gb8kyRYOVF0Azt3OIzzyw=;
-        b=WMRWc7am3w1CVgd1NdD3Sta5iNOY7Loi4qude8FMJaR5Tv8wvH0GaEgEcLKisNTylV
-         c7yKpoIjiL1H63qjUANHmkvCehMeH8ChvgWZ5CicRO5StS+50KunHNqz9GpaAhbkz1ww
-         QkhiN5IbawLZlyFaSaXuhtSIuKOuNUgqZc9aw=
+        d=paul-moore.com; s=google; t=1736962151; x=1737566951; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1Ho5vWfIyGqdayu0mn5cAMk4IND86P5Ih3gYUlwO5LM=;
+        b=TRIUlqMJE7d1zVK9ChVpv7d6ClUBY/2hoiK+SOVUclGH6kA5eY2bFaGIzGLXRArIpT
+         iQBva0NCv/M2jM61LEsXvGZ6hA7CWda125KdpOsjXAwP2RUZh9QTTBKfEsC0nc3LTbpg
+         wUlMS/B2JSLsJIKC+JVa/jOvbUBU1loq4QWabxkAuB9YdFcPH/IMsOgYCYxgfeJDTfr6
+         iZHMjt7zNZJvnAKTDB4ACEmN3Nvyrx+3wQ3Ilz9qhc4qzmfLOKD2Qq6WlmzrjTJBQOm+
+         mopnlxZsN6rlh97C5tQCN6QdVGpA6cL5C8lYSb9Cm+xzajIoYwv2tCQHOiXIEvis0PSj
+         o5Sw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736962077; x=1737566877;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=X/tOyA1p7QjHDsifRN5k+/Gb8kyRYOVF0Azt3OIzzyw=;
-        b=mI9HwlQ/b/ss/6/pQbJ2SjHpw+dR5vdstcB8AXBlP0Vnmh47ZMn9JUGSCqDsgm8nrK
-         DRJlGr31VNBdRuIDgFK8dkC8wJsiMhVLqPDYQBUm9WcLSUZIE8SifZPIvgQgQGQ5SYRF
-         851H/3LL8MceZRs3J1tO6w6A0n9OyUZYZil1CXi1/xmGZJCU1+DfPwVLSqho8mhkUm7i
-         fz+I3W74rcNWx0jDBIH+2VqjUb95tRy2ddsP/jFKklg//8Y6ijhm4ZrAHSyvWp9ukpE+
-         TWr9BVWJoy4jVWVkC72Dx3m2GbmYpp++Kcq3FR6xzzVIF298SQFoQUFiAl1hTpxVQZj7
-         9ilw==
-X-Gm-Message-State: AOJu0YxZWsTeh/E1JDD7hoviXrJXHGJDyJ0BYpi7zuxjofvmuVFtNVVY
-	nzFBThlQrIw7MbYDQXrLoq0oGuj+FwgJEI+Zi/Op4XQhjngXxaTeztyKdccUimw=
-X-Gm-Gg: ASbGncvKSrJrHrTaNGhXxeWNcGfkmPyh8RLoRtqfL2bgeMtS6ntsqidaln1afZ6SIql
-	RbMzeIzbh5f/0uRbrIhUX75KjZNf8VE6c64pBb7SHvCyn3BVqA0R5Cy/Y+0jPdPtx9STdcWL5kX
-	zKJbrccatSBG/8EVttoFchM9YfXEAaEHIwT/1IhJoVAbxBunCx6GSKIwXZadrIXlitgLST6Xonm
-	Dkv4nnA8zUp1JiO90EsQqAGp//9TXdk2i1qEXGmFduhnchWVRfGh6FOdadVeXEBmXfJ/uS+j6wH
-	77YfjwJ8eAlxyrHPzLHuYd0=
-X-Google-Smtp-Source: AGHT+IGksVKSylJkV0LbwF+RW3gakMaxvSakIRb83Rj9Zk5r6cV3J0tIrcgSWtS1CavXnppBEpmgAQ==
-X-Received: by 2002:a05:6a00:1906:b0:72a:bc6a:3a85 with SMTP id d2e1a72fcca58-72d22007a0emr30575531b3a.22.1736962076898;
-        Wed, 15 Jan 2025 09:27:56 -0800 (PST)
-Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72d405485b7sm9320991b3a.2.2025.01.15.09.27.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Jan 2025 09:27:56 -0800 (PST)
-Date: Wed, 15 Jan 2025 09:27:53 -0800
-From: Joe Damato <jdamato@fastly.com>
-To: Furong Xu <0x1207@gmail.com>
-Cc: netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, xfr@outlook.com
-Subject: Re: [PATCH net-next v2 3/3] net: stmmac: Optimize cache prefetch in
- RX path
-Message-ID: <Z4fwGc50mAfrMmYJ@LQ3V64L9R2>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Furong Xu <0x1207@gmail.com>, netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, xfr@outlook.com
-References: <cover.1736777576.git.0x1207@gmail.com>
- <668cfa117e41a0f1325593c94f6bb739c3bb38da.1736777576.git.0x1207@gmail.com>
- <Z4bzuToquRAMfvvu@LQ3V64L9R2>
- <20250115103358.00005b57@gmail.com>
+        d=1e100.net; s=20230601; t=1736962151; x=1737566951;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=1Ho5vWfIyGqdayu0mn5cAMk4IND86P5Ih3gYUlwO5LM=;
+        b=PZJ/5dDX7inMDo7MHQCkRrqCuI+jjh7fuIIMaOYLBCL/cJOVzIYh8A0eKAB/4Dsb6r
+         wXp16U59Vz83TEuPXZOdja8UB9BafsFO/fIvqdx318VhRfWLR7Q1a/0iKVfceFk+8454
+         EXzDfppHuvL70ZjiF4s6gGoGF1FVoikIXCNmJBaFdOx+jQJ7rJ9I4U3IPtqkeMAvCexK
+         0Ou9ekHlME7QmiQCU/jHO9jL4904pB1/LHvElIYvnXs3GnUUs2XzoY/ex0jX5JgRGqcY
+         S+Np82rbcYnerBY6JX07Y0gukGnO3B8ILP2wYuL2k3qOFOOERncPsRUy7Ddl5Y6xfJuc
+         XfuA==
+X-Forwarded-Encrypted: i=1; AJvYcCUX1AXcsQw7A8h00j/pA8qplgCIxiabgGj0Lw+d6Qu9C94KsxB2YxgAgCQ5obMTb9UqDQjBKxw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz5k1dJWf5NKOT/Lz2qzex/ORV6szL5e6CU6mfObVendYLxP2cG
+	kj1typz5wmiHNKka99p5SieUKIyL9XnXkmas2PUvp7WExg+ZQ4+HwRY2mG9gypD0jkc4m8Awz+K
+	rjjAOfA8DZIXSQbbulZKQuOyni6KKtByB686J
+X-Gm-Gg: ASbGncvhc9JRHeqWZII02m+PKYVXRZY0o6E9hfsqzUVAvEm2cVj61+Ot3vfcBe9lgJv
+	hg7ZZ/O0kav9VeuINujr0KsAveFJdXk/Ea5bl
+X-Google-Smtp-Source: AGHT+IHS9tYzd/oT/05LvfCuU2hNDmtanssgntueoSZkgq3iiJ1Lv/I4SGzz67OKeocKZFDPgvn7fKFXoNeXkBKiHdY=
+X-Received: by 2002:a25:200b:0:b0:e53:b023:70a7 with SMTP id
+ 3f1490d57ef6-e54ee17e99emr16507763276.22.1736962151420; Wed, 15 Jan 2025
+ 09:29:11 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250115103358.00005b57@gmail.com>
+References: <20250108231554.3634987-1-tweek@google.com> <266861ab-cc0d-4a7c-9804-6bf4670868b1@6wind.com>
+In-Reply-To: <266861ab-cc0d-4a7c-9804-6bf4670868b1@6wind.com>
+From: Paul Moore <paul@paul-moore.com>
+Date: Wed, 15 Jan 2025 12:29:00 -0500
+X-Gm-Features: AbW1kvYRgCbUKUHzVWUmDyI1Ip0ALStXj7NY0DVlm3abI5HxYcmUbQZx-kxTFEQ
+Message-ID: <CAHC9VhTFBPG2Ai7zT80m=Ez7RRN5J+1rA+n=q4SrAjrVvs+Dpw@mail.gmail.com>
+Subject: Re: [PATCH] selinux: map RTM_DELNSID to nlmsg_write
+To: =?UTF-8?Q?Thi=C3=A9baud_Weksteen?= <tweek@google.com>, 
+	nicolas.dichtel@6wind.com
+Cc: "David S . Miller" <davem@davemloft.net>, selinux@vger.kernel.org, 
+	netdev <netdev@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jan 15, 2025 at 10:33:58AM +0800, Furong Xu wrote:
-> On Tue, 14 Jan 2025 15:31:05 -0800, Joe Damato <jdamato@fastly.com> wrote:
-> 
-> > On Mon, Jan 13, 2025 at 10:20:31PM +0800, Furong Xu wrote:
-> > > Current code prefetches cache lines for the received frame first, and
-> > > then dma_sync_single_for_cpu() against this frame, this is wrong.
-> > > Cache prefetch should be triggered after dma_sync_single_for_cpu().
-> > > 
-> > > This patch brings ~2.8% driver performance improvement in a TCP RX
-> > > throughput test with iPerf tool on a single isolated Cortex-A65 CPU
-> > > core, 2.84 Gbits/sec increased to 2.92 Gbits/sec.
-> > > 
-> > > Signed-off-by: Furong Xu <0x1207@gmail.com>
-> > > ---
-> > >  drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 5 +----
-> > >  1 file changed, 1 insertion(+), 4 deletions(-)
-> > > 
-> > > diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> > > index ca340fd8c937..b60f2f27140c 100644
-> > > --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> > > +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> > > @@ -5500,10 +5500,6 @@ static int stmmac_rx(struct stmmac_priv *priv, int limit, u32 queue)
-> > >  
-> > >  		/* Buffer is good. Go on. */
-> > >  
-> > > -		prefetch(page_address(buf->page) + buf->page_offset);
-> > > -		if (buf->sec_page)
-> > > -			prefetch(page_address(buf->sec_page));
-> > > -
-> > >  		buf1_len = stmmac_rx_buf1_len(priv, p, status, len);
-> > >  		len += buf1_len;
-> > >  		buf2_len = stmmac_rx_buf2_len(priv, p, status, len);
-> > > @@ -5525,6 +5521,7 @@ static int stmmac_rx(struct stmmac_priv *priv, int limit, u32 queue)
-> > >  
-> > >  			dma_sync_single_for_cpu(priv->device, buf->addr,
-> > >  						buf1_len, dma_dir);
-> > > +			prefetch(page_address(buf->page) + buf->page_offset);  
-> > 
-> > Minor nit: I've seen in other drivers authors using net_prefetch.
-> > Probably not worth a re-roll just for something this minor.
-> 
-> After switch to net_prefetch(), I get another 4.5% throughput improvement :)
-> Thanks! This definitely worth a v3 of this series.q
+On Thu, Jan 9, 2025 at 4:24=E2=80=AFAM Nicolas Dichtel
+<nicolas.dichtel@6wind.com> wrote:
+> Le 09/01/2025 =C3=A0 00:15, Thi=C3=A9baud Weksteen a =C3=A9crit :
+> >
+> > The mapping for RTM_DELNSID was added in commit 387f989a60db
+> > ("selinux/nlmsg: add RTM_GETNSID"). While this message type is not
+> > expected from userspace, other RTM_DEL* types are mapped to the more
+> > restrictive nlmsg_write permission. Move RTM_DELNSID to nlmsg_write in
+> > case the implementation is changed in the future.
+>
+> Frankly, I don't think this will ever change. It's not a problem of imple=
+menting
+> the delete command, it's conceptually no sense.
+>
+> I don't see why the DEL should be restricted in any way.
 
-No worries. For what it's worth, it looks like there are a few other
-instances in this driver where net_prefetch or net_prefetchw can be
-used instead. That might be better as a followup / cleanup and
-separate from this series though.
+While the RTM_DELNSID messages are not generated from userspace, the
+presence of the SELinux access control point is visible to userspace
+and thus we have to worry about the backwards compatibility impact of
+changing a "read" operation to a "write" operation.
 
-Just thought I'd mention it as you have a way to test the
-improvements and I, unfortunately, do not have one of these devices.
+We could likely have a discussion about which is a better permission
+mapping for RTM_DELNSID, read or write, but ultimately I think this
+should probably be treated as a read operation since the kernel is
+using this simply as a notification message.  Sending, or receiving, a
+RTM_DELNSID message doesn't affect the state of the netns ID, or the
+netns itself; in other words, a RTM_DELNSID is not the cause of netns
+state change, it is a notification artifact of such a change.  Leaving
+this mapped as a "read" operation seems correct to me.
+
+It is also worth noting that the SELinux netlink xperms support that
+will ship for the first time in v6.13 will allow policy developers to
+target RTM_DELNSID messages with much greater permissions granularity,
+largely solving this problem for those who care about it.
+
+Finally, looking at unhash_nsid(), the only place which seems to
+generate RTM_DELNSID notification messages, an access control denial
+on the netlink notification operation will have no impact on the
+removal of the netns or the netns ID, only the notification itself
+should be impacted.
+
+--=20
+paul-moore.com
 
