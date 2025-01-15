@@ -1,152 +1,199 @@
-Return-Path: <netdev+bounces-158328-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158326-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 27885A11680
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 02:26:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 558A4A1166E
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 02:17:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 339D5188A9FB
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 01:26:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 60129188ABF2
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 01:17:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B70F35945;
-	Wed, 15 Jan 2025 01:26:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B72702FC52;
+	Wed, 15 Jan 2025 01:17:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b="LTa8Bo1y"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="H+zLI7/L"
 X-Original-To: netdev@vger.kernel.org
-Received: from sonic313-15.consmr.mail.bf2.yahoo.com (sonic313-15.consmr.mail.bf2.yahoo.com [74.6.133.125])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-184.mta1.migadu.com (out-184.mta1.migadu.com [95.215.58.184])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F62D1798F
-	for <netdev@vger.kernel.org>; Wed, 15 Jan 2025 01:26:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.6.133.125
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EFA8182C5
+	for <netdev@vger.kernel.org>; Wed, 15 Jan 2025 01:17:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.184
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736904363; cv=none; b=Awyzox8RSbtr6LRTFmOM5nY4dMo3Ve4amBSMtnpj5yjh3FlBvMv5YcCgOKMELtdhLDhfa4o1KbVj4FqdXjgvCZBUBiTDmSCY1ZUjWzH88eNMtj+F/FZlzKY4HWLkDKlvkUg4YE3XrYoM/CBjH/esf+FdW3LzgtPZXHE7nDuTVhg=
+	t=1736903852; cv=none; b=adF9rw+7c5fIEQW78W1fcuZlbRqHVXb71ZXUGD7lGZG7ls/8tQC6+fCEs0qPRXYIsbheRVRP98MUm4ASckRVfQkk+G9g+YRWwUpQQce1O2xKFJPiu/2EQhbgu+miKnV1cOIB9ueO5aVGi2Fa/VrVuP46fhKB+8h+iUAsyE7RB5c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736904363; c=relaxed/simple;
-	bh=J596zsZH8nthlDPy8sIPEYZu/ulpgCY7xmtl/nTb4CY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:References; b=MtWqGnqT8nLSMxc233BOoccS3apvmsySN1DwVhxgtmrttRuLsCC4jX7TgDIV4tMXyUDgatEGRWugHuNyDititZlIPYgbwbQpTmTtqtnbQOvwD9lUTk69zJQCAGJlAud4scdAhPKcyyDqkyDbZXl1JyLC0lm+aGbyaFMJUmYG10A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com; spf=pass smtp.mailfrom=yahoo.com; dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b=LTa8Bo1y; arc=none smtp.client-ip=74.6.133.125
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yahoo.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1736904360; bh=WhmMp4DtkoCndYSZG6Zsl0jQwRCj7Qq7I81RrO15sng=; h=From:To:Cc:Subject:Date:References:From:Subject:Reply-To; b=LTa8Bo1yn518e/RFTKce7AIw7AnAOpdojm9kKWmzBLryf1QQX00pztAg7Kzn0QTvpdeu92PI9RW+gPp6DjowOeGn2SNvqT4NyxwaGjQGiBxYchsWUzO4oq5Ew1HImBehZsIjnfeixmttpdqk0dCk/H27v4740zYj+O3DmbeCZ0cQ6Ru58mPBLqcgT3RM0MHOdW00JxuqtxMp663InencFvauczsxAbSMPOUQBA8bP0vDimHaLhjiE1LWEx8N7kA6SV1UL/Nme1RSqKKtsVVpXSY5p6n0C5Z1kJJ4UALnTJmOWDbnchjXNs+kQSQxra4EYJ4dvzTMftprX0HCp3QUkQ==
-X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1736904360; bh=OKkDey0IY7326fSuv0DGnUuptk+MDBBfCJEsnoknCzz=; h=X-Sonic-MF:From:To:Subject:Date:From:Subject; b=PHz0B93Kwgc0pg4IoZq4buWOaIyfoxKFSHXSzCtzB+cZvSUGbDeh1SW+g1xnZJz0gDrzwQYpiy6cKAfmmfy2kSwzhUAz/bZJgxPnxdk7t69SjU4HshjmrdOz1++M8yEfQhrzL9vOstvh0WrtnyA2dI3nPzB48rVEJeoroNYb3SCJgg1/hMMDa0OwQ7r4/+Nz2kV7EkAIO1Of+HISbUoBzTko2VrPDTPT+vK4UUdmmMIz8U/g8uBff7g/peRcC8MeiOPvx1s0KxcwtuZX3UefebjO95nu14LtZEGSlJwlrvFXCwElMUkB35Gag3uKKrWzbHlVwKCnCO/DIyQvSuEOmQ==
-X-YMail-OSG: dzcSOXUVM1kaUiYb94Kl_p5m6tJNkvPZxHfyBCRJfQha4S1MZam_TFpyEpNECLl
- 3gEZOLZFREfGhSzGU94TA3iXCzsrZBoGKCp7oDBA41CEL7chCskMwN_wViaLotCzYUAnfkNMEqYY
- yfiIVHJBbKEC7TnMqe5l_GCkKVDzPtm2kOzjQ3dvNxyLBHxRzUKYjWNsdMOEj_36oTga0DL3bQT.
- zwvWTaHT5VHz5ORol.HGVeMhqR_ZtlNSxIgnRx3byWdgRprux1jCb51HYfNb9bBDeU0Bfos9C8hx
- 36c0gN5dHTAyVY2aHIFw6lSQAdqlHY8b_R3.EA9yOqcuFwzoDXPs0E_PurvU.43rnMP1qBmCCfwe
- 5UutrBq1_x4lc9zUmOsUua837fPVWO3BvnxddeCs3n9bvnuw4TBI3P.FVCuhtD6QXOg.Nzfp8IlC
- dkSA6N_umLc4webrl7VFiedGaWpOdMZAFmphDuthmcn1QbtaliDfoG7z1GH95ozUpJk9q8Zkj4iZ
- qGWebNAg.5D8dplNcicSULczzntijxa1ufzuiYpimfAmDsvSl8_k2HzkRP5ax_jNYYPYtpR1CfR5
- zSulz6K1GyTlNSqgpBh3lHL9PHVoWWpUCh3oJBPwFXuig.bleXVFX8.TosVDsjxwH4GQQif846.D
- f0YPMQ8Zj.iX_11TTff8.UeyeA660ZQ08JVORK6B5an5xhqeO6HtTK0KyTu_reYDKunAhipyUsG0
- 9GlmMFQR2gK88m2FC5436TzZV7p8q58bWSyYtFfjofmbQg9FkOmnczL9ueAvwyH64KUHi4CvpCKv
- wu9Y1i6WIdpzczmM_gwxRBQpXWWApuaPO9NceWd6qMLXmaolUIOEVCeW.gjw_xhTqJLoNm5RpjfN
- W35ruGu7Cv2y9durzVIlUS5Z175k4Nr8SRK56f0yrFEahw_cahw8ieIYkvw8ObG97GT4ZhGXSJ3N
- CWqhNXtfDkNhU0Co_4FD8gnrEu5V0KLFwHglKEFAC_nlcOfwdqr47yF294fZX1p7lWbBYYA8xRwE
- 2CHmftMGpcYd0rjnwPvBBpHWHV15MP9MzUuhabtAXnhdoqhnKW7adJqKaAuq7N1_XKq13_VuuWhP
- 58L3hm745cy8c0ho42DMSQ1euJiMIM1EyQb4LzX54Eum28Kxmef6D.5a2chyH6yKH0YZcRnXg5CZ
- 2V3SVV2PI5dHsXfkvquOyk8cR0XHS3LOs0HvRD.rfjYFL7b8X_RraFy6CxpYwu8BjKVnfq8.iCXL
- _cQycNxql1b224kUt8QXp4hGyep0LAqGqmqouVXFPc5OtBoE2O9fOKIwC1Ud8queVBHq9ZZPBMxN
- WFCqipygJluKaUacnDjDYGoV4LDQ84VT0Bg.r.VHjCUESZkkTdpEVCLMl8VACLs7erYBblml2Pqm
- Yd.9ADGAW3rq_kEqP_GQfSdiZXnGzbebulS9DOC0gSy2EuI8xBRleyM5CoIVWCLjhiG4jejCAcE3
- .U.OHjPNAnoJv31UxjQibUDcQKd28JEKic0dXs_LJ7_s8W9HT.RRfKXIcgQcmVjJbqYGEsfjYiTc
- ul6TJdo7DOHy5EOqjknDd2MoQ6XmuAdADPDh438x0wTxfsWAkMYXihBxkVbVw7yFA97djXREWOqH
- GuVI9Y5Jm1l02I5C46bJuct53uPP8Od0x71qfP45V0.QolKEyIuUiQUWmqaW3uKNW4ZP6wCYm6ak
- tf_odK4uf7Vn8XmjkJFmnWrb_qDjm7nEPR33IAANDr34IGYhdqp6qSHLJsGbvxAW3u_8bNXIwiIX
- fj1ezrYbhMt5byv78332T52eb_dSAqLgGcf.z1b73ppvMmll9c_xpoGsMl0pNPYeNTiG6EIuwcFZ
- YbZ3_L5vfu2Zl6LIZ.kBXLX5gWDCOjwo.7RR7W624ts1jt.GPmY2WAbBBXAX5KiY1pzjfpKT9kp9
- bNxmY.osTdbhzMS.MpU9y39bnyiDDoBr.xNUAV_rITCboIQAHqx8ZXNCzxCnQi5kiMPYMuvqbKEI
- iI3Gd9RhYV0quWpkNJQyhH90BRpgK7fV5IbITEhhyVfsgzyZyercnRvIhZd4CbvEGyZCxhRShLBh
- pqudvQ0z7btCEdIyaY0SpmbgNQ5vLxpyDPR.BRVZHDJuUGWECvVDUcTPXldI7HXE_5qmPMHFZ7an
- TYBv8F0ylp5dz6Zd6h1o.qfRv4k09sJAmW0fAonAtV6eO5Cl11jJSmwLubOnw9d2yw1YhMYzjEfD
- 8MF8ByCe2zeewgZFdemFfK8f05JLaGsMi6hMi.8N9SKwqGhbQJSQ3ddoB_DSj
-X-Sonic-MF: <ma.arghavani@yahoo.com>
-X-Sonic-ID: fb8b9fa5-10a8-46f4-a9f6-de356fe3ed47
-Received: from sonic.gate.mail.ne1.yahoo.com by sonic313.consmr.mail.bf2.yahoo.com with HTTP; Wed, 15 Jan 2025 01:26:00 +0000
-Received: by hermes--production-gq1-5dd4b47f46-9j75b (Yahoo Inc. Hermes SMTP Server) with ESMTPA ID d04c840b748146b98f8b7c39c5959005;
-          Wed, 15 Jan 2025 01:05:42 +0000 (UTC)
-From: Mahdi Arghavani <ma.arghavani@yahoo.com>
-To: netdev@vger.kernel.org
-Cc: ncardwell@google.com,
-	edumazet@google.com,
-	haibo.zhang@otago.ac.nz,
-	david.eyers@otago.ac.nz,
-	abbas.arghavani@mdu.se,
-	Mahdi Arghavani <ma.arghavani@yahoo.com>
-Subject: [PATCH net v2] tcp_cubic: fix incorrect HyStart round start detection
-Date: Wed, 15 Jan 2025 01:04:50 +0000
-Message-ID: <20250115010450.2472-1-ma.arghavani@yahoo.com>
-X-Mailer: git-send-email 2.45.2
+	s=arc-20240116; t=1736903852; c=relaxed/simple;
+	bh=tNhwArqPp1gm4tyy9B3TK51+REmy7c+T3o6UBlbJc3s=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=tV5o9DKRQ0rrCHGn+o6W/3aCWwfrGyBsiizox4HFED27LnMy4FYNjtc/no+DdOwFMekmFaW5lVb9LEp9z9Au/VkBzvZsNhyEu44MbTvCuypmw5QgILdDp6/bVJBswD/uB1mAP27ieYgwUtZ2t1WjWcgxVqw/N2swDyNz80mkrno=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=H+zLI7/L; arc=none smtp.client-ip=95.215.58.184
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <02031003-872e-49bf-a658-c22bc7e1a954@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1736903848;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=MGSguZrh0S4QzlRr4LAZHQzehwExWEFMcRJhr7aDRNI=;
+	b=H+zLI7/LdGHjQVnED81vuI5604DztE1UF+YtLvWPyX/BPy0afKzr4TR7BSFCIW51xlUlgw
+	BybGGpzlPoifHOpn11/NF168AKEcEznyC5zfquJPFTtw45ghwMpwZ1c2A8m9O9774aSTF0
+	1U5d2Vpm+biog7p0oV6Kt2bl3rrArPg=
+Date: Tue, 14 Jan 2025 17:17:20 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-References: <20250115010450.2472-1-ma.arghavani.ref@yahoo.com>
+Subject: Re: [PATCH net-next v5 03/15] bpf: introduce timestamp_used to allow
+ UDP socket fetched in bpf prog
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, dsahern@kernel.org, willemdebruijn.kernel@gmail.com,
+ willemb@google.com, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
+ eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev,
+ john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me,
+ haoluo@google.com, jolsa@kernel.org, horms@kernel.org, bpf@vger.kernel.org,
+ netdev@vger.kernel.org
+References: <20250112113748.73504-1-kerneljasonxing@gmail.com>
+ <20250112113748.73504-4-kerneljasonxing@gmail.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+Content-Language: en-US
+In-Reply-To: <20250112113748.73504-4-kerneljasonxing@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-I noticed that HyStart incorrectly marks the start of rounds,
-resulting in inaccurate measurements of ACK train lengths.
-Since HyStart relies on ACK train lengths as one of two thresholds
-to terminate exponential cwnd growth during Slow-Start, this
-inaccuracy renders that threshold ineffective, potentially degrading
-TCP performance.
+On 1/12/25 3:37 AM, Jason Xing wrote:
+> timestamp_used consists of two parts, one is is_fullsock, the other
+> one is for UDP socket which will be support in the next round.
+> 
+> Signed-off-by: Jason Xing <kerneljasonxing@gmail.com>
+> ---
+>   include/linux/filter.h | 1 +
+>   net/core/filter.c      | 4 ++--
+>   net/core/sock.c        | 1 +
+>   net/ipv4/tcp_input.c   | 2 ++
+>   net/ipv4/tcp_output.c  | 2 ++
+>   5 files changed, 8 insertions(+), 2 deletions(-)
+> 
+> diff --git a/include/linux/filter.h b/include/linux/filter.h
+> index a3ea46281595..daca3fe48b8f 100644
+> --- a/include/linux/filter.h
+> +++ b/include/linux/filter.h
+> @@ -1508,6 +1508,7 @@ struct bpf_sock_ops_kern {
+>   	void	*skb_data_end;
+>   	u8	op;
+>   	u8	is_fullsock;
+> +	u8	timestamp_used;
+>   	u8	remaining_opt_len;
+>   	u64	temp;			/* temp and everything after is not
+>   					 * initialized to 0 before calling
+> diff --git a/net/core/filter.c b/net/core/filter.c
+> index c6dd2d2e44c8..1ac996ec5e0f 100644
+> --- a/net/core/filter.c
+> +++ b/net/core/filter.c
+> @@ -10424,10 +10424,10 @@ static u32 sock_ops_convert_ctx_access(enum bpf_access_type type,
+>   		}							      \
+>   		*insn++ = BPF_LDX_MEM(BPF_FIELD_SIZEOF(			      \
+>   						struct bpf_sock_ops_kern,     \
+> -						is_fullsock),		      \
+> +						timestamp_used),	      \
+>   				      fullsock_reg, si->src_reg,	      \
+>   				      offsetof(struct bpf_sock_ops_kern,      \
+> -					       is_fullsock));		      \
+> +					       timestamp_used));	      \
 
-The issue arises because the changes introduced in commit 4e1fddc98d25
-("tcp_cubic: fix spurious Hystart ACK train detections for not-cwnd-limited flows")
-moved the caller of the `bictcp_hystart_reset` function inside the `hystart_update` function.
-This modification added an additional condition for triggering the caller,
-requiring that (tcp_snd_cwnd(tp) >= hystart_low_window) must also
-be satisfied before invoking `bictcp_hystart_reset`.
+hmm... I don't think it is the right change. This change may disallow the bpf 
+prog from reading skops->sk. It is fine to allow bpf prog (includes the new 
+timestamp callback) getting the skops->sk as long as skops->sk is a fullsock.
 
-This fix ensures that `bictcp_hystart_reset` is correctly called
-at the start of a new round, regardless of the congestion window size.
-This is achieved by moving the condition
-(tcp_snd_cwnd(tp) >= hystart_low_window)
-from before calling `bictcp_hystart_reset` to after it.
+The actual thing that needs to address is writing to sk, like:
 
-Fixes: 4e1fddc98d25 ("tcp_cubic: fix spurious Hystart ACK train detections for not-cwnd-limited flows")
-Signed-off-by: Mahdi Arghavani <ma.arghavani@yahoo.com>
-Cc: Neal Cardwell <ncardwell@google.com>
-Cc: Eric Dumazet <edumazet@google.com>
-Cc: Haibo Zhang <haibo.zhang@otago.ac.nz>
-Cc: David Eyers <david.eyers@otago.ac.nz>
-Cc: Abbas Arghavani <abbas.arghavani@mdu.se>
----
- net/ipv4/tcp_cubic.c | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
+	case offsetof(struct bpf_sock_ops, sk_txhash):
+		SOCK_OPS_GET_OR_SET_FIELD(sk_txhash, sk_txhash,
+                                           struct sock, type);
 
-diff --git a/net/ipv4/tcp_cubic.c b/net/ipv4/tcp_cubic.c
-index 5dbed91c6178..76c23675ae50 100644
---- a/net/ipv4/tcp_cubic.c
-+++ b/net/ipv4/tcp_cubic.c
-@@ -392,6 +392,10 @@ static void hystart_update(struct sock *sk, u32 delay)
- 	if (after(tp->snd_una, ca->end_seq))
- 		bictcp_hystart_reset(sk);
- 
-+	/* hystart triggers when cwnd is larger than some threshold */
-+	if (tcp_snd_cwnd(tp) < hystart_low_window)
-+		return;
-+
- 	if (hystart_detect & HYSTART_ACK_TRAIN) {
- 		u32 now = bictcp_clock_us(sk);
- 
-@@ -467,9 +471,7 @@ __bpf_kfunc static void cubictcp_acked(struct sock *sk, const struct ack_sample
- 	if (ca->delay_min == 0 || ca->delay_min > delay)
- 		ca->delay_min = delay;
- 
--	/* hystart triggers when cwnd is larger than some threshold */
--	if (!ca->found && tcp_in_slow_start(tp) && hystart &&
--	    tcp_snd_cwnd(tp) >= hystart_low_window)
-+	if (!ca->found && tcp_in_slow_start(tp) && hystart)
- 		hystart_update(sk, delay);
- }
- 
--- 
-2.45.2
+
+and also all the SOCK_OPS_GET_TCP_SOCK_FIELD() to prepare for the udp sock 
+support. After this patch 3, I think I start to understand the udp/fullsock 
+discussion in patch 2. is_fullsock here does not mean it is tcp, although it is 
+always a tcp_sock now. It literally means it is a full "struct sock". The 
+verifier will treat the skops->sk as "struct sock" instead of "struct tcp_sock".
+
+>   		*insn++ = BPF_JMP_IMM(BPF_JEQ, fullsock_reg, 0, jmp);	      \
+>   		if (si->dst_reg == si->src_reg)				      \
+>   			*insn++ = BPF_LDX_MEM(BPF_DW, reg, si->src_reg,	      \
+> diff --git a/net/core/sock.c b/net/core/sock.c
+> index e06bcafb1b2d..dbb9326ae9d1 100644
+> --- a/net/core/sock.c
+> +++ b/net/core/sock.c
+> @@ -958,6 +958,7 @@ void bpf_skops_tx_timestamping(struct sock *sk, struct sk_buff *skb, int op)
+>   	if (sk_is_tcp(sk) && sk_fullsock(sk))
+>   		sock_ops.is_fullsock = 1;
+>   	sock_ops.sk = sk;
+> +	sock_ops.timestamp_used = 1;
+>   	__cgroup_bpf_run_filter_sock_ops(sk, &sock_ops, CGROUP_SOCK_OPS);
+>   }
+>   #endif
+> diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
+> index 4811727b8a02..cad41ad34bd5 100644
+> --- a/net/ipv4/tcp_input.c
+> +++ b/net/ipv4/tcp_input.c
+> @@ -169,6 +169,7 @@ static void bpf_skops_parse_hdr(struct sock *sk, struct sk_buff *skb)
+>   	memset(&sock_ops, 0, offsetof(struct bpf_sock_ops_kern, temp));
+>   	sock_ops.op = BPF_SOCK_OPS_PARSE_HDR_OPT_CB;
+>   	sock_ops.is_fullsock = 1;
+> +	sock_ops.timestamp_used = 1;
+>   	sock_ops.sk = sk;
+>   	bpf_skops_init_skb(&sock_ops, skb, tcp_hdrlen(skb));
+>   
+> @@ -185,6 +186,7 @@ static void bpf_skops_established(struct sock *sk, int bpf_op,
+>   	memset(&sock_ops, 0, offsetof(struct bpf_sock_ops_kern, temp));
+>   	sock_ops.op = bpf_op;
+>   	sock_ops.is_fullsock = 1;
+> +	sock_ops.timestamp_used = 1;
+>   	sock_ops.sk = sk;
+>   	/* sk with TCP_REPAIR_ON does not have skb in tcp_finish_connect */
+>   	if (skb)
+> diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
+> index 0e5b9a654254..7b4d1dfd57d4 100644
+> --- a/net/ipv4/tcp_output.c
+> +++ b/net/ipv4/tcp_output.c
+> @@ -522,6 +522,7 @@ static void bpf_skops_hdr_opt_len(struct sock *sk, struct sk_buff *skb,
+>   		sock_owned_by_me(sk);
+>   
+>   		sock_ops.is_fullsock = 1;
+> +		sock_ops.timestamp_used = 1;
+>   		sock_ops.sk = sk;
+>   	}
+>   
+> @@ -567,6 +568,7 @@ static void bpf_skops_write_hdr_opt(struct sock *sk, struct sk_buff *skb,
+>   		sock_owned_by_me(sk);
+>   
+>   		sock_ops.is_fullsock = 1;
+> +		sock_ops.timestamp_used = 1;
+
+The "timestamp_used = 1;' assignment has missed some places. At least in the 
+tcp_call_bpf().
+
+Also, the name "timestamp_used" is confusing. Like setting timestamp_used in the 
+bpf_skops_*_hdr_opt() callback here when it is not a timestamp callback.
+
+Altogether, need to rethink what to add to sock_ops instead of timestamp_used 
+and it should be checked in "some" of the SOCK_OPS_*_FIELD(). A quick thought 
+(not 100% sure) is to add "u8 allow_direct_access" which is only set for the 
+existing sockops callbacks.
+
+[ I will continue the rest later. ]
+
+>   		sock_ops.sk = sk;
+>   	}
+>   
 
 
