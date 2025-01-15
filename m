@@ -1,74 +1,54 @@
-Return-Path: <netdev+bounces-158532-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158534-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ADB9AA1265B
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 15:44:18 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 85A6CA1265A
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 15:44:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 88C823A887F
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 14:43:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8B0C3168FA0
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 14:44:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8709486320;
-	Wed, 15 Jan 2025 14:43:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="ddHnqtib"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47619146A7A;
+	Wed, 15 Jan 2025 14:43:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B97E78C6C;
-	Wed, 15 Jan 2025 14:43:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6712B78C6C;
+	Wed, 15 Jan 2025 14:43:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736952217; cv=none; b=RIwdEIALaC1dCXFFu4sw3TKlgZBWCF4c4x+8xdhTBNi7um0b7F9Um8N8v5araijh+Bslf+5L9d4VdEXqV2S6SuGJ02JXg4lxaxfHxnqXj6qK6uzqBSWMfeE/2oJcIyCXLHKXWTfcohNSmR0i+NwJAC/p4dmQ+Tg5x3SYCpxiuzU=
+	t=1736952223; cv=none; b=u3OREcGYfWv6QzJL0Qz8CslfxWDa7t2geUCS3yTvf0TKrduxDxR7rkJfko6epdOerOvKFr+a5zWwBD8HtwLIp3msd5xhNwQfVM4vc91Qs9Sko3DK67/QOkFFKouz7cii4CvTerXWCffQ4SM3P3CypWZAwZNT7x51vBIZvBU4Dmk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736952217; c=relaxed/simple;
-	bh=EGxr3f1Hp9rA0ARBX9STSNQ6goPhd754A6QHHBolOU4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pLzWINRstFvjSSK1wyOZr3W2ajNgjUMy9ZmSRk+RCSqvo1uhoOSlzteywpXDW5amuLnJspjWHBw2hCEz4DFBRbpx+wUMz8Ktmyc0IA3ph/0LVj32Gg5GUdCa85saNuB8sqwLuT0wMO8iFvePzpsM+zzylZj+d86RU0ukPcFCc0Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=ddHnqtib; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=i/j5p8GOUpKWGp44THvpHWvOSrabQaXeAztkPN54uS4=; b=ddHnqtibxA2RIs7orSgsLbk/W6
-	dPp5r0b2KNDzgZGQKmQ43KBP0dkK/8PFXJQV9rHCbc0bjekh6eWD9nNzlOXeD5EW6b0q0FbNokRHB
-	8JnO+lP0xAWhi/6WBrNnUNpXN9Q0arq2ya2Oc6uRUuaVnB7BiqxoHUBRpQQUpW9laxZ9KIT9Znkim
-	UlYhwOX8zstGJmzYTJDTsNmuBVgPpkxJdgpuPFwFw8Ojf467CJcL74TAoVNvPcQTff3rgh0IRSj8u
-	+Za9/uOjySulb3HLrV1qn/nSZ6mmfeWVQM9E7m2avGt4/zj6o0l3UP7HP+Kj7m0oCeBzZ/3hKANgh
-	K7ImEkag==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:34660)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1tY4cD-0001IC-16;
-	Wed, 15 Jan 2025 14:43:29 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1tY4c9-0006Eb-1V;
-	Wed, 15 Jan 2025 14:43:25 +0000
-Date: Wed, 15 Jan 2025 14:43:25 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: netdev@vger.kernel.org, Jose Abreu <Jose.Abreu@synopsys.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
+	s=arc-20240116; t=1736952223; c=relaxed/simple;
+	bh=wwxdpcLQVMX/FeBDgj0mXlU4TChQb6kQBWzp9h7YvTM=;
+	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SdS5I7lB1ngGOzoLvrFGwJdXCwUEkRB3toVw+Shheq/h28EntHrDSirr6dE46t1vdOkxYcjwCWd5F36GWFC0w8ULLsmE7TI06CEkFqZv6JAgWIlbwC14UlVdMoBECf73txRdHpPSACNSEKNDT1cXn+EWmq/xfix4zPVzvMsfGRM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.98)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1tY4cM-00000000226-005g;
+	Wed, 15 Jan 2025 14:43:38 +0000
+Date: Wed, 15 Jan 2025 14:43:35 +0000
+From: Daniel Golle <daniel@makrotopia.org>
+To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Voon Weifeng <weifeng.voon@intel.com>,
-	Michael Sit Wei Hong <michael.wei.hong.sit@intel.com>,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net 1/2] net: pcs: xpcs: fix DW_VR_MII_DIG_CTRL1_2G5_EN
- bit being set for 1G SGMII w/o inband
-Message-ID: <Z4fJjf4nyiNyRus_@shell.armlinux.org.uk>
-References: <20250114164721.2879380-1-vladimir.oltean@nxp.com>
+	Daniel Golle <daniel@makrotopia.org>,
+	"Russell King (Oracle)" <linux@armlinux.org.uk>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH net 1/3] net: phy: realtek: clear 1000Base-T lpa if link is
+ down
+Message-ID: <67e38eee4c46b921938fb33f5bc86c8979b9aa33.1736951652.git.daniel@makrotopia.org>
+References: <cover.1736951652.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,35 +57,55 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250114164721.2879380-1-vladimir.oltean@nxp.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <cover.1736951652.git.daniel@makrotopia.org>
 
-On Tue, Jan 14, 2025 at 06:47:20PM +0200, Vladimir Oltean wrote:
-> On a port with SGMII fixed-link at SPEED_1000, DW_VR_MII_DIG_CTRL1 gets
-> set to 0x2404. This is incorrect, because bit 2 (DW_VR_MII_DIG_CTRL1_2G5_EN)
-> is set.
-> 
-> It comes from the previous write to DW_VR_MII_AN_CTRL, because the "val"
-> variable is reused and is dirty. Actually, its value is 0x4, aka
-> FIELD_PREP(DW_VR_MII_PCS_MODE_MASK, DW_VR_MII_PCS_MODE_C37_SGMII).
-> 
-> Resolve the issue by clearing "val" to 0 when writing to a new register.
-> After the fix, the register value is 0x2400.
-> 
-> Prior to the blamed commit, when the read-modify-write was open-coded,
-> the code saved the content of the DW_VR_MII_DIG_CTRL1 register in the
-> "ret" variable.
-> 
-> Fixes: ce8d6081fcf4 ("net: pcs: xpcs: add _modify() accessors")
-> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+Only read 1000Base-T link partner advertisement if autonegotiation has
+completed and otherwise 1000Base-T link partner advertisement bits.
 
-Good catch!
+This fixes bogus 1000Base-T link partner advertisement after link goes
+down (eg. by disconnecting the wire).
+Fixes: 5cb409b3960e ("net: phy: realtek: clear 1000Base-T link partner advertisement")
+Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+---
+ drivers/net/phy/realtek.c | 19 ++++++++-----------
+ 1 file changed, 8 insertions(+), 11 deletions(-)
 
-Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-
-Thanks!
-
+diff --git a/drivers/net/phy/realtek.c b/drivers/net/phy/realtek.c
+index f65d7f1f348e..26b324ab0f90 100644
+--- a/drivers/net/phy/realtek.c
++++ b/drivers/net/phy/realtek.c
+@@ -1023,23 +1023,20 @@ static int rtl822x_c45_read_status(struct phy_device *phydev)
+ {
+ 	int ret, val;
+ 
+-	ret = genphy_c45_read_status(phydev);
+-	if (ret < 0)
+-		return ret;
+-
+-	if (phydev->autoneg == AUTONEG_DISABLE ||
+-	    !genphy_c45_aneg_done(phydev))
+-		mii_stat1000_mod_linkmode_lpa_t(phydev->lp_advertising, 0);
+-
+ 	/* Vendor register as C45 has no standardized support for 1000BaseT */
+-	if (phydev->autoneg == AUTONEG_ENABLE) {
++	if (phydev->autoneg == AUTONEG_ENABLE && genphy_c45_aneg_done(phydev)) {
+ 		val = phy_read_mmd(phydev, MDIO_MMD_VEND2,
+ 				   RTL822X_VND2_GANLPAR);
+ 		if (val < 0)
+ 			return val;
+-
+-		mii_stat1000_mod_linkmode_lpa_t(phydev->lp_advertising, val);
++	} else {
++		val = 0;
+ 	}
++	mii_stat1000_mod_linkmode_lpa_t(phydev->lp_advertising, val);
++
++	ret = genphy_c45_read_status(phydev);
++	if (ret < 0)
++		return ret;
+ 
+ 	if (!phydev->link)
+ 		return 0;
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.47.1
 
