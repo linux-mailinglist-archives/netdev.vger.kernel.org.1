@@ -1,225 +1,258 @@
-Return-Path: <netdev+bounces-158607-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158609-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75225A12AFD
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 19:34:23 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0B69A12B4A
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 20:00:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CE67C3A719C
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 18:33:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7DC283A4D54
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 19:00:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1F721D63CA;
-	Wed, 15 Jan 2025 18:31:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 688D41D6DDA;
+	Wed, 15 Jan 2025 19:00:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=marvell.com header.i=@marvell.com header.b="rb4Xt6jY"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b="aKd9X3Yb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+Received: from smtp1.cs.Stanford.EDU (smtp1.cs.stanford.edu [171.64.64.25])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BC3E1D5172;
-	Wed, 15 Jan 2025 18:31:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=67.231.148.174
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736965907; cv=fail; b=pqMxL+I6Y4oHAGjv/6Xytp5uwIZjzZFAnDc8N5VYUnb880/QK6l9peZp4x41kHPoZGn/BXQVaCmFtJTEYRTYPqSMSdbv4W78OhXjzZCNiK7UdP8+k/pnfOiBNcR7G8XQzzwDsKOMcGGvuXWFSQ+kBh/Vr8hnls/eYW/PqBoaxrI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736965907; c=relaxed/simple;
-	bh=nXTUVbMsGpwmmJGNd3293iiN7F1MPVSKXnnS0y1zG4I=;
-	h=From:To:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=IDTXDPnt8pLCMG6oriEjWd3lY6Cxqn01cihTlrDc0V8hETigWADJTeevwqCwI2j/bxRvuw0mQ3IsiVBHJmZy5tn34bNxYqwwSN41gTWFYh7oDP8Vn51n392MnYPQO4mYCUg69K6A/xzUJuHs1lYwqHf30gilQcMFjT9smyF90Bs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (1024-bit key) header.d=marvell.com header.i=@marvell.com header.b=rb4Xt6jY; arc=fail smtp.client-ip=67.231.148.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0431384.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50FF3iY8024421;
-	Wed, 15 Jan 2025 10:31:25 -0800
-Received: from nam10-dm6-obe.outbound.protection.outlook.com (mail-dm6nam10lp2040.outbound.protection.outlook.com [104.47.58.40])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 446fb30f5t-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 15 Jan 2025 10:31:24 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=COIKWv77V6B94Lx82CS3UX97xZlJhy+lsbsI3oCJTu1ZxUQ1n5WSnHW7/B3lAyzwzrlcuLlrXVO83sBIPdtxRI/C0ax30PIkmLUxk083qfGAlB2Ntszl+RXz5f3dhGr0iQGyHv4Ah7N2ZwygLVj0eO+gNWon0G7zVG/FxZIJVw8Ujg12N/HqRETd+GYgW5BDulW3uixO3oXELYvDMORJeNZWHZg4d0U8GdJ7QsR8QKTivhd0OI8iQmW5Kkc6FwoOwsrhk4TBXd7x+5JFzGr1zcnp3HO8cDaJE3eHt2mRsZXGGq7/mbfkYQBq7tSEbh3osB0oSqeloEk7pdubQj7LDw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=nXTUVbMsGpwmmJGNd3293iiN7F1MPVSKXnnS0y1zG4I=;
- b=IoeVjGuNID04sZSzMSCZiE/GRttoy8f1rKq8dHRogNnV9yl56cp7tnI6D8wLgW/g8jA2/cRY7OfWhkJR2EO9S4Ytnjxzv7mniu6q/G/03N7kh1deElL2vVOG7De/CzseQvzB/9nAoOfG1PClmE+tr0BHQhto9r+x0Yx8DJeq8Ngm8YJTXUO1BKnmhWstwZnLf4tfuynArbPSgLJkhMPsNV/MuvLM8Fbm2AzWvmW4sn/bBdiioO+EMoBkwLxtII1Jt0YvW6mMeAUF6hbmWdEX6PFjoG+msAPNrrGM2seONXlHJgrF9e5cso/lRyiD1b6sPB/aW6HUfV20ffWFK7De4g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=marvell.com; dmarc=pass action=none header.from=marvell.com;
- dkim=pass header.d=marvell.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=nXTUVbMsGpwmmJGNd3293iiN7F1MPVSKXnnS0y1zG4I=;
- b=rb4Xt6jYZJ5JRFpJz+QfkUeXY593TBXvjBhgQpxTiAU9vydXMVCR6zsC7CzrXXX3oCiieIMmbsz3s7oM8nX2JEGGRy3mDE3lAzcKJ6vubZ8mKGj+AZx5p4EKOX0BEASz62IjmaFhRab/626zspYAhrQU0cSc9ktBN3yFWPT3b+U=
-Received: from SJ0PR18MB5216.namprd18.prod.outlook.com (2603:10b6:a03:430::6)
- by DM6PR18MB3537.namprd18.prod.outlook.com (2603:10b6:5:2a4::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8356.14; Wed, 15 Jan
- 2025 18:31:22 +0000
-Received: from SJ0PR18MB5216.namprd18.prod.outlook.com
- ([fe80::2bf5:960a:a348:fad1]) by SJ0PR18MB5216.namprd18.prod.outlook.com
- ([fe80::2bf5:960a:a348:fad1%5]) with mapi id 15.20.8356.010; Wed, 15 Jan 2025
- 18:31:22 +0000
-From: Suman Ghosh <sumang@marvell.com>
-To: Paolo Abeni <pabeni@redhat.com>, "horms@kernel.org" <horms@kernel.org>,
-        Sunil Kovvuri Goutham <sgoutham@marvell.com>,
-        Geethasowjanya Akula
-	<gakula@marvell.com>,
-        Subbaraya Sundeep Bhatta <sbhatta@marvell.com>,
-        Hariprasad Kelam <hkelam@marvell.com>,
-        "davem@davemloft.net"
-	<davem@davemloft.net>,
-        "edumazet@google.com" <edumazet@google.com>,
-        "kuba@kernel.org" <kuba@kernel.org>,
-        "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>,
-        Linu Cherian <lcherian@marvell.com>, Jerin
- Jacob <jerinj@marvell.com>,
-        "john.fastabend@gmail.com"
-	<john.fastabend@gmail.com>,
-        Bharat Bhushan <bbhushan2@marvell.com>,
-        "hawk@kernel.org" <hawk@kernel.org>,
-        "andrew+netdev@lunn.ch"
-	<andrew+netdev@lunn.ch>,
-        "ast@kernel.org" <ast@kernel.org>,
-        "daniel@iogearbox.net" <daniel@iogearbox.net>,
-        "bpf@vger.kernel.org"
-	<bpf@vger.kernel.org>
-Subject: RE: [EXTERNAL] Re: [net-next PATCH v3 3/6] octeontx2-pf: AF_XDP zero
- copy receive support
-Thread-Topic: [EXTERNAL] Re: [net-next PATCH v3 3/6] octeontx2-pf: AF_XDP zero
- copy receive support
-Thread-Index: AQHbY0Nx43bEYrYu2EOhQMHw2kVr7bMWPjkAgAHyg1A=
-Date: Wed, 15 Jan 2025 18:31:22 +0000
-Message-ID:
- <SJ0PR18MB52164594C0C0C24C0AD50C71DB192@SJ0PR18MB5216.namprd18.prod.outlook.com>
-References: <20250110093807.2451954-1-sumang@marvell.com>
- <20250110093807.2451954-4-sumang@marvell.com>
- <49043623-f34e-4274-ab4d-494d8319cb32@redhat.com>
-In-Reply-To: <49043623-f34e-4274-ab4d-494d8319cb32@redhat.com>
-Accept-Language: en-IN, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SJ0PR18MB5216:EE_|DM6PR18MB3537:EE_
-x-ms-office365-filtering-correlation-id: 22a92510-b2ff-4dc9-d811-08dd3592cff5
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|1800799024|366016|7416014|376014|921020|38070700018;
-x-microsoft-antispam-message-info:
- =?utf-8?B?cG5GeXU1RlRMcUQxWk1xSjdDTEhITWpZQ2N5aUJGaUNDcW9VSnFndENZZkty?=
- =?utf-8?B?ay80ZCsrZFVoWkd2cE1YV1k2UUdNcStPTlB5VUdmM01LZk9mV1NhMXU1Vkk1?=
- =?utf-8?B?ZmNuVkRtVmVIMW1YUFZtWlFjTk1SaUpFcmZyTmdKRWJISjhsQTFtMVppcXNw?=
- =?utf-8?B?UW93OXgxMmdJTHVuYWZ1UkZUWGQ0a0JvMldzTXN6RzEveTl4TXJWaWpIb3dQ?=
- =?utf-8?B?dGpSV3c5TmtQQmFiZlczVTdwTUFJQmFXaldsaEIwOCtpQW5OLzdKUHcyc0Zk?=
- =?utf-8?B?LzdEUUQyYzNjQUxmMXBsY09wckhybE5vRzByaml6WG1iaThKbC9JN1RiYjVv?=
- =?utf-8?B?MTd5NW5tRkR2cGpHTjNMM0JXT0x2L09kUGg0SjRNMDV3S3RtZGg5d2NpMnBh?=
- =?utf-8?B?RGZOdHJVWUVrWnRQajVIbkc0akU3YXJhMlR6QzNLdE96eEtDeGQ5T2FqYzcx?=
- =?utf-8?B?ekUrQkM2amlrcC9Md3prS2RUL2hyajY3aGhCVVp6M1hYdzBmc2N1dElLVGpu?=
- =?utf-8?B?dGRyUnJzdDFLRmpUOGVTdEg4aUxZMW5CdXcxbXp2dHhWeE01RUV6UGdZemMw?=
- =?utf-8?B?RXVWSmFHUElXWlJEVTRtd0w0a3p4R2ExMnloM0NjZXBIZ3hkcU1ETCtxbTA5?=
- =?utf-8?B?SG9ScWFEUXhWYndDVWxiZEs1MzYrUUhiemxBMWRrZUZLKzBtUEdxUXdDaWdi?=
- =?utf-8?B?ODZla1JtMDJ3Y0J0M3J3eWF6VEZiQXNHb0FWc0dONFhpS2ozMHdBMUJCU2x2?=
- =?utf-8?B?ZGx3SFdmekVhYTRqcjBXYXJpMndveUQ1eGxCSC9WUXNGNWkybzlmUFFJQWNs?=
- =?utf-8?B?VVQ0eDYyU3pHZjBSQmMrcXZ5NFNhejhzTHE3aDJkdDNMMnZKMG5GRGc5bkI2?=
- =?utf-8?B?OXMvUmlPUHFDL3JDaVlpZDRHOGJwRVdRWHVXUVVlWUc2a0pvTzcxMzFOVWI1?=
- =?utf-8?B?QVFPM2NPWlI3Z0t0TVhXaTR1UFVqc1NGTWs0VW5kSzN3c2ZWMFhRcTBxR2NG?=
- =?utf-8?B?M3Rmdjdmb1V5NUp3bTRyUllHTXA4SEF2RGcvMUpQSE04ZDFjdjlXeUFKeERv?=
- =?utf-8?B?SWRCNUFISUZUK3FSQlJscjBOWVh0emppNm5YaXlYUmhBWTI0OUt1TU1aSzdC?=
- =?utf-8?B?WTRnNmtJUUVRSjA5dDVibnl5MnZNOVR4WW5KcTgrcitTK2ZGNWN2V0NBVzZy?=
- =?utf-8?B?WDJ1eXU4ZzRWZUFjWUdmRmxLd2VYUkRZRGxuTU9aV3VJS1NFVzFaY0JzUVJE?=
- =?utf-8?B?ZEFGNUxYVWkzNWpPQkRuTmlCQjhCa3ppaHRTZTV0eE52ejE2TXpZaVFyLzZ5?=
- =?utf-8?B?Q0JtSWFrbk82SnNhcWliN2JvSE4vTXhJUEREQUhUUThrMm5OYmVQdlhzMjV2?=
- =?utf-8?B?dWxxbXB1aDBCdHlRVythUHlyQXQzbG1qY0dYTUs5TEp5WW1naFpyblJYU0Jj?=
- =?utf-8?B?SFZGS0VIbm0zSHRKWE9WRDFka1ptUENEWm5CU0sxdERDZ3pQN0tNL0Z4aWlt?=
- =?utf-8?B?R3hrTTVYTS9CNG1hSmxVcU4zdmtUUDhySlNxaGRTN0Iyam16a3RNYkhKREg5?=
- =?utf-8?B?cXlxazRueEllTFFEUlZGVloxWkJxZEYwUVpuVFVYRTU5VGVKTko0eWR6U1d3?=
- =?utf-8?B?c1AwRklETUVZZEZwbytxdTlzcmFSYzlDemlqUDlCaXVWdkU2bVJtZ290K0JH?=
- =?utf-8?B?QXFEQko1SnRXOUhCQmxkbk5nczFkU1QwakV1NVFPK1NMQno5TDVjSnFSaWZk?=
- =?utf-8?B?V2pOVXRQNU9pWkk1NDMvM3dOUnBxOUY4Z1dXWk91dVhQSDBBblRPWkR4aVQ2?=
- =?utf-8?B?VUkwQUpxYWhoUEplMFUvZlowRVkxYUcrT0xzam1ROVg3aElJbDl2QU9XVEQv?=
- =?utf-8?B?YUVjK0JoTTZ4ZVBtT0ZFcVhWVzBJa3hVNXVYcWsxNUhZT2g4NDVXQ1V4WVA5?=
- =?utf-8?B?cGF4YnBTQ2c0dUh2Q1J6bUk2eXl2clJ2U0h5SmgvRTFaTkExK20wWDFPNm9w?=
- =?utf-8?B?d1FwcXo5QjV3PT0=?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ0PR18MB5216.namprd18.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014)(921020)(38070700018);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?K2NZKzlIcFZTN0p1NFYwTmtGVEpHb3lFOGkrdnAvc25FTnp6TnFITkY4RStS?=
- =?utf-8?B?amZuMysxTDdRMWoraHc2Y3J4WDM5QjUyOThtZjNrdWRhdUhIU0NUb0NjTGhw?=
- =?utf-8?B?QU5wM1pWcXhQcDhCTmErQ0RLaCt3TTFveFpKbjBPeC9kUjBtZExpbU85N2Ny?=
- =?utf-8?B?QXpqcFJkSXhMaVpYaFJyMVcrZXZwblYwNE9jTnR4UDNDRnA3dU5lczI2elph?=
- =?utf-8?B?NzZ2V1EvZHRWZlA3dlVaWks3TklmZkt5c1U4djBZV3pIUS8yeWJBRmg2QkFt?=
- =?utf-8?B?bStXWnNNcWo2a0RhYlU4aGJoMUV1UVdvQ0NTZ3h1cG43UHdacDZNdlEyWk1N?=
- =?utf-8?B?MHFkL0lNSmdTR21yMFJEdXNvZ2p5azlLaWd2UlBIZllMaXFqM1lNdjB2ejR2?=
- =?utf-8?B?R0lmNGZ5Q0NweUZ1aThZSkkvRHlHOWFOeGpjUGJEbnZVaFZtdEU1N205YUxX?=
- =?utf-8?B?VkliRDRFU0JNc3FMOWZrMmpyTWdIRlFSbnVFdWNwc3RuVUZBZHlEZFN3NGxX?=
- =?utf-8?B?Ry9NY2dUVVo4aTZkTU1xNWx4ci85ODRMZTFybjFTTHA5SWtpbC9QK2c4SVdF?=
- =?utf-8?B?MHRBYWpoRkk1SWI4TnkrNzF0Q1FwYWY5Y3VlUzUrS09Qa2lYdERnK0NaVWt6?=
- =?utf-8?B?eVZxN2ZFVkZDRVYwMkRvM2daeldaN29IY1Z3TERTU0QrQ3FoUVdhTWpqcEN5?=
- =?utf-8?B?T0FCMGs4UmpTemRmaU1xc3M5M29VVTJxRHBEQ1VHd2xJdHRoemJFQ3FJc01T?=
- =?utf-8?B?Y0xtRTdjWW1ORmFDK1NrZTBacjIwQ08yMDYxVDZ6YWJiR3NQN1A5am9WY3hv?=
- =?utf-8?B?UGhPQkVxdFpEVC80dGJPai9ZWFdjd2pMcFB1YWJQZEcwemtqUXRvaHF0VjU4?=
- =?utf-8?B?ZWFqSzd4M3d1eFpmUEljYVNyZGFaOE9Tc2wwRWgrQ3FWTjVBZ3A4UWpkMGZa?=
- =?utf-8?B?QUlVZXZ0a29rQW5MRzBxbGQrNXAzbE9QMzRKS1RxWE0zZFZ2VGxLRzBaMUZ1?=
- =?utf-8?B?eWIwUXI3V21zcTNxMXNVdjVBcjByYXluVE9FV2FyenRSVVZrcWd4c2tDcFEy?=
- =?utf-8?B?MkxMVUJTbW14d1dWU2o2Z2NsdFcxems2WUFVYlFZRHFKaEVVNlVYcXFYcWlo?=
- =?utf-8?B?ays3aU4xRU10TTFNYUxNR2V5YlZLaHA1S2tGYlN1ZWNYRFV6Q2dHRUpLSGU2?=
- =?utf-8?B?NFRuNDdjeVVwSkdzYlpkMHFVTTlJWExBSnZaVFVtRGEvVWJ1VkJnY1phVXdM?=
- =?utf-8?B?clJHdVRVU3JxWGF0a09WSG52RVpjUVZKRTVYSk5NcGtBbEZSdWxGQ3kyZG5C?=
- =?utf-8?B?WWZzdjBROVM0SzUzRXRTWnBvL0pxUS9zakNzazZ3d3JCTlJZekhnMWtDd3l3?=
- =?utf-8?B?SUFIbzUzWjZrK2RkSnZ2SkJyY0FWMkNzZkpCakZweVFraWE0WW9maVRrdUxi?=
- =?utf-8?B?WHVsUVVXYUhiaVdRQzBBdkRDdHBNVEhCYmVFM2czRjBGaG85WklvajkzNTl2?=
- =?utf-8?B?NlppQmpSMGF5RDFGOVNPVXV0QzZtdEZNNDl6MWdKSldvR1RybVJRWGx0Mllv?=
- =?utf-8?B?NXN3YW9GLzNsbVJzd2dFNytLT015WWFKOG9wRVZScFQvRG1ZZHh5cGRidG9a?=
- =?utf-8?B?WlhuVHBFOEF6VU1GSFdldFdpM0pHYkRNZ0tOMURSU2dYWHAxWnhzUWZYT1FG?=
- =?utf-8?B?ZGdCank1RHRpc3ZVbGUxUXF3YVRseUp4WEhHQzZxdWNNcFR3UExrLzBCRktU?=
- =?utf-8?B?M290aUx6MlgyMUtQSFZaZEVhVmtPVWN2Z1diU2tRcnhtdE5BSC9nUWdPd3Ft?=
- =?utf-8?B?dTExV2RnRFpjU091aHBqczZhOHVOK3hUZVRrUGpCTC9za0JoTVcrMUJjR2sx?=
- =?utf-8?B?enpyYU85R3VucFFRTGxRbEhJMWx1Vk9RUXV3V0hGUGVFZTM3MUI1ZkRZYU41?=
- =?utf-8?B?ZW9YUVVBVThxZXMzL2FvSGE2ZjR5R1NXckUzczNYUSt5YmRsVDNrNDE1amFN?=
- =?utf-8?B?RncyUWhLYk1mTk5JL0UxTG1rSWplN1hXNE1sWmVjait5TStGV0t6RzhSSlFl?=
- =?utf-8?B?TXZyaEpLUFNPaWtnK1NjMThlUzJ5NERwd0h6UERRaDRMOCthbklvZjZjNEFh?=
- =?utf-8?Q?45A1aL8Tis7PwJdWpv3NAu1yz?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C80C1D5AB8
+	for <netdev@vger.kernel.org>; Wed, 15 Jan 2025 19:00:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=171.64.64.25
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1736967619; cv=none; b=urRhfpjYU3pYHlfwliObRyzf+nUkky/lEv0JleItlawKvbcu5u5dL0EDt/Z/1Ab77f60F7aPNsKfo9dsc0ddSi4+sOIwwlkCnLPDdSGZUb3A9PM2JSuptwWuxFxO45fKWNwV5zwaNpmtRsJz/IaKX3Gu2mTHTwOWnQ8JYbi03p8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1736967619; c=relaxed/simple;
+	bh=EpjgUbWZasQo0ueRLGg6KfUxrjJcjihbrnyhcJc8CiM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=KjvSPQTEbzaycUUo7fkR1BHc5YYDF3d9WkPMNneWsc/MlR/ZhCWc3mXZNMoMIVE98IV1eg+Wtvx26WKxY61bKgnokX1hmAr8V65SMbY9B90unhUUn/ikWsLkCrmmZMXQxkFDsoGydaVnzkngTDw7yECCIF++Bek3idczoHujDsw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu; spf=pass smtp.mailfrom=cs.stanford.edu; dkim=pass (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b=aKd9X3Yb; arc=none smtp.client-ip=171.64.64.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cs.stanford.edu
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=cs.stanford.edu; s=cs2308; h=Content-Transfer-Encoding:MIME-Version:
+	Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=tG1lcSBoGRdPkDm89qBLAXp4dc2n/d09TUMM39tRJXM=; t=1736967617; x=1737831617; 
+	b=aKd9X3YbiGIt/HebXAKj+wQUJis74l/uualPrbaXARmnhWjLLPFgXk7iZQ525AjrkqZkalETXkc
+	EY2ZiGAJa7r2Pi4RyNSmq4uVZOZVhgUhh/lHMEWAdvuEykBLcQkOao+vJzwM1fm/oLMMZvGzcP+Ab
+	zEIFoEVe3smZyya8gSHPfzeYaJhVgGecGYrhYwF329fRlqCnd82/GH0Hkw84mW/GMPgRwTaNm4Kgh
+	j7m9MYV2tP3XHFAMVeB7dZu+tXpxlejIORRtl6xaRugdqw5sn6GtFDt6UCedA9Mse2v6Q9fhUeNBT
+	Up1UkCm9jg4NMRhtn1u1u30/CDh1lD0s69jQ==;
+Received: from ouster448.stanford.edu ([172.24.72.71]:52661 helo=localhost.localdomain)
+	by smtp1.cs.Stanford.EDU with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ouster@cs.stanford.edu>)
+	id 1tY8cb-0002BF-OY; Wed, 15 Jan 2025 11:00:10 -0800
+From: John Ousterhout <ouster@cs.stanford.edu>
+To: netdev@vger.kernel.org
+Cc: pabeni@redhat.com,
+	edumazet@google.com,
+	horms@kernel.org,
+	kuba@kernel.org,
+	John Ousterhout <ouster@cs.stanford.edu>
+Subject: [PATCH net-next v6 00/12] Begin upstreaming Homa transport protocol
+Date: Wed, 15 Jan 2025 10:59:24 -0800
+Message-ID: <20250115185937.1324-1-ouster@cs.stanford.edu>
+X-Mailer: git-send-email 2.45.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: marvell.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SJ0PR18MB5216.namprd18.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 22a92510-b2ff-4dc9-d811-08dd3592cff5
-X-MS-Exchange-CrossTenant-originalarrivaltime: 15 Jan 2025 18:31:22.6927
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 70e1fb47-1155-421d-87fc-2e58f638b6e0
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: mfmo+E+LMxuzF6ZvRYPYU+iFeMI13iWW+BKeG+/VFmK2L1VIX9MO3Qu+O19fPmZFfZMZ1gb8x1ABhZ2qJyonvQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR18MB3537
-X-Proofpoint-GUID: spzx4SecSvpgc2KiWQHtJiriKTVnYq6R
-X-Proofpoint-ORIG-GUID: spzx4SecSvpgc2KiWQHtJiriKTVnYq6R
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-01-15_08,2025-01-15_02,2024-11-22_01
+Content-Transfer-Encoding: 8bit
+X-Spam-Score: -101.0
+X-Scan-Signature: 1d850ab87a3e5a2ab763966491000bbf
 
-Pj4gQEAgLTEzMzcsOCArMTM1OCwxMiBAQCB2b2lkIG90eDJfYXVyYV9wb29sX2ZyZWUoc3RydWN0
-IG90eDJfbmljICpwZnZmKQ0KPj4gIAkJcG9vbCA9ICZwZnZmLT5xc2V0LnBvb2xbcG9vbF9pZF07
-DQo+PiAgCQlxbWVtX2ZyZWUocGZ2Zi0+ZGV2LCBwb29sLT5zdGFjayk7DQo+PiAgCQlxbWVtX2Zy
-ZWUocGZ2Zi0+ZGV2LCBwb29sLT5mY19hZGRyKTsNCj4+IC0JCXBhZ2VfcG9vbF9kZXN0cm95KHBv
-b2wtPnBhZ2VfcG9vbCk7DQo+PiAtCQlwb29sLT5wYWdlX3Bvb2wgPSBOVUxMOw0KPj4gKwkJaWYg
-KHBvb2wtPnBhZ2VfcG9vbCkgew0KPj4gKwkJCXBhZ2VfcG9vbF9kZXN0cm95KHBvb2wtPnBhZ2Vf
-cG9vbCk7DQo+PiArCQkJcG9vbC0+cGFnZV9wb29sID0gTlVMTDsNCj4+ICsJCX0NCj4NCj5JdCBs
-b29rcyBsaWtlIHRoZSBhYm92ZSBkZWx0YSBpcyBub3QgbmVlZGVkOiBwYWdlX3Bvb2xfZGVzdHJv
-eSgpIGhhbmRsZXMNCj5jb3JyZWN0bHkgTlVMTCB2YWx1ZSBmb3IgdGhlIHBhZ2UgcG9vbC4NCltT
-dW1hbl0gYWNrLCB3aWxsIHVwZGF0ZSBpbiB2NA0KPg0KPi9QDQoNCg==
+This patch series begins the process of upstreaming the Homa transport
+protocol. Homa is an alternative to TCP for use in datacenter
+environments. It provides 10-100x reductions in tail latency for short
+messages relative to TCP. Its benefits are greatest for mixed workloads
+containing both short and long messages running under high network loads.
+Homa is not API-compatible with TCP: it is connectionless and message-
+oriented (but still reliable and flow-controlled). Homa's new API not
+only contributes to its performance gains, but it also eliminates the
+massive amount of connection state required by TCP for highly connected
+datacenter workloads.
+
+For more details on Homa, please consult the Homa Wiki:
+https://homa-transport.atlassian.net/wiki/spaces/HOMA/overview
+The Wiki has pointers to two papers on Homa (one of which describes
+this implementation) as well as man pages describing the application
+API and other information.
+
+There is also a GitHub repo for Homa:
+https://github.com/PlatformLab/HomaModule
+The GitHub repo contains a superset of this patch set, including:
+* Additional source code that will eventually be upstreamed
+* Extensive unit tests (which will also be upstreamed eventually)
+* Application-level library functions (which need to go in glibc?)
+* Man pages (which need to be upstreamed as well)
+* Benchmarking and instrumentation code
+
+For this patch series, Homa has been stripped down to the bare minimum
+functionality capable of actually executing remote procedure calls. (about
+8000 lines of source code, compared to 15000 in the complete Homa). The
+remaining code will be upstreamed in smaller batches once this patch
+series has been accepted. Note: the code in this patch series is
+functional but its performance is not very interesting (about the same
+as TCP).
+
+The patch series is arranged to introduce the major functional components
+of Homa. Until the last patch has been applied, the code is inert (it
+will not be compiled).
+
+Note: this implementation of Homa supports both IPv4 and IPv6.
+
+v6 changes:
+- Make hrtimer variable in homa_timer_main static instead of stack-allocated
+  (avoids complaints when in debug mode).
+- Remove unnecessary cast in homa_dst_refresh.
+- Replace erroneous uses of GFP_KERNEL with GFP_ATOMIC.
+- Check for "all ports in use" in homa_sock_init.
+- Refactor API for homa_rpc_reap to incorporate "reap all" feature,
+  eliminate need for callers to specify exact amount of work to do
+  when in "reap a few" mode.
+- Fix bug in homa_rpc_reap (wasn't resetting rx_frees for each iteration
+  of outer loop).
+
+v5 changes:
+- Change type of start in struct homa_rcvbuf_args from void* to __u64;
+  also add more __user annotations.
+- Refactor homa_interest: replace awkward ready_rpc field with two
+  fields: rpc and rpc_ready. Added new functions homa_interest_get_rpc
+  and homa_interest_set_rpc to encapsulate/clarify access to
+  interest->rpc_ready.
+- Eliminate use of LIST_POISON1 etc. in homa_interests (use list_del_init
+  instead of list_del).
+- Remove homa_next_skb function, which is obsolete, unused, and incorrect
+- Eliminate ipv4_to_ipv6 function (use ipv6_addr_set_v4mapped instead)
+- Eliminate is_mapped_ipv4 function (use ipv6_addr_v4mapped instead)
+- Use __u64 instead of uint64_t in homa.h
+- Remove 'extern "C"' from homa.h
+- Various fixes from patchwork checks (checkpatch.pl, etc.)
+- A few improvements to comments
+
+v4 changes:
+- Remove sport argument for homa_find_server_rpc (unneeded). Also
+  remove client_port field from struct homa_ack
+- Refactor ICMP packet handling (v6 was incorrect)
+- Check for socket shutdown in homa_poll
+- Fix potential for memory garbling in homa_symbol_for_type
+- Remove unused ETHERNET_MAX_PAYLOAD declaration
+- Rename classes in homa_wire.h so they all have "homa_" prefixes
+- Various fixes from patchwork checks (checkpatch.pl, etc.)
+- A few improvements to comments
+
+v3 changes:
+- Fix formatting in Kconfig
+- Set ipv6_pinfo_offset in struct proto
+- Check return value of inet6_register_protosw
+- In homa_load cleanup, don't cleanup things that haven't been
+  initialized
+- Add MODULE_ALIAS_NET_PF_PROTO_TYPE to auto-load module
+- Check return value from kzalloc call in homa_sock_init
+- Change SO_HOMA_SET_BUF to SO_HOMA_RCVBUF
+- Change struct homa_set_buf_args to struct homa_rcvbuf_args
+- Implement getsockopt for SO_HOMA_RCVBUF
+- Return ENOPROTOOPT instead of EINVAL where appropriate in
+  setsockopt and getsockopt
+- Fix crash in homa_pool_check_waiting if pool has no region yet
+- Check for NULL msg->msg_name in homa_sendmsg
+- Change addr->in6.sin6_family to addr->sa.sa_family in homa_sendmsg
+  for clarity
+- For some errors in homa_recvmsg, return directly rather than "goto done"
+- Return error from recvmsg if offsets of returned read buffers are bogus
+- Added comments to clarify lock-unlock pairs for RPCs
+- Renamed homa_try_bucket_lock to homa_try_rpc_lock
+- Fix issues found by test robot and checkpatch.pl
+- Ensure first argument to do_div is 64 bits
+- Remove C++ style comments
+- Removed some code that will only be relevant in future patches that
+  fill in missing Homa functionality
+
+v2 changes:
+- Remove sockaddr_in_union declaration from public API in homa.h
+- Remove kernel wrapper functions (homa_send, etc.) from homa.h
+- Fix many sparse warnings (still more work to do here) and other issues
+  uncovered by test robot
+- Fix checkpatch.pl issues
+- Remove residual code related to unit tests
+- Remove references to tt_record from comments
+- Make it safe to delete sockets during homa_socktab scans
+- Use uintptr_t for portability fo 32-bit platforms
+- Use do_div instead of "/" for portability
+- Remove homa->busy_usecs and homa->gro_busy_usecs (not needed in
+  this stripped down version of Homa)
+- Eliminate usage of cpu_khz, use sched_clock instead of get_cycles
+- Add missing checks of kmalloc return values
+- Remove "inline" qualifier from functions in .c files
+- Document that pad fields must be zero
+- Use more precise type "uint32_t" rather than "int"
+- Remove unneeded #include of linux/version.h
+
+John Ousterhout (12):
+  net: homa: define user-visible API for Homa
+  net: homa: create homa_wire.h
+  net: homa: create shared Homa header files
+  net: homa: create homa_pool.h and homa_pool.c
+  net: homa: create homa_rpc.h and homa_rpc.c
+  net: homa: create homa_peer.h and homa_peer.c
+  net: homa: create homa_sock.h and homa_sock.c
+  net: homa: create homa_incoming.c
+  net: homa: create homa_outgoing.c
+  net: homa: create homa_timer.c
+  net: homa: create homa_plumbing.c and homa_utils.c
+  net: homa: create Makefile and Kconfig
+
+ MAINTAINERS               |    7 +
+ include/uapi/linux/homa.h |  161 ++++++
+ net/Kconfig               |    1 +
+ net/Makefile              |    1 +
+ net/homa/Kconfig          |   19 +
+ net/homa/Makefile         |   14 +
+ net/homa/homa_impl.h      |  711 ++++++++++++++++++++++++
+ net/homa/homa_incoming.c  | 1076 +++++++++++++++++++++++++++++++++++++
+ net/homa/homa_outgoing.c  |  855 +++++++++++++++++++++++++++++
+ net/homa/homa_peer.c      |  366 +++++++++++++
+ net/homa/homa_peer.h      |  233 ++++++++
+ net/homa/homa_plumbing.c  | 1004 ++++++++++++++++++++++++++++++++++
+ net/homa/homa_pool.c      |  453 ++++++++++++++++
+ net/homa/homa_pool.h      |  154 ++++++
+ net/homa/homa_rpc.c       |  494 +++++++++++++++++
+ net/homa/homa_rpc.h       |  458 ++++++++++++++++
+ net/homa/homa_sock.c      |  388 +++++++++++++
+ net/homa/homa_sock.h      |  410 ++++++++++++++
+ net/homa/homa_stub.h      |   81 +++
+ net/homa/homa_timer.c     |  157 ++++++
+ net/homa/homa_utils.c     |  166 ++++++
+ net/homa/homa_wire.h      |  367 +++++++++++++
+ 22 files changed, 7576 insertions(+)
+ create mode 100644 include/uapi/linux/homa.h
+ create mode 100644 net/homa/Kconfig
+ create mode 100644 net/homa/Makefile
+ create mode 100644 net/homa/homa_impl.h
+ create mode 100644 net/homa/homa_incoming.c
+ create mode 100644 net/homa/homa_outgoing.c
+ create mode 100644 net/homa/homa_peer.c
+ create mode 100644 net/homa/homa_peer.h
+ create mode 100644 net/homa/homa_plumbing.c
+ create mode 100644 net/homa/homa_pool.c
+ create mode 100644 net/homa/homa_pool.h
+ create mode 100644 net/homa/homa_rpc.c
+ create mode 100644 net/homa/homa_rpc.h
+ create mode 100644 net/homa/homa_sock.c
+ create mode 100644 net/homa/homa_sock.h
+ create mode 100644 net/homa/homa_stub.h
+ create mode 100644 net/homa/homa_timer.c
+ create mode 100644 net/homa/homa_utils.c
+ create mode 100644 net/homa/homa_wire.h
+
+--
+2.34.1
+
 
