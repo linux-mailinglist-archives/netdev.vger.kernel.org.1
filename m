@@ -1,241 +1,152 @@
-Return-Path: <netdev+bounces-158474-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158464-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01A44A11F47
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 11:26:05 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 068AEA11F2E
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 11:24:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 95FFB3A378C
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 10:25:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 295CA161D05
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 10:24:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 863E123F27F;
-	Wed, 15 Jan 2025 10:25:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99CB12361F4;
+	Wed, 15 Jan 2025 10:23:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=yunsilicon.com header.i=@yunsilicon.com header.b="f1SSw3C4"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aCm3GTDP"
 X-Original-To: netdev@vger.kernel.org
-Received: from va-2-56.ptr.blmpb.com (va-2-56.ptr.blmpb.com [209.127.231.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FB481ADC64
-	for <netdev@vger.kernel.org>; Wed, 15 Jan 2025 10:25:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.127.231.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73D252361C9;
+	Wed, 15 Jan 2025 10:23:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736936746; cv=none; b=f733T+IV6YSaOrlxe2WlrFWhuoyJL5e8CvMuPfEPStq/vTNDyip66EVz6VsR6EPdZMNLL6oyXCeApOSfSnpNUIRJrry4UpIY/0k8///ojQ6GcVJPdM0rgwBdxNufgi+isUrdMJvwxM9HfKFwKLJyFffaumH45Zusqeq2acbSI/o=
+	t=1736936622; cv=none; b=d1b5Oni+p937fJXuVcEKUxP5rsFDBrkA+l+lr1Um6qZVxplPXjWEPcPokMGM4a+Gpff8HmD89zsDsMNRfzpCL+UJYtv/x1lEne5P5TYhGNUu21AR3Lr4M8e+1Elyo2tjgxBN0DLD52v/45hKmRnTTAiejt+aPoDf8gSn8+jblLQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736936746; c=relaxed/simple;
-	bh=BvedamTubGi6nGXQOyrr30HhX6hRfRAogxUeC9OVvRA=;
-	h=From:Mime-Version:Date:Content-Type:To:Cc:Subject:Message-Id; b=iTQaewFsaVB+fMCTc/U5MLeJHk8ogxyWeMFAmFhfqjoDOxTSbs5++dFbFUsh8dcOGrsYuncDL/e82BKDhYMqbNKh5rMZe/B0yDLKkN0XPXf5LQv+ugLub9d8GziCShpyUM3uQXNon40ZqQGvJz8gHmpwclXctz6XiRyS3twpRW0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=yunsilicon.com; spf=pass smtp.mailfrom=yunsilicon.com; dkim=pass (2048-bit key) header.d=yunsilicon.com header.i=@yunsilicon.com header.b=f1SSw3C4; arc=none smtp.client-ip=209.127.231.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=yunsilicon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yunsilicon.com
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- s=feishu2403070942; d=yunsilicon.com; t=1736936600; h=from:subject:
- mime-version:from:date:message-id:subject:to:cc:reply-to:content-type:
- mime-version:in-reply-to:message-id;
- bh=pOsk0vixPMXs6RL+YCGx8fSHix8/X+zDtdSJFPIUzCg=;
- b=f1SSw3C4Sh3SjXXVSSgEUKIyDRogTmAjA5emSvDjYEbXBjEA0JX7zdRIQZE5fkKkDbMAm1
- JneIUYhemaTRsFd6EZQFjwdAUrD4sAIWg7nFyqdxXU9mNGvvaLamNmijnPYJ1D5OHW+LNB
- fgdEdgua7wkSxsbRvMKfgcKCzeeN/R4mpc6Pffn11U8nnJRMumpITB8L48rncacV6jvf11
- TF09vzsIIQpmd4eOI0Oc4/qQMQOrIfWkYOZ4BIJSc4ETaXHZkan4Tj73JaaNuzXRhxJZvD
- 2ZFWhHbCbNbEV9j3HFbLmTBj5feHbgB2PBcimFoz6zQ7HHRPXHWZvLYvwVD1Rw==
-From: "Xin Tian" <tianx@yunsilicon.com>
+	s=arc-20240116; t=1736936622; c=relaxed/simple;
+	bh=ExcmRWQOBhtL7v61Lp5pLboXAkLM1EV+vtCHIDGJNPM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Bvyve83kXUvsspvSRbVCtOWPCRmDlf6Ec/wCB/+fWGkru9PjUVtTagzwW8jjLn2WhAmnJMvvAaa3+BvbjgDtm5GIWo6YidJ8zrRK6LzoTZYKcvh75e0x5O5j2YxVieh4J+I5efYWJI1kOXpx3Ven+tLgTH2gjmVXrQQQHnteBNU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aCm3GTDP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A93A0C4CEDF;
+	Wed, 15 Jan 2025 10:23:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1736936622;
+	bh=ExcmRWQOBhtL7v61Lp5pLboXAkLM1EV+vtCHIDGJNPM=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=aCm3GTDPAnC5ZMu75sf1DhmV6alNXdQ7BTrEQpn5OvQxeMsRWkwHMlOv+ToTnksVx
+	 WhGa3pUd6lx1s6cdAzvAOWMg3jEdZPfNwNBziKVIfRXqP7ttY7uppMW1er2IQR15R6
+	 Te6Ndr0Eb3SmyT4G1goGO7RZFek/E5dfd+UiNJN5d5LwR9mvOSZ5qBUh56KyHHVwoK
+	 DnKz9ZfDav0UGDXzarZAdVqtHi3z97KdkAIs7OSwdOYQF1H+mSQZPI//s92XjBTgvK
+	 c42/rWyHhSNHUiY2nOzhF32na20KG1ErrfJmt+a+IkqBo/sURQAcNC23R1JF4lMOfV
+	 2O1ekPTjCaUsw==
+Message-ID: <74582905-b884-41f3-8c46-761631c06c22@kernel.org>
+Date: Wed, 15 Jan 2025 11:23:37 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Date: Wed, 15 Jan 2025 18:23:17 +0800
-Content-Type: text/plain; charset=UTF-8
-X-Mailer: git-send-email 2.25.1
-Content-Transfer-Encoding: 7bit
-To: <netdev@vger.kernel.org>
-Cc: <leon@kernel.org>, <andrew+netdev@lunn.ch>, <kuba@kernel.org>, 
-	<pabeni@redhat.com>, <edumazet@google.com>, <davem@davemloft.net>, 
-	<jeff.johnson@oss.qualcomm.com>, <przemyslaw.kitszel@intel.com>, 
-	<weihg@yunsilicon.com>, <wanry@yunsilicon.com>
-Subject: [PATCH v3 00/14] net-next/yunsilicon: ADD Yunsilicon XSC Ethernet Driver
-Message-Id: <20250115102242.3541496-1-tianx@yunsilicon.com>
-Received: from ubuntu-liun.yunsilicon.com ([58.34.192.114]) by smtp.feishu.cn with ESMTPS; Wed, 15 Jan 2025 18:23:17 +0800
-X-Lms-Return-Path: <lba+267878c96+4ad673+vger.kernel.org+tianx@yunsilicon.com>
-X-Original-From: Xin Tian <tianx@yunsilicon.com>
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [xdp-hints] Re: XDP Redirect and TX Metadata
+To: Florian Kauer <florian.kauer@linutronix.de>,
+ Marcus Wichelmann <marcus.wichelmann@hetzner-cloud.de>,
+ =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>,
+ xdp-hints@xdp-project.net, xdp-newbies@vger.kernel.org
+Cc: Stanislav Fomichev <sdf@fomichev.me>, Arthur Fabre
+ <afabre@cloudflare.com>, Jakub Sitnicki <jakub@cloudflare.com>,
+ Netdev <netdev@vger.kernel.org>, kernel-team <kernel-team@cloudflare.com>
+References: <c8072891-6d5c-42c3-8b13-e8ca9ab6c43c@linutronix.de>
+ <87v86tg5qp.fsf@toke.dk> <b3112980-1e58-4615-9a1e-9d8a01d364cc@linutronix.de>
+ <a8f8d8af-0573-49dc-9ddb-1eadb8c31b7b@hetzner-cloud.de>
+ <3c4192e4-0305-40f3-93ce-e2250d658c93@linutronix.de>
+Content-Language: en-US
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <3c4192e4-0305-40f3-93ce-e2250d658c93@linutronix.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-The patch series adds the xsc driver, which will support the YunSilicon
-MS/MC/MV series of network cards. These network cards offer support for
-high-speed Ethernet and RDMA networking, with speeds of up to 200Gbps.
 
-The Ethernet functionality is implemented by two modules. One is a
-PCI driver(xsc_pci), which provides PCIe configuration,
-CMDQ service (communication with firmware), interrupt handling,
-hardware resource management, and other services, while offering
-common interfaces for Ethernet and future InfiniBand drivers to
-utilize hardware resources. The other is an Ethernet driver(xsc_eth),
-which handles Ethernet interface configuration and data
-transmission/reception.
 
-- Patches 1-7 implement the PCI driver
-- Patches 8-14 implement the Ethernet driver
+On 14/01/2025 19.07, Florian Kauer wrote:
+> Hi Marcus,
+> 
+> On 1/14/25 17:47, Marcus Wichelmann wrote:
+>> Am 12.02.24 um 15:35 schrieb Florian Kauer:
+>>> On 12.02.24 14:41, Toke Høiland-Jørgensen wrote:
+>>>> Florian Kauer <florian.kauer@linutronix.de> writes:
+>>>>
+>>>>> 2. For the RX side, the metadata is documented as "XDP RX Metadata"
+>>>>> (https://docs.kernel.org/networking/xdp-rx-metadata.html), while for
+>>>>> TX it is "AF_XDP TX Metadata"
+>>>>> (https://www.kernel.org/doc/html/next/networking/xsk-tx-metadata.html).
+>>>>> That seems to imply that TX metadata only works for AF_XDP, but not
+>>>>> for direct redirection. Is there a reason for that?
+>>>>
+>>>> Well, IIRC, AF_XDP was the most pressing use case, and no one has gotten
+>>>> around to extending this to the regular XDP forwarding path yet.
+>>>
+>>> Ok, that is fine. I had the fear that there is some fundamental problem
+>>> that prevents to implement this.
+>>
+>> Hi,
+>> are there any updates on this? I'm currently looking into this as well.
+> 
+> I am still interested, but have no implementation planned short- or mid-term.
+> So, looking forward to your implementation :-)
+> 
+> Greetings,
+> Florian
+> 
+>>
+>> I'd like to have a way to enable the TX checksum offload when redirecting from
+>> one device to another.
+>> Stanislav Fomichev already implemented [1] the TX offload support for the AF_XDP
+>> use case (thanks for that), but for now, this cannot be used for "regular"
+>> redirects.
+>>
+>> I'm currently in a position where I can invest some work into this, but figured
+>> it would make sense to ask you first:
+>>
+>> Do you already have concrete plans or ideas in mind, how the API to trigger the
+>> TX offloads should look like?
+>> I have seen the talk [2] from Jesper about this, but I'm not sure if the
+>> proposals in there are still up to date.
 
-This submission is the first phase, which includes the PF-based Ethernet
-transmit and receive functionality. Once this is merged, we will submit
-additional patches to implement support for other features, such as SR-IOV,
-ethtool support, and a new RDMA driver.
+My talk is outdated. My co-workers Arthur and Jakub did a
+presentation[3] at LPC2024.  Alexei liked the Compressed Key-Value store
+idea from that presentation[3].   So, we are currently working on a
+Compressed Key-Value store that Arthur named "traits".  We are almost
+done benchmarking this, see traits0N_* documents in [4].
 
-Changes v2->v3:
-Link to v2: https://lore.kernel.org/netdev/20241230101513.3836531-1-tianx@yunsilicon.com/
-1. Use auxiliary bus for ethernet functionality.
-- Leon Romanovsky comments
-2. Remove netdev from struct xsc_core_device, as it can be accessed via eth_priv.
-- Andrew Lunn comments
+[3] https://lpc.events/event/18/contributions/1935/
+[4] https://github.com/xdp-project/xdp-project/blob/main/areas/hints/
 
-Changes v1->v2:
-Link to v1: https://lore.kernel.org/netdev/20241218105023.2237645-1-tianx@yunsilicon.com/
-1. Remove the last two patches to reduce the total code submitted.
-- Jakub Kicinski comments
-2. Remove the custom logging interfaces and switch to using
-   pci_xxx/netdev_xxx logging interfaces. Delete the related
-   module parameters.
-3. No use of inline functions in .c files.
-4. Remove unnecessary license information.
-5. Remove unnecessary void casts.
-- Andrew Lunn comments
-6. Use double underscore (__) for header file macros.
-7. Fix the depend field in Kconfig.
-8. Add sign-off for co-developers.
-9. use string directly in MODULE_DESCRIPTION
-10. Fix poor formatting issues in the code.
-11. Modify some macros that don't use the XSC_ prefix.
-12. Remove unused code from xsc_cmd.h that is not part of this patch series.
-13. No comma after items in a complete enum.
-14. Use the BIT() macro to define constants related to bit operations.
-15. Add comments to clarify names like ver, cqe, eqn, pas, etc.
-- Przemek Kitszel comments
+Our implementation is primarily focused on the RX side, and transferring 
+  RX hardware metadata to CPUMAP+veth when doing XDP_REDIRECT.
 
-Changes v0->v1:
-1. name xsc_core_device as xdev instead of dev
-2. modify Signed-off-by tag to Co-developed-by
-3. remove some obvious comments
-4. remove unnecessary zero-init and NULL-init
-5. modify bad-named goto labels
-6. reordered variable declarations according to the RCT rule
-- Przemek Kitszel comments
-7. add MODULE_DESCRIPTION()
-- Jeff Johnson comments
-8. remove unnecessary dev_info logs
-9. replace these magic numbers with #defines in xsc_eth_common.h
-10. move code to right place
-11. delete unlikely() used in probe
-12. remove unnecessary reboot callbacks
-- Andrew Lunn comments
+You ask is about TX side, right?
 
-Xin Tian (14):
-  net-next/yunsilicon: Add xsc driver basic framework
-  net-next/yunsilicon: Enable CMDQ
-  net-next/yunsilicon: Add hardware setup APIs
-  net-next/yunsilicon: Add qp and cq management
-  net-next/yunsilicon: Add eq and alloc
-  net-next/yunsilicon: Add pci irq
-  net-next/yunsilicon: Init auxiliary device
-  net-next/yunsilicon: Add ethernet interface
-  net-next/yunsilicon: Init net device
-  net-next/yunsilicon: Add eth needed qp and cq apis
-  net-next/yunsilicon: ndo_open and ndo_stop
-  net-next/yunsilicon: Add ndo_start_xmit
-  net-next/yunsilicon: Add eth rx
-  net-next/yunsilicon: add ndo_get_stats64
-
- drivers/net/ethernet/Kconfig                  |    1 +
- drivers/net/ethernet/Makefile                 |    1 +
- drivers/net/ethernet/yunsilicon/Kconfig       |   26 +
- drivers/net/ethernet/yunsilicon/Makefile      |    8 +
- .../yunsilicon/xsc/common/xsc_auto_hw.h       |   94 +
- .../ethernet/yunsilicon/xsc/common/xsc_cmd.h  |  632 ++++++
- .../ethernet/yunsilicon/xsc/common/xsc_cmdq.h |  215 ++
- .../ethernet/yunsilicon/xsc/common/xsc_core.h |  529 +++++
- .../yunsilicon/xsc/common/xsc_device.h        |   77 +
- .../yunsilicon/xsc/common/xsc_driver.h        |   25 +
- .../ethernet/yunsilicon/xsc/common/xsc_pp.h   |   38 +
- .../net/ethernet/yunsilicon/xsc/net/Kconfig   |   17 +
- .../net/ethernet/yunsilicon/xsc/net/Makefile  |    9 +
- .../net/ethernet/yunsilicon/xsc/net/main.c    | 1929 +++++++++++++++++
- .../net/ethernet/yunsilicon/xsc/net/xsc_eth.h |   56 +
- .../yunsilicon/xsc/net/xsc_eth_common.h       |  239 ++
- .../ethernet/yunsilicon/xsc/net/xsc_eth_rx.c  |  557 +++++
- .../yunsilicon/xsc/net/xsc_eth_stats.c        |   42 +
- .../yunsilicon/xsc/net/xsc_eth_stats.h        |   33 +
- .../ethernet/yunsilicon/xsc/net/xsc_eth_tx.c  |  295 +++
- .../yunsilicon/xsc/net/xsc_eth_txrx.c         |  185 ++
- .../yunsilicon/xsc/net/xsc_eth_txrx.h         |   90 +
- .../ethernet/yunsilicon/xsc/net/xsc_eth_wq.c  |   80 +
- .../ethernet/yunsilicon/xsc/net/xsc_eth_wq.h  |  179 ++
- .../net/ethernet/yunsilicon/xsc/net/xsc_pph.h |  176 ++
- .../ethernet/yunsilicon/xsc/net/xsc_queue.h   |  203 ++
- .../net/ethernet/yunsilicon/xsc/pci/Kconfig   |   16 +
- .../net/ethernet/yunsilicon/xsc/pci/Makefile  |   10 +
- .../net/ethernet/yunsilicon/xsc/pci/adev.c    |  109 +
- .../net/ethernet/yunsilicon/xsc/pci/adev.h    |   14 +
- .../net/ethernet/yunsilicon/xsc/pci/alloc.c   |  221 ++
- .../net/ethernet/yunsilicon/xsc/pci/alloc.h   |   15 +
- .../net/ethernet/yunsilicon/xsc/pci/cmdq.c    | 1555 +++++++++++++
- drivers/net/ethernet/yunsilicon/xsc/pci/cq.c  |  151 ++
- drivers/net/ethernet/yunsilicon/xsc/pci/cq.h  |   14 +
- drivers/net/ethernet/yunsilicon/xsc/pci/eq.c  |  334 +++
- drivers/net/ethernet/yunsilicon/xsc/pci/eq.h  |   46 +
- drivers/net/ethernet/yunsilicon/xsc/pci/hw.c  |  266 +++
- drivers/net/ethernet/yunsilicon/xsc/pci/hw.h  |   18 +
- .../net/ethernet/yunsilicon/xsc/pci/main.c    |  384 ++++
- .../net/ethernet/yunsilicon/xsc/pci/pci_irq.c |  419 ++++
- .../net/ethernet/yunsilicon/xsc/pci/pci_irq.h |   14 +
- drivers/net/ethernet/yunsilicon/xsc/pci/qp.c  |  189 ++
- drivers/net/ethernet/yunsilicon/xsc/pci/qp.h  |   15 +
- .../net/ethernet/yunsilicon/xsc/pci/vport.c   |   30 +
- 45 files changed, 9556 insertions(+)
- create mode 100644 drivers/net/ethernet/yunsilicon/Kconfig
- create mode 100644 drivers/net/ethernet/yunsilicon/Makefile
- create mode 100644 drivers/net/ethernet/yunsilicon/xsc/common/xsc_auto_hw.h
- create mode 100644 drivers/net/ethernet/yunsilicon/xsc/common/xsc_cmd.h
- create mode 100644 drivers/net/ethernet/yunsilicon/xsc/common/xsc_cmdq.h
- create mode 100644 drivers/net/ethernet/yunsilicon/xsc/common/xsc_core.h
- create mode 100644 drivers/net/ethernet/yunsilicon/xsc/common/xsc_device.h
- create mode 100644 drivers/net/ethernet/yunsilicon/xsc/common/xsc_driver.h
- create mode 100644 drivers/net/ethernet/yunsilicon/xsc/common/xsc_pp.h
- create mode 100644 drivers/net/ethernet/yunsilicon/xsc/net/Kconfig
- create mode 100644 drivers/net/ethernet/yunsilicon/xsc/net/Makefile
- create mode 100644 drivers/net/ethernet/yunsilicon/xsc/net/main.c
- create mode 100644 drivers/net/ethernet/yunsilicon/xsc/net/xsc_eth.h
- create mode 100644 drivers/net/ethernet/yunsilicon/xsc/net/xsc_eth_common.h
- create mode 100644 drivers/net/ethernet/yunsilicon/xsc/net/xsc_eth_rx.c
- create mode 100644 drivers/net/ethernet/yunsilicon/xsc/net/xsc_eth_stats.c
- create mode 100644 drivers/net/ethernet/yunsilicon/xsc/net/xsc_eth_stats.h
- create mode 100644 drivers/net/ethernet/yunsilicon/xsc/net/xsc_eth_tx.c
- create mode 100644 drivers/net/ethernet/yunsilicon/xsc/net/xsc_eth_txrx.c
- create mode 100644 drivers/net/ethernet/yunsilicon/xsc/net/xsc_eth_txrx.h
- create mode 100644 drivers/net/ethernet/yunsilicon/xsc/net/xsc_eth_wq.c
- create mode 100644 drivers/net/ethernet/yunsilicon/xsc/net/xsc_eth_wq.h
- create mode 100644 drivers/net/ethernet/yunsilicon/xsc/net/xsc_pph.h
- create mode 100644 drivers/net/ethernet/yunsilicon/xsc/net/xsc_queue.h
- create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/Kconfig
- create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/Makefile
- create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/adev.c
- create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/adev.h
- create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/alloc.c
- create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/alloc.h
- create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/cmdq.c
- create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/cq.c
- create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/cq.h
- create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/eq.c
- create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/eq.h
- create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/hw.c
- create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/hw.h
- create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/main.c
- create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/pci_irq.c
- create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/pci_irq.h
- create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/qp.c
- create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/qp.h
- create mode 100644 drivers/net/ethernet/yunsilicon/xsc/pci/vport.c
-
---
-2.43.0
+>> I think it could be possible to introduce a program flag, just like
+>> `BPF_F_XDP_HAS_FRAGS`, and if this flag is set, interpret a part of the
+>> metadata area as a `struct xsk_tx_metadata`. Then, the code to apply the
+>> offloads from that struct when xmit-ing the frame could be reused, as it
+>> is already implemented in `mlx5e_xmit_xdp_frame` for example.
+>> But the "xsk" in the struct name may be a bit confusing. :/
+>>
+>> Do you think this could work or could you guide me into a direction that may
+>> have a chance to be upstreamable? Also, is there any recent work on this that
+>> I should know off?
+>>
+>> Thanks!
+>>
+>> Marcus Wichelmann
+>> Hetzner Cloud GmbH
+>>
+>> [1] https://lore.kernel.org/bpf/20231127190319.1190813-3-sdf@google.com/
+>> [2] https://lpc.events/event/16/contributions/1362/attachments/1056/2017/xdp-hints-lpc2022.pdf
+>>
+> 
 
