@@ -1,140 +1,142 @@
-Return-Path: <netdev+bounces-158385-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158386-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F148A1188B
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 05:36:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E826A118B7
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 06:07:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 02FDC3A499D
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 04:36:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 186073A730D
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 05:07:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 942031547D5;
-	Wed, 15 Jan 2025 04:36:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="Mc+BLtcG"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C003522E3F7;
+	Wed, 15 Jan 2025 05:07:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-6001.amazon.com (smtp-fw-6001.amazon.com [52.95.48.154])
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC6E4232423
-	for <netdev@vger.kernel.org>; Wed, 15 Jan 2025 04:36:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.48.154
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C5514C6C;
+	Wed, 15 Jan 2025 05:07:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736915814; cv=none; b=GMisMZgSBvxp9O5GyXw/RjeDDzBwYTKNaFv7hXw8TZXchf6AVHtY7KuwvUE8/vL69ZDOKakdE0/sVPHyz/CzgJdDkj8l20SC1t5mW/q049OOeFZg73nKeMO3BOaBuUHopuVF3z7wF+pDMX6wHA0gFRxytORe2l9MEFrprJROT4g=
+	t=1736917656; cv=none; b=aod4zhrsaixi54AEKBTTZ3QxUM3L/EX0POt9YHyv5xgQq+/w3Uq1Z5oSYnF73OZmOMTJEWX+e5w4pRPtyCANClxOtemwMGuFqrQTdAQJSvkZGkHrL98C8A1Z2urbO5zea7l+QIHHpfSdB0HU5mTpsfnflgXz517zaluh6xkEJTk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736915814; c=relaxed/simple;
-	bh=xdwHXkPrDi8yFdwEqsB1HFtQTx5jUPMiDrYo1QHVs0A=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=aJ65hr2xJrajpKaHPkxOZ2FPxq9OYw8aKaTbZLC/Jh78iemEoJiRY5R7hg5eTjyw6wrtJ+yiUb3VaeJVIhfnMmRsf8mP2ZP0ydjZy2HMfHKvSBjyawpcGoG/7quqYb7JGC3chAePLx4Supc1D++P4XMBFkY7u5EBtwGLw5xV0mU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=Mc+BLtcG; arc=none smtp.client-ip=52.95.48.154
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1736915813; x=1768451813;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=w/VVSJhzDGKbFbPCSh1jSlgZX8UWgADmLGXti7Py3F0=;
-  b=Mc+BLtcGviDuZGBzjCedmknm5zBMj8xHizMcei0+VvG8/cqtHyFbgBrh
-   OXrUBg0rARjFdAbwcTEW31QNofNbqC4sCXd8hDpZOoUBv9FABbtTPYMB0
-   MgywpUz3U2IHQ6FxNLpKXTn14YjkYrmEw1zxtdfLxmv7/KiuXvr++/E7d
-   8=;
-X-IronPort-AV: E=Sophos;i="6.12,316,1728950400"; 
-   d="scan'208";a="454302514"
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.2])
-  by smtp-border-fw-6001.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jan 2025 04:36:50 +0000
-Received: from EX19MTAUWA002.ant.amazon.com [10.0.21.151:59549]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.58.70:2525] with esmtp (Farcaster)
- id 9529cf20-58a0-4d62-aa22-12f9dc66af24; Wed, 15 Jan 2025 04:36:49 +0000 (UTC)
-X-Farcaster-Flow-ID: 9529cf20-58a0-4d62-aa22-12f9dc66af24
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Wed, 15 Jan 2025 04:36:48 +0000
-Received: from 6c7e67c6786f.amazon.com (10.118.248.178) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Wed, 15 Jan 2025 04:36:44 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <stfomichev@gmail.com>
-CC: <davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
-	<horms@kernel.org>, <kuba@kernel.org>, <kuni1840@gmail.com>,
-	<kuniyu@amazon.com>, <netdev@vger.kernel.org>, <pabeni@redhat.com>
-Subject: Re: [PATCH v1 net-next 00/11] ipv6: Convert RTM_{NEW,DEL}ADDR and more to per-netns RTNL.
-Date: Wed, 15 Jan 2025 13:36:35 +0900
-Message-ID: <20250115043635.4429-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
-In-Reply-To: <Z4abUFyLfalEFCfz@mini-arch>
-References: <Z4abUFyLfalEFCfz@mini-arch>
+	s=arc-20240116; t=1736917656; c=relaxed/simple;
+	bh=gGhcTfxRbAcekrj1K5nAiEt1uTYwmJGCNFmFwJ9Pyi0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BMVXR4c/aghy1YYqbEyfrf6CKj976HWrXtzEhHDJqZ+708oA2vYIJsZ6KdfddIzqewbertJBhXApSGOxushmlpwAjAWU/AIuor90kbxx1Ce5qkDMwD3o8O2P5M6pXdZmC4uprTXpEu5WBEpM574b5sbwIlPiE3hQoF5UIm6p334=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.98)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1tXvck-000000006yc-0TuA;
+	Wed, 15 Jan 2025 05:07:26 +0000
+Date: Wed, 15 Jan 2025 05:07:22 +0000
+From: Daniel Golle <daniel@makrotopia.org>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] net: phy: realtek: clear status if link is down
+Message-ID: <Z4dCig1kd-BhSHqD@makrotopia.org>
+References: <229e077bad31d1a9086426f60c3a4f4ac20d2c1a.1736901813.git.daniel@makrotopia.org>
+ <7dd12859-dd20-4ce1-a877-4c93b335b911@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D040UWA001.ant.amazon.com (10.13.139.22) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <7dd12859-dd20-4ce1-a877-4c93b335b911@lunn.ch>
 
-From: Stanislav Fomichev <stfomichev@gmail.com>
-Date: Tue, 14 Jan 2025 09:13:52 -0800
-> On 01/14, Kuniyuki Iwashima wrote:
-> > This series converts RTM_NEWADDR/RTM_DELADDR and some more
-> > RTNL users in addrconf.c to per-netns RTNL.
+Hi Andrew,
+
+On Wed, Jan 15, 2025 at 03:50:33AM +0100, Andrew Lunn wrote:
+> On Wed, Jan 15, 2025 at 12:46:11AM +0000, Daniel Golle wrote:
+> > Clear speed, duplex and master/slave status in case the link is down
+> > to avoid reporting bogus link(-partner) properties.
+> > 
+> > Fixes: 5cb409b3960e ("net: phy: realtek: clear 1000Base-T link partner advertisement")
+> > Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+> > ---
+> >  drivers/net/phy/realtek.c | 20 ++++++++++++++------
+> >  1 file changed, 14 insertions(+), 6 deletions(-)
+> > 
+> > diff --git a/drivers/net/phy/realtek.c b/drivers/net/phy/realtek.c
+> > index f65d7f1f348e..3f0e03e2abce 100644
+> > --- a/drivers/net/phy/realtek.c
+> > +++ b/drivers/net/phy/realtek.c
+> > @@ -720,8 +720,12 @@ static int rtlgen_read_status(struct phy_device *phydev)
+> >  	if (ret < 0)
+> >  		return ret;
+> >  
+> > -	if (!phydev->link)
+> > +	if (!phydev->link) {
+> > +		phydev->duplex = DUPLEX_UNKNOWN;
+> > +		phydev->master_slave_state = MASTER_SLAVE_STATE_UNKNOWN;
+> > +		phydev->speed = SPEED_UNKNOWN;
+> >  		return 0;
+> > +	}
+> >  
 > 
-> This makes a lot of tests unhappy:
-> https://netdev.bots.linux.dev/contest.html?pw-n=0&branch=net-next-2025-01-14--15-00&pw-n=0&pass=0
+> I must be missing something here...
 > 
-> I have confirmed with a single one (drivers/net/ping.py) on my side,
-> fails with:
-> STDERR: b'ping: connect: Network is unreachable\n'
+> 
+> rtlgen_read_status() first calls genphy_read_status(phydev);
+> [...]
+> Why is that not sufficient ?
 
-Oh sorry, I had to move lifetime validation after cfg.ifa_flags
-initialisation, otherwise IFA_F_PERMANENT disappears.
+The problem are the stale NBase-T link-partner advertisement bits and the
+subsequent call to phy_resolve_aneg_linkmode(), which results in bogus
+speed and duplex, based on previously connected link partner advertising
+2500Base-T, 5GBase-T or 10GBase-T modes.
 
-Will squash the diff below to patch 9 in v2.
+The more elegant solution I found by now is to just always call
+mii_10gbt_stat_mod_linkmode_lpa_t(phydev->lp_advertising, 0);
+before calling rtlgen_read_status().
+In case the link is up, rtlgen_decode_physr() will anyway set speed and
+duplex.
 
-Thanks!
+> > @@ -1041,8 +1045,12 @@ static int rtl822x_c45_read_status(struct phy_device *phydev)
+> >  		mii_stat1000_mod_linkmode_lpa_t(phydev->lp_advertising, val);
+> >  	}
+> >  
+> > -	if (!phydev->link)
+> > +	if (!phydev->link) {
+> > +		phydev->duplex = DUPLEX_UNKNOWN;
+> > +		phydev->master_slave_state = MASTER_SLAVE_STATE_UNKNOWN;
+> > +		phydev->speed = SPEED_UNKNOWN;
+> >  		return 0;
+> > +	}
+> 
+> 
+> rtl822x_c45_read_status() calls genphy_c45_read_link() which again
+> clears state from phydev.
 
----8<---
-diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
-index 721a4bceb107..9ae25a8d1632 100644
---- a/net/ipv6/addrconf.c
-+++ b/net/ipv6/addrconf.c
-@@ -4974,9 +4974,16 @@ inet6_rtm_newaddr(struct sk_buff *skb, struct nlmsghdr *nlh,
- 	if (tb[IFA_PROTO])
- 		cfg.ifa_proto = nla_get_u8(tb[IFA_PROTO]);
- 
-+	cfg.ifa_flags = nla_get_u32_default(tb[IFA_FLAGS], ifm->ifa_flags);
-+
-+	/* We ignore other flags so far. */
-+	cfg.ifa_flags &= IFA_F_NODAD | IFA_F_HOMEADDRESS |
-+			 IFA_F_MANAGETEMPADDR | IFA_F_NOPREFIXROUTE |
-+			 IFA_F_MCAUTOJOIN | IFA_F_OPTIMISTIC;
-+
-+	cfg.ifa_flags |= IFA_F_PERMANENT;
- 	cfg.valid_lft = INFINITY_LIFE_TIME;
- 	cfg.preferred_lft = INFINITY_LIFE_TIME;
--	cfg.ifa_flags |= IFA_F_PERMANENT;
- 	expires = 0;
- 	flags = 0;
- 
-@@ -5009,13 +5016,6 @@ inet6_rtm_newaddr(struct sk_buff *skb, struct nlmsghdr *nlh,
- 		}
- 	}
- 
--	cfg.ifa_flags = nla_get_u32_default(tb[IFA_FLAGS], ifm->ifa_flags);
--
--	/* We ignore other flags so far. */
--	cfg.ifa_flags &= IFA_F_NODAD | IFA_F_HOMEADDRESS |
--			 IFA_F_MANAGETEMPADDR | IFA_F_NOPREFIXROUTE |
--			 IFA_F_MCAUTOJOIN | IFA_F_OPTIMISTIC;
--
- 	dev =  __dev_get_by_index(net, ifm->ifa_index);
- 	if (!dev) {
- 		NL_SET_ERR_MSG_MOD(extack, "Unable to find the interface");
----8<---
+rtl822x_c45_read_status() calls genphy_c45_read_status(), which calls
+genphy_c45_read_lpa(), and that doesn't clear either
+ETHTOOL_LINK_MODE_1000baseT_Half_BIT nor ETHTOOL_LINK_MODE_1000baseT_Full_BIT
+as there is no generic handling for 1000Base-T in Clause-45.
+
+So also in the Clause-45 case, the subsequent call to
+phy_resolve_aneg_linkmode() may then wrongly populate speed and duplex, this
+time according to the stale 1000baseT bits.
+
+Moving the call to rtl822x_c45_read_status() in rtl822x_c45_read_status() to
+after the 1000baseT lpa bits have been taken care of fixes that part of the
+issue.
+
+Clearing master_slave_state in the C45 case is still necessary because it isn't
+done by genphy_c45_read_status().
+
+I will post a series replacing this patch for all 3 described changes.
 
