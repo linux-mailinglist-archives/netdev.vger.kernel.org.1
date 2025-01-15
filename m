@@ -1,187 +1,103 @@
-Return-Path: <netdev+bounces-158453-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158475-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 488A7A11EE2
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 11:05:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B107EA11F56
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 11:27:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B83AA188B1DD
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 10:05:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EDFE6188504D
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 10:27:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DEF41F9A9F;
-	Wed, 15 Jan 2025 10:05:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01EFF231A49;
+	Wed, 15 Jan 2025 10:27:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VNKFrfTw"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgeu1.qq.com (smtpbgeu1.qq.com [52.59.177.22])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7796F1EBFE8
-	for <netdev@vger.kernel.org>; Wed, 15 Jan 2025 10:05:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.59.177.22
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B4F11E7C16
+	for <netdev@vger.kernel.org>; Wed, 15 Jan 2025 10:27:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736935522; cv=none; b=bhNlqTIQzJ7cTclogLY/3mFWBsZtXKzrRkH+TFLnkeT5xeE+Xz+T/YU6PoJOTsWQhNqYuiiwbtw9d2LRWnDIhkgiNuyH0MX0RF7JltnUis3fkBLxIIccrCFTTjC10wD6QrG/kL87tN1joxOd9aqhZKqjVRkPwFQnLR/+/In0RVc=
+	t=1736936822; cv=none; b=mJUxDonPG9JN2XVX2eyCb4na6R4vfLBCjj5fIQHdwgLrPcX0WgvmXE6/OAjemdmgtarVmbwuzrzZrpBWqE3XH5Iv7FCfxA07guv+BZXcbc1j3K89LY17hO/Wu/kCaF3ybbngU9De4FMDvT2kFVuTiZy6eR1sb0mFx1hW24P1va8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736935522; c=relaxed/simple;
-	bh=C2kGi8wUKt/SOYuDRx7x16y/56MPkSjishwWdCMxxZM=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=BUmrxsRb6v1dYtWagrpuC4DvTPCGR7bBHhRDMQbsf8d047EM/o3KY4Q252WEH0+inM6KMMJAKBevaRJ2f31nSmj0ctMFismBWbAEVHpnYFYdFWaKY4GIBdb56K0ABtkQAvXc8oStCm94zdF5GDPpiswpL+BBYLa4q8kcyndFjL0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=52.59.177.22
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
-X-QQ-mid: bizesmtp79t1736935418t5f3ubvc
-X-QQ-Originating-IP: hXyX6IAOXwcCXM34XTmSkL4atrm1UDs3Og0CVezkYVg=
-Received: from wxdbg.localdomain.com ( [36.24.187.167])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Wed, 15 Jan 2025 18:03:37 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 1522690815015460781
-From: Jiawen Wu <jiawenwu@trustnetic.com>
-To: andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	linux@armlinux.org.uk,
-	horms@kernel.org,
-	netdev@vger.kernel.org
-Cc: mengyuanlou@net-swift.com,
-	Jiawen Wu <jiawenwu@trustnetic.com>
-Subject: [PATCH net-next v3 2/2] net: wangxun: Replace the judgement of MAC type with flags
-Date: Wed, 15 Jan 2025 18:24:08 +0800
-Message-Id: <20250115102408.2225055-2-jiawenwu@trustnetic.com>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20250115102408.2225055-1-jiawenwu@trustnetic.com>
-References: <20250115102408.2225055-1-jiawenwu@trustnetic.com>
+	s=arc-20240116; t=1736936822; c=relaxed/simple;
+	bh=odACzEB28j0z1iVmC2Ess7euhmNb1eOHPvCKxgTK3xg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=kjKCwAGWQu8l4Wps5Vt9cSAV4Pi1EDUsXdNsoLQQ2evuuIFeS+k/unxrfBk69L0IOupH76o8bbU8MDzPYHx4bdlR8Y5bzpdFW5djLACsb20z7GKKGLfeRKf3xAktYijuZgaNQ0Kxu4KHvPo6NZx2XaovDr9b5CiCqyuOYA3vU1c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=VNKFrfTw; arc=none smtp.client-ip=209.85.208.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-5d9f0a6ad83so4736712a12.2
+        for <netdev@vger.kernel.org>; Wed, 15 Jan 2025 02:27:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1736936819; x=1737541619; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=odACzEB28j0z1iVmC2Ess7euhmNb1eOHPvCKxgTK3xg=;
+        b=VNKFrfTwGTM2inP18D5zoI+yBTLEl2H1lQCVk88tKqN4dIXBPO2EyyqQpSzXGxgGAE
+         I1LY8rOov4BQIPuym26U0jb6Sqg2pR/V3H7NAvmPOL6cVgmrSyYZYTOWaMZmflrqucQR
+         CiC1QEYDFGK9LkucxgPp/tgi9Wrnf0OBhA+EKVfAP35xnNRGtwNyZPJMw5YyckZ5hIhd
+         klcrUWeKt2taaxXyZJPJMl7U7qMhECgFsspmyOsiYuwOgkZK6hiB5hk7M4TDa35W/dLB
+         adQBnZum6Y8t+dQ9o7UAZFMr+aM4O/yNYP8zZVL/4E1ty54hJKHAxsRjtRy32CUff39K
+         ZA0A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736936819; x=1737541619;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=odACzEB28j0z1iVmC2Ess7euhmNb1eOHPvCKxgTK3xg=;
+        b=OuO6LIQ5kICIzuxQULW9i8anE6Mh4R2d0fg8DQ/jc1x2rWSKebma/q+cVleHp37vKp
+         F/3B3zdS1ZE6Nf7PdPk+vXPVg80h3RNahVn0kA3VuvuuyF5cdVvjowxXaEsivEKfnh9a
+         OMKVBh7925ilJIoC/RdIlq68BCwSBUE24iMdkaGaiPCLVAVKLfXMX4qUAjEWvUUFFiPA
+         ac+Z+7QgIl9gy7wZqkNbPSNxc/2M2GqRY1TsFqwX1/iGBR4Fqp1ZkR/CdRuI/vty16gI
+         RsDLuf3C5SdFg5iVNHZoi5diRdgaJTW7G0cJa1H7G3bUXWq2g5Fnjmaq8NsnzKyY5wgp
+         Kfyw==
+X-Forwarded-Encrypted: i=1; AJvYcCW3c5JCo7aUr2hIyp1KXQz6zMnXXoiWYj5fGyjGlRrXp73vti3aWydNBjiin5iQn6gr5NWBsBg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz1eclWaYwSw8ofs69HHiJckaY/K79Jwl+HjbXYvcP8NDoHqyST
+	8WpqpFFEIcjOymZKJvVtX0YeXxEcD/jN1sWgtvmraQ1AZLL/Xl3W1OdPnjBAZQMeyfhiUJ/KgLg
+	QM5K3ITjEoKCbOZHy2zySc2NLZmP2lI9dt/oT
+X-Gm-Gg: ASbGnctKuirYYjSwwy1PmWsVPfT70axn3xpo09pPM0LdKToSJamKd9egBxkTpHFFw4r
+	4wQyGWdwwxHZOkVoIOa1OaKVPkxT1+xLlBx62ag==
+X-Google-Smtp-Source: AGHT+IG93d6Wv7ftiB5aagQVfE0aOqwIf2uwhM0//NXQRNdA7eRkf885IT9EvTYw1q1Efq3wVyC5QyePW0bFP2IUL7U=
+X-Received: by 2002:a05:6402:5246:b0:5d0:ceec:dee1 with SMTP id
+ 4fb4d7f45d1cf-5d972e0af6bmr28173791a12.13.1736936819130; Wed, 15 Jan 2025
+ 02:26:59 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtp:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz8a-1
-X-QQ-XMAILINFO: MOfz9TzWtqadpJNf7SJnfCINRKD/pmlNz1z7mv4jb6F2ldyV4bvTNnqY
-	oQ3l83Mp206jL/C6wiv7g944rAhpJnOXZFHkujiSakYnnBmBukj5fUpdCV3CSXPt+/fT+cb
-	EWLb+x3gvwqgWBiNffN0x2Z6vRJcZ5+yqSlP9xV924kbG/VfffDSVriRBxwBR3hea7iG7mz
-	6cD4zQ6wXAbaYJ6PZePfXuKFMo3B7MLyuDDX9WX59CBZwN8dD7pcLfpZFqioj86AfZAa4Z3
-	SrF6Feipmycz15cYR18m35561lbSSuyX4xqqNhiYtZfcWzq1TI1zMCApqc3LxUlqaPRs10s
-	lGmlwJ5oOKIvM8KlrxK8NbmuuHsRXq4dOEoPs48gvK7LRiM5qlswsvbepdZM5JaKJ+mnS+M
-	/Hsa9fEp4ECsLh8hWEK5Paazzd2dH3Q59D+RB9ldfCgiptHvIbotrpAbXLkAlk9isl1LeNk
-	OscJ4fXLtT9q8MvfJ7ruszw4ChZpyirfiXIyEgfxOLrFmUUtgA8PB3JvcVK1RxeRoDqptbl
-	zJdbfNF215wm/skGdFJ4diqCDNTiMPEe3bnhQVvZ+T5ahA2bBDzIMtVD49IaKDonyyPOzCu
-	mMGI0eRuXtqCHQRcXkq1b/yxf39ciUFUb+F/+TDR3OLnyMIlz7lD2x82YYlu0qKFha9ycfa
-	ejFwDdsWVB9JpQlBfNT8FgXnh2YtO+h8L57Qf5D2it68d04HePEzpijsmSPNqK7dXlyzwEl
-	nSMtbEsvY0EJHmq975PfOzL1znAZYAjp26jWjnsjamJRyAs1haFUueNlDrMuk23NhuR8K+q
-	VI6KgYOY4rIYHh0xr5JDQ12faCI5JxNDda+BOQZZmMMa7CGn3vJSoG6N+6I7iYNBHG2lBSV
-	GG8XuSXhaOSZAvZR6hkl+dJi6hqbwifyk2n7JBXobZsvZ6H82M8IjAFl+8RYvnQd+CN3cep
-	m0Dz8njy/Vax1zhXaS7xGAwko9Z4GOKSZFG48aLBEsuI289qFXY4NHdRK3X+RKRqdAsOJi7
-	1rAWetAZd+pUV4kghbDaqA187tEcg=
-X-QQ-XMRINFO: OWPUhxQsoeAVDbp3OJHYyFg=
-X-QQ-RECHKSPAM: 0
+References: <20250115095545.52709-1-kuniyu@amazon.com> <20250115095545.52709-3-kuniyu@amazon.com>
+In-Reply-To: <20250115095545.52709-3-kuniyu@amazon.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 15 Jan 2025 11:26:48 +0100
+X-Gm-Features: AbW1kvYnNNfm3751qFW3JheUzqMU_mdn1RKkbtfr2jcxx3onzIC29gV-35kf6wQ
+Message-ID: <CANn89iLBY6JQo5cEGVdU=+Z66aG-5rxOJtFS4wBAT=MxazjK_g@mail.gmail.com>
+Subject: Re: [PATCH v1 net-next 2/3] dev: Remove devnet_rename_sem.
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Since device MAC types are constantly being added, the judgments of
-wx->mac.type are complex. Try to convert the types to flags depending
-on functions.
+On Wed, Jan 15, 2025 at 10:57=E2=80=AFAM Kuniyuki Iwashima <kuniyu@amazon.c=
+om> wrote:
+>
+> devnet_rename_sem is no longer used since commit
+> 0840556e5a3a ("net: Protect dev->name by seqlock.").
+>
+> Also, RTNL serialises dev_change_name().
+>
+> Let's remove devnet_rename_sem.
+>
+> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 
-Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
----
- drivers/net/ethernet/wangxun/libwx/wx_ethtool.c | 8 ++++----
- drivers/net/ethernet/wangxun/libwx/wx_hw.c      | 4 ++--
- drivers/net/ethernet/wangxun/libwx/wx_type.h    | 1 +
- drivers/net/ethernet/wangxun/txgbe/txgbe_main.c | 2 ++
- 4 files changed, 9 insertions(+), 6 deletions(-)
-
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c b/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
-index f6b1323e606b..10cc7260fc4e 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
-@@ -69,7 +69,7 @@ int wx_get_sset_count(struct net_device *netdev, int sset)
- 
- 	switch (sset) {
- 	case ETH_SS_STATS:
--		return (wx->mac.type == wx_mac_sp) ?
-+		return (test_bit(WX_FLAG_FDIR_CAPABLE, wx->flags)) ?
- 			WX_STATS_LEN + WX_FDIR_STATS_LEN : WX_STATS_LEN;
- 	default:
- 		return -EOPNOTSUPP;
-@@ -87,7 +87,7 @@ void wx_get_strings(struct net_device *netdev, u32 stringset, u8 *data)
- 	case ETH_SS_STATS:
- 		for (i = 0; i < WX_GLOBAL_STATS_LEN; i++)
- 			ethtool_puts(&p, wx_gstrings_stats[i].stat_string);
--		if (wx->mac.type == wx_mac_sp) {
-+		if (test_bit(WX_FLAG_FDIR_CAPABLE, wx->flags)) {
- 			for (i = 0; i < WX_FDIR_STATS_LEN; i++)
- 				ethtool_puts(&p, wx_gstrings_fdir_stats[i].stat_string);
- 		}
-@@ -121,7 +121,7 @@ void wx_get_ethtool_stats(struct net_device *netdev,
- 			   sizeof(u64)) ? *(u64 *)p : *(u32 *)p;
- 	}
- 
--	if (wx->mac.type == wx_mac_sp) {
-+	if (test_bit(WX_FLAG_FDIR_CAPABLE, wx->flags)) {
- 		for (k = 0; k < WX_FDIR_STATS_LEN; k++) {
- 			p = (char *)wx + wx_gstrings_fdir_stats[k].stat_offset;
- 			data[i++] = *(u64 *)p;
-@@ -196,7 +196,7 @@ void wx_get_drvinfo(struct net_device *netdev, struct ethtool_drvinfo *info)
- 	unsigned int stats_len = WX_STATS_LEN;
- 	struct wx *wx = netdev_priv(netdev);
- 
--	if (wx->mac.type == wx_mac_sp)
-+	if (test_bit(WX_FLAG_FDIR_CAPABLE, wx->flags))
- 		stats_len += WX_FDIR_STATS_LEN;
- 
- 	strscpy(info->driver, wx->driver_name, sizeof(info->driver));
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_hw.c b/drivers/net/ethernet/wangxun/libwx/wx_hw.c
-index 7198650de096..10c42f681256 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_hw.c
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_hw.c
-@@ -1843,7 +1843,7 @@ void wx_configure_rx(struct wx *wx)
- 	/* enable hw crc stripping */
- 	wr32m(wx, WX_RSC_CTL, WX_RSC_CTL_CRC_STRIP, WX_RSC_CTL_CRC_STRIP);
- 
--	if (wx->mac.type == wx_mac_sp) {
-+	if (test_bit(WX_FLAG_RSC_CAPABLE, wx->flags)) {
- 		u32 psrctl;
- 
- 		/* RSC Setup */
-@@ -2495,7 +2495,7 @@ void wx_update_stats(struct wx *wx)
- 	hwstats->b2ogprc += rd32(wx, WX_RDM_BMC2OS_CNT);
- 	hwstats->rdmdrop += rd32(wx, WX_RDM_DRP_PKT);
- 
--	if (wx->mac.type == wx_mac_sp) {
-+	if (test_bit(WX_FLAG_FDIR_CAPABLE, wx->flags)) {
- 		hwstats->fdirmatch += rd32(wx, WX_RDB_FDIR_MATCH);
- 		hwstats->fdirmiss += rd32(wx, WX_RDB_FDIR_MISS);
- 	}
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_type.h b/drivers/net/ethernet/wangxun/libwx/wx_type.h
-index ba6e45eeaba6..c0d8ecfd7f03 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_type.h
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_type.h
-@@ -1051,6 +1051,7 @@ enum wx_pf_flags {
- 	WX_FLAG_FDIR_CAPABLE,
- 	WX_FLAG_FDIR_HASH,
- 	WX_FLAG_FDIR_PERFECT,
-+	WX_FLAG_RSC_CAPABLE,
- 	WX_PF_FLAGS_NBITS               /* must be last */
- };
- 
-diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-index ffe42b77de3e..12bb947daba4 100644
---- a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-+++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-@@ -293,6 +293,8 @@ static int txgbe_sw_init(struct wx *wx)
- 	wx->atr = txgbe_atr;
- 	wx->configure_fdir = txgbe_configure_fdir;
- 
-+	set_bit(WX_FLAG_RSC_CAPABLE, wx->flags);
-+
- 	/* enable itr by default in dynamic mode */
- 	wx->rx_itr_setting = 1;
- 	wx->tx_itr_setting = 1;
--- 
-2.27.0
-
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
