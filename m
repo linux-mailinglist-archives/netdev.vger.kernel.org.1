@@ -1,133 +1,172 @@
-Return-Path: <netdev+bounces-158365-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158366-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC3BAA117CE
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 04:28:44 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C7813A117D8
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 04:36:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 85B563A5A3E
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 03:28:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D84E91889547
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 03:36:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACD8322F827;
-	Wed, 15 Jan 2025 03:27:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 551B715250F;
+	Wed, 15 Jan 2025 03:36:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jOugD/YN"
+	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="aJNrtlpj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+Received: from out.smtpout.orange.fr (out-17.smtpout.orange.fr [193.252.22.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3139B22F152;
-	Wed, 15 Jan 2025 03:27:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D66604C98;
+	Wed, 15 Jan 2025 03:36:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.252.22.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736911669; cv=none; b=tPKGrfJAC/deesjvr306ugZFqRFvB09VjoUBaG8oETDOE8eP/ZBAj37rhVqCRmB3s5+MHRCadd595rfdIg3/JAHFTIMd0R2c6NLj8T/loPGRYLs4e6NRSAxdlqdm4B/4BkCbza66ZMnRoUleYWEYwWZVLMGXO40T/QPAdSM773Y=
+	t=1736912196; cv=none; b=XOOQu1pE8Vi756xd1f10GjQcRDOJl7/JzAYiRyvujxPXbDXQ8HcEaLyFVLjr4iH8dTuB6GwSytPUf7G9zjZ499UPaeOdOn2zRoO5x6ErUpp2HjzuNxzSxx7yFKiK8emLtjLdNJnEnpZymQ7ObVzFsgYs5BCHu5i+kmxtcV4MC0c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736911669; c=relaxed/simple;
-	bh=ELqzb7GOkkxhmiH++knkIhUE2YwbBBJ9bPiY6iO6wrQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=PCGjAhYnphbkbWz4TffCo/IL2Q+vPrhcZiuCV9XMZvoTop8yBpo7GWe8XTeIqM81w2mi7PZJsTSWZrNJLBBAu1VbABOVzIv81928p70AYeT+FMHNtUC42PvBvdECfq3b5wl3agrKyp2iQwm1HMDpfQa3ii6xH/aeb7Ll34H6LYk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jOugD/YN; arc=none smtp.client-ip=209.85.214.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-21669fd5c7cso113757105ad.3;
-        Tue, 14 Jan 2025 19:27:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736911667; x=1737516467; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vrnZOWuzbTsFJQSfUdSJAVwNu1OpPEJIPOluJRIjDnY=;
-        b=jOugD/YNA4Gm8aXCfSyMZNMds8icosDlcijNlpHFbi/tKpdG9jYScups+2NRPertoG
-         JZeay0eRQ0mbfYni4MwXLwCzJ2SEVVhkkUGFpuLmWqIINmsKMgb3myOsVgZE1ruOp9xY
-         PgJTEwHiUe5H63nt1lB4RyrysjGdu72a9jgwnaQTygASei2fp8XPH46ySzAV40njOuK8
-         jYh3F7ZHXBHZCwOkMouU1xAcxG6eK8tZCJD1MTqiSWd+yMBpDHc6VvlxmbC154OfCoeW
-         q5MXBDtJndt9EDDSkeJr+003bXzLqxVEjZYNdWBBApMXJplDuMLo0mq15oVdPIz9rFz8
-         r6ag==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736911667; x=1737516467;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=vrnZOWuzbTsFJQSfUdSJAVwNu1OpPEJIPOluJRIjDnY=;
-        b=JwbtGsnkP1A78KLWCZD7TW1+USlBK6ZcE0tb9zYmGAzZlFXcGfgot58UOQpUvZFCVC
-         Mrt4PNMJQsfpjce9quWL3BBtOnidd+FgAtmlffKixw9M6t4CJTvOvtoZSrgLkbhOOAMs
-         FCsl4YX5wA1K5GZHKxdFcuFzSWrT7EadWcpCN/wYh3Yabth5w51e7GptW3MieOt9LuH7
-         tM/MpGX4cPDl3Yt7e28jpX5jLnVu16J8y4W2OY74WlzaAVHGZ44AFjGxfBwA8Plsop+m
-         XqS/02QsoUcqHiWxWv6ZQrh+EVSDZEVbmeimJxZCHsrA+tXHQcbWtnU3K3s8D0BhCd7g
-         Y6jg==
-X-Forwarded-Encrypted: i=1; AJvYcCXkzQ4WVxkqo7/TPnHF0EqBhUUeYJVmZSWNudVe1uoZ0tA7fzPPpYExiOg/YUZMGpjCO+v06ozlhM0gMgE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwTaRwl0nPkbjDZPySyfWm+udHbLlaeE2aaawKiaQdT5E7RM/rQ
-	P+dr3lJZgz5lgCeBIp0aP3B/J6BHDsuDAY7Guy682zB38G0asDRcS4lXCA==
-X-Gm-Gg: ASbGnctXAWfTLLO2XezSU9iba3gg6HKcDlwX3obSu6cJUAKZSQdrSo5WOGoVQOOrEzI
-	YcOVIKeYNPmjqaesksvuVv3qUCQvqTVzkt5Kzr1ODcAiT8DYbjivHajskVpZNiOIxsPt11YaRgl
-	iAsmGdsL4FEKt07JdqXnDg1bbetsUHBBJGZCq2GQ2aAN4uf5OltwforY0NrBdBrllZeBrM0rWJx
-	JXtDEzdN43/KMjQ8u2YIj31fh0cKqNd4kpi2GREs4TY4Lacz4LehdAHflg5Ct5i1ySiZQ==
-X-Google-Smtp-Source: AGHT+IEgvbbedPhMmlQrROuWhBJEvCl3rJhkcO1ll2KbOYDFwCkOh7dbSjQ3/MMG4kA76MxUXWGidA==
-X-Received: by 2002:a05:6a00:39a7:b0:728:e382:5f14 with SMTP id d2e1a72fcca58-72d21f314e9mr32614582b3a.9.1736911665971;
-        Tue, 14 Jan 2025 19:27:45 -0800 (PST)
-Received: from localhost.localdomain ([129.146.253.192])
-        by smtp.googlemail.com with ESMTPSA id d2e1a72fcca58-72d405493basm8166452b3a.27.2025.01.14.19.27.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Jan 2025 19:27:45 -0800 (PST)
-From: Furong Xu <0x1207@gmail.com>
-To: netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Joe Damato <jdamato@fastly.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	xfr@outlook.com,
-	Furong Xu <0x1207@gmail.com>
-Subject: [PATCH net-next v3 4/4] net: stmmac: Convert prefetch() to net_prefetch() for received frames
-Date: Wed, 15 Jan 2025 11:27:05 +0800
-Message-Id: <909631f38edfac07244ea62d94dc76953d52035e.1736910454.git.0x1207@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <cover.1736910454.git.0x1207@gmail.com>
-References: <cover.1736910454.git.0x1207@gmail.com>
+	s=arc-20240116; t=1736912196; c=relaxed/simple;
+	bh=6uouPwruT4T4lGCnNTZ+epyQ0LFUmA1s6AHNKGnDQZQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=gGWN1HxoNut47d1MQzUfrFkZhjcovoGaaIXeRzsatyaSmQkiY5xDjJydEIK+V+nHxXtRVSxATMxF4Y9+ZaUQPMpVO8SZrgF2UABhKWUydE8Ns2vrUJ0BCIiS2G6LmvCoQvYGSRoXKKduzmuo/kKQa2Er6meQtqtY2xk8gpmzgac=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=aJNrtlpj; arc=none smtp.client-ip=193.252.22.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
+Received: from [172.16.82.72] ([124.33.176.97])
+	by smtp.orange.fr with ESMTPA
+	id XuCUtxHwDebtjXuCYtxLu4; Wed, 15 Jan 2025 04:36:29 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
+	s=t20230301; t=1736912189;
+	bh=J8fFcIQP713EnSS7oTLmRNGq2KoaDAy7Nz8BtUjaVws=;
+	h=Message-ID:Date:MIME-Version:Subject:To:From;
+	b=aJNrtlpjJhKr+eQJ83siupHLVsBtKjVbPIoFK4utf+mn/hnBPukU4a440qI+NeLzH
+	 W4mVuJ12DK8zH/ws9EZYzBmggNxwj6kE3MLVnA9Llw1ARiztpgY/3y/ZKku8kxPd6H
+	 9beVFFlw0wPv0SK6OXtW1pGXBMv3hwOBfnV/gfb9bUEmOg4SuYzTa9di2+wVUQh+Zs
+	 wzaBW9FOKAIlwhnHBVZevaTHvIutO+XDJVEbCTAuRlK/3iK2DT3HETY6v4pQgsFULF
+	 I6POim6Mlv5HRxBeYqS3abhvNDS5YH9Z5ZUJOAt9CCi61Dqvpv5tkNo3nSfAl//mGh
+	 VPXtwhfDSuDlA==
+X-ME-Helo: [172.16.82.72]
+X-ME-Auth: bWFpbGhvbC52aW5jZW50QHdhbmFkb28uZnI=
+X-ME-Date: Wed, 15 Jan 2025 04:36:29 +0100
+X-ME-IP: 124.33.176.97
+Message-ID: <0ccedc84-d429-4d6f-bd21-7487e6a0fbf9@wanadoo.fr>
+Date: Wed, 15 Jan 2025 12:36:13 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 4/7] can: Add Nuvoton NCT6694 CAN support
+To: Ming Yu <a0282524688@gmail.com>
+Cc: tmyu0@nuvoton.com, lee@kernel.org, linus.walleij@linaro.org,
+ brgl@bgdev.pl, andi.shyti@kernel.org, mkl@pengutronix.de,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, wim@linux-watchdog.org,
+ linux@roeck-us.net, jdelvare@suse.com, alexandre.belloni@bootlin.com,
+ linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org,
+ linux-i2c@vger.kernel.org, linux-can@vger.kernel.org,
+ netdev@vger.kernel.org, linux-watchdog@vger.kernel.org,
+ linux-hwmon@vger.kernel.org, linux-rtc@vger.kernel.org,
+ linux-usb@vger.kernel.org
+References: <20250114033010.2445925-1-a0282524688@gmail.com>
+ <20250114033010.2445925-5-a0282524688@gmail.com>
+ <CAMZ6RqLHEoukxDfV33iDWXjM1baK922QnWSkOP01VzZ0S_9H8g@mail.gmail.com>
+ <CAOoeyxW=k35-bkeqNmhyZwUxjy=g3irTBS5mbXLxqp1Stx-Zfg@mail.gmail.com>
+ <6e349f0f-6509-4a3b-bb75-e2381e9205c6@wanadoo.fr>
+ <CAOoeyxVST6rEqp65rU6ZgmM-rSkAdeUVM=0nTLZYrqiO4DbQOA@mail.gmail.com>
+Content-Language: en-US
+From: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
+Autocrypt: addr=mailhol.vincent@wanadoo.fr; keydata=
+ xjMEZluomRYJKwYBBAHaRw8BAQdAf+/PnQvy9LCWNSJLbhc+AOUsR2cNVonvxhDk/KcW7FvN
+ LFZpbmNlbnQgTWFpbGhvbCA8bWFpbGhvbC52aW5jZW50QHdhbmFkb28uZnI+wrIEExYKAFoC
+ GwMFCQp/CJcFCwkIBwICIgIGFQoJCAsCBBYCAwECHgcCF4AWIQTtj3AFdOZ/IOV06OKrX+uI
+ bbuZwgUCZx41XhgYaGtwczovL2tleXMub3BlbnBncC5vcmcACgkQq1/riG27mcIYiwEAkgKK
+ BJ+ANKwhTAAvL1XeApQ+2NNNEwFWzipVAGvTRigA+wUeyB3UQwZrwb7jsQuBXxhk3lL45HF5
+ 8+y4bQCUCqYGzjgEZx4y8xIKKwYBBAGXVQEFAQEHQJrbYZzu0JG5w8gxE6EtQe6LmxKMqP6E
+ yR33sA+BR9pLAwEIB8J+BBgWCgAmFiEE7Y9wBXTmfyDldOjiq1/riG27mcIFAmceMvMCGwwF
+ CQPCZwAACgkQq1/riG27mcJU7QEA+LmpFhfQ1aij/L8VzsZwr/S44HCzcz5+jkxnVVQ5LZ4B
+ ANOCpYEY+CYrld5XZvM8h2EntNnzxHHuhjfDOQ3MAkEK
+In-Reply-To: <CAOoeyxVST6rEqp65rU6ZgmM-rSkAdeUVM=0nTLZYrqiO4DbQOA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-The size of DMA descriptors is 32 bytes at most.
-net_prefetch() for received frames, and keep prefetch() for descriptors.
+On 15/01/2025 at 11:11, Ming Yu wrote:
+> Vincent Mailhol <mailhol.vincent@wanadoo.fr> 於 2025年1月14日 週二 下午11:12寫道：
+>>
+> ...
+>>>>> +static int nct6694_can_get_berr_counter(const struct net_device *ndev,
+>>>>> +                                       struct can_berr_counter *bec)
+>>>>> +{
+>>>>> +       struct nct6694_can_priv *priv = netdev_priv(ndev);
+>>>>> +       struct nct6694_can_event *evt = priv->rx->event;
+>>>>> +       struct nct6694_cmd_header cmd_hd;
+>>>>> +       u8 mask = NCT6694_CAN_EVENT_REC | NCT6694_CAN_EVENT_TEC;
+>>>>> +       int ret;
+>>>>> +
+>>>>> +       guard(mutex)(&priv->lock);
+>>>>> +
+>>>>> +       cmd_hd = (struct nct6694_cmd_header) {
+>>>>> +               .mod = NCT6694_CAN_MOD,
+>>>>> +               .cmd = NCT6694_CAN_EVENT,
+>>>>> +               .sel = NCT6694_CAN_EVENT_SEL(priv->can_idx, mask),
+>>>>> +               .len = cpu_to_le16(sizeof(priv->rx->event))
+>>>>> +       };
+>>>>> +
+>>>>> +       ret = nct6694_read_msg(priv->nct6694, &cmd_hd, evt);
+>>>>> +       if (ret < 0)
+>>>>> +               return ret;
+>>>>
+>>>> You are holding the priv->lock mutex before calling
+>>>> nct6694_read_msg(). But nct6694_read_msg() then holds the
+>>>> nct6694->access_lock mutex. Why do you need a double mutex here? What
+>>>> kind of race scenario are you trying to prevent here?
+>>>>
+>>>
+>>> I think priv->lock need to be placed here to prevent priv->rx from
+>>> being assigned by other functions, and nct6694->access_lock ensures
+>>> that the nct6694_read_msg() transaction is completed.
+>>> But in this case, cmd_hd does not need to be in priv->lock's scope.
+>>
+>> So, the only reason for holding priv->lock is because priv->rx is shared
+>> between functions.
+>>
+>> struct nct6694_can_event is only 8 bytes. And you only need it for the
+>> life time of the function so it can simply be declared on the stack:
+>>
+>>         struct nct6694_can_event evt;
+>>
+>> and with this, no more need to hold the lock. And the same thing also
+>> applies to the other functions.
+>>
+>> Here, by trying to optimize the memory for only a few bytes, you are
+>> getting a huge penalty on the performance by putting locks on all the
+>> functions. This is not a good tradeoff.
+>>
+> 
+> Since nct6694_read_msg()/nct6694_write_msg() process URBs via
+> usb_bulk_msg(), the transferred data must not be located on the stack.
+> For more details about allocating buffers for transmitting data,
+> please refer to the link:
+> https://lore.kernel.org/linux-can/20241028-observant-gentle-doberman-0a2baa-mkl@pengutronix.de/
 
-This patch brings ~4.8% driver performance improvement in a TCP RX
-throughput test with iPerf tool on a single isolated Cortex-A65 CPU
-core, 2.92 Gbits/sec increased to 3.06 Gbits/sec.
+Ack, I forgot that you can not use stack memory in usb_bulk_msg().
 
-Suggested-by: Joe Damato <jdamato@fastly.com>
-Signed-off-by: Furong Xu <0x1207@gmail.com>
----
- drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Then, instead, you can either:
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index ad928e8e21a9..49b41148d594 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -5529,7 +5529,8 @@ static int stmmac_rx(struct stmmac_priv *priv, int limit, u32 queue)
- 
- 			dma_sync_single_for_cpu(priv->device, buf->addr,
- 						buf1_len, dma_dir);
--			prefetch(page_address(buf->page) + buf->page_offset);
-+			net_prefetch(page_address(buf->page) +
-+				     buf->page_offset);
- 
- 			xdp_init_buff(&ctx.xdp, buf_sz, &rx_q->xdp_rxq);
- 			xdp_prepare_buff(&ctx.xdp, page_address(buf->page),
--- 
-2.34.1
+  - do a dynamic memory allocation directly in the function (good for
+    when you are outside of the hot path, for example struct
+    nct6694_can_setting)
+
+  - and for the other structures which are part of the hot path
+    (typically struct nct6694_can_frame) continue to use a dynamically
+    allocated buffer stored in your priv but change the type of
+    nct6694_can_tx and nct6694_can_rx from union to structures.
+
+And no more overlaps, thus no more need for the mutex.
+
+
+Yours sincerely,
+Vincent Mailhol
 
 
