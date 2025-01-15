@@ -1,140 +1,113 @@
-Return-Path: <netdev+bounces-158578-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158579-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 349ECA128EE
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 17:42:45 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 10BAAA128F2
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 17:43:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 58B4B1660F1
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 16:42:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2B1A8165D56
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 16:43:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21BE8166F3A;
-	Wed, 15 Jan 2025 16:42:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51E6B161311;
+	Wed, 15 Jan 2025 16:43:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="utM8w0bk"
 X-Original-To: netdev@vger.kernel.org
-Received: from exchange.fintech.ru (exchange.fintech.ru [195.54.195.159])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8EAC161321;
-	Wed, 15 Jan 2025 16:42:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.54.195.159
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23F6F33DB;
+	Wed, 15 Jan 2025 16:43:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736959363; cv=none; b=DaNeO9BFpkV8daMh3ESlKzaRTdlTsgfRI9Q3gH2LRdfsUzaHuKzemdIHr2/6sn2hkQOIGi8S8c47ZcysKBCRiIOZFbdnE+wfJ9rfMisPmO+HZUT1Z2Cl7Rj2sivxBtN62oDJDExQebzvm+jSnBy5kRjuc5g+6dOawiLGqcUPUOc=
+	t=1736959388; cv=none; b=hAVOvgHNBr24VRCU6ZiyLwhzWxXkDUMwbjzZKI15rsqDfFUXILpLplgDyMGOH8cUc+UKd3kFkYFlH7UkV879SUWwo3UDySN+9YCRcM9RrccMh1qNL3n99TWZLH+sCxGDNmn4ZhWqxUuhjG6UmEWk7IYZQdCVfigIj2b7Ayicnwo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736959363; c=relaxed/simple;
-	bh=EpeOfQj3LnpJIDlx1U23VqPIU+2Zgf5ATTqLIl+9W9A=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=F+GmiHLJMerRSLWr6G1K0xISQbAfiKFMq2U6OqjQnD+7e3CORnyVvpPMYlSFJBQw+rnU76Mr+DCKV8uCCY1/TiS/1YnJyKcYfdQSylRtZLrUWUIg+91BnIL2tH3PE1Hn/g4DfPrOxD/W28vpxroff8eEMdCfOIJ1yv2wA9B0AD0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fintech.ru; spf=pass smtp.mailfrom=fintech.ru; arc=none smtp.client-ip=195.54.195.159
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fintech.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fintech.ru
-Received: from Ex16-01.fintech.ru (10.0.10.18) by exchange.fintech.ru
- (195.54.195.159) with Microsoft SMTP Server (TLS) id 14.3.498.0; Wed, 15 Jan
- 2025 19:42:30 +0300
-Received: from localhost (10.0.253.138) by Ex16-01.fintech.ru (10.0.10.18)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2242.4; Wed, 15 Jan
- 2025 19:42:29 +0300
-From: Nikita Zhandarovich <n.zhandarovich@fintech.ru>
-To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>
-CC: Nikita Zhandarovich <n.zhandarovich@fintech.ru>, Simon Horman
-	<horms@kernel.org>, <linux-hams@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <lvc-project@linuxtesting.org>,
-	<stable@vger.kernel.org>
-Subject: [PATCH net] net/rose: prevent integer overflows in rose_setsockopt()
-Date: Wed, 15 Jan 2025 08:42:20 -0800
-Message-ID: <20250115164220.19954-1-n.zhandarovich@fintech.ru>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1736959388; c=relaxed/simple;
+	bh=ZCamzQkvq1oDoF97LibgjHo8ZRywVZi3FJjGzkleH6M=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=ZJHp7uAUdmB8kQAwDaevWRnYIkpkPj66yjzizc7On6u9Hj/6xFctAJ9ZLHMbYLwLBUVF2pnHBjVj+5ncpGipWDNJS32e5udw5MUR12RG3ViJbozk8WvZL/oRk3TTTiYcUOIbfAcahTLBWAEuhKZmNqp11t1OCvCTLq+8aC8bHs4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=utM8w0bk; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0793FC4CED1;
+	Wed, 15 Jan 2025 16:43:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1736959387;
+	bh=ZCamzQkvq1oDoF97LibgjHo8ZRywVZi3FJjGzkleH6M=;
+	h=From:Subject:Date:To:Cc:From;
+	b=utM8w0bkCdkDUywj1oq71iNIN9g3q4A3A8blXLNbM3oAmWv6t7fbXRvE1S4BrGVao
+	 MIAqH7KF+SHDtD7/P5uAaJAXGtPy42o8B2QL4OolqRH0mdaEAouOtxemm4Jmtcv8Y8
+	 X+frP8KgVJcfGfmrCcmPXmsoI12pNGByGY6jgxcATRTffnj5WxNU0rHebOPGeVn3H3
+	 ByVlLexTz2egWUkV4RWKdm5GY8987q/7FeuP2Y2DDzv9vHNE0GKm4NFgGB48kEQgtz
+	 Rob5vLIhY/BJh0zLgpc8nJ2XrHL0CgKVibNWJUBSutjZsVlf+oLtZGqBNPwCxNcJ7m
+	 TrJnzQReQkt+Q==
+From: Roger Quadros <rogerq@kernel.org>
+Subject: [PATCH net-next 0/4] net: ethernet: ti: am65-cpsw: streamline
+ RX/TX queue creation and cleanup
+Date: Wed, 15 Jan 2025 18:42:59 +0200
+Message-Id: <20250115-am65-cpsw-streamline-v1-0-326975c36935@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: Ex16-02.fintech.ru (10.0.10.19) To Ex16-01.fintech.ru
- (10.0.10.18)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAJPlh2cC/x3MQQqDMBBG4avIrB0wSqz2KtJF0N92oE4lE6wg3
+ t3g8lu8d5AhCoyexUERm5j8NMOVBY2foG+wTNlUV7WvnHMcltbzuNqfLUWE5SsKbhrfPQJa9PC
+ U0zVilv3eDqRIrNgTvc7zAliIee1wAAAA
+To: Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Russell King <linux@armlinux.org.uk>, Alexei Starovoitov <ast@kernel.org>, 
+ Daniel Borkmann <daniel@iogearbox.net>, 
+ Jesper Dangaard Brouer <hawk@kernel.org>, 
+ John Fastabend <john.fastabend@gmail.com>
+Cc: Siddharth Vadapalli <s-vadapalli@ti.com>, srk@ti.com, 
+ danishanwar@ti.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ bpf@vger.kernel.org, Roger Quadros <rogerq@kernel.org>
+X-Mailer: b4 0.14.1
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1057; i=rogerq@kernel.org;
+ h=from:subject:message-id; bh=ZCamzQkvq1oDoF97LibgjHo8ZRywVZi3FJjGzkleH6M=;
+ b=owEBbQKS/ZANAwAIAdJaa9O+djCTAcsmYgBnh+WX+w+qa78nialP4MqMRFcAio+xI6Bh10K1Z
+ 1bjSu8IoIiJAjMEAAEIAB0WIQRBIWXUTJ9SeA+rEFjSWmvTvnYwkwUCZ4fllwAKCRDSWmvTvnYw
+ kzPeD/9eczK+j26cmF83cMXBA4yEnjnLCrZ6OHrSD5LkrBQOho4GmSekayao/Hene+mLOr6NiBn
+ ukU4ySWfcDse7C1KGCkUIUGYVQVJUiknd3QVIuKil9DJ6cTe4OaTjQZBvPZbr0FXQLvDZGX2RE7
+ vIQcA9BTeiYSs2ogvDd7Q55FpvChPBdMg4j15MwNIqFsYllNJd81vgyceLe5FG3WSTWYVJUwQH7
+ +14kHVxKCLK49ImG10krDkDUwLGDloV7EkeN3sKkdch9HvScB7pi8iXIUwjJFVzaedGMzgXz01Q
+ rU+rFEd8o8jPxGqbGKYk7JUzOcF1Vr0vgwPYF9NgFseq0EnXxUGDBXvkdZ0P0Xyp7wpPXIjbD1i
+ u4hCY+sokkXI6GEg9H9SoEeYnZP5gucU4paw2KZOP1eOUeJAfjkeKqfi9CigJ/mYqZuvjb5oe31
+ fqjZuc5Iia1pvxEoIJt74yUvWM1RJNBf47t9ZZiGAoMfZLYhU6SSa0G13Ha7cUTfp6y7Tp9/YwD
+ sk1dv///YCKnIPUvm/eE9Weiwvw4Hxe1nI4na7EFwmNnLTAZU7dSYanxxGYX5IiH8Ocf4p5DUHm
+ LMzgLcKK5/6+YfJyvZboCrXvawQ+FZSp/LF/eC6KU21yRGWSESYrBx0/YhVkBW1NjrmKPjxsBXO
+ dzJEpZv4l/3iqIw==
+X-Developer-Key: i=rogerq@kernel.org; a=openpgp;
+ fpr=412165D44C9F52780FAB1058D25A6BD3BE763093
 
-In case of possible unpredictably large arguments passed to
-rose_setsockopt() and multiplied by extra values on top of that,
-integer overflows may occur.
+In this series we first cleanup probe error path and get rid of
+devm_add/remove_action(). Split code into symmetric init and cleanup
+functions and use them.
 
-Do the safest minimum and fix these issues by checking the
-contents of 'opt' and returning -EINVAL if they are too large. Also,
-switch to unsigned int and remove useless check for negative 'opt'
-in ROSE_IDLE case.
+Then we streamline RX and TX queue creation and cleanup. The queues
+can now be created or destroyed by calling the appropriate
+functions am65_cpsw_create_rxqs/txqs() and am65_cpsw_destroy_rxq/txqs().
 
-Found by Linux Verification Center (linuxtesting.org) with static
-analysis tool SVACE.
-
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Cc: stable@vger.kernel.org
-Signed-off-by: Nikita Zhandarovich <n.zhandarovich@fintech.ru>
+Signed-off-by: Roger Quadros <rogerq@kernel.org>
 ---
- net/rose/af_rose.c | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
+Roger Quadros (4):
+      net: ethernet: am65-cpsw: call netif_carrier_on/off() when appropriate
+      net: ethernet: ti: am65-cpsw: streamline .probe() error handling
+      net: ethernet: ti: am65-cpsw: streamline RX queue creation and cleanup
+      net: ethernet: ti: am65-cpsw: streamline TX queue creation and cleanup
 
-diff --git a/net/rose/af_rose.c b/net/rose/af_rose.c
-index 59050caab65c..72c65d938a15 100644
---- a/net/rose/af_rose.c
-+++ b/net/rose/af_rose.c
-@@ -397,15 +397,15 @@ static int rose_setsockopt(struct socket *sock, int level, int optname,
- {
- 	struct sock *sk = sock->sk;
- 	struct rose_sock *rose = rose_sk(sk);
--	int opt;
-+	unsigned int opt;
- 
- 	if (level != SOL_ROSE)
- 		return -ENOPROTOOPT;
- 
--	if (optlen < sizeof(int))
-+	if (optlen < sizeof(unsigned int))
- 		return -EINVAL;
- 
--	if (copy_from_sockptr(&opt, optval, sizeof(int)))
-+	if (copy_from_sockptr(&opt, optval, sizeof(unsigned int)))
- 		return -EFAULT;
- 
- 	switch (optname) {
-@@ -414,31 +414,31 @@ static int rose_setsockopt(struct socket *sock, int level, int optname,
- 		return 0;
- 
- 	case ROSE_T1:
--		if (opt < 1)
-+		if (opt < 1 || opt > UINT_MAX / HZ)
- 			return -EINVAL;
- 		rose->t1 = opt * HZ;
- 		return 0;
- 
- 	case ROSE_T2:
--		if (opt < 1)
-+		if (opt < 1 || opt > UINT_MAX / HZ)
- 			return -EINVAL;
- 		rose->t2 = opt * HZ;
- 		return 0;
- 
- 	case ROSE_T3:
--		if (opt < 1)
-+		if (opt < 1 || opt > UINT_MAX / HZ)
- 			return -EINVAL;
- 		rose->t3 = opt * HZ;
- 		return 0;
- 
- 	case ROSE_HOLDBACK:
--		if (opt < 1)
-+		if (opt < 1 || opt > UINT_MAX / HZ)
- 			return -EINVAL;
- 		rose->hb = opt * HZ;
- 		return 0;
- 
- 	case ROSE_IDLE:
--		if (opt < 0)
-+		if (opt > UINT_MAX / (60 * HZ))
- 			return -EINVAL;
- 		rose->idle = opt * 60 * HZ;
- 		return 0;
+ drivers/net/ethernet/ti/am65-cpsw-nuss.c | 643 ++++++++++++++++---------------
+ 1 file changed, 324 insertions(+), 319 deletions(-)
+---
+base-commit: 9c7ad35632297edc08d0f2c7b599137e9fb5f9ff
+change-id: 20250111-am65-cpsw-streamline-33587ae6e9e5
+
+Best regards,
+-- 
+Roger Quadros <rogerq@kernel.org>
+
 
