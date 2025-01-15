@@ -1,192 +1,139 @@
-Return-Path: <netdev+bounces-158655-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158656-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 929A3A12DEC
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 22:48:53 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 86420A12DFA
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 22:56:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 26B353A58C5
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 21:48:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AF00E1888C66
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 21:56:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCF861D6DA3;
-	Wed, 15 Jan 2025 21:48:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F11121DB13B;
+	Wed, 15 Jan 2025 21:56:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="YG6Ujs69"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BQKbtbOj"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-171.mta1.migadu.com (out-171.mta1.migadu.com [95.215.58.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F37B19CC2A
-	for <netdev@vger.kernel.org>; Wed, 15 Jan 2025 21:48:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 167C614F12D
+	for <netdev@vger.kernel.org>; Wed, 15 Jan 2025 21:56:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736977729; cv=none; b=PNTWNj3Uz9NQlDeP2wp1AtwpvkGazuf8tvtz841b5bHEO0CNT724i1mQO4wAR9XpfEqbjX56tkshAkgkuNNAFQzv4QF4pUEk6Ffnq6VFU/aNg3fAjnwkLVh1/X03TpzLXvWn7T68s+fvxIw91cg0qcnD5SK0LAds/cihHkAeiBw=
+	t=1736978162; cv=none; b=SZ+bBmhyN/KNVBCC34XiKIX1CIGOxI2HucBp1FZaYBC1pJTUodBqyU3X7tN0vXaBkZY4Tscac672bwaRBIH5fYmgRQ4X1S/ytPPOYlSBfwnYBwZBbKgrvwcgebaiTJM0FJqrnS0eQ97h5KJox0r4ZiY94VR8eMRIoD+mzPqYskU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736977729; c=relaxed/simple;
-	bh=eNjDr+kbc/7tm2nrjTg/UAoANKa+ssxWp9ac77aL1a0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=S//0HooSd5K1PlN2rUf0GFm0t1p6nqepLMfl0c0AkxaEorecCSUs2tgmAOYH7eKjCA0ejGGjZM/LkFruF6NLEhB5lHGt6UsmW8XSuvam/mZ1zPFYElrrRcMy8Rau4YRXIwhWWYpbFOCzGWXvFvZmVYtCStW/4YJjqLi0urYoDWY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=YG6Ujs69; arc=none smtp.client-ip=95.215.58.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <ca852e76-2627-4e07-8005-34168271bf12@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1736977725;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=52cb4GS2ZhRvjZmzSdZ0gUccl71Kegjj/jwbIqe2zTI=;
-	b=YG6Ujs69KB38n0dMWzf+hWivnRcJm7Oc1f0FPikImV8gSO0fYhO1B2ipdTeoG/H+9RDc2c
-	QblbG9Ca7lj/IcDibi8KRxyqspNqmurcvPUEX20JmhVm9eQUJeoEgeleR55zwp7KxuDGgS
-	yf+l9tmr5NGO/YHbsPuY8O+Y7i20iEs=
-Date: Wed, 15 Jan 2025 13:48:37 -0800
+	s=arc-20240116; t=1736978162; c=relaxed/simple;
+	bh=C4VLBJzPBpAwYolk7n9Iw5sT6nUxlMb2oibYKArKT6Q=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=H93Ko72Oytk71QABNMxCN/S1LBGMb0wj0jSGh0UWWiCZDS4EN8JNUMiEqVeAlnY0+Ld0HHN3qN7YfvnQ5wUdiMU7ZMnm0UBo3PS5DyX27JoqlL11OqMBtjSUsCdlV8uN2JJJtqgvjLz0R7rhmYSDSr5/OaAbCLwMflTFhBJS6XE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=BQKbtbOj; arc=none smtp.client-ip=209.85.167.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-53e64f3c7d0so1954e87.0
+        for <netdev@vger.kernel.org>; Wed, 15 Jan 2025 13:56:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1736978159; x=1737582959; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hns+SMO/Ao9YuYT65xxYfiz6buCFo3AsAultAnKCQ1w=;
+        b=BQKbtbOjQQVMhKdgwioS1ejxeo43XA01CjvxXW7/X+OfwZjvSQQeVI6eFHiahRug+1
+         b9ZpcMq7rmjDglOLk5bTHwraDtEm2DqmTk3CQKuShItqTYhaUrYnlC0lXpFgX83ChDT6
+         Tk7QFmkUF3lrnqTBjF3XBderihdpAQ9aFKVf8v47QB09M8pMJcCEbG1DIjJgjxO7X2d2
+         tE+SLieW9wjzNyFqYRoy9BPx0EhVcBmeNkBdFzB9oxXYgG3HQopOwRlEPw8G9j1Pn1ck
+         uc6z8V/w5TSodIEaRtsli8Fs5o/IPAZ1sHdmTzc7BvwMZzT+eN1d0Yn1RFJCTlmV7Pbp
+         5ItA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736978159; x=1737582959;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=hns+SMO/Ao9YuYT65xxYfiz6buCFo3AsAultAnKCQ1w=;
+        b=OL09+0RIvPE+XxvH7AL9z7F0FSlXack5Yd4/oJcSuea8WyjTaqCbBUb5bc9RzDP2D/
+         K7su9QPGQ55HaoTxSu9I+se+KKJWyXlj1ZEPBjlFJXRVwYU1CuakgqtN0RweW44YvP9Y
+         1050MC9VYpiLNOA3r/xXEWNv8P88O086Mcnm6N9wDlAPqhXkiI3qQIRszw1pGjhxPqTZ
+         7LXg9l7OQ+blnzm0cetVuXCPsppKwFbG+rM6nh/OI24/h5G9uI5TIGW8Pq8kt/mZ5Ka9
+         Nk9JSLvxtAzVQRt4ZugQ1oQ0Ln0lH7FBHv+jYAm7tssxxWtryCHym5qFXIal4Xn2tRfJ
+         HDsQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUx//nz09BRYwUHJpaGWogJ8lppNZ44d82NO6NZd7QQxcL7sUE2boPLmn0jUSb0mwdFHtwPYiM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzP7gsmOubDO12Jgwj/J3qh/xNs2FTyWbw6OawWh7Vrl1nNTnCT
+	5PvA6Kqqai8tKkBgZbMhACEUhSGZnMsW9Xfz4Au0T4PCgWK2IiR7ONU5KnoKUHvpjVZdyLDVUT9
+	uFDdfVh/FnXn85F5vFAr/z1KENGsjO9AmcW1oAKdVlIWCrTij+T5z
+X-Gm-Gg: ASbGncv1yryp2Bqi1svI8jREg8H990cHegDmUvkWOHSmoErdqvOB18RpiHcQKWQEo7K
+	p1lDcaGNuEqXAm38gJHY8ra1svZU1xUp9Mvi0Lw==
+X-Google-Smtp-Source: AGHT+IGTV6ubfbmZ9HdqjvdhW/BnJYZtaGRJECv23F8XKO9TCEAFvfjBcaGr8u0+8YFr43+cogVdF5PFS6ifymptHiI=
+X-Received: by 2002:a05:6512:982:b0:542:7130:bad2 with SMTP id
+ 2adb3069b0e04-542f46b229amr10124e87.5.1736978158947; Wed, 15 Jan 2025
+ 13:55:58 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next v5 05/15] net-timestamp: add strict check in some
- BPF calls
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, dsahern@kernel.org, willemdebruijn.kernel@gmail.com,
- willemb@google.com, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
- eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev,
- john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me,
- haoluo@google.com, jolsa@kernel.org, horms@kernel.org, bpf@vger.kernel.org,
- netdev@vger.kernel.org
-References: <20250112113748.73504-1-kerneljasonxing@gmail.com>
- <20250112113748.73504-6-kerneljasonxing@gmail.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-Content-Language: en-US
-In-Reply-To: <20250112113748.73504-6-kerneljasonxing@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+References: <20250108231554.3634987-1-tweek@google.com> <266861ab-cc0d-4a7c-9804-6bf4670868b1@6wind.com>
+ <CAHC9VhTFBPG2Ai7zT80m=Ez7RRN5J+1rA+n=q4SrAjrVvs+Dpw@mail.gmail.com>
+In-Reply-To: <CAHC9VhTFBPG2Ai7zT80m=Ez7RRN5J+1rA+n=q4SrAjrVvs+Dpw@mail.gmail.com>
+From: =?UTF-8?Q?Thi=C3=A9baud_Weksteen?= <tweek@google.com>
+Date: Thu, 16 Jan 2025 08:55:41 +1100
+X-Gm-Features: AbW1kvZE6yaIQBrluZBM2IBghqmkgTZ0CZ6JYC27IEVNIDDuS0uE4-gyyI8iJX4
+Message-ID: <CA+zpnLe5X3jcjF2=A72Bgpxt7wDrSgK0Y29h42mttTDr6vk9NA@mail.gmail.com>
+Subject: Re: [PATCH] selinux: map RTM_DELNSID to nlmsg_write
+To: Paul Moore <paul@paul-moore.com>
+Cc: nicolas.dichtel@6wind.com, "David S . Miller" <davem@davemloft.net>, selinux@vger.kernel.org, 
+	netdev <netdev@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 1/12/25 3:37 AM, Jason Xing wrote:
-> In the next round, we will support the UDP proto for SO_TIMESTAMPING
-> bpf extension, so we need to ensure there is no safety problem.
-> 
-> Signed-off-by: Jason Xing <kerneljasonxing@gmail.com>
-> ---
->   net/core/filter.c | 9 +++++++--
->   1 file changed, 7 insertions(+), 2 deletions(-)
-> 
-> diff --git a/net/core/filter.c b/net/core/filter.c
-> index 0e915268db5f..517f09aabc92 100644
-> --- a/net/core/filter.c
-> +++ b/net/core/filter.c
-> @@ -5571,7 +5571,7 @@ static int __bpf_getsockopt(struct sock *sk, int level, int optname,
->   static int _bpf_getsockopt(struct sock *sk, int level, int optname,
->   			   char *optval, int optlen)
->   {
-> -	if (sk_fullsock(sk))
-> +	if (sk_fullsock(sk) && optname != SK_BPF_CB_FLAGS)
->   		sock_owned_by_me(sk);
->   	return __bpf_getsockopt(sk, level, optname, optval, optlen);
->   }
-> @@ -5776,6 +5776,7 @@ BPF_CALL_5(bpf_sock_ops_getsockopt, struct bpf_sock_ops_kern *, bpf_sock,
->   	   int, level, int, optname, char *, optval, int, optlen)
->   {
->   	if (IS_ENABLED(CONFIG_INET) && level == SOL_TCP &&
-> +	    bpf_sock->sk->sk_protocol == IPPROTO_TCP &&
->   	    optname >= TCP_BPF_SYN && optname <= TCP_BPF_SYN_MAC) {
->   		int ret, copy_len = 0;
->   		const u8 *start;
-> @@ -5817,7 +5818,8 @@ BPF_CALL_2(bpf_sock_ops_cb_flags_set, struct bpf_sock_ops_kern *, bpf_sock,
->   	struct sock *sk = bpf_sock->sk;
->   	int val = argval & BPF_SOCK_OPS_ALL_CB_FLAGS;
->   
-> -	if (!IS_ENABLED(CONFIG_INET) || !sk_fullsock(sk))
-> +	if (!IS_ENABLED(CONFIG_INET) || !sk_fullsock(sk) ||
-> +	    sk->sk_protocol != IPPROTO_TCP)
->   		return -EINVAL;
->   
->   	tcp_sk(sk)->bpf_sock_ops_cb_flags = val;
-> @@ -7626,6 +7628,9 @@ BPF_CALL_4(bpf_sock_ops_load_hdr_opt, struct bpf_sock_ops_kern *, bpf_sock,
->   	u8 search_kind, search_len, copy_len, magic_len;
->   	int ret;
->   
-> +	if (bpf_sock->op != SK_BPF_CB_FLAGS)
+On Thu, Jan 16, 2025 at 4:29=E2=80=AFAM Paul Moore <paul@paul-moore.com> wr=
+ote:
+>
+> On Thu, Jan 9, 2025 at 4:24=E2=80=AFAM Nicolas Dichtel
+> <nicolas.dichtel@6wind.com> wrote:
+> > Le 09/01/2025 =C3=A0 00:15, Thi=C3=A9baud Weksteen a =C3=A9crit :
+> > >
+> > > The mapping for RTM_DELNSID was added in commit 387f989a60db
+> > > ("selinux/nlmsg: add RTM_GETNSID"). While this message type is not
+> > > expected from userspace, other RTM_DEL* types are mapped to the more
+> > > restrictive nlmsg_write permission. Move RTM_DELNSID to nlmsg_write i=
+n
+> > > case the implementation is changed in the future.
+> >
+> > Frankly, I don't think this will ever change. It's not a problem of imp=
+lementing
+> > the delete command, it's conceptually no sense.
+> >
+> > I don't see why the DEL should be restricted in any way.
+>
+> While the RTM_DELNSID messages are not generated from userspace, the
+> presence of the SELinux access control point is visible to userspace
+> and thus we have to worry about the backwards compatibility impact of
+> changing a "read" operation to a "write" operation.
+>
+> We could likely have a discussion about which is a better permission
+> mapping for RTM_DELNSID, read or write, but ultimately I think this
+> should probably be treated as a read operation since the kernel is
+> using this simply as a notification message.  Sending, or receiving, a
+> RTM_DELNSID message doesn't affect the state of the netns ID, or the
+> netns itself; in other words, a RTM_DELNSID is not the cause of netns
+> state change, it is a notification artifact of such a change.  Leaving
+> this mapped as a "read" operation seems correct to me.
+>
+> It is also worth noting that the SELinux netlink xperms support that
+> will ship for the first time in v6.13 will allow policy developers to
+> target RTM_DELNSID messages with much greater permissions granularity,
+> largely solving this problem for those who care about it.
+>
+> Finally, looking at unhash_nsid(), the only place which seems to
+> generate RTM_DELNSID notification messages, an access control denial
+> on the netlink notification operation will have no impact on the
+> removal of the netns or the netns ID, only the notification itself
+> should be impacted.
 
-SK_BPF_CB_FLAGS is not an op enum, so the check is incorrect. It does break the 
-existing test.
-
-./test_progs -t tcp_hdr_options
-WARNING! Selftests relying on bpf_testmod.ko will be skipped.
-#402/1   tcp_hdr_options/simple_estab:FAIL
-#402/2   tcp_hdr_options/no_exprm_estab:FAIL
-#402/3   tcp_hdr_options/syncookie_estab:FAIL
-#402/4   tcp_hdr_options/fastopen_estab:FAIL
-#402/5   tcp_hdr_options/fin:FAIL
-#402/6   tcp_hdr_options/misc:FAIL
-#402     tcp_hdr_options:FAIL
-#402/1   tcp_hdr_options/simple_estab:FAIL
-#402/2   tcp_hdr_options/no_exprm_estab:FAIL
-#402/3   tcp_hdr_options/syncookie_estab:FAIL
-#402/4   tcp_hdr_options/fastopen_estab:FAIL
-#402/5   tcp_hdr_options/fin:FAIL
-#402/6   tcp_hdr_options/misc:FAIL
-#402     tcp_hdr_options:FAIL
-
-
-Many changes of this set is in bpf and the newly added selftest is also a bpf 
-prog, all bpf selftests should be run before posting. 
-(Documentation/bpf/bpf_devel_QA.rst)
-
-The bpf CI can automatically pick it up and get an auto email on breakage like 
-this if the set is tagged to bpf-next. We can figure out where to land the set 
-later (bpf-next/net or net-next/main) when it is ready.
-
-All these changes also need a test in selftests/bpf. For example, I expect there 
-is a test to ensure calling these bpf helpers from the new tstamp callback will 
-get a negative errno value.
-
-For patch 4 and patch 5, I would suggest keeping it simple to only check for 
-bpf_sock->op for the helpers that make tcp_sock and/or locked sk assumption.
-Something like this on top of your patch. Untested:
-
-diff --git i/net/core/filter.c w/net/core/filter.c
-index 517f09aabc92..ccb13b61c528 100644
---- i/net/core/filter.c
-+++ w/net/core/filter.c
-@@ -7620,6 +7620,11 @@ static const u8 *bpf_search_tcp_opt(const u8 *op, const 
-u8 *opend,
-  	return ERR_PTR(-ENOMSG);
-  }
-
-+static bool is_locked_tcp_sock_ops(struct bpf_sock_ops_kern *bpf_sock)
-+{
-+	return bpf_sock->op <= BPF_SOCK_OPS_WRITE_HDR_OPT_CB;
-+}
-+
-  BPF_CALL_4(bpf_sock_ops_load_hdr_opt, struct bpf_sock_ops_kern *, bpf_sock,
-  	   void *, search_res, u32, len, u64, flags)
-  {
-@@ -7628,8 +7633,8 @@ BPF_CALL_4(bpf_sock_ops_load_hdr_opt, struct 
-bpf_sock_ops_kern *, bpf_sock,
-  	u8 search_kind, search_len, copy_len, magic_len;
-  	int ret;
-
--	if (bpf_sock->op != SK_BPF_CB_FLAGS)
--		return -EINVAL;
-+	if (!is_locked_tcp_sock_ops(bpf_sock))
-+		return -EOPNOTSUPP;
-
-  	/* 2 byte is the minimal option len except TCPOPT_NOP and
-  	 * TCPOPT_EOL which are useless for the bpf prog to learn
-
-
-> +		return -EINVAL;
-> +
->   	/* 2 byte is the minimal option len except TCPOPT_NOP and
->   	 * TCPOPT_EOL which are useless for the bpf prog to learn
->   	 * and this helper disallow loading them also.
-
+Ack. No worries. I agree with you Paul. When I was going through the
+list for updating our policy, this entry stood out as the only DEL_
+mapped to nlmsg_read. But as you described, it makes little sense to
+move it now. Thanks for the review.
 
