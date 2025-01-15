@@ -1,131 +1,113 @@
-Return-Path: <netdev+bounces-158518-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158519-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1515BA12509
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 14:42:04 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 33411A12568
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 14:51:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6F80A3A69E2
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 13:41:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 846153A27B4
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 13:49:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEDD2241A0F;
-	Wed, 15 Jan 2025 13:40:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E178870816;
+	Wed, 15 Jan 2025 13:48:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE1D1224AEF
-	for <netdev@vger.kernel.org>; Wed, 15 Jan 2025 13:40:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E5B824A7E0
+	for <netdev@vger.kernel.org>; Wed, 15 Jan 2025 13:48:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736948418; cv=none; b=Pi3R+J2CY44Uq0G7XxxACfa0HREorpnNP9QcghFIB6Cc4sBNnApq3WZowg5rEVzk3GddkoU7A1HGlyX7ZTvcopvVHfU9j24fKgMnIWMFtTzpVItkFG5ocNxsfqv0Yaqv8mdrWJlnIls8TBfWig+CJEpVBOdcnK2yFKX8ZM2IAec=
+	t=1736948909; cv=none; b=a/ood1OVn5D/dqXpc5o5hWE5k52shBFEqSlwnEHnDTOVwATF5lPMGExaISZPGU3AGm9Qdp4WCyJ8p5S8Nss6V30eIM/8YvHGCe4ZhLzeAMH/g7S3BcUDsuJvp0QcqLxvCr7paTQDUvYt7As8xRXzmM9k7FeseO5ar/w9vCHDRKg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736948418; c=relaxed/simple;
-	bh=r1xsjJUOy2JgUySvO3eaWqeMmfqNQDIF+7/tYLeVTeM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=DU/yZknIJf23ZufmUvc/iYlr4g6OsXIx6TieW11Cetb4/06DAhfJg2r9HTGVMUH1dTT8JLz47LDCQbcVm/u+R7HpQsQrmrwjYssEsPp7Xk4QhezuxbhvGjY3WWLmLvWqHKFjN8sUw/+oKJ9zyyHLnXfHXsc6h5f7mk3By5VrdxQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [141.14.220.45] (g45.guest.molgen.mpg.de [141.14.220.45])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id DF51361E647A3;
-	Wed, 15 Jan 2025 14:39:52 +0100 (CET)
-Message-ID: <c8cf251c-9788-4d00-a633-7a4a7bdc5e87@molgen.mpg.de>
-Date: Wed, 15 Jan 2025 14:39:52 +0100
+	s=arc-20240116; t=1736948909; c=relaxed/simple;
+	bh=rEAPHA1abP0sujPJONmG9VSZxci9i71qDCn7ZtGof0Q=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=ulb9puRhOncn2qeCGZAt+uXKkKBRdm1+ARoVNSEpsAhJGZpJd3+yxVpU6CErSHrLjpG6y5ZhBkTt5/kjR30kQFc5Cr/sNNMZHdL7+uCxmGCOVJ+VjsimHlDYe4x2QhNW0tyk+Q9N31fuD8Gxguh0HsgVQGwZrfvbbgaY8tStC7U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-3a9c9b37244so120657705ab.1
+        for <netdev@vger.kernel.org>; Wed, 15 Jan 2025 05:48:27 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736948907; x=1737553707;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=8NDK5DLIh1fZyrKWvILXfndimZCQbg5cpXOPK/22uk0=;
+        b=tUJHQ8aPPXhaay3JDrxV3LXiWXVR/vRYkJRqN6GGeXPqUKv+PTrDQvXsv/HBkLkGZ+
+         6k5eU8GL0TKYNk4mdqPZi/lfO4Q1RqtM3P1e3h2NLhY2GOqTKsyo0ODgve2Td7nuSyeh
+         eYht2CsYHaDgI1gBHoB4uyF8erxhvxwAlI4MFR07NO5p+I+ZkQi5384XPNTFrgX9o576
+         5wick3yCuivU3lZ8k7t8toBrhSH6KdethzRbtqNjXFedEigbSvlUHiKJE0xKK4B0LJ4B
+         CQsu1guy5QjmudFZ8TX4BhBY8vPawG+N2iIYxPAasUuQLQy5bsjHJ+WX/r4W4U2VIf4c
+         aNNA==
+X-Forwarded-Encrypted: i=1; AJvYcCUSV1Pwev7xThCH4GXvFnTlMeB7I1rQliuel0kZ3I73J9xPyUuRWeNPkdHhaAEbTQSjMeRonq4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzArMd22ylkXGpCsPlV15nILa1SxbREO1zFFEGUpYAz11cOptXS
+	QoZ0umt3j+uEBLbBB0OiYUjcVKNSX6w3rCMTxtHWxiRqUirZtbT0Zbp4VJ5lvjMKSIwzVM68JXN
+	QcglrZpwtyMU2WfghaCvyZd3o/q5gAvBSdFK05aq/HzWrmRYIutbYOMY=
+X-Google-Smtp-Source: AGHT+IGEJ90l3vPxFfDM1H+9IFajPIQeWKsRHU8XoSqebmq/RfqTf+MjiT4lrbL8LKAzJamxgt+VH/ULcmuDOVGSQJZkU6FlBQKX
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH iwl-next v1] ixgbe: add support for
- thermal sensor event reception
-To: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, anthony.l.nguyen@intel.com,
- netdev@vger.kernel.org, Przemek Kitszel <przemyslaw.kitszel@intel.com>
-References: <20250115122720.431223-1-jedrzej.jagielski@intel.com>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20250115122720.431223-1-jedrzej.jagielski@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-Received: by 2002:a05:6e02:1f89:b0:3a7:dd62:e954 with SMTP id
+ e9e14a558f8ab-3ce3a7a8ab7mr238896135ab.0.1736948907275; Wed, 15 Jan 2025
+ 05:48:27 -0800 (PST)
+Date: Wed, 15 Jan 2025 05:48:27 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6787bcab.050a0220.20d369.0018.GAE@google.com>
+Subject: [syzbot] Monthly wireless report (Jan 2025)
+From: syzbot <syzbot+lista7b682df404894299f40@syzkaller.appspotmail.com>
+To: linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
+	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-Dear Jedrzej,
+Hello wireless maintainers/developers,
 
+This is a 31-day syzbot report for the wireless subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/wireless
 
-Thank you for the patch.
+During the period, 8 new issues were detected and 0 were fixed.
+In total, 60 issues are still open and 147 have already been fixed.
 
-Am 15.01.25 um 13:27 schrieb Jedrzej Jagielski:
-> E610 NICs unlike the previous devices utilising ixgbe driver
-> are notified in the case of overheat by the FW ACI event.
+Some of the still happening issues:
 
-overheat*ing*
+Ref  Crashes Repro Title
+<1>  70405   Yes   WARNING in __ieee80211_beacon_get
+                   https://syzkaller.appspot.com/bug?extid=18c783c5cf6a781e3e2c
+<2>  6211    Yes   WARNING in __cfg80211_ibss_joined (2)
+                   https://syzkaller.appspot.com/bug?extid=7f064ba1704c2466e36d
+<3>  5866    Yes   WARNING in rate_control_rate_init (3)
+                   https://syzkaller.appspot.com/bug?extid=9bdc0c5998ab45b05030
+<4>  5673    Yes   WARNING in ath6kl_bmi_get_target_info (2)
+                   https://syzkaller.appspot.com/bug?extid=92c6dd14aaa230be6855
+<5>  3627    Yes   WARNING in __rate_control_send_low (3)
+                   https://syzkaller.appspot.com/bug?extid=34463a129786910405dd
+<6>  2248    Yes   WARNING in plfxlc_mac_release
+                   https://syzkaller.appspot.com/bug?extid=51a42f7c2e399392ea82
+<7>  1194    Yes   WARNING in ieee80211_start_next_roc
+                   https://syzkaller.appspot.com/bug?extid=c3a167b5615df4ccd7fb
+<8>  740     Yes   INFO: task hung in rfkill_global_led_trigger_worker (3)
+                   https://syzkaller.appspot.com/bug?extid=50499e163bfa302dfe7b
+<9>  397     Yes   INFO: task hung in crda_timeout_work (8)
+                   https://syzkaller.appspot.com/bug?extid=d41f74db64598e0b5016
+<10> 335     Yes   INFO: task hung in reg_check_chans_work (7)
+                   https://syzkaller.appspot.com/bug?extid=a2de4763f84f61499210
 
-> In event of overheat when treshhold is exceeded, FW suspends all
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-threshold
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
 
-> traffic and sends overtemp event to the driver. Then driver
-> loggs appropriate message and closes the adapter instance.
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
 
-logs
-
-> The card remains in that state until the platform is rebooted.
-
-How did you test this? Can you please paste the message?
-
-> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-> Signed-off-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
-> ---
->   drivers/net/ethernet/intel/ixgbe/ixgbe_main.c      | 5 +++++
->   drivers/net/ethernet/intel/ixgbe/ixgbe_type_e610.h | 3 +++
->   2 files changed, 8 insertions(+)
-> 
-> diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-> index 7236f20c9a30..5c804948dd1f 100644
-> --- a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-> +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-> @@ -3165,6 +3165,7 @@ static void ixgbe_aci_event_cleanup(struct ixgbe_aci_event *event)
->   static void ixgbe_handle_fw_event(struct ixgbe_adapter *adapter)
->   {
->   	struct ixgbe_aci_event event __cleanup(ixgbe_aci_event_cleanup);
-> +	struct net_device *netdev = adapter->netdev;
->   	struct ixgbe_hw *hw = &adapter->hw;
->   	bool pending = false;
->   	int err;
-> @@ -3185,6 +3186,10 @@ static void ixgbe_handle_fw_event(struct ixgbe_adapter *adapter)
->   		case ixgbe_aci_opc_get_link_status:
->   			ixgbe_handle_link_status_event(adapter, &event);
->   			break;
-> +		case ixgbe_aci_opc_temp_tca_event:
-> +			e_crit(drv, "%s\n", ixgbe_overheat_msg);
-> +			ixgbe_close(netdev);
-> +			break;
->   		default:
->   			e_warn(hw, "unknown FW async event captured\n");
->   			break;
-> diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_type_e610.h b/drivers/net/ethernet/intel/ixgbe/ixgbe_type_e610.h
-> index 8d06ade3c7cd..617e07878e4f 100644
-> --- a/drivers/net/ethernet/intel/ixgbe/ixgbe_type_e610.h
-> +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_type_e610.h
-> @@ -171,6 +171,9 @@ enum ixgbe_aci_opc {
->   	ixgbe_aci_opc_done_alt_write			= 0x0904,
->   	ixgbe_aci_opc_clear_port_alt_write		= 0x0906,
->   
-> +	/* TCA Events */
-> +	ixgbe_aci_opc_temp_tca_event                    = 0x0C94,
-> +
->   	/* debug commands */
->   	ixgbe_aci_opc_debug_dump_internals		= 0xFF08,
-
-Kind regards,
-
-Paul
+You may send multiple commands in a single email message.
 
