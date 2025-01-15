@@ -1,99 +1,95 @@
-Return-Path: <netdev+bounces-158595-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158596-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 948DCA129F8
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 18:35:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D2D5A12A03
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 18:38:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 30B963A3DEB
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 17:35:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3644C3A3D45
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 17:38:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A23C919922A;
-	Wed, 15 Jan 2025 17:35:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 109EA1AB50C;
+	Wed, 15 Jan 2025 17:38:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="FkTn2oD8"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="v/5iIPyr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21D2624A7ED
-	for <netdev@vger.kernel.org>; Wed, 15 Jan 2025 17:35:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73246150994
+	for <netdev@vger.kernel.org>; Wed, 15 Jan 2025 17:38:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736962532; cv=none; b=szcb4C+Dx8ycVAVoe4Z77/FCGXutRgWutlGnXB/ljCqgcCUXLbNrafecLcsa/r0rPqlQe/6Gi4X1mKE3Zq9pUMUvE7BgMEOgMK/3+MELT+Yv+8oEwvhpe7DbjE5VGK67U2nhCB+j3a1/XZOhBDb14IbCWYPRxQQhGb0tUjj8H34=
+	t=1736962722; cv=none; b=HrMKBiCZlmhy6vfXBxu+KwxQ4rG10FR6kX5VU6SLIGZ7hlcWoU1Y70VqWN6OFuYJfORWo6QejD3TCPzzchrQlsw9mwdHf7ucfBMzioYVMP5UmpV3v+IRQxYM917WO+aFbq55KHhFMIhiySyrh0IPo3KMNt4iodsyTGUp2erjsQk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736962532; c=relaxed/simple;
-	bh=Jo8aL5VG2iaQGf1RgZwXxeIOleNjhAR4oR8U3AskrE0=;
+	s=arc-20240116; t=1736962722; c=relaxed/simple;
+	bh=cCVtDtI3L9QMh6P2HaAgCq28O/T4xEBL4t88d6cSS7o=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QZYEchkC2r3+P6YAqqCqcrgei/4gZ7NXls5MeeuhyKk0ibyn8fy9jTgWTcsEQnPjSZBVQcMIWGVw1p3E/pHLgHY6IWlwy8yL4coEuy75Gg9eEfiF1YUSPOH5zRv9WxZCiFJ5o/Qho01WGO6ENUh4trF32ITdOa9M+KN35ohGteI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=FkTn2oD8; arc=none smtp.client-ip=209.85.214.180
+	 Content-Type:Content-Disposition:In-Reply-To; b=XIsA4qleBorahXquZq6zlpI/Q2KtZ6KyWopWzbLdC3+LjHuHiZNKI9lGL904ijXk739ncwSsywTlFnqpF8pufBTLc4yYzNrDKQ0xgBPZQJD5d2bk0aXbASwHzuZ0yATBC/x+from8GQg30cNLTEgin3lDZOmoJvhUzy42DxmxSk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=v/5iIPyr; arc=none smtp.client-ip=209.85.214.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-2165448243fso156210705ad.1
-        for <netdev@vger.kernel.org>; Wed, 15 Jan 2025 09:35:30 -0800 (PST)
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-21628b3fe7dso122479815ad.3
+        for <netdev@vger.kernel.org>; Wed, 15 Jan 2025 09:38:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1736962530; x=1737567330; darn=vger.kernel.org;
+        d=fastly.com; s=google; t=1736962719; x=1737567519; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references
          :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=drwGg6Ggv7y2iA4MXzxrkwRrSRb14xgzjKtqkAwh0hM=;
-        b=FkTn2oD8tpPZJ/iHdDEr6GiOsMIhKCfSRFcL6IVftisNZUAtTTxSpCdCCkmZn3XRwR
-         pXwMbL2RQ0Ou2RYDKdS/tvDi+GsnV7rQmDE8qmwoMJ42RUl8HE203KBy2JSF0tu8Sa4N
-         wrpsYzlLiRO815eQftBN/t/RCTdmtQl9MXASg=
+        bh=p4H2dDO5oqjOdgcji2cLVYChhEYMYo6QJGh5tEb4A6Q=;
+        b=v/5iIPyrMCQ+xqiAeLXPiIHWnzaw5+g8v5/VC7qG/Taesmwd2dY+99rstKXzIeix5E
+         ZEHfqE8ux9sjOCSy90bTIEmGnVmq7fKy6raC3ZDxQVokIEi8I0ydiw1uYVgd44QHC+XM
+         DwpwuRxnUpIj6jscDabnoE7JHOzNaWS80ZaKY=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736962530; x=1737567330;
+        d=1e100.net; s=20230601; t=1736962719; x=1737567519;
         h=in-reply-to:content-disposition:mime-version:references
          :mail-followup-to:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=drwGg6Ggv7y2iA4MXzxrkwRrSRb14xgzjKtqkAwh0hM=;
-        b=iU0EPBmKevnHw3R8GMOeTQIHDySaFCyCrelACVt4h1kZGN7wnLbrNegeR0dmuvPQXQ
-         HCC5MABUZV0JfvPMJ3cbdF8Tn/bTR/XAt1IfQrEfDdanK7NCjikf1XGaQy3yqlOQ35Ag
-         ahv64nh+EtIXIzZ8OMeeZDfLJ7h8/AmNR2mU+lRg0m41RWSeE4V2NOs0uKwx9rj2kAnM
-         LWAl+AKAWKbRGEOLPGgFTHSfG6QGujSyFPs7iCnkmKvxlmqVR20MhyVZbQQML2rcoVSa
-         czl1UVV8e0YA73SLEQxbYz6fPVxifOt98GicevzghlnWRxLys5U0zcsb4r66Qgf4vNAk
-         RY5Q==
-X-Gm-Message-State: AOJu0YwfTXdQPRkAp4D9ZSfgriAe9SxuJ4JWiaUUAwzdcPBE7TdnWwY9
-	vZ6nVvZ6YRcofyIognUO4D38Q5R+A3oeCUSblA8wKe2aCHWboar6M+kzOR8BVEw=
-X-Gm-Gg: ASbGncsHyY8Sp7JhZuywoLq2PchYoRvWuJrFFnH4h4wBszAOBQFv9+Sua5UAYNRxflC
-	A0QJtuX3bOhp4MvtZKZHoVJtv3U74hYFF6B4BmTwTCP6gvI6iazCI0RNjBqTd/LJzqCTKYmoa+w
-	HpMMi4NEW3Eb1gE0dTKPnCC3b4e2MeAf0n0SZKWU3pBwXMVWJewuY0Uix0WEF/9ohyE829zE5Qo
-	UL2FZ9lhsOTQXmhSaTs4hjlxJsBuRnOhRb+mDGBOE4ptDmz4UyruWXOmMvW35jY3Mwp/rPwuY7t
-	U2vThodO0dRjd2MCo/jGnNs=
-X-Google-Smtp-Source: AGHT+IHh9H8PaJ6cgjJiGUCjtnIBHOrMsIR66gZMMMrlpxbHphZLN5joIg1CaCDzyN8qA1Kz6Fewvg==
-X-Received: by 2002:a05:6a00:2406:b0:72d:8fa2:9999 with SMTP id d2e1a72fcca58-72d8fa29fbdmr3989071b3a.11.1736962530490;
-        Wed, 15 Jan 2025 09:35:30 -0800 (PST)
+        bh=p4H2dDO5oqjOdgcji2cLVYChhEYMYo6QJGh5tEb4A6Q=;
+        b=EkVTpOf4/2GVS0+hQ7rcIE19ueHILSVQewNiCss28ZJWtF8habzC9yjLhaB3nodK2s
+         xwtU7gncvu73ACl91X8gtThZkM3B1udLoUJsaja5xcTXsdomas1GCvGgtCEth/N4/d1J
+         5vDXHwjCrxx8L6k/WpYVBMwjmt9cNxLqENDNZXpwOLypak/NTwaslh/nBg10Y2jCCkKE
+         LeB9EGxnJnV4h/qB4+b4tDN4sHdKLgVTzaLeOGnObAT++Dyplzm6mNZLZaGYfqaaMUiT
+         Q5Y/Q8O8XJtai1F4imu5Icymu6cNMhoRjRuV93UYTG9yIdemIHGxmAzEUqpBCRFU3ZHs
+         J4WA==
+X-Forwarded-Encrypted: i=1; AJvYcCWHs14eVQ/eslqgdlcbx4KaDGa9oMGfM4BBph5et8XGL+TWD0qZEj5+BGkn/olBXgo2auKVP68=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz4X6Z8uNqBU+TQ9dt03yzZuX93et83GYL7DWTRw8w4JJISWeA6
+	Q6BLOKyLEkxGnEQxmDcSZ6Xzl22gxdmNZK6yLZ/cOQA0KEJ0ZZh8AvypSaxFbsU=
+X-Gm-Gg: ASbGncslcs1Jbr2cKYh8NgrPBePBlBWVykuweu0XtYupJtikFLplwso0ObqtknQ9660
+	YLe+tA2tBKudp8NNp9HnllfLtXkG+UZj7mjTtMgSRGju2FS9ABDU/XRiE2YkPwmvif1uUPEKROS
+	J9rPfyAqG7FVXgck7HWBxQy+fSytxrLdLiNnK8i2b8QFgHHYgbAYi1z7o8DE+dN+Yi1FbhEBI7h
+	Zo9W5Dap17XdMczX6TjK8hpAbWLJvbCTiDvnEa8/gSUB9TXFnCV9pElnN9Cw8KKCoKUsq3IRPC9
+	DA+GWGxF9WYdvofLq1OAtSY=
+X-Google-Smtp-Source: AGHT+IGtF5HTNfkxn2kiIHCJVZmMSRnqGMzuxU3E5MQKOylnC/s74SbaEpbh6Lam1G4blDN8suUzJA==
+X-Received: by 2002:a05:6a00:9294:b0:725:cfa3:bc76 with SMTP id d2e1a72fcca58-72d21f115b4mr46941225b3a.4.1736962719624;
+        Wed, 15 Jan 2025 09:38:39 -0800 (PST)
 Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72d4067ede1sm9361054b3a.124.2025.01.15.09.35.28
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72d4056d5aesm9458749b3a.43.2025.01.15.09.38.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Jan 2025 09:35:30 -0800 (PST)
-Date: Wed, 15 Jan 2025 09:35:27 -0800
+        Wed, 15 Jan 2025 09:38:39 -0800 (PST)
+Date: Wed, 15 Jan 2025 09:38:36 -0800
 From: Joe Damato <jdamato@fastly.com>
-To: Furong Xu <0x1207@gmail.com>
-Cc: netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, xfr@outlook.com
-Subject: Re: [PATCH net-next v3 4/4] net: stmmac: Convert prefetch() to
- net_prefetch() for received frames
-Message-ID: <Z4fx32HuqJk-0cQS@LQ3V64L9R2>
+	Simon Horman <horms@kernel.org>,
+	Donald Hunter <donald.hunter@redhat.com>,
+	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
+Subject: Re: [PATCH v2 net-next 00/11] af_unix: Set skb drop reason in every
+ kfree_skb() path.
+Message-ID: <Z4fynNxk3FJ8BCWA@LQ3V64L9R2>
 Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Furong Xu <0x1207@gmail.com>, netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Kuniyuki Iwashima <kuniyu@amazon.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, xfr@outlook.com
-References: <cover.1736910454.git.0x1207@gmail.com>
- <909631f38edfac07244ea62d94dc76953d52035e.1736910454.git.0x1207@gmail.com>
+	Simon Horman <horms@kernel.org>,
+	Donald Hunter <donald.hunter@redhat.com>,
+	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
+References: <20250112040810.14145-1-kuniyu@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -102,21 +98,47 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <909631f38edfac07244ea62d94dc76953d52035e.1736910454.git.0x1207@gmail.com>
+In-Reply-To: <20250112040810.14145-1-kuniyu@amazon.com>
 
-On Wed, Jan 15, 2025 at 11:27:05AM +0800, Furong Xu wrote:
-> The size of DMA descriptors is 32 bytes at most.
-> net_prefetch() for received frames, and keep prefetch() for descriptors.
+On Sun, Jan 12, 2025 at 01:07:59PM +0900, Kuniyuki Iwashima wrote:
+> There is a potential user for skb drop reason for AF_UNIX.
 > 
-> This patch brings ~4.8% driver performance improvement in a TCP RX
-> throughput test with iPerf tool on a single isolated Cortex-A65 CPU
-> core, 2.92 Gbits/sec increased to 3.06 Gbits/sec.
+> This series sets skb drop reason for every kfree_skb() path
+> in AF_UNIX code.
 > 
-> Suggested-by: Joe Damato <jdamato@fastly.com>
-> Signed-off-by: Furong Xu <0x1207@gmail.com>
-> ---
->  drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+> Link: https://lore.kernel.org/netdev/CAAf2ycmZHti95WaBR3s+L5Epm1q7sXmvZ-EqCK=-oZj=45tOwQ@mail.gmail.com/
+> 
+> 
+> Changes:
+>   v2:
+>     * Drop the old patch 6 to silence false-positive uninit warning
+> 
+>   v1: https://lore.kernel.org/netdev/20250110092641.85905-1-kuniyu@amazon.com/
+> 
+> 
+> Kuniyuki Iwashima (11):
+>   net: dropreason: Gather SOCKET_ drop reasons.
+>   af_unix: Set drop reason in unix_release_sock().
+>   af_unix: Set drop reason in unix_sock_destructor().
+>   af_unix: Set drop reason in __unix_gc().
+>   af_unix: Set drop reason in unix_stream_connect().
+>   af_unix: Set drop reason in unix_stream_sendmsg().
+>   af_unix: Set drop reason in queue_oob().
+>   af_unix: Set drop reason in manage_oob().
+>   af_unix: Set drop reason in unix_stream_read_skb().
+>   af_unix: Set drop reason in unix_dgram_disconnected().
+>   af_unix: Set drop reason in unix_dgram_sendmsg().
+> 
+>  include/net/dropreason-core.h |  46 ++++++++--
+>  net/unix/af_unix.c            | 153 +++++++++++++++++++++++++---------
+>  net/unix/garbage.c            |   2 +-
+>  3 files changed, 154 insertions(+), 47 deletions(-)
 
-Reviewed-by: Joe Damato <jdamato@fastly.com>
+I know there's feedback from others on some parts of this series but
+I wanted to say thank you for the detailed commit messages that
+include python examples.
+
+I found that very refreshing and helpful when attempting to review
+the code you've proposed; thanks for putting in the extra effort to
+include those examples in the commit messages.
 
