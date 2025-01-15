@@ -1,179 +1,139 @@
-Return-Path: <netdev+bounces-158358-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158359-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B4D6A117B0
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 04:13:49 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 94D20A117B3
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 04:14:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1431B7A3163
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 03:13:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6C88718896D5
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 03:13:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4266422DF93;
-	Wed, 15 Jan 2025 03:13:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="noOWt4pG"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7399E22E402;
+	Wed, 15 Jan 2025 03:13:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f49.google.com (mail-qv1-f49.google.com [209.85.219.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BEA32AE6A;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5826D20CCD9;
 	Wed, 15 Jan 2025 03:13:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.49
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736910820; cv=none; b=LEB6h/g3xKQNM213BY9eTZ0ow2do74r45HCyNh+E0HBxbBIiWWZfzJ+InH3XwDBANwIDNmDaO5bOlUyQi3z6pkQqYSIt/v/nwKqtFIZAqFRi7Zk4jgNmNUrzgnG3KbiwqFdSnmrNVnbiM865Ou4KAIvDApHSdcGwYtnlixyCaOE=
+	t=1736910825; cv=none; b=GIkY5w+Udupp/CR9z2oXZltkpWorDDOWbnu/azv8RQu3M6Yx3JRNFtpfXoDomgw9NOKrzZhUynUBi0NnDfklNnUWOKjqALYhRsTf4cFbXicrvg56ZxcqM8syPdWENDxBFmFHgGXm7x0/QpAFRF+OXhISnLQD2SwfMNr/mcWdLpE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736910820; c=relaxed/simple;
-	bh=6GTcMx3vLk5bajSKbOiTL+/pzHZtzvIcGicvObWykwc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=VX7m0KLnnkrtdkm7zj/gyoXwq5B5WULRSlTk3+mlHBgBE1jmqcN8X75G8/+Jy/ZnuZDLFk3aJShfMSODg8ahkpd6EspG6I+Tu1TNbli4akudVoZ7klwZtL6l8qp5UVmPO3KtPyt6EY2AH71qrbEzwiqCmEuQ1DF2eEyjuZdVbqc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=noOWt4pG; arc=none smtp.client-ip=209.85.219.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f49.google.com with SMTP id 6a1803df08f44-6dccccd429eso50514946d6.3;
-        Tue, 14 Jan 2025 19:13:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736910817; x=1737515617; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PpTzoD/ye+KTP7gxymR/okpXKgS/beqVqNicgHEcvMw=;
-        b=noOWt4pG5TanTS8KUtLHpn8YkrGotQkqJD7HC+MWrMTxdrS4Aftzyz+cZM99Yo3Jh9
-         M1qja10ttQ9a2rnd+6K/rbKFaXkweS52icSRshslb98SuRoBfeJrJpO5bX15ilUGpGRg
-         hb8nRP3VfPlLt8xae6GF0Wmsl+7D6OKx+ZtQrcWMKEoKTLkXD/2//9fwBnh9LOZstV/r
-         RG74gxwexyOWqTaPcGxAYtJndLitj+K8dVPyR2Yyp90mus15xUBobGkAM7L2fAE9ax7z
-         65avUYybotegCtyM5DhMeFFOBvnp2XSvj7JPn86IBKm7BzmjhIrvERjYvKCxOJBnRur+
-         DcEA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736910817; x=1737515617;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=PpTzoD/ye+KTP7gxymR/okpXKgS/beqVqNicgHEcvMw=;
-        b=iU/OcfkHdeeft/rWuF2e90UQixPVqvbcMRnRws6Ayo1Eacwo/WKoUL+tzgNPnD9H2J
-         MwjLoYJ8Ofy6SFuUL0m2I7PfTXfU7F3eAlf+J9ltK1FeUPg4IOawq/SQqeY9sbInXbXi
-         2Kvti7pvK7LDeO4XJscmB8u/FD4J6dkcaosaccXPrICPLuWRZiPtBExZkNKhXYvgskFs
-         J9B+rnQdOUQ3ffrYue/IkhoqkCzsUjTa+2PXA50fkmUAcy480wE4RPIRuAENu6JT7Lve
-         huK6K5TK416q+UOLYUzRcK8pMi4s+Wj6/rDiopVqDFvS3xuGlg8AuCCeY0TA6IE1oMjx
-         BJcw==
-X-Forwarded-Encrypted: i=1; AJvYcCU+cB6HtzHJm6OFcsT7oBXKQPshRqOyb60EBPTbIho5+YvjRQScjiDRxVIY0A+DW/5jk9MfMV89@vger.kernel.org, AJvYcCXrlp0lYvhbXZLX3r8jx9IBqe9wIEry4BB5hUDsDDQXDMW8YI9U+jVCY16VGSwuT1Nl9kY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw7JTDsmt5e6Bly2h/Ozz/JTTGzTYKBI43spuKodv5tWcdGGDKk
-	Rx2uaJi4NaS/Oy3JqTl0Uz4UkypWcQ3lM9PbVu87PicNFo4iLJ2cOF+qgXCE1XyELle46a3Bl0a
-	nYn85T2xWy4N8cbwvscKvQ/AcB70=
-X-Gm-Gg: ASbGncuFFDkKdi/gibFMecocDvy9GSbHRi/cahrhOw+KMLB3HhJrMgpNTnMLWNFk2Av
-	WDPj8BqB3xBfijvhOsCVmZpxusq86KLSxl9fF
-X-Google-Smtp-Source: AGHT+IH+CYAX72SyvQcFDJ6GsVSqiWWWnfYTSL8/Vuh7YS8GGSnaq9CzrCMo6/DAaet4t0ruECPcbQgAusL5xo+lkGo=
-X-Received: by 2002:a05:6214:5a08:b0:6d8:aa04:9a5d with SMTP id
- 6a1803df08f44-6df9b1d1fa1mr406581456d6.4.1736910817485; Tue, 14 Jan 2025
- 19:13:37 -0800 (PST)
+	s=arc-20240116; t=1736910825; c=relaxed/simple;
+	bh=19fhQBX1GnkzmQ9DU/Ak5HELfw73UfqbA4i/2V/XM14=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=JyN8qrqnSuPRQkeNggHtcHrJCca7xfdONS7P6XILO4C7i/y6hzVgM/rGnJPXOqtk3c9fNNFgYU8u4cSXh8fv7XlUowjextim5MIaOnCRHVEGLCS6RgsTs1KzKoYspgyKm5koZkmK0MLmEeJI6//Sl7vT2/Uxng9LNkm9ZQMjQUk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
+X-UUID: b209254ed2ee11efa216b1d71e6e1362-20250115
+X-CTIC-Tags:
+	HR_CC_COUNT, HR_CC_DOMAIN_COUNT, HR_CC_NO_NAME, HR_CTE_8B, HR_CTT_MISS
+	HR_DATE_H, HR_DATE_WKD, HR_DATE_ZONE, HR_FROM_NAME, HR_SJ_DIGIT_LEN
+	HR_SJ_LANG, HR_SJ_LEN, HR_SJ_LETTER, HR_SJ_NOR_SYM, HR_SJ_PHRASE
+	HR_SJ_PHRASE_LEN, HR_SJ_WS, HR_TO_COUNT, HR_TO_DOMAIN_COUNT, HR_TO_NO_NAME
+	IP_TRUSTED, SRC_TRUSTED, DN_TRUSTED, SA_EXISTED, SN_EXISTED
+	SPF_NOPASS, DKIM_NOPASS, DMARC_NOPASS, CIE_BAD, CIE_GOOD_SPF
+	GTI_FG_BS, GTI_RG_INFO, GTI_C_BU, AMN_T1, AMN_GOOD
+	AMN_C_TI, AMN_C_BU, ABX_MISS_RDNS
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.45,REQID:45d68ee1-211d-47c8-a391-f8cbda3922f5,IP:10,
+	URL:0,TC:0,Content:0,EDM:25,RT:0,SF:-5,FILE:0,BULK:0,RULE:Release_Ham,ACTI
+	ON:release,TS:30
+X-CID-INFO: VERSION:1.1.45,REQID:45d68ee1-211d-47c8-a391-f8cbda3922f5,IP:10,UR
+	L:0,TC:0,Content:0,EDM:25,RT:0,SF:-5,FILE:0,BULK:0,RULE:Release_Ham,ACTION
+	:release,TS:30
+X-CID-META: VersionHash:6493067,CLOUDID:175ee3dc6dc9720ea11cec0ee7149125,BulkI
+	D:250115111333OMY4YBWU,BulkQuantity:0,Recheck:0,SF:17|19|24|42|66|74|78|81
+	|82|100|101|102,TC:nil,Content:0|50,EDM:5,IP:-2,URL:0,File:nil,RT:nil,Bulk
+	:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,
+	BRE:0,ARC:0
+X-CID-BVR: 0,NGT
+X-CID-BAS: 0,NGT,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_FAS,TF_CID_SPAM_FSD,TF_CID_SPAM_FSI
+X-UUID: b209254ed2ee11efa216b1d71e6e1362-20250115
+X-User: liuye@kylinos.cn
+Received: from localhost.localdomain [(223.70.160.239)] by mailgw.kylinos.cn
+	(envelope-from <liuye@kylinos.cn>)
+	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
+	with ESMTP id 1552104714; Wed, 15 Jan 2025 11:13:30 +0800
+From: Liu Ye <liuye@kylinos.cn>
+To: horms@kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	herbert@gondor.apana.org.au,
+	kuba@kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	liuye@kylinos.cn,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	shuah@kernel.org,
+	steffen.klassert@secunet.com
+Subject: [PATCH net V2] selftests/net/ipsec: Fix Null pointer dereference in rtattr_pack()
+Date: Wed, 15 Jan 2025 11:13:22 +0800
+Message-Id: <20250115031322.43561-1-liuye@kylinos.cn>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20250114160126.GJ5497@kernel.org>
+References: <20250114160126.GJ5497@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250112064513.883-1-laoar.shao@gmail.com> <CAEf4BzZcs6YP067-KJYQRsMJMLooypepq8iiX7wXu7CZwVhD3g@mail.gmail.com>
-In-Reply-To: <CAEf4BzZcs6YP067-KJYQRsMJMLooypepq8iiX7wXu7CZwVhD3g@mail.gmail.com>
-From: Yafang Shao <laoar.shao@gmail.com>
-Date: Wed, 15 Jan 2025 11:13:01 +0800
-X-Gm-Features: AbW1kvb-dIXz4uBz4Mj9_8CuK_ym1PsFudUg4rh-ljRRu-iM2RKnrYCFoIBjtjQ
-Message-ID: <CALOAHbAXyLy6gcRLwtF9rz8v5hcpx5ua4En25sst3pgUu0K=xA@mail.gmail.com>
-Subject: Re: [RFC PATCH v2 0/2] libbpf: Add support for dynamic tracepoints
-To: Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Cc: andrii@kernel.org, eddyz87@gmail.com, ast@kernel.org, daniel@iogearbox.net, 
-	martin.lau@linux.dev, song@kernel.org, yonghong.song@linux.dev, 
-	john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me, 
-	haoluo@google.com, jolsa@kernel.org, edumazet@google.com, dxu@dxuuu.xyz, 
-	bpf@vger.kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Wed, Jan 15, 2025 at 6:32=E2=80=AFAM Andrii Nakryiko
-<andrii.nakryiko@gmail.com> wrote:
->
-> On Sat, Jan 11, 2025 at 10:45=E2=80=AFPM Yafang Shao <laoar.shao@gmail.co=
-m> wrote:
-> >
-> > The primary goal of this change is to enable tracing of inlined kernel
-> > functions with BPF programs.
-> >
-> > Dynamic tracepoints can be created using tools like perf-probe, debugfs=
-, or
-> > similar utilities. For example:
-> >
-> >   $ perf probe -a 'tcp_listendrop sk'
-> >   $ ls /sys/kernel/debug/tracing/events/probe/tcp_listendrop/
-> >   enable  filter  format  hist  id  trigger
-> >
-> > Here, tcp_listendrop() is an example of an inlined kernel function.
-> >
-> > While these dynamic tracepoints are functional, they cannot be easily
-> > attached to BPF programs. For instance, attempting to use them with
-> > bpftrace results in the following error:
-> >
-> >   $ bpftrace -l 'tracepoint:probe:*'
-> >   tracepoint:probe:tcp_listendrop
-> >
-> >   $ bpftrace -e 'tracepoint:probe:tcp_listendrop {print(comm)}'
-> >   Attaching 1 probe...
-> >   ioctl(PERF_EVENT_IOC_SET_BPF): Invalid argument
-> >   ERROR: Error attaching probe: tracepoint:probe:tcp_listendrop
-> >
-> > The issue lies in how these dynamic tracepoints are implemented: despit=
-e
-> > being exposed as tracepoints, they remain kprobe events internally. As =
-a
-> > result, loading them as a tracepoint program fails. Instead, they must =
-be
-> > loaded as kprobe programs.
-> >
-> > This change introduces support for such use cases in libbpf by adding a
-> > new section: SEC("kprobe/SUBSYSTEM/PROBE")
-> >
-> > - Future work
-> >   Extend support for dynamic tracepoints in bpftrace.
->
-> Seems like the primary motivation is bpftrace support, so let's start
-> there.
+From: liuye <liuye@kylinos.cn>
 
-I believe we should extend support for this feature in BCC as well.
-Since this is a common and widely applicable feature, wouldn't it make
-sense to include it directly in libbpf?
+From: Liu Ye <liuye@kylinos.cn>
 
-> I'm hesitant to include this in libbpf right now. The whole
-> SEC("kprobe") that calls "attach_tracepoint()" underneath makes me
-> uncomfortable.
+Address Null pointer dereference in rtattr_pack.
 
-I reused the bpf_program__attach_tracepoint() function, but if we
-examine its implementation closely, we can see that it actually
-creates a DECLARE_LIBBPF_OPTS(bpf_perf_event_opts, pe_opts); rather
-than a bpf_tracepoint_opts.
+Flagged by cppcheck as:
+    tools/testing/selftests/net/ipsec.c:230:25: warning: Possible null pointer
+    dereference: payload [nullPointer]
+    memcpy(RTA_DATA(attr), payload, size);
+                           ^
+    tools/testing/selftests/net/ipsec.c:1618:54: note: Calling function 'rtattr_pack',
+    4th argument 'NULL' value is 0
+    if (rtattr_pack(&req.nh, sizeof(req), XFRMA_IF_ID, NULL, 0)) {
+                                                       ^
+    tools/testing/selftests/net/ipsec.c:230:25: note: Null pointer dereference
+    memcpy(RTA_DATA(attr), payload, size);
+                           ^
+Fixes: 70bfdf62e93a ("selftests/net/ipsec: Add test for xfrm_spdattr_type_t")
+---
+V2: Modify description.
+    Add code checking tools.
+    Separating family and given name in Signed-off-by line.
+    Modify code format.
+    Add fixes.
+---
 
-If naming is a significant concern, it wouldn=E2=80=99t be difficult to
-reimplement the same logic with a more appropriate name, such as
-attach_kprobe_based_tracepoint().
+Signed-off-by: Liu Ye <liuye@kylinos.cn>
+---
+ tools/testing/selftests/net/ipsec.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
->
-> You can still attach to such dynamic probe today with pure libbpf
-> (e.g., if bpftrace needs to do this, for example) by creating
-> perf_event FD from tracefs' id, and then using
-> bpf_program__attach_perf_event_opts() to attach to it. It will be on
-> the user to use either tracepoint or kprobe BPF program for such
-> attachment.
+diff --git a/tools/testing/selftests/net/ipsec.c b/tools/testing/selftests/net/ipsec.c
+index be4a30a0d02a..9b44a091802c 100644
+--- a/tools/testing/selftests/net/ipsec.c
++++ b/tools/testing/selftests/net/ipsec.c
+@@ -227,7 +227,8 @@ static int rtattr_pack(struct nlmsghdr *nh, size_t req_sz,
+ 
+ 	attr->rta_len = RTA_LENGTH(size);
+ 	attr->rta_type = rta_type;
+-	memcpy(RTA_DATA(attr), payload, size);
++	if (payload)
++		memcpy(RTA_DATA(attr), payload, size);
+ 
+ 	return 0;
+ }
+-- 
+2.25.1
 
-You're right=E2=80=94we can manually attach it in the tools, but if we can
-make it auto-attachable in libbpf, why not take advantage of that and
-simplify the process?
-
-
->
-> Yes, this doesn't work "declaratively" with a nice SEC("...") syntax,
-> but at least it's doable programmatically, and that's what matters for
-> bpftrace.
-
-
---
-Regards
-Yafang
 
