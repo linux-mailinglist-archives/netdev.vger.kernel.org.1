@@ -1,121 +1,179 @@
-Return-Path: <netdev+bounces-158357-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158358-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 920FEA117A5
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 04:06:08 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B4D6A117B0
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 04:13:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CEF1818821E0
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 03:06:11 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1431B7A3163
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 03:13:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E53481CDFA9;
-	Wed, 15 Jan 2025 03:06:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4266422DF93;
+	Wed, 15 Jan 2025 03:13:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="krVR3BV+"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="noOWt4pG"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f49.google.com (mail-qv1-f49.google.com [209.85.219.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1C0079C0;
-	Wed, 15 Jan 2025 03:06:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BEA32AE6A;
+	Wed, 15 Jan 2025 03:13:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736910362; cv=none; b=I7OxoDCwjJH10rVnHcHPIclaX2959KqO/FHCWPvFgV5B2veNW0zzMYA/ZmnSbnn2fKWrvfm8GLq4k2ksNXZAZG+TbX0NaN9Om/U8fIIg7geHZQku+x68kkFJgjBVgmSFBqGTMa0ANl1hH0evakZOy8HcT2S8a15XNr3suSxVY2o=
+	t=1736910820; cv=none; b=LEB6h/g3xKQNM213BY9eTZ0ow2do74r45HCyNh+E0HBxbBIiWWZfzJ+InH3XwDBANwIDNmDaO5bOlUyQi3z6pkQqYSIt/v/nwKqtFIZAqFRi7Zk4jgNmNUrzgnG3KbiwqFdSnmrNVnbiM865Ou4KAIvDApHSdcGwYtnlixyCaOE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736910362; c=relaxed/simple;
-	bh=9rqZtZ658I8C/7KeTF4yZcpEiL9EAcBb3GFwN2I2zwc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QRL4PF0TNm1tSk/F9cWYzerwX7O18skaH+AidnGAqD7qAraKnTkM859O+FCMM5n1DchChClBaDgo9ZOte6lnl9J+eivQzj5iHp2AiS0+yWUmXjbd7BNWR8s9pDccrBR5eCVEQSnrFNPpwS+3EH1ea+KCGCTgqyNcxPOAPcFqF7U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=krVR3BV+; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=xZ3pSeWobvg8Tl71lQfQroV+f3jXMvH5qIsHJ4PQK2A=; b=krVR3BV+9Rjj3324BmDgxaZ2mg
-	hvJQmkiQLPMtvaxTBuqsr6Cbg69R1frvco63GG5G1dyw/jnG65GNG/3pDGQUCxDQteU/UDf3hUIDE
-	15MV/GMsuGypwbzxqc/55u7g29U9XYdknbk0RptcwYib0cd5HTzItZPOkx6hKnJmgjAk=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tXtii-004eNm-6i; Wed, 15 Jan 2025 04:05:28 +0100
-Date: Wed, 15 Jan 2025 04:05:28 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jacky Chou <jacky_chou@aspeedtech.com>
-Cc: Ninad Palsule <ninad@linux.ibm.com>,
-	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
-	"andrew@codeconstruct.com.au" <andrew@codeconstruct.com.au>,
-	"conor+dt@kernel.org" <conor+dt@kernel.org>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-	"eajames@linux.ibm.com" <eajames@linux.ibm.com>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"joel@jms.id.au" <joel@jms.id.au>,
-	"krzk+dt@kernel.org" <krzk+dt@kernel.org>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	"linux-aspeed@lists.ozlabs.org" <linux-aspeed@lists.ozlabs.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"minyard@acm.org" <minyard@acm.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"openipmi-developer@lists.sourceforge.net" <openipmi-developer@lists.sourceforge.net>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"ratbert@faraday-tech.com" <ratbert@faraday-tech.com>,
-	"robh@kernel.org" <robh@kernel.org>
-Subject: Re: =?utf-8?B?5Zue6KaGOiDlm57opoY6IOWbng==?=
- =?utf-8?B?6KaGOiDlm57opoY6IFtQQVRD?= =?utf-8?Q?H?= v2 05/10] ARM: dts:
- aspeed: system1: Add RGMII support
-Message-ID: <e5178acd-0b6f-4580-9892-0cca48b6898a@lunn.ch>
-References: <SEYPR06MB51344BA59830265A083469489D132@SEYPR06MB5134.apcprd06.prod.outlook.com>
- <8042c67c-04d3-41c0-9e88-8ce99839f70b@lunn.ch>
- <c0b653ea-3fe0-4bdb-9681-bf4e3ef1364a@linux.ibm.com>
- <c05c0476-c8bd-42f4-81da-7fe96e8e503b@lunn.ch>
- <SEYPR06MB5134A63DBE28AA1305967A0C9D1C2@SEYPR06MB5134.apcprd06.prod.outlook.com>
- <d80f5916-4918-4849-bf4e-2ef608ece09d@linux.ibm.com>
- <SEYPR06MB51340579A53502150F67ADEC9D1F2@SEYPR06MB5134.apcprd06.prod.outlook.com>
- <bcebe5ed-6080-4642-b6a5-5007d97fac71@linux.ibm.com>
- <26dec4b7-0c6d-4e8e-9df6-d644191e767f@lunn.ch>
- <SEYPR06MB5134DD6F514225EA8607DC979D192@SEYPR06MB5134.apcprd06.prod.outlook.com>
+	s=arc-20240116; t=1736910820; c=relaxed/simple;
+	bh=6GTcMx3vLk5bajSKbOiTL+/pzHZtzvIcGicvObWykwc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=VX7m0KLnnkrtdkm7zj/gyoXwq5B5WULRSlTk3+mlHBgBE1jmqcN8X75G8/+Jy/ZnuZDLFk3aJShfMSODg8ahkpd6EspG6I+Tu1TNbli4akudVoZ7klwZtL6l8qp5UVmPO3KtPyt6EY2AH71qrbEzwiqCmEuQ1DF2eEyjuZdVbqc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=noOWt4pG; arc=none smtp.client-ip=209.85.219.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f49.google.com with SMTP id 6a1803df08f44-6dccccd429eso50514946d6.3;
+        Tue, 14 Jan 2025 19:13:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1736910817; x=1737515617; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=PpTzoD/ye+KTP7gxymR/okpXKgS/beqVqNicgHEcvMw=;
+        b=noOWt4pG5TanTS8KUtLHpn8YkrGotQkqJD7HC+MWrMTxdrS4Aftzyz+cZM99Yo3Jh9
+         M1qja10ttQ9a2rnd+6K/rbKFaXkweS52icSRshslb98SuRoBfeJrJpO5bX15ilUGpGRg
+         hb8nRP3VfPlLt8xae6GF0Wmsl+7D6OKx+ZtQrcWMKEoKTLkXD/2//9fwBnh9LOZstV/r
+         RG74gxwexyOWqTaPcGxAYtJndLitj+K8dVPyR2Yyp90mus15xUBobGkAM7L2fAE9ax7z
+         65avUYybotegCtyM5DhMeFFOBvnp2XSvj7JPn86IBKm7BzmjhIrvERjYvKCxOJBnRur+
+         DcEA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736910817; x=1737515617;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=PpTzoD/ye+KTP7gxymR/okpXKgS/beqVqNicgHEcvMw=;
+        b=iU/OcfkHdeeft/rWuF2e90UQixPVqvbcMRnRws6Ayo1Eacwo/WKoUL+tzgNPnD9H2J
+         MwjLoYJ8Ofy6SFuUL0m2I7PfTXfU7F3eAlf+J9ltK1FeUPg4IOawq/SQqeY9sbInXbXi
+         2Kvti7pvK7LDeO4XJscmB8u/FD4J6dkcaosaccXPrICPLuWRZiPtBExZkNKhXYvgskFs
+         J9B+rnQdOUQ3ffrYue/IkhoqkCzsUjTa+2PXA50fkmUAcy480wE4RPIRuAENu6JT7Lve
+         huK6K5TK416q+UOLYUzRcK8pMi4s+Wj6/rDiopVqDFvS3xuGlg8AuCCeY0TA6IE1oMjx
+         BJcw==
+X-Forwarded-Encrypted: i=1; AJvYcCU+cB6HtzHJm6OFcsT7oBXKQPshRqOyb60EBPTbIho5+YvjRQScjiDRxVIY0A+DW/5jk9MfMV89@vger.kernel.org, AJvYcCXrlp0lYvhbXZLX3r8jx9IBqe9wIEry4BB5hUDsDDQXDMW8YI9U+jVCY16VGSwuT1Nl9kY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw7JTDsmt5e6Bly2h/Ozz/JTTGzTYKBI43spuKodv5tWcdGGDKk
+	Rx2uaJi4NaS/Oy3JqTl0Uz4UkypWcQ3lM9PbVu87PicNFo4iLJ2cOF+qgXCE1XyELle46a3Bl0a
+	nYn85T2xWy4N8cbwvscKvQ/AcB70=
+X-Gm-Gg: ASbGncuFFDkKdi/gibFMecocDvy9GSbHRi/cahrhOw+KMLB3HhJrMgpNTnMLWNFk2Av
+	WDPj8BqB3xBfijvhOsCVmZpxusq86KLSxl9fF
+X-Google-Smtp-Source: AGHT+IH+CYAX72SyvQcFDJ6GsVSqiWWWnfYTSL8/Vuh7YS8GGSnaq9CzrCMo6/DAaet4t0ruECPcbQgAusL5xo+lkGo=
+X-Received: by 2002:a05:6214:5a08:b0:6d8:aa04:9a5d with SMTP id
+ 6a1803df08f44-6df9b1d1fa1mr406581456d6.4.1736910817485; Tue, 14 Jan 2025
+ 19:13:37 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <SEYPR06MB5134DD6F514225EA8607DC979D192@SEYPR06MB5134.apcprd06.prod.outlook.com>
+References: <20250112064513.883-1-laoar.shao@gmail.com> <CAEf4BzZcs6YP067-KJYQRsMJMLooypepq8iiX7wXu7CZwVhD3g@mail.gmail.com>
+In-Reply-To: <CAEf4BzZcs6YP067-KJYQRsMJMLooypepq8iiX7wXu7CZwVhD3g@mail.gmail.com>
+From: Yafang Shao <laoar.shao@gmail.com>
+Date: Wed, 15 Jan 2025 11:13:01 +0800
+X-Gm-Features: AbW1kvb-dIXz4uBz4Mj9_8CuK_ym1PsFudUg4rh-ljRRu-iM2RKnrYCFoIBjtjQ
+Message-ID: <CALOAHbAXyLy6gcRLwtF9rz8v5hcpx5ua4En25sst3pgUu0K=xA@mail.gmail.com>
+Subject: Re: [RFC PATCH v2 0/2] libbpf: Add support for dynamic tracepoints
+To: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Cc: andrii@kernel.org, eddyz87@gmail.com, ast@kernel.org, daniel@iogearbox.net, 
+	martin.lau@linux.dev, song@kernel.org, yonghong.song@linux.dev, 
+	john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me, 
+	haoluo@google.com, jolsa@kernel.org, edumazet@google.com, dxu@dxuuu.xyz, 
+	bpf@vger.kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jan 15, 2025 at 02:57:04AM +0000, Jacky Chou wrote:
-> Hi Andrew and Ninad,
-> 
-> > >
-> > > Thanks. What will be the "phy-mode" value after you make these changes?
-> > >
-> > > Will it be "rgmii-id" for MAC1..4?
-> > 
-> > It should be.
-> 
-> Perhaps we will keep using "rgmii"
+On Wed, Jan 15, 2025 at 6:32=E2=80=AFAM Andrii Nakryiko
+<andrii.nakryiko@gmail.com> wrote:
+>
+> On Sat, Jan 11, 2025 at 10:45=E2=80=AFPM Yafang Shao <laoar.shao@gmail.co=
+m> wrote:
+> >
+> > The primary goal of this change is to enable tracing of inlined kernel
+> > functions with BPF programs.
+> >
+> > Dynamic tracepoints can be created using tools like perf-probe, debugfs=
+, or
+> > similar utilities. For example:
+> >
+> >   $ perf probe -a 'tcp_listendrop sk'
+> >   $ ls /sys/kernel/debug/tracing/events/probe/tcp_listendrop/
+> >   enable  filter  format  hist  id  trigger
+> >
+> > Here, tcp_listendrop() is an example of an inlined kernel function.
+> >
+> > While these dynamic tracepoints are functional, they cannot be easily
+> > attached to BPF programs. For instance, attempting to use them with
+> > bpftrace results in the following error:
+> >
+> >   $ bpftrace -l 'tracepoint:probe:*'
+> >   tracepoint:probe:tcp_listendrop
+> >
+> >   $ bpftrace -e 'tracepoint:probe:tcp_listendrop {print(comm)}'
+> >   Attaching 1 probe...
+> >   ioctl(PERF_EVENT_IOC_SET_BPF): Invalid argument
+> >   ERROR: Error attaching probe: tracepoint:probe:tcp_listendrop
+> >
+> > The issue lies in how these dynamic tracepoints are implemented: despit=
+e
+> > being exposed as tracepoints, they remain kprobe events internally. As =
+a
+> > result, loading them as a tracepoint program fails. Instead, they must =
+be
+> > loaded as kprobe programs.
+> >
+> > This change introduces support for such use cases in libbpf by adding a
+> > new section: SEC("kprobe/SUBSYSTEM/PROBE")
+> >
+> > - Future work
+> >   Extend support for dynamic tracepoints in bpftrace.
+>
+> Seems like the primary motivation is bpftrace support, so let's start
+> there.
 
-No. It is wrong.
+I believe we should extend support for this feature in BCC as well.
+Since this is a common and widely applicable feature, wouldn't it make
+sense to include it directly in libbpf?
 
-> The reason is we cannot be sure all PHYs have support for phy-mode property.
-> We will refer to the other MACs and PHYs driver about phy-mode and 
-> rx/tx-internal-delay-ps properties how they implement.
-> 
-> Currently, we will plan to implement RGMII delay in ftgmac100 driver based on
-> ethernet-controller.yaml.
-> 
-> At same time, we will think how to configure these phy-mode "rgmii-rxid", "rgmii-txid" 
-> and "rgmii-id in MAC driver.
+> I'm hesitant to include this in libbpf right now. The whole
+> SEC("kprobe") that calls "attach_tracepoint()" underneath makes me
+> uncomfortable.
 
-I already explain how this works once. Please read this thread
-again.... The MAC can apply the delays, but it must mask the phy-mode
-it passes to the PHY.
+I reused the bpf_program__attach_tracepoint() function, but if we
+examine its implementation closely, we can see that it actually
+creates a DECLARE_LIBBPF_OPTS(bpf_perf_event_opts, pe_opts); rather
+than a bpf_tracepoint_opts.
 
-	Andrew
+If naming is a significant concern, it wouldn=E2=80=99t be difficult to
+reimplement the same logic with a more appropriate name, such as
+attach_kprobe_based_tracepoint().
+
+>
+> You can still attach to such dynamic probe today with pure libbpf
+> (e.g., if bpftrace needs to do this, for example) by creating
+> perf_event FD from tracefs' id, and then using
+> bpf_program__attach_perf_event_opts() to attach to it. It will be on
+> the user to use either tracepoint or kprobe BPF program for such
+> attachment.
+
+You're right=E2=80=94we can manually attach it in the tools, but if we can
+make it auto-attachable in libbpf, why not take advantage of that and
+simplify the process?
+
+
+>
+> Yes, this doesn't work "declaratively" with a nice SEC("...") syntax,
+> but at least it's doable programmatically, and that's what matters for
+> bpftrace.
+
+
+--
+Regards
+Yafang
 
