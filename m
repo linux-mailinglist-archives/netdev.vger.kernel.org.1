@@ -1,105 +1,236 @@
-Return-Path: <netdev+bounces-158481-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158482-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D167A11FC3
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 11:36:05 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1075DA11FD4
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 11:38:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 99D381603B4
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 10:36:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A4B163A698C
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 10:38:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37DCF1EEA2A;
-	Wed, 15 Jan 2025 10:32:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2617248BB6;
+	Wed, 15 Jan 2025 10:38:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="X/up0YZ/"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="eMN1r21d"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fllvem-ot04.ext.ti.com (fllvem-ot04.ext.ti.com [198.47.19.246])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70AFF248BD2
-	for <netdev@vger.kernel.org>; Wed, 15 Jan 2025 10:32:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CFE1248BA4;
+	Wed, 15 Jan 2025 10:38:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.246
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736937166; cv=none; b=LQLZlaGLinyh0XGmJ/FAe6iLWEnk0LOoaK6fU3n2I1gl8nIRD4SP5t8UjAIbSAuWM4HlkJJMnKjuRnGYw0tN5jQLzq0XpzqVa/kKCE4HM4etHDo2KuV3oSBKKxWcKAzNZJBYRhoWDReYoEeQajh7pssc2UF/5tIgYEFZ5zvzQYU=
+	t=1736937510; cv=none; b=hkDbJwvqvlB6Mw2k4N6gRzFm+kETB+AgN16uB0bRsv9iqlG+sowlh8Ss78wts9ZpLoqhR8gsfnJpdHNelcwZKkBFetg6dD2jcYstjXZWEXGkbq0u/QFE2YFMplxKIHaldtsvlokgWaDGYSUXTW3p4UiDwpSahGkeodv1UcUcIfM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736937166; c=relaxed/simple;
-	bh=kG1nWW7S26qSrv4/pOdn/YimebDaM2xgx3XXbTQ3qfc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=sy5yykXX2WJp7s+lbOCTyGH+GttrTcqIbP91LE059/qRRptFJA5c1HaQVLiz3BA031dhlp0KjvPYrONHA5AdtYYdebOIo6BgqXb6zBUnIpm2Tq/saMzEhmXI4PbPY8vz7mvVMQDyMDRwnFPbBqoPwLEk7PYIUMeJU3xD37q993E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=X/up0YZ/; arc=none smtp.client-ip=209.85.208.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-5d88c355e0dso11569045a12.0
-        for <netdev@vger.kernel.org>; Wed, 15 Jan 2025 02:32:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1736937163; x=1737541963; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kG1nWW7S26qSrv4/pOdn/YimebDaM2xgx3XXbTQ3qfc=;
-        b=X/up0YZ/0DxZau1men5f6Ejp7Ujt5dckS4hMfzC9gro4BNlf5spIgcfVH6jvG4JCYV
-         V6e9aTDbEIiqcVz230fzSCrqfmegXljuAaXPc+T1zsycxcrAp1/3tA0K0NlFwFf91Uig
-         7jS9JsjgroI3YmubFCWi2DXtQpG+wxEkO5ouTiHKk8vCBd5Gl2t5yO7AjN7+QNElojSn
-         MaftygNoSwI5ewhRBBzgymqhQMigk82X0Ejhl1vHi6hlLFRGmsqHBpHhkcveYipxAjAK
-         Emr66mGgxumAUnjTmxCiEyvt81i6yIi8zQ5ZYoxXxeREuvrSA4jHeKV27W4g5sxpqA32
-         1HfQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736937163; x=1737541963;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=kG1nWW7S26qSrv4/pOdn/YimebDaM2xgx3XXbTQ3qfc=;
-        b=luGwiAU8KNBf7tvUgtUB7p1Mu8MdheLvp9QVIfYgtb3syc5uSfznF6CXO7dcaFXdTf
-         P/IKY7WxEhhH+b/YjHaLs4DTg7WGG9BDkFA1rmI42gdL1stfGVMSBwC2P9nKvduh1mmy
-         LeqdRNuiHW1XC5/OQdrI/yy1tuT9TzR/lXl6/gNSg/TiP4zW0Tix0bJy2PLWyomehwfT
-         T/2d2C6KIWjYeNqJyTq9rJPf3GH5x0Lf7NxGAyR1Uum7PgxJWHZlioH3I5FtxMNzHIf6
-         YKjxuKVJFyQRw6G8Mn3sgOxim6/7AZjMFPfi+hwAOqahwznJGHg5TCifW0Pm0iQyEF2n
-         eG4w==
-X-Forwarded-Encrypted: i=1; AJvYcCWqkMOs/tiNJd4zaI7Kmq3T1pPOg/6gOV/UsbiuOEVVZJtTXgelbBx83LKkMUkrZt7BgJnex/U=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw2s4xxldpaxW7Ll95zwssIzu+CnF7pF+JqgRYcOkVlPyWx4h3E
-	0axvKzletZcAy6SCx0n8LURsVAaehQBNZrmnTh0rlw+swS3BJm4wQ5GrAZXoFWX1xiGSYdBxDRQ
-	iVYeqbjhGT/PxWdCnr0fu7+26WFSG0W/cbSpZ
-X-Gm-Gg: ASbGncuTPDKn2KcZgdbBom43zbXMrDL+Pzak8e0+3TUucPrbKzj5ksesMsWajRbCyvN
-	uVYK+M6m6kpjVXbfxlpBUy8L0aOv7bGV/spACFA==
-X-Google-Smtp-Source: AGHT+IFPNXYBqfx0I4jfHafkpWjEsjTdYHAjhR1WKOc5vCiQK+5CBkdcw4uZ0x7DBp+g1oKYKtVDQxhzB0j26zc24p4=
-X-Received: by 2002:a05:6402:5241:b0:5d0:eb2d:db97 with SMTP id
- 4fb4d7f45d1cf-5d972e64807mr26411907a12.25.1736937162549; Wed, 15 Jan 2025
- 02:32:42 -0800 (PST)
+	s=arc-20240116; t=1736937510; c=relaxed/simple;
+	bh=Jbeu6FtJK3uXjY3ab59hFF2zcGilCnkpp7k8ZEZzW6c=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=olz5zU7xi96OKfwWMT5lEjWK1LnsAAtD1dtn4cPTFEoEaUVK9uf5JYs7otQFCnYqHs3uQ9IViSM+0VRbOakm4NDH/To/s1rwlb0f0WHisYz83Sly0CBaQrd5QU5qOYJ/iSwwxlfBulJ4J4tTZMKwBKyt6dArdSgr0zIFjbRFe/g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=eMN1r21d; arc=none smtp.client-ip=198.47.19.246
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from fllv0035.itg.ti.com ([10.64.41.0])
+	by fllvem-ot04.ext.ti.com (8.15.2/8.15.2) with ESMTPS id 50FAcGiZ4009895
+	(version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 15 Jan 2025 04:38:16 -0600
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1736937496;
+	bh=mL3Dnt9U/zSbR2BfUwFnOQJR5th32xjWapBTFPm3cg4=;
+	h=Date:From:To:CC:Subject:References:In-Reply-To;
+	b=eMN1r21dKCHWAB5iTisUM+56lZIl/O6BhLqtg5vtrBna1Me/AR339l1BqeQ1my+OD
+	 046m8sIS7AGBL4MwkbzcJ/cQpVr5tENP2TcZZAN/MbmwUcwp7ROC4UEMRjLXjkKQKB
+	 mQuQgCO33vFYIK3dUr2dc+jxI2gkg+1G4ez9I2Hk=
+Received: from DFLE103.ent.ti.com (dfle103.ent.ti.com [10.64.6.24])
+	by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 50FAcGmF024847
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Wed, 15 Jan 2025 04:38:16 -0600
+Received: from DFLE108.ent.ti.com (10.64.6.29) by DFLE103.ent.ti.com
+ (10.64.6.24) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Wed, 15
+ Jan 2025 04:38:16 -0600
+Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DFLE108.ent.ti.com
+ (10.64.6.29) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Wed, 15 Jan 2025 04:38:16 -0600
+Received: from localhost (uda0492258.dhcp.ti.com [10.24.72.104])
+	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 50FAcE1W035356;
+	Wed, 15 Jan 2025 04:38:15 -0600
+Date: Wed, 15 Jan 2025 16:08:14 +0530
+From: Siddharth Vadapalli <s-vadapalli@ti.com>
+To: Roger Quadros <rogerq@kernel.org>
+CC: Siddharth Vadapalli <s-vadapalli@ti.com>,
+        Andrew Lunn
+	<andrew+netdev@lunn.ch>,
+        "David S. Miller" <davem@davemloft.net>,
+        "Eric
+ Dumazet" <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>,
+        Grygorii Strashko <grygorii.strashko@ti.com>, <srk@ti.com>,
+        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net] net: ethernet: ti: am65-cpsw: fix freeing IRQ in
+ am65_cpsw_nuss_remove_tx_chns()
+Message-ID: <m4rhkzcr7dlylxr54udyt6lal5s2q4krrvmyay6gzgzhcu4q2c@r34snfumzqxy>
+References: <20250114-am65-cpsw-fix-tx-irq-free-v1-1-b2069e6ed185@kernel.org>
+ <gygqjjyso3p4qgam4fpjdkqidj2lhxldkmaopqg32bw3g4ktpj@43tmtsdexkqv>
+ <8776a109-22c3-4c1e-a6a1-7bb0a4c70b06@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250115095545.52709-1-kuniyu@amazon.com> <20250115095545.52709-4-kuniyu@amazon.com>
-In-Reply-To: <20250115095545.52709-4-kuniyu@amazon.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 15 Jan 2025 11:32:31 +0100
-X-Gm-Features: AbW1kvZRxgr6RBlkemaEruACALC58hN-tYaTjd8BNvR5B3iUrBVXlTBKV2-p8Jc
-Message-ID: <CANn89i+4qWFZhQQbHapKt9FYtMUzH+WiK9UsKbHBzT9J2E3yDg@mail.gmail.com>
-Subject: Re: [PATCH v1 net-next 3/3] dev: Hold rtnl_net_lock() for dev_ifsioc().
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <8776a109-22c3-4c1e-a6a1-7bb0a4c70b06@kernel.org>
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
 
-On Wed, Jan 15, 2025 at 10:57=E2=80=AFAM Kuniyuki Iwashima <kuniyu@amazon.c=
-om> wrote:
->
-> Basically, dev_ifsioc() operates on the passed single netns (except
-> for netdev notifier chains with lower/upper devices for which we will
-> need more changes).
->
-> Let's hold rtnl_net_lock() for dev_ifsioc().
->
-> Now that NETDEV_CHANGENAME is always triggered under rtnl_net_lock()
-> of the device's netns. (do_setlink() and dev_ifsioc())
->
-> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+On Wed, Jan 15, 2025 at 12:04:17PM +0200, Roger Quadros wrote:
+> Hi Siddharth,
+> 
+> On 15/01/2025 07:18, Siddharth Vadapalli wrote:
+> > On Tue, Jan 14, 2025 at 06:44:02PM +0200, Roger Quadros wrote:
+> > 
+> > Hello Roger,
+> > 
+> >> When getting the IRQ we use k3_udma_glue_rx_get_irq() which returns
+> > 
+> > You probably meant "k3_udma_glue_tx_get_irq()" instead? It is used to
+> > assign tx_chn->irq within am65_cpsw_nuss_init_tx_chns() as follows:
+> 
+> Yes I meant tx instead of rx.
+> 
+> > 
+> > 		tx_chn->irq = k3_udma_glue_tx_get_irq(tx_chn->tx_chn);
+> > 
+> > Additionally, following the above section we have:
+> > 
+> > 		if (tx_chn->irq < 0) {
+> > 			dev_err(dev, "Failed to get tx dma irq %d\n",
+> > 				tx_chn->irq);
+> > 			ret = tx_chn->irq;
+> > 			goto err;
+> > 		}
+> > 
+> > Could you please provide details on the code-path which will lead to a
+> > negative "tx_chn->irq" within "am65_cpsw_nuss_remove_tx_chns()"?
+> > 
+> > There seem to be two callers of am65_cpsw_nuss_remove_tx_chns(), namely:
+> > 1. am65_cpsw_nuss_update_tx_rx_chns()
+> > 2. am65_cpsw_nuss_suspend()
+> > Since both of them seem to invoke am65_cpsw_nuss_remove_tx_chns() only
+> > in the case where am65_cpsw_nuss_init_tx_chns() *did not* error out, it
+> > appears to me that "tx_chn->irq" will never be negative within
+> > am65_cpsw_nuss_remove_tx_chns()
+> > 
+> > Please let me know if I have overlooked something.
+> 
+> The issue is with am65_cpsw_nuss_update_tx_rx_chns(). It can be called
+> repeatedly (by user changing number of TX queues) even if previous call
+> to am65_cpsw_nuss_init_tx_chns() failed.
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+Thank you for clarifying. So the issue/bug was discovered since the
+implementation of am65_cpsw_nuss_update_tx_rx_chns(). The "Fixes" tag
+misled me. Maybe the "Fixes" tag should be updated? Though we should
+code to future-proof it as done in this patch, the "Fixes" tag pointing
+to the very first commit of the driver might not be accurate as the
+code-path associated with the bug cannot be exercised at that commit.
+
+Independent of the above change suggested for the "Fixes" tag,
+
+Reviewed-by: Siddharth Vadapalli <s-vadapalli@ti.com>
+
+There seems to be a different bug in am65_cpsw_nuss_update_tx_rx_chns()
+which I have described below.
+
+> 
+> Please try the below patch to simulate the error condition.
+> 
+> Then do the following
+> - bring down all network interfaces
+> - change num TX queues to 2. IRQ for 2nd channel fails.
+> - change num TX queues to 3. Now we try to free an invalid IRQ and we see warning.
+> 
+> Also I think it is good practice to code for set value than to code
+> for existing code paths as they can change in the future.
+> 
+> --test patch starts--
+> 
+> diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.c b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
+> index 36c29d3db329..c22cadaaf3d3 100644
+> --- a/drivers/net/ethernet/ti/am65-cpsw-nuss.c
+> +++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
+> @@ -155,7 +155,7 @@
+>  			 NETIF_MSG_IFUP	| NETIF_MSG_PROBE | NETIF_MSG_IFDOWN | \
+>  			 NETIF_MSG_RX_ERR | NETIF_MSG_TX_ERR)
+>  
+> -#define AM65_CPSW_DEFAULT_TX_CHNS	8
+> +#define AM65_CPSW_DEFAULT_TX_CHNS	1
+>  #define AM65_CPSW_DEFAULT_RX_CHN_FLOWS	1
+>  
+>  /* CPPI streaming packet interface */
+> @@ -2346,7 +2348,10 @@ static int am65_cpsw_nuss_init_tx_chns(struct am65_cpsw_common *common)
+>  		tx_chn->dsize_log2 = __fls(hdesc_size_out);
+>  		WARN_ON(hdesc_size_out != (1 << tx_chn->dsize_log2));
+>  
+> -		tx_chn->irq = k3_udma_glue_tx_get_irq(tx_chn->tx_chn);
+> +		if (i == 1)
+> +			tx_chn->irq = -ENODEV;
+> +		else
+> +			tx_chn->irq = k3_udma_glue_tx_get_irq(tx_chn->tx_chn);
+
+The pair - am65_cpsw_nuss_init_tx_chns()/am65_cpsw_nuss_remove_tx_chns()
+seem to be written under the assumption that failure will result in the
+driver's probe failing.
+
+With am65_cpsw_nuss_update_tx_rx_chns(), that assumption no longer holds
+true. Please consider the following sequence:
+
+1.
+am65_cpsw_nuss_probe()
+  am65_cpsw_nuss_register_ndevs()
+    am65_cpsw_nuss_init_tx_chns() => Succeeds
+
+2.
+Probe is successful
+
+3.
+am65_cpsw_nuss_update_tx_rx_chns() => Invoked by user
+  am65_cpsw_nuss_remove_tx_chns() => Succeeds
+    am65_cpsw_nuss_init_tx_chns() => Partially fails
+      devm_add_action(dev, am65_cpsw_nuss_free_tx_chns, common);
+      ^ DEVM Action is added, but since the driver isn't removed,
+      the cleanup via am65_cpsw_nuss_free_tx_chns() will not run.
+
+Only when the user re-invokes am65_cpsw_nuss_update_tx_rx_chns(),
+the cleanup will be performed. This might have to be fixed in the
+following manner:
+
+@@ -3416,10 +3416,17 @@ int am65_cpsw_nuss_update_tx_rx_chns(struct am65_cpsw_common *common,
+        common->tx_ch_num = num_tx;
+        common->rx_ch_num_flows = num_rx;
+        ret = am65_cpsw_nuss_init_tx_chns(common);
+-       if (ret)
++       if (ret) {
++               devm_remove_action(dev, am65_cpsw_nuss_free_tx_chns, common);
++               am65_cpsw_nuss_free_tx_chns(common);
+                return ret;
++       }
+
+        ret = am65_cpsw_nuss_init_rx_chns(common);
++       if (ret) {
++               devm_remove_action(dev, am65_cpsw_nuss_free_rx_chns, common);
++               am65_cpsw_nuss_free_rx_chns(common);
++       }
+
+        return ret;
+ }
+
+ Please let me know what you think.
+
+
+Regards,
+Siddharth.
 
