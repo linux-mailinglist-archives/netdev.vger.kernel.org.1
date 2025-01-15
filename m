@@ -1,164 +1,119 @@
-Return-Path: <netdev+bounces-158539-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158540-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07F81A1268F
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 15:53:57 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 11081A12691
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 15:54:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A5BC13A67BE
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 14:53:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D178C1889C4C
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 14:54:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAD9C13DB9F;
-	Wed, 15 Jan 2025 14:53:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5680513A865;
+	Wed, 15 Jan 2025 14:54:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="Lm3wOwko"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="O7Sa1k/b"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3FC112BF24
-	for <netdev@vger.kernel.org>; Wed, 15 Jan 2025 14:53:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E6AB13C3D6
+	for <netdev@vger.kernel.org>; Wed, 15 Jan 2025 14:53:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736952822; cv=none; b=FYYBamHRFTFVS79tZuHQk/CL5o7QunNXfOSDGXrIQCn1WQgQLBLkd3zZv9tAt8oQs8HuukSUBMnV0GepFWJWttrkuM4VmPua99kVdr8MSlqW5iMgnYjNNlNXG5W9ioXG5MUi+MUhqJafgkgUVpAktzTlmXub/7xjWi4ruiD8h6o=
+	t=1736952842; cv=none; b=fjoHkrZl3yZ+hUsXw+0pzgdD/5sfeH5cduILoi75Fjd3mYjoauJg1DUcHzh2rt3iudhMCKRhskOdS/4QGLbHJIkWxNd+yJabMXIYpZm4KMM4P2aTFcvyVbAXP19+MizMH7ipWdhpwTFH3kr9YUOeji/HpQTWppKNGf40huOnQI0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736952822; c=relaxed/simple;
-	bh=1AvMoU+I739xYK4gjmeP4+Ghbvde9T/5mj9++l2dz3U=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Gmj/TiNfC+9v2+s0AxEZjfgMoX+oVGdqhz1Xz4eBPyz6I5VnDNFlDIToqrIhJ4IJTfs2I2kCqSc4vbL+jFQQg0kBkvodxeew6kPWM4DHDS/lzrxSqKBVsLOUSDueVkSLlmCKy4wTeq60qMV+Kp8Fav0H3cAyGyBTRCYIxaIvo9E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=Lm3wOwko; arc=none smtp.client-ip=209.85.216.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-2f441791e40so9008787a91.3
-        for <netdev@vger.kernel.org>; Wed, 15 Jan 2025 06:53:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1736952820; x=1737557620; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=dYlnNMwNgVCQYHqelJFFojRZvlLtalcOn671K/kH8yU=;
-        b=Lm3wOwkoN4A/NYmtQclAc5dHUl7d93wzkdsBJaoQh/4RxfLMuE4Ff7sSXy9arwqcaW
-         Pr8MJWgCJFOvnZ7ph8b7jHTX6OWahGmfGAhaBML/LYMHQUNbd9gSvM74ErbU5sZ3WQhR
-         GujGpDcfBE/DbFNmmmMZZg3WSDxY1bZdCvNGj9hd2PORpimKTRgj2Z5BlFe8ts3UGDAZ
-         Du+EXm9Eue8/IngYqOhhmWaFxyluWrUnOCE6ljFilgXsUTe2+m4L+IgMipLvylvpJuVf
-         40of/uHMTfiIPfSCEllBfZTGrilbIGscNq1Hp4F7czIspJR2QrNLprnjynD+btz1pxco
-         D22g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736952820; x=1737557620;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=dYlnNMwNgVCQYHqelJFFojRZvlLtalcOn671K/kH8yU=;
-        b=cgIYXfB0PcZs4DDjc4qtBi8jONBbyeZ88HCelAkUSLDRKhnfGUu10Rl2rbvUoOrrTL
-         kAAGQQeIQ9ca0EUzMlzyG8IQVf0HWYijqbJOy7hCRiShb7VL1fnc/ZoXAgW/NgECdeUm
-         0p5SUW+zou+hBYFDKj6zKpRdpy/jn7x22Ww2tMIgxT0TwJ9ytya6XXl7FTj+dZ5GWKAJ
-         C0blI40Iq5XU7deKPsv3NonbIf5OpVScaazO3v/6WNYx5aVdNRDWdJr7Qc0oQiuqx/Q4
-         sUfLqbQnV5NWc5BMPMEkSYdOpivRQIZ0hvuFOa52Qzer7YMFA0P27DlIcbLsveD9U6uj
-         J9KA==
-X-Gm-Message-State: AOJu0YzVPqIaycPH9KXhGxhy5VrdnSLmvew8UyVSxRyjvEMMGosBecQ2
-	sxzZEDVEP5rM+KT1PHJVkcFlygOt0RO4kkLy3SIzBkF1xnnbyGjWky5jOk6F4rSV7M2klTA1X2G
-	BgIbYs8t50Y7rbONLKDMBeDDYzxJfRxDMv3rh5hZHWi8PkPw=
-X-Gm-Gg: ASbGnctnOM4XKS8pNWhjyTXGlC9I7hGnlDiZtIeEocTInpMeAwnC4A/6iMPcatvK5sa
-	R6RSw51ZrRng4Vf5YeRtjlAdKN6IJMsIdzUR5
-X-Google-Smtp-Source: AGHT+IERWc+jKFDIxAo+VLfk/wRUDQYy7GLx+yu0HRC0TCYKbKsVfYvn/ENqhXXDbLSlX2F2LvKXROtXO+Lj+7xPNck=
-X-Received: by 2002:a17:90b:2f0e:b0:2ee:8e75:4ae1 with SMTP id
- 98e67ed59e1d1-2f548f6aa23mr38858722a91.21.1736952818519; Wed, 15 Jan 2025
- 06:53:38 -0800 (PST)
+	s=arc-20240116; t=1736952842; c=relaxed/simple;
+	bh=Ht71pen2DjZ4KrcyxlrE8/Qc3lERU/loKFju16OuWxw=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ocGw943gxpVLQfKQqDvzELkPsA4+jkepdgMvRx1yIXTWUgsTHMKKxcppLurJ7RSkmK9LhDmZxuslRKlKQcX8v3dIUQY7QZ2+tQ9VCa/+A+K7VfkNOH4/CwjcZpB/bR67fELV6NqgKxIeH01NcfVoUE00skCZwB081jQEdXRzywE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=O7Sa1k/b; arc=none smtp.client-ip=217.70.183.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 42FD420007;
+	Wed, 15 Jan 2025 14:53:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1736952837;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=A5HzedHrDTTaaYhW4c4vjlkU8W6+KNnjRLtnJ7FWDig=;
+	b=O7Sa1k/bt4nVGHriNYjerugIhcrT6/4qoUmwt0nufvXWFJ0XoYacyu2lg1IYfE8wX7Bu+G
+	W6u81AHHSIj+ToXo849sJQBQtCuU1LCh/YEmGB17dubCFOBDFyAzq0j+7oCuTghMMAi1k0
+	frCjkp8x88ZXzRPlKUU2dD3kIcg9Vvrr9oxBZO6++rOdLwrXejmgQes2HJy4CROUk5Co54
+	NwYk4Y3Muq0uhV1a70EoamSEZynuayFfa1z/Yg6+67UENHzS6n93Wakae4bZGZ/REU+NJG
+	+ke/eejMCpTCGV18rORimootvxuBCANSIXH7DYqIiiSaokT/o//9vNuFVUbKrQ==
+Date: Wed, 15 Jan 2025 15:53:54 +0100
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, Bryan Whitehead <bryan.whitehead@microchip.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ linux-arm-kernel@lists.infradead.org,
+ linux-stm32@st-md-mailman.stormreply.com, Marcin Wojtas
+ <marcin.s.wojtas@gmail.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+ <horms@kernel.org>, UNGLinuxDriver@microchip.com, Vladimir Oltean
+ <olteanv@gmail.com>
+Subject: Re: [PATCH RFC net-next 06/10] net: mvpp2: add EEE implementation
+Message-ID: <20250115155354.0acdacc7@fedora.home>
+In-Reply-To: <E1tXhUz-000n0k-IY@rmk-PC.armlinux.org.uk>
+References: <Z4ZtoeeHIXPucjUv@shell.armlinux.org.uk>
+	<E1tXhUz-000n0k-IY@rmk-PC.armlinux.org.uk>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250111151455.75480-1-jhs@mojatatu.com> <20250114172620.7e7e97b4@kernel.org>
- <CAM0EoMnYi3JBPS7KyPoW5-St-xAaJ8Xa1tEp8JH9483Z5k8cLg@mail.gmail.com> <20250115063655.21be5c74@kernel.org>
-In-Reply-To: <20250115063655.21be5c74@kernel.org>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Wed, 15 Jan 2025 09:53:27 -0500
-X-Gm-Features: AbW1kvbdk8ErKPpnkzXPYqKbGyJpZw3tOYaVH-3SpH4H6eAg8tGonrp2ChYkPxw
-Message-ID: <CAM0EoMk0rKe=AqoD_vNZNj2dz9eKSQpgS0Cc7Bi+FQwqpyHXaw@mail.gmail.com>
-Subject: Re: [PATCH net 1/1 v3] net: sched: Disallow replacing of child qdisc
- from one parent to another
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, jiri@resnulli.us, xiyou.wangcong@gmail.com, 
-	davem@davemloft.net, edumazet@google.com, security@kernel.org, 
-	nnamrec@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-On Wed, Jan 15, 2025 at 9:36=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Wed, 15 Jan 2025 09:15:31 -0500 Jamal Hadi Salim wrote:
-> > > On Sat, 11 Jan 2025 10:14:55 -0500 Jamal Hadi Salim wrote:
-> > > > The semantics of "replace" is for a del/add _on the same node_ and =
-not
-> > > > a delete from one node(3:1) and add to another node (1:3) as in ste=
-p10.
-> > > > While we could "fix" with a more complex approach there could be
-> > > > consequences to expectations so the patch takes the preventive appr=
-oach of
-> > > > "disallow such config".
-> > >
-> > > Your explanation reads like you want to prevent a qdisc changing
-> > > from one parent to another.
-> >
-> > Yes.
->
-> In the selftest with mq Victor updated I'd say we're not changing
-> the parent. We replace one child of mq with another.
-> TC noobs would say mq is the parent.
+Hello Russell,
 
-Yeah, Victor's test was to reduce the number of lines changed. IIRC,
-there was an _child_assert which would have to change to a different
-number given mq doesnt destroy the manually created qdiscs.
+On Tue, 14 Jan 2025 14:02:29 +0000
+"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk> wrote:
 
-You can replace a queue attributes (eg queue size) or its algorithm
-(example change from pfifo to bfifo) in place - that doesnt change.
-What the patch avoids is taking that queue and moving it elsewhere or
-having it "shared"; that puts it in the funny state that was used in
-the exploit.
-That was the ambiguity i was talking about in the earlier email.
+> Add EEE support for mvpp2, using phylink's EEE implementation, which
+> means we just need to implement the two methods for LPI control, and
+> with the initial configuration. Only SGMII mode is supported, so only
+> 100M and 1G speeds.
+> 
+> Disabling LPI requires clearing a single bit. Enabling LPI needs a full
+> configuration of several values, as the timer values are dependent on
+> the MAC operating speed.
+> 
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> --
+> v3: split LPI timer limit and validation into separate patches
+> ---
+>  drivers/net/ethernet/marvell/mvpp2/mvpp2.h    |  5 ++
+>  .../net/ethernet/marvell/mvpp2/mvpp2_main.c   | 86 +++++++++++++++++++
+>  2 files changed, 91 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/marvell/mvpp2/mvpp2.h b/drivers/net/ethernet/marvell/mvpp2/mvpp2.h
+> index 9e02e4367bec..364d038da7ea 100644
+> --- a/drivers/net/ethernet/marvell/mvpp2/mvpp2.h
+> +++ b/drivers/net/ethernet/marvell/mvpp2/mvpp2.h
+> @@ -481,6 +481,11 @@
+>  #define MVPP22_GMAC_INT_SUM_MASK		0xa4
+>  #define     MVPP22_GMAC_INT_SUM_MASK_LINK_STAT	BIT(1)
+>  #define	    MVPP22_GMAC_INT_SUM_MASK_PTP	BIT(2)
+> +#define MVPP2_GMAC_LPI_CTRL0			0xc0
+> +#define     MVPP2_GMAC_LPI_CTRL0_TS_MASK	GENMASK(8, 8)
 
-> > > > +                             if (leaf_q && leaf_q->parent !=3D q->=
-parent) {
-> > > > +                                     NL_SET_ERR_MSG(extack, "Inval=
-id Parent for operation");
-> > > > +                                     return -EINVAL;
-> > > > +                             }
-> > >
-> > > But this test looks at the full parent path, not the major.
-> > > So the only case you allow is replacing the node.. with itself?
-> > >
-> >
-> > Yes.
-> >
-> > > Did you mean to wrap these in TC_H_MAJ() || the parent comparison
-> > > is redundant || I misunderstand?
-> >
-> > I may be missing something - what does TC_H_MAJ() provide?
-> > The 3:1 and 1:3 in that example are both descendants of the same
-> > parent. It could have been 1:3 vs 1:2 and the same rules would apply.
->
-> Let me flip the question. What qdisc movement / grafts are you intending
-> to still support?
->
+I think this should be GENMASK(15, 8) :)
 
-Grafting essentially boils down to a del/add of a qdisc. The
-ambiguities: Does it mean deleting it from one hierachy point and
-adding it to another point? Or does it mean not deleting it from the
-first location but making it available in the other one?
+The rest looks good to me,
 
-> From the report it sounds like we don't want to support _any_ movement
-> of existing qdiscs within the hierarchy. Only purpose of graft would
-> be to install a new / fresh qdisc as a child.
+Thanks,
 
-That sounded like the safest approach. If there is a practical use for
-moving queues around (I am not aware of any, doesnt mean there is no
-practical use) then we can do the much bigger surgery.
-
-cheers,
-jamal
+Maxime
 
