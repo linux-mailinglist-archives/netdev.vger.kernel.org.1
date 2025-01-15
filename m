@@ -1,186 +1,143 @@
-Return-Path: <netdev+bounces-158437-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158438-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0BE79A11D72
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 10:23:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D4661A11D77
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 10:23:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4C5AF7A2FBA
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 09:23:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2A36E7A123F
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 09:23:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BDD2236EB2;
-	Wed, 15 Jan 2025 09:19:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iYoCJFCU"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8999C248177;
+	Wed, 15 Jan 2025 09:23:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72DA71EEA3C;
-	Wed, 15 Jan 2025 09:19:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 725C8248171;
+	Wed, 15 Jan 2025 09:23:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736932786; cv=none; b=BqDd0TwvJN6TqCJATO7l71XbgEEgMqMB8y1aQI8IZRvHBHdSvbs226yr7677UkcJ8933D/6zCVNT7XLFTL+Fv4qXohQ6IsmYc3cHcH4YxRTAafDa1lVi7AGHH3HqsstrVHsl567LMSxr7wK/AQ0k8HRITbh4w5L9gRTeAAvDxCk=
+	t=1736933020; cv=none; b=Cp+DYNFgPM9VLscaEJwBqi6G87eH7drIiqXOy8ZwEd1ih8Au4Xb0+emA8Fa6de38hMVOm5HdBUqwGcln8Z6keOfig2Gr90o04VdvA85p9T54/lf2SZLzVOjxq1btpGZN5niD3eWJhzv9MNJmuX675U92AxIsk7k7lq+uuWYPPcw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736932786; c=relaxed/simple;
-	bh=RvhwOre/z7gR+muMadtDKtL5V3OxuoZM3Ph6e0Y81N0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VLasmJ8A0ltLZQ7je6E+USVuvVUbjMBDCatbQRPRJ+HVCNMJ2dUx6NQPR69Ty2sWP5r4X3ts6m+dZ5TTC6AqQEATIEDq8et8UqPyxDEGiE0cfiKCYUorj+9PbZElDtV2PD83o/lczSPc8mDYu2F/1LjrQYy+Xe/xqoG75mkf7U8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iYoCJFCU; arc=none smtp.client-ip=209.85.214.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-2167141dfa1so11352915ad.1;
-        Wed, 15 Jan 2025 01:19:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736932784; x=1737537584; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=sXdSbSC6AwIP7P9EAjkKQv89mKJ3kko9rfa47rf4ABc=;
-        b=iYoCJFCU+awc4I4CgKNIQRb0FY44DJfQO/qeoUP2lCRS1rF5rqaIMYFKpJACsDiLfq
-         AHo6WcdxyzP6SDOzSmxXESmtsq2aKfWdh7k7JXuiCQBbPfyHIJPSHTxMypYh3keq7sf2
-         f9P5wzfcip7CBqxvCmlQw0QVVOCGpcd3drWIJH9SYhD9+ON4Uaoq2PXJF4IEQ9rCt5/r
-         hYwvQmrLuRAyNqra9zJyW1x1kqKZY6Qw9Njo9gOgSSC0L7gAa0CiTvC2KM5MiRB0uS+Y
-         BtAenVK/F30+3xv+c6r8MVCe+tH2AvUCrEeSHd+j0uA9PwVkFZv5Kj+xrUl7XXWkvS8/
-         WttQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736932784; x=1737537584;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sXdSbSC6AwIP7P9EAjkKQv89mKJ3kko9rfa47rf4ABc=;
-        b=MmvT2GheXy2/Wk/meQkomPqYCWKjcI3hSDZQhtzlRroSuAL/+oYtc3Pf5+tuHkKtou
-         Ri4Dxf/sFQTI1i/MY01uo4svVxl2fs3Af0SL7nz17BhO1hJ3Jrz6KYdnLf8p38ZlPfnj
-         2MPESy12c71fla4gaSpi9W2eBdW+FwxK0R+OxIiDI41yKbIxwzqz0P3lhbg1cYrJjyDO
-         MTXrQJHh4JhBJSLPCgVzwsS301/sCxNdRAZP548/CHsXb4agjQec934YUP8Mkptx6F60
-         m0144hBMRHnzx+KP7afWcdNbv4BrVyo6Ac66z8PxcwvhZG8IURT8WZTWwSVnUujJNEiJ
-         bpOw==
-X-Forwarded-Encrypted: i=1; AJvYcCUq5aKLQZyKH8T4Uax6ivcq8DT5D+HsmK/Uo9n8/tP7wt5RZYV6Duw7jxS8OgzcwwRNmUP4gl8km0nmUqw=@vger.kernel.org, AJvYcCWaAS60NeD6nqhn2i12uUY4jUs0M+5UmTvucjUVel3q0GDXHxJdk32nJIZxsKYlSuDBGocevMCJBt3rdrHHwRom@vger.kernel.org, AJvYcCX3x7R/dTIeQxiJ4P5fXGiGhvDSRkcBFjl4ZBFdMolvHTp3oc2j064l9V5HU0wmG5clom/m0tzu@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw5wNfWJcldlRif86TqRa1fZP2xEzIQJRIuKtGwoW8ByyDuy+ps
-	HmGdzUpS4uC+dBYevdhbKtvMYKm1DvaZYDsj8JLBAQin8n9vDVP0
-X-Gm-Gg: ASbGnctROrzpJTx2iX9EdWafxsujYFQRoqsscxvN1occcg96uloxuedWAVksnG349lT
-	6ifpklQv8BhifFNGB/iSycsXia9y5Q+2r968SkvfQUebpU+rqAZFNT9T7l8WXnLL9hVX63IXCJw
-	x3tSUTKSDE5ZeCkyYAqLMd6UKqUQUTK6XTraeiECwWD35jWA8RJJbWgjwZlRTg1WfHj69mOwmyo
-	Of92QU/F+N3uYqWaV7Xnryy+BObKBoDr+TczkKeP/xb5P1OMCWcJkBEnznyRQ==
-X-Google-Smtp-Source: AGHT+IGlB215DiONNHf9EqhRn2hGW0cLM3QYP1QRMSjhhYG7i+IPrOxNCHkNUpojeqrVDfYyeu3HAQ==
-X-Received: by 2002:a17:90b:1f8c:b0:2ee:8cbb:de28 with SMTP id 98e67ed59e1d1-2f728deacf6mr3779482a91.8.1736932783628;
-        Wed, 15 Jan 2025 01:19:43 -0800 (PST)
-Received: from fedora ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2f72c2f69d1sm911702a91.45.2025.01.15.01.19.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Jan 2025 01:19:42 -0800 (PST)
-Date: Wed, 15 Jan 2025 09:19:33 +0000
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Steffen Klassert <steffen.klassert@secunet.com>,
-	Jianbo Liu <jianbol@nvidia.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	Jay Vosburgh <jv@jvosburgh.net>,
-	Andy Gospodarek <andy@greyhouse.net>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Simon Horman <horms@kernel.org>, Tariq Toukan <tariqt@nvidia.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>, Shuah Khan <shuah@kernel.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Sabrina Dubroca <sd@queasysnail.net>,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net 0/2] bond: fix xfrm offload feature during init
-Message-ID: <Z4d9pVshf3RKQp_o@fedora>
-References: <20241211071127.38452-1-liuhangbin@gmail.com>
- <20241212062734.182a0164@kernel.org>
- <Z1vfsAyuxcohT7th@fedora>
- <20241213193127.4c31ef80@kernel.org>
- <Z3X9pfu12GUOBUY6@fedora>
- <1d8c901f-e292-43e4-970f-8440b26e92b0@nvidia.com>
- <Z3u0q5HSOshLn2V0@fedora>
- <Z33nEKg4PxwReUu_@fedora>
- <ad289f9a-41c3-4544-8aeb-535615f45aef@nvidia.com>
- <Z34l6hpbzPP9n65Y@fedora>
+	s=arc-20240116; t=1736933020; c=relaxed/simple;
+	bh=u9nQ62Cqws90qRdvAbxG1Lsc7wDKsH8xbteVuDu2FWg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=fx83A8XmHhbv1Q4/98Ftr0JxLb+D4MhoYyuL8hm+3/bMwl7TumNAOu4C79W8WJP+XoYo7aH0pOkahksJMGa85pvZUXOX6o6V7OKJ4RzZJMlzOJOGoN7YYcOlgTqtqsJztID+zOK+BZFZDdS1cOZvhCQgJjoRpmF2zVwjS901nlE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [192.168.0.2] (ip5f5af1b4.dynamic.kabel-deutschland.de [95.90.241.180])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 9D6D261E64783;
+	Wed, 15 Jan 2025 10:22:10 +0100 (CET)
+Message-ID: <990a3fc9-7fd6-49b6-8918-d5bf4ae48953@molgen.mpg.de>
+Date: Wed, 15 Jan 2025 10:22:09 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z34l6hpbzPP9n65Y@fedora>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v7 3/3] net: stmmac: dwmac-nuvoton: Add dwmac
+ glue for Nuvoton MA35 family
+To: Joey Lu <a0987203069@gmail.com>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org,
+ conor+dt@kernel.org, mcoquelin.stm32@gmail.com, richardcochran@gmail.com,
+ devicetree@vger.kernel.org, ychuang3@nuvoton.com, netdev@vger.kernel.org,
+ openbmc@lists.ozlabs.org, alexandre.torgue@foss.st.com,
+ linux-kernel@vger.kernel.org, joabreu@synopsys.com,
+ Andrew Lunn <andrew@lunn.ch>, schung@nuvoton.com, peppe.cavallaro@st.com,
+ yclu4@nuvoton.com, linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org
+References: <20250113055434.3377508-1-a0987203069@gmail.com>
+ <20250113055434.3377508-4-a0987203069@gmail.com>
+ <a30b338f-0a6f-47e7-922b-c637a6648a6d@molgen.mpg.de>
+ <2cf758f2-529e-4ccd-9dc1-18fc29ad5ac0@gmail.com>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <2cf758f2-529e-4ccd-9dc1-18fc29ad5ac0@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Wed, Jan 08, 2025 at 07:15:00AM +0000, Hangbin Liu wrote:
-> > > > > > I don't know how to disable bonding sleeping since we use mutex_lock now.
-> > > > > > Hi Jianbo, do you have any idea?
-> > > > > > 
-> > > > > 
-> > > > > I think we should allow drivers to sleep in the callbacks. So, maybe it's
-> > > > > better to move driver's xdo_dev_state_delete out of state's spin lock.
-> > > > 
-> > > > I just check the code, xfrm_dev_state_delete() and later
-> > > > dev->xfrmdev_ops->xdo_dev_state_delete(x) have too many xfrm_state x
-> > > > checks. Can we really move it out of spin lock from xfrm_state_delete()
-> > > 
-> > > I tried to move the mutex lock code to a work queue, but found we need to
-> > > check (ipsec->xs == xs) in bonding. So we still need xfrm_state x during bond
-> > 
-> > Maybe I miss something, but why need to hold spin lock. You can keep xfrm
-> > state by its refcnt.
+Dear Joey,
+
+
+Thank you for your prompt reply.
+
+
+Am 15.01.25 um 10:03 schrieb Joey Lu:
+
+> Paul Menzel 於 1/14/2025 9:49 AM 寫道:
+
+[…]
+
+>> Am 13.01.25 um 00:54 schrieb Joey Lu:
+>>> Add support for Gigabit Ethernet on Nuvoton MA35 series using dwmac 
+>>> driver.
+
+[…]
+
+>> Also, please document how tested the driver. Maybe even paste new log 
+>> messages.
 > 
-> Do you mean move the xfrm_dev_state_delete() out of spin lock directly like:
+> These are the kernel configurations for testing the MA35D1 GMAC driver: 
+> ARCH_MA35, STMMAC_PLATFORM, DWMAC_NUVOTON.
 > 
-> diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
-> index 67ca7ac955a3..6881ddeb4360 100644
-> --- a/net/xfrm/xfrm_state.c
-> +++ b/net/xfrm/xfrm_state.c
-> @@ -766,13 +766,6 @@ int __xfrm_state_delete(struct xfrm_state *x)
->  		if (x->encap_sk)
->  			sock_put(rcu_dereference_raw(x->encap_sk));
->  
-> -		xfrm_dev_state_delete(x);
-> -
-> -		/* All xfrm_state objects are created by xfrm_state_alloc.
-> -		 * The xfrm_state_alloc call gives a reference, and that
-> -		 * is what we are dropping here.
-> -		 */
-> -		xfrm_state_put(x);
->  		err = 0;
->  	}
->  
-> @@ -787,8 +780,20 @@ int xfrm_state_delete(struct xfrm_state *x)
->  	spin_lock_bh(&x->lock);
->  	err = __xfrm_state_delete(x);
->  	spin_unlock_bh(&x->lock);
-> +	if (err)
-> +		return err;
->  
-> -	return err;
-> +	if (x->km.state == XFRM_STATE_DEAD) {
-> +		xfrm_dev_state_delete(x);
-> +
-> +		/* All xfrm_state objects are created by xfrm_state_alloc.
-> +		 * The xfrm_state_alloc call gives a reference, and that
-> +		 * is what we are dropping here.
-> +		 */
-> +		xfrm_state_put(x);
-> +	}
-> +
-> +	return 0;
->  }
->  EXPORT_SYMBOL(xfrm_state_delete);
->  
+> I'm not sure if this information is sufficient, so please provide some 
+> guidance on what else I should include to meet your requirements.
 
-Hi Jianbo,
+I’d be interested on what hardware you tested it. Probably some 
+evaluation or customer reference board.
 
-I talked with Sabrina and it looks we can't simply do this. Because both
-xfrm_add_sa_expire() and xfrm_timer_handler() calling __xfrm_state_delete() under
-spin lock. If we move the xfrm_dev_state_delete() out of __xfrm_state_delete(),
-all the places need to be handled correctly.
+> I will include the log messages at the end of the email.
 
-At the same time xfrm_timer_handler() calling xfrm_dev_state_update_stats before
-__xfrm_state_delete(). Should we also take care of it to make sure the state
-change and delete are called at the same time?
+Awesome. Thank you. Personally, I also like to see those in the commit 
+message.
 
-Hi Steffen, do you have any comments?
+>>> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+>>> Signed-off-by: Joey Lu <a0987203069@gmail.com>
+>>
+>> As you use your company email address in the AUTHOR line below, please 
+>> also add that email address to the commit message (and maybe even as 
+>> the author).
+>
+> I will update the AUTHOR to use my personal email address instead of the 
+> company email.
 
-Thanks
-Hangbin
+Understood. (yclu4@nuvoton.com is also personal, but the Gmail address 
+is private, I guess. ;-)).
+
+For statistics, how companies contribute to the Linux kernel, having the 
+company address somewhere would be nice though, as you are doing this as 
+your work at Nuvoton, right?
+
+>>> ---
+>>>   drivers/net/ethernet/stmicro/stmmac/Kconfig   |  11 ++
+>>>   drivers/net/ethernet/stmicro/stmmac/Makefile  |   1 +
+>>>   .../ethernet/stmicro/stmmac/dwmac-nuvoton.c   | 179 ++++++++++++++++++
+>>>   3 files changed, 191 insertions(+)
+>>>   create mode 100644 drivers/net/ethernet/stmicro/stmmac/dwmac-nuvoton.c
+
+[…]
+
+> log:
+> 
+> [    T0] Booting Linux on physical CPU 0x0000000000 [0x411fd040]
+
+Out of curiosity, how do you get these timestamps T0, T1, …?
+
+[…]
+
+
+Thank you and kind regards,
+
+Paul
 
