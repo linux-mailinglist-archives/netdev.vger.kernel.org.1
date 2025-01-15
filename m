@@ -1,147 +1,98 @@
-Return-Path: <netdev+bounces-158648-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158649-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88295A12D9F
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 22:22:39 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A4D4AA12DB3
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 22:30:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 20B343A40BB
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 21:22:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3EE1C3A4C9A
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 21:30:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37DFC1DA103;
-	Wed, 15 Jan 2025 21:22:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E0721DB943;
+	Wed, 15 Jan 2025 21:30:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ZJkAF7az"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RMWiQQuu"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-176.mta0.migadu.com (out-176.mta0.migadu.com [91.218.175.176])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CDE31D79A9
-	for <netdev@vger.kernel.org>; Wed, 15 Jan 2025 21:22:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D81971DB15C;
+	Wed, 15 Jan 2025 21:30:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736976156; cv=none; b=Q/0fc0M1ylBJZuC67E/zIReRy8jT/D+x+eVBfqPkzL6hWAThhc3A9gVNjYE0jEXIndH2lRS5Sfv3GQ2rbPjxqpdwH3C6aypk2Vr3ddGzWl7F7iCojIjfkSbdoSknjFhEq8Ek8dY4cV4Zwy7jcauxHG2cMpRNorDIqWLkadEtotE=
+	t=1736976611; cv=none; b=KFxM2QY2cjFHN/lEFS+Q6YIUK5YafAnPW5RYE+410NL4KlpDYDkBBPPh98J9dmY/UJGDRHw1R8ZOhP3v+ExfmYIGMZhQCa855x+2srZ7Qh3vHpNwqduEvOz+lt5oSarzbOLawcnlYj4l1Wi7REg9ChFRvmFGl0FK+aIQyTACSQc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736976156; c=relaxed/simple;
-	bh=uraepEbQJnaWY3X4oH+bHhZuel7YSuPlB/L4bjCLQwc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ogMKdT9CkvaILt+UVw8VX2o/L3/FNK4d0JHgJ5QQpBZGMBWdp97Phpf1LBvnGG2UQu5pV8WTFI8QoViTUPMK2GF9G6lgoYP8UFelCRCnmGGljGU+crGgagZi3pUEGvCm91Vn1AmDb66gZAqbyaRiW7UaebL5c2M4J6DqrB32CWI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ZJkAF7az; arc=none smtp.client-ip=91.218.175.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <80309f62-0900-4946-bb2c-d73a2b724739@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1736976137;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=e0Bgm5lCM/3V2FVS63iTi2McfY+jsPoi84BVnDZHNH4=;
-	b=ZJkAF7azXjdAaWgHQrqGQ5hfnYBRhjUmIXiplGGVuLtFFKn+OL9C3oFLjhIH0gaVdZwcuq
-	e5LBrowv2EYsx/Wo5ljGCNcZ7/2KrthA+kzDNaN8FfORHZNsL7tCUL28UghILR1+iyh9nc
-	5Q6uzabsV4+lzo9lplO+WRRsbfNPnF4=
-Date: Wed, 15 Jan 2025 13:22:10 -0800
+	s=arc-20240116; t=1736976611; c=relaxed/simple;
+	bh=DAZ1OUcJEkhA34HJivvdY5l8I6j6aFS+wT4ukAJ0H9I=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=sMBDbBLbqbuSVg1Igw65hW3TqkfjpNtxCEEQh8m+yR8sgZExM1XeMpKjlnXsHx+ITzIYaatf64d/dmO9R4lvTE76Eu9xV9MmXHrUS4Dy9tvjqSwvcKPF6V788gPPcig4VYOrNZ//fqiVQA9xjz1PDm3+YY0kQACalFAB1IIsKQA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RMWiQQuu; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4ACF2C4CED1;
+	Wed, 15 Jan 2025 21:30:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1736976611;
+	bh=DAZ1OUcJEkhA34HJivvdY5l8I6j6aFS+wT4ukAJ0H9I=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=RMWiQQuuzh3jEpXmFh7smJxyyvhR8ebkqqftGe0uutT76bainXh9x+A/OlOXwUA9X
+	 O4O4Qyj3vl8dXgyDmveien1XFBtp+2SNdUq+L5i0WhuZoalwscXJsdu9IMtcsfMaqR
+	 r1wAlTegA1rksl8CjCghRkN0+rzrnO+xAnSW1hQLhWXtgRAahr5zWy29QYSU1YZeGk
+	 Swbn9JKSavP5+WQwat3AuPHihzPDUuZjsxkntHX2NFjNFxPfA4Xdi2n42YjZ0lfu5s
+	 IUfSFou9z5ElH8Vw8m9yN1ZXuogOChv3MJZMdnxVcbZ0H7KDNpjWlzfOmodxLnOq9y
+	 jYoO1XZOgVIww==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 71F81380AA5F;
+	Wed, 15 Jan 2025 21:30:35 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next v5 04/15] net-timestamp: support SK_BPF_CB_FLAGS
- only in bpf_sock_ops_setsockopt
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, dsahern@kernel.org, willemdebruijn.kernel@gmail.com,
- willemb@google.com, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
- eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev,
- john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me,
- haoluo@google.com, jolsa@kernel.org, horms@kernel.org, bpf@vger.kernel.org,
- netdev@vger.kernel.org
-References: <20250112113748.73504-1-kerneljasonxing@gmail.com>
- <20250112113748.73504-5-kerneljasonxing@gmail.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-Content-Language: en-US
-In-Reply-To: <20250112113748.73504-5-kerneljasonxing@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net 1/2] net: pcs: xpcs: fix DW_VR_MII_DIG_CTRL1_2G5_EN bit
+ being set for 1G SGMII w/o inband
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <173697663427.885620.13714707273486620208.git-patchwork-notify@kernel.org>
+Date: Wed, 15 Jan 2025 21:30:34 +0000
+References: <20250114164721.2879380-1-vladimir.oltean@nxp.com>
+In-Reply-To: <20250114164721.2879380-1-vladimir.oltean@nxp.com>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: netdev@vger.kernel.org, Jose.Abreu@synopsys.com, andrew@lunn.ch,
+ hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ rmk+kernel@armlinux.org.uk, weifeng.voon@intel.com,
+ michael.wei.hong.sit@intel.com, linux-kernel@vger.kernel.org
 
-On 1/12/25 3:37 AM, Jason Xing wrote:
-> We will allow both TCP and UDP sockets to use this helper to
-> enable this feature. So let SK_BPF_CB_FLAGS pass the check:
-> 1. skip is_fullsock check
-> 2. skip owned by me check
+Hello:
+
+This series was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Tue, 14 Jan 2025 18:47:20 +0200 you wrote:
+> On a port with SGMII fixed-link at SPEED_1000, DW_VR_MII_DIG_CTRL1 gets
+> set to 0x2404. This is incorrect, because bit 2 (DW_VR_MII_DIG_CTRL1_2G5_EN)
+> is set.
 > 
-> Signed-off-by: Jason Xing <kerneljasonxing@gmail.com>
-> ---
->   net/core/filter.c | 27 +++++++++++++++++++++------
->   1 file changed, 21 insertions(+), 6 deletions(-)
+> It comes from the previous write to DW_VR_MII_AN_CTRL, because the "val"
+> variable is reused and is dirty. Actually, its value is 0x4, aka
+> FIELD_PREP(DW_VR_MII_PCS_MODE_MASK, DW_VR_MII_PCS_MODE_C37_SGMII).
 > 
-> diff --git a/net/core/filter.c b/net/core/filter.c
-> index 1ac996ec5e0f..0e915268db5f 100644
-> --- a/net/core/filter.c
-> +++ b/net/core/filter.c
-> @@ -5507,12 +5507,9 @@ static int sol_ipv6_sockopt(struct sock *sk, int optname,
->   					      KERNEL_SOCKPTR(optval), *optlen);
->   }
->   
-> -static int __bpf_setsockopt(struct sock *sk, int level, int optname,
-> -			    char *optval, int optlen)
-> +static int ___bpf_setsockopt(struct sock *sk, int level, int optname,
-> +			     char *optval, int optlen)
->   {
-> -	if (!sk_fullsock(sk))
-> -		return -EINVAL;
-> -
->   	if (level == SOL_SOCKET)
->   		return sol_socket_sockopt(sk, optname, optval, &optlen, false);
->   	else if (IS_ENABLED(CONFIG_INET) && level == SOL_IP)
-> @@ -5525,6 +5522,15 @@ static int __bpf_setsockopt(struct sock *sk, int level, int optname,
->   	return -EINVAL;
->   }
->   
-> +static int __bpf_setsockopt(struct sock *sk, int level, int optname,
-> +			    char *optval, int optlen)
-> +{
-> +	if (!sk_fullsock(sk))
-> +		return -EINVAL;
-> +
-> +	return ___bpf_setsockopt(sk, level, optname, optval, optlen);
-> +}
-> +
->   static int _bpf_setsockopt(struct sock *sk, int level, int optname,
->   			   char *optval, int optlen)
->   {
-> @@ -5675,7 +5681,16 @@ static const struct bpf_func_proto bpf_sock_addr_getsockopt_proto = {
->   BPF_CALL_5(bpf_sock_ops_setsockopt, struct bpf_sock_ops_kern *, bpf_sock,
->   	   int, level, int, optname, char *, optval, int, optlen)
->   {
-> -	return _bpf_setsockopt(bpf_sock->sk, level, optname, optval, optlen);
-> +	struct sock *sk = bpf_sock->sk;
-> +
-> +	if (optname != SK_BPF_CB_FLAGS) {
-> +		if (sk_fullsock(sk))
-> +			sock_owned_by_me(sk);
-> +		else if (optname != SK_BPF_CB_FLAGS)
+> [...]
 
-This is redundant considering the outer "if" has the same check.
+Here is the summary with links:
+  - [net,1/2] net: pcs: xpcs: fix DW_VR_MII_DIG_CTRL1_2G5_EN bit being set for 1G SGMII w/o inband
+    https://git.kernel.org/netdev/net/c/5c71729ab92c
+  - [net,2/2] net: pcs: xpcs: actively unset DW_VR_MII_DIG_CTRL1_2G5_EN for 1G SGMII
+    https://git.kernel.org/netdev/net/c/d6e3316a1680
 
-Regardless, "optname != SK_BPF_CB_FLAGS" is not the right check. The new 
-callback (e.g. BPF_SOCK_OPS_TS_SCHED_OPT_CB) can still call 
-bpf_setsockopt(TCP_*) which will be broken without a lock.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-It needs to check for bpf_sock->op. I saw patch 5 has the bpf_sock->op check but 
-that check is also incorrect. I will comment in there together.
-
-> +			return -EINVAL;
-> +	}
-> +
-> +	return ___bpf_setsockopt(sk, level, optname, optval, optlen);
->   }
->   
->   static const struct bpf_func_proto bpf_sock_ops_setsockopt_proto = {
 
 
