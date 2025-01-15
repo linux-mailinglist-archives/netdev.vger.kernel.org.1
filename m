@@ -1,59 +1,62 @@
-Return-Path: <netdev+bounces-158662-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158663-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 32477A12E31
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 23:19:46 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 08325A12E37
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 23:23:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7B67C18898CC
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 22:19:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 214AD165C52
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 22:23:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B6AA1DACBE;
-	Wed, 15 Jan 2025 22:19:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8309A1DB158;
+	Wed, 15 Jan 2025 22:23:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tyten9uD"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AHFXRl+V"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F01E132C38;
-	Wed, 15 Jan 2025 22:19:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AA83132C38;
+	Wed, 15 Jan 2025 22:23:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736979582; cv=none; b=V6oJrI34rzRLP0on2JlM46q6fwHLJGBH7Q1AEtbOGitOKqKwga5WR00D1YDIwgWei0jpP23bYPO4r7HU0wBV4AxKI+HTBISqNaiiVcUz7ELEu3fge8GR/7wwH6OJ9VfaA1/kO4nBZ+uMTFqKEhqhR3tZ8hnBWG6Z7mwZKMna4cE=
+	t=1736979789; cv=none; b=q1bju+bFNTJoLJvrfRl3ujWhc2j0tlaUxefu+MuRRBg84PSiRVjrCF8bos5P5T+H9FdJ/ma3VTcN4+VG/tEUaz/FNG7g4V/E24n5C+rZy+wuqt37M/IPMJcT4HD3M2ToEcrLGGuFbAJrvg/KbDNAXyfXuHCdUDCq4Qbafl35Lns=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736979582; c=relaxed/simple;
-	bh=cHrmy7zaz+reWz1imJe3e1MpHjJwQfuGaFL+mD/SSvE=;
+	s=arc-20240116; t=1736979789; c=relaxed/simple;
+	bh=xZDaAgAgfLwPND9U7+0w/smVD+0b6CjU5iWZeF5xBKo=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=FXy9DwqLZvzyADbWxmPmh7d2SjlJg3/X95UA88Y6LIyFq+dFozmtaBVIXHAndX/zGp/XYwvdIFCW5EOQ/Qdx1YrgY6oTDABn+RYe49hWkOKkr6EcULOOJs+Ikmnt3eyJ+v7XbtoeTIgjlQavDgrTz5vH54HvXiguIZYHOGTmy6k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tyten9uD; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 22B3BC4CED1;
-	Wed, 15 Jan 2025 22:19:41 +0000 (UTC)
+	 MIME-Version:Content-Type; b=C0PM7EmOmKnZB9h7QYgQGjkdXUQXSxwTGDtjR+no7Id1p5yW6Sbr2rUEjnsGjyU6DXYcuWRl1WhHqSZTK69K2q6O2BkCh+f77RKIFu0aeQnM7j84zynrtuoeu/MjE6GzEV0zk/aJoke+5ZTZXInSLQk1gBzdb0IxG6w9bQCkEjs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AHFXRl+V; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4466AC4CED1;
+	Wed, 15 Jan 2025 22:23:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736979581;
-	bh=cHrmy7zaz+reWz1imJe3e1MpHjJwQfuGaFL+mD/SSvE=;
+	s=k20201202; t=1736979788;
+	bh=xZDaAgAgfLwPND9U7+0w/smVD+0b6CjU5iWZeF5xBKo=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=tyten9uDuElwKZ1qE1fANxF5KpmdxYcjAPsqYDvsbu8fsbllINNBv/IXGdM7RW4RN
-	 p7gndwjcVt+dDWjDm064vRB4REUKfO0gJB6bpyFgR43kXeHasPqcMuTfuexYo4fC3s
-	 uxM7le/PyptHvR2oRzsVKXgEOXfkcjbminrNcH5dqmTLL12M1TDr8L563r1OsPrl7g
-	 XNZr/LEUSiy9x3vOu18fl/Pnf63gM8/rzi1A1n2H74h3WauZw5/oYV4n1Osy6obyHa
-	 QQgeAkwzBtGeBJl7rEtoeVJDT/W/txEAKNOA4iNAgzy8/eaIb8ItEg/yMsVwFIh526
-	 mmHd0kyZpPN+Q==
-Date: Wed, 15 Jan 2025 14:19:40 -0800
+	b=AHFXRl+VGflPkO0+oOn+SR74AZXi8TSdrUZXZI3b6Jm1A+NybpHzXcn9YFt1J+s4H
+	 Xtjq8ONUDkfZ/0VBIqy9kJhqnxZa4+lGnoNmk/LT8G6RvakqTBLB+inFeGGe51fye7
+	 JEhxa+JEkYhq/KQ4+OGb/ZwfD0qv1xT6FFOjfaXCEaIMnXla6VMRjxa+YUBht++r+R
+	 DjF53XWKOI31+DcveUO4N2T5Q3QwpNo2/i22V4qGc1FIw/e2AmvBkaT2TXP/FqOIKK
+	 ORKKCM3jXdb1sGBs2oLmq37KPdY1rftF1Ce6SKKNwDqgJqth9oSzwklyBFcmoTQNh+
+	 PypPdzYSzr8+w==
+Date: Wed, 15 Jan 2025 14:23:07 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Liu Ye <liuye@kylinos.cn>
-Cc: horms@kernel.org, davem@davemloft.net, edumazet@google.com,
- herbert@gondor.apana.org.au, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com,
- shuah@kernel.org, steffen.klassert@secunet.com
-Subject: Re: [PATCH net V2] selftests/net/ipsec: Fix Null pointer
- dereference in rtattr_pack()
-Message-ID: <20250115141940.399ecd28@kernel.org>
-In-Reply-To: <20250115031322.43561-1-liuye@kylinos.cn>
-References: <20250114160126.GJ5497@kernel.org>
-	<20250115031322.43561-1-liuye@kylinos.cn>
+To: Shinas Rasheed <srasheed@marvell.com>
+Cc: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+ <hgani@marvell.com>, <sedara@marvell.com>, <vimleshk@marvell.com>,
+ <thaller@redhat.com>, <wizhao@redhat.com>, <kheib@redhat.com>,
+ <konguyen@redhat.com>, <horms@kernel.org>, <einstein.xue@synaxg.com>,
+ Veerasenareddy Burru <vburru@marvell.com>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, "Paolo Abeni" <pabeni@redhat.com>
+Subject: Re: [PATCH net v7 1/4] octeon_ep: update tx/rx stats locally for
+ persistence
+Message-ID: <20250115142307.35840bae@kernel.org>
+In-Reply-To: <20250114125124.2570660-2-srasheed@marvell.com>
+References: <20250114125124.2570660-1-srasheed@marvell.com>
+	<20250114125124.2570660-2-srasheed@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,43 +66,42 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 15 Jan 2025 11:13:22 +0800 Liu Ye wrote:
-> From: liuye <liuye@kylinos.cn>
-> 
-> From: Liu Ye <liuye@kylinos.cn>
+On Tue, 14 Jan 2025 04:51:21 -0800 Shinas Rasheed wrote:
+> +	tx_packets = 0;
+> +	tx_bytes = 0;
+> +	rx_packets = 0;
+> +	rx_bytes = 0;
+> +	for (q = 0; q < oct->num_ioq_stats; q++) {
+> +		tx_packets += oct->stats_iq[q].instr_completed;
+> +		tx_bytes += oct->stats_iq[q].bytes_sent;
+> +		rx_packets += oct->stats_oq[q].packets;
+> +		rx_bytes += oct->stats_oq[q].bytes;
+> +	}
+> +
+>  	if (netif_running(netdev))
+>  		octep_ctrl_net_get_if_stats(oct,
+>  					    OCTEP_CTRL_NET_INVALID_VFID,
+>  					    &oct->iface_rx_stats,
+>  					    &oct->iface_tx_stats);
+>  
+> -	tx_packets = 0;
+> -	tx_bytes = 0;
+> -	rx_packets = 0;
+> -	rx_bytes = 0;
+> -	for (q = 0; q < oct->num_oqs; q++) {
+> -		struct octep_iq *iq = oct->iq[q];
+> -		struct octep_oq *oq = oct->oq[q];
+> -
+> -		tx_packets += iq->stats.instr_completed;
+> -		tx_bytes += iq->stats.bytes_sent;
+> -		rx_packets += oq->stats.packets;
+> -		rx_bytes += oq->stats.bytes;
+> -	}
 
-too many From lines.
-
-> Address Null pointer dereference in rtattr_pack.
-
-I think size is 0 in the bad case, so it's more of an undefinied
-behavior.
-
-> Flagged by cppcheck as:
->     tools/testing/selftests/net/ipsec.c:230:25: warning: Possible null pointer
->     dereference: payload [nullPointer]
->     memcpy(RTA_DATA(attr), payload, size);
->                            ^
->     tools/testing/selftests/net/ipsec.c:1618:54: note: Calling function 'rtattr_pack',
->     4th argument 'NULL' value is 0
->     if (rtattr_pack(&req.nh, sizeof(req), XFRMA_IF_ID, NULL, 0)) {
->                                                        ^
->     tools/testing/selftests/net/ipsec.c:230:25: note: Null pointer dereference
->     memcpy(RTA_DATA(attr), payload, size);
->                            ^
-> Fixes: 70bfdf62e93a ("selftests/net/ipsec: Add test for xfrm_spdattr_type_t")
-
-Your Sign-off needs to be right after fixes.
-
-> ---
-> V2: Modify description.
->     Add code checking tools.
->     Separating family and given name in Signed-off-by line.
->     Modify code format.
->     Add fixes.
-> ---
-
-Please post v3 as a new thread (not in reply to).
+This code move is unnecessary. Next patch removes the
+octep_ctrl_net_get_if_stats() call, so you can just 
+reorder the patches to remove the FW calls first, 
+and the diff will be smaller here.
 -- 
 pw-bot: cr
 
