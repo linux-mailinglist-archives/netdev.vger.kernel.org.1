@@ -1,187 +1,188 @@
-Return-Path: <netdev+bounces-158679-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158680-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91C8CA12F3B
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 00:27:20 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55A92A12F3E
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 00:30:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1FE3E3A630A
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 23:27:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7528F1887EF1
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 23:30:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA9DA1DD9AC;
-	Wed, 15 Jan 2025 23:27:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02F521DDA14;
+	Wed, 15 Jan 2025 23:29:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IHWzKf6T"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VosqbvC+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f45.google.com (mail-io1-f45.google.com [209.85.166.45])
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1071A1D89F1;
-	Wed, 15 Jan 2025 23:27:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E49F14B959;
+	Wed, 15 Jan 2025 23:29:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736983635; cv=none; b=UkI3IkycLm7ur3I/44e98bU4vBhz1vHQstXDDVbGgBUT8amwIDLBreasc+hI48sjvC4tuLRJl1wwgfYDQudrdjShhaRqMEXAKIJuznI/cocqOWffrPEZYyNu/imbhHCgvyHp3kHJ+pUSC61E3gJyqwmYg0FmZa+XsZneM98TX3M=
+	t=1736983797; cv=none; b=uA0S8mZNqbJVrZcn6Tvaew9faUEav28oZCxQ60DYWpTJJfLe5Sh3qw0RsWM+JNUpmpMqgIP23cbprMLAzSZv90Ff8DhhgYfC/ui0Qe5Kq0uy0nqmCiR38VmiW1CUbWL7SMZ8AvcWbqfJBKhhKOSqP8vmCSWH/1LfMYLg5ZM446g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736983635; c=relaxed/simple;
-	bh=BlWi5FLNGDxjA5f19jRqU2mVmFkmhJpmGWkJhhLSdgQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=bQRiyceo4oGZTI/mVrc8zVqpte6TpwCUqop4cp7yYORcb7Me0jhLSt0sQ3DVQPQB6NMBUn70v3Zku3lfxhDNlrxubcD9viR6Q+J7qPyjDN3eka2XE08C1SrmyZD6sjDpjnWNXnsP268aluNDqlwRB176pEhp6QviOV5v5v3w0G4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IHWzKf6T; arc=none smtp.client-ip=209.85.166.45
+	s=arc-20240116; t=1736983797; c=relaxed/simple;
+	bh=tR8UaN7ZYY+xze2NiGBqja/fsWyajwNrPbVBlhYFccM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=bj3SntQabii5TX5NWu+zU3SxlR/WMCBlnTA6lX7kaWlN6FiMgPDHaHW706rIpp1ln4NzH/M0BP+Pf0zEnZGA49cquLdBCtS3yLz1RwBxri9GS2aOZLrc3rctedyO+rsXl9+QeEdDAeUA5TLZDY3puNtcwoU7ah+TewJFpPpOL00=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VosqbvC+; arc=none smtp.client-ip=209.85.128.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-io1-f45.google.com with SMTP id ca18e2360f4ac-84cdb6fba9bso27269139f.2;
-        Wed, 15 Jan 2025 15:27:13 -0800 (PST)
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-436a03197b2so1471215e9.2;
+        Wed, 15 Jan 2025 15:29:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736983633; x=1737588433; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1736983794; x=1737588594; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=YtDrgUIV95SNBzLRkAPXxXIPkF5yNqah3IU5TVyFHU0=;
-        b=IHWzKf6T5w94M1DN2jcK395QWNTK9jqShFlTZR/ZR3+SeCso8eB5B2JYxIWrQ0XKBd
-         0mAgka9Q4No1pSckA866YINWJ+FGgj1piY+5b1dvEdEq+4wfLSsq+tx/TYsD1EIS2rma
-         rFG3iCPe69x5sFF5UlIF1k7Mqg/aBzva+s7hpQYbmbW1YWaftO4Rva21WNB8HyGBTz5S
-         2q3SqgtdOvD/K4VJ9Hn5J2cPG9YxYpq1l9FhGY81L+Ty9OFvPSx2hOOXD+8tXWGYurcB
-         h5Josk0Yn1H7cptrb5Pk28ut1cdI6IMD1E8LFkgJuPIIzTFpvBMl2JXP+hRXPD6OoDt1
-         zd0Q==
+        bh=AA85lizn+4y3tVKckeAfu/sCD8UsF/7zytrgJMgx6X8=;
+        b=VosqbvC+nQFkmfn0v+3KfWt0zQIlYt6znzdXqNXDdF6HpwaRfsHUZmE7oaMkW6W65N
+         fEUbEcaPsQzdCK56cTJDOG7vlXibl6OhnFnQV3E2bYBoY7yZVHb3BRVDLeeVzAfLVlWv
+         sverBpTYTMM4GWUJTcMINh7Rp0oyDOhNNzxhiNNT8Y2J9kpnG9KPRY/4q7EyOO9VmnyG
+         RVpX95atX0Qx6ZPybW8C9hjU8a3GVHufCppPCs5ZiiqlNBC8pNlRLDedc4J3ypR9W/LN
+         DzxoqkmvRHbSrqUlS7SHpWWS3ur6LkmexzzupqHzpeLAPdk00CLnozQoobxs6PQv4ftP
+         9BNw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736983633; x=1737588433;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1736983794; x=1737588594;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=YtDrgUIV95SNBzLRkAPXxXIPkF5yNqah3IU5TVyFHU0=;
-        b=piSCOuH9mcniaXYWcu2Dcmf7qJhQ9GGjoBHsiIOE+EHZtRFcqjrK22dhm8ZdM49GTB
-         TtDyJ8bf9hE1LYq/I1/Uz4Sjc2oVwU1P7DFEGLOEtdyuy8z1KSeFIjiMkma99Gmag4T0
-         1xmdfiQe1H76d1mkMkdzPmvIumNmUDAf6umwR3taSyLVaOpZ00zYPH9O4n2op5uznhVb
-         xwbnzlzIviTXl0L5Ov6yK9iD31aZdpmb0GyY8Y2jGgj5lQOiT606q7uBLdkU2OJJPWmQ
-         Q5pBGX+fkMkpRSGEF4vpLQb0wIKg2YgS9tpoAcaFti3jVq5w4QzN7YJBDQhNJEXea4to
-         dsOw==
-X-Forwarded-Encrypted: i=1; AJvYcCW3yXVgTLsBmqGm5LZFLdhzBdClT4q07aUGJ6dfJP6KheXttggHWRhgbbbWeEs1sTRzC+ZyA4yQ@vger.kernel.org, AJvYcCXQTyL+cJLKIVhO+QXbPKxK11Eqm06mcn7TqDe79hO1KnKlktDlXFYtVLTv2oL29YE5Qz4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxDkQHgN1SxmHFk4kMYrcwu8Qw4JQ6xlv02ua9SE/8q33zEFLBZ
-	6stkPdJS+Ezvt3OLNqW6g/VH+JwUixBGhxN7tVaMbymntPF1F6JLZI0XBkz3OEtfEAgOVcr9HMb
-	DewJpMpE/Q2l9UU3a+hHjKLyy7MM=
-X-Gm-Gg: ASbGncseprfSw8RykSEiDjH9V99F0GXc8MvIssc03h9qN1Lbmv40wLa5hqq/GNsXIFJ
-	aXgMWNxIHs0sB1Ac7eqLdZ9QKZQg3Lxott+RD
-X-Google-Smtp-Source: AGHT+IGnNgamkfZNs9F/m//pjRWczuyni5KeSU7GTILINta2cKYjkrR8+Bm27d7cP7xdyfhOPhuQkUaFSC6FKZ0oe4k=
-X-Received: by 2002:a05:6e02:d54:b0:3ce:67ae:48f2 with SMTP id
- e9e14a558f8ab-3ce67ae4b01mr125954945ab.15.1736983633163; Wed, 15 Jan 2025
- 15:27:13 -0800 (PST)
+        bh=AA85lizn+4y3tVKckeAfu/sCD8UsF/7zytrgJMgx6X8=;
+        b=LPYInu/Uvys5x9HlbD+AEqMI87m+1tKBuJ/ErHwszQ1499m1Rfl8S3VFxTVw1A8exL
+         kif2hP+Rw5Dg+JeJEgQaOUzjIN1giwtzYnXChun6tvUxASzN25fwCtDjxZsiS4Qe/QBN
+         QOnloVaXvr1POdjKIrVm8BiE7MRx8pxEZylmto3+aw7Xb+t714XBSysQ2uI5wAAa9IDy
+         AQ5ZWyNbtes3mWZn5nduojOZQt9wIegFPYRysQYisXTnOi/HmjK2WoUmdwr7EDNOVRaC
+         O9RbOe2yqLJZw9+UettkaJq0QJ/hbnwkZDl8r3MwNMZ+sn5J+ILyV5JxdEo5akASWvaf
+         pPPQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVbBZyUZ4ZnKBJvXcqV586lzFG3wqRImsIPZhqi2hRGDN2beVEvPywChUz2a62r0THinXf6dyHAohj2@vger.kernel.org, AJvYcCVkvjNCuynpGKqGCLlaNanEIOK+dQGznsPSbZeLkgKkqDeNCVxcbdc9H1sWShwTOVxfFWX6hgaR@vger.kernel.org, AJvYcCWr5G93KZgDuSnNhD0QumET8zM0pgOjL6Dnq3eL6JAACe2Sckuin3/oOuuSPX5ImRQzwv5V56ML@vger.kernel.org, AJvYcCXmQKiY1tquNBqX8vk6TZgKxpp5Hmt8ezZXlYdnmO/w28xxp+ECKornixFwaZ5LFqnZbRyqNOmZewqN8fRg@vger.kernel.org
+X-Gm-Message-State: AOJu0YwCud6djVBXlxUppGObaR0zBpQ8CHJc/uoJW8ybdn2hIKet5SLp
+	JNRbocc0mLznANil/KjABr20rpTM20Iv1fGTWZrn0MHFqCoLi4F4Mu/nnA==
+X-Gm-Gg: ASbGnctDKBKW6HLCMEoVhECTRTzTY6fXHZajA3JXjCx0efEsIC+7RaE+pu5zKhaP23V
+	m3RMueJ/xU1xhBtMZQ1/gN9YEh2F0f1rpm9mue5/KohuDkFzoKwd6KKMgY4k/yc3DlYoKgzhUPC
+	U8TVcEhgfkoHoMyI2WW0V57TTwdBJJxAV/J7iU/MujJvX1EEs/+gLAiAhvxKa1FgHWlr6vzJSDO
+	D+PuI/zNExxusK5Srspni/fqS8IK+DOAfli0HHC53NPLIzpo653vOZeiQf5GUA3XFB65nyYxS8/
+	XSNmgaUMm0ih8hbLPGg=
+X-Google-Smtp-Source: AGHT+IGHT6gwn/i7tqdptm35vr6/1ZvguxuWOv8R6zd9N7gFMI1OVesj0CUG1ETkcppAJyxXugo7nA==
+X-Received: by 2002:a05:600c:1384:b0:436:1c04:aa8e with SMTP id 5b1f17b1804b1-436e26bdac1mr335593495e9.16.1736983794166;
+        Wed, 15 Jan 2025 15:29:54 -0800 (PST)
+Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38bebccc93asm542914f8f.17.2025.01.15.15.29.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 15 Jan 2025 15:29:53 -0800 (PST)
+Date: Wed, 15 Jan 2025 23:29:52 +0000
+From: David Laight <david.laight.linux@gmail.com>
+To: Nikita Zhandarovich <n.zhandarovich@fintech.ru>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ <linux-hams@vger.kernel.org>, <netdev@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, <lvc-project@linuxtesting.org>,
+ <stable@vger.kernel.org>
+Subject: Re: [PATCH net] net/rose: prevent integer overflows in
+ rose_setsockopt()
+Message-ID: <20250115232952.1d4ef002@pumpkin>
+In-Reply-To: <20250115164220.19954-1-n.zhandarovich@fintech.ru>
+References: <20250115164220.19954-1-n.zhandarovich@fintech.ru>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250112113748.73504-1-kerneljasonxing@gmail.com>
- <20250112113748.73504-5-kerneljasonxing@gmail.com> <80309f62-0900-4946-bb2c-d73a2b724739@linux.dev>
-In-Reply-To: <80309f62-0900-4946-bb2c-d73a2b724739@linux.dev>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Thu, 16 Jan 2025 07:26:37 +0800
-X-Gm-Features: AbW1kvZb-bIIF_qxaO1VEW8lo7xwRRdVhNwa5yJQLuJAXUytEbJ8oXh6cJE1OQ4
-Message-ID: <CAL+tcoCd_RXno2uKi1bZoz5m1D3fGXKxPX0NC4tbpExwW49R3A@mail.gmail.com>
-Subject: Re: [PATCH net-next v5 04/15] net-timestamp: support SK_BPF_CB_FLAGS
- only in bpf_sock_ops_setsockopt
-To: Martin KaFai Lau <martin.lau@linux.dev>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, dsahern@kernel.org, willemdebruijn.kernel@gmail.com, 
-	willemb@google.com, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, 
-	eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev, 
-	john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me, 
-	haoluo@google.com, jolsa@kernel.org, horms@kernel.org, bpf@vger.kernel.org, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, Jan 16, 2025 at 5:22=E2=80=AFAM Martin KaFai Lau <martin.lau@linux.=
-dev> wrote:
->
-> On 1/12/25 3:37 AM, Jason Xing wrote:
-> > We will allow both TCP and UDP sockets to use this helper to
-> > enable this feature. So let SK_BPF_CB_FLAGS pass the check:
-> > 1. skip is_fullsock check
-> > 2. skip owned by me check
-> >
-> > Signed-off-by: Jason Xing <kerneljasonxing@gmail.com>
-> > ---
-> >   net/core/filter.c | 27 +++++++++++++++++++++------
-> >   1 file changed, 21 insertions(+), 6 deletions(-)
-> >
-> > diff --git a/net/core/filter.c b/net/core/filter.c
-> > index 1ac996ec5e0f..0e915268db5f 100644
-> > --- a/net/core/filter.c
-> > +++ b/net/core/filter.c
-> > @@ -5507,12 +5507,9 @@ static int sol_ipv6_sockopt(struct sock *sk, int=
- optname,
-> >                                             KERNEL_SOCKPTR(optval), *op=
-tlen);
-> >   }
-> >
-> > -static int __bpf_setsockopt(struct sock *sk, int level, int optname,
-> > -                         char *optval, int optlen)
-> > +static int ___bpf_setsockopt(struct sock *sk, int level, int optname,
-> > +                          char *optval, int optlen)
-> >   {
-> > -     if (!sk_fullsock(sk))
-> > -             return -EINVAL;
-> > -
-> >       if (level =3D=3D SOL_SOCKET)
-> >               return sol_socket_sockopt(sk, optname, optval, &optlen, f=
-alse);
-> >       else if (IS_ENABLED(CONFIG_INET) && level =3D=3D SOL_IP)
-> > @@ -5525,6 +5522,15 @@ static int __bpf_setsockopt(struct sock *sk, int=
- level, int optname,
-> >       return -EINVAL;
-> >   }
-> >
-> > +static int __bpf_setsockopt(struct sock *sk, int level, int optname,
-> > +                         char *optval, int optlen)
-> > +{
-> > +     if (!sk_fullsock(sk))
-> > +             return -EINVAL;
-> > +
-> > +     return ___bpf_setsockopt(sk, level, optname, optval, optlen);
-> > +}
-> > +
-> >   static int _bpf_setsockopt(struct sock *sk, int level, int optname,
-> >                          char *optval, int optlen)
-> >   {
-> > @@ -5675,7 +5681,16 @@ static const struct bpf_func_proto bpf_sock_addr=
-_getsockopt_proto =3D {
-> >   BPF_CALL_5(bpf_sock_ops_setsockopt, struct bpf_sock_ops_kern *, bpf_s=
-ock,
-> >          int, level, int, optname, char *, optval, int, optlen)
-> >   {
-> > -     return _bpf_setsockopt(bpf_sock->sk, level, optname, optval, optl=
-en);
-> > +     struct sock *sk =3D bpf_sock->sk;
-> > +
-> > +     if (optname !=3D SK_BPF_CB_FLAGS) {
-> > +             if (sk_fullsock(sk))
-> > +                     sock_owned_by_me(sk);
-> > +             else if (optname !=3D SK_BPF_CB_FLAGS)
->
-> This is redundant considering the outer "if" has the same check.
->
-> Regardless, "optname !=3D SK_BPF_CB_FLAGS" is not the right check. The ne=
-w
-> callback (e.g. BPF_SOCK_OPS_TS_SCHED_OPT_CB) can still call
-> bpf_setsockopt(TCP_*) which will be broken without a lock.
->
-> It needs to check for bpf_sock->op. I saw patch 5 has the bpf_sock->op ch=
-eck but
-> that check is also incorrect. I will comment in there together.
+On Wed, 15 Jan 2025 08:42:20 -0800
+Nikita Zhandarovich <n.zhandarovich@fintech.ru> wrote:
 
-Thanks. Will correct them soon.
+> In case of possible unpredictably large arguments passed to
+> rose_setsockopt() and multiplied by extra values on top of that,
+> integer overflows may occur.
+> 
+> Do the safest minimum and fix these issues by checking the
+> contents of 'opt' and returning -EINVAL if they are too large. Also,
+> switch to unsigned int and remove useless check for negative 'opt'
+> in ROSE_IDLE case.
+> 
+> Found by Linux Verification Center (linuxtesting.org) with static
+> analysis tool SVACE.
+> 
+> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Nikita Zhandarovich <n.zhandarovich@fintech.ru>
+> ---
+>  net/rose/af_rose.c | 16 ++++++++--------
+>  1 file changed, 8 insertions(+), 8 deletions(-)
+> 
+> diff --git a/net/rose/af_rose.c b/net/rose/af_rose.c
+> index 59050caab65c..72c65d938a15 100644
+> --- a/net/rose/af_rose.c
+> +++ b/net/rose/af_rose.c
+> @@ -397,15 +397,15 @@ static int rose_setsockopt(struct socket *sock, int level, int optname,
+>  {
+>  	struct sock *sk = sock->sk;
+>  	struct rose_sock *rose = rose_sk(sk);
+> -	int opt;
+> +	unsigned int opt;
+>  
+>  	if (level != SOL_ROSE)
+>  		return -ENOPROTOOPT;
+>  
+> -	if (optlen < sizeof(int))
+> +	if (optlen < sizeof(unsigned int))
+>  		return -EINVAL;
+>  
+> -	if (copy_from_sockptr(&opt, optval, sizeof(int)))
+> +	if (copy_from_sockptr(&opt, optval, sizeof(unsigned int)))
 
->
-> > +                     return -EINVAL;
-> > +     }
-> > +
-> > +     return ___bpf_setsockopt(sk, level, optname, optval, optlen);
-> >   }
-> >
-> >   static const struct bpf_func_proto bpf_sock_ops_setsockopt_proto =3D =
-{
->
+Shouldn't all those be 'sizeof (opt)' ?
+
+	David
+
+>  		return -EFAULT;
+>  
+>  	switch (optname) {
+> @@ -414,31 +414,31 @@ static int rose_setsockopt(struct socket *sock, int level, int optname,
+>  		return 0;
+>  
+>  	case ROSE_T1:
+> -		if (opt < 1)
+> +		if (opt < 1 || opt > UINT_MAX / HZ)
+>  			return -EINVAL;
+>  		rose->t1 = opt * HZ;
+>  		return 0;
+>  
+>  	case ROSE_T2:
+> -		if (opt < 1)
+> +		if (opt < 1 || opt > UINT_MAX / HZ)
+>  			return -EINVAL;
+>  		rose->t2 = opt * HZ;
+>  		return 0;
+>  
+>  	case ROSE_T3:
+> -		if (opt < 1)
+> +		if (opt < 1 || opt > UINT_MAX / HZ)
+>  			return -EINVAL;
+>  		rose->t3 = opt * HZ;
+>  		return 0;
+>  
+>  	case ROSE_HOLDBACK:
+> -		if (opt < 1)
+> +		if (opt < 1 || opt > UINT_MAX / HZ)
+>  			return -EINVAL;
+>  		rose->hb = opt * HZ;
+>  		return 0;
+>  
+>  	case ROSE_IDLE:
+> -		if (opt < 0)
+> +		if (opt > UINT_MAX / (60 * HZ))
+>  			return -EINVAL;
+>  		rose->idle = opt * 60 * HZ;
+>  		return 0;
+> 
+
 
