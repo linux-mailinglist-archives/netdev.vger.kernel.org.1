@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-158315-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158316-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B03D2A115E4
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 01:09:48 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9075CA115E6
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 01:10:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BD8021690C1
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 00:09:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 80955168D92
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 00:09:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10D452BAF7;
-	Wed, 15 Jan 2025 00:09:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34D5A29A5;
+	Wed, 15 Jan 2025 00:09:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="H/4jrRwi"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="cxIzbswW"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75F7B20326
-	for <netdev@vger.kernel.org>; Wed, 15 Jan 2025 00:08:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E2082AE66
+	for <netdev@vger.kernel.org>; Wed, 15 Jan 2025 00:09:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736899741; cv=none; b=eza2ikU899Y26/W6qgracd9CdV6VgsXkRjoEZk9pa0+YsIEEdnVbqPRL1oVetDRTdGE59juMsmasTzv1TJJ+utXAeQMF9w1r9hCLMQDYndtS7t22YLividCbUGlgyfnJ+OiM5nV/A06k9VGdDtE0USeqFZx3y/7I52QebQ28TIk=
+	t=1736899742; cv=none; b=mH9l2UgaAuymmna/DXOhJm4/XP9bMkUiD01j3v3IZxiiRgKuu6wyBQd4fe38sUqVzXoPcYZfcUh3JFABoC13mHnroRJVXhMvzmPNLQTZlpxvhxx776eUjGoiMUfa1Ax5h994f6KifLk9NlMpq/WkCBwObtK2AG2tw8VFqhZP/Is=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736899741; c=relaxed/simple;
-	bh=CHp661+t+7H9/4pEJJ8EFBpReKWewJIAWGP69BALars=;
+	s=arc-20240116; t=1736899742; c=relaxed/simple;
+	bh=rFfi023SDwpGClUuPSm7n2YTtCDe4IBaBYK1Fn6l3q8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=NP3wvOhuuV6E0OqdQH8PDEr+NE2NwGIXi068Fpjcf2G92lrVrWx+Oc+ZkWrs9+rrnlh9shh+IunXNAUuX9cRcKMujozu/ZWmcWeb0WcPjGf3+4F9HlYOr0BWidMdUvoKBZ0Q0bvO021CsYHMXmOGVQ70AJS39J5ygJyTqkdF8w0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=H/4jrRwi; arc=none smtp.client-ip=198.175.65.15
+	 MIME-Version; b=NxiyBa1XDzqZSt6HSYobJJ6PI6MjRbBDjN8GzDd/7dfFJELHJ+Bgpy6zDn4bYCQ3DK5WVIMd/K+7edTsrzAXYYpt9rHoHyRpav8xUNCSkPJJeXgdZy8Pryv2LL2iX/sGA6V87g7YsQq/UCMVLz2ZkxoavjzVLopBgkVsavsuhKc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=cxIzbswW; arc=none smtp.client-ip=198.175.65.15
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1736899739; x=1768435739;
+  t=1736899740; x=1768435740;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=CHp661+t+7H9/4pEJJ8EFBpReKWewJIAWGP69BALars=;
-  b=H/4jrRwiFHEKeigLtpXydWVZRsW6H4BwtiW4XKqfZcLPG4WnQUvnR8oM
-   OrMaapQJxs+bEV1swN97ezF0N1fk0MoGbJZ6QGopBii4UFudUMkOYrmJ/
-   1eyyKhGfpfUTHMeD9vxcv8vh3Wy9ZgePGQp9AKJXhDtrhwOCsxPePb/d5
-   XMGpiEaIqsumcyIEJtBbQLzdLDFByeifw8qktHnL24E+AhDd7LwElBDCI
-   h7vnEmLCiktIl9uU1E96i1afehcymaRdaBWV8ATl7ihUHOnoOSA6wNjIx
-   Xr/hgB8lxj6iGm6VdEFlndpDfTJAsR8jgDotKj4r21080CXgjZgSpRIXF
-   Q==;
-X-CSE-ConnectionGUID: 5TqUCVFNRziN/Kvmp6p4XA==
-X-CSE-MsgGUID: tEY3Us9ESM+h1kUr3fp+5Q==
-X-IronPort-AV: E=McAfee;i="6700,10204,11315"; a="40897522"
+  bh=rFfi023SDwpGClUuPSm7n2YTtCDe4IBaBYK1Fn6l3q8=;
+  b=cxIzbswWUwtJFHNlm7ekaEa0IZC7UluoxrN/mhVtBA84uCmrsAWXrokm
+   dcIB3aax0cXuQ7bpsanEqE2uCAj+X3v2RPsmS1KGKgbAyqL2dd+VTPv/b
+   YuA2bPMidm0pK5dU2BVnc9tPkTcdzKyk4y38kr9BudO7ASvbXb/ZMVF19
+   OWa7u/iYdrLpodiPRJ0Yv+fbpnzLN5Pt1sPvXmzO54L64ou+gosZDi6Hu
+   0mb8KxTq7kHRTvf2JxHuDsC9etfJlIwo65Y2Af/AdO8eUJuQzSGomRqoi
+   rJDJKLNfzN3l92UmO3meGN/odFGzn5Lvror3SVAB1eDjOc6Pf5ev78vqY
+   A==;
+X-CSE-ConnectionGUID: Xg64fQ/9SQmP8xtYkkik0w==
+X-CSE-MsgGUID: VV3OLhEQT0uvp6/c3tb0zQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11315"; a="40897530"
 X-IronPort-AV: E=Sophos;i="6.12,315,1728975600"; 
-   d="scan'208";a="40897522"
+   d="scan'208";a="40897530"
 Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jan 2025 16:08:55 -0800
-X-CSE-ConnectionGUID: gJtlnN60QCyyQyEzzDtkiQ==
-X-CSE-MsgGUID: twYxgTr0ToyJHjMAsYl44g==
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jan 2025 16:08:56 -0800
+X-CSE-ConnectionGUID: vmkz3ktATBucZDXtRzaNvw==
+X-CSE-MsgGUID: fKMMtohfTgG8QuroJysEyg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="128211438"
+   d="scan'208";a="128211456"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
   by fmviesa002.fm.intel.com with ESMTP; 14 Jan 2025 16:08:55 -0800
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
@@ -74,9 +74,9 @@ Cc: Jacob Keller <jacob.e.keller@intel.com>,
 	richardcochran@gmail.com,
 	mschmidt@redhat.com,
 	Karol Kolacinski <karol.kolacinski@intel.com>
-Subject: [PATCH net-next v2 11/13] ice: check low latency PHY timer update firmware capability
-Date: Tue, 14 Jan 2025 16:08:37 -0800
-Message-ID: <20250115000844.714530-12-anthony.l.nguyen@intel.com>
+Subject: [PATCH net-next v2 12/13] ice: implement low latency PHY timer updates
+Date: Tue, 14 Jan 2025 16:08:38 -0800
+Message-ID: <20250115000844.714530-13-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20250115000844.714530-1-anthony.l.nguyen@intel.com>
 References: <20250115000844.714530-1-anthony.l.nguyen@intel.com>
@@ -90,62 +90,218 @@ Content-Transfer-Encoding: 8bit
 
 From: Jacob Keller <jacob.e.keller@intel.com>
 
-Newer versions of firmware support programming the PHY timer via the low
-latency interface exposed over REG_LL_PROXY_L and REG_LL_PROXY_H. Add
-support for checking the device capabilities for this feature.
+Programming the PHY registers in preparation for an increment value change
+or a timer adjustment on E810 requires issuing Admin Queue commands for
+each PHY register. It has been found that the firmware Admin Queue
+processing occasionally has delays of tens or rarely up to hundreds of
+milliseconds. This delay cascades to failures in the PTP applications which
+depend on these updates being low latency.
+
+Consider a standard PTP profile with a sync rate of 16 times per second.
+This means there is ~62 milliseconds between sync messages. A complete
+cycle of the PTP algorithm
+
+1) Sync message (with Tx timestamp) from source
+2) Follow-up message from source
+3) Delay request (with Tx timestamp) from sink
+4) Delay response (with Rx timestamp of request) from source
+5) measure instantaneous clock offset
+6) request time adjustment via CLOCK_ADJTIME systemcall
+
+The Tx timestamps have a default maximum timeout of 10 milliseconds. If we
+assume that the maximum possible time is used, this leaves us with ~42
+milliseconds of processing time for a complete cycle.
+
+The CLOCK_ADJTIME system call is synchronous and will block until the
+driver completes its timer adjustment or frequency change.
+
+If the writes to prepare the PHY timers get hit by a latency spike of 50
+milliseconds, then the PTP application will be delayed past the point where
+the next cycle should start. Packets from the next cycle may have already
+arrived and are waiting on the socket.
+
+In particular, LinuxPTP ptp4l may start complaining about missing an
+announce message from the source, triggering a fault. In addition, the
+clockcheck logic it uses may trigger. This clockcheck failure occurs
+because the timestamp captured by hardware is compared against a reading of
+CLOCK_MONOTONIC. It is assumed that the time when the Rx timestamp is
+captured and the read from CLOCK_MONOTONIC are relatively close together.
+This is not the case if there is a significant delay to processing the Rx
+packet.
+
+Newer firmware supports programming the PHY registers over a low latency
+interface which bypasses the Admin Queue. Instead, software writes to the
+REG_LL_PROXY_L and REG_LL_PROXY_H registers. Firmware reads these registers
+and then programs the PHY timers.
+
+Implement functions to use this interface when available to program the PHY
+timers instead of using the Admin Queue. This avoids the Admin Queue
+latency and ensures that adjustments happen within acceptable latency
+bounds.
 
 Co-developed-by: Karol Kolacinski <karol.kolacinski@intel.com>
 Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
 Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
-Reviewed-by: Milena Olech <milena.olech@intel.com>
 Signed-off-by: Anton Nadezhdin <anton.nadezhdin@intel.com>
 Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
- drivers/net/ethernet/intel/ice/ice_common.c | 3 +++
- drivers/net/ethernet/intel/ice/ice_type.h   | 2 ++
- 2 files changed, 5 insertions(+)
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.c | 105 ++++++++++++++++++++
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.h |   4 +
+ 2 files changed, 109 insertions(+)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
-index 7af169466655..9d143c6803f1 100644
---- a/drivers/net/ethernet/intel/ice/ice_common.c
-+++ b/drivers/net/ethernet/intel/ice/ice_common.c
-@@ -2641,6 +2641,7 @@ ice_parse_1588_dev_caps(struct ice_hw *hw, struct ice_hw_dev_caps *dev_p,
+diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
+index d7dd18de64ef..da7cd04778e1 100644
+--- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
++++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
+@@ -5078,6 +5078,55 @@ static int ice_ptp_prep_phy_time_e810(struct ice_hw *hw, u32 time)
+ 	return 0;
+ }
  
- 	info->ts_ll_read = ((number & ICE_TS_LL_TX_TS_READ_M) != 0);
- 	info->ts_ll_int_read = ((number & ICE_TS_LL_TX_TS_INT_READ_M) != 0);
-+	info->ll_phy_tmr_update = ((number & ICE_TS_LL_PHY_TMR_UPDATE_M) != 0);
++/**
++ * ice_ptp_prep_phy_adj_ll_e810 - Prep PHY ports for a time adjustment
++ * @hw: pointer to HW struct
++ * @adj: adjustment value to program
++ *
++ * Use the low latency firmware interface to program PHY time adjustment to
++ * all PHY ports.
++ *
++ * Return: 0 on success, -EBUSY on timeout
++ */
++static int ice_ptp_prep_phy_adj_ll_e810(struct ice_hw *hw, s32 adj)
++{
++	const u8 tmr_idx = hw->func_caps.ts_func_info.tmr_index_owned;
++	struct ice_e810_params *params = &hw->ptp.phy.e810;
++	u32 val;
++	int err;
++
++	spin_lock_irq(&params->atqbal_wq.lock);
++
++	/* Wait for any pending in-progress low latency interrupt */
++	err = wait_event_interruptible_locked_irq(params->atqbal_wq,
++						  !(params->atqbal_flags &
++						    ATQBAL_FLAGS_INTR_IN_PROGRESS));
++	if (err) {
++		spin_unlock_irq(&params->atqbal_wq.lock);
++		return err;
++	}
++
++	wr32(hw, REG_LL_PROXY_L, adj);
++	val = FIELD_PREP(REG_LL_PROXY_H_PHY_TMR_CMD_M, REG_LL_PROXY_H_PHY_TMR_CMD_ADJ) |
++	      FIELD_PREP(REG_LL_PROXY_H_PHY_TMR_IDX_M, tmr_idx) | REG_LL_PROXY_H_EXEC;
++	wr32(hw, REG_LL_PROXY_H, val);
++
++	/* Read the register repeatedly until the FW indicates completion */
++	err = read_poll_timeout_atomic(rd32, val,
++				       !FIELD_GET(REG_LL_PROXY_H_EXEC, val),
++				       10, REG_LL_PROXY_H_TIMEOUT_US, false, hw,
++				       REG_LL_PROXY_H);
++	if (err) {
++		ice_debug(hw, ICE_DBG_PTP, "Failed to prepare PHY timer adjustment using low latency interface\n");
++		spin_unlock_irq(&params->atqbal_wq.lock);
++		return err;
++	}
++
++	spin_unlock_irq(&params->atqbal_wq.lock);
++
++	return 0;
++}
++
+ /**
+  * ice_ptp_prep_phy_adj_e810 - Prep PHY port for a time adjustment
+  * @hw: pointer to HW struct
+@@ -5096,6 +5145,9 @@ static int ice_ptp_prep_phy_adj_e810(struct ice_hw *hw, s32 adj)
+ 	u8 tmr_idx;
+ 	int err;
  
- 	info->ena_ports = logical_id;
- 	info->tmr_own_map = phys_id;
-@@ -2663,6 +2664,8 @@ ice_parse_1588_dev_caps(struct ice_hw *hw, struct ice_hw_dev_caps *dev_p,
- 		  info->ts_ll_read);
- 	ice_debug(hw, ICE_DBG_INIT, "dev caps: ts_ll_int_read = %u\n",
- 		  info->ts_ll_int_read);
-+	ice_debug(hw, ICE_DBG_INIT, "dev caps: ll_phy_tmr_update = %u\n",
-+		  info->ll_phy_tmr_update);
- 	ice_debug(hw, ICE_DBG_INIT, "dev caps: ieee_1588 ena_ports = %u\n",
- 		  info->ena_ports);
- 	ice_debug(hw, ICE_DBG_INIT, "dev caps: tmr_own_map = %u\n",
-diff --git a/drivers/net/ethernet/intel/ice/ice_type.h b/drivers/net/ethernet/intel/ice/ice_type.h
-index d01a9e798678..f5eac66d207e 100644
---- a/drivers/net/ethernet/intel/ice/ice_type.h
-+++ b/drivers/net/ethernet/intel/ice/ice_type.h
-@@ -369,6 +369,7 @@ struct ice_ts_func_info {
- #define ICE_TS_TMR1_ENA_M		BIT(26)
- #define ICE_TS_LL_TX_TS_READ_M		BIT(28)
- #define ICE_TS_LL_TX_TS_INT_READ_M	BIT(29)
-+#define ICE_TS_LL_PHY_TMR_UPDATE_M	BIT(30)
++	if (hw->dev_caps.ts_dev_info.ll_phy_tmr_update)
++		return ice_ptp_prep_phy_adj_ll_e810(hw, adj);
++
+ 	tmr_idx = hw->func_caps.ts_func_info.tmr_index_owned;
  
- struct ice_ts_dev_info {
- 	/* Device specific info */
-@@ -383,6 +384,7 @@ struct ice_ts_dev_info {
- 	u8 tmr1_ena;
- 	u8 ts_ll_read;
- 	u8 ts_ll_int_read;
-+	u8 ll_phy_tmr_update;
- };
+ 	/* Adjustments are represented as signed 2's complement values in
+@@ -5118,6 +5170,56 @@ static int ice_ptp_prep_phy_adj_e810(struct ice_hw *hw, s32 adj)
+ 	return 0;
+ }
  
- #define ICE_NAC_TOPO_PRIMARY_M	BIT(0)
++/**
++ * ice_ptp_prep_phy_incval_ll_e810 - Prep PHY ports increment value change
++ * @hw: pointer to HW struct
++ * @incval: The new 40bit increment value to prepare
++ *
++ * Use the low latency firmware interface to program PHY time increment value
++ * for all PHY ports.
++ *
++ * Return: 0 on success, -EBUSY on timeout
++ */
++static int ice_ptp_prep_phy_incval_ll_e810(struct ice_hw *hw, u64 incval)
++{
++	const u8 tmr_idx = hw->func_caps.ts_func_info.tmr_index_owned;
++	struct ice_e810_params *params = &hw->ptp.phy.e810;
++	u32 val;
++	int err;
++
++	spin_lock_irq(&params->atqbal_wq.lock);
++
++	/* Wait for any pending in-progress low latency interrupt */
++	err = wait_event_interruptible_locked_irq(params->atqbal_wq,
++						  !(params->atqbal_flags &
++						    ATQBAL_FLAGS_INTR_IN_PROGRESS));
++	if (err) {
++		spin_unlock_irq(&params->atqbal_wq.lock);
++		return err;
++	}
++
++	wr32(hw, REG_LL_PROXY_L, lower_32_bits(incval));
++	val = FIELD_PREP(REG_LL_PROXY_H_PHY_TMR_CMD_M, REG_LL_PROXY_H_PHY_TMR_CMD_FREQ) |
++	      FIELD_PREP(REG_LL_PROXY_H_TS_HIGH, (u8)upper_32_bits(incval)) |
++	      FIELD_PREP(REG_LL_PROXY_H_PHY_TMR_IDX_M, tmr_idx) | REG_LL_PROXY_H_EXEC;
++	wr32(hw, REG_LL_PROXY_H, val);
++
++	/* Read the register repeatedly until the FW indicates completion */
++	err = read_poll_timeout_atomic(rd32, val,
++				       !FIELD_GET(REG_LL_PROXY_H_EXEC, val),
++				       10, REG_LL_PROXY_H_TIMEOUT_US, false, hw,
++				       REG_LL_PROXY_H);
++	if (err) {
++		ice_debug(hw, ICE_DBG_PTP, "Failed to prepare PHY timer increment using low latency interface\n");
++		spin_unlock_irq(&params->atqbal_wq.lock);
++		return err;
++	}
++
++	spin_unlock_irq(&params->atqbal_wq.lock);
++
++	return 0;
++}
++
+ /**
+  * ice_ptp_prep_phy_incval_e810 - Prep PHY port increment value change
+  * @hw: pointer to HW struct
+@@ -5133,6 +5235,9 @@ static int ice_ptp_prep_phy_incval_e810(struct ice_hw *hw, u64 incval)
+ 	u8 tmr_idx;
+ 	int err;
+ 
++	if (hw->dev_caps.ts_dev_info.ll_phy_tmr_update)
++		return ice_ptp_prep_phy_incval_ll_e810(hw, incval);
++
+ 	tmr_idx = hw->func_caps.ts_func_info.tmr_index_owned;
+ 	low = lower_32_bits(incval);
+ 	high = upper_32_bits(incval);
+diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.h b/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
+index 5a3b1b15c746..231dd00cf38c 100644
+--- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
++++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
+@@ -690,7 +690,11 @@ static inline bool ice_is_dual(struct ice_hw *hw)
+ 
+ /* Tx timestamp low latency read definitions */
+ #define REG_LL_PROXY_H_TIMEOUT_US	2000
++#define REG_LL_PROXY_H_PHY_TMR_CMD_M	GENMASK(7, 6)
++#define REG_LL_PROXY_H_PHY_TMR_CMD_ADJ	0x1
++#define REG_LL_PROXY_H_PHY_TMR_CMD_FREQ	0x2
+ #define REG_LL_PROXY_H_TS_HIGH		GENMASK(23, 16)
++#define REG_LL_PROXY_H_PHY_TMR_IDX_M	BIT(24)
+ #define REG_LL_PROXY_H_TS_IDX		GENMASK(29, 24)
+ #define REG_LL_PROXY_H_TS_INTR_ENA	BIT(30)
+ #define REG_LL_PROXY_H_EXEC		BIT(31)
 -- 
 2.47.1
 
