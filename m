@@ -1,156 +1,198 @@
-Return-Path: <netdev+bounces-158543-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158544-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF1E2A126FB
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 16:13:11 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83F26A12704
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 16:15:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E2F9B188627F
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 15:13:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 98CEF166E17
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 15:15:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34D8E13A257;
-	Wed, 15 Jan 2025 15:13:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="C9fJEHQy"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B35A7080C;
+	Wed, 15 Jan 2025 15:15:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 554B324A7D3
-	for <netdev@vger.kernel.org>; Wed, 15 Jan 2025 15:13:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7863A24A7DB;
+	Wed, 15 Jan 2025 15:15:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736953988; cv=none; b=KX6yICtBzP5pjDOsvAffHg6HyoGfgiQlm43d7Hbu9erkC+gxOO0wI05HSmpZvdBTk2TFbztXzi3EChkp4QIDa0gmy2xzyQBK5640CQDTBT2fVDm6+USsK4YK1EsZP43hnpuHI9sJ395Md3n9olzUKv8KOV+IBYP+pbMAAozpBtg=
+	t=1736954153; cv=none; b=kld3bfm7yyC9YKRaSb0z1OWAwbPhR81AYJ8pI8QkWFo/qXr1TxpudWFLxb/Omm1KluQCg3hahtTdkukqnERN3j8yxKz55IFbfThcXwB0o95spJArO5W3HiSrm4DIIw0B7BqXd2ZP+xx+N7CjBDXUIQpDFLoUPys+f0V5uNWPEzo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736953988; c=relaxed/simple;
-	bh=ikkCONyZXlBdcJUw3MedMriXJgyQP1dzgvb87yX++yo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cVEmUSqWc207TitHqUMcG/yqkyrT+3Py4w+bO9C2lQNzc+xKQ7Bz4Hnrc8D4RioAwH72OsVPSRzYkqZop1nzE81ycn3fu5JCw639D1DIt2QIaep1jpB5xteFzOm06usc+s1vUUxkbTQt03V7wjfuue2gFd/6EZQaYw3d6KZbGX0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=C9fJEHQy; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1736953985;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=oLdU8RkgSeQ0Ab6g/eU0VlbWu1fMgAfz2w454NRUIM4=;
-	b=C9fJEHQyPoNfdJtXQFenle1NOatR2S0ZagTZu5eoVAdY9y2rUpgtn6gZP8Cq8TF3a8PqPO
-	uEvQPw5B2FUArW2XqoKghGw0LVoft/dbk9hlJTOVdxDQzMiCvTPHJCSQYE3ekQ4VEgf9FB
-	FoAUV5RrvJ5ym1DXf6LNXmilGnWY+sI=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-395-fQqJhkjdPuGdEmxBZ9rMrg-1; Wed, 15 Jan 2025 10:13:02 -0500
-X-MC-Unique: fQqJhkjdPuGdEmxBZ9rMrg-1
-X-Mimecast-MFC-AGG-ID: fQqJhkjdPuGdEmxBZ9rMrg
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-436289a570eso30886015e9.0
-        for <netdev@vger.kernel.org>; Wed, 15 Jan 2025 07:13:02 -0800 (PST)
+	s=arc-20240116; t=1736954153; c=relaxed/simple;
+	bh=n3aedPDU58g9oi8jG7q6qNb6L07RnHv5DCH2ebVvDrM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GqV7LdaWHf1vrRlIFft+e6vEQRoFmTinleFhXQWhQ8NY9+PIZjKUaBOWInTPxqkn0+YQn3zUWwOEp7+JQiwz8qEIXWKb8MFyYjIFwzHWgecb4KhUizSXIVPJRL+3rpR/SbOpRUUyi+xFOr4uGCCjdVRPDKElsnx9JQtZG8zG2+c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-aaec61d0f65so1362698366b.1;
+        Wed, 15 Jan 2025 07:15:51 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736953981; x=1737558781;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=oLdU8RkgSeQ0Ab6g/eU0VlbWu1fMgAfz2w454NRUIM4=;
-        b=AsxXbA7Wq/zuFAVg26bTEF7xv3UAwSPUTUZGgF0aG+emQyy2r2iXxBEwykqdMlO/IF
-         BNPrCG6oq5lWlpTXYW378qiDEZNwczmjwPMYgQaLip9SmkKoU5LbsQEll07n3O0khxGR
-         FlfWiaNIwoqlM/84I1ngRZN6ulsgCTTsScu5INVjFIUP8/CAdPPLBqzZxJL7eLDktS7V
-         Ct1efnwgwC5yl1Q42rjdrxovICAF0fJV35O1U/aaRzHfNx8xta9lmMUabQv9GlBhoVQn
-         dhVmB/ymsMV3BkswejsglJJLCY5tvsJoRO9gJFUvy/7Wb2v+MUNGkGBTeaAs/nQm/BIg
-         UmzQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWP/g0SrPWedhzNj5Ebupq6HbENaRnT3vFQeq0UxqFMCUU/Ze7dDpBwHGmE64yAvIcA0VgAUNQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxIhcpmEe9Bw5Etxfp6eLF6omgiCyRA3ePZco7CshCJRNST8XXu
-	MIFQcNHOviGbFJgdwrrKzOxETBYCF2vNSz1JPg8eKwDtvYSwht2sDSMXtB+0cpwyMK01qAPDqn7
-	OjATje94rFYousm4Mz7wYRPLWCpRFH6LFCcR2b9zJStRYDdUFGqU6Sw==
-X-Gm-Gg: ASbGncs/4006p+Wh2CNIpHF6GYklRIt+Aq1ISoLXq5rMxHBGC45xQlR0vyQxL/dbLn9
-	tjCrnL/CHQ2MIlMx1NtTldVWEScoeWfOTNUW+B/+M+smbSn512tJn4RRvZQTwzj3SQEgMA3E7Mq
-	tJapzgQUCZ6p1OWfYm28Cgl76+uR4dI5yAVdCnEAE7wltjmt17PnAWKCdRx4OhB/7wDQp5u3nb7
-	hi755VQjEabSx3fOX1mydnVrxGnXoXRdUZZzmF1q4yMvj9sCPTwC8kLWibWF//+3hy+3Qz7YeCo
-	llwrdjYe95I=
-X-Received: by 2002:a05:600c:3c85:b0:436:18d0:aa6e with SMTP id 5b1f17b1804b1-436e2679a7cmr316714495e9.5.1736953981337;
-        Wed, 15 Jan 2025 07:13:01 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGTMHKNjVPDlDgcim9qsAEueVqCzcKyVc8UZRKYRGgDLyXFC3PbDg++48ILlva9ypVyqYTwnA==
-X-Received: by 2002:a05:600c:3c85:b0:436:18d0:aa6e with SMTP id 5b1f17b1804b1-436e2679a7cmr316714105e9.5.1736953980953;
-        Wed, 15 Jan 2025 07:13:00 -0800 (PST)
-Received: from [192.168.88.253] (146-241-15-169.dyn.eolo.it. [146.241.15.169])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-437c74c5b2esm26230435e9.23.2025.01.15.07.12.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 15 Jan 2025 07:13:00 -0800 (PST)
-Message-ID: <eb30b164-7f86-46bf-a5d3-0f8bda5e9398@redhat.com>
-Date: Wed, 15 Jan 2025 16:12:59 +0100
+        d=1e100.net; s=20230601; t=1736954150; x=1737558950;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=VxAdtxkE+UEREV6mcvRrNj4o4nik0aOIdra7qRiWZc4=;
+        b=KV2Rf2PzVBpG+xmnig1IF++E6MrB71rpernBz3J+rGyEJ78ceCkFmW4VeuuSir6WyF
+         OTp8Kg8MkI6FEBNZyudjUmzy6QlTgqJFhjzcpn8gv4yLiZA5/G1Vc5eQv+8aBsYSNdc8
+         bWd7Bg29RMQrxtmPjWFNMntLAh8FgxOH0c7vT3WIgdLul0WUlbWB4IyFYzJUym0yVspP
+         g17MMZOeADNoP7qeMo+4f2HRju2tbzIsx0O8PhRdHXYp/rcaWCOPU6iScYqe7bF7jDzg
+         uGi1ZZiP0P/87gTfFTNOnYRBYVzbWi21Y7n9CMckDdP3SZGHOnjrCDCoBBMWC3FO9da+
+         vtgA==
+X-Forwarded-Encrypted: i=1; AJvYcCWSQiRllGvc/VL1706xc+Zh23ErH1mATkF5ojI/7rOvl8CJ1KF1RdcGSpq6HtU+8c1WWj8X1nfsGCaQpR2R@vger.kernel.org, AJvYcCX3RzZ5ByvPVam8vaC1jFVw57ZZC/O0SZZFrWQ79pN+2Dzb09+tORxPYhksBHf060U+7rM5ptKL@vger.kernel.org, AJvYcCXE/jsFShp20JmyxN5jm60k4ns4Fbyve1+jUM6683WOM6uDFZ2/qYcxhvNgKbVxxhhuVi1aNbl6mVIXZK/5@vger.kernel.org, AJvYcCXt8H8LnEQdwUdfedWp8yaPqEIwiAhsNc6CJRVzN8Wy0gOkdcS+5yxaAg4w1d8eoU7XYulGq1Ja2A/nz8A=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxnhZnLmwLnrBcoBzhEIReqRRofOVr3NWmcjxz7GxFRYdOWgKn8
+	nqe0wTP5g1InJl0eKJ0v4BnJCbFGO0mCp4jPB86n97NCFwSTS8E/
+X-Gm-Gg: ASbGncv4uk2D5+SJdBLMrG0HAOeiX7FwBnRe03UrQ4B/vOZNFv2jZkb5IFpJRZLqru/
+	Yujxja28qApa+/ieZgxlgROecAPEmXA1RatzO+TIzUN0MCUAa1R4E64lf2uUJHVh+fPZIpj9ysa
+	OcazGh5VvVSO5F2sg7noF6vjEZRVPwPyJL8P7kfxnAAKKEd/JGPnwVWSVvZ/esQQBei+4WLzWbE
+	1nn7hY4aS0G2DuxcvJuRLq+zMDF3cn5sRI3yrK07NHE2n8=
+X-Google-Smtp-Source: AGHT+IHiSCWa2oGdZdDLuvQ3qdU+v2LX5LzfGe//YSM+4KYGuK3X4yasIQ/H0OgC3CyaYs2W7qOEFA==
+X-Received: by 2002:a17:907:3e24:b0:aac:2298:8960 with SMTP id a640c23a62f3a-ab2ab6fcf7amr2927968666b.35.1736954149465;
+        Wed, 15 Jan 2025 07:15:49 -0800 (PST)
+Received: from gmail.com ([2a03:2880:30ff:9::])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5da0aec6e7asm1101432a12.33.2025.01.15.07.15.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 15 Jan 2025 07:15:48 -0800 (PST)
+Date: Wed, 15 Jan 2025 07:15:46 -0800
+From: Breno Leitao <leitao@debian.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Michael Kelley <mhklinux@outlook.com>,
+	"saeedm@nvidia.com" <saeedm@nvidia.com>,
+	"tariqt@nvidia.com" <tariqt@nvidia.com>,
+	"linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Thomas Graf <tgraf@suug.ch>, Tejun Heo <tj@kernel.org>,
+	Hao Luo <haoluo@google.com>, Josh Don <joshdon@google.com>,
+	Barret Rhoden <brho@google.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: Re: [v3 PATCH] rhashtable: Fix rhashtable_try_insert test
+Message-ID: <20250115-cordial-steadfast-perch-c4dfda@leitao>
+References: <Z1rYGzEpMub4Fp6i@gondor.apana.org.au>
+ <Z2aFL3dNLYOcmzH3@gondor.apana.org.au>
+ <20250102-daffy-vanilla-boar-6e1a61@leitao>
+ <SN6PR02MB41572415707F0FA6D9A61247D4132@SN6PR02MB4157.namprd02.prod.outlook.com>
+ <20250109-marigold-bandicoot-of-exercise-8ebede@leitao>
+ <Z4DoFYQ3ytB-wS3-@gondor.apana.org.au>
+ <SN6PR02MB41577C2C4EB260F3D2D4F85FD41C2@SN6PR02MB4157.namprd02.prod.outlook.com>
+ <Z4FXs8vAtitHIJyl@gondor.apana.org.au>
+ <SN6PR02MB41570F1F5F4F579B4E8F0CD3D41C2@SN6PR02MB4157.namprd02.prod.outlook.com>
+ <Z4XWx5X0doetOJni@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 net-next 06/11] af_unix: Set drop reason in
- unix_stream_sendmsg().
-To: Donald Hunter <donald.hunter@redhat.com>, Jakub Kicinski <kuba@kernel.org>
-Cc: Kuniyuki Iwashima <kuniyu@amazon.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuni1840@gmail.com>,
- netdev@vger.kernel.org
-References: <20250112040810.14145-1-kuniyu@amazon.com>
- <20250112040810.14145-7-kuniyu@amazon.com>
- <20250114170516.2a923a87@kernel.org>
- <CAAf2ycmV2T_QUn2Y6rSUjwiwTLQqfW1TFk_3SfeTiO03jz8vXg@mail.gmail.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <CAAf2ycmV2T_QUn2Y6rSUjwiwTLQqfW1TFk_3SfeTiO03jz8vXg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z4XWx5X0doetOJni@gondor.apana.org.au>
 
-On 1/15/25 2:52 PM, Donald Hunter wrote:
-> On Tue, 14 Jan 2025 at 20:05, Jakub Kicinski <kuba@kernel.org> wrote:
->>
->> On Sun, 12 Jan 2025 13:08:05 +0900 Kuniyuki Iwashima wrote:
->>> @@ -2249,14 +2265,13 @@ static int queue_oob(struct socket *sock, struct msghdr *msg, struct sock *other
->>>  static int unix_stream_sendmsg(struct socket *sock, struct msghdr *msg,
->>>                              size_t len)
->>>  {
->>> +     enum skb_drop_reason reason;
->>
->> I feel like we should draw the line somewhere for the reason codes.
->> We started with annotating packet drops in the stack, which are
->> otherwise hard to notice, we don't even have counters for all of them.
->> But at this point we're annotating sendmsg() errors? The fact we free
->> an skb on the error path seems rather coincidental for a sendmsg error.
->> IOW aren't we moving from packet loss annotation into general tracing
->> territory here?
->>
->> If there is no ambiguity and application will get an error from a system
->> call I'd just use consume_skb().
->>
->> I'm probably the most resistant to the drop reason codes, so I defer
->> to Paolo / Eric for the real judgment...
+On Tue, Jan 14, 2025 at 11:15:19AM +0800, Herbert Xu wrote:
+> On Fri, Jan 10, 2025 at 06:22:40PM +0000, Michael Kelley wrote:
+> >
+> > This patch passes my tests. I'm doing a narrow test to verify that
+> > the boot failure when opening the Mellanox NIC is no longer occurring.
+> > I also unloaded/reloaded the mlx5 driver a couple of times. For good
+> > measure, I then did a full Linux kernel build, and all is good. My testing
+> > does not broadly verify correct operation of rhashtable except as it
+> > gets exercised implicitly by these basic tests.
 > 
-> For what it's worth, I agree that there's no need to annotate a drop
-> reason for sendmsg failures that return error codes to the caller.
-> That's why my original patch proposal just changed them to use
-> consume_skb(). I did misrepresent the cases as "happy path" but I
-> really meant that from the perspective of "no send initiated, so no
-> drop reason".
+> Thanks for testing! The patch needs one more change though as
+> moving the atomic_inc outside of the lock was a bad idea on my
+> part.  This could cause atomic_inc/atomic_dec to be reordered
+> thus resulting in an underflow.
 > 
-> https://lore.kernel.org/netdev/20241116094236.28786-1-donald.hunter@gmail.com/
+> Thanks,
+> 
+> ---8<---
+> The test on whether rhashtable_insert_one did an insertion relies
+> on the value returned by rhashtable_lookup_one.  Unfortunately that
+> value is overwritten after rhashtable_insert_one returns.  Fix this
+> by moving the test before data gets overwritten.
+> 
+> Simplify the test as only data == NULL matters.
+> 
+> Finally move atomic_inc back within the lock as otherwise it may
+> be reordered with the atomic_dec on the removal side, potentially
+> leading to an underflow.
+> 
+> Reported-by: Michael Kelley <mhklinux@outlook.com>
+> Fixes: e1d3422c95f0 ("rhashtable: Fix potential deadlock by moving schedule_work outside lock")
+> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-I also agree with Jakub with a slightly different reasoning. IMHO drop
-reason goal is to let user-space easily understand where/why skbs are
-dropped. If the drop reason reflects a syscall error code, the
-user-space already has all the info.
+Reviewed-by: Breno Leitao <leitao@debian.org>
 
-IIRC the general guidance agreed upon in the last Netconf was to add
-drop reasons when we can't distinguish multiple kind of drops within the
-same function. IMHO such guidance fits with not using drop reason in
-this specific case: as said we can discriminate the errors via the
-syscall error code.
+> diff --git a/lib/rhashtable.c b/lib/rhashtable.c
+> index bf956b85455a..0e9a1d4cf89b 100644
+> --- a/lib/rhashtable.c
+> +++ b/lib/rhashtable.c
+> @@ -611,21 +611,23 @@ static void *rhashtable_try_insert(struct rhashtable *ht, const void *key,
+>  			new_tbl = rht_dereference_rcu(tbl->future_tbl, ht);
+>  			data = ERR_PTR(-EAGAIN);
+>  		} else {
+> +			bool inserted;
+> +
+>  			flags = rht_lock(tbl, bkt);
+>  			data = rhashtable_lookup_one(ht, bkt, tbl,
+>  						     hash, key, obj);
+>  			new_tbl = rhashtable_insert_one(ht, bkt, tbl,
+>  							hash, obj, data);
+> +			inserted = data && !new_tbl;
+> +			if (inserted)
+> +				atomic_inc(&ht->nelems);
+>  			if (PTR_ERR(new_tbl) != -EEXIST)
+>  				data = ERR_CAST(new_tbl);
+>  
+>  			rht_unlock(tbl, bkt, flags);
+>  
+> -			if (PTR_ERR(data) == -ENOENT && !new_tbl) {
+> -				atomic_inc(&ht->nelems);
+> -				if (rht_grow_above_75(ht, tbl))
+> -					schedule_work(&ht->run_work);
+> -			}
+> +			if (inserted && rht_grow_above_75(ht, tbl))
+> +				schedule_work(&ht->run_work);
 
-Cheers,
+That makes sense, since data could be ERR_PTR(-ENOENT) and ERR_PTR(-EAGAIN), and
+the object being inserted, which means that nelems should be increased.
 
-Paolo
+It was hard to review this patch, basically rhashtable_insert_one()
+returns three type of values, and you are interested in only one case,
+when the obj was inserted.
 
+These are the type of values that is coming from
+rhashtable_insert_one():
+
+  1) NULL: if object was inserted OR if data is NULL
+  2) Non error and !NULL: A new table to look at
+  3) ERR: Definitely not added
+
+I am wondering if we decoupled the first case, and only return NULL iff
+the object was added, it would simplify this logic.
+
+Something like the following (not tested):
+
+	diff --git a/lib/rhashtable.c b/lib/rhashtable.c
+	index 3e555d012ed60..5a0ec71e990ee 100644
+	--- a/lib/rhashtable.c
+	+++ b/lib/rhashtable.c
+	@@ -554,7 +554,7 @@ static struct bucket_table *rhashtable_insert_one(
+			return ERR_PTR(-EEXIST);
+
+		if (PTR_ERR(data) != -EAGAIN && PTR_ERR(data) != -ENOENT)
+	-               return ERR_CAST(data);
+	+               return ERR_PTR(-EINVAL);
+
+		new_tbl = rht_dereference_rcu(tbl->future_tbl, ht);
+		if (new_tbl)
+
+
+Thanks for fixing it,
+--breno
 
