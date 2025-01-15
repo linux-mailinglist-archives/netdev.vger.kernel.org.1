@@ -1,84 +1,80 @@
-Return-Path: <netdev+bounces-158359-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158360-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94D20A117B3
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 04:14:03 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3BC59A117BA
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 04:23:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6C88718896D5
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 03:13:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BE9443A4F39
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 03:22:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7399E22E402;
-	Wed, 15 Jan 2025 03:13:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFC5B481D1;
+	Wed, 15 Jan 2025 03:23:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jXoOw39C"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5826D20CCD9;
-	Wed, 15 Jan 2025 03:13:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D5C46AA1;
+	Wed, 15 Jan 2025 03:22:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736910825; cv=none; b=GIkY5w+Udupp/CR9z2oXZltkpWorDDOWbnu/azv8RQu3M6Yx3JRNFtpfXoDomgw9NOKrzZhUynUBi0NnDfklNnUWOKjqALYhRsTf4cFbXicrvg56ZxcqM8syPdWENDxBFmFHgGXm7x0/QpAFRF+OXhISnLQD2SwfMNr/mcWdLpE=
+	t=1736911381; cv=none; b=RMLwxIt1uYtZK7FlmB62TM6QiwR9XLpRQdteixdXW9b0epsLA3qmFvO7y3Te5z+Jm0M3myJow9KnZ8KWNRHU2oUdN4bI2hl+13KPKiHge5965SZwtTO4MxUOZsF80kGLR/ZVGU8Pnf76YlqJCqrhWhTj93kKsxvEIjGvD94PLEg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736910825; c=relaxed/simple;
-	bh=19fhQBX1GnkzmQ9DU/Ak5HELfw73UfqbA4i/2V/XM14=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=JyN8qrqnSuPRQkeNggHtcHrJCca7xfdONS7P6XILO4C7i/y6hzVgM/rGnJPXOqtk3c9fNNFgYU8u4cSXh8fv7XlUowjextim5MIaOnCRHVEGLCS6RgsTs1KzKoYspgyKm5koZkmK0MLmEeJI6//Sl7vT2/Uxng9LNkm9ZQMjQUk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: b209254ed2ee11efa216b1d71e6e1362-20250115
-X-CTIC-Tags:
-	HR_CC_COUNT, HR_CC_DOMAIN_COUNT, HR_CC_NO_NAME, HR_CTE_8B, HR_CTT_MISS
-	HR_DATE_H, HR_DATE_WKD, HR_DATE_ZONE, HR_FROM_NAME, HR_SJ_DIGIT_LEN
-	HR_SJ_LANG, HR_SJ_LEN, HR_SJ_LETTER, HR_SJ_NOR_SYM, HR_SJ_PHRASE
-	HR_SJ_PHRASE_LEN, HR_SJ_WS, HR_TO_COUNT, HR_TO_DOMAIN_COUNT, HR_TO_NO_NAME
-	IP_TRUSTED, SRC_TRUSTED, DN_TRUSTED, SA_EXISTED, SN_EXISTED
-	SPF_NOPASS, DKIM_NOPASS, DMARC_NOPASS, CIE_BAD, CIE_GOOD_SPF
-	GTI_FG_BS, GTI_RG_INFO, GTI_C_BU, AMN_T1, AMN_GOOD
-	AMN_C_TI, AMN_C_BU, ABX_MISS_RDNS
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.1.45,REQID:45d68ee1-211d-47c8-a391-f8cbda3922f5,IP:10,
-	URL:0,TC:0,Content:0,EDM:25,RT:0,SF:-5,FILE:0,BULK:0,RULE:Release_Ham,ACTI
-	ON:release,TS:30
-X-CID-INFO: VERSION:1.1.45,REQID:45d68ee1-211d-47c8-a391-f8cbda3922f5,IP:10,UR
-	L:0,TC:0,Content:0,EDM:25,RT:0,SF:-5,FILE:0,BULK:0,RULE:Release_Ham,ACTION
-	:release,TS:30
-X-CID-META: VersionHash:6493067,CLOUDID:175ee3dc6dc9720ea11cec0ee7149125,BulkI
-	D:250115111333OMY4YBWU,BulkQuantity:0,Recheck:0,SF:17|19|24|42|66|74|78|81
-	|82|100|101|102,TC:nil,Content:0|50,EDM:5,IP:-2,URL:0,File:nil,RT:nil,Bulk
-	:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,
-	BRE:0,ARC:0
-X-CID-BVR: 0,NGT
-X-CID-BAS: 0,NGT,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_FAS,TF_CID_SPAM_FSD,TF_CID_SPAM_FSI
-X-UUID: b209254ed2ee11efa216b1d71e6e1362-20250115
-X-User: liuye@kylinos.cn
-Received: from localhost.localdomain [(223.70.160.239)] by mailgw.kylinos.cn
-	(envelope-from <liuye@kylinos.cn>)
-	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
-	with ESMTP id 1552104714; Wed, 15 Jan 2025 11:13:30 +0800
-From: Liu Ye <liuye@kylinos.cn>
-To: horms@kernel.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	herbert@gondor.apana.org.au,
-	kuba@kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	liuye@kylinos.cn,
+	s=arc-20240116; t=1736911381; c=relaxed/simple;
+	bh=Tca4XH1RiY/74FH6duaTmwocup7M/EKjp0h466Y8NjQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=l8nk7jX/ZfSz/7VzZh7sze3WPrw6Grexvs0UkudlzQPFSVQJRu5xriRCZmT5MoIjbYEAi9b4JzIRzv1EHqlouuHeYJBd1+mn9GLnPfhOxvBXVrM48swsjhBFVnHR3f4j+0K4Bv9H+qEReUuZA52CV0zsG7B9VfnWqvuGYOv1ms4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jXoOw39C; arc=none smtp.client-ip=198.175.65.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1736911380; x=1768447380;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=Tca4XH1RiY/74FH6duaTmwocup7M/EKjp0h466Y8NjQ=;
+  b=jXoOw39CEOcmi30An9L246R6zaFN6+OYL976VuESGra4/5ORsHjoOqsQ
+   CMHXGgL2V/hwFIHFOOHfr0hnLYBmdBG0Wazmsmwc47wS4ertEndipJvL6
+   cWLm4bYxXs1kI9MmJEeSLjcYjNsXAsVE52+0A10+cW1quROIr2BrxzYUX
+   WvsNw1B5AcojjeV+O1Zvewxsu0QptXM00yShUcnQ7y/ucQ1pEoPWEmyxK
+   qVZ2Mr/UWM8MOZlfLl35ObYh/fR4RdCwCXt6Lf4MwS+/IP+t7iZAfGO9L
+   +hXDOuVxnTqq5qvSi6KpcoWn8ZVbgFp3ABjloimZEn50kO3m0mxx8mZck
+   Q==;
+X-CSE-ConnectionGUID: 4P2pCfY+S4GPnMhPVFCl3g==
+X-CSE-MsgGUID: 3D6w6xjOTDque+qCWcGD3g==
+X-IronPort-AV: E=McAfee;i="6700,10204,11315"; a="40997407"
+X-IronPort-AV: E=Sophos;i="6.12,316,1728975600"; 
+   d="scan'208";a="40997407"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jan 2025 19:22:59 -0800
+X-CSE-ConnectionGUID: A/SXHqtqQG6YzkuRjkgwSg==
+X-CSE-MsgGUID: pfcvW7p9ST6cGKT97NfshQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,316,1728975600"; 
+   d="scan'208";a="105593665"
+Received: from p12ill20yoongsia.png.intel.com ([10.88.227.38])
+  by fmviesa009.fm.intel.com with ESMTP; 14 Jan 2025 19:22:55 -0800
+From: Song Yoong Siang <yoong.siang.song@intel.com>
+To: Stanislav Fomichev <sdf@fomichev.me>,
+	Vishal Chourasia <vishalc@linux.ibm.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	"David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Cc: stable@vger.kernel.org,
 	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	shuah@kernel.org,
-	steffen.klassert@secunet.com
-Subject: [PATCH net V2] selftests/net/ipsec: Fix Null pointer dereference in rtattr_pack()
-Date: Wed, 15 Jan 2025 11:13:22 +0800
-Message-Id: <20250115031322.43561-1-liuye@kylinos.cn>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20250114160126.GJ5497@kernel.org>
-References: <20250114160126.GJ5497@kernel.org>
+	linux-kernel@vger.kernel.org,
+	bpf@vger.kernel.org
+Subject: [PATCH net 1/1] tools: Sync if_xdp.h uapi tooling header
+Date: Wed, 15 Jan 2025 11:22:48 +0800
+Message-Id: <20250115032248.125742-1-yoong.siang.song@intel.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -87,53 +83,43 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: liuye <liuye@kylinos.cn>
+From: Vishal Chourasia <vishalc@linux.ibm.com>
 
-From: Liu Ye <liuye@kylinos.cn>
+Sync if_xdp.h uapi header to remove following warning:
 
-Address Null pointer dereference in rtattr_pack.
+Warning: Kernel ABI header at 'tools/include/uapi/linux/if_xdp.h' differs
+from latest version at 'include/uapi/linux/if_xdp.h'
 
-Flagged by cppcheck as:
-    tools/testing/selftests/net/ipsec.c:230:25: warning: Possible null pointer
-    dereference: payload [nullPointer]
-    memcpy(RTA_DATA(attr), payload, size);
-                           ^
-    tools/testing/selftests/net/ipsec.c:1618:54: note: Calling function 'rtattr_pack',
-    4th argument 'NULL' value is 0
-    if (rtattr_pack(&req.nh, sizeof(req), XFRMA_IF_ID, NULL, 0)) {
-                                                       ^
-    tools/testing/selftests/net/ipsec.c:230:25: note: Null pointer dereference
-    memcpy(RTA_DATA(attr), payload, size);
-                           ^
-Fixes: 70bfdf62e93a ("selftests/net/ipsec: Add test for xfrm_spdattr_type_t")
+Fixes: 48eb03dd2630 ("xsk: Add TX timestamp and TX checksum offload support")
+Cc: <stable@vger.kernel.org> # 6.8
+Signed-off-by: Vishal Chourasia <vishalc@linux.ibm.com>
+Signed-off-by: Song Yoong Siang <yoong.siang.song@intel.com>
 ---
-V2: Modify description.
-    Add code checking tools.
-    Separating family and given name in Signed-off-by line.
-    Modify code format.
-    Add fixes.
+RFC: https://patchwork.kernel.org/project/netdevbpf/patch/Z4TjzzB8NSnTy_Wa@linux.ibm.com/
 ---
+ tools/include/uapi/linux/if_xdp.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Signed-off-by: Liu Ye <liuye@kylinos.cn>
----
- tools/testing/selftests/net/ipsec.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/tools/testing/selftests/net/ipsec.c b/tools/testing/selftests/net/ipsec.c
-index be4a30a0d02a..9b44a091802c 100644
---- a/tools/testing/selftests/net/ipsec.c
-+++ b/tools/testing/selftests/net/ipsec.c
-@@ -227,7 +227,8 @@ static int rtattr_pack(struct nlmsghdr *nh, size_t req_sz,
+diff --git a/tools/include/uapi/linux/if_xdp.h b/tools/include/uapi/linux/if_xdp.h
+index 2f082b01ff22..42ec5ddaab8d 100644
+--- a/tools/include/uapi/linux/if_xdp.h
++++ b/tools/include/uapi/linux/if_xdp.h
+@@ -117,12 +117,12 @@ struct xdp_options {
+ 	((1ULL << XSK_UNALIGNED_BUF_OFFSET_SHIFT) - 1)
  
- 	attr->rta_len = RTA_LENGTH(size);
- 	attr->rta_type = rta_type;
--	memcpy(RTA_DATA(attr), payload, size);
-+	if (payload)
-+		memcpy(RTA_DATA(attr), payload, size);
+ /* Request transmit timestamp. Upon completion, put it into tx_timestamp
+- * field of union xsk_tx_metadata.
++ * field of struct xsk_tx_metadata.
+  */
+ #define XDP_TXMD_FLAGS_TIMESTAMP		(1 << 0)
  
- 	return 0;
- }
+ /* Request transmit checksum offload. Checksum start position and offset
+- * are communicated via csum_start and csum_offset fields of union
++ * are communicated via csum_start and csum_offset fields of struct
+  * xsk_tx_metadata.
+  */
+ #define XDP_TXMD_FLAGS_CHECKSUM			(1 << 1)
 -- 
-2.25.1
+2.34.1
 
 
