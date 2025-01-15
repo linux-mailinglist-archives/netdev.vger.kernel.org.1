@@ -1,198 +1,188 @@
-Return-Path: <netdev+bounces-158544-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158545-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83F26A12704
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 16:15:57 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E6F6A1271B
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 16:19:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 98CEF166E17
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 15:15:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0E7AE3A142A
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 15:19:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B35A7080C;
-	Wed, 15 Jan 2025 15:15:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB499145B2E;
+	Wed, 15 Jan 2025 15:19:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Nyg/v2wF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7863A24A7DB;
-	Wed, 15 Jan 2025 15:15:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4FEB70801;
+	Wed, 15 Jan 2025 15:19:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736954153; cv=none; b=kld3bfm7yyC9YKRaSb0z1OWAwbPhR81AYJ8pI8QkWFo/qXr1TxpudWFLxb/Omm1KluQCg3hahtTdkukqnERN3j8yxKz55IFbfThcXwB0o95spJArO5W3HiSrm4DIIw0B7BqXd2ZP+xx+N7CjBDXUIQpDFLoUPys+f0V5uNWPEzo=
+	t=1736954384; cv=none; b=WO3DLYpkFkGD8xhpgeY63sk8YHrE3S6Cr3UMCXOmmfgxWLE+M1O9ivSMGwcbRB2HIMnI7ILc4g1kwSJcMMEh2Cu3SwhJD4mDHfGS6HABAEE5TOv+TloPeayFLK4xf3TZfxHYMHIbuz+G8aqGmNT6YZId9TtbVvBeFk9QmEJw77E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736954153; c=relaxed/simple;
-	bh=n3aedPDU58g9oi8jG7q6qNb6L07RnHv5DCH2ebVvDrM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GqV7LdaWHf1vrRlIFft+e6vEQRoFmTinleFhXQWhQ8NY9+PIZjKUaBOWInTPxqkn0+YQn3zUWwOEp7+JQiwz8qEIXWKb8MFyYjIFwzHWgecb4KhUizSXIVPJRL+3rpR/SbOpRUUyi+xFOr4uGCCjdVRPDKElsnx9JQtZG8zG2+c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-aaec61d0f65so1362698366b.1;
-        Wed, 15 Jan 2025 07:15:51 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736954150; x=1737558950;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=VxAdtxkE+UEREV6mcvRrNj4o4nik0aOIdra7qRiWZc4=;
-        b=KV2Rf2PzVBpG+xmnig1IF++E6MrB71rpernBz3J+rGyEJ78ceCkFmW4VeuuSir6WyF
-         OTp8Kg8MkI6FEBNZyudjUmzy6QlTgqJFhjzcpn8gv4yLiZA5/G1Vc5eQv+8aBsYSNdc8
-         bWd7Bg29RMQrxtmPjWFNMntLAh8FgxOH0c7vT3WIgdLul0WUlbWB4IyFYzJUym0yVspP
-         g17MMZOeADNoP7qeMo+4f2HRju2tbzIsx0O8PhRdHXYp/rcaWCOPU6iScYqe7bF7jDzg
-         uGi1ZZiP0P/87gTfFTNOnYRBYVzbWi21Y7n9CMckDdP3SZGHOnjrCDCoBBMWC3FO9da+
-         vtgA==
-X-Forwarded-Encrypted: i=1; AJvYcCWSQiRllGvc/VL1706xc+Zh23ErH1mATkF5ojI/7rOvl8CJ1KF1RdcGSpq6HtU+8c1WWj8X1nfsGCaQpR2R@vger.kernel.org, AJvYcCX3RzZ5ByvPVam8vaC1jFVw57ZZC/O0SZZFrWQ79pN+2Dzb09+tORxPYhksBHf060U+7rM5ptKL@vger.kernel.org, AJvYcCXE/jsFShp20JmyxN5jm60k4ns4Fbyve1+jUM6683WOM6uDFZ2/qYcxhvNgKbVxxhhuVi1aNbl6mVIXZK/5@vger.kernel.org, AJvYcCXt8H8LnEQdwUdfedWp8yaPqEIwiAhsNc6CJRVzN8Wy0gOkdcS+5yxaAg4w1d8eoU7XYulGq1Ja2A/nz8A=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxnhZnLmwLnrBcoBzhEIReqRRofOVr3NWmcjxz7GxFRYdOWgKn8
-	nqe0wTP5g1InJl0eKJ0v4BnJCbFGO0mCp4jPB86n97NCFwSTS8E/
-X-Gm-Gg: ASbGncv4uk2D5+SJdBLMrG0HAOeiX7FwBnRe03UrQ4B/vOZNFv2jZkb5IFpJRZLqru/
-	Yujxja28qApa+/ieZgxlgROecAPEmXA1RatzO+TIzUN0MCUAa1R4E64lf2uUJHVh+fPZIpj9ysa
-	OcazGh5VvVSO5F2sg7noF6vjEZRVPwPyJL8P7kfxnAAKKEd/JGPnwVWSVvZ/esQQBei+4WLzWbE
-	1nn7hY4aS0G2DuxcvJuRLq+zMDF3cn5sRI3yrK07NHE2n8=
-X-Google-Smtp-Source: AGHT+IHiSCWa2oGdZdDLuvQ3qdU+v2LX5LzfGe//YSM+4KYGuK3X4yasIQ/H0OgC3CyaYs2W7qOEFA==
-X-Received: by 2002:a17:907:3e24:b0:aac:2298:8960 with SMTP id a640c23a62f3a-ab2ab6fcf7amr2927968666b.35.1736954149465;
-        Wed, 15 Jan 2025 07:15:49 -0800 (PST)
-Received: from gmail.com ([2a03:2880:30ff:9::])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5da0aec6e7asm1101432a12.33.2025.01.15.07.15.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Jan 2025 07:15:48 -0800 (PST)
-Date: Wed, 15 Jan 2025 07:15:46 -0800
-From: Breno Leitao <leitao@debian.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Michael Kelley <mhklinux@outlook.com>,
-	"saeedm@nvidia.com" <saeedm@nvidia.com>,
-	"tariqt@nvidia.com" <tariqt@nvidia.com>,
-	"linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Thomas Graf <tgraf@suug.ch>, Tejun Heo <tj@kernel.org>,
-	Hao Luo <haoluo@google.com>, Josh Don <joshdon@google.com>,
-	Barret Rhoden <brho@google.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: Re: [v3 PATCH] rhashtable: Fix rhashtable_try_insert test
-Message-ID: <20250115-cordial-steadfast-perch-c4dfda@leitao>
-References: <Z1rYGzEpMub4Fp6i@gondor.apana.org.au>
- <Z2aFL3dNLYOcmzH3@gondor.apana.org.au>
- <20250102-daffy-vanilla-boar-6e1a61@leitao>
- <SN6PR02MB41572415707F0FA6D9A61247D4132@SN6PR02MB4157.namprd02.prod.outlook.com>
- <20250109-marigold-bandicoot-of-exercise-8ebede@leitao>
- <Z4DoFYQ3ytB-wS3-@gondor.apana.org.au>
- <SN6PR02MB41577C2C4EB260F3D2D4F85FD41C2@SN6PR02MB4157.namprd02.prod.outlook.com>
- <Z4FXs8vAtitHIJyl@gondor.apana.org.au>
- <SN6PR02MB41570F1F5F4F579B4E8F0CD3D41C2@SN6PR02MB4157.namprd02.prod.outlook.com>
- <Z4XWx5X0doetOJni@gondor.apana.org.au>
+	s=arc-20240116; t=1736954384; c=relaxed/simple;
+	bh=7ejRYevHYOXah2gzkbZoNHZ3U+tY63P81luAAusOV5c=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ARQLnxW6F3kyIUbXtasbAN0eNIDe8LWO4/5uqE9bX3iU0gS0g2Bc52K9VYS+o2/S3lloo4ngw6EPty0XRSbjbVoKSkgYx6IgrWGYu79PwhFSbGZ4mp1BKFPe5uXRjOlJEW84T9uT6cI3fG987cZ17uDiqJXEiP51g5Z/uMXIAls=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Nyg/v2wF; arc=none smtp.client-ip=192.198.163.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1736954383; x=1768490383;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=7ejRYevHYOXah2gzkbZoNHZ3U+tY63P81luAAusOV5c=;
+  b=Nyg/v2wFv5GjbopIdgMumt426wMZJ8ArFpurSVm2365LgBKW2cTXZ+5O
+   /U9+u5NyaI+Th7mTuqRzhmz5YDSl3urcUfhUIQ02/Ad/DlDBt+FkbrWHE
+   8tStd+9bcDHn6mnO9xLj7OzZf/0wLfulOauXq3mZjmiHUMRKfObVT+2yl
+   UuqBsxWi4aUxkIjjhh1fZLLhSPLj7W/uZ73PGUN+zvfple7JPC4oq1ZiM
+   QKnzCe48p0ySmoThPn254RPG5oHsQm6KcEVNbGayurqLwFuA3ggpgZ6gX
+   zDMjGkp2kApi6NwfLIZE4sg+jtPKN5grkQCX6tIgLQyKinenYd6LYiUw1
+   A==;
+X-CSE-ConnectionGUID: qIpaeHGKTN++xMZWw1kJ7A==
+X-CSE-MsgGUID: wylSEl8uTfeJjUtSCm0g6A==
+X-IronPort-AV: E=McAfee;i="6700,10204,11316"; a="37451756"
+X-IronPort-AV: E=Sophos;i="6.13,206,1732608000"; 
+   d="scan'208";a="37451756"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jan 2025 07:19:41 -0800
+X-CSE-ConnectionGUID: GyD+oBEsRR+ALt26wRX3rw==
+X-CSE-MsgGUID: EBVu00rWTdOolhOuqOIJNg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.13,206,1732608000"; 
+   d="scan'208";a="105116640"
+Received: from newjersey.igk.intel.com ([10.102.20.203])
+  by fmviesa007.fm.intel.com with ESMTP; 15 Jan 2025 07:19:37 -0800
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Daniel Xu <dxu@dxuuu.xyz>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	=?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	netdev@vger.kernel.org,
+	bpf@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v3 0/8] bpf: cpumap: enable GRO for XDP_PASS frames
+Date: Wed, 15 Jan 2025 16:18:53 +0100
+Message-ID: <20250115151901.2063909-1-aleksander.lobakin@intel.com>
+X-Mailer: git-send-email 2.48.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z4XWx5X0doetOJni@gondor.apana.org.au>
+Content-Transfer-Encoding: 8bit
 
-On Tue, Jan 14, 2025 at 11:15:19AM +0800, Herbert Xu wrote:
-> On Fri, Jan 10, 2025 at 06:22:40PM +0000, Michael Kelley wrote:
-> >
-> > This patch passes my tests. I'm doing a narrow test to verify that
-> > the boot failure when opening the Mellanox NIC is no longer occurring.
-> > I also unloaded/reloaded the mlx5 driver a couple of times. For good
-> > measure, I then did a full Linux kernel build, and all is good. My testing
-> > does not broadly verify correct operation of rhashtable except as it
-> > gets exercised implicitly by these basic tests.
-> 
-> Thanks for testing! The patch needs one more change though as
-> moving the atomic_inc outside of the lock was a bad idea on my
-> part.  This could cause atomic_inc/atomic_dec to be reordered
-> thus resulting in an underflow.
-> 
-> Thanks,
-> 
-> ---8<---
-> The test on whether rhashtable_insert_one did an insertion relies
-> on the value returned by rhashtable_lookup_one.  Unfortunately that
-> value is overwritten after rhashtable_insert_one returns.  Fix this
-> by moving the test before data gets overwritten.
-> 
-> Simplify the test as only data == NULL matters.
-> 
-> Finally move atomic_inc back within the lock as otherwise it may
-> be reordered with the atomic_dec on the removal side, potentially
-> leading to an underflow.
-> 
-> Reported-by: Michael Kelley <mhklinux@outlook.com>
-> Fixes: e1d3422c95f0 ("rhashtable: Fix potential deadlock by moving schedule_work outside lock")
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Several months ago, I had been looking through my old XDP hints tree[0]
+to check whether some patches not directly related to hints can be sent
+standalone. Roughly at the same time, Daniel appeared and asked[1] about
+GRO for cpumap from that tree.
 
-Reviewed-by: Breno Leitao <leitao@debian.org>
+Currently, cpumap uses its own kthread which processes cpumap-redirected
+frames by batches of 8, without any weighting (but with rescheduling
+points). The resulting skbs get passed to the stack via
+netif_receive_skb_list(), which means no GRO happens.
+Even though we can't currently pass checksum status from the drivers,
+in many cases GRO performs better than the listified Rx without the
+aggregation, confirmed by tests.
 
-> diff --git a/lib/rhashtable.c b/lib/rhashtable.c
-> index bf956b85455a..0e9a1d4cf89b 100644
-> --- a/lib/rhashtable.c
-> +++ b/lib/rhashtable.c
-> @@ -611,21 +611,23 @@ static void *rhashtable_try_insert(struct rhashtable *ht, const void *key,
->  			new_tbl = rht_dereference_rcu(tbl->future_tbl, ht);
->  			data = ERR_PTR(-EAGAIN);
->  		} else {
-> +			bool inserted;
-> +
->  			flags = rht_lock(tbl, bkt);
->  			data = rhashtable_lookup_one(ht, bkt, tbl,
->  						     hash, key, obj);
->  			new_tbl = rhashtable_insert_one(ht, bkt, tbl,
->  							hash, obj, data);
-> +			inserted = data && !new_tbl;
-> +			if (inserted)
-> +				atomic_inc(&ht->nelems);
->  			if (PTR_ERR(new_tbl) != -EEXIST)
->  				data = ERR_CAST(new_tbl);
->  
->  			rht_unlock(tbl, bkt, flags);
->  
-> -			if (PTR_ERR(data) == -ENOENT && !new_tbl) {
-> -				atomic_inc(&ht->nelems);
-> -				if (rht_grow_above_75(ht, tbl))
-> -					schedule_work(&ht->run_work);
-> -			}
-> +			if (inserted && rht_grow_above_75(ht, tbl))
-> +				schedule_work(&ht->run_work);
+In order to enable GRO in cpumap, we need to do the following:
 
-That makes sense, since data could be ERR_PTR(-ENOENT) and ERR_PTR(-EAGAIN), and
-the object being inserted, which means that nelems should be increased.
+* patches 1-2: decouple the GRO struct from the NAPI struct and allow
+  using it out of a NAPI entity within the kernel core code;
+* patch 3: switch cpumap from netif_receive_skb_list() to
+  gro_receive_skb().
 
-It was hard to review this patch, basically rhashtable_insert_one()
-returns three type of values, and you are interested in only one case,
-when the obj was inserted.
+Additional improvements:
 
-These are the type of values that is coming from
-rhashtable_insert_one():
+* patch 4: optimize XDP_PASS in cpumap by using arrays instead of linked
+  lists;
+* patch 5-6: introduce and use function do get skbs from the NAPI percpu
+  caches by bulks, not one at a time;
+* patch 7-8: use that function in veth as well and remove the one that
+  was now superseded by it.
 
-  1) NULL: if object was inserted OR if data is NULL
-  2) Non error and !NULL: A new table to look at
-  3) ERR: Definitely not added
+My trafficgen UDP GRO tests, small frame sizes:
 
-I am wondering if we decoupled the first case, and only return NULL iff
-the object was added, it would simplify this logic.
+                GRO off    GRO on
+baseline        2.7        N/A       Mpps
+patch 3         2.3        4         Mpps
+patch 8         2.4        4.7       Mpps
 
-Something like the following (not tested):
+1...3 diff      -17        +48       %
+1...8 diff      -11        +74       %
 
-	diff --git a/lib/rhashtable.c b/lib/rhashtable.c
-	index 3e555d012ed60..5a0ec71e990ee 100644
-	--- a/lib/rhashtable.c
-	+++ b/lib/rhashtable.c
-	@@ -554,7 +554,7 @@ static struct bucket_table *rhashtable_insert_one(
-			return ERR_PTR(-EEXIST);
+Daniel reported from +14%[2] to +18%[3] of throughput in neper's TCP RR
+tests. On my system however, the same test gave me up to +100%.
 
-		if (PTR_ERR(data) != -EAGAIN && PTR_ERR(data) != -ENOENT)
-	-               return ERR_CAST(data);
-	+               return ERR_PTR(-EINVAL);
+Note that there's a series from Lorenzo[4] which achieves the same, but
+in a different way. During the discussions, the approach using a
+standalone GRO instance was preferred over the threaded NAPI.
 
-		new_tbl = rht_dereference_rcu(tbl->future_tbl, ht);
-		if (new_tbl)
+[0] https://github.com/alobakin/linux/tree/xdp_hints
+[1] https://lore.kernel.org/bpf/cadda351-6e93-4568-ba26-21a760bf9a57@app.fastmail.com
+[2] https://lore.kernel.org/bpf/merfatcdvwpx2lj4j2pahhwp4vihstpidws3jwljwazhh76xkd@t5vsh4gvk4mh
+[3] https://lore.kernel.org/bpf/yzda66wro5twmzpmjoxvy4si5zvkehlmgtpi6brheek3sj73tj@o7kd6nurr3o6
+[4] https://lore.kernel.org/bpf/20241130-cpumap-gro-v1-0-c1180b1b5758@kernel.org
 
+Alexander Lobakin (8):
+  net: gro: decouple GRO from the NAPI layer
+  net: gro: expose GRO init/cleanup to use outside of NAPI
+  bpf: cpumap: switch to GRO from netif_receive_skb_list()
+  bpf: cpumap: reuse skb array instead of a linked list to chain skbs
+  net: skbuff: introduce napi_skb_cache_get_bulk()
+  bpf: cpumap: switch to napi_skb_cache_get_bulk()
+  veth: use napi_skb_cache_get_bulk() instead of xdp_alloc_skb_bulk()
+  xdp: remove xdp_alloc_skb_bulk()
 
-Thanks for fixing it,
---breno
+ include/linux/netdevice.h                  |  26 ++--
+ include/linux/skbuff.h                     |   1 +
+ include/net/busy_poll.h                    |  11 +-
+ include/net/gro.h                          |  38 ++++--
+ include/net/xdp.h                          |   1 -
+ drivers/net/ethernet/brocade/bna/bnad.c    |   1 +
+ drivers/net/ethernet/cortina/gemini.c      |   1 +
+ drivers/net/veth.c                         |   3 +-
+ drivers/net/wwan/t7xx/t7xx_hif_dpmaif_rx.c |   1 +
+ kernel/bpf/cpumap.c                        | 145 +++++++++++++--------
+ net/core/dev.c                             |  77 +++--------
+ net/core/gro.c                             | 101 +++++++++-----
+ net/core/skbuff.c                          |  62 +++++++++
+ net/core/xdp.c                             |  10 --
+ 14 files changed, 298 insertions(+), 180 deletions(-)
+
+---
+From v2[5]:
+* 1: remove napi_id duplication in both &gro_node and &napi_struct by
+     using a tagged struct group. The most efficient approach I've
+     found so far: no additional branches, no inline expansion, no tail
+     calls / double calls, saves 8 bytes of &napi_struct in comparison
+     with v2 (Jakub, Paolo, me);
+* 4: improve and streamline skb allocation fails (-1 branch per frame),
+     skip more code for skb-only batches.
+
+From v1[6]:
+* use a standalone GRO instance instead of the threaded NAPI (Jakub);
+* rebase and send to net-next as it's now more networking than BPF.
+
+[5] https://lore.kernel.org/netdev/20250107152940.26530-1-aleksander.lobakin@intel.com
+[6] https://lore.kernel.org/bpf/20240830162508.1009458-1-aleksander.lobakin@intel.com
+-- 
+2.48.0
+
 
