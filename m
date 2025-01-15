@@ -1,114 +1,123 @@
-Return-Path: <netdev+bounces-158352-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158354-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70E95A11779
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 03:50:29 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C248A1177D
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 03:51:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1EB411889023
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 02:50:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 76C347A3106
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 02:51:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E094E14B946;
-	Wed, 15 Jan 2025 02:50:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C39C1465BE;
+	Wed, 15 Jan 2025 02:51:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ro8Q5VSG"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FNVmokXp"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC4F5846D
-	for <netdev@vger.kernel.org>; Wed, 15 Jan 2025 02:50:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59D0022DF8F
+	for <netdev@vger.kernel.org>; Wed, 15 Jan 2025 02:51:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736909412; cv=none; b=FK+cm9ps1binm0Pitb3JDpSAP+6WS5kBQr7y4StdHG4dE8rxhnq55kAIjj5dsRzXZ0uk1WZyOtTmhRDImShpw9xyU+9FPILl0dZWJ9Q+UMGNIS9lFGDArsdYotYrLOp4lN1lPUYhLmfAscZuKx0OzOnKSis9fW9nX9yJAKxWcvU=
+	t=1736909478; cv=none; b=eYACVCCN4ixF51dbGaKcp5UDZCHzdVgwyh0LK7umBimeZy2AqK0kAH20cUD2ijWQr96b7jfJd6JyI4F6F3P6Ox0YLkWcl44651SVzL72b6Wc1FeAzT/c/FCTnDB2FpIKPOWUegAe5NSMq1X/hetVIZQKCwGGu39piKFT66oZ/n8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736909412; c=relaxed/simple;
-	bh=XZnxBk+FcFoHxx191qImvZNg7w+IyFMnBMHTXx6L5ZE=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=aQDaemVJPGr6DiOMVw2/b8p714ZGA5UX2hVY6poo6aTWMj5PohPRO/Htx24jB4pkpoAqqcUZM0UZ5AENMFSH2KLhswbSh5XVDOpXExbbg4p7wYyKN7Nbl32RLYbEIynDlowUSE8SdfOFOVR/FRGxSMLHTXPdRpBnBByJwLP1IC4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ro8Q5VSG; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3C91EC4CEDD;
-	Wed, 15 Jan 2025 02:50:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736909412;
-	bh=XZnxBk+FcFoHxx191qImvZNg7w+IyFMnBMHTXx6L5ZE=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ro8Q5VSGF3ozPz8UtYtwIDdO3bUq+DZXh2zvyVFoMzBbsLYiAfm0Vhyg06qEZ6YAm
-	 hUU7XtQe6frBDOBahLq5YkoW0eCCXPnnQrKvt9HrlyJ7sADGmfRjJyL84Y7sVoDhEY
-	 xyeLkf5MwkMqaeLR2neatqE0uO95H+6LLQotiMElQEwL2hd20j4CxXyRxVq6b1CFhv
-	 1BDnko5EJzTjyqnD38D9cijquhOAfRudMIUk62JMZc55P0HJvHJCJ95c4bshAwlSYQ
-	 YWsmpNQDzQyrO8HcMLjOlVmpNMEoRPRe0QH71rBohz9nhmnTjuCtVBYevmCab+XFwS
-	 c5TgBbBqAT9Ng==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 34A5F380AA5F;
-	Wed, 15 Jan 2025 02:50:36 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1736909478; c=relaxed/simple;
+	bh=Ol1foyh0v+J/5oTdMoykClI9Rf1Br3w7yVmhBxRK+sU=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=jdTNPcCg6wU1Rw/SfuHEvaaDG2VNsNkz1CGJyiw8c/hd6SyY6MwlqBPAXc0+K6uQrb9D0eKaOhIOUo6qMbjuUBN3TpVPGBWUklAOR37V2Qwb00R4jd65qek4z9OAE56AOtKCh73lFuiVxWBScmUcrbFo9EwbLC6RWfXacHYvir8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FNVmokXp; arc=none smtp.client-ip=209.85.128.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-43621d27adeso42908505e9.2
+        for <netdev@vger.kernel.org>; Tue, 14 Jan 2025 18:51:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1736909474; x=1737514274; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=97jHUU/zDxIQl5qdvo3rd8r3MNE7feZ3PfjTB4KTijE=;
+        b=FNVmokXpBA3PT1GbBh7lWpe+i6PrNK2AxDhAFgV8Q5d6xIiCiWxb9ccnuKDc5vzDGx
+         SCqyVEslGVNmhYFA5DEVPB+2D7wrpK8HpI8zJNGtngUSjb42gwxqHIhJbOcfhSZgiBCo
+         HhRF3ER2ynRWlOceVYO0u7gscfEqXDu9R479l6gpKMeexPqL9j80/LozvN5Z3Oa7s5pH
+         H6Tq1oyFJvm+YkInvt+Gm6+GOPg98fmLRM5yr4Cd5o7gzCoMe2CpX1ZG7YR6ybeja94I
+         QAsWovl1VkVVobE2PqIIC38VMTJ6aTvrvQ0J3UB6GyWsR10pkrV8NLXvzHY2C/DYnSro
+         cCZA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736909474; x=1737514274;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=97jHUU/zDxIQl5qdvo3rd8r3MNE7feZ3PfjTB4KTijE=;
+        b=i3tz2Ua4T0KcpD7YSc4KSVDzISJoURE+M81PeQEU8w+A+eGk9nfT5McszJIRi3b7gN
+         dahyYMt3AMtSH9n2Hnt31k3z4A6whkhOrz++sucVPfOi2oGiW21qnhFN9WVHKNV/B73c
+         4ZCzsoSzz/nPqTUsdwUgioAUW6ORT6zHL0jqI4SpLoW3vMF7eGyJ+Ia0/JueWOhWtysz
+         19KEX/Ct3JJ+IjEDwHlSKnghaUjD4LTWHhxnRiIpTkGTKrWFMAuqPEwnDY5n/cSX8Ngm
+         Se+75oVODmNejL9lrlx2DLsPVW12YFyFwXaRIqp+Y8iIn75VVc0TZ9wqHxt0dX1m461W
+         TwJA==
+X-Forwarded-Encrypted: i=1; AJvYcCUpMQGXT7siZKu+n2GDQiyc3C+lC/zMdrBdigHxIa8ZawLrPKz2eCaGDwkxSBe0W7o9JGWDvtw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyDk0UL5J6NAAlCR5I+fVjuYmGEm8+lTe+i6DloxMFUlmxfE7Jc
+	7mvhSikEaUeothNmwOYpW8tJO+ewfKXw+4zQrDYvq8BsrSY+Ct9b5NRiqw==
+X-Gm-Gg: ASbGncschSiRC+2WeL+mt/TkgddsrS3c5KgfFfDrO3bcDD6Vy1buOSC9lS+xyNIGpKz
+	oU1xHDCqx1WOSuugRxWkZ0CWCh2rKhnur+q/oSCSy/Qdurnk6szoEWiPInOyiwb8P+Tzfd9B7HE
+	/hg/yrTNKFtWoLi/oLtWNbsTYFeJMSR4qoLiu7XzkTmwov78GMbmFRLidbNsfQB1whW9H8fc6Of
+	hBWNpusMl+S1GjXbncMHbj+3opYz+5Ld1A5GXb3Isp+y7Mcj7PFXu4VyQglR12b9nHuwJxGeZXb
+	vfJW9rYsvqUIT5D8SuNWCAPydT9tYUElHVZ1RylAPxSV
+X-Google-Smtp-Source: AGHT+IFzWMQ4xPPxDUyyDouZPHa9Vc4zJh/mL0EaxCe51iBMJJUz4R9wg04YBWfSPKYEFB+ZkZ3sUA==
+X-Received: by 2002:a05:600c:5750:b0:436:e3ea:4447 with SMTP id 5b1f17b1804b1-436e3ea445dmr266356435e9.30.1736909474253;
+        Tue, 14 Jan 2025 18:51:14 -0800 (PST)
+Received: from [192.168.1.122] (cpc159313-cmbg20-2-0-cust161.5-4.cable.virginm.net. [82.0.78.162])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38a8e37d2f5sm16501529f8f.17.2025.01.14.18.51.12
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 14 Jan 2025 18:51:13 -0800 (PST)
+Subject: Re: [PATCH net] net: avoid race between device unregistration and
+ set_channels
+To: Jakub Kicinski <kuba@kernel.org>, Antoine Tenart <atenart@kernel.org>
+Cc: davem@davemloft.net, pabeni@redhat.com, edumazet@google.com,
+ netdev@vger.kernel.org
+References: <20250113161842.134350-1-atenart@kernel.org>
+ <20250114112401.545a70f7@kernel.org>
+From: Edward Cree <ecree.xilinx@gmail.com>
+Message-ID: <f87576e0-93d2-42fe-a6da-09430386bc16@gmail.com>
+Date: Wed, 15 Jan 2025 02:51:12 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 0/9] net: stmmac: further EEE cleanups (and one fix!)
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173690943498.230797.5869251402223823826.git-patchwork-notify@kernel.org>
-Date: Wed, 15 Jan 2025 02:50:34 +0000
-References: <Z4T84SbaC4D-fN5y@shell.armlinux.org.uk>
-In-Reply-To: <Z4T84SbaC4D-fN5y@shell.armlinux.org.uk>
-To: Russell King (Oracle) <linux@armlinux.org.uk>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, alexandre.torgue@foss.st.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- ericwouds@gmail.com, kuba@kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-stm32@st-md-mailman.stormreply.com, mcoquelin.stm32@gmail.com,
- netdev@vger.kernel.org, pabeni@redhat.com
+In-Reply-To: <20250114112401.545a70f7@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Mon, 13 Jan 2025 11:45:37 +0000 you wrote:
-> Hi,
+On 14/01/2025 19:24, Jakub Kicinski wrote:
+> On Mon, 13 Jan 2025 17:18:40 +0100 Antoine Tenart wrote:
+>> This is because unregister_netdevice_many_notify might run before
+>> set_channels (both are under rtnl). 
 > 
-> This series continues the EEE cleanup of the stmmac driver, and
-> includes one fix.
+> But that is very bad, not at all sane. The set call should not proceed
+> once dismantle begins.
 > 
-> As mentioned in the previous series, I wasn't entirely happy with the
-> "stmmac_disable_sw_eee_mode" name, so the first patch renames this to
-> "stmmac_stop_sw_lpi" instead, which I think better describes what this
-> function is doing - stopping the transmit of the LPI state because we
-> have a packet ot send.
+> How about this?
 > 
-> [...]
+> diff --git a/net/ethtool/netlink.c b/net/ethtool/netlink.c index 849c98e637c6..913c8e329a06 100644
+> --- a/net/ethtool/netlink.c
+> +++ b/net/ethtool/netlink.c
+> @@ -90,7 +90,7 @@ int ethnl_ops_begin(struct net_device *dev)
+>                 pm_runtime_get_sync(dev->dev.parent);
+>  
+>         if (!netif_device_present(dev) ||
+> -           dev->reg_state == NETREG_UNREGISTERING) {
+> +           dev->reg_state > NETREG_REGISTERED) {
+>                 ret = -ENODEV;
+>                 goto err;
+>         }
+> 
 
-Here is the summary with links:
-  - [net-next,1/9] net: stmmac: rename stmmac_disable_sw_eee_mode()
-    https://git.kernel.org/netdev/net-next/c/900782a029e5
-  - [net-next,2/9] net: stmmac: correct priv->eee_sw_timer_en setting
-    https://git.kernel.org/netdev/net-next/c/4fe09a0d64d5
-  - [net-next,3/9] net: stmmac: simplify TX cleanup decision for ending sw LPI mode
-    https://git.kernel.org/netdev/net-next/c/bfa9e131c9b2
-  - [net-next,4/9] net: stmmac: check priv->eee_sw_timer_en in suspend path
-    https://git.kernel.org/netdev/net-next/c/c920e6402523
-  - [net-next,5/9] net: stmmac: add stmmac_try_to_start_sw_lpi()
-    https://git.kernel.org/netdev/net-next/c/0cf44bd0c118
-  - [net-next,6/9] net: stmmac: provide stmmac_eee_tx_busy()
-    https://git.kernel.org/netdev/net-next/c/82f2025dda76
-  - [net-next,7/9] net: stmmac: provide function for restarting sw LPI timer
-    https://git.kernel.org/netdev/net-next/c/af5dc22bdb5f
-  - [net-next,8/9] net: stmmac: combine stmmac_enable_eee_mode()
-    https://git.kernel.org/netdev/net-next/c/ec8553673b1f
-  - [net-next,9/9] net: stmmac: restart LPI timer after cleaning transmit descriptors
-    https://git.kernel.org/netdev/net-next/c/d28e89244978
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Would __dev_ethtool() need a similar check?
 
