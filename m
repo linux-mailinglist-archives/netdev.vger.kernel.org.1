@@ -1,112 +1,158 @@
-Return-Path: <netdev+bounces-158560-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158561-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 33B46A127D8
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 16:52:09 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3906AA127EB
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 16:55:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 92B6A3A7879
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 15:51:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7B8E9188BACA
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 15:55:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EFC515B14B;
-	Wed, 15 Jan 2025 15:51:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E164146D40;
+	Wed, 15 Jan 2025 15:54:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Qunw6Huf"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WZqNIYZc"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B48724A7C4
-	for <netdev@vger.kernel.org>; Wed, 15 Jan 2025 15:51:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7969F24A7C4
+	for <netdev@vger.kernel.org>; Wed, 15 Jan 2025 15:54:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736956316; cv=none; b=agLM2jSLVo/KsMJlA7YRcJ+8i/MRQWH/j3O5r4ck7lp+aoQB9px1pRkCSFTNKfs4UcQ3F9xEJrJVSXMQPttLah+Qa9cmfQ53amYzkj3WkAp747wcDJaP4tLvN7p6CrxTFg2+QwmVfoHap4h5yduKy4WxERtcKAhAGqpzs4YnNSE=
+	t=1736956497; cv=none; b=uT0G5SQ8TGEfLrYtyDeaAoyxBxTAozDORVEmHkQKUmOZ5IZN3LWbHH9g843PlAVVa+7ntVxiJFhU+XV3Jad6NzeTQE8jE0AEIiuYhRpn+bUE+TZ2YBbMmTA3o+iGefyt9LeY1BPd86CXYkPQ/HbMtndfpsJwlXs2S6YQmmA+AOA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736956316; c=relaxed/simple;
-	bh=vq7TaRrmt+cHZ7ljRtzXJQsFR/LIOZrEyYrVV4qPrmU=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=u+LAEbRXDragSgbv/jfZZx2jfN35sOnGOHtIcrOfivU1MdeR0B4nbQvjSxhibJu26NyzcHqaMS7Lci+DOtscGAsjFIvUkks2NP0caiaD1OFd8E027MJrMI1UZEg3q5i4s4eoC0s/EKtzwwqDDIxnE5B1mObfD71HG2Mrf2l4eoQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Qunw6Huf; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AED1AC4CED1;
-	Wed, 15 Jan 2025 15:51:55 +0000 (UTC)
+	s=arc-20240116; t=1736956497; c=relaxed/simple;
+	bh=hEtlioN6X7ERl4nlGh0NmlPefyzDMuNdQpg1m5c6TYs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DjPrvwkmfQG+QenbWZ91X4H9cAh3Fd+RrhZc+9UP1OZePe8Qp1D5+cELN9czkw3D40vHKNoG+jQpCKktOcsqOGOkQRVqi1tYbomOomIhqJgRtBoBgbmqswbXv+8moJBKtJFn9uL5Ctt7q004R0hD1eg6PR8NY7OXZyxqj4DTZRQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WZqNIYZc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A72B5C4CED1;
+	Wed, 15 Jan 2025 15:54:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736956316;
-	bh=vq7TaRrmt+cHZ7ljRtzXJQsFR/LIOZrEyYrVV4qPrmU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Qunw6HufL0PWHrlPlWEGHFDd14NGzSC5MQHobhy3sIvLIfnvm4G5cr8PjlZvVAXJk
-	 0Nk18N8ROIPuP/qDzIvKSu1/Au3HkgnbCFLyW19qAN+0G8iHIitXdAkrdChaVmJZUp
-	 1bfVKTu3Cd/YRJ4I39sYDXX3V1vqH1Zkd6Z+OZSVECr5UaA9hylrRRr4pnstyOs6n2
-	 FVpS7JdvBuY9IztyUST0jedI9aRA6bGq3vfMrYANSKCA95B+i1KsXHzOjJDaTrlXN+
-	 gru10BVrzG6nI1x4BytAoEteWn2xz3drpCrMANH5Ms+sooiAB2XBK3W5LsHbL/ToHn
-	 rtxRgo+ENzC/w==
-Date: Wed, 15 Jan 2025 07:51:54 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Jamal Hadi Salim <jhs@mojatatu.com>
-Cc: netdev@vger.kernel.org, jiri@resnulli.us, xiyou.wangcong@gmail.com,
- davem@davemloft.net, edumazet@google.com, security@kernel.org,
- nnamrec@gmail.com
-Subject: Re: [PATCH net 1/1 v3] net: sched: Disallow replacing of child
- qdisc from one parent to another
-Message-ID: <20250115075154.528eee8a@kernel.org>
-In-Reply-To: <CAM0EoMk0rKe=AqoD_vNZNj2dz9eKSQpgS0Cc7Bi+FQwqpyHXaw@mail.gmail.com>
-References: <20250111151455.75480-1-jhs@mojatatu.com>
-	<20250114172620.7e7e97b4@kernel.org>
-	<CAM0EoMnYi3JBPS7KyPoW5-St-xAaJ8Xa1tEp8JH9483Z5k8cLg@mail.gmail.com>
-	<20250115063655.21be5c74@kernel.org>
-	<CAM0EoMk0rKe=AqoD_vNZNj2dz9eKSQpgS0Cc7Bi+FQwqpyHXaw@mail.gmail.com>
+	s=k20201202; t=1736956497;
+	bh=hEtlioN6X7ERl4nlGh0NmlPefyzDMuNdQpg1m5c6TYs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=WZqNIYZcHo3QDhaZ+q1m07apetc5IUqBpYfiTdz9VJhJpxJme3Y0jBB7RdXFw1Ao2
+	 tZCMmJE/4Sf71U1bFLQSrL868/gkl30Uzghj09tx7k4G9N4l/UJ0YYYSeJgKItmYuA
+	 4bIhQlDnZMNuznUZGJBEuDPM5PSVbTsIdkdetcEFOTK4mLkdYcXH7Rl3FV1cDwjqdO
+	 byWfbQOiH8N9iSZyORr5ECfdziakZcSHz1IRdECV9zmaUUDVKOFXoIlJPe1mW+xxeU
+	 xZ5IKXDVNAcEVS5t5hqPmiKRttEe0UYyX5g+1esZlnX8ie1JCj0A7qarMY5drivuU7
+	 7bKxVXym5PIDQ==
+Date: Wed, 15 Jan 2025 15:54:52 +0000
+From: Simon Horman <horms@kernel.org>
+To: Xin Tian <tianx@yunsilicon.com>
+Cc: netdev@vger.kernel.org, leon@kernel.org, andrew+netdev@lunn.ch,
+	kuba@kernel.org, pabeni@redhat.com, edumazet@google.com,
+	davem@davemloft.net, jeff.johnson@oss.qualcomm.com,
+	przemyslaw.kitszel@intel.com, weihg@yunsilicon.com,
+	wanry@yunsilicon.com
+Subject: Re: [PATCH v3 01/14] net-next/yunsilicon: Add xsc driver basic
+ framework
+Message-ID: <20250115155452.GP5497@kernel.org>
+References: <20250115102242.3541496-1-tianx@yunsilicon.com>
+ <20250115102242.3541496-2-tianx@yunsilicon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250115102242.3541496-2-tianx@yunsilicon.com>
 
-On Wed, 15 Jan 2025 09:53:27 -0500 Jamal Hadi Salim wrote:
-> > > I may be missing something - what does TC_H_MAJ() provide?
-> > > The 3:1 and 1:3 in that example are both descendants of the same
-> > > parent. It could have been 1:3 vs 1:2 and the same rules would apply.  
-> >
-> > Let me flip the question. What qdisc movement / grafts are you intending
-> > to still support?
-> >  
+On Wed, Jan 15, 2025 at 06:22:44PM +0800, Xin Tian wrote:
+> Add yunsilicon xsc driver basic framework, including xsc_pci driver
+> and xsc_eth driver
 > 
-> Grafting essentially boils down to a del/add of a qdisc. The
-> ambiguities: Does it mean deleting it from one hierachy point and
-> adding it to another point? Or does it mean not deleting it from the
-> first location but making it available in the other one?
-> 
-> > From the report it sounds like we don't want to support _any_ movement
-> > of existing qdiscs within the hierarchy. Only purpose of graft would
-> > be to install a new / fresh qdisc as a child.  
-> 
-> That sounded like the safest approach. If there is a practical use for
-> moving queues around (I am not aware of any, doesnt mean there is no
-> practical use) then we can do the much bigger surgery.
+> Co-developed-by: Honggang Wei <weihg@yunsilicon.com>
+> Signed-off-by: Honggang Wei <weihg@yunsilicon.com>
+> Co-developed-by: Lei Yan <jacky@yunsilicon.com>
+> Signed-off-by: Lei Yan <jacky@yunsilicon.com>
+> Signed-off-by: Xin Tian <tianx@yunsilicon.com>
 
-So coming back to the code I would have expected the patch to look
-something along the lines of:
+...
 
-diff --git a/net/sched/sch_api.c b/net/sched/sch_api.c
-index 300430b8c4d2..fac9c946a4c7 100644
---- a/net/sched/sch_api.c
-+++ b/net/sched/sch_api.c
-@@ -1664,6 +1664,10 @@ static int tc_modify_qdisc(struct sk_buff *skb, struct nlmsghdr *n,
- 				q = qdisc_lookup(dev, tcm->tcm_handle);
- 				if (!q)
- 					goto create_n_graft;
-+				if (q->parent != tcm->tcm_parent) {
-+					NL_SET_ERR_MSG(extack, "Cannot move an existing qdisc to a different parent");
-+					return -EINVAL;
-+				}
- 				if (n->nlmsg_flags & NLM_F_EXCL) {
- 					NL_SET_ERR_MSG(extack, "Exclusivity flag on, cannot override");
- 					return -EEXIST;
+> diff --git a/drivers/net/ethernet/yunsilicon/xsc/common/xsc_core.h b/drivers/net/ethernet/yunsilicon/xsc/common/xsc_core.h
 
+...
 
-Whether a real (non-default) leaf already existed in that spot 
-is not important..
+> +struct xsc_dev_resource {
+> +	struct mutex alloc_mutex;	/* protect buffer alocation according to numa node */
+
+nit: allocation
+
+...
+
+> diff --git a/drivers/net/ethernet/yunsilicon/xsc/pci/main.c b/drivers/net/ethernet/yunsilicon/xsc/pci/main.c
+
+...
+
+> +static int xsc_pci_init(struct xsc_core_device *xdev, const struct pci_device_id *id)
+> +{
+> +	struct pci_dev *pdev = xdev->pdev;
+> +	void __iomem *bar_base;
+> +	int bar_num = 0;
+> +	int err;
+> +
+> +	xdev->numa_node = dev_to_node(&pdev->dev);
+> +
+> +	err = xsc_pci_enable_device(xdev);
+> +	if (err) {
+> +		pci_err(pdev, "failed to enable PCI device: err=%d\n", err);
+> +		goto err_ret;
+> +	}
+> +
+> +	err = pci_request_region(pdev, bar_num, KBUILD_MODNAME);
+> +	if (err) {
+> +		pci_err(pdev, "failed to request %s pci_region=%d: err=%d\n",
+> +			KBUILD_MODNAME, bar_num, err);
+> +		goto err_disable;
+> +	}
+> +
+> +	pci_set_master(pdev);
+> +
+> +	err = set_dma_caps(pdev);
+> +	if (err) {
+> +		pci_err(pdev, "failed to set DMA capabilities mask: err=%d\n", err);
+> +		goto err_clr_master;
+> +	}
+> +
+> +	bar_base = pci_ioremap_bar(pdev, bar_num);
+> +	if (!bar_base) {
+> +		pci_err(pdev, "failed to ioremap %s bar%d\n", KBUILD_MODNAME, bar_num);
+
+Should err, which will be the return value of the function,
+be set to a negative error value here? As is, the function will
+return 0.
+
+> +		goto err_clr_master;
+> +	}
+> +
+> +	err = pci_save_state(pdev);
+> +	if (err) {
+> +		pci_err(pdev, "pci_save_state failed: err=%d\n", err);
+> +		goto err_io_unmap;
+> +	}
+> +
+> +	xdev->bar_num = bar_num;
+> +	xdev->bar = bar_base;
+> +
+> +	return 0;
+> +
+> +err_io_unmap:
+> +	pci_iounmap(pdev, bar_base);
+> +err_clr_master:
+> +	pci_clear_master(pdev);
+> +	pci_release_region(pdev, bar_num);
+> +err_disable:
+> +	xsc_pci_disable_device(xdev);
+> +err_ret:
+> +	return err;
+> +}
+
+...
 
