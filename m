@@ -1,59 +1,68 @@
-Return-Path: <netdev+bounces-158527-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158528-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6BC45A12624
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 15:37:01 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7CE32A12629
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 15:38:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ACB44188A4BF
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 14:37:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 43D39168D71
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 14:38:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49ABD78F41;
-	Wed, 15 Jan 2025 14:36:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBD7D78F46;
+	Wed, 15 Jan 2025 14:38:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iI5/9tlQ"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Sx0rN2Tj"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25D9041C6C
-	for <netdev@vger.kernel.org>; Wed, 15 Jan 2025 14:36:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DFCE78F39;
+	Wed, 15 Jan 2025 14:38:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736951817; cv=none; b=aLVYJl+6nfxbs1Vko4mlF0l04uiNtJzWWLEEKe1OPIOcuCEZVugV+CrmNqLcYGjXU1aSvjouvZ0mbCHGXQRE/FFc58dyauneE8kweV5nDU+ukuSyKtDTbUMzvQ2x/Y4mqHww8iwBU49bW4LMI+2O15sznAHqwCe9D4RNRriFCBM=
+	t=1736951883; cv=none; b=eGZsGGZa9WQt2rl8FMRn4IL/MJURNMQya610nZEG8VMM04Pe1l80SN6kMeS0f96n23mu411rU0KmFfq0AZrjDmHJMmm7cRdkAM5NRVsL7PEI8fo43g0PPTOKve6y/htxvGycb1bfYkKBs+zJ+rIXo0Bnayj5gUmeXG+zCbX46SI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736951817; c=relaxed/simple;
-	bh=JtZR8moECWCaG7O9Whi1lIYRGydadbS+tU6TglBPyXg=;
+	s=arc-20240116; t=1736951883; c=relaxed/simple;
+	bh=BAolRM5b/6608HH9VWhpPP+/x6Dgkn994vGSheK6JBA=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=kCZ8om7aNQmvUktEuTxGVxwVfguAJj2jYMPptQ5sxbD7iyXH2qr2svB6tpx5lyDMGTv6CsCvXUTbba0U6YfbFtnmPqbkPyg5NN93wdBGAQTVUMaggGA3Z8pPbn6ShUNp0AYPnYzaWCAXYNrlnlegM2VDi3jihE85Z01C4NN/GSo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iI5/9tlQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6F3F2C4CED1;
-	Wed, 15 Jan 2025 14:36:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736951816;
-	bh=JtZR8moECWCaG7O9Whi1lIYRGydadbS+tU6TglBPyXg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=iI5/9tlQYnlMw5S67N13E8mB16h9v9gYqSAOkPqsy0n4cDHqW0xXtCVYOeGlfNeCo
-	 KlUWR5B+ei2lT5vwSEPMsgZTuzkuEPDyTBE5SRCFY3U7bbrCc4gHfG9dS9Nh5CL1Lb
-	 zdJn8QlvHE5aTSjVd9ydNp+sE7FKBbM7Od8yF2XGVRNMQEe0nTB6QnDBM+RuX8jHXd
-	 sUlC+brAvKCHGgFELf/DvR67Qlnb4pU3HhKr/6LkHE5R4A1UT78LKW9Jy7Yi8eLneC
-	 beSnPZ6fsQzdgIPBvwbtboGPKrynn2g6zgyV3HC9cWzYX2dgP52Rvq3MEcodMgjcC2
-	 wOAqBBMn8sOLQ==
-Date: Wed, 15 Jan 2025 06:36:55 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Jamal Hadi Salim <jhs@mojatatu.com>
-Cc: netdev@vger.kernel.org, jiri@resnulli.us, xiyou.wangcong@gmail.com,
- davem@davemloft.net, edumazet@google.com, security@kernel.org,
- nnamrec@gmail.com
-Subject: Re: [PATCH net 1/1 v3] net: sched: Disallow replacing of child
- qdisc from one parent to another
-Message-ID: <20250115063655.21be5c74@kernel.org>
-In-Reply-To: <CAM0EoMnYi3JBPS7KyPoW5-St-xAaJ8Xa1tEp8JH9483Z5k8cLg@mail.gmail.com>
-References: <20250111151455.75480-1-jhs@mojatatu.com>
-	<20250114172620.7e7e97b4@kernel.org>
-	<CAM0EoMnYi3JBPS7KyPoW5-St-xAaJ8Xa1tEp8JH9483Z5k8cLg@mail.gmail.com>
+	 MIME-Version:Content-Type; b=tg1HgNVRtffwspczU13hg8y54W3eQO1UwrB6fqGAH4iV0xOlayu24TaEbDnvvv3DV2VDaKrmKSHWwPOYy7mdK9SCfIEV7Vecv0PXsSvT/79GuicF69u6z5pTH5YaEa7Ud9B9obc8RsW8Yh1+5Qb9DyOC3V9yOfvVBN1X+MISjuw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Sx0rN2Tj; arc=none smtp.client-ip=217.70.183.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 3BAC660003;
+	Wed, 15 Jan 2025 14:37:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1736951873;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=yHZ7onjSnwFynJ8nKgFXjzHKr0loi0YNNTWs+eMgrpA=;
+	b=Sx0rN2TjNmyRpxoxKKM43Kvb2Mv6D+wfnkD4kOeMFh//CJLtqgHJv+HZBlkr/qqxGUi3Ek
+	TXPOuIoP6vqygp6KTBOvCv5RYL2t6NozyZh4F5oncz54X25HFzKGrbEKjbbFC6JapI4GNo
+	BDK8qVJhuHyqfMYFOtWN31NPfA5XlmXUEZuns1ifZh4ERx/3KStE9BQTs5PVngCzS94GS2
+	GghM+ugcDJWIZiRB7GswX1PViHpVJxbixRVOHcZITs+ZNps5gtMIhN25vWP8eEGN+W+PPb
+	avI8ML6gddE9g1WApCb+fh//vHpIKum/Le4xkmE1UZwn15eCG9G56hUjZBLdPA==
+Date: Wed, 15 Jan 2025 15:37:50 +0100
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: netdev@vger.kernel.org, Jose Abreu <Jose.Abreu@synopsys.com>, Andrew
+ Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, "Russell King (Oracle)"
+ <rmk+kernel@armlinux.org.uk>, Voon Weifeng <weifeng.voon@intel.com>,
+ Michael Sit Wei Hong <michael.wei.hong.sit@intel.com>,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net 1/2] net: pcs: xpcs: fix DW_VR_MII_DIG_CTRL1_2G5_EN
+ bit being set for 1G SGMII w/o inband
+Message-ID: <20250115153750.1aac00b7@fedora.home>
+In-Reply-To: <20250114164721.2879380-1-vladimir.oltean@nxp.com>
+References: <20250114164721.2879380-1-vladimir.oltean@nxp.com>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,51 +70,35 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-On Wed, 15 Jan 2025 09:15:31 -0500 Jamal Hadi Salim wrote:
-> > On Sat, 11 Jan 2025 10:14:55 -0500 Jamal Hadi Salim wrote: =20
-> > > The semantics of "replace" is for a del/add _on the same node_ and not
-> > > a delete from one node(3:1) and add to another node (1:3) as in step1=
-0.
-> > > While we could "fix" with a more complex approach there could be
-> > > consequences to expectations so the patch takes the preventive approa=
-ch of
-> > > "disallow such config". =20
-> >
-> > Your explanation reads like you want to prevent a qdisc changing
-> > from one parent to another.
->=20
-> Yes.
+Hello Vlad,
 
-In the selftest with mq Victor updated I'd say we're not changing
-the parent. We replace one child of mq with another.
-TC noobs would say mq is the parent.
+On Tue, 14 Jan 2025 18:47:20 +0200
+Vladimir Oltean <vladimir.oltean@nxp.com> wrote:
 
-> > > +                             if (leaf_q && leaf_q->parent !=3D q->pa=
-rent) {
-> > > +                                     NL_SET_ERR_MSG(extack, "Invalid=
- Parent for operation");
-> > > +                                     return -EINVAL;
-> > > +                             } =20
-> >
-> > But this test looks at the full parent path, not the major.
-> > So the only case you allow is replacing the node.. with itself?
-> > =20
->=20
-> Yes.
->=20
-> > Did you mean to wrap these in TC_H_MAJ() || the parent comparison
-> > is redundant || I misunderstand? =20
->=20
-> I may be missing something - what does TC_H_MAJ() provide?
-> The 3:1 and 1:3 in that example are both descendants of the same
-> parent. It could have been 1:3 vs 1:2 and the same rules would apply.
+> On a port with SGMII fixed-link at SPEED_1000, DW_VR_MII_DIG_CTRL1 gets
+> set to 0x2404. This is incorrect, because bit 2 (DW_VR_MII_DIG_CTRL1_2G5_EN)
+> is set.
+> 
+> It comes from the previous write to DW_VR_MII_AN_CTRL, because the "val"
+> variable is reused and is dirty. Actually, its value is 0x4, aka
+> FIELD_PREP(DW_VR_MII_PCS_MODE_MASK, DW_VR_MII_PCS_MODE_C37_SGMII).
+> 
+> Resolve the issue by clearing "val" to 0 when writing to a new register.
+> After the fix, the register value is 0x2400.
+> 
+> Prior to the blamed commit, when the read-modify-write was open-coded,
+> the code saved the content of the DW_VR_MII_DIG_CTRL1 register in the
+> "ret" variable.
+> 
+> Fixes: ce8d6081fcf4 ("net: pcs: xpcs: add _modify() accessors")
+> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
 
-Let me flip the question. What qdisc movement / grafts are you intending
-to still support?
+Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
 
-=46rom the report it sounds like we don't want to support _any_ movement=20
-of existing qdiscs within the hierarchy. Only purpose of graft would=20
-be to install a new / fresh qdisc as a child.
+Thanks,
+
+Maxime
 
