@@ -1,115 +1,153 @@
-Return-Path: <netdev+bounces-158633-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158635-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC996A12CB2
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 21:31:55 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A093BA12CCD
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 21:40:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0E60F166DB4
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 20:31:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F2BAD1889468
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 20:40:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC6C21DC1A7;
-	Wed, 15 Jan 2025 20:30:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 005DD1D88BE;
+	Wed, 15 Jan 2025 20:39:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="uHP/y9C0"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="QRYnrT6t"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8D0D1DA2FD;
-	Wed, 15 Jan 2025 20:30:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19B5F1DC9B3
+	for <netdev@vger.kernel.org>; Wed, 15 Jan 2025 20:39:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736973047; cv=none; b=ouPGIjESCQMoZGlg4uRHxgxJp3YdUvjuLnJQaxkuxebqiE9dxhETQy+y3LxwmEcjNBzl1sekTLi1NKPUq3Jp7aVnBYWgacnzSCSNPvf3BJ3zTlXXFdM7/KGFe2yhgHNeAClRxCt1qx6/vk6rqu3GWMhNfp84KsgNS64yDH2nCPA=
+	t=1736973596; cv=none; b=KGfItottsywzEhEjAwURZoD0Hbq39vZ7CdE6+omNgP77khMwqcDTS3J9k6PnBsMjzDffnkSEmpMnFaDmSYGNAKt+UV0Z7K+4gFFbgoOmsDyoPc7JRTtLM3PdkH2psxEQc+5wnyEZSQOHB/51PyT3AKWlNPPSWNEAxEWudpn3kPg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736973047; c=relaxed/simple;
-	bh=BYOO8ahA7KfPQlXlr5RsOfavt8hnK4U757hh8EFudms=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pgV9Q/bsAwJXTtEfqAlKhmcO4KVVGQOelebUkSLETgzbDbPuIWtTUreW4em8L8u1pkQErwOwsRkLG7R131wzkwg/yqJqLBqJpIg3OWxZvKumELuNJ0FzfF9iojLDKob/L+0dU6rNH9Ox2FH6O+Eb6ygVHxYj8YKD0d4im3NthRU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=uHP/y9C0; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=rXTIpr22DZcYITN7Dougj4FUS5jO5aee0GhdxiE+89U=; b=uHP/y9C0A43shn/tMQl7hZFR1e
-	sIpapg2etl95IeP6cmwDn9znhIjiDvPCqBWdPBJJhfD8i/RSzRrOc1hbIgbUNh2Q0ziU1NucVot8q
-	RuTUkqHershfsAIAa9MPlF1tS3ytnEpa5AqCmtfPPUtTARFHiu6EFs9+dH7XreAIB0UZlD6iegzJS
-	iS18Yt+710zhroLLDuOnFsjUghC7IWx/siTwlL7OK1U6VrZBktRzCk1WRWtoadsQg6pmCBwU35l68
-	v1PRG7MhP7W6fXJfx0zdwatQlcXXLCtzet6lWptY9HIl0bpMQZpmDUZsPkbWZKiGNAKl2gVCt08CB
-	ayNcMSyw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:33574)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1tYA26-0001h3-2T;
-	Wed, 15 Jan 2025 20:30:34 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1tYA25-0006TL-0C;
-	Wed, 15 Jan 2025 20:30:33 +0000
-Date: Wed, 15 Jan 2025 20:30:32 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Roger Quadros <rogerq@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Siddharth Vadapalli <s-vadapalli@ti.com>, srk@ti.com,
-	danishanwar@ti.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, bpf@vger.kernel.org
-Subject: Re: [PATCH net-next 2/4] net: ethernet: ti: am65-cpsw: streamline
- .probe() error handling
-Message-ID: <Z4ga6N7brU1FrQzx@shell.armlinux.org.uk>
-References: <20250115-am65-cpsw-streamline-v1-0-326975c36935@kernel.org>
- <20250115-am65-cpsw-streamline-v1-2-326975c36935@kernel.org>
+	s=arc-20240116; t=1736973596; c=relaxed/simple;
+	bh=0U+WdmrcGoX+2GDiVHap8V6ikJGwwsUi+S2MGMhBqsw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=TKfNBdV4IGFVdzd51KGUnkgf6IwFKTuUq6BmtJK3vTnLvjGGhbybz7qvh0C2oXbWgaRWzxMRp7Rzp4ysXbcFkUyIF7NPzoHkp0WdM2DfKzYgnDBXSgZWODoUeJPa0zysG/wMXjdZso49UPFkSbv+mcTS7EotHN+c4m6R+3VInB4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=QRYnrT6t; arc=none smtp.client-ip=209.85.214.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-2161eb94cceso1303285ad.2
+        for <netdev@vger.kernel.org>; Wed, 15 Jan 2025 12:39:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1736973594; x=1737578394; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=BpSxMGZKuuwfwCy7eG2/ooQQTFo9sFOtmBMODSSN0ZI=;
+        b=QRYnrT6t1I1MQYUQf+gXK28eOTu8vYlvMzKSSqvKuoiE70tEzZcZ5xy91W6d1P85+G
+         cQ9enj69OBCwgvWkAdWG+tPIDeCxreHbwZGZs1l2uENwHbf1gJgEAlfFmJZS9j3Fn2mq
+         adX0ZOzX5o5mTJDouT6K84XY/tRDbOOlqDlb4I2whF6AHeEq0YFrttTwkbYwbojiKOwP
+         i4+jkcQpSanq19UQ1f5r5i9DRKddVjuqQLo0frGUv8jidjRmNtdxeofC3BY/XmCX9x85
+         lF7oBQpLw2x7SK+5G0mDsWKrD4EMx7sS7jHcvZp1qU6D//fmb/6ft1haHg2mFfz5MISY
+         QqXA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736973594; x=1737578394;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=BpSxMGZKuuwfwCy7eG2/ooQQTFo9sFOtmBMODSSN0ZI=;
+        b=nfHrpYrjapVMadvpEOH1EFODRTGV0RwdRXp+3mEwFAFYakwwW+33xytdkndXXBj/zj
+         WD1jvyAWmfSCF+Y5P3MyWpfLAf4LWx+6COwOD9Xu7v3GZSMEOQ7pTviKQGeZ6oGVKGnY
+         FHhLAP3fi0Y9uFdcZBNINL/ByKYrvsSKdap/sfqGcXk3KLsAsZjRi8BoWmwRC7OIRKIx
+         O22G9JBDzAyQ3Iu4Vf6+tXBS854oWWyQZ6FcYod66CpmBY/gaHCk9keqa3kS9ez8BG0S
+         RBibtvug1yQL0RKI6r1/vwumicoAoTavnsY1cXZRx29Um6VtVPAkN6067G3MhjyKLt5H
+         eHsA==
+X-Gm-Message-State: AOJu0YwzrYajCLMCZncW744ejLUeKe12aLG4f/RK5G4MEQ4yCw9Ptl75
+	K3la4MkP0ov6pvMhGPHsqHw0otcF3G2r/JfKQzEVIpAFBkWe8qzRfsplfeNWCfgJofXtp3KIRtV
+	9hO8sBd6DSvlZFDu9F+e12hTu8L4U2uPynRrB
+X-Gm-Gg: ASbGncu48FjeUUFdoqQ4vvNDMpBFX8pvV+hD3cKFOF6fq+7YwM9LBcI2Rc+M3IEusrt
+	gcbxNwWQl2NANSuENQPMURlhp3sLuCFKo9/Dg
+X-Google-Smtp-Source: AGHT+IEaJjEW0MEYjng5rR2glqaHLzWA4Hbxv9qrYwBJYgxX1HDNkQPjGdAfRKLMur/nRtNXj/wZKDqmKnszCGFzsF0=
+X-Received: by 2002:a05:6a00:4c14:b0:726:64a5:5f67 with SMTP id
+ d2e1a72fcca58-72d21fea927mr39739025b3a.12.1736973594364; Wed, 15 Jan 2025
+ 12:39:54 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250115-am65-cpsw-streamline-v1-2-326975c36935@kernel.org>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+References: <20250111151455.75480-1-jhs@mojatatu.com> <20250114172620.7e7e97b4@kernel.org>
+ <CAM0EoMnYi3JBPS7KyPoW5-St-xAaJ8Xa1tEp8JH9483Z5k8cLg@mail.gmail.com>
+ <20250115063655.21be5c74@kernel.org> <CAM0EoMk0rKe=AqoD_vNZNj2dz9eKSQpgS0Cc7Bi+FQwqpyHXaw@mail.gmail.com>
+ <20250115075154.528eee8a@kernel.org>
+In-Reply-To: <20250115075154.528eee8a@kernel.org>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Wed, 15 Jan 2025 15:39:43 -0500
+X-Gm-Features: AbW1kvYg1gdEKGWE3FzIyTUPoBZU2X5KGk_sryd50yfDlJsib_LHQfFSUV9UhGY
+Message-ID: <CAM0EoM=zzidXbUNYUfnV-P5vVU7KOYZJPw7bdfKt4+nSdyWCvw@mail.gmail.com>
+Subject: Re: [PATCH net 1/1 v3] net: sched: Disallow replacing of child qdisc
+ from one parent to another
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, jiri@resnulli.us, xiyou.wangcong@gmail.com, 
+	davem@davemloft.net, edumazet@google.com, security@kernel.org, 
+	nnamrec@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jan 15, 2025 at 06:43:01PM +0200, Roger Quadros wrote:
-> Keep things simple by explicitly cleaning up on .probe() error
-> path or .remove(). Get rid of devm_add/remove_action() usage.
-> 
-> Rename am65_cpsw_disable_serdes_phy() to
-> am65_cpsw_nuss_cleanup_slave_ports() and move it right before
-> am65_cpsw_nuss_init_slave_ports().
-> 
-> Get rid of am65_cpsw_nuss_phylink_cleanup() and introduce
-> am65_cpsw_nuss_cleanup_ndevs() right before am65_cpsw_nuss_init_ndevs()
-> 
-> Move channel initiailzation code out of am65_cpsw_nuss_register_ndevs()
-> into new function am65_cpsw_nuss_init_chns().
-> Add am65_cpsw_nuss_remove_chns() to do reverse of
-> am65_cpsw_nuss_init_chns().
-> 
-> Add am65_cpsw_nuss_unregister_ndev() to do reverse of
-> am65_cpsw_nuss_register_ndevs().
-> 
-> Use the introduced helpers in probe/remove.
+On Wed, Jan 15, 2025 at 10:51=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> w=
+rote:
+>
+> On Wed, 15 Jan 2025 09:53:27 -0500 Jamal Hadi Salim wrote:
+> > > > I may be missing something - what does TC_H_MAJ() provide?
+> > > > The 3:1 and 1:3 in that example are both descendants of the same
+> > > > parent. It could have been 1:3 vs 1:2 and the same rules would appl=
+y.
+> > >
+> > > Let me flip the question. What qdisc movement / grafts are you intend=
+ing
+> > > to still support?
+> > >
+> >
+> > Grafting essentially boils down to a del/add of a qdisc. The
+> > ambiguities: Does it mean deleting it from one hierachy point and
+> > adding it to another point? Or does it mean not deleting it from the
+> > first location but making it available in the other one?
+> >
+> > > From the report it sounds like we don't want to support _any_ movemen=
+t
+> > > of existing qdiscs within the hierarchy. Only purpose of graft would
+> > > be to install a new / fresh qdisc as a child.
+> >
+> > That sounded like the safest approach. If there is a practical use for
+> > moving queues around (I am not aware of any, doesnt mean there is no
+> > practical use) then we can do the much bigger surgery.
+>
+> So coming back to the code I would have expected the patch to look
+> something along the lines of:
+>
+> diff --git a/net/sched/sch_api.c b/net/sched/sch_api.c
+> index 300430b8c4d2..fac9c946a4c7 100644
+> --- a/net/sched/sch_api.c
+> +++ b/net/sched/sch_api.c
+> @@ -1664,6 +1664,10 @@ static int tc_modify_qdisc(struct sk_buff *skb, st=
+ruct nlmsghdr *n,
+>                                 q =3D qdisc_lookup(dev, tcm->tcm_handle);
+>                                 if (!q)
+>                                         goto create_n_graft;
+> +                               if (q->parent !=3D tcm->tcm_parent) {
+> +                                       NL_SET_ERR_MSG(extack, "Cannot mo=
+ve an existing qdisc to a different parent");
+> +                                       return -EINVAL;
+> +                               }
 
-Wow, so we're now saying that devm shouldn't be used? Given that patch 1
-is wrong, I'm not sure I'd trust this patch to be correct either as it
-goes against what I understand is preferred - to avoid explicit cleanups
-that can get in the wrong order or be missed.
+Yes, this should work as well - doesnt have to save the leaf_q, so more opt=
+imal.
+Please send the patch.
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+cheers,
+jamal
+>                                 if (n->nlmsg_flags & NLM_F_EXCL) {
+>                                         NL_SET_ERR_MSG(extack, "Exclusivi=
+ty flag on, cannot override");
+>                                         return -EEXIST;
+>
+>
+> Whether a real (non-default) leaf already existed in that spot
+> is not important..
 
