@@ -1,200 +1,137 @@
-Return-Path: <netdev+bounces-158389-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158390-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 61D7CA1190C
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 06:35:33 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 63AF3A11961
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 06:58:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6B389161B21
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 05:35:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9B53C7A1EB8
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 05:58:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD76E22F388;
-	Wed, 15 Jan 2025 05:35:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 844DC22E419;
+	Wed, 15 Jan 2025 05:58:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nARYuG+1"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Nh7ydqTO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f172.google.com (mail-yb1-f172.google.com [209.85.219.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EC1A156F3B;
-	Wed, 15 Jan 2025 05:35:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9CB929A5;
+	Wed, 15 Jan 2025 05:58:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736919326; cv=none; b=i/Ja5o7xLnPVCqaAoT5EDmH7X3NyaI11n/raEfzw+DXvcOxMz/6bbN0JphiOXbdDrMwIJr1rzvwPBqgMGT+3umOwcQGUiFwXi/D/iSQTZEyy/3L/V/2PA18elvulQSPdf2OrgonxR6gs33PxHNrYLQzhezKdF8t59tTljqxMYqk=
+	t=1736920706; cv=none; b=sXED4UnNLuo7BSSkM8DRl8a/2RMzQcHKViOh0LIlLagskGA8WP41UnyOpQFvbv3WWWk08/kX7PPVdWIhmhIUXTYc0pa1k6XF2qBJD2qkckPMI4naTawI6LGpdH+jpT5rM0EPF1ztnXoJurwxk3d2TwaZqtn0LdchoZOl8B577kA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736919326; c=relaxed/simple;
-	bh=ccZtzwf7Bt4htpF0UDvneUd8+3+5zGc0vg0OixiVwrc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=pOZoTAobV0dXuNIXirAZJz2xnGpw/pmb6nVcV9v5Hu3tNb8PgKGQKjvU5EETc9hs+Vs3Z1gEd6QObsMABVv2PvA1DxmESy85EKznGNXevynHY5HbrLWDzheNX6G6760Zp1Rn2aIxI6i9iKM6/LrydJRjcMOggM2l/dJbpCHlV8s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nARYuG+1; arc=none smtp.client-ip=209.85.219.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f172.google.com with SMTP id 3f1490d57ef6-e54d268bc3dso11252160276.1;
-        Tue, 14 Jan 2025 21:35:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736919324; x=1737524124; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tuitbmn9mwEi9tghL+gGB4/50R1hxo101PES+YZbaVU=;
-        b=nARYuG+1dD4Qy3J3ljDFMinYOPfwtUeOP7aQ82jUgSRxD8UVraFtZBvy+tIooGaT9D
-         5hhTQey+RucJ7W4Fwy+8JsC+ymRlxAzLVMxQY2LmhMSzxVCq+zuBJvF8NUCI5x1JUa6i
-         4h20DpPJ/puZ5kBIx+zOCTkT9oXy5zy+SuQYQcj7IPaOU4+NCT4Sh/UuBf32MCYYMjdL
-         lXn8yE3G4t/QUQ9ThCCgAeFDhHDVnY/qjU3fJiegjVvDS1em+KXngKDT0cWRB1kBdXRe
-         LRSCJIkUTvqfpPzQadjUdawTMYyYTVpUg53YmaT/HYMBuvURNT2cIxUJBR4+5ramstXr
-         11KQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736919324; x=1737524124;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=tuitbmn9mwEi9tghL+gGB4/50R1hxo101PES+YZbaVU=;
-        b=hQI2kPCXOg9JPwg8GOX2L/AjMM0gni9pGqiRiQWFT8txCliK3+2CjOHr7Edd+9ae2m
-         xJ/yl0NUJcZkszKgXj4NQdV3tkc3zcWruOeaOLZl19FqB0KyHBTa9giqqwJp39yWXuU9
-         NY3y7uRA3XVlmz4YKodgt0koFHeV8XJ5sOW2yIbSrNLVbr1SBIjUhVTVDiiFNAhwYMta
-         mQGhlQa6FrqhjZDa6S4F/7elAtnbw3LIRGgTtn2wc8AF2NlpS9T5uVitmRo1MTwQDrPz
-         V6COnUZmgcEl9wgcMzqBkaeDQxbKP/wO8NBsJCXvH+ms0p9TOKgGiwmwDrE3IE/dEs5e
-         xgkQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU/IlbnW7QMW69PGQX+ubsOcqaoAyizfMbSkRu3lD3N8u1Ysu2N0NW5cLiArnZRrvI4mmB/HgYj@vger.kernel.org, AJvYcCU3wQY2q5M6Ej3js864PywyJmFvNFI6CygLIATEjR7jpeMbYT76+/w/60Wh+E1jfnFSqTWNvIqa4QbA7cD3f8g=@vger.kernel.org, AJvYcCUADMEuFaODFQT7SkfGJ+dNV7/cqiOZR0Zpcf4h4Ad31AVDScnFPJMm5iW3tITml18cLyXPPBkXZrx3@vger.kernel.org, AJvYcCUzBYp6w1w97tb/Bip3lFGVQesqileRygYaWM6LKlMEkAH1uXGirD+H6ibTkerQ94rBD6JlxCIK9d8b1g==@vger.kernel.org, AJvYcCV67DQxz+DU+0fVG/FkJF+Prml00q3hNn956+X3Ly2C/MUKS13m7dd1ynrBLefK8kkj56aq3OxyS+xKKlE=@vger.kernel.org, AJvYcCVViNhi/IMJcPxvvduaxtaZfjN1KlLwTgYNNZLaPDrOnwjuPYzDrnrsWMBweA3Ru7W4XaAdBuQlSb0T@vger.kernel.org, AJvYcCVtvEgNbhvazqk78QfNpKaOtJeBRmEyfrWe+dTsmycowZqPbl5Wvljx6iDaqfLLPQ2ywvqWgnf5M4gl@vger.kernel.org, AJvYcCW21BWeO7PlyAmgpn5OmMx58u4Ln90I/iKwCO00WOWEPtfEAeHb9lrKjBEdcKSwjXEyH4OcRsf63C6ol0Av@vger.kernel.org, AJvYcCX5l+p0b8wWZRA1uTz5Zw6YqO363LLqH4s+dzwl6YExASsMLuwlbhgG7X4tcBKxJQkWKrevE4TcLB8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxDSQurrcFg29zWbXMS2BBaAf+N96kdbh5PWFu2PSwA/gSTwZr3
-	A8S1yjg4t5A3YchRyEoR+V8nWOdf5+yQ+THvWolUEaGwPqa3AitSPA5vksXZheYPfWj1q9nSbhy
-	3jktlxmFvmBKaWuajib0kHKhkwBk=
-X-Gm-Gg: ASbGnctR2nr5KbfkL1d+WvnWHQBLY8MgIbfkmyAeCgz8wKgoy72z4Fg8TOdHcOwmUC+
-	LWQHj+EVntFqw/KLeHFIUuhsM71+SFmRlrWUetHcnBYb15H/avRSHu3RW6XVMGOroLDGarg==
-X-Google-Smtp-Source: AGHT+IHa0peyoW79otucX6pcKMHFQRgLPI8Jc1kUfEh09kuPHR5lvaAVDd56ygEj8SVYIvfG5yLjw+kt4S5vxq6LvDs=
-X-Received: by 2002:a25:5886:0:b0:e47:f4e3:8801 with SMTP id
- 3f1490d57ef6-e54edf25d61mr14722987276.12.1736919323806; Tue, 14 Jan 2025
- 21:35:23 -0800 (PST)
+	s=arc-20240116; t=1736920706; c=relaxed/simple;
+	bh=ee7/cU8Rh7hsiv0IFSWaCv5xbg/nU6TL/m27ZjUv5WQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=A0iuRH1051dT1ayXxfmX2tJ9F6pfOmh+OlDCHvm1LTaTzC3f8wQUyTtqR/cswC0hToUavrKoHjcZoOyGVlu+kuote1jQ0jIfFnRK4a0xmzoENSMZ8xrlN9pRJDWeV6SeZfeW1IYjYQrL8kOvpwtnmW02VIyW2X5NOq6ncWE0Roc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Nh7ydqTO; arc=none smtp.client-ip=192.198.163.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1736920705; x=1768456705;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=ee7/cU8Rh7hsiv0IFSWaCv5xbg/nU6TL/m27ZjUv5WQ=;
+  b=Nh7ydqTO0TRcbvOhgXwJTJBsBlAX3Lps1iU6NU37xt7v5i7lJyUXLajX
+   llU3umM40hvhjyBFcklTOFLnm8qiPBl1F6FFlv+tmfQCfyOyK7ZVZTQU4
+   +1YC25vF01aVtLIcLX32DVgLcORmUovAKt8xaxglE+CjsfNQSu7mzJ9fy
+   ZysgfXD1LrYfoDvhNKcRA2rn0mAlKtADXzkv+TyGja39kKrgB8thWsp41
+   ZHamnA68BDX14MV0piEV1+ey9quP3rxOfQ9wriZAf6Ko10N4vG4E8Zbjw
+   GRpEMh3U8qJ/AN/NljeAjiWrd8exsSDV2N+EL4SJP6trB2YKnxRmOagYI
+   w==;
+X-CSE-ConnectionGUID: mtb1M9prQwSZQiXbKji7ow==
+X-CSE-MsgGUID: NqKSFYPVTyu2fg1hxyHsRw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11315"; a="40053090"
+X-IronPort-AV: E=Sophos;i="6.12,316,1728975600"; 
+   d="scan'208";a="40053090"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jan 2025 21:58:24 -0800
+X-CSE-ConnectionGUID: Z/y2dthoQ62/tnmXEbvudg==
+X-CSE-MsgGUID: 8WCvsK4hT1+UlRAsc8mHvQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,316,1728975600"; 
+   d="scan'208";a="105627746"
+Received: from mev-dev.igk.intel.com ([10.237.112.144])
+  by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jan 2025 21:58:21 -0800
+Date: Wed, 15 Jan 2025 06:55:01 +0100
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+To: Dheeraj Reddy Jonnalagadda <dheeraj.linuxdev@gmail.com>
+Cc: anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
+	piotr.kwapulinski@intel.com, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 net-next] ixgbe: Fix endian handling for ACI
+ descriptor registers
+Message-ID: <Z4dNkNLkQlSPA/SA@mev-dev.igk.intel.com>
+References: <20250115034117.172999-1-dheeraj.linuxdev@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250114033010.2445925-1-a0282524688@gmail.com>
- <20250114033010.2445925-5-a0282524688@gmail.com> <CAMZ6RqLHEoukxDfV33iDWXjM1baK922QnWSkOP01VzZ0S_9H8g@mail.gmail.com>
- <CAOoeyxW=k35-bkeqNmhyZwUxjy=g3irTBS5mbXLxqp1Stx-Zfg@mail.gmail.com>
- <6e349f0f-6509-4a3b-bb75-e2381e9205c6@wanadoo.fr> <CAOoeyxVST6rEqp65rU6ZgmM-rSkAdeUVM=0nTLZYrqiO4DbQOA@mail.gmail.com>
- <0ccedc84-d429-4d6f-bd21-7487e6a0fbf9@wanadoo.fr>
-In-Reply-To: <0ccedc84-d429-4d6f-bd21-7487e6a0fbf9@wanadoo.fr>
-From: Ming Yu <a0282524688@gmail.com>
-Date: Wed, 15 Jan 2025 13:35:12 +0800
-X-Gm-Features: AbW1kvZNPxXDWAaMAp3vY2xZ992Wka8WXVeWv9rwrP0hSU7PpAVZxt0ONIZ8pwE
-Message-ID: <CAOoeyxUrJdtVRykS15UxjEgrsstpOba-s+4=i7Xh9oXAsGcMWg@mail.gmail.com>
-Subject: Re: [PATCH v5 4/7] can: Add Nuvoton NCT6694 CAN support
-To: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
-Cc: tmyu0@nuvoton.com, lee@kernel.org, linus.walleij@linaro.org, brgl@bgdev.pl, 
-	andi.shyti@kernel.org, mkl@pengutronix.de, andrew+netdev@lunn.ch, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	wim@linux-watchdog.org, linux@roeck-us.net, jdelvare@suse.com, 
-	alexandre.belloni@bootlin.com, linux-kernel@vger.kernel.org, 
-	linux-gpio@vger.kernel.org, linux-i2c@vger.kernel.org, 
-	linux-can@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org, 
-	linux-rtc@vger.kernel.org, linux-usb@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250115034117.172999-1-dheeraj.linuxdev@gmail.com>
 
-Vincent Mailhol <mailhol.vincent@wanadoo.fr> =E6=96=BC 2025=E5=B9=B41=E6=9C=
-=8815=E6=97=A5 =E9=80=B1=E4=B8=89 =E4=B8=8A=E5=8D=8811:36=E5=AF=AB=E9=81=93=
-=EF=BC=9A
-> >>>>> +static int nct6694_can_get_berr_counter(const struct net_device *n=
-dev,
-> >>>>> +                                       struct can_berr_counter *be=
-c)
-> >>>>> +{
-> >>>>> +       struct nct6694_can_priv *priv =3D netdev_priv(ndev);
-> >>>>> +       struct nct6694_can_event *evt =3D priv->rx->event;
-> >>>>> +       struct nct6694_cmd_header cmd_hd;
-> >>>>> +       u8 mask =3D NCT6694_CAN_EVENT_REC | NCT6694_CAN_EVENT_TEC;
-> >>>>> +       int ret;
-> >>>>> +
-> >>>>> +       guard(mutex)(&priv->lock);
-> >>>>> +
-> >>>>> +       cmd_hd =3D (struct nct6694_cmd_header) {
-> >>>>> +               .mod =3D NCT6694_CAN_MOD,
-> >>>>> +               .cmd =3D NCT6694_CAN_EVENT,
-> >>>>> +               .sel =3D NCT6694_CAN_EVENT_SEL(priv->can_idx, mask)=
-,
-> >>>>> +               .len =3D cpu_to_le16(sizeof(priv->rx->event))
-> >>>>> +       };
-> >>>>> +
-> >>>>> +       ret =3D nct6694_read_msg(priv->nct6694, &cmd_hd, evt);
-> >>>>> +       if (ret < 0)
-> >>>>> +               return ret;
-> >>>>
-> >>>> You are holding the priv->lock mutex before calling
-> >>>> nct6694_read_msg(). But nct6694_read_msg() then holds the
-> >>>> nct6694->access_lock mutex. Why do you need a double mutex here? Wha=
-t
-> >>>> kind of race scenario are you trying to prevent here?
-> >>>>
-> >>>
-> >>> I think priv->lock need to be placed here to prevent priv->rx from
-> >>> being assigned by other functions, and nct6694->access_lock ensures
-> >>> that the nct6694_read_msg() transaction is completed.
-> >>> But in this case, cmd_hd does not need to be in priv->lock's scope.
-> >>
-> >> So, the only reason for holding priv->lock is because priv->rx is shar=
-ed
-> >> between functions.
-> >>
-> >> struct nct6694_can_event is only 8 bytes. And you only need it for the
-> >> life time of the function so it can simply be declared on the stack:
-> >>
-> >>         struct nct6694_can_event evt;
-> >>
-> >> and with this, no more need to hold the lock. And the same thing also
-> >> applies to the other functions.
-> >>
-> >> Here, by trying to optimize the memory for only a few bytes, you are
-> >> getting a huge penalty on the performance by putting locks on all the
-> >> functions. This is not a good tradeoff.
-> >>
-> >
-> > Since nct6694_read_msg()/nct6694_write_msg() process URBs via
-> > usb_bulk_msg(), the transferred data must not be located on the stack.
-> > For more details about allocating buffers for transmitting data,
-> > please refer to the link:
-> > https://lore.kernel.org/linux-can/20241028-observant-gentle-doberman-0a=
-2baa-mkl@pengutronix.de/
->
-> Ack, I forgot that you can not use stack memory in usb_bulk_msg().
->
-> Then, instead, you can either:
->
->   - do a dynamic memory allocation directly in the function (good for
->     when you are outside of the hot path, for example struct
->     nct6694_can_setting)
->
->   - and for the other structures which are part of the hot path
->     (typically struct nct6694_can_frame) continue to use a dynamically
->     allocated buffer stored in your priv but change the type of
->     nct6694_can_tx and nct6694_can_rx from union to structures.
->
-> And no more overlaps, thus no more need for the mutex.
->
-
-Understood, I will remove the unions and add members to private
-structure in the next patch.
-e.g.
-struct nct6694_can_priv {
-    struct can_priv can;
-    ...
-    struct nct6694_can_frame tx;
-    struct nct6694_can_frame rx;
-};
-And do dynamic memory allocation for struct nct6694_can_setting and
-struct nct6694_can_information.
-
-In addition, I would like to know your thoughts on how struct
-nct6694_can_event[2] should be handled?
-It is utilized in both nct6694_can_get_berr_counter() and
-nct6694_can_irq(), with the latter being called more frequently during
-runtime.
-
-Thanks,
-Ming
+On Wed, Jan 15, 2025 at 09:11:17AM +0530, Dheeraj Reddy Jonnalagadda wrote:
+> The ixgbe driver was missing proper endian conversion for ACI descriptor
+> register operations. Add the necessary conversions when reading and
+> writing to the registers.
+> 
+> Fixes: 46761fd52a88 ("ixgbe: Add support for E610 FW Admin Command Interface")
+> Closes: https://scan7.scan.coverity.com/#/project-view/52337/11354?selectedIssue=1602757
+> Signed-off-by: Dheeraj Reddy Jonnalagadda <dheeraj.linuxdev@gmail.com>
+> ---
+> Changelog
+> 
+> v2:
+> 	- Updated the patch to include suggested fix
+> 	- Updated the commit message to describe the issue
+> 
+>  drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
+> index 683c668672d6..3b9017e72d0e 100644
+> --- a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
+> +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
+> @@ -113,7 +113,7 @@ static int ixgbe_aci_send_cmd_execute(struct ixgbe_hw *hw,
+>  
+>  	/* Descriptor is written to specific registers */
+>  	for (i = 0; i < IXGBE_ACI_DESC_SIZE_IN_DWORDS; i++)
+> -		IXGBE_WRITE_REG(hw, IXGBE_PF_HIDA(i), raw_desc[i]);
+> +		IXGBE_WRITE_REG(hw, IXGBE_PF_HIDA(i), cpu_to_le32(raw_desc[i]));
+>  
+>  	/* SW has to set PF_HICR.C bit and clear PF_HICR.SV and
+>  	 * PF_HICR_EV
+> @@ -145,7 +145,7 @@ static int ixgbe_aci_send_cmd_execute(struct ixgbe_hw *hw,
+>  	if ((hicr & IXGBE_PF_HICR_SV)) {
+>  		for (i = 0; i < IXGBE_ACI_DESC_SIZE_IN_DWORDS; i++) {
+>  			raw_desc[i] = IXGBE_READ_REG(hw, IXGBE_PF_HIDA(i));
+> -			raw_desc[i] = raw_desc[i];
+> +			raw_desc[i] = le32_to_cpu(raw_desc[i]);
+>  		}
+>  	}
+>  
+> @@ -153,7 +153,7 @@ static int ixgbe_aci_send_cmd_execute(struct ixgbe_hw *hw,
+>  	if ((hicr & IXGBE_PF_HICR_EV) && !(hicr & IXGBE_PF_HICR_C)) {
+>  		for (i = 0; i < IXGBE_ACI_DESC_SIZE_IN_DWORDS; i++) {
+>  			raw_desc[i] = IXGBE_READ_REG(hw, IXGBE_PF_HIDA_2(i));
+> -			raw_desc[i] = raw_desc[i];
+> +			raw_desc[i] = le32_to_cpu(raw_desc[i]);
+>  		}
+>  	}
+>  
+> -- 
+> 2.34.1
+> 
+Thanks for fixing it
+Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 
