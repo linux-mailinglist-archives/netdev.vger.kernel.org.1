@@ -1,107 +1,142 @@
-Return-Path: <netdev+bounces-158634-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158632-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 13E1CA12CBB
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 21:34:10 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2FED3A12CAF
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 21:31:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5A85618805AD
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 20:34:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 465E5166F91
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 20:31:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB2AF1D7E50;
-	Wed, 15 Jan 2025 20:34:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DA561DB534;
+	Wed, 15 Jan 2025 20:30:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="JG8WxfK+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tXOiMClp"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E14D51D6DC9;
-	Wed, 15 Jan 2025 20:34:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1B061D79A6;
+	Wed, 15 Jan 2025 20:30:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736973244; cv=none; b=JgB6SQAHznQq89FET4Iph0qRmiA3b+Zns6985YYshjphlEgaeq0rQkKR8B52HzcW0lNHSk8EktT0ddEN0MgZ/bSNxRTpMUiI7HzORH5P1aj8b76s/RWZTciyl96Gm5OSEUto/VAbvC+L0YqI6DSalwUT5dmXjctHBio+Lyxpxtc=
+	t=1736973035; cv=none; b=Dky7xIWHCqJpkBLy60r9fdju+hodfbVJ3y5l6xr1UKD696lQEPaLgDVL16JsbYUsA/JG11ExQMqT4n8gqEWiucVu5V9D23JzMx9/7HlQz4a1x80Oi9e4p9QI1LdyO6eJ2MbHDYjd3BBukb0Fcb2sS5jfM7AKXA5YfDI0gvFBO1Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736973244; c=relaxed/simple;
-	bh=KZxR19csE3un82z3vbatrBUQSSwl8b+Ml2h9SIkQfhM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JjOIWAN+D8oeCZbVqNBMSc2sDAq6J7WCC8zMNn5ffCCBIpHZgJswkjM9podRTs39p8929gb1IlK4RskDbHZaWwJ1z4gVckCq9ZlMsGCRPgMTqozBqJ4LIarE3LjOcjw/cQct0bozDrisvDImUGYNsbonKq85WIkt9UgXG6cxXyg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=JG8WxfK+; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=ceb4oq7WhDog+LiW7ivw1MeE3NGGByFdmcwvde172Mw=; b=JG8WxfK+seQ+y9nGV3w0egZqpW
-	Ji9WiJQ9+ECy8O30SGntVO1MayR3tgU93slkxCdVp5yyFLNhfhRFjWwwLVGN8elU2IiZJ4zKv0T7T
-	VKrK3AfeOhKnIxlte/7iQdWIwlaTm01zmQYCfk/5OENm6gAX/iznPstQKhEoORyJX3aNXTYbcYjf6
-	M+OiYjEFFrQYn6SoNegiFTfPpU47K4yv5hpx/64bIDG2fVE9FDlU1AmaPaLfsfMNY3l+5V02mmDwB
-	jkGhtCNTLW81NQN40IXMvSJ1pUq7f8R3cBMXerXAJxB0h/kV/YwBWzIf9EkUtDqBw7+9VQFBMAOmd
-	7kGEXaKQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:38206)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1tY9zt-0001gb-2I;
-	Wed, 15 Jan 2025 20:28:17 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1tY9zp-0006T6-32;
-	Wed, 15 Jan 2025 20:28:13 +0000
-Date: Wed, 15 Jan 2025 20:28:13 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Roger Quadros <rogerq@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Siddharth Vadapalli <s-vadapalli@ti.com>, srk@ti.com,
-	danishanwar@ti.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, bpf@vger.kernel.org
-Subject: Re: [PATCH net-next 1/4] net: ethernet: am65-cpsw: call
- netif_carrier_on/off() when appropriate
-Message-ID: <Z4gaXU76kzlsmtwK@shell.armlinux.org.uk>
-References: <20250115-am65-cpsw-streamline-v1-0-326975c36935@kernel.org>
- <20250115-am65-cpsw-streamline-v1-1-326975c36935@kernel.org>
+	s=arc-20240116; t=1736973035; c=relaxed/simple;
+	bh=gB8UBTvmb8E1QTudIroWAe/RajxF90HeTzlSkghei6M=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=bmpRejZX9FgwnYS2DILmJBL1HDb8BGP2ZGoGHp9r5hbpOjb2Wiwreo9VralzWPBoXS+8doqEPh990Y8BjWFXzQCE32K3OSDUDxxRTPicpOfnP++LTzbix6Kn3QyOqzABnZig9hhIZ8Vk2qRKpH0erf0GjNWB5sqJZdlGK7g5O78=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tXOiMClp; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9028CC4CEE8;
+	Wed, 15 Jan 2025 20:30:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1736973035;
+	bh=gB8UBTvmb8E1QTudIroWAe/RajxF90HeTzlSkghei6M=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=tXOiMClpszQtUjtPEHUd3RW/12+ocDakbB9+FdSymLyPBMXjXrPd42638msOw2Uiq
+	 T6LlUv4Di8HpUsnyaL6NBSV9gTwoQAnopvERBkG1sbwwFLMtHsSH1HixDRNY1O3x6z
+	 UsEc3GvRILBl4bXOsSoMGv52ctcWsb5tkCUfXMfrC210MKGg8d0sFB8BJa52JwYIJ8
+	 VVL2hV0okKt2ofQX+hPVwO+Ms6bE7x0mCLXQ8MxQYcyIoaDMkuKLmqB0LEOhGtHUQo
+	 rZ6S38ElZh9bcXoomFwnFSs2QJJPk9os2+mpV3gSd0p9SlZ+T4ceAv4LDr7bYLhIoT
+	 KUgXXOuc6jSjA==
+Message-ID: <d823325a-1549-44e5-a1b5-6fe0d547cfd1@kernel.org>
+Date: Wed, 15 Jan 2025 21:30:26 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250115-am65-cpsw-streamline-v1-1-326975c36935@kernel.org>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 03/10] dt-bindings: gpio: ast2400-gpio: Add hogs
+ parsing
+To: Rob Herring <robh@kernel.org>
+Cc: Ninad Palsule <ninad@linux.ibm.com>, minyard@acm.org, krzk+dt@kernel.org,
+ conor+dt@kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ openipmi-developer@lists.sourceforge.net, netdev@vger.kernel.org,
+ joel@jms.id.au, andrew@codeconstruct.com.au, devicetree@vger.kernel.org,
+ eajames@linux.ibm.com, linux-arm-kernel@lists.infradead.org,
+ linux-aspeed@lists.ozlabs.org, linux-kernel@vger.kernel.org
+References: <20250114220147.757075-1-ninad@linux.ibm.com>
+ <20250114220147.757075-4-ninad@linux.ibm.com>
+ <mbtwdqpalfr2xkhnjc5c5jcjk4w5brrxmgfeydjj5j2jfze4mj@smyyogplpxss>
+ <20250115142457.GA3859772-robh@kernel.org>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
+ cFgcqTTuNHjAvxtUG8pQgGTHAObYs6xeYJtjUH0ZX6ndJ33FJYf5V3yXqqjcZ30FgHzJCFUu
+ JMp7PSyMPzpUXfU12yfcRYVEMQrmplNZssmYhiTeVicuOOypWugZKVLGNm0IweVCaZ/DJDIH
+ gNbpvVwjcKYrx85m9cBVEBUGaQP6AT7qlVCkrf50v8bofSIyVa2xmubbAwwFA1oxoOusjPIE
+ J3iadrwpFvsZjF5uHAKS+7wHLoW9hVzOnLbX6ajk5Hf8Pb1m+VH/E8bPBNNYKkfTtypTDUCj
+ NYcd27tjnXfG+SDs/EXNUAIRefCyvaRG7oRYF3Ec+2RgQDRnmmjCjoQNbFrJvJkFHlPeHaeS
+ BosGY+XWKydnmsfY7SSnjAzLUGAFhLd/XDVpb1Een2XucPpKvt9ORF+48gy12FA5GduRLhQU
+ vK4tU7ojoem/G23PcowM1CwPurC8sAVsQb9KmwTGh7rVz3ks3w/zfGBy3+WmLg++C2Wct6nM
+ Pd8/6CBVjEWqD06/RjI2AnjIq5fSEH/BIfXXfC68nMp9BZoy3So4ZsbOlBmtAPvMYX6U8VwD
+ TNeBxJu5Ex0Izf1NV9CzC3nNaFUYOY8KfN01X5SExAoVTr09ewARAQABzSVLcnp5c3p0b2Yg
+ S296bG93c2tpIDxrcnprQGtlcm5lbC5vcmc+wsGVBBMBCgA/AhsDBgsJCAcDAgYVCAIJCgsE
+ FgIDAQIeAQIXgBYhBJvQfg4MUfjVlne3VBuTQ307QWKbBQJgPO8PBQkUX63hAAoJEBuTQ307
+ QWKbBn8P+QFxwl7pDsAKR1InemMAmuykCHl+XgC0LDqrsWhAH5TYeTVXGSyDsuZjHvj+FRP+
+ gZaEIYSw2Yf0e91U9HXo3RYhEwSmxUQ4Fjhc9qAwGKVPQf6YuQ5yy6pzI8brcKmHHOGrB3tP
+ /MODPt81M1zpograAC2WTDzkICfHKj8LpXp45PylD99J9q0Y+gb04CG5/wXs+1hJy/dz0tYy
+ iua4nCuSRbxnSHKBS5vvjosWWjWQXsRKd+zzXp6kfRHHpzJkhRwF6ArXi4XnQ+REnoTfM5Fk
+ VmVmSQ3yFKKePEzoIriT1b2sXO0g5QXOAvFqB65LZjXG9jGJoVG6ZJrUV1MVK8vamKoVbUEe
+ 0NlLl/tX96HLowHHoKhxEsbFzGzKiFLh7hyboTpy2whdonkDxpnv/H8wE9M3VW/fPgnL2nPe
+ xaBLqyHxy9hA9JrZvxg3IQ61x7rtBWBUQPmEaK0azW+l3ysiNpBhISkZrsW3ZUdknWu87nh6
+ eTB7mR7xBcVxnomxWwJI4B0wuMwCPdgbV6YDUKCuSgRMUEiVry10xd9KLypR9Vfyn1AhROrq
+ AubRPVeJBf9zR5UW1trJNfwVt3XmbHX50HCcHdEdCKiT9O+FiEcahIaWh9lihvO0ci0TtVGZ
+ MCEtaCE80Q3Ma9RdHYB3uVF930jwquplFLNF+IBCn5JRzsFNBFVDXDQBEADNkrQYSREUL4D3
+ Gws46JEoZ9HEQOKtkrwjrzlw/tCmqVzERRPvz2Xg8n7+HRCrgqnodIYoUh5WsU84N03KlLue
+ MNsWLJBvBaubYN4JuJIdRr4dS4oyF1/fQAQPHh8Thpiz0SAZFx6iWKB7Qrz3OrGCjTPcW6ei
+ OMheesVS5hxietSmlin+SilmIAPZHx7n242u6kdHOh+/SyLImKn/dh9RzatVpUKbv34eP1wA
+ GldWsRxbf3WP9pFNObSzI/Bo3kA89Xx2rO2roC+Gq4LeHvo7ptzcLcrqaHUAcZ3CgFG88CnA
+ 6z6lBZn0WyewEcPOPdcUB2Q7D/NiUY+HDiV99rAYPJztjeTrBSTnHeSBPb+qn5ZZGQwIdUW9
+ YegxWKvXXHTwB5eMzo/RB6vffwqcnHDoe0q7VgzRRZJwpi6aMIXLfeWZ5Wrwaw2zldFuO4Dt
+ 91pFzBSOIpeMtfgb/Pfe/a1WJ/GgaIRIBE+NUqckM+3zJHGmVPqJP/h2Iwv6nw8U+7Yyl6gU
+ BLHFTg2hYnLFJI4Xjg+AX1hHFVKmvl3VBHIsBv0oDcsQWXqY+NaFahT0lRPjYtrTa1v3tem/
+ JoFzZ4B0p27K+qQCF2R96hVvuEyjzBmdq2esyE6zIqftdo4MOJho8uctOiWbwNNq2U9pPWmu
+ 4vXVFBYIGmpyNPYzRm0QPwARAQABwsF8BBgBCgAmAhsMFiEEm9B+DgxR+NWWd7dUG5NDfTtB
+ YpsFAmA872oFCRRflLYACgkQG5NDfTtBYpvScw/9GrqBrVLuJoJ52qBBKUBDo4E+5fU1bjt0
+ Gv0nh/hNJuecuRY6aemU6HOPNc2t8QHMSvwbSF+Vp9ZkOvrM36yUOufctoqON+wXrliEY0J4
+ ksR89ZILRRAold9Mh0YDqEJc1HmuxYLJ7lnbLYH1oui8bLbMBM8S2Uo9RKqV2GROLi44enVt
+ vdrDvo+CxKj2K+d4cleCNiz5qbTxPUW/cgkwG0lJc4I4sso7l4XMDKn95c7JtNsuzqKvhEVS
+ oic5by3fbUnuI0cemeizF4QdtX2uQxrP7RwHFBd+YUia7zCcz0//rv6FZmAxWZGy5arNl6Vm
+ lQqNo7/Poh8WWfRS+xegBxc6hBXahpyUKphAKYkah+m+I0QToCfnGKnPqyYIMDEHCS/RfqA5
+ t8F+O56+oyLBAeWX7XcmyM6TGeVfb+OZVMJnZzK0s2VYAuI0Rl87FBFYgULdgqKV7R7WHzwD
+ uZwJCLykjad45hsWcOGk3OcaAGQS6NDlfhM6O9aYNwGL6tGt/6BkRikNOs7VDEa4/HlbaSJo
+ 7FgndGw1kWmkeL6oQh7wBvYll2buKod4qYntmNKEicoHGU+x91Gcan8mCoqhJkbqrL7+nXG2
+ 5Q/GS5M9RFWS+nYyJh+c3OcfKqVcZQNANItt7+ULzdNJuhvTRRdC3g9hmCEuNSr+CLMdnRBY fv0=
+In-Reply-To: <20250115142457.GA3859772-robh@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Jan 15, 2025 at 06:43:00PM +0200, Roger Quadros wrote:
-> Call netif_carrier_on/off when link is up/down.
-> When link is up only wake TX netif queue if network device is
-> running.
+On 15/01/2025 15:24, Rob Herring wrote:
+>>>  
+>>> +patternProperties:
+>>> +  "^(hog-[0-9]+|.+-hog(-[0-9]+)?)$":
+>>
+>> Choose one - suffix or prefix. More popular is suffix.
+> 
+> I was about to say that, but this matches what gpio-hog.yaml defines. 
+> Why we did both, I don't remember. We could probably eliminate 
+> 'hog-[0-9]+' as that doesn't appear to be used much.
 
-Sorry, but no, this is wrong.
+Only one case:
+arch/arm64/boot/dts/nvidia/tegra210-p2894.dtsi:                 hog-0 {
 
-Documentation/networking/sfp-phylink.rst:
+Although there are few "hog" prefixes followed by alphanumeric, so not
+matching above pattern.
 
-16. Verify that the driver does not call::
+> 
+> Long term, I want to make all gpio controllers reference a gpio 
+> controller schema and put the hog stuff there. Then we have the node 
+> names defined in 1 place.
 
-        netif_carrier_on()
-        netif_carrier_off()
 
-    as these will interfere with phylink's tracking of the link state,
-    and cause phylink to omit calls via the :c:func:`mac_link_up` and
-    :c:func:`mac_link_down` methods.
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Best regards,
+Krzysztof
 
