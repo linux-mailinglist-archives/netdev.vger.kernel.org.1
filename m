@@ -1,92 +1,58 @@
-Return-Path: <netdev+bounces-158370-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158371-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B05A6A11800
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 04:41:52 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC1E5A11816
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 04:53:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B9799167C75
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 03:41:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ECD49168B6E
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 03:53:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F76F156644;
-	Wed, 15 Jan 2025 03:41:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D36C156676;
+	Wed, 15 Jan 2025 03:53:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AHkPGLvQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OEj7gmty"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A8C94C98;
-	Wed, 15 Jan 2025 03:41:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69769136E3F
+	for <netdev@vger.kernel.org>; Wed, 15 Jan 2025 03:53:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736912508; cv=none; b=enlPBTqj70OkrGmQEeLYJsUzG1j4UWEcdc+lLy5LCtC4d080lTWPK+SYGiw3arBmsvKLzAsuwoPGIO7wN/Bbmk5N/7ITMw3yCsi8ezxaIQxxL+kzHR3uu2T915NwDPLLQaeYgIkxFMJ7LRMlPzuFBXE1n45+6AKA3ZCFqjxSsRw=
+	t=1736913216; cv=none; b=UNJgGub+H5GIKyj6stmp8YZ8jBj1FLa3+YyciV1W8BYuUAgmQPqdvPp+Fcj+5QwFKPDPhIfx+w93yHZ9/GJ2ydpICDxgmIxAGt6meE95iGMcdxIfOjhR99XKSgRaJbwK3vfeX1w+AEFdFElR4Eu6UpPxI/vh0DpvqJa4IaFA0NI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736912508; c=relaxed/simple;
-	bh=mF395oh0tVtZ0nQP01E0uDaCUrAm5f1mTBgQ8AIXq+M=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=hwtLM27kjgjre4ED5ilnjAoK0JC1MFh38xo+JuxKhzfmT5dMtWz7LhLDsAtQIEciwdvp0z+TY93tGDfe0yPa2jDJAbq2jJnxnM3OiwqmOk3ROonYBKdRdAhLvakaDqYYGWxN7JDVUyRrTluV78xniIA/4AhTeDAU+SLOOnHXS/Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AHkPGLvQ; arc=none smtp.client-ip=209.85.216.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-2ef72924e53so10317609a91.3;
-        Tue, 14 Jan 2025 19:41:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736912506; x=1737517306; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=w79G0sAdFORxpLEmin5NUYiYaNJ/dpjL2Qm4mGDbE+g=;
-        b=AHkPGLvQjkWvBE4XrpxLWFLXgZs/N5pDRqGv8VN3mq6tZaK3uG4ILI2dxeifghYXNZ
-         qtenHm43kIbMG7bGf3ZBwwJTsGaboG1GMB2PuwGOhAHbYdmpNJyEuc/1hxIViOMLgwX7
-         7+sbrVKnwCAZWc0WSojbbnXxKCMARgS+tLqyd2QFahcmbH4/rRz9IrFt3Js7b1qfh+FO
-         IOJVrZdpiOhW9B2j78vWanNAQNUKAGUwVF4M4nmF9V3TLkl20Gnj0YjZj5GpVA3EjAdM
-         Maww44VfpOpWV5lrsFD8TY9Ttk5qPavNVZBeIDQpP+qHSyElJRESXRztZTXS0fvxyBew
-         DRqw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736912506; x=1737517306;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=w79G0sAdFORxpLEmin5NUYiYaNJ/dpjL2Qm4mGDbE+g=;
-        b=M7T5HkY0p31y5O+SU+/Hu3hCQyowqhQxh7hm320dzxfcF2AwIDPzFvTj+W4ie6xj/B
-         SpZUE+grprUmTVpiqn2pXimnFsnyJILnl0R6e/VdpmkVCG3SCZc82FWnVxB4kLPZNCyw
-         /CiBspZCMeLdcd0fcPfLdUyTmWNfcazHZ43ghCTsEUsyjTHsYNRbEGbniOkDJ1WWS0ER
-         WR2jyQ4FKhYOaDdyE2fVn11d+oOskxLPeDvYhIMl3rc6wJ7SwCSFGostfG6Hjk/CRsGf
-         GUeJ1hVJsv5zmW2gQJv9Y1CTDLO/6hVs7V393tcRAV3UHCM16+PkYxeZQv7JEGsHVq7V
-         NcVA==
-X-Forwarded-Encrypted: i=1; AJvYcCUEgH5zw9sVB9QcieQEIfiK8ppMibq+9s4KxBTm1d+6FaSxD/IkCH1LmDo5UvTF/LYt9ZWBzlMO2DxVehU=@vger.kernel.org, AJvYcCUnhNepmD8pNRVnaXgf6v7s3Q3QkNHpvxf399peaXCLaFNScnggzuS1CPSj+6BeFOy5CeyN22pM@vger.kernel.org
-X-Gm-Message-State: AOJu0YyOlvLruVdgp+XiyPFhYAqFjvWXaYoE+Pkdtecoe/ybv/rTLmG6
-	CrbwrU2GyM30U3ILKLmAymm7aRs14MzuV5Dkqxyxpr4NHP7qaZK6
-X-Gm-Gg: ASbGnct+Zci1YALjcGzjbJ6j/E3EigOw6MagBSI7w+X3Az/6moz0zTrhVvPB8S7Lhdc
-	dZe6lHk1D6HRGZ0fNyQzh2WsW2Y/bE8g1lpUt1eBv/jJo/XCHzzOZoLlthKd3ccJqofZV/w9gRW
-	aRaRemEgUJOX8WJNLsZkifc/Ylwb0e3D5dOIiF6hFw380nwDpzxyhq2ceAUokJF3oPulrY96L/A
-	+wORtltAhAL19DSrAF5TtU2+H1Zv+zvZBgDjwIiyOtzcU5ClLG8e2lAN5SV
-X-Google-Smtp-Source: AGHT+IFUsVIMLNo7dsDWNM7Y7j/R+wYJTfLLRH9xMmGx3hdnhEDN5EwruBttORubiH3a0y9p2WRBIg==
-X-Received: by 2002:a17:90b:274b:b0:2ee:8427:4b02 with SMTP id 98e67ed59e1d1-2f548f5f941mr38369822a91.28.1736912506496;
-        Tue, 14 Jan 2025 19:41:46 -0800 (PST)
-Received: from HOME-PC ([223.185.133.12])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2f72c04b157sm325868a91.0.2025.01.14.19.41.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Jan 2025 19:41:46 -0800 (PST)
-From: Dheeraj Reddy Jonnalagadda <dheeraj.linuxdev@gmail.com>
-To: anthony.l.nguyen@intel.com,
-	przemyslaw.kitszel@intel.com,
-	piotr.kwapulinski@intel.com
-Cc: andrew+netdev@lunn.ch,
-	davem@davemloft.net,
+	s=arc-20240116; t=1736913216; c=relaxed/simple;
+	bh=9f4nA0oH56PWsr4M4sj5gY2HaaEElyJTD0Xhc9rsehw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tm+eqwTW1ai2mABEhulYd4+3jKXTg4XpFua42w0VWjZ6/BY9BBZm6g9gDJxEsvjNCLp5T/fiYv1TW95laE7ry2URzjM9nJll7Q9Fa6FnHo8s19jTj6zvKLSaim83WnAe0z1r3k36KO5rNzxQH/1tH+soAMHJ4BiXJcD9Ars9imo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OEj7gmty; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7E0C9C4CEDF;
+	Wed, 15 Jan 2025 03:53:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1736913215;
+	bh=9f4nA0oH56PWsr4M4sj5gY2HaaEElyJTD0Xhc9rsehw=;
+	h=From:To:Cc:Subject:Date:From;
+	b=OEj7gmtydy8NYIa2a8bC2kKHuG7AE/uefl5EOHHvWEZ1yVwO0Ec3Q55TZdXngy0A+
+	 PhIRHSZcU8jQ5BqoxHVytRv/2/FoFhx1fudyXtdP/ls0vP0KfTXYTCLNgDN96fl8BH
+	 DmgCoLTP/ZzhNnHaGa95VreB0Yt+69QUDBL7FAbppFsvFve/dQWZuyJ8AlxjU374aH
+	 cZCDoaPmPXYcCTdbd7THR3qEsVCCniaeD589uqi3vxElCvm7WAarW0GTNnnuHsP4Pf
+	 NyHGVNrVw/gNgWuIztIALfdGwsDpXowB22FIIHrXO1R8Auac81pADPOghMwDqwJyB+
+	 nJ4TYozBSwxcw==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
 	edumazet@google.com,
-	kuba@kernel.org,
 	pabeni@redhat.com,
-	michal.swiatkowski@linux.intel.com,
-	intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Dheeraj Reddy Jonnalagadda <dheeraj.linuxdev@gmail.com>
-Subject: [PATCH v2 net-next] ixgbe: Fix endian handling for ACI descriptor registers
-Date: Wed, 15 Jan 2025 09:11:17 +0530
-Message-Id: <20250115034117.172999-1-dheeraj.linuxdev@gmail.com>
-X-Mailer: git-send-email 2.34.1
+	andrew+netdev@lunn.ch,
+	horms@kernel.org,
+	jdamato@fastly.com,
+	Jakub Kicinski <kuba@kernel.org>
+Subject: [PATCH net-next v2 00/11] net: use netdev->lock to protect NAPI
+Date: Tue, 14 Jan 2025 19:53:08 -0800
+Message-ID: <20250115035319.559603-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.48.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -95,55 +61,47 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The ixgbe driver was missing proper endian conversion for ACI descriptor
-register operations. Add the necessary conversions when reading and
-writing to the registers.
+We recently added a lock member to struct net_device, with a vague
+plan to start using it to protect netdev-local state, removing
+the need to take rtnl_lock for new configuration APIs.
 
-Fixes: 46761fd52a88 ("ixgbe: Add support for E610 FW Admin Command Interface")
-Closes: https://scan7.scan.coverity.com/#/project-view/52337/11354?selectedIssue=1602757
-Signed-off-by: Dheeraj Reddy Jonnalagadda <dheeraj.linuxdev@gmail.com>
----
-Changelog
+Lay some groundwork and use this lock for protecting NAPI APIs.
 
 v2:
-	- Updated the patch to include suggested fix
-	- Updated the commit message to describe the issue
+ - reorder patches 2 and 3
+ - add missing READ_ONCE()
+ - fix up the kdoc to please Sphinx / htmldocs
+ - use napi_disabled_locked() in via-velocity
+ - update the comment on dev_isalive()
+v1: https://lore.kernel.org/20250114035118.110297-1-kuba@kernel.org
 
- drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+Jakub Kicinski (11):
+  net: add netdev_lock() / netdev_unlock() helpers
+  net: make netdev_lock() protect netdev->reg_state
+  net: add helpers for lookup and walking netdevs under netdev_lock()
+  net: add netdev->up protected by netdev_lock()
+  net: protect netdev->napi_list with netdev_lock()
+  net: protect NAPI enablement with netdev_lock()
+  net: make netdev netlink ops hold netdev_lock()
+  net: protect threaded status of NAPI with netdev_lock()
+  net: protect napi->irq with netdev_lock()
+  net: protect NAPI config fields with netdev_lock()
+  netdev-genl: remove rtnl_lock protection from NAPI ops
 
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
-index 683c668672d6..3b9017e72d0e 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
-@@ -113,7 +113,7 @@ static int ixgbe_aci_send_cmd_execute(struct ixgbe_hw *hw,
- 
- 	/* Descriptor is written to specific registers */
- 	for (i = 0; i < IXGBE_ACI_DESC_SIZE_IN_DWORDS; i++)
--		IXGBE_WRITE_REG(hw, IXGBE_PF_HIDA(i), raw_desc[i]);
-+		IXGBE_WRITE_REG(hw, IXGBE_PF_HIDA(i), cpu_to_le32(raw_desc[i]));
- 
- 	/* SW has to set PF_HICR.C bit and clear PF_HICR.SV and
- 	 * PF_HICR_EV
-@@ -145,7 +145,7 @@ static int ixgbe_aci_send_cmd_execute(struct ixgbe_hw *hw,
- 	if ((hicr & IXGBE_PF_HICR_SV)) {
- 		for (i = 0; i < IXGBE_ACI_DESC_SIZE_IN_DWORDS; i++) {
- 			raw_desc[i] = IXGBE_READ_REG(hw, IXGBE_PF_HIDA(i));
--			raw_desc[i] = raw_desc[i];
-+			raw_desc[i] = le32_to_cpu(raw_desc[i]);
- 		}
- 	}
- 
-@@ -153,7 +153,7 @@ static int ixgbe_aci_send_cmd_execute(struct ixgbe_hw *hw,
- 	if ((hicr & IXGBE_PF_HICR_EV) && !(hicr & IXGBE_PF_HICR_C)) {
- 		for (i = 0; i < IXGBE_ACI_DESC_SIZE_IN_DWORDS; i++) {
- 			raw_desc[i] = IXGBE_READ_REG(hw, IXGBE_PF_HIDA_2(i));
--			raw_desc[i] = raw_desc[i];
-+			raw_desc[i] = le32_to_cpu(raw_desc[i]);
- 		}
- 	}
- 
+ include/linux/netdevice.h                   | 118 +++++++++++--
+ net/core/dev.h                              |  29 +++-
+ drivers/net/ethernet/amd/pcnet32.c          |  11 +-
+ drivers/net/ethernet/intel/iavf/iavf_main.c |  84 ++++-----
+ drivers/net/ethernet/marvell/mvneta.c       |   5 +-
+ drivers/net/ethernet/via/via-velocity.c     |   6 +-
+ drivers/net/netdevsim/ethtool.c             |   4 +-
+ net/core/dev.c                              | 183 ++++++++++++++++++--
+ net/core/net-sysfs.c                        |  39 ++++-
+ net/core/netdev-genl.c                      |  56 +++---
+ net/shaper/shaper.c                         |   6 +-
+ 11 files changed, 420 insertions(+), 121 deletions(-)
+
 -- 
-2.34.1
+2.48.0
 
 
