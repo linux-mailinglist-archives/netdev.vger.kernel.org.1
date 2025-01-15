@@ -1,240 +1,173 @@
-Return-Path: <netdev+bounces-158576-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158577-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6875DA128E3
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 17:39:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 48C22A128EA
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 17:41:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 278E53A502B
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 16:39:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D47123A2FD1
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 16:41:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2220166F3A;
-	Wed, 15 Jan 2025 16:39:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 086741553BB;
+	Wed, 15 Jan 2025 16:41:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ad8QyAxZ"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="h3AQBKwp"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2054.outbound.protection.outlook.com [40.107.95.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8209161321;
-	Wed, 15 Jan 2025 16:39:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736959142; cv=none; b=pTEOoB3hic6QO7ixsTE2fAvIJ1VNESa8bo+58cgUJyxoFjN1rnpmKYejThbwR9HtCm4Ybc3CBptEJiF4cIlUYOYmGWVkrRigY38PVS4J8EJPBkPiJRLV3twdHz6QSRQHzGSOR1KT5EZHUp1PPVO7nSdgy2rLdP8NF53HULlIkew=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736959142; c=relaxed/simple;
-	bh=FgPty/rV2Ym7FHRQ8IZ/fR8y4+fVfmTW3R67Z35EXsw=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=DtaWG0fiF6smK2taIecCkcklaLNUxEQcYoCSGFP2aFsNm0ZQcbsLCPpA2Yj49huPBKmr0V2jLBT3PFtVp7VW7Qmo3r0BZWURaznqgk16cOiCty2uB945PFRtkGTY6x1xgG8BBEOEuOV8HH0b1pDJxI7GRPi4nTlvfFa+M1PFCO8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ad8QyAxZ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EA24CC4CED1;
-	Wed, 15 Jan 2025 16:38:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736959142;
-	bh=FgPty/rV2Ym7FHRQ8IZ/fR8y4+fVfmTW3R67Z35EXsw=;
-	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
-	b=ad8QyAxZtltvkQmeCXVgv/UwarTftRUz0G9/n2aSVfbJolIyc8O9EhGfk++TSQGqV
-	 +MPyyy6VyxqLg6oZw+ac+kTcnoCLGYqnXSaPlL4EWUm0ZYGLZnAttltZvYqW9pj1hk
-	 +TAuNTWQHaD1j+jHUvrQfrpfhPNb0a5AXIIo8GcJJbuxHNIBl5I3tRnBpD8QZP/i0M
-	 MBrKXp3cHJWlChERkvkmqOI3HnsPfMTsiQ7WSsoTQFVgLG+QJcu4vj7HgrWasV3iJn
-	 8p4a6Jga/+5XQHULFXNIW6V1MB87J+szwaLexLDOvw6tsiKk5h8qbg777moXZMSFMN
-	 tpGbtDfasBA2A==
-Message-ID: <8829d58b-fbfc-4040-93de-51970631d935@kernel.org>
-Date: Wed, 15 Jan 2025 18:38:57 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5495143C63
+	for <netdev@vger.kernel.org>; Wed, 15 Jan 2025 16:41:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.95.54
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1736959266; cv=fail; b=JhdX7zectgVPDgHC9NhmE24JCXtDP6USHXLhp8dt1NGUYIkrP34HBKompM6UoZyg3lsxb3LTHOx7OkDuN5+x+MTH5DNHz1ubXXDxzMJrlmvQ7g9vJa/ytVWWMLOs4X1TjrIICmqxbXF0pJY9r0zb2lANgTfLoWZyZ4Fxjyuk7YY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1736959266; c=relaxed/simple;
+	bh=xmh1IDBs2tPOP5PX+J7WnNQbFs82f89oU/KaCx8sUNc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=hxoUslPdER1f9WesOMo6nP5BG4wVPm/c9K7Y2xxi2e3udnm0lpd2ftQS4QhNI6r+2zskcnSx0Ujgs5u54ZHs0IW87w+ujFT3n1RWdt6aLVGvJb4pamnPc2ToI9tcsOLL4+0Waa2GjqxWYiWLigaNc2MxuMat8+aENqBti1mm4S4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=h3AQBKwp; arc=fail smtp.client-ip=40.107.95.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=xZVLKBzkhOap/8npirdxAUGje+MU2aU2AaFDeufZxYFZFT9F8jjSfG9H0tW9wFF9pdwg2QpsOuQlbI2Dq0o5FlxEbzZxReTRzR55qMKEhAC5XcBz0UdbeCkg+MN2iTPlj2R310yj2pCLtgoECTegSbsr749YrFWlfil9Bh24ZmTFMsWaN5M5/sLrXLrW2QBOPeyYjv6cMTFWklLF4nrbkMZUliphoeBaVq5kUdw2OU9ew6R8S87giCVaFkb00ErKduZdYS4xps1xR3dGrW1TT8iRSX+bpJ8Fl8jbFqhbUI/XEpN1qj8aj4Pn2n47WKTlE4UDbtIuMYfRS6S+S3WTqA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=xj1K2cYTUiuq+91ecL8yjjAJE4Lhlbhp+fsWaVQg8vw=;
+ b=AUzr+S/hgkD7yWPPal0DGmhDI1mLcQN0YDMEAqp3xP3H/pbeP/nHmvFGSr431rtxB1iUbAQ0rJWgFuX9+L4EMOVqEJcB5Z2oKOUGJKWJ0/AHLUs8uIssm2KC8/5j/C80kPdt855BbFTw7XJ0gFqsW4cbEW8+c2azvkcuqZL3YUq+BHxeDbcvZcnSig/48if7sidh3PZeSt32Vy9efDtqvWkN6ZORFNL0qDmFTVoDWQl10Gw5rTdtTpvncw97jUn/b+xPs6k8YpcmocueImrCsa69GQ2FV4vPrLIm8hO41n5cf+6OLjYaCvafpnjP0P6owyK8ksbGsd/eLv79DsxRHg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=xj1K2cYTUiuq+91ecL8yjjAJE4Lhlbhp+fsWaVQg8vw=;
+ b=h3AQBKwpQsbiteOK5E9uOtQu+/ACBsNpoN5O5gxQw/RCIiE2rEwH41Na2VFJ3vxgBIgJ5z00mLTlD+ESC3GhLGF7rhV82gGn/X3zRPelIOrU05C9zHXjiyuo4hi2oFVmm8RGppXYPtUpg2SBd0XYhfFn1YdtE3TUvWo5sqDMUviF/+9Z9lN9WynsUSNMIVdU18QTitqlQjslEDMDzZuiw4D+JX8/sxrxTbW1PmrOrKTDkwth76BwskvCwE0hKhIStFUP1krhTMg6banOWuBRyaBklgDMvg0j9bjjySru/3iGlhJiM7Lf0MQfxhp3nP44TNTKT8lVmmaN9obYEgJK1A==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from SA3PR12MB7901.namprd12.prod.outlook.com (2603:10b6:806:306::12)
+ by DM3PR12MB9414.namprd12.prod.outlook.com (2603:10b6:0:47::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8356.13; Wed, 15 Jan
+ 2025 16:41:00 +0000
+Received: from SA3PR12MB7901.namprd12.prod.outlook.com
+ ([fe80::66fc:f8a2:1bfb:6de8]) by SA3PR12MB7901.namprd12.prod.outlook.com
+ ([fe80::66fc:f8a2:1bfb:6de8%4]) with mapi id 15.20.8335.017; Wed, 15 Jan 2025
+ 16:41:00 +0000
+Date: Wed, 15 Jan 2025 18:40:50 +0200
+From: Ido Schimmel <idosch@nvidia.com>
+To: Guillaume Nault <gnault@redhat.com>
+Cc: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+	netdev@vger.kernel.org, Simon Horman <horms@kernel.org>,
+	David Ahern <dsahern@kernel.org>
+Subject: Re: [PATCH net-next] ipv4: Prepare inet_rtm_getroute() to
+ .flowi4_tos conversion.
+Message-ID: <Z4flEv2n52lxrTED@shredder>
+References: <7bc1c7dc47ad1393569095d334521fae59af5bc7.1736944951.git.gnault@redhat.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <7bc1c7dc47ad1393569095d334521fae59af5bc7.1736944951.git.gnault@redhat.com>
+X-ClientProxiedBy: LO4P123CA0545.GBRP123.PROD.OUTLOOK.COM
+ (2603:10a6:600:319::13) To SA3PR12MB7901.namprd12.prod.outlook.com
+ (2603:10b6:806:306::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net: ethernet: ti: am65-cpsw: fix freeing IRQ in
- am65_cpsw_nuss_remove_tx_chns()
-From: Roger Quadros <rogerq@kernel.org>
-To: Siddharth Vadapalli <s-vadapalli@ti.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Grygorii Strashko <grygorii.strashko@ti.com>, srk@ti.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20250114-am65-cpsw-fix-tx-irq-free-v1-1-b2069e6ed185@kernel.org>
- <gygqjjyso3p4qgam4fpjdkqidj2lhxldkmaopqg32bw3g4ktpj@43tmtsdexkqv>
- <8776a109-22c3-4c1e-a6a1-7bb0a4c70b06@kernel.org>
- <m4rhkzcr7dlylxr54udyt6lal5s2q4krrvmyay6gzgzhcu4q2c@r34snfumzqxy>
- <3c9bdd38-d60f-466d-a767-63f71368d41e@kernel.org>
-Content-Language: en-US
-In-Reply-To: <3c9bdd38-d60f-466d-a767-63f71368d41e@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SA3PR12MB7901:EE_|DM3PR12MB9414:EE_
+X-MS-Office365-Filtering-Correlation-Id: 14eb599f-cc13-4c10-bd07-08dd358364da
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|366016|7053199007;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?yasl1ribXlBD4M47ZtWtucJIOwmpKq1ebdH0yfsTkbjFC4vtNTxZoCeOB+EY?=
+ =?us-ascii?Q?kygM8SjWHJMtDYWbNGF+gcwAsbXW+ASHKduRY9kH9/UJe3UKMw8lFyeHURnE?=
+ =?us-ascii?Q?iTUjnFMEIrjrG6fc2NvjRrvpP2ow9C6ZyYHdWSXkO8XRP9UId/oN7dufpQrV?=
+ =?us-ascii?Q?/D4qt+twupuYwVI5NNMerN82PA/SSVJQ2DtnSGIvtcGptzhhwHIjOeBiEFGO?=
+ =?us-ascii?Q?hiUYzy7qvejzQWMHc134nxNOckNDCYr/YYtrQkgTY5ppKegrUECF1tIgbsXn?=
+ =?us-ascii?Q?fia5wFJNiJW03/EUDcfMkQy0jeUZ2XxFYUgvncV7kxwR/uAQYSInn5P7MNVJ?=
+ =?us-ascii?Q?pivZVfx/OhOEBXXlKhEHwl/KmuLBzH4U7yLLgMaFgJ2CNfCwX+O328etBcte?=
+ =?us-ascii?Q?cIGHK8YNSFMZcr7mXcZ+iwFlFH3sl0g39dU93wO9cGzBc4ms4JewBAEYPyVw?=
+ =?us-ascii?Q?DVUdRspRybmmOf7wXNa4jFprWGXt8FEtSwXXBhZtJLRzNgJ7lWsqTRP7a6kT?=
+ =?us-ascii?Q?UgE0TPTmp0V95dlEIIo8hXSxgc4u3B05c7muLv7vvuD+na1sltrOYT7TehXT?=
+ =?us-ascii?Q?dAC6g5eJ/l7VayUaVRYTY02JrONKC+0Kb1hh3UekYd2iJr3B19KM1zK30gBy?=
+ =?us-ascii?Q?6GBTZo91D+G2Jmoz+TXU2ZqvN7Si479vjgkMJuHHnqZkJzonSOFbTdmwQWD2?=
+ =?us-ascii?Q?Qd7xwM5pU6jUnN+HZU3fJe4zw6z5XuJHyQ5BBNkrDxEr0qpG/gkTr1Vu4zYY?=
+ =?us-ascii?Q?VegBlM5JzBU7MpgxCGi5HOX5K3UORXxV4E19Q6wDfMql7vNlpDWG2nphA0yz?=
+ =?us-ascii?Q?ML4Kp9sFe4zCiz6/oH/iA/hlt2FRGPC6HO0ZZe4tGwnlJC1qIbI8zLo3UWi2?=
+ =?us-ascii?Q?oMeem7TIUBDDAxjF08NHQF0UqyC/92xExwVkavovWWqBOW7TNxUGF47krj6M?=
+ =?us-ascii?Q?b4bOVfdJ3BflattIYi8NM8KYAY+nQcaw8X+VYsjTBOihvcwEm75Ktcdy69af?=
+ =?us-ascii?Q?3GlM08hGX2YPLw0bjiiL8d/4J0/Ucw43ocjjZNxUgNt73tl/Ae3x1jGM8J4C?=
+ =?us-ascii?Q?6FV+v40TWgXRyE25gru0rE7WqQh4jxB2mcsAL19ZXz6ySncQdndbwvD1cj5m?=
+ =?us-ascii?Q?A8pzSg9Dfaeg2Zv+1mW683uHrbtCl1N32FouHERe2gPwmJNh8I5+mA0UeHrH?=
+ =?us-ascii?Q?QFUJN/K+8iGC8kPGyugl7g9h25ZyCWVwpQL8Exuzc4k1KcKmxovKTVk+PrvH?=
+ =?us-ascii?Q?/65eLi02H36R4ExGcLBViZD/Koe5ER1UDayHYYDsjmOElaebuC401KDmrhW3?=
+ =?us-ascii?Q?iXF+WUBsXKb2rqs25RsGx0A1zM4TIzG9tEJRP0N1yKEW8/cKSIqXW0fBAtfV?=
+ =?us-ascii?Q?RwGBF0gkl54H7AjSEkZqLElZry6z?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA3PR12MB7901.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?jIGMmm1Xru1e81dSSdFPm/YewFpBd8oewM4HtgEKQMOrjUTVE+9y8qG96RP3?=
+ =?us-ascii?Q?qKr9PpaV+PerW4mHaBAl8pjFu9QVDmuJTdpwvz/murVII39X0nXL6eAvLKcE?=
+ =?us-ascii?Q?yIowOzIIvE/C4mUTiXYKU8xX1zVD/8xF0aM9eLdNwpyb+2X9QxWCzMKD7CPq?=
+ =?us-ascii?Q?+fpi3DAeOI1sytwM1SsxN1ZHX2SY06b1RSHqXB5PFHa6I+pj1ot3clhsV2vK?=
+ =?us-ascii?Q?VsoGSr2lIasvKUNsu0xceFWod2/87d6ZvpH/cxYKDNm26lV01+ezxNIk/NaA?=
+ =?us-ascii?Q?IQ6+C6lA3I3ps6WFMYUiro6PG49MX2ySZluBggKQyQQEIGLz18ZpzVck8KdM?=
+ =?us-ascii?Q?EfY1DwacWlMSiE4oOmWzN5PzDPNUf0k07rUNtGLRWHJO/iO97w9R1oATNBfQ?=
+ =?us-ascii?Q?5TBSk1SvYq2OcLIdhS7mBrSksH9u2XWgnVGzrhqNb8XbcubOXnsfiKD1Zzna?=
+ =?us-ascii?Q?J9W54uBSAxMv+tfVR/9Mt8e8X2q+xSqZYsytjToima5c4JhnONINxaa+9ytY?=
+ =?us-ascii?Q?FSJW8b5U2OyZ+MxRuTA1kC68j4zpBQ3tDYXtLqaSex5er5EYsQpGDx7CiWEb?=
+ =?us-ascii?Q?M0XBYnl6D89jeMSkTQKMjgABEoV1vQcQNa0ple/dfDSLPT8MN20Kfbrv9NSd?=
+ =?us-ascii?Q?4hnNMOyGRL7vBPtRX3/1EhWsbq5tBi5h+0AMpoi6ySVdxHSDHWfYgeAuRY4B?=
+ =?us-ascii?Q?/EAFj+0DHf6REXCBGzmt8XWlkgnZmiz261mEaNc+4UcLTbouNzE155GgooXK?=
+ =?us-ascii?Q?jYZaj105dWN5L7OFlt27AHVX6o/jwjEkrqPZ4oS+MZh5g6ph01RM8BsrVFPB?=
+ =?us-ascii?Q?ukPWwI/PXh2YKFit9ZBWUv9q+JlhasU7DO3EZhbafrc3sbhPCsgelCyrnGo8?=
+ =?us-ascii?Q?2/yfYT+u/4aVPXNGfHG68L/gA63LJUZ7bb+pQJZWZodlHxlXLbLUJnbPSqqo?=
+ =?us-ascii?Q?fZNQfiR+285S/TS0JpY6umOOtUBrPJnMhhZd7Lk+1kO+rUkv3fR+7er4ESvJ?=
+ =?us-ascii?Q?aWEwBRA9TfGUh8tulW/t4c0BJXz6HsejsVI/BQHJg0e3ttYkySWtKmfreCGX?=
+ =?us-ascii?Q?goJ8Y5HwtF1cUqiIEcmoFE8tyY6t45aHh+3xXwRGJjxvaAmiRFA5GOjnYUG0?=
+ =?us-ascii?Q?Pm2xLPMLG2KGJiSK41RA0SsMyku52ofDpcvXzB8ZiowYV12MmDCDLuM9FETT?=
+ =?us-ascii?Q?EWIjQflPWWj0DAe5t2ullkUbOm7GKTzlycMCNa8aYrh9zKdXKI2uccHHhy6p?=
+ =?us-ascii?Q?zY7brEyIHxWroUXO82Cm7B8Ok5sNh5dWxE90FTcYCB1xwejYSfdygmrvKurg?=
+ =?us-ascii?Q?Hb2+mXKTGFFKNKT85dIRyNoeVL3UcEdGRNU1Z1nf9PmwjM+rIqKGygI6i/Ul?=
+ =?us-ascii?Q?2E2tpxvzDAX1rSYYC45/WLpXQoFKzKwcfUxmcNYsq2fHbIcyssGPlxF0TLPE?=
+ =?us-ascii?Q?cr2ibBpolfEQlouZsE+TIBT2STcpMZmRM3S68jukPhxCDLZ2LTD2sneyluwU?=
+ =?us-ascii?Q?tuEoTAo8Qc/BjQ+TXYmOTe9AfActwmG5xJPHzDM0hMqxFGj6O8bjwOnvTgMX?=
+ =?us-ascii?Q?zqniYJzu1373ysvRbEfJoJD2mO9+kgkkzTOTapni?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 14eb599f-cc13-4c10-bd07-08dd358364da
+X-MS-Exchange-CrossTenant-AuthSource: SA3PR12MB7901.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Jan 2025 16:41:00.6820
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: +LbY/iOjjjfKeDIOW1QZityK9/JUDycEEbQqFZQ1qssnO1SiZhCQIVDEQ7+XrVmIYQsh1XK0lBb7JLmhDUc1Sw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM3PR12MB9414
 
-Siddharth,
-
-On 15/01/2025 17:49, Roger Quadros wrote:
-> Hi Siddharth,
+On Wed, Jan 15, 2025 at 01:44:52PM +0100, Guillaume Nault wrote:
+> Store rtm->rtm_tos in a dscp_t variable, which can then be used for
+> setting fl4.flowi4_tos and also be passed as parameter of
+> ip_route_input_rcu().
 > 
-> On 15/01/2025 12:38, Siddharth Vadapalli wrote:
->> On Wed, Jan 15, 2025 at 12:04:17PM +0200, Roger Quadros wrote:
->>> Hi Siddharth,
->>>
->>> On 15/01/2025 07:18, Siddharth Vadapalli wrote:
->>>> On Tue, Jan 14, 2025 at 06:44:02PM +0200, Roger Quadros wrote:
->>>>
->>>> Hello Roger,
->>>>
->>>>> When getting the IRQ we use k3_udma_glue_rx_get_irq() which returns
->>>>
->>>> You probably meant "k3_udma_glue_tx_get_irq()" instead? It is used to
->>>> assign tx_chn->irq within am65_cpsw_nuss_init_tx_chns() as follows:
->>>
->>> Yes I meant tx instead of rx.
->>>
->>>>
->>>> 		tx_chn->irq = k3_udma_glue_tx_get_irq(tx_chn->tx_chn);
->>>>
->>>> Additionally, following the above section we have:
->>>>
->>>> 		if (tx_chn->irq < 0) {
->>>> 			dev_err(dev, "Failed to get tx dma irq %d\n",
->>>> 				tx_chn->irq);
->>>> 			ret = tx_chn->irq;
->>>> 			goto err;
->>>> 		}
->>>>
->>>> Could you please provide details on the code-path which will lead to a
->>>> negative "tx_chn->irq" within "am65_cpsw_nuss_remove_tx_chns()"?
->>>>
->>>> There seem to be two callers of am65_cpsw_nuss_remove_tx_chns(), namely:
->>>> 1. am65_cpsw_nuss_update_tx_rx_chns()
->>>> 2. am65_cpsw_nuss_suspend()
->>>> Since both of them seem to invoke am65_cpsw_nuss_remove_tx_chns() only
->>>> in the case where am65_cpsw_nuss_init_tx_chns() *did not* error out, it
->>>> appears to me that "tx_chn->irq" will never be negative within
->>>> am65_cpsw_nuss_remove_tx_chns()
->>>>
->>>> Please let me know if I have overlooked something.
->>>
->>> The issue is with am65_cpsw_nuss_update_tx_rx_chns(). It can be called
->>> repeatedly (by user changing number of TX queues) even if previous call
->>> to am65_cpsw_nuss_init_tx_chns() failed.
->>
->> Thank you for clarifying. So the issue/bug was discovered since the
->> implementation of am65_cpsw_nuss_update_tx_rx_chns(). The "Fixes" tag
->> misled me. Maybe the "Fixes" tag should be updated? Though we should
->> code to future-proof it as done in this patch, the "Fixes" tag pointing
->> to the very first commit of the driver might not be accurate as the
->> code-path associated with the bug cannot be exercised at that commit.
+> The .flowi4_tos field is going to be converted to dscp_t to ensure ECN
+> bits aren't erroneously taken into account during route lookups. Having
+> a dscp_t variable available will simplify that conversion, as we'll
+> just have to drop the inet_dscp_to_dsfield() call.
 > 
-> Fair enough. I'll change the Fixes commit.
-
-Now that I check the code again, am65_cpsw_nuss_remove_tx_chns(),
-am65_cpsw_nuss_update_tx_chns() and am65_cpsw_nuss_init_tx_chns()
-were all introduced in the Fixes commit I stated.
-
-Could you please share why you thought it is not accurate?
-
+> Note that we can't just convert rtm->rtm_tos to dscp_t because this
+> structure is exported to user space.
 > 
->>
->> Independent of the above change suggested for the "Fixes" tag,
->>
->> Reviewed-by: Siddharth Vadapalli <s-vadapalli@ti.com>
->>
->> There seems to be a different bug in am65_cpsw_nuss_update_tx_rx_chns()
->> which I have described below.
->>
->>>
->>> Please try the below patch to simulate the error condition.
->>>
->>> Then do the following
->>> - bring down all network interfaces
->>> - change num TX queues to 2. IRQ for 2nd channel fails.
->>> - change num TX queues to 3. Now we try to free an invalid IRQ and we see warning.
->>>
->>> Also I think it is good practice to code for set value than to code
->>> for existing code paths as they can change in the future.
->>>
->>> --test patch starts--
->>>
->>> diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.c b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
->>> index 36c29d3db329..c22cadaaf3d3 100644
->>> --- a/drivers/net/ethernet/ti/am65-cpsw-nuss.c
->>> +++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
->>> @@ -155,7 +155,7 @@
->>>  			 NETIF_MSG_IFUP	| NETIF_MSG_PROBE | NETIF_MSG_IFDOWN | \
->>>  			 NETIF_MSG_RX_ERR | NETIF_MSG_TX_ERR)
->>>  
->>> -#define AM65_CPSW_DEFAULT_TX_CHNS	8
->>> +#define AM65_CPSW_DEFAULT_TX_CHNS	1
->>>  #define AM65_CPSW_DEFAULT_RX_CHN_FLOWS	1
->>>  
->>>  /* CPPI streaming packet interface */
->>> @@ -2346,7 +2348,10 @@ static int am65_cpsw_nuss_init_tx_chns(struct am65_cpsw_common *common)
->>>  		tx_chn->dsize_log2 = __fls(hdesc_size_out);
->>>  		WARN_ON(hdesc_size_out != (1 << tx_chn->dsize_log2));
->>>  
->>> -		tx_chn->irq = k3_udma_glue_tx_get_irq(tx_chn->tx_chn);
->>> +		if (i == 1)
->>> +			tx_chn->irq = -ENODEV;
->>> +		else
->>> +			tx_chn->irq = k3_udma_glue_tx_get_irq(tx_chn->tx_chn);
->>
->> The pair - am65_cpsw_nuss_init_tx_chns()/am65_cpsw_nuss_remove_tx_chns()
->> seem to be written under the assumption that failure will result in the
->> driver's probe failing.
->>
->> With am65_cpsw_nuss_update_tx_rx_chns(), that assumption no longer holds
->> true. Please consider the following sequence:
->>
->> 1.
->> am65_cpsw_nuss_probe()
->>   am65_cpsw_nuss_register_ndevs()
->>     am65_cpsw_nuss_init_tx_chns() => Succeeds
->>
->> 2.
->> Probe is successful
->>
->> 3.
->> am65_cpsw_nuss_update_tx_rx_chns() => Invoked by user
->>   am65_cpsw_nuss_remove_tx_chns() => Succeeds
->>     am65_cpsw_nuss_init_tx_chns() => Partially fails
->>       devm_add_action(dev, am65_cpsw_nuss_free_tx_chns, common);
->>       ^ DEVM Action is added, but since the driver isn't removed,
->>       the cleanup via am65_cpsw_nuss_free_tx_chns() will not run.
->>
->> Only when the user re-invokes am65_cpsw_nuss_update_tx_rx_chns(),
->> the cleanup will be performed. This might have to be fixed in the
->> following manner:
->>
->> @@ -3416,10 +3416,17 @@ int am65_cpsw_nuss_update_tx_rx_chns(struct am65_cpsw_common *common,
->>         common->tx_ch_num = num_tx;
->>         common->rx_ch_num_flows = num_rx;
->>         ret = am65_cpsw_nuss_init_tx_chns(common);
->> -       if (ret)
->> +       if (ret) {
->> +               devm_remove_action(dev, am65_cpsw_nuss_free_tx_chns, common);
->> +               am65_cpsw_nuss_free_tx_chns(common);
->>                 return ret;
->> +       }
->>
->>         ret = am65_cpsw_nuss_init_rx_chns(common);
->> +       if (ret) {
->> +               devm_remove_action(dev, am65_cpsw_nuss_free_rx_chns, common);
->> +               am65_cpsw_nuss_free_rx_chns(common);
->> +       }
->>
->>         return ret;
->>  }
->>
->>  Please let me know what you think.
-> 
-> I've already implemented a cleanup series to get rid of devm_add/remove_action,
-> cleanup probe error path and streamline TX and RQ queue init/cleanup.
-> I'll send out the series soon as soon as I finish some tests.
-> 
+> Signed-off-by: Guillaume Nault <gnault@redhat.com>
 
--- 
-cheers,
--roger
-
+Reviewed-by: Ido Schimmel <idosch@nvidia.com>
 
