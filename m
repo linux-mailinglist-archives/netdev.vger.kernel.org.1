@@ -1,72 +1,89 @@
-Return-Path: <netdev+bounces-158504-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158506-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91076A123C2
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 13:32:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 63160A123F0
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 13:45:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CEEEA1889507
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 12:32:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A1A37188B7E7
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 12:45:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD60C1DFEF;
-	Wed, 15 Jan 2025 12:32:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 814852139C6;
+	Wed, 15 Jan 2025 12:45:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="UcFb77Ae"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QZ4EBjzU"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DCB12475D9
-	for <netdev@vger.kernel.org>; Wed, 15 Jan 2025 12:32:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4D912475C8
+	for <netdev@vger.kernel.org>; Wed, 15 Jan 2025 12:45:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736944334; cv=none; b=GIQx9kX+1nlwL9qMpF8GxaF2oyxJ71dtHZcktm13ONr998DmuJ3lZhzsAn3HuYkqisyKEN+bQdfafxugs8L8FwxcU/yoyoYVlF7kWlGmgeamrR84E1bPIPMWdbTEhWBfggoxx7BNpRlPIPw3GRTh5V1S2n02t2al+WKOcd7QB/c=
+	t=1736945102; cv=none; b=aV50grgU4emNezIkWV4J2orrM0kobtGHKrHQnL6HOuTIuKGRYagEYS+RYewihZYyoJAwCGSRGu9AzzUTWK2Pxwk11AvNftquj/uCfKwrfBeNMNVMs1lYY+nyz3+VFQ3WKgSU7jKvwnzX0Gfl3r7SliTNR7pj8kfceRFqDKnBnWY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736944334; c=relaxed/simple;
-	bh=GycCbtKdKNGhlj9JRWUf7ifNuLN7M1lKMVdfGyhsOzU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kjml6n0YMjqny/HpFj+JjfSjNiwI8Hym6qHF2tTV3kFASO+0UAbK61uaQqoc6d78TrbnWpZjKYPFug0Op07Vr9Dgwi8usd+7QusnpKphtm61jZlw8HZmrIAJtIGa3Sv/ICumKL/ZKfB9R/pMXkzDpdJ6b9da0hu9fE8bMuwRRHE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=UcFb77Ae; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=lBejSM1tNrbwGto9QaNo5+mc0Fs7U+0WzpR9pSG/hPw=; b=UcFb77Aeyx6kmULkLkBk1z4/xY
-	sU9YhFEPud410z4Lxx+wcFJEDR5xElcEhCZRG88EmexM8Z+sVCRAGWowbDsxxRtuAVjSTEWkhwl+w
-	3ugD5eZvoG0DiUnjSdiWRRcsQAO8cTvf7amYM9engdytYsjJxcMouFdxPycYfhVBx0Bfc3XPBL65x
-	8b4HffJMBFh+4kMFUfDP0t6hvzrhMjRki2DX1rd/vFngNY6To0P/yghINerxqW3IYBWm6lnbKEe2L
-	e1/rvqZgVc1AZ2U7K2lTMLNFD7s4HoCAXSOnjbOWhuEQ2/acZv9VG+zvqjYKo1E3vXE0yI0ksX4Id
-	fCp3gaRQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:52486)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1tY2Yv-0001AU-0c;
-	Wed, 15 Jan 2025 12:31:57 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1tY2Ys-00069C-1u;
-	Wed, 15 Jan 2025 12:31:54 +0000
-Date: Wed, 15 Jan 2025 12:31:54 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>, Paolo Abeni <pabeni@redhat.com>,
-	David Miller <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>,
-	Andrew Lunn <andrew@lunn.ch>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [PATCH net-next v3 03/10] ethtool: allow ethtool op set_eee to
- set an NL extack message
-Message-ID: <Z4equilzNzBv5wUa@shell.armlinux.org.uk>
-References: <5e36223a-ee52-4dff-93d5-84dbf49187b5@gmail.com>
- <e3165b27-b627-41dd-be8f-51ab848010eb@gmail.com>
- <20250114150043.222e1eb5@kernel.org>
+	s=arc-20240116; t=1736945102; c=relaxed/simple;
+	bh=+0Pp6MfZvYi31RiamzwKQPw5KC6VEPCDjQ1AOgXLRHw=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=AEiwPDwgjjA/8skg8EkCR6c6wRhZoRXKsmfM8KyJ/0/aJIzK1ZccWPHuiKuDUst5O4BuY0OqxIlftrHMqSdXXBK6YlAyMqw40XIwUPxJXDmsEe6LMD9OIBLYtMpefFYggKg0zMRvOgu91LcCtYCaX2G0cU7oip7Gb75vHTcDknY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QZ4EBjzU; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1736945099;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+	bh=68ei5DOvAa/E5bc2+JnDKedc78DBOvWfZQBNFL4tRhM=;
+	b=QZ4EBjzU3OWDp8+iVrOEoTPfrfP8RlDyK6p+j3VtwqSeFk52J6ixrjEfpalnvNFXXb20r4
+	RLjEuM5kqCzzv2dnn7FvJcBNrIiftE8jL4xUOmc9ioTRF6LMD/0XkcF7sR3Sfq52mrKSUN
+	rVj9jOa+dwIYfXnDjm+1Jkwd4pfD52k=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-631-UeG64twPPeC9HVpzBkbWHg-1; Wed, 15 Jan 2025 07:44:56 -0500
+X-MC-Unique: UeG64twPPeC9HVpzBkbWHg-1
+X-Mimecast-MFC-AGG-ID: UeG64twPPeC9HVpzBkbWHg
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-436248d1240so31598455e9.0
+        for <netdev@vger.kernel.org>; Wed, 15 Jan 2025 04:44:56 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736945095; x=1737549895;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=68ei5DOvAa/E5bc2+JnDKedc78DBOvWfZQBNFL4tRhM=;
+        b=qyg/vY0bu4TMJOlEfued+oo5REkiufn5bLj+zNt0vMeb3PeyPQtFmYNhRbQatZjGa7
+         Qx3cLlCUVK/wMU4cPg3DzXtuNgTIivvoxTyKqE8cFLx3+J8BEyEoEj7RnZT32tx5ALx7
+         ESRJkXDv9v565Mkc2zfsTYfigu/G7phlAb3uJLLofFNUbLCGeULNrMQuFNfFS3zWds/l
+         P/ua9cZeWV8kSmRKBelUAXHHyu89uXyerNhk9voczua+JAykW64JlE9eOFtAYWBroqcK
+         PzUhXWJtw3KRuD5+p2KAbDsoQua1GmW+R7yGG15Jhp8LexN50XGVcUjCmHUimr2Q8nKM
+         xmfw==
+X-Gm-Message-State: AOJu0Yy+ztyHmYulZCElKyFUbIpqsc/oDwlq/VoZq48/Fm964doTZ+wj
+	S6xRE/glPzKP5JQxolnIj525VTznBuVvoRlKrI55HMfeIb4WpQtNX7dZ/vj/QI88HexPMud3pNX
+	FTOW8aJ/4p/0+f7QgGdyT2g5TNt0g7jIm3O+uHNCY9UiVEySC4K3z7A==
+X-Gm-Gg: ASbGncvOHvXNdsiw11CCgtXEmpcutyuZzbY23pnB9zl7bJXRX3bWp3XiIida5uvcMMr
+	KAt7s/LeqzCbSyUF8dfGOk7tkRs5m6k6OSXPaEkIFgD2wGpHcxfPYYfex785hAFEulk4WT5EfK6
+	PU5wjM+ctO/XE4c+NgZSbY8rj8dTh9IPEQDfdXUSoyBlFLJbBZyg68I2x92ZCUE/3LkpZbGrJC6
+	STEc2KtjatAFwysko6iQOps/yf3kg0NhghhJGrGgGLpDl8jZKGR1fIXJrNh8Vnx0cYmSS69/oWE
+	TJXAXJIY10CtEJxfRljRsCvOpCAhFgykONvX
+X-Received: by 2002:a05:600c:1c8b:b0:434:f5c0:32b1 with SMTP id 5b1f17b1804b1-436e26a7578mr278574635e9.15.1736945095096;
+        Wed, 15 Jan 2025 04:44:55 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEWMt27yG2kMWi1F5AG48AAxfZOpqYQ28lr80ZUv7RadtO0edXKJh06nLDhYNQLkMgaeFpJow==
+X-Received: by 2002:a05:600c:1c8b:b0:434:f5c0:32b1 with SMTP id 5b1f17b1804b1-436e26a7578mr278574395e9.15.1736945094701;
+        Wed, 15 Jan 2025 04:44:54 -0800 (PST)
+Received: from debian (2a01cb058d23d6009e7a50f94171b2f9.ipv6.abo.wanadoo.fr. [2a01:cb05:8d23:d600:9e7a:50f9:4171:b2f9])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-437c7499502sm22098855e9.4.2025.01.15.04.44.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 15 Jan 2025 04:44:54 -0800 (PST)
+Date: Wed, 15 Jan 2025 13:44:52 +0100
+From: Guillaume Nault <gnault@redhat.com>
+To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>
+Cc: netdev@vger.kernel.org, Simon Horman <horms@kernel.org>,
+	David Ahern <dsahern@kernel.org>, Ido Schimmel <idosch@nvidia.com>
+Subject: [PATCH net-next] ipv4: Prepare inet_rtm_getroute() to .flowi4_tos
+ conversion.
+Message-ID: <7bc1c7dc47ad1393569095d334521fae59af5bc7.1736944951.git.gnault@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,34 +92,66 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250114150043.222e1eb5@kernel.org>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Tue, Jan 14, 2025 at 03:00:43PM -0800, Jakub Kicinski wrote:
-> On Sun, 12 Jan 2025 14:28:22 +0100 Heiner Kallweit wrote:
-> > diff --git a/include/linux/ethtool.h b/include/linux/ethtool.h
-> > index f711bfd75..8ee047747 100644
-> > --- a/include/linux/ethtool.h
-> > +++ b/include/linux/ethtool.h
-> > @@ -270,6 +270,7 @@ struct ethtool_keee {
-> >  	__ETHTOOL_DECLARE_LINK_MODE_MASK(supported);
-> >  	__ETHTOOL_DECLARE_LINK_MODE_MASK(advertised);
-> >  	__ETHTOOL_DECLARE_LINK_MODE_MASK(lp_advertised);
-> > +	struct netlink_ext_ack *extack;
-> >  	u32	tx_lpi_timer;
-> >  	bool	tx_lpi_enabled;
-> >  	bool	eee_active;
-> 
-> :S I don't think we have a precedent for passing extack inside 
-> the paramter struct. I see 25 .set_eee callbacks, not crazy many.
-> Could you plumb this thru as a separate argument, please?
+Store rtm->rtm_tos in a dscp_t variable, which can then be used for
+setting fl4.flowi4_tos and also be passed as parameter of
+ip_route_input_rcu().
 
-I was going to wait for this before reworking the phylink based EEE
-support, but as it looks like this is going to be a while before it's
-merged, I'll rework my series based on this not being merged and
-post it non-RFC this afternoon.
+The .flowi4_tos field is going to be converted to dscp_t to ensure ECN
+bits aren't erroneously taken into account during route lookups. Having
+a dscp_t variable available will simplify that conversion, as we'll
+just have to drop the inet_dscp_to_dsfield() call.
 
+Note that we can't just convert rtm->rtm_tos to dscp_t because this
+structure is exported to user space.
+
+Signed-off-by: Guillaume Nault <gnault@redhat.com>
+---
+ net/ipv4/route.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/net/ipv4/route.c b/net/ipv4/route.c
+index 9f9d4e6ea1b9..1f7e2a02dd25 100644
+--- a/net/ipv4/route.c
++++ b/net/ipv4/route.c
+@@ -3269,6 +3269,7 @@ static int inet_rtm_getroute(struct sk_buff *in_skb, struct nlmsghdr *nlh,
+ 	struct flowi4 fl4 = {};
+ 	__be32 dst = 0;
+ 	__be32 src = 0;
++	dscp_t dscp;
+ 	kuid_t uid;
+ 	u32 iif;
+ 	int err;
+@@ -3283,6 +3284,7 @@ static int inet_rtm_getroute(struct sk_buff *in_skb, struct nlmsghdr *nlh,
+ 	dst = nla_get_in_addr_default(tb[RTA_DST], 0);
+ 	iif = nla_get_u32_default(tb[RTA_IIF], 0);
+ 	mark = nla_get_u32_default(tb[RTA_MARK], 0);
++	dscp = inet_dsfield_to_dscp(rtm->rtm_tos);
+ 	if (tb[RTA_UID])
+ 		uid = make_kuid(current_user_ns(), nla_get_u32(tb[RTA_UID]));
+ 	else
+@@ -3307,7 +3309,7 @@ static int inet_rtm_getroute(struct sk_buff *in_skb, struct nlmsghdr *nlh,
+ 
+ 	fl4.daddr = dst;
+ 	fl4.saddr = src;
+-	fl4.flowi4_tos = rtm->rtm_tos & INET_DSCP_MASK;
++	fl4.flowi4_tos = inet_dscp_to_dsfield(dscp);
+ 	fl4.flowi4_oif = nla_get_u32_default(tb[RTA_OIF], 0);
+ 	fl4.flowi4_mark = mark;
+ 	fl4.flowi4_uid = uid;
+@@ -3331,9 +3333,8 @@ static int inet_rtm_getroute(struct sk_buff *in_skb, struct nlmsghdr *nlh,
+ 		fl4.flowi4_iif = iif; /* for rt_fill_info */
+ 		skb->dev	= dev;
+ 		skb->mark	= mark;
+-		err = ip_route_input_rcu(skb, dst, src,
+-					 inet_dsfield_to_dscp(rtm->rtm_tos),
+-					 dev, &res) ? -EINVAL : 0;
++		err = ip_route_input_rcu(skb, dst, src, dscp, dev,
++					 &res) ? -EINVAL : 0;
+ 
+ 		rt = skb_rtable(skb);
+ 		if (err == 0 && rt->dst.error)
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.39.2
+
 
