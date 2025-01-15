@@ -1,110 +1,187 @@
-Return-Path: <netdev+bounces-158678-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158679-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE738A12F09
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 00:21:38 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 91C8CA12F3B
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 00:27:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1E6FA164C69
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 23:21:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1FE3E3A630A
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 23:27:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE5AE1DCB0E;
-	Wed, 15 Jan 2025 23:21:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA9DA1DD9AC;
+	Wed, 15 Jan 2025 23:27:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BWZRY9Uk"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IHWzKf6T"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f45.google.com (mail-io1-f45.google.com [209.85.166.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3C6A24A7CC;
-	Wed, 15 Jan 2025 23:21:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1071A1D89F1;
+	Wed, 15 Jan 2025 23:27:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736983295; cv=none; b=ZLnu++vmzwOwvpxwdSHVpSpNKloD7VGgz43gG2uZY7DRrSLOQ9ksKCPncSiOfn5naRL8VV4T+xr72ByNLJhCBZNnQ7W2Ca4Vpdt9PaI4UGHc03bzBW6rIdqni3IsJSYuS1Q6nDQH0ZqYAfQY3MFiCyrtpYjTCjzqh2Z8XLnqRBA=
+	t=1736983635; cv=none; b=UkI3IkycLm7ur3I/44e98bU4vBhz1vHQstXDDVbGgBUT8amwIDLBreasc+hI48sjvC4tuLRJl1wwgfYDQudrdjShhaRqMEXAKIJuznI/cocqOWffrPEZYyNu/imbhHCgvyHp3kHJ+pUSC61E3gJyqwmYg0FmZa+XsZneM98TX3M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736983295; c=relaxed/simple;
-	bh=mPosCnzgcJbE1pjkdLDkGQw+G/s6LoErO422lPW/XII=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=HICzABxa/7j7m2GS7g9OtnTOc359lxg7x8F6dEphHPaKe88HlocJW1DT8k9u2HBd4dVcXtWmN/SQzhlFEXdOSrdr/BStZuuccFSPyCX2IWQ1YCA+WHNngfy7RYHuMh8pVv2Z3esDdAvms8dCG+9wrmY5XKAmUFfgRcN4JB2S6g4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BWZRY9Uk; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DA5B5C4CEE1;
-	Wed, 15 Jan 2025 23:21:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736983295;
-	bh=mPosCnzgcJbE1pjkdLDkGQw+G/s6LoErO422lPW/XII=;
-	h=From:To:Cc:Subject:Date:From;
-	b=BWZRY9UkEVjlxkgk+qRn0xLEFakd/Nqiw/TYpwFN14NUw3x5gDzPTzbYbzWuXUzWU
-	 ubdPFC+IXGfXjrA5Skl7MXjYIY3TaEeukJa8+afESZO/wAQj2gbw+PvrOWdkp4rrIV
-	 42eGkcz8u+Gk3bByZBHN3pUKZkPu6jj0X22d6Nq3hmMFq7Uy4njqkVP5zyIc5nbIcs
-	 74/B+Lnv776gQ5shR20t6rmyh70q6qviNOENqpXbIajdlPBNKseVz3gVpzsNipXFvJ
-	 Jh9SZlWdyI5wtt/cnQ/wtSlJzu9JvSIWTB/aVH2LbQq79B2foxC80OcEWsPNzDmypk
-	 VPhZli9hGdWVw==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	shuah@kernel.org,
-	willemb@google.com,
-	matttbe@kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: [PATCH net-next] selftests/net: packetdrill: make tcp buf limited timing tests benign
-Date: Wed, 15 Jan 2025 15:21:29 -0800
-Message-ID: <20250115232129.845884-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.48.0
+	s=arc-20240116; t=1736983635; c=relaxed/simple;
+	bh=BlWi5FLNGDxjA5f19jRqU2mVmFkmhJpmGWkJhhLSdgQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=bQRiyceo4oGZTI/mVrc8zVqpte6TpwCUqop4cp7yYORcb7Me0jhLSt0sQ3DVQPQB6NMBUn70v3Zku3lfxhDNlrxubcD9viR6Q+J7qPyjDN3eka2XE08C1SrmyZD6sjDpjnWNXnsP268aluNDqlwRB176pEhp6QviOV5v5v3w0G4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IHWzKf6T; arc=none smtp.client-ip=209.85.166.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-io1-f45.google.com with SMTP id ca18e2360f4ac-84cdb6fba9bso27269139f.2;
+        Wed, 15 Jan 2025 15:27:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1736983633; x=1737588433; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YtDrgUIV95SNBzLRkAPXxXIPkF5yNqah3IU5TVyFHU0=;
+        b=IHWzKf6T5w94M1DN2jcK395QWNTK9jqShFlTZR/ZR3+SeCso8eB5B2JYxIWrQ0XKBd
+         0mAgka9Q4No1pSckA866YINWJ+FGgj1piY+5b1dvEdEq+4wfLSsq+tx/TYsD1EIS2rma
+         rFG3iCPe69x5sFF5UlIF1k7Mqg/aBzva+s7hpQYbmbW1YWaftO4Rva21WNB8HyGBTz5S
+         2q3SqgtdOvD/K4VJ9Hn5J2cPG9YxYpq1l9FhGY81L+Ty9OFvPSx2hOOXD+8tXWGYurcB
+         h5Josk0Yn1H7cptrb5Pk28ut1cdI6IMD1E8LFkgJuPIIzTFpvBMl2JXP+hRXPD6OoDt1
+         zd0Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736983633; x=1737588433;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=YtDrgUIV95SNBzLRkAPXxXIPkF5yNqah3IU5TVyFHU0=;
+        b=piSCOuH9mcniaXYWcu2Dcmf7qJhQ9GGjoBHsiIOE+EHZtRFcqjrK22dhm8ZdM49GTB
+         TtDyJ8bf9hE1LYq/I1/Uz4Sjc2oVwU1P7DFEGLOEtdyuy8z1KSeFIjiMkma99Gmag4T0
+         1xmdfiQe1H76d1mkMkdzPmvIumNmUDAf6umwR3taSyLVaOpZ00zYPH9O4n2op5uznhVb
+         xwbnzlzIviTXl0L5Ov6yK9iD31aZdpmb0GyY8Y2jGgj5lQOiT606q7uBLdkU2OJJPWmQ
+         Q5pBGX+fkMkpRSGEF4vpLQb0wIKg2YgS9tpoAcaFti3jVq5w4QzN7YJBDQhNJEXea4to
+         dsOw==
+X-Forwarded-Encrypted: i=1; AJvYcCW3yXVgTLsBmqGm5LZFLdhzBdClT4q07aUGJ6dfJP6KheXttggHWRhgbbbWeEs1sTRzC+ZyA4yQ@vger.kernel.org, AJvYcCXQTyL+cJLKIVhO+QXbPKxK11Eqm06mcn7TqDe79hO1KnKlktDlXFYtVLTv2oL29YE5Qz4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxDkQHgN1SxmHFk4kMYrcwu8Qw4JQ6xlv02ua9SE/8q33zEFLBZ
+	6stkPdJS+Ezvt3OLNqW6g/VH+JwUixBGhxN7tVaMbymntPF1F6JLZI0XBkz3OEtfEAgOVcr9HMb
+	DewJpMpE/Q2l9UU3a+hHjKLyy7MM=
+X-Gm-Gg: ASbGncseprfSw8RykSEiDjH9V99F0GXc8MvIssc03h9qN1Lbmv40wLa5hqq/GNsXIFJ
+	aXgMWNxIHs0sB1Ac7eqLdZ9QKZQg3Lxott+RD
+X-Google-Smtp-Source: AGHT+IGnNgamkfZNs9F/m//pjRWczuyni5KeSU7GTILINta2cKYjkrR8+Bm27d7cP7xdyfhOPhuQkUaFSC6FKZ0oe4k=
+X-Received: by 2002:a05:6e02:d54:b0:3ce:67ae:48f2 with SMTP id
+ e9e14a558f8ab-3ce67ae4b01mr125954945ab.15.1736983633163; Wed, 15 Jan 2025
+ 15:27:13 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20250112113748.73504-1-kerneljasonxing@gmail.com>
+ <20250112113748.73504-5-kerneljasonxing@gmail.com> <80309f62-0900-4946-bb2c-d73a2b724739@linux.dev>
+In-Reply-To: <80309f62-0900-4946-bb2c-d73a2b724739@linux.dev>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Thu, 16 Jan 2025 07:26:37 +0800
+X-Gm-Features: AbW1kvZb-bIIF_qxaO1VEW8lo7xwRRdVhNwa5yJQLuJAXUytEbJ8oXh6cJE1OQ4
+Message-ID: <CAL+tcoCd_RXno2uKi1bZoz5m1D3fGXKxPX0NC4tbpExwW49R3A@mail.gmail.com>
+Subject: Re: [PATCH net-next v5 04/15] net-timestamp: support SK_BPF_CB_FLAGS
+ only in bpf_sock_ops_setsockopt
+To: Martin KaFai Lau <martin.lau@linux.dev>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, dsahern@kernel.org, willemdebruijn.kernel@gmail.com, 
+	willemb@google.com, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, 
+	eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev, 
+	john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me, 
+	haoluo@google.com, jolsa@kernel.org, horms@kernel.org, bpf@vger.kernel.org, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The following tests are failing on debug kernels:
+On Thu, Jan 16, 2025 at 5:22=E2=80=AFAM Martin KaFai Lau <martin.lau@linux.=
+dev> wrote:
+>
+> On 1/12/25 3:37 AM, Jason Xing wrote:
+> > We will allow both TCP and UDP sockets to use this helper to
+> > enable this feature. So let SK_BPF_CB_FLAGS pass the check:
+> > 1. skip is_fullsock check
+> > 2. skip owned by me check
+> >
+> > Signed-off-by: Jason Xing <kerneljasonxing@gmail.com>
+> > ---
+> >   net/core/filter.c | 27 +++++++++++++++++++++------
+> >   1 file changed, 21 insertions(+), 6 deletions(-)
+> >
+> > diff --git a/net/core/filter.c b/net/core/filter.c
+> > index 1ac996ec5e0f..0e915268db5f 100644
+> > --- a/net/core/filter.c
+> > +++ b/net/core/filter.c
+> > @@ -5507,12 +5507,9 @@ static int sol_ipv6_sockopt(struct sock *sk, int=
+ optname,
+> >                                             KERNEL_SOCKPTR(optval), *op=
+tlen);
+> >   }
+> >
+> > -static int __bpf_setsockopt(struct sock *sk, int level, int optname,
+> > -                         char *optval, int optlen)
+> > +static int ___bpf_setsockopt(struct sock *sk, int level, int optname,
+> > +                          char *optval, int optlen)
+> >   {
+> > -     if (!sk_fullsock(sk))
+> > -             return -EINVAL;
+> > -
+> >       if (level =3D=3D SOL_SOCKET)
+> >               return sol_socket_sockopt(sk, optname, optval, &optlen, f=
+alse);
+> >       else if (IS_ENABLED(CONFIG_INET) && level =3D=3D SOL_IP)
+> > @@ -5525,6 +5522,15 @@ static int __bpf_setsockopt(struct sock *sk, int=
+ level, int optname,
+> >       return -EINVAL;
+> >   }
+> >
+> > +static int __bpf_setsockopt(struct sock *sk, int level, int optname,
+> > +                         char *optval, int optlen)
+> > +{
+> > +     if (!sk_fullsock(sk))
+> > +             return -EINVAL;
+> > +
+> > +     return ___bpf_setsockopt(sk, level, optname, optval, optlen);
+> > +}
+> > +
+> >   static int _bpf_setsockopt(struct sock *sk, int level, int optname,
+> >                          char *optval, int optlen)
+> >   {
+> > @@ -5675,7 +5681,16 @@ static const struct bpf_func_proto bpf_sock_addr=
+_getsockopt_proto =3D {
+> >   BPF_CALL_5(bpf_sock_ops_setsockopt, struct bpf_sock_ops_kern *, bpf_s=
+ock,
+> >          int, level, int, optname, char *, optval, int, optlen)
+> >   {
+> > -     return _bpf_setsockopt(bpf_sock->sk, level, optname, optval, optl=
+en);
+> > +     struct sock *sk =3D bpf_sock->sk;
+> > +
+> > +     if (optname !=3D SK_BPF_CB_FLAGS) {
+> > +             if (sk_fullsock(sk))
+> > +                     sock_owned_by_me(sk);
+> > +             else if (optname !=3D SK_BPF_CB_FLAGS)
+>
+> This is redundant considering the outer "if" has the same check.
+>
+> Regardless, "optname !=3D SK_BPF_CB_FLAGS" is not the right check. The ne=
+w
+> callback (e.g. BPF_SOCK_OPS_TS_SCHED_OPT_CB) can still call
+> bpf_setsockopt(TCP_*) which will be broken without a lock.
+>
+> It needs to check for bpf_sock->op. I saw patch 5 has the bpf_sock->op ch=
+eck but
+> that check is also incorrect. I will comment in there together.
 
-  tcp_tcp_info_tcp-info-rwnd-limited.pkt
-  tcp_tcp_info_tcp-info-sndbuf-limited.pkt
+Thanks. Will correct them soon.
 
-with reports like:
-
-      assert 19000 <= tcpi_sndbuf_limited <= 21000, tcpi_sndbuf_limited; \
-  AssertionError: 18000
-
-and:
-
-      assert 348000 <= tcpi_busy_time <= 360000, tcpi_busy_time
-  AssertionError: 362000
-
-Extend commit 912d6f669725 ("selftests/net: packetdrill: report benign
-debug flakes as xfail") to cover them.
-
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-CC: shuah@kernel.org
-CC: willemb@google.com
-CC: matttbe@kernel.org
-CC: linux-kselftest@vger.kernel.org
----
- tools/testing/selftests/net/packetdrill/ksft_runner.sh | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/tools/testing/selftests/net/packetdrill/ksft_runner.sh b/tools/testing/selftests/net/packetdrill/ksft_runner.sh
-index ff989c325eef..e15c43b7359b 100755
---- a/tools/testing/selftests/net/packetdrill/ksft_runner.sh
-+++ b/tools/testing/selftests/net/packetdrill/ksft_runner.sh
-@@ -43,6 +43,7 @@ if [[ -n "${KSFT_MACHINE_SLOW}" ]]; then
- 		"tcp_timestamping.*.pkt"
- 		"tcp_user_timeout_user-timeout-probe.pkt"
- 		"tcp_zerocopy_epoll_.*.pkt"
-+		"tcp_tcp_info_tcp-info-*-limited.pkt"
- 	)
- 	readonly xfail_regex="^($(printf '%s|' "${xfail_list[@]}"))$"
- 	[[ "$script" =~ ${xfail_regex} ]] && failfunc=ktap_test_xfail
--- 
-2.48.0
-
+>
+> > +                     return -EINVAL;
+> > +     }
+> > +
+> > +     return ___bpf_setsockopt(sk, level, optname, optval, optlen);
+> >   }
+> >
+> >   static const struct bpf_func_proto bpf_sock_ops_setsockopt_proto =3D =
+{
+>
 
