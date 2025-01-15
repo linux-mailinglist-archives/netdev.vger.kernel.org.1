@@ -1,277 +1,186 @@
-Return-Path: <netdev+bounces-158436-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158437-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92934A11D74
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 10:23:30 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0BE79A11D72
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 10:23:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B674A162C21
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 09:23:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4C5AF7A2FBA
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 09:23:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6636822FAFD;
-	Wed, 15 Jan 2025 09:19:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BDD2236EB2;
+	Wed, 15 Jan 2025 09:19:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iYoCJFCU"
 X-Original-To: netdev@vger.kernel.org
-Received: from air.basealt.ru (air.basealt.ru [193.43.8.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D960122FACA;
-	Wed, 15 Jan 2025 09:19:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.43.8.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72DA71EEA3C;
+	Wed, 15 Jan 2025 09:19:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736932767; cv=none; b=gCVkXXaZuTXEHTdoepRAHQjZdj0D8ROTkY4zyRKNsjTJ1N8b4BTGhcZfyehIvxOwFyyJr+EfQJOo8TxKU2+ZuxjRF8WdX1+PKzC/9iQHq4bNe6XcUUNAz8B6FJVKHWJNeQvY8tf7yF2Hl2KEfIiF19HCOPr5STMKEVhVysT4bMs=
+	t=1736932786; cv=none; b=BqDd0TwvJN6TqCJATO7l71XbgEEgMqMB8y1aQI8IZRvHBHdSvbs226yr7677UkcJ8933D/6zCVNT7XLFTL+Fv4qXohQ6IsmYc3cHcH4YxRTAafDa1lVi7AGHH3HqsstrVHsl567LMSxr7wK/AQ0k8HRITbh4w5L9gRTeAAvDxCk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736932767; c=relaxed/simple;
-	bh=hZnmZpsSybCTH1E14UMX1xw4897EKM3ygXvOmOnmRtA=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=QnL5n0mVNLfSiI881xmFVeKdPAiX1eFGKJFvhBRnFKfLCeg9CtQDh4GVnVJntB/4zn3ZHeSpV5MqL2oBrNNMZ8rsoWEfB+BhuhfvazE4CUG52idGiLpRYHLWB2w0pJCsdoieAesWvqzCm/+kWygLrnXU/g3+DhSC1c6pnwo+1Ms=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=altlinux.org; spf=pass smtp.mailfrom=altlinux.org; arc=none smtp.client-ip=193.43.8.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=altlinux.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=altlinux.org
-Received: from altlinux.ipa.basealt.ru (unknown [178.76.204.78])
-	by air.basealt.ru (Postfix) with ESMTPSA id A42F8233C6;
-	Wed, 15 Jan 2025 12:19:21 +0300 (MSK)
-From: Vasiliy Kovalev <kovalev@altlinux.org>
-To: stable@vger.kernel.org
-Cc: netdev@vger.kernel.org,
-	lvc-project@linuxtesting.org,
-	kovalev@altlinux.org,
-	Eric Dumazet <edumazet@google.com>,
-	Ilya Maximets <i.maximets@ovn.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Kuniyuki Iwashima <kuniyu@amazon.com>,
-	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH 5.10] net: defer final 'struct net' free in netns dismantle
-Date: Wed, 15 Jan 2025 12:19:13 +0300
-Message-Id: <20250115091913.335173-1-kovalev@altlinux.org>
-X-Mailer: git-send-email 2.33.8
+	s=arc-20240116; t=1736932786; c=relaxed/simple;
+	bh=RvhwOre/z7gR+muMadtDKtL5V3OxuoZM3Ph6e0Y81N0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VLasmJ8A0ltLZQ7je6E+USVuvVUbjMBDCatbQRPRJ+HVCNMJ2dUx6NQPR69Ty2sWP5r4X3ts6m+dZ5TTC6AqQEATIEDq8et8UqPyxDEGiE0cfiKCYUorj+9PbZElDtV2PD83o/lczSPc8mDYu2F/1LjrQYy+Xe/xqoG75mkf7U8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iYoCJFCU; arc=none smtp.client-ip=209.85.214.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-2167141dfa1so11352915ad.1;
+        Wed, 15 Jan 2025 01:19:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1736932784; x=1737537584; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=sXdSbSC6AwIP7P9EAjkKQv89mKJ3kko9rfa47rf4ABc=;
+        b=iYoCJFCU+awc4I4CgKNIQRb0FY44DJfQO/qeoUP2lCRS1rF5rqaIMYFKpJACsDiLfq
+         AHo6WcdxyzP6SDOzSmxXESmtsq2aKfWdh7k7JXuiCQBbPfyHIJPSHTxMypYh3keq7sf2
+         f9P5wzfcip7CBqxvCmlQw0QVVOCGpcd3drWIJH9SYhD9+ON4Uaoq2PXJF4IEQ9rCt5/r
+         hYwvQmrLuRAyNqra9zJyW1x1kqKZY6Qw9Njo9gOgSSC0L7gAa0CiTvC2KM5MiRB0uS+Y
+         BtAenVK/F30+3xv+c6r8MVCe+tH2AvUCrEeSHd+j0uA9PwVkFZv5Kj+xrUl7XXWkvS8/
+         WttQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736932784; x=1737537584;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=sXdSbSC6AwIP7P9EAjkKQv89mKJ3kko9rfa47rf4ABc=;
+        b=MmvT2GheXy2/Wk/meQkomPqYCWKjcI3hSDZQhtzlRroSuAL/+oYtc3Pf5+tuHkKtou
+         Ri4Dxf/sFQTI1i/MY01uo4svVxl2fs3Af0SL7nz17BhO1hJ3Jrz6KYdnLf8p38ZlPfnj
+         2MPESy12c71fla4gaSpi9W2eBdW+FwxK0R+OxIiDI41yKbIxwzqz0P3lhbg1cYrJjyDO
+         MTXrQJHh4JhBJSLPCgVzwsS301/sCxNdRAZP548/CHsXb4agjQec934YUP8Mkptx6F60
+         m0144hBMRHnzx+KP7afWcdNbv4BrVyo6Ac66z8PxcwvhZG8IURT8WZTWwSVnUujJNEiJ
+         bpOw==
+X-Forwarded-Encrypted: i=1; AJvYcCUq5aKLQZyKH8T4Uax6ivcq8DT5D+HsmK/Uo9n8/tP7wt5RZYV6Duw7jxS8OgzcwwRNmUP4gl8km0nmUqw=@vger.kernel.org, AJvYcCWaAS60NeD6nqhn2i12uUY4jUs0M+5UmTvucjUVel3q0GDXHxJdk32nJIZxsKYlSuDBGocevMCJBt3rdrHHwRom@vger.kernel.org, AJvYcCX3x7R/dTIeQxiJ4P5fXGiGhvDSRkcBFjl4ZBFdMolvHTp3oc2j064l9V5HU0wmG5clom/m0tzu@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw5wNfWJcldlRif86TqRa1fZP2xEzIQJRIuKtGwoW8ByyDuy+ps
+	HmGdzUpS4uC+dBYevdhbKtvMYKm1DvaZYDsj8JLBAQin8n9vDVP0
+X-Gm-Gg: ASbGnctROrzpJTx2iX9EdWafxsujYFQRoqsscxvN1occcg96uloxuedWAVksnG349lT
+	6ifpklQv8BhifFNGB/iSycsXia9y5Q+2r968SkvfQUebpU+rqAZFNT9T7l8WXnLL9hVX63IXCJw
+	x3tSUTKSDE5ZeCkyYAqLMd6UKqUQUTK6XTraeiECwWD35jWA8RJJbWgjwZlRTg1WfHj69mOwmyo
+	Of92QU/F+N3uYqWaV7Xnryy+BObKBoDr+TczkKeP/xb5P1OMCWcJkBEnznyRQ==
+X-Google-Smtp-Source: AGHT+IGlB215DiONNHf9EqhRn2hGW0cLM3QYP1QRMSjhhYG7i+IPrOxNCHkNUpojeqrVDfYyeu3HAQ==
+X-Received: by 2002:a17:90b:1f8c:b0:2ee:8cbb:de28 with SMTP id 98e67ed59e1d1-2f728deacf6mr3779482a91.8.1736932783628;
+        Wed, 15 Jan 2025 01:19:43 -0800 (PST)
+Received: from fedora ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2f72c2f69d1sm911702a91.45.2025.01.15.01.19.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 15 Jan 2025 01:19:42 -0800 (PST)
+Date: Wed, 15 Jan 2025 09:19:33 +0000
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Steffen Klassert <steffen.klassert@secunet.com>,
+	Jianbo Liu <jianbol@nvidia.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+	Jay Vosburgh <jv@jvosburgh.net>,
+	Andy Gospodarek <andy@greyhouse.net>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Simon Horman <horms@kernel.org>, Tariq Toukan <tariqt@nvidia.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>, Shuah Khan <shuah@kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Sabrina Dubroca <sd@queasysnail.net>,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net 0/2] bond: fix xfrm offload feature during init
+Message-ID: <Z4d9pVshf3RKQp_o@fedora>
+References: <20241211071127.38452-1-liuhangbin@gmail.com>
+ <20241212062734.182a0164@kernel.org>
+ <Z1vfsAyuxcohT7th@fedora>
+ <20241213193127.4c31ef80@kernel.org>
+ <Z3X9pfu12GUOBUY6@fedora>
+ <1d8c901f-e292-43e4-970f-8440b26e92b0@nvidia.com>
+ <Z3u0q5HSOshLn2V0@fedora>
+ <Z33nEKg4PxwReUu_@fedora>
+ <ad289f9a-41c3-4544-8aeb-535615f45aef@nvidia.com>
+ <Z34l6hpbzPP9n65Y@fedora>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z34l6hpbzPP9n65Y@fedora>
 
-From: Eric Dumazet <edumazet@google.com>
+On Wed, Jan 08, 2025 at 07:15:00AM +0000, Hangbin Liu wrote:
+> > > > > > I don't know how to disable bonding sleeping since we use mutex_lock now.
+> > > > > > Hi Jianbo, do you have any idea?
+> > > > > > 
+> > > > > 
+> > > > > I think we should allow drivers to sleep in the callbacks. So, maybe it's
+> > > > > better to move driver's xdo_dev_state_delete out of state's spin lock.
+> > > > 
+> > > > I just check the code, xfrm_dev_state_delete() and later
+> > > > dev->xfrmdev_ops->xdo_dev_state_delete(x) have too many xfrm_state x
+> > > > checks. Can we really move it out of spin lock from xfrm_state_delete()
+> > > 
+> > > I tried to move the mutex lock code to a work queue, but found we need to
+> > > check (ipsec->xs == xs) in bonding. So we still need xfrm_state x during bond
+> > 
+> > Maybe I miss something, but why need to hold spin lock. You can keep xfrm
+> > state by its refcnt.
+> 
+> Do you mean move the xfrm_dev_state_delete() out of spin lock directly like:
+> 
+> diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
+> index 67ca7ac955a3..6881ddeb4360 100644
+> --- a/net/xfrm/xfrm_state.c
+> +++ b/net/xfrm/xfrm_state.c
+> @@ -766,13 +766,6 @@ int __xfrm_state_delete(struct xfrm_state *x)
+>  		if (x->encap_sk)
+>  			sock_put(rcu_dereference_raw(x->encap_sk));
+>  
+> -		xfrm_dev_state_delete(x);
+> -
+> -		/* All xfrm_state objects are created by xfrm_state_alloc.
+> -		 * The xfrm_state_alloc call gives a reference, and that
+> -		 * is what we are dropping here.
+> -		 */
+> -		xfrm_state_put(x);
+>  		err = 0;
+>  	}
+>  
+> @@ -787,8 +780,20 @@ int xfrm_state_delete(struct xfrm_state *x)
+>  	spin_lock_bh(&x->lock);
+>  	err = __xfrm_state_delete(x);
+>  	spin_unlock_bh(&x->lock);
+> +	if (err)
+> +		return err;
+>  
+> -	return err;
+> +	if (x->km.state == XFRM_STATE_DEAD) {
+> +		xfrm_dev_state_delete(x);
+> +
+> +		/* All xfrm_state objects are created by xfrm_state_alloc.
+> +		 * The xfrm_state_alloc call gives a reference, and that
+> +		 * is what we are dropping here.
+> +		 */
+> +		xfrm_state_put(x);
+> +	}
+> +
+> +	return 0;
+>  }
+>  EXPORT_SYMBOL(xfrm_state_delete);
+>  
 
-commit 0f6ede9fbc747e2553612271bce108f7517e7a45 upstream.
+Hi Jianbo,
 
-Ilya reported a slab-use-after-free in dst_destroy [1]
+I talked with Sabrina and it looks we can't simply do this. Because both
+xfrm_add_sa_expire() and xfrm_timer_handler() calling __xfrm_state_delete() under
+spin lock. If we move the xfrm_dev_state_delete() out of __xfrm_state_delete(),
+all the places need to be handled correctly.
 
-Issue is in xfrm6_net_init() and xfrm4_net_init() :
+At the same time xfrm_timer_handler() calling xfrm_dev_state_update_stats before
+__xfrm_state_delete(). Should we also take care of it to make sure the state
+change and delete are called at the same time?
 
-They copy xfrm[46]_dst_ops_template into net->xfrm.xfrm[46]_dst_ops.
+Hi Steffen, do you have any comments?
 
-But net structure might be freed before all the dst callbacks are
-called. So when dst_destroy() calls later :
-
-if (dst->ops->destroy)
-    dst->ops->destroy(dst);
-
-dst->ops points to the old net->xfrm.xfrm[46]_dst_ops, which has been freed.
-
-See a relevant issue fixed in :
-
-ac888d58869b ("net: do not delay dst_entries_add() in dst_release()")
-
-A fix is to queue the 'struct net' to be freed after one
-another cleanup_net() round (and existing rcu_barrier())
-
-[1]
-
-BUG: KASAN: slab-use-after-free in dst_destroy (net/core/dst.c:112)
-Read of size 8 at addr ffff8882137ccab0 by task swapper/37/0
-Dec 03 05:46:18 kernel:
-CPU: 37 UID: 0 PID: 0 Comm: swapper/37 Kdump: loaded Not tainted 6.12.0 #67
-Hardware name: Red Hat KVM/RHEL, BIOS 1.16.1-1.el9 04/01/2014
-Call Trace:
- <IRQ>
-dump_stack_lvl (lib/dump_stack.c:124)
-print_address_description.constprop.0 (mm/kasan/report.c:378)
-? dst_destroy (net/core/dst.c:112)
-print_report (mm/kasan/report.c:489)
-? dst_destroy (net/core/dst.c:112)
-? kasan_addr_to_slab (mm/kasan/common.c:37)
-kasan_report (mm/kasan/report.c:603)
-? dst_destroy (net/core/dst.c:112)
-? rcu_do_batch (kernel/rcu/tree.c:2567)
-dst_destroy (net/core/dst.c:112)
-rcu_do_batch (kernel/rcu/tree.c:2567)
-? __pfx_rcu_do_batch (kernel/rcu/tree.c:2491)
-? lockdep_hardirqs_on_prepare (kernel/locking/lockdep.c:4339 kernel/locking/lockdep.c:4406)
-rcu_core (kernel/rcu/tree.c:2825)
-handle_softirqs (kernel/softirq.c:554)
-__irq_exit_rcu (kernel/softirq.c:589 kernel/softirq.c:428 kernel/softirq.c:637)
-irq_exit_rcu (kernel/softirq.c:651)
-sysvec_apic_timer_interrupt (arch/x86/kernel/apic/apic.c:1049 arch/x86/kernel/apic/apic.c:1049)
- </IRQ>
- <TASK>
-asm_sysvec_apic_timer_interrupt (./arch/x86/include/asm/idtentry.h:702)
-RIP: 0010:default_idle (./arch/x86/include/asm/irqflags.h:37 ./arch/x86/include/asm/irqflags.h:92 arch/x86/kernel/process.c:743)
-Code: 00 4d 29 c8 4c 01 c7 4c 29 c2 e9 6e ff ff ff 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 66 90 0f 00 2d c7 c9 27 00 fb f4 <fa> c3 cc cc cc cc 66 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 90
-RSP: 0018:ffff888100d2fe00 EFLAGS: 00000246
-RAX: 00000000001870ed RBX: 1ffff110201a5fc2 RCX: ffffffffb61a3e46
-RDX: 0000000000000000 RSI: 0000000000000000 RDI: ffffffffb3d4d123
-RBP: 0000000000000000 R08: 0000000000000001 R09: ffffed11c7e1835d
-R10: ffff888e3f0c1aeb R11: 0000000000000000 R12: 0000000000000000
-R13: ffff888100d20000 R14: dffffc0000000000 R15: 0000000000000000
-? ct_kernel_exit.constprop.0 (kernel/context_tracking.c:148)
-? cpuidle_idle_call (kernel/sched/idle.c:186)
-default_idle_call (./include/linux/cpuidle.h:143 kernel/sched/idle.c:118)
-cpuidle_idle_call (kernel/sched/idle.c:186)
-? __pfx_cpuidle_idle_call (kernel/sched/idle.c:168)
-? lock_release (kernel/locking/lockdep.c:467 kernel/locking/lockdep.c:5848)
-? lockdep_hardirqs_on_prepare (kernel/locking/lockdep.c:4347 kernel/locking/lockdep.c:4406)
-? tsc_verify_tsc_adjust (arch/x86/kernel/tsc_sync.c:59)
-do_idle (kernel/sched/idle.c:326)
-cpu_startup_entry (kernel/sched/idle.c:423 (discriminator 1))
-start_secondary (arch/x86/kernel/smpboot.c:202 arch/x86/kernel/smpboot.c:282)
-? __pfx_start_secondary (arch/x86/kernel/smpboot.c:232)
-? soft_restart_cpu (arch/x86/kernel/head_64.S:452)
-common_startup_64 (arch/x86/kernel/head_64.S:414)
- </TASK>
-Dec 03 05:46:18 kernel:
-Allocated by task 12184:
-kasan_save_stack (mm/kasan/common.c:48)
-kasan_save_track (./arch/x86/include/asm/current.h:49 mm/kasan/common.c:60 mm/kasan/common.c:69)
-__kasan_slab_alloc (mm/kasan/common.c:319 mm/kasan/common.c:345)
-kmem_cache_alloc_noprof (mm/slub.c:4085 mm/slub.c:4134 mm/slub.c:4141)
-copy_net_ns (net/core/net_namespace.c:421 net/core/net_namespace.c:480)
-create_new_namespaces (kernel/nsproxy.c:110)
-unshare_nsproxy_namespaces (kernel/nsproxy.c:228 (discriminator 4))
-ksys_unshare (kernel/fork.c:3313)
-__x64_sys_unshare (kernel/fork.c:3382)
-do_syscall_64 (arch/x86/entry/common.c:52 arch/x86/entry/common.c:83)
-entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:130)
-Dec 03 05:46:18 kernel:
-Freed by task 11:
-kasan_save_stack (mm/kasan/common.c:48)
-kasan_save_track (./arch/x86/include/asm/current.h:49 mm/kasan/common.c:60 mm/kasan/common.c:69)
-kasan_save_free_info (mm/kasan/generic.c:582)
-__kasan_slab_free (mm/kasan/common.c:271)
-kmem_cache_free (mm/slub.c:4579 mm/slub.c:4681)
-cleanup_net (net/core/net_namespace.c:456 net/core/net_namespace.c:446 net/core/net_namespace.c:647)
-process_one_work (kernel/workqueue.c:3229)
-worker_thread (kernel/workqueue.c:3304 kernel/workqueue.c:3391)
-kthread (kernel/kthread.c:389)
-ret_from_fork (arch/x86/kernel/process.c:147)
-ret_from_fork_asm (arch/x86/entry/entry_64.S:257)
-Dec 03 05:46:18 kernel:
-Last potentially related work creation:
-kasan_save_stack (mm/kasan/common.c:48)
-__kasan_record_aux_stack (mm/kasan/generic.c:541)
-insert_work (./include/linux/instrumented.h:68 ./include/asm-generic/bitops/instrumented-non-atomic.h:141 kernel/workqueue.c:788 kernel/workqueue.c:795 kernel/workqueue.c:2186)
-__queue_work (kernel/workqueue.c:2340)
-queue_work_on (kernel/workqueue.c:2391)
-xfrm_policy_insert (net/xfrm/xfrm_policy.c:1610)
-xfrm_add_policy (net/xfrm/xfrm_user.c:2116)
-xfrm_user_rcv_msg (net/xfrm/xfrm_user.c:3321)
-netlink_rcv_skb (net/netlink/af_netlink.c:2536)
-xfrm_netlink_rcv (net/xfrm/xfrm_user.c:3344)
-netlink_unicast (net/netlink/af_netlink.c:1316 net/netlink/af_netlink.c:1342)
-netlink_sendmsg (net/netlink/af_netlink.c:1886)
-sock_write_iter (net/socket.c:729 net/socket.c:744 net/socket.c:1165)
-vfs_write (fs/read_write.c:590 fs/read_write.c:683)
-ksys_write (fs/read_write.c:736)
-do_syscall_64 (arch/x86/entry/common.c:52 arch/x86/entry/common.c:83)
-entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:130)
-Dec 03 05:46:18 kernel:
-Second to last potentially related work creation:
-kasan_save_stack (mm/kasan/common.c:48)
-__kasan_record_aux_stack (mm/kasan/generic.c:541)
-insert_work (./include/linux/instrumented.h:68 ./include/asm-generic/bitops/instrumented-non-atomic.h:141 kernel/workqueue.c:788 kernel/workqueue.c:795 kernel/workqueue.c:2186)
-__queue_work (kernel/workqueue.c:2340)
-queue_work_on (kernel/workqueue.c:2391)
-__xfrm_state_insert (./include/linux/workqueue.h:723 net/xfrm/xfrm_state.c:1150 net/xfrm/xfrm_state.c:1145 net/xfrm/xfrm_state.c:1513)
-xfrm_state_update (./include/linux/spinlock.h:396 net/xfrm/xfrm_state.c:1940)
-xfrm_add_sa (net/xfrm/xfrm_user.c:912)
-xfrm_user_rcv_msg (net/xfrm/xfrm_user.c:3321)
-netlink_rcv_skb (net/netlink/af_netlink.c:2536)
-xfrm_netlink_rcv (net/xfrm/xfrm_user.c:3344)
-netlink_unicast (net/netlink/af_netlink.c:1316 net/netlink/af_netlink.c:1342)
-netlink_sendmsg (net/netlink/af_netlink.c:1886)
-sock_write_iter (net/socket.c:729 net/socket.c:744 net/socket.c:1165)
-vfs_write (fs/read_write.c:590 fs/read_write.c:683)
-ksys_write (fs/read_write.c:736)
-do_syscall_64 (arch/x86/entry/common.c:52 arch/x86/entry/common.c:83)
-entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:130)
-
-Fixes: a8a572a6b5f2 ("xfrm: dst_entries_init() per-net dst_ops")
-Reported-by: Ilya Maximets <i.maximets@ovn.org>
-Closes: https://lore.kernel.org/netdev/CANn89iKKYDVpB=MtmfH7nyv2p=rJWSLedO5k7wSZgtY_tO8WQg@mail.gmail.com/T/#m02c98c3009fe66382b73cfb4db9cf1df6fab3fbf
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Acked-by: Paolo Abeni <pabeni@redhat.com>
-Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-Link: https://patch.msgid.link/20241204125455.3871859-1-edumazet@google.com
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-Signed-off-by: Vasiliy Kovalev <kovalev@altlinux.org>
----
-Backport to fix CVE-2024-56658
-Link: https://www.cve.org/CVERecord/?id=CVE-2024-56658
----
- include/net/net_namespace.h |  1 +
- net/core/net_namespace.c    | 25 +++++++++++++++++++++++--
- 2 files changed, 24 insertions(+), 2 deletions(-)
-
-diff --git a/include/net/net_namespace.h b/include/net/net_namespace.h
-index eb0e7731f3b1c8..df95d553923937 100644
---- a/include/net/net_namespace.h
-+++ b/include/net/net_namespace.h
-@@ -80,6 +80,7 @@ struct net {
- 						 * or to unregister pernet ops
- 						 * (pernet_ops_rwsem write locked).
- 						 */
-+	struct llist_node	defer_free_list;
- 	struct llist_node	cleanup_list;	/* namespaces on death row */
- 
- #ifdef CONFIG_KEYS
-diff --git a/net/core/net_namespace.c b/net/core/net_namespace.c
-index 6192a05ebcce2c..232c5afc1f777d 100644
---- a/net/core/net_namespace.c
-+++ b/net/core/net_namespace.c
-@@ -452,10 +452,29 @@ static struct net *net_alloc(void)
- 	goto out;
- }
- 
-+static LLIST_HEAD(defer_free_list);
-+
-+static void net_complete_free(void)
-+{
-+	struct llist_node *kill_list;
-+	struct net *net, *next;
-+
-+	/* Get the list of namespaces to free from last round. */
-+	kill_list = llist_del_all(&defer_free_list);
-+
-+	llist_for_each_entry_safe(net, next, kill_list, defer_free_list)
-+		kmem_cache_free(net_cachep, net);
-+
-+}
-+
- static void net_free(struct net *net)
- {
--	kfree(rcu_access_pointer(net->gen));
--	kmem_cache_free(net_cachep, net);
-+	if (refcount_dec_and_test(&net->passive)) {
-+		kfree(rcu_access_pointer(net->gen));
-+
-+		/* Wait for an extra rcu_barrier() before final free. */
-+		llist_add(&net->defer_free_list, &defer_free_list);
-+	}
- }
- 
- void net_drop_ns(void *p)
-@@ -628,6 +647,8 @@ static void cleanup_net(struct work_struct *work)
- 	 */
- 	rcu_barrier();
- 
-+	net_complete_free();
-+
- 	/* Finally it is safe to free my network namespace structure */
- 	list_for_each_entry_safe(net, tmp, &net_exit_list, exit_list) {
- 		list_del_init(&net->exit_list);
--- 
-2.33.8
-
+Thanks
+Hangbin
 
