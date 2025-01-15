@@ -1,166 +1,155 @@
-Return-Path: <netdev+bounces-158387-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158388-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6375DA118BA
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 06:07:57 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D8652A118DB
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 06:19:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0894C3A726D
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 05:07:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 04A8F1685E9
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 05:18:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1891B22F3BD;
-	Wed, 15 Jan 2025 05:07:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBC9A157472;
+	Wed, 15 Jan 2025 05:18:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="ojNFcQ6q"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="ynRYaGH4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from lelvem-ot02.ext.ti.com (lelvem-ot02.ext.ti.com [198.47.23.235])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A00B22E40A
-	for <netdev@vger.kernel.org>; Wed, 15 Jan 2025 05:07:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B94C801;
+	Wed, 15 Jan 2025 05:18:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.235
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736917663; cv=none; b=HjVhGvROt8JzppisWiORK0Q14eaB0iP5axVFY+bOYLAZyQKrNQE6nGfng9B1k+1NYVqCDVwqBhKDpJASIvYT7CAXZvHNrFuJ7Zy8JquQariqRPUBkfmpP+fa+0wkF1747BsRdbtg18DQ1F06Qru+fAVGdqmbIjUduxxV8El6+PY=
+	t=1736918336; cv=none; b=FF4ZIfxb0r4chLi/QPdWDykpDCvkkIXyBN5udtxl8aKT4K23fJmvZOASP/0F5n2/78iKqxNIyyNLHNLX/zKcpvxVHP7bT9JR/fNk3/vcTM+3p1ad1Tv+/Ek0+nsKO85ZjnIDCWFbrHzC7nYYBF0z2gXHpZ8f4VKwo1powihV0oQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736917663; c=relaxed/simple;
-	bh=t4dXpTZmsRI2k2NZ4xiQUhN5dBPeJttIl5lhtigwHU8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Ko0ykkN1hkZofWitJid9NxC4EsxQTNzzv5PTeX4hLAjtMTREFhQsNbE5e8OcVFnLnU1xsGZ1yaHg8kl7cvBIkzvqCw6MuUXDeDI+ImYwf/rahi5kowUmBaYGttOYM8dsUEEADQgqDnMqmI8gfg6adhjzqBfnSgjIFOciT/SM040=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=pass smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=ojNFcQ6q; arc=none smtp.client-ip=209.85.214.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=daynix.com
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-2163bd70069so114563145ad.0
-        for <netdev@vger.kernel.org>; Tue, 14 Jan 2025 21:07:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1736917660; x=1737522460; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=tJj2ax30G5cYMMuz85Qw6SCJDIZ/bbwOrDlSPLFGRgM=;
-        b=ojNFcQ6qbQMsuh63BrZPD2cg5u7/AjaUXt9B7ekVeZhZM8dOXf3eAAuYd+TBljvKwK
-         JtNVSsZSxxxJMsHDenuRv66Q+3LiW/CEFkGmFZ15GfcB1tGh258PdjinToYMY6fN5CT9
-         yLK/AIBtJTJJwU1XATwHLqPmqX6dv8V9mBOPQ6Rx1Sfri9vVUE/+dgN+cKHNzxg2ivhk
-         m7ysgpWjGkfKAPQDfwx20th4mSNaYEPeGZwe/pPtPrlYgMFWu6FprvmzyPayoSWQys1k
-         2nGX8N5IF/6m1UIIXjlIlqdAOoj5xaQRHCPESiDfRHfQYqYL7WKNb6iJHI4t1rnWxhjb
-         XD/g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736917660; x=1737522460;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=tJj2ax30G5cYMMuz85Qw6SCJDIZ/bbwOrDlSPLFGRgM=;
-        b=GUyjQGDZxd+A8HWUBYXilpSaEEy/192r2ZNjYZGJm81R2tZtklchh15aa0RudZgtJb
-         ZWOpAH4dEow9f8wTmdV8yIPoT5tF/Z2CLuGq8BzS7jksntK+an7Uk8XUAP/2V4cC9Kr0
-         v1pQDwDPLo1tYfig8BVZJR0gDuBjyrdkTb6z0R8WH81N1hTJm57tIuTrQp68VCHnqpEH
-         2DszSQWLLb6gqYCPBl5VSFDvBbpPKq+9n5obYVbAEP7EKJhj6/I1E5qIQBuD+Lr0weAK
-         ys0+2Z0WpSaz9DVtMAIttmPHQLsRxccTX8evhOKfB8NvH3Mtp1s1A23BJtlAUDfAoELw
-         YdaQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVQLJ/w56t0UK2/6a77NB3TC0Ql/4fGaLc7y+9Mk6ZI7kI3JowdepPGQQsQTnLrI16ItqZGenw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwHIV4J3jLpy74iuMoUTSmSxhisABvJWeUmsVobyIuauVwX5652
-	5t1T94p0t6Fr6UcYA8CiTsaWciNxC0kUr+MwzHqJAAaEfcUOcOcsV8CBmU8d+CM=
-X-Gm-Gg: ASbGncsyBzpE3FJm7Oh6WwNYp5cGWsty9OsvgXjXpM7ATe28HUQXCts+djbMudHyam0
-	ygb71rrWRIFgbN6kgXc7kxq6JfmxGuLj5tCb1K5LxXQxZ29VbLgMhPnvcJZ0Osv+LSXqkCg1ucn
-	FWq34ff02xDZx2YC0kNNch3NNpIgVHRFGSX7WGv1lxd4lmm61CB2hHqy8gWuW9kPxYI7KNqwO9e
-	MHZpSAJVg+QFk4XPHx2AzWoYxIRGhFJ2SH9UpLE1VUqKrDFNxtsmSVqki68viLUlBA=
-X-Google-Smtp-Source: AGHT+IH85/A6RLxL+2rEhiloGI8TMEvrvGtTvROtv7Pjqakmsz8YgZ7ly7fq+kIggy8KHNzrf4rkjg==
-X-Received: by 2002:a17:902:ea0a:b0:216:3083:d03d with SMTP id d9443c01a7336-21a83ffc447mr470885135ad.44.1736917659024;
-        Tue, 14 Jan 2025 21:07:39 -0800 (PST)
-Received: from [157.82.203.37] ([157.82.203.37])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21a9f10e41csm73994625ad.11.2025.01.14.21.07.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 14 Jan 2025 21:07:38 -0800 (PST)
-Message-ID: <fcb301e8-c808-4e20-92dd-2e3b83998d18@daynix.com>
-Date: Wed, 15 Jan 2025 14:07:32 +0900
+	s=arc-20240116; t=1736918336; c=relaxed/simple;
+	bh=JcXvKzIH+p1oggldabJBriZLR/hDNCfyLBSyTQmwAKU=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FtBLLFHEtbhp+eFlZJwNpmx+bUkYsNkWRg0LP3HxRAzaxeHI67j2J4ex5eSMmzt6ErtT9pfOtWa8KbvLx11CE4VdGIjIwpAtJ9qGHXYklG+9vRl2uaKGWkoUNFchGhsT9o4X9z9MS/im/2eKMwfaapEGQOaaTl41zZpOz5qxVeo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=ynRYaGH4; arc=none smtp.client-ip=198.47.23.235
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from lelv0266.itg.ti.com ([10.180.67.225])
+	by lelvem-ot02.ext.ti.com (8.15.2/8.15.2) with ESMTPS id 50F5IT5W4093185
+	(version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
+	Tue, 14 Jan 2025 23:18:29 -0600
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1736918309;
+	bh=zwzM98V9qnooH7NVSiXPmmN6N+1zDFByxSTKmHUzOYY=;
+	h=Date:From:To:CC:Subject:References:In-Reply-To;
+	b=ynRYaGH4oiCOvaOmfQfNu+dBKeIipmpXBWKINaHU8nhW7Xhn8Xd5gFfkI9jU3gK6W
+	 L6YEagrnDlw0kE+GDZLtTl/w0pMt53lzeVFsrP6j/NSqHf4eo6DAQtoBW36qNzyeca
+	 qseaBKgw5Mt0XnOiZEx75dTg8zQA/w+iuhl6oBZ0=
+Received: from DFLE112.ent.ti.com (dfle112.ent.ti.com [10.64.6.33])
+	by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTP id 50F5ITBf073779;
+	Tue, 14 Jan 2025 23:18:29 -0600
+Received: from DFLE103.ent.ti.com (10.64.6.24) by DFLE112.ent.ti.com
+ (10.64.6.33) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Tue, 14
+ Jan 2025 23:18:29 -0600
+Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DFLE103.ent.ti.com
+ (10.64.6.24) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Tue, 14 Jan 2025 23:18:29 -0600
+Received: from localhost (uda0492258.dhcp.ti.com [10.24.72.104])
+	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 50F5ISiG042784;
+	Tue, 14 Jan 2025 23:18:29 -0600
+Date: Wed, 15 Jan 2025 10:48:28 +0530
+From: Siddharth Vadapalli <s-vadapalli@ti.com>
+To: Roger Quadros <rogerq@kernel.org>
+CC: Andrew Lunn <andrew+netdev@lunn.ch>,
+        "David S. Miller"
+	<davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Grygorii Strashko
+	<grygorii.strashko@ti.com>,
+        Siddharth Vadapalli <s-vadapalli@ti.com>, <srk@ti.com>,
+        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net] net: ethernet: ti: am65-cpsw: fix freeing IRQ in
+ am65_cpsw_nuss_remove_tx_chns()
+Message-ID: <gygqjjyso3p4qgam4fpjdkqidj2lhxldkmaopqg32bw3g4ktpj@43tmtsdexkqv>
+References: <20250114-am65-cpsw-fix-tx-irq-free-v1-1-b2069e6ed185@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 3/3] tun: Set num_buffers for virtio 1.0
-To: Jason Wang <jasowang@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Shuah Khan <shuah@kernel.org>,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, kvm@vger.kernel.org,
- virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org,
- Yuri Benditovich <yuri.benditovich@daynix.com>,
- Andrew Melnychenko <andrew@daynix.com>,
- Stephen Hemminger <stephen@networkplumber.org>, gur.stavi@huawei.com,
- devel@daynix.com
-References: <20250109-tun-v2-0-388d7d5a287a@daynix.com>
- <20250109-tun-v2-3-388d7d5a287a@daynix.com>
- <CACGkMEsm5DCb+n3NYeRjmq3rAANztZz5QmV8rbPNo+cH-=VzDQ@mail.gmail.com>
- <20250110052246-mutt-send-email-mst@kernel.org>
- <2e015ee6-8a3b-43fb-b119-e1921139c74b@daynix.com>
- <CACGkMEuiyfH-QitiiKJ__-8NiTjoOfc8Nx5BwLM-GOfPpVEitA@mail.gmail.com>
-Content-Language: en-US
-From: Akihiko Odaki <akihiko.odaki@daynix.com>
-In-Reply-To: <CACGkMEuiyfH-QitiiKJ__-8NiTjoOfc8Nx5BwLM-GOfPpVEitA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20250114-am65-cpsw-fix-tx-irq-free-v1-1-b2069e6ed185@kernel.org>
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
 
-On 2025/01/13 12:04, Jason Wang wrote:
-> On Fri, Jan 10, 2025 at 7:12 PM Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
->>
->> On 2025/01/10 19:23, Michael S. Tsirkin wrote:
->>> On Fri, Jan 10, 2025 at 11:27:13AM +0800, Jason Wang wrote:
->>>> On Thu, Jan 9, 2025 at 2:59 PM Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
->>>>>
->>>>> The specification says the device MUST set num_buffers to 1 if
->>>>> VIRTIO_NET_F_MRG_RXBUF has not been negotiated.
->>>>
->>>> Have we agreed on how to fix the spec or not?
->>>>
->>>> As I replied in the spec patch, if we just remove this "MUST", it
->>>> looks like we are all fine?
->>>>
->>>> Thanks
->>>
->>> We should replace MUST with SHOULD but it is not all fine,
->>> ignoring SHOULD is a quality of implementation issue.
->>>
-> 
-> So is this something that the driver should notice?
-> 
->>
->> Should we really replace it? It would mean that a driver conformant with
->> the current specification may not be compatible with a device conformant
->> with the future specification.
-> 
-> I don't get this. We are talking about devices and we want to relax so
-> it should compatibile.
+On Tue, Jan 14, 2025 at 06:44:02PM +0200, Roger Quadros wrote:
 
+Hello Roger,
 
-The problem is:
-1) On the device side, the num_buffers can be left uninitialized due to bugs
-2) On the driver side, the specification allows assuming the num_buffers 
-is set to one.
+> When getting the IRQ we use k3_udma_glue_rx_get_irq() which returns
 
-Relaxing the device requirement will replace "due to bugs" with 
-"according to the specification" in 1). It still contradicts with 2) so 
-does not fix compatibility.
+You probably meant "k3_udma_glue_tx_get_irq()" instead? It is used to
+assign tx_chn->irq within am65_cpsw_nuss_init_tx_chns() as follows:
 
-Instead, we should make the driver requirement stricter to change 2). 
-That is what "[PATCH v3] virtio-net: Ignore num_buffers when unused" does:
-https://lore.kernel.org/r/20250110-reserved-v3-1-2ade0a5d2090@daynix.com
+		tx_chn->irq = k3_udma_glue_tx_get_irq(tx_chn->tx_chn);
 
-> 
->>
->> We are going to fix all implementations known to buggy (QEMU and Linux)
->> anyway so I think it's just fine to leave that part of specification as is.
-> 
-> I don't think we can fix it all.
+Additionally, following the above section we have:
 
-It essentially only requires storing 16 bits. There are details we need 
-to work out, but it should be possible to fix.
+		if (tx_chn->irq < 0) {
+			dev_err(dev, "Failed to get tx dma irq %d\n",
+				tx_chn->irq);
+			ret = tx_chn->irq;
+			goto err;
+		}
+
+Could you please provide details on the code-path which will lead to a
+negative "tx_chn->irq" within "am65_cpsw_nuss_remove_tx_chns()"?
+
+There seem to be two callers of am65_cpsw_nuss_remove_tx_chns(), namely:
+1. am65_cpsw_nuss_update_tx_rx_chns()
+2. am65_cpsw_nuss_suspend()
+Since both of them seem to invoke am65_cpsw_nuss_remove_tx_chns() only
+in the case where am65_cpsw_nuss_init_tx_chns() *did not* error out, it
+appears to me that "tx_chn->irq" will never be negative within
+am65_cpsw_nuss_remove_tx_chns()
+
+Please let me know if I have overlooked something.
 
 Regards,
-Akihiko Odaki
+Siddharth.
+
+> negative error value on error. So not NULL check is not sufficient
+> to deteremine if IRQ is valid. Check that IRQ is greater then zero
+> to ensure it is valid.
+> 
+> Fixes: 93a76530316a ("net: ethernet: ti: introduce am65x/j721e gigabit eth subsystem driver")
+> Signed-off-by: Roger Quadros <rogerq@kernel.org>
+> ---
+>  drivers/net/ethernet/ti/am65-cpsw-nuss.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.c b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
+> index 5465bf872734..e1de45fb18ae 100644
+> --- a/drivers/net/ethernet/ti/am65-cpsw-nuss.c
+> +++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
+> @@ -2248,7 +2248,7 @@ static void am65_cpsw_nuss_remove_tx_chns(struct am65_cpsw_common *common)
+>  	for (i = 0; i < common->tx_ch_num; i++) {
+>  		struct am65_cpsw_tx_chn *tx_chn = &common->tx_chns[i];
+>  
+> -		if (tx_chn->irq)
+> +		if (tx_chn->irq > 0)
+>  			devm_free_irq(dev, tx_chn->irq, tx_chn);
+>  
+>  		netif_napi_del(&tx_chn->napi_tx);
+> 
+> ---
+> base-commit: 5bc55a333a2f7316b58edc7573e8e893f7acb532
+> change-id: 20250114-am65-cpsw-fix-tx-irq-free-846ac55ee6e1
+> 
+> Best regards,
+> -- 
+> Roger Quadros <rogerq@kernel.org>
+> 
 
