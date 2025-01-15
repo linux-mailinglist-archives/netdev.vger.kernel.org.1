@@ -1,50 +1,61 @@
-Return-Path: <netdev+bounces-158677-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158678-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 61FC1A12F08
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 00:20:11 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE738A12F09
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 00:21:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E9C2E3A26A2
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 23:20:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1E6FA164C69
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 23:21:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E49EB1DCB0E;
-	Wed, 15 Jan 2025 23:20:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE5AE1DCB0E;
+	Wed, 15 Jan 2025 23:21:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F7cSBgwI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BWZRY9Uk"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCFA81D89F1
-	for <netdev@vger.kernel.org>; Wed, 15 Jan 2025 23:20:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3C6A24A7CC;
+	Wed, 15 Jan 2025 23:21:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736983206; cv=none; b=lsaEHPpGW2X59macVLDwJLcmyDh2y3BVx+cfUGc49xEuQoKxgKdvxE9OKOGMMPFglwwXFmDweWoFAGaNxVsC2szwv6B8+KdZ/NIIk0lWnmeEbMdC29MHoAe1vLhsP/k0al1//f2aghw/soWPU3PnW+f1F8vZg+OLyd+zaxc7NGY=
+	t=1736983295; cv=none; b=ZLnu++vmzwOwvpxwdSHVpSpNKloD7VGgz43gG2uZY7DRrSLOQ9ksKCPncSiOfn5naRL8VV4T+xr72ByNLJhCBZNnQ7W2Ca4Vpdt9PaI4UGHc03bzBW6rIdqni3IsJSYuS1Q6nDQH0ZqYAfQY3MFiCyrtpYjTCjzqh2Z8XLnqRBA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736983206; c=relaxed/simple;
-	bh=u1iopNtebgkLUj1oT9xplsp1wOKHbzF630GO3GvaUFc=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=TvhYxFY0Owf2rmg+xuMTGq8NvtycS+uIqBXoo3dZJ1WYqRA7AgQ+TY3NT/kkZE/aJDfxBIbOpfSmZTx/nu5d8U5PdTS9N7XOD5bcdoOKnliKCHaGEk7D7VkU4FjkcHfqp5lRNgofFWiMNiY3UgDXiqh8czEvgeqjG5UBBy0zaF4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F7cSBgwI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4474AC4CED1;
-	Wed, 15 Jan 2025 23:20:06 +0000 (UTC)
+	s=arc-20240116; t=1736983295; c=relaxed/simple;
+	bh=mPosCnzgcJbE1pjkdLDkGQw+G/s6LoErO422lPW/XII=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=HICzABxa/7j7m2GS7g9OtnTOc359lxg7x8F6dEphHPaKe88HlocJW1DT8k9u2HBd4dVcXtWmN/SQzhlFEXdOSrdr/BStZuuccFSPyCX2IWQ1YCA+WHNngfy7RYHuMh8pVv2Z3esDdAvms8dCG+9wrmY5XKAmUFfgRcN4JB2S6g4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BWZRY9Uk; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DA5B5C4CEE1;
+	Wed, 15 Jan 2025 23:21:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736983206;
-	bh=u1iopNtebgkLUj1oT9xplsp1wOKHbzF630GO3GvaUFc=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=F7cSBgwIY6UcsdnPm+4vYo4UTknf/AYr82qfCP/hS5diaWok46UoUYoKlGdL8eKlK
-	 ttheQHF0iSqUtw4C6E/xrUV6Z+vkysTJQAwaKwe+YqGByr6QYxsbBI37zyYJocYB9f
-	 4SNw6hV3f1d0N/Ezlq65x2wgcQb5WccSB1nfrvZmqdsYl4RWNT5Hu5m0QqLpN3e+lK
-	 wydYmpqQkoqRIqqWDLj+Sce0ESSJ0Zf/r0PRE2yisP+pxRTemrn8idHT9h4FL7svbS
-	 mHswoquqMP99pSUsMIimMl0v8oEOujcf9Cwef41s0jkoQ85OWN8y7rchpehanuvsAD
-	 hFKeHzUH2tXzQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70F06380AA5F;
-	Wed, 15 Jan 2025 23:20:30 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1736983295;
+	bh=mPosCnzgcJbE1pjkdLDkGQw+G/s6LoErO422lPW/XII=;
+	h=From:To:Cc:Subject:Date:From;
+	b=BWZRY9UkEVjlxkgk+qRn0xLEFakd/Nqiw/TYpwFN14NUw3x5gDzPTzbYbzWuXUzWU
+	 ubdPFC+IXGfXjrA5Skl7MXjYIY3TaEeukJa8+afESZO/wAQj2gbw+PvrOWdkp4rrIV
+	 42eGkcz8u+Gk3bByZBHN3pUKZkPu6jj0X22d6Nq3hmMFq7Uy4njqkVP5zyIc5nbIcs
+	 74/B+Lnv776gQ5shR20t6rmyh70q6qviNOENqpXbIajdlPBNKseVz3gVpzsNipXFvJ
+	 Jh9SZlWdyI5wtt/cnQ/wtSlJzu9JvSIWTB/aVH2LbQq79B2foxC80OcEWsPNzDmypk
+	 VPhZli9hGdWVw==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	horms@kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	shuah@kernel.org,
+	willemb@google.com,
+	matttbe@kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: [PATCH net-next] selftests/net: packetdrill: make tcp buf limited timing tests benign
+Date: Wed, 15 Jan 2025 15:21:29 -0800
+Message-ID: <20250115232129.845884-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.48.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,43 +63,48 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2 net-next] inet: ipmr: fix data-races
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173698322926.910486.11639270509692820277.git-patchwork-notify@kernel.org>
-Date: Wed, 15 Jan 2025 23:20:29 +0000
-References: <20250114221049.1190631-1-edumazet@google.com>
-In-Reply-To: <20250114221049.1190631-1-edumazet@google.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, horms@kernel.org, eric.dumazet@gmail.com,
- dsahern@kernel.org
 
-Hello:
+The following tests are failing on debug kernels:
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+  tcp_tcp_info_tcp-info-rwnd-limited.pkt
+  tcp_tcp_info_tcp-info-sndbuf-limited.pkt
 
-On Tue, 14 Jan 2025 22:10:49 +0000 you wrote:
-> Following fields of 'struct mr_mfc' can be updated
-> concurrently (no lock protection) from ip_mr_forward()
-> and ip6_mr_forward()
-> 
-> - bytes
-> - pkt
-> - wrong_if
-> - lastuse
-> 
-> [...]
+with reports like:
 
-Here is the summary with links:
-  - [v2,net-next] inet: ipmr: fix data-races
-    https://git.kernel.org/netdev/net-next/c/3440fa34ad99
+      assert 19000 <= tcpi_sndbuf_limited <= 21000, tcpi_sndbuf_limited; \
+  AssertionError: 18000
 
-You are awesome, thank you!
+and:
+
+      assert 348000 <= tcpi_busy_time <= 360000, tcpi_busy_time
+  AssertionError: 362000
+
+Extend commit 912d6f669725 ("selftests/net: packetdrill: report benign
+debug flakes as xfail") to cover them.
+
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+CC: shuah@kernel.org
+CC: willemb@google.com
+CC: matttbe@kernel.org
+CC: linux-kselftest@vger.kernel.org
+---
+ tools/testing/selftests/net/packetdrill/ksft_runner.sh | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/tools/testing/selftests/net/packetdrill/ksft_runner.sh b/tools/testing/selftests/net/packetdrill/ksft_runner.sh
+index ff989c325eef..e15c43b7359b 100755
+--- a/tools/testing/selftests/net/packetdrill/ksft_runner.sh
++++ b/tools/testing/selftests/net/packetdrill/ksft_runner.sh
+@@ -43,6 +43,7 @@ if [[ -n "${KSFT_MACHINE_SLOW}" ]]; then
+ 		"tcp_timestamping.*.pkt"
+ 		"tcp_user_timeout_user-timeout-probe.pkt"
+ 		"tcp_zerocopy_epoll_.*.pkt"
++		"tcp_tcp_info_tcp-info-*-limited.pkt"
+ 	)
+ 	readonly xfail_regex="^($(printf '%s|' "${xfail_list[@]}"))$"
+ 	[[ "$script" =~ ${xfail_regex} ]] && failfunc=ktap_test_xfail
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.48.0
 
 
