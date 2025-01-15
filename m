@@ -1,114 +1,145 @@
-Return-Path: <netdev+bounces-158348-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158349-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 475EAA1174D
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 03:33:38 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id CA731A11751
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 03:34:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D6B3F3A5FC8
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 02:33:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 131AB188781E
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 02:34:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 704D04206B;
-	Wed, 15 Jan 2025 02:33:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A951022DC29;
+	Wed, 15 Jan 2025 02:34:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h8A/W02w"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kbDwDP2P"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f178.google.com (mail-il1-f178.google.com [209.85.166.178])
+Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4E286FB9
-	for <netdev@vger.kernel.org>; Wed, 15 Jan 2025 02:33:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8EA24502F;
+	Wed, 15 Jan 2025 02:34:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736908414; cv=none; b=WzsuIZWD7aaQjd7k7HM0qNY/qw+q1GUnA8QixdyKyGi/6K2VV6382nLq8umNEVRczW7N9C6LdZyefEWCF8+sYdaSfGNOQCq8daTzXVmc+LUpR4NtlcKs/zECkZq7y+n4WjzGbEDleF+XJ6imS0jD3Htacs7hwdVqDvbVyQgL+VM=
+	t=1736908455; cv=none; b=JjTi2L8UktxCFmwMO+HmtqURzw4tC0OF7i8v/cJ/oH1VJSYb+X03sda8ykZ7Dn8pAFPVYVOdSjlpgte4uzhxJtzE+0mfQqYjqjV438oL//5dVQl8g+XzGXnnH1OxfXCXsDaFCuSpV7K8n9Qv2QZMrB0g5sAo7R0O3GOdOEFMdnE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736908414; c=relaxed/simple;
-	bh=bh8totm4Zm4sXlg935lfzlVZ2dXzuc4blVHVXkaWqwg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=hvj9vw5iQoUhveCMIloL2nfnoEwAI7eDGzBNCXw1J1cEztwZ/wGViZD/rZAja5vlecK6n9xKqn2UQRZCNbXkR6R/PkA3AHUwuxPKDpxfObjkSsj4csswEAqAb6js9wCfT0yI/Ry6fhk4S7A8Jk4RgoO8XfbKpvwPMyx6QE2qtJg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=h8A/W02w; arc=none smtp.client-ip=209.85.166.178
+	s=arc-20240116; t=1736908455; c=relaxed/simple;
+	bh=0GduT77PTmTFltREJ10LStJ4FI+1pB1H1AcBSh3sd1k=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=AY/edgpVAa8VV2pF1R42kLiU3wwKNV5HpF3aapqsX88AyBv8ZR4F6Lu97Ma3/BFfxHJCYg6QRo74bUrhV401ZW6X1vIIOvUqhUlCUgVYVJDC42B1qR8x2gPSOVWdvZbMqNWCQRCxiOuyuI36AQX531JJ7SfX7qPFILArqzHsCCw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kbDwDP2P; arc=none smtp.client-ip=209.85.216.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f178.google.com with SMTP id e9e14a558f8ab-3ce7a33ea70so7898115ab.3
-        for <netdev@vger.kernel.org>; Tue, 14 Jan 2025 18:33:32 -0800 (PST)
+Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-2ef760a1001so10281396a91.0;
+        Tue, 14 Jan 2025 18:34:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736908412; x=1737513212; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1736908451; x=1737513251; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=bh8totm4Zm4sXlg935lfzlVZ2dXzuc4blVHVXkaWqwg=;
-        b=h8A/W02wGsBfGXahHxPSjjQLtk7mV9pGlklikoICVQH6UYJYP2hAw3rsnh+R8LIMIK
-         btkD59GCfYL5H9GaYG63U0YLvHUqjuDUrUz8121K0vd1gimKcr+VHVLc6HQJcZcswMVe
-         lwoQaiTT25Q6MRT6u8T0QEitLuJljGA8H+bhw0GQUOsToCWwIx5W99RaaZafp8YDMCbJ
-         FhDWxfJhPxLsQWvkWSksXRBOQM9cEeE2K504oO12litOlDYxAdR5GXxtD9HNxff/RC60
-         ECl80mEUJ6noyfmZT8bEN+kZtJz4xevV/oPloV6iqK86oBlIlUI1K8GnOUfo4H2gwH8G
-         VK1g==
+        bh=mRcnAFzvXdlWc4UHhAzH7Qrj8PlVITjNIxD+h/EtYRI=;
+        b=kbDwDP2PiNFAQHlPYI/NkKaMJkgpQ30CvI4Ig4slZrsZfKiAMP2dwCfkb3mvtLsD2f
+         cr+SjxYrf+xC0CuryU32XPj8Gg9jelapkXsgw4G2y76Q51M82eRCnjctztp7ohPzxYE9
+         ZBS7M7IyVf8iHqQVFraMuPD+PkcmCskFkvz+Pi39hA1NWvdncges0k40Lu7Yja5Z2fNL
+         FHGr7nSluTMaurUzHd69/U6BRGCm3lNVFD87UayiusRveKIud6FokJN0A3ZJh83YiSZ2
+         hvuma1HFpmEb6nTT58Qr2oB+GttqrMqNrsnB2/gMwsvyNufH10kvPxJGpqBDvWisXChv
+         /c9Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736908412; x=1737513212;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1736908451; x=1737513251;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=bh8totm4Zm4sXlg935lfzlVZ2dXzuc4blVHVXkaWqwg=;
-        b=ScnycSuUNqKi3Bk1rCVWYX8Flh8bavAVriJ/7MiF+PRyUb29GRNKGWTWapvvUErdvN
-         F1x+gwqLN47l9Icyg0A2OUBXqVBIcOBSm65pou7iwEgv4QZqqp462Oy8hczMWxvo2SZa
-         Wy6sPFjFLaWQL+XNJv4/C3w3RDCI5Q7lhML2zqJhpN0VP6lZF6MGzyNYnXIYXRDRWsR7
-         KDef4NfnEjKmFO97PdWaJcLgY02LbQJ3EPsmbbYU/Gt9JqAgZs6bYbHOp8a/uSOSs3f8
-         hm6YzQTPtS184PDSv2ZrBWCXZyYnMLMWnacUAq6LlEms0kQrsoyxFU/Z7chmvXB0vT4L
-         4P7Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWFTPVGH5ooSHysdsV1jWIUOHhF9regdOAP1VvK9Lp++Dzcf8409VNQvnH6kuEHMsxDO2ejIMk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzyiRWvCBrDNJivjzr92F4YF3xvTPEdrgzrcMtEEn+lAUvJHUf6
-	ziIaqJBcoPlWIQtTZw6CnnSLbF+WFJTn+0X54o0ge/diGp/qYRY+tJi99ceznFbkWBg5fpBzV5C
-	jblTMz7Ljp1I5vaib7vPEshLWv/s=
-X-Gm-Gg: ASbGncsoYCJwlvJHxatJJ4XZhRoKhtK1bUkjnEgaLQ49I5i1M+w5W/yJ1U0PWsBuGIo
-	hAbBCOh5k2tatuvRAUdDjc/rMIYphD59+dZfwGgpL
-X-Google-Smtp-Source: AGHT+IF+5Auh1Gz8ZM2CsjXH7EbBF18lq3Uu5NboAXo7pwkQVcO1t2FKRB/uDWr8xx1jZ56M95WVsAkO/+EER33tX5A=
-X-Received: by 2002:a05:6e02:1a82:b0:3a7:fe47:6228 with SMTP id
- e9e14a558f8ab-3ce3a9b5739mr207510435ab.6.1736908411650; Tue, 14 Jan 2025
- 18:33:31 -0800 (PST)
+        bh=mRcnAFzvXdlWc4UHhAzH7Qrj8PlVITjNIxD+h/EtYRI=;
+        b=FGOAa2w5rmmRfE5RAGJCHsMYSsCtd8PO+0jt638ypUoN+prkIKNDT5hVw3OXRa8PoQ
+         rlOpJDk38QK1R+PyDFNLt7hlb+1tM66rh9cCyh5rc9BTRFlVx1U21YxEoLjGTfhqDZ30
+         VknlRvmURuoTIvwYirnZ6PmCsI7L1h2KNzgar8QlPCAkjLc84jGKuKY4uKMnohFvUCOx
+         HrZqXtizBxqzBC6cNrisThqbtM1Mw9XW70CIa+hz7SC+TsJEM0M2rKn7A503GQtjU0Oj
+         AZP3nYfo5eB7nStQVteU+ifWJk9j7zGKQ6kkVDrvRbGiWt3B+ontiRa/hkIwlPq1+AJ0
+         yRyw==
+X-Forwarded-Encrypted: i=1; AJvYcCWGLdFZQBcKRcLeewg2IVjqfZBlEhmZwv15gQjo7S6mSPg7aa1942I1+ITOrQ4pE5ceVAOqfgfz+Iuqv8I=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxUe9db400DLhcj/IMWZOor4zmxwntTU7joJ46pFXxp8WqAzhxe
+	BMZpduEI7gRn7HzomVjHylmq04PDAyqgwCvcyCkWeYFdES26pHtJ1pyORg==
+X-Gm-Gg: ASbGncvcvoaIAbYaU0/PK93liCEmX60Oo8NnevLtz/E5Awac7mI8+IYQoyDm74WM+9U
+	2InFfQRoYUfSUdvJhqPxZnqCGaR617Bb8Ad9959WXzTXQbKVg1gGdUaGvahOSBwUPBLGegmd5TT
+	diuQckzNyEMdHbWgo4SISsL7ReS3dWTRiEBM1WRJEK3NG4enYpqcffNKtuHv5f9tYV1X+fdYe7l
+	OYZKLHCzY2BVX8R8GJXtXrZ8JSeDDDeLRhql4zZJdDUOytez+BY2g==
+X-Google-Smtp-Source: AGHT+IFb183ByNSb0J0nzR81UMTSxQR60wvthDYKiKHQfrnq8srKLOSDrRHT8CLMHYY7rlkQn7gsPA==
+X-Received: by 2002:a17:90b:3cd0:b0:2ee:5bc9:75c3 with SMTP id 98e67ed59e1d1-2f548f09e88mr36058871a91.5.1736908450551;
+        Tue, 14 Jan 2025 18:34:10 -0800 (PST)
+Received: from localhost ([129.146.253.192])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2f72c151cbfsm247347a91.6.2025.01.14.18.34.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 14 Jan 2025 18:34:10 -0800 (PST)
+Date: Wed, 15 Jan 2025 10:33:58 +0800
+From: Furong Xu <0x1207@gmail.com>
+To: Joe Damato <jdamato@fastly.com>
+Cc: netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Alexander Lobakin <aleksander.lobakin@intel.com>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ xfr@outlook.com
+Subject: Re: [PATCH net-next v2 3/3] net: stmmac: Optimize cache prefetch in
+ RX path
+Message-ID: <20250115103358.00005b57@gmail.com>
+In-Reply-To: <Z4bzuToquRAMfvvu@LQ3V64L9R2>
+References: <cover.1736777576.git.0x1207@gmail.com>
+	<668cfa117e41a0f1325593c94f6bb739c3bb38da.1736777576.git.0x1207@gmail.com>
+	<Z4bzuToquRAMfvvu@LQ3V64L9R2>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <17d459487b61c5d0276a01a3bc1254c6432b5d12.1736793775.git.lucien.xin@gmail.com>
- <8cf44ce9-e117-46fe-8bef-21200db97d0f@fiberby.net> <CADvbK_dYKMvZ8iUS-CvzNYYue1qxTsWXDpvcETyBD+sWOJcaSA@mail.gmail.com>
- <b7b144d9-7099-42b1-b057-f6101b4580eb@fiberby.net>
-In-Reply-To: <b7b144d9-7099-42b1-b057-f6101b4580eb@fiberby.net>
-From: Xin Long <lucien.xin@gmail.com>
-Date: Tue, 14 Jan 2025 21:33:20 -0500
-X-Gm-Features: AbW1kvaeadmeMju5a6E7qDWoJ7rAtgoJ1MA5iUjuy_J3upyxvcRdb44zlfAKjeM
-Message-ID: <CADvbK_dq+uxtuH8H8jnPGQgzSSPMh50Q2fbkvhDPQ-O1OqgOCw@mail.gmail.com>
-Subject: Re: [PATCHv2 net] net: sched: refine software bypass handling in tc_run
-To: =?UTF-8?B?QXNiasO4cm4gU2xvdGggVMO4bm5lc2Vu?= <ast@fiberby.net>
-Cc: davem@davemloft.net, kuba@kernel.org, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Jamal Hadi Salim <jhs@mojatatu.com>, 
-	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, 
-	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, Shuang Li <shuali@redhat.com>, 
-	network dev <netdev@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Tue, Jan 14, 2025 at 12:33=E2=80=AFPM Asbj=C3=B8rn Sloth T=C3=B8nnesen <=
-ast@fiberby.net> wrote:
->
-> On 1/14/25 2:30 AM, Xin Long wrote:
-> > On Mon, Jan 13, 2025 at 4:41=E2=80=AFPM Asbj=C3=B8rn Sloth T=C3=B8nnese=
-n <ast@fiberby.net> wrote:
-> >> I will run it through some tests tomorrow with my patch applied.
-> > That will be great. :-)
->
-> Hi Xin,
->
-> Given the already posted changes, when I rerun the benchmark tests from m=
-y
-> original patch last year, I don't see any significant differences in the
-> forwarding performance. (single 8-core CPU, no parallel rule updates)
->
-> The test code is linked in my original patch:
-> https://lore.kernel.org/netdev/20240325204740.1393349-4-ast@fiberby.net/
-Thanks!
-I will post v3 on net-next.git tomorrow.
+On Tue, 14 Jan 2025 15:31:05 -0800, Joe Damato <jdamato@fastly.com> wrote:
+
+> On Mon, Jan 13, 2025 at 10:20:31PM +0800, Furong Xu wrote:
+> > Current code prefetches cache lines for the received frame first, and
+> > then dma_sync_single_for_cpu() against this frame, this is wrong.
+> > Cache prefetch should be triggered after dma_sync_single_for_cpu().
+> > 
+> > This patch brings ~2.8% driver performance improvement in a TCP RX
+> > throughput test with iPerf tool on a single isolated Cortex-A65 CPU
+> > core, 2.84 Gbits/sec increased to 2.92 Gbits/sec.
+> > 
+> > Signed-off-by: Furong Xu <0x1207@gmail.com>
+> > ---
+> >  drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 5 +----
+> >  1 file changed, 1 insertion(+), 4 deletions(-)
+> > 
+> > diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> > index ca340fd8c937..b60f2f27140c 100644
+> > --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> > +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> > @@ -5500,10 +5500,6 @@ static int stmmac_rx(struct stmmac_priv *priv, int limit, u32 queue)
+> >  
+> >  		/* Buffer is good. Go on. */
+> >  
+> > -		prefetch(page_address(buf->page) + buf->page_offset);
+> > -		if (buf->sec_page)
+> > -			prefetch(page_address(buf->sec_page));
+> > -
+> >  		buf1_len = stmmac_rx_buf1_len(priv, p, status, len);
+> >  		len += buf1_len;
+> >  		buf2_len = stmmac_rx_buf2_len(priv, p, status, len);
+> > @@ -5525,6 +5521,7 @@ static int stmmac_rx(struct stmmac_priv *priv, int limit, u32 queue)
+> >  
+> >  			dma_sync_single_for_cpu(priv->device, buf->addr,
+> >  						buf1_len, dma_dir);
+> > +			prefetch(page_address(buf->page) + buf->page_offset);  
+> 
+> Minor nit: I've seen in other drivers authors using net_prefetch.
+> Probably not worth a re-roll just for something this minor.
+
+After switch to net_prefetch(), I get another 4.5% throughput improvement :)
+Thanks! This definitely worth a v3 of this series.
+
+pw-bot: changes-requested
 
