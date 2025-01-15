@@ -1,56 +1,77 @@
-Return-Path: <netdev+bounces-158556-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158557-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 407FBA12771
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 16:30:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 09BA6A127B4
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 16:41:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 63795162641
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 15:30:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1E337166943
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 15:41:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61994144304;
-	Wed, 15 Jan 2025 15:29:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 703A31487DD;
+	Wed, 15 Jan 2025 15:41:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i/8ApA+w"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="GcQ2FiDE"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E30B1514F6
-	for <netdev@vger.kernel.org>; Wed, 15 Jan 2025 15:29:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1717520326;
+	Wed, 15 Jan 2025 15:41:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736954995; cv=none; b=RrlI8nfReagWZlvwwT6k5vridD0tbi9yVkxCiQMglp0KhrzRuTKtVLDloMU3Za9ykNh2joVFKT/udnydPyE8Bcbi7YC95fWyYzZBCJ6q1Ls69HWwY/hSLVsyxY8heW2GAjW6koSVKihBxH731k0lNOloXOJh+G3AvnfAMdx+5oU=
+	t=1736955685; cv=none; b=OfMU0ISRZbemJIMjZdElRZ/Asd8NWK9exTr85XnxA6ktEr2rWv0QLcC12u9vhSDOYJw1lLE8rO3bslGRK0+twIAAxSCAXAHyaBkSD0KdXaICHs3B9U1k8KRWAyCCbqpI/BZDqMSHaY6c9ve7ohvJVMwuyPjQCP/mDYQtWHzrVGs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736954995; c=relaxed/simple;
-	bh=dvCKF1yfIjbcxWxfj+dDO8xQmJ6jPPh6U/Msz3gPCQw=;
+	s=arc-20240116; t=1736955685; c=relaxed/simple;
+	bh=64NEIoEQ0u1ocA/xyvPJwaz7EyARX4Ime40lVqNGAPU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=J2ihz8Wzz83l/Z+zSHLx/tJUXoi9wB99OTyi/Ni3sb+xqr3/tY1OP1jz6aKt8P7DM1uHBnBkds3+0oIQdBmAx+GqEG6F9k7X4PPJlcYkJIKpdXsIms1lzCP8RW/3m4fKoeHT/qeNdIDQya4d1JQjwHfIPyK91tZbsKj0dQROmWI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i/8ApA+w; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EF3D2C4AF09;
-	Wed, 15 Jan 2025 15:29:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736954994;
-	bh=dvCKF1yfIjbcxWxfj+dDO8xQmJ6jPPh6U/Msz3gPCQw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=i/8ApA+w7Yx+7j1h+/280+106TnwjiHidjw7YGvnRQGhFfQsAps6Pndj8xKpL3MzW
-	 Zk4RwAGqyWrgwZ4MKpV0WeArzfvfwIMvY4+IXxRxyfg6hvbBfWMoqITcFrYxLnYIkA
-	 TRvq8AKb9s0AEeGjmJ8qDVsTBsEdoCgM84A6KiBWWHNDPzaG2GojTRhYFk4ItL8Qsb
-	 6S2Pebw+6f1NkqskttaJkxswfleb+Vz8DlTpsf2TJwBhpF91ySVDwTKLZvosUmQVsF
-	 TsKki9zco4z2PSpaeawDZni7TVdJUqAsBdVOSRIHyzqz+XQn4ENEyliPHrrGYzPBi3
-	 Qpes9q32zY1XQ==
-Date: Wed, 15 Jan 2025 15:29:50 +0000
-From: Simon Horman <horms@kernel.org>
-To: Jiawen Wu <jiawenwu@trustnetic.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, linux@armlinux.org.uk,
-	netdev@vger.kernel.org, mengyuanlou@net-swift.com
-Subject: Re: [PATCH net-next v3 1/2] net: txgbe: Add basic support for new
- AML devices
-Message-ID: <20250115152950.GO5497@kernel.org>
-References: <20250115102408.2225055-1-jiawenwu@trustnetic.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=n1QpAP3oHsw00zk/Wd2aSSyT9GHKYWzkO3etLISXQZDaOMLiErdKU67rTzUHToa91sX+sNb8jiwzRl8XSYf8Gwi2fX7JUCjUWnB0PQrLQpyyrEM/L3YFABmPWoDvnhXX6J3hSLtOQsKYgry6DAq8/mSAwrrgqYlBcbm6KQNkXRI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=GcQ2FiDE; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=93rwv1ansdDHk58RJz190FX82+Zq5smcfY9/6AN7aSk=; b=GcQ2FiDEW8HYURxPpGzlY0Pq3Q
+	hLQtGUkfelCf6nSpZvRZc1vMuKifeVmXqPwAT4m77rl8rtpVlGa+WyvfhE6ajnp19gg7uk/Q9W+Zl
+	MANL7cK+EeqUcaO1GWJr++jBLBxlSkurW4rzQ4/qcU5EYz91LqaKsgUir5frLg/y615uVJ1DF+asB
+	/pE2ns18BFiqIaWAgjEiPVQuCLHpxPL1F3N8+UXBqqDHSOkRHVNSECXhbHwMiYCCy521lMJb/Xlfz
+	mgzuaHZ91zRYwckbWdHj4ElP8kobMkJkZGJVotLc0XYf5oFgakw+uMeaaXuq0z3k1uC8Ly1yfcBAE
+	7K6HrF3A==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:59420)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1tY5W9-0001Lz-0T;
+	Wed, 15 Jan 2025 15:41:17 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1tY5W5-0006Gp-1L;
+	Wed, 15 Jan 2025 15:41:13 +0000
+Date: Wed, 15 Jan 2025 15:41:13 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: netdev@vger.kernel.org, Jose Abreu <Jose.Abreu@synopsys.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Voon Weifeng <weifeng.voon@intel.com>,
+	Michael Sit Wei Hong <michael.wei.hong.sit@intel.com>,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net 2/2] net: pcs: xpcs: actively unset
+ DW_VR_MII_DIG_CTRL1_2G5_EN for 1G SGMII
+Message-ID: <Z4fXGULd-6_rxgRR@shell.armlinux.org.uk>
+References: <20250114164721.2879380-1-vladimir.oltean@nxp.com>
+ <20250114164721.2879380-2-vladimir.oltean@nxp.com>
+ <Z4fJ5FIuotHMZ8fN@shell.armlinux.org.uk>
+ <20250115145145.4jdajfaksyfkx5zh@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,136 +80,128 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250115102408.2225055-1-jiawenwu@trustnetic.com>
+In-Reply-To: <20250115145145.4jdajfaksyfkx5zh@skbuf>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Wed, Jan 15, 2025 at 06:24:07PM +0800, Jiawen Wu wrote:
-> There is a new 40/25/10 Gigabit Ethernet device.
+On Wed, Jan 15, 2025 at 04:51:45PM +0200, Vladimir Oltean wrote:
+> On Wed, Jan 15, 2025 at 02:44:52PM +0000, Russell King (Oracle) wrote:
+> > On Tue, Jan 14, 2025 at 06:47:21PM +0200, Vladimir Oltean wrote:
+> > > xpcs_config_2500basex() sets DW_VR_MII_DIG_CTRL1_2G5_EN, but
+> > > xpcs_config_aneg_c37_sgmii() never unsets it. So, on a protocol change
+> > > from 2500base-x to sgmii, the DW_VR_MII_DIG_CTRL1_2G5_EN bit will remain
+> > > set.
+> > > 
+> > > Fixes: f27abde3042a ("net: pcs: add 2500BASEX support for Intel mGbE controller")
+> > > Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+> > 
+> > Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> > 
+> > Thanks!
+> > 
+> > I wonder whether, now that we have in-band capabilities, and thus
+> > phylink knows whether AN should be enabled or not, whether we can
+> > simplify all these different config functions and rely on the
+> > neg_mode from phylink to configure in-band appropriately.
 > 
-> To support basic functions, PHYLINK is temporarily skipped as it is
-> intended to implement these configurations in the firmware. And the
-> associated link IRQ is also skipped.
+> I don't understand, many sub-functions of xpcs_do_config() use neg_mode
+> already.
 > 
-> And Implement the new SW-FW interaction interface, which use 64 Byte
-> message buffer.
-> 
-> Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
+> If you're talking about replacing compat->an_mode with something derived
+> partially from the neg_mode and partially from state->interface, then in
+> principle yes, sure, but we will need new neg_modes for clause 73
+> auto-negotiation (to replace DW_AN_C73), plus appropriate handling in phylink.
 
-...
+No, I'm thinking that xpcs_config_aneg_c37_sgmii(),
+xpcs_config_aneg_c37_1000basex() and xpcs_config_2500basex() can
+be rolled into a single function.
 
-> diff --git a/drivers/net/ethernet/wangxun/libwx/wx_hw.c b/drivers/net/ethernet/wangxun/libwx/wx_hw.c
 
-...
+	SGMII
+	modify vendor 2 MII_BMCR
+	- clear BMCR_ANENABLE
+	modify vendor 2 DW_VR_MII_AN_CTRL
+	- set DW_VR_MII_PCS_MODE_MASK to 
+	  DW_VR_MII_PCS_MODE_C37_SGMII
+	- configure  DW_VR_MII_TX_CONFIG_MASK for MAC or if txgbe, PHY side
+	- set DW_VR_MII_AN_CTRL_8BIT (if txgbe)
+	modify vendor 2 DW_VR_MII_DIG_CTRL1
+	- set DW_VR_MII_DIG_CTRL1_MAC_AUTO_SW if
+	    PHYLINK_PCS_NEG_INBAND_ENABLED
+	- set DW_VR_MII_DIG_CTRL1_PHY_MODE_CTRL if txgbe
+	write vendor 2 DW_VR_MII_DIG_CTRL1
+	set BMCR_ANENABLE in vendor 2 MII_BMCR if
+	  PHYLINK_PCS_NEG_INBAND_ENABLED
 
-> +static bool wx_poll_fw_reply(struct wx *wx, u32 *buffer,
-> +			     struct wx_hic_hdr *recv_hdr, u8 send_cmd)
-> +{
-> +	u32 dword_len = sizeof(struct wx_hic_hdr) >> 2;
-> +	u32 i;
-> +
-> +	/* read hdr */
-> +	for (i = 0; i < dword_len; i++) {
-> +		buffer[i] = rd32a(wx, WX_FW2SW_MBOX, i);
-> +		le32_to_cpus(&buffer[i]);
-> +	}
-> +
-> +	/* check hdr */
-> +	recv_hdr = (struct wx_hic_hdr *)buffer;
-> +	if (recv_hdr->cmd == send_cmd &&
-> +	    recv_hdr->index == wx->swfw_index)
-> +		return true;
+	1000BASE-X
+	modify vendor 2 MII_BMCR
+	- clear BMCR_ANENABLE
+	modify DW_VR_MII_AN_CTRL
+	- set DW_VR_MII_PCS_MODE_MASK to
+	  DW_VR_MII_PCS_MODE_C37_1000BASEX
+	- set DW_VR_MII_AN_INTR_EN if using interrupts (shouldn't SGMII
+	  also do this?)
+	encode advertisement and write to vendor 2 MII_ADVERTISE
+	clear vendor 2 DW_VR_MII_AN_INTR_STS register (if using
+	interrupts shouldn't this also apply to SGMII?)
+	set BMCR_ANENABLE in vendor 2 MII_BMCR if
+	  PHYLINK_PCS_NEG_INBAND_ENABLED
 
-Hi Jiawen Wu,
+	2500BASE-X
+	modify vendor 2 DW_VR_MII_DIG_CTRL1:
+	- set DW_VR_MII_DIG_CTRL1_2G5_EN
+	- clear DW_VR_MII_DIG_CTRL1_MAC_AUTO_SW
+	modify vendor 2 MII_BMCR:
+	- clear BMCR_ANENABLE, BMCR_SPEED100
+	- set BMCR_SPEED1000
+	(shouldn't this clear BMCR_ANENABLE first, like the other two
+	 configurations above?)
 
-Maybe I am misreading this but, given the way that recv_hdr is
-passed to this function, it seems that the same result would
-he achieved if recv_hdr was a local variable...
+So, sticking this altogether, making some assumptions on the above
+questions, it becomes:
 
-> +
-> +	return false;
-> +}
-> +
-> +static int wx_host_interface_command_r(struct wx *wx, u32 *buffer,
-> +				       u32 length, u32 timeout, bool return_data)
-> +{
-> +	struct wx_hic_hdr *send_hdr = (struct wx_hic_hdr *)buffer;
-> +	u32 hdr_size = sizeof(struct wx_hic_hdr);
-> +	struct wx_hic_hdr *recv_hdr;
-> +	bool busy, reply;
-> +	u32 dword_len;
-> +	u16 buf_len;
-> +	int err = 0;
-> +	u8 send_cmd;
-> +	u32 i;
-> +
-> +	/* wait to get lock */
-> +	might_sleep();
-> +	err = read_poll_timeout(test_and_set_bit, busy, !busy, 1000, timeout * 1000,
-> +				false, WX_STATE_SWFW_BUSY, wx->state);
-> +	if (err)
-> +		return err;
-> +
-> +	/* index to unique seq id for each mbox message */
-> +	send_hdr->index = wx->swfw_index;
-> +	send_cmd = send_hdr->cmd;
-> +
-> +	dword_len = length >> 2;
-> +	/* write data to SW-FW mbox array */
-> +	for (i = 0; i < dword_len; i++) {
-> +		wr32a(wx, WX_SW2FW_MBOX, i, (__force u32)cpu_to_le32(buffer[i]));
-> +		/* write flush */
-> +		rd32a(wx, WX_SW2FW_MBOX, i);
-> +	}
-> +
-> +	/* generate interrupt to notify FW */
-> +	wr32m(wx, WX_SW2FW_MBOX_CMD, WX_SW2FW_MBOX_CMD_VLD, 0);
-> +	wr32m(wx, WX_SW2FW_MBOX_CMD, WX_SW2FW_MBOX_CMD_VLD, WX_SW2FW_MBOX_CMD_VLD);
-> +
-> +	/* polling reply from FW */
-> +	err = read_poll_timeout(wx_poll_fw_reply, reply, reply, 1000, 50000,
-> +				true, wx, buffer, recv_hdr, send_cmd);
-> +	if (err) {
-> +		wx_err(wx, "Polling from FW messages timeout, cmd: 0x%x, index: %d\n",
-> +		       send_cmd, wx->swfw_index);
-> +		goto rel_out;
-> +	}
-> +
-> +	/* expect no reply from FW then return */
-> +	if (!return_data)
-> +		goto rel_out;
-> +
-> +	/* If there is any thing in data position pull it in */
-> +	buf_len = recv_hdr->buf_len;
+	modify vendor 2 MII_BMCR
+	- clear BMCR_ANENABLE
+	modify DW_VR_MII_AN_CTRL
+	- set DW_VR_MII_PCS_MODE_MASK to 
+	  - DW_VR_MII_PCS_MODE_C37_SGMII if using SGMII
+	  - DW_VR_MII_PCS_MODE_C37_1000BASEX if using 1000BASE-X or
+	    2500BASE-X
+	- configure  DW_VR_MII_TX_CONFIG_MASK for MAC or if txgbe, PHY
+	  side
+	- set DW_VR_MII_AN_CTRL_8BIT (if txgbe)
+	- set DW_VR_MII_AN_INTR_EN if using interrupts (shouldn't SGMII
+	  also do this?)
+	modify vendor 2 DW_VR_MII_DIG_CTRL1
+	- set DW_VR_MII_DIG_CTRL1_MAC_AUTO_SW if
+	    PHYLINK_PCS_NEG_INBAND_ENABLED
+	- set DW_VR_MII_DIG_CTRL1_PHY_MODE_CTRL if txgbe
+	encode advertisement and write to vendor 2 MII_ADVERTISE
+	clear vendor 2 DW_VR_MII_AN_INTR_STS register
+	set BMCR_ANENABLE in vendor 2 MII_BMCR if
+	  PHYLINK_PCS_NEG_INBAND_ENABLED
 
-... and most likely related, recv_hdr appears to be uninitialised here.
+Which would avoid variability in register values when phylink
+transitions the PCS between SGMII, 1000base-X and 2500base-X that
+will occur today - e.g., when switching from either SGMII or
+1000base-X to 2500base-X, then the following register fields do
+not get written and are left how they were last configured:
 
-This part is flagged by W=1 builds with clang-19, and my Smatch.
+	DW_VR_MII_AN_CTRL at all
+	DW_VR_MII_PCS_MODE_MASK
+	DW_VR_MII_TX_CONFIG_MASK
+	DW_VR_MII_AN_CTRL_8BIT
+	DW_VR_MII_DIG_CTRL1_PHY_MODE_CTRL
 
-> +	if (buf_len == 0)
-> +		goto rel_out;
-> +
-> +	if (length < buf_len + hdr_size) {
-> +		wx_err(wx, "Buffer not large enough for reply message.\n");
-> +		err = -EFAULT;
-> +		goto rel_out;
-> +	}
-> +
-> +	/* Calculate length in DWORDs, add 3 for odd lengths */
-> +	dword_len = (buf_len + 3) >> 2;
-> +	for (i = hdr_size >> 2; i <= dword_len; i++) {
-> +		buffer[i] = rd32a(wx, WX_FW2SW_MBOX, i);
-> +		le32_to_cpus(&buffer[i]);
-> +	}
-> +
-> +rel_out:
-> +	/* index++, index replace wx_hic_hdr.checksum */
-> +	if (send_hdr->index == WX_HIC_HDR_INDEX_MAX)
-> +		wx->swfw_index = 0;
-> +	else
-> +		wx->swfw_index = send_hdr->index + 1;
-> +
-> +	clear_bit(WX_STATE_SWFW_BUSY, wx->state);
-> +	return err;
-> +}
+For example, switching from SGMII to 2500base-X, the
+DW_VR_MII_PCS_MODE_MASK field will be left as
+DW_VR_MII_PCS_MODE_C37_SGMII, but if switching from 1000base-X to
+2500base-X, it will be DW_VR_MII_PCS_MODE_C37_1000BASEX.
 
-...
+Maybe it doesn't matter, because maybe setting
+DW_VR_MII_DIG_CTRL1_2G5_EN overrides a whole host of register
+configuration?
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
