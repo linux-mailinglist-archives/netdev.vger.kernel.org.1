@@ -1,58 +1,114 @@
-Return-Path: <netdev+bounces-158658-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158659-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C516A12E14
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 23:06:36 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 934B4A12E17
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 23:07:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2ED7E1889A67
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 22:06:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2C9643A5F41
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 22:06:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3300A1DACB8;
-	Wed, 15 Jan 2025 22:06:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FA1E1D935A;
+	Wed, 15 Jan 2025 22:06:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YVSU6PHR"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="CwZbpjjL"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0803114B959;
-	Wed, 15 Jan 2025 22:06:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4AB91D90B3;
+	Wed, 15 Jan 2025 22:06:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736978791; cv=none; b=b+opEFiG5B2NKW2o9QxvCp2VUiCzmjgc9Se1U6TWnG0zVOWJUsMpaxEQ0jftYVJO4vYZc/5WVicdQ2PuhYW6Q4hglunBR2yYiyTrjEiXp/ZiGUVxOncIgB9QT9eDlcHZRw+GDLNaKJ/XajNTZJds15lP6fFuf7pNWfdYnLWMB34=
+	t=1736978819; cv=none; b=tJawk86f2c1l4ghMD90A5BDgkrCQvOZcj7597m+ErHnGWnF5fq0C68+bhR44pXWusmy03cX+mmgdwUu3+xnqxflS5L7u4XUFi0Qk+Jh3vYw3AKJ+c/d5/LvCaGOr9YNPCPHGjKbrj3oULQvXPRF5ajy1VVpC8PM081bvAAZMBi0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736978791; c=relaxed/simple;
-	bh=OrqNIeP5Lsyj0QQbwXP6V6pMaJ3YCATIJ7eT3LsJKjY=;
+	s=arc-20240116; t=1736978819; c=relaxed/simple;
+	bh=nm9E0p4LIeGTehuGx5B4Bv0XymvRys2UeFjSk72px2o=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=W6P3j+LuFmgMfJI4ynacHK39CsQzXSLS88HgCih/ZMwqyEminTbtKymJEYgo7dTG9NDvkjYlVx0+oLcxiMgq0trtOoAutDR+d9u7H8ZuDdT6I0OzJVzRtBzoEkWOcFkRt33Fv92M4PHhCUewpTt4FHwYdjm9xQKWDx7ik9CW1Rc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YVSU6PHR; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A8C8C4CED1;
-	Wed, 15 Jan 2025 22:06:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736978790;
-	bh=OrqNIeP5Lsyj0QQbwXP6V6pMaJ3YCATIJ7eT3LsJKjY=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=YVSU6PHRIDStXuNKnHl2KTyfrHshzJEZShltiqasWXphcmY5a9+nupHRYSsDGASgX
-	 kWFIKZ29qq1Fi4qfjTZlQ3sbyS77iCrSU+pIMqUQVKW4mRGVsDU9HoNyhZw+i/g4p9
-	 HNw0n9QWcLgjnMiKAdp1YjQdJgSaXnyzwHSK0sDG3T3ErDqVODVYcStboqRNCnv59l
-	 Tn+QCotMBhpycvQrKgS4/Zx1RicI8ZGVygB8bWJfUtCkIHXPEV/t23VP477kGD8l9P
-	 rn57XY6MIQqoXm6yY5atramIWE9xDWLXH+oiyqbwT3GqZuYARmhJGkYXFTvjdBVVdJ
-	 DCerY39s2kFIQ==
-Date: Wed, 15 Jan 2025 14:06:29 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Yeking@Red54.com
-Cc: arnd@arndb.de, davem@davemloft.net, edumazet@google.com,
- gregkh@linuxfoundation.org, horms@kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, pabeni@redhat.com, prarit@redhat.com,
- vkuznets@redhat.com
-Subject: Re: [PATCH net v2] net: appletalk: Drop aarp_send_probe_phase1()
-Message-ID: <20250115140629.1c37c8a2@kernel.org>
-In-Reply-To: <tencent_EE9140075A979E58EBB03FA7E7DEF6831F07@qq.com>
-References: <20250110182435.6b811abe@kernel.org>
-	<tencent_EE9140075A979E58EBB03FA7E7DEF6831F07@qq.com>
+	 MIME-Version:Content-Type; b=UqSSTrGi9DgtnHooMxNW83xFxwyLw1pJakrkaJUQ1A+F8Y8MesMK6QQVuQeY+D9/tZBBKyHbN0S9iJB7XZMdRqB4qAOMfzXTiyD0lxFgdYQZ+/vQsvPK4M05i1538Na1GDuPcqKLssEpCb7HJLnjX9Az/1OarUm/y3gNQaam3YE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=CwZbpjjL; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50FHX4qq024412;
+	Wed, 15 Jan 2025 22:06:51 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=urlAdT
+	ys7/q8kAgE4YVyR4Fc4aIGBxgImaHxBvJDnGg=; b=CwZbpjjL05q0+XfUZouy2v
+	6CLiLeMsRx3RYq+9auDxMtuvZqalFluwDirS+/5l/CPdYEnNUe6HRc2EzMFjDcAM
+	CD/0kGjOt/Gn+3TKUCjL0K0gAE33JoZqu/vmvfizplhaG4DbR7sdqYjCwzXtHVx2
+	JxbDHqw2m/P9NKxjaWrnF2xUj73clZPT75SAUo1iCTe8kvSx1uYkY+aA1FdSJ3l2
+	HxIs2hfE9+IioqRgiJUhz5b/FmTajTMkDyLxck4JZOBTJvFXrYodNDamExtQuP+g
+	G4kQvNoL+8toQc0YZoKhIO+2pJzq4ioc0uuaDmlAaG73ZPpakUpLn/O/YmfC/ibw
+	==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44622hwh5m-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 15 Jan 2025 22:06:50 +0000 (GMT)
+Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 50FM6o2t010430;
+	Wed, 15 Jan 2025 22:06:50 GMT
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44622hwh5j-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 15 Jan 2025 22:06:50 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 50FJ4t8P000881;
+	Wed, 15 Jan 2025 22:06:49 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 44456k2dem-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 15 Jan 2025 22:06:49 +0000
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 50FM6j5S34275598
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 15 Jan 2025 22:06:45 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id C75BE2004F;
+	Wed, 15 Jan 2025 22:06:45 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 53C7C2004E;
+	Wed, 15 Jan 2025 22:06:44 +0000 (GMT)
+Received: from li-ce58cfcc-320b-11b2-a85c-85e19b5285e0 (unknown [9.171.34.169])
+	by smtpav07.fra02v.mail.ibm.com (Postfix) with SMTP;
+	Wed, 15 Jan 2025 22:06:44 +0000 (GMT)
+Date: Wed, 15 Jan 2025 23:06:42 +0100
+From: Halil Pasic <pasic@linux.ibm.com>
+To: Alexandra Winter <wintera@linux.ibm.com>
+Cc: Wenjia Zhang <wenjia@linux.ibm.com>, Jan Karcher <jaka@linux.ibm.com>,
+        Gerd Bayer <gbayer@linux.ibm.com>,
+        "D. Wythe" <alibuda@linux.alibaba.com>,
+        Tony Lu <tonylu@linux.alibaba.com>, Wen Gu <guwen@linux.alibaba.com>,
+        Peter
+ Oberparleiter <oberpar@linux.ibm.com>,
+        David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Eric
+ Dumazet <edumazet@google.com>,
+        Andrew Lunn <andrew+netdev@lunn.ch>,
+        Julian
+ Ruess <julianr@linux.ibm.com>,
+        Niklas Schnelle <schnelle@linux.ibm.com>,
+        Thorsten Winkler <twinkler@linux.ibm.com>, netdev@vger.kernel.org,
+        linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
+        Vasily
+ Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Sven Schnelle
+ <svens@linux.ibm.com>, Simon Horman <horms@kernel.org>,
+        Halil Pasic
+ <pasic@linux.ibm.com>
+Subject: Re: [RFC net-next 4/7] net/ism: Add kernel-doc comments for ism
+ functions
+Message-ID: <20250115230642.0fe21fb1.pasic@linux.ibm.com>
+In-Reply-To: <20250115195527.2094320-5-wintera@linux.ibm.com>
+References: <20250115195527.2094320-1-wintera@linux.ibm.com>
+	<20250115195527.2094320-5-wintera@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,23 +116,31 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: lnsDvFPvhzIHeYnksvk7M6uFuLxXxoN6
+X-Proofpoint-ORIG-GUID: m6BHoGvvCq3CWH1C5sdDrkrbZxD6JIB4
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-01-15_09,2025-01-15_02,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 clxscore=1011
+ impostorscore=0 bulkscore=0 lowpriorityscore=0 phishscore=0 suspectscore=0
+ priorityscore=1501 mlxlogscore=773 malwarescore=0 adultscore=0 mlxscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2411120000
+ definitions=main-2501150157
 
-On Mon, 13 Jan 2025 09:44:51 +0000 Yeking@Red54.com wrote:
->  void aarp_probe_network(struct atalk_iface *atif)
->  {
-> -	if (atif->dev->type == ARPHRD_LOCALTLK ||
-> -	    atif->dev->type == ARPHRD_PPP)
-> -		aarp_send_probe_phase1(atif);
-> -	else {
-> +	if (atif->dev->type != ARPHRD_LOCALTLK &&
-> +	    atif->dev->type != ARPHRD_PPP) {
->  		unsigned int count;
+On Wed, 15 Jan 2025 20:55:24 +0100
+Alexandra Winter <wintera@linux.ibm.com> wrote:
 
-You assert this is our only option, so why leave the if () around 
-at all?
+> Note that in this RFC this patch is not complete, future versions
+> of this patch need to contain comments for all ism_ops.
+> Especially signal_event() and handle_event() need a good generic
+> description.
 
-nit: subject prefix should be "PATCH net-next v2"
--- 
-pw-bot: cr
+Such notes don't belong to the commit message, but to the inline cover
+letter IMHO.
+
+> 
+> Signed-off-by: Alexandra Winter <wintera@linux.ibm.com>
+> ---
 
