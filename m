@@ -1,157 +1,114 @@
-Return-Path: <netdev+bounces-158353-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158352-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B4F2A1177B
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 03:51:07 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70E95A11779
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 03:50:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F04947A069F
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 02:50:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1EB411889023
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 02:50:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F054B14D430;
-	Wed, 15 Jan 2025 02:51:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E094E14B946;
+	Wed, 15 Jan 2025 02:50:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="vu7T6gYc"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ro8Q5VSG"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14E132D600;
-	Wed, 15 Jan 2025 02:50:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC4F5846D
+	for <netdev@vger.kernel.org>; Wed, 15 Jan 2025 02:50:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736909460; cv=none; b=Fh+QrwyimEhBP9u8jkavGd8aoP66rI7TCRoR7ts/evZCB8HpuBkFh1o7xppYnBslPuvVkETEqJYs28zig7zE9l+PktVmjAUT/wWo4guiX8QIaXNKjgyZzbXFilFKoE2ioFHj7yfhL20xAvWtbhz3pC64wDXC8kIotYjdoo9cFcw=
+	t=1736909412; cv=none; b=FK+cm9ps1binm0Pitb3JDpSAP+6WS5kBQr7y4StdHG4dE8rxhnq55kAIjj5dsRzXZ0uk1WZyOtTmhRDImShpw9xyU+9FPILl0dZWJ9Q+UMGNIS9lFGDArsdYotYrLOp4lN1lPUYhLmfAscZuKx0OzOnKSis9fW9nX9yJAKxWcvU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736909460; c=relaxed/simple;
-	bh=k+VcSSRYDW6G1ONdmDMR75pcGEaFM85covYOckH3vKA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=K5LzUMR2z1kWCm/wcQkpfLBuj0sdDImoQkSI9OxOzHqt2lx/dTSQDghV5z6AfonYcm8HBmAiEqu7Dy2N+habKUZFsQEuLkdx9E9ynCmnpEQCEcQ9syrNvjVGchYTTBm7gH0cKm4G6IyWaaRMKEj3jASvLyDSDMA889hNEqxjBXA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=vu7T6gYc; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=x5wCmHhsGS0A1OidXlTesaZoOIKeXQZp/eLun9Bsv/I=; b=vu7T6gYc4hXzdL8Iez/4QN7MNs
-	fFxXInsV47fKLh9GUknptzB0Q0Tc6qa+ohoSVjvpboq3uJC97AhE+APE1GJDFpBWGOFv3fo+xKEEC
-	6Ryr3ScXSXJ7zF9tIBZexgp0pUwYAziH/9j8VmDDw+dLlIx3ZxuzozsxPy7D6J/tNuVA=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tXtUH-004e9t-Pq; Wed, 15 Jan 2025 03:50:33 +0100
-Date: Wed, 15 Jan 2025 03:50:33 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Daniel Golle <daniel@makrotopia.org>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net] net: phy: realtek: clear status if link is down
-Message-ID: <7dd12859-dd20-4ce1-a877-4c93b335b911@lunn.ch>
-References: <229e077bad31d1a9086426f60c3a4f4ac20d2c1a.1736901813.git.daniel@makrotopia.org>
+	s=arc-20240116; t=1736909412; c=relaxed/simple;
+	bh=XZnxBk+FcFoHxx191qImvZNg7w+IyFMnBMHTXx6L5ZE=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=aQDaemVJPGr6DiOMVw2/b8p714ZGA5UX2hVY6poo6aTWMj5PohPRO/Htx24jB4pkpoAqqcUZM0UZ5AENMFSH2KLhswbSh5XVDOpXExbbg4p7wYyKN7Nbl32RLYbEIynDlowUSE8SdfOFOVR/FRGxSMLHTXPdRpBnBByJwLP1IC4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ro8Q5VSG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3C91EC4CEDD;
+	Wed, 15 Jan 2025 02:50:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1736909412;
+	bh=XZnxBk+FcFoHxx191qImvZNg7w+IyFMnBMHTXx6L5ZE=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=ro8Q5VSGF3ozPz8UtYtwIDdO3bUq+DZXh2zvyVFoMzBbsLYiAfm0Vhyg06qEZ6YAm
+	 hUU7XtQe6frBDOBahLq5YkoW0eCCXPnnQrKvt9HrlyJ7sADGmfRjJyL84Y7sVoDhEY
+	 xyeLkf5MwkMqaeLR2neatqE0uO95H+6LLQotiMElQEwL2hd20j4CxXyRxVq6b1CFhv
+	 1BDnko5EJzTjyqnD38D9cijquhOAfRudMIUk62JMZc55P0HJvHJCJ95c4bshAwlSYQ
+	 YWsmpNQDzQyrO8HcMLjOlVmpNMEoRPRe0QH71rBohz9nhmnTjuCtVBYevmCab+XFwS
+	 c5TgBbBqAT9Ng==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 34A5F380AA5F;
+	Wed, 15 Jan 2025 02:50:36 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <229e077bad31d1a9086426f60c3a4f4ac20d2c1a.1736901813.git.daniel@makrotopia.org>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next 0/9] net: stmmac: further EEE cleanups (and one fix!)
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <173690943498.230797.5869251402223823826.git-patchwork-notify@kernel.org>
+Date: Wed, 15 Jan 2025 02:50:34 +0000
+References: <Z4T84SbaC4D-fN5y@shell.armlinux.org.uk>
+In-Reply-To: <Z4T84SbaC4D-fN5y@shell.armlinux.org.uk>
+To: Russell King (Oracle) <linux@armlinux.org.uk>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, alexandre.torgue@foss.st.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ ericwouds@gmail.com, kuba@kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-stm32@st-md-mailman.stormreply.com, mcoquelin.stm32@gmail.com,
+ netdev@vger.kernel.org, pabeni@redhat.com
 
-On Wed, Jan 15, 2025 at 12:46:11AM +0000, Daniel Golle wrote:
-> Clear speed, duplex and master/slave status in case the link is down
-> to avoid reporting bogus link(-partner) properties.
+Hello:
+
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Mon, 13 Jan 2025 11:45:37 +0000 you wrote:
+> Hi,
 > 
-> Fixes: 5cb409b3960e ("net: phy: realtek: clear 1000Base-T link partner advertisement")
-> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
-> ---
->  drivers/net/phy/realtek.c | 20 ++++++++++++++------
->  1 file changed, 14 insertions(+), 6 deletions(-)
+> This series continues the EEE cleanup of the stmmac driver, and
+> includes one fix.
 > 
-> diff --git a/drivers/net/phy/realtek.c b/drivers/net/phy/realtek.c
-> index f65d7f1f348e..3f0e03e2abce 100644
-> --- a/drivers/net/phy/realtek.c
-> +++ b/drivers/net/phy/realtek.c
-> @@ -720,8 +720,12 @@ static int rtlgen_read_status(struct phy_device *phydev)
->  	if (ret < 0)
->  		return ret;
->  
-> -	if (!phydev->link)
-> +	if (!phydev->link) {
-> +		phydev->duplex = DUPLEX_UNKNOWN;
-> +		phydev->master_slave_state = MASTER_SLAVE_STATE_UNKNOWN;
-> +		phydev->speed = SPEED_UNKNOWN;
->  		return 0;
-> +	}
->  
+> As mentioned in the previous series, I wasn't entirely happy with the
+> "stmmac_disable_sw_eee_mode" name, so the first patch renames this to
+> "stmmac_stop_sw_lpi" instead, which I think better describes what this
+> function is doing - stopping the transmit of the LPI state because we
+> have a packet ot send.
+> 
+> [...]
 
-I must be missing something here...
+Here is the summary with links:
+  - [net-next,1/9] net: stmmac: rename stmmac_disable_sw_eee_mode()
+    https://git.kernel.org/netdev/net-next/c/900782a029e5
+  - [net-next,2/9] net: stmmac: correct priv->eee_sw_timer_en setting
+    https://git.kernel.org/netdev/net-next/c/4fe09a0d64d5
+  - [net-next,3/9] net: stmmac: simplify TX cleanup decision for ending sw LPI mode
+    https://git.kernel.org/netdev/net-next/c/bfa9e131c9b2
+  - [net-next,4/9] net: stmmac: check priv->eee_sw_timer_en in suspend path
+    https://git.kernel.org/netdev/net-next/c/c920e6402523
+  - [net-next,5/9] net: stmmac: add stmmac_try_to_start_sw_lpi()
+    https://git.kernel.org/netdev/net-next/c/0cf44bd0c118
+  - [net-next,6/9] net: stmmac: provide stmmac_eee_tx_busy()
+    https://git.kernel.org/netdev/net-next/c/82f2025dda76
+  - [net-next,7/9] net: stmmac: provide function for restarting sw LPI timer
+    https://git.kernel.org/netdev/net-next/c/af5dc22bdb5f
+  - [net-next,8/9] net: stmmac: combine stmmac_enable_eee_mode()
+    https://git.kernel.org/netdev/net-next/c/ec8553673b1f
+  - [net-next,9/9] net: stmmac: restart LPI timer after cleaning transmit descriptors
+    https://git.kernel.org/netdev/net-next/c/d28e89244978
 
-
-rtlgen_read_status() first calls genphy_read_status(phydev);
-
-
-int genphy_read_status(struct phy_device *phydev)
-{
-	int err, old_link = phydev->link;
-
-	/* Update the link, but return if there was an error */
-	err = genphy_update_link(phydev);
-	if (err)
-		return err;
-
-	/* why bother the PHY if nothing can have changed */
-	if (phydev->autoneg == AUTONEG_ENABLE && old_link && phydev->link)
-		return 0;
-
-	phydev->master_slave_get = MASTER_SLAVE_CFG_UNSUPPORTED;
-	phydev->master_slave_state = MASTER_SLAVE_STATE_UNSUPPORTED;
-	phydev->speed = SPEED_UNKNOWN;
-	phydev->duplex = DUPLEX_UNKNOWN;
-	phydev->pause = 0;
-	phydev->asym_pause = 0;
-
-Why is that not sufficient ?
-
->  	val = phy_read_paged(phydev, 0xa43, 0x12);
->  	if (val < 0)
-> @@ -1028,11 +1032,11 @@ static int rtl822x_c45_read_status(struct phy_device *phydev)
->  		return ret;
->  
->  	if (phydev->autoneg == AUTONEG_DISABLE ||
-> -	    !genphy_c45_aneg_done(phydev))
-> +	    !genphy_c45_aneg_done(phydev) ||
-> +	    !phydev->link) {
->  		mii_stat1000_mod_linkmode_lpa_t(phydev->lp_advertising, 0);
-> -
-> -	/* Vendor register as C45 has no standardized support for 1000BaseT */
-> -	if (phydev->autoneg == AUTONEG_ENABLE) {
-> +	} else {
-> +		/* Vendor register as C45 has no standardized support for 1000BaseT */
->  		val = phy_read_mmd(phydev, MDIO_MMD_VEND2,
->  				   RTL822X_VND2_GANLPAR);
->  		if (val < 0)
-> @@ -1041,8 +1045,12 @@ static int rtl822x_c45_read_status(struct phy_device *phydev)
->  		mii_stat1000_mod_linkmode_lpa_t(phydev->lp_advertising, val);
->  	}
->  
-> -	if (!phydev->link)
-> +	if (!phydev->link) {
-> +		phydev->duplex = DUPLEX_UNKNOWN;
-> +		phydev->master_slave_state = MASTER_SLAVE_STATE_UNKNOWN;
-> +		phydev->speed = SPEED_UNKNOWN;
->  		return 0;
-> +	}
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-rtl822x_c45_read_status() calls genphy_c45_read_link() which again
-clears state from phydev.
-
-	Andrew
 
