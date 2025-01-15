@@ -1,137 +1,123 @@
-Return-Path: <netdev+bounces-158390-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158391-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 63AF3A11961
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 06:58:33 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8EB6EA11966
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 07:01:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9B53C7A1EB8
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 05:58:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B458316731C
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 06:01:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 844DC22E419;
-	Wed, 15 Jan 2025 05:58:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 028E71E572F;
+	Wed, 15 Jan 2025 06:01:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Nh7ydqTO"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iW+YR61Q"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9CB929A5;
-	Wed, 15 Jan 2025 05:58:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E24483CD2
+	for <netdev@vger.kernel.org>; Wed, 15 Jan 2025 06:01:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736920706; cv=none; b=sXED4UnNLuo7BSSkM8DRl8a/2RMzQcHKViOh0LIlLagskGA8WP41UnyOpQFvbv3WWWk08/kX7PPVdWIhmhIUXTYc0pa1k6XF2qBJD2qkckPMI4naTawI6LGpdH+jpT5rM0EPF1ztnXoJurwxk3d2TwaZqtn0LdchoZOl8B577kA=
+	t=1736920899; cv=none; b=PMZ90aJLDGJDqHypWzLTTwuaxhNOvXFysWWk3h/179IW+CjweLXcJX7AOliRRFMfBXcLdigkr374aH8YrndRN8Z6c7FXlzdpsIQEYEJTxFe4QhvyjtOSoRpJS+wqqfFCsfs0Y+WASZbtiivuL9mS0So42LzuMddJMfIw7sZzgJs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736920706; c=relaxed/simple;
-	bh=ee7/cU8Rh7hsiv0IFSWaCv5xbg/nU6TL/m27ZjUv5WQ=;
+	s=arc-20240116; t=1736920899; c=relaxed/simple;
+	bh=yGZ+VrltVnZcAleYWtfVGTO7Qw8orcy/1CeZXPK80zo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=A0iuRH1051dT1ayXxfmX2tJ9F6pfOmh+OlDCHvm1LTaTzC3f8wQUyTtqR/cswC0hToUavrKoHjcZoOyGVlu+kuote1jQ0jIfFnRK4a0xmzoENSMZ8xrlN9pRJDWeV6SeZfeW1IYjYQrL8kOvpwtnmW02VIyW2X5NOq6ncWE0Roc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Nh7ydqTO; arc=none smtp.client-ip=192.198.163.13
+	 Content-Type:Content-Disposition:In-Reply-To; b=E6QAaEWxVxcGmVmkKvIjOZf9EJYDPFdnFTLg0fMUbUDuweFO4tcraa6PCwhW+gJeXxcsMUT1eCj6AzvW62v2ke0/ogANzqyjNAwW4UG5EBJkKh4pgMePi1LrFV/Xwd6OpT6uRm7sq1G45t11TRiucLOj1H3/aFO7uqVruqwtlFU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iW+YR61Q; arc=none smtp.client-ip=192.198.163.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1736920705; x=1768456705;
+  t=1736920898; x=1768456898;
   h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=ee7/cU8Rh7hsiv0IFSWaCv5xbg/nU6TL/m27ZjUv5WQ=;
-  b=Nh7ydqTO0TRcbvOhgXwJTJBsBlAX3Lps1iU6NU37xt7v5i7lJyUXLajX
-   llU3umM40hvhjyBFcklTOFLnm8qiPBl1F6FFlv+tmfQCfyOyK7ZVZTQU4
-   +1YC25vF01aVtLIcLX32DVgLcORmUovAKt8xaxglE+CjsfNQSu7mzJ9fy
-   ZysgfXD1LrYfoDvhNKcRA2rn0mAlKtADXzkv+TyGja39kKrgB8thWsp41
-   ZHamnA68BDX14MV0piEV1+ey9quP3rxOfQ9wriZAf6Ko10N4vG4E8Zbjw
-   GRpEMh3U8qJ/AN/NljeAjiWrd8exsSDV2N+EL4SJP6trB2YKnxRmOagYI
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=yGZ+VrltVnZcAleYWtfVGTO7Qw8orcy/1CeZXPK80zo=;
+  b=iW+YR61QM8RlbtiYHF4utyrdrvGVfaJX9HNixiEC1Joim9dYC3gd8ZGZ
+   B8NCxOYs2ovQfgxEDB/8ivMeKAJb/8Y5suU8GaakCK5TkfrhjnnBFTIxI
+   5pe6Gcskvvuy7NClXIRx5EH3sV/zDiZiJLMbcPdBzVS0DRLKOsnnWvNTp
+   wd3jM5Q5ezPyh03UdalyoHXE1vTHGJ0qHKrr3vCrNhueYqRY3kXhbj0ca
+   QlD9Hlt2MSiTnivxYv6tvLpQbDaGBuxDp2wlHwAagU2CfEunvTFb+SqT1
+   SLT6EaQPOcbua+0h2sZFgGHq01YNGAi/+w1R690qcOPrX3H2k2dp6qjAP
    w==;
-X-CSE-ConnectionGUID: mtb1M9prQwSZQiXbKji7ow==
-X-CSE-MsgGUID: NqKSFYPVTyu2fg1hxyHsRw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11315"; a="40053090"
+X-CSE-ConnectionGUID: Tv2XSmkYRsSO993kCStQ4Q==
+X-CSE-MsgGUID: 1dku/K6+Rf2Ucq35fCeNFg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11315"; a="62611742"
 X-IronPort-AV: E=Sophos;i="6.12,316,1728975600"; 
-   d="scan'208";a="40053090"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jan 2025 21:58:24 -0800
-X-CSE-ConnectionGUID: Z/y2dthoQ62/tnmXEbvudg==
-X-CSE-MsgGUID: 8WCvsK4hT1+UlRAsc8mHvQ==
+   d="scan'208";a="62611742"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jan 2025 22:01:38 -0800
+X-CSE-ConnectionGUID: +pTEnyUnQp6ujySwGk4hxQ==
+X-CSE-MsgGUID: PFlfPyPHRRmny59n4LnLrQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.12,316,1728975600"; 
-   d="scan'208";a="105627746"
+   d="scan'208";a="104998001"
 Received: from mev-dev.igk.intel.com ([10.237.112.144])
-  by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jan 2025 21:58:21 -0800
-Date: Wed, 15 Jan 2025 06:55:01 +0100
+  by fmviesa007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jan 2025 22:01:35 -0800
+Date: Wed, 15 Jan 2025 06:58:19 +0100
 From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: Dheeraj Reddy Jonnalagadda <dheeraj.linuxdev@gmail.com>
-Cc: anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
-	piotr.kwapulinski@intel.com, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 net-next] ixgbe: Fix endian handling for ACI
- descriptor registers
-Message-ID: <Z4dNkNLkQlSPA/SA@mev-dev.igk.intel.com>
-References: <20250115034117.172999-1-dheeraj.linuxdev@gmail.com>
+To: Michael Chan <michael.chan@broadcom.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, andrew+netdev@lunn.ch,
+	pavan.chebbi@broadcom.com, andrew.gospodarek@broadcom.com,
+	somnath.kotur@broadcom.com, David Wei <dw@davidwei.uk>
+Subject: Re: [PATCH net-next 08/10] bnxt_en: Reallocate Rx completion ring
+ for TPH support
+Message-ID: <Z4dOe6xxfvt9gB4K@mev-dev.igk.intel.com>
+References: <20250113063927.4017173-1-michael.chan@broadcom.com>
+ <20250113063927.4017173-9-michael.chan@broadcom.com>
+ <Z4TQK4pSFJd0y1Jd@mev-dev.igk.intel.com>
+ <CACKFLimyogEMB4n9hJs2W+2=MB2iN3DWh1wXsfT9UWpzeKQqcQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20250115034117.172999-1-dheeraj.linuxdev@gmail.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CACKFLimyogEMB4n9hJs2W+2=MB2iN3DWh1wXsfT9UWpzeKQqcQ@mail.gmail.com>
 
-On Wed, Jan 15, 2025 at 09:11:17AM +0530, Dheeraj Reddy Jonnalagadda wrote:
-> The ixgbe driver was missing proper endian conversion for ACI descriptor
-> register operations. Add the necessary conversions when reading and
-> writing to the registers.
+On Tue, Jan 14, 2025 at 01:42:42PM -0800, Michael Chan wrote:
+> On Mon, Jan 13, 2025 at 12:38 AM Michal Swiatkowski
+> <michal.swiatkowski@linux.intel.com> wrote:
+> >
+> > On Sun, Jan 12, 2025 at 10:39:25PM -0800, Michael Chan wrote:
+> > > From: Somnath Kotur <somnath.kotur@broadcom.com>
+> > > @@ -15669,11 +15689,13 @@ static int bnxt_queue_stop(struct net_device *dev, void *qmem, int idx)
+> > >       cancel_work_sync(&rxr->bnapi->cp_ring.dim.work);
+> > >       bnxt_hwrm_rx_ring_free(bp, rxr, false);
+> > >       bnxt_hwrm_rx_agg_ring_free(bp, rxr, false);
+> > > -     rxr->rx_next_cons = 0;
+> > Unrelated?
 > 
-> Fixes: 46761fd52a88 ("ixgbe: Add support for E610 FW Admin Command Interface")
-> Closes: https://scan7.scan.coverity.com/#/project-view/52337/11354?selectedIssue=1602757
-> Signed-off-by: Dheeraj Reddy Jonnalagadda <dheeraj.linuxdev@gmail.com>
-> ---
-> Changelog
+> This line is unneeded.  It gets overwritten by the clone during
+> queue_start().  We remove it since we are making related changes in
+> this function.  I'll add a comment about this in the Changelog.
+> Thanks.
+
+Sure, thanks.
+
 > 
-> v2:
-> 	- Updated the patch to include suggested fix
-> 	- Updated the commit message to describe the issue
-> 
->  drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
-> index 683c668672d6..3b9017e72d0e 100644
-> --- a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
-> +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
-> @@ -113,7 +113,7 @@ static int ixgbe_aci_send_cmd_execute(struct ixgbe_hw *hw,
->  
->  	/* Descriptor is written to specific registers */
->  	for (i = 0; i < IXGBE_ACI_DESC_SIZE_IN_DWORDS; i++)
-> -		IXGBE_WRITE_REG(hw, IXGBE_PF_HIDA(i), raw_desc[i]);
-> +		IXGBE_WRITE_REG(hw, IXGBE_PF_HIDA(i), cpu_to_le32(raw_desc[i]));
->  
->  	/* SW has to set PF_HICR.C bit and clear PF_HICR.SV and
->  	 * PF_HICR_EV
-> @@ -145,7 +145,7 @@ static int ixgbe_aci_send_cmd_execute(struct ixgbe_hw *hw,
->  	if ((hicr & IXGBE_PF_HICR_SV)) {
->  		for (i = 0; i < IXGBE_ACI_DESC_SIZE_IN_DWORDS; i++) {
->  			raw_desc[i] = IXGBE_READ_REG(hw, IXGBE_PF_HIDA(i));
-> -			raw_desc[i] = raw_desc[i];
-> +			raw_desc[i] = le32_to_cpu(raw_desc[i]);
->  		}
->  	}
->  
-> @@ -153,7 +153,7 @@ static int ixgbe_aci_send_cmd_execute(struct ixgbe_hw *hw,
->  	if ((hicr & IXGBE_PF_HICR_EV) && !(hicr & IXGBE_PF_HICR_C)) {
->  		for (i = 0; i < IXGBE_ACI_DESC_SIZE_IN_DWORDS; i++) {
->  			raw_desc[i] = IXGBE_READ_REG(hw, IXGBE_PF_HIDA_2(i));
-> -			raw_desc[i] = raw_desc[i];
-> +			raw_desc[i] = le32_to_cpu(raw_desc[i]);
->  		}
->  	}
->  
-> -- 
-> 2.34.1
-> 
-Thanks for fixing it
-Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+> >
+> > >       page_pool_disable_direct_recycling(rxr->page_pool);
+> > >       if (bnxt_separate_head_pool())
+> > >               page_pool_disable_direct_recycling(rxr->head_pool);
+> > >
+> > > +     bnxt_hwrm_cp_ring_free(bp, rxr->rx_cpr);
+> > > +     bnxt_clear_one_cp_ring(bp, rxr->rx_cpr);
+> > > +
+> > >       memcpy(qmem, rxr, sizeof(*rxr));
+> > >       bnxt_init_rx_ring_struct(bp, qmem);
+> > >
+> >
+> > Rest looks fine:
+> > Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+
+
 
