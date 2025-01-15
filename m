@@ -1,100 +1,182 @@
-Return-Path: <netdev+bounces-158333-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158334-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 147E7A116B4
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 02:38:22 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 167D0A116B5
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 02:40:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B586F3A816A
-	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 01:38:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 24E4F16179C
+	for <lists+netdev@lfdr.de>; Wed, 15 Jan 2025 01:40:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C67AC6F2F2;
-	Wed, 15 Jan 2025 01:38:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 513DC38FAD;
+	Wed, 15 Jan 2025 01:40:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nJy1jSyl"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uas6dGNi"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A24331805E
-	for <netdev@vger.kernel.org>; Wed, 15 Jan 2025 01:38:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23FA635976;
+	Wed, 15 Jan 2025 01:40:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736905087; cv=none; b=sFVJdwWSmCAnQZVD+PR2JXokN3MG6gvXWMeFYvbZkkdIepDTHNBoD20862H0z00PyYt/PReMm2b5byzlvutRmC1HIvlfN9fPkR9X5eFCQqsvLF5gMD69pA6W17r5bsQQzYRUpZCHG3YtUWj/i60S7iARa5WRs+qPoCLEAwhC0IY=
+	t=1736905202; cv=none; b=N/w1tPhq0zS4xCyCdI95dMvv21zfGeXF8Rsv1PVlmYPQiPGvrqU5JQR+qH2lQOmT3LE6YkYCF7hUDz7nB3tDAEnFEZNcaIyB3QX6ZCP2OqmwSdgh0kaSCtQ9dNW2FPCufSa2UV6bUWlzArFg/uXVABxRn019sqykwUExiAxTdCk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736905087; c=relaxed/simple;
-	bh=rXDyVzqRYD1yqsER5V/bGDwGrtFOZ+HbyXu3jgH1F+I=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=DepLd/DgQIA39zKVeNilTa9lbAjpzDr84FPyfyXsrXG04CDfWLiaALI83B/Rq045dYnYLIEMiDzOOXFHJcrJ68EhbytMLxEMGqGVsAeIj2jMj2Bb8rt5+NCrS7dAnXAroMH+VcrrafOf84M/leYmwooboMF45NYUvatk4XMp2vk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nJy1jSyl; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 59D4BC4CEDD;
-	Wed, 15 Jan 2025 01:38:06 +0000 (UTC)
+	s=arc-20240116; t=1736905202; c=relaxed/simple;
+	bh=/K1CIcKnQKuZL6lCyuCE9f8Owon49DpZzh2xTlkMCuA=;
+	h=Date:Content-Type:MIME-Version:From:Cc:To:In-Reply-To:References:
+	 Message-Id:Subject; b=Q5UwBA1sTsRsqc02DnISMRILKXYsyKUb7yzBjLUK4YDwR058ImTXJ4tRQ+tHD9vQGv2bX5N+0G21q0myMg7j+R7vpMboZ3PxxMnMDJ3oePRvwUHxcKF0I6uQuzTtWNMNef9VJBEXJqR3NLTxIsnvrQfrwJxen0FIfFIhOGt0UK8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uas6dGNi; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 579DBC4CEDD;
+	Wed, 15 Jan 2025 01:40:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736905087;
-	bh=rXDyVzqRYD1yqsER5V/bGDwGrtFOZ+HbyXu3jgH1F+I=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=nJy1jSylS3VUDL7OObgc1tMwFpn/1zDSr3o/+/c/vTMupvPMKsS6grWaPsB2+UxzV
-	 w57b0ZhkF6q8/byuHtsIXxUFnlckdL/yKo7lEk3svNYaD+HnBSwZVjOTHZZ6S5u/ai
-	 DYpEZ8LdC4Xw/Dw92AYyJPbwEOg6GfhgSiZHa7S//9rx5FzcApyOj3mE/cptcQEJCb
-	 bKy0EwwGKRx+Vj2IF2D74gl41jeZnH2najGqxG0qI46G6PqOTMyNGqYtgzIHT68chN
-	 HydPC2jJ3cQJ3DMewiXT5ZVhdDxsu3Yc2LHzANlD911WSWuRMnaGp36lN12GOV6b90
-	 M/zjefGiW5YDg==
-Date: Tue, 14 Jan 2025 17:38:05 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Ahmed Zaki <ahmed.zaki@intel.com>
-Cc: <netdev@vger.kernel.org>, <intel-wired-lan@lists.osuosl.org>,
- <andrew+netdev@lunn.ch>, <edumazet@google.com>, <horms@kernel.org>,
- <pabeni@redhat.com>, <davem@davemloft.net>, <michael.chan@broadcom.com>,
- <tariqt@nvidia.com>, <anthony.l.nguyen@intel.com>,
- <przemyslaw.kitszel@intel.com>, <jdamato@fastly.com>, <shayd@nvidia.com>,
- <akpm@linux-foundation.org>, <shayagr@amazon.com>,
- <kalesh-anakkur.purayil@broadcom.com>, <pavan.chebbi@broadcom.com>,
- <yury.norov@gmail.com>, <darinzon@amazon.com>
-Subject: Re: [PATCH net-next v5 1/6] net: move ARFS rmap management to core
-Message-ID: <20250114173805.23d254a9@kernel.org>
-In-Reply-To: <5e9659aa-d21f-4ee9-8c0a-1d9191bbeb8c@intel.com>
-References: <20250113171042.158123-1-ahmed.zaki@intel.com>
-	<20250113171042.158123-2-ahmed.zaki@intel.com>
-	<20250114140813.5a7d527f@kernel.org>
-	<5e9659aa-d21f-4ee9-8c0a-1d9191bbeb8c@intel.com>
+	s=k20201202; t=1736905201;
+	bh=/K1CIcKnQKuZL6lCyuCE9f8Owon49DpZzh2xTlkMCuA=;
+	h=Date:From:Cc:To:In-Reply-To:References:Subject:From;
+	b=uas6dGNi0YZD+pkEZQSyV5hHDDz3vVmnXl3rRD+2uIf0WWRr7QIL0bCycjYuzsDnW
+	 ao+nEPKm0G2Q2EaRzD+vQpSTgjZDq1mgr/6qqqOKzdL96ybqJEVJP2ALfd6li4Ouno
+	 drpA3YPw6AeqakCkaASQtQIxz5Bc2OUge0aHJyNCb4p+kp5GZP0wgRikFsOOkzY4Nu
+	 OvNn1sznveAgFrHU4JfK8nZ7DOqZ9dhossNMrqD2flNIaLbHtF8xHoHCjU8TjoXSRT
+	 8J07eGyeHu+qLnL55nnfx+U4kOl99mqurrnqew4Nq8DoxTl6QP5dxAcOG93NfHeLn0
+	 1iWdsP6534qqw==
+Date: Tue, 14 Jan 2025 19:40:00 -0600
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+From: "Rob Herring (Arm)" <robh@kernel.org>
+Cc: linux-kernel@vger.kernel.org, openipmi-developer@lists.sourceforge.net, 
+ pabeni@redhat.com, krzk+dt@kernel.org, kuba@kernel.org, joel@jms.id.au, 
+ linux-arm-kernel@lists.infradead.org, linux-aspeed@lists.ozlabs.org, 
+ davem@davemloft.net, eajames@linux.ibm.com, andrew@codeconstruct.com.au, 
+ andrew+netdev@lunn.ch, minyard@acm.org, edumazet@google.com, 
+ conor+dt@kernel.org, netdev@vger.kernel.org, devicetree@vger.kernel.org
+To: Ninad Palsule <ninad@linux.ibm.com>
+In-Reply-To: <20250114220147.757075-1-ninad@linux.ibm.com>
+References: <20250114220147.757075-1-ninad@linux.ibm.com>
+Message-Id: <173690506198.2128017.15705512689029125898.robh@kernel.org>
+Subject: Re: [PATCH v5 00/10] DTS updates for system1 BMC
 
-On Tue, 14 Jan 2025 18:00:30 -0700 Ahmed Zaki wrote:
-> > Similarly netif_napi_set_irq() may get called with -1 to clear
-> > the IRQ number, which you currently treat at a real IRQ id, AFAICT.  
+
+On Tue, 14 Jan 2025 16:01:34 -0600, Ninad Palsule wrote:
+> Hello,
 > 
-> correct there is no handling for irq = -1. So netif_napi_set_irq() needs 
-> to add the irq to the rmap only if it is > 0.
+> Please review the patch set version 5.
 > 
-> I need to clarify expectation of netif_napi_set_irq() because I only see 
-> it called with irq = -1 in napi_add_weight. But you say it can be called 
-> with irq = -1 to "clear" the IRQ.
+> V5:
+> ---
+>   - Improved IPBM device documentation.
+>   - Added the hog parsing in ast2400-gpio
+> 
+> V4:
+> ---
+>   - Removed "Add RGMII support" patch as it needs some work from the
+>     driver side.
+>   - Improved IPBM device documentation.
+>   - There is a new warning in CHECK_DTBS which are false positive so
+>     ignored them.
+>     arch/arm/boot/dts/aspeed/aspeed-bmc-ibm-system1.dtb: gpio@1e780000: 'hog-0', 'hog-1', 'hog-2', 'hog-3' do not match any of the regexes: 'pinctrl-[0-9]+'
+> 
+> V3:
+> ---
+>   - Fixed dt_binding_check warnings in ipmb-dev.yaml
+>   - Updated title and description in ipmb-dev.yaml file.
+>   - Updated i2c-protocol description in ipmb-dev.yaml file.
+> 
+> V2:
+> ---
+>   Fixed CHECK_DTBS errors by
+>     - Using generic node names
+>     - Documenting phy-mode rgmii-rxid in ftgmac100.yaml
+>     - Adding binding documentation for IPMB device interface
+> 
+> NINAD PALSULE (6):
+>   ARM: dts: aspeed: system1: Add IPMB device
+>   ARM: dts: aspeed: system1: Add GPIO line name
+>   ARM: dts: aspeed: system1: Reduce sgpio speed
+>   ARM: dts: aspeed: system1: Update LED gpio name
+>   ARM: dts: aspeed: system1: Remove VRs max8952
+>   ARM: dts: aspeed: system1: Mark GPIO line high/low
+> 
+> Ninad Palsule (4):
+>   dt-bindings: net: faraday,ftgmac100: Add phys mode
+>   bindings: ipmi: Add binding for IPMB device intf
+>   dt-bindings: gpio: ast2400-gpio: Add hogs parsing
+>   ARM: dts: aspeed: system1: Disable gpio pull down
+> 
+>  .../bindings/gpio/aspeed,ast2400-gpio.yaml    |   6 +
+>  .../devicetree/bindings/ipmi/ipmb-dev.yaml    |  55 +++++++
+>  .../bindings/net/faraday,ftgmac100.yaml       |   3 +
+>  .../dts/aspeed/aspeed-bmc-ibm-system1.dts     | 139 +++++++++++-------
+>  4 files changed, 149 insertions(+), 54 deletions(-)
+>  create mode 100644 Documentation/devicetree/bindings/ipmi/ipmb-dev.yaml
+> 
+> --
+> 2.43.0
+> 
+> 
+> 
 
-I _think_ that's what Amritha had in mind. For queue <> NAPI linking
-similarly we are expected to call the same helper with a NULL param.
 
-> Does this mean that, if irq = -1, we need to "delete" the irq from rmap 
-> if a valid irq already existed (which means this can happen as an 
-> alternative to napi_del()/napi_diable())? or just skip adding irq to 
-> rmap is enough?
+My bot found new DTB warnings on the .dts files added or changed in this
+series.
 
-I'm afraid we need both. Most drivers today simply never clear the IRQ,
-they will just delete the NAPI and kfree() its memory. So we need to
-"catch" NAPIs with IRQs assigned getting deleted and clean up the IRQ.
+Some warnings may be from an existing SoC .dtsi. Or perhaps the warnings
+are fixed by another series. Ultimately, it is up to the platform
+maintainer whether these warnings are acceptable or not. No need to reply
+unless the platform maintainer has comments.
 
-In the future some drivers may explicitly call the set with -1,
-especially now that the IRQ has more implications than just getting
-reported via netlink. We need to support that, too.
+If you already ran DT checks and didn't see these error(s), then
+make sure dt-schema is up to date:
 
-And for a good measure we should also throw in a warning if a driver
-tries to set the IRQ but the IRQ is already set in the NAPI (not -1).
+  pip3 install dtschema --upgrade
+
+
+New warnings running 'make CHECK_DTBS=y for arch/arm/boot/dts/aspeed/' for 20250114220147.757075-1-ninad@linux.ibm.com:
+
+arch/arm/boot/dts/aspeed/aspeed-bmc-opp-palmetto.dtb: gpio@1e780000: 'pin_func_mode0', 'pin_func_mode1', 'pin_func_mode2', 'pin_gpio_a0', 'pin_gpio_a1', 'pin_gpio_b1', 'pin_gpio_b2', 'pin_gpio_b7', 'pin_gpio_d1', 'pin_gpio_f1', 'pin_gpio_f4', 'pin_gpio_f5', 'pin_gpio_f7', 'pin_gpio_g3', 'pin_gpio_g4', 'pin_gpio_g5', 'pin_gpio_h0', 'pin_gpio_h1', 'pin_gpio_h2', 'pin_gpio_h7' do not match any of the regexes: '^(hog-[0-9]+|.+-hog(-[0-9]+)?)$', 'pinctrl-[0-9]+'
+	from schema $id: http://devicetree.org/schemas/gpio/aspeed,ast2400-gpio.yaml#
+arch/arm/boot/dts/aspeed/aspeed-bmc-delta-ahe50dc.dtb: gpio@1e780000: 'doom-guardrail' does not match any of the regexes: '^(hog-[0-9]+|.+-hog(-[0-9]+)?)$', 'pinctrl-[0-9]+'
+	from schema $id: http://devicetree.org/schemas/gpio/aspeed,ast2400-gpio.yaml#
+arch/arm/boot/dts/aspeed/aspeed-bmc-opp-romulus.dtb: gpio@1e780000: 'nic_func_mode0', 'nic_func_mode1', 'seq_cont' do not match any of the regexes: '^(hog-[0-9]+|.+-hog(-[0-9]+)?)$', 'pinctrl-[0-9]+'
+	from schema $id: http://devicetree.org/schemas/gpio/aspeed,ast2400-gpio.yaml#
+arch/arm/boot/dts/aspeed/aspeed-bmc-opp-lanyang.dtb: gpio@1e780000: 'pin_gpio_aa6', 'pin_gpio_aa7', 'pin_gpio_ab0', 'pin_gpio_b0', 'pin_gpio_b5', 'pin_gpio_h5', 'pin_gpio_z2' do not match any of the regexes: '^(hog-[0-9]+|.+-hog(-[0-9]+)?)$', 'pinctrl-[0-9]+'
+	from schema $id: http://devicetree.org/schemas/gpio/aspeed,ast2400-gpio.yaml#
+arch/arm/boot/dts/aspeed/aspeed-bmc-bytedance-g220a.dtb: gpio@1e780000: 'pin_gpio_b6', 'pin_gpio_i3' do not match any of the regexes: '^(hog-[0-9]+|.+-hog(-[0-9]+)?)$', 'pinctrl-[0-9]+'
+	from schema $id: http://devicetree.org/schemas/gpio/aspeed,ast2400-gpio.yaml#
+arch/arm/boot/dts/aspeed/aspeed-bmc-ibm-everest.dtb: gpio@1e780000: 'usb_power' does not match any of the regexes: '^(hog-[0-9]+|.+-hog(-[0-9]+)?)$', 'pinctrl-[0-9]+'
+	from schema $id: http://devicetree.org/schemas/gpio/aspeed,ast2400-gpio.yaml#
+arch/arm/boot/dts/aspeed/aspeed-bmc-asrock-e3c246d4i.dtb: gpio@1e780000: 'bmc-ready' does not match any of the regexes: '^(hog-[0-9]+|.+-hog(-[0-9]+)?)$', 'pinctrl-[0-9]+'
+	from schema $id: http://devicetree.org/schemas/gpio/aspeed,ast2400-gpio.yaml#
+arch/arm/boot/dts/aspeed/aspeed-bmc-ibm-rainier.dtb: gpio@1e780000: 'i2c3_mux_oe_n', 'usb_power' do not match any of the regexes: '^(hog-[0-9]+|.+-hog(-[0-9]+)?)$', 'pinctrl-[0-9]+'
+	from schema $id: http://devicetree.org/schemas/gpio/aspeed,ast2400-gpio.yaml#
+arch/arm/boot/dts/aspeed/aspeed-bmc-ampere-mtjade.dtb: gpio@1e780000: 'bmc-ready' does not match any of the regexes: '^(hog-[0-9]+|.+-hog(-[0-9]+)?)$', 'pinctrl-[0-9]+'
+	from schema $id: http://devicetree.org/schemas/gpio/aspeed,ast2400-gpio.yaml#
+arch/arm/boot/dts/aspeed/aspeed-bmc-ibm-rainier-1s4u.dtb: gpio@1e780000: 'i2c3_mux_oe_n', 'usb_power' do not match any of the regexes: '^(hog-[0-9]+|.+-hog(-[0-9]+)?)$', 'pinctrl-[0-9]+'
+	from schema $id: http://devicetree.org/schemas/gpio/aspeed,ast2400-gpio.yaml#
+arch/arm/boot/dts/aspeed/aspeed-bmc-ibm-rainier-4u.dtb: gpio@1e780000: 'i2c3_mux_oe_n', 'usb_power' do not match any of the regexes: '^(hog-[0-9]+|.+-hog(-[0-9]+)?)$', 'pinctrl-[0-9]+'
+	from schema $id: http://devicetree.org/schemas/gpio/aspeed,ast2400-gpio.yaml#
+arch/arm/boot/dts/aspeed/aspeed-bmc-ibm-bonnell.dtb: gpio@1e780000: 'usb_power' does not match any of the regexes: '^(hog-[0-9]+|.+-hog(-[0-9]+)?)$', 'pinctrl-[0-9]+'
+	from schema $id: http://devicetree.org/schemas/gpio/aspeed,ast2400-gpio.yaml#
+arch/arm/boot/dts/aspeed/aspeed-bmc-opp-nicole.dtb: gpio@1e780000: 'func_mode0', 'func_mode1', 'func_mode2', 'ncsi_cfg', 'seq_cont' do not match any of the regexes: '^(hog-[0-9]+|.+-hog(-[0-9]+)?)$', 'pinctrl-[0-9]+'
+	from schema $id: http://devicetree.org/schemas/gpio/aspeed,ast2400-gpio.yaml#
+arch/arm/boot/dts/aspeed/aspeed-bmc-lenovo-hr855xg2.dtb: gpio@1e780000: 'pin_gpio_a1', 'pin_gpio_a3', 'pin_gpio_aa0', 'pin_gpio_aa4', 'pin_gpio_ab3', 'pin_gpio_ac6', 'pin_gpio_b5', 'pin_gpio_b7', 'pin_gpio_e0', 'pin_gpio_e2', 'pin_gpio_e5', 'pin_gpio_e6', 'pin_gpio_f0', 'pin_gpio_f1', 'pin_gpio_f2', 'pin_gpio_f3', 'pin_gpio_f4', 'pin_gpio_f6', 'pin_gpio_g7', 'pin_gpio_h6', 'pin_gpio_i3', 'pin_gpio_j1', 'pin_gpio_j2', 'pin_gpio_j3', 'pin_gpio_l0', 'pin_gpio_l1', 'pin_gpio_l4', 'pin_gpio_l5', 'pin_gpio_r6', 'pin_gpio_r7', 'pin_gpio_s1', 'pin_gpio_s2', 'pin_gpio_s6', 'pin_gpio_z3' do not match any of the regexes: '^(hog-[0-9]+|.+-hog(-[0-9]+)?)$', 'pinctrl-[0-9]+'
+	from schema $id: http://devicetree.org/schemas/gpio/aspeed,ast2400-gpio.yaml#
+arch/arm/boot/dts/aspeed/aspeed-bmc-lenovo-hr630.dtb: gpio@1e780000: 'pin_gpio_aa0', 'pin_gpio_aa5', 'pin_gpio_b5', 'pin_gpio_f0', 'pin_gpio_f3', 'pin_gpio_f4', 'pin_gpio_f5', 'pin_gpio_g4', 'pin_gpio_g7', 'pin_gpio_h2', 'pin_gpio_h3', 'pin_gpio_i3', 'pin_gpio_j2', 'pin_gpio_j3', 'pin_gpio_s2', 'pin_gpio_s4', 'pin_gpio_s6', 'pin_gpio_y0', 'pin_gpio_y1', 'pin_gpio_z0', 'pin_gpio_z2', 'pin_gpio_z3', 'pin_gpio_z7' do not match any of the regexes: '^(hog-[0-9]+|.+-hog(-[0-9]+)?)$', 'pinctrl-[0-9]+'
+	from schema $id: http://devicetree.org/schemas/gpio/aspeed,ast2400-gpio.yaml#
+arch/arm/boot/dts/aspeed/aspeed-bmc-opp-zaius.dtb: gpio@1e780000: 'line_bmc_i2c2_sw_rst_n', 'line_bmc_i2c5_sw_rst_n', 'line_iso_u146_en', 'ncsi_mux_en_n' do not match any of the regexes: '^(hog-[0-9]+|.+-hog(-[0-9]+)?)$', 'pinctrl-[0-9]+'
+	from schema $id: http://devicetree.org/schemas/gpio/aspeed,ast2400-gpio.yaml#
+arch/arm/boot/dts/aspeed/aspeed-bmc-arm-stardragon4800-rep2.dtb: gpio@1e780000: 'pin_gpio_c7', 'pin_gpio_d1' do not match any of the regexes: '^(hog-[0-9]+|.+-hog(-[0-9]+)?)$', 'pinctrl-[0-9]+'
+	from schema $id: http://devicetree.org/schemas/gpio/aspeed,ast2400-gpio.yaml#
+
+
+
+
+
 
