@@ -1,151 +1,116 @@
-Return-Path: <netdev+bounces-159032-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159033-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6BCFEA142AB
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 21:00:30 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A5E7A142BF
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 21:04:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D10113A5DD3
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 20:00:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7425D16973C
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 20:04:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81AB881727;
-	Thu, 16 Jan 2025 20:00:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75CB92361D6;
+	Thu, 16 Jan 2025 20:04:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="lNvai7Rh"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="IsdpPYDa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6352F24A7EE
-	for <netdev@vger.kernel.org>; Thu, 16 Jan 2025 20:00:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53BEF23243D
+	for <netdev@vger.kernel.org>; Thu, 16 Jan 2025 20:04:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.186
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737057626; cv=none; b=bJImnw1gTTSHo81ATv1dy0iVkvKeXKYmwrPuNaKPHxdsBrj7J1BlW6OwAayrDCTrRmtwcURqJxdwVtaiEEuQDtclK/JG3l9ZmM6nPyAiifXv1bmc+aN3evn7nPEKJrf8osoeCqFvznr/jQ/Smn2ZgzbHDmjKjZP+QZqVt8UmdDc=
+	t=1737057849; cv=none; b=mJjFjHVS2OpDKeZVaHZC0BY+iMAVEzoRufGHDDbJl823AKnnM6HNB1vrRhEdONOAyQ3Dqt0sXwceWWltVFh1SFHGEhlpxlvBPPL7auNo+81NrFKdM6izkHetfG/lTalHvddkIW0Rvf1uoZk/fjdeYQRlcVyYfvA6M6NveG/oi7U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737057626; c=relaxed/simple;
-	bh=vs9Oibl3hWQNdAvc7b4GPXdRh3C4fMeHj9bOGq1LruM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=OCwAjTG3OXuoalO0wUgP17P7A/kt2FU7z3C5rdMLnowNC/lAKYpFCQYWcYHDQTvA7wnoeqyf//MWHWL5kJ2u0BJW1bIsUCbLj7IgOIJWvDdYRdMLl1v9ETzmzzNcdgz91y1mifQkZ6ccNCGZlWcO4GgVz/73xi60Mw2nUUhe8Rs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=lNvai7Rh; arc=none smtp.client-ip=209.85.214.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-218c8aca5f1so32631555ad.0
-        for <netdev@vger.kernel.org>; Thu, 16 Jan 2025 12:00:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1737057623; x=1737662423; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=foStEkQNvwSKxgEkbLnhwc2C374vT9+WxNKRa1K+d5k=;
-        b=lNvai7RhZs+9k0Z21O1FJMM0idoDzRNAhhm3KixGhAXHA5bWwG8mylyU0Cs0fW/xOJ
-         oQyLOWOsTSNCKnZmqrcAze6YVlZuOic9bdoGz2khOeufkk4UXxVtBr8q0rgF6i5un4nV
-         dryoeAZ936Ws5x655TYjjO3eg3ayZr7JCIRnkcbF0ORp6AgSqJZRzAQR7mcFXJkT9kji
-         18HtPLnJsHYRABnJ7CkW+7e6+aee63Ge4IpMewjeneC8S40iHKmFybuFPCq2IA5/rFje
-         EbBmNQqzfJin4UBB05QMqZ2GRrFCOoBXGmOufNFpus7smKkQc289ZRJjoyy1GmeyUqtz
-         /CBQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737057623; x=1737662423;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=foStEkQNvwSKxgEkbLnhwc2C374vT9+WxNKRa1K+d5k=;
-        b=uK+GcMdpkvKQwDHIpyI167oI4JpyOSzZljX7EO57Gc8vwnCzGLc0chm72JjkrllClo
-         THxUkL3NugTmvamITgF0Z7R0lq2oYgw2lvc0hEv0+iCkIqFBO1EAEhOhHDgvBIcIBQdS
-         RO3HX/GwHGCHL2Gr81kNB9mWw5o0z2zqp4DpW8YU6ZYTXyN+UmR4mDdi+DclE4TE1ri8
-         IcQDZRWHy3M9KRqGrTC62tIUCyN9kBha2zXyadNnKZIkO1lk2ixZdLK+zVjsm6D9cxKp
-         ZeI0CUoUlE1/Yku8JiGUykyLUTpM4O4Y1tBhCHzwrk85yQuu+iT/fzdmCPTG6odh5v2t
-         NZIw==
-X-Gm-Message-State: AOJu0YyTklG2RPI7ARWyunovQntXE86wE6tLhmn9JQDEMWaBfuYaSukw
-	M3MOm3OKoy5sd8v6bBi4km2UXHWsuUYNr/K/+0vtZcGLNf/iQpyvjKy8y8Y3YZzdggCFPFTIt7z
-	6OqAx7JNM10wQxDQ3eZaOFhGlP4ZJEez4QCi/YgkSOo+mDsQ=
-X-Gm-Gg: ASbGncvds+gux5OjdXDI8m4WYUmkT/cqBY+5tpcjojx7yFA2/cbyGRjGDv5EUwp9Oeh
-	Tcxrwy31Z+oktgAgN+gKUdMTtPv1lxE7Mwz8w
-X-Google-Smtp-Source: AGHT+IERnwfTtoLJYTeR65lwk2QUmi36MigiO2YTTrrp6naxZ9DZ2pH7J35NwYfTKER2zSMAYYdEqmE1K2PRDQ6qzmo=
-X-Received: by 2002:a05:6a00:4218:b0:725:db34:6a8c with SMTP id
- d2e1a72fcca58-72dafa06dd3mr193544b3a.13.1737057623628; Thu, 16 Jan 2025
- 12:00:23 -0800 (PST)
+	s=arc-20240116; t=1737057849; c=relaxed/simple;
+	bh=5EXta7kpLt5yaegjOlD1OpZbITaQ48ZLPtOl+gI2CcM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=OMxlGUKZE7xia7O2xVDrEq4q4aM9mKoMKXgP9quBYxRVu5bBnND8FVFoN7phx7JokkXziseCDR4RKqfUTWTjEYTlKQ3sc/xDW93cYm/1W2YzW63Bs/brIJaUbVKBIzXz/46m4qvyyKUUm+32yBH2AeT5iEuzpLN2VuLEXSgmviY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=IsdpPYDa; arc=none smtp.client-ip=91.218.175.186
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <9e5b183e-5dd5-4d3d-b3e6-09ad5e7262dc@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1737057840;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=IqHq2Y2jq8JAJpoGQ2hS6bFm7a13DqxW+Q9h4zZv3mo=;
+	b=IsdpPYDaUOBchiGdF2FkugelmmyTLLxURio+d0H1pg1c5PtScV4J5PwrMwppVoRFXafxTb
+	zTUgqjXhCwANhZNHhwH0fDr24w54IDPTkzDG7HSpOREc+MiosXGjJxuqJjYRdon+03Yvj2
+	qaqAhH0PY83dqMjpkii0+1TP5WDwubQ=
+Date: Thu, 16 Jan 2025 12:03:53 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250116195642.2794-1-ouster@cs.stanford.edu>
-In-Reply-To: <20250116195642.2794-1-ouster@cs.stanford.edu>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Thu, 16 Jan 2025 15:00:12 -0500
-X-Gm-Features: AbW1kvatE_GnYaHDSkSwaoZenJGXmy6B6jRXpMT68Vx5ZgvMx4bIH6gu8c6nDhs
-Message-ID: <CAM0EoMkkk-dT5kQH6OoVp-zs9bhg8ZLW2w+Dp4SYAZnFfw=CTA@mail.gmail.com>
-Subject: Re: [PATCH netnext] net: tc: improve qdisc error messages
-To: John Ousterhout <ouster@cs.stanford.edu>
-Cc: netdev@vger.kernel.org, xiyou.wangcong@gmail.com, jiri@resnulli.us
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH bpf] bpf: use attach_btf instead of vmlinux in
+ bpf_sk_storage_tracing_allowed
+To: Jared Kangas <jkangas@redhat.com>
+Cc: bpf@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, martin.lau@kernel.org,
+ ast@kernel.org, johannes.berg@intel.com, kafai@fb.com,
+ songliubraving@fb.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20250116162356.1054047-1-jkangas@redhat.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+Content-Language: en-US
+In-Reply-To: <20250116162356.1054047-1-jkangas@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, Jan 16, 2025 at 2:57=E2=80=AFPM John Ousterhout <ouster@cs.stanford=
-.edu> wrote:
->
-> The existing error message ("Invalid qdisc name") is confusing
-> because it suggests that there is no qdisc with the given name. In
-> fact, the name does refer to a valid qdisc, but it doesn't match
-> the kind of an existing qdisc being modified or replaced. The
-> new error message provides more detail to eliminate confusion.
->
-> Signed-off-by: John Ousterhout <ouster@cs.stanford.edu>
-> ---
->  net/sched/sch_api.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
->
-> diff --git a/net/sched/sch_api.c b/net/sched/sch_api.c
-> index 300430b8c4d2..5d017c06a96f 100644
-> --- a/net/sched/sch_api.c
-> +++ b/net/sched/sch_api.c
-> @@ -1560,7 +1560,7 @@ static int tc_get_qdisc(struct sk_buff *skb, struct=
- nlmsghdr *n,
->         }
->
->         if (tca[TCA_KIND] && nla_strcmp(tca[TCA_KIND], q->ops->id)) {
-> -               NL_SET_ERR_MSG(extack, "Invalid qdisc name");
-> +               NL_SET_ERR_MSG(extack, "Invalid qdisc name: must match ex=
-isting qdisc");
->                 return -EINVAL;
->         }
->
-> @@ -1670,7 +1670,7 @@ static int tc_modify_qdisc(struct sk_buff *skb, str=
-uct nlmsghdr *n,
->                                 }
->                                 if (tca[TCA_KIND] &&
->                                     nla_strcmp(tca[TCA_KIND], q->ops->id)=
-) {
-> -                                       NL_SET_ERR_MSG(extack, "Invalid q=
-disc name");
-> +                                       NL_SET_ERR_MSG(extack, "Invalid q=
-disc name: must match existing qdisc");
->                                         return -EINVAL;
->                                 }
->                                 if (q->flags & TCQ_F_INGRESS) {
-> @@ -1746,7 +1746,7 @@ static int tc_modify_qdisc(struct sk_buff *skb, str=
-uct nlmsghdr *n,
->                 return -EEXIST;
->         }
->         if (tca[TCA_KIND] && nla_strcmp(tca[TCA_KIND], q->ops->id)) {
-> -               NL_SET_ERR_MSG(extack, "Invalid qdisc name");
-> +               NL_SET_ERR_MSG(extack, "Invalid qdisc name: must match ex=
-isting qdisc");
->                 return -EINVAL;
->         }
->         err =3D qdisc_change(q, tca, extack);
-> --
+On 1/16/25 8:23 AM, Jared Kangas wrote:
+> diff --git a/net/core/bpf_sk_storage.c b/net/core/bpf_sk_storage.c
+> index 2f4ed83a75ae..74584dd12550 100644
+> --- a/net/core/bpf_sk_storage.c
+> +++ b/net/core/bpf_sk_storage.c
+> @@ -352,8 +352,8 @@ const struct bpf_func_proto bpf_sk_storage_delete_proto = {
+>   
+>   static bool bpf_sk_storage_tracing_allowed(const struct bpf_prog *prog)
+>   {
+> -	const struct btf *btf_vmlinux;
+>   	const struct btf_type *t;
+> +	const struct btf *btf;
+>   	const char *tname;
+>   	u32 btf_id;
+>   
+> @@ -371,12 +371,12 @@ static bool bpf_sk_storage_tracing_allowed(const struct bpf_prog *prog)
+>   		return true;
+>   	case BPF_TRACE_FENTRY:
+>   	case BPF_TRACE_FEXIT:
+> -		btf_vmlinux = bpf_get_btf_vmlinux();
+> -		if (IS_ERR_OR_NULL(btf_vmlinux))
+> +		btf = prog->aux->attach_btf;
+> +		if (!btf)
+>   			return false;
+>   		btf_id = prog->aux->attach_btf_id;
+> -		t = btf_type_by_id(btf_vmlinux, btf_id);
+> -		tname = btf_name_by_offset(btf_vmlinux, t->name_off);
+> +		t = btf_type_by_id(btf, btf_id);
+> +		tname = btf_name_by_offset(btf, t->name_off);
+>   		return !!strncmp(tname, "bpf_sk_storage",
+>   				 strlen("bpf_sk_storage"));
 
-LGTM.
-Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
+Thanks for the report.
 
-cheers,
-jamal
+There is a prog->aux->attach_func_name, so it can be directly used, like:
 
-> 2.34.1
->
->
+	case BPF_TRACE_FENTRY:
+	case BPF_TRACE_FEXIT:
+		return !!strncmp(prog->aux->attach_func_name, "bpf_sk_storage",
+				 strlen("bpf_sk_storage"));
+
+The above should do for the fix.
+
+No need to check for null on attach_func_name. It should have been checked 
+earlier in bpf_check_attach_target (the "tname" variable).
+
+pw-bot: cr
+
 
