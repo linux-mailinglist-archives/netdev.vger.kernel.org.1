@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-158881-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158882-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E3149A13A27
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 13:45:48 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 48A5EA13A36
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 13:52:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4EA5F1884E67
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 12:45:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9C21B18893E3
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 12:52:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 773DA1DBB3A;
-	Thu, 16 Jan 2025 12:45:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B8461DE88B;
+	Thu, 16 Jan 2025 12:52:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dnr4NOUB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PhV4Txyq"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C1481862;
-	Thu, 16 Jan 2025 12:45:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F24824A7E7;
+	Thu, 16 Jan 2025 12:52:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737031544; cv=none; b=oPuDPyB5kh/mpU9oQZAf2KvmCkAh4bN+HFduEbClVgjDq++yb1KRc1pc3INyxeSiseeXmwoqvO5tRdltluM20cdCub9JJHjcoKSXfkTEhEVvHaVWGa+xNlfEbBh2lb/yszAD+GQNem23cidacULlgHj/7V+oyvxokanXhs1fD4Q=
+	t=1737031920; cv=none; b=sj3ivvQGrCKz/BSRUvL2joy7xn/5Gu6UKyFk4nmYiQlDvWkmnmcYoW6/AmHq1JAkABSB79fVTLQ02tdmlTI324Cw2ypOOTERWAYH7RBVKFN2QnKdOLqDbVVangF9RirRBlzPW1omAST657tloW3lLpvSU0WALIKAzMxDhpTrGLc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737031544; c=relaxed/simple;
-	bh=9Wx+ucB4Cy3SL0t6vzNkJ/wDcZULfLHD1XwHjTcIBvc=;
+	s=arc-20240116; t=1737031920; c=relaxed/simple;
+	bh=CM19J5Yje3bHJvpx0mH29A4eL7/r3Lzy2jE0fI6yFw4=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LZ/wt0sfr/42YHscALJUplMbumFx1gAtxwTM6f2eymvmW1F2ZI8eYkzInmgBaiF3i3HieQs1fD30NI7VZRnF22TNCX+3JQT2HuDeuZahJzcXuHJWqB7w39Sp9GXvwnElRdjkjBa5O82a0SplDltxd7DrXE++HcyndvOjIHSaea0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dnr4NOUB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4F9A0C4CED6;
-	Thu, 16 Jan 2025 12:45:38 +0000 (UTC)
+	 In-Reply-To:Content-Type; b=jCkS8T5uYhkOjyHlurb42gYA8f8EfMa8h/yM2on06L/ZIPrPLdxj/zd4mqurTK/g3dPEtbhJz9gg1rRJGuOqu0BkQUybOxZlbiRFl9hbyfqB3N2woAqjMKTGAok9ihwrgtqZ7D3H35NMWiXljvMIS9KffxE3Cluci0OHuA0zTIM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PhV4Txyq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7FD9FC4CED6;
+	Thu, 16 Jan 2025 12:51:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737031543;
-	bh=9Wx+ucB4Cy3SL0t6vzNkJ/wDcZULfLHD1XwHjTcIBvc=;
+	s=k20201202; t=1737031919;
+	bh=CM19J5Yje3bHJvpx0mH29A4eL7/r3Lzy2jE0fI6yFw4=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=dnr4NOUBthdiya/3gobQSflpU/SGrzmQEkE6lSH6386KdZ01zJgyd1Kq7U5u9Oyv5
-	 0esxnr2q7bfY2waAZv0qAIj+/pP5JXhkXRnN2Xv4Wz4Cr73nZIEgvdTyBBy/G3xAlJ
-	 BJZCy3mGBuBwhBU8ztkbgpI6R3JMT2JJmCrP4FPMZEMIPzsLOQ3puE23Ejiii3zSom
-	 j8I8YIwLWWny+8ZNCgCqLakO4xu+VKdO1LWkW0qmyFS8Loy9ScDe/n+KL3wk6bX0+y
-	 lGq6a36K93w9ATm1We/0nifrgYJ6FOcRoS8HXZRibpQ60UJSBXU8ScSvqO8tkkXWUA
-	 2fffpNfjFXK4Q==
-Message-ID: <df2a463c-102c-4eb1-905d-96dbd926db7e@kernel.org>
-Date: Thu, 16 Jan 2025 13:45:35 +0100
+	b=PhV4Txyq7zNaPk6uwZs9RLARktwuufErPCZDV5v+mQpnEohM0YRCyJiK6c+MVoy+G
+	 huF0HY1GYxdbzkWgdApLQSIh1SBeCLMVFGsRxZy8q0W0naYLt5R9Pwo1GPlMTuqDi1
+	 gobEiUbcquFfDAOZhrQt4cui4oAF05Ly5skF+OreGuovNoiDk0IIQSvhauRUx/E/mE
+	 KtNH5Kvyue57Grijgvn4VphHnx04agH8axIdhudpjop3Au5xRMdT8jRHwznDPsqwGY
+	 j05XidJtFALvXx+ZAE3DMrczbOiKlSkqMNngJLMOcPJJartWdy85aWJe3JmeZDuqmL
+	 abkObqFRDG3fA==
+Message-ID: <833df79b-1e9f-4a13-bae5-9e7bb989a8f1@kernel.org>
+Date: Thu, 16 Jan 2025 13:51:53 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -115,39 +115,32 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 16/01/2025 02:21, Sky Huang wrote:
-> +
-> +static int mt798x_2p5ge_phy_load_fw(struct phy_device *phydev)
-> +{
-> +	struct mtk_i2p5ge_phy_priv *priv = phydev->priv;
-> +	void __iomem *mcu_csr_base, *pmb_addr;
-> +	struct device *dev = &phydev->mdio.dev;
-> +	const struct firmware *fw;
-> +	struct device_node *np;
-> +	int ret, i;
-> +	u32 reg;
-> +
-> +	if (priv->fw_loaded)
-> +		return 0;
-> +
-> +	np = of_find_compatible_node(NULL, NULL, "mediatek,2p5gphy-fw");
+> From: Sky Huang <skylake.huang@mediatek.com>
+> 
+> Add support for internal 2.5Gphy on MT7988. This driver will load
+> necessary firmware and add appropriate time delay to make sure
+> that firmware works stably. Also, certain control registers will
+> be set to fix link-up issues.
+> 
+> Signed-off-by: Sky Huang <skylake.huang@mediatek.com>
+> ---
+>  MAINTAINERS                          |   1 +
+>  drivers/net/phy/mediatek/Kconfig     |  11 +
+>  drivers/net/phy/mediatek/Makefile    |   1 +
+>  drivers/net/phy/mediatek/mtk-2p5ge.c | 343 +++++++++++++++++++++++++++
+>  4 files changed, 356 insertions(+)
+>  create mode 100644 drivers/net/phy/mediatek/mtk-2p5ge.c
 
-There is no such compatible. You cannot just add undocumented bindings.
+I don't understand this. You already sent it half a year ago. You
+received detailed review, but you now send again the same? Till we accept?
 
-Also, devices should not just look for some random compatibles. Express
-proper relationships with phandles or node hierarchy.
+Doing same review twice is not acceptable. Ignoring the review either.
 
-> +	if (!np)
-> +		return -ENOENT;
-> +
-> +	pmb_addr = of_iomap(np, 1);
-> +	if (!pmb_addr)
-> +		return -ENOMEM;
-> +	mcu_csr_base = of_iomap(np, 2);
-> +	if (!mcu_csr_base) {
-> +		ret = -ENOMEM;
-> +		goto free_pmb;
-> +	}
-> +
+NAK.
+
+Implement all the changes you were asked for, then send a next version
+(v2) with proper, detailed, exhaustive changelog.
+
 Best regards,
 Krzysztof
 
