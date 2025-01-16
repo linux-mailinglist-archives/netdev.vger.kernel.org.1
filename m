@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-159034-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159035-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0DCC8A142D0
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 21:08:39 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1695AA142DF
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 21:16:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7A9963A296A
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 20:08:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4EC997A2376
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 20:16:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34B0C232438;
-	Thu, 16 Jan 2025 20:08:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF55B1DDC16;
+	Thu, 16 Jan 2025 20:16:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="pvfAzbJu"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="RHP6CIuC"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1513024A7EE;
-	Thu, 16 Jan 2025 20:08:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E741926AEC;
+	Thu, 16 Jan 2025 20:16:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737058115; cv=none; b=N5Z/8vheXh0hspZVJfrMpwc/UEgITicLJd0gBXPl/4TTZMli7DZ5Gmcq4zn+BTpeVRIpxNM745kvYarF+PpMVE8Y1pRdwf6MiinSk4u9JHgSdVPNa8QeO635x7cwZENvlt18KdQ1OADMeVwl4y8zsaqKkv0sdfLTAGlf8uU1/wk=
+	t=1737058589; cv=none; b=NySQ6hYF+6RP+gJqZl46p1KKCwTHRJXiswy+pOyJH6TxVKtuV+JX9B/W9LaUSjgw/P108oPo4s7uJaE/SYDoV9OuixKei1i07IFajcD3I42n2hjM38U6AOxRLZZ9IcglxLzOR3GLXeK1s7K9Utpjuer3Yzm9CEqLQ7IN3RgkRtA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737058115; c=relaxed/simple;
-	bh=1Y7xY78VuEuSDHnLrcANVcfv6asWKHAjfj0vKGYSx1I=;
+	s=arc-20240116; t=1737058589; c=relaxed/simple;
+	bh=1JE+ymPgq9mt5oWcmIP5doFiILO2bPYks3EqHl6e5RU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ja14UgpODoZOM8oz6q3YiVGFC/xuAyIWYVx7p+LJP8rS6YQyOHRrlLIwMDurAhWRXyTKj0qKO+kZrNr5EwypGqAbg/oYgc/4+Bh1ahpoHZNrz6pv/5iJ0RA1UZWFsb9om9RGXJ+sEXFTmpOQ4fWp6L+/QNMicjOXONaaNu1O3cQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=pvfAzbJu; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=o90TlDWPUYwlhPXd9fIA/Fv8ZRAlwuDrYS/aP2MIaA1NBX45BUoNqPWrkHzBud5+CQZ9AItZVLbzEPXBH3ScgIvY6UOo30Kk8aBVb5eWgRER6ENg5eS00g0K4qW3nPV25B9w64NVMBZaucqGvCAdN4L2B9/EHgIs3/tGiPPBQmE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=RHP6CIuC; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,39 +36,27 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=3A5jJ7OjfSb2aSIqIMcL4dOznCbAHUNHnn6oMc0ovuk=; b=pvfAzbJuvNhSXaB7hzRptra0vU
-	FUbh0Gc76p8yl1Fhk8bQVwB4m/rovlIVYcQMNBZpCEAnDo/buMiR2DrMX4tA9sNQRgAGeRAfbDjLS
-	uFa3+WxZ/FxcZBZyo4c988hA+6ry6IxOFFepENaw4Hv3BeNjkgpIVprUJh1n4ynueoEs=;
+	bh=qTn0XJzLZzbvEDnsM9fN083POcmzoNp1hBp9n5GW3D8=; b=RHP6CIuC9TA9hnSf9xr3gZ/SMT
+	e7Iblvyxkl6dFUGN/wB1huW3vyFA7bshkOJnWiUOJWF69i47V+TstW3fqKClqDJkq3zHUWBXO/jpt
+	n+7sUCKnnZ7O2/lkrgYlGDI/S7mL0jxi7z6x2jHhej6TS1GZUqir6fq5ckNJFDdUw5V0=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1tYWAA-005Dxm-J3; Thu, 16 Jan 2025 21:08:22 +0100
-Date: Thu, 16 Jan 2025 21:08:22 +0100
+	id 1tYWHg-005E3N-W1; Thu, 16 Jan 2025 21:16:09 +0100
+Date: Thu, 16 Jan 2025 21:16:08 +0100
 From: Andrew Lunn <andrew@lunn.ch>
-To: Alexandra Winter <wintera@linux.ibm.com>
-Cc: Wenjia Zhang <wenjia@linux.ibm.com>, Jan Karcher <jaka@linux.ibm.com>,
-	Gerd Bayer <gbayer@linux.ibm.com>,
-	Halil Pasic <pasic@linux.ibm.com>,
-	"D. Wythe" <alibuda@linux.alibaba.com>,
-	Tony Lu <tonylu@linux.alibaba.com>,
-	Wen Gu <guwen@linux.alibaba.com>,
-	Peter Oberparleiter <oberpar@linux.ibm.com>,
-	David Miller <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>,
+To: Kunihiko Hayashi <hayashi.kunihiko@socionext.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Julian Ruess <julianr@linux.ibm.com>,
-	Niklas Schnelle <schnelle@linux.ibm.com>,
-	Thorsten Winkler <twinkler@linux.ibm.com>, netdev@vger.kernel.org,
-	linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Simon Horman <horms@kernel.org>
-Subject: Re: [RFC net-next 1/7] net/ism: Create net/ism
-Message-ID: <e379f0dd-8ad0-4617-9b24-0fa4756d30ea@lunn.ch>
-References: <20250115195527.2094320-1-wintera@linux.ibm.com>
- <20250115195527.2094320-2-wintera@linux.ibm.com>
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net 1/2] net: stmmac: Limit FIFO size by hardware feature
+ value
+Message-ID: <636bad71-8da8-4fda-a433-1586d93683a5@lunn.ch>
+References: <20250116020853.2835521-1-hayashi.kunihiko@socionext.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,25 +65,25 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250115195527.2094320-2-wintera@linux.ibm.com>
+In-Reply-To: <20250116020853.2835521-1-hayashi.kunihiko@socionext.com>
 
-> +ISM (INTERNAL SHARED MEMORY)
-> +M:	Alexandra Winter <wintera@linux.ibm.com>
-> +L:	netdev@vger.kernel.org
-> +S:	Supported
-> +F:	include/linux/ism.h
-> +F:	net/ism/
+On Thu, Jan 16, 2025 at 11:08:52AM +0900, Kunihiko Hayashi wrote:
+> Tx/Rx FIFO size is specified by the parameter "{tx,rx}-fifo-depth" from
+> the platform layer.
+> 
+> However, these values are constrained by upper limits determined by the
+> capabilities of each hardware feature. There is a risk that the upper
+> bits will be truncated due to the calculation, so it's appropriate to
+> limit them to the upper limit values.
 
-Is there any high level documentation about this?
+Are these values hard coded in the platform layer? Or can they come
+from userspace?
 
-A while back, TI was trying to upstream something for one of there
-SoCs. It was a multi CPU system, with not all CPUs used for SMP, but
-one or two kept for management and real time tasks, not even running
-Linux. They had a block of shared memory used for communication
-between the CPUs/OSes, along with rproc. They layered an ethernet
-driver on top of this, with buffers for frames in the shared memory.
-
-Could ISM be used for something like this?
+If they are hard coded, we should also fix them. So maybe add a
+netdev_warn(), and encourage the platform maintainers to fix their
+platform. If they are coming from userspace, we should consider
+failing the ethtool call with an -EINVAL, and maybe an extack with the
+valid range?
 
 	Andrew
 
