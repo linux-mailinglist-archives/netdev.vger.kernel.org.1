@@ -1,169 +1,147 @@
-Return-Path: <netdev+bounces-158736-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158737-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D2C9A13194
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 03:55:02 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A2CEA131A5
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 04:06:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D7C323A110E
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 02:54:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4E5D416543B
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 03:06:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1207C45948;
-	Thu, 16 Jan 2025 02:54:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 750E578F59;
+	Thu, 16 Jan 2025 03:06:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="f8Xp5rc+"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U1G7JLnZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-9102.amazon.com (smtp-fw-9102.amazon.com [207.171.184.29])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 710E814F9FB
-	for <netdev@vger.kernel.org>; Thu, 16 Jan 2025 02:54:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.184.29
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA97D17C8B;
+	Thu, 16 Jan 2025 03:06:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736996099; cv=none; b=T/86dgMomkjm3kwMWZFkYUOtnguR+pe0T1sswok+SnpPV0kvfq3WMI7HW2IJyra+bD5fyVeAzZ8+lIjpzBrJB6OS4kvbs8H0kVoRwsNgRGWRcALTK4RE3Z1PYMjiTp6FZo5Embx7Xz+FrtHzkVI0I4OPI9kcrZruHn2zm6ObGUU=
+	t=1736996796; cv=none; b=R+PyGII18Y5nxdtWwxaLkwELnEvZDAUeflpd1+m/O5YC39wDTmbOdTKuPmHa2wgjCQXdORi4n7NjlLNZ9tu75w3KnhaJAnKK9durv0KsAcc4TDML4wZw+qIXfyyf7GvrCcA7LogVtB+WZluHAzVp49cmcNAFdLre0/FoK+1Dfxo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736996099; c=relaxed/simple;
-	bh=JA0DmeHfWf2kW0E516hUkA3wkbgZTPA79bhKfbL9oQQ=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mznhoAPeVnH3HokFs1J3XlcZ7WqKkWila+VT7OvOKx2D8jWPa6+hq6bF98af5CNHQbwY9CDlUVDy+KonrV3x9S++KjwFb6SWlvNmHXOAwsqopS4fErkVrbkm5MHKQvyBCiRl2/gzn789PNO+YNjTOd+bcrPc2pLnXfwozIPWiqk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=f8Xp5rc+; arc=none smtp.client-ip=207.171.184.29
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+	s=arc-20240116; t=1736996796; c=relaxed/simple;
+	bh=v2bFSkjdtfnCkNYGH7vEiJOa9fAHqO3ZwshoGezugBI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=H0NdERLV8zSwXSPvgaTHx69FiEHEhj8FiCULMQZl43j4g+u/21YM2qXZUQyzt0TJ5gTCHX/OE5+0V5b4HzqqweMIw5V7TLSNtqGGU1DG7YAg8YFlSpzVJexvOtEszukJMQ4W+vw356JCn4hRG18W0iBU0kRyRXCYfTh7gyws4Rc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=U1G7JLnZ; arc=none smtp.client-ip=209.85.214.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-21670dce0a7so8865715ad.1;
+        Wed, 15 Jan 2025 19:06:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1736996095; x=1768532095;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=HunarVt3IL8PqvyN0I76Y3i/1GJm1RMYOrnNYYGbzXA=;
-  b=f8Xp5rc+aQz1jI0LOzG0ePBzSpW6wYAcYMMmNBhk/lU8TaVANiWJZ4Np
-   CrtuztxgJqVRx8NGkNr8a/Crui3Kg0YvNNEqGWE25O9lwWZcaKM8RJiuu
-   rNTx/jsSHjCsBv8o4/tnNuSFdz/W2vsGH6jM8hU5HtVLo3uK4PnMh7iNH
-   M=;
-X-IronPort-AV: E=Sophos;i="6.13,208,1732579200"; 
-   d="scan'208";a="486338448"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-9102.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jan 2025 02:54:49 +0000
-Received: from EX19MTAUWB002.ant.amazon.com [10.0.21.151:20577]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.63.209:2525] with esmtp (Farcaster)
- id 272de5bf-bf43-4b03-8e8a-aa07065eeade; Thu, 16 Jan 2025 02:54:48 +0000 (UTC)
-X-Farcaster-Flow-ID: 272de5bf-bf43-4b03-8e8a-aa07065eeade
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Thu, 16 Jan 2025 02:54:47 +0000
-Received: from 6c7e67c6786f.amazon.com (10.119.2.246) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Thu, 16 Jan 2025 02:54:44 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <ychemla@nvidia.com>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <horms@kernel.org>,
-	<kuba@kernel.org>, <kuni1840@gmail.com>, <kuniyu@amazon.com>,
-	<netdev@vger.kernel.org>, <pabeni@redhat.com>
-Subject: Re: [PATCH v1 net-next 4/4] net: Hold rtnl_net_lock() in (un)?register_netdevice_notifier_dev_net().
-Date: Thu, 16 Jan 2025 11:54:35 +0900
-Message-ID: <20250116025435.85541-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
-In-Reply-To: <146eabfe-123c-4970-901e-e961b4c09bc3@nvidia.com>
-References: <146eabfe-123c-4970-901e-e961b4c09bc3@nvidia.com>
+        d=gmail.com; s=20230601; t=1736996794; x=1737601594; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4ze2u6ogswUGLWexD9dL+Uvbmw1nnxbIQ0UCNZR5y2U=;
+        b=U1G7JLnZcuWV3K3IixHQWn5r1YCQodec8SacaRaU2fQM9VsGPAGFdvFyJdwIucQ2hD
+         pe2eYqtnyD9DK9qObt3A+sAt8DHrM2gnXriY339r43P+ebmjgnNSIovvBcNJY/8p9x99
+         OfkyahKmSN/jKqjmChGkrTCDznAu+m5HDvChHUBAkkMxpVV3UPkJpVN3ExK1LDq3ub9H
+         mgFbqG9JAMiEojThMWzcO00wN3APquKsE4UNlDMlc7JJlgenq4bGMFaxGXwf3iepexeJ
+         1NfI3HVoLzjqZY6YGXhsHus+IuqHyHlXpulGBC5CzkNuBObNFEhDenANWGO3nsCzAgjj
+         pjNw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736996794; x=1737601594;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=4ze2u6ogswUGLWexD9dL+Uvbmw1nnxbIQ0UCNZR5y2U=;
+        b=F+o1rg2Q+5dcT40CMKq7O+Bu1SUrhPoJ5XZ7mnqs/gCcmP4g6w9aADTqBwhKDzItQ1
+         +Su70N+FpriR1FuwzIyvoaKRrfi8J8hWhZlrGi98JlhCKHLA51tkhWCEeD/BHkmGjg6v
+         i2yHFQ+rA2s2W76i7Gq1b8bhiYRWWi39meX9aIdFpBqmdns33Nc2hsh14yas8CjV1689
+         sARuB96SSLOLLob8+AN6EwpgcdAstUwgaYCdo494cdw6Vp88FEnnMro7GKr25XF9OZeQ
+         tAVg36AVjn2daDrYeWMr+23WmaYtQIX8Rv4KZAOlTIMDlDQT09NBiE2uour9KH7BYno2
+         OAfQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVRM6LCp2jAG3Naz5v1FZc08XfqEQzysjDtU6+5F0BcZAN7d49RQFwo7y4omvqX/mp48p4d1w/RY3uEg8I=@vger.kernel.org, AJvYcCVWtdiM7Di7kgr8OBZA+KqtYbQvXaQEvy5i02bDNOjB8nkNP7I5o16H35XPrdsqUOHw8rAwxg9u@vger.kernel.org
+X-Gm-Message-State: AOJu0YxhNlQnnqZ+s/Vi5TUHMO70uNYiPONbl6k3OJvXyBZs2QULPiM/
+	PAGA1PkoMbSk4vxjmIihHLtQ0Es7dL3HmdhMoCcB5Y1VkGxn02oT
+X-Gm-Gg: ASbGnctyfnM9UAiB15i/fe1XayztkG3bNNACe2Aq94+ypMpbP5B/6V9/E+pdibwn4dS
+	EoM79vJIiAJCobWWR/L+izC7ksIGb3LtWEAVbOZKxWesE9dFaUkPKfPNT9GuD2vZJBytx/4wjAy
+	bRNl+5y9/A+KV/pGDnaHxexVfxsHn6SdUQ5doq0VsODxuNfg3D8KoKuE6OvAUtAeJzt1rL4pLyM
+	WiTSuVYNAWN8Nlplr4A6Pzaz2t66tRlREyXxamZuraZmBn1ZF9h5w==
+X-Google-Smtp-Source: AGHT+IG+gbuPhTugQjUyA8q5cqsivSTkcwRWWlQBn8xqPiJT5A4ujHeYMSSbV2ToO+BpK0JupiGTeQ==
+X-Received: by 2002:a17:902:e544:b0:216:50c6:6b47 with SMTP id d9443c01a7336-21a8400038bmr503434195ad.46.1736996794005;
+        Wed, 15 Jan 2025 19:06:34 -0800 (PST)
+Received: from localhost ([129.146.253.192])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21a9f10df6dsm89036585ad.5.2025.01.15.19.05.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 15 Jan 2025 19:06:33 -0800 (PST)
+Date: Thu, 16 Jan 2025 11:04:36 +0800
+From: Furong Xu <0x1207@gmail.com>
+To: Kunihiko Hayashi <hayashi.kunihiko@socionext.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu
+ <joabreu@synopsys.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Maxime
+ Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net 1/2] net: stmmac: Limit FIFO size by hardware
+ feature value
+Message-ID: <20250116105011.00003206@gmail.com>
+In-Reply-To: <20250116020853.2835521-1-hayashi.kunihiko@socionext.com>
+References: <20250116020853.2835521-1-hayashi.kunihiko@socionext.com>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D037UWB004.ant.amazon.com (10.13.138.84) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Thanks for the report!
+On Thu, 16 Jan 2025 11:08:52 +0900, Kunihiko Hayashi <hayashi.kunihiko@socionext.com> wrote:
 
-From: Yael Chemla <ychemla@nvidia.com>
-Date: Thu, 16 Jan 2025 00:16:27 +0200
-> we observed in our regression tests the following issue:
+> Tx/Rx FIFO size is specified by the parameter "{tx,rx}-fifo-depth" from
+> the platform layer.
 > 
-> BUG: KASAN: slab-use-after-free in notifier_call_chain+0x22c/0x280
-> kasan_report+0xbd/0xf0
-> RIP: 0033:0x7f70839018b7
-> kasan_save_stack+0x1c/0x40
-> kasan_save_track+0x10/0x30
-> __kasan_kmalloc+0x83/0x90
-> kasan_save_stack+0x1c/0x40
-> kasan_save_track+0x10/0x30
-> kasan_save_free_info+0x37/0x50
-> __kasan_slab_free+0x33/0x40
-> page dumped because: kasan: bad access detected
-> BUG: KASAN: slab-use-after-free in notifier_call_chain+0x222/0x280
-> kasan_report+0xbd/0xf0
-> RIP: 0033:0x7f70839018b7
-> kasan_save_stack+0x1c/0x40
-> kasan_save_track+0x10/0x30
-> __kasan_kmalloc+0x83/0x90
-> kasan_save_stack+0x1c/0x40
-> kasan_save_track+0x10/0x30
-> kasan_save_free_info+0x37/0x50
-> __kasan_slab_free+0x33/0x40
-> page dumped because: kasan: bad access detected
+> However, these values are constrained by upper limits determined by the
+> capabilities of each hardware feature. There is a risk that the upper
+> bits will be truncated due to the calculation, so it's appropriate to
+> limit them to the upper limit values.
 > 
-> and there are many more of that kind.
 
-Do you have any other stack traces with more callers info ?
-Also can you decode the trace with ./scripts/decode_stacktrace.sh ?
+Patch is fine, but the Fixes: tag is required here.
 
+And if you like to group this patch and the another patch into one series,
+it is better to add a cover letter.
+
+> Signed-off-by: Kunihiko Hayashi <hayashi.kunihiko@socionext.com>
+> ---
+>  drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
 > 
-> it happens after applying commit 7fb1073300a2 ("net: Hold 
-> rtnl_net_lock() in (un)?register_netdevice_notifier_dev_net()")
-> 
-> test scenario includes configuration and traffic over two namespaces 
-> associated with two different VFs.
-
-Could you elaborate more about the test scenario, especially
-how each device/netns is dismantled after the test case ?
-
-I guess the VF is moved to init_net ?
-
-> 
-> 
-> On 04/01/2025 8:37, Kuniyuki Iwashima wrote:
-> > (un)?register_netdevice_notifier_dev_net() hold RTNL before triggering
-> > the notifier for all netdev in the netns.
-> > 
-> > Let's convert the RTNL to rtnl_net_lock().
-> > 
-> > Note that move_netdevice_notifiers_dev_net() is assumed to be (but not
-> > yet) protected by per-netns RTNL of both src and dst netns; we need to
-> > convert wireless and hyperv drivers that call dev_change_net_namespace().
-> > 
-> > Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-> > ---
-> >   net/core/dev.c | 16 ++++++++++------
-> >   1 file changed, 10 insertions(+), 6 deletions(-)
-> > 
-> > diff --git a/net/core/dev.c b/net/core/dev.c
-> > index f6c6559e2548..a0dd34463901 100644
-> > --- a/net/core/dev.c
-> > +++ b/net/core/dev.c
-> > @@ -1943,15 +1943,17 @@ int register_netdevice_notifier_dev_net(struct net_device *dev,
-> >   					struct notifier_block *nb,
-> >   					struct netdev_net_notifier *nn)
-> >   {
-> > +	struct net *net = dev_net(dev);
-> 
-> it seems to happen since the net pointer is acquired here without a lock.
-> Note that KASAN issue is not triggered when executing with rtnl_lock() 
-> taken before this line. and our kernel .config expands 
-> rtnl_net_lock(net) to rtnl_lock() (CONFIG_DEBUG_NET_SMALL_RTNL is not set).
-
-It sounds like the device was being moved to another netns while
-unregister_netdevice_notifier_dev_net() was called.
-
-Could you check if dev_net() is changed before/after rtnl_lock() in
-
-  * register_netdevice_notifier_dev_net()
-  * unregister_netdevice_notifier_dev_net()
-
-?
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> index 7bf275f127c9..2d69c3c4b329 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> @@ -2375,9 +2375,9 @@ static void stmmac_dma_operation_mode(struct stmmac_priv *priv)
+>  	u32 chan = 0;
+>  	u8 qmode = 0;
+>  
+> -	if (rxfifosz == 0)
+> +	if (!rxfifosz || rxfifosz > priv->dma_cap.rx_fifo_size)
+>  		rxfifosz = priv->dma_cap.rx_fifo_size;
+> -	if (txfifosz == 0)
+> +	if (!txfifosz || txfifosz > priv->dma_cap.tx_fifo_size)
+>  		txfifosz = priv->dma_cap.tx_fifo_size;
+>  
+>  	/* Split up the shared Tx/Rx FIFO memory on DW QoS Eth and DW XGMAC */
+> @@ -2851,9 +2851,9 @@ static void stmmac_set_dma_operation_mode(struct stmmac_priv *priv, u32 txmode,
+>  	int rxfifosz = priv->plat->rx_fifo_size;
+>  	int txfifosz = priv->plat->tx_fifo_size;
+>  
+> -	if (rxfifosz == 0)
+> +	if (!rxfifosz || rxfifosz > priv->dma_cap.rx_fifo_size)
+>  		rxfifosz = priv->dma_cap.rx_fifo_size;
+> -	if (txfifosz == 0)
+> +	if (!txfifosz || txfifosz > priv->dma_cap.tx_fifo_size)
+>  		txfifosz = priv->dma_cap.tx_fifo_size;
+>  
+>  	/* Adjust for real per queue fifo size */
 
