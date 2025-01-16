@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-159100-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159101-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4ABDA1466F
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 00:39:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id DAEF7A14672
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 00:40:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0D76E3A48B9
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 23:39:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 276663A3DC4
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 23:39:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B75122442DE;
-	Thu, 16 Jan 2025 23:30:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B4752451D9;
+	Thu, 16 Jan 2025 23:30:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="H7YoDbru"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="db6XkV1m"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-182.mta1.migadu.com (out-182.mta1.migadu.com [95.215.58.182])
+Received: from out-177.mta1.migadu.com (out-177.mta1.migadu.com [95.215.58.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F66A24386A
-	for <netdev@vger.kernel.org>; Thu, 16 Jan 2025 23:30:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18B02244F89
+	for <netdev@vger.kernel.org>; Thu, 16 Jan 2025 23:30:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737070207; cv=none; b=oqZBZoLSdlUGqz7rOlTCQskHNKGqpOdCAPEkdXZktFnEs4mzCBvtRXz8EyMeawe1zHOCYb0gSngy2tBPFANRv1bo/VQySHHVZFQdiK9uoqklle5AVan6W5lhWyyLpfP9vXryr0RzXEpfDu7cRXQcvQ7ciJjJpLGivI3o7G0BrV0=
+	t=1737070210; cv=none; b=WgVEhAO5iuPEQWgW7Si/eb03hm6SYEcZxQ/IXV5obECVZKi6BqU/Re4ypRIJT+3uOFIwzryHZdALoQQ7sWtfAhtnIEpywSKN23+kI7tUYfBTI6Zo6TV7EUc1gOtc/qaJ+xRwqT/oMthpHhavhQ2PD/33UCU4DG1fDpdZTKp0jWc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737070207; c=relaxed/simple;
-	bh=0ovZud7HtG3Tj2gpzpN2GUrZgs+D7dNcA2ORWtWOiEk=;
+	s=arc-20240116; t=1737070210; c=relaxed/simple;
+	bh=Y7YKle50adsEZBFHfxDM55VoUjsRltCGNCOWC0HcpYY=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=uxhHy1/HgB/5283WjlR7vnupTock1KD9MZCYOmP2xYYjwMLEUBupDQDTNs59bWqXSv1Oa0sR8sOZ8o7tgljIXswH+MH9e0wRpyiHmP9/Ra23FPzEzWRURTzLJ5pOBGYkGVG8WMwfFLMA3uYEKFVxM28e+Za/k7DWzWai1CWpzgE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=H7YoDbru; arc=none smtp.client-ip=95.215.58.182
+	 MIME-Version; b=FIz3wsDbkirtCXhg3ExjxRzs1a1SWipzgPu7Bam4sPV+yvAOjvRru5W97p//akuWkH2VWymXjgCGdN3FjAu0VnjIArpxM1bFn5Lw8xEB6eXumQHKXaL1nJzzTuNZmB3lOMNeKpZKsxrVSN0HrNelUyyRQddn7GdmkDmaIr1fKLY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=db6XkV1m; arc=none smtp.client-ip=95.215.58.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1737070202;
+	t=1737070205;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=stXRbr6NMAFCNaNplm0LLeRfGGK/AKy1U5jOfxsu6KA=;
-	b=H7YoDbruHBzE9kO2GwMtyuP73nJ2aJ30OIgU3CIz2ARf5x3Mrcxl4H3JsC7KEHV4E3BmR8
-	JSjVKzVp+z9eEWPbTVE089Cis5GQgoixsY6ryTyLbYpH6RQd8FdOZtEjeHYUXNr1DU/q41
-	FWHkDaq14EzAtbUxLwK7LFn4VdaiD40=
+	bh=eAMLm6yea8HkssgtGd3J3JCpe9oPgNIXAXNQ53QiS30=;
+	b=db6XkV1mGJkBP4oT5jQHxa2uP5KACvfKmttyX13jQ0/E3niZuEkFkWf8JXXzmshfEqbzVW
+	b9ej8UFLumPT8fpKZVE4IzUwn43sdlTs7rhsh5gOzod7GfR1Qk7f4l893ahy0mB6RoaccF
+	A5GT5BRT17OwzN1jt0iAGavIxptHA9s=
 From: Sean Anderson <sean.anderson@linux.dev>
 To: "David S . Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
@@ -54,9 +54,9 @@ Cc: Michal Simek <michal.simek@amd.com>,
 	Shannon Nelson <shannon.nelson@amd.com>,
 	linux-arm-kernel@lists.infradead.org,
 	Sean Anderson <sean.anderson@linux.dev>
-Subject: [PATCH net-next v4 1/6] net: xilinx: axienet: Add some symbolic constants for IRQ delay timer
-Date: Thu, 16 Jan 2025 18:29:49 -0500
-Message-Id: <20250116232954.2696930-2-sean.anderson@linux.dev>
+Subject: [PATCH net-next v4 2/6] net: xilinx: axienet: Report an error for bad coalesce settings
+Date: Thu, 16 Jan 2025 18:29:50 -0500
+Message-Id: <20250116232954.2696930-3-sean.anderson@linux.dev>
 In-Reply-To: <20250116232954.2696930-1-sean.anderson@linux.dev>
 References: <20250116232954.2696930-1-sean.anderson@linux.dev>
 Precedence: bulk
@@ -68,8 +68,9 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-Instead of using literals, add some symbolic constants for the IRQ delay
-timer calculation.
+Instead of silently ignoring invalid/unsupported settings, report an
+error. Additionally, relax the check for non-zero usecs to apply only
+when it will be used (i.e. when frames != 1).
 
 Signed-off-by: Sean Anderson <sean.anderson@linux.dev>
 Reviewed by: Shannon Nelson <shannon.nelson@amd.com>
@@ -80,42 +81,47 @@ Reviewed by: Shannon Nelson <shannon.nelson@amd.com>
 Changes in v2:
 - New
 
- drivers/net/ethernet/xilinx/xilinx_axienet.h      | 3 +++
- drivers/net/ethernet/xilinx/xilinx_axienet_main.c | 7 ++-----
- 2 files changed, 5 insertions(+), 5 deletions(-)
+ .../net/ethernet/xilinx/xilinx_axienet_main.c | 27 +++++++++++++------
+ 1 file changed, 19 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/net/ethernet/xilinx/xilinx_axienet.h b/drivers/net/ethernet/xilinx/xilinx_axienet.h
-index d64b8abcf018..a3f4f3e42587 100644
---- a/drivers/net/ethernet/xilinx/xilinx_axienet.h
-+++ b/drivers/net/ethernet/xilinx/xilinx_axienet.h
-@@ -120,6 +120,9 @@
- #define XAXIDMA_IRQ_ERROR_MASK		0x00004000 /* Error interrupt */
- #define XAXIDMA_IRQ_ALL_MASK		0x00007000 /* All interrupts */
- 
-+/* Constant to convert delay counts to microseconds */
-+#define XAXIDMA_DELAY_SCALE		(125ULL * USEC_PER_SEC)
-+
- /* Default TX/RX Threshold and delay timer values for SGDMA mode */
- #define XAXIDMA_DFT_TX_THRESHOLD	24
- #define XAXIDMA_DFT_TX_USEC		50
 diff --git a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
-index 07850ad331dd..0532dc94ee93 100644
+index 0532dc94ee93..9e7fa012e4fa 100644
 --- a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
 +++ b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
-@@ -238,11 +238,8 @@ static u32 axienet_usec_to_timer(struct axienet_local *lp, u32 coalesce_usec)
+@@ -2059,14 +2059,25 @@ axienet_ethtools_set_coalesce(struct net_device *ndev,
+ 		return -EINVAL;
+ 	}
  
- 	/* 1 Timeout Interval = 125 * (clock period of SG clock) */
- 	result = DIV64_U64_ROUND_CLOSEST((u64)coalesce_usec * clk_rate,
--					 (u64)125000000);
--	if (result > 255)
--		result = 255;
--
--	return result;
-+					 XAXIDMA_DELAY_SCALE);
-+	return min(result, FIELD_MAX(XAXIDMA_DELAY_MASK));
+-	if (ecoalesce->rx_max_coalesced_frames)
+-		lp->coalesce_count_rx = ecoalesce->rx_max_coalesced_frames;
+-	if (ecoalesce->rx_coalesce_usecs)
+-		lp->coalesce_usec_rx = ecoalesce->rx_coalesce_usecs;
+-	if (ecoalesce->tx_max_coalesced_frames)
+-		lp->coalesce_count_tx = ecoalesce->tx_max_coalesced_frames;
+-	if (ecoalesce->tx_coalesce_usecs)
+-		lp->coalesce_usec_tx = ecoalesce->tx_coalesce_usecs;
++	if (!ecoalesce->rx_max_coalesced_frames ||
++	    !ecoalesce->tx_max_coalesced_frames) {
++		NL_SET_ERR_MSG(extack, "frames must be non-zero");
++		return -EINVAL;
++	}
++
++	if ((ecoalesce->rx_max_coalesced_frames > 1 &&
++	     !ecoalesce->rx_coalesce_usecs) ||
++	    (ecoalesce->tx_max_coalesced_frames > 1 &&
++	     !ecoalesce->tx_coalesce_usecs)) {
++		NL_SET_ERR_MSG(extack,
++			       "usecs must be non-zero when frames is greater than one");
++		return -EINVAL;
++	}
++
++	lp->coalesce_count_rx = ecoalesce->rx_max_coalesced_frames;
++	lp->coalesce_usec_rx = ecoalesce->rx_coalesce_usecs;
++	lp->coalesce_count_tx = ecoalesce->tx_max_coalesced_frames;
++	lp->coalesce_usec_tx = ecoalesce->tx_coalesce_usecs;
+ 
+ 	return 0;
  }
- 
- /**
 -- 
 2.35.1.1320.gc452695387.dirty
 
