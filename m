@@ -1,202 +1,192 @@
-Return-Path: <netdev+bounces-158792-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158791-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B2EAA13475
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 08:56:47 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id EEADEA1346D
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 08:55:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 320463A6660
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 07:56:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F299918882DB
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 07:55:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02C9A197A7F;
-	Thu, 16 Jan 2025 07:56:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="V3o+/kXN"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABBE6194AC7;
+	Thu, 16 Jan 2025 07:55:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-119.freemail.mail.aliyun.com (out30-119.freemail.mail.aliyun.com [115.124.30.119])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4057F194AD5;
-	Thu, 16 Jan 2025 07:56:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.119
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1108C19644B
+	for <netdev@vger.kernel.org>; Thu, 16 Jan 2025 07:55:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737014201; cv=none; b=lBJakf+ZTTwvuIdvb6k0o8px/kh3rhfAzSVGdvb3OQGiTnquVjWeDO8uedneY2wpLsj/HlIqpjcCXNYBc9mIYZZ6wMqV1rqv6WrZ3GX6CscZherQb7tUhQ1wSwjwULFEsiKfS0GEEd1vT791qokh8ho3Om+DOlwoXWnnf5PTI2s=
+	t=1737014112; cv=none; b=HPRaQxAw8DwlkuZHsG1UxFrklTONO7eFybq7VufXgNB3UsYv9+TYhic4exLx827Tf7+ZMg1AfN9nN0jan8Lc5KWHOTGuCWpkP9jKmmG3xPk2eAi4ZZpFheVZ/StFo7lbPwDYFfNLpsI7p2Yp11na2khtZpf9sUMo+wgzGFX/Ztc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737014201; c=relaxed/simple;
-	bh=pkqdGjdMYi1yzQk1vCN3PKgu8+/8JJKz6CLoOkKB+s8=;
-	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=Egf0DjVeqL/vOtFq96N4MROTvqfrBolbnWxEbG0a5zR9TXGGtvveklUiaAfc+yKzhA7jfmvLwK7fSdalGJUnPR2PceA0ypewiCH7Jmm1pyL+bYptTS3UUUJqIqyeaNfhtm1XPUN/m1FHD3wGEiOxzTXQvyIghSpObLDkfcCfzls=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=V3o+/kXN; arc=none smtp.client-ip=115.124.30.119
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1737014197; h=Message-ID:Subject:Date:From:To;
-	bh=QyeVoBuE8ZtHm/3gJn14NT7ilefLQr2T3k8o7w8Ll+c=;
-	b=V3o+/kXNC4J7+Kle5bZ3MO5P2qt4IG822PS7G9t7WpWYwVOLawutZnNHBM8At5FsLJLwUI3we+Z36UiKJMbkn880qcmrV2JHQ59gNWhQSoTdd5JOeBwN/T/UN6ciNrA2CZ2RiBcGhKunDXxg9ngmuRve+qlORQJak/EiUB6fsWk=
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0WNkwH05_1737014194 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Thu, 16 Jan 2025 15:56:35 +0800
-Message-ID: <1737013994.1861002-1-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH net-next v2 3/4] virtio_net: Map NAPIs to queues
-Date: Thu, 16 Jan 2025 15:53:14 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: Joe Damato <jdamato@fastly.com>
-Cc: gerhard@engleder-embedded.com,
- jasowang@redhat.com,
- leiyang@redhat.com,
- mkarsten@uwaterloo.ca,
- Joe Damato <jdamato@fastly.com>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- =?utf-8?q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- virtualization@lists.linux.dev (open list:VIRTIO CORE AND NET DRIVERS),
- linux-kernel@vger.kernel.org (open list),
- bpf@vger.kernel.org (open list:XDP (eXpress Data Path):Keyword:(?:\b|_)xdp(?:\b|_)),
- netdev@vger.kernel.org
-References: <20250116055302.14308-1-jdamato@fastly.com>
- <20250116055302.14308-4-jdamato@fastly.com>
-In-Reply-To: <20250116055302.14308-4-jdamato@fastly.com>
+	s=arc-20240116; t=1737014112; c=relaxed/simple;
+	bh=7M65RmMX3Ry4OaGybSFFVt26wFFfaatRGurZ9wLro+M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bvhMgn78+xauVoa54+16N9wrsTxIpFTJU8pgo0QZgP5jtqAKtbv+KyEjD15AGB4nUKNvx7DQ5Wl+tcYvSg2M+gUx5rn4VlwI3ngcJ5NplCo33F4GLZCxFx9uI25KLkK+kPS/l28+9UaisNNdF2hMhbUGxbGKT360Chnsr098WmY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1tYKhe-00075B-4S; Thu, 16 Jan 2025 08:54:10 +0100
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1tYKhT-000DS3-0I;
+	Thu, 16 Jan 2025 08:53:59 +0100
+Received: from pengutronix.de (pd9e59fec.dip0.t-ipconnect.de [217.229.159.236])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id 165233A99BF;
+	Thu, 16 Jan 2025 07:53:43 +0000 (UTC)
+Date: Thu, 16 Jan 2025 08:53:42 +0100
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: Kees Cook <kees@kernel.org>
+Cc: Jakub Kicinski <kuba@kernel.org>, 
+	Cheng Xu <chengyou@linux.alibaba.com>, Kai Shen <kaishen@linux.alibaba.com>, 
+	Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>, 
+	Christian Benvenuti <benve@cisco.com>, Nelson Escobar <neescoba@cisco.com>, 
+	Bernard Metzler <bmt@zurich.ibm.com>, Karsten Keil <isdn@linux-pingi.de>, 
+	Michal Ostrowski <mostrows@earthlink.net>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>, 
+	Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>, 
+	Chaitanya Kulkarni <kch@nvidia.com>, Lee Duncan <lduncan@suse.com>, Chris Leech <cleech@redhat.com>, 
+	Mike Christie <michael.christie@oracle.com>, "James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, 
+	"Martin K. Petersen" <martin.petersen@oracle.com>, Bjorn Andersson <andersson@kernel.org>, 
+	Konrad Dybcio <konradybcio@kernel.org>, Alexander Aring <aahringo@redhat.com>, 
+	David Teigland <teigland@redhat.com>, Trond Myklebust <trondmy@kernel.org>, 
+	Anna Schumaker <anna@kernel.org>, Mark Fasheh <mark@fasheh.com>, Joel Becker <jlbec@evilplan.org>, 
+	Joseph Qi <joseph.qi@linux.alibaba.com>, Namjae Jeon <linkinjeon@kernel.org>, 
+	Steve French <sfrench@samba.org>, Sergey Senozhatsky <senozhatsky@chromium.org>, 
+	Tom Talpey <tom@talpey.com>, Simon Horman <horms@kernel.org>, 
+	Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>, Neil Brown <neilb@suse.de>, 
+	Olga Kornievskaia <okorniev@redhat.com>, Dai Ngo <Dai.Ngo@oracle.com>, David Ahern <dsahern@kernel.org>, 
+	Joerg Reuter <jreuter@yaina.de>, Marcel Holtmann <marcel@holtmann.org>, 
+	Johan Hedberg <johan.hedberg@gmail.com>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+	Oliver Hartkopp <socketcan@hartkopp.net>, Robin van der Gracht <robin@protonic.nl>, 
+	Oleksij Rempel <o.rempel@pengutronix.de>, Alexandra Winter <wintera@linux.ibm.com>, 
+	Thorsten Winkler <twinkler@linux.ibm.com>, James Chapman <jchapman@katalix.com>, 
+	Krzysztof Kozlowski <krzk@kernel.org>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+	Remi Denis-Courmont <courmisch@gmail.com>, Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>, 
+	Allison Henderson <allison.henderson@oracle.com>, Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, 
+	Xin Long <lucien.xin@gmail.com>, Wenjia Zhang <wenjia@linux.ibm.com>, 
+	Jan Karcher <jaka@linux.ibm.com>, "D. Wythe" <alibuda@linux.alibaba.com>, 
+	Tony Lu <tonylu@linux.alibaba.com>, Wen Gu <guwen@linux.alibaba.com>, Jon Maloy <jmaloy@redhat.com>, 
+	Ying Xue <ying.xue@windriver.com>, Stefano Garzarella <sgarzare@redhat.com>, 
+	Martin Schiller <ms@dev.tdt.de>, Kentaro Takeda <takedakn@nttdata.co.jp>, 
+	Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>, Paul Moore <paul@paul-moore.com>, 
+	James Morris <jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>, 
+	Guillaume Nault <gnault@redhat.com>, 
+	Ahelenia =?utf-8?Q?Ziemia=C5=84ska?= <nabijaczleweli@nabijaczleweli.xyz>, Andrew Morton <akpm@linux-foundation.org>, 
+	Wu Yunchuan <yunchuan@nfschina.com>, Max Gurtovoy <mgurtovoy@nvidia.com>, 
+	Maurizio Lombardi <mlombard@redhat.com>, David Howells <dhowells@redhat.com>, 
+	Atte =?utf-8?B?SGVpa2tpbMOk?= <atteh.mailbox@gmail.com>, Vincent Duvert <vincent.ldev@duvert.net>, 
+	Denis Kirjanov <kirjanov@gmail.com>, Lukas Bulwahn <lukas.bulwahn@gmail.com>, 
+	Arnd Bergmann <arnd@arndb.de>, Thomas Huth <thuth@redhat.com>, 
+	Andrew Waterman <waterman@eecs.berkeley.edu>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Andrej Shadura <andrew.shadura@collabora.co.uk>, Ying Hsu <yinghsu@chromium.org>, 
+	Kuniyuki Iwashima <kuniyu@amazon.com>, Tom Parkin <tparkin@katalix.com>, 
+	Jason Xing <kernelxing@tencent.com>, Dan Carpenter <error27@gmail.com>, Hyunwoo Kim <v4bel@theori.io>, 
+	Bernard Pidoux <f6bvp@free.fr>, Sangsoo Lee <constant.lee@samsung.com>, 
+	Doug Brown <doug@schmorgal.com>, Ignat Korchagin <ignat@cloudflare.com>, 
+	Gou Hao <gouhao@uniontech.com>, Mina Almasry <almasrymina@google.com>, 
+	Abhishek Chauhan <quic_abchauha@quicinc.com>, Yajun Deng <yajun.deng@linux.dev>, Michal Luczaj <mhal@rbox.co>, 
+	Jiri Pirko <jiri@resnulli.us>, syzbot <syzkaller@googlegroups.com>, 
+	linux-kernel@vger.kernel.org, kernel@pengutronix.de, linux-rdma@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-nvme@lists.infradead.org, open-iscsi@googlegroups.com, 
+	linux-scsi@vger.kernel.org, linux-arm-msm@vger.kernel.org, target-devel@vger.kernel.org, 
+	gfs2@lists.linux.dev, linux-nfs@vger.kernel.org, ocfs2-devel@lists.linux.dev, 
+	linux-cifs@vger.kernel.org, linux-hams@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
+	linux-can@vger.kernel.org, linux-s390@vger.kernel.org, rds-devel@oss.oracle.com, 
+	linux-sctp@vger.kernel.org, tipc-discussion@lists.sourceforge.net, 
+	virtualization@lists.linux.dev, linux-x25@vger.kernel.org, linux-security-module@vger.kernel.org, 
+	syzbot+d7ce59b06b3eb14fd218@syzkaller.appspotmail.com, linux-hardening@vger.kernel.org
+Subject: Re: [PATCH] net: Convert proto_ops::getname to sockaddr_storage
+Message-ID: <20250116-light-panda-of-reverence-2f5da8-mkl@pengutronix.de>
+References: <20241217023417.work.145-kees@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="nbdyd5ky7ajuduf3"
+Content-Disposition: inline
+In-Reply-To: <20241217023417.work.145-kees@kernel.org>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Thu, 16 Jan 2025 05:52:58 +0000, Joe Damato <jdamato@fastly.com> wrote:
-> Use netif_queue_set_napi to map NAPIs to queue IDs so that the mapping
-> can be accessed by user apps.
->
-> $ ethtool -i ens4 | grep driver
-> driver: virtio_net
->
-> $ sudo ethtool -L ens4 combined 4
->
-> $ ./tools/net/ynl/pyynl/cli.py \
->        --spec Documentation/netlink/specs/netdev.yaml \
->        --dump queue-get --json='{"ifindex": 2}'
-> [{'id': 0, 'ifindex': 2, 'napi-id': 8289, 'type': 'rx'},
->  {'id': 1, 'ifindex': 2, 'napi-id': 8290, 'type': 'rx'},
->  {'id': 2, 'ifindex': 2, 'napi-id': 8291, 'type': 'rx'},
->  {'id': 3, 'ifindex': 2, 'napi-id': 8292, 'type': 'rx'},
->  {'id': 0, 'ifindex': 2, 'type': 'tx'},
->  {'id': 1, 'ifindex': 2, 'type': 'tx'},
->  {'id': 2, 'ifindex': 2, 'type': 'tx'},
->  {'id': 3, 'ifindex': 2, 'type': 'tx'}]
->
-> Note that virtio_net has TX-only NAPIs which do not have NAPI IDs, so
-> the lack of 'napi-id' in the above output is expected.
->
-> Signed-off-by: Joe Damato <jdamato@fastly.com>
+
+--nbdyd5ky7ajuduf3
+Content-Type: text/plain; protected-headers=v1; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH] net: Convert proto_ops::getname to sockaddr_storage
+MIME-Version: 1.0
+
+On 16.12.2024 18:34:28, Kees Cook wrote:
+> The proto_ops::getname callback was long ago backed by sockaddr_storage,
+> but the replacement of it for sockaddr was never done. Plumb it through
+> all the getname() callbacks, adjust prototypes, and fix casts.
+>=20
+> There are a few cases where the backing object is _not_ a sockaddr_storage
+> and converting it looks painful. In those cases, they use a cast to
+> struct sockaddr_storage. They appear well bounds-checked, so the risk
+> is no worse that we have currently.
+>=20
+> Other casts to sockaddr are removed, though to avoid spilling this
+> change into BPF (which becomes a much larger set of changes), cast the
+> sockaddr_storage instances there to sockaddr for the time being.
+>=20
+> In theory this could be split up into per-caller patches that add more
+> casts that all later get removed, but it seemed like there are few
+> enough callers that it seems feasible to do this in a single patch. Most
+> conversions are mechanical, so review should be fairly easy. (Famous
+> last words.)
+>=20
+> Signed-off-by: Kees Cook <kees@kernel.org>
 > ---
->  v2:
->    - Eliminate RTNL code paths using the API Jakub introduced in patch 1
->      of this v2.
->    - Added virtnet_napi_disable to reduce code duplication as
->      suggested by Jason Wang.
->
->  drivers/net/virtio_net.c | 34 +++++++++++++++++++++++++++++-----
->  1 file changed, 29 insertions(+), 5 deletions(-)
->
-> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> index cff18c66b54a..c6fda756dd07 100644
-> --- a/drivers/net/virtio_net.c
-> +++ b/drivers/net/virtio_net.c
-> @@ -2803,9 +2803,18 @@ static void virtnet_napi_do_enable(struct virtqueue *vq,
->  	local_bh_enable();
->  }
->
-> -static void virtnet_napi_enable(struct virtqueue *vq, struct napi_struct *napi)
-> +static void virtnet_napi_enable(struct virtqueue *vq,
-> +				struct napi_struct *napi)
->  {
-> +	struct virtnet_info *vi = vq->vdev->priv;
-> +	int q = vq2rxq(vq);
-> +	u16 curr_qs;
-> +
->  	virtnet_napi_do_enable(vq, napi);
-> +
-> +	curr_qs = vi->curr_queue_pairs - vi->xdp_queue_pairs;
-> +	if (!vi->xdp_enabled || q < curr_qs)
-> +		netif_queue_set_napi(vi->dev, q, NETDEV_QUEUE_TYPE_RX, napi);
+>  net/can/isotp.c                               |  3 +-
+>  net/can/j1939/socket.c                        |  2 +-
+>  net/can/raw.c                                 |  2 +-
 
-So what case the check of xdp_enabled is for?
+Acked-by: Marc Kleine-Budde <mkl@pengutronix.de> # for net/can
 
-And I think we should merge this to last commit.
+regards,
+Marc
 
-Thanks.
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
 
->  }
->
->  static void virtnet_napi_tx_enable(struct virtnet_info *vi,
-> @@ -2826,6 +2835,20 @@ static void virtnet_napi_tx_enable(struct virtnet_info *vi,
->  	virtnet_napi_do_enable(vq, napi);
->  }
->
-> +static void virtnet_napi_disable(struct virtqueue *vq,
-> +				 struct napi_struct *napi)
-> +{
-> +	struct virtnet_info *vi = vq->vdev->priv;
-> +	int q = vq2rxq(vq);
-> +	u16 curr_qs;
-> +
-> +	curr_qs = vi->curr_queue_pairs - vi->xdp_queue_pairs;
-> +	if (!vi->xdp_enabled || q < curr_qs)
-> +		netif_queue_set_napi(vi->dev, q, NETDEV_QUEUE_TYPE_RX, NULL);
-> +
-> +	napi_disable(napi);
-> +}
-> +
->  static void virtnet_napi_tx_disable(struct napi_struct *napi)
->  {
->  	if (napi->weight)
-> @@ -2842,7 +2865,8 @@ static void refill_work(struct work_struct *work)
->  	for (i = 0; i < vi->curr_queue_pairs; i++) {
->  		struct receive_queue *rq = &vi->rq[i];
->
-> -		napi_disable(&rq->napi);
-> +		virtnet_napi_disable(rq->vq, &rq->napi);
-> +
->  		still_empty = !try_fill_recv(vi, rq, GFP_KERNEL);
->  		virtnet_napi_enable(rq->vq, &rq->napi);
->
-> @@ -3042,7 +3066,7 @@ static int virtnet_poll(struct napi_struct *napi, int budget)
->  static void virtnet_disable_queue_pair(struct virtnet_info *vi, int qp_index)
->  {
->  	virtnet_napi_tx_disable(&vi->sq[qp_index].napi);
-> -	napi_disable(&vi->rq[qp_index].napi);
-> +	virtnet_napi_disable(vi->rq[qp_index].vq, &vi->rq[qp_index].napi);
->  	xdp_rxq_info_unreg(&vi->rq[qp_index].xdp_rxq);
->  }
->
-> @@ -3313,7 +3337,7 @@ static void virtnet_rx_pause(struct virtnet_info *vi, struct receive_queue *rq)
->  	bool running = netif_running(vi->dev);
->
->  	if (running) {
-> -		napi_disable(&rq->napi);
-> +		virtnet_napi_disable(rq->vq, &rq->napi);
->  		virtnet_cancel_dim(vi, &rq->dim);
->  	}
->  }
-> @@ -5932,7 +5956,7 @@ static int virtnet_xdp_set(struct net_device *dev, struct bpf_prog *prog,
->  	/* Make sure NAPI is not using any XDP TX queues for RX. */
->  	if (netif_running(dev)) {
->  		for (i = 0; i < vi->max_queue_pairs; i++) {
-> -			napi_disable(&vi->rq[i].napi);
-> +			virtnet_napi_disable(vi->rq[i].vq, &vi->rq[i].napi);
->  			virtnet_napi_tx_disable(&vi->sq[i].napi);
->  		}
->  	}
-> --
-> 2.25.1
->
+--nbdyd5ky7ajuduf3
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmeIuv8ACgkQKDiiPnot
+vG/tCQgAnoYMQthE5qhN4islXZibYx3HOEVpQp20V/CdVVRH56MNpoQvsjN0F5I9
+Pe8FiGuyUR9fNqhHJPDV5qTZfzq6vRSoc7PpwLTwF9ReyzpbKcMrYcmv/Wkbso1k
+faQaG0U/F/5wp2/nsK1h/PUHRvlwFfLs41wCCmlXQDks5vvt1U+8F/0mUiM/L0yT
+SQG9iudLNDMEv22xlkR1e90s94ARgRIKcBcOZ9LudgYLwGmT8I3JAenyHET3Q8d2
+GWVaepqliLBxoq7pfWcJm1yFL8DFp2xSUy/gP7BqrfKIJoJhRqOR2EXGSgAZ6rek
+c/YmUBVaGDu2ZBkxhzlB6NKXFu9dBA==
+=LAEY
+-----END PGP SIGNATURE-----
+
+--nbdyd5ky7ajuduf3--
 
