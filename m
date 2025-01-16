@@ -1,127 +1,149 @@
-Return-Path: <netdev+bounces-158914-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158915-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 007A5A13BDA
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 15:11:47 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8442BA13BF9
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 15:17:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 59276188C61C
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 14:11:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F0EA43A9F52
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 14:17:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B928322B5B8;
-	Thu, 16 Jan 2025 14:10:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NiTTJ52D"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06F81198A29;
+	Thu, 16 Jan 2025 14:17:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 222BB22B5A3;
-	Thu, 16 Jan 2025 14:10:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 162EF8633A
+	for <netdev@vger.kernel.org>; Thu, 16 Jan 2025 14:17:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737036604; cv=none; b=XmOPBmjvAlDQbmSkhglzkSkQod4W7cnhfRoSQEIptLkAeoUmOsolb6UkpjCO5PZGYbvsQ0PaLlUAqFMIJV9ekA3VYe3ZQM/DXLaeQxsHdsmC+lwTrNCui31/HZwi5DCZu+/LPZE5m4esU0MjfOFXgrN7z4VkvRzZYLUXB5LFuF4=
+	t=1737037041; cv=none; b=HEMEzGlZpqBK7QG1Wv9sTX9rVRgUfU3cfqy+78UA2lGiC7vOGDkuEzAP3yrY0u1Vc98q6CDoo3xzH9wnhc7M2ShNs2Mrt+I++dPGKOMwjTNs8y2gBHOCYiGIWBMtdSYIf/BFzQwzbI2aKWLJo6zJRsgxmV+ypz9vdLso5ip2w9E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737036604; c=relaxed/simple;
-	bh=vQpCD+s9y2/3FMZPZMkdmu4cJpvjF97PHf8SLhHeGFE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JoTbCKP32g4rpYjwQDKTyBg23y/n8XtR0zj/wke8gJGgnBDn3F+iVzETF11VM0pKA7ga/AQ1dQD5jd2GDeQ7mZ26O73/+FLo3oGeaIE2/xhJx2lRYUZXpj7P9tSWmrNaFpTKZLeg4vJP5tlphdikP2jWeAULzHB+z8KweTvGMKM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NiTTJ52D; arc=none smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1737036603; x=1768572603;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=vQpCD+s9y2/3FMZPZMkdmu4cJpvjF97PHf8SLhHeGFE=;
-  b=NiTTJ52D3hEMF7UJIVAZWxxdgbbuSA9Ky1TGL+9UmZ7GkfYSAKASb5Wn
-   JNUPM3SVp4SBsxJ+QSiq15eXodAuYov5MrfwYW9/vXmZapQ4ZWwzRpbO5
-   J7t334e7Nh9QXqtt9gO40pdE0Za432iwP/JTiwYnul1QxGLDcTRDrON0r
-   DeaSneVhu44VPIsrTLba1pB2mJFxtVHWbkNXnDZJ2nxIPH7QbpvgU9QVw
-   HsOtHVanFeORosHy1hGdJ4ZgmiUlc+FD6YR6dUgqS0klDaOBIhh8jApsC
-   MOzrjMsWS81//4gY8tq1s+SFNB9L3AlT/eWbbbP0VgTG0TUFRPcZbMOtX
-   w==;
-X-CSE-ConnectionGUID: zQYFKTZ5Q1yEPnbO8iF1Vw==
-X-CSE-MsgGUID: be5z8XH1S6CuByyeVTBlDQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11316"; a="36632656"
-X-IronPort-AV: E=Sophos;i="6.13,209,1732608000"; 
-   d="scan'208";a="36632656"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jan 2025 06:10:02 -0800
-X-CSE-ConnectionGUID: NxG4/B1WQqyOrsh2l3bC2w==
-X-CSE-MsgGUID: NWiIkY+QTEWt618ZBnu5Zw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.13,209,1732608000"; 
-   d="scan'208";a="110485509"
-Received: from mev-dev.igk.intel.com ([10.237.112.144])
-  by fmviesa004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jan 2025 06:10:00 -0800
-Date: Thu, 16 Jan 2025 15:06:41 +0100
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: Daniel Golle <daniel@makrotopia.org>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net 3/3] net: phy: realtek: always clear NBase-T lpa
-Message-ID: <Z4kSZ2FRV+5T3rd7@mev-dev.igk.intel.com>
-References: <cover.1736951652.git.daniel@makrotopia.org>
- <566d4771d68a1e18d2d48860e25891e468e26551.1736951652.git.daniel@makrotopia.org>
+	s=arc-20240116; t=1737037041; c=relaxed/simple;
+	bh=8kM58Shj9T4pC5Rmb3vmf6xTklpSgJjj0bEZuGF31H0=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=bvd0Z7Y+WnKBKOi1g6CpWeNmzc47oBQu7v6/0Qr0WjbUWpg/R5vxVwb52sO0tLZn5L8Z0JFAGLbbbhXwKcC+CCd1rEpo6LSwWkaPIyK35LjgQHJusJ/R9cIey2HiR69hkZ3HefN8Sj5knka/zv11K/7xCzZvj9vGJwRtEEPbpzk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.234])
+	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4YYlGf41Mqz2Dkdv;
+	Thu, 16 Jan 2025 22:14:02 +0800 (CST)
+Received: from kwepemg200003.china.huawei.com (unknown [7.202.181.30])
+	by mail.maildlp.com (Postfix) with ESMTPS id 5246A140109;
+	Thu, 16 Jan 2025 22:17:14 +0800 (CST)
+Received: from huawei.com (10.175.101.6) by kwepemg200003.china.huawei.com
+ (7.202.181.30) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Thu, 16 Jan
+ 2025 22:17:13 +0800
+From: Liu Jian <liujian56@huawei.com>
+To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <horms@kernel.org>, <stephen@networkplumber.org>,
+	<matthias.tafelmeier@gmx.net>
+CC: <netdev@vger.kernel.org>, <liujian56@huawei.com>
+Subject: [PATCH net] net: let net.core.dev_weight always be non-zero
+Date: Thu, 16 Jan 2025 22:30:53 +0800
+Message-ID: <20250116143053.4146855-1-liujian56@huawei.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <566d4771d68a1e18d2d48860e25891e468e26551.1736951652.git.daniel@makrotopia.org>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ kwepemg200003.china.huawei.com (7.202.181.30)
 
-On Wed, Jan 15, 2025 at 02:45:00PM +0000, Daniel Golle wrote:
-> Clear NBase-T link partner advertisement before calling
-> rtlgen_read_status() to avoid phy_resolve_aneg_linkmode() wrongly
-> setting speed and duplex.
-> 
-> This fixes bogus 2.5G/5G/10G link partner advertisement and thus
-> speed and duplex being set by phy_resolve_aneg_linkmode() due to stale
-> NBase-T lpa.
-> 
-> Fixes: 68d5cd09e891 ("net: phy: realtek: change order of calls in C22 read_status()")
-> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
-> ---
->  drivers/net/phy/realtek.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/net/phy/realtek.c b/drivers/net/phy/realtek.c
-> index 93704abb6787..9cefca1aefa1 100644
-> --- a/drivers/net/phy/realtek.c
-> +++ b/drivers/net/phy/realtek.c
-> @@ -952,15 +952,15 @@ static int rtl822x_read_status(struct phy_device *phydev)
->  {
->  	int lpadv, ret;
->  
-> +	mii_10gbt_stat_mod_linkmode_lpa_t(phydev->lp_advertising, 0);
-> +
->  	ret = rtlgen_read_status(phydev);
->  	if (ret < 0)
->  		return ret;
->  
->  	if (phydev->autoneg == AUTONEG_DISABLE ||
-> -	    !phydev->autoneg_complete) {
-> -		mii_10gbt_stat_mod_linkmode_lpa_t(phydev->lp_advertising, 0);
-> +	    !phydev->autoneg_complete)
->  		return 0;
-> -	}
->  
->  	lpadv = phy_read_paged(phydev, 0xa5d, 0x13);
->  	if (lpadv < 0)
+The following problem was encountered during stability test:
 
-Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+(NULL net_device): NAPI poll function process_backlog+0x0/0x530 \
+	returned 1, exceeding its budget of 0.
+------------[ cut here ]------------
+list_add double add: new=ffff88905f746f48, prev=ffff88905f746f48, \
+	next=ffff88905f746e40.
+WARNING: CPU: 18 PID: 5462 at lib/list_debug.c:35 \
+	__list_add_valid_or_report+0xf3/0x130
+CPU: 18 UID: 0 PID: 5462 Comm: ping Kdump: loaded Not tainted 6.13.0-rc7+
+RIP: 0010:__list_add_valid_or_report+0xf3/0x130
+Call Trace:
+? __warn+0xcd/0x250
+? __list_add_valid_or_report+0xf3/0x130
+enqueue_to_backlog+0x923/0x1070
+netif_rx_internal+0x92/0x2b0
+__netif_rx+0x15/0x170
+loopback_xmit+0x2ef/0x450
+dev_hard_start_xmit+0x103/0x490
+__dev_queue_xmit+0xeac/0x1950
+ip_finish_output2+0x6cc/0x1620
+ip_output+0x161/0x270
+ip_push_pending_frames+0x155/0x1a0
+raw_sendmsg+0xe13/0x1550
+__sys_sendto+0x3bf/0x4e0
+__x64_sys_sendto+0xdc/0x1b0
+do_syscall_64+0x5b/0x170
+entry_SYSCALL_64_after_hwframe+0x76/0x7e
 
-> -- 
-> 2.47.1
+The reproduction command is as follows:
+sysctl -w net.core.dev_weight=0
+Ping 127.0.0.1
+
+This is because when the napi's weight is set to 0, process_backlog() may
+return 0 and clear the NAPI_STATE_SCHED bit of napi->state, causing this
+napi to be re-polled in net_rx_action() until __do_softirq() times out.
+Since the NAPI_STATE_SCHED bit has been cleared, napi_schedule_rps() can
+be retriggered in enqueue_to_backlog(), causing this issue.
+
+Making the napi's weight always non-zero solves this problem.
+
+Fixes: e38766054509 ("[NET]: Fix sysctl net.core.dev_weight")
+Fixes: 3d48b53fb2ae ("net: dev_weight: TX/RX orthogonality")
+Signed-off-by: Liu Jian <liujian56@huawei.com>
+---
+ net/core/sysctl_net_core.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/net/core/sysctl_net_core.c b/net/core/sysctl_net_core.c
+index cb8d32e5c14e..ad2741f1346a 100644
+--- a/net/core/sysctl_net_core.c
++++ b/net/core/sysctl_net_core.c
+@@ -319,7 +319,7 @@ static int proc_do_dev_weight(const struct ctl_table *table, int write,
+ 	int ret, weight;
+ 
+ 	mutex_lock(&dev_weight_mutex);
+-	ret = proc_dointvec(table, write, buffer, lenp, ppos);
++	ret = proc_dointvec_minmax(table, write, buffer, lenp, ppos);
+ 	if (!ret && write) {
+ 		weight = READ_ONCE(weight_p);
+ 		WRITE_ONCE(net_hotdata.dev_rx_weight, weight * dev_weight_rx_bias);
+@@ -412,6 +412,7 @@ static struct ctl_table net_core_table[] = {
+ 		.maxlen		= sizeof(int),
+ 		.mode		= 0644,
+ 		.proc_handler	= proc_do_dev_weight,
++		.extra1         = SYSCTL_ONE,
+ 	},
+ 	{
+ 		.procname	= "dev_weight_rx_bias",
+@@ -419,6 +420,7 @@ static struct ctl_table net_core_table[] = {
+ 		.maxlen		= sizeof(int),
+ 		.mode		= 0644,
+ 		.proc_handler	= proc_do_dev_weight,
++		.extra1         = SYSCTL_ONE,
+ 	},
+ 	{
+ 		.procname	= "dev_weight_tx_bias",
+@@ -426,6 +428,7 @@ static struct ctl_table net_core_table[] = {
+ 		.maxlen		= sizeof(int),
+ 		.mode		= 0644,
+ 		.proc_handler	= proc_do_dev_weight,
++		.extra1         = SYSCTL_ONE,
+ 	},
+ 	{
+ 		.procname	= "netdev_max_backlog",
+-- 
+2.34.1
+
 
