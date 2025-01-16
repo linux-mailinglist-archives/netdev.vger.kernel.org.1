@@ -1,182 +1,219 @@
-Return-Path: <netdev+bounces-158815-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158816-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6169CA135CF
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 09:47:51 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C3E2A135E6
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 09:57:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4BCF13A3EE8
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 08:47:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A7FE63A4FFA
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 08:57:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 489731D89F8;
-	Thu, 16 Jan 2025 08:47:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A60E21D79A5;
+	Thu, 16 Jan 2025 08:57:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=leica-geosystems.com header.i=@leica-geosystems.com header.b="o/mO4JjY"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b+iUGFTV"
 X-Original-To: netdev@vger.kernel.org
-Received: from DUZPR83CU001.outbound.protection.outlook.com (mail-northeuropeazon11013064.outbound.protection.outlook.com [52.101.67.64])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E80B1D7E52;
-	Thu, 16 Jan 2025 08:47:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.67.64
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737017250; cv=fail; b=umWzvttZS6d5IN4Cz7fIXvXIKcGdlbuCdjhAvEfviFUl9UWRRflrFFa+Zxr+pikGFnmbUNRtVrChEWlLzBUhqb77LjOYEEr3/CPUNjfz2DaBWOUMdnamEwRmbJviODcm0C4txxtU8OaZ6Cv3XkR0huFkGBDV1sCuWN+s2ZAdO1M=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737017250; c=relaxed/simple;
-	bh=LDDJcUrXFkWKe5FKTIJ1hpQpKblSf4eAw0bOSHuH8iE=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ulQuUIAWGLAT0+QR7UFrRy+jtrhOiibfDtFDwL9b7MT4ua3QTupl8EAqZwuDfW8/Nus6pl3KSWsD0lXN89/T9ppWUJARI69N/Jk/xYvtA4P9Hm5yBtQdAnsBnwvLfhkCUbYhMnDi9oyj2ndPMwDA0KK0h0m7iBUtm5zB8v3RX5U=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=leica-geosystems.com; spf=fail smtp.mailfrom=leica-geosystems.com; dkim=pass (1024-bit key) header.d=leica-geosystems.com header.i=@leica-geosystems.com header.b=o/mO4JjY; arc=fail smtp.client-ip=52.101.67.64
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=leica-geosystems.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=leica-geosystems.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=jwSq7yoQDgpkdJCnZaeTvVLSXCtRPCSp67jc/vRMnykchdkTX7GkWyIW3aG+inoEQ2Zg8zCFlb1V/poHaIxX+nIyqytxl9kwBW/MYCTw544d7TS68chR1Jp0gOITvOwmj01+jI9Fr5jKGvzCUkT/FNPqv5ODV+A0PkG9YutbKcJ721Tpfp67sCbqefwBuyb7pDyfpQb48XtfWhsX0A5WaRK25jLzI9j986etaZFDJaFaGBgWHnaU0Ztb4LdLWff6q94ZBjWKstXTIINczfasPeJ3qVabc5kX877DGfpWeVkOMG2xMuRM8VKLSFZ2X0YotAbgflenalozrc8voh2W/w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Z7ePe8LrpbKbpFWmraqm2BTfhKZLA99rUCyeM3NWd/s=;
- b=ta3ivX1fb57Ecfej8AO2qUbXFpI5v7JeamIhwoZ5H3dkSvKJz9OczxxeJZujGvekgxyL+bipgnp3j+aBAmkxp19+fPpoJoerVOxiiZpPUWl9ZUpLrSxP6G3OvReWpowbHp+bbNWY+tUxrQOWn/B/8py8OeFmeX4qnqOrxRkATxkgg+Rf83wuypQ7O0SP5zR91A5bvAo+i3tfxzmuM9nvwDPJ2X0FTkUKpyjvoSZpg0rl0WnV4rl9MhViJUlYdgxVpnhNOWUAxoniU0bALI3blxHSIy9RcKxhC9D4x5T9gHfiE73FOoTuaaHUXODJrqsnH/e92IvcQctr5tX7OR7BmA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 193.8.40.94) smtp.rcpttodomain=vger.kernel.org
- smtp.mailfrom=leica-geosystems.com; dmarc=pass (p=reject sp=reject pct=100)
- action=none header.from=leica-geosystems.com; dkim=none (message not signed);
- arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=leica-geosystems.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Z7ePe8LrpbKbpFWmraqm2BTfhKZLA99rUCyeM3NWd/s=;
- b=o/mO4JjY/zpCIV6MrBISkwOXrTi22ZcJkmhNCFS7+6LyiwtDgcNYPcJ2O7rE7Cgdr6FypuXfJ2BCXxivRjMghaew2QOOyC+CqiAn4+bPygG9oSz2oOP96ehtg0Z+4Ihwto8hgTn0fBG5a0/YYV1SzWepCC2Jo3Oy7hsWZjIWbTk=
-Received: from DU6P191CA0057.EURP191.PROD.OUTLOOK.COM (2603:10a6:10:53e::15)
- by PAXPR06MB7422.eurprd06.prod.outlook.com (2603:10a6:102:12e::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8356.13; Thu, 16 Jan
- 2025 08:47:25 +0000
-Received: from DB1PEPF00050A01.eurprd03.prod.outlook.com
- (2603:10a6:10:53e:cafe::e2) by DU6P191CA0057.outlook.office365.com
- (2603:10a6:10:53e::15) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8356.14 via Frontend Transport; Thu,
- 16 Jan 2025 08:47:25 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 193.8.40.94)
- smtp.mailfrom=leica-geosystems.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=leica-geosystems.com;
-Received-SPF: Pass (protection.outlook.com: domain of leica-geosystems.com
- designates 193.8.40.94 as permitted sender) receiver=protection.outlook.com;
- client-ip=193.8.40.94; helo=hexagon.com; pr=C
-Received: from hexagon.com (193.8.40.94) by
- DB1PEPF00050A01.mail.protection.outlook.com (10.167.242.43) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8356.11 via Frontend Transport; Thu, 16 Jan 2025 08:47:23 +0000
-Received: from aherlnxbspsrv01.lgs-net.com ([10.60.34.116]) by hexagon.com with Microsoft SMTPSVC(10.0.17763.1697);
-	 Thu, 16 Jan 2025 09:47:23 +0100
-From: Catalin Popescu <catalin.popescu@leica-geosystems.com>
-To: andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	robh@kernel.org,
-	krzk+dt@kernel.org,
-	conor+dt@kernel.org,
-	johannes@sipsolutions.net,
-	p.zabel@pengutronix.de
-Cc: netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-wireless@vger.kernel.org,
-	m.felsch@pengutronix.de,
-	bsp-development.geo@leica-geosystems.com,
-	Catalin Popescu <catalin.popescu@leica-geosystems.com>
-Subject: [PATCH net-next v2 2/2] net: rfkill: gpio: allow booting in blocked state
-Date: Thu, 16 Jan 2025 09:47:02 +0100
-Message-Id: <20250116084702.3473176-2-catalin.popescu@leica-geosystems.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250116084702.3473176-1-catalin.popescu@leica-geosystems.com>
-References: <20250116084702.3473176-1-catalin.popescu@leica-geosystems.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D2D61D5AA8
+	for <netdev@vger.kernel.org>; Thu, 16 Jan 2025 08:57:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1737017841; cv=none; b=Oo+6SPjTBfnfyrwUPa55dYmugZdQoAOQO5idFoo8ZGJ92j8XkKtQevAJ2IIA+jF1EjcVW52p9BmBQlCHurf+c0jTio/KF7CPAkcJBuW53dgUpDioabKaldT6iNY0y5onfQCWz/kBBCbg+OsrPl2N+iudRLGeL0aAt89D1M5W2H4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1737017841; c=relaxed/simple;
+	bh=PtUhQynYgZLYfz9e+zHBnnH2YW9fJ84gqLC9SnFqqqU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KdOzgOHq2na7YwI7kQROPzgXhPN4F9Mn7SyQ3Wd5sTRnQ0ckI719Hx5dkII+n/2WjiUVoYJY/NqfeaKHmLziFXQpeAYB/IMpOQQvV9Ze0pQlYxHH7irr3hlwS40WCoa/BAKPIkQTA1zSWCknYTwb6scHMxpZYLlTEGJMPAVGSc4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=b+iUGFTV; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1737017838;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=pmkLmsyIcPYmFuaESsfI5oPSmcbmJsLv+8kU8eWcxJk=;
+	b=b+iUGFTVAQTEESja0Q2tHSyjXymaEO+gM2Ow+H6WseVs4tQUCnDgSieFrf4N99ZynKKZV/
+	JEGAuo6h4Ezc12u+ghHLDJxbnukg91t+dQec10P4JMiod1j4Nbx3lnRjKtlV+JS2BaYWRj
+	QsgiPERHC2isFLHuBUfd1p/B/WckPKM=
+Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
+ [209.85.160.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-606-NZL1xecWNc-a99WveoC1fA-1; Thu, 16 Jan 2025 03:57:16 -0500
+X-MC-Unique: NZL1xecWNc-a99WveoC1fA-1
+X-Mimecast-MFC-AGG-ID: NZL1xecWNc-a99WveoC1fA
+Received: by mail-qt1-f197.google.com with SMTP id d75a77b69052e-467a0a6c846so17023921cf.1
+        for <netdev@vger.kernel.org>; Thu, 16 Jan 2025 00:57:16 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737017836; x=1737622636;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=pmkLmsyIcPYmFuaESsfI5oPSmcbmJsLv+8kU8eWcxJk=;
+        b=YLSOBEkf09rMXZQZ7V1Z8/4K+b2dayjl/rff9o+FkFVy7N528zvvBqRX2uhFu3nMCt
+         vLMmmA1S8nOmeplLzvcIXXH4sdFymtpfp1CZXlmuV83jR+sIrmCZcBakiFZa0fXvANfl
+         qYgABJQeI7hvUt/GCnDWCFOj0hEBwf27veZxHQPr8IiQShjxJ8A1PMsQXG9U7DIRmpui
+         VBkjG/9CAMrjo3IagJAAPmT74Hs62n8soi1Q/yPni0vDsBe4iamwajCmJSQTiD+nqjOY
+         aw9kY+2Uzr9xOvrciSSwX0HyZLpe/x8w6Jo0NhSF+5zMHssN0ox5nF66bfqO10Tl/tK1
+         xN1A==
+X-Gm-Message-State: AOJu0Yz2Rl7a4fnyygaqG5YRrHPMZBC93GxmI4NiEHv9evF4Simsm82i
+	qV15QSFuHBVznff843Q6OaBhQdrkHW3m+HOoLajbjbDXT5tqvJ67QqW2Jf8a8n0/3mlDALlluxs
+	PCu/qlTNU1EEVotr2TzfeTVBIe1eSSNX+WuBFOwnqwhS5eFwTRulUPw==
+X-Gm-Gg: ASbGncvTvhqJ1jR+zVIGjYg9HKBo2tjmH8lWeHjonqec9FFZtr2IbmfjvMFrPLsBUpv
+	gq84UDrRn8RSW5rJUiUgkqW+57TQ16z+Gc5NHLxxZVXS71UuUyiMvIodR+BgMCKt+05LeOn51LF
+	9Z0Yc2aSDHuxWfyhq0s9kaFxOFCXNT/d5F9hj03WaKKOUoq3cxuKvaheT3Lpald7E/b6I/JEcqu
+	SEyFC0etpmfKU4nHGeGktwHt6O4cVva16qBKwc+NlOiYBGywSl3NlZ24oD2wwu+KR/lq+1kx8hg
+	Zw4Ps3PCvNItwjotQIBiTVJ1gszoNtva
+X-Received: by 2002:ac8:5813:0:b0:466:aee5:a5b with SMTP id d75a77b69052e-46c70fd1faemr467248171cf.10.1737017836169;
+        Thu, 16 Jan 2025 00:57:16 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEO29yrvkRyeFaWTkkTVXxmLbJIQYKA6Cnx5MRQ30jCm4qRaBjl6Z9IlhJpdMAezqnYQnnKAw==
+X-Received: by 2002:ac8:5813:0:b0:466:aee5:a5b with SMTP id d75a77b69052e-46c70fd1faemr467247821cf.10.1737017835757;
+        Thu, 16 Jan 2025 00:57:15 -0800 (PST)
+Received: from sgarzare-redhat (host-82-53-134-100.retail.telecomitalia.it. [82.53.134.100])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-46c873216dbsm73689241cf.7.2025.01.16.00.57.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 16 Jan 2025 00:57:15 -0800 (PST)
+Date: Thu, 16 Jan 2025 09:57:07 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Michal Luczaj <mhal@rbox.co>
+Cc: netdev@vger.kernel.org, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+	bpf@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Luigi Leonardi <leonardi@redhat.com>, "David S. Miller" <davem@davemloft.net>, 
+	Wongi Lee <qwerty@theori.io>, Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Eric Dumazet <edumazet@google.com>, kvm@vger.kernel.org, 
+	Paolo Abeni <pabeni@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, 
+	Jason Wang <jasowang@redhat.com>, Simon Horman <horms@kernel.org>, Hyunwoo Kim <v4bel@theori.io>, 
+	Jakub Kicinski <kuba@kernel.org>, virtualization@lists.linux.dev, stable@vger.kernel.org
+Subject: Re: [PATCH net v2 1/5] vsock/virtio: discard packets if the
+ transport changes
+Message-ID: <pl4mhcim7v3ukv6eseynh6x2r6nftf7yuayjzd3ftyupwy5r2h@ixmlevubqzb2>
+References: <1aa83abf-6baa-4cf1-a108-66b677bcfd93@rbox.co>
+ <nedvcylhjxrkmkvgugsku2lpdjgjpo5exoke4o6clxcxh64s3i@jkjnvngazr5v>
+ <CAGxU2F7BoMNi-z=SHsmCV5+99=CxHo4dxFeJnJ5=q9X=CM3QMA@mail.gmail.com>
+ <cccb1a4f-5495-4db1-801e-eca211b757c3@rbox.co>
+ <nzpj4hc6m4jlqhcwv6ngmozl3hcoxr6kehoia4dps7jytxf6df@iqglusiqrm5n>
+ <903dd624-44e5-4792-8aac-0eaaf1e675c5@rbox.co>
+ <5nkibw33isxiw57jmoaadizo3m2p76ve6zioumlu2z2nh5lwck@xodwiv56zrou>
+ <7de34054-10cf-45d0-a869-adebb77ad913@rbox.co>
+ <n2itoh23kikzszzgmyejfwe3mdf6fmxzwbtyo5ahtxpaco3euq@osupldmckz7p>
+ <fb6f876f-a4eb-4005-bd76-fff0632291b8@rbox.co>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-OriginalArrivalTime: 16 Jan 2025 08:47:23.0321 (UTC) FILETIME=[42D01A90:01DB67F3]
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DB1PEPF00050A01:EE_|PAXPR06MB7422:EE_
-Content-Type: text/plain
-X-MS-Office365-Filtering-Correlation-Id: ac49c42b-ecea-4662-2a32-08dd360a6582
-X-SET-LOWER-SCL-SCANNER: YES
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|1800799024|36860700013|82310400026|921020;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?ARzLZeS56oV47x+UIeElUYTeL/53flYCd48OC/E1sM7m99/x3gkVbxHEROb4?=
- =?us-ascii?Q?/wLPRddNksuATamG+WHQqJNj9lgsuwmMH7jy0zmynzVLrRJoxl1CG9BE9Yim?=
- =?us-ascii?Q?hhBmoaWbkO+6jKNCFoKKxoCJ/jC+MRvTvkH16CfydDb121giSYHxUH9D338M?=
- =?us-ascii?Q?0nF1/kyb6i8NVb0QPowinF91XbkzM4LWtWQbFT33DfIXcyY65AkaQsZuJpP8?=
- =?us-ascii?Q?qPIdTTGh2n+QUjbBTJvUsbZwXDVK6Rjf8qXv/Y2soirT3KChVgWpKgJUV3+c?=
- =?us-ascii?Q?s6zIZ0t7uOcfRWvBkFyG3z+Gf5k9FPfo2veObjgtXqpssfXd8H1+nIV5kxfD?=
- =?us-ascii?Q?mNoH/5kO6yuUAwK0mXp0mlb7GyNqVcEasHybf2n8+mbr1FUxEMARcp+iAh++?=
- =?us-ascii?Q?qsrWI+TqAFJvN5G4wnuBVaLFGzeocJI5Ty+57EgBD8/drfeRtHqVTuGDP6D3?=
- =?us-ascii?Q?GLXt+ghXlW9kr3DJmJJWU8vBKfOUhLyCq322gPoo89hbIqZGVkGDNh9UDV7J?=
- =?us-ascii?Q?sTqvqVYpZT4p7q413ehVOjHmSF1CCwPC7VKlVF6RNt7i77/OB2NTT6TtAQ7o?=
- =?us-ascii?Q?Y39NDWCEDL5CvfaUuoM/Od75ycZO/xPif06fa77E2p3wJ/1po3VSCbMzPqmQ?=
- =?us-ascii?Q?mGwYGH2BgQFSnLP+mrDujx/g8Z9z0JtH93kbB6cmRH9tKZ2tghKTZLrfSzh3?=
- =?us-ascii?Q?DdfTTRvQIo58B94RxdRuv0pF8whO2Stg1m2gE19dce4+VrQqTOvb80LFLfrN?=
- =?us-ascii?Q?BP0kRhEzH59PP2Wrx5jhlCBGVWxgMXfnrKNoJb3escoouzGP3lBlVwoXm19l?=
- =?us-ascii?Q?cY+VqfqNDRmdkOzg285aglHLUQJEWylkn5xV8NrYyOi1ks9sh2yhjbm0Wreo?=
- =?us-ascii?Q?WezxsrQijbOXXajSb5LZJMGAB2XiKTQjCGJz+pYV60hH9XnfOmHX3LGYf/IA?=
- =?us-ascii?Q?a/iYGD/mwbNclNLhQLMxCVVo3q4YWNK6+10+UjPjMUK7/inXtFOxVjxm1qIv?=
- =?us-ascii?Q?4MwrXXfLnVDR/wVXPXGp/PlaAeGDACv7qMg/Xg0FY9Lxljm9GgkC1qe49nmo?=
- =?us-ascii?Q?A10+C8/fhRYmsaF64InDlrY2TPrZ00nGCaFlOCcrTeE228wzQn/5ALSdTDW1?=
- =?us-ascii?Q?9RhEA0CNcMQYd4ZI3o7yC7+BKCptUTcEOjc2FzVGtBWLMRgA+6glOm22N2SK?=
- =?us-ascii?Q?lCVXTsw4tO/J4aMbjiO/aZ5U5V0ZYb5u1cmxEgXPKE4gnAhep5KCQMQ3YuV0?=
- =?us-ascii?Q?X76K5VYfFagqg1qeqLnBmI4EsJNNuJ7ryydAs6gbT1kXDHRJ6pawfZc6l8TA?=
- =?us-ascii?Q?em8QN6R013H66HMFjTSOaivFDeB/TDYm5W0VZIGlj9+Rfg3kVcryuAqWpSBT?=
- =?us-ascii?Q?N3m7UHJPBnzrl9i/9GQZrfT/KZkU6sDeL8Zz9UeL1Z24Kv+Nlo4NCKDfq63r?=
- =?us-ascii?Q?++z8+3Y90hEqqg3FxEZ2Pw50dlz6n993Mdp06BqSzP8Kx6uDY8cxyGN3ZE3t?=
- =?us-ascii?Q?iFzaOILvHWbOMG4=3D?=
-X-Forefront-Antispam-Report:
-	CIP:193.8.40.94;CTRY:CH;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:hexagon.com;PTR:ahersrvdom50.leica-geosystems.com;CAT:NONE;SFS:(13230040)(376014)(1800799024)(36860700013)(82310400026)(921020);DIR:OUT;SFP:1101;
-X-OriginatorOrg: leica-geosystems.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Jan 2025 08:47:23.5674
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: ac49c42b-ecea-4662-2a32-08dd360a6582
-X-MS-Exchange-CrossTenant-Id: 1b16ab3e-b8f6-4fe3-9f3e-2db7fe549f6a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=1b16ab3e-b8f6-4fe3-9f3e-2db7fe549f6a;Ip=[193.8.40.94];Helo=[hexagon.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	DB1PEPF00050A01.eurprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAXPR06MB7422
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <fb6f876f-a4eb-4005-bd76-fff0632291b8@rbox.co>
 
-By default, rfkill state is unblocked and this behavior is not
-configurable. Add support for booting in blocked state based on the
-presence of a devicetree property.
+On Tue, Jan 14, 2025 at 05:31:08PM +0100, Michal Luczaj wrote:
+>On 1/14/25 11:16, Stefano Garzarella wrote:
+>> On Tue, Jan 14, 2025 at 01:09:24AM +0100, Michal Luczaj wrote:
+>>> On 1/13/25 16:01, Stefano Garzarella wrote:
+>>>> On Mon, Jan 13, 2025 at 02:51:58PM +0100, Michal Luczaj wrote:
+>>>>> On 1/13/25 12:05, Stefano Garzarella wrote:
+>>>>>> ...
+>>>>>> An alternative approach, which would perhaps allow us to avoid all this,
+>>>>>> is to re-insert the socket in the unbound list after calling release()
+>>>>>> when we deassign the transport.
+>>>>>>
+>>>>>> WDYT?
+>>>>>
+>>>>> If we can't keep the old state (sk_state, transport, etc) on failed
+>>>>> re-connect() then reverting back to initial state sounds, uhh, like an
+>>>>> option :) I'm not sure how well this aligns with (user's expectations of)
+>>>>> good ol' socket API, but maybe that train has already left.
+>>>>
+>>>> We really want to behave as similar as possible with the other sockets,
+>>>> like AF_INET, so I would try to continue toward that train.
+>>>
+>>> I was worried that such connect()/transport error handling may have some
+>>> user visible side effects, but I guess I was wrong. I mean you can still
+>>> reach a sk_state=TCP_LISTEN with a transport assigned[1], but perhaps
+>>> that's a different issue.
+>>>
+>>> I've tried your suggestion on top of this series. Passes the tests.
+>>
+>> Great, thanks!
+>>
+>>>
+>>> diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
+>>> index fa9d1b49599b..4718fe86689d 100644
+>>> --- a/net/vmw_vsock/af_vsock.c
+>>> +++ b/net/vmw_vsock/af_vsock.c
+>>> @@ -492,6 +492,10 @@ int vsock_assign_transport(struct vsock_sock *vsk, struct vsock_sock *psk)
+>>> 		vsk->transport->release(vsk);
+>>> 		vsock_deassign_transport(vsk);
+>>>
+>>> +		vsock_addr_unbind(&vsk->local_addr);
+>>> +		vsock_addr_unbind(&vsk->remote_addr);
+>>
+>> My only doubt is that if a user did a specific bind() before the
+>> connect, this way we're resetting everything, is that right?
+>
+>That is right.
+>
+>But we aren't changing much. Transport release already removes vsk from
+>vsock_bound_sockets. So even though vsk->local_addr is untouched (i.e.
+>vsock_addr_bound() returns `true`), vsk can't be picked by
+>vsock_find_bound_socket(). User can't bind() it again, either.
 
-Signed-off-by: Catalin Popescu <catalin.popescu@leica-geosystems.com>
----
- net/rfkill/rfkill-gpio.c | 3 +++
- 1 file changed, 3 insertions(+)
+Okay, I see, so maybe for now makes sense to merge your patch, to fix 
+the UAF fist.
 
-diff --git a/net/rfkill/rfkill-gpio.c b/net/rfkill/rfkill-gpio.c
-index 9fa019e0dcad..41e657e97761 100644
---- a/net/rfkill/rfkill-gpio.c
-+++ b/net/rfkill/rfkill-gpio.c
-@@ -162,6 +162,9 @@ static int rfkill_gpio_probe(struct platform_device *pdev)
- 	if (!rfkill->rfkill_dev)
- 		return -ENOMEM;
- 
-+	if (device_property_present(&pdev->dev, "default-blocked"))
-+		rfkill_init_sw_state(rfkill->rfkill_dev, true);
-+
- 	ret = rfkill_register(rfkill->rfkill_dev);
- 	if (ret < 0)
- 		goto err_destroy;
--- 
-2.34.1
+>
+>And when patched as above: bind() works as "expected", but socket is pretty
+>much useless, anyway. If I'm correct, the first failing connect() trips
+>virtio_transport_recv_connecting(), which sets `sk->sk_err`. I don't see it
+>being reset. Does the vsock suppose to keep sk_err state once set?
+
+Nope, I think this is another thing to fix.
+
+>
+>Currently only AF_VSOCK throws ConnectionResetError:
+>```
+>from socket import *
+>
+>def test(family, addr):
+>	s = socket(family, SOCK_STREAM)
+>	assert s.connect_ex(addr) != 0
+>
+>	lis = socket(family, SOCK_STREAM)
+>	lis.bind(addr)
+>	lis.listen()
+>	s.connect(addr)
+>
+>	p, _ = lis.accept()
+>	p.send(b'x')
+>	assert s.recv(1) == b'x'
+>
+>test(AF_INET, ('127.0.0.1', 2000))
+>test(AF_UNIX, '\0/tmp/foo')
+>test(AF_VSOCK, (1, 2000)) # VMADDR_CID_LOCAL
+>```
+>
+>> Maybe we need to look better at the release, and prevent it from
+>> removing the socket from the lists as you suggested, maybe adding a
+>> function in af_vsock.c that all transports can call.
+>
+>I'd be happy to submit a proper patch, but it would be helpful to decide
+>how close to AF_INET/AF_UNIX's behaviour is close enough. Or would you
+>rather have that UAF plugged first?
+>
+
+I'd say, let's fix the UAF first, then fix the behaviour (also in a
+single series, but I prefer 2 separate patches if possible).
+About that, AF_VSOCK was started with the goal of following AF_INET as
+closely as possible, and the test suite should serve that as well, so if
+we can solve this problem and get closer to AF_INET, possibly even
+adding a dedicated test, that would be ideal!
+
+Thank you very much for the help!
+Stefano
 
 
