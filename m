@@ -1,172 +1,140 @@
-Return-Path: <netdev+bounces-158860-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158861-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CCD86A1395D
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 12:48:18 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9FB36A13963
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 12:48:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5E868168BE4
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 11:48:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 096821881532
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 11:49:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54EEC1DE4EC;
-	Thu, 16 Jan 2025 11:48:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DCEB1DE3DC;
+	Thu, 16 Jan 2025 11:48:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AOjCuGfm"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="kLIWNy4z"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C0FC19FA92;
-	Thu, 16 Jan 2025 11:48:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A11481DE2C6;
+	Thu, 16 Jan 2025 11:48:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737028085; cv=none; b=Nf56YeM2PM42J967xs/r2bcThbgbm/S13SgJW+WeSqMN9XLOXXj1ribhqA4Kcsmwt5M/5r2JaH2jsEcdU+8tPSKqVieo2rseaATYI6q15DGtnXiMXIJcfGftwnus6r8AnK6oRtqMniRYddKlqPzGUtv6iBWqLV/rdQajADSfo7o=
+	t=1737028133; cv=none; b=Vi2QOeRV0zCjIKvLnm0DFWVv4/ysj1QYKbFzrMK9TiTBDF3DEUZb0rcp51XSckJKsVz7ivoSpXEElE3n22p+YfQvcw2rmFxfBPZiXmg9e8ZA9TZehUFH2SYvp1UY938VOOD1RyucrmC5VcH0XUGPaa4UiTI3nw91q9xlrf1wJHI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737028085; c=relaxed/simple;
-	bh=clOmASgvnqzZyxG7wHd+nBEyJHzoGXkbDU3R++H44KA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=n8KnPoBrrh0i3P4LNKZWcJjRx11J3hvMHULsDsteaaX3WHr/+1t6Nc99gC7Zgu1c+ddFfOqItFeZ/QlOMHGULIQ0ascpqCLpcqgtPHkPFQHuBAQT8xFGHgnnDs88IoKC4+/1gc60np+7jva9o0ta1JOfJe6rea7LfOWruhOyczc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AOjCuGfm; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 38507C4CEDF;
-	Thu, 16 Jan 2025 11:48:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737028084;
-	bh=clOmASgvnqzZyxG7wHd+nBEyJHzoGXkbDU3R++H44KA=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=AOjCuGfmk8z9jPNT/+J2jS7vCfY62IXHjcPg3KqTqNk37ycUVMHmA8kPHOhgLG6P7
-	 td6ViX2UbN59kRAgHk5lk8+R/9p+3s2P/6Bd+ojfQRVGtI6+/RmW2SYQfjLu21rKsy
-	 bWquoK3k8ZqnLDKhPXDWMscUejS8XvPEZGPifUmcn2l/H/+w+ED9iEkWUZtRdssqEy
-	 dupnZgF6GaC+tlS9bGIxq7Ixd397VL4SIYgCwoTxG3ZpzVCchUKiTtFSpYIiYe2Ltv
-	 q9xoAXB3+r178dqcHBxYsqSZmtvadfMndZWbc/ksDkUDQCyNIb9YDy/YgG66kAR5TJ
-	 Jqa3rVhUdd83Q==
-Message-ID: <e2d17324-39b8-4db5-85e7-bd66e67fcd52@kernel.org>
-Date: Thu, 16 Jan 2025 13:47:59 +0200
+	s=arc-20240116; t=1737028133; c=relaxed/simple;
+	bh=Lw4wjAUigKzBAUDQnvuZb4RB/km3WbYe+PynVWIOnQE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UeDFC0fkWLsQpNvPsjd1P0EQdZI5u7ZwWyoUSXtE1aOhzv7zGk3cdFQP/9UyT5MGaVcP0KxC0NqC3SRr7Z7FaVwxXfoi/i0QU2sIblYpi9GUaJDLh7Bd1uEaufydzSoepA3w3ZWiSsuZJLvEf3w1hOartIot8oDAeNcqLImu5aU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=kLIWNy4z; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50G3qjc4005877;
+	Thu, 16 Jan 2025 11:48:31 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pp1; bh=+xgvNP4z2pVkcvpTDSHfoQCpM3nse3
+	2c8mpx7FXqAvg=; b=kLIWNy4zL5Y5d6PkjnnOJZWv2DFdqKHWq37n0sIxRIML4n
+	q95gw/kzWsc4kTMeY5TfTJqywVtaGJ0WaPQhGUNlKC58mN6lNcqatrjNy+MnVScQ
+	BdEJPadtwpEuh6Vj8GLUFj3bvNZYORcYxg8pTwUtDT9dIn6P7i11ad+/G/6VPRXI
+	pVqjkd5a/kY1JRBlmdDJMIl9WQJGXYLxCWj3uTIUo7BShXRsvQygLAtMVwg0tBhB
+	64w+njncburLeQg3iT/HGhZknNnw4gO2Gz0ZTX3aMYyRzCCm/u8FCRetFTXKqVjH
+	Btc8E4dsTEVzsKG1P24cqsHtWlal27/CjpBB+jQg==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 446tkcj2c0-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 16 Jan 2025 11:48:31 +0000 (GMT)
+Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 50GBia3N022145;
+	Thu, 16 Jan 2025 11:48:30 GMT
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 446tkcj2bv-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 16 Jan 2025 11:48:30 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 50GA62Qb007519;
+	Thu, 16 Jan 2025 11:48:29 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4443yndmvw-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 16 Jan 2025 11:48:28 +0000
+Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
+	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 50GBmRls58196414
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 16 Jan 2025 11:48:27 GMT
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id F0C2120049;
+	Thu, 16 Jan 2025 11:48:26 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id AE68F20040;
+	Thu, 16 Jan 2025 11:48:26 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Thu, 16 Jan 2025 11:48:26 +0000 (GMT)
+Date: Thu, 16 Jan 2025 12:48:25 +0100
+From: Alexander Gordeev <agordeev@linux.ibm.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Michael Kelley <mhklinux@outlook.com>, Breno Leitao <leitao@debian.org>,
+        "saeedm@nvidia.com" <saeedm@nvidia.com>,
+        "tariqt@nvidia.com" <tariqt@nvidia.com>,
+        "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>, Thomas Graf <tgraf@suug.ch>,
+        Tejun Heo <tj@kernel.org>, Hao Luo <haoluo@google.com>,
+        Josh Don <joshdon@google.com>, Barret Rhoden <brho@google.com>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Zaslonko Mikhail <zaslonko@linux.ibm.com>
+Subject: Re: [v3 PATCH] rhashtable: Fix rhashtable_try_insert test
+Message-ID: <Z4jyCZQOy8JMVu3Q@tuxmaker.boeblingen.de.ibm.com>
+References: <Z1rYGzEpMub4Fp6i@gondor.apana.org.au>
+ <Z2aFL3dNLYOcmzH3@gondor.apana.org.au>
+ <20250102-daffy-vanilla-boar-6e1a61@leitao>
+ <SN6PR02MB41572415707F0FA6D9A61247D4132@SN6PR02MB4157.namprd02.prod.outlook.com>
+ <20250109-marigold-bandicoot-of-exercise-8ebede@leitao>
+ <Z4DoFYQ3ytB-wS3-@gondor.apana.org.au>
+ <SN6PR02MB41577C2C4EB260F3D2D4F85FD41C2@SN6PR02MB4157.namprd02.prod.outlook.com>
+ <Z4FXs8vAtitHIJyl@gondor.apana.org.au>
+ <SN6PR02MB41570F1F5F4F579B4E8F0CD3D41C2@SN6PR02MB4157.namprd02.prod.outlook.com>
+ <Z4XWx5X0doetOJni@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net: ethernet: ti: am65-cpsw: fix freeing IRQ in
- am65_cpsw_nuss_remove_tx_chns()
-To: Siddharth Vadapalli <s-vadapalli@ti.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Grygorii Strashko <grygorii.strashko@ti.com>, srk@ti.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20250114-am65-cpsw-fix-tx-irq-free-v1-1-b2069e6ed185@kernel.org>
- <gygqjjyso3p4qgam4fpjdkqidj2lhxldkmaopqg32bw3g4ktpj@43tmtsdexkqv>
- <8776a109-22c3-4c1e-a6a1-7bb0a4c70b06@kernel.org>
- <m4rhkzcr7dlylxr54udyt6lal5s2q4krrvmyay6gzgzhcu4q2c@r34snfumzqxy>
- <3c9bdd38-d60f-466d-a767-63f71368d41e@kernel.org>
- <8829d58b-fbfc-4040-93de-51970631d935@kernel.org>
- <2bhpxcdducequwchyobyinj3xp2vsnpxkshtwqy24swto6zqvz@mbnnn7calbhv>
-Content-Language: en-US
-From: Roger Quadros <rogerq@kernel.org>
-In-Reply-To: <2bhpxcdducequwchyobyinj3xp2vsnpxkshtwqy24swto6zqvz@mbnnn7calbhv>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z4XWx5X0doetOJni@gondor.apana.org.au>
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: hf-R3-h7RehK4HoSkpmbwde3SAJhOX-A
+X-Proofpoint-GUID: Ls7pGjaLPrYOTwLcB5MjMFoEaNuc74Jt
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-01-16_05,2025-01-16_01,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 malwarescore=0
+ impostorscore=0 mlxscore=0 spamscore=0 priorityscore=1501
+ lowpriorityscore=0 bulkscore=0 suspectscore=0 clxscore=1011
+ mlxlogscore=686 phishscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.19.0-2411120000 definitions=main-2501160086
 
+On Tue, Jan 14, 2025 at 11:15:19AM +0800, Herbert Xu wrote:
 
+Hi Herbert,
 
-On 16/01/2025 07:15, Siddharth Vadapalli wrote:
-> On Wed, Jan 15, 2025 at 06:38:57PM +0200, Roger Quadros wrote:
->> Siddharth,
->>
->> On 15/01/2025 17:49, Roger Quadros wrote:
->>> Hi Siddharth,
->>>
->>> On 15/01/2025 12:38, Siddharth Vadapalli wrote:
->>>> On Wed, Jan 15, 2025 at 12:04:17PM +0200, Roger Quadros wrote:
->>>>> Hi Siddharth,
->>>>>
->>>>> On 15/01/2025 07:18, Siddharth Vadapalli wrote:
->>>>>> On Tue, Jan 14, 2025 at 06:44:02PM +0200, Roger Quadros wrote:
->>>>>>
->>>>>> Hello Roger,
->>>>>>
->>>>>>> When getting the IRQ we use k3_udma_glue_rx_get_irq() which returns
->>>>>>
->>>>>> You probably meant "k3_udma_glue_tx_get_irq()" instead? It is used to
->>>>>> assign tx_chn->irq within am65_cpsw_nuss_init_tx_chns() as follows:
->>>>>
->>>>> Yes I meant tx instead of rx.
->>>>>
->>>>>>
->>>>>> 		tx_chn->irq = k3_udma_glue_tx_get_irq(tx_chn->tx_chn);
->>>>>>
->>>>>> Additionally, following the above section we have:
->>>>>>
->>>>>> 		if (tx_chn->irq < 0) {
->>>>>> 			dev_err(dev, "Failed to get tx dma irq %d\n",
->>>>>> 				tx_chn->irq);
->>>>>> 			ret = tx_chn->irq;
->>>>>> 			goto err;
->>>>>> 		}
->>>>>>
->>>>>> Could you please provide details on the code-path which will lead to a
->>>>>> negative "tx_chn->irq" within "am65_cpsw_nuss_remove_tx_chns()"?
->>>>>>
->>>>>> There seem to be two callers of am65_cpsw_nuss_remove_tx_chns(), namely:
->>>>>> 1. am65_cpsw_nuss_update_tx_rx_chns()
->>>>>> 2. am65_cpsw_nuss_suspend()
->>>>>> Since both of them seem to invoke am65_cpsw_nuss_remove_tx_chns() only
->>>>>> in the case where am65_cpsw_nuss_init_tx_chns() *did not* error out, it
->>>>>> appears to me that "tx_chn->irq" will never be negative within
->>>>>> am65_cpsw_nuss_remove_tx_chns()
->>>>>>
->>>>>> Please let me know if I have overlooked something.
->>>>>
->>>>> The issue is with am65_cpsw_nuss_update_tx_rx_chns(). It can be called
->>>>> repeatedly (by user changing number of TX queues) even if previous call
->>>>> to am65_cpsw_nuss_init_tx_chns() failed.
->>>>
->>>> Thank you for clarifying. So the issue/bug was discovered since the
->>>> implementation of am65_cpsw_nuss_update_tx_rx_chns(). The "Fixes" tag
->>>> misled me. Maybe the "Fixes" tag should be updated? Though we should
->>>> code to future-proof it as done in this patch, the "Fixes" tag pointing
->>>> to the very first commit of the driver might not be accurate as the
->>>> code-path associated with the bug cannot be exercised at that commit.
->>>
->>> Fair enough. I'll change the Fixes commit.
->>
->> Now that I check the code again, am65_cpsw_nuss_remove_tx_chns(),
->> am65_cpsw_nuss_update_tx_chns() and am65_cpsw_nuss_init_tx_chns()
->> were all introduced in the Fixes commit I stated.
->>
->> Could you please share why you thought it is not accurate?
-> 
-> Though the functions were introduced in the Fixes commit that you have
-> mentioned in the commit message, the check for "tx_chn->irq" being
-> strictly positive as implemented in this patch, is not required until
-> the commit which added am65_cpsw_nuss_update_tx_rx_chns(). The reason
-> I say so is that a negative value for "tx_chn->irq" within
-> am65_cpsw_nuss_remove_tx_chns() requires am65_cpsw_nuss_init_tx_chns()
-> to partially fail *followed by* invocation of
-> am65_cpsw_nuss_remove_tx_chns(). That isn't possible in the blamed
-> commit which introduced them, since the driver probe fails when
-> am65_cpsw_nuss_init_tx_chns() fails. The code path:
-> 
-> 	am65_cpsw_nuss_init_tx_chns() => Partially fails / Fails
-> 	  am65_cpsw_nuss_remove_tx_chns() => Invoked later on
-> 
-> isn't possible in the blamed commit.
+> Thanks for testing! The patch needs one more change though as
+> moving the atomic_inc outside of the lock was a bad idea on my
+> part.  This could cause atomic_inc/atomic_dec to be reordered
+> thus resulting in an underflow.
 
-But, am65_cpsw_nuss_update_tx_chns() and am65_cpsw_set_channels() was
-introduced in the blamed commit and the test case I shared to
-test .set_channels with different channel counts can still
-fail with warning if am65_cpsw_nuss_init_tx_chns() partially fails.
+I want to confirm that this patch fixes massive strangenesses and
+few crashes observed on s390 systems, in addition to OOMs reported
+by Mikhail Zaslonko earlier.
 
-> 
-> Regards,
-> Siddharth.
+> Thanks,
 
--- 
-cheers,
--roger
-
+Thanks!
 
