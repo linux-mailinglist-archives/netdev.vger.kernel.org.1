@@ -1,82 +1,47 @@
-Return-Path: <netdev+bounces-159050-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159051-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B744A14387
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 21:39:55 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D202EA14397
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 21:46:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9598F16A246
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 20:39:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 542153A5EB1
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 20:46:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBDE124224E;
-	Thu, 16 Jan 2025 20:38:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77583231A3A;
+	Thu, 16 Jan 2025 20:46:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="ek/0N0/d"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="swb6s1Rf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AD97236ED6;
-	Thu, 16 Jan 2025 20:38:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12F6C158520;
+	Thu, 16 Jan 2025 20:45:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737059911; cv=none; b=TNMpFEzRgmHgaxE6s7uB7fK/wlE1oahXKchPpVx+PGG3Top3NjWf984bksvsoiSvw2+FEhxMX7oyxUTjZYKKcOcNOMYW/CcMhu6QRPW6IclV4qCq+tCauNVCpjDgEFzvO5R2grfg7iivJnUudKOcjIrs+4hwxhxgsgHLdwGcOYw=
+	t=1737060361; cv=none; b=m7hBWl21KEYSMqxUwJXAENzcXmuDjQP5uQSRMBH9j5Ayyz0LaYpllWyBI+C1R55ZGv/uxehv1iKDSUOhfGcLDU7ejpcDpv0x1MR3bjhnWqfpHVvSb+0tYtoJj0e5h1yD5/7CYFdzMCj81J5FgZ/u1zifd+qfaqupvAXG4urc1ZI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737059911; c=relaxed/simple;
-	bh=zlsnNQeZ6ITgaVjZOYsoogAkcodVJQOFZef1bu912lw=;
+	s=arc-20240116; t=1737060361; c=relaxed/simple;
+	bh=857k75VGVZq3Jn8ImkYEnUApMM6JR6PKh5Sgv6enpE4=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ABbcpYAH1F0A2dVUPsVa0lSVbYtmbod4SJ2DGmczaPs69whoBI/AXNKbMwG0WecdbxK22xxEulqmm9U8T4zHIYt4QaDN05WGa0WsSzh2sPc9uDG2iF62lyHLVSSgXa/iNprWZkEAAilsemGw8ISAmEjKCiZCiVuTaMptnS9dZUs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=ek/0N0/d; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50GEN71W004842;
-	Thu, 16 Jan 2025 20:37:47 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=XOwUUj
-	+9Al5+mspF1UWIyD+W6CPpDiMR74J1EVLvCzs=; b=ek/0N0/daEP783QrNb5L2O
-	VajxIFEIdCTOl48UZCAc7XcL+4Mkjh6yRTvCUVJhAK+fQf/7JmQSaHq+daxaWeRS
-	lTk9TnZAiuiDq4ghdSRJuBI/mP92Ovc6joOGhmZLomMvRh4Sq0fL0zyiciaC5oBd
-	P2E+cl25X9GecJTjdD9+/+B1h5sGezk73se5vK9SBbSlw7roVgCcOAhjBK8HQhT0
-	l5wgAX+mih2CVThNsfeV3CKWay2nQJ9EYRgjF1oSA4h/2aV6kgbLbnFdOLeFMmXT
-	yqTiI9Q4rI+J99/VsHm1cwD/3iF2+TU6i/BSdy/jVPlHZvKvko6JdZ+nwiwgXnyg
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 446tkhcqg4-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 16 Jan 2025 20:37:47 +0000 (GMT)
-Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 50GKXJSW010145;
-	Thu, 16 Jan 2025 20:37:46 GMT
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 446tkhcqff-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 16 Jan 2025 20:37:46 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 50GHdmgL007519;
-	Thu, 16 Jan 2025 20:37:45 GMT
-Received: from smtprelay02.wdc07v.mail.ibm.com ([172.16.1.69])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4443ynfmw7-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 16 Jan 2025 20:37:45 +0000
-Received: from smtpav06.wdc07v.mail.ibm.com (smtpav06.wdc07v.mail.ibm.com [10.39.53.233])
-	by smtprelay02.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 50GKbi2L24445642
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 16 Jan 2025 20:37:44 GMT
-Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 93A3658055;
-	Thu, 16 Jan 2025 20:37:44 +0000 (GMT)
-Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 72B075804E;
-	Thu, 16 Jan 2025 20:37:39 +0000 (GMT)
-Received: from [9.61.59.21] (unknown [9.61.59.21])
-	by smtpav06.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 16 Jan 2025 20:37:39 +0000 (GMT)
-Message-ID: <c61740c8-8dd3-4d59-8553-1dea4cbd5c93@linux.ibm.com>
-Date: Thu, 16 Jan 2025 14:37:38 -0600
+	 In-Reply-To:Content-Type; b=E2g0Fd70PO28nqexIgkI3mdaa+4IytVu06ze5z+ID++VVhzsOGneBfoU2N0DRZlGi5s4AsLGTAxO/W8cHQV+aDVSuiAKG0Bmr0Wc69sGW3WkDLucjjKeuayfSdQJUqv/GECs73n9y6aGXiwOENsDvouv5vMWGfYwmTsO38iG4jc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=swb6s1Rf; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: from [10.137.184.60] (unknown [131.107.160.188])
+	by linux.microsoft.com (Postfix) with ESMTPSA id 69ABF205919A;
+	Thu, 16 Jan 2025 12:45:53 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 69ABF205919A
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1737060353;
+	bh=K7TQmpfPOEaXLhGQbBit9pnYRQxz7oZENIOpaN38BGU=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=swb6s1Rf3wOZrXrLJLk2at1m5qDWQkJlMUrFFD9g5/Xsc8l4MHEoOnvFqIeQI6je3
+	 hQ3pPWOVdrkfYlNLv4sw4V9VjUTbVMvgwpMdtd4RzqPuLGJbQ3LsxwdaSv13OyYsWV
+	 DNPdohs1zIVVI4WhUA8kpI3MreJqDY+s8kEXiosw=
+Message-ID: <d136130c-6895-4394-88c2-2911123afce5@linux.microsoft.com>
+Date: Thu, 16 Jan 2025 12:45:53 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,51 +49,60 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 03/10] dt-bindings: gpio: ast2400-gpio: Add hogs
- parsing
-To: Rob Herring <robh@kernel.org>
-Cc: andrew+netdev@lunn.ch, pabeni@redhat.com,
-        linux-arm-kernel@lists.infradead.org, edumazet@google.com,
-        joel@jms.id.au, krzk+dt@kernel.org, linux-kernel@vger.kernel.org,
-        andrew@codeconstruct.com.au, devicetree@vger.kernel.org,
-        davem@davemloft.net, kuba@kernel.org,
-        openipmi-developer@lists.sourceforge.net, netdev@vger.kernel.org,
-        linux-aspeed@lists.ozlabs.org, conor+dt@kernel.org,
-        eajames@linux.ibm.com, minyard@acm.org
-References: <20250114220147.757075-1-ninad@linux.ibm.com>
- <20250114220147.757075-4-ninad@linux.ibm.com>
- <173689907575.1972841.5521973699547085746.robh@kernel.org>
- <35572405-2dd6-48c9-9113-991196c3f507@linux.ibm.com>
- <CAL_JsqK1z4w62pGX0NgM7by+QRFcmBadw=CRVrvF2vv-zgAExg@mail.gmail.com>
+Subject: Re: [PATCH] hv_netvsc: Replace one-element array with flexible array
+ member
+To: Thorsten Blum <thorsten.blum@linux.dev>,
+ "K. Y. Srinivasan" <kys@microsoft.com>,
+ Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
+ Dexuan Cui <decui@microsoft.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: linux-hardening@vger.kernel.org, linux-hyperv@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20250116201635.47870-2-thorsten.blum@linux.dev>
 Content-Language: en-US
-From: Ninad Palsule <ninad@linux.ibm.com>
-In-Reply-To: <CAL_JsqK1z4w62pGX0NgM7by+QRFcmBadw=CRVrvF2vv-zgAExg@mail.gmail.com>
+From: Roman Kisel <romank@linux.microsoft.com>
+In-Reply-To: <20250116201635.47870-2-thorsten.blum@linux.dev>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: pDZnXta5jIEiLEPhuvleI218uMy8Px8J
-X-Proofpoint-ORIG-GUID: c5p-lEQ3kr5JODh2EUhlema0DIXGbz0H
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-01-16_09,2025-01-16_01,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 spamscore=0
- priorityscore=1501 impostorscore=0 adultscore=0 mlxscore=0 clxscore=1015
- bulkscore=0 lowpriorityscore=0 mlxlogscore=547 phishscore=0 suspectscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2411120000
- definitions=main-2501160151
-
-Hi Rob,
 
 
->> I am not seeing any error even after upgrading dtschema. Also this mail
->> also doesn't show any warning. Is this false negative?
+
+On 1/16/2025 12:16 PM, Thorsten Blum wrote:
+> Replace the deprecated one-element array with a modern flexible array
+> member in the struct nvsp_1_message_send_receive_buffer_complete.
 > 
-> I believe this happens when a prior patch in the series has an error.
+> Link: https://github.com/KSPP/linux/issues/79
+> Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
+> ---
+>   drivers/net/hyperv/hyperv_net.h | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/hyperv/hyperv_net.h b/drivers/net/hyperv/hyperv_net.h
+> index e690b95b1bbb..234db693cefa 100644
+> --- a/drivers/net/hyperv/hyperv_net.h
+> +++ b/drivers/net/hyperv/hyperv_net.h
+> @@ -464,7 +464,7 @@ struct nvsp_1_message_send_receive_buffer_complete {
+>   	 *  LargeOffset                            SmallOffset
+>   	 */
+>   
+> -	struct nvsp_1_receive_buffer_section sections[1];
+> +	struct nvsp_1_receive_buffer_section sections[];
+>   } __packed;
+>   
+>   /*
 
-Thanks for the response. I have sent a next version.
+1. How have you tested the change?
+
+2. There is an instance of
+
+`sizeof(struct nvsp_1_message_send_receive_buffer_complete))`
+
+and your change decreases the size of the struct. Why do you think
+that is fine?
 
 -- 
-Thanks & Regards,
-Ninad
+Thank you,
+Roman
 
 
