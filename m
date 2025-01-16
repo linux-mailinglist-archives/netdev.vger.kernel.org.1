@@ -1,156 +1,182 @@
-Return-Path: <netdev+bounces-158776-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158777-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 56551A13310
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 07:24:42 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2AADAA13326
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 07:35:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A4A3E188ADD1
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 06:24:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5BD67188AFB5
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 06:35:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6851818C035;
-	Thu, 16 Jan 2025 06:24:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4E5118E76B;
+	Thu, 16 Jan 2025 06:34:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FhYcbo2/"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbg150.qq.com (smtpbg150.qq.com [18.132.163.193])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f181.google.com (mail-yb1-f181.google.com [209.85.219.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF06D155743
-	for <netdev@vger.kernel.org>; Thu, 16 Jan 2025 06:24:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.132.163.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1A3024A7E8;
+	Thu, 16 Jan 2025 06:34:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737008670; cv=none; b=NQNY3kjFw9yctk2Xbqo7hZz+QruWYLRaisZxfyHWHyLJK1UB4dqVgRJkXoN0aK/SUdveQcw+bBcqr9YWuQ4SimHZQtnQMuUoCMa3o/4fMNgmyzdCRyKfqe8IoinLmskmXtXMRvqWsxmbknZXRvw9+K2+B9/cSch/kNb3Ab8shK0=
+	t=1737009294; cv=none; b=FPseENzbTnfZ9aTGihYUaNzWxGnpw0TKf3iqQPqzoQ6qwI0APwrkwbQ3ccG8ZViTx8zrMz9pB+i1y6onVqkt9ZzYML/MXsofDbG5CXK7mfiSS7cxBQiwx+LSaXOLFW7lFh35G0F3eFuCu1Q/QyAj2HWdGwR88cCqA/SkUiS6O5Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737008670; c=relaxed/simple;
-	bh=YqS28taoe2QcEA39yaojYaAoCyeLdse6trded9GWEs4=;
-	h=From:To:Cc:References:In-Reply-To:Subject:Date:Message-ID:
-	 MIME-Version:Content-Type; b=VrWXEYTYYC2znlbENb8b8yOzZtnlAyzt/F6yjnSiW1mgTsbBQj5X81e4s5//fdU3D+5EVvO3ISdKHFU64UsoEZ6+Dhi0Jl+RTvaD7qdrdY89uALYBJD+z46+fN1KZcUShSJkGnRqVnC9ysImPQ2s3RBY0OHPkEF0ICJeHwCNEQI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=18.132.163.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
-X-QQ-mid:Yeas9t1737008653t472t44704
-Received: from 3DB253DBDE8942B29385B9DFB0B7E889 (jiawenwu@trustnetic.com [36.24.187.167])
-X-QQ-SSF:0000000000000000000000000000000
-From: =?utf-8?b?Smlhd2VuIFd1?= <jiawenwu@trustnetic.com>
-X-BIZMAIL-ID: 14527688114952598449
-To: "'Richard Cochran'" <richardcochran@gmail.com>
-Cc: <andrew+netdev@lunn.ch>,
-	<davem@davemloft.net>,
-	<edumazet@google.com>,
-	<kuba@kernel.org>,
-	<pabeni@redhat.com>,
-	<linux@armlinux.org.uk>,
-	<horms@kernel.org>,
-	<jacob.e.keller@intel.com>,
-	<netdev@vger.kernel.org>,
-	<vadim.fedorenko@linux.dev>,
-	<mengyuanlou@net-swift.com>
-References: <20250114084425.2203428-1-jiawenwu@trustnetic.com> <20250114084425.2203428-5-jiawenwu@trustnetic.com> <Z4aPzfa_ngf98t3F@hoboy.vegasvil.org>
-In-Reply-To: <Z4aPzfa_ngf98t3F@hoboy.vegasvil.org>
-Subject: RE: [PATCH net-next v4 4/4] net: ngbe: Add support for 1PPS and TOD
-Date: Thu, 16 Jan 2025 14:24:12 +0800
-Message-ID: <067101db67df$422cecd0$c686c670$@trustnetic.com>
+	s=arc-20240116; t=1737009294; c=relaxed/simple;
+	bh=c4bb3EMGsgMUrTeDTt/1IawO6xWVcbipTrw2VtmyAng=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=MPSSwH4W1U7Z4ir91fKJDY8D5scjvJlG0uSI0hSbh0PI446VQFTpmUZNcnhwmM4nXPULb1DiSnOHXZ81C6iocGG899kkiq2jZlBEthjEme4xGizqRBw3pF3vdoP7T9ppEGsh5VnCBjmgQqJeoKlyLz5aGoaqscY2SCE9D6eVeQc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FhYcbo2/; arc=none smtp.client-ip=209.85.219.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yb1-f181.google.com with SMTP id 3f1490d57ef6-e54bd61e793so1095830276.2;
+        Wed, 15 Jan 2025 22:34:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1737009292; x=1737614092; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hUMl2lV37NeEyUYQ+8hv4yRX1yZLm9fZeIJWVyQAT9A=;
+        b=FhYcbo2/BMbsjW7hmwyRbRc+edN+6c80zj7EVm+qPUuaziTQtJGz/jgbavNrg9qbXf
+         5Ku3U6+qStP21J2qr0DSG4hi7VkoLpAC3uY7Fi/A2NzdiE8xSF9IBuLxZ3prYQdj5a+R
+         QIy0f03tEBWLn1HEgQrQI+reAFruvukm5ryCXTsN4+qACkbPwAjkitxxHibjzGPmKBeC
+         hJiGSTGWaQDO4qgYIxKBi94Uy1YTPP//KM+OcQLrS7LlnpjP977+Jqd7xPzZJbLK8WzN
+         BYyvkSqZw69E6Ndu5YWe9gBm7uYs25yvkEHBiG4CUIg8yJ25B8IoB4C45rqEdBELo91a
+         TKEw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737009292; x=1737614092;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=hUMl2lV37NeEyUYQ+8hv4yRX1yZLm9fZeIJWVyQAT9A=;
+        b=NW0sY/CS6nzXrNicZg7T6Q2wsVWEISOADkywNqOl3WBuzm1PoTahXRZ0Dps25op8ou
+         eHD1UiB1cTHdnGeU8McFXDoBteDS0hrHCRdEfAFExwMGfCTAPJCzYJ4Q/5GJfdcHJCw1
+         emr15p0Ij/RjExyW7rhtJ9ye2YJiu/LwUvEBrXsawiWELYbkk9th47CWklWaA+GEGz0w
+         ftdxvFrjAEm6KBXG1ye3bb0HOB0wFWmpIYLGqbRqv0/7+dipaSoQBwUoIqgmFFSaELnd
+         495dgMOtzGE3ZOGO3Im/mqORobF+ZHY4n1gWUu6lvplOaJr/TKjprIdgTLMEa07pkdEY
+         K9jA==
+X-Forwarded-Encrypted: i=1; AJvYcCUCQt2kY1urPyRk/h9tN70EUmBq7HYgpNY3lr5R6W+HLKlowYou3RrfvMDKgL02rHxyvVmPNLgqsGNG@vger.kernel.org, AJvYcCUEZsIHdopj7ddkKiKANjCKry2fv6NmmNEkW3nvvRfsT5uVEOF5gL1ZqOmkca1TjsOlPvMvRmEvPtwl@vger.kernel.org, AJvYcCUosTDjI7JCMZWoq+SPv0o1iRtZEmudsbp1ciylKAwa6S8TFnv9ePfIlvrK1ztVuH9JO65KHjQKrAiK@vger.kernel.org, AJvYcCUq0GBEvra3eaRi/vl2xbsLHK7dEDH5Tdw/QeuyC4iIpArzWWe2kIMDysgWFmkOAvVqvhI6wQK2ZqU=@vger.kernel.org, AJvYcCVCiVUNKukvLrhziF0x8PGJJSo9aEfbRxhQF8Nbhvr/sbZDoCuVih4830cqT8TKg/l/hjShAWEdRr0JAw==@vger.kernel.org, AJvYcCWEFNsrcwhFSVz+Mt26vlcLljmhnpLUT9OMeL/7YfZhIm1rgtz5y9V8MGICQcUGav9YTMXkIb4B@vger.kernel.org, AJvYcCWOx8hin3A5cMdedhNkFj/BrNdBHHNXRiSXw4pve0adFrradrnTtM8RC9jX4dm9WNfXxllPAVl3+rTjIbP7Qbo=@vger.kernel.org, AJvYcCXFL62vzL6qVxVzQntc5yJbzL5VXBuxysQzbHUs1YxWRqT/z1dIGTZebZgd8i+ft1K8vXivM8GOE0YFIj0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywo5kdDOdklx4LobLPhpxK8sHYyircAL0JFMdI6AmqXwRzJ86YY
+	qBmclXnxFSBtu4b8tU963WFTXQSm+zuJIc3auMAA5p/kkRrx2h4NHQlEgqD6W9k96jovi2qqe4C
+	i5pmgl1xqbu9A7GzS0NDin0Z7wj8=
+X-Gm-Gg: ASbGnctD8yoHXYqv8thkC4s6CRPB5tznyMNj9eKye+kThTNcLJQloh79iXWsj9PJIfy
+	SJOsgRExrNBKcQN98pFsk5CFC9/oNIfJS1npyRfVWb2qFvUxAQJFbP1/K0iqE5l5MLphjNgr8
+X-Google-Smtp-Source: AGHT+IEBjbrPYm9uZ4tkDJz8bKIImgmSbE3fPZUiZeCgys3yex7NZywUBcf/cb/InNa/yBzsGp+ThfaTGo+an3nLKdc=
+X-Received: by 2002:a05:6902:f84:b0:e38:8a2e:e3bc with SMTP id
+ 3f1490d57ef6-e54fca4021cmr25184463276.5.1737009291859; Wed, 15 Jan 2025
+ 22:34:51 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-X-Mailer: Microsoft Outlook 16.0
-Content-Language: zh-cn
-Thread-Index: AQKnw1dDjg88W28lNwlExgbrf+Wj9wGGMHfHAhFqqr2xY3f9wA==
-X-QQ-SENDSIZE: 520
-Feedback-ID: Yeas:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz8a-1
-X-QQ-XMAILINFO: N4ZILu3POr3ONuM24q5/JVDcf+ULkevHSQmX+7sznIeh5coNIXkUlq4A
-	p9EIE6u1Vx8kjdbdDLJR6D9cK4+GmXgkxUoSnwr2YW3SxSQGbSeo3smofe5QcEnESG1vnm7
-	j+QQO3m3L22/tkqA0eiuWVouY9j3r0sxYLiY5Mqe3SbdJ7T5Tn1kE59Z12tbot1n13Le0+O
-	eppPd3bWFOvKiFz3rLerK6IlvQ7i7p0hY3zY57HsXiyKCWZHAbz7QOGIPPwBPRpZFuho0Ja
-	rNFSj+gDAJW4I6Jr0rUt6m/utqL2h8qWCT5UdCQbZ9aEHP9mJ/8JJRqkwX5WFXnCfuoL5pg
-	sUyJEjLifz9CudQ8hbs+21Vv6L+LhDGsWDJeNfY3S4IToYrXyjVsfZESfIOvIomrbZNz2cI
-	Wut76AXE0GfIWImHElk/TkN8o0wkLkkcdyDWbLBe2KAt4NTO/QF7EJ17S0awAIsGOYMHRfk
-	b5IHUZjzKLy0DX4kTGXBBdcgGwLC+OUf+mQ5Qbbvgf6gzbaPCnvIb3YiVihGGyvt2r4rtjX
-	lwPNg/XZpjIq92ga26cvCyuegRlxsHU32EqmckAwLrEF3lyO6SIomOBu+Cip6GKL4PxrXzn
-	awexSPlCZY8z/AzKfsiyXkU80eJth3eh5FdOC8FymJO9/dfvfmenbt9S0mnzi2EmdP8928Z
-	FnckopNYhUM4hz23qlU7XIFmqTz81StM2zYmcjJJV4rxFuwFn+HTxEjfprWQB3fkWA5Iz/R
-	8w18FsRVU7U7GVKR196klfi8c3XJ8PB/AZ75z85nElYzY8gv0SDoV4Fd41JGeiuDJx1H5iB
-	RNdwcZ7UsMJOeuK4qUckXcPM+W2mSA5aE7Qu0bV7WBkVaxI/g5ryltxh+E62VoQrJ1hZ0hI
-	4q22PsdxnB1HQGu96LEr+TEGEOBeQ2CDUjeDtanwnoEXsPT/LO9f4/Y0dwzpvvIMKjhCBMC
-	mF+caieCsf8QHOZfOsZTz1GqFpMYn0FjEj+RzA2HkxIfxUTotHoqnF/SMLD80c5IBg98=
-X-QQ-XMRINFO: NS+P29fieYNw95Bth2bWPxk=
-X-QQ-RECHKSPAM: 0
+References: <20250114033010.2445925-1-a0282524688@gmail.com>
+ <20250114033010.2445925-5-a0282524688@gmail.com> <cef1b9bf-59f6-484d-861e-82b405653ca1@wanadoo.fr>
+In-Reply-To: <cef1b9bf-59f6-484d-861e-82b405653ca1@wanadoo.fr>
+From: Ming Yu <a0282524688@gmail.com>
+Date: Thu, 16 Jan 2025 14:34:40 +0800
+X-Gm-Features: AbW1kvYJI-ZlyxfzNTVWRJivNQwAAI1rVA1G13z7pWoyr3_f28bZHldijS45J6Y
+Message-ID: <CAOoeyxVK=iBmj3BDX=D8a9=GFBkE158jbq3Rnq-RuoA5HxMi7g@mail.gmail.com>
+Subject: Re: [PATCH v5 4/7] can: Add Nuvoton NCT6694 CAN support
+To: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
+Cc: linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org, 
+	linux-i2c@vger.kernel.org, linux-can@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org, 
+	linux-rtc@vger.kernel.org, linux-usb@vger.kernel.org, tmyu0@nuvoton.com, 
+	lee@kernel.org, linus.walleij@linaro.org, brgl@bgdev.pl, 
+	andi.shyti@kernel.org, mkl@pengutronix.de, andrew+netdev@lunn.ch, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	wim@linux-watchdog.org, linux@roeck-us.net, jdelvare@suse.com, 
+	alexandre.belloni@bootlin.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jan 15, 2025 12:25 AM, Richard Cochran wrote:
-> On Tue, Jan 14, 2025 at 04:44:25PM +0800, Jiawen Wu wrote:
-> > +static int wx_ptp_feature_enable(struct ptp_clock_info *ptp,
-> > +				 struct ptp_clock_request *rq, int on)
+Hi Vincent,
+
+I will remove priv->tx_skb in the next patch, but it seems that
+can_flush_echo_skb() has not been EXPORT_SYMBOL_GPL().
+
+I would like to know if nct6694_can_clean() requires modification.
+
+Vincent Mailhol <mailhol.vincent@wanadoo.fr> =E6=96=BC 2025=E5=B9=B41=E6=9C=
+=8816=E6=97=A5 =E9=80=B1=E5=9B=9B =E4=B8=8A=E5=8D=8812:45=E5=AF=AB=E9=81=93=
+=EF=BC=9A
+> > +static void nct6694_can_clean(struct net_device *ndev)
 > > +{
-> > +	struct wx *wx = container_of(ptp, struct wx, ptp_caps);
+> > +     struct nct6694_can_priv *priv =3D netdev_priv(ndev);
 > > +
-> > +	/**
-> > +	 * When PPS is enabled, unmask the interrupt for the ClockOut
-> > +	 * feature, so that the interrupt handler can send the PPS
-> > +	 * event when the clock SDP triggers. Clear mask when PPS is
-> > +	 * disabled
-> > +	 */
-> > +	if (rq->type != PTP_CLK_REQ_PEROUT || !wx->ptp_setup_sdp)
-> > +		return -EOPNOTSUPP;
+> > +     if (priv->tx_skb || netif_queue_stopped(ndev))
+> > +             ndev->stats.tx_errors++;
+> > +     dev_kfree_skb(priv->tx_skb);
+>
+> Use:
+>
+>         can_flush_echo_skb(ndev);
+>
+> (related to the following comments).
+>
+> > +     priv->tx_skb =3D NULL;
+> > +}
+>
+> (...)
+>
+> > +static void nct6694_can_tx_work(struct work_struct *work)
+> > +{
+> > +     struct nct6694_can_priv *priv =3D container_of(work,
+> > +                                                  struct nct6694_can_p=
+riv,
+> > +                                                  tx_work);
+> > +     struct net_device *ndev =3D priv->ndev;
 > > +
-> > +	/* Reject requests with unsupported flags */
-> > +	if (rq->perout.flags & ~PTP_PEROUT_PHASE)
-> > +		return -EOPNOTSUPP;
+> > +     guard(mutex)(&priv->lock);
 > > +
-> > +	if (rq->perout.phase.sec || rq->perout.phase.nsec) {
-> > +		wx_err(wx, "Absolute start time not supported.\n");
-> > +		return -EINVAL;
-> > +	}
+> > +     if (priv->tx_skb) {
+> > +             if (priv->can.state =3D=3D CAN_STATE_BUS_OFF) {
+>
+> Just stop the queue when the can bus is off so that you do not have do
+> check the bus status each time a frame is sent.
+>
+> > +                     nct6694_can_clean(ndev);
+> > +             } else {
+> > +                     nct6694_can_tx(ndev);
+> > +                     can_put_echo_skb(priv->tx_skb, ndev, 0, 0);
+> > +                     priv->tx_skb =3D NULL;
+> > +             }
+> > +     }
+> > +}
 > > +
-> > +	if (on)
-> > +		set_bit(WX_FLAG_PTP_PPS_ENABLED, wx->flags);
-> > +	else
-> > +		clear_bit(WX_FLAG_PTP_PPS_ENABLED, wx->flags);
+> > +static netdev_tx_t nct6694_can_start_xmit(struct sk_buff *skb,
+> > +                                       struct net_device *ndev)
+> > +{
+> > +     struct nct6694_can_priv *priv =3D netdev_priv(ndev);
 > > +
-> > +	wx->pps_width = rq->perout.period.nsec;
-> 
-> This is still wrong.
-> 
-> perout.period specifies the *period* not the pulse width.
+> > +     if (can_dev_dropped_skb(ndev, skb))
+> > +             return NETDEV_TX_OK;
+> > +
+> > +     if (priv->tx_skb) {
+> > +             netdev_err(ndev, "hard_xmit called while tx busy\n");
+> > +             return NETDEV_TX_BUSY;
+> > +     }
+> > +
+> > +     netif_stop_queue(ndev);
+> > +     priv->tx_skb =3D skb;
+>
+> Here, you can directly do:
+>
+>         can_put_echo_skb(skb, ndev, 0, 0);
+>
+> The skb remains accessible under priv->can.echo_skb[0]. With this, you
+> can remove the priv->tx_skb field.
+>
+> > +     queue_work(priv->wq, &priv->tx_work);
+> > +
+> > +     return NETDEV_TX_OK;
+> > +}
+>
 
-Thanks for the guidance. But what I'm really confused about is how
-do I get the duty cycle ("on" in struct ptp_perout_request).
-I try this:
-	echo "0 0 0 1 0" > /sys/class/ptp/ptp0/period
-to pass the period 1s for 1pps. Then where should the duty cycle
-values put? Seems "rq->perout.flags & PTP_PEROUT_DUTY_CYCLE"
-always be false.
-
-+       /* Reject requests with unsupported flags */
-+       if (rq->perout.flags & ~(PTP_PEROUT_DUTY_CYCLE |
-+                                PTP_PEROUT_PHASE))
-+               return -EOPNOTSUPP;
-+
-+       if (rq->perout.phase.sec || rq->perout.phase.nsec) {
-+               wx_err(wx, "Absolute start time not supported.\n");
-+               return -EINVAL;
-+       }
-+
-+       if (rq->perout.period.sec != 1 || rq->perout.period.nsec) {
-+               wx_err(wx, "Only 1pps is supported.\n");
-+               return -EINVAL;
-+       }
-+
-+       if (rq->perout.flags & PTP_PEROUT_DUTY_CYCLE) {
-+               struct timespec64 ts_on;
-+
-+               ts_on.tv_sec = rq->perout.on.sec;
-+               ts_on.tv_nsec = rq->perout.on.nsec;
-+               wx->pps_width = timespec64_to_ns(&ts_on);
-+       } else {
-+               wx->pps_width = 120000000;
-+       }
-
-
+Thanks,
+Ming
 
