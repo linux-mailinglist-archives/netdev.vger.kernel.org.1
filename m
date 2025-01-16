@@ -1,116 +1,101 @@
-Return-Path: <netdev+bounces-159033-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159034-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A5E7A142BF
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 21:04:19 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0DCC8A142D0
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 21:08:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7425D16973C
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 20:04:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7A9963A296A
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 20:08:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75CB92361D6;
-	Thu, 16 Jan 2025 20:04:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34B0C232438;
+	Thu, 16 Jan 2025 20:08:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="IsdpPYDa"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="pvfAzbJu"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53BEF23243D
-	for <netdev@vger.kernel.org>; Thu, 16 Jan 2025 20:04:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1513024A7EE;
+	Thu, 16 Jan 2025 20:08:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737057849; cv=none; b=mJjFjHVS2OpDKeZVaHZC0BY+iMAVEzoRufGHDDbJl823AKnnM6HNB1vrRhEdONOAyQ3Dqt0sXwceWWltVFh1SFHGEhlpxlvBPPL7auNo+81NrFKdM6izkHetfG/lTalHvddkIW0Rvf1uoZk/fjdeYQRlcVyYfvA6M6NveG/oi7U=
+	t=1737058115; cv=none; b=N5Z/8vheXh0hspZVJfrMpwc/UEgITicLJd0gBXPl/4TTZMli7DZ5Gmcq4zn+BTpeVRIpxNM745kvYarF+PpMVE8Y1pRdwf6MiinSk4u9JHgSdVPNa8QeO635x7cwZENvlt18KdQ1OADMeVwl4y8zsaqKkv0sdfLTAGlf8uU1/wk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737057849; c=relaxed/simple;
-	bh=5EXta7kpLt5yaegjOlD1OpZbITaQ48ZLPtOl+gI2CcM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=OMxlGUKZE7xia7O2xVDrEq4q4aM9mKoMKXgP9quBYxRVu5bBnND8FVFoN7phx7JokkXziseCDR4RKqfUTWTjEYTlKQ3sc/xDW93cYm/1W2YzW63Bs/brIJaUbVKBIzXz/46m4qvyyKUUm+32yBH2AeT5iEuzpLN2VuLEXSgmviY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=IsdpPYDa; arc=none smtp.client-ip=91.218.175.186
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <9e5b183e-5dd5-4d3d-b3e6-09ad5e7262dc@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1737057840;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=IqHq2Y2jq8JAJpoGQ2hS6bFm7a13DqxW+Q9h4zZv3mo=;
-	b=IsdpPYDaUOBchiGdF2FkugelmmyTLLxURio+d0H1pg1c5PtScV4J5PwrMwppVoRFXafxTb
-	zTUgqjXhCwANhZNHhwH0fDr24w54IDPTkzDG7HSpOREc+MiosXGjJxuqJjYRdon+03Yvj2
-	qaqAhH0PY83dqMjpkii0+1TP5WDwubQ=
-Date: Thu, 16 Jan 2025 12:03:53 -0800
+	s=arc-20240116; t=1737058115; c=relaxed/simple;
+	bh=1Y7xY78VuEuSDHnLrcANVcfv6asWKHAjfj0vKGYSx1I=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ja14UgpODoZOM8oz6q3YiVGFC/xuAyIWYVx7p+LJP8rS6YQyOHRrlLIwMDurAhWRXyTKj0qKO+kZrNr5EwypGqAbg/oYgc/4+Bh1ahpoHZNrz6pv/5iJ0RA1UZWFsb9om9RGXJ+sEXFTmpOQ4fWp6L+/QNMicjOXONaaNu1O3cQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=pvfAzbJu; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=3A5jJ7OjfSb2aSIqIMcL4dOznCbAHUNHnn6oMc0ovuk=; b=pvfAzbJuvNhSXaB7hzRptra0vU
+	FUbh0Gc76p8yl1Fhk8bQVwB4m/rovlIVYcQMNBZpCEAnDo/buMiR2DrMX4tA9sNQRgAGeRAfbDjLS
+	uFa3+WxZ/FxcZBZyo4c988hA+6ry6IxOFFepENaw4Hv3BeNjkgpIVprUJh1n4ynueoEs=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tYWAA-005Dxm-J3; Thu, 16 Jan 2025 21:08:22 +0100
+Date: Thu, 16 Jan 2025 21:08:22 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Alexandra Winter <wintera@linux.ibm.com>
+Cc: Wenjia Zhang <wenjia@linux.ibm.com>, Jan Karcher <jaka@linux.ibm.com>,
+	Gerd Bayer <gbayer@linux.ibm.com>,
+	Halil Pasic <pasic@linux.ibm.com>,
+	"D. Wythe" <alibuda@linux.alibaba.com>,
+	Tony Lu <tonylu@linux.alibaba.com>,
+	Wen Gu <guwen@linux.alibaba.com>,
+	Peter Oberparleiter <oberpar@linux.ibm.com>,
+	David Miller <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Julian Ruess <julianr@linux.ibm.com>,
+	Niklas Schnelle <schnelle@linux.ibm.com>,
+	Thorsten Winkler <twinkler@linux.ibm.com>, netdev@vger.kernel.org,
+	linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	Simon Horman <horms@kernel.org>
+Subject: Re: [RFC net-next 1/7] net/ism: Create net/ism
+Message-ID: <e379f0dd-8ad0-4617-9b24-0fa4756d30ea@lunn.ch>
+References: <20250115195527.2094320-1-wintera@linux.ibm.com>
+ <20250115195527.2094320-2-wintera@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf] bpf: use attach_btf instead of vmlinux in
- bpf_sk_storage_tracing_allowed
-To: Jared Kangas <jkangas@redhat.com>
-Cc: bpf@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, martin.lau@kernel.org,
- ast@kernel.org, johannes.berg@intel.com, kafai@fb.com,
- songliubraving@fb.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20250116162356.1054047-1-jkangas@redhat.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-Content-Language: en-US
-In-Reply-To: <20250116162356.1054047-1-jkangas@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250115195527.2094320-2-wintera@linux.ibm.com>
 
-On 1/16/25 8:23 AM, Jared Kangas wrote:
-> diff --git a/net/core/bpf_sk_storage.c b/net/core/bpf_sk_storage.c
-> index 2f4ed83a75ae..74584dd12550 100644
-> --- a/net/core/bpf_sk_storage.c
-> +++ b/net/core/bpf_sk_storage.c
-> @@ -352,8 +352,8 @@ const struct bpf_func_proto bpf_sk_storage_delete_proto = {
->   
->   static bool bpf_sk_storage_tracing_allowed(const struct bpf_prog *prog)
->   {
-> -	const struct btf *btf_vmlinux;
->   	const struct btf_type *t;
-> +	const struct btf *btf;
->   	const char *tname;
->   	u32 btf_id;
->   
-> @@ -371,12 +371,12 @@ static bool bpf_sk_storage_tracing_allowed(const struct bpf_prog *prog)
->   		return true;
->   	case BPF_TRACE_FENTRY:
->   	case BPF_TRACE_FEXIT:
-> -		btf_vmlinux = bpf_get_btf_vmlinux();
-> -		if (IS_ERR_OR_NULL(btf_vmlinux))
-> +		btf = prog->aux->attach_btf;
-> +		if (!btf)
->   			return false;
->   		btf_id = prog->aux->attach_btf_id;
-> -		t = btf_type_by_id(btf_vmlinux, btf_id);
-> -		tname = btf_name_by_offset(btf_vmlinux, t->name_off);
-> +		t = btf_type_by_id(btf, btf_id);
-> +		tname = btf_name_by_offset(btf, t->name_off);
->   		return !!strncmp(tname, "bpf_sk_storage",
->   				 strlen("bpf_sk_storage"));
+> +ISM (INTERNAL SHARED MEMORY)
+> +M:	Alexandra Winter <wintera@linux.ibm.com>
+> +L:	netdev@vger.kernel.org
+> +S:	Supported
+> +F:	include/linux/ism.h
+> +F:	net/ism/
 
-Thanks for the report.
+Is there any high level documentation about this?
 
-There is a prog->aux->attach_func_name, so it can be directly used, like:
+A while back, TI was trying to upstream something for one of there
+SoCs. It was a multi CPU system, with not all CPUs used for SMP, but
+one or two kept for management and real time tasks, not even running
+Linux. They had a block of shared memory used for communication
+between the CPUs/OSes, along with rproc. They layered an ethernet
+driver on top of this, with buffers for frames in the shared memory.
 
-	case BPF_TRACE_FENTRY:
-	case BPF_TRACE_FEXIT:
-		return !!strncmp(prog->aux->attach_func_name, "bpf_sk_storage",
-				 strlen("bpf_sk_storage"));
+Could ISM be used for something like this?
 
-The above should do for the fix.
-
-No need to check for null on attach_func_name. It should have been checked 
-earlier in bpf_check_attach_target (the "tname" variable).
-
-pw-bot: cr
-
+	Andrew
 
