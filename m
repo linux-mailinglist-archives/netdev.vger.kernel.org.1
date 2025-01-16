@@ -1,126 +1,183 @@
-Return-Path: <netdev+bounces-158887-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158888-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B971AA13A53
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 14:00:35 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 59650A13A54
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 14:00:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E50F3188B213
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 13:00:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8F2BA188AF88
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 13:01:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74E9A1DD0F8;
-	Thu, 16 Jan 2025 13:00:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17AD21DE899;
+	Thu, 16 Jan 2025 13:00:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gSek0pWF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eAIXyiuD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f45.google.com (mail-qv1-f45.google.com [209.85.219.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C54751DE8A8;
-	Thu, 16 Jan 2025 13:00:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E27FB24A7C2;
+	Thu, 16 Jan 2025 13:00:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737032430; cv=none; b=cm6rb5uE/IoyNeEfoHmTtpkDPSMzPl9O0qt5urMFAlAgo/bRZ6r0ooYqwgMdO/CEyVzK3HF9Ayo/9XVDdNI8zxwUvcTOy5TjWTV0Irjzb8T7JfPApQsDuAbhrfu8t6ChOfgqHGOplV04NW8w/jasi8DrlFOH2rkTgBipVH4DMYI=
+	t=1737032453; cv=none; b=KcyndYB020TN+JtBGoDsY7TYNZwtvwnvx/7CHtpezxcnarF+Vka2KZHaUdTmG4M7HsgdHVtk/OTJlb90YKiyO3CjXZR2fvTtwPwJz+5TiZpH/8Oy0Q1uo57lj8ResJqr+wER0b1ZEiUoHEezqqeW3Wx86SLewxrDXB0LaQGxi5U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737032430; c=relaxed/simple;
-	bh=5UMbsUR3uezYmQkND+aHznqfBtOMq7AAaSselEbiyO4=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=sAeYEoHhYG9alPfLOesvLaYnvPJD1qLM/meyFtaMRK/adlG3GRb807pEh/F2izuzjlq6TIFhe+8Uw+eEJ/k7p9N872dQ//DwmRYFBE3boykZOUC3ZbMoTD8Yr4obby5nBcuOHe+2s01K/iuHYCU1bgSQS1ObvbuO8BUFMxFYojY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gSek0pWF; arc=none smtp.client-ip=209.85.219.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f45.google.com with SMTP id 6a1803df08f44-6dccccd429eso9353606d6.3;
-        Thu, 16 Jan 2025 05:00:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1737032426; x=1737637226; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jDAPDENh5j906Y6hu4L3U4UaJRAPYR+j5H8J3pj7FYA=;
-        b=gSek0pWFkEfaTr016Dq1ujsSUja4isxB39o5jWFN6j1cvNbDMyagmK9HcBwrg2eUpf
-         GC5Vc+iHLJRAMg6vdoNjVyMXqakUzvNo+Ez6lZO4QhTdG7XbnEekgSqgogvHRrfa7qxt
-         TbDWUvoxppd+W0sXVSw/WToCnEyD9ugSsI2TbE9m3ZBX5lc9VxV98oTtK+IHFsM5k3Mg
-         26PUBQVhT0Izq5juB46W4ZWiTebPvv+67sZYqifOSNlDe+keOmDppHgLeVE43jGOHEMX
-         4rGJmKV/F9rXMmI2H2Eed8uWflGp1iU4Kbns5bKj9Wd85fTULcuoXW+NDK7Q30H9OutZ
-         4ihg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737032426; x=1737637226;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=jDAPDENh5j906Y6hu4L3U4UaJRAPYR+j5H8J3pj7FYA=;
-        b=FxQka/YC+veYbEBwGwnfCqOZk/DTcbNxt0RIO+q+G2rxqJ5h48dowPvDPEMc18JxCW
-         amV1gZ3Uxtn9xLqbQPRbXpxUcPm+29xZJcfhDmLMXRAp3/rQybCjz2A2E+QK/WV04WzB
-         p+YBGIr1PfXgpfdVAbbj+hlBta626HMNJAD/8otVCnatQhKq/DLXYf8jByY2POZ2x8+E
-         1+iFZ35J29FdF1CtxZxKyweFoMz4jFoWeMb5IMwbyqEr/fp2buPipDDftKOYStuM9Prh
-         LcYNqTK88YiZfr/xNruqErTpQTqusQNYLx1IUyZuATJ04MZ4/lT88Q7Ykx/ekIFtFOTn
-         davg==
-X-Forwarded-Encrypted: i=1; AJvYcCU648T0rYKJWgZbL7MNRsBGm74YKb2Ae/SYa5chCratXwVGbYYqfsmEH8YOkyCR/QuDRtCoGTSa49wFYSXEo3Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxwKRMZ8hIFjNyHzeJnjzxGxPa5rcpo9xhiU4OEaD/GcFnBYZrC
-	SkCQvtWARrRd+ElwVm1SA1u3zSwBWkGyTFT9mXcpr+PbZPXcN8lD
-X-Gm-Gg: ASbGncuGCh5AP2zQiJgC701UBMtFFZOnYoWT0a0RFdHISk523Bxq0n+JuyHRPWVsK/E
-	jRoyrlztCiyhtVV085wsJAq4W6MMacsUApfUCCXTzS2qneoJWb9Fr/J7ENdiiOkNrjdX5SqBbLs
-	tFafV0yPbo+1lSX7llFRCHiiA43D87MSWAoEg1cY6G6P2WpiSuNmgu1NGV6m6Wh4x3H8hCBY6nl
-	ErzJkj+B7yCm1kK3NVCc0F0Oi1ZW3JJjrP6cN5bezyDuK1QBIKvg0MDS8nu9UAc6Ud8STgd7JmB
-	JsuRHkB3wEjIrqum8fLo8o3vchBW
-X-Google-Smtp-Source: AGHT+IEqZd3YsXVTaJNqnc8P4/zUTq4aoOBXPiUTSi9FbqN1NFo0pmvC7/XQPrTVzPToXMZLDOx0Ag==
-X-Received: by 2002:a05:6214:19c5:b0:6d8:8256:41d4 with SMTP id 6a1803df08f44-6df9b1f00c4mr578711256d6.19.1737032426489;
-        Thu, 16 Jan 2025 05:00:26 -0800 (PST)
-Received: from localhost (15.60.86.34.bc.googleusercontent.com. [34.86.60.15])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6dfad8add1bsm76930666d6.49.2025.01.16.05.00.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Jan 2025 05:00:25 -0800 (PST)
-Date: Thu, 16 Jan 2025 08:00:24 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>, 
- davem@davemloft.net
-Cc: netdev@vger.kernel.org, 
- edumazet@google.com, 
- pabeni@redhat.com, 
- andrew+netdev@lunn.ch, 
- horms@kernel.org, 
- Jakub Kicinski <kuba@kernel.org>, 
- shuah@kernel.org, 
- linux-kselftest@vger.kernel.org, 
- willemdebruijn.kernel@gmail.com
-Message-ID: <678902e8e7bd1_3710bc29490@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20250116020105.931338-1-kuba@kernel.org>
-References: <20250116020105.931338-1-kuba@kernel.org>
-Subject: Re: [PATCH net-next] selftests: net: give up on the cmsg_time
- accuracy on slow machines
+	s=arc-20240116; t=1737032453; c=relaxed/simple;
+	bh=OayDs9CzsfamNNuo2QzEV1pwaK+L1bAdF0n6M33jwtg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=buGFAvAGkjjyWm5GGtyQDOLmNIsV/MIODO6wWtSns3sqnpoDCshs5MtDOBjZyIfjy/rguZTqGuAmhgYsdczSROVpR1zuyNbjQC45eENyrLp8a597YaKMS4EWVLZ4Pu1XTu6GH8tWFTsC5Sb03/2xhy38l9SBdDQH550tDSmcLOM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eAIXyiuD; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E89ECC4CED6;
+	Thu, 16 Jan 2025 13:00:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1737032452;
+	bh=OayDs9CzsfamNNuo2QzEV1pwaK+L1bAdF0n6M33jwtg=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=eAIXyiuD55vnW2c334kLxAP++EwTvQ+RHchpHUJXIBknhGV3XtuBmrjDnFmBANMdL
+	 fHkzcpZZBe4CDqSKQ9WZNqHY8YpaVMk+ZyNzLzEssyzGvC5OcOSNqQDA3zRawtL6iH
+	 FUuL0xN54hUqHNzl6a5F8s4rHsH4BJJYYKAVQ+2x58qN8MOtGM7Akrkcz1n6WcIrTc
+	 wL1xe+jJkcpeLzWtwG9kjdWf38ZgSJclZCLERF+HhXjA2nVdGFXgmBNhWcO0bEc3ER
+	 iIayDpPi3BlToebxbxcHUXvuMBmx8WL9/KG0TYZNhFUDruds0RYCC27ZZeSPSx2aUC
+	 ikk130rLsx3Eg==
+Message-ID: <0004a78f-6802-4c47-9f1f-414cdecb2b2e@kernel.org>
+Date: Thu, 16 Jan 2025 15:00:47 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net: ethernet: ti: am65-cpsw: fix freeing IRQ in
+ am65_cpsw_nuss_remove_tx_chns()
+To: Siddharth Vadapalli <s-vadapalli@ti.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Grygorii Strashko <grygorii.strashko@ti.com>, srk@ti.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20250114-am65-cpsw-fix-tx-irq-free-v1-1-b2069e6ed185@kernel.org>
+ <gygqjjyso3p4qgam4fpjdkqidj2lhxldkmaopqg32bw3g4ktpj@43tmtsdexkqv>
+ <8776a109-22c3-4c1e-a6a1-7bb0a4c70b06@kernel.org>
+ <m4rhkzcr7dlylxr54udyt6lal5s2q4krrvmyay6gzgzhcu4q2c@r34snfumzqxy>
+ <3c9bdd38-d60f-466d-a767-63f71368d41e@kernel.org>
+ <8829d58b-fbfc-4040-93de-51970631d935@kernel.org>
+ <2bhpxcdducequwchyobyinj3xp2vsnpxkshtwqy24swto6zqvz@mbnnn7calbhv>
+ <e2d17324-39b8-4db5-85e7-bd66e67fcd52@kernel.org>
+ <yhxlrqqt4cuxp2hkv7nm7h5i25jjaxjhmuzhlvpfwb24jga7o2@f47d4wqe75tu>
+Content-Language: en-US
+From: Roger Quadros <rogerq@kernel.org>
+In-Reply-To: <yhxlrqqt4cuxp2hkv7nm7h5i25jjaxjhmuzhlvpfwb24jga7o2@f47d4wqe75tu>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-Jakub Kicinski wrote:
-> Commit b9d5f5711dd8 ("selftests: net: increase the delay for relative
-> cmsg_time.sh test") widened the accepted value range 8x but we still
-> see flakes (at a rate of around 7%).
-> 
-> Return XFAIL for the most timing sensitive test on slow machines.
-> 
-> Before:
-> 
->   # ./cmsg_time.sh
->     Case UDPv4  - TXTIME rel returned '8074us - 7397us < 4000', expected 'OK'
->   FAIL - 1/36 cases failed
-> 
-> After:
-> 
->   # ./cmsg_time.sh
->     Case UDPv4  - TXTIME rel returned '1123us - 941us < 500', expected 'OK' (XFAIL)
->     Case UDPv6  - TXTIME rel returned '1227us - 776us < 500', expected 'OK' (XFAIL)
->   OK
-> 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-Reviewed-by: Willem de Bruijn <willemb@google.com>
+
+On 16/01/2025 14:10, Siddharth Vadapalli wrote:
+> On Thu, Jan 16, 2025 at 01:47:59PM +0200, Roger Quadros wrote:
+>>
+>>
+>> On 16/01/2025 07:15, Siddharth Vadapalli wrote:
+>>> On Wed, Jan 15, 2025 at 06:38:57PM +0200, Roger Quadros wrote:
+>>>> Siddharth,
+>>>>
+>>>> On 15/01/2025 17:49, Roger Quadros wrote:
+>>>>> Hi Siddharth,
+>>>>>
+>>>>> On 15/01/2025 12:38, Siddharth Vadapalli wrote:
+>>>>>> On Wed, Jan 15, 2025 at 12:04:17PM +0200, Roger Quadros wrote:
+>>>>>>> Hi Siddharth,
+>>>>>>>
+>>>>>>> On 15/01/2025 07:18, Siddharth Vadapalli wrote:
+>>>>>>>> On Tue, Jan 14, 2025 at 06:44:02PM +0200, Roger Quadros wrote:
+>>>>>>>>
+>>>>>>>> Hello Roger,
+>>>>>>>>
+>>>>>>>>> When getting the IRQ we use k3_udma_glue_rx_get_irq() which returns
+>>>>>>>>
+>>>>>>>> You probably meant "k3_udma_glue_tx_get_irq()" instead? It is used to
+>>>>>>>> assign tx_chn->irq within am65_cpsw_nuss_init_tx_chns() as follows:
+>>>>>>>
+>>>>>>> Yes I meant tx instead of rx.
+>>>>>>>
+>>>>>>>>
+>>>>>>>> 		tx_chn->irq = k3_udma_glue_tx_get_irq(tx_chn->tx_chn);
+>>>>>>>>
+>>>>>>>> Additionally, following the above section we have:
+>>>>>>>>
+>>>>>>>> 		if (tx_chn->irq < 0) {
+>>>>>>>> 			dev_err(dev, "Failed to get tx dma irq %d\n",
+>>>>>>>> 				tx_chn->irq);
+>>>>>>>> 			ret = tx_chn->irq;
+>>>>>>>> 			goto err;
+>>>>>>>> 		}
+>>>>>>>>
+>>>>>>>> Could you please provide details on the code-path which will lead to a
+>>>>>>>> negative "tx_chn->irq" within "am65_cpsw_nuss_remove_tx_chns()"?
+>>>>>>>>
+>>>>>>>> There seem to be two callers of am65_cpsw_nuss_remove_tx_chns(), namely:
+>>>>>>>> 1. am65_cpsw_nuss_update_tx_rx_chns()
+>>>>>>>> 2. am65_cpsw_nuss_suspend()
+>>>>>>>> Since both of them seem to invoke am65_cpsw_nuss_remove_tx_chns() only
+>>>>>>>> in the case where am65_cpsw_nuss_init_tx_chns() *did not* error out, it
+>>>>>>>> appears to me that "tx_chn->irq" will never be negative within
+>>>>>>>> am65_cpsw_nuss_remove_tx_chns()
+>>>>>>>>
+>>>>>>>> Please let me know if I have overlooked something.
+>>>>>>>
+>>>>>>> The issue is with am65_cpsw_nuss_update_tx_rx_chns(). It can be called
+>>>>>>> repeatedly (by user changing number of TX queues) even if previous call
+>>>>>>> to am65_cpsw_nuss_init_tx_chns() failed.
+>>>>>>
+>>>>>> Thank you for clarifying. So the issue/bug was discovered since the
+>>>>>> implementation of am65_cpsw_nuss_update_tx_rx_chns(). The "Fixes" tag
+>>>>>> misled me. Maybe the "Fixes" tag should be updated? Though we should
+>>>>>> code to future-proof it as done in this patch, the "Fixes" tag pointing
+>>>>>> to the very first commit of the driver might not be accurate as the
+>>>>>> code-path associated with the bug cannot be exercised at that commit.
+>>>>>
+>>>>> Fair enough. I'll change the Fixes commit.
+>>>>
+>>>> Now that I check the code again, am65_cpsw_nuss_remove_tx_chns(),
+>>>> am65_cpsw_nuss_update_tx_chns() and am65_cpsw_nuss_init_tx_chns()
+>>>> were all introduced in the Fixes commit I stated.
+>>>>
+>>>> Could you please share why you thought it is not accurate?
+>>>
+>>> Though the functions were introduced in the Fixes commit that you have
+>>> mentioned in the commit message, the check for "tx_chn->irq" being
+>>> strictly positive as implemented in this patch, is not required until
+>>> the commit which added am65_cpsw_nuss_update_tx_rx_chns(). The reason
+>>> I say so is that a negative value for "tx_chn->irq" within
+>>> am65_cpsw_nuss_remove_tx_chns() requires am65_cpsw_nuss_init_tx_chns()
+>>> to partially fail *followed by* invocation of
+>>> am65_cpsw_nuss_remove_tx_chns(). That isn't possible in the blamed
+>>> commit which introduced them, since the driver probe fails when
+>>> am65_cpsw_nuss_init_tx_chns() fails. The code path:
+>>>
+>>> 	am65_cpsw_nuss_init_tx_chns() => Partially fails / Fails
+>>> 	  am65_cpsw_nuss_remove_tx_chns() => Invoked later on
+>>>
+>>> isn't possible in the blamed commit.
+>>
+>> But, am65_cpsw_nuss_update_tx_chns() and am65_cpsw_set_channels() was
+>> introduced in the blamed commit and the test case I shared to
+>> test .set_channels with different channel counts can still
+>> fail with warning if am65_cpsw_nuss_init_tx_chns() partially fails.
+> 
+> I was looking for "am65_cpsw_nuss_update_tx_rx_chns()" in the blamed
+> commit. I realize now that it was renamed from
+> am65_cpsw_nuss_update_tx_chns() which indeed is present in the blamed
+> commit. I apologize for the confusion caused.
+> 
+
+No worries at all. I'll respin the patch with the typo fix and add more
+description in commit log to clarify this.
+
+-- 
+cheers,
+-roger
+
 
