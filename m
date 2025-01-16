@@ -1,111 +1,158 @@
-Return-Path: <netdev+bounces-158831-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158832-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 439BEA136DF
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 10:44:59 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 44BF3A136E2
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 10:45:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6AFAA166D8E
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 09:44:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B97CD7A23CC
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 09:45:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9E331DA100;
-	Thu, 16 Jan 2025 09:44:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C2181DD0C7;
+	Thu, 16 Jan 2025 09:45:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ivU2pRFl"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="UUYJkrB1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com [209.85.208.181])
+Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4D631D89FA
-	for <netdev@vger.kernel.org>; Thu, 16 Jan 2025 09:44:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80F63145A11
+	for <netdev@vger.kernel.org>; Thu, 16 Jan 2025 09:45:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737020695; cv=none; b=auxzKww4Poeb6b6SR4HIIJBls25DlhNj9oaa1TbNHesu108c53z7xr76t4aAhOXKXWPGpuD7Z4vacxKywapryPcabEj8nipIqJrP6kiFhsrkIG7eAip5jIAuK2KxV29UBZimcr9IYTsx9Twoigsa1T59Vvz4y23LUyxkXgalztY=
+	t=1737020717; cv=none; b=nFM9dYdu6EYdjs/5kquTnbF77Va6AYJvKeACJXC2guuVx77B3CSRkkTYGUEpVdJk1CInuYyuwVwK8ioYo6JMIbzl7GCWmG960dC7f5XlWg+EVSU7Ygk4LzTBX7vNahwi5XDccF1IsWgJ6PtBOVssZLVktLOrOTG0rCZdUxJDm3Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737020695; c=relaxed/simple;
-	bh=8cjgqBCfUvmD/Nakzi/u8g0O25WgCwHu79rBw/5yfFc=;
+	s=arc-20240116; t=1737020717; c=relaxed/simple;
+	bh=SL6zWPg7b13eNNbqzfJiEUxNOGH87kbqXmMqxrNyzZk=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=IZSEKpL3AjXmaccv/UO7H0VkyeIhojD58TK8uB2I++shjggPrDmft1K8SAS2kagxNmXSjd8+3HOOrwyyaoU6KjrBZqKU7eM4Iyvg9B18m0WlnicFMM0zrR4WgXyl+wm+nFh3JPd5Z0dF/9og9jSrr/tWixbVgaX5vQIDOxSBxGQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=ivU2pRFl; arc=none smtp.client-ip=209.85.208.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-304e4562516so8096181fa.1
-        for <netdev@vger.kernel.org>; Thu, 16 Jan 2025 01:44:53 -0800 (PST)
+	 To:Cc:Content-Type; b=Rgx2PzBVI0DQBEG8OycTc/vRXg0K7YQMsRlMpHVsec1Rg0F+L8MFUSWv8PJ8ipJ5i2vWMtAxcugaptQWWa0dWxYtWi6ND9GXQd/vZT7WMGrl1guY5sUwZVeB01IwQygNh4mbyNkiZyWyK9datU66SsCZVed/01s/WzWZOnF588A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=UUYJkrB1; arc=none smtp.client-ip=209.85.221.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-38be3bfb045so1095000f8f.0
+        for <netdev@vger.kernel.org>; Thu, 16 Jan 2025 01:45:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1737020692; x=1737625492; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1737020713; x=1737625513; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=MLkMsfgSGfno6czydYkHbxN/rzByw44hUzXqWAYxloA=;
-        b=ivU2pRFlBIetqObhH734/1ZyBnB2kL6P4SC05Y23hqyN+2Q4jUwylPfpPT1NlhpnEr
-         jTqrQkV6l2swzOOgwp2hZKzDwxSL/Ojw5OOM6EzhGf/SkQXdS3ZOXxNSq4l987pI33AP
-         +ZtTnqK1r3xoUKaYIFkPyXrLnX00odLQ3ujoN/xURE8Ra2eGZa83elLBqG1d3SS0r/f7
-         M46TXsgK0KyjkLTmrG6SMc+FJHJn2IhnMrBEK0P+9cjeIvMNOpERF1QPB1hPxVynxYak
-         07HVrVlHDF/VCNq/aZT69TFEs/HwGY44l5wnsZEYeD26LJgzv+xgbaj622gvmXZxDp3q
-         +n7w==
+        bh=G97hjMfDtUXj+Is0oUFrqTtwBK3UMNwO8cqTTqcsyh8=;
+        b=UUYJkrB1mawCcaNGcpqxeOBj7pe564ermYi41DCx0dppMlg6yzWv02OQ6GkDf+XdAr
+         aYmmSELOPZ0Zjueg7QDnx6SaoP7iNXVxp5JSDZeavwvrWVEhzdG9p20XI3rxXUGx9zRj
+         mKvr8GgqvlQX3F1OMV8RAqRWSoAL4kOz3FJEDX61BaXZ4Z/w4sL8p2VTOAZELXfqW8Bo
+         xzlYoXjKs9IMA/r0lMhAE+3MPFU1/j17iLrUcdnagIEIVTyiKt26B68NGb0RsVyFy3Ur
+         v0UAVFamK56XQefUT61hiEM9KZbbW7eZ4qIfw3r7bXimPGn7NBPQyTK7dJk34qLmPiDd
+         l3zg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737020692; x=1737625492;
+        d=1e100.net; s=20230601; t=1737020713; x=1737625513;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=MLkMsfgSGfno6czydYkHbxN/rzByw44hUzXqWAYxloA=;
-        b=vxngtGjIGVWuSJ8TLinkhNoYgSQIPRjvx8Aj6BcfktKNC1VmdhS8UIS1MiDNReZnaQ
-         t9ak89h/utorFGBzUthZsXOI45D/NXLcF56xMMPF8GOKhRGo5tcQIKDn0gB0iVuYQAMm
-         xJVjllbc8jMheKpZVrkwo4lfeIxXlMCr5LL+3AfVvmEbr9Guk5kxx6Kgq4Y/qLWf3Zkl
-         dsAWCeSFAVC+q/OIcbv8Ht0xNGsrFqElQmiyhBjGgECPVabpWeIqvQduAG4zuzyUqFGg
-         WoLyF5W6ukufHn3UvG+zOf1Mb7hQxBP7EoDGw2rhQvqjVumnf+yjLUsM+8JgtzzUg/kw
-         JPPQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVIqJOXkNsIH6KorwEbSsO8yJWAKZg7eH7+wbltHPDN6eh1UgfTJYuPOdP20rk888iT9Vr8oXs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzRICmb7FYsCXkxSlrf2DFVyC6o7wzA9ud4CmMD5d6f4mY5DGlM
-	NTUl7zPWeOOYpwvf6Y3KOEi5/mvJfu5tZ8pbQ6i+I+S9+pHX9uxXiIJfnG5Zua9ZmBR3im+UWKQ
-	PPdlQoS9sKhuPRM/AIck4wovoopRBMUkXrVEg7g==
-X-Gm-Gg: ASbGncvPLrL21HWGdose82IO+UA6wfKZ6ZNZjnpPD17ATDgTNLYTcCeqcwGmHd0tSEC
-	21iJtlNhIklbfxSIB2xDL0TFbh/kyeBoN4ix9
-X-Google-Smtp-Source: AGHT+IEO2UrQBQPPNxhpuGsIyQinj9e1e00jDeeneDUGdhuo8jbsWgvgZ8CLJIBEXCxSyfKMiq6XS9YXE+6OO6TGYBg=
-X-Received: by 2002:a2e:b88b:0:b0:300:31dc:8a4a with SMTP id
- 38308e7fff4ca-30630686f10mr26379861fa.18.1737020692039; Thu, 16 Jan 2025
- 01:44:52 -0800 (PST)
+        bh=G97hjMfDtUXj+Is0oUFrqTtwBK3UMNwO8cqTTqcsyh8=;
+        b=QlFoWS0HPLcHbjvTd7nMFxyaPsmGXR01pDBWHf4aQdulid9z5fJ1Wcw1K40Rw3VHf5
+         KoAczjjsofpXF4F+iOvCV4SGebAwKhhDOG9fmQS1thfq+/BlpimseIVApmPMolGv9Sea
+         Cf66MuvLtm3N6hr99EFI7CbjOoEntvP+4DEkqwGY4rD++vwFtSfNwwInYvAC5sLgACzr
+         NIieeiQpdwcUDsQsFixyRkdPLRwDjMms7nlTXmtrEKdfruU0S+gTmaQNtwkgwYWMmlez
+         sj81ezfT/31tetH+4s2DrAQxZRcyh/JeNhVeKCbJk/JJYaCIv+MjMAHoUpF1K3DaM2gz
+         p6WQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU7ILbGgtGytBOMNbDch43ABByrI3vU5Io+GtHx98IG8xG8ZYgl/NQw07ZHCupm5T/eX+BpaL8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxLgpO3fmLTmvXRtf92/8jEQCqEfCv7capkiKpuIrKcu5+AAcgr
+	FN19J/WWH0MWVvmccvIe5g7dlWVoQNjTav+LA/Y3RfH2SkmiwyALkbrg8hUAl9wUQwa3CCvZZBy
+	3UedgBzfr3oe4ZzUFNN47TdlPtcLHj4LytO3/
+X-Gm-Gg: ASbGncuL5g4jy6EDb90Ro2QV/siu/ycrxUQXsVmZttFnXvvtB51Dlrf94XJ+R3uqR5+
+	9+UAPq5IT0et7qMarMpAEDlmxUmuGF3EBdox+lAFjoEIuXmoJsAYXjypY0MBFYniEwbM=
+X-Google-Smtp-Source: AGHT+IHyJ8nvs2yvNcmDYbDwEp1qMKTZrUw/yqDAC3Hebhph+3mCuJ7v/Xmj4uOyJRH25eESP+IdpuvrTHkRcNm9laQ=
+X-Received: by 2002:a05:6000:184f:b0:38a:a117:3dbe with SMTP id
+ ffacd0b85a97d-38bec507323mr1823023f8f.21.1737020712688; Thu, 16 Jan 2025
+ 01:45:12 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250115194703.117074-1-krzysztof.kozlowski@linaro.org>
-In-Reply-To: <20250115194703.117074-1-krzysztof.kozlowski@linaro.org>
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Thu, 16 Jan 2025 10:44:41 +0100
-X-Gm-Features: AbW1kva0mDHb6GI_lH7zjDAzCdNV603y6c8zcMnZJBBXOm3OjrAweUvcR2aovV4
-Message-ID: <CACRpkdZfnqiwPC69XXcX6Fqokqxu7PV7oc4ph6+Q+Au3PmzZTg@mail.gmail.com>
-Subject: Re: [PATCH net-next] dsa: Use str_enable_disable-like helpers
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	=?UTF-8?Q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
+References: <20250116044100.80679-1-fujita.tomonori@gmail.com> <20250116044100.80679-7-fujita.tomonori@gmail.com>
+In-Reply-To: <20250116044100.80679-7-fujita.tomonori@gmail.com>
+From: Alice Ryhl <aliceryhl@google.com>
+Date: Thu, 16 Jan 2025 10:45:00 +0100
+X-Gm-Features: AbW1kvYdQi8ZJtKAP6jrR98YMJn2YEu4b49Q0-p39jnMzgaoN3yho_fE7k21c3M
+Message-ID: <CAH5fLgjoAzv1Q0w+ifgYZ-YttHMiJ9GV95aEumLw4LeFoHOcyg@mail.gmail.com>
+Subject: Re: [PATCH v8 6/7] rust: Add read_poll_timeout functions
+To: FUJITA Tomonori <fujita.tomonori@gmail.com>
+Cc: linux-kernel@vger.kernel.org, Boqun Feng <boqun.feng@gmail.com>, 
+	rust-for-linux@vger.kernel.org, netdev@vger.kernel.org, andrew@lunn.ch, 
+	hkallweit1@gmail.com, tmgross@umich.edu, ojeda@kernel.org, 
+	alex.gaynor@gmail.com, gary@garyguo.net, bjorn3_gh@protonmail.com, 
+	benno.lossin@proton.me, a.hindborg@samsung.com, anna-maria@linutronix.de, 
+	frederic@kernel.org, tglx@linutronix.de, arnd@arndb.de, jstultz@google.com, 
+	sboyd@kernel.org, mingo@redhat.com, peterz@infradead.org, 
+	juri.lelli@redhat.com, vincent.guittot@linaro.org, dietmar.eggemann@arm.com, 
+	rostedt@goodmis.org, bsegall@google.com, mgorman@suse.de, vschneid@redhat.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jan 15, 2025 at 8:47=E2=80=AFPM Krzysztof Kozlowski
-<krzysztof.kozlowski@linaro.org> wrote:
-
-> Replace ternary (condition ? "enable" : "disable") syntax with helpers
-> from string_choices.h because:
-> 1. Simple function call with one argument is easier to read.  Ternary
->    operator has three arguments and with wrapping might lead to quite
->    long code.
-> 2. Is slightly shorter thus also easier to read.
-> 3. It brings uniformity in the text - same string.
-> 4. Allows deduping by the linker, which results in a smaller binary
->    file.
+On Thu, Jan 16, 2025 at 5:43=E2=80=AFAM FUJITA Tomonori
+<fujita.tomonori@gmail.com> wrote:
 >
-> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+> Add read_poll_timeout functions which poll periodically until a
+> condition is met or a timeout is reached.
+>
+> C's read_poll_timeout (include/linux/iopoll.h) is a complicated macro
+> and a simple wrapper for Rust doesn't work. So this implements the
+> same functionality in Rust.
+>
+> The C version uses usleep_range() while the Rust version uses
+> fsleep(), which uses the best sleep method so it works with spans that
+> usleep_range() doesn't work nicely with.
+>
+> Unlike the C version, __might_sleep() is used instead of might_sleep()
+> to show proper debug info; the file name and line
+> number. might_resched() could be added to match what the C version
+> does but this function works without it.
+>
+> The sleep_before_read argument isn't supported since there is no user
+> for now. It's rarely used in the C version.
+>
+> core::panic::Location::file() doesn't provide a null-terminated string
+> so add __might_sleep_precision() helper function, which takes a
+> pointer to a string with its length.
+>
+> read_poll_timeout() can only be used in a nonatomic context. This
+> requirement is not checked by these abstractions, but it is intended
+> that klint [1] or a similar tool will be used to check it in the
+> future.
+>
+> Link: https://rust-for-linux.com/klint [1]
+> Co-developed-by: Boqun Feng <boqun.feng@gmail.com>
+> Signed-off-by: Boqun Feng <boqun.feng@gmail.com>
+> Signed-off-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
 
-Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
+[...]
 
-Yours,
-Linus Walleij
+> +void __might_sleep(const char *file, int line)
+> +{
+> +       long len =3D strlen(file);
+> +
+> +       __might_sleep_precision(file, len, line);
+>  }
+>  EXPORT_SYMBOL(__might_sleep);
+
+I think these strlen() calls could be pretty expensive. You run them
+every time might_sleep() runs even if the check does not fail.
+
+How about changing __might_resched_precision() to accept a length of
+-1 for nul-terminated strings, and having it compute the length with
+strlen only *if* we know that we actually need the length?
+
+if (len < 0) len =3D strlen(file);
+pr_err("BUG: sleeping function called from invalid context at %.*s:%d\n",
+       len, file, line);
+
+Another option might be to compile the lengths at compile-time by
+having the macros use sizeof on __FILE__, but that sounds more tricky
+to get right.
+
+Alice
 
