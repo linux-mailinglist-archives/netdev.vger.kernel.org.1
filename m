@@ -1,257 +1,245 @@
-Return-Path: <netdev+bounces-158952-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158953-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A4B7A13F14
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 17:17:55 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1EBBFA13F21
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 17:20:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A42E57A2595
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 16:17:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 42EF51886AD4
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 16:20:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1893D157E88;
-	Thu, 16 Jan 2025 16:17:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2A2522B8D0;
+	Thu, 16 Jan 2025 16:20:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Tib4ayVt"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="aYlXskKy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5ABA478F2B;
-	Thu, 16 Jan 2025 16:17:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737044269; cv=none; b=n9gTs/EvQzsEGH0c+gQEvE1b9BiC9qZ4zMZUpmyB49voMfwohGpQex09Y1QxnWMrVQl1CJQlbWp4giJBpc2JBBe9LVsOvAn6hGFUQfPz7SdbcX3DearuyEL2rAgPv9EV6SMIjWxumazZpuAWA+PmtfQRtn5q/MnZw+MCPNCXGOM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737044269; c=relaxed/simple;
-	bh=pIKytAdtXKpVYASFmcHFnlyR2BiFx970oXXfr1V44Gc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=W6CzCWlp9V4jBg0lc9dyECz3c8xegL51JTbxXPIPVBo0ju7x4qEkNYA/LEhot2FiQdx+VXnD/2hEAv/CcuDemoSaD53zC7qV6z00eQtA/5AXedbfzkncuvqzA8qqYVwsJYiDjDLqbzoPs1F1TpMDZQ73nePqmQ4BVWE5HGQ83B4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Tib4ayVt; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50GBvX77022867;
-	Thu, 16 Jan 2025 16:17:39 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=yz8DXn
-	BWEUGcHEegJJtqj1vvCHBWIJPhGb/k2OWbxLQ=; b=Tib4ayVtggjqCpuGyKzikG
-	TI032VIg3wEcsggAIQ9VFHx0p9DC8bYYXIqhIzR55KP80QfkLBW1s7181ArYIvZA
-	+g69S5aiGmf8VLbRZUrjV8UTuJ7+P2Ig70+WdQsmZA6l7jELKD/+orFuHCTXNXEX
-	c/fS4tRjw5/PJ9m8laSvfwgp/OAEqZzVpsRtz+Xx+s/qRMZDz9/Id3QoHwl16EbV
-	BwgzV3FFDhkHS+vqUyhTuPgh9b6Q7jUj1njeQrO/lwXarVTaWj7VYbebfqmj0eqz
-	GSEcOquu2na3HuvL41QISqs5B1sPWGDm6OrFafRObfPBgGCjWlBvFYm53jV+EpFQ
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 446pub43va-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 16 Jan 2025 16:17:39 +0000 (GMT)
-Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 50GGHcd9024334;
-	Thu, 16 Jan 2025 16:17:38 GMT
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 446pub43v8-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 16 Jan 2025 16:17:38 +0000 (GMT)
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 50GE3DNG017014;
-	Thu, 16 Jan 2025 16:17:37 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4444fkeh1n-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 16 Jan 2025 16:17:37 +0000
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 50GGHYcD43450838
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 16 Jan 2025 16:17:34 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 093AF2004B;
-	Thu, 16 Jan 2025 16:17:34 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 95C4720040;
-	Thu, 16 Jan 2025 16:17:33 +0000 (GMT)
-Received: from [9.152.224.153] (unknown [9.152.224.153])
-	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 16 Jan 2025 16:17:33 +0000 (GMT)
-Message-ID: <0f96574a-567e-495a-b815-6aef336f12e6@linux.ibm.com>
-Date: Thu, 16 Jan 2025 17:17:33 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A93E81E47A5
+	for <netdev@vger.kernel.org>; Thu, 16 Jan 2025 16:20:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.15
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1737044420; cv=fail; b=Ew4DM9XA/ZHVGqoGuuRDXRGvnQaJYj9moEAInteIF0djB8ITMc519n25n3pOk32srJ/gPKmjB8O+IE6mko7DBy51azhzMtF6H258GD7bPq/w8L/lEfNC9Jl0pQ3WKWNulfTqlA9RF3Z4scW+tPH+urIjHblooak7LXXwdFdngh8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1737044420; c=relaxed/simple;
+	bh=mqlTrRlAe+eQGORiBYIm2Mabb3Qd9JcpZ8VGb5nXmTU=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=uE9WEFBTf6vjeqFx+l7Kce86wQ/PiwvQs63HpXXWBSI5cvxHOl6Ll7SbXcmdd9puh8HahE26Vc7gGUJa14SOT2lTDwfwyJ/llizy+BWRcUunaXHuvlpHPvUgpe61XIPXTXgvuTLx+18fOZBCzFoxc1SiwkrZQpP5tQCLsqOZi2U=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=aYlXskKy; arc=fail smtp.client-ip=192.198.163.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1737044419; x=1768580419;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=mqlTrRlAe+eQGORiBYIm2Mabb3Qd9JcpZ8VGb5nXmTU=;
+  b=aYlXskKyMNpwPiu8/B99g7IVMDA57DWpJW7q8kIQxniN5Dq3XsJyJwJn
+   rpWJD0X+7G6mrcO4rmfEheskony+eBKp9umX/DCsIxwuHQxPJQTpIvk0n
+   ReQgWi/RAhgj/pGrlZpO9JmYjitjOAqHD6/LF9QAgglwCw3f2ex2TqCj6
+   iFUEzwnblfNya2kaz9zbkPGuRCpcvH2eWaKhim4naN1JXghsJUNarT5R4
+   en4aoRvUmsDP0rAMbupA5iSFpH6YkxSs3Wx8quv4g0H9D5k6JBoxm+DyQ
+   cdMjmErxATf3GOk4xJFozn/zGtP/IVlDOExPXhWHJ/rkamfBVWQI1Vdgo
+   Q==;
+X-CSE-ConnectionGUID: ALYyMPKhRC+hB/NNd6WhaQ==
+X-CSE-MsgGUID: M34R9NP6SQqGa4BLptHPLA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11317"; a="37599478"
+X-IronPort-AV: E=Sophos;i="6.13,209,1732608000"; 
+   d="scan'208";a="37599478"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jan 2025 08:19:56 -0800
+X-CSE-ConnectionGUID: f4YsChTvSk+86hpR0/h1uw==
+X-CSE-MsgGUID: qREb7OfXT6SEgfksijbkWg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="105391973"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by orviesa010.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 16 Jan 2025 08:19:55 -0800
+Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44; Thu, 16 Jan 2025 08:19:54 -0800
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44 via Frontend Transport; Thu, 16 Jan 2025 08:19:54 -0800
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.42) by
+ edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Thu, 16 Jan 2025 08:19:54 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=aGqAk2aEDbYV7az5JlCshX4YIwQRsx42aJeOtuVs1sQmYKuAzvkiguhOC1/UOsi11Ggn0lyDGhwJd34wNNJ8PpQLvGcalVwplxlO/W36cQU6tsayrqe6+cDSrGAYOQ5+sQS1zXN9WWrYO65ytDfzJH7XQbVskzH0lEoJr6jZI+c+49FRt2hgs0PRc89dMqCfbruUzP1BYweMdvIbzAaGjRIcOQv6ZeHkaOCtlliWLWaZML4wlbhVgGBW94MoypK6liwSTYjLPuBhTRbcfW3xSqeF+9JYau0EwkglTPr4R47U7zmA9kGjKtsot3JNVQpaRvqtKWa0TAvJK6fpxaah4A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=rFWK2wBUGjqIGeMwLkpacR59ywlIGxIo0CRQZ7arHYM=;
+ b=g8LDxYo9ji6FA2HPOxQFay31djriE7ADlrLGCf6zodMqHmW6V0Wd3biqi/atVPZOL3g4YKJ0hJsqlZE/ibt0/AKUoN5QLKFfrjJz+lDrauv3WPoJo22kWAvyY/Wvlh1TQaqJ7WW/+tmKD528OU4nASmDpV95oDLl+bSwIsnPoJXl9xVd8qjIo4EyZ7d7WevqD68R2+CxGB9TI9Ku8QpBL7HaFiW4X+XjpvRjnio+QtBpaUprKL2kE5C4jSi8uFqCrOy5kRZ4tnYV5CUr+GrswGtiziZ6nGUByr+5TtkNaDqyr+jqroYB/iRcBfcBVRXvcZg346lonZmUW8KMhCEh+A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from MN6PR11MB8102.namprd11.prod.outlook.com (2603:10b6:208:46d::9)
+ by PH7PR11MB6523.namprd11.prod.outlook.com (2603:10b6:510:211::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8335.18; Thu, 16 Jan
+ 2025 16:19:49 +0000
+Received: from MN6PR11MB8102.namprd11.prod.outlook.com
+ ([fe80::15b2:ee05:2ae7:cfd6]) by MN6PR11MB8102.namprd11.prod.outlook.com
+ ([fe80::15b2:ee05:2ae7:cfd6%6]) with mapi id 15.20.8356.010; Thu, 16 Jan 2025
+ 16:19:49 +0000
+Message-ID: <97dffc47-3363-4a0d-983a-5620fa5ad745@intel.com>
+Date: Thu, 16 Jan 2025 17:19:43 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH intel-net 0/3] ice: fix Rx data path for heavy 9k MTU
+ traffic
+To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	<jacob.e.keller@intel.com>, <xudu@redhat.com>
+CC: <netdev@vger.kernel.org>, <anthony.l.nguyen@intel.com>,
+	<magnus.karlsson@intel.com>, <mschmidt@redhat.com>, <jmaxwell@redhat.com>,
+	<poros@redhat.com>, <intel-wired-lan@lists.osuosl.org>
+References: <20250116153908.515848-1-maciej.fijalkowski@intel.com>
+From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Content-Language: en-US
+In-Reply-To: <20250116153908.515848-1-maciej.fijalkowski@intel.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: ZR0P278CA0011.CHEP278.PROD.OUTLOOK.COM
+ (2603:10a6:910:16::21) To MN6PR11MB8102.namprd11.prod.outlook.com
+ (2603:10b6:208:46d::9)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC net-next 0/7] Provide an ism layer
-Content-Language: en-US
-To: Julian Ruess <julianr@linux.ibm.com>, dust.li@linux.alibaba.com,
-        Wenjia Zhang <wenjia@linux.ibm.com>, Jan Karcher <jaka@linux.ibm.com>,
-        Gerd Bayer <gbayer@linux.ibm.com>, Halil Pasic <pasic@linux.ibm.com>,
-        "D. Wythe" <alibuda@linux.alibaba.com>,
-        Tony Lu <tonylu@linux.alibaba.com>, Wen Gu <guwen@linux.alibaba.com>,
-        Peter Oberparleiter
- <oberpar@linux.ibm.com>,
-        David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
-        Andrew Lunn <andrew+netdev@lunn.ch>
-Cc: Niklas Schnelle <schnelle@linux.ibm.com>,
-        Thorsten Winkler <twinkler@linux.ibm.com>, netdev@vger.kernel.org,
-        linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev
- <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>, Simon Horman <horms@kernel.org>
-References: <20250115195527.2094320-1-wintera@linux.ibm.com>
- <20250116093231.GD89233@linux.alibaba.com>
- <D73H7Q080GUQ.3BDOH23P4WDOL@linux.ibm.com>
-From: Alexandra Winter <wintera@linux.ibm.com>
-In-Reply-To: <D73H7Q080GUQ.3BDOH23P4WDOL@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 2ZF7Tt_ZVWtQjrdbX7Np-O9GotYqG2xd
-X-Proofpoint-ORIG-GUID: gWFvR8XsF4n3gxyV9mSXN_OI2YNfUR4J
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-01-16_06,2025-01-16_01,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 impostorscore=0
- spamscore=0 malwarescore=0 lowpriorityscore=0 mlxscore=0 suspectscore=0
- priorityscore=1501 bulkscore=0 mlxlogscore=999 clxscore=1015 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2411120000
- definitions=main-2501160121
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN6PR11MB8102:EE_|PH7PR11MB6523:EE_
+X-MS-Office365-Filtering-Correlation-Id: 09a0f673-de4c-467b-2623-08dd36499976
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?dFA4TXQwNFBuS3dSU0lxTS85ZWppdVV1VXFKdnFBak5wTzF6UkFqSldKVlNU?=
+ =?utf-8?B?S0xvaVdmTlUrM1Q3NGh3NWM2alZDZE9JVHRKUE5XM0ZMT3hkNnZoTm9VT0M4?=
+ =?utf-8?B?UzQzWlc0cjVLM25NNWt5K0xoUjhWZy9SaUlRSDVkWFFDTVplVEcyNDFNNHBt?=
+ =?utf-8?B?Q1hqS0pmWk1rME1tVXFwbFM2ZTFpSTRBdjEvMllLQjBPdDNUVmFicTd5ZXVE?=
+ =?utf-8?B?dUwxa0F6bjBhVHFKRlNvdGVoZFgxeXNTVFpmdFlMNG1ydmNIQ3FkckdUMDNX?=
+ =?utf-8?B?dUd0SWRPMHVaY2pQVEVUSnlVSDc0UHJJT1dWYnEzbG8yTzRhWDVVSVp6aWF0?=
+ =?utf-8?B?V2NhdGVKQjZPcW8wYmJ1VWlJR0lhbHpxcHY1ZnlxRFE0ZjFBRTdUMTNPTTYv?=
+ =?utf-8?B?aUVGMWZjWmwrRVY5Ymp4NGh6SjAwdlFXVVh1NVFhRUZFYXNwd0p6Z21INHFq?=
+ =?utf-8?B?bkFUM3hVdGU4S0pjVGg3YUNaM213ZEN0YkdsOEU1bXZCMjEzeFVydjV0Rk0v?=
+ =?utf-8?B?bXEvSnNOL3NIQ0VjaVM4ak5ZemF6bUQ2ZnNqOG9TTGpTTks5VWJZdS9pRlp6?=
+ =?utf-8?B?ZnYwaFMyU1lEejJkbzlkYWNzU2pxcGUrMlI0aVROTDZHUnUyU2VYSUNpbFpz?=
+ =?utf-8?B?TlVBQjhjUEp3SHYrbTVMUXRaRForUjJVbU15UXlUMXRpVVVIVHpTNUpRN0dn?=
+ =?utf-8?B?dDlWa2I2cVFKRnRyRElwZVN3ZkV1ZC9sUU91OWlxR3M3aGg2c2ZnTTdnNUcw?=
+ =?utf-8?B?dHN5NHJ4dVZuUWpUY0hkT1hEeE5rU0x0d3VBc1R5aysrWDV5b2Z1VjZLWkFF?=
+ =?utf-8?B?dlFidGFubFZJNjV3elRwbTlsRzJWWGdhMEVUalZ3WUxiMmVPMkNjS3d6RFMx?=
+ =?utf-8?B?LzBvQzRYdzR6dUthRlJrUWdXWVFFdHdiSEJyamluZ2p6em81Qkc5ZzhmYmhK?=
+ =?utf-8?B?YWRUb3BqMTFleURhdkF2cnBOZFV5OHV2a2E1c1FqY0toeXVOMUkzbjFqbTVE?=
+ =?utf-8?B?WFdQMVdNM3JpYjYzMVgyWHpqUjdWM3d5NVY0S0IwelRUeEl5N1hkd0dVWGd2?=
+ =?utf-8?B?T0MwK2RPOHQza0ZHeS9kR2gyWkQ2U3dJTU16Q2VLRDhFVUNocVlQOGh3dFN5?=
+ =?utf-8?B?aElGMUFnQ3VEVUFlbEFpcTV2dXZQWE5Qb09VVkVIbmN2aFpKVEk3TXNETkZC?=
+ =?utf-8?B?RGk2S2hwSk9kQnRjYVZvUVh4c2xDMUtXL3VyTmtNbXQ0aHZubm9rdGVNVlBB?=
+ =?utf-8?B?aVo1MDIwQ202NndPU2dZci82cG5SOEVUb3Rib2hTc20zQThRU29yWG53MHV1?=
+ =?utf-8?B?NEN5dFNyMmI5SWM5d01jamQ4TENxNmZMY1RCbnUvVHR2SDlLV21obFBOWThZ?=
+ =?utf-8?B?eEtEVmwzUVF6UStOaU10ZTNBMm5sTzF6enJZVmRMS2k4M1NmRGhtaExTbm5w?=
+ =?utf-8?B?ZFZsSG5GUGlOcmxBaEVFZzNJekhLWUhsR0xOU29tOWw3WXYzUWRFNnIwT0wy?=
+ =?utf-8?B?UHFiRDVjZFJXKzZDQkFCUjNRYmVmalJLZHUzTWFpUHpidTkyMVU5b04yNlc2?=
+ =?utf-8?B?WmF0VjRLZ0N5VlhlamZneTVOVllMT1ZwTldmTHUyRGlkQTE3RUdkOXp3M1po?=
+ =?utf-8?B?NTFqMlREeFVMRFNMemRiNm5YZ2JlenpEVWpSRGVlTzkzbzMwWFhRV3NJVzVU?=
+ =?utf-8?B?Y2FhUzBodVJhL1NNYkp2M0o3NWlsQmloZlVnZ2RtVzlNVUNkTys1bTcxbzZ5?=
+ =?utf-8?B?c0o5RG81bHBGdlV5dzZoSklNalRiSzVyYVFUUVJGNDhhUFgwd2hQVTEzL04y?=
+ =?utf-8?B?MjVNWVdYdkNEWWVYdXhpZHZyRFA1WGFObDUxdzJjclB5VGRraFlyWktDYnlX?=
+ =?utf-8?Q?s7mM/KDihxVHH?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN6PR11MB8102.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?cXkzL2VCSXZYNzRncWl6VGJVdTJiYjZBWUdBRXd6QmlrMW9WT3dReHJZdys5?=
+ =?utf-8?B?RzdPT3hJN0o1OGVRUjQ4alozMXBxRytrS1dFSjFSQlU5c0ZUa1VRdXNpOG1R?=
+ =?utf-8?B?VTFyUjBRY0hoWGt6cjZDVVFJK2V3MW8vb1pvZGtKYWkwSGxFN2h1NVN4SGxH?=
+ =?utf-8?B?Vm1pdzc0bnh5enZEZzZyR3lmc1lOVElaK0JCV3pYUnJnYXJsY2RPWXJmQU5H?=
+ =?utf-8?B?emFmQ08rTnZVejZiOVlDdTB2bDd0cnpFbkJOTDJzT21yZjZiR2hoWHBZd0Zx?=
+ =?utf-8?B?eUVHd3kxRktDcnJ4QkNUTlRkRlY0c3g0ZWFMZEJRVytSVVJzcDBzOXJMRW5i?=
+ =?utf-8?B?RUZOVkFHSWVuQUxkRnd1c1d4eURHcFByV3grTC9ydzR6NGd1UFZjSjBwNWor?=
+ =?utf-8?B?QTBiNGFqaGRrZVJvVnF5aStNRm1ERFpRYmk0MEFrK0doVnpqNFZ6eUVVVlNa?=
+ =?utf-8?B?VEZFNHk3TERBN1dSdlNYdE41ZSt4T0ZtK3pGQzgrQ3ZObnR2TWRuRFRGTERs?=
+ =?utf-8?B?NDByeUhLN2NxS293N1Z1KzRqbE1mSm8yVDI2Mk9TN1dGcE1sRmlZOWpKcUFP?=
+ =?utf-8?B?OE1kbURjcGpIbktvR0xBZmg1eWdGMVlLMkJqOWFEZTY3alk5TUZESFo3aU9L?=
+ =?utf-8?B?UzVxSXhxTWgySGF1S21PbDBCMWNLTDFPUmd2VjdWVHdTT3JHdjdoS21Qak1W?=
+ =?utf-8?B?T0pBR1NwNGdMVkNIRkluYlFmK2dId1o5M0hraHB0ZG5lKzI1WW5LNEovamti?=
+ =?utf-8?B?N1hYQ0pxa3ZKU2Jsd21RRForb0xFNG5NaU5YWlpwNHBPY2tLekx1NU9vZlg0?=
+ =?utf-8?B?b25YTTdpNDRDU0ZEQS9pL1cyOWVDenBIVUZYTXlDYm0wSy90ODgvellFTGVu?=
+ =?utf-8?B?MU8wSHR6UFFKdGRNM3RXb29hS1BLM3IwYStyaW5FYysrVWl1bS80UXJMQjJN?=
+ =?utf-8?B?cVR6SG9wYURhdzJJT2VTc0Y1MUMvVythNWpvanZ6dE00R3VUTUtQTGpWTGVt?=
+ =?utf-8?B?bkdhRUFPdWUrMjZ2NzArTXFMejRvbENRY0d2ekpuSWpWYU5qRWhML3ljS28v?=
+ =?utf-8?B?TDkxb29ieHRhVHdxaXFvMTFTeE51V3gxOVFVdGlFY0UvN3VsWldxVm4wSkk3?=
+ =?utf-8?B?UmVjeHdwVG5QYkhJaXNncFdTMHl3MHVHTmVnQWlYT20wejkwZkdhMFpraUIv?=
+ =?utf-8?B?Uk9MTk5mcko5Q0FjL2RIeVpiOFdhaW0ycG5nNkVRRElLd0kzRU9zNHpRaHpr?=
+ =?utf-8?B?bjc5VWg3UGJOZXVGZjdzSEdWMzhnazAvdDVUSjlmdm1yZWxMNFJOcjgvd2ZE?=
+ =?utf-8?B?Kzg3b2huNngvN0J4S1JzVHZqSlRYblhxUWMrL002dHhOWk5OdisyS282L3Ns?=
+ =?utf-8?B?NklTSDF5R3hWRnl0aVczdTg2L3JjK1pUNmdWWElqL1NJS2JjZVFaWk51UnZv?=
+ =?utf-8?B?S01uUFA0VG80Y3AxWjQ5YVk3NEFHWDUxVzlPMkhIdXNvbE1KUzh5Ynpmdmtk?=
+ =?utf-8?B?SEpRTkwvN3lyZVZldTVKRUNDNGR1aE92YnZ2WEFSb0xQQm40SHRScXNkNlFY?=
+ =?utf-8?B?K0VYSzI1L2JCMVAva2RXRS8yVGdoc1RmOXpVRk41TlhiOGNQa21tQ0NFakQ3?=
+ =?utf-8?B?dG41dW4xL21NUTRRbDdsamZDT2wvWnJZdm1wenBhc1crY3hPMGRrdGlqMkxi?=
+ =?utf-8?B?UTlEU0lEbUkwZWtlRHV3OWpRRzJyc2YrTjk4aVJ0QXRPSmg3RlA1K3VNM3lr?=
+ =?utf-8?B?ZzgwWjhYcmZtdDFlVzZXTFRFa3ZMVVBxSVhJa0RuRnBndWw0RTJhMWtZTDhI?=
+ =?utf-8?B?VzNoZ2ZWRkdKbERxeVBoMFJsRVlNM2tvTkVhVG4rNldIUDczSTVvZXNtN2dz?=
+ =?utf-8?B?eU02cFRsOEZETlpORCtCRUYzWEtLV1NTVHJaNzZURWUvT2ZPYXpmaHBXcUJ2?=
+ =?utf-8?B?VGc0aFRGbzVNZCt6RTNzR1lQKy85eExqSTRIYXZ5ZjNUNWwyeElZRTdZK3hD?=
+ =?utf-8?B?TXowM0ZMbDBCVGVPS3NreEpQR0VrU1NxSnpMNmdjVEMwWWtiWDBwUFlvQnhp?=
+ =?utf-8?B?MFE4NWdDU3ZJSUFVQldWRVZsZzRlZ01VMG9lVXI1dzdwZE5FeXRpck1uTXE2?=
+ =?utf-8?B?UWR3dFBNbzRmbWJseDYvUkFEZ3ZhSGlYSDJJS3dkY2ZCUlNkQzAvT1lnOTdi?=
+ =?utf-8?B?K1E9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 09a0f673-de4c-467b-2623-08dd36499976
+X-MS-Exchange-CrossTenant-AuthSource: MN6PR11MB8102.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Jan 2025 16:19:49.3745
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: e3h6+/JGd7c2BNC83ZSJFxDS1HIl7Hy7AWuhyL4tHoaXno1VqtxtEhI9eNPJTCMk8s4JcPMVXDeiSBkAkYfkzyoA7SXlto1WEx4aJBCd3tA=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB6523
+X-OriginatorOrg: intel.com
 
-
-
-On 16.01.25 12:55, Julian Ruess wrote:
-> On Thu Jan 16, 2025 at 10:32 AM CET, Dust Li wrote:
->> On 2025-01-15 20:55:20, Alexandra Winter wrote:
->>
->> Hi Winter,
->>
->> I'm fully supportive of the refactor!
-
-
-Thank you very much Dust Li for joining the discussion.
-
-
->> Interestingly, I developed a similar RFC code about a month ago while
->> working on enhancing internal communication between guest and host
->> systems. 
-
-
-But you did not send that out, did you?
-I hope I did not overlook an earlier proposal by you.
-
-
-Here are some of my thoughts on the matter:
->>
->> Naming and Structure: I suggest we refer to it as SHD (Shared Memory
->> Device) instead of ISM (Internal Shared Memory). 
-
-
-So where does the 'H' come from? If you want to call it Shared Memory _D_evice?
-
-
-To my knowledge, a
->> "Shared Memory Device" better encapsulates the functionality we're
->> aiming to implement. 
-
-
-Could you explain why that would be better?
-'Internal Shared Memory' is supposed to be a bit of a counterpart to the
-Remote 'R' in RoCE. Not the greatest name, but it is used already by our ISM
-devices and by ism_loopback. So what is the benefit in changing it?
-
-
-It might be beneficial to place it under
->> drivers/shd/ and register it as a new class under /sys/class/shd/. That
->> said, my initial draft also adopted the ISM terminology for simplicity.
+On 1/16/25 16:39, Maciej Fijalkowski wrote:
+> Hello in 2025,
 > 
-> I'm not sure if we really want to introduce a new name for
-> the already existing ISM device. For me, having two names
-> for the same thing just adds additional complexity.
+> this patchset fixes a pretty nasty issue that was reported by RedHat
+> folks which occured after ~30 minutes (this value varied, just trying
+> here to state that it was not observed immediately but rather after a
+> considerable longer amount of time) when ice driver was tortured with
+> jumbo frames via mix of iperf traffic executed simultaneously with
+> wrk/nginx on client/server sides (HTTP and TCP workloads basically).
 > 
-> I would go for /sys/class/ism
-> 
->>
->> Modular Approach: I've made the ism_loopback an independent kernel
->> module since dynamic enable/disable functionality is not yet supported
->> in SMC. Using insmod and rmmod for module management could provide the
->> flexibility needed in practical scenarios.
-
-
-With this proposal ism_loopback is just another ism device and SMC-D will
-handle removal just like ism_client.remove(ism_dev) of other ism devices.
-
-But I understand that net/smc/ism_loopback.c today does not provide enable/disable,
-which is a big disadvantage, I agree. The ism layer is prepared for dynamic
-removal by ism_dev_unregister(). In case of this RFC that would only happen
-in case of rmmod ism. Which should be improved.
-One way to do that would be a separate ism_loopback kernel module, like you say.
-Today ism_loopback is only 10k LOC, so I'd be fine with leaving it in the ism module.
-I also think it is a great way for testing any ISM client, so it has benefit for
-anybody using the ism module.
-Another way would be e.g. an 'enable' entry in the sysfs of the loopback device.
-(Once we agree if and how to represent ism devices in genera in sysfs).
-
->>
->> Abstraction of ISM Device Details: I propose we abstract the ISM device
->> details by providing SMC with helper functions. These functions could
->> encapsulate ism->ops, making the implementation cleaner and more
->> intuitive. This way, the struct ism_device would mainly serve its
->> implementers, while the upper helper functions offer a streamlined
->> interface for SMC.
->>
->> Structuring and Naming: I recommend embedding the structure of ism_ops
->> directly within ism_dev rather than using a pointer. Additionally,
->> renaming it to ism_device_ops could enhance clarity and consistency.
->>
->>
->>> This RFC is about providing a generic shim layer between all kinds of
->>> ism devices and all kinds of ism users.
->>>
->>> Benefits:
->>> - Cleaner separation of ISM and SMC-D functionality
->>> - simpler and less module dependencies
->>> - Clear interface definition.
->>> - Extendable for future devices and clients.
->>
->> Fully agree.
->>
->>>
-[...]
->>>
->>> Ideas for next steps:
->>> ---------------------
->>> - sysfs representation? e.g. as /sys/class/ism ?
->>> - provide a full-fledged ism loopback interface
->>>    (runtime enable/disable, sysfs device, ..)
->>
->> I think it's better if we can make this common for all ISM devices.
->> but yeah, that shoud be the next step.
-
-
-The s390 ism_vpci devices are already backed by struct pci_dev. 
-And I assume that would be represented in sysfs somehow like:
-/sys/class/ism/ism_vp0/device -> /sys/devices/<pci bus no>/<pci dev no>
-so there is an 
-/sys/class/ism/<ism dev name>/device/enable entry already, 
-because there is /sys/devices/<pci bus no>/<pci dev no>/enable today.
-
-I remember Wen Gu's first proposal for ism_loopback had a device
-in /sys/devices/virtual/ and had an 'active' entry to enable/disable.
-Something like that could be linked to /sys/class/ism/ism_lo/device.
 
 
 > 
-> I already have patches based on this series that introduce
-> /sys/class/ism and show ism-loopback as well as
-> s390/ism devices. I can send this soon.
+> Special thanks to Xu Du for providing reproducer and Jacob Keller for
+> initial extensive analysis.
 > 
+> Thanks,
+> Maciej
+
+Thank you all for this piece of gold, including description.
+
 > 
-> Julian
+> Maciej Fijalkowski (3):
+>    ice: put Rx buffers after being done with current frame
+>    ice: gather page_count()'s of each frag right before XDP prog call
+>    ice: stop storing XDP verdict within ice_rx_buf
+> 
+>   drivers/net/ethernet/intel/ice/ice_txrx.c     | 128 +++++++++++-------
+>   drivers/net/ethernet/intel/ice/ice_txrx.h     |   1 -
+>   drivers/net/ethernet/intel/ice/ice_txrx_lib.h |  43 ------
+>   3 files changed, 82 insertions(+), 90 deletions(-)
+> 
+
+It was a pleasure to read this series:
+Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 
 
