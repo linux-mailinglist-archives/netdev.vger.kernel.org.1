@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-159101-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159102-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DAEF7A14672
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 00:40:01 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E3468A14674
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 00:40:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 276663A3DC4
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 23:39:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5803C3A6EA7
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 23:39:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B4752451D9;
-	Thu, 16 Jan 2025 23:30:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6236C22DF96;
+	Thu, 16 Jan 2025 23:30:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="db6XkV1m"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ou46e/MI"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-177.mta1.migadu.com (out-177.mta1.migadu.com [95.215.58.177])
+Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18B02244F89
-	for <netdev@vger.kernel.org>; Thu, 16 Jan 2025 23:30:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9AD3244F9A
+	for <netdev@vger.kernel.org>; Thu, 16 Jan 2025 23:30:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737070210; cv=none; b=WgVEhAO5iuPEQWgW7Si/eb03hm6SYEcZxQ/IXV5obECVZKi6BqU/Re4ypRIJT+3uOFIwzryHZdALoQQ7sWtfAhtnIEpywSKN23+kI7tUYfBTI6Zo6TV7EUc1gOtc/qaJ+xRwqT/oMthpHhavhQ2PD/33UCU4DG1fDpdZTKp0jWc=
+	t=1737070212; cv=none; b=g0pbWSnlNzPzWZpwK8SsiOlWs0VbTP+UD1jsvGpxG2Va4lzUSKlQJfLvncwox4igVX0uV0fMe2lvYu+pFJCOQxIXDElCHq2W02vFJQTetlG5mlLXa17JPnmh4c3Hs8zDmz/4NK2bjUBhvY6qQJ7w9gLfB6dLFir+VEYl09/+Qrs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737070210; c=relaxed/simple;
-	bh=Y7YKle50adsEZBFHfxDM55VoUjsRltCGNCOWC0HcpYY=;
+	s=arc-20240116; t=1737070212; c=relaxed/simple;
+	bh=0ahfcfXvduwegKwL8GvGGFBIQenHgnxg2fJRLgq9luU=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=FIz3wsDbkirtCXhg3ExjxRzs1a1SWipzgPu7Bam4sPV+yvAOjvRru5W97p//akuWkH2VWymXjgCGdN3FjAu0VnjIArpxM1bFn5Lw8xEB6eXumQHKXaL1nJzzTuNZmB3lOMNeKpZKsxrVSN0HrNelUyyRQddn7GdmkDmaIr1fKLY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=db6XkV1m; arc=none smtp.client-ip=95.215.58.177
+	 MIME-Version; b=e/WfDFN3Y4+y8z0kAsnOefQbQcuQ9yHOFTtMS7igLTtX/X47C2Loiig6UEIafh4Mr1M5rrKGdKnzL4sL+7CTWs72izTBBkdQ9vR0EsCx8DPOYdhI7lu+ytYVUMecaIycbTmL64WpJoq+X0igY0MhrD5UC2fbZTH+oTWsCRtLGH4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ou46e/MI; arc=none smtp.client-ip=95.215.58.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1737070205;
+	t=1737070208;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=eAMLm6yea8HkssgtGd3J3JCpe9oPgNIXAXNQ53QiS30=;
-	b=db6XkV1mGJkBP4oT5jQHxa2uP5KACvfKmttyX13jQ0/E3niZuEkFkWf8JXXzmshfEqbzVW
-	b9ej8UFLumPT8fpKZVE4IzUwn43sdlTs7rhsh5gOzod7GfR1Qk7f4l893ahy0mB6RoaccF
-	A5GT5BRT17OwzN1jt0iAGavIxptHA9s=
+	bh=PF5hZGMvLAEl9volfS3ZgWDttX3TNY4bhsRMPhjvOic=;
+	b=ou46e/MIHX0bZe9tb9EhW5UK1nXGW7QRuX0lGNbCdFyHK3t1haIEuHY8/1im58bFkElasK
+	/nAD58pau8ku7xrJcFmsI24ZldqO4uDa1sH58yuKsDEl5OJcYKjmkkXP0WRHlW26B3AFH0
+	h0wEtqiXlbFEkYMd9GPhr9BJ4LTQfrQ=
 From: Sean Anderson <sean.anderson@linux.dev>
 To: "David S . Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
@@ -54,9 +54,9 @@ Cc: Michal Simek <michal.simek@amd.com>,
 	Shannon Nelson <shannon.nelson@amd.com>,
 	linux-arm-kernel@lists.infradead.org,
 	Sean Anderson <sean.anderson@linux.dev>
-Subject: [PATCH net-next v4 2/6] net: xilinx: axienet: Report an error for bad coalesce settings
-Date: Thu, 16 Jan 2025 18:29:50 -0500
-Message-Id: <20250116232954.2696930-3-sean.anderson@linux.dev>
+Subject: [PATCH net-next v4 3/6] net: xilinx: axienet: Combine CR calculation
+Date: Thu, 16 Jan 2025 18:29:51 -0500
+Message-Id: <20250116232954.2696930-4-sean.anderson@linux.dev>
 In-Reply-To: <20250116232954.2696930-1-sean.anderson@linux.dev>
 References: <20250116232954.2696930-1-sean.anderson@linux.dev>
 Precedence: bulk
@@ -68,60 +68,130 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-Instead of silently ignoring invalid/unsupported settings, report an
-error. Additionally, relax the check for non-zero usecs to apply only
-when it will be used (i.e. when frames != 1).
+Combine the common parts of the CR calculations for better code reuse.
+While we're at it, simplify the code a bit.
 
 Signed-off-by: Sean Anderson <sean.anderson@linux.dev>
-Reviewed by: Shannon Nelson <shannon.nelson@amd.com>
+Reviewed-by: Shannon Nelson <shannon.nelson@amd.com>
 ---
 
-(no changes since v2)
+(no changes since v3)
+
+Changes in v3:
+- Fix mismatched parameter name documentation for axienet_calc_cr
+- Integrate some cleanups originally included in
+  https://lore.kernel.org/netdev/20240909230908.1319982-1-sean.anderson@linux.dev/
 
 Changes in v2:
-- New
+- Split off from runtime coalesce modification support
 
- .../net/ethernet/xilinx/xilinx_axienet_main.c | 27 +++++++++++++------
- 1 file changed, 19 insertions(+), 8 deletions(-)
+ drivers/net/ethernet/xilinx/xilinx_axienet.h  |  3 -
+ .../net/ethernet/xilinx/xilinx_axienet_main.c | 64 ++++++++++---------
+ 2 files changed, 34 insertions(+), 33 deletions(-)
 
+diff --git a/drivers/net/ethernet/xilinx/xilinx_axienet.h b/drivers/net/ethernet/xilinx/xilinx_axienet.h
+index a3f4f3e42587..8fd3b45ef6aa 100644
+--- a/drivers/net/ethernet/xilinx/xilinx_axienet.h
++++ b/drivers/net/ethernet/xilinx/xilinx_axienet.h
+@@ -112,9 +112,6 @@
+ #define XAXIDMA_DELAY_MASK		0xFF000000 /* Delay timeout counter */
+ #define XAXIDMA_COALESCE_MASK		0x00FF0000 /* Coalesce counter */
+ 
+-#define XAXIDMA_DELAY_SHIFT		24
+-#define XAXIDMA_COALESCE_SHIFT		16
+-
+ #define XAXIDMA_IRQ_IOC_MASK		0x00001000 /* Completion intr */
+ #define XAXIDMA_IRQ_DELAY_MASK		0x00002000 /* Delay interrupt */
+ #define XAXIDMA_IRQ_ERROR_MASK		0x00004000 /* Error interrupt */
 diff --git a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
-index 0532dc94ee93..9e7fa012e4fa 100644
+index 9e7fa012e4fa..bd95f2ba3bae 100644
 --- a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
 +++ b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
-@@ -2059,14 +2059,25 @@ axienet_ethtools_set_coalesce(struct net_device *ndev,
- 		return -EINVAL;
- 	}
- 
--	if (ecoalesce->rx_max_coalesced_frames)
--		lp->coalesce_count_rx = ecoalesce->rx_max_coalesced_frames;
--	if (ecoalesce->rx_coalesce_usecs)
--		lp->coalesce_usec_rx = ecoalesce->rx_coalesce_usecs;
--	if (ecoalesce->tx_max_coalesced_frames)
--		lp->coalesce_count_tx = ecoalesce->tx_max_coalesced_frames;
--	if (ecoalesce->tx_coalesce_usecs)
--		lp->coalesce_usec_tx = ecoalesce->tx_coalesce_usecs;
-+	if (!ecoalesce->rx_max_coalesced_frames ||
-+	    !ecoalesce->tx_max_coalesced_frames) {
-+		NL_SET_ERR_MSG(extack, "frames must be non-zero");
-+		return -EINVAL;
-+	}
-+
-+	if ((ecoalesce->rx_max_coalesced_frames > 1 &&
-+	     !ecoalesce->rx_coalesce_usecs) ||
-+	    (ecoalesce->tx_max_coalesced_frames > 1 &&
-+	     !ecoalesce->tx_coalesce_usecs)) {
-+		NL_SET_ERR_MSG(extack,
-+			       "usecs must be non-zero when frames is greater than one");
-+		return -EINVAL;
-+	}
-+
-+	lp->coalesce_count_rx = ecoalesce->rx_max_coalesced_frames;
-+	lp->coalesce_usec_rx = ecoalesce->rx_coalesce_usecs;
-+	lp->coalesce_count_tx = ecoalesce->tx_max_coalesced_frames;
-+	lp->coalesce_usec_tx = ecoalesce->tx_coalesce_usecs;
- 
- 	return 0;
+@@ -224,22 +224,40 @@ static void axienet_dma_bd_release(struct net_device *ndev)
  }
+ 
+ /**
+- * axienet_usec_to_timer - Calculate IRQ delay timer value
+- * @lp:		Pointer to the axienet_local structure
+- * @coalesce_usec: Microseconds to convert into timer value
++ * axienet_calc_cr() - Calculate control register value
++ * @lp: Device private data
++ * @count: Number of completions before an interrupt
++ * @usec: Microseconds after the last completion before an interrupt
++ *
++ * Calculate a control register value based on the coalescing settings. The
++ * run/stop bit is not set.
+  */
+-static u32 axienet_usec_to_timer(struct axienet_local *lp, u32 coalesce_usec)
++static u32 axienet_calc_cr(struct axienet_local *lp, u32 count, u32 usec)
+ {
+-	u32 result;
+-	u64 clk_rate = 125000000; /* arbitrary guess if no clock rate set */
++	u32 cr;
+ 
+-	if (lp->axi_clk)
+-		clk_rate = clk_get_rate(lp->axi_clk);
++	cr = FIELD_PREP(XAXIDMA_COALESCE_MASK, count) | XAXIDMA_IRQ_IOC_MASK |
++	     XAXIDMA_IRQ_ERROR_MASK;
++	/* Only set interrupt delay timer if not generating an interrupt on
++	 * the first packet. Otherwise leave at 0 to disable delay interrupt.
++	 */
++	if (count > 1) {
++		u64 clk_rate = 125000000; /* arbitrary guess if no clock rate set */
++		u32 timer;
+ 
+-	/* 1 Timeout Interval = 125 * (clock period of SG clock) */
+-	result = DIV64_U64_ROUND_CLOSEST((u64)coalesce_usec * clk_rate,
+-					 XAXIDMA_DELAY_SCALE);
+-	return min(result, FIELD_MAX(XAXIDMA_DELAY_MASK));
++		if (lp->axi_clk)
++			clk_rate = clk_get_rate(lp->axi_clk);
++
++		/* 1 Timeout Interval = 125 * (clock period of SG clock) */
++		timer = DIV64_U64_ROUND_CLOSEST((u64)usec * clk_rate,
++						XAXIDMA_DELAY_SCALE);
++
++		timer = min(timer, FIELD_MAX(XAXIDMA_DELAY_MASK));
++		cr |= FIELD_PREP(XAXIDMA_DELAY_MASK, timer) |
++		      XAXIDMA_IRQ_DELAY_MASK;
++	}
++
++	return cr;
+ }
+ 
+ /**
+@@ -249,27 +267,13 @@ static u32 axienet_usec_to_timer(struct axienet_local *lp, u32 coalesce_usec)
+ static void axienet_dma_start(struct axienet_local *lp)
+ {
+ 	/* Start updating the Rx channel control register */
+-	lp->rx_dma_cr = (lp->coalesce_count_rx << XAXIDMA_COALESCE_SHIFT) |
+-			XAXIDMA_IRQ_IOC_MASK | XAXIDMA_IRQ_ERROR_MASK;
+-	/* Only set interrupt delay timer if not generating an interrupt on
+-	 * the first RX packet. Otherwise leave at 0 to disable delay interrupt.
+-	 */
+-	if (lp->coalesce_count_rx > 1)
+-		lp->rx_dma_cr |= (axienet_usec_to_timer(lp, lp->coalesce_usec_rx)
+-					<< XAXIDMA_DELAY_SHIFT) |
+-				 XAXIDMA_IRQ_DELAY_MASK;
++	lp->rx_dma_cr = axienet_calc_cr(lp, lp->coalesce_count_rx,
++					lp->coalesce_usec_rx);
+ 	axienet_dma_out32(lp, XAXIDMA_RX_CR_OFFSET, lp->rx_dma_cr);
+ 
+ 	/* Start updating the Tx channel control register */
+-	lp->tx_dma_cr = (lp->coalesce_count_tx << XAXIDMA_COALESCE_SHIFT) |
+-			XAXIDMA_IRQ_IOC_MASK | XAXIDMA_IRQ_ERROR_MASK;
+-	/* Only set interrupt delay timer if not generating an interrupt on
+-	 * the first TX packet. Otherwise leave at 0 to disable delay interrupt.
+-	 */
+-	if (lp->coalesce_count_tx > 1)
+-		lp->tx_dma_cr |= (axienet_usec_to_timer(lp, lp->coalesce_usec_tx)
+-					<< XAXIDMA_DELAY_SHIFT) |
+-				 XAXIDMA_IRQ_DELAY_MASK;
++	lp->tx_dma_cr = axienet_calc_cr(lp, lp->coalesce_count_tx,
++					lp->coalesce_usec_tx);
+ 	axienet_dma_out32(lp, XAXIDMA_TX_CR_OFFSET, lp->tx_dma_cr);
+ 
+ 	/* Populate the tail pointer and bring the Rx Axi DMA engine out of
 -- 
 2.35.1.1320.gc452695387.dirty
 
