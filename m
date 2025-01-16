@@ -1,158 +1,174 @@
-Return-Path: <netdev+bounces-158721-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158722-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7723A1310A
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 03:05:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 89E4EA13111
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 03:06:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 04742164F4A
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 02:05:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A6459165FE0
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 02:06:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6355C3A8CB;
-	Thu, 16 Jan 2025 02:05:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D09B5674D;
+	Thu, 16 Jan 2025 02:06:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="qGv0IY4Q"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.nfschina.com (unknown [42.101.60.213])
-	by smtp.subspace.kernel.org (Postfix) with SMTP id 29DB78836;
-	Thu, 16 Jan 2025 02:05:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=42.101.60.213
+Received: from out-170.mta1.migadu.com (out-170.mta1.migadu.com [95.215.58.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDEDEE555
+	for <netdev@vger.kernel.org>; Thu, 16 Jan 2025 02:05:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736993108; cv=none; b=sOzEENN3gNnrFAuHnTTPEsnzBYZpYxQ2lUEM5N7lcTUIZuzm0Wm2DArkIIV5l1IVAMUOciSa1Vx4+Evl694QYWfOmo+/Yzx/oYjnkyki/wrbOf1J4XVOb2zoovJL8JX47EtxWGLj0aB+4wm5tJo1FEYWZb7nRElU7XDYoumHbdM=
+	t=1736993161; cv=none; b=BQQCjdrvsz2j8Dn5hQ4upp4JGMnsbprLIOiJUaToITaxJNbntx5SB8hqGbJAM30j6j6pB0UiGd7ONeDQIA1aIboPlG6R+rmdQ8yriTJzJ2u9MdS9rjEwnPd1Kr2sMm8GNk/YY+AzIUVm3ixzR7ODnRNG3MOXjMCWiozzAWlbyqE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736993108; c=relaxed/simple;
-	bh=K41LxaeY5b1PJhdqsphAZteLpi5PMaWTF/rGxvUmgEQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
-	 Content-Type; b=LL0kLTm9YmB+aH3RS/8hZ7eCbGAOypsiwhU7LKGm1kPCVoS7N2Go/pj/HtLDFRMl+ZBcaMUbl+tbW7E3vfcanihnuL60P5UfihDbF5MnWbKc7+kd8c0jyFEp8AAk3kesLvuIFGDp41dHmfL3ZBLNIK00hGlU3Q+ZhM7gHD6K63o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nfschina.com; spf=pass smtp.mailfrom=nfschina.com; arc=none smtp.client-ip=42.101.60.213
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nfschina.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nfschina.com
-Received: from [172.30.20.101] (unknown [180.167.10.98])
-	by mail.nfschina.com (MailData Gateway V2.8.8) with ESMTPSA id B711660108120;
-	Thu, 16 Jan 2025 10:04:47 +0800 (CST)
-Message-ID: <6f79c23a-7acb-5faf-5e8d-104ca37dbb08@nfschina.com>
-Date: Thu, 16 Jan 2025 10:04:47 +0800
+	s=arc-20240116; t=1736993161; c=relaxed/simple;
+	bh=XyfRDqb0/XnepzUeZ5FU7SrNyZCtV4uRhhXZSL6CR1s=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=fV7pT/aQjPwBrW3yvOUBiLZ1C+dtIa4o9d81EDdgYch3ieDPslYLs35Nk7ayMr4/uKcBM/JSJnPDlfDld5lpBBJOCAKisvcOrd5wqNXzu+tPmB+qf4HjOUJzQpLE3GnQHGIu2oC+GOUN+RxX6VaVsFynHTdyz4auDQRuc3uKULA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=qGv0IY4Q; arc=none smtp.client-ip=95.215.58.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <1985a09f-f851-48a6-af6c-07e21611b514@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1736993145;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=RVbG7W6+7JxHys/x2BFctt4lICVhXoK01DPy3Q0JzFo=;
+	b=qGv0IY4QgXb/DWaMfG35Kdr+HZFobNX/I/1i5oqx198Wbz3zSDY5uEXo0sUhoLT9RilHH8
+	XqWtLE/8gjiG5MLgHztvVngAnwzdOEzWd3NXb8a0eG/GYfuJm4TT8I2rkDca09TK9bUMWe
+	1dJKtkimFLnDZwhBrtUjOO9tfs51iEI=
+Date: Thu, 16 Jan 2025 10:05:37 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.13.1
-Subject: Re: [PATCH net] net/rose: prevent integer overflows in
- rose_setsockopt()
+Subject: Re: [PATCH net-next v3 1/4] net: stmmac: Switch to zero-copy in
+ non-XDP RX path
+To: Furong Xu <0x1207@gmail.com>, netdev@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
+ Joe Damato <jdamato@fastly.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>, xfr@outlook.com
+References: <cover.1736910454.git.0x1207@gmail.com>
+ <bd7aabf4d9b6696885922ed4bef8fc95142d3004.1736910454.git.0x1207@gmail.com>
 Content-Language: en-US
-To: David Laight <david.laight.linux@gmail.com>,
- Nikita Zhandarovich <n.zhandarovich@fintech.ru>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- linux-hams@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, lvc-project@linuxtesting.org,
- stable@vger.kernel.org, kernel-janitors@vger.kernel.org
-X-MD-Sfrom: suhui@nfschina.com
-X-MD-SrcIP: 180.167.10.98
-From: Su Hui <suhui@nfschina.com>
-In-Reply-To: <20250115232952.1d4ef002@pumpkin>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Yanteng Si <si.yanteng@linux.dev>
+In-Reply-To: <bd7aabf4d9b6696885922ed4bef8fc95142d3004.1736910454.git.0x1207@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On 2025/1/16 07:29, David Laight wrote:
-> On Wed, 15 Jan 2025 08:42:20 -0800
-> Nikita Zhandarovich <n.zhandarovich@fintech.ru> wrote:
->
->> In case of possible unpredictably large arguments passed to
->> rose_setsockopt() and multiplied by extra values on top of that,
->> integer overflows may occur.
->>
->> Do the safest minimum and fix these issues by checking the
->> contents of 'opt' and returning -EINVAL if they are too large. Also,
->> switch to unsigned int and remove useless check for negative 'opt'
->> in ROSE_IDLE case.
->>
->> Found by Linux Verification Center (linuxtesting.org) with static
->> analysis tool SVACE.
->>
->> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
->> Cc: stable@vger.kernel.org
->> Signed-off-by: Nikita Zhandarovich <n.zhandarovich@fintech.ru>
->> ---
->>   net/rose/af_rose.c | 16 ++++++++--------
->>   1 file changed, 8 insertions(+), 8 deletions(-)
->>
->> diff --git a/net/rose/af_rose.c b/net/rose/af_rose.c
->> index 59050caab65c..72c65d938a15 100644
->> --- a/net/rose/af_rose.c
->> +++ b/net/rose/af_rose.c
->> @@ -397,15 +397,15 @@ static int rose_setsockopt(struct socket *sock, int level, int optname,
->>   {
->>   	struct sock *sk = sock->sk;
->>   	struct rose_sock *rose = rose_sk(sk);
->> -	int opt;
->> +	unsigned int opt;
->>   
->>   	if (level != SOL_ROSE)
->>   		return -ENOPROTOOPT;
->>   
->> -	if (optlen < sizeof(int))
->> +	if (optlen < sizeof(unsigned int))
->>   		return -EINVAL;
->>   
->> -	if (copy_from_sockptr(&opt, optval, sizeof(int)))
->> +	if (copy_from_sockptr(&opt, optval, sizeof(unsigned int)))
-> Shouldn't all those be 'sizeof (opt)' ?
->
-> 	David
->
->>   		return -EFAULT;
->>   
->>   	switch (optname) {
->> @@ -414,31 +414,31 @@ static int rose_setsockopt(struct socket *sock, int level, int optname,
->>   		return 0;
->>   
->>   	case ROSE_T1:
->> -		if (opt < 1)
->> +		if (opt < 1 || opt > UINT_MAX / HZ)
+在 2025/1/15 11:27, Furong Xu 写道:
+> Avoid memcpy in non-XDP RX path by marking all allocated SKBs to
+> be recycled in the upper network stack.
+> 
+> This patch brings ~11.5% driver performance improvement in a TCP RX
+> throughput test with iPerf tool on a single isolated Cortex-A65 CPU
+> core, from 2.18 Gbits/sec increased to 2.43 Gbits/sec.
+> 
+> Signed-off-by: Furong Xu <0x1207@gmail.com>
+> Reviewed-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+Reviewed-by: Yanteng Si <si.yanteng@linux.dev>
 
-'rose->t1' is unsigned long, how about 'opt > ULONG_MAX / HZ' ?
+Thanks,
+Yanteng
+> ---
+>   drivers/net/ethernet/stmicro/stmmac/stmmac.h  |  1 +
+>   .../net/ethernet/stmicro/stmmac/stmmac_main.c | 26 ++++++++++++-------
+>   2 files changed, 18 insertions(+), 9 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac.h b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
+> index e8dbce20129c..f05cae103d83 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac.h
+> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
+> @@ -126,6 +126,7 @@ struct stmmac_rx_queue {
+>   	unsigned int cur_rx;
+>   	unsigned int dirty_rx;
+>   	unsigned int buf_alloc_num;
+> +	unsigned int napi_skb_frag_size;
+>   	dma_addr_t dma_rx_phy;
+>   	u32 rx_tail_addr;
+>   	unsigned int state_saved;
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> index acd6994c1764..1d98a5e8c98c 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> @@ -1341,7 +1341,7 @@ static unsigned int stmmac_rx_offset(struct stmmac_priv *priv)
+>   	if (stmmac_xdp_is_enabled(priv))
+>   		return XDP_PACKET_HEADROOM;
+>   
+> -	return 0;
+> +	return NET_SKB_PAD;
+>   }
+>   
+>   static int stmmac_set_bfsize(int mtu, int bufsize)
+> @@ -2040,17 +2040,21 @@ static int __alloc_dma_rx_desc_resources(struct stmmac_priv *priv,
+>   	struct stmmac_channel *ch = &priv->channel[queue];
+>   	bool xdp_prog = stmmac_xdp_is_enabled(priv);
+>   	struct page_pool_params pp_params = { 0 };
+> -	unsigned int num_pages;
+> +	unsigned int dma_buf_sz_pad, num_pages;
+>   	unsigned int napi_id;
+>   	int ret;
+>   
+> +	dma_buf_sz_pad = stmmac_rx_offset(priv) + dma_conf->dma_buf_sz +
+> +			 SKB_DATA_ALIGN(sizeof(struct skb_shared_info));
+> +	num_pages = DIV_ROUND_UP(dma_buf_sz_pad, PAGE_SIZE);
+> +
+>   	rx_q->queue_index = queue;
+>   	rx_q->priv_data = priv;
+> +	rx_q->napi_skb_frag_size = num_pages * PAGE_SIZE;
+>   
+>   	pp_params.flags = PP_FLAG_DMA_MAP | PP_FLAG_DMA_SYNC_DEV;
+>   	pp_params.pool_size = dma_conf->dma_rx_size;
+> -	num_pages = DIV_ROUND_UP(dma_conf->dma_buf_sz, PAGE_SIZE);
+> -	pp_params.order = ilog2(num_pages);
+> +	pp_params.order = order_base_2(num_pages);
+>   	pp_params.nid = dev_to_node(priv->device);
+>   	pp_params.dev = priv->device;
+>   	pp_params.dma_dir = xdp_prog ? DMA_BIDIRECTIONAL : DMA_FROM_DEVICE;
+> @@ -5582,22 +5586,26 @@ static int stmmac_rx(struct stmmac_priv *priv, int limit, u32 queue)
+>   		}
+>   
+>   		if (!skb) {
+> +			unsigned int head_pad_len;
+> +
+>   			/* XDP program may expand or reduce tail */
+>   			buf1_len = ctx.xdp.data_end - ctx.xdp.data;
+>   
+> -			skb = napi_alloc_skb(&ch->rx_napi, buf1_len);
+> +			skb = napi_build_skb(page_address(buf->page),
+> +					     rx_q->napi_skb_frag_size);
+>   			if (!skb) {
+> +				page_pool_recycle_direct(rx_q->page_pool,
+> +							 buf->page);
+>   				rx_dropped++;
+>   				count++;
+>   				goto drain_data;
+>   			}
+>   
+>   			/* XDP program may adjust header */
+> -			skb_copy_to_linear_data(skb, ctx.xdp.data, buf1_len);
+> +			head_pad_len = ctx.xdp.data - ctx.xdp.data_hard_start;
+> +			skb_reserve(skb, head_pad_len);
+>   			skb_put(skb, buf1_len);
+> -
+> -			/* Data payload copied into SKB, page ready for recycle */
+> -			page_pool_recycle_direct(rx_q->page_pool, buf->page);
+> +			skb_mark_for_recycle(skb);
+>   			buf->page = NULL;
+>   		} else if (buf1_len) {
+>   			dma_sync_single_for_cpu(priv->device, buf->addr,
 
-BTW, I think only in 32bit or 16bit machine when 'sizeof(int) == 
-sizeof(unsigned long)',
-this integer overflows may occur..
-
-Su Hui
-
->>   			return -EINVAL;
->>   		rose->t1 = opt * HZ;
->>   		return 0;
->>   
->>   	case ROSE_T2:
->> -		if (opt < 1)
->> +		if (opt < 1 || opt > UINT_MAX / HZ)
->>   			return -EINVAL;
->>   		rose->t2 = opt * HZ;
->>   		return 0;
->>   
->>   	case ROSE_T3:
->> -		if (opt < 1)
->> +		if (opt < 1 || opt > UINT_MAX / HZ)
->>   			return -EINVAL;
->>   		rose->t3 = opt * HZ;
->>   		return 0;
->>   
->>   	case ROSE_HOLDBACK:
->> -		if (opt < 1)
->> +		if (opt < 1 || opt > UINT_MAX / HZ)
->>   			return -EINVAL;
->>   		rose->hb = opt * HZ;
->>   		return 0;
->>   
->>   	case ROSE_IDLE:
->> -		if (opt < 0)
->> +		if (opt > UINT_MAX / (60 * HZ))
->>   			return -EINVAL;
->>   		rose->idle = opt * 60 * HZ;
->>   		return 0;
->>
 
