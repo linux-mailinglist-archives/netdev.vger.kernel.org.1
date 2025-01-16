@@ -1,81 +1,119 @@
-Return-Path: <netdev+bounces-159099-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159103-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92739A14570
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 00:21:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B6D4A14673
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 00:40:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BD45416399D
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 23:21:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8F4F61605D6
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 23:40:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 856C81DDC02;
-	Thu, 16 Jan 2025 23:21:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8028246EA9;
+	Thu, 16 Jan 2025 23:30:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y0bTgwOU"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="G0nM/EMK"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-183.mta1.migadu.com (out-183.mta1.migadu.com [95.215.58.183])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6120024335E
-	for <netdev@vger.kernel.org>; Thu, 16 Jan 2025 23:21:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7EC724415F
+	for <netdev@vger.kernel.org>; Thu, 16 Jan 2025 23:30:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737069698; cv=none; b=H988EyUQ2A5DM1R20l8gPk7a78YqXaa1D7WiJXbkf0M6d33ws5tpw783qcGV5ElcyShUBotsW+Op8XfPJ4gak95TLRgUhZGJXJYVD/jFsOL8JJasnqN/KhI/lAbQqVcubvWu7dcG3WMOQ6DE83cfELg8R32S4MNsA45EuAavKhI=
+	t=1737070214; cv=none; b=pSaFXywVVO8M4LmmElJBm8Xv/SPNRp18Y1RBgFm47n04DFnZsZtMjjIc/X9XuiRvIVhUcdmQLSCEswyKsUlKkW8e4LjHB6dpfgvYklGNBBRtojCnqBOZ8pOQ23iMOTSo4mHBftlVnDGA/UygnEAgV9vTbPylZu2++NEsEe++wmg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737069698; c=relaxed/simple;
-	bh=GEH8SxCnJrnh8IdRarRxjGJShiARiUciH38q+TMYh0U=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=E234iVObxNVyh1AuXuziaF/ygcxuTkmQZHs3DuXa91d8GRVMDirTWwXRVvfDloz636FONkirfEunvXDmvWozDXQOupSCr/ROVWTFYgIBPqJnGlWWFI4FcLkmcMwyBRqsLyBOEjpogmFc2BPRbfYIQSHITQ65LKsO2pNNRg4iCoA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y0bTgwOU; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6A6E8C4CEE4;
-	Thu, 16 Jan 2025 23:21:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737069697;
-	bh=GEH8SxCnJrnh8IdRarRxjGJShiARiUciH38q+TMYh0U=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Y0bTgwOUq95ATz0HeNgZMB2fzcvwf0ZZtnzd180TvnH121QKFNoa9wYG+wg+j+HW9
-	 MKbqtZk7NBQJFBJ4oEEep/glQOhqgj6WQocp71XytSd+vOkYfCla6cgRT4GkI79Xks
-	 ZV9Pdez+Rg2zZJ7Mg5opqDWm6bEDfdfLbv1FVSiaCG27COKKNiJ5WqvUaJNBupBSMp
-	 6cKi+UM7PQd6ezSL12HePWEk/cDS+LxgSe0VJ52NTd8YlSGCtzrWDYHFMGWFfozCCC
-	 wTN0Hzks0mluVKZ5jvoWifGSviDmnDBQfPrv9VumAfonLlCyKb58Fm7mcjPr6u8EgA
-	 +6yBKzY6m1L4Q==
-Date: Thu, 16 Jan 2025 15:21:36 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Saeed Mahameed <saeed@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>, Paolo Abeni
- <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, Saeed Mahameed
- <saeedm@nvidia.com>, netdev@vger.kernel.org, Tariq Toukan
- <tariqt@nvidia.com>, Gal Pressman <gal@nvidia.com>, Leon Romanovsky
- <leonro@nvidia.com>, Dragos Tatulea <dtatulea@nvidia.com>
-Subject: Re: [net-next 10/11] net/mlx5e: Implement queue mgmt ops and single
- channel swap
-Message-ID: <20250116152136.53f16ecb@kernel.org>
-In-Reply-To: <20250116215530.158886-11-saeed@kernel.org>
-References: <20250116215530.158886-1-saeed@kernel.org>
-	<20250116215530.158886-11-saeed@kernel.org>
+	s=arc-20240116; t=1737070214; c=relaxed/simple;
+	bh=l1tObXhd/EFR5RtmdTwYwbJwmRyIheDR720blDLTjBo=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ok0JV+/yGhqnchut7/TRMNMk4NFkiAWSz+rwZ6VMPuKj6tfepCLotOUeV9V8G+G3w3a+ryRZ9pyuBwpoMaB2uhLwyZrYjJIES049ts8aWPQ7UiezkuD0cvh02/xoC9i7vpwXBY+RPR1+AkK8IMv49mgbBzQia5AAZwrjqhcQ5LY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=G0nM/EMK; arc=none smtp.client-ip=95.215.58.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1737070200;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=+1pCZCYTxd9JIXQBkYmreH5OVS2P9P4SJ14S/oIDWYo=;
+	b=G0nM/EMKXh83jcV/sMw08ZNJ53XFyCQpN+/KzNrSt42f49uDqtqaMaySZu7cK0q6n0b5EB
+	bFVXz6oTPBWBKdVprlBwEXdgadrXaupusr/c4aGBiJpIwXJa/El3kKYZiT/SUmtyP0xSO1
+	7BbbxBvtCRCbovZiUN0oM6w36ZBK814=
+From: Sean Anderson <sean.anderson@linux.dev>
+To: "David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
+	netdev@vger.kernel.org
+Cc: Michal Simek <michal.simek@amd.com>,
+	linux-kernel@vger.kernel.org,
+	Shannon Nelson <shannon.nelson@amd.com>,
+	linux-arm-kernel@lists.infradead.org,
+	Sean Anderson <sean.anderson@linux.dev>,
+	Heng Qi <hengqi@linux.alibaba.com>
+Subject: [PATCH net-next v4 0/6] net: xilinx: axienet: Enable adaptive IRQ coalescing with DIM
+Date: Thu, 16 Jan 2025 18:29:48 -0500
+Message-Id: <20250116232954.2696930-1-sean.anderson@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, 16 Jan 2025 13:55:28 -0800 Saeed Mahameed wrote:
-> +static const struct netdev_queue_mgmt_ops mlx5e_queue_mgmt_ops = {
-> +	.ndo_queue_mem_size	=	sizeof(struct mlx5_qmgmt_data),
-> +	.ndo_queue_mem_alloc	=	mlx5e_queue_mem_alloc,
-> +	.ndo_queue_mem_free	=	mlx5e_queue_mem_free,
-> +	.ndo_queue_start	=	mlx5e_queue_start,
-> +	.ndo_queue_stop		=	mlx5e_queue_stop,
-> +};
+To improve performance without sacrificing latency under low load,
+enable DIM. While I appreciate not having to write the library myself, I
+do think there are many unusual aspects to DIM, as detailed in the last
+patch.
 
-We need to pay off some technical debt we accrued before we merge more
-queue ops implementations. Specifically the locking needs to move from
-under rtnl. Sorry, this is not going in for 6.14.
+Changes in v4:
+- Fix incorrect function name in doc comment for axienet_coalesce_params
+- Rebase onto net-next/master
+
+Changes in v3:
+- Fix mismatched parameter name documentation for axienet_calc_cr
+- Integrate some cleanups originally included in
+  https://lore.kernel.org/netdev/20240909230908.1319982-1-sean.anderson@linux.dev/
+- Move spin (un)locking in IRQs inside the if condition of
+  napi_schedule_prep. This lets us hold the lock just for the rmw.
+- Fix function name in doc comments for axienet_update_coalesce_rx/tx
+- Adjust axienet_local doc comment order to match the members
+- Rebase onto net-next/master
+
+Changes in v2:
+- Add some symbolic constants for IRQ delay timer
+- Report an error for bad coalesce settings
+- Don't use spin_lock_irqsave when we know the context
+- Split the CR calculation refactor from runtime coalesce settings
+  adjustment support for easier review.
+- Have axienet_update_coalesce_rx/tx take the cr value/mask instead of
+  calculating it with axienet_calc_cr. This will make it easier to add
+  partial updates in the next few commits.
+- Get coalesce parameters from driver state
+- Don't take the RTNL in axienet_rx_dim_work to avoid deadlock. Instead,
+  calculate a partial cr update that axienet_update_coalesce_rx can
+  perform under a spin lock.
+- Use READ/WRITE_ONCE when accessing/modifying rx_irqs
+
+Sean Anderson (6):
+  net: xilinx: axienet: Add some symbolic constants for IRQ delay timer
+  net: xilinx: axienet: Report an error for bad coalesce settings
+  net: xilinx: axienet: Combine CR calculation
+  net: xilinx: axienet: Support adjusting coalesce settings while
+    running
+  net: xilinx: axienet: Get coalesce parameters from driver state
+  net: xilinx: axienet: Enable adaptive IRQ coalescing with DIM
+
+ drivers/net/ethernet/xilinx/Kconfig           |   1 +
+ drivers/net/ethernet/xilinx/xilinx_axienet.h  |  32 +-
+ .../net/ethernet/xilinx/xilinx_axienet_main.c | 330 ++++++++++++++----
+ 3 files changed, 280 insertions(+), 83 deletions(-)
+
 -- 
-pw-bot: defer
+2.35.1.1320.gc452695387.dirty
+
 
