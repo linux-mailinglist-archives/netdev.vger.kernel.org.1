@@ -1,145 +1,140 @@
-Return-Path: <netdev+bounces-158885-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158886-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0C8CA13A42
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 13:54:10 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B6DBA13A46
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 13:55:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 231391889B6E
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 12:54:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 86F13188994C
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 12:55:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3ADE51DE8BA;
-	Thu, 16 Jan 2025 12:54:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 855CA1DE899;
+	Thu, 16 Jan 2025 12:55:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YkTm3tgt"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Bf+f8Sec"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97DE31DE3D9;
-	Thu, 16 Jan 2025 12:54:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B5DA1DDA3F;
+	Thu, 16 Jan 2025 12:55:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737032044; cv=none; b=WsXcmrFK2Xj5LzYX70ecg7fE24vKPNWfb8pT9UeO67hyaqtC6eLnWs4DsMYOTN76BVXOUO/nXUVE2LiGFjqJs8z5LyHpfHids/UlgMpSWAGvx2E6BN5oCZxBPk5102KkxRHITBlBln+ZzXwXLvYIo7nfxBp0t2Dui/VWAfYhCug=
+	t=1737032108; cv=none; b=Enu5SunPHwpfWbtkajQAjWP6sVFCcP0Kq6ApJrD/oxaYO6ckkza8T+Vu9/q5bgufDlHBNCPmJ2MvjeBAfuO+52kq/RR/3q8aEv0lBUCot+wZR4QJFuRcQTy7nLkh9H+UU0twQcf+w5BOWqDM3Wr7wR5dihuxbk1HI98bwgzZ3+U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737032044; c=relaxed/simple;
-	bh=/smTJtfyV4jnOqCiO5F5O17FS608/jSCKpjgFAeV7QM=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=N6eD+rwjuD281Y/tq/Izetz2j0VpWAiPkXCG7ZWFM7oQ0XCG1He2w1FIxzqtn/J4STcDpLGPp3JRsDSE4l8v96kAG92Q7Ccz5MlJurdAG5cCYXWJaw1yMmrqNhrlwyDfDkDn46CnlE4TPT2leVo+KRLWE4rZ5c49XU/JDJZRRw0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YkTm3tgt; arc=none smtp.client-ip=209.85.160.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-467a8d2d7f1so7764171cf.1;
-        Thu, 16 Jan 2025 04:54:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1737032041; x=1737636841; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KQMffHB5V9jp1w/KCByUeoZ7ulffBvZYTaCL6OedkWM=;
-        b=YkTm3tgt/CqcpAZy8iDtx/pb1BgLvdvWORKFQvJXC+G+HBDmqP1BLWZ8yM55EulMbZ
-         XOIgjHTZLjayyltUDBLwCXWQkakWUkXT4+dWqeWXuyEKYbjXEqeW5rYuezZWfaMlj+O9
-         J/nIX2vW9x0ZdlvbI+qqkumCZtHqq84ObS9henHvGDtW77hrHEz96mC214wVq97FJQQD
-         iEc11AsZmG3sitUMNQoGokwssnhRaabQmMvhLDHJ/vKyZRXDso8j7dpEN4+y68V7BUD6
-         SUnrm8153JslZ5gYwH9sgXE4DhtQIAGjrI3nb22WkVcxizcL57tCyKrLOWKnMcrunRrx
-         H7Mg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737032041; x=1737636841;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=KQMffHB5V9jp1w/KCByUeoZ7ulffBvZYTaCL6OedkWM=;
-        b=cOX9KcIjJELthFhppyo3R6UglxLr0LuYxssDrZIRsxT24AEEfJF0wkWR2cDZ/ef69v
-         gxaGiLdhSku1B2TZ9FG9RBCQspmza85ZnkpKpmkULHocqjRlFiLm0n0MCgigjRrunCnP
-         rUmNJlo7tj16APWb08R2xBKgCi930KdeC1H/5IhhVKYFk91GROKgDIOgbOImzINtfX0L
-         lc91G+JFapKaddFUPvMqZMREAl60BaihreCh8+ddo8XQHpylM8Tm2g+TBetfvL9fL+Zu
-         EJKfArQqyoYiHgoFBFWnVtvTWQuRj2Pg/nZ8RBQ4blvv5HG0AU1VDArekc0k1w/lrraQ
-         us8Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUZouIgwORy3VW6fFkyxHrvJvCJcOwj8xda3a68t3MEGJbAa6FdwhkXtRtIqA/RWcbtw3pFMqAj@vger.kernel.org, AJvYcCVXFVHnrqdp8psi8otYsSx89uGkdqOFjte9evNp+sCcXxDkDM3cvTSPfpsGQmL3rY2J7xR16Nw5sRUfiVIoT7ZT@vger.kernel.org, AJvYcCWN5W/WRBHnWJJkYQb/lj64w4jLKs9ZVDVM+YRPA3JhZAPJi/vbfL8aAyYiqT8Y7MMZput6S+Ezb0wAY4yL@vger.kernel.org, AJvYcCWOEHmjxEaTV9lrWvr0QywswI3je3PXjoATyeWmrP1tfaOmlYk8NZwcajzzlwF5ji3jttM/zSxZVQzY@vger.kernel.org, AJvYcCXxPfg1go9vizdvYEIEFZ40N8IG606ug46kSLFm2n9naGIHcy/4qIAudkjLebkh9cvmdWo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxh0WeEmNicoFXrMiQdsVhgErcoFWDpi9WhkTUz8u1hqlLhPwEu
-	vuk76nMMp6QW26ppNifRyIBvmuz111paRmw1zL2slk/3RMu3t8+1
-X-Gm-Gg: ASbGnctJhibUyjptfJp1/y5YyhZ13t9u6PjBdrgcplc0Bq7MZfISrDv2L8poGiMs0fC
-	dqRn576agwbBy07UFROMaURRf+8COa8N+8FN11Tfe8/bsElQlzLa41RHyLhk+QHXNedF86o0jML
-	Oayc6SkPLKXv9lWnZCe1KtWHVKRkR8NcVcuruUpt+Ch/e/Yc9Bqfj8bjlpgUN8lYQPYhAGf/DKd
-	AG1E69fWE2sMTWCtcQnPvxxiVZNqklnV0IjAaLRNWP8v/GGK0PzD4F3z6abXQHM6T7GOG+bW+bN
-	GvR+2QhL8hVfedNAqI0y/7udtFTh
-X-Google-Smtp-Source: AGHT+IGAPwHCulVk3YA3srEPPAkpgIxRZlbJrc49E6sk7X4J2EiUFlVkp6rRmzHsvgqlARBJ+pjj/Q==
-X-Received: by 2002:ac8:5705:0:b0:466:85eb:6123 with SMTP id d75a77b69052e-46c71003317mr520830751cf.22.1737032041353;
-        Thu, 16 Jan 2025 04:54:01 -0800 (PST)
-Received: from localhost (15.60.86.34.bc.googleusercontent.com. [34.86.60.15])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6dfade72b59sm75303556d6.87.2025.01.16.04.54.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Jan 2025 04:54:00 -0800 (PST)
-Date: Thu, 16 Jan 2025 07:54:00 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>, 
- Akihiko Odaki <akihiko.odaki@daynix.com>
-Cc: Jonathan Corbet <corbet@lwn.net>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- Jason Wang <jasowang@redhat.com>, 
- "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
- Shuah Khan <shuah@kernel.org>, 
- linux-doc@vger.kernel.org, 
- linux-kernel@vger.kernel.org, 
- netdev@vger.kernel.org, 
- kvm@vger.kernel.org, 
- virtualization@lists.linux-foundation.org, 
- linux-kselftest@vger.kernel.org, 
- Yuri Benditovich <yuri.benditovich@daynix.com>, 
- Andrew Melnychenko <andrew@daynix.com>, 
- Stephen Hemminger <stephen@networkplumber.org>, 
- gur.stavi@huawei.com, 
- devel@daynix.com
-Message-ID: <678901682ff09_3710bc2944f@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20250116031331-mutt-send-email-mst@kernel.org>
-References: <20250116-tun-v3-0-c6b2871e97f7@daynix.com>
- <20250116031331-mutt-send-email-mst@kernel.org>
-Subject: Re: [PATCH net v3 0/9] tun: Unify vnet implementation
+	s=arc-20240116; t=1737032108; c=relaxed/simple;
+	bh=SDsYWVDFHCtqpRTEcvKkftdq9j3Hd9+XjId4g7OHfUM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ofYqsEHFKR0UZAEiLOolZqV1gPY8qQbprt38jPY0zHCHiTyGXSDfePc4y9qKBA3xwrng1lAa1xl0yoTMg/cwOHnJ9d2f4qaYOdPOn0HYSiR4Akbaol3/I17HoxAOgwTWj3QbFqaxTf3Ub+bl5YPE3qPkpJZMcjllHJjZr8hq2rc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Bf+f8Sec; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 616E7C4CED6;
+	Thu, 16 Jan 2025 12:55:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1737032108;
+	bh=SDsYWVDFHCtqpRTEcvKkftdq9j3Hd9+XjId4g7OHfUM=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=Bf+f8Sec3xyMf+ALBGpV/fbi8Ii2Ar9XyUxBuKmJ78D8Lr5zLUPqxb50l7v8AtMBb
+	 KdovV+etbpcTM/GHpYSdVF/QM6UuFCjOExrZNU/krS7ndK+RCDAlk1ayJcwFnrHr5v
+	 ClhboGABvq6Va7YFo4FQszvti1pNNSiLZXyXxWQUpOokc+1uebEc4vI4k019Kho8NI
+	 9D1OGI4MKWyLCmWl5yOTQu12Gb4o/zpnqDrRx158I3nibr5NDnXPf5qgDd/hLDGP+F
+	 FUMHlMeEQgeTJXhQcLXABblsczT7kCLC1ALOkwFBHDo9BwF8FMEEP8D8PGypme9P4a
+	 7iaa8Ung0gN1Q==
+Message-ID: <fa77f4e0-aa5c-4ac6-8223-29b20374dd01@kernel.org>
+Date: Thu, 16 Jan 2025 13:55:00 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 1/3] net: phy: mediatek: Add token ring access
+ helper functions in mtk-phy-lib
+To: Sky Huang <SkyLake.Huang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
+ Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Daniel Golle <daniel@makrotopia.org>,
+ Qingfang Deng <dqfext@gmail.com>, Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org
+Cc: Steven Liu <Steven.Liu@mediatek.com>,
+ "paul-pl.chen" <paul-pl.chen@mediatek.com>, Fei Shao <fshao@chromium.org>
+References: <20250116012159.3816135-1-SkyLake.Huang@mediatek.com>
+ <20250116012159.3816135-2-SkyLake.Huang@mediatek.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
+ cFgcqTTuNHjAvxtUG8pQgGTHAObYs6xeYJtjUH0ZX6ndJ33FJYf5V3yXqqjcZ30FgHzJCFUu
+ JMp7PSyMPzpUXfU12yfcRYVEMQrmplNZssmYhiTeVicuOOypWugZKVLGNm0IweVCaZ/DJDIH
+ gNbpvVwjcKYrx85m9cBVEBUGaQP6AT7qlVCkrf50v8bofSIyVa2xmubbAwwFA1oxoOusjPIE
+ J3iadrwpFvsZjF5uHAKS+7wHLoW9hVzOnLbX6ajk5Hf8Pb1m+VH/E8bPBNNYKkfTtypTDUCj
+ NYcd27tjnXfG+SDs/EXNUAIRefCyvaRG7oRYF3Ec+2RgQDRnmmjCjoQNbFrJvJkFHlPeHaeS
+ BosGY+XWKydnmsfY7SSnjAzLUGAFhLd/XDVpb1Een2XucPpKvt9ORF+48gy12FA5GduRLhQU
+ vK4tU7ojoem/G23PcowM1CwPurC8sAVsQb9KmwTGh7rVz3ks3w/zfGBy3+WmLg++C2Wct6nM
+ Pd8/6CBVjEWqD06/RjI2AnjIq5fSEH/BIfXXfC68nMp9BZoy3So4ZsbOlBmtAPvMYX6U8VwD
+ TNeBxJu5Ex0Izf1NV9CzC3nNaFUYOY8KfN01X5SExAoVTr09ewARAQABzSVLcnp5c3p0b2Yg
+ S296bG93c2tpIDxrcnprQGtlcm5lbC5vcmc+wsGVBBMBCgA/AhsDBgsJCAcDAgYVCAIJCgsE
+ FgIDAQIeAQIXgBYhBJvQfg4MUfjVlne3VBuTQ307QWKbBQJgPO8PBQkUX63hAAoJEBuTQ307
+ QWKbBn8P+QFxwl7pDsAKR1InemMAmuykCHl+XgC0LDqrsWhAH5TYeTVXGSyDsuZjHvj+FRP+
+ gZaEIYSw2Yf0e91U9HXo3RYhEwSmxUQ4Fjhc9qAwGKVPQf6YuQ5yy6pzI8brcKmHHOGrB3tP
+ /MODPt81M1zpograAC2WTDzkICfHKj8LpXp45PylD99J9q0Y+gb04CG5/wXs+1hJy/dz0tYy
+ iua4nCuSRbxnSHKBS5vvjosWWjWQXsRKd+zzXp6kfRHHpzJkhRwF6ArXi4XnQ+REnoTfM5Fk
+ VmVmSQ3yFKKePEzoIriT1b2sXO0g5QXOAvFqB65LZjXG9jGJoVG6ZJrUV1MVK8vamKoVbUEe
+ 0NlLl/tX96HLowHHoKhxEsbFzGzKiFLh7hyboTpy2whdonkDxpnv/H8wE9M3VW/fPgnL2nPe
+ xaBLqyHxy9hA9JrZvxg3IQ61x7rtBWBUQPmEaK0azW+l3ysiNpBhISkZrsW3ZUdknWu87nh6
+ eTB7mR7xBcVxnomxWwJI4B0wuMwCPdgbV6YDUKCuSgRMUEiVry10xd9KLypR9Vfyn1AhROrq
+ AubRPVeJBf9zR5UW1trJNfwVt3XmbHX50HCcHdEdCKiT9O+FiEcahIaWh9lihvO0ci0TtVGZ
+ MCEtaCE80Q3Ma9RdHYB3uVF930jwquplFLNF+IBCn5JRzsFNBFVDXDQBEADNkrQYSREUL4D3
+ Gws46JEoZ9HEQOKtkrwjrzlw/tCmqVzERRPvz2Xg8n7+HRCrgqnodIYoUh5WsU84N03KlLue
+ MNsWLJBvBaubYN4JuJIdRr4dS4oyF1/fQAQPHh8Thpiz0SAZFx6iWKB7Qrz3OrGCjTPcW6ei
+ OMheesVS5hxietSmlin+SilmIAPZHx7n242u6kdHOh+/SyLImKn/dh9RzatVpUKbv34eP1wA
+ GldWsRxbf3WP9pFNObSzI/Bo3kA89Xx2rO2roC+Gq4LeHvo7ptzcLcrqaHUAcZ3CgFG88CnA
+ 6z6lBZn0WyewEcPOPdcUB2Q7D/NiUY+HDiV99rAYPJztjeTrBSTnHeSBPb+qn5ZZGQwIdUW9
+ YegxWKvXXHTwB5eMzo/RB6vffwqcnHDoe0q7VgzRRZJwpi6aMIXLfeWZ5Wrwaw2zldFuO4Dt
+ 91pFzBSOIpeMtfgb/Pfe/a1WJ/GgaIRIBE+NUqckM+3zJHGmVPqJP/h2Iwv6nw8U+7Yyl6gU
+ BLHFTg2hYnLFJI4Xjg+AX1hHFVKmvl3VBHIsBv0oDcsQWXqY+NaFahT0lRPjYtrTa1v3tem/
+ JoFzZ4B0p27K+qQCF2R96hVvuEyjzBmdq2esyE6zIqftdo4MOJho8uctOiWbwNNq2U9pPWmu
+ 4vXVFBYIGmpyNPYzRm0QPwARAQABwsF8BBgBCgAmAhsMFiEEm9B+DgxR+NWWd7dUG5NDfTtB
+ YpsFAmA872oFCRRflLYACgkQG5NDfTtBYpvScw/9GrqBrVLuJoJ52qBBKUBDo4E+5fU1bjt0
+ Gv0nh/hNJuecuRY6aemU6HOPNc2t8QHMSvwbSF+Vp9ZkOvrM36yUOufctoqON+wXrliEY0J4
+ ksR89ZILRRAold9Mh0YDqEJc1HmuxYLJ7lnbLYH1oui8bLbMBM8S2Uo9RKqV2GROLi44enVt
+ vdrDvo+CxKj2K+d4cleCNiz5qbTxPUW/cgkwG0lJc4I4sso7l4XMDKn95c7JtNsuzqKvhEVS
+ oic5by3fbUnuI0cemeizF4QdtX2uQxrP7RwHFBd+YUia7zCcz0//rv6FZmAxWZGy5arNl6Vm
+ lQqNo7/Poh8WWfRS+xegBxc6hBXahpyUKphAKYkah+m+I0QToCfnGKnPqyYIMDEHCS/RfqA5
+ t8F+O56+oyLBAeWX7XcmyM6TGeVfb+OZVMJnZzK0s2VYAuI0Rl87FBFYgULdgqKV7R7WHzwD
+ uZwJCLykjad45hsWcOGk3OcaAGQS6NDlfhM6O9aYNwGL6tGt/6BkRikNOs7VDEa4/HlbaSJo
+ 7FgndGw1kWmkeL6oQh7wBvYll2buKod4qYntmNKEicoHGU+x91Gcan8mCoqhJkbqrL7+nXG2
+ 5Q/GS5M9RFWS+nYyJh+c3OcfKqVcZQNANItt7+ULzdNJuhvTRRdC3g9hmCEuNSr+CLMdnRBY fv0=
+In-Reply-To: <20250116012159.3816135-2-SkyLake.Huang@mediatek.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-Michael S. Tsirkin wrote:
-> On Thu, Jan 16, 2025 at 05:08:03PM +0900, Akihiko Odaki wrote:
-> > When I implemented virtio's hash-related features to tun/tap [1],
-> > I found tun/tap does not fill the entire region reserved for the virtio
-> > header, leaving some uninitialized hole in the middle of the buffer
-> > after read()/recvmesg().
-> > 
-> > This series fills the uninitialized hole. More concretely, the
-> > num_buffers field will be initialized with 1, and the other fields will
-> > be inialized with 0. Setting the num_buffers field to 1 is mandated by
-> > virtio 1.0 [2].
-> > 
-> > The change to virtio header is preceded by another change that refactors
-> > tun and tap to unify their virtio-related code.
-> > 
-> > [1]: https://lore.kernel.org/r/20241008-rss-v5-0-f3cf68df005d@daynix.com
-> > [2]: https://lore.kernel.org/r/20241227084256-mutt-send-email-mst@kernel.org/
-> > 
-> > Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
+On 16/01/2025 02:21, Sky Huang wrote:
+> From: "SkyLake.Huang" <skylake.huang@mediatek.com>
 > 
-> Will review. But this does not look like net material to me.
-> Not really a bugfix. More like net-next.
+> This patch adds TR(token ring) manipulations and adds correct
+> macro names for those magic numbers. TR is a way to access
+> proprietary registers on page 52b5. Use these helper functions
+> so we can see which fields we're going to modify/set/clear.
+> 
+> This patch doesn't really change registers' settings but just
+> enhances readability and maintainability.
+> 
+> Signed-off-by: SkyLake.Huang <skylake.huang@mediatek.com>
+Few days ago I complained the Mediatek too frequent uses login as full
+name. Several different Mediatek contributors repeat the same mistake,
+so I asked to fix this internally with some sort of
+guideline/checklist/internal reviews.
 
-+1. I said basically the same in v2.
+Other patches here look OK, so there is some progress, but not complete
+- please fix here as well.
 
-Perhaps the field initialization is net material, though not
-critical until hashing is merged, so not stable.
-
-The deduplication does not belong in net.
-
-IMHO it should all go to net-next.
+Best regards,
+Krzysztof
 
