@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-158846-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158847-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F127AA1383A
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 11:46:59 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB94FA1383B
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 11:47:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C44393A4911
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 10:46:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 506881680A4
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 10:46:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C90B1DE2BE;
-	Thu, 16 Jan 2025 10:46:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3D1F1DDA00;
+	Thu, 16 Jan 2025 10:46:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="ls3RWKYT"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="iDLZrTbo"
 X-Original-To: netdev@vger.kernel.org
 Received: from EUR03-VI1-obe.outbound.protection.outlook.com (mail-vi1eur03on2048.outbound.protection.outlook.com [40.107.103.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 498B91DDA00
-	for <netdev@vger.kernel.org>; Thu, 16 Jan 2025 10:46:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A461C1DE2C0
+	for <netdev@vger.kernel.org>; Thu, 16 Jan 2025 10:46:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.103.48
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737024408; cv=fail; b=N4bcNBBcFVC6xtKqJjSL0jDEcRC7dtOtooTo4A4uh3SlPP3DqU2/S8GC6pbAX56IRvMeG46jbcI80mfk0sYsh7F2bSE0RH7CXnVIB42wqei4CZTaiJlzytrMQPNUUiSKZRdMlhJDBsS+B5zM6ktjHZiSyhLtCteCmuL3tBfynr4=
+	t=1737024410; cv=fail; b=PH3Uvz/qmRoNJHkRHu5d1XGn8X/JZCVmcMs4uqrKfvNG2hUlyUY+HXyJ7t6wXoDTsb1PPhdJgz9ZBQpU1ynAzNAdqPPlCchnC512Xz5vf4f3zeV8X4fe50ON1J6DhKE/COgzRHFTlvOoFKBzCAAoNBPBktaML5SBRgXmUVl1pKk=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737024408; c=relaxed/simple;
-	bh=A0G1H39jf8gruX399WWti7z/lw8jpyOUSkfbHpOliSM=;
+	s=arc-20240116; t=1737024410; c=relaxed/simple;
+	bh=VyXE3Tl/IQsLvR/FQ0lQU9J40w7WfdlzxF3enZNGzps=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=ce9oAnvcE43q4kDiUUQtWK//zf15abBjkTj6NpGXwg9T00oNjGUZYX5bmWrFtAaykmMXOKD2TQsr/UNGFx2x0VHrEHkC9vIwABpq3mI+mfWXnUvgkAgTjKANVGvWtPwF+ZHhzNoD7Q94B421Sg6JeAugTys8rcx3+G3doP/8gLk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=ls3RWKYT; arc=fail smtp.client-ip=40.107.103.48
+	 Content-Type:MIME-Version; b=nlr2RkQrNvkMNUijITZiQXFWlw2XihPIni8qTPfeQDgUTkCo3w8/hNEYkcKhPAh70f0TrZmgV7lNKCgyslynVLEHOOYXJiUFjvdn8pNNI/2UtLGYxrWTF8i52KBptqMbB0990BsviwXRQ4NJCUZiCp3UqsU+dHf9nkSpWU5Ffhw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=iDLZrTbo; arc=fail smtp.client-ip=40.107.103.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ObvzJj9tYn7lHZt4vyliSt2sm73ql4zkZR5VLpKZ7swHR9p8dUCVL6XbiDV7fglnLp2lTPt3zBaI0lPGZm9yJsU3Lp5jJsBaQASt0srWQzCrh1N/qfE3jVZq7eX91AkMDKvAGyka33vGKW9xtssf7aOoO2tMNGXkJhla0YBbn8UIoyGls5Aydvl3VQ3Kh0H6x6r/gagGV03+BTjYIg06N+5vJTKb54K96ApbmqNkui9A//yyLyF9x1c0nKPxS6Z0aMZI0WcIlxTg6K0Nf+/myuYRM5xRyQdB+5xWgnZM+1Gtpg2JCEanktk+/zrOcmkNjjPX9/nU0LAVr0Drmen15Q==
+ b=pgmeyfKQOkaV5v0JGBcWzsBXi/4Zu/xJYNvDu5euTlg37dpwKfCF5yq6aasLfUzmKyk37tKJ/7/mSvHZNf6RXcj3dsD6qfrmqRMDJwjufzOLYf7h7X/abebfIsnGsoTCQUZ6Sk8MUSfz8zxxBUlfINji0HDSrfHjj0dI2Y8KoX83zlVUcvCnAxmofk2q6eAdx3ucs9IvEyh75OAwWi4uom5xJWNV0U56QQAsBKNvIRlPCrciV/YYyNoNMLb5h3wZ1cgmRHThbpZQeaC9QvkscTVC1/K0QV8pXlLyrbwHn7eSPbXNFgDbVhBHgqbsBsxRQq/+v/PgHK4iIqzXJri11g==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=iThzukZnWfxIQ5uMxxj4lb0iPwQP10emQKZh9pa+0x0=;
- b=j5U/ZBDzxN2Fw81ayxu4mfz9hoOaaEvxftLqw0X0qMSLFw6r2OWxPr5AO5Lhv9H7fmzMrYCR6T04gHirFkheIxftGz2G/Ya0EkzWGOikSo4bR8+wC3xMs806x0nz93A9I9EO7D5AaozD0Y+ZBjSktaXFPkpc/klQbZQgvquxiApoo5T/zQYNzZzmmsgVfmXcLg6TsV5lmt1KVTLbu4Nu3knVRnvg/FIRn5caOupReCxXHxU/ITjvOt09IqgZiweYA7eUAyXYIJuRO61hriNv5wdsdJcwsF+o7uh9QZp88USHLdGmmGNzdHhIiwFUvr9vxqvQc/rEPZKhb5ft+4VhPA==
+ bh=CSlhLIJNWCPrvXAQzL2o8wT7Tqiy2uMdyVLTS3B28kw=;
+ b=j07G0Fc+RtdPpj+7srgOhivem0umwHdfm+RrreO3QBsxPGcYV1yP1zXx+fnZmhVJ4lhi3Fj+scB0VVW75cExMS4Miv/JysfURIg+kJOtCZeXHv/YSMtNUtXuyQb+dRvTisAb1BCV7U0pVlE9R9FYpR3oHii+vYBgplG1mAzqnDcKiuDp7CkRrf8J+aowma/RYomfUFp+GLUr70fgpeyZrTfc9JFo0vFxg/OaR6u6B3iRXfpFlPMLcQPcO8lCarl71Dl6ODy/4bTGTEZY+opuGx6Z+TLujszwTuZWo4HFuvQ/7YzCqt3V2CbPvZrQlD+Ar+QsB1OPwqh8Fk5WHhEXiw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
  header.d=nxp.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=iThzukZnWfxIQ5uMxxj4lb0iPwQP10emQKZh9pa+0x0=;
- b=ls3RWKYTg+vXrg+Zr/+wjY44IXxU85JoTMkrX6u+xT/H7LaeTiMdXE0nrwtT7MITkBKGz1uR1bCT8VrXHNOrbQiQk1jj4Md+OtNuw/fiXf/Z4/9vfsrKTOqbBnOP9od0SGgllHHZDH21FdShKPSVnkHpAjWGGrW3pQ2k8t3WTZ3WiTt8lo03yVIZE2KY8E6NpAoLbqW5Hnh5MJ3eeYiz1sQrk/pCsCSqHCzPLLMMPgy3SMYg6iOZFyPyG8Prwd0mT9FpjuVei6A4RgkJAOXcNGAE31Up/OFfpVgvgZkD51wNO/i6qquMjkWiMzSBCNJL4zs57J+PSKP46tC2CiyIlw==
+ bh=CSlhLIJNWCPrvXAQzL2o8wT7Tqiy2uMdyVLTS3B28kw=;
+ b=iDLZrTbodrV1qppJt+ZaAXN4g84DC2ODQWaOtPFYhHLiFSYbef2siJrfYUVKxujTOuP4usGmElzGZ/Malzu61hd08XBzUaMb5jQR4kMXjz/ztaOpAYsNmuHc+xj32JQoYlS2bc2JeCiOMFXxIXF8ozfQI7WK+jKhbwTK9IWk5VI/I5UTEgNK8Nt2doGC6o+NaL8i2rLYhkvgMbsScQ4XpJmX7Cm2rna3AeJ0ejXUxqZnG3zOCXarOKuzkMJEYPJFEPeqshRoI5zbL3yPh0K+FDrmj3FHPdaCa6325ewN16qfXLhZYYnpqY5c/LhCD6uHcDKT2Rz3AEq+PfvFRyPL6w==
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nxp.com;
 Received: from AM8PR04MB7779.eurprd04.prod.outlook.com (2603:10a6:20b:24b::14)
  by DB9PR04MB9675.eurprd04.prod.outlook.com (2603:10a6:10:307::7) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8356.14; Thu, 16 Jan
- 2025 10:46:42 +0000
+ 2025 10:46:43 +0000
 Received: from AM8PR04MB7779.eurprd04.prod.outlook.com
  ([fe80::7417:d17f:8d97:44d2]) by AM8PR04MB7779.eurprd04.prod.outlook.com
  ([fe80::7417:d17f:8d97:44d2%6]) with mapi id 15.20.8356.010; Thu, 16 Jan 2025
- 10:46:42 +0000
+ 10:46:43 +0000
 From: Vladimir Oltean <vladimir.oltean@nxp.com>
 To: netdev@vger.kernel.org
 Cc: "David S. Miller" <davem@davemloft.net>,
@@ -71,9 +71,9 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 	Xiaoliang Yang <xiaoliang.yang_1@nxp.com>,
 	Yangbo Lu <yangbo.lu@nxp.com>,
 	Richard Cochran <richardcochran@gmail.com>
-Subject: [PATCH v2 net-next 1/4] net: ethtool: ts: add separate counter for unconfirmed one-step TX timestamps
-Date: Thu, 16 Jan 2025 12:46:25 +0200
-Message-ID: <20250116104628.123555-2-vladimir.oltean@nxp.com>
+Subject: [PATCH v2 net-next 2/4] net: dsa: implement get_ts_stats ethtool operation for user ports
+Date: Thu, 16 Jan 2025 12:46:26 +0200
+Message-ID: <20250116104628.123555-3-vladimir.oltean@nxp.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250116104628.123555-1-vladimir.oltean@nxp.com>
 References: <20250116104628.123555-1-vladimir.oltean@nxp.com>
@@ -90,206 +90,135 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: AM8PR04MB7779:EE_|DB9PR04MB9675:EE_
-X-MS-Office365-Filtering-Correlation-Id: 1ded4eab-cfd6-4177-c729-08dd361b0ff4
+X-MS-Office365-Filtering-Correlation-Id: 782a339e-a6bf-4765-fcf1-08dd361b10ed
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
 	BCL:0;ARA:13230040|366016|1800799024|7416014|52116014|376014|38350700014;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?N4Iuf3SZTDwwkPe53Tvyj0u18xXBelLwX3ZBjDX9xxawjdBMv8H+jVcV0iOQ?=
- =?us-ascii?Q?ZDYLHrakL6i+yvhKemh2OlV/jK5Kk+v51RzgUDMZ6zicWZEFH9QySHmT/wTo?=
- =?us-ascii?Q?H6MisXR2DlO8duQaqKCIMM2mBkndYNzDDwKpRcUpIlW6zXQ1HCl3hgOgEE/i?=
- =?us-ascii?Q?EYQg36eIwQ8xvfvo1zgW3Og9RjZ2JgzGt2Hb8lGE+k4TnNc1ZixJ+XEzkntQ?=
- =?us-ascii?Q?+EqbJusmF0QSFT+nIn/UD+Bp6dNJBSHkRnMDKcC/zyXDG8/Y5zic6E+yg6Hr?=
- =?us-ascii?Q?ozidMMWoB78YfqTwfHOpHWAM6dZmkcvOXw+kN2HXV44W2oahujmnhKywmIRN?=
- =?us-ascii?Q?QvXvXCMVEuU7gxDlS+AlzFXlRocjwBTMTx+g4kTUyTNxWw6sB915fdzdkCL0?=
- =?us-ascii?Q?mfcqk4iKdGhYZWAOL9hPtZ4trKhnpfSslEUUFMC7+yrXlU+5WquXLRFKMNm7?=
- =?us-ascii?Q?O6h2vJnTAE0R34U6d6QC7YXEldpQOmsSq5QaoXBJFgdHAmDNjuA6roSjZmn0?=
- =?us-ascii?Q?sXQo7ajp5N7yo0/XHQ/mvc9aOvXUMyCzlE2c5nkQadwU9kp1ATpRz29jyTZ9?=
- =?us-ascii?Q?jY6nIOZvxyRybCvkbsaAWxrHEIFqtq1G8xmWoDwCQgMgfvoubI99E388VPAr?=
- =?us-ascii?Q?VzB1QZIvgZORfwE9EXoSnHyasKEDbZcgLMjcUWFKvaT3hqiHSKoXy/B1krDs?=
- =?us-ascii?Q?unBlruJrsZzhs+t6kH7rwoEW5s6qbCvRUpSk90b2RdiuEuBzN371GFo9Z0wm?=
- =?us-ascii?Q?Zy8YG/GQKeuA5KkIfgXPiuIGWSvUxsLajX8uane7PE3QPFj0lkdxr31vd/Wj?=
- =?us-ascii?Q?h1PVcNiRp6BMPmVnLitV4hpQEWAzzS/1sGTdqtjSf49XFSC32cbiVinnDtbg?=
- =?us-ascii?Q?1fGP0YHenccXitm6ZB2W16IYiz1sYPAU91M6h+Gnp1eaduOaZdvdL+QyPifc?=
- =?us-ascii?Q?8kHGkuAYAdA8G1Pu/QuY8Ywv+pcsOmSPw0NLu84gW3pEFTa5EVrsN81aObLB?=
- =?us-ascii?Q?tMKXcnrlu8iJkc5pYKGXqY7JkegOHLcsIpZ3IfJQ5i5pvzOcPAS9rZiRVd+y?=
- =?us-ascii?Q?aHLZgL17ifGTELqkM5lI3O+/LUlfpCLbCux0tLCl85U+ecvOr/141EhkXOmI?=
- =?us-ascii?Q?Q6BwMrN04XmNo/uaHyUrSp57sdsWp+CIbuAINy5q+sxCjbVz/BhGXZDvJIaf?=
- =?us-ascii?Q?dTOd1oT+Qbgyoi7EM9UvyGtMmnqX2u7IGY6CMKH5T26+9aDOEmDwJVqc7VPi?=
- =?us-ascii?Q?uBwjPUFNqdGTpOmMUkiSvKxXFWrTNccN8/KlIOaN4h3AKKK0wJrjfKv7hDdh?=
- =?us-ascii?Q?sKapszstbNe8lHQAsXKxaZIduBHxZHGn0cR+jIw7J5DVJlIAybygqTppK8La?=
- =?us-ascii?Q?2Jz3S4isSz9QIL50ezDA43udA82ZWljL/8gxdwr/Jo9YGJMD9JIhUX+0q0Md?=
- =?us-ascii?Q?WD1cmoxzbcMcXd05mnhEjbg0YXQdNl+i?=
+	=?us-ascii?Q?ivxzciYcRLMQ3fWcHgYYoWK6dmRbNpInVXD4ssB1Ga8u0yI4z7sc89g7lV99?=
+ =?us-ascii?Q?SC161WWBQGCQ8+nwAuWf4JGGb/i/O7cqZH66nqUB6YHsY1hTk2/ieaS4lcR5?=
+ =?us-ascii?Q?i6YRlAPdQFZQPEbMdOz2S0vuIyJRJ3vD8v9sW0q6UZbJSSTVIVDHFcWcigpE?=
+ =?us-ascii?Q?MPY7eGw5roHlZT/zpiyasQUFKHM0a+G5mN37H3K4CRY636v/LR8YJaCG7yBt?=
+ =?us-ascii?Q?TaTXvtkFoDDgMtiC9tLu2OI7UjVZmHtNrySxbXL1GZbCP7Zi+lg1rXoUQZGH?=
+ =?us-ascii?Q?onv06gITJO/CsOwMdXlWx+eIkKLYgPJz2R8rl9WYbTp4tlxZGqCGMoVfrrTO?=
+ =?us-ascii?Q?ILvQTwxRX06p6tcl5ZZyHxHvB678VMmMPpClIZ5EMooxfFSX85QV1BQulhzW?=
+ =?us-ascii?Q?kxeIDRSe0od+k2CwUtKUvE/Z6T4VC81j+khweUA5UYBSla6QVmNIl62EDpkJ?=
+ =?us-ascii?Q?Xb6GdXk8dlixqOtVYBJkXSaMhUXVJQhBBfu6UM+jlenHGzidUNvmz0HaeTMT?=
+ =?us-ascii?Q?DU/RHqUcDTIQHfTP73mXgWbxif1QV9q7J3J1UOUUZbeEHiHAB5KV+Elb0rON?=
+ =?us-ascii?Q?fpYmby3kGVSGtCaTo0Ovp8IIHRDLzl6NxGuJEiSVXEXqn1zTgkwe69MVFUk6?=
+ =?us-ascii?Q?Do7ZboGnh1OxHnifF5/cOvMOLA69AX0kAgumBZvM+vCzB58RrLZf47UPDhHP?=
+ =?us-ascii?Q?JeebDE9UyvRd2t/GJgNuXxu5rjkRYIm1Yx5Z7gcQt+JQhTC4TCKzuG48H1q6?=
+ =?us-ascii?Q?uK4qwfmobYIq2MAyY91th3VdvUHIYSSQUI56FnuE/eX2jTBSMZzKIcKk7uze?=
+ =?us-ascii?Q?HDsoIcGFIUiskx56t80B5SflNUOdcKPRj6atFrezQ43ze5CB7j0crFUwBTSO?=
+ =?us-ascii?Q?gEXNQmMOQK9coZ6pFyZTonOkRDQKiomq5+iBo38QTx3rvKZDAOonxdF1VmVV?=
+ =?us-ascii?Q?+38iQ4y8OgKnWxGu/bXAq0QxaaDfg8uJsuz4JxNVgnzu5JPhLQyB0EyfMfho?=
+ =?us-ascii?Q?uYnK6E6gquAgjgCKlDC3TVyQVUx7rh9ghUQvuagJA+X3MzriwBF05NO3X5no?=
+ =?us-ascii?Q?6pM5GZrdUTiQLGdXeF6wDTO4pKx2mQOf67TE1tSEI15M+2M9drh4yEe/I96C?=
+ =?us-ascii?Q?MtA6idHtXftWjUuWp8jaeFddkKDh9lHKvKXP+qEETd7nPeQDvRru32KOf2F1?=
+ =?us-ascii?Q?TNXeyfyC2pcW7Qdnl2zUp0z9I8rRTE1lBq159pLpA78qilYuBESQbWeFNqUa?=
+ =?us-ascii?Q?GK/SzfUXAW6nyexgci7DnntS5+lsgCFwNtbw8wVY2YKOOAwzrkL/WWQmq1sV?=
+ =?us-ascii?Q?ZHjCewq9ioXSfKsVMz87nZDRc136QY8MCvidMyPBbcBYTZWKDyoh5PRSf1y6?=
+ =?us-ascii?Q?NuoXo3z9usXiqinss9iqjX+7rNGG0FME2gV9Lz34oO0AbGILPl/rZxEG9mgz?=
+ =?us-ascii?Q?LH0pEcNW1hh8JL8g0G81vwRJG0tFIBQ2?=
 X-Forefront-Antispam-Report:
 	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM8PR04MB7779.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(52116014)(376014)(38350700014);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?F1zoGR+qSQn1uKLDIUQjDD4fKYbZO1Lf1DjebVQXE3fQjG0EZyIN2kHyqoeu?=
- =?us-ascii?Q?2NYslaS3s0JiyEkMwK/lUa7Lllp8K/qn7zU1n7EGJJaVyxVOQN9jMRA/ji0Z?=
- =?us-ascii?Q?dOwE2MLcaL5bYavM09i2pT5cDDse95ucGWi7g8UU/Pb0Hu84BWymPNK1JpO/?=
- =?us-ascii?Q?87jt3HCg55LTZligNHTgwbXpMpe+Lsgd3sEX0/oKLn72arvGwf51a5C8UAim?=
- =?us-ascii?Q?WuToniysKfMkK8lxjrIglQt/YmfSXZyx6j69dPJIhJW4QBTUHmdHnm8+NV6F?=
- =?us-ascii?Q?X3KYOKffZAlgLaQfVidu6zDPfyppYRE3unV828nAoG1bMQKVBQpZvB//LBnY?=
- =?us-ascii?Q?/CWXz7soypzwN02gOulI+mBTzBtL5S2PJCDEaAOvmUFEQjmAdAy3nrUNtZiy?=
- =?us-ascii?Q?rjTgWYI0E2sSvhbgwaHOiePZmTNZ3G/ZlnzAAtQprsoYMRY8oeN7tT9UvS/0?=
- =?us-ascii?Q?G+5xH+4WkTe0On99v3oHw/+ksywV+84Hpol7kvmT8qKGcW2ufrZ3Cl0Ce/4c?=
- =?us-ascii?Q?RR1kAWxdWc4SSvq8PBQ/oTkWI9OPHcpPYUCCk7a0CFGHe5+d8RjqRyofEond?=
- =?us-ascii?Q?RURxW6ZXh94odj7MVDBAWKnukyhTTEQQuRZumxCMLjrVM3W6xd6D8ea8nf3s?=
- =?us-ascii?Q?Vek/jMniH6JbmFAwKrGJuERg3wspUP6ZsySef2k3S8TwOdfsbEOv7nuAtg6O?=
- =?us-ascii?Q?U2CKqzoSBwrgQAWqxqzKv96csBOpoFeSnnIIo+CUdvzZqWSk2pgNb5VETqCa?=
- =?us-ascii?Q?GDNkeyerf74LNhHGjEy4ZeEwi+l3M8TkZAdZJg3+L3WNdscLHxTQkFsD4jvv?=
- =?us-ascii?Q?FVW0HIbIMXtyqFGuBbRkuJkrizZkM93poEYUeZ3x/1VxP0pv0OVTVzt7/YIv?=
- =?us-ascii?Q?rXaz8HOLlK+P25BaXyzJXV580bCMdJxXab+TzcZCJipY6bg1mtyJx6akcz/0?=
- =?us-ascii?Q?h472TtzsZJjRem4LzaDsjjLG8KMjxc2T2JqU7vx84I6H3evclJiZ92+pde5V?=
- =?us-ascii?Q?o1oFiVOJIZAdkISBdVQ9yU107Yh7zmJmETVOBZIvymAT6VzMIbUXYyKT2z4K?=
- =?us-ascii?Q?mOHQJW16EzYa0wJ7itteo4oo/tyXWXSkfGSrIgZstXU5LsKJnzcWew/lMNHi?=
- =?us-ascii?Q?EWWWRdBBSfSFP/G9tVKjRp0Fvoqm3hk1i0nKeD1/GDD+q6O2nj7Wo9ZHhoXt?=
- =?us-ascii?Q?Ejzmvfzg04qxsgaWNOH6fKyADjNSu5s2/AHYoXs6odeWw6zW1Dkcwvi1x5Z9?=
- =?us-ascii?Q?J7ymESD75SBBKGgK0G2zkzSVO8nazOINZUAfX+5pLMv8lHZM844Hz+ACrZo9?=
- =?us-ascii?Q?HaP/Q9lprm+PPNU3M3ZOyi5R/8tTxIuVR2oBUVOxvbE7FW0HxELRwU0XpA4p?=
- =?us-ascii?Q?/Fn5WDDTZbjAV0JEaHdp1JKUDKGTJGPQPz0G6ihq2rsJuhB7m0KomdLlLVZV?=
- =?us-ascii?Q?v/PPMkWtKBqUqlWO5TXtagaxuxoOBNw7sQcTK0I24FZuG9wfhxDMA8KfSd6b?=
- =?us-ascii?Q?Y9a+1BlG6ascv+Xk4hnQ0RILD7yaYuOXEgqUIieZCqXos0Lhp89jaHqHQ8NM?=
- =?us-ascii?Q?gC4FiHIeMt6jJ77fDOYuiSfCXUO9thkgQ7mnolDNrktc4i2EF4Q1BFFWG8Sq?=
- =?us-ascii?Q?lQ=3D=3D?=
+	=?us-ascii?Q?r8nXtGfsEneM/xG7c6gUWm8TVEREWGStluq4J0EGiIjUCnpOLU973QiEmnTq?=
+ =?us-ascii?Q?BVpcxwRi6fcTmbUyz5Ves8GCvjlO3KfIb7HV4oUoNpGjf8aw+9HCeWXo6XBh?=
+ =?us-ascii?Q?F0EymTzTI9xPwxd2eJKyMw87vpUE8FV8IrfR/XhDHxzFk8KIH18MCTS8BfmY?=
+ =?us-ascii?Q?SgM9JZcNWmnCLFQjOmk5Dw+dI8oqBB+iInofeNNcqpQS6k8BP8ITQGsoHoDN?=
+ =?us-ascii?Q?JWckvxwVFPHw1GL/yWTzXUXTqMdxl7rNcQAr595rCrnciaMmAgMAntKfgIev?=
+ =?us-ascii?Q?GCfsx9XJNhAHzJmtUkK3iPd72jjGhLyKixFCz35hRVLKxZR7qyx+r+JWc2BF?=
+ =?us-ascii?Q?wT2u7Xc9eKQR7GfueSm3RIc9vgMOntT3ahgw71dnw1VdC1Ov8NUYyJNupbZR?=
+ =?us-ascii?Q?7GUOAPpDcZp3M11Q5XVYverVkgxdUbJaLVM7jgU00+0hcn2Zy78MEwV6kqTh?=
+ =?us-ascii?Q?rHdeay9iJ91XCW7YAFC9qa/GjUceHqEHWW2hQCEtDOPcc4NqlDfLLVotdgFu?=
+ =?us-ascii?Q?SdxFnRke2Br2jVAaLY0c2kZK+EnwCrl4+x7uUy6tERzklFRHcDzG1DnetU9f?=
+ =?us-ascii?Q?LHXy3004rCE2L/yu+3kB3gHSgnnK7WbPfaoZhlJLuCf6muxNDisWkZLVQ5Hu?=
+ =?us-ascii?Q?h8ZhYNt5FjjY5AbTtkbohcDMZWHJ29XLBmuMoIeBEBLlwHI2oXC/qp4N7+pK?=
+ =?us-ascii?Q?+Mina1G18wsPNoYwEOIkHEfbbzQ7uqo2mrwmFtJWPllL8zHTN81ef5gEUG89?=
+ =?us-ascii?Q?sQjTNDt+M0EDc2kr+iuPKK1M9+9k8lm+p/nHqwSXkBhMw2q+YmEUomN7ymZd?=
+ =?us-ascii?Q?Q9oibX05scNxOdeRhEyKLOvNtfSbiYWEKjwPdU6PJlTXqqeyeNm0w0qorwYN?=
+ =?us-ascii?Q?bATG7c2Hu8tiMDxcWCXvgTmsWBKpcP4AW73SEJYAUNnT2/svaWau2COfbzpA?=
+ =?us-ascii?Q?MQcI2kGBqOy0h+9kfda5qL/Lsgp+1tFKuY4O76aBuG4dLz3KBw0qS+xE+lX7?=
+ =?us-ascii?Q?RVyvBMDOWam3U+Dz1dcPGCzHr5WCqXr9QiJVZJLtunxkkly27wYDqY2h6j/W?=
+ =?us-ascii?Q?XLrf6RiTKtxKK+wscZ0Za3xsg01unyYKKCTnAhk0Bb5Ig81zHH7AthmSAFmL?=
+ =?us-ascii?Q?wUwUrcQUP4TOycUGgX1hmpD4D1e090fYzqJogDsfUlZ4t8kqTCUXmSYuHOC5?=
+ =?us-ascii?Q?/5RarI5PQgttSWYtdM6GEKlZGEItmfCBLILUqO+x6ER2Np21FjiDdfRSCuei?=
+ =?us-ascii?Q?YMFb6RI+F1i2eT7m1bbjG2suPmlyZ1qHjznGjObqf5RTdHC9I14CKOrZHaBm?=
+ =?us-ascii?Q?/mi6Sl9PST1vgPVW5A1ovlbKHlQf8//8jISz6z+btciXS8rL7tdG2s26pxfN?=
+ =?us-ascii?Q?ZT7WK1QyEjT1pKn0p16M2b9HgXF6N013UmA/2vVtqCvtSRCyDL3JhhWt/v7i?=
+ =?us-ascii?Q?3K7ybLsQjyswvrySFK0MCgOP+hB+NwmV7ur8Y8P4VqA7zDjWVwzjbViFnKye?=
+ =?us-ascii?Q?H//QBsnqrlpF0CAjymObVbeP6WPdPLbPpVu406lPa+7TjsNRpFNQHcBlkDUN?=
+ =?us-ascii?Q?ocYQjXkc6CiLYQWUj1HmM70b1afhnTjbQB/ln/Ezm6kWzKNJmdY3AhiuvAIY?=
+ =?us-ascii?Q?Ew=3D=3D?=
 X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1ded4eab-cfd6-4177-c729-08dd361b0ff4
+X-MS-Exchange-CrossTenant-Network-Message-Id: 782a339e-a6bf-4765-fcf1-08dd361b10ed
 X-MS-Exchange-CrossTenant-AuthSource: AM8PR04MB7779.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Jan 2025 10:46:42.0500
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Jan 2025 10:46:43.4671
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Rk+xYzbEoZpqG+GmdxdRaQlzYdrGRJU7m2NcRdUEJzrmpZPL9zdlSoibEZ3wMfRVMMv4aUJWzL8Mk9MUZXKDIg==
+X-MS-Exchange-CrossTenant-UserPrincipalName: yS29T+hBdEyzLS2P19LuUeppl9NMacxHbFWLJRZ/QZZWHDXgig6ZozxEO+atKUH99Bdop0b4LEaiPaQL5NE+ow==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB9PR04MB9675
 
-For packets with two-step timestamp requests, the hardware timestamp
-comes back to the driver through a confirmation mechanism of sorts,
-which allows the driver to confidently bump the successful "pkts"
-counter.
-
-For one-step PTP, the NIC is supposed to autonomously insert its
-hardware TX timestamp in the packet headers while simultaneously
-transmitting it. There may be a confirmation that this was done
-successfully, or there may not.
-
-None of the current drivers which implement ethtool_ops :: get_ts_stats()
-also support HWTSTAMP_TX_ONESTEP_SYNC or HWTSTAMP_TX_ONESTEP_SYNC, so it
-is a bit unclear which model to follow. But there are NICs, such as DSA,
-where there is no transmit confirmation at all. Here, it would be wrong /
-misleading to increment the successful "pkts" counter, because one-step
-PTP packets can be dropped on TX just like any other packets.
-
-So introduce a special counter which signifies "yes, an attempt was made,
-but we don't know whether it also exited the port or not". I expect that
-for one-step PTP packets where a confirmation is available, the "pkts"
-counter would be bumped.
+Integrate with the standard infrastructure for reporting hardware packet
+timestamping statistics.
 
 Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
 Reviewed-by: Jakub Kicinski <kuba@kernel.org>
 ---
-v1->v2: rebase
+v1->v2: none
 
- Documentation/netlink/specs/ethtool.yaml       |  3 +++
- Documentation/networking/ethtool-netlink.rst   | 16 +++++++++++-----
- include/linux/ethtool.h                        |  7 +++++++
- include/uapi/linux/ethtool_netlink_generated.h |  1 +
- net/ethtool/tsinfo.c                           |  2 ++
- 5 files changed, 24 insertions(+), 5 deletions(-)
+ include/net/dsa.h |  2 ++
+ net/dsa/user.c    | 11 +++++++++++
+ 2 files changed, 13 insertions(+)
 
-diff --git a/Documentation/netlink/specs/ethtool.yaml b/Documentation/netlink/specs/ethtool.yaml
-index 66be04013048..259cb211a338 100644
---- a/Documentation/netlink/specs/ethtool.yaml
-+++ b/Documentation/netlink/specs/ethtool.yaml
-@@ -842,6 +842,9 @@ attribute-sets:
-       -
-         name: tx-err
-         type: uint
-+      -
-+        name: tx-onestep-pkts-unconfirmed
-+        type: uint
-   -
-     name: ts-hwtstamp-provider
-     attr-cnt-name: __ethtool-a-ts-hwtstamp-provider-cnt
-diff --git a/Documentation/networking/ethtool-netlink.rst b/Documentation/networking/ethtool-netlink.rst
-index f70c0249860c..3770a2294509 100644
---- a/Documentation/networking/ethtool-netlink.rst
-+++ b/Documentation/networking/ethtool-netlink.rst
-@@ -1281,11 +1281,17 @@ would be empty (no bit set).
+diff --git a/include/net/dsa.h b/include/net/dsa.h
+index 9640d5c67f56..a0a9481c52c2 100644
+--- a/include/net/dsa.h
++++ b/include/net/dsa.h
+@@ -906,6 +906,8 @@ struct dsa_switch_ops {
+ 	void	(*get_rmon_stats)(struct dsa_switch *ds, int port,
+ 				  struct ethtool_rmon_stats *rmon_stats,
+ 				  const struct ethtool_rmon_hist_range **ranges);
++	void	(*get_ts_stats)(struct dsa_switch *ds, int port,
++				struct ethtool_ts_stats *ts_stats);
+ 	void	(*get_stats64)(struct dsa_switch *ds, int port,
+ 				   struct rtnl_link_stats64 *s);
+ 	void	(*get_pause_stats)(struct dsa_switch *ds, int port,
+diff --git a/net/dsa/user.c b/net/dsa/user.c
+index c74f2b2b92de..291ab1b4acc4 100644
+--- a/net/dsa/user.c
++++ b/net/dsa/user.c
+@@ -1150,6 +1150,16 @@ dsa_user_get_rmon_stats(struct net_device *dev,
+ 		ds->ops->get_rmon_stats(ds, dp->index, rmon_stats, ranges);
+ }
  
- Additional hardware timestamping statistics response contents:
- 
--  =====================================  ======  ===================================
--  ``ETHTOOL_A_TS_STAT_TX_PKTS``          uint    Packets with Tx HW timestamps
--  ``ETHTOOL_A_TS_STAT_TX_LOST``          uint    Tx HW timestamp not arrived count
--  ``ETHTOOL_A_TS_STAT_TX_ERR``           uint    HW error request Tx timestamp count
--  =====================================  ======  ===================================
-+  ==================================================  ======  =====================
-+  ``ETHTOOL_A_TS_STAT_TX_PKTS``                       uint    Packets with Tx
-+                                                              HW timestamps
-+  ``ETHTOOL_A_TS_STAT_TX_LOST``                       uint    Tx HW timestamp
-+                                                              not arrived count
-+  ``ETHTOOL_A_TS_STAT_TX_ERR``                        uint    HW error request
-+                                                              Tx timestamp count
-+  ``ETHTOOL_A_TS_STAT_TX_ONESTEP_PKTS_UNCONFIRMED``   uint    Packets with one-step
-+                                                              HW TX timestamps with
-+                                                              unconfirmed delivery
-+  ==================================================  ======  =====================
- 
- CABLE_TEST
- ==========
-diff --git a/include/linux/ethtool.h b/include/linux/ethtool.h
-index e4136b0df892..64301ddf2f59 100644
---- a/include/linux/ethtool.h
-+++ b/include/linux/ethtool.h
-@@ -559,6 +559,12 @@ struct ethtool_rmon_stats {
- /**
-  * struct ethtool_ts_stats - HW timestamping statistics
-  * @pkts: Number of packets successfully timestamped by the hardware.
-+ * @onestep_pkts_unconfirmed: Number of PTP packets with one-step TX
-+ *			      timestamping that were sent, but for which the
-+ *			      device offers no confirmation whether they made
-+ *			      it onto the wire and the timestamp was inserted
-+ *			      in the originTimestamp or correctionField, or
-+ *			      not.
-  * @lost: Number of hardware timestamping requests where the timestamping
-  *	information from the hardware never arrived for submission with
-  *	the skb.
-@@ -571,6 +577,7 @@ struct ethtool_rmon_stats {
- struct ethtool_ts_stats {
- 	struct_group(tx_stats,
- 		u64 pkts;
-+		u64 onestep_pkts_unconfirmed;
- 		u64 lost;
- 		u64 err;
- 	);
-diff --git a/include/uapi/linux/ethtool_netlink_generated.h b/include/uapi/linux/ethtool_netlink_generated.h
-index 2e17ff348f89..fe24c3459ac0 100644
---- a/include/uapi/linux/ethtool_netlink_generated.h
-+++ b/include/uapi/linux/ethtool_netlink_generated.h
-@@ -382,6 +382,7 @@ enum {
- 	ETHTOOL_A_TS_STAT_TX_PKTS,
- 	ETHTOOL_A_TS_STAT_TX_LOST,
- 	ETHTOOL_A_TS_STAT_TX_ERR,
-+	ETHTOOL_A_TS_STAT_TX_ONESTEP_PKTS_UNCONFIRMED,
- 
- 	__ETHTOOL_A_TS_STAT_CNT,
- 	ETHTOOL_A_TS_STAT_MAX = (__ETHTOOL_A_TS_STAT_CNT - 1)
-diff --git a/net/ethtool/tsinfo.c b/net/ethtool/tsinfo.c
-index 7e495a41aeec..691be6c445b3 100644
---- a/net/ethtool/tsinfo.c
-+++ b/net/ethtool/tsinfo.c
-@@ -186,6 +186,8 @@ static int tsinfo_put_stats(struct sk_buff *skb,
- 
- 	if (tsinfo_put_stat(skb, stats->tx_stats.pkts,
- 			    ETHTOOL_A_TS_STAT_TX_PKTS) ||
-+	    tsinfo_put_stat(skb, stats->tx_stats.onestep_pkts_unconfirmed,
-+			    ETHTOOL_A_TS_STAT_TX_ONESTEP_PKTS_UNCONFIRMED) ||
- 	    tsinfo_put_stat(skb, stats->tx_stats.lost,
- 			    ETHTOOL_A_TS_STAT_TX_LOST) ||
- 	    tsinfo_put_stat(skb, stats->tx_stats.err,
++static void dsa_user_get_ts_stats(struct net_device *dev,
++				  struct ethtool_ts_stats *ts_stats)
++{
++	struct dsa_port *dp = dsa_user_to_port(dev);
++	struct dsa_switch *ds = dp->ds;
++
++	if (ds->ops->get_ts_stats)
++		ds->ops->get_ts_stats(ds, dp->index, ts_stats);
++}
++
+ static void dsa_user_net_selftest(struct net_device *ndev,
+ 				  struct ethtool_test *etest, u64 *buf)
+ {
+@@ -2501,6 +2511,7 @@ static const struct ethtool_ops dsa_user_ethtool_ops = {
+ 	.get_eth_mac_stats	= dsa_user_get_eth_mac_stats,
+ 	.get_eth_ctrl_stats	= dsa_user_get_eth_ctrl_stats,
+ 	.get_rmon_stats		= dsa_user_get_rmon_stats,
++	.get_ts_stats		= dsa_user_get_ts_stats,
+ 	.set_wol		= dsa_user_set_wol,
+ 	.get_wol		= dsa_user_get_wol,
+ 	.set_eee		= dsa_user_set_eee,
 -- 
 2.43.0
 
