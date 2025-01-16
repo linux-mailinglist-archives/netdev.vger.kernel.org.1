@@ -1,130 +1,97 @@
-Return-Path: <netdev+bounces-158826-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158827-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C989A136B4
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 10:35:28 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 739E2A136B6
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 10:36:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8ABD7161574
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 09:35:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C54171885F70
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 09:36:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C71A31D95A3;
-	Thu, 16 Jan 2025 09:35:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBF871D86D6;
+	Thu, 16 Jan 2025 09:36:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f207.google.com (mail-il1-f207.google.com [209.85.166.207])
+Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EB011D619D
-	for <netdev@vger.kernel.org>; Thu, 16 Jan 2025 09:35:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.207
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03C0B1D63E8
+	for <netdev@vger.kernel.org>; Thu, 16 Jan 2025 09:35:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737020123; cv=none; b=rU4UScqtNFPNVz7qS3Tzg3McEkH2g7YSgWtkc6YYpCKMkGjQIx+uHsqNlWtuXVZiwzWf1HZKUgQxlXIWZRQc+eKzyvxFXfFTaecDtO5zCa681+zR1lBacDvsOQusj/zLexWOy4H/mBRZyG/lmVrXViCb6127l84HsrFHwlEKv2Y=
+	t=1737020161; cv=none; b=jsvzrbur26L7Q63jCzIEt0++RZBkwsvU8KYmy5c094tSpWhysdh+dKaayMH25N7nE23PTXh/O1q1dl3iJs/L6XAfkBYBL7oQufbCV7q2J0hSSNhwtArjY7SxDuBySOZGfP6MF2V7fvLWN/Zs9jAgWEDPSn/2aceHLCAMdiDTSpI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737020123; c=relaxed/simple;
-	bh=hMbX15oWoVS2tElQGRcsCeNcEPwQIA0VM4qELoladQs=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=d3x3e44Pcxn0GnOfBQxvIliVQsTVpkeuUpRSSefza/b2KuMxMHdZFYk/QKaEgBnJQcYnruNywif5U4PuEJjPn3fjSc65xDdBQ7RC9/HhF6tE7ijdXE9c/7iuxnwwqJidUPjdm43Nw5fXV8Jd8s/dyw7QP5VF2poU63II9GvWwvs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.207
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f207.google.com with SMTP id e9e14a558f8ab-3a814bfb77bso15105805ab.0
-        for <netdev@vger.kernel.org>; Thu, 16 Jan 2025 01:35:21 -0800 (PST)
+	s=arc-20240116; t=1737020161; c=relaxed/simple;
+	bh=qNCrKkINH3eN8H0PdAAPZDPDSrVWUy/f5GPyB19BZmU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Q8n6NTKC5ByOh3j2ZhjjTg5QdVkD3pmEqgdU3Mx6vTpYvFm1tMbhyhGgWMjHTZ8cpXBUWHGwroJyET+rn8tVHxSJVx3461p01vRoBdbJ3hyUPSmL6uBgJ0eZ6eXsI19Q5ZmzeWMj3uSvXa33UPWcBok3z6E97/BFc6lSW5AsaG8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-aaedd529ba1so114923766b.1
+        for <netdev@vger.kernel.org>; Thu, 16 Jan 2025 01:35:59 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737020121; x=1737624921;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=lom7AH32L0Mgs9aUPNzFepeonekVl8G5+OoAuPJlwRE=;
-        b=ghl1Zlm58HCMl1Ht1C8whdEY29DyBXWBIJWQjfSf1TGuBu8s++BBnG0DQ8vm6I5yFB
-         HGJA7N7hdx8QsoHKH+GpsnfQ2t7mci29bz4u1RQ/4ZvtSdIZDFcYFWFl/AHHBL6+6F80
-         qLzFFMBMdDc0j/lKGvIJfSsZ5tLSd7olVRgHD617a2bIyXv/mV/u89xuEA6Z+NI8ty0v
-         msZs8F8XzeZ19mzCcA24JP3q9Y64rHZvqopFbOupRGE7bs3NJYQNcAPDo6NaSblbmHeo
-         cYkXE9f1U8ilLQS5Uq/d2ACq4uM8wgvNPWLNarxO1AC7hn/hYQg1XxGDJpehKtDcoTUU
-         aBWA==
-X-Forwarded-Encrypted: i=1; AJvYcCUKIp2+pjE3pFPhgOxUKqk3oUBEPrF9Xv7s46Qkrj1N+qRbRHqRDPb/PZ6Uv/sAfHyl29sDV+w=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzAcXi+WTitLmsoZAi6AOqnUrmkQUwQPWAmKIsTnLCODffyfqad
-	t4nBunoOnK6IDwAF76iKGuvin++QhKdsx53MVSgww76Hxgcd059P8ISK+k0FPGUocAn8ZqJvXEe
-	M9QqtT3Zg4TGcz05FmBQVRMgq/ov/C5MxW5I5wiD2YliWdXFcNcDWxrY=
-X-Google-Smtp-Source: AGHT+IEqx756E/5dFyjefWS47ErqHCTijzSpHRd2YibhzHOcMuqd3B9lXZw4TLFiQarLe4UVNFGxHGqnOudNcf9ZqGMYp3a/u6uz
+        d=1e100.net; s=20230601; t=1737020158; x=1737624958;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mZw6tEH8ZaJV6zFkhXU9f3b/ffuWvIQ/M+PHpA7VL7s=;
+        b=MvQzAFNravC3+jQNBNLaWuVH/ON89nAuajp4v9sIeaGe/cr0NDcLjUkC4j5j0El/oD
+         iumsY0GvTpghJRl/j1wZLMtkAHEZiUtJC6lxsw3zh5zIcunqRqtYZjqa5j+BP0dMvUdl
+         Vhdq5FnqTMOeVoe7d41/DFWlXLzlohNo/Dh8ztMX2zrFOoc16sECBB/TcyUPZmUBCZsF
+         ryaNZXyIuhESufNLtIcsmcRwfOW8BsNKTQRn5fMGRdEyUVzS1plcdSKUBIoqORKdrrAz
+         iCQpAXEzJOjpgbEEdaExksDzuSPdwHxGwVSgFXaSuyp22/PbKP3sitmawHKotE9/Ydde
+         h8yA==
+X-Forwarded-Encrypted: i=1; AJvYcCWWVHXXUkfVK3PR4npBewtcxwz8nDgscB82nIn3GPa9IMpmtK3Tp7ZY8u8t2LWHozgx966ao+w=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyuAJsgKtAP8Z15WbnkdNpnZw2W4zqjp7dvZ/GccvWhTn1XxAvM
+	bbPU4IHrsk4T2QvbVQPZBSLCwSVHFeC57WprfrgY65zlc0R+GDueLrogFA==
+X-Gm-Gg: ASbGncvxu7RYCdWsefRJJEYF3wHvEzm6UUOBOeHwQecveK/s8OiEID4ANlL+e8GA9Ls
+	HG5oMbvAX21ueaLZN8mb2PmqjJ++jXzVqswp2TZBN2motCVn1QGBLaRGJO3dlxFtCEE2BDe/qdJ
+	eUPeSldUsmg66NcELBUXVNuIfbLC7KoUboQaBJmvUvs9nVS4d0STt7btOcT5ST2Csk1yYMAPv/K
+	mEtYja9YL8S1YJ04jES2PIFDOqcPuPhxDW2iRBjtyxTyI4=
+X-Google-Smtp-Source: AGHT+IFVPMOtw4kf6s6wse3Ocg01Zwg4InWz3KmGzO4AJAmV3tsR3Sd9pL6Mu+jlBDY5BDZY/a4Thg==
+X-Received: by 2002:a05:6402:35ca:b0:5d0:d818:559d with SMTP id 4fb4d7f45d1cf-5d972e0b955mr633223a12.11.1737020158123;
+        Thu, 16 Jan 2025 01:35:58 -0800 (PST)
+Received: from gmail.com ([2a03:2880:30ff:8::])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ab2c9064070sm883891366b.37.2025.01.16.01.35.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 16 Jan 2025 01:35:57 -0800 (PST)
+Date: Thu, 16 Jan 2025 01:35:55 -0800
+From: Breno Leitao <leitao@debian.org>
+To: kernel test robot <oliver.sang@intel.com>
+Cc: oe-lkp@lists.linux.dev, lkp@intel.com,
+	Herbert Xu <herbert@gondor.apana.org.au>, Tejun Heo <tj@kernel.org>,
+	netdev@vger.kernel.org
+Subject: Re: [linux-next:master] [rhashtable]  e1d3422c95:
+ xfstests.generic.417.fail
+Message-ID: <20250116-expert-stimulating-chicken-e1ef07@leitao>
+References: <202501161047.39c960cb-lkp@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:190c:b0:3ce:7b33:8c3b with SMTP id
- e9e14a558f8ab-3ce849de894mr57987995ab.5.1737020121230; Thu, 16 Jan 2025
- 01:35:21 -0800 (PST)
-Date: Thu, 16 Jan 2025 01:35:21 -0800
-In-Reply-To: <673b71bc.050a0220.87769.004d.GAE@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6788d2d9.050a0220.20d369.0028.GAE@google.com>
-Subject: Re: [syzbot] [wireless?] WARNING in sta_info_insert_rcu (4)
-From: syzbot <syzbot+8b512026a7ec10dcbdd9@syzkaller.appspotmail.com>
-To: johannes@sipsolutions.net, linux-kernel@vger.kernel.org, 
-	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <202501161047.39c960cb-lkp@intel.com>
 
-syzbot has found a reproducer for the following issue on:
+On Thu, Jan 16, 2025 at 01:15:21PM +0800, kernel test robot wrote:
+> 
+> hi, Breno Leitao,
+> 
+> FYI. we noticed this commit is in linux-next/master. now we noticed some
+> xfstests tests failed randomly while pass on parent.
+> 
+> xfstests.generic.417 seems have higher rate to fail.
+> we also noticed a "Corruption of in-memory data" while running this case.
 
-HEAD commit:    619f0b6fad52 Merge tag 'seccomp-v6.13-rc8' of git://git.ke..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=15c7cfc4580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=d1cb4a1f148c0861
-dashboard link: https://syzkaller.appspot.com/bug?extid=8b512026a7ec10dcbdd9
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=11e6c7c4580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=13c7cfc4580000
+Thanks for the report. This is a real issue and there is a fix under
+review now:
 
-Downloadable assets:
-disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7feb34a89c2a/non_bootable_disk-619f0b6f.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/8f14bca15c5e/vmlinux-619f0b6f.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/42522ef81b09/bzImage-619f0b6f.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+8b512026a7ec10dcbdd9@syzkaller.appspotmail.com
-
-------------[ cut here ]------------
-WARNING: CPU: 1 PID: 1139 at net/mac80211/sta_info.c:737 sta_info_insert_check net/mac80211/sta_info.c:737 [inline]
-WARNING: CPU: 1 PID: 1139 at net/mac80211/sta_info.c:737 sta_info_insert_rcu+0x24a/0x1b70 net/mac80211/sta_info.c:942
-Modules linked in:
-CPU: 1 UID: 0 PID: 1139 Comm: kworker/u32:7 Not tainted 6.13.0-rc7-syzkaller-00043-g619f0b6fad52 #0
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
-Workqueue: events_unbound cfg80211_wiphy_work
-RIP: 0010:sta_info_insert_check net/mac80211/sta_info.c:737 [inline]
-RIP: 0010:sta_info_insert_rcu+0x24a/0x1b70 net/mac80211/sta_info.c:942
-Code: 0f b7 83 ae 20 00 00 31 ff 44 31 e0 0f b7 c0 09 d0 89 c6 89 44 24 08 e8 e4 49 fd f6 8b 44 24 08 85 c0 75 7f e8 d7 4e fd f6 90 <0f> 0b 90 c7 44 24 14 ea ff ff ff e8 c6 4e fd f6 48 8b 34 24 4c 89
-RSP: 0018:ffffc900064b7ab0 EFLAGS: 00010293
-RAX: 0000000000000000 RBX: ffff888030c1cd80 RCX: ffffffff8a9cd65b
-RDX: ffff8880277dc880 RSI: ffffffff8a9cd5c9 RDI: 0000000000000001
-RBP: ffffffff905f7cb4 R08: 0000000000000001 R09: 0000000000000000
-R10: 0000000000000001 R11: 0000000000000005 R12: 000000000000ffff
-R13: ffff888031e30048 R14: 00000000ffffffff R15: ffff888030338e40
-FS:  0000000000000000(0000) GS:ffff88806a700000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f35d7d620e0 CR3: 000000002e2c6000 CR4: 0000000000352ef0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- ieee80211_ocb_finish_sta net/mac80211/ocb.c:102 [inline]
- ieee80211_ocb_work+0x30c/0x650 net/mac80211/ocb.c:136
- ieee80211_iface_work+0x8ad/0xf00 net/mac80211/iface.c:1697
- cfg80211_wiphy_work+0x3de/0x560 net/wireless/core.c:440
- process_one_work+0x9c5/0x1ba0 kernel/workqueue.c:3236
- process_scheduled_works kernel/workqueue.c:3317 [inline]
- worker_thread+0x6c8/0xf00 kernel/workqueue.c:3398
- kthread+0x2c1/0x3a0 kernel/kthread.c:389
- ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
- </TASK>
+https://lore.kernel.org/all/Z4XWx5X0doetOJni@gondor.apana.org.au/
 
 
----
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+--breno
 
