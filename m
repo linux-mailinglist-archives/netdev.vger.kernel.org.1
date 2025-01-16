@@ -1,95 +1,130 @@
-Return-Path: <netdev+bounces-158705-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158707-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 50E29A13085
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 02:13:03 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D0D5DA130A2
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 02:18:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D90543A51E6
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 01:12:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 01D9D161451
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 01:18:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB5375672;
-	Thu, 16 Jan 2025 01:12:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BFD7208A9;
+	Thu, 16 Jan 2025 01:18:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sPCLEkOB"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Lqq/Y/90"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-181.mta1.migadu.com (out-181.mta1.migadu.com [95.215.58.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82F851C695;
-	Thu, 16 Jan 2025 01:12:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A8D929A1
+	for <netdev@vger.kernel.org>; Thu, 16 Jan 2025 01:18:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736989979; cv=none; b=mM1qRZsapb08aO06eK+BrZVgfU9DJmRa3AbwtipCYuLWV+sHZE1sbIBwQeUqEVzg1g/Y8oZJbMf7iEWzxdUw4+NbfBFXrF/sSR/bekiAHTQLkjUVlF6n9S7mJjRqJDRoJY/zvagLn+QHtC5wqBEkvh6xBL0Epu8a8q/pO+FxKTA=
+	t=1736990319; cv=none; b=OwmAFe1thTmxTByTjyEi8d8W9sUgki4wLUJpX6NI9AFOXIdVj1VAMHmmfFd+qHCCoOSf0pdUhbJyNLGphvVwpMmxg8hOOrYX3Pm7Y8JzFLI2nyUA3C0KRpGRfzcU1TpMP/A7zOpjmAUmZiduW0Z1z88miUvPx/zyFGmvUAKD42g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736989979; c=relaxed/simple;
-	bh=66RvYYm+yQPiJ81hmrvb4gjGExU4ffsA/G2xU7ulz58=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=RQJowwGbpcACKlVZBw/gEL/qFq8MjJ44oFmSgHGYEXhW5VRrpQgy9U9me6YDCZ9h7ZyWeDq1Ys4AeNJJO2p0Rk/ZmRBlQfdyrb6DBdjx93L0UtMBkAko0RtbQybu17WWq1jF1syTWBeNko98c//YPeDqISaaKN8kMPwRL0hroFM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sPCLEkOB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8A821C4CED1;
-	Thu, 16 Jan 2025 01:12:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736989979;
-	bh=66RvYYm+yQPiJ81hmrvb4gjGExU4ffsA/G2xU7ulz58=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=sPCLEkOBtIHjftAsWeJFS0uJ/0JgWwjEF+Vr0NcWSucDMCBeWfeFfnymmayDxh7/s
-	 5IBRaBA30XBMQaszzM8CnPZlqlcMN0LbcqOZmE2mNjg17yaXsgeoCfLlhY2dvn8FYP
-	 RfbCrDiwOpJS5sZLTc7kSvQ/SMYR4ETvnwaBNSKf7YTYk+P9oSHdBYtMkmi5ZakrFp
-	 /b6HC0XejRavmX3zyV9ib5T10rxOegcpTUjUmjChjrAJ2tyDmMNhzBhHH/QbK0+i0/
-	 YHg43HvRxVSzl8FkcMe7QxKrLyTYiA28ROsTMzfw6odlZYLKVxwQW4+WXGaAw0AQQn
-	 m34H3m2ZP2Skw==
-Date: Wed, 15 Jan 2025 17:12:57 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: David Wei <dw@davidwei.uk>
-Cc: io-uring@vger.kernel.org, netdev@vger.kernel.org, Jens Axboe
- <axboe@kernel.dk>, Pavel Begunkov <asml.silence@gmail.com>, Paolo Abeni
- <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jesper Dangaard Brouer <hawk@kernel.org>, David
- Ahern <dsahern@kernel.org>, Mina Almasry <almasrymina@google.com>,
- Stanislav Fomichev <stfomichev@gmail.com>, Joe Damato <jdamato@fastly.com>,
- Pedro Tammela <pctammela@mojatatu.com>
-Subject: Re: [PATCH net-next v10 18/22] io_uring/zcrx: set pp memory
- provider for an rx queue
-Message-ID: <20250115171257.04289cc9@kernel.org>
-In-Reply-To: <20250108220644.3528845-19-dw@davidwei.uk>
-References: <20250108220644.3528845-1-dw@davidwei.uk>
-	<20250108220644.3528845-19-dw@davidwei.uk>
+	s=arc-20240116; t=1736990319; c=relaxed/simple;
+	bh=svejckkpxT1tNqB6vLFqAhoPEzrsLt9DXVcYfXYAUf0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=hwmBCtQbM5fB0rfAmvqZ64M5T527ZFA5k3NhZKae5pHnvho5bnPUkR+tTQZl7DOT+J57xtnOaTHZttCPjvo4m4UARhTj/YpvkzbhmW6UBkW9Q31h16bTk431CslAJjVtRcJS8i+dcpvdCYuTLpEs3Jy/Pv4fWKwnS9cFjaSR/cQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Lqq/Y/90; arc=none smtp.client-ip=95.215.58.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <d9601490-26f6-4aaf-80f0-0c92464e0c42@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1736990305;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=R5t/XcH9zAzEGWfzylUtnUHKUkj+2hXiOa7AVb7ZOuQ=;
+	b=Lqq/Y/90qwJJvRkRrVRlgef040PV2dUL0d9tRXBESabnTLObFX+dWxfFswTQoZEvaG4y/P
+	4Hy+tTxMEwMLl1GHggEdzqoXMWcZADmLlIntIgrQsXPnr1YwaizO9HJ3003GaQIecFqwgb
+	5uQFn/f/HyyJLM+MAmY9yixFxLkW/Hg=
+Date: Wed, 15 Jan 2025 17:18:16 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Subject: Re: [PATCH net-next v5 13/15] net-timestamp: support tcp_sendmsg for
+ bpf extension
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, dsahern@kernel.org, willemdebruijn.kernel@gmail.com,
+ willemb@google.com, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
+ eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev,
+ john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me,
+ haoluo@google.com, jolsa@kernel.org, horms@kernel.org, bpf@vger.kernel.org,
+ netdev@vger.kernel.org
+References: <20250112113748.73504-1-kerneljasonxing@gmail.com>
+ <20250112113748.73504-14-kerneljasonxing@gmail.com>
+ <5d9ba064-3288-4926-b9dc-3119bb3404c1@linux.dev>
+ <CAL+tcoCe-Ee92r5B7LwV8GCxEBWDzq3X_g_oOWWzo7-u4wYZzw@mail.gmail.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+Content-Language: en-US
+In-Reply-To: <CAL+tcoCe-Ee92r5B7LwV8GCxEBWDzq3X_g_oOWWzo7-u4wYZzw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Wed,  8 Jan 2025 14:06:39 -0800 David Wei wrote:
-> +	ASSERT_RTNL();
-> +
-> +	if (ifq_idx >= dev->num_rx_queues)
+On 1/15/25 4:41 PM, Jason Xing wrote:
+>>> diff --git a/include/uapi/linux/bpf.h b/include/uapi/linux/bpf.h
+>>> index a0aff1b4eb61..87420c0f2235 100644
+>>> --- a/include/uapi/linux/bpf.h
+>>> +++ b/include/uapi/linux/bpf.h
+>>> @@ -7037,6 +7037,9 @@ enum {
+>>>                                         * feature is on. It indicates the
+>>>                                         * recorded timestamp.
+>>>                                         */
+>>> +     BPF_SOCK_OPS_TS_TCP_SND_CB,     /* Called when every tcp_sendmsg
+>>> +                                      * syscall is triggered
+>>> +                                      */
+>>
+>> UDP will need this also?
+> 
+> Yep.
 
-_real_ rx queues.
+Then the TCP naming will need to be adjusted.
 
-We don't allow configuring disabled queues today.
+While on UDP, how the UDP bpf callback will look like during sendmsg?
 
-> +		return -EINVAL;
-> +	ifq_idx = array_index_nospec(ifq_idx, dev->num_rx_queues);
-> +
-> +	rxq = __netif_get_rx_queue(ifq->dev, ifq_idx);
-> +	if (rxq->mp_params.mp_priv)
-> +		return -EEXIST;
-> +
-> +	ifq->if_rxq = ifq_idx;
-> +	rxq->mp_params.mp_ops = &io_uring_pp_zc_ops;
-> +	rxq->mp_params.mp_priv = ifq;
-> +	ret = netdev_rx_queue_restart(ifq->dev, ifq->if_rxq);
-> +	if (ret)
-> +		goto fail;
+>>> @@ -1067,10 +1068,15 @@ int tcp_sendmsg_locked(struct sock *sk, struct msghdr *msg, size_t size)
+>>>        int flags, err, copied = 0;
+>>>        int mss_now = 0, size_goal, copied_syn = 0;
+>>>        int process_backlog = 0;
+>>> +     u32 first_write_seq = 0;
+>>>        int zc = 0;
+>>>        long timeo;
+>>>
+>>>        flags = msg->msg_flags;
+>>> +     if (SK_BPF_CB_FLAG_TEST(sk, SK_BPF_CB_TX_TIMESTAMPING)) {
+>>> +             first_write_seq = tp->write_seq;
+>>> +             bpf_skops_tx_timestamping(sk, NULL, BPF_SOCK_OPS_TS_TCP_SND_CB);
+>>
+>> My preference is to skip this bpf callout for now and depends on a bpf trace
+>> program if it is really needed.
+> 
+> I have no idea if the bpf program wants to record the timestamp here
+> without the above three lines? Please enlighten me more. Thanks in
+> advance.
+> 
+> I guess there is one way which I don't know yet to monitor at the
+> beginning of tcp_sendmsg_locked().
 
-Hm. Could you move all this (and the rtnl_lock() in the caller) 
-to a helper under net/ ? Or does something io_uring-y here need 
-to be protected by rtnl_lock()?
+The tracing bpf program (fentry in particular here). Give the one-liner bpftrace 
+script a try.
+
+Take a look at trace_tcp_connect in test_sk_storage_tracing.c. It uses fentry 
+and also bpf_sk_storage_get.
+
+If tcp_sendmsg_locked is inline-d, it can go up to the tcp_sendmsg(). It would 
+be nice to have a stable bpf callback if it is really useful but I suspect this 
+can be revisited later with the UDP support.
+
+[ I will followup other replies later. ]
+
 
