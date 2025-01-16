@@ -1,149 +1,200 @@
-Return-Path: <netdev+bounces-158915-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158916-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8442BA13BF9
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 15:17:25 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1C02A13C4A
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 15:32:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F0EA43A9F52
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 14:17:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F12EB188CAC9
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 14:32:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06F81198A29;
-	Thu, 16 Jan 2025 14:17:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C43F22B5A1;
+	Thu, 16 Jan 2025 14:32:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 162EF8633A
-	for <netdev@vger.kernel.org>; Thu, 16 Jan 2025 14:17:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1136424A7C9;
+	Thu, 16 Jan 2025 14:32:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737037041; cv=none; b=HEMEzGlZpqBK7QG1Wv9sTX9rVRgUfU3cfqy+78UA2lGiC7vOGDkuEzAP3yrY0u1Vc98q6CDoo3xzH9wnhc7M2ShNs2Mrt+I++dPGKOMwjTNs8y2gBHOCYiGIWBMtdSYIf/BFzQwzbI2aKWLJo6zJRsgxmV+ypz9vdLso5ip2w9E=
+	t=1737037939; cv=none; b=tbvR0kB89BpYPSzIHUJ2rVEu9k4QwC21V54c+uTt+UdUzPhL6uyY2vrvwJdqnWAl6bKL8Q3ycEQ1bNsfm/p1d849mh8eZK98O+gpPWr30IGz5+xj3PSp1euYPsU9c9uhbsAndnoPi1QLtHichfTcTZrf3cRnVUFJkqxs90EN5Cw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737037041; c=relaxed/simple;
-	bh=8kM58Shj9T4pC5Rmb3vmf6xTklpSgJjj0bEZuGF31H0=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=bvd0Z7Y+WnKBKOi1g6CpWeNmzc47oBQu7v6/0Qr0WjbUWpg/R5vxVwb52sO0tLZn5L8Z0JFAGLbbbhXwKcC+CCd1rEpo6LSwWkaPIyK35LjgQHJusJ/R9cIey2HiR69hkZ3HefN8Sj5knka/zv11K/7xCzZvj9vGJwRtEEPbpzk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
+	s=arc-20240116; t=1737037939; c=relaxed/simple;
+	bh=a+J4RqokX+OyBvlrm7FDmekCYwN+zCu6y5izBNDqtjg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=lFhnNDwlUjk8YErWYmLRHJvyItzOKx6QEPuUztztiB1s9C7T9lrAkJmB6xbQBWYRRXyKDcMBt7LHL+Bi/Z2SJtu9XCrFukwOOjD6OjLFYPcz8wDRGXYKuxxInVEJ7OVpB3WrrBjdleKV3lrBrMDPhYyHrjFe2PumWhenxPV9CHc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.234])
-	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4YYlGf41Mqz2Dkdv;
-	Thu, 16 Jan 2025 22:14:02 +0800 (CST)
-Received: from kwepemg200003.china.huawei.com (unknown [7.202.181.30])
-	by mail.maildlp.com (Postfix) with ESMTPS id 5246A140109;
-	Thu, 16 Jan 2025 22:17:14 +0800 (CST)
-Received: from huawei.com (10.175.101.6) by kwepemg200003.china.huawei.com
- (7.202.181.30) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Thu, 16 Jan
- 2025 22:17:13 +0800
-From: Liu Jian <liujian56@huawei.com>
-To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <horms@kernel.org>, <stephen@networkplumber.org>,
-	<matthias.tafelmeier@gmx.net>
-CC: <netdev@vger.kernel.org>, <liujian56@huawei.com>
-Subject: [PATCH net] net: let net.core.dev_weight always be non-zero
-Date: Thu, 16 Jan 2025 22:30:53 +0800
-Message-ID: <20250116143053.4146855-1-liujian56@huawei.com>
-X-Mailer: git-send-email 2.34.1
+Received: from mail.maildlp.com (unknown [172.19.162.254])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4YYlc40QVBzbnp0;
+	Thu, 16 Jan 2025 22:29:08 +0800 (CST)
+Received: from kwepemg500017.china.huawei.com (unknown [7.202.181.81])
+	by mail.maildlp.com (Postfix) with ESMTPS id A571E180101;
+	Thu, 16 Jan 2025 22:32:11 +0800 (CST)
+Received: from [10.174.179.155] (10.174.179.155) by
+ kwepemg500017.china.huawei.com (7.202.181.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Thu, 16 Jan 2025 22:32:09 +0800
+Message-ID: <751d31cc-640f-47fc-bb5e-1f9fbdd6316b@huawei.com>
+Date: Thu, 16 Jan 2025 22:32:09 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: =?UTF-8?B?TW96aWxsYSBUaHVuZGVyYmlyZCDmtYvor5XniYg=?=
+Subject: Re: [PATCH] SUNRPC: Set tk_rpc_status when RPC_TASK_SIGNALLED is
+ detected
+To: yangerkun <yangerkun@huawei.com>, <trondmy@kernel.org>, <anna@kernel.org>,
+	<chuck.lever@oracle.com>, <jlayton@kernel.org>, <neilb@suse.de>,
+	<okorniev@redhat.com>, <Dai.Ngo@oracle.com>, <tom@talpey.com>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <horms@kernel.org>
+CC: <linux-nfs@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <yukuai1@huaweicloud.com>, <houtao1@huawei.com>,
+	<yi.zhang@huawei.com>, <lilingfeng@huaweicloud.com>
+References: <20250114144101.2511043-1-lilingfeng3@huawei.com>
+ <fed3cd85-0a15-ae30-b167-84881d6a5efd@huawei.com>
+From: Li Lingfeng <lilingfeng3@huawei.com>
+In-Reply-To: <fed3cd85-0a15-ae30-b167-84881d6a5efd@huawei.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- kwepemg200003.china.huawei.com (7.202.181.30)
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ kwepemg500017.china.huawei.com (7.202.181.81)
 
-The following problem was encountered during stability test:
-
-(NULL net_device): NAPI poll function process_backlog+0x0/0x530 \
-	returned 1, exceeding its budget of 0.
-------------[ cut here ]------------
-list_add double add: new=ffff88905f746f48, prev=ffff88905f746f48, \
-	next=ffff88905f746e40.
-WARNING: CPU: 18 PID: 5462 at lib/list_debug.c:35 \
-	__list_add_valid_or_report+0xf3/0x130
-CPU: 18 UID: 0 PID: 5462 Comm: ping Kdump: loaded Not tainted 6.13.0-rc7+
-RIP: 0010:__list_add_valid_or_report+0xf3/0x130
-Call Trace:
-? __warn+0xcd/0x250
-? __list_add_valid_or_report+0xf3/0x130
-enqueue_to_backlog+0x923/0x1070
-netif_rx_internal+0x92/0x2b0
-__netif_rx+0x15/0x170
-loopback_xmit+0x2ef/0x450
-dev_hard_start_xmit+0x103/0x490
-__dev_queue_xmit+0xeac/0x1950
-ip_finish_output2+0x6cc/0x1620
-ip_output+0x161/0x270
-ip_push_pending_frames+0x155/0x1a0
-raw_sendmsg+0xe13/0x1550
-__sys_sendto+0x3bf/0x4e0
-__x64_sys_sendto+0xdc/0x1b0
-do_syscall_64+0x5b/0x170
-entry_SYSCALL_64_after_hwframe+0x76/0x7e
-
-The reproduction command is as follows:
-sysctl -w net.core.dev_weight=0
-Ping 127.0.0.1
-
-This is because when the napi's weight is set to 0, process_backlog() may
-return 0 and clear the NAPI_STATE_SCHED bit of napi->state, causing this
-napi to be re-polled in net_rx_action() until __do_softirq() times out.
-Since the NAPI_STATE_SCHED bit has been cleared, napi_schedule_rps() can
-be retriggered in enqueue_to_backlog(), causing this issue.
-
-Making the napi's weight always non-zero solves this problem.
-
-Fixes: e38766054509 ("[NET]: Fix sysctl net.core.dev_weight")
-Fixes: 3d48b53fb2ae ("net: dev_weight: TX/RX orthogonality")
-Signed-off-by: Liu Jian <liujian56@huawei.com>
----
- net/core/sysctl_net_core.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
-
-diff --git a/net/core/sysctl_net_core.c b/net/core/sysctl_net_core.c
-index cb8d32e5c14e..ad2741f1346a 100644
---- a/net/core/sysctl_net_core.c
-+++ b/net/core/sysctl_net_core.c
-@@ -319,7 +319,7 @@ static int proc_do_dev_weight(const struct ctl_table *table, int write,
- 	int ret, weight;
- 
- 	mutex_lock(&dev_weight_mutex);
--	ret = proc_dointvec(table, write, buffer, lenp, ppos);
-+	ret = proc_dointvec_minmax(table, write, buffer, lenp, ppos);
- 	if (!ret && write) {
- 		weight = READ_ONCE(weight_p);
- 		WRITE_ONCE(net_hotdata.dev_rx_weight, weight * dev_weight_rx_bias);
-@@ -412,6 +412,7 @@ static struct ctl_table net_core_table[] = {
- 		.maxlen		= sizeof(int),
- 		.mode		= 0644,
- 		.proc_handler	= proc_do_dev_weight,
-+		.extra1         = SYSCTL_ONE,
- 	},
- 	{
- 		.procname	= "dev_weight_rx_bias",
-@@ -419,6 +420,7 @@ static struct ctl_table net_core_table[] = {
- 		.maxlen		= sizeof(int),
- 		.mode		= 0644,
- 		.proc_handler	= proc_do_dev_weight,
-+		.extra1         = SYSCTL_ONE,
- 	},
- 	{
- 		.procname	= "dev_weight_tx_bias",
-@@ -426,6 +428,7 @@ static struct ctl_table net_core_table[] = {
- 		.maxlen		= sizeof(int),
- 		.mode		= 0644,
- 		.proc_handler	= proc_do_dev_weight,
-+		.extra1         = SYSCTL_ONE,
- 	},
- 	{
- 		.procname	= "netdev_max_backlog",
--- 
-2.34.1
-
+在 2025/1/16 19:43, yangerkun 写道:
+> Hi,
+>
+> Thanks for the patch.
+>
+> Before 39494194f93b("SUNRPC: Fix races with rpc_killall_tasks()", every
+> time we set RPC_TASK_SIGNALLED, when we go through __rpc_execute, this
+> rpc_task will immediate break and exist.
+>
+> However after that, __rpc_execute won't judge RPC_TASK_SIGNNALED, so for
+> the case like you point out below, even after your commit
+> rpc_check_timeout will help break and exist eventually, but this
+> rpc_task has already do some work. I prefer reintroduce judging
+> RPC_TASK_SIGNNALED in __rpc_execute to help exist immediatly.
+Thanks for your advice, I will send v2 soon.
+>
+> 在 2025/1/14 22:41, Li Lingfeng 写道:
+>> Commit 39494194f93b("SUNRPC: Fix races with rpc_killall_tasks()") adds
+>> rpc_task_set_rpc_status before setting RPC_TASK_SIGNALLED in
+>> rpc_signal_task, ensuring that rpc_status is definitely set when
+>> RPC_TASK_SIGNALLED is set.
+>> Therefore, it seems unnecessary to set rpc_status again after detecting
+>> RPC_TASK_SIGNALLED in rpc_check_timeout.
+>>
+>> However, in some exceptional cases, invalid and endlessly looping
+>> rpc_tasks may be generated. The rpc_call_rpcerror in 
+>> rpc_check_timeout can
+>> timely terminate such rpc_tasks. Removing rpc_call_rpcerror may cause 
+>> the
+>> rpc_task to fall into an infinite loop.
+>>
+>> For example, in the following situation:
+>> nfs4_close_done
+>>   // get err from server
+>>   nfs4_async_handle_exception
+>>   // goto out_restart
+>>                              // umount -f
+>>                              nfs_umount_begin
+>>                               rpc_killall_tasks
+>>                                rpc_signal_task
+>>                                 rpc_task_set_rpc_status
+>>                                  task->tk_rpc_status = -ERESTARTSYS
+>>                                  set_bit
+>>                                  // set RPC_TASK_SIGNALLED to 
+>> tk_runstate
+>>   rpc_restart_call_prepare
+>>    __rpc_restart_call
+>>     task->tk_rpc_status = 0
+>>     // clear tk_rpc_status
+>>    ...
+>>    rpc_prepare_task
+>>     nfs4_close_prepare
+>>      nfs4_setup_sequence
+>>       rpc_call_start
+>>        task->tk_action = call_start
+>>
+>> At this point, an rpc_task with RPC_TASK_SIGNALLED set but tk_rpc_status
+>> as 0 will be generated. This rpc_task will fall into the following loop:
+>> call_encode --> call_transmit --> call_transmit_status --> call_status
+>> --> call_encode.
+>>
+>> Since RPC_TASK_SIGNALLED is set, no request will be sent in 
+>> call_transmit.
+>> Similarly, since RPC_TASK_SIGNALLED is set, rq_majortimeo will not be
+>> updated in call_status --> rpc_check_timeout, which will cause 
+>> -ETIMEDOUT
+>> to be directly set to tk_status in call_transmit_status -->
+>> xprt_request_wait_receive --> xprt_wait_for_reply_request_def -->
+>> rpc_sleep_on_timeout --> __rpc_sleep_on_priority_timeout.
+>>
+>> Here is the state and loop process of the rpc_task:
+>> tk_runstate:
+>> RPC_TASK_RUNNING RPC_TASK_ACTIVE RPC_TASK_NEED_RECV RPC_TASK_SIGNALLED
+>> tk_xprt->state:
+>> XPRT_CONNECTED XPRT_BOUND
+>> tk_flags
+>> RPC_TASK_ASYNC RPC_TASK_MOVEABLE RPC_TASK_DYNAMIC RPC_TASK_SOFT
+>> RPC_TASK_NO_RETRANS_TIMEOUT RPC_TASK_CRED_NOREF
+>>
+>> call_encode
+>>   xprt_request_enqueue_transmit
+>>    set_bit // RPC_TASK_NEED_XMIT
+>>   task->tk_action = call_transmit
+>>
+>> call_transmit
+>>   task->tk_action = call_transmit_status
+>>   xprt_transmit
+>>    xprt_request_transmit
+>>     // check RPC_TASK_SIGNALLED and goto out_dequeue
+>>     xprt_request_dequeue_transmit
+>>      xprt_request_dequeue_transmit_locked
+>>       test_and_clear_bit // RPC_TASK_NEED_XMIT
+>>
+>> call_transmit_status
+>>   task->tk_action = call_status
+>>   xprt_request_wait_receive
+>>    xprt_wait_for_reply_request_def
+>>     xprt_request_timeout // get timeout
+>>      req->rq_majortimeo // rq_majortimeo will not be updated
+>>     rpc_sleep_on_timeout
+>>      __rpc_sleep_on_priority_timeout
+>>       task->tk_status = -ETIMEDOUT // set ETIMEDOUT
+>>
+>> call_status
+>>   task->tk_action = call_encode
+>>   rpc_check_timeout
+>>    // check RPC_TASK_SIGNALLED and skip xprt_reset_majortimeo
+>>
+>> Fix it by adding rpc_call_rpcerror back.
+>>
+>> Fixes: 39494194f93b ("SUNRPC: Fix races with rpc_killall_tasks()")
+>> Signed-off-by: Li Lingfeng <lilingfeng3@huawei.com>
+>> ---
+>>   net/sunrpc/clnt.c | 4 +++-
+>>   1 file changed, 3 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/net/sunrpc/clnt.c b/net/sunrpc/clnt.c
+>> index 0090162ee8c3..0acdff19a37c 100644
+>> --- a/net/sunrpc/clnt.c
+>> +++ b/net/sunrpc/clnt.c
+>> @@ -2509,8 +2509,10 @@ rpc_check_timeout(struct rpc_task *task)
+>>   {
+>>       struct rpc_clnt    *clnt = task->tk_client;
+>>   -    if (RPC_SIGNALLED(task))
+>> +    if (RPC_SIGNALLED(task)) {
+>> +        rpc_call_rpcerror(task, -ERESTARTSYS);
+>>           return;
+>> +    }
+>>         if (xprt_adjust_timeout(task->tk_rqstp) == 0)
+>>           return;
 
