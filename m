@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-159071-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159072-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC3BDA1444A
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 22:56:42 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 583B6A1444D
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 22:57:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0025716BB3D
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 21:56:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1953F3AAA1E
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 21:56:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A664A243864;
-	Thu, 16 Jan 2025 21:56:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D43D24386F;
+	Thu, 16 Jan 2025 21:56:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pKdJPnhD"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KuQ4+eKl"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82038243861
-	for <netdev@vger.kernel.org>; Thu, 16 Jan 2025 21:56:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27616243853
+	for <netdev@vger.kernel.org>; Thu, 16 Jan 2025 21:56:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737064560; cv=none; b=cgb1b4OHlS53vYGsG8je3EtnvOS99/y2SQnc0igyB5nbQjHrML52on46swmOCu0+AXahagAJcVlvr7Mwmo75eFN8hdxRrR2bRXb2f8Huw8nTcZB+zcF+J66VSx6Tu+vXRSvzBkaCQwI++6CGAu9eVZqpl/6+yJT/CFokumW1AqA=
+	t=1737064561; cv=none; b=aJBFuhBxGaNd2T2k03n+1yWtxPXvTctA8bYPulhofz3N0zrZaaxaaA2Oxh/4v4bOAGBc4q+T0LKky+2230E/8deCM9rrSwJjIiGo9TohWYOF+3apxqhmnacFF4CqgSkrpoq5NfZW5D0LTXuftdpEf6jMY71Jf3lk3/QqQ1C5Yys=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737064560; c=relaxed/simple;
-	bh=5EbEcp2FZ+JVu3cf+ci5oG4EMKcdkO5xHtXX6DAx/FQ=;
+	s=arc-20240116; t=1737064561; c=relaxed/simple;
+	bh=3a1Kgxkp7cFO0SKRQVCaOOhbnuY6OHqdt5jjCtEd06k=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=dJqPxjKID+GEoC7JDUl+eV2HA37edW465IatyDlvRpnEizwUb/BpJ8X+JPBasflTOwJ/LJae5i7CVqIjOkSHEX/85GKC3fuRshmYkFWqDecV6F1PeVly6CHaaektAz5Z2PnxcohKARr4Znw2DmtW3yWnavVBErWjmw42YubhjPQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pKdJPnhD; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EE533C4CED6;
-	Thu, 16 Jan 2025 21:55:59 +0000 (UTC)
+	 MIME-Version; b=WP8KIYL+ryOZ8qlLYP7EQP0aRNL/yYPwu2MtfHSGbObMeeNnBxmzfpmlA2CGf6G760hn4RR8JO2QnlXxTKdsalyi8b23ZnPm5xhs9TmJEtxW0rEhTRDh0vfEpGGaS3HPQvn7VkvbhgTCUS9YkMl3Aa9r0n45gxArzWIT8eSL5X0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KuQ4+eKl; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E4C8BC4CED6;
+	Thu, 16 Jan 2025 21:56:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737064560;
-	bh=5EbEcp2FZ+JVu3cf+ci5oG4EMKcdkO5xHtXX6DAx/FQ=;
+	s=k20201202; t=1737064561;
+	bh=3a1Kgxkp7cFO0SKRQVCaOOhbnuY6OHqdt5jjCtEd06k=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=pKdJPnhDOv09YYb02lgXjFrS0OatUMnAd3wPXldarHiLC6SHiQvl6oXmT1KMtAmmU
-	 wJP64r4RjuqAHCCCJHzvo6DZuMGmddSJnjJi7xAKEx+RtzKvbImDAGXGayxr5E7ex8
-	 RnnwsAIvfw0x8HqNeiSZzwX6Bga1ZZEdCdn2d9e4tFR0hAv1hY2cf5GmQHsX+FGUol
-	 6olPD14RzRmIFJcOvemfz0+cngsWjGkX95fCBMPxVtmi51B5MMGylU0GlFZOAhcq4N
-	 Elnf3YlBxbgMix9fkXRRwPcN56C1H+7GCcfgK+itiqfhBDIBeKfzoLaAP0dW7J1V/A
-	 8Y17NeSoZPMbw==
+	b=KuQ4+eKlpj3HjqxmsF61YZPpaPQBnt4tRJhURbb4MfXUqoE5sJM8yjVI8Ah8Ig/gQ
+	 DE37yI+TqFhjoNxXtXXyVEEh1ePufpK+EKVHtyqjwXCsu95iuCoKVC62audKDAJesk
+	 wyV/dQKEIYQNn345jNnkao+PvjWzsudxwUJewFpKbHdNKN4In5WFyq3zI/pJ47zfmH
+	 mvCMYBrtP81JPecx69VDZor36+CA7sFV1yZRSz3PNpMpYZkzu1J+9lQMRAMMh+auAd
+	 P/rFFjH4Jj2hRG3xhgmEZwGAy7HzhkAGFBmerxqOCxGDVvKGsxTxto9gqrSLpRe8Yk
+	 PYRK1cC/T2NZw==
 From: Saeed Mahameed <saeed@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -52,9 +52,9 @@ Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	Gal Pressman <gal@nvidia.com>,
 	Leon Romanovsky <leonro@nvidia.com>,
 	Dragos Tatulea <dtatulea@nvidia.com>
-Subject: [net-next 10/11] net/mlx5e: Implement queue mgmt ops and single channel swap
-Date: Thu, 16 Jan 2025 13:55:28 -0800
-Message-ID: <20250116215530.158886-11-saeed@kernel.org>
+Subject: [net-next 11/11] net/mlx5e: Support ethtool tcp-data-split settings
+Date: Thu, 16 Jan 2025 13:55:29 -0800
+Message-ID: <20250116215530.158886-12-saeed@kernel.org>
 X-Mailer: git-send-email 2.48.0
 In-Reply-To: <20250116215530.158886-1-saeed@kernel.org>
 References: <20250116215530.158886-1-saeed@kernel.org>
@@ -68,135 +68,96 @@ Content-Transfer-Encoding: 8bit
 
 From: Saeed Mahameed <saeedm@nvidia.com>
 
-The bulk of the work is done in mlx5e_queue_mem_alloc, where we allocate
-and create the new channel resources, similar to
-mlx5e_safe_switch_params, but here we do it for a single channel using
-existing params, sort of a clone channel.
-To swap the old channel with the new one, we deactivate and close the
-old channel then replace it with the new one, since the swap procedure
-doesn't fail in mlx5, we do it all in one place (mlx5e_queue_start).
+Try enabling HW GRO when requested.
 
 Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
 Reviewed-by: Dragos Tatulea <dtatulea@nvidia.com>
 Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
 ---
- .../net/ethernet/mellanox/mlx5/core/en_main.c | 96 +++++++++++++++++++
- 1 file changed, 96 insertions(+)
+ .../ethernet/mellanox/mlx5/core/en_ethtool.c  | 49 +++++++++++++++++++
+ 1 file changed, 49 insertions(+)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-index 340ed7d3feac..1e03f2afe625 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-@@ -5489,6 +5489,101 @@ static const struct netdev_stat_ops mlx5e_stat_ops = {
- 	.get_base_stats      = mlx5e_get_base_stats,
- };
- 
-+struct mlx5_qmgmt_data {
-+	struct mlx5e_channel *c;
-+	struct mlx5e_channel_param cparam;
-+};
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c b/drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c
+index cae39198b4db..ee188e033e99 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c
+@@ -349,6 +349,14 @@ void mlx5e_ethtool_get_ringparam(struct mlx5e_priv *priv,
+ 		(priv->channels.params.packet_merge.type == MLX5E_PACKET_MERGE_SHAMPO) ?
+ 		ETHTOOL_TCP_DATA_SPLIT_ENABLED :
+ 		ETHTOOL_TCP_DATA_SPLIT_DISABLED;
 +
-+static int mlx5e_queue_mem_alloc(struct net_device *dev, void *newq, int queue_index)
-+{
-+	struct mlx5_qmgmt_data *new = (struct mlx5_qmgmt_data *)newq;
-+	struct mlx5e_priv *priv = netdev_priv(dev);
-+	struct mlx5e_channels *chs = &priv->channels;
-+	struct mlx5e_params params = chs->params;
-+	struct mlx5_core_dev *mdev;
-+	int err;
-+
-+	ASSERT_RTNL();
-+	mutex_lock(&priv->state_lock);
-+	if (!test_bit(MLX5E_STATE_OPENED, &priv->state)) {
-+		err = -ENODEV;
-+		goto unlock;
-+	}
-+
-+	if (queue_index >= chs->num) {
-+		err = -ERANGE;
-+		goto unlock;
-+	}
-+
-+	if (MLX5E_GET_PFLAG(&chs->params, MLX5E_PFLAG_TX_PORT_TS) ||
-+	    chs->params.ptp_rx   ||
-+	    chs->params.xdp_prog ||
-+	    priv->htb) {
-+		netdev_err(priv->netdev,
-+			   "Cloning channels with Port/rx PTP, XDP or HTB is not supported\n");
-+		err = -EOPNOTSUPP;
-+		goto unlock;
-+	}
-+
-+	mdev = mlx5_sd_ch_ix_get_dev(priv->mdev, queue_index);
-+	err = mlx5e_build_channel_param(mdev, &params, &new->cparam);
-+	if (err) {
-+		return err;
-+		goto unlock;
-+	}
-+
-+	err = mlx5e_open_channel(priv, queue_index, &params, NULL, &new->c);
-+unlock:
-+	mutex_unlock(&priv->state_lock);
-+	return err;
-+}
-+
-+static void mlx5e_queue_mem_free(struct net_device *dev, void *mem)
-+{
-+	struct mlx5_qmgmt_data *data = (struct mlx5_qmgmt_data *)mem;
-+
-+	/* not supposed to happen since mlx5e_queue_start never fails
-+	 * but this is how this should be implemented just in case
++	/* if HW GRO is not enabled due to external limitations but is wanted,
++	 * report HDS state as unknown so it won't get truned off explicitly.
 +	 */
-+	if (data->c)
-+		mlx5e_close_channel(data->c);
-+}
++	if (kernel_param->tcp_data_split == ETHTOOL_TCP_DATA_SPLIT_DISABLED &&
++	    priv->netdev->wanted_features & NETIF_F_GRO_HW)
++		kernel_param->tcp_data_split = ETHTOOL_TCP_DATA_SPLIT_UNKNOWN;
 +
-+static int mlx5e_queue_stop(struct net_device *dev, void *oldq, int queue_index)
+ }
+ 
+ static void mlx5e_get_ringparam(struct net_device *dev,
+@@ -361,6 +369,43 @@ static void mlx5e_get_ringparam(struct net_device *dev,
+ 	mlx5e_ethtool_get_ringparam(priv, param, kernel_param);
+ }
+ 
++static bool mlx5e_ethtool_set_tcp_data_split(struct mlx5e_priv *priv,
++					     u8 tcp_data_split)
 +{
-+	/* mlx5e_queue_start does not fail, we stop the old queue there */
-+	return 0;
++	bool enable = (tcp_data_split == ETHTOOL_TCP_DATA_SPLIT_ENABLED);
++	struct net_device *dev = priv->netdev;
++
++	if (tcp_data_split == ETHTOOL_TCP_DATA_SPLIT_UNKNOWN)
++		return true;
++
++	if (enable && !(dev->hw_features & NETIF_F_GRO_HW)) {
++		netdev_warn(dev, "TCP-data-split is not supported when GRO HW is not supported\n");
++		return false; /* GRO HW is not supported */
++	}
++
++	if (enable && (dev->features & NETIF_F_GRO_HW)) {
++		/* Already enabled */
++		dev->wanted_features |= NETIF_F_GRO_HW;
++		return true;
++	}
++
++	if (!enable && !(dev->features & NETIF_F_GRO_HW)) {
++		/* Already disabled */
++		dev->wanted_features &= ~NETIF_F_GRO_HW;
++		return true;
++	}
++
++	/* Try enable or disable GRO HW */
++	if (enable)
++		dev->wanted_features |= NETIF_F_GRO_HW;
++	else
++		dev->wanted_features &= ~NETIF_F_GRO_HW;
++
++	netdev_change_features(dev);
++
++	return enable == !!(dev->features & NETIF_F_GRO_HW);
 +}
 +
-+static int mlx5e_queue_start(struct net_device *dev, void *newq, int queue_index)
-+{
-+	struct mlx5_qmgmt_data *new = (struct mlx5_qmgmt_data *)newq;
-+	struct mlx5e_priv *priv = netdev_priv(dev);
-+	struct mlx5e_channel *old;
-+
-+	mutex_lock(&priv->state_lock);
-+
-+	/* stop and close the old */
-+	old = priv->channels.c[queue_index];
-+	mlx5e_deactivate_priv_channels(priv);
-+	/* close old before activating new, to avoid napi conflict */
-+	mlx5e_close_channel(old);
-+
-+	/* start the new */
-+	priv->channels.c[queue_index] = new->c;
-+	mlx5e_activate_priv_channels(priv);
-+	mutex_unlock(&priv->state_lock);
-+	return 0;
-+}
-+
-+static const struct netdev_queue_mgmt_ops mlx5e_queue_mgmt_ops = {
-+	.ndo_queue_mem_size	=	sizeof(struct mlx5_qmgmt_data),
-+	.ndo_queue_mem_alloc	=	mlx5e_queue_mem_alloc,
-+	.ndo_queue_mem_free	=	mlx5e_queue_mem_free,
-+	.ndo_queue_start	=	mlx5e_queue_start,
-+	.ndo_queue_stop		=	mlx5e_queue_stop,
-+};
-+
- static void mlx5e_build_nic_netdev(struct net_device *netdev)
+ int mlx5e_ethtool_set_ringparam(struct mlx5e_priv *priv,
+ 				struct ethtool_ringparam *param,
+ 				struct netlink_ext_ack *extack)
+@@ -419,6 +464,9 @@ static int mlx5e_set_ringparam(struct net_device *dev,
  {
- 	struct mlx5e_priv *priv = netdev_priv(netdev);
-@@ -5499,6 +5594,7 @@ static void mlx5e_build_nic_netdev(struct net_device *netdev)
- 	SET_NETDEV_DEV(netdev, mdev->device);
+ 	struct mlx5e_priv *priv = netdev_priv(dev);
  
- 	netdev->netdev_ops = &mlx5e_netdev_ops;
-+	netdev->queue_mgmt_ops = &mlx5e_queue_mgmt_ops;
- 	netdev->xdp_metadata_ops = &mlx5e_xdp_metadata_ops;
- 	netdev->xsk_tx_metadata_ops = &mlx5e_xsk_tx_metadata_ops;
++	if (!mlx5e_ethtool_set_tcp_data_split(priv, kernel_param->tcp_data_split))
++		return -EINVAL;
++
+ 	return mlx5e_ethtool_set_ringparam(priv, param, extack);
+ }
  
+@@ -2613,6 +2661,7 @@ const struct ethtool_ops mlx5e_ethtool_ops = {
+ 				     ETHTOOL_COALESCE_MAX_FRAMES |
+ 				     ETHTOOL_COALESCE_USE_ADAPTIVE |
+ 				     ETHTOOL_COALESCE_USE_CQE,
++	.supported_ring_params = ETHTOOL_RING_USE_TCP_DATA_SPLIT,
+ 	.get_drvinfo       = mlx5e_get_drvinfo,
+ 	.get_link          = ethtool_op_get_link,
+ 	.get_link_ext_state  = mlx5e_get_link_ext_state,
 -- 
 2.48.0
 
