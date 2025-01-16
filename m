@@ -1,60 +1,50 @@
-Return-Path: <netdev+bounces-158716-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158717-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2224DA130D4
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 02:37:21 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0FC54A130DD
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 02:40:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 46C11163648
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 01:37:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2BF5D1641AD
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 01:40:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2166E28E0F;
-	Thu, 16 Jan 2025 01:37:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AC222868B;
+	Thu, 16 Jan 2025 01:40:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fqKZIda0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DElgkymd"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF73929A1
-	for <netdev@vger.kernel.org>; Thu, 16 Jan 2025 01:37:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9C0129A1
+	for <netdev@vger.kernel.org>; Thu, 16 Jan 2025 01:40:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736991438; cv=none; b=mcr9x5FZasHryXPl8G2F4AbbVxW04lDKUwGpKioR5OUSa5XJbDFiPtfcCmOz2yR+EH6eNBc3C+zgtJWgN0Ux3O1+6q75mWQeKbDmEmytqKU8a+C5OsfUB6f07AfxySAsnx+JrI38MNPQsMTFx7m3JEMBZ76khr/3jGgOVogpRc8=
+	t=1736991609; cv=none; b=HSs6AxIK33ihvftPPxSrqhwxPMEOHrzqHaPsVUt+hpJYR1G5ADNPh3uGmi2WmXYI0LDG6920ZpzQbmJwuQ8QEH7wGjdYuJauvCF44HuxRmqMIC7CRew25bY81vrPPqzMTFKDMHSNOjwIPM55ZWzPhvkV8KScogGSMQUOW0dMRaI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736991438; c=relaxed/simple;
-	bh=SWAX39jPdx7bKPd8w+uodnCBl6x/S/Oa6E9Z6hq0SdQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZLi21TgZE7HsIOfOWeD0YFKD7aKQyedSf7ai8R/MHMWJNxsT6Rtie6Eyt/A9bmVMBgdr+nzCeTBiFEhFsB87vGa980W+6+PTqtT90SwIXph4GIMPiGVxfrskwYZk7Mu/WiUznddWq7DrvMIA4N0k7pxP7/sxhQh9ZMZ7bCRcL7k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fqKZIda0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A02BCC4CED1;
-	Thu, 16 Jan 2025 01:37:16 +0000 (UTC)
+	s=arc-20240116; t=1736991609; c=relaxed/simple;
+	bh=M0LJrANGNXotU6iod3jySHAhm3Pf9k0t50XFBHUnCcM=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=sFez57AkK3uDIoZL/W27pzooc93wlko7YjVy3tlmgXACqIJAC66w6lWeJcTdHMA0AyP4EnjZ7X/G7GD0teOVwomlBiWOobheU1E8CDNcr1cDjSL0meWgxx/ocjjqUmjQz0RBhBbGNpVq0dz5o3mZxSlTNO/JGmL128bJNVN/SHw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DElgkymd; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B5BD4C4CED1;
+	Thu, 16 Jan 2025 01:40:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736991437;
-	bh=SWAX39jPdx7bKPd8w+uodnCBl6x/S/Oa6E9Z6hq0SdQ=;
-	h=From:To:Cc:Subject:Date:From;
-	b=fqKZIda0GqnkNfWiHU24Z8wWfQtGt1wEaaWo/tQq/eFWFtTtUGULtnr+Xb6TBFPRy
-	 r0RGqcwv1IQ9NxEHG0x0MhcgiUUI3b/SWOSPdXaKi4TjpGrTuZmsenTVtZGHacp2HA
-	 vX0N85Y4v8SwJ1Iix+xUGDJWAIulY79p15urv2yXO+XPpAOAj5P4pMPuyyqE+9wmTm
-	 kcmWv6q0HZ28+9IA758LX3e1/Vdyzl8F3l8s2fiNGaBwsumSXDM1c3jQCl9Hdh5BOU
-	 RG/CECDflIALSzpaO/UU1nyf1dEMRbysIuAfXHlGUe5vCVoZoLqqiCkethFJmfynwT
-	 5o45MB2ZaEqYQ==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	Jamal Hadi Salim <jhs@mojatatu.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	xiyou.wangcong@gmail.com,
-	jiri@resnulli.us
-Subject: [PATCH net v4] net: sched: Disallow replacing of child qdisc from one parent to another
-Date: Wed, 15 Jan 2025 17:37:13 -0800
-Message-ID: <20250116013713.900000-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.48.0
+	s=k20201202; t=1736991608;
+	bh=M0LJrANGNXotU6iod3jySHAhm3Pf9k0t50XFBHUnCcM=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=DElgkymdqWTUQLOIy3PL8vVae9+2vOttEDJmVYq6IEtgJst2Fz1f9ZLaVwKcLPaUC
+	 MsHHvddG5JgVc6npI5wNd5MEVAVy4jn3FWol/CREMTLJt9aRP/VK0FEy/DrnTZrNtG
+	 b+e2z4cqz1ddXnW4cy0dMLnmHxUDgfjJx0e/d9eg1W8V6PIGRE1m4wGbv24xShvYDE
+	 9NyVAGiIV8hhGh6gKZjaKa5TSMJC08PcNQ2xkJKLqeJrqPbfJ2CnBaTXT1kSJ7aWka
+	 THDaUgcX994NhOxf5OI3BtILlMlAQBakPCu2VZYiLGUS3oWdntDCAqn6u6TYuKu/ME
+	 dD7bWjf/bY7jg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB224380AA5F;
+	Thu, 16 Jan 2025 01:40:32 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,117 +52,65 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v2 00/13][pull request] Intel Wired LAN Driver
+ Updates 2025-01-08 (ice)
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <173699163174.942981.11604439373791717150.git-patchwork-notify@kernel.org>
+Date: Thu, 16 Jan 2025 01:40:31 +0000
+References: <20250115000844.714530-1-anthony.l.nguyen@intel.com>
+In-Reply-To: <20250115000844.714530-1-anthony.l.nguyen@intel.com>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, andrew+netdev@lunn.ch, netdev@vger.kernel.org
 
-From: Jamal Hadi Salim <jhs@mojatatu.com>
+Hello:
 
-Lion Ackermann was able to create a UAF which can be abused for privilege
-escalation with the following script
+This series was applied to netdev/net-next.git (main)
+by Tony Nguyen <anthony.l.nguyen@intel.com>:
 
-Step 1. create root qdisc
-tc qdisc add dev lo root handle 1:0 drr
+On Tue, 14 Jan 2025 16:08:26 -0800 you wrote:
+> This series contains updates to ice driver only.
+> 
+> Przemek reworks implementation so that ice_init_hw() is called before
+> ice_adapter initialization. The motivation is to have ability to act
+> on the number of PFs in ice_adapter initialization. This is not done
+> here but the code is also a bit cleaner.
+> 
+> [...]
 
-step2. a class for packet aggregation do demonstrate uaf
-tc class add dev lo classid 1:1 drr
+Here is the summary with links:
+  - [net-next,v2,01/13] ice: c827: move wait for FW to ice_init_hw()
+    https://git.kernel.org/netdev/net-next/c/c37dd67c4233
+  - [net-next,v2,02/13] ice: split ice_init_hw() out from ice_init_dev()
+    https://git.kernel.org/netdev/net-next/c/4d3f59bfa2cd
+  - [net-next,v2,03/13] ice: minor: rename goto labels from err to unroll
+    https://git.kernel.org/netdev/net-next/c/5d5d9c2c0fb9
+  - [net-next,v2,04/13] ice: ice_probe: init ice_adapter after HW init
+    https://git.kernel.org/netdev/net-next/c/fb59a520bbb1
+  - [net-next,v2,05/13] ice: add recipe priority check in search
+    https://git.kernel.org/netdev/net-next/c/e81e1d79a974
+  - [net-next,v2,06/13] ice: add fw and port health reporters
+    https://git.kernel.org/netdev/net-next/c/85d6164ec56d
+  - [net-next,v2,07/13] ice: use string choice helpers
+    https://git.kernel.org/netdev/net-next/c/4c9f13a65426
+  - [net-next,v2,08/13] ice: use read_poll_timeout_atomic in ice_read_phy_tstamp_ll_e810
+    https://git.kernel.org/netdev/net-next/c/95aca43b4a82
+  - [net-next,v2,09/13] ice: rename TS_LL_READ* macros to REG_LL_PROXY_H_*
+    https://git.kernel.org/netdev/net-next/c/5b15b1f144c8
+  - [net-next,v2,10/13] ice: add lock to protect low latency interface
+    https://git.kernel.org/netdev/net-next/c/50327223a8bb
+  - [net-next,v2,11/13] ice: check low latency PHY timer update firmware capability
+    https://git.kernel.org/netdev/net-next/c/a5c69d45df27
+  - [net-next,v2,12/13] ice: implement low latency PHY timer updates
+    https://git.kernel.org/netdev/net-next/c/ef9a64c07294
+  - [net-next,v2,13/13] ice: Add in/out PTP pin delays
+    https://git.kernel.org/netdev/net-next/c/914639464b76
 
-step3. a class for nesting
-tc class add dev lo classid 1:2 drr
-
-step4. a class to graft qdisc to
-tc class add dev lo classid 1:3 drr
-
-step5.
-tc qdisc add dev lo parent 1:1 handle 2:0 plug limit 1024
-
-step6.
-tc qdisc add dev lo parent 1:2 handle 3:0 drr
-
-step7.
-tc class add dev lo classid 3:1 drr
-
-step 8.
-tc qdisc add dev lo parent 3:1 handle 4:0 pfifo
-
-step 9. Display the class/qdisc layout
-
-tc class ls dev lo
- class drr 1:1 root leaf 2: quantum 64Kb
- class drr 1:2 root leaf 3: quantum 64Kb
- class drr 3:1 root leaf 4: quantum 64Kb
-
-tc qdisc ls
- qdisc drr 1: dev lo root refcnt 2
- qdisc plug 2: dev lo parent 1:1
- qdisc pfifo 4: dev lo parent 3:1 limit 1000p
- qdisc drr 3: dev lo parent 1:2
-
-step10. trigger the bug <=== prevented by this patch
-tc qdisc replace dev lo parent 1:3 handle 4:0
-
-step 11. Redisplay again the qdiscs/classes
-
-tc class ls dev lo
- class drr 1:1 root leaf 2: quantum 64Kb
- class drr 1:2 root leaf 3: quantum 64Kb
- class drr 1:3 root leaf 4: quantum 64Kb
- class drr 3:1 root leaf 4: quantum 64Kb
-
-tc qdisc ls
- qdisc drr 1: dev lo root refcnt 2
- qdisc plug 2: dev lo parent 1:1
- qdisc pfifo 4: dev lo parent 3:1 refcnt 2 limit 1000p
- qdisc drr 3: dev lo parent 1:2
-
-Observe that a) parent for 4:0 does not change despite the replace request.
-There can only be one parent.  b) refcount has gone up by two for 4:0 and
-c) both class 1:3 and 3:1 are pointing to it.
-
-Step 12.  send one packet to plug
-echo "" | socat -u STDIN UDP4-DATAGRAM:127.0.0.1:8888,priority=$((0x10001))
-step13.  send one packet to the grafted fifo
-echo "" | socat -u STDIN UDP4-DATAGRAM:127.0.0.1:8888,priority=$((0x10003))
-
-step14. lets trigger the uaf
-tc class delete dev lo classid 1:3
-tc class delete dev lo classid 1:1
-
-The semantics of "replace" is for a del/add _on the same node_ and not
-a delete from one node(3:1) and add to another node (1:3) as in step10.
-While we could "fix" with a more complex approach there could be
-consequences to expectations so the patch takes the preventive approach of
-"disallow such config".
-
-Joint work with Lion Ackermann <nnamrec@gmail.com>
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-v4:
- - compare the parent directly from metadata, rather than lookup result
-v3: https://lore.kernel.org/20250111151455.75480-1-jhs@mojatatu.com
-
-CC: jhs@mojatatu.com
-CC: xiyou.wangcong@gmail.com
-CC: jiri@resnulli.us
----
- net/sched/sch_api.c | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/net/sched/sch_api.c b/net/sched/sch_api.c
-index 300430b8c4d2..fac9c946a4c7 100644
---- a/net/sched/sch_api.c
-+++ b/net/sched/sch_api.c
-@@ -1664,6 +1664,10 @@ static int tc_modify_qdisc(struct sk_buff *skb, struct nlmsghdr *n,
- 				q = qdisc_lookup(dev, tcm->tcm_handle);
- 				if (!q)
- 					goto create_n_graft;
-+				if (q->parent != tcm->tcm_parent) {
-+					NL_SET_ERR_MSG(extack, "Cannot move an existing qdisc to a different parent");
-+					return -EINVAL;
-+				}
- 				if (n->nlmsg_flags & NLM_F_EXCL) {
- 					NL_SET_ERR_MSG(extack, "Exclusivity flag on, cannot override");
- 					return -EEXIST;
+You are awesome, thank you!
 -- 
-2.48.0
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
