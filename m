@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-158970-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158971-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4061DA13FE9
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 17:55:23 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 29EB0A13FEB
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 17:55:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D77B73A53AB
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 16:55:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0301416B727
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 16:55:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93F2D22FE00;
-	Thu, 16 Jan 2025 16:54:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31039232450;
+	Thu, 16 Jan 2025 16:54:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="btBbeVx/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="inGsTxum"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A74B22CBEE;
-	Thu, 16 Jan 2025 16:54:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 034D723243D;
+	Thu, 16 Jan 2025 16:54:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737046482; cv=none; b=IvMaubL16SF1jV0sVwToNVrGue4rAxGxSSQcCMRadybgR67zizNBfeSzlG65svMwX8h4BuXuk/yLBwU1rRtASYdMFcrEBMEaLO7tfSvOeSksqsj/RXtKdQebFMJV/zfdLmreWjMf5LcB6BH2UE3LT+n1RV8Q166lU0W0s9qLl94=
+	t=1737046485; cv=none; b=jsf7BF3bL7nYiFDI/6/Ifvdr819u7LSIzD60y1+ZpDJDXdCAge2kIgK3yHEpUNVpYBhN+AlwIkANdL5a+JZDA0583pPM5IyT6CWvEQc2Pv0CtUajREKQHt/oPrHfcSUY5kGx9p6EyazjlWKlfptDFxtKAIKJuTkVKck6KLID5HM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737046482; c=relaxed/simple;
-	bh=ywVqaLMcTnS7/LX0E47JY1rOXoObiNL+nHvd4fAztMw=;
+	s=arc-20240116; t=1737046485; c=relaxed/simple;
+	bh=ziY1kNo4JB2WGFwqk/DGfw7wmfDoIoZ2o4P5q2wJOOo=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=rVU4QI+ggoQik7atYRZe/4yaMP5+Nm+yF6BASiQo8k9Vb7uNU/BxXPYbz9fiUJiURluDstszr5hBY55NbFe3ztygF6XSj3XeQKixJiyBX8KsLZQrw9ULRlZTxzmMiWHsQkW6VAceeXOG2k7jHHVEXZxNcKBO4lXPKYBVFlYVBBc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=btBbeVx/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AE51FC4CEE4;
-	Thu, 16 Jan 2025 16:54:39 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=rahexGIIb6ojcDhF/v8aJzu4q30/jW66CGVDtAG3ZR9d5j0oFAzG9hsCCfQg/jfI9w4tbiFafdJu0KIBkLJFLJ1R0Q8tkreQzhO6/VdWSx4hNd03f9LvYl7gQdIh3ryd87Ib7x3S1XVBXGJIcIkmF9rXT4/kk3l1UIaGnUpuO2s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=inGsTxum; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5DB36C4CED6;
+	Thu, 16 Jan 2025 16:54:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737046481;
-	bh=ywVqaLMcTnS7/LX0E47JY1rOXoObiNL+nHvd4fAztMw=;
+	s=k20201202; t=1737046484;
+	bh=ziY1kNo4JB2WGFwqk/DGfw7wmfDoIoZ2o4P5q2wJOOo=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=btBbeVx/B1fuysYHpZEhH7jEMNdt2aNgACM6lCp5Q0hWA+YffLyrA/OOgpImkhheH
-	 1CJ9IPU7b+zqP3O0CXs3W+/YZCnAxk8vB3MHk98ZwL2Px25/rdC24pu9F/uonq47N2
-	 ay6mN6FLlzEWk0zo4nc5MvDN7cTeGRqnOw+O56QVIk4dcaTV2Dd4nRh33aNuhlIVSj
-	 2gvmcDxOuAuihInoFJLU62RICDiWoR97ZKB+7FWqF7eXbCkZXmInKOANpMAptpz9dU
-	 IvsRlYSNfTIT5AR10QwVV/SEyfkUFZC9xwawEcEzjUPAmFJNcjkcmRsdc2Adc+mKP/
-	 +cMwqH5/BeKmQ==
+	b=inGsTxumRBZ7RvrCNVdca+QhtgHIIQZCkmddqaTiKwpcy7KsAbII1C/0uigpDSuF5
+	 GsjROws9rKQafYqo3Fl7Df/lF9WTeKgLXTxf8Ss9SD8KnU05/Fd3+vHOCDRiT4H9eK
+	 wPf+UzpkFoJhoKfhEsAbtv9hcpCB7L/VrX2Puppw+vbebTK7v+jopFGUSltZdoXMaT
+	 zT44MqcreA7ZOCSQBYLuXbDGsYPmy3na0CEQICh2x8vh5LQOzTiQI2EmLBpBUvXqvU
+	 8l8a2I1zaAqBP+MMMv6ykEBxTwn28XtfH08qZ4YgSYlEaCZgE6XdlbrblQitYBuyf1
+	 4Bx3EWvrwGMOA==
 From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-Date: Thu, 16 Jan 2025 17:51:25 +0100
-Subject: [PATCH net-next 03/15] mptcp: pm: more precise error messages
+Date: Thu, 16 Jan 2025 17:51:26 +0100
+Subject: [PATCH net-next 04/15] mptcp: pm: improve error messages
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,7 +52,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250116-net-next-mptcp-pm-misc-cleanup-2-v1-3-c0b43f18fe06@kernel.org>
+Message-Id: <20250116-net-next-mptcp-pm-misc-cleanup-2-v1-4-c0b43f18fe06@kernel.org>
 References: <20250116-net-next-mptcp-pm-misc-cleanup-2-v1-0-c0b43f18fe06@kernel.org>
 In-Reply-To: <20250116-net-next-mptcp-pm-misc-cleanup-2-v1-0-c0b43f18fe06@kernel.org>
 To: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, 
@@ -62,98 +62,107 @@ To: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>,
 Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
  "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
 X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2478; i=matttbe@kernel.org;
- h=from:subject:message-id; bh=ywVqaLMcTnS7/LX0E47JY1rOXoObiNL+nHvd4fAztMw=;
- b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBniTnG5p7BZzhyXeOBcJOMYIC0VKj7uIo+Eq/vA
- /HfLFgbB7uJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZ4k5xgAKCRD2t4JPQmmg
- cyL0D/99IRidY4r9bsEAuJusa/tUeU8VvT9pcdn7BtM8Roym098NToGpxGmB9z0j5G97uUctqEc
- bvyC99NohQQpkCNO0pZ59PcT2TkIfLt3Nw8uCgVsyfLGWTFTpoEKF3gwfLloOuWEMQ5MFNQLeOW
- WZRx2WXpXDaVOtQ7RIWi+SXMGeALx7kVd0z8gs6gfSkCPi1Ykah0chmAArmX+eBav7NN3mas0vx
- TgFjUylms7oPIBp7KXNFH/dq0BsXrUKNOv9/aTfw7O0pMSrm5GrptJsFf/w2egJLeq1QHZC/P3o
- cb47DDX/dnucrMGvmxIuvc4ugCmL2OfKJlcmjGUoUEDJwcUKKfsKSULDHaAv4wxVmcXfKC2rH0d
- dZW5LjNLinWY1dY8yIZjOYoyBnG5e0gY8IghdlyxrOZ/bt4EDbqMnQz5FLdG0m5/TFPsaLLiccj
- PutRPcpEaGb+w+7dixCLKy4wFm3+hzw1Z3K7wID5/mFA+F1n5fZXHQhAjVCjXsY1yXelTmFyLhi
- Jxuu6N8NzEKQea9tZq1JHlnDsIXxIecWYIyZyoUxQhcghku89/VfG2248EQGaebmgUWR4Lv+fM/
- SRzKB3RgDSwIUKxCd8RJ/yV4eCPeVS2Qf1veyBTJ5jO7aXCOTj4/H5oJRaOD609FH9rWwMPQE2Z
- 9kKQdqUEIzfyxEQ==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3062; i=matttbe@kernel.org;
+ h=from:subject:message-id; bh=ziY1kNo4JB2WGFwqk/DGfw7wmfDoIoZ2o4P5q2wJOOo=;
+ b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBniTnG4flcF3NSKxOkKdfa0fwkOjEhqGgpTHxlN
+ ELnBh8thjqJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZ4k5xgAKCRD2t4JPQmmg
+ cwdoEACKPvWXr2JpO9PR2sJHAvp/i72MjOm6nii1F1GBA3jDcHiPmfuVSh1S0hwFSgStR/3rHHr
+ Vkmk14p20H53tJT7SCl0jBdP/7+KuI72b1v0khnlrUlqdVYMDKJXk8Mfi37RP4EZhoO5aPgHNxV
+ Ylg85KMYTHs92Wsf0kksGS371hrX2Rhu24CU4YvuOGavjT6dSrUZpWoF3eFa5fPzLLn8ZWEJes/
+ Ga3l1lk3uW52qwe/GpIVn1EAl+YQtAOgF2NtL600RbDVf1RazwPOpTR2nEYzEz08/Z2OYX1HleJ
+ o5mKwoWD+NdLrp6krAhVk0m3upiiD4tRLW4E2DGEKjIUITAMLKMAKQp57d+vxer+Ds+RMJGVYlI
+ 7k4eitue+Kc+XQe2K56G5wy5Vyrk8A5YvYkC7g4JF60ui3YMJkomdhuQe3V1lJZS94iUdmMlC6E
+ O67K8Q+TTcoidAqImsKYLfKCaLoqnzPll6iLCSnCgYgE//QRYvdPZW+jxjLrmaNALeXiS0dXnMm
+ WW9jZ7HjdTJxjRJZDst+9yK5UxpogHNRm/Q3WoJNBf+583VYqfW9yzby/B2PQXUrZE1Ol7ASYTa
+ /t8G8UY/pfy0Pwh0y9rdhRzPRTbR9Cmok4dX4D8r7HwQODDFO/SorJR70NiYh343iUHlAFEUBgd
+ IT7cMlGu6OtWxNA==
 X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
  fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
 
-Some errors reported by the userspace PM were vague: "this or that is
-invalid".
+Some error messages were:
 
-It is easier for the userspace to know which part is wrong, instead of
-having to guess that.
+ - too generic: "missing input", "invalid request"
 
-While at it, in mptcp_userspace_pm_set_flags() move the parsing after
-the check linked to the local attribute.
+ - not precise enough: "limit greater than maximum" but what's the max?
+
+ - missing: subflow not found, or connect error.
+
+This can be easily improved by being more precise, or adding new error
+messages.
 
 Reviewed-by: Geliang Tang <geliang@kernel.org>
 Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
 ---
- net/mptcp/pm_userspace.c | 31 ++++++++++++++++++++++++-------
- 1 file changed, 24 insertions(+), 7 deletions(-)
+ net/mptcp/pm_netlink.c   |  6 ++++--
+ net/mptcp/pm_userspace.c | 10 +++++++++-
+ 2 files changed, 13 insertions(+), 3 deletions(-)
 
+diff --git a/net/mptcp/pm_netlink.c b/net/mptcp/pm_netlink.c
+index 98ac73938bd8196e196d5ee8c264784ba8d37645..a60217faf95debf870dd87ecf1afc1cde7c69bcf 100644
+--- a/net/mptcp/pm_netlink.c
++++ b/net/mptcp/pm_netlink.c
+@@ -1875,7 +1875,9 @@ static int parse_limit(struct genl_info *info, int id, unsigned int *limit)
+ 
+ 	*limit = nla_get_u32(attr);
+ 	if (*limit > MPTCP_PM_ADDR_MAX) {
+-		GENL_SET_ERR_MSG(info, "limit greater than maximum");
++		NL_SET_ERR_MSG_ATTR_FMT(info->extack, attr,
++					"limit greater than maximum (%u)",
++					MPTCP_PM_ADDR_MAX);
+ 		return -EINVAL;
+ 	}
+ 	return 0;
+@@ -2003,7 +2005,7 @@ int mptcp_pm_nl_set_flags(struct sk_buff *skb, struct genl_info *info)
+ 	if (addr.addr.family == AF_UNSPEC) {
+ 		lookup_by_id = 1;
+ 		if (!addr.addr.id) {
+-			GENL_SET_ERR_MSG(info, "missing required inputs");
++			GENL_SET_ERR_MSG(info, "missing address ID");
+ 			return -EOPNOTSUPP;
+ 		}
+ 	}
 diff --git a/net/mptcp/pm_userspace.c b/net/mptcp/pm_userspace.c
-index b6cf8ea1161ddc7f0f1662320aebfe720f55e722..cdc83fabb7c2c45bc3d7c954a824c8f27bb85718 100644
+index cdc83fabb7c2c45bc3d7c954a824c8f27bb85718..e350d6cc23bf2e23c5f255ede51570d8596b4585 100644
 --- a/net/mptcp/pm_userspace.c
 +++ b/net/mptcp/pm_userspace.c
-@@ -223,8 +223,14 @@ int mptcp_pm_nl_announce_doit(struct sk_buff *skb, struct genl_info *info)
- 		goto announce_err;
+@@ -190,7 +190,7 @@ static struct mptcp_sock *mptcp_userspace_pm_get_sock(const struct genl_info *in
  	}
  
--	if (addr_val.addr.id == 0 || !(addr_val.flags & MPTCP_PM_ADDR_FLAG_SIGNAL)) {
--		GENL_SET_ERR_MSG(info, "invalid addr id or flags");
-+	if (addr_val.addr.id == 0) {
-+		GENL_SET_ERR_MSG(info, "invalid addr id");
-+		err = -EINVAL;
-+		goto announce_err;
-+	}
+ 	if (!mptcp_pm_is_userspace(msk)) {
+-		GENL_SET_ERR_MSG(info, "invalid request; userspace PM not selected");
++		GENL_SET_ERR_MSG(info, "userspace PM not selected");
+ 		sock_put((struct sock *)msk);
+ 		return NULL;
+ 	}
+@@ -428,6 +428,9 @@ int mptcp_pm_nl_subflow_create_doit(struct sk_buff *skb, struct genl_info *info)
+ 	err = __mptcp_subflow_connect(sk, &local, &addr_r);
+ 	release_sock(sk);
+ 
++	if (err)
++		GENL_SET_ERR_MSG_FMT(info, "connect error: %d", err);
 +
-+	if (!(addr_val.flags & MPTCP_PM_ADDR_FLAG_SIGNAL)) {
-+		GENL_SET_ERR_MSG(info, "invalid addr flags");
- 		err = -EINVAL;
- 		goto announce_err;
+ 	spin_lock_bh(&msk->pm.lock);
+ 	if (err)
+ 		mptcp_userspace_pm_delete_local_addr(msk, &entry);
+@@ -552,6 +555,7 @@ int mptcp_pm_nl_subflow_destroy_doit(struct sk_buff *skb, struct genl_info *info
+ 	lock_sock(sk);
+ 	ssk = mptcp_nl_find_ssk(msk, &addr_l.addr, &addr_r);
+ 	if (!ssk) {
++		GENL_SET_ERR_MSG(info, "subflow not found");
+ 		err = -ESRCH;
+ 		goto release_sock;
  	}
-@@ -531,8 +537,14 @@ int mptcp_pm_nl_subflow_destroy_doit(struct sk_buff *skb, struct genl_info *info
- 		goto destroy_err;
- 	}
+@@ -625,6 +629,10 @@ int mptcp_userspace_pm_set_flags(struct sk_buff *skb, struct genl_info *info)
+ 	ret = mptcp_pm_nl_mp_prio_send_ack(msk, &loc.addr, &rem.addr, bkup);
+ 	release_sock(sk);
  
--	if (!addr_l.addr.port || !addr_r.port) {
--		GENL_SET_ERR_MSG(info, "missing local or remote port");
-+	if (!addr_l.addr.port) {
-+		GENL_SET_ERR_MSG(info, "missing local port");
-+		err = -EINVAL;
-+		goto destroy_err;
-+	}
++	/* mptcp_pm_nl_mp_prio_send_ack() only fails in one case */
++	if (ret < 0)
++		GENL_SET_ERR_MSG(info, "subflow not found");
 +
-+	if (!addr_r.port) {
-+		GENL_SET_ERR_MSG(info, "missing remote port");
- 		err = -EINVAL;
- 		goto destroy_err;
- 	}
-@@ -580,13 +592,18 @@ int mptcp_userspace_pm_set_flags(struct sk_buff *skb, struct genl_info *info)
- 	if (ret < 0)
- 		goto set_flags_err;
- 
-+	if (loc.addr.family == AF_UNSPEC) {
-+		GENL_SET_ERR_MSG(info, "invalid local address family");
-+		ret = -EINVAL;
-+		goto set_flags_err;
-+	}
-+
- 	ret = mptcp_pm_parse_entry(attr_rem, info, false, &rem);
- 	if (ret < 0)
- 		goto set_flags_err;
- 
--	if (loc.addr.family == AF_UNSPEC ||
--	    rem.addr.family == AF_UNSPEC) {
--		GENL_SET_ERR_MSG(info, "invalid address families");
-+	if (rem.addr.family == AF_UNSPEC) {
-+		GENL_SET_ERR_MSG(info, "invalid remote address family");
- 		ret = -EINVAL;
- 		goto set_flags_err;
- 	}
+ set_flags_err:
+ 	sock_put(sk);
+ 	return ret;
 
 -- 
 2.47.1
