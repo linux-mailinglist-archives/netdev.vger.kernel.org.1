@@ -1,145 +1,572 @@
-Return-Path: <netdev+bounces-158902-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158903-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04524A13B65
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 14:56:46 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 02CC5A13B68
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 14:56:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 804B8188719B
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 13:56:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EB1791696C3
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 13:56:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8023522A81B;
-	Thu, 16 Jan 2025 13:55:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24A1B22ACE4;
+	Thu, 16 Jan 2025 13:55:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LECfM7Xo"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="UZ21wQ03"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 575E922A7FE;
-	Thu, 16 Jan 2025 13:55:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A308422A808
+	for <netdev@vger.kernel.org>; Thu, 16 Jan 2025 13:55:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737035704; cv=none; b=mAVH6ud98mzEAccdRCfNTdBWWvxGzYGzrRqrwIVtzLvvgT1NT885w/j4MBlOZF0mvX0R+K1Agslu0bWR+zVT0C7ov3YnSjg90jpzf/E/yK/I4cIS+pdXaGp2KMWuQTkaXlwSKIJBrEvo4LZd07vQk2guzUgCraeFpSL7nCY8TTQ=
+	t=1737035745; cv=none; b=WuGeS9AkU6v/7vVjXkz+VIYG95s6k0sIH/9qYKMRVNS35/n/cEbbjGQMuVSzVbc4ViK/+DknmNR/GUW9/0DK7hA9Dmwk5vec5n9homuHXSqPy/26fYLFhv53tqOLH13TwLMhjoaByJzzBpg/GBqO5yMz9mg6S1NNqnADnzEG7yc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737035704; c=relaxed/simple;
-	bh=7YyaAJeLvCjPoXkFQ+N/Qnf8eZ1Mngdi9TENnBCJttA=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=rVO0oO51dhmWc3WYrKdnz7Z00KaEgeQHKB5B8pqpD/xmkpC6d6m5Qlv+4BAURRp2srJ0lzXK4xp1KQPoTpSvcTinXAhcg+/9T9gsNHxD09aGxv741UHdc9AR4hVVXMly5tMw4/3hvCxB5j09ov8UpPgN2owslEJHHS7TV1cCuRQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LECfM7Xo; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 31F91C4CED6;
-	Thu, 16 Jan 2025 13:55:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737035703;
-	bh=7YyaAJeLvCjPoXkFQ+N/Qnf8eZ1Mngdi9TENnBCJttA=;
-	h=From:Date:Subject:To:Cc:From;
-	b=LECfM7XomfoctY7bnNNmNo2hJcatJd1OzpD7CN1l5W/LYa5qEF3VqazVd2fUe8Ug+
-	 Mr/E4RffSjAtfFLc1rhHpK/BYG6NZrSsJ9yf46zILy+cLpVlgVpVGC6kKIPAkyYvPK
-	 JfNuKqqwK1UZ9ggy43T4hB/YU3BbnSsYdGElm3MWURJddaYn0iDwmrly8EDKmvgoc3
-	 4sqJqjQZryQUTnlRNHaVFK56BmFDo4AOzYZjTCxnaZOuAspVLuqGoWmDonVAk3iVDI
-	 x0nJO9G7Pppm/LoK5BR9DGKkISq2+PiBnFobbWSodN1/KvZYrbaUlSLXebyBwx2DaD
-	 gCsHTWS3uJyhA==
-From: Roger Quadros <rogerq@kernel.org>
-Date: Thu, 16 Jan 2025 15:54:49 +0200
-Subject: [PATCH net v2] net: ethernet: ti: am65-cpsw: fix freeing IRQ in
- am65_cpsw_nuss_remove_tx_chns()
+	s=arc-20240116; t=1737035745; c=relaxed/simple;
+	bh=j8OIq66lVwHLNAiZpaavtl9Qcru3dp2btV8QWQ4UWgQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JNsYWVYIsga5dHuTVdzweuTZDqikFbOg8sL9FRol5WrrEwoGqFQNoY9bKqh/jsfxiYlTAVtZWY3Ic6WzqTT8+xXbe1uhRXCxeZkCPbsMSmQunO4VYg3jsVxdXjY0kOAINNrCfOPdIboAv58ocL/haIzMRzD1VoUlz5PmFsui5v8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=UZ21wQ03; arc=none smtp.client-ip=198.175.65.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1737035742; x=1768571742;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=j8OIq66lVwHLNAiZpaavtl9Qcru3dp2btV8QWQ4UWgQ=;
+  b=UZ21wQ03hA5ZIahNIUDIDdKHL8K2+qnrgvSdHcFs5fY2nnC+M0cWnPq1
+   /UWP6RcGCOaldFWSld85f1k3pD3SmFe8FNCfx7/Kx1E4+piyi50NyB+x1
+   Z2+81R2pPi8XO2hRlDH3ln4bZ32dy3XhR1XujsmQ0ZP8vdSxIZrC6FbPK
+   Au5tpS3CrMdjHnNvqJDXPEeignbsHEyJ/gg/nsobvfDixJjq3zIEfSzRZ
+   vXc2zKKG14TYqjTUaFC/KwrWzVVSs7yDnryxjL4oQEX71BeXZwlDqcI6n
+   7BZ+u4hq4SaH8v7uEnuynUvu6AyRdK3VO2UbhhUMrvZ+ENZT2ppKbeCxv
+   g==;
+X-CSE-ConnectionGUID: aGWrhsMdSzS6N7r6/9WQcA==
+X-CSE-MsgGUID: UAY3j3OlQny/E8Kev9ZNlA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11316"; a="48815284"
+X-IronPort-AV: E=Sophos;i="6.13,209,1732608000"; 
+   d="scan'208";a="48815284"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jan 2025 05:55:41 -0800
+X-CSE-ConnectionGUID: IbfPlEN5TOOoTx3QiO4huA==
+X-CSE-MsgGUID: x6VAw3bRTHGGOCc+1gI+jA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="142769881"
+Received: from spandruv-desk1.amr.corp.intel.com (HELO azaki-desk1.intel.com) ([10.125.109.48])
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jan 2025 05:55:38 -0800
+From: Ahmed Zaki <ahmed.zaki@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	Ahmed Zaki <ahmed.zaki@intel.com>,
+	Madhu Chittim <madhu.chittim@intel.com>
+Subject: [PATCH iwl-next] idpf: modify vport_cfg_lock to be per-vport
+Date: Thu, 16 Jan 2025 06:55:30 -0700
+Message-ID: <20250116135530.94562-1-ahmed.zaki@intel.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250116-am65-cpsw-fix-tx-irq-free-v2-1-ada49409a45f@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAKgPiWcC/42NTQ6CMBCFr0Jm7RimoQ268h6GRYUBJmqBKUEM4
- e42nMDl+/veBpFVOMI120B5kShDSMKcMqh7HzpGaZIGkxubExXo385iPcYPtrLivKLohK0yY1k
- 4X1vL7Jgg7UflVDnYdwg8Q5XMXuI86Pf4W+iI/kAvhIQPk7tLgjdU2tuTNfDrPGgH1b7vP1KoY
- JXIAAAA
-To: Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Grygorii Strashko <grygorii.strashko@ti.com>, 
- Siddharth Vadapalli <s-vadapalli@ti.com>
-Cc: srk@ti.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Roger Quadros <rogerq@kernel.org>, Simon Horman <horms@kernel.org>
-X-Mailer: b4 0.14.1
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2336; i=rogerq@kernel.org;
- h=from:subject:message-id; bh=7YyaAJeLvCjPoXkFQ+N/Qnf8eZ1Mngdi9TENnBCJttA=;
- b=owEBbQKS/ZANAwAIAdJaa9O+djCTAcsmYgBniQ+0AI1SHnLa/2ktV8J/piObDIk1ncrKNsWMW
- 0fdQap8bX+JAjMEAAEIAB0WIQRBIWXUTJ9SeA+rEFjSWmvTvnYwkwUCZ4kPtAAKCRDSWmvTvnYw
- k0auD/wPVMnKWi68Ds3qwAflRMYBfHRawrg73okIT/rsp+4GzBpFdaUXqgezo77xz56kt5BMK4v
- pqlmH0O3iJWkk1/cCd8pzgy5ctSpeibomAx1p0HchiYbBS8xZ7L8sjEpHMSYRXRGmjabFTp9BuX
- dCohzxQa8XhNBlVsmhNJq1NmAWU52RPkBzuhOEl6fUrKwRXpBnHzfbZjUN/xdu8awrhNxjY+3v+
- 44kfLXqQVTxRx77clYsSXPih1INl13cHS+XzY2l0yy3DlylJ6ABMOeWk/LPWp5RnDjqrsC69hx0
- ynvf/nDYbEBNjvGTql9UQR1GBL3Wi4TopQ4cYLqZQ4FVY2ZD5GcD6ydm59mpDw0fyraTLmHsGhf
- ATXrtdkZg2OifXYqXRngT21gNVZ+Wsn1KUgWzYYwIKN1x5ZbP0k84bLQdDCobBbJlp3cAvgspQF
- lGy9l1ZBtZ88Ui6T+iwsxUJKXLns6vCIrAurydJn4cpxHBvhNynFvbNsMJAMFmcSfe7j4Fp9JoB
- fZycgfdAMVK7UAc+TISXqL7L39hKgRW4Ek0knww3ElzvVNqAR3lpLWo1tsbR9R5Twa5OAR0r+i3
- GpKfnlvplMd5IhTm0G4YUVXmyx2kuy5DS+oJ2xk3Pf9/9c4rx17UAua4A76dYl+8DTOAALfwuF5
- V9lzLMeQRCu9VWA==
-X-Developer-Key: i=rogerq@kernel.org; a=openpgp;
- fpr=412165D44C9F52780FAB1058D25A6BD3BE763093
+Content-Transfer-Encoding: 8bit
 
-When getting the IRQ we use k3_udma_glue_tx_get_irq() which returns
-negative error value on error. So not NULL check is not sufficient
-to deteremine if IRQ is valid. Check that IRQ is greater then zero
-to ensure it is valid.
+The vport config lock protects the vports queues and config data. These
+mainly change in soft reset path. Since there is no dependency across
+vports, there is no need for this lock to be global.
 
-There is no issue at probe time but at runtime user can invoke
-.set_channels which results in the following call chain.
-am65_cpsw_set_channels()
- am65_cpsw_nuss_update_tx_rx_chns()
-  am65_cpsw_nuss_remove_tx_chns()
-  am65_cpsw_nuss_init_tx_chns()
+Move the lock to be per-vport and allow one vport to reset without
+locking the rest of the vports.
 
-At this point if am65_cpsw_nuss_init_tx_chns() fails due to
-k3_udma_glue_tx_get_irq() then tx_chn->irq will be set to a
-negative value.
-
-Then, at subsequent .set_channels with higher channel count we
-will attempt to free an invalid IRQ in am65_cpsw_nuss_remove_tx_chns()
-leading to a kernel warning.
-
-The issue is present in the original commit that introduced this driver,
-although there, am65_cpsw_nuss_update_tx_rx_chns() existed as
-am65_cpsw_nuss_update_tx_chns().
-
-Fixes: 93a76530316a ("net: ethernet: ti: introduce am65x/j721e gigabit eth subsystem driver")
-Signed-off-by: Roger Quadros <rogerq@kernel.org>
-Reviewed-by: Simon Horman <horms@kernel.org>
-Reviewed-by: Siddharth Vadapalli <s-vadapalli@ti.com>
+Reviewed-by: Madhu Chittim <madhu.chittim@intel.com>
+Signed-off-by: Ahmed Zaki <ahmed.zaki@intel.com>
 ---
-Changes in v2:
-- Fixed typo in commit log k3_udma_glue_rx_get_irq->k3_udma_glue_tx_get_irq
-- Added more details to commit log
-- Added Reviewed-by tags
-- Link to v1: https://lore.kernel.org/r/20250114-am65-cpsw-fix-tx-irq-free-v1-1-b2069e6ed185@kernel.org
+depends on iwl series:
+https://patchwork.ozlabs.org/project/intel-wired-lan/list/?series=431435
 ---
- drivers/net/ethernet/ti/am65-cpsw-nuss.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/net/ethernet/intel/idpf/idpf.h        | 16 ++---
+ .../net/ethernet/intel/idpf/idpf_ethtool.c    | 58 +++++++++----------
+ drivers/net/ethernet/intel/idpf/idpf_lib.c    | 31 +++++-----
+ drivers/net/ethernet/intel/idpf/idpf_main.c   |  2 -
+ 4 files changed, 50 insertions(+), 57 deletions(-)
 
-diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.c b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-index 5465bf872734..e1de45fb18ae 100644
---- a/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-+++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-@@ -2248,7 +2248,7 @@ static void am65_cpsw_nuss_remove_tx_chns(struct am65_cpsw_common *common)
- 	for (i = 0; i < common->tx_ch_num; i++) {
- 		struct am65_cpsw_tx_chn *tx_chn = &common->tx_chns[i];
+diff --git a/drivers/net/ethernet/intel/idpf/idpf.h b/drivers/net/ethernet/intel/idpf/idpf.h
+index 34dbdc7d6c88..3fcf4072c9ec 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf.h
++++ b/drivers/net/ethernet/intel/idpf/idpf.h
+@@ -290,6 +290,7 @@ struct idpf_port_stats {
+  * @port_stats: per port csum, header split, and other offload stats
+  * @link_up: True if link is up
+  * @sw_marker_wq: workqueue for marker packets
++ * @vport_cfg_lock: Lock to protect access to vports during alloc/dealloc/reset
+  */
+ struct idpf_vport {
+ 	u16 num_txq;
+@@ -334,6 +335,7 @@ struct idpf_vport {
+ 	bool link_up;
  
--		if (tx_chn->irq)
-+		if (tx_chn->irq > 0)
- 			devm_free_irq(dev, tx_chn->irq, tx_chn);
+ 	wait_queue_head_t sw_marker_wq;
++	struct mutex vport_cfg_lock;
+ };
  
- 		netif_napi_del(&tx_chn->napi_tx);
-
----
-base-commit: 5bc55a333a2f7316b58edc7573e8e893f7acb532
-change-id: 20250114-am65-cpsw-fix-tx-irq-free-846ac55ee6e1
-
-Best regards,
+ /**
+@@ -527,7 +529,6 @@ struct idpf_vc_xn_manager;
+  * @req_tx_splitq: TX split or single queue model to request
+  * @req_rx_splitq: RX split or single queue model to request
+  * @vport_init_lock: Lock to protect vport init, re-init, and deinit flow
+- * @vport_cfg_lock: Lock to protect the vport config flow
+  * @vector_lock: Lock to protect vector distribution
+  * @queue_lock: Lock to protect queue distribution
+  * @vc_buf_lock: Lock to protect virtchnl buffer
+@@ -585,7 +586,6 @@ struct idpf_adapter {
+ 	bool req_rx_splitq;
+ 
+ 	struct mutex vport_init_lock;
+-	struct mutex vport_cfg_lock;
+ 	struct mutex vector_lock;
+ 	struct mutex queue_lock;
+ 	struct mutex vc_buf_lock;
+@@ -812,23 +812,23 @@ static inline void idpf_vport_init_unlock(struct idpf_adapter *adapter)
+ 
+ /**
+  * idpf_vport_cfg_lock - Acquire the vport config lock
+- * @adapter: private data struct
++ * @vport: private data struct
+  *
+  * This lock should be used by non-datapath code to protect against vport
+  * destruction.
+  */
+-static inline void idpf_vport_cfg_lock(struct idpf_adapter *adapter)
++static inline void idpf_vport_cfg_lock(struct idpf_vport *vport)
+ {
+-	mutex_lock(&adapter->vport_cfg_lock);
++	mutex_lock(&vport->vport_cfg_lock);
+ }
+ 
+ /**
+  * idpf_vport_cfg_unlock - Release the vport config lock
+- * @adapter: private data struct
++ * @vport: private data struct
+  */
+-static inline void idpf_vport_cfg_unlock(struct idpf_adapter *adapter)
++static inline void idpf_vport_cfg_unlock(struct idpf_vport *vport)
+ {
+-	mutex_unlock(&adapter->vport_cfg_lock);
++	mutex_unlock(&vport->vport_cfg_lock);
+ }
+ 
+ void idpf_statistics_task(struct work_struct *work);
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_ethtool.c b/drivers/net/ethernet/intel/idpf/idpf_ethtool.c
+index b3ed1d9a80ae..d2b9b15cfd75 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_ethtool.c
++++ b/drivers/net/ethernet/intel/idpf/idpf_ethtool.c
+@@ -14,23 +14,22 @@
+ static int idpf_get_rxnfc(struct net_device *netdev, struct ethtool_rxnfc *cmd,
+ 			  u32 __always_unused *rule_locs)
+ {
+-	struct idpf_adapter *adapter = idpf_netdev_to_adapter(netdev);
+ 	struct idpf_vport *vport;
+ 
+-	idpf_vport_cfg_lock(adapter);
+ 	vport = idpf_netdev_to_vport(netdev);
++	idpf_vport_cfg_lock(vport);
+ 
+ 	switch (cmd->cmd) {
+ 	case ETHTOOL_GRXRINGS:
+ 		cmd->data = vport->num_rxq;
+-		idpf_vport_cfg_unlock(adapter);
++		idpf_vport_cfg_unlock(vport);
+ 
+ 		return 0;
+ 	default:
+ 		break;
+ 	}
+ 
+-	idpf_vport_cfg_unlock(adapter);
++	idpf_vport_cfg_unlock(vport);
+ 
+ 	return -EOPNOTSUPP;
+ }
+@@ -86,11 +85,13 @@ static int idpf_get_rxfh(struct net_device *netdev,
+ 	struct idpf_netdev_priv *np = netdev_priv(netdev);
+ 	struct idpf_rss_data *rss_data;
+ 	struct idpf_adapter *adapter;
++	struct idpf_vport *vport;
+ 	int err = 0;
+ 	u16 i;
+ 
+ 	adapter = np->adapter;
+-	idpf_vport_cfg_lock(adapter);
++	vport = np->vport;
++	idpf_vport_cfg_lock(vport);
+ 
+ 	if (!idpf_is_cap_ena_all(adapter, IDPF_RSS_CAPS, IDPF_CAP_RSS)) {
+ 		err = -EOPNOTSUPP;
+@@ -112,7 +113,7 @@ static int idpf_get_rxfh(struct net_device *netdev,
+ 	}
+ 
+ unlock_mutex:
+-	idpf_vport_cfg_unlock(adapter);
++	idpf_vport_cfg_unlock(vport);
+ 
+ 	return err;
+ }
+@@ -137,8 +138,8 @@ static int idpf_set_rxfh(struct net_device *netdev,
+ 	int err = 0;
+ 	u16 lut;
+ 
+-	idpf_vport_cfg_lock(adapter);
+ 	vport = idpf_netdev_to_vport(netdev);
++	idpf_vport_cfg_lock(vport);
+ 
+ 	if (!idpf_is_cap_ena_all(adapter, IDPF_RSS_CAPS, IDPF_CAP_RSS)) {
+ 		err = -EOPNOTSUPP;
+@@ -166,7 +167,7 @@ static int idpf_set_rxfh(struct net_device *netdev,
+ 	err = idpf_config_rss(vport);
+ 
+ unlock_mutex:
+-	idpf_vport_cfg_unlock(adapter);
++	idpf_vport_cfg_unlock(vport);
+ 
+ 	return err;
+ }
+@@ -219,7 +220,6 @@ static void idpf_get_channels(struct net_device *netdev,
+ static int idpf_set_channels(struct net_device *netdev,
+ 			     struct ethtool_channels *ch)
+ {
+-	struct idpf_adapter *adapter = idpf_netdev_to_adapter(netdev);
+ 	struct idpf_vport_config *vport_config;
+ 	unsigned int num_req_tx_q;
+ 	unsigned int num_req_rx_q;
+@@ -234,8 +234,8 @@ static int idpf_set_channels(struct net_device *netdev,
+ 		return -EINVAL;
+ 	}
+ 
+-	idpf_vport_cfg_lock(adapter);
+ 	vport = idpf_netdev_to_vport(netdev);
++	idpf_vport_cfg_lock(vport);
+ 
+ 	idx = vport->idx;
+ 	vport_config = vport->adapter->vport_config[idx];
+@@ -278,7 +278,7 @@ static int idpf_set_channels(struct net_device *netdev,
+ 	}
+ 
+ unlock_mutex:
+-	idpf_vport_cfg_unlock(adapter);
++	idpf_vport_cfg_unlock(vport);
+ 
+ 	return err;
+ }
+@@ -298,11 +298,10 @@ static void idpf_get_ringparam(struct net_device *netdev,
+ 			       struct kernel_ethtool_ringparam *kring,
+ 			       struct netlink_ext_ack *ext_ack)
+ {
+-	struct idpf_adapter *adapter = idpf_netdev_to_adapter(netdev);
+ 	struct idpf_vport *vport;
+ 
+-	idpf_vport_cfg_lock(adapter);
+ 	vport = idpf_netdev_to_vport(netdev);
++	idpf_vport_cfg_lock(vport);
+ 
+ 	ring->rx_max_pending = IDPF_MAX_RXQ_DESC;
+ 	ring->tx_max_pending = IDPF_MAX_TXQ_DESC;
+@@ -311,7 +310,7 @@ static void idpf_get_ringparam(struct net_device *netdev,
+ 
+ 	kring->tcp_data_split = idpf_vport_get_hsplit(vport);
+ 
+-	idpf_vport_cfg_unlock(adapter);
++	idpf_vport_cfg_unlock(vport);
+ }
+ 
+ /**
+@@ -329,15 +328,14 @@ static int idpf_set_ringparam(struct net_device *netdev,
+ 			      struct kernel_ethtool_ringparam *kring,
+ 			      struct netlink_ext_ack *ext_ack)
+ {
+-	struct idpf_adapter *adapter = idpf_netdev_to_adapter(netdev);
+ 	struct idpf_vport_user_config_data *config_data;
+ 	u32 new_rx_count, new_tx_count;
+ 	struct idpf_vport *vport;
+ 	int i, err = 0;
+ 	u16 idx;
+ 
+-	idpf_vport_cfg_lock(adapter);
+ 	vport = idpf_netdev_to_vport(netdev);
++	idpf_vport_cfg_lock(vport);
+ 
+ 	idx = vport->idx;
+ 
+@@ -395,7 +393,7 @@ static int idpf_set_ringparam(struct net_device *netdev,
+ 	err = idpf_initiate_soft_reset(vport, IDPF_SR_Q_DESC_CHANGE);
+ 
+ unlock_mutex:
+-	idpf_vport_cfg_unlock(adapter);
++	idpf_vport_cfg_unlock(vport);
+ 
+ 	return err;
+ }
+@@ -870,7 +868,6 @@ static void idpf_get_ethtool_stats(struct net_device *netdev,
+ 				   u64 *data)
+ {
+ 	struct idpf_netdev_priv *np = netdev_priv(netdev);
+-	struct idpf_adapter *adapter = np->adapter;
+ 	struct idpf_vport_config *vport_config;
+ 	struct idpf_vport *vport;
+ 	unsigned int total = 0;
+@@ -878,11 +875,11 @@ static void idpf_get_ethtool_stats(struct net_device *netdev,
+ 	bool is_splitq;
+ 	u16 qtype;
+ 
+-	idpf_vport_cfg_lock(adapter);
+ 	vport = idpf_netdev_to_vport(netdev);
++	idpf_vport_cfg_lock(vport);
+ 
+ 	if (np->state != __IDPF_VPORT_UP) {
+-		idpf_vport_cfg_unlock(adapter);
++		idpf_vport_cfg_unlock(vport);
+ 
+ 		return;
+ 	}
+@@ -949,7 +946,7 @@ static void idpf_get_ethtool_stats(struct net_device *netdev,
+ 
+ 	rcu_read_unlock();
+ 
+-	idpf_vport_cfg_unlock(adapter);
++	idpf_vport_cfg_unlock(vport);
+ }
+ 
+ /**
+@@ -1027,12 +1024,11 @@ static int idpf_get_q_coalesce(struct net_device *netdev,
+ 			       u32 q_num)
+ {
+ 	const struct idpf_netdev_priv *np = netdev_priv(netdev);
+-	struct idpf_adapter *adapter = np->adapter;
+-	const struct idpf_vport *vport;
++	struct idpf_vport *vport;
+ 	int err = 0;
+ 
+-	idpf_vport_cfg_lock(adapter);
+ 	vport = idpf_netdev_to_vport(netdev);
++	idpf_vport_cfg_lock(vport);
+ 
+ 	if (np->state != __IDPF_VPORT_UP)
+ 		goto unlock_mutex;
+@@ -1051,7 +1047,7 @@ static int idpf_get_q_coalesce(struct net_device *netdev,
+ 				      VIRTCHNL2_QUEUE_TYPE_TX);
+ 
+ unlock_mutex:
+-	idpf_vport_cfg_unlock(adapter);
++	idpf_vport_cfg_unlock(vport);
+ 
+ 	return err;
+ }
+@@ -1203,12 +1199,11 @@ static int idpf_set_coalesce(struct net_device *netdev,
+ 			     struct netlink_ext_ack *extack)
+ {
+ 	struct idpf_netdev_priv *np = netdev_priv(netdev);
+-	struct idpf_adapter *adapter = np->adapter;
+ 	struct idpf_vport *vport;
+ 	int i, err = 0;
+ 
+-	idpf_vport_cfg_lock(adapter);
+ 	vport = idpf_netdev_to_vport(netdev);
++	idpf_vport_cfg_lock(vport);
+ 
+ 	if (np->state != __IDPF_VPORT_UP)
+ 		goto unlock_mutex;
+@@ -1226,7 +1221,7 @@ static int idpf_set_coalesce(struct net_device *netdev,
+ 	}
+ 
+ unlock_mutex:
+-	idpf_vport_cfg_unlock(adapter);
++	idpf_vport_cfg_unlock(vport);
+ 
+ 	return err;
+ }
+@@ -1242,23 +1237,22 @@ static int idpf_set_coalesce(struct net_device *netdev,
+ static int idpf_set_per_q_coalesce(struct net_device *netdev, u32 q_num,
+ 				   struct ethtool_coalesce *ec)
+ {
+-	struct idpf_adapter *adapter = idpf_netdev_to_adapter(netdev);
+ 	struct idpf_vport *vport;
+ 	int err;
+ 
+-	idpf_vport_cfg_lock(adapter);
+ 	vport = idpf_netdev_to_vport(netdev);
++	idpf_vport_cfg_lock(vport);
+ 
+ 	err = idpf_set_q_coalesce(vport, ec, q_num, false);
+ 	if (err) {
+-		idpf_vport_cfg_unlock(adapter);
++		idpf_vport_cfg_unlock(vport);
+ 
+ 		return err;
+ 	}
+ 
+ 	err = idpf_set_q_coalesce(vport, ec, q_num, true);
+ 
+-	idpf_vport_cfg_unlock(adapter);
++	idpf_vport_cfg_unlock(vport);
+ 
+ 	return err;
+ }
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_lib.c b/drivers/net/ethernet/intel/idpf/idpf_lib.c
+index 931d0f988c95..83a27bec15ab 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_lib.c
++++ b/drivers/net/ethernet/intel/idpf/idpf_lib.c
+@@ -910,12 +910,12 @@ static int idpf_stop(struct net_device *netdev)
+ 	if (test_bit(IDPF_REMOVE_IN_PROG, adapter->flags))
+ 		return 0;
+ 
+-	idpf_vport_cfg_lock(adapter);
+ 	vport = idpf_netdev_to_vport(netdev);
++	idpf_vport_cfg_lock(vport);
+ 
+ 	idpf_vport_stop(vport);
+ 
+-	idpf_vport_cfg_unlock(adapter);
++	idpf_vport_cfg_unlock(vport);
+ 
+ 	return 0;
+ }
+@@ -1001,9 +1001,9 @@ static void idpf_vport_dealloc(struct idpf_vport *vport)
+ 
+ 	idpf_deinit_mac_addr(vport);
+ 
+-	idpf_vport_cfg_lock(adapter);
++	idpf_vport_cfg_lock(vport);
+ 	idpf_vport_stop(vport);
+-	idpf_vport_cfg_unlock(adapter);
++	idpf_vport_cfg_unlock(vport);
+ 
+ 	if (!test_bit(IDPF_HR_RESET_IN_PROG, adapter->flags))
+ 		idpf_decfg_netdev(vport);
+@@ -1016,6 +1016,7 @@ static void idpf_vport_dealloc(struct idpf_vport *vport)
+ 		np->vport = NULL;
+ 	}
+ 
++	mutex_destroy(&vport->vport_cfg_lock);
+ 	idpf_vport_rel(vport);
+ 
+ 	adapter->vports[i] = NULL;
+@@ -1156,6 +1157,7 @@ static struct idpf_vport *idpf_vport_alloc(struct idpf_adapter *adapter,
+ 	adapter->vports[idx] = vport;
+ 	adapter->vport_ids[idx] = idpf_get_vport_id(vport);
+ 
++	mutex_init(&vport->vport_cfg_lock);
+ 	adapter->num_alloc_vports++;
+ 	/* prepare adapter->next_vport for next use */
+ 	adapter->next_vport = idpf_get_free_slot(adapter);
+@@ -1526,9 +1528,9 @@ void idpf_init_task(struct work_struct *work)
+ 	np = netdev_priv(vport->netdev);
+ 	np->state = __IDPF_VPORT_DOWN;
+ 	if (test_and_clear_bit(IDPF_VPORT_UP_REQUESTED, vport_config->flags)) {
+-		idpf_vport_cfg_lock(adapter);
++		idpf_vport_cfg_lock(vport);
+ 		idpf_vport_open(vport);
+-		idpf_vport_cfg_unlock(adapter);
++		idpf_vport_cfg_unlock(vport);
+ 	}
+ 
+ 	/* Spawn and return 'idpf_init_task' work queue until all the
+@@ -2131,8 +2133,8 @@ static int idpf_set_features(struct net_device *netdev,
+ 	struct idpf_vport *vport;
+ 	int err = 0;
+ 
+-	idpf_vport_cfg_lock(adapter);
+ 	vport = idpf_netdev_to_vport(netdev);
++	idpf_vport_cfg_lock(vport);
+ 
+ 	if (idpf_is_reset_in_prog(adapter)) {
+ 		dev_err(&adapter->pdev->dev, "Device is resetting, changing netdev features temporarily unavailable.\n");
+@@ -2160,7 +2162,7 @@ static int idpf_set_features(struct net_device *netdev,
+ 	}
+ 
+ unlock_mutex:
+-	idpf_vport_cfg_unlock(adapter);
++	idpf_vport_cfg_unlock(vport);
+ 
+ 	return err;
+ }
+@@ -2186,12 +2188,12 @@ static int idpf_open(struct net_device *netdev)
+ 	if (test_bit(IDPF_REMOVE_IN_PROG, adapter->flags))
+ 		return 0;
+ 
+-	idpf_vport_cfg_lock(adapter);
+ 	vport = idpf_netdev_to_vport(netdev);
++	idpf_vport_cfg_lock(vport);
+ 
+ 	err = idpf_vport_open(vport);
+ 
+-	idpf_vport_cfg_unlock(adapter);
++	idpf_vport_cfg_unlock(vport);
+ 
+ 	return err;
+ }
+@@ -2205,18 +2207,17 @@ static int idpf_open(struct net_device *netdev)
+  */
+ static int idpf_change_mtu(struct net_device *netdev, int new_mtu)
+ {
+-	struct idpf_adapter *adapter = idpf_netdev_to_adapter(netdev);
+ 	struct idpf_vport *vport;
+ 	int err;
+ 
+-	idpf_vport_cfg_lock(adapter);
+ 	vport = idpf_netdev_to_vport(netdev);
++	idpf_vport_cfg_lock(vport);
+ 
+ 	WRITE_ONCE(netdev->mtu, new_mtu);
+ 
+ 	err = idpf_initiate_soft_reset(vport, IDPF_SR_MTU_CHANGE);
+ 
+-	idpf_vport_cfg_unlock(adapter);
++	idpf_vport_cfg_unlock(vport);
+ 
+ 	return err;
+ }
+@@ -2298,8 +2299,8 @@ static int idpf_set_mac(struct net_device *netdev, void *p)
+ 	struct idpf_vport *vport;
+ 	int err = 0;
+ 
+-	idpf_vport_cfg_lock(adapter);
+ 	vport = idpf_netdev_to_vport(netdev);
++	idpf_vport_cfg_lock(vport);
+ 
+ 	if (!idpf_is_cap_ena(adapter, IDPF_OTHER_CAPS,
+ 			     VIRTCHNL2_CAP_MACFILTER)) {
+@@ -2332,7 +2333,7 @@ static int idpf_set_mac(struct net_device *netdev, void *p)
+ 	eth_hw_addr_set(netdev, addr->sa_data);
+ 
+ unlock_mutex:
+-	idpf_vport_cfg_unlock(adapter);
++	idpf_vport_cfg_unlock(vport);
+ 
+ 	return err;
+ }
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_main.c b/drivers/net/ethernet/intel/idpf/idpf_main.c
+index da1e3525719f..0864afe047ab 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_main.c
++++ b/drivers/net/ethernet/intel/idpf/idpf_main.c
+@@ -80,7 +80,6 @@ static void idpf_remove(struct pci_dev *pdev)
+ 	adapter->vcxn_mngr = NULL;
+ 
+ 	mutex_destroy(&adapter->vport_init_lock);
+-	mutex_destroy(&adapter->vport_cfg_lock);
+ 	mutex_destroy(&adapter->vector_lock);
+ 	mutex_destroy(&adapter->queue_lock);
+ 	mutex_destroy(&adapter->vc_buf_lock);
+@@ -145,7 +144,6 @@ static int idpf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 	adapter->req_rx_splitq = true;
+ 
+ 	mutex_init(&adapter->vport_init_lock);
+-	mutex_init(&adapter->vport_cfg_lock);
+ 	mutex_init(&adapter->vector_lock);
+ 	mutex_init(&adapter->queue_lock);
+ 	mutex_init(&adapter->vc_buf_lock);
 -- 
-Roger Quadros <rogerq@kernel.org>
+2.43.0
 
 
