@@ -1,138 +1,159 @@
-Return-Path: <netdev+bounces-158906-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158908-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70160A13B97
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 15:05:02 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D473A13BAF
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 15:08:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 911AC164F3A
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 14:05:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3B7E83A937F
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 14:07:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D78F122A809;
-	Thu, 16 Jan 2025 14:04:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6125B22B58E;
+	Thu, 16 Jan 2025 14:07:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="cabSHwaF"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="IhR5O/2s"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 291131DE89B;
-	Thu, 16 Jan 2025 14:04:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
+Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.4])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 881FF3BBC5;
+	Thu, 16 Jan 2025 14:07:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737036297; cv=none; b=rJp4n0q2zrR8AGFX3K38OihnH3hiZDsT6RGXKfLkZLUKOodnQnMzJTo+KWdd8r7PF0zKc7p53K1qyevMrcVtpzQCY3g6jcf1xx2nfxZe6cvOKCf4yOB8OexzMtfS0+kcK85CNUhhQn01wfB+wXHCKFlehG0ULhFkIssPLoJdMsY=
+	t=1737036473; cv=none; b=hlZ6wWimzptHD2cUA5ThLhzdoqDVmJOGv/Z2SMzjaqymC4CCpt2BgyziDqUKSNuJYs3rzHF9iBjiWUBV3kL1gh9Jumu7JBOgQ1QvDnsoXQK5BhBRRozasHLmi+Y47BhK78ARjBP7KQA1CGh4wlIe+KcmyFAw5J79vmIFi0ED8WA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737036297; c=relaxed/simple;
-	bh=HFA0q3xAz/S1TQxkXai+x+tmQpoGIi19wGBzzmfvo/w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Xqtha91jyqZaPVzSf9U3KYjk4MKyKA9wP5q5+soYcNpt6bi7adnVm7Na9RiIqmIpH4Vri+iAg1uOPpEzZL8v3quk9yNkGyXp2l6s/KPARE14Ht+Fuah3I4tzugTduuZ+HOdCGAytkcZKNxeqEXY/HNZ4sfWc8gh5L+RChkDvFxw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=cabSHwaF; arc=none smtp.client-ip=192.198.163.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1737036296; x=1768572296;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=HFA0q3xAz/S1TQxkXai+x+tmQpoGIi19wGBzzmfvo/w=;
-  b=cabSHwaF8jzRP7bcjmC3yFh0/fGsQfS3bjBXGTPY6Ia0jUYsa7xPtun+
-   xXbYtS6QTW5Y41hZU0zMWtbhT/na955obJ29BeiM5r7yRwFCzClDHyc86
-   wpE4SgfmTPsXmO/I65JVmNEFctGY+QIufWHDEP/ZgCscfraG4IuFNIh98
-   YqvT2HdSLX+SisEYKzWYAob+6UtJ7GaRI5cWkV1CudFWAu/WLrbmuMa/S
-   WjOVeuDpKRgMafX+sCYbPy9WS3hs/M03hXLVGsc5N4geLdt145HrgVtNe
-   AmbspeiFQOzo0Nfc3jdSJO9Wlfr6/qInERxvnpZj6rYB/JTmSFV6SOFLT
-   Q==;
-X-CSE-ConnectionGUID: DLA4lcs9ShqgpZcEjRWGAw==
-X-CSE-MsgGUID: kKfwk5YXRwa5RsQaF3Av6g==
-X-IronPort-AV: E=McAfee;i="6700,10204,11316"; a="48082477"
-X-IronPort-AV: E=Sophos;i="6.13,209,1732608000"; 
-   d="scan'208";a="48082477"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jan 2025 06:04:16 -0800
-X-CSE-ConnectionGUID: hsC7Lo90SwuWAzLfIrpaTQ==
-X-CSE-MsgGUID: dmOeFuPSTieqecqH8l4FHA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="105355341"
-Received: from mev-dev.igk.intel.com ([10.237.112.144])
-  by orviesa010-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jan 2025 06:04:13 -0800
-Date: Thu, 16 Jan 2025 15:00:53 +0100
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: Daniel Golle <daniel@makrotopia.org>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net 1/3] net: phy: realtek: clear 1000Base-T lpa if link
- is down
-Message-ID: <Z4kRFVs6ktqubOJd@mev-dev.igk.intel.com>
-References: <cover.1736951652.git.daniel@makrotopia.org>
- <67e38eee4c46b921938fb33f5bc86c8979b9aa33.1736951652.git.daniel@makrotopia.org>
+	s=arc-20240116; t=1737036473; c=relaxed/simple;
+	bh=qDDszGLFZbkocWudTbx04OroDq+KUvoNCTQGknbvHvo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=MD22rRfkk84uJtUBvUO1jxkpBMJS8i6z/kO8pjeI1ABlJYEGqc+tUyw/I/pyX9FpfRIPsCPQs82J8vbdbgmz7tZGzbrD+c7swEwtWl/kfeMnLyrQjcH5OrX+2bRHyhem+HrIIdt1fE0gHbNm/hnLDDinyLHmapKI5MtsCFx9TMI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=IhR5O/2s; arc=none smtp.client-ip=220.197.31.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:Subject:Date:Message-ID:MIME-Version; bh=NBocW
+	ZCLvopgnMePJRakkB0MKYnFNzqXan9lXnHlZjE=; b=IhR5O/2s51aftDVwCswFF
+	xp1Ec4Fw2HLFUcLa7olpjt6np144C/8mYwGbWN0BPjW0eS0N+WvPRmFRP/jYjkDq
+	EstF/5C9KAoex+f6ChSLvmNZwTecN/VUV1Pll8ws97EiDhsbsAejJ1RhlR/0U8QA
+	BuK/HsOgGP2IfmPtB9OayI=
+Received: from localhost.localdomain (unknown [])
+	by gzga-smtp-mtada-g1-2 (Coremail) with SMTP id _____wD3d5IwEolnR5IwGg--.20972S2;
+	Thu, 16 Jan 2025 22:05:46 +0800 (CST)
+From: Jiayuan Chen <mrpre@163.com>
+To: bpf@vger.kernel.org,
+	jakub@cloudflare.com,
+	john.fastabend@gmail.com
+Cc: netdev@vger.kernel.org,
+	martin.lau@linux.dev,
+	ast@kernel.org,
+	edumazet@google.com,
+	davem@davemloft.net,
+	dsahern@kernel.org,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux-kernel@vger.kernel.org,
+	song@kernel.org,
+	andrii@kernel.org,
+	mhal@rbox.co,
+	yonghong.song@linux.dev,
+	daniel@iogearbox.net,
+	xiyou.wangcong@gmail.com,
+	horms@kernel.org,
+	corbet@lwn.net,
+	eddyz87@gmail.com,
+	cong.wang@bytedance.com,
+	shuah@kernel.org,
+	mykolal@fb.com,
+	jolsa@kernel.org,
+	haoluo@google.com,
+	sdf@fomichev.me,
+	kpsingh@kernel.org,
+	linux-doc@vger.kernel.org,
+	Jiayuan Chen <mrpre@163.com>
+Subject: [PATCH bpf v7 0/5] bpf: fix wrong copied_seq calculation and add tests
+Date: Thu, 16 Jan 2025 22:05:26 +0800
+Message-ID: <20250116140531.108636-1-mrpre@163.com>
+X-Mailer: git-send-email 2.43.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <67e38eee4c46b921938fb33f5bc86c8979b9aa33.1736951652.git.daniel@makrotopia.org>
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wD3d5IwEolnR5IwGg--.20972S2
+X-Coremail-Antispam: 1Uf129KBjvJXoWxWFyrGFyfXw4kuryDAFyxKrg_yoW5Ar4UpF
+	WkC34rGr47tFyIvw4DA392gF4rKw4rCayUKF1Fq3yfAw4jkryYyrs2ka4aqr98GrWrZF1U
+	ur15Wr4Y934DAFDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0z_pnQ7UUUUU=
+X-CM-SenderInfo: xpus2vi6rwjhhfrp/xtbBDwvWp2eJDhZJNQAAs-
 
-On Wed, Jan 15, 2025 at 02:43:35PM +0000, Daniel Golle wrote:
-> Only read 1000Base-T link partner advertisement if autonegotiation has
-> completed and otherwise 1000Base-T link partner advertisement bits.
-> 
-> This fixes bogus 1000Base-T link partner advertisement after link goes
-> down (eg. by disconnecting the wire).
-> Fixes: 5cb409b3960e ("net: phy: realtek: clear 1000Base-T link partner advertisement")
-> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
-> ---
->  drivers/net/phy/realtek.c | 19 ++++++++-----------
->  1 file changed, 8 insertions(+), 11 deletions(-)
-> 
-> diff --git a/drivers/net/phy/realtek.c b/drivers/net/phy/realtek.c
-> index f65d7f1f348e..26b324ab0f90 100644
-> --- a/drivers/net/phy/realtek.c
-> +++ b/drivers/net/phy/realtek.c
-> @@ -1023,23 +1023,20 @@ static int rtl822x_c45_read_status(struct phy_device *phydev)
->  {
->  	int ret, val;
->  
-> -	ret = genphy_c45_read_status(phydev);
-> -	if (ret < 0)
-> -		return ret;
-> -
-> -	if (phydev->autoneg == AUTONEG_DISABLE ||
-> -	    !genphy_c45_aneg_done(phydev))
-> -		mii_stat1000_mod_linkmode_lpa_t(phydev->lp_advertising, 0);
-> -
->  	/* Vendor register as C45 has no standardized support for 1000BaseT */
-> -	if (phydev->autoneg == AUTONEG_ENABLE) {
-> +	if (phydev->autoneg == AUTONEG_ENABLE && genphy_c45_aneg_done(phydev)) {
->  		val = phy_read_mmd(phydev, MDIO_MMD_VEND2,
->  				   RTL822X_VND2_GANLPAR);
->  		if (val < 0)
->  			return val;
-> -
-> -		mii_stat1000_mod_linkmode_lpa_t(phydev->lp_advertising, val);
-> +	} else {
-> +		val = 0;
->  	}
-> +	mii_stat1000_mod_linkmode_lpa_t(phydev->lp_advertising, val);
-> +
-> +	ret = genphy_c45_read_status(phydev);
-> +	if (ret < 0)
-> +		return ret;
->  
->  	if (!phydev->link)
->  		return 0;
+A previous commit described in this topic
+http://lore.kernel.org/bpf/20230523025618.113937-9-john.fastabend@gmail.com
+directly updated 'sk->copied_seq' in the tcp_eat_skb() function when the
+action of a BPF program was SK_REDIRECT. For other actions, like SK_PASS,
+the update logic for 'sk->copied_seq' was moved to
+tcp_bpf_recvmsg_parser() to ensure the accuracy of the 'fionread' feature.
 
-Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+That commit works for a single stream_verdict scenario, as it also
+modified 'sk_data_ready->sk_psock_verdict_data_ready->tcp_read_skb'
+to remove updating 'sk->copied_seq'.
 
-> -- 
-> 2.47.1
+However, for programs where both stream_parser and stream_verdict are
+active(strparser purpose), tcp_read_sock() was used instead of
+tcp_read_skb() (sk_data_ready->strp_data_ready->tcp_read_sock)
+tcp_read_sock() now still update 'sk->copied_seq', leading to duplicated
+updates.
+
+In summary, for strparser + SK_PASS, copied_seq is redundantly calculated
+in both tcp_read_sock() and tcp_bpf_recvmsg_parser().
+
+The issue causes incorrect copied_seq calculations, which prevent
+correct data reads from the recv() interface in user-land.
+
+Also we added test cases for bpf + strparser and separated them from
+sockmap_basic, as strparser has more encapsulation and parsing
+capabilities compared to sockmap.
+
+Fixes: e5c6de5fa025 ("bpf, sockmap: Incorrectly handling copied_seq")
+
+---
+V3 -> V7:
+https://lore.kernel.org/bpf/20250109094402.50838-1-mrpre@163.com/
+https://lore.kernel.org/bpf/20241218053408.437295-1-mrpre@163.com/
+Avoid introducing new proto_ops. (Jakub Sitnicki).
+Add more edge test cases for strparser + bpf.
+Fix patchwork fail of test cases code.
+Fix psock fetch without rcu lock.
+Move code of modifying to tcp_bpf.c.
+
+V1 -> V3:
+https://lore.kernel.org/bpf/20241209152740.281125-1-mrpre@163.com/
+Fix patchwork fail by adding Fixes tag.
+Save skb data offset for ENOMEM. (John Fastabend)
+
+Jiayuan Chen (5):
+  strparser: add read_sock callback
+  bpf: fix wrong copied_seq calculation
+  bpf: disable non stream socket for strparser
+  selftests/bpf: fix invalid flag of recv()
+  selftests/bpf: add strparser test for bpf
+
+ Documentation/networking/strparser.rst        |  11 +-
+ include/linux/skmsg.h                         |   4 +
+ include/net/strparser.h                       |   2 +
+ include/net/tcp.h                             |   3 +
+ net/core/skmsg.c                              |  23 +
+ net/core/sock_map.c                           |  13 +-
+ net/ipv4/tcp.c                                |  29 +-
+ net/ipv4/tcp_bpf.c                            |  47 ++
+ net/strparser/strparser.c                     |  11 +-
+ .../selftests/bpf/prog_tests/sockmap_basic.c  |  59 +--
+ .../selftests/bpf/prog_tests/sockmap_strp.c   | 452 ++++++++++++++++++
+ .../selftests/bpf/progs/test_sockmap_strp.c   |  53 ++
+ 12 files changed, 642 insertions(+), 65 deletions(-)
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/sockmap_strp.c
+ create mode 100644 tools/testing/selftests/bpf/progs/test_sockmap_strp.c
+
+-- 
+2.43.5
+
 
