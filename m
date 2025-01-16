@@ -1,161 +1,155 @@
-Return-Path: <netdev+bounces-158934-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158935-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 211DBA13D9E
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 16:30:04 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1379DA13DA4
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 16:30:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 526B3188B76B
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 15:30:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5D6903A9C08
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 15:30:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B74722ACE7;
-	Thu, 16 Jan 2025 15:29:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBC9635968;
+	Thu, 16 Jan 2025 15:30:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kg3LO/7E"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tpdo5BCD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
+Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E6A478F2B;
-	Thu, 16 Jan 2025 15:29:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D72A712BF24
+	for <netdev@vger.kernel.org>; Thu, 16 Jan 2025 15:30:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737041399; cv=none; b=AMnlciaUE/fI6ceRSRU5yGFr9fihlt2Q4mA0PL2jfUZ7J+v0VB7HlWcdtCooibJ1YH34TSeeNgLyD938epydhmtML849k/+2rSITjAO/lM/MnPMwqpf/VtjSef6ojNX2AeQqz8ot0T9nOz8PC4gowd7TQhIF/y84FVLxLTw7rUs=
+	t=1737041426; cv=none; b=jqwKGBLN2KldroX1gPdjCrX504SfhJ+mdstxRjteziysVa/UEf4hqj5nIWleXry4OiQraH7HfRFKzAEmjlNHCnLat+bRDmn5B5fTJiagVJ+G8GMXXpRfQsUkuhsPEAwTWuS4MjYSyzYD2OJXWUgMfJ33yCaS65wuJouo1qbB1Qs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737041399; c=relaxed/simple;
-	bh=2frU9X7dbWLUl8WO2hD3vcwXOw47sVSnR2+r8CWLSKA=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=SjXBHC4MS9kOF1wi6lFhRgm53bmU4AUpJZRITh9JiuDE3uZtR6h/A8ZNM8agPaavazqhGByY1wOh7MApBlTQkzNVtmlZ7e1PWfphGm9KGohLCWxrtTWmJXok+lBtwHUAFcVMJPYG67WpOwPLZreA/JSe+yfHo+ya1Zduu87JHK4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kg3LO/7E; arc=none smtp.client-ip=209.85.221.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-385de59c1a0so647223f8f.2;
-        Thu, 16 Jan 2025 07:29:57 -0800 (PST)
+	s=arc-20240116; t=1737041426; c=relaxed/simple;
+	bh=H+wJNJJb1N6FKJqcKXUDaiMLQ5FpwEyXhKeFs5Ra0+o=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Omh4CUwmm6axjZ+z+8vyOXocJeZdvr0RPL+NGS4iF0HMffeTActe7mz+l3e4TY/z6BTevgQEsrkt9hvQbCFBpsH3nSpKzF5hwL47rr+ISEs70QIrQdE1eWZIzcZY/eUCKk9pmP+W73gybF7tghVjl77THZYwWLGAoCRSkXTW/9E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=tpdo5BCD; arc=none smtp.client-ip=209.85.208.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-5d0ac27b412so1469024a12.1
+        for <netdev@vger.kernel.org>; Thu, 16 Jan 2025 07:30:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1737041395; x=1737646195; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1737041423; x=1737646223; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=8tw313LemcnV4eOs9J849ueqzSp6vM+lhTqL56doHZU=;
-        b=kg3LO/7E2LceMkqHd/4cCQYz5qtQ1AnkrwXGW7RAV4Zpx39ufgGm4VxAd3GfLdLQlT
-         W4EussN3nCYS1J/ngvo8ky3JO8WaSJYskAbebKwKzX2yKaajTAZPASxbB+WYdyRyl3Ur
-         G8wAula5+bd45JHyQrjjNavTZRJWOe1pTP4a52liCryjARHLUd1jQSChgY/pz7lMAzyN
-         UCEGJaUa31YF29szJZyfE6oLknlxK8yaX4mcE3/5QHr0P4f+x07Ydxbprtkb7dv88h+m
-         Hce+4vuMGO8s5AoVajR/nHUD9+MXjc7bIcXNjljfiv+M3NkL4ef5AiKKpOBIbjMeZ0+R
-         sBnQ==
+        bh=H+wJNJJb1N6FKJqcKXUDaiMLQ5FpwEyXhKeFs5Ra0+o=;
+        b=tpdo5BCDyfUIYxcTvh26nXUB5PnE2rwF1gQ6yxxc7ZEYmM5lRBmnRmxHc9aYTjhTHa
+         TZvXMpPEWJ3TKwAmpzzbFCaLXOfUPOJwWcPHViwe7kld9wSF8uRez0m8ESgcRi6JAuea
+         yHsCBbImycKshWpJZqJmtkqu4MpbMdN2LFqKBlqGhlSpqIb4S4M7KKTWo/fF2MP1QfPr
+         fA1H20NIOZGOXEVu79WvoUDNZ2lUfItSsujwDzzUQKiRRQSbdWu8nXU/2Xw+hMaQR9Tt
+         nlNBLb0M64c3ZWtCMcVrl7+338bVb6JYiIQ3RJwYc0/hn/+buvgudec4lPE+g3sfXnsI
+         3tNw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737041395; x=1737646195;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1737041423; x=1737646223;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=8tw313LemcnV4eOs9J849ueqzSp6vM+lhTqL56doHZU=;
-        b=BvHXgrHQ0oyrUXtf46BPryu/6/dc4CZlJPrbqdRX28WAeHJcZ13bsg2u33nt/LXsg0
-         h2W38TLG2lAl6ilBYLoMNwZUgj1jC7Q52N9sxpjavCMIInVEwi7sVJlWSOkUVQTHuAjT
-         Qn/A3O8LEr1Q97ujsv0NfM9Dn8Bj8U9e1UdI6/JMrms3w6lv8zam5xVLNJbp8O7JbYAB
-         4/uUx6l6YNn4kKoTgLnsh63IbxsjpeZj6SYT96kBYkNqKPJTj74L8yHnmsKYSAyUE0Sa
-         UpmVbuiAmHnt1ptagcefYe7iqiAD3vJc1NCuj4iT/SANIbT/rhtDiQw9hkV6gAMRRFR8
-         YPhg==
-X-Forwarded-Encrypted: i=1; AJvYcCVZzPTwNJVdDhkZm0/j4CUWDLAL9dX0zP2MYwVMqw6oPhsr4DrT0xw5U/iLECKyHQ3JyTSTbUaiMUZ7c4o=@vger.kernel.org, AJvYcCWd/9mqbNLHHK1s+8y1W6591KmgvqBp4lZEI9cgY366TyL5Xhmy3G1F/VYC6uUonP2Irsy7ceqp@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzb1x8sOvJ2JZVlECSPX5TCK8tWIFMeEoaXwfXQeuCuislWPdNt
-	0Tx0GnC5vdTQ+DxyCkDCFZ+wey1H+IfpBDDECtX3zy0rSQQTJXUW
-X-Gm-Gg: ASbGncsMsYPbblgOslTXWDs0fyhO0Exsn9o/PfkgkgrZCLPFapVXPn6x6nsyPqxBEdi
-	QNm6a4wW8Liq5f+neJ9mlkK6Br6FRy3YGsPQkx2Zbmr1pFJP5iUvbHcGC7BHP1YscMJBPQyfSh0
-	xyZ8zIf52Y48TY+67vr6m/F6lfrBrO3R8ZswaX2ARP6XeGcY6hSQ0R97fBUk99Z9Bz3OdSffSPG
-	eoJo5z41O5WZZd37ltN08TjEuS8Unp2jxBcwuL3JUBINMZRToXeQe6RggBKDsrF2EvUOjo=
-X-Google-Smtp-Source: AGHT+IEef8S7Jx5rYUCpDubnXGjnbOP3kPqHoI2nCeuf4dEPI9YGEFPuF5pDKiffY/hcSYgjAqouxA==
-X-Received: by 2002:a5d:64cc:0:b0:385:e8ce:7483 with SMTP id ffacd0b85a97d-38a872faf34mr23870496f8f.4.1737041395360;
-        Thu, 16 Jan 2025 07:29:55 -0800 (PST)
-Received: from home.paul.comp (paulfertser.info. [2001:470:26:54b:226:9eff:fe70:80c2])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43890409758sm2800065e9.2.2025.01.16.07.29.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Jan 2025 07:29:55 -0800 (PST)
-Received: from home.paul.comp (home.paul.comp [IPv6:0:0:0:0:0:0:0:1])
-	by home.paul.comp (8.15.2/8.15.2/Debian-22+deb11u3) with ESMTP id 50GFTpkn008705;
-	Thu, 16 Jan 2025 18:29:52 +0300
-Received: (from paul@localhost)
-	by home.paul.comp (8.15.2/8.15.2/Submit) id 50GFTnrZ008702;
-	Thu, 16 Jan 2025 18:29:49 +0300
-From: Paul Fertser <fercerpav@gmail.com>
-To: Potin Lai <potin.lai.pt@gmail.com>, Cosmo Chou <chou.cosmo@gmail.com>,
-        Eddie James <eajames@linux.ibm.com>,
-        Samuel Mendoza-Jonas <sam@mendozajonas.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Ivan Mikhaylov <fr0st61te@gmail.com>,
-        Paul Fertser <fercerpav@gmail.com>, stable@vger.kernel.org
-Subject: [PATCH] net/ncsi: wait for the last response to Deselect Package before configuring channel
-Date: Thu, 16 Jan 2025 18:29:00 +0300
-Message-Id: <20250116152900.8656-1-fercerpav@gmail.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <CAGfYmwVH1A+imBF5TLenLaSM0Zf0C5wgfgocYix9Ye_7siR_xQ@mail.gmail.com>
-References: <CAGfYmwVH1A+imBF5TLenLaSM0Zf0C5wgfgocYix9Ye_7siR_xQ@mail.gmail.com>
+        bh=H+wJNJJb1N6FKJqcKXUDaiMLQ5FpwEyXhKeFs5Ra0+o=;
+        b=xUpr2ER8GRdZEGpRwGctl3GCELDXgDzJAhqqdL0A6k5jXDNu58jzpvtVo/f9xRJycV
+         C4JSn2VeSY8g31LhTX/60P+ejYGERaon4AzgdEBQT+q3gVYnXYgIx297jJ+wHtI9VEEc
+         5jRHzO9+prNsu+POetWd+LyOVDHvElqc4IoeIGWkUy1Oxy8XXJo0fCA6EAxRPmSMuUpu
+         jhD0tNrHEN3xEYvpFbbJWyC52ZiBp9FEOqEw0EtnuN0YIDdFNtj5ThzBZe9/vPnI3dCB
+         qrWeghznXgUJaibkL2mXkXnEccfz3Mdq5/X/nlyQUmeNnVlRxKpWs1TBAIMwEJeAgn9W
+         GOjA==
+X-Forwarded-Encrypted: i=1; AJvYcCXsYDQ/f629VRohZY28FIVRYmfXYLpOBBKPW9WoeyLqfVh595mt31y9v7OG/JSCU4rT8Mtj7OM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyX/8QDt0O/KWnsRcx2QSwERJOK9XbU/a6i/vH23c91Cv4oprHV
+	jHQmOet6lKSHcZ8fckgqEnc6rAmTCRMHnAJC6V1l8ZxhdLj+5gnfwzoMu+/m9cGxxfvn61FRQdG
+	zYuBWBPT2NX2LCjxBQmxDHoIald177lP4uGwH
+X-Gm-Gg: ASbGncvxGziTLPIwX4UVwzIUf+EKjzngoZWhw2ahTUiDLa2H3LcgeAUP20/+XVC5qLK
+	XpF1fXAZoKL10lMM5gv+SjIV90rKzds9Z2D6l
+X-Google-Smtp-Source: AGHT+IG96xH0lX+KT49SwN7wIpWAnhUmxscKBwEmNN284TIzYuqpvR5tdwJLaL3okKC14Ca9n0bsHj1begHgqYLQKok=
+X-Received: by 2002:a05:6402:210f:b0:5d4:4143:c06c with SMTP id
+ 4fb4d7f45d1cf-5d972e4c99amr26896481a12.23.1737041422999; Thu, 16 Jan 2025
+ 07:30:22 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20250115010450.2472-1-ma.arghavani.ref@yahoo.com>
+ <20250115010450.2472-1-ma.arghavani@yahoo.com> <CAL+tcoAtzuGZ8US5NcJwJdBh29afYGZHpeMJ4jXgiSnWBr75Ww@mail.gmail.com>
+ <501586671.358052.1737020976218@mail.yahoo.com> <CAL+tcoA9yEUmXnHFdotcfEgHqWSqaUXu1Aoj=cfCtL5zFG1ubg@mail.gmail.com>
+ <CADVnQy=3xz2_gjnM1vifjPJ_2TpT55mc=Oh7hO_omAAi9P6fxw@mail.gmail.com>
+In-Reply-To: <CADVnQy=3xz2_gjnM1vifjPJ_2TpT55mc=Oh7hO_omAAi9P6fxw@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 16 Jan 2025 16:30:12 +0100
+X-Gm-Features: AbW1kvbAqQQBZaputEazZcjPDUoqzYWveg6Y0XMkoxOYp5HN2VNZiaM-ASqRKtM
+Message-ID: <CANn89iJfx3CBJYBS01Mz9z3twjsP3xvSSOamno-cYSSzv3gSxw@mail.gmail.com>
+Subject: Re: [PATCH net v2] tcp_cubic: fix incorrect HyStart round start detection
+To: Neal Cardwell <ncardwell@google.com>
+Cc: Jason Xing <kerneljasonxing@gmail.com>, Mahdi Arghavani <ma.arghavani@yahoo.com>, 
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
+	"haibo.zhang@otago.ac.nz" <haibo.zhang@otago.ac.nz>, 
+	"david.eyers@otago.ac.nz" <david.eyers@otago.ac.nz>, "abbas.arghavani@mdu.se" <abbas.arghavani@mdu.se>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The NCSI state machine as it's currently implemented assumes that
-transition to the next logical state is performed either explicitly by
-calling `schedule_work(&ndp->work)` to re-queue itself or implicitly
-after processing the predefined (ndp->pending_req_num) number of
-replies. Thus to avoid the configuration FSM from advancing prematurely
-and getting out of sync with the process it's essential to not skip
-waiting for a reply.
+On Thu, Jan 16, 2025 at 3:42=E2=80=AFPM Neal Cardwell <ncardwell@google.com=
+> wrote:
+>
+> On Thu, Jan 16, 2025 at 6:40=E2=80=AFAM Jason Xing <kerneljasonxing@gmail=
+.com> wrote:
+> >
+> > On Thu, Jan 16, 2025 at 5:49=E2=80=AFPM Mahdi Arghavani <ma.arghavani@y=
+ahoo.com> wrote:
+> > >
+> > > Hi Jason,
+> > >
+> > > I will explain this using a test conducted on my local testbed. Imagi=
+ne a client and a server connected through two Linux software routers. In t=
+his setup, the minimum RTT is 150 ms, the bottleneck bandwidth is 50 Mbps, =
+and the bottleneck buffer size is 1 BDP, calculated as (50M / 1514 / 8) * 0=
+.150 =3D 619 packets.
+> > >
+> > > I conducted the test twice, transferring data from the server to the =
+client for 1.5 seconds:
+> > >
+> > > TEST 1) With the patch applied: HyStart stopped the exponential growt=
+h of cwnd when cwnd =3D 632 and the bottleneck link was saturated (632 > 61=
+9).
+> > >
+> > >
+> > > TEST 2) Without the patch applied: HyStart stopped the exponential gr=
+owth of cwnd when cwnd =3D 516 and the bottleneck link was not yet saturate=
+d (516 < 619). This resulted in 300 KB less delivered data compared to the =
+first test.
+> >
+> > Thanks for sharing these numbers. I would suggest in the v3 adding the
+> > above description in the commit message. No need to send v3 until the
+> > maintainers of TCP (Eric and Neal) give further suggestions :)
+> >
+> > Feel free to add my reviewed-by tag in the next version:
+> > Reviewed-by: Jason Xing <kerneljasonxing@gmail.com>
+> >
+> > Thanks,
+> > Jason
+>
+> Mahdi, a few quick questions about your test logs, beforePatch.log and
+> afterPatch.log:
+>
+> + What is moRTT? Is that ca->curr_rtt? It would be great to share the
+> debug patch you used, so we know for certain how to interpret each
+> column in the debug output.
 
-This patch makes the code wait for reception of the Deselect Package
-response for the last package probed before proceeding to channel
-configuration.
++1
 
-Thanks go to Potin Lai and Cosmo Chou for the initial investigation and
-testing.
+Debug patches can alone add delays...
 
-Fixes: 8e13f70be05e ("net/ncsi: Probe single packages to avoid conflict")
-Cc: stable@vger.kernel.org
-Signed-off-by: Paul Fertser <fercerpav@gmail.com>
----
- net/ncsi/ncsi-manage.c | 13 +++++++------
- 1 file changed, 7 insertions(+), 6 deletions(-)
 
-diff --git a/net/ncsi/ncsi-manage.c b/net/ncsi/ncsi-manage.c
-index 5cf55bde366d..bf8e27b84a66 100644
---- a/net/ncsi/ncsi-manage.c
-+++ b/net/ncsi/ncsi-manage.c
-@@ -1373,6 +1373,12 @@ static void ncsi_probe_channel(struct ncsi_dev_priv *ndp)
- 		nd->state = ncsi_dev_state_probe_package;
- 		break;
- 	case ncsi_dev_state_probe_package:
-+		if (ndp->package_probe_id >= 8) {
-+			/* Last package probed, finishing */
-+			ndp->flags |= NCSI_DEV_PROBED;
-+			break;
-+		}
-+
- 		ndp->pending_req_num = 1;
- 
- 		nca.type = NCSI_PKT_CMD_SP;
-@@ -1489,13 +1495,8 @@ static void ncsi_probe_channel(struct ncsi_dev_priv *ndp)
- 		if (ret)
- 			goto error;
- 
--		/* Probe next package */
-+		/* Probe next package after receiving response */
- 		ndp->package_probe_id++;
--		if (ndp->package_probe_id >= 8) {
--			/* Probe finished */
--			ndp->flags |= NCSI_DEV_PROBED;
--			break;
--		}
- 		nd->state = ncsi_dev_state_probe_package;
- 		ndp->active_package = NULL;
- 		break;
--- 
-2.34.1
 
+>
+> + Are both HYSTART-DELAY and HYSTART-ACK-TRAIN enabled for both of those =
+tests?
+
+I also wonder if cubictcp_cwnd_event( event =3D=3D CA_EVENT_TX_START)
+should also call bictcp_hystart_reset()
+
+cubic was not really expecting app_limited mode.
 
