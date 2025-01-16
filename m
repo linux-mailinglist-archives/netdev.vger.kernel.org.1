@@ -1,100 +1,138 @@
-Return-Path: <netdev+bounces-158891-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158892-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12084A13A76
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 14:07:44 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B723DA13A85
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 14:09:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2DDBA163642
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 13:07:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6AF5D1881BDB
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 13:09:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FF9F1F37CD;
-	Thu, 16 Jan 2025 13:07:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C11121E5716;
+	Thu, 16 Jan 2025 13:09:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X1D87wyC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6C0B1F2C53
-	for <netdev@vger.kernel.org>; Thu, 16 Jan 2025 13:07:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AF801DE4C8;
+	Thu, 16 Jan 2025 13:09:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737032843; cv=none; b=fZQOJPBVrIYPmmaBEhkHj7NDpfrxxg+L68ahvnT/zFtQhaavRD5HgLxNYpxE7mjetkWKbXSsfIygZBT1vtFSAJR18RqRfe5/H7FryOoALS6EUCz/NPupmfXCzOR30tQINR5m/js1/nWBZTd021/t4uDw+ygarTt9ImpdL1bcPQ4=
+	t=1737032974; cv=none; b=gRdWTFumDpgOCRTM6C9LIuiFCf9sW7SD5r8oWfeNtwcBjs08YNXr7stTwLBwAu0DIVawZUfitvmwyLDZizkq9aiwi01e7a2aR3AwSRNzbyREcorJUh5e3ow5D2+HauqFKPhDgOXr3md4xWX7rklDMRjrnlDRMGoBJzaNTk22I40=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737032843; c=relaxed/simple;
-	bh=bt4Dqaj3KiJm6oOOP/oi3442OiP+mmJ00loVyqbtACo=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=hcd5sSc5pNkjI9e5/LaWU3X8+vUB3jf3QkJRV+Cgs0ZrHUMPukBSxahBlNwjnGPY9XK7tgSB6qKlTEsoWSJLub3OIxG7CB35vWMJIg2pEuHSTwk3bYelfKvE63rAPtvOOJbMoXUh705FZkDal5dCvPaVYYIzJ7SGZZqXnVMm4hg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-84cdb5795b0so59562339f.2
-        for <netdev@vger.kernel.org>; Thu, 16 Jan 2025 05:07:21 -0800 (PST)
+	s=arc-20240116; t=1737032974; c=relaxed/simple;
+	bh=cIAqiPzlev6Stxgd/seSBG5lcv2RnLx9IgIT7Mx0JD0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=gd6SxeatEWAmw7j6kBhqTPN4zyTU+7tWW7g75ZZz2jE/7UNiX8IdTobr9EUvT706XqgpjNf+RDGs4zr8a4SX3euBroNFUmC19Fho7SciZd54NNXvK621S3VaWygYPqJZ6M5EVSjAkAUsUA8Jp+BE2AW+LFRU/MEWuLMjEC3UjJQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=X1D87wyC; arc=none smtp.client-ip=209.85.214.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-21644aca3a0so18843425ad.3;
+        Thu, 16 Jan 2025 05:09:33 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1737032973; x=1737637773; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=snptrSjCp/WTiLu8I8u0XSZwNccoh5U/0syc3p+zW30=;
+        b=X1D87wyCY/qCu/wnjT4xReIxQcbrlyX/gAxKmaYCbOofVvMWG9RKAL1Ls0ZgdAyR8X
+         pBap5IXiRO4+utQ5VZhxKUUMmXAgpcqiAcifh9AEt73u36nOLlt7TPg1maH8Lmy5vDWK
+         c7+1p4ASmcIHKvrIQXAWL99FWL0pPqph7ONrNado1EEV1m2maoqYllUYfx9TIGnics2T
+         AofeUq+kdpsNuqCsJEXJJthw5a+GgPXJgupejG/sGAH1SDBLB2BtHpFl0Hf3BrV4Or0p
+         dFs0oVsDb5unK8EuyJwxCbHU3e7szAJAmedP+M4SXSkmE/sfUaNBhHs9mpcPRDc8uWVc
+         T67g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737032841; x=1737637641;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=HZnwLAZE1hvc7zr13C8s1bzWnJbdM8KYpOkg+JFZ4GM=;
-        b=bSzOy4DhukckTlsTZA2Z011UZ+wGheXX1F+NRFAhfP4lH4nANy4HtaoVtXPuvubXcd
-         796pLDfN/dMtsOkUsG4ev3NKF5n+uyzGJOQPkU/QJ1OcRrf8YOM5tN5Yvm2Io8toVuDg
-         heUkFDAv8HwG/oxd2DRQKSj3c4hZdBwPqj5yVVhBNw0tw0HRj5o4+1PAWcaV7aflSiI8
-         L/TMp1LYyeYPhTBk6K7tUyFAdmYsYQuLeH6Q8AMxCqS87UgVPMoQMQBmzIhh0HduPzDV
-         Tm7o2HvC9VPzAID+WD3SK6zevAFmll7tFhi0EucNdS2A1BYi4L5mSGDvKDmAjxCchikr
-         D91g==
-X-Forwarded-Encrypted: i=1; AJvYcCV6DVRdqy+czmwdcO2ZSgdFe+408stO3aHSfQSQnRJ9VwezNyKfSMRw3o8vAt7qdJvGtIndd9I=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy5ItU0bnjtBFKUB4JsGDCkCGktcGCs6KP7BcpUFyYfFLeu2vYE
-	N/AFzpYIGtc/x8fW7B8rtOCJVsj3wFoZ/NhBjUezHvg2mRbwF+eIcI4jzSgz1YGAoip+HOg7Iwd
-	Q+vNt6t379Cn8Q28spIsgh3dnhhm8utkFAvDCNXTiUsuJ4oB/noUHCPk=
-X-Google-Smtp-Source: AGHT+IEyIfUjlHp2v67R/YAXNYsxt5y3Ql3uf8qYNFpqE7tp3+/B8sxZt7KvBlfasEoBjLjX+TxAkyqvfUXjnwvu5VqHMqDcS9/C
+        d=1e100.net; s=20230601; t=1737032973; x=1737637773;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=snptrSjCp/WTiLu8I8u0XSZwNccoh5U/0syc3p+zW30=;
+        b=p0Euc7Nc6IsNaTWt84RY+TOeRsBcPDUJh/meza0FZeClttmfCP9H/SbXI26o5IeMuR
+         6rgmq0C3wKdwfAPQoxaW825AG9s5oSL/93MbjKrIcnYIuYMjyZjE4wyzucm+NnmVg+Dj
+         fjDwQgrUbF9wxla4Zn2udSsk1PcAcLlBMAj8xfigJwJIOPQj0zYSIfKq2ZBA2OR9RKOy
+         jw8np/xSwnuBxbDLFuibSDz3S3rrPmIQzXy3P/DT3zHXI3P1w06VLQgG1s/BI8lv4wlz
+         VuLp45JlJV95KT3N6lnzlOAvGagIprtIAGYdk1J+fhIxF1xFy80NIUGQmCY05Xap6+xj
+         qTuA==
+X-Forwarded-Encrypted: i=1; AJvYcCU9PWIjZSsmY7mIEQoIR/dFZs3bPSL3HctKbN0VdxjEr5jMoHWvSD7KhSrtz7qTFO8szI2GY1XH@vger.kernel.org, AJvYcCVbzGaaQ2DnDxrt7LIUDshmfw3CjHh9WIRdT5xHlPoZ5CUhEjEHyktNFSJkG9xoiLycEO6Pl6VCmwts/9s=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxyIGhaZtf28RzrEolJ/otxGcO5b4V61Tm8zvFMQeDxlxtXxRWT
+	0Y/BHfilvDAmDBKwMy2of6mbDagZkAAL8QYrX0JtTgxV2trmxoGO
+X-Gm-Gg: ASbGnculxLQpvkd1fvb0m+cQLam5LkXCQJTuH7c5ARzeXND+4QWFyVntCJTO2RX2KCw
+	7GEiC/eCC3G/fzWUZG9yzlMM6Qq1byBATV7xvyUA/R5BDJPXaCFygO8QfJkvvBHYHyCeyDvDzfs
+	8n6slx5tElmq491Nde06L0cYxiHFZfsr6CyfH1u6FwV5TpR4Z5bXWvSMj00dWhUsNhsU5egs0pA
+	BAc7wUyMLXDe6PNblSGv2pbO0iR+Iazm/krgQbCwSntIHLw+BGqHbm9UV7q
+X-Google-Smtp-Source: AGHT+IFwvxoH6j5w/7H364LI1PDnz4GWvdvRTrSBQCw/AugbZy6zJhUICULr6Udxk4KcvLdJYHGJmw==
+X-Received: by 2002:a17:902:ea0a:b0:216:6769:9ee7 with SMTP id d9443c01a7336-21a83ffbab5mr535838205ad.41.1737032972572;
+        Thu, 16 Jan 2025 05:09:32 -0800 (PST)
+Received: from HOME-PC ([223.185.135.17])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21a9f22d0d7sm98728015ad.163.2025.01.16.05.09.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 16 Jan 2025 05:09:32 -0800 (PST)
+From: Dheeraj Reddy Jonnalagadda <dheeraj.linuxdev@gmail.com>
+To: wei.fang@nxp.com,
+	shenwei.wang@nxp.com,
+	xiaoning.wang@nxp.com
+Cc: andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	imx@lists.linux.dev,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Dheeraj Reddy Jonnalagadda <dheeraj.linuxdev@gmail.com>
+Subject: [PATCH net-next] net: fec: implement TSO descriptor cleanup
+Date: Thu, 16 Jan 2025 18:39:20 +0530
+Message-Id: <20250116130920.30984-1-dheeraj.linuxdev@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1d87:b0:3ce:80b8:7328 with SMTP id
- e9e14a558f8ab-3ce80b873d1mr74471705ab.3.1737032841121; Thu, 16 Jan 2025
- 05:07:21 -0800 (PST)
-Date: Thu, 16 Jan 2025 05:07:21 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <67890489.050a0220.20d369.003a.GAE@google.com>
-Subject: [syzbot] Monthly mptcp report (Jan 2025)
-From: syzbot <syzbot+list199304eb885a80743e78@syzkaller.appspotmail.com>
-To: linux-kernel@vger.kernel.org, martineau@kernel.org, matttbe@kernel.org, 
-	mptcp@lists.linux.dev, netdev@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-Hello mptcp maintainers/developers,
+Implement the TODO in fec_enet_txq_submit_tso() error path to properly
+release buffer descriptors that were allocated during a failed TSO
+operation. This prevents descriptor leaks when TSO operations fail
+partway through.
 
-This is a 31-day syzbot report for the mptcp subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/mptcp
+The cleanup iterates from the starting descriptor to where the error
+occurred, resetting the status and buffer address fields of each
+descriptor.
 
-During the period, 2 new issues were detected and 0 were fixed.
-In total, 3 issues are still open and 23 have already been fixed.
-
-Some of the still happening issues:
-
-Ref Crashes Repro Title
-<1> 11      Yes   WARNING in __mptcp_clean_una (2)
-                  https://syzkaller.appspot.com/bug?extid=ebc0b8ae5d3590b2c074
-<2> 5       No    KMSAN: uninit-value in mptcp_incoming_options (2)
-                  https://syzkaller.appspot.com/bug?extid=23728c2df58b3bd175ad
-<3> 2       Yes   WARNING in mptcp_pm_nl_set_flags (2)
-                  https://syzkaller.appspot.com/bug?extid=cd16e79c1e45f3fe0377
-
+Signed-off-by: Dheeraj Reddy Jonnalagadda <dheeraj.linuxdev@gmail.com>
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+ drivers/net/ethernet/freescale/fec_main.c | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
 
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
+diff --git a/drivers/net/ethernet/freescale/fec_main.c b/drivers/net/ethernet/freescale/fec_main.c
+index b2daed55bf6c..eff065010c9e 100644
+--- a/drivers/net/ethernet/freescale/fec_main.c
++++ b/drivers/net/ethernet/freescale/fec_main.c
+@@ -913,7 +913,18 @@ static int fec_enet_txq_submit_tso(struct fec_enet_priv_tx_q *txq,
+ 	return 0;
+ 
+ err_release:
+-	/* TODO: Release all used data descriptors for TSO */
++	/* Release all used data descriptors for TSO */
++	struct bufdesc *tmp_bdp = txq->bd.cur;
++
++	while (tmp_bdp != bdp) {
++		tmp_bdp->cbd_sc = 0;
++		tmp_bdp->cbd_bufaddr = 0;
++		tmp_bdp->cbd_datlen = 0;
++		tmp_bdp = fec_enet_get_nextdesc(tmp_bdp, &txq->bd);
++	}
++
++	dev_kfree_skb_any(skb);
++
+ 	return ret;
+ }
+ 
+-- 
+2.34.1
 
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
-
-You may send multiple commands in a single email message.
 
