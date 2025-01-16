@@ -1,80 +1,71 @@
-Return-Path: <netdev+bounces-158822-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158823-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 104DCA1369F
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 10:31:56 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 58415A136A8
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 10:32:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 927373A6F6C
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 09:31:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8187C1889775
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 09:32:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A61C1198842;
-	Thu, 16 Jan 2025 09:31:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2A9924A7E8;
+	Thu, 16 Jan 2025 09:32:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="CXe9M9ng"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-97.freemail.mail.aliyun.com (out30-97.freemail.mail.aliyun.com [115.124.30.97])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFDC333DB;
-	Thu, 16 Jan 2025 09:31:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 220F71D63E8;
+	Thu, 16 Jan 2025 09:32:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.97
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737019910; cv=none; b=YGOeXZvfqdirdkWi6U+N+H47vRupXr/GdgB+/+uhn9SGtBbRRFV6RGRNsFVlZSRQWaZAX0bzur6DXvctRUxrJx5wepY5TeQDcM/els6M0ECysb7baUoTYxY0rGVn2kKGAPI5nxn01DZ6taxK6xXi/shZYeCeRNsE2AQ4yEI9prI=
+	t=1737019959; cv=none; b=gMa5+gCz5oXB5zGejdeY0y7uSgpHEsiD61hyZw32kPBl6LFaD7UuugDI1vd1Nt4W5Tpl8j7FQk4b428I8mPdDvKssiKj7vI0kDAT3D6qzOceeRtBGYz34aia5lRKjpbwtRzmBpU6UZsRriD2AFk1Q3NTvZ42lzXD82Opgr1CFyg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737019910; c=relaxed/simple;
-	bh=7szx2gxdaewH7rPgIQ2jNbT1I3KzNgWe4RC961FzvD0=;
+	s=arc-20240116; t=1737019959; c=relaxed/simple;
+	bh=LWt7XEVPS8N0YQy0uQOXW6JLOsPR54wsDdcCXDxVGWw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Tc9L51Iy/arMfvA9NSY6J0fH4oRWbOoDlREeJiYEFsSh8Nn4aC/ZMNNxdeoMm+Ix+mAbjlCBVe+pYCeyLMXC08IvwFy9xMoHWAZPYIrt+pVVZQkvGkz+L0P6wCGbhbNRiajmEAQZc8O7PTaG855UkWpxBs4b9fio2opUq9MrPtY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-aab6fa3e20eso132369666b.2;
-        Thu, 16 Jan 2025 01:31:48 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737019907; x=1737624707;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=m2P5Op0PE0ntDX/4CbdjSlAdBOP2yikx9ameN+GlxVA=;
-        b=YfEMackOWuQgZ031BIAgnQW7MGEkZjs0e3bSGr8iKeIDqrsPeAiD48Rxlob+n3O7p4
-         Rqn4PITtMbtr3K+9Crv9CEP0ekmJKTpkTApMOyJ5346Z/IBN4XaNSIYjouZnIeVotp+Q
-         SGKV2Bsf0XNjSKhygjzEv2PK/ax5qToDVUUS4TrHnyyGyYmFZ0ihRvn5wyK+HM6rFsbr
-         sISdUvfyAbYguxE8PH//E9COISCPFMVVPTHSMElOg/lm4Cr7lM0YuOGxMvJWwDMGZbvH
-         3r10l47rX1Qmz0i9kKNfKmyQu7PyV61b9fVfuriGUgTp8684ElJiwUBFcJ/fwmHHdc45
-         TYew==
-X-Forwarded-Encrypted: i=1; AJvYcCUaotVkDxWBVy9LHv2MsD9F3G/vGoLtVYFbyQ/QDtAS0KI8ugmxj5GCSKoCd9HPZCRztMP+SNsKZxSmvjB+bH72@vger.kernel.org, AJvYcCVZkq4vAWzzC+vnRM5I6os1nYNQ0JFFge67Z8CsJ0GxY4LN7HEg1XTtJw/t5AwxCtknM9QLmCtm@vger.kernel.org, AJvYcCX+CMv7kqW9KGw6ire4HLIbuMD7jVR394i3gBdFKMv3unZov2ppPbz05cdUNfwfNNJJRrxTIFi19AdV8woA@vger.kernel.org, AJvYcCX5Za9K/si8nIamkhn3vmvI1KsCT6zEfNrm+dmPkpyeLGwn7MREl+gB1TyY1TTyME01VZANFnJLZvg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwE5T7e+sO7N9hnlqJZktF0eP2JBGL5+1kEM+7JbfKjsmuSenNj
-	TFudKZvgSZmeDZgUnCc27KSuAjHdE85YlWg52kyVfuLP3O8Qflsg
-X-Gm-Gg: ASbGnctLW1mh8iiWmgjhxfBJUOo/KWHFp0YRFSw1q2S/FPDl8VUF0gBpDqyUvdhp+vr
-	gIcTq02rimBtnOOQzgTtcqU3Zkk3HVZ2kUe2u/Xs+zlECTvATSRKePTDZiflDwIlWqSX9y9LWYl
-	hRpKSFFr2gHqh7OK/R94w7SrEKm8Rmrv55ieIOqayEwVWL4taEkMVnZGc8b51NqPFK49gxG/5pP
-	bBcEycvnopEfP3D7frZmI0T07THExkcsZ3oX5PjMt99PA0=
-X-Google-Smtp-Source: AGHT+IGZV6lgbdhuVrLEd33Yv8qOfJzFESHNVW9Z/XSMD0r82hvlj3BkZQGz1iGhAAodDKfqxHlc2g==
-X-Received: by 2002:a17:907:7d92:b0:aae:b259:ef5e with SMTP id a640c23a62f3a-ab2aad118b5mr2958827666b.0.1737019906742;
-        Thu, 16 Jan 2025 01:31:46 -0800 (PST)
-Received: from gmail.com ([2a03:2880:30ff:9::])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ab2c9134403sm897933666b.90.2025.01.16.01.31.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Jan 2025 01:31:46 -0800 (PST)
-Date: Thu, 16 Jan 2025 01:31:43 -0800
-From: Breno Leitao <leitao@debian.org>
-To: Randy Dunlap <rdunlap@infradead.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=RpkMtdNLjmxx/6fh24SIM6FJGyqtWkzEBjcNaXMYl3jFKe3jJOFQCD6qyqQuEfvalg0QaS3V7krRzhvg2813VP1Tpm7+SuYakxPr4+QjrmoO/nbp3Ui8rPNz3vkQ7a7IKNnaBC4Y3NOgdX2Tfa+jBxAu1WC7INAxx+0gi6QSsro=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=CXe9M9ng; arc=none smtp.client-ip=115.124.30.97
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1737019953; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
+	bh=uuXQ582Ha4DdvDN45Lh8QaDTbd5XVBqL+jFWzVMrE5Q=;
+	b=CXe9M9ngwDpnU9UcufqvNYhvn9tJDZtqI3Vb5p1pWROqHmXIAcghwsfgtJDK6FXRptJFSzO9egnoApTrBZBjchhEQ15N/NOWsIMZGaPJXww4KYNivtF3n3asZfcgL7WBUjN+lCYlIH5XDs1h6mKOzxedxFGc1CXlP5YmK/LKr9o=
+Received: from localhost(mailfrom:dust.li@linux.alibaba.com fp:SMTPD_---0WNlGIC9_1737019952 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Thu, 16 Jan 2025 17:32:32 +0800
+Date: Thu, 16 Jan 2025 17:32:31 +0800
+From: Dust Li <dust.li@linux.alibaba.com>
+To: Alexandra Winter <wintera@linux.ibm.com>,
+	Wenjia Zhang <wenjia@linux.ibm.com>,
+	Jan Karcher <jaka@linux.ibm.com>, Gerd Bayer <gbayer@linux.ibm.com>,
+	Halil Pasic <pasic@linux.ibm.com>,
+	"D. Wythe" <alibuda@linux.alibaba.com>,
+	Tony Lu <tonylu@linux.alibaba.com>,
+	Wen Gu <guwen@linux.alibaba.com>,
+	Peter Oberparleiter <oberpar@linux.ibm.com>,
+	David Miller <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, kernel-team@meta.com,
-	max@kutsevol.com, thepacketgeek@gmail.com
-Subject: Re: [PATCH net-next v2 5/5] netconsole: docs: Add documentation for
- CPU number auto-population
-Message-ID: <20250116-ethereal-vigilant-duck-0bcffe@leitao>
-References: <20250115-netcon_cpu-v2-0-95971b44dc56@debian.org>
- <20250115-netcon_cpu-v2-5-95971b44dc56@debian.org>
- <417a5115-891b-41b9-bd2c-a77e813b4ef0@infradead.org>
+	Eric Dumazet <edumazet@google.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>
+Cc: Julian Ruess <julianr@linux.ibm.com>,
+	Niklas Schnelle <schnelle@linux.ibm.com>,
+	Thorsten Winkler <twinkler@linux.ibm.com>, netdev@vger.kernel.org,
+	linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	Simon Horman <horms@kernel.org>
+Subject: Re: [RFC net-next 0/7] Provide an ism layer
+Message-ID: <20250116093231.GD89233@linux.alibaba.com>
+Reply-To: dust.li@linux.alibaba.com
+References: <20250115195527.2094320-1-wintera@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,56 +74,163 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <417a5115-891b-41b9-bd2c-a77e813b4ef0@infradead.org>
+In-Reply-To: <20250115195527.2094320-1-wintera@linux.ibm.com>
 
-Hello Randy,
+On 2025-01-15 20:55:20, Alexandra Winter wrote:
 
-On Wed, Jan 15, 2025 at 02:56:06PM -0800, Randy Dunlap wrote:
-> On 1/15/25 5:35 AM, Breno Leitao wrote:
-> > Update the netconsole documentation to explain the new feature that
-> > allows automatic population of the CPU number.
-> > 
-> > The key changes include introducing a new section titled "CPU number
-> > auto population in userdata", explaining how to enable the CPU number
-> > auto-population feature by writing to the "populate_cpu_nr" file in the
-> > netconsole configfs hierarchy.
-> > 
-> > This documentation update ensures users are aware of the new CPU number
-> > auto-population functionality and how to leverage it for better
-> > demultiplexing and visibility of parallel netconsole output.
-> > 
-> > Signed-off-by: Breno Leitao <leitao@debian.org>
-> > ---
-> >  Documentation/networking/netconsole.rst | 45 +++++++++++++++++++++++++++++++++
-> >  1 file changed, 45 insertions(+)
-> > 
-> > diff --git a/Documentation/networking/netconsole.rst b/Documentation/networking/netconsole.rst
-> > index 94c4680fdf3e7e1a0020d11b44547acfd68072a5..bc9ccebdae7adadd7c57aef20a726536d7ab3173 100644
-> > --- a/Documentation/networking/netconsole.rst
-> > +++ b/Documentation/networking/netconsole.rst
-> > @@ -17,6 +17,8 @@ Release prepend support by Breno Leitao <leitao@debian.org>, Jul 7 2023
-> >  
-> >  Userdata append support by Matthew Wood <thepacketgeek@gmail.com>, Jan 22 2024
-> >  
-> > +Sysdata append support by Breno Leitao <leitao@debian.org>, Jan 15 2025
-> > +
-> >  Please send bug reports to Matt Mackall <mpm@selenic.com>
-> >  Satyam Sharma <satyam.sharma@gmail.com>, and Cong Wang <xiyou.wangcong@gmail.com>
-> >  
-> > @@ -238,6 +240,49 @@ Delete `userdata` entries with `rmdir`::
-> >  
-> >     It is recommended to not write user data values with newlines.
-> >  
-> > +CPU number auto population in userdata
-> > +--------------------------------------
-> > +
-> > +Inside the netconsole configfs hierarchy, there is a file called
-> > +`cpu_nr` under the `userdata` directory. This file is used to enable or disable
-> > +the automatic CPU number population feature. This feature automatically
-> > +populate the CPU number that is sending the message.
-> 
->    populates
+Hi Winter,
 
-Thanks for the review, I will update.
---breno
+I'm fully supportive of the refactor!
+
+Interestingly, I developed a similar RFC code about a month ago while
+working on enhancing internal communication between guest and host
+systems. Here are some of my thoughts on the matter:
+
+Naming and Structure: I suggest we refer to it as SHD (Shared Memory
+Device) instead of ISM (Internal Shared Memory). To my knowledge, a
+"Shared Memory Device" better encapsulates the functionality we're
+aiming to implement. It might be beneficial to place it under
+drivers/shd/ and register it as a new class under /sys/class/shd/. That
+said, my initial draft also adopted the ISM terminology for simplicity.
+
+Modular Approach: I've made the ism_loopback an independent kernel
+module since dynamic enable/disable functionality is not yet supported
+in SMC. Using insmod and rmmod for module management could provide the
+flexibility needed in practical scenarios.
+
+Abstraction of ISM Device Details: I propose we abstract the ISM device
+details by providing SMC with helper functions. These functions could
+encapsulate ism->ops, making the implementation cleaner and more
+intuitive. This way, the struct ism_device would mainly serve its
+implementers, while the upper helper functions offer a streamlined
+interface for SMC.
+
+Structuring and Naming: I recommend embedding the structure of ism_ops
+directly within ism_dev rather than using a pointer. Additionally,
+renaming it to ism_device_ops could enhance clarity and consistency.
+
+
+>This RFC is about providing a generic shim layer between all kinds of
+>ism devices and all kinds of ism users.
+>
+>Benefits:
+>- Cleaner separation of ISM and SMC-D functionality
+>- simpler and less module dependencies
+>- Clear interface definition.
+>- Extendable for future devices and clients.
+
+Fully agree.
+
+>
+>Request for comments:
+>---------------------
+>Any comments are welcome, but I am aware that this series needs more work.
+>It may not be worth your time to do an in-depth review of the details, I am
+>looking for feedback on the general idea.
+>I am mostly interested in your thoughts and recommendations about the general
+>concept, the location of net/ism, the structure of include/linux/ism.h, the
+>KConfig and makefiles.
+>
+>Status of this RFC:
+>-------------------
+>This is a very early RFC to ask you for comments on this general idea.
+>The RFC does not fullfill all criteria required for a patchset.
+>The whole set compiles and runs, but I did not try all combinations of
+>module and built-in yet. I did not check for checkpatch or any other checkers.
+>Also I have only done very rudimentary quick tests of SMC-D. More testing is
+>required.
+>
+>Background / Status quo:
+>------------------------
+>Currently s390 hardware provides virtual PCI ISM devices (ism_vpci). Their
+>driver is in drivers/s390/net/ism_drv.c. The main user is SMC-D (net/smc).
+>ism_vpci driver offers a client interface so other users/protocols
+>can also use them, but it is still heavily intermingled with the smc code.
+>Namely, the ISM vPCI module cannot be used without the SMC module, which
+>feels artificial.
+>
+>The ISM concept is being extended:
+>[1] proposed an ISM loopback interface (ism_lo), that can be used on non-s390
+>architectures (e.g. between containers or to test SMC-D). A minimal implementation
+>went upstream with [2]: ism_lo currently is a part of the smc protocol and rather
+>hidden.
+>
+>[3] proposed a virtio definition of ISM (ism_virtio) that can be used between
+>kvm guests.
+>
+>We will shortly send an RFC for an ISM client that uses ISM as transport for TTY.
+>
+>Concept:
+>--------
+>Create a shim layer in net/ism that contains common definitions and code for
+>all ism devices and all ism clients.
+>Any device or client module only needs to depend on this ism layer module and
+>any device or client code only needs to include the definitions in
+>include/linux/ism.h
+>
+>Ideas for next steps:
+>---------------------
+>- sysfs representation? e.g. as /sys/class/ism ?
+>- provide a full-fledged ism loopback interface
+>    (runtime enable/disable, sysfs device, ..)
+
+I think it's better if we can make this common for all ISM devices.
+but yeah, that shoud be the next step.
+
+Best regards,
+Dust
+
+>- additional clients (tty over ism)
+>- additional devices (virtio-ism, ...)
+>
+>Link: [1] https://lore.kernel.org/netdev/1695568613-125057-1-git-send-email-guwen@linux.alibaba.com/
+>Link: [2] https://lore.kernel.org/linux-kernel//20240428060738.60843-1-guwen@linux.alibaba.com/
+>Link: [3] https://groups.oasis-open.org/communities/community-home/digestviewer/viewthread?GroupId=3973&MessageKey=c060ecf9-ea1a-49a2-9827-c92f0e6447b2&CommunityKey=2f26be99-3aa1-48f6-93a5-018dce262226&hlmlt=VT
+>
+>Alexandra Winter (7):
+>  net/ism: Create net/ism
+>  net/ism: Remove dependencies between ISM_VPCI and SMC
+>  net/ism: Use uuid_t for ISM GID
+>  net/ism: Add kernel-doc comments for ism functions
+>  net/ism: Move ism_loopback to net/ism
+>  s390/ism: Define ismvp_dev
+>  net/smc: Use only ism_ops
+>
+> MAINTAINERS                |   7 +
+> drivers/s390/net/Kconfig   |  10 +-
+> drivers/s390/net/Makefile  |   4 +-
+> drivers/s390/net/ism.h     |  27 ++-
+> drivers/s390/net/ism_drv.c | 467 ++++++++++++-------------------------
+> include/linux/ism.h        | 299 +++++++++++++++++++++---
+> include/net/smc.h          |  52 +----
+> net/Kconfig                |   1 +
+> net/Makefile               |   1 +
+> net/ism/Kconfig            |  27 +++
+> net/ism/Makefile           |   8 +
+> net/ism/ism_loopback.c     | 366 +++++++++++++++++++++++++++++
+> net/ism/ism_loopback.h     |  59 +++++
+> net/ism/ism_main.c         | 171 ++++++++++++++
+> net/smc/Kconfig            |  13 --
+> net/smc/Makefile           |   1 -
+> net/smc/af_smc.c           |  12 +-
+> net/smc/smc_clc.c          |   6 +-
+> net/smc/smc_core.c         |   6 +-
+> net/smc/smc_diag.c         |   2 +-
+> net/smc/smc_ism.c          | 112 +++++----
+> net/smc/smc_ism.h          |  29 ++-
+> net/smc/smc_loopback.c     | 427 ---------------------------------
+> net/smc/smc_loopback.h     |  60 -----
+> net/smc/smc_pnet.c         |   8 +-
+> 25 files changed, 1183 insertions(+), 992 deletions(-)
+> create mode 100644 net/ism/Kconfig
+> create mode 100644 net/ism/Makefile
+> create mode 100644 net/ism/ism_loopback.c
+> create mode 100644 net/ism/ism_loopback.h
+> create mode 100644 net/ism/ism_main.c
+> delete mode 100644 net/smc/smc_loopback.c
+> delete mode 100644 net/smc/smc_loopback.h
+>
+>-- 
+>2.45.2
+>
 
