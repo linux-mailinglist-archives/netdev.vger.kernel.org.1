@@ -1,112 +1,127 @@
-Return-Path: <netdev+bounces-158924-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158926-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0574EA13D0B
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 15:59:14 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6B18A13D2B
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 16:04:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7E63D1882550
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 14:58:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 196FB161CB3
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 15:04:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9D9222B8C6;
-	Thu, 16 Jan 2025 14:58:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B066822B5A4;
+	Thu, 16 Jan 2025 15:04:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Vi8CmRzb"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YESEZZUb"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEA3122B8C2;
-	Thu, 16 Jan 2025 14:58:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C1CC22B8A8
+	for <netdev@vger.kernel.org>; Thu, 16 Jan 2025 15:04:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737039517; cv=none; b=dxj6Vg6U3jiWPXodrZISG8JxlhgIxCipjlXMZ/GLGMiO5yihgbkz6L4MDaX5/AB4oJDjgq9hS7zCLW4sNZ05LkE8xoybM8ac+spStrHDqjouUrGvanCcexdABXSAnjvJoscCDu2ipia3jXRElyaIJsJjFLIsBP5faNEOD2EmsWI=
+	t=1737039843; cv=none; b=geWDaXLTGwHDhCcp7ehizR5f/DL5epreEdZTirGOEoiWzNdOg/THZW7A/eT7twJV5Y1AYLG9KpKvJa8eCu6HT1ClfsbOH+rmIVz1WZKpovPvKeAx34Q/MEnr/0IbLVpN2JSj8YIiKbQ12okQrwR/kyk4bIZa3X+KB8YoQFz71ZM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737039517; c=relaxed/simple;
-	bh=TiVFCV4vTQJVEsmUheRI0KBsKO4lzgyHujgevy5cSzg=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=l9ug6aPL0fiG7klah7O2UVltXmwp0zOeaOYp8ZWUXUerqOkvOyHHlz2ggbc6NvtpqFSAH2jAlGs9BLmDYVtSX6MDI6iNs6+tg4j1Gaux0uRj8sEZsv3dvwLFN7otgRKmGzi1TGmW8D1ni1/fY/obFkz27J0QKzJWMe6Ga9xPuGo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Vi8CmRzb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D00D9C4CED6;
-	Thu, 16 Jan 2025 14:58:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737039517;
-	bh=TiVFCV4vTQJVEsmUheRI0KBsKO4lzgyHujgevy5cSzg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Vi8CmRzb8CBVoSUqB9HzYDg/67ZbxU0snlXxRQHkxkOeaIuAg0bEfpRVSydfKweCx
-	 pK2c/wNKCpB2Ki3nInDxqoJzSOXA2uL6H0xklDARcWtm+UGM0cGvXpyHCRuiGwNMh2
-	 i3h+68FtiEtir5YV1wSF7/S01/8Ko10ZpxloTYHDrUmwQoOqWldcv/KIIjKz6s4Xgz
-	 9zn78g28IPrdNZcJVMNe9RQMUUoxgWH3AnbFITGlFVjljDpkW1h9cjUKcARv+SYX2k
-	 y/hp9gWjorObqox6cfLA7D9cqR72e2G3vBHt4ApXyhB5WIl2dv3CMoED7tb4depLtk
-	 a72unD/FeDxHA==
-Date: Thu, 16 Jan 2025 06:58:35 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
- shuah@kernel.org, willemb@google.com, matttbe@kernel.org,
- linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net-next] selftests/net: packetdrill: make tcp buf
- limited timing tests benign
-Message-ID: <20250116065835.1cc1eaac@kernel.org>
-In-Reply-To: <678904353ca7e_3710bc294ef@willemb.c.googlers.com.notmuch>
-References: <20250115232129.845884-1-kuba@kernel.org>
-	<678904353ca7e_3710bc294ef@willemb.c.googlers.com.notmuch>
+	s=arc-20240116; t=1737039843; c=relaxed/simple;
+	bh=LOI/Zq1TNfYoRHMeo//q6o5DF9EgwbS+yo1GJ2vdWlw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=F0d0EUIKTPbG5m9Y9RCI8t/dUaUzB+yJqypOPDqq1QWK6bSGiL26CR6LRnKCsEYkf1TT3LGPD5BmxRYP0I8LoDHn3S0USJJpB+K+pzdwcegW2n5uNPwdlHkra2go3DmjLrE/SUOHJcDcimEPf3Jc4CwycCbR9g+vLfhXIYkxDp0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YESEZZUb; arc=none smtp.client-ip=198.175.65.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1737039842; x=1768575842;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=LOI/Zq1TNfYoRHMeo//q6o5DF9EgwbS+yo1GJ2vdWlw=;
+  b=YESEZZUb8YjxO3lNAPm/Ede3dDpilcbWXpTkLJKIMU1sJ5HczCmHYTIY
+   mFxb2GArs68WlwneGhZ9qB/F4mxduPND5nyAW8j/aIXUK68LDQ+CfWvUx
+   +7BQ700NOLx4ucLY3ERg0R3ca4zn9W6i9uBaHOohH77JEU0ru/siHSKto
+   0KFOtGEwQYwepsP7AH4On1EFOkw4gM3jWPb5QJUzg4BeVco1SlY2khYc4
+   f/He0kvvJYYhzsQ7WKZ7c/CzWpO38zxW0FT9W+2ISO6upe0WhRerdFP90
+   LOahGmxxK1OLUBEug6I5vqWyoI20yeWQ9kX1quIZ67cEBKU85kiDKmL4T
+   w==;
+X-CSE-ConnectionGUID: yy/Bop29QM6m4XT+Tdqymw==
+X-CSE-MsgGUID: iwgs4Io4RayppYd7fnewQQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11317"; a="54842593"
+X-IronPort-AV: E=Sophos;i="6.13,209,1732608000"; 
+   d="scan'208";a="54842593"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jan 2025 07:04:01 -0800
+X-CSE-ConnectionGUID: BZ0a8x0EQbqaLwrJgWlHAg==
+X-CSE-MsgGUID: K7A5EQl4SUSMYonoy/wt2w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.13,209,1732608000"; 
+   d="scan'208";a="136353273"
+Received: from mev-dev.igk.intel.com ([10.237.112.144])
+  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jan 2025 07:03:59 -0800
+Date: Thu, 16 Jan 2025 16:00:38 +0100
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+To: Moshe Shemesh <moshe@nvidia.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+	Ido Schimmel <idosch@nvidia.com>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Tariq Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>,
+	Maher Sanalla <msanalla@nvidia.com>
+Subject: Re: [PATCH net] net/mlxfw: Drop hard coded max FW flash image size
+Message-ID: <Z4kfFlUx6GloTh6v@mev-dev.igk.intel.com>
+References: <1737030796-1441634-1-git-send-email-moshe@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1737030796-1441634-1-git-send-email-moshe@nvidia.com>
 
-On Thu, 16 Jan 2025 08:05:57 -0500 Willem de Bruijn wrote:
-> Jakub Kicinski wrote:
-> > The following tests are failing on debug kernels:
-> > 
-> >   tcp_tcp_info_tcp-info-rwnd-limited.pkt
-> >   tcp_tcp_info_tcp-info-sndbuf-limited.pkt
-> > 
-> > with reports like:
-> > 
-> >       assert 19000 <= tcpi_sndbuf_limited <= 21000, tcpi_sndbuf_limited; \
-> >   AssertionError: 18000
-> > 
-> > and:
-> > 
-> >       assert 348000 <= tcpi_busy_time <= 360000, tcpi_busy_time
-> >   AssertionError: 362000
-> > 
-> > Extend commit 912d6f669725 ("selftests/net: packetdrill: report benign
-> > debug flakes as xfail") to cover them.
-> > 
-> > Signed-off-by: Jakub Kicinski <kuba@kernel.org>  
+On Thu, Jan 16, 2025 at 02:33:16PM +0200, Moshe Shemesh wrote:
+> From: Maher Sanalla <msanalla@nvidia.com>
 > 
-> Reviewed-by: Willem de Bruijn <willemb@google.com>
+> Currently, mlxfw kernel module limits FW flash image size to be
+> 10MB at most, preventing the ability to burn recent BlueField-3
+> FW that exceeds the said size limit.
 > 
-> Thanks.
+> Thus, drop the hard coded limit. Instead, rely on FW's
+> max_component_size threshold that is reported in MCQI register
+> as the size limit for FW image.
 > 
-> I see that we'll still have a few flakes on dbg. Perhaps one total
-> failure a day. From the following.
+> Fixes: 410ed13cae39 ("Add the mlxfw module for Mellanox firmware flash process")
+> Cc: Ido Schimmel <idosch@nvidia.com>
+> Signed-off-by: Maher Sanalla <msanalla@nvidia.com>
+> Signed-off-by: Moshe Shemesh <moshe@nvidia.com>
+> ---
+>  drivers/net/ethernet/mellanox/mlxfw/mlxfw_fsm.c | 2 --
+>  1 file changed, 2 deletions(-)
 > 
-> tcp-close-close-local-close-then-remote-fin-pkt
-> tcp-ecn-ecn-uses-ect0-pkt
-> tcp-eor-no-coalesce-retrans-pkt
-> tcp-slow-start-slow-start-after-win-update-pkt
+> diff --git a/drivers/net/ethernet/mellanox/mlxfw/mlxfw_fsm.c b/drivers/net/ethernet/mellanox/mlxfw/mlxfw_fsm.c
+> index 46245e0b2462..43c84900369a 100644
+> --- a/drivers/net/ethernet/mellanox/mlxfw/mlxfw_fsm.c
+> +++ b/drivers/net/ethernet/mellanox/mlxfw/mlxfw_fsm.c
+> @@ -14,7 +14,6 @@
+>  #define MLXFW_FSM_STATE_WAIT_TIMEOUT_MS 30000
+>  #define MLXFW_FSM_STATE_WAIT_ROUNDS \
+>  	(MLXFW_FSM_STATE_WAIT_TIMEOUT_MS / MLXFW_FSM_STATE_WAIT_CYCLE_MS)
+> -#define MLXFW_FSM_MAX_COMPONENT_SIZE (10 * (1 << 20))
+>  
+>  static const int mlxfw_fsm_state_errno[] = {
+>  	[MLXFW_FSM_STATE_ERR_ERROR] = -EIO,
+> @@ -229,7 +228,6 @@ static int mlxfw_flash_component(struct mlxfw_dev *mlxfw_dev,
+>  		return err;
+>  	}
+>  
+> -	comp_max_size = min_t(u32, comp_max_size, MLXFW_FSM_MAX_COMPONENT_SIZE);
+>  	if (comp->data_size > comp_max_size) {
+>  		MLXFW_ERR_MSG(mlxfw_dev, extack,
+>  			      "Component size is bigger than limit", -EINVAL);
 
-Argh, I missed the two above, I had the ignored cases filtered out 
-when I was looking :(
+Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 
-> tcp-sack-sack-route-refresh-ip-tos-pkt
-> tcp-ts-recent-reset-tsval-pkt
-> tcp-zerocopy-closed-pkt
-> 
-> We'll take a look after this change whether we can make these
-> more resilient. But likely also allow-list or even xfail for
-> everything in dbg.
-
-Okay.
+> -- 
+> 2.18.2
 
