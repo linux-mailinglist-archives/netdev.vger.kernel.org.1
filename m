@@ -1,165 +1,155 @@
-Return-Path: <netdev+bounces-158719-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158720-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5D48A130FD
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 02:58:53 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7EFC5A130FF
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 03:01:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 28C6D1885673
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 01:58:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0E60F3A1153
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 02:01:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C570149652;
-	Thu, 16 Jan 2025 01:58:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4962E555;
+	Thu, 16 Jan 2025 02:01:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WSR2ajiN"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D915BCA4E;
-	Thu, 16 Jan 2025 01:58:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B02124A7C2;
+	Thu, 16 Jan 2025 02:01:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736992728; cv=none; b=uyTNqysUZh9Ha5plbhBIWgudBrO/wIbZiXQKurOl2CiixAEW3gl5YwzxaLaekm6e6ycPzfLwXTi4t0PajzOPo/Vl26AQoyT+SjgPwcS8SHOsz40sAoQtx7YQlH82ytMsYxNxAUegvBExX2o7HMGVq5MRNxnkrYo5s2AIpJQV4bg=
+	t=1736992871; cv=none; b=VcuLk07Z6upSMenwKJJRYzVT/yARr2ef1KBesuPC4bvzFKvSP9LstMxpyDQC3ZMfU9TOTKbkykloUop/8w5ZGlVnOZkIpiKxKGiv3cGsRiVbpswfMbVBfJaPz6/WIYCk18ClM4ZLhOq7LnUijdF8SLIC47k6rUkleg6O7f7SHOU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736992728; c=relaxed/simple;
-	bh=TmMJtEfASvIwmYEqdahDMkZ/kYpz2LK+G0QK9J24s2E=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=P9J/wcLwgjZJpPXWRKvmKP8M1c8MqyOGlT9o8V26Ect8kmeZA1GxVZDwrH6y3V+3F0I+c6CfHixNuRBL8SF0eGPUQxIRyg1A9hjv10lrZV8r8E8ky647/39tyoHEkLJ5s1rfJLTinkjSJDQOv3/K7xGqLLHaVYuwRgYMRIrb+kY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.98)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1tYF9Q-000000005g8-1tmN;
-	Thu, 16 Jan 2025 01:58:28 +0000
-Date: Thu, 16 Jan 2025 01:58:23 +0000
-From: Daniel Golle <daniel@makrotopia.org>
-To: Sky Huang <SkyLake.Huang@mediatek.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Qingfang Deng <dqfext@gmail.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org,
-	Steven Liu <Steven.Liu@mediatek.com>
-Subject: Re: [PATCH net-next 3/3] net: phy: mediatek: add driver for built-in
- 2.5G ethernet PHY on MT7988
-Message-ID: <Z4hnv2lzy8Ntd_Hp@makrotopia.org>
-References: <20250116012159.3816135-1-SkyLake.Huang@mediatek.com>
- <20250116012159.3816135-4-SkyLake.Huang@mediatek.com>
+	s=arc-20240116; t=1736992871; c=relaxed/simple;
+	bh=k7vDAaC+/z+iEoB2pRYl1CqHTDynOmhU4+hG5waP8C8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LHzVDXxhMSWxiQAYRv1RrI+z2t4v47hdE2tOFltf2hm5uUOmMRiY2Gc63uhFOSw0gQHfiVL9Au3Au31ma5bSuwed+Vc33wCorqDAM5QBDCpSi+6EwgmXfzOuIfz1oHAr2e9FDt8+FJ6UmKzNqTPayeS/AG+AbA8nf/VBrwuP7r4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WSR2ajiN; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B81A8C4CED1;
+	Thu, 16 Jan 2025 02:01:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1736992871;
+	bh=k7vDAaC+/z+iEoB2pRYl1CqHTDynOmhU4+hG5waP8C8=;
+	h=From:To:Cc:Subject:Date:From;
+	b=WSR2ajiNegiTn7xwwHR3BjuT2xOq5H6nRmelElMOhyCyQcl0X7r9aXqbeCNLcmwad
+	 SCXdQUgPK/EMwQQuoRpiZcrecel5+95cAR3hFq3/Q70q1KwGYXHQWapKLQ8nU/8G5H
+	 dheQBAZeoa3xjaX3nd+xT2vdD47R+7T3HlgR2c38EiExWZrSKF7BjtxDZDZnYyoIVJ
+	 nKZL4lMTAv71Z8F07yp6HsQFjW6iSzjMWBo0kaNYSE0SdF0s/kbS9rukxZmnbdEZMA
+	 LPy4HmygT70EQ4jLgT+ce8fcDrPmKkEDDXOWwLSWY0IiSaGaj11NL6ULfIFmHQP+dO
+	 9xyfHw2QBz8Fw==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	horms@kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	shuah@kernel.org,
+	linux-kselftest@vger.kernel.org,
+	willemdebruijn.kernel@gmail.com
+Subject: [PATCH net-next] selftests: net: give up on the cmsg_time accuracy on slow machines
+Date: Wed, 15 Jan 2025 18:01:05 -0800
+Message-ID: <20250116020105.931338-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.48.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250116012159.3816135-4-SkyLake.Huang@mediatek.com>
+Content-Transfer-Encoding: 8bit
 
-Hi Sky,
+Commit b9d5f5711dd8 ("selftests: net: increase the delay for relative
+cmsg_time.sh test") widened the accepted value range 8x but we still
+see flakes (at a rate of around 7%).
 
-On Thu, Jan 16, 2025 at 09:21:58AM +0800, Sky Huang wrote:
-> From: Sky Huang <skylake.huang@mediatek.com>
-> 
-> Add support for internal 2.5Gphy on MT7988. This driver will load
-> necessary firmware and add appropriate time delay to make sure
-> that firmware works stably. Also, certain control registers will
-> be set to fix link-up issues.
-> 
-> Signed-off-by: Sky Huang <skylake.huang@mediatek.com>
-> ---
->  MAINTAINERS                          |   1 +
->  drivers/net/phy/mediatek/Kconfig     |  11 +
->  drivers/net/phy/mediatek/Makefile    |   1 +
->  drivers/net/phy/mediatek/mtk-2p5ge.c | 343 +++++++++++++++++++++++++++
->  4 files changed, 356 insertions(+)
->  create mode 100644 drivers/net/phy/mediatek/mtk-2p5ge.c
-> 
-> [...]
-> +static int mt798x_2p5ge_phy_probe(struct phy_device *phydev)
-> +{
-> +	struct mtk_i2p5ge_phy_priv *priv;
-> +
-> +	priv = devm_kzalloc(&phydev->mdio.dev,
-> +			    sizeof(struct mtk_i2p5ge_phy_priv), GFP_KERNEL);
-> +	if (!priv)
-> +		return -ENOMEM;
-> +
-> +	switch (phydev->drv->phy_id) {
-> +	case MTK_2P5GPHY_ID_MT7988:
-> +		/* The original hardware only sets MDIO_DEVS_PMAPMD */
-> +		phydev->c45_ids.mmds_present |= MDIO_DEVS_PCS |
-> +						MDIO_DEVS_AN |
-> +						MDIO_DEVS_VEND1 |
-> +						MDIO_DEVS_VEND2;
-> +		break;
-> +	default:
-> +		return -EINVAL;
-> +	}
-> +
-> +	priv->fw_loaded = false;
-> +	phydev->priv = priv;
-> +
-> +	mtk_phy_leds_state_init(phydev);
+Return XFAIL for the most timing sensitive test on slow machines.
 
-Calling mtk_phy_leds_state_init() can't work without also defining
-led_hw_control_get() for that driver.
+Before:
 
-This is what mtk_phy_leds_state_init() does:
-        for (i = 0; i < 2; ++i)
-                phydev->drv->led_hw_control_get(phydev, i, NULL);
+  # ./cmsg_time.sh
+    Case UDPv4  - TXTIME rel returned '8074us - 7397us < 4000', expected 'OK'
+  FAIL - 1/36 cases failed
 
-The driver lacking led_hw_control_get() method (see below) will make
-this a call to a NULL function pointer.
+After:
 
-Imho it's fine to add the driver without support for the LEDs for now
-and add LED support later on. But in that case you also shouldn't call
-mtk_phy_leds_state_init().
+  # ./cmsg_time.sh
+    Case UDPv4  - TXTIME rel returned '1123us - 941us < 500', expected 'OK' (XFAIL)
+    Case UDPv6  - TXTIME rel returned '1227us - 776us < 500', expected 'OK' (XFAIL)
+  OK
 
-> +
-> +	return 0;
-> +}
-> +
-> +static struct phy_driver mtk_2p5gephy_driver[] = {
-> +	{
-> +		PHY_ID_MATCH_MODEL(MTK_2P5GPHY_ID_MT7988),
-> +		.name = "MediaTek MT7988 2.5GbE PHY",
-> +		.probe = mt798x_2p5ge_phy_probe,
-> +		.config_init = mt798x_2p5ge_phy_config_init,
-> +		.config_aneg = mt798x_2p5ge_phy_config_aneg,
-> +		.get_features = mt798x_2p5ge_phy_get_features,
-> +		.read_status = mt798x_2p5ge_phy_read_status,
-> +		.get_rate_matching = mt798x_2p5ge_phy_get_rate_matching,
-> +		.suspend = genphy_suspend,
-> +		.resume = genphy_resume,
-> +		.read_page = mtk_phy_read_page,
-> +		.write_page = mtk_phy_write_page,
-> +	},
-> +};
-> +
-> +module_phy_driver(mtk_2p5gephy_driver);
-> +
-> +static struct mdio_device_id __maybe_unused mtk_2p5ge_phy_tbl[] = {
-> +	{ PHY_ID_MATCH_VENDOR(0x00339c00) },
-> +	{ }
-> +};
-> +
-> +MODULE_DESCRIPTION("MediaTek 2.5Gb Ethernet PHY driver");
-> +MODULE_AUTHOR("SkyLake Huang <SkyLake.Huang@mediatek.com>");
-> +MODULE_LICENSE("GPL");
-> +
-> +MODULE_DEVICE_TABLE(mdio, mtk_2p5ge_phy_tbl);
-> +MODULE_FIRMWARE(MT7988_2P5GE_PMB_FW);
-> -- 
-> 2.45.2
-> 
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+CC: shuah@kernel.org
+CC: linux-kselftest@vger.kernel.org
+CC: willemdebruijn.kernel@gmail.com
+---
+ tools/testing/selftests/net/cmsg_time.sh | 35 +++++++++++++++++-------
+ 1 file changed, 25 insertions(+), 10 deletions(-)
+
+diff --git a/tools/testing/selftests/net/cmsg_time.sh b/tools/testing/selftests/net/cmsg_time.sh
+index 1d7e756644bc..478af0aefa97 100755
+--- a/tools/testing/selftests/net/cmsg_time.sh
++++ b/tools/testing/selftests/net/cmsg_time.sh
+@@ -34,13 +34,28 @@ BAD=0
+ TOTAL=0
+ 
+ check_result() {
++    local ret=$1
++    local got=$2
++    local exp=$3
++    local case=$4
++    local xfail=$5
++    local xf=
++    local inc=
++
++    if [ "$xfail" == "xfail" ]; then
++	xf="(XFAIL)"
++	inc=0
++    else
++	inc=1
++    fi
++
+     ((TOTAL++))
+-    if [ $1 -ne 0 ]; then
+-	echo "  Case $4 returned $1, expected 0"
+-	((BAD++))
++    if [ $ret -ne 0 ]; then
++	echo "  Case $case returned $ret, expected 0 $xf"
++	((BAD+=inc))
+     elif [ "$2" != "$3" ]; then
+-	echo "  Case $4 returned '$2', expected '$3'"
+-	((BAD++))
++	echo "  Case $case returned '$got', expected '$exp' $xf"
++	((BAD+=inc))
+     fi
+ }
+ 
+@@ -66,14 +81,14 @@ for i in "-4 $TGT4" "-6 $TGT6"; do
+ 		 awk '/SND/ { if ($3 > 1000) print "OK"; }')
+ 	check_result $? "$ts" "OK" "$prot - TXTIME abs"
+ 
+-	[ "$KSFT_MACHINE_SLOW" = yes ] && delay=8000 || delay=1000
++	[ "$KSFT_MACHINE_SLOW" = yes ] && xfail=xfail
+ 
+-	ts=$(ip netns exec $NS ./cmsg_sender -p $p $i 1234 -t -d $delay |
++	ts=$(ip netns exec $NS ./cmsg_sender -p $p $i 1234 -t -d 1000 |
+ 		 awk '/SND/ {snd=$3}
+ 		      /SCHED/ {sch=$3}
+-		      END { if (snd - sch > '$((delay/2))') print "OK";
+-			    else print snd, "-", sch, "<", '$((delay/2))'; }')
+-	check_result $? "$ts" "OK" "$prot - TXTIME rel"
++		      END { if (snd - sch > 500) print "OK";
++			    else print snd, "-", sch, "<", 500; }')
++	check_result $? "$ts" "OK" "$prot - TXTIME rel" $xfail
+     done
+ done
+ 
+-- 
+2.48.0
+
 
