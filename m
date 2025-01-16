@@ -1,293 +1,217 @@
-Return-Path: <netdev+bounces-158982-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158983-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52298A14003
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 17:59:03 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0925BA14016
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 18:03:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C6CC53A1E0C
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 16:58:56 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 15E977A4A7B
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 17:03:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A1312459A5;
-	Thu, 16 Jan 2025 16:55:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF90114D28C;
+	Thu, 16 Jan 2025 17:03:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nHQJGdOE"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="T+5eHCMA"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A38A244FBF;
-	Thu, 16 Jan 2025 16:55:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 173747081E
+	for <netdev@vger.kernel.org>; Thu, 16 Jan 2025 17:03:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737046514; cv=none; b=uARAydlFtEikKZTIO2pquL3EvGqjEOxBbwFA7E2RdJ5ETuHp9hW4zBuuB8qCptcepcm8gr0h3vOCQuSomuTiR0ZnsH0mp/8yJ2l+NQiHZskHWtE7QF6ip4sxqt4n5JSgtnG7R2f1Y6o9i7qjqt79814GsuXVAPW/LIw0C3NWcG8=
+	t=1737047021; cv=none; b=nlGcu5wzIOlOoo5ZLOWZ7jTZQo3VNO6cmviUhUhVfnLemR6lderAYxhEdNmPeQMMMtIwcCl99nGiiLJPChG7D1mqyOUZFWBVx9bvVBHoePh2qeE8PMhAoh8jZ/NYah2BssWC603xDw5ywwMNZdJhZdQm3dQvJsuXfGD1UTME0j0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737046514; c=relaxed/simple;
-	bh=qpx/nK/kNfYWU2WE0IRnrCNR49g6pC5ohkkPOmplINc=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=XhaEfEWTiZVlCPu/zNEIoxT8qWeu7qaIJICCWP5Y12Rt/V05CltJLVnk3jXHruHwM5x41JM8v7KbIq7JAgyfbI24Yy7e9RYAwChqJMv2D75q288uT44smjFmTR7aIQN9ytCZRCholer1zzBteTp8/bXEH2NtgUso2n9pGVSoQKg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nHQJGdOE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C1F6CC4CEE2;
-	Thu, 16 Jan 2025 16:55:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737046514;
-	bh=qpx/nK/kNfYWU2WE0IRnrCNR49g6pC5ohkkPOmplINc=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=nHQJGdOEGSVEEHhi717mXTMu62ceHjcPpK27ua/wywsKv2NQuugyXAwrXpkjquy+1
-	 cY1jWB7AQb4X73w82JSrsf2z4OlyI7BBMlZt+ORJTCZBIAvSVdqpPQfEC7XDW4MDdF
-	 Q3bSp2eWJzwEq1MelGYLgjTYbTUG9ZIq6/b5Bt+D+opRh9naShhaOzQnfNBGxirFd4
-	 r0GcFTl1hY0MlCauu6fbYgnP4PYc9GzyEmJBpCy3Kx3mP5z+TuUHoyAG00RUQrpskV
-	 fkqN4F5SUDRA7SDasOQ/N3uQVcIwpOwK4ZsvGKktddmSbRbyMfNuiynJTVmejIED+N
-	 6Oiy6KKmeeJZQ==
-From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-Date: Thu, 16 Jan 2025 17:51:37 +0100
-Subject: [PATCH net-next 15/15] mptcp: pm: add local parameter for
- set_flags
+	s=arc-20240116; t=1737047021; c=relaxed/simple;
+	bh=fkwxZFEqnU6AbSh+8p8cbNH6HKuVVX8YCMbpLMBvrFc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=WhdV8bVWj4l74JN+HhI0NZNnwBFSHHFIuOea7/qDBB0yeliccpT5MzgHTcNEaH+JrjFZNX1SfVd6Kc9QSwNdEt1BU/0xJivE7b8Fe4+IRY0JTM6OhkAyes0v6NoiaJFmprlwD39rEG9NWmO5NdYyH7TKmEjhxv5Q/gWkKhQTblM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=T+5eHCMA; arc=none smtp.client-ip=209.85.160.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-4678c9310afso264491cf.1
+        for <netdev@vger.kernel.org>; Thu, 16 Jan 2025 09:03:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1737047019; x=1737651819; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fkwxZFEqnU6AbSh+8p8cbNH6HKuVVX8YCMbpLMBvrFc=;
+        b=T+5eHCMAx2kUC2NrB8dipI8gi9IcZvsgEYSJSuAi5Uj63pDvdSr4ZMKTLH8mNoAXFX
+         P04Jc5LW6nZAuiOjxwPfdCCOHNUMBpQgQSMpIOkvd1DpqT5g2uecrvMyHkElBOlk2TYE
+         pnMCAc0zJHQZTOw17bIzKzWivDrySqiTJYgB477dz0wF472Ijfi4TIYNCJ7xn9pGncaq
+         r+r9BRFOn6U4mzKOpo1w/NYjtoMp8msI8Jgsd7wOVRNz8nFpN1s43Ee2DRm1vlF9kbHf
+         e/Tncl+y9Lv6JkooxS/rAKMIy3U5v1L9nKUWaXSPKjQ19OUdUyi6ho0DlnvUCuDKZf/9
+         awzQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737047019; x=1737651819;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=fkwxZFEqnU6AbSh+8p8cbNH6HKuVVX8YCMbpLMBvrFc=;
+        b=dYkOJbMsRxo8X4DPQhLgVtuRgkcAfIeeatrKR4c07LTIhPdKJ80Ov7vqX5XdVkPyg1
+         jMQc72eGP3BCaIIlT3h++dpwWeGL4953xDt1rgN4MpkMkgfL10FwqqryzxrpPpi0APuc
+         9R/ANgfoy/LU84aHrn2KDoEdFtRv9a+NOGIfKEUbcJ7TFYtckRci2dPFD7QgXPakqFef
+         MsHICKrLcIwqlkaxG85DI2UbjEU+z/Y8bvVv/BoCfiqoddoVI3PtVBkeMd5ZQzrcAOFN
+         lbecXjGEQGotJRznXgHveRIWKB/zrUjLp32TapqV9++Ar5/BDk0DyX6/5dZ4SjmgsT7H
+         bRew==
+X-Forwarded-Encrypted: i=1; AJvYcCWjhBT518qNng3HJYeYpnBasloCC0Aztdx3lcclqt3f7uaoqY1KfTr7I9Rfk2HFrimUsfje6wQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzxlC9hlV5bfWHQ/5qkLMAF0J4xLLgX04L1bUCK5Jfn7I7WyWby
+	wFYc6hmrlejqzW1kEJqsIHr5pRZaoYZKh3SqL49zswsyDK09GkDFg3HtnyPfMFHxb8LrOOpJLdb
+	LVbLv/tsG8Qj66BmKj4bRcRu2t0YmNa4KtEuu
+X-Gm-Gg: ASbGnct/bo052oSqxSN1OoYUNQR7fEmBCHTbzmYn8Ow5/9KAC3fShBTim0bwfh3yaCi
+	CX5lq/uGA2F47v/XIrwg0/LLaEfmOUTNUvQAw4DDRB/IpSMgkuqwPyPJaaIf5PzgiNc5VLpg=
+X-Google-Smtp-Source: AGHT+IGnk+jUUo7pUXIJ3Hw9bg1zlxz30zfPCrY0NagbzVbEUEqyz/PcdYrFq1J+vGjckaQL5f6+5uod+jNZBR3rzuI=
+X-Received: by 2002:a05:622a:191f:b0:467:84a1:df08 with SMTP id
+ d75a77b69052e-46e054bc8ecmr3305011cf.23.1737047018590; Thu, 16 Jan 2025
+ 09:03:38 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250116-net-next-mptcp-pm-misc-cleanup-2-v1-15-c0b43f18fe06@kernel.org>
-References: <20250116-net-next-mptcp-pm-misc-cleanup-2-v1-0-c0b43f18fe06@kernel.org>
-In-Reply-To: <20250116-net-next-mptcp-pm-misc-cleanup-2-v1-0-c0b43f18fe06@kernel.org>
-To: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, 
- Geliang Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- "Matthieu Baerts (NGI0)" <matttbe@kernel.org>, 
- Geliang Tang <geliang@kernel.org>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=7567; i=matttbe@kernel.org;
- h=from:subject:message-id; bh=86fR+WPYPbsLnT25WiPo1DWMfkniQLE3jYOhbnPN5Dk=;
- b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBniTnHxdeTowXg3HNuwF5lfWLUBeRK8dGX+XOfb
- 7TGfL9c1qeJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZ4k5xwAKCRD2t4JPQmmg
- c+2JEACrnKd34lRZ8nqLX8MCexaFT8Zu0j6XTB8Y0ICjEHb2makWJNdvfftnGJjJHBbbrnA0F3Q
- 9YSsTLubz2N7ksG2g0D117UjqrmrdMzeOY3NrOF6isjWZcAZfijKo/iku77zxXnYAMtCraHpipd
- xSkn7zG90c6lZ1DKIyNXwZVSTHuAhVfPycS4wX90k53nvNOIGFoR7IrYXFLaPEVJz9XXHBDs5er
- rTVShDyxffOtJRcC5BvFPi2cWJLDQhyiRnRNqWNb2CJ4kPXl6lUuaKVMpclc2KzpjSXruB0L+2t
- eGFcA1UKISmRAM4ri1KhXdnoJvgrYvnGCeOOlGpR/jW9rE9iW2CfUAUTZbhH1tPRYLNCDKkuD4i
- 5v23/MzpFP8PzMk/jaarQ+8rOFGltzUjh+Ljqpsrn2jKoJOFsqBPREdBSeuyJ6uAaslYcmwPWPV
- XVKgr3yQRcCYfpW9Ky+3/Ht7BiyPt2kta5vn/Yuw/AjEOfvf7W4b8ZhxFBqnqT9q5P9GBnl6CKf
- DEm8+TekKB9zgCknAfaSGaIrMPdy6VqTGas6fwuC+pHIko0E9ns4mdDwptzxg4pbtcU3y8TcQad
- /zK6EOZDJYgLDVUnbVkU0rh7wfsA3/0IbPuImRk2Ie6cSng91Kzhw55QnwMSn8IDs2ghG6Xvemy
- 59VVCMuV629DQHw==
-X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
- fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
+References: <20250115010450.2472-1-ma.arghavani.ref@yahoo.com>
+ <20250115010450.2472-1-ma.arghavani@yahoo.com> <CAL+tcoAtzuGZ8US5NcJwJdBh29afYGZHpeMJ4jXgiSnWBr75Ww@mail.gmail.com>
+ <501586671.358052.1737020976218@mail.yahoo.com> <CAL+tcoA9yEUmXnHFdotcfEgHqWSqaUXu1Aoj=cfCtL5zFG1ubg@mail.gmail.com>
+ <CADVnQy=3xz2_gjnM1vifjPJ_2TpT55mc=Oh7hO_omAAi9P6fxw@mail.gmail.com>
+ <CANn89iJfx3CBJYBS01Mz9z3twjsP3xvSSOamno-cYSSzv3gSxw@mail.gmail.com> <CADVnQyndHKQ62_9psR1SD9LLtP_johFm-Q+tuaW3E5OYO+sGrg@mail.gmail.com>
+In-Reply-To: <CADVnQyndHKQ62_9psR1SD9LLtP_johFm-Q+tuaW3E5OYO+sGrg@mail.gmail.com>
+From: Neal Cardwell <ncardwell@google.com>
+Date: Thu, 16 Jan 2025 12:03:22 -0500
+X-Gm-Features: AbW1kvax3OqnJ_QJS0qt-xxr9S03NWypcg99YWytc9Iy5uu6rZM931pifzW5MZk
+Message-ID: <CADVnQymHGF=X_b32Vfp+ZtpNf+t535Lw0vqnxO4M20Z-0bWqEw@mail.gmail.com>
+Subject: Re: [PATCH net v2] tcp_cubic: fix incorrect HyStart round start detection
+To: Eric Dumazet <edumazet@google.com>
+Cc: Jason Xing <kerneljasonxing@gmail.com>, Mahdi Arghavani <ma.arghavani@yahoo.com>, 
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
+	"haibo.zhang@otago.ac.nz" <haibo.zhang@otago.ac.nz>, 
+	"david.eyers@otago.ac.nz" <david.eyers@otago.ac.nz>, "abbas.arghavani@mdu.se" <abbas.arghavani@mdu.se>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Geliang Tang <tanggeliang@kylinos.cn>
+On Thu, Jan 16, 2025 at 10:46=E2=80=AFAM Neal Cardwell <ncardwell@google.co=
+m> wrote:
+>
+> On Thu, Jan 16, 2025 at 10:30=E2=80=AFAM Eric Dumazet <edumazet@google.co=
+m> wrote:
+> >
+> > On Thu, Jan 16, 2025 at 3:42=E2=80=AFPM Neal Cardwell <ncardwell@google=
+.com> wrote:
+> > >
+> > > On Thu, Jan 16, 2025 at 6:40=E2=80=AFAM Jason Xing <kerneljasonxing@g=
+mail.com> wrote:
+> > > >
+> > > > On Thu, Jan 16, 2025 at 5:49=E2=80=AFPM Mahdi Arghavani <ma.arghava=
+ni@yahoo.com> wrote:
+> > > > >
+> > > > > Hi Jason,
+> > > > >
+> > > > > I will explain this using a test conducted on my local testbed. I=
+magine a client and a server connected through two Linux software routers. =
+In this setup, the minimum RTT is 150 ms, the bottleneck bandwidth is 50 Mb=
+ps, and the bottleneck buffer size is 1 BDP, calculated as (50M / 1514 / 8)=
+ * 0.150 =3D 619 packets.
+> > > > >
+> > > > > I conducted the test twice, transferring data from the server to =
+the client for 1.5 seconds:
+> > > > >
+> > > > > TEST 1) With the patch applied: HyStart stopped the exponential g=
+rowth of cwnd when cwnd =3D 632 and the bottleneck link was saturated (632 =
+> 619).
+> > > > >
+> > > > >
+> > > > > TEST 2) Without the patch applied: HyStart stopped the exponentia=
+l growth of cwnd when cwnd =3D 516 and the bottleneck link was not yet satu=
+rated (516 < 619). This resulted in 300 KB less delivered data compared to =
+the first test.
+> > > >
+> > > > Thanks for sharing these numbers. I would suggest in the v3 adding =
+the
+> > > > above description in the commit message. No need to send v3 until t=
+he
+> > > > maintainers of TCP (Eric and Neal) give further suggestions :)
+> > > >
+> > > > Feel free to add my reviewed-by tag in the next version:
+> > > > Reviewed-by: Jason Xing <kerneljasonxing@gmail.com>
+> > > >
+> > > > Thanks,
+> > > > Jason
+> > >
+> > > Mahdi, a few quick questions about your test logs, beforePatch.log an=
+d
+> > > afterPatch.log:
+> > >
+> > > + What is moRTT? Is that ca->curr_rtt? It would be great to share the
+> > > debug patch you used, so we know for certain how to interpret each
+> > > column in the debug output.
+> >
+> > +1
+> >
+> > Debug patches can alone add delays...
+> >
+> >
+> >
+> > >
+> > > + Are both HYSTART-DELAY and HYSTART-ACK-TRAIN enabled for both of th=
+ose tests?
+>
+> I like Jason's suggestion to include your test results in the v3
+> commit message. Please also include a phrase about which Hystart
+> mechanism triggered in each case.
+>
+> Perhaps something like the following, just above the footers (with an
+> empty line separating this text and the following footers):
+>
+> ---
+> I tested with a client and a server connected through two Linux
+> software routers. In this setup, the minimum RTT is 150 ms, the
+> bottleneck bandwidth is 50 Mbps, and the bottleneck buffer size is 1
+> BDP, calculated as (50M / 1514 / 8) * 0.150 =3D 619 packets.
+>
+> I conducted the test twice, transferring data from the server to the
+> client for 1.5 seconds:
+>
+> Before: Without the patch applied: HYSTART-DELAY stopped the
+> exponential growth of cwnd when cwnd =3D 516 and the bottleneck link was
+> not yet saturated (516 < 619). This resulted in 300 KB less delivered
+> data compared to the first test.
+>
+> After: With the patch applied: HYSTART-ACK-TRAIN stopped the
+> exponential growth of cwnd when cwnd =3D 632 and the bottleneck link was
+> saturated (632 > 619).
+> ---
+>
+> (with all lines wrapped in a way that makes scripts/checkpatch.pl happy..=
+.)
+>
+> Eric mentioned:
+> > Debug patches can alone add delays...
+>
+> Yes, this is a good point. To avoid introducing delays, you probably
+> want to run your emulation test without the debug patch, and simply
+> use "nstat -n" before the test and "nstat" after the test to see (a)
+> the type of Hystart mechanism that triggered (b) the cwnd at which it
+> triggered.
+>
+> (I'm still interested in your debug patch so we know for certain how
+> to interpret your previously shared log files.)
+>
+> Mahdi, your tcp_cubic.c patch looks OK to me, so I'm running your
+> patch and tests through our kernel test pipeline to see what we get.
 
-This patch updates the interfaces set_flags to reduce repetitive
-code, adds a new parameter 'local' for them.
+Your tcp_cubic.c patch passes our internal packetdrill test suite,
+with your updated/added packetdrill scripts, and one additional
+reasonable tweak for an internal test that is not upstream yet (in
+which the flow now exits slowstart with a cwnd of 28 instead of 24).
 
-The local address is parsed in public helper mptcp_pm_nl_set_flags_doit(),
-then pass it to mptcp_pm_nl_set_flags() and mptcp_userspace_pm_set_flags().
+So I would suggest sending the v3 version of the patch with the tweaks
+we have suggested above for the commit message. And hopefully we can
+get a consensus to merge the v3 version of the patch, if we get a
+consensus that we like the v3 commit message.
 
-Signed-off-by: Geliang Tang <tanggeliang@kylinos.cn>
-Reviewed-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
-Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
----
- net/mptcp/pm.c           | 16 ++++++++++++++--
- net/mptcp/pm_netlink.c   | 35 +++++++++++++----------------------
- net/mptcp/pm_userspace.c | 19 +++++++------------
- net/mptcp/protocol.h     |  6 ++++--
- 4 files changed, 38 insertions(+), 38 deletions(-)
-
-diff --git a/net/mptcp/pm.c b/net/mptcp/pm.c
-index c213f06bc70234ad3cb84d43971f6eb4aa6ff429..b1f36dc1a09113594324ef0547093a5447664181 100644
---- a/net/mptcp/pm.c
-+++ b/net/mptcp/pm.c
-@@ -506,9 +506,21 @@ int mptcp_pm_nl_get_addr_dumpit(struct sk_buff *msg,
- 
- static int mptcp_pm_set_flags(struct genl_info *info)
- {
-+	struct mptcp_pm_addr_entry loc = { .addr = { .family = AF_UNSPEC }, };
-+	struct nlattr *attr_loc;
-+	int ret = -EINVAL;
-+
-+	if (GENL_REQ_ATTR_CHECK(info, MPTCP_PM_ATTR_ADDR))
-+		return ret;
-+
-+	attr_loc = info->attrs[MPTCP_PM_ATTR_ADDR];
-+	ret = mptcp_pm_parse_entry(attr_loc, info, false, &loc);
-+	if (ret < 0)
-+		return ret;
-+
- 	if (info->attrs[MPTCP_PM_ATTR_TOKEN])
--		return mptcp_userspace_pm_set_flags(info);
--	return mptcp_pm_nl_set_flags(info);
-+		return mptcp_userspace_pm_set_flags(&loc, info);
-+	return mptcp_pm_nl_set_flags(&loc, info);
- }
- 
- int mptcp_pm_nl_set_flags_doit(struct sk_buff *skb, struct genl_info *info)
-diff --git a/net/mptcp/pm_netlink.c b/net/mptcp/pm_netlink.c
-index c2101f7ca31e648aa72ff0890ba3a0801c1bf674..fef01692eaed404e272359df691264f797240d10 100644
---- a/net/mptcp/pm_netlink.c
-+++ b/net/mptcp/pm_netlink.c
-@@ -1951,62 +1951,53 @@ static int mptcp_nl_set_flags(struct net *net,
- 	return ret;
- }
- 
--int mptcp_pm_nl_set_flags(struct genl_info *info)
-+int mptcp_pm_nl_set_flags(struct mptcp_pm_addr_entry *local,
-+			  struct genl_info *info)
- {
--	struct mptcp_pm_addr_entry addr = { .addr = { .family = AF_UNSPEC }, };
-+	struct nlattr *attr = info->attrs[MPTCP_PM_ATTR_ADDR];
- 	u8 changed, mask = MPTCP_PM_ADDR_FLAG_BACKUP |
- 			   MPTCP_PM_ADDR_FLAG_FULLMESH;
- 	struct net *net = genl_info_net(info);
- 	struct mptcp_pm_addr_entry *entry;
- 	struct pm_nl_pernet *pernet;
--	struct nlattr *attr;
- 	u8 lookup_by_id = 0;
- 	u8 bkup = 0;
--	int ret;
--
--	if (GENL_REQ_ATTR_CHECK(info, MPTCP_PM_ATTR_ADDR))
--		return -EINVAL;
- 
- 	pernet = pm_nl_get_pernet(net);
- 
--	attr = info->attrs[MPTCP_PM_ATTR_ADDR];
--	ret = mptcp_pm_parse_entry(attr, info, false, &addr);
--	if (ret < 0)
--		return ret;
--
--	if (addr.addr.family == AF_UNSPEC) {
-+	if (local->addr.family == AF_UNSPEC) {
- 		lookup_by_id = 1;
--		if (!addr.addr.id) {
-+		if (!local->addr.id) {
- 			NL_SET_ERR_MSG_ATTR(info->extack, attr,
- 					    "missing address ID");
- 			return -EOPNOTSUPP;
- 		}
- 	}
- 
--	if (addr.flags & MPTCP_PM_ADDR_FLAG_BACKUP)
-+	if (local->flags & MPTCP_PM_ADDR_FLAG_BACKUP)
- 		bkup = 1;
- 
- 	spin_lock_bh(&pernet->lock);
--	entry = lookup_by_id ? __lookup_addr_by_id(pernet, addr.addr.id) :
--			       __lookup_addr(pernet, &addr.addr);
-+	entry = lookup_by_id ? __lookup_addr_by_id(pernet, local->addr.id) :
-+			       __lookup_addr(pernet, &local->addr);
- 	if (!entry) {
- 		spin_unlock_bh(&pernet->lock);
- 		NL_SET_ERR_MSG_ATTR(info->extack, attr, "address not found");
- 		return -EINVAL;
- 	}
--	if ((addr.flags & MPTCP_PM_ADDR_FLAG_FULLMESH) &&
-+	if ((local->flags & MPTCP_PM_ADDR_FLAG_FULLMESH) &&
- 	    (entry->flags & MPTCP_PM_ADDR_FLAG_SIGNAL)) {
- 		spin_unlock_bh(&pernet->lock);
- 		NL_SET_ERR_MSG_ATTR(info->extack, attr, "invalid addr flags");
- 		return -EINVAL;
- 	}
- 
--	changed = (addr.flags ^ entry->flags) & mask;
--	entry->flags = (entry->flags & ~mask) | (addr.flags & mask);
--	addr = *entry;
-+	changed = (local->flags ^ entry->flags) & mask;
-+	entry->flags = (entry->flags & ~mask) | (local->flags & mask);
-+	*local = *entry;
- 	spin_unlock_bh(&pernet->lock);
- 
--	mptcp_nl_set_flags(net, &addr.addr, bkup, changed);
-+	mptcp_nl_set_flags(net, &local->addr, bkup, changed);
- 	return 0;
- }
- 
-diff --git a/net/mptcp/pm_userspace.c b/net/mptcp/pm_userspace.c
-index 1af70828c03c21d03a25f3747132014dcdc5c0e8..277cf092a87042a85623470237a8ef24d29e65e6 100644
---- a/net/mptcp/pm_userspace.c
-+++ b/net/mptcp/pm_userspace.c
-@@ -564,9 +564,9 @@ int mptcp_pm_nl_subflow_destroy_doit(struct sk_buff *skb, struct genl_info *info
- 	return err;
- }
- 
--int mptcp_userspace_pm_set_flags(struct genl_info *info)
-+int mptcp_userspace_pm_set_flags(struct mptcp_pm_addr_entry *local,
-+				 struct genl_info *info)
- {
--	struct mptcp_pm_addr_entry loc = { .addr = { .family = AF_UNSPEC }, };
- 	struct mptcp_addr_info rem = { .family = AF_UNSPEC, };
- 	struct mptcp_pm_addr_entry *entry;
- 	struct nlattr *attr, *attr_rem;
-@@ -575,8 +575,7 @@ int mptcp_userspace_pm_set_flags(struct genl_info *info)
- 	struct sock *sk;
- 	u8 bkup = 0;
- 
--	if (GENL_REQ_ATTR_CHECK(info, MPTCP_PM_ATTR_ADDR) ||
--	    GENL_REQ_ATTR_CHECK(info, MPTCP_PM_ATTR_ADDR_REMOTE))
-+	if (GENL_REQ_ATTR_CHECK(info, MPTCP_PM_ATTR_ADDR_REMOTE))
- 		return ret;
- 
- 	msk = mptcp_userspace_pm_get_sock(info);
-@@ -586,11 +585,7 @@ int mptcp_userspace_pm_set_flags(struct genl_info *info)
- 	sk = (struct sock *)msk;
- 
- 	attr = info->attrs[MPTCP_PM_ATTR_ADDR];
--	ret = mptcp_pm_parse_entry(attr, info, false, &loc);
--	if (ret < 0)
--		goto set_flags_err;
--
--	if (loc.addr.family == AF_UNSPEC) {
-+	if (local->addr.family == AF_UNSPEC) {
- 		NL_SET_ERR_MSG_ATTR(info->extack, attr,
- 				    "invalid local address family");
- 		ret = -EINVAL;
-@@ -609,11 +604,11 @@ int mptcp_userspace_pm_set_flags(struct genl_info *info)
- 		goto set_flags_err;
- 	}
- 
--	if (loc.flags & MPTCP_PM_ADDR_FLAG_BACKUP)
-+	if (local->flags & MPTCP_PM_ADDR_FLAG_BACKUP)
- 		bkup = 1;
- 
- 	spin_lock_bh(&msk->pm.lock);
--	entry = mptcp_userspace_pm_lookup_addr(msk, &loc.addr);
-+	entry = mptcp_userspace_pm_lookup_addr(msk, &local->addr);
- 	if (entry) {
- 		if (bkup)
- 			entry->flags |= MPTCP_PM_ADDR_FLAG_BACKUP;
-@@ -623,7 +618,7 @@ int mptcp_userspace_pm_set_flags(struct genl_info *info)
- 	spin_unlock_bh(&msk->pm.lock);
- 
- 	lock_sock(sk);
--	ret = mptcp_pm_nl_mp_prio_send_ack(msk, &loc.addr, &rem, bkup);
-+	ret = mptcp_pm_nl_mp_prio_send_ack(msk, &local->addr, &rem, bkup);
- 	release_sock(sk);
- 
- 	/* mptcp_pm_nl_mp_prio_send_ack() only fails in one case */
-diff --git a/net/mptcp/protocol.h b/net/mptcp/protocol.h
-index 1ac531fb2c70b7b5c7487e3f5aa5313c5e01aa37..a80bb6ef5c5469c4c4ce59ee37d0358d20fff8d9 100644
---- a/net/mptcp/protocol.h
-+++ b/net/mptcp/protocol.h
-@@ -1031,8 +1031,10 @@ bool mptcp_lookup_subflow_by_saddr(const struct list_head *list,
- 				   const struct mptcp_addr_info *saddr);
- bool mptcp_remove_anno_list_by_saddr(struct mptcp_sock *msk,
- 				     const struct mptcp_addr_info *addr);
--int mptcp_pm_nl_set_flags(struct genl_info *info);
--int mptcp_userspace_pm_set_flags(struct genl_info *info);
-+int mptcp_pm_nl_set_flags(struct mptcp_pm_addr_entry *local,
-+			  struct genl_info *info);
-+int mptcp_userspace_pm_set_flags(struct mptcp_pm_addr_entry *local,
-+				 struct genl_info *info);
- int mptcp_pm_announce_addr(struct mptcp_sock *msk,
- 			   const struct mptcp_addr_info *addr,
- 			   bool echo);
-
--- 
-2.47.1
-
+thanks,
+neal
 
