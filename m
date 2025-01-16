@@ -1,191 +1,156 @@
-Return-Path: <netdev+bounces-158937-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158938-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2FCF9A13DD6
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 16:38:05 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BFD9DA13DE8
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 16:39:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A8EC83A1EC2
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 15:37:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AF3BF1883A28
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 15:39:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C445F22B8C7;
-	Thu, 16 Jan 2025 15:38:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA52B22A80B;
+	Thu, 16 Jan 2025 15:39:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GM7SiUdU"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="SbXHWQN9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F33F11DDC12;
-	Thu, 16 Jan 2025 15:37:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A95B22A809
+	for <netdev@vger.kernel.org>; Thu, 16 Jan 2025 15:39:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737041880; cv=none; b=ih1uECQRSksJloVbHLY5nk+Gv23s8/zYZljLDs9+vp3HOi7dqbimgdOMc5bt8Gr1Bfj4tyZpfnQf+0BoeVWf8X4/oC+MXImsPowG61ryj5ENewYLMv7jOj6TDdrgJwH40qYa9zuRQqMPYl5UKfP6Fhz6ipFw9ci1Z8mhqKD7so0=
+	t=1737041957; cv=none; b=b72Z9DonWLot2GmH1g4eO67dvz0mjj33jnrxLrLVAk7fgBLUE/KjCRNVIblvX9EMTbFr0izDcE6tJHHqFIc69ZvWTpJtKVEaMhXGVvNy/5NUT1pYpQa+gQaim3dsl5ShzHrznJO/iKDQL/a+QDr7YCzHqgdiEd57thaVnpVwc8Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737041880; c=relaxed/simple;
-	bh=ZC0RYR1ltnLyKvLk6LeStwXGRFIa/CFwlUvkdoclUc4=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=MjxFxYJitNTlugN3597cTD6OJWj+wixgrFHniZ0jttwcOibFaXUU16NZlGS7YRThnSjKNCYYXtAKKdAYAKoIOcUuMUe/rmG7otMPX9ZQVmE3l84ft47VObCl1EX8gIA/9fWR3RqPlBdQvVEXt6K/fG6rPLWtfPx4Ukb3jBAuRMU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GM7SiUdU; arc=none smtp.client-ip=209.85.128.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-436a03197b2so6883775e9.2;
-        Thu, 16 Jan 2025 07:37:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1737041877; x=1737646677; darn=vger.kernel.org;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=IvKsGcuwHSSfTksCXd89NVhV3jyKpjpaSxG5iBRmpcM=;
-        b=GM7SiUdUHOP30ksppVbso0QWFtfp8djVkswHDUJNN1M8x0LkI9D4kSYo/NbDQEQ0FQ
-         gbwnWBu+a1H3CO/e2G6DS8yRFaIv9Taux9RRihI5MYkPddUNC9aejEd6QgCHvEk6nnss
-         Sfd00akfgpydyhDMqaMKBxNHs3Nl1/dBB6RYBt4xbQqRB8aa5O7cXcaglClsSkHxDBif
-         Ej44ZDwGuDd0GJJ8V9YHDq6yaGnh3IFn6kI4+yaT756Ll9ENw/OLATYYZPFs6n34zmQE
-         xoNj2JIeRs9Q07EFazpZGfwfqxxszy/ZB5AGxSO3Osf/8AWt2BlFcg55Wuu+J7bW/efi
-         EXsw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737041877; x=1737646677;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=IvKsGcuwHSSfTksCXd89NVhV3jyKpjpaSxG5iBRmpcM=;
-        b=b/qNKrCp6GoN/TeWd20xNCns3cN/Q3/NeMzoZZ3CiNt0mwIv6R+3/7FLMcTRfwTGgA
-         drdeengEG3IiCD3RMDAhNof+NQw82Y93ffg16VO3D9T4tjtKmX1kX7aHyM+5jgn+J0dl
-         P9uqsu3JA+cXm7AdUHVLCeFRvwkUXyopUg8B6Q6jcClfSO3QLbGNwW0XdqGOFB8ShL7u
-         nUFZxRR2/XXf4LluWX64nLdRvpiT0Fcc27CYn0UPQX3AqewER6grxPsjWVdz6NczPP+S
-         Tq6MZm3pDT+gnFr7DIvVpt5/5ftkXJPlw0vyPp5BRn25WJ3TICA1fuVsA2mp+hsLSHSy
-         QUFg==
-X-Forwarded-Encrypted: i=1; AJvYcCXol2PT9QED3vqEdOAeV65Enjgm0VtwqkT3lY4ln2ZlG6gPw4on5EAUYIgYsn6fZJ/5iZiVsQdcfQb/n+g=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz78ymmLbKjYzDLT1oGV5vJZtVAkrP8JOdnWt3DQ+QdwKenSZ7r
-	pqssHB+FnO2tloo0X8MR766JiEwagTzOYdqd3uCinSa7l946GzYQ
-X-Gm-Gg: ASbGncu3pmDvr7vPDH59e6SMG/Km+kuE/wquERMk+Adj8J5sju4Ac0HH9M9ttv7KrGJ
-	GyJcZoRlwggTuDd9QIDffpznEKVIokomfjdbC469NrMl+4RIavoWmzUik9bcWwVXLP7LNgzkgke
-	Z7VbERNgh4fx9R2CYQIZyskcGt/hx+C/KbDzlstZUAcIMITpMY/KvY/qlsQwyhRyPp+ILZJQaAu
-	b6AnhMXG8ZOjqX0urnT3eFV9hr8nUPEfq/czJuA7VVT/DOsKmhkofMrCWE=
-X-Google-Smtp-Source: AGHT+IGVC7O7Y8ZL3GoILZTnZsH/SaLMPsr2sypNzFotAMAMRRVYh+NuXcopuvWtoYJPK1cQ0aaKyA==
-X-Received: by 2002:a05:600c:1384:b0:436:1c04:aa8e with SMTP id 5b1f17b1804b1-436e26bdac1mr364732675e9.16.1737041877163;
-        Thu, 16 Jan 2025 07:37:57 -0800 (PST)
-Received: from [127.0.1.1] ([2a00:79c0:650:2c00:303:6c5b:4b07:6715])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4389041f61bsm2834985e9.17.2025.01.16.07.37.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Jan 2025 07:37:56 -0800 (PST)
-From: Dimitri Fedrau <dima.fedrau@gmail.com>
-Date: Thu, 16 Jan 2025 16:37:44 +0100
-Subject: [PATCH] net: phy: marvell-88q2xxx: Fix temperature measurement
- with reset-gpios
+	s=arc-20240116; t=1737041957; c=relaxed/simple;
+	bh=15ABlglkjWdVDcYXhOjVsxKTozHEJVUe0W95l8VAFg4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=iQC+ztVgEjcJCKZqr023YK0ijDEmNVetepmNeGzE+EnxhKhpHRVY/WizFp1P1EjET5q3ohN3ABV/kjQDKIpPQhTpzhefMWC8g6DVaSSMx49mu7+23GNgIsjx6FO78GdqaIdm6WqPfTqvy56FrvpkPBcSDswUOhpSgkQyTnhtjJg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=SbXHWQN9; arc=none smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1737041956; x=1768577956;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=15ABlglkjWdVDcYXhOjVsxKTozHEJVUe0W95l8VAFg4=;
+  b=SbXHWQN9LUOsj/uPoUG7bC3QYtUkggtMM84JLou+W7flsN5VGntBpDxE
+   Wz+kkDCxiv8BG/MtZf3vQRO+alqFjqHPjFquFxXb9P51b7k4ElyVLXvAJ
+   HZxqVAACnPegXzhwnk00gwsrtWgZBWLdjrzWUPaKnEoUOb8uiPwO08amE
+   aU5d8654ZumYWWzsiAGLdYaxHGehVnqeJsM6JTjT5mTOVviXodcnC7GD9
+   hFGyF2Ue5b2qIGvXviab8tUeXEfTHOkEcfXAzNo2d/h9CGG/DHrRn7gyJ
+   /kqAh7CIPH1MMQ66uMi37gaC64oGrNuxImH5nktVm+6j2WEjbHMxBC639
+   g==;
+X-CSE-ConnectionGUID: vBqqLk5QS6+vnRUY7tZahQ==
+X-CSE-MsgGUID: mjMOL294TJe9LOzkl1HJdg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11317"; a="25037407"
+X-IronPort-AV: E=Sophos;i="6.13,209,1732608000"; 
+   d="scan'208";a="25037407"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jan 2025 07:39:15 -0800
+X-CSE-ConnectionGUID: gCaoGKOOSBWVs3lBxF0FSw==
+X-CSE-MsgGUID: ZTS/+uYETTejp1sk5qJ7Tg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.13,209,1732608000"; 
+   d="scan'208";a="110540978"
+Received: from boxer.igk.intel.com ([10.102.20.173])
+  by orviesa004.jf.intel.com with ESMTP; 16 Jan 2025 07:39:12 -0800
+From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	anthony.l.nguyen@intel.com,
+	magnus.karlsson@intel.com,
+	jacob.e.keller@intel.com,
+	xudu@redhat.com,
+	mschmidt@redhat.com,
+	jmaxwell@redhat.com,
+	poros@redhat.com,
+	przemyslaw.kitszel@intel.com,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Subject: [PATCH intel-net 0/3] ice: fix Rx data path for heavy 9k MTU traffic
+Date: Thu, 16 Jan 2025 16:39:05 +0100
+Message-Id: <20250116153908.515848-1-maciej.fijalkowski@intel.com>
+X-Mailer: git-send-email 2.38.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250116-marvell-88q2xxx-fix-hwmon-v1-1-ee5cfda4be87@gmail.com>
-X-B4-Tracking: v=1; b=H4sIAMcniWcC/x2MQQqAIBAAvxJ7bkEXyuor0UFqy4WyUigh+nvSc
- RhmHogchCN0xQOBL4my+wy6LGB01i+MMmUGUlQprWvcbLh4XbFpTkop4SwJ3b3tHqfaKGUtt0Q
- Gcn8EzvJ/98P7fph9GDprAAAA
-X-Change-ID: 20250116-marvell-88q2xxx-fix-hwmon-d6700aae9227
-To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
- Russell King <linux@armlinux.org.uk>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- =?utf-8?q?Niklas_S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>, 
- Gregor Herburger <gregor.herburger@ew.tq-group.com>, 
- Stefan Eichenberger <eichest@gmail.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Dimitri Fedrau <dima.fedrau@gmail.com>
-X-Mailer: b4 0.14.2
+Content-Transfer-Encoding: 8bit
 
-When using temperature measurement on Marvell 88Q2XXX devices and the
-reset-gpios property is set in DT, the device does a hardware reset when
-interface is brought down and up again. That means that the content of
-the register MDIO_MMD_PCS_MV_TEMP_SENSOR2 is reset to default and that
-leads to permanent deactivation of the temperature measurement, because
-activation is done in mv88q2xxx_probe. To fix this move activation of
-temperature measurement to mv88q222x_config_init.
+Hello in 2025,
 
-Signed-off-by: Dimitri Fedrau <dima.fedrau@gmail.com>
----
- drivers/net/phy/marvell-88q2xxx.c | 33 ++++++++++++++++++++++++++-------
- 1 file changed, 26 insertions(+), 7 deletions(-)
+this patchset fixes a pretty nasty issue that was reported by RedHat
+folks which occured after ~30 minutes (this value varied, just trying
+here to state that it was not observed immediately but rather after a
+considerable longer amount of time) when ice driver was tortured with
+jumbo frames via mix of iperf traffic executed simultaneously with
+wrk/nginx on client/server sides (HTTP and TCP workloads basically).
 
-diff --git a/drivers/net/phy/marvell-88q2xxx.c b/drivers/net/phy/marvell-88q2xxx.c
-index 4494b3e39ce2b672efe49d53d7021b765def6aa6..a3996471a1c9a5d4060d5d19ce44aa70e902a83f 100644
---- a/drivers/net/phy/marvell-88q2xxx.c
-+++ b/drivers/net/phy/marvell-88q2xxx.c
-@@ -95,6 +95,10 @@
- 
- #define MDIO_MMD_PCS_MV_TDR_OFF_CUTOFF			65246
- 
-+struct mv88q2xxx_priv {
-+	bool enable_temp;
-+};
-+
- struct mmd_val {
- 	int devad;
- 	u32 regnum;
-@@ -710,17 +714,12 @@ static const struct hwmon_chip_info mv88q2xxx_hwmon_chip_info = {
- 
- static int mv88q2xxx_hwmon_probe(struct phy_device *phydev)
- {
-+	struct mv88q2xxx_priv *priv = phydev->priv;
- 	struct device *dev = &phydev->mdio.dev;
- 	struct device *hwmon;
- 	char *hwmon_name;
--	int ret;
--
--	/* Enable temperature sense */
--	ret = phy_modify_mmd(phydev, MDIO_MMD_PCS, MDIO_MMD_PCS_MV_TEMP_SENSOR2,
--			     MDIO_MMD_PCS_MV_TEMP_SENSOR2_DIS_MASK, 0);
--	if (ret < 0)
--		return ret;
- 
-+	priv->enable_temp = true;
- 	hwmon_name = devm_hwmon_sanitize_name(dev, dev_name(dev));
- 	if (IS_ERR(hwmon_name))
- 		return PTR_ERR(hwmon_name);
-@@ -743,6 +742,14 @@ static int mv88q2xxx_hwmon_probe(struct phy_device *phydev)
- 
- static int mv88q2xxx_probe(struct phy_device *phydev)
- {
-+	struct mv88q2xxx_priv *priv;
-+
-+	priv = devm_kzalloc(&phydev->mdio.dev, sizeof(*priv), GFP_KERNEL);
-+	if (!priv)
-+		return -ENOMEM;
-+
-+	phydev->priv = priv;
-+
- 	return mv88q2xxx_hwmon_probe(phydev);
- }
- 
-@@ -810,6 +817,18 @@ static int mv88q222x_revb1_revb2_config_init(struct phy_device *phydev)
- 
- static int mv88q222x_config_init(struct phy_device *phydev)
- {
-+	struct mv88q2xxx_priv *priv = phydev->priv;
-+	int ret;
-+
-+	/* Enable temperature sense */
-+	if (priv->enable_temp) {
-+		ret = phy_modify_mmd(phydev, MDIO_MMD_PCS,
-+				     MDIO_MMD_PCS_MV_TEMP_SENSOR2,
-+				     MDIO_MMD_PCS_MV_TEMP_SENSOR2_DIS_MASK, 0);
-+		if (ret < 0)
-+			return ret;
-+	}
-+
- 	if (phydev->c45_ids.device_ids[MDIO_MMD_PMAPMD] == PHY_ID_88Q2220_REVB0)
- 		return mv88q222x_revb0_config_init(phydev);
- 	else
+The reported splats were spanning across all the bad things that can
+happen to the state of page - refcount underflow, use-after-free, etc.
+One of these looked as follows:
 
----
-base-commit: b44e27b4df1a1cd3fd84cf26c82156ed0301575f
-change-id: 20250116-marvell-88q2xxx-fix-hwmon-d6700aae9227
+[ 2084.019891] BUG: Bad page state in process swapper/34  pfn:97fcd0
+[ 2084.025990] page:00000000a60ee772 refcount:-1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x97fcd0
+[ 2084.035462] flags: 0x17ffffc0000000(node=0|zone=2|lastcpupid=0x1fffff)
+[ 2084.041990] raw: 0017ffffc0000000 dead000000000100 dead000000000122 0000000000000000
+[ 2084.049730] raw: 0000000000000000 0000000000000000 ffffffffffffffff 0000000000000000
+[ 2084.057468] page dumped because: nonzero _refcount
+[ 2084.062260] Modules linked in: bonding tls sunrpc intel_rapl_msr intel_rapl_common intel_uncore_frequency intel_uncore_frequency_common i10nm_edac nfit libnvdimm x86_pkg_temp_thermal intel_powerclamp coretemp kvm_intel kvm mgag200 irqd
+[ 2084.137829] CPU: 34 PID: 0 Comm: swapper/34 Kdump: loaded Not tainted 5.14.0-427.37.1.el9_4.x86_64 #1
+[ 2084.147039] Hardware name: Dell Inc. PowerEdge R750/0216NK, BIOS 1.13.2 12/19/2023
+[ 2084.154604] Call Trace:
+[ 2084.157058]  <IRQ>
+[ 2084.159080]  dump_stack_lvl+0x34/0x48
+[ 2084.162752]  bad_page.cold+0x63/0x94
+[ 2084.166333]  check_new_pages+0xb3/0xe0
+[ 2084.170083]  rmqueue_bulk+0x2d2/0x9e0
+[ 2084.173749]  ? ktime_get+0x35/0xa0
+[ 2084.177159]  rmqueue_pcplist+0x13b/0x210
+[ 2084.181081]  rmqueue+0x7d3/0xd40
+[ 2084.184316]  ? xas_load+0x9/0xa0
+[ 2084.187547]  ? xas_find+0x183/0x1d0
+[ 2084.191041]  ? xa_find_after+0xd0/0x130
+[ 2084.194879]  ? intel_iommu_iotlb_sync_map+0x89/0xe0
+[ 2084.199759]  get_page_from_freelist+0x11f/0x530
+[ 2084.204291]  __alloc_pages+0xf2/0x250
+[ 2084.207958]  ice_alloc_rx_bufs+0xcc/0x1c0 [ice]
+[ 2084.212543]  ice_clean_rx_irq+0x631/0xa20 [ice]
+[ 2084.217111]  ice_napi_poll+0xdf/0x2a0 [ice]
+[ 2084.221330]  __napi_poll+0x27/0x170
+[ 2084.224824]  net_rx_action+0x233/0x2f0
+[ 2084.228575]  __do_softirq+0xc7/0x2ac
+[ 2084.232155]  __irq_exit_rcu+0xa1/0xc0
+[ 2084.235821]  common_interrupt+0x80/0xa0
+[ 2084.239662]  </IRQ>
+[ 2084.241768]  <TASK>
 
-Best regards,
+The fix is mostly about reverting what was done in commit 1dc1a7e7f410
+("ice: Centrallize Rx buffer recycling") followed by proper timing on
+page_count() storage and then removing the ice_rx_buf::act related logic
+(which was mostly introduced for purposes from cited commit).
+
+Special thanks to Xu Du for providing reproducer and Jacob Keller for
+initial extensive analysis.
+
+Thanks,
+Maciej
+
+Maciej Fijalkowski (3):
+  ice: put Rx buffers after being done with current frame
+  ice: gather page_count()'s of each frag right before XDP prog call
+  ice: stop storing XDP verdict within ice_rx_buf
+
+ drivers/net/ethernet/intel/ice/ice_txrx.c     | 128 +++++++++++-------
+ drivers/net/ethernet/intel/ice/ice_txrx.h     |   1 -
+ drivers/net/ethernet/intel/ice/ice_txrx_lib.h |  43 ------
+ 3 files changed, 82 insertions(+), 90 deletions(-)
+
 -- 
-Dimitri Fedrau <dima.fedrau@gmail.com>
+2.43.0
 
 
