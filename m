@@ -1,217 +1,233 @@
-Return-Path: <netdev+bounces-158834-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158835-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB139A1371F
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 10:56:35 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C4C88A1372D
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 10:58:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 308483A1C05
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 09:56:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 070BC1885E95
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 09:58:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19F3C1DD0D4;
-	Thu, 16 Jan 2025 09:56:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 911FE1DD0C7;
+	Thu, 16 Jan 2025 09:58:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XDjARZru"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="T8+W1kNS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FF711A0731;
-	Thu, 16 Jan 2025 09:56:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2CF51DC997
+	for <netdev@vger.kernel.org>; Thu, 16 Jan 2025 09:58:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737021391; cv=none; b=GgWC+34+V61Rcmta2lAK7Yr4voWnLmI67QDRCBclsJr8QRVomyD03ac8ydMbXnDnu+DAumR8oq3cDuLMIbbeMw43BrwETcZRIp0s+zKhpnPqC5u9pRGADYwdAfhthCz46jihoatPs5wjPGU2ZMXOROJz1SyAx3KwtTI7Pr8vDZw=
+	t=1737021531; cv=none; b=bJkeGHPjGFK+KYpgDMnUa2hQvtlMBoQqgOMI2fLsf4AjA6hHwoSFKn0GUun6tFfOMT5ehwRCBtQQsqegLgtjgzoeklM0vDpyM85oESAmP5AvGLonnG9TPNDTkrq9TT5edaUxnu26NmtJd2DvRoUsfkh3t6JMfdH6IPpOLKxh+To=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737021391; c=relaxed/simple;
-	bh=hZHwfCafp/2jaIcxq0xCA2JGNMReouh9aUpppvq7Rnc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qCP9wqQ59giWOZksuB1EvIUXX4AfW07HRpz/svBLCQvqgHUthg9k/vT2KDNgvBaMqH50Rr12ayisqeLR93bY6JML6TVZFzN8Q1lCKOODNGcnfPr2zy3nsCzFK6P6U6NcDPSWp45XQ1K1cF8zvJqKHXhfgNqAj9G7boUAS5aiv3E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XDjARZru; arc=none smtp.client-ip=209.85.221.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-38a25d4b9d4so397478f8f.0;
-        Thu, 16 Jan 2025 01:56:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1737021387; x=1737626187; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=jv50vXLyCohKkolh8HL4ExMX3KlgCPYX7TMDlSK4yyQ=;
-        b=XDjARZrus829y+9lDfMDsrHCWkBNLgqeRb0MXH3k/qmVJ3R6s+ANAhUVOWPm8SdemE
-         RljfMMTBAS3wD8NBDLEYTPThzr21PjVcwcdM5iUIyO409YIwFG1dOZNnY5Q+Q0WDUw3T
-         aao3aVEI5+6uI7W0QSu4TzGvArXOJetQfRS3OFxg2Lrj7kgF01DCKuA1TAxaVnHylXLX
-         FdEVl1RQLYDzBEFRYBl/LAn22i2oKc7JGIqz02zWtJQWGOW3pJuRhOmVnfvT3VG718FD
-         9L20uth9C0SZ6uTFPgV0JSdwq8tuqtMUC6taYShl5OQA+gQ4YiuFgZLjFVyQUWJAYJjy
-         IhkQ==
+	s=arc-20240116; t=1737021531; c=relaxed/simple;
+	bh=Cyqv1j8F6DMV6z1elEYYVjcaLdtyX62sDpAusHZ4VIs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=TmrrIa97WIQzCh0oU4TLm40tRjjBAS9Cu+LSfBzpc+XpjisC36iJ8m7dKhAKkF7rfl5qBnG1i6drj5RolLR+tw6k3yuqF0hOW2wSjYCvNW3TVJUaM7wXtG3GHlD23mCMSPGKB99QE+A2NpX8V6JYhSsIQScEWAE1EolB8/oDJ08=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=T8+W1kNS; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1737021528;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=L1XJosZW4NShn5dioApxiP1subq7KqxK4uXe93H7Ho8=;
+	b=T8+W1kNSb2wed1yU9dChNhKSjhpNdf7zJ5JhBkqHVlN86MdxhdOSEL45EbADGdsUVeAxS+
+	Oxfa9g/MyVc5qZA+qkZCyeJ/Xp6k+Uyuqz5Y+Kkb+I1Pe5425fWO5fPpPTVdO8EE2MurRN
+	J5IC602ocOZDDaWxxJ2A2+uqjNubkuA=
+Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
+ [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-607-VkXBN15UN9Kz5ua0CN5N0A-1; Thu, 16 Jan 2025 04:58:43 -0500
+X-MC-Unique: VkXBN15UN9Kz5ua0CN5N0A-1
+X-Mimecast-MFC-AGG-ID: VkXBN15UN9Kz5ua0CN5N0A
+Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-7b6d0be4fb8so118059885a.2
+        for <netdev@vger.kernel.org>; Thu, 16 Jan 2025 01:58:43 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737021387; x=1737626187;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jv50vXLyCohKkolh8HL4ExMX3KlgCPYX7TMDlSK4yyQ=;
-        b=VCYC64CNRaBuYeJwoPU650cHhXG8GwX2CAO2BsbDYYhNQI1/PSAY78N3mtVPjVARP2
-         WkJYYsJnHGI27peR1iiVknWT9TE4IOndQfzedouSsEe2tRD9nZqQkij0cGbsy7uLEJi0
-         cAesOzUQCjfH3XD18wgwnLHXPGvIpdYQHKAR9JH/iELNDmzdLlOrUlZ6UUDKq+h5YVEy
-         hiiUzT0L7TISJ2sN98cZCYGgX/iPhWP2OWqqOBGZ+JdTMLYtDrojnlbRBon6qUCFfd9W
-         yjMsktOrAS+IvTd9Mtk0BQ18yL1/4M35x2bghqTZX/L89172kC2lLIi72Zq1gFfVFwW1
-         b8gw==
-X-Forwarded-Encrypted: i=1; AJvYcCUv6Wl63f239MGbAQhWavBzJUtZFyJaRFkeDsl/tMhe5a8ZUQ4CuKnw59zJxUSNlkJkKmKb2yUn5y1a@vger.kernel.org, AJvYcCW/Dz4eP4BS6vNjDQZ14AGvwsGW3GL08zMf3h7L+XroCpZThhuNDD+XnOMk1C2Qxuil+ui9As/mnL8mIKza@vger.kernel.org, AJvYcCXL+wV8/69ajyy9uVisXKpZzEalAGmtuHidoylZ3ootauMHp7wZVmtAm+cLKUe3BKs9bVa9lR/Y@vger.kernel.org
-X-Gm-Message-State: AOJu0YyE+nF76sySbJn7J4aUOMFz2d8HsG/cP8TVKVRBYvDiXo1f74ee
-	gtarV4QLVtz4QQJ/ZfH0GugFXbAnFWQRXKMhniQEKIQ51RO//PCc
-X-Gm-Gg: ASbGnct8Vd+pwi1Kyb6A2PiQ5g6sW5yGopgMTOc4hMHr+bAHx9qhW+gPdlDtuWs0A4K
-	ASghUHja64tf1IWTXYhw+KidftvPkAaXJqTyWJl/X6CVlZKRbxTSXHfCRlYX8HJZ/wGFWK2tFIs
-	4UHCcqnTcBZiaScC9aIRpGt8GGf4p/k8JAMe3FS4c5HWxT2ywXC7HO7fpByy7SXFP8MHd2heF7c
-	OqcdZJZf3+/2IYlgWf7tmZXij4/if6OipzCUXAKEX5xg4p7jjYn
-X-Google-Smtp-Source: AGHT+IHzH1W8ReHz81xgqmeQjgmWXXdbxuZnQGUcOlWiMkSjs6qBP8f4LT8IkgM6yePzS/DnvD9siw==
-X-Received: by 2002:a5d:64eb:0:b0:386:41bd:53a3 with SMTP id ffacd0b85a97d-38a87310667mr28181865f8f.50.1737021387053;
-        Thu, 16 Jan 2025 01:56:27 -0800 (PST)
-Received: from debian ([2a00:79c0:650:2c00:303:6c5b:4b07:6715])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38bdc0d8e4bsm10844258f8f.42.2025.01.16.01.56.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Jan 2025 01:56:26 -0800 (PST)
-Date: Thu, 16 Jan 2025 10:56:24 +0100
-From: Dimitri Fedrau <dima.fedrau@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: dimitri.fedrau@liebherr.com, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, Andrew Davis <afd@ti.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 0/2] net: phy: dp83822: Add support for changing
- the transmit amplitude voltage
-Message-ID: <20250116095624.GA4526@debian>
-References: <20250113-dp83822-tx-swing-v1-0-7ed5a9d80010@liebherr.com>
- <fcffef06-c8d1-4398-bc20-30d252cd2fd2@lunn.ch>
- <20250113141828.GA4250@debian>
- <5118eb9a-ff6e-4e78-8529-d174e09cf52e@lunn.ch>
+        d=1e100.net; s=20230601; t=1737021523; x=1737626323;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=L1XJosZW4NShn5dioApxiP1subq7KqxK4uXe93H7Ho8=;
+        b=VBI2ny8eHytHpOifDHZVzzXOB9BeQ4xy6xYQISmNqvCeYVduKYLkHdwuDE/NL29iQS
+         7oA902RnbItsQSwUGk+mUYbcgglCwdNLrojQgNwi7D0t3gJSC+SQNTvs7rHxEVAaPRK8
+         nnDePRNJusXSt1MCVRKeuFg8gJ/crofA3CXn4c4ozJ4zVmw9agqqxTuHcgWkpIGe3R7D
+         tMLDq0Ka4jmYZOvFXiErwQmNgTKNBu4T0rwbtnS35N0pEYNp/fhQD6fCW78udZMHV57h
+         bEHQpvRq1bP35r2Qc1vHEMduK8Zm9CGU1E2/McI/FMtRqM70Zr0qWsum+ChDQvlXNv2R
+         K13A==
+X-Forwarded-Encrypted: i=1; AJvYcCW2/duvypmKIBmSwL3jflQtjlYRT1kECwC0QqAZ/bGiRLmyVBfLA0RMgF4QQ1J571s7H2o173k=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxiUS8geGjlXByHMtwDV0I2Cccrb12nd8S9ShQa4E1dssV9IjAr
+	0og11pDykHuKenIakADvqyObdKdX58nhrsfTySc7fzZXSHbp+IfE2V9FkdtY3GdCVJKZrYQpwJz
+	mmN6ti2oPXuqub7zNa6vYHq9CONdLSis1Hjb4h2D/QWV2oEKQMUGhgA==
+X-Gm-Gg: ASbGncsapmvzd0jM9KTr8fHKFIGwAnONULErrc0oVpIA0xzCdboAXPYv1O++vRipkcI
+	WRYLZdy8r4oNsnqx20+f5uLVW5SmcWX21tC1Ce8k0jUN9BMm0R0MoJSBQOLIvGaMbb9qsCcx4Dj
+	mCNvS+1BfWtNj/FWhuHQvozqd90+Y4qouCTMlRw33dllLJyw8NkvQmQGD31Jl/5ePZPkDcXMM3b
+	lApixyfOUzaM2Z5TAzrdOUuGgS+8CB0tGJHxZB4NOPe5pM0+Ij02/IBPP9vSHSkUN44rEWLIQw4
+	UFQAqnporQY=
+X-Received: by 2002:a05:620a:17a2:b0:7b8:6331:a55e with SMTP id af79cd13be357-7bcd975a181mr5034591785a.44.1737021522817;
+        Thu, 16 Jan 2025 01:58:42 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHSzqYsRXFRHXmdcXRECfUeMtwN//Cgn8zDTTdXOVwpXVGGF5zjiCATJuBBM+fQrOcpaTKCnQ==
+X-Received: by 2002:a05:620a:17a2:b0:7b8:6331:a55e with SMTP id af79cd13be357-7bcd975a181mr5034589585a.44.1737021522466;
+        Thu, 16 Jan 2025 01:58:42 -0800 (PST)
+Received: from [192.168.88.253] (146-241-15-169.dyn.eolo.it. [146.241.15.169])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7bce324828esm803620985a.45.2025.01.16.01.58.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 16 Jan 2025 01:58:42 -0800 (PST)
+Message-ID: <4d02f786-e87e-4588-87ed-b5fa414a4b5a@redhat.com>
+Date: Thu, 16 Jan 2025 10:58:38 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5118eb9a-ff6e-4e78-8529-d174e09cf52e@lunn.ch>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [net-next,PATCH 2/2] net: phy: micrel: Add KSZ87XX Switch LED
+ control
+To: Marek Vasut <marex@denx.de>, netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>, Andrew Lunn <andrew@lunn.ch>,
+ Eric Dumazet <edumazet@google.com>, Heiner Kallweit <hkallweit1@gmail.com>,
+ Jakub Kicinski <kuba@kernel.org>, Russell King <linux@armlinux.org.uk>,
+ Tristram Ha <tristram.ha@microchip.com>, UNGLinuxDriver@microchip.com,
+ Vladimir Oltean <olteanv@gmail.com>, Woojung Huh
+ <woojung.huh@microchip.com>, linux-kernel@vger.kernel.org
+References: <20250113001543.296510-1-marex@denx.de>
+ <20250113001543.296510-2-marex@denx.de>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250113001543.296510-2-marex@denx.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hi Andrew,
+On 1/13/25 1:15 AM, Marek Vasut wrote:
+> The KSZ87xx switch contains LED control registers. There is one shared
+> global control register bitfield which affects behavior of all LEDs on
+> all ports, the Register 11 (0x0B): Global Control 9 bitfield [5:4].
+> There is also one per-port Register 29/45/61 (0x1D/0x2D/0x3D): Port 1/2/3
+> Control 10 bit 7 which controls enablement of both LEDs on each port
+> separately.
+> 
+> Expose LED brightness control and HW offload support for both of the two
+> programmable LEDs on this KSZ87XX Switch. Note that on KSZ87xx there are
+> three or more instances of simple KSZ87XX Switch PHY, one for each port,
+> however, the registers which control the LED behavior are mostly shared.
+> 
+> Introduce LED brightness control using Register 29/45/61 (0x1D/0x2D/0x3D):
+> Port 1/2/3 Control 10 bit 7. This bit selects between LEDs disabled and
+> LEDs set to Function mode. In case LED brightness is set to 0, both LEDs
+> are turned off, otherwise both LEDs are configured to Function mode which
+> follows the global Register 11 (0x0B): Global Control 9 bitfield [5:4]
+> setting.
 
-Am Mon, Jan 13, 2025 at 04:59:38PM +0100 schrieb Andrew Lunn:
-> On Mon, Jan 13, 2025 at 03:18:28PM +0100, Dimitri Fedrau wrote:
-> > Hi Andrew,
-> > 
-> > Am Mon, Jan 13, 2025 at 02:54:28PM +0100 schrieb Andrew Lunn:
-> > > On Mon, Jan 13, 2025 at 06:40:11AM +0100, Dimitri Fedrau via B4 Relay wrote:
-> > > > Add support for changing the transmit amplitude voltage in 100BASE-TX mode.
-> > > > Add support for configuration via DT.
-> > > 
-> > > The commit message is supposed to answer the question "Why?". Isn't
-> > > reducing the voltage going to make the device non conforming? Why
-> > > would i want to break it? I could understand setting it a bit higher
-> > > than required to handle losses on the PCB and connector, so the
-> > > voltages measured on the RJ45 pins are conforming.
-> > >
-> > - Will add the "Why?" to the commit description. You already answered it.
-> > - Yes you are right.
-> > - I don't want to break it, the PHY just provides these settings. And I
-> >   just wanted to reflect this in the code, although it probably doesn't
-> >   make sense.
-> > - In my case I want to set it a bit higher to be conforming.
-> 
-> I have seen use cases for deeply embedded systems where they want to
-> reduce it, to avoid some EMC issues and save some power/heat. They
-> know the cable lengths, so know a lower voltage won't cause an
-> issue. The issue in that case is that the configuration was policy,
-> not a description of the hardware. So i pushed for it to be a PHY
-> tunable, which can be set at runtime. Your use case is however about
-> the hardware, you need a slightly higher voltage because of the
-> hardware design. So for this case, i think DT is O.K. But you will
-> need to make this clear in the commit message, you want to make the
-> device conform by increasing the voltage. And put something in the
-> binding description to indicate this setting should be used to tune
-> the PHY for conformance. It is not our problem if somebody misuses it
-> for EMC/power saving and makes there device non-conform.
-> 
-Thanks for the explanation. Will add the comment in the commit message.
-
-> > > Also, what makes the dp8382 special? I know other PHYs can actually do
-> > > this. So why are we adding some vendor specific property just for
-> > > 100base-tx?
-> > >
-> > I don't think that the dp83822 is special in this case. I just didn't
-> > know better. Would be removing the vendor specific property enough ?
-> > Or is there already a defined property describing this. Didn't found
-> > anything.
-> 
-> If i remember correctly, there might be a property for
-> automotive/safety critical, where there is a choice of two
-> voltages. But it might be just deciding which of the two voltages are
-> used?
-> 
-> There is also:
-> 
->   ti,cfg-dac-minus-one-bp:
->     description: |
->        DP83826 PHY only.
->        Sets the voltage ratio (with respect to the nominal value)
->        of the logical level -1 for the MLT-3 encoded TX data.
->     enum: [5000, 5625, 6250, 6875, 7500, 8125, 8750, 9375, 10000,
->            10625, 11250, 11875, 12500, 13125, 13750, 14375, 15000]
->     default: 10000
-> 
->   ti,cfg-dac-plus-one-bp:
->     description: |
->        DP83826 PHY only.
->        Sets the voltage ratio (with respect to the nominal value)
->        of the logical level +1 for the MLT-3 encoded TX data.
->     enum: [5000, 5625, 6250, 6875, 7500, 8125, 8750, 9375, 10000,
->            10625, 11250, 11875, 12500, 13125, 13750, 14375, 15000]
->     default: 10000
-> 
-> I'm not so much an analogue person, but these don't make too much
-> sense to me. A ratio of 10,000 relative to nominal sounds rather
-> large. I would of expected a ration of 1 as the default? Since this
-> makes little sense to me, i don't think it is a good idea to copy it!
-> 
-
-I think the ratio of 10.000 was chosen to avoid truncation when calculating
-register values. These are in steps of 6,25%. Using gain in DT seems to me
-the more generic way of describing amplitude modification. But converting
-the gain to register values might be more challenging in some cases. And
-I think we also need to scale when we want to represent it as gain. The
-DP83822 allows to modify the amplitude in terms of gain by 1.65% per
-step and for 10BASE-TE gain is 9% per step. I don't have any other PHY that
-allows me to modify the amplitude, so I'm quite biased. Do you know any other
-PHY supporting this ?
-
-> I've not looked at 802.3.... Do we need different settings for
-> different link modes?  Are the losses dependent on the link mode?  Are
-> the voltages different for different link modes? Is voltage actually
-> the best unit, if different link modes have different differential
-> voltages? Would a gain make more sense for a generic binding, and then
-> let the PHY driver convert that into whatever the hardware uses?
-> 
-
-I had a quick look at 802.3, but I don't have much knowledge regarding
-the analogue part:
-
-- Different link modes have different differential voltages.
-- I would prefer gain instead of voltage, should also fit for fiber
-  optics.
-- I would prefer separate settings for the link modes. Specs for the
-  link modes are quite different, not that I could really judge. Maybe
-  someone can help us out ?
-- Maybe something like tx-amplitude-100base-tx-gain-milli or
-  tx-amplitude-100base-tx-gain-micro ?
+@Andrew, @Russel: can the above problem be address with the current phy
+API? or does phy device need to expose a new brightness_get op?
 
 [...]
+> @@ -891,6 +892,112 @@ static int ksz8795_match_phy_device(struct phy_device *phydev)
+>  	return ksz8051_ksz8795_match_phy_device(phydev, false);
+>  }
+>  
+> +#define KSZ8795_LED_COUNT	2
+> +
+> +static const unsigned long ksz8795_led_rules_map[4][2] = {
+> +	{
+> +		/* Control Bits = 2'b00 => LEDx_0=Link/ACT LEDx_1=Speed */
+> +		BIT(TRIGGER_NETDEV_LINK) | BIT(TRIGGER_NETDEV_RX) |
+> +		BIT(TRIGGER_NETDEV_TX),
+> +		BIT(TRIGGER_NETDEV_LINK_100)
+> +	}, {
+> +		/* Control Bits = 2'b01 => LEDx_0=Link     LEDx_1=ACT */
+> +		BIT(TRIGGER_NETDEV_LINK),
+> +		BIT(TRIGGER_NETDEV_RX) | BIT(TRIGGER_NETDEV_TX)
+> +	}, {
+> +		/* Control Bits = 2'b10 => LEDx_0=Link/ACT LEDx_1=Duplex */
+> +		BIT(TRIGGER_NETDEV_LINK) | BIT(TRIGGER_NETDEV_RX) |
+> +		BIT(TRIGGER_NETDEV_TX),
+> +		BIT(TRIGGER_NETDEV_FULL_DUPLEX)
+> +	}, {
+> +		/* Control Bits = 2'b11 => LEDx_0=Link     LEDx_1=Duplex */
+> +		BIT(TRIGGER_NETDEV_LINK),
+> +		BIT(TRIGGER_NETDEV_FULL_DUPLEX)
+> +	}
+> +};
+> +
+> +static int ksz8795_led_brightness_set(struct phy_device *phydev, u8 index,
+> +				      enum led_brightness value)
+> +{
+> +	/* Turn all LEDs on this port on or off */
+> +	/* Emulated rmw of Register 29/45/61 (0x1D/0x2D/0x3D): Port 1/2/3 Control 10 */
+> +	return phy_modify(phydev, 0x0d00, BIT(7), (value == LED_OFF) ? BIT(7) : 0);
 
-Best regards,
-Dimitri Fedrau
+Please defines macros for all the above 'magic numbers'
+
+> +}
+> +
+> +static int ksz8795_led_hw_is_supported(struct phy_device *phydev, u8 index,
+> +				       unsigned long rules)
+> +{
+> +	const unsigned long mask[2] = {
+> +		BIT(TRIGGER_NETDEV_LINK) | BIT(TRIGGER_NETDEV_RX) |
+> +		BIT(TRIGGER_NETDEV_TX),
+> +		BIT(TRIGGER_NETDEV_LINK_100) | BIT(TRIGGER_NETDEV_RX) |
+> +		BIT(TRIGGER_NETDEV_TX) | BIT(TRIGGER_NETDEV_FULL_DUPLEX)
+> +	};
+> +
+> +	if (index >= KSZ8795_LED_COUNT)
+> +		return -EINVAL;
+> +
+> +	/* Filter out any other unsupported triggers. */
+> +	if (rules & ~mask[index])
+> +		return -EOPNOTSUPP;
+> +
+> +	/* RX and TX are not differentiated, either both are set or not set. */
+> +	if (!(rules & BIT(TRIGGER_NETDEV_RX)) ^ !(rules & BIT(TRIGGER_NETDEV_TX)))
+> +		return -EOPNOTSUPP;
+> +
+> +	return 0;
+> +}
+> +
+> +static int ksz8795_led_hw_control_get(struct phy_device *phydev, u8 index,
+> +				      unsigned long *rules)
+> +{
+> +	int val;
+> +
+> +	if (index >= KSZ8795_LED_COUNT)
+> +		return -EINVAL;
+> +
+> +	/* Emulated read of Register 11 (0x0B): Global Control 9 */
+> +	val = phy_read(phydev, 0x0b00);
+> +	if (val < 0)
+> +		return val;
+> +
+> +	/* Extract bits [5:4] and look up matching LED configuration */
+> +	*rules = ksz8795_led_rules_map[(val >> 4) & 0x3][index];
+
+This calls for FIELD_GET() usage.
+
+[...]
+> @@ -5666,10 +5773,15 @@ static struct phy_driver ksphy_driver[] = {
+>  }, {
+>  	.name		= "Micrel KSZ87XX Switch",
+>  	/* PHY_BASIC_FEATURES */
+> +	.probe		= kszphy_probe,
+>  	.config_init	= kszphy_config_init,
+>  	.match_phy_device = ksz8795_match_phy_device,
+>  	.suspend	= genphy_suspend,
+>  	.resume		= genphy_resume,
+> +	.led_brightness_set = ksz8795_led_brightness_set,
+> +	.led_hw_is_supported = ksz8795_led_hw_is_supported,
+> +	.led_hw_control_get = ksz8795_led_hw_control_get,
+> +	.led_hw_control_set = ksz8795_led_hw_control_set,
+
+The preferred style is to use an additional tab to align all the '=' in
+this new block.
+
+/P
+
 
