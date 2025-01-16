@@ -1,75 +1,98 @@
-Return-Path: <netdev+bounces-158933-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158934-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0691DA13D9C
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 16:27:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 211DBA13D9E
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 16:30:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 66556188C63A
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 15:27:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 526B3188B76B
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 15:30:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3228022AE55;
-	Thu, 16 Jan 2025 15:27:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B74722ACE7;
+	Thu, 16 Jan 2025 15:29:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AKzDLKy1"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kg3LO/7E"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93AF113AA35;
-	Thu, 16 Jan 2025 15:27:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E6A478F2B;
+	Thu, 16 Jan 2025 15:29:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737041269; cv=none; b=FK9mvTQCmrfTGlDpEy4vPQZrTxABzCgJXkZWqMB+E30/Ip8rD+RaXGfoT4iu1NY8GnVm1jjqsLy/OCIcakBtE0YKVfZkR8/ZUoX4GC+F8AM23fPOg7qTW661WB5C7QI8BAnvFCj3inewSC+wMUr/raprqMTXjUZk9HdtrNaZdfE=
+	t=1737041399; cv=none; b=AMnlciaUE/fI6ceRSRU5yGFr9fihlt2Q4mA0PL2jfUZ7J+v0VB7HlWcdtCooibJ1YH34TSeeNgLyD938epydhmtML849k/+2rSITjAO/lM/MnPMwqpf/VtjSef6ojNX2AeQqz8ot0T9nOz8PC4gowd7TQhIF/y84FVLxLTw7rUs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737041269; c=relaxed/simple;
-	bh=myBHpucL5mlkU/eDPoSKRGsRNHNBsxAcFzoiWMSpXf0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WthxFmFjI1YRvHk9OxdseweTYtKP1IqdAtcOI7VND4wP+Az7MVptnpl1ZR3KAGJF1RZHHYr4T4bk9hdfkgd4zAmidCYwEo6sVCW6H3V8poGKGlUbnq9VFE7Wh6UuYrtLwHo+CrMCuwogA/a7PhYIrBMqANlZVh8Ao6wjfz+pmQc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AKzDLKy1; arc=none smtp.client-ip=192.198.163.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1737041267; x=1768577267;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=myBHpucL5mlkU/eDPoSKRGsRNHNBsxAcFzoiWMSpXf0=;
-  b=AKzDLKy1TuCmb8etJ/AId4ArtlrKaZpYM1OjWxl+rx0rEjP/OhBlFoUj
-   Zuuqo/Mz2SPqvzxV2iwwI7JemS2dugn4lrfqLS3u+RROZ3Vrk91PT5Jf3
-   B0aitfgBw3Op0Elypc+F0gqSIHDsNiYf3v07RMo8qzY9SXPBGT1W5a9K+
-   +MXe2W+FYYumgibACFTitr9blwDCCRXQXrMzvAV55thpNkwOPo3fTtKi5
-   MeMLeiQHviXffn03iMZQuIAJ+gsvTcv7suMY1CA3giXKMYzV1pGrijksW
-   +b4PAOPLvlZbYxvx+3YwOL8nTs7mU7ruuPcFouq2sCD0RGMRYEASoq+6J
-   A==;
-X-CSE-ConnectionGUID: S2GynI45SWmZNxIWjQXduQ==
-X-CSE-MsgGUID: 5mwhPjJLSxKLQ3DBOuvP+A==
-X-IronPort-AV: E=McAfee;i="6700,10204,11314"; a="48846736"
-X-IronPort-AV: E=Sophos;i="6.12,310,1728975600"; 
-   d="scan'208";a="48846736"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jan 2025 07:27:47 -0800
-X-CSE-ConnectionGUID: p6kANKICToKUD4tPzJO6qQ==
-X-CSE-MsgGUID: yvPEI6rzQCCaixSfwtnx/w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.13,209,1732608000"; 
-   d="scan'208";a="105284630"
-Received: from black.fi.intel.com ([10.237.72.28])
-  by orviesa009.jf.intel.com with ESMTP; 16 Jan 2025 07:27:45 -0800
-Received: by black.fi.intel.com (Postfix, from userid 1003)
-	id BEA5039C; Thu, 16 Jan 2025 17:27:43 +0200 (EET)
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
-	=?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Krzysztof Kozlowski <krzk@kernel.org>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Subject: [PATCH net-next v2 1/1] nfc: st21nfca: Remove unused of_gpio.h
-Date: Thu, 16 Jan 2025 17:27:28 +0200
-Message-ID: <20250116152742.147739-1-andriy.shevchenko@linux.intel.com>
-X-Mailer: git-send-email 2.43.0.rc1.1336.g36b5255a03ac
+	s=arc-20240116; t=1737041399; c=relaxed/simple;
+	bh=2frU9X7dbWLUl8WO2hD3vcwXOw47sVSnR2+r8CWLSKA=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=SjXBHC4MS9kOF1wi6lFhRgm53bmU4AUpJZRITh9JiuDE3uZtR6h/A8ZNM8agPaavazqhGByY1wOh7MApBlTQkzNVtmlZ7e1PWfphGm9KGohLCWxrtTWmJXok+lBtwHUAFcVMJPYG67WpOwPLZreA/JSe+yfHo+ya1Zduu87JHK4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kg3LO/7E; arc=none smtp.client-ip=209.85.221.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-385de59c1a0so647223f8f.2;
+        Thu, 16 Jan 2025 07:29:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1737041395; x=1737646195; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8tw313LemcnV4eOs9J849ueqzSp6vM+lhTqL56doHZU=;
+        b=kg3LO/7E2LceMkqHd/4cCQYz5qtQ1AnkrwXGW7RAV4Zpx39ufgGm4VxAd3GfLdLQlT
+         W4EussN3nCYS1J/ngvo8ky3JO8WaSJYskAbebKwKzX2yKaajTAZPASxbB+WYdyRyl3Ur
+         G8wAula5+bd45JHyQrjjNavTZRJWOe1pTP4a52liCryjARHLUd1jQSChgY/pz7lMAzyN
+         UCEGJaUa31YF29szJZyfE6oLknlxK8yaX4mcE3/5QHr0P4f+x07Ydxbprtkb7dv88h+m
+         Hce+4vuMGO8s5AoVajR/nHUD9+MXjc7bIcXNjljfiv+M3NkL4ef5AiKKpOBIbjMeZ0+R
+         sBnQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737041395; x=1737646195;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=8tw313LemcnV4eOs9J849ueqzSp6vM+lhTqL56doHZU=;
+        b=BvHXgrHQ0oyrUXtf46BPryu/6/dc4CZlJPrbqdRX28WAeHJcZ13bsg2u33nt/LXsg0
+         h2W38TLG2lAl6ilBYLoMNwZUgj1jC7Q52N9sxpjavCMIInVEwi7sVJlWSOkUVQTHuAjT
+         Qn/A3O8LEr1Q97ujsv0NfM9Dn8Bj8U9e1UdI6/JMrms3w6lv8zam5xVLNJbp8O7JbYAB
+         4/uUx6l6YNn4kKoTgLnsh63IbxsjpeZj6SYT96kBYkNqKPJTj74L8yHnmsKYSAyUE0Sa
+         UpmVbuiAmHnt1ptagcefYe7iqiAD3vJc1NCuj4iT/SANIbT/rhtDiQw9hkV6gAMRRFR8
+         YPhg==
+X-Forwarded-Encrypted: i=1; AJvYcCVZzPTwNJVdDhkZm0/j4CUWDLAL9dX0zP2MYwVMqw6oPhsr4DrT0xw5U/iLECKyHQ3JyTSTbUaiMUZ7c4o=@vger.kernel.org, AJvYcCWd/9mqbNLHHK1s+8y1W6591KmgvqBp4lZEI9cgY366TyL5Xhmy3G1F/VYC6uUonP2Irsy7ceqp@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzb1x8sOvJ2JZVlECSPX5TCK8tWIFMeEoaXwfXQeuCuislWPdNt
+	0Tx0GnC5vdTQ+DxyCkDCFZ+wey1H+IfpBDDECtX3zy0rSQQTJXUW
+X-Gm-Gg: ASbGncsMsYPbblgOslTXWDs0fyhO0Exsn9o/PfkgkgrZCLPFapVXPn6x6nsyPqxBEdi
+	QNm6a4wW8Liq5f+neJ9mlkK6Br6FRy3YGsPQkx2Zbmr1pFJP5iUvbHcGC7BHP1YscMJBPQyfSh0
+	xyZ8zIf52Y48TY+67vr6m/F6lfrBrO3R8ZswaX2ARP6XeGcY6hSQ0R97fBUk99Z9Bz3OdSffSPG
+	eoJo5z41O5WZZd37ltN08TjEuS8Unp2jxBcwuL3JUBINMZRToXeQe6RggBKDsrF2EvUOjo=
+X-Google-Smtp-Source: AGHT+IEef8S7Jx5rYUCpDubnXGjnbOP3kPqHoI2nCeuf4dEPI9YGEFPuF5pDKiffY/hcSYgjAqouxA==
+X-Received: by 2002:a5d:64cc:0:b0:385:e8ce:7483 with SMTP id ffacd0b85a97d-38a872faf34mr23870496f8f.4.1737041395360;
+        Thu, 16 Jan 2025 07:29:55 -0800 (PST)
+Received: from home.paul.comp (paulfertser.info. [2001:470:26:54b:226:9eff:fe70:80c2])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43890409758sm2800065e9.2.2025.01.16.07.29.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 16 Jan 2025 07:29:55 -0800 (PST)
+Received: from home.paul.comp (home.paul.comp [IPv6:0:0:0:0:0:0:0:1])
+	by home.paul.comp (8.15.2/8.15.2/Debian-22+deb11u3) with ESMTP id 50GFTpkn008705;
+	Thu, 16 Jan 2025 18:29:52 +0300
+Received: (from paul@localhost)
+	by home.paul.comp (8.15.2/8.15.2/Submit) id 50GFTnrZ008702;
+	Thu, 16 Jan 2025 18:29:49 +0300
+From: Paul Fertser <fercerpav@gmail.com>
+To: Potin Lai <potin.lai.pt@gmail.com>, Cosmo Chou <chou.cosmo@gmail.com>,
+        Eddie James <eajames@linux.ibm.com>,
+        Samuel Mendoza-Jonas <sam@mendozajonas.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Ivan Mikhaylov <fr0st61te@gmail.com>,
+        Paul Fertser <fercerpav@gmail.com>, stable@vger.kernel.org
+Subject: [PATCH] net/ncsi: wait for the last response to Deselect Package before configuring channel
+Date: Thu, 16 Jan 2025 18:29:00 +0300
+Message-Id: <20250116152900.8656-1-fercerpav@gmail.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <CAGfYmwVH1A+imBF5TLenLaSM0Zf0C5wgfgocYix9Ye_7siR_xQ@mail.gmail.com>
+References: <CAGfYmwVH1A+imBF5TLenLaSM0Zf0C5wgfgocYix9Ye_7siR_xQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -78,29 +101,61 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-of_gpio.h is deprecated and subject to remove. The drivers in question
-don't use it, simply remove the unused header.
+The NCSI state machine as it's currently implemented assumes that
+transition to the next logical state is performed either explicitly by
+calling `schedule_work(&ndp->work)` to re-queue itself or implicitly
+after processing the predefined (ndp->pending_req_num) number of
+replies. Thus to avoid the configuration FSM from advancing prematurely
+and getting out of sync with the process it's essential to not skip
+waiting for a reply.
 
-Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+This patch makes the code wait for reception of the Deselect Package
+response for the last package probed before proceeding to channel
+configuration.
+
+Thanks go to Potin Lai and Cosmo Chou for the initial investigation and
+testing.
+
+Fixes: 8e13f70be05e ("net/ncsi: Probe single packages to avoid conflict")
+Cc: stable@vger.kernel.org
+Signed-off-by: Paul Fertser <fercerpav@gmail.com>
 ---
-v2: added tag (Krzysztof)
- drivers/nfc/st21nfca/i2c.c | 1 -
- 1 file changed, 1 deletion(-)
+ net/ncsi/ncsi-manage.c | 13 +++++++------
+ 1 file changed, 7 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/nfc/st21nfca/i2c.c b/drivers/nfc/st21nfca/i2c.c
-index 02c3d11a19c4..6d7861383806 100644
---- a/drivers/nfc/st21nfca/i2c.c
-+++ b/drivers/nfc/st21nfca/i2c.c
-@@ -11,7 +11,6 @@
- #include <linux/i2c.h>
- #include <linux/gpio/consumer.h>
- #include <linux/of_irq.h>
--#include <linux/of_gpio.h>
- #include <linux/acpi.h>
- #include <linux/interrupt.h>
- #include <linux/delay.h>
+diff --git a/net/ncsi/ncsi-manage.c b/net/ncsi/ncsi-manage.c
+index 5cf55bde366d..bf8e27b84a66 100644
+--- a/net/ncsi/ncsi-manage.c
++++ b/net/ncsi/ncsi-manage.c
+@@ -1373,6 +1373,12 @@ static void ncsi_probe_channel(struct ncsi_dev_priv *ndp)
+ 		nd->state = ncsi_dev_state_probe_package;
+ 		break;
+ 	case ncsi_dev_state_probe_package:
++		if (ndp->package_probe_id >= 8) {
++			/* Last package probed, finishing */
++			ndp->flags |= NCSI_DEV_PROBED;
++			break;
++		}
++
+ 		ndp->pending_req_num = 1;
+ 
+ 		nca.type = NCSI_PKT_CMD_SP;
+@@ -1489,13 +1495,8 @@ static void ncsi_probe_channel(struct ncsi_dev_priv *ndp)
+ 		if (ret)
+ 			goto error;
+ 
+-		/* Probe next package */
++		/* Probe next package after receiving response */
+ 		ndp->package_probe_id++;
+-		if (ndp->package_probe_id >= 8) {
+-			/* Probe finished */
+-			ndp->flags |= NCSI_DEV_PROBED;
+-			break;
+-		}
+ 		nd->state = ncsi_dev_state_probe_package;
+ 		ndp->active_package = NULL;
+ 		break;
 -- 
-2.43.0.rc1.1336.g36b5255a03ac
+2.34.1
 
 
