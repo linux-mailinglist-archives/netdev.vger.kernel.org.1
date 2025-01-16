@@ -1,95 +1,100 @@
-Return-Path: <netdev+bounces-158890-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158891-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C085A13A75
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 14:07:23 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 12084A13A76
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 14:07:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 73F09188BA83
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 13:07:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2DDBA163642
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 13:07:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 104C91E5708;
-	Thu, 16 Jan 2025 13:06:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Jm5IRekK"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FF9F1F37CD;
+	Thu, 16 Jan 2025 13:07:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB9F41E3DFE;
-	Thu, 16 Jan 2025 13:06:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6C0B1F2C53
+	for <netdev@vger.kernel.org>; Thu, 16 Jan 2025 13:07:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.70
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737032793; cv=none; b=bhBioYoH5ZLTNK6EmNzb6qzYyEhd/BHT4+eFskpzfvYRujQ3Asy/vsg93U4IH04N9OuL6LJ2O6JVxEJHycDRbi+zFSoYMevI0GuVQr+Fwdmc4l3TS+T4GcdRsFopdZK9UIHqWxQZaduzKgugzT8c30xYCk9zHIoS4ItKjyV9At4=
+	t=1737032843; cv=none; b=fZQOJPBVrIYPmmaBEhkHj7NDpfrxxg+L68ahvnT/zFtQhaavRD5HgLxNYpxE7mjetkWKbXSsfIygZBT1vtFSAJR18RqRfe5/H7FryOoALS6EUCz/NPupmfXCzOR30tQINR5m/js1/nWBZTd021/t4uDw+ygarTt9ImpdL1bcPQ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737032793; c=relaxed/simple;
-	bh=OnXHaP2RXlZAkdXMUBJaRh3PdILLHIcuTgCimQm/K60=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UNVLywDsnCv3D8sbQoSxjc9X9aMVDKPDk8BxhiQuSvZiD2KN+Dnxd+YEZJ0RP3tBz8vxCNMdjhjd+dPq8j9mMuvbxbZllCqwdEdm8R7ajL7CHkIpWL4JSIv7BW8jN4MlftwItxzrJcLSgqn/i8AE7jXFSJRM9j/je7MYHD6r2Xk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Jm5IRekK; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=gGfqbH0+0xNHDaBP8mufxix1MaSaVnHOZLrK9FPiOgQ=; b=Jm5IRekKNfHpSJBpdovOOR/X1F
-	4+XkY+5vrPKiy+RrkNFrHkKkTjTjoRvdjg4/yvV1XYGXoKssZR5dmsKu+ETY7/iyTBEP9HUbv9Osw
-	aHI75CwnRw4gHylFHvU19qv8uLWj8vGGBszWxxdCStfdnU8NTLo5S6jeGQhNpTX2tBpk=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tYPZX-00582T-GD; Thu, 16 Jan 2025 14:06:07 +0100
-Date: Thu, 16 Jan 2025 14:06:07 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Marek Vasut <marex@denx.de>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Tristram Ha <tristram.ha@microchip.com>,
-	UNGLinuxDriver@microchip.com, Vladimir Oltean <olteanv@gmail.com>,
-	Woojung Huh <woojung.huh@microchip.com>,
-	linux-kernel@vger.kernel.org
-Subject: Re: [net-next,PATCH 1/2] net: dsa: microchip: Add emulated MIIM
- access to switch LED config registers
-Message-ID: <ec7861e2-85f5-45bf-bff6-19bc5009cac2@lunn.ch>
-References: <20250113001543.296510-1-marex@denx.de>
+	s=arc-20240116; t=1737032843; c=relaxed/simple;
+	bh=bt4Dqaj3KiJm6oOOP/oi3442OiP+mmJ00loVyqbtACo=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=hcd5sSc5pNkjI9e5/LaWU3X8+vUB3jf3QkJRV+Cgs0ZrHUMPukBSxahBlNwjnGPY9XK7tgSB6qKlTEsoWSJLub3OIxG7CB35vWMJIg2pEuHSTwk3bYelfKvE63rAPtvOOJbMoXUh705FZkDal5dCvPaVYYIzJ7SGZZqXnVMm4hg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.70
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-84cdb5795b0so59562339f.2
+        for <netdev@vger.kernel.org>; Thu, 16 Jan 2025 05:07:21 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737032841; x=1737637641;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=HZnwLAZE1hvc7zr13C8s1bzWnJbdM8KYpOkg+JFZ4GM=;
+        b=bSzOy4DhukckTlsTZA2Z011UZ+wGheXX1F+NRFAhfP4lH4nANy4HtaoVtXPuvubXcd
+         796pLDfN/dMtsOkUsG4ev3NKF5n+uyzGJOQPkU/QJ1OcRrf8YOM5tN5Yvm2Io8toVuDg
+         heUkFDAv8HwG/oxd2DRQKSj3c4hZdBwPqj5yVVhBNw0tw0HRj5o4+1PAWcaV7aflSiI8
+         L/TMp1LYyeYPhTBk6K7tUyFAdmYsYQuLeH6Q8AMxCqS87UgVPMoQMQBmzIhh0HduPzDV
+         Tm7o2HvC9VPzAID+WD3SK6zevAFmll7tFhi0EucNdS2A1BYi4L5mSGDvKDmAjxCchikr
+         D91g==
+X-Forwarded-Encrypted: i=1; AJvYcCV6DVRdqy+czmwdcO2ZSgdFe+408stO3aHSfQSQnRJ9VwezNyKfSMRw3o8vAt7qdJvGtIndd9I=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy5ItU0bnjtBFKUB4JsGDCkCGktcGCs6KP7BcpUFyYfFLeu2vYE
+	N/AFzpYIGtc/x8fW7B8rtOCJVsj3wFoZ/NhBjUezHvg2mRbwF+eIcI4jzSgz1YGAoip+HOg7Iwd
+	Q+vNt6t379Cn8Q28spIsgh3dnhhm8utkFAvDCNXTiUsuJ4oB/noUHCPk=
+X-Google-Smtp-Source: AGHT+IEyIfUjlHp2v67R/YAXNYsxt5y3Ql3uf8qYNFpqE7tp3+/B8sxZt7KvBlfasEoBjLjX+TxAkyqvfUXjnwvu5VqHMqDcS9/C
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250113001543.296510-1-marex@denx.de>
+X-Received: by 2002:a05:6e02:1d87:b0:3ce:80b8:7328 with SMTP id
+ e9e14a558f8ab-3ce80b873d1mr74471705ab.3.1737032841121; Thu, 16 Jan 2025
+ 05:07:21 -0800 (PST)
+Date: Thu, 16 Jan 2025 05:07:21 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <67890489.050a0220.20d369.003a.GAE@google.com>
+Subject: [syzbot] Monthly mptcp report (Jan 2025)
+From: syzbot <syzbot+list199304eb885a80743e78@syzkaller.appspotmail.com>
+To: linux-kernel@vger.kernel.org, martineau@kernel.org, matttbe@kernel.org, 
+	mptcp@lists.linux.dev, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-> This preparatory patch exposes the LED control bits in those Switch Config
-> Registers by mapping them at high addresses in the MIIM space, so the PHY
-> driver can access those registers and surely not collide with the existing
-> MIIM block registers. The two registers which are exposed are the global
-> Register 11 (0x0B): Global Control 9 as MIIM block register 0x0b00 and
-> port specific Register 29/45/61 (0x1D/0x2D/0x3D): Port 1/2/3 Control 10
-> as MIIM block register 0x0d00 . The access to those registers is further
-> restricted only to the LED configuration bits to prevent the PHY driver
-> or userspace tools like 'phytool' from tampering with any other switch
-> configuration through this interface.
+Hello mptcp maintainers/developers,
 
-I do wounder about using register numbers outside of the 0-31
-range. We never have enforced it, but these clearly break 802.3 C22.
+This is a 31-day syzbot report for the mptcp subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/mptcp
 
-I wounder if it would be better to emulate pages as well. The PHY
-driver already has lanphy_write_page_reg() and
-lanphy_read_page_reg(). Could you emulate what those need?  It adds a
-lot of complexity, but it should be future proof.
+During the period, 2 new issues were detected and 0 were fixed.
+In total, 3 issues are still open and 23 have already been fixed.
 
-What might be simpler is to expose an emulated C45 register range, and
-put the registers in the vendor section.
+Some of the still happening issues:
 
+Ref Crashes Repro Title
+<1> 11      Yes   WARNING in __mptcp_clean_una (2)
+                  https://syzkaller.appspot.com/bug?extid=ebc0b8ae5d3590b2c074
+<2> 5       No    KMSAN: uninit-value in mptcp_incoming_options (2)
+                  https://syzkaller.appspot.com/bug?extid=23728c2df58b3bd175ad
+<3> 2       Yes   WARNING in mptcp_pm_nl_set_flags (2)
+                  https://syzkaller.appspot.com/bug?extid=cd16e79c1e45f3fe0377
 
-	Andrew
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
+
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
+
+You may send multiple commands in a single email message.
 
