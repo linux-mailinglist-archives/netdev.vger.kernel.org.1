@@ -1,203 +1,117 @@
-Return-Path: <netdev+bounces-158875-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158877-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23DFEA139FD
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 13:34:05 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C0EFBA13A04
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 13:38:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 576271887E84
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 12:34:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2B2B6188AF9F
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 12:38:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76FEA1DB125;
-	Thu, 16 Jan 2025 12:34:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F3451DE4DA;
+	Thu, 16 Jan 2025 12:37:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JCZ9wrBl"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e9sn7ncD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB73F24A7F4
-	for <netdev@vger.kernel.org>; Thu, 16 Jan 2025 12:33:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F7BB24A7F8;
+	Thu, 16 Jan 2025 12:37:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737030840; cv=none; b=M+LZ6FxxF1oh9u5chsjenTkOL/rXX8mULuzaVeUxTStdIQwhv4V+0oflnId6h8exH9UbusU++PFOVEC4Sgn6iGf76aVw83Z/uLLuBgQEZi1vsel/LgR4IMrfnfUMGv94hOI/buEFWupDYZUMu6tBBAPEk+uAwNRF8cNSZtBc63A=
+	t=1737031076; cv=none; b=Yfdlecofpm5ypmUliceGMt9O9GJBebX8E2Wvo/a45PCEeAc1ZOS1qXPXctNkpEoFhhZzmGzY0AUqGCJ2E6GQ031x3HnSwmsZgXSspHD1ZZp0g8aRnVGoVkv0tFTSdBMSv5DP7/nNYyJNH4Suor4gbStHNVYGnMytVubhjYsagco=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737030840; c=relaxed/simple;
-	bh=URYD4orAWUPlAIo0veMlLGPudtl79GZLpB4L3IsRIaQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hqEmGasI5c7YdTBbO15Ybnj49LvAgq3Fw03HH4+Qy6XwyNDW+v2gwXGXCVkgSuPMRNOuvCnXxXpaLqmn6V53YfT6XXom+XapqoSxj38atUslUYV5OpFmh2ajDPxWSt0BA3I7yJ1KMZzS2sW3LAcC/EiMKSEH9i9bfaIY0wTEwx0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=JCZ9wrBl; arc=none smtp.client-ip=192.198.163.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1737030838; x=1768566838;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=URYD4orAWUPlAIo0veMlLGPudtl79GZLpB4L3IsRIaQ=;
-  b=JCZ9wrBl7vjQMWXxNbIEc1JCG8kqtPPAkWeDqcYxjNUm0rba99jrZ1uW
-   dsMCh91tKEky5M2RmqwiQF3jZo27alVKnAKNDcLnCWaMinb65pkLNqztU
-   sS1qStl2Ja3jWutt9ZcHwtUKbiGRmPkpLiDWQIX0utRZ22a3JWxOb1AUI
-   +vJdws+4ljMWAK3mbiPKReeKI7bknFL6WPTeN0UpIYELIROwSEkMg8Ip5
-   BZntsOHGTVuRSIQhd7JnqcXEAvzseGr6x7UTk828k5nht7sOwjUX5t4GY
-   udDp5WkeejVGR+4GYCmgk8PE7bjnYSwG3AaE6B6iHiNBAaphP6s+b05TN
-   g==;
-X-CSE-ConnectionGUID: RB/Ci6nLQ+e1J2u0MRJ/sw==
-X-CSE-MsgGUID: 1qrymeu8TvaO8n3jL3pebg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11316"; a="40225291"
-X-IronPort-AV: E=Sophos;i="6.13,209,1732608000"; 
-   d="scan'208";a="40225291"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jan 2025 04:33:58 -0800
-X-CSE-ConnectionGUID: AbJ1C9V/SRyGtZ1yrlP0dg==
-X-CSE-MsgGUID: pBy6lnfsQoCZLC0XGxUE9A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.13,209,1732608000"; 
-   d="scan'208";a="136322745"
-Received: from lkp-server01.sh.intel.com (HELO d63d4d77d921) ([10.239.97.150])
-  by orviesa002.jf.intel.com with ESMTP; 16 Jan 2025 04:33:55 -0800
-Received: from kbuild by d63d4d77d921 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1tYP4K-000RoB-2S;
-	Thu, 16 Jan 2025 12:33:52 +0000
-Date: Thu, 16 Jan 2025 20:33:35 +0800
-From: kernel test robot <lkp@intel.com>
-To: Jiawen Wu <jiawenwu@trustnetic.com>, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, linux@armlinux.org.uk, horms@kernel.org,
-	netdev@vger.kernel.org
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	mengyuanlou@net-swift.com, Jiawen Wu <jiawenwu@trustnetic.com>
-Subject: Re: [PATCH net-next v3 1/2] net: txgbe: Add basic support for new
- AML devices
-Message-ID: <202501162038.zXreDkFM-lkp@intel.com>
-References: <20250115102408.2225055-1-jiawenwu@trustnetic.com>
+	s=arc-20240116; t=1737031076; c=relaxed/simple;
+	bh=bnEqEX+MAfj7+VeyF/2JEQyOue0+pDQ7DR0eMGkm2pI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=kYHl9kXKT81a9A2CC0paR4wFYphyVFfCqWXaTSQL1ryvDfvScqfzwm/wN7Fq9AMjdSkdlj5cMzjnfVAnH3kHecyvMT4do/wOE+6+8E6N+PqPM3kl2+jQiAA30f3pDrzbScQsYil66/cWqA09Wy+fnwCykY3wHywybWZZ2iCZBzY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=e9sn7ncD; arc=none smtp.client-ip=209.85.216.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-2ee94a2d8d0so178671a91.2;
+        Thu, 16 Jan 2025 04:37:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1737031074; x=1737635874; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=m9R+Pk0aHXXpiAhR4vEIRTl9sluVZzFwXWiO3bzv8qo=;
+        b=e9sn7ncDbiFSH31x7nvt1Pzvqlh0yevKXhfdSiL5olxQfU5cquT+Jeqv2w/N5ZuhJE
+         u07iwSP7476AiUjH2aVQbvUYkbmU++50CwAs+JB/vyGdCq0P+l21mZzt6afyKLbWtBMO
+         7nrhYW//iYlNriFWoiAn8/cn0gL0z86z4BKV5aVQwbrfqNCximuQtCo2MRrrPsStDVcR
+         R0MrsI339hJpqw4PRLy2IbVdaS1NaTFQPDpuG5qL4Qe1Ogs55dtUyoOlGFw+mVVuCSoD
+         4IY9C5lDufkH++oURyi5RVTicFNZAGuZ5XzYOHU13zAQ1M6/udUxBR8R4uo9IICFcHz3
+         PG7w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737031074; x=1737635874;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=m9R+Pk0aHXXpiAhR4vEIRTl9sluVZzFwXWiO3bzv8qo=;
+        b=gtJh7H8dVO+JU8oaJsVWbxIi84ln8tlXeGWdS6gdodznFwe7ig9/MYt52ppZRgjqZr
+         pVheoyJnREq3Ury/52xX9BlZlvIDecz7kDJ318dQ8gS3nDZH8SDYey0iK9bfmri4X3cB
+         d+1yMecEi9fyx7/8BzSuwPk3Kd4RevJ0nKkNKyE8HznMkwdSw1ctVQPbQPgFh4w2iNE8
+         Wxgt4chL2xq9wgtQT0LX3hapxe5qsmUb5h3eBjUr49wx0SyjYs0IJaW+qxbaiWJgS2G7
+         bU3xqFo5SN78GquztuYEGZJ9sK/uqfo/euMocSmmCqfdooqjSDI/Q5EAkJo/XU8AnqLA
+         Onjg==
+X-Forwarded-Encrypted: i=1; AJvYcCUGjo0i49EmAtBrdZwLOAi3okjYgn0Wg8Qmzmk3LhSkZ8JX+T5egxuX3pBcm5GMLlm2h3b2GHlYGRdvqnYj9sw=@vger.kernel.org, AJvYcCW036vQDkWKsKbx0n5KuKkPtNUejs0ybqs3xhmImyhKmxL3o/TQ0PtHJbFN2p7DBnyHNCGujgc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzM24JhQeVl4BiZa9bNHDd0jZkEwTRzK9iAsxsaW9vIMZrK2wwA
+	KX9yaE0w/CdhfslrBrDmxlrxYjY9Gh1wQFh3HcP1gMSrevHz1TDYWI+sBAsF/Z87eoGZ+29SmtS
+	B/L1SSBRSLT10IBPu4w/CFC0Yfg4BCpWt5w4=
+X-Gm-Gg: ASbGncs9/MNwla5CohcCrLOfv4CVkoC6SjZ0WyWm0fCiSF3AypeNg1mjgC9XBpFhQ79
+	ur5xs1LLiWlToZ284e0DAPbH49pN+fCtORAgi+w==
+X-Google-Smtp-Source: AGHT+IFE4XCsez9Msxvxl0Nl8G94hgUYlPTl4zgqCmdZzIXqbjgojxz8FPJ+BNtrBPYSqRGKq/2ozAqcd/Az3UIsE88=
+X-Received: by 2002:a17:90b:2e03:b0:2ee:e518:c1d4 with SMTP id
+ 98e67ed59e1d1-2f548f1a2cemr18883556a91.1.1737031074448; Thu, 16 Jan 2025
+ 04:37:54 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250115102408.2225055-1-jiawenwu@trustnetic.com>
+References: <20250116044100.80679-1-fujita.tomonori@gmail.com> <20250116044100.80679-4-fujita.tomonori@gmail.com>
+In-Reply-To: <20250116044100.80679-4-fujita.tomonori@gmail.com>
+From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Date: Thu, 16 Jan 2025 13:37:42 +0100
+X-Gm-Features: AbW1kvYEBSu9eRhYq5gSpRi0HKVf-XB8bWbv90Ijfiw-ecFIIJ8_ueQPJrdC5jE
+Message-ID: <CANiq72m++27i+=H0KUaf=6fn=p29iueEV-+g8toctp0O0zEW+A@mail.gmail.com>
+Subject: Re: [PATCH v8 3/7] rust: time: Introduce Instant type
+To: FUJITA Tomonori <fujita.tomonori@gmail.com>
+Cc: linux-kernel@vger.kernel.org, Boqun Feng <boqun.feng@gmail.com>, 
+	rust-for-linux@vger.kernel.org, netdev@vger.kernel.org, andrew@lunn.ch, 
+	hkallweit1@gmail.com, tmgross@umich.edu, ojeda@kernel.org, 
+	alex.gaynor@gmail.com, gary@garyguo.net, bjorn3_gh@protonmail.com, 
+	benno.lossin@proton.me, a.hindborg@samsung.com, aliceryhl@google.com, 
+	anna-maria@linutronix.de, frederic@kernel.org, tglx@linutronix.de, 
+	arnd@arndb.de, jstultz@google.com, sboyd@kernel.org, mingo@redhat.com, 
+	peterz@infradead.org, juri.lelli@redhat.com, vincent.guittot@linaro.org, 
+	dietmar.eggemann@arm.com, rostedt@goodmis.org, bsegall@google.com, 
+	mgorman@suse.de, vschneid@redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Jiawen,
+On Thu, Jan 16, 2025 at 5:42=E2=80=AFAM FUJITA Tomonori
+<fujita.tomonori@gmail.com> wrote:
+>
+> -/// A Rust wrapper around a `ktime_t`.
+> +/// A specific point in time.
+>  #[repr(transparent)]
+>  #[derive(Copy, Clone, PartialEq, PartialOrd, Eq, Ord)]
+> -pub struct Ktime {
+> +pub struct Instant {
+> +    // Range from 0 to `KTIME_MAX`.
 
-kernel test robot noticed the following build warnings:
+On top of what Tom mentioned: is this intended as an invariant? If
+yes, then please document it publicly in the `Instant` docs in a `#
+Invariants` section. Otherwise, I would clarify this comment somehow,
+since it seems ambiguous.
 
-[auto build test WARNING on net-next/main]
+Thanks!
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Jiawen-Wu/net-wangxun-Replace-the-judgement-of-MAC-type-with-flags/20250115-180916
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20250115102408.2225055-1-jiawenwu%40trustnetic.com
-patch subject: [PATCH net-next v3 1/2] net: txgbe: Add basic support for new AML devices
-config: powerpc-randconfig-001-20250116 (https://download.01.org/0day-ci/archive/20250116/202501162038.zXreDkFM-lkp@intel.com/config)
-compiler: clang version 20.0.0git (https://github.com/llvm/llvm-project c23f2417dc5f6dc371afb07af5627ec2a9d373a0)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250116/202501162038.zXreDkFM-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202501162038.zXreDkFM-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
->> drivers/net/ethernet/wangxun/libwx/wx_hw.c:451:12: warning: variable 'recv_hdr' is uninitialized when used here [-Wuninitialized]
-     451 |         buf_len = recv_hdr->buf_len;
-         |                   ^~~~~~~~
-   drivers/net/ethernet/wangxun/libwx/wx_hw.c:406:29: note: initialize the variable 'recv_hdr' to silence this warning
-     406 |         struct wx_hic_hdr *recv_hdr;
-         |                                    ^
-         |                                     = NULL
-   1 warning generated.
-
-
-vim +/recv_hdr +451 drivers/net/ethernet/wangxun/libwx/wx_hw.c
-
-   400	
-   401	static int wx_host_interface_command_r(struct wx *wx, u32 *buffer,
-   402					       u32 length, u32 timeout, bool return_data)
-   403	{
-   404		struct wx_hic_hdr *send_hdr = (struct wx_hic_hdr *)buffer;
-   405		u32 hdr_size = sizeof(struct wx_hic_hdr);
-   406		struct wx_hic_hdr *recv_hdr;
-   407		bool busy, reply;
-   408		u32 dword_len;
-   409		u16 buf_len;
-   410		int err = 0;
-   411		u8 send_cmd;
-   412		u32 i;
-   413	
-   414		/* wait to get lock */
-   415		might_sleep();
-   416		err = read_poll_timeout(test_and_set_bit, busy, !busy, 1000, timeout * 1000,
-   417					false, WX_STATE_SWFW_BUSY, wx->state);
-   418		if (err)
-   419			return err;
-   420	
-   421		/* index to unique seq id for each mbox message */
-   422		send_hdr->index = wx->swfw_index;
-   423		send_cmd = send_hdr->cmd;
-   424	
-   425		dword_len = length >> 2;
-   426		/* write data to SW-FW mbox array */
-   427		for (i = 0; i < dword_len; i++) {
-   428			wr32a(wx, WX_SW2FW_MBOX, i, (__force u32)cpu_to_le32(buffer[i]));
-   429			/* write flush */
-   430			rd32a(wx, WX_SW2FW_MBOX, i);
-   431		}
-   432	
-   433		/* generate interrupt to notify FW */
-   434		wr32m(wx, WX_SW2FW_MBOX_CMD, WX_SW2FW_MBOX_CMD_VLD, 0);
-   435		wr32m(wx, WX_SW2FW_MBOX_CMD, WX_SW2FW_MBOX_CMD_VLD, WX_SW2FW_MBOX_CMD_VLD);
-   436	
-   437		/* polling reply from FW */
-   438		err = read_poll_timeout(wx_poll_fw_reply, reply, reply, 1000, 50000,
-   439					true, wx, buffer, recv_hdr, send_cmd);
-   440		if (err) {
-   441			wx_err(wx, "Polling from FW messages timeout, cmd: 0x%x, index: %d\n",
-   442			       send_cmd, wx->swfw_index);
-   443			goto rel_out;
-   444		}
-   445	
-   446		/* expect no reply from FW then return */
-   447		if (!return_data)
-   448			goto rel_out;
-   449	
-   450		/* If there is any thing in data position pull it in */
- > 451		buf_len = recv_hdr->buf_len;
-   452		if (buf_len == 0)
-   453			goto rel_out;
-   454	
-   455		if (length < buf_len + hdr_size) {
-   456			wx_err(wx, "Buffer not large enough for reply message.\n");
-   457			err = -EFAULT;
-   458			goto rel_out;
-   459		}
-   460	
-   461		/* Calculate length in DWORDs, add 3 for odd lengths */
-   462		dword_len = (buf_len + 3) >> 2;
-   463		for (i = hdr_size >> 2; i <= dword_len; i++) {
-   464			buffer[i] = rd32a(wx, WX_FW2SW_MBOX, i);
-   465			le32_to_cpus(&buffer[i]);
-   466		}
-   467	
-   468	rel_out:
-   469		/* index++, index replace wx_hic_hdr.checksum */
-   470		if (send_hdr->index == WX_HIC_HDR_INDEX_MAX)
-   471			wx->swfw_index = 0;
-   472		else
-   473			wx->swfw_index = send_hdr->index + 1;
-   474	
-   475		clear_bit(WX_STATE_SWFW_BUSY, wx->state);
-   476		return err;
-   477	}
-   478	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Cheers,
+Miguel
 
