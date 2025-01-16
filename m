@@ -1,140 +1,153 @@
-Return-Path: <netdev+bounces-158929-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158930-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E5A5A13D51
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 16:11:12 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4910EA13D5C
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 16:13:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E12E11674C6
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 15:11:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9CE231888040
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 15:13:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6E0322B590;
-	Thu, 16 Jan 2025 15:11:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3788822B5A4;
+	Thu, 16 Jan 2025 15:13:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="n0efISJt"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IRlCteGF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43B0E22A7EA;
-	Thu, 16 Jan 2025 15:10:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E3391DD9AC
+	for <netdev@vger.kernel.org>; Thu, 16 Jan 2025 15:13:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737040261; cv=none; b=eVf9E9KHFWzzNSRoLJ8P82qrhpD2qXMGtnIHUEwkV/d0ZRq3pWwX9+CydeGglxzbkRFIgFWUKX36DabGC2urB8w1NwSjNIgYyQvZZs39nlDScApLAi5Lh5bJHbGkc5VQwZLPii2NU4M0dEj0bC3rFjsXYlFpGYFdUAbcjFEUTWc=
+	t=1737040419; cv=none; b=T3conw4+ksORZWrbed/IJ1JKxXDvc2T97TD2hZVdTLdaeKmUzaEvxvkC/buXLlAYQmo2VQXTUxoSqmPL1+/5kULlY28xS/aFMpxLJlcyxY8aPZpKGq0o3n5HTtb5oogQCB4JvjCJAmz7rDZ2KIuTGr+oiLN7H0jh3kiYAqEQz3U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737040261; c=relaxed/simple;
-	bh=9kMsm7jJrAx1IN2gYEC8j2oi13whyI4ysY2MoDYfRaw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ueLYPik5lDfaAKsRNpqXcyPYwe3KG4UY5p4CPFHmFjsq/SrYr2mDzA6VzGdTQISogqUL+aXYyco75ejAB53omVr9BV8tMlwjNgBEAyOu3V9Hzaysr1MsrIYYIiWFuuKZMeU8kXMpcyYGh6Gid7QqOyo1eOIjOKlHOMYTC1xnIAY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=n0efISJt; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50GDcZFT005641;
-	Thu, 16 Jan 2025 15:10:16 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=9kMsm7
-	jJrAx1IN2gYEC8j2oi13whyI4ysY2MoDYfRaw=; b=n0efISJtYoPTmwZACD9/JJ
-	XR81H59ZXaOeB7D2dq086jXjSvKCxh9hP/TFVOnwxlEbQsW7CHOpMvtOzcVHauv7
-	jFhouCJKKMDGucfkTuOeZERwV3IKAqvdy/Rraw8JYwg02apXtvsLP655zsCxLkAX
-	22ee1523s/7IDZrB7UOOsR0D8vMV0bdCd80YBqnsQIbCrbHK/4WUt8V72eLmGTya
-	v05WwLOmklixfCXLaRWxPwFjR1BqvGyefx8zVF8CmPFuGLmmUXfRW0dcsrEly1hW
-	j4HphjMFuzUAWs3oXxVE3rEMJH+m717ZPb1PqnBazJrZXf0gV9o1MPogpQlT89tw
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 446tkck4b4-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 16 Jan 2025 15:10:16 +0000 (GMT)
-Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 50GExBFG017832;
-	Thu, 16 Jan 2025 15:10:15 GMT
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 446tkck4av-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 16 Jan 2025 15:10:15 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 50GDCw1w007994;
-	Thu, 16 Jan 2025 15:10:14 GMT
-Received: from smtprelay07.wdc07v.mail.ibm.com ([172.16.1.74])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4443yned0n-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 16 Jan 2025 15:10:14 +0000
-Received: from smtpav06.wdc07v.mail.ibm.com (smtpav06.wdc07v.mail.ibm.com [10.39.53.233])
-	by smtprelay07.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 50GFADIJ21299764
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 16 Jan 2025 15:10:14 GMT
-Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id E665B58054;
-	Thu, 16 Jan 2025 15:10:13 +0000 (GMT)
-Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id A1A815803F;
-	Thu, 16 Jan 2025 15:10:11 +0000 (GMT)
-Received: from [9.61.59.21] (unknown [9.61.59.21])
-	by smtpav06.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 16 Jan 2025 15:10:11 +0000 (GMT)
-Message-ID: <8a9724b0-440f-4647-9505-058717f7ee07@linux.ibm.com>
-Date: Thu, 16 Jan 2025 09:10:10 -0600
+	s=arc-20240116; t=1737040419; c=relaxed/simple;
+	bh=Rm9U+LikrwsLMBhE4urZm2lq1jTTHeP5iXYUS5+/0+M=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=hx+M/TcWc+3yK/eHfW9R0cmaPWnBKVk5IjVVV/Q6eQsJTSKFmvYg+uvMAi22RizKSBvZB9yhq9vVDpRlwS9ktA2rJFALK7+UI8YpVrRTv+/0CeCAkNQnadb5R4bGeTU5jv85xeBSfYpAMI3E8w3gLuQ/jbJ70Uv0setbRjhw2NQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IRlCteGF; arc=none smtp.client-ip=209.85.160.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-467896541e1so260671cf.0
+        for <netdev@vger.kernel.org>; Thu, 16 Jan 2025 07:13:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1737040416; x=1737645216; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7yXVMjy/vsHybAFrzZeMLE1CCIXgfmMqlAdhH1pduzk=;
+        b=IRlCteGFhcP8VpFdVEEzwAxcqK2HkyMz/iqWHKEh4H5a1dUeCSiJ/k+AnSfPvo02Xg
+         cFoC9DsmnLm8XZImLi6Qjn3d22itUt8Zd3u4290gzsGN2eeHYJeX6fo+oIBQt4Tp6OkO
+         Eb2+0ib9WEi2TM3H5XvTyLNh8o31J/1Ntf1eO7S2PmS8K92ejGJP5kWDgFCG7tyqUYV2
+         Sz+fOunavNvZJPSexBIVrlEhXeDXr/+mh+d3P6fIhtygD4XcnTQnY6xtvnKl3drkVuwd
+         HUCGVbZflAD60rAI1j9jvLCEc2ikoUXq6h6hMapmZdH4v55VNn1olhpoBiFJGLaYK+jj
+         WyxQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737040416; x=1737645216;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=7yXVMjy/vsHybAFrzZeMLE1CCIXgfmMqlAdhH1pduzk=;
+        b=ju0FJMhYZ44d7j6Dr7YVsER93NmjF5udKWreHRoeET6xz+9TXQbDPiqMn+WGnt3k0v
+         hHUrCD91M5rXKCclSQBtI2alyOuLIrtBIEprhEoJEsrWEDTtj96TXx7h1gojCDMZE1xQ
+         9VuUUnDo8Y5JrqRdRuwFmLEyLwm/3opsdrSJcGfEi+AwIHuRfIRaQmjL2HrImvSocfiW
+         QclfdHANt3/uBTO6SB9mrKEyFsQY5ekxw1zWY0CwngvIvELf3dTAenYRQyaNR4MVeyg7
+         yi70EjgB52hUBVRyZRPQxmYWiqZsDebP7rOUIF4uR01WYYye1xTPWTjrUxqqIt4OOMvf
+         kgcQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVA82zH1SkWdUifWTfk99UxgDmQvLrR3KLAAsL+YzrDdBH3P4pnn+l0aKg5G5EZoBFuAmrKFoI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz5BoCJtq0XRHJ6RrOka+BJj8SRv70RsLv3gGRGmWvi/qA+x9AK
+	rf5Fm+DdmDEgCnE6fiNxXx36QHaXT0qqA8W7Biz/Rubzo8E6+lYsoCpHIU+gjazm5QKJ6cXnwsj
+	3AoURTlzTgzXUcs/dldAg6EwpOChVc3ia3PHxKxwd2NPWSRuMDb+pq7Q=
+X-Gm-Gg: ASbGnctlDkbYuqopyAwN2dXhY2JEoYET5CAP+0CkjT5QrJBfF6RDr3+2QuatX3jnRl+
+	9t1yMaqoRRmP7iRoF6pq7qP2FSga862qLR5Z9HcCvyedZCDPoggErrfBmSzq6XvKbAO2uYOw=
+X-Google-Smtp-Source: AGHT+IFvyZAfz36yss0sELhxfed5sH9K6Ecdgj3FyM5mtlyGuFWlBDPced7RRd4ANaUn3NDBMF9fzRwgB+QzyrKA6i4=
+X-Received: by 2002:a05:622a:245:b0:467:82de:d949 with SMTP id
+ d75a77b69052e-46e041641bdmr3814561cf.12.1737040416271; Thu, 16 Jan 2025
+ 07:13:36 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 03/10] dt-bindings: gpio: ast2400-gpio: Add hogs
- parsing
-To: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk@kernel.org>
-Cc: minyard@acm.org, krzk+dt@kernel.org, conor+dt@kernel.org,
-        andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-        kuba@kernel.org, pabeni@redhat.com,
-        openipmi-developer@lists.sourceforge.net, netdev@vger.kernel.org,
-        joel@jms.id.au, andrew@codeconstruct.com.au,
-        devicetree@vger.kernel.org, eajames@linux.ibm.com,
-        linux-arm-kernel@lists.infradead.org, linux-aspeed@lists.ozlabs.org,
-        linux-kernel@vger.kernel.org
-References: <20250114220147.757075-1-ninad@linux.ibm.com>
- <20250114220147.757075-4-ninad@linux.ibm.com>
- <mbtwdqpalfr2xkhnjc5c5jcjk4w5brrxmgfeydjj5j2jfze4mj@smyyogplpxss>
- <20250115142457.GA3859772-robh@kernel.org>
-Content-Language: en-US
-From: Ninad Palsule <ninad@linux.ibm.com>
-In-Reply-To: <20250115142457.GA3859772-robh@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: TC-QwuyWLELS3rwujChq29wvqC7RmVnh
-X-Proofpoint-GUID: vg3ZPGERppcMA5dqf5ZuhwOkDOxlsLVG
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-01-16_06,2025-01-16_01,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 malwarescore=0
- impostorscore=0 mlxscore=0 spamscore=0 priorityscore=1501
- lowpriorityscore=0 bulkscore=0 suspectscore=0 clxscore=1015
- mlxlogscore=717 phishscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.19.0-2411120000 definitions=main-2501160114
+References: <408334417.4436448.1736139157134.ref@mail.yahoo.com>
+ <408334417.4436448.1736139157134@mail.yahoo.com> <CANn89iLzo0Wk7p=dtUQ4Q2-pCAsjSxXZw71ngNTw6NZbEEvoDA@mail.gmail.com>
+ <2046438615.4484034.1736328888690@mail.yahoo.com> <CADVnQymzCpJozeF-wMPbppizg0SUAUufgyQEeD7AB5DZDNBTEw@mail.gmail.com>
+ <1815460239.6961054.1736660842181@mail.yahoo.com> <CADVnQy=J+mse5Zx2gfctxDa4h-JHjW885RjtfVZ7DbSr_Hy9Lw@mail.gmail.com>
+ <979088118.32930.1736903937403@mail.yahoo.com>
+In-Reply-To: <979088118.32930.1736903937403@mail.yahoo.com>
+From: Neal Cardwell <ncardwell@google.com>
+Date: Thu, 16 Jan 2025 10:13:20 -0500
+X-Gm-Features: AbW1kva6epIZEE2WI6quuEXInXwkzr_TdtYQW7-Sk7lW6GAsru5yH_gt8B1EsLM
+Message-ID: <CADVnQykL-z4bzAsxtqPa2EgEkc+fbDYBiUCjym-Jf3k-bphjcw@mail.gmail.com>
+Subject: Re: [PATCH net] tcp_cubic: Fix for bug in HyStart implementation in
+ the Linux kernel
+To: Mahdi Arghavani <ma.arghavani@yahoo.com>
+Cc: Eric Dumazet <edumazet@google.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
+	Haibo Zhang <haibo.zhang@otago.ac.nz>, David Eyers <david.eyers@otago.ac.nz>, 
+	Abbas Arghavani <abbas.arghavani@mdu.se>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Rob,
-
-On 1/15/25 08:24, Rob Herring wrote:
+On Tue, Jan 14, 2025 at 8:19=E2=80=AFPM Mahdi Arghavani <ma.arghavani@yahoo=
+.com> wrote:
 >
-> I was about to say that, but this matches what gpio-hog.yaml defines.
-> Why we did both, I don't remember. We could probably eliminate
-> 'hog-[0-9]+' as that doesn't appear to be used much.
+> Hi Neal,
+> I appreciate your guidance in submitting the bug fix.
+>  Attached are my updated packetdrill tests.
 >
-> Long term, I want to make all gpio controllers reference a gpio
-> controller schema and put the hog stuff there. Then we have the node
-> names defined in 1 place.
+> Best wishes,
+> Mahdi
 
-Ok, choosing suffix.
+Hi Mahdi,
 
-Thanks for the review.
+Thanks for sharing the modified/added tests! Can you please make the
+following tweaks and retest:
 
-Regards,
+(1) to ease git diffs, please leave the names of the files as-is when
+you modify them
 
-Ninad
+(2) in cubic-bulk-166k-idle-restart.pkt, where your version of the test say=
+s:
 
+-   +4 write(4, ..., 160000) =3D 160000
+...
++   +0 write(4, ..., 112000) =3D 112000
 
+...please change the write to actually still insert an idle period of
+4 secs, so the test is still testing idle periods:
+
++   +4 write(4, ..., 112000) =3D 112000
+
+(3) in each test, please add the following before the first injected
+SYN, so we reset nstat counters:
+  +0 `nstat -n`
+
+(4) in each test, after the assertion following the "Hystart exits
+slow start here" comment, please add an assertion that ssthresh has
+been reduced from the TCP_INFINITE_SSTHRESH value:
+
++0 %{ assert tcpi_snd_ssthresh !=3D TCP_INFINITE_SSTHRESH, tcpi_snd_ssthres=
+h }%
+
+(5) in each test, after the assertion following the "Hystart exits
+slow start here" comment, please add a check of the nstat counters to
+verify that a Hystart exit of the expected type has happened, like:
+
+...either:
+   +0 `nstat | grep TcpExtTCPHystartTrainDetect | grep -q ' 1 '`
+
+...or:
+   +0 `nstat | grep TcpExtTCPHystartDelayDetect | grep -q ' 1 '`
+
+Can you please test something like those changes, and re-attach the
+pkt tests, so we know what the behavior is after your patch? (e.g.,
+which type of Hystart heuristic is triggering in each test after your
+patch...)
+
+Thanks!
+neal
 
