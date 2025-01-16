@@ -1,79 +1,157 @@
-Return-Path: <netdev+bounces-158986-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158988-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66B9CA14071
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 18:14:09 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B1FDCA1409C
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 18:19:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8ECCA167DFF
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 17:14:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DACE8164B92
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 17:19:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBA8C22D4C4;
-	Thu, 16 Jan 2025 17:13:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o+r2N8Hq"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF87922BAB3;
+	Thu, 16 Jan 2025 17:19:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B522922CF3B;
-	Thu, 16 Jan 2025 17:13:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from mail.netfilter.org (unknown [217.70.188.207])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9CEB22DC49;
+	Thu, 16 Jan 2025 17:19:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.188.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737047631; cv=none; b=AHlr5X6C3eGTeQN4TVCYVTWtL6xdc6ygm6jxm7LaKk88+MJgHfntRZRJnbIZ52rUs1+Lr1cl+0dOSXUql0MNE06LslG5IGmKCTNxuF6LVe1ha5TrKk4odQ0qkboryyy6fOCQoi/QX4rNOyDfGMmYTKG/4q6qWZLNXyVTgfQvM7U=
+	t=1737047961; cv=none; b=C9ggl4H8n6P/uDiPLM4qVEhVOBbs3QUbMkm6xLXyim6r2PIEz4KKH7PPRG4QpWIwg9AQ/ZPnq+ZNpsHwUy+zGbaBWzUprMJZwjYTgPKSm3889fc+fM9/a1WjOaBRrSbuj2sx5iimEiYC62Oo2MDb53LHJBsftvhmzhlIlQrn9Q4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737047631; c=relaxed/simple;
-	bh=OqDFn4Doo4sjMH/E3IkZnefGfk0NEfdqGvLT7j55bFg=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=ooCZZzauzFkYuKBrdqafuL9OhBFQmHjXjjWVItkdLDevvF/BdXqhvTRhDhEvarHKyagwUi90SF4trGFU2o/0xgwK51W9bOTdJPl4cxrFv62430hSLEH5ZZ28kz10y4H+MGi/3My1YOzLbn3XGihj15wR2wxyGYcQaMa5LL/hjx4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o+r2N8Hq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 968B4C4CED6;
-	Thu, 16 Jan 2025 17:13:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737047631;
-	bh=OqDFn4Doo4sjMH/E3IkZnefGfk0NEfdqGvLT7j55bFg=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=o+r2N8Hq3ddrDxjFKy8CkYD0mVOxdRNwnI/v3Ey1njVL4ra3KFb1ukDqnueYOm9gn
-	 MHY2PQrlNqAfoS2HoGpVfe4J31PxLYTLkiSM+85Q/27WFjPFF3eZJcnModIQhgzTz7
-	 G2x5krM6L9HwC9eogzY8UiJfwzEPNykKE7pTaiCCbNx+AZne+lbzkP9hEpSw4hMYgC
-	 xRZBpsmMENICQVHumPs2ottzFKu+XExhyreAeyW3WR9Yb3i2qqh33MmyDN17fb63qV
-	 4pQXdz/ryP5LvjeMvc1aw6DzdOHDVsJHcb4Lt0/qMv9VfYWr9EFkfoLD2x9AQXIyb7
-	 GKiFzpwsj8Qrg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB8CD380AA63;
-	Thu, 16 Jan 2025 17:14:15 +0000 (UTC)
-Subject: Re: [GIT PULL] Networking for v6.13-rc8
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <20250116144619.40965-1-pabeni@redhat.com>
-References: <20250116144619.40965-1-pabeni@redhat.com>
-X-PR-Tracked-List-Id: <netdev.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20250116144619.40965-1-pabeni@redhat.com>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git net-6.13-rc8
-X-PR-Tracked-Commit-Id: a50da36562cd62b41de9bef08edbb3e8af00f118
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: ce69b4019001407f9cd738dd2ba217b3a8ab831b
-Message-Id: <173704765452.1527932.12141926384174401387.pr-tracker-bot@kernel.org>
-Date: Thu, 16 Jan 2025 17:14:14 +0000
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: torvalds@linux-foundation.org, kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+	s=arc-20240116; t=1737047961; c=relaxed/simple;
+	bh=ZqRPox1nnhKrUsxW2lG/Oo6fKK4L/00h6UYGchpMDmY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Y+G3YHZeAdr0nZ00NKbqbedJA0wpVw4InJ7emMTElGO5jmN18LG8GiFHqZn/SwdhvWkF1FX2Ffq8faegB5QhCN5rKj5XLmsEAHILp1kvPCaok2OUZALCr57GYuBX7fXoinQc/wEzW2dk6XJLofESPi1hicMo0PrBXhoA9nxR8+s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; arc=none smtp.client-ip=217.70.188.207
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: netfilter-devel@vger.kernel.org
+Cc: davem@davemloft.net,
+	netdev@vger.kernel.org,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	fw@strlen.de
+Subject: [PATCH net-next 00/14] Netfilter updates for net-next
+Date: Thu, 16 Jan 2025 18:18:48 +0100
+Message-Id: <20250116171902.1783620-1-pablo@netfilter.org>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-The pull request you sent on Thu, 16 Jan 2025 15:46:19 +0100:
+Hi,
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git net-6.13-rc8
+The following batch contains Netfilter updates for net-next:
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/ce69b4019001407f9cd738dd2ba217b3a8ab831b
+1) Unbreak set size settings for rbtree set backend, intervals in
+   rbtree are represented as two elements, this detailed is leaked
+   to userspace leading to bogus ENOSPC from control plane.
 
-Thank you!
+2) Remove dead code in br_netfilter's br_nf_pre_routing_finish()
+   due to never matching error when looking up for route,
+   from Antoine Tenart.
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+3) Simplify check for device already in use in flowtable,
+   from Phil Sutter.
+
+4) Three patches to restore interface name field in struct nft_hook
+   and use it, this is to prepare for wildcard interface support.
+   From Phil Sutter.
+
+5) Do not remove netdev basechain when last device is gone, this is
+   for consistency with the flowtable behaviour. This allows for netdev
+   basechains without devices. Another patch to simplify netdev event
+   notifier after this update. Also from Phil.
+
+6) Two patches to add missing spinlock when flowtable updates TCP
+   state flags, from Florian Westphal.
+
+7) Simplify __nf_ct_refresh_acct() by removing skbuff parameter,
+   also from Florian.
+
+8) Flowtable gc now extends ct timeout for offloaded flow. This
+   is to address a possible race that leads to handing over flow
+   to classic path with long ct timeouts.
+
+9) Tear down flow if cached rt_mtu is stale, before this patch,
+   packet is handed over to classic path but flow entry still remained
+   in place.
+
+10) Revisit flowtable teardown strategy, that is originally conceived
+    to release flowtable hardware entries early. Add a new CLOSING flag
+    which still allows hardware to release entries when fin/rst from
+    hardware, but keep flow entry in place when the TCP connection is
+    shutting down. Release the flow after the timeout expires or a new
+    syn packet for TCP reopen scenario is seen.
+
+Please, pull these changes from:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf-next.git nf-next-25-01-16
+
+Thanks.
+
+----------------------------------------------------------------
+
+The following changes since commit 9c7ad35632297edc08d0f2c7b599137e9fb5f9ff:
+
+  Merge branch 'arrange-pse-core-and-update-tps23881-driver' (2025-01-14 13:56:37 +0100)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf-next.git tags/nf-next-25-01-16
+
+for you to fetch changes up to e8dcdaa9dec9475f0a156cc998d40552cff071d7:
+
+  netfilter: flowtable: add CLOSING state (2025-01-15 17:21:03 +0100)
+
+----------------------------------------------------------------
+netfilter pull request 25-01-16
+
+----------------------------------------------------------------
+Antoine Tenart (1):
+      netfilter: br_netfilter: remove unused conditional and dead code
+
+Florian Westphal (4):
+      netfilter: nft_flow_offload: clear tcp MAXACK flag before moving to slowpath
+      netfilter: nft_flow_offload: update tcp state flags under lock
+      netfilter: conntrack: remove skb argument from nf_ct_refresh
+      netfilter: conntrack: rework offload nf_conn timeout extension logic
+
+Pablo Neira Ayuso (3):
+      netfilter: nf_tables: fix set size with rbtree backend
+      netfilter: flowtable: teardown flow if cached mtu is stale
+      netfilter: flowtable: add CLOSING state
+
+Phil Sutter (6):
+      netfilter: nf_tables: Flowtable hook's pf value never varies
+      netfilter: nf_tables: Store user-defined hook ifname
+      netfilter: nf_tables: Use stored ifname in netdev hook dumps
+      netfilter: nf_tables: Compare netdev hooks based on stored name
+      netfilter: nf_tables: Tolerate chains with no remaining hooks
+      netfilter: nf_tables: Simplify chain netdev notifier
+
+ include/net/netfilter/nf_conntrack.h   |  18 +---
+ include/net/netfilter/nf_flow_table.h  |   1 +
+ include/net/netfilter/nf_tables.h      |   7 +-
+ net/bridge/br_netfilter_hooks.c        |  30 +-----
+ net/netfilter/nf_conntrack_amanda.c    |   2 +-
+ net/netfilter/nf_conntrack_broadcast.c |   2 +-
+ net/netfilter/nf_conntrack_core.c      |  13 +--
+ net/netfilter/nf_conntrack_h323_main.c |   4 +-
+ net/netfilter/nf_conntrack_sip.c       |   4 +-
+ net/netfilter/nf_flow_table_core.c     | 183 +++++++++++++++++++++++++++++----
+ net/netfilter/nf_flow_table_ip.c       |  14 ++-
+ net/netfilter/nf_tables_api.c          | 123 +++++++++++-----------
+ net/netfilter/nft_chain_filter.c       |  48 +++------
+ net/netfilter/nft_ct.c                 |   2 +-
+ net/netfilter/nft_flow_offload.c       |  16 ++-
+ net/netfilter/nft_set_rbtree.c         |  43 ++++++++
+ 16 files changed, 325 insertions(+), 185 deletions(-)
 
