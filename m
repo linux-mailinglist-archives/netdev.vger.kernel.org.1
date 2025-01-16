@@ -1,208 +1,133 @@
-Return-Path: <netdev+bounces-158852-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158853-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1569BA138C0
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 12:18:47 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A1F5EA138D5
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 12:22:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3DAB818831FA
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 11:18:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CA8971675F4
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 11:22:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 703371DE2C4;
-	Thu, 16 Jan 2025 11:18:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32D491DE2C4;
+	Thu, 16 Jan 2025 11:21:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="dfwcQ7CA"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L6BnzTQu"
 X-Original-To: netdev@vger.kernel.org
-Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBFCD1DE2C1
-	for <netdev@vger.kernel.org>; Thu, 16 Jan 2025 11:18:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737026299; cv=none; b=jkGR3d5EYaZeqeH8+6dKoAFmYgsy5bK14FiXo2cQ2mBc7FqGxcHIxdfNvm068sJFADMJKlAxjhPhOEmYsf79fp5oQBu1wlC+M4M8xc1h/nvIK4Q02vtPZgclpB1Gqwn+5Bcs67WRyWBIfh+yDHrci0kOxV35YolgjccB1YFd+QY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737026299; c=relaxed/simple;
-	bh=yfSs3ASU2XpzxF+iK2Cge4Q9YPVpBQ9lxTxNuRTU/z8=;
-	h=Date:From:To:CC:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=iVsaymXATxSakt6zAu6v38adU7Kypo/LsnPTox7eJDlphmQJ92j7mYeeSUJERxxMNapn9keg7Vu75NHrY89PJwhz0GBcMZD2SfeMpIuz+/1m2pdiXO8a6RJFXjQ7B09IeJzChJPjRKg25lGG0VrYZ9OgrWJI44+F5kAldYeyUe8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=dfwcQ7CA; arc=none smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by a.mx.secunet.com (Postfix) with ESMTP id AF16220868;
-	Thu, 16 Jan 2025 12:18:08 +0100 (CET)
-X-Virus-Scanned: by secunet
-Received: from a.mx.secunet.com ([127.0.0.1])
-	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id LTssnzN-gw3A; Thu, 16 Jan 2025 12:18:08 +0100 (CET)
-Received: from cas-essen-02.secunet.de (rl2.secunet.de [10.53.40.202])
+Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by a.mx.secunet.com (Postfix) with ESMTPS id 0D81C2085A;
-	Thu, 16 Jan 2025 12:18:08 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 0D81C2085A
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1737026288;
-	bh=yY1PXA4S8/0oAg2Z5+/MddTKodO37SSWo2RMIURQTQw=;
-	h=Date:From:To:CC:Subject:From;
-	b=dfwcQ7CA6BCro70m9OqaA7olvAg/g8ajVkM7ba26SK1cEtOvcHCxbV8itMO3ktVYK
-	 mZZWO0fsFAV4NmTrS5SHDGN2IdMPixTM8GR39Gw6pXiGKDO2riylGq3mcg6BVlnvpE
-	 jJXg5Wt6lM7oi0GGr+ap65ojW9jCgehrDHtwT3BZieNhe/xi/q+z6xjVvmLGcSL5Cx
-	 NbG2LsQEb/4kqV4Gkbl5MDCcdsUpwBIks+PbbUpQ5duJrV4dOc7ijr84BpZ3M+qqDH
-	 SVclDPPjOLBnFYCxcCJatxuO76S93fS9tI09+QeHg6UIdII+5i07zeEGJxEJ/R7uG+
-	 ihW0+Vd7Oy6OA==
-Received: from mbx-essen-02.secunet.de (10.53.40.198) by
- cas-essen-02.secunet.de (10.53.40.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Thu, 16 Jan 2025 12:18:07 +0100
-Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
- (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Thu, 16 Jan
- 2025 12:18:07 +0100
-Received: by gauss2.secunet.de (Postfix, from userid 1000)
-	id 6FC053182D7D; Thu, 16 Jan 2025 12:18:07 +0100 (CET)
-Date: Thu, 16 Jan 2025 12:18:07 +0100
-From: Steffen Klassert <steffen.klassert@secunet.com>
-To: <netdev@vger.kernel.org>
-CC: Eric Dumazet <edumazet@google.com>, Shahar Shitrit <shshitrit@nvidia.com>
-Subject: [PATCH ipsec] xfrm: Fix the usage of skb->sk
-Message-ID: <Z4jq71F78d0gKo7/@gauss3.secunet.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F5FA1A4F09;
+	Thu, 16 Jan 2025 11:21:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1737026511; cv=none; b=lIA4KpTc6dWSIXEBMgxgD0HvOqZKbUHSZtXWml69Y8QAzw0z9p3p/YS8UzMptutd8udPKIQxHJvGZhLiPCnwslI7ZSFHBCaWS3O5EkeCinUOWgu7n1unx2jGv/k+nPDbrcSrRsUGSJqNnnTEdD26OfOoz3A5l4tppEASNukyiEE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1737026511; c=relaxed/simple;
+	bh=m6SlfLnJPhNAQ2lHdg5Idcg5nkpZBJ4FUuHsHpmnIeI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uxZLW7uCM0HPxWxBQpuEo9HbHZ19l8DubGXqxx9p8D/DPanOM8NMROXwE0Iv6fGRjzy1nDBZI/C9DespufAeCcfq0NSEcfFeVFyPUhp8qbrISjJE5fXja7WrFO3SCyYRh3z6gWtiY3mX962WdGyPuWdMiDjaT6gswldVf+6drik=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=L6BnzTQu; arc=none smtp.client-ip=209.85.221.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-385e0d47720so37937f8f.0;
+        Thu, 16 Jan 2025 03:21:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1737026508; x=1737631308; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=5cnkfv5FiyIEMgQtii7tTFfT4tDOB+nEHJKZMDL+AF0=;
+        b=L6BnzTQubx6298UFJPByTByrnO1LjmHBKu8ko+BLxF1MDn0mfsg1zUAjBm0MCw/Ehm
+         0+za6YbZjqD0enYY0xWMApSchcwy99zGwq9E6O2THQU+yCsoQYYQQokR6vL/fSimVeAZ
+         yR9tjIeHma74nYKpBpf/ukCKmAeNgS9dwjiQudSOvXftEEvD1KIBnGRCKHJE6K5myadq
+         Fk5dM3jHfe+TD2MuQYX9yn0pXhj3pUx33VJ+AlATqCt9apgLHjDWD6NnGzf/WCYlsNZl
+         u4QeFrfSb3EoB+nuMJzdp7fEkBnfqriuofNod46tmxNN12tXDi/FXJeMlccM1loUqOhT
+         sVMQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737026508; x=1737631308;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5cnkfv5FiyIEMgQtii7tTFfT4tDOB+nEHJKZMDL+AF0=;
+        b=OF+e2fEhEz7tDbes8NsIuK2n1ckwBLxGvb1qtI3kqJN24mYrrFj6lCVVvJlLSwvFiC
+         gh4pf7f1D9IViPb0BWOu4sZpE3wYIyT6D2XzxCkiE1TMwvG61YtcKDQjwnxQ52UXWL6Z
+         vqzrbC8QLGD4bw+mtuGVTIESE1BoGCnSYQe5UI5GucEdodZi2gL7eHgHAeA7yqDd9XcP
+         MyZiJLE9Qa2uYa5UyAwy19Gtf3An0swEuFaEhC3qLBKARnWMwsiL9SSW4B9OjrOrnX3K
+         sLdyLkdnSikKgu6S3STXSelsAn1cA8bp+6XOdTlMOG1Ge9JpAZKpPb6reAdBFj84Nm1B
+         h8oQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUWlw3at2+Svk4rStXLtoBBJB6l6RMiJyNKU6+R5dJsXvIc/PQwiQu8w4saYfglWChaZMmmXM7SanBFKgg=@vger.kernel.org, AJvYcCUski4/aLvcEgSWzM2VWHTrrgZ+9r7IaJzm5t5zuWg3C1rRse5R2gYNVU8SICmvNSBQ3s+gKRQZ@vger.kernel.org
+X-Gm-Message-State: AOJu0YwDIrBu+jwSFNslwe3TlcF9eOH3n3S1jWlb5VHb039uSDCXvjXZ
+	Yt9dNW3oOeHVsqV0wYSqvbmiYDtEV3++c7bFzD3+eBY9MwNGD8/e
+X-Gm-Gg: ASbGncvY7fh0Pt/AIXbb/849DJTve0r8+7xF9/BMrKhFK4qquGFMYTQkT375bDvAa1/
+	V4m+ayZROqAHjscHaTC7K8VHU5yPPiJW5p4Vu8TBUMUEHSi0zLnoUQpqGJjXYlYz91wejjksd1u
+	yEpjLNub6LpL/aDC+gi7zCRVL3Z+Vp+M6WrNVhakx3V/S/z0i02KAavoJU0vc+8Uvl05zFMT1eF
+	YMBBK5n5rsnOK18KSwTSO3vwYXSsnsqlVmIfeXQwka6
+X-Google-Smtp-Source: AGHT+IGR1I99IAClHX2s5usKK8sQLzjYpQJwqK000ODk6ec+5SUKtSwQDMHL01u64RwrWL1I31S41w==
+X-Received: by 2002:a5d:5f86:0:b0:385:dd10:213f with SMTP id ffacd0b85a97d-38a8730ce34mr12493348f8f.9.1737026507386;
+        Thu, 16 Jan 2025 03:21:47 -0800 (PST)
+Received: from skbuf ([86.127.124.81])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38bddbf50a2sm9684180f8f.43.2025.01.16.03.21.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 16 Jan 2025 03:21:46 -0800 (PST)
+Date: Thu, 16 Jan 2025 13:21:44 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Cc: Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Alvin =?utf-8?Q?=C5=A0ipraga?= <alsi@bang-olufsen.dk>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] dsa: Use str_enable_disable-like helpers
+Message-ID: <20250116112144.vtgaelbpq4lmipd6@skbuf>
+References: <20250115194703.117074-1-krzysztof.kozlowski@linaro.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-X-ClientProxiedBy: cas-essen-02.secunet.de (10.53.40.202) To
- mbx-essen-02.secunet.de (10.53.40.198)
-X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
+In-Reply-To: <20250115194703.117074-1-krzysztof.kozlowski@linaro.org>
 
-xfrm assumed to always have a full socket at skb->sk.
-This is not always true, so fix it by converting to a
-full socket before it is used.
+On Wed, Jan 15, 2025 at 08:47:03PM +0100, Krzysztof Kozlowski wrote:
+> Replace ternary (condition ? "enable" : "disable") syntax with helpers
+> from string_choices.h because:
+> 1. Simple function call with one argument is easier to read.  Ternary
+>    operator has three arguments and with wrapping might lead to quite
+>    long code.
+> 2. Is slightly shorter thus also easier to read.
+> 3. It brings uniformity in the text - same string.
+> 4. Allows deduping by the linker, which results in a smaller binary
+>    file.
+> 
+> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+> ---
+> 
+> I have more of similar patches in progress, but before I start spamming
+> you with this let me know if you find such code more readable, specially
+> for more complex conditions in ternary operators.
 
-Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
----
- net/ipv4/esp4.c                | 2 +-
- net/ipv6/esp6.c                | 2 +-
- net/ipv6/xfrm6_output.c        | 4 ++--
- net/xfrm/xfrm_interface_core.c | 2 +-
- net/xfrm/xfrm_output.c         | 7 ++++---
- net/xfrm/xfrm_policy.c         | 2 +-
- 6 files changed, 10 insertions(+), 9 deletions(-)
+This is a positive change (especially because of reason #4), but I have
+2 process-related complaints for the future (especially if more patches
+are coming):
 
-diff --git a/net/ipv4/esp4.c b/net/ipv4/esp4.c
-index f3281312eb5e..8cf5f6634775 100644
---- a/net/ipv4/esp4.c
-+++ b/net/ipv4/esp4.c
-@@ -279,7 +279,7 @@ static void esp_output_done(void *data, int err)
- 		    x->encap && x->encap->encap_type == TCP_ENCAP_ESPINTCP)
- 			esp_output_tail_tcp(x, skb);
- 		else
--			xfrm_output_resume(skb->sk, skb, err);
-+			xfrm_output_resume(skb_to_full_sk(skb), skb, err);
- 	}
- }
- 
-diff --git a/net/ipv6/esp6.c b/net/ipv6/esp6.c
-index b2400c226a32..fad4d7c9fa50 100644
---- a/net/ipv6/esp6.c
-+++ b/net/ipv6/esp6.c
-@@ -315,7 +315,7 @@ static void esp_output_done(void *data, int err)
- 		    x->encap && x->encap->encap_type == TCP_ENCAP_ESPINTCP)
- 			esp_output_tail_tcp(x, skb);
- 		else
--			xfrm_output_resume(skb->sk, skb, err);
-+			xfrm_output_resume(skb_to_full_sk(skb), skb, err);
- 	}
- }
- 
-diff --git a/net/ipv6/xfrm6_output.c b/net/ipv6/xfrm6_output.c
-index 5f7b1fdbffe6..b3d5d1f266ee 100644
---- a/net/ipv6/xfrm6_output.c
-+++ b/net/ipv6/xfrm6_output.c
-@@ -82,14 +82,14 @@ static int __xfrm6_output(struct net *net, struct sock *sk, struct sk_buff *skb)
- 
- 	toobig = skb->len > mtu && !skb_is_gso(skb);
- 
--	if (toobig && xfrm6_local_dontfrag(skb->sk)) {
-+	if (toobig && xfrm6_local_dontfrag(sk)) {
- 		xfrm6_local_rxpmtu(skb, mtu);
- 		kfree_skb(skb);
- 		return -EMSGSIZE;
- 	} else if (toobig && xfrm6_noneed_fragment(skb)) {
- 		skb->ignore_df = 1;
- 		goto skip_frag;
--	} else if (!skb->ignore_df && toobig && skb->sk) {
-+	} else if (!skb->ignore_df && toobig && sk) {
- 		xfrm_local_error(skb, mtu);
- 		kfree_skb(skb);
- 		return -EMSGSIZE;
-diff --git a/net/xfrm/xfrm_interface_core.c b/net/xfrm/xfrm_interface_core.c
-index 98f1e2b67c76..c397eb99d867 100644
---- a/net/xfrm/xfrm_interface_core.c
-+++ b/net/xfrm/xfrm_interface_core.c
-@@ -506,7 +506,7 @@ xfrmi_xmit2(struct sk_buff *skb, struct net_device *dev, struct flowi *fl)
- 	skb_dst_set(skb, dst);
- 	skb->dev = tdev;
- 
--	err = dst_output(xi->net, skb->sk, skb);
-+	err = dst_output(xi->net, skb_to_full_sk(skb), skb);
- 	if (net_xmit_eval(err) == 0) {
- 		dev_sw_netstats_tx_add(dev, 1, length);
- 	} else {
-diff --git a/net/xfrm/xfrm_output.c b/net/xfrm/xfrm_output.c
-index e5722c95b8bb..1fb4dc0a76e1 100644
---- a/net/xfrm/xfrm_output.c
-+++ b/net/xfrm/xfrm_output.c
-@@ -796,7 +796,7 @@ static int xfrm4_tunnel_check_size(struct sk_buff *skb)
- 	     !skb_gso_validate_network_len(skb, ip_skb_dst_mtu(skb->sk, skb)))) {
- 		skb->protocol = htons(ETH_P_IP);
- 
--		if (skb->sk)
-+		if (skb->sk && sk_fullsock(skb->sk))
- 			xfrm_local_error(skb, mtu);
- 		else
- 			icmp_send(skb, ICMP_DEST_UNREACH,
-@@ -832,6 +832,7 @@ static int xfrm6_tunnel_check_size(struct sk_buff *skb)
- {
- 	int mtu, ret = 0;
- 	struct dst_entry *dst = skb_dst(skb);
-+	struct sock *sk = skb_to_full_sk(skb);
- 
- 	if (skb->ignore_df)
- 		goto out;
-@@ -846,9 +847,9 @@ static int xfrm6_tunnel_check_size(struct sk_buff *skb)
- 		skb->dev = dst->dev;
- 		skb->protocol = htons(ETH_P_IPV6);
- 
--		if (xfrm6_local_dontfrag(skb->sk))
-+		if (xfrm6_local_dontfrag(sk))
- 			ipv6_stub->xfrm6_local_rxpmtu(skb, mtu);
--		else if (skb->sk)
-+		else if (sk)
- 			xfrm_local_error(skb, mtu);
- 		else
- 			icmpv6_send(skb, ICMPV6_PKT_TOOBIG, 0, mtu);
-diff --git a/net/xfrm/xfrm_policy.c b/net/xfrm/xfrm_policy.c
-index 4408c11c0835..c27da1fd070e 100644
---- a/net/xfrm/xfrm_policy.c
-+++ b/net/xfrm/xfrm_policy.c
-@@ -2959,7 +2959,7 @@ static void xfrm_policy_queue_process(struct timer_list *t)
- 		skb_dst_drop(skb);
- 		skb_dst_set(skb, dst);
- 
--		dst_output(net, skb->sk, skb);
-+		dst_output(net, skb_to_full_sk(skb), skb);
- 	}
- 
- out:
--- 
-2.34.1
+- "net: dsa: " for the commit prefix for patches on the "net/dsa/"
+  core folder, and "net: dsa: $(driver name): " for patches on
+  "drivers/net/dsa/$(driver name)", please
+- I have observed a tendency for people with a Marvell DSA switch to
+  not care about a Realtek switch and vice versa. Sometimes these people
+  backport patches. It would be good for patches which can be split per
+  driver to be split per driver, otherwise there is a risk that trivial
+  context changes create a deep web of avoidable dependencies.
 
+Not a reason to resend for this right now, just something to be aware of.
+
+Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
+
+Side note: what are you going to do in the hypothetical situation when
+the converted string used to be capitalized (like we have in this set
+with "Force"/"Unforce")? Create str_Enable_Disable()?
 
