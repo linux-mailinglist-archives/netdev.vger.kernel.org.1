@@ -1,140 +1,126 @@
-Return-Path: <netdev+bounces-158886-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158887-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B6DBA13A46
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 13:55:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B971AA13A53
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 14:00:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 86F13188994C
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 12:55:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E50F3188B213
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 13:00:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 855CA1DE899;
-	Thu, 16 Jan 2025 12:55:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74E9A1DD0F8;
+	Thu, 16 Jan 2025 13:00:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Bf+f8Sec"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gSek0pWF"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f45.google.com (mail-qv1-f45.google.com [209.85.219.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B5DA1DDA3F;
-	Thu, 16 Jan 2025 12:55:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C54751DE8A8;
+	Thu, 16 Jan 2025 13:00:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737032108; cv=none; b=Enu5SunPHwpfWbtkajQAjWP6sVFCcP0Kq6ApJrD/oxaYO6ckkza8T+Vu9/q5bgufDlHBNCPmJ2MvjeBAfuO+52kq/RR/3q8aEv0lBUCot+wZR4QJFuRcQTy7nLkh9H+UU0twQcf+w5BOWqDM3Wr7wR5dihuxbk1HI98bwgzZ3+U=
+	t=1737032430; cv=none; b=cm6rb5uE/IoyNeEfoHmTtpkDPSMzPl9O0qt5urMFAlAgo/bRZ6r0ooYqwgMdO/CEyVzK3HF9Ayo/9XVDdNI8zxwUvcTOy5TjWTV0Irjzb8T7JfPApQsDuAbhrfu8t6ChOfgqHGOplV04NW8w/jasi8DrlFOH2rkTgBipVH4DMYI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737032108; c=relaxed/simple;
-	bh=SDsYWVDFHCtqpRTEcvKkftdq9j3Hd9+XjId4g7OHfUM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ofYqsEHFKR0UZAEiLOolZqV1gPY8qQbprt38jPY0zHCHiTyGXSDfePc4y9qKBA3xwrng1lAa1xl0yoTMg/cwOHnJ9d2f4qaYOdPOn0HYSiR4Akbaol3/I17HoxAOgwTWj3QbFqaxTf3Ub+bl5YPE3qPkpJZMcjllHJjZr8hq2rc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Bf+f8Sec; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 616E7C4CED6;
-	Thu, 16 Jan 2025 12:55:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737032108;
-	bh=SDsYWVDFHCtqpRTEcvKkftdq9j3Hd9+XjId4g7OHfUM=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Bf+f8Sec3xyMf+ALBGpV/fbi8Ii2Ar9XyUxBuKmJ78D8Lr5zLUPqxb50l7v8AtMBb
-	 KdovV+etbpcTM/GHpYSdVF/QM6UuFCjOExrZNU/krS7ndK+RCDAlk1ayJcwFnrHr5v
-	 ClhboGABvq6Va7YFo4FQszvti1pNNSiLZXyXxWQUpOokc+1uebEc4vI4k019Kho8NI
-	 9D1OGI4MKWyLCmWl5yOTQu12Gb4o/zpnqDrRx158I3nibr5NDnXPf5qgDd/hLDGP+F
-	 FUMHlMeEQgeTJXhQcLXABblsczT7kCLC1ALOkwFBHDo9BwF8FMEEP8D8PGypme9P4a
-	 7iaa8Ung0gN1Q==
-Message-ID: <fa77f4e0-aa5c-4ac6-8223-29b20374dd01@kernel.org>
-Date: Thu, 16 Jan 2025 13:55:00 +0100
+	s=arc-20240116; t=1737032430; c=relaxed/simple;
+	bh=5UMbsUR3uezYmQkND+aHznqfBtOMq7AAaSselEbiyO4=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=sAeYEoHhYG9alPfLOesvLaYnvPJD1qLM/meyFtaMRK/adlG3GRb807pEh/F2izuzjlq6TIFhe+8Uw+eEJ/k7p9N872dQ//DwmRYFBE3boykZOUC3ZbMoTD8Yr4obby5nBcuOHe+2s01K/iuHYCU1bgSQS1ObvbuO8BUFMxFYojY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gSek0pWF; arc=none smtp.client-ip=209.85.219.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f45.google.com with SMTP id 6a1803df08f44-6dccccd429eso9353606d6.3;
+        Thu, 16 Jan 2025 05:00:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1737032426; x=1737637226; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jDAPDENh5j906Y6hu4L3U4UaJRAPYR+j5H8J3pj7FYA=;
+        b=gSek0pWFkEfaTr016Dq1ujsSUja4isxB39o5jWFN6j1cvNbDMyagmK9HcBwrg2eUpf
+         GC5Vc+iHLJRAMg6vdoNjVyMXqakUzvNo+Ez6lZO4QhTdG7XbnEekgSqgogvHRrfa7qxt
+         TbDWUvoxppd+W0sXVSw/WToCnEyD9ugSsI2TbE9m3ZBX5lc9VxV98oTtK+IHFsM5k3Mg
+         26PUBQVhT0Izq5juB46W4ZWiTebPvv+67sZYqifOSNlDe+keOmDppHgLeVE43jGOHEMX
+         4rGJmKV/F9rXMmI2H2Eed8uWflGp1iU4Kbns5bKj9Wd85fTULcuoXW+NDK7Q30H9OutZ
+         4ihg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737032426; x=1737637226;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=jDAPDENh5j906Y6hu4L3U4UaJRAPYR+j5H8J3pj7FYA=;
+        b=FxQka/YC+veYbEBwGwnfCqOZk/DTcbNxt0RIO+q+G2rxqJ5h48dowPvDPEMc18JxCW
+         amV1gZ3Uxtn9xLqbQPRbXpxUcPm+29xZJcfhDmLMXRAp3/rQybCjz2A2E+QK/WV04WzB
+         p+YBGIr1PfXgpfdVAbbj+hlBta626HMNJAD/8otVCnatQhKq/DLXYf8jByY2POZ2x8+E
+         1+iFZ35J29FdF1CtxZxKyweFoMz4jFoWeMb5IMwbyqEr/fp2buPipDDftKOYStuM9Prh
+         LcYNqTK88YiZfr/xNruqErTpQTqusQNYLx1IUyZuATJ04MZ4/lT88Q7Ykx/ekIFtFOTn
+         davg==
+X-Forwarded-Encrypted: i=1; AJvYcCU648T0rYKJWgZbL7MNRsBGm74YKb2Ae/SYa5chCratXwVGbYYqfsmEH8YOkyCR/QuDRtCoGTSa49wFYSXEo3Y=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxwKRMZ8hIFjNyHzeJnjzxGxPa5rcpo9xhiU4OEaD/GcFnBYZrC
+	SkCQvtWARrRd+ElwVm1SA1u3zSwBWkGyTFT9mXcpr+PbZPXcN8lD
+X-Gm-Gg: ASbGncuGCh5AP2zQiJgC701UBMtFFZOnYoWT0a0RFdHISk523Bxq0n+JuyHRPWVsK/E
+	jRoyrlztCiyhtVV085wsJAq4W6MMacsUApfUCCXTzS2qneoJWb9Fr/J7ENdiiOkNrjdX5SqBbLs
+	tFafV0yPbo+1lSX7llFRCHiiA43D87MSWAoEg1cY6G6P2WpiSuNmgu1NGV6m6Wh4x3H8hCBY6nl
+	ErzJkj+B7yCm1kK3NVCc0F0Oi1ZW3JJjrP6cN5bezyDuK1QBIKvg0MDS8nu9UAc6Ud8STgd7JmB
+	JsuRHkB3wEjIrqum8fLo8o3vchBW
+X-Google-Smtp-Source: AGHT+IEqZd3YsXVTaJNqnc8P4/zUTq4aoOBXPiUTSi9FbqN1NFo0pmvC7/XQPrTVzPToXMZLDOx0Ag==
+X-Received: by 2002:a05:6214:19c5:b0:6d8:8256:41d4 with SMTP id 6a1803df08f44-6df9b1f00c4mr578711256d6.19.1737032426489;
+        Thu, 16 Jan 2025 05:00:26 -0800 (PST)
+Received: from localhost (15.60.86.34.bc.googleusercontent.com. [34.86.60.15])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6dfad8add1bsm76930666d6.49.2025.01.16.05.00.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 16 Jan 2025 05:00:25 -0800 (PST)
+Date: Thu, 16 Jan 2025 08:00:24 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>, 
+ davem@davemloft.net
+Cc: netdev@vger.kernel.org, 
+ edumazet@google.com, 
+ pabeni@redhat.com, 
+ andrew+netdev@lunn.ch, 
+ horms@kernel.org, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ shuah@kernel.org, 
+ linux-kselftest@vger.kernel.org, 
+ willemdebruijn.kernel@gmail.com
+Message-ID: <678902e8e7bd1_3710bc29490@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20250116020105.931338-1-kuba@kernel.org>
+References: <20250116020105.931338-1-kuba@kernel.org>
+Subject: Re: [PATCH net-next] selftests: net: give up on the cmsg_time
+ accuracy on slow machines
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 1/3] net: phy: mediatek: Add token ring access
- helper functions in mtk-phy-lib
-To: Sky Huang <SkyLake.Huang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
- Heiner Kallweit <hkallweit1@gmail.com>, Russell King
- <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Daniel Golle <daniel@makrotopia.org>,
- Qingfang Deng <dqfext@gmail.com>, Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org
-Cc: Steven Liu <Steven.Liu@mediatek.com>,
- "paul-pl.chen" <paul-pl.chen@mediatek.com>, Fei Shao <fshao@chromium.org>
-References: <20250116012159.3816135-1-SkyLake.Huang@mediatek.com>
- <20250116012159.3816135-2-SkyLake.Huang@mediatek.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 fv0=
-In-Reply-To: <20250116012159.3816135-2-SkyLake.Huang@mediatek.com>
-Content-Type: text/plain; charset=UTF-8
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
 Content-Transfer-Encoding: 7bit
 
-On 16/01/2025 02:21, Sky Huang wrote:
-> From: "SkyLake.Huang" <skylake.huang@mediatek.com>
+Jakub Kicinski wrote:
+> Commit b9d5f5711dd8 ("selftests: net: increase the delay for relative
+> cmsg_time.sh test") widened the accepted value range 8x but we still
+> see flakes (at a rate of around 7%).
 > 
-> This patch adds TR(token ring) manipulations and adds correct
-> macro names for those magic numbers. TR is a way to access
-> proprietary registers on page 52b5. Use these helper functions
-> so we can see which fields we're going to modify/set/clear.
+> Return XFAIL for the most timing sensitive test on slow machines.
 > 
-> This patch doesn't really change registers' settings but just
-> enhances readability and maintainability.
+> Before:
 > 
-> Signed-off-by: SkyLake.Huang <skylake.huang@mediatek.com>
-Few days ago I complained the Mediatek too frequent uses login as full
-name. Several different Mediatek contributors repeat the same mistake,
-so I asked to fix this internally with some sort of
-guideline/checklist/internal reviews.
+>   # ./cmsg_time.sh
+>     Case UDPv4  - TXTIME rel returned '8074us - 7397us < 4000', expected 'OK'
+>   FAIL - 1/36 cases failed
+> 
+> After:
+> 
+>   # ./cmsg_time.sh
+>     Case UDPv4  - TXTIME rel returned '1123us - 941us < 500', expected 'OK' (XFAIL)
+>     Case UDPv6  - TXTIME rel returned '1227us - 776us < 500', expected 'OK' (XFAIL)
+>   OK
+> 
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-Other patches here look OK, so there is some progress, but not complete
-- please fix here as well.
-
-Best regards,
-Krzysztof
+Reviewed-by: Willem de Bruijn <willemb@google.com>
 
