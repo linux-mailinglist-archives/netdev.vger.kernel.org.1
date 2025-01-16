@@ -1,214 +1,122 @@
-Return-Path: <netdev+bounces-158758-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158759-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 912A3A13297
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 06:30:31 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CBCA3A132A5
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 06:35:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 169653A3537
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 05:30:25 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 35DD47A034B
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 05:35:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B94B3155389;
-	Thu, 16 Jan 2025 05:30:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C38832AE99;
+	Thu, 16 Jan 2025 05:35:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="Ct3biXum"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="sYi0B6j0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF2804C85
-	for <netdev@vger.kernel.org>; Thu, 16 Jan 2025 05:30:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F7AF1804A
+	for <netdev@vger.kernel.org>; Thu, 16 Jan 2025 05:35:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737005425; cv=none; b=Wl/AhcpaRIERVCBPYi9VDXK8FmVGaOWZ0uNL3q3f/8rt/Wn2ipqR95+HdcZRRJuZhkukEstIlmEy+KSvmFzPmCedMKXc8EKSnDcl8ia7sz1WnXW1C2MH+1bu+LQ54jVlTbdmHcW0RBidTL8NmdDbwv8VawfuJHpwKGtGSVYMLMw=
+	t=1737005713; cv=none; b=jNbPD6FZRASO4uDMVkE6dk8/Osjc24nId0PMKcMCPp06K5p2zevLg0fCtVCPj7rCf02tI3zTPpdANZQDbXW4D62ecoQKgrEvhD8uwqqnkru5NPVj2KU5v5oLgWscM0dA2iBFvAg4fKATyV83GmVW8bp1SK1ap9Na6zIx6GecrgM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737005425; c=relaxed/simple;
-	bh=5xQA7+rcyNu9tK/Yw0+0NEwKQ5hjxrD+NiJB5k0WJ3A=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hIYwwEmtMCUz/y7ZnzEul/hXEBpqsah4KyoqQNadL2Rpwkx3xsLH4Kj5wE8hGxnFpsP6rFiJB0RHUkW0GerD+gfgjgzsPJTG2UCKmJyptROwwmpvi81zBoSTy+zjBaEG+WdJxojG8/OcdkI1Ub0xWkQmkRBcH15q5rkkW0mpn8k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=pass smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=Ct3biXum; arc=none smtp.client-ip=209.85.214.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=daynix.com
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-2166022c5caso7269465ad.2
-        for <netdev@vger.kernel.org>; Wed, 15 Jan 2025 21:30:23 -0800 (PST)
+	s=arc-20240116; t=1737005713; c=relaxed/simple;
+	bh=I4f3tpmkI4DW4Ygiy1ddhZRvRFRz4+tQ5KqqVlceZ0E=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=VhaGj2PcvnSObtJG32BQR56O5+V5OM0k1MekId/JP+39+ovkuSz3N5b2wIrei1YIXXGqabI+uJzEXdHQ0RzvEDnUrPmgKbpv4cJ7WhbVw7qNmy5DeqnKcgpossweoNHRqVR+OIOYZDuNMM7Uk0clo3EWEy4rwWTXO5xjHh790FQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=sYi0B6j0; arc=none smtp.client-ip=99.78.197.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1737005423; x=1737610223; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=t85mZgz2Rs3YU6wJKJ13zARpOEqd4Q3PLwsjti7bxDQ=;
-        b=Ct3biXumbZ8x4r0PTptGSo33l1ZLQq70j+BXPuYlXDxxLJXQ4YcrYRh6tfR4fqabOO
-         7IeiK5xCteU9Vy+4qe450Pnfr2Euqbt18+XnTorYKyKIYMkFT7SDvS8ncvLI+1eAQ3r5
-         P+YXsb0U7hsQoWS+y+X+e7seAJulj40sCCXhTt1v04y6vy8MFGUGjBinqOnS2ZFZQ8oW
-         6lcENAShZx40W+kYt2UJ/uHkL5krmNWY8/ycNeJJS8gIhXKrOrv95+U7o+hVCwTkMwOI
-         prMxEBejHxG52OIxExbzNjDyU1H3jqMeCvhi4I94A35lsy2evEJ96aXm0KBcp1OfWQe1
-         s6wQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737005423; x=1737610223;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=t85mZgz2Rs3YU6wJKJ13zARpOEqd4Q3PLwsjti7bxDQ=;
-        b=DWcgUoxVhOzS+Btso8emR+OMQMN9vciDwxzQdFYpAHI0ybtlhKWKVJJmj/Zrnpc1wn
-         4obukbxyPOiiOrCEFUk642kP4Idu0t6B7yOEOTvT2mKvcxV/PPEA+Jsih41IHmxi8Yjx
-         nQt+TsOv+DVhQAu/2VKTCIxuv+Q2YlalRATROKxt4EY20MOVoBUO35uQ16yLNTrSl9ho
-         8hG0eEv9lB4eTVPvJWjwC0FJ0RxhYeaLojS50org8ZF1mLeAaPwmkcD0bmhL7Er6iH97
-         Z+w7jl/sup5cSEmjp7P9jFhdd8FuBxKMP7mnW/gKenES5j4CNBalzV8Z++qGtNq6j/s9
-         RyEQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUGEjbsHnm/iAUDLETcFER1NQKPpWj6eT0RyAlqGSOBBKxT0p+k3jxig0HPu/tj7yhPxEvPp9E=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxZUQXyv9YUnKtUx5sDNjM8gLnNdDmpWnT6FkvmOO2MvG3ZoKsD
-	Yl6EuLgwp65Go5ceMCxnqx3gC4dF7M/jAiwas3oUpV6ZMcwvlfGsBnwxVGsWIyA=
-X-Gm-Gg: ASbGncsj/qJC7njfF+hMJriLu54Ah5NWhLlhu0qZy9XalHhou2nGd9hNK3ZbCLqRY1c
-	wFkmSXWsvF8vyuesF1uwsVdJ6P/51GpVw51oD+z8xMvLG2oHAeOmAtRNOEb/gKm/tUbu/BE8NqI
-	oRA6YYxXYXUyz4HSBpROjzaZTQnI1I3oQTFFsgla6jHpxTKmxLLYN4rnT2p5WXzxXPcJOGxGzdb
-	cUC9R8R6dWJuehbOUInbQl+2bQmCG3PlBEfhdQMlFbc2edFswdjnx1a89jusbTe5oQ=
-X-Google-Smtp-Source: AGHT+IEwP5ZyOaLIZ2+ZynbDYG6rMIezxsEt9Oeopwo0vGbe1vdYSLm0vMdAkgahtQxltszD6eVILA==
-X-Received: by 2002:a17:902:ea0a:b0:216:682f:175 with SMTP id d9443c01a7336-21a840029a0mr517608085ad.49.1737005423363;
-        Wed, 15 Jan 2025 21:30:23 -0800 (PST)
-Received: from [157.82.203.37] ([157.82.203.37])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21a9f217565sm90290735ad.125.2025.01.15.21.30.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 15 Jan 2025 21:30:22 -0800 (PST)
-Message-ID: <cc79bef1-c24e-448d-bc20-f8302e341b2c@daynix.com>
-Date: Thu, 16 Jan 2025 14:30:16 +0900
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1737005712; x=1768541712;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=gKlub8YMf/DgPFXwbrD32oOybYDk1XPG/wSaL2hD7Jc=;
+  b=sYi0B6j0c8uyfoSNQmLX/3um2jERvIOXzsIF+itpiYz++VNFFE5wvHHl
+   kx+0vXkv9zRUbx7oEomxsrjT82A5C54cdILHrsGLxTgBXAIMwTW8ywGnK
+   xj5S59Lp8GVaWjNEPGmxE76gGENIn23Folgw/QNKP00+QeQ4+WTN9V+cu
+   0=;
+X-IronPort-AV: E=Sophos;i="6.13,208,1732579200"; 
+   d="scan'208";a="369483208"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jan 2025 05:35:11 +0000
+Received: from EX19MTAUWA001.ant.amazon.com [10.0.38.20:43758]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.42.53:2525] with esmtp (Farcaster)
+ id fbb2e316-2db3-46cd-9c3c-4f8698ec073e; Thu, 16 Jan 2025 05:35:10 +0000 (UTC)
+X-Farcaster-Flow-ID: fbb2e316-2db3-46cd-9c3c-4f8698ec073e
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWA001.ant.amazon.com (10.250.64.218) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
+ Thu, 16 Jan 2025 05:35:07 +0000
+Received: from 6c7e67c6786f.amazon.com (10.143.84.222) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
+ Thu, 16 Jan 2025 05:35:03 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>
+CC: Donald Hunter <donald.hunter@redhat.com>, Kuniyuki Iwashima
+	<kuniyu@amazon.com>, Kuniyuki Iwashima <kuni1840@gmail.com>,
+	<netdev@vger.kernel.org>
+Subject: [PATCH v3 net-next 0/9] af_unix: Set skb drop reason in every kfree_skb() path.
+Date: Thu, 16 Jan 2025 14:34:33 +0900
+Message-ID: <20250116053441.5758-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 3/3] tun: Set num_buffers for virtio 1.0
-To: Jason Wang <jasowang@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Shuah Khan <shuah@kernel.org>,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, kvm@vger.kernel.org,
- virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org,
- Yuri Benditovich <yuri.benditovich@daynix.com>,
- Andrew Melnychenko <andrew@daynix.com>,
- Stephen Hemminger <stephen@networkplumber.org>, gur.stavi@huawei.com,
- devel@daynix.com
-References: <20250109-tun-v2-0-388d7d5a287a@daynix.com>
- <20250109-tun-v2-3-388d7d5a287a@daynix.com>
- <CACGkMEsm5DCb+n3NYeRjmq3rAANztZz5QmV8rbPNo+cH-=VzDQ@mail.gmail.com>
- <20250110052246-mutt-send-email-mst@kernel.org>
- <2e015ee6-8a3b-43fb-b119-e1921139c74b@daynix.com>
- <CACGkMEuiyfH-QitiiKJ__-8NiTjoOfc8Nx5BwLM-GOfPpVEitA@mail.gmail.com>
- <fcb301e8-c808-4e20-92dd-2e3b83998d18@daynix.com>
- <CACGkMEvBU3mLbW+-nOscriR-SeDvPSm1mtwwgznYFOocuao5MQ@mail.gmail.com>
-Content-Language: en-US
-From: Akihiko Odaki <akihiko.odaki@daynix.com>
-In-Reply-To: <CACGkMEvBU3mLbW+-nOscriR-SeDvPSm1mtwwgznYFOocuao5MQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D040UWB004.ant.amazon.com (10.13.138.91) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On 2025/01/16 10:06, Jason Wang wrote:
-> On Wed, Jan 15, 2025 at 1:07 PM Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
->>
->> On 2025/01/13 12:04, Jason Wang wrote:
->>> On Fri, Jan 10, 2025 at 7:12 PM Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
->>>>
->>>> On 2025/01/10 19:23, Michael S. Tsirkin wrote:
->>>>> On Fri, Jan 10, 2025 at 11:27:13AM +0800, Jason Wang wrote:
->>>>>> On Thu, Jan 9, 2025 at 2:59 PM Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
->>>>>>>
->>>>>>> The specification says the device MUST set num_buffers to 1 if
->>>>>>> VIRTIO_NET_F_MRG_RXBUF has not been negotiated.
->>>>>>
->>>>>> Have we agreed on how to fix the spec or not?
->>>>>>
->>>>>> As I replied in the spec patch, if we just remove this "MUST", it
->>>>>> looks like we are all fine?
->>>>>>
->>>>>> Thanks
->>>>>
->>>>> We should replace MUST with SHOULD but it is not all fine,
->>>>> ignoring SHOULD is a quality of implementation issue.
->>>>>
->>>
->>> So is this something that the driver should notice?
->>>
->>>>
->>>> Should we really replace it? It would mean that a driver conformant with
->>>> the current specification may not be compatible with a device conformant
->>>> with the future specification.
->>>
->>> I don't get this. We are talking about devices and we want to relax so
->>> it should compatibile.
->>
->>
->> The problem is:
->> 1) On the device side, the num_buffers can be left uninitialized due to bugs
->> 2) On the driver side, the specification allows assuming the num_buffers
->> is set to one.
->>
->> Relaxing the device requirement will replace "due to bugs" with
->> "according to the specification" in 1). It still contradicts with 2) so
->> does not fix compatibility.
-> 
-> Just to clarify I meant we can simply remove the following:
-> 
-> """
-> The device MUST use only a single descriptor if VIRTIO_NET_F_MRG_RXBUF
-> was not negotiated. Note: This means that num_buffers will always be 1
-> if VIRTIO_NET_F_MRG_RXBUF is not negotiated.
-> """
-> 
-> And
-> 
-> """
-> If VIRTIO_NET_F_MRG_RXBUF has not been negotiated, the device MUST set
-> num_buffers to 1.
-> """
-> 
-> This seems easier as it reflects the fact where some devices don't set
-> it. And it eases the transitional device as it doesn't need to have
-> any special care.
+There is a potential user for skb drop reason for AF_UNIX.
 
-That can potentially break existing drivers that are compliant with the 
-current and assumes the num_buffers is set to 1.
+This series replaces some kfree_skb() in connect() and
+sendmsg() paths and sets skb drop reason for the rest of
+kfree_skb() in AF_UNIX.
 
-Regards,
-Akihiko Odaki
+Link: https://lore.kernel.org/netdev/CAAf2ycmZHti95WaBR3s+L5Epm1q7sXmvZ-EqCK=-oZj=45tOwQ@mail.gmail.com/
 
-> 
-> Then we don't need any driver normative so I don't see any conflict.
-> 
-> Michael suggests we use "SHOULD", but if this is something that the
-> driver needs to be aware of I don't know how "SHOULD" can help a lot
-> or not.
-> 
->>
->> Instead, we should make the driver requirement stricter to change 2).
->> That is what "[PATCH v3] virtio-net: Ignore num_buffers when unused" does:
->> https://lore.kernel.org/r/20250110-reserved-v3-1-2ade0a5d2090@daynix.com
->>
->>>
->>>>
->>>> We are going to fix all implementations known to buggy (QEMU and Linux)
->>>> anyway so I think it's just fine to leave that part of specification as is.
->>>
->>> I don't think we can fix it all.
->>
->> It essentially only requires storing 16 bits. There are details we need
->> to work out, but it should be possible to fix.
-> 
-> I meant it's not realistic to fix all the hypervisors. Note that
-> modern devices have been implemented for about a decade so we may have
-> too many versions of various hypervisors. (E.g DPDK seems to stick
-> with the same behaviour of the current kernel).
- > >>
->> Regards,
->> Akihiko Odaki
->>
-> 
-> Thanks
-> 
+
+Changes:
+  v3:
+    * Drop skb drop reason patches for connect() and sendmsg()
+    * Restore patch 8
+    * Add patch 9 replacing kfree_skb() with consume_skb() in connect()
+      and sendmsg()
+
+  v2: https://lore.kernel.org/netdev/20250112040810.14145-1-kuniyu@amazon.com/
+    * Drop the old patch 6 to silence false-positive uninit warning
+
+  v1: https://lore.kernel.org/netdev/20250110092641.85905-1-kuniyu@amazon.com/
+
+
+Kuniyuki Iwashima (9):
+  net: dropreason: Gather SOCKET_ drop reasons.
+  af_unix: Set drop reason in unix_release_sock().
+  af_unix: Set drop reason in unix_sock_destructor().
+  af_unix: Set drop reason in __unix_gc().
+  af_unix: Set drop reason in manage_oob().
+  af_unix: Set drop reason in unix_stream_read_skb().
+  af_unix: Set drop reason in unix_dgram_disconnected().
+  af_unix: Reuse out_pipe label in unix_stream_sendmsg().
+  af_unix: Use consume_skb() in connect() and sendmsg().
+
+ include/net/dropreason-core.h | 28 +++++++++++----
+ net/unix/af_unix.c            | 67 +++++++++++++++++------------------
+ net/unix/garbage.c            |  2 +-
+ 3 files changed, 55 insertions(+), 42 deletions(-)
+
+-- 
+2.39.5 (Apple Git-154)
 
 
