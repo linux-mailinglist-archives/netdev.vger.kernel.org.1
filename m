@@ -1,182 +1,220 @@
-Return-Path: <netdev+bounces-158777-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158778-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2AADAA13326
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 07:35:02 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3AAE0A13379
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 07:59:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5BD67188AFB5
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 06:35:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4F763166E84
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 06:59:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4E5118E76B;
-	Thu, 16 Jan 2025 06:34:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FhYcbo2/"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A746D19DF9A;
+	Thu, 16 Jan 2025 06:58:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f181.google.com (mail-yb1-f181.google.com [209.85.219.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpbgsg1.qq.com (smtpbgsg1.qq.com [54.254.200.92])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1A3024A7E8;
-	Thu, 16 Jan 2025 06:34:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAFF3156F3C
+	for <netdev@vger.kernel.org>; Thu, 16 Jan 2025 06:58:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.254.200.92
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737009294; cv=none; b=FPseENzbTnfZ9aTGihYUaNzWxGnpw0TKf3iqQPqzoQ6qwI0APwrkwbQ3ccG8ZViTx8zrMz9pB+i1y6onVqkt9ZzYML/MXsofDbG5CXK7mfiSS7cxBQiwx+LSaXOLFW7lFh35G0F3eFuCu1Q/QyAj2HWdGwR88cCqA/SkUiS6O5Q=
+	t=1737010731; cv=none; b=M1GXlzZR3sgcE/OyOfEvcdIvsJSZW6260YSbgrILCASs+Xz15kINGuI1J0ZpNNxS3AgxRqfe/kxA/IAbZ9ScYQG+vNNqps6QdYCw4kXIrHfC6/H3nFjD+t80jFp5IXRBdviC9wkeqVPLkIdZBnWxfueHCqjPMlU57o6asnXhx64=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737009294; c=relaxed/simple;
-	bh=c4bb3EMGsgMUrTeDTt/1IawO6xWVcbipTrw2VtmyAng=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=MPSSwH4W1U7Z4ir91fKJDY8D5scjvJlG0uSI0hSbh0PI446VQFTpmUZNcnhwmM4nXPULb1DiSnOHXZ81C6iocGG899kkiq2jZlBEthjEme4xGizqRBw3pF3vdoP7T9ppEGsh5VnCBjmgQqJeoKlyLz5aGoaqscY2SCE9D6eVeQc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FhYcbo2/; arc=none smtp.client-ip=209.85.219.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f181.google.com with SMTP id 3f1490d57ef6-e54bd61e793so1095830276.2;
-        Wed, 15 Jan 2025 22:34:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1737009292; x=1737614092; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hUMl2lV37NeEyUYQ+8hv4yRX1yZLm9fZeIJWVyQAT9A=;
-        b=FhYcbo2/BMbsjW7hmwyRbRc+edN+6c80zj7EVm+qPUuaziTQtJGz/jgbavNrg9qbXf
-         5Ku3U6+qStP21J2qr0DSG4hi7VkoLpAC3uY7Fi/A2NzdiE8xSF9IBuLxZ3prYQdj5a+R
-         QIy0f03tEBWLn1HEgQrQI+reAFruvukm5ryCXTsN4+qACkbPwAjkitxxHibjzGPmKBeC
-         hJiGSTGWaQDO4qgYIxKBi94Uy1YTPP//KM+OcQLrS7LlnpjP977+Jqd7xPzZJbLK8WzN
-         BYyvkSqZw69E6Ndu5YWe9gBm7uYs25yvkEHBiG4CUIg8yJ25B8IoB4C45rqEdBELo91a
-         TKEw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737009292; x=1737614092;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=hUMl2lV37NeEyUYQ+8hv4yRX1yZLm9fZeIJWVyQAT9A=;
-        b=NW0sY/CS6nzXrNicZg7T6Q2wsVWEISOADkywNqOl3WBuzm1PoTahXRZ0Dps25op8ou
-         eHD1UiB1cTHdnGeU8McFXDoBteDS0hrHCRdEfAFExwMGfCTAPJCzYJ4Q/5GJfdcHJCw1
-         emr15p0Ij/RjExyW7rhtJ9ye2YJiu/LwUvEBrXsawiWELYbkk9th47CWklWaA+GEGz0w
-         ftdxvFrjAEm6KBXG1ye3bb0HOB0wFWmpIYLGqbRqv0/7+dipaSoQBwUoIqgmFFSaELnd
-         495dgMOtzGE3ZOGO3Im/mqORobF+ZHY4n1gWUu6lvplOaJr/TKjprIdgTLMEa07pkdEY
-         K9jA==
-X-Forwarded-Encrypted: i=1; AJvYcCUCQt2kY1urPyRk/h9tN70EUmBq7HYgpNY3lr5R6W+HLKlowYou3RrfvMDKgL02rHxyvVmPNLgqsGNG@vger.kernel.org, AJvYcCUEZsIHdopj7ddkKiKANjCKry2fv6NmmNEkW3nvvRfsT5uVEOF5gL1ZqOmkca1TjsOlPvMvRmEvPtwl@vger.kernel.org, AJvYcCUosTDjI7JCMZWoq+SPv0o1iRtZEmudsbp1ciylKAwa6S8TFnv9ePfIlvrK1ztVuH9JO65KHjQKrAiK@vger.kernel.org, AJvYcCUq0GBEvra3eaRi/vl2xbsLHK7dEDH5Tdw/QeuyC4iIpArzWWe2kIMDysgWFmkOAvVqvhI6wQK2ZqU=@vger.kernel.org, AJvYcCVCiVUNKukvLrhziF0x8PGJJSo9aEfbRxhQF8Nbhvr/sbZDoCuVih4830cqT8TKg/l/hjShAWEdRr0JAw==@vger.kernel.org, AJvYcCWEFNsrcwhFSVz+Mt26vlcLljmhnpLUT9OMeL/7YfZhIm1rgtz5y9V8MGICQcUGav9YTMXkIb4B@vger.kernel.org, AJvYcCWOx8hin3A5cMdedhNkFj/BrNdBHHNXRiSXw4pve0adFrradrnTtM8RC9jX4dm9WNfXxllPAVl3+rTjIbP7Qbo=@vger.kernel.org, AJvYcCXFL62vzL6qVxVzQntc5yJbzL5VXBuxysQzbHUs1YxWRqT/z1dIGTZebZgd8i+ft1K8vXivM8GOE0YFIj0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywo5kdDOdklx4LobLPhpxK8sHYyircAL0JFMdI6AmqXwRzJ86YY
-	qBmclXnxFSBtu4b8tU963WFTXQSm+zuJIc3auMAA5p/kkRrx2h4NHQlEgqD6W9k96jovi2qqe4C
-	i5pmgl1xqbu9A7GzS0NDin0Z7wj8=
-X-Gm-Gg: ASbGnctD8yoHXYqv8thkC4s6CRPB5tznyMNj9eKye+kThTNcLJQloh79iXWsj9PJIfy
-	SJOsgRExrNBKcQN98pFsk5CFC9/oNIfJS1npyRfVWb2qFvUxAQJFbP1/K0iqE5l5MLphjNgr8
-X-Google-Smtp-Source: AGHT+IEBjbrPYm9uZ4tkDJz8bKIImgmSbE3fPZUiZeCgys3yex7NZywUBcf/cb/InNa/yBzsGp+ThfaTGo+an3nLKdc=
-X-Received: by 2002:a05:6902:f84:b0:e38:8a2e:e3bc with SMTP id
- 3f1490d57ef6-e54fca4021cmr25184463276.5.1737009291859; Wed, 15 Jan 2025
- 22:34:51 -0800 (PST)
+	s=arc-20240116; t=1737010731; c=relaxed/simple;
+	bh=+YRDea7Ii9PrFZNOygXnjaoHOhSy1VpS/WnsZtT32sg=;
+	h=From:To:Cc:References:In-Reply-To:Subject:Date:Message-ID:
+	 MIME-Version:Content-Type; b=NtBsbtENyyY4SahhwdYOfmmVJxHJKfNI5ko29QVsmgrhTLy8w0LxXSV4deyg82f81s42x0mW0qbSwYRQtf7M4gf5jzIb+R2JCnm+jvLQwpUgeA+N3xHP7bIpyorEeL5ak/HoyfAWnx8GPEfwHJQKMvLJIx5WJWeENRdlaRD2OKo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=54.254.200.92
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
+X-QQ-mid:Yeas5t1737010622t324t38536
+Received: from 3DB253DBDE8942B29385B9DFB0B7E889 (jiawenwu@trustnetic.com [36.24.187.167])
+X-QQ-SSF:0000000000000000000000000000000
+From: =?utf-8?b?Smlhd2VuIFd1?= <jiawenwu@trustnetic.com>
+X-BIZMAIL-ID: 3979780559288719152
+To: "'Simon Horman'" <horms@kernel.org>
+Cc: <andrew+netdev@lunn.ch>,
+	<davem@davemloft.net>,
+	<edumazet@google.com>,
+	<kuba@kernel.org>,
+	<pabeni@redhat.com>,
+	<linux@armlinux.org.uk>,
+	<netdev@vger.kernel.org>,
+	<mengyuanlou@net-swift.com>
+References: <20250115102408.2225055-1-jiawenwu@trustnetic.com> <20250115152950.GO5497@kernel.org>
+In-Reply-To: <20250115152950.GO5497@kernel.org>
+Subject: RE: [PATCH net-next v3 1/2] net: txgbe: Add basic support for new AML devices
+Date: Thu, 16 Jan 2025 14:57:01 +0800
+Message-ID: <067201db67e3$d7e88aa0$87b99fe0$@trustnetic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250114033010.2445925-1-a0282524688@gmail.com>
- <20250114033010.2445925-5-a0282524688@gmail.com> <cef1b9bf-59f6-484d-861e-82b405653ca1@wanadoo.fr>
-In-Reply-To: <cef1b9bf-59f6-484d-861e-82b405653ca1@wanadoo.fr>
-From: Ming Yu <a0282524688@gmail.com>
-Date: Thu, 16 Jan 2025 14:34:40 +0800
-X-Gm-Features: AbW1kvYJI-ZlyxfzNTVWRJivNQwAAI1rVA1G13z7pWoyr3_f28bZHldijS45J6Y
-Message-ID: <CAOoeyxVK=iBmj3BDX=D8a9=GFBkE158jbq3Rnq-RuoA5HxMi7g@mail.gmail.com>
-Subject: Re: [PATCH v5 4/7] can: Add Nuvoton NCT6694 CAN support
-To: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
-Cc: linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org, 
-	linux-i2c@vger.kernel.org, linux-can@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org, 
-	linux-rtc@vger.kernel.org, linux-usb@vger.kernel.org, tmyu0@nuvoton.com, 
-	lee@kernel.org, linus.walleij@linaro.org, brgl@bgdev.pl, 
-	andi.shyti@kernel.org, mkl@pengutronix.de, andrew+netdev@lunn.ch, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	wim@linux-watchdog.org, linux@roeck-us.net, jdelvare@suse.com, 
-	alexandre.belloni@bootlin.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain;
+	charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+X-Mailer: Microsoft Outlook 16.0
+Content-Language: zh-cn
+Thread-Index: AQJm9lagLf8/PoRds90UQkL38VDXjQG0eFMisfQ2flA=
+X-QQ-SENDSIZE: 520
+Feedback-ID: Yeas:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz8a-1
+X-QQ-XMAILINFO: NzOHSugmTg7X2k+6OIgFKwyQnxva2YbiAFKOVn3c6HIbJ+ZeyE8lfwFS
+	n82vzsZV36S/tzD9Bm+MO6Q4glQ1WA4XXw4nH4LG8EeG6fsNkh+msSrf3J60M215NKgxpsY
+	lB17ngDsWXlfAbS2+gByzmp3yPSxVhCX/MMwKxoCXWOb1BcAduq60XmVzrOFpmLda45vFui
+	kmF+FVCXFySJS0ly4sFLOyo1CASBMeWZZJmRN5rWHFuXO9m7qcJHo4TXAi2ftmdcsL14lFs
+	2dBI0bDxOT/8zHvq47qwexNXQD0WL78kAg7hOPrZT6wvqN2lIc/GNFd3K8sbBtQcYAiNBr3
+	xnORro+KPSBdospJXc8XvtVhnx9sF4cqE+3ZvTJ+xUEpqD1NHtuaoLsU4WDc3AEiPnC9pmU
+	ra7BP8ajjCeSvX119UnoLE94Ri5DNJ73cYFslgbDPWMLbaBSlfBL1TbcWzLSDdUBQkyR10i
+	iIiNXkFjep71j3ZzYKuyzqAk9N8sXyffPgyLA/y+A0aKNdLD4fuI2D0sAVrQwyhY7vZT1//
+	Q8rohOQaonb1BY6yi9N9+aqny3GYjUIZzdWXwfulmzazIzKO6LyepFs7lHchKtZUlxmd7vQ
+	C0qJd9OpIbdVGOOjkgiwTXB1/aDgJhHAE+ON3rCwYRb4OsD70InSUKEDQRJpgMtWM/hI9jt
+	lI+aVdewJX8/kjjrMQeH8HHY/J95Q7OR06IaNdlge++3W/1PrGqWknH+9LoC+LeKU+70vAC
+	AiaO9sMNYI7YWhAppNMDKdb6wyOXyTf/QBpxVgslDAEa+LvK/4xEzqyKfOtGKPaCxnIsCqX
+	NBaiztzL20NFyMKpHgAOvBUP6RIjTqIJzwf8SMwX9WXqK//CJyokoMq88ZE/lK/azeDCLY0
+	TddNCb4AH0HMOGfqpF3OWOpd/beMYHLZTYqm6WWdSafJYdSIiwlUJkGAfPehW0LrwaHTL7Y
+	eiGiUaeFuo3S1bcxKg1oULxaKIHl9zqIk3CFm29X34OjYf9zJ9dVAotcYjmIMxv+812fBOE
+	ZO2Zd69g==
+X-QQ-XMRINFO: Mp0Kj//9VHAxr69bL5MkOOs=
+X-QQ-RECHKSPAM: 0
 
-Hi Vincent,
-
-I will remove priv->tx_skb in the next patch, but it seems that
-can_flush_echo_skb() has not been EXPORT_SYMBOL_GPL().
-
-I would like to know if nct6694_can_clean() requires modification.
-
-Vincent Mailhol <mailhol.vincent@wanadoo.fr> =E6=96=BC 2025=E5=B9=B41=E6=9C=
-=8816=E6=97=A5 =E9=80=B1=E5=9B=9B =E4=B8=8A=E5=8D=8812:45=E5=AF=AB=E9=81=93=
-=EF=BC=9A
-> > +static void nct6694_can_clean(struct net_device *ndev)
+On Wed, Jan 15, 2025 11:30 PM, Simon Horman wrote:
+> On Wed, Jan 15, 2025 at 06:24:07PM +0800, Jiawen Wu wrote:
+> > There is a new 40/25/10 Gigabit Ethernet device.
+> >
+> > To support basic functions, PHYLINK is temporarily skipped as it is
+> > intended to implement these configurations in the firmware. And the
+> > associated link IRQ is also skipped.
+> >
+> > And Implement the new SW-FW interaction interface, which use 64 Byte
+> > message buffer.
+> >
+> > Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
+> 
+> ...
+> 
+> > diff --git a/drivers/net/ethernet/wangxun/libwx/wx_hw.c b/drivers/net/ethernet/wangxun/libwx/wx_hw.c
+> 
+> ...
+> 
+> > +static bool wx_poll_fw_reply(struct wx *wx, u32 *buffer,
+> > +			     struct wx_hic_hdr *recv_hdr, u8 send_cmd)
 > > +{
-> > +     struct nct6694_can_priv *priv =3D netdev_priv(ndev);
+> > +	u32 dword_len = sizeof(struct wx_hic_hdr) >> 2;
+> > +	u32 i;
 > > +
-> > +     if (priv->tx_skb || netif_queue_stopped(ndev))
-> > +             ndev->stats.tx_errors++;
-> > +     dev_kfree_skb(priv->tx_skb);
->
-> Use:
->
->         can_flush_echo_skb(ndev);
->
-> (related to the following comments).
->
-> > +     priv->tx_skb =3D NULL;
-> > +}
->
-> (...)
->
-> > +static void nct6694_can_tx_work(struct work_struct *work)
-> > +{
-> > +     struct nct6694_can_priv *priv =3D container_of(work,
-> > +                                                  struct nct6694_can_p=
-riv,
-> > +                                                  tx_work);
-> > +     struct net_device *ndev =3D priv->ndev;
+> > +	/* read hdr */
+> > +	for (i = 0; i < dword_len; i++) {
+> > +		buffer[i] = rd32a(wx, WX_FW2SW_MBOX, i);
+> > +		le32_to_cpus(&buffer[i]);
+> > +	}
 > > +
-> > +     guard(mutex)(&priv->lock);
-> > +
-> > +     if (priv->tx_skb) {
-> > +             if (priv->can.state =3D=3D CAN_STATE_BUS_OFF) {
->
-> Just stop the queue when the can bus is off so that you do not have do
-> check the bus status each time a frame is sent.
->
-> > +                     nct6694_can_clean(ndev);
-> > +             } else {
-> > +                     nct6694_can_tx(ndev);
-> > +                     can_put_echo_skb(priv->tx_skb, ndev, 0, 0);
-> > +                     priv->tx_skb =3D NULL;
-> > +             }
-> > +     }
-> > +}
-> > +
-> > +static netdev_tx_t nct6694_can_start_xmit(struct sk_buff *skb,
-> > +                                       struct net_device *ndev)
-> > +{
-> > +     struct nct6694_can_priv *priv =3D netdev_priv(ndev);
-> > +
-> > +     if (can_dev_dropped_skb(ndev, skb))
-> > +             return NETDEV_TX_OK;
-> > +
-> > +     if (priv->tx_skb) {
-> > +             netdev_err(ndev, "hard_xmit called while tx busy\n");
-> > +             return NETDEV_TX_BUSY;
-> > +     }
-> > +
-> > +     netif_stop_queue(ndev);
-> > +     priv->tx_skb =3D skb;
->
-> Here, you can directly do:
->
->         can_put_echo_skb(skb, ndev, 0, 0);
->
-> The skb remains accessible under priv->can.echo_skb[0]. With this, you
-> can remove the priv->tx_skb field.
->
-> > +     queue_work(priv->wq, &priv->tx_work);
-> > +
-> > +     return NETDEV_TX_OK;
-> > +}
->
+> > +	/* check hdr */
+> > +	recv_hdr = (struct wx_hic_hdr *)buffer;
+> > +	if (recv_hdr->cmd == send_cmd &&
+> > +	    recv_hdr->index == wx->swfw_index)
+> > +		return true;
+> 
+> Hi Jiawen Wu,
+> 
+> Maybe I am misreading this but, given the way that recv_hdr is
+> passed to this function, it seems that the same result would
+> he achieved if recv_hdr was a local variable...
 
-Thanks,
-Ming
+Oooh, you are right, I'm too careless.
+
+> 
+> > +
+> > +	return false;
+> > +}
+> > +
+> > +static int wx_host_interface_command_r(struct wx *wx, u32 *buffer,
+> > +				       u32 length, u32 timeout, bool return_data)
+> > +{
+> > +	struct wx_hic_hdr *send_hdr = (struct wx_hic_hdr *)buffer;
+> > +	u32 hdr_size = sizeof(struct wx_hic_hdr);
+> > +	struct wx_hic_hdr *recv_hdr;
+> > +	bool busy, reply;
+> > +	u32 dword_len;
+> > +	u16 buf_len;
+> > +	int err = 0;
+> > +	u8 send_cmd;
+> > +	u32 i;
+> > +
+> > +	/* wait to get lock */
+> > +	might_sleep();
+> > +	err = read_poll_timeout(test_and_set_bit, busy, !busy, 1000, timeout * 1000,
+> > +				false, WX_STATE_SWFW_BUSY, wx->state);
+> > +	if (err)
+> > +		return err;
+> > +
+> > +	/* index to unique seq id for each mbox message */
+> > +	send_hdr->index = wx->swfw_index;
+> > +	send_cmd = send_hdr->cmd;
+> > +
+> > +	dword_len = length >> 2;
+> > +	/* write data to SW-FW mbox array */
+> > +	for (i = 0; i < dword_len; i++) {
+> > +		wr32a(wx, WX_SW2FW_MBOX, i, (__force u32)cpu_to_le32(buffer[i]));
+> > +		/* write flush */
+> > +		rd32a(wx, WX_SW2FW_MBOX, i);
+> > +	}
+> > +
+> > +	/* generate interrupt to notify FW */
+> > +	wr32m(wx, WX_SW2FW_MBOX_CMD, WX_SW2FW_MBOX_CMD_VLD, 0);
+> > +	wr32m(wx, WX_SW2FW_MBOX_CMD, WX_SW2FW_MBOX_CMD_VLD, WX_SW2FW_MBOX_CMD_VLD);
+> > +
+> > +	/* polling reply from FW */
+> > +	err = read_poll_timeout(wx_poll_fw_reply, reply, reply, 1000, 50000,
+> > +				true, wx, buffer, recv_hdr, send_cmd);
+> > +	if (err) {
+> > +		wx_err(wx, "Polling from FW messages timeout, cmd: 0x%x, index: %d\n",
+> > +		       send_cmd, wx->swfw_index);
+> > +		goto rel_out;
+> > +	}
+> > +
+> > +	/* expect no reply from FW then return */
+> > +	if (!return_data)
+> > +		goto rel_out;
+> > +
+> > +	/* If there is any thing in data position pull it in */
+> > +	buf_len = recv_hdr->buf_len;
+> 
+> ... and most likely related, recv_hdr appears to be uninitialised here.
+> 
+> This part is flagged by W=1 builds with clang-19, and my Smatch.
+> 
+> > +	if (buf_len == 0)
+> > +		goto rel_out;
+> > +
+> > +	if (length < buf_len + hdr_size) {
+> > +		wx_err(wx, "Buffer not large enough for reply message.\n");
+> > +		err = -EFAULT;
+> > +		goto rel_out;
+> > +	}
+> > +
+> > +	/* Calculate length in DWORDs, add 3 for odd lengths */
+> > +	dword_len = (buf_len + 3) >> 2;
+> > +	for (i = hdr_size >> 2; i <= dword_len; i++) {
+> > +		buffer[i] = rd32a(wx, WX_FW2SW_MBOX, i);
+> > +		le32_to_cpus(&buffer[i]);
+> > +	}
+> > +
+> > +rel_out:
+> > +	/* index++, index replace wx_hic_hdr.checksum */
+> > +	if (send_hdr->index == WX_HIC_HDR_INDEX_MAX)
+> > +		wx->swfw_index = 0;
+> > +	else
+> > +		wx->swfw_index = send_hdr->index + 1;
+> > +
+> > +	clear_bit(WX_STATE_SWFW_BUSY, wx->state);
+> > +	return err;
+> > +}
+> 
+> ...
+> 
+
 
