@@ -1,172 +1,217 @@
-Return-Path: <netdev+bounces-158956-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158950-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id F2238A13F83
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 17:31:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 77534A13EE0
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 17:09:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 26DA71619AE
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 16:31:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9F5F5160293
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 16:09:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A41881DE884;
-	Thu, 16 Jan 2025 16:31:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C776D22CA10;
+	Thu, 16 Jan 2025 16:09:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dFljLtnv"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="x9pgjSWt"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 250F48632B;
-	Thu, 16 Jan 2025 16:31:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DBE522C356
+	for <netdev@vger.kernel.org>; Thu, 16 Jan 2025 16:09:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737045099; cv=none; b=d/xxXGor+fKsI0weNJBIwQWtxcsW8i+vavBzJTZx+8v3UzOYpKEzmhrFrXCLx+csw+DmlKGPKfWbH6mG7NcqOJ54QEztt5Zpq4xKLw3oQN/JAuUGE4//XH0+UAq186WhXPkDBMkbGm2d0hYzhyBolBXEEki3klaY8hE7tWYrtfA=
+	t=1737043781; cv=none; b=KErCjFVoLPsUPDtLz66GC8BiG+v2kb5jg42KH93vGCPa+fh0qcCEqqRHSQJZLL2JT9MYY+BvmTKDeV5N91fqZl2qPqTmUP8IGuwX26HTd1wQmdo/nSuVJf8t+0B88d/TsMY9MeLiBr2bdjsFX3bbK4T44kFdJ/FmgZJRKkduB9s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737045099; c=relaxed/simple;
-	bh=c/pB9MvUB5Rcm/tw9gT1SXD7fMVGER9S8EYn1QfX+kM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=iEH4aWxqDPw1y958aKEH16lyr14MDqRDQdfp+2lLobce4Lg7vmYlW9/scoEFOZOub4I1L1a6oPdMHV3QnO8IWsWkIyls6gc83osv/8CmcJkY7j0FVzhCIeFGMLHjlLDB/JMtTkcJuMUS9Muq3SwGRg3cWXGZmgTAi8kMFgdBm9Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dFljLtnv; arc=none smtp.client-ip=209.85.214.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-21628b3fe7dso21570615ad.3;
-        Thu, 16 Jan 2025 08:31:37 -0800 (PST)
+	s=arc-20240116; t=1737043781; c=relaxed/simple;
+	bh=6r93PtDxADKddNEKMIl2n1KK6HOXUzLNWsnmppK99mA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=P9KoH2VpALBzugW7ENiuf5BBAEvH8T0q4wH0rOvwKoWWtZbNkr7SUqijAEGeRrnlwwSLnSEXcMIfHQVPmKR/R6S4dgew1Od5Ncz9IKDp4EpQJ5aXDzEdjTECYeWc6liwEVTyjc8MKZydLK5zKzX6UvG/3OkPf9wdew3blSm/Gwc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=x9pgjSWt; arc=none smtp.client-ip=209.85.214.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-2166f1e589cso26351315ad.3
+        for <netdev@vger.kernel.org>; Thu, 16 Jan 2025 08:09:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1737045097; x=1737649897; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=ARDjCcRGT03WV/jJzISRYsEH/PAIJYg2xIBjnV8W+gg=;
-        b=dFljLtnvjHyckCYYo9LWtg6hGpZ2mFBLbK979gyAd77+LfW18nv+KzPJUTNA6aZwRX
-         UZvHOo6Fg8OasHH5z6YiVp0DjvyaFMjszuP5fj5BQGdYO9D8VG76pAhDBE4u0aJECNUn
-         ITiA26lBOGV6kQ+1x7oOLbyUHti0pBNADEyH+x6pGYZOWhAp896/Dn2u9+40lemNL65b
-         G/SrbB+Mb15bAihJBuUpEmqM9smcvDSQom7y7i2ZR7btm+oT5UTju1lS/sAv5Jj6E+T7
-         PqP5l0KYJ/CVa/6u/DJFP6HMwyHx6yb+zMpXeO0PrSWyDz7DunwFNorzum13t242TcAV
-         bAVQ==
+        d=fastly.com; s=google; t=1737043779; x=1737648579; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=o3SvrDu0caDhzdAVkyBr9gYgBKDDR95aZo/K9YBI7/c=;
+        b=x9pgjSWtwjVgsSC5qNmd77leknDz5rcQwbOWq1is71mOu02i6F/J54+wskLicLYhuF
+         63dTvt5WXJN/HIxlANSI0mU2OHK2XkLOU84qeEw8mKr0faX1z5bjMwSdLK+uA/y64Wb1
+         8utc+gb9dO/7YBxIe5AbO2a9/uADojuC/BX4M=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737045097; x=1737649897;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ARDjCcRGT03WV/jJzISRYsEH/PAIJYg2xIBjnV8W+gg=;
-        b=QGpDkdR3qSfosoxwgyF0yjqsVSm6BpY0G7QZ905muaOs1EIa6gmcAflD8BqxggSjFr
-         tPoFWwEPr0/Gie31/tiHsdIfhYHzOKU2ryKgBQVOfBKxMNoXXFYzrTIQpbYDPNhAV6ne
-         38C4Tja1f7lv5BR0VKVHs6oWy1rBetq0Bfd4J4KPaPc271lqURAuR7E2+rCsOiQzdDqk
-         PSegCn3lpAZHs5xkgd596+8i1gPGkbELk2qilqP6yG05eejjJNKsjZ2KHX01R2IekXdV
-         Sbf/ACnFZK6JKGYuLdLal7T/9FwCrRUX+tvVegyO9HGpVbd5YE2In/h+BI8gsbpRx3yY
-         n/9w==
-X-Forwarded-Encrypted: i=1; AJvYcCUHJuEHLjWx5qcZT47COAkV1EoODqLSiwNmZ2+ZCUTj9lsEz2UQlKKJOGMO9OEt8dT6AqMpnmDj@vger.kernel.org, AJvYcCUolDfbXzFtuQoAIMH7byIf2BRoLJTupdkZ4VgJ7uN/UFhGeEnkrk+xAJJ59AwGx7Y5OmUpwNdF/1dxXEA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwyDsMlMdGHAKkBo/DcLqYZajoIHX74L4J+5gS2w9/IVjL8iHXD
-	R5CR6y7R6caC5pP7oFvIWpsqD9VE5zNMIM/oDrAqu/94hUy6PWVs
-X-Gm-Gg: ASbGnctWFS6gt1ZpUEF6vyK8ofOKqMuesEVWajsw8cV7PwPuS2ZCs2RduJ7OBBmqOMr
-	KSaOW9hVhMCzwxzx8zMCO0EDE3zkargYu5ggSUUQzCgZNunVs5RuL5T0NjgIckiiLjAjDdAxT+r
-	2F5BxO9p79y8EVJj2tfadvlJ7KcKsZwwMXHN9GPSxK1koP83p+iu/cUvkS3ycqBpl2WMg2jI0Po
-	FNYmZ37gQ2t6r9lORYwW+UKvDQ2L+oZcB0CrzOC/LcBhNYQ/5YzuZl2eN28lloY3jzqc2KMdmDr
-	WL0BSg==
-X-Google-Smtp-Source: AGHT+IHstWMd+CWUx3IaPktREduKNzy4NF5JqEL4Gn7RlChbOWkHBGTUy2DrCBCQC9bznntdLIzaZQ==
-X-Received: by 2002:a17:903:1cf:b0:21a:8300:b9d5 with SMTP id d9443c01a7336-21a83f4cd36mr543199275ad.23.1737045095907;
-        Thu, 16 Jan 2025 08:31:35 -0800 (PST)
-Received: from localhost.localdomain ([121.185.186.233])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21c2d406cb5sm2205315ad.246.2025.01.16.08.31.32
+        d=1e100.net; s=20230601; t=1737043779; x=1737648579;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=o3SvrDu0caDhzdAVkyBr9gYgBKDDR95aZo/K9YBI7/c=;
+        b=w3LOarQ+e+NSOFJsyQ/mun+UbMM/xvwJXOB0YQeWCNB/uPm6Kqfp3JskHt8OLyWJ9I
+         YnqAHysdYrcH1GUq62Vs9PjvNRZyyvN8wkejyzNPDZxj4gKFpl5c8q7ZerQytItnjC0T
+         6CKmmE7HPOLZG2EZv58VyahOtY0RbxHs0OjlsnFmEoLM00W4sQKUzs2UiG7eAJgLpavy
+         f/zxEnFhtAQXOzk4+vCPu9XSVRJ1JLdFNTV0CwAoSIHzADOSPu7G64lWj6qYo06CXhNP
+         XDAx4ttUfZ+CFtzg5cP+cpsgjPKeitkaq484t+apw48l+qO2kMRdPDT7Bhq4ESX1Wy17
+         fxrg==
+X-Forwarded-Encrypted: i=1; AJvYcCW/CZ/MfybC3B2Incai6rmZ/+EKK42NABcL1FTGpT3Cq29yIhIFPrtt+8IkoOZD1JqDWfbCbMI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxYfTisTTlbiJj4VRBEUZZsGGaJQVvFvG2OYBABnkoj1BvUOvdm
+	bEpoFeKS5qkykGF2AZugdo0Iu89UI6e1dXp7xmFtZXPrSDpLjGyxC7xx6ZR1aFg=
+X-Gm-Gg: ASbGnctESJiUGdGUIDHouEFp7pEdtK8mxpBcZkPzLfDBGIiTvHmBr/Gpl4hXYHI0Oja
+	XH+CjTwucqF2HXUq7kJIwpVwPXFTC4Zx2oHuzwqJzNCgUPUDxFohhglcOE6nT1Zqe/vr28Xcdb8
+	LSir0BHY/yaK6CgB1iOHSLxlaslLnjKoD7umbWwOl0nh5siy+80eIJ1yUoWdGfqt/Ecg0dTp9mG
+	WwFjMLmUC1YrAPXDem6oTY+wWbksdDbFyJz8ehhlrzyF7L01nNnBxRZqaQZUMr/vms=
+X-Google-Smtp-Source: AGHT+IFXQCdp082WWpGcpuSjSz2khkKE+kq+/Zwi6NgiDuGp4et1L72GBvo6pH6pxi/Ft6I0r1EIJg==
+X-Received: by 2002:a17:902:c408:b0:21a:8839:4f4d with SMTP id d9443c01a7336-21a88395835mr395241215ad.6.1737043779271;
+        Thu, 16 Jan 2025 08:09:39 -0800 (PST)
+Received: from LQ3V64L9R2 ([65.133.87.50])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-a9bdd02b954sm221289a12.52.2025.01.16.08.09.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Jan 2025 08:31:35 -0800 (PST)
-From: Jeongjun Park <aha310510@gmail.com>
-To: bh74.an@samsung.com
-Cc: andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	richardcochran@gmail.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Jeongjun Park <aha310510@gmail.com>
-Subject: [PATCH net-next] net: sxgbe: change conditional statement from if to switch
-Date: Fri, 17 Jan 2025 01:03:14 +0900
-Message-ID: <20250116160314.23873-1-aha310510@gmail.com>
-X-Mailer: git-send-email 2.43.0
+        Thu, 16 Jan 2025 08:09:38 -0800 (PST)
+Date: Thu, 16 Jan 2025 08:09:36 -0800
+From: Joe Damato <jdamato@fastly.com>
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Cc: gerhard@engleder-embedded.com, jasowang@redhat.com, leiyang@redhat.com,
+	mkarsten@uwaterloo.ca, "Michael S. Tsirkin" <mst@redhat.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	"open list:VIRTIO CORE AND NET DRIVERS" <virtualization@lists.linux.dev>,
+	open list <linux-kernel@vger.kernel.org>,
+	"open list:XDP (eXpress Data Path):Keyword:(?:b|_)xdp(?:b|_)" <bpf@vger.kernel.org>,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v2 3/4] virtio_net: Map NAPIs to queues
+Message-ID: <Z4kvQI8GmmEGrq1F@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	gerhard@engleder-embedded.com, jasowang@redhat.com,
+	leiyang@redhat.com, mkarsten@uwaterloo.ca,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	"open list:VIRTIO CORE AND NET DRIVERS" <virtualization@lists.linux.dev>,
+	open list <linux-kernel@vger.kernel.org>,
+	"open list:XDP (eXpress Data Path):Keyword:(?:b|_)xdp(?:b|_)" <bpf@vger.kernel.org>,
+	netdev@vger.kernel.org
+References: <20250116055302.14308-1-jdamato@fastly.com>
+ <20250116055302.14308-4-jdamato@fastly.com>
+ <1737013994.1861002-1-xuanzhuo@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1737013994.1861002-1-xuanzhuo@linux.alibaba.com>
 
-Change the if conditional statement in sxgbe_rx_ctxt_wbstatus() to a switch
-conditional statement to improve readability, and also add processing for
-cases where all conditions are not satisfied.
+On Thu, Jan 16, 2025 at 03:53:14PM +0800, Xuan Zhuo wrote:
+> On Thu, 16 Jan 2025 05:52:58 +0000, Joe Damato <jdamato@fastly.com> wrote:
+> > Use netif_queue_set_napi to map NAPIs to queue IDs so that the mapping
+> > can be accessed by user apps.
+> >
+> > $ ethtool -i ens4 | grep driver
+> > driver: virtio_net
+> >
+> > $ sudo ethtool -L ens4 combined 4
+> >
+> > $ ./tools/net/ynl/pyynl/cli.py \
+> >        --spec Documentation/netlink/specs/netdev.yaml \
+> >        --dump queue-get --json='{"ifindex": 2}'
+> > [{'id': 0, 'ifindex': 2, 'napi-id': 8289, 'type': 'rx'},
+> >  {'id': 1, 'ifindex': 2, 'napi-id': 8290, 'type': 'rx'},
+> >  {'id': 2, 'ifindex': 2, 'napi-id': 8291, 'type': 'rx'},
+> >  {'id': 3, 'ifindex': 2, 'napi-id': 8292, 'type': 'rx'},
+> >  {'id': 0, 'ifindex': 2, 'type': 'tx'},
+> >  {'id': 1, 'ifindex': 2, 'type': 'tx'},
+> >  {'id': 2, 'ifindex': 2, 'type': 'tx'},
+> >  {'id': 3, 'ifindex': 2, 'type': 'tx'}]
+> >
+> > Note that virtio_net has TX-only NAPIs which do not have NAPI IDs, so
+> > the lack of 'napi-id' in the above output is expected.
+> >
+> > Signed-off-by: Joe Damato <jdamato@fastly.com>
+> > ---
+> >  v2:
+> >    - Eliminate RTNL code paths using the API Jakub introduced in patch 1
+> >      of this v2.
+> >    - Added virtnet_napi_disable to reduce code duplication as
+> >      suggested by Jason Wang.
+> >
+> >  drivers/net/virtio_net.c | 34 +++++++++++++++++++++++++++++-----
+> >  1 file changed, 29 insertions(+), 5 deletions(-)
+> >
+> > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> > index cff18c66b54a..c6fda756dd07 100644
+> > --- a/drivers/net/virtio_net.c
+> > +++ b/drivers/net/virtio_net.c
+> > @@ -2803,9 +2803,18 @@ static void virtnet_napi_do_enable(struct virtqueue *vq,
+> >  	local_bh_enable();
+> >  }
+> >
+> > -static void virtnet_napi_enable(struct virtqueue *vq, struct napi_struct *napi)
+> > +static void virtnet_napi_enable(struct virtqueue *vq,
+> > +				struct napi_struct *napi)
+> >  {
+> > +	struct virtnet_info *vi = vq->vdev->priv;
+> > +	int q = vq2rxq(vq);
+> > +	u16 curr_qs;
+> > +
+> >  	virtnet_napi_do_enable(vq, napi);
+> > +
+> > +	curr_qs = vi->curr_queue_pairs - vi->xdp_queue_pairs;
+> > +	if (!vi->xdp_enabled || q < curr_qs)
+> > +		netif_queue_set_napi(vi->dev, q, NETDEV_QUEUE_TYPE_RX, napi);
+> 
+> So what case the check of xdp_enabled is for?
 
-Signed-off-by: Jeongjun Park <aha310510@gmail.com>
----
- .../net/ethernet/samsung/sxgbe/sxgbe_desc.c   | 43 +++++++++++++------
- 1 file changed, 30 insertions(+), 13 deletions(-)
+Based on a previous discussion [1], the NAPIs should not be linked
+for in-kernel XDP, but they _should_ be linked for XSK.
 
-diff --git a/drivers/net/ethernet/samsung/sxgbe/sxgbe_desc.c b/drivers/net/ethernet/samsung/sxgbe/sxgbe_desc.c
-index b33ebf2dca47..5e69ab8a4b90 100644
---- a/drivers/net/ethernet/samsung/sxgbe/sxgbe_desc.c
-+++ b/drivers/net/ethernet/samsung/sxgbe/sxgbe_desc.c
-@@ -421,31 +421,48 @@ static void sxgbe_rx_ctxt_wbstatus(struct sxgbe_rx_ctxt_desc *p,
- 	if (p->tstamp_dropped)
- 		x->timestamp_dropped++;
- 
--	/* ptp */
--	if (p->ptp_msgtype == RX_NO_PTP)
-+	/* PTP Msg type */
-+	switch (p->ptp_msgtype) {
-+	case RX_NO_PTP:
- 		x->rx_msg_type_no_ptp++;
--	else if (p->ptp_msgtype == RX_PTP_SYNC)
-+		break;
-+	case RX_PTP_SYNC:
- 		x->rx_ptp_type_sync++;
--	else if (p->ptp_msgtype == RX_PTP_FOLLOW_UP)
-+		break;
-+	case RX_PTP_FOLLOW_UP:
- 		x->rx_ptp_type_follow_up++;
--	else if (p->ptp_msgtype == RX_PTP_DELAY_REQ)
-+		break;
-+	case RX_PTP_DELAY_REQ:
- 		x->rx_ptp_type_delay_req++;
--	else if (p->ptp_msgtype == RX_PTP_DELAY_RESP)
-+		break;
-+	case RX_PTP_DELAY_RESP:
- 		x->rx_ptp_type_delay_resp++;
--	else if (p->ptp_msgtype == RX_PTP_PDELAY_REQ)
-+		break;
-+	case RX_PTP_PDELAY_REQ:
- 		x->rx_ptp_type_pdelay_req++;
--	else if (p->ptp_msgtype == RX_PTP_PDELAY_RESP)
-+		break;
-+	case RX_PTP_PDELAY_RESP:
- 		x->rx_ptp_type_pdelay_resp++;
--	else if (p->ptp_msgtype == RX_PTP_PDELAY_FOLLOW_UP)
-+		break;
-+	case RX_PTP_PDELAY_FOLLOW_UP:
- 		x->rx_ptp_type_pdelay_follow_up++;
--	else if (p->ptp_msgtype == RX_PTP_ANNOUNCE)
-+		break;
-+	case RX_PTP_ANNOUNCE:
- 		x->rx_ptp_announce++;
--	else if (p->ptp_msgtype == RX_PTP_MGMT)
-+		break;
-+	case RX_PTP_MGMT:
- 		x->rx_ptp_mgmt++;
--	else if (p->ptp_msgtype == RX_PTP_SIGNAL)
-+		break;
-+	case RX_PTP_SIGNAL:
- 		x->rx_ptp_signal++;
--	else if (p->ptp_msgtype == RX_PTP_RESV_MSG)
-+		break;
-+	case RX_PTP_RESV_MSG:
- 		x->rx_ptp_resv_msg_type++;
-+		break;
-+	default:
-+		pr_err("Invalid PTP Message type\n");
-+		break;
-+	}
- }
- 
- /* Get rx timestamp status */
---
+I could certainly have misread the virtio_net code (please let me
+know if I've gotten it wrong, I'm not an expert), but the three
+cases I have in mind are:
+
+  - vi->xdp_enabled = false, which happens when no XDP is being
+    used, so the queue number will be < vi->curr_queue_pairs.
+
+  - vi->xdp_enabled = false, which I believe is what happens in the
+    XSK case. In this case, the NAPI is linked.
+
+  - vi->xdp_enabled = true, which I believe only happens for
+    in-kernel XDP - but not XSK - and in this case, the NAPI should
+    NOT be linked.
+
+Thank you for your review and questions about this, I definitely
+want to make sure I've gotten it right :)
+
+> And I think we should merge this to last commit.
+
+I kept them separate for two reasons:
+  1. Easier to review :)
+  2. If a bug were to appear, it'll be easier to bisect the code to
+     determine if the bug is being caused either from linking the
+     queues to NAPIs or from adding support for persistent NAPI
+     config parameters.
+
+Having the two features separated makes it easier to understand and
+fix, as there have been minor bugs in other drivers with NAPI config
+[2].
+
+[1]: https://lore.kernel.org/netdev/20250113135609.13883897@kernel.org/
+[2]: https://lore.kernel.org/lkml/38d019dd-b876-4fc1-ba7e-f1eb85ad7360@nvidia.com/
 
