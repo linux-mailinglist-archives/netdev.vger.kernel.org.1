@@ -1,116 +1,91 @@
-Return-Path: <netdev+bounces-158717-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158718-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0FC54A130DD
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 02:40:12 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 99479A130E0
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 02:42:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2BF5D1641AD
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 01:40:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2BEFD3A598A
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 01:42:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AC222868B;
-	Thu, 16 Jan 2025 01:40:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FE49225D6;
+	Thu, 16 Jan 2025 01:42:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DElgkymd"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="C5eaGIxR"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-173.mta0.migadu.com (out-173.mta0.migadu.com [91.218.175.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9C0129A1
-	for <netdev@vger.kernel.org>; Thu, 16 Jan 2025 01:40:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 017A029A1
+	for <netdev@vger.kernel.org>; Thu, 16 Jan 2025 01:42:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736991609; cv=none; b=HSs6AxIK33ihvftPPxSrqhwxPMEOHrzqHaPsVUt+hpJYR1G5ADNPh3uGmi2WmXYI0LDG6920ZpzQbmJwuQ8QEH7wGjdYuJauvCF44HuxRmqMIC7CRew25bY81vrPPqzMTFKDMHSNOjwIPM55ZWzPhvkV8KScogGSMQUOW0dMRaI=
+	t=1736991753; cv=none; b=pMF4/DbcO0n0JOcqP8mDg2eyN7tp387Bz7kwSEegwAUx7B9/jMJdkz7ognVxnMv7LfFwmV6keC8lznrvBo/gCqBP2kseuaXCwP0Jw3D/6Cl+Fndj+iYYWVEaNwSS6Eb8ptEGqHyDsmLdWZSudcf6DLYkPFNHJYA5DUrN+vqc08Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736991609; c=relaxed/simple;
-	bh=M0LJrANGNXotU6iod3jySHAhm3Pf9k0t50XFBHUnCcM=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=sFez57AkK3uDIoZL/W27pzooc93wlko7YjVy3tlmgXACqIJAC66w6lWeJcTdHMA0AyP4EnjZ7X/G7GD0teOVwomlBiWOobheU1E8CDNcr1cDjSL0meWgxx/ocjjqUmjQz0RBhBbGNpVq0dz5o3mZxSlTNO/JGmL128bJNVN/SHw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DElgkymd; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B5BD4C4CED1;
-	Thu, 16 Jan 2025 01:40:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736991608;
-	bh=M0LJrANGNXotU6iod3jySHAhm3Pf9k0t50XFBHUnCcM=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=DElgkymdqWTUQLOIy3PL8vVae9+2vOttEDJmVYq6IEtgJst2Fz1f9ZLaVwKcLPaUC
-	 MsHHvddG5JgVc6npI5wNd5MEVAVy4jn3FWol/CREMTLJt9aRP/VK0FEy/DrnTZrNtG
-	 b+e2z4cqz1ddXnW4cy0dMLnmHxUDgfjJx0e/d9eg1W8V6PIGRE1m4wGbv24xShvYDE
-	 9NyVAGiIV8hhGh6gKZjaKa5TSMJC08PcNQ2xkJKLqeJrqPbfJ2CnBaTXT1kSJ7aWka
-	 THDaUgcX994NhOxf5OI3BtILlMlAQBakPCu2VZYiLGUS3oWdntDCAqn6u6TYuKu/ME
-	 dD7bWjf/bY7jg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB224380AA5F;
-	Thu, 16 Jan 2025 01:40:32 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1736991753; c=relaxed/simple;
+	bh=njj52WhQMQZOfH2kXflonVWbgm+vByvjDK+FYp02Htg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=qLye5wVQhn/pNoQDrZkzxsVythN2tRHueeLpM2j6dnBKL27ZsGkbNNcAg6e52i6Sddk9meqyLTumgdnmmMdVcmjqzw57/+lZqDWjvhpJ9srg+cfNfxfg92u5AS5MX1YtEia6vJY8mxcUck0AnG6wA0T/MOwJxN4XhnqscVjNTV8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=C5eaGIxR; arc=none smtp.client-ip=91.218.175.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <11039148-82ea-4dea-8734-47eabdb268ef@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1736991744;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=GLy/3JATL1k66rTb0dW5NsSlSQ5yJgsR+7thbR9U3cw=;
+	b=C5eaGIxRV3ayQge6Xj4XKsfcnmm9nAKRFjEtmoxnEM3iXQAmnz3ETiDyzMWfvf29mvHvzI
+	jKcdzoL7Sn9PEfibkgxo12/Bxba0zl6cUls9Mg6TgpsYsi1Ax7Ua/M8ZryYibtZSdgM4zR
+	EMZzeYExnsimcrX8VVLdnN4YJTaifKo=
+Date: Thu, 16 Jan 2025 09:42:16 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Subject: Re: [PATCH] net: mii: Fix the Speed display when the network cable is
+ not connected
+To: Xiangqian Zhang <zhangxiangqian@kylinos.cn>, andrew+netdev@lunn.ch
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20250115111805.3894377-1-zhangxiangqian@kylinos.cn>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Yanteng Si <si.yanteng@linux.dev>
+In-Reply-To: <20250115111805.3894377-1-zhangxiangqian@kylinos.cn>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2 00/13][pull request] Intel Wired LAN Driver
- Updates 2025-01-08 (ice)
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173699163174.942981.11604439373791717150.git-patchwork-notify@kernel.org>
-Date: Thu, 16 Jan 2025 01:40:31 +0000
-References: <20250115000844.714530-1-anthony.l.nguyen@intel.com>
-In-Reply-To: <20250115000844.714530-1-anthony.l.nguyen@intel.com>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, andrew+netdev@lunn.ch, netdev@vger.kernel.org
+X-Migadu-Flow: FLOW_OUT
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by Tony Nguyen <anthony.l.nguyen@intel.com>:
-
-On Tue, 14 Jan 2025 16:08:26 -0800 you wrote:
-> This series contains updates to ice driver only.
+在 2025/1/15 19:18, Xiangqian Zhang 写道:
+> Two different models of usb card, the drivers are r8152 and asix. If no
+> network cable is connected, Speed = 10Mb/s. This problem is repeated in
+> linux 3.10, 4.19, and 5.4. Both drivers call
+> mii_ethtool_get_link_ksettings, but the value of cmd->base.speed in this
+> function can only be SPEED_1000 or SPEED_100 or SPEED_10.
+> When the network cable is not connected, set cmd->base.speed
+> =SPEED_UNKNOWN.
 > 
-> Przemek reworks implementation so that ice_init_hw() is called before
-> ice_adapter initialization. The motivation is to have ability to act
-> on the number of PFs in ice_adapter initialization. This is not done
-> here but the code is also a bit cleaner.
-> 
-> [...]
+> v2:
+> https://lore.kernel.org/20250111132242.3327654-1-zhangxiangqian@kylinos.cn
+So, you've already sent a v2. This patch should be sent as v3.
 
-Here is the summary with links:
-  - [net-next,v2,01/13] ice: c827: move wait for FW to ice_init_hw()
-    https://git.kernel.org/netdev/net-next/c/c37dd67c4233
-  - [net-next,v2,02/13] ice: split ice_init_hw() out from ice_init_dev()
-    https://git.kernel.org/netdev/net-next/c/4d3f59bfa2cd
-  - [net-next,v2,03/13] ice: minor: rename goto labels from err to unroll
-    https://git.kernel.org/netdev/net-next/c/5d5d9c2c0fb9
-  - [net-next,v2,04/13] ice: ice_probe: init ice_adapter after HW init
-    https://git.kernel.org/netdev/net-next/c/fb59a520bbb1
-  - [net-next,v2,05/13] ice: add recipe priority check in search
-    https://git.kernel.org/netdev/net-next/c/e81e1d79a974
-  - [net-next,v2,06/13] ice: add fw and port health reporters
-    https://git.kernel.org/netdev/net-next/c/85d6164ec56d
-  - [net-next,v2,07/13] ice: use string choice helpers
-    https://git.kernel.org/netdev/net-next/c/4c9f13a65426
-  - [net-next,v2,08/13] ice: use read_poll_timeout_atomic in ice_read_phy_tstamp_ll_e810
-    https://git.kernel.org/netdev/net-next/c/95aca43b4a82
-  - [net-next,v2,09/13] ice: rename TS_LL_READ* macros to REG_LL_PROXY_H_*
-    https://git.kernel.org/netdev/net-next/c/5b15b1f144c8
-  - [net-next,v2,10/13] ice: add lock to protect low latency interface
-    https://git.kernel.org/netdev/net-next/c/50327223a8bb
-  - [net-next,v2,11/13] ice: check low latency PHY timer update firmware capability
-    https://git.kernel.org/netdev/net-next/c/a5c69d45df27
-  - [net-next,v2,12/13] ice: implement low latency PHY timer updates
-    https://git.kernel.org/netdev/net-next/c/ef9a64c07294
-  - [net-next,v2,13/13] ice: Add in/out PTP pin delays
-    https://git.kernel.org/netdev/net-next/c/914639464b76
+Also, the link to v2 should not be included in the commit message. 
+Instead, it should be placed here:
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+---
+v2: 
+https://lore.kernel.org/20250111132242.3327654-1-zhangxiangqian@kylinos.cn
 
+  drivers/net/mii.c | 3 +++
+  1 file changed, 3 insertions(+)
 
+Thanks,
+Yanteng
 
