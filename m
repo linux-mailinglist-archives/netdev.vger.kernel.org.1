@@ -1,340 +1,299 @@
-Return-Path: <netdev+bounces-159058-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159059-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7187A143F8
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 22:21:42 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1BC20A14413
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 22:38:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 32D73169202
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 21:21:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8572718836B6
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 21:38:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A5342419FA;
-	Thu, 16 Jan 2025 21:21:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A961D1D90DF;
+	Thu, 16 Jan 2025 21:38:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="i4hZv2TV"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y1vAXi6p"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5E27236A87
-	for <netdev@vger.kernel.org>; Thu, 16 Jan 2025 21:21:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A89391D63EB
+	for <netdev@vger.kernel.org>; Thu, 16 Jan 2025 21:38:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737062478; cv=none; b=t5m7IDNflycVBTCWEqzfAMDXYXvrZZPsj6AnLDFy7Uac+1Vp0XRLzANgRihiBY2MHoADWOO3nsflZqbZvgbwxkDI0UrH0gm6T6t9SbWymuGduCBS2L8q/SBnJFxf1S8Doc9PX6Zna1bfzXsmaEK97gUUg8o3JGW/fdbp/ehyW4g=
+	t=1737063523; cv=none; b=uajVCGRxjWwiSxJppvReZ+sXdn87AdQUKkGQ0FYxzUJR4/iZXNmgW4FowlJIMJOa1JDqAizaN+o88sBjUdipDSoLojUkGZGaUDp9Vj9eZm3H5o0yNou/yefbaa/+m3hm7mvDMueZTD9UnIoPqRglJ+Tv9yniVT4LnFQjD1a3ago=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737062478; c=relaxed/simple;
-	bh=M6BndXKI15UFim+F3BZL7dQTHjrl7M1wsuCDAgcZU8Y=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=rcOFl9fbkRa6YW/xeTP7BVCGDjY7tYlAqlko4B2+kftv/Tl46HyCj9ENYiCwmzgS5JD1Ic3vnZJnE4HQ/sqXamcuQbi+V59XDi4rcSXIDJl+qvOLTi83AI2d8Z8L2T+AEiocSuZXYNbd2IEQckv4Q7SrN3Ie2vQkMQjRRmnsWXo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=i4hZv2TV; arc=none smtp.client-ip=192.198.163.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1737062476; x=1768598476;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=M6BndXKI15UFim+F3BZL7dQTHjrl7M1wsuCDAgcZU8Y=;
-  b=i4hZv2TVG3dJSwH+JQzzdw0sOIhBzj5uoIcCdSHttiiiAKo3oPOv4yPi
-   LG5v7nG2ascGXomNg3RSMJU9W86APCrl4EnfyNMGeJbBT89qO+pmOglS2
-   0tqRPI/2s93Cm7k7Sgq02UUV0rdOiAPkkwHJXI8UPIBquWkj3Yb/6eIPz
-   m6O7T46JumlCehFSfUo9zqiwQhqPm+lwa8FeAw7H8k8t8/YvbLJI7I6DI
-   Hj1hz02xai1UVo8frsGYoHZGAE4D794yLmEyWnP1mwHqoggVgyjXb7csz
-   l895t0iXEizJpVq2dQ2shpNpL95KYKmRzNUFwgpkcK+Fg1FPUfVc9XiS7
-   Q==;
-X-CSE-ConnectionGUID: iltm82X1RmGgUa5Zmfn9uw==
-X-CSE-MsgGUID: 75f8uwuERuqZeFjzjbqdVg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11317"; a="55019538"
-X-IronPort-AV: E=Sophos;i="6.13,210,1732608000"; 
-   d="scan'208";a="55019538"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jan 2025 13:21:11 -0800
-X-CSE-ConnectionGUID: Pj+n/MK9T+y0rzsz6gge1w==
-X-CSE-MsgGUID: RzsbdWM4SiKrPusirFs+/w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.13,210,1732608000"; 
-   d="scan'208";a="105572576"
-Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by fmviesa007.fm.intel.com with ESMTP; 16 Jan 2025 13:21:10 -0800
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	andrew+netdev@lunn.ch,
-	netdev@vger.kernel.org
-Cc: Konrad Knitter <konrad.knitter@intel.com>,
-	anthony.l.nguyen@intel.com,
-	jacob.e.keller@intel.com,
-	przemyslaw.kitszel@intel.com,
-	jiri@resnulli.us,
-	horms@kernel.org
-Subject: [PATCH net-next 3/3] ice: support FW Recovery Mode
-Date: Thu, 16 Jan 2025 13:20:57 -0800
-Message-ID: <20250116212059.1254349-4-anthony.l.nguyen@intel.com>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <20250116212059.1254349-1-anthony.l.nguyen@intel.com>
-References: <20250116212059.1254349-1-anthony.l.nguyen@intel.com>
+	s=arc-20240116; t=1737063523; c=relaxed/simple;
+	bh=LUprR35Q0Os14OV+DWrjugaaw+Ay7yC1Muc//yvJ0io=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:Content-Type; b=nYP3ucSRvyti08UuM2YKoRG49Bap+ohf/G/TAp/GJ3Ntt/CkKpwpac9bvPKwgLD1xH0d3puNxMa5Ji65TQLXADj0HaXoiKAoRdQCEo3cc72B059aM1QzralmYpp7WTBp2V/4syLNlUrosNPfxWzX+9q4ZbXsc1j7m4AnJlNK6EA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Y1vAXi6p; arc=none smtp.client-ip=209.85.221.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-385eed29d17so822450f8f.0
+        for <netdev@vger.kernel.org>; Thu, 16 Jan 2025 13:38:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1737063520; x=1737668320; darn=vger.kernel.org;
+        h=content-transfer-encoding:autocrypt:content-language:cc:to:subject
+         :from:user-agent:mime-version:date:message-id:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=+1aU8NZXs25NHwqYAR9jk8iMXXeHcvpB3/Bg34P3Kc4=;
+        b=Y1vAXi6p95hHjNZbufcFCF4NTFnnNGdGLOHsnOvzfVdDj89RdHiDhHkYZB/j4dQNYz
+         G8kPU7hHT8YXZrxZggU8ejTTVm8MzypGGMhPfAGWmvKrDwNJRDa6BcidnD5/wP3mqHTs
+         IZE3lvPa2wd4WhuqMp0A+9BVJQCajjXhaKW4uGJyhmFNy+Ai40bcfkb3OGrVXb0+nt8+
+         BeHi8/UVLFJR2OIc9zCkR2b9ruu2WtrjND8f36CwHT2MJVY9tOTS9oG3yBQyKY60Zxps
+         HJxfnlwsRiV8RBkEkuvW3ha2gj+1ZaDj/hJbX7kZL4Xp7gCModmXDx93i5qiwa8AZ0t4
+         R4eg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737063520; x=1737668320;
+        h=content-transfer-encoding:autocrypt:content-language:cc:to:subject
+         :from:user-agent:mime-version:date:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=+1aU8NZXs25NHwqYAR9jk8iMXXeHcvpB3/Bg34P3Kc4=;
+        b=ryaPCyVxhlhcNKe17Y5q3uAcRSweyYz8fR8NGeSPfGEvqqM8TrYYjMpKfOEXS6xJpV
+         9my+aEeUmTFdndLXIUZDPmbwcJNHNVbnznT6tXtHMi66FBt03Z2Fk/rz182jD+qx5CQu
+         SP08d6VtrXV1I0Nza4QLpWU/HLXFZHt73eAUEUjesAtJeVRB2NRkr0ajaw5BBZFLSNq6
+         Iuwz3JV+ZCliLWUBtIp+o3yQg04/D6za0fHumFHaUf/Bz38A8WsUCkiba4zV8x0r7wNq
+         kjPWG08cjG7vaRyWtXP1SPvyXGmwNVJ/zwfqg10DFctPd1AocM7K00qXMCd55GY3AwRS
+         3A4w==
+X-Gm-Message-State: AOJu0Yww9qe65IfTTgaJHDyLGPf5WtAN1A8KqHrvVjkUsXJkq115A/tc
+	FHJb2RDuGP3+2byd2rY0FR9E7uJrEcVpzA3F3boDp6CaYqS6l0Th
+X-Gm-Gg: ASbGncuFbEVSEfr/qhNVRS7IQoyNnTHmbw96PFy8eePkyCOD24BuaOo/quzhH5S3XMF
+	6IWP3ZgyPLgFoCC+pVQOLi75vDzCnCgBOf/St1m3fmzC4F6+HC6aNv8FxtyunpS4BLrTPIAf3J5
+	jAep/6gizagvdYwh8OpBKbyMQcpshTUAPrfF4oolcI9AdSHcXRbAlsPSe0wEVFTNrayTw/f7/bI
+	IaZ5rzct+2znK5iutT3xsVLyzZI6v1fg4/XZoOZxjQftXu6Ex+HvwujL4qQMV7jBZXyfyuXjJWm
+	7kPOUI2qD4ebwKFwSWbIu26HpdxYwoeLP+CCjD00AzEv04vlycZsGsvpIBqSXG+BNF4O2SdSMv/
+	ZLYkbopbvDYecN5MiPG2ALs4Ar2GyaZhLfyg5Xg+LevKRjxTo
+X-Google-Smtp-Source: AGHT+IHKjY4+g2EkiiE4r21Ic8BqX6iB3pI8czADLmgfgKlbx/87GqnleHrlsnIej88JZNJzphTFfA==
+X-Received: by 2002:a05:6000:1a87:b0:385:fc32:1ec6 with SMTP id ffacd0b85a97d-38bf57bb947mr134676f8f.50.1737063519704;
+        Thu, 16 Jan 2025 13:38:39 -0800 (PST)
+Received: from ?IPV6:2a02:3100:b19d:2500:5581:de5f:8aae:777c? (dynamic-2a02-3100-b19d-2500-5581-de5f-8aae-777c.310.pool.telefonica.de. [2a02:3100:b19d:2500:5581:de5f:8aae:777c])
+        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-38bf3221bf0sm819018f8f.28.2025.01.16.13.38.37
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 16 Jan 2025 13:38:38 -0800 (PST)
+Message-ID: <5493b96e-88bb-4230-a911-322659ec5167@gmail.com>
+Date: Thu, 16 Jan 2025 22:38:40 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Subject: [PATCH net-next] net: phy: remove leftovers from switch to linkmode
+ bitmaps
+To: Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+ David Miller <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Simon Horman <horms@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+ Russell King - ARM Linux <linux@armlinux.org.uk>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Content-Language: en-US
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ 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
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-From: Konrad Knitter <konrad.knitter@intel.com>
+We have some leftovers from the switch to linkmode bitmaps which
+- have never been used
+- are not used any longer
+- have no user outside phy_device.c
+So remove them.
 
-Recovery Mode is intended to recover from a fatal failure scenario in
-which the device is not accessible to the host, meaning the firmware is
-non-responsive.
-
-The purpose of the Firmware Recovery Mode is to enable software tools to
-update firmware and/or device configuration so the fatal error can be
-resolved.
-
-Recovery Mode Firmware supports a limited set of admin commands required
-for NVM update.
-Recovery Firmware does not support hardware interrupts so a polling mode
-is used.
-
-The driver will expose only the minimum set of devlink commands required
-for the recovery of the adapter.
-
-Using an appropriate NVM image, the user can recover the adapter using
-the devlink flash API.
-
-Prior to 4.20 E810 Adapter Recovery Firmware supports only the update
-and erase of the "fw.mgmt" component.
-
-E810 Adapter Recovery Firmware doesn't support selected preservation of
-cards settings or identifiers.
-
-The following command can be used to recover the adapter:
-
-$ devlink dev flash <pci-address> <update-image.bin> component fw.mgmt
-  overwrite settings overwrite identifier
-
-Newer FW versions (4.20 or newer) supports update of "fw.undi" and
-"fw.netlist" components.
-
-$ devlink dev flash <pci-address> <update-image.bin>
-
-Tested on Intel Corporation Ethernet Controller E810-C for SFP
-FW revision 3.20 and 4.30.
-
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Signed-off-by: Konrad Knitter <konrad.knitter@intel.com>
-Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com> (A Contingent worker at Intel)
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
 ---
- .../net/ethernet/intel/ice/devlink/devlink.c  |  8 ++-
- .../net/ethernet/intel/ice/ice_adminq_cmd.h   |  1 +
- .../net/ethernet/intel/ice/ice_fw_update.c    | 14 ++++-
- drivers/net/ethernet/intel/ice/ice_lib.c      |  6 +++
- drivers/net/ethernet/intel/ice/ice_lib.h      |  1 +
- drivers/net/ethernet/intel/ice/ice_main.c     | 53 +++++++++++++++++++
- 6 files changed, 80 insertions(+), 3 deletions(-)
+ drivers/net/phy/phy_device.c | 54 ++----------------------------------
+ include/linux/phy.h          | 18 ------------
+ 2 files changed, 2 insertions(+), 70 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/ice/devlink/devlink.c b/drivers/net/ethernet/intel/ice/devlink/devlink.c
-index d1b9ccec5e05..d116e2b10bce 100644
---- a/drivers/net/ethernet/intel/ice/devlink/devlink.c
-+++ b/drivers/net/ethernet/intel/ice/devlink/devlink.c
-@@ -368,14 +368,18 @@ static int ice_devlink_info_get(struct devlink *devlink,
- 			}
- 			break;
- 		case ICE_VERSION_RUNNING:
--			err = devlink_info_version_running_put(req, key, ctx->buf);
-+			err = devlink_info_version_running_put_ext(req, key,
-+								   ctx->buf,
-+								   DEVLINK_INFO_VERSION_TYPE_COMPONENT);
- 			if (err) {
- 				NL_SET_ERR_MSG_MOD(extack, "Unable to set running version");
- 				goto out_free_ctx;
- 			}
- 			break;
- 		case ICE_VERSION_STORED:
--			err = devlink_info_version_stored_put(req, key, ctx->buf);
-+			err = devlink_info_version_stored_put_ext(req, key,
-+								  ctx->buf,
-+								  DEVLINK_INFO_VERSION_TYPE_COMPONENT);
- 			if (err) {
- 				NL_SET_ERR_MSG_MOD(extack, "Unable to set stored version");
- 				goto out_free_ctx;
-diff --git a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
-index dd41a4dcc0b9..1f65eedabf7c 100644
---- a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
-+++ b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
-@@ -1814,6 +1814,7 @@ struct ice_aqc_nvm_pass_comp_tbl {
- #define ICE_AQ_NVM_PASS_COMP_CAN_BE_UPDATED		0x0
- #define ICE_AQ_NVM_PASS_COMP_CAN_MAY_BE_UPDATEABLE	0x1
- #define ICE_AQ_NVM_PASS_COMP_CAN_NOT_BE_UPDATED		0x2
-+#define ICE_AQ_NVM_PASS_COMP_PARTIAL_CHECK		0x3
- 	u8 component_response_code; /* Response only */
- #define ICE_AQ_NVM_PASS_COMP_CAN_BE_UPDATED_CODE	0x0
- #define ICE_AQ_NVM_PASS_COMP_STAMP_IDENTICAL_CODE	0x1
-diff --git a/drivers/net/ethernet/intel/ice/ice_fw_update.c b/drivers/net/ethernet/intel/ice/ice_fw_update.c
-index 2702a0da5c3e..70c201f569ce 100644
---- a/drivers/net/ethernet/intel/ice/ice_fw_update.c
-+++ b/drivers/net/ethernet/intel/ice/ice_fw_update.c
-@@ -6,6 +6,7 @@
- #include <linux/crc32.h>
- #include <linux/pldmfw.h>
- #include "ice.h"
-+#include "ice_lib.h"
- #include "ice_fw_update.h"
+diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
+index 5b34d39d1..46713d274 100644
+--- a/drivers/net/phy/phy_device.c
++++ b/drivers/net/phy/phy_device.c
+@@ -60,15 +60,9 @@ EXPORT_SYMBOL_GPL(phy_gbit_features);
+ __ETHTOOL_DECLARE_LINK_MODE_MASK(phy_gbit_fibre_features) __ro_after_init;
+ EXPORT_SYMBOL_GPL(phy_gbit_fibre_features);
  
- struct ice_fwu_priv {
-@@ -125,6 +126,10 @@ ice_check_component_response(struct ice_pf *pf, u16 id, u8 response, u8 code,
- 	case ICE_AQ_NVM_PASS_COMP_CAN_NOT_BE_UPDATED:
- 		dev_info(dev, "firmware has rejected updating %s\n", component);
- 		break;
-+	case ICE_AQ_NVM_PASS_COMP_PARTIAL_CHECK:
-+		if (ice_is_recovery_mode(&pf->hw))
-+			return 0;
-+		break;
- 	}
+-__ETHTOOL_DECLARE_LINK_MODE_MASK(phy_gbit_all_ports_features) __ro_after_init;
+-EXPORT_SYMBOL_GPL(phy_gbit_all_ports_features);
+-
+ __ETHTOOL_DECLARE_LINK_MODE_MASK(phy_10gbit_features) __ro_after_init;
+ EXPORT_SYMBOL_GPL(phy_10gbit_features);
  
- 	switch (code) {
-@@ -1004,13 +1009,20 @@ int ice_devlink_flash_update(struct devlink *devlink,
- 		return -EOPNOTSUPP;
- 	}
+-__ETHTOOL_DECLARE_LINK_MODE_MASK(phy_10gbit_fec_features) __ro_after_init;
+-EXPORT_SYMBOL_GPL(phy_10gbit_fec_features);
+-
+ const int phy_basic_ports_array[3] = {
+ 	ETHTOOL_LINK_MODE_Autoneg_BIT,
+ 	ETHTOOL_LINK_MODE_TP_BIT,
+@@ -76,12 +70,7 @@ const int phy_basic_ports_array[3] = {
+ };
+ EXPORT_SYMBOL_GPL(phy_basic_ports_array);
  
--	if (!hw->dev_caps.common_cap.nvm_unified_update) {
-+	if (!hw->dev_caps.common_cap.nvm_unified_update && !ice_is_recovery_mode(hw)) {
- 		NL_SET_ERR_MSG_MOD(extack, "Current firmware does not support unified update");
- 		return -EOPNOTSUPP;
- 	}
+-const int phy_fibre_port_array[1] = {
+-	ETHTOOL_LINK_MODE_FIBRE_BIT,
+-};
+-EXPORT_SYMBOL_GPL(phy_fibre_port_array);
+-
+-const int phy_all_ports_features_array[7] = {
++static const int phy_all_ports_features_array[7] = {
+ 	ETHTOOL_LINK_MODE_Autoneg_BIT,
+ 	ETHTOOL_LINK_MODE_TP_BIT,
+ 	ETHTOOL_LINK_MODE_MII_BIT,
+@@ -90,7 +79,6 @@ const int phy_all_ports_features_array[7] = {
+ 	ETHTOOL_LINK_MODE_BNC_BIT,
+ 	ETHTOOL_LINK_MODE_Backplane_BIT,
+ };
+-EXPORT_SYMBOL_GPL(phy_all_ports_features_array);
  
- 	memset(&priv, 0, sizeof(priv));
+ const int phy_10_100_features_array[4] = {
+ 	ETHTOOL_LINK_MODE_10baseT_Half_BIT,
+@@ -124,20 +112,6 @@ const int phy_10gbit_features_array[1] = {
+ };
+ EXPORT_SYMBOL_GPL(phy_10gbit_features_array);
  
-+	if (params->component && strcmp(params->component, "fw.mgmt") == 0) {
-+		priv.context.mode = PLDMFW_UPDATE_MODE_SINGLE_COMPONENT;
-+		priv.context.component_identifier = NVM_COMP_ID_NVM;
-+	} else if (params->component) {
-+		return -EOPNOTSUPP;
-+	}
-+
- 	/* the E822 device needs a slightly different ops */
- 	if (hw->mac_type == ICE_MAC_GENERIC)
- 		priv.context.ops = &ice_fwu_ops_e822;
-diff --git a/drivers/net/ethernet/intel/ice/ice_lib.c b/drivers/net/ethernet/intel/ice/ice_lib.c
-index a7d45a8ce7ac..38a1c8372180 100644
---- a/drivers/net/ethernet/intel/ice/ice_lib.c
-+++ b/drivers/net/ethernet/intel/ice/ice_lib.c
-@@ -1700,6 +1700,12 @@ bool ice_pf_state_is_nominal(struct ice_pf *pf)
- 	return true;
- }
+-static const int phy_10gbit_fec_features_array[1] = {
+-	ETHTOOL_LINK_MODE_10000baseR_FEC_BIT,
+-};
+-
+-__ETHTOOL_DECLARE_LINK_MODE_MASK(phy_10gbit_full_features) __ro_after_init;
+-EXPORT_SYMBOL_GPL(phy_10gbit_full_features);
+-
+-static const int phy_10gbit_full_features_array[] = {
+-	ETHTOOL_LINK_MODE_10baseT_Full_BIT,
+-	ETHTOOL_LINK_MODE_100baseT_Full_BIT,
+-	ETHTOOL_LINK_MODE_1000baseT_Full_BIT,
+-	ETHTOOL_LINK_MODE_10000baseT_Full_BIT,
+-};
+-
+ static const int phy_eee_cap1_features_array[] = {
+ 	ETHTOOL_LINK_MODE_100baseT_Full_BIT,
+ 	ETHTOOL_LINK_MODE_1000baseT_Full_BIT,
+@@ -199,20 +173,7 @@ static void features_init(void)
+ 	linkmode_set_bit_array(phy_gbit_features_array,
+ 			       ARRAY_SIZE(phy_gbit_features_array),
+ 			       phy_gbit_fibre_features);
+-	linkmode_set_bit_array(phy_fibre_port_array,
+-			       ARRAY_SIZE(phy_fibre_port_array),
+-			       phy_gbit_fibre_features);
+-
+-	/* 10/100 half/full + 1000 half/full + TP/MII/FIBRE/AUI/BNC/Backplane*/
+-	linkmode_set_bit_array(phy_all_ports_features_array,
+-			       ARRAY_SIZE(phy_all_ports_features_array),
+-			       phy_gbit_all_ports_features);
+-	linkmode_set_bit_array(phy_10_100_features_array,
+-			       ARRAY_SIZE(phy_10_100_features_array),
+-			       phy_gbit_all_ports_features);
+-	linkmode_set_bit_array(phy_gbit_features_array,
+-			       ARRAY_SIZE(phy_gbit_features_array),
+-			       phy_gbit_all_ports_features);
++	linkmode_set_bit(ETHTOOL_LINK_MODE_FIBRE_BIT, phy_gbit_fibre_features);
  
-+#define ICE_FW_MODE_REC_M BIT(1)
-+bool ice_is_recovery_mode(struct ice_hw *hw)
-+{
-+	return rd32(hw, GL_MNG_FWSM) & ICE_FW_MODE_REC_M;
-+}
-+
- /**
-  * ice_update_eth_stats - Update VSI-specific ethernet statistics counters
-  * @vsi: the VSI to be updated
-diff --git a/drivers/net/ethernet/intel/ice/ice_lib.h b/drivers/net/ethernet/intel/ice/ice_lib.h
-index 10d6fc479a32..eabb35834a24 100644
---- a/drivers/net/ethernet/intel/ice/ice_lib.h
-+++ b/drivers/net/ethernet/intel/ice/ice_lib.h
-@@ -90,6 +90,7 @@ void ice_set_q_vector_intrl(struct ice_q_vector *q_vector);
+ 	/* 10/100 half/full + 1000 half/full + 10G full*/
+ 	linkmode_set_bit_array(phy_all_ports_features_array,
+@@ -228,17 +189,6 @@ static void features_init(void)
+ 			       ARRAY_SIZE(phy_10gbit_features_array),
+ 			       phy_10gbit_features);
  
- bool ice_is_safe_mode(struct ice_pf *pf);
- bool ice_is_rdma_ena(struct ice_pf *pf);
-+bool ice_is_recovery_mode(struct ice_hw *hw);
- bool ice_is_dflt_vsi_in_use(struct ice_port_info *pi);
- bool ice_is_vsi_dflt_vsi(struct ice_vsi *vsi);
- int ice_set_dflt_vsi(struct ice_vsi *vsi);
-diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
-index 749b5e29e83a..2205ea871209 100644
---- a/drivers/net/ethernet/intel/ice/ice_main.c
-+++ b/drivers/net/ethernet/intel/ice/ice_main.c
-@@ -2364,6 +2364,18 @@ static void ice_check_media_subtask(struct ice_pf *pf)
- 	}
- }
+-	/* 10/100/1000/10G full */
+-	linkmode_set_bit_array(phy_all_ports_features_array,
+-			       ARRAY_SIZE(phy_all_ports_features_array),
+-			       phy_10gbit_full_features);
+-	linkmode_set_bit_array(phy_10gbit_full_features_array,
+-			       ARRAY_SIZE(phy_10gbit_full_features_array),
+-			       phy_10gbit_full_features);
+-	/* 10G FEC only */
+-	linkmode_set_bit_array(phy_10gbit_fec_features_array,
+-			       ARRAY_SIZE(phy_10gbit_fec_features_array),
+-			       phy_10gbit_fec_features);
+ 	linkmode_set_bit_array(phy_eee_cap1_features_array,
+ 			       ARRAY_SIZE(phy_eee_cap1_features_array),
+ 			       phy_eee_cap1_features);
+diff --git a/include/linux/phy.h b/include/linux/phy.h
+index afaae74d0..559b267be 100644
+--- a/include/linux/phy.h
++++ b/include/linux/phy.h
+@@ -32,19 +32,6 @@
+ #include <linux/atomic.h>
+ #include <net/eee.h>
  
-+static void ice_service_task_recovery_mode(struct work_struct *work)
-+{
-+	struct ice_pf *pf = container_of(work, struct ice_pf, serv_task);
-+
-+	set_bit(ICE_ADMINQ_EVENT_PENDING, pf->state);
-+	ice_clean_adminq_subtask(pf);
-+
-+	ice_service_task_complete(pf);
-+
-+	mod_timer(&pf->serv_tmr, jiffies + msecs_to_jiffies(100));
-+}
-+
- /**
-  * ice_service_task - manage and run subtasks
-  * @work: pointer to work_struct contained by the PF struct
-@@ -5217,6 +5229,36 @@ void ice_unload(struct ice_pf *pf)
- 	ice_decfg_netdev(vsi);
- }
+-#define PHY_DEFAULT_FEATURES	(SUPPORTED_Autoneg | \
+-				 SUPPORTED_TP | \
+-				 SUPPORTED_MII)
+-
+-#define PHY_10BT_FEATURES	(SUPPORTED_10baseT_Half | \
+-				 SUPPORTED_10baseT_Full)
+-
+-#define PHY_100BT_FEATURES	(SUPPORTED_100baseT_Half | \
+-				 SUPPORTED_100baseT_Full)
+-
+-#define PHY_1000BT_FEATURES	(SUPPORTED_1000baseT_Half | \
+-				 SUPPORTED_1000baseT_Full)
+-
+ extern __ETHTOOL_DECLARE_LINK_MODE_MASK(phy_basic_features) __ro_after_init;
+ extern __ETHTOOL_DECLARE_LINK_MODE_MASK(phy_basic_t1_features) __ro_after_init;
+ extern __ETHTOOL_DECLARE_LINK_MODE_MASK(phy_basic_t1s_p2mp_features) __ro_after_init;
+@@ -62,16 +49,11 @@ extern __ETHTOOL_DECLARE_LINK_MODE_MASK(phy_eee_cap2_features) __ro_after_init;
+ #define PHY_BASIC_T1S_P2MP_FEATURES ((unsigned long *)&phy_basic_t1s_p2mp_features)
+ #define PHY_GBIT_FEATURES ((unsigned long *)&phy_gbit_features)
+ #define PHY_GBIT_FIBRE_FEATURES ((unsigned long *)&phy_gbit_fibre_features)
+-#define PHY_GBIT_ALL_PORTS_FEATURES ((unsigned long *)&phy_gbit_all_ports_features)
+ #define PHY_10GBIT_FEATURES ((unsigned long *)&phy_10gbit_features)
+-#define PHY_10GBIT_FEC_FEATURES ((unsigned long *)&phy_10gbit_fec_features)
+-#define PHY_10GBIT_FULL_FEATURES ((unsigned long *)&phy_10gbit_full_features)
+ #define PHY_EEE_CAP1_FEATURES ((unsigned long *)&phy_eee_cap1_features)
+ #define PHY_EEE_CAP2_FEATURES ((unsigned long *)&phy_eee_cap2_features)
  
-+static int ice_probe_recovery_mode(struct ice_pf *pf)
-+{
-+	struct device *dev = ice_pf_to_dev(pf);
-+	int err;
-+
-+	dev_err(dev, "Firmware recovery mode detected. Limiting functionality. Refer to the Intel(R) Ethernet Adapters and Devices User Guide for details on firmware recovery mode\n");
-+
-+	INIT_HLIST_HEAD(&pf->aq_wait_list);
-+	spin_lock_init(&pf->aq_wait_lock);
-+	init_waitqueue_head(&pf->aq_wait_queue);
-+
-+	timer_setup(&pf->serv_tmr, ice_service_timer, 0);
-+	pf->serv_tmr_period = HZ;
-+	INIT_WORK(&pf->serv_task, ice_service_task_recovery_mode);
-+	clear_bit(ICE_SERVICE_SCHED, pf->state);
-+	err = ice_create_all_ctrlq(&pf->hw);
-+	if (err)
-+		return err;
-+
-+	scoped_guard(devl, priv_to_devlink(pf)) {
-+		err = ice_init_devlink(pf);
-+		if (err)
-+			return err;
-+	}
-+
-+	ice_service_task_restart(pf);
-+
-+	return 0;
-+}
-+
- /**
-  * ice_probe - Device initialization routine
-  * @pdev: PCI device information struct
-@@ -5308,6 +5350,9 @@ ice_probe(struct pci_dev *pdev, const struct pci_device_id __always_unused *ent)
- 		hw->debug_mask = debug;
- #endif
- 
-+	if (ice_is_recovery_mode(hw))
-+		return ice_probe_recovery_mode(pf);
-+
- 	err = ice_init_hw(hw);
- 	if (err) {
- 		dev_err(dev, "ice_init_hw failed: %d\n", err);
-@@ -5425,6 +5470,14 @@ static void ice_remove(struct pci_dev *pdev)
- 		msleep(100);
- 	}
- 
-+	if (ice_is_recovery_mode(&pf->hw)) {
-+		ice_service_task_stop(pf);
-+		scoped_guard(devl, priv_to_devlink(pf)) {
-+			ice_deinit_devlink(pf);
-+		}
-+		return;
-+	}
-+
- 	if (test_bit(ICE_FLAG_SRIOV_ENA, pf->flags)) {
- 		set_bit(ICE_VF_RESETS_DISABLED, pf->state);
- 		ice_free_vfs(pf);
+ extern const int phy_basic_ports_array[3];
+-extern const int phy_fibre_port_array[1];
+-extern const int phy_all_ports_features_array[7];
+ extern const int phy_10_100_features_array[4];
+ extern const int phy_basic_t1_features_array[3];
+ extern const int phy_basic_t1s_p2mp_features_array[2];
 -- 
-2.47.1
+2.48.1
+
+
 
 
