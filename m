@@ -1,116 +1,110 @@
-Return-Path: <netdev+bounces-159030-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159031-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA0D0A142A5
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 20:57:22 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 985BCA142A7
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 20:57:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ECD72188CC76
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 19:57:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1A5DC3A5EFD
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 19:57:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D769D22FDF5;
-	Thu, 16 Jan 2025 19:57:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86530234CF2;
+	Thu, 16 Jan 2025 19:57:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b="pkylbECm"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aqj/PJ7J"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp1.cs.Stanford.EDU (smtp1.cs.stanford.edu [171.64.64.25])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4398118FC8F
-	for <netdev@vger.kernel.org>; Thu, 16 Jan 2025 19:57:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=171.64.64.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59D1A230D15;
+	Thu, 16 Jan 2025 19:57:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737057438; cv=none; b=GRut569R49yHLOiHchnWeTTFHvoNuu50tCnresW2MdGKyy0mJm+eh+1YujU7ilHl87vgYejpYV8UwvOVoIpLBa58gWIwTy6ZPy15v5y34+/z8Tivvk9bhph9CEZ1V0cTsc161KtCU85brLHNGMGG79QqSOcglNX2nuyIfS43rUA=
+	t=1737057465; cv=none; b=s4Nb8/xaCZo90UzYs9+mkF94acJtImQACn1bBBGdFYgtF+7BPAP24SJlqOln1dagbR34r53qLQHeiNzIlnnXJgFCKGayjOxrcWsN/q+j3sOmiE/oRt0+P41KgC4eeYM0Y+X2BhBOvI931PpkGuCwcgewxzMGAa+3ITK67vpyM+w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737057438; c=relaxed/simple;
-	bh=vgGPySTWHFH69cmgTbe5BlKqDOPi9B9W5htrrLa/Ktg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=u0sDjKAPuMPyqjpeOfmet+xRVErdBbIMuM2/BmLtj1vSNljEaWJmywNDJJq0CR33ID9EpiDUb/w/P/mHh8XrpyyFj2aAaTfx5YDQ6TkHRFMGokZExe+VvzUSsnQSHXfG/rWNeyWQ7p/xd0M8+MKwdXKTxLWNDE3AA8bDMJPO/00=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu; spf=pass smtp.mailfrom=cs.stanford.edu; dkim=pass (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b=pkylbECm; arc=none smtp.client-ip=171.64.64.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cs.stanford.edu
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=cs.stanford.edu; s=cs2308; h=Content-Transfer-Encoding:MIME-Version:
-	Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=eRKziJB1S2amRJerLCGXAMP9M+eTh8ejMrg81K2RUME=; t=1737057437; x=1737921437; 
-	b=pkylbECmafrr8Np66nadlAYd5tHnvbiSqyYt5/vgiA8ZDOkcmave1gObme4BoY+mK0j56bVlIBz
-	XN0lXmK3fi9OwB1nh1j+TN2L2XvrRwZOpxopr93rPqaj9qKZvGOTPnFMkM6j6KlP3SwXJr8RqjWoq
-	7lk62+iP+bCiroZaBXrkGD+RTybJiAOAWeqXG/NBpW8CMsSK1foxky/KSwqM7I3vFZtiQXIQG3bvv
-	ih1tLEVd7eTa3NGtiwG4C1AwfOC9KuRIyR2Qwg2oVP7jtIp/PlcJYJ8d8qQkN4bnpQG3gvJ4PBDqI
-	6V8tzWbG9MoNWaPFyEQaYtCW+mjeiVSXW29g==;
-Received: from 70-228-78-207.lightspeed.sntcca.sbcglobal.net ([70.228.78.207]:52807 helo=localhost.localdomain)
-	by smtp1.cs.Stanford.EDU with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ouster@cs.stanford.edu>)
-	id 1tYVzJ-0005uB-LP; Thu, 16 Jan 2025 11:57:10 -0800
-From: John Ousterhout <ouster@cs.stanford.edu>
-To: netdev@vger.kernel.org
-Cc: jhs@mojatatu.com,
-	xiyou.wangcong@gmail.com,
-	jiri@resnulli.us,
-	John Ousterhout <ouster@cs.stanford.edu>
-Subject: [PATCH netnext] net: tc: improve qdisc error messages
-Date: Thu, 16 Jan 2025 11:56:41 -0800
-Message-ID: <20250116195642.2794-1-ouster@cs.stanford.edu>
-X-Mailer: git-send-email 2.45.1
+	s=arc-20240116; t=1737057465; c=relaxed/simple;
+	bh=BpGbL4CFfsflMGaBvp4j9m1dN/ZGd8uGCM2kddow5H8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=DAjW1IV3NYXZd8ICt+P0Cxz2GhyOXwTNA8A4RBJom5FGrTFvAflbLHpQW6UmElDdACZ2rgeTfFZu3BaAMgxpuRBMwAAiAPB6fATXRPPEWYkAvaKlIx1mwPhFxIRcdyLdIOZ9F2sjFWue6rf369CvEWUITkuGuZNloNCDrkxihEE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aqj/PJ7J; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D391AC4CEE4;
+	Thu, 16 Jan 2025 19:57:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1737057464;
+	bh=BpGbL4CFfsflMGaBvp4j9m1dN/ZGd8uGCM2kddow5H8=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=aqj/PJ7JlbWZi20JPqqhgl4FtKBowEHKrr5py0QJZaT/h7NwbJLKWtfZF5HVJ+f01
+	 eaumhpfu06/SjCfeP4TGZg7LFj0jw5dpOxHBHmnfIZjWAOLq6Gictv0ymZ294BVo+6
+	 wZxDS8gqUVXCZFkkiyPfGqx6r+MImWIilKWs1HvUPklZ8YaFqKl3Gk24rjgg7ys+D2
+	 TpIs5/FNVV7ktyFEOULoBvnjU5NoveD+FaNRhRgWJYYvPlaC2gBzCYDaoTGt87wI8+
+	 WcnzI/xvOoCtspwq+cwpNhM8PyQ0GWcAnShRPgNtAGka16GTj2unoDYSF7vH1jGFbW
+	 mkYRd0WRyzITQ==
+Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-30225b2586cso22797981fa.0;
+        Thu, 16 Jan 2025 11:57:44 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCW38vvo3stx7Ioar8nLc1MbPGeqpt4aVo7z81FL9fgFP08vGJZwHI2RLusrHINGIk0TCSXJ59IcwZ3x@vger.kernel.org, AJvYcCWPYRJIkDtAGvVQvLYm+QBuFt60rsNME98I3qxLSiZfbZ4aovU0d1DK9emLQyHxSSVAU8jr62T4xwtHo8D4@vger.kernel.org, AJvYcCXNxpFpLHNf2ls7C/lgIDPTX3PE4vVC8I3k7DvpeSRyeRz71MjCyz5HxkFBx4jtp8bUo33sDDdF@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywmz+/M38sM09yJGXf2TWArHNanO2ps6GD1pS7fQ/lV5dlSHYzC
+	z/uPQL1kFUiYMGu5lpcvNTBQ/0QdNnKvfZzVu3LpeN9Ra9YJ8pUHSQURhi8RMf2l23/wR4vFNiy
+	xlvAFmIuapKNAYTtQx6kEurO2Mg==
+X-Google-Smtp-Source: AGHT+IE8PDn7axUoinBnTIfZ0cfMVPVQgH/bj9hTJDusIxJXQXf3Z2wDnrh+6FvWe+I1CQJPWkBXl12skSmq8p7UwQ8=
+X-Received: by 2002:ac2:4e16:0:b0:540:2fe6:6a3c with SMTP id
+ 2adb3069b0e04-542abe955e7mr3496186e87.0.1737057463177; Thu, 16 Jan 2025
+ 11:57:43 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Score: -1.0
-X-Spam-Level: 
-X-Scan-Signature: d3e02c565cd5ac634b2ff74b6ba3e13d
+References: <20250114220147.757075-1-ninad@linux.ibm.com> <20250114220147.757075-4-ninad@linux.ibm.com>
+ <173689907575.1972841.5521973699547085746.robh@kernel.org> <35572405-2dd6-48c9-9113-991196c3f507@linux.ibm.com>
+In-Reply-To: <35572405-2dd6-48c9-9113-991196c3f507@linux.ibm.com>
+From: Rob Herring <robh@kernel.org>
+Date: Thu, 16 Jan 2025 13:57:23 -0600
+X-Gmail-Original-Message-ID: <CAL_JsqK1z4w62pGX0NgM7by+QRFcmBadw=CRVrvF2vv-zgAExg@mail.gmail.com>
+X-Gm-Features: AbW1kvaz7cz0JErISAQO978pEbpoqDGvU0yV8aV8M5Xy632yu2go8X9lmt54eW8
+Message-ID: <CAL_JsqK1z4w62pGX0NgM7by+QRFcmBadw=CRVrvF2vv-zgAExg@mail.gmail.com>
+Subject: Re: [PATCH v5 03/10] dt-bindings: gpio: ast2400-gpio: Add hogs parsing
+To: Ninad Palsule <ninad@linux.ibm.com>
+Cc: andrew+netdev@lunn.ch, pabeni@redhat.com, 
+	linux-arm-kernel@lists.infradead.org, edumazet@google.com, joel@jms.id.au, 
+	krzk+dt@kernel.org, linux-kernel@vger.kernel.org, andrew@codeconstruct.com.au, 
+	devicetree@vger.kernel.org, davem@davemloft.net, kuba@kernel.org, 
+	openipmi-developer@lists.sourceforge.net, netdev@vger.kernel.org, 
+	linux-aspeed@lists.ozlabs.org, conor+dt@kernel.org, eajames@linux.ibm.com, 
+	minyard@acm.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The existing error message ("Invalid qdisc name") is confusing
-because it suggests that there is no qdisc with the given name. In
-fact, the name does refer to a valid qdisc, but it doesn't match
-the kind of an existing qdisc being modified or replaced. The
-new error message provides more detail to eliminate confusion.
+On Thu, Jan 16, 2025 at 9:04=E2=80=AFAM Ninad Palsule <ninad@linux.ibm.com>=
+ wrote:
+>
+> Hi Rob,
+>
+> On 1/14/25 17:57, Rob Herring (Arm) wrote:
+> > On Tue, 14 Jan 2025 16:01:37 -0600, Ninad Palsule wrote:
+> >> Allow parsing GPIO controller children nodes with GPIO hogs.
+> >>
+> >> Signed-off-by: Ninad Palsule <ninad@linux.ibm.com>
+> >> ---
+> >>   .../devicetree/bindings/gpio/aspeed,ast2400-gpio.yaml       | 6 ++++=
+++
+> >>   1 file changed, 6 insertions(+)
+> >>
+> > My bot found errors running 'make dt_binding_check' on your patch:
+> >
+> > yamllint warnings/errors:
+> >
+> > dtschema/dtc warnings/errors:
+> >
+> >
+> > doc reference errors (make refcheckdocs):
+>
+> I am not seeing any error even after upgrading dtschema. Also this mail
+> also doesn't show any warning. Is this false negative?
 
-Signed-off-by: John Ousterhout <ouster@cs.stanford.edu>
----
- net/sched/sch_api.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+I believe this happens when a prior patch in the series has an error.
 
-diff --git a/net/sched/sch_api.c b/net/sched/sch_api.c
-index 300430b8c4d2..5d017c06a96f 100644
---- a/net/sched/sch_api.c
-+++ b/net/sched/sch_api.c
-@@ -1560,7 +1560,7 @@ static int tc_get_qdisc(struct sk_buff *skb, struct nlmsghdr *n,
- 	}
-
- 	if (tca[TCA_KIND] && nla_strcmp(tca[TCA_KIND], q->ops->id)) {
--		NL_SET_ERR_MSG(extack, "Invalid qdisc name");
-+		NL_SET_ERR_MSG(extack, "Invalid qdisc name: must match existing qdisc");
- 		return -EINVAL;
- 	}
-
-@@ -1670,7 +1670,7 @@ static int tc_modify_qdisc(struct sk_buff *skb, struct nlmsghdr *n,
- 				}
- 				if (tca[TCA_KIND] &&
- 				    nla_strcmp(tca[TCA_KIND], q->ops->id)) {
--					NL_SET_ERR_MSG(extack, "Invalid qdisc name");
-+					NL_SET_ERR_MSG(extack, "Invalid qdisc name: must match existing qdisc");
- 					return -EINVAL;
- 				}
- 				if (q->flags & TCQ_F_INGRESS) {
-@@ -1746,7 +1746,7 @@ static int tc_modify_qdisc(struct sk_buff *skb, struct nlmsghdr *n,
- 		return -EEXIST;
- 	}
- 	if (tca[TCA_KIND] && nla_strcmp(tca[TCA_KIND], q->ops->id)) {
--		NL_SET_ERR_MSG(extack, "Invalid qdisc name");
-+		NL_SET_ERR_MSG(extack, "Invalid qdisc name: must match existing qdisc");
- 		return -EINVAL;
- 	}
- 	err = qdisc_change(q, tca, extack);
---
-2.34.1
-
+Rob
 
