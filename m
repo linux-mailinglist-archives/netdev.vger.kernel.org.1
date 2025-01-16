@@ -1,155 +1,158 @@
-Return-Path: <netdev+bounces-158720-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158721-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7EFC5A130FF
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 03:01:16 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D7723A1310A
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 03:05:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0E60F3A1153
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 02:01:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 04742164F4A
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 02:05:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4962E555;
-	Thu, 16 Jan 2025 02:01:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WSR2ajiN"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6355C3A8CB;
+	Thu, 16 Jan 2025 02:05:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B02124A7C2;
-	Thu, 16 Jan 2025 02:01:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from mail.nfschina.com (unknown [42.101.60.213])
+	by smtp.subspace.kernel.org (Postfix) with SMTP id 29DB78836;
+	Thu, 16 Jan 2025 02:05:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=42.101.60.213
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736992871; cv=none; b=VcuLk07Z6upSMenwKJJRYzVT/yARr2ef1KBesuPC4bvzFKvSP9LstMxpyDQC3ZMfU9TOTKbkykloUop/8w5ZGlVnOZkIpiKxKGiv3cGsRiVbpswfMbVBfJaPz6/WIYCk18ClM4ZLhOq7LnUijdF8SLIC47k6rUkleg6O7f7SHOU=
+	t=1736993108; cv=none; b=sOzEENN3gNnrFAuHnTTPEsnzBYZpYxQ2lUEM5N7lcTUIZuzm0Wm2DArkIIV5l1IVAMUOciSa1Vx4+Evl694QYWfOmo+/Yzx/oYjnkyki/wrbOf1J4XVOb2zoovJL8JX47EtxWGLj0aB+4wm5tJo1FEYWZb7nRElU7XDYoumHbdM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736992871; c=relaxed/simple;
-	bh=k7vDAaC+/z+iEoB2pRYl1CqHTDynOmhU4+hG5waP8C8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LHzVDXxhMSWxiQAYRv1RrI+z2t4v47hdE2tOFltf2hm5uUOmMRiY2Gc63uhFOSw0gQHfiVL9Au3Au31ma5bSuwed+Vc33wCorqDAM5QBDCpSi+6EwgmXfzOuIfz1oHAr2e9FDt8+FJ6UmKzNqTPayeS/AG+AbA8nf/VBrwuP7r4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WSR2ajiN; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B81A8C4CED1;
-	Thu, 16 Jan 2025 02:01:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736992871;
-	bh=k7vDAaC+/z+iEoB2pRYl1CqHTDynOmhU4+hG5waP8C8=;
-	h=From:To:Cc:Subject:Date:From;
-	b=WSR2ajiNegiTn7xwwHR3BjuT2xOq5H6nRmelElMOhyCyQcl0X7r9aXqbeCNLcmwad
-	 SCXdQUgPK/EMwQQuoRpiZcrecel5+95cAR3hFq3/Q70q1KwGYXHQWapKLQ8nU/8G5H
-	 dheQBAZeoa3xjaX3nd+xT2vdD47R+7T3HlgR2c38EiExWZrSKF7BjtxDZDZnYyoIVJ
-	 nKZL4lMTAv71Z8F07yp6HsQFjW6iSzjMWBo0kaNYSE0SdF0s/kbS9rukxZmnbdEZMA
-	 LPy4HmygT70EQ4jLgT+ce8fcDrPmKkEDDXOWwLSWY0IiSaGaj11NL6ULfIFmHQP+dO
-	 9xyfHw2QBz8Fw==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	shuah@kernel.org,
-	linux-kselftest@vger.kernel.org,
-	willemdebruijn.kernel@gmail.com
-Subject: [PATCH net-next] selftests: net: give up on the cmsg_time accuracy on slow machines
-Date: Wed, 15 Jan 2025 18:01:05 -0800
-Message-ID: <20250116020105.931338-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.48.0
+	s=arc-20240116; t=1736993108; c=relaxed/simple;
+	bh=K41LxaeY5b1PJhdqsphAZteLpi5PMaWTF/rGxvUmgEQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:From:In-Reply-To:
+	 Content-Type; b=LL0kLTm9YmB+aH3RS/8hZ7eCbGAOypsiwhU7LKGm1kPCVoS7N2Go/pj/HtLDFRMl+ZBcaMUbl+tbW7E3vfcanihnuL60P5UfihDbF5MnWbKc7+kd8c0jyFEp8AAk3kesLvuIFGDp41dHmfL3ZBLNIK00hGlU3Q+ZhM7gHD6K63o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nfschina.com; spf=pass smtp.mailfrom=nfschina.com; arc=none smtp.client-ip=42.101.60.213
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nfschina.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nfschina.com
+Received: from [172.30.20.101] (unknown [180.167.10.98])
+	by mail.nfschina.com (MailData Gateway V2.8.8) with ESMTPSA id B711660108120;
+	Thu, 16 Jan 2025 10:04:47 +0800 (CST)
+Message-ID: <6f79c23a-7acb-5faf-5e8d-104ca37dbb08@nfschina.com>
+Date: Thu, 16 Jan 2025 10:04:47 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.13.1
+Subject: Re: [PATCH net] net/rose: prevent integer overflows in
+ rose_setsockopt()
+Content-Language: en-US
+To: David Laight <david.laight.linux@gmail.com>,
+ Nikita Zhandarovich <n.zhandarovich@fintech.ru>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ linux-hams@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, lvc-project@linuxtesting.org,
+ stable@vger.kernel.org, kernel-janitors@vger.kernel.org
+X-MD-Sfrom: suhui@nfschina.com
+X-MD-SrcIP: 180.167.10.98
+From: Su Hui <suhui@nfschina.com>
+In-Reply-To: <20250115232952.1d4ef002@pumpkin>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Commit b9d5f5711dd8 ("selftests: net: increase the delay for relative
-cmsg_time.sh test") widened the accepted value range 8x but we still
-see flakes (at a rate of around 7%).
+On 2025/1/16 07:29, David Laight wrote:
+> On Wed, 15 Jan 2025 08:42:20 -0800
+> Nikita Zhandarovich <n.zhandarovich@fintech.ru> wrote:
+>
+>> In case of possible unpredictably large arguments passed to
+>> rose_setsockopt() and multiplied by extra values on top of that,
+>> integer overflows may occur.
+>>
+>> Do the safest minimum and fix these issues by checking the
+>> contents of 'opt' and returning -EINVAL if they are too large. Also,
+>> switch to unsigned int and remove useless check for negative 'opt'
+>> in ROSE_IDLE case.
+>>
+>> Found by Linux Verification Center (linuxtesting.org) with static
+>> analysis tool SVACE.
+>>
+>> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+>> Cc: stable@vger.kernel.org
+>> Signed-off-by: Nikita Zhandarovich <n.zhandarovich@fintech.ru>
+>> ---
+>>   net/rose/af_rose.c | 16 ++++++++--------
+>>   1 file changed, 8 insertions(+), 8 deletions(-)
+>>
+>> diff --git a/net/rose/af_rose.c b/net/rose/af_rose.c
+>> index 59050caab65c..72c65d938a15 100644
+>> --- a/net/rose/af_rose.c
+>> +++ b/net/rose/af_rose.c
+>> @@ -397,15 +397,15 @@ static int rose_setsockopt(struct socket *sock, int level, int optname,
+>>   {
+>>   	struct sock *sk = sock->sk;
+>>   	struct rose_sock *rose = rose_sk(sk);
+>> -	int opt;
+>> +	unsigned int opt;
+>>   
+>>   	if (level != SOL_ROSE)
+>>   		return -ENOPROTOOPT;
+>>   
+>> -	if (optlen < sizeof(int))
+>> +	if (optlen < sizeof(unsigned int))
+>>   		return -EINVAL;
+>>   
+>> -	if (copy_from_sockptr(&opt, optval, sizeof(int)))
+>> +	if (copy_from_sockptr(&opt, optval, sizeof(unsigned int)))
+> Shouldn't all those be 'sizeof (opt)' ?
+>
+> 	David
+>
+>>   		return -EFAULT;
+>>   
+>>   	switch (optname) {
+>> @@ -414,31 +414,31 @@ static int rose_setsockopt(struct socket *sock, int level, int optname,
+>>   		return 0;
+>>   
+>>   	case ROSE_T1:
+>> -		if (opt < 1)
+>> +		if (opt < 1 || opt > UINT_MAX / HZ)
 
-Return XFAIL for the most timing sensitive test on slow machines.
+'rose->t1' is unsigned long, how about 'opt > ULONG_MAX / HZ' ?
 
-Before:
+BTW, I think only in 32bit or 16bit machine when 'sizeof(int) == 
+sizeof(unsigned long)',
+this integer overflows may occur..
 
-  # ./cmsg_time.sh
-    Case UDPv4  - TXTIME rel returned '8074us - 7397us < 4000', expected 'OK'
-  FAIL - 1/36 cases failed
+Su Hui
 
-After:
-
-  # ./cmsg_time.sh
-    Case UDPv4  - TXTIME rel returned '1123us - 941us < 500', expected 'OK' (XFAIL)
-    Case UDPv6  - TXTIME rel returned '1227us - 776us < 500', expected 'OK' (XFAIL)
-  OK
-
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-CC: shuah@kernel.org
-CC: linux-kselftest@vger.kernel.org
-CC: willemdebruijn.kernel@gmail.com
----
- tools/testing/selftests/net/cmsg_time.sh | 35 +++++++++++++++++-------
- 1 file changed, 25 insertions(+), 10 deletions(-)
-
-diff --git a/tools/testing/selftests/net/cmsg_time.sh b/tools/testing/selftests/net/cmsg_time.sh
-index 1d7e756644bc..478af0aefa97 100755
---- a/tools/testing/selftests/net/cmsg_time.sh
-+++ b/tools/testing/selftests/net/cmsg_time.sh
-@@ -34,13 +34,28 @@ BAD=0
- TOTAL=0
- 
- check_result() {
-+    local ret=$1
-+    local got=$2
-+    local exp=$3
-+    local case=$4
-+    local xfail=$5
-+    local xf=
-+    local inc=
-+
-+    if [ "$xfail" == "xfail" ]; then
-+	xf="(XFAIL)"
-+	inc=0
-+    else
-+	inc=1
-+    fi
-+
-     ((TOTAL++))
--    if [ $1 -ne 0 ]; then
--	echo "  Case $4 returned $1, expected 0"
--	((BAD++))
-+    if [ $ret -ne 0 ]; then
-+	echo "  Case $case returned $ret, expected 0 $xf"
-+	((BAD+=inc))
-     elif [ "$2" != "$3" ]; then
--	echo "  Case $4 returned '$2', expected '$3'"
--	((BAD++))
-+	echo "  Case $case returned '$got', expected '$exp' $xf"
-+	((BAD+=inc))
-     fi
- }
- 
-@@ -66,14 +81,14 @@ for i in "-4 $TGT4" "-6 $TGT6"; do
- 		 awk '/SND/ { if ($3 > 1000) print "OK"; }')
- 	check_result $? "$ts" "OK" "$prot - TXTIME abs"
- 
--	[ "$KSFT_MACHINE_SLOW" = yes ] && delay=8000 || delay=1000
-+	[ "$KSFT_MACHINE_SLOW" = yes ] && xfail=xfail
- 
--	ts=$(ip netns exec $NS ./cmsg_sender -p $p $i 1234 -t -d $delay |
-+	ts=$(ip netns exec $NS ./cmsg_sender -p $p $i 1234 -t -d 1000 |
- 		 awk '/SND/ {snd=$3}
- 		      /SCHED/ {sch=$3}
--		      END { if (snd - sch > '$((delay/2))') print "OK";
--			    else print snd, "-", sch, "<", '$((delay/2))'; }')
--	check_result $? "$ts" "OK" "$prot - TXTIME rel"
-+		      END { if (snd - sch > 500) print "OK";
-+			    else print snd, "-", sch, "<", 500; }')
-+	check_result $? "$ts" "OK" "$prot - TXTIME rel" $xfail
-     done
- done
- 
--- 
-2.48.0
-
+>>   			return -EINVAL;
+>>   		rose->t1 = opt * HZ;
+>>   		return 0;
+>>   
+>>   	case ROSE_T2:
+>> -		if (opt < 1)
+>> +		if (opt < 1 || opt > UINT_MAX / HZ)
+>>   			return -EINVAL;
+>>   		rose->t2 = opt * HZ;
+>>   		return 0;
+>>   
+>>   	case ROSE_T3:
+>> -		if (opt < 1)
+>> +		if (opt < 1 || opt > UINT_MAX / HZ)
+>>   			return -EINVAL;
+>>   		rose->t3 = opt * HZ;
+>>   		return 0;
+>>   
+>>   	case ROSE_HOLDBACK:
+>> -		if (opt < 1)
+>> +		if (opt < 1 || opt > UINT_MAX / HZ)
+>>   			return -EINVAL;
+>>   		rose->hb = opt * HZ;
+>>   		return 0;
+>>   
+>>   	case ROSE_IDLE:
+>> -		if (opt < 0)
+>> +		if (opt > UINT_MAX / (60 * HZ))
+>>   			return -EINVAL;
+>>   		rose->idle = opt * 60 * HZ;
+>>   		return 0;
+>>
 
