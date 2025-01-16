@@ -1,176 +1,134 @@
-Return-Path: <netdev+bounces-158710-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158714-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A7FCA130B5
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 02:23:18 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 40CE3A130CB
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 02:31:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AA4FA7A171A
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 01:23:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 88EED1886C40
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 01:31:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CE401804A;
-	Thu, 16 Jan 2025 01:23:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i6o5kyq1"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93A1C22612;
+	Thu, 16 Jan 2025 01:31:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f179.google.com (mail-il1-f179.google.com [209.85.166.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B36BD6136;
-	Thu, 16 Jan 2025 01:23:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7979A1CAA4;
+	Thu, 16 Jan 2025 01:31:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736990592; cv=none; b=NcGUtCPdeZ6B70hRf37gLNGtptLxcIDNMY9mjHYnNXSScb5b/j5iPvo5iOWT4CuqjSd8ntE1twBnHravWD5G2XGa2QeTLqJsakpMwpP0PvrqlRUJGPsjg3/JcQ2DDLksMAC7Df1a9p5cMjE/nsiCy9RZHVs6GrREwq9eY9a5mx8=
+	t=1736991067; cv=none; b=fLcP7je0CAwANpO0e0KCs2GxhFhxFafdWyqm1hobRxwlrifh+bciVjF8aawgVvb+DnbMb9SnAqHr3+nwfnPqai6uvP9AsimIdmyMPQSr2dDSvBCxMrcX37HyrF1k2T4lQOxSxQFVRW+CyvYuDqRHul6A1Gw3L0ivmcpg9/cUyLo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736990592; c=relaxed/simple;
-	bh=RBcaA5Qs3Sl79hmCs+h8iDGCvOrlk79gpNojaTiLrrE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=QzfflFc1eVhz1O/fRxAItwyAVdOXmSz78WTlGlUbB0K+tVs73ZazskeAqbA180gJNFhSb8JSNamF0jPJxrbK/JNrwtSrM7kFSvmejifIWirXH3hdfTLsLPci/hSL6ItvcqF4BUfx93fxy152BkE0QwfbCiHGD7G6PTleWAErdkg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=i6o5kyq1; arc=none smtp.client-ip=209.85.166.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f179.google.com with SMTP id e9e14a558f8ab-3ce7a77e5a1so1396905ab.0;
-        Wed, 15 Jan 2025 17:23:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736990590; x=1737595390; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=uvYa6gBShMYLfc1ehjv5ezyY0fRHP8xKJ616OqcJkdg=;
-        b=i6o5kyq1oCDKdgxvDzTY9J/yxq4OfvXNIIuMw9iA4jBjXsxTvhBqVL0TwWJj0PiMnK
-         T5aHTWhshj9eP3hJy91px575XxvACtkL7X0NzZ5b0B2k8i5P0RfdrEeTCm/y0S+QYETR
-         YKcu9dkKPwCt4gWeUzLxRoljnb+lv6pZ3uGDOfkGiDdxbR2BShrKa3kvN9lGUUoaiju7
-         UajOa7nsAXY+CIaEPzP0V1NrDSmej1+WHkYlWIbK822eHZIJ8yewD+s+rvaPwRARAAan
-         Sn3RZjAm+N/pErJq5q6hwcuzwxoLe7MWKtRkWmUnEGYFhyXtZco5APPYGGSuMgjZOjm2
-         yCCQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736990590; x=1737595390;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=uvYa6gBShMYLfc1ehjv5ezyY0fRHP8xKJ616OqcJkdg=;
-        b=FXJr6JLanXiJvfl0+8rdX1bKxPSycEHFN1bMh4NfD9W0yH2BDm8uH6BSzEaab8knqZ
-         QrQ0sPoYhVP+I9DeCazOf8tg4wUiCY8TXQfXmek5iqACILHN75iAAJfeUrFbbs2U/kz6
-         srRkb5LE7H/yLb4VF4q2pItTYpIkulvUbG82NgWVYOxnELssbsIFtKgKEO9GrwOvtnsH
-         sBro/wxsH0o2lTx304znKPVl+W6VV+MRO/tt0l6ZTnfRXVTWEMhv0n6mrxARyqjj6m0T
-         K1AYIk7ORpvtX8DcdaehcpbwirE/EoAZydpXfXUQePHrAYeN++HCPS0IJngJlNNRM02R
-         DXcg==
-X-Forwarded-Encrypted: i=1; AJvYcCVfdBTRaGdJ7wwfQI9hkiTOGT6lus96l+8p/24aU2kjnYlTPKVnoMMCbjz24mXRzbpGVMn1NA7g@vger.kernel.org, AJvYcCXyHez+RJJOgLMKus6dIwx0YTLL0XFm4H1s0CFh5tJlSssMo3uT69Satz9XsRKsC6MdxeI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwNhnqCOWHXSKAs893JiS4LrqYkA21F9GsjZjmu+DrgqfEQV9pU
-	VTYJVsidXuoZn2DZRt6nDjnVF/gFG69OgR+kSx0mzk8MjsmlMebqtfRDl6qaeARNcZVj6ry6ZEb
-	9ywLqZY76CD6g7sdFEWJPo5IW+e0=
-X-Gm-Gg: ASbGncsWvwEgq+koJ/k4Y+V6MLR5iM78X4vq0hBPUSkoo3WJ0oImq/8s3TrmU31F85B
-	DAKK2q9IrOWvmdFH6NkviwYNCr1/4+R7JMGj/
-X-Google-Smtp-Source: AGHT+IGSFwXspnnJ+/rQwX1+9nIbZKKjx0HH32EmB1nGas3RFsKQVO1fZDkbvMkquAb8ofmuGkP9nZ6l27awyd8v0Fg=
-X-Received: by 2002:a05:6e02:1808:b0:3ce:665b:cdf7 with SMTP id
- e9e14a558f8ab-3ce665bd10amr128208305ab.14.1736990589714; Wed, 15 Jan 2025
- 17:23:09 -0800 (PST)
+	s=arc-20240116; t=1736991067; c=relaxed/simple;
+	bh=6XU7rPogTnSvDcaHhfcMJ+LgOBWIDGmRAUrSDGLwc28=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=mWCzPKrP1cb692k1miF9UjcsnEBlqW74MqyAAj1c/+3cqE6KJJeQsoFrV4lQtlrCjd1vA94e34rZA+t/17OGbHBtUZ37Q+qmAzvrfL38PnYNiloTwWgYX5Z5EzJ3d+5z8JQZg3MI/ZBgleqlwsRPjO9QLIRCJFsj9sjbLspY9C8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
+X-UUID: 86c0708ed3a911efa216b1d71e6e1362-20250116
+X-CTIC-Tags:
+	HR_CC_COUNT, HR_CC_DOMAIN_COUNT, HR_CC_NAME, HR_CC_NO_NAME, HR_CTE_8B
+	HR_CTT_MISS, HR_DATE_H, HR_DATE_WKD, HR_DATE_ZONE, HR_FROM_NAME
+	HR_SJ_DIGIT_LEN, HR_SJ_LANG, HR_SJ_LEN, HR_SJ_LETTER, HR_SJ_NOR_SYM
+	HR_SJ_PHRASE, HR_SJ_PHRASE_LEN, HR_SJ_WS, HR_TO_COUNT, HR_TO_DOMAIN_COUNT
+	HR_TO_NO_NAME, IP_TRUSTED, SRC_TRUSTED, DN_TRUSTED, SA_EXISTED
+	SN_EXISTED, SPF_NOPASS, DKIM_NOPASS, DMARC_NOPASS, CIE_BAD
+	CIE_GOOD_SPF, GTI_FG_BS, GTI_RG_INFO, GTI_C_BU, AMN_T1
+	AMN_GOOD, AMN_C_TI, AMN_C_BU, ABX_MISS_RDNS
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.45,REQID:c9985ef2-bbba-4b01-b3de-a76a8cec2d06,IP:10,
+	URL:0,TC:0,Content:0,EDM:-30,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,AC
+	TION:release,TS:-35
+X-CID-INFO: VERSION:1.1.45,REQID:c9985ef2-bbba-4b01-b3de-a76a8cec2d06,IP:10,UR
+	L:0,TC:0,Content:0,EDM:-30,RT:0,SF:-15,FILE:0,BULK:0,RULE:EDM_GN8D19FE,ACT
+	ION:release,TS:-35
+X-CID-META: VersionHash:6493067,CLOUDID:e8f02b030673cbf608d91505b1c65131,BulkI
+	D:250116092008UL8F1QDU,BulkQuantity:2,Recheck:0,SF:17|19|24|38|44|66|78|10
+	2,TC:nil,Content:0|50,EDM:2,IP:-2,URL:0,File:nil,RT:nil,Bulk:40,QS:nil,BEC
+	:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
+X-CID-BVR: 0
+X-CID-BAS: 0,_,0,_
+X-CID-FACTOR: TF_CID_SPAM_FAS,TF_CID_SPAM_FSD,TF_CID_SPAM_FSI,TF_CID_SPAM_SNR
+X-UUID: 86c0708ed3a911efa216b1d71e6e1362-20250116
+X-User: liuye@kylinos.cn
+Received: from localhost.localdomain [(223.70.160.239)] by mailgw.kylinos.cn
+	(envelope-from <liuye@kylinos.cn>)
+	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
+	with ESMTP id 1419805636; Thu, 16 Jan 2025 09:30:53 +0800
+From: Liu Ye <liuye@kylinos.cn>
+To: horms@kernel.org,
+	kuba@kernel.org,
+	steffen.klassert@secunet.com,
+	herbert@gondor.apana.org.au,
+	davem@davemloft.net,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	shuah@kernel.org
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	Liu Ye <liuye@kylinos.cn>
+Subject: [PATCH net V3] selftests/net/ipsec: Fix Null pointer dereference in rtattr_pack()
+Date: Thu, 16 Jan 2025 09:30:37 +0800
+Message-Id: <20250116013037.29470-1-liuye@kylinos.cn>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250112113748.73504-1-kerneljasonxing@gmail.com>
- <20250112113748.73504-14-kerneljasonxing@gmail.com> <5d9ba064-3288-4926-b9dc-3119bb3404c1@linux.dev>
- <CAL+tcoCe-Ee92r5B7LwV8GCxEBWDzq3X_g_oOWWzo7-u4wYZzw@mail.gmail.com> <d9601490-26f6-4aaf-80f0-0c92464e0c42@linux.dev>
-In-Reply-To: <d9601490-26f6-4aaf-80f0-0c92464e0c42@linux.dev>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Thu, 16 Jan 2025 09:22:33 +0800
-X-Gm-Features: AbW1kvb2vs2P9WxqvK19o8s7BIB_j8jMMqUgpVTx_3AZLlwDETgHXyeMeAu3NoM
-Message-ID: <CAL+tcoBu=5Ub_5E3HNK6uub4MiHEOpRCgtWMRQX3heKObM9rHA@mail.gmail.com>
-Subject: Re: [PATCH net-next v5 13/15] net-timestamp: support tcp_sendmsg for
- bpf extension
-To: Martin KaFai Lau <martin.lau@linux.dev>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, dsahern@kernel.org, willemdebruijn.kernel@gmail.com, 
-	willemb@google.com, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, 
-	eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev, 
-	john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me, 
-	haoluo@google.com, jolsa@kernel.org, horms@kernel.org, bpf@vger.kernel.org, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Thu, Jan 16, 2025 at 9:18=E2=80=AFAM Martin KaFai Lau <martin.lau@linux.=
-dev> wrote:
->
-> On 1/15/25 4:41 PM, Jason Xing wrote:
-> >>> diff --git a/include/uapi/linux/bpf.h b/include/uapi/linux/bpf.h
-> >>> index a0aff1b4eb61..87420c0f2235 100644
-> >>> --- a/include/uapi/linux/bpf.h
-> >>> +++ b/include/uapi/linux/bpf.h
-> >>> @@ -7037,6 +7037,9 @@ enum {
-> >>>                                         * feature is on. It indicates=
- the
-> >>>                                         * recorded timestamp.
-> >>>                                         */
-> >>> +     BPF_SOCK_OPS_TS_TCP_SND_CB,     /* Called when every tcp_sendms=
-g
-> >>> +                                      * syscall is triggered
-> >>> +                                      */
-> >>
-> >> UDP will need this also?
-> >
-> > Yep.
->
-> Then the TCP naming will need to be adjusted.
+From: Liu Ye <liuye@kylinos.cn>
 
-Right, right!
+Address Null pointer dereference in rtattr_pack.
 
->
-> While on UDP, how the UDP bpf callback will look like during sendmsg?
->
-> >>> @@ -1067,10 +1068,15 @@ int tcp_sendmsg_locked(struct sock *sk, struc=
-t msghdr *msg, size_t size)
-> >>>        int flags, err, copied =3D 0;
-> >>>        int mss_now =3D 0, size_goal, copied_syn =3D 0;
-> >>>        int process_backlog =3D 0;
-> >>> +     u32 first_write_seq =3D 0;
-> >>>        int zc =3D 0;
-> >>>        long timeo;
-> >>>
-> >>>        flags =3D msg->msg_flags;
-> >>> +     if (SK_BPF_CB_FLAG_TEST(sk, SK_BPF_CB_TX_TIMESTAMPING)) {
-> >>> +             first_write_seq =3D tp->write_seq;
-> >>> +             bpf_skops_tx_timestamping(sk, NULL, BPF_SOCK_OPS_TS_TCP=
-_SND_CB);
-> >>
-> >> My preference is to skip this bpf callout for now and depends on a bpf=
- trace
-> >> program if it is really needed.
-> >
-> > I have no idea if the bpf program wants to record the timestamp here
-> > without the above three lines? Please enlighten me more. Thanks in
-> > advance.
-> >
-> > I guess there is one way which I don't know yet to monitor at the
-> > beginning of tcp_sendmsg_locked().
->
-> The tracing bpf program (fentry in particular here). Give the one-liner b=
-pftrace
-> script a try.
->
-> Take a look at trace_tcp_connect in test_sk_storage_tracing.c. It uses fe=
-ntry
-> and also bpf_sk_storage_get.
+Flagged by cppcheck as:
+    tools/testing/selftests/net/ipsec.c:230:25: warning: Possible null pointer
+    dereference: payload [nullPointer]
+    memcpy(RTA_DATA(attr), payload, size);
+                           ^
+    tools/testing/selftests/net/ipsec.c:1618:54: note: Calling function 'rtattr_pack',
+    4th argument 'NULL' value is 0
+    if (rtattr_pack(&req.nh, sizeof(req), XFRMA_IF_ID, NULL, 0)) {
+                                                       ^
+    tools/testing/selftests/net/ipsec.c:230:25: note: Null pointer dereference
+    memcpy(RTA_DATA(attr), payload, size);
+                           ^
+Fixes: 70bfdf62e93a ("selftests/net/ipsec: Add test for xfrm_spdattr_type_t")
+Signed-off-by: Liu Ye <liuye@kylinos.cn>
+---
+V3: Remove the redundant from.
+    Sign-off after fixes.
+V2: Modify description.
+    Add code checking tools.
+    Separating family and given name in Signed-off-by line.
+    Modify code format.
+    Add fixes.
+---
+---
+ tools/testing/selftests/net/ipsec.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-Thanks for the reference!
+diff --git a/tools/testing/selftests/net/ipsec.c b/tools/testing/selftests/net/ipsec.c
+index be4a30a0d02a..9b44a091802c 100644
+--- a/tools/testing/selftests/net/ipsec.c
++++ b/tools/testing/selftests/net/ipsec.c
+@@ -227,7 +227,8 @@ static int rtattr_pack(struct nlmsghdr *nh, size_t req_sz,
+ 
+ 	attr->rta_len = RTA_LENGTH(size);
+ 	attr->rta_type = rta_type;
+-	memcpy(RTA_DATA(attr), payload, size);
++	if (payload)
++		memcpy(RTA_DATA(attr), payload, size);
+ 
+ 	return 0;
+ }
+-- 
+2.25.1
 
->
-> If tcp_sendmsg_locked is inline-d, it can go up to the tcp_sendmsg(). It =
-would
-> be nice to have a stable bpf callback if it is really useful but I suspec=
-t this
-> can be revisited later with the UDP support.
-
-Got it!
-
->
-> [ I will followup other replies later. ]
->
-
-Thank you!
 
