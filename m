@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-158847-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158849-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB94FA1383B
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 11:47:01 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 39276A1383D
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 11:47:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 506881680A4
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 10:46:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C22481888878
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 10:47:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3D1F1DDA00;
-	Thu, 16 Jan 2025 10:46:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71AD81DE2BA;
+	Thu, 16 Jan 2025 10:46:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="iDLZrTbo"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="jcFsgjAk"
 X-Original-To: netdev@vger.kernel.org
 Received: from EUR03-VI1-obe.outbound.protection.outlook.com (mail-vi1eur03on2048.outbound.protection.outlook.com [40.107.103.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A461C1DE2C0
-	for <netdev@vger.kernel.org>; Thu, 16 Jan 2025 10:46:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2804D1DDC28
+	for <netdev@vger.kernel.org>; Thu, 16 Jan 2025 10:46:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.103.48
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737024410; cv=fail; b=PH3Uvz/qmRoNJHkRHu5d1XGn8X/JZCVmcMs4uqrKfvNG2hUlyUY+HXyJ7t6wXoDTsb1PPhdJgz9ZBQpU1ynAzNAdqPPlCchnC512Xz5vf4f3zeV8X4fe50ON1J6DhKE/COgzRHFTlvOoFKBzCAAoNBPBktaML5SBRgXmUVl1pKk=
+	t=1737024415; cv=fail; b=knuMa6yvWr+xT9SsmZNhjyyZ9pN4fGqIh1hlZT9KhUtpwZOw4AHMDOpz9KV9hZ9kO6YxnY+J8CCKnBbIPNfCRTsF416xavEQoEeqfnuM+LTazyc8rDMhU+Lf1jOxEhtjm4SFWehxtKpR/XSNFY2UI/Bhk6inmCK3fQd/MYe6AME=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737024410; c=relaxed/simple;
-	bh=VyXE3Tl/IQsLvR/FQ0lQU9J40w7WfdlzxF3enZNGzps=;
+	s=arc-20240116; t=1737024415; c=relaxed/simple;
+	bh=qbaHkQRmofEg4awn9NyC6StmCVCFVB96Cs/AHFQfhMI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=nlr2RkQrNvkMNUijITZiQXFWlw2XihPIni8qTPfeQDgUTkCo3w8/hNEYkcKhPAh70f0TrZmgV7lNKCgyslynVLEHOOYXJiUFjvdn8pNNI/2UtLGYxrWTF8i52KBptqMbB0990BsviwXRQ4NJCUZiCp3UqsU+dHf9nkSpWU5Ffhw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=iDLZrTbo; arc=fail smtp.client-ip=40.107.103.48
+	 Content-Type:MIME-Version; b=TL+2eSElL+s/Ru+07AgYpYrEpgS6MAHMfxdolX0XkUHnh6MZeDjfs7hI4W686x4fq3C3RczVmRSr6FQOXDOZHcgSFx075JXjiTYZc3Lou2m6eGITJ0JIWEd89z97OtIbeEH/q4uY1rKZSGDsSmWPSeCEZSqg6IKue5LCYbggcsU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=jcFsgjAk; arc=fail smtp.client-ip=40.107.103.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=pgmeyfKQOkaV5v0JGBcWzsBXi/4Zu/xJYNvDu5euTlg37dpwKfCF5yq6aasLfUzmKyk37tKJ/7/mSvHZNf6RXcj3dsD6qfrmqRMDJwjufzOLYf7h7X/abebfIsnGsoTCQUZ6Sk8MUSfz8zxxBUlfINji0HDSrfHjj0dI2Y8KoX83zlVUcvCnAxmofk2q6eAdx3ucs9IvEyh75OAwWi4uom5xJWNV0U56QQAsBKNvIRlPCrciV/YYyNoNMLb5h3wZ1cgmRHThbpZQeaC9QvkscTVC1/K0QV8pXlLyrbwHn7eSPbXNFgDbVhBHgqbsBsxRQq/+v/PgHK4iIqzXJri11g==
+ b=YTOdnvDVwR6nfSc3+qIrSOCff7CkiKfJO9+SKLfdn1enruWU1PgwHAREGFAPhr6aUBJgmRN9YpYieslVX0H54KoxsPZN8x6KHso1RZ1ZN1Uzfo8nwXh4hjrxu3o4owynalT9z13VBzJ1nhmEyYg8enMCG/dGfu1HHueCj1LdmYI4eo+Bf0T1xOrelIcQ0v1sUk+BIJBOdM9iOc1ftzaFr3l+X0G0we+5BuzdJ11U/M1wHqHCWWfURTiA5ZcqSSabVN61BAqE5rgh8VMHJ+4Gk3n1AYd6Ke/BOVwdicBiz3Ii/toHUiD99ZYlhCpeY0f/gN0bxytd3PWAEoMlRCI++g==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=CSlhLIJNWCPrvXAQzL2o8wT7Tqiy2uMdyVLTS3B28kw=;
- b=j07G0Fc+RtdPpj+7srgOhivem0umwHdfm+RrreO3QBsxPGcYV1yP1zXx+fnZmhVJ4lhi3Fj+scB0VVW75cExMS4Miv/JysfURIg+kJOtCZeXHv/YSMtNUtXuyQb+dRvTisAb1BCV7U0pVlE9R9FYpR3oHii+vYBgplG1mAzqnDcKiuDp7CkRrf8J+aowma/RYomfUFp+GLUr70fgpeyZrTfc9JFo0vFxg/OaR6u6B3iRXfpFlPMLcQPcO8lCarl71Dl6ODy/4bTGTEZY+opuGx6Z+TLujszwTuZWo4HFuvQ/7YzCqt3V2CbPvZrQlD+Ar+QsB1OPwqh8Fk5WHhEXiw==
+ bh=w8VXBLzPSasIchTcZn6SpSIMzNcxSuD9y8MRI6fhNZk=;
+ b=CfSTJplgaFnxk0cdlHvp3iFk+VrrNJnqJg8nHkxEOHhuAHjuPPm/mtIrha5nJyO5T1d+uqzePeVrMIXMEcdJ2AxJpINkEm7lljfSzYKk66ox4EFCZV6dyi1O889xAWungKF4Cqcnmp6Dxe/1annkxPj+9bUtLvicZ+rjs84CmJfkZrKy4QtdMdCRod3Uu2vlMYsPys6hFE7DJU2oRPXdQl7u8pNVb6x5pMt3P34UsM2+kXNu6D5HzgPA8ZGlQ7hjNmVCul6tHwI1pMP3HMRKhK4M5SCaPlBOyiaiMhkHYfykQwbg9jefPyKnNqqNQ0iNZV9PjkdHO7KCghrhSjoCoQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
  header.d=nxp.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=CSlhLIJNWCPrvXAQzL2o8wT7Tqiy2uMdyVLTS3B28kw=;
- b=iDLZrTbodrV1qppJt+ZaAXN4g84DC2ODQWaOtPFYhHLiFSYbef2siJrfYUVKxujTOuP4usGmElzGZ/Malzu61hd08XBzUaMb5jQR4kMXjz/ztaOpAYsNmuHc+xj32JQoYlS2bc2JeCiOMFXxIXF8ozfQI7WK+jKhbwTK9IWk5VI/I5UTEgNK8Nt2doGC6o+NaL8i2rLYhkvgMbsScQ4XpJmX7Cm2rna3AeJ0ejXUxqZnG3zOCXarOKuzkMJEYPJFEPeqshRoI5zbL3yPh0K+FDrmj3FHPdaCa6325ewN16qfXLhZYYnpqY5c/LhCD6uHcDKT2Rz3AEq+PfvFRyPL6w==
+ bh=w8VXBLzPSasIchTcZn6SpSIMzNcxSuD9y8MRI6fhNZk=;
+ b=jcFsgjAko35CCmpyRRHYtK378nVInrM5rkq9IRsO4Fqq99XdMeS48miRg/LHNS3ccHN9AKmdLkODsBCZ6gbDDyDrpv9yJx5xyYjH3hrLZ63rVAVKnoNddm2b84bNIeMx4Y2Iem7KOkHI1LaR6GfPBR2NZZTy8Y0sp+W5WxKY5x2BEC2Atah2cY7yfP8A4MDi0QXq347rv2G0iGvrkMijZuP7c4Cp5BaHuN12rWqyQqb1qt1G23ScfG4S/8wTFT+X9DVMkw5liJOSDkDKsTTun/AQ2Cs36cNd//QgHxsD/Sc7jCeGWZBWvv8fNCXU6fkf1II9oZz436HcfhBfujxGRg==
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nxp.com;
 Received: from AM8PR04MB7779.eurprd04.prod.outlook.com (2603:10a6:20b:24b::14)
  by DB9PR04MB9675.eurprd04.prod.outlook.com (2603:10a6:10:307::7) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8356.14; Thu, 16 Jan
- 2025 10:46:43 +0000
+ 2025 10:46:46 +0000
 Received: from AM8PR04MB7779.eurprd04.prod.outlook.com
  ([fe80::7417:d17f:8d97:44d2]) by AM8PR04MB7779.eurprd04.prod.outlook.com
  ([fe80::7417:d17f:8d97:44d2%6]) with mapi id 15.20.8356.010; Thu, 16 Jan 2025
- 10:46:43 +0000
+ 10:46:46 +0000
 From: Vladimir Oltean <vladimir.oltean@nxp.com>
 To: netdev@vger.kernel.org
 Cc: "David S. Miller" <davem@davemloft.net>,
@@ -71,9 +71,9 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 	Xiaoliang Yang <xiaoliang.yang_1@nxp.com>,
 	Yangbo Lu <yangbo.lu@nxp.com>,
 	Richard Cochran <richardcochran@gmail.com>
-Subject: [PATCH v2 net-next 2/4] net: dsa: implement get_ts_stats ethtool operation for user ports
-Date: Thu, 16 Jan 2025 12:46:26 +0200
-Message-ID: <20250116104628.123555-3-vladimir.oltean@nxp.com>
+Subject: [PATCH v2 net-next 3/4] net: mscc: ocelot: add TX timestamping statistics
+Date: Thu, 16 Jan 2025 12:46:27 +0200
+Message-ID: <20250116104628.123555-4-vladimir.oltean@nxp.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250116104628.123555-1-vladimir.oltean@nxp.com>
 References: <20250116104628.123555-1-vladimir.oltean@nxp.com>
@@ -90,135 +90,341 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: AM8PR04MB7779:EE_|DB9PR04MB9675:EE_
-X-MS-Office365-Filtering-Correlation-Id: 782a339e-a6bf-4765-fcf1-08dd361b10ed
+X-MS-Office365-Filtering-Correlation-Id: 4f7f7bdd-ccd4-4fc7-f641-08dd361b11a7
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
 	BCL:0;ARA:13230040|366016|1800799024|7416014|52116014|376014|38350700014;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?ivxzciYcRLMQ3fWcHgYYoWK6dmRbNpInVXD4ssB1Ga8u0yI4z7sc89g7lV99?=
- =?us-ascii?Q?SC161WWBQGCQ8+nwAuWf4JGGb/i/O7cqZH66nqUB6YHsY1hTk2/ieaS4lcR5?=
- =?us-ascii?Q?i6YRlAPdQFZQPEbMdOz2S0vuIyJRJ3vD8v9sW0q6UZbJSSTVIVDHFcWcigpE?=
- =?us-ascii?Q?MPY7eGw5roHlZT/zpiyasQUFKHM0a+G5mN37H3K4CRY636v/LR8YJaCG7yBt?=
- =?us-ascii?Q?TaTXvtkFoDDgMtiC9tLu2OI7UjVZmHtNrySxbXL1GZbCP7Zi+lg1rXoUQZGH?=
- =?us-ascii?Q?onv06gITJO/CsOwMdXlWx+eIkKLYgPJz2R8rl9WYbTp4tlxZGqCGMoVfrrTO?=
- =?us-ascii?Q?ILvQTwxRX06p6tcl5ZZyHxHvB678VMmMPpClIZ5EMooxfFSX85QV1BQulhzW?=
- =?us-ascii?Q?kxeIDRSe0od+k2CwUtKUvE/Z6T4VC81j+khweUA5UYBSla6QVmNIl62EDpkJ?=
- =?us-ascii?Q?Xb6GdXk8dlixqOtVYBJkXSaMhUXVJQhBBfu6UM+jlenHGzidUNvmz0HaeTMT?=
- =?us-ascii?Q?DU/RHqUcDTIQHfTP73mXgWbxif1QV9q7J3J1UOUUZbeEHiHAB5KV+Elb0rON?=
- =?us-ascii?Q?fpYmby3kGVSGtCaTo0Ovp8IIHRDLzl6NxGuJEiSVXEXqn1zTgkwe69MVFUk6?=
- =?us-ascii?Q?Do7ZboGnh1OxHnifF5/cOvMOLA69AX0kAgumBZvM+vCzB58RrLZf47UPDhHP?=
- =?us-ascii?Q?JeebDE9UyvRd2t/GJgNuXxu5rjkRYIm1Yx5Z7gcQt+JQhTC4TCKzuG48H1q6?=
- =?us-ascii?Q?uK4qwfmobYIq2MAyY91th3VdvUHIYSSQUI56FnuE/eX2jTBSMZzKIcKk7uze?=
- =?us-ascii?Q?HDsoIcGFIUiskx56t80B5SflNUOdcKPRj6atFrezQ43ze5CB7j0crFUwBTSO?=
- =?us-ascii?Q?gEXNQmMOQK9coZ6pFyZTonOkRDQKiomq5+iBo38QTx3rvKZDAOonxdF1VmVV?=
- =?us-ascii?Q?+38iQ4y8OgKnWxGu/bXAq0QxaaDfg8uJsuz4JxNVgnzu5JPhLQyB0EyfMfho?=
- =?us-ascii?Q?uYnK6E6gquAgjgCKlDC3TVyQVUx7rh9ghUQvuagJA+X3MzriwBF05NO3X5no?=
- =?us-ascii?Q?6pM5GZrdUTiQLGdXeF6wDTO4pKx2mQOf67TE1tSEI15M+2M9drh4yEe/I96C?=
- =?us-ascii?Q?MtA6idHtXftWjUuWp8jaeFddkKDh9lHKvKXP+qEETd7nPeQDvRru32KOf2F1?=
- =?us-ascii?Q?TNXeyfyC2pcW7Qdnl2zUp0z9I8rRTE1lBq159pLpA78qilYuBESQbWeFNqUa?=
- =?us-ascii?Q?GK/SzfUXAW6nyexgci7DnntS5+lsgCFwNtbw8wVY2YKOOAwzrkL/WWQmq1sV?=
- =?us-ascii?Q?ZHjCewq9ioXSfKsVMz87nZDRc136QY8MCvidMyPBbcBYTZWKDyoh5PRSf1y6?=
- =?us-ascii?Q?NuoXo3z9usXiqinss9iqjX+7rNGG0FME2gV9Lz34oO0AbGILPl/rZxEG9mgz?=
- =?us-ascii?Q?LH0pEcNW1hh8JL8g0G81vwRJG0tFIBQ2?=
+	=?us-ascii?Q?a5ZI5S6zUibL3DjPr5Sj/aG5hjlQMSOhMht6ebqZe/BuGKA+21QOFI/5TdIx?=
+ =?us-ascii?Q?lrlK605OvXh3vJ4Sil1Kj46AMJvi1EesOIMSv3NJz15j7JGntpQJxiT/vUzL?=
+ =?us-ascii?Q?MfCJ+ZkcT3JLwwPZuAF5JgUmqHFtOMkmh+HR2UtvQKZ/dIursubH2tqxvEhC?=
+ =?us-ascii?Q?ehjOUlf8/197mWT+TfW+pBI986MbkGID78+TeOBpsy5o0Rvr6xihDVcbFr6Q?=
+ =?us-ascii?Q?jTKg8cYlgXLxfUYCl1cl1EnkGNsZ67+1vpSu1rydgXsFYYYF/zTjvZPocNBX?=
+ =?us-ascii?Q?WCDU07Q5YGoCy/qmNc+Nue1HSJCubwPQ0/j5pLdIMHc41ZRgArk4hLO1OX37?=
+ =?us-ascii?Q?l/zCs112fEvSWuLlrhuCcgnIi9ae3XUORlMlMFfo7Rym2nhRQBdoFXGUkeOP?=
+ =?us-ascii?Q?Zv6f76CGY4+puziOVQnZ/E5S6UjtC7Z5FpjfJyHivn0uxleSlLX87HxHFEU9?=
+ =?us-ascii?Q?M0AI72Q4uwL1iPpfsoOlr9HVyeD/I21Ri7gJgY0B0rfFEV3Edh7/tmq2qrA3?=
+ =?us-ascii?Q?J3p1VMP7sup0ece7KFglSkXD2RcUMbhdiReabNua1FyS1GCiggNJM0ZfRrSq?=
+ =?us-ascii?Q?kK6+c81ojBHGhG4bufV6NccROAMb89gUbMIiBSBoToX9/8BtvDPIItgdkUss?=
+ =?us-ascii?Q?3vvAEOzHxx+6tdCJGru8lJhF2DeK6jOUuPdtWflTmqe935iOqi6dP+xkjZji?=
+ =?us-ascii?Q?dQ9dVZobkysuQ9cwl7khE1Ucw87c2Mzm2JCYaMYWkMn+xZAXGV4FJ0B78vwe?=
+ =?us-ascii?Q?jfq8qas4dsVgBm/3/Tfrhc8YFYUXHx2KJxlj7PAU5HxJ0ehXpb8z/a4DnRTh?=
+ =?us-ascii?Q?CxruRm4ZgayZ6F/CtrK72cVnAPL/edZqT1/iD9zxgV5ttJgRFoK2pP8CmxWW?=
+ =?us-ascii?Q?uqcUN7TL/o+b+wA0yDJGqaGJoaxIk2We9BiaJ5/hPJEBTzUqkPUOoeSnim8B?=
+ =?us-ascii?Q?V+QITmKVNE/POhQyAMIW9lhYpxz7yjHGkfiwJ4xxZAlA6L3DvJgMyXYOlj2N?=
+ =?us-ascii?Q?NY0PDjGgqwHhejzkqW83ng6GBMho8y598kUjLX+DAnVIi87hFic6X+FvIWO+?=
+ =?us-ascii?Q?WTrMEpP3Jv9PqpxNjWUxYfFwjCwR3T2yAuWGFpRIX5mawdzLt+p/5wR6JbcC?=
+ =?us-ascii?Q?ms3SrvNoQTs2FFPGGDyd4hZGaxzTWDaPdMvGTK33xG3OQNeESOEKoBhcbKuW?=
+ =?us-ascii?Q?BScOZBdMXYk35I4EeLXTi6NEgVgVI75paCJfUxmLg6glBLK1z5UFHZlvyeMS?=
+ =?us-ascii?Q?mKGPYph9SiAGTIe9ycqEIq9+hhFPnsCAbhlUDrVbZxZ9DxQuNqVNWV7JpWoU?=
+ =?us-ascii?Q?bASRRCmca2pzFLmHXZBH7FJN96LlUxOO4l0A+WakgDwyevo9WvhWOxxeAFSj?=
+ =?us-ascii?Q?nODldKFYORunIUaMqLsDGATL5RuFcf5/s7CJgbuTyZ9u74S8GWk4pEke9i+m?=
+ =?us-ascii?Q?hXQgMTSczUZCyBfZU/Z+q2aNuMWH856E?=
 X-Forefront-Antispam-Report:
 	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM8PR04MB7779.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(52116014)(376014)(38350700014);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?r8nXtGfsEneM/xG7c6gUWm8TVEREWGStluq4J0EGiIjUCnpOLU973QiEmnTq?=
- =?us-ascii?Q?BVpcxwRi6fcTmbUyz5Ves8GCvjlO3KfIb7HV4oUoNpGjf8aw+9HCeWXo6XBh?=
- =?us-ascii?Q?F0EymTzTI9xPwxd2eJKyMw87vpUE8FV8IrfR/XhDHxzFk8KIH18MCTS8BfmY?=
- =?us-ascii?Q?SgM9JZcNWmnCLFQjOmk5Dw+dI8oqBB+iInofeNNcqpQS6k8BP8ITQGsoHoDN?=
- =?us-ascii?Q?JWckvxwVFPHw1GL/yWTzXUXTqMdxl7rNcQAr595rCrnciaMmAgMAntKfgIev?=
- =?us-ascii?Q?GCfsx9XJNhAHzJmtUkK3iPd72jjGhLyKixFCz35hRVLKxZR7qyx+r+JWc2BF?=
- =?us-ascii?Q?wT2u7Xc9eKQR7GfueSm3RIc9vgMOntT3ahgw71dnw1VdC1Ov8NUYyJNupbZR?=
- =?us-ascii?Q?7GUOAPpDcZp3M11Q5XVYverVkgxdUbJaLVM7jgU00+0hcn2Zy78MEwV6kqTh?=
- =?us-ascii?Q?rHdeay9iJ91XCW7YAFC9qa/GjUceHqEHWW2hQCEtDOPcc4NqlDfLLVotdgFu?=
- =?us-ascii?Q?SdxFnRke2Br2jVAaLY0c2kZK+EnwCrl4+x7uUy6tERzklFRHcDzG1DnetU9f?=
- =?us-ascii?Q?LHXy3004rCE2L/yu+3kB3gHSgnnK7WbPfaoZhlJLuCf6muxNDisWkZLVQ5Hu?=
- =?us-ascii?Q?h8ZhYNt5FjjY5AbTtkbohcDMZWHJ29XLBmuMoIeBEBLlwHI2oXC/qp4N7+pK?=
- =?us-ascii?Q?+Mina1G18wsPNoYwEOIkHEfbbzQ7uqo2mrwmFtJWPllL8zHTN81ef5gEUG89?=
- =?us-ascii?Q?sQjTNDt+M0EDc2kr+iuPKK1M9+9k8lm+p/nHqwSXkBhMw2q+YmEUomN7ymZd?=
- =?us-ascii?Q?Q9oibX05scNxOdeRhEyKLOvNtfSbiYWEKjwPdU6PJlTXqqeyeNm0w0qorwYN?=
- =?us-ascii?Q?bATG7c2Hu8tiMDxcWCXvgTmsWBKpcP4AW73SEJYAUNnT2/svaWau2COfbzpA?=
- =?us-ascii?Q?MQcI2kGBqOy0h+9kfda5qL/Lsgp+1tFKuY4O76aBuG4dLz3KBw0qS+xE+lX7?=
- =?us-ascii?Q?RVyvBMDOWam3U+Dz1dcPGCzHr5WCqXr9QiJVZJLtunxkkly27wYDqY2h6j/W?=
- =?us-ascii?Q?XLrf6RiTKtxKK+wscZ0Za3xsg01unyYKKCTnAhk0Bb5Ig81zHH7AthmSAFmL?=
- =?us-ascii?Q?wUwUrcQUP4TOycUGgX1hmpD4D1e090fYzqJogDsfUlZ4t8kqTCUXmSYuHOC5?=
- =?us-ascii?Q?/5RarI5PQgttSWYtdM6GEKlZGEItmfCBLILUqO+x6ER2Np21FjiDdfRSCuei?=
- =?us-ascii?Q?YMFb6RI+F1i2eT7m1bbjG2suPmlyZ1qHjznGjObqf5RTdHC9I14CKOrZHaBm?=
- =?us-ascii?Q?/mi6Sl9PST1vgPVW5A1ovlbKHlQf8//8jISz6z+btciXS8rL7tdG2s26pxfN?=
- =?us-ascii?Q?ZT7WK1QyEjT1pKn0p16M2b9HgXF6N013UmA/2vVtqCvtSRCyDL3JhhWt/v7i?=
- =?us-ascii?Q?3K7ybLsQjyswvrySFK0MCgOP+hB+NwmV7ur8Y8P4VqA7zDjWVwzjbViFnKye?=
- =?us-ascii?Q?H//QBsnqrlpF0CAjymObVbeP6WPdPLbPpVu406lPa+7TjsNRpFNQHcBlkDUN?=
- =?us-ascii?Q?ocYQjXkc6CiLYQWUj1HmM70b1afhnTjbQB/ln/Ezm6kWzKNJmdY3AhiuvAIY?=
- =?us-ascii?Q?Ew=3D=3D?=
+	=?us-ascii?Q?iuw5u2SGghpxBpeTa7z2DO1gAsow2U5Mo0RXgHILrPF8hcykN/f6a4FsRKGv?=
+ =?us-ascii?Q?5T6eOJ4uGQWCV7qp/aErHxFCiPsPf9r7KYyKH7DaQfttQtAj/Gpa/1+o74aJ?=
+ =?us-ascii?Q?IFglVLrWb/JBGXZPdYIZcFkaSaIeLI1wL7JCnASs6J/Kx0N5m+ElfwosWAZU?=
+ =?us-ascii?Q?fQ0XlW+N46aPNmcazoLyfEBIG0xYnmu52ksXbbeYt1zRy3g6iQfWGlGQVbth?=
+ =?us-ascii?Q?7cyD7chC3GyfbmaGey91cPNsUzhjxOysoeVrwBd5+Z786QLayCULEC+IUEQ9?=
+ =?us-ascii?Q?DdiJKuQbhySH9Pw9PAnxZhquiWaTKiD5jLSXlTtusrU48fc+8GIOeHrbPSOR?=
+ =?us-ascii?Q?aGdmPjTj5XsLkLvnMq4xNFEIHrsoVhR+hvFQyDKPlUT6dGSVq6OVi5sYmzPW?=
+ =?us-ascii?Q?srdQMM1y4GYl3YHXhOmnVG07TBMeUQj7LHJ4c+rvXyYFQ2/zYL855bnXx3t5?=
+ =?us-ascii?Q?CCiUrSrjFAH4yMao0Z6rIpoD1RZCsXh/f2DLU0L2j52XOYKYjLc7Z9Dkk1us?=
+ =?us-ascii?Q?5qiHJ+/5dLejnWmwD6h8hnd1M3+EKXAKClZ1ZAkwPhtS2+gTWsySB8rz9Pu0?=
+ =?us-ascii?Q?tl5wAvmjQJoK9UdDPq4oxlCfzZ1Nq2KYb+dXHfm0OweZunbETYSB1KA6usqb?=
+ =?us-ascii?Q?cj1BX2cVR9Tz8xThvFCelNB1eWgETfLCjAsaa+LLbVjIPwGyg2vd4JDHTUD6?=
+ =?us-ascii?Q?S0+ofpQ/SICz6URuRfE/UKetyjv+Ugl0Ia6RGtvc/woUQq7pHnZZ8EwPacXP?=
+ =?us-ascii?Q?3dgyD+5DmsiKoFgB1MBU3c6mqj2aanGJnEh0fdrxCbvxaxXg33jQuXV8ZmFB?=
+ =?us-ascii?Q?lF7ZRQokE/H7fEoz6vO956bRx6RxXv926Adq2cqiiaWdUaQLOqQ6UP/SPO8q?=
+ =?us-ascii?Q?U13IDO2mNAQz1u+h9YJ3PA2zLL4XvmfMxO0aSl8fF1DNkjZ7bcLOHZKSeQEs?=
+ =?us-ascii?Q?Q1fK8L+P5xdarYIXs0OxCvYOxw/oGsPifpcTXU0GXTWS2uxIKCE7Qfnvn9Qf?=
+ =?us-ascii?Q?xO8eVqU3VMKO9EFOoiVW9TkrZjOrDs+BQg6+6jfuaVkLva3k7Rjo4gsXPTKA?=
+ =?us-ascii?Q?gRd1yAxncL3tBaG64+v0aYTyaUWzAPqfUuqz1461Yc/8+ksKtPahFaPBxQbk?=
+ =?us-ascii?Q?vHxXUmlC/dfPI07Dv4mdjKLijJL+HuGPoQBvoMOc0HL81Vfbx40oqp0poOaw?=
+ =?us-ascii?Q?3qPWxXHMMZOK8RTFRnYUrJc+WRg6qPZnONeSHdvocwP+knHLb964bKStf04O?=
+ =?us-ascii?Q?3LGYIs5W1zXG3VlKtVw9ZThxrwg4Jr6vi2loq7xBL7VfpLa4355taBROYmCH?=
+ =?us-ascii?Q?hbpQ2N5ivh87ZECCKoACRVxEvE5gY+dePU5EkG4DVvT0oCA8ztNQUDMk+SpW?=
+ =?us-ascii?Q?Hc1zOkCiDgbcKqp3sOWLzi/nw5t1rUCQalxeW3HEdJwZUjM2b7LMEApLeP0D?=
+ =?us-ascii?Q?q4/pNZYRh+uuULoUxOh85pSgZWKncRtNnREuUdFL/xaqmQSi82CJusuFcw5Q?=
+ =?us-ascii?Q?Co/Z8bWFMgOj5+VN/hefW0tpv6Gw7yA/M/Op97FX7B84uiilQj3bQFK8vTHa?=
+ =?us-ascii?Q?iiFrJkF128+hkJqAxpOmkcUiq/H5s4TM1FzrGtlEj65n1i6XjbNM+jRNGeln?=
+ =?us-ascii?Q?bg=3D=3D?=
 X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 782a339e-a6bf-4765-fcf1-08dd361b10ed
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4f7f7bdd-ccd4-4fc7-f641-08dd361b11a7
 X-MS-Exchange-CrossTenant-AuthSource: AM8PR04MB7779.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Jan 2025 10:46:43.4671
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Jan 2025 10:46:44.7180
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: yS29T+hBdEyzLS2P19LuUeppl9NMacxHbFWLJRZ/QZZWHDXgig6ZozxEO+atKUH99Bdop0b4LEaiPaQL5NE+ow==
+X-MS-Exchange-CrossTenant-UserPrincipalName: Vv/W/sVd1z9o7R2bbW46Qwn/bKLLRw+iSdkuh9GSW2MNk+LktvH3JxdSyuQ9LscADutqCI0QqRif+8boVQ5OJw==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB9PR04MB9675
 
-Integrate with the standard infrastructure for reporting hardware packet
-timestamping statistics.
+Add an u64 hardware timestamping statistics structure for each ocelot
+port. Export a function from the common switch library for reporting
+them to ethtool. This is called by the ocelot switchdev front-end for
+now.
+
+Note that for the switchdev driver, we report the one-step PTP packets
+as unconfirmed, even though in principle, for some transmission
+mechanisms like FDMA, we may be able to confirm transmission and bump
+the "pkts" counter in ocelot_fdma_tx_cleanup() instead. I don't have
+access to hardware which uses the switchdev front-end, and I've kept the
+implementation simple.
 
 Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
 Reviewed-by: Jakub Kicinski <kuba@kernel.org>
 ---
 v1->v2: none
 
- include/net/dsa.h |  2 ++
- net/dsa/user.c    | 11 +++++++++++
- 2 files changed, 13 insertions(+)
+ drivers/net/ethernet/mscc/ocelot_net.c   | 11 +++++
+ drivers/net/ethernet/mscc/ocelot_ptp.c   | 53 +++++++++++++++++++-----
+ drivers/net/ethernet/mscc/ocelot_stats.c | 37 +++++++++++++++++
+ include/soc/mscc/ocelot.h                | 11 +++++
+ 4 files changed, 101 insertions(+), 11 deletions(-)
 
-diff --git a/include/net/dsa.h b/include/net/dsa.h
-index 9640d5c67f56..a0a9481c52c2 100644
---- a/include/net/dsa.h
-+++ b/include/net/dsa.h
-@@ -906,6 +906,8 @@ struct dsa_switch_ops {
- 	void	(*get_rmon_stats)(struct dsa_switch *ds, int port,
- 				  struct ethtool_rmon_stats *rmon_stats,
- 				  const struct ethtool_rmon_hist_range **ranges);
-+	void	(*get_ts_stats)(struct dsa_switch *ds, int port,
-+				struct ethtool_ts_stats *ts_stats);
- 	void	(*get_stats64)(struct dsa_switch *ds, int port,
- 				   struct rtnl_link_stats64 *s);
- 	void	(*get_pause_stats)(struct dsa_switch *ds, int port,
-diff --git a/net/dsa/user.c b/net/dsa/user.c
-index c74f2b2b92de..291ab1b4acc4 100644
---- a/net/dsa/user.c
-+++ b/net/dsa/user.c
-@@ -1150,6 +1150,16 @@ dsa_user_get_rmon_stats(struct net_device *dev,
- 		ds->ops->get_rmon_stats(ds, dp->index, rmon_stats, ranges);
+diff --git a/drivers/net/ethernet/mscc/ocelot_net.c b/drivers/net/ethernet/mscc/ocelot_net.c
+index 8d48468cddd7..7663d196eaf8 100644
+--- a/drivers/net/ethernet/mscc/ocelot_net.c
++++ b/drivers/net/ethernet/mscc/ocelot_net.c
+@@ -993,6 +993,16 @@ static int ocelot_port_get_ts_info(struct net_device *dev,
+ 	return ocelot_get_ts_info(ocelot, port, info);
  }
  
-+static void dsa_user_get_ts_stats(struct net_device *dev,
-+				  struct ethtool_ts_stats *ts_stats)
++static void ocelot_port_ts_stats(struct net_device *dev,
++				 struct ethtool_ts_stats *ts_stats)
 +{
-+	struct dsa_port *dp = dsa_user_to_port(dev);
-+	struct dsa_switch *ds = dp->ds;
++	struct ocelot_port_private *priv = netdev_priv(dev);
++	struct ocelot *ocelot = priv->port.ocelot;
++	int port = priv->port.index;
 +
-+	if (ds->ops->get_ts_stats)
-+		ds->ops->get_ts_stats(ds, dp->index, ts_stats);
++	ocelot_port_get_ts_stats(ocelot, port, ts_stats);
 +}
 +
- static void dsa_user_net_selftest(struct net_device *ndev,
- 				  struct ethtool_test *etest, u64 *buf)
+ static const struct ethtool_ops ocelot_ethtool_ops = {
+ 	.get_strings		= ocelot_port_get_strings,
+ 	.get_ethtool_stats	= ocelot_port_get_ethtool_stats,
+@@ -1000,6 +1010,7 @@ static const struct ethtool_ops ocelot_ethtool_ops = {
+ 	.get_link_ksettings	= phy_ethtool_get_link_ksettings,
+ 	.set_link_ksettings	= phy_ethtool_set_link_ksettings,
+ 	.get_ts_info		= ocelot_port_get_ts_info,
++	.get_ts_stats		= ocelot_port_ts_stats,
+ };
+ 
+ static void ocelot_port_attr_stp_state_set(struct ocelot *ocelot, int port,
+diff --git a/drivers/net/ethernet/mscc/ocelot_ptp.c b/drivers/net/ethernet/mscc/ocelot_ptp.c
+index 808ce8e68d39..cc1088988da0 100644
+--- a/drivers/net/ethernet/mscc/ocelot_ptp.c
++++ b/drivers/net/ethernet/mscc/ocelot_ptp.c
+@@ -680,9 +680,14 @@ static int ocelot_port_queue_ptp_tx_skb(struct ocelot *ocelot, int port,
+ 	skb_queue_walk_safe(&ocelot_port->tx_skbs, skb, skb_tmp) {
+ 		if (time_before(OCELOT_SKB_CB(skb)->ptp_tx_time +
+ 				OCELOT_PTP_TX_TSTAMP_TIMEOUT, jiffies)) {
+-			dev_warn_ratelimited(ocelot->dev,
+-					     "port %d invalidating stale timestamp ID %u which seems lost\n",
+-					     port, OCELOT_SKB_CB(skb)->ts_id);
++			u64_stats_update_begin(&ocelot_port->ts_stats->syncp);
++			ocelot_port->ts_stats->lost++;
++			u64_stats_update_end(&ocelot_port->ts_stats->syncp);
++
++			dev_dbg_ratelimited(ocelot->dev,
++					    "port %d invalidating stale timestamp ID %u which seems lost\n",
++					    port, OCELOT_SKB_CB(skb)->ts_id);
++
+ 			__skb_unlink(skb, &ocelot_port->tx_skbs);
+ 			kfree_skb(skb);
+ 			ocelot->ptp_skbs_in_flight--;
+@@ -748,13 +753,20 @@ int ocelot_port_txtstamp_request(struct ocelot *ocelot, int port,
+ 		return 0;
+ 
+ 	ptp_class = ptp_classify_raw(skb);
+-	if (ptp_class == PTP_CLASS_NONE)
+-		return -EINVAL;
++	if (ptp_class == PTP_CLASS_NONE) {
++		err = -EINVAL;
++		goto error;
++	}
+ 
+ 	/* Store ptp_cmd in OCELOT_SKB_CB(skb)->ptp_cmd */
+ 	if (ptp_cmd == IFH_REW_OP_ORIGIN_PTP) {
+ 		if (ocelot_ptp_is_onestep_sync(skb, ptp_class)) {
+ 			OCELOT_SKB_CB(skb)->ptp_cmd = ptp_cmd;
++
++			u64_stats_update_begin(&ocelot_port->ts_stats->syncp);
++			ocelot_port->ts_stats->onestep_pkts_unconfirmed++;
++			u64_stats_update_end(&ocelot_port->ts_stats->syncp);
++
+ 			return 0;
+ 		}
+ 
+@@ -764,14 +776,16 @@ int ocelot_port_txtstamp_request(struct ocelot *ocelot, int port,
+ 
+ 	if (ptp_cmd == IFH_REW_OP_TWO_STEP_PTP) {
+ 		*clone = skb_clone_sk(skb);
+-		if (!(*clone))
+-			return -ENOMEM;
++		if (!(*clone)) {
++			err = -ENOMEM;
++			goto error;
++		}
+ 
+ 		/* Store timestamp ID in OCELOT_SKB_CB(clone)->ts_id */
+ 		err = ocelot_port_queue_ptp_tx_skb(ocelot, port, *clone);
+ 		if (err) {
+ 			kfree_skb(*clone);
+-			return err;
++			goto error;
+ 		}
+ 
+ 		skb_shinfo(*clone)->tx_flags |= SKBTX_IN_PROGRESS;
+@@ -780,6 +794,12 @@ int ocelot_port_txtstamp_request(struct ocelot *ocelot, int port,
+ 	}
+ 
+ 	return 0;
++
++error:
++	u64_stats_update_begin(&ocelot_port->ts_stats->syncp);
++	ocelot_port->ts_stats->err++;
++	u64_stats_update_end(&ocelot_port->ts_stats->syncp);
++	return err;
+ }
+ EXPORT_SYMBOL(ocelot_port_txtstamp_request);
+ 
+@@ -816,6 +836,7 @@ void ocelot_get_txtstamp(struct ocelot *ocelot)
+ 
+ 	while (budget--) {
+ 		struct skb_shared_hwtstamps shhwtstamps;
++		struct ocelot_port *ocelot_port;
+ 		u32 val, id, seqid, txport;
+ 		struct sk_buff *skb_match;
+ 		struct timespec64 ts;
+@@ -832,17 +853,27 @@ void ocelot_get_txtstamp(struct ocelot *ocelot)
+ 		id = SYS_PTP_STATUS_PTP_MESS_ID_X(val);
+ 		txport = SYS_PTP_STATUS_PTP_MESS_TXPORT_X(val);
+ 		seqid = SYS_PTP_STATUS_PTP_MESS_SEQ_ID(val);
++		ocelot_port = ocelot->ports[txport];
+ 
+ 		/* Retrieve its associated skb */
+ 		skb_match = ocelot_port_dequeue_ptp_tx_skb(ocelot, txport, id,
+ 							   seqid);
+ 		if (!skb_match) {
+-			dev_warn_ratelimited(ocelot->dev,
+-					     "port %d received TX timestamp (seqid %d, ts id %u) for packet previously declared stale\n",
+-					     txport, seqid, id);
++			u64_stats_update_begin(&ocelot_port->ts_stats->syncp);
++			ocelot_port->ts_stats->err++;
++			u64_stats_update_end(&ocelot_port->ts_stats->syncp);
++
++			dev_dbg_ratelimited(ocelot->dev,
++					    "port %d received TX timestamp (seqid %d, ts id %u) for packet previously declared stale\n",
++					    txport, seqid, id);
++
+ 			goto next_ts;
+ 		}
+ 
++		u64_stats_update_begin(&ocelot_port->ts_stats->syncp);
++		ocelot_port->ts_stats->pkts++;
++		u64_stats_update_end(&ocelot_port->ts_stats->syncp);
++
+ 		/* Get the h/w timestamp */
+ 		ocelot_get_hwtimestamp(ocelot, &ts);
+ 
+diff --git a/drivers/net/ethernet/mscc/ocelot_stats.c b/drivers/net/ethernet/mscc/ocelot_stats.c
+index c018783757fb..545710dadcf5 100644
+--- a/drivers/net/ethernet/mscc/ocelot_stats.c
++++ b/drivers/net/ethernet/mscc/ocelot_stats.c
+@@ -821,6 +821,26 @@ void ocelot_port_get_eth_phy_stats(struct ocelot *ocelot, int port,
+ }
+ EXPORT_SYMBOL_GPL(ocelot_port_get_eth_phy_stats);
+ 
++void ocelot_port_get_ts_stats(struct ocelot *ocelot, int port,
++			      struct ethtool_ts_stats *ts_stats)
++{
++	struct ocelot_port *ocelot_port = ocelot->ports[port];
++	struct ocelot_ts_stats *stats = ocelot_port->ts_stats;
++	unsigned int start;
++
++	if (!ocelot->ptp)
++		return;
++
++	do {
++		start = u64_stats_fetch_begin(&stats->syncp);
++		ts_stats->pkts = stats->pkts;
++		ts_stats->onestep_pkts_unconfirmed = stats->onestep_pkts_unconfirmed;
++		ts_stats->lost = stats->lost;
++		ts_stats->err = stats->err;
++	} while (u64_stats_fetch_retry(&stats->syncp, start));
++}
++EXPORT_SYMBOL_GPL(ocelot_port_get_ts_stats);
++
+ void ocelot_port_get_stats64(struct ocelot *ocelot, int port,
+ 			     struct rtnl_link_stats64 *stats)
  {
-@@ -2501,6 +2511,7 @@ static const struct ethtool_ops dsa_user_ethtool_ops = {
- 	.get_eth_mac_stats	= dsa_user_get_eth_mac_stats,
- 	.get_eth_ctrl_stats	= dsa_user_get_eth_ctrl_stats,
- 	.get_rmon_stats		= dsa_user_get_rmon_stats,
-+	.get_ts_stats		= dsa_user_get_ts_stats,
- 	.set_wol		= dsa_user_set_wol,
- 	.get_wol		= dsa_user_get_wol,
- 	.set_eee		= dsa_user_set_eee,
+@@ -960,6 +980,23 @@ int ocelot_stats_init(struct ocelot *ocelot)
+ 	if (!ocelot->stats)
+ 		return -ENOMEM;
+ 
++	if (ocelot->ptp) {
++		for (int port = 0; port < ocelot->num_phys_ports; port++) {
++			struct ocelot_port *ocelot_port = ocelot->ports[port];
++
++			if (!ocelot_port)
++				continue;
++
++			ocelot_port->ts_stats = devm_kzalloc(ocelot->dev,
++							     sizeof(*ocelot_port->ts_stats),
++							     GFP_KERNEL);
++			if (!ocelot_port->ts_stats)
++				return -ENOMEM;
++
++			u64_stats_init(&ocelot_port->ts_stats->syncp);
++		}
++	}
++
+ 	snprintf(queue_name, sizeof(queue_name), "%s-stats",
+ 		 dev_name(ocelot->dev));
+ 	ocelot->stats_queue = create_singlethread_workqueue(queue_name);
+diff --git a/include/soc/mscc/ocelot.h b/include/soc/mscc/ocelot.h
+index 2db9ae0575b6..6db7fc9dbaa4 100644
+--- a/include/soc/mscc/ocelot.h
++++ b/include/soc/mscc/ocelot.h
+@@ -759,6 +759,14 @@ struct ocelot_mm_state {
+ 	u8 active_preemptible_tcs;
+ };
+ 
++struct ocelot_ts_stats {
++	u64 pkts;
++	u64 onestep_pkts_unconfirmed;
++	u64 lost;
++	u64 err;
++	struct u64_stats_sync syncp;
++};
++
+ struct ocelot_port;
+ 
+ struct ocelot_port {
+@@ -778,6 +786,7 @@ struct ocelot_port {
+ 
+ 	phy_interface_t			phy_mode;
+ 
++	struct ocelot_ts_stats		*ts_stats;
+ 	struct sk_buff_head		tx_skbs;
+ 
+ 	unsigned int			trap_proto;
+@@ -1023,6 +1032,8 @@ void ocelot_port_get_eth_mac_stats(struct ocelot *ocelot, int port,
+ 				   struct ethtool_eth_mac_stats *mac_stats);
+ void ocelot_port_get_eth_phy_stats(struct ocelot *ocelot, int port,
+ 				   struct ethtool_eth_phy_stats *phy_stats);
++void ocelot_port_get_ts_stats(struct ocelot *ocelot, int port,
++			      struct ethtool_ts_stats *ts_stats);
+ int ocelot_get_ts_info(struct ocelot *ocelot, int port,
+ 		       struct kernel_ethtool_ts_info *info);
+ void ocelot_set_ageing_time(struct ocelot *ocelot, unsigned int msecs);
 -- 
 2.43.0
 
