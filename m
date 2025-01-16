@@ -1,217 +1,305 @@
-Return-Path: <netdev+bounces-158950-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158951-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77534A13EE0
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 17:09:46 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B0F0A13EED
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 17:10:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9F5F5160293
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 16:09:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0A5C57A53F4
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 16:10:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C776D22CA10;
-	Thu, 16 Jan 2025 16:09:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E625922CBD4;
+	Thu, 16 Jan 2025 16:09:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="x9pgjSWt"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sxuT5UpI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DBE522C356
-	for <netdev@vger.kernel.org>; Thu, 16 Jan 2025 16:09:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B85B722CA1F;
+	Thu, 16 Jan 2025 16:09:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737043781; cv=none; b=KErCjFVoLPsUPDtLz66GC8BiG+v2kb5jg42KH93vGCPa+fh0qcCEqqRHSQJZLL2JT9MYY+BvmTKDeV5N91fqZl2qPqTmUP8IGuwX26HTd1wQmdo/nSuVJf8t+0B88d/TsMY9MeLiBr2bdjsFX3bbK4T44kFdJ/FmgZJRKkduB9s=
+	t=1737043797; cv=none; b=WoG/ncElZHoKsxSLMkjSAckTFViyMZ00m7mIGPg/GyYYpcHSPVWhU/GpDgwWzl4X8fvgCgKbcYZtd137xhrCeh2/T4h1Yn+SUoMRfie+e6Uacg0rCMu4wTYW+yNTzMEUQ8UOaPMwYh4pCpOCGIIdThm634q8+jtk/ST7KPZ8ivM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737043781; c=relaxed/simple;
-	bh=6r93PtDxADKddNEKMIl2n1KK6HOXUzLNWsnmppK99mA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=P9KoH2VpALBzugW7ENiuf5BBAEvH8T0q4wH0rOvwKoWWtZbNkr7SUqijAEGeRrnlwwSLnSEXcMIfHQVPmKR/R6S4dgew1Od5Ncz9IKDp4EpQJ5aXDzEdjTECYeWc6liwEVTyjc8MKZydLK5zKzX6UvG/3OkPf9wdew3blSm/Gwc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=x9pgjSWt; arc=none smtp.client-ip=209.85.214.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-2166f1e589cso26351315ad.3
-        for <netdev@vger.kernel.org>; Thu, 16 Jan 2025 08:09:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1737043779; x=1737648579; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=o3SvrDu0caDhzdAVkyBr9gYgBKDDR95aZo/K9YBI7/c=;
-        b=x9pgjSWtwjVgsSC5qNmd77leknDz5rcQwbOWq1is71mOu02i6F/J54+wskLicLYhuF
-         63dTvt5WXJN/HIxlANSI0mU2OHK2XkLOU84qeEw8mKr0faX1z5bjMwSdLK+uA/y64Wb1
-         8utc+gb9dO/7YBxIe5AbO2a9/uADojuC/BX4M=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737043779; x=1737648579;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=o3SvrDu0caDhzdAVkyBr9gYgBKDDR95aZo/K9YBI7/c=;
-        b=w3LOarQ+e+NSOFJsyQ/mun+UbMM/xvwJXOB0YQeWCNB/uPm6Kqfp3JskHt8OLyWJ9I
-         YnqAHysdYrcH1GUq62Vs9PjvNRZyyvN8wkejyzNPDZxj4gKFpl5c8q7ZerQytItnjC0T
-         6CKmmE7HPOLZG2EZv58VyahOtY0RbxHs0OjlsnFmEoLM00W4sQKUzs2UiG7eAJgLpavy
-         f/zxEnFhtAQXOzk4+vCPu9XSVRJ1JLdFNTV0CwAoSIHzADOSPu7G64lWj6qYo06CXhNP
-         XDAx4ttUfZ+CFtzg5cP+cpsgjPKeitkaq484t+apw48l+qO2kMRdPDT7Bhq4ESX1Wy17
-         fxrg==
-X-Forwarded-Encrypted: i=1; AJvYcCW/CZ/MfybC3B2Incai6rmZ/+EKK42NABcL1FTGpT3Cq29yIhIFPrtt+8IkoOZD1JqDWfbCbMI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxYfTisTTlbiJj4VRBEUZZsGGaJQVvFvG2OYBABnkoj1BvUOvdm
-	bEpoFeKS5qkykGF2AZugdo0Iu89UI6e1dXp7xmFtZXPrSDpLjGyxC7xx6ZR1aFg=
-X-Gm-Gg: ASbGnctESJiUGdGUIDHouEFp7pEdtK8mxpBcZkPzLfDBGIiTvHmBr/Gpl4hXYHI0Oja
-	XH+CjTwucqF2HXUq7kJIwpVwPXFTC4Zx2oHuzwqJzNCgUPUDxFohhglcOE6nT1Zqe/vr28Xcdb8
-	LSir0BHY/yaK6CgB1iOHSLxlaslLnjKoD7umbWwOl0nh5siy+80eIJ1yUoWdGfqt/Ecg0dTp9mG
-	WwFjMLmUC1YrAPXDem6oTY+wWbksdDbFyJz8ehhlrzyF7L01nNnBxRZqaQZUMr/vms=
-X-Google-Smtp-Source: AGHT+IFXQCdp082WWpGcpuSjSz2khkKE+kq+/Zwi6NgiDuGp4et1L72GBvo6pH6pxi/Ft6I0r1EIJg==
-X-Received: by 2002:a17:902:c408:b0:21a:8839:4f4d with SMTP id d9443c01a7336-21a88395835mr395241215ad.6.1737043779271;
-        Thu, 16 Jan 2025 08:09:39 -0800 (PST)
-Received: from LQ3V64L9R2 ([65.133.87.50])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-a9bdd02b954sm221289a12.52.2025.01.16.08.09.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Jan 2025 08:09:38 -0800 (PST)
-Date: Thu, 16 Jan 2025 08:09:36 -0800
-From: Joe Damato <jdamato@fastly.com>
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Cc: gerhard@engleder-embedded.com, jasowang@redhat.com, leiyang@redhat.com,
-	mkarsten@uwaterloo.ca, "Michael S. Tsirkin" <mst@redhat.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	"open list:VIRTIO CORE AND NET DRIVERS" <virtualization@lists.linux.dev>,
-	open list <linux-kernel@vger.kernel.org>,
-	"open list:XDP (eXpress Data Path):Keyword:(?:b|_)xdp(?:b|_)" <bpf@vger.kernel.org>,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v2 3/4] virtio_net: Map NAPIs to queues
-Message-ID: <Z4kvQI8GmmEGrq1F@LQ3V64L9R2>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	gerhard@engleder-embedded.com, jasowang@redhat.com,
-	leiyang@redhat.com, mkarsten@uwaterloo.ca,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	"open list:VIRTIO CORE AND NET DRIVERS" <virtualization@lists.linux.dev>,
-	open list <linux-kernel@vger.kernel.org>,
-	"open list:XDP (eXpress Data Path):Keyword:(?:b|_)xdp(?:b|_)" <bpf@vger.kernel.org>,
-	netdev@vger.kernel.org
-References: <20250116055302.14308-1-jdamato@fastly.com>
- <20250116055302.14308-4-jdamato@fastly.com>
- <1737013994.1861002-1-xuanzhuo@linux.alibaba.com>
+	s=arc-20240116; t=1737043797; c=relaxed/simple;
+	bh=FqbKc2fY/kv4BYvAVtzqn0MGRJpWCRDnHMTimy8za7Q=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=dV35kGF0/j2B++i5E6GJRcv/O4/vFjfOfmSMu7zRjL/x6IjSjCIZWQiM7v/BB7PT1/E3U6IUYzLF4uEtJ18oLJTqAJj1l9kSSjzn2xvFM/25SpVE4bBxlgIKVCyzW06uDjkF5iUu4Xu9DVn353xSYYK7yMg2B1wknJ2sEfmIl8Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sxuT5UpI; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 11286C4CED6;
+	Thu, 16 Jan 2025 16:09:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1737043797;
+	bh=FqbKc2fY/kv4BYvAVtzqn0MGRJpWCRDnHMTimy8za7Q=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=sxuT5UpIvmPd54H7pV1pDlE+i24u9gdhhGNalpaGB0IoY1cEO9YDsNhnTbt+cCPE9
+	 +UZZmlWaxQI64Fz5wvDD4of2tBGjYNcCw+oBvumOxHz71EomCdOsbs/x1QwDoL1k4g
+	 v/R9cqv9TrvGJPHBrMgv617wC/T28H5UVk+5cw2hfrMKnR6Ho6mc4Ky4kiUe5ej3cr
+	 pIC5dPOO75LkWD8x1oiueuZO46WJNr1MZeSLqv4g9QXbWkV4C5dinK0YYdSq6tzDsC
+	 JE9GJtBXCLTYMQcWk0o8KY+/OLWv+mw99t8V44E8ZtF1V3qxeN7rctOr5xkaP9pBK9
+	 PP6bBRCpJ0WvA==
+Message-ID: <95f258b2-52f5-4a80-a670-b9a182caec7c@kernel.org>
+Date: Thu, 16 Jan 2025 17:09:50 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1737013994.1861002-1-xuanzhuo@linux.alibaba.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v7 3/8] page_pool: fix IOMMU crash when driver
+ has already unbound
+To: Yunsheng Lin <linyunsheng@huawei.com>, davem@davemloft.net,
+ kuba@kernel.org, pabeni@redhat.com
+Cc: zhangkun09@huawei.com, liuyonglong@huawei.com, fanghaiqing@huawei.com,
+ Robin Murphy <robin.murphy@arm.com>,
+ Alexander Duyck <alexander.duyck@gmail.com>, IOMMU <iommu@lists.linux.dev>,
+ Andrew Morton <akpm@linux-foundation.org>, Eric Dumazet
+ <edumazet@google.com>, Simon Horman <horms@kernel.org>,
+ Ilias Apalodimas <ilias.apalodimas@linaro.org>, linux-mm@kvack.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ kernel-team <kernel-team@cloudflare.com>
+References: <20250110130703.3814407-1-linyunsheng@huawei.com>
+ <20250110130703.3814407-4-linyunsheng@huawei.com>
+ <921c827c-41b7-40af-8c01-c21adbe8f41f@kernel.org>
+ <2b5a58f3-d67a-4bf7-921a-033326958ac6@huawei.com>
+Content-Language: en-US
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <2b5a58f3-d67a-4bf7-921a-033326958ac6@huawei.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Thu, Jan 16, 2025 at 03:53:14PM +0800, Xuan Zhuo wrote:
-> On Thu, 16 Jan 2025 05:52:58 +0000, Joe Damato <jdamato@fastly.com> wrote:
-> > Use netif_queue_set_napi to map NAPIs to queue IDs so that the mapping
-> > can be accessed by user apps.
-> >
-> > $ ethtool -i ens4 | grep driver
-> > driver: virtio_net
-> >
-> > $ sudo ethtool -L ens4 combined 4
-> >
-> > $ ./tools/net/ynl/pyynl/cli.py \
-> >        --spec Documentation/netlink/specs/netdev.yaml \
-> >        --dump queue-get --json='{"ifindex": 2}'
-> > [{'id': 0, 'ifindex': 2, 'napi-id': 8289, 'type': 'rx'},
-> >  {'id': 1, 'ifindex': 2, 'napi-id': 8290, 'type': 'rx'},
-> >  {'id': 2, 'ifindex': 2, 'napi-id': 8291, 'type': 'rx'},
-> >  {'id': 3, 'ifindex': 2, 'napi-id': 8292, 'type': 'rx'},
-> >  {'id': 0, 'ifindex': 2, 'type': 'tx'},
-> >  {'id': 1, 'ifindex': 2, 'type': 'tx'},
-> >  {'id': 2, 'ifindex': 2, 'type': 'tx'},
-> >  {'id': 3, 'ifindex': 2, 'type': 'tx'}]
-> >
-> > Note that virtio_net has TX-only NAPIs which do not have NAPI IDs, so
-> > the lack of 'napi-id' in the above output is expected.
-> >
-> > Signed-off-by: Joe Damato <jdamato@fastly.com>
-> > ---
-> >  v2:
-> >    - Eliminate RTNL code paths using the API Jakub introduced in patch 1
-> >      of this v2.
-> >    - Added virtnet_napi_disable to reduce code duplication as
-> >      suggested by Jason Wang.
-> >
-> >  drivers/net/virtio_net.c | 34 +++++++++++++++++++++++++++++-----
-> >  1 file changed, 29 insertions(+), 5 deletions(-)
-> >
-> > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> > index cff18c66b54a..c6fda756dd07 100644
-> > --- a/drivers/net/virtio_net.c
-> > +++ b/drivers/net/virtio_net.c
-> > @@ -2803,9 +2803,18 @@ static void virtnet_napi_do_enable(struct virtqueue *vq,
-> >  	local_bh_enable();
-> >  }
-> >
-> > -static void virtnet_napi_enable(struct virtqueue *vq, struct napi_struct *napi)
-> > +static void virtnet_napi_enable(struct virtqueue *vq,
-> > +				struct napi_struct *napi)
-> >  {
-> > +	struct virtnet_info *vi = vq->vdev->priv;
-> > +	int q = vq2rxq(vq);
-> > +	u16 curr_qs;
-> > +
-> >  	virtnet_napi_do_enable(vq, napi);
-> > +
-> > +	curr_qs = vi->curr_queue_pairs - vi->xdp_queue_pairs;
-> > +	if (!vi->xdp_enabled || q < curr_qs)
-> > +		netif_queue_set_napi(vi->dev, q, NETDEV_QUEUE_TYPE_RX, napi);
+
+
+
+On 16/01/2025 13.52, Yunsheng Lin wrote:
+> On 2025/1/16 0:29, Jesper Dangaard Brouer wrote:
+>>
+>>
+>> On 10/01/2025 14.06, Yunsheng Lin wrote:
+>> [...]
+>>> In order not to call DMA APIs to do DMA unmmapping after driver
+>>> has already unbound and stall the unloading of the networking
+>>> driver, use some pre-allocated item blocks to record inflight
+>>> pages including the ones which are handed over to network stack,
+>>> so the page_pool can do the DMA unmmapping for those pages when
+>>> page_pool_destroy() is called. As the pre-allocated item blocks
+>>> need to be large enough to avoid performance degradation, add a
+>>> 'item_fast_empty' stat to indicate the unavailability of the
+>>> pre-allocated item blocks.
+>>>
+>>
 > 
-> So what case the check of xdp_enabled is for?
+> ...
+> 
+>>> +
+>>> +static __always_inline void __page_pool_release_page_dma(struct page_pool *pool,
+>>> +                             netmem_ref netmem,
+>>> +                             bool destroyed)
+>>> +{
+>>> +    struct page_pool_item *item;
+>>> +    dma_addr_t dma;
+>>> +
+>>> +    if (!pool->dma_map)
+>>> +        /* Always account for inflight pages, even if we didn't
+>>> +         * map them
+>>> +         */
+>>> +        return;
+>>> +
+>>> +    dma = page_pool_get_dma_addr_netmem(netmem);
+>>> +    item = netmem_get_pp_item(netmem);
+>>> +
+>>> +    /* dma unmapping is always needed when page_pool_destory() is not called
+>>> +     * yet.
+>>> +     */
+>>> +    DEBUG_NET_WARN_ON_ONCE(!destroyed && !page_pool_item_is_mapped(item));
+>>> +    if (unlikely(destroyed && !page_pool_item_is_mapped(item)))
+>>> +        return;
+>>> +
+>>> +    /* When page is unmapped, it cannot be returned to our pool */
+>>> +    dma_unmap_page_attrs(pool->p.dev, dma,
+>>> +                 PAGE_SIZE << pool->p.order, pool->p.dma_dir,
+>>> +                 DMA_ATTR_SKIP_CPU_SYNC | DMA_ATTR_WEAK_ORDERING);
+>>> +    page_pool_set_dma_addr_netmem(netmem, 0);
+>>> +    page_pool_item_clear_mapped(item);
+>>> +}
+>>> +
+>>
+>> I have a hard time reading/reviewing/maintaining below code, without
+>> some design description.  This code needs more comments on what is the
+>> *intend* and design it's trying to achieve.
+>>
+>>  From patch description the only hint I have is:
+>>   "use some pre-allocated item blocks to record inflight pages"
+>>
+>> E.g. Why is it needed/smart to hijack the page->pp pointer?
+> 
+> Mainly because there is no space available for keeping tracking of inflight
+> pages, using page->pp can only find the page_pool owning the page, but page_pool
+> is not able to keep track of the inflight page when the page is handled by
+> networking stack.
+> 
+> By using page_pool_item as below, the state is used to tell if a specific
+> item is being used/dma mapped or not by scanning all the item blocks in
+> pool->item_blocks. If a specific item is used by a page, then 'pp_netmem'
+> will point to that page so that dma unmapping can be done for that page
+> when page_pool_destroy() is called, otherwise free items sit in the
+> pool->hold_items or pool->release_items by using 'lentry':
+> 
+> struct page_pool_item {
+> 	unsigned long state;
+> 	
+> 	union {
+> 		netmem_ref pp_netmem;
+> 		struct llist_node lentry;
+> 	};
+> };
 
-Based on a previous discussion [1], the NAPIs should not be linked
-for in-kernel XDP, but they _should_ be linked for XSK.
+pahole  -C page_pool_item vmlinux
+struct page_pool_item {
+	/* An 'encoded_next' is a pointer to next item, lower 2 bits is used to
+	 * indicate the state of current item.
+	 */	
+	long unsigned int          encoded_next;     /*     0     8 */
+	union {
+		netmem_ref         pp_netmem;        /*     8     8 */
+		struct llist_node  lentry;           /*     8     8 */
+	};                                           /*     8     8 */
 
-I could certainly have misread the virtio_net code (please let me
-know if I've gotten it wrong, I'm not an expert), but the three
-cases I have in mind are:
+	/* size: 16, cachelines: 1, members: 2 */
+	/* last cacheline: 16 bytes */
+};
 
-  - vi->xdp_enabled = false, which happens when no XDP is being
-    used, so the queue number will be < vi->curr_queue_pairs.
 
-  - vi->xdp_enabled = false, which I believe is what happens in the
-    XSK case. In this case, the NAPI is linked.
+> When a page is added to the page_pool, a item is deleted from pool->hold_items
+> or pool->release_items and set the 'pp_netmem' pointing to that page and set
+> 'state' accordingly in order to keep track of that page.
+> 
+> When a page is deleted from the page_pool, it is able to tell which page_pool
+> this page belong to by using the below function, and after clearing the 'state',
+> the item is added back to pool->release_items so that the item is reused for new
+> pages.
+> 
 
-  - vi->xdp_enabled = true, which I believe only happens for
-    in-kernel XDP - but not XSK - and in this case, the NAPI should
-    NOT be linked.
+To understand below, I'm listing struct page_pool_item_block for other
+reviewers:
 
-Thank you for your review and questions about this, I definitely
-want to make sure I've gotten it right :)
+pahole  -C page_pool_item_block vmlinux
+struct page_pool_item_block {
+	struct page_pool *         pp;               /*     0     8 */
+	struct list_head           list;             /*     8    16 */
+	unsigned int               flags;            /*    24     4 */
+	refcount_t                 ref;              /*    28     4 */
+	struct page_pool_item      items[];          /*    32     0 */
 
-> And I think we should merge this to last commit.
+	/* size: 32, cachelines: 1, members: 5 */
+	/* last cacheline: 32 bytes */
+};
 
-I kept them separate for two reasons:
-  1. Easier to review :)
-  2. If a bug were to appear, it'll be easier to bisect the code to
-     determine if the bug is being caused either from linking the
-     queues to NAPIs or from adding support for persistent NAPI
-     config parameters.
+> static inline struct page_pool_item_block *
+> page_pool_item_to_block(struct page_pool_item *item)
+> {
+> 	return (struct page_pool_item_block *)((unsigned long)item & PAGE_MASK);
 
-Having the two features separated makes it easier to understand and
-fix, as there have been minor bugs in other drivers with NAPI config
-[2].
+This trick requires some comments explaining what is going on!
+Please correct me if I'm wrong: Here you a masking off the lower bits of
+the pointer to page_pool_item *item, as you know that a struct
+page_pool_item_block is stored in the top of a struct page.  This trick
+is like a "container_of" for going from page_pool_item to
+page_pool_item_block, right?
 
-[1]: https://lore.kernel.org/netdev/20250113135609.13883897@kernel.org/
-[2]: https://lore.kernel.org/lkml/38d019dd-b876-4fc1-ba7e-f1eb85ad7360@nvidia.com/
+I do notice that you have a comment above struct page_pool_item_block
+(that says "item_block is always PAGE_SIZE"), which is nice, but to be
+more explicit/clear:
+  I want a big comment block (placed above the main code here) that
+explains the design and intention behind this newly invented
+"item-block" scheme, like e.g. the connection between
+page_pool_item_block and page_pool_item. Like the advantage/trick that
+allows page->pp pointer to be an "item" and be mapped back to a "block"
+to find the page_pool object it belongs to.  Don't write *what* the code
+does, but write about the intended purpose and design reasons behind the
+code.
+
+
+> }
+> 
+>   static inline struct page_pool *page_pool_get_pp(struct page *page)
+>   {
+>        return page_pool_item_to_block(page->pp_item)->pp;
+>   }
+> 
+> 
+>>
+>>> +static void __page_pool_item_init(struct page_pool *pool, struct page *page)
+>>> +{
+>>
+>> Function name is confusing.  First I though this was init'ing a single
+>> item, but looking at the code it is iterating over ITEMS_PER_PAGE.
+>>
+>> Maybe it should be called page_pool_item_block_init ?
+> 
+> The __page_pool_item_init() is added to make the below
+> page_pool_item_init() function more readable or maintainable, changing
+> it to page_pool_item_block_init doesn't seems consistent?
+
+You (of-cause) also have to rename the other function, I though that was
+implicitly understood.
+
+BUT does my suggested rename make sense?  What I'm seeing is that all
+the *items* in the "block" is getting inited. But we are also setting up
+the "block" (e.g.  "block->pp=pool").
+
+>>
+>>> +    struct page_pool_item_block *block = page_address(page);
+>>> +    struct page_pool_item *items = block->items;
+>>> +    unsigned int i;
+>>> +
+>>> +    list_add(&block->list, &pool->item_blocks);
+>>> +    block->pp = pool;
+>>> +
+>>> +    for (i = 0; i < ITEMS_PER_PAGE; i++) {
+>>> +        page_pool_item_init_state(&items[i]);
+>>> +        __llist_add(&items[i].lentry, &pool->hold_items);
+>>> +    }
+>>> +}
+>>> +
+>>> +static int page_pool_item_init(struct page_pool *pool)
+>>> +{
+>>> +#define PAGE_POOL_MIN_INFLIGHT_ITEMS        512
+>>> +    struct page_pool_item_block *block;
+>>> +    int item_cnt;
+>>> +
+>>> +    INIT_LIST_HEAD(&pool->item_blocks);
+>>> +    init_llist_head(&pool->hold_items);
+>>> +    init_llist_head(&pool->release_items);
+>>> +
+>>> +    item_cnt = pool->p.pool_size * 2 + PP_ALLOC_CACHE_SIZE +
+>>> +        PAGE_POOL_MIN_INFLIGHT_ITEMS;
+>>> +    while (item_cnt > 0) {
+>>> +        struct page *page;
+>>> +
+>>> +        page = alloc_pages_node(pool->p.nid, GFP_KERNEL, 0);
+>>> +        if (!page)
+>>> +            goto err;
+>>> +
+>>> +        __page_pool_item_init(pool, page);
+>>> +        item_cnt -= ITEMS_PER_PAGE;
+>>> +    }
+>>> +
+>>> +    return 0;
+>>> +err:
+>>> +    list_for_each_entry(block, &pool->item_blocks, list)
+>>> +        put_page(virt_to_page(block));
+> 
+> This one also have used-after-free problem as the page_pool_item_uninit
+> in the previous version.
+> 
+>>> +
+>>> +    return -ENOMEM;
+>>> +}
+>>> +
+> 
 
