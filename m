@@ -1,48 +1,46 @@
-Return-Path: <netdev+bounces-158882-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158883-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 48A5EA13A36
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 13:52:02 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 899C3A13A3B
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 13:52:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9C21B18893E3
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 12:52:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6E6757A2B9A
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 12:52:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B8461DE88B;
-	Thu, 16 Jan 2025 12:52:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PhV4Txyq"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD9B01DE8BC;
+	Thu, 16 Jan 2025 12:52:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F24824A7E7;
-	Thu, 16 Jan 2025 12:52:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B8FD1DE8BB;
+	Thu, 16 Jan 2025 12:52:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737031920; cv=none; b=sj3ivvQGrCKz/BSRUvL2joy7xn/5Gu6UKyFk4nmYiQlDvWkmnmcYoW6/AmHq1JAkABSB79fVTLQ02tdmlTI324Cw2ypOOTERWAYH7RBVKFN2QnKdOLqDbVVangF9RirRBlzPW1omAST657tloW3lLpvSU0WALIKAzMxDhpTrGLc=
+	t=1737031931; cv=none; b=rrY4lG0BE5CvRn6NfByus2YT6s6nniTPioekI+nR8lZYa1ebThGlvKp7eqo1kWavpzHxJtJo8F1yx3TrFvZEF+8T+g4padL8Bl4dA9KrRPFSmyTonD9l9NhUGem4v2rBsjQlMSJhOWo74xqNA5WwzK+ka9NKQgIbY199U2vSWrQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737031920; c=relaxed/simple;
-	bh=CM19J5Yje3bHJvpx0mH29A4eL7/r3Lzy2jE0fI6yFw4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jCkS8T5uYhkOjyHlurb42gYA8f8EfMa8h/yM2on06L/ZIPrPLdxj/zd4mqurTK/g3dPEtbhJz9gg1rRJGuOqu0BkQUybOxZlbiRFl9hbyfqB3N2woAqjMKTGAok9ihwrgtqZ7D3H35NMWiXljvMIS9KffxE3Cluci0OHuA0zTIM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PhV4Txyq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7FD9FC4CED6;
-	Thu, 16 Jan 2025 12:51:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737031919;
-	bh=CM19J5Yje3bHJvpx0mH29A4eL7/r3Lzy2jE0fI6yFw4=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=PhV4Txyq7zNaPk6uwZs9RLARktwuufErPCZDV5v+mQpnEohM0YRCyJiK6c+MVoy+G
-	 huF0HY1GYxdbzkWgdApLQSIh1SBeCLMVFGsRxZy8q0W0naYLt5R9Pwo1GPlMTuqDi1
-	 gobEiUbcquFfDAOZhrQt4cui4oAF05Ly5skF+OreGuovNoiDk0IIQSvhauRUx/E/mE
-	 KtNH5Kvyue57Grijgvn4VphHnx04agH8axIdhudpjop3Au5xRMdT8jRHwznDPsqwGY
-	 j05XidJtFALvXx+ZAE3DMrczbOiKlSkqMNngJLMOcPJJartWdy85aWJe3JmeZDuqmL
-	 abkObqFRDG3fA==
-Message-ID: <833df79b-1e9f-4a13-bae5-9e7bb989a8f1@kernel.org>
-Date: Thu, 16 Jan 2025 13:51:53 +0100
+	s=arc-20240116; t=1737031931; c=relaxed/simple;
+	bh=eUdOT2Un72yDGZvOoQ8OJIwBSP/aANwUwNwJcybgR00=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=k1TsujAjge9xxfxZSAM0xlhPGmB1rkqFIdm6EC/nf21gQ39AZeelpJDdLNLtHBGwkQsnDBWV6DaxC1ZUry9HnhcoV9XBBiGaHA8y0dkGxB6lDAJ5DJ16yBfJEH8s/Bd2PlWH6nAvItIxgvgIpDKufQgT70Wnvu5G2JR3vRJhpP8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.214])
+	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4YYjR348srz1xmTj;
+	Thu, 16 Jan 2025 20:51:11 +0800 (CST)
+Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id 9D57C1A016C;
+	Thu, 16 Jan 2025 20:52:05 +0800 (CST)
+Received: from [10.67.120.129] (10.67.120.129) by
+ dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Thu, 16 Jan 2025 20:52:05 +0800
+Message-ID: <1bef4a35-efaa-4083-8ed5-8818fe285db5@huawei.com>
+Date: Thu, 16 Jan 2025 20:52:04 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,97 +48,115 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 3/3] net: phy: mediatek: add driver for built-in
- 2.5G ethernet PHY on MT7988
-To: Sky Huang <SkyLake.Huang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
- Heiner Kallweit <hkallweit1@gmail.com>, Russell King
- <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Daniel Golle <daniel@makrotopia.org>,
- Qingfang Deng <dqfext@gmail.com>, Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org
-Cc: Steven Liu <Steven.Liu@mediatek.com>
-References: <20250116012159.3816135-1-SkyLake.Huang@mediatek.com>
- <20250116012159.3816135-4-SkyLake.Huang@mediatek.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
+Subject: Re: [PATCH net-next v7 0/8] fix two bugs related to page_pool
+To: Jesper Dangaard Brouer <hawk@kernel.org>, <davem@davemloft.net>,
+	<kuba@kernel.org>, <pabeni@redhat.com>
+CC: <zhangkun09@huawei.com>, <liuyonglong@huawei.com>,
+	<fanghaiqing@huawei.com>, Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Robin Murphy <robin.murphy@arm.com>, Alexander Duyck
+	<alexander.duyck@gmail.com>, Andrew Morton <akpm@linux-foundation.org>, IOMMU
+	<iommu@lists.linux.dev>, MM <linux-mm@kvack.org>, Alexei Starovoitov
+	<ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, John Fastabend
+	<john.fastabend@gmail.com>, Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	<netdev@vger.kernel.org>, <intel-wired-lan@lists.osuosl.org>,
+	<bpf@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-mediatek@lists.infradead.org>
+References: <20250110130703.3814407-1-linyunsheng@huawei.com>
+ <3c8e4f86-87e2-470d-84d8-86c70b3e2fcc@kernel.org>
+ <c02e856e-6ec5-49d0-8527-2647695a0174@huawei.com>
+ <3a853e1b-b5bf-4709-b8f6-e466e3e7375e@kernel.org>
 Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 fv0=
-In-Reply-To: <20250116012159.3816135-4-SkyLake.Huang@mediatek.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+From: Yunsheng Lin <linyunsheng@huawei.com>
+In-Reply-To: <3a853e1b-b5bf-4709-b8f6-e466e3e7375e@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ dggpemf200006.china.huawei.com (7.185.36.61)
 
-On 16/01/2025 02:21, Sky Huang wrote:
-> From: Sky Huang <skylake.huang@mediatek.com>
+On 2025/1/16 1:40, Jesper Dangaard Brouer wrote:
 > 
-> Add support for internal 2.5Gphy on MT7988. This driver will load
-> necessary firmware and add appropriate time delay to make sure
-> that firmware works stably. Also, certain control registers will
-> be set to fix link-up issues.
 > 
-> Signed-off-by: Sky Huang <skylake.huang@mediatek.com>
-> ---
->  MAINTAINERS                          |   1 +
->  drivers/net/phy/mediatek/Kconfig     |  11 +
->  drivers/net/phy/mediatek/Makefile    |   1 +
->  drivers/net/phy/mediatek/mtk-2p5ge.c | 343 +++++++++++++++++++++++++++
->  4 files changed, 356 insertions(+)
->  create mode 100644 drivers/net/phy/mediatek/mtk-2p5ge.c
+> On 15/01/2025 12.33, Yunsheng Lin wrote:
+>> On 2025/1/14 22:31, Jesper Dangaard Brouer wrote:
+>>>
+>>>
+>>> On 10/01/2025 14.06, Yunsheng Lin wrote:
+>>>> This patchset fix a possible time window problem for page_pool and
+>>>> the dma API misuse problem as mentioned in [1], and try to avoid the
+>>>> overhead of the fixing using some optimization.
+>>>>
+>>>>   From the below performance data, the overhead is not so obvious
+>>>> due to performance variations for time_bench_page_pool01_fast_path()
+>>>> and time_bench_page_pool02_ptr_ring, and there is about 20ns overhead
+>>>> for time_bench_page_pool03_slow() for fixing the bug.
+>>>>
+>>>
+>>> My benchmarking on x86_64 CPUs looks significantly different.
+>>>   - CPU: Intel(R) Xeon(R) CPU E5-1650 v4 @ 3.60GHz
+>>>
+>>> Benchmark (bench_page_pool_simple) results from before and after patchset:
+>>>
+>>> | Test name  | Cycles |       |    |Nanosec |        |       |      % |
+>>> | (tasklet_*)| Before | After |diff| Before |  After |  diff | change |
+>>> |------------+--------+-------+----+--------+--------+-------+--------|
+>>> | fast_path  |     19 |    24 |   5|  5.399 |  6.928 | 1.529 |   28.3 |
+>>> | ptr_ring   |     54 |    79 |  25| 15.090 | 21.976 | 6.886 |   45.6 |
+>>> | slow       |    238 |   299 |  61| 66.134 | 83.298 |17.164 |   26.0 |
+>>> #+TBLFM: $4=$3-$2::$7=$6-$5::$8=(($7/$5)*100);%.1f
+>>>
+>>> My above testing show a clear performance regressions across three
+>>> different page_pool operating modes.
+>>
+>> I retested it on arm64 server patch by patch as the raw performance
+>> data in the attachment, it seems the result seemed similar as before.
+>>
+>> Before this patchset:
+>>              fast_path              ptr_ring            slow
+>> 1.         31.171 ns               60.980 ns          164.917 ns
+>> 2.         28.824 ns               60.891 ns          170.241 ns
+>> 3.         14.236 ns               60.583 ns          164.355 ns
+>>
+>> With patch 1-4:
+>> 4.         31.443 ns               53.242 ns          210.148 ns
+>> 5.         31.406 ns               53.270 ns          210.189 ns
+>>
+>> With patch 1-5:
+>> 6.         26.163 ns               53.781 ns          189.450 ns
+>> 7.         26.189 ns               53.798 ns          189.466 ns
+>>
+>> With patch 1-8:
+>> 8.         28.108 ns               68.199 ns          202.516 ns
+>> 9.         16.128 ns               55.904 ns          202.711 ns
+>>
+>> I am not able to get hold of a x86 server yet, I might be able
+>> to get one during weekend.
+>>
+>> Theoretically, patch 1-4 or 1-5 should not have much performance
+>> impact for fast_path and ptr_ring except for the rcu_lock mentioned
+>> in page_pool_napi_local(), so it would be good if patch 1-5 is also
+>> tested in your testlab with the rcu_lock removing in
+>> page_pool_napi_local().
+>>
+> 
+> What are you saying?
+>  - (1) test patch 1-5
+>  - or (2) test patch 1-5 but revert patch 2 with page_pool_napi_local()
 
-I don't understand this. You already sent it half a year ago. You
-received detailed review, but you now send again the same? Till we accept?
+patch 1-5 with below applied.
 
-Doing same review twice is not acceptable. Ignoring the review either.
+--- a/net/core/page_pool.c
++++ b/net/core/page_pool.c
+@@ -1207,10 +1207,8 @@ static bool page_pool_napi_local(const struct page_pool *pool)
+        /* Synchronizated with page_pool_destory() to avoid use-after-free
+         * for 'napi'.
+         */
+-       rcu_read_lock();
+        napi = READ_ONCE(pool->p.napi);
+        napi_local = napi && READ_ONCE(napi->list_owner) == cpuid;
+-       rcu_read_unlock();
 
-NAK.
+        return napi_local;
+ }
 
-Implement all the changes you were asked for, then send a next version
-(v2) with proper, detailed, exhaustive changelog.
-
-Best regards,
-Krzysztof
 
