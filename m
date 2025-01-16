@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-159056-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159057-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A131A143F5
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 22:21:29 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1286FA143F7
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 22:21:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4EDFE188DEB0
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 21:21:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 247AB16B883
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 21:21:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEB611F37AA;
-	Thu, 16 Jan 2025 21:21:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F11C2419E8;
+	Thu, 16 Jan 2025 21:21:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TBTr1dgU"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="K7W72qq2"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 024811D61A1
-	for <netdev@vger.kernel.org>; Thu, 16 Jan 2025 21:21:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C51C236A81
+	for <netdev@vger.kernel.org>; Thu, 16 Jan 2025 21:21:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737062475; cv=none; b=URRq9udCNj8jc4VHnZg4AuUl/ansFVlb2ObDrFNIgmkhUW96MwLtzU9+zjkC/WkOpv8qb/kJL6xyrh3KodUhkmFzPzcnZGtW797zUojQqaCOIkCUDoRA/JeWJXn+Xdoa/QBX/m+RzVk7CgRAIBxD6QD4KbDXYXGCRxjvDL+EJSc=
+	t=1737062477; cv=none; b=WjSnL377OCEqEOKwnGU5petlSKTmrEzkIYVQN180tJJqD+Or8Ypn3T8xzBhmdHN3yPNztJ5Py4ijU/ANGqDP7ZJ53Y4BbP1kzGMqJPsuPJ4/ngrQewcZOXWzf/cEDqTfDhsVVHbj2mgzgTr7Gs1Ic7wgbL+GiBd/kf/2z52wzwo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737062475; c=relaxed/simple;
-	bh=tOlxc56viZ6Yr5EHzXUgCNO/V1n1aksTtdGCo9g5GGg=;
+	s=arc-20240116; t=1737062477; c=relaxed/simple;
+	bh=oaSxKAQMpS13TWHgbFGz0i7yncnkmJ9XJbS46aO6428=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=TJLIwtoaMrBVNVw9ZdX0uHp4h7Y5dTWgexBjsmx0lsigBbsfChkNIHaWvJnOwRrnW56Hm/EUWfqm2vwf7GdUQihIz9Wol2Z994Do1Y8lEe2pGvfb5cihDyiudyXSIWPaM3wzppyqh6zQ5+iIyF8DQowJZFmprZsYhO7m4qcuqdI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TBTr1dgU; arc=none smtp.client-ip=192.198.163.8
+	 MIME-Version; b=fG9ohDO4qhATcjJPnMVuSkXRCzuQ8Ty0Axjjp9gRbm6WycTgDvfmpc/CrzVpUsvpAb6kxiv3B7HJGO+EtP7AxKzGszbk652fkrDZ1qDY6Cvjm2rOM3JQZddzAHHcvDhZpuzIyIlvQGu3qYGiFSWmM4s+/PekPgwzANhSVENvYtQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=K7W72qq2; arc=none smtp.client-ip=192.198.163.8
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1737062474; x=1768598474;
+  t=1737062476; x=1768598476;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=tOlxc56viZ6Yr5EHzXUgCNO/V1n1aksTtdGCo9g5GGg=;
-  b=TBTr1dgUOOM3dlHeIBh7u4NJVkC1DT7Xf68qGDzudKjOHZj1daQN6OwZ
-   nldRFvbkRr+g/d3opBwFpp3SnveV8dO1o2YGdPhh+iJTAq8PWOaN0HTJv
-   9mlKZvqCHtGmy7pbCeZrFwv7EUHZNeHI/RKfi16VRCVUkEWVeuGlEQxim
-   X6zWzbkAt60/eUpU25eL5VQFT5PGQl5dF57WEROpjq15RHt8KGPV4s3Oz
-   BN7VmJjOj5xszOTLQfB83Pgr/BEM6FVsXUfErztClZX1W8kt61TZiRQOo
-   eOhIWlfZAHYDsy5AwaLM6X45rkqdgWIs1XfmqJ7fzuxGEMDR442eZGjIC
-   w==;
-X-CSE-ConnectionGUID: md/IGazxRRu306+mXq+y7w==
-X-CSE-MsgGUID: ddb0S+7vSWyRFIHFrrvpcQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11317"; a="55019521"
+  bh=oaSxKAQMpS13TWHgbFGz0i7yncnkmJ9XJbS46aO6428=;
+  b=K7W72qq2ibLPUqyk5EffxY2fUAPSpH7sA/qEsk7LFK4I7dCQ4rRyAdtZ
+   flOiiWJqnnG5JZvhK5KwzBaacrBYHkhxQc0aknTW/jx2afDvx9Mc+pU+I
+   7M2f5GqlGsriYTXORI5H49gDpdTV0robruL2yDs6XCQQ79SaGddpa1wDF
+   /lP6qBjRUEtUUmFnwVO/m/DJIZKFXwJWJ5QQbEOPgbQsFqOU1ucAynVDn
+   PLUbPqewIAvwE6b2MFllU6l8A5M5h760cuSVVgPIId4c+so/QlO97V5cR
+   5FBNthocIbwUa6vAGA70bh0sXNDK1LhUzKYOZk8XXqfOuoYTgtSAfPUmX
+   g==;
+X-CSE-ConnectionGUID: Q5OUnJf1SJy/O/BWrYexMw==
+X-CSE-MsgGUID: yDMWPJHvQGqgp2yRUXh8eA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11317"; a="55019530"
 X-IronPort-AV: E=Sophos;i="6.13,210,1732608000"; 
-   d="scan'208";a="55019521"
+   d="scan'208";a="55019530"
 Received: from fmviesa007.fm.intel.com ([10.60.135.147])
   by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jan 2025 13:21:10 -0800
-X-CSE-ConnectionGUID: RBhvTL0GT4Wt1El9D0qYog==
-X-CSE-MsgGUID: cKj42bqtSuiz0yxKK1osUw==
+X-CSE-ConnectionGUID: VmKo/AKCROGeJ9vzjeiwiA==
+X-CSE-MsgGUID: pU4g3ONsQdes+SNhKjEK5A==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.13,210,1732608000"; 
-   d="scan'208";a="105572567"
+   d="scan'208";a="105572572"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by fmviesa007.fm.intel.com with ESMTP; 16 Jan 2025 13:21:09 -0800
+  by fmviesa007.fm.intel.com with ESMTP; 16 Jan 2025 13:21:10 -0800
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
 To: davem@davemloft.net,
 	kuba@kernel.org,
@@ -69,11 +69,10 @@ Cc: Konrad Knitter <konrad.knitter@intel.com>,
 	anthony.l.nguyen@intel.com,
 	jacob.e.keller@intel.com,
 	przemyslaw.kitszel@intel.com,
-	jiri@resnulli.us,
-	Marcin Szycik <marcin.szycik@linux.intel.com>
-Subject: [PATCH net-next 1/3] pldmfw: enable selected component update
-Date: Thu, 16 Jan 2025 13:20:55 -0800
-Message-ID: <20250116212059.1254349-2-anthony.l.nguyen@intel.com>
+	jiri@resnulli.us
+Subject: [PATCH net-next 2/3] devlink: add devl guard
+Date: Thu, 16 Jan 2025 13:20:56 -0800
+Message-ID: <20250116212059.1254349-3-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20250116212059.1254349-1-anthony.l.nguyen@intel.com>
 References: <20250116212059.1254349-1-anthony.l.nguyen@intel.com>
@@ -87,70 +86,37 @@ Content-Transfer-Encoding: 8bit
 
 From: Konrad Knitter <konrad.knitter@intel.com>
 
-This patch enables to update a selected component from PLDM image
-containing multiple components.
+Add devl guard for scoped_guard().
 
 Example usage:
 
-struct pldmfw;
-data.mode = PLDMFW_UPDATE_MODE_SINGLE_COMPONENT;
-data.compontent_identifier = DRIVER_FW_MGMT_COMPONENT_ID;
+scoped_guard(devl, priv_to_devlink(pf)) {
+	err = init_devlink(pf);
+	if (err)
+		return err;
+}
 
-Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
-Reviewed-by: Marcin Szycik <marcin.szycik@linux.intel.com>
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Co-developed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Signed-off-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 Signed-off-by: Konrad Knitter <konrad.knitter@intel.com>
 Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com> (A Contingent worker at Intel)
 Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
- include/linux/pldmfw.h | 8 ++++++++
- lib/pldmfw/pldmfw.c    | 8 ++++++++
- 2 files changed, 16 insertions(+)
+ include/net/devlink.h | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/include/linux/pldmfw.h b/include/linux/pldmfw.h
-index 0fc831338226..f5047983004f 100644
---- a/include/linux/pldmfw.h
-+++ b/include/linux/pldmfw.h
-@@ -125,9 +125,17 @@ struct pldmfw_ops;
-  * a pointer to their own data, used to implement the device specific
-  * operations.
-  */
-+
-+enum pldmfw_update_mode {
-+	PLDMFW_UPDATE_MODE_FULL,
-+	PLDMFW_UPDATE_MODE_SINGLE_COMPONENT,
-+};
-+
- struct pldmfw {
- 	const struct pldmfw_ops *ops;
- 	struct device *dev;
-+	u16 component_identifier;
-+	enum pldmfw_update_mode mode;
- };
+diff --git a/include/net/devlink.h b/include/net/devlink.h
+index fc79fe2297a1..b8783126c1ed 100644
+--- a/include/net/devlink.h
++++ b/include/net/devlink.h
+@@ -1535,6 +1535,7 @@ int devl_trylock(struct devlink *devlink);
+ void devl_unlock(struct devlink *devlink);
+ void devl_assert_locked(struct devlink *devlink);
+ bool devl_lock_is_held(struct devlink *devlink);
++DEFINE_GUARD(devl, struct devlink *, devl_lock(_T), devl_unlock(_T));
  
- bool pldmfw_op_pci_match_record(struct pldmfw *context, struct pldmfw_record *record);
-diff --git a/lib/pldmfw/pldmfw.c b/lib/pldmfw/pldmfw.c
-index 6e1581b9a616..6264e2013f25 100644
---- a/lib/pldmfw/pldmfw.c
-+++ b/lib/pldmfw/pldmfw.c
-@@ -481,9 +481,17 @@ static int pldm_parse_components(struct pldmfw_priv *data)
- 		component->component_data = data->fw->data + offset;
- 		component->component_size = size;
+ struct ib_device;
  
-+		if (data->context->mode == PLDMFW_UPDATE_MODE_SINGLE_COMPONENT &&
-+		    data->context->component_identifier != component->identifier)
-+			continue;
-+
- 		list_add_tail(&component->entry, &data->components);
- 	}
- 
-+	if (data->context->mode == PLDMFW_UPDATE_MODE_SINGLE_COMPONENT &&
-+	    list_empty(&data->components))
-+		return -ENOENT;
-+
- 	header_crc_ptr = data->fw->data + data->offset;
- 
- 	err = pldm_move_fw_offset(data, sizeof(data->header_crc));
 -- 
 2.47.1
 
