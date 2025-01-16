@@ -1,112 +1,153 @@
-Return-Path: <netdev+bounces-158880-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158881-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF1E4A13A1F
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 13:44:19 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E3149A13A27
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 13:45:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7253A167328
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 12:44:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4EA5F1884E67
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 12:45:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 802F51DED66;
-	Thu, 16 Jan 2025 12:43:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 773DA1DBB3A;
+	Thu, 16 Jan 2025 12:45:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z1yHZtm3"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dnr4NOUB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02FEF1DE892;
-	Thu, 16 Jan 2025 12:43:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C1481862;
+	Thu, 16 Jan 2025 12:45:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737031434; cv=none; b=VvOFHiMlGCGt2Fxb+uGXcrod9blNqShUfMH2V/u2lTzr1hmZfkkP8b/R0QThaDzn5NOEJgweHpLY1cyt4YdxrkbjojkC2mK6Sjnbn7Q3k4PTmvR3uwpw3cOXngBo3ZXWtAeM+v8HaE17h1Sh1rN464hClvhoa3b02JLjUpsM6Ns=
+	t=1737031544; cv=none; b=oPuDPyB5kh/mpU9oQZAf2KvmCkAh4bN+HFduEbClVgjDq++yb1KRc1pc3INyxeSiseeXmwoqvO5tRdltluM20cdCub9JJHjcoKSXfkTEhEVvHaVWGa+xNlfEbBh2lb/yszAD+GQNem23cidacULlgHj/7V+oyvxokanXhs1fD4Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737031434; c=relaxed/simple;
-	bh=91faCPnI6BFBNuEQ1W5ciAABK9q4SQ7lWA8dOZ2SPLg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=UohYdieOTg8BHTlG/jkszrn6zq1zfyMQ7YkFU6HQBLaJ5A8ggPjemwF/tqOzIfVsL9bOVio0nTFLtmR2+vobYARWgLqN1VFb4x8l/8k8WQ1tnrnOCBbmTDoP7g5kqvQyQpx2M0EQJRyxhm7g6oHaM8u19ZOo8xc7ECnkMuQNO8c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Z1yHZtm3; arc=none smtp.client-ip=209.85.216.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-2ef05d0ef18so195495a91.0;
-        Thu, 16 Jan 2025 04:43:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1737031432; x=1737636232; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=91faCPnI6BFBNuEQ1W5ciAABK9q4SQ7lWA8dOZ2SPLg=;
-        b=Z1yHZtm3LG9yAvOkLZkq3vJ7UTqVbQNYfEYQ3Jr2ROMSunP1iKS1y7Q+NLns1Eohq8
-         VSsRxUcvozl2vV2/ypvD3X9PGtov4SlUDiIMrcdaKHdt+iFvrpzLkkvfN1ldak9Kt7wB
-         CgTaOZWkHzQ3NgPr3KwUViP3HU6UdndyeoKBUJyOcw6yTpE9xiNk2MLUjnHfJEPCnWo/
-         VsR30cQNvtC28cdnmjjSYnm0vakXyFN6I8QBTrknjzKc06ZvtyG3YnDpOsZZI8jbPv8N
-         8/rrjdxmUjbFURokE3ws7b+UVTFXnwypfhgEn4NmhJj3u9cMZMbyHKra6CoUONBH8Vtl
-         QC4Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737031432; x=1737636232;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=91faCPnI6BFBNuEQ1W5ciAABK9q4SQ7lWA8dOZ2SPLg=;
-        b=AsXVnCMkM4P8CKhx5JA13/KZcD7xdMWLE4UbCqXyFVCJmkXTQlL9X1VfD76PL7ufZG
-         AVFlDpogCjoCDu7Nab/OafKXX1rpDzLAftfW8cGrDeBQJs+c+NBGvkcihyAfntArIhNX
-         ABZslgCwbhRtzraOG8VV4exSTmYHnBwVWFpbpHU9+D3x741j7zThV6aOM+VLjGOhz7Sw
-         yB6ZyLTHEpkxeN6IhFwW/W/4LdxfEyfZYhmAO0C9GVa7Cb67ZHkF3hnM+Vuc83os/xwI
-         94c0H7EwUBrvid5NdZ/rzyQXybgt/+sebxnFcvZqsXFnfzdcc8KK0D4ikCkxJG2xlwPx
-         zBrw==
-X-Forwarded-Encrypted: i=1; AJvYcCUDBbv5gqnArkKV9O61x+jAkog2xtIRrRfR5ibBwFy7d9q9cjnLuUmt1k/X5uX44cFZtU8+CXrYa5ODNWc=@vger.kernel.org, AJvYcCWrbtzuF5ae5gTAasba8dclKHGrGKHqqzaOj30z6Bp0n3k/Uw/pwufkCtit2Md8AWDZkNbIaesJr0uu2WZ23Is=@vger.kernel.org, AJvYcCWz6jGsDONSmCeg47vz1diMCYrQVQD5iCUfCAB76MtPbJI+WcgQhMdFBVQHrPzGkORKC39gGEGj@vger.kernel.org
-X-Gm-Message-State: AOJu0YxHUj8MvSl8/1F8T1N/PGtAEQ+Qu0bwH0497MZXHCYztniYzzz9
-	/6jd9bqKF4Z67FMk7OZ0ZX/92cuvDDmaCF3L6R9i1cHKiKFG/n1d3RrUmozqtc7zDn+vWhEGTxQ
-	Wj1yZwPzybMy3zTkDFgH5oMKeYUs=
-X-Gm-Gg: ASbGncvljBunWH11DX2v1RHQWLoG5v5VGPRDseYubp5NGDcn75CbLJuWyth6UE0X6Pe
-	V3bWvqW/zgPdaxoTRwfV2r18iqoXZfbQKOd/KRw==
-X-Google-Smtp-Source: AGHT+IEfMzPUH0Gcuohd1YVqNHc9QJARY1WRjsvRhqrqjLIaqstfyo2D9zD8jhIfd+ioQeb52klag3s731FmZfSIpPI=
-X-Received: by 2002:a17:90b:2811:b0:2ee:cbc9:d50b with SMTP id
- 98e67ed59e1d1-2f5490ac695mr18452301a91.4.1737031432299; Thu, 16 Jan 2025
- 04:43:52 -0800 (PST)
+	s=arc-20240116; t=1737031544; c=relaxed/simple;
+	bh=9Wx+ucB4Cy3SL0t6vzNkJ/wDcZULfLHD1XwHjTcIBvc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=LZ/wt0sfr/42YHscALJUplMbumFx1gAtxwTM6f2eymvmW1F2ZI8eYkzInmgBaiF3i3HieQs1fD30NI7VZRnF22TNCX+3JQT2HuDeuZahJzcXuHJWqB7w39Sp9GXvwnElRdjkjBa5O82a0SplDltxd7DrXE++HcyndvOjIHSaea0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dnr4NOUB; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4F9A0C4CED6;
+	Thu, 16 Jan 2025 12:45:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1737031543;
+	bh=9Wx+ucB4Cy3SL0t6vzNkJ/wDcZULfLHD1XwHjTcIBvc=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=dnr4NOUBthdiya/3gobQSflpU/SGrzmQEkE6lSH6386KdZ01zJgyd1Kq7U5u9Oyv5
+	 0esxnr2q7bfY2waAZv0qAIj+/pP5JXhkXRnN2Xv4Wz4Cr73nZIEgvdTyBBy/G3xAlJ
+	 BJZCy3mGBuBwhBU8ztkbgpI6R3JMT2JJmCrP4FPMZEMIPzsLOQ3puE23Ejiii3zSom
+	 j8I8YIwLWWny+8ZNCgCqLakO4xu+VKdO1LWkW0qmyFS8Loy9ScDe/n+KL3wk6bX0+y
+	 lGq6a36K93w9ATm1We/0nifrgYJ6FOcRoS8HXZRibpQ60UJSBXU8ScSvqO8tkkXWUA
+	 2fffpNfjFXK4Q==
+Message-ID: <df2a463c-102c-4eb1-905d-96dbd926db7e@kernel.org>
+Date: Thu, 16 Jan 2025 13:45:35 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250116044100.80679-1-fujita.tomonori@gmail.com>
- <20250116044100.80679-3-fujita.tomonori@gmail.com> <CAH5fLghAfovcm0ZJBByswXRSM4dRQY4ht7N7YGscWOaT+fN9OA@mail.gmail.com>
- <20250116.210042.151459337736478197.fujita.tomonori@gmail.com>
-In-Reply-To: <20250116.210042.151459337736478197.fujita.tomonori@gmail.com>
-From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date: Thu, 16 Jan 2025 13:43:39 +0100
-X-Gm-Features: AbW1kvYt7d_iVfTVjqvF1od81AQIPrtxluUDw4bnVHdFin9wcMRIoz8lfthzIrA
-Message-ID: <CANiq72k8=M-9HLedMatqA1U7vTa981MFpQYivYOh+PFWA27OQQ@mail.gmail.com>
-Subject: Re: [PATCH v8 2/7] rust: time: Introduce Delta type
-To: FUJITA Tomonori <fujita.tomonori@gmail.com>
-Cc: aliceryhl@google.com, linux-kernel@vger.kernel.org, andrew@lunn.ch, 
-	rust-for-linux@vger.kernel.org, netdev@vger.kernel.org, hkallweit1@gmail.com, 
-	tmgross@umich.edu, ojeda@kernel.org, alex.gaynor@gmail.com, gary@garyguo.net, 
-	bjorn3_gh@protonmail.com, benno.lossin@proton.me, a.hindborg@samsung.com, 
-	anna-maria@linutronix.de, frederic@kernel.org, tglx@linutronix.de, 
-	arnd@arndb.de, jstultz@google.com, sboyd@kernel.org, mingo@redhat.com, 
-	peterz@infradead.org, juri.lelli@redhat.com, vincent.guittot@linaro.org, 
-	dietmar.eggemann@arm.com, rostedt@goodmis.org, bsegall@google.com, 
-	mgorman@suse.de, vschneid@redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 3/3] net: phy: mediatek: add driver for built-in
+ 2.5G ethernet PHY on MT7988
+To: Sky Huang <SkyLake.Huang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
+ Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Daniel Golle <daniel@makrotopia.org>,
+ Qingfang Deng <dqfext@gmail.com>, Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org
+Cc: Steven Liu <Steven.Liu@mediatek.com>
+References: <20250116012159.3816135-1-SkyLake.Huang@mediatek.com>
+ <20250116012159.3816135-4-SkyLake.Huang@mediatek.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 fv0=
+In-Reply-To: <20250116012159.3816135-4-SkyLake.Huang@mediatek.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Jan 16, 2025 at 1:00=E2=80=AFPM FUJITA Tomonori
-<fujita.tomonori@gmail.com> wrote:
->
-> I dropped as_millis() method in v4 because I followed the rule, don't
-> add an API that may not be used.
+On 16/01/2025 02:21, Sky Huang wrote:
+> +
+> +static int mt798x_2p5ge_phy_load_fw(struct phy_device *phydev)
+> +{
+> +	struct mtk_i2p5ge_phy_priv *priv = phydev->priv;
+> +	void __iomem *mcu_csr_base, *pmb_addr;
+> +	struct device *dev = &phydev->mdio.dev;
+> +	const struct firmware *fw;
+> +	struct device_node *np;
+> +	int ret, i;
+> +	u32 reg;
+> +
+> +	if (priv->fw_loaded)
+> +		return 0;
+> +
+> +	np = of_find_compatible_node(NULL, NULL, "mediatek,2p5gphy-fw");
 
-Yeah, please mention the intended/expected use case in the commit
-message so that it is clear, and then it should be OK (at least for
-something simple like `as_millis()` here).
+There is no such compatible. You cannot just add undocumented bindings.
 
-Thanks!
+Also, devices should not just look for some random compatibles. Express
+proper relationships with phandles or node hierarchy.
 
-Cheers,
-Miguel
+> +	if (!np)
+> +		return -ENOENT;
+> +
+> +	pmb_addr = of_iomap(np, 1);
+> +	if (!pmb_addr)
+> +		return -ENOMEM;
+> +	mcu_csr_base = of_iomap(np, 2);
+> +	if (!mcu_csr_base) {
+> +		ret = -ENOMEM;
+> +		goto free_pmb;
+> +	}
+> +
+Best regards,
+Krzysztof
 
