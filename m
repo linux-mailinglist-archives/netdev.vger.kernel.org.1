@@ -1,144 +1,129 @@
-Return-Path: <netdev+bounces-158793-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158794-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6EC80A13479
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 08:57:07 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 683E9A134A1
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 09:05:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C9DFD18881CA
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 07:57:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7E4A4166C8F
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 08:05:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E41F19644B;
-	Thu, 16 Jan 2025 07:57:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98E5B198A38;
+	Thu, 16 Jan 2025 08:05:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="GAaEeVRo"
+	dkim=pass (2048-bit key) header.d=yunsilicon.com header.i=@yunsilicon.com header.b="eY3SXb1c"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-112.freemail.mail.aliyun.com (out30-112.freemail.mail.aliyun.com [115.124.30.112])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from va-2-44.ptr.blmpb.com (va-2-44.ptr.blmpb.com [209.127.231.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47356156C76;
-	Thu, 16 Jan 2025 07:56:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.112
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CBC5381AA
+	for <netdev@vger.kernel.org>; Thu, 16 Jan 2025 08:05:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.127.231.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737014220; cv=none; b=Z877Z4onnREOU9M6zmE0x3pSQfQc18HB+M3VNVot3EQ9LPiHrQmqvU/VC3+m4BH7S/tgWw3Vd6BvuvA9Of/SI4he1BT7/C9Dzq7DL5OIfm+1RyJoXdWIuxE4I+9gx9MdZWGCoabxgvWxtvFuwepinpGamXjRCKViYyUYQM6inZk=
+	t=1737014704; cv=none; b=Enig5HstWKibdQyDw7pZlJQEE5PvMRFTGhoksZn+qjuhay9cx5vhHcU/sUflqeamOHkK/QtxiHUcyPFuXkLKUtQ2o+bKtc9RMxb8teblXR0jiSucdcMB0NAT5gEQA6q8n+8T61BMGiIT/ABUiZkY6D2wvKaij1Sdgkki8rrYt6Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737014220; c=relaxed/simple;
-	bh=ic1Tdl5eQV9IhEkanXH8pQd/pPr8stQL+iCCxmLxuHk=;
-	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=qL+6nfrpnCE3rKgCnV51OzrP8LBzNKrpqRq6sVw4RoYFyx2jBRZI6IkdO5ptZP/G/MS9C2RRe1sCJUH4EbcB5dGh6BANf49r5Dhv/L1wxQq5rck2c380eOQiZ1cLou1vKqzeepYoZJKg/BEA1IU3XdojNDnMuzt7cOwgxBSXbT4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=GAaEeVRo; arc=none smtp.client-ip=115.124.30.112
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1737014216; h=Message-ID:Subject:Date:From:To;
-	bh=ki0PBrtLkvSDIfEjuIbvOsNpP0XUwjZ9O5tjmqTVT3A=;
-	b=GAaEeVRosPZUDXc2KPO+EeMo0urZfSkaxcnagbyHCvDcZ81Od3SjM6phF+QHcEd3huuYxFd6ytDpKyCFoTT4d/EYmDHRqLBCpEYJBqYkq+baY9thJQCaVVzav8957Ju8qlaCQHy0nwghj0+pnQSHo6l1ykYGD6/eKnkHseLCF1I=
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0WNl-Mc3_1737014213 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Thu, 16 Jan 2025 15:56:54 +0800
-Message-ID: <1737014207.587077-2-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH net-next v2 4/4] virtio_net: Use persistent NAPI config
-Date: Thu, 16 Jan 2025 15:56:47 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: Joe Damato <jdamato@fastly.com>
-Cc: gerhard@engleder-embedded.com,
- jasowang@redhat.com,
- leiyang@redhat.com,
- mkarsten@uwaterloo.ca,
- Joe Damato <jdamato@fastly.com>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- =?utf-8?q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- virtualization@lists.linux.dev (open list:VIRTIO CORE AND NET DRIVERS),
- linux-kernel@vger.kernel.org (open list),
- netdev@vger.kernel.org
-References: <20250116055302.14308-1-jdamato@fastly.com>
- <20250116055302.14308-5-jdamato@fastly.com>
-In-Reply-To: <20250116055302.14308-5-jdamato@fastly.com>
+	s=arc-20240116; t=1737014704; c=relaxed/simple;
+	bh=qtNhhWaYVNIQ1W7ff/AqT3OpVKqnXiZmtxv2hLFGQ94=;
+	h=In-Reply-To:Date:Content-Type:From:Subject:Message-Id:
+	 Mime-Version:Cc:References:To; b=HLyvGlmSVRh3lRktSsj2kcy2738YizqAREIiCum7wWV73LqC6PdM0dyxWeJTr6ghPbfugcNqZXobGVs2hUBHVbaLXb4hh+AtdeacbvkzilmCPvcSPG/F4R+I4V9ofcZK8F8R4BGJrohHB4yncy0Pv75rgdmr5Gc0f0CRBxwzroU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=yunsilicon.com; spf=pass smtp.mailfrom=yunsilicon.com; dkim=pass (2048-bit key) header.d=yunsilicon.com header.i=@yunsilicon.com header.b=eY3SXb1c; arc=none smtp.client-ip=209.127.231.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=yunsilicon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yunsilicon.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ s=feishu2403070942; d=yunsilicon.com; t=1737014692; h=from:subject:
+ mime-version:from:date:message-id:subject:to:cc:reply-to:content-type:
+ mime-version:in-reply-to:message-id;
+ bh=qtNhhWaYVNIQ1W7ff/AqT3OpVKqnXiZmtxv2hLFGQ94=;
+ b=eY3SXb1ciE4fCLk/5C/6bkxka/IsJHC9Nhe/uWQANbvzDNiJHJQP+ZIT1ufaebuofrTMtP
+ HA/84korwVAS6eOR+1RcJQTrSZZ3m4yg4lGLBX50EocVUSjUOZOo2FO6/1tXKZZdiSj3R5
+ +I1QyU0C5vRDKg+UAhtQALWPI+En2pMvxspJi4JzChxEkAQSWKZJ39msoxCsAgOIATgBo0
+ DPX1RT7sbIf8i27yXN1lfwGJVEi+x0D3QnUZ4duSkWEWHT85ynyJjofxXruUct0mROpLt7
+ Gdlc5PqszOpeRi8wW5yKn2KZb19Qule4KEWmONxVhTSWMRlUTfbypn3VdUt9+A==
+In-Reply-To: <20250115160412.GQ5497@kernel.org>
+Date: Thu, 16 Jan 2025 16:04:47 +0800
+User-Agent: Mozilla Thunderbird
+Content-Type: text/plain; charset=UTF-8
+From: "tianx" <tianx@yunsilicon.com>
+Subject: Re: [PATCH v3 01/14] net-next/yunsilicon: Add xsc driver basic framework
+Message-Id: <a1951ab6-3ef1-441f-877f-ae2ca7c8f1c5@yunsilicon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+Mime-Version: 1.0
+X-Original-From: tianx <tianx@yunsilicon.com>
+Cc: <netdev@vger.kernel.org>, <leon@kernel.org>, <andrew+netdev@lunn.ch>, 
+	<kuba@kernel.org>, <pabeni@redhat.com>, <edumazet@google.com>, 
+	<davem@davemloft.net>, <jeff.johnson@oss.qualcomm.com>, 
+	<przemyslaw.kitszel@intel.com>, <weihg@yunsilicon.com>, 
+	<wanry@yunsilicon.com>
+References: <20250115102242.3541496-1-tianx@yunsilicon.com> <20250115102242.3541496-2-tianx@yunsilicon.com> <20250115160412.GQ5497@kernel.org>
+X-Lms-Return-Path: <lba+26788bda2+df0a32+vger.kernel.org+tianx@yunsilicon.com>
+Received: from [127.0.0.1] ([218.1.137.133]) by smtp.feishu.cn with ESMTPS; Thu, 16 Jan 2025 16:04:49 +0800
+Content-Transfer-Encoding: 7bit
+To: "Simon Horman" <horms@kernel.org>
 
-On Thu, 16 Jan 2025 05:52:59 +0000, Joe Damato <jdamato@fastly.com> wrote:
-> Use persistent NAPI config so that NAPI IDs are not renumbered as queue
-> counts change.
+On 2025/1/16 0:04, Simon Horman wrote:
+> On Wed, Jan 15, 2025 at 06:22:44PM +0800, Xin Tian wrote:
+>> Add yunsilicon xsc driver basic framework, including xsc_pci driver
+>> and xsc_eth driver
+>>
+>> Co-developed-by: Honggang Wei <weihg@yunsilicon.com>
+>> Signed-off-by: Honggang Wei <weihg@yunsilicon.com>
+>> Co-developed-by: Lei Yan <jacky@yunsilicon.com>
+>> Signed-off-by: Lei Yan <jacky@yunsilicon.com>
+>> Signed-off-by: Xin Tian <tianx@yunsilicon.com>
+> ...
 >
-> $ sudo ethtool -l ens4  | tail -5 | egrep -i '(current|combined)'
-> Current hardware settings:
-> Combined:	4
+>> diff --git a/drivers/net/ethernet/yunsilicon/xsc/pci/Makefile b/drivers/net/ethernet/yunsilicon/xsc/pci/Makefile
+>> new file mode 100644
+>> index 000000000..709270df8
+>> --- /dev/null
+>> +++ b/drivers/net/ethernet/yunsilicon/xsc/pci/Makefile
+>> @@ -0,0 +1,9 @@
+>> +# SPDX-License-Identifier: GPL-2.0
+>> +# Copyright (C) 2021-2025, Shanghai Yunsilicon Technology Co., Ltd.
+>> +# All rights reserved.
+>> +
+>> +ccflags-y += -I$(srctree)/drivers/net/ethernet/yunsilicon/xsc
+>> +
+>> +obj-$(CONFIG_YUNSILICON_XSC_PCI) += xsc_pci.o
+>> +
+>> +xsc_pci-y := main.o
+>> diff --git a/drivers/net/ethernet/yunsilicon/xsc/pci/main.c b/drivers/net/ethernet/yunsilicon/xsc/pci/main.c
+>> new file mode 100644
+>> index 000000000..4859be58f
+>> --- /dev/null
+>> +++ b/drivers/net/ethernet/yunsilicon/xsc/pci/main.c
+>> @@ -0,0 +1,251 @@
+>> +// SPDX-License-Identifier: GPL-2.0
+>> +/* Copyright (C) 2021-2025, Shanghai Yunsilicon Technology Co., Ltd.
+>> + * All rights reserved.
+>> + */
+>> +
+>> +#include "common/xsc_core.h"
+> Hi Xin Tian, all,
 >
-> $ ./tools/net/ynl/pyynl/cli.py \
->     --spec Documentation/netlink/specs/netdev.yaml \
->     --dump queue-get --json='{"ifindex": 2}'
-> [{'id': 0, 'ifindex': 2, 'napi-id': 8193, 'type': 'rx'},
->  {'id': 1, 'ifindex': 2, 'napi-id': 8194, 'type': 'rx'},
->  {'id': 2, 'ifindex': 2, 'napi-id': 8195, 'type': 'rx'},
->  {'id': 3, 'ifindex': 2, 'napi-id': 8196, 'type': 'rx'},
->  {'id': 0, 'ifindex': 2, 'type': 'tx'},
->  {'id': 1, 'ifindex': 2, 'type': 'tx'},
->  {'id': 2, 'ifindex': 2, 'type': 'tx'},
->  {'id': 3, 'ifindex': 2, 'type': 'tx'}]
+> Sorry for not noticing this before sending my previous email.
 >
-> Now adjust the queue count, note that the NAPI IDs are not renumbered:
+> Please consider a relative include like the following,
+> rather than the above combined with a -I directive in the Makefile.
 >
-> $ sudo ethtool -L ens4 combined 1
-> $ ./tools/net/ynl/pyynl/cli.py \
->     --spec Documentation/netlink/specs/netdev.yaml \
->     --dump queue-get --json='{"ifindex": 2}'
-> [{'id': 0, 'ifindex': 2, 'napi-id': 8193, 'type': 'rx'},
->  {'id': 0, 'ifindex': 2, 'type': 'tx'}]
+> #include "../common/xsc_core.h"
 >
-> $ sudo ethtool -L ens4 combined 8
-> $ ./tools/net/ynl/pyynl/cli.py \
->     --spec Documentation/netlink/specs/netdev.yaml \
->     --dump queue-get --json='{"ifindex": 2}'
-> [{'id': 0, 'ifindex': 2, 'napi-id': 8193, 'type': 'rx'},
->  {'id': 1, 'ifindex': 2, 'napi-id': 8194, 'type': 'rx'},
->  {'id': 2, 'ifindex': 2, 'napi-id': 8195, 'type': 'rx'},
->  {'id': 3, 'ifindex': 2, 'napi-id': 8196, 'type': 'rx'},
->  {'id': 4, 'ifindex': 2, 'napi-id': 8197, 'type': 'rx'},
->  {'id': 5, 'ifindex': 2, 'napi-id': 8198, 'type': 'rx'},
->  {'id': 6, 'ifindex': 2, 'napi-id': 8199, 'type': 'rx'},
->  {'id': 7, 'ifindex': 2, 'napi-id': 8200, 'type': 'rx'},
->  [...]
+> This is common practice in Networking code.
+> And, for one thing, allows the following to work:
 >
-> Signed-off-by: Joe Damato <jdamato@fastly.com>
+> make drivers/net/ethernet/yunsilicon/xsc/pci/main.o
 
-Reviewed-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Hi, Simon
 
-> ---
->  v2:
->    - New in this v2. Adds persistent NAPI config so that NAPI IDs are
->      not renumbered and napi_config settings are persisted.
+I don't fully understand the benefit of using relative includes in this case,
+as|"make drivers/net/ethernet/yunsilicon/xsc/pci/main.o|" already works with the current setup.
+
 >
->  drivers/net/virtio_net.c | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
->
-> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> index c6fda756dd07..52094596e94b 100644
-> --- a/drivers/net/virtio_net.c
-> +++ b/drivers/net/virtio_net.c
-> @@ -6420,8 +6420,9 @@ static int virtnet_alloc_queues(struct virtnet_info *vi)
->  	INIT_DELAYED_WORK(&vi->refill, refill_work);
->  	for (i = 0; i < vi->max_queue_pairs; i++) {
->  		vi->rq[i].pages = NULL;
-> -		netif_napi_add_weight(vi->dev, &vi->rq[i].napi, virtnet_poll,
-> -				      napi_weight);
-> +		netif_napi_add_config(vi->dev, &vi->rq[i].napi, virtnet_poll,
-> +				      i);
-> +		vi->rq[i].napi.weight = napi_weight;
->  		netif_napi_add_tx_weight(vi->dev, &vi->sq[i].napi,
->  					 virtnet_poll_tx,
->  					 napi_tx ? napi_weight : 0);
-> --
-> 2.25.1
->
+> ...
 
