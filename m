@@ -1,209 +1,185 @@
-Return-Path: <netdev+bounces-158704-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158706-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38F33A13075
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 02:07:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id CB2B1A13087
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 02:13:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 452471658F7
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 01:07:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E2A22165BD2
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 01:13:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 450231C695;
-	Thu, 16 Jan 2025 01:07:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B02A418EAB;
+	Thu, 16 Jan 2025 01:13:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OE3ZqqWY"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YFB3Ht3U"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f48.google.com (mail-io1-f48.google.com [209.85.166.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D3FD208D0
-	for <netdev@vger.kernel.org>; Thu, 16 Jan 2025 01:07:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 982A48494;
+	Thu, 16 Jan 2025 01:13:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736989630; cv=none; b=XB6W4tU2BuvTGR1Hze7+F8NlncdGJ/gLM8KaVABFs0AhpEJwhoyP0jiY3HA5ftPPd+sFezV9WpmDoSDTcsj2DA2y5DksX5nr3TI2eMHrYUbkO3cBMMec434uQ07Klp53Egzm2JSGxBDt4dq5obIDoGSlBOT8oo/ZP3NQ5MAMKOg=
+	t=1736989991; cv=none; b=QWFylnfFKNn3y/Tv7RiKhC95LyXxEM32SByd+fH4GTvit9shLRxHFbIHanD6vnBOWhilZigPe3ShKGyGZR2kBHZzVLgdIVXsjaUk6vWl5mvaeb6wNrVrp+KF7IiBIz3nPnb/+7bpC5DfS8at1mow5lqUbF8do8adhk0A/2UMRvo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736989630; c=relaxed/simple;
-	bh=wlj81as0MSR+2QoKMzymAk7Z0bJsw6YvCNC5UATgJPE=;
+	s=arc-20240116; t=1736989991; c=relaxed/simple;
+	bh=4BQOfZxHB5HndhISHgem1p4U7kXFZ+Cp7oKH5ALMXBI=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=OHjrHQqu1Gs10dbF7fE6yxJuJY65wtIdKT4t3chUzivcX9wqGIzJoQ+PISaJmpuqoo7IN6PAIG4HEQsD2x4df5Y3mEaJpuAPwYP3O0QZ6xDBO2woETPtYG1S6c6BMZMU+n/MlwpcVu2PUy9BVvqRu0fgkEtPTARPlVoNE4UrNFQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OE3ZqqWY; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1736989627;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=wlj81as0MSR+2QoKMzymAk7Z0bJsw6YvCNC5UATgJPE=;
-	b=OE3ZqqWYdzUo9+pSRk0ipVvvLEEdgBgRlq4uulUTWi2EaDEjAoIMQAchpw00g8RtfgjIdx
-	Oilhaiq0+DAukJP/cwx9ySAs2KkLrO5l+y5hoECY0SC7qUJnSeCiTsoNYEEmqZc4GUcXb/
-	E0Yt3dRuQRmcyHHf5WuRLnv4PH3FFho=
-Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
- [209.85.216.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-361-Hi5zXDHrNS-p8IpJxlrWtQ-1; Wed, 15 Jan 2025 20:07:05 -0500
-X-MC-Unique: Hi5zXDHrNS-p8IpJxlrWtQ-1
-X-Mimecast-MFC-AGG-ID: Hi5zXDHrNS-p8IpJxlrWtQ
-Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-2ef9204f898so848040a91.2
-        for <netdev@vger.kernel.org>; Wed, 15 Jan 2025 17:07:05 -0800 (PST)
+	 To:Cc:Content-Type; b=pC5SNrNiFpQ98eCeVnx9fYtYWQ1U2QcaJpXCEtOy7dxCzfp8vIqg22UffaPg1UiUNfFrhwjRcdeBbxA0CqW2CxT6rWN+350xDKmuy06zTRQGw+SMNkjitxmsjLNrU/ZpvNffBcUK0hp5PbYqXnh6gtVl0Cs/0KnMr81fZbJRShs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YFB3Ht3U; arc=none smtp.client-ip=209.85.166.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-io1-f48.google.com with SMTP id ca18e2360f4ac-844e9b83aaaso33425939f.3;
+        Wed, 15 Jan 2025 17:13:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1736989988; x=1737594788; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=N8C2C2bsZxq9vqDHdNsHWMM6AyuPxp4suTcXbrM1CMA=;
+        b=YFB3Ht3UDwv+0lAKNsSSCsbgfNEUuYqwOuAPt6XdeWuV57hnNtT+5NHck5S2HZ6I1e
+         prFAXEodjXegEYRZIY6XM44rv9tz/HzjyjaUWzQnbsRAKLRRdYEtmfKcvImvisLbMgiN
+         QlKoOAFG8tvfVpoX7lmifBESY2o3M/k64ks38XtabxTz4QMXu6e9I7IuXjMtcH95e7mF
+         PRIihsAOaLAXrEdFbueDZcSRuj5fIv/FO64eOVjr7RJH7n9Zq9XtAR7zKW43mBiDHuNt
+         3ovQlMbsga9yRtHjxMtShXc0iVQOeWJEd+eNaWS0fsl8qAhPfWBfnyxqLyqlb7bOWizT
+         PKHA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736989624; x=1737594424;
+        d=1e100.net; s=20230601; t=1736989988; x=1737594788;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=wlj81as0MSR+2QoKMzymAk7Z0bJsw6YvCNC5UATgJPE=;
-        b=s/UlQv2B86ihwYxfjztxmFH3gyzqP90ti4qKkH5dAaVPMvU9Ksk39ThxmNk6EzkAe/
-         Jo/x7UYTBCakXPEAsFI73a0EdSQgR1kfeesyb6ejkScgE+VlHbR91CGpSvxi2+WG+EKc
-         9rUy1q6FBMr62GkYIlNR9TB8JX0xFVzb7SqA0ffMurD5JZ1RNErR8zKSNlhXLejXiuOr
-         9WWFJQ49v9ZTi9Y3wCwAaTWi4ttIiDePLjQxwOnogpI5jWoEXx02AvzQ4yaPfmZ+Q+Pw
-         2tqNDY09caibBYB1b1KPwPECKrh1E9eI46h+flZh7tWR+KpBgFc2UE76SWBdtFa6a4aI
-         Lvjg==
-X-Forwarded-Encrypted: i=1; AJvYcCWiXWZZ10KJ7t4uepVe8/AXuV8+7gywOkoUvV197KHL7/Oyf6RbR5WKjJTq+r5YDI3OCnL7Ii8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwFPZiVuc5/2lr9v/E5qQZEaSqKFz8RA9NZBUuWzANeBPtLY9fk
-	UKtfpm9xqA+x4CGvj+e7qKZEH2gqZKjE7AOj32SAmx3NtPZclvKqoM8ets9T3omavXOUQB1nPGY
-	ruryT42uskyMl0KTa/LxpVWkI8yKJ85swHICet8X36+S7fwexegHlSxhpvEOjAjf5sygxI2HWQT
-	dLmQ778zgihqKV9JDYSr+4P0Qp/88g
-X-Gm-Gg: ASbGncv0Dmlx8f56qdf/eYSVlWkr9itr9tGUwVM8YHBacMknJ6NT0Z+qvgns55YGqKO
-	bYUs1OtDawTiwUA1gSTQRTAFC7ryTKIuHlZv08Ao=
-X-Received: by 2002:a17:90b:51cb:b0:2ef:3192:d280 with SMTP id 98e67ed59e1d1-2f548f162acmr41742267a91.5.1736989624169;
-        Wed, 15 Jan 2025 17:07:04 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFXTlxUYfojfThpUlYe1bY0TrNIHeZ7wOATIqqDywvf5ON2WLv7gIgxHZLXiKaVB1ytp3colHV+0p05xw+gzAU=
-X-Received: by 2002:a17:90b:51cb:b0:2ef:3192:d280 with SMTP id
- 98e67ed59e1d1-2f548f162acmr41742236a91.5.1736989623732; Wed, 15 Jan 2025
- 17:07:03 -0800 (PST)
+        bh=N8C2C2bsZxq9vqDHdNsHWMM6AyuPxp4suTcXbrM1CMA=;
+        b=akNpW7+dZQCV3aTNkwyS5Vq8dUkOYcwlSgmAXWDlh6O+lNH0nATWN0IVUfv+lFzNve
+         dtyq3GrwE5kYVjeaskmVPVw4Wr6fwgZO6ehVH6BbfcedHIE7XaudNkGru0ocwN+3ztEF
+         x24qB4nbDw+QqOdri4yll5hp4K87g8qqej/uxSx5elCC/gda3Cpshl4XOb+Syq2VV9i7
+         myfiD0QowluAnI1YN3aIRCPVxFIRlJqpjaY4LaGQi7RvLx4NYAg5QgLyX4H+zHmZBicJ
+         Wle1PeIY+9IlaOZEWSep4QT7Om90v0P27tRUYoDhBVQYie4n6xBfIMFngWhHREIQpMWy
+         dW8g==
+X-Forwarded-Encrypted: i=1; AJvYcCUhmytBd5FF7wGLasOmEgN17Buh0YFEq+Dkaw3KZCVjNn+Ta94/EO0eEWj9WFK9jKF8UcY=@vger.kernel.org, AJvYcCVlmbg8ylRvBNzcsO89bwEvC8xOmiliCu+5E16taeWl6j17Ww1dW8GsoenWY9vDuvB1qS8BPlA1@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy5WHiA6AggKax860KDDvgCtEfXIHXAR6CHfYNDjvrbvQf7WUg3
+	2Zub4Qmrnnm6fPpZe7qJkZG4sK3+rxAeEWZbJUMfZMYGC96PysW4W1kbw8wj8B69w8tpbVygR1C
+	JZEcsQoiecdBJ7A8sGpAxfg/TNiw=
+X-Gm-Gg: ASbGncuTACmNOlgMF4Z9/hk95bYwUCLtzm/ix00dYTFx0OkLINglTS5iFg+h+TX/t2+
+	K5qZmELoeei2sw14Y9E3CzczI5hkjdI6Pqu47
+X-Google-Smtp-Source: AGHT+IGvRWRudFeMb6nNd2IXuDFhoB0ZzDfdLTF4XM+v01cKTQNoTwnddq28FteKSc/6w0+unwOQZs4asEmao/9/7Hs=
+X-Received: by 2002:a05:6e02:330a:b0:3ce:8bae:d88b with SMTP id
+ e9e14a558f8ab-3ce8baedb52mr45050525ab.18.1736989987105; Wed, 15 Jan 2025
+ 17:13:07 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250109-tun-v2-0-388d7d5a287a@daynix.com> <20250109-tun-v2-3-388d7d5a287a@daynix.com>
- <CACGkMEsm5DCb+n3NYeRjmq3rAANztZz5QmV8rbPNo+cH-=VzDQ@mail.gmail.com>
- <20250110052246-mutt-send-email-mst@kernel.org> <2e015ee6-8a3b-43fb-b119-e1921139c74b@daynix.com>
- <CACGkMEuiyfH-QitiiKJ__-8NiTjoOfc8Nx5BwLM-GOfPpVEitA@mail.gmail.com> <fcb301e8-c808-4e20-92dd-2e3b83998d18@daynix.com>
-In-Reply-To: <fcb301e8-c808-4e20-92dd-2e3b83998d18@daynix.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Thu, 16 Jan 2025 09:06:52 +0800
-X-Gm-Features: AbW1kvY854xB4UWOJdJLBydWl06vsh4taL7pE63yt9P1_IVO_L6kO5WvWI7S_B8
-Message-ID: <CACGkMEvBU3mLbW+-nOscriR-SeDvPSm1mtwwgznYFOocuao5MQ@mail.gmail.com>
-Subject: Re: [PATCH v2 3/3] tun: Set num_buffers for virtio 1.0
-To: Akihiko Odaki <akihiko.odaki@daynix.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Shuah Khan <shuah@kernel.org>, linux-doc@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, kvm@vger.kernel.org, 
-	virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org, 
-	Yuri Benditovich <yuri.benditovich@daynix.com>, Andrew Melnychenko <andrew@daynix.com>, 
-	Stephen Hemminger <stephen@networkplumber.org>, gur.stavi@huawei.com, devel@daynix.com
+References: <20250112113748.73504-1-kerneljasonxing@gmail.com>
+ <20250112113748.73504-4-kerneljasonxing@gmail.com> <02031003-872e-49bf-a658-c22bc7e1a954@linux.dev>
+ <CAL+tcoD6MqBfbpM+ESkiNoRwsQqWsxMwMb4b0qvO=Cf8s52JyA@mail.gmail.com>
+ <CAL+tcoDS6H4SMDRs9r+cOM_2bdbNRFRQpuYmpVFyxoMcQJDXLQ@mail.gmail.com> <ba353503-bfd3-4de0-bb99-9c7e865e8a73@linux.dev>
+In-Reply-To: <ba353503-bfd3-4de0-bb99-9c7e865e8a73@linux.dev>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Thu, 16 Jan 2025 09:12:30 +0800
+X-Gm-Features: AbW1kvYEushpMBnz-ZVyiwuwHJSwJn3_z6lkX6rdRikKO18FLOof4Nw2490kdDA
+Message-ID: <CAL+tcoChGB3vA7LMm0VHb9OjmXHUw0--f6v4Crz5R7U+EPo+cg@mail.gmail.com>
+Subject: Re: [PATCH net-next v5 03/15] bpf: introduce timestamp_used to allow
+ UDP socket fetched in bpf prog
+To: Martin KaFai Lau <martin.lau@linux.dev>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, dsahern@kernel.org, willemdebruijn.kernel@gmail.com, 
+	willemb@google.com, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, 
+	eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev, 
+	john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me, 
+	haoluo@google.com, jolsa@kernel.org, horms@kernel.org, bpf@vger.kernel.org, 
+	netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jan 15, 2025 at 1:07=E2=80=AFPM Akihiko Odaki <akihiko.odaki@daynix=
-.com> wrote:
+On Thu, Jan 16, 2025 at 8:51=E2=80=AFAM Martin KaFai Lau <martin.lau@linux.=
+dev> wrote:
 >
-> On 2025/01/13 12:04, Jason Wang wrote:
-> > On Fri, Jan 10, 2025 at 7:12=E2=80=AFPM Akihiko Odaki <akihiko.odaki@da=
-ynix.com> wrote:
-> >>
-> >> On 2025/01/10 19:23, Michael S. Tsirkin wrote:
-> >>> On Fri, Jan 10, 2025 at 11:27:13AM +0800, Jason Wang wrote:
-> >>>> On Thu, Jan 9, 2025 at 2:59=E2=80=AFPM Akihiko Odaki <akihiko.odaki@=
-daynix.com> wrote:
-> >>>>>
-> >>>>> The specification says the device MUST set num_buffers to 1 if
-> >>>>> VIRTIO_NET_F_MRG_RXBUF has not been negotiated.
-> >>>>
-> >>>> Have we agreed on how to fix the spec or not?
-> >>>>
-> >>>> As I replied in the spec patch, if we just remove this "MUST", it
-> >>>> looks like we are all fine?
-> >>>>
-> >>>> Thanks
-> >>>
-> >>> We should replace MUST with SHOULD but it is not all fine,
-> >>> ignoring SHOULD is a quality of implementation issue.
-> >>>
+> On 1/14/25 6:54 PM, Jason Xing wrote:
+> > I construct my thoughts here according to our previous discussion:
+> > 1. not limiting the use of is_fullsock, so in patch 2, I will use the
+> > follow codes:
+> > +void bpf_skops_tx_timestamping(struct sock *sk, struct sk_buff *skb, i=
+nt op)
+> > +{
+> > +       struct bpf_sock_ops_kern sock_ops;
+> > +
+> > +       memset(&sock_ops, 0, offsetof(struct bpf_sock_ops_kern, temp));
+> > +       sock_ops.op =3D op;
+> > +       sock_ops.is_fullsock =3D 1;
+> > +       sock_ops.sk =3D sk;
+>
+> lgtm.
+>
+> > +       BPF_CGROUP_RUN_PROG_SOCK_OPS(sk, &sock_ops, CGROUP_SOCK_OPS);
+>
+> After looking through the set and looking again at how sk is used in
+> __skb_tstamp_tx(), I think the sk must be fullsock here, so using
+> __cgroup_bpf_run_filter_sock_ops() as in patch 2 is good. It will be usef=
+ul to
+> have a comment here to explain it must be a fullsock.
+
+Got it, will add more comments on it.
+
+>
+> > +}
 > >
-> > So is this something that the driver should notice?
-> >
-> >>
-> >> Should we really replace it? It would mean that a driver conformant wi=
-th
-> >> the current specification may not be compatible with a device conforma=
-nt
-> >> with the future specification.
-> >
-> > I don't get this. We are talking about devices and we want to relax so
-> > it should compatibile.
+> > 2. introduce the allow_direct_access flag which is used to test if the
+> > socket is allowed to access tcp socket or not.
 >
+> yeah, right now is only tcp_sock, but future will have UDP TS support.
 >
-> The problem is:
-> 1) On the device side, the num_buffers can be left uninitialized due to b=
-ugs
-> 2) On the driver side, the specification allows assuming the num_buffers
-> is set to one.
->
-> Relaxing the device requirement will replace "due to bugs" with
-> "according to the specification" in 1). It still contradicts with 2) so
-> does not fix compatibility.
+> May be the "allow_direct_access" naming is not obvious to mean the existi=
+ng
+> tcp_sock support. May be "allow_tcp_access"?
 
-Just to clarify I meant we can simply remove the following:
-
-"""
-The device MUST use only a single descriptor if VIRTIO_NET_F_MRG_RXBUF
-was not negotiated. Note: This means that num_buffers will always be 1
-if VIRTIO_NET_F_MRG_RXBUF is not negotiated.
-"""
-
-And
-
-"""
-If VIRTIO_NET_F_MRG_RXBUF has not been negotiated, the device MUST set
-num_buffers to 1.
-"""
-
-This seems easier as it reflects the fact where some devices don't set
-it. And it eases the transitional device as it doesn't need to have
-any special care.
-
-Then we don't need any driver normative so I don't see any conflict.
-
-Michael suggests we use "SHOULD", but if this is something that the
-driver needs to be aware of I don't know how "SHOULD" can help a lot
-or not.
+I like this name :)
 
 >
-> Instead, we should make the driver requirement stricter to change 2).
-> That is what "[PATCH v3] virtio-net: Ignore num_buffers when unused" does=
-:
-> https://lore.kernel.org/r/20250110-reserved-v3-1-2ade0a5d2090@daynix.com
+> I was thinking to set the allow_direct_access for the "existing" sockops
+> callback which must be tcp_sock and must have the sk locked.
+>
+> > On the basis of the above bpf_skops_tx_timestamping() function, I
+> > would add one check there:
+> > + if (sk_is_tcp(sk))
+> > +       sock_ops. allow_direct_access =3D 1;
+>
+> so don't set this in the new TS callback from bpf_skops_tx_timestamping
+> regardless it is tcp or not.
 >
 > >
-> >>
-> >> We are going to fix all implementations known to buggy (QEMU and Linux=
-)
-> >> anyway so I think it's just fine to leave that part of specification a=
-s is.
+> > Also, I need to set allow_direct_access to one as long as there is
+> > "sock_ops.is_fullsock =3D 1;" in the existing callbacks.
+>
+> Only set allow_direct_access when the sk is fullsock in the "existing" so=
+ckops
+> callback.
+
+Only "existing"? Then how can the bpf program access those members of
+the tcp socket structure in the current/new timestamping callbacks?
+
+>
+> After thinking a bit more today, I think this should work. Please give it=
+ a try
+> and check if some cases may be missed in sock_ops_convert_ctx_access().
+
+I will give it a shot this week.
+
+>
 > >
-> > I don't think we can fix it all.
+> > 3. I will replace is_fullsock with allow_direct_access in
+> > SOCK_OPS_GET/SET_FIELD() instead of SOCK_OPS_GET_SK().
 >
-> It essentially only requires storing 16 bits. There are details we need
-> to work out, but it should be possible to fix.
-
-I meant it's not realistic to fix all the hypervisors. Note that
-modern devices have been implemented for about a decade so we may have
-too many versions of various hypervisors. (E.g DPDK seems to stick
-with the same behaviour of the current kernel).
-
+> Yep.
 >
-> Regards,
-> Akihiko Odaki
+> >
+> > Then the udp socket can freely access the socket with the helper
+> > SOCK_OPS_GET_SK() because it is a fullsock. And udp socket cannot
+> > access struct tcp_sock because in the timestamping callback, there is
+> > no place where setting allow_direct_access for udp use.
 >
-
-Thanks
-
+> __sk_buff->sk? yes.
 
