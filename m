@@ -1,73 +1,73 @@
-Return-Path: <netdev+bounces-158744-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158745-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 277A4A131E4
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 05:09:56 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 12EDAA131F3
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 05:19:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 942F83A12AA
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 04:09:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8BEAC3A368B
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 04:19:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29F72137932;
-	Thu, 16 Jan 2025 04:09:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70C51126C05;
+	Thu, 16 Jan 2025 04:19:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="iONjz8XW"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="ZyHLGhAU"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-2101.amazon.com (smtp-fw-2101.amazon.com [72.21.196.25])
+Received: from smtp-fw-6001.amazon.com (smtp-fw-6001.amazon.com [52.95.48.154])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AC87E555
-	for <netdev@vger.kernel.org>; Thu, 16 Jan 2025 04:09:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=72.21.196.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57D154414
+	for <netdev@vger.kernel.org>; Thu, 16 Jan 2025 04:19:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.48.154
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737000592; cv=none; b=oaZ6M6GtNJFrhlAqSLe2hTQjUlhnQumHvLJi/e7jgW98guYswVK6tYsSi+0bkMnveqCUuRdvDg6elEG0i4P4vebeqjRyBiqEbM83UKjhZFE1mvK23BRTeg9Z6SJqJhDDVGsdhWh/RLgLkcOy/0vYTn21XayoJjp8kp+WaX6MO8c=
+	t=1737001187; cv=none; b=lz9BcJrE0GBQhCaI6fnymLJOrSZ7zS2lL7QloSBw3picheB4mHk+z7JbfO7E6gueKQ1RczaApr2YgM8CPV3XD4Foqmf0jETCrDku7rioGjPMhEh5WwAhXxP7Al5M5U/eERSUXmd/L3RDq1F9sr4x3N7yWB0MniNd81VzOt6KBaw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737000592; c=relaxed/simple;
-	bh=cQKzpfXlvieT3WmbrvvHFfNbVP1Ga/EXQB4MVZUvxBs=;
+	s=arc-20240116; t=1737001187; c=relaxed/simple;
+	bh=VkOIvHv5jZ3jVrT4mM0LLOO+5feGQ5Z/g6afce0j4gk=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Mz4Vrz8/y8qHOUksqxdKmPSl5oGL7AdKpjurNWFDx6m/T3MWXQnY6HanvXP84es9gExKswPT5vzDY14OrrkjLbIiFxczsd+FUU/sDQ35cp6Mc4IvKGH8mREuYxbVOwl2LeeaxN8dxLf/KN3jMxy87fNg3fumlnT/VlIy6zbbfs4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=iONjz8XW; arc=none smtp.client-ip=72.21.196.25
+	 MIME-Version:Content-Type; b=St63OwgKrNiZ/ZZ9bP3quBdsIsyhpHj9Sk46d8xgymXEhNYH/NB/JKVn1Kmn39hVAi8JjR+a7hZsHgRbQPpgssXKnmdJ8ntVNf9dP4qrbZRLKjPilswCCe2loeoUfhWxXc7IXNpJ7hPO3qojW57LbyLOz88kLzVwaTVLP3dZ7hM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=ZyHLGhAU; arc=none smtp.client-ip=52.95.48.154
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1737000591; x=1768536591;
+  t=1737001186; x=1768537186;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=dZ67Y5OrleyP1+4XyR5naRI2nsMgMaqU77PyXtsxXvM=;
-  b=iONjz8XW53oTUa0dQ+R9Z96nD1PLi8Ay/6Kpmmcs2kgs/kglWBV0kKcz
-   Og8Xdk9O4fr4Drc3WLRZQsJI/m8zqug3/eqpuGYL0PKWUaAHsynv2odlo
-   hmc0+S15h2wUesilNnYpddY8iXxTHGmmsY4f/IZiRFvPxiMLed6BWLenB
-   g=;
+  bh=6plv1QLb1+58mwiS+TwSTRGDr/06IgLPCmgiO1QaMlQ=;
+  b=ZyHLGhAUHIjNCzHdsEPWsL30HQPT7iyXyF8zw3gnFH0gt3YWlJdqRV7U
+   /OwbxoDBFAPeOYiluDHe4rbvxgs0FZ2Bv5eoumjRTupiOsgz1DvHobJIR
+   yavjubqwdgBtQ0iG49dbTs/9ftILPYI64ToPRDeEIPyw+ML9VHywbEEPa
+   Y=;
 X-IronPort-AV: E=Sophos;i="6.13,208,1732579200"; 
-   d="scan'208";a="459193436"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-2101.iad2.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jan 2025 04:09:47 +0000
-Received: from EX19MTAUWB001.ant.amazon.com [10.0.7.35:37568]
+   d="scan'208";a="454606666"
+Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.2])
+  by smtp-border-fw-6001.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jan 2025 04:19:42 +0000
+Received: from EX19MTAUWA002.ant.amazon.com [10.0.21.151:20398]
  by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.27.193:2525] with esmtp (Farcaster)
- id 39e13d26-8c6f-482e-aa0e-6f38b7b4c608; Thu, 16 Jan 2025 04:09:46 +0000 (UTC)
-X-Farcaster-Flow-ID: 39e13d26-8c6f-482e-aa0e-6f38b7b4c608
+ id 9f92ecd9-7167-4706-bfcd-8eea7236be0c; Thu, 16 Jan 2025 04:19:41 +0000 (UTC)
+X-Farcaster-Flow-ID: 9f92ecd9-7167-4706-bfcd-8eea7236be0c
 Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Thu, 16 Jan 2025 04:09:45 +0000
+ Thu, 16 Jan 2025 04:19:41 +0000
 Received: from 6c7e67c6786f.amazon.com (10.143.84.222) by
  EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Thu, 16 Jan 2025 04:09:41 +0000
+ Thu, 16 Jan 2025 04:19:37 +0000
 From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <pabeni@redhat.com>
+To: <jdamato@fastly.com>
 CC: <davem@davemloft.net>, <donald.hunter@redhat.com>, <edumazet@google.com>,
 	<horms@kernel.org>, <kuba@kernel.org>, <kuni1840@gmail.com>,
-	<kuniyu@amazon.com>, <netdev@vger.kernel.org>
-Subject: Re: [PATCH v2 net-next 06/11] af_unix: Set drop reason in unix_stream_sendmsg().
-Date: Thu, 16 Jan 2025 13:09:32 +0900
-Message-ID: <20250116040932.96265-1-kuniyu@amazon.com>
+	<kuniyu@amazon.com>, <netdev@vger.kernel.org>, <pabeni@redhat.com>
+Subject: Re: [PATCH v2 net-next 00/11] af_unix: Set skb drop reason in every kfree_skb() path.
+Date: Thu, 16 Jan 2025 13:19:28 +0900
+Message-ID: <20250116041928.97203-1-kuniyu@amazon.com>
 X-Mailer: git-send-email 2.39.5 (Apple Git-154)
-In-Reply-To: <eb30b164-7f86-46bf-a5d3-0f8bda5e9398@redhat.com>
-References: <eb30b164-7f86-46bf-a5d3-0f8bda5e9398@redhat.com>
+In-Reply-To: <Z4fynNxk3FJ8BCWA@LQ3V64L9R2>
+References: <Z4fynNxk3FJ8BCWA@LQ3V64L9R2>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,63 +76,59 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D042UWA001.ant.amazon.com (10.13.139.92) To
+X-ClientProxiedBy: EX19D035UWB003.ant.amazon.com (10.13.138.85) To
  EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-From: Paolo Abeni <pabeni@redhat.com>
-Date: Wed, 15 Jan 2025 16:12:59 +0100
-> On 1/15/25 2:52 PM, Donald Hunter wrote:
-> > On Tue, 14 Jan 2025 at 20:05, Jakub Kicinski <kuba@kernel.org> wrote:
-> >>
-> >> On Sun, 12 Jan 2025 13:08:05 +0900 Kuniyuki Iwashima wrote:
-> >>> @@ -2249,14 +2265,13 @@ static int queue_oob(struct socket *sock, struct msghdr *msg, struct sock *other
-> >>>  static int unix_stream_sendmsg(struct socket *sock, struct msghdr *msg,
-> >>>                              size_t len)
-> >>>  {
-> >>> +     enum skb_drop_reason reason;
-> >>
-> >> I feel like we should draw the line somewhere for the reason codes.
-> >> We started with annotating packet drops in the stack, which are
-> >> otherwise hard to notice, we don't even have counters for all of them.
-> >> But at this point we're annotating sendmsg() errors? The fact we free
-> >> an skb on the error path seems rather coincidental for a sendmsg error.
-> >> IOW aren't we moving from packet loss annotation into general tracing
-> >> territory here?
-> >>
-> >> If there is no ambiguity and application will get an error from a system
-> >> call I'd just use consume_skb().
-> >>
-> >> I'm probably the most resistant to the drop reason codes, so I defer
-> >> to Paolo / Eric for the real judgment...
+From: Joe Damato <jdamato@fastly.com>
+Date: Wed, 15 Jan 2025 09:38:36 -0800
+> On Sun, Jan 12, 2025 at 01:07:59PM +0900, Kuniyuki Iwashima wrote:
+> > There is a potential user for skb drop reason for AF_UNIX.
 > > 
-> > For what it's worth, I agree that there's no need to annotate a drop
-> > reason for sendmsg failures that return error codes to the caller.
-> > That's why my original patch proposal just changed them to use
-> > consume_skb(). I did misrepresent the cases as "happy path" but I
-> > really meant that from the perspective of "no send initiated, so no
-> > drop reason".
+> > This series sets skb drop reason for every kfree_skb() path
+> > in AF_UNIX code.
 > > 
-> > https://lore.kernel.org/netdev/20241116094236.28786-1-donald.hunter@gmail.com/
+> > Link: https://lore.kernel.org/netdev/CAAf2ycmZHti95WaBR3s+L5Epm1q7sXmvZ-EqCK=-oZj=45tOwQ@mail.gmail.com/
+> > 
+> > 
+> > Changes:
+> >   v2:
+> >     * Drop the old patch 6 to silence false-positive uninit warning
+> > 
+> >   v1: https://lore.kernel.org/netdev/20250110092641.85905-1-kuniyu@amazon.com/
+> > 
+> > 
+> > Kuniyuki Iwashima (11):
+> >   net: dropreason: Gather SOCKET_ drop reasons.
+> >   af_unix: Set drop reason in unix_release_sock().
+> >   af_unix: Set drop reason in unix_sock_destructor().
+> >   af_unix: Set drop reason in __unix_gc().
+> >   af_unix: Set drop reason in unix_stream_connect().
+> >   af_unix: Set drop reason in unix_stream_sendmsg().
+> >   af_unix: Set drop reason in queue_oob().
+> >   af_unix: Set drop reason in manage_oob().
+> >   af_unix: Set drop reason in unix_stream_read_skb().
+> >   af_unix: Set drop reason in unix_dgram_disconnected().
+> >   af_unix: Set drop reason in unix_dgram_sendmsg().
+> > 
+> >  include/net/dropreason-core.h |  46 ++++++++--
+> >  net/unix/af_unix.c            | 153 +++++++++++++++++++++++++---------
+> >  net/unix/garbage.c            |   2 +-
+> >  3 files changed, 154 insertions(+), 47 deletions(-)
 > 
-> I also agree with Jakub with a slightly different reasoning. IMHO drop
-> reason goal is to let user-space easily understand where/why skbs are
-> dropped. If the drop reason reflects a syscall error code, the
-> user-space already has all the info.
+> I know there's feedback from others on some parts of this series but
+> I wanted to say thank you for the detailed commit messages that
+> include python examples.
 > 
-> IIRC the general guidance agreed upon in the last Netconf was to add
-> drop reasons when we can't distinguish multiple kind of drops within the
-> same function. IMHO such guidance fits with not using drop reason in
-> this specific case: as said we can discriminate the errors via the
-> syscall error code.
+> I found that very refreshing and helpful when attempting to review
+> the code you've proposed; thanks for putting in the extra effort to
+> include those examples in the commit messages.
 
-Thanks for the feedback, all!
+Thanks, Joe.
 
-I'll change kfree_skb() to consume_skb() in
+The goal was to give full information in the commit message and
+the drop reason comments so that user can reference it and will
+never ask why skb was dropped.
 
-  * unix_stream_connect()
-  * unix_stream_sendmsg()
-  * queue_oob()
-  * unix_dgram_sendmsg()
-
-where we can distinguish what happened from errno.
+Now I think the part of the effort should've put into man-pages
+instead ;) (and will do)
 
