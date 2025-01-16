@@ -1,103 +1,118 @@
-Return-Path: <netdev+bounces-158724-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158725-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 446FBA1311E
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 03:10:33 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 543E4A13120
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 03:11:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AAFA43A5514
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 02:10:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9FDD91889159
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 02:11:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5451C8635C;
-	Thu, 16 Jan 2025 02:10:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F51F36AF5;
+	Thu, 16 Jan 2025 02:11:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X9pcSY3t"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.socionext.com (mx.socionext.com [202.248.49.38])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0EA574059;
-	Thu, 16 Jan 2025 02:10:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.248.49.38
+Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88946E555;
+	Thu, 16 Jan 2025 02:11:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736993414; cv=none; b=RNOAjcl/u+WhZVXPyS6hvagkezMHz3wYA0QBCwGjDN/mR49vtP3VeVpGLqTfizBbedm4b5Pqcy1dT9VXHYx6dcVzWdB/4x4B4iVuRBA/0CEOcYXGE/vJZqjVvm2ZibEypIxXOWslrclc7o/drU5wpepeZdgVoLueM88G5s49amk=
+	t=1736993485; cv=none; b=kiCn0yWjaD/g0hFw5OQQJFtS5bR+I1NfPM1UtlyOHPyC3wZwQ2rPrITK1hghN21eRvxmiL/XPyUIV/EZG5sMJ2zu/XvcFuDeKJC3Xz1y9oWGXfiR7LbZkuAE7Qj5hg5maQfHtX+Jj3+a87MGg7RTG+YZmJjtLBRBbdSbmbyc8q8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736993414; c=relaxed/simple;
-	bh=V/9nExnpkF1RQPTnxy0A6QYwxq8JNFrk5GHUVYMX8Zc=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=pmTuamtjd3QK8j071dKN8w/T+v1rf/kJyFWGPeYWXseNQF6mkdju3mdSSjZlnybZm2RV+JzxzC1Ige+TI7z4Ica2FHiJQfiHkbPEV9GF2bMjkQ6SUko86yk2m+qgNw3hlXK6gBDYi3bi6ui5eyEOOrOlbEdUc97e5Wtgf1yRKnk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=socionext.com; spf=pass smtp.mailfrom=socionext.com; arc=none smtp.client-ip=202.248.49.38
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=socionext.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=socionext.com
-Received: from unknown (HELO kinkan2-ex.css.socionext.com) ([172.31.9.52])
-  by mx.socionext.com with ESMTP; 16 Jan 2025 11:09:00 +0900
-Received: from mail.mfilter.local (mail-arc01.css.socionext.com [10.213.46.36])
-	by kinkan2-ex.css.socionext.com (Postfix) with ESMTP id CF9BA200C4F1;
-	Thu, 16 Jan 2025 11:09:00 +0900 (JST)
-Received: from kinkan2.css.socionext.com ([172.31.9.51]) by m-FILTER with ESMTP; Thu, 16 Jan 2025 11:09:00 +0900
-Received: from plum.e01.socionext.com (unknown [10.212.245.39])
-	by kinkan2.css.socionext.com (Postfix) with ESMTP id 1055EAB187;
-	Thu, 16 Jan 2025 11:09:00 +0900 (JST)
-From: Kunihiko Hayashi <hayashi.kunihiko@socionext.com>
-To: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>
-Cc: netdev@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Kunihiko Hayashi <hayashi.kunihiko@socionext.com>
-Subject: [PATCH net 2/2] net: stmmac: Limit the number of MTL queues to maximum value
-Date: Thu, 16 Jan 2025 11:08:53 +0900
-Message-Id: <20250116020853.2835521-2-hayashi.kunihiko@socionext.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20250116020853.2835521-1-hayashi.kunihiko@socionext.com>
-References: <20250116020853.2835521-1-hayashi.kunihiko@socionext.com>
+	s=arc-20240116; t=1736993485; c=relaxed/simple;
+	bh=If6e7JUd0wHH3QJbKx1jLYerq1TRixK3ys7C7XgVnak=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=isL9LoS15JwDH6T25sQHu75JLO9hLFWB3GNRiEQKsUepSDptzpoM30w4t3/siSETQNZuq+fV0yKsG6QuDAKKOSh3Wircekev4nSIgjs8dQOZw5etEQpI9UpjILmsSI90EjfJeCd3Psx5uE4suQkvvPUBZ1ldKzSb8fuNz439fLY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=X9pcSY3t; arc=none smtp.client-ip=209.85.218.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-aaf3c3c104fso86448266b.1;
+        Wed, 15 Jan 2025 18:11:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1736993482; x=1737598282; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=HobMKiDrpJIwR5gQ0zoCBwyAXPBc+T1lokPO3vlcSm8=;
+        b=X9pcSY3tnh7el54ysdwc5u5yFbd+hSTtGJARYKFAOVEdUkTIskc7LKw4w8GfF1cPuI
+         asseNlT8FEZHlJDQqyS+lvahNIEO6p2uMqwN2Kbr3r1cHZMX8csuxSVpbpZPv+4KfRiD
+         zx3Niz0oLxPzaJ6y9hzTicShUI7/b9R3fQ7pk/yQk2QDbdBTv3Jaa6rq6Yw9GjgNEXnO
+         uacbnJAbsjBX76VuLxmML5LCGVwYJxWxg3SPCaYolh42O/QThbm3zuzyR+U0kKaJjlF2
+         ZYHMnS8BTWPRMAI16ToG9s/AZeqAuDGvfwvkdmeSFY0zMtCgCYoMu+E9H6ONVKGGJbSh
+         xS9A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736993482; x=1737598282;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=HobMKiDrpJIwR5gQ0zoCBwyAXPBc+T1lokPO3vlcSm8=;
+        b=fLORXK22ipAxyMRIMNJ9ZyNmoKxZyEydnoGh1Dpd1lQreHLHs3Lfyr6We4TZhky2ji
+         lAwYfpe9Q9mpZ+DXwTIuyTYH0gh31epgw9gocRVVwmhUGNjKC5avsECrpGFmfxR07TiO
+         pVZwg/b75BNK1crCBxmGWV1VkrtwFUQ3pgRKbJ69eLf80WkBPG1d2fyGjpi3lxK4nUCO
+         NfIJsKLMjGwwyrtIIhdfIshBXaI8DVfU6O5k9PCWtUdy6VbFbluEOO5aj5Us4LJhkTpT
+         irwyW44eDUWENeMTbLRGeYo/+zZXZ2RJBEV9tVw1uiv66aNl7a50RanFGhE5+2QllEt2
+         skvQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUNuHL+8dFq7Bxt8pXOpA3Q+olzvYsxA0FGGrYtC7msBAYL35PRg+bNrCYRm4eaQoXAGM+5fcc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzia0ar/ryyKDvnGeKsH+OdrhtGK35l/7cgJwMxrr8aVt3Desp0
+	Pn4ti2k54kVIo9xOHYyqGUI9NceKFNiDywX54x2uA456X/UtXfs8
+X-Gm-Gg: ASbGncv7zQKP+Q3bvL5xf+rivPoaenPwXxL4gB2Jaswknk4y9V+TQO0m7lulMknTQyd
+	7rfaq/xrTvQlHjlUj20/Bs12Wx4d42UfQ2C5BOlRgDfK4gkOrDNmjIN/kXqZkZWH6D61rjwKMwM
+	IRanYpFVablXfNMVblNR5w7YNjHQv+hyuDHdWGZfvGRa7BYGwHsiNcyFPUWfKvDEIvmHXBxwA5x
+	svbTV1KuijKlBK67tGbAXKbZWkJh5SQr/9FamFEjhGNcfJj+qWcopDbhzH7hgT7n0E=
+X-Google-Smtp-Source: AGHT+IGjrzuchJ0ljYWZnknsMRFzZ7MqEZ1pqMNfE9BHyvUa8D/vnsgmMOHtVVGI5jm/SQE7a0/QqQ==
+X-Received: by 2002:a17:907:d1b:b0:aa6:b63a:4521 with SMTP id a640c23a62f3a-ab2ab558881mr3096399566b.15.1736993481619;
+        Wed, 15 Jan 2025 18:11:21 -0800 (PST)
+Received: from [192.168.8.100] ([148.252.147.234])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ab2c9060badsm836041666b.29.2025.01.15.18.11.20
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 15 Jan 2025 18:11:21 -0800 (PST)
+Message-ID: <52fffbfb-dadb-48fe-84e4-8296b18fd22e@gmail.com>
+Date: Thu, 16 Jan 2025 02:12:06 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v10 01/22] net: make page_pool_ref_netmem work
+ with net iovs
+To: Jakub Kicinski <kuba@kernel.org>, David Wei <dw@davidwei.uk>
+Cc: io-uring@vger.kernel.org, netdev@vger.kernel.org,
+ Jens Axboe <axboe@kernel.dk>, Paolo Abeni <pabeni@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jesper Dangaard Brouer <hawk@kernel.org>, David Ahern <dsahern@kernel.org>,
+ Mina Almasry <almasrymina@google.com>,
+ Stanislav Fomichev <stfomichev@gmail.com>, Joe Damato <jdamato@fastly.com>,
+ Pedro Tammela <pctammela@mojatatu.com>
+References: <20250108220644.3528845-1-dw@davidwei.uk>
+ <20250108220644.3528845-2-dw@davidwei.uk>
+ <20250115163019.3e810c0d@kernel.org>
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <20250115163019.3e810c0d@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-The number of MTL queues to use is specified by the parameter
-"snps,{tx,rx}-queues-to-use" from the platform layer.
+On 1/16/25 00:30, Jakub Kicinski wrote:
+> On Wed,  8 Jan 2025 14:06:22 -0800 David Wei wrote:
+>> From: Pavel Begunkov <asml.silence@gmail.com>
+>>
+>> page_pool_ref_netmem() should work with either netmem representation, but
+>> currently it casts to a page with netmem_to_page(), which will fail with
+>> net iovs. Use netmem_get_pp_ref_count_ref() instead.
+> 
+> This is a fix, right? If we try to coalesce a cloned netmem skb
+> we'll crash.
 
-However, the maximum number of queues is determined by
-the macro MTL_MAX_{TX,RX}_QUEUES. It's appropriate to limit the
-values not to exceed the upper limit values.
+True, I missed it it's actually used.
 
-Signed-off-by: Kunihiko Hayashi <hayashi.kunihiko@socionext.com>
----
- drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-index ad868e8d195d..471eb1a99d90 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-@@ -165,6 +165,8 @@ static int stmmac_mtl_setup(struct platform_device *pdev,
- 	if (of_property_read_u32(rx_node, "snps,rx-queues-to-use",
- 				 &plat->rx_queues_to_use))
- 		plat->rx_queues_to_use = 1;
-+	if (plat->rx_queues_to_use > MTL_MAX_RX_QUEUES)
-+		plat->rx_queues_to_use = MTL_MAX_RX_QUEUES;
- 
- 	if (of_property_read_bool(rx_node, "snps,rx-sched-sp"))
- 		plat->rx_sched_algorithm = MTL_RX_ALGORITHM_SP;
-@@ -224,6 +226,8 @@ static int stmmac_mtl_setup(struct platform_device *pdev,
- 	if (of_property_read_u32(tx_node, "snps,tx-queues-to-use",
- 				 &plat->tx_queues_to_use))
- 		plat->tx_queues_to_use = 1;
-+	if (plat->tx_queues_to_use > MTL_MAX_TX_QUEUES)
-+		plat->tx_queues_to_use = MTL_MAX_TX_QUEUES;
- 
- 	if (of_property_read_bool(tx_node, "snps,tx-sched-wrr"))
- 		plat->tx_sched_algorithm = MTL_TX_ALGORITHM_WRR;
 -- 
-2.25.1
+Pavel Begunkov
 
 
