@@ -1,266 +1,133 @@
-Return-Path: <netdev+bounces-158866-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158867-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08B0CA13985
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 12:55:22 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id F001EA1399E
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 13:00:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3C6DE1889DD9
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 11:55:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 158BD161199
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 12:00:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE2121E86E;
-	Thu, 16 Jan 2025 11:55:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B65FB19FA92;
+	Thu, 16 Jan 2025 12:00:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="tuG3SE+9"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a1i/6p69"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 498A724A7C2;
-	Thu, 16 Jan 2025 11:55:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38575156F57;
+	Thu, 16 Jan 2025 12:00:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737028517; cv=none; b=TlBWjHy2I4q5Kdzf0W4fQEXlFmoFJIT1MqMDx3lDlVtETw2WygIWYQWq7ngWGur64w3MZYx2tATMopK5FkpH4Cz+VxObLCqqO9qSrwziJPJ8LNj1wLiOpj3XDsYV2CuNw6MPJIGZ1QtMqBXmW52jDyxmOczGrdaB5WpdBTw8+9s=
+	t=1737028855; cv=none; b=caGvT9a7QJNu7guwGpU+MDfACyEYd6msZw2z3w6nnN30zPKaq3tbtkrf5yRmCbOQ9sXORGJ3GF7DxVEELjhS3sjI9EBQoPPyZtvPwanQsS68019nJRmTC3B2jv/t7D4fKSMO/B5cb5XYSW2hkXG4ZbPbNXo978knePWPyL5GpAc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737028517; c=relaxed/simple;
-	bh=8hbVN9YI8078tT8U7lrYZ98z4vS7Y/T+E7zIKDTJMCc=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
-	 References:In-Reply-To; b=ksn6BUqQb9Wqied4xEr71G2nsMObryHBqMpNmcApmQL8PGeHwIo8pp8de5XzouOzLbz6YjgPu5kvzNUhpbkJBOWGehf0apVGIrTtjcg9MvGWTLQF2XycmLnZFMbDHKzE07FN4JgCDfzidt1PUuNP78W15dKUR3K2/cYy9HwT/GQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=tuG3SE+9; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50G85g9F020410;
-	Thu, 16 Jan 2025 11:55:09 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=6WsHXS
-	0exKRc+P/C03gFAFZ609oBGsJkwai4PeAqKhc=; b=tuG3SE+9/ubvUHj7uiv0EP
-	g5c9yI7GBrsq4e1qV8J3eCtCOPauuyuZWrN7//P/3AOCsa3w7Z7ofupt29/w+KY1
-	/YeXkZdogfbVb+l11vUgApZpqnxkjMGqu0JOtxmUj1ARAFQMFktx9Pp8JrxmNULc
-	V9XZLSwxE5XVQapkgzGVL9+/b6rqowCRVCBo4UsU8au+Hu77mRQfNQzKQqoPTYEq
-	UFqZG+PV92tC1v8ulZCoobQCXk1p97avxynUi5z+XWM2v4t+YPK/pBnxxVUsTfwi
-	kMxgFX2MhH+C/pJjp5BKY7bttxqUx0GEry7/QcfyVxOn15/aoMOB3q9N+gebxxcA
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 446xa391nt-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 16 Jan 2025 11:55:08 +0000 (GMT)
-Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 50GBhCkT019881;
-	Thu, 16 Jan 2025 11:55:08 GMT
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 446xa391np-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 16 Jan 2025 11:55:07 +0000 (GMT)
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 50GAPmbB017400;
-	Thu, 16 Jan 2025 11:55:07 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4444fkdjkb-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 16 Jan 2025 11:55:07 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 50GBt37h55116062
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 16 Jan 2025 11:55:03 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 5455020043;
-	Thu, 16 Jan 2025 11:55:03 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 04D6A20040;
-	Thu, 16 Jan 2025 11:55:03 +0000 (GMT)
-Received: from localhost (unknown [9.152.212.252])
-	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 16 Jan 2025 11:55:02 +0000 (GMT)
+	s=arc-20240116; t=1737028855; c=relaxed/simple;
+	bh=mzRnJLkb3Ruw5HTjlk1xCQUs218U3dRZhKI7d6EV+yw=;
+	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=IX/YyEnTqQvswMGef7UBl7ZDX+DxJDeKEmzJoYKhrKweC2vOKXCzon4/RqHfmq5HSFIjuBVuOFvIRx7EuWL47cwtLv4ocsFusYw1GCrln1HIajhTr+EVoyO8Efz2xpgG7kkWuanCQgN8q7Bbiz7cUrph7sTsDultFQarnskl5JU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=a1i/6p69; arc=none smtp.client-ip=209.85.214.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-21628b3fe7dso13544375ad.3;
+        Thu, 16 Jan 2025 04:00:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1737028853; x=1737633653; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=mzRnJLkb3Ruw5HTjlk1xCQUs218U3dRZhKI7d6EV+yw=;
+        b=a1i/6p69OI0zr7kjtpjpPdTfdmcNkfO1Ou2p+pZYZqsehWMB7hAxvVJE6ltJYUgjav
+         XSxuSxf5z6I6Ef6cHYp+2805VWs9aGstBOnPQ3cPfz+0l7vj2H+GG9mkGXRIWWOcKljx
+         ufQaOGxxgfPFsDuMCbC0KPPa+R8YEl8JNXDL3ugxTFjNMVEaczv6QxfKbf0CWDKLShK0
+         5WHM0Viywzr7bEo4z1ZaUvt5oAts5poKyBRzF/RzwhnHTlf9LdAvMwAg5ezdMLO4s53I
+         4GVadVsFuthHA70kPtsvdZzwXDAK4A5T+hvEa2vw2BEUNEcPmtdELpQVXzCstIIADLPS
+         7frQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737028853; x=1737633653;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=mzRnJLkb3Ruw5HTjlk1xCQUs218U3dRZhKI7d6EV+yw=;
+        b=l2ixJmmhjDCKx5/0dr7HZ7IHIZ3WUofKnHpdaskgvPsHOM2uPtszSLyWeUiOsgZbfU
+         ndrW6U4btnsUy2Jijo2MJ+DF93VFRszRr00NPDAPv1jt2nG0Cf3S6nmG8Xfa/zBFc4Mp
+         sz7JQurKw/qykt1r2x+P3dNbVlqGwSiezm4cFsvdMzZJvs1PWgy6NFUaqoACep/FS/Go
+         LkqcHfoZL5E0pDm39MgVukRo40psrg2hnEmGP5rymTLIGbQBqGmfSb+t0e/FOAKqJP3g
+         Fkq40A1BSL5UIE5XY0epLdl3lLYk6vo/L8vjNE5kYGfl2RzQv+PrCzHv561xX1wl+SMM
+         BKAA==
+X-Forwarded-Encrypted: i=1; AJvYcCUw3FvOlWQKPv4unuCMWRji9emY/eIfSZOIb/Y8cIy5JuhnmfIFcMYBaF5Hv/W+/mAtRxawZ6Seqhpo+QM=@vger.kernel.org, AJvYcCXEZyexoguEQS+9vfcsjfhRxmrv7wF5g52UrRBJuP3TITS3kGWhF6FXgysCoCB7gO+bwUT4JI4G@vger.kernel.org, AJvYcCXrj2ZqQRXDzKZuPPPCOd7gBIxJkui936QRYKK0N2hNBwnY6u3boRPXvnfxLItAlBabnW7tXUjTiHOsqJ27b8s=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxZ+qZGDDYjvAw5dWta7R3hTflPmwkI5Mrf6hCYI1AIgIlXHzTW
+	wVjYirFbFdHbjLeYy5TibCzCNgkjtVz1NTDgdmypxnOOHQiHzF1U
+X-Gm-Gg: ASbGncvDm+vCTYFeYYQjY5nraJYVUmlSc//gDK8KtEvQwcz9ykHyaN+0I9B3JFNp5+4
+	nzsuIpmdEPQEm6B3ot7AoOgo6K+vD1iOy/PjuJcZSKc3RepTYW0CfhXgDisPBiiIJ6OBMA+f/Jy
+	kjAWuaPKDyXkhP+P/31Cm2w0fYyWydjgkzxqEPCr2tbDbHYmMJEcLWCX3ORc/QjNkUcztaiY6gj
+	hjFgiYzbs1x94NK+L+2/6UAG8eSrn/M/8/77kzhhp4sxZu3hS7dFv4ePf5/6OwMNMpjpUiK6HRu
+	IboGqq/iBJ7Jwu/uaA3W2B+Pshv0i4wT71LQdw==
+X-Google-Smtp-Source: AGHT+IHt0zaudgYG/mpLiHolJ2UDB1y/8Uu7OsoUC5tocGiariRcjfiH1ulLwwMqrjF8kWcd8WEsSQ==
+X-Received: by 2002:a17:902:e84c:b0:215:4757:9ef3 with SMTP id d9443c01a7336-21a83f338b0mr453007905ad.9.1737028851986;
+        Thu, 16 Jan 2025 04:00:51 -0800 (PST)
+Received: from localhost (p3882177-ipxg22501hodogaya.kanagawa.ocn.ne.jp. [180.15.148.177])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21a9f253e02sm97919815ad.225.2025.01.16.04.00.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 16 Jan 2025 04:00:51 -0800 (PST)
+Date: Thu, 16 Jan 2025 21:00:42 +0900 (JST)
+Message-Id: <20250116.210042.151459337736478197.fujita.tomonori@gmail.com>
+To: aliceryhl@google.com
+Cc: fujita.tomonori@gmail.com, linux-kernel@vger.kernel.org,
+ andrew@lunn.ch, rust-for-linux@vger.kernel.org, netdev@vger.kernel.org,
+ hkallweit1@gmail.com, tmgross@umich.edu, ojeda@kernel.org,
+ alex.gaynor@gmail.com, gary@garyguo.net, bjorn3_gh@protonmail.com,
+ benno.lossin@proton.me, a.hindborg@samsung.com, anna-maria@linutronix.de,
+ frederic@kernel.org, tglx@linutronix.de, arnd@arndb.de,
+ jstultz@google.com, sboyd@kernel.org, mingo@redhat.com,
+ peterz@infradead.org, juri.lelli@redhat.com, vincent.guittot@linaro.org,
+ dietmar.eggemann@arm.com, rostedt@goodmis.org, bsegall@google.com,
+ mgorman@suse.de, vschneid@redhat.com
+Subject: Re: [PATCH v8 2/7] rust: time: Introduce Delta type
+From: FUJITA Tomonori <fujita.tomonori@gmail.com>
+In-Reply-To: <CAH5fLghAfovcm0ZJBByswXRSM4dRQY4ht7N7YGscWOaT+fN9OA@mail.gmail.com>
+References: <20250116044100.80679-1-fujita.tomonori@gmail.com>
+	<20250116044100.80679-3-fujita.tomonori@gmail.com>
+	<CAH5fLghAfovcm0ZJBByswXRSM4dRQY4ht7N7YGscWOaT+fN9OA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Thu, 16 Jan 2025 12:55:02 +0100
-Message-Id: <D73H7Q080GUQ.3BDOH23P4WDOL@linux.ibm.com>
-Cc: "Niklas Schnelle" <schnelle@linux.ibm.com>,
-        "Thorsten Winkler"
- <twinkler@linux.ibm.com>, <netdev@vger.kernel.org>,
-        <linux-s390@vger.kernel.org>, "Heiko Carstens" <hca@linux.ibm.com>,
-        "Vasily
- Gorbik" <gor@linux.ibm.com>,
-        "Alexander Gordeev" <agordeev@linux.ibm.com>,
-        "Christian Borntraeger" <borntraeger@linux.ibm.com>,
-        "Sven Schnelle"
- <svens@linux.ibm.com>,
-        "Simon Horman" <horms@kernel.org>
-Subject: Re: [RFC net-next 0/7] Provide an ism layer
-From: "Julian Ruess" <julianr@linux.ibm.com>
-To: <dust.li@linux.alibaba.com>, "Alexandra Winter" <wintera@linux.ibm.com>,
-        "Wenjia Zhang" <wenjia@linux.ibm.com>,
-        "Jan Karcher" <jaka@linux.ibm.com>,
-        "Gerd Bayer" <gbayer@linux.ibm.com>,
-        "Halil Pasic" <pasic@linux.ibm.com>,
-        "D. Wythe" <alibuda@linux.alibaba.com>,
-        "Tony Lu"
- <tonylu@linux.alibaba.com>,
-        "Wen Gu" <guwen@linux.alibaba.com>,
-        "Peter
- Oberparleiter" <oberpar@linux.ibm.com>,
-        "David Miller"
- <davem@davemloft.net>,
-        "Jakub Kicinski" <kuba@kernel.org>, "Paolo Abeni"
- <pabeni@redhat.com>,
-        "Eric Dumazet" <edumazet@google.com>,
-        "Andrew Lunn"
- <andrew+netdev@lunn.ch>
-X-Mailer: aerc 0.18.2
-References: <20250115195527.2094320-1-wintera@linux.ibm.com>
- <20250116093231.GD89233@linux.alibaba.com>
-In-Reply-To: <20250116093231.GD89233@linux.alibaba.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: g1AF_0ccCVsJ4D_uIEKg71EqVM-xJvTq
-X-Proofpoint-ORIG-GUID: uSQbR03rO6Wpiy8HraAqore_CAF8D85i
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-01-16_05,2025-01-16_01,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0 mlxscore=0
- bulkscore=0 clxscore=1011 adultscore=0 mlxlogscore=999 priorityscore=1501
- suspectscore=0 spamscore=0 phishscore=0 impostorscore=0 malwarescore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2411120000
- definitions=main-2501160086
+Content-Type: Text/Plain; charset=utf-8
+Content-Transfer-Encoding: base64
 
-On Thu Jan 16, 2025 at 10:32 AM CET, Dust Li wrote:
-> On 2025-01-15 20:55:20, Alexandra Winter wrote:
->
-> Hi Winter,
->
-> I'm fully supportive of the refactor!
->
-> Interestingly, I developed a similar RFC code about a month ago while
-> working on enhancing internal communication between guest and host
-> systems. Here are some of my thoughts on the matter:
->
-> Naming and Structure: I suggest we refer to it as SHD (Shared Memory
-> Device) instead of ISM (Internal Shared Memory). To my knowledge, a
-> "Shared Memory Device" better encapsulates the functionality we're
-> aiming to implement. It might be beneficial to place it under
-> drivers/shd/ and register it as a new class under /sys/class/shd/. That
-> said, my initial draft also adopted the ISM terminology for simplicity.
-
-I'm not sure if we really want to introduce a new name for
-the already existing ISM device. For me, having two names
-for the same thing just adds additional complexity.
-
-I would go for /sys/class/ism
-
->
-> Modular Approach: I've made the ism_loopback an independent kernel
-> module since dynamic enable/disable functionality is not yet supported
-> in SMC. Using insmod and rmmod for module management could provide the
-> flexibility needed in practical scenarios.
->
-> Abstraction of ISM Device Details: I propose we abstract the ISM device
-> details by providing SMC with helper functions. These functions could
-> encapsulate ism->ops, making the implementation cleaner and more
-> intuitive. This way, the struct ism_device would mainly serve its
-> implementers, while the upper helper functions offer a streamlined
-> interface for SMC.
->
-> Structuring and Naming: I recommend embedding the structure of ism_ops
-> directly within ism_dev rather than using a pointer. Additionally,
-> renaming it to ism_device_ops could enhance clarity and consistency.
->
->
-> >This RFC is about providing a generic shim layer between all kinds of
-> >ism devices and all kinds of ism users.
-> >
-> >Benefits:
-> >- Cleaner separation of ISM and SMC-D functionality
-> >- simpler and less module dependencies
-> >- Clear interface definition.
-> >- Extendable for future devices and clients.
->
-> Fully agree.
->
-> >
-> >Request for comments:
-> >---------------------
-> >Any comments are welcome, but I am aware that this series needs more wor=
-k.
-> >It may not be worth your time to do an in-depth review of the details, I=
- am
-> >looking for feedback on the general idea.
-> >I am mostly interested in your thoughts and recommendations about the ge=
-neral
-> >concept, the location of net/ism, the structure of include/linux/ism.h, =
-the
-> >KConfig and makefiles.
-> >
-> >Status of this RFC:
-> >-------------------
-> >This is a very early RFC to ask you for comments on this general idea.
-> >The RFC does not fullfill all criteria required for a patchset.
-> >The whole set compiles and runs, but I did not try all combinations of
-> >module and built-in yet. I did not check for checkpatch or any other che=
-ckers.
-> >Also I have only done very rudimentary quick tests of SMC-D. More testin=
-g is
-> >required.
-> >
-> >Background / Status quo:
-> >------------------------
-> >Currently s390 hardware provides virtual PCI ISM devices (ism_vpci). The=
-ir
-> >driver is in drivers/s390/net/ism_drv.c. The main user is SMC-D (net/smc=
-).
-> >ism_vpci driver offers a client interface so other users/protocols
-> >can also use them, but it is still heavily intermingled with the smc cod=
-e.
-> >Namely, the ISM vPCI module cannot be used without the SMC module, which
-> >feels artificial.
-> >
-> >The ISM concept is being extended:
-> >[1] proposed an ISM loopback interface (ism_lo), that can be used on non=
--s390
-> >architectures (e.g. between containers or to test SMC-D). A minimal impl=
-ementation
-> >went upstream with [2]: ism_lo currently is a part of the smc protocol a=
-nd rather
-> >hidden.
-> >
-> >[3] proposed a virtio definition of ISM (ism_virtio) that can be used be=
-tween
-> >kvm guests.
-> >
-> >We will shortly send an RFC for an ISM client that uses ISM as transport=
- for TTY.
-> >
-> >Concept:
-> >--------
-> >Create a shim layer in net/ism that contains common definitions and code=
- for
-> >all ism devices and all ism clients.
-> >Any device or client module only needs to depend on this ism layer modul=
-e and
-> >any device or client code only needs to include the definitions in
-> >include/linux/ism.h
-> >
-> >Ideas for next steps:
-> >---------------------
-> >- sysfs representation? e.g. as /sys/class/ism ?
-> >- provide a full-fledged ism loopback interface
-> >    (runtime enable/disable, sysfs device, ..)
->
-> I think it's better if we can make this common for all ISM devices.
-> but yeah, that shoud be the next step.
-
-I already have patches based on this series that introduce
-/sys/class/ism and show ism-loopback as well as
-s390/ism devices. I can send this soon.
-
-
-Julian
+T24gVGh1LCAxNiBKYW4gMjAyNSAxMDozNjowNyArMDEwMA0KQWxpY2UgUnlobCA8YWxpY2VyeWhs
+QGdvb2dsZS5jb20+IHdyb3RlOg0KDQo+IE9uIFRodSwgSmFuIDE2LCAyMDI1IGF0IDU6NDLigK9B
+TSBGVUpJVEEgVG9tb25vcmkNCj4gPGZ1aml0YS50b21vbm9yaUBnbWFpbC5jb20+IHdyb3RlOg0K
+Pj4NCj4+IEludHJvZHVjZSBhIHR5cGUgcmVwcmVzZW50aW5nIGEgc3BhbiBvZiB0aW1lLiBEZWZp
+bmUgb3VyIG93biB0eXBlDQo+PiBiZWNhdXNlIGBjb3JlOjp0aW1lOjpEdXJhdGlvbmAgaXMgbGFy
+Z2UgYW5kIGNvdWxkIHBhbmljIGR1cmluZw0KPj4gY3JlYXRpb24uDQo+Pg0KPj4gdGltZTo6S3Rp
+bWUgY291bGQgYmUgYWxzbyB1c2VkIGZvciB0aW1lIGR1cmF0aW9uIGJ1dCB0aW1lc3RhbXAgYW5k
+DQo+PiB0aW1lZGVsdGEgYXJlIGRpZmZlcmVudCBzbyBiZXR0ZXIgdG8gdXNlIGEgbmV3IHR5cGUu
+DQo+Pg0KPj4gaTY0IGlzIHVzZWQgaW5zdGVhZCBvZiB1NjQgdG8gcmVwcmVzZW50IGEgc3BhbiBv
+ZiB0aW1lOyBzb21lIEMgZHJpdmVycw0KPj4gdXNlcyBuZWdhdGl2ZSBEZWx0YXMgYW5kIGk2NCBp
+cyBtb3JlIGNvbXBhdGlibGUgd2l0aCBLdGltZSB1c2luZyBpNjQNCj4+IHRvbyAoZS5nLiwga3Rp
+bWVfW3VzfG1zXV9kZWx0YSgpIEFQSXMgcmV0dXJuIGk2NCBzbyB3ZSBjcmVhdGUgRGVsdGENCj4+
+IG9iamVjdCB3aXRob3V0IHR5cGUgY29udmVyc2lvbi4NCj4+DQo+PiBpNjQgaXMgdXNlZCBpbnN0
+ZWFkIG9mIGJpbmRpbmdzOjprdGltZV90IGJlY2F1c2Ugd2hlbiB0aGUga3RpbWVfdA0KPj4gdHlw
+ZSBpcyB1c2VkIGFzIHRpbWVzdGFtcCwgaXQgcmVwcmVzZW50cyB2YWx1ZXMgZnJvbSAwIHRvDQo+
+PiBLVElNRV9NQVgsIHdoaWNoIGRpZmZlcmVudCBmcm9tIERlbHRhLg0KPj4NCj4+IERlbHRhOjpm
+cm9tX1ttaWxsaXN8c2Vjc10gQVBJcyB0YWtlIGk2NC4gV2hlbiBhIHNwYW4gb2YgdGltZQ0KPj4g
+b3ZlcmZsb3dzLCBpNjQ6Ok1BWCBpcyB1c2VkLg0KPj4NCj4+IFJldmlld2VkLWJ5OiBBbmRyZXcg
+THVubiA8YW5kcmV3QGx1bm4uY2g+DQo+PiBTaWduZWQtb2ZmLWJ5OiBGVUpJVEEgVG9tb25vcmkg
+PGZ1aml0YS50b21vbm9yaUBnbWFpbC5jb20+DQo+IA0KPiBPbmUgbml0IGJlbG93LCBvdGhlcndp
+c2UgTEdUTQ0KPiANCj4gUmV2aWV3ZWQtYnk6IEFsaWNlIFJ5aGwgPGFsaWNlcnlobEBnb29nbGUu
+Y29tPg0KDQpUaGFua3MhDQoNCj4+ICsgICAgLy8vIFJldHVybiB0aGUgbnVtYmVyIG9mIG5hbm9z
+ZWNvbmRzIGluIHRoZSBgRGVsdGFgLg0KPj4gKyAgICAjW2lubGluZV0NCj4+ICsgICAgcHViIGZu
+IGFzX25hbm9zKHNlbGYpIC0+IGk2NCB7DQo+PiArICAgICAgICBzZWxmLm5hbm9zDQo+PiArICAg
+IH0NCj4gDQo+IEkgYWRkZWQgdGhlIGt0aW1lX21zX2RlbHRhKCkgZnVuY3Rpb24gYmVjYXVzZSBJ
+IHdhcyBnb2luZyB0byB1c2UgaXQuDQo+IENhbiB5b3UgYWRkIGFuIGBhc19taWxsaXMoKWAgZnVu
+Y3Rpb24gdG9vPyBUaGF0IHdheSBJIGNhbiB1c2UNCj4gc3RhcnRfdGltZS5lbGFwc2VkKCkuYXNf
+bWlsbGlzKCkgZm9yIG15IHVzZS1jYXNlLg0KDQpTdXJlbHksIEknbGwgaW4gdGhlIG5leHQgdmVy
+c2lvbi4NCg0KSSBkcm9wcGVkIGFzX21pbGxpcygpIG1ldGhvZCBpbiB2NCBiZWNhdXNlIEkgZm9s
+bG93ZWQgdGhlIHJ1bGUsIGRvbid0DQphZGQgYW4gQVBJIHRoYXQgbWF5IG5vdCBiZSB1c2VkLg0K
 
