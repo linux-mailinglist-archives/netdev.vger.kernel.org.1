@@ -1,572 +1,154 @@
-Return-Path: <netdev+bounces-158903-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158904-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02CC5A13B68
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 14:56:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 31B84A13B69
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 14:56:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EB1791696C3
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 13:56:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0184E162FBA
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 13:56:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24A1B22ACE4;
-	Thu, 16 Jan 2025 13:55:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E60271F37CE;
+	Thu, 16 Jan 2025 13:56:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="UZ21wQ03"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dEbFkt2f"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A308422A808
-	for <netdev@vger.kernel.org>; Thu, 16 Jan 2025 13:55:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C19ED142900
+	for <netdev@vger.kernel.org>; Thu, 16 Jan 2025 13:56:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737035745; cv=none; b=WuGeS9AkU6v/7vVjXkz+VIYG95s6k0sIH/9qYKMRVNS35/n/cEbbjGQMuVSzVbc4ViK/+DknmNR/GUW9/0DK7hA9Dmwk5vec5n9homuHXSqPy/26fYLFhv53tqOLH13TwLMhjoaByJzzBpg/GBqO5yMz9mg6S1NNqnADnzEG7yc=
+	t=1737035764; cv=none; b=ADD/5IpVuK1mscp6qgdVm13L3Nw1as7ad1+TV5aYgWfadd6e6vIutZNC1Q9SqjXEdQW3XC8sM/JUk1xNR086rgl9yXtZBsQT9WO87H6D1RN9mvYKu7G1F6CK4nZ3mM+QPX4zdmaaB7DxzEsXT5TSgfNJgD9XkJHQ/FKSZFsaxtg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737035745; c=relaxed/simple;
-	bh=j8OIq66lVwHLNAiZpaavtl9Qcru3dp2btV8QWQ4UWgQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JNsYWVYIsga5dHuTVdzweuTZDqikFbOg8sL9FRol5WrrEwoGqFQNoY9bKqh/jsfxiYlTAVtZWY3Ic6WzqTT8+xXbe1uhRXCxeZkCPbsMSmQunO4VYg3jsVxdXjY0kOAINNrCfOPdIboAv58ocL/haIzMRzD1VoUlz5PmFsui5v8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=UZ21wQ03; arc=none smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1737035742; x=1768571742;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=j8OIq66lVwHLNAiZpaavtl9Qcru3dp2btV8QWQ4UWgQ=;
-  b=UZ21wQ03hA5ZIahNIUDIDdKHL8K2+qnrgvSdHcFs5fY2nnC+M0cWnPq1
-   /UWP6RcGCOaldFWSld85f1k3pD3SmFe8FNCfx7/Kx1E4+piyi50NyB+x1
-   Z2+81R2pPi8XO2hRlDH3ln4bZ32dy3XhR1XujsmQ0ZP8vdSxIZrC6FbPK
-   Au5tpS3CrMdjHnNvqJDXPEeignbsHEyJ/gg/nsobvfDixJjq3zIEfSzRZ
-   vXc2zKKG14TYqjTUaFC/KwrWzVVSs7yDnryxjL4oQEX71BeXZwlDqcI6n
-   7BZ+u4hq4SaH8v7uEnuynUvu6AyRdK3VO2UbhhUMrvZ+ENZT2ppKbeCxv
-   g==;
-X-CSE-ConnectionGUID: aGWrhsMdSzS6N7r6/9WQcA==
-X-CSE-MsgGUID: UAY3j3OlQny/E8Kev9ZNlA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11316"; a="48815284"
-X-IronPort-AV: E=Sophos;i="6.13,209,1732608000"; 
-   d="scan'208";a="48815284"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jan 2025 05:55:41 -0800
-X-CSE-ConnectionGUID: IbfPlEN5TOOoTx3QiO4huA==
-X-CSE-MsgGUID: x6VAw3bRTHGGOCc+1gI+jA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="142769881"
-Received: from spandruv-desk1.amr.corp.intel.com (HELO azaki-desk1.intel.com) ([10.125.109.48])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jan 2025 05:55:38 -0800
-From: Ahmed Zaki <ahmed.zaki@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	Ahmed Zaki <ahmed.zaki@intel.com>,
-	Madhu Chittim <madhu.chittim@intel.com>
-Subject: [PATCH iwl-next] idpf: modify vport_cfg_lock to be per-vport
-Date: Thu, 16 Jan 2025 06:55:30 -0700
-Message-ID: <20250116135530.94562-1-ahmed.zaki@intel.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1737035764; c=relaxed/simple;
+	bh=N5ghbuoNNnHs88ftnq73DIsB4NyJ0OKPo2w5taUdKx4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kP3mP2ode0YGzUhgVB85fuutPpSEan0tLMPZB2nHcELNGLTLK/0YENhPmGhWzoIq3bHnhzPhvkbic5r6BNBCoANAd1aBri7Dk3vQjag2zux14bUaCy27l2wDrsBAQtxj93LjTSbr0RoGTyzDUCponvl9pgWR+XGnFg6ApDtk/Uo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dEbFkt2f; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2172AC4CED6;
+	Thu, 16 Jan 2025 13:56:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1737035764;
+	bh=N5ghbuoNNnHs88ftnq73DIsB4NyJ0OKPo2w5taUdKx4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=dEbFkt2fYkV+zIunwnCmw/mo7y29PJE98Ukwd4GEEGIFyDL2kYolD6fMocJEciy1z
+	 2+gkHCBGgMQcQXywBuNgG+w6Dz0mjFWxs1dEPd836LBjbTXQEGSvhkPnL2VnMuxOr5
+	 mY+0HO2Y1IxBqnNpQ3sCqfWgqGW7hO2ZcZ3aLIAsujPn/CG5OepnP2MicmblCRI7vM
+	 z4h85iVXAZZBpOSesMv3tKVdLc6jNslAKYQGZrxZA6JrIw/xaFnuCLPAiT4ZUEVVmS
+	 YY27A06LQxxCXLR1WzC/VB8KLu/lInTUJc84S/j3RyLgVL4VucNVKciu1KQmlrX+fJ
+	 4oQujmysongmA==
+Date: Thu, 16 Jan 2025 13:55:59 +0000
+From: Simon Horman <horms@kernel.org>
+To: Xin Tian <tianx@yunsilicon.com>
+Cc: netdev@vger.kernel.org, leon@kernel.org, andrew+netdev@lunn.ch,
+	kuba@kernel.org, pabeni@redhat.com, edumazet@google.com,
+	davem@davemloft.net, jeff.johnson@oss.qualcomm.com,
+	przemyslaw.kitszel@intel.com, weihg@yunsilicon.com,
+	wanry@yunsilicon.com
+Subject: Re: [PATCH v3 02/14] net-next/yunsilicon: Enable CMDQ
+Message-ID: <20250116135559.GB6206@kernel.org>
+References: <20250115102242.3541496-1-tianx@yunsilicon.com>
+ <20250115102245.3541496-3-tianx@yunsilicon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250115102245.3541496-3-tianx@yunsilicon.com>
 
-The vport config lock protects the vports queues and config data. These
-mainly change in soft reset path. Since there is no dependency across
-vports, there is no need for this lock to be global.
+On Wed, Jan 15, 2025 at 06:22:46PM +0800, Xin Tian wrote:
+> Enable cmd queue to support driver-firmware communication.
+> Hardware control will be performed through cmdq mostly.
+> 
+> Co-developed-by: Honggang Wei <weihg@yunsilicon.com>
+> Signed-off-by: Honggang Wei <weihg@yunsilicon.com>
+> Co-developed-by: Lei Yan <jacky@yunsilicon.com>
+> Signed-off-by: Lei Yan <jacky@yunsilicon.com>
+> Signed-off-by: Xin Tian <tianx@yunsilicon.com>
 
-Move the lock to be per-vport and allow one vport to reset without
-locking the rest of the vports.
+...
 
-Reviewed-by: Madhu Chittim <madhu.chittim@intel.com>
-Signed-off-by: Ahmed Zaki <ahmed.zaki@intel.com>
----
-depends on iwl series:
-https://patchwork.ozlabs.org/project/intel-wired-lan/list/?series=431435
----
- drivers/net/ethernet/intel/idpf/idpf.h        | 16 ++---
- .../net/ethernet/intel/idpf/idpf_ethtool.c    | 58 +++++++++----------
- drivers/net/ethernet/intel/idpf/idpf_lib.c    | 31 +++++-----
- drivers/net/ethernet/intel/idpf/idpf_main.c   |  2 -
- 4 files changed, 50 insertions(+), 57 deletions(-)
+> diff --git a/drivers/net/ethernet/yunsilicon/xsc/pci/cmdq.c b/drivers/net/ethernet/yunsilicon/xsc/pci/cmdq.c
 
-diff --git a/drivers/net/ethernet/intel/idpf/idpf.h b/drivers/net/ethernet/intel/idpf/idpf.h
-index 34dbdc7d6c88..3fcf4072c9ec 100644
---- a/drivers/net/ethernet/intel/idpf/idpf.h
-+++ b/drivers/net/ethernet/intel/idpf/idpf.h
-@@ -290,6 +290,7 @@ struct idpf_port_stats {
-  * @port_stats: per port csum, header split, and other offload stats
-  * @link_up: True if link is up
-  * @sw_marker_wq: workqueue for marker packets
-+ * @vport_cfg_lock: Lock to protect access to vports during alloc/dealloc/reset
-  */
- struct idpf_vport {
- 	u16 num_txq;
-@@ -334,6 +335,7 @@ struct idpf_vport {
- 	bool link_up;
- 
- 	wait_queue_head_t sw_marker_wq;
-+	struct mutex vport_cfg_lock;
- };
- 
- /**
-@@ -527,7 +529,6 @@ struct idpf_vc_xn_manager;
-  * @req_tx_splitq: TX split or single queue model to request
-  * @req_rx_splitq: RX split or single queue model to request
-  * @vport_init_lock: Lock to protect vport init, re-init, and deinit flow
-- * @vport_cfg_lock: Lock to protect the vport config flow
-  * @vector_lock: Lock to protect vector distribution
-  * @queue_lock: Lock to protect queue distribution
-  * @vc_buf_lock: Lock to protect virtchnl buffer
-@@ -585,7 +586,6 @@ struct idpf_adapter {
- 	bool req_rx_splitq;
- 
- 	struct mutex vport_init_lock;
--	struct mutex vport_cfg_lock;
- 	struct mutex vector_lock;
- 	struct mutex queue_lock;
- 	struct mutex vc_buf_lock;
-@@ -812,23 +812,23 @@ static inline void idpf_vport_init_unlock(struct idpf_adapter *adapter)
- 
- /**
-  * idpf_vport_cfg_lock - Acquire the vport config lock
-- * @adapter: private data struct
-+ * @vport: private data struct
-  *
-  * This lock should be used by non-datapath code to protect against vport
-  * destruction.
-  */
--static inline void idpf_vport_cfg_lock(struct idpf_adapter *adapter)
-+static inline void idpf_vport_cfg_lock(struct idpf_vport *vport)
- {
--	mutex_lock(&adapter->vport_cfg_lock);
-+	mutex_lock(&vport->vport_cfg_lock);
- }
- 
- /**
-  * idpf_vport_cfg_unlock - Release the vport config lock
-- * @adapter: private data struct
-+ * @vport: private data struct
-  */
--static inline void idpf_vport_cfg_unlock(struct idpf_adapter *adapter)
-+static inline void idpf_vport_cfg_unlock(struct idpf_vport *vport)
- {
--	mutex_unlock(&adapter->vport_cfg_lock);
-+	mutex_unlock(&vport->vport_cfg_lock);
- }
- 
- void idpf_statistics_task(struct work_struct *work);
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_ethtool.c b/drivers/net/ethernet/intel/idpf/idpf_ethtool.c
-index b3ed1d9a80ae..d2b9b15cfd75 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_ethtool.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_ethtool.c
-@@ -14,23 +14,22 @@
- static int idpf_get_rxnfc(struct net_device *netdev, struct ethtool_rxnfc *cmd,
- 			  u32 __always_unused *rule_locs)
- {
--	struct idpf_adapter *adapter = idpf_netdev_to_adapter(netdev);
- 	struct idpf_vport *vport;
- 
--	idpf_vport_cfg_lock(adapter);
- 	vport = idpf_netdev_to_vport(netdev);
-+	idpf_vport_cfg_lock(vport);
- 
- 	switch (cmd->cmd) {
- 	case ETHTOOL_GRXRINGS:
- 		cmd->data = vport->num_rxq;
--		idpf_vport_cfg_unlock(adapter);
-+		idpf_vport_cfg_unlock(vport);
- 
- 		return 0;
- 	default:
- 		break;
- 	}
- 
--	idpf_vport_cfg_unlock(adapter);
-+	idpf_vport_cfg_unlock(vport);
- 
- 	return -EOPNOTSUPP;
- }
-@@ -86,11 +85,13 @@ static int idpf_get_rxfh(struct net_device *netdev,
- 	struct idpf_netdev_priv *np = netdev_priv(netdev);
- 	struct idpf_rss_data *rss_data;
- 	struct idpf_adapter *adapter;
-+	struct idpf_vport *vport;
- 	int err = 0;
- 	u16 i;
- 
- 	adapter = np->adapter;
--	idpf_vport_cfg_lock(adapter);
-+	vport = np->vport;
-+	idpf_vport_cfg_lock(vport);
- 
- 	if (!idpf_is_cap_ena_all(adapter, IDPF_RSS_CAPS, IDPF_CAP_RSS)) {
- 		err = -EOPNOTSUPP;
-@@ -112,7 +113,7 @@ static int idpf_get_rxfh(struct net_device *netdev,
- 	}
- 
- unlock_mutex:
--	idpf_vport_cfg_unlock(adapter);
-+	idpf_vport_cfg_unlock(vport);
- 
- 	return err;
- }
-@@ -137,8 +138,8 @@ static int idpf_set_rxfh(struct net_device *netdev,
- 	int err = 0;
- 	u16 lut;
- 
--	idpf_vport_cfg_lock(adapter);
- 	vport = idpf_netdev_to_vport(netdev);
-+	idpf_vport_cfg_lock(vport);
- 
- 	if (!idpf_is_cap_ena_all(adapter, IDPF_RSS_CAPS, IDPF_CAP_RSS)) {
- 		err = -EOPNOTSUPP;
-@@ -166,7 +167,7 @@ static int idpf_set_rxfh(struct net_device *netdev,
- 	err = idpf_config_rss(vport);
- 
- unlock_mutex:
--	idpf_vport_cfg_unlock(adapter);
-+	idpf_vport_cfg_unlock(vport);
- 
- 	return err;
- }
-@@ -219,7 +220,6 @@ static void idpf_get_channels(struct net_device *netdev,
- static int idpf_set_channels(struct net_device *netdev,
- 			     struct ethtool_channels *ch)
- {
--	struct idpf_adapter *adapter = idpf_netdev_to_adapter(netdev);
- 	struct idpf_vport_config *vport_config;
- 	unsigned int num_req_tx_q;
- 	unsigned int num_req_rx_q;
-@@ -234,8 +234,8 @@ static int idpf_set_channels(struct net_device *netdev,
- 		return -EINVAL;
- 	}
- 
--	idpf_vport_cfg_lock(adapter);
- 	vport = idpf_netdev_to_vport(netdev);
-+	idpf_vport_cfg_lock(vport);
- 
- 	idx = vport->idx;
- 	vport_config = vport->adapter->vport_config[idx];
-@@ -278,7 +278,7 @@ static int idpf_set_channels(struct net_device *netdev,
- 	}
- 
- unlock_mutex:
--	idpf_vport_cfg_unlock(adapter);
-+	idpf_vport_cfg_unlock(vport);
- 
- 	return err;
- }
-@@ -298,11 +298,10 @@ static void idpf_get_ringparam(struct net_device *netdev,
- 			       struct kernel_ethtool_ringparam *kring,
- 			       struct netlink_ext_ack *ext_ack)
- {
--	struct idpf_adapter *adapter = idpf_netdev_to_adapter(netdev);
- 	struct idpf_vport *vport;
- 
--	idpf_vport_cfg_lock(adapter);
- 	vport = idpf_netdev_to_vport(netdev);
-+	idpf_vport_cfg_lock(vport);
- 
- 	ring->rx_max_pending = IDPF_MAX_RXQ_DESC;
- 	ring->tx_max_pending = IDPF_MAX_TXQ_DESC;
-@@ -311,7 +310,7 @@ static void idpf_get_ringparam(struct net_device *netdev,
- 
- 	kring->tcp_data_split = idpf_vport_get_hsplit(vport);
- 
--	idpf_vport_cfg_unlock(adapter);
-+	idpf_vport_cfg_unlock(vport);
- }
- 
- /**
-@@ -329,15 +328,14 @@ static int idpf_set_ringparam(struct net_device *netdev,
- 			      struct kernel_ethtool_ringparam *kring,
- 			      struct netlink_ext_ack *ext_ack)
- {
--	struct idpf_adapter *adapter = idpf_netdev_to_adapter(netdev);
- 	struct idpf_vport_user_config_data *config_data;
- 	u32 new_rx_count, new_tx_count;
- 	struct idpf_vport *vport;
- 	int i, err = 0;
- 	u16 idx;
- 
--	idpf_vport_cfg_lock(adapter);
- 	vport = idpf_netdev_to_vport(netdev);
-+	idpf_vport_cfg_lock(vport);
- 
- 	idx = vport->idx;
- 
-@@ -395,7 +393,7 @@ static int idpf_set_ringparam(struct net_device *netdev,
- 	err = idpf_initiate_soft_reset(vport, IDPF_SR_Q_DESC_CHANGE);
- 
- unlock_mutex:
--	idpf_vport_cfg_unlock(adapter);
-+	idpf_vport_cfg_unlock(vport);
- 
- 	return err;
- }
-@@ -870,7 +868,6 @@ static void idpf_get_ethtool_stats(struct net_device *netdev,
- 				   u64 *data)
- {
- 	struct idpf_netdev_priv *np = netdev_priv(netdev);
--	struct idpf_adapter *adapter = np->adapter;
- 	struct idpf_vport_config *vport_config;
- 	struct idpf_vport *vport;
- 	unsigned int total = 0;
-@@ -878,11 +875,11 @@ static void idpf_get_ethtool_stats(struct net_device *netdev,
- 	bool is_splitq;
- 	u16 qtype;
- 
--	idpf_vport_cfg_lock(adapter);
- 	vport = idpf_netdev_to_vport(netdev);
-+	idpf_vport_cfg_lock(vport);
- 
- 	if (np->state != __IDPF_VPORT_UP) {
--		idpf_vport_cfg_unlock(adapter);
-+		idpf_vport_cfg_unlock(vport);
- 
- 		return;
- 	}
-@@ -949,7 +946,7 @@ static void idpf_get_ethtool_stats(struct net_device *netdev,
- 
- 	rcu_read_unlock();
- 
--	idpf_vport_cfg_unlock(adapter);
-+	idpf_vport_cfg_unlock(vport);
- }
- 
- /**
-@@ -1027,12 +1024,11 @@ static int idpf_get_q_coalesce(struct net_device *netdev,
- 			       u32 q_num)
- {
- 	const struct idpf_netdev_priv *np = netdev_priv(netdev);
--	struct idpf_adapter *adapter = np->adapter;
--	const struct idpf_vport *vport;
-+	struct idpf_vport *vport;
- 	int err = 0;
- 
--	idpf_vport_cfg_lock(adapter);
- 	vport = idpf_netdev_to_vport(netdev);
-+	idpf_vport_cfg_lock(vport);
- 
- 	if (np->state != __IDPF_VPORT_UP)
- 		goto unlock_mutex;
-@@ -1051,7 +1047,7 @@ static int idpf_get_q_coalesce(struct net_device *netdev,
- 				      VIRTCHNL2_QUEUE_TYPE_TX);
- 
- unlock_mutex:
--	idpf_vport_cfg_unlock(adapter);
-+	idpf_vport_cfg_unlock(vport);
- 
- 	return err;
- }
-@@ -1203,12 +1199,11 @@ static int idpf_set_coalesce(struct net_device *netdev,
- 			     struct netlink_ext_ack *extack)
- {
- 	struct idpf_netdev_priv *np = netdev_priv(netdev);
--	struct idpf_adapter *adapter = np->adapter;
- 	struct idpf_vport *vport;
- 	int i, err = 0;
- 
--	idpf_vport_cfg_lock(adapter);
- 	vport = idpf_netdev_to_vport(netdev);
-+	idpf_vport_cfg_lock(vport);
- 
- 	if (np->state != __IDPF_VPORT_UP)
- 		goto unlock_mutex;
-@@ -1226,7 +1221,7 @@ static int idpf_set_coalesce(struct net_device *netdev,
- 	}
- 
- unlock_mutex:
--	idpf_vport_cfg_unlock(adapter);
-+	idpf_vport_cfg_unlock(vport);
- 
- 	return err;
- }
-@@ -1242,23 +1237,22 @@ static int idpf_set_coalesce(struct net_device *netdev,
- static int idpf_set_per_q_coalesce(struct net_device *netdev, u32 q_num,
- 				   struct ethtool_coalesce *ec)
- {
--	struct idpf_adapter *adapter = idpf_netdev_to_adapter(netdev);
- 	struct idpf_vport *vport;
- 	int err;
- 
--	idpf_vport_cfg_lock(adapter);
- 	vport = idpf_netdev_to_vport(netdev);
-+	idpf_vport_cfg_lock(vport);
- 
- 	err = idpf_set_q_coalesce(vport, ec, q_num, false);
- 	if (err) {
--		idpf_vport_cfg_unlock(adapter);
-+		idpf_vport_cfg_unlock(vport);
- 
- 		return err;
- 	}
- 
- 	err = idpf_set_q_coalesce(vport, ec, q_num, true);
- 
--	idpf_vport_cfg_unlock(adapter);
-+	idpf_vport_cfg_unlock(vport);
- 
- 	return err;
- }
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_lib.c b/drivers/net/ethernet/intel/idpf/idpf_lib.c
-index 931d0f988c95..83a27bec15ab 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_lib.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_lib.c
-@@ -910,12 +910,12 @@ static int idpf_stop(struct net_device *netdev)
- 	if (test_bit(IDPF_REMOVE_IN_PROG, adapter->flags))
- 		return 0;
- 
--	idpf_vport_cfg_lock(adapter);
- 	vport = idpf_netdev_to_vport(netdev);
-+	idpf_vport_cfg_lock(vport);
- 
- 	idpf_vport_stop(vport);
- 
--	idpf_vport_cfg_unlock(adapter);
-+	idpf_vport_cfg_unlock(vport);
- 
- 	return 0;
- }
-@@ -1001,9 +1001,9 @@ static void idpf_vport_dealloc(struct idpf_vport *vport)
- 
- 	idpf_deinit_mac_addr(vport);
- 
--	idpf_vport_cfg_lock(adapter);
-+	idpf_vport_cfg_lock(vport);
- 	idpf_vport_stop(vport);
--	idpf_vport_cfg_unlock(adapter);
-+	idpf_vport_cfg_unlock(vport);
- 
- 	if (!test_bit(IDPF_HR_RESET_IN_PROG, adapter->flags))
- 		idpf_decfg_netdev(vport);
-@@ -1016,6 +1016,7 @@ static void idpf_vport_dealloc(struct idpf_vport *vport)
- 		np->vport = NULL;
- 	}
- 
-+	mutex_destroy(&vport->vport_cfg_lock);
- 	idpf_vport_rel(vport);
- 
- 	adapter->vports[i] = NULL;
-@@ -1156,6 +1157,7 @@ static struct idpf_vport *idpf_vport_alloc(struct idpf_adapter *adapter,
- 	adapter->vports[idx] = vport;
- 	adapter->vport_ids[idx] = idpf_get_vport_id(vport);
- 
-+	mutex_init(&vport->vport_cfg_lock);
- 	adapter->num_alloc_vports++;
- 	/* prepare adapter->next_vport for next use */
- 	adapter->next_vport = idpf_get_free_slot(adapter);
-@@ -1526,9 +1528,9 @@ void idpf_init_task(struct work_struct *work)
- 	np = netdev_priv(vport->netdev);
- 	np->state = __IDPF_VPORT_DOWN;
- 	if (test_and_clear_bit(IDPF_VPORT_UP_REQUESTED, vport_config->flags)) {
--		idpf_vport_cfg_lock(adapter);
-+		idpf_vport_cfg_lock(vport);
- 		idpf_vport_open(vport);
--		idpf_vport_cfg_unlock(adapter);
-+		idpf_vport_cfg_unlock(vport);
- 	}
- 
- 	/* Spawn and return 'idpf_init_task' work queue until all the
-@@ -2131,8 +2133,8 @@ static int idpf_set_features(struct net_device *netdev,
- 	struct idpf_vport *vport;
- 	int err = 0;
- 
--	idpf_vport_cfg_lock(adapter);
- 	vport = idpf_netdev_to_vport(netdev);
-+	idpf_vport_cfg_lock(vport);
- 
- 	if (idpf_is_reset_in_prog(adapter)) {
- 		dev_err(&adapter->pdev->dev, "Device is resetting, changing netdev features temporarily unavailable.\n");
-@@ -2160,7 +2162,7 @@ static int idpf_set_features(struct net_device *netdev,
- 	}
- 
- unlock_mutex:
--	idpf_vport_cfg_unlock(adapter);
-+	idpf_vport_cfg_unlock(vport);
- 
- 	return err;
- }
-@@ -2186,12 +2188,12 @@ static int idpf_open(struct net_device *netdev)
- 	if (test_bit(IDPF_REMOVE_IN_PROG, adapter->flags))
- 		return 0;
- 
--	idpf_vport_cfg_lock(adapter);
- 	vport = idpf_netdev_to_vport(netdev);
-+	idpf_vport_cfg_lock(vport);
- 
- 	err = idpf_vport_open(vport);
- 
--	idpf_vport_cfg_unlock(adapter);
-+	idpf_vport_cfg_unlock(vport);
- 
- 	return err;
- }
-@@ -2205,18 +2207,17 @@ static int idpf_open(struct net_device *netdev)
-  */
- static int idpf_change_mtu(struct net_device *netdev, int new_mtu)
- {
--	struct idpf_adapter *adapter = idpf_netdev_to_adapter(netdev);
- 	struct idpf_vport *vport;
- 	int err;
- 
--	idpf_vport_cfg_lock(adapter);
- 	vport = idpf_netdev_to_vport(netdev);
-+	idpf_vport_cfg_lock(vport);
- 
- 	WRITE_ONCE(netdev->mtu, new_mtu);
- 
- 	err = idpf_initiate_soft_reset(vport, IDPF_SR_MTU_CHANGE);
- 
--	idpf_vport_cfg_unlock(adapter);
-+	idpf_vport_cfg_unlock(vport);
- 
- 	return err;
- }
-@@ -2298,8 +2299,8 @@ static int idpf_set_mac(struct net_device *netdev, void *p)
- 	struct idpf_vport *vport;
- 	int err = 0;
- 
--	idpf_vport_cfg_lock(adapter);
- 	vport = idpf_netdev_to_vport(netdev);
-+	idpf_vport_cfg_lock(vport);
- 
- 	if (!idpf_is_cap_ena(adapter, IDPF_OTHER_CAPS,
- 			     VIRTCHNL2_CAP_MACFILTER)) {
-@@ -2332,7 +2333,7 @@ static int idpf_set_mac(struct net_device *netdev, void *p)
- 	eth_hw_addr_set(netdev, addr->sa_data);
- 
- unlock_mutex:
--	idpf_vport_cfg_unlock(adapter);
-+	idpf_vport_cfg_unlock(vport);
- 
- 	return err;
- }
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_main.c b/drivers/net/ethernet/intel/idpf/idpf_main.c
-index da1e3525719f..0864afe047ab 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_main.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_main.c
-@@ -80,7 +80,6 @@ static void idpf_remove(struct pci_dev *pdev)
- 	adapter->vcxn_mngr = NULL;
- 
- 	mutex_destroy(&adapter->vport_init_lock);
--	mutex_destroy(&adapter->vport_cfg_lock);
- 	mutex_destroy(&adapter->vector_lock);
- 	mutex_destroy(&adapter->queue_lock);
- 	mutex_destroy(&adapter->vc_buf_lock);
-@@ -145,7 +144,6 @@ static int idpf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	adapter->req_rx_splitq = true;
- 
- 	mutex_init(&adapter->vport_init_lock);
--	mutex_init(&adapter->vport_cfg_lock);
- 	mutex_init(&adapter->vector_lock);
- 	mutex_init(&adapter->queue_lock);
- 	mutex_init(&adapter->vc_buf_lock);
--- 
-2.43.0
+...
 
+> +static void cmd_work_handler(struct work_struct *work)
+> +{
+> +	struct xsc_cmd_work_ent *ent = container_of(work, struct xsc_cmd_work_ent, work);
+> +	struct xsc_cmd *cmd = ent->cmd;
+> +	struct xsc_core_device *xdev = container_of(cmd, struct xsc_core_device, cmd);
+> +	struct xsc_cmd_layout *lay;
+> +	struct semaphore *sem;
+> +	unsigned long flags;
+
+Hi Xin Tian,
+
+Please consider arranging local variables in reverse xmas tree order -
+longest line to shortest - as is preferred in Networking code.
+Separating initialisation from declarations as needed.
+
+And also, please consider limiting lines to 80 columns wide or less,
+where it can be achieved without reducing readability. This is also
+preferred in Networking code.
+
+I think that in this case that both could be achieved like this
+(completely untested):
+
+	struct xsc_cmd_work_ent *ent;
+	struct xsc_core_device *xdev;
+	struct xsc_cmd_layout *lay;
+	struct semaphore *sem;
+	struct xsc_cmd *cmd;
+	unsigned long flags;
+
+	ent = container_of(work, struct xsc_cmd_work_ent, work);
+	cmd = ent->cmd;
+	xdev = container_of(cmd, struct xsc_core_device, cmd);
+
+With regards to reverse xmas tree ordering, this tool can be useful:
+https://github.com/ecree-solarflare/xmastree
+
+...
+
+> +static void xsc_cmd_comp_handler(struct xsc_core_device *xdev, u8 idx, struct xsc_rsp_layout *rsp)
+> +{
+> +	struct xsc_cmd *cmd = &xdev->cmd;
+> +	struct xsc_cmd_work_ent *ent;
+> +	struct xsc_inbox_hdr *hdr;
+> +
+> +	if (idx > cmd->max_reg_cmds || (cmd->bitmask & (1 << idx))) {
+> +		pci_err(xdev->pdev, "idx[%d] exceed max cmds, or has no relative request.\n", idx);
+> +		return;
+> +	}
+> +	ent = cmd->ent_arr[idx];
+> +	ent->rsp_lay = rsp;
+> +	ktime_get_ts64(&ent->ts2);
+> +
+> +	memcpy(ent->out->first.data, ent->rsp_lay->out, sizeof(ent->rsp_lay->out));
+> +	if (!cmd->checksum_disabled)
+> +		ent->ret = verify_signature(ent);
+> +	else
+> +		ent->ret = 0;
+> +	ent->status = 0;
+> +
+> +	hdr = (struct xsc_inbox_hdr *)ent->in->first.data;
+
+nit: hdr is set but otherwise unused in this function.
+     Perhaps it can be removed (and added in a later patch if needed there)?
+
+     Flagged by W=1 builds.
+
+> +	free_ent(cmd, ent->idx);
+> +	complete(&ent->done);
+> +	up(&cmd->sem);
+> +}
+
+...
 
