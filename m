@@ -1,62 +1,62 @@
-Return-Path: <netdev+bounces-158766-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158767-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0FBBA132AD
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 06:38:23 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E601A132AE
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 06:38:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4816A3A1311
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 05:38:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AD5E318831F1
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 05:38:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3ECB157A72;
-	Thu, 16 Jan 2025 05:38:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 989CF156F41;
+	Thu, 16 Jan 2025 05:38:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="lZuQIqIT"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="eHrdU2wu"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-6002.amazon.com (smtp-fw-6002.amazon.com [52.95.49.90])
+Received: from smtp-fw-52002.amazon.com (smtp-fw-52002.amazon.com [52.119.213.150])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 307A815820C
-	for <netdev@vger.kernel.org>; Thu, 16 Jan 2025 05:38:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.49.90
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9E9829A1
+	for <netdev@vger.kernel.org>; Thu, 16 Jan 2025 05:38:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.150
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737005899; cv=none; b=dj/j71NDO9q+o7gl9L6z40vaPp7V6oYEu5rOuBGAwiqM/lWmA64d8aN+oyALWtkhrp4dIMyck7qzej8qBctXVGhatam1xvCyvS6IoLHDo84QmHGsK7lWZJWUDZhTXR9qQWN/PyKr6uaEQ8XQ3w13AVzsaIstoZ7lMlwf5YJOtZM=
+	t=1737005926; cv=none; b=KpKoH84Zg6AHGQZI2KSrxdCDyhM1n0XaWQIQuEGl2Cd0dPbJkrDYYFgbRJSNlI2TV8vDy2gyx8YZZSJNJUr1AmVg6DyWDtrU45yyDuCghKU4b1l7tdVQmMtYmd92neY5J8S04u0ah2BSyio5QgGF2FN9XDPhnpjaZnbXW+j2608=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737005899; c=relaxed/simple;
-	bh=OCOiJ1xGYlG7aBIGYhBjEJf8uor6sSUI20s2rVgyrHk=;
+	s=arc-20240116; t=1737005926; c=relaxed/simple;
+	bh=ixLalfpXpIs3rsP+wBLi8puDHry4QeSa/RslrGfTQOQ=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=c7MR+I1E/TPrMxGeBs6s5DwWy1PSHEPE/tb6Wqrvdv8dmHPUehx0scFho7sQ5ZjOVRaO9oR+sWMTAVAZ1/mioRmPXR+Cw3Nhp4DLEn2qgVuvLiFeLOkHsyRcTLAwGYjAFxQS5N5UVHXf+e9lPxdv5e9eRCPJBsW9kxRwCph4jS4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=lZuQIqIT; arc=none smtp.client-ip=52.95.49.90
+	 MIME-Version:Content-Type; b=C96U9hNgAEDYDKFSgSe6Q3vkf946/sXXPxbOrn+tlJbjH1ouUyMG76HS+fE+nC9i97MVEXl39BUCAdSJAShCcS4kXXFzBIDq3/bfP2AEjSy6BPwSauCChxH1LZELb+8kI9QgIuiSYKlPLfwPMtGKOUEyZjUJYHgooMh68JbpO1o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=eHrdU2wu; arc=none smtp.client-ip=52.119.213.150
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1737005898; x=1768541898;
+  t=1737005925; x=1768541925;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=G2N+ESqLCThoICczy6rEH3giIMA08YsknZE0mrlMPbI=;
-  b=lZuQIqIT9Dgo7xmjZcPFaCE+ZWxAenwnHnbwt5j+R5olgrvrgh4fUkco
-   C9NINjdzPCDhakmOmL/4hgslGEdzpDaL+PoXeswI/2ywaz/dgX0PbO3Y+
-   TTnKK1OowJa82fyYWu858v5ur2wCKAvpgFr8rm1A0AIu5+vqr3bpxZD99
-   M=;
+  bh=RPsaapkXDL+bgCoY2e0fYyABxBnoL5f0jdivCVBQdHE=;
+  b=eHrdU2wujS6O3nJqCI6NDjifRyUiToIYcO/QtQpDdKSmBloI7caOKvyW
+   21NZQHlpWD8QJuaRHwd1btPNCby6tLS2F+y00sWdtOMVEl+9AWtQtJM7i
+   O22thC8C9bCdOWVCRflqANRsj+oYrROWBOcXNympre0UdmUnWEW4BdQJ/
+   E=;
 X-IronPort-AV: E=Sophos;i="6.13,208,1732579200"; 
-   d="scan'208";a="464483843"
+   d="scan'208";a="689608985"
 Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-6002.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jan 2025 05:38:17 +0000
-Received: from EX19MTAUWC001.ant.amazon.com [10.0.7.35:55185]
+  by smtp-border-fw-52002.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jan 2025 05:38:43 +0000
+Received: from EX19MTAUWC002.ant.amazon.com [10.0.38.20:18920]
  by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.54.33:2525] with esmtp (Farcaster)
- id 0bbe0dfa-6460-4d60-ac65-452560df6c2a; Thu, 16 Jan 2025 05:38:15 +0000 (UTC)
-X-Farcaster-Flow-ID: 0bbe0dfa-6460-4d60-ac65-452560df6c2a
+ id 36c7afda-1c03-4591-be7a-46efaff903f4; Thu, 16 Jan 2025 05:38:42 +0000 (UTC)
+X-Farcaster-Flow-ID: 36c7afda-1c03-4591-be7a-46efaff903f4
 Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
+ EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Thu, 16 Jan 2025 05:38:15 +0000
+ Thu, 16 Jan 2025 05:38:42 +0000
 Received: from 6c7e67c6786f.amazon.com (10.143.84.222) by
  EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Thu, 16 Jan 2025 05:38:11 +0000
+ Thu, 16 Jan 2025 05:38:38 +0000
 From: Kuniyuki Iwashima <kuniyu@amazon.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
@@ -64,9 +64,9 @@ To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 CC: Donald Hunter <donald.hunter@redhat.com>, Kuniyuki Iwashima
 	<kuniyu@amazon.com>, Kuniyuki Iwashima <kuni1840@gmail.com>,
 	<netdev@vger.kernel.org>
-Subject: [PATCH v3 net-next 7/9] af_unix: Set drop reason in unix_dgram_disconnected().
-Date: Thu, 16 Jan 2025 14:34:40 +0900
-Message-ID: <20250116053441.5758-8-kuniyu@amazon.com>
+Subject: [PATCH v3 net-next 8/9] af_unix: Reuse out_pipe label in unix_stream_sendmsg().
+Date: Thu, 16 Jan 2025 14:34:41 +0900
+Message-ID: <20250116053441.5758-9-kuniyu@amazon.com>
 X-Mailer: git-send-email 2.39.5 (Apple Git-154)
 In-Reply-To: <20250116053441.5758-1-kuniyu@amazon.com>
 References: <20250116053441.5758-1-kuniyu@amazon.com>
@@ -78,85 +78,86 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D040UWA003.ant.amazon.com (10.13.139.6) To
+X-ClientProxiedBy: EX19D039UWA003.ant.amazon.com (10.13.139.49) To
  EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-unix_dgram_disconnected() is called from two places:
+This is a follow-up of commit d460b04bc452 ("af_unix: Clean up
+error paths in unix_stream_sendmsg().").
 
-  1. when a connect()ed socket dis-connect()s or re-connect()s to
-     another socket
+If we initialise skb with NULL in unix_stream_sendmsg(), we can
+reuse the existing out_pipe label for the SEND_SHUTDOWN check.
 
-  2. when sendmsg() fails because the peer socket that the client
-     has connect()ed to has been close()d
+Let's rename it and adjust the existing label as out_pipe_lock.
 
-Then, the client's recv queue is purged to remove all messages from
-the old peer socket.
+While at it, size and data_len are moved to the while loop scope.
 
-Let's define a new drop reason for that case.
-
-  # echo 1 > /sys/kernel/tracing/events/skb/kfree_skb/enable
-
-  # python3
-  >>> from socket import *
-  >>>
-  >>> # s1 has a message from s2
-  >>> s1, s2 = socketpair(AF_UNIX, SOCK_DGRAM)
-  >>> s2.send(b'hello world')
-  >>>
-  >>> # re-connect() drops the message from s2
-  >>> s3 = socket(AF_UNIX, SOCK_DGRAM)
-  >>> s3.bind('')
-  >>> s1.connect(s3.getsockname())
-
-  # cat /sys/kernel/tracing/trace_pipe
-     python3-250 ... kfree_skb: ... location=skb_queue_purge_reason+0xdc/0x110 reason: UNIX_DISCONNECT
-
+Suggested-by: Paolo Abeni <pabeni@redhat.com>
 Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 ---
- include/net/dropreason-core.h | 7 +++++++
- net/unix/af_unix.c            | 4 +++-
- 2 files changed, 10 insertions(+), 1 deletion(-)
+ net/unix/af_unix.c | 23 +++++++++--------------
+ 1 file changed, 9 insertions(+), 14 deletions(-)
 
-diff --git a/include/net/dropreason-core.h b/include/net/dropreason-core.h
-index d6c9d841eb11..32a34dfe8cc5 100644
---- a/include/net/dropreason-core.h
-+++ b/include/net/dropreason-core.h
-@@ -9,6 +9,7 @@
- 	FN(SOCKET_CLOSE)		\
- 	FN(SOCKET_FILTER)		\
- 	FN(SOCKET_RCVBUFF)		\
-+	FN(UNIX_DISCONNECT)		\
- 	FN(UNIX_SKIP_OOB)		\
- 	FN(PKT_TOO_SMALL)		\
- 	FN(TCP_CSUM)			\
-@@ -146,6 +147,12 @@ enum skb_drop_reason {
- 	SKB_DROP_REASON_SOCKET_FILTER,
- 	/** @SKB_DROP_REASON_SOCKET_RCVBUFF: socket receive buff is full */
- 	SKB_DROP_REASON_SOCKET_RCVBUFF,
-+	/**
-+	 * @SKB_DROP_REASON_UNIX_DISCONNECT: recv queue is purged when SOCK_DGRAM
-+	 * or SOCK_SEQPACKET socket re-connect()s to another socket or notices
-+	 * during send() that the peer has been close()d.
-+	 */
-+	SKB_DROP_REASON_UNIX_DISCONNECT,
- 	/**
- 	 * @SKB_DROP_REASON_UNIX_SKIP_OOB: Out-Of-Band data is skipped by
- 	 * recv() without MSG_OOB so dropped.
 diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
-index de4966e1b7ff..5e1b408c19da 100644
+index 5e1b408c19da..43a45cf06f2e 100644
 --- a/net/unix/af_unix.c
 +++ b/net/unix/af_unix.c
-@@ -622,7 +622,9 @@ static void unix_write_space(struct sock *sk)
- static void unix_dgram_disconnected(struct sock *sk, struct sock *other)
+@@ -2238,13 +2238,11 @@ static int unix_stream_sendmsg(struct socket *sock, struct msghdr *msg,
+ 			       size_t len)
  {
- 	if (!skb_queue_empty(&sk->sk_receive_queue)) {
--		skb_queue_purge(&sk->sk_receive_queue);
-+		skb_queue_purge_reason(&sk->sk_receive_queue,
-+				       SKB_DROP_REASON_UNIX_DISCONNECT);
-+
- 		wake_up_interruptible_all(&unix_sk(sk)->peer_wait);
+ 	struct sock *sk = sock->sk;
++	struct sk_buff *skb = NULL;
+ 	struct sock *other = NULL;
+-	int err, size;
+-	struct sk_buff *skb;
+-	int sent = 0;
+ 	struct scm_cookie scm;
+ 	bool fds_sent = false;
+-	int data_len;
++	int err, sent = 0;
  
- 		/* If one link of bidirectional dgram pipe is disconnected,
+ 	err = scm_send(sock, msg, &scm, false);
+ 	if (err < 0)
+@@ -2273,16 +2271,12 @@ static int unix_stream_sendmsg(struct socket *sock, struct msghdr *msg,
+ 		}
+ 	}
+ 
+-	if (READ_ONCE(sk->sk_shutdown) & SEND_SHUTDOWN) {
+-		if (!(msg->msg_flags & MSG_NOSIGNAL))
+-			send_sig(SIGPIPE, current, 0);
+-
+-		err = -EPIPE;
+-		goto out_err;
+-	}
++	if (READ_ONCE(sk->sk_shutdown) & SEND_SHUTDOWN)
++		goto out_pipe;
+ 
+ 	while (sent < len) {
+-		size = len - sent;
++		int size = len - sent;
++		int data_len;
+ 
+ 		if (unlikely(msg->msg_flags & MSG_SPLICE_PAGES)) {
+ 			skb = sock_alloc_send_pskb(sk, 0, 0,
+@@ -2335,7 +2329,7 @@ static int unix_stream_sendmsg(struct socket *sock, struct msghdr *msg,
+ 
+ 		if (sock_flag(other, SOCK_DEAD) ||
+ 		    (other->sk_shutdown & RCV_SHUTDOWN))
+-			goto out_pipe;
++			goto out_pipe_unlock;
+ 
+ 		maybe_add_creds(skb, sock, other);
+ 		scm_stat_add(other, skb);
+@@ -2358,8 +2352,9 @@ static int unix_stream_sendmsg(struct socket *sock, struct msghdr *msg,
+ 
+ 	return sent;
+ 
+-out_pipe:
++out_pipe_unlock:
+ 	unix_state_unlock(other);
++out_pipe:
+ 	if (!sent && !(msg->msg_flags & MSG_NOSIGNAL))
+ 		send_sig(SIGPIPE, current, 0);
+ 	err = -EPIPE;
 -- 
 2.39.5 (Apple Git-154)
 
