@@ -1,143 +1,95 @@
-Return-Path: <netdev+bounces-158889-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158890-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B391CA13A6B
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 14:06:24 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C085A13A75
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 14:07:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DBE011683E4
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 13:06:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 73F09188BA83
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 13:07:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 803461DE8B7;
-	Thu, 16 Jan 2025 13:06:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 104C91E5708;
+	Thu, 16 Jan 2025 13:06:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hWB9x7MA"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Jm5IRekK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f179.google.com (mail-qk1-f179.google.com [209.85.222.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D90FB1DBB3A;
-	Thu, 16 Jan 2025 13:05:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB9F41E3DFE;
+	Thu, 16 Jan 2025 13:06:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737032761; cv=none; b=os/y3OnhXjlME0nJkdqimcBWIPjXpl/FfvbxAhRmy/asCNMXiQvmWcHGKwE4MfPYOAmiUjqhdo1n6dMatftCPQIQzbjcoq7IJ9BT1xCMAhnPVttx+jpQ+FzqfqgX4lXQjdW3QYGAg3yQGDDiPzRZmhOYVHHIg01qht277hEPNEI=
+	t=1737032793; cv=none; b=bhBioYoH5ZLTNK6EmNzb6qzYyEhd/BHT4+eFskpzfvYRujQ3Asy/vsg93U4IH04N9OuL6LJ2O6JVxEJHycDRbi+zFSoYMevI0GuVQr+Fwdmc4l3TS+T4GcdRsFopdZK9UIHqWxQZaduzKgugzT8c30xYCk9zHIoS4ItKjyV9At4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737032761; c=relaxed/simple;
-	bh=xqmwHNMUxOzWQNMkjdnL99R7EvmlfjtjhNY8AJdh0J0=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=ruUqkvigdR4siBsUogcN21E8Iw/bCdsyCIGIXFKnKcFBefmwMPvI+383OmH07jXOoNfgTyCzNmjZQxSS91NexlQCK5aWEGKA747IMo/cOJbX6KKUvs1Wo8WIvEpYSCH2Z2grb0RNOAEWIfZ8lNmEeoQztSAqhamcBaA1ba9skFY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hWB9x7MA; arc=none smtp.client-ip=209.85.222.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f179.google.com with SMTP id af79cd13be357-7b7041273ddso63680285a.3;
-        Thu, 16 Jan 2025 05:05:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1737032759; x=1737637559; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OhBgJdxLvQes3eD3Fu4rvlsneR+YPZhZCBELAv2eIdc=;
-        b=hWB9x7MAH8Qw/ZUAlIE2Gj+r8OVstXu19ABfOyAs74y/id0+PkFbVnlHN6Eo55hLzT
-         2LpkBhT42YrDDwLIVBkSkwiNFQS6FhEGpx/V6ws//VtBHgArfyqwog21vGNHA9OVMiAH
-         o+PUSFdFJruh03QosPCM/53FMj5OJhrGnkEa0nzdEOChqBGLm2AYbPtLu67JyAK3tvmz
-         k25KCD/0Xn9Q3VHXiYZ5ggzk7kj7I1WfacGZsm8z3PDrOhBKC22U3aFskzJNghFBdL//
-         33Q/fKyp3h16UyMTjz7c+HpX4tCsA4ZhUJkYbhE6hmK++C3uzjs8RofJOvskDsZk1HsO
-         TYyg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737032759; x=1737637559;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=OhBgJdxLvQes3eD3Fu4rvlsneR+YPZhZCBELAv2eIdc=;
-        b=NHpKUEMCNLsYTd9t6tlXfmyitAh3N+T9Wm6MmLR7FpkXLFmmC8nT3GqWnORxSkpR/q
-         D/eN4DW2hZzt1d7GSoKaYcViO7XfLIj2sm86tWgExAkwY7SiWxS3nlACFSGNqxD3lxlx
-         sFLMu2/6EE+Lor4kWVGD06eOoUdp+dwhGf9NbPsmsZRq5dXHi4FPeQMzUYIs5lNjexie
-         zWyxZfO5YOLnmhzS+iyXK466YsYxtwoQz4b/HNduApivSdrcNkLBxeLeJFv1jyt7h0jK
-         e8RayJQoeqLksVeSVvfC0G9xovEVGLKoKZP+5cyzUHhzA7gOpQSKvMMeiqjqB7X3eTcx
-         tYxg==
-X-Forwarded-Encrypted: i=1; AJvYcCWsWRngbOV8gPqDPBgakfwPC91DcVXblBt1xSzu5zi0aZ3Dt5QmDJ2tgcld38PI0t07HGSB7sgsSqzaV9Z5TiA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwoE87tMvd/ReDujvZiwicuuv8q6u4ydCaDGc+qjjh/nLpdLmwX
-	F9RqXDO1IJGZbrdhO/brQwA/74cUU3gFeF8nVqGb0en5xctuqdDM
-X-Gm-Gg: ASbGncsc87n8X2JbzEwuP0Hk1gmjc1CeoSUfouZhANLf45oeBgoiB03+Pe/4y7ClOja
-	hOl/ocrsziB8x8nhan1HIGqDjspBMn2pT9CdezDGzA7pG+1zdatFY4N7BLJfjhTxRVOAJR5Ew88
-	TKO0ONP/O8gBTg87Lq3ab0lSPz911QecjqX89bVoD9YLC2jc4uCS/CHRc54/2VIr2ll7zRgRtzO
-	pbkAmXQY7OcEkPf96eGHpyeFcNlvWW24VEkslR7cf4hcMTFpk8optPjHh0A7ICyso843X14jdJZ
-	lzVIn2jcTsVNeiLjjwbSrXm3fkVA
-X-Google-Smtp-Source: AGHT+IElbOoja7u6ZoigUpifYLw6hVVbviBYUjq+InFERrp8VSBSuxpHDrR748dJuhRz3jJqU6nUHw==
-X-Received: by 2002:a05:620a:4612:b0:7b6:d736:55c4 with SMTP id af79cd13be357-7bcd973ca24mr4672937685a.17.1737032758410;
-        Thu, 16 Jan 2025 05:05:58 -0800 (PST)
-Received: from localhost (15.60.86.34.bc.googleusercontent.com. [34.86.60.15])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7be614d9989sm2130185a.83.2025.01.16.05.05.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Jan 2025 05:05:57 -0800 (PST)
-Date: Thu, 16 Jan 2025 08:05:57 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>, 
- davem@davemloft.net
-Cc: netdev@vger.kernel.org, 
- edumazet@google.com, 
- pabeni@redhat.com, 
- andrew+netdev@lunn.ch, 
- horms@kernel.org, 
- Jakub Kicinski <kuba@kernel.org>, 
- shuah@kernel.org, 
- willemb@google.com, 
- matttbe@kernel.org, 
- linux-kselftest@vger.kernel.org
-Message-ID: <678904353ca7e_3710bc294ef@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20250115232129.845884-1-kuba@kernel.org>
-References: <20250115232129.845884-1-kuba@kernel.org>
-Subject: Re: [PATCH net-next] selftests/net: packetdrill: make tcp buf limited
- timing tests benign
+	s=arc-20240116; t=1737032793; c=relaxed/simple;
+	bh=OnXHaP2RXlZAkdXMUBJaRh3PdILLHIcuTgCimQm/K60=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UNVLywDsnCv3D8sbQoSxjc9X9aMVDKPDk8BxhiQuSvZiD2KN+Dnxd+YEZJ0RP3tBz8vxCNMdjhjd+dPq8j9mMuvbxbZllCqwdEdm8R7ajL7CHkIpWL4JSIv7BW8jN4MlftwItxzrJcLSgqn/i8AE7jXFSJRM9j/je7MYHD6r2Xk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Jm5IRekK; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=gGfqbH0+0xNHDaBP8mufxix1MaSaVnHOZLrK9FPiOgQ=; b=Jm5IRekKNfHpSJBpdovOOR/X1F
+	4+XkY+5vrPKiy+RrkNFrHkKkTjTjoRvdjg4/yvV1XYGXoKssZR5dmsKu+ETY7/iyTBEP9HUbv9Osw
+	aHI75CwnRw4gHylFHvU19qv8uLWj8vGGBszWxxdCStfdnU8NTLo5S6jeGQhNpTX2tBpk=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tYPZX-00582T-GD; Thu, 16 Jan 2025 14:06:07 +0100
+Date: Thu, 16 Jan 2025 14:06:07 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Marek Vasut <marex@denx.de>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Tristram Ha <tristram.ha@microchip.com>,
+	UNGLinuxDriver@microchip.com, Vladimir Oltean <olteanv@gmail.com>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	linux-kernel@vger.kernel.org
+Subject: Re: [net-next,PATCH 1/2] net: dsa: microchip: Add emulated MIIM
+ access to switch LED config registers
+Message-ID: <ec7861e2-85f5-45bf-bff6-19bc5009cac2@lunn.ch>
+References: <20250113001543.296510-1-marex@denx.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250113001543.296510-1-marex@denx.de>
 
-Jakub Kicinski wrote:
-> The following tests are failing on debug kernels:
-> 
->   tcp_tcp_info_tcp-info-rwnd-limited.pkt
->   tcp_tcp_info_tcp-info-sndbuf-limited.pkt
-> 
-> with reports like:
-> 
->       assert 19000 <= tcpi_sndbuf_limited <= 21000, tcpi_sndbuf_limited; \
->   AssertionError: 18000
-> 
-> and:
-> 
->       assert 348000 <= tcpi_busy_time <= 360000, tcpi_busy_time
->   AssertionError: 362000
-> 
-> Extend commit 912d6f669725 ("selftests/net: packetdrill: report benign
-> debug flakes as xfail") to cover them.
-> 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> This preparatory patch exposes the LED control bits in those Switch Config
+> Registers by mapping them at high addresses in the MIIM space, so the PHY
+> driver can access those registers and surely not collide with the existing
+> MIIM block registers. The two registers which are exposed are the global
+> Register 11 (0x0B): Global Control 9 as MIIM block register 0x0b00 and
+> port specific Register 29/45/61 (0x1D/0x2D/0x3D): Port 1/2/3 Control 10
+> as MIIM block register 0x0d00 . The access to those registers is further
+> restricted only to the LED configuration bits to prevent the PHY driver
+> or userspace tools like 'phytool' from tampering with any other switch
+> configuration through this interface.
 
-Reviewed-by: Willem de Bruijn <willemb@google.com>
+I do wounder about using register numbers outside of the 0-31
+range. We never have enforced it, but these clearly break 802.3 C22.
 
-Thanks.
+I wounder if it would be better to emulate pages as well. The PHY
+driver already has lanphy_write_page_reg() and
+lanphy_read_page_reg(). Could you emulate what those need?  It adds a
+lot of complexity, but it should be future proof.
 
-I see that we'll still have a few flakes on dbg. Perhaps one total
-failure a day. From the following.
+What might be simpler is to expose an emulated C45 register range, and
+put the registers in the vendor section.
 
-tcp-close-close-local-close-then-remote-fin-pkt
-tcp-ecn-ecn-uses-ect0-pkt
-tcp-eor-no-coalesce-retrans-pkt
-tcp-slow-start-slow-start-after-win-update-pkt
-tcp-sack-sack-route-refresh-ip-tos-pkt
-tcp-ts-recent-reset-tsval-pkt
-tcp-zerocopy-closed-pkt
 
-We'll take a look after this change whether we can make these
-more resilient. But likely also allow-list or even xfail for
-everything in dbg.
+	Andrew
 
