@@ -1,127 +1,284 @@
-Return-Path: <netdev+bounces-158926-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158925-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6B18A13D2B
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 16:04:06 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D51A3A13D12
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 16:00:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 196FB161CB3
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 15:04:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4E7E43A31A4
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 15:00:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B066822B5A4;
-	Thu, 16 Jan 2025 15:04:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CFD522AE75;
+	Thu, 16 Jan 2025 15:00:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YESEZZUb"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lvAMTQDN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C1CC22B8A8
-	for <netdev@vger.kernel.org>; Thu, 16 Jan 2025 15:04:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 101D922A7F2;
+	Thu, 16 Jan 2025 15:00:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737039843; cv=none; b=geWDaXLTGwHDhCcp7ehizR5f/DL5epreEdZTirGOEoiWzNdOg/THZW7A/eT7twJV5Y1AYLG9KpKvJa8eCu6HT1ClfsbOH+rmIVz1WZKpovPvKeAx34Q/MEnr/0IbLVpN2JSj8YIiKbQ12okQrwR/kyk4bIZa3X+KB8YoQFz71ZM=
+	t=1737039654; cv=none; b=eGq+iQkRuz8F1pEEUepNEd+YqmJq+OY6chavYzkYM2yjZ5u3KZ7fx3D7jBlKHrImMpCn8Dc/OJS3oBgbVoRJ3Qa/VyGU7d54LZwu94VPl8X28Y00hpID/Md/97jgBfSr1X7bpJdp7aM4tEvPVoyPUEtkqXpB0rV0HknPssd5Q1c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737039843; c=relaxed/simple;
-	bh=LOI/Zq1TNfYoRHMeo//q6o5DF9EgwbS+yo1GJ2vdWlw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=F0d0EUIKTPbG5m9Y9RCI8t/dUaUzB+yJqypOPDqq1QWK6bSGiL26CR6LRnKCsEYkf1TT3LGPD5BmxRYP0I8LoDHn3S0USJJpB+K+pzdwcegW2n5uNPwdlHkra2go3DmjLrE/SUOHJcDcimEPf3Jc4CwycCbR9g+vLfhXIYkxDp0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YESEZZUb; arc=none smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1737039842; x=1768575842;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=LOI/Zq1TNfYoRHMeo//q6o5DF9EgwbS+yo1GJ2vdWlw=;
-  b=YESEZZUb8YjxO3lNAPm/Ede3dDpilcbWXpTkLJKIMU1sJ5HczCmHYTIY
-   mFxb2GArs68WlwneGhZ9qB/F4mxduPND5nyAW8j/aIXUK68LDQ+CfWvUx
-   +7BQ700NOLx4ucLY3ERg0R3ca4zn9W6i9uBaHOohH77JEU0ru/siHSKto
-   0KFOtGEwQYwepsP7AH4On1EFOkw4gM3jWPb5QJUzg4BeVco1SlY2khYc4
-   f/He0kvvJYYhzsQ7WKZ7c/CzWpO38zxW0FT9W+2ISO6upe0WhRerdFP90
-   LOahGmxxK1OLUBEug6I5vqWyoI20yeWQ9kX1quIZ67cEBKU85kiDKmL4T
-   w==;
-X-CSE-ConnectionGUID: yy/Bop29QM6m4XT+Tdqymw==
-X-CSE-MsgGUID: iwgs4Io4RayppYd7fnewQQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11317"; a="54842593"
-X-IronPort-AV: E=Sophos;i="6.13,209,1732608000"; 
-   d="scan'208";a="54842593"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jan 2025 07:04:01 -0800
-X-CSE-ConnectionGUID: BZ0a8x0EQbqaLwrJgWlHAg==
-X-CSE-MsgGUID: K7A5EQl4SUSMYonoy/wt2w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.13,209,1732608000"; 
-   d="scan'208";a="136353273"
-Received: from mev-dev.igk.intel.com ([10.237.112.144])
-  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jan 2025 07:03:59 -0800
-Date: Thu, 16 Jan 2025 16:00:38 +0100
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: Moshe Shemesh <moshe@nvidia.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	Ido Schimmel <idosch@nvidia.com>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Tariq Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>,
-	Maher Sanalla <msanalla@nvidia.com>
-Subject: Re: [PATCH net] net/mlxfw: Drop hard coded max FW flash image size
-Message-ID: <Z4kfFlUx6GloTh6v@mev-dev.igk.intel.com>
-References: <1737030796-1441634-1-git-send-email-moshe@nvidia.com>
+	s=arc-20240116; t=1737039654; c=relaxed/simple;
+	bh=LHvdWOUzqFIxMZF6cFbOtU78ShJJm3+sua0F9MDsOuA=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=Z3xYOx6Z5IAbnLZibcgRfRasXW2WK0wJXv/8cIl/LwnP9VaTOx+PVd6MsnfG2ZKltMCyDsRHg2QdoAC+1jwjMSG2MlDCU3i9SgnUjk5I6GWZjext6r5ldpltBNnpb7bnaKoRgq/CH0WGY6xcaks0WXgIQ6JXExyZvVBvYROhgqo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lvAMTQDN; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 15EA6C4CEE1;
+	Thu, 16 Jan 2025 15:00:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1737039653;
+	bh=LHvdWOUzqFIxMZF6cFbOtU78ShJJm3+sua0F9MDsOuA=;
+	h=From:Date:Subject:To:Cc:From;
+	b=lvAMTQDNCLiDwCXNYTs7IaWX5id398BQpszrWXASAX1QjKUmbI+Xv3i1u4EGeC7j0
+	 lJAmw66TcSOuPamgqdTiMvrKd4K2PaaSdoS14G9XHHMJ4U5dPoDxzoGSYHpZ9JbUm3
+	 u7dK4HpeQ3f3NGz4nxHjXAukKDf7mnQ3hrsXrPaR3Y7ttMCgSAnYoeTlFuZ735Fps5
+	 mohHQ9cWU9EJnm2t7QW80LbFcQxiQfgva4SymEAX2r26ItuMgmlgf5LNi7oYxLFT1C
+	 wxV0VhMoaNWSi4hRxhY8ggOFhxhlqzTmcGcXZw7gqR4McPGEZPevkkYVNEVOx19k9K
+	 TYJuZUyqEQwzg==
+From: Roger Quadros <rogerq@kernel.org>
+Date: Thu, 16 Jan 2025 17:00:46 +0200
+Subject: [PATCH] dmaengine: ti: k3-udma-glue: Drop skip_fdq argument from
+ k3_udma_glue_reset_rx_chn
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1737030796-1441634-1-git-send-email-moshe@nvidia.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20250116-k3-udma-glue-single-fdq-v1-1-a0de73e36390@kernel.org>
+X-B4-Tracking: v=1; b=H4sIAB0fiWcC/x3MQQ5AMBBA0avIrE3SoiSuIhal05qgaEMk4u4ay
+ 7f4/4FIgSlCmz0Q6OLIm0+QeQbjpL0jZJMMhSiUkLLGucTTrBrdchJG9m4htObAUQ9iUJWSjVW
+ Q6j2Q5fs/d/37fqWUBA9pAAAA
+To: Peter Ujfalusi <peter.ujfalusi@gmail.com>, 
+ Vinod Koul <vkoul@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ MD Danish Anwar <danishanwar@ti.com>, 
+ Siddharth Vadapalli <s-vadapalli@ti.com>, 
+ Vignesh Raghavendra <vigneshr@ti.com>
+Cc: srk@ti.com, dmaengine@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+ Roger Quadros <rogerq@kernel.org>
+X-Mailer: b4 0.14.1
+X-Developer-Signature: v=1; a=openpgp-sha256; l=9171; i=rogerq@kernel.org;
+ h=from:subject:message-id; bh=LHvdWOUzqFIxMZF6cFbOtU78ShJJm3+sua0F9MDsOuA=;
+ b=owEBbQKS/ZANAwAIAdJaa9O+djCTAcsmYgBniR8hpY/hzD/bnHMzpKCanAmOaV0J4PNaPoZlR
+ SBuGS1rYo2JAjMEAAEIAB0WIQRBIWXUTJ9SeA+rEFjSWmvTvnYwkwUCZ4kfIQAKCRDSWmvTvnYw
+ k4zAD/9Syh0M/JZY0CJkA4KjKSwbelXudJkmcceGRfpBYDJfL5Xk8z6/mqLTC/DegA8qFqeuRjm
+ 1DMKgv983gCLd5i/Zf2Sj4PKB4oDQ2KQhac/YaDzml4h6h4vTGmWngdUqNKl9Odw5BVb+fSNG8p
+ aLmkOnnOuUMkLBjU4/9HduaNInpXbwccx7KELnuqniW2n5y5dXWs5UIo6MWRKHdf564oOgUIvsC
+ DsA6m9kGP+5LnRzQ/iyZ1XN3CNOhnsm6UOsQoqvGfK5ysNL4C+fc/elTvoUVXLOx4Q/PSrmX3BT
+ LXEA1x53S41djkBaF4SbR8U7H0WX4N/Kvg6PZLe2XkFnP1nJDy5yxwjQlhx7ubzlDH8RQDCXIaj
+ g3qtMpQyga0s+CV5QVjsa7CebfZ4He/HwKBLNPOKlBspvQNhEQcJFnB9bevcUyxR0XCSpZ0jGeH
+ ++tiyynrSKPwHRiQcEN98+fg3Vsbd9xrVkdOZb2DPrQqx/+clXVwni+bjQVuDOj1ZczFc9vBdFn
+ KrngG7HGOKYsbBhyRZxXcC7qzVyKB/HFdYAO87olVDJjkY2zEoj0f7B84dyyQ5flsGxf9LKlIK8
+ BEWHDs4DBU2cytTx2/jJawbuzQmvVcRY12evmyvqAJEIx3dsXgN7XncMVe697NVu2GCK39NU8GD
+ yakrPSwfK3j5i/A==
+X-Developer-Key: i=rogerq@kernel.org; a=openpgp;
+ fpr=412165D44C9F52780FAB1058D25A6BD3BE763093
 
-On Thu, Jan 16, 2025 at 02:33:16PM +0200, Moshe Shemesh wrote:
-> From: Maher Sanalla <msanalla@nvidia.com>
-> 
-> Currently, mlxfw kernel module limits FW flash image size to be
-> 10MB at most, preventing the ability to burn recent BlueField-3
-> FW that exceeds the said size limit.
-> 
-> Thus, drop the hard coded limit. Instead, rely on FW's
-> max_component_size threshold that is reported in MCQI register
-> as the size limit for FW image.
-> 
-> Fixes: 410ed13cae39 ("Add the mlxfw module for Mellanox firmware flash process")
-> Cc: Ido Schimmel <idosch@nvidia.com>
-> Signed-off-by: Maher Sanalla <msanalla@nvidia.com>
-> Signed-off-by: Moshe Shemesh <moshe@nvidia.com>
-> ---
->  drivers/net/ethernet/mellanox/mlxfw/mlxfw_fsm.c | 2 --
->  1 file changed, 2 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/mellanox/mlxfw/mlxfw_fsm.c b/drivers/net/ethernet/mellanox/mlxfw/mlxfw_fsm.c
-> index 46245e0b2462..43c84900369a 100644
-> --- a/drivers/net/ethernet/mellanox/mlxfw/mlxfw_fsm.c
-> +++ b/drivers/net/ethernet/mellanox/mlxfw/mlxfw_fsm.c
-> @@ -14,7 +14,6 @@
->  #define MLXFW_FSM_STATE_WAIT_TIMEOUT_MS 30000
->  #define MLXFW_FSM_STATE_WAIT_ROUNDS \
->  	(MLXFW_FSM_STATE_WAIT_TIMEOUT_MS / MLXFW_FSM_STATE_WAIT_CYCLE_MS)
-> -#define MLXFW_FSM_MAX_COMPONENT_SIZE (10 * (1 << 20))
->  
->  static const int mlxfw_fsm_state_errno[] = {
->  	[MLXFW_FSM_STATE_ERR_ERROR] = -EIO,
-> @@ -229,7 +228,6 @@ static int mlxfw_flash_component(struct mlxfw_dev *mlxfw_dev,
->  		return err;
->  	}
->  
-> -	comp_max_size = min_t(u32, comp_max_size, MLXFW_FSM_MAX_COMPONENT_SIZE);
->  	if (comp->data_size > comp_max_size) {
->  		MLXFW_ERR_MSG(mlxfw_dev, extack,
->  			      "Component size is bigger than limit", -EINVAL);
+The user of k3_udma_glue_reset_rx_chn() e.g. ti_am65_cpsw_nuss can
+run on multiple platforms having different DMA architectures.
+On some platforms there can be one FDQ for all flows in the RX channel
+while for others there is a separate FDQ for each flow in the RX channel.
 
-Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+So far we have been relying on the skip_fdq argument of
+k3_udma_glue_reset_rx_chn().
 
-> -- 
-> 2.18.2
+Instead of relying on the user to provide this information, infer it
+based on DMA architecture during k3_udma_glue_request_rx_chn() and save it
+in an internal flag 'single_fdq'. Use that flag at
+k3_udma_glue_reset_rx_chn() to deicide if the FDQ needs
+to be cleared for every flow or just for flow 0.
+
+Fixes the below issue on ti_am65_cpsw_nuss driver on AM62-SK.
+
+> ip link set eth1 down
+> ip link set eth0 down
+> ethtool -L eth0 rx 8
+> ip link set eth0 up
+> modprobe -r ti_am65_cpsw_nuss
+
+[  103.045726] ------------[ cut here ]------------
+[  103.050505] k3_knav_desc_pool size 512000 != avail 64000
+[  103.050703] WARNING: CPU: 1 PID: 450 at drivers/net/ethernet/ti/k3-cppi-desc-pool.c:33 k3_cppi_desc_pool_destroy+0xa0/0xa8 [k3_cppi_desc_pool]
+[  103.068810] Modules linked in: ti_am65_cpsw_nuss(-) k3_cppi_desc_pool snd_soc_hdmi_codec crct10dif_ce snd_soc_simple_card snd_soc_simple_card_utils display_connector rtc_ti_k3 k3_j72xx_bandgap tidss drm_client_lib snd_soc_davinci_mcas
+p drm_dma_helper tps6598x phylink snd_soc_ti_udma rti_wdt drm_display_helper snd_soc_tlv320aic3x_i2c typec at24 phy_gmii_sel snd_soc_ti_edma snd_soc_tlv320aic3x sii902x snd_soc_ti_sdma sa2ul omap_mailbox drm_kms_helper authenc cfg80211 r
+fkill fuse drm drm_panel_orientation_quirks backlight ip_tables x_tables ipv6 [last unloaded: k3_cppi_desc_pool]
+[  103.119950] CPU: 1 UID: 0 PID: 450 Comm: modprobe Not tainted 6.13.0-rc7-00001-g9c5e3435fa66 #1011
+[  103.119968] Hardware name: Texas Instruments AM625 SK (DT)
+[  103.119974] pstate: 80000005 (Nzcv daif -PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+[  103.119983] pc : k3_cppi_desc_pool_destroy+0xa0/0xa8 [k3_cppi_desc_pool]
+[  103.148007] lr : k3_cppi_desc_pool_destroy+0xa0/0xa8 [k3_cppi_desc_pool]
+[  103.154709] sp : ffff8000826ebbc0
+[  103.158015] x29: ffff8000826ebbc0 x28: ffff0000090b6300 x27: 0000000000000000
+[  103.165145] x26: 0000000000000000 x25: 0000000000000000 x24: ffff0000019df6b0
+[  103.172271] x23: ffff0000019df6b8 x22: ffff0000019df410 x21: ffff8000826ebc88
+[  103.179397] x20: 000000000007d000 x19: ffff00000a3b3000 x18: 0000000000000000
+[  103.186522] x17: 0000000000000000 x16: 0000000000000000 x15: 000001e8c35e1cde
+[  103.193647] x14: 0000000000000396 x13: 000000000000035c x12: 0000000000000000
+[  103.200772] x11: 000000000000003a x10: 00000000000009c0 x9 : ffff8000826eba20
+[  103.207897] x8 : ffff0000090b6d20 x7 : ffff00007728c180 x6 : ffff00007728c100
+[  103.215022] x5 : 0000000000000001 x4 : ffff000000508a50 x3 : ffff7ffff6146000
+[  103.222147] x2 : 0000000000000000 x1 : e300b4173ee6b200 x0 : 0000000000000000
+[  103.229274] Call trace:
+[  103.231714]  k3_cppi_desc_pool_destroy+0xa0/0xa8 [k3_cppi_desc_pool] (P)
+[  103.238408]  am65_cpsw_nuss_free_rx_chns+0x28/0x4c [ti_am65_cpsw_nuss]
+[  103.244942]  devm_action_release+0x14/0x20
+[  103.249040]  release_nodes+0x3c/0x68
+[  103.252610]  devres_release_all+0x8c/0xdc
+[  103.256614]  device_unbind_cleanup+0x18/0x60
+[  103.260876]  device_release_driver_internal+0xf8/0x178
+[  103.266004]  driver_detach+0x50/0x9c
+[  103.269571]  bus_remove_driver+0x6c/0xbc
+[  103.273485]  driver_unregister+0x30/0x60
+[  103.277401]  platform_driver_unregister+0x14/0x20
+[  103.282096]  am65_cpsw_nuss_driver_exit+0x18/0xff4 [ti_am65_cpsw_nuss]
+[  103.288620]  __arm64_sys_delete_module+0x17c/0x25c
+[  103.293404]  invoke_syscall+0x44/0x100
+[  103.297149]  el0_svc_common.constprop.0+0xc0/0xe0
+[  103.301845]  do_el0_svc+0x1c/0x28
+[  103.305155]  el0_svc+0x28/0x98
+[  103.308207]  el0t_64_sync_handler+0xc8/0xcc
+[  103.312384]  el0t_64_sync+0x198/0x19c
+[  103.316040] ---[ end trace 0000000000000000 ]---
+
+Signed-off-by: Roger Quadros <rogerq@kernel.org>
+---
+ drivers/dma/ti/k3-udma-glue.c                | 15 +++++++++++----
+ drivers/net/ethernet/ti/am65-cpsw-nuss.c     |  6 +++---
+ drivers/net/ethernet/ti/icssg/icssg_common.c |  2 +-
+ include/linux/dma/k3-udma-glue.h             |  3 +--
+ 4 files changed, 16 insertions(+), 10 deletions(-)
+
+diff --git a/drivers/dma/ti/k3-udma-glue.c b/drivers/dma/ti/k3-udma-glue.c
+index 7c224c3ab7a0..f87d244cc2d6 100644
+--- a/drivers/dma/ti/k3-udma-glue.c
++++ b/drivers/dma/ti/k3-udma-glue.c
+@@ -84,6 +84,7 @@ struct k3_udma_glue_rx_channel {
+ 	struct k3_udma_glue_rx_flow *flows;
+ 	u32 flow_num;
+ 	u32 flows_ready;
++	bool single_fdq;	/* one FDQ for all flows */
+ };
+ 
+ static void k3_udma_chan_dev_release(struct device *dev)
+@@ -970,10 +971,13 @@ k3_udma_glue_request_rx_chn_priv(struct device *dev, const char *name,
+ 
+ 	ep_cfg = rx_chn->common.ep_config;
+ 
+-	if (xudma_is_pktdma(rx_chn->common.udmax))
++	if (xudma_is_pktdma(rx_chn->common.udmax)) {
+ 		rx_chn->udma_rchan_id = ep_cfg->mapped_channel_id;
+-	else
++		rx_chn->single_fdq = false;
++	} else {
+ 		rx_chn->udma_rchan_id = -1;
++		rx_chn->single_fdq = true;
++	}
+ 
+ 	/* request and cfg UDMAP RX channel */
+ 	rx_chn->udma_rchanx = xudma_rchan_get(rx_chn->common.udmax,
+@@ -1103,6 +1107,9 @@ k3_udma_glue_request_remote_rx_chn_common(struct k3_udma_glue_rx_channel *rx_chn
+ 		rx_chn->common.chan_dev.dma_coherent = true;
+ 		dma_coerce_mask_and_coherent(&rx_chn->common.chan_dev,
+ 					     DMA_BIT_MASK(48));
++		rx_chn->single_fdq = false;
++	} else {
++		rx_chn->single_fdq = true;
+ 	}
+ 
+ 	ret = k3_udma_glue_allocate_rx_flows(rx_chn, cfg);
+@@ -1453,7 +1460,7 @@ EXPORT_SYMBOL_GPL(k3_udma_glue_tdown_rx_chn);
+ 
+ void k3_udma_glue_reset_rx_chn(struct k3_udma_glue_rx_channel *rx_chn,
+ 		u32 flow_num, void *data,
+-		void (*cleanup)(void *data, dma_addr_t desc_dma), bool skip_fdq)
++		void (*cleanup)(void *data, dma_addr_t desc_dma))
+ {
+ 	struct k3_udma_glue_rx_flow *flow = &rx_chn->flows[flow_num];
+ 	struct device *dev = rx_chn->common.dev;
+@@ -1465,7 +1472,7 @@ void k3_udma_glue_reset_rx_chn(struct k3_udma_glue_rx_channel *rx_chn,
+ 	dev_dbg(dev, "RX reset flow %u occ_rx %u\n", flow_num, occ_rx);
+ 
+ 	/* Skip RX FDQ in case one FDQ is used for the set of flows */
+-	if (skip_fdq)
++	if (rx_chn->single_fdq && flow_num)
+ 		goto do_reset;
+ 
+ 	/*
+diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.c b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
+index 5465bf872734..ba6af99aa2a8 100644
+--- a/drivers/net/ethernet/ti/am65-cpsw-nuss.c
++++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
+@@ -859,7 +859,7 @@ static int am65_cpsw_nuss_common_open(struct am65_cpsw_common *common)
+ fail_rx:
+ 	for (i = 0; i < common->rx_ch_num_flows; i++)
+ 		k3_udma_glue_reset_rx_chn(rx_chn->rx_chn, i, rx_chn,
+-					  am65_cpsw_nuss_rx_cleanup, !!i);
++					  am65_cpsw_nuss_rx_cleanup);
+ 
+ 	am65_cpsw_destroy_xdp_rxqs(common);
+ 
+@@ -915,7 +915,7 @@ static int am65_cpsw_nuss_common_stop(struct am65_cpsw_common *common)
+ 		napi_disable(&rx_chn->flows[i].napi_rx);
+ 		hrtimer_cancel(&rx_chn->flows[i].rx_hrtimer);
+ 		k3_udma_glue_reset_rx_chn(rx_chn->rx_chn, i, rx_chn,
+-					  am65_cpsw_nuss_rx_cleanup, !!i);
++					  am65_cpsw_nuss_rx_cleanup);
+ 	}
+ 
+ 	k3_udma_glue_disable_rx_chn(rx_chn->rx_chn);
+@@ -3364,7 +3364,7 @@ static int am65_cpsw_nuss_register_ndevs(struct am65_cpsw_common *common)
+ 	for (i = 0; i < common->rx_ch_num_flows; i++)
+ 		k3_udma_glue_reset_rx_chn(rx_chan->rx_chn, i,
+ 					  rx_chan,
+-					  am65_cpsw_nuss_rx_cleanup, !!i);
++					  am65_cpsw_nuss_rx_cleanup);
+ 
+ 	k3_udma_glue_disable_rx_chn(rx_chan->rx_chn);
+ 
+diff --git a/drivers/net/ethernet/ti/icssg/icssg_common.c b/drivers/net/ethernet/ti/icssg/icssg_common.c
+index 74f0f200a89d..62065416e886 100644
+--- a/drivers/net/ethernet/ti/icssg/icssg_common.c
++++ b/drivers/net/ethernet/ti/icssg/icssg_common.c
+@@ -955,7 +955,7 @@ void prueth_reset_rx_chan(struct prueth_rx_chn *chn,
+ 
+ 	for (i = 0; i < num_flows; i++)
+ 		k3_udma_glue_reset_rx_chn(chn->rx_chn, i, chn,
+-					  prueth_rx_cleanup, !!i);
++					  prueth_rx_cleanup);
+ 	if (disable)
+ 		k3_udma_glue_disable_rx_chn(chn->rx_chn);
+ }
+diff --git a/include/linux/dma/k3-udma-glue.h b/include/linux/dma/k3-udma-glue.h
+index 2dea217629d0..5d43881e6fb7 100644
+--- a/include/linux/dma/k3-udma-glue.h
++++ b/include/linux/dma/k3-udma-glue.h
+@@ -138,8 +138,7 @@ int k3_udma_glue_rx_get_irq(struct k3_udma_glue_rx_channel *rx_chn,
+ 			    u32 flow_num);
+ void k3_udma_glue_reset_rx_chn(struct k3_udma_glue_rx_channel *rx_chn,
+ 		u32 flow_num, void *data,
+-		void (*cleanup)(void *data, dma_addr_t desc_dma),
+-		bool skip_fdq);
++		void (*cleanup)(void *data, dma_addr_t desc_dma));
+ int k3_udma_glue_rx_flow_enable(struct k3_udma_glue_rx_channel *rx_chn,
+ 				u32 flow_idx);
+ int k3_udma_glue_rx_flow_disable(struct k3_udma_glue_rx_channel *rx_chn,
+
+---
+base-commit: 5bc55a333a2f7316b58edc7573e8e893f7acb532
+change-id: 20250116-k3-udma-glue-single-fdq-cab0b54517f5
+
+Best regards,
+-- 
+Roger Quadros <rogerq@kernel.org>
+
 
