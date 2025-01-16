@@ -1,95 +1,180 @@
-Return-Path: <netdev+bounces-158872-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158874-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B10CA139D4
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 13:20:26 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 86284A139DE
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 13:23:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D81407A5004
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 12:20:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E549D188ADF2
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 12:23:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85EA61DE884;
-	Thu, 16 Jan 2025 12:20:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50FE11DE4F9;
+	Thu, 16 Jan 2025 12:23:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Zgl57AQF"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="aBbdOx0G"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out30-112.freemail.mail.aliyun.com (out30-112.freemail.mail.aliyun.com [115.124.30.112])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A12B1DE881
-	for <netdev@vger.kernel.org>; Thu, 16 Jan 2025 12:20:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A0DB1DE4D4;
+	Thu, 16 Jan 2025 12:23:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.112
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737030011; cv=none; b=qrUvTbvCkhsE8WYq2NXJPhVm4TuLzJFQa84EzQ/TE6ywKcjxx7V5L/wtQIU/+GnkSFtFRHdEiCa3LS++EKoxifDIea2MP4eHSnigi/nMqYkFb8OX/GwjQ+P3Hlgsrlre/9Wc7qX5kJFSSwAHyn+1Jr0t+6zgTVmBBnRRJ8Zr6rk=
+	t=1737030193; cv=none; b=XxzFmYw8kXskbEVsZfAp4StUD62X6nDl/kmg7Y0MgIR+oKzw6TKlFfuq2EOwcxQBilqQxdlNppzdHM/AXCEMdIlIUTWQRrQ080HlVyKflMYBjn4WbG1d5Wf2PgQfM3ovz4tmzh4uvInbJlC5RoI6l0t9Z4zKcKJT+eLL/Dwq8Fg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737030011; c=relaxed/simple;
-	bh=j44ddHhb5lqOi8+uP/S4bL392bZ7sw/3T1yDaT7lnDA=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=gZ84OQIaYv9sBNj48UH1ehF9pBQWSEA/jZEEKPDk5nkKbmVsOcBNfOUBj2iNGnD6LvJry9D1P8uIEFKwr3/aCrbMg4UIzc8bCETrfQbm9+X6O6WWtXp9krbiEQBxNaY8pSRs3xSONWPPX5t1lzrodvDTgYaDkuC/qg/uUqVrVbE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Zgl57AQF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DB01BC4CEE4;
-	Thu, 16 Jan 2025 12:20:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737030010;
-	bh=j44ddHhb5lqOi8+uP/S4bL392bZ7sw/3T1yDaT7lnDA=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Zgl57AQFH31O98ZPcRlKRtH+BLX4aCzkNLI8IF99c8cZry+HY2Lxk31Q+0SJ4caEL
-	 HiJBBWe9ICwm4f2g2+Wvj1Y2sgGR3y4IhYJKTQHZEHLpRsDSAfhcII9DBKxmq9vCli
-	 n4+RcOArqD8CvX0TOLEmsSNhW+I6mS6pqDHZEAXqsfNGpMpxnnBNgtgexcL3wcTmMt
-	 NPSDDfFvNQYXBtWqOicHChY9xp3+JCA4GpCiLBu2UalBBDqulaTT4A/DBjOyiBNGFI
-	 2n1UCfuJII4xowBi2M3qTYogzcEyHLhjB+hJSGRXj8LKiMsH9RlDnK7K8m/WsmO9F3
-	 2Ccz+4EY5Y4bQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33C35380AA62;
-	Thu, 16 Jan 2025 12:20:35 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1737030193; c=relaxed/simple;
+	bh=DHqEvLwf3HDkS2JVIwmCrqfeDQIkB8B3EbXIvh3PJ8s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jTUmeOX+Q3Oe4YoQ+5+XASb2HUZ8DgjecY/CkLe3lb4S2SQYYl4MfLj5rd6LNa/piutsA70HQVXOEltrylRFhWom21PbLzW6QZ5GWRMmtiAuHXbSmywFREIfPRcKMrsZVtd4HtaaVAZ5zdiJljdEj5DCMviuv0Dk3r7tsVxoDOM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=aBbdOx0G; arc=none smtp.client-ip=115.124.30.112
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1737030181; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
+	bh=z/2X4QCJz0+PjyBqoo8pjyWfSn+lHxhP2Hw0xitx+xw=;
+	b=aBbdOx0GBWv0xqNbiQwOCdBdCoX7wngQbPTG8guLWzkYLFE0NLORM3BXK6GJE2Zu7UCdzw6OMMpw7YXoOOIdRlCYHicTQVcl9yqM50YBkq0oyxE8ucKfOMiVXE1MYjrbR0xf09kbLtrUK0ZCwXymIr9qy87SZ9e3OLAYyX99j3s=
+Received: from localhost(mailfrom:dust.li@linux.alibaba.com fp:SMTPD_---0WNlhgBZ_1737030179 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Thu, 16 Jan 2025 20:23:00 +0800
+Date: Thu, 16 Jan 2025 20:22:59 +0800
+From: Dust Li <dust.li@linux.alibaba.com>
+To: "D. Wythe" <alibuda@linux.alibaba.com>, kgraul@linux.ibm.com,
+	wenjia@linux.ibm.com, jaka@linux.ibm.com, ast@kernel.org,
+	daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev,
+	pabeni@redhat.com, song@kernel.org, sdf@google.com,
+	haoluo@google.com, yhs@fb.com, edumazet@google.com,
+	john.fastabend@gmail.com, kpsingh@kernel.org, jolsa@kernel.org,
+	guwen@linux.alibaba.com
+Cc: kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
+	linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org,
+	bpf@vger.kernel.org
+Subject: Re: [PATCH bpf-next v6 2/5] net/smc: Introduce generic hook smc_ops
+Message-ID: <20250116122259.GE89233@linux.alibaba.com>
+Reply-To: dust.li@linux.alibaba.com
+References: <20250116074442.79304-1-alibuda@linux.alibaba.com>
+ <20250116074442.79304-3-alibuda@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] netdev: avoid CFI problems with sock priv helpers
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173703003374.1435910.6006607918623329312.git-patchwork-notify@kernel.org>
-Date: Thu, 16 Jan 2025 12:20:33 +0000
-References: <20250115161436.648646-1-kuba@kernel.org>
-In-Reply-To: <20250115161436.648646-1-kuba@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
- dualli@chromium.org, donald.hunter@gmail.com, sdf@fomichev.me,
- almasrymina@google.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250116074442.79304-3-alibuda@linux.alibaba.com>
 
-Hello:
-
-This patch was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Wed, 15 Jan 2025 08:14:36 -0800 you wrote:
-> Li Li reports that casting away callback type may cause issues
-> for CFI. Let's generate a small wrapper for each callback,
-> to make sure compiler sees the anticipated types.
+On 2025-01-16 15:44:39, D. Wythe wrote:
+>The introduction of IPPROTO_SMC enables eBPF programs to determine
+>whether to use SMC based on the context of socket creation, such as
+>network namespaces, PID and comm name, etc.
+>
+>As a subsequent enhancement, to introduce a new generic hook that
+>allows decisions on whether to use SMC or not at runtime, including
+>but not limited to local/remote IP address or ports.
+>
+>Moreover, in the future, we can achieve more complex extensions to the
+>protocol stack by extending this ops.
+>
+>Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
+>---
+> include/net/netns/smc.h |  3 ++
+> include/net/smc.h       | 53 +++++++++++++++++++++++
+> net/ipv4/tcp_output.c   | 18 ++++++--
+> net/smc/Kconfig         | 12 ++++++
+> net/smc/Makefile        |  1 +
+> net/smc/smc_ops.c       | 53 +++++++++++++++++++++++
+> net/smc/smc_ops.h       | 28 ++++++++++++
+> net/smc/smc_sysctl.c    | 94 +++++++++++++++++++++++++++++++++++++++++
+> 8 files changed, 258 insertions(+), 4 deletions(-)
+> create mode 100644 net/smc/smc_ops.c
+> create mode 100644 net/smc/smc_ops.h
+>
+>diff --git a/include/net/netns/smc.h b/include/net/netns/smc.h
+>index fc752a50f91b..81b3fdb39cd2 100644
+>--- a/include/net/netns/smc.h
+>+++ b/include/net/netns/smc.h
+>@@ -17,6 +17,9 @@ struct netns_smc {
+> #ifdef CONFIG_SYSCTL
+> 	struct ctl_table_header		*smc_hdr;
+> #endif
+>+#if IS_ENABLED(CONFIG_SMC_OPS)
+>+	struct smc_ops __rcu		*ops;
+>+#endif /* CONFIG_SMC_OPS */
+> 	unsigned int			sysctl_autocorking_size;
+> 	unsigned int			sysctl_smcr_buf_type;
+> 	int				sysctl_smcr_testlink_time;
+>diff --git a/include/net/smc.h b/include/net/smc.h
+>index db84e4e35080..271838591b63 100644
+>--- a/include/net/smc.h
+>+++ b/include/net/smc.h
+>@@ -18,6 +18,8 @@
+> #include "linux/ism.h"
 > 
-> Reported-by: Li Li <dualli@chromium.org>
-> Link: https://lore.kernel.org/CANBPYPjQVqmzZ4J=rVQX87a9iuwmaetULwbK_5_3YWk2eGzkaA@mail.gmail.com
-> Fixes: 170aafe35cb9 ("netdev: support binding dma-buf to netdevice")
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> struct sock;
+>+struct tcp_sock;
+>+struct inet_request_sock;
 > 
-> [...]
+> #define SMC_MAX_PNETID_LEN	16	/* Max. length of PNET id */
+> 
+>@@ -97,4 +99,55 @@ struct smcd_dev {
+> 	u8 going_away : 1;
+> };
+> 
+>+#define  SMC_OPS_NAME_MAX 16
+>+
+>+enum {
+>+	/* ops can be inherit from init_net */
+>+	SMC_OPS_FLAG_INHERITABLE = 0x1,
+>+
+>+	SMC_OPS_ALL_FLAGS = SMC_OPS_FLAG_INHERITABLE,
+>+};
+>+
+>+struct smc_ops {
+>+	/* priavte */
+>+
+>+	struct list_head list;
+>+	struct module *owner;
+>+
+>+	/* public */
+>+
+>+	/* unique name */
+>+	char name[SMC_OPS_NAME_MAX];
+>+	int flags;
+>+
+>+	/* Invoked before computing SMC option for SYN packets.
+>+	 * We can control whether to set SMC options by returning varios value.
+>+	 * Return 0 to disable SMC, or return any other value to enable it.
+>+	 */
+>+	int (*set_option)(struct tcp_sock *tp);
+>+
+>+	/* Invoked before Set up SMC options for SYN-ACK packets
+>+	 * We can control whether to respond SMC options by returning varios
+>+	 * value. Return 0 to disable SMC, or return any other value to enable
+>+	 * it.
+>+	 */
+>+	int (*set_option_cond)(const struct tcp_sock *tp,
+>+			       struct inet_request_sock *ireq);
+>+};
+>+
+>+#if IS_ENABLED(CONFIG_SMC_OPS)
+>+#define smc_call_retops(init_val, sk, func, ...) ({	\
+>+	typeof(init_val) __ret = (init_val);		\
+>+	struct smc_ops *ops;				\
+>+	rcu_read_lock();				\
+>+	ops = READ_ONCE(sock_net(sk)->smc.ops);		\
+>+	if (ops && ops->func)				\
+>+		__ret = ops->func(__VA_ARGS__);		\
+>+	rcu_read_unlock();				\
+>+	!!__ret;					\
+>+})
 
-Here is the summary with links:
-  - [net] netdev: avoid CFI problems with sock priv helpers
-    https://git.kernel.org/netdev/net/c/a50da36562cd
+Here you force the return value to be bool by !!ret, what if the
+future caller expects the return value to be an integer or other types ?
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+Best regards,
+Dust
 
 
