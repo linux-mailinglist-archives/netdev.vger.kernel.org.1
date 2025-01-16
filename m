@@ -1,68 +1,64 @@
-Return-Path: <netdev+bounces-158732-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158733-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A9BDFA1317F
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 03:41:14 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0CB94A13187
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 03:48:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BC1DC3A06C1
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 02:41:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1A323163F97
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 02:48:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7B8578F3A;
-	Thu, 16 Jan 2025 02:41:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7D5835948;
+	Thu, 16 Jan 2025 02:48:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JPasyAZ2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gDModgfc"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7736B1862;
-	Thu, 16 Jan 2025 02:41:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DA6717BD3;
+	Thu, 16 Jan 2025 02:48:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736995268; cv=none; b=GKHq5DN2VtGNtfBYKwHmjMONnbQx3y8S0U7rBUKS/zwgAaGezrZwXNPAti/kUA7g2XvIwt5LgkvWLwV+Q0hEhRNQCoiCE3WW5urD18Wk5RyRmZ/1RWfp/tYw9fMj1GHNKYSbXj+ij1tRXZ71rruf7diXhKm7dGsnyWq4Xwkof2A=
+	t=1736995732; cv=none; b=ejpegEn2Ivk4yEAziXAV8ePla3hDwaScCwmnW1BQWp/t6AzBKPy/At+k/sM4qEtSvFdebT6nJYaowrPAIvU8hN5bhJDPpGx6iEXQm90bR9G16g+dO0leXgV1BRXxOYSJE9BJBmkh/jQyeFwhA8uFP37+GTtBYxZYXp1Rl++iMk0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736995268; c=relaxed/simple;
-	bh=357X8ueNSmXmBC6zxKI/63tEqCXBjNeDU6GK2yNvUAc=;
+	s=arc-20240116; t=1736995732; c=relaxed/simple;
+	bh=5ETaFEkTljab3ojVYsXyNwdOM6bFvmz7QnYyt2ttLZI=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=p3n6Jm98K+ammeKvIR1XIBS3WEV5oWPQIzdXeTa4vFoaUn2TGDB0BKJy9GCfc2V04ZBSn+OKpVGWXf3F2nSX1xDOI0ay+YErjMwdpWtukedSzG6lkduZrCSZXTn+59FZWAhv8/qmuAuO/mMacnuvA128XY0vtv7Y8RAB0PdWjfo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JPasyAZ2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9E850C4CED1;
-	Thu, 16 Jan 2025 02:41:06 +0000 (UTC)
+	 MIME-Version:Content-Type; b=bI7C+Sh/UELj7qNbPgXjZVKWHHHgiMXQeH/r+Ykd+OXmJk6WHmXe8O2HKVGrGcssHcHARbFLm/GkAd8OyVlpMu0ROV1dvtlPrBcYaMZVcxhcNjdyHt40nCRKqhySywhJvK7Pr6HDiSn+N91JarX7+r6YxsXLygsghy7OUEV8jlM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gDModgfc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8757AC4CED1;
+	Thu, 16 Jan 2025 02:48:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736995267;
-	bh=357X8ueNSmXmBC6zxKI/63tEqCXBjNeDU6GK2yNvUAc=;
+	s=k20201202; t=1736995732;
+	bh=5ETaFEkTljab3ojVYsXyNwdOM6bFvmz7QnYyt2ttLZI=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=JPasyAZ2pXyo8qbSFD7ZwIEuV1EKK/LSSeua5vU//cH6s7iu3tSTYwGQSny2KAC7D
-	 VznLxn5ygEAW5jlVKrZMx3n+Sb+AI/Jy66mm7E0ZwL2ppZuSFXd1dwS8tP+plcfKUj
-	 QEWcn41dyqz32+oVWK4tkBXlo6v9cCydSkC7dtKql1zZv0dq7H7lIlVi1/HTR0NrFa
-	 coEvsEQlICfRbB9IWB+lIvHzUMx1DQzdBK8NXErtZL694f3SCcyssiyaNNhzDscAwg
-	 o/LC8tuOBCs6gsUPk/KAvTSKdjKbY5lditIZMMnjqOkQdiPRWKRMWU3mjDNdvkOG2J
-	 9YoR6N03JSnOw==
-Date: Wed, 15 Jan 2025 18:41:05 -0800
+	b=gDModgfcodXAhBnQqgwvUtLlCJEnFJLTVI3fFDcQDTjBnCMs6tMVzZsWZhy8TR6eX
+	 5b3xHIoh2t6B0P9aPDnlmbs60/v61PpEVtittIIi7o/KHeXcN+lTpuQG6HNkJUz2lr
+	 vFAuMW5pQ0j8K4CB+TZxRk2P/EcITwHPQz2SIJ/XxMh8+DSTGb4a/vAXFxIP4I9lWJ
+	 /hG5oE8UZ/S58kl/g9DgI5x4R545wonRCZTiv22MlQ0BCP5aPsWhdfah7kP0cKwMj5
+	 UHNC6S8cTJ6RhmmYiTo2jcCCR1u9uw5lik9rAfkGQnNy1cQUXgp6QyKh6FNJxipyaw
+	 xwrZmac6TEsJQ==
+Date: Wed, 15 Jan 2025 18:48:50 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Wei Fang <wei.fang@nxp.com>
-Cc: Claudiu Manoil <claudiu.manoil@nxp.com>, Vladimir Oltean
- <vladimir.oltean@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>,
- "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, "davem@davemloft.net"
- <davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
- "pabeni@redhat.com" <pabeni@redhat.com>, "christophe.leroy@csgroup.eu"
- <christophe.leroy@csgroup.eu>, "netdev@vger.kernel.org"
- <netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
- <linux-kernel@vger.kernel.org>, "linuxppc-dev@lists.ozlabs.org"
- <linuxppc-dev@lists.ozlabs.org>, "linux-arm-kernel@lists.infradead.org"
- <linux-arm-kernel@lists.infradead.org>, "imx@lists.linux.dev"
- <imx@lists.linux.dev>
-Subject: Re: [PATCH v2 net-next 07/13] net: enetc: add RSS support for
- i.MX95 ENETC PF
-Message-ID: <20250115184105.139aed9c@kernel.org>
-In-Reply-To: <PAXPR04MB8510B52B7D27640C557680B4881A2@PAXPR04MB8510.eurprd04.prod.outlook.com>
-References: <20250113082245.2332775-1-wei.fang@nxp.com>
-	<20250113082245.2332775-8-wei.fang@nxp.com>
-	<20250115140042.63b99c4f@kernel.org>
-	<PAXPR04MB8510B52B7D27640C557680B4881A2@PAXPR04MB8510.eurprd04.prod.outlook.com>
+To: Pavel Begunkov <asml.silence@gmail.com>
+Cc: David Wei <dw@davidwei.uk>, io-uring@vger.kernel.org,
+ netdev@vger.kernel.org, Jens Axboe <axboe@kernel.dk>, Paolo Abeni
+ <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jesper Dangaard Brouer <hawk@kernel.org>, David
+ Ahern <dsahern@kernel.org>, Mina Almasry <almasrymina@google.com>,
+ Stanislav Fomichev <stfomichev@gmail.com>, Joe Damato <jdamato@fastly.com>,
+ Pedro Tammela <pctammela@mojatatu.com>
+Subject: Re: [PATCH net-next v10 01/22] net: make page_pool_ref_netmem work
+ with net iovs
+Message-ID: <20250115184850.4d30e408@kernel.org>
+In-Reply-To: <52fffbfb-dadb-48fe-84e4-8296b18fd22e@gmail.com>
+References: <20250108220644.3528845-1-dw@davidwei.uk>
+	<20250108220644.3528845-2-dw@davidwei.uk>
+	<20250115163019.3e810c0d@kernel.org>
+	<52fffbfb-dadb-48fe-84e4-8296b18fd22e@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -72,17 +68,23 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Thu, 16 Jan 2025 02:24:10 +0000 Wei Fang wrote:
-> > Why create full ops for something this trivial?  
+On Thu, 16 Jan 2025 02:12:06 +0000 Pavel Begunkov wrote:
+> On 1/16/25 00:30, Jakub Kicinski wrote:
+> > On Wed,  8 Jan 2025 14:06:22 -0800 David Wei wrote:  
+> >> From: Pavel Begunkov <asml.silence@gmail.com>
+> >>
+> >> page_pool_ref_netmem() should work with either netmem representation, but
+> >> currently it casts to a page with netmem_to_page(), which will fail with
+> >> net iovs. Use netmem_get_pp_ref_count_ref() instead.  
+> > 
+> > This is a fix, right? If we try to coalesce a cloned netmem skb
+> > we'll crash.  
 > 
-> We add enetc_pf_hw_ops to implement different hardware ops
-> for different chips. So that they can be called in common functions.
-> Although the change is minor, it is consistent with the original
-> intention of adding enetc_pf_hw_ops.
+> True, I missed it it's actually used.
 
-In other words you prefer ops.
+I'll add:
 
-Now imagine you have to refactor such piece of code in 10 drivers 
-and each of them has 2 layers of indirect ops like you do.
-Unnecessary complexity.
+Fixes: 8ab79ed50cf1 ("page_pool: devmem support")
+
+and we'll send it to Linus tomorrow. Hope that's okay.
 
