@@ -1,230 +1,154 @@
-Return-Path: <netdev+bounces-158966-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158967-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5FBF0A13FD7
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 17:51:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A92FA13FE3
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 17:54:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7A218163623
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 16:51:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 42CD716AEC8
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 16:54:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EA9B22BACA;
-	Thu, 16 Jan 2025 16:51:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98A7E22CA13;
+	Thu, 16 Jan 2025 16:54:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="iJ4s5LGP"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VIinGWU7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0200E1BE87B;
-	Thu, 16 Jan 2025 16:51:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 680892AE96;
+	Thu, 16 Jan 2025 16:54:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737046300; cv=none; b=vB+TKzFdjPOIJOm4vWLXTRcqTYIUVWBUs/5r5oqTpe/ZOubIC87hpyBlu6w3hgrJdeTB4OBVgta6Le79b7d5UmO5ArEWq+jLBC0ka8prOorkeO+KMLVPoAJcuoV1KiizmlwtZ0iC9vNsp41ozB6EL0ZTXi1Pv5/t+jIzQIkWKCw=
+	t=1737046474; cv=none; b=sTTIzOMFlmFeL/USSSqB0joLsRB0Na11UykSJXuC9ydyvJSovKNzuJ7JjJq8kLsy5EC3zkuc1xTcMgFnZ6XvDmYbwvE6JDlj6epPL3eByzmV4yMGMcn7087Uvfz4/eiVHlSJdavP+MjFvCUUEmugfEPfmcs2djBV7OxccxHxwAQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737046300; c=relaxed/simple;
-	bh=D3JD/vbxmwqtIyNWMpjVhxCt6ry4H5+D4k7Wbc3AI+Q=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=c5kXkr3pSXGEsllIwPC5SCD0tpJ113/WlIvtqThcDE5h7nqqndzXexgALY8l4bGIQwRfn7keM81DzMuolqcdzLNQhmouG98OjTtgs61tLnUfRHLudu3WvWw6L+6HM/Dn0s/zRkx139ZuyMU3ZviKLQmAwYwZEvaHXxeW1WbhaKo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=iJ4s5LGP; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50GEHb15011611;
-	Thu, 16 Jan 2025 16:51:16 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	OtY1uZXRYVPypdc88s6LWbYwRRfD/kfRfUAAg+Ac6SI=; b=iJ4s5LGPFDFtS6gH
-	Tlv39YJ5KGJMBXldTeUHlPWBLwlYSAblxenfICB9wc450jMVqsnfcQKXMGYvQKND
-	+rAhdMFvu/dc2b7Xzhx/SB1zD/toOraqYg4+oZ33//VkFmYYQGmOxl1erBYLZJJ9
-	UJDewgOfrcTnUbU45yP2/5GwV0FwkWFOj2+yl5s4q/05h8h7pnxGbLWXPShDFhVe
-	+tDm9j7wQAFlpzMPYQ1Dxxk2K7dDChzoOrUGSENzUFrFClwNBx+o99VlSznxyZDV
-	sCNSKm7BRrMf53L32LecJ2hvGZW3HHk6Je+4MPoxd+gFC8Er0G6M7Z4g+THXM9jp
-	FV2alg==
-Received: from nasanppmta04.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4473rercd4-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 16 Jan 2025 16:51:16 +0000 (GMT)
-Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
-	by NASANPPMTA04.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 50GGpFZx024849
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 16 Jan 2025 16:51:15 GMT
-Received: from [10.253.79.139] (10.80.80.8) by nasanex01a.na.qualcomm.com
- (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Thu, 16 Jan
- 2025 08:51:10 -0800
-Message-ID: <778aa678-b097-4b79-b332-ac3af0ad474d@quicinc.com>
-Date: Fri, 17 Jan 2025 00:51:07 +0800
+	s=arc-20240116; t=1737046474; c=relaxed/simple;
+	bh=Ysa8GOnOkbLdnT1XswsCi8J7b5VsNoEjaoHVXePqvYE=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=hehWUSYVVgYWGZqB+rtTRAT+UF0M3jyYb4sk4gCtAltax++UOpKo/onlKOZg/n/VHRDaI4aYuGc3uVXJbZDdc4lPufa8TMdInymSVGKKY0ZB4NAG5Z0xp9+r5xH4s4PQdta6AJCjVmaiCx3iagifZdUf/lbBYIE3kjMLLUbSSSM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VIinGWU7; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A9D21C4CED6;
+	Thu, 16 Jan 2025 16:54:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1737046473;
+	bh=Ysa8GOnOkbLdnT1XswsCi8J7b5VsNoEjaoHVXePqvYE=;
+	h=From:Subject:Date:To:Cc:From;
+	b=VIinGWU75Shk9UmFzaZP2uvwWndk4Ww/sQM/Fbl7ZI8P4D5P4Ic/c60WdenqMplpS
+	 lj1fj+vs5or6g8eTdXlXPan5Qu9Cingx2YMexsTh0RZMaqffLZhBEahxvBxoREl9R9
+	 BIGrN7e36ZlxU2ok2KCsfHdMB3c3SoRwF299R9EBlUlFobAWknHyfkj0CxPWzCe4uN
+	 SavoukHTWGueu0m1EXpUv6MDD4b85GqxzHuT81+idtTTI2gjj7lAQsTrAs/R3YLlMV
+	 d0hNuhy552XmNWrIA079ZwN0QZ2/Zd7QN2IOYGfScWcRHVvX9o5avASNdfTi/wVjec
+	 DxlHHpH9hy51w==
+From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+Subject: [PATCH net-next 00/15] mptcp: pm: misc cleanups, part 2
+Date: Thu, 16 Jan 2025 17:51:22 +0100
+Message-Id: <20250116-net-next-mptcp-pm-misc-cleanup-2-v1-0-c0b43f18fe06@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v4 3/5] net: pcs: qcom-ipq9574: Add PCS
- instantiation and phylink operations
-To: Daniel Golle <daniel@makrotopia.org>
-CC: Andrew Lunn <andrew+netdev@lunn.ch>,
-        "David S. Miller"
-	<davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Rob Herring
-	<robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley
-	<conor+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
-        Heiner Kallweit
-	<hkallweit1@gmail.com>,
-        Russell King <linux@armlinux.org.uk>, <netdev@vger.kernel.org>,
-        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-arm-msm@vger.kernel.org>, <quic_kkumarcs@quicinc.com>,
-        <quic_suruchia@quicinc.com>, <quic_pavir@quicinc.com>,
-        <quic_linchen@quicinc.com>, <quic_luoj@quicinc.com>,
-        <srinivas.kandagatla@linaro.org>, <bartosz.golaszewski@linaro.org>,
-        <vsmuthu@qti.qualcomm.com>, <john@phrozen.org>
-References: <20250108-ipq_pcs_net-next-v4-0-0de14cd2902b@quicinc.com>
- <20250108-ipq_pcs_net-next-v4-3-0de14cd2902b@quicinc.com>
- <Z4B6DqpZG55aGVh9@makrotopia.org>
-Content-Language: en-US
-From: Lei Wei <quic_leiwei@quicinc.com>
-In-Reply-To: <Z4B6DqpZG55aGVh9@makrotopia.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nasanex01a.na.qualcomm.com (10.52.223.231)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: dJHZlNNrkT1J17zoeNHxJQuHAu-RxBrs
-X-Proofpoint-GUID: dJHZlNNrkT1J17zoeNHxJQuHAu-RxBrs
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-01-16_07,2025-01-16_01,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- priorityscore=1501 malwarescore=0 mlxscore=0 bulkscore=0 mlxlogscore=999
- impostorscore=0 spamscore=0 clxscore=1011 adultscore=0 phishscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2411120000 definitions=main-2501160127
+X-B4-Tracking: v=1; b=H4sIAAo5iWcC/zWNQQqDMBBFryKz7sAkaJFeRbqwcWIHmjgksQji3
+ Q2Ci7d4i/f/DpmTcIZXs0Piv2RZYhXzaMB9xzgzylQdLNmOjHli5FLZCgYtTlEDBskO3Y/HuCp
+ a/JDviL3vqW+hzmhiL9t1McBdw/s4TlIrr718AAAA
+X-Change-ID: 20250116-net-next-mptcp-pm-misc-cleanup-2-b0f50eff8084
+To: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, 
+ Geliang Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ "Matthieu Baerts (NGI0)" <matttbe@kernel.org>, 
+ Geliang Tang <geliang@kernel.org>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2674; i=matttbe@kernel.org;
+ h=from:subject:message-id; bh=Ysa8GOnOkbLdnT1XswsCi8J7b5VsNoEjaoHVXePqvYE=;
+ b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBniTnGzSBA4VNBEfzPqc+kxVT3hc3yZ/SRZ91Tg
+ WPRoSRFrMKJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZ4k5xgAKCRD2t4JPQmmg
+ cyMwD/4l8nIaCJkgL0CKbaasJZNVUYY95PDkkV9Xu/LPugBIG66NtZOHvddoqtCd5EYwfk8ygCT
+ uLFqweN/Wez81W0iRYWcXZF7/CuI4+ngCfqDdmevLPCSZWUCol5/Ew0LiAlIKCciYn9oN/yvFRb
+ h5lKANObjU7jHRDYKGAUaKf3ushrOyXMBY/U9gmDtAdmCAYsvjraxsG//DCc7pZqj0S9nMEtX7U
+ D0G4u+1MUjIYjKsST9h52hiMzHuAnPU2Sg5qtKX2wiXh8x9JbsoYRPUE9E93zWBSH2pBd+2dko7
+ P6WfF0sb2FrgC/1abgCQ4uJmOvW86L262InP1RvHYl5jybLSXkkOvPPXrCtBAvnBlPSHztzS2xf
+ I2sRJSDtgfjTssr6qdneRnGWcxRGfBJLQ9WuqM/U0DfYi8wCUnStH44QM5u0k7+I/jH2v9jUK9Y
+ 8FeEElS2C/SHRdm6Q73h0szzrqT8l0VbJHSKJducg3GmqcNtBy0CuMJ6u9R56uFzs5LnWgPGDv1
+ kd6RmZRT/jGA6sEuLWIhSptD9BDfBp8wyGNI0Jo9eME1QvtSeatkqZ5zIf1D5m72Z2dixY/MMKN
+ 8mHxyMAl/wU3QGp1u6EG1utuW9ZBWfLwwgPsXSt7C2i8bSpka2NA+kD8z0lgzAPyllf8uefQDd4
+ yXibOVCVIYjZAWQ==
+X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
+ fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
 
+These cleanups lead the way to the unification of the path-manager
+interfaces, and allow future extensions. The following patches are not
+all linked to each others, but are all related to the path-managers.
 
+- Patch 1: drop unneeded parameter in a function helper.
 
-On 1/10/2025 9:38 AM, Daniel Golle wrote:
-> Hi Lei,
-> 
-> On Wed, Jan 08, 2025 at 10:50:26AM +0800, Lei Wei wrote:
->> ...
->> +/**
->> + * ipq_pcs_get() - Get the IPQ PCS MII instance
->> + * @np: Device tree node to the PCS MII
->> + *
->> + * Description: Get the phylink PCS instance for the given PCS MII node @np.
->> + * This instance is associated with the specific MII of the PCS and the
->> + * corresponding Ethernet netdevice.
->> + *
->> + * Return: A pointer to the phylink PCS instance or an error-pointer value.
->> + */
->> +struct phylink_pcs *ipq_pcs_get(struct device_node *np)
->> +{
->> +	struct platform_device *pdev;
->> +	struct ipq_pcs_mii *qpcs_mii;
->> +	struct ipq_pcs *qpcs;
->> +	u32 index;
->> +
->> +	if (of_property_read_u32(np, "reg", &index))
->> +		return ERR_PTR(-EINVAL);
->> +
->> +	if (index >= PCS_MAX_MII_NRS)
->> +		return ERR_PTR(-EINVAL);
->> +
->> +	/* Get the parent device */
->> +	pdev = of_find_device_by_node(np->parent);
->> +	if (!pdev)
->> +		return ERR_PTR(-ENODEV);
->> +
->> +	qpcs = platform_get_drvdata(pdev);
-> 
-> What if the node referenced belongs to another driver?
-> 
+- Patch 2: clearer NL error message when an NL attribute is missing.
 
-Usually this case would not happen, unless the DTS for the ethernet 
-ports are incorrectly configured. However I can add the 'compatible 
-string' check to catch such cases.
+- Patch 3: more precise NL messages by avoiding 'this or that is NOK'.
 
->> +	if (!qpcs) {
->> +		put_device(&pdev->dev);
->> +
->> +		/* If probe is not yet completed, return DEFER to
->> +		 * the dependent driver.
->> +		 */
->> +		return ERR_PTR(-EPROBE_DEFER);
->> +	}
->> +
->> +	qpcs_mii = qpcs->qpcs_mii[index];
->> +	if (!qpcs_mii) {
->> +		put_device(&pdev->dev);
->> +		return ERR_PTR(-ENOENT);
->> +	}
->> +
->> +	return &qpcs_mii->pcs;
->> +}
->> +EXPORT_SYMBOL(ipq_pcs_get);
-> 
-> All the above seems a bit fragile to me, and most of the comments
-> Russell King has made on my series implementing a PCS driver for the
-> MediaTek SoCs apply here as well, esp.:
-> 
-> "If we are going to have device drivers for PCS, then we need to
-> seriously think about how we look up PCS and return the phylink_pcs
-> pointer - and also how we handle the PCS device going away. None of that
-> should be coded into _any_ PCS driver."
-> 
-> It would hence be better to implement a generic way to get/put
-> phylink_pcs instances from a DT node, and take care of what happens
-> if the PCS device goes away.
-> 
-> See also
-> https://patchwork.kernel.org/comment/25625601/
-> 
-> I've since (unsucessfully) started to work on such infrastructure.
-> In order to avoid repeating the same debate and mistakes, you may want
-> to take a look at at:
-> 
-> https://patchwork.kernel.org/project/netdevbpf/patch/ba4e359584a6b3bc4b3470822c42186d5b0856f9.1721910728.git.daniel@makrotopia.org/
-> 
-> 
-> Cheers
-> 
-> 
-> Daniel
+- Patch 4: improve too vague or missing NL err messages.
 
-I reviewed the discussion shared above. As I understand, there were two 
-concerns from Russel, that can be potentially resolved using a common 
-framework for all PCS drivers:
+- Patch 5: use GENL_REQ_ATTR_CHECK to look for mandatory NL attributes.
 
-a.) Safe handling of PCS device removals
-b.) Consistency in the PCS instance lookup API
+- Patch 6: avoid overriding the error message.
 
-For a), please note that the PCS device in IPQ chipsets such as IPQ9574 
-is built into the SoC chip and is not pluggable. Also, the PCS driver 
-module is not unloadable until the GMAC driver that depends on it is 
-unloaded. Therefore, marking the driver '.suppress_bind_attrs = true' to 
-disable user unbind action may be good enough to cover all possible 
-scenarios of device going away for IPQ9574 PCS driver.
+- Patch 7: check all mandatory NL attributes with GENL_REQ_ATTR_CHECK.
 
-In relation to b), while a common infrastructure is certainly preferable
-for the longer term to have a consistent lookup, the urgency is perhaps
-more to resolve the issue of hot-pluggable devices going away, and less
-for devices that do not support it.
+- Patch 8: use NL_SET_ERR_MSG_ATTR instead of GENL_SET_ERR_MSG
 
-One another issue we can notice currently is the lack of consistency in
-the PCS lookup API signatures across drivers (For ex: xxx_get() vs
-xxx_create() vs xxx_select_pcs() etc). A common 
-naming-convention/signature can be enforced for the lookup API across 
-the newer PCS drivers like these, to bring in some consistency in lookup.
+- Patch 9: move doit callbacks used for both PM to pm.c.
 
-Perhaps Russel could provide his comments as well. Thanks.
+- Patch 10: drop another unneeded parameter in a function helper.
+
+- Patch 11: share the ID parsing code for the 'get_addr' callback.
+
+- Patch 12: share sending NL code for the 'get_addr' callback.
+
+- Patch 13: drop yet another unneeded parameter in a function helper.
+
+- Patch 14: pick the usual structure type for the remote address.
+
+- Patch 15: share the local addr parsing code for the 'set_flags' cb.
+
+The behaviour when there are no errors should then not be modified.
+
+Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+---
+Geliang Tang (9):
+      mptcp: pm: drop info of userspace_pm_remove_id_zero_address
+      mptcp: pm: userspace: use GENL_REQ_ATTR_CHECK
+      mptcp: pm: make three pm wrappers static
+      mptcp: pm: drop skb parameter of get_addr
+      mptcp: pm: add id parameter for get_addr
+      mptcp: pm: reuse sending nlmsg code in get_addr
+      mptcp: pm: drop skb parameter of set_flags
+      mptcp: pm: change rem type of set_flags
+      mptcp: pm: add local parameter for set_flags
+
+Matthieu Baerts (NGI0) (6):
+      mptcp: pm: userspace: flags: clearer msg if no remote addr
+      mptcp: pm: more precise error messages
+      mptcp: pm: improve error messages
+      mptcp: pm: remove duplicated error messages
+      mptcp: pm: mark missing address attributes
+      mptcp: pm: use NL_SET_ERR_MSG_ATTR when possible
+
+ net/mptcp/pm.c           |  86 +++++++++++++++++--
+ net/mptcp/pm_netlink.c   | 129 ++++++++++-------------------
+ net/mptcp/pm_userspace.c | 209 +++++++++++++++++++++--------------------------
+ net/mptcp/protocol.h     |  14 ++--
+ 4 files changed, 225 insertions(+), 213 deletions(-)
+---
+base-commit: b44e27b4df1a1cd3fd84cf26c82156ed0301575f
+change-id: 20250116-net-next-mptcp-pm-misc-cleanup-2-b0f50eff8084
+
+Best regards,
+-- 
+Matthieu Baerts (NGI0) <matttbe@kernel.org>
+
 
