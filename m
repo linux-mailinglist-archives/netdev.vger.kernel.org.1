@@ -1,213 +1,138 @@
-Return-Path: <netdev+bounces-158743-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158744-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8DFD4A131DD
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 05:04:04 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 277A4A131E4
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 05:09:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A0450164115
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 04:04:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 942F83A12AA
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 04:09:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F92778F2E;
-	Thu, 16 Jan 2025 04:04:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29F72137932;
+	Thu, 16 Jan 2025 04:09:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="KYhPswJU"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="iONjz8XW"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR03-AM7-obe.outbound.protection.outlook.com (mail-am7eur03on2076.outbound.protection.outlook.com [40.107.105.76])
+Received: from smtp-fw-2101.amazon.com (smtp-fw-2101.amazon.com [72.21.196.25])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1719E4C81;
-	Thu, 16 Jan 2025 04:03:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.105.76
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737000240; cv=fail; b=jOhbsP3EnH/KfSlf7IsXmpL5w6EJxBb7r8PvchHxJXLvD8hwTqlNuKmoEWhj8waw2WxAxzdxYEAu9DltaPDoh7yrAbkKAYldLYxqeLPnytRSHcm31XcXNG7DtwIsab22YpezV2bu68yWRmW7UKy/OBIIrpuWA0oLBScvBdZ9NVI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737000240; c=relaxed/simple;
-	bh=e09UzvCjy2+a05z7kUeMjg/ll7zCLRUPCS61eOmfmZ4=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=IFnjgR2efpZhZSsjlcB3yP8gB2I7QdHCnVuUIPowO2feoIj2ZJZQaD9TCqznoa4vx42atrat6KynxPRkPHJbXyXQk7GLEaMWCIyWUOc8tbFGzFW0ytF210rgxTuhF2s5tK9JXRbKesIjLZYYZJehRDejP/IfNuWv76/VVAZ18F8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=KYhPswJU; arc=fail smtp.client-ip=40.107.105.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=UVO94YicnQIhhAkmg3BDvw6KBpRA/J8eccQ+r2L2m5xHQm2Z0Ecq+nsYSaAR3+6CYu03NIUYVGB9cVr25wNXeyTNpm24cOa4j7yW4p44sza2TkM1Ek5wODG7ZqXlU5NN1RG99+JUautsNOL4tBm/YhFdws474LcF6HWc5lZ80dAqoiq98uuHT7GyjP2YxH7I9uaN1tRqDeoL2rDxvXc/goT3gtULcNIocBiDqlpDSJ658yfPCntxsOtXHfv/VbpqgB9kh7wv5XrXlbafD8EnBLIhDQWH+Sj/6CSKt21CDkBNVO08HNSumvS1+1O7tkYDts57Sdna2diSNzczI1wO5A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=e09UzvCjy2+a05z7kUeMjg/ll7zCLRUPCS61eOmfmZ4=;
- b=gg1iDAV2kgIAmYuYVyhaEc8QyhCkc+OnmBIFet1FjwMisGpdGm8iU5RMjfYV4KcKzPXj2Y+8G7lkPxRFAh+SSxGyz1bo08RpcsIhjoc49bCbKcLPMgN0AuD6ox/CLUQ6//wYwEGgCydA00Wf5PtuYtvf3oQaM/P4PKU+g+AufSQyEGaDyt95k1g6xTa9EKYFTIgvzp5KMingkqU7lKoMOT51/bNgNeKJyM3o+FnTRtnJq7175CVuGdWOAIbaAfhXWp3hWbFUvAEs44V4TTgIkCZqKOgYkdD5HMtNuyI1W+OgP3DPtx+a24p5nIhIujixGE4y4gVwapclYVBuVGeWpw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=e09UzvCjy2+a05z7kUeMjg/ll7zCLRUPCS61eOmfmZ4=;
- b=KYhPswJUHuRFCQQU7BllNRMm9BzFRejCc+td9LbkqjN7xmHFAwoqvxr/UGu2u+7jczBC1v+ZqzSQIAwvViXIIF90eNbVVKTOLWW/uKtAc41303uPWQAhWfVAxqj1JNI2i9LRNjoGnyv2vK30TiV0/DTVbz1FgjWx5OxAuAqAvHxnwMYEocEGKqTtwN9st7aX/8VtIFeYVWSIy7fTNi096/osH0pB5TGXOMATlcDnnOaM37tpqX8x1uXe3HsNMXJwfaJB7UzdmQq+vjm4+ZeHVdOiK9BmhyOuVnmchMiar11IjPdK6zS0/EhesKjCLQDTGhYa7ItWbv01V6uimpuPXw==
-Received: from PAXPR04MB8510.eurprd04.prod.outlook.com (2603:10a6:102:211::7)
- by DBAPR04MB7413.eurprd04.prod.outlook.com (2603:10a6:10:1a6::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8356.13; Thu, 16 Jan
- 2025 04:03:54 +0000
-Received: from PAXPR04MB8510.eurprd04.prod.outlook.com
- ([fe80::a7c2:e2fa:8e04:40db]) by PAXPR04MB8510.eurprd04.prod.outlook.com
- ([fe80::a7c2:e2fa:8e04:40db%6]) with mapi id 15.20.8335.017; Thu, 16 Jan 2025
- 04:03:54 +0000
-From: Wei Fang <wei.fang@nxp.com>
-To: Jakub Kicinski <kuba@kernel.org>
-CC: Claudiu Manoil <claudiu.manoil@nxp.com>, Vladimir Oltean
-	<vladimir.oltean@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>,
-	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, "davem@davemloft.net"
-	<davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
-	"pabeni@redhat.com" <pabeni@redhat.com>, "christophe.leroy@csgroup.eu"
-	<christophe.leroy@csgroup.eu>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "linuxppc-dev@lists.ozlabs.org"
-	<linuxppc-dev@lists.ozlabs.org>, "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "imx@lists.linux.dev"
-	<imx@lists.linux.dev>
-Subject: RE: [PATCH v2 net-next 07/13] net: enetc: add RSS support for i.MX95
- ENETC PF
-Thread-Topic: [PATCH v2 net-next 07/13] net: enetc: add RSS support for i.MX95
- ENETC PF
-Thread-Index: AQHbZZbFHVAXua2Zbk+OQT+Myj+77LMYZqkAgAA+4eCAAA91gIAAFkEA
-Date: Thu, 16 Jan 2025 04:03:54 +0000
-Message-ID:
- <PAXPR04MB85106EFD7CCC559489C00401881A2@PAXPR04MB8510.eurprd04.prod.outlook.com>
-References: <20250113082245.2332775-1-wei.fang@nxp.com>
-	<20250113082245.2332775-8-wei.fang@nxp.com>
-	<20250115140042.63b99c4f@kernel.org>
-	<PAXPR04MB8510B52B7D27640C557680B4881A2@PAXPR04MB8510.eurprd04.prod.outlook.com>
- <20250115184105.139aed9c@kernel.org>
-In-Reply-To: <20250115184105.139aed9c@kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PAXPR04MB8510:EE_|DBAPR04MB7413:EE_
-x-ms-office365-filtering-correlation-id: 43ca630f-d395-444d-1ab5-08dd35e2cb60
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|7416014|376014|1800799024|366016|38070700018;
-x-microsoft-antispam-message-info:
- =?gb2312?B?VXBURmFoQXFPZTVrT09xN2tkc1V0ZDB5NkFtRzdJVEkzd3dxbHNyYUJhaE5U?=
- =?gb2312?B?eHJ1cklhSERrSS9Hb3JGaG9MaURsaXRnb3pBOUIxYysvTHNNRXZaOWdYOFEx?=
- =?gb2312?B?dW00NmdLVERyNkl6LzlBc25tSWJYSjFZVTdOZS8zSHBFU0R4T3RDZlF4VjQ5?=
- =?gb2312?B?U2E1OUx6d0FKcVZVUkQzTUs2K0xSdHU3WWpFVXQwbnJqNlNnOXBuYjRyNXVa?=
- =?gb2312?B?YTdySVBUOEg2M1cwK1BXeGZIKzVLc3EyYnFBUU1FQ003SE0yTU43SXhZbkpU?=
- =?gb2312?B?dGJDVDYvQUdIU1lneHlGZWhPRkpNSklwRzdMMnM2endsY0pzbjBMNVhOUVlJ?=
- =?gb2312?B?WW43cXZHZWpCVjk0dUt3Y3NIV20zYlFBd2laaVdRV0UyYUVDR09MaXVQdnRk?=
- =?gb2312?B?ZFJRSzF4bllIYjNrSjZlVFM5SkFCS3ljTnFERitzdnh2Qk5HL1llellNNWV1?=
- =?gb2312?B?bFBWaEtWVGFjRnovUzlhSUhzZ2R3QmxYTGhEU2pIakdwMjRtSkdSQUJoTDV0?=
- =?gb2312?B?dzZwMVMyeVVnTmVWTjMwL0dxWXBmb3diaWQxeXU3eG93c29yNTRWMDJEbzFV?=
- =?gb2312?B?L2I2MTJaRU52cDRKVjRHWVE1QzRodzZhK0pya0V0WS9sK3lJdXVCblN2Nll5?=
- =?gb2312?B?Z1ZWcVlBY0xtOVY3eDF0NE5QMGJlSXliQyt0S0tyck1KNUxHbVV4M1dIOUFj?=
- =?gb2312?B?aER0MTl0MnlMd1VCN20wUkFUamszUC9JYkJud3hiYkxoVmRXeEsveldpNzkz?=
- =?gb2312?B?N00zVDZPZytpNU13S1ppRlYwbTBLa2h2Z3VOaEVvb0JpR0Ivc3VxbFNxK3RQ?=
- =?gb2312?B?WnkyL0VLWnB6MFExQmNGME1lN1NDRWRSSjJ1WEN2ODVZVzFvRFZvMVlUbmJ4?=
- =?gb2312?B?STh4N2tTTnRyUTQyWXRFQjd3dUxWdnJlbFYzY2ZCcnZlS3hiRHN1clpybFVo?=
- =?gb2312?B?Y2lScGNBelpPR1NieDFvaXRZTmU0ejNoM3dpSDcrTlE2bzN5dE5CMGhEeTRS?=
- =?gb2312?B?SWFieDRQTmN3TDZNd2NMd3dhN3ZxLzZCcG9RcTF1c01LWFY2ZW8rRWVZcWhE?=
- =?gb2312?B?cUdQWGNRbFliWlRzMkM0ODJpRTNiZVMwRUFuOEJoK1dtNmpwUkxVeUF3SStv?=
- =?gb2312?B?K2doejFzd25jVmpmb0plSWRNWFNuRkpPQnBrTVdDSmFGSnZRSlpYMld0bVBS?=
- =?gb2312?B?c1NNbjcyRzcvbkIyTmhOWW1OWU94cm1IL2RzNm45eVc0cjBpWjgwTEFHeHdF?=
- =?gb2312?B?UTNBRFBTZEVQQlVBREVaNlNvcjVCdGl3U3pNN0w0dmJCMlk5WUczRXZBYzFE?=
- =?gb2312?B?cU9HK01ZK21QbGhMWUs5a0Fkc3FFdVVpUWtPWE5hY1RLam1QeGoweU1YZmVW?=
- =?gb2312?B?c2xUL3B3WWhOWU5Kd21JWVpDckg0bEpVWlNFUmxUOFdtVVQ4KzZSbG4vL2k3?=
- =?gb2312?B?YmpYeVZrQXdyNlZDWS81RmVQRk9nOU1ZZi96WHZRZkIrR3ZJcGZUZjFiclk3?=
- =?gb2312?B?YlpCRzJEMEdwNGhXcmVqS202cE51d084OGR6aXp3WEpwdzNPbUpxRWhlb1BF?=
- =?gb2312?B?TW1IUy8xdkJFNFE0bjFVSFp0dGZPTmdKRVA1UkZhck00UExMb1BNcnFNR2pq?=
- =?gb2312?B?bWxVMXVjSFhDa3k0SUVYZkxoVHFWc0FJRjdBNGtYNFU3YWtKS1BQUm5USjFN?=
- =?gb2312?B?d2dmOGRlaWpUYVYxS2VKYllaYTNGeHlQMC9jbDNVM0lqUU8zUE1IV3FPWGho?=
- =?gb2312?B?VjFrdmlkS3FXenQ3SzUrakZNZGdsc1VMeFU2SEFFSFp2dCsrMWQyU01kZ2gx?=
- =?gb2312?B?bmNaOVBaMEdCYzl4WHJzdnBlNWpRT0lEYUhoQ0R3T254ZitXWDRrem9kaXps?=
- =?gb2312?B?b3F0TmxubXRQRHppaDU2a2FIR2dBc251SzM3ekxhNzdCYVFzYVkzV2NaRXFO?=
- =?gb2312?Q?UX3+W3dphBGafyPgb9dvgWx9xWM9aYtJ?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:zh-cn;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB8510.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(366016)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?gb2312?B?Wmw2emRuZ2xqSUtKaDdxR05rQTY2TUlHUHdUdC8vWkJRZGpVK2ZmTG1YMjhK?=
- =?gb2312?B?TGxaL2tzNStSU2ZwSnRuRG03YlJVUjM2dGZ3VEg3NjgvTld3Wkg5Sy9aRFhN?=
- =?gb2312?B?WjlwQkFiVFdub0o4NEYyOUxpRi9kNjlIM3YyWTJHWHl4YncxNHVqZzRMZ3RF?=
- =?gb2312?B?ZUZ4YUJoVVVZWndZam1DWEIrdTBtZzhBOFpJelNFbjJUaS9qS1lrL012Z0NX?=
- =?gb2312?B?S0s0S29mL3RLVHBxM0JsWkxjWG1RRFpjRTRPcHJtNHRpalp3WlEwdFJFNVlG?=
- =?gb2312?B?b0d2eFVVRDY4TGQ4MUJpaFh1dWdZT3M2NGsrNDBYRUt6UitScWNveEgwWEwx?=
- =?gb2312?B?dmJhTHNUaHBTbzhRdjE4dHdhNERzOGlsRERwRGRlcDAxRk9WazlPNWVCYUdp?=
- =?gb2312?B?SnNlbWNYbi9vU1hONFNvSU05UGVLcWFiZEVxczhTeG5qR1ZJR1ZoekxnSnpV?=
- =?gb2312?B?SnJucHgrYjZuNW1ub3ZvamJDcmZhNmZFN3RTbERKSE1ZdEQ3ODRBSmVEZlRS?=
- =?gb2312?B?VVRoQmxLMlhGeUNHaWxVN1V2T2YycFhrZlFwQXBNMTB6OHh6eGhTdWg3bGJo?=
- =?gb2312?B?d1VzK09SZTJVNFY2OHlSZ2RaMjYrekRadG9ZeW10eHk1c1dscUZ6ZW84ODdw?=
- =?gb2312?B?TU5VWTNKNjJWc3llNlI3Nyt6QW0vWTRVbVgrMERYTzlHZzFBMVpkWG8rU21Y?=
- =?gb2312?B?TGtCalhuWmY3MDh2MGtTMm9WTnhVWnJidUxHVlBVdVorZVhoSW8ybTZrb3Rz?=
- =?gb2312?B?U0VyeVgxZ0VMN3A1alV1cktBaUR4Q0JmSkJTMEdoMlBLVGVaWkEvcGxGRDMz?=
- =?gb2312?B?TkEyUzlnT0h3dVk5UUpTbU5RckpyNTRxTitXY3FlV0dEQ293YVd0ZEVpbFRL?=
- =?gb2312?B?YllURFlVZTJrZE9SSkpTYitoL2p2R0xMU3NhSTB5d0hwZFhPRTh0TGxidHFi?=
- =?gb2312?B?a1g4N3d2VGRBL0UvV2ZvN2ZWQzBzL2R2V3M5YWlweGoxTmZtcmhqUExpeFF0?=
- =?gb2312?B?cWpLQ0hnZlJxaitTbHhLdTIrSGJCUHFTblFkbkY3bjRKemRjUUFsN3d0MWdQ?=
- =?gb2312?B?MkFnYUFDM0YyNVJzMTB6NWZnUitpRVpaL3dTTEZNZENpaWcwTURBKzdXeUZo?=
- =?gb2312?B?REc2UE50YnQwbWNkdkIzYkQzaGxyZmFNMlhHbTJuNnoxZWtRa2tPWnlFYzBK?=
- =?gb2312?B?Y2FGRHljY0lCRHc4bHVCaHZDQzdJYTBaZEZqYlZ1WGtoZ2JRZ3pIcUppd2Vn?=
- =?gb2312?B?NVRVRkJKNGZFZTEvSUdMWTlXbEwzelA2QXVIbW1ZNEtmVlo2WnlhbEY2SC9z?=
- =?gb2312?B?dlRMTzYzL3dzV01Ic2hVRFFTN3NsOCsrMkppbWdqMWZYK2gweCt4VUY5QUEy?=
- =?gb2312?B?NFZzWThiTmZwemVFZTdCR1NvZWdtMkhrWCtLQ09GblFOdnpOWGQxYW43YVFu?=
- =?gb2312?B?dmRDUU1zeFVDYTdWNHJ3Zmk1ZWV2dW9BZ2VsSXU1cHhsdFUxdXA2czZDTU5y?=
- =?gb2312?B?UjBIMm9zM1lmZ2xmNHpKYWdXVmdTemQxVzVxTDhGOTBGbFlnYzg5RVV1ZnFQ?=
- =?gb2312?B?dlZKQVlpaFBrUmQ1L3BwZkpWeDNlVDBDQTlZT2JWYmJYTFVjOStYM1ovQTRs?=
- =?gb2312?B?amtTVWZ5MW5iQ080L0JwMjlCRXZMWVlMcGFlRUF5Sng2WVNhSFVKdmp3ck9h?=
- =?gb2312?B?bm9OejVSZGRYbUdYTWhGNXUyNXM1RUhpZktZTVEvNHluOFhoRXcyOE9vRHlj?=
- =?gb2312?B?VlRHZ2RTSzJqbE5NS3d4Z0xaM1k3VGQ2OGM2TUI5eXNxSU5tMUlKNVhxc1dW?=
- =?gb2312?B?Qjcvblo2RUhqS01jSFFlWWpidjNzeVBLaDhRVjhYekxZY3RXZWdQcmhIWEdx?=
- =?gb2312?B?OVN3a3RiRkRRZGd0RGhQMlhNNUhlS0ZZVWV5U2VYcG1YMmx4ZEg4SEUzY0FC?=
- =?gb2312?B?ZC9yN1hrNWt4Y3ZSVEJPMmJaQ0NiSGh5NmRLNDllRVZTR3p5NDhGWHI0ZVgw?=
- =?gb2312?B?Mk04SlI5MUp4ckdGcnRKZnh5d0c3YktwQmhPUFZ1MDVVY05xTTg4TUF1TURV?=
- =?gb2312?B?YWt6aURSZ3FvT2xBR2tGekZ2OFM5dWlEM1FRWDA4R2o1NkgrWS9GRnFQS3VF?=
- =?gb2312?Q?zJYI=3D?=
-Content-Type: text/plain; charset="gb2312"
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AC87E555
+	for <netdev@vger.kernel.org>; Thu, 16 Jan 2025 04:09:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=72.21.196.25
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1737000592; cv=none; b=oaZ6M6GtNJFrhlAqSLe2hTQjUlhnQumHvLJi/e7jgW98guYswVK6tYsSi+0bkMnveqCUuRdvDg6elEG0i4P4vebeqjRyBiqEbM83UKjhZFE1mvK23BRTeg9Z6SJqJhDDVGsdhWh/RLgLkcOy/0vYTn21XayoJjp8kp+WaX6MO8c=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1737000592; c=relaxed/simple;
+	bh=cQKzpfXlvieT3WmbrvvHFfNbVP1Ga/EXQB4MVZUvxBs=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Mz4Vrz8/y8qHOUksqxdKmPSl5oGL7AdKpjurNWFDx6m/T3MWXQnY6HanvXP84es9gExKswPT5vzDY14OrrkjLbIiFxczsd+FUU/sDQ35cp6Mc4IvKGH8mREuYxbVOwl2LeeaxN8dxLf/KN3jMxy87fNg3fumlnT/VlIy6zbbfs4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=iONjz8XW; arc=none smtp.client-ip=72.21.196.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1737000591; x=1768536591;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=dZ67Y5OrleyP1+4XyR5naRI2nsMgMaqU77PyXtsxXvM=;
+  b=iONjz8XW53oTUa0dQ+R9Z96nD1PLi8Ay/6Kpmmcs2kgs/kglWBV0kKcz
+   Og8Xdk9O4fr4Drc3WLRZQsJI/m8zqug3/eqpuGYL0PKWUaAHsynv2odlo
+   hmc0+S15h2wUesilNnYpddY8iXxTHGmmsY4f/IZiRFvPxiMLed6BWLenB
+   g=;
+X-IronPort-AV: E=Sophos;i="6.13,208,1732579200"; 
+   d="scan'208";a="459193436"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-2101.iad2.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jan 2025 04:09:47 +0000
+Received: from EX19MTAUWB001.ant.amazon.com [10.0.7.35:37568]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.27.193:2525] with esmtp (Farcaster)
+ id 39e13d26-8c6f-482e-aa0e-6f38b7b4c608; Thu, 16 Jan 2025 04:09:46 +0000 (UTC)
+X-Farcaster-Flow-ID: 39e13d26-8c6f-482e-aa0e-6f38b7b4c608
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
+ Thu, 16 Jan 2025 04:09:45 +0000
+Received: from 6c7e67c6786f.amazon.com (10.143.84.222) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
+ Thu, 16 Jan 2025 04:09:41 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <pabeni@redhat.com>
+CC: <davem@davemloft.net>, <donald.hunter@redhat.com>, <edumazet@google.com>,
+	<horms@kernel.org>, <kuba@kernel.org>, <kuni1840@gmail.com>,
+	<kuniyu@amazon.com>, <netdev@vger.kernel.org>
+Subject: Re: [PATCH v2 net-next 06/11] af_unix: Set drop reason in unix_stream_sendmsg().
+Date: Thu, 16 Jan 2025 13:09:32 +0900
+Message-ID: <20250116040932.96265-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+In-Reply-To: <eb30b164-7f86-46bf-a5d3-0f8bda5e9398@redhat.com>
+References: <eb30b164-7f86-46bf-a5d3-0f8bda5e9398@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB8510.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 43ca630f-d395-444d-1ab5-08dd35e2cb60
-X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Jan 2025 04:03:54.6748
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: xLM/5bPdMrGfmzQuBgA0J/6Ptq6XdpDZ3Tf7ETMIwF7Ijo9T81SufYQaoXmv43MF0weu1lL7AjhiA2rqXqV9sA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DBAPR04MB7413
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D042UWA001.ant.amazon.com (10.13.139.92) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBKYWt1YiBLaWNpbnNraSA8a3Vi
-YUBrZXJuZWwub3JnPg0KPiBTZW50OiAyMDI1xOox1MIxNsjVIDEwOjQxDQo+IFRvOiBXZWkgRmFu
-ZyA8d2VpLmZhbmdAbnhwLmNvbT4NCj4gQ2M6IENsYXVkaXUgTWFub2lsIDxjbGF1ZGl1Lm1hbm9p
-bEBueHAuY29tPjsgVmxhZGltaXIgT2x0ZWFuDQo+IDx2bGFkaW1pci5vbHRlYW5AbnhwLmNvbT47
-IENsYXJrIFdhbmcgPHhpYW9uaW5nLndhbmdAbnhwLmNvbT47DQo+IGFuZHJldytuZXRkZXZAbHVu
-bi5jaDsgZGF2ZW1AZGF2ZW1sb2Z0Lm5ldDsgZWR1bWF6ZXRAZ29vZ2xlLmNvbTsNCj4gcGFiZW5p
-QHJlZGhhdC5jb207IGNocmlzdG9waGUubGVyb3lAY3Nncm91cC5ldTsgbmV0ZGV2QHZnZXIua2Vy
-bmVsLm9yZzsNCj4gbGludXgta2VybmVsQHZnZXIua2VybmVsLm9yZzsgbGludXhwcGMtZGV2QGxp
-c3RzLm96bGFicy5vcmc7DQo+IGxpbnV4LWFybS1rZXJuZWxAbGlzdHMuaW5mcmFkZWFkLm9yZzsg
-aW14QGxpc3RzLmxpbnV4LmRldg0KPiBTdWJqZWN0OiBSZTogW1BBVENIIHYyIG5ldC1uZXh0IDA3
-LzEzXSBuZXQ6IGVuZXRjOiBhZGQgUlNTIHN1cHBvcnQgZm9yIGkuTVg5NQ0KPiBFTkVUQyBQRg0K
-PiANCj4gT24gVGh1LCAxNiBKYW4gMjAyNSAwMjoyNDoxMCArMDAwMCBXZWkgRmFuZyB3cm90ZToN
-Cj4gPiA+IFdoeSBjcmVhdGUgZnVsbCBvcHMgZm9yIHNvbWV0aGluZyB0aGlzIHRyaXZpYWw/DQo+
-ID4NCj4gPiBXZSBhZGQgZW5ldGNfcGZfaHdfb3BzIHRvIGltcGxlbWVudCBkaWZmZXJlbnQgaGFy
-ZHdhcmUgb3BzDQo+ID4gZm9yIGRpZmZlcmVudCBjaGlwcy4gU28gdGhhdCB0aGV5IGNhbiBiZSBj
-YWxsZWQgaW4gY29tbW9uIGZ1bmN0aW9ucy4NCj4gPiBBbHRob3VnaCB0aGUgY2hhbmdlIGlzIG1p
-bm9yLCBpdCBpcyBjb25zaXN0ZW50IHdpdGggdGhlIG9yaWdpbmFsDQo+ID4gaW50ZW50aW9uIG9m
-IGFkZGluZyBlbmV0Y19wZl9od19vcHMuDQo+IA0KPiBJbiBvdGhlciB3b3JkcyB5b3UgcHJlZmVy
-IG9wcy4NCj4gDQo+IE5vdyBpbWFnaW5lIHlvdSBoYXZlIHRvIHJlZmFjdG9yIHN1Y2ggcGllY2Ug
-b2YgY29kZSBpbiAxMCBkcml2ZXJzDQo+IGFuZCBlYWNoIG9mIHRoZW0gaGFzIDIgbGF5ZXJzIG9m
-IGluZGlyZWN0IG9wcyBsaWtlIHlvdSBkby4NCj4gVW5uZWNlc3NhcnkgY29tcGxleGl0eS4NCg0K
-T2theSwgSSB3aWxsIHJlbW92ZSB0aGVtIGZyb20gb3BzLg0KDQo=
+From: Paolo Abeni <pabeni@redhat.com>
+Date: Wed, 15 Jan 2025 16:12:59 +0100
+> On 1/15/25 2:52 PM, Donald Hunter wrote:
+> > On Tue, 14 Jan 2025 at 20:05, Jakub Kicinski <kuba@kernel.org> wrote:
+> >>
+> >> On Sun, 12 Jan 2025 13:08:05 +0900 Kuniyuki Iwashima wrote:
+> >>> @@ -2249,14 +2265,13 @@ static int queue_oob(struct socket *sock, struct msghdr *msg, struct sock *other
+> >>>  static int unix_stream_sendmsg(struct socket *sock, struct msghdr *msg,
+> >>>                              size_t len)
+> >>>  {
+> >>> +     enum skb_drop_reason reason;
+> >>
+> >> I feel like we should draw the line somewhere for the reason codes.
+> >> We started with annotating packet drops in the stack, which are
+> >> otherwise hard to notice, we don't even have counters for all of them.
+> >> But at this point we're annotating sendmsg() errors? The fact we free
+> >> an skb on the error path seems rather coincidental for a sendmsg error.
+> >> IOW aren't we moving from packet loss annotation into general tracing
+> >> territory here?
+> >>
+> >> If there is no ambiguity and application will get an error from a system
+> >> call I'd just use consume_skb().
+> >>
+> >> I'm probably the most resistant to the drop reason codes, so I defer
+> >> to Paolo / Eric for the real judgment...
+> > 
+> > For what it's worth, I agree that there's no need to annotate a drop
+> > reason for sendmsg failures that return error codes to the caller.
+> > That's why my original patch proposal just changed them to use
+> > consume_skb(). I did misrepresent the cases as "happy path" but I
+> > really meant that from the perspective of "no send initiated, so no
+> > drop reason".
+> > 
+> > https://lore.kernel.org/netdev/20241116094236.28786-1-donald.hunter@gmail.com/
+> 
+> I also agree with Jakub with a slightly different reasoning. IMHO drop
+> reason goal is to let user-space easily understand where/why skbs are
+> dropped. If the drop reason reflects a syscall error code, the
+> user-space already has all the info.
+> 
+> IIRC the general guidance agreed upon in the last Netconf was to add
+> drop reasons when we can't distinguish multiple kind of drops within the
+> same function. IMHO such guidance fits with not using drop reason in
+> this specific case: as said we can discriminate the errors via the
+> syscall error code.
+
+Thanks for the feedback, all!
+
+I'll change kfree_skb() to consume_skb() in
+
+  * unix_stream_connect()
+  * unix_stream_sendmsg()
+  * queue_oob()
+  * unix_dgram_sendmsg()
+
+where we can distinguish what happened from errno.
 
