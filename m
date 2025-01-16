@@ -1,236 +1,181 @@
-Return-Path: <netdev+bounces-158823-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158824-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 58415A136A8
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 10:32:44 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D569A136AA
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 10:33:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8187C1889775
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 09:32:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A700F3A6F90
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 09:33:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2A9924A7E8;
-	Thu, 16 Jan 2025 09:32:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A4CE1D935C;
+	Thu, 16 Jan 2025 09:33:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="CXe9M9ng"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="yXMY6IaZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-97.freemail.mail.aliyun.com (out30-97.freemail.mail.aliyun.com [115.124.30.97])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 220F71D63E8;
-	Thu, 16 Jan 2025 09:32:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.97
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0FB11D619D
+	for <netdev@vger.kernel.org>; Thu, 16 Jan 2025 09:32:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737019959; cv=none; b=gMa5+gCz5oXB5zGejdeY0y7uSgpHEsiD61hyZw32kPBl6LFaD7UuugDI1vd1Nt4W5Tpl8j7FQk4b428I8mPdDvKssiKj7vI0kDAT3D6qzOceeRtBGYz34aia5lRKjpbwtRzmBpU6UZsRriD2AFk1Q3NTvZ42lzXD82Opgr1CFyg=
+	t=1737019981; cv=none; b=jyP9RBR4+3c9QGJz4pWpmsJTRCZpyocldK4qsSKlUjG2qQCFifKzSKnokk4KXi1KuGqLs0oBB1EGx7RnWfMCthmoSY6lM4TE96WQK2pFuVWHbaQTWBEbWNowda3+vp4KOFZTTnIJSOHVlVsseqbtXSQ1AqWxwV7lQsCZ/og0d9I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737019959; c=relaxed/simple;
-	bh=LWt7XEVPS8N0YQy0uQOXW6JLOsPR54wsDdcCXDxVGWw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RpkMtdNLjmxx/6fh24SIM6FJGyqtWkzEBjcNaXMYl3jFKe3jJOFQCD6qyqQuEfvalg0QaS3V7krRzhvg2813VP1Tpm7+SuYakxPr4+QjrmoO/nbp3Ui8rPNz3vkQ7a7IKNnaBC4Y3NOgdX2Tfa+jBxAu1WC7INAxx+0gi6QSsro=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=CXe9M9ng; arc=none smtp.client-ip=115.124.30.97
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1737019953; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
-	bh=uuXQ582Ha4DdvDN45Lh8QaDTbd5XVBqL+jFWzVMrE5Q=;
-	b=CXe9M9ngwDpnU9UcufqvNYhvn9tJDZtqI3Vb5p1pWROqHmXIAcghwsfgtJDK6FXRptJFSzO9egnoApTrBZBjchhEQ15N/NOWsIMZGaPJXww4KYNivtF3n3asZfcgL7WBUjN+lCYlIH5XDs1h6mKOzxedxFGc1CXlP5YmK/LKr9o=
-Received: from localhost(mailfrom:dust.li@linux.alibaba.com fp:SMTPD_---0WNlGIC9_1737019952 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Thu, 16 Jan 2025 17:32:32 +0800
-Date: Thu, 16 Jan 2025 17:32:31 +0800
-From: Dust Li <dust.li@linux.alibaba.com>
-To: Alexandra Winter <wintera@linux.ibm.com>,
-	Wenjia Zhang <wenjia@linux.ibm.com>,
-	Jan Karcher <jaka@linux.ibm.com>, Gerd Bayer <gbayer@linux.ibm.com>,
-	Halil Pasic <pasic@linux.ibm.com>,
-	"D. Wythe" <alibuda@linux.alibaba.com>,
-	Tony Lu <tonylu@linux.alibaba.com>,
-	Wen Gu <guwen@linux.alibaba.com>,
-	Peter Oberparleiter <oberpar@linux.ibm.com>,
-	David Miller <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>
-Cc: Julian Ruess <julianr@linux.ibm.com>,
-	Niklas Schnelle <schnelle@linux.ibm.com>,
-	Thorsten Winkler <twinkler@linux.ibm.com>, netdev@vger.kernel.org,
-	linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Simon Horman <horms@kernel.org>
-Subject: Re: [RFC net-next 0/7] Provide an ism layer
-Message-ID: <20250116093231.GD89233@linux.alibaba.com>
-Reply-To: dust.li@linux.alibaba.com
-References: <20250115195527.2094320-1-wintera@linux.ibm.com>
+	s=arc-20240116; t=1737019981; c=relaxed/simple;
+	bh=V8+QvPpARnKrkJb8595G+XtmIKFpdAON5phNCpj3p4E=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=aYgL4TkOanZSscy3nX+RiqnLVlS4PkGx5TkcGcZ5iAkZw39boWr1K6QjseF+FOxJWAm643EIcPK/OvMHM3ZlreVN9si1ndB9JJ4ee7fwp1Tt6fXPsGwXawGKeeE6DphCMPIBPP7t6EcXV1qQkPMZQMN7lAldm3Kq4rb007QWd1E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=yXMY6IaZ; arc=none smtp.client-ip=209.85.221.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-385de59c1a0so408647f8f.2
+        for <netdev@vger.kernel.org>; Thu, 16 Jan 2025 01:32:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1737019977; x=1737624777; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0AphgVzvfaUIVqVYPr6fiv7DOFwwK3EuZo7EKsczRJA=;
+        b=yXMY6IaZq6hp5fEyfkEVFk7XSizEHcqHXRen7CmWB8pZB1ZEgnua5n6EOFUYq4UcCC
+         ivIXUyd3Q3rsBszqAW5v+48A0JOQ22kT+2KMYU320o5ULeNmcGcAVUM36BS1u4VQoDbl
+         iBHIgEy1JihRXoruDBxIX3XvcrAiuVWFFwgu8GGRotd91m9c9RmALCOXATPPx7EN4e+T
+         n11pB/9m4fVwDIAApqptcigNXlDuQbTFDFovPhjltaE2lKiECJWv+2GO9cIg8meT+O3r
+         1UGW+WO8FA6KeGcXNw3pwrqz01aa0nHdqc13+i0DUkh+1Gvd3yRxrP2UhgChMcYRlfLq
+         Qi7A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737019977; x=1737624777;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=0AphgVzvfaUIVqVYPr6fiv7DOFwwK3EuZo7EKsczRJA=;
+        b=mzCytfHaWss/XKFRL9DaNcgrOA1tad0xrtdINmH7zLx+0rsChDfu04duP8K9B59V0f
+         6vBWt/laPg/ZrsqhVpdC/80Q/rki6/MfZ3O35jT4+pb6jrzauuruHMVsCOApEZwW+m20
+         OmCZhEdAPjXN74WiJ78knYVgPr9dAQ+0Tiu9oZ2LZSSCIjmGhYMsHtBG36l//OnUmPxk
+         gB210PXHioazlYSQslG9sVHJU+hcf2HJq7x7jidMfGqxYjSD7rTLKyT1akFK/R2xAvfK
+         jTce4Mi4tHZtqnotBhszB4V9JMmyQNsw8iYKXgLpgH1p1lZfMUMXjVH2r5zIfOUaU7qI
+         hsOw==
+X-Forwarded-Encrypted: i=1; AJvYcCWND0gjUkjCcrAsGiPWNzaTtJur3Jq5tZLli5pC2e/aBBmljRsK9s3y1CNiu3kceDdAmxJMjnk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzrb+3Yn7bO6nZtpu0TDlZlRHNRBBZjcVDPt1KcR8IRpAFAbcP6
+	1uqEga2iWrLT7ZEeYy2i4pE3EqnGLsRBECFlPiIkIFPMKFAfmCA09i/vRNoftgsAuJHFMMz9DXb
+	INHKL5Eazmvh08EPPINcQBzbGOwJq1GtKHxc4
+X-Gm-Gg: ASbGncuPP91Iorx+5qswtB59O6jCcnZjySlZmVb1q9neICxHxLHXZBWV6yZcRFj+9HY
+	rBP6qPIZuPmvmJevmH+kGHFD0IJrY5iDdiQgINCFVmpVmhtA+b6vpNY1ofzCMcz2KrBU=
+X-Google-Smtp-Source: AGHT+IGavv/S+FGMzRsD+B5yFTbKHW8KU60XCAD7woJDoOOlcNj17H9fQLQvapryZJuBJhN8/kutcCVcpGlP3vhrktM=
+X-Received: by 2002:a5d:6484:0:b0:385:fd07:85f4 with SMTP id
+ ffacd0b85a97d-38a87312c8dmr30099106f8f.31.1737019977029; Thu, 16 Jan 2025
+ 01:32:57 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250115195527.2094320-1-wintera@linux.ibm.com>
+References: <20250116044100.80679-1-fujita.tomonori@gmail.com> <20250116044100.80679-4-fujita.tomonori@gmail.com>
+In-Reply-To: <20250116044100.80679-4-fujita.tomonori@gmail.com>
+From: Alice Ryhl <aliceryhl@google.com>
+Date: Thu, 16 Jan 2025 10:32:45 +0100
+X-Gm-Features: AbW1kvYpLLcgfXZGH-liSIppmg5D9F3z56wv2IDdFqulwdya8AAzonAHOGxg9Lo
+Message-ID: <CAH5fLggz0t3wTxSNUw9oVBDbR_PSWpQysaSSt6drd7vw8AXQfw@mail.gmail.com>
+Subject: Re: [PATCH v8 3/7] rust: time: Introduce Instant type
+To: FUJITA Tomonori <fujita.tomonori@gmail.com>
+Cc: linux-kernel@vger.kernel.org, Boqun Feng <boqun.feng@gmail.com>, 
+	rust-for-linux@vger.kernel.org, netdev@vger.kernel.org, andrew@lunn.ch, 
+	hkallweit1@gmail.com, tmgross@umich.edu, ojeda@kernel.org, 
+	alex.gaynor@gmail.com, gary@garyguo.net, bjorn3_gh@protonmail.com, 
+	benno.lossin@proton.me, a.hindborg@samsung.com, anna-maria@linutronix.de, 
+	frederic@kernel.org, tglx@linutronix.de, arnd@arndb.de, jstultz@google.com, 
+	sboyd@kernel.org, mingo@redhat.com, peterz@infradead.org, 
+	juri.lelli@redhat.com, vincent.guittot@linaro.org, dietmar.eggemann@arm.com, 
+	rostedt@goodmis.org, bsegall@google.com, mgorman@suse.de, vschneid@redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 2025-01-15 20:55:20, Alexandra Winter wrote:
-
-Hi Winter,
-
-I'm fully supportive of the refactor!
-
-Interestingly, I developed a similar RFC code about a month ago while
-working on enhancing internal communication between guest and host
-systems. Here are some of my thoughts on the matter:
-
-Naming and Structure: I suggest we refer to it as SHD (Shared Memory
-Device) instead of ISM (Internal Shared Memory). To my knowledge, a
-"Shared Memory Device" better encapsulates the functionality we're
-aiming to implement. It might be beneficial to place it under
-drivers/shd/ and register it as a new class under /sys/class/shd/. That
-said, my initial draft also adopted the ISM terminology for simplicity.
-
-Modular Approach: I've made the ism_loopback an independent kernel
-module since dynamic enable/disable functionality is not yet supported
-in SMC. Using insmod and rmmod for module management could provide the
-flexibility needed in practical scenarios.
-
-Abstraction of ISM Device Details: I propose we abstract the ISM device
-details by providing SMC with helper functions. These functions could
-encapsulate ism->ops, making the implementation cleaner and more
-intuitive. This way, the struct ism_device would mainly serve its
-implementers, while the upper helper functions offer a streamlined
-interface for SMC.
-
-Structuring and Naming: I recommend embedding the structure of ism_ops
-directly within ism_dev rather than using a pointer. Additionally,
-renaming it to ism_device_ops could enhance clarity and consistency.
-
-
->This RFC is about providing a generic shim layer between all kinds of
->ism devices and all kinds of ism users.
+On Thu, Jan 16, 2025 at 5:42=E2=80=AFAM FUJITA Tomonori
+<fujita.tomonori@gmail.com> wrote:
 >
->Benefits:
->- Cleaner separation of ISM and SMC-D functionality
->- simpler and less module dependencies
->- Clear interface definition.
->- Extendable for future devices and clients.
+> Introduce a type representing a specific point in time. We could use
+> the Ktime type but C's ktime_t is used for both timestamp and
+> timedelta. To avoid confusion, introduce a new Instant type for
+> timestamp.
+>
+> Rename Ktime to Instant and modify their methods for timestamp.
+>
+> Implement the subtraction operator for Instant:
+>
+> Delta =3D Instant A - Instant B
+>
+> The operation never overflows (Instant ranges from 0 to
+> `KTIME_MAX`).
+>
+> Reviewed-by: Boqun Feng <boqun.feng@gmail.com>
+> Signed-off-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
+> ---
+>  rust/kernel/time.rs | 48 +++++++++++++++------------------------------
+>  1 file changed, 16 insertions(+), 32 deletions(-)
+>
+> diff --git a/rust/kernel/time.rs b/rust/kernel/time.rs
+> index 55a365af85a3..da54a70f8f1f 100644
+> --- a/rust/kernel/time.rs
+> +++ b/rust/kernel/time.rs
+> @@ -31,59 +31,43 @@ pub fn msecs_to_jiffies(msecs: Msecs) -> Jiffies {
+>      unsafe { bindings::__msecs_to_jiffies(msecs) }
+>  }
+>
+> -/// A Rust wrapper around a `ktime_t`.
+> +/// A specific point in time.
+>  #[repr(transparent)]
+>  #[derive(Copy, Clone, PartialEq, PartialOrd, Eq, Ord)]
+> -pub struct Ktime {
+> +pub struct Instant {
+> +    // Range from 0 to `KTIME_MAX`.
+>      inner: bindings::ktime_t,
+>  }
+>
+> -impl Ktime {
+> -    /// Create a `Ktime` from a raw `ktime_t`.
+> +impl Instant {
+> +    /// Create a `Instant` from a raw `ktime_t`.
+>      #[inline]
+> -    pub fn from_raw(inner: bindings::ktime_t) -> Self {
+> +    fn from_raw(inner: bindings::ktime_t) -> Self {
+>          Self { inner }
+>      }
 
-Fully agree.
+Please keep this function public.
 
+>      /// Get the current time using `CLOCK_MONOTONIC`.
+>      #[inline]
+> -    pub fn ktime_get() -> Self {
+> +    pub fn now() -> Self {
+>          // SAFETY: It is always safe to call `ktime_get` outside of NMI =
+context.
+>          Self::from_raw(unsafe { bindings::ktime_get() })
+>      }
 >
->Request for comments:
->---------------------
->Any comments are welcome, but I am aware that this series needs more work.
->It may not be worth your time to do an in-depth review of the details, I am
->looking for feedback on the general idea.
->I am mostly interested in your thoughts and recommendations about the general
->concept, the location of net/ism, the structure of include/linux/ism.h, the
->KConfig and makefiles.
->
->Status of this RFC:
->-------------------
->This is a very early RFC to ask you for comments on this general idea.
->The RFC does not fullfill all criteria required for a patchset.
->The whole set compiles and runs, but I did not try all combinations of
->module and built-in yet. I did not check for checkpatch or any other checkers.
->Also I have only done very rudimentary quick tests of SMC-D. More testing is
->required.
->
->Background / Status quo:
->------------------------
->Currently s390 hardware provides virtual PCI ISM devices (ism_vpci). Their
->driver is in drivers/s390/net/ism_drv.c. The main user is SMC-D (net/smc).
->ism_vpci driver offers a client interface so other users/protocols
->can also use them, but it is still heavily intermingled with the smc code.
->Namely, the ISM vPCI module cannot be used without the SMC module, which
->feels artificial.
->
->The ISM concept is being extended:
->[1] proposed an ISM loopback interface (ism_lo), that can be used on non-s390
->architectures (e.g. between containers or to test SMC-D). A minimal implementation
->went upstream with [2]: ism_lo currently is a part of the smc protocol and rather
->hidden.
->
->[3] proposed a virtio definition of ISM (ism_virtio) that can be used between
->kvm guests.
->
->We will shortly send an RFC for an ISM client that uses ISM as transport for TTY.
->
->Concept:
->--------
->Create a shim layer in net/ism that contains common definitions and code for
->all ism devices and all ism clients.
->Any device or client module only needs to depend on this ism layer module and
->any device or client code only needs to include the definitions in
->include/linux/ism.h
->
->Ideas for next steps:
->---------------------
->- sysfs representation? e.g. as /sys/class/ism ?
->- provide a full-fledged ism loopback interface
->    (runtime enable/disable, sysfs device, ..)
+> -    /// Divide the number of nanoseconds by a compile-time constant.
+>      #[inline]
+> -    fn divns_constant<const DIV: i64>(self) -> i64 {
+> -        self.to_ns() / DIV
+> -    }
+> -
+> -    /// Returns the number of nanoseconds.
+> -    #[inline]
+> -    pub fn to_ns(self) -> i64 {
+> -        self.inner
+> -    }
+> -
+> -    /// Returns the number of milliseconds.
+> -    #[inline]
+> -    pub fn to_ms(self) -> i64 {
+> -        self.divns_constant::<NSEC_PER_MSEC>()
+> +    /// Return the amount of time elapsed since the `Instant`.
+> +    pub fn elapsed(&self) -> Delta {
 
-I think it's better if we can make this common for all ISM devices.
-but yeah, that shoud be the next step.
+Nit: This places the #[inline] marker before the documentation. Please
+move it after to be consistent.
 
-Best regards,
-Dust
-
->- additional clients (tty over ism)
->- additional devices (virtio-ism, ...)
->
->Link: [1] https://lore.kernel.org/netdev/1695568613-125057-1-git-send-email-guwen@linux.alibaba.com/
->Link: [2] https://lore.kernel.org/linux-kernel//20240428060738.60843-1-guwen@linux.alibaba.com/
->Link: [3] https://groups.oasis-open.org/communities/community-home/digestviewer/viewthread?GroupId=3973&MessageKey=c060ecf9-ea1a-49a2-9827-c92f0e6447b2&CommunityKey=2f26be99-3aa1-48f6-93a5-018dce262226&hlmlt=VT
->
->Alexandra Winter (7):
->  net/ism: Create net/ism
->  net/ism: Remove dependencies between ISM_VPCI and SMC
->  net/ism: Use uuid_t for ISM GID
->  net/ism: Add kernel-doc comments for ism functions
->  net/ism: Move ism_loopback to net/ism
->  s390/ism: Define ismvp_dev
->  net/smc: Use only ism_ops
->
-> MAINTAINERS                |   7 +
-> drivers/s390/net/Kconfig   |  10 +-
-> drivers/s390/net/Makefile  |   4 +-
-> drivers/s390/net/ism.h     |  27 ++-
-> drivers/s390/net/ism_drv.c | 467 ++++++++++++-------------------------
-> include/linux/ism.h        | 299 +++++++++++++++++++++---
-> include/net/smc.h          |  52 +----
-> net/Kconfig                |   1 +
-> net/Makefile               |   1 +
-> net/ism/Kconfig            |  27 +++
-> net/ism/Makefile           |   8 +
-> net/ism/ism_loopback.c     | 366 +++++++++++++++++++++++++++++
-> net/ism/ism_loopback.h     |  59 +++++
-> net/ism/ism_main.c         | 171 ++++++++++++++
-> net/smc/Kconfig            |  13 --
-> net/smc/Makefile           |   1 -
-> net/smc/af_smc.c           |  12 +-
-> net/smc/smc_clc.c          |   6 +-
-> net/smc/smc_core.c         |   6 +-
-> net/smc/smc_diag.c         |   2 +-
-> net/smc/smc_ism.c          | 112 +++++----
-> net/smc/smc_ism.h          |  29 ++-
-> net/smc/smc_loopback.c     | 427 ---------------------------------
-> net/smc/smc_loopback.h     |  60 -----
-> net/smc/smc_pnet.c         |   8 +-
-> 25 files changed, 1183 insertions(+), 992 deletions(-)
-> create mode 100644 net/ism/Kconfig
-> create mode 100644 net/ism/Makefile
-> create mode 100644 net/ism/ism_loopback.c
-> create mode 100644 net/ism/ism_loopback.h
-> create mode 100644 net/ism/ism_main.c
-> delete mode 100644 net/smc/smc_loopback.c
-> delete mode 100644 net/smc/smc_loopback.h
->
->-- 
->2.45.2
->
+Alice
 
