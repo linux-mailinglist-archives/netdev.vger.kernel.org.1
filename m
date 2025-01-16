@@ -1,104 +1,88 @@
-Return-Path: <netdev+bounces-158734-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158732-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95001A1318A
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 03:50:10 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A9BDFA1317F
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 03:41:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B16F6163FF2
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 02:50:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BC1DC3A06C1
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 02:41:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B6CF2744D;
-	Thu, 16 Jan 2025 02:50:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7B8578F3A;
+	Thu, 16 Jan 2025 02:41:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JPasyAZ2"
 X-Original-To: netdev@vger.kernel.org
-Received: from chinatelecom.cn (smtpnm6-07.21cn.com [182.42.151.156])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E1AE1862;
-	Thu, 16 Jan 2025 02:50:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=182.42.151.156
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7736B1862;
+	Thu, 16 Jan 2025 02:41:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736995807; cv=none; b=RfN/kXEiKMRQ8vX1M8fdIa2wDPBIzp1GXODR6xUH5HTsVErEpU3XN4kNWM3lBIUOYqZcQc1W/RXq11W66Nmvas4ASvyeKuspBrqantjDEiCUPUswWeavOzb2LnfzJhFWzzcw83xLG5I3wNx8x3lNiakGTzsM+AQMbnJzuA9jizY=
+	t=1736995268; cv=none; b=GKHq5DN2VtGNtfBYKwHmjMONnbQx3y8S0U7rBUKS/zwgAaGezrZwXNPAti/kUA7g2XvIwt5LgkvWLwV+Q0hEhRNQCoiCE3WW5urD18Wk5RyRmZ/1RWfp/tYw9fMj1GHNKYSbXj+ij1tRXZ71rruf7diXhKm7dGsnyWq4Xwkof2A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736995807; c=relaxed/simple;
-	bh=vXJPN5fkl5Edzzx788oumQZZKn0BfcPryAIxLhZ/bzk=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=fsI3c0YapoKOaW4sAjBpek2ACtd0h8qN2y3NbxLkwh94HBjNaURRb5Fqm8gEGa51xOv2PlEHkIFtXf4Xsl38Kw47zL2T8IYRYA3T4KSGRMc92h8uLty0JQn/rSvcYZH5UsztV1n8+XgyFNN6+n3WzllrG76+nte7zQcONgJxugk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chinatelecom.cn; spf=pass smtp.mailfrom=chinatelecom.cn; arc=none smtp.client-ip=182.42.151.156
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chinatelecom.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chinatelecom.cn
-HMM_SOURCE_IP:192.168.138.117:0.1690985996
-HMM_ATTACHE_NUM:0000
-HMM_SOURCE_TYPE:SMTP
-Received: from clientip-36.111.140.9 (unknown [192.168.138.117])
-	by chinatelecom.cn (HERMES) with SMTP id 519309F5EB;
-	Thu, 16 Jan 2025 10:40:39 +0800 (CST)
-X-189-SAVE-TO-SEND: +liyonglong@chinatelecom.cn
-Received: from  ([36.111.140.9])
-	by gateway-ssl-dep-84dfd8c7d7-bnxj5 with ESMTP id 15e972f1e60c426da08153c9f1bcac9e for linux-kernel@vger.kernel.org;
-	Thu, 16 Jan 2025 10:40:45 CST
-X-Transaction-ID: 15e972f1e60c426da08153c9f1bcac9e
-X-Real-From: liyonglong@chinatelecom.cn
-X-Receive-IP: 36.111.140.9
-X-MEDUSA-Status: 0
-Sender: liyonglong@chinatelecom.cn
-From: Yonglong Li <liyonglong@chinatelecom.cn>
-To: linux-kernel@vger.kernel.org
-Cc: netdev@vger.kernel.org,
-	davem@davemloft.net,
-	dsahern@kernel.org,
-	edumazet@google.com,
-	kuba@kernel.org,
-	liyonglong@chinatelecom.cn
-Subject: [PATCH] seg6: inherit inner IPv4 TTL on ip4ip6 encapsulation
-Date: Thu, 16 Jan 2025 10:40:36 +0800
-Message-Id: <1736995236-23063-1-git-send-email-liyonglong@chinatelecom.cn>
-X-Mailer: git-send-email 1.8.3.1
+	s=arc-20240116; t=1736995268; c=relaxed/simple;
+	bh=357X8ueNSmXmBC6zxKI/63tEqCXBjNeDU6GK2yNvUAc=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=p3n6Jm98K+ammeKvIR1XIBS3WEV5oWPQIzdXeTa4vFoaUn2TGDB0BKJy9GCfc2V04ZBSn+OKpVGWXf3F2nSX1xDOI0ay+YErjMwdpWtukedSzG6lkduZrCSZXTn+59FZWAhv8/qmuAuO/mMacnuvA128XY0vtv7Y8RAB0PdWjfo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JPasyAZ2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9E850C4CED1;
+	Thu, 16 Jan 2025 02:41:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1736995267;
+	bh=357X8ueNSmXmBC6zxKI/63tEqCXBjNeDU6GK2yNvUAc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=JPasyAZ2pXyo8qbSFD7ZwIEuV1EKK/LSSeua5vU//cH6s7iu3tSTYwGQSny2KAC7D
+	 VznLxn5ygEAW5jlVKrZMx3n+Sb+AI/Jy66mm7E0ZwL2ppZuSFXd1dwS8tP+plcfKUj
+	 QEWcn41dyqz32+oVWK4tkBXlo6v9cCydSkC7dtKql1zZv0dq7H7lIlVi1/HTR0NrFa
+	 coEvsEQlICfRbB9IWB+lIvHzUMx1DQzdBK8NXErtZL694f3SCcyssiyaNNhzDscAwg
+	 o/LC8tuOBCs6gsUPk/KAvTSKdjKbY5lditIZMMnjqOkQdiPRWKRMWU3mjDNdvkOG2J
+	 9YoR6N03JSnOw==
+Date: Wed, 15 Jan 2025 18:41:05 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Wei Fang <wei.fang@nxp.com>
+Cc: Claudiu Manoil <claudiu.manoil@nxp.com>, Vladimir Oltean
+ <vladimir.oltean@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>,
+ "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, "davem@davemloft.net"
+ <davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
+ "pabeni@redhat.com" <pabeni@redhat.com>, "christophe.leroy@csgroup.eu"
+ <christophe.leroy@csgroup.eu>, "netdev@vger.kernel.org"
+ <netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+ <linux-kernel@vger.kernel.org>, "linuxppc-dev@lists.ozlabs.org"
+ <linuxppc-dev@lists.ozlabs.org>, "linux-arm-kernel@lists.infradead.org"
+ <linux-arm-kernel@lists.infradead.org>, "imx@lists.linux.dev"
+ <imx@lists.linux.dev>
+Subject: Re: [PATCH v2 net-next 07/13] net: enetc: add RSS support for
+ i.MX95 ENETC PF
+Message-ID: <20250115184105.139aed9c@kernel.org>
+In-Reply-To: <PAXPR04MB8510B52B7D27640C557680B4881A2@PAXPR04MB8510.eurprd04.prod.outlook.com>
+References: <20250113082245.2332775-1-wei.fang@nxp.com>
+	<20250113082245.2332775-8-wei.fang@nxp.com>
+	<20250115140042.63b99c4f@kernel.org>
+	<PAXPR04MB8510B52B7D27640C557680B4881A2@PAXPR04MB8510.eurprd04.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-inherit inner IPv4 TTL on ip4ip6 SHR encapsulation like as inherit 
-inner hop_limit on ip6ip6 SHR encapsulation
+On Thu, 16 Jan 2025 02:24:10 +0000 Wei Fang wrote:
+> > Why create full ops for something this trivial?  
+> 
+> We add enetc_pf_hw_ops to implement different hardware ops
+> for different chips. So that they can be called in common functions.
+> Although the change is minor, it is consistent with the original
+> intention of adding enetc_pf_hw_ops.
 
-Signed-off-by: Yonglong Li <liyonglong@chinatelecom.cn>
----
- net/ipv6/seg6_iptunnel.c | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
+In other words you prefer ops.
 
-diff --git a/net/ipv6/seg6_iptunnel.c b/net/ipv6/seg6_iptunnel.c
-index 098632a..2f1f9cf 100644
---- a/net/ipv6/seg6_iptunnel.c
-+++ b/net/ipv6/seg6_iptunnel.c
-@@ -160,7 +160,10 @@ int seg6_do_srh_encap(struct sk_buff *skb, struct ipv6_sr_hdr *osrh, int proto)
- 		hdr->hop_limit = inner_hdr->hop_limit;
- 	} else {
- 		ip6_flow_hdr(hdr, 0, flowlabel);
--		hdr->hop_limit = ip6_dst_hoplimit(skb_dst(skb));
-+		if (skb->protocol == htons(ETH_P_IP))
-+			hdr->hop_limit = ((struct iphdr *)inner_hdr)->ttl;
-+		else
-+			hdr->hop_limit = ip6_dst_hoplimit(skb_dst(skb));
- 
- 		memset(IP6CB(skb), 0, sizeof(*IP6CB(skb)));
- 
-@@ -249,7 +252,10 @@ static int seg6_do_srh_encap_red(struct sk_buff *skb,
- 		hdr->hop_limit = inner_hdr->hop_limit;
- 	} else {
- 		ip6_flow_hdr(hdr, 0, flowlabel);
--		hdr->hop_limit = ip6_dst_hoplimit(skb_dst(skb));
-+		if (skb->protocol == htons(ETH_P_IP))
-+			hdr->hop_limit = ((struct iphdr *)inner_hdr)->ttl;
-+		else
-+			hdr->hop_limit = ip6_dst_hoplimit(skb_dst(skb));
- 
- 		memset(IP6CB(skb), 0, sizeof(*IP6CB(skb)));
- 		IP6CB(skb)->iif = skb->skb_iif;
--- 
-1.8.3.1
-
+Now imagine you have to refactor such piece of code in 10 drivers 
+and each of them has 2 layers of indirect ops like you do.
+Unnecessary complexity.
 
