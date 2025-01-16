@@ -1,195 +1,172 @@
-Return-Path: <netdev+bounces-158859-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-158860-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E691A13953
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 12:43:35 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CCD86A1395D
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 12:48:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E2BE53A58FB
-	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 11:43:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5E868168BE4
+	for <lists+netdev@lfdr.de>; Thu, 16 Jan 2025 11:48:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83D531DE886;
-	Thu, 16 Jan 2025 11:43:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54EEC1DE4EC;
+	Thu, 16 Jan 2025 11:48:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AOjCuGfm"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA88F1DE4FF;
-	Thu, 16 Jan 2025 11:43:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.255
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C0FC19FA92;
+	Thu, 16 Jan 2025 11:48:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737027797; cv=none; b=gaVaeuA4xpXEBjRwXmzgq8+EVURA05gdsVHlgy7W5qec8sweYj6A2K8tYr0J5kdT+WeJCbR7tbWes4+CV6F+W2RElpucqcCmd9QfTK8B+oCVAXQTDRzihH+u3RB3u1jlL+zlNe15n7GU1ZHjzXj59T5OFu99t8uW+1WwdjcbVqk=
+	t=1737028085; cv=none; b=Nf56YeM2PM42J967xs/r2bcThbgbm/S13SgJW+WeSqMN9XLOXXj1ribhqA4Kcsmwt5M/5r2JaH2jsEcdU+8tPSKqVieo2rseaATYI6q15DGtnXiMXIJcfGftwnus6r8AnK6oRtqMniRYddKlqPzGUtv6iBWqLV/rdQajADSfo7o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737027797; c=relaxed/simple;
-	bh=eIj+V3eF624jD5grwIHMeLFukrAphaI3SnVgjSHt1XM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=uIK1kG8U3HwPK5m4lsAeRzSBx4IaOwCE0DTLq7ggErbnsXVwW+2ck2FUPResIyQjboVfLxGUiebiK6FtMv17ic2Pm8JpenWrezb8/Ny6GN/tz+Mu4f8STGgNu8YNoJD+Gv7thsSXD3mhCJfpMj6dIoy6Mup8TCND2O09IHLBKY8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.255
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.252])
-	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4YYgr63j3Hz1W4Dm;
-	Thu, 16 Jan 2025 19:39:18 +0800 (CST)
-Received: from kwepemf100006.china.huawei.com (unknown [7.202.181.220])
-	by mail.maildlp.com (Postfix) with ESMTPS id A80601800D9;
-	Thu, 16 Jan 2025 19:43:10 +0800 (CST)
-Received: from [10.174.177.210] (10.174.177.210) by
- kwepemf100006.china.huawei.com (7.202.181.220) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Thu, 16 Jan 2025 19:43:09 +0800
-Message-ID: <fed3cd85-0a15-ae30-b167-84881d6a5efd@huawei.com>
-Date: Thu, 16 Jan 2025 19:43:08 +0800
+	s=arc-20240116; t=1737028085; c=relaxed/simple;
+	bh=clOmASgvnqzZyxG7wHd+nBEyJHzoGXkbDU3R++H44KA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=n8KnPoBrrh0i3P4LNKZWcJjRx11J3hvMHULsDsteaaX3WHr/+1t6Nc99gC7Zgu1c+ddFfOqItFeZ/QlOMHGULIQ0ascpqCLpcqgtPHkPFQHuBAQT8xFGHgnnDs88IoKC4+/1gc60np+7jva9o0ta1JOfJe6rea7LfOWruhOyczc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AOjCuGfm; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 38507C4CEDF;
+	Thu, 16 Jan 2025 11:48:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1737028084;
+	bh=clOmASgvnqzZyxG7wHd+nBEyJHzoGXkbDU3R++H44KA=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=AOjCuGfmk8z9jPNT/+J2jS7vCfY62IXHjcPg3KqTqNk37ycUVMHmA8kPHOhgLG6P7
+	 td6ViX2UbN59kRAgHk5lk8+R/9p+3s2P/6Bd+ojfQRVGtI6+/RmW2SYQfjLu21rKsy
+	 bWquoK3k8ZqnLDKhPXDWMscUejS8XvPEZGPifUmcn2l/H/+w+ED9iEkWUZtRdssqEy
+	 dupnZgF6GaC+tlS9bGIxq7Ixd397VL4SIYgCwoTxG3ZpzVCchUKiTtFSpYIiYe2Ltv
+	 q9xoAXB3+r178dqcHBxYsqSZmtvadfMndZWbc/ksDkUDQCyNIb9YDy/YgG66kAR5TJ
+	 Jqa3rVhUdd83Q==
+Message-ID: <e2d17324-39b8-4db5-85e7-bd66e67fcd52@kernel.org>
+Date: Thu, 16 Jan 2025 13:47:59 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.1
-Subject: Re: [PATCH] SUNRPC: Set tk_rpc_status when RPC_TASK_SIGNALLED is
- detected
-To: Li Lingfeng <lilingfeng3@huawei.com>, <trondmy@kernel.org>,
-	<anna@kernel.org>, <chuck.lever@oracle.com>, <jlayton@kernel.org>,
-	<neilb@suse.de>, <okorniev@redhat.com>, <Dai.Ngo@oracle.com>,
-	<tom@talpey.com>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <horms@kernel.org>
-CC: <linux-nfs@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <yukuai1@huaweicloud.com>, <houtao1@huawei.com>,
-	<yi.zhang@huawei.com>, <lilingfeng@huaweicloud.com>
-References: <20250114144101.2511043-1-lilingfeng3@huawei.com>
-From: yangerkun <yangerkun@huawei.com>
-In-Reply-To: <20250114144101.2511043-1-lilingfeng3@huawei.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- kwepemf100006.china.huawei.com (7.202.181.220)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net: ethernet: ti: am65-cpsw: fix freeing IRQ in
+ am65_cpsw_nuss_remove_tx_chns()
+To: Siddharth Vadapalli <s-vadapalli@ti.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Grygorii Strashko <grygorii.strashko@ti.com>, srk@ti.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20250114-am65-cpsw-fix-tx-irq-free-v1-1-b2069e6ed185@kernel.org>
+ <gygqjjyso3p4qgam4fpjdkqidj2lhxldkmaopqg32bw3g4ktpj@43tmtsdexkqv>
+ <8776a109-22c3-4c1e-a6a1-7bb0a4c70b06@kernel.org>
+ <m4rhkzcr7dlylxr54udyt6lal5s2q4krrvmyay6gzgzhcu4q2c@r34snfumzqxy>
+ <3c9bdd38-d60f-466d-a767-63f71368d41e@kernel.org>
+ <8829d58b-fbfc-4040-93de-51970631d935@kernel.org>
+ <2bhpxcdducequwchyobyinj3xp2vsnpxkshtwqy24swto6zqvz@mbnnn7calbhv>
+Content-Language: en-US
+From: Roger Quadros <rogerq@kernel.org>
+In-Reply-To: <2bhpxcdducequwchyobyinj3xp2vsnpxkshtwqy24swto6zqvz@mbnnn7calbhv>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hi,
 
-Thanks for the patch.
 
-Before 39494194f93b("SUNRPC: Fix races with rpc_killall_tasks()", every
-time we set RPC_TASK_SIGNALLED, when we go through __rpc_execute, this
-rpc_task will immediate break and exist.
+On 16/01/2025 07:15, Siddharth Vadapalli wrote:
+> On Wed, Jan 15, 2025 at 06:38:57PM +0200, Roger Quadros wrote:
+>> Siddharth,
+>>
+>> On 15/01/2025 17:49, Roger Quadros wrote:
+>>> Hi Siddharth,
+>>>
+>>> On 15/01/2025 12:38, Siddharth Vadapalli wrote:
+>>>> On Wed, Jan 15, 2025 at 12:04:17PM +0200, Roger Quadros wrote:
+>>>>> Hi Siddharth,
+>>>>>
+>>>>> On 15/01/2025 07:18, Siddharth Vadapalli wrote:
+>>>>>> On Tue, Jan 14, 2025 at 06:44:02PM +0200, Roger Quadros wrote:
+>>>>>>
+>>>>>> Hello Roger,
+>>>>>>
+>>>>>>> When getting the IRQ we use k3_udma_glue_rx_get_irq() which returns
+>>>>>>
+>>>>>> You probably meant "k3_udma_glue_tx_get_irq()" instead? It is used to
+>>>>>> assign tx_chn->irq within am65_cpsw_nuss_init_tx_chns() as follows:
+>>>>>
+>>>>> Yes I meant tx instead of rx.
+>>>>>
+>>>>>>
+>>>>>> 		tx_chn->irq = k3_udma_glue_tx_get_irq(tx_chn->tx_chn);
+>>>>>>
+>>>>>> Additionally, following the above section we have:
+>>>>>>
+>>>>>> 		if (tx_chn->irq < 0) {
+>>>>>> 			dev_err(dev, "Failed to get tx dma irq %d\n",
+>>>>>> 				tx_chn->irq);
+>>>>>> 			ret = tx_chn->irq;
+>>>>>> 			goto err;
+>>>>>> 		}
+>>>>>>
+>>>>>> Could you please provide details on the code-path which will lead to a
+>>>>>> negative "tx_chn->irq" within "am65_cpsw_nuss_remove_tx_chns()"?
+>>>>>>
+>>>>>> There seem to be two callers of am65_cpsw_nuss_remove_tx_chns(), namely:
+>>>>>> 1. am65_cpsw_nuss_update_tx_rx_chns()
+>>>>>> 2. am65_cpsw_nuss_suspend()
+>>>>>> Since both of them seem to invoke am65_cpsw_nuss_remove_tx_chns() only
+>>>>>> in the case where am65_cpsw_nuss_init_tx_chns() *did not* error out, it
+>>>>>> appears to me that "tx_chn->irq" will never be negative within
+>>>>>> am65_cpsw_nuss_remove_tx_chns()
+>>>>>>
+>>>>>> Please let me know if I have overlooked something.
+>>>>>
+>>>>> The issue is with am65_cpsw_nuss_update_tx_rx_chns(). It can be called
+>>>>> repeatedly (by user changing number of TX queues) even if previous call
+>>>>> to am65_cpsw_nuss_init_tx_chns() failed.
+>>>>
+>>>> Thank you for clarifying. So the issue/bug was discovered since the
+>>>> implementation of am65_cpsw_nuss_update_tx_rx_chns(). The "Fixes" tag
+>>>> misled me. Maybe the "Fixes" tag should be updated? Though we should
+>>>> code to future-proof it as done in this patch, the "Fixes" tag pointing
+>>>> to the very first commit of the driver might not be accurate as the
+>>>> code-path associated with the bug cannot be exercised at that commit.
+>>>
+>>> Fair enough. I'll change the Fixes commit.
+>>
+>> Now that I check the code again, am65_cpsw_nuss_remove_tx_chns(),
+>> am65_cpsw_nuss_update_tx_chns() and am65_cpsw_nuss_init_tx_chns()
+>> were all introduced in the Fixes commit I stated.
+>>
+>> Could you please share why you thought it is not accurate?
+> 
+> Though the functions were introduced in the Fixes commit that you have
+> mentioned in the commit message, the check for "tx_chn->irq" being
+> strictly positive as implemented in this patch, is not required until
+> the commit which added am65_cpsw_nuss_update_tx_rx_chns(). The reason
+> I say so is that a negative value for "tx_chn->irq" within
+> am65_cpsw_nuss_remove_tx_chns() requires am65_cpsw_nuss_init_tx_chns()
+> to partially fail *followed by* invocation of
+> am65_cpsw_nuss_remove_tx_chns(). That isn't possible in the blamed
+> commit which introduced them, since the driver probe fails when
+> am65_cpsw_nuss_init_tx_chns() fails. The code path:
+> 
+> 	am65_cpsw_nuss_init_tx_chns() => Partially fails / Fails
+> 	  am65_cpsw_nuss_remove_tx_chns() => Invoked later on
+> 
+> isn't possible in the blamed commit.
 
-However after that, __rpc_execute won't judge RPC_TASK_SIGNNALED, so for
-the case like you point out below, even after your commit
-rpc_check_timeout will help break and exist eventually, but this
-rpc_task has already do some work. I prefer reintroduce judging
-RPC_TASK_SIGNNALED in __rpc_execute to help exist immediatly.
+But, am65_cpsw_nuss_update_tx_chns() and am65_cpsw_set_channels() was
+introduced in the blamed commit and the test case I shared to
+test .set_channels with different channel counts can still
+fail with warning if am65_cpsw_nuss_init_tx_chns() partially fails.
 
-在 2025/1/14 22:41, Li Lingfeng 写道:
-> Commit 39494194f93b("SUNRPC: Fix races with rpc_killall_tasks()") adds
-> rpc_task_set_rpc_status before setting RPC_TASK_SIGNALLED in
-> rpc_signal_task, ensuring that rpc_status is definitely set when
-> RPC_TASK_SIGNALLED is set.
-> Therefore, it seems unnecessary to set rpc_status again after detecting
-> RPC_TASK_SIGNALLED in rpc_check_timeout.
 > 
-> However, in some exceptional cases, invalid and endlessly looping
-> rpc_tasks may be generated. The rpc_call_rpcerror in rpc_check_timeout can
-> timely terminate such rpc_tasks. Removing rpc_call_rpcerror may cause the
-> rpc_task to fall into an infinite loop.
-> 
-> For example, in the following situation:
-> nfs4_close_done
->   // get err from server
->   nfs4_async_handle_exception
->   // goto out_restart
->                              // umount -f
->                              nfs_umount_begin
->                               rpc_killall_tasks
->                                rpc_signal_task
->                                 rpc_task_set_rpc_status
->                                  task->tk_rpc_status = -ERESTARTSYS
->                                  set_bit
->                                  // set RPC_TASK_SIGNALLED to tk_runstate
->   rpc_restart_call_prepare
->    __rpc_restart_call
->     task->tk_rpc_status = 0
->     // clear tk_rpc_status
->    ...
->    rpc_prepare_task
->     nfs4_close_prepare
->      nfs4_setup_sequence
->       rpc_call_start
->        task->tk_action = call_start
-> 
-> At this point, an rpc_task with RPC_TASK_SIGNALLED set but tk_rpc_status
-> as 0 will be generated. This rpc_task will fall into the following loop:
-> call_encode --> call_transmit --> call_transmit_status --> call_status
-> --> call_encode.
-> 
-> Since RPC_TASK_SIGNALLED is set, no request will be sent in call_transmit.
-> Similarly, since RPC_TASK_SIGNALLED is set, rq_majortimeo will not be
-> updated in call_status --> rpc_check_timeout, which will cause -ETIMEDOUT
-> to be directly set to tk_status in call_transmit_status -->
-> xprt_request_wait_receive --> xprt_wait_for_reply_request_def -->
-> rpc_sleep_on_timeout --> __rpc_sleep_on_priority_timeout.
-> 
-> Here is the state and loop process of the rpc_task:
-> tk_runstate:
-> RPC_TASK_RUNNING RPC_TASK_ACTIVE RPC_TASK_NEED_RECV RPC_TASK_SIGNALLED
-> tk_xprt->state:
-> XPRT_CONNECTED XPRT_BOUND
-> tk_flags
-> RPC_TASK_ASYNC RPC_TASK_MOVEABLE RPC_TASK_DYNAMIC RPC_TASK_SOFT
-> RPC_TASK_NO_RETRANS_TIMEOUT RPC_TASK_CRED_NOREF
-> 
-> call_encode
->   xprt_request_enqueue_transmit
->    set_bit // RPC_TASK_NEED_XMIT
->   task->tk_action = call_transmit
-> 
-> call_transmit
->   task->tk_action = call_transmit_status
->   xprt_transmit
->    xprt_request_transmit
->     // check RPC_TASK_SIGNALLED and goto out_dequeue
->     xprt_request_dequeue_transmit
->      xprt_request_dequeue_transmit_locked
->       test_and_clear_bit // RPC_TASK_NEED_XMIT
-> 
-> call_transmit_status
->   task->tk_action = call_status
->   xprt_request_wait_receive
->    xprt_wait_for_reply_request_def
->     xprt_request_timeout // get timeout
->      req->rq_majortimeo // rq_majortimeo will not be updated
->     rpc_sleep_on_timeout
->      __rpc_sleep_on_priority_timeout
->       task->tk_status = -ETIMEDOUT // set ETIMEDOUT
-> 
-> call_status
->   task->tk_action = call_encode
->   rpc_check_timeout
->    // check RPC_TASK_SIGNALLED and skip xprt_reset_majortimeo
-> 
-> Fix it by adding rpc_call_rpcerror back.
-> 
-> Fixes: 39494194f93b ("SUNRPC: Fix races with rpc_killall_tasks()")
-> Signed-off-by: Li Lingfeng <lilingfeng3@huawei.com>
-> ---
->   net/sunrpc/clnt.c | 4 +++-
->   1 file changed, 3 insertions(+), 1 deletion(-)
-> 
-> diff --git a/net/sunrpc/clnt.c b/net/sunrpc/clnt.c
-> index 0090162ee8c3..0acdff19a37c 100644
-> --- a/net/sunrpc/clnt.c
-> +++ b/net/sunrpc/clnt.c
-> @@ -2509,8 +2509,10 @@ rpc_check_timeout(struct rpc_task *task)
->   {
->   	struct rpc_clnt	*clnt = task->tk_client;
->   
-> -	if (RPC_SIGNALLED(task))
-> +	if (RPC_SIGNALLED(task)) {
-> +		rpc_call_rpcerror(task, -ERESTARTSYS);
->   		return;
-> +	}
->   
->   	if (xprt_adjust_timeout(task->tk_rqstp) == 0)
->   		return;
+> Regards,
+> Siddharth.
+
+-- 
+cheers,
+-roger
+
 
