@@ -1,141 +1,251 @@
-Return-Path: <netdev+bounces-159172-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159174-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0A93A149D2
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 07:51:18 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA55AA149EA
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 07:59:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 04E433A2C04
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 06:51:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EFF2E1882C0E
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 06:59:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5975A1F78ED;
-	Fri, 17 Jan 2025 06:51:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 453391F78E1;
+	Fri, 17 Jan 2025 06:59:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="QLiKBGoQ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="N7CjI/wC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D969D1F7577
-	for <netdev@vger.kernel.org>; Fri, 17 Jan 2025 06:51:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8671A1F76D5
+	for <netdev@vger.kernel.org>; Fri, 17 Jan 2025 06:59:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737096666; cv=none; b=Wtr9WlhjSGGbO4UmTxT4MNa72dxK5xFvKCuV9QS5VMM5+7klzszfI6FfX50d/Ao2EG4A9P7j0ood5N67RXWCk51DvY8ntaCNYteJzBwPtbatfDQQms1BPwiQMnfTm3mXuLLEWLR3fSbWR/dTFC7idesh6yfDBMiLCiSqmyhWD28=
+	t=1737097176; cv=none; b=vFmEN4VnnG3AyrFbitlryhk/vQrcpQ1EBcJLIhbqIY0Hm7UICcvSG0OvB7enfWGYwWxMK5cE0DMrhwAwjWf2qpqDCo6Jt38HAHHmDJhSsqZr3FtKl0nkPWC/4LgjjhiDYcfQOHvvk7QFg6SJpVeJ1WCH+R96qimFXAWTDSanUoU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737096666; c=relaxed/simple;
-	bh=2u2YVfoxLd7Cvn3rxair1v5iw/Nh3ozWpr+rXKeCIOI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=IfNt49jdPC3DkkhSLQL459/vm+xoP3xIv7rKVsM4ya69NYJlUgg8As4lESoY5GCuZH7lYxYNnXlI5GiSmq1HbkJY4FTsJQgI5jb1iMK3HjwuvsB7MZEn1+UKFsW/aMGw64TJsFLKp8AAHXP47teOZuRam/8SLMcSxFGKcca6nu0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=pass smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=QLiKBGoQ; arc=none smtp.client-ip=209.85.214.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=daynix.com
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-21a7ed0155cso26840905ad.3
-        for <netdev@vger.kernel.org>; Thu, 16 Jan 2025 22:51:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1737096663; x=1737701463; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=bxvFAOToWR486xbEC+Pgvw2Hl5TN/daUG+P6fxzoIwU=;
-        b=QLiKBGoQt0T6tjkOmTb+aOtVzDU7f3+enxY5ZgBTnWVm3ThPt5O1mkaIPzjb7wstT3
-         x8U9pZCHf+RepsooVDM0hQAhRQhoEdrOGDJNPj2zUkalprfz/eu5cMOjwttJ3jQycoLv
-         BbXeo4dAx7MwEtQOIq131MmUIN+URbtM9dYBmgj5A0hQEEfo7qh0/7BYqcZY06Y7rKYB
-         7yI4TmAYvsVogpELX/K4EGIRAB3Y7wQuZydBkxP5zlHdry0ys3J0dHQzK8RpAl4nJDAA
-         M1jdSK2DnvVNhTC9ba6mTwDo0Dn4fdNkpjZMjyGwDqsDDdsYyN5y5UFp/WTn86WYOhAk
-         oNbg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737096663; x=1737701463;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=bxvFAOToWR486xbEC+Pgvw2Hl5TN/daUG+P6fxzoIwU=;
-        b=lQH4Oq4TpyRlituDa5nY28jzgGTA9hzk3+UUPZgcDbaAeoaNcerxb2m+Svy2azXiMM
-         8G/YJqBMhtbi0CzZ9yc4S6JNS4SBnou+WpghkHCKzqIWSi64IfHZULO/UzutfJrOSqwC
-         ab16zw8jQP7TVUkCAdFBC9d3u270B/E6m3+nann/TiLsJ785tvEy0X6RxsgKyysKAeJ3
-         3o3/kfETHoZifM51YO2JbLFkmiefvfdrD61dlevUIWJhJdzHAApaH/8eASjmVSvocF4x
-         TK8tMg4Z7Pfj7PIaTDTdEVr7rLYRt0hc77UJH0VxOMehKTCz14fJwNzFtpBp8mVTpl3C
-         MjpA==
-X-Forwarded-Encrypted: i=1; AJvYcCWYk/n4f3z9T5X6ZGJOBrhUMw5qQ07R8Ec7HYc2oH7xYbT+fxkXej40pN4kAwPmskeyZnJZQfY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxbMx97kbwAD4JvROIToijaQ4czeDg3BC0xtqJoqtaaPPcN8Xti
-	QvpdKBLek3/yh63FSWteWml3pDg7QCDLXxvwh3VCu6gQBAt4337AErhaDQ9kUAo=
-X-Gm-Gg: ASbGncvKEzbAkNmtKfohcmhuVFHgrVpKEZUDG13PpnewrpwJoeU6lqGfnM+O45jhAv5
-	tf13NduzMArtmOyHDb7piuV13ooGcprUtxLnJFZC5VGPikQdTIQCwGl7ltTAceWxQTLNTNeJPI5
-	8c6oV3940Onvmi1JqDUr+1JWr6kjySdFMgCjkCu8BZsjcYYZvX/5xJs0loheNA9yuCZbXk/ae6v
-	e6m70a9pJXeisfnX6CbU1AnOJuGRWWgBhN7uRxQGIAdOn8XcfnQr3/c8SUOnsHkDbA=
-X-Google-Smtp-Source: AGHT+IHEp4jaCJNggzbZ2ij/bh9rzGAo+Mt5lP+zOwoLCq8mYHxh8b68OP5RujQgDJEqW/JvnG0eSA==
-X-Received: by 2002:a05:6a00:2296:b0:72a:8b90:92e9 with SMTP id d2e1a72fcca58-72daf931244mr2463308b3a.5.1737096662981;
-        Thu, 16 Jan 2025 22:51:02 -0800 (PST)
-Received: from [157.82.203.37] ([157.82.203.37])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72dab7f07b9sm1110387b3a.3.2025.01.16.22.50.57
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 16 Jan 2025 22:51:02 -0800 (PST)
-Message-ID: <1a419eb7-0ca4-43ea-9420-da0c35e5f1a9@daynix.com>
-Date: Fri, 17 Jan 2025 15:50:56 +0900
+	s=arc-20240116; t=1737097176; c=relaxed/simple;
+	bh=Kh99yRrt1KfTzAQKc+MnZyA5aF3QuHL2w0fcK3MSk4Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=K1ZGiSO1q4La9orJh8CrlqKeEhCpUv1Yi/J88NkMWJkwbmV97yrfsL36q3SrEhDmiZ0U3HlnYB2cdtfZhCZJyD1jit7GYUO+RFIbHVaQfYxUidd0MfMnXgPajHFpNnQWcLLKR9R1VyBtKQ3H7OYZtRdpTp+NnyrcpZRBI3+ivVE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=N7CjI/wC; arc=none smtp.client-ip=198.175.65.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1737097175; x=1768633175;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=Kh99yRrt1KfTzAQKc+MnZyA5aF3QuHL2w0fcK3MSk4Y=;
+  b=N7CjI/wC4KLbfSu4oRYd9ZRch7PoOBHYa5zu1GC+AdJ9gxUVh0pb+6Do
+   XVdwH58ZIyvcMOW/jq7WskpYI381ds/nHsgq/ulQan0VzqJBTVQ0xkqKY
+   1Zrz1K1wyJl7+Zgj/X/Hu1LiKZ02KS/Bnv3sNb6Acx5HpDpwUHbT3RP9M
+   +mOL5LWSpMFk/TNC8WM0SmcHSHJxDy9OPfTz40K1XIw/CRL6z1NuGUEp1
+   L/EQzrTnb0NpxD2FWvFjzDDjzSyM0M5AbbeEnBToYivfpFd7UPMz+qFPW
+   HohpkB+08Yp+NcUmS0HpgRVnlb1Fb5Tcc8DiU2FWmt9z2KUaNIHcgjCem
+   Q==;
+X-CSE-ConnectionGUID: 1LbgCj5ES+yui4hESYu2+w==
+X-CSE-MsgGUID: jUb5mh/tT7aEerS/oYjIig==
+X-IronPort-AV: E=McAfee;i="6700,10204,11314"; a="37636225"
+X-IronPort-AV: E=Sophos;i="6.12,310,1728975600"; 
+   d="scan'208";a="37636225"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jan 2025 22:59:34 -0800
+X-CSE-ConnectionGUID: g9DfxZMFQS2sk/93mHwnrQ==
+X-CSE-MsgGUID: g9rKf+WwT0y72UVx6asUQQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.13,211,1732608000"; 
+   d="scan'208";a="110720814"
+Received: from mev-dev.igk.intel.com ([10.237.112.144])
+  by fmviesa004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jan 2025 22:59:31 -0800
+Date: Fri, 17 Jan 2025 07:56:10 +0100
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+To: Michael Chan <michael.chan@broadcom.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, andrew+netdev@lunn.ch,
+	pavan.chebbi@broadcom.com, andrew.gospodarek@broadcom.com,
+	helgaas@kernel.org, Somnath Kotur <somnath.kotur@broadcom.com>,
+	Ajit Khaparde <ajit.khaparde@broadcom.com>,
+	David Wei <dw@davidwei.uk>
+Subject: Re: [PATCH net-next v2 09/10] bnxt_en: Extend queue stop/start for
+ TX rings
+Message-ID: <Z4n/CkPn1v+eydD2@mev-dev.igk.intel.com>
+References: <20250116192343.34535-1-michael.chan@broadcom.com>
+ <20250116192343.34535-10-michael.chan@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v3 0/9] tun: Unify vnet implementation
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Jonathan Corbet <corbet@lwn.net>, Jason Wang <jasowang@redhat.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Shuah Khan <shuah@kernel.org>,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, kvm@vger.kernel.org,
- virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org,
- Yuri Benditovich <yuri.benditovich@daynix.com>,
- Andrew Melnychenko <andrew@daynix.com>,
- Stephen Hemminger <stephen@networkplumber.org>, gur.stavi@huawei.com,
- devel@daynix.com
-References: <20250116-tun-v3-0-c6b2871e97f7@daynix.com>
- <20250116031331-mutt-send-email-mst@kernel.org>
- <678901682ff09_3710bc2944f@willemb.c.googlers.com.notmuch>
-Content-Language: en-US
-From: Akihiko Odaki <akihiko.odaki@daynix.com>
-In-Reply-To: <678901682ff09_3710bc2944f@willemb.c.googlers.com.notmuch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250116192343.34535-10-michael.chan@broadcom.com>
 
-On 2025/01/16 21:54, Willem de Bruijn wrote:
-> Michael S. Tsirkin wrote:
->> On Thu, Jan 16, 2025 at 05:08:03PM +0900, Akihiko Odaki wrote:
->>> When I implemented virtio's hash-related features to tun/tap [1],
->>> I found tun/tap does not fill the entire region reserved for the virtio
->>> header, leaving some uninitialized hole in the middle of the buffer
->>> after read()/recvmesg().
->>>
->>> This series fills the uninitialized hole. More concretely, the
->>> num_buffers field will be initialized with 1, and the other fields will
->>> be inialized with 0. Setting the num_buffers field to 1 is mandated by
->>> virtio 1.0 [2].
->>>
->>> The change to virtio header is preceded by another change that refactors
->>> tun and tap to unify their virtio-related code.
->>>
->>> [1]: https://lore.kernel.org/r/20241008-rss-v5-0-f3cf68df005d@daynix.com
->>> [2]: https://lore.kernel.org/r/20241227084256-mutt-send-email-mst@kernel.org/
->>>
->>> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
->>
->> Will review. But this does not look like net material to me.
->> Not really a bugfix. More like net-next.
+On Thu, Jan 16, 2025 at 11:23:42AM -0800, Michael Chan wrote:
+> From: Somnath Kotur <somnath.kotur@broadcom.com>
 > 
-> +1. I said basically the same in v2.
+> In order to use queue_stop/queue_start to support the new Steering
+> Tags, we need to free the TX ring and TX completion ring if it is a
+> combined channel with TX/RX sharing the same NAPI.  Otherwise
+> TX completions will not have the updated Steering Tag.  With that
+> we can now add napi_disable() and napi_enable() during queue_stop()/
+> queue_start().  This will guarantee that NAPI will stop processing
+> the completion entries in case there are additional pending entries
+> in the completion rings after queue_stop().
 > 
-> Perhaps the field initialization is net material, though not
-> critical until hashing is merged, so not stable.
+> There could be some NQEs sitting unprocessed while NAPI is disabled
+> thereby leaving the NQ unarmed.  Explicitly re-arm the NQ after
+> napi_enable() in queue start so that NAPI will resume properly.
 > 
-> The deduplication does not belong in net.
+> Error handling in bnxt_queue_start() requires a reset.  If a TX
+> ring cannot be allocated or initialized properly, it will cause
+> TX timeout.  The reset will also free any partially allocated
+> rings.
 > 
-> IMHO it should all go to net-next.
+> Reviewed-by: Ajit Khaparde <ajit.khaparde@broadcom.com>
+> Signed-off-by: Somnath Kotur <somnath.kotur@broadcom.com>
+> Signed-off-by: Michael Chan <michael.chan@broadcom.com>
+> ---
+> Cc: David Wei <dw@davidwei.uk>
+> 
+> v2:
+> Add reset for error handling in queue_start().
+> Fix compile error.
+> 
+> Discussion about adding napi_disable()/napi_enable():
+> 
+> https://lore.kernel.org/netdev/5336d624-8d8b-40a6-b732-b020e4a119a2@davidwei.uk/#t
+> ---
+>  drivers/net/ethernet/broadcom/bnxt/bnxt.c | 124 ++++++++++++++++++++--
+>  1 file changed, 115 insertions(+), 9 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> index 53279904cdb5..0a10a4cffcc8 100644
+> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> @@ -7346,6 +7346,22 @@ static int hwrm_ring_free_send_msg(struct bnxt *bp,
+>  	return 0;
+>  }
+>
 
-I will post the future version for net-next. I also intend to post the 
-field initialization for net-next too.
+[...]
+
+>  static void bnxt_free_irq(struct bnxt *bp)
+>  {
+>  	struct bnxt_irq *irq;
+> @@ -15616,6 +15694,7 @@ static int bnxt_queue_start(struct net_device *dev, void *qmem, int idx)
+>  	struct bnxt_rx_ring_info *rxr, *clone;
+>  	struct bnxt_cp_ring_info *cpr;
+>  	struct bnxt_vnic_info *vnic;
+> +	struct bnxt_napi *bnapi;
+>  	int i, rc;
+>  
+>  	rxr = &bp->rx_ring[idx];
+> @@ -15633,25 +15712,40 @@ static int bnxt_queue_start(struct net_device *dev, void *qmem, int idx)
+>  
+>  	bnxt_copy_rx_ring(bp, rxr, clone);
+>  
+> +	bnapi = rxr->bnapi;
+>  	rc = bnxt_hwrm_rx_ring_alloc(bp, rxr);
+>  	if (rc)
+> -		return rc;
+> +		goto err_reset_rx;
+>  
+>  	rc = bnxt_hwrm_cp_ring_alloc_p5(bp, rxr->rx_cpr);
+>  	if (rc)
+> -		goto err_free_hwrm_rx_ring;
+> +		goto err_reset_rx;
+>  
+>  	rc = bnxt_hwrm_rx_agg_ring_alloc(bp, rxr);
+>  	if (rc)
+> -		goto err_free_hwrm_cp_ring;
+> +		goto err_reset_rx;
+>  
+>  	bnxt_db_write(bp, &rxr->rx_db, rxr->rx_prod);
+>  	if (bp->flags & BNXT_FLAG_AGG_RINGS)
+>  		bnxt_db_write(bp, &rxr->rx_agg_db, rxr->rx_agg_prod);
+>  
+> -	cpr = &rxr->bnapi->cp_ring;
+> +	cpr = &bnapi->cp_ring;
+>  	cpr->sw_stats->rx.rx_resets++;
+>  
+> +	if (bp->flags & BNXT_FLAG_SHARED_RINGS) {
+> +		cpr->sw_stats->tx.tx_resets++;
+> +		rc = bnxt_tx_queue_start(bp, idx);
+> +		if (rc) {
+> +			netdev_warn(bp->dev,
+> +				    "tx queue restart failed: rc=%d\n", rc);
+> +			bnapi->tx_fault = 1;
+> +			goto err_reset;
+> +		}
+> +	}
+> +
+> +	napi_enable(&bnapi->napi);
+> +	bnxt_db_nq_arm(bp, &cpr->cp_db, cpr->cp_raw_cons);
+> +
+>  	for (i = 0; i <= BNXT_VNIC_NTUPLE; i++) {
+>  		vnic = &bp->vnic_info[i];
+>  
+> @@ -15668,10 +15762,12 @@ static int bnxt_queue_start(struct net_device *dev, void *qmem, int idx)
+>  
+>  	return 0;
+>  
+> -err_free_hwrm_cp_ring:
+> -	bnxt_hwrm_cp_ring_free(bp, rxr->rx_cpr);
+> -err_free_hwrm_rx_ring:
+> -	bnxt_hwrm_rx_ring_free(bp, rxr, false);
+It looked good to have partial freeing here, but as reset can do the
+same it is fine to drop it.
+
+Thanks for fixing the error path.
+Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+
+> +err_reset_rx:
+> +	rxr->bnapi->in_reset = true;
+> +err_reset:
+> +	napi_enable(&bnapi->napi);
+> +	bnxt_db_nq_arm(bp, &cpr->cp_db, cpr->cp_raw_cons);
+> +	bnxt_reset_task(bp, true);
+>  	return rc;
+>  }
+>  
+> @@ -15679,7 +15775,9 @@ static int bnxt_queue_stop(struct net_device *dev, void *qmem, int idx)
+>  {
+>  	struct bnxt *bp = netdev_priv(dev);
+>  	struct bnxt_rx_ring_info *rxr;
+> +	struct bnxt_cp_ring_info *cpr;
+>  	struct bnxt_vnic_info *vnic;
+> +	struct bnxt_napi *bnapi;
+>  	int i;
+>  
+>  	for (i = 0; i <= BNXT_VNIC_NTUPLE; i++) {
+> @@ -15691,15 +15789,23 @@ static int bnxt_queue_stop(struct net_device *dev, void *qmem, int idx)
+>  	/* Make sure NAPI sees that the VNIC is disabled */
+>  	synchronize_net();
+>  	rxr = &bp->rx_ring[idx];
+> -	cancel_work_sync(&rxr->bnapi->cp_ring.dim.work);
+> +	bnapi = rxr->bnapi;
+> +	cpr = &bnapi->cp_ring;
+> +	cancel_work_sync(&cpr->dim.work);
+>  	bnxt_hwrm_rx_ring_free(bp, rxr, false);
+>  	bnxt_hwrm_rx_agg_ring_free(bp, rxr, false);
+>  	page_pool_disable_direct_recycling(rxr->page_pool);
+>  	if (bnxt_separate_head_pool())
+>  		page_pool_disable_direct_recycling(rxr->head_pool);
+>  
+> +	if (bp->flags & BNXT_FLAG_SHARED_RINGS)
+> +		bnxt_tx_queue_stop(bp, idx);
+> +
+> +	napi_disable(&bnapi->napi);
+> +
+>  	bnxt_hwrm_cp_ring_free(bp, rxr->rx_cpr);
+>  	bnxt_clear_one_cp_ring(bp, rxr->rx_cpr);
+> +	bnxt_db_nq(bp, &cpr->cp_db, cpr->cp_raw_cons);
+>  
+>  	memcpy(qmem, rxr, sizeof(*rxr));
+>  	bnxt_init_rx_ring_struct(bp, qmem);
+> -- 
+> 2.30.1
+> 
 
