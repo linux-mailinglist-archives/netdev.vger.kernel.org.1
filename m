@@ -1,122 +1,446 @@
-Return-Path: <netdev+bounces-159295-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159293-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0CFBA14FCD
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 13:59:40 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 166E8A14FC7
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 13:59:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CE5C91667D2
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 12:59:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AC5FA3A8DC4
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 12:58:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35E8920012A;
-	Fri, 17 Jan 2025 12:58:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F07F91FF7A4;
+	Fri, 17 Jan 2025 12:58:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hrYtg9ZO"
+	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="Y4VFKyV6"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A72A71FF1B6
-	for <netdev@vger.kernel.org>; Fri, 17 Jan 2025 12:58:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B6961FF5F5
+	for <netdev@vger.kernel.org>; Fri, 17 Jan 2025 12:58:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737118735; cv=none; b=AUF/b/KL41K3PZQablZtYU0sV10xOr6rARP0tgdR+l0GtD3dllej3KNPao28GX4krI8J5fvgroNNIDaz7UCKehvgirp1+4RF469U5y7jILy39ZiBuo7m0c4rpjXuJZzrQrTFk/L4x88sD9yXjspA0wSoAXIo+ozAG7lSV0qic78=
+	t=1737118726; cv=none; b=KHAhASPMOtw/gl8QNNO+DARzgH4NOrlps/rtvcmyiTtl+oCpr2devmQL2+fiblogY0NNXVqA2RHY7OREM+UPtzzbxG78nhfzjYw++EWoi3NVBqO6P03iaEQGcGMv2CgYvKr7u8iyqtTXTjKxcjmjlfcvE0tqxw5hTVV0u9eXbuc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737118735; c=relaxed/simple;
-	bh=LUZN6UQM4fLoP0BmXx1jU/m3Jz1LnC0DxZ30eVflpy8=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=l6h2pUirl01GfP8HxL5AUGn6tg3PTjyifYA+Fx2qUScGRi2Oc7HGiH20FBvFgPxpO5iOMDlFA9i06HIIv4RDasnHknysvGO7tLRk71xD+oN+BKCPkYAvQ25NT1b/o5gQEuTFt/01wYdnD6wVi0o11GsMV0mtVrhQHODaSrEizNE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hrYtg9ZO; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1737118732;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=LUZN6UQM4fLoP0BmXx1jU/m3Jz1LnC0DxZ30eVflpy8=;
-	b=hrYtg9ZONP/2iZHgEdHrB4vl2CX+IZc3MQ1QGNacNoOZ9JZT7Cb+xCK+4jh3bEIHyxMO20
-	Y4MoCk9nSCupkdVnBRHDn+YoRg3E4Sc3liHbEWwDbpMjnz3Oalwhr0njnVpCRrmKfaHV4h
-	jChJ1062LmDMv2mY0bzpz9DMX0XfH6M=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-374-eYsOnMhmOWylho_nfBaZmA-1; Fri, 17 Jan 2025 07:58:51 -0500
-X-MC-Unique: eYsOnMhmOWylho_nfBaZmA-1
-X-Mimecast-MFC-AGG-ID: eYsOnMhmOWylho_nfBaZmA
-Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-ab367e406b3so182061966b.0
-        for <netdev@vger.kernel.org>; Fri, 17 Jan 2025 04:58:50 -0800 (PST)
+	s=arc-20240116; t=1737118726; c=relaxed/simple;
+	bh=WJugkzorubRkma9VgNw+lf8jh9y83GLfI7FmMgDhjkk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=UjHaD119znV9zLyKDcMdifR5RkWOYCk1Zv7mBBmecEU/uXaMc8JNSCT4yhlxwbY2HH2YYGumN7ZvKrPC5B+/ZsCMz90lDySo+Spq21YJ82b2ujtENYaTmxKuWYPmOUJ/cfBUU7HlL6u8uB5QJi2j93I3+uSEZD+4TlA72tup9SQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=Y4VFKyV6; arc=none smtp.client-ip=209.85.221.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
+Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-385de59c1a0so1151297f8f.2
+        for <netdev@vger.kernel.org>; Fri, 17 Jan 2025 04:58:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=openvpn.net; s=google; t=1737118722; x=1737723522; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=jVGvVTJNwvC4Wpg7WxydswxWPnAeM3iFiQjVV/l2OB4=;
+        b=Y4VFKyV6zoIbZsmjzHn+rKNKQVXeS1zI9oYde4UiLHkd58SigS/yOhXcC1P5FM9cxQ
+         UR9Fk4c0xkLvL7TXWayNrb7RFvEFm8wCgP5LOx+j6AmklJUaJJBKBjOB84GifZmbozmK
+         YG5eOfLSIGNDFyTI75tlwWeVPvWz4HQ6lFAdGwuIYpOXz4UahMKJIeLktv3M24CwqC7v
+         6dQRs9Qax/vQDwHWYi3dDg29k92Bj9h7eZQh3i91WbgsZ9LAPl//unasyUyaOuuIKAOK
+         BjPFOPaahxkXz6k8/0h8b3bKW2BNx5q9EdMyrPhgDBcPP07JpY90aE0xEAHotMHzEnd9
+         Mn2g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737118730; x=1737723530;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=LUZN6UQM4fLoP0BmXx1jU/m3Jz1LnC0DxZ30eVflpy8=;
-        b=DYOtmrFnqcvGs0nDoceJ1qWSzPwvDQ3Jds6Aez3kCoSjADw3jnnNQINyPGzOH+PqGw
-         NBa0KgCP6IbC6aNIgVky1eUCePEYQ+FmjM2xhgAUiEpUkcqY+SkCbvUFiN2dobmR+Okt
-         mCzoH7m9Ws4mihO0+zy3nyY/eRIF624/qklzxiFuRv1n02V2BzTRMA8nGIErMbJqETso
-         EFvGXoBgazmagqAtHPaxBMIFN0BNtmj0v9W35dotNmH5ryM2BIV/TeJSP7CEMIh7ytLK
-         ObKXjRMZsAzHElDBgGQ6nwCAW6Eakzs59Zo7crNAGv4S4cf189kfBujeb97L55FYSwOz
-         ydKA==
-X-Forwarded-Encrypted: i=1; AJvYcCVpeSfnsd3HJ4WC7+q7HQAT+XWwNG1ZdySJLoEYj7NcP8pGGJOVmsVGduKhD6yEL7EFD0bGS7k=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyxsJxGGez4yp4RSeeyfOJERfFHCkbtgwgvLKyWDAdmkX1Vqki0
-	NXwTtjb4F/yjQ67JuRHPNW0u/PozrfnXNjAGjgFUhofsB9w4vAaJZmhHrrnuvU5RfInXQ59y0hX
-	EZ3rvpRRmdsstYG0Vx9uqOQkp7uMwe/Vr3LAkE8HqHBC65H7YmBl+SA==
-X-Gm-Gg: ASbGnctW3XIbgre8BCZqJcX4hXcrEz7d+Usa4ifK1Q/5/4bHObWBhuvuQ11VFhlETzo
-	aMjxpsyhfXVrupYqfQ/IronfR7zEqOujTM2tqmza5um0eyuJ4yANBgW7XLl4TUKMcPpvFuqiAYW
-	OXeWaaRbyYG+MgWMPSk7CRLPNp96gkQHrmMTYbTQ72sPqUHDLZzzlYP6e5AIX+k/JPGmDJjeP2t
-	Dt9NIXzAl9Nzx1rAtoaziebdaNG5u63gV/msyajo5BRz8dZ5aWm6BZUBwLN1k12zuNfoGpj289j
-	36FfzA==
-X-Received: by 2002:a17:907:7eaa:b0:ab3:398c:c989 with SMTP id a640c23a62f3a-ab38ada1546mr328705766b.0.1737118729747;
-        Fri, 17 Jan 2025 04:58:49 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGLmD1GTGTSt675IQTRpthCfqVA1AbcSDMJl9EZkTXmZm66OBCCVwcEUSSLmPrXc8rBhS/6Cw==
-X-Received: by 2002:a17:907:7eaa:b0:ab3:398c:c989 with SMTP id a640c23a62f3a-ab38ada1546mr328703366b.0.1737118729365;
-        Fri, 17 Jan 2025 04:58:49 -0800 (PST)
-Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ab384fceb0dsm164970866b.185.2025.01.17.04.58.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 17 Jan 2025 04:58:49 -0800 (PST)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id 1C46D17E7877; Fri, 17 Jan 2025 13:58:48 +0100 (CET)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: Alexander Lobakin <aleksander.lobakin@intel.com>, Andrew Lunn
- <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>
-Cc: Alexander Lobakin <aleksander.lobakin@intel.com>, Lorenzo Bianconi
- <lorenzo@kernel.org>, Daniel Xu <dxu@dxuuu.xyz>, Alexei Starovoitov
- <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko
- <andrii@kernel.org>, John Fastabend <john.fastabend@gmail.com>, Jesper
- Dangaard Brouer <hawk@kernel.org>, Martin KaFai Lau
- <martin.lau@linux.dev>, netdev@vger.kernel.org, bpf@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v3 8/8] xdp: remove xdp_alloc_skb_bulk()
-In-Reply-To: <20250115151901.2063909-9-aleksander.lobakin@intel.com>
-References: <20250115151901.2063909-1-aleksander.lobakin@intel.com>
- <20250115151901.2063909-9-aleksander.lobakin@intel.com>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Fri, 17 Jan 2025 13:58:48 +0100
-Message-ID: <87y0z9mwaf.fsf@toke.dk>
+        d=1e100.net; s=20230601; t=1737118722; x=1737723522;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jVGvVTJNwvC4Wpg7WxydswxWPnAeM3iFiQjVV/l2OB4=;
+        b=XbnYS802BJdx9bCQQ4WIGZkX1aVNZ1coY+HkivK0DmHdx4gVfThYVo1C2WtvlHZIhs
+         +gOFy17OFG33r2TmA5OSU33TXCdwVKN9umq9gJw/jhMTELW6F528+H+dJ3XFYCTfAh8x
+         fFL4lJ2pHueY9OmeuGy7ArFraGef9CU1Pvc+zzZyDLiIclVDLmT5viywItKh7jlK0p2D
+         yObPVbqcvraNLKoHPxuhPnkjH5wSWj9ICB7zXqZo6aEKKgZzCI4knvYK1Y8XTI45TsEm
+         UFMdIkxpe10bts5VmHfz0POfHBE09s6021ZLpgvRkuLpLCmJA2bfNM5ggkCcvqOJwW6C
+         EWKw==
+X-Gm-Message-State: AOJu0YyXVyZZho5Aqs8cfJNDGunLea06fA5ed3+0JHh4ZmxmxkZ6+MPC
+	5hcSgvzPsMRcsUp8OjmQzS1L0hwWWpDQ6tX2m7jO3GLLLPNY4FfGuT1GJo2er0A=
+X-Gm-Gg: ASbGncuCM7kAAZCavVUgMXKxLDHFD3zx3Agc93sPCg/lVu7T2/UkBZ4rsK8M8jkMmFV
+	W3MFyyqqKhU3L/Wm5kiSI2z3sQP+jsTEnC85gL1tF8CTV8foVT0hpXahy6fcH/zXXeqHdkN7Ta6
+	eLYUflhwPHGHytK8CCMmS9EP7G6e1DBqIUdzPrl9hO0GSPvn5MTw8UvBVB5jA+JEh5FKE5cSgGO
+	dFngf+rFZsOC/Hs+oRXh5zZRovsBTru6GudVUizJo7mssYATEGeoJ5Ob8G5wRTCG0IdIAvba77x
+	qVGEot9I6gJbaDydOO0=
+X-Google-Smtp-Source: AGHT+IED/P2oAxgUrWyPlsOU/pWmjBVzZTUOb3aunt+NEjZDT/VbT/tHwb6JPD4UAKdV9XehnLFC6w==
+X-Received: by 2002:a5d:648a:0:b0:385:f349:fffb with SMTP id ffacd0b85a97d-38bf57bfba2mr2446533f8f.45.1737118722445;
+        Fri, 17 Jan 2025 04:58:42 -0800 (PST)
+Received: from ?IPV6:2001:67c:2fbc:1:217f:1ce8:9888:d2ed? ([2001:67c:2fbc:1:217f:1ce8:9888:d2ed])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38bf3215482sm2444717f8f.5.2025.01.17.04.58.41
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 17 Jan 2025 04:58:42 -0800 (PST)
+Message-ID: <f5507529-e61c-4b81-ab93-4ea6c8df46e9@openvpn.net>
+Date: Fri, 17 Jan 2025 13:59:35 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v18 20/25] ovpn: implement peer
+ add/get/dump/delete via netlink
+To: Sabrina Dubroca <sd@queasysnail.net>, ryazanov.s.a@gmail.com
+Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Donald Hunter <donald.hunter@gmail.com>, Shuah Khan <shuah@kernel.org>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, Simon Horman <horms@kernel.org>,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ Xiao Liang <shaw.leon@gmail.com>
+References: <20250113-b4-ovpn-v18-0-1f00db9c2bd6@openvpn.net>
+ <20250113-b4-ovpn-v18-20-1f00db9c2bd6@openvpn.net> <Z4pDpqN2hCc-7DGt@hog>
+Content-Language: en-US
+From: Antonio Quartulli <antonio@openvpn.net>
+Autocrypt: addr=antonio@openvpn.net; keydata=
+ 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
+Organization: OpenVPN Inc.
+In-Reply-To: <Z4pDpqN2hCc-7DGt@hog>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Alexander Lobakin <aleksander.lobakin@intel.com> writes:
+On 17/01/2025 12:48, Sabrina Dubroca wrote:
+> 2025-01-13, 10:31:39 +0100, Antonio Quartulli wrote:
+>>   int ovpn_nl_peer_new_doit(struct sk_buff *skb, struct genl_info *info)
+>>   {
+>> -	return -EOPNOTSUPP;
+>> +	struct nlattr *attrs[OVPN_A_PEER_MAX + 1];
+>> +	struct ovpn_priv *ovpn = info->user_ptr[0];
+>> +	struct ovpn_socket *ovpn_sock;
+>> +	struct socket *sock = NULL;
+>> +	struct ovpn_peer *peer;
+>> +	u32 sockfd, peer_id;
+>> +	int ret;
+>> +
+>> +	/* peers can only be added when the interface is up and running */
+>> +	if (!netif_running(ovpn->dev))
+>> +		return -ENETDOWN;
+> 
+> Since we're not under rtnl_lock here, the device could go down while
+> we're creating this peer, and we may end up with a down device that
+> has a peer anyway.
 
-> The only user was veth, which now uses napi_skb_cache_get_bulk().
-> It's now preferred over a direct allocation and is exported as
-> well, so remove this one.
->
-> Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+hmm, indeed. This means we must hold the rtnl_lock to prevent ending up 
+in an inconsistent state.
 
-Reviewed-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
+> 
+> I'm not sure what this (and the peer flushing on NETDEV_DOWN) is
+> trying to accomplish. Is it a problem to keep peers when the netdevice
+> is down?
+
+This is the result of my discussion with Sergey that started in v23 5/23:
+
+https://lore.kernel.org/r/netdev/20241029-b4-ovpn-v11-5-de4698c73a25@openvpn.net/
+
+The idea was to match operational state with actual connectivity to peer(s).
+
+Originally I wanted to simply kee the carrier always on, but after 
+further discussion (including the meaning of the openvpn option 
+--persist-tun) we agreed on following the logic where an UP device has a 
+peer connected (logic is slightly different between MP and P2P).
+
+I am not extremely happy with the resulting complexity, but it seemed to 
+be blocker for Sergey.
+
+> 
+>> +
+>> +	if (GENL_REQ_ATTR_CHECK(info, OVPN_A_PEER))
+>> +		return -EINVAL;
+>> +
+>> +	ret = nla_parse_nested(attrs, OVPN_A_PEER_MAX, info->attrs[OVPN_A_PEER],
+>> +			       ovpn_peer_nl_policy, info->extack);
+>> +	if (ret)
+>> +		return ret;
+>> +
+>> +	ret = ovpn_nl_peer_precheck(ovpn, info, attrs);
+>> +	if (ret < 0)
+>> +		return ret;
+>> +
+>> +	if (NL_REQ_ATTR_CHECK(info->extack, info->attrs[OVPN_A_PEER], attrs,
+>> +			      OVPN_A_PEER_SOCKET))
+>> +		return -EINVAL;
+>> +
+>> +	peer_id = nla_get_u32(attrs[OVPN_A_PEER_ID]);
+>> +	peer = ovpn_peer_new(ovpn, peer_id);
+>> +	if (IS_ERR(peer)) {
+>> +		NL_SET_ERR_MSG_FMT_MOD(info->extack,
+>> +				       "cannot create new peer object for peer %u: %ld",
+>> +				       peer_id, PTR_ERR(peer));
+>> +		return PTR_ERR(peer);
+>> +	}
+>> +
+>> +	/* lookup the fd in the kernel table and extract the socket object */
+>> +	sockfd = nla_get_u32(attrs[OVPN_A_PEER_SOCKET]);
+>> +	/* sockfd_lookup() increases sock's refcounter */
+>> +	sock = sockfd_lookup(sockfd, &ret);
+>> +	if (!sock) {
+>> +		NL_SET_ERR_MSG_FMT_MOD(info->extack,
+>> +				       "cannot lookup peer socket (fd=%u): %d",
+>> +				       sockfd, ret);
+>> +		return -ENOTSOCK;
+> 
+> All those returns should be "goto peer_release" (and setting ret) so
+> that we don't leak peer.
+
+indeed
+> 
+>> +	}
+>> +
+>> +	/* Only when using UDP as transport protocol the remote endpoint
+>> +	 * can be configured so that ovpn knows where to send packets to.
+>> +	 *
+>> +	 * In case of TCP, the socket is connected to the peer and ovpn
+>> +	 * will just send bytes over it, without the need to specify a
+>> +	 * destination.
+>> +	 */
+>> +	if (sock->sk->sk_protocol != IPPROTO_UDP &&
+>> +	    (attrs[OVPN_A_PEER_REMOTE_IPV4] ||
+>> +	     attrs[OVPN_A_PEER_REMOTE_IPV6])) {
+>> +		NL_SET_ERR_MSG_FMT_MOD(info->extack,
+>> +				       "unexpected remote IP address for non UDP socket");
+>> +		sockfd_put(sock);
+>> +		return -EINVAL;
+> 
+> goto peer_release
+> 
+>> +	}
+>> +
+>> +	ovpn_sock = ovpn_socket_new(sock, peer);
+>> +	if (IS_ERR(ovpn_sock)) {
+>> +		NL_SET_ERR_MSG_FMT_MOD(info->extack,
+>> +				       "cannot encapsulate socket: %ld",
+>> +				       PTR_ERR(ovpn_sock));
+>> +		sockfd_put(sock);
+>> +		return -ENOTSOCK;
+> 
+> goto peer_release
+> 
+>> +	}
+>> +
+>> +	peer->sock = ovpn_sock;
+>> +
+>> +	ret = ovpn_nl_peer_modify(peer, info, attrs);
+>> +	if (ret < 0)
+>> +		goto peer_release;
+>> +
+>> +	ret = ovpn_peer_add(ovpn, peer);
+>> +	if (ret < 0) {
+>> +		NL_SET_ERR_MSG_FMT_MOD(info->extack,
+>> +				       "cannot add new peer (id=%u) to hashtable: %d\n",
+>> +				       peer->id, ret);
+>> +		goto peer_release;
+>> +	}
+>> +
+>> +	return 0;
+>> +
+>> +peer_release:
+>> +	/* release right away because peer is not used in any context */
+>> +	ovpn_peer_release(peer);
+>> +
+>> +	return ret;
+>>   }
+> 
+> 
+> [...]
+>>   int ovpn_nl_peer_del_doit(struct sk_buff *skb, struct genl_info *info)
+>>   {
+>> -	return -EOPNOTSUPP;
+>> +	struct nlattr *attrs[OVPN_A_PEER_MAX + 1];
+>> +	struct ovpn_priv *ovpn = info->user_ptr[0];
+>> +	struct ovpn_peer *peer;
+>> +	u32 peer_id;
+>> +	int ret;
+>> +
+>> +	if (GENL_REQ_ATTR_CHECK(info, OVPN_A_PEER))
+>> +		return -EINVAL;
+>> +
+>> +	ret = nla_parse_nested(attrs, OVPN_A_PEER_MAX, info->attrs[OVPN_A_PEER],
+>> +			       ovpn_peer_nl_policy, info->extack);
+>> +	if (ret)
+>> +		return ret;
+>> +
+>> +	if (NL_REQ_ATTR_CHECK(info->extack, info->attrs[OVPN_A_PEER], attrs,
+>> +			      OVPN_A_PEER_ID))
+>> +		return -EINVAL;
+>> +
+>> +	peer_id = nla_get_u32(attrs[OVPN_A_PEER_ID]);
+>> +	peer = ovpn_peer_get_by_id(ovpn, peer_id);
+>> +	if (!peer) {
+>> +		NL_SET_ERR_MSG_FMT_MOD(info->extack,
+>> +				       "cannot find peer with id %u", peer_id);
+>> +		return -ENOENT;
+>> +	}
+>> +
+>> +	netdev_dbg(ovpn->dev, "del peer %u\n", peer->id);
+>> +	ret = ovpn_peer_del(peer, OVPN_DEL_PEER_REASON_USERSPACE);
+> 
+> With the delayed socket release (which is similar to what was in v11,
+> but now with refcounting on the netdevice which should make
+> rtnl_link_unregister in ovpn_cleanup wait [*]), we may return to
+> userspace as if the peer was gone, but the socket hasn't been detached
+> yet.
+> 
+> A userspace application that tries to remove the peer and immediately
+> re-create it with the same socket could get EBUSY if the workqueue
+> hasn't done its job yet. That would be quite confusing to the
+> application.
+
+This may happen only for TCP, because in the UDP case we would increase 
+the refcounter and keep the socket attached.
+
+However, re-attaching the same TCP socket is hardly going to happen (in 
+TCP we have one socket per peer, therefore if the peer is going away, 
+we're most likely killing the socket too).
+
+This said, the complexity added by the completion seems quite tiny, 
+therefore I'll add the code you are suggesting below.
+
+
+> 
+> So I would add a completion to wait here until the socket has been
+> fully detached. Something like below.
+> 
+> [*] I don't think the current refcounting fully protects against that,
+> I'll comment on 05/25
+
+ok!
+
+> 
+> 
+> -------- 8< --------
+> 
+> diff --git a/drivers/net/ovpn/netlink.c b/drivers/net/ovpn/netlink.c
+> index 72357bb5f30b..19aa4ee6d468 100644
+> --- a/drivers/net/ovpn/netlink.c
+> +++ b/drivers/net/ovpn/netlink.c
+> @@ -733,6 +733,9 @@ int ovpn_nl_peer_del_doit(struct sk_buff *skb, struct genl_info *info)
+>   
+>   	netdev_dbg(ovpn->dev, "del peer %u\n", peer->id);
+>   	ret = ovpn_peer_del(peer, OVPN_DEL_PEER_REASON_USERSPACE);
+> +	if (ret >= 0 && peer->sock)
+> +		wait_for_completion(&peer->sock_detach);
+> +
+>   	ovpn_peer_put(peer);
+>   
+>   	return ret;
+> diff --git a/drivers/net/ovpn/peer.c b/drivers/net/ovpn/peer.c
+> index b032390047fe..6120521d0c32 100644
+> --- a/drivers/net/ovpn/peer.c
+> +++ b/drivers/net/ovpn/peer.c
+> @@ -92,6 +92,7 @@ struct ovpn_peer *ovpn_peer_new(struct ovpn_priv *ovpn, u32 id)
+>   	ovpn_peer_stats_init(&peer->vpn_stats);
+>   	ovpn_peer_stats_init(&peer->link_stats);
+>   	INIT_WORK(&peer->keepalive_work, ovpn_peer_keepalive_send);
+> +	init_completion(&peer->sock_detach);
+>   
+>   	ret = dst_cache_init(&peer->dst_cache, GFP_KERNEL);
+>   	if (ret < 0) {
+> diff --git a/drivers/net/ovpn/peer.h b/drivers/net/ovpn/peer.h
+> index 7a062cc5a5a4..8c54bf5709ef 100644
+> --- a/drivers/net/ovpn/peer.h
+> +++ b/drivers/net/ovpn/peer.h
+> @@ -112,6 +112,7 @@ struct ovpn_peer {
+>   	struct rcu_head rcu;
+>   	struct work_struct remove_work;
+>   	struct work_struct keepalive_work;
+> +	struct completion sock_detach;
+>   };
+>   
+>   /**
+> diff --git a/drivers/net/ovpn/socket.c b/drivers/net/ovpn/socket.c
+> index a5c3bc834a35..7cefac42c3be 100644
+> --- a/drivers/net/ovpn/socket.c
+> +++ b/drivers/net/ovpn/socket.c
+> @@ -31,6 +31,8 @@ static void ovpn_socket_release_kref(struct kref *kref)
+>   
+>   	sockfd_put(sock->sock);
+>   	kfree_rcu(sock, rcu);
+> +
+> +	complete(&sock->peer->sock_detach);
+>   }
+>   
+>   /**
+> @@ -181,12 +183,12 @@ struct ovpn_socket *ovpn_socket_new(struct socket *sock, struct ovpn_peer *peer)
+>   
+>   	ovpn_sock->sock = sock;
+>   	kref_init(&ovpn_sock->refcount);
+> +	ovpn_sock->peer = peer;
+>   
+>   	/* TCP sockets are per-peer, therefore they are linked to their unique
+>   	 * peer
+>   	 */
+>   	if (sock->sk->sk_protocol == IPPROTO_TCP) {
+> -		ovpn_sock->peer = peer;
+>   		ovpn_peer_hold(peer);
+>   	} else if (sock->sk->sk_protocol == IPPROTO_UDP) {
+>   		/* in UDP we only link the ovpn instance since the socket is
+> diff --git a/drivers/net/ovpn/socket.h b/drivers/net/ovpn/socket.h
+> index 15827e347f53..3f5a35fd9048 100644
+> --- a/drivers/net/ovpn/socket.h
+> +++ b/drivers/net/ovpn/socket.h
+> @@ -28,12 +28,12 @@ struct ovpn_peer;
+>    * @rcu: member used to schedule RCU destructor callback
+>    */
+>   struct ovpn_socket {
+> +	struct ovpn_peer *peer;
+>   	union {
+>   		struct {
+>   			struct ovpn_priv *ovpn;
+>   			netdevice_tracker dev_tracker;
+>   		};
+> -		struct ovpn_peer *peer;
+>   	};
+>   
+>   	struct socket *sock;
+> 
+> 
+
+Thanks! will add this.
+
+Regards,
+
+
+-- 
+Antonio Quartulli
+OpenVPN Inc.
 
 
