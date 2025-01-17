@@ -1,272 +1,110 @@
-Return-Path: <netdev+bounces-159313-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159314-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80696A15144
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 15:08:04 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 11402A15160
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 15:15:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CC711188CF36
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 14:08:07 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2AF747A2136
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 14:14:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7B9E202C44;
-	Fri, 17 Jan 2025 14:07:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E5D31FFC5B;
+	Fri, 17 Jan 2025 14:14:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cSexfObQ"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="NcpsGw9j"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCEDC202C3B;
-	Fri, 17 Jan 2025 14:07:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 578B71FF7D2;
+	Fri, 17 Jan 2025 14:14:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737122833; cv=none; b=STNoe+VNITlsaEwwCnjMo0OxyD7XSbi6sUI1vncC7kepGm/aPCioi2iT3e+pz08sXVGr4SIrF1W5FSjg7wCFXgb4GKMESO0sRiKS+lq2/cqrEl5DDdeGE+fVKFl9jdcl/PBOma+Pp+DMj+cwwtrKW4916GnHvRLSj4mB3Q08HRo=
+	t=1737123294; cv=none; b=tDURW33OqOxJvJihrhuFI8pc/gBlm87xGmbss4VyeMKn0ZsjFbDQcQWoBGKbK1298dscLx8M7OpgDhda+lz6mo0j5dneqBTAEZXFpLVkZmADByGQjfZ0yqKQ5eGe+YgzoDxjpw1JTMkWcv9nA6r965u56RBYphDVVaalJ6j+bTY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737122833; c=relaxed/simple;
-	bh=JoibIR4zZQkOBFkS+APsUy4BDrDrp+ZGllSQEZJySjk=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=nd6Z+8mEWGNM9QIvEXMedyLo3infQ3y+KuzH4RGFKPeXoTYf6AzrONgUQ1fV8RK0mgioyEuLZV+jARQpUYBw/oUlH3rgtJPqGq7gB3Rhp9PrXAl4VAOVZwKUA9mnW8wt147OO2ThJ63dRGTngyIs9RT15/9z8VCVCFxA+DCKI0M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cSexfObQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A0C54C4CEDD;
-	Fri, 17 Jan 2025 14:07:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737122833;
-	bh=JoibIR4zZQkOBFkS+APsUy4BDrDrp+ZGllSQEZJySjk=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=cSexfObQqkr26eU9SGU+Vnn4sXEKLdMeqTikE8lP/HN3CVJFeyA0atJzsRLymodO8
-	 JEcxdVp1DSodxsADnQ0d8KsJqs9DXJmdQM+hC0pgYjDs5orV5rZksag1NhLRUy+oZP
-	 V9HAvxYFNWIyu/0Fmrxaeccb8CVlZFh2AVDSdeSK+LJwOlhzkKIu9GY+2Mr5eEj6bK
-	 S22v8cMsW2RYen8DElGPQyyT76EJIj2go5HAnAo5Ipf235nYi3LDKBmw5o0o3hFzn8
-	 CpI4q5+Pt77J+PglBwmvq16arSFDLZ7deZqoqEBXRto0kQrBfPl6pgDQe7hxfOpLtV
-	 z8dzfTdj7CIuQ==
-From: Roger Quadros <rogerq@kernel.org>
-Date: Fri, 17 Jan 2025 16:06:35 +0200
-Subject: [PATCH net-next v2 3/3] net: ethernet: ti: am65-cpsw: streamline
- TX queue creation and cleanup
+	s=arc-20240116; t=1737123294; c=relaxed/simple;
+	bh=1bOPb5VdCz4eHXjqT5fY4ekBP0H/uXTuzfMUrUK2EKE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=kHj6ym3OmiOdBzXBEv2YSUxHaitEwl+USw8cLF9YSddxxUAWy2nGRaXt07svxkZe+58F/3ToJLBVkASYhXW2SBnEmToJpO6DlNoqMa6H1lpFfrH0G2DZLFDu6a/7/2BOzcafMZbofzEXcW59Faa19buhd+MnMNEYr9x+zMXeb+A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=NcpsGw9j; arc=none smtp.client-ip=217.70.183.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 2CC54FF809;
+	Fri, 17 Jan 2025 14:14:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1737123290;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=x0KUv8M5Gb6Z9m+QF9uSKWB3kjhkWezSSQK/wpVRB8w=;
+	b=NcpsGw9j/ZWtgLymot/CGGMcU1AEAox+oCn5d5dtD4/3jE8pRO9a1I79zpIxzgy4pNKdEO
+	o2UIJ3C5x2bS7eYwH0B5UpHxl6gB49UQn4B8pRJT8EZJK1z2X+lAWimhuYLReajt1CrB9i
+	mzP2HHDtIBDbLZ6Zumh7ODQeFnq29s0K99kHwQuUFM/a1MjCPxApp9n2hwpr5/6XhUO94s
+	7jpr4aaRcI7sZoxCdGkeAJYHPd69MjOpSADAsvx2PqHdj6lC7OJ7Hark2sqMlexxwIK55W
+	xnxevBP1YvDfTtfH4mcf0IQY7BTYDhtBEqK/fCujadmONdzG7GNBMNGkBGS+6A==
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: "David S. Miller" <davem@davemloft.net>,
+	Kory Maincent <kory.maincent@bootlin.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>,
+	thomas.petazzoni@bootlin.com,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: [PATCH net-next] net: phy: Fix suspicious rcu_dereference usage
+Date: Fri, 17 Jan 2025 15:14:45 +0100
+Message-Id: <20250117141446.1076951-1-kory.maincent@bootlin.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250117-am65-cpsw-streamline-v2-3-91a29c97e569@kernel.org>
-References: <20250117-am65-cpsw-streamline-v2-0-91a29c97e569@kernel.org>
-In-Reply-To: <20250117-am65-cpsw-streamline-v2-0-91a29c97e569@kernel.org>
-To: Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Russell King <linux@armlinux.org.uk>, Alexei Starovoitov <ast@kernel.org>, 
- Daniel Borkmann <daniel@iogearbox.net>, 
- Jesper Dangaard Brouer <hawk@kernel.org>, 
- John Fastabend <john.fastabend@gmail.com>
-Cc: Siddharth Vadapalli <s-vadapalli@ti.com>, srk@ti.com, 
- danishanwar@ti.com, "Russell King (Oracle)" <linux@armlinux.org.uk>, 
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, bpf@vger.kernel.org, 
- Roger Quadros <rogerq@kernel.org>
-X-Mailer: b4 0.14.1
-X-Developer-Signature: v=1; a=openpgp-sha256; l=5366; i=rogerq@kernel.org;
- h=from:subject:message-id; bh=JoibIR4zZQkOBFkS+APsUy4BDrDrp+ZGllSQEZJySjk=;
- b=owEBbQKS/ZANAwAIAdJaa9O+djCTAcsmYgBnimQAR7c1ywZ8Z2CxW68gWxO3mF6JEd84qOCqE
- dMPBlXM4kqJAjMEAAEIAB0WIQRBIWXUTJ9SeA+rEFjSWmvTvnYwkwUCZ4pkAAAKCRDSWmvTvnYw
- k8SbEADAvgAv7ERZnm8Oo2TGNJpRx/FBz9MJZRPBhoB1pqx6xfLUnWA5TLS8SE6YDrxQIL3RRzs
- FieYq7eoC3SOF0xaOCdO1CbraNz1J6AtlhlLhkU/AOEZSheDhOEUYPkHT5dkhLTpxUB9sBWU+oV
- k+QHvkPFV5uTeY9iW6LyOrKvsNIh8U+BruARKK8wEsOYgmhDpjg+ZthTwm46nKosk+AJ9K+OunA
- CazodQT2Cyeuvy6bdrWYHDfUx6Qd8MjNIB33oxaG3MkNff2Iro1U9hMA1lFQFw1BW79T/ofhT5b
- V0/zVwneOx7MmBOi+k/lb54z2146szAIyE6jaZrbnphffvySh69Qz+NfE9QP4tYk+LS3Og6sJNt
- kNTakMhDUC7eD0tOvQP8ZMIcR57QmY+Y0f6qz3BfAEg6A2NheZidBHpYO5Kz3s7DQas2BBq90EH
- Zp5bg10nmuHXfYMdZA5VUeDFCfjbIAqpKYP5zgJjkzqSqsSil8K4dlIrVeK49MAvE2gwR/MPQ3y
- uvzZd7+t8tb0cpzyqqYlsm8DyFe7cOfmLYwpqH/iU0nKBD5Q5+neM6rRn/1E1joqK/TGrPKJWaR
- Rsukg4DoioGaoEwn0hQPRIqV2079nlKN7pTrxM3F/9JX3q9gJ0YL+yV2KoNpBxgFXAlUMcGPrOP
- vSc+zPrF/ytsVSA==
-X-Developer-Key: i=rogerq@kernel.org; a=openpgp;
- fpr=412165D44C9F52780FAB1058D25A6BD3BE763093
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: kory.maincent@bootlin.com
 
-Introduce am65_cpsw_create_txqs() and am65_cpsw_destroy_txqs()
-and use them.
+The phy_detach function can be called with or without the rtnl lock held.
+When the rtnl lock is not held, using rtnl_dereference() triggers a
+warning due to the lack of lock context.
 
-Signed-off-by: Roger Quadros <rogerq@kernel.org>
+Add an rcu_read_lock() to ensure the lock is acquired and to maintain
+synchronization.
+
+Tested-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+Reported-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+Closes: https://lore.kernel.org/netdev/4c6419d8-c06b-495c-b987-d66c2e1ff848@tuxon.dev/
+Fixes: 35f7cad1743e ("net: Add the possibility to support a selected hwtstamp in netdevice")
+Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
 ---
- drivers/net/ethernet/ti/am65-cpsw-nuss.c | 123 +++++++++++++++++++------------
- 1 file changed, 77 insertions(+), 46 deletions(-)
+ drivers/net/phy/phy_device.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.c b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-index 5c87002eeee9..391e78425777 100644
---- a/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-+++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-@@ -501,6 +501,7 @@ static inline void am65_cpsw_put_page(struct am65_cpsw_rx_flow *flow,
- 				      struct page *page,
- 				      bool allow_direct);
- static void am65_cpsw_nuss_rx_cleanup(void *data, dma_addr_t desc_dma);
-+static void am65_cpsw_nuss_tx_cleanup(void *data, dma_addr_t desc_dma);
+diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
+index 5b34d39d1d52..b9b9aa16c10a 100644
+--- a/drivers/net/phy/phy_device.c
++++ b/drivers/net/phy/phy_device.c
+@@ -2001,12 +2001,14 @@ void phy_detach(struct phy_device *phydev)
+ 	if (dev) {
+ 		struct hwtstamp_provider *hwprov;
  
- static void am65_cpsw_destroy_rxq(struct am65_cpsw_common *common, int id)
- {
-@@ -655,6 +656,76 @@ static int am65_cpsw_create_rxqs(struct am65_cpsw_common *common)
- 	return ret;
- }
+-		hwprov = rtnl_dereference(dev->hwprov);
++		rcu_read_lock()
++		hwprov = rcu_dereference(dev->hwprov);
+ 		/* Disable timestamp if it is the one selected */
+ 		if (hwprov && hwprov->phydev == phydev) {
+ 			rcu_assign_pointer(dev->hwprov, NULL);
+ 			kfree_rcu(hwprov, rcu_head);
+ 		}
++		rcu_read_unlock();
  
-+static void am65_cpsw_destroy_txq(struct am65_cpsw_common *common, int id)
-+{
-+	struct am65_cpsw_tx_chn *tx_chn = &common->tx_chns[id];
-+
-+	napi_disable(&tx_chn->napi_tx);
-+	hrtimer_cancel(&tx_chn->tx_hrtimer);
-+	k3_udma_glue_reset_tx_chn(tx_chn->tx_chn, tx_chn,
-+				  am65_cpsw_nuss_tx_cleanup);
-+	k3_udma_glue_disable_tx_chn(tx_chn->tx_chn);
-+}
-+
-+static void am65_cpsw_destroy_txqs(struct am65_cpsw_common *common)
-+{
-+	struct am65_cpsw_tx_chn *tx_chn = common->tx_chns;
-+	int id;
-+
-+	/* shutdown tx channels */
-+	atomic_set(&common->tdown_cnt, common->tx_ch_num);
-+	/* ensure new tdown_cnt value is visible */
-+	smp_mb__after_atomic();
-+	reinit_completion(&common->tdown_complete);
-+
-+	for (id = 0; id < common->tx_ch_num; id++)
-+		k3_udma_glue_tdown_tx_chn(tx_chn[id].tx_chn, false);
-+
-+	id = wait_for_completion_timeout(&common->tdown_complete,
-+					 msecs_to_jiffies(1000));
-+	if (!id)
-+		dev_err(common->dev, "tx teardown timeout\n");
-+
-+	for (id = common->tx_ch_num - 1; id >= 0; id--)
-+		am65_cpsw_destroy_txq(common, id);
-+}
-+
-+static int am65_cpsw_create_txq(struct am65_cpsw_common *common, int id)
-+{
-+	struct am65_cpsw_tx_chn *tx_chn = &common->tx_chns[id];
-+	int ret;
-+
-+	ret = k3_udma_glue_enable_tx_chn(tx_chn->tx_chn);
-+	if (ret)
-+		return ret;
-+
-+	napi_enable(&tx_chn->napi_tx);
-+
-+	return 0;
-+}
-+
-+static int am65_cpsw_create_txqs(struct am65_cpsw_common *common)
-+{
-+	int id, ret;
-+
-+	for (id = 0; id < common->tx_ch_num; id++) {
-+		ret = am65_cpsw_create_txq(common, id);
-+		if (ret) {
-+			dev_err(common->dev, "couldn't create txq %d: %d\n",
-+				id, ret);
-+			goto err;
-+		}
-+	}
-+
-+	return 0;
-+
-+err:
-+	for (--id; id >= 0; id--)
-+		am65_cpsw_destroy_txq(common, id);
-+
-+	return ret;
-+}
-+
- static int am65_cpsw_nuss_desc_idx(struct k3_cppi_desc_pool *desc_pool,
- 				   void *desc,
- 				   unsigned char dsize_log2)
-@@ -789,9 +860,8 @@ static struct sk_buff *am65_cpsw_build_skb(void *page_addr,
- static int am65_cpsw_nuss_common_open(struct am65_cpsw_common *common)
- {
- 	struct am65_cpsw_host *host_p = am65_common_get_host(common);
--	struct am65_cpsw_tx_chn *tx_chn = common->tx_chns;
--	int port_idx, ret, tx;
- 	u32 val, port_mask;
-+	int port_idx, ret;
- 
- 	if (common->usage_count)
- 		return 0;
-@@ -855,27 +925,14 @@ static int am65_cpsw_nuss_common_open(struct am65_cpsw_common *common)
- 	if (ret)
- 		return ret;
- 
--	for (tx = 0; tx < common->tx_ch_num; tx++) {
--		ret = k3_udma_glue_enable_tx_chn(tx_chn[tx].tx_chn);
--		if (ret) {
--			dev_err(common->dev, "couldn't enable tx chn %d: %d\n",
--				tx, ret);
--			tx--;
--			goto fail_tx;
--		}
--		napi_enable(&tx_chn[tx].napi_tx);
--	}
-+	ret = am65_cpsw_create_txqs(common);
-+	if (ret)
-+		goto cleanup_rx;
- 
- 	dev_dbg(common->dev, "cpsw_nuss started\n");
- 	return 0;
- 
--fail_tx:
--	while (tx >= 0) {
--		napi_disable(&tx_chn[tx].napi_tx);
--		k3_udma_glue_disable_tx_chn(tx_chn[tx].tx_chn);
--		tx--;
--	}
--
-+cleanup_rx:
- 	am65_cpsw_destroy_rxqs(common);
- 
- 	return ret;
-@@ -883,39 +940,13 @@ static int am65_cpsw_nuss_common_open(struct am65_cpsw_common *common)
- 
- static int am65_cpsw_nuss_common_stop(struct am65_cpsw_common *common)
- {
--	struct am65_cpsw_tx_chn *tx_chn = common->tx_chns;
--	int i;
--
- 	if (common->usage_count != 1)
- 		return 0;
- 
- 	cpsw_ale_control_set(common->ale, HOST_PORT_NUM,
- 			     ALE_PORT_STATE, ALE_PORT_STATE_DISABLE);
- 
--	/* shutdown tx channels */
--	atomic_set(&common->tdown_cnt, common->tx_ch_num);
--	/* ensure new tdown_cnt value is visible */
--	smp_mb__after_atomic();
--	reinit_completion(&common->tdown_complete);
--
--	for (i = 0; i < common->tx_ch_num; i++)
--		k3_udma_glue_tdown_tx_chn(tx_chn[i].tx_chn, false);
--
--	i = wait_for_completion_timeout(&common->tdown_complete,
--					msecs_to_jiffies(1000));
--	if (!i)
--		dev_err(common->dev, "tx timeout\n");
--	for (i = 0; i < common->tx_ch_num; i++) {
--		napi_disable(&tx_chn[i].napi_tx);
--		hrtimer_cancel(&tx_chn[i].tx_hrtimer);
--	}
--
--	for (i = 0; i < common->tx_ch_num; i++) {
--		k3_udma_glue_reset_tx_chn(tx_chn[i].tx_chn, &tx_chn[i],
--					  am65_cpsw_nuss_tx_cleanup);
--		k3_udma_glue_disable_tx_chn(tx_chn[i].tx_chn);
--	}
--
-+	am65_cpsw_destroy_txqs(common);
- 	am65_cpsw_destroy_rxqs(common);
- 	cpsw_ale_stop(common->ale);
- 
-
+ 		phydev->attached_dev->phydev = NULL;
+ 		phydev->attached_dev = NULL;
 -- 
 2.34.1
 
