@@ -1,317 +1,314 @@
-Return-Path: <netdev+bounces-159173-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159175-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 09054A149E3
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 07:57:36 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BABC0A149F5
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 08:07:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6E3833A9CB7
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 06:57:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D563E169485
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 07:07:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 641C81F78E3;
-	Fri, 17 Jan 2025 06:57:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D223E1F755B;
+	Fri, 17 Jan 2025 07:07:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KEE/q+Lu"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ZKsxRk2J"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f173.google.com (mail-il1-f173.google.com [209.85.166.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93E9A1F75A6
-	for <netdev@vger.kernel.org>; Fri, 17 Jan 2025 06:57:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 252671D6DBF
+	for <netdev@vger.kernel.org>; Fri, 17 Jan 2025 07:07:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737097054; cv=none; b=Lnw2QAKSOoUT3ixp1IIeuGcWKKhWLeLXGKlv2yrxAKvKw2JLq6etJLyhraR5aRi0T3A7og5aceQfYMNfcY1B+q35KIrXb6FIubEgIC3/6L4QbP8zx7vzb4IexJWk9zR400Om4/PniOeNQY9CcYEuZnGAAEp79p1PsIOJaOf3hy4=
+	t=1737097659; cv=none; b=gxb+5W9aWlaoWh/m+IdjpqAALhFWFsuToSpW2dUG7fRi90ysTIipCyERCwp8kuwOq2aUb9xwMG8ki3T8Qc88sZ1PLvd5yGRqVq9WJ0LIDPTuN6BcLK4LP3oQTAE0oUjDbYxI7QKOU+7jV94+FzNQcCy97b2doRPTMBntGN/gOAU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737097054; c=relaxed/simple;
-	bh=R2ax26dc068VPcFTLRabCKLrbRsvnHJwy2ajMPD0LLM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Tnrg40WvXmeo/DaPZ0zEM1Dv0GsWXipn/QAHZLB3b/ZjdNFyieDmqvhXoLHZLH6juh9i5FlYbsCvZ9f7lnmqoOWoJWygzqg+qQQ7ZmRtStxQLA/nvROuEfscir0nqy9GkHN3nd+HZe/jzJLO0VDEqO08MGYdioUCC1kuCxURQM0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KEE/q+Lu; arc=none smtp.client-ip=209.85.166.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-il1-f173.google.com with SMTP id e9e14a558f8ab-3ce7e876317so15ab.1
-        for <netdev@vger.kernel.org>; Thu, 16 Jan 2025 22:57:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1737097052; x=1737701852; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Be2q/K9796facHwyGzkyCOH6c+2wk9xgt9HDYl9TLTo=;
-        b=KEE/q+LuW5DYOiJhimUVEFZ87XRmt+iXe7HtfGUv6M0vGaAPLVr12GFpWBhSnD0shx
-         PWY5M/v1JGdRQXhA5mQ5XqbQNA0zmgzHeOBTMDrMK4X3taUv7htwZT5DWBtHTGZofpCC
-         jRcRK6nK1i9QVvVj7O26RAHHEdD5NkLijQoxo+1isEC6A12U4VuMrso8uvyXI31JUThq
-         sKA0AP3H8mlP8npcAKqT0aI+G9NL2TfhCKaunfrAKqA3hNkgZsxvvEwLoQhEu4K7Pkzf
-         edXdgfyEQ03zXjYocROLSRCUgjrXr+zf5ybhAnDPQZJpAPZueMyRdjhRda4iDIJHcBF4
-         pd9g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737097052; x=1737701852;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Be2q/K9796facHwyGzkyCOH6c+2wk9xgt9HDYl9TLTo=;
-        b=lI4vH0N/+8OntPSfL+twpMEVFhcc6ozgvZTfj4EdPrX88a4n29CmUrsuBqVYaPhGVR
-         8Tx76+0xtAy8H8QxwFxU5d4c3LspZ9+xg+/WhvjBcIUL1nkpPFsm/ATAoECTSziGyGRq
-         fZIJRd3colxiWSRjVrj5xvcVuhoU0z4KjqNl3i5MuQVtb4cZf0O9O7VngG4OalR09zDu
-         l79osMSCoR2pjLpyypkJiDWaehYoMNHmIHYGL97xF3VPHICSDIjBqQhr/AciDQOuglkl
-         0QNfNCtCYfYSY7OwfPmLQ2b8eXKD07GxdnsRpMlx91AYaqDnZoD57FvERCcjWOuKgVdZ
-         uwXQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXnnxKsAwJTOoaAgrPSk8K/RLgYj1jeRnOXkhFO2hWoIHdOEa5egOa+lE4fRi5sFkvlYg3isog=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwQQEUr2NFJRX0Cw6EHdL/Qf20rDxPYuvx2XZ/xj4Ur0Trd+4OB
-	RyLUCE0X8znirvdwzdevloJ/L7x8C8zI3sZCbENlD87noQMRBJByFoFjuj4K11AIWazy2q8oPn7
-	pSLO/ykS3zVzdubbnKWL9sObR1Yel89M6jW2U
-X-Gm-Gg: ASbGncv/YApOMhYb2HTYAIhw8nVKk8LEu1jyzmdt9x5wSNPineHPn/ydkRg03pmr/dO
-	4//aHmz8pRDMGTC2NW3UTfyCsfOi5YMgger7TIKBtgM/LOSL5Xw+U8vkjsy6KBBI1+GY=
-X-Google-Smtp-Source: AGHT+IFRuoo5Dr5QhvOsVYEqGgKqkoMWzq+rVObcCkRzc3eZSZdnt6FeX24JNTpMztj28BUrWIUvW1/weeoGa6Zir/c=
-X-Received: by 2002:a92:daca:0:b0:3ce:4ed9:5249 with SMTP id
- e9e14a558f8ab-3cf78590f1bmr31535ab.1.1737097050753; Thu, 16 Jan 2025 22:57:30
- -0800 (PST)
+	s=arc-20240116; t=1737097659; c=relaxed/simple;
+	bh=/LiuZ91CJ42MgrWOGkeq90OSp1438J5fR5yH8U7G0gQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RY7TRntZ6j8CeyDHUUKk4VscowbH7JUhSyb6heUXGAUfrU4we9zqp0zs7wFNvYOy1JhAHaDXomYToqeEXKh+dvsBemu/JkAEOWxmUKUjcTDIg7WMuGdXr86R9wy1xSE49ZPgd70MRuviQFnqmf5ZoI/mcza3WNTOD2cRhkh4FAE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ZKsxRk2J; arc=none smtp.client-ip=192.198.163.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1737097658; x=1768633658;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=/LiuZ91CJ42MgrWOGkeq90OSp1438J5fR5yH8U7G0gQ=;
+  b=ZKsxRk2JsD6MmVK7OknGhNLVSiEDDG7qMJfwwbPkd/2rujxSgSlytag7
+   6kJXGYunb1fiLHgfQTX2fk1IDRmY9rObyphedttrZS7rckvs/uBL5LpoT
+   4eKdkmo+pDvGNN4/HGUTsUKPQMmMlgLtM92zxuXBx3II/RCOP8tHyasSM
+   Lrl+TfnNYZOQpKKM/tOBuxtaincFO3d5o86onVavNlxM5gBwdIrv+8SEK
+   6YMA+bMvAbsgN75Ofg8j7cx5OtDbosQnCI3oVoePP4QbdsURnMsGTB9ZI
+   xfK0oBP/A1yeToN3qaagwCsa1moigvYuf3JbvI5Ixejsv9s7F89xA5exP
+   Q==;
+X-CSE-ConnectionGUID: qvMYA6eGQ2mk0q8mLv4JsA==
+X-CSE-MsgGUID: UN/HE9w+QcmD0zlbumYv0g==
+X-IronPort-AV: E=McAfee;i="6700,10204,11317"; a="37757427"
+X-IronPort-AV: E=Sophos;i="6.13,211,1732608000"; 
+   d="scan'208";a="37757427"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jan 2025 23:07:38 -0800
+X-CSE-ConnectionGUID: aJpbCbknT1OME1wdRKmd1g==
+X-CSE-MsgGUID: HEVsw0CeRvaCKXSwWFoQAw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.13,211,1732608000"; 
+   d="scan'208";a="105789452"
+Received: from mev-dev.igk.intel.com ([10.237.112.144])
+  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jan 2025 23:07:34 -0800
+Date: Fri, 17 Jan 2025 08:04:17 +0100
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+To: Michael Chan <michael.chan@broadcom.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, andrew+netdev@lunn.ch,
+	pavan.chebbi@broadcom.com, andrew.gospodarek@broadcom.com,
+	helgaas@kernel.org, Manoj Panicker <manoj.panicker2@amd.com>,
+	Somnath Kotur <somnath.kotur@broadcom.com>,
+	Wei Huang <wei.huang2@amd.com>,
+	Ajit Khaparde <ajit.khaparde@broadcom.com>
+Subject: Re: [PATCH net-next v2 10/10] bnxt_en: Add TPH support in BNXT driver
+Message-ID: <Z4oA8U3opS/7Ike0@mev-dev.igk.intel.com>
+References: <20250116192343.34535-1-michael.chan@broadcom.com>
+ <20250116192343.34535-11-michael.chan@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250114023740.3753350-1-yuyanghuang@google.com> <b7305f0a-fe4d-4dd4-aaaf-77a08fd919ac@redhat.com>
-In-Reply-To: <b7305f0a-fe4d-4dd4-aaaf-77a08fd919ac@redhat.com>
-From: Yuyang Huang <yuyanghuang@google.com>
-Date: Fri, 17 Jan 2025 15:56:54 +0900
-X-Gm-Features: AbW1kvYoqgBmP-VHM6DmUUhDJ9Jnyw_YcGbKpysft72T0yArfYAel2SlDm77Cn4
-Message-ID: <CADXeF1EiMaASLhRiNMEeXmUUT3dXhhbasOeReaNy=nuVwa1agw@mail.gmail.com>
-Subject: Re: [PATCH net-next, v5] netlink: support dumping IPv4 multicast addresses
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>, 
-	netdev@vger.kernel.org, Donald Hunter <donald.hunter@gmail.com>, 
-	Shuah Khan <shuah@kernel.org>, Nikolay Aleksandrov <razor@blackwall.org>, 
-	Hangbin Liu <liuhangbin@gmail.com>, Daniel Borkmann <daniel@iogearbox.net>, 
-	linux-kselftest@vger.kernel.org, =?UTF-8?Q?Maciej_=C5=BBenczykowski?= <maze@google.com>, 
-	Lorenzo Colitti <lorenzo@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250116192343.34535-11-michael.chan@broadcom.com>
 
-Hi Paolo
+On Thu, Jan 16, 2025 at 11:23:43AM -0800, Michael Chan wrote:
+> From: Manoj Panicker <manoj.panicker2@amd.com>
+> 
+> Add TPH support to the Broadcom BNXT device driver. This allows the
+> driver to utilize TPH functions for retrieving and configuring Steering
+> Tags when changing interrupt affinity. With compatible NIC firmware,
+> network traffic will be tagged correctly with Steering Tags, resulting
+> in significant memory bandwidth savings and other advantages as
+> demonstrated by real network benchmarks on TPH-capable platforms.
+> 
+> Co-developed-by: Somnath Kotur <somnath.kotur@broadcom.com>
+> Signed-off-by: Somnath Kotur <somnath.kotur@broadcom.com>
+> Co-developed-by: Wei Huang <wei.huang2@amd.com>
+> Signed-off-by: Wei Huang <wei.huang2@amd.com>
+> Signed-off-by: Manoj Panicker <manoj.panicker2@amd.com>
+> Reviewed-by: Ajit Khaparde <ajit.khaparde@broadcom.com>
+> Reviewed-by: Andy Gospodarek <andrew.gospodarek@broadcom.com>
+> Signed-off-by: Michael Chan <michael.chan@broadcom.com>
+> ---
+> Cc: Bjorn Helgaas <helgaas@kernel.org>
+> 
+> Previous driver series fixing rtnl_lock and empty release function:
+> 
+> https://lore.kernel.org/netdev/20241115200412.1340286-1-wei.huang2@amd.com/
+> 
+> v5 of the PCI series using netdev_rx_queue_restart():
+> 
+> https://lore.kernel.org/netdev/20240916205103.3882081-5-wei.huang2@amd.com/
+> 
+> v1 of the PCI series using open/close:
+> 
+> https://lore.kernel.org/netdev/20240509162741.1937586-9-wei.huang2@amd.com/
+> ---
+>  drivers/net/ethernet/broadcom/bnxt/bnxt.c | 105 ++++++++++++++++++++++
+>  drivers/net/ethernet/broadcom/bnxt/bnxt.h |   7 ++
+>  2 files changed, 112 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> index 0a10a4cffcc8..8c24642b8812 100644
+> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> @@ -55,6 +55,8 @@
+>  #include <net/page_pool/helpers.h>
+>  #include <linux/align.h>
+>  #include <net/netdev_queues.h>
+> +#include <net/netdev_rx_queue.h>
+> +#include <linux/pci-tph.h>
+>  
+>  #include "bnxt_hsi.h"
+>  #include "bnxt.h"
+> @@ -11330,6 +11332,83 @@ static int bnxt_tx_queue_start(struct bnxt *bp, int idx)
+>  	return 0;
+>  }
+>  
+> +static void bnxt_irq_affinity_notify(struct irq_affinity_notify *notify,
+> +				     const cpumask_t *mask)
+> +{
+> +	struct bnxt_irq *irq;
+> +	u16 tag;
+> +	int err;
+> +
+> +	irq = container_of(notify, struct bnxt_irq, affinity_notify);
+> +
+> +	if (!irq->bp->tph_mode)
+> +		return;
+> +
+Can it not be set? The notifier is registered only if it is set, can
+mode change while irq notifier is registered? Maybe I am missing sth,
+but it looks like it can't.
 
-Thanks for the review feedback, I will adjust them in the patch v6.
+> +	cpumask_copy(irq->cpu_mask, mask);
+> +
+> +	if (irq->ring_nr >= irq->bp->rx_nr_rings)
+> +		return;
+> +
+> +	if (pcie_tph_get_cpu_st(irq->bp->pdev, TPH_MEM_TYPE_VM,
+> +				cpumask_first(irq->cpu_mask), &tag))
+> +		return;
+> +
+> +	if (pcie_tph_set_st_entry(irq->bp->pdev, irq->msix_nr, tag))
+> +		return;
+> +
+> +	rtnl_lock();
+> +	if (netif_running(irq->bp->dev)) {
+> +		err = netdev_rx_queue_restart(irq->bp->dev, irq->ring_nr);
+> +		if (err)
+> +			netdev_err(irq->bp->dev,
+> +				   "RX queue restart failed: err=%d\n", err);
+> +	}
+> +	rtnl_unlock();
+> +}
+> +
+> +static void bnxt_irq_affinity_release(struct kref *ref)
+> +{
+> +	struct irq_affinity_notify *notify =
+> +		container_of(ref, struct irq_affinity_notify, kref);
+> +	struct bnxt_irq *irq;
+> +
+> +	irq = container_of(notify, struct bnxt_irq, affinity_notify);
+> +
+> +	if (!irq->bp->tph_mode)
+The same here.
 
->Why moving the struct definition here? IMHO addrconf.h is better suited
->and will avoid additional headers dep.
-
-The `struct inet_fill_args` is moved from devinet.c to igmp.h to make
-it usable in both devinet.c and igmp.c.
-I feel it is incorrect to move `struct inet_fill_args` to addrconf.h
-because that file contains IPv6 specific definition and it also
-contains `struct inet6_fill_args`. After refactoring, I will remove
-the usage of enum addr_type_t type, so we don't need to import
-addrconf.h anymore.
-
-Thanks,
-
-Yuyang
-
-On Thu, Jan 16, 2025 at 8:06=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> wro=
-te:
->
-> On 1/14/25 3:37 AM, Yuyang Huang wrote:
-> > Extended RTM_GETMULTICAST to support dumping joined IPv4 multicast
-> > addresses, in addition to the existing IPv6 functionality. This allows
-> > userspace applications to retrieve both IPv4 and IPv6 multicast
-> > addresses through similar netlink command and then monitor future
-> > changes by registering to RTNLGRP_IPV4_MCADDR and RTNLGRP_IPV6_MCADDR.
-> >
-> > This change includes a new ynl based selftest case. To run the test,
-> > execute the following command:
-> >
-> > $ vng -v --user root --cpus 16 -- \
-> >     make -C tools/testing/selftests TARGETS=3Dnet \
-> >     TEST_PROGS=3Drtnetlink.py TEST_GEN_PROGS=3D"" run_tests
->
-> Thanks for including the test!
->
-> > diff --git a/Documentation/netlink/specs/rt_link.yaml b/Documentation/n=
-etlink/specs/rt_link.yaml
-> > index 0d492500c7e5..7dcd5fddac9d 100644
-> > --- a/Documentation/netlink/specs/rt_link.yaml
-> > +++ b/Documentation/netlink/specs/rt_link.yaml
-> > @@ -92,6 +92,41 @@ definitions:
-> >        -
-> >          name: ifi-change
-> >          type: u32
-> > +  -
-> > +    name: ifaddrmsg
-> > +    type: struct
-> > +    members:
-> > +      -
-> > +        name: ifa-family
-> > +        type: u8
-> > +      -
-> > +        name: ifa-prefixlen
-> > +        type: u8
-> > +      -
-> > +        name: ifa-flags
-> > +        type: u8
-> > +      -
-> > +        name: ifa-scope
-> > +        type: u8
-> > +      -
-> > +        name: ifa-index
-> > +        type: u32
-> > +  -
-> > +    name: ifacacheinfo
-> > +    type: struct
-> > +    members:
-> > +      -
-> > +        name: ifa-prefered
-> > +        type: u32
-> > +      -
-> > +        name: ifa-valid
-> > +        type: u32
-> > +      -
-> > +        name: cstamp
-> > +        type: u32
-> > +      -
-> > +        name: tstamp
-> > +        type: u32
-> >    -
-> >      name: ifla-bridge-id
-> >      type: struct
-> > @@ -2253,6 +2288,18 @@ attribute-sets:
-> >        -
-> >          name: tailroom
-> >          type: u16
-> > +  -
-> > +    name: ifmcaddr-attrs
-> > +    attributes:
-> > +      -
-> > +        name: addr
-> > +        type: binary
-> > +        value: 7
-> > +      -
-> > +        name: cacheinfo
-> > +        type: binary
-> > +        struct: ifacacheinfo
-> > +        value: 6
-> >
-> >  sub-messages:
-> >    -
-> > @@ -2493,6 +2540,29 @@ operations:
-> >          reply:
-> >            value: 92
-> >            attributes: *link-stats-attrs
-> > +    -
-> > +      name: getmaddrs
-> > +      doc: Get / dump IPv4/IPv6 multicast addresses.
-> > +      attribute-set: ifmcaddr-attrs
-> > +      fixed-header: ifaddrmsg
-> > +      do:
-> > +        request:
-> > +          value: 58
-> > +          attributes:
-> > +            - ifa-family
-> > +            - ifa-index
-> > +        reply:
-> > +          value: 58
-> > +          attributes: &mcaddr-attrs
-> > +            - addr
-> > +            - cacheinfo
-> > +      dump:
-> > +        request:
-> > +          value: 58
-> > +            - ifa-family
-> > +        reply:
-> > +          value: 58
-> > +          attributes: *mcaddr-attrs
-> >
-> >  mcast-groups:
-> >    list:
->
-> IMHO the test case itself should land to a separate patch.
->
-> > diff --git a/include/linux/igmp.h b/include/linux/igmp.h
-> > index 073b30a9b850..a460e1ef0524 100644
-> > --- a/include/linux/igmp.h
-> > +++ b/include/linux/igmp.h
-> > @@ -16,6 +16,7 @@
-> >  #include <linux/ip.h>
-> >  #include <linux/refcount.h>
-> >  #include <linux/sockptr.h>
-> > +#include <net/addrconf.h>
-> >  #include <uapi/linux/igmp.h>
-> >
-> >  static inline struct igmphdr *igmp_hdr(const struct sk_buff *skb)
-> > @@ -92,6 +93,16 @@ struct ip_mc_list {
-> >       struct rcu_head         rcu;
-> >  };
-> >
-> > +struct inet_fill_args {
-> > +     u32 portid;
-> > +     u32 seq;
-> > +     int event;
-> > +     unsigned int flags;
-> > +     int netnsid;
-> > +     int ifindex;
-> > +     enum addr_type_t type;
-> > +};
->
-> Why moving the struct definition here? IMHO addrconf.h is better suited
-> and will avoid additional headers dep.
->
-> > @@ -1874,6 +1894,23 @@ static int in_dev_dump_addr(struct in_device *in=
-_dev, struct sk_buff *skb,
-> >       return err;
-> >  }
-> >
-> > +static int in_dev_dump_addr(struct in_device *in_dev, struct sk_buff *=
-skb,
-> > +                         struct netlink_callback *cb, int *s_ip_idx,
-> > +                         struct inet_fill_args *fillargs)
-> > +{
-> > +     switch (fillargs->type) {
-> > +     case UNICAST_ADDR:
-> > +             fillargs->event =3D RTM_NEWADDR;
->
-> I think that adding an additional argument for 'event' to
-> inet_dump_addr() would simplify the code a bit.
->
-> > +             return in_dev_dump_ifaddr(in_dev, skb, cb, s_ip_idx, fill=
-args);
-> > +     case MULTICAST_ADDR:
-> > +             fillargs->event =3D RTM_GETMULTICAST;
-> > +             return in_dev_dump_ifmcaddr(in_dev, skb, cb, s_ip_idx,
-> > +                                         fillargs);
-> > +     default:
-> > +             return 0;
->
-> Why not erroring out on unknown types? should never happen, right?
->
-> > @@ -1949,6 +1987,20 @@ static int inet_dump_ifaddr(struct sk_buff *skb,=
- struct netlink_callback *cb)
-> >       return err;
-> >  }
-> >
-> > +static int inet_dump_ifaddr(struct sk_buff *skb, struct netlink_callba=
-ck *cb)
-> > +{
-> > +     enum addr_type_t type =3D UNICAST_ADDR;
-> > +
-> > +     return inet_dump_addr(skb, cb, type);
->
-> You can avoid the local variable usage.
->
-> > +}
-> > +
-> > +static int inet_dump_ifmcaddr(struct sk_buff *skb, struct netlink_call=
-back *cb)
-> > +{
-> > +     enum addr_type_t type =3D MULTICAST_ADDR;
-> > +
-> > +     return inet_dump_addr(skb, cb, type);
->
-> Same here.
->
-> Thanks!
->
-> Paolo
->
+> +		return;
+> +
+> +	if (pcie_tph_set_st_entry(irq->bp->pdev, irq->msix_nr, 0)) {
+> +		netdev_err(irq->bp->dev,
+> +			   "Setting ST=0 for MSIX entry %d failed\n",
+> +			   irq->msix_nr);
+> +		return;
+> +	}
+> +}
+> +
+> +static void bnxt_release_irq_notifier(struct bnxt_irq *irq)
+> +{
+> +	irq_set_affinity_notifier(irq->vector, NULL);
+> +}
+> +
+> +static void bnxt_register_irq_notifier(struct bnxt *bp, struct bnxt_irq *irq)
+> +{
+> +	struct irq_affinity_notify *notify;
+> +
+> +	irq->bp = bp;
+> +
+> +	/* Nothing to do if TPH is not enabled */
+> +	if (!bp->tph_mode)
+> +		return;
+> +
+> +	/* Register IRQ affinity notifier */
+> +	notify = &irq->affinity_notify;
+> +	notify->irq = irq->vector;
+> +	notify->notify = bnxt_irq_affinity_notify;
+> +	notify->release = bnxt_irq_affinity_release;
+> +
+> +	irq_set_affinity_notifier(irq->vector, notify);
+> +}
+> +
+>  static void bnxt_free_irq(struct bnxt *bp)
+>  {
+>  	struct bnxt_irq *irq;
+> @@ -11352,11 +11431,18 @@ static void bnxt_free_irq(struct bnxt *bp)
+>  				free_cpumask_var(irq->cpu_mask);
+>  				irq->have_cpumask = 0;
+>  			}
+> +
+> +			bnxt_release_irq_notifier(irq);
+> +
+>  			free_irq(irq->vector, bp->bnapi[i]);
+>  		}
+>  
+>  		irq->requested = 0;
+>  	}
+> +
+> +	/* Disable TPH support */
+> +	pcie_disable_tph(bp->pdev);
+> +	bp->tph_mode = 0;
+>  }
+>  
+>  static int bnxt_request_irq(struct bnxt *bp)
+> @@ -11376,6 +11462,12 @@ static int bnxt_request_irq(struct bnxt *bp)
+>  #ifdef CONFIG_RFS_ACCEL
+>  	rmap = bp->dev->rx_cpu_rmap;
+>  #endif
+> +
+> +	/* Enable TPH support as part of IRQ request */
+> +	rc = pcie_enable_tph(bp->pdev, PCI_TPH_ST_IV_MODE);
+> +	if (!rc)
+> +		bp->tph_mode = PCI_TPH_ST_IV_MODE;
+> +
+>  	for (i = 0, j = 0; i < bp->cp_nr_rings; i++) {
+>  		int map_idx = bnxt_cp_num_to_irq_num(bp, i);
+>  		struct bnxt_irq *irq = &bp->irq_tbl[map_idx];
+> @@ -11399,8 +11491,11 @@ static int bnxt_request_irq(struct bnxt *bp)
+>  
+>  		if (zalloc_cpumask_var(&irq->cpu_mask, GFP_KERNEL)) {
+>  			int numa_node = dev_to_node(&bp->pdev->dev);
+> +			u16 tag;
+>  
+>  			irq->have_cpumask = 1;
+> +			irq->msix_nr = map_idx;
+> +			irq->ring_nr = i;
+>  			cpumask_set_cpu(cpumask_local_spread(i, numa_node),
+>  					irq->cpu_mask);
+>  			rc = irq_update_affinity_hint(irq->vector, irq->cpu_mask);
+> @@ -11410,6 +11505,16 @@ static int bnxt_request_irq(struct bnxt *bp)
+>  					    irq->vector);
+>  				break;
+>  			}
+> +
+> +			bnxt_register_irq_notifier(bp, irq);
+> +
+> +			/* Init ST table entry */
+> +			if (pcie_tph_get_cpu_st(irq->bp->pdev, TPH_MEM_TYPE_VM,
+> +						cpumask_first(irq->cpu_mask),
+> +						&tag))
+> +				continue;
+> +
+> +			pcie_tph_set_st_entry(irq->bp->pdev, irq->msix_nr, tag);
+>  		}
+>  	}
+>  	return rc;
+> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+> index 826ae030fc09..02dc2ed9c75d 100644
+> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+> @@ -1234,6 +1234,11 @@ struct bnxt_irq {
+>  	u8		have_cpumask:1;
+>  	char		name[IFNAMSIZ + BNXT_IRQ_NAME_EXTRA];
+>  	cpumask_var_t	cpu_mask;
+> +
+> +	struct bnxt	*bp;
+> +	int		msix_nr;
+> +	int		ring_nr;
+> +	struct irq_affinity_notify affinity_notify;
+>  };
+>  
+>  #define HWRM_RING_ALLOC_TX	0x1
+> @@ -2229,6 +2234,8 @@ struct bnxt {
+>  	struct net_device	*dev;
+>  	struct pci_dev		*pdev;
+>  
+> +	u8			tph_mode;
+> +
+>  	atomic_t		intr_sem;
+>  
+>  	u32			flags;
+> -- 
+> 2.30.1
+> 
 
