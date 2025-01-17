@@ -1,78 +1,174 @@
-Return-Path: <netdev+bounces-159484-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159485-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C254A15990
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 23:43:38 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF815A15992
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 23:44:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8356F167C24
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 22:43:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E0AAE167B74
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 22:44:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80BED1D5ACD;
-	Fri, 17 Jan 2025 22:43:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IOioszaV"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F8E31D8DFE;
+	Fri, 17 Jan 2025 22:44:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f205.google.com (mail-il1-f205.google.com [209.85.166.205])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52B6519CC27;
-	Fri, 17 Jan 2025 22:43:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 870C81B424C
+	for <netdev@vger.kernel.org>; Fri, 17 Jan 2025 22:44:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.205
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737153814; cv=none; b=oQ1PLskW3bn9RcvZ3KYo3tlaz6sy5ipPZASeLim3FMqmeaAxDi1A6gQTjZXFpbpledOW3Gwo8RlExtV3u3lo0C/3Kcfpvb6CANpteOFt+Z8gYyTSZcZuKZqnb0+bRoqXIzEbAe4wz2XSxVpkyZDrGHoo4hY4A1vG0VIBTjv4bgU=
+	t=1737153862; cv=none; b=I0afnWt8ihqngh0S0rmhilOClbpRSNGZRcPvQHgr8ghbszvZ+JqJHuMJ7LomfRcCrQTve272m+4QCB45EqGwoAynJuYvGt1vq+yVVGCWrpSmtoX1KgYExj8Xgg5EAL49Rf6fU4MXaWj4SWLYYx6ClACRAmHL/Llm02RDb19fl/8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737153814; c=relaxed/simple;
-	bh=50uUaiGANqV+eTVjv+pUZPnWo8IjZ2+xGwYeZjmL7hc=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=D80g+jwqcpCaP43EOeI1CTfQgodIbdPnM49qVrtw4mPXxzZKz+KUa1sOUvWvtVzhiUKOHFTswB1Fpnb9jUTEwt9caau21YjWPuv2n1QqGLxXSTQ5C6Y035Tj3q/Zr+4eMVDjvCRNLVskP1LlQX6EcYJoPEGC957kCuV+k8VCpIw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IOioszaV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 49BCCC4CEDD;
-	Fri, 17 Jan 2025 22:43:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737153813;
-	bh=50uUaiGANqV+eTVjv+pUZPnWo8IjZ2+xGwYeZjmL7hc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=IOioszaVH8LLT7fa6lFj/MNgpD8sikIgmv0ceP8neLNe2fjm9UrtPXxVDwn7T7EQi
-	 LIDyGK384xfOkactUZ6BeTEZ9PWA0Gw9eT56ypi3+X3ubQu5CryRY9CSfZVORzMjZk
-	 WU0f4+p8uF2ukZ1LSUkYjwmCSD44IdPBQ6amSe9nMtAWAhhA0TSjsrBYb+NSivgu6j
-	 jxzh94s04D/yxfnGHG3yC3ZlyEEHhiPIT31Ndb88zHog+cp5iBXi/VqiUG3dCCqUVc
-	 NhxiLxL6rNo+aAgdL6fvWR1rhZDFfvP5PelzAbqMNizBRhSSgaxd2flFx6ccgevK4J
-	 jrFcJ/q8CIs+A==
-Date: Fri, 17 Jan 2025 14:43:32 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Eddie James <eajames@linux.ibm.com>
-Cc: Paul Fertser <fercerpav@gmail.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, horms@kernel.org, pabeni@redhat.com,
- edumazet@google.com, davem@davemloft.net, sam@mendozajonas.com, Ivan
- Mikhaylov <fr0st61te@gmail.com>
-Subject: Re: [PATCH] net/ncsi: Fix NULL pointer derefence if CIS arrives
- before SP
-Message-ID: <20250117144332.7ea38896@kernel.org>
-In-Reply-To: <97ec8df6-0690-4158-be44-ef996746d734@linux.ibm.com>
-References: <20250110194133.948294-1-eajames@linux.ibm.com>
-	<20250114144932.7d2ba3c9@kernel.org>
-	<Z4g+LmRZC/BXqVbI@home.paul.comp>
-	<97ec8df6-0690-4158-be44-ef996746d734@linux.ibm.com>
+	s=arc-20240116; t=1737153862; c=relaxed/simple;
+	bh=sHlR9V1r6jP9xFsceVsELkCDS3kR96/2CujWA8btVsg=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=NbrQHrl1BOiC7r1YxnLATz/CdWhZ0EOS+MKG21Igb/4fE+FnUI80w/5qwrqF1D7to/mQiOJu4yxNzczKerNmAcXmwp8bdqB2LuKCN/2AP+VFvtQ6raEq//+baIroMj5CEpyyTf1oQuj4y8rg22TofgnkN4nBh/cuWif2rerqLq4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.205
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f205.google.com with SMTP id e9e14a558f8ab-3ce7e5d651aso22185325ab.2
+        for <netdev@vger.kernel.org>; Fri, 17 Jan 2025 14:44:20 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737153859; x=1737758659;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=A7RrhgjZYtvPZcYAN5b0RCSWkhBjOlEmR5OPIQjnKXQ=;
+        b=qz0Q2hxJR7ajice0tbJMXVT5IIcF7SC9Szlvzh476n8qdPcIMhTldbMOgkRUj1lN6N
+         fq7OmJsnHpPPlHnp3dbESbgBB36qHqoNnCh1Yc/HCX4AAYHqR+2hmrOihJLGS0tQ3nfZ
+         rBn1/5fmksrhdvtnbI9L9nRMNXg2uRCBxqB7m7U5er9p01HnX7OTuLcRArkZnLI5LxNb
+         pZU2zBrETwBms2uaR/WhhFXcsqtVRUcoT8HfunTBTmT28vAwBLP8ns45039YfVmrZJYN
+         gl2+9RTIcBITlNJOv+YrgAfrV12Pjzrcz7XvAoAU+Gdn3sKmr911aW6t5HuwkrP4PlQJ
+         6A6A==
+X-Forwarded-Encrypted: i=1; AJvYcCUdaXgP5XOf0ssvUZbnyPjOWnjpK/CbcQKQTnipvcjbw4reZnnkUdu7KTeQZdRlYxS+v45f01g=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxX0Tc8aSAczLee76KJ2PRjV3Olk/EFY5f75ETpWG6fGTZWA2L4
+	gAot1h2CpmBZ/cDqJBjzdXbbNjWMf8WKpGcXTcqdn6qt6RP7+d1iGNU63S2WgOekb+KIlo5QjCX
+	39QsHp8KcHDPaxC7BTjcMqG/oeDXYqZuW3rJd15nkWMYebW2VzQwE7ck=
+X-Google-Smtp-Source: AGHT+IGUrxAw+btpJ1VSdv/ZGL704SgMRa0RjYKrpW1c1Z8LRmA4x5q+qM+/tHdULQK3jI0lRxW5K2oMVn4ZjnXkkqHqLyY3xtzw
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+X-Received: by 2002:a92:c26b:0:b0:3ce:7ac0:64ce with SMTP id
+ e9e14a558f8ab-3cf74495f72mr41048905ab.18.1737153859687; Fri, 17 Jan 2025
+ 14:44:19 -0800 (PST)
+Date: Fri, 17 Jan 2025 14:44:19 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <678add43.050a0220.303755.0016.GAE@google.com>
+Subject: [syzbot] [bluetooth?] [wireless?] WARNING in free_netdev (2)
+From: syzbot <syzbot+85ff1051228a04613a32@syzkaller.appspotmail.com>
+To: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
+	luiz.dentz@gmail.com, marcel@holtmann.org, netdev@vger.kernel.org, 
+	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, 17 Jan 2025 15:05:24 -0600 Eddie James wrote:
-> I am able to reproduce the panic at will, and unfortunately your patch 
-> does not prevent the issue.
-> 
-> However I suspect this issue may be unique to my set up, so my patch may 
-> not be necessary. I found that I had some user space issues. Fixing 
-> userspace prevented this issue.
+Hello,
 
-The kernel shouldn't crash even if user space is buggy..
-Maybe we can apply a simplified patch to return an error if !np?
+syzbot found the following issue on:
+
+HEAD commit:    8d20dcda404d selftests: drv-net-hw: inject pp_alloc_fail e..
+git tree:       net-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=15ffc2b0580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=c30f048a4f12891
+dashboard link: https://syzkaller.appspot.com/bug?extid=85ff1051228a04613a32
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=13ffc2b0580000
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/5ce07c743ced/disk-8d20dcda.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/66f2a9a35d5e/vmlinux-8d20dcda.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/4c790c086a46/bzImage-8d20dcda.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+85ff1051228a04613a32@syzkaller.appspotmail.com
+
+------------[ cut here ]------------
+DEBUG_LOCKS_WARN_ON(lock->magic != lock)
+WARNING: CPU: 1 PID: 5961 at kernel/locking/mutex.c:564 __mutex_lock_common kernel/locking/mutex.c:564 [inline]
+WARNING: CPU: 1 PID: 5961 at kernel/locking/mutex.c:564 __mutex_lock+0xdac/0xee0 kernel/locking/mutex.c:735
+Modules linked in:
+CPU: 1 UID: 0 PID: 5961 Comm: syz-executor Not tainted 6.13.0-rc7-syzkaller-01131-g8d20dcda404d #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 12/27/2024
+RIP: 0010:__mutex_lock_common kernel/locking/mutex.c:564 [inline]
+RIP: 0010:__mutex_lock+0xdac/0xee0 kernel/locking/mutex.c:735
+Code: 0f b6 04 38 84 c0 0f 85 1a 01 00 00 83 3d 6f 40 4c 04 00 75 19 90 48 c7 c7 60 84 0a 8c 48 c7 c6 00 85 0a 8c e8 f5 dc 91 f5 90 <0f> 0b 90 90 90 e9 c7 f3 ff ff 90 0f 0b 90 e9 29 f8 ff ff 90 0f 0b
+RSP: 0018:ffffc90003987580 EFLAGS: 00010246
+RAX: ef7de89246652d00 RBX: ffff888029dc0cb0 RCX: ffff888025ad3c00
+RDX: 0000000000000000 RSI: 0000000000000001 RDI: 0000000000000000
+RBP: ffffc90003987710 R08: ffffffff81602ac2 R09: 1ffff110170e519a
+R10: dffffc0000000000 R11: ffffed10170e519b R12: 0000000000000000
+R13: 0000000000000000 R14: 1ffff92000730ec4 R15: dffffc0000000000
+FS:  000055558b849500(0000) GS:ffff8880b8700000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007fffad944418 CR3: 00000000336ec000 CR4: 00000000003526f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ netdev_lock include/linux/netdevice.h:2691 [inline]
+ __netif_napi_del include/linux/netdevice.h:2829 [inline]
+ netif_napi_del include/linux/netdevice.h:2848 [inline]
+ free_netdev+0x2d9/0x610 net/core/dev.c:11621
+ netdev_run_todo+0xf21/0x10d0 net/core/dev.c:11189
+ nsim_destroy+0x3c3/0x620 drivers/net/netdevsim/netdev.c:1028
+ __nsim_dev_port_del+0x14b/0x1b0 drivers/net/netdevsim/dev.c:1428
+ nsim_dev_port_del_all drivers/net/netdevsim/dev.c:1440 [inline]
+ nsim_dev_reload_destroy+0x28a/0x490 drivers/net/netdevsim/dev.c:1661
+ nsim_drv_remove+0x58/0x160 drivers/net/netdevsim/dev.c:1676
+ device_remove drivers/base/dd.c:567 [inline]
+ __device_release_driver drivers/base/dd.c:1273 [inline]
+ device_release_driver_internal+0x4a9/0x7c0 drivers/base/dd.c:1296
+ bus_remove_device+0x34f/0x420 drivers/base/bus.c:576
+ device_del+0x57a/0x9b0 drivers/base/core.c:3854
+ device_unregister+0x20/0xc0 drivers/base/core.c:3895
+ nsim_bus_dev_del drivers/net/netdevsim/bus.c:462 [inline]
+ del_device_store+0x363/0x480 drivers/net/netdevsim/bus.c:226
+ kernfs_fop_write_iter+0x3a0/0x500 fs/kernfs/file.c:334
+ new_sync_write fs/read_write.c:586 [inline]
+ vfs_write+0xaeb/0xd30 fs/read_write.c:679
+ ksys_write+0x18f/0x2b0 fs/read_write.c:731
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f44ce1847df
+Code: 89 54 24 18 48 89 74 24 10 89 7c 24 08 e8 f9 92 02 00 48 8b 54 24 18 48 8b 74 24 10 41 89 c0 8b 7c 24 08 b8 01 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 31 44 89 c7 48 89 44 24 08 e8 4c 93 02 00 48
+RSP: 002b:00007ffde8b7b2a0 EFLAGS: 00000293 ORIG_RAX: 0000000000000001
+RAX: ffffffffffffffda RBX: 0000000000000005 RCX: 00007f44ce1847df
+RDX: 0000000000000001 RSI: 00007ffde8b7b2f0 RDI: 0000000000000005
+RBP: 00007f44ce202d15 R08: 0000000000000000 R09: 00007ffde8b7b0f7
+R10: 0000000000000000 R11: 0000000000000293 R12: 0000000000000001
+R13: 00007ffde8b7b2f0 R14: 00007f44ceea4620 R15: 0000000000000003
+ </TASK>
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
