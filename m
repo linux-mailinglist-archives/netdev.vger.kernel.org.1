@@ -1,62 +1,64 @@
-Return-Path: <netdev+bounces-159113-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159114-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BBB99A146FD
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 01:17:34 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 06DABA14704
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 01:27:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1DD2E188E7F3
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 00:17:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 77FF23A947A
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 00:27:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E383725A64E;
-	Fri, 17 Jan 2025 00:17:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D8D825A650;
+	Fri, 17 Jan 2025 00:27:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Qff67ldd"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H2xnr22s"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B392925A62F;
-	Fri, 17 Jan 2025 00:17:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FC501C32;
+	Fri, 17 Jan 2025 00:27:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737073049; cv=none; b=ZlAhOr/4934mXaDnOU67BG1osaSnuv85Qjou5G58ysrrcJfwZzpWY3VzaqpxDFItfCLtyL0bKg4KANu+kDMmlMF7TdRJ+eAcFcU1A85Ytkz9m+KIIoIRN49Agt8rr6qV9c19jrkVN8yA3CHyZ7FJaQeLtj4Ogc9g4umu2oe2dVo=
+	t=1737073633; cv=none; b=UEDJcNqjGr0RuvDPEL+VRF7h7jnNRNQ17IxMs4NVkU21NmSWFb4F3cQjA5U8CwC/48Fb/4p6w32rKO1Z+wBrm9qZq1HA7sPq60gTSQC17TzSyXqd1Zib0pAxhxuekiNTAc6x2ND03RNuqaIjHNGB4rRt4pXrQg4YkubckGUjmWg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737073049; c=relaxed/simple;
-	bh=a/+eIgBYU6NyUzeRruBfxpDtxqLfwtNUZUkOPdqV+qE=;
+	s=arc-20240116; t=1737073633; c=relaxed/simple;
+	bh=dESk8X92BLtzB+2p85epCK0l5JJoQ+ZXkqgvn/ACGxo=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ZOvYNX+X0o3BfusX67eSPRRf6yFCxlqGRj3ZUSD58OYCmfWNoAnksIA4Oee0PBN1QVK/wHapTitsLDddOCaS7bIHTnbxp7u2bnjT5rJylxB51eUB1t+/K+roHGKo58lk+520BLDPnMlhELmsq9wEXvjH3rTyU9OvR0Db4I7BXd4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Qff67ldd; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A60EEC4CED6;
-	Fri, 17 Jan 2025 00:17:28 +0000 (UTC)
+	 MIME-Version:Content-Type; b=gzgpWhxRKNkrf3feTv++yZ2Leyt6zqNDsjtgiVACw2KkwmvrcnMVOFUQvlcBW0Tf2Tua2FseMkDN+JdxwACAQHwWplf/uP5sgN20QjjAU5LYFvyVe76ptuzzNWMosuihSyPL9HfVhW1CLxTMdCj7azHSVvjU4laJ/LiOK6ZExDQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=H2xnr22s; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 13C00C4CED6;
+	Fri, 17 Jan 2025 00:27:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737073049;
-	bh=a/+eIgBYU6NyUzeRruBfxpDtxqLfwtNUZUkOPdqV+qE=;
+	s=k20201202; t=1737073632;
+	bh=dESk8X92BLtzB+2p85epCK0l5JJoQ+ZXkqgvn/ACGxo=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Qff67lddtY+hcjOQuwaA234+g9CsctOX+DCNiwvdHTmX7clnPNfJ/InGVdoNGnZgX
-	 S6phN9HpeUcUotBGrtfTnnolLmQtbIl4vtFL+a4YnCdY4sxZPO6oweIhTCzLYw/QZQ
-	 Fmqq4ZD8Cg3qa0DGIE3Dnq5qtIZl8DpC7eDh8sua69mpnYW6/qwBrkZ3QxsfisVJn2
-	 pAtLxeCbcojE03O/M/AoZsSNHv7sDEUlZmDGsb8Vs4WiHIPXKCiv0HoC2B+/21vhjy
-	 qMDbp3wK0MGK2tiC748c35bHa2yipubJ0vD1NhbGhznHpY9/q0zQIpVU2YEuwMKuxH
-	 Zo2MsNgSctslg==
-Date: Thu, 16 Jan 2025 16:17:27 -0800
+	b=H2xnr22sElZA6qSaQ0kbrKobOyJreQxK9F1Anii6UlZEOo4iRY8gYRlt792S8QGnm
+	 BcIYvdCZLNSDrMs2vLm0WIA9KksmJgnaDSRC51OXgusQkDUvqVyVZDK1ao1EGkKPWw
+	 3ghIeTTYfUGeiLk/2DbH4BkFqQHnFZJ47K8Cy6sFI/j0PveFRq/wRRGKa8uTx8TGO8
+	 4WEJis1e5O1phdU4gL8XcpdJRJUBKm/egDOfi5boQ0A1CC74u4zHDcZMmCrsQxwYlQ
+	 o2ul5Cu/oInfP/IJQD8fJhiDZFxZlQGTlb3jd6HlsI2zrs0ougRJY/QxwTp6BE/X9Q
+	 f/+kOsfzvWwHg==
+Date: Thu, 16 Jan 2025 16:27:11 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Roman Kisel <romank@linux.microsoft.com>
-Cc: Thorsten Blum <thorsten.blum@linux.dev>, "K. Y. Srinivasan"
- <kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu
- <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>, Andrew Lunn
- <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- linux-hardening@vger.kernel.org, linux-hyperv@vger.kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] hv_netvsc: Replace one-element array with flexible
- array member
-Message-ID: <20250116161727.19a3bbb0@kernel.org>
-In-Reply-To: <0927ebf9-db17-49f5-a188-e0d486ae4bda@linux.microsoft.com>
-References: <20250116211932.139564-2-thorsten.blum@linux.dev>
-	<0927ebf9-db17-49f5-a188-e0d486ae4bda@linux.microsoft.com>
+To: Larysa Zaremba <larysa.zaremba@intel.com>
+Cc: Shinas Rasheed <srasheed@marvell.com>, <netdev@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, <hgani@marvell.com>, <sedara@marvell.com>,
+ <vimleshk@marvell.com>, <thaller@redhat.com>, <wizhao@redhat.com>,
+ <kheib@redhat.com>, <konguyen@redhat.com>, <horms@kernel.org>,
+ <einstein.xue@synaxg.com>, Veerasenareddy Burru <vburru@marvell.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>
+Subject: Re: [PATCH net v8 2/4] octeon_ep: update tx/rx stats locally for
+ persistence
+Message-ID: <20250116162711.71d74e10@kernel.org>
+In-Reply-To: <Z4klGpVVsxOPR3RZ@lzaremba-mobl.ger.corp.intel.com>
+References: <20250116083825.2581885-1-srasheed@marvell.com>
+	<20250116083825.2581885-3-srasheed@marvell.com>
+	<Z4klGpVVsxOPR3RZ@lzaremba-mobl.ger.corp.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,25 +68,18 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Thu, 16 Jan 2025 13:39:52 -0800 Roman Kisel wrote:
-> On 1/16/2025 1:19 PM, Thorsten Blum wrote:
-> > Replace the deprecated one-element array with a modern flexible array
-> > member in the struct nvsp_1_message_send_receive_buffer_complete.
-> > 
-> > Use struct_size_t(,,1) instead of sizeof() to maintain the same size.  
+On Thu, 16 Jan 2025 16:26:18 +0100 Larysa Zaremba wrote:
+> > +	for (q = 0; q < oct->num_ioq_stats; q++) {
+> > +		tx_packets += oct->stats_iq[q].instr_completed;
+> > +		tx_bytes += oct->stats_iq[q].bytes_sent;
+> > +		rx_packets += oct->stats_oq[q].packets;
+> > +		rx_bytes += oct->stats_oq[q].bytes;  
 > 
-> Thanks!
-> 
-> > 
-> > Compile-tested only.  
-> 
-> The code change looks good to me now. I'll build a VM with this change
-> to clear my conscience (maybe the change triggers a compiler bug,
-> however unlikely that sounds) before replying with any tags. Likely next
-> Monday, but feel free to beat me to it, or perhaps, someone else will
-> tag this as reviewed by them and/or tested by them.
+> Correct me if I am wrong, but the interface-wide statistics should not change 
+> when changing queue number. In such case maybe it would be a good idea to 
+> always iterate over all OCTEP_MAX_QUEUES queues when calculating the stats.
 
-Doesn't look like a real bug fix, so would be good to get some signal
-soon. The merge window is soon so we'll likely close the trees very
-very soon ..
+Good catch!
+-- 
+pw-bot: cr
 
