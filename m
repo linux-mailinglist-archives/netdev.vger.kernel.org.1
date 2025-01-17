@@ -1,126 +1,199 @@
-Return-Path: <netdev+bounces-159328-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159329-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF788A151EA
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 15:35:15 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED4B5A15202
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 15:41:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1EC827A256B
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 14:35:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 584403A2692
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 14:41:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 117B81422A8;
-	Fri, 17 Jan 2025 14:35:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D380158851;
+	Fri, 17 Jan 2025 14:41:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="d9h8qe66"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GhPUp+1i"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
+Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E8FA20B20
-	for <netdev@vger.kernel.org>; Fri, 17 Jan 2025 14:35:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97CEB158870;
+	Fri, 17 Jan 2025 14:41:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737124510; cv=none; b=YYEPWPaL89fc36cQoOKgnjF5hfFuWQYewdXFms7BqRkNWYqvX6XZkcbCB+9RoPnkJ5JCT8yAjQrbUHusoLLRK55XQjE8yW5deIC7uznhDN8DG7T1tueI1rDF1ui/TScefrMV8E/aehdigACdOtE0YjGuOlOU/U/vz27TDzcoHV0=
+	t=1737124910; cv=none; b=plWZBaPN7iKQ6oVFb6Kqy5MnK/oyQHZ6Qefdd5z/bg381784wRFRbSnonQ0ofJ0V7xLqhp28HYnRDrO41xcxWdLpCk+5mHEweE/PP+vXE4iuqIu9KGfLUyyjSdDto9smnplet6SCRowcaZ/ZCcguGXp4QaoEltuIm/RxI9hoVT8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737124510; c=relaxed/simple;
-	bh=RBOmzvdf3GotooCuHS6i9sK/AMVSIf6owHWDeBb0YBY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=JKZR0MVRXD/oDrbYBZ1HC6yAHOfbymgRsSEwbRV0NIMco4lCNQVJgQJWjhAQRrVZa/t1gPL6rmi6yx0ufFS3X4dL2KSXKtw687hXBBaPz86Q4vW3KZ1KLyG95qmuOxQ9CRqOKKGfgGCMGcPsEKJJTAt9Jq7cTsa+J+hvjiIwm1I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=d9h8qe66; arc=none smtp.client-ip=209.85.160.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-4678c9310afso211081cf.1
-        for <netdev@vger.kernel.org>; Fri, 17 Jan 2025 06:35:08 -0800 (PST)
+	s=arc-20240116; t=1737124910; c=relaxed/simple;
+	bh=KulbyKepCLarT86VF0p05Hz+9Ji42FDc8DmOReszu0s=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=rG72nHwa63IVpCnKs9rAe0jr02CV2XneChH4SeaU++cFVWTm+y4O97NDYuVSIvfktDdmewZ+o/5Kn23W48qWsBnwrIfh19TDCjoK1Sb2e+ILKsN014OYkM8EvTuNSYwX4HQ2ELKYxAzYg7pa0lys25VCvri8Rzfbospo0bMn2oM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GhPUp+1i; arc=none smtp.client-ip=209.85.208.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-5d3f57582a2so6709479a12.1;
+        Fri, 17 Jan 2025 06:41:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1737124507; x=1737729307; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/gkmUH6rnCH4M7CtAF8xgXNOL4c3VMsXAk8tY0xp32A=;
-        b=d9h8qe66qAtnjuf/7OP/6yhQ4pt0S5iM0byZZgdADYIvO1/9zJzpVH8tUAXAI7fLbI
-         Y/IP8B5NcR6/DCDDTSNG7khFJEJ5vhj12TWrS5P5IGpe4clffv55QVg2KxxUkhkP4Mvk
-         D4OUoe+wSs5VJCM38Nds3Q4/YEZaBDBsymbEB3o5c+777fhOld1+CYqdF6AdHhh8BSiU
-         l0yHlcvnzr9z/1nl9hzwaTodTFtF8wE25QYAZ6U9iPDrSzF0X03CSlsHMTQ/6sZZPnJS
-         DdjhtWJs6/FZQbDMh0RC/sVDeo6XpOWaUxI7EPOroJwQ3oz9iYjfJQ7ZC0FvIJ3WjdFb
-         p8WA==
+        d=gmail.com; s=20230601; t=1737124907; x=1737729707; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=SlIrXoiTLkvo9Nus/MqEtLJXMV6m2Qw67+BcTKYb0SM=;
+        b=GhPUp+1imTc8sh79g5Rausaa5TJwUqARejOBJbO66qlSKUd1CzlEBVAwiPY80wg8oW
+         ru9ShhmnstRD4Q9vrXYkpnvmFGbRu1eF4ECdIQwM36Zcgqi3gB6VNhWqs9/ll1IU/UyX
+         R+kOistLZDRh38tM6Kt9AFAkvj/VwIdkxbEAGLQd6rM7oIQT94m9S7yOUJ+WD1nSHdcm
+         FZfFTeGr0DRV8G3M2z3dwR+ZL/ARL74db70TfuWQCBm+U6K4PGL9rkbIINQvPNkQh7bu
+         e/3AINOzCq4Y1Y1hHh83fJKjBSQtZKbp9/NhnI9X7PQP3xchwr/bhujbi4aabpKjTQC6
+         UEHQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737124507; x=1737729307;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/gkmUH6rnCH4M7CtAF8xgXNOL4c3VMsXAk8tY0xp32A=;
-        b=kpAsiHanJ2BChK0DLkLzYDVHZWtR0wAdNEDuxEm/GDBsfrDR7hdd0LTS8TRZwS3Xif
-         pm1xQMe2LN+GF+e3KjpC380tpo1QPTefd5fs+kZ6cIFd58AVVu5UKhRX6bTtA7FLZws+
-         DiFez2WUnrrr9dnGS4QIBX8H/f+keg3Tt9MoQR146tZKd63W0pQ5u5NobSbMNjBh2KeN
-         uHDouu6qOXWuLJtMQbECKI5O1f/RzZhznaIZpw33xeN9Rnx9BatDeP7ZRioEiaUNOZRp
-         W9mFDHA1LaYp24jKrtEwGOb7GPS3klCTVgMQ56IkxD+qAdY+oBgV7PRAfBXhej0JQtCy
-         BE4g==
-X-Forwarded-Encrypted: i=1; AJvYcCWyX/8jn1JPM96L3QY1EQ9yviY6VzTaBv61BniSyO3tcCkygj9KX3ne3Yu/6/7G/jduEwiiY+o=@vger.kernel.org
-X-Gm-Message-State: AOJu0YylWu6JGXooJbuq0fZ7UwfCieM+4jhNKobMyEsOxDoSUdojPazs
-	qi3eQtKfrrdQLhSY+GDajKzU4oLKBdlRTNul6A9RIHeyEyvnfIPVlANJtaDFFDmqKU4fP2IREsH
-	8cqLAIvZe6xWZeUhyFGjOdc4eCPMyLqfTeUxV
-X-Gm-Gg: ASbGncvWmDJimveWhacvaxheISX7H4XAfvRpTn+Ocdlx5tZPnYx1E2BJnI0GFGVQ9ZB
-	1nPYXmPcmUB6kvmk9E0XUHOQuKrnOl5pxIzW+qC7KNddRMMfcS3SM2lAowcJww9Ne6kAdmQ==
-X-Google-Smtp-Source: AGHT+IFpXDDoYyslWZd0GxM2rONI8ZPb3ET0Yyjpp9+Tfzlqt6W5LwAD5Q/fPjfLMY9j5t4ZH20hiXtNEQVUbR/OWtw=
-X-Received: by 2002:ac8:5a45:0:b0:46d:f29d:4173 with SMTP id
- d75a77b69052e-46e11a9da9cmr3926151cf.16.1737124507171; Fri, 17 Jan 2025
- 06:35:07 -0800 (PST)
+        d=1e100.net; s=20230601; t=1737124907; x=1737729707;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=SlIrXoiTLkvo9Nus/MqEtLJXMV6m2Qw67+BcTKYb0SM=;
+        b=eltPa/6+RNjTqlZQfM2b3Ctw7zifFGITvrmtaNWBdUyC0UGparFrvC9ZBPJz9kaIJR
+         kZeEPAzU3ab2TgPfp+8y4NX7EPxs5Lms4ne0xWPEXizalpxZmpPJfv7HQxPF9zfwvAiF
+         nrvdqHxJ6tEXP6Dxt1JNEHPH50RizAZSSDlfIyo61d8ir83T9rYXTS5jgle9uj4NakZN
+         l9NAZn4xP/42Sv9XOBZg+CGYCWQIRepBGzCExgOcs2t7H5UYnU/2wmUldG3IAsUybKIS
+         NBfI97iZWLZUW10jFGqyFqBPQ29D9qvV6pknHKb2/Aq3bzzCD+HYTpW4CvhYOprExx9J
+         +EWA==
+X-Forwarded-Encrypted: i=1; AJvYcCUd2xH1XZTJkmqNDmJRpOSGRmpoEzPq9E647aEhL4uGtWBo2K3VrsBHCRdak1CaAwaMRbtFlHBC0Q==@vger.kernel.org, AJvYcCWERBWDhDArT6YnXCkYvvfcGStWUecAkcV7SEAuk8zxUiYxBm1T7DuYJX616v6nUXvkIFGCIJ9M@vger.kernel.org
+X-Gm-Message-State: AOJu0YwLkPcV+b8Yfg38it8dGRh5FmHVzTAVU9uHQ6ge5WyuxYxvCXEu
+	gkNjPqV7SM8lSTqRRdGKLtQotX6Us/QrFAGgKeMl6hRvfxrIW0LS
+X-Gm-Gg: ASbGnctTh/ge8FsimFvibicGM/VpJMcpuo3ftLdLNAYMAw/+9TRCg/JV4JfG3S0M4cb
+	pLLkL23+ktC5RFM41YShnXzIyF1o9f1yBPTCit+YepZziJsEzm6AnhTTqzfSO4/nzrl8TWkLj38
+	olepLlmRldvG02Dzt4fWoLJrzd0ylJ4M1VmghNcVMSKaLaBgYJwrvjNHuUz91Rdk/0tyfQ/bJfo
+	nfnzHRm0Ycreuxkt2safShuhBOJRMTv7YCozz1GX5wiSWDLXSC/BIZ3nK3y3ihfR4zpS9oPn97F
+	UNcc8kXKqbis9w==
+X-Google-Smtp-Source: AGHT+IGU7cGVURZupnicsSIbvcjzO+/TIyUDWVQxCWRsL6hpsQdaOOKWB2PBo6tet8TufvFjdRsbgA==
+X-Received: by 2002:a17:907:1c96:b0:aa6:88a2:cfbd with SMTP id a640c23a62f3a-ab38cd63a57mr269238266b.22.1737124906745;
+        Fri, 17 Jan 2025 06:41:46 -0800 (PST)
+Received: from ?IPV6:2620:10d:c096:325:77fd:1068:74c8:af87? ([2620:10d:c092:600::1:56de])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ab384f8d86esm181107366b.154.2025.01.17.06.41.46
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 17 Jan 2025 06:41:46 -0800 (PST)
+Message-ID: <ce9caef4-0d95-4e81-bdb8-536236377f81@gmail.com>
+Date: Fri, 17 Jan 2025 14:42:30 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250115010450.2472-1-ma.arghavani.ref@yahoo.com>
- <20250115010450.2472-1-ma.arghavani@yahoo.com> <CAL+tcoAtzuGZ8US5NcJwJdBh29afYGZHpeMJ4jXgiSnWBr75Ww@mail.gmail.com>
- <501586671.358052.1737020976218@mail.yahoo.com> <CAL+tcoA9yEUmXnHFdotcfEgHqWSqaUXu1Aoj=cfCtL5zFG1ubg@mail.gmail.com>
- <CADVnQy=3xz2_gjnM1vifjPJ_2TpT55mc=Oh7hO_omAAi9P6fxw@mail.gmail.com> <444436856.605765.1737101558108@mail.yahoo.com>
-In-Reply-To: <444436856.605765.1737101558108@mail.yahoo.com>
-From: Neal Cardwell <ncardwell@google.com>
-Date: Fri, 17 Jan 2025 09:34:51 -0500
-X-Gm-Features: AbW1kvZiGaR_OzTqJFRHP_xMfA7jcRNUL9bMqPfL35PzTNiLRCg8FjeUal20xko
-Message-ID: <CADVnQymhhNG-W0XAMC-=ptANc8meG08yi2z-C9-+M0yc9-oSMA@mail.gmail.com>
-Subject: Re: [PATCH net v2] tcp_cubic: fix incorrect HyStart round start detection
-To: Mahdi Arghavani <ma.arghavani@yahoo.com>
-Cc: Jason Xing <kerneljasonxing@gmail.com>, 
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "edumazet@google.com" <edumazet@google.com>, 
-	"haibo.zhang@otago.ac.nz" <haibo.zhang@otago.ac.nz>, 
-	"david.eyers@otago.ac.nz" <david.eyers@otago.ac.nz>, "abbas.arghavani@mdu.se" <abbas.arghavani@mdu.se>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v11 00/21] io_uring zero copy rx
+To: Paolo Abeni <pabeni@redhat.com>, David Wei <dw@davidwei.uk>,
+ io-uring@vger.kernel.org, netdev@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>, Jakub Kicinski <kuba@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jesper Dangaard Brouer <hawk@kernel.org>, David Ahern <dsahern@kernel.org>,
+ Mina Almasry <almasrymina@google.com>,
+ Stanislav Fomichev <stfomichev@gmail.com>, Joe Damato <jdamato@fastly.com>,
+ Pedro Tammela <pctammela@mojatatu.com>
+References: <20250116231704.2402455-1-dw@davidwei.uk>
+ <406fcbd2-55af-4919-abee-7cd80fb449d3@redhat.com>
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <406fcbd2-55af-4919-abee-7cd80fb449d3@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, Jan 17, 2025 at 3:12=E2=80=AFAM Mahdi Arghavani <ma.arghavani@yahoo=
-.com> wrote:
->
-> Hi,
-> >>>+ What is moRTT? Is that ca->curr_rtt? It would be great to share the
-> debug patch you used, so we know for certain how to interpret each
-> column in the debug output.
->
-> Yes. moRTT stands for ca->curr_rtt
-> t stands for tp->tcp_mstamp,
-> c stands for  tp->snd_cwnd,
-> i stands for tcp_packets_in_flight(tp),
-> a stands for acked,
-> RTT stands for (tp->srtt_us >> 3),
-> minRTT stands for  ca->delay_min,
-> d  stands for  total delivered,
-> l stands for tp->lost,
-> tRnd stands for ca->round_start
-> Please ignore the rest.
->
-> >>>+ Are both HYSTART-DELAY and HYSTART-ACK-TRAIN enabled for both of tho=
-se tests?
-> Yes.
->
-> Best Wishes,
-> Mahdi Arghavani
+On 1/17/25 14:28, Paolo Abeni wrote:
+> On 1/17/25 12:16 AM, David Wei wrote:
+>> This patchset adds support for zero copy rx into userspace pages using
+>> io_uring, eliminating a kernel to user copy.
+>>
+>> We configure a page pool that a driver uses to fill a hw rx queue to
+>> hand out user pages instead of kernel pages. Any data that ends up
+>> hitting this hw rx queue will thus be dma'd into userspace memory
+>> directly, without needing to be bounced through kernel memory. 'Reading'
+>> data out of a socket instead becomes a _notification_ mechanism, where
+>> the kernel tells userspace where the data is. The overall approach is
+>> similar to the devmem TCP proposal.
+>>
+>> This relies on hw header/data split, flow steering and RSS to ensure
+>> packet headers remain in kernel memory and only desired flows hit a hw
+>> rx queue configured for zero copy. Configuring this is outside of the
+>> scope of this patchset.
+>>
+>> We share netdev core infra with devmem TCP. The main difference is that
+>> io_uring is used for the uAPI and the lifetime of all objects are bound
+>> to an io_uring instance. Data is 'read' using a new io_uring request
+>> type. When done, data is returned via a new shared refill queue. A zero
+>> copy page pool refills a hw rx queue from this refill queue directly. Of
+>> course, the lifetime of these data buffers are managed by io_uring
+>> rather than the networking stack, with different refcounting rules.
+>>
+>> This patchset is the first step adding basic zero copy support. We will
+>> extend this iteratively with new features e.g. dynamically allocated
+>> zero copy areas, THP support, dmabuf support, improved copy fallback,
+>> general optimisations and more.
+>>
+>> In terms of netdev support, we're first targeting Broadcom bnxt. Patches
+>> aren't included since Taehee Yoo has already sent a more comprehensive
+>> patchset adding support in [1]. Google gve should already support this,
+>> and Mellanox mlx5 support is WIP pending driver changes.
+>>
+>> ===========
+>> Performance
+>> ===========
+>>
+>> Note: Comparison with epoll + TCP_ZEROCOPY_RECEIVE isn't done yet.
+>>
+>> Test setup:
+>> * AMD EPYC 9454
+>> * Broadcom BCM957508 200G
+>> * Kernel v6.11 base [2]
+>> * liburing fork [3]
+>> * kperf fork [4]
+>> * 4K MTU
+>> * Single TCP flow
+>>
+>> With application thread + net rx softirq pinned to _different_ cores:
+>>
+>> +-------------------------------+
+>> | epoll     | io_uring          |
+>> |-----------|-------------------|
+>> | 82.2 Gbps | 116.2 Gbps (+41%) |
+>> +-------------------------------+
+>>
+>> Pinned to _same_ core:
+>>
+>> +-------------------------------+
+>> | epoll     | io_uring          |
+>> |-----------|-------------------|
+>> | 62.6 Gbps | 80.9 Gbps (+29%)  |
+>> +-------------------------------+
+>>
+>> =====
+>> Links
+>> =====
+>>
+>> Broadcom bnxt support:
+>> [1]: https://lore.kernel.org/netdev/20241003160620.1521626-8-ap420073@gmail.com/
+>>
+>> Linux kernel branch:
+>> [2]: https://github.com/spikeh/linux.git zcrx/v9
+>>
+>> liburing for testing:
+>> [3]: https://github.com/isilence/liburing.git zcrx/next
+>>
+>> kperf for testing:
+>> [4]: https://git.kernel.dk/kperf.git
+> 
+> We are getting very close to the merge window. In order to get this
+> series merged before such deadline the point raised by Jakub on this
+> version must me resolved, the next iteration should land to the ML
+> before the end of the current working day and the series must apply
+> cleanly to net-next, so that it can be processed by our CI.
 
-Thanks. Can you please send a v3 version of the tcp_cubic.c patch with
-the tweaks we have suggested above for the commit message.
+Sounds good, thanks Paolo.
 
-thanks,
-neal
+Since the merging is not trivial, I'll send a PR for the net/
+patches instead of reposting the entire thing, if that sounds right
+to you. The rest will be handled on the io_uring side.
+
+-- 
+Pavel Begunkov
+
 
