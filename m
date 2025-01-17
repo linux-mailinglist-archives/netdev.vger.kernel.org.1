@@ -1,59 +1,57 @@
-Return-Path: <netdev+bounces-159233-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159234-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57ED4A14DE0
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 11:43:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2FED0A14DFB
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 11:51:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 842371665E1
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 10:43:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 530BD16510F
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 10:51:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC5F71F76AD;
-	Fri, 17 Jan 2025 10:43:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6A841FCFDB;
+	Fri, 17 Jan 2025 10:50:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="if3YGguh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ye2Fi7GA"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCAAF197A92;
-	Fri, 17 Jan 2025 10:43:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DC661FCFC6;
+	Fri, 17 Jan 2025 10:50:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737110620; cv=none; b=TeT3VjiwEtNd3973xu/ZRsci7xlMwxLF7hLdmkrXfUTuBnx4+yGCkzDp70Xol5YelEhjPyeU4OJ8rt81xVtx/Vynj6Ne+4eBE1NBWJ6iGdEUhFkKW1EBIiU2rtoCCQNALTwVNT0o9QJuvmdh393Ei0iOF0voCJVUJx9spRkasBQ=
+	t=1737111001; cv=none; b=huPnPyhaTYd7xJ0yVvLUZy83ieBwklpZSJ3e7SOi5PNTK4yd8BFNBPjymNSUkbVGhvSPlaEBVewBrvGC86aeQtFls7uCXcDCZfHA0xp0s/XXaLPmpVWBm118McJSYVqRuQ+Y0CkScZeyw9xbYasq/LTfk8kJe7Cx/fm/LjlzsP4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737110620; c=relaxed/simple;
-	bh=YnL9Lry0apWXg6yYJ7GRxiM80aTmM8mfu7TQwviwweY=;
+	s=arc-20240116; t=1737111001; c=relaxed/simple;
+	bh=CazV5uos1NITCYZZ4rDXeX9a/Bj6TVkhmyDyy7U5K9U=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=T7hlBkWUjFYojxh9hZu8aLbe3cGRXG9rmoD6OMCBXuHh/Uni5RZOTTtQMxE4k2agZpXoJYP9PM1k3N3D/g1hFkbLMNtgM38n8U8Uv9EpCMjcfC7T44RLZrsFuuu80iCy0RP6BUCMhAHyJGAdz0RRtc8vFhkOh9YJkdaja/v0dBM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=if3YGguh; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5450DC4CEDD;
-	Fri, 17 Jan 2025 10:43:38 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=UXr/FSIT7+qlVUT2yDEoHnvHT8lzXSZtIz94UFt++lk9xdsU8hojf4ooKNjYFIIo+zoISJuCirEB46CK1RAbectcXh1VLcf6VSnPIG/LxxEXlhGR4fzYKO3gF82VS1Dk9RTk/WMJPl7n5ZJlAu+EvmoKhL5DzsLUTBu+ONAYbHE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ye2Fi7GA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 861B8C4CEDD;
+	Fri, 17 Jan 2025 10:49:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737110620;
-	bh=YnL9Lry0apWXg6yYJ7GRxiM80aTmM8mfu7TQwviwweY=;
+	s=k20201202; t=1737111001;
+	bh=CazV5uos1NITCYZZ4rDXeX9a/Bj6TVkhmyDyy7U5K9U=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=if3YGguhUrb5dFaL0wV2Rp7B1P6FSDamjbGEhZu8bAwlibYRz/jreWfO0o15NZ0mh
-	 yOhTgl7dz95hSJVk3EKwJcgAoFwGLx4unL53ValKEq6ns7gVojWAYmM1Ue12m4yWj4
-	 eKDFAcLksYLlY+cS+3/dc3WssYzLxUWZ9aAS7cFt//YIgkDGynDqtR/iIzCgaoW+id
-	 AKX2KOBQRDQMOd5UzI/HhIXlnm8KLZDpSJeIi+wN4HJqP0zp5A6uW06lFfhwv3dToM
-	 ZIq9r8sLmoF+SODZstrgiKg+sRr7ZSO9DxP8E/uXRjOtBY6uTWb0FVuB0t9wviPN3n
-	 SE74rpSaG0Kuw==
-Date: Fri, 17 Jan 2025 10:43:36 +0000
+	b=Ye2Fi7GADN9GV/uxHO8hFSs9WeXmLXw/YylVOdLZ7aXbpN9nJhRIGD6f1WiU/jZ0W
+	 ZNnV7pwJV1qQFuFNGbq/B/lz6CnROY/cBDS9nmpMrm1XTTQplm9YrjfDeV2jKKyz4J
+	 Rhju3l0i76BSugJBL6JWnv3rdcEHG9yUtZxY91Yhrr8Emw2ZmPL7uC2cgRXHZWuZSA
+	 R46I6JvjAwhND+XMUw1JU3MydPhya+D1AXSopTCK+Mxh6jjwPgxVIBzf/ZmYH2X7DD
+	 Xg2z7AhiHFexDZjG56X/xdS4wVos1fsyqfBNUWzu59ZkqUJs425yvD2zvPB+6aGbzL
+	 xMgc1WDkx/8vA==
+Date: Fri, 17 Jan 2025 10:49:57 +0000
 From: Simon Horman <horms@kernel.org>
-To: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-Cc: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>,
-	Geliang Tang <geliang@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 11/15] mptcp: pm: add id parameter for get_addr
-Message-ID: <20250117104336.GJ6206@kernel.org>
-References: <20250116-net-next-mptcp-pm-misc-cleanup-2-v1-0-c0b43f18fe06@kernel.org>
- <20250116-net-next-mptcp-pm-misc-cleanup-2-v1-11-c0b43f18fe06@kernel.org>
+To: Pablo Neira Ayuso <pablo@netfilter.org>
+Cc: netfilter-devel@vger.kernel.org, davem@davemloft.net,
+	netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
+	edumazet@google.com, fw@strlen.de
+Subject: Re: [PATCH net-next 01/14] netfilter: nf_tables: fix set size with
+ rbtree backend
+Message-ID: <20250117104957.GK6206@kernel.org>
+References: <20250116171902.1783620-1-pablo@netfilter.org>
+ <20250116171902.1783620-2-pablo@netfilter.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,73 +60,44 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250116-net-next-mptcp-pm-misc-cleanup-2-v1-11-c0b43f18fe06@kernel.org>
+In-Reply-To: <20250116171902.1783620-2-pablo@netfilter.org>
 
-On Thu, Jan 16, 2025 at 05:51:33PM +0100, Matthieu Baerts (NGI0) wrote:
-> From: Geliang Tang <tanggeliang@kylinos.cn>
+On Thu, Jan 16, 2025 at 06:18:49PM +0100, Pablo Neira Ayuso wrote:
+> The existing rbtree implementation uses singleton elements to represent
+> ranges, however, userspace provides a set size according to the number
+> of ranges in the set.
 > 
-> The address id is parsed both in mptcp_pm_nl_get_addr() and
-> mptcp_userspace_pm_get_addr(), this makes the code somewhat repetitive.
+> Adjust provided userspace set size to the number of singleton elements
+> in the kernel by multiplying the range by two.
 > 
-> So this patch adds a new parameter 'id' for all get_addr() interfaces.
-> The address id is only parsed in mptcp_pm_nl_get_addr_doit(), then pass
-> it to both mptcp_pm_nl_get_addr() and mptcp_userspace_pm_get_addr().
+> Check if the no-match all-zero element is already in the set, in such
+> case release one slot in the set size.
 > 
-> Signed-off-by: Geliang Tang <tanggeliang@kylinos.cn>
-> Reviewed-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
-> Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+> Fixes: 0ed6389c483d ("netfilter: nf_tables: rename set implementations")
+> Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
+> ---
+>  include/net/netfilter/nf_tables.h |  3 ++
+>  net/netfilter/nf_tables_api.c     | 49 +++++++++++++++++++++++++++++--
+>  net/netfilter/nft_set_rbtree.c    | 43 +++++++++++++++++++++++++++
+>  3 files changed, 93 insertions(+), 2 deletions(-)
+> 
+> diff --git a/include/net/netfilter/nf_tables.h b/include/net/netfilter/nf_tables.h
+> index 0027beca5cd5..7dcea247f853 100644
+> --- a/include/net/netfilter/nf_tables.h
+> +++ b/include/net/netfilter/nf_tables.h
+> @@ -495,6 +495,9 @@ struct nft_set_ops {
+>  					       const struct nft_set *set,
+>  					       const struct nft_set_elem *elem,
+>  					       unsigned int flags);
+> +	u32				(*ksize)(u32 size);
+> +	u32				(*usize)(u32 size);
+> +	u32				(*adjust_maxsize)(const struct nft_set *set);
+>  	void				(*commit)(struct nft_set *set);
+>  	void				(*abort)(const struct nft_set *set);
+>  	u64				(*privsize)(const struct nlattr * const nla[],
 
-...
+Hi Pablo,
 
-> diff --git a/net/mptcp/pm_netlink.c b/net/mptcp/pm_netlink.c
-> index 853b1ea8680ae753fcb882d8b8f4486519798503..392f91dd21b4ce07efb5f44c701f2261afcdc37e 100644
-> --- a/net/mptcp/pm_netlink.c
-> +++ b/net/mptcp/pm_netlink.c
-> @@ -1773,23 +1773,15 @@ int mptcp_nl_fill_addr(struct sk_buff *skb,
->  	return -EMSGSIZE;
->  }
->  
-> -int mptcp_pm_nl_get_addr(struct genl_info *info)
-> +int mptcp_pm_nl_get_addr(u8 id, struct genl_info *info)
->  {
->  	struct pm_nl_pernet *pernet = genl_info_pm_nl(info);
-> -	struct mptcp_pm_addr_entry addr, *entry;
-> +	struct mptcp_pm_addr_entry *entry;
->  	struct sk_buff *msg;
->  	struct nlattr *attr;
->  	void *reply;
->  	int ret;
->  
-> -	if (GENL_REQ_ATTR_CHECK(info, MPTCP_PM_ENDPOINT_ADDR))
-> -		return -EINVAL;
-> -
-> -	attr = info->attrs[MPTCP_PM_ENDPOINT_ADDR];
-> -	ret = mptcp_pm_parse_entry(attr, info, false, &addr);
-> -	if (ret < 0)
-> -		return ret;
-> -
-
-Hi Matthieu and Geliang,
-
-This hunk removes the initialisation of attr...
-
->  	msg = nlmsg_new(NLMSG_DEFAULT_SIZE, GFP_KERNEL);
->  	if (!msg)
->  		return -ENOMEM;
-> @@ -1803,7 +1795,7 @@ int mptcp_pm_nl_get_addr(struct genl_info *info)
->  	}
->  
->  	rcu_read_lock();
-> -	entry = __lookup_addr_by_id(pernet, addr.addr.id);
-> +	entry = __lookup_addr_by_id(pernet, id);
->  	if (!entry) {
->  		NL_SET_ERR_MSG_ATTR(info->extack, attr, "address not found");
-
-... but attr is still used here.
-
-Flagged by clang-19 W=1 builds and Smatch.
-
->  		ret = -EINVAL;
-
-...
+As a follow-up could these new fields be added to
+the Kernel doc for nft_set_ops?
 
