@@ -1,153 +1,133 @@
-Return-Path: <netdev+bounces-159196-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159197-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18D70A14BD0
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 10:05:57 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 81013A14BDE
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 10:13:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 446DA163452
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 09:05:55 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BAD447A1F3A
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 09:13:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 241111F91FA;
-	Fri, 17 Jan 2025 09:05:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C4691F8EE5;
+	Fri, 17 Jan 2025 09:13:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="HX3fKtFb"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="j9XIWZZh"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 702E61F8AD6
-	for <netdev@vger.kernel.org>; Fri, 17 Jan 2025 09:05:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E40235960
+	for <netdev@vger.kernel.org>; Fri, 17 Jan 2025 09:13:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737104741; cv=none; b=G6oa5Dba6u67CpzSDZwQIqEpGBugrEgOAsjfZw91dBaBVRghRU10Pd3U4GrCxAuG5iMTi2l+n+bnifzU+UI6uiczYlp6Rlg0uIAVpGQRSw69F/1VIWCTezJQ5OVvKd+Aupse5HckHJHoY7ccBpFfOGOzWB2Ubswep39Hnl/QnhM=
+	t=1737105204; cv=none; b=lEWTQjpLE7HQtD404JtGxi864PxXe4hUXLv/sRwTDPRdAnmCagBPlmXpro0LA6a/BuLzlfxUGiYVcgEJ7cx/tIKEQzyz0O2bLbNd6FqAffWm3f2COnW54C/MDTsG0ULA/vnAqD3VczCJT34SxeHIUKzBtMsceI9OGSP3uxQVSRw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737104741; c=relaxed/simple;
-	bh=r6ShggBKl12fErmxqnlOFdskYV6nTNHYxtysw5Pn+08=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=krUnFVTWcNfFtPU7dO0vVFYvoTqWOeSyqgJZ4f5gKJUGdzB4AYcfAPigAVYDSWdA7G6xHMb5AkW6rNUq4B2p4s3PFkDl+lcMX9zPl2jlBIUGmOBKK4l2iRqDCz5OT+KSgyVIVRvCajyefl0Qof3Z5keafuWOzPs/bAyfbDGe8TY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=HX3fKtFb; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=803wd+XrzBXv/QN065wJvFDvqjKzNdhjPPcBp4nDMNs=; b=HX3fKtFbUqxKAN4DIM4+2//X1i
-	6RoO4ZdaRl4KVIRBvmMhjilyidMLFXYNUp91yf4wC7jeyfugFaMkd40yPnqs9IkPvTRCYco9FNYlB
-	29Iq3e/UvpgMywxIbMobGrpzNA70pFIXZWf8owPazU4DMbuzYpTu8OmcbiarPlMSxdK+9tjCS1xFo
-	8jJkGWlk4w2K/+pf+qPDCL8SH0BYLwBCx7cOrBhGLQgUdxmpK+F6c0ekKXY9OICgFjIZBIY1citnO
-	/k5FnhUkM9oPhUN/PSKxpp0OBW+oF9aGjKg0WaplA3lxunJ+l9m0GO3FW+t/WUCLd/2iYNX6q0gKp
-	sep/HoBw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:60586)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1tYiI8-0003U5-1q;
-	Fri, 17 Jan 2025 09:05:24 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1tYiI4-00089U-0u;
-	Fri, 17 Jan 2025 09:05:20 +0000
-Date: Fri, 17 Jan 2025 09:05:20 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Jiawen Wu <jiawenwu@trustnetic.com>
-Cc: 'Andrew Lunn' <andrew@lunn.ch>,
-	'Heiner Kallweit' <hkallweit1@gmail.com>, mengyuanlou@net-swift.com,
-	'Alexandre Torgue' <alexandre.torgue@foss.st.com>,
-	'Andrew Lunn' <andrew+netdev@lunn.ch>,
-	'Bryan Whitehead' <bryan.whitehead@microchip.com>,
-	"'David S. Miller'" <davem@davemloft.net>,
-	'Eric Dumazet' <edumazet@google.com>,
-	'Jakub Kicinski' <kuba@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	'Marcin Wojtas' <marcin.s.wojtas@gmail.com>,
-	'Maxime Coquelin' <mcoquelin.stm32@gmail.com>,
-	netdev@vger.kernel.org, 'Paolo Abeni' <pabeni@redhat.com>,
-	UNGLinuxDriver@microchip.com
-Subject: Re: [PATCH net-next 0/9] net: add phylink managed EEE support
-Message-ID: <Z4odUIWmYb8TelZS@shell.armlinux.org.uk>
-References: <Z4gdtOaGsBhQCZXn@shell.armlinux.org.uk>
- <06d301db68bd$b59d3c90$20d7b5b0$@trustnetic.com>
+	s=arc-20240116; t=1737105204; c=relaxed/simple;
+	bh=PRNantFyQnMm+z+Qg3Bn+Or13LcoL6VuT+ErdPcFZXI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ewjTXAgNYxv87MpRGv/DItJmyW5HIHfgr9ElxAbkiLXLMWMOI7kF9RONzGvlQureVnBm6f4fiL0gs7I1A3DO9QPXLGeOeGaRgkM51me8LjDQB/ht3GTz+pffZaDGufep+VXp/njBEx92FJKJSrPEoKmXLOUZ7g9amOPZ2JVrrvQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=j9XIWZZh; arc=none smtp.client-ip=209.85.128.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-4368a293339so19652325e9.3
+        for <netdev@vger.kernel.org>; Fri, 17 Jan 2025 01:13:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1737105201; x=1737710001; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=bAM8kx5e/afWbeDYvSzLROsFKd+B+b4c0k0I/E5Dlac=;
+        b=j9XIWZZhW2IxtovSRjuI0rVW98+6d6c2fi14fFXj36gU6IsqsWfBUw816qcGRHLzSD
+         yVLldMHeGuP7GbAWImZ4JJoO8/DqR0KHoESB3gm+eaWooWPRMFLFqXoQjzZxR6hJ7LTF
+         VyEA6IkI3nZDMgEGeIPTyzgqO3oBUyBMs5OYwf+0D60mpAX+4FnThVPUJcwNoTPXMYM+
+         LG+0CAupJsMT/nuyIRsPo7d6F7T1R9wdwFN/SSYvTS3/QGZGt1F+eREgNw9FRUOI3NhD
+         MZ8FrxjyNW4GXToQn6tBlDgtBuDKmTXaLKxVlT0QysmIda8fOGPQTa6giU85/5gPs+pw
+         jggA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737105201; x=1737710001;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=bAM8kx5e/afWbeDYvSzLROsFKd+B+b4c0k0I/E5Dlac=;
+        b=LI3bPy+e39pD+zyFkLgiOstRc8/u18EXlmko6E3j0/8alnQdePLmtpffVf3d100GP7
+         4ffeAQh2xdIXEc8fxfAk110nI8rAJi2pzoHtWlY88ELZ4S+l4ytDsFC3+EC7AkGIUOk3
+         jcMVBqEs0d1xzxl7+fag0z0775hNHOb3f33kpZ2yzN8SSIopWuEXIbykZaVNWlpqTu7I
+         amB+6yIDiR71Z3d6FpyiNWzxbpi5hPhqrjw3v2mhE/53Qmx5DPw2qnPIr22m4dnSwHIc
+         beIkoYarwxoREj8ZM5cO73m+7kL3L5oIbOtwJNVW8pQ+pp1J/kk8N7dmYOB5BkeNsu7z
+         QT/w==
+X-Forwarded-Encrypted: i=1; AJvYcCXpSFVgtfhYUotO7dAlsfJo0iG92dnL/mGXHVeCxUPECFf5/RhxTLTo+V2iDwhi9zzcYD5Wd10=@vger.kernel.org
+X-Gm-Message-State: AOJu0YytEJMQuSrQ4yMKfMAsyUS/ELWLMaANiZStWjmH0zJ1o9uU0y7U
+	+P+u+098Yc17NN5dyo+KMUONBEFGaVJAdn79TsieXa5jI0iK66LgsBJM69WbcXTkQGm8TvN9RaH
+	ortd5dsQU5AkiKGrpNHgc1wW6m7x+Q2jBXni1
+X-Gm-Gg: ASbGncsShrGcRfTo7J0/zjNCmugD2gY83QhgoaBK3vGpF9TsDeWHTBzFSSu31tOcsCR
+	pQ2BnOK5B5A3N99t0FWZTRyCdWX+ryGO/UZB9lng=
+X-Google-Smtp-Source: AGHT+IGoKfIDcYzqb9OIA08vetyakky0sbXMEo8krBZvuPEsIuN+t2I7ymdIv+XGJrzznA+vpYbB8I50ryCYbvR6gAw=
+X-Received: by 2002:adf:e84a:0:b0:385:f0c9:4b66 with SMTP id
+ ffacd0b85a97d-38bf5686090mr1272148f8f.33.1737105200809; Fri, 17 Jan 2025
+ 01:13:20 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <06d301db68bd$b59d3c90$20d7b5b0$@trustnetic.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+References: <20250116044100.80679-5-fujita.tomonori@gmail.com>
+ <CAH5fLgjwTiR+qX0XbTrtv71UnKorSJKW26dTt2nPro6DmZiJ-g@mail.gmail.com>
+ <20250117.165326.1882417578898126323.fujita.tomonori@gmail.com> <20250117.180147.1155447135795143952.fujita.tomonori@gmail.com>
+In-Reply-To: <20250117.180147.1155447135795143952.fujita.tomonori@gmail.com>
+From: Alice Ryhl <aliceryhl@google.com>
+Date: Fri, 17 Jan 2025 10:13:08 +0100
+X-Gm-Features: AbW1kvYAn3ce7RD39nEID63_c0BAgBCUpAuFSOMc6Fu7kSbe-ZhSy7GInXTgleA
+Message-ID: <CAH5fLggUGT83saC++M-kd57bGvWj5dwAgbWZ95r+PHz_B67NLQ@mail.gmail.com>
+Subject: Re: [PATCH v8 4/7] rust: time: Add wrapper for fsleep function
+To: FUJITA Tomonori <fujita.tomonori@gmail.com>
+Cc: linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org, 
+	netdev@vger.kernel.org, andrew@lunn.ch, hkallweit1@gmail.com, 
+	tmgross@umich.edu, ojeda@kernel.org, alex.gaynor@gmail.com, gary@garyguo.net, 
+	bjorn3_gh@protonmail.com, benno.lossin@proton.me, a.hindborg@samsung.com, 
+	anna-maria@linutronix.de, frederic@kernel.org, tglx@linutronix.de, 
+	arnd@arndb.de, jstultz@google.com, sboyd@kernel.org, mingo@redhat.com, 
+	peterz@infradead.org, juri.lelli@redhat.com, vincent.guittot@linaro.org, 
+	dietmar.eggemann@arm.com, rostedt@goodmis.org, bsegall@google.com, 
+	mgorman@suse.de, vschneid@redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jan 17, 2025 at 04:56:34PM +0800, Jiawen Wu wrote:
-> > Hi,
-> > 
-> > Adding managed EEE support to phylink has been on the cards ever since
-> > the idea in phylib was mooted. This overly large series attempts to do
-> > so. I've included all the patches as it's important to get the driver
-> > patches out there.
-> > 
-> > Patch 1 adds a definition for the clock stop capable bit in the PCS
-> > MMD status register.
-> > 
-> > Patch 2 adds a phylib API to query whether the PHY allows the transmit
-> > xMII clock to be stopped while in LPI mode. This capability is for MAC
-> > drivers to save power when LPI is active, to allow them to stop their
-> > transmit clock.
-> > 
-> > Patch 3 extracts a phylink internal helper for determining whether the
-> > link is up.
-> > 
-> > Patch 4 adds basic phylink managed EEE support. Two new MAC APIs are
-> > added, to enable and disable LPI. The enable method is passed the LPI
-> > timer setting which it is expected to program into the hardware, and
-> > also a flag ehther the transmit clock should be stopped.
-> > 
-> > I have taken the decision to make enable_tx_lpi() to return an error
-> > code, but not do much with it other than report it - the intention
-> > being that we can later use it to extend functionality if needed
-> > without reworking loads of drivers.
-> > 
-> > I have also dropped the validation/limitation of the LPI timer, and
-> > left that in the driver code prior to calling phylink_ethtool_set_eee().
-> > 
-> > The remainder of the patches convert mvneta, lan743x and stmmac, and
-> > add support for mvneta.
-> > 
-> > Since yesterday's RFC:
-> > - fixed the mvpp2 GENMASK()
-> > - dropped the DSA patch
-> > - changed how phylink restricts EEE advertisement, and the EEE support
-> >   reported to userspace which fixes a bug.
-> > 
-> >  drivers/net/ethernet/marvell/mvneta.c             | 107 ++++++++++------
-> >  drivers/net/ethernet/marvell/mvpp2/mvpp2.h        |   5 +
-> >  drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c   |  86 +++++++++++++
-> >  drivers/net/ethernet/microchip/lan743x_ethtool.c  |  21 ---
-> >  drivers/net/ethernet/microchip/lan743x_main.c     |  46 ++++++-
-> >  drivers/net/ethernet/microchip/lan743x_main.h     |   1 -
-> >  drivers/net/ethernet/stmicro/stmmac/stmmac_main.c |  57 +++++++--
-> >  drivers/net/phy/phy.c                             |  20 +++
-> >  drivers/net/phy/phylink.c                         | 149 ++++++++++++++++++++--
-> >  include/linux/phy.h                               |   1 +
-> >  include/linux/phylink.h                           |  45 +++++++
-> >  include/uapi/linux/mdio.h                         |   1 +
-> >  12 files changed, 446 insertions(+), 93 deletions(-)
-> 
-> Since merging these patches, phylink_connect_phy() can no longer be
-> invoked correctly in ngbe_open(). The error is returned from the function
-> phy_eee_rx_clock_stop(). Since EEE is not supported on our NGBE hardware.
+On Fri, Jan 17, 2025 at 10:01=E2=80=AFAM FUJITA Tomonori
+<fujita.tomonori@gmail.com> wrote:
+>
+> On Fri, 17 Jan 2025 16:53:26 +0900 (JST)
+> FUJITA Tomonori <fujita.tomonori@gmail.com> wrote:
+>
+> > On Thu, 16 Jan 2025 10:27:02 +0100
+> > Alice Ryhl <aliceryhl@google.com> wrote:
+> >
+> >>> +/// This function can only be used in a nonatomic context.
+> >>> +pub fn fsleep(delta: Delta) {
+> >>> +    // The argument of fsleep is an unsigned long, 32-bit on 32-bit =
+architectures.
+> >>> +    // Considering that fsleep rounds up the duration to the nearest=
+ millisecond,
+> >>> +    // set the maximum value to u32::MAX / 2 microseconds.
+> >>> +    const MAX_DURATION: Delta =3D Delta::from_micros(u32::MAX as i64=
+ >> 1);
+> >>
+> >> Hmm, is this value correct on 64-bit platforms?
+> >
+> > You meant that the maximum can be longer on 64-bit platforms? 2147484
+> > milliseconds is long enough for fsleep's duration?
+> >
+> > If you prefer, I use different maximum durations for 64-bit and 32-bit
+> > platforms, respectively.
+>
+> How about the following?
+>
+> const MAX_DURATION: Delta =3D Delta::from_micros(usize::MAX as i64 >> 1);
 
-That would mean phy_modify_mmd() is failing, but the question is why
-that is. Please investigate. Thanks.
+Why is there a maximum in the first place? Are you worried about
+overflow on the C side?
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Alice
 
