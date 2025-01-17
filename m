@@ -1,209 +1,167 @@
-Return-Path: <netdev+bounces-159238-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159239-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E339A14E1B
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 12:02:52 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D42DA14E21
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 12:04:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5B2A91889AAF
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 11:02:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5CB703A219C
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 11:04:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA5FE1FC7F0;
-	Fri, 17 Jan 2025 11:02:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2773D1FAC55;
+	Fri, 17 Jan 2025 11:04:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="I8isLou3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 014501F7577;
-	Fri, 17 Jan 2025 11:02:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90A821F8905;
+	Fri, 17 Jan 2025 11:04:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737111767; cv=none; b=ZsWlqaKVHD4J4vhAXCnfEFVrFIsdTecZqiGBgS7oTapWrNSB1S9FrmQtADyBXtRYth7HaG1S/SscMYyk6wML1Q1bSz0bnGkzmlCwff5Z1ay/Lb6nmbXFn1P+BRLm4I/i5UD5s0ImiFZJQXRbQ+1ue3If8lsU+IGZc9ChXt9qWoU=
+	t=1737111861; cv=none; b=qYpgS7TcURWowjJ2Ld85OUHwXaF0eR9Q5CwAGlCwJmFL7lJ4ha/0h7JbQ8CXXhgYqKCsnwuWmMd/KzSY/SCNQcULSqcoeJZwze8r7GF/+O3QOSy5abue075cbuSppAJqROwrNC6TAKZydVParoLDD8xCuECw6jgpwwZGtR5qEHY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737111767; c=relaxed/simple;
-	bh=c6+L2Rwk15a+td57DbDbPDyEYtK7MOGgveqVh/MJXnk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MdrATZ/G2U+wa24GmvtfvTsqmYMzmPujTnHe+ccSvYVBeF2WfYsIPzm1ZRdCFFMqfAHu2iAk2TSJfV0wLbt0SUZV0gCtDbDL+mf4DXhv448cgR2efGajtaUesNX7c9UGuvFMWjM6/o0Uw9F5mltg/a1NBagkJ1FYK1RBk7VpL0Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-aab6fa3e20eso370976366b.2;
-        Fri, 17 Jan 2025 03:02:45 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737111764; x=1737716564;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=51F+1maMrhx6mhtRzm797H0J9chmoIpuqA0W0BWbLr4=;
-        b=MFsqucvbJlmTdMfHqw1g0WNdkMAxIzRI0YB5Swn+g5e6cJx8qFyecqzQUmeSdddc4f
-         R04rZTq3OO+H5Sqw+Fvg1QeNR3AgjOgtzaErjQfkOTqsekWyFJHFozDp/vpZ7G71xSgP
-         jLU6AJwU5WbnfiyWcwgj5OcSbMkare5Lnbo9y5EJ1RD72Dyws9owfw0TU3fqB0+rWkxo
-         +vaN25S2LXh4NZFvu8gWwlPumHR+rk3Kob6rj4IcxzSG9rLlKGEOjuR0mMKxOCBUheV8
-         LVKa+O1DBBT8eeyBL8g5Uz64qyE8YucJPKefpdKd7IhkKV8IfmWXKlneiF0jtuq3UQLk
-         AAyQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU6M3H89GnuDojE1Vye0065R0Virwa3ld1U96236M6UsYW2yf6AhYibO1OdoDz77Ji51SaRpoPnXgnqBmdLsZln@vger.kernel.org, AJvYcCUDPvsPkAbjO6kqwdLIgtVUm4SG5hzAua3pN3xYboHcRhvnnJkxsrd2fCStO6xMYCId+pIgrlrV@vger.kernel.org, AJvYcCUPSgYjZDtDBbxyiLSnwSKAjtQPKMINm0v2mlIU/3Ulk/tHV8yV3OCXNNfP/J+xDLS+gUYtusNZRerehAyY@vger.kernel.org, AJvYcCVh+VkaRLAUcgocpYhAkInpNmEexSfyjIVlaE0gdnqbjnxf0VflO5gXHm6GODAv6Wypxsmqb7gsIOo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwoDJbrqAa1lurueVOOOw4qL6LWDJuocndoLQHYE8t/mmzZEJvm
-	KB1/3bdtu5Vxdr2KiBSXu9PeksIxEYy/YQLYrViA4xS0dByOBmax
-X-Gm-Gg: ASbGncuR1q40+vc0HF3Q98xDrdLQO/0dKaUWMMVvwDqStr072YY+Dsulp34R2lKAsx/
-	3lmwulZ8E/RU4wlx8mj86tmjGrfVA7qMZtQJDUOQ2iSI7qwr89HqcJP76mdBYoze1ZmqYlyVPBS
-	LXZTfta6VItBw//m7NstROL9lYSjTyxcPJ4QxI5lcRycrsPPzgPsD5ZGXLzYlZT2bUkJWif/DLx
-	AnahMLoa+X/bAWmhJKz/hQHaIzvCcdoIwimYhAGy7dt
-X-Google-Smtp-Source: AGHT+IFXztlqwpxselOI2ZQ7Ho9PNO4LfSy55N0oANn3eeF3xkUbwMKcDOAOzemkTvuOwwwpwT0jiw==
-X-Received: by 2002:a17:906:2594:b0:aaf:f1a:d2ad with SMTP id a640c23a62f3a-ab38b4c6af1mr186073966b.50.1737111764022;
-        Fri, 17 Jan 2025 03:02:44 -0800 (PST)
-Received: from gmail.com ([2a03:2880:30ff::])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ab384f1e57bsm152313966b.104.2025.01.17.03.02.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 17 Jan 2025 03:02:43 -0800 (PST)
-Date: Fri, 17 Jan 2025 03:02:40 -0800
-From: Breno Leitao <leitao@debian.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, kernel-team@meta.com,
-	max@kutsevol.com, thepacketgeek@gmail.com
-Subject: Re: [PATCH net-next v2 3/5] netconsole: add support for sysdata and
- CPU population
-Message-ID: <20250117-terrestrial-clam-of-satiation-cf312f@leitao>
-References: <20250115-netcon_cpu-v2-0-95971b44dc56@debian.org>
- <20250115-netcon_cpu-v2-3-95971b44dc56@debian.org>
- <20250116174405.20a0e20b@kernel.org>
+	s=arc-20240116; t=1737111861; c=relaxed/simple;
+	bh=6dHuOH8tZH87hfcM8Zo2QAgoWHdytFSqcuRVEsj8ANo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=XgBDuMyhmvfBz5OW8QuWfOVfaC6GvttC0wHgKzZUyeGHuGs79vq3Q+WqfpWC1lNL+glmN22IcXSRvXC4hO0IHzFMDfSta/Dq4GvYiWS29KZg65YOSOiVeP9RXJWhrw46O9n8PeRTtb22oaK5pC8/59hLLimOVKzfrYk7HBsK26w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=I8isLou3; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50H3qqqP025512;
+	Fri, 17 Jan 2025 11:04:12 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=z9VWwi
+	BIRwOvxV6QcNBCpok231Z8erNJNcVDezJ2D9s=; b=I8isLou3gvy/gUm+1E2Rdn
+	4eczJ4fy6XOuIIdA1NljyFHIyuyx+Ve8g+7NIVFe5YUdn4hGyEl4QXlGqWzxFsT6
+	wUuUr0QRoscnNT5bzCVkvAz+ZdnTfDP9PbOCg2QZ7EctglX1WgMNLu5MS7Iart8R
+	ENRxpkrk4o8MR/teACfzkhB0pj2tcEK1pfeXgDN19ao2nRCROztMA2oCSDE/HbOz
+	kygobWZPyIdQaL/ddY4qcyYUukKRSHBuNo/hjKPaiEpjRr6m+mrHlRKFrfECT+LU
+	NGAXJj+wtS5SZz9tIBFc7HleCMpWhrvPTsN2PH999fX8j4x0EcK5D3+zC7vLrfhA
+	==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 447fpc9qua-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 17 Jan 2025 11:04:12 +0000 (GMT)
+Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 50HAx2dj007845;
+	Fri, 17 Jan 2025 11:04:12 GMT
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 447fpc9qu8-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 17 Jan 2025 11:04:11 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 50H7ZdbA016571;
+	Fri, 17 Jan 2025 11:04:11 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 4445p226sq-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 17 Jan 2025 11:04:10 +0000
+Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
+	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 50HB47m052888048
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 17 Jan 2025 11:04:07 GMT
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 5A0632004B;
+	Fri, 17 Jan 2025 11:04:07 +0000 (GMT)
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 0BE9920040;
+	Fri, 17 Jan 2025 11:04:06 +0000 (GMT)
+Received: from [9.171.79.45] (unknown [9.171.79.45])
+	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Fri, 17 Jan 2025 11:04:05 +0000 (GMT)
+Message-ID: <235f4580-a062-4789-a598-ea54d13504bb@linux.ibm.com>
+Date: Fri, 17 Jan 2025 12:04:06 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250116174405.20a0e20b@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC net-next 0/7] Provide an ism layer
+To: dust.li@linux.alibaba.com, Wenjia Zhang <wenjia@linux.ibm.com>,
+        Jan Karcher <jaka@linux.ibm.com>, Gerd Bayer <gbayer@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        "D. Wythe" <alibuda@linux.alibaba.com>,
+        Tony Lu <tonylu@linux.alibaba.com>, Wen Gu <guwen@linux.alibaba.com>,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+        Andrew Lunn <andrew+netdev@lunn.ch>
+Cc: Julian Ruess <julianr@linux.ibm.com>,
+        Niklas Schnelle <schnelle@linux.ibm.com>,
+        Thorsten Winkler <twinkler@linux.ibm.com>, netdev@vger.kernel.org,
+        linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev
+ <agordeev@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>, Simon Horman <horms@kernel.org>
+References: <20250115195527.2094320-1-wintera@linux.ibm.com>
+ <20250116093231.GD89233@linux.alibaba.com>
+Content-Language: en-US
+From: Alexandra Winter <wintera@linux.ibm.com>
+In-Reply-To: <20250116093231.GD89233@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: Bc5ul1wygm9gBnHl7Y7C9AI4itJqMy-3
+X-Proofpoint-GUID: 4hgNXehnU4vmNjx6aiB2Sb3C9yGOnPjB
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-01-17_04,2025-01-16_01,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
+ impostorscore=0 mlxlogscore=654 spamscore=0 malwarescore=0 clxscore=1015
+ priorityscore=1501 mlxscore=0 phishscore=0 adultscore=0 lowpriorityscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2411120000 definitions=main-2501170084
 
-Hello Jakub,
+I hit the send button to early, sorry about that. 
+Let me comment on the other proposals from Dust Li as well.
 
-
-On Thu, Jan 16, 2025 at 05:44:05PM -0800, Jakub Kicinski wrote:
-> On Wed, 15 Jan 2025 05:35:20 -0800 Breno Leitao wrote:
-> > +	WARN_ON_ONCE(userdata_len + sysdata_len >
-> > +		     MAX_EXTRADATA_ENTRY_LEN * MAX_EXTRADATA_ITEMS);
-> > +
-> > +	/* nt->sysdata_length will be used later to decide if the message
-> > +	 * needs to be fragmented.
-> > +	 * userdata_len cannot be used for it, once next sysdata append should
-> > +	 * start from the same userdata_len location, and only overwrite old
-> > +	 * sysdata.
-> > +	 */
-> > +	nt->sysdata_length = sysdata_len;
-> 
-> Updating nt-> fields at runtime is something we haven't done before,
-> right?
-
-Correct. nt-> fields were only updated by configfs helpers.
-
-> What's the locking? We depend on target_list_lock ?
-
-Correct. "Runtime updates" (aka nt->sysdata_length) always occur within
-the target_list_lock().
-
-At the same time, userdata updates (aka nt->userdata_length) happen
-inside dynamic_netconsole_mutex().
-
-The weirdness here is that:
-
-	1) Writers of nt->sysdata_length hold dynamic_netconsole_mutex()
-
-	2) Readers of nt->sysdata_length hold target_list_lock()
-
-	3) There is no dependency between target_list_lock() and
-	dynamic_netconsole_mutex()
-
-	4) Creating a dependency on target_list_lock() in configfs could lead to
-	potential DoS attacks by userspace holding target_list_lock() for
-	extended periods, starving netconsole.
-
-	5) A possible solution might involve using read-write or RCU locks.
-
-
-> Looks like previously all the data was on the stack, now we have a mix.
-
-Not sure I followed. The data ({userdata,extradata}_complete) was always
-inside nt field, which belongs to target_list.
-
-{userdata,extradata}_complete was always in the stack. It is allocated
-in the following way:
+On 16.01.25 10:32, Dust Li wrote:
+> Abstraction of ISM Device Details: I propose we abstract the ISM device
+> details by providing SMC with helper functions. These functions could
+> encapsulate ism->ops, making the implementation cleaner and more
+> intuitive. 
 
 
-	struct netconsole_target {
-		...
-		char extradata_complete[MAX_EXTRADATA_ENTRY_LEN * MAX_EXTRADATA_ITEMS];
-	}
-
-	static struct netconsole_target *alloc_and_init(void) {
-		struct netconsole_target *nt;
-		nt = kzalloc(sizeof(*nt), GFP_KERNEL);
-		...
-		return nt
-	}
-
-	static struct netconsole_target *alloc_param_target(char *target_config,
-							    int cmdline_count) {
-		nt = alloc_and_init();
-		....
-		return nt;
-	}
-
-	static int __init init_netconsole(void) {
-		nt = alloc_param_target(target_config, count);
-		...
-		list_add(&nt->list, &target_list);
-	}
-
-> Maybe we can pack all the bits of state into a struct for easier
-> passing around, but still put it on the stack?
-
-It depends on what state you need here. We can certainly pass runtime
-(aka sysdata in this patchset) data in the stack, but doing the same for
-userdata would require extra computation in runtime. In other words, the
-userdata_complete and length are calculated at configfs update time
-today, and only read during runtime, and there is no connection between
-configfs and runtime (write_ext_msg()) except through the stack.
+Maybe I misunderstand what you mean by helper functions..
+Why would you encapsulate ism->ops functions in another set of wrappers?
+I was happy to remove the helper functions in 2/7 and 7/7.
 
 
-On the other side, if we want to have extradata_complete in the stack, I
-still think that userdata will need to be in the stack, and create a
-buffer in runtime's frame and copy userdata + sysdata at run time, doing
-an extra copy. 
-
-Trying to put this in code, this is what I thought:
-
-	/* Copy to the stack (buf) the userdata string + sysdata */
-	static void append_runtime_sysdata(struct netconsole_target *nt, char *buf) {
-		if (!(nt->sysdata_fields & CPU_NR))
-			return;
-
-		return scnprintf(buf,  MAX_EXTRADATA_ENTRY_LEN * MAX_EXTRADATA_ITEMS,
-				  "%s cpu=%u\n", nt->userdata_complete, raw_smp_processor_id());
-	}
-
-	/* Move complete string in the stack and send from there */
-	static void send_ext_msg_udp(struct netconsole_target *nt, const char *msg,
-				     int msg_len) {
-		...
-	#ifdef CONFIG_NETCONSOLE_DYNAMIC
-		struct char buf[MAX_EXTRADATA_ENTRY_LEN * MAX_EXTRADATA_ITEMS];
-		extradata_len = append_runtime_sysdata(nt, buf);
-	#endif
-
-		send_msg_{no}_fragmentation(nt, msg, buf, extradata_len, release_len)
-		...
-	}
+This way, the struct ism_device would mainly serve its
+> implementers, while the upper helper functions offer a streamlined
+> interface for SMC.
 
 
-Thank for the review and the help with the design,
---breno
+I was actually also wondering, whether the clients should access ism_device
+at all. Or whether they should only use the ism_ops.
+I can give that a try in the next version. I think this RFC almost there already.
+The clients would still need to pass a poitner to ism_dev as a parameter.
+
+
+> Structuring and Naming: I recommend embedding the structure of ism_ops
+> directly within ism_dev rather than using a pointer. 
+
+
+I think it is a common method to have the const struct xy_ops in the device driver code
+and then use pointer to register the device with an upper layer.
+What would be the benefit of duplicating that struct in every ism_dev?
+
+
+Additionally,
+> renaming it to ism_device_ops could enhance clarity and consistency.
+
+
+Yes, that would help to distinguish them from the ism_client functions. 
+I' rename them to ism_dev_ops in the next version.
+
 
