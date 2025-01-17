@@ -1,88 +1,115 @@
-Return-Path: <netdev+bounces-159383-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159384-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 13D81A155C9
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 18:32:17 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE1AEA155D8
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 18:37:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7BC7E188D6D6
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 17:32:20 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B328F7A4AAC
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 17:37:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DA621A23A4;
-	Fri, 17 Jan 2025 17:32:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CAA01A0BDB;
+	Fri, 17 Jan 2025 17:37:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="lfQRcf4M"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 522F9165F01
-	for <netdev@vger.kernel.org>; Fri, 17 Jan 2025 17:32:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B8A71A239F;
+	Fri, 17 Jan 2025 17:36:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737135126; cv=none; b=Rk2QtRfWWZURRcNOa+oiC8yS4NH7COXY3afIRbgxFfIsndsCzD+Z1/EAPqR/oV9UkOlrDfuMRAdGXnae363tQsLj7LdY1tQ32klXRdDXh2qY9JXgDStTNiGaoTgvqY+oKQJA4dhFFCa50CoLEdBUWyC6ilk5jwguAre6JRGHvYo=
+	t=1737135421; cv=none; b=biAAb4/bpuv6854DeKtzYoYZsEFyl/I4jpUKAi67KKrI+VpDIWPlZw0jz8mjBt0vx+J8faZW8K6creQFqIMv+uYYb04xfB3C7lzUbe82CKj2UT1kS1uekDlJOAO9gD6FLKAZDEPTV/V28Narcb9Af3B/jW2HKtcq1ICmLEGh6mw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737135126; c=relaxed/simple;
-	bh=2Nk2Oy1IWVAKqUUJi2SAb+QprDPIbFPfhxGF+Nkq5bw=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=To5+7c7gnNPDvbshAZs/zMudA2h3PNlRNXFMq1zd801Qt8I9fW48T/hS2NF7W49N5XiiBHr87LRN10Ec6KP3Gs46Xw9GzBmzvX9AL6Gq1OSoe5ct0SljMN6VPtuzbHCILQX3w+j0eUgjZdglk8cXjzm6yeX9JOoTlTSShcj3Rvk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-3ce8868a7a5so18748935ab.1
-        for <netdev@vger.kernel.org>; Fri, 17 Jan 2025 09:32:04 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737135123; x=1737739923;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=axNUQUDH1jvBaGJQhc6GPaD1iNkdOyagDPhgOxI6o10=;
-        b=nVOvaJ8kpwjeyEmRf4MvPh6L2KM4g07Jijy7b1nXjPWVY4oK8bGo0QatFMehiLO/h2
-         oytGT6eyXJsR+0gLnsVg/iTGV59Vwo/YnAQUXC+0jfo1UYh+nB55axXMspwudB9a5Blh
-         /74dq9RfD8LSduNo8Hd7QwEedan6pPe9A8ts/6kwN4LjcbcXbgzrz2ZckMZRJj0x6WPr
-         h3pvR1g4usAw2VW/fbo1hhaPxWj7cLQF3u0TOnQr3c91zaqxWHBFQfW5gIfuRV2MDr+h
-         Cnc16m9GZQT8E4vT5JCqM2U5us6Bsf1xWMs6yVpQ916Nfx7cN/MS3Y0VPG1BBfX+BDVW
-         Ts5Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVhzaJvtwWoWdB9v03YohzZEOw9d/cJ+6TXyTmVhpx3b6S9U6qAxJpi6Amx7VtKPa1sRkfqApo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzm6XbBsSa76j0jBSfhFX4q/2giN0aiKDLQBcA5xw4BfADwhI7A
-	oZ/1Iys26rLRZBaWo4cE44Hmbzp+2YBP5Gb3YU7kgVDHItpLPp0hTs+GoTqKsuY38bg2RgLh/cZ
-	V/LOl52fCbrW2Qf85RWX02LGdQtFaiTr0noxJMEJvqsMFJG8i8r7N2Jk=
-X-Google-Smtp-Source: AGHT+IGo3YxZCNQ/w3Z1ipsSeX4bR/eBqKzP/x6yGR1c20N50Nr9fqm006172S4TfgbGkDD9mp3faP9wzzce+9oZyLBLfNmUd+bT
+	s=arc-20240116; t=1737135421; c=relaxed/simple;
+	bh=d8WQchQlANQhIMdsoo8xXU0d6OB8RCTcmltw+Gl2Ncc=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=a/X+KX15c3O6GOOyGszlubErp6tekrmOR8tGfAAnwI1rMgCScNWgAyoU1v+16oQPV4SsGT9NWU63q0hcn3r1NylEWlSt8dRrAup2M7dCCBpaW47O/ou93S13xIch2PJWdeM9LAQWVtRd16gxCsDkqqp5iCTgjXwmMH0UsvUmXBo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=lfQRcf4M; arc=none smtp.client-ip=217.70.183.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id ACBDE60003;
+	Fri, 17 Jan 2025 17:36:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1737135416;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=Ne4f4mP67u3AZLSxFOKlfoi1xjfft9ILWQZ7yv01rtY=;
+	b=lfQRcf4MYS6gEVjVaMjHWiVOqk8dEaqD2V2oraJvCUm57yfxgJal09epUfUxtIX7to71XE
+	Nm2Dkb2iwgRyk5LjSvBYjm8xp1W6myK/VNLR50tX6DYn4YjvfX2I2VjjklX91NGbm1rWnr
+	rY3c1CX8reFzavlS8DabjvGI/XXq74ah10co7+2c/fg3wmGhL19mqai1xhDJnVX4HK5WnS
+	GM5A5r46dNhNC3MMqc70ogW+OKT1tO7j2ldtoCheH7fTdEOV5W+EyIRWp/091kvG9gXc1R
+	kg89szrigCA4QdjQDcB9PWa2dWkPjDnq80Z+ebFZTZQgU55xzDqKbUqGLdKIFg==
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: Kory Maincent <kory.maincent@bootlin.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>,
+	thomas.petazzoni@bootlin.com,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: [PATCH net-next v2] net: phy: Fix suspicious rcu_dereference usage
+Date: Fri, 17 Jan 2025 18:36:44 +0100
+Message-Id: <20250117173645.1107460-1-kory.maincent@bootlin.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:8e:b0:3ce:7b33:8c3b with SMTP id
- e9e14a558f8ab-3cf747e2027mr28485745ab.5.1737135123486; Fri, 17 Jan 2025
- 09:32:03 -0800 (PST)
-Date: Fri, 17 Jan 2025 09:32:03 -0800
-In-Reply-To: <66fa6c80-4383-479d-b17e-234bee6ed7ad@redhat.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <678a9413.050a0220.303755.0011.GAE@google.com>
-Subject: Re: [syzbot] [mptcp?] WARNING in __mptcp_clean_una (2)
-From: syzbot <syzbot+ebc0b8ae5d3590b2c074@syzkaller.appspotmail.com>
-To: linux-kernel@vger.kernel.org, mptcp@lists.linux.dev, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: kory.maincent@bootlin.com
 
-Hello,
+The phy_detach function can be called with or without the rtnl lock held.
+When the rtnl lock is not held, using rtnl_dereference() triggers a
+warning due to the lack of lock context.
 
-syzbot has tested the proposed patch and the reproducer did not trigger any issue:
+Add an rcu_read_lock() to ensure the lock is acquired and to maintain
+synchronization.
 
-Reported-by: syzbot+ebc0b8ae5d3590b2c074@syzkaller.appspotmail.com
-Tested-by: syzbot+ebc0b8ae5d3590b2c074@syzkaller.appspotmail.com
+Tested-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+Reported-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+Closes: https://lore.kernel.org/netdev/4c6419d8-c06b-495c-b987-d66c2e1ff848@tuxon.dev/
+Fixes: 35f7cad1743e ("net: Add the possibility to support a selected hwtstamp in netdevice")
+Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
+---
 
-Tested on:
+Changes in v2:
+- Add a missing ;
+---
+ drivers/net/phy/phy_device.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-commit:         5d6a361d Merge branch 'realtek-link-down'
-git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git main
-console output: https://syzkaller.appspot.com/x/log.txt?x=151669df980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=aadf89e2f6db86cc
-dashboard link: https://syzkaller.appspot.com/bug?extid=ebc0b8ae5d3590b2c074
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-patch:          https://syzkaller.appspot.com/x/patch.diff?x=10983a18580000
+diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
+index 5b34d39d1d52..3eeee7cba923 100644
+--- a/drivers/net/phy/phy_device.c
++++ b/drivers/net/phy/phy_device.c
+@@ -2001,12 +2001,14 @@ void phy_detach(struct phy_device *phydev)
+ 	if (dev) {
+ 		struct hwtstamp_provider *hwprov;
+ 
+-		hwprov = rtnl_dereference(dev->hwprov);
++		rcu_read_lock();
++		hwprov = rcu_dereference(dev->hwprov);
+ 		/* Disable timestamp if it is the one selected */
+ 		if (hwprov && hwprov->phydev == phydev) {
+ 			rcu_assign_pointer(dev->hwprov, NULL);
+ 			kfree_rcu(hwprov, rcu_head);
+ 		}
++		rcu_read_unlock();
+ 
+ 		phydev->attached_dev->phydev = NULL;
+ 		phydev->attached_dev = NULL;
+-- 
+2.34.1
 
-Note: testing is done by a robot and is best-effort only.
 
