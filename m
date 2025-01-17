@@ -1,265 +1,234 @@
-Return-Path: <netdev+bounces-159380-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159381-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3043BA1557B
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 18:12:24 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 28843A15580
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 18:13:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 71304188B587
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 17:12:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 47362163D3B
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 17:12:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21FE21A23AE;
-	Fri, 17 Jan 2025 17:11:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D27E19F487;
+	Fri, 17 Jan 2025 17:12:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="z+yYSnOi";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="mqIP7LZa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f207.google.com (mail-il1-f207.google.com [209.85.166.207])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fhigh-b7-smtp.messagingengine.com (fhigh-b7-smtp.messagingengine.com [202.12.124.158])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 367F31A0711
-	for <netdev@vger.kernel.org>; Fri, 17 Jan 2025 17:11:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.207
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DFF719D098;
+	Fri, 17 Jan 2025 17:12:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.158
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737133888; cv=none; b=c4xE1SPwJE6nTDWUU860ssqgPAjQxnOHIqcukKTxWQk82+qAQqETfpP0kj+7X8wmakeJC8obtbk5HbrgKp4EZBPSWZ0bNAfkvNNBB5Iu6WaK5VBSQ6c1aW0QMJ/kIk3/37qHSLcLadpXgbq5XHbJ324fxlRm59khSJMOyPfnZjs=
+	t=1737133975; cv=none; b=B4rWuqv/5OMPXZwFcoUPlpZL0s9JkIoxcow3BbuPzFZbyVIVqg/sAdBb4NxAXNyqdU5Z4jPfqDr0mThSn116CPeud3K6aStKOwMZJyRX38LKi5H4Z8lSiJ8S2fJCPR/GbwsjPF1Bra9JGzU2u21EWWpU3gSZPoWZmgrKEwC+9WQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737133888; c=relaxed/simple;
-	bh=Qrq8BD7JaUXf06PyAFn7svOSVVGYCKGvO/fkFQVZTiM=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=KqN6IXZbRsQzrRER+UVpVwFueOJh5ipRJixLpbO5KxYWcXC7RPbVJHYoB3+q55nQDtWn9VHbWGPxOJ2cAUjAjD3fqfGdUJ3pQsXMONe/8fRzX535UilD8DhDzmglSvqSQOL95/d+55PQqOrAFlRdP+2cvKqMfHjysUA3PqV7VvU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.207
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f207.google.com with SMTP id e9e14a558f8ab-3cca581135dso35450445ab.3
-        for <netdev@vger.kernel.org>; Fri, 17 Jan 2025 09:11:25 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737133885; x=1737738685;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=xCWd7FDsSO2NhebTopf6A9YY2ozYshVvujEbGm9jpzo=;
-        b=pcQQvpbwnSyRWnb+zKMfF08FX1hdwrpe6TxeYKI2YBCB5G393n3e0vROWUEymY5vXE
-         iC1BEet/5pNdtmdZh/7RZDZPE3IdBLgNA1W98uKDqveE1O4edXCPOAoAEzpmJXJBm2pU
-         HiqD49leY0PvAlOGQ2r0eOWdu943GUM+RiKMQu7QD/ePbv3s/DhvbomWYQm8+el5isAG
-         hhmcSFTIhFPQqJRMNmpbvOiiA4102WuZlVlrgrSHFOzKYSKm/qPiVtnbijvU2ktTH2IL
-         ny+NpYM1p/EL7OcKFmTqtQKw2jKqGiS7H/Efjnv/d/FOewrp6VQt1a2uxpAJaiFLVbi7
-         +Y3Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUGlDem/Q2f/nKjuYrDtuzkfloGbbslModcepFYGd+3vGvhPkvjvm/BNfAKJHyrH/KfgTkHSIE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzzrl//feq3TytRqlpnLMMZEAfDkkW/DlTyg45GjSICPkUnrDqN
-	TuJkTxk9UJUqzPEH87T5ZZE4GyGS3fTZk4jOGkgeOuT+EnT8/DTOgE0rXby489XT0jJMkC3Q3XN
-	zdZpav0EOsJUKMUk+6Orrr39gkeut7nMo/mJilFl1GxkoGKoBaQtPZRU=
-X-Google-Smtp-Source: AGHT+IHCo3RUQoQW5DbZvos6Ik7lhffXGw9pY1ANsCQQoLOB9sLKHsZCZo4OmqYucEMGBIfvcLRgwiG3VNC/j7gMtGEPLozM66sD
+	s=arc-20240116; t=1737133975; c=relaxed/simple;
+	bh=W5wGK/Y8ktpn6/aur6KV/qLNQ4ace4+kf2KM30SWmns=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jKb2DL22ht5SsEWYn4vnvAOly6uM7az9eMMR7pdAbU8OjT5DK3jWRMJleqwgEXa5ZCj6ljwaBrRMN++RrhKYX+ciieGEA5hUCj+L5c7Raht8baVCSzR25VuMWhbVdZ7Rbr4HS/E4t2Qe2yBoBjQQrgqn5Oel9epq80PSq+2Jn/4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=z+yYSnOi; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=mqIP7LZa; arc=none smtp.client-ip=202.12.124.158
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-10.internal (phl-compute-10.phl.internal [10.202.2.50])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id 0979D254019B;
+	Fri, 17 Jan 2025 12:12:50 -0500 (EST)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-10.internal (MEProxy); Fri, 17 Jan 2025 12:12:50 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm3; t=1737133969; x=
+	1737220369; bh=Sj5SokLTzsfLlMMuekU52yIDWRRKGO0rNyAhA8UBRMA=; b=z
+	+yYSnOi7dCuc8WUp+Bor2BXMoDZXM0ZyiYAjZi2w78hn19vTCXLLQAnJ9nxIFLbt
+	TfVbiGswicQoHKXzscjZ2/KI/vYadIKLahYWQuZofnRPQXV+Nkjj3tFBRMMvQZMD
+	S8G1YJfjI5r9ft6MbFOjMKOavJB/sdwPKonTZg6+b8h+K0/n59JvCWv7KCHsIwPL
+	llBycDF82AkWdrX6RxXWKkokXrCfm6K4oESbEvMd9JTQARTkxbsnIXXIVdkAdEBl
+	IsyIug1SXo2eN5vH0L3vbFaxYyuyzBSso5ztvVDHNXltm3WEApwCnT3LAQxbbfp8
+	QGPIE8qUlgGud8spcsoZw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
+	1737133969; x=1737220369; bh=Sj5SokLTzsfLlMMuekU52yIDWRRKGO0rNyA
+	hA8UBRMA=; b=mqIP7LZaxYNoDPWwl6h2e/L6IwIPKOX14Q/fkN6pt2htWRfMSM3
+	OfAZY5CCgKBuk5HG+slobUtmR4YKAZ72Vn3RxDAY6k43XCVG4wwGXxnsPDEZPhtx
+	eU7a7Rc2V4AkJto4rZSNDK/r8hBYuMLLvQAXDIAQkk3V/9zPKnmjf9uwLbO2ApF6
+	myQdF0hTNPK3qFnEos7hSK9AM2b558Nx6D6qW1miy1RgF2z/yu1nq3J/haZ8LNqn
+	D7i2tLiTWYQ/4BgJGL/xAK6gteP5jVDSJloqQZsfKHovG0txXQfIogdTtZuRLGz/
+	liMEjbOpqovn0if4s5N0An8mSkNpqwdJsjA==
+X-ME-Sender: <xms:kY-KZ87CqiarEEaW8L8RLU5DBvbFki_Wmts0svouj2lrej8g6_X6Hg>
+    <xme:kY-KZ94hmGMx_5sivs82ehWEPPS7nug0r7m9Tvc3m7TKr77zNnvADnq0b852TotxQ
+    hzRuraK41qmuuAwhGk>
+X-ME-Received: <xmr:kY-KZ7c3PMo1RpD5C9H4VcD82dhURMaNiLmSxA3mIYDjg1ujVHBihD8HHX20>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrudeifedgleeiucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
+    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
+    htshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtredttddtjeen
+    ucfhrhhomhepufgrsghrihhnrgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrg
+    hilhdrnhgvtheqnecuggftrfgrthhtvghrnhepgefhffdtvedugfekffejvdeiieelhfet
+    ffeffefghedvvefhjeejvdekfeelgefgnecuffhomhgrihhnpehkvghrnhgvlhdrohhrgh
+    enucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehsuges
+    qhhuvggrshihshhnrghilhdrnhgvthdpnhgspghrtghpthhtohepudefpdhmohguvgepsh
+    hmthhpohhuthdprhgtphhtthhopegrnhhtohhnihhosehophgvnhhvphhnrdhnvghtpdhr
+    tghpthhtoheprhihrgiirghnohhvrdhsrdgrsehgmhgrihhlrdgtohhmpdhrtghpthhtoh
+    epnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepvgguuhhm
+    rgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrd
+    horhhgpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthho
+    peguohhnrghlugdrhhhunhhtvghrsehgmhgrihhlrdgtohhmpdhrtghpthhtohepshhhuh
+    grhheskhgvrhhnvghlrdhorhhgpdhrtghpthhtoheprghnughrvgifodhnvghtuggvvhes
+    lhhunhhnrdgthh
+X-ME-Proxy: <xmx:kY-KZxKPSYlyALeCxvMbftJsAkrHi0xnM6y-Cjb9-UaNqMqv4NlU9w>
+    <xmx:kY-KZwLbt0fJ9bE0ng-L_mZ4VZ9BubSBIUWtdkqgH6Dh9fgx4ap4sg>
+    <xmx:kY-KZyyoytqgXE5IXeVlhyYqw1GjWYV7kA2XlITaFIrIsdz_DA3D6w>
+    <xmx:kY-KZ0K0jt55yLG99Ju9UuyrFbkXtZoHliCBo0Eu3jjxs0zgorevfA>
+    <xmx:kY-KZzZei-E2mWfYlcmF96D9ECa4KVXge4khHHkZuTMkBajplN5EUU8k>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
+ 17 Jan 2025 12:12:48 -0500 (EST)
+Date: Fri, 17 Jan 2025 18:12:46 +0100
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Antonio Quartulli <antonio@openvpn.net>
+Cc: ryazanov.s.a@gmail.com, netdev@vger.kernel.org,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Shuah Khan <shuah@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, Xiao Liang <shaw.leon@gmail.com>
+Subject: Re: [PATCH net-next v18 20/25] ovpn: implement peer
+ add/get/dump/delete via netlink
+Message-ID: <Z4qPjuK3_fQUYLJi@hog>
+References: <20250113-b4-ovpn-v18-0-1f00db9c2bd6@openvpn.net>
+ <20250113-b4-ovpn-v18-20-1f00db9c2bd6@openvpn.net>
+ <Z4pDpqN2hCc-7DGt@hog>
+ <f5507529-e61c-4b81-ab93-4ea6c8df46e9@openvpn.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:160c:b0:3ce:88b1:7f21 with SMTP id
- e9e14a558f8ab-3cf7449070emr29027315ab.15.1737133885397; Fri, 17 Jan 2025
- 09:11:25 -0800 (PST)
-Date: Fri, 17 Jan 2025 09:11:25 -0800
-In-Reply-To: <000000000000a4a7550611e234f5@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <678a8f3d.050a0220.303755.000f.GAE@google.com>
-Subject: Re: [syzbot] [net?] KASAN: slab-use-after-free Read in handle_tx (2)
-From: syzbot <syzbot+827272712bd6d12c79a4@syzkaller.appspotmail.com>
-To: andrew+netdev@lunn.ch, andrew@lunn.ch, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <f5507529-e61c-4b81-ab93-4ea6c8df46e9@openvpn.net>
 
-syzbot has found a reproducer for the following issue on:
+2025-01-17, 13:59:35 +0100, Antonio Quartulli wrote:
+> On 17/01/2025 12:48, Sabrina Dubroca wrote:
+> > 2025-01-13, 10:31:39 +0100, Antonio Quartulli wrote:
+> > >   int ovpn_nl_peer_new_doit(struct sk_buff *skb, struct genl_info *info)
+> > >   {
+> > > -	return -EOPNOTSUPP;
+> > > +	struct nlattr *attrs[OVPN_A_PEER_MAX + 1];
+> > > +	struct ovpn_priv *ovpn = info->user_ptr[0];
+> > > +	struct ovpn_socket *ovpn_sock;
+> > > +	struct socket *sock = NULL;
+> > > +	struct ovpn_peer *peer;
+> > > +	u32 sockfd, peer_id;
+> > > +	int ret;
+> > > +
+> > > +	/* peers can only be added when the interface is up and running */
+> > > +	if (!netif_running(ovpn->dev))
+> > > +		return -ENETDOWN;
+> > 
+> > Since we're not under rtnl_lock here, the device could go down while
+> > we're creating this peer, and we may end up with a down device that
+> > has a peer anyway.
+> 
+> hmm, indeed. This means we must hold the rtnl_lock to prevent ending up in
+> an inconsistent state.
+> 
+> > 
+> > I'm not sure what this (and the peer flushing on NETDEV_DOWN) is
+> > trying to accomplish. Is it a problem to keep peers when the netdevice
+> > is down?
+> 
+> This is the result of my discussion with Sergey that started in v23 5/23:
+> 
+> https://lore.kernel.org/r/netdev/20241029-b4-ovpn-v11-5-de4698c73a25@openvpn.net/
+> 
+> The idea was to match operational state with actual connectivity to peer(s).
+> 
+> Originally I wanted to simply kee the carrier always on, but after further
+> discussion (including the meaning of the openvpn option --persist-tun) we
+> agreed on following the logic where an UP device has a peer connected (logic
+> is slightly different between MP and P2P).
+> 
+> I am not extremely happy with the resulting complexity, but it seemed to be
+> blocker for Sergey.
 
-HEAD commit:    9bffa1ad25b8 Merge tag 'drm-fixes-2025-01-17' of https://g..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=107a69df980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=d1cb4a1f148c0861
-dashboard link: https://syzkaller.appspot.com/bug?extid=827272712bd6d12c79a4
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=15783a18580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=17d6c2b0580000
+[after re-reading that discussion with Sergey]
 
-Downloadable assets:
-disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7feb34a89c2a/non_bootable_disk-9bffa1ad.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/0c65d8091a25/vmlinux-9bffa1ad.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/1d98f79a18b7/bzImage-9bffa1ad.xz
+I don't understand why "admin does 'ip link set tun0 down'" means "we
+should get rid of all peers. For me the carrier situation goes the
+other way: no peer, no carrier (as if I unplugged the cable from my
+ethernet card), and it's independent of what the user does (ip link
+set XXX up/down). You have that with netif_carrier_{on,off}, but
+flushing peers when the admin does "ip link set tun0 down" is separate
+IMO.
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+827272712bd6d12c79a4@syzkaller.appspotmail.com
+[...]
+> > >   int ovpn_nl_peer_del_doit(struct sk_buff *skb, struct genl_info *info)
+> > >   {
+> > > -	return -EOPNOTSUPP;
+> > > +	struct nlattr *attrs[OVPN_A_PEER_MAX + 1];
+> > > +	struct ovpn_priv *ovpn = info->user_ptr[0];
+> > > +	struct ovpn_peer *peer;
+> > > +	u32 peer_id;
+> > > +	int ret;
+> > > +
+> > > +	if (GENL_REQ_ATTR_CHECK(info, OVPN_A_PEER))
+> > > +		return -EINVAL;
+> > > +
+> > > +	ret = nla_parse_nested(attrs, OVPN_A_PEER_MAX, info->attrs[OVPN_A_PEER],
+> > > +			       ovpn_peer_nl_policy, info->extack);
+> > > +	if (ret)
+> > > +		return ret;
+> > > +
+> > > +	if (NL_REQ_ATTR_CHECK(info->extack, info->attrs[OVPN_A_PEER], attrs,
+> > > +			      OVPN_A_PEER_ID))
+> > > +		return -EINVAL;
+> > > +
+> > > +	peer_id = nla_get_u32(attrs[OVPN_A_PEER_ID]);
+> > > +	peer = ovpn_peer_get_by_id(ovpn, peer_id);
+> > > +	if (!peer) {
+> > > +		NL_SET_ERR_MSG_FMT_MOD(info->extack,
+> > > +				       "cannot find peer with id %u", peer_id);
+> > > +		return -ENOENT;
+> > > +	}
+> > > +
+> > > +	netdev_dbg(ovpn->dev, "del peer %u\n", peer->id);
+> > > +	ret = ovpn_peer_del(peer, OVPN_DEL_PEER_REASON_USERSPACE);
+> > 
+> > With the delayed socket release (which is similar to what was in v11,
+> > but now with refcounting on the netdevice which should make
+> > rtnl_link_unregister in ovpn_cleanup wait [*]), we may return to
+> > userspace as if the peer was gone, but the socket hasn't been detached
+> > yet.
+> > 
+> > A userspace application that tries to remove the peer and immediately
+> > re-create it with the same socket could get EBUSY if the workqueue
+> > hasn't done its job yet. That would be quite confusing to the
+> > application.
+> 
+> This may happen only for TCP, because in the UDP case we would increase the
+> refcounter and keep the socket attached.
 
-==================================================================
-BUG: KASAN: slab-use-after-free in handle_tx+0x5a5/0x630 drivers/net/caif/caif_serial.c:236
-Read of size 8 at addr ffff888027ef3020 by task aoe_tx0/1417
+Not if we're re-attaching to a different ovpn instance/netdevice.
 
-CPU: 3 UID: 0 PID: 1417 Comm: aoe_tx0 Not tainted 6.13.0-rc7-syzkaller-00149-g9bffa1ad25b8 #0
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:94 [inline]
- dump_stack_lvl+0x116/0x1f0 lib/dump_stack.c:120
- print_address_description mm/kasan/report.c:378 [inline]
- print_report+0xc3/0x620 mm/kasan/report.c:489
- kasan_report+0xd9/0x110 mm/kasan/report.c:602
- handle_tx+0x5a5/0x630 drivers/net/caif/caif_serial.c:236
- __netdev_start_xmit include/linux/netdevice.h:5002 [inline]
- netdev_start_xmit include/linux/netdevice.h:5011 [inline]
- xmit_one net/core/dev.c:3620 [inline]
- dev_hard_start_xmit+0x9a/0x7b0 net/core/dev.c:3636
- __dev_queue_xmit+0x7f0/0x43e0 net/core/dev.c:4466
- dev_queue_xmit include/linux/netdevice.h:3168 [inline]
- tx+0xcc/0x190 drivers/block/aoe/aoenet.c:62
- kthread+0x1e7/0x3c0 drivers/block/aoe/aoecmd.c:1237
- kthread+0x2c1/0x3a0 kernel/kthread.c:389
- ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
- </TASK>
+> 
+> However, re-attaching the same TCP socket is hardly going to happen (in TCP
+> we have one socket per peer, therefore if the peer is going away, we're most
+> likely killing the socket too).
+> 
+> This said, the complexity added by the completion seems quite tiny,
+> therefore I'll add the code you are suggesting below.
 
-Allocated by task 9336:
- kasan_save_stack+0x33/0x60 mm/kasan/common.c:47
- kasan_save_track+0x14/0x30 mm/kasan/common.c:68
- poison_kmalloc_redzone mm/kasan/common.c:377 [inline]
- __kasan_kmalloc+0xaa/0xb0 mm/kasan/common.c:394
- kmalloc_noprof include/linux/slab.h:901 [inline]
- kzalloc_noprof include/linux/slab.h:1037 [inline]
- alloc_tty_struct+0x98/0x8d0 drivers/tty/tty_io.c:3116
- tty_init_dev.part.0+0x1e/0x660 drivers/tty/tty_io.c:1409
- tty_init_dev include/linux/err.h:67 [inline]
- tty_open_by_driver drivers/tty/tty_io.c:2082 [inline]
- tty_open+0xac1/0xf80 drivers/tty/tty_io.c:2129
- chrdev_open+0x237/0x6a0 fs/char_dev.c:414
- do_dentry_open+0xf59/0x1ea0 fs/open.c:945
- vfs_open+0x82/0x3f0 fs/open.c:1075
- do_open fs/namei.c:3828 [inline]
- path_openat+0x1e6a/0x2d60 fs/namei.c:3987
- do_filp_open+0x20c/0x470 fs/namei.c:4014
- do_sys_openat2+0x17a/0x1e0 fs/open.c:1402
- do_sys_open fs/open.c:1417 [inline]
- __do_sys_openat fs/open.c:1433 [inline]
- __se_sys_openat fs/open.c:1428 [inline]
- __x64_sys_openat+0x175/0x210 fs/open.c:1428
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xcd/0x250 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
+Ok.
 
-Freed by task 3233:
- kasan_save_stack+0x33/0x60 mm/kasan/common.c:47
- kasan_save_track+0x14/0x30 mm/kasan/common.c:68
- kasan_save_free_info+0x3b/0x60 mm/kasan/generic.c:582
- poison_slab_object mm/kasan/common.c:247 [inline]
- __kasan_slab_free+0x51/0x70 mm/kasan/common.c:264
- kasan_slab_free include/linux/kasan.h:233 [inline]
- slab_free_hook mm/slub.c:2353 [inline]
- slab_free mm/slub.c:4613 [inline]
- kfree+0x14f/0x4b0 mm/slub.c:4761
- process_one_work+0x9c5/0x1ba0 kernel/workqueue.c:3236
- process_scheduled_works kernel/workqueue.c:3317 [inline]
- worker_thread+0x6c8/0xf00 kernel/workqueue.c:3398
- kthread+0x2c1/0x3a0 kernel/kthread.c:389
- ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
-
-Last potentially related work creation:
- kasan_save_stack+0x33/0x60 mm/kasan/common.c:47
- __kasan_record_aux_stack+0xba/0xd0 mm/kasan/generic.c:544
- insert_work+0x36/0x230 kernel/workqueue.c:2183
- __queue_work+0x97e/0x1080 kernel/workqueue.c:2339
- queue_work_on+0x11a/0x140 kernel/workqueue.c:2390
- kref_put include/linux/kref.h:65 [inline]
- tty_kref_put drivers/tty/tty_io.c:1566 [inline]
- tty_kref_put drivers/tty/tty_io.c:1563 [inline]
- release_tty+0x4de/0x5d0 drivers/tty/tty_io.c:1602
- tty_release_struct+0xb7/0xe0 drivers/tty/tty_io.c:1701
- tty_release+0xe25/0x1410 drivers/tty/tty_io.c:1861
- __fput+0x3f8/0xb60 fs/file_table.c:450
- __fput_sync+0xa1/0xc0 fs/file_table.c:535
- __do_sys_close fs/open.c:1554 [inline]
- __se_sys_close fs/open.c:1539 [inline]
- __x64_sys_close+0x86/0x100 fs/open.c:1539
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xcd/0x250 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-The buggy address belongs to the object at ffff888027ef3000
- which belongs to the cache kmalloc-cg-2k of size 2048
-The buggy address is located 32 bytes inside of
- freed 2048-byte region [ffff888027ef3000, ffff888027ef3800)
-
-The buggy address belongs to the physical page:
-page: refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x27ef0
-head: order:3 mapcount:0 entire_mapcount:0 nr_pages_mapped:0 pincount:0
-memcg:ffff88802da23f81
-flags: 0xfff00000000040(head|node=0|zone=1|lastcpupid=0x7ff)
-page_type: f5(slab)
-raw: 00fff00000000040 ffff88801b050140 dead000000000100 dead000000000122
-raw: 0000000000000000 0000000000080008 00000001f5000000 ffff88802da23f81
-head: 00fff00000000040 ffff88801b050140 dead000000000100 dead000000000122
-head: 0000000000000000 0000000000080008 00000001f5000000 ffff88802da23f81
-head: 00fff00000000003 ffffea00009fbc01 ffffffffffffffff 0000000000000000
-head: 0000000000000008 0000000000000000 00000000ffffffff 0000000000000000
-page dumped because: kasan: bad access detected
-page_owner tracks the page as allocated
-page last allocated via order 3, migratetype Unmovable, gfp_mask 0xd20c0(__GFP_IO|__GFP_FS|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP|__GFP_NOMEMALLOC), pid 5950, tgid 5950 (syz-executor374), ts 92233424258, free_ts 92129665975
- set_page_owner include/linux/page_owner.h:32 [inline]
- post_alloc_hook+0x2d1/0x350 mm/page_alloc.c:1558
- prep_new_page mm/page_alloc.c:1566 [inline]
- get_page_from_freelist+0xfce/0x2f80 mm/page_alloc.c:3476
- __alloc_pages_noprof+0x223/0x25b0 mm/page_alloc.c:4753
- alloc_pages_mpol_noprof+0x2c8/0x620 mm/mempolicy.c:2269
- alloc_slab_page mm/slub.c:2423 [inline]
- allocate_slab mm/slub.c:2589 [inline]
- new_slab+0x2c9/0x410 mm/slub.c:2642
- ___slab_alloc+0xd7d/0x17a0 mm/slub.c:3830
- __slab_alloc.constprop.0+0x56/0xb0 mm/slub.c:3920
- __slab_alloc_node mm/slub.c:3995 [inline]
- slab_alloc_node mm/slub.c:4156 [inline]
- __do_kmalloc_node mm/slub.c:4297 [inline]
- __kmalloc_node_noprof+0x2f0/0x510 mm/slub.c:4304
- __kvmalloc_node_noprof+0xad/0x1a0 mm/util.c:645
- kvmalloc_array_node_noprof include/linux/slab.h:1063 [inline]
- alloc_fdtable+0xee/0x2b0 fs/file.c:199
- dup_fd+0x83b/0xb90 fs/file.c:400
- copy_files kernel/fork.c:1797 [inline]
- copy_process+0x25d2/0x8e50 kernel/fork.c:2382
- kernel_clone+0xfd/0x960 kernel/fork.c:2806
- __do_sys_clone+0xba/0x100 kernel/fork.c:2949
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xcd/0x250 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-page last free pid 6083 tgid 6083 stack trace:
- reset_page_owner include/linux/page_owner.h:25 [inline]
- free_pages_prepare mm/page_alloc.c:1127 [inline]
- free_unref_page+0x661/0x1080 mm/page_alloc.c:2659
- __put_partials+0x14c/0x170 mm/slub.c:3157
- qlink_free mm/kasan/quarantine.c:163 [inline]
- qlist_free_all+0x4e/0x120 mm/kasan/quarantine.c:179
- kasan_quarantine_reduce+0x195/0x1e0 mm/kasan/quarantine.c:286
- __kasan_slab_alloc+0x69/0x90 mm/kasan/common.c:329
- kasan_slab_alloc include/linux/kasan.h:250 [inline]
- slab_post_alloc_hook mm/slub.c:4119 [inline]
- slab_alloc_node mm/slub.c:4168 [inline]
- kmem_cache_alloc_noprof+0x226/0x3d0 mm/slub.c:4175
- getname_flags.part.0+0x4c/0x550 fs/namei.c:139
- getname_flags include/linux/audit.h:322 [inline]
- getname+0x8d/0xe0 fs/namei.c:223
- getname_maybe_null include/linux/fs.h:2796 [inline]
- vfs_fstatat+0xdf/0xf0 fs/stat.c:361
- __do_sys_newfstatat+0xa2/0x130 fs/stat.c:530
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xcd/0x250 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-Memory state around the buggy address:
- ffff888027ef2f00: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
- ffff888027ef2f80: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
->ffff888027ef3000: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-                               ^
- ffff888027ef3080: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
- ffff888027ef3100: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-==================================================================
-
-
----
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+-- 
+Sabrina
 
