@@ -1,121 +1,134 @@
-Return-Path: <netdev+bounces-159147-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159148-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 155C1A14843
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 03:29:52 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 02F37A14850
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 03:37:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 40DF916B609
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 02:29:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 79B003A969A
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 02:37:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E6811F63DE;
-	Fri, 17 Jan 2025 02:29:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B023C25A620;
+	Fri, 17 Jan 2025 02:37:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ROdTIsTr"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38BB217084F;
-	Fri, 17 Jan 2025 02:29:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFAC638DE3;
+	Fri, 17 Jan 2025 02:37:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737080979; cv=none; b=ZFnxZIwcOD+RwmYV8fMhJBH0ZXu4JgdzTMeAlLRWjXlkXxl0d75TCgRXnun/7+z4r2wQhzuclQTzTKryEI43H3UYS0+THIuJSW7qEXupHanf13HVlW6WoB4DpKDeKyHxDmYsIs/Ni60fAJu5IIY68f7Jkqw00Ff8Bhb7S6maYi4=
+	t=1737081474; cv=none; b=b3fWR/AxYgx7a/Nh8wOp5wsPIlDLTAPCYXrePp6f1JCal9N3ljSNob12DLaQ3WVEZGEBjalKyWJsS6+oDzIc5Og2zEQxpUhfpc9cw501oiMTDwWruUbVfv7TmS6DQOl0YHIKBlAZB6FwHRIi7OKbrxoJ5H/dMp4ojNlXNJleuEM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737080979; c=relaxed/simple;
-	bh=iAnulAQsHBGkAS3rZ7bUQ1TN3luTGy4FNkIZEmYp5Fw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=uSryLkK99GripBfblz7vR2ENeRPnpY1Dhd7HAilzqzxL9of2cl0EaYVpL1v7sHpmt/C5S78ws/MRxf2/edfm2xeXtHAukIZFJgg0+JfLW0utIo/GNo3YFOblDTET3ldTwQQTVBhndsROib1ogAiWMJC0BygIYTzEWLWXVHcel8M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.17])
-	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4YZ3XX5ngDz22lPX;
-	Fri, 17 Jan 2025 10:27:08 +0800 (CST)
-Received: from kwepemf100006.china.huawei.com (unknown [7.202.181.220])
-	by mail.maildlp.com (Postfix) with ESMTPS id 335E71A0188;
-	Fri, 17 Jan 2025 10:29:33 +0800 (CST)
-Received: from [10.174.177.210] (10.174.177.210) by
- kwepemf100006.china.huawei.com (7.202.181.220) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Fri, 17 Jan 2025 10:29:31 +0800
-Message-ID: <58bf9d83-b58d-e5a6-4096-64eb96f3854a@huawei.com>
-Date: Fri, 17 Jan 2025 10:29:31 +0800
+	s=arc-20240116; t=1737081474; c=relaxed/simple;
+	bh=hcw68fNYyG1DCwRB2lxQzffiVC7LXU7caQ6dSHDepNI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=KBZ2B78X7dKhuErjKkQ17LksqrbQmjmomzvxlBVkptT2Q8P097qa2Jiz5uN1yN74kjH4OkvmHStOCQDu/zHQp78KGaYNlReIc9Wkz1I4kddrOD/zxRArSF0TWmXKqN3EQtHzQgEqUgQ7eMTSeExIsyXu61sxGdiqhIh7X7DvHPQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ROdTIsTr; arc=none smtp.client-ip=209.85.218.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-ab38a8ad61bso55742966b.3;
+        Thu, 16 Jan 2025 18:37:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1737081471; x=1737686271; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=TdxH+rVX2v44Nsl5timtDCzBYhVYgdi4rasFbxAjVOs=;
+        b=ROdTIsTrIoGVdb7Z8Atr45jjGGZN6OF1daqlENh8gJxmFiWHFanbYCSzDZvquBaTbk
+         Q9OFJW038u0fcQZsaCkJvn4ei1kC4UQA3fzDpNxe3sfHDcTxX3YHm0s50H5ZTMJxZA9r
+         8xMGKq4E/iq5H15FVN2IimjoWwAkpW+tM17lJU0bUkfJ/Kz4YMpIOs4Q5M0aJOJyVY4A
+         JHTlkNzG92GLev4CHgJ5oJIRlweeMgaRlcs3wFv1ziKGFBYdNai9LFtWYk/pQvPdhrdd
+         M+JZDBqZ0xzo+FClWGlCfHY4BMvJbUraE/zRLk6RdMClef/e0PI3H7sX6x9RJujCAC/X
+         8lbg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737081471; x=1737686271;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=TdxH+rVX2v44Nsl5timtDCzBYhVYgdi4rasFbxAjVOs=;
+        b=lpAvnq+w//ehEoVhlXo9xF6A+gpFd1PqZmRgdzQ7R7onGrmz65SfRbYNMbWl8p8aHc
+         4SglbFsSoJ8MrqA9PREjN9kUS0YGnyX03lPws47E+XoGjoRRoUVppWOchAwPWJs/p4E9
+         3a3AJDtS3Q2hA58vUiGN540QCyPcyDhXpcSe2EY6RKbwEjBtbGHvT+Bt/bAo1ktosFnt
+         4B+XSB+WOEzVQp/lpqFsBhsNMZfazSM9j5Dplr3mPESi/pYrxUWOLWVpZCcBN1wifSi0
+         VdpfTj8/07noeRqCpG7iK3E7d56hCthmXuIJola8lCiqpwGMSySzOL3yCUdNnkROE3yD
+         pACQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUWLadtmPRyhgfh33z1pd/oR9crRHQHn0PpIUTpPtxntdccjgQHMqRY1V/YYzugNprllP/VBHA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxMMzaLgi2vAONG72X5fAb76BJ7EanQwLi17N0PapiHtX9BnZhj
+	XQMGNUcBULuZ8K8W+9LQ099JB4G0svfPCatYrn9PrEz3aUIVomy3
+X-Gm-Gg: ASbGnctHlmiESUHqSJ3HxIfWiVmydf+nKtZFw0DrGDorgUp7ToO+7g8+lFnglEKd6mV
+	QrAN2Atl/08Mv/Ug41pXnua9uGxFKSUy2r4SY9xi3ItYb/V/9s80AjRLMaLpxXG+EqPOcw9N5ws
+	5JZDLc4lHUK/9wsfPql4fJ1BZp9yO/NbmaIWY++zEHTIMeGKBI8/+UdIuaFyov+8/lx8AGKv0ol
+	7Z+31jV/o6RUXGnX+jf0ewMr7k1JLSStJ3GA330CjpPcId7Zk6S3/d+9xTdAVwcXyY=
+X-Google-Smtp-Source: AGHT+IH1kCsSx7eANFle2Gb/tMxWxvlJraguq/FN0O/YA2aY06NCuT2UnqBzQFVnRwPC++DGaV7x+A==
+X-Received: by 2002:a17:907:7207:b0:ab3:8b1:12aa with SMTP id a640c23a62f3a-ab38b0a2216mr93577566b.8.1737081470912;
+        Thu, 16 Jan 2025 18:37:50 -0800 (PST)
+Received: from [192.168.8.100] ([148.252.147.234])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ab384c60746sm89498266b.4.2025.01.16.18.37.49
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 16 Jan 2025 18:37:50 -0800 (PST)
+Message-ID: <9c8e9ad4-22ab-4727-a345-f8e403c55294@gmail.com>
+Date: Fri, 17 Jan 2025 02:38:33 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.1
-Subject: Re: [PATCH] SUNRPC: Set tk_rpc_status when RPC_TASK_SIGNALLED is
- detected
-To: Trond Myklebust <trondmy@hammerspace.com>, "horms@kernel.org"
-	<horms@kernel.org>, "davem@davemloft.net" <davem@davemloft.net>,
-	"chuck.lever@oracle.com" <chuck.lever@oracle.com>, "pabeni@redhat.com"
-	<pabeni@redhat.com>, "okorniev@redhat.com" <okorniev@redhat.com>,
-	"anna@kernel.org" <anna@kernel.org>, "lilingfeng3@huawei.com"
-	<lilingfeng3@huawei.com>, "Dai.Ngo@oracle.com" <Dai.Ngo@oracle.com>,
-	"jlayton@kernel.org" <jlayton@kernel.org>, "neilb@suse.de" <neilb@suse.de>,
-	"tom@talpey.com" <tom@talpey.com>, "edumazet@google.com"
-	<edumazet@google.com>, "kuba@kernel.org" <kuba@kernel.org>
-CC: "lilingfeng@huaweicloud.com" <lilingfeng@huaweicloud.com>,
-	"houtao1@huawei.com" <houtao1@huawei.com>, "linux-nfs@vger.kernel.org"
-	<linux-nfs@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "yukuai1@huaweicloud.com"
-	<yukuai1@huaweicloud.com>, "yi.zhang@huawei.com" <yi.zhang@huawei.com>
-References: <20250114144101.2511043-1-lilingfeng3@huawei.com>
- <fed3cd85-0a15-ae30-b167-84881d6a5efd@huawei.com>
- <642413c4bdbe296db722f0091ffa5190c992eb8e.camel@hammerspace.com>
-From: yangerkun <yangerkun@huawei.com>
-In-Reply-To: <642413c4bdbe296db722f0091ffa5190c992eb8e.camel@hammerspace.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- kwepemf100006.china.huawei.com (7.202.181.220)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v11 17/21] io_uring/zcrx: set pp memory provider
+ for an rx queue
+To: Jakub Kicinski <kuba@kernel.org>, David Wei <dw@davidwei.uk>
+Cc: io-uring@vger.kernel.org, netdev@vger.kernel.org,
+ Jens Axboe <axboe@kernel.dk>, Paolo Abeni <pabeni@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jesper Dangaard Brouer <hawk@kernel.org>, David Ahern <dsahern@kernel.org>,
+ Mina Almasry <almasrymina@google.com>,
+ Stanislav Fomichev <stfomichev@gmail.com>, Joe Damato <jdamato@fastly.com>,
+ Pedro Tammela <pctammela@mojatatu.com>
+References: <20250116231704.2402455-1-dw@davidwei.uk>
+ <20250116231704.2402455-18-dw@davidwei.uk>
+ <20250116181349.623471eb@kernel.org>
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <20250116181349.623471eb@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-
-
-在 2025/1/17 4:52, Trond Myklebust 写道:
-> On Thu, 2025-01-16 at 19:43 +0800, yangerkun wrote:
->> Hi,
->>
->> Thanks for the patch.
->>
->> Before 39494194f93b("SUNRPC: Fix races with rpc_killall_tasks()",
->> every
->> time we set RPC_TASK_SIGNALLED, when we go through __rpc_execute,
->> this
->> rpc_task will immediate break and exist.
->>
->> However after that, __rpc_execute won't judge RPC_TASK_SIGNNALED, so
->> for
->> the case like you point out below, even after your commit
->> rpc_check_timeout will help break and exist eventually, but this
->> rpc_task has already do some work. I prefer reintroduce judging
->> RPC_TASK_SIGNNALED in __rpc_execute to help exist immediatly.
->>
+On 1/17/25 02:13, Jakub Kicinski wrote:
+> On Thu, 16 Jan 2025 15:16:59 -0800 David Wei wrote:
+>> +static void io_close_queue(struct io_zcrx_ifq *ifq)
+>> +{
+>> +	struct net_device *netdev;
+>> +	netdevice_tracker netdev_tracker;
+>> +	struct pp_memory_provider_params p = {
+>> +		.mp_ops = &io_uring_pp_zc_ops,
+>> +		.mp_priv = ifq,
+>> +	};
+>> +
+>> +	if (ifq->if_rxq == -1)
+>> +		return;
+>> +
+>> +	spin_lock(&ifq->lock);
+>> +	netdev = ifq->netdev;
+>> +	netdev_tracker = ifq->netdev_tracker;
+>> +	ifq->netdev = NULL;
+>> +	spin_unlock(&ifq->lock);
+>> +
+>> +	if (netdev)
+>> +		net_mp_close_rxq(netdev, ifq->if_rxq, &p);
+>> +	ifq->if_rxq = -1;
+>> +}
 > 
-> Better yet... Let's get rid of the RPC_TASK_SIGNALLED flag altogether
-> and just replace
-> 
-> #define RPC_TASK_SIGNALLED(task) (READ_ONCE(task->tk_rpc_status) == -ERESTARTSYS)
+> Did you mean to call netdev_put() somewhere here? :S
 
-Hi,
+yeah, it's missed
 
-Thanks for your reply! Yeah, if all the places where tk_rpc_status is
-updated are by calling rpc_task_set_rpc_status, we can use
-task->tk_rpc_status == -ERESTARTSYS to determine whether rpc_task is
-RPC_TASK_SIGNALLED. But for the case like Li has provided,
-__rpc_restart_call won't do this, and will overwrite tk_rpc_status 
-unconditionally. This won't be a stable solution. Maybe it's better to
-change __rpc_restart_call calling rpc_task_set_rpc_status too? And
-__rpc_execute will be enough to help solve this case.
+-- 
+Pavel Begunkov
 
-> 
-> There is no good reason to try to maintain two completely separate
-> sources of truth to describe the same task state.
-> 
 
