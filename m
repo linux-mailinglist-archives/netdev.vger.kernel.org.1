@@ -1,99 +1,157 @@
-Return-Path: <netdev+bounces-159193-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159194-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A6B35A14B88
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 09:56:38 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB19EA14BAE
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 09:59:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D8DEF169071
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 08:56:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A866418821DD
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 08:58:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 805FD1F91E0;
-	Fri, 17 Jan 2025 08:56:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bcCaU9Nm"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD13E1F9A80;
+	Fri, 17 Jan 2025 08:57:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtpbg150.qq.com (smtpbg150.qq.com [18.132.163.193])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47FDB1F754C;
-	Fri, 17 Jan 2025 08:56:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BC0B1F9A9C
+	for <netdev@vger.kernel.org>; Fri, 17 Jan 2025 08:57:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.132.163.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737104194; cv=none; b=qpCCwADHNiPicxCMUOu71bTJANA3xx0gegDFRb2w8nlz/LbcYPp0ADxS2e5RHTuU97ZcaOq0orqxY3ibjnLONHkAI+al0NF79lGeCzODGmh3aUdb2lV5vb1ZIXsnzg+9KGiErmMOKycxR9uMt3BqOAEUID0P9m9iH5l+yM/ZmDM=
+	t=1737104252; cv=none; b=MH9Vg0ypmShl6w4VkwY4IHOHKEchXplo4uiz+vu1L4RyE5jZYdm9E+UTaIWW5tZV6fFhkIU/LODUxwRuWt2SEqob/ev0emf9wbcN2FxnZk3pHBx03uRIUqX8qryPfnNkh05qpBoNKVMFbEvmSImK0qjQ9GjCZ85xl1Tp3hRB5yE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737104194; c=relaxed/simple;
-	bh=AGecMXknwWlOL9Fox1ctaYE4gI/yBsQgeqsHWg2+DSg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NDBC/+GQwuOMJF2Ladm76IoVBxF6U9B/fUCpQ9CBGMRvdKl6zv74zfpePydYJ1TdhDxcPjJeb1An8qpl4yoqdXwJlqPXO3c9r5utUXnlvfeeyzekn7SyGTMydnYMFfKVypf8nT80hKjST7mFNJ44u+SFu8oqZ2ABOhcUW3wT4R4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bcCaU9Nm; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3B97AC4CEDD;
-	Fri, 17 Jan 2025 08:56:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737104193;
-	bh=AGecMXknwWlOL9Fox1ctaYE4gI/yBsQgeqsHWg2+DSg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=bcCaU9Nmz4y5WH7lpnIvowjmu7oCMjtxBlat7dk/JvMGcs600tqqVY/k/ZHhSeLXJ
-	 VtqieNWVdwh6gDxSVHu6SyRCE08GStGeVbsy52i9rqWgKw9qzdN/NUlQasatf+3pww
-	 rDXlePwqtFDbgNiyfX6FGlajRPlybQjQ5Y8WmnDj8gz97R/29KNeVkEIKgkQZj1YMo
-	 I/qszuDnBTihO2kjjZKFbzqWlZ6BksjP4POnno1dBFLU3ekv6ZU4wAV8tihlui9Etf
-	 Xg7RymFER80RGn+G+1zdMkvfh2kFP1wm56gobVaNcMfTtOD2bXobdt8tRgo3wTP8En
-	 Kj1QvaLdI6iBQ==
-Date: Fri, 17 Jan 2025 09:56:30 +0100
-From: Krzysztof Kozlowski <krzk@kernel.org>
-To: Catalin Popescu <catalin.popescu@leica-geosystems.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org, 
-	conor+dt@kernel.org, johannes@sipsolutions.net, p.zabel@pengutronix.de, 
-	netdev@vger.kernel.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-wireless@vger.kernel.org, m.felsch@pengutronix.de, 
-	bsp-development.geo@leica-geosystems.com
-Subject: Re: [PATCH net-next v2 1/2] dt-bindings: net: rfkill-gpio: enable
- booting in blocked state
-Message-ID: <20250117-truthful-reindeer-of-perception-496bd4@krzk-bin>
-References: <20250116084702.3473176-1-catalin.popescu@leica-geosystems.com>
+	s=arc-20240116; t=1737104252; c=relaxed/simple;
+	bh=vXITqcaO71wcfi7Zt+zUrFW5/yV6v4Y8t5L633JXoKI=;
+	h=From:To:Cc:References:In-Reply-To:Subject:Date:Message-ID:
+	 MIME-Version:Content-Type; b=JhkC1H2mrl7SErHyWKLEONy730Q0I+LuGSBJdqGaJQSZzBeO2eW4eY17QgmgbaXllATsFMF6dbJ+luCWPCG0zCJR1IikdVt04FDzy9hAS7HtQ9H5Csyv6XShgMpsIk84Py3djLS+RIpryH2MjAsDsOh5OOT8d3+h4eFVxzVuXu4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=18.132.163.193
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
+X-QQ-mid:Yeas8t1737104195t105t50410
+Received: from 3DB253DBDE8942B29385B9DFB0B7E889 (jiawenwu@trustnetic.com [36.24.187.167])
+X-QQ-SSF:0000000000000000000000000000000
+From: =?utf-8?b?Smlhd2VuIFd1?= <jiawenwu@trustnetic.com>
+X-BIZMAIL-ID: 13642672395322382177
+To: "'Russell King \(Oracle\)'" <linux@armlinux.org.uk>,
+	"'Andrew Lunn'" <andrew@lunn.ch>,
+	"'Heiner Kallweit'" <hkallweit1@gmail.com>,
+	<mengyuanlou@net-swift.com>
+Cc: "'Alexandre Torgue'" <alexandre.torgue@foss.st.com>,
+	"'Andrew Lunn'" <andrew+netdev@lunn.ch>,
+	"'Bryan Whitehead'" <bryan.whitehead@microchip.com>,
+	"'David S. Miller'" <davem@davemloft.net>,
+	"'Eric Dumazet'" <edumazet@google.com>,
+	"'Jakub Kicinski'" <kuba@kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>,
+	<linux-stm32@st-md-mailman.stormreply.com>,
+	"'Marcin Wojtas'" <marcin.s.wojtas@gmail.com>,
+	"'Maxime Coquelin'" <mcoquelin.stm32@gmail.com>,
+	<netdev@vger.kernel.org>,
+	"'Paolo Abeni'" <pabeni@redhat.com>,
+	<UNGLinuxDriver@microchip.com>
+References: <Z4gdtOaGsBhQCZXn@shell.armlinux.org.uk>
+In-Reply-To: <Z4gdtOaGsBhQCZXn@shell.armlinux.org.uk>
+Subject: RE: [PATCH net-next 0/9] net: add phylink managed EEE support
+Date: Fri, 17 Jan 2025 16:56:34 +0800
+Message-ID: <06d301db68bd$b59d3c90$20d7b5b0$@trustnetic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250116084702.3473176-1-catalin.popescu@leica-geosystems.com>
+Content-Type: text/plain;
+	charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+X-Mailer: Microsoft Outlook 16.0
+Content-Language: zh-cn
+Thread-Index: AQJuuL6961zeRYLpn6fcQniPsxo8VLH0BglA
+X-QQ-SENDSIZE: 520
+Feedback-ID: Yeas:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz8a-1
+X-QQ-XMAILINFO: NfPsrf/HTJYA0FB+FKFb+twO+nReN9JwUckHktUCQiiqU8jhsDc10wky
+	XT22GKLtNkX1+oGYVbKqm/GtNzNKMQhsR6BE1DEGtmIvHVp2kw+5KFzzq1ch9VFT/xDcZxM
+	MDoPayJKQRfMQBts7Shr8bFBTl6mXgLEIgQcd4ZrrofFLnbJD+xRjqKXHfrtBF757+QBRbc
+	SLLfhMGyvlHNL8YdDxyGRf3aCZkaN6BwZTi11pk3cC6n+HqND/nOCeiXO8AYoZlIUA2WgmL
+	xBWPhpJNb8Wj38o+7APUvlx5iX9qKi5G4dQZNaWA8fKmxuJOFma3L2yTbq+IdHEW5F9Ft49
+	tP6M+ICnSqRdRhMlVZyvJTIFHJ6g9xun5WDT+xvkJMCs9GG2UiAQuErGNI+78B8X4/hepEl
+	vPeYOlcQUOcXM5bhRpXTahXyfmDu9OgyiD1Y8ynPJxeCE+tm/oxurjeORusHO5t+vRWliUD
+	3pRyxrtfVzt0ORvDfS6SOH8FJb0k8x0oO1XoMsdPIn1NH02x4gZVsU03QwCoSHlbYEkoOPf
+	tjiD5QvoWCD1NfJAi1XW0NBFVKssLEkb6Y/rjmoRoNifFipFOfZy5P8ecTXVbR8yLw6iErN
+	mO+dQktVBtxSdspY7nSfehSafxTghd4FICZ/oShxC+pQPfQ41jAjOHhQ2loQ/wlGkblPdMd
+	EWZTKWtd45gkM9qTFbRWOOiQ9Gxy4qCHq7pgFAM6xIK01fb6QTBZKDSr8VT9hIG8Q38ZXef
+	JPw7a9siCy4bPrarGgorATuqmoDHkHQGP3GqRpUaDQvp2GJAAkZccBr33civBy9kJQvqLaT
+	1DHC4rY61pwa4lsthufv5B0GgX3PgNNzZaiahcxzT+4z4Z5r8R5tRLjQoSwGGBANWgZUz4X
+	LTfSx6NgiXbeIxpJZ96QBc/hbSO50jT2LKtYZWUDnU1aUmwhpDh8v6of3XTf1a8kz2lvD4C
+	ibm61ao7eaRLeweSGx28KvoS5q+lyXCkRLDFT+SeKntEZZBfz3Kj0ANPW2GfmOaRqzSM=
+X-QQ-XMRINFO: NS+P29fieYNw95Bth2bWPxk=
+X-QQ-RECHKSPAM: 0
 
-On Thu, Jan 16, 2025 at 09:47:01AM +0100, Catalin Popescu wrote:
-> By default, rfkill state is set to unblocked. Sometimes, we want to boot
-> in blocked state and let the application unblock the rfkill.
+> Hi,
 > 
-> Signed-off-by: Catalin Popescu <catalin.popescu@leica-geosystems.com>
-> ---
-> Changes in v2:
->  - change "default-blocked" type from boolean to flag
-> ---
->  Documentation/devicetree/bindings/net/rfkill-gpio.yaml | 5 +++++
->  1 file changed, 5 insertions(+)
+> Adding managed EEE support to phylink has been on the cards ever since
+> the idea in phylib was mooted. This overly large series attempts to do
+> so. I've included all the patches as it's important to get the driver
+> patches out there.
 > 
-> diff --git a/Documentation/devicetree/bindings/net/rfkill-gpio.yaml b/Documentation/devicetree/bindings/net/rfkill-gpio.yaml
-> index 9630c8466fac..4a706a41ab38 100644
-> --- a/Documentation/devicetree/bindings/net/rfkill-gpio.yaml
-> +++ b/Documentation/devicetree/bindings/net/rfkill-gpio.yaml
-> @@ -32,6 +32,10 @@ properties:
->    shutdown-gpios:
->      maxItems: 1
->  
-> +  default-blocked:
-> +    $ref: /schemas/types.yaml#/definitions/flag
-> +    description: configure rfkill state as blocked at boot
+> Patch 1 adds a definition for the clock stop capable bit in the PCS
+> MMD status register.
+> 
+> Patch 2 adds a phylib API to query whether the PHY allows the transmit
+> xMII clock to be stopped while in LPI mode. This capability is for MAC
+> drivers to save power when LPI is active, to allow them to stop their
+> transmit clock.
+> 
+> Patch 3 extracts a phylink internal helper for determining whether the
+> link is up.
+> 
+> Patch 4 adds basic phylink managed EEE support. Two new MAC APIs are
+> added, to enable and disable LPI. The enable method is passed the LPI
+> timer setting which it is expected to program into the hardware, and
+> also a flag ehther the transmit clock should be stopped.
+> 
+> I have taken the decision to make enable_tx_lpi() to return an error
+> code, but not do much with it other than report it - the intention
+> being that we can later use it to extend functionality if needed
+> without reworking loads of drivers.
+> 
+> I have also dropped the validation/limitation of the LPI timer, and
+> left that in the driver code prior to calling phylink_ethtool_set_eee().
+> 
+> The remainder of the patches convert mvneta, lan743x and stmmac, and
+> add support for mvneta.
+> 
+> Since yesterday's RFC:
+> - fixed the mvpp2 GENMASK()
+> - dropped the DSA patch
+> - changed how phylink restricts EEE advertisement, and the EEE support
+>   reported to userspace which fixes a bug.
+> 
+>  drivers/net/ethernet/marvell/mvneta.c             | 107 ++++++++++------
+>  drivers/net/ethernet/marvell/mvpp2/mvpp2.h        |   5 +
+>  drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c   |  86 +++++++++++++
+>  drivers/net/ethernet/microchip/lan743x_ethtool.c  |  21 ---
+>  drivers/net/ethernet/microchip/lan743x_main.c     |  46 ++++++-
+>  drivers/net/ethernet/microchip/lan743x_main.h     |   1 -
+>  drivers/net/ethernet/stmicro/stmmac/stmmac_main.c |  57 +++++++--
+>  drivers/net/phy/phy.c                             |  20 +++
+>  drivers/net/phy/phylink.c                         | 149 ++++++++++++++++++++--
+>  include/linux/phy.h                               |   1 +
+>  include/linux/phylink.h                           |  45 +++++++
+>  include/uapi/linux/mdio.h                         |   1 +
+>  12 files changed, 446 insertions(+), 93 deletions(-)
 
-I am assuming rfkill does not have third state possible, so it is only
-off or on.
+Hi Russell,
 
-Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Since merging these patches, phylink_connect_phy() can no longer be
+invoked correctly in ngbe_open(). The error is returned from the function
+phy_eee_rx_clock_stop(). Since EEE is not supported on our NGBE hardware.
 
-Best regards,
-Krzysztof
+How should I modify the ngbe driver to meet this change?
+
+Thanks.
+
+
 
 
