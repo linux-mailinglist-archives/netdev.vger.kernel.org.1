@@ -1,174 +1,87 @@
-Return-Path: <netdev+bounces-159131-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159132-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86ABFA147AA
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 02:42:21 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E7FF4A147AE
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 02:44:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C3FAC7A1114
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 01:42:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 273791887EA1
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 01:44:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCB701F95A;
-	Fri, 17 Jan 2025 01:42:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F3053B791;
+	Fri, 17 Jan 2025 01:44:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="pXUCit1+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YWzdGyik"
 X-Original-To: netdev@vger.kernel.org
-Received: from out203-205-221-235.mail.qq.com (out203-205-221-235.mail.qq.com [203.205.221.235])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9299778F4A;
-	Fri, 17 Jan 2025 01:42:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.205.221.235
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CF455383;
+	Fri, 17 Jan 2025 01:44:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737078134; cv=none; b=QZ+2Gk9PDeKE3Hu7oVQWYOd4gsDlV+PiTt9LLIIbUsVdUsRwnV7qheVWxz1720x6AoDz4TRzkCczMrj9QV8c1qvrFmkLW7CO8zLF7sLiiiNAcZpo98zBsU4p6TGX/LIK9uRNKms1cpwaaoU1Lbr6HAhlt3ly/OuzfIQ2gsSsQwI=
+	t=1737078247; cv=none; b=TzhngY5Gt9viSpshxq7/fGdcidsqUvR71fR0IbDs45ilGeB/ydWfSfjbk77/mwTKDqxz8NB6DUPXFCM+eKNmTqbT8TMphvCrCQVYpwr4tU0Yjd62yiwe7ojEuxedLaxPYzKIXSZPIgFb4XKvmdqqWm0B9zPYtMui7wQCcN3kR6o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737078134; c=relaxed/simple;
-	bh=CnguXFDboJbCn4G1/RrkMA436NeV6IFnZANRlKwyDsU=;
-	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=PbaaK+zuM8i217oz2bFz4E7RKSbC8i/E/GhMQJXr2ji4VcYBNHoRW43YFRrF/4+5LB8LNhjR/1dSoslO0eSd3RzjkCnedcpB64osnsvovTCGhLlAuea7mg3DEJdCFryUr68BM55DUybaSqqdbnCCt4HnDglV5Li4Gs2IGxHb9nA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=Red54.com; spf=pass smtp.mailfrom=red54.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=pXUCit1+; arc=none smtp.client-ip=203.205.221.235
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=Red54.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=red54.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
-	t=1737078127; bh=V/kVfBSc6XNDSpGWUA89ZDPbtRDg4CT3J8xdbo5yU5A=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=pXUCit1+radxg4csWdY6Ae1Fk2M8WLVhuYAtfcsKtwO60uDjQ93EbabNzUgLWCRYc
-	 rXKRyJAHlLXRPbVDwwe0Xxwzpq6L51BD9aB9Kv/us1IbP6W7HiMCRilnpQBcdZfrRv
-	 n01o1VghwOshIdSsJ0JirpeI+j78Te6YXQYcWTQM=
-Received: from mail.red54.com ([2603:c023:2:bd00:3e58:d853:ce34:adf3])
-	by newxmesmtplogicsvrszgpuc5-0.qq.com (NewEsmtp) with SMTP
-	id A7627643; Fri, 17 Jan 2025 09:41:54 +0800
-X-QQ-mid: xmsmtpt1737078114tur81dlbk
-Message-ID: <tencent_27DFF9F35BFBF50F6EE024ED508FA8F5FA06@qq.com>
-X-QQ-XMAILINFO: MQAOa38Yz/8/xDUypGXbB5QCNvhaMIxXGbW4d0RErgpaqZ9gAy0zyDuxTOT0xg
-	 sVOs4Q4U7X8aJTiHDj/tKxVZD6ih0Va2mS6Ao4t0PigY5Npn+UoUYrNqa2cq2wrMrLCSmCon5pYp
-	 fYnk1NhTstWaRWwz0rbQ2zORKtEMqIHZeNAjCQucTVKyZtj2R7XmKOFqDkXQPgsho1REg5PaO+a4
-	 s5zrbLowygkAULSlcxiJrABPgSadnRVRoxrnfX2MF5KNeJl+f0NOPWEVEL/y/rxmT7B1BOaYxqXo
-	 35LO7Ouk7bhe4zdnzq+bTNSVTzuPg3apvmFAGlPoDTB9Gn7TDwXkcG29GfU1l7If1H5eiUEBCsT4
-	 H3yOFljB9ZoV+MAAeb8wL+139lA+cTKePS/iUQZjzVG6024rBQBX40xNJ83LVIV5vWbrPGjl6pLd
-	 uW+cY2pYZjLEScCkAQ2+7CWXPw0oTiPyywmD+p4PbiulnJCnYm6J/KKJCtQQmZlLe3oIUeQlJzkl
-	 LWVmE3Qwp8vAcYRFgnLAQeq+ZDZqdg/b+lhtDcRVJycecz94UbiWflizqYHGv9qMCPn/kgumGPLt
-	 4Hyv4PAucZObolpv9CJvqe16nw7tIDfDzDbQM4F0xQuVDECIsnPtNhEd3YQAZyo6/qEyHlO7C6qS
-	 vn/l5PqsNTQafB0NU5TKacKDFIpJLvwOrj2bTFehJ57Z9vzDJdweQaua7r8A3sz7G5Iha34mE3yx
-	 lfuleCKSV8yDp81ROX5+ap9AWmuNHe3bopVUzI33XPvcD1M6OhaaKZD9R7mrBnivpstMPFOLDPOo
-	 kt61nFnz8/NWdfcq+LdwYT/W07HmrDh5SO8fSgefBUHEgy+UMcHVXi1uZDwZVCYl9WpKJk4aT7gG
-	 cY6w0RgYvFo60m5kmIYvNFdisD6pZUb0cV8h1WvIlR+5STN5rhqK2K7poQAqZ0B2ho0X0/Cq5710
-	 0EZzxvxachulWrdltIkACL76RQAdLZD8q6l0DxITl6BvCIpBOeGOnUUkcW2XoAB+Fq5RgsQzotU7
-	 FX+IcOh67MS8bprPGf/EVi4X9wU4Y=
-X-QQ-XMRINFO: OWPUhxQsoeAVDbp3OJHYyFg=
-Sender: yeking@red54.com
-From: Yeking@Red54.com
-To: kuba@kernel.org
-Cc: Yeking@Red54.com,
-	arnd@arndb.de,
-	davem@davemloft.net,
-	edumazet@google.com,
-	gregkh@linuxfoundation.org,
-	horms@kernel.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	prarit@redhat.com,
-	vkuznets@redhat.com
-Subject: [PATCH net-next v3] net: appletalk: Drop aarp_send_probe_phase1()
-Date: Fri, 17 Jan 2025 01:41:40 +0000
-X-OQ-MSGID: <20250117014140.244788-1-Yeking@Red54.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250115140629.1c37c8a2@kernel.org>
-References: <20250115140629.1c37c8a2@kernel.org>
+	s=arc-20240116; t=1737078247; c=relaxed/simple;
+	bh=6xzTH+3aaMXmw8yu6wbcyw5/dNk9bdoOWb2rzNoHKoY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=WqmTk2qOA/6xIWmHasJ3rNuq4ke/gClSkHoqITrx0k6wHl17S0sy/KM+6fIEXVfImf1qFd7W3cbu/z8FdrG5eePacHVbkPLYZq+kNZi8Kjnb82QdwhSYuJLR5+E33Wpve767gnHfi7+ruqZy0o/kgj3SGgnz2+uMNGFqs0VUPVU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YWzdGyik; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F4089C4CEDF;
+	Fri, 17 Jan 2025 01:44:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1737078246;
+	bh=6xzTH+3aaMXmw8yu6wbcyw5/dNk9bdoOWb2rzNoHKoY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=YWzdGyik5Spa2eoyYAkytpkqA8nyMnxM/v/I19eqJZGkm/iA6I+7LnJCCW6f2m3fo
+	 eyPoYdy/f4AM5rQSnNwYoz2sg3cKxJqsOZ7LrUuhrA0/sTTWi8r93bfu9YIoGu6kIL
+	 iLGW0cI9zfMCQwQ/zbCaJeTEArjVuCdqXi2pIfWnC+KRsHZkHR+zhCIsWqi/PIWbiS
+	 q5BHBxK1o3zL2G8gb/79r9zxD/andz3AaQ9Q2xZqxBPnwYhHzLQJKo7i1HEZdUhzsq
+	 xgZdeQMEUUkjwKTvQtcTJb8m9IR+AxYP6RwtuuXsGWYeukpdmyW1nGX1p4ZyaBxSdL
+	 UyfVRE56zIvHw==
+Date: Thu, 16 Jan 2025 17:44:05 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Breno Leitao <leitao@debian.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Jonathan Corbet
+ <corbet@lwn.net>, Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, kernel-team@meta.com, max@kutsevol.com,
+ thepacketgeek@gmail.com
+Subject: Re: [PATCH net-next v2 3/5] netconsole: add support for sysdata and
+ CPU population
+Message-ID: <20250116174405.20a0e20b@kernel.org>
+In-Reply-To: <20250115-netcon_cpu-v2-3-95971b44dc56@debian.org>
+References: <20250115-netcon_cpu-v2-0-95971b44dc56@debian.org>
+	<20250115-netcon_cpu-v2-3-95971b44dc56@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-From: 谢致邦 (XIE Zhibang) <Yeking@Red54.com>
+On Wed, 15 Jan 2025 05:35:20 -0800 Breno Leitao wrote:
+> +	WARN_ON_ONCE(userdata_len + sysdata_len >
+> +		     MAX_EXTRADATA_ENTRY_LEN * MAX_EXTRADATA_ITEMS);
+> +
+> +	/* nt->sysdata_length will be used later to decide if the message
+> +	 * needs to be fragmented.
+> +	 * userdata_len cannot be used for it, once next sysdata append should
+> +	 * start from the same userdata_len location, and only overwrite old
+> +	 * sysdata.
+> +	 */
+> +	nt->sysdata_length = sysdata_len;
 
-aarp_send_probe_phase1() used to work by calling ndo_do_ioctl of
-appletalk drivers ltpc or cops, but these two drivers have been removed
-since the following commits:
-commit 03dcb90dbf62 ("net: appletalk: remove Apple/Farallon LocalTalk PC
-support")
-commit 00f3696f7555 ("net: appletalk: remove cops support")
+Updating nt-> fields at runtime is something we haven't done before,
+right? What's the locking? We depend on target_list_lock ?
 
-Thus aarp_send_probe_phase1() no longer works, so drop it. (found by
-code inspection)
-
-Signed-off-by: 谢致邦 (XIE Zhibang) <Yeking@Red54.com>
----
-V2 -> V3: Drop if(), and update commit message
-V1 -> V2: Update commit message
-
- net/appletalk/aarp.c | 45 +++++++-------------------------------------
- 1 file changed, 7 insertions(+), 38 deletions(-)
-
-diff --git a/net/appletalk/aarp.c b/net/appletalk/aarp.c
-index 9fa0b246902b..05cbb3c227c5 100644
---- a/net/appletalk/aarp.c
-+++ b/net/appletalk/aarp.c
-@@ -432,49 +432,18 @@ static struct atalk_addr *__aarp_proxy_find(struct net_device *dev,
- 	return a ? sa : NULL;
- }
- 
--/*
-- * Probe a Phase 1 device or a device that requires its Net:Node to
-- * be set via an ioctl.
-- */
--static void aarp_send_probe_phase1(struct atalk_iface *iface)
--{
--	struct ifreq atreq;
--	struct sockaddr_at *sa = (struct sockaddr_at *)&atreq.ifr_addr;
--	const struct net_device_ops *ops = iface->dev->netdev_ops;
--
--	sa->sat_addr.s_node = iface->address.s_node;
--	sa->sat_addr.s_net = ntohs(iface->address.s_net);
--
--	/* We pass the Net:Node to the drivers/cards by a Device ioctl. */
--	if (!(ops->ndo_do_ioctl(iface->dev, &atreq, SIOCSIFADDR))) {
--		ops->ndo_do_ioctl(iface->dev, &atreq, SIOCGIFADDR);
--		if (iface->address.s_net != htons(sa->sat_addr.s_net) ||
--		    iface->address.s_node != sa->sat_addr.s_node)
--			iface->status |= ATIF_PROBE_FAIL;
--
--		iface->address.s_net  = htons(sa->sat_addr.s_net);
--		iface->address.s_node = sa->sat_addr.s_node;
--	}
--}
--
--
- void aarp_probe_network(struct atalk_iface *atif)
- {
--	if (atif->dev->type == ARPHRD_LOCALTLK ||
--	    atif->dev->type == ARPHRD_PPP)
--		aarp_send_probe_phase1(atif);
--	else {
--		unsigned int count;
-+	unsigned int count;
- 
--		for (count = 0; count < AARP_RETRANSMIT_LIMIT; count++) {
--			aarp_send_probe(atif->dev, &atif->address);
-+	for (count = 0; count < AARP_RETRANSMIT_LIMIT; count++) {
-+		aarp_send_probe(atif->dev, &atif->address);
- 
--			/* Defer 1/10th */
--			msleep(100);
-+		/* Defer 1/10th */
-+		msleep(100);
- 
--			if (atif->status & ATIF_PROBE_FAIL)
--				break;
--		}
-+		if (atif->status & ATIF_PROBE_FAIL)
-+			break;
- 	}
- }
- 
--- 
-2.43.0
-
+Looks like previously all the data was on the stack, now we have a mix.
+Maybe we can pack all the bits of state into a struct for easier
+passing around, but still put it on the stack?
 
