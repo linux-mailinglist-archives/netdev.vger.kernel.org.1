@@ -1,182 +1,141 @@
-Return-Path: <netdev+bounces-159253-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159254-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0CC9AA14EFD
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 13:07:04 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3380DA14F01
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 13:07:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6E0D33A9088
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 12:06:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 61E7E16731E
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 12:07:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40F841FE45E;
-	Fri, 17 Jan 2025 12:06:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A46471FECBC;
+	Fri, 17 Jan 2025 12:07:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="H+wQHNeh"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="mc0KjBmg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FC991FC7FA;
-	Fri, 17 Jan 2025 12:06:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 945AF1FF1C1;
+	Fri, 17 Jan 2025 12:07:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737115613; cv=none; b=gJZ1hH7LzNG2yLvaKrFsZNITEifMF6+rTi/fEfgMQlwRnLleVVAFvyvRgxPxQcdW58vR2nogXbKKZovknnrdbLLqcoIF6jqpX9fYiFI8iWeJE+dbXzJfQ338IRxf2m6LPkEw8XUHCc6Sthzkk+isq/xDLTAnwNa+hHmRS8TCwCg=
+	t=1737115625; cv=none; b=giub6rUKCIrKNGdVYVLLp+yPHqt/2Yqcc5hkelbn9Nhx/0SW3IdF+S4H/nikrD7aFZ64OKBsz4qs3PXVD+27nMHcWsmim5Cq5LWQ4rkiDCE9X5b8fSVeQdMM8dIxC/m1lWIWvBd2+r0ge9JjOQNcwbYysQ6ahuB9QA7OjgxCSuQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737115613; c=relaxed/simple;
-	bh=xsSRIjIkgn9T3QF1O2r1XLv6qGuUZswNM7sUf5cK54k=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Jx/tpgpulXGSA/hPQwwbswhcKhTQ04ibbG4f50I73yO8WksYdjYIzxLY8P03nXxfHDI/BxTSz5QzVUcy4L9TXbNNh4W51Aeubm2Ew0kpN55KRUoZJuA6xY3i2SPip4R76OECuvkZes9b5HfRjnilaxnMof1x/H4A/eLWBEw+HT4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=H+wQHNeh; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50H85pKg000849;
-	Fri, 17 Jan 2025 12:06:39 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=sdRtsC
-	rS8b3c9WX8npFv2fTaSEgz06Rcf08YZEuFkIk=; b=H+wQHNehe3pMk7uHIZnGjF
-	b3VARVC3aOgwCYDGEOmTSJ0jRtUjE+5ThjaYIU/AP6uVEwdbgsHNgsrOUvrdhHOX
-	a1I6PFR/VofHI5YQ0tFFrcd2p3F8g4mFRYNXh3GMc78RLA+Ru+PPuXkEBtgxYgnA
-	DmgxdcRtO8eSpL6gVRWGxuqxhdA6QCkVVEehmSXO6IUDAYurVca2knoCdXfrN62g
-	l2adGSX3ynyoKbEAixgB1Re/hEd6WEkSOoE87zSZEh5ioT/JewKGNrwMCiEh5Ysj
-	/mPbmuADH9bBtrVGQA/w+Rrx5XDeJG3dT9uwUBsUK2UIAamqCL9F2nNOOD/54cnQ
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 447kd3h077-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 17 Jan 2025 12:06:38 +0000 (GMT)
-Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 50HC6cfu008199;
-	Fri, 17 Jan 2025 12:06:38 GMT
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 447kd3h075-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 17 Jan 2025 12:06:38 +0000 (GMT)
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 50HBvdpD016571;
-	Fri, 17 Jan 2025 12:06:37 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 4445p22ddv-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 17 Jan 2025 12:06:37 +0000
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 50HC6Xvc32637546
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 17 Jan 2025 12:06:33 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id B48D020043;
-	Fri, 17 Jan 2025 12:06:33 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 986BF20040;
-	Fri, 17 Jan 2025 12:06:32 +0000 (GMT)
-Received: from [9.171.79.45] (unknown [9.171.79.45])
-	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 17 Jan 2025 12:06:32 +0000 (GMT)
-Message-ID: <5bb98815-43f8-4ca5-96b7-9b4b0cd77d40@linux.ibm.com>
-Date: Fri, 17 Jan 2025 13:06:32 +0100
+	s=arc-20240116; t=1737115625; c=relaxed/simple;
+	bh=BDyeNUdYNgJIV9Wz9fNA3O+1iHfYkvub8q2++d++Wzs=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=uEy7Qa8+Bl7obUA4eYlRyuoIqsU4jN8yeAS/E6n+kToHyH62VcPOcGTDBrxXywJTzHTSbyWLsNCZwq6qyt10hQmaGI4Iu3FiMiR3HVmmEmimt05V7I9niBaDs8l2iyQ9xxiGnkSv8qsC2Wh9aMpmalBIrRn3Heh6oTEtDJ6XDqA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=mc0KjBmg; arc=none smtp.client-ip=217.70.183.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 017F4FF802;
+	Fri, 17 Jan 2025 12:06:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1737115620;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=J8s9Nvc6uI8BiPOLipMqZY1pbcBB2gHob6Y7DtmFdoI=;
+	b=mc0KjBmgh1T8QrUsMm5CneXoqRZ88g39WKkWitNYXBg9sE8mbP7oZqQWi569W/s3Q/TJi0
+	PKZDABEZv/64lud0Uj8E+8U1EU6C6P8fd80ptF3faGcjcxhibiBhBrG+2JgGlcrAh8wyfG
+	GJqs1RdjiY7sMaQfwZ1JpBQem6QQRrIroIJMoy1IU4FNdY5mMlroTo4Dg+N+DAp1B4XPqj
+	tAhayjSaq1h7uSsTpQUfIUk43FtBeNTIZbbfbFCBiJOJnNzis6s0CzMeWpuKCmwy3oWZ9M
+	MafxrB01WiIoIQvcEnuso7PtcR2PpXJGVdVaEG1RWJfo41SFk6JXYsPZYVa6NA==
+Date: Fri, 17 Jan 2025 13:06:56 +0100
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: Claudiu Beznea <claudiu.beznea@tuxon.dev>
+Cc: Florian Fainelli <florian.fainelli@broadcom.com>, Broadcom internal
+ kernel review list <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn
+ <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>, Radu
+ Pirea <radu-nicolae.pirea@oss.nxp.com>, Jay Vosburgh
+ <j.vosburgh@gmail.com>, Andy Gospodarek <andy@greyhouse.net>, Nicolas Ferre
+ <nicolas.ferre@microchip.com>, Willem de Bruijn
+ <willemdebruijn.kernel@gmail.com>, Jonathan Corbet <corbet@lwn.net>,
+ Horatiu Vultur <horatiu.vultur@microchip.com>,
+ UNGLinuxDriver@microchip.com, Simon Horman <horms@kernel.org>, Vladimir
+ Oltean <vladimir.oltean@nxp.com>, donald.hunter@gmail.com,
+ danieller@nvidia.com, ecree.xilinx@gmail.com, Andrew Lunn
+ <andrew+netdev@lunn.ch>, Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ linux-doc@vger.kernel.org, Maxime Chevallier
+ <maxime.chevallier@bootlin.com>, Rahul Rameshbabu <rrameshbabu@nvidia.com>,
+ Willem de Bruijn <willemb@google.com>, Shannon Nelson
+ <shannon.nelson@amd.com>, Alexandra Winter <wintera@linux.ibm.com>
+Subject: Re: [PATCH net-next v21 3/5] net: Add the possibility to support a
+ selected hwtstamp in netdevice
+Message-ID: <20250117130656.23a41605@kmaincent-XPS-13-7390>
+In-Reply-To: <4c6419d8-c06b-495c-b987-d66c2e1ff848@tuxon.dev>
+References: <20241212-feature_ptp_netnext-v21-0-2c282a941518@bootlin.com>
+	<20241212-feature_ptp_netnext-v21-3-2c282a941518@bootlin.com>
+	<4c6419d8-c06b-495c-b987-d66c2e1ff848@tuxon.dev>
+Organization: bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC net-next 1/7] net/ism: Create net/ism
-Content-Language: en-US
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Wenjia Zhang <wenjia@linux.ibm.com>, Jan Karcher <jaka@linux.ibm.com>,
-        Gerd Bayer <gbayer@linux.ibm.com>, Halil Pasic <pasic@linux.ibm.com>,
-        "D. Wythe" <alibuda@linux.alibaba.com>,
-        Tony Lu <tonylu@linux.alibaba.com>, Wen Gu <guwen@linux.alibaba.com>,
-        Peter Oberparleiter
- <oberpar@linux.ibm.com>,
-        David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
-        Andrew Lunn <andrew+netdev@lunn.ch>,
-        Julian Ruess <julianr@linux.ibm.com>,
-        Niklas Schnelle <schnelle@linux.ibm.com>,
-        Thorsten Winkler <twinkler@linux.ibm.com>, netdev@vger.kernel.org,
-        linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev
- <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>, Simon Horman <horms@kernel.org>
-References: <20250115195527.2094320-1-wintera@linux.ibm.com>
- <20250115195527.2094320-2-wintera@linux.ibm.com>
- <e379f0dd-8ad0-4617-9b24-0fa4756d30ea@lunn.ch>
-From: Alexandra Winter <wintera@linux.ibm.com>
-In-Reply-To: <e379f0dd-8ad0-4617-9b24-0fa4756d30ea@lunn.ch>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: nOEOSnOZBmnXAC7Lec3Cd4onq6_Scmbd
-X-Proofpoint-GUID: 5YBBgT4p4bPSwkD-KUvDJggrEuxaIREg
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-01-17_05,2025-01-16_01,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 mlxlogscore=999
- priorityscore=1501 malwarescore=0 mlxscore=0 suspectscore=0 bulkscore=0
- spamscore=0 impostorscore=0 clxscore=1015 phishscore=0 lowpriorityscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2411120000
- definitions=main-2501170096
+Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: kory.maincent@bootlin.com
 
+On Fri, 17 Jan 2025 13:57:41 +0200
+Claudiu Beznea <claudiu.beznea@tuxon.dev> wrote:
 
+> Hi, Kory,
+>=20
+> On 12.12.2024 19:06, Kory Maincent wrote:
+> > Introduce the description of a hwtstamp provider, mainly defined with a
+> > the hwtstamp source and the phydev pointer.
+> >=20
+> > Add a hwtstamp provider description within the netdev structure to
+> > allow saving the hwtstamp we want to use. This prepares for future
+> > support of an ethtool netlink command to select the desired hwtstamp
+> > provider. By default, the old API that does not support hwtstamp
+> > selectability is used, meaning the hwtstamp provider pointer is unset.
+> >=20
+> > Signed-off-by: Kory Maincent <kory.maincent@bootlin.com> =20
+>=20
+> I'm getting this error when doing suspend/resume on the Renesas RZ/G3S
+> Smarc Module + RZ SMARC Carrier II board:
+>=20
+> [   39.032969] =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> [   39.032983] WARNING: suspicious RCU usage
+> [   39.033000] 6.13.0-rc7-next-20250116-arm64-renesas-00002-g35245dfdc62c
+> #7 Not tainted
+> [   39.033019] -----------------------------
+> [   39.033033] drivers/net/phy/phy_device.c:2004 suspicious
+> rcu_dereference_protected() usage!
 
-On 16.01.25 21:08, Andrew Lunn wrote:
->> +ISM (INTERNAL SHARED MEMORY)
->> +M:	Alexandra Winter <wintera@linux.ibm.com>
->> +L:	netdev@vger.kernel.org
->> +S:	Supported
->> +F:	include/linux/ism.h
->> +F:	net/ism/
-> 
-> Is there any high level documentation about this?
+Thanks for the report.
+Oh so it seems there are cases where phy_detach is not called under RTNL lo=
+ck!
 
+This should solve the issue:
+-               hwprov =3D rtnl_dereference(dev->hwprov);
++               rcu_read_lock()
++               hwprov =3D rcu_dereference(dev->hwprov);
+                /* Disable timestamp if it is the one selected */
+                if (hwprov && hwprov->phydev =3D=3D phydev) {
+                        rcu_assign_pointer(dev->hwprov, NULL);
+                        kfree_rcu(hwprov, rcu_head);
+                }
++               rcu_read_unlock();
 
-As the ISM devices were developed for SMC-D, the only documentation
-is about their usage for SMC-D.
-e.g.:
-https://www.ibm.com/support/pages/system/files/inline-files/IBM%20Shared%20Memory%20Communications%20Version%202.1%20Emulated-ISM_0.pdf
-(page 33)
-https://community.ibm.com/community/user/ibmz-and-linuxone/viewdocument/2021-07-15-boosting-tcp-networking?CommunityKey=c1293167-6d93-448e-8854-3068846d3dfe&tab=librarydocuments
-But those do not go into much detail.
+I will send a patch soon.
 
-We now want to provide interfaces for other usecases in Linux.
-
-ism.h would be the place to  explicitely state the assumptions, restrictions and
-requirements in a single place, so future devices and clients know about them.
-
-
-> 
-> A while back, TI was trying to upstream something for one of there
-> SoCs. It was a multi CPU system, with not all CPUs used for SMP, but
-> one or two kept for management and real time tasks, not even running
-> Linux. They had a block of shared memory used for communication
-> between the CPUs/OSes, along with rproc. They layered an ethernet
-> driver on top of this, with buffers for frames in the shared memory.
-> 
-> Could ISM be used for something like this?
-> 
-> 	Andrew
-
-
-If the communication endpoints were represented as devices, that sounds like a similar concept.
-
-I think you could implement a client that provides network devices on top of ism devices.
-(mapping MACs to GIDs)
-As the memory buffers are set up for 1 sender and 1 receiver, it would either create some additional
-latency, if you setup buffers for each message or additional memory consumption, if you try to keep and
-re-use the buffers.
-I'm not sure what the benefit ISM would provide as ethernet device. A shared network card would probably 
-outperform such a usecase.
-SMC exploits ISM for TCP traffic. There the buffers are kept per socket connection, and a lot of the
-TCP/IP mechanisms are not neccessary, because transport is reliable, synchronous and in-order.
-Thus latency is minimal.
-
- 
-
+Regards,
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
