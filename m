@@ -1,94 +1,73 @@
-Return-Path: <netdev+bounces-159330-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159331-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 059C2A1521C
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 15:50:15 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F997A15241
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 15:55:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 696333A4448
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 14:50:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 843393A5475
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 14:54:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86A9F15B984;
-	Fri, 17 Jan 2025 14:50:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4481419882F;
+	Fri, 17 Jan 2025 14:53:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DnOAmPYe"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Pyowb9Uh"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5254B13CA81;
-	Fri, 17 Jan 2025 14:50:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A1DD18A6A7;
+	Fri, 17 Jan 2025 14:53:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737125408; cv=none; b=Wi78Q2bVHrvLW9SNJeh9pe1d8lz+rEcdQCv/mbMIko6Rau/nCmd9dLd0viy7zfYFmtIj8jIFDAlr01XLByZ1K/rTiyoojU9ooyklLB7LeTpWvXCDewip9+AZ1y5/3UN9t/yDrVTHHwBL2+uETalWst+exUuElcgc72prY3WEeE4=
+	t=1737125605; cv=none; b=it2O5qXwZ6/W5tq6QuNElDrPE88n/OjUIO+dvUST0MWJADgUFEbbw14BLiX52mWE37ATPSGz2qD2udguwR0d9SvWQ3hU8sIrtjwmpBZqIKx1YnE6nrvGt4aj1uudnadzw58lPZKO+nMn6+OkJkvc0r/3JuVLcvXdvnkiN6auLJ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737125408; c=relaxed/simple;
-	bh=QuOwvl5pfYaEp+myY0/QNRAPY4YxB9yhVOpmIoqf/TI=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=tukYE0NLMNMWpJsu2U87TaBVQmIK2QmZI2WsogCdTNUSLoepCcI9OKdZJLNzL6Qh0z7E5gczDikXa9Kl2u/AR7PvAHcPDya7Rb4Ip4PIEWdI/G8rWcaQ4Gdr6FmuueNiBJ/bbk1wJJwIR9sggUlPrF0iyDXMTSHgH2hyV5ar40U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DnOAmPYe; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BDC7BC4CEDD;
-	Fri, 17 Jan 2025 14:50:06 +0000 (UTC)
+	s=arc-20240116; t=1737125605; c=relaxed/simple;
+	bh=WikLHt6WuE9RBpcStaRT/Uib5k6t8b6gpZU6j1qxo+s=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=SqAmVHinM/0guo7ryNEorTlwuyYUIw0eHLBJwkeOwdAIXNzWRZlQ/fApwJb5ZWTLJdVhfC3oU2lekVCS2Ic8qfQa2pbCsQY7lrZpUPjZqkv7tPIaNddWIBeajjLfGkfAxLeooDINhxdRvl3VUsE2GPIyUNKcUtctJtSYhObJ1ks=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Pyowb9Uh; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 26DCAC4CEDD;
+	Fri, 17 Jan 2025 14:53:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737125406;
-	bh=QuOwvl5pfYaEp+myY0/QNRAPY4YxB9yhVOpmIoqf/TI=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=DnOAmPYeGRgwICwzYj//eyT1Ujvy6kH/AVEhJjSebHVkp3EuuBAke+P3cIQ8e9ojT
-	 tTueDkU+PIkipn2RMcJ8IOH+JnHCGU82k3u6wXwKGAGUpMJxPJcyWIJ6ZG6lurXtPu
-	 8TVP5fzqSic+/UwDf55VqDelRlUrRt2388t4voDvsn6lgNFR+QbMnFLx7XDfqdGcNv
-	 1+J3WJ7riCb3fRFP9xO3IHFDnFdTQbgt1BoFqA09BJp6mkVhPjcXowiEnfojKOH57Y
-	 FvCycO/aDXHAue7CTpFx5r5GU2K2iV0ndRGT3W4eLMIrRS47wGBF6GOVv1QyELqr5i
-	 5+fsp9AkFV+ow==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 35576380AA62;
-	Fri, 17 Jan 2025 14:50:31 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1737125604;
+	bh=WikLHt6WuE9RBpcStaRT/Uib5k6t8b6gpZU6j1qxo+s=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Pyowb9UhD1tnoauSadhvUmo/43lm4YTfSucpYVEleglYrTRU7c6W/dEOvGDf2h23c
+	 2qORrXzqAzfVmORZNFsHROV5SwLHdxarE8HL5tvpWZXIJ+jTPclv6tcMta9D4mKYyM
+	 8Jm54BPvd5ehI/s5MvPqWGYBeDKU41SgPtvdktErJ7SCPFCvrAKiAXCYSelPOCGLVI
+	 0RxflqaDwV/2ZhJG1o+2TrHmlzk9a2nNsUonaAC3I4oBda8iLuRDfM1kD4kD7uL9Ao
+	 Uizblnka6Br0O7yFQwrFPnqIhSjVkwaTXSBdyC5upusbxhWi5g+ckV4tq+Jnd3dtSL
+	 vi09Umo7nr/rA==
+Date: Fri, 17 Jan 2025 06:53:23 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Petr Machata <petrm@nvidia.com>
+Cc: <davem@davemloft.net>, <netdev@vger.kernel.org>, <edumazet@google.com>,
+ <pabeni@redhat.com>, <andrew+netdev@lunn.ch>, <horms@kernel.org>,
+ <shuah@kernel.org>, <linux-kselftest@vger.kernel.org>,
+ <willemdebruijn.kernel@gmail.com>
+Subject: Re: [PATCH net-next] selftests: net: give up on the cmsg_time
+ accuracy on slow machines
+Message-ID: <20250117065323.42daa2f9@kernel.org>
+In-Reply-To: <87ed114mbw.fsf@nvidia.com>
+References: <20250116020105.931338-1-kuba@kernel.org>
+	<87ed114mbw.fsf@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 1/1] tools: Sync if_xdp.h uapi tooling header
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173712543002.2150446.16563970234271982689.git-patchwork-notify@kernel.org>
-Date: Fri, 17 Jan 2025 14:50:30 +0000
-References: <20250115032248.125742-1-yoong.siang.song@intel.com>
-In-Reply-To: <20250115032248.125742-1-yoong.siang.song@intel.com>
-To: Song Yoong Siang <yoong.siang.song@intel.com>
-Cc: sdf@fomichev.me, vishalc@linux.ibm.com, ast@kernel.org,
- daniel@iogearbox.net, davem@davemloft.net, kuba@kernel.org, hawk@kernel.org,
- john.fastabend@gmail.com, maciej.fijalkowski@intel.com,
- stable@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- bpf@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Fri, 17 Jan 2025 13:49:23 +0100 Petr Machata wrote:
+> This logging and xfail handling duplicates lib.sh. Would a patch like
+> below be OK with you? The gist of it is to just use check_err, log_test
+> and xfail_on_slow from lib.sh to achieve what the test open-codes.
 
-This patch was applied to bpf/bpf-next.git (master)
-by Daniel Borkmann <daniel@iogearbox.net>:
-
-On Wed, 15 Jan 2025 11:22:48 +0800 you wrote:
-> From: Vishal Chourasia <vishalc@linux.ibm.com>
-> 
-> Sync if_xdp.h uapi header to remove following warning:
-> 
-> Warning: Kernel ABI header at 'tools/include/uapi/linux/if_xdp.h' differs
-> from latest version at 'include/uapi/linux/if_xdp.h'
-> 
-> [...]
-
-Here is the summary with links:
-  - [net,1/1] tools: Sync if_xdp.h uapi tooling header
-    https://git.kernel.org/bpf/bpf-next/c/e055a46dd3cf
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Hm, maybe? I'm not going to say no if you send a patch, but IMHO
+if we were to change the output I think we should make it ktap.
 
