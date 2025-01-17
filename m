@@ -1,155 +1,176 @@
-Return-Path: <netdev+bounces-159258-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159259-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8169CA14F12
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 13:17:02 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 49C79A14F18
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 13:19:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D8BDD3A5C3E
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 12:16:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 940C518890AB
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 12:19:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30FEB1FDE19;
-	Fri, 17 Jan 2025 12:16:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D86801FECBC;
+	Fri, 17 Jan 2025 12:19:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="eqJfxF7q";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="cSt8qx6k"
+	dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b="nsn5Vlz+"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-b5-smtp.messagingengine.com (fout-b5-smtp.messagingengine.com [202.12.124.148])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 364A71FC0EC;
-	Fri, 17 Jan 2025 12:16:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.148
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 650521FE45A
+	for <netdev@vger.kernel.org>; Fri, 17 Jan 2025 12:19:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737116217; cv=none; b=p8R8Sa6YcyXLMyOWqMX/WtD+5nWJxh2VlPTPSVhRyzYK7Suqd5JUztkOHL1pVAvl83WuwOYm2xHuGo0hxBTuhCFCjEWDFAxxMnq2GdeEXPS1x31CCecedFrlulhISjIpRYKvo4Nx0CzyrS7qDYhD3h5uVHykY5pPzg70cYeDHJM=
+	t=1737116365; cv=none; b=XvVfpp7nDFvLVsxbHawKLprH6M4EGMyJ3O9cWK8xHOGpsjYK2uovJJe0iAeBkBX1sYnS1vsfFVCeDYJTalPVIIpPXPD5ekItNfP52MNRA4m6vCo0aAyMJwJVBSzi5N8VVVOifI/aOrnPYh1VvIqGNdZsdUagDrCUlYUtjANNors=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737116217; c=relaxed/simple;
-	bh=kTV/v+V/cycXsCi3SiMzEUMn87AolYcVMl4Tzpz9Y1w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ocm31nDK3tzFGwwyry6Q/udHMW5Q+NF3zHameXtB4Xv5cG67ieT1MWR73zd48CMOFHPtGiCioov15ntDvLQl1hpQLomgTqFzqISAthDUqiyGt39eKpeVj3KqpbL797J/H88bCJCxWkQJ8bimxThlBmbpMLqAl6yqn2OKMrPyNic=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=eqJfxF7q; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=cSt8qx6k; arc=none smtp.client-ip=202.12.124.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-03.internal (phl-compute-03.phl.internal [10.202.2.43])
-	by mailfout.stl.internal (Postfix) with ESMTP id BDFE3114017D;
-	Fri, 17 Jan 2025 07:16:52 -0500 (EST)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-03.internal (MEProxy); Fri, 17 Jan 2025 07:16:53 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm3; t=1737116212; x=
-	1737202612; bh=CyahNqnw/YyFCY6Rx2T0hKkQbVlMcU0W2AtHSdPDGSs=; b=e
-	qJfxF7qNSzZ+MlWPVOvsHfOUucrFvwkdjlWt5oHbtjUWQ/g0ZpmnF7WMToyhcuXA
-	W4wXc589vLdn5fxejMC5ENjCB6AiT5Ui1UmBPtry2jy1VM/ZxnNRnY8wh89TPtos
-	4+QA+A0SdWIT+k+F9Zynd4rVhglsG7pAXBCumU6CYCYFmb7eoOgR6JUL7aQ9OUpW
-	lOV6oDyw14G/GSWHDu5RY1B4nXMeeyjgrhkPcdBz6qsjjj7A/RQB51XNrfxbPsco
-	K3LW3gDEgCTPtShqi0lF5SH464S75R9ZTLUoIGliVuMKDfHSfLXlYMrt0Vz91gBF
-	dILuYsQDasQ5aehmEXWKQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
-	1737116212; x=1737202612; bh=CyahNqnw/YyFCY6Rx2T0hKkQbVlMcU0W2At
-	HSdPDGSs=; b=cSt8qx6k8dqxV7fIbGO/ZS2Q35Lx6BLpO5Dj5TfTl+kZ7rf31ak
-	+pmHN1pXrXfysdw9OAPnHqO35PLjutfM9ReEnQH8WReONn0Zn7Md1qRkxLgPdU5/
-	rh80XlkdC8BbzIz5FJRBuIjlK3k7OMpZYtqp9XoCR2kAaUWg1HstPeVyy0tQV50l
-	KsZ4oSHPN/PQ8wSLYgSsSjCC7gp7n8bFt6gnzR8Hp+/9JcXY8E4eyw5hifGL4iLE
-	2QnfXE3z4DhD6PCCSRMWtQdFswhOHS/fx9qdgN91UxyVgBpwcvanS3M9pypyGh93
-	8pf/JRJgAuVuAe/o3W+jgPyzRMI+ajcB8xA==
-X-ME-Sender: <xms:NEqKZ6aBN9PksvNWf2M6Gj8Y0CDHR3fPwDzvHMmtQyTq3--7KFbLTA>
-    <xme:NEqKZ9ZzG45tr_P3aWUE8HgH_IS0mXglVyVb5Km7wjqCCQ6cJkNFhw0uINcsWA5ZM
-    QeYGm4Nnbx7yNiRT_A>
-X-ME-Received: <xmr:NEqKZ0_uaoA8iQiiLmzeP52Zs1Qq3xefduxDNHEaUKt2B4T74P4lbK8D7g3->
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrudeifedgfeejucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
-    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
-    htshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtredttddtjeen
-    ucfhrhhomhepufgrsghrihhnrgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrg
-    hilhdrnhgvtheqnecuggftrfgrthhtvghrnhepuefhhfffgfffhfefueeiudegtdefhfek
-    geetheegheeifffguedvuefffefgudffnecuvehluhhsthgvrhfuihiivgeptdenucfrrg
-    hrrghmpehmrghilhhfrhhomhepshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggp
-    rhgtphhtthhopedufedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtoheprghnthhonh
-    hiohesohhpvghnvhhpnhdrnhgvthdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhk
-    vghrnhgvlhdrohhrghdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtoh
-    hmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehprggs
-    vghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtohepughonhgrlhgurdhhuhhnthgvrh
-    esghhmrghilhdrtghomhdprhgtphhtthhopehshhhurghhsehkvghrnhgvlhdrohhrghdp
-    rhgtphhtthhopehrhigriigrnhhovhdrshdrrgesghhmrghilhdrtghomhdprhgtphhtth
-    hopegrnhgurhgvfidonhgvthguvghvsehluhhnnhdrtghh
-X-ME-Proxy: <xmx:NEqKZ8rdWTcyM2u9FzPpll0WXjT0qswkdODhLevH1xR32lvpDf5tWg>
-    <xmx:NEqKZ1qvAi2CA363jqVQOMCAK2xPPfJE5p8LMgXH4XOP7oGOmLT7Yw>
-    <xmx:NEqKZ6Qhjsd6Yo6SuRfcIeXTfKmgnR1Abu_QmOVeF7QZi5IKTLQb6w>
-    <xmx:NEqKZ1o8i1fhh3FBCk5cx18ZeztxvOVITdwv4AVbaTTC7Ta3qAdi4Q>
-    <xmx:NEqKZ27eu2CHW-z8LYIa9X8gxfxxG4kGmJBt8p91DUqjPIL_y-yTLkAK>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
- 17 Jan 2025 07:16:51 -0500 (EST)
-Date: Fri, 17 Jan 2025 13:16:50 +0100
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Antonio Quartulli <antonio@openvpn.net>
-Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Shuah Khan <shuah@kernel.org>, ryazanov.s.a@gmail.com,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, Xiao Liang <shaw.leon@gmail.com>
-Subject: Re: [PATCH net-next v18 09/25] ovpn: implement packet processing
-Message-ID: <Z4pKMkDrujMWMlCW@hog>
-References: <20250113-b4-ovpn-v18-0-1f00db9c2bd6@openvpn.net>
- <20250113-b4-ovpn-v18-9-1f00db9c2bd6@openvpn.net>
+	s=arc-20240116; t=1737116365; c=relaxed/simple;
+	bh=Ov6RyDvlBV40EYwFXuzQXiVzA/WzwQtDr93JFljbJYc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=XKET/MAeeMI8c5O5Fvlz88EgTDHKIXbIIYct3becZ+TbZkZsCu3yXfcJY2/6Qux5SscA67E6ZKLgjZ3778+RELKnpkANZC9+R7aYxfFoW9hl5/j7+AI4d/wBeufpLXQaH/vuR2NqsHPm4us419QSe6qCtf8WmPRVu06VTiLuD74=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev; spf=pass smtp.mailfrom=tuxon.dev; dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b=nsn5Vlz+; arc=none smtp.client-ip=209.85.221.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tuxon.dev
+Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-385dece873cso1115206f8f.0
+        for <netdev@vger.kernel.org>; Fri, 17 Jan 2025 04:19:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=tuxon.dev; s=google; t=1737116362; x=1737721162; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=G6R97ZJ/eTJmxy+gIbZqfH/ad7ajv9h0FEj5S8dEJik=;
+        b=nsn5Vlz+gfyiYtcyqHbAxRfNyBigN+mCvFt7XMzV805Pnw4a4KH7j18wz572eTjy3O
+         gSK5eYYmTTzQF1o0lRMpx051Ffjw0Cf/ykh8T41yMEdSH8THvyp7f61WF4eGYYtEKc60
+         Maw8/qJM+KEPOAmW2sI3Nb0ydyTvwZFBkwYCA+5MNox4/axmfRPEVjY9EBcl2bxyJMO1
+         YBGWSvTa/iU2oFhUijxjr8FRISqdHxqvFzYD5mti0XQVXZC78/IbgjzcqaD3oBdOAMcc
+         jBcLqjoALYDOZGJxhfo9u/Dm3CQtJ1MVatsJJN5/P2DZtmSc4TTRrbrafPGeCulIpihU
+         /EFw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737116362; x=1737721162;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=G6R97ZJ/eTJmxy+gIbZqfH/ad7ajv9h0FEj5S8dEJik=;
+        b=cvHc4PJ+nzts9RMFMhP5g2zu4CWOs2vSnK6jH+Tl15bmYJn9o7GpTCeb5TcrFeZrRL
+         eBERZ6mekjBTfW0fa3aFq1qJWC3+L//UeBgm2Kxf8S8wBa+rY2iL5potP7VsHIib4/Hb
+         PxC5e7j+OIQWGWjWn06SD7gN/ks/lD1siXEpXdBPwCZ6B+RLmsCkyPGWtdusnMnXS3z+
+         lQUS+8/ca150cxjVkqoU/gufEbTFOyKoKjYYgOnzt85nnsQriVaZ62kmwcqHXaNBtKic
+         NmpctJSCbSaU3Zyhy11o7LDPGemvkb7rLPkmWn3ZttSxa6aE80VO9DosRL5HYanDqIaK
+         qPGA==
+X-Forwarded-Encrypted: i=1; AJvYcCWEVtPNr9qteZrYdrYxJh++PBqUAwxODJ2JqAPVUBCzeGi9MnhEzBMAd0JiU5koQNPVqbUOWZ8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyng0dq93t9sKswLz0Cy3XYwbTEtS5eKfYmhjOeWZRCd/H8hqI8
+	LjjltY8nI3M7WDKueDpsj+rwSpgrs2tBVIfD+JaCX5IQLWH7xPhq+zXOBRoc0CI=
+X-Gm-Gg: ASbGncufjC9tgYycsLJdl9tvRtjJmVua12yFzUw3PNVfl1IX0XOlJhj+j7HTh1O6/ou
+	WD6wgDARCw9KrsUrOYiPnwQCBsJ71qGBR6m0a4e/yqA1VCG+0oWlQ7iNcP5FZQ2H+6hUAd/TCBB
+	QQAP+OLjZ6gohzyV7nqAnwakbszbr4ajRqq7YIo0vmEN9jZ+5ZdQP7qpEMOphJzjzSIoHukrjQl
+	XxefsLZGYOpBE87NOnRJdpagGKUS44jIAm4hjEAqMP8GMYoQ5rIKQPx4JszwThOtg==
+X-Google-Smtp-Source: AGHT+IFiHsjzhhmivgjSF5VfJ0c3FKWNde2pUo4Vnzewlo1Hnuu5vdVh/ypoJIqfonBn0h5h7oo9dg==
+X-Received: by 2002:a5d:4d04:0:b0:385:e429:e59e with SMTP id ffacd0b85a97d-38bf57c9337mr1823143f8f.52.1737116361664;
+        Fri, 17 Jan 2025 04:19:21 -0800 (PST)
+Received: from [192.168.50.4] ([82.78.167.165])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38bf3221c25sm2355234f8f.23.2025.01.17.04.19.19
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 17 Jan 2025 04:19:21 -0800 (PST)
+Message-ID: <3fe00f86-60f3-42a2-9491-7b876531c215@tuxon.dev>
+Date: Fri, 17 Jan 2025 14:19:15 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250113-b4-ovpn-v18-9-1f00db9c2bd6@openvpn.net>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v21 3/5] net: Add the possibility to support a
+ selected hwtstamp in netdevice
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
+ Broadcom internal kernel review list
+ <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn <andrew@lunn.ch>,
+ Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>,
+ Radu Pirea <radu-nicolae.pirea@oss.nxp.com>,
+ Jay Vosburgh <j.vosburgh@gmail.com>, Andy Gospodarek <andy@greyhouse.net>,
+ Nicolas Ferre <nicolas.ferre@microchip.com>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ Jonathan Corbet <corbet@lwn.net>,
+ Horatiu Vultur <horatiu.vultur@microchip.com>, UNGLinuxDriver@microchip.com,
+ Simon Horman <horms@kernel.org>, Vladimir Oltean <vladimir.oltean@nxp.com>,
+ donald.hunter@gmail.com, danieller@nvidia.com, ecree.xilinx@gmail.com,
+ Andrew Lunn <andrew+netdev@lunn.ch>,
+ Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ linux-doc@vger.kernel.org, Maxime Chevallier
+ <maxime.chevallier@bootlin.com>, Rahul Rameshbabu <rrameshbabu@nvidia.com>,
+ Willem de Bruijn <willemb@google.com>,
+ Shannon Nelson <shannon.nelson@amd.com>,
+ Alexandra Winter <wintera@linux.ibm.com>
+References: <20241212-feature_ptp_netnext-v21-0-2c282a941518@bootlin.com>
+ <20241212-feature_ptp_netnext-v21-3-2c282a941518@bootlin.com>
+ <4c6419d8-c06b-495c-b987-d66c2e1ff848@tuxon.dev>
+ <20250117130656.23a41605@kmaincent-XPS-13-7390>
+From: Claudiu Beznea <claudiu.beznea@tuxon.dev>
+Content-Language: en-US
+In-Reply-To: <20250117130656.23a41605@kmaincent-XPS-13-7390>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-2025-01-13, 10:31:28 +0100, Antonio Quartulli wrote:
->  static bool ovpn_encrypt_one(struct ovpn_peer *peer, struct sk_buff *skb)
->  {
-> -	ovpn_skb_cb(skb)->peer = peer;
-> +	struct ovpn_crypto_key_slot *ks;
-> +
-> +	if (unlikely(skb->ip_summed == CHECKSUM_PARTIAL &&
-> +		     skb_checksum_help(skb))) {
-> +		net_warn_ratelimited("%s: cannot compute checksum for outgoing packet for peer %u\n",
-> +				     netdev_name(peer->ovpn->dev), peer->id);
-> +		return false;
-> +	}
-> +
-> +	/* get primary key to be used for encrypting data */
-> +	ks = ovpn_crypto_key_slot_primary(&peer->crypto);
-> +	if (unlikely(!ks))
-> +		return false;
->  
->  	/* take a reference to the peer because the crypto code may run async.
->  	 * ovpn_encrypt_post() will release it upon completion
-> @@ -118,7 +244,8 @@ static bool ovpn_encrypt_one(struct ovpn_peer *peer, struct sk_buff *skb)
 
-Adding in the few lines that got snipped:
 
-	/* take a reference to the peer because the crypto code may run async.
-	 * ovpn_encrypt_post() will release it upon completion
-	 */
-	if (unlikely(!ovpn_peer_hold(peer))) {
-		DEBUG_NET_WARN_ON_ONCE(1);
-		return false;
-	}
+On 17.01.2025 14:06, Kory Maincent wrote:
+> On Fri, 17 Jan 2025 13:57:41 +0200
+> Claudiu Beznea <claudiu.beznea@tuxon.dev> wrote:
+> 
+>> Hi, Kory,
+>>
+>> On 12.12.2024 19:06, Kory Maincent wrote:
+>>> Introduce the description of a hwtstamp provider, mainly defined with a
+>>> the hwtstamp source and the phydev pointer.
+>>>
+>>> Add a hwtstamp provider description within the netdev structure to
+>>> allow saving the hwtstamp we want to use. This prepares for future
+>>> support of an ethtool netlink command to select the desired hwtstamp
+>>> provider. By default, the old API that does not support hwtstamp
+>>> selectability is used, meaning the hwtstamp provider pointer is unset.
+>>>
+>>> Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>  
+>>
+>> I'm getting this error when doing suspend/resume on the Renesas RZ/G3S
+>> Smarc Module + RZ SMARC Carrier II board:
+>>
+>> [   39.032969] =============================
+>> [   39.032983] WARNING: suspicious RCU usage
+>> [   39.033000] 6.13.0-rc7-next-20250116-arm64-renesas-00002-g35245dfdc62c
+>> #7 Not tainted
+>> [   39.033019] -----------------------------
+>> [   39.033033] drivers/net/phy/phy_device.c:2004 suspicious
+>> rcu_dereference_protected() usage!
+> 
+> Thanks for the report.
+> Oh so it seems there are cases where phy_detach is not called under RTNL lock!
+> 
+> This should solve the issue:
+> -               hwprov = rtnl_dereference(dev->hwprov);
+> +               rcu_read_lock()
+> +               hwprov = rcu_dereference(dev->hwprov);
+>                 /* Disable timestamp if it is the one selected */
+>                 if (hwprov && hwprov->phydev == phydev) {
+>                         rcu_assign_pointer(dev->hwprov, NULL);
+>                         kfree_rcu(hwprov, rcu_head);
+>                 }
+> +               rcu_read_unlock();
 
-This should never happen, but just in case, we'd want
-ovpn_crypto_key_slot_put() here.
+Just tested. The issue is gone. You can add my:
 
->  		return false;
->  	}
+Tested-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
 
--- 
-Sabrina
+Thank you,
+Claudiu
+
+> 
+> I will send a patch soon.
+> 
+> Regards,
+
 
