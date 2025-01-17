@@ -1,309 +1,183 @@
-Return-Path: <netdev+bounces-159161-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159162-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6DE85A148BF
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 05:14:23 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 968DDA1490F
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 06:05:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B2B0B1888860
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 04:14:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F273F3A98F4
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 05:05:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A3731F63ED;
-	Fri, 17 Jan 2025 04:14:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6ACCE1F7575;
+	Fri, 17 Jan 2025 05:05:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QgxKZoUu"
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="HrmQyD27"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailout2.samsung.com (mailout2.samsung.com [203.254.224.25])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5629C15747C
-	for <netdev@vger.kernel.org>; Fri, 17 Jan 2025 04:14:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93DC01F76DF
+	for <netdev@vger.kernel.org>; Fri, 17 Jan 2025 05:05:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737087259; cv=none; b=a0b/35+CVLuTaIxo5C2fjcouRzkCd5USZFlemVJe522gHHsUC9XpYGxB7g/lydC0OyqRTquvcBLQB+QttsIDXSx9Qvvy4T1aABADuvT96Gr+3CGe6DSuvDlcDr0T29TAINJkYMWRmAPmvLqFp1mNfccR3JSX//fIEsmYUoFMkBo=
+	t=1737090304; cv=none; b=Y7kd/7eMZUsh+SilDoDF0qtPkqnXvT+cHng24YJV0SoxvLC4zDqwAw9U+xYGMFuIb75QNsexxaZ5A4O2roB10f2g8ozmbwRfMNdjxq6WF/64Fg7MumsAwxeK4bmj5i1FFVKRjPGIvP2Vw4O+5/Z8aJ26cSVFaj3lAH0H7rrYFYk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737087259; c=relaxed/simple;
-	bh=GCI4SN1y27vCTBvq3qlvLN6+Y02DWi1T1AnuIutJ+ro=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=U+Nj+7F7u3cwd3tTVCkTtc3skVnFWzOzzQ561XKejGFXU7mL5hnJFNVAaacIoHHDgQhRFaTdDJ+jPWq3YQm529Mo48Z1Nj7aDgi3AXN2ONXWBVeckYjikSl2xk9NyZ7ykPFIQyZeTXNhhEcveEX2lW1h497XL+1cpXs7tf8E9qY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QgxKZoUu; arc=none smtp.client-ip=209.85.208.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-5da12190e75so3378440a12.1
-        for <netdev@vger.kernel.org>; Thu, 16 Jan 2025 20:14:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1737087256; x=1737692056; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2ROuh+929mMDC4iky0HeNpGaSK8yH5uKAPHH6U0Cgig=;
-        b=QgxKZoUuJZdhShVn/n2ZaW5MBxU5zfzJpz7rkYuwtYboE3Qh7Q6bS3Sp1C+OaxOk+q
-         0tlOSmnG/IBR9GuyEd3p3qkrVFGw5uf5+W39mJdblp+dgnCWPsjfbOVlvQ39xJKXhDlL
-         A/wGvp47Mvygc/FJVQwCEs2xYHr3n0Vs1qxMGdn7vSbaePUZ8xScY6BgEm8766bQa2eS
-         igRKU6opo1WWM+eQPqJxYfndQ+HMIY8WsNQhP82+KkVLYKyLC3pdj4iuD2PgFq6vL9Vg
-         lzdS+f/vYqD47v+lKKJjycf0gQAl1XRJeN0jjcI4yy6P5vogH+18ianhbnPM5/lI2MPx
-         qYmA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737087256; x=1737692056;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=2ROuh+929mMDC4iky0HeNpGaSK8yH5uKAPHH6U0Cgig=;
-        b=ZW8mfzVXP+cM2P9fqSjgVzMNY/KZimCbxe0iHYhpJPRIOsdC0FCFnY9Uiq9RBW0MO4
-         2cE3+QrdlGu5QvXfp0PptDPJe+e4xYKMwg0Sfwqt3IJB8V9rvK20M5RqN8j6jUw9yYaE
-         6AvJOdV4bJBRiVOf586qq7Hdzs2AD8RG0r3Mlc4aoA6qEnzssW+cvOfww4yuAcyf035+
-         Fz7ANESWjUS4BW+UFlUzqj8c9bUZKjP7ugD3Uwdnt3VzBQH5VYDGhpVz/GnCEmNW+ABC
-         O4KaRZjPf+lmGm2CiIh/IceUlqdJrkBt7qqt+3VNm71IEYGEPT4pioHchGWznvcF0Elb
-         gjrA==
-X-Forwarded-Encrypted: i=1; AJvYcCVOLb8ZvsNzIWCZdfTgW6lnetC4XYAIKdFBzWdGfXhMIckvScdq1VIqUI4H9rC+QCKJuaGqrLk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw3CPtgZnTyZTPr78rQTWM6X0//y/h+OefpyRrxXj10GXWw8dl+
-	j0E+u3Y/1yERVS07wbJ2F7jWcHgSk9+q/0tiV5TSJCBDZpQb9sTyvLbzz3TRXT8Fb2Z0nzbJXC/
-	bwTdhoZ2AJPwwHXtC6PI/3B6Imz7+8x+tfuWK
-X-Gm-Gg: ASbGncs373iKJUiT+i67vwjAX4iuRyylnu5El+HGILVu9ay73zvyQqOUTqOfy8OAQkT
-	Q8b+7Fl9zNnJgtnxTd+OprbkOsmOsXmj7YMdUSoI=
-X-Google-Smtp-Source: AGHT+IE4PfKh6ogwR1JVx6LitwiG4+7efC8fuqXr6Z2dZC2zmrgG+fkQtJbyATAiKB8JS8qBK/uHXwJg521mcICmyHU=
-X-Received: by 2002:a17:907:86aa:b0:ab2:faed:e305 with SMTP id
- a640c23a62f3a-ab38b1b2689mr100447766b.10.1737087255504; Thu, 16 Jan 2025
- 20:14:15 -0800 (PST)
+	s=arc-20240116; t=1737090304; c=relaxed/simple;
+	bh=nA735ijctfPvXKw2MPMn/SYX2exiUysdHgw1pzxx+XM=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:In-Reply-To:
+	 Content-Type:References; b=dQAeSKSs5ImFRanj49WFdDtPSLJ5H1zvsMRBXQTA18uVHwrG5oChEcJZNyCvMREvuXAcAKyv8lE002XBmt6lEzJDn/1l3kTooNi3t4WwAORT556WD8oGCWKWPYAMvsHli9Uoc+I7Bo0h3uprNA1tQOTgFLHRqf3sOZu1+o3hndA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=HrmQyD27; arc=none smtp.client-ip=203.254.224.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+Received: from epcas2p3.samsung.com (unknown [182.195.41.55])
+	by mailout2.samsung.com (KnoxPortal) with ESMTP id 20250117050454epoutp021e27c4ce21320e9acf3a54e8d5486fab~bYmtSVdt42472724727epoutp029
+	for <netdev@vger.kernel.org>; Fri, 17 Jan 2025 05:04:54 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20250117050454epoutp021e27c4ce21320e9acf3a54e8d5486fab~bYmtSVdt42472724727epoutp029
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1737090294;
+	bh=HIR8q2mF4sWDFC/z0m7EBIG9TEG9U8v6XXqg5Vmz6lg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=HrmQyD27rjSNOaOLgKkbMXxMgY9E4+tpWsPbHbpgRzzmhg4SeN6M1ZU5suAoDY6x2
+	 I7WptpYwzMnBW9U9xoXml3izhHajmBQGvuwIJUvTEXc1VRc16kuVfiyocyrDU1W3wU
+	 yUuOLGgGHjmvcMsn6uxgzgdNejCuy2TivcSjE8JI=
+Received: from epsnrtp2.localdomain (unknown [182.195.42.163]) by
+	epcas2p1.samsung.com (KnoxPortal) with ESMTP id
+	20250117050453epcas2p19e0105c16b75682998e44b6ad601120d~bYmswJlEj1001910019epcas2p1K;
+	Fri, 17 Jan 2025 05:04:53 +0000 (GMT)
+Received: from epsmgec2p1-new.samsung.com (unknown [182.195.36.92]) by
+	epsnrtp2.localdomain (Postfix) with ESMTP id 4YZ72Y34JCz4x9Py; Fri, 17 Jan
+	2025 05:04:53 +0000 (GMT)
+Received: from epcas2p3.samsung.com ( [182.195.41.55]) by
+	epsmgec2p1-new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	1A.C6.32010.5F4E9876; Fri, 17 Jan 2025 14:04:53 +0900 (KST)
+Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
+	epcas2p3.samsung.com (KnoxPortal) with ESMTPA id
+	20250117050452epcas2p3eec45f40766213150d849de55e6114ae~bYmr8_LIa0554805548epcas2p3K;
+	Fri, 17 Jan 2025 05:04:52 +0000 (GMT)
+Received: from epsmgmcp1.samsung.com (unknown [182.195.42.82]) by
+	epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
+	20250117050452epsmtrp1a2ae4ba790b9c5def6285c50c89e2a31~bYmr8HJAu0799307993epsmtrp1Y;
+	Fri, 17 Jan 2025 05:04:52 +0000 (GMT)
+X-AuditID: b6c32a4d-abdff70000007d0a-5e-6789e4f58055
+Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
+	epsmgmcp1.samsung.com (Symantec Messaging Gateway) with SMTP id
+	4D.E4.33707.4F4E9876; Fri, 17 Jan 2025 14:04:52 +0900 (KST)
+Received: from perf (unknown [10.229.95.91]) by epsmtip1.samsung.com
+	(KnoxPortal) with ESMTPA id
+	20250117050452epsmtip14a1c60a3330af1eccdb5ebd4a86aaec3~bYmrsfZzb2367423674epsmtip1J;
+	Fri, 17 Jan 2025 05:04:52 +0000 (GMT)
+Date: Fri, 17 Jan 2025 14:08:34 +0900
+From: Youngmin Nam <youngmin.nam@samsung.com>
+To: Neal Cardwell <ncardwell@google.com>
+Cc: Eric Dumazet <edumazet@google.com>, Youngmin Nam
+	<youngmin.nam@samsung.com>, Jakub Kicinski <kuba@kernel.org>,
+	davem@davemloft.net, dsahern@kernel.org, pabeni@redhat.com,
+	horms@kernel.org, guo88.liu@samsung.com, yiwang.cai@samsung.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	joonki.min@samsung.com, hajun.sung@samsung.com, d7271.choe@samsung.com,
+	sw.ju@samsung.com, "Dujeong.lee" <dujeong.lee@samsung.com>
+Subject: Re: [PATCH] tcp: check socket state before calling WARN_ON
+Message-ID: <Z4nl0h1IZ5R/KDEc@perf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <000000000000c1ae9e062164e101@google.com> <6789d55f.050a0220.20d369.004e.GAE@google.com>
-In-Reply-To: <6789d55f.050a0220.20d369.004e.GAE@google.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 17 Jan 2025 05:14:04 +0100
-X-Gm-Features: AbW1kvaOdOQCmXS2ovmr2OC6hdwPt3leOeWr0-9snK5mArRAYsxnNsyWeFjQ1kI
-Message-ID: <CANn89iJiQeF=7g0wFVOZ=TMUnL-7U0xvw4ZQL5H5f4+ChBp__w@mail.gmail.com>
-Subject: Re: [syzbot] [wireless?] possible deadlock in ieee80211_remove_interfaces
-To: syzbot <syzbot+5b9196ecf74447172a9a@syzkaller.appspotmail.com>
-Cc: davem@davemloft.net, johannes@sipsolutions.net, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <CADVnQykPo35mQ1y16WD3zppENCeOi+2Ea_2m-AjUQVPc9SXm4g@mail.gmail.com>
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrMJsWRmVeSWpSXmKPExsWy7bCmue7XJ53pBlNPi1pc2zuR3WLO+RYW
+	i3W7Wpksni2YwWLx9NgjdovJUxgtmvZfYrZ41H+CzeLq7nfMFhe29bFaXN41h82i485eFotj
+	C8Qsvp1+w2jR+vgzu8XH403sFosPfGJ3EPTYsvImk8eCTaUem1Z1snm833eVzaNvyypGj8+b
+	5ALYorJtMlITU1KLFFLzkvNTMvPSbZW8g+Od403NDAx1DS0tzJUU8hJzU22VXHwCdN0yc4BO
+	V1IoS8wpBQoFJBYXK+nb2RTll5akKmTkF5fYKqUWpOQUmBfoFSfmFpfmpevlpZZYGRoYGJkC
+	FSZkZxzbsZi9oImz4vWxXSwNjIfZuxg5OSQETCR6Pn9l62Lk4hAS2MMo0bPyDROE84lR4szk
+	0yxwzqJnK+FaNp5ZCpXYySjx4sJLRgjnIaPEqiPzgDIcHCwCqhJ//geANLAJ6EpsO/GPEcQW
+	EdCQuLvoAVg9s8AWZokHb74wgtQLCzhL/L1jC1LDK6As8Xf2dxYIW1Di5MwnYCM5BQIlZnak
+	gbRKCOzhkLjcfokZ4iAXiR9tv1ghbGGJV8e3QB0qJfGyvw3KLpZouH+LGaK5hVHi1PUXUM3G
+	ErOetYMdxyyQKTHx1yuwZRJARxy5xQIR5pPoOPyXHSLMK9HRJgTRqSbxa8oGRghbRmL34hVQ
+	Ez0kbh0/wQ4JknksEicn/2CawCg3C8k7s5Bsg7B1JBbs/sQ2C2gFs4C0xPJ/HBCmpsT6XfoL
+	GFlXMUqlFhTnpqcmGxUY6uallsMjOTk/dxMjODVr+e5gfL3+r94hRiYOxkOMEhzMSiK8ab87
+	0oV4UxIrq1KL8uOLSnNSiw8xmgKjZyKzlGhyPjA75JXEG5pYGpiYmRmaG5kamCuJ81bvaEkX
+	EkhPLEnNTk0tSC2C6WPi4JRqYGLMnyjGXc0rF7Fjz9lyf/t50m3f1QSyV/85O/3AJZF5B7n+
+	qCxQyu5fplSQ/bH/w5Lop/2b+sQcZzGlJLY/nGV9R6VXkq28Le4ck/PyZ5+XOO85fiDzt89t
+	7otb0o+u7NkyN/lqgTWLssDL+kqVhDUTYxaVzEiIetimc2BOhENE5bW/+7U2MrSekW5cKTLf
+	W2bm9H1c+/fNbFtg76T98eHFxPIWPt/jSx04t5nwJ045sDr782JOx82FM+7vP2235d2c5hsq
+	puedivNFv4faCISsW8b23PbhQe/NjxoMLl3wcFzoNumZbp3xP8+Qum0a5y5xPdn6xCf+5Hy5
+	mzO4w+4/3HBmzyu+zwuzzp1/9bJTiaU4I9FQi7moOBEAWgYyIlYEAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrPLMWRmVeSWpSXmKPExsWy7bCSnO6XJ53pBo8mGllc2zuR3WLO+RYW
+	i3W7Wpksni2YwWLx9NgjdovJUxgtmvZfYrZ41H+CzeLq7nfMFhe29bFaXN41h82i485eFotj
+	C8Qsvp1+w2jR+vgzu8XH403sFosPfGJ3EPTYsvImk8eCTaUem1Z1snm833eVzaNvyypGj8+b
+	5ALYorhsUlJzMstSi/TtErgyfuz9zlqwn61i8ZY57A2MM1m7GDk5JARMJDaeWcoCYgsJbGeU
+	+DLVEiIuI3F75WWoGmGJ+y1HgGwuoJr7jBKfX51k7mLk4GARUJX48z8ApIZNQFdi24l/jCC2
+	iICGxN1FDxhB6pkFdjBLLG3dxwZSLyzgLPH3ji1IDa+AssTf2d9ZIGYuYJH4d3o6I0RCUOLk
+	zCdgBzELaEnc+PeSCaSXWUBaYvk/DhCTUyBQYmZH2gRGgVlIGmYhaZiF0LCAkXkVo2hqQXFu
+	em5ygaFecWJucWleul5yfu4mRnAcaQXtYFy2/q/eIUYmDsZDjBIczEoivGm/O9KFeFMSK6tS
+	i/Lji0pzUosPMUpzsCiJ8yrndKYICaQnlqRmp6YWpBbBZJk4OKUamLb1Okh9uM903+G52Lnj
+	J9PWlCyeVuKmGpkmH65d4yixuS7npNldGa3aDR7Xdm5ak1y0nvHKupZFK37OD30Ucu3t9z/b
+	Tp80Xdl78mKwuQ23QAOzSvvPbafnHiy24D7w/Ma7sGMPLq/Lvjz1A6f5s2k7FG5v63lirD3/
+	9IEVBzkNnvrVRqr9LQhZe/lwd/5ORp4S5cefPOoNztwWL1Bf+TbtQEjt/tRdm06bPCjXk4xu
+	8jp+fetTf9FPr6IjK5QmTkibyWG4NK/G4ixjttWJ3RPu/lTZ8V540cvf1WtO1FVoKe+J63z1
+	yUTC3M335bF5RrLKzCWJ28IaL77W2uLavuVx+pMVywR0ubPXS27dWXpCiaU4I9FQi7moOBEA
+	TavUNxIDAAA=
+X-CMS-MailID: 20250117050452epcas2p3eec45f40766213150d849de55e6114ae
+X-Msg-Generator: CA
+Content-Type: multipart/mixed;
+	boundary="----6TxoHKXr_qkwT5q0XKHb2K6SEyMzWlX0etqXdnnbNHHFM6GI=_284afd_"
+X-Sendblock-Type: AUTO_CONFIDENTIAL
+CMS-TYPE: 102P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20241203081005epcas2p247b3d05bc767b1a50ba85c4433657295
+References: <CGME20241203081005epcas2p247b3d05bc767b1a50ba85c4433657295@epcas2p2.samsung.com>
+	<20241203081247.1533534-1-youngmin.nam@samsung.com>
+	<CANn89iK+7CKO31=3EvNo6-raUzyibwRRN8HkNXeqzuP9q8k_tA@mail.gmail.com>
+	<CADVnQynUspJL4e3UnZTKps9WmgnE-0ngQnQmn=8gjSmyg4fQ5A@mail.gmail.com>
+	<20241203181839.7d0ed41c@kernel.org> <Z0/O1ivIwiVVNRf0@perf>
+	<CANn89iKms_9EX+wArf1FK7Cy3-Cr_ryX+MJ2YC8yt1xmvpY=Uw@mail.gmail.com>
+	<009e01db4620$f08f42e0$d1adc8a0$@samsung.com>
+	<CADVnQykPo35mQ1y16WD3zppENCeOi+2Ea_2m-AjUQVPc9SXm4g@mail.gmail.com>
 
-On Fri, Jan 17, 2025 at 4:58=E2=80=AFAM syzbot
-<syzbot+5b9196ecf74447172a9a@syzkaller.appspotmail.com> wrote:
->
-> syzbot has found a reproducer for the following issue on:
->
-> HEAD commit:    8d20dcda404d selftests: drv-net-hw: inject pp_alloc_fail =
-e..
-> git tree:       net-next
-> console output: https://syzkaller.appspot.com/x/log.txt?x=3D14ef5a1858000=
-0
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=3Dc30f048a4f128=
-91
-> dashboard link: https://syzkaller.appspot.com/bug?extid=3D5b9196ecf744471=
-72a9a
-> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Deb=
-ian) 2.40
-> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=3D15d7a1f8580=
-000
->
-> Downloadable assets:
-> disk image: https://storage.googleapis.com/syzbot-assets/5ce07c743ced/dis=
-k-8d20dcda.raw.xz
-> vmlinux: https://storage.googleapis.com/syzbot-assets/66f2a9a35d5e/vmlinu=
-x-8d20dcda.xz
-> kernel image: https://storage.googleapis.com/syzbot-assets/4c790c086a46/b=
-zImage-8d20dcda.xz
->
-> IMPORTANT: if you fix the issue, please add the following tag to the comm=
-it:
-> Reported-by: syzbot+5b9196ecf74447172a9a@syzkaller.appspotmail.com
->
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D
-> WARNING: possible circular locking dependency detected
-> 6.13.0-rc7-syzkaller-01131-g8d20dcda404d #0 Not tainted
-> ------------------------------------------------------
-> kworker/u8:6/3534 is trying to acquire lock:
-> ffffffff8fcb4a08 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_acquire_if_cleanup_ne=
-t net/core/dev.c:10281 [inline]
-> ffffffff8fcb4a08 (rtnl_mutex){+.+.}-{4:4}, at: unregister_netdevice_many_=
-notify+0xac2/0x2030 net/core/dev.c:11783
->
-> but task is already holding lock:
-> ffff8880216b0768 (&rdev->wiphy.mtx){+.+.}-{4:4}, at: class_wiphy_construc=
-tor include/net/cfg80211.h:6034 [inline]
-> ffff8880216b0768 (&rdev->wiphy.mtx){+.+.}-{4:4}, at: ieee80211_remove_int=
-erfaces+0x129/0x700 net/mac80211/iface.c:2276
->
-> which lock already depends on the new lock.
->
->
-> the existing dependency chain (in reverse order) is:
->
-> -> #1 (&rdev->wiphy.mtx){+.+.}-{4:4}:
->        lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5849
->        __mutex_lock_common kernel/locking/mutex.c:585 [inline]
->        __mutex_lock+0x1ac/0xee0 kernel/locking/mutex.c:735
->        wiphy_lock include/net/cfg80211.h:6019 [inline]
->        wiphy_register+0x1a49/0x27b0 net/wireless/core.c:1006
->        ieee80211_register_hw+0x30fb/0x3e10 net/mac80211/main.c:1582
->        mac80211_hwsim_new_radio+0x2a9f/0x4a90 drivers/net/wireless/virtua=
-l/mac80211_hwsim.c:5558
->        init_mac80211_hwsim+0x87a/0xb00 drivers/net/wireless/virtual/mac80=
-211_hwsim.c:6910
->        do_one_initcall+0x248/0x870 init/main.c:1266
->        do_initcall_level+0x157/0x210 init/main.c:1328
->        do_initcalls+0x3f/0x80 init/main.c:1344
->        kernel_init_freeable+0x435/0x5d0 init/main.c:1577
->        kernel_init+0x1d/0x2b0 init/main.c:1466
->        ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
->        ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
->
-> -> #0 (rtnl_mutex){+.+.}-{4:4}:
->        check_prev_add kernel/locking/lockdep.c:3161 [inline]
->        check_prevs_add kernel/locking/lockdep.c:3280 [inline]
->        validate_chain+0x18ef/0x5920 kernel/locking/lockdep.c:3904
->        __lock_acquire+0x1397/0x2100 kernel/locking/lockdep.c:5226
->        lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5849
->        __mutex_lock_common kernel/locking/mutex.c:585 [inline]
->        __mutex_lock+0x1ac/0xee0 kernel/locking/mutex.c:735
->        rtnl_acquire_if_cleanup_net net/core/dev.c:10281 [inline]
->        unregister_netdevice_many_notify+0xac2/0x2030 net/core/dev.c:11783
->        unregister_netdevice_many net/core/dev.c:11866 [inline]
->        unregister_netdevice_queue+0x303/0x370 net/core/dev.c:11732
->        unregister_netdevice include/linux/netdevice.h:3320 [inline]
->        _cfg80211_unregister_wdev+0x163/0x590 net/wireless/core.c:1251
->        ieee80211_remove_interfaces+0x4ef/0x700 net/mac80211/iface.c:2301
->        ieee80211_unregister_hw+0x5d/0x2c0 net/mac80211/main.c:1676
->        mac80211_hwsim_del_radio+0x2c4/0x4c0 drivers/net/wireless/virtual/=
-mac80211_hwsim.c:5664
->        hwsim_exit_net+0x5c1/0x670 drivers/net/wireless/virtual/mac80211_h=
-wsim.c:6544
->        ops_exit_list net/core/net_namespace.c:172 [inline]
->        cleanup_net+0x812/0xd60 net/core/net_namespace.c:652
->        process_one_work kernel/workqueue.c:3236 [inline]
->        process_scheduled_works+0xa66/0x1840 kernel/workqueue.c:3317
->        worker_thread+0x870/0xd30 kernel/workqueue.c:3398
->        kthread+0x2f0/0x390 kernel/kthread.c:389
->        ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
->        ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
->
-> other info that might help us debug this:
->
->  Possible unsafe locking scenario:
->
->        CPU0                    CPU1
->        ----                    ----
->   lock(&rdev->wiphy.mtx);
->                                lock(rtnl_mutex);
->                                lock(&rdev->wiphy.mtx);
->   lock(rtnl_mutex);
->
->  *** DEADLOCK ***
->
-> 4 locks held by kworker/u8:6/3534:
->  #0: ffff88801baf5948 ((wq_completion)netns){+.+.}-{0:0}, at: process_one=
-_work kernel/workqueue.c:3211 [inline]
->  #0: ffff88801baf5948 ((wq_completion)netns){+.+.}-{0:0}, at: process_sch=
-eduled_works+0x93b/0x1840 kernel/workqueue.c:3317
->  #1: ffffc9000d507d00 (net_cleanup_work){+.+.}-{0:0}, at: process_one_wor=
-k kernel/workqueue.c:3212 [inline]
->  #1: ffffc9000d507d00 (net_cleanup_work){+.+.}-{0:0}, at: process_schedul=
-ed_works+0x976/0x1840 kernel/workqueue.c:3317
->  #2: ffffffff8fca8290 (pernet_ops_rwsem){++++}-{4:4}, at: cleanup_net+0x1=
-7a/0xd60 net/core/net_namespace.c:606
->  #3: ffff8880216b0768 (&rdev->wiphy.mtx){+.+.}-{4:4}, at: class_wiphy_con=
-structor include/net/cfg80211.h:6034 [inline]
->  #3: ffff8880216b0768 (&rdev->wiphy.mtx){+.+.}-{4:4}, at: ieee80211_remov=
-e_interfaces+0x129/0x700 net/mac80211/iface.c:2276
->
-> stack backtrace:
-> CPU: 1 UID: 0 PID: 3534 Comm: kworker/u8:6 Not tainted 6.13.0-rc7-syzkall=
-er-01131-g8d20dcda404d #0
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS G=
-oogle 12/27/2024
-> Workqueue: netns cleanup_net
-> Call Trace:
->  <TASK>
->  __dump_stack lib/dump_stack.c:94 [inline]
->  dump_stack_lvl+0x241/0x360 lib/dump_stack.c:120
->  print_circular_bug+0x13a/0x1b0 kernel/locking/lockdep.c:2074
->  check_noncircular+0x36a/0x4a0 kernel/locking/lockdep.c:2206
->  check_prev_add kernel/locking/lockdep.c:3161 [inline]
->  check_prevs_add kernel/locking/lockdep.c:3280 [inline]
->  validate_chain+0x18ef/0x5920 kernel/locking/lockdep.c:3904
->  __lock_acquire+0x1397/0x2100 kernel/locking/lockdep.c:5226
->  lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5849
->  __mutex_lock_common kernel/locking/mutex.c:585 [inline]
->  __mutex_lock+0x1ac/0xee0 kernel/locking/mutex.c:735
->  rtnl_acquire_if_cleanup_net net/core/dev.c:10281 [inline]
->  unregister_netdevice_many_notify+0xac2/0x2030 net/core/dev.c:11783
->  unregister_netdevice_many net/core/dev.c:11866 [inline]
->  unregister_netdevice_queue+0x303/0x370 net/core/dev.c:11732
->  unregister_netdevice include/linux/netdevice.h:3320 [inline]
->  _cfg80211_unregister_wdev+0x163/0x590 net/wireless/core.c:1251
->  ieee80211_remove_interfaces+0x4ef/0x700 net/mac80211/iface.c:2301
->  ieee80211_unregister_hw+0x5d/0x2c0 net/mac80211/main.c:1676
->  mac80211_hwsim_del_radio+0x2c4/0x4c0 drivers/net/wireless/virtual/mac802=
-11_hwsim.c:5664
->  hwsim_exit_net+0x5c1/0x670 drivers/net/wireless/virtual/mac80211_hwsim.c=
-:6544
->  ops_exit_list net/core/net_namespace.c:172 [inline]
->  cleanup_net+0x812/0xd60 net/core/net_namespace.c:652
->  process_one_work kernel/workqueue.c:3236 [inline]
->  process_scheduled_works+0xa66/0x1840 kernel/workqueue.c:3317
->  worker_thread+0x870/0xd30 kernel/workqueue.c:3398
->  kthread+0x2f0/0x390 kernel/kthread.c:389
->  ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
->  ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
->  </TASK>
-> hsr_slave_0: left promiscuous mode
-> hsr_slave_1: left promiscuous mode
-> batman_adv: batadv0: Interface deactivated: batadv_slave_0
-> batman_adv: batadv0: Removing interface: batadv_slave_0
-> batman_adv: batadv0: Interface deactivated: batadv_slave_1
-> batman_adv: batadv0: Removing interface: batadv_slave_1
-> veth1_macvtap: left promiscuous mode
-> veth0_macvtap: left promiscuous mode
-> veth1_vlan: left promiscuous mode
-> veth0_vlan: left promiscuous mode
-> team0 (unregistering): Port device team_slave_1 removed
-> team0 (unregistering): Port device team_slave_0 removed
-> bridge0: port 2(bridge_slave_1) entered blocking state
-> bridge0: port 2(bridge_slave_1) entered forwarding state
-> bridge0: port 1(bridge_slave_0) entered blocking state
-> bridge0: port 1(bridge_slave_0) entered forwarding state
-> bridge0: port 2(bridge_slave_1) entered blocking state
-> bridge0: port 2(bridge_slave_1) entered forwarding state
->
->
-> ---
-> If you want syzbot to run the reproducer, reply with:
-> #syz test: git://repo/address.git branch-or-commit-hash
-> If you attach or paste a git patch, syzbot will apply it before testing.
+------6TxoHKXr_qkwT5q0XKHb2K6SEyMzWlX0etqXdnnbNHHFM6GI=_284afd_
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
 
-This repro is for another bug I think, caused by my recent commits in net-n=
-ext:
+> Thanks for all the details! If the ramdump becomes available again at
+> some point, would it be possible to pull out the following values as
+> well:
+> 
+> tp->mss_cache
+> inet_csk(sk)->icsk_pmtu_cookie
+> inet_csk(sk)->icsk_ca_state
+> 
+> Thanks,
+> neal
+> 
 
-83419b61d187ce22aa3da5ffdda850fca3a12600 net: reduce RTNL hold
-duration in unregister_netdevice_many_notify() (part 2)
-ae646f1a0bb97401bac0044bbe2a179a1e38b408 net: reduce RTNL hold
-duration in unregister_netdevice_many_notify() (part 1)
-cfa579f6665635b72d4a075fc91eb144c2b0f74e net: no longer hold RTNL
-while calling flush_all_backlogs()
+Hi Neal. Happy new year.
 
-cleanup_net()
-  rtnl_lock();
-    mutex_lock(subsystem_mutex);
+We are currently trying to capture a tcpdump during the problem situation
+to construct the Packetdrill script. However, this issue does not occur very often.
 
-    unregister_netdevice();
+By the way, we have a full ramdump, so we can provide the information you requested.
 
-       rtnl_unlock();       // LOCKDEP violation
-       rtnl_lock();
+tp->packets_out = 0
+tp->sacked_out = 0
+tp->lost_out = 4
+tp->retrans_out = 1
+tcp_is_sack(tp) = 1
+tp->mss_cache = 1428
+inet_csk(sk)->icsk_ca_state = 4
+inet_csk(sk)->icsk_pmtu_cookie = 1500
 
-I will work today on a fix, auditing all unregister_netdevice() and
-unregister_netdevice_many()
-and select which of them can safely opt-in for a variant which _can_
-temporarily release RTNL.
+If you need any specific information from the ramdump, please let me know.
+
+Thanks.
+
+------6TxoHKXr_qkwT5q0XKHb2K6SEyMzWlX0etqXdnnbNHHFM6GI=_284afd_
+Content-Type: text/plain; charset="utf-8"
+
+
+------6TxoHKXr_qkwT5q0XKHb2K6SEyMzWlX0etqXdnnbNHHFM6GI=_284afd_--
 
