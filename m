@@ -1,79 +1,82 @@
-Return-Path: <netdev+bounces-159369-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159370-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2DCD3A15411
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 17:18:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 135D7A1541D
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 17:21:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 555A8165A28
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 16:18:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2356D164057
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 16:21:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 646D7189F3F;
-	Fri, 17 Jan 2025 16:18:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2031619ABB6;
+	Fri, 17 Jan 2025 16:21:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="msbZ6pG3"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="hHLojEd8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0D369443;
-	Fri, 17 Jan 2025 16:18:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E2329443;
+	Fri, 17 Jan 2025 16:21:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737130709; cv=none; b=Y8QJPsZANcyoew/j/Wykl8JsHjQQ0o3EAPuiI+NNC8wl5F/Yl3aVOmMmxd9pEiHlEd0xiUt5y4N6eEVrBxI3R+wPbOUBYCO+W/c1PcVUJ3BhF3AVM8+eCoTF2bV7x2RV4BJ47GTtIlabPNLYpezUr46k8iByhgvaoBbb0NXcbiU=
+	t=1737130865; cv=none; b=YdLsQNx5rKNUb43HN84FIUA55eNXIRb67g+P2YwKRW1zS6j7lH8EURCPMAp+410J/4wnmf3x0HbeG93huzNq4EvUvlY5h9Bmg6PU/srVe2ry9MhZNXjliWOm69OHOiW7KBxlmXWHg/XjEHzOXi/QFX0iqSwtmfLDupTpaJmK0tM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737130709; c=relaxed/simple;
-	bh=H30YAu54q3FjWz55Z5MS665Mz7D7iGOCU9G8Q8djKPM=;
+	s=arc-20240116; t=1737130865; c=relaxed/simple;
+	bh=Tjho4acKS2vqGIV85FQZRWncNKnvgwo8IsPwRoUmBjQ=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BTLD78xT/8sJ3sMRNyoT8h1AnbFtGfrSbUvKABlKmxdr2jXd6wraUVETRNteRdRM9zIe49OHgKk/3aJ7qGZg2WWbWnWu5U4pn5SSnZ+VlbpL7giTCBjRW1WXuGSzQzDWmeEx1I276fKiL4BFh4NePwj3Vu7+lERKGIfaZGNtRHw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=msbZ6pG3; arc=none smtp.client-ip=209.85.218.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-ab39f84cbf1so38549266b.3;
-        Fri, 17 Jan 2025 08:18:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1737130706; x=1737735506; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=8co1a7wv4+Y2VVTmsu7Jr8NcJfElBwN78vRge4ydYT8=;
-        b=msbZ6pG3lLUnzSkBmACQScShnLDdjxRVY4KCAhvE/MSPdamteiS+mAfyo0/XN5G/vX
-         4Cnrht63Rr126j9V9U5GHMw5fwQvqjZjQnwhQYjm7vku7xYGEjReHaRXy8qg/PlwiNbk
-         BKAHVT/2BVV8loDaejPOb9lMBHZ5OB9FNI7AFGUnKxL0Y2oBzjV2prl/56LgYqAeVyrJ
-         pjVmIebXtMOipFBriJA9VjtkO3QoDl8bVhwMvB4tb6ArpS2A2y2YIGBYpR55unD7Yiw8
-         918JF3Z2LG1qp+wobGindU50JoQ98Pi54WE5Ljr6NjHtciDVAnSbkaqboeZPe2qmW++X
-         lTFQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737130706; x=1737735506;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8co1a7wv4+Y2VVTmsu7Jr8NcJfElBwN78vRge4ydYT8=;
-        b=CrkwvMISpVzhzHEyrxyXoeVWE+rQem7XoHWtTgLs2ifk5JF4l53TIyqgyzGGqsOKVT
-         +xWQYgg2f5kThFHbxx7c54f7uLEP/X2xZFVWM+2bbFA9wHo4Do/h7cm2DJfe7criBsyI
-         Xv6zOb4BYeTzafQn4jZ+IJ5gsKG3Fasag1nLfzclIgFLcxlswb7fR/GwLJNcoCGSlFP8
-         ACi1kNL+5GlafIwjy+6BTgaTBbluNzn491+DCdjyOgdeO8AhxAkwFEGY/cXgr2MSeqe6
-         LW+xJiSo5TeQOiYJZspPy9cSepo7iPy8U0Uu0tVxPciiEYsgFqUIB8S4ww7Ufzwexy1/
-         JZ2Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUbZXklcMvep+3huqO8RjsbRYCbkto8JxQvgv1HGpHDzNpQivN6AQorrahZSbmOt8C3f5xiNnCQIg==@vger.kernel.org, AJvYcCWOY9Yl3RGYqeUWeLOJoCcum9GWnZB3WhjpU6L9ee/yy2r0VoJK8Bt8ujopYqqJTFqnhnIimJv0@vger.kernel.org
-X-Gm-Message-State: AOJu0YzymIuAINjOhES+24EQMlMPjTgn1iZSPckNcZ3JsnXXXKDkJ1YH
-	Hhn3ZrZP0ozMp5fw3TWCkuvg07sh+4QEhaizHptb3gw4HU+hUe0A
-X-Gm-Gg: ASbGncvI32Z6FYMNc7VP+Agy7dhlt9HEpwExNy5R2e3FSksKwprym7Lshj4g35PLfir
-	Vhm5ES4tVRiWaSN74fEtLcwKCa661xl98/WKW8wyDoHm9sYU+qcnwwvHxFx60Ua/n3w71XNb2cZ
-	sw9KkZgTt3ZzwcSExcH8YmMS9L+sAhpNxiQ8rq6bOODw0wsxRFlIjRgKSsn0gZangweIEeD0/nN
-	zq2v33ulIuKlkjSrWojQnQYY0b5f7PtguziHPEPFEfmYg1v2tX08x2zZVNcflTR8AXO7T6FcuXz
-	wpMCXqPEH/9Phw==
-X-Google-Smtp-Source: AGHT+IGo7pRyf6/gnIgkcTwwx90nAh1ndHVKLlnZo67jxd++rcz5yWQb77oRDz4SsXn1vUQCuJqUfw==
-X-Received: by 2002:a17:907:940d:b0:aa6:a05c:b068 with SMTP id a640c23a62f3a-ab38b3d6ec1mr297745766b.56.1737130705975;
-        Fri, 17 Jan 2025 08:18:25 -0800 (PST)
-Received: from ?IPV6:2620:10d:c096:325:77fd:1068:74c8:af87? ([2620:10d:c092:600::1:56de])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ab384c61388sm192232566b.20.2025.01.17.08.18.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 17 Jan 2025 08:18:25 -0800 (PST)
-Message-ID: <dfa31033-c4c1-4430-81b2-5df41afc33a2@gmail.com>
-Date: Fri, 17 Jan 2025 16:19:09 +0000
+	 In-Reply-To:Content-Type; b=dhcjR7mLg6iG86bx2v8ZCd0764ELk7Nr7CmGd38Gg8Hk/OadoB1hQRtOU6eJI8Yn1iFfcycdc1RPQ0nLLexE8QKcagKw9kG07i+thip196JnGfIJ8q7nIY/DU/snqeyhjIfhB78zPFh6yI1dBbpGhMALjhRUZ0FzdTM6KAAxxgg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=hHLojEd8; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50H867iF001307;
+	Fri, 17 Jan 2025 16:20:55 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=hy33pq
+	oJM743WFn31tUt+jQJFsYGaLenYBtnVpUuw1w=; b=hHLojEd85Gw6KO6P4qMFzm
+	W4ObQowwrNmLgvDAnBCgjgvvOOrwFqzQt1zaWGeL21vk2O5xzJJqaYPy4m6daQKH
+	jdyDggpXTBvFrtM90S/T+WIGRDFSlB2gmJi3NSCAoYzdeh7eqOuAlUtOxXFZeLwD
+	CS97KWGDs0NnNOt205nLrTCeU0OuhGXUROSA4c91nCUxeI/azJVVfD6B5IRh0nqG
+	G798807f/h8kRLHBeRmEHlV7uDwQ0X0CGJRKRVsWx0KgKdO1IqyjwfJOw64pgpiV
+	x8gGYascXDsnYGf1R2jzd5NneZ1sQpkOsPhxObMVxmXbdq4IORnsJN2j+gERV2fA
+	==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 447kd3j684-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 17 Jan 2025 16:20:55 +0000 (GMT)
+Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 50HGEXkg024168;
+	Fri, 17 Jan 2025 16:20:54 GMT
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 447kd3j682-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 17 Jan 2025 16:20:54 +0000 (GMT)
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 50HDiH3s002689;
+	Fri, 17 Jan 2025 16:20:54 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4443byksg2-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 17 Jan 2025 16:20:53 +0000
+Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
+	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 50HGKoTI58917288
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 17 Jan 2025 16:20:50 GMT
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 26FDF2004B;
+	Fri, 17 Jan 2025 16:20:50 +0000 (GMT)
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id BDCB820040;
+	Fri, 17 Jan 2025 16:20:48 +0000 (GMT)
+Received: from [9.171.79.45] (unknown [9.171.79.45])
+	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Fri, 17 Jan 2025 16:20:48 +0000 (GMT)
+Message-ID: <3f6defb9-5e68-4fe5-84f0-58477c8c897b@linux.ibm.com>
+Date: Fri, 17 Jan 2025 17:20:48 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,65 +84,152 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v11 00/21] io_uring zero copy rx
-To: Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>
-Cc: Jens Axboe <axboe@kernel.dk>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jesper Dangaard Brouer
- <hawk@kernel.org>, David Ahern <dsahern@kernel.org>,
- Mina Almasry <almasrymina@google.com>,
- Stanislav Fomichev <stfomichev@gmail.com>, Joe Damato <jdamato@fastly.com>,
- Pedro Tammela <pctammela@mojatatu.com>, David Wei <dw@davidwei.uk>,
- io-uring@vger.kernel.org, netdev@vger.kernel.org
-References: <20250116231704.2402455-1-dw@davidwei.uk>
- <406fcbd2-55af-4919-abee-7cd80fb449d3@redhat.com>
- <ce9caef4-0d95-4e81-bdb8-536236377f81@gmail.com>
- <c25f6c3f-e576-4c56-ba4b-328dfecbfb35@redhat.com>
+Subject: Re: [RFC net-next 0/7] Provide an ism layer
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: dust.li@linux.alibaba.com, Julian Ruess <julianr@linux.ibm.com>,
+        Wenjia Zhang <wenjia@linux.ibm.com>, Jan Karcher <jaka@linux.ibm.com>,
+        Gerd Bayer <gbayer@linux.ibm.com>, Halil Pasic <pasic@linux.ibm.com>,
+        "D. Wythe" <alibuda@linux.alibaba.com>,
+        Tony Lu <tonylu@linux.alibaba.com>, Wen Gu <guwen@linux.alibaba.com>,
+        Peter Oberparleiter
+ <oberpar@linux.ibm.com>,
+        David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+        Andrew Lunn <andrew+netdev@lunn.ch>,
+        Niklas Schnelle <schnelle@linux.ibm.com>,
+        Thorsten Winkler <twinkler@linux.ibm.com>, netdev@vger.kernel.org,
+        linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev
+ <agordeev@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>, Simon Horman <horms@kernel.org>
+References: <20250115195527.2094320-1-wintera@linux.ibm.com>
+ <20250116093231.GD89233@linux.alibaba.com>
+ <D73H7Q080GUQ.3BDOH23P4WDOL@linux.ibm.com>
+ <0f96574a-567e-495a-b815-6aef336f12e6@linux.ibm.com>
+ <20250117021353.GF89233@linux.alibaba.com>
+ <80330f0e-d769-4251-be2f-a2b5adb12ef2@linux.ibm.com>
+ <3e97f471-69fd-42bd-acf4-64201eaf6994@lunn.ch>
 Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <c25f6c3f-e576-4c56-ba4b-328dfecbfb35@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: Alexandra Winter <wintera@linux.ibm.com>
+In-Reply-To: <3e97f471-69fd-42bd-acf4-64201eaf6994@lunn.ch>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: 6a9zCcfnkGHylP8bQGICjviaPtS77EuF
+X-Proofpoint-GUID: LWO5JUuE9G_SnMHjTLEyn8Lu3L6jzMyx
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-01-17_06,2025-01-16_01,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 mlxlogscore=819
+ priorityscore=1501 malwarescore=0 mlxscore=0 suspectscore=0 bulkscore=0
+ spamscore=0 impostorscore=0 clxscore=1015 phishscore=0 lowpriorityscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2411120000
+ definitions=main-2501170126
 
-On 1/17/25 16:05, Paolo Abeni wrote:
-> On 1/17/25 3:42 PM, Pavel Begunkov wrote:
->> On 1/17/25 14:28, Paolo Abeni wrote:
->>> On 1/17/25 12:16 AM, David Wei wrote:
->>>> This patchset adds support for zero copy rx into userspace pages using
->>>> io_uring, eliminating a kernel to user copy.
+
+
+On 17.01.25 16:10, Andrew Lunn wrote:
+> On Fri, Jan 17, 2025 at 02:00:55PM +0100, Alexandra Winter wrote:
+>>
+>>
+>> On 17.01.25 03:13, Dust Li wrote:
+>>>>>> Modular Approach: I've made the ism_loopback an independent kernel
+>>>>>> module since dynamic enable/disable functionality is not yet supported
+>>>>>> in SMC. Using insmod and rmmod for module management could provide the
+>>>>>> flexibility needed in practical scenarios.
 >>>>
-...
->>>> Broadcom bnxt support:
->>>> [1]: https://lore.kernel.org/netdev/20241003160620.1521626-8-ap420073@gmail.com/
+>>>> With this proposal ism_loopback is just another ism device and SMC-D will
+>>>> handle removal just like ism_client.remove(ism_dev) of other ism devices.
 >>>>
->>>> Linux kernel branch:
->>>> [2]: https://github.com/spikeh/linux.git zcrx/v9
->>>>
->>>> liburing for testing:
->>>> [3]: https://github.com/isilence/liburing.git zcrx/next
->>>>
->>>> kperf for testing:
->>>> [4]: https://git.kernel.dk/kperf.git
+>>>> But I understand that net/smc/ism_loopback.c today does not provide enable/disable,
+>>>> which is a big disadvantage, I agree. The ism layer is prepared for dynamic
+>>>> removal by ism_dev_unregister(). In case of this RFC that would only happen
+>>>> in case of rmmod ism. Which should be improved.
+>>>> One way to do that would be a separate ism_loopback kernel module, like you say.
+>>>> Today ism_loopback is only 10k LOC, so I'd be fine with leaving it in the ism module.
+>>>> I also think it is a great way for testing any ISM client, so it has benefit for
+>>>> anybody using the ism module.
+>>>> Another way would be e.g. an 'enable' entry in the sysfs of the loopback device.
+>>>> (Once we agree if and how to represent ism devices in genera in sysfs).
+>>> This works for me as well. I think it would be better to implement this
+>>> within the common ISM layer, rather than duplicating the code in each
+>>> device. Similar to how it's done in netdevice.
 >>>
->>> We are getting very close to the merge window. In order to get this
->>> series merged before such deadline the point raised by Jakub on this
->>> version must me resolved, the next iteration should land to the ML
->>> before the end of the current working day and the series must apply
->>> cleanly to net-next, so that it can be processed by our CI.
+>>> Best regards,
+>>> Dust
 >>
->> Sounds good, thanks Paolo.
 >>
->> Since the merging is not trivial, I'll send a PR for the net/
->> patches instead of reposting the entire thing, if that sounds right
->> to you. The rest will be handled on the io_uring side.
+>> Is there a specific example for enable/disable in the netdevice code, you have in mind?
+>> Or do you mean in general how netdevice provides a common layer?
+>> Yes, everything that is common for all devices should be provided by the network layer.
 > 
-> I agree it is the more straight-forward path. @Jakub: do you see any
-> problem with the above?
+> Again, lack of basic understanding.... but why is it not a network
+> device? Network devices are not just Ethernet. We also have CAN, SLIP,
+> FDDI, etc.
+> 
+> 	Andrew
+> 
 
-I couldn't cleanly base it onto linus' branch, so after talking it
-over with Jens, I sent it as a normal patchset. Jens will help to
-handle the rest if the net patches are merged.
+Thank you very much Andrew for spending the time and discussing this.
 
--- 
-Pavel Begunkov
+At the moment there is not usecase for attaching an ism interface via
+struct net_device to the linux network layer.
+Current client is SMC-D and they bypass the network stack.
+Next client is a tty-over-ism console driver.
+And Niklas Schnelle envisions TTYs, block devices, framebuffers over ISM.
+None of them do need queues or headers or other things the network stack
+offers, as long as the source can directly write into the target buffer.
+As mentioned earlier, probably one could write an network-over-ism
+driver, but nobody asks for it at the moment.
+
+I have read about the Linux device model with devices and buses, but I
+have a bit of a hard time mapping that to an existing machine with
+classes, susbsystems, slots, subtypes, buses over buses and virtual
+things, etc that often have the same names for different things.
+So any advice for alternative placements of ism is welcome.
+
+This is the kind of picture I have in my head:
+
+                 SMC-sockets		     console
+ISM clients:         |				|
+             +-----------------+        +-----------------+
+             |     SMC-D       |        |     tty-ism     |
+             +-----------------+        +-----------------+
+		     |			         |
++----------------------------------------------------------------------+
+|            ism layer						       |
+|  ism interfaces:     						       |
+| ism_vp0	     ism_vp1,        ism_lo,           ism_virtio0, .. |
++----------------------------------------------------------------------+
+     |			|		|
++--------------+  +--------------+ +----------------+	
+| 0000:00:00.0 |  | 0000:00:00.1 | | virtual/ism/lo |	
++--------------+  +--------------+ +----------------+	
+	\		/
++------------------------+
+|     pci bus            |
++------------------------+
+
+
+ls /sys/class/ism
+ism_vp0 -> ../../devices/pci0124:00/0124:00:00.0/ism/ism_vp0
+ism_vp1 -> ../../devices/pci0125:00/0125:00:00.0/ism/ism_vp1
+ism_lo -> ../../devices/virtual/ism/ism_lo
+
+
+Maybe all that is overkill for ISM?
+I think it would be very helpful, if they show up in sysfs, but not
+absolutely required.
+
+
+
+
+
+
+
+
+
 
 
