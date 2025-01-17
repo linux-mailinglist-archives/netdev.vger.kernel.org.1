@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-159451-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159452-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0C7AA15857
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 20:48:41 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D3AD2A15859
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 20:48:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CF7467A3671
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 19:48:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9CBB3169900
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 19:48:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A0EE1ACEBA;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0E901B042D;
 	Fri, 17 Jan 2025 19:48:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QWMnH20Y"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UKre49ng"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8AAF1ACEB6
-	for <netdev@vger.kernel.org>; Fri, 17 Jan 2025 19:48:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC1441B0409
+	for <netdev@vger.kernel.org>; Fri, 17 Jan 2025 19:48:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737143301; cv=none; b=lX7ku0/letcjYYe3rwaRjE1grInKWbUDAL0NWRPiFh8UQ+Yn+KRQ1+ZnqqvLSVB7/udwvLkzjvFh633rKd4OCI/3u+G1yskXSiGYvlSvjWP3IfGIbmS+KzHDaVzuTXSkCOZxrH/YMAZe3TIG2bYdNjFx1jQE67IwkKNDa/iJmLI=
+	t=1737143302; cv=none; b=HyVUOUmb6i4hk0QkFrlVjQUbbD87G+hMGBYqadXCo6a0syVkoyKMNNAiG+Zcry4JYWWP+Cf0n8GLrQ2bDnE8lJvPRcvIfnCeipa4amtTjbhusfptGv+MFIDQ9uWe+Qxo9HDSR4fdUKMEsfK060bmNZdUZwSyQo7fWomB+3CtZbY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737143301; c=relaxed/simple;
-	bh=liEb6FrciZS5IMCArR+0U4lSsdrh9MYWLJ5LVZqT+gg=;
+	s=arc-20240116; t=1737143302; c=relaxed/simple;
+	bh=W7g5mzKYbLZMyqo4vpbvxQf4UQRTdOwmKnBZtmNVrTo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=IattHLJGiYWvYicmgBv1aqyy39+R3nmAChMuZlmSIsEcmxo8dHVT/aREAySKCtaUMnw5JZz83UXEItts1QeNIaPpxf7GJ5s8FeXHOUirhGalDWrLTvQAeiXNLakHhgudR/G0V+njdtMsBFaonXPI9z6VIWQpTgUVzR1m7RRG9iQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QWMnH20Y; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5C871C4CEE8;
+	 MIME-Version; b=OcvwDUfrtzMny7MCtoKGMxlqNC6tulJWP1oDUhgDT34uIfpY53Gmqv1W9SBa5je0OBuzXWOiXa6/GlMKfTH+aVqcD42qG+4m2PQT2kxPxJDo60MhsVNB6bZ4tg4742due74ZTz4h+ZTM8zbjz4ltdvjNxkpoqhmywP3B+SKl5UE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UKre49ng; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D8C38C4CEE2;
 	Fri, 17 Jan 2025 19:48:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737143301;
-	bh=liEb6FrciZS5IMCArR+0U4lSsdrh9MYWLJ5LVZqT+gg=;
+	s=k20201202; t=1737143302;
+	bh=W7g5mzKYbLZMyqo4vpbvxQf4UQRTdOwmKnBZtmNVrTo=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=QWMnH20Y68ZKLqtv8S3/izdDnjs3k2/iGdUddZp3njckEDVESQCy07jtDIwTCak1/
-	 5pDcXeqRcwY7BQXd6aZEz0mEys3+iU0KCM6+OT23427rk45KiidY8032ekqRxAC2ym
-	 Emi0pXGVhdSCpTn3xjEfmr9XLHi/XorE+fO9lK+FgrNkjmSmHlxyJtkJvZ8W9s1vFG
-	 6lVwqfKk2qIswsIjLwZOzXO1Vho7/xkae8cnM+AMI7nPxBWkPnpfoNWD48sELNhl7e
-	 /SZxrHzfs5ZTn+CRNL6119W/pcxDKee7/zGl1bOUaULqQm2vzvsAhuxOybZ84pszVM
-	 Nrc8NTXvZFJRw==
+	b=UKre49nglAPfog17YI6wqLfbHl+s4LMxTlWEESUz/dOlgw8lWMrgpr2y1Ki128GXQ
+	 zr2o4WjBv/lH6dRohB7tu7/ZT/UcNMnWF1imlha04al7k0TFpgRFNG7oYdUNM6fIAn
+	 cPNti9NXjigptrMpRLHesnvUMYje/uVjdZgMB36qI0Q/Pe+mvc7Jm9xRt9Vs1+StgR
+	 HA91uvtkNUY94eGWhaWEjHCxp3ZgrMA0cHAUff5c9mMS97GgQ9LPUqPyxGgtcUeFuZ
+	 zt+hTqMaLZo0fLbBdpsGLkFz3rCHPwqIF16ZLabX+fI880Dm6RADw3a6jzkNlLuUql
+	 6b/wyBnz+K87A==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -52,9 +52,9 @@ Cc: netdev@vger.kernel.org,
 	pavan.chebbi@broadcom.com,
 	ap420073@gmail.com,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next 5/6] eth: bnxt: allocate enough buffer space to meet HDS threshold
-Date: Fri, 17 Jan 2025 11:48:14 -0800
-Message-ID: <20250117194815.1514410-6-kuba@kernel.org>
+Subject: [PATCH net-next 6/6] eth: bnxt: update header sizing defaults
+Date: Fri, 17 Jan 2025 11:48:15 -0800
+Message-ID: <20250117194815.1514410-7-kuba@kernel.org>
 X-Mailer: git-send-email 2.48.1
 In-Reply-To: <20250117194815.1514410-1-kuba@kernel.org>
 References: <20250117194815.1514410-1-kuba@kernel.org>
@@ -66,35 +66,46 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Now that we can configure HDS threshold separately from the rx_copybreak
-HDS threshold may be higher than rx_copybreak.
+300-400B RPC requests are fairly common. With the current default
+of 256B HDS threshold bnxt ends up splitting those, lowering PCIe
+bandwidth efficiency and increasing the number of memory allocation.
 
-We need to make sure that we have enough space for the headers.
+Increase the HDS threshold to fit 4 buffers in a 4k page.
+This works out to 640B as the threshold on a typical kernel confing.
+This change increases the performance for a microbenchmark which
+receives 400B RPCs and sends empty responses by 4.5%.
+Admittedly this is just a single benchmark, but 256B works out to
+just 6 (so 2 more) packets per head page, because shinfo size
+dominates the headers.
 
-Fixes: 6b43673a25c3 ("bnxt_en: add support for hds-thresh ethtool command")
+Now that we use page pool for the header pages I was also tempted
+to default rx_copybreak to 0, but in synthetic testing the copybreak
+size doesn't seem to make much difference.
+
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index 2eeed4c11b64..19e723493c4e 100644
+index 19e723493c4e..589a1008601c 100644
 --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
 +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -4671,9 +4671,10 @@ void bnxt_set_ring_params(struct bnxt *bp)
- 				  ALIGN(max(NET_SKB_PAD, XDP_PACKET_HEADROOM), 8) -
- 				  SKB_DATA_ALIGN(sizeof(struct skb_shared_info));
- 		} else {
--			rx_size = SKB_DATA_ALIGN(max(BNXT_DEFAULT_RX_COPYBREAK,
--						     bp->rx_copybreak) +
--						 NET_IP_ALIGN);
-+			rx_size = max3(BNXT_DEFAULT_RX_COPYBREAK,
-+				       bp->rx_copybreak,
-+				       bp->dev->cfg_pending->hds_thresh);
-+			rx_size = SKB_DATA_ALIGN(rx_size + NET_IP_ALIGN);
- 			rx_space = rx_size + NET_SKB_PAD +
- 				SKB_DATA_ALIGN(sizeof(struct skb_shared_info));
- 		}
+@@ -4609,8 +4609,13 @@ void bnxt_set_tpa_flags(struct bnxt *bp)
+ 
+ static void bnxt_init_ring_params(struct bnxt *bp)
+ {
++	unsigned int rx_size;
++
+ 	bp->rx_copybreak = BNXT_DEFAULT_RX_COPYBREAK;
+-	bp->dev->cfg->hds_thresh = BNXT_DEFAULT_RX_COPYBREAK;
++	/* Try to fit 4 chunks into a 4k page */
++	rx_size = SZ_1K -
++		NET_SKB_PAD - SKB_DATA_ALIGN(sizeof(struct skb_shared_info));
++	bp->dev->cfg->hds_thresh = max(BNXT_DEFAULT_RX_COPYBREAK, rx_size);
+ }
+ 
+ /* bp->rx_ring_size, bp->tx_ring_size, dev->mtu, BNXT_FLAG_{G|L}RO flags must
 -- 
 2.48.1
 
