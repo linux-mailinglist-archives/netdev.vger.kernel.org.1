@@ -1,62 +1,62 @@
-Return-Path: <netdev+bounces-159132-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159133-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7FF4A147AE
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 02:44:12 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF471A147B9
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 02:46:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 273791887EA1
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 01:44:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ACFE33A6E96
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 01:46:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F3053B791;
-	Fri, 17 Jan 2025 01:44:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB29C148FED;
+	Fri, 17 Jan 2025 01:46:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YWzdGyik"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aWobnlhp"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CF455383;
-	Fri, 17 Jan 2025 01:44:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E6B31442F4;
+	Fri, 17 Jan 2025 01:46:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737078247; cv=none; b=TzhngY5Gt9viSpshxq7/fGdcidsqUvR71fR0IbDs45ilGeB/ydWfSfjbk77/mwTKDqxz8NB6DUPXFCM+eKNmTqbT8TMphvCrCQVYpwr4tU0Yjd62yiwe7ojEuxedLaxPYzKIXSZPIgFb4XKvmdqqWm0B9zPYtMui7wQCcN3kR6o=
+	t=1737078396; cv=none; b=MqeDjkK17MPiABsbtKv2+JSUfJb6WY/XKdVveHnSVL13KMUHyOA6IkJtz5lYOjl7knb9VE2uTsI6p2i0BqTZR1e6UJnB79K0RS6eJc9fonrz7UQMmAhHBkIO4/csMn05Yc9A5B38KJW9iOgYGgfGOEPWSInhp3il1DhMAlfhp2I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737078247; c=relaxed/simple;
-	bh=6xzTH+3aaMXmw8yu6wbcyw5/dNk9bdoOWb2rzNoHKoY=;
+	s=arc-20240116; t=1737078396; c=relaxed/simple;
+	bh=mhlfksy1xaml6LoQlTsKrIRqYevxA+r+vcoIHtgZaFk=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=WqmTk2qOA/6xIWmHasJ3rNuq4ke/gClSkHoqITrx0k6wHl17S0sy/KM+6fIEXVfImf1qFd7W3cbu/z8FdrG5eePacHVbkPLYZq+kNZi8Kjnb82QdwhSYuJLR5+E33Wpve767gnHfi7+ruqZy0o/kgj3SGgnz2+uMNGFqs0VUPVU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YWzdGyik; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F4089C4CEDF;
-	Fri, 17 Jan 2025 01:44:05 +0000 (UTC)
+	 MIME-Version:Content-Type; b=cMNfOsSZXr15JRz/hUwDctaZK2vflXayqqj6EYWECtVOik+Z/WU3bOO3+08YFrt07pNEt/t4vbZ/2FJHojm8N5S4L1Y9W30hvEkyoVhx/5eQZm33gzk6qaKc4qyI8OCb0mBVeoLJfRVhDXUalbOHdjuGe02x6AVNoWm4wmA4hNI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aWobnlhp; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6E26CC4CED6;
+	Fri, 17 Jan 2025 01:46:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737078246;
-	bh=6xzTH+3aaMXmw8yu6wbcyw5/dNk9bdoOWb2rzNoHKoY=;
+	s=k20201202; t=1737078396;
+	bh=mhlfksy1xaml6LoQlTsKrIRqYevxA+r+vcoIHtgZaFk=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=YWzdGyik5Spa2eoyYAkytpkqA8nyMnxM/v/I19eqJZGkm/iA6I+7LnJCCW6f2m3fo
-	 eyPoYdy/f4AM5rQSnNwYoz2sg3cKxJqsOZ7LrUuhrA0/sTTWi8r93bfu9YIoGu6kIL
-	 iLGW0cI9zfMCQwQ/zbCaJeTEArjVuCdqXi2pIfWnC+KRsHZkHR+zhCIsWqi/PIWbiS
-	 q5BHBxK1o3zL2G8gb/79r9zxD/andz3AaQ9Q2xZqxBPnwYhHzLQJKo7i1HEZdUhzsq
-	 xgZdeQMEUUkjwKTvQtcTJb8m9IR+AxYP6RwtuuXsGWYeukpdmyW1nGX1p4ZyaBxSdL
-	 UyfVRE56zIvHw==
-Date: Thu, 16 Jan 2025 17:44:05 -0800
+	b=aWobnlhp6fdH4kj5RtRwBfnYuXhY4X3bwrgwBCEIJska+acfd9kbAG+yfiQVJnmyK
+	 KuikqDzosDq6wOLOCCh/ADswfsu+POHSu+YAfNoZXKNr1hvJYRs9UmZFbX+ozX2LMz
+	 O71z5lrSnqLP8B3EvAZIhyhfZNNEa44vjy/DAHcZkTFwwrbdCDiNFcS8mVAkhUHNMI
+	 MenCoTNRTR5K6myfYcENuWkzFKh+4BuayVIgzmGaF/f4vtdhVz9IWz9QUDl8bNfLQi
+	 JEWq2AYB0eWldp37wADGz/eNJvIOl8V3Rs8KTmlWUORf2u/hI2JndjSz32zre56dYP
+	 0nko7ww5uO6mA==
+Date: Thu, 16 Jan 2025 17:46:34 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Breno Leitao <leitao@debian.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Jonathan Corbet
- <corbet@lwn.net>, Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-kselftest@vger.kernel.org, kernel-team@meta.com, max@kutsevol.com,
- thepacketgeek@gmail.com
-Subject: Re: [PATCH net-next v2 3/5] netconsole: add support for sysdata and
- CPU population
-Message-ID: <20250116174405.20a0e20b@kernel.org>
-In-Reply-To: <20250115-netcon_cpu-v2-3-95971b44dc56@debian.org>
-References: <20250115-netcon_cpu-v2-0-95971b44dc56@debian.org>
-	<20250115-netcon_cpu-v2-3-95971b44dc56@debian.org>
+To: David Wei <dw@davidwei.uk>
+Cc: io-uring@vger.kernel.org, netdev@vger.kernel.org, Jens Axboe
+ <axboe@kernel.dk>, Pavel Begunkov <asml.silence@gmail.com>, Paolo Abeni
+ <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jesper Dangaard Brouer <hawk@kernel.org>, David
+ Ahern <dsahern@kernel.org>, Mina Almasry <almasrymina@google.com>,
+ Stanislav Fomichev <stfomichev@gmail.com>, Joe Damato <jdamato@fastly.com>,
+ Pedro Tammela <pctammela@mojatatu.com>
+Subject: Re: [PATCH net-next v11 04/21] net: page_pool: create hooks for
+ custom memory providers
+Message-ID: <20250116174634.0b421245@kernel.org>
+In-Reply-To: <20250116231704.2402455-5-dw@davidwei.uk>
+References: <20250116231704.2402455-1-dw@davidwei.uk>
+	<20250116231704.2402455-5-dw@davidwei.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,22 +66,20 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 15 Jan 2025 05:35:20 -0800 Breno Leitao wrote:
-> +	WARN_ON_ONCE(userdata_len + sysdata_len >
-> +		     MAX_EXTRADATA_ENTRY_LEN * MAX_EXTRADATA_ITEMS);
-> +
-> +	/* nt->sysdata_length will be used later to decide if the message
-> +	 * needs to be fragmented.
-> +	 * userdata_len cannot be used for it, once next sysdata append should
-> +	 * start from the same userdata_len location, and only overwrite old
-> +	 * sysdata.
-> +	 */
-> +	nt->sysdata_length = sysdata_len;
+On Thu, 16 Jan 2025 15:16:46 -0800 David Wei wrote:
+> From: Pavel Begunkov <asml.silence@gmail.com>
+> 
+> A spin off from the original page pool memory providers patch by Jakub,
+> which allows extending page pools with custom allocators. One of such
+> providers is devmem TCP, and the other is io_uring zerocopy added in
+> following patches.
+> 
+> Co-developed-by: Jakub Kicinski <kuba@kernel.org> # initial mp proposal
+> Link: https://lore.kernel.org/netdev/20230707183935.997267-7-kuba@kernel.org/
+> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
+> Signed-off-by: David Wei <dw@davidwei.uk>
 
-Updating nt-> fields at runtime is something we haven't done before,
-right? What's the locking? We depend on target_list_lock ?
-
-Looks like previously all the data was on the stack, now we have a mix.
-Maybe we can pack all the bits of state into a struct for easier
-passing around, but still put it on the stack?
+FWIW you still need to add my SoB for Co-developed-by.
+Doesn't checkpatch complain?
+I guess not a deal breaker here if I'm the one applying it...
 
