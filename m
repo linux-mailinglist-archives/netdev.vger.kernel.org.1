@@ -1,259 +1,87 @@
-Return-Path: <netdev+bounces-159403-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159396-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B31B2A156F7
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 19:38:24 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 19517A156D2
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 19:35:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 00EF1188C9ED
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 18:38:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 56CEF3A22D2
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 18:35:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 219111DD886;
-	Fri, 17 Jan 2025 18:36:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2417A1A3056;
+	Fri, 17 Jan 2025 18:35:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZRQPZnnj"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bZaKdJeq"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FE011DDC01
-	for <netdev@vger.kernel.org>; Fri, 17 Jan 2025 18:36:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F36D5146D59
+	for <netdev@vger.kernel.org>; Fri, 17 Jan 2025 18:35:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737138993; cv=none; b=Bp7p3nQZrMsKWVHtlU4fS4Wb/CvdNKOHxcwflGD3fb2PKEN7Kdb8Ijfkonp6y/+M596ek+TCiZOJbiKgeaF2JyHgdYg7fBb/DJvtMYqzkjWZW+28/E5AUfmpD3BoJbLBHHk4xaZdz9u10GIC1p9eqNuIaTSmd2G5PABGF2EIquI=
+	t=1737138920; cv=none; b=gXoLpJSkS2aITOgUfn6RdhFB3DAbZ+Of39LRkL5Pm8c2XE2yNhwOxGnTsEC4PGZn7AtcmcfrGanvtIzhK+XCmRowUPgPRnCNFspmrt6Fj3bJLfIQgtlXz/7FL59+EGS7R3nb+vLUt72Q4gClK+bKSw5hsK2iuv4ztwXkSiFWJio=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737138993; c=relaxed/simple;
-	bh=eFp8ZqcQRTVC7qF60Sf2exc9B5aLtaR1JGWpl3lHq/Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Ku7IbQN89k8EDVcEuinQo4DMwWDkqIo6PXabiGlyfDEY8G9jFQBskcqRLOog8ICIPJcL5xFTiGAs0bgIQ3q5FkhJVKHSVEXhsQpiZ0gkKuj0qkkV2H3Q5P4gNIYkn5JLtvIXvMNjA5Qs8Du1qCZBouVpXRRp9GVj7KhMODwB3jg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZRQPZnnj; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1737138990;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ZBykrmXQ+JqjSUNiYCuDnSd7LtC9xGveIE0UhOB9riI=;
-	b=ZRQPZnnjUvwV1FwPGqrECLPdhzBZEdeQikn16F8e+AYWSCXu9/nanHw4vVWzo0z3xlijul
-	NFbKRkV1U1B2QGIMUrShsqfTD7ToumyOuMtPEJuSFzi8blb1aBawAzW9UQ+TCAsUaxbG+L
-	g0rO8RPrnIwAyhxQQZMSAIIvcjF5eSA=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-84-zYjCWUutOaOaUfmJZazgfQ-1; Fri,
- 17 Jan 2025 13:36:24 -0500
-X-MC-Unique: zYjCWUutOaOaUfmJZazgfQ-1
-X-Mimecast-MFC-AGG-ID: zYjCWUutOaOaUfmJZazgfQ
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5E8B019560B3;
-	Fri, 17 Jan 2025 18:36:22 +0000 (UTC)
-Received: from warthog.procyon.org.com (unknown [10.42.28.5])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id F37213003E7F;
-	Fri, 17 Jan 2025 18:36:17 +0000 (UTC)
-From: David Howells <dhowells@redhat.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	Chuck Lever <chuck.lever@oracle.com>
-Cc: David Howells <dhowells@redhat.com>,
-	Trond Myklebust <trond.myklebust@hammerspace.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Marc Dionne <marc.dionne@auristor.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Eric Biggers <ebiggers@kernel.org>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	linux-crypto@vger.kernel.org,
-	linux-afs@lists.infradead.org,
-	linux-nfs@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [RFC PATCH 06/24] crypto/krb5: Add an API to query the layout of the crypto section
-Date: Fri, 17 Jan 2025 18:35:15 +0000
-Message-ID: <20250117183538.881618-7-dhowells@redhat.com>
-In-Reply-To: <20250117183538.881618-1-dhowells@redhat.com>
-References: <20250117183538.881618-1-dhowells@redhat.com>
+	s=arc-20240116; t=1737138920; c=relaxed/simple;
+	bh=/2Oy4hUeLlZ7ifwsyw0+umPl2SqFLRlXMxlzwqsE//A=;
+	h=Content-Type:MIME-Version:In-Reply-To:References:Subject:From:Cc:
+	 To:Date:Message-ID; b=tGF/YO2skp8y73TdXQxIMQ9w7jp6jj+5970NatUGCV0s2ltnhb8BJTrHpAEyhk1sJUzoXrr5Z05yoItW4ZeOFY5Rd6RWU2dHqsQHE0U5gpo4l3NOIw/kDPm1IlxJfZRT1LIZFC+Z9PHjGN0ywFFWvMrgho0nnSRwSdlLwU2cvZU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bZaKdJeq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6C863C4CEDD;
+	Fri, 17 Jan 2025 18:35:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1737138919;
+	bh=/2Oy4hUeLlZ7ifwsyw0+umPl2SqFLRlXMxlzwqsE//A=;
+	h=In-Reply-To:References:Subject:From:Cc:To:Date:From;
+	b=bZaKdJeq/XVRIIPeBMIx74x0Slq8OpUAcO5U4xNIaezkgPscn2snjnLDGfX0Rzvxf
+	 /EeyBHpAZORDoXYYuQ4ySqGfhYK8OPo43i8Q1Al/7KQz6Ej/uAoBTws3xOikqWiRGn
+	 aMjBEMUf+BwMmUXXm8dBBLQfSBVTBPlyfX8CdV166SSvMyocT/nuqoEy4A7V9GLZGr
+	 U48RhxbwkvhtCfaITvw5cS4dH1THji4nAxnm2zYu8HJzwBw6r5gwVmD3jGn0Oz8GbP
+	 m1LlyKkbKTSZHyQAwCuipByrN+Nmk8w4lw2DrN65zMBO/6RlTgPx2vATNwVZPD+/MW
+	 3T/ksIxRYo5Bw==
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20250117090311.23257dcc@hermes.local>
+References: <20250117102612.132644-1-atenart@kernel.org> <20250117102612.132644-2-atenart@kernel.org> <20250117090311.23257dcc@hermes.local>
+Subject: Re: [PATCH net-next 1/4] net-sysfs: remove rtnl_trylock from device attributes
+From: Antoine Tenart <atenart@kernel.org>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, edumazet@google.com, gregkh@linuxfoundation.org, netdev@vger.kernel.org
+To: Stephen Hemminger <stephen@networkplumber.org>
+Date: Fri, 17 Jan 2025 19:35:16 +0100
+Message-ID: <173713891639.5144.4856802697008623996@kwain>
 
-Provide some functions to allow the called to find out about the layout of
-the crypto section:
+Quoting Stephen Hemminger (2025-01-17 18:03:11)
+> On Fri, 17 Jan 2025 11:26:08 +0100
+> Antoine Tenart <atenart@kernel.org> wrote:
+>=20
+> > diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
+> > index 1f4d4b5570ab..7c3a0f79a669 100644
+> > --- a/net/core/rtnetlink.c
+> > +++ b/net/core/rtnetlink.c
+> > @@ -80,6 +80,12 @@ void rtnl_lock(void)
+> >  }
+> >  EXPORT_SYMBOL(rtnl_lock);
+> > =20
+> > +int rtnl_lock_interruptible(void)
+> > +{
+> > +     return mutex_lock_interruptible(&rtnl_mutex);
+> > +}
+> > +EXPORT_SYMBOL_GPL(rtnl_lock_interruptible);
+>=20
+> Is export symbol needed at all? The sysfs stuff isn't in a module.
 
- (1) Calculate, for a given size of data, how big a buffer will be
-     required to hold it and where the data will be within it.
+You're right, this could be removed and only added if/when there is a
+use case. The only reason would be for consistence with other similar
+helpers but some are not exported already so I guess that's OK.
 
- (2) Calculate, for an amount of buffer, what's the maximum size of data
-     that will fit therein, and where it will start.
-
- (3) Determine where the data will be in a received message.
-
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Herbert Xu <herbert@gondor.apana.org.au>
-cc: "David S. Miller" <davem@davemloft.net>
-cc: Chuck Lever <chuck.lever@oracle.com>
-cc: Marc Dionne <marc.dionne@auristor.com>
-cc: Eric Dumazet <edumazet@google.com>
-cc: Jakub Kicinski <kuba@kernel.org>
-cc: Paolo Abeni <pabeni@redhat.com>
-cc: Simon Horman <horms@kernel.org>
-cc: linux-afs@lists.infradead.org
-cc: linux-nfs@vger.kernel.org
-cc: linux-crypto@vger.kernel.org
-cc: netdev@vger.kernel.org
----
- crypto/krb5/krb5_api.c | 108 +++++++++++++++++++++++++++++++++++++++++
- include/crypto/krb5.h  |   9 ++++
- 2 files changed, 117 insertions(+)
-
-diff --git a/crypto/krb5/krb5_api.c b/crypto/krb5/krb5_api.c
-index 5c1cd5d07fc3..f6d1bc813daa 100644
---- a/crypto/krb5/krb5_api.c
-+++ b/crypto/krb5/krb5_api.c
-@@ -40,3 +40,111 @@ const struct krb5_enctype *crypto_krb5_find_enctype(u32 enctype)
- 	return NULL;
- }
- EXPORT_SYMBOL(crypto_krb5_find_enctype);
-+
-+/**
-+ * crypto_krb5_how_much_buffer - Work out how much buffer is required for an amount of data
-+ * @krb5: The encoding to use.
-+ * @mode: The mode in which to operated (checksum/encrypt)
-+ * @data_size: How much data we want to allow for
-+ * @_offset: Where to place the offset into the buffer
-+ *
-+ * Calculate how much buffer space is required to wrap a given amount of data.
-+ * This allows for a confounder, padding and checksum as appropriate.  The
-+ * amount of buffer required is returned and the offset into the buffer at
-+ * which the data will start is placed in *_offset.
-+ */
-+size_t crypto_krb5_how_much_buffer(const struct krb5_enctype *krb5,
-+				   enum krb5_crypto_mode mode,
-+				   size_t data_size, size_t *_offset)
-+{
-+	switch (mode) {
-+	case KRB5_CHECKSUM_MODE:
-+		*_offset = krb5->cksum_len;
-+		return krb5->cksum_len + data_size;
-+
-+	case KRB5_ENCRYPT_MODE:
-+		*_offset = krb5->conf_len;
-+		return krb5->conf_len + data_size + krb5->cksum_len;
-+
-+	default:
-+		WARN_ON(1);
-+		*_offset = 0;
-+		return 0;
-+	}
-+}
-+EXPORT_SYMBOL(crypto_krb5_how_much_buffer);
-+
-+/**
-+ * crypto_krb5_how_much_data - Work out how much data can fit in an amount of buffer
-+ * @krb5: The encoding to use.
-+ * @mode: The mode in which to operated (checksum/encrypt)
-+ * @_buffer_size: How much buffer we want to allow for (may be reduced)
-+ * @_offset: Where to place the offset into the buffer
-+ *
-+ * Calculate how much data can be fitted into given amount of buffer.  This
-+ * allows for a confounder, padding and checksum as appropriate.  The amount of
-+ * data that will fit is returned, the amount of buffer required is shrunk to
-+ * allow for alignment and the offset into the buffer at which the data will
-+ * start is placed in *_offset.
-+ */
-+size_t crypto_krb5_how_much_data(const struct krb5_enctype *krb5,
-+				 enum krb5_crypto_mode mode,
-+				 size_t *_buffer_size, size_t *_offset)
-+{
-+	size_t buffer_size = *_buffer_size, data_size;
-+
-+	switch (mode) {
-+	case KRB5_CHECKSUM_MODE:
-+		if (WARN_ON(buffer_size < krb5->cksum_len + 1))
-+			goto bad;
-+		*_offset = krb5->cksum_len;
-+		return buffer_size - krb5->cksum_len;
-+
-+	case KRB5_ENCRYPT_MODE:
-+		if (WARN_ON(buffer_size < krb5->conf_len + 1 + krb5->cksum_len))
-+			goto bad;
-+		data_size = buffer_size - krb5->cksum_len;
-+		*_offset = krb5->conf_len;
-+		return data_size - krb5->conf_len;
-+
-+	default:
-+		WARN_ON(1);
-+		goto bad;
-+	}
-+
-+bad:
-+	*_offset = 0;
-+	return 0;
-+}
-+EXPORT_SYMBOL(crypto_krb5_how_much_data);
-+
-+/**
-+ * crypto_krb5_where_is_the_data - Find the data in a decrypted message
-+ * @krb5: The encoding to use.
-+ * @mode: Mode of operation
-+ * @_offset: Offset of the secure blob in the buffer; updated to data offset.
-+ * @_len: The length of the secure blob; updated to data length.
-+ *
-+ * Find the offset and size of the data in a secure message so that this
-+ * information can be used in the metadata buffer which will get added to the
-+ * digest by crypto_krb5_verify_mic().
-+ */
-+void crypto_krb5_where_is_the_data(const struct krb5_enctype *krb5,
-+				   enum krb5_crypto_mode mode,
-+				   size_t *_offset, size_t *_len)
-+{
-+	switch (mode) {
-+	case KRB5_CHECKSUM_MODE:
-+		*_offset += krb5->cksum_len;
-+		*_len -= krb5->cksum_len;
-+		return;
-+	case KRB5_ENCRYPT_MODE:
-+		*_offset += krb5->conf_len;
-+		*_len -= krb5->conf_len + krb5->cksum_len;
-+		return;
-+	default:
-+		WARN_ON_ONCE(1);
-+		return;
-+	}
-+}
-+EXPORT_SYMBOL(crypto_krb5_where_is_the_data);
-diff --git a/include/crypto/krb5.h b/include/crypto/krb5.h
-index a67a5e1a0a4f..e7dfe0b7c60d 100644
---- a/include/crypto/krb5.h
-+++ b/include/crypto/krb5.h
-@@ -101,6 +101,15 @@ struct krb5_enctype {
-  * krb5_api.c
-  */
- const struct krb5_enctype *crypto_krb5_find_enctype(u32 enctype);
-+size_t crypto_krb5_how_much_buffer(const struct krb5_enctype *krb5,
-+				   enum krb5_crypto_mode mode,
-+				   size_t data_size, size_t *_offset);
-+size_t crypto_krb5_how_much_data(const struct krb5_enctype *krb5,
-+				 enum krb5_crypto_mode mode,
-+				 size_t *_buffer_size, size_t *_offset);
-+void crypto_krb5_where_is_the_data(const struct krb5_enctype *krb5,
-+				   enum krb5_crypto_mode mode,
-+				   size_t *_offset, size_t *_len);
- 
- /*
-  * krb5enc.c
-
+Thanks,
+Antoine
 
