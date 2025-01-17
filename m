@@ -1,179 +1,219 @@
-Return-Path: <netdev+bounces-159395-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159397-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0688A156B5
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 19:33:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id CDE13A156D9
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 19:35:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 261273A19E5
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 18:33:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 355DF3A1C1D
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 18:35:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F4091A23A1;
-	Fri, 17 Jan 2025 18:33:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61A7E1A3056;
+	Fri, 17 Jan 2025 18:35:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="khPMctKy"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hMrbkBf4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f169.google.com (mail-il1-f169.google.com [209.85.166.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CD1D1A0BED
-	for <netdev@vger.kernel.org>; Fri, 17 Jan 2025 18:33:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E6BE19D89D
+	for <netdev@vger.kernel.org>; Fri, 17 Jan 2025 18:35:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737138788; cv=none; b=Qenk1MOlU4YXrGkne4+fsabHDCVg8bLJhPuValTwTLWXgfnzD2jRvd0EVizru1OOnBsTSPDO8rge1T/L719TvzLgzaD/C5LQATKO37/ggmnqIjM4TGk19eu36gMprdjFLEDLJSEY+mL5sN5aDc986cW5IdGd/TU3HMY7QxmkCBU=
+	t=1737138953; cv=none; b=Ra9qC3THVE7ax9Do6b1ZccjsoJGKjrNwt+ock+Je0zA0/xPEtHE42diMpQejLWo8FJyG0iPb/msfT9WEIoYHdk+voG1SSue9GEO4siR9lvnoE3sUmRO3XsklMClaKnaCuFJSgZE+/7JfJ2veEizySTJCwCCNzwNgoyIFRUU8MQQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737138788; c=relaxed/simple;
-	bh=6CBOkRB6qBd/41Dkwtczu6LnEcyINtBsr65wbYCwx2w=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Te+DitFpiWXUPBuDOahd60q8zLkbojaRdQLtCVG9qbZkxrMOb1tM+drt6b+Ke7st9Laq9jyqNw95FvbKC8y+4liif/od5UFB2+HSKwiuTyIN3/oEOpfbln++Y2ZQ4IqVyoSDE8JEfPReJq3DzEzZleowggWw0KaW1yRm/KwubIk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=khPMctKy; arc=none smtp.client-ip=209.85.166.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f169.google.com with SMTP id e9e14a558f8ab-3ce7c4115e8so12208105ab.1
-        for <netdev@vger.kernel.org>; Fri, 17 Jan 2025 10:33:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1737138784; x=1737743584; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Cj5bixpNlO/gi/yB0CEBgSahcL6cuxT5jqyJf8plj7g=;
-        b=khPMctKyczaRmXCTe6Bb1oktREPnRZljHyfFxo8uBYhRfAAhcb3zaZZ9x54p1dC7h2
-         aDj7vL3NOBcMYYlF7txhCdyLPXiQEDoki9PF/PAW7iMfMUIhES0fJhOsqyFJDiYUFioU
-         ewRs3vw95h5b4Uan9k57CSY4DqwV3IHzdUweRIk2CPhhv4Zh2+w7c6HojhHHwgcQN0qp
-         0l2GJ//M03hplixtUz1DwIbnVdkdNCJv2n74282keHoKH+Yj/RuPEfwt7+wLD+8ahlOJ
-         7FfnOCS6poYSHAJFkA7mVt5RaG/CZTAnaTAtMDyz8PKk+ntLeMmSqJd2ujL0M7ZzAvPl
-         T2HQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737138784; x=1737743584;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Cj5bixpNlO/gi/yB0CEBgSahcL6cuxT5jqyJf8plj7g=;
-        b=qNa/Ax0ujW6hVegMUjkWZCqrNWj9yvGYAvr3bJEdU21u/F4y/GorWJLaZujShsWqWI
-         NXC+j8+jj7p+7h/iiqm51vZyBN/kbl43ER2N02eR4QOcLOoY4DtRvrJFjyqxi3SQ9GzG
-         Omk2LO1BGXf3Vc03CTcOzQDjO8zhZwqzGbTaBasggd5sNBUtkQkiOQ3CBYbI5l5okgQA
-         t+a1L+BLcF1KaHhMwwWS8q0eI16hVw4Qgtg4bRQrzJ83Fd88wA3n4TY511UoolHB2Wix
-         yA81qQwrlR6n4GAW2JI/C8uYWSE/uaNlmkOgtHfDYvKvwNTAIli8e8OLB1ozj2w/CS/j
-         4vHw==
-X-Gm-Message-State: AOJu0Ywf+F18VnS0ZHMBHNdQxdSCVIxAv12xDczEMIu9R84avAEpSNv5
-	x6LhCEhjPNVZ5GfykNHWtZQ+7dKn9YMHRnTdTN/+vTcv3OAPZs3rRxITEshk3TUr1piHXcm+7zv
-	N56OaqmbpGG4i9pLYuODQosN3yeM=
-X-Gm-Gg: ASbGncvOTcWrSqVHGr3TDxm2sY/TdCCKKEHtyqhJIHiPlittviE/Q8tgkHK2WNlpgk6
-	mDZtB854bB+gRA3vfhBA2N9NLdlibfAPy7bMXUpE=
-X-Google-Smtp-Source: AGHT+IFOMWPu0Bnlr+kbLFCsHdxqqFWdbbPXszBH2khM7tqJOg0DKveapktfT3XEj04HmdLDjkCZ+IQvDFm3JFhKBwY=
-X-Received: by 2002:a05:6e02:218e:b0:3cd:bcbf:1091 with SMTP id
- e9e14a558f8ab-3cf748ba6bcmr26121835ab.10.1737138784565; Fri, 17 Jan 2025
- 10:33:04 -0800 (PST)
+	s=arc-20240116; t=1737138953; c=relaxed/simple;
+	bh=EwaRsGvoytuEXQaeAnAsS+1qSte4kmJYn5CXdcJQ8CY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pH7sV9NjmqU1Q92x7stPDWuLj/8JL61nyfmnWTOsmObHp11DDnD5NccgVRA1dDTu4iJU+pAvio1UeQF0a8iJfjgN8NNcDDMwq8p6JVtEV0KSTIGkxpf+qJ67sK/p+bZeuSP7O+y/xyk64QCNmuvUhUm/jCrqlwSRc9d66VElGYI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hMrbkBf4; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1737138950;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=IC/vjHgPbYSN2fnGkdfn27W/+JiuRdUwuEhUGD/2C8M=;
+	b=hMrbkBf42+Abn/ZWDg2EWFZCV17fCUZFp1pKCZKmyvQ70p8zpP+PdRS8v1V45aEZnxwp7q
+	HPYLh20bBZiIuN5v69CUYK2vfTCc/YyKVPTHnFPMbpil+e8qcijt5vOaEX4xC7oJit2EBY
+	lJVh1mMxDzE/9uHAFHlpd3y0XAIVD80=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-142-gbL1jXDYP1e480UuFa8zEg-1; Fri,
+ 17 Jan 2025 13:35:48 -0500
+X-MC-Unique: gbL1jXDYP1e480UuFa8zEg-1
+X-Mimecast-MFC-AGG-ID: gbL1jXDYP1e480UuFa8zEg
+Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id EF5111956048;
+	Fri, 17 Jan 2025 18:35:45 +0000 (UTC)
+Received: from warthog.procyon.org.com (unknown [10.42.28.5])
+	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 2D71A195608A;
+	Fri, 17 Jan 2025 18:35:40 +0000 (UTC)
+From: David Howells <dhowells@redhat.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	Chuck Lever <chuck.lever@oracle.com>
+Cc: David Howells <dhowells@redhat.com>,
+	Trond Myklebust <trond.myklebust@hammerspace.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Eric Biggers <ebiggers@kernel.org>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	linux-crypto@vger.kernel.org,
+	linux-afs@lists.infradead.org,
+	linux-nfs@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [RFC PATCH 00/24] crypto: Add generic Kerberos library with AEAD template for hash-then-crypt
+Date: Fri, 17 Jan 2025 18:35:09 +0000
+Message-ID: <20250117183538.881618-1-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <76c421c64c640f5a5868c439d6be3c6d1548789e.1736951274.git.lucien.xin@gmail.com>
- <741cd05e-e62a-4d72-b85f-ebc627b1e4d3@fiberby.net>
-In-Reply-To: <741cd05e-e62a-4d72-b85f-ebc627b1e4d3@fiberby.net>
-From: Xin Long <lucien.xin@gmail.com>
-Date: Fri, 17 Jan 2025 13:32:53 -0500
-X-Gm-Features: AbW1kvZMtIjjz_IsvCoGZhHqlrkbMISBTt8P7KB1egBiUVHM5NjPrNAhxMMpfPs
-Message-ID: <CADvbK_fkcw4XkT4zhb0Db5qH9q_yFMWmRgKMrHQvmVH+CMY=7g@mail.gmail.com>
-Subject: Re: [PATCH v3 net-next] net: sched: refine software bypass handling
- in tc_run
-To: =?UTF-8?B?QXNiasO4cm4gU2xvdGggVMO4bm5lc2Vu?= <ast@fiberby.net>
-Cc: network dev <netdev@vger.kernel.org>, "David S . Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, 
-	Jiri Pirko <jiri@resnulli.us>, Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, 
-	Shuang Li <shuali@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
 
-On Fri, Jan 17, 2025 at 10:08=E2=80=AFAM Asbj=C3=B8rn Sloth T=C3=B8nnesen <=
-ast@fiberby.net> wrote:
->
-> On 1/15/25 2:27 PM, Xin Long wrote:
-> > This patch addresses issues with filter counting in block (tcf_block),
-> > particularly for software bypass scenarios, by introducing a more
-> > accurate mechanism using useswcnt.
-> >
-> > [...]
-> >    The improvement can be demonstrated using the following script:
-> >
-> >    # cat insert_tc_rules.sh
-> >
-> >      tc qdisc add dev ens1f0np0 ingress
-> >      for i in $(seq 16); do
-> >          taskset -c $i tc -b rules_$i.txt &
-> >      done
-> >      wait
-> >
-> >    Each of rules_$i.txt files above includes 100000 tc filter rules to =
-a
-> >    mlx5 driver NIC ens1f0np0.
-> >
-> >    Without this patch:
-> >
-> >    # time sh insert_tc_rules.sh
-> >
-> >      real    0m50.780s
-> >      user    0m23.556s
-> >      sys          4m13.032s
-> >
-> >    With this patch:
-> >
-> >    # time sh insert_tc_rules.sh
-> >
-> >      real    0m17.718s
-> >      user    0m7.807s
-> >      sys     3m45.050s
->
-> I assume that you have tested that these numbers are still roughly the sa=
-me for v3?
-Yup, roughly the same.
+Hi Herbert, Chuck,
 
->
-> > [...]
-> >   DEFINE_STATIC_KEY_FALSE(netstamp_needed_key);
-> > @@ -4045,10 +4045,13 @@ static int tc_run(struct tcx_entry *entry, stru=
-ct sk_buff *skb,
-> >       if (!miniq)
-> >               return ret;
-> >
-> > -     if (static_branch_unlikely(&tcf_bypass_check_needed_key)) {
-> > -             if (tcf_block_bypass_sw(miniq->block))
-> > -                     return ret;
-> > -     }
-> > +     /* Global bypass */
-> > +     if (!static_branch_likely(&tcf_sw_enabled_key))
-> > +             return ret;
->
-> I have tested with both static_branch_likely() and static_branch_unlikely=
-(),
-> but my results are inconclusive, I don't see a significant difference in =
-my tests,
-> but it cases a lot of changes in the object code.
->
-> $ diff -Naur <(objdump --no-addresses -d dev_likely.o) \
->               <(objdump --no-addresses -d dev_unlikely.o) | diffstat
->   62 |  156 ++++++++++++++++++++++++++++++++++---------------------------=
--------
->   1 file changed, 79 insertions(+), 77 deletions(-)
->
-> > +
-> > +     /* Block-wise bypass */
-> > +     if (tcf_block_bypass_sw(miniq->block))
-> > +             return ret;
-> >
-> >       tc_skb_cb(skb)->mru =3D 0;
-> >       tc_skb_cb(skb)->post_ct =3D false;
-> > [...]
->
-> When I run the benchmark tests from my original bypass patch last year,
-> I don't see any significant differences in the forwarding performance.
-> (Xeon D-1518, single 8-core CPU, no parallel rule updates).
->
-> Reviewed-by: Asbj=C3=B8rn Sloth T=C3=B8nnesen <ast@fiberby.net>
-> Tested-by: Asbj=C3=B8rn Sloth T=C3=B8nnesen <ast@fiberby.net>
+Here's yet another go at a generic Kerberos crypto library in the kernel so
+that I can share code between rxrpc and sunrpc (and cifs?).  I derived some
+of the parts from the sunrpc gss library and added more advanced AES and
+Camellia crypto.
+
+I added an addition AEAD template type, derived from authenc, that does
+hash-then-crypt rather than crypt-then-hash as authenc does.  I called it
+"krb5enc" for want of a better name.  Possibly I should call it "hashenc"
+or something like that.
+
+I went back to my previous more library-based approach, but for encrypt
+mode, I replaced the separate skcipher and shash objects with a single
+templated AEAD object - either krb5enc (AES+SHA1 and Camellia) or authenc
+(AES+SHA2).
+
+Apart from that, things are much as they were previously from the point of
+view of someone using the API.  There's a new pair of functions that, given
+an encoding type, a key and a usage value, will derive the necessary keys
+and return an AEAD or hash handle.  These handles can then be passed to
+operation functions that will do the actual work of performing an
+encryption, a decryption, MIC generation or MIC verification.
+
+Querying functions are also available to look up an encoding type table by
+kerberos protocol number and to help manage message layout.
+
+This library has its own self-testing framework that checks more things
+than is possible with the testmgr, including subkey derivation.  It also
+checks things about the output of encrypt + decrypt that testmgr doesn't.
+That said, testmgr is also provisioned with some encryption and
+checksumming tests for Camilla and AES2, though these have to be
+provisioned with the intermediate subkeys rather than the transport key.
+
+Note that, for purposes of illustration, I've included some rxrpc patches
+that use this interface to implement the rxgk Rx security class.  The
+branch also is based on net-next that carries some rxrpc patches that are a
+prerequisite for this, but the crypto patches don't need it.
+
+---
+The patches can be found here also:
+
+	http://git.kernel.org/cgit/linux/kernel/git/dhowells/linux-fs.git/log/?h=crypto-krb5
+
+David
+
+David Howells (24):
+  crypto/krb5: Add API Documentation
+  crypto/krb5: Add some constants out of sunrpc headers
+  crypto: Add 'krb5enc' hash and cipher AEAD algorithm
+  crypto/krb5: Test manager data
+  crypto/krb5: Implement Kerberos crypto core
+  crypto/krb5: Add an API to query the layout of the crypto section
+  crypto/krb5: Add an API to alloc and prepare a crypto object
+  crypto/krb5: Add an API to perform requests
+  crypto/krb5: Provide infrastructure and key derivation
+  crypto/krb5: Implement the Kerberos5 rfc3961 key derivation
+  crypto/krb5: Provide RFC3961 setkey packaging functions
+  crypto/krb5: Implement the Kerberos5 rfc3961 encrypt and decrypt
+    functions
+  crypto/krb5: Implement the Kerberos5 rfc3961 get_mic and verify_mic
+  crypto/krb5: Implement the AES enctypes from rfc3962
+  crypto/krb5: Implement the AES enctypes from rfc8009
+  crypto/krb5: Implement the AES encrypt/decrypt from rfc8009
+  crypto/krb5: Implement crypto self-testing
+  crypto/krb5: Add the AES self-testing data from rfc8009
+  crypto/krb5: Implement the Camellia enctypes from rfc6803
+  rxrpc: Add the security index for yfs-rxgk
+  rxrpc: Add YFS RxGK (GSSAPI) security class
+  rxrpc: rxgk: Provide infrastructure and key derivation
+  rxrpc: rxgk: Implement the yfs-rxgk security class (GSSAPI)
+  rxrpc: rxgk: Implement connection rekeying
+
+ Documentation/crypto/index.rst   |    1 +
+ Documentation/crypto/krb5.rst    |  262 +++++++
+ crypto/Kconfig                   |   13 +
+ crypto/Makefile                  |    3 +
+ crypto/krb5/Kconfig              |   26 +
+ crypto/krb5/Makefile             |   18 +
+ crypto/krb5/internal.h           |  257 +++++++
+ crypto/krb5/krb5_api.c           |  452 ++++++++++++
+ crypto/krb5/krb5_kdf.c           |  145 ++++
+ crypto/krb5/rfc3961_simplified.c |  791 ++++++++++++++++++++
+ crypto/krb5/rfc3962_aes.c        |  115 +++
+ crypto/krb5/rfc6803_camellia.c   |  237 ++++++
+ crypto/krb5/rfc8009_aes2.c       |  431 +++++++++++
+ crypto/krb5/selftest.c           |  544 ++++++++++++++
+ crypto/krb5/selftest_data.c      |  291 ++++++++
+ crypto/krb5enc.c                 |  491 +++++++++++++
+ crypto/testmgr.c                 |   16 +
+ crypto/testmgr.h                 |  401 ++++++++++
+ fs/afs/misc.c                    |   13 +
+ include/crypto/krb5.h            |  167 +++++
+ include/keys/rxrpc-type.h        |   17 +
+ include/trace/events/rxrpc.h     |   36 +
+ include/uapi/linux/rxrpc.h       |   17 +
+ net/rxrpc/Kconfig                |   10 +
+ net/rxrpc/Makefile               |    5 +-
+ net/rxrpc/ar-internal.h          |   22 +
+ net/rxrpc/conn_event.c           |    2 +-
+ net/rxrpc/conn_object.c          |    1 +
+ net/rxrpc/key.c                  |  183 +++++
+ net/rxrpc/output.c               |    2 +-
+ net/rxrpc/protocol.h             |   20 +
+ net/rxrpc/rxgk.c                 | 1170 ++++++++++++++++++++++++++++++
+ net/rxrpc/rxgk_app.c             |  284 ++++++++
+ net/rxrpc/rxgk_common.h          |  140 ++++
+ net/rxrpc/rxgk_kdf.c             |  287 ++++++++
+ net/rxrpc/rxkad.c                |    6 +-
+ net/rxrpc/security.c             |    3 +
+ 37 files changed, 6874 insertions(+), 5 deletions(-)
+ create mode 100644 Documentation/crypto/krb5.rst
+ create mode 100644 crypto/krb5/Kconfig
+ create mode 100644 crypto/krb5/Makefile
+ create mode 100644 crypto/krb5/internal.h
+ create mode 100644 crypto/krb5/krb5_api.c
+ create mode 100644 crypto/krb5/krb5_kdf.c
+ create mode 100644 crypto/krb5/rfc3961_simplified.c
+ create mode 100644 crypto/krb5/rfc3962_aes.c
+ create mode 100644 crypto/krb5/rfc6803_camellia.c
+ create mode 100644 crypto/krb5/rfc8009_aes2.c
+ create mode 100644 crypto/krb5/selftest.c
+ create mode 100644 crypto/krb5/selftest_data.c
+ create mode 100644 crypto/krb5enc.c
+ create mode 100644 include/crypto/krb5.h
+ create mode 100644 net/rxrpc/rxgk.c
+ create mode 100644 net/rxrpc/rxgk_app.c
+ create mode 100644 net/rxrpc/rxgk_common.h
+ create mode 100644 net/rxrpc/rxgk_kdf.c
+
 
