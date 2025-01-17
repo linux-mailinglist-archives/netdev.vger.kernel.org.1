@@ -1,251 +1,171 @@
-Return-Path: <netdev+bounces-159375-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159376-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86721A15513
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 17:57:38 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 788ABA1552E
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 18:01:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CAB591882DBA
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 16:57:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B740D1885580
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 17:01:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 699FD19D884;
-	Fri, 17 Jan 2025 16:57:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8DE919E979;
+	Fri, 17 Jan 2025 17:01:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="IADzNmmN"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H237JfPk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4B9F19D098;
-	Fri, 17 Jan 2025 16:57:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BD251993B7
+	for <netdev@vger.kernel.org>; Fri, 17 Jan 2025 17:01:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737133048; cv=none; b=M9kiCwondxVnQJh93gWUEG7yXs0M/krp9Pny1NyT4YYIpBeq0xCPJbQ+8hIf3EujpPZaMSly8+sk3VMkfjjnr2UDuXmDbpvNw4qLSkU6rfdNd7vLKsBCngpLr1TBxRd9B0kEhcKIeBbrnbMf0Nn0ONtmL8IAK4GK2xXqMU1mWTQ=
+	t=1737133308; cv=none; b=eL85DjzNf6I0S6/d8AkZRcFKdfcSTT6nsgbe+YnBbElqBIn6UD9yE+bzrrSsEvnU5MHGeaXT/F0+KPDLHhWdK7meKfAflIbKaMbmRr8bqwM4lu3oNpTBH0K8YFuhkj7Ta4oajsVH7Qpcid45l53mHoPiMPxn/w846RYRdDsQHnM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737133048; c=relaxed/simple;
-	bh=hY4KQb5f505xNYTwG/F/Ret6BMwLtDPyOmPU1zwXjHQ=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=UwIL6p5+IZmNBwmPDMWpqUdfNEbdqHN4YVSp1GTPwjBPBXKDiPsD3i3tCwe6W4urkEKZHFFxsn/JQtFoDq7nZkhuADjtIb4kExgozm6t7BpGTkZaXB/kbOrKMtU9b/BZUPINbQD5zmnQl3A4lGEiwWoVGyw6cOuXZaYRQ/Rg9/A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=IADzNmmN; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50HEKObE015200;
-	Fri, 17 Jan 2025 16:57:19 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=qlWznX
-	u3dKPrZdqKv562Fw2hwWvdcB1K8vm6Swgh4p4=; b=IADzNmmNsD9FATwnbMM7C7
-	jchjKYzGrGxdu+SLHIy2dTsfBET3XfESOpUfv6kEmVblsqG05hI4SXJYFQqv8o3I
-	JOx5qWFPH/DanH4iwfJQUL/VYXDZ+Fl6f+wzUwcoF+IpvVyQ5/2SHZvXc/uJnUbB
-	0yffl3LID5KKtHtnBY/7PUlzh9QMumz13Kkr20dVC9yjvd76/Ya8n18VxKyYEgK6
-	GssKoPRRAe1PvyPF2y0kg3zYfReHuQ3ddUp0zrcDsLu1nOQ/VUTxkXTCIp8hsCAX
-	caN4P42kI3zC5IZj3O3nkpTLN8fgJbFNGRHXF+vQp4FSC7j6+nf4zwLKOh+Xb6Ew
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 447fpubdyr-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 17 Jan 2025 16:57:19 +0000 (GMT)
-Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 50HGa6qP003718;
-	Fri, 17 Jan 2025 16:57:18 GMT
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 447fpubdyp-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 17 Jan 2025 16:57:18 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 50HE5h3C002663;
-	Fri, 17 Jan 2025 16:57:17 GMT
-Received: from smtprelay03.dal12v.mail.ibm.com ([172.16.1.5])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4443bykxfm-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 17 Jan 2025 16:57:17 +0000
-Received: from smtpav06.wdc07v.mail.ibm.com (smtpav06.wdc07v.mail.ibm.com [10.39.53.233])
-	by smtprelay03.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 50HGvGtR30671514
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 17 Jan 2025 16:57:16 GMT
-Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id DCDE65803F;
-	Fri, 17 Jan 2025 16:57:15 +0000 (GMT)
-Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 319355804E;
-	Fri, 17 Jan 2025 16:57:11 +0000 (GMT)
-Received: from [9.171.9.47] (unknown [9.171.9.47])
-	by smtpav06.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 17 Jan 2025 16:57:10 +0000 (GMT)
-Message-ID: <c2eb6fd7e9a786749d70a17266a04fb50dbd5bb8.camel@linux.ibm.com>
-Subject: Re: [RFC net-next 0/7] Provide an ism layer
-From: Niklas Schnelle <schnelle@linux.ibm.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: dust.li@linux.alibaba.com, Alexandra Winter <wintera@linux.ibm.com>,
-        Julian Ruess <julianr@linux.ibm.com>,
-        Wenjia Zhang <wenjia@linux.ibm.com>, Jan Karcher <jaka@linux.ibm.com>,
-        Gerd Bayer <gbayer@linux.ibm.com>, Halil
- Pasic <pasic@linux.ibm.com>,
-        "D. Wythe"	 <alibuda@linux.alibaba.com>,
-        Tony
- Lu <tonylu@linux.alibaba.com>, Wen Gu	 <guwen@linux.alibaba.com>,
-        Peter
- Oberparleiter <oberpar@linux.ibm.com>,
-        David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Eric
- Dumazet <edumazet@google.com>,
-        Andrew Lunn <andrew+netdev@lunn.ch>,
-        Thorsten Winkler	 <twinkler@linux.ibm.com>, netdev@vger.kernel.org,
-        linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
-        Vasily
- Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle
- <svens@linux.ibm.com>, Simon Horman <horms@kernel.org>
-Date: Fri, 17 Jan 2025 17:57:10 +0100
-In-Reply-To: <7dc80dfb-5a75-4638-9d44-d5a080ddb693@lunn.ch>
-References: <20250115195527.2094320-1-wintera@linux.ibm.com>
-	 <20250116093231.GD89233@linux.alibaba.com>
-	 <D73H7Q080GUQ.3BDOH23P4WDOL@linux.ibm.com>
-	 <0f96574a-567e-495a-b815-6aef336f12e6@linux.ibm.com>
-	 <20250117021353.GF89233@linux.alibaba.com>
-	 <dc2ff4c83ce8f7884872068570454f285510bda2.camel@linux.ibm.com>
-	 <034e69fe-84b4-44f2-80d1-7c36ab4ee4c9@lunn.ch>
-	 <64df7d8ca3331be205171ddaf7090cae632b7768.camel@linux.ibm.com>
-	 <7dc80dfb-5a75-4638-9d44-d5a080ddb693@lunn.ch>
-Autocrypt: addr=schnelle@linux.ibm.com; prefer-encrypt=mutual;
- keydata=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
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.54.3 (3.54.3-1.fc41) 
+	s=arc-20240116; t=1737133308; c=relaxed/simple;
+	bh=Zo0noal+6+Q9ZtmdrtFRVcNRZ95mLntQN2uOZfZWOiA=;
+	h=Content-Type:Message-ID:Date:MIME-Version:Subject:To:References:
+	 From:In-Reply-To; b=cc9ewlDuuVbyJe9IPMvT5EG9sWgizYGBcqsN50Ju6kujwC6tldmYO9yd6ps1+Fhq8FIp08DWAn+TbeMrKnkl2uX7REoca8dOIYHdd1q0WD+IiuPYMn7PtIptoK53LvzRSvpuGksd5APuqlu0owCBR/8SpmZP1jFQE8NI+PWmXtM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=H237JfPk; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1737133306;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=3Q0ZXxkC4N2O25sLExzL9biJmOen8eY0G6kLH2oNAlw=;
+	b=H237JfPkSYCgyhwjx0Qa27Ft3QFbkEPWTf+L/tmiTWKnDmJMmMuRtWrqpl4YzcI28e7nye
+	I0wLS9A7iMxTyzT7yb8lNTsPuM/5wlIq2cifP5eeksRKksiAoyRSxsV2KfpvVdLa2o71NI
+	bYFlASThsIiajxUbOsc6ySMWjFcH6yA=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-185-jzA7V6P1MGSas36gzgfFKg-1; Fri, 17 Jan 2025 12:01:44 -0500
+X-MC-Unique: jzA7V6P1MGSas36gzgfFKg-1
+X-Mimecast-MFC-AGG-ID: jzA7V6P1MGSas36gzgfFKg
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-43582d49dacso16883815e9.2
+        for <netdev@vger.kernel.org>; Fri, 17 Jan 2025 09:01:44 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737133303; x=1737738103;
+        h=in-reply-to:from:content-language:references:to:subject:user-agent
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=3Q0ZXxkC4N2O25sLExzL9biJmOen8eY0G6kLH2oNAlw=;
+        b=eLuQ1rfPrGi1MxNj+YcjIJ75p5hMIWfHCy6K+ZC8uAXjnxhm1JjuyrVfaA7qIGJJFi
+         y9Un5s1iTojoLm1EptADyABJyzWPyjZ6H8NMWNyPlStca/hhbMmmPNPi+/Mz/P9nng3p
+         NFR8vZt0a7JUvOnVP+JDvamPjwDhS0QFzjA19rLD7cyodG7FCIYnRYN5uNtC+H9Db7zL
+         pweIFbsrTb3GEli9vXqhfEebSpz592Tdqn1ar+kE+SOhnUdf/4/GogPdrI/phGv+N/yB
+         ZraWKiw7LiV/kNMCZ3SioX1Vly7UoY3wDZ2lz4JmeAS2kRNVy2NLS99JDjBLcQMyK8CI
+         p3PQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX+sAIf9kfp+goMH9i30Pm5UY7SrMpMNHNf5xNdiXSSDW/Ho5rWhEb9XVFNP7TZ8JHGTv+gzSs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyPos46zhicX1QtF9TfMIeG3zfjR+ADvDpWJyxWqcOZkDYDGgjk
+	F6O1eUKm2rcCCzd2Lm3ffUSuj3SySpIIVdRZ9kUxPUYxolmN5OLTH7xirDWVQ6LtPJDaEqR8dnR
+	FUduKGevYuaSXvLXK+wXVpsyBV7XmTXor3xrUUOLXYOwdZmG/XJOew+zgC635Kw==
+X-Gm-Gg: ASbGnctzUr9DEtra96qJ9hXBKFePsLOQubztWt6ciyBFVDTr7Dn5g2s74mk9pbOfErJ
+	bghg6+C5+BeGd5/8L0vkhqiUMkD0HhVwZFDKanPQvk0v1q4lXsUykW2b9wYAwDy+djNu4AccNYP
+	wWyo4MjwClvb1v0SNcpyxLkIXlOhOUNoB00XEGI1tV3WWyox6xaXl4DRX/FUOzpDwpyXPRaejrt
+	gwYO939qd1YJZwPFaOw7g+7YKfW8oVCZfDIQQ7k497Kn82kbpvfihosqevk2tCcYpilznZ0YQ3Y
+	H5QytEFfYNE=
+X-Received: by 2002:a05:6000:1acd:b0:38a:88be:bcb5 with SMTP id ffacd0b85a97d-38bf56555f4mr3168325f8f.5.1737133302968;
+        Fri, 17 Jan 2025 09:01:42 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IE+gWUxs0A9tdilaf0k8FT76TRqrqIZ7JEg82rVAPlJvSGlBWlxaUaRbuHG+WKr2Qsbxygt/g==
+X-Received: by 2002:a05:6000:1acd:b0:38a:88be:bcb5 with SMTP id ffacd0b85a97d-38bf56555f4mr3168126f8f.5.1737133300908;
+        Fri, 17 Jan 2025 09:01:40 -0800 (PST)
+Received: from [192.168.88.253] (146-241-15-169.dyn.eolo.it. [146.241.15.169])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38bf3214c5csm2971915f8f.8.2025.01.17.09.01.39
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 17 Jan 2025 09:01:40 -0800 (PST)
+Content-Type: multipart/mixed; boundary="------------V0dHquHNhoNq0Eokc4Xl32xm"
+Message-ID: <66fa6c80-4383-479d-b17e-234bee6ed7ad@redhat.com>
+Date: Fri, 17 Jan 2025 18:01:38 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: a_IOCrvlW2R-9K4krF9PCVvfq_pUMBX4
-X-Proofpoint-ORIG-GUID: -mQzV7MgixzX7W7vFv09Zn7lvBiIz1yn
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-01-17_06,2025-01-16_01,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 suspectscore=0
- clxscore=1015 malwarescore=0 phishscore=0 lowpriorityscore=0 spamscore=0
- impostorscore=0 mlxscore=0 priorityscore=1501 bulkscore=0 mlxlogscore=550
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2411120000
- definitions=main-2501170130
+User-Agent: Mozilla Thunderbird
+Subject: Re: [syzbot] [mptcp?] WARNING in __mptcp_clean_una (2)
+To: syzbot <syzbot+ebc0b8ae5d3590b2c074@syzkaller.appspotmail.com>,
+ mptcp@lists.linux.dev, netdev@vger.kernel.org,
+ syzkaller-bugs@googlegroups.com
+References: <67605870.050a0220.37aaf.0137.GAE@google.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <67605870.050a0220.37aaf.0137.GAE@google.com>
 
-On Fri, 2025-01-17 at 17:33 +0100, Andrew Lunn wrote:
-> > Conceptually kind of but the existing s390 specific ISM device is a bit
-> > special. But let me start with some background. On s390 aka Mainframes
-> > OSs including Linux runs in so called logical partitions (LPARs) which
-> > are machine hypervisor VMs which use partitioned non-paging memory. The
-> > fact that memory is partitioned is important because this means LPARs
-> > can not share physical memory by mapping it.
-> >=20
-> > Now at a high level an ISM device allows communication between two such
-> > Linux LPARs on the same machine. The device is discovered as a PCI
-> > device and allows Linux to take a buffer called a DMB map that in the
-> > IOMMU and generate a token specific to another LPAR which also sees an
-> > ISM device sharing the same virtual channel identifier (VCHID). This
-> > token can then be transferred out of band (e.g. as part of an extended
-> > TCP handshake in SMC-D) to that other system. With the token the other
-> > system can use its ISM device to securely (authenticated by the token,
-> > LPAR identity and the IOMMU mapping) write into the original systems
-> > DMB at throughput and latency similar to doing a memcpy() via a
-> > syscall.
-> >=20
-> > On the implementation level the ISM device is actually a piece of
-> > firmware and the write to a remote DMB is a special case of our PCI
-> > Store Block instruction (no real MMIO on s390, instead there are
-> > special instructions). Sadly there are a few more quirks but in
-> > principle you can think of it as redirecting writes to a part of the
-> > ISM PCI devices' BAR to the DMB in the peer system if that makes sense.
-> > There's of course also a mechanism to cause an interrupt on the
-> > receiver as the write completes.
->=20
-> So the s390 details are interesting, but as you say, it is
-> special. Ideally, all the special should be hidden away inside the
-> driver.
+This is a multi-part message in MIME format.
+--------------V0dHquHNhoNq0Eokc4Xl32xm
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Yes and it will be. There are some exceptions e.g. for vfio-pci pass-
-through but that's not unusual and why there is already the concept of
-vfio-pci extension module.
+On 12/16/24 5:42 PM, syzbot wrote:
+> syzbot found the following issue on:
+> 
+> HEAD commit:    00a5acdbf398 bpf: Fix configuration-dependent BTF function..
+> git tree:       bpf-next
+> console output: https://syzkaller.appspot.com/x/log.txt?x=148de730580000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=fee25f93665c89ac
+> dashboard link: https://syzkaller.appspot.com/bug?extid=ebc0b8ae5d3590b2c074
+> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=16d82344580000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=179654f8580000
+> 
+> Downloadable assets:
+> disk image: https://storage.googleapis.com/syzbot-assets/fc306c95490c/disk-00a5acdb.raw.xz
+> vmlinux: https://storage.googleapis.com/syzbot-assets/e17d5125ee77/vmlinux-00a5acdb.xz
+> kernel image: https://storage.googleapis.com/syzbot-assets/65f791a7fd14/bzImage-00a5acdb.xz
 
->=20
-> So please take a step back. What is the abstract model?
+Trying again... Mat noted I actually forgot the actual command
 
-I think my high level description may be a good start. The abstract
-model is the ability to share a memory buffer (DMB) for writing by a
-communication partner, authenticated by a DMB Token. Plus stuff like
-triggering an interrupt on write or explicit trigger. Then Alibaba
-added optional support for what they called attaching the buffer which
-means it becomes truly shared between the peers but which IBM's ISM
-can't support. Plus a few more optional pieces such as VLANs, PNETIDs
-don't ask. The idea for the new layer then is to define this interface
-with operations and documentation.
+#syz test: git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git main
 
->=20
-> Can the abstract model be mapped onto CLX? Could it be used with a GPU
-> vRAM? SoC with real shared memory between a pool of CPUs.
->=20
-> 	Andrew
 
-I'd think that yes, one could implement such a mechanism on top of CXL
-as well as on SoC. Or even with no special hardware between a host and
-a DPU (e.g. via PCIe endpoint framework). Basically anything that can
-DMA and IRQs between two OS instances.
+--------------V0dHquHNhoNq0Eokc4Xl32xm
+Content-Type: text/x-patch; charset=UTF-8;
+ name="mptcp_clean_una_splat_debug_disc.patch"
+Content-Disposition: attachment;
+ filename="mptcp_clean_una_splat_debug_disc.patch"
+Content-Transfer-Encoding: base64
+
+ZGlmZiAtLWdpdCBhL25ldC9tcHRjcC9wcm90b2NvbC5jIGIvbmV0L21wdGNwL3Byb3RvY29s
+LmMKaW5kZXggMWIyZTdjYmI1NzdmLi5mYzhkOWZjMzY5NDIgMTAwNjQ0Ci0tLSBhL25ldC9t
+cHRjcC9wcm90b2NvbC5jCisrKyBiL25ldC9tcHRjcC9wcm90b2NvbC5jCkBAIC0xMDIyLDgg
+KzEwMjIsMTggQEAgc3RhdGljIHZvaWQgX19tcHRjcF9jbGVhbl91bmEoc3RydWN0IHNvY2sg
+KnNrKQogCiAJCWlmICh1bmxpa2VseShkZnJhZyA9PSBtc2stPmZpcnN0X3BlbmRpbmcpKSB7
+CiAJCQkvKiBpbiByZWNvdmVyeSBtb2RlIGNhbiBzZWUgYWNrIGFmdGVyIHRoZSBjdXJyZW50
+IHNuZCBoZWFkICovCi0JCQlpZiAoV0FSTl9PTl9PTkNFKCFtc2stPnJlY292ZXJ5KSkKKwkJ
+CWlmICghbXNrLT5yZWNvdmVyeSkgeworCQkJCXByX2Vycigic25kX3VuYSAlbGx4IHNuZF9u
+eHQgJWxseCB3cml0ZV9zZXEgJWxseCAiCisJCQkJICAgICAgICJpZHNuICVsbHggZGZyYWcg
+c2VxICVsbHggbGVuICVkIGRpc2Nvbm5lY3RzICVkOiVkICIKKwkJCQkJInN0YXRlICVkICVk
+XG4iLAorCQkJCSAgICAgICBzbmRfdW5hLCBtc2stPnNuZF9ueHQsIG1zay0+d3JpdGVfc2Vx
+LAorCQkJCSAgICAgICBtcHRjcF9zdWJmbG93X2N0eChtc2stPmZpcnN0KS0+aWRzbiwKKwkJ
+CQkgICAgICAgZGZyYWctPmRhdGFfc2VxLCBkZnJhZy0+ZGF0YV9sZW4sCisJCQkJICAgICAg
+IHNrLT5za19kaXNjb25uZWN0cywgbXNrLT5kaXNjb25uZWN0cywKKwkJCQkgICAgICAgc2st
+PnNrX3N0YXRlLCBzay0+c2tfc29ja2V0ID8gc2stPnNrX3NvY2tldC0+c3RhdGU6IC0xKTsK
+KwkJCQlXQVJOX09OKDEpOwogCQkJCWJyZWFrOworCQkJfQogCiAJCQlXUklURV9PTkNFKG1z
+ay0+Zmlyc3RfcGVuZGluZywgbXB0Y3Bfc2VuZF9uZXh0KHNrKSk7CiAJCX0KQEAgLTE3Njcs
+OCArMTc3NywxMCBAQCBzdGF0aWMgaW50IG1wdGNwX3NlbmRtc2dfZmFzdG9wZW4oc3RydWN0
+IHNvY2sgKnNrLCBzdHJ1Y3QgbXNnaGRyICptc2csCiAJCSAqIHNlZSBtcHRjcF9kaXNjb25u
+ZWN0KCkuCiAJCSAqIEF0dGVtcHQgaXQgYWdhaW4gb3V0c2lkZSB0aGUgcHJvYmxlbWF0aWMg
+c2NvcGUuCiAJCSAqLwotCQlpZiAoIW1wdGNwX2Rpc2Nvbm5lY3Qoc2ssIDApKQorCQlpZiAo
+IW1wdGNwX2Rpc2Nvbm5lY3Qoc2ssIDApKSB7CisJCQlzay0+c2tfZGlzY29ubmVjdHMrKzsK
+IAkJCXNrLT5za19zb2NrZXQtPnN0YXRlID0gU1NfVU5DT05ORUNURUQ7CisJCX0KIAl9CiAJ
+aW5ldF9jbGVhcl9iaXQoREVGRVJfQ09OTkVDVCwgc2spOwogCkBAIC0zMjA4LDYgKzMyMjAs
+NyBAQCBzdGF0aWMgaW50IG1wdGNwX2Rpc2Nvbm5lY3Qoc3RydWN0IHNvY2sgKnNrLCBpbnQg
+ZmxhZ3MpCiAJaWYgKG1zay0+ZmFzdG9wZW5pbmcpCiAJCXJldHVybiAtRUJVU1k7CiAKKwlt
+c2stPmRpc2Nvbm5lY3RzKys7CiAJbXB0Y3BfY2hlY2tfbGlzdGVuX3N0b3Aoc2spOwogCW1w
+dGNwX3NldF9zdGF0ZShzaywgVENQX0NMT1NFKTsKIApkaWZmIC0tZ2l0IGEvbmV0L21wdGNw
+L3Byb3RvY29sLmggYi9uZXQvbXB0Y3AvcHJvdG9jb2wuaAppbmRleCA3MzUyNmYxZDc2OGYu
+LjU5YTZlNTJmMDJhNCAxMDA2NDQKLS0tIGEvbmV0L21wdGNwL3Byb3RvY29sLmgKKysrIGIv
+bmV0L21wdGNwL3Byb3RvY29sLmgKQEAgLTM0MCw2ICszNDAsNyBAQCBzdHJ1Y3QgbXB0Y3Bf
+c29jayB7CiAJCXU2NAlydHRfdXM7IC8qIGxhc3QgbWF4aW11bSBydHQgb2Ygc3ViZmxvd3Mg
+Ki8KIAl9IHJjdnFfc3BhY2U7CiAJdTgJCXNjYWxpbmdfcmF0aW87CisJdTE2CQlkaXNjb25u
+ZWN0czsKIAogCXUzMgkJc3ViZmxvd19pZDsKIAl1MzIJCXNldHNvY2tvcHRfc2VxOwo=
+
+--------------V0dHquHNhoNq0Eokc4Xl32xm--
+
 
