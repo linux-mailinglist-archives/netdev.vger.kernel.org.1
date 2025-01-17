@@ -1,187 +1,101 @@
-Return-Path: <netdev+bounces-159262-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159263-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8195A14F25
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 13:27:51 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id F1FEDA14F36
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 13:34:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C62AF167A9F
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 12:27:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3F26E18895E8
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 12:34:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6ABC1FECD8;
-	Fri, 17 Jan 2025 12:27:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="bo7oyRED"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F29F81FF1AD;
+	Fri, 17 Jan 2025 12:34:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
+Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B37B1F8ADA
-	for <netdev@vger.kernel.org>; Fri, 17 Jan 2025 12:27:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EEE31FECBC
+	for <netdev@vger.kernel.org>; Fri, 17 Jan 2025 12:34:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737116864; cv=none; b=KZPU7jcx4V0svCr+ESvnUlVLTzlv94TIsxJOuspSH1FTpAiJuNzJCf99Ff+cPcbGRtU4PsxADQDTaRxvxlvkKMNP4NP4AyHdX2b2a9qMqE3qfETeCf/b6B+LAlgbOczGy8KoddRbbuVmRHrt9RraNeFskyxiEbyeEZYCK+OqV6M=
+	t=1737117245; cv=none; b=FkMuTU+LyV3aPVFLzP/p2oAxuzl5Z7jqLEw6ILvxur0YwAgvpwlq4MZACiKLlEBx78ljlgjDRXoT5A1CZMl7nEQqKWrhybqr7Hb5w7Hzva6NstLQKDD05/iGzrfNlB/oJBYM/6WRE5ZqQ+J1wiXc0vfSZF/4i4/K694XLicKIhk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737116864; c=relaxed/simple;
-	bh=n7JIFaUpzLMmjke6jiJJ78m6HqJgWSraMzRkvdqmlng=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Cw2QX953nO4iq5VAMQYuTNBPa3tTVRuiWbzyxJ1GJDW6pi/ZCRCUpaejoLYVtJvJ+42VNPXGuYckv+GXOChWFy3YE1p6I/PhC8gBvZMoKkRbauIzmq27F580aT9nLNTuiJN8x5F0fL9XQEFNhIQ6T6Wm8/JnU/SC452/q2MepGo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=bo7oyRED; arc=none smtp.client-ip=209.85.221.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
-Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-385dece873cso1120005f8f.0
-        for <netdev@vger.kernel.org>; Fri, 17 Jan 2025 04:27:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openvpn.net; s=google; t=1737116860; x=1737721660; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=U/ywgdQqRdWagz+3QDsZ+uwPbQn1KKALcsBHVUlaYmo=;
-        b=bo7oyREDb7N220TyFmgt9PcAfKbD8T7jyjJqgeDrjtCCcZzbwHyBAToAqS30b8G/jb
-         TA+0PBt1CuU91EdoYk2JptTcioljZ/ugEojZUVDRwgHyDIynTbTpbZg1ZUvk1CW6ewJz
-         rklti7XaeiJbOvPYmliZBXbWk0sZ/47EWwa9QXQiKP8BQIEJ7NAM5A9hILdeCVhR0Cv7
-         vt19vReKRs7iH/hIID/FU6RyElNxpyj6wekZXna3Q7qxIdc/uZyhDeXsqalIENZyLSrF
-         mb1ns6F/LLCW5DCpcB4+JE0gGiJHn2GVuDZCWrPh47vllrb0kU/aNDfhUOXrNryl9GsU
-         nH3w==
+	s=arc-20240116; t=1737117245; c=relaxed/simple;
+	bh=f6UH6L4B+hKtCwzKAlYd+xmm5Ot1kU+xbkfzuFhko94=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=Hr993dGSlWMjI3j6R+SZAS8jRMBYVjq8qsy3wQcUCG+gVZICEimFTX5r0Vo9nwHLKrRyrtIp7QNX64GTk8gnzuM3f54q24keNJNdXdCqpKpnO4oQ5zv1jrnP/+lz9j7QybRJrAAdWEAGbic7aQRN3YUEL0aUISaKQabQnhH4vBw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-3a814bfb77bso25847045ab.0
+        for <netdev@vger.kernel.org>; Fri, 17 Jan 2025 04:34:04 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737116860; x=1737721660;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=U/ywgdQqRdWagz+3QDsZ+uwPbQn1KKALcsBHVUlaYmo=;
-        b=u55sREbGhN/9QsCdORCnUJAYBU0c39Jcn9gSzir9Hu1scre37lWiY5Y1quZ/Yta5NG
-         bysWOVbAzUK8kCGxxtZybj0yQnSJzKmxkYFqPyWVp+Qf7ul+Ds67yTgFQyK9110YD8ws
-         zaSBGT2l+p9rJ+CaGoLbdMdnuIAT1nk5VKAwguhHM1NJccwiR4hcZSq/oEYDY9ULc/su
-         qQO8HjIJziRur24DVra/JiJZtR/aQnh4blCeWZWNMjuefvhFqoKWVvtHzBaAklz+6xxg
-         UAdBpSb4jQDTmoG//IDAG7GvPLfOlXNvGXqqbdQHt1JXy+oPA1Kt+aZaHYPnvoDxh+aZ
-         BWjw==
-X-Gm-Message-State: AOJu0YzHmROQv7NT6ps2g/n63QzKUm+tHaTE0nFxwr8odW3aNvdVAlRp
-	qljSz8QajvVmW1SzjgmNHK4CBNZDfe5ixuakNtduMTmD62BnqKaJI1TkmC+dsnc=
-X-Gm-Gg: ASbGncvK3BAZ0SIVa0OEuqKu+Ffniwf08p1DU8BobnBbWyjriVP6GhYK3vVr5c0RtXN
-	vTxgkng3T7DzEp9SCPPprJMAZBTfQNcc5hSMXLSsZaST6MTw4jwel3jgp93g8pbjDoUsUPD5FWw
-	67KdxqykTUDXu9q6YH/iiZ4nj0ZlxzYlloPiL6uREK4rp8CjtvsYDe3/kNbOWq/wPmT+WroBCiT
-	L+qj/6Jx8r70DMupXt822ohR8Tc4/Qd4uQE5XoJJUJ8TRgxVs5Hrj5WoQlQYEnGPDWy0LNRpCz1
-	Dl6B23nZZGJCwvUMPFk=
-X-Google-Smtp-Source: AGHT+IGfLzzJ7vZlc+8sqiP+zb0S4DkfVNWBk9IiMR4T3jQ7OCc77FUbOhvVrwl/2YhSgTkg6/08yA==
-X-Received: by 2002:adf:f381:0:b0:385:ec89:2f07 with SMTP id ffacd0b85a97d-38bf5687fc8mr1901653f8f.32.1737116860043;
-        Fri, 17 Jan 2025 04:27:40 -0800 (PST)
-Received: from ?IPV6:2001:67c:2fbc:1:217f:1ce8:9888:d2ed? ([2001:67c:2fbc:1:217f:1ce8:9888:d2ed])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38bf3275622sm2426201f8f.69.2025.01.17.04.27.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 17 Jan 2025 04:27:39 -0800 (PST)
-Message-ID: <1bbbde25-ef86-4890-9984-bd2f502e9e9e@openvpn.net>
-Date: Fri, 17 Jan 2025 13:28:33 +0100
+        d=1e100.net; s=20230601; t=1737117243; x=1737722043;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=QvZtm/UtggZQ4vZzY3P7eWyMLxgL/oSk0kGt7oXniJs=;
+        b=XxyBpqAdAlIWrlUZGPRZwaJ7ZOXsBM24FipO9cxt7W7vmW+K/d416AK0+ycrWDAeCi
+         6ZL4LEWoVdTwQASxy0TVaU2ct0rmjTOmjodHUldjqUkp/ETEpPN465ekMhT3IGVWV6Wl
+         /QrJUi7umO8xAbODlas2vTk3bsDMZW2mVnA262s0r2g+j3MmEcsfqudhtCWLAqs+Hakl
+         HWQwyDwGlsBMu4C51tdnt+eLtO0esd71pYBPQ6mAFMpvgTl7W94x3JCIpIgoZD03ykwP
+         iJxan+OJme+WJUX97Moo0s6KVtfjLhEA/z0HvXbBjWtlcysnME1Q4JipjGSrwNblE0YL
+         6Iqw==
+X-Forwarded-Encrypted: i=1; AJvYcCX2BXS/FA4MdgxrOJm93miGdIlUXdvgcGikPq5ol5ULrTtur+AExr+DtP3ONSHX05wS+R1hapM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwIF2QbVPoZ7moOboLNYjL2EHbzMPCrym74lSY5tE040NmxkQvM
+	dVyyXRSUwrL+z9NXNbyUWK4Gry+OaW6H6YmyZvYl7g4RbS+q8pl8mY3bMArlKZT97xVmdJFo+tV
+	rq6c3dBcCg4e5HkeNKoP5Q3/iHzsvJtO4gN/KFDbpIZ9bPufGYGAAFf4=
+X-Google-Smtp-Source: AGHT+IGSN+89+ev6I1KKIKrYVVMo2ys84hMSR+T3BfDaLgnUIIaFdFWMTnr/kHWhlVvZWahKwsOImXHsCYbnOPCcr/MWQDnXuHB1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v18 09/25] ovpn: implement packet processing
-To: Sabrina Dubroca <sd@queasysnail.net>
-Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Donald Hunter <donald.hunter@gmail.com>, Shuah Khan <shuah@kernel.org>,
- ryazanov.s.a@gmail.com, Andrew Lunn <andrew+netdev@lunn.ch>,
- Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org, Xiao Liang <shaw.leon@gmail.com>
-References: <20250113-b4-ovpn-v18-0-1f00db9c2bd6@openvpn.net>
- <20250113-b4-ovpn-v18-9-1f00db9c2bd6@openvpn.net> <Z4pKMkDrujMWMlCW@hog>
-Content-Language: en-US
-From: Antonio Quartulli <antonio@openvpn.net>
-Autocrypt: addr=antonio@openvpn.net; keydata=
- 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
-Organization: OpenVPN Inc.
-In-Reply-To: <Z4pKMkDrujMWMlCW@hog>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-Received: by 2002:a05:6e02:148e:b0:3ce:7cc9:9f46 with SMTP id
+ e9e14a558f8ab-3cf748b4d2dmr14934665ab.9.1737117243572; Fri, 17 Jan 2025
+ 04:34:03 -0800 (PST)
+Date: Fri, 17 Jan 2025 04:34:03 -0800
+In-Reply-To: <0000000000001e66f5061fe3b883@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <678a4e3b.050a0220.303755.0005.GAE@google.com>
+Subject: Re: [syzbot] [cgroups?] possible deadlock in console_lock_spinning_enable
+ (5)
+From: syzbot <syzbot+622acb507894a48b2ce9@syzkaller.appspotmail.com>
+To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
+	cgroups@vger.kernel.org, daniel@iogearbox.net, davem@davemloft.net, 
+	elic@nvidia.com, gregkh@linuxfoundation.org, hannes@cmpxchg.org, 
+	hawk@kernel.org, jasowang@redhat.com, jirislaby@kernel.org, 
+	john.fastabend@gmail.com, kafai@fb.com, kpsingh@kernel.org, kuba@kernel.org, 
+	len.brown@intel.com, linux-kernel@vger.kernel.org, linux-pm@vger.kernel.org, 
+	linux-serial@vger.kernel.org, mingo@redhat.com, mkoutny@suse.com, 
+	mst@redhat.com, netdev@vger.kernel.org, parav@nvidia.com, pavel@ucw.cz, 
+	rafael@kernel.org, rostedt@goodmis.org, songliubraving@fb.com, 
+	syzkaller-bugs@googlegroups.com, tj@kernel.org, yhs@fb.com
+Content-Type: text/plain; charset="UTF-8"
 
-On 17/01/2025 13:16, Sabrina Dubroca wrote:
-> 2025-01-13, 10:31:28 +0100, Antonio Quartulli wrote:
->>   static bool ovpn_encrypt_one(struct ovpn_peer *peer, struct sk_buff *skb)
->>   {
->> -	ovpn_skb_cb(skb)->peer = peer;
->> +	struct ovpn_crypto_key_slot *ks;
->> +
->> +	if (unlikely(skb->ip_summed == CHECKSUM_PARTIAL &&
->> +		     skb_checksum_help(skb))) {
->> +		net_warn_ratelimited("%s: cannot compute checksum for outgoing packet for peer %u\n",
->> +				     netdev_name(peer->ovpn->dev), peer->id);
->> +		return false;
->> +	}
->> +
->> +	/* get primary key to be used for encrypting data */
->> +	ks = ovpn_crypto_key_slot_primary(&peer->crypto);
->> +	if (unlikely(!ks))
->> +		return false;
->>   
->>   	/* take a reference to the peer because the crypto code may run async.
->>   	 * ovpn_encrypt_post() will release it upon completion
->> @@ -118,7 +244,8 @@ static bool ovpn_encrypt_one(struct ovpn_peer *peer, struct sk_buff *skb)
-> 
-> Adding in the few lines that got snipped:
-> 
-> 	/* take a reference to the peer because the crypto code may run async.
-> 	 * ovpn_encrypt_post() will release it upon completion
-> 	 */
-> 	if (unlikely(!ovpn_peer_hold(peer))) {
-> 		DEBUG_NET_WARN_ON_ONCE(1);
-> 		return false;
-> 	}
-> 
-> This should never happen, but just in case, we'd want
-> ovpn_crypto_key_slot_put() here.
+syzbot has bisected this issue to:
 
-ACK
+commit bc0d90ee021f1baecd6aaa010d787eb373aa74dd
+Author: Parav Pandit <parav@nvidia.com>
+Date:   Tue Jan 5 10:32:02 2021 +0000
 
-> 
->>   		return false;
->>   	}
-> 
+    vdpa: Enable user to query vdpa device info
 
--- 
-Antonio Quartulli
-OpenVPN Inc.
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=1440c2b0580000
+start commit:   619f0b6fad52 Merge tag 'seccomp-v6.13-rc8' of git://git.ke..
+git tree:       upstream
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=1640c2b0580000
+console output: https://syzkaller.appspot.com/x/log.txt?x=1240c2b0580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=d1cb4a1f148c0861
+dashboard link: https://syzkaller.appspot.com/bug?extid=622acb507894a48b2ce9
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=175029df980000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=16f29a18580000
 
+Reported-by: syzbot+622acb507894a48b2ce9@syzkaller.appspotmail.com
+Fixes: bc0d90ee021f ("vdpa: Enable user to query vdpa device info")
+
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
