@@ -1,157 +1,187 @@
-Return-Path: <netdev+bounces-159346-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159347-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F331A152EE
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 16:38:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id DE23DA152FA
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 16:41:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 93AC6188278D
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 15:38:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5CC4A18899C1
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 15:42:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5216156C71;
-	Fri, 17 Jan 2025 15:38:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26D6F197A7E;
+	Fri, 17 Jan 2025 15:41:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="MG36Y+v0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tujTLL7p"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22E18D530;
-	Fri, 17 Jan 2025 15:38:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01F9B193404
+	for <netdev@vger.kernel.org>; Fri, 17 Jan 2025 15:41:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737128328; cv=none; b=kGXCBPH/VAEmIEdjVOC6K4WKLGXy8quuQfgIT7k8HQyBOvJBOjfMYrCctYW7x+6sGAqfk0x0zIkotOmcBtOn2OM+MY9FRsJ5Wg9sW95XZ37uPJSrtIZu/NjcofeclWolI4XiyEKxtoVAA2dcFxky0YviwYN0EmqEtZprzUlmP+E=
+	t=1737128515; cv=none; b=W/yupWFIUcggDLRwbTfshgTFS5eLKYHfzk1zbO0C4pWVHaAGR1VK04wKh6FSW7GbL2gRdrU7M0o2vXPFzLi59+LzGl8CNz5G/3b/+QJba2MKuoA9skcyPGFGWUj7STBNsPfQmJL88yV3dXAGO1j0G/qKRLNW78HRZPxksZn57XQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737128328; c=relaxed/simple;
-	bh=prmmqicUYpBStsmoFjdm2jAAKyf4XrMWxBLTJCmDSII=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=M4euoZxwjVV9rYraddWnZYwRwsDrSNdW+2pCLri23uK864/TWpV9fuzQ3EM5RULUrTBX3+DQF8sVOjs2FwoiFtTSu6DNPWVbnPD4zWNpTaWWIbuB1hkyjdOEpIYkPii5tCFY1eq6KFcAFrZdm+lfYEQu90DgaePxVPLw8iO0iZE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=MG36Y+v0; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50HEs9sc026521;
-	Fri, 17 Jan 2025 15:38:28 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=NgMqxK
-	WUOpakIfsPIMo0duOb1vtEbUYqa9rh5bkaG+o=; b=MG36Y+v0XqJ6Hfrul5/tZW
-	rRHV1FnnpQv2IbwxDIwkVjdVMP75/E7uOCWD5WChcxHfQhXzZ82CbwmSIAwDGJzU
-	JsqhM4JlPGoib9uU7XUEMjb6c3R0j58vHeT62KT5Rph2nkMV2pqgdc6zKYCWlprE
-	loYAIQm+tle0J4pU0GquOykSoS3w7NNAUdK9TsONvcXESQmPC35mQPjEXz3geyeI
-	Akcu7d409dVHGSp24QDZWUZYz1kWNL+KLaTo0nD4lpjDhBJDAY1qlJoghYAL666u
-	SGYn5YpbaEWwAclRExpteC9xMUQ9ySn6/DeYA6+zn/ZBO3ZlCxzmCcBjokIakavQ
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 447fpcb09s-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 17 Jan 2025 15:38:27 +0000 (GMT)
-Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 50HFQVac014897;
-	Fri, 17 Jan 2025 15:38:27 GMT
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 447fpcb09h-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 17 Jan 2025 15:38:27 +0000 (GMT)
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 50HF0cve017003;
-	Fri, 17 Jan 2025 15:38:25 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4444fkkf0j-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 17 Jan 2025 15:38:25 +0000
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 50HFcMj450266436
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 17 Jan 2025 15:38:22 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 15E362004B;
-	Fri, 17 Jan 2025 15:38:22 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 1C69C20040;
-	Fri, 17 Jan 2025 15:38:21 +0000 (GMT)
-Received: from [9.171.79.45] (unknown [9.171.79.45])
-	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 17 Jan 2025 15:38:21 +0000 (GMT)
-Message-ID: <bfa431f9-333e-439a-b6b0-8fc16e0f38f1@linux.ibm.com>
-Date: Fri, 17 Jan 2025 16:38:21 +0100
+	s=arc-20240116; t=1737128515; c=relaxed/simple;
+	bh=0goQeBdrjWL8unfZLe+i6UZ3RI4bCo3nkPsp0fvxPQs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CWcyJb6CuIaLiiupcSzW6MNrMRF4R4oD1F2ZspmwqO4r/jvoyr9UgYzT+zzhA5Lcy/5xzrevE5LAhe4bu80dyaDb2Ts2tGgfrzDHU7jmRcQCMSNKrXaIth7hhPKyfmhIOca4yEvS/FoAP5nC4Xp3fwzzynp/6wCM0cr9Lv9iGfs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tujTLL7p; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0A61EC4CEDD;
+	Fri, 17 Jan 2025 15:41:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1737128514;
+	bh=0goQeBdrjWL8unfZLe+i6UZ3RI4bCo3nkPsp0fvxPQs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=tujTLL7pxFDMNi4B4jiI5o7KYyOI0iG2E2VtzwXlPUCmtsdokowT7tKtBL9aOZ1a1
+	 Jlbj7PvClXWFBbYaPKuMcXWdtFIff6r4Qv6PACyN81CjmkCn+KaHEwegvO83PWdS5t
+	 ziP6qPZ/7gqkhLw639FzSUyw7gXcfqTXhD57mdQrzEJ9i1ida5h8Ok4JIfEXHqWRSg
+	 mYu77vXkxJg6fvtA1H3m/+yqFxoxWOK4PIux/nTknH2E0Aub8/avvhVZqzgZlhDgWm
+	 LtJFzKLd2b08G4xKuOzrjo6bblnnC0c+Y5BrJ7QZ7cXEEDTj5H/WAP37WqPOmZgN2m
+	 6Qk9CWKa4d5iQ==
+Date: Fri, 17 Jan 2025 15:41:49 +0000
+From: Simon Horman <horms@kernel.org>
+To: Michael Chan <michael.chan@broadcom.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, andrew+netdev@lunn.ch,
+	pavan.chebbi@broadcom.com, andrew.gospodarek@broadcom.com,
+	michal.swiatkowski@linux.intel.com, helgaas@kernel.org,
+	Manoj Panicker <manoj.panicker2@amd.com>,
+	Somnath Kotur <somnath.kotur@broadcom.com>,
+	Wei Huang <wei.huang2@amd.com>,
+	Ajit Khaparde <ajit.khaparde@broadcom.com>
+Subject: Re: [PATCH net-next v2 10/10] bnxt_en: Add TPH support in BNXT driver
+Message-ID: <20250117154149.GQ6206@kernel.org>
+References: <20250116192343.34535-1-michael.chan@broadcom.com>
+ <20250116192343.34535-11-michael.chan@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC net-next 0/7] Provide an ism layer
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Julian Ruess <julianr@linux.ibm.com>, dust.li@linux.alibaba.com,
-        Wenjia Zhang <wenjia@linux.ibm.com>, Jan Karcher <jaka@linux.ibm.com>,
-        Gerd Bayer <gbayer@linux.ibm.com>, Halil Pasic <pasic@linux.ibm.com>,
-        "D. Wythe" <alibuda@linux.alibaba.com>,
-        Tony Lu <tonylu@linux.alibaba.com>, Wen Gu <guwen@linux.alibaba.com>,
-        Peter Oberparleiter
- <oberpar@linux.ibm.com>,
-        David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
-        Andrew Lunn <andrew+netdev@lunn.ch>,
-        Niklas Schnelle <schnelle@linux.ibm.com>,
-        Thorsten Winkler <twinkler@linux.ibm.com>, netdev@vger.kernel.org,
-        linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev
- <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>, Simon Horman <horms@kernel.org>
-References: <20250115195527.2094320-1-wintera@linux.ibm.com>
- <20250116093231.GD89233@linux.alibaba.com>
- <D73H7Q080GUQ.3BDOH23P4WDOL@linux.ibm.com>
- <0f96574a-567e-495a-b815-6aef336f12e6@linux.ibm.com>
- <221565b5-f603-43a1-a326-3f6c568684b8@lunn.ch>
-Content-Language: en-US
-From: Alexandra Winter <wintera@linux.ibm.com>
-In-Reply-To: <221565b5-f603-43a1-a326-3f6c568684b8@lunn.ch>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: T6o-DzzPsUegc7SqRlKFzQJgnbOrOaEW
-X-Proofpoint-GUID: pPenGHSo7FPJbt3yb4WCYVgt801LyfHT
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-01-17_06,2025-01-16_01,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
- impostorscore=0 mlxlogscore=494 spamscore=0 malwarescore=0 clxscore=1015
- priorityscore=1501 mlxscore=0 phishscore=0 adultscore=0 lowpriorityscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2411120000 definitions=main-2501170122
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250116192343.34535-11-michael.chan@broadcom.com>
 
-
-
-On 17.01.25 16:06, Andrew Lunn wrote:
->> With this proposal ism_loopback is just another ism device and SMC-D will
->> handle removal just like ism_client.remove(ism_dev) of other ism devices.
+On Thu, Jan 16, 2025 at 11:23:43AM -0800, Michael Chan wrote:
+> From: Manoj Panicker <manoj.panicker2@amd.com>
 > 
-> In Linux terminology, a device is something which has a struct device,
-> and a device lives on some sort of bus, even if it is a virtual
-> bus. Will ISM devices properly fit into the Linux device driver model?
+> Add TPH support to the Broadcom BNXT device driver. This allows the
+> driver to utilize TPH functions for retrieving and configuring Steering
+> Tags when changing interrupt affinity. With compatible NIC firmware,
+> network traffic will be tagged correctly with Steering Tags, resulting
+> in significant memory bandwidth savings and other advantages as
+> demonstrated by real network benchmarks on TPH-capable platforms.
 > 
-> 	Andrew
+> Co-developed-by: Somnath Kotur <somnath.kotur@broadcom.com>
+> Signed-off-by: Somnath Kotur <somnath.kotur@broadcom.com>
+> Co-developed-by: Wei Huang <wei.huang2@amd.com>
+> Signed-off-by: Wei Huang <wei.huang2@amd.com>
+> Signed-off-by: Manoj Panicker <manoj.panicker2@amd.com>
+> Reviewed-by: Ajit Khaparde <ajit.khaparde@broadcom.com>
+> Reviewed-by: Andy Gospodarek <andrew.gospodarek@broadcom.com>
+> Signed-off-by: Michael Chan <michael.chan@broadcom.com>
+> ---
+> Cc: Bjorn Helgaas <helgaas@kernel.org>
 > 
+> Previous driver series fixing rtnl_lock and empty release function:
+> 
+> https://lore.kernel.org/netdev/20241115200412.1340286-1-wei.huang2@amd.com/
+> 
+> v5 of the PCI series using netdev_rx_queue_restart():
+> 
+> https://lore.kernel.org/netdev/20240916205103.3882081-5-wei.huang2@amd.com/
+> 
+> v1 of the PCI series using open/close:
+> 
+> https://lore.kernel.org/netdev/20240509162741.1937586-9-wei.huang2@amd.com/
+> ---
+>  drivers/net/ethernet/broadcom/bnxt/bnxt.c | 105 ++++++++++++++++++++++
+>  drivers/net/ethernet/broadcom/bnxt/bnxt.h |   7 ++
+>  2 files changed, 112 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> index 0a10a4cffcc8..8c24642b8812 100644
+> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> @@ -55,6 +55,8 @@
+>  #include <net/page_pool/helpers.h>
+>  #include <linux/align.h>
+>  #include <net/netdev_queues.h>
+> +#include <net/netdev_rx_queue.h>
+> +#include <linux/pci-tph.h>
+>  
+>  #include "bnxt_hsi.h"
+>  #include "bnxt.h"
 
-ism_vpci lives on a pci bus (zpci flavor) today. The fact that it is not
-backed by a real hardware PCI slot, but emulated by s390 firmware is not
-visible to Linux.
+Hi Manoj, Michael, all,
 
-In the first proposal, ism_lo lived in on a virtual bus, afaiu. I liked
-that. In the current stage 1 implementation that is currently upstream,
-it is not visible in sysfs :-(
+Modpost complains that:
 
+WARNING: modpost: module bnxt_en uses symbol netdev_rx_queue_restart from namespace NETDEV_INTERNAL, but does not import it.
 
-ism_dev is a bit modeled after net_device. So it is contains a pointer
-to a struct device, but it is not the device itself.
+And looking into this I see:
 
-I have to admit that the sysfs details are a bit confusing to me,
-so I wanted to discuss them first before adding them to the RFC.
-But I tried to bring all the prereqs in place.
+* netdev: define NETDEV_INTERNAL
+  https://git.kernel.org/netdev/net-next/c/0b7bdc7fab57
+
+Which adds the following text to Documentation/networking/netdevices.rst
+
+  NETDEV_INTERNAL symbol namespace
+  ================================
+
+  Symbols exported as NETDEV_INTERNAL can only be used in networking
+  core and drivers which exclusively flow via the main networking list and trees.
+  Note that the inverse is not true, most symbols outside of NETDEV_INTERNAL
+  are not expected to be used by random code outside netdev either.
+  Symbols may lack the designation because they predate the namespaces,
+  or simply due to an oversight.
+
+Which I think is satisfied here. So I think this problem can be
+addressed by adding the following about here (completely untested!).
+
+MODULE_IMPORT_NS("NETDEV_INTERNAL");
+
+> @@ -11330,6 +11332,83 @@ static int bnxt_tx_queue_start(struct bnxt *bp, int idx)
+>  	return 0;
+>  }
+>  
+> +static void bnxt_irq_affinity_notify(struct irq_affinity_notify *notify,
+> +				     const cpumask_t *mask)
+> +{
+> +	struct bnxt_irq *irq;
+> +	u16 tag;
+> +	int err;
+> +
+> +	irq = container_of(notify, struct bnxt_irq, affinity_notify);
+> +
+> +	if (!irq->bp->tph_mode)
+> +		return;
+> +
+> +	cpumask_copy(irq->cpu_mask, mask);
+> +
+> +	if (irq->ring_nr >= irq->bp->rx_nr_rings)
+> +		return;
+> +
+> +	if (pcie_tph_get_cpu_st(irq->bp->pdev, TPH_MEM_TYPE_VM,
+> +				cpumask_first(irq->cpu_mask), &tag))
+> +		return;
+> +
+> +	if (pcie_tph_set_st_entry(irq->bp->pdev, irq->msix_nr, tag))
+> +		return;
+> +
+> +	rtnl_lock();
+> +	if (netif_running(irq->bp->dev)) {
+> +		err = netdev_rx_queue_restart(irq->bp->dev, irq->ring_nr);
+> +		if (err)
+> +			netdev_err(irq->bp->dev,
+> +				   "RX queue restart failed: err=%d\n", err);
+> +	}
+> +	rtnl_unlock();
+> +}
+
+...
 
