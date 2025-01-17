@@ -1,107 +1,121 @@
-Return-Path: <netdev+bounces-159218-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159217-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A9B7A14D6C
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 11:18:04 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B4178A14D68
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 11:17:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BA19F188BFCF
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 10:18:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1C78C188C0E3
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 10:17:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D1231F941F;
-	Fri, 17 Jan 2025 10:18:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63AEC1FC7F7;
+	Fri, 17 Jan 2025 10:17:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TgJ5PPAP"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgsg2.qq.com (smtpbgsg2.qq.com [54.254.200.128])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E14F91F7093
-	for <netdev@vger.kernel.org>; Fri, 17 Jan 2025 10:17:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.254.200.128
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C69521F7093;
+	Fri, 17 Jan 2025 10:17:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737109080; cv=none; b=Ox8IM+ndV2uzDsplLvmONODgBirMWWhuHNjvSy6Af4ze7SZ7TTrxzYktPJ+9/bWBeF7k1PWJtFu2ZwQ3nIpAbbtDF8+4Bdz3/QwDLqBRL4d+SMunf484xxPerLRJh+XRAxKVheHvkhCDovTTsL+mVBZFGpIgej76qjw3qW5jY7E=
+	t=1737109035; cv=none; b=L3aj+0PjsVBSktFbEFAW9CHjPK+NaVNjV/GpTm/run57TpvGGfor4J1x+PYPCWWHtuAlJfaXpwS8myXFXzlo6LdR/OO5amJ179GVE7UNBQNE80mBVsBN7Ua89ZGrLQATnC2hAEMaPfsL77hXcZitrZZRTBhq7F5DrUi8Bvzz934=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737109080; c=relaxed/simple;
-	bh=oRwRrEcKzYRf9wAB5P+BeTyWhtTM1Lubr/86QsaJdcc=;
-	h=From:To:Cc:References:In-Reply-To:Subject:Date:Message-ID:
-	 MIME-Version:Content-Type; b=ikuz+A7V50oAXxq0gYrF0Rwm1mNCX6VabM87JgJs4VVqsHT2qA12FRF47kbSieHmc63rOXwfyiVN3GbVZAY0mXa7PslRqNYyx1CCKsS6Lhay5M7na1HOSMEtvAL1XtEY/K4cZnaJsXMBWVIrVRPuvpREyHE3Dn99sgQrd481xWg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=54.254.200.128
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
-X-QQ-mid:Yeas8t1737109026t788t53021
-Received: from 3DB253DBDE8942B29385B9DFB0B7E889 (jiawenwu@trustnetic.com [36.24.187.167])
-X-QQ-SSF:0000000000000000000000000000000
-From: =?utf-8?b?Smlhd2VuIFd1?= <jiawenwu@trustnetic.com>
-X-BIZMAIL-ID: 5973032802346409785
-To: "'Russell King \(Oracle\)'" <linux@armlinux.org.uk>
-Cc: "'Andrew Lunn'" <andrew@lunn.ch>,
-	"'Heiner Kallweit'" <hkallweit1@gmail.com>,
-	<mengyuanlou@net-swift.com>,
-	"'Alexandre Torgue'" <alexandre.torgue@foss.st.com>,
-	"'Andrew Lunn'" <andrew+netdev@lunn.ch>,
-	"'Bryan Whitehead'" <bryan.whitehead@microchip.com>,
-	"'David S. Miller'" <davem@davemloft.net>,
-	"'Eric Dumazet'" <edumazet@google.com>,
-	"'Jakub Kicinski'" <kuba@kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>,
-	"'Marcin Wojtas'" <marcin.s.wojtas@gmail.com>,
-	"'Maxime Coquelin'" <mcoquelin.stm32@gmail.com>,
-	<netdev@vger.kernel.org>,
-	"'Paolo Abeni'" <pabeni@redhat.com>,
-	<UNGLinuxDriver@microchip.com>
-References: <Z4gdtOaGsBhQCZXn@shell.armlinux.org.uk> <06d301db68bd$b59d3c90$20d7b5b0$@trustnetic.com> <Z4odUIWmYb8TelZS@shell.armlinux.org.uk>
-In-Reply-To: <Z4odUIWmYb8TelZS@shell.armlinux.org.uk>
-Subject: RE: [PATCH net-next 0/9] net: add phylink managed EEE support
-Date: Fri, 17 Jan 2025 18:17:05 +0800
-Message-ID: <06dc01db68c8$f5853fa0$e08fbee0$@trustnetic.com>
+	s=arc-20240116; t=1737109035; c=relaxed/simple;
+	bh=JFEi2wLeGZOf8BHQEKqWbZM9NCkw6C1VmawHgv9xFhs=;
+	h=Date:From:To:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=C37Vdt+8sbWS0AvcEuxmWt3K74MTnDok7DPV/Op2DPL7x6DtQSCPpfSQYqS31HeVNGiLi8j/vI9fZtXaa0eyK3Q2myPO40qdmmI9waLOnb8E5E1y7vwTTmP4JMVueTwq9BQyLT0WFfyWBu80XwTKLHVn+/+QYItatWi8GR3iBlU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TgJ5PPAP; arc=none smtp.client-ip=209.85.160.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-46c8474d8f6so16665701cf.3;
+        Fri, 17 Jan 2025 02:17:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1737109032; x=1737713832; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ScPbdVpBxzYO8pUJQAAuO4Xb4212ZYcCAfsm5wTEeKs=;
+        b=TgJ5PPAPvhZqFacs/2/4jwp+ztznExBtuPrRGjUCCpbok3CA4sxC/I3t7NVQh6KGJO
+         Zpr/wJIPquwtnB8MZuN+sTrt7IzR7XMSbOrJxpBzL4nMw5H6i756Vv1uXp56uB/MqwtZ
+         HDxo0HtBnmx94P4ohOTTy3igZBn5UHQhs1ZiP+/auhSv8qz/8UWAN4+YsViytmNE/z8l
+         VZ6DLDwF7QrlnFd41nw71KbPLKoOtiafmvzFYKcrO/1RC0foe2+eIJRgZ/o5laPealRU
+         hbgaeiY7akHyB0gb9MF/4ZnZSbhV7rnLQ/M1ukPhHiZ1+0eSnubrL1nGUCtWI/ZJVLWL
+         /3Nw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737109032; x=1737713832;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ScPbdVpBxzYO8pUJQAAuO4Xb4212ZYcCAfsm5wTEeKs=;
+        b=G6KDaz8G3o25jZn7grmgDE/GnL02sa3p/NJF8DT8UUe9uzUYDUy6ZLuPB4lj0X37ql
+         V7uFayODdN5tpR+wFcdUsS/5fZJkqbZRDiTo7YgxqNXHPqJ1e4TskLWrQJbakGoF3Lf2
+         XCYA9hCSY2M0chYbXltSV53EFGl6wUJYIrGaktb7kIZcqZR6eUvUgezb7EvtVXdxCoaF
+         dQA1Y6S/Ta1zM/hyxEfZKdjr3C9sH5qHhoxw0NEwyMASvccHZwAYULxJMyQzTbyRxc2t
+         sTSeIMB3igXHpcWeSDhWvF0t0U0FvIrWqGqvJVYEBFpyKJbRqIDmziatkIj2g2krVLn5
+         WMSA==
+X-Forwarded-Encrypted: i=1; AJvYcCU/4JnU+LEKi92c0LfYkF8Q428Nw6UiRhJOoo4uWic9qQWf4Bsinzl5UsMQIHpaT6a/+3jF2IMqTDK8W+pi@vger.kernel.org, AJvYcCUT++/QT6d+dkD1X+fjT9Kjuuxqi+LWvr+UOIF/ksd/p+tyal6Ui+fjAvYyaI7kG09uLkIeaUNWCg3AlaGVmPmE@vger.kernel.org, AJvYcCWHrN97/LKqQJaATiw8qsUdWGB89OMZPeiMxSwvq5Y1avPIKp2JcROGyCirdmBFk/o5IQQr813a7+Co@vger.kernel.org, AJvYcCWLVp8FL8J274hEw+D0/De88K2wFS4aLp4cIIFPioEL3DRRpivygoNypFobOiHSaclP4wM=@vger.kernel.org, AJvYcCX/tX/JfywZUXLfIjoKMST7jSEnSwDANG+VUgjdtU9K9rARN4TG7NUYlVxTo/F1kHURSwR1zM2h@vger.kernel.org
+X-Gm-Message-State: AOJu0YwywVLvpN4kBhejkxJStd3XbboNO0Jig30qF5qWD99vigREWu5W
+	/aOzvflTFRTeVz8lcpP7msMAJeToKIfv9P+Iy0PrMfMs1iipsOL2
+X-Gm-Gg: ASbGnctgsOKPv1RIfWSecJRTPYxdHs264kRcCe9jjzrujoGfZmVl8vQl1q94sF+wOry
+	Ru1WBzRs9gpqL1cyJyjCoZwUFNDCbktIcFPtiploF+eHD68TPsFsOnH/KAPYy5Zt/TwvjYV6GbV
+	woJLJduwHVZygGuGNd8kaK1Q/RAqv0tG9DZGu4N0Rj04TR6sBgY3TAjmIAKjhrY3zaKMvE9DLuD
+	/e1B2LDKNudauAl29BOI2xdfDlHNpY0uV176NxPYJf+DaYfzvB092HX1a3Ty2Vnz0oOmvH2hlMo
+	WE8Jzw6XzsbrbImszIJ/ljUuBOCZ
+X-Google-Smtp-Source: AGHT+IHi7GfJK6r/tRrun8aHPOSCgfPVe7JmZONv6mDjqRyn86C/st2dbOpHBXdzCk3DyzPzJ6Egfg==
+X-Received: by 2002:a05:622a:201:b0:467:5ea8:83df with SMTP id d75a77b69052e-46e12a9a0a9mr29192481cf.30.1737109032691;
+        Fri, 17 Jan 2025 02:17:12 -0800 (PST)
+Received: from localhost (15.60.86.34.bc.googleusercontent.com. [34.86.60.15])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-46e102ec299sm9805661cf.6.2025.01.17.02.17.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 17 Jan 2025 02:17:12 -0800 (PST)
+Date: Fri, 17 Jan 2025 05:17:11 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Akihiko Odaki <akihiko.odaki@daynix.com>, 
+ Jonathan Corbet <corbet@lwn.net>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ Jason Wang <jasowang@redhat.com>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ "Michael S. Tsirkin" <mst@redhat.com>, 
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+ Shuah Khan <shuah@kernel.org>, 
+ linux-doc@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ netdev@vger.kernel.org, 
+ kvm@vger.kernel.org, 
+ virtualization@lists.linux-foundation.org, 
+ linux-kselftest@vger.kernel.org, 
+ Yuri Benditovich <yuri.benditovich@daynix.com>, 
+ Andrew Melnychenko <andrew@daynix.com>, 
+ Stephen Hemminger <stephen@networkplumber.org>, 
+ gur.stavi@huawei.com, 
+ devel@daynix.com, 
+ Akihiko Odaki <akihiko.odaki@daynix.com>
+Message-ID: <678a2e27c25eb_3e985b29494@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20250116-tun-v3-3-c6b2871e97f7@daynix.com>
+References: <20250116-tun-v3-0-c6b2871e97f7@daynix.com>
+ <20250116-tun-v3-3-c6b2871e97f7@daynix.com>
+Subject: Re: [PATCH net v3 3/9] tun: Keep hdr_len in tun_get_user()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
+Mime-Version: 1.0
 Content-Type: text/plain;
-	charset="us-ascii"
+ charset=utf-8
 Content-Transfer-Encoding: 7bit
-X-Mailer: Microsoft Outlook 16.0
-Content-Language: zh-cn
-Thread-Index: AQJuuL6961zeRYLpn6fcQniPsxo8VAIOTZqlAVk2ssyx2OG8AA==
-X-QQ-SENDSIZE: 520
-Feedback-ID: Yeas:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz8a-1
-X-QQ-XMAILINFO: NEAuM+RWOySTVAAXhdhYDgg85MX23/jRqes6cMCw2E6Cd19TpARe48ex
-	omcuSKj/eVPDx5/8ZN74AQfkEUPMN6JHTvX++X85CGytCNi0ZjFnB6YxCryKeDngVrLrNJZ
-	qOLj/O0zDRl7z9JhbxesRX3VJbQfuBokz4UC8ag1yipON7L330yP8bDNJdesPcSShkyXpFx
-	WdguuPPmlydhgy89SHTykCnqyN3KeQcjxWAAOR3pVlDCta/d07u4cTWATgv0Eutt4pBwHYb
-	17I/ZlPI3wdPbv09iM6oTusc4r1eg79SygoBVpEsh3NYHtS0n3zzVlet42X5TQc/rgOrjbu
-	fOhRGtrjYfie9F3S3KRpBsMrxPOpAC3mNsQwz/GRG4PyLVk8i8XZZvy65lWUfxJQv6An8lv
-	R016fdo/hyEF1wDP9R/I39sYcwqMNcTMo7RYH8lK2fnN4LOyXWU/uSJo2h3zda9nkc0UgDH
-	T836YnE6tD3Mc4hNIFZVzrgBiM5t4RDGMEGNLko0MBdS5hwmZzSDnvnV6WYY9DzWtXLCjFP
-	grZkxxmxA+VQ68wvBCUPUrD8eqsrG3d2CoSOjjdPB5i+STWWrnu0FdEEAP233x9oC0NLVYl
-	7VjBPNBm+vVxPh8zy7pJ378DhhYJ6mT9/rziauDsDJFUWOrn9EMmotz9BBxoJelZigLdBmS
-	AqXu+p9Bw+Yz4aUFmKuhz2p4UxcBgny6N/ni4U5hMge0vWtg2kNCv2e6YuHp1ccuc9pJhMq
-	OEdVNDfSaQ0aFEGiE3Esg4FtufOcXaJnXLSCF5hkJvT7Hc019gJw3WkL//+l7uekL8wfQhZ
-	wStY6bFrh8led88rCkJPnaUTFbNHZ2QyF+QDfP5Hd0Hxm2XeVM5Z72We2MhspZBoblPdfdy
-	wDDpSUCqXbmo9WgvgzvKBWMgPCpCW45lLYOrz5arVkwEkynZ+gxm0i5Eqy0Sxcb2UPOXe3U
-	ucvJ0FZSvxCGoSijjqp4PgHezY/nrDBNrzw2DWDGya3maG21GW73ULQwxXH5dwy1+60FZro
-	L/6J5TK/WJgesQO+2JpHXxUi70omD7XcnNAMI/EPKWoEHd/ziE
-X-QQ-XMRINFO: MSVp+SPm3vtS1Vd6Y4Mggwc=
-X-QQ-RECHKSPAM: 0
 
-> > Since merging these patches, phylink_connect_phy() can no longer be
-> > invoked correctly in ngbe_open(). The error is returned from the function
-> > phy_eee_rx_clock_stop(). Since EEE is not supported on our NGBE hardware.
+Akihiko Odaki wrote:
+> hdr_len is repeatedly used so keep it in a local variable.
 > 
-> That would mean phy_modify_mmd() is failing, but the question is why
-> that is. Please investigate. Thanks.
+> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
 
-Yes, phy_modify_mmd() returns -EOPNOTSUPP. Since .read/write_mmd are
-implemented in the PHY driver, but it's not supported to read/write the
-register field (devnum=MDIO_MMD_PCS, regnum= MDIO_CTRL1).
-
-So the error occurs on  __phy_read_mmd():
-	if (phydev->drv && phydev->drv->read_mmd)
-		return phydev->drv->read_mmd(phydev, devad, regnum);
-
-
+Reviewed-by: Willem de Bruijn <willemb@google.com>
 
