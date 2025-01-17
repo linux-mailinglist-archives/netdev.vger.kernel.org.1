@@ -1,197 +1,156 @@
-Return-Path: <netdev+bounces-159302-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159303-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77AC3A15062
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 14:21:16 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B4599A1506A
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 14:22:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C3A44188B3CB
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 13:21:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C83687A186C
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 13:22:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76EF61FF5F7;
-	Fri, 17 Jan 2025 13:21:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 030A81FF1D4;
+	Fri, 17 Jan 2025 13:22:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="nzhgJhl8"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fjUYIRpZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18FA21FC0FE;
-	Fri, 17 Jan 2025 13:21:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 255BE1FDE23
+	for <netdev@vger.kernel.org>; Fri, 17 Jan 2025 13:22:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737120069; cv=none; b=GLckw81SwUh9hdG4yke6sD8+yW+0cTgBkw5QE7foHhD7c9PdEKUl5hULqCmcBjzUXpoHrSVut6FUmGWM1n34KzpV7aLN3l6NLLth62Bh/s0PxJjUb4WDxnqcPdKFzM9+Gr5GLXQCDFLNiPtR+uxIyvY5TSAsKlWFoKaK1XersPU=
+	t=1737120136; cv=none; b=ISyIVvx4DSOnvDM+EDicKUr+p2vCdBwgktB8mes9MvxIz3+94+Tv0gs7FJCl2kzKuITvYuIFvVEwizTbw5RgWrbcM1HpNu+JfWhur5/aJBh5fzRSWkK4+wK3KypslpGIOY1Za1MBWLkQJB/fW23SNKNL7zc/ouuu+nXfRmtaHj8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737120069; c=relaxed/simple;
-	bh=aiaLO7JOS/tiFH4bjxy1BXejLm8z/5d2sO9cWPTeqBc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=oHrofFzSaZ6+opq3UuxE5VaZuzAPzqxMjdevH8s2oH6BaDYuvFskKfvpfh8T8Xg0vQeYsZ7EWc59QehHMJtxwmxB2QLcLgx1AErTmdOMg/xHdcmRsSiGB5Rnl526ZxS69uU120bo0yNAU4BaqIyguxUShIUhLlALDRmlJ93sDHs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=nzhgJhl8; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50H3rR79014843;
-	Fri, 17 Jan 2025 13:20:53 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=pbus+S
-	7a/ttKEhJxvSdfKJlC6GWLE/WfDPSwSWIOm6A=; b=nzhgJhl8rBJynIUzc86dnP
-	KEMI+6PJ/6WlrxMduKu5lw9OTP8ewZCRq5ZrINyv2iIELDledWo/qWY7XGjhzazZ
-	s2wfQMPqOqdBM4SdeFRpqTzreo3MGu9OjS98uBzeDCOuH6I/iWllgBUlL6/mBH9b
-	E1RtQZN3RzqmOyeuyT/d6Gd3TqY787mq/nUbo+te9rnqyjneeW8gW5ivG4C2Jxq0
-	10k6rMn77E/w2KjF46avpxIMkeLkTQBHyb2M1wU/nG9h0u4npF650xYY3/BP9yPf
-	32L+9WIyWUBNs50Uc3KPRWDZLwWeE1t9VvfpvEFTNasQSrbNYZdBLNUeWfSMd6xA
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 447fpuaba7-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 17 Jan 2025 13:20:53 +0000 (GMT)
-Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 50HDKq5d013294;
-	Fri, 17 Jan 2025 13:20:52 GMT
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 447fpuaba3-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 17 Jan 2025 13:20:52 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 50H9h0PA002700;
-	Fri, 17 Jan 2025 13:20:51 GMT
-Received: from smtprelay07.dal12v.mail.ibm.com ([172.16.1.9])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4443byk5nt-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 17 Jan 2025 13:20:51 +0000
-Received: from smtpav02.wdc07v.mail.ibm.com (smtpav02.wdc07v.mail.ibm.com [10.39.53.229])
-	by smtprelay07.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 50HDKokL30736906
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 17 Jan 2025 13:20:50 GMT
-Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 7063558059;
-	Fri, 17 Jan 2025 13:20:50 +0000 (GMT)
-Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id B4F0058058;
-	Fri, 17 Jan 2025 13:20:47 +0000 (GMT)
-Received: from [9.171.10.145] (unknown [9.171.10.145])
-	by smtpav02.wdc07v.mail.ibm.com (Postfix) with ESMTPS;
-	Fri, 17 Jan 2025 13:20:47 +0000 (GMT)
-Message-ID: <0749cd68-c5ab-4ab6-9c48-6e445263333b@linux.ibm.com>
-Date: Fri, 17 Jan 2025 14:20:46 +0100
+	s=arc-20240116; t=1737120136; c=relaxed/simple;
+	bh=39BsaknFgOiEdbF3Yb4xSEmqTiHR56YMJ9X8Ygv2jJM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ppm4NzdKMjBSTdsnxqQFN55BLeevh7Bf6spIV/aiqqH2O7YTt9qaTtbwxCy74lKFuAKbBaQgJIYqBhbYW+t32rsTvYiWwAnGKF8WXE37TIftHtT/tQKlDCyFlKYcBAEmr3Tv+cjUQ0KWSAaC4qYZEJjYzurHaPOMg+nKGEGw0Lg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fjUYIRpZ; arc=none smtp.client-ip=209.85.208.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-5d9837f201aso5792425a12.0
+        for <netdev@vger.kernel.org>; Fri, 17 Jan 2025 05:22:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1737120133; x=1737724933; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6hDVkXTaBafrac7UfqDYs+w32ZWiDV01O/viLpwKSwk=;
+        b=fjUYIRpZ5OZuMTgssWwd6bIABx8eYC+Nq9ppP1R86oFgtrOtAKgxYfof/Moeyp73OE
+         wDFFhEKDcyQq9n3kSWWpH3PAgJ/zdZsY2DLvCkX9yejxMGtVFpwV3R4W8ra829Ze2YEB
+         GXKIoIJqnwvvnqEoLCo4uu+wuuy1gfivHtGhBbNYUNCG0vcXAu53FL+0PqmWc/9yFkcu
+         6t97akINPifHvzvvlQJC+K4F8dZLnkEbCtKwAfK1JzoXo5UcPLzJ9o/zOx5ip+6LzhZ9
+         bNcC4L9Wj725haAvKo2drtNxUnmxojpv/w8myEFsUAydZ2pADowKNj2MOQfiU/D+FSVS
+         P8Ww==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737120133; x=1737724933;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=6hDVkXTaBafrac7UfqDYs+w32ZWiDV01O/viLpwKSwk=;
+        b=MTGbI2VsqS1SwZK0e0oyyi2jzfGrwQoj9jUVqS5fuVjBv6wEryTHHBn6y6LWhgl6D7
+         R/ZGhJ6BKc4OwDyBtIRJaRsDS3yqTqUJM+cne1WeohzXQQHpZoKWyP2xBDFUoIg9CpQG
+         sM6kNbJ1ohQTyQqyaT/2wU4+9h4Kae70RSnQXXklFnLyXpzL8Lo1WwRwwyhOF0c7GOYw
+         vRWiX+hY4FRv1f8+2ejG63rJ07iomwUhMm81hUH56usOIav4rTUSxA6MzuhrqMzqsVOL
+         DC/ybW2ldpYIcPeULnJbfBrZyIzwDenKhGVeVGXggukrEeW5bTlQGHQuwqfZQZhWWHon
+         kQEA==
+X-Forwarded-Encrypted: i=1; AJvYcCUk+K0qv5Js30Z63A2cIELOenYlF+khQe1hlPF2o7WXZDfFjIa2hXMPNQ3FVk+trIbOxbXpSIg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx6cPB0h6NnUHd4G2BJ6CiXuKxv2k0HsAERBlHcdoPy3YOK7Kqi
+	Qzj6sVhrXd5xaaxR02kmu3v8jYOhDj1pWfX3XBtL2CPAqqILPazk2vIPlaaOpnQTOAKYHjhMK3L
+	Nyioi/inM/E2MUE9RisRG7SPNhYFCRPnz/CIt
+X-Gm-Gg: ASbGncsQE6miM3DX9ksZBpUT4EUGaJQY4tx9qbDScckIC7MNkjcbKwWl5EiOnyJ121T
+	RcmkQ5aTSOXLEDqTIkUjB6m/0cdx+DkGcz/zvig==
+X-Google-Smtp-Source: AGHT+IEtfZs96nhUo3VM9nB4pB8VPQzoVioe6/EOtRmUuKMZyzN+iL70qi9mMkIkcXaWZ3IRrtbw4+eBZBs6oruCKc0=
+X-Received: by 2002:a05:6402:35d6:b0:5d9:f1fd:c1a2 with SMTP id
+ 4fb4d7f45d1cf-5db7dcec1afmr2368595a12.12.1737120133338; Fri, 17 Jan 2025
+ 05:22:13 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [v3 PATCH] rhashtable: Fix rhashtable_try_insert test
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        Michael Kelley <mhklinux@outlook.com>
-Cc: Breno Leitao <leitao@debian.org>, "saeedm@nvidia.com"
- <saeedm@nvidia.com>,
-        "tariqt@nvidia.com" <tariqt@nvidia.com>,
-        "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>, Thomas Graf <tgraf@suug.ch>,
-        Tejun Heo <tj@kernel.org>, Hao Luo <haoluo@google.com>,
-        Josh Don <joshdon@google.com>, Barret Rhoden <brho@google.com>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-References: <20241128-scx_lockdep-v1-1-2315b813b36b@debian.org>
- <Z1rYGzEpMub4Fp6i@gondor.apana.org.au> <Z2aFL3dNLYOcmzH3@gondor.apana.org.au>
- <20250102-daffy-vanilla-boar-6e1a61@leitao>
- <SN6PR02MB41572415707F0FA6D9A61247D4132@SN6PR02MB4157.namprd02.prod.outlook.com>
- <20250109-marigold-bandicoot-of-exercise-8ebede@leitao>
- <Z4DoFYQ3ytB-wS3-@gondor.apana.org.au>
- <SN6PR02MB41577C2C4EB260F3D2D4F85FD41C2@SN6PR02MB4157.namprd02.prod.outlook.com>
- <Z4FXs8vAtitHIJyl@gondor.apana.org.au>
- <SN6PR02MB41570F1F5F4F579B4E8F0CD3D41C2@SN6PR02MB4157.namprd02.prod.outlook.com>
- <Z4XWx5X0doetOJni@gondor.apana.org.au>
-Content-Language: en-US
-From: Zaslonko Mikhail <zaslonko@linux.ibm.com>
-In-Reply-To: <Z4XWx5X0doetOJni@gondor.apana.org.au>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: SfzBTF39apMgRV92JDaLcMDIDNyBIFLg
-X-Proofpoint-ORIG-GUID: rL4d-Rmr_WWKK3HQ6hGm2fGBG1kY_hF8
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-01-17_05,2025-01-16_01,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 suspectscore=0
- clxscore=1011 malwarescore=0 phishscore=0 lowpriorityscore=0 spamscore=0
- impostorscore=0 mlxscore=0 priorityscore=1501 bulkscore=0 mlxlogscore=999
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2411120000
- definitions=main-2501170105
+References: <20241126144344.4177332-1-edumazet@google.com> <Z4o_UC0HweBHJ_cw@PC-LX-SteWu>
+In-Reply-To: <Z4o_UC0HweBHJ_cw@PC-LX-SteWu>
+From: Eric Dumazet <edumazet@google.com>
+Date: Fri, 17 Jan 2025 14:22:02 +0100
+X-Gm-Features: AbW1kvYbXmVLkChYAQLGYOgwujlsH5OyEW1V3lt_X178uQjL8yZb4aPZX9qWJcc
+Message-ID: <CANn89iLSPdPvotnGhPb3Rq2gkmpn3kLGJO8=3PDFrhSjUQSAkg@mail.gmail.com>
+Subject: Re: [PATCH net] net: hsr: avoid potential out-of-bound access in fill_frame_info()
+To: Stephan Wurm <stephan.wurm@a-eberle.de>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	syzbot+671e2853f9851d039551@syzkaller.appspotmail.com, 
+	WingMan Kwok <w-kwok2@ti.com>, Murali Karicheri <m-karicheri2@ti.com>, 
+	MD Danish Anwar <danishanwar@ti.com>, Jiri Pirko <jiri@nvidia.com>, 
+	George McCollister <george.mccollister@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello,
+On Fri, Jan 17, 2025 at 12:30=E2=80=AFPM Stephan Wurm <stephan.wurm@a-eberl=
+e.de> wrote:
+>
+> Hello Eric,
+>
+> Am 26. Nov 14:43 hat Eric Dumazet geschrieben:
+> > syzbot is able to feed a packet with 14 bytes, pretending
+> > it is a vlan one.
+> >
+> > Since fill_frame_info() is relying on skb->mac_len already,
+> > extend the check to cover this case.
+> thanks for addressing this szybot finding.
+>
+> Unfortunately, this seems to cause issues with VLAN tagged frames being
+> dropped from a PRP interface.
+>
+> My setup consists of a custom embedded system equipped with v6.6 kernel,
+> recently updated from v6.6.62 to v6.6.69. In order to gain support for
+> VLAN tagged messages on top of PRP, I have applied first patch of the
+> series (see msgid 20241106091710.3308519-2-danishanwar@ti.com) that is
+> currently integrated with v6.13.
+>
+> Now I want to send GOOSE messages (L2 broadcast messages with VLAN
+> header, including id=3D0 and QoS information) via the PRP interface.
+> With v6.6.62 this works as expected, with v6.6.69 the functionality
+> stopped again, with all VLAN-tagged frames being dropped from the PRP
+> interface.
+>
+> By reverting this fix locally, I was able to restore the desired
+> functionality. But I do not iyet understand, why this fix breaks
+> sending of VLAN tagged frames in general.
+>
+> Do you already know about this side effect?
+> Can you guide me to narrow down this issue?
+>
 
-On 14.01.2025 04:15, Herbert Xu wrote:
-> On Fri, Jan 10, 2025 at 06:22:40PM +0000, Michael Kelley wrote:
-> 
-> Thanks for testing! The patch needs one more change though as
-> moving the atomic_inc outside of the lock was a bad idea on my
-> part.  This could cause atomic_inc/atomic_dec to be reordered
-> thus resulting in an underflow.
-> 
-> Thanks,
+Thanks for the report !
 
-I've tested v3 patch on s390 for the boot OOM problem with 'mem=1G'
-kernel parameter we experience on current linux-next kernel and confirm
-that the issue is no longer present.
+You could add instrumentation there so that we see packet content.
 
-Tested-by: Mikhail Zaslonko <zaslonko@linux.ibm.com>
+I suspect mac_len was not properly set somewhere.
 
-> 
-> ---8<---
-> The test on whether rhashtable_insert_one did an insertion relies
-> on the value returned by rhashtable_lookup_one.  Unfortunately that
-> value is overwritten after rhashtable_insert_one returns.  Fix this
-> by moving the test before data gets overwritten.
-> 
-> Simplify the test as only data == NULL matters.
-> 
-> Finally move atomic_inc back within the lock as otherwise it may
-> be reordered with the atomic_dec on the removal side, potentially
-> leading to an underflow.
-> 
-> Reported-by: Michael Kelley <mhklinux@outlook.com>
-> Fixes: e1d3422c95f0 ("rhashtable: Fix potential deadlock by moving schedule_work outside lock")
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-> 
-> diff --git a/lib/rhashtable.c b/lib/rhashtable.c
-> index bf956b85455a..0e9a1d4cf89b 100644
-> --- a/lib/rhashtable.c
-> +++ b/lib/rhashtable.c
-> @@ -611,21 +611,23 @@ static void *rhashtable_try_insert(struct rhashtable *ht, const void *key,
->  			new_tbl = rht_dereference_rcu(tbl->future_tbl, ht);
->  			data = ERR_PTR(-EAGAIN);
->  		} else {
-> +			bool inserted;
-> +
->  			flags = rht_lock(tbl, bkt);
->  			data = rhashtable_lookup_one(ht, bkt, tbl,
->  						     hash, key, obj);
->  			new_tbl = rhashtable_insert_one(ht, bkt, tbl,
->  							hash, obj, data);
-> +			inserted = data && !new_tbl;
-> +			if (inserted)
-> +				atomic_inc(&ht->nelems);
->  			if (PTR_ERR(new_tbl) != -EEXIST)
->  				data = ERR_CAST(new_tbl);
->  
->  			rht_unlock(tbl, bkt, flags);
->  
-> -			if (PTR_ERR(data) == -ENOENT && !new_tbl) {
-> -				atomic_inc(&ht->nelems);
-> -				if (rht_grow_above_75(ht, tbl))
-> -					schedule_work(&ht->run_work);
-> -			}
-> +			if (inserted && rht_grow_above_75(ht, tbl))
-> +				schedule_work(&ht->run_work);
->  		}
->  	} while (!IS_ERR_OR_NULL(new_tbl));
->  
+diff --git a/net/hsr/hsr_forward.c b/net/hsr/hsr_forward.c
+index 87bb3a91598ee96b825f7aaff53aafb32ffe4f95..b0068e23083416ba13794e3b152=
+517afbe5125b7
+100644
+--- a/net/hsr/hsr_forward.c
++++ b/net/hsr/hsr_forward.c
+@@ -700,8 +700,10 @@ static int fill_frame_info(struct hsr_frame_info *fram=
+e,
+                frame->is_vlan =3D true;
 
-Thanks!
+        if (frame->is_vlan) {
+-               if (skb->mac_len < offsetofend(struct hsr_vlan_ethhdr, vlan=
+hdr))
++               if (skb->mac_len < offsetofend(struct hsr_vlan_ethhdr,
+vlanhdr)) {
++                       DO_ONCE_LITE(skb_dump, KERN_ERR, skb, true);
+                        return -EINVAL;
++               }
+                vlan_hdr =3D (struct hsr_vlan_ethhdr *)ethhdr;
+                proto =3D vlan_hdr->vlanhdr.h_vlan_encapsulated_proto;
+        }
 
