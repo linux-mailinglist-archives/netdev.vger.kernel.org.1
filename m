@@ -1,226 +1,197 @@
-Return-Path: <netdev+bounces-159301-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159302-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F08B0A1505D
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 14:20:04 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 77AC3A15062
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 14:21:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 502F23A5EED
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 13:19:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C3A44188B3CB
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 13:21:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADB731FF1C3;
-	Fri, 17 Jan 2025 13:20:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76EF61FF5F7;
+	Fri, 17 Jan 2025 13:21:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YJ9lbKs8"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="nzhgJhl8"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8247825A627
-	for <netdev@vger.kernel.org>; Fri, 17 Jan 2025 13:19:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18FA21FC0FE;
+	Fri, 17 Jan 2025 13:21:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737120000; cv=none; b=HEkS+6kbi46cXfxLfrEKDPnBSaPZ0CtAbHv3+ucQpCx9hnF2AGVwzIDcq7V0oQG1HBY/JF0icggcpkpIwLWLZs6L+0omzeY+1ykOJVKp8LIDU6fuhWdOgpEjxXydORZSZ84mq/h7GfRvg/E/UBvR2LHMah32SvYzqi9C1Gg90Pg=
+	t=1737120069; cv=none; b=GLckw81SwUh9hdG4yke6sD8+yW+0cTgBkw5QE7foHhD7c9PdEKUl5hULqCmcBjzUXpoHrSVut6FUmGWM1n34KzpV7aLN3l6NLLth62Bh/s0PxJjUb4WDxnqcPdKFzM9+Gr5GLXQCDFLNiPtR+uxIyvY5TSAsKlWFoKaK1XersPU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737120000; c=relaxed/simple;
-	bh=5hrHI4tvyKGzcE04uCoclEOaXVYOD9n2OJ8uELCswXc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ryiFhe1dnD7AzxLs9VAgEQGlLWv3wJ/YhHxYJOZACqzkrSZ8LIbl8ruCKKLO7pV6imxXtbs7rObURnV9/sljPNe4qxTvAzjYT8qUcIpznabQyo2syPiUoc+KiV6OE76+2aATL+5YfPpmOz9Wy8q1R8GpCwApz1t668KVu0DHFmA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YJ9lbKs8; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1737119997;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cMt7H4uJupL0n7CmNDQGQgqsD0sjSTEnlM24sJ8421I=;
-	b=YJ9lbKs8pwAPL6tspj8O7mXfQCaF/tL0j51TROSOHgToScw2ufvgTuJXkKXhSX0Sor7iv1
-	ZaDhC06a1nNRY04XrO8n5rrcFQ94sm2Dtk5qdxPDa/RzL3w8Xn4xtD1+KslENvvLUF3P5Q
-	siQJ5FIphusermgSqX9y7WH74vrYxhk=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-147-4YfPpel6PlyvLf1pr5dEYQ-1; Fri,
- 17 Jan 2025 08:19:56 -0500
-X-MC-Unique: 4YfPpel6PlyvLf1pr5dEYQ-1
-X-Mimecast-MFC-AGG-ID: 4YfPpel6PlyvLf1pr5dEYQ
-Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 13E32195606B;
-	Fri, 17 Jan 2025 13:19:53 +0000 (UTC)
-Received: from wcosta-thinkpadt14gen4.rmtbr.csb (unknown [10.22.64.120])
-	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 9D8F719560BF;
-	Fri, 17 Jan 2025 13:19:46 +0000 (UTC)
-Date: Fri, 17 Jan 2025 10:19:44 -0300
-From: Wander Lairson Costa <wander@redhat.com>
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>, 
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Clark Williams <clrkwllms@kernel.org>, Steven Rostedt <rostedt@goodmis.org>, 
-	Jeff Garzik <jgarzik@redhat.com>, Auke Kok <auke-jan.h.kok@intel.com>, 
-	"moderated list:INTEL ETHERNET DRIVERS" <intel-wired-lan@lists.osuosl.org>, "open list:NETWORKING DRIVERS" <netdev@vger.kernel.org>, 
-	open list <linux-kernel@vger.kernel.org>, 
-	"open list:Real-time Linux (PREEMPT_RT):Keyword:PREEMPT_RT" <linux-rt-devel@lists.linux.dev>
-Subject: Re: [PATCH iwl-net 0/4] igb: fix igb_msix_other() handling for
- PREEMPT_RT
-Message-ID: <givxfwonfer5kgowuxuz4bezxkhri4ottnmlmh3duhan3viznb@ic5sscp2twit>
-References: <20241204114229.21452-1-wander@redhat.com>
- <20250107135106.WWrtBMXY@linutronix.de>
- <taea3z7nof4szjir2azxsjtbouymqxyy4draa3hz35zbacqeeq@t3uidpha64k7>
- <20250108102532.VWnKWvoo@linutronix.de>
- <CAAq0SUnoS45Fctkzj4t4OxT=9qm9Bg8zu79=S3DUL_jcoLbC-A@mail.gmail.com>
- <20250109174512.At7ZERjU@linutronix.de>
+	s=arc-20240116; t=1737120069; c=relaxed/simple;
+	bh=aiaLO7JOS/tiFH4bjxy1BXejLm8z/5d2sO9cWPTeqBc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=oHrofFzSaZ6+opq3UuxE5VaZuzAPzqxMjdevH8s2oH6BaDYuvFskKfvpfh8T8Xg0vQeYsZ7EWc59QehHMJtxwmxB2QLcLgx1AErTmdOMg/xHdcmRsSiGB5Rnl526ZxS69uU120bo0yNAU4BaqIyguxUShIUhLlALDRmlJ93sDHs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=nzhgJhl8; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50H3rR79014843;
+	Fri, 17 Jan 2025 13:20:53 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=pbus+S
+	7a/ttKEhJxvSdfKJlC6GWLE/WfDPSwSWIOm6A=; b=nzhgJhl8rBJynIUzc86dnP
+	KEMI+6PJ/6WlrxMduKu5lw9OTP8ewZCRq5ZrINyv2iIELDledWo/qWY7XGjhzazZ
+	s2wfQMPqOqdBM4SdeFRpqTzreo3MGu9OjS98uBzeDCOuH6I/iWllgBUlL6/mBH9b
+	E1RtQZN3RzqmOyeuyT/d6Gd3TqY787mq/nUbo+te9rnqyjneeW8gW5ivG4C2Jxq0
+	10k6rMn77E/w2KjF46avpxIMkeLkTQBHyb2M1wU/nG9h0u4npF650xYY3/BP9yPf
+	32L+9WIyWUBNs50Uc3KPRWDZLwWeE1t9VvfpvEFTNasQSrbNYZdBLNUeWfSMd6xA
+	==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 447fpuaba7-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 17 Jan 2025 13:20:53 +0000 (GMT)
+Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 50HDKq5d013294;
+	Fri, 17 Jan 2025 13:20:52 GMT
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 447fpuaba3-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 17 Jan 2025 13:20:52 +0000 (GMT)
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 50H9h0PA002700;
+	Fri, 17 Jan 2025 13:20:51 GMT
+Received: from smtprelay07.dal12v.mail.ibm.com ([172.16.1.9])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4443byk5nt-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 17 Jan 2025 13:20:51 +0000
+Received: from smtpav02.wdc07v.mail.ibm.com (smtpav02.wdc07v.mail.ibm.com [10.39.53.229])
+	by smtprelay07.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 50HDKokL30736906
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 17 Jan 2025 13:20:50 GMT
+Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 7063558059;
+	Fri, 17 Jan 2025 13:20:50 +0000 (GMT)
+Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id B4F0058058;
+	Fri, 17 Jan 2025 13:20:47 +0000 (GMT)
+Received: from [9.171.10.145] (unknown [9.171.10.145])
+	by smtpav02.wdc07v.mail.ibm.com (Postfix) with ESMTPS;
+	Fri, 17 Jan 2025 13:20:47 +0000 (GMT)
+Message-ID: <0749cd68-c5ab-4ab6-9c48-6e445263333b@linux.ibm.com>
+Date: Fri, 17 Jan 2025 14:20:46 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250109174512.At7ZERjU@linutronix.de>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
+User-Agent: Mozilla Thunderbird
+Subject: Re: [v3 PATCH] rhashtable: Fix rhashtable_try_insert test
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        Michael Kelley <mhklinux@outlook.com>
+Cc: Breno Leitao <leitao@debian.org>, "saeedm@nvidia.com"
+ <saeedm@nvidia.com>,
+        "tariqt@nvidia.com" <tariqt@nvidia.com>,
+        "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>, Thomas Graf <tgraf@suug.ch>,
+        Tejun Heo <tj@kernel.org>, Hao Luo <haoluo@google.com>,
+        Josh Don <joshdon@google.com>, Barret Rhoden <brho@google.com>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+References: <20241128-scx_lockdep-v1-1-2315b813b36b@debian.org>
+ <Z1rYGzEpMub4Fp6i@gondor.apana.org.au> <Z2aFL3dNLYOcmzH3@gondor.apana.org.au>
+ <20250102-daffy-vanilla-boar-6e1a61@leitao>
+ <SN6PR02MB41572415707F0FA6D9A61247D4132@SN6PR02MB4157.namprd02.prod.outlook.com>
+ <20250109-marigold-bandicoot-of-exercise-8ebede@leitao>
+ <Z4DoFYQ3ytB-wS3-@gondor.apana.org.au>
+ <SN6PR02MB41577C2C4EB260F3D2D4F85FD41C2@SN6PR02MB4157.namprd02.prod.outlook.com>
+ <Z4FXs8vAtitHIJyl@gondor.apana.org.au>
+ <SN6PR02MB41570F1F5F4F579B4E8F0CD3D41C2@SN6PR02MB4157.namprd02.prod.outlook.com>
+ <Z4XWx5X0doetOJni@gondor.apana.org.au>
+Content-Language: en-US
+From: Zaslonko Mikhail <zaslonko@linux.ibm.com>
+In-Reply-To: <Z4XWx5X0doetOJni@gondor.apana.org.au>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: SfzBTF39apMgRV92JDaLcMDIDNyBIFLg
+X-Proofpoint-ORIG-GUID: rL4d-Rmr_WWKK3HQ6hGm2fGBG1kY_hF8
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-01-17_05,2025-01-16_01,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 suspectscore=0
+ clxscore=1011 malwarescore=0 phishscore=0 lowpriorityscore=0 spamscore=0
+ impostorscore=0 mlxscore=0 priorityscore=1501 bulkscore=0 mlxlogscore=999
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2411120000
+ definitions=main-2501170105
 
-On Thu, Jan 09, 2025 at 06:45:12PM +0100, Sebastian Andrzej Siewior wrote:
-> On 2025-01-09 13:46:47 [-0300], Wander Lairson Costa wrote:
-> > > If the issue is indeed the use of threaded interrupts then the fix
-> > > should not be limited to be PREEMPT_RT only.
-> > >
-> > Although I was not aware of this scenario, the patch should work for it as well,
-> > as I am forcing it to run in interrupt context. I will test it to confirm.
+Hello,
 
-I tested with the stock kernel with threadirqs and the problem does show up.
-Applying the patches the issue is gone.
+On 14.01.2025 04:15, Herbert Xu wrote:
+> On Fri, Jan 10, 2025 at 06:22:40PM +0000, Michael Kelley wrote:
+> 
+> Thanks for testing! The patch needs one more change though as
+> moving the atomic_inc outside of the lock was a bad idea on my
+> part.  This could cause atomic_inc/atomic_dec to be reordered
+> thus resulting in an underflow.
+> 
+> Thanks,
+
+I've tested v3 patch on s390 for the boot OOM problem with 'mem=1G'
+kernel parameter we experience on current linux-next kernel and confirm
+that the issue is no longer present.
+
+Tested-by: Mikhail Zaslonko <zaslonko@linux.ibm.com>
 
 > 
-> If I remember correctly there were "ifdef preempt_rt" things in it.
-
-That exists only to handle the case in which part in which the ISR needs to
-partially run in thread context (because the piece of code calling kmalloc),
-so I need an sleeping lock for that. For non-PREEMPT_RT, we don't have this
-constrain.
-
+> ---8<---
+> The test on whether rhashtable_insert_one did an insertion relies
+> on the value returned by rhashtable_lookup_one.  Unfortunately that
+> value is overwritten after rhashtable_insert_one returns.  Fix this
+> by moving the test before data gets overwritten.
 > 
-> > > > > - What causes the failure? I see you reworked into two parts to behave
-> > > > >   similar to what happens without threaded interrupts. There is still no
-> > > > >   explanation for it. Is there a timing limit or was there another
-> > > > >   register operation which removed the mailbox message?
-> > > > >
-> > > >
-> > > > I explained the root cause of the issue in the last commit. Maybe I should
-> > > > have added the explanation to the cover letter as well.  Anyway, here is a
-> > > > partial verbatim copy of it:
-> > > >
-> > > > "During testing of SR-IOV, Red Hat QE encountered an issue where the
-> > > > ip link up command intermittently fails for the igbvf interfaces when
-> > > > using the PREEMPT_RT variant. Investigation revealed that
-> > > > e1000_write_posted_mbx returns an error due to the lack of an ACK
-> > > > from e1000_poll_for_ack.
-> > >
-> > > That ACK would have come if it would poll longer?
-
-No, the poll happens while preemption is disabled.
-
-> > >
-> > No, the service wouldn't be serviced while polling.
-
-s/service/interrupt/. Since we can't sleep at this context, there is
-no way to wait for an event.
-
+> Simplify the test as only data == NULL matters.
 > 
-> Hmm. 
-
-
+> Finally move atomic_inc back within the lock as otherwise it may
+> be reordered with the atomic_dec on the removal side, potentially
+> leading to an underflow.
 > 
-> > > > The underlying issue arises from the fact that IRQs are threaded by
-> > > > default under PREEMPT_RT. While the exact hardware details are not
-> > > > available, it appears that the IRQ handled by igb_msix_other must
-> > > > be processed before e1000_poll_for_ack times out. However,
-> > > > e1000_write_posted_mbx is called with preemption disabled, leading
-> > > > to a scenario where the IRQ is serviced only after the failure of
-> > > > e1000_write_posted_mbx."
-> > >
-> > > Where is this disabled preemption coming from? This should be one of the
-> > > ops.write_posted() calls, right? I've been looking around and don't see
-> > > anything obvious.
-> > 
-> > I don't remember if I found the answer by looking at the code or by
-> > looking at the ftrace flags.
-> > I am currently on sick leave with covid. I can check it when I come back.
+> Reported-by: Michael Kelley <mhklinux@outlook.com>
+> Fixes: e1d3422c95f0 ("rhashtable: Fix potential deadlock by moving schedule_work outside lock")
+> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 > 
-> Don't worry, get better first. I'm kind of off myself. I'm not sure if I
-> have the hardware needed to setup so I can look at it…
-> 
+> diff --git a/lib/rhashtable.c b/lib/rhashtable.c
+> index bf956b85455a..0e9a1d4cf89b 100644
+> --- a/lib/rhashtable.c
+> +++ b/lib/rhashtable.c
+> @@ -611,21 +611,23 @@ static void *rhashtable_try_insert(struct rhashtable *ht, const void *key,
+>  			new_tbl = rht_dereference_rcu(tbl->future_tbl, ht);
+>  			data = ERR_PTR(-EAGAIN);
+>  		} else {
+> +			bool inserted;
+> +
+>  			flags = rht_lock(tbl, bkt);
+>  			data = rhashtable_lookup_one(ht, bkt, tbl,
+>  						     hash, key, obj);
+>  			new_tbl = rhashtable_insert_one(ht, bkt, tbl,
+>  							hash, obj, data);
+> +			inserted = data && !new_tbl;
+> +			if (inserted)
+> +				atomic_inc(&ht->nelems);
+>  			if (PTR_ERR(new_tbl) != -EEXIST)
+>  				data = ERR_CAST(new_tbl);
+>  
+>  			rht_unlock(tbl, bkt, flags);
+>  
+> -			if (PTR_ERR(data) == -ENOENT && !new_tbl) {
+> -				atomic_inc(&ht->nelems);
+> -				if (rht_grow_above_75(ht, tbl))
+> -					schedule_work(&ht->run_work);
+> -			}
+> +			if (inserted && rht_grow_above_75(ht, tbl))
+> +				schedule_work(&ht->run_work);
+>  		}
+>  	} while (!IS_ERR_OR_NULL(new_tbl));
+>  
 
-The reason of why you didn't find is because the interrupt in the igb
-driver is triggered inside the igbvf code. igbvf_reset() calls
-spin_lock_bh() [1], although in the cases I found it was already called
-with preemption disabled from process_one_work() (workqueue) and netlink_sendmsg().
-
-Here is an ftrace log for the failure case:
-
-kworker/-86      0...1    85.381866: function:                   igbvf_reset
-kworker/-86      0...2    85.381866: function:                      e1000_reset_hw_vf
-kworker/-86      0...2    85.381867: function:                         e1000_check_for_rst_vf
-kworker/-86      0...2    85.381868: function:                         e1000_write_posted_mbx
-kworker/-86      0...2    85.381868: function:                            e1000_write_mbx_vf
-kworker/-86      0...2    85.381870: function:                            e1000_check_for_ack_vf // repeats for 2000 lines
-...
-kworker/-86      0.N.2    86.393782: function:                         e1000_read_posted_mbx
-kworker/-86      0.N.2    86.398606: function:                      e1000_init_hw_vf
-kworker/-86      0.N.2    86.398606: function:                         e1000_rar_set_vf
-kworker/-86      0.N.2    86.398606: function:                            e1000_write_posted_mbx
-irq/65-e-1287    0d..1    86.398609: function:             igb_msix_other
-irq/65-e-1287    0d..1    86.398609: function:                igb_rd32
-irq/65-e-1287    0d..2    86.398610: function:                igb_check_for_rst
-irq/65-e-1287    0d..2    86.398610: function:                igb_check_for_rst_pf
-irq/65-e-1287    0d..2    86.398610: function:                   igb_rd32
-irq/65-e-1287    0d..2    86.398611: function:                igb_check_for_msg
-irq/65-e-1287    0d..2    86.398611: function:                igb_check_for_msg_pf
-irq/65-e-1287    0d..2    86.398611: function:                   igb_rd32
-irq/65-e-1287    0d..2    86.398612: function:                igb_rcv_msg_from_vf
-irq/65-e-1287    0d..2    86.398612: function:                   igb_read_mbx
-irq/65-e-1287    0d..2    86.398612: function:                   igb_read_mbx_pf
-irq/65-e-1287    0d..2    86.398612: function:                      igb_obtain_mbx_lock_pf
-irq/65-e-1287    0d..2    86.398612: function:                         igb_rd32
-
-Notice the interrupt handler only executes after e1000_write_posted()
-returns. And here it is for the sucessful case:
-
-      ip-5603    0...1  1884.710747: function:             igbvf_reset
-      ip-5603    0...2  1884.710754: function:                e1000_reset_hw_vf
-      ip-5603    0...2  1884.710755: function:                   e1000_check_for_rst_vf
-      ip-5603    0...2  1884.710756: function:                   e1000_write_posted_mbx
-      ip-5603    0...2  1884.710756: function:                      e1000_write_mbx_vf
-      ip-5603    0...2  1884.710758: function:                      e1000_check_for_ack_vf
-      ip-5603    0d.h2  1884.710760: function:             igb_msix_other
-      ip-5603    0d.h2  1884.710760: function:                igb_rd32
-      ip-5603    0d.h3  1884.710761: function:                igb_check_for_rst
-      ip-5603    0d.h3  1884.710761: function:                igb_check_for_rst_pf
-      ip-5603    0d.h3  1884.710761: function:                   igb_rd32
-      ip-5603    0d.h3  1884.710762: function:                igb_check_for_msg
-      ip-5603    0d.h3  1884.710762: function:                igb_check_for_msg_pf
-      ip-5603    0d.h3  1884.710762: function:                   igb_rd32
-      ip-5603    0d.h3  1884.710763: function:                igb_rcv_msg_from_vf
-      ip-5603    0d.h3  1884.710763: function:                   igb_read_mbx
-      ip-5603    0d.h3  1884.710763: function:                   igb_read_mbx_pf
-      ip-5603    0d.h3  1884.710763: function:                      igb_obtain_mbx_lock_pf
-      ip-5603    0d.h3  1884.710763: function:                         igb_rd32
-
-The ISR executes immediately fater e1000_write_mbx_vf().
-
-[1] https://elixir.bootlin.com/linux/v6.12.6/source/drivers/net/ethernet/intel/igbvf/netdev.c#L1522
-
-> Sebastian
-> 
-
+Thanks!
 
