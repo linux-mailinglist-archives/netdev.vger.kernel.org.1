@@ -1,159 +1,200 @@
-Return-Path: <netdev+bounces-159490-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159491-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53971A159D2
-	for <lists+netdev@lfdr.de>; Sat, 18 Jan 2025 00:11:38 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5BD8EA159DD
+	for <lists+netdev@lfdr.de>; Sat, 18 Jan 2025 00:20:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9EEA13A6DE7
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 23:11:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6F4201885FEF
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 23:20:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06E1C1D9A66;
-	Fri, 17 Jan 2025 23:11:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AF851A9B5E;
+	Fri, 17 Jan 2025 23:20:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="m8jddjW1"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SUkiL3Ho"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 402F51D8DFE
-	for <netdev@vger.kernel.org>; Fri, 17 Jan 2025 23:11:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C69613B2A9;
+	Fri, 17 Jan 2025 23:20:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737155494; cv=none; b=OUOwz+mMNdZ73sqHUN+3dLnK9fGa/7ujd6cDcApQRUVrhXqX9AXitH+s8q7+WWjvz3j8jWaumz7cqEEK/GRDThgY7rqJNXV3/OJRC2wlnaBHHpMUb9OnfvtXd8IgPqs8oDM67sJ/LKiUaFlT2j5hZWep6D0hmEJwy7tTnAme8oY=
+	t=1737156020; cv=none; b=NIZvBLiwCLNr3x4SzpOItQuheOSecKGYy1DaYrd3yHiPU80xf0zVJUCXyTxe4zES11F3QQLnKB63vH5F/KvrfSIDeg3Qg/skwk1pTkVj1zzCua2gMq1jmEGCKDV9Mz4e5W+oUX8rkYd8lsTRj7wobFiaazlZHr2ueNwJgPmx9+k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737155494; c=relaxed/simple;
-	bh=3PRbDV0P1rgbpm0TN020zCThRm2mpSzTYK+C4h6HXTo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=AM5sOCszw+LZ41BzP5PonIbUrMYMjH0p8acZz4fynmC6vatmCZRZrQQ7i+arneICnD8ayRcdv9P4QDQKFOOMaiOqytUoDZFh8/Gfn5s6YOlli/YGGPbLE3BW3uJHFZDyh+MwZ9pfxXLaDraypRWwrAtBESwRd91ErlY6rFXfF1A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=m8jddjW1; arc=none smtp.client-ip=209.85.160.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-467abce2ef9so76721cf.0
-        for <netdev@vger.kernel.org>; Fri, 17 Jan 2025 15:11:32 -0800 (PST)
+	s=arc-20240116; t=1737156020; c=relaxed/simple;
+	bh=cwqXrM87Y52GNegmWv4acFjPYnKB0Mc5ugVW3/jtJj8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=DubV+QP7bCTe8EFMRgcffu/SRUMZJV2QBdBtwypMT52vXECdPqsVvmQQvrwWnOE9azD4H7QBZ+x/iGAu8ocsPl9RmpKXizQ/MiOktnF76WfdLEfUYGlXDN2gmiNJ8+3ilsrLU+4rYwu4SyIL6YLH6sftVuGI7tmc8TsYXpVm5jw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SUkiL3Ho; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-4363ae65100so28049225e9.0;
+        Fri, 17 Jan 2025 15:20:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1737155492; x=1737760292; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3PRbDV0P1rgbpm0TN020zCThRm2mpSzTYK+C4h6HXTo=;
-        b=m8jddjW1GX/9KNg9zKTh1GQncFBVl2N9fWIcbVZXPdIEl4Jdx312+DwH0bmuwaQpGt
-         qJfhTifA2AV7rrjhLLokqOtgt3VLUFAAdMf7rAqdrzO+9knAIl1DGDYHiqTeoZ4di2I4
-         0aRFpl84Lq1Owp9zx2W+U7FxnjPcyQNYRkqY7Y8EkEERDZG/BLVR50bKtFlYwHtXf3qg
-         qCVW+xgZHDFh2THwuId8PfvwzwXi9yjwYdtFuR0Mv57jaUC0QEX8PUivjmjjOLP48yLx
-         9J0Gy6Yr89aZOKpsnIXc3LA+IyTEFM0UWQByMPPM3QTUMSVdCdcSZn5QfEfPcMvNo44m
-         VNpg==
+        d=gmail.com; s=20230601; t=1737156016; x=1737760816; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Ku1yk6FP1LtN7qGO6ZCJBmeakwiQptzKOPlKjKosyDw=;
+        b=SUkiL3HoInj/CjDIwpOHgzN/Bb3jN0UzE/68bzjjxip5MesMTsHt6LgcaeoqTh8Ejr
+         Op6/MEhO1piz/kvIhnFsbYcJvCgbI7UK7ZWRE+sWBqGAk3jiTNKd+H2aTR8UPCTBZlaL
+         pPwxMlqPLWG5S3m4mfBZVfMfmBII3jKaYab6mSzzvrL3vRrWGjoShxWxl8I8JSMls1Il
+         9UQfWQDh23JrJhoTkoMxHlMmocG0Q8k69QpDriQPRboRZCwS2Y+OF35/R5TC8k39c83E
+         45Gkn/iP6ifhdJQGCkxqxp18c7Jhc+xHPLxVKPZzngKlryTszV4TQEkv0MSAMe92h5PQ
+         TNdg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737155492; x=1737760292;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=3PRbDV0P1rgbpm0TN020zCThRm2mpSzTYK+C4h6HXTo=;
-        b=JAPrc2OZTBZ44if7ZojkmJa+0EUIYGwf9hOzgD+TDW7W03riivEXCLu3snGQ9+Yfns
-         WwUm95beQhrUaNxIWw4kodTy6O2qPEvHh+8GRi85RZalCTi+iUYCXgOr3H7c0rJ4iYAz
-         mNm0YdZFANz0edDsaRS22+7enu4LxVEjmQZLdIJVtuyeOqiFgNIF5hIFKDJYaZhdYdV+
-         YcYrF6pUkqs338Cqv4YBQ+MyDcZK8QY7lVkhvkO04wdoN+p1WSBP3VSeApXJ1cuaArEs
-         LleMPAxcPRnr+jHL6gtnO2mibUO6bNVojyJTEa4JxX52MnOKlJPBxh9c6HiiEY/V1Ii1
-         dkPA==
-X-Forwarded-Encrypted: i=1; AJvYcCW87VExO7sFoX2CeTdHQLLTZDZ7Zy3JPbGXSXnLXKqKjlxTjKbxKzJTP6PCjpYUnvdK4mMkDBU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzc7lyzNI7EJyC7cSVaM24QJzSnfxb4ks9ykKcmn5UeplYCjHI7
-	TGT7R02b4LPGwjYP8dAkb0A8snpdJuvaq07YjkwFOHE2QoAYH/SYuHZBEx06X/tGzHZT4j/Kr4x
-	NQyJ2du0j/G75BTATLlIKFukwdMZlJ80l35MV
-X-Gm-Gg: ASbGncvBiD32K0oNp0twye+kK0/VT+tgL9vBmvFE4nVd5FOx6vpTwOWrRlkBktzQ8zk
-	Vsvm23vJrObvD+FaB6d8XDm7eH2mlDvmkTsawY3bt65JjZ+bz6HM0Fe4ZSZNTsmJvS+7vXi/L1o
-	sn2aMhXvmCeJazom4p/Q==
-X-Google-Smtp-Source: AGHT+IGl+gKjkOP6569phnI1GdSd7E/S4/3Y0wN4rgNlSZLySKaeCXSniI49MdyHHVwE0AEL0WKH+0SAePjbIKtvGOk=
-X-Received: by 2002:a05:622a:13cf:b0:466:861a:f633 with SMTP id
- d75a77b69052e-46e21081e0cmr366381cf.5.1737155491841; Fri, 17 Jan 2025
- 15:11:31 -0800 (PST)
+        d=1e100.net; s=20230601; t=1737156016; x=1737760816;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ku1yk6FP1LtN7qGO6ZCJBmeakwiQptzKOPlKjKosyDw=;
+        b=L2EFJOln2Rqt7MvdRxO3q00gdhrO9YPAADisDtK+3xggc9f3tHwVedEDptjRnYXTvl
+         fUrss4bYme7TKsz+lOoy5YZTC92maheh3iG9Nkt+boBAbuKtnqfsKqt+s3p+mUmoJ342
+         QajnS/MHKy3R0EMh9HIqLfGnfSBhVZC5t13fb+6uDSsNEUxmtxYGbkBYIsQbgjx2+BpZ
+         4aXyWyzk6IznRtv7Xu5iAa1zpw62zACuKZki2Ir9fkK8MoYPbT1Www28JGL1kCbxTqb+
+         ChBkty46DURCcxJXZEJLsHqBZIOeILCxjz6dXa37Z2OeflVIz5LWHzH+/E++ndxdrG2e
+         VVwA==
+X-Forwarded-Encrypted: i=1; AJvYcCV2fZD21v/zV3spMVnDhlTmBo+v5YjgB9uUzoPN2IPAVtLXMNaNKs2fKTDpTBNSusbDK0cafJd+@vger.kernel.org, AJvYcCXYNkfRiw18/7u0VmmrsoDD92GyUwW/OmGpRs8SboH5VmcdtwxFeOiiH2JNbGO/9EsrjppMRMjKDQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzRbItOKEv+yEzUnRGPkbbXmFlpuMH269ck+QhO6vGCDVlxBONm
+	ptiplGqdBsr5npbuQnD1jZvf7Xvx5uYwxnr/8VmCk5A+cV4uyL+3
+X-Gm-Gg: ASbGncvxwqO7P7zaDRW5tEksmZ8s4wJb1SGf95xyTe2RC00cMho558rIAw3riKT/at1
+	e1gNvzCMlrLOI+LfnnXBTGXEsR22PugdkZOkd37RPGOPqDbVnnz6s9vHIt5q9+1BXYd6xalPcxM
+	gzNXgNZPQB39GBAtG35VZpfbFx+5QAtdDHCFtyBWDGkuSoDhTOZOd8NX66vB5DoYS29ORRuti1E
+	7Y68PHT8+gsGmVhPiqZrA+u4EhRVt0aVf7wLjq2aB77dKSam2Ec6neg0s2UguEyEO7ElIsF0oGW
+	9Q==
+X-Google-Smtp-Source: AGHT+IGWwzQoAOmKe8zx7tySLcevTiaWAtEpVULyWdj7gLYboetswyQkdB33dHv+c6tMw6u2hAgTWQ==
+X-Received: by 2002:a05:600c:4710:b0:431:557e:b40c with SMTP id 5b1f17b1804b1-438914532admr41715045e9.27.1737156016262;
+        Fri, 17 Jan 2025 15:20:16 -0800 (PST)
+Received: from [192.168.8.100] ([85.255.237.67])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-437c752935csm106630805e9.26.2025.01.17.15.20.14
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 17 Jan 2025 15:20:15 -0800 (PST)
+Message-ID: <0d851165-dfe3-491a-be8b-77d01ee00de4@gmail.com>
+Date: Fri, 17 Jan 2025 23:20:58 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250117213751.2404-1-ma.arghavani.ref@yahoo.com>
- <20250117213751.2404-1-ma.arghavani@yahoo.com> <CANn89i+g380KQq7C8GEJVxwNNZJE6gwq3JCCyGsn6M09+y8N7Q@mail.gmail.com>
-In-Reply-To: <CANn89i+g380KQq7C8GEJVxwNNZJE6gwq3JCCyGsn6M09+y8N7Q@mail.gmail.com>
-From: Neal Cardwell <ncardwell@google.com>
-Date: Fri, 17 Jan 2025 18:11:15 -0500
-X-Gm-Features: AbW1kvaTyGdBVg0B5EDQUucSk4rmsgfFkCNSkVJp4vloGZgCLNRNHSyxna3mO-Q
-Message-ID: <CADVnQyn-T_3r2_M9M03qPvvyeRgX2GP543x89SeDrDmLWPJAcQ@mail.gmail.com>
-Subject: Re: [PATCH net v3] tcp_cubic: fix incorrect HyStart round start detection
-To: Eric Dumazet <edumazet@google.com>
-Cc: Mahdi Arghavani <ma.arghavani@yahoo.com>, netdev@vger.kernel.org, haibo.zhang@otago.ac.nz, 
-	david.eyers@otago.ac.nz, abbas.arghavani@mdu.se, 
-	Jason Xing <kerneljasonxing@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v11 10/21] net: add helpers for setting a memory
+ provider on an rx queue
+To: Jakub Kicinski <kuba@kernel.org>, Mina Almasry <almasrymina@google.com>
+Cc: David Wei <dw@davidwei.uk>, io-uring@vger.kernel.org,
+ netdev@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+ Paolo Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jesper Dangaard Brouer
+ <hawk@kernel.org>, David Ahern <dsahern@kernel.org>,
+ Stanislav Fomichev <stfomichev@gmail.com>, Joe Damato <jdamato@fastly.com>,
+ Pedro Tammela <pctammela@mojatatu.com>
+References: <20250116231704.2402455-1-dw@davidwei.uk>
+ <20250116231704.2402455-11-dw@davidwei.uk>
+ <20250116182558.4c7b66f6@kernel.org>
+ <939728a0-b479-4b60-ad0e-9778e2a41551@gmail.com>
+ <20250117141136.6b9a0cf2@kernel.org>
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <20250117141136.6b9a0cf2@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, Jan 17, 2025 at 5:00=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
-wrote:
->
-> On Fri, Jan 17, 2025 at 10:38=E2=80=AFPM Mahdi Arghavani <ma.arghavani@ya=
-hoo.com> wrote:
-> >
-> > I noticed that HyStart incorrectly marks the start of rounds,
-> > leading to inaccurate measurements of ACK train lengths and
-> > resetting the `ca->sample_cnt` variable. This inaccuracy can impact
-> > HyStart's functionality in terminating exponential cwnd growth during
-> > Slow-Start, potentially degrading TCP performance.
-> >
-> > The issue arises because the changes introduced in commit 4e1fddc98d25
-> > ("tcp_cubic: fix spurious Hystart ACK train detections for not-cwnd-lim=
-ited flows")
-> > moved the caller of the `bictcp_hystart_reset` function inside the `hys=
-tart_update` function.
-> > This modification added an additional condition for triggering the call=
-er,
-> > requiring that (tcp_snd_cwnd(tp) >=3D hystart_low_window) must also
-> > be satisfied before invoking `bictcp_hystart_reset`.
-> >
-> > This fix ensures that `bictcp_hystart_reset` is correctly called
-> > at the start of a new round, regardless of the congestion window size.
-> > This is achieved by moving the condition
-> > (tcp_snd_cwnd(tp) >=3D hystart_low_window)
-> > from before calling `bictcp_hystart_reset` to after it.
-> >
-> > I tested with a client and a server connected through two Linux softwar=
-e routers.
-> > In this setup, the minimum RTT was 150 ms, the bottleneck bandwidth was=
- 50 Mbps,
-> > and the bottleneck buffer size was 1 BDP, calculated as (50M / 1514 / 8=
-) * 0.150 =3D 619 packets.
-> > I conducted the test twice, transferring data from the server to the cl=
-ient for 1.5 seconds.
-> > Before the patch was applied, HYSTART-DELAY stopped the exponential gro=
-wth of cwnd when
-> > cwnd =3D 516, and the bottleneck link was not yet saturated (516 < 619)=
-.
-> > After the patch was applied, HYSTART-ACK-TRAIN stopped the exponential =
-growth of cwnd when
-> > cwnd =3D 632, and the bottleneck link was saturated (632 > 619).
-> > In this test, applying the patch resulted in 300 KB more data delivered=
-.
-> >
-> > Fixes: 4e1fddc98d25 ("tcp_cubic: fix spurious Hystart ACK train detecti=
-ons for not-cwnd-limited flows")
-> > Signed-off-by: Mahdi Arghavani <ma.arghavani@yahoo.com>
-> > Reviewed-by: Jason Xing <kerneljasonxing@gmail.com>
-> > Cc: Neal Cardwell <ncardwell@google.com>
-> > Cc: Eric Dumazet <edumazet@google.com>
-> > Cc: Haibo Zhang <haibo.zhang@otago.ac.nz>
-> > Cc: David Eyers <david.eyers@otago.ac.nz>
-> > Cc: Abbas Arghavani <abbas.arghavani@mdu.se>
-> > ---
->
-> SGTM thanks.
->
-> Reviewed-by: Eric Dumazet <edumazet@google.com>
+On 1/17/25 22:11, Jakub Kicinski wrote:
+> On Fri, 17 Jan 2025 02:47:15 +0000 Pavel Begunkov wrote:
+>>>> +	rxq = __netif_get_rx_queue(dev, ifq_idx);
+>>>
+>>> I think there's a small race between io_uring closing and the netdev
+>>> unregister. We can try to uninstall twice, let's put
+>>
+>> They're gated by checking ifq->netdev in io_uring code, which is
+>> cleared by them under a spin. So either io_uring does
+>> __net_mp_close_rxq() and ->uninstall does nothing, or vise versa.
+> 
+> True, so not twice, but the race is there. It's not correct to call
+> ops of a device which has already been unregistered.
 
-LGTM as well. Thanks for the fix!
+Ok, from what you're saying it's regardless of the netdev still
+having refs lingering. In this case it was better a version ago
+where io_uring was just taking the rtnl lock, which protects
+against concurrent unregistration while io_uring is checking
+netdev.
 
-Reviewed-by: Neal Cardwell <ncardwell@google.com>
-Tested-by: Neal Cardwell <ncardwell@google.com>
+Does your patch below covers that? Or does it have to be resolved
+in this set? I assume you're going to queue it as a fix.
 
-neal
+  
+> Mina, did we consider that the device may be closed when the provider
+> is being bound? Perhaps that's what you meant when you were reviewing
+> the netdevsim patches!
+> 
+> Do we need something like this?
+> 
+> ---->8------------
+> 
+> From: Jakub Kicinski <kuba@kernel.org>
+> Subject: net: devmem: don't call queue stop / start when the interface is down
+> 
+> We seem to be missing a netif_running() check from the devmem
+> installation path. Starting a queue on a stopped device makes
+> no sense. We still want to be able to allocate the memory, just
+> to test that the device is indeed setting up the page pools
+> in a memory provider compatible way.
+> 
+> Fixes: 7c88f86576f3 ("netdev: add netdev_rx_queue_restart()")
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+>   include/net/netdev_queues.h |  4 ++++
+>   net/core/netdev_rx_queue.c  | 16 ++++++++++------
+>   2 files changed, 14 insertions(+), 6 deletions(-)
+> 
+> diff --git a/include/net/netdev_queues.h b/include/net/netdev_queues.h
+> index 5ca019d294ca..9296efeab4c0 100644
+> --- a/include/net/netdev_queues.h
+> +++ b/include/net/netdev_queues.h
+> @@ -107,6 +107,10 @@ struct netdev_stat_ops {
+>    *
+>    * @ndo_queue_stop:	Stop the RX queue at the specified index. The stopped
+>    *			queue's memory is written at the specified address.
+> + *
+> + * Note that @ndo_queue_mem_alloc and @ndo_queue_mem_free may be called while
+> + * the interface is closed. @ndo_queue_start and @ndo_queue_stop will only
+> + * be called for an interface which is open.
+>    */
+>   struct netdev_queue_mgmt_ops {
+>   	size_t			ndo_queue_mem_size;
+> diff --git a/net/core/netdev_rx_queue.c b/net/core/netdev_rx_queue.c
+> index b02b28d2ae44..9b9c2589150a 100644
+> --- a/net/core/netdev_rx_queue.c
+> +++ b/net/core/netdev_rx_queue.c
+> @@ -38,13 +38,17 @@ int netdev_rx_queue_restart(struct net_device *dev, unsigned int rxq_idx)
+>   	if (err)
+>   		goto err_free_new_queue_mem;
+>   
+> -	err = qops->ndo_queue_stop(dev, old_mem, rxq_idx);
+> -	if (err)
+> -		goto err_free_new_queue_mem;
+> +	if (netif_running(dev)) {
+> +		err = qops->ndo_queue_stop(dev, old_mem, rxq_idx);
+> +		if (err)
+> +			goto err_free_new_queue_mem;
+>   
+> -	err = qops->ndo_queue_start(dev, new_mem, rxq_idx);
+> -	if (err)
+> -		goto err_start_queue;
+> +		err = qops->ndo_queue_start(dev, new_mem, rxq_idx);
+> +		if (err)
+> +			goto err_start_queue;
+> +	} else {
+> +		swap(new_mem, old_mem);
+> +	}
+>   
+>   	qops->ndo_queue_mem_free(dev, old_mem);
+>   
+
+-- 
+Pavel Begunkov
+
 
