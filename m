@@ -1,190 +1,130 @@
-Return-Path: <netdev+bounces-159141-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159142-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0DD5BA147F3
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 03:14:02 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 13A5DA14801
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 03:16:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6E9F63A70D0
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 02:13:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 833823A717F
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 02:15:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C2901F560B;
-	Fri, 17 Jan 2025 02:14:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3687C1DDC35;
+	Fri, 17 Jan 2025 02:16:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="e7eEHEYw"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="K5ALaNwG"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-111.freemail.mail.aliyun.com (out30-111.freemail.mail.aliyun.com [115.124.30.111])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 090001F5604;
-	Fri, 17 Jan 2025 02:13:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.111
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B493111CAF
+	for <netdev@vger.kernel.org>; Fri, 17 Jan 2025 02:16:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737080040; cv=none; b=foTG0/gPu/ULfYYVjxro3qiJf4rrGCDKMXLn8NMLrwcK8H7Ofev2z2cGZO7AoTdMOIFhkHQGujoXYPNzYMEnkCxnfMpX8bmbdfvFO9hMlqiu6KGH2tL4ifVuBpa49k0WuNFFoQRKUueQ6z7jxR0/iVhToFCCJ+aMDkmHxQMzr2Q=
+	t=1737080162; cv=none; b=bWwYpySalcpHjG1ogu5FXRp3w/ScCzi+isFt+yu2o1ClqXBaMNdZXkmIztL9s6Y56kVPLpWYHo5BxKSbc1xwE8r801BhpxcnbS2Py9GyODf7wBnISaCD14zfRRyg+MKmqY5ZHyk/cr50f7Hbe/fYGf0ECVmQSfHZCA6U/fPsk1E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737080040; c=relaxed/simple;
-	bh=b8bP5SE0USzXzDD7E0HSc23dN32N4tag6/cV3tDf0z8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XJb138s8Iuj4goYEVFoQMYP0KdJL0XtuS8Ft2o2spyxOp3mEIT3ORD/ercSPuW+6KOUvrlbMbLtWeD5U9tsYVp2N/VWQOG0JW5EsJ1wRrBlLxwnUeiCO2Ey/BMvCWHMvEIDs7WhF/lRuqI/LUCggR9X80xRDLl5d60zSQJxWUm4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=e7eEHEYw; arc=none smtp.client-ip=115.124.30.111
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1737080034; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
-	bh=LsnmJDLMPx6BOmdSkxnx6bCuBrhMBXTPA1M6hZHcRM0=;
-	b=e7eEHEYwLJwDOaOGHFGa1uWEJUkQCSylQiKQ9riTUAc2SiQlY/NeqtBnq3a9Kkp+lSdUGESc4+FlsCT01LzDzs6ZvL1DOnzq7ocuHcmlDem2VdnRmTNxiGJ4n0m3h/PG45qaL7ZgwUOAcaWllKVl9CZtyRQK4eUaSRfH52PwSWI=
-Received: from localhost(mailfrom:dust.li@linux.alibaba.com fp:SMTPD_---0WNn-gA3_1737080033 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Fri, 17 Jan 2025 10:13:53 +0800
-Date: Fri, 17 Jan 2025 10:13:53 +0800
-From: Dust Li <dust.li@linux.alibaba.com>
-To: Alexandra Winter <wintera@linux.ibm.com>,
-	Julian Ruess <julianr@linux.ibm.com>,
-	Wenjia Zhang <wenjia@linux.ibm.com>,
-	Jan Karcher <jaka@linux.ibm.com>, Gerd Bayer <gbayer@linux.ibm.com>,
-	Halil Pasic <pasic@linux.ibm.com>,
-	"D. Wythe" <alibuda@linux.alibaba.com>,
-	Tony Lu <tonylu@linux.alibaba.com>,
-	Wen Gu <guwen@linux.alibaba.com>,
-	Peter Oberparleiter <oberpar@linux.ibm.com>,
-	David Miller <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>
-Cc: Niklas Schnelle <schnelle@linux.ibm.com>,
-	Thorsten Winkler <twinkler@linux.ibm.com>, netdev@vger.kernel.org,
-	linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Simon Horman <horms@kernel.org>
-Subject: Re: [RFC net-next 0/7] Provide an ism layer
-Message-ID: <20250117021353.GF89233@linux.alibaba.com>
-Reply-To: dust.li@linux.alibaba.com
-References: <20250115195527.2094320-1-wintera@linux.ibm.com>
- <20250116093231.GD89233@linux.alibaba.com>
- <D73H7Q080GUQ.3BDOH23P4WDOL@linux.ibm.com>
- <0f96574a-567e-495a-b815-6aef336f12e6@linux.ibm.com>
+	s=arc-20240116; t=1737080162; c=relaxed/simple;
+	bh=GK6afS3pR7STHAAJosx89JAfCV4nfsvfsdBaf/OGF3w=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ZlWXaTM4EVuOFsv4UE5A9aBZ5iXudMSdO52ff01dR70Tmdw9U+0+cXqlipFrGIOpTZu/LPO7RzQveikfeJmYrFh1L+R9s0W3+YsYZ2VElGFdTX4dnG1NK4G4dlVWuD3SDcVR9YaDElYOwU4bW9vHqW0ZJqJpxQ9n2XqCiaA2mWI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=K5ALaNwG; arc=none smtp.client-ip=209.85.214.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-216281bc30fso37004005ad.0
+        for <netdev@vger.kernel.org>; Thu, 16 Jan 2025 18:16:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1737080160; x=1737684960; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=TCuVVzkQy59UCcZDOiVi2Rn0kAlSnwhXHYiolAdQcns=;
+        b=K5ALaNwG74qYfE1QmaRna5H4CbEbuA+ufaQ0BuDvDyfS+vY85fabswCaV4QZAOzunX
+         QtbXo2MUuLsIhfPwryez9Utum3rJvCcW+GhpUEBTISnas/Qx1stoUWX7m77xmVbzNk4i
+         MOyNCm7hh2wlcNji270u7E76ma0YKzHzXpEIOHnCPE11jX2oIndyLLdaWiPYZk34isfm
+         U4c90wWnC3+JqORVL6WNHwU5if69yDwBKwsG0+dDwxKpCyqqXsjSTylG9Z7uNTa7G3Ef
+         LWDKmRMmsg5bUQcC10W3GvUIrWkbcXi03FD6xAluiUyNJrNdsF4ULBfOoafeZ0276HhL
+         cAow==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737080160; x=1737684960;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=TCuVVzkQy59UCcZDOiVi2Rn0kAlSnwhXHYiolAdQcns=;
+        b=RWgHhB8lgvVTPtNTtK8wQjlykKLxSiPy82C5pJMd63y+KRShmHzOkL9Wzg4iCYL+Lu
+         idxJjvO2attraWbC4Uf8PvZXuKVjM752wSHozgkvo6M/Du2H7LF5xO7xDTTP0of+iyoi
+         WOIa7tOezanLGGfKncVxeZxn/cTNhN+QrC0WXmk8CbvRwktgHS3SUpJ+U+Wb+FoVMOPo
+         O1TA3bixb928aKN5bEAJNDgZCWKsj1f8etuDsewV1gXuCqzhvfdiRZOmnJD/au0HZybD
+         6zptqogr/1cxqPn1XcGRzCyfZCPVsy6euupaV6Y2OkLwbJK9txMyh0KM4MhEgd7GfGif
+         cxKA==
+X-Forwarded-Encrypted: i=1; AJvYcCWy9MDi0WKiDP3PvmxP5ShZZUohjtcOQJy5aeZtw746zlVWWdKx1AnBbfUwgIJFOBiQ+TyzwOk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw9Rq5foBiK0x/eVaZdpfdce+MJgFSqGe5RZdbevW7KSvll8XLc
+	rC6fLNB5GBf140fROeHLAOUqnOcYvwP9UgAT5j6Qt8L3FB3C2BhxsARdmE5hbKOzg5UOmQhqcip
+	mkk8=
+X-Gm-Gg: ASbGncv7FtRyx9P2s0Ap/4ETaCYBnA7eqpEomXtcSgR1H5p6pzZXyJiYmPBpjkll9qi
+	m7fca3u+Za89dd9Rzfcx9oag58xKFmvEmXqGBhw4J4tWFFlqYgPpIaCAYITMKxA2xqjkH6PlGN6
+	4QEghrmglzb4b+UJ9AacnIXWf/mFU4OgT9zT8l93rB7PHKpqoez2h/OBlE0+GZcRxaDW1RBxv8S
+	4f37KkQIl16gmHQArfrj/jYzi4lYADfr5K7xmW9LJiPilrN4/WQHsd/jAkyo3SjFMOYx8IpYpdJ
+	e9+th1Z7Pe+xQHkOyg==
+X-Google-Smtp-Source: AGHT+IG7iU445RErzMyHQfWntDOYm0u6q8Co5wgOH5BezmytYlTIPCVKI3H5lcFN36ZKluXllht/Nw==
+X-Received: by 2002:a05:6a20:b805:b0:1db:e40d:5f89 with SMTP id adf61e73a8af0-1eb21590232mr1301770637.28.1737080159994;
+        Thu, 16 Jan 2025 18:15:59 -0800 (PST)
+Received: from ?IPV6:2a03:83e0:1156:1:cf1:8047:5c7b:abf4? ([2620:10d:c090:500::4:b8ed])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72dab7f1776sm690701b3a.7.2025.01.16.18.15.58
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 16 Jan 2025 18:15:59 -0800 (PST)
+Message-ID: <4f8dc7b1-0213-46a1-85f5-2d77e7b98067@davidwei.uk>
+Date: Thu, 16 Jan 2025 18:15:57 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <0f96574a-567e-495a-b815-6aef336f12e6@linux.ibm.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v11 04/21] net: page_pool: create hooks for
+ custom memory providers
+Content-Language: en-GB
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: io-uring@vger.kernel.org, netdev@vger.kernel.org,
+ Jens Axboe <axboe@kernel.dk>, Pavel Begunkov <asml.silence@gmail.com>,
+ Paolo Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jesper Dangaard Brouer
+ <hawk@kernel.org>, David Ahern <dsahern@kernel.org>,
+ Mina Almasry <almasrymina@google.com>,
+ Stanislav Fomichev <stfomichev@gmail.com>, Joe Damato <jdamato@fastly.com>,
+ Pedro Tammela <pctammela@mojatatu.com>
+References: <20250116231704.2402455-1-dw@davidwei.uk>
+ <20250116231704.2402455-5-dw@davidwei.uk>
+ <20250116174634.0b421245@kernel.org> <20250116174822.6195f52e@kernel.org>
+From: David Wei <dw@davidwei.uk>
+In-Reply-To: <20250116174822.6195f52e@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On 2025-01-16 17:17:33, Alexandra Winter wrote:
->
->
->On 16.01.25 12:55, Julian Ruess wrote:
->> On Thu Jan 16, 2025 at 10:32 AM CET, Dust Li wrote:
->>> On 2025-01-15 20:55:20, Alexandra Winter wrote:
+On 2025-01-16 17:48, Jakub Kicinski wrote:
+> On Thu, 16 Jan 2025 17:46:34 -0800 Jakub Kicinski wrote:
+>> On Thu, 16 Jan 2025 15:16:46 -0800 David Wei wrote:
+>>> From: Pavel Begunkov <asml.silence@gmail.com>
 >>>
->>> Hi Winter,
+>>> A spin off from the original page pool memory providers patch by Jakub,
+>>> which allows extending page pools with custom allocators. One of such
+>>> providers is devmem TCP, and the other is io_uring zerocopy added in
+>>> following patches.
 >>>
->>> I'm fully supportive of the refactor!
->
->
->Thank you very much Dust Li for joining the discussion.
->
->
->>> Interestingly, I developed a similar RFC code about a month ago while
->>> working on enhancing internal communication between guest and host
->>> systems. 
->
->
->But you did not send that out, did you?
->I hope I did not overlook an earlier proposal by you.
+>>> Co-developed-by: Jakub Kicinski <kuba@kernel.org> # initial mp proposal
+>>> Link: https://lore.kernel.org/netdev/20230707183935.997267-7-kuba@kernel.org/
+>>> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
+>>> Signed-off-by: David Wei <dw@davidwei.uk>  
+>>
+>> FWIW you still need to add my SoB for Co-developed-by.
+>> Doesn't checkpatch complain?
+>> I guess not a deal breaker here if I'm the one applying it...
+> 
+> Ah, and in case I am not..
+> 
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-No, I just did a POC and didn't find the time to improve it.
-So I think we can go on with your version.
-
->
->
->Here are some of my thoughts on the matter:
->>>
->>> Naming and Structure: I suggest we refer to it as SHD (Shared Memory
->>> Device) instead of ISM (Internal Shared Memory). 
->
->
->So where does the 'H' come from? If you want to call it Shared Memory _D_evice?
-
-Oh, I was trying to refer to SHM(Share memory file in the userspace, see man
-shm_open(3)). SMD is also OK.
-
->
->
->To my knowledge, a
->>> "Shared Memory Device" better encapsulates the functionality we're
->>> aiming to implement. 
->
->
->Could you explain why that would be better?
->'Internal Shared Memory' is supposed to be a bit of a counterpart to the
->Remote 'R' in RoCE. Not the greatest name, but it is used already by our ISM
->devices and by ism_loopback. So what is the benefit in changing it?
-
-I believe that if we are going to separate and refine the code, and add
-a common subsystem, we should choose the most appropriate name.
-
-In my opinion, "ISM" doesn’t quite capture what the device provides.
-Since we’re adding a "Device" that enables different entities (such as
-processes or VMs) to perform shared memory communication, I think a more
-fitting name would be better. If you have any alternative suggestions,
-I’m open to them.
-
-
->
->
->It might be beneficial to place it under
->>> drivers/shd/ and register it as a new class under /sys/class/shd/. That
->>> said, my initial draft also adopted the ISM terminology for simplicity.
->> 
->> I'm not sure if we really want to introduce a new name for
->> the already existing ISM device. For me, having two names
->> for the same thing just adds additional complexity.
-
-I believe that if we are going to rename it, there should be no
-reference to "ISM" in this subsystem. IBM's PCI ISM can retain that
-name, as it is an implementation of the Shared Memory device (assuming
-we adopt that name).
-
->> 
->> I would go for /sys/class/ism
->> 
->>>
->>> Modular Approach: I've made the ism_loopback an independent kernel
->>> module since dynamic enable/disable functionality is not yet supported
->>> in SMC. Using insmod and rmmod for module management could provide the
->>> flexibility needed in practical scenarios.
->
->
->With this proposal ism_loopback is just another ism device and SMC-D will
->handle removal just like ism_client.remove(ism_dev) of other ism devices.
->
->But I understand that net/smc/ism_loopback.c today does not provide enable/disable,
->which is a big disadvantage, I agree. The ism layer is prepared for dynamic
->removal by ism_dev_unregister(). In case of this RFC that would only happen
->in case of rmmod ism. Which should be improved.
->One way to do that would be a separate ism_loopback kernel module, like you say.
->Today ism_loopback is only 10k LOC, so I'd be fine with leaving it in the ism module.
->I also think it is a great way for testing any ISM client, so it has benefit for
->anybody using the ism module.
->Another way would be e.g. an 'enable' entry in the sysfs of the loopback device.
->(Once we agree if and how to represent ism devices in genera in sysfs).
-
-This works for me as well. I think it would be better to implement this
-within the common ISM layer, rather than duplicating the code in each
-device. Similar to how it's done in netdevice.
-
-Best regards,
-Dust
-
+I'm sorry... Checkpatch does complain but I missed it in the sea of
+warnings of 'prefer unsigned int to bare unsigned'.
 
