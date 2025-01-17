@@ -1,200 +1,177 @@
-Return-Path: <netdev+bounces-159326-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159327-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D24D5A151CD
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 15:28:31 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7524BA151D9
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 15:31:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 28713188499F
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 14:28:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8DC267A2D2E
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 14:31:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 658C686337;
-	Fri, 17 Jan 2025 14:28:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8482A155CBD;
+	Fri, 17 Jan 2025 14:31:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KHUI1ANd"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rSxBdML6"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5FCC78F5B
-	for <netdev@vger.kernel.org>; Fri, 17 Jan 2025 14:28:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C36C1547F5
+	for <netdev@vger.kernel.org>; Fri, 17 Jan 2025 14:31:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737124106; cv=none; b=PjaxSAITB6rGrL2uaD6Iq4gDRp0UcUV31L5z4Sz9rNaLpKfF7+YERJSiry3ZBiQKeeE+/kPjbJVpq9U4oKPAldpax6aOBeWH92RdnzAwKDXek1Se9/53cDqeuvalBr6he/lNODl6HqaXAk59QGvucP6tIPUXP8YuN8PfJaMfiAE=
+	t=1737124282; cv=none; b=LhLadMj/11GOmG3IylRfgodgMoTTPaQPYnSZ6PzZ7RfrBBj0bRv8YDDfDzsn+hZLKaxtZhw6fFEnD+maKxTYbk7z3mo/yHPA2BPx0e5QUvucpXGONSATzsy6XySo2iBwomsniZvzXMYq/IAHlOotzyNq34ZFwk9IQ6vdGjkWgYg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737124106; c=relaxed/simple;
-	bh=mDdv8bie31on18kTBHvxq3RFrERNo/c/QthRYx79W8Q=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Z0R5V6DDSaLqwUverWda/P4UZhzZD69mGkZ4sN8NU/GwJ5PHYhgoK2YtHoQkH55xaxdq1GEWUA1t5KuuYzrwT6p4NDAK7IQasCW4jUvTdJXuf4zIRW1ZoaOZJWbGpfgiZhLqFwJUUquuB1NGHtAiqVSok5mmivLM6whq/bHWpeE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KHUI1ANd; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1737124103;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=2oi08zdO3Y89Or/bOx5y047G2RaQw5VgeU693ZnudoM=;
-	b=KHUI1ANdNsqzgRK8UxRy5TxCvTbnWcb8YFBXmskp4Jx9Q+lHKI9SmPxKOcjTCrL16qfBJb
-	yFZ8cjGor/+mI/TnlluO0pGUZPM1Pk1pwT10dADPU1Zp9iSuiSAn4e++k3diLuyBRikudq
-	gryf7ndwlXoYBnMSwJmitI8ymx+/g2o=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-358-_Oy_IwFFN_KHutCnH90TfQ-1; Fri, 17 Jan 2025 09:28:22 -0500
-X-MC-Unique: _Oy_IwFFN_KHutCnH90TfQ-1
-X-Mimecast-MFC-AGG-ID: _Oy_IwFFN_KHutCnH90TfQ
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4361efc9dc6so11021445e9.3
-        for <netdev@vger.kernel.org>; Fri, 17 Jan 2025 06:28:21 -0800 (PST)
+	s=arc-20240116; t=1737124282; c=relaxed/simple;
+	bh=3ao/GWH5Tc2xAnwaRzHtnnwvVkVRW9lwqtS8ByvomIQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=CulZP51vozMG7fJV0LQXqPFNKfrXDVVJGbpvKgsed6BwczdTt39Y1lZ4Sy/FnATC+Vjk9dfptC3XiXKuDN9uNjitkRzzMKXb0UD1PYuIffV6gh58BzJSHI/CXewbQNcmTinTAXEoHxgnsJO3qd/dxjfARrjOJXBpCme1NK1olcE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rSxBdML6; arc=none smtp.client-ip=209.85.221.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-385d7f19f20so1108283f8f.1
+        for <netdev@vger.kernel.org>; Fri, 17 Jan 2025 06:31:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1737124279; x=1737729079; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=SR55i3HkYctE7pnXIlYdROvAQkAqVIwUg/mFNkzAzc0=;
+        b=rSxBdML6vUtDXjGNOQefMmw+vp2iczk7QX6SeqbM2/iRpEuEc740x6SMjVwL0osccM
+         0RM8metTvwvQA8DwgfGaHcHhY0crrDMwFKHio0PF+49TJCHkz+JW3KMlcsO64fUUzAco
+         URBr8G4wEumubQRwJcjyLHLLosyrkIGJpSvuXnP/hODVm92IobrmkGvpmqaZHLPna8w2
+         kNujZDyHxDQZdcC4XIhyQq6AgT06IPjTunWC9s29uRkJKSVdykCT7mQSVEU2lwlBwpOV
+         NgpgMuW5QfkdPuXV1kEg2YbZDKRSDOxMgfKQ++QnF5JU+HrG8P8pOw7kVRvs3sRVQHQ5
+         YS4w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737124100; x=1737728900;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2oi08zdO3Y89Or/bOx5y047G2RaQw5VgeU693ZnudoM=;
-        b=NZjQjldhFuBDKg7MtYHhLBojvyTxZSxLadDtoU6vm6kVgQSUDGHQsCJU2Z9Qo39Gdw
-         aGTyQA8xJ5+bvjmjMsjMWl7zsbCGgeaAJ8t/+N9y54pw9lRaCsa0Bo6zlspwqKgMkj1H
-         /+VH9mtalQhWl/TOya8A+Vxo7zbAEc+XXtcS3f0dYoVrl2Xsd+VJ0Mz5PtX+adhHGS7Z
-         8WjsmB+o3jXv4xU4tDGqfT+z08txHaGoQzQJtjelfQfdRXijtk19p1M6K8ZU+qwpSjLo
-         V0y2Mv3t2rUF2y97WIJgzbtRX0YvNidah8IUu4Ye4hSwtvbPAypKYfVVrQQn39vQ711x
-         deQQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUjUDyoq6dVgh0l8Ecz5HaDZu9BwHp1JybuJ4Se2PQONsPbwOHNA32v2M4bD4aXYZbcMsEOMqE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxcJJ0kB+2HMO99LB4wbpWU/07WNnbTfoR6ywSqAn4Cub4/kNeU
-	zy/hyMBpXsZd2RCcAWt1iC/jNk9I5E4Vs/dAoONilGoijXkIoShaPLEy7ikxtVHWYnutY2dx/pb
-	o8oPh2nInZ5SnEtUbACm3YuZBkEvZammHyWfIqwnkWNkEP5haaYnJ9A==
-X-Gm-Gg: ASbGncu38+zTneBxyCw+ps4Y1IUqOi7cx4EEJlIYmUWjtwjEMWJk194sfzF3hNn4ZyZ
-	4pZ89fbLM+kWzgUk7busk2UZKISmv2EtHCNW00nt2nJqqEFkmDxZAqtBp8/bwmqUkwaHEwLfFsY
-	BwSR4IitwsD0/sNeu28kdDDlpsofUYOFQ7sa98+oNRbhZ32N35VmImKpt2Vxa2IYwgBlKrFH5JW
-	AZzNNareHtoDYk1hx9hLfclq4zCdsPknJdS3FGFlCZljfM+S5Q0oaT8JVWs+nB3BG3ou6B9nNWw
-	Oj2TOWn4DBU=
-X-Received: by 2002:a05:600c:5112:b0:434:a5bc:70fc with SMTP id 5b1f17b1804b1-438913cfa0emr30436275e9.8.1737124099127;
-        Fri, 17 Jan 2025 06:28:19 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFguh3eO0ebu9zvt9jzGDEhcT4DR9FA36zwFEJJvb9LxoI84XCY17GLvDMG2Y5+ZSZ0+MvdsQ==
-X-Received: by 2002:a05:600c:5112:b0:434:a5bc:70fc with SMTP id 5b1f17b1804b1-438913cfa0emr30435045e9.8.1737124097250;
-        Fri, 17 Jan 2025 06:28:17 -0800 (PST)
-Received: from [192.168.88.253] (146-241-15-169.dyn.eolo.it. [146.241.15.169])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4388ebdefe0sm50904125e9.15.2025.01.17.06.28.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 17 Jan 2025 06:28:16 -0800 (PST)
-Message-ID: <406fcbd2-55af-4919-abee-7cd80fb449d3@redhat.com>
-Date: Fri, 17 Jan 2025 15:28:15 +0100
+        d=1e100.net; s=20230601; t=1737124279; x=1737729079;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=SR55i3HkYctE7pnXIlYdROvAQkAqVIwUg/mFNkzAzc0=;
+        b=Dto3hsyQTZZmpMrRnUicvFSlpPfeL3UenqbqF/6ijtuIsrxcg6GWClQenshLP1BW5Y
+         QJ2yvD8bViELfnAqbKRolinmvQCa2IPtdndxiZA3C6MsALGttlUSlaT96KLXFF0gU+fu
+         75nNtfb73pu5n++wPLa3RkXVneAea80x01NN2op8ag9TmHzOk5+QvPYkz9LIR16GGq9x
+         jm72hSgzltcLs0qdKXuL8fUFeyi9hSbOMWzYNcLICMMbtFwkGVrKxEXz6/E/x6H12IRo
+         2Rg7c14zAF4Nka+uAYHgDaAkGmWboWhisw4n6f+Q3LUP9VwG2tYTpQrtb+46vuYfNDkn
+         Vyzg==
+X-Forwarded-Encrypted: i=1; AJvYcCXO3m1BglIQcFyrV3bqj4G2M1Mk3ht6rurhOirLuLjI+466FqJWdVMQb3gVvYS/NGivdyKsQAI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzF42gJGKTBJP4vXQT4hhqPs1BIGcMGEvA/9IIWaGdQDpFVjAx0
+	MmiEnA7mJFZXdD+Fz/URuv+sb8GAyEEoTi1geIqDFAIBQUSFCnQbM7RIzTZr/96wPyGGCApiuyW
+	yJaGgowX2sUDmiFRZZ9LFqrFFZidbSg5SrTmR
+X-Gm-Gg: ASbGncsihkVEQI0w5CwTaYWGPSmFdgCr3AE8/I8h4HvSQFZqzpQCSPwPfmeHacj7ixQ
+	H0W1ZlLut9xOk6dFrECVCwB5RA6bFo0WpPZPUQhc=
+X-Google-Smtp-Source: AGHT+IGODadZTBAPzKwgax05vY9NUHUfkPNs+7IG+444xS58i4EJ6Pre/dh+yQmUcOszmxuzeJpeMHnIsaQ/pkp5F+c=
+X-Received: by 2002:a5d:508d:0:b0:38a:673b:3738 with SMTP id
+ ffacd0b85a97d-38bf5688e01mr2489905f8f.33.1737124278795; Fri, 17 Jan 2025
+ 06:31:18 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v11 00/21] io_uring zero copy rx
-To: David Wei <dw@davidwei.uk>, io-uring@vger.kernel.org,
- netdev@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>, Pavel Begunkov <asml.silence@gmail.com>,
- Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jesper Dangaard Brouer
- <hawk@kernel.org>, David Ahern <dsahern@kernel.org>,
- Mina Almasry <almasrymina@google.com>,
- Stanislav Fomichev <stfomichev@gmail.com>, Joe Damato <jdamato@fastly.com>,
- Pedro Tammela <pctammela@mojatatu.com>
-References: <20250116231704.2402455-1-dw@davidwei.uk>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20250116231704.2402455-1-dw@davidwei.uk>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <CAH5fLggUGT83saC++M-kd57bGvWj5dwAgbWZ95r+PHz_B67NLQ@mail.gmail.com>
+ <20250117.185501.1171065234025373111.fujita.tomonori@gmail.com>
+ <CAH5fLghqbY4UKQ2n1XVKPtvnLfJ4ceh+2aNpVmm9WxbUTu8-GQ@mail.gmail.com> <20250117.232015.1047782190952648538.fujita.tomonori@gmail.com>
+In-Reply-To: <20250117.232015.1047782190952648538.fujita.tomonori@gmail.com>
+From: Alice Ryhl <aliceryhl@google.com>
+Date: Fri, 17 Jan 2025 15:31:07 +0100
+X-Gm-Features: AbW1kvYSufSejqtJamYDlgBaixJFLn8sr1F6oBphlqAd7AYJWrHcRO2_8GhIn5w
+Message-ID: <CAH5fLgh7jpDyOGJPpasSK8E126YUUL+gj37_2RQr8m2fE9ifVw@mail.gmail.com>
+Subject: Re: [PATCH v8 4/7] rust: time: Add wrapper for fsleep function
+To: FUJITA Tomonori <fujita.tomonori@gmail.com>
+Cc: linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org, 
+	netdev@vger.kernel.org, andrew@lunn.ch, hkallweit1@gmail.com, 
+	tmgross@umich.edu, ojeda@kernel.org, alex.gaynor@gmail.com, gary@garyguo.net, 
+	bjorn3_gh@protonmail.com, benno.lossin@proton.me, a.hindborg@samsung.com, 
+	anna-maria@linutronix.de, frederic@kernel.org, tglx@linutronix.de, 
+	arnd@arndb.de, jstultz@google.com, sboyd@kernel.org, mingo@redhat.com, 
+	peterz@infradead.org, juri.lelli@redhat.com, vincent.guittot@linaro.org, 
+	dietmar.eggemann@arm.com, rostedt@goodmis.org, bsegall@google.com, 
+	mgorman@suse.de, vschneid@redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 1/17/25 12:16 AM, David Wei wrote:
-> This patchset adds support for zero copy rx into userspace pages using
-> io_uring, eliminating a kernel to user copy.
-> 
-> We configure a page pool that a driver uses to fill a hw rx queue to
-> hand out user pages instead of kernel pages. Any data that ends up
-> hitting this hw rx queue will thus be dma'd into userspace memory
-> directly, without needing to be bounced through kernel memory. 'Reading'
-> data out of a socket instead becomes a _notification_ mechanism, where
-> the kernel tells userspace where the data is. The overall approach is
-> similar to the devmem TCP proposal.
-> 
-> This relies on hw header/data split, flow steering and RSS to ensure
-> packet headers remain in kernel memory and only desired flows hit a hw
-> rx queue configured for zero copy. Configuring this is outside of the
-> scope of this patchset.
-> 
-> We share netdev core infra with devmem TCP. The main difference is that
-> io_uring is used for the uAPI and the lifetime of all objects are bound
-> to an io_uring instance. Data is 'read' using a new io_uring request
-> type. When done, data is returned via a new shared refill queue. A zero
-> copy page pool refills a hw rx queue from this refill queue directly. Of
-> course, the lifetime of these data buffers are managed by io_uring
-> rather than the networking stack, with different refcounting rules.
-> 
-> This patchset is the first step adding basic zero copy support. We will
-> extend this iteratively with new features e.g. dynamically allocated
-> zero copy areas, THP support, dmabuf support, improved copy fallback,
-> general optimisations and more.
-> 
-> In terms of netdev support, we're first targeting Broadcom bnxt. Patches
-> aren't included since Taehee Yoo has already sent a more comprehensive
-> patchset adding support in [1]. Google gve should already support this,
-> and Mellanox mlx5 support is WIP pending driver changes.
-> 
-> ===========
-> Performance
-> ===========
-> 
-> Note: Comparison with epoll + TCP_ZEROCOPY_RECEIVE isn't done yet.
-> 
-> Test setup:
-> * AMD EPYC 9454
-> * Broadcom BCM957508 200G
-> * Kernel v6.11 base [2]
-> * liburing fork [3]
-> * kperf fork [4]
-> * 4K MTU
-> * Single TCP flow
-> 
-> With application thread + net rx softirq pinned to _different_ cores:
-> 
-> +-------------------------------+
-> | epoll     | io_uring          |
-> |-----------|-------------------|
-> | 82.2 Gbps | 116.2 Gbps (+41%) |
-> +-------------------------------+
-> 
-> Pinned to _same_ core:
-> 
-> +-------------------------------+
-> | epoll     | io_uring          |
-> |-----------|-------------------|
-> | 62.6 Gbps | 80.9 Gbps (+29%)  |
-> +-------------------------------+
-> 
-> =====
-> Links
-> =====
-> 
-> Broadcom bnxt support:
-> [1]: https://lore.kernel.org/netdev/20241003160620.1521626-8-ap420073@gmail.com/
-> 
-> Linux kernel branch:
-> [2]: https://github.com/spikeh/linux.git zcrx/v9
-> 
-> liburing for testing:
-> [3]: https://github.com/isilence/liburing.git zcrx/next
-> 
-> kperf for testing:
-> [4]: https://git.kernel.dk/kperf.git
+On Fri, Jan 17, 2025 at 3:20=E2=80=AFPM FUJITA Tomonori
+<fujita.tomonori@gmail.com> wrote:
+>
+> On Fri, 17 Jan 2025 14:05:52 +0100
+> Alice Ryhl <aliceryhl@google.com> wrote:
+>
+> > On Fri, Jan 17, 2025 at 10:55=E2=80=AFAM FUJITA Tomonori
+> > <fujita.tomonori@gmail.com> wrote:
+> >>
+> >> On Fri, 17 Jan 2025 10:13:08 +0100
+> >> Alice Ryhl <aliceryhl@google.com> wrote:
+> >>
+> >> > On Fri, Jan 17, 2025 at 10:01=E2=80=AFAM FUJITA Tomonori
+> >> > <fujita.tomonori@gmail.com> wrote:
+> >> >>
+> >> >> On Fri, 17 Jan 2025 16:53:26 +0900 (JST)
+> >> >> FUJITA Tomonori <fujita.tomonori@gmail.com> wrote:
+> >> >>
+> >> >> > On Thu, 16 Jan 2025 10:27:02 +0100
+> >> >> > Alice Ryhl <aliceryhl@google.com> wrote:
+> >> >> >
+> >> >> >>> +/// This function can only be used in a nonatomic context.
+> >> >> >>> +pub fn fsleep(delta: Delta) {
+> >> >> >>> +    // The argument of fsleep is an unsigned long, 32-bit on 3=
+2-bit architectures.
+> >> >> >>> +    // Considering that fsleep rounds up the duration to the n=
+earest millisecond,
+> >> >> >>> +    // set the maximum value to u32::MAX / 2 microseconds.
+> >> >> >>> +    const MAX_DURATION: Delta =3D Delta::from_micros(u32::MAX =
+as i64 >> 1);
+> >> >> >>
+> >> >> >> Hmm, is this value correct on 64-bit platforms?
+> >> >> >
+> >> >> > You meant that the maximum can be longer on 64-bit platforms? 214=
+7484
+> >> >> > milliseconds is long enough for fsleep's duration?
+> >> >> >
+> >> >> > If you prefer, I use different maximum durations for 64-bit and 3=
+2-bit
+> >> >> > platforms, respectively.
+> >> >>
+> >> >> How about the following?
+> >> >>
+> >> >> const MAX_DURATION: Delta =3D Delta::from_micros(usize::MAX as i64 =
+>> 1);
+> >> >
+> >> > Why is there a maximum in the first place? Are you worried about
+> >> > overflow on the C side?
+> >>
+> >> Yeah, Boqun is concerned that an incorrect input (a negative value or
+> >> an overflow on the C side) leads to unintentional infinite sleep:
+> >>
+> >> https://lore.kernel.org/lkml/ZxwVuceNORRAI7FV@Boquns-Mac-mini.local/
+> >
+> > Okay, can you explain in the comment that this maximum value prevents
+> > integer overflow inside fsleep?
+>
+> Surely, how about the following?
+>
+> pub fn fsleep(delta: Delta) {
+>     // The argument of fsleep is an unsigned long, 32-bit on 32-bit archi=
+tectures.
+>     // Considering that fsleep rounds up the duration to the nearest mill=
+isecond,
+>     // set the maximum value to u32::MAX / 2 microseconds to prevent inte=
+ger
+>     // overflow inside fsleep, which could lead to unintentional infinite=
+ sleep.
+>     const MAX_DURATION: Delta =3D Delta::from_micros(u32::MAX as i64 >> 1=
+);
 
-We are getting very close to the merge window. In order to get this
-series merged before such deadline the point raised by Jakub on this
-version must me resolved, the next iteration should land to the ML
-before the end of the current working day and the series must apply
-cleanly to net-next, so that it can be processed by our CI.
+Hmm ... this is phrased as-if the problem is on 32-bit machines, but
+the problem is that fsleep casts an `unsigned long` to `unsigned int`
+which can overflow on 64-bit machines. I would instead say this
+prevents overflow on 64-bit machines when casting to an int.
 
-Thanks,
+Also, it might be cleaner to just use `i32::MAX as i64` instead of u32.
 
-Paolo
-
+Alice
 
