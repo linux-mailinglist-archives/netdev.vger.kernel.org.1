@@ -1,137 +1,99 @@
-Return-Path: <netdev+bounces-159192-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159193-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4505A14B60
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 09:44:59 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A6B35A14B88
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 09:56:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1CF59168E6D
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 08:44:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D8DEF169071
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 08:56:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D0951F8ADF;
-	Fri, 17 Jan 2025 08:44:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 805FD1F91E0;
+	Fri, 17 Jan 2025 08:56:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Z6wYYyWs"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bcCaU9Nm"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B16781F7909
-	for <netdev@vger.kernel.org>; Fri, 17 Jan 2025 08:44:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47FDB1F754C;
+	Fri, 17 Jan 2025 08:56:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737103496; cv=none; b=oXaMsiCnzPCCAl1CfBIk12c9uf4IpgvzTha3dB5jp9FVJiiviq9cOSQJJGP+dEgG2BnDduNDsW21d+HIz3Y5vTsSPe62fBA61edsDkd52x4MBZCA6tsu8jBCsAolUrWo5NyAhXZ2c6ymOzCnO2DmtkoXfLQHY1FDiJrTFXpo1/U=
+	t=1737104194; cv=none; b=qpCCwADHNiPicxCMUOu71bTJANA3xx0gegDFRb2w8nlz/LbcYPp0ADxS2e5RHTuU97ZcaOq0orqxY3ibjnLONHkAI+al0NF79lGeCzODGmh3aUdb2lV5vb1ZIXsnzg+9KGiErmMOKycxR9uMt3BqOAEUID0P9m9iH5l+yM/ZmDM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737103496; c=relaxed/simple;
-	bh=Z484xkyxYcSI61TkuYQBBLEqgYBK50pl3CT1AB8Rgpg=;
-	h=From:To:Cc:Subject:MIME-Version:Content-Disposition:Content-Type:
-	 Message-Id:Date; b=rszZyENp3x+Tg0QItj2M/gbWznQZ2eOTfURJIC4VIVh8fS/PcWyM9kcnkLAsyaCjL5jBvga7pEwV/t+ko6FTBc99EZCHtD78/20Dy7KCddQz54480IvR7flq+0CTj7pE6slYfUqfq4IO9tAaXd8rIB8HnIJED3GFfmNgEjBjUVI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=Z6wYYyWs; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
-	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:Reply-To:Content-ID
-	:Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:
-	Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=i4Yfty4BlHVy0fxTNfin1Lk2Mqnf2dUlMcpNONE97cA=; b=Z6wYYyWsTJAJuacHl+hKqtMhOv
-	cHQSRfxwDEIR7pi6k5juo7egzMbHrzOPga49FWMe39K/u9G8SHlYU1tOQNQjwsXTxfgxjZ604Ean3
-	oQhbqPNj2GvkwdIaDWwo2lLXXDUao7k9aMfCopHFU+Aco/CZwSkMfqX/leYlUJebsY1nZl8oxBXRp
-	CXMmkxp5o36H8Fo2scoQqEhGOILCfmdfMNTaA75QUHxWu7ms1pVMxCsFSgkVAhmEIheemwXFhea/r
-	viJOhBkg+E06MyPDint0ux4mYrJNi9ju157peGhn8XQbpu6scjrXzVXW+zecYwF4o3i6kax919BWb
-	LdKMgQYw==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:38704 helo=rmk-PC.armlinux.org.uk)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <rmk@armlinux.org.uk>)
-	id 1tYhy8-0003T5-0y;
-	Fri, 17 Jan 2025 08:44:44 +0000
-Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1tYhxp-001FHf-Ac; Fri, 17 Jan 2025 08:44:25 +0000
-From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org
-Subject: [PATCH net-next] net: phylink: always do a major config when
- attaching a SFP PHY
+	s=arc-20240116; t=1737104194; c=relaxed/simple;
+	bh=AGecMXknwWlOL9Fox1ctaYE4gI/yBsQgeqsHWg2+DSg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=NDBC/+GQwuOMJF2Ladm76IoVBxF6U9B/fUCpQ9CBGMRvdKl6zv74zfpePydYJ1TdhDxcPjJeb1An8qpl4yoqdXwJlqPXO3c9r5utUXnlvfeeyzekn7SyGTMydnYMFfKVypf8nT80hKjST7mFNJ44u+SFu8oqZ2ABOhcUW3wT4R4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bcCaU9Nm; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3B97AC4CEDD;
+	Fri, 17 Jan 2025 08:56:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1737104193;
+	bh=AGecMXknwWlOL9Fox1ctaYE4gI/yBsQgeqsHWg2+DSg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=bcCaU9Nmz4y5WH7lpnIvowjmu7oCMjtxBlat7dk/JvMGcs600tqqVY/k/ZHhSeLXJ
+	 VtqieNWVdwh6gDxSVHu6SyRCE08GStGeVbsy52i9rqWgKw9qzdN/NUlQasatf+3pww
+	 rDXlePwqtFDbgNiyfX6FGlajRPlybQjQ5Y8WmnDj8gz97R/29KNeVkEIKgkQZj1YMo
+	 I/qszuDnBTihO2kjjZKFbzqWlZ6BksjP4POnno1dBFLU3ekv6ZU4wAV8tihlui9Etf
+	 Xg7RymFER80RGn+G+1zdMkvfh2kFP1wm56gobVaNcMfTtOD2bXobdt8tRgo3wTP8En
+	 Kj1QvaLdI6iBQ==
+Date: Fri, 17 Jan 2025 09:56:30 +0100
+From: Krzysztof Kozlowski <krzk@kernel.org>
+To: Catalin Popescu <catalin.popescu@leica-geosystems.com>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org, 
+	conor+dt@kernel.org, johannes@sipsolutions.net, p.zabel@pengutronix.de, 
+	netdev@vger.kernel.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-wireless@vger.kernel.org, m.felsch@pengutronix.de, 
+	bsp-development.geo@leica-geosystems.com
+Subject: Re: [PATCH net-next v2 1/2] dt-bindings: net: rfkill-gpio: enable
+ booting in blocked state
+Message-ID: <20250117-truthful-reindeer-of-perception-496bd4@krzk-bin>
+References: <20250116084702.3473176-1-catalin.popescu@leica-geosystems.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1tYhxp-001FHf-Ac@rmk-PC.armlinux.org.uk>
-Sender: Russell King <rmk@armlinux.org.uk>
-Date: Fri, 17 Jan 2025 08:44:25 +0000
+In-Reply-To: <20250116084702.3473176-1-catalin.popescu@leica-geosystems.com>
 
-Background: https://lore.kernel.org/r/20250107123615.161095-1-ericwouds@gmail.com
+On Thu, Jan 16, 2025 at 09:47:01AM +0100, Catalin Popescu wrote:
+> By default, rfkill state is set to unblocked. Sometimes, we want to boot
+> in blocked state and let the application unblock the rfkill.
+> 
+> Signed-off-by: Catalin Popescu <catalin.popescu@leica-geosystems.com>
+> ---
+> Changes in v2:
+>  - change "default-blocked" type from boolean to flag
+> ---
+>  Documentation/devicetree/bindings/net/rfkill-gpio.yaml | 5 +++++
+>  1 file changed, 5 insertions(+)
+> 
+> diff --git a/Documentation/devicetree/bindings/net/rfkill-gpio.yaml b/Documentation/devicetree/bindings/net/rfkill-gpio.yaml
+> index 9630c8466fac..4a706a41ab38 100644
+> --- a/Documentation/devicetree/bindings/net/rfkill-gpio.yaml
+> +++ b/Documentation/devicetree/bindings/net/rfkill-gpio.yaml
+> @@ -32,6 +32,10 @@ properties:
+>    shutdown-gpios:
+>      maxItems: 1
+>  
+> +  default-blocked:
+> +    $ref: /schemas/types.yaml#/definitions/flag
+> +    description: configure rfkill state as blocked at boot
 
-Since adding negotiation of in-band capabilities, it is no longer
-sufficient to just look at the MLO_AN_xxx mode and PHY interface to
-decide whether to do a major configuration, since the result now
-depends on the capabilities of the attaching PHY.
+I am assuming rfkill does not have third state possible, so it is only
+off or on.
 
-Always trigger a major configuration in this case.
+Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 
-Testing log: https://lore.kernel.org/r/f20c9744-3953-40e7-a9c9-5534b25d2e2a@gmail.com
-
-Reported-by: Eric Woudstra <ericwouds@gmail.com>
-Tested-by: Eric Woudstra <ericwouds@gmail.com>
-Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
----
- drivers/net/phy/phylink.c | 11 +++++------
- 1 file changed, 5 insertions(+), 6 deletions(-)
-
-diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
-index 66eea3f963d3..d130634d3bc7 100644
---- a/drivers/net/phy/phylink.c
-+++ b/drivers/net/phy/phylink.c
-@@ -3541,12 +3541,11 @@ static phy_interface_t phylink_choose_sfp_interface(struct phylink *pl,
- 	return interface;
- }
- 
--static void phylink_sfp_set_config(struct phylink *pl,
--				   unsigned long *supported,
--				   struct phylink_link_state *state)
-+static void phylink_sfp_set_config(struct phylink *pl, unsigned long *supported,
-+				   struct phylink_link_state *state,
-+				   bool changed)
- {
- 	u8 mode = MLO_AN_INBAND;
--	bool changed = false;
- 
- 	phylink_dbg(pl, "requesting link mode %s/%s with support %*pb\n",
- 		    phylink_an_mode_str(mode), phy_modes(state->interface),
-@@ -3623,7 +3622,7 @@ static int phylink_sfp_config_phy(struct phylink *pl, struct phy_device *phy)
- 
- 	pl->link_port = pl->sfp_port;
- 
--	phylink_sfp_set_config(pl, support, &config);
-+	phylink_sfp_set_config(pl, support, &config, true);
- 
- 	return 0;
- }
-@@ -3698,7 +3697,7 @@ static int phylink_sfp_config_optical(struct phylink *pl)
- 
- 	pl->link_port = pl->sfp_port;
- 
--	phylink_sfp_set_config(pl, pl->sfp_support, &config);
-+	phylink_sfp_set_config(pl, pl->sfp_support, &config, false);
- 
- 	return 0;
- }
--- 
-2.30.2
+Best regards,
+Krzysztof
 
 
