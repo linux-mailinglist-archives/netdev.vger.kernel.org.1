@@ -1,160 +1,150 @@
-Return-Path: <netdev+bounces-159297-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159298-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E9DCA14FD6
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 14:01:13 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 54EC3A1500D
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 14:06:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DF95D3A8D6E
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 13:01:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7FB2F16444F
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 13:06:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E621D1FDE1B;
-	Fri, 17 Jan 2025 13:01:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4542A1FF608;
+	Fri, 17 Jan 2025 13:06:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="D1upPy8o"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HkBoyQep"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B1161D8E12;
-	Fri, 17 Jan 2025 13:01:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80FB61FCCEE
+	for <netdev@vger.kernel.org>; Fri, 17 Jan 2025 13:06:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737118869; cv=none; b=QsbKSrQV23x/oDUmrDvmjskpS0GE+4ZsIbI47IDx59q7KnF2BasZb9zI44nSNX1e1F2RWnbCH3mg17iVllG/vSJ1a9HADL2thBvr7/7dfAUrWWy7iWBGNtBRS7eZjKIDcnoWK7oY0xmOwTBFH5meuo40rkT7jUHpZCSJ/F9uDVQ=
+	t=1737119167; cv=none; b=ffCh6kilOo00fhKli461338BHeGbIA8hbdHz4xpW0Y8vMhxwedwTJQXFniIJ5PRtrPl0VUOCGJDfnPNm+wwrdrLi7+XeacxjFStdXNtEsb+493Ux1rKhjJqIC5IMPSYqwlg1nCnZHiMtFJLoNyj7NM8pm6V4El58krWc5DoCzKE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737118869; c=relaxed/simple;
-	bh=DtBqAiwYn1HCqeIYoElglq++muGygnstVIbpQUGUEaY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=EihlBMBrqsXb1CPMseG5d9hf+NmPduLVFAOITRkCzm95yNwRt5Z6bZUdVjdIEayAac49bOtfJtl/8vmdc7nsrhJA73V2Se54zNWETntlwwRxi0MlIIvLd8asMZNKbPo9krOhYUICB+gwd19KhCCQI/FEUV1mdr6uoRo2VYd0Wic=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=D1upPy8o; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50H3qZwa025351;
-	Fri, 17 Jan 2025 13:01:01 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=VVs+K3
-	EeTYV4VAov0c8Y1wSaOO4Xz6nw+zDYObs71SM=; b=D1upPy8oNwiZdMER5PcS/6
-	N8GKU40nSSifdc/HS7vd/WkCfsL5hXBINDpouud2Yq4nZPKHC3MNX4U6SI2QY/Xq
-	pgSq/sLQTtKGxdQeQieM+/6csIbfc4iGAwpSPQTAamGpQ46mJYb5/isQNG67qj82
-	ctpjxEy4m4YBSXs+eN4XStUTsET+7c6JVFa+vewyBUk/eRin7Sk7RQF0Cy0xcqPw
-	84cwZuT7K3tLsokKPhz3fGijFo3CLIeolpgieObZMqMACvvVf6WktUSfA9/75HVw
-	DzmK+SREgM/4pF/eAMQFeZSFEMqNNWqYrQbPbEo57G5CnQwS95Y7KPFOvEbbqgHA
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 447fpca7wk-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 17 Jan 2025 13:01:01 +0000 (GMT)
-Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 50HCoqkV017532;
-	Fri, 17 Jan 2025 13:01:01 GMT
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 447fpca7wf-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 17 Jan 2025 13:01:00 +0000 (GMT)
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 50HA2Zhm016976;
-	Fri, 17 Jan 2025 13:00:59 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4444fkjwph-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 17 Jan 2025 13:00:59 +0000
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 50HD0tQR18612708
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 17 Jan 2025 13:00:56 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id D8A4C2004B;
-	Fri, 17 Jan 2025 13:00:55 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id DD8CF20043;
-	Fri, 17 Jan 2025 13:00:54 +0000 (GMT)
-Received: from [9.171.79.45] (unknown [9.171.79.45])
-	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 17 Jan 2025 13:00:54 +0000 (GMT)
-Message-ID: <80330f0e-d769-4251-be2f-a2b5adb12ef2@linux.ibm.com>
-Date: Fri, 17 Jan 2025 14:00:55 +0100
+	s=arc-20240116; t=1737119167; c=relaxed/simple;
+	bh=hQ9e6rbR6HiF0VYlbEEItopkOeT1txabxJnTwEAQWtI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=VUHENXQtRzQ0qbAJX1BeaPSEABfh1qJLHHySje1s9YRuSOkMtir9IchK4sUmQ+0Iih/LVXpaAd2dUh7vGbIbxVR8DiCaODAVNzWwgtGwD5nDUXJDZRSusYnogwx9gTvEViYU/siJioGNBxosIj/v+gfoDJ9Mvwk+26tPk3kwprw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HkBoyQep; arc=none smtp.client-ip=209.85.128.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-43618283d48so13903835e9.1
+        for <netdev@vger.kernel.org>; Fri, 17 Jan 2025 05:06:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1737119164; x=1737723964; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MffWZy2qG7Y6JWmoh4iHVpcAaSZTVr3Q5Le/78Z0tU4=;
+        b=HkBoyQepFj8rA5LGyw8tTJKgtRmFNoVD9Y8hi45fLgT11oV9fEnnPbgx94MHnRmjcH
+         09lzG3ZtHg2HBruL6G57oD8pLqWF/ECuo/e37bNxraU6ZI7BgjEV9QsP7Lh01bDOwQoJ
+         zD/xbykgjgMct0c5Nnjb2wx9TO6oLm+5jz7f7R8shtyhJf6uEf6quonrXHeKuAe5642N
+         SIGgBb6FkDIB9zC7uGqBWDHSOocTevDQ1uzZohY754ItlHOG3nrtAA+Z1k9n0XSmSMgZ
+         Syn7BCgX4S8j4yynsJD6LFGWzCH9/y03WkPwFmsFEB4AgbJY0dDsKDiJfIt4B4siNaCW
+         Qs9g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737119164; x=1737723964;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=MffWZy2qG7Y6JWmoh4iHVpcAaSZTVr3Q5Le/78Z0tU4=;
+        b=Vm9h/SSUAEYgW+UjVEUcFKLR8mGZl1JLcKHWk/48fdKs7JYx+IlbdH6emWvE7aHmMV
+         Tajy/BL8Na5wqMfWWsU9tYcIHn7GzKy88uviT6gFy6sWEF4q4puvTML7afU1MHKeKKar
+         gh/p6ETQzigv1zuGihtIJG5hLA3F5YAo+BDCidDHYuFEy8kD+Iy1/66FTlBheNGNg8Op
+         vvCXZguT8kXH0LbYogieaxHXBrRi31XdxZy26s2yTVlGAuaGWZ4OyRrWyK+tthDSBaSQ
+         OAcEg8x/R9Vw4oi90QTi1Ut1/Bor6cfhS6NwYGJ/t9CufCl7MCDYWU/ymo8iPHPJ0vwu
+         y2jg==
+X-Forwarded-Encrypted: i=1; AJvYcCVoFahq7cbfweF26fbJjQjfc38QNZ+hagg1TdJsgXn6CarVTCvRL5pbW7hYuBdT77Y05fCDpq4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyxJiq2mAz+ehaW1NUWWadM0GALeJ5hRXEW8R9xmrbaZCpgCvao
+	2W3Vae8kSqRm+0xlWHGJhsSrQtNcMrg460AE6ItUlBkkVUNvsArOOkXPQORv+sXewr1wKnLNNpe
+	nxZDN+rsMSGuyBcBaDm6y5jxu4+EMnNno+r5b
+X-Gm-Gg: ASbGncvsDgBQDcgNPgsZaPaO6KvUyDr8Ic+A6jCqnkmCLptL/6RJKm2BajVr+2qDVXC
+	hJRSEk61enB8K0CCneQH36WiJEb4emHFr8U6d5Ic=
+X-Google-Smtp-Source: AGHT+IFIrgN0kXkKi1laseLg/MV2oUQuJQaUgpoC2ZJDGiSWy3dT9jT1ButtO2C/XovaEoCIWMhN7wBieoH1VVtyfF8=
+X-Received: by 2002:a05:6000:2a9:b0:38a:2798:c3e0 with SMTP id
+ ffacd0b85a97d-38bf57c9b83mr2372799f8f.54.1737119163705; Fri, 17 Jan 2025
+ 05:06:03 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC net-next 0/7] Provide an ism layer
-Content-Language: en-US
-To: dust.li@linux.alibaba.com, Julian Ruess <julianr@linux.ibm.com>,
-        Wenjia Zhang <wenjia@linux.ibm.com>, Jan Karcher <jaka@linux.ibm.com>,
-        Gerd Bayer <gbayer@linux.ibm.com>, Halil Pasic <pasic@linux.ibm.com>,
-        "D. Wythe" <alibuda@linux.alibaba.com>,
-        Tony Lu <tonylu@linux.alibaba.com>, Wen Gu <guwen@linux.alibaba.com>,
-        Peter Oberparleiter
- <oberpar@linux.ibm.com>,
-        David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
-        Andrew Lunn <andrew+netdev@lunn.ch>
-Cc: Niklas Schnelle <schnelle@linux.ibm.com>,
-        Thorsten Winkler <twinkler@linux.ibm.com>, netdev@vger.kernel.org,
-        linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev
- <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>, Simon Horman <horms@kernel.org>
-References: <20250115195527.2094320-1-wintera@linux.ibm.com>
- <20250116093231.GD89233@linux.alibaba.com>
- <D73H7Q080GUQ.3BDOH23P4WDOL@linux.ibm.com>
- <0f96574a-567e-495a-b815-6aef336f12e6@linux.ibm.com>
- <20250117021353.GF89233@linux.alibaba.com>
-From: Alexandra Winter <wintera@linux.ibm.com>
-In-Reply-To: <20250117021353.GF89233@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: SeGWHKV7ATYFQYJvRA1LeG8J6pmYe63s
-X-Proofpoint-GUID: 5ZWIpIwTbc2xkdAZUOLSN3Eiew2tp0C4
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-01-17_05,2025-01-16_01,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
- impostorscore=0 mlxlogscore=258 spamscore=0 malwarescore=0 clxscore=1015
- priorityscore=1501 mlxscore=0 phishscore=0 adultscore=0 lowpriorityscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2411120000 definitions=main-2501170105
+References: <20250117.165326.1882417578898126323.fujita.tomonori@gmail.com>
+ <20250117.180147.1155447135795143952.fujita.tomonori@gmail.com>
+ <CAH5fLggUGT83saC++M-kd57bGvWj5dwAgbWZ95r+PHz_B67NLQ@mail.gmail.com> <20250117.185501.1171065234025373111.fujita.tomonori@gmail.com>
+In-Reply-To: <20250117.185501.1171065234025373111.fujita.tomonori@gmail.com>
+From: Alice Ryhl <aliceryhl@google.com>
+Date: Fri, 17 Jan 2025 14:05:52 +0100
+X-Gm-Features: AbW1kvbrFl85FFffgJR887ohWA8nRSfhdN_SJdP7V78TZ56SODUNWQNtZKv4CjU
+Message-ID: <CAH5fLghqbY4UKQ2n1XVKPtvnLfJ4ceh+2aNpVmm9WxbUTu8-GQ@mail.gmail.com>
+Subject: Re: [PATCH v8 4/7] rust: time: Add wrapper for fsleep function
+To: FUJITA Tomonori <fujita.tomonori@gmail.com>
+Cc: linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org, 
+	netdev@vger.kernel.org, andrew@lunn.ch, hkallweit1@gmail.com, 
+	tmgross@umich.edu, ojeda@kernel.org, alex.gaynor@gmail.com, gary@garyguo.net, 
+	bjorn3_gh@protonmail.com, benno.lossin@proton.me, a.hindborg@samsung.com, 
+	anna-maria@linutronix.de, frederic@kernel.org, tglx@linutronix.de, 
+	arnd@arndb.de, jstultz@google.com, sboyd@kernel.org, mingo@redhat.com, 
+	peterz@infradead.org, juri.lelli@redhat.com, vincent.guittot@linaro.org, 
+	dietmar.eggemann@arm.com, rostedt@goodmis.org, bsegall@google.com, 
+	mgorman@suse.de, vschneid@redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Fri, Jan 17, 2025 at 10:55=E2=80=AFAM FUJITA Tomonori
+<fujita.tomonori@gmail.com> wrote:
+>
+> On Fri, 17 Jan 2025 10:13:08 +0100
+> Alice Ryhl <aliceryhl@google.com> wrote:
+>
+> > On Fri, Jan 17, 2025 at 10:01=E2=80=AFAM FUJITA Tomonori
+> > <fujita.tomonori@gmail.com> wrote:
+> >>
+> >> On Fri, 17 Jan 2025 16:53:26 +0900 (JST)
+> >> FUJITA Tomonori <fujita.tomonori@gmail.com> wrote:
+> >>
+> >> > On Thu, 16 Jan 2025 10:27:02 +0100
+> >> > Alice Ryhl <aliceryhl@google.com> wrote:
+> >> >
+> >> >>> +/// This function can only be used in a nonatomic context.
+> >> >>> +pub fn fsleep(delta: Delta) {
+> >> >>> +    // The argument of fsleep is an unsigned long, 32-bit on 32-b=
+it architectures.
+> >> >>> +    // Considering that fsleep rounds up the duration to the near=
+est millisecond,
+> >> >>> +    // set the maximum value to u32::MAX / 2 microseconds.
+> >> >>> +    const MAX_DURATION: Delta =3D Delta::from_micros(u32::MAX as =
+i64 >> 1);
+> >> >>
+> >> >> Hmm, is this value correct on 64-bit platforms?
+> >> >
+> >> > You meant that the maximum can be longer on 64-bit platforms? 214748=
+4
+> >> > milliseconds is long enough for fsleep's duration?
+> >> >
+> >> > If you prefer, I use different maximum durations for 64-bit and 32-b=
+it
+> >> > platforms, respectively.
+> >>
+> >> How about the following?
+> >>
+> >> const MAX_DURATION: Delta =3D Delta::from_micros(usize::MAX as i64 >> =
+1);
+> >
+> > Why is there a maximum in the first place? Are you worried about
+> > overflow on the C side?
+>
+> Yeah, Boqun is concerned that an incorrect input (a negative value or
+> an overflow on the C side) leads to unintentional infinite sleep:
+>
+> https://lore.kernel.org/lkml/ZxwVuceNORRAI7FV@Boquns-Mac-mini.local/
 
+Okay, can you explain in the comment that this maximum value prevents
+integer overflow inside fsleep?
 
-On 17.01.25 03:13, Dust Li wrote:
->>>> Modular Approach: I've made the ism_loopback an independent kernel
->>>> module since dynamic enable/disable functionality is not yet supported
->>>> in SMC. Using insmod and rmmod for module management could provide the
->>>> flexibility needed in practical scenarios.
->>
->> With this proposal ism_loopback is just another ism device and SMC-D will
->> handle removal just like ism_client.remove(ism_dev) of other ism devices.
->>
->> But I understand that net/smc/ism_loopback.c today does not provide enable/disable,
->> which is a big disadvantage, I agree. The ism layer is prepared for dynamic
->> removal by ism_dev_unregister(). In case of this RFC that would only happen
->> in case of rmmod ism. Which should be improved.
->> One way to do that would be a separate ism_loopback kernel module, like you say.
->> Today ism_loopback is only 10k LOC, so I'd be fine with leaving it in the ism module.
->> I also think it is a great way for testing any ISM client, so it has benefit for
->> anybody using the ism module.
->> Another way would be e.g. an 'enable' entry in the sysfs of the loopback device.
->> (Once we agree if and how to represent ism devices in genera in sysfs).
-> This works for me as well. I think it would be better to implement this
-> within the common ISM layer, rather than duplicating the code in each
-> device. Similar to how it's done in netdevice.
-> 
-> Best regards,
-> Dust
-
-
-Is there a specific example for enable/disable in the netdevice code, you have in mind?
-Or do you mean in general how netdevice provides a common layer?
-Yes, everything that is common for all devices should be provided by the network layer.
+Alice
 
