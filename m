@@ -1,99 +1,149 @@
-Return-Path: <netdev+bounces-159241-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159242-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D497A14E3E
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 12:13:12 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F655A14E58
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 12:21:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 498E71681C0
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 11:13:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C75753A8182
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 11:21:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 879881FCFF0;
-	Fri, 17 Jan 2025 11:13:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 892AB1FCF47;
+	Fri, 17 Jan 2025 11:21:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V6yL5boe"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.netfilter.org (unknown [217.70.188.207])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D58AE1F7577;
-	Fri, 17 Jan 2025 11:13:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.188.207
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DBA446BF;
+	Fri, 17 Jan 2025 11:21:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737112388; cv=none; b=KX7GyF51JSO22NhgVUhtBkSg+8eVbPzyg/CPKSfDZ60u6F34dcYM1V8dXaLj8R3rTiapzsXrUAFam8vKss94XJs/9jUt2OjaYmTK7L44FUxWwcyQmiPNwAEvXXV7a2Gi2onP1SsYqwL4wkz11FzsK60ZgG7fXt74sMSSQy57lw4=
+	t=1737112890; cv=none; b=VKfKBlugiNBE7xoZrmOBsNri1N4vqUPjYgNLjroQkDRkRtZAMi2UZrwWXo12ZCdHYz91oscXzc0nBzSYr3nrPPnmubkppZ+yGs0RxiQyiax0Ui8n9NFSG9JqWwaksuXpZsdfZDiwJRveYy6e2n8ES72mlUlN2pE6y5KvcmKR6O0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737112388; c=relaxed/simple;
-	bh=XUX+55rtMQoeYlACZI4MM+XpjNlzl2KjWCDqK2xitTo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=P6DlWYdhAMTwPksi9R3itA/B8lDhEVooPblxWECqbcR4BVMQu3q7xV583r+qDVZXpw46ZaxZdKUpn4Z1yWKktt3pdsWfKr7ZJx2GpYLFZbSl8/Ys418LustUXlyi66AvXKXvhrbH412uinh7/37Zeby7lmerVWdThXatJsreVus=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; arc=none smtp.client-ip=217.70.188.207
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
-Date: Fri, 17 Jan 2025 12:12:49 +0100
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: Simon Horman <horms@kernel.org>
-Cc: netfilter-devel@vger.kernel.org, davem@davemloft.net,
-	netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
-	edumazet@google.com, fw@strlen.de
-Subject: Re: [PATCH net-next 01/14] netfilter: nf_tables: fix set size with
- rbtree backend
-Message-ID: <Z4o6-xme3AbmzrYW@calendula>
-References: <20250116171902.1783620-1-pablo@netfilter.org>
- <20250116171902.1783620-2-pablo@netfilter.org>
- <20250117104957.GK6206@kernel.org>
+	s=arc-20240116; t=1737112890; c=relaxed/simple;
+	bh=Co1DCFjxxhpAid1mrlCPz2pqOzEgHOBfgr4SL6G6rZs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=cs6pxyGcIuaQb9y+cZRpikSM0P9SmCx0BBxR7TMtV0SPfb2npodNy5sygOZlNdZs9U5kl7AufIDp21XQlvzDgTIAtN1ihUgQSXRlDSqjoYercxwF1NiJvvYq4rWe9RA/UwLz3ycOYZOWFjMJLH9Mn+NOkAWbmwgS64MEM0eHJHM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V6yL5boe; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C0E9AC4CEDD;
+	Fri, 17 Jan 2025 11:21:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1737112890;
+	bh=Co1DCFjxxhpAid1mrlCPz2pqOzEgHOBfgr4SL6G6rZs=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=V6yL5boevwWP7qcydTLn7xbocKRIlTz/tBZU8fDeETvQj9XFWELK2TM/r06PMFxTz
+	 peenXRgNt1Gj1HMZNmE0g5kq7S0PQnARHTnPKD1YtP+TR9wHWFSbXSsd9w6P/r0dn+
+	 PeVAn5OXAgN0DxszVFfLXlZ0htyRVYmKnuqxiV3K9zfwq/yPvaEl+OGjPns2CBtyDV
+	 BxE2TODtT47gNJalCjjnbvkfiBKk/+ZVYSURQy3/sxAoHDc5eGqPAoKd/gtYQYl8iW
+	 jPaDxNkQIWB3QajZk5QhwAD5ZDxM1NVU3HAah6Kui/5pfRkg46S2UReLMVIPn1Y6jn
+	 JKtjYwy/KLQUw==
+Message-ID: <16f25267-059c-4792-9928-a868ac3ee309@kernel.org>
+Date: Fri, 17 Jan 2025 12:21:17 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250117104957.GK6206@kernel.org>
+User-Agent: Mozilla Thunderbird Beta
+Subject: Re: [PATCH net-next] selftests/net: packetdrill: make tcp buf limited
+ timing tests benign
+Content-Language: en-GB
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
+ andrew+netdev@lunn.ch, horms@kernel.org, shuah@kernel.org,
+ willemb@google.com, linux-kselftest@vger.kernel.org, davem@davemloft.net
+References: <20250115232129.845884-1-kuba@kernel.org>
+ <678904353ca7e_3710bc294ef@willemb.c.googlers.com.notmuch>
+From: Matthieu Baerts <matttbe@kernel.org>
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ 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
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <678904353ca7e_3710bc294ef@willemb.c.googlers.com.notmuch>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hi Simon,
+Hi Willem, Jakub,
 
-On Fri, Jan 17, 2025 at 10:49:57AM +0000, Simon Horman wrote:
-> On Thu, Jan 16, 2025 at 06:18:49PM +0100, Pablo Neira Ayuso wrote:
-> > The existing rbtree implementation uses singleton elements to represent
-> > ranges, however, userspace provides a set size according to the number
-> > of ranges in the set.
-> > 
-> > Adjust provided userspace set size to the number of singleton elements
-> > in the kernel by multiplying the range by two.
-> > 
-> > Check if the no-match all-zero element is already in the set, in such
-> > case release one slot in the set size.
-> > 
-> > Fixes: 0ed6389c483d ("netfilter: nf_tables: rename set implementations")
-> > Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
-> > ---
-> >  include/net/netfilter/nf_tables.h |  3 ++
-> >  net/netfilter/nf_tables_api.c     | 49 +++++++++++++++++++++++++++++--
-> >  net/netfilter/nft_set_rbtree.c    | 43 +++++++++++++++++++++++++++
-> >  3 files changed, 93 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/include/net/netfilter/nf_tables.h b/include/net/netfilter/nf_tables.h
-> > index 0027beca5cd5..7dcea247f853 100644
-> > --- a/include/net/netfilter/nf_tables.h
-> > +++ b/include/net/netfilter/nf_tables.h
-> > @@ -495,6 +495,9 @@ struct nft_set_ops {
-> >  					       const struct nft_set *set,
-> >  					       const struct nft_set_elem *elem,
-> >  					       unsigned int flags);
-> > +	u32				(*ksize)(u32 size);
-> > +	u32				(*usize)(u32 size);
-> > +	u32				(*adjust_maxsize)(const struct nft_set *set);
-> >  	void				(*commit)(struct nft_set *set);
-> >  	void				(*abort)(const struct nft_set *set);
-> >  	u64				(*privsize)(const struct nlattr * const nla[],
-> 
-> Hi Pablo,
-> 
-> As a follow-up could these new fields be added to
-> the Kernel doc for nft_set_ops?
+On 16/01/2025 14:05, Willem de Bruijn wrote:
+> Jakub Kicinski wrote:
+>> The following tests are failing on debug kernels:
+>>
+>>   tcp_tcp_info_tcp-info-rwnd-limited.pkt
+>>   tcp_tcp_info_tcp-info-sndbuf-limited.pkt
 
-Sure, I can do that.
+(...)
 
-I can also send a v2 for this pull request if more comments accumulate.
+> We'll take a look after this change whether we can make these
+> more resilient. But likely also allow-list or even xfail for
+> everything in dbg.
 
-Thanks.
+On MPTCP side, I spent quite a bit of time trying to improve the
+situation on debug kernels. Sure it feels good and reassuring to have
+spent this time understanding the instabilities. Most issues were due to
+spurious retransmissions, because Packetdrill was "too slow" to inject
+replies: so more like an issue in the tests. But I don't know if having
+these tests running in such slow environments helped to find bugs
+directly, e.g. catching unexpected packets. Maybe once? But at what cost?
+
+Still it is good to run them on debug kernels to have extra
+verifications on the kernel side. As Ido mentioned last summer, perhaps
+we can ignore the test results, but keep logging them, and only look at
+the kernel warnings?
+
+So yes, I agree with Willem: if that cannot easily be fixed, ignoring
+packetdrill err code for everything in debug sounds like the right
+direction.
+
+Cheers,
+Matt
+-- 
+Sponsored by the NGI0 Core fund.
+
 
