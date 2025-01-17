@@ -1,224 +1,211 @@
-Return-Path: <netdev+bounces-159385-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159386-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB0DBA155E0
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 18:40:54 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BBEDDA155E9
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 18:44:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 34E6D188D8CC
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 17:40:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 09483188B6D2
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 17:44:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB90F1A072A;
-	Fri, 17 Jan 2025 17:40:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F22E819F461;
+	Fri, 17 Jan 2025 17:44:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rjsPlveI"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="iSOS6Qsd"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 955B620B20;
-	Fri, 17 Jan 2025 17:40:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED081192D84
+	for <netdev@vger.kernel.org>; Fri, 17 Jan 2025 17:44:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737135647; cv=none; b=WkJhi6DGVWGV5hK/gLAFp8dZrg12k/baXXLwCNbULkRZZHTloAmCVkAQgY9jE/8Y1S/AneJnrnLZQLRCQwnNhE0Fxd5BsNMXhfwmUnfWHmfJUvjeuNvhM8ZXu82pijQseT1bLu2eDUkzGTw3mdN7r1opTQ3zR5KUg21c0/w3T8k=
+	t=1737135867; cv=none; b=aHAU4DaRAkTMHeGwGHd9BflRD/ap6npsOgJOcvSbk83eJ6/YFaqFWmgjt+/AVNvKIsKaLOwFH7S+4FfRLMssGvF8N5COXesE3NUMm8pA6DZVyOun5x/bw68Wvg9yYr4WDyV145io7Pxp/k3qpJNXaX5ivPNvfh5TvQcNaw2Ma1Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737135647; c=relaxed/simple;
-	bh=jFuGDsElHAm0qEIO6nUF5QEJFbi0ENxEj18hPsjBiSQ=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=AQXUKEAE2+xCB0KDz2kLRsyjhGhyadgVcalyCrDmok4Yxe2ngchSuvt0aiYDFTDCRsinBJJUGlskcGNYIbKDTURKpQb0+IuHN/G6d5wflJThaDhJtFVriaBbrQRB+Mqz23IAC8/buTIL/MF/LRtH/IA2QVcaXclf6wlrYVPR8gw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rjsPlveI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6E047C4CEDD;
-	Fri, 17 Jan 2025 17:40:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737135647;
-	bh=jFuGDsElHAm0qEIO6nUF5QEJFbi0ENxEj18hPsjBiSQ=;
-	h=From:Date:Subject:To:Cc:From;
-	b=rjsPlveIpkor21bZPfXy8Tj1XjvOte0yF5+pK2RkTCNSkEnZgshM8FM+GJEIp4uUZ
-	 6NJo92Uk74wCjLni0twuNwszDxkuiRMn7w7eCm3QwJzosoRaAuVmCPxhRkPKqmpsEW
-	 sNqHqP7ln4qI5MvjS5OwponU6N/k7EdI5XubebZybAETjgGyn5EL29989h74GwbbS5
-	 nRcVyofArwFwQxyIHMlxSC39VCQnU3J1Jcnqp0KPi5s+1+jJ0tzEcNB8tsiqnyH8UV
-	 UJrftKn9BBrhNgZ8dAaDfUWiRr+Uu377arpyM0EZHhSdBgy+q75yer7ik97KFVJQPN
-	 rxmaGfBGtBCTQ==
-From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-Date: Fri, 17 Jan 2025 18:40:31 +0100
-Subject: [PATCH net-next] mptcp: sysctl: add
- syn_retrans_before_tcp_fallback
+	s=arc-20240116; t=1737135867; c=relaxed/simple;
+	bh=1IuL/qqZXB/pfu99mOQufObNv4sVYnrlfZSwsjw+H7w=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=kycdwWFTpLhxeHWPsvD4Ny1+Hp0hO/xdFuVoBKN9IYvygn2XUjXSTTRs7OzRV+WG/8NL9Ke/q/G409KflT9QLl+Nc1CgnS+7Jc9+CHd0W2SgLRDoDFnvyj8cmV5FUYdRxTh0HrLIiPuuc+d6IW4z61Rwq3qa+1F943H22fCyV8A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=iSOS6Qsd; arc=none smtp.client-ip=209.85.208.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-5da135d3162so3919267a12.3
+        for <netdev@vger.kernel.org>; Fri, 17 Jan 2025 09:44:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1737135864; x=1737740664; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=hy53ahmlf+cPx+01a4uqCOHyr7EE87P4PFBhUsoN6vU=;
+        b=iSOS6Qsdv2obgRmyG1/Ax+Zl6k5Y1DCVy3ZitfWKH9s1OfFOLsp4cBQOH6eCMriI3w
+         ypoXaUbLVQ66OphQO7/VuT1YtKUAB4tVtCjHy31aRzj7KuydV09iblCMMe0+sPUc15IH
+         WfmWsxGZmESmRY2nuydn+QQCoEpyZuQrN772g=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737135864; x=1737740664;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=hy53ahmlf+cPx+01a4uqCOHyr7EE87P4PFBhUsoN6vU=;
+        b=f2peetOarqalDszoyBi8AN3C7dPGy0rWbZHYx16jClTlA1/sSKQLhcjww4XAoKJBuC
+         tiAh5uU0gARBmyrlzTIO03azTKXT9G/Dzn2eCM1QMfe1S7R/i2B6WiyeYw46XNYTKPL2
+         borkz5njydDVxKLKiEG2FFrL7oLwHfRCXwDsfZNjK3PGXGLeCOkuJLQ+77qkm9kUDkrQ
+         25AvC/TV957oaTh5bOb93y3zp2JwUpZpiXbvX5rkVON/hQXORr+3ACx+lLU9IrCz9tnR
+         VWyCwT8CqJZZPCJZBUjxB8NSu/dGu6ZACsUp7EcOzM06Xvt0FLroSDCTAO/yPNxF0Q2Y
+         MgWg==
+X-Forwarded-Encrypted: i=1; AJvYcCVEaW0j8Qr7BzzuwIZG33Hirysy2c0aLtZWh511iePSnMgh6ZVu7SGCFVpjOdY0LQiH6n8L4TU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyU7wInM1QpTHoTIOM2uYzgHREW226FKfjAawLe4HY39x8zk/8n
+	E5gDBABtuUb6Rb17UnbN4P/WbMHUN/IvUefboP6WQdg875MMwJSJoMzHYTnlIbNHJAG2BbNU2b9
+	hpSsYVTZmYBYqqRsO1cd9B9Kkrt4XXZaAl76KoMRdJQun2Gs=
+X-Gm-Gg: ASbGnctM4FrQkbnoyvx7afFLwWfhiDVKTrEaij7Wxu8y7j846xV2XUCaXnah+B6Rdsv
+	LhLnA4GMU0qL39MEP2+CHxyL2KwUVQNkXIKP3m4g=
+X-Google-Smtp-Source: AGHT+IGBPgP/xmRLeJsv8VHwlcWXrRyYzo96aCF59zs5xJVrSNrlcAkWtFtmkIAAXvFnoSKrHZvK8cj9sq/Ql4KwaBw=
+X-Received: by 2002:a05:6402:27cc:b0:5d0:b2c8:8d04 with SMTP id
+ 4fb4d7f45d1cf-5db7d3005b5mr3722843a12.18.1737135864282; Fri, 17 Jan 2025
+ 09:44:24 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250117-net-next-mptcp-syn_retrans_before_tcp_fallback-v1-1-ab4b187099b0@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAA6WimcC/zWNQQrCMBBFr1Jm7UATWixeRSQkcaLBOg0zoVRK7
- 24QXPzF+4v3dlCSTAqXbgehNWteuIE5dRCfnh+E+d4YbG/H3pgzMtW2reK71FhQP+yEqnhWFyg
- tQq7dLvl5Dj6+cEyDCSFOw2QJmrQIpbz9glf4u+B2HF/a6LjuigAAAA==
-X-Change-ID: 20250117-net-next-mptcp-syn_retrans_before_tcp_fallback-5f41bbc8482e
-To: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, 
- Geliang Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
- Jonathan Corbet <corbet@lwn.net>
-Cc: netdev@vger.kernel.org, linux-doc@vger.kernel.org, 
- linux-kernel@vger.kernel.org, "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=5317; i=matttbe@kernel.org;
- h=from:subject:message-id; bh=jFuGDsElHAm0qEIO6nUF5QEJFbi0ENxEj18hPsjBiSQ=;
- b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBnipYcdIvV7UlaIjx/I/1bUxaO31uZKd87UDQkW
- IkDLkWoeXCJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZ4qWHAAKCRD2t4JPQmmg
- c64/D/9Y04eRrG73ab0V6M0LksxmXeBlo3DMHBWvOs+ar29VF1BTOwgxPvnmTGg4xcd3ZrnyFyJ
- f02ArLHyE8OYOuZwqnsB79bKHB3dmcxfcO4FbTAP7GcZVYn8V9sxrxcTSekIMzeMILZFDVwup6v
- cfEGA5DQJ85VmkOC23d9gkDvEXQbwEH87LisWQ+mF3Zp1lEmYDShC+y/bAnZtnIcFcXbzBri8IH
- 3/OhmIsCsc+B6LXaafwcEpuBCu5809z3c3ckkrExrD5PREoQOR7O42WjXKS1JOzgQOSBvgTSC0M
- AerjjV3MhRKmHWmFHKUgqGEOwlfHB1d84RhrAepJy0HRei3xTCZ8ZAti1nzcpU0fBQsUR9mCkHj
- LJzCWx+wJ+hcU6D9X4UGdvnqAxCnafp/z47Hix+wYtNWiOTNTVT1KeMGSBghkaKQnPDi177mu/L
- 1KRJo8BflSg1I5dK77DXjqNIDATN5rf3NNPbr6qTb9+Hgql9p+FBg1sgKquZ5K1tz8ECxGc67u9
- EDW1lCVrE+A/0bwSsLYF1j2mMVV1F0/fckTAcxW+Nol5PomljHTXzvpl+T7DVqr+xp0PfISGV6j
- e9cnJ/7S4Le+xlAGiVqJERSpGxFr2qmuXYDIuPh4UtDmt621VDDrTNMzI/qhX+QWSHdcV8vpTJ5
- J19V+cFN/s7Hi8g==
-X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
- fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
+References: <20250117-frisky-macho-bustard-e92632@leitao>
+In-Reply-To: <20250117-frisky-macho-bustard-e92632@leitao>
+From: Michael Chan <michael.chan@broadcom.com>
+Date: Fri, 17 Jan 2025 09:44:12 -0800
+X-Gm-Features: AbW1kvaQN0nFOhJev7LK5E9pFFghRLLGVCygRQWTihGq_pbr48TrY6W3X5uNpb4
+Message-ID: <CACKFLik4bdefMtUe_CjKcQuekadPj+kqExUnNrim2qiyyhG-QQ@mail.gmail.com>
+Subject: Re: bnxt_en: NETDEV WATCHDOG in 6.13-rc7
+To: Breno Leitao <leitao@debian.org>
+Cc: pavan.chebbi@broadcom.com, netdev@vger.kernel.org, kuba@kernel.org, 
+	kernel-team@meta.com
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="0000000000002309f7062bea76d1"
 
-The number of SYN + MPC retransmissions before falling back to TCP was
-fixed to 2. This is certainly a good default value, but having a fixed
-number can be a problem in some environments.
+--0000000000002309f7062bea76d1
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The current behaviour means that if all packets are dropped, there will
-be:
+On Fri, Jan 17, 2025 at 4:08=E2=80=AFAM Breno Leitao <leitao@debian.org> wr=
+ote:
 
-- The initial SYN + MPC
+>          Showing all locks held in the system:
 
-- 2 retransmissions with MPC
+>          7 locks held by kworker/u144:3/208:
+>          4 locks held by kworker/u144:4/290:
+>           #0: ffff88811db39948 ((wq_completion)bnxt_pf_wq){+.+.}-{0:0}, a=
+t: process_one_work+0x1090/0x1950
+>           #1: ffffc9000303fda0 ((work_completion)(&bp->sp_task)){+.+.}-{0=
+:0}, at: process_one_work+0x7eb/0x1950
+>           #2: ffffffff86f71208 (rtnl_mutex){+.+.}-{4:4}, at: bnxt_reset+0=
+x30/0xa0
+>           #3: ffff88811e41d160 (&bp->hwrm_cmd_lock){+.+.}-{4:4}, at: __hw=
+rm_send+0x2f6/0x28d0
 
-- The next ones will be without MPTCP.
+Since there is TX timeout, we will call bnxt_reset() from
+bnxt_sp_task() workqueue.  rtnl_lock will be held and we will hold the
+hwrm_cmd_lock mutex for every command we send to the firmware.
+Perhaps there is a problem communicating with the firmware.  This will
+cause the firmware command to timeout in about a second with these
+locks held.  We send many commands to the firmware and this can take a
+while if firmware is not responding.
 
-So typically ~3 seconds before falling back to TCP. In some networks
-where some temporally blackholes are unfortunately frequent, or when a
-client tries to initiate connections while the network is not ready yet,
-this can cause new connections not to have MPTCP connections.
+>          3 locks held by kworker/u144:6/322:
+>           #0: ffff88810812a948 ((wq_completion)events_unbound){+.+.}-{0:0=
+}, at: process_one_work+0x1090/0x1950
+>           #1: ffffc90003a4fda0 ((linkwatch_work).work){+.+.}-{0:0}, at: p=
+rocess_one_work+0x7eb/0x1950
+>           #2: ffffffff86f71208 (rtnl_mutex){+.+.}-{4:4}, at: linkwatch_ev=
+ent+0xe/0x60
 
-In such environments, it is now possible to increase the number of SYN
-retransmissions with MPTCP options to make sure MPTCP is used.
+Meanwhile linkwatch is trying to get the rtnl_lock.
 
-Interesting values are:
+>
+>
+> Full log at https://pastebin.com/4pWmaayt
+>
 
-- 0: the first retransmission will be done without MPTCP options: quite
-     aggressive, but also a higher risk of detecting false-positive
-     MPTCP blackholes.
+I will take a closer look at the full log today.  Thanks.
 
-- >= 128: all SYN retransmissions will keep the MPTCP options: back to
-          the < 6.12 behaviour.
+--0000000000002309f7062bea76d1
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
 
-The default behaviour is not changed here.
-
-Reviewed-by: Mat Martineau <martineau@kernel.org>
-Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
----
- Documentation/networking/mptcp-sysctl.rst | 16 ++++++++++++++++
- net/mptcp/ctrl.c                          | 21 +++++++++++++++++----
- 2 files changed, 33 insertions(+), 4 deletions(-)
-
-diff --git a/Documentation/networking/mptcp-sysctl.rst b/Documentation/networking/mptcp-sysctl.rst
-index 95598c21fc8e8782533bbc6a36de63bb465c297c..dc45c02113537b98dff76a6ed431c0449b5217f8 100644
---- a/Documentation/networking/mptcp-sysctl.rst
-+++ b/Documentation/networking/mptcp-sysctl.rst
-@@ -108,3 +108,19 @@ stale_loss_cnt - INTEGER
- 	This is a per-namespace sysctl.
- 
- 	Default: 4
-+
-+syn_retrans_before_tcp_fallback - INTEGER
-+	The number of SYN + MP_CAPABLE retransmissions before falling back to
-+	TCP, i.e. dropping the MPTCP options. In other words, if all the packets
-+	are dropped on the way, there will be:
-+
-+	* The initial SYN with MPTCP support
-+	* This number of SYN retransmitted with MPTCP support
-+	* The next SYN retransmissions will be without MPTCP support
-+
-+	0 means the first retransmission will be done without MPTCP options.
-+	>= 128 means that all SYN retransmissions will keep the MPTCP options. A
-+	lower number might increase false-positive MPTCP blackholes detections.
-+	This is a per-namespace sysctl.
-+
-+	Default: 2
-diff --git a/net/mptcp/ctrl.c b/net/mptcp/ctrl.c
-index b0dd008e2114bce65ee3906bbdc19a5a4316cefa..3999e0ba2c35b50c36ce32277e0b8bfb24197946 100644
---- a/net/mptcp/ctrl.c
-+++ b/net/mptcp/ctrl.c
-@@ -32,6 +32,7 @@ struct mptcp_pernet {
- 	unsigned int close_timeout;
- 	unsigned int stale_loss_cnt;
- 	atomic_t active_disable_times;
-+	u8 syn_retrans_before_tcp_fallback;
- 	unsigned long active_disable_stamp;
- 	u8 mptcp_enabled;
- 	u8 checksum_enabled;
-@@ -92,6 +93,7 @@ static void mptcp_pernet_set_defaults(struct mptcp_pernet *pernet)
- 	pernet->mptcp_enabled = 1;
- 	pernet->add_addr_timeout = TCP_RTO_MAX;
- 	pernet->blackhole_timeout = 3600;
-+	pernet->syn_retrans_before_tcp_fallback = 2;
- 	atomic_set(&pernet->active_disable_times, 0);
- 	pernet->close_timeout = TCP_TIMEWAIT_LEN;
- 	pernet->checksum_enabled = 0;
-@@ -245,6 +247,12 @@ static struct ctl_table mptcp_sysctl_table[] = {
- 		.proc_handler = proc_blackhole_detect_timeout,
- 		.extra1 = SYSCTL_ZERO,
- 	},
-+	{
-+		.procname = "syn_retrans_before_tcp_fallback",
-+		.maxlen = sizeof(u8),
-+		.mode = 0644,
-+		.proc_handler = proc_dou8vec_minmax,
-+	},
- };
- 
- static int mptcp_pernet_new_table(struct net *net, struct mptcp_pernet *pernet)
-@@ -269,6 +277,7 @@ static int mptcp_pernet_new_table(struct net *net, struct mptcp_pernet *pernet)
- 	/* table[7] is for available_schedulers which is read-only info */
- 	table[8].data = &pernet->close_timeout;
- 	table[9].data = &pernet->blackhole_timeout;
-+	table[10].data = &pernet->syn_retrans_before_tcp_fallback;
- 
- 	hdr = register_net_sysctl_sz(net, MPTCP_SYSCTL_PATH, table,
- 				     ARRAY_SIZE(mptcp_sysctl_table));
-@@ -392,17 +401,21 @@ void mptcp_active_enable(struct sock *sk)
- void mptcp_active_detect_blackhole(struct sock *ssk, bool expired)
- {
- 	struct mptcp_subflow_context *subflow;
--	u32 timeouts;
- 
- 	if (!sk_is_mptcp(ssk))
- 		return;
- 
--	timeouts = inet_csk(ssk)->icsk_retransmits;
- 	subflow = mptcp_subflow_ctx(ssk);
- 
- 	if (subflow->request_mptcp && ssk->sk_state == TCP_SYN_SENT) {
--		if (timeouts == 2 || (timeouts < 2 && expired)) {
--			MPTCP_INC_STATS(sock_net(ssk), MPTCP_MIB_MPCAPABLEACTIVEDROP);
-+		struct net *net = sock_net(ssk);
-+		u8 timeouts, to_max;
-+
-+		timeouts = inet_csk(ssk)->icsk_retransmits;
-+		to_max = mptcp_get_pernet(net)->syn_retrans_before_tcp_fallback;
-+
-+		if (timeouts == to_max || (timeouts < to_max && expired)) {
-+			MPTCP_INC_STATS(net, MPTCP_MIB_MPCAPABLEACTIVEDROP);
- 			subflow->mpc_drop = 1;
- 			mptcp_subflow_early_fallback(mptcp_sk(subflow->conn), subflow);
- 		} else {
-
----
-base-commit: 7d2eba0f83a59d360ed1e77ed2778101a6e3c4a1
-change-id: 20250117-net-next-mptcp-syn_retrans_before_tcp_fallback-5f41bbc8482e
-
-Best regards,
--- 
-Matthieu Baerts (NGI0) <matttbe@kernel.org>
-
+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
+OnaLEot1MoQO7BIe5S9H4AcCEXXcrJJiAtMCl47ARpyHmvQFQFFTrHgUYEd9V+9bOzY7MBIGSV1N
+/JfsT1sZw6HT0lJkSQefhPGpBniAob62DJP3qr11tu8CAwEAAaOCAdowggHWMA4GA1UdDwEB/wQE
+AwIFoDCBowYIKwYBBQUHAQEEgZYwgZMwTgYIKwYBBQUHMAKGQmh0dHA6Ly9zZWN1cmUuZ2xvYmFs
+c2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNydDBBBggrBgEFBQcw
+AYY1aHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAw
+TQYDVR0gBEYwRDBCBgorBgEEAaAyASgKMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2Jh
+bHNpZ24uY29tL3JlcG9zaXRvcnkvMAkGA1UdEwQCMAAwSQYDVR0fBEIwQDA+oDygOoY4aHR0cDov
+L2NybC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcmwwJAYDVR0R
+BB0wG4EZbWljaGFlbC5jaGFuQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
+HSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQU31rAyTdZweIF0tJTFYwfOv2w
+L4QwDQYJKoZIhvcNAQELBQADggEBACcuyaGmk0NSZ7Kio7O7WSZ0j0f9xXcBnLbJvQXFYM7JI5uS
+kw5ozATEN5gfmNIe0AHzqwoYjAf3x8Dv2w7HgyrxWdpjTKQFv5jojxa3A5LVuM8mhPGZfR/L5jSk
+5xc3llsKqrWI4ov4JyW79p0E99gfPA6Waixoavxvv1CZBQ4Stu7N660kTu9sJrACf20E+hdKLoiU
+hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
+E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
+aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
+EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIHQhFEjYrwo7/kx3gB3U6LV1naRlUBZe
+LkczIwpJmRi8MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI1MDEx
+NzE3NDQyNFowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
+ATANBgkqhkiG9w0BAQEFAASCAQAA+mIqOyh7P7v64ZEw5jJo7t0WVnXVPCi9bOL4xB56gFrzNdZ2
+Xk4YxKGDHArJHtzfuQ0m9BPjcFwV7Ih4KEnV78opMEROeA0F7123KnpHu0U+E7UBIl+cXK1cT4Q9
+NKJmwfgZTleLkZ7ixOIhDK+o0mvb5YNaiQf+/eKq98QrMbqaScEqu8zpS4nstN3/Z7sYqT/XZwU4
++2jvCtkcgQOyx6q/LHywYPTnKzmhdANNCXCOogkY90AZrlL2fqjgxGDJFnA6E/C5qqsIk2jk4de3
+AdjtQ3BupjqZAi7Xl2gk8CgZOVvfD39lBnuVvlYwxg0qJnr8/gYwNYikh9V31m5e
+--0000000000002309f7062bea76d1--
 
