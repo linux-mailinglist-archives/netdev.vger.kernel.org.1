@@ -1,104 +1,90 @@
-Return-Path: <netdev+bounces-159112-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159113-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38E63A146E9
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 01:06:46 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BBB99A146FD
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 01:17:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9A31D7A3783
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 00:06:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1DD2E188E7F3
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 00:17:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B251F23BE;
-	Fri, 17 Jan 2025 00:06:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E383725A64E;
+	Fri, 17 Jan 2025 00:17:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="rZ6OoCkm"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Qff67ldd"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-177.mta1.migadu.com (out-177.mta1.migadu.com [95.215.58.177])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F19C11362
-	for <netdev@vger.kernel.org>; Fri, 17 Jan 2025 00:06:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B392925A62F;
+	Fri, 17 Jan 2025 00:17:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737072399; cv=none; b=fuNnUSJb308XzST6HnQpryFFWe1hW+F8RocwB7gkd4ZZE/0yYdyY77iMBOdPajlfVNRTY40MmlCPVsF0j8esL9qpHbamCriZCKDfX4uhpxqK7cvYePxowXRtf5yjQZ+7KTDet1TXGwRngTkLXlyyXqpgp3xVmouksdlDU4mR7TY=
+	t=1737073049; cv=none; b=ZlAhOr/4934mXaDnOU67BG1osaSnuv85Qjou5G58ysrrcJfwZzpWY3VzaqpxDFItfCLtyL0bKg4KANu+kDMmlMF7TdRJ+eAcFcU1A85Ytkz9m+KIIoIRN49Agt8rr6qV9c19jrkVN8yA3CHyZ7FJaQeLtj4Ogc9g4umu2oe2dVo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737072399; c=relaxed/simple;
-	bh=W+/ZMCFfF8UkxRFqpc3P08yqu1zQ/77bHNhaViYZCio=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ecW6Sv2/lSNT47sAsBwHx0IZRpiSY4aBhflU6sKa5b9t6vcX41JMgQHxm7DY9awHBqD4kzTHboZfhKbUR9D69QRtu9kwsJp9cCi8P8TH1CxazDVhG/Uz/4NPQVyg7j9oeSDWKY6KEjploWnPRxoEqh8/4CkZPGh2GQZPUmVB/J8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=rZ6OoCkm; arc=none smtp.client-ip=95.215.58.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <6645ad6e-8874-44c5-8730-854c30673218@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1737072386;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8FEV71PljjkgDpPNVt8LCNrRV5CglqTpIhlGFqVJkgI=;
-	b=rZ6OoCkmqqFXSQJQZqe8jN+35THxZCl41T61VqJOv+fJ1WxZ9/FDTuqQLGwsO94rndYxI1
-	0DEWcr6/CI5iD5+vwsbYv/Bz0cZPcKh+KL8vnebvk/9btngqIY2dpIdkMkvkBS8dp9AlrY
-	fw+s9KawbA8yfGTBH/97htQ9IYafBns=
-Date: Thu, 16 Jan 2025 16:06:17 -0800
+	s=arc-20240116; t=1737073049; c=relaxed/simple;
+	bh=a/+eIgBYU6NyUzeRruBfxpDtxqLfwtNUZUkOPdqV+qE=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ZOvYNX+X0o3BfusX67eSPRRf6yFCxlqGRj3ZUSD58OYCmfWNoAnksIA4Oee0PBN1QVK/wHapTitsLDddOCaS7bIHTnbxp7u2bnjT5rJylxB51eUB1t+/K+roHGKo58lk+520BLDPnMlhELmsq9wEXvjH3rTyU9OvR0Db4I7BXd4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Qff67ldd; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A60EEC4CED6;
+	Fri, 17 Jan 2025 00:17:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1737073049;
+	bh=a/+eIgBYU6NyUzeRruBfxpDtxqLfwtNUZUkOPdqV+qE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Qff67lddtY+hcjOQuwaA234+g9CsctOX+DCNiwvdHTmX7clnPNfJ/InGVdoNGnZgX
+	 S6phN9HpeUcUotBGrtfTnnolLmQtbIl4vtFL+a4YnCdY4sxZPO6oweIhTCzLYw/QZQ
+	 Fmqq4ZD8Cg3qa0DGIE3Dnq5qtIZl8DpC7eDh8sua69mpnYW6/qwBrkZ3QxsfisVJn2
+	 pAtLxeCbcojE03O/M/AoZsSNHv7sDEUlZmDGsb8Vs4WiHIPXKCiv0HoC2B+/21vhjy
+	 qMDbp3wK0MGK2tiC748c35bHa2yipubJ0vD1NhbGhznHpY9/q0zQIpVU2YEuwMKuxH
+	 Zo2MsNgSctslg==
+Date: Thu, 16 Jan 2025 16:17:27 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Roman Kisel <romank@linux.microsoft.com>
+Cc: Thorsten Blum <thorsten.blum@linux.dev>, "K. Y. Srinivasan"
+ <kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu
+ <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ linux-hardening@vger.kernel.org, linux-hyperv@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] hv_netvsc: Replace one-element array with flexible
+ array member
+Message-ID: <20250116161727.19a3bbb0@kernel.org>
+In-Reply-To: <0927ebf9-db17-49f5-a188-e0d486ae4bda@linux.microsoft.com>
+References: <20250116211932.139564-2-thorsten.blum@linux.dev>
+	<0927ebf9-db17-49f5-a188-e0d486ae4bda@linux.microsoft.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next/net v2 0/7] bpf: Add mptcp_subflow bpf_iter
- support
-To: Matthieu Baerts <matttbe@kernel.org>
-Cc: Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
- Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
- Yonghong Song <yonghong.song@linux.dev>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, Mykola Lysenko <mykolal@fb.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
- linux-kselftest@vger.kernel.org, Martin KaFai Lau <martin.lau@kernel.org>,
- mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>,
- Geliang Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Shuah Khan <shuah@kernel.org>
-References: <20241219-bpf-next-net-mptcp-bpf_iter-subflows-v2-0-ae244d3cdbbc@kernel.org>
- <1ff05fca-28ff-491e-ab4e-b562d310359b@kernel.org>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-Content-Language: en-US
-In-Reply-To: <1ff05fca-28ff-491e-ab4e-b562d310359b@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
 
-On 1/15/25 1:39 AM, Matthieu Baerts wrote:
->> Here is a series from Geliang, adding mptcp_subflow bpf_iter support.
->>
->> We are working on extending MPTCP with BPF, e.g. to control the path
->> manager -- in charge of the creation, deletion, and announcements of
->> subflows (paths) -- and the packet scheduler -- in charge of selecting
->> which available path the next data will be sent to. These extensions
->> need to iterate over the list of subflows attached to an MPTCP
->> connection, and do some specific actions via some new kfunc that will be
->> added later on.
+On Thu, 16 Jan 2025 13:39:52 -0800 Roman Kisel wrote:
+> On 1/16/2025 1:19 PM, Thorsten Blum wrote:
+> > Replace the deprecated one-element array with a modern flexible array
+> > member in the struct nvsp_1_message_send_receive_buffer_complete.
+> > 
+> > Use struct_size_t(,,1) instead of sizeof() to maintain the same size.  
 > 
-> (...)
+> Thanks!
 > 
->> Changes in v2:
->> - Patches 1-2: new ones.
->> - Patch 3: remove two kfunc, more restrictions. (Martin)
->> - Patch 4: add BUILD_BUG_ON(), more restrictions. (Martin)
->> - Patch 7: adaptations due to modifications in patches 1-4.
->> - Link to v1: https://lore.kernel.org/r/20241108-bpf-next-net-mptcp-bpf_iter-subflows-v1-0-cf16953035c1@kernel.org
+> > 
+> > Compile-tested only.  
 > 
-> The v2 of this series didn't get any reviews, probably because it has
-> been sent the week before Xmas. Do you prefer if I resend it?
+> The code change looks good to me now. I'll build a VM with this change
+> to clear my conscience (maybe the change triggers a compiler bug,
+> however unlikely that sounds) before replying with any tags. Likely next
+> Monday, but feel free to beat me to it, or perhaps, someone else will
+> tag this as reviewed by them and/or tested by them.
 
-No need to resend. will get to it.
-
+Doesn't look like a real bug fix, so would be good to get some signal
+soon. The merge window is soon so we'll likely close the trees very
+very soon ..
 
