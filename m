@@ -1,225 +1,275 @@
-Return-Path: <netdev+bounces-159473-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159475-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14551A1595A
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 23:07:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B8885A15967
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 23:09:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 635D73A8D3A
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 22:07:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1BD613A8D5D
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 22:09:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E37F1A23A4;
-	Fri, 17 Jan 2025 22:07:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DC1B1B394E;
+	Fri, 17 Jan 2025 22:09:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="MxWvjjb4"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="d/Z/n6SN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35F2D19E7D1
-	for <netdev@vger.kernel.org>; Fri, 17 Jan 2025 22:07:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EBE319E7D1
+	for <netdev@vger.kernel.org>; Fri, 17 Jan 2025 22:09:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737151640; cv=none; b=OOiVn7RJnMQc0stzmCT+/+sH1/N9mzjYhebc+Kswoiu1CyZ2ajKzn2xCgqKB5FSko+l/PlkY5PhN83qxSWKZ1kEQrsi32hkJlEYz4XRux5bANcEZoyKmIpdBhLk3CmqOrPStdohqOpchm7GtVj5iY0aWHqhd4Mdna1qIFswebuc=
+	t=1737151783; cv=none; b=TqfFjHInUiJZ+5FfRHWeL3UuPhOQNbXG3aMcGmO8Dc7NVb8xU1JBq0zpKMvXsz9wiU8tV3pmCuIZd92mj/6HtWMcC2/AKTvP0YXp1Vick99gInQJhJzpJ9WOThmwKRASKWBhX+t3TMpzPx5Wf7qFdg8CTsQAEcfxafKeXIGVD0o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737151640; c=relaxed/simple;
-	bh=tUe46uuOFuBc9Sp1dXYTXVHuhFYTCtu8Ckr0hrRvcTM=;
+	s=arc-20240116; t=1737151783; c=relaxed/simple;
+	bh=TgdxiP8Cy/+MZi4wY1jfwm6pjFQIZpDY3B/4fc4XnVA=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=MWXAOkYyhZ0garzC2lhs+073Fhiz2qTh0lMGynvyuskIdFwNumo+2RlXDgZDxekn0Ng9l/yur+1kOdymonS+ck7pqk5JAs/iNL5zjomFNIci4qfoj4AfKM6Co4jgLlEoctikacBnBzH3X7cLRpgRNLH67FzYVK9XA5luU4zkIiI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=MxWvjjb4; arc=none smtp.client-ip=209.85.218.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-aa679ad4265so717299566b.0
-        for <netdev@vger.kernel.org>; Fri, 17 Jan 2025 14:07:16 -0800 (PST)
+	 To:Cc:Content-Type; b=eyLQjZVxzPDb8LClIReDEbqWBDX99oqqAxhZ80nt7KJdTcs9hc3oZjKybQBFldDsbOLnvsixOAL5dzOXkaSayrkLDqZ5eVWkqPVoufrcK/Ax+CmwgwcRlXiFlXKNcyhSPh8dxaR+WKRYj0I8WxkZtad6Hjj490UVFJPF5T304sM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=d/Z/n6SN; arc=none smtp.client-ip=209.85.208.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-5d90a5581fcso4506159a12.1
+        for <netdev@vger.kernel.org>; Fri, 17 Jan 2025 14:09:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1737151635; x=1737756435; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=I1x9/3rtT8xahu83WqhvesVp14sIcbGuzyo8Y5wksbs=;
-        b=MxWvjjb47Dl4GQDpEWSyVWz17B1K1C11XTgyFDez2kf26m5Bj+WiGZloOowlDDdET6
-         JxpgZaD+EvX5LSFrF470Vxqq1ly/qXrXNWqvT48SCRMOIyNfq7FZO9pFCfig3980x3iL
-         ysU/XZ5jWOrHBwBhVB2SHAblhNANLIDVYNeRA=
+        d=google.com; s=20230601; t=1737151778; x=1737756578; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=XxWJt7vMg8HEzcChWeewww178yhKsckOUrymoyMFD/k=;
+        b=d/Z/n6SNCITviLFlYFD1X/dTTRbHstPX9l0v/mz4r8L/+0ZFO9Y68EQPJpgw8kyOco
+         tsLGr+P04hHA718ksLT8vhDK+x0jiHf76rxwJCch7SVgRV8E8OzEv0YiUlJs8Ayw2GFS
+         Thep3nyeeqUtRGVvnoxTmUXVjvvj1Z/CVDbY5xnBT+C4y8Y7ry+EUMLChozF9FHrWz2l
+         qW+J6MfukzhjJl9CO3ZdE3RQzdD2Q6mzpSlwBpo6TCxOMSkULfdAjz+JGyBTd8CGX1Id
+         J+rnnf/U1qWgaOba90a+HGnir5i2QLZYeyy4/cw2v7VnY/ffwU+cqNCVuroIa2c4EiTU
+         uENw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737151635; x=1737756435;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=I1x9/3rtT8xahu83WqhvesVp14sIcbGuzyo8Y5wksbs=;
-        b=b2m2CVNyb64eP5tUqcmrEI/xMIQfpomnshAqySLBSBlvFzf12Q2II9sFORhYRateip
-         vH5U4JlVmfk6fFVW/ruYPDayoadH/xf8SjrjJy1W2vq4JhRYtXGJ3evU5JOb9JBIK9GQ
-         0x9QUp9v07eyQ6koJcFpGxt/1r1cYtlYm7udSTNwAzo77/QzFo2Mu6EgvT5JYkNEqItu
-         qOXpZwxc792pWHSBFzxzvu9ceEAR7JVY4IrZrWv35Xvao8SsU5wl6vFSuJ3XFgCPq9Zu
-         bgtKD6YRdBDYx9GOpR+j8t524aHc5yAb5jRTFS344BKbP//az/qek6BLLUqcPw2FqI31
-         fRiQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWNYDkE441YlPUVoqM2mGE3oeFg9P/Aub0wNR18w68o1ae4Jzt7OzHu3jiYbQS+VjrmX4k9eRg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxL+apM7NhFiozsx0iKILRQhkvBKp2DAbQ80Mg9y73XuVxg+11U
-	Mb6XQhT1uL62yr8RsLBVwxPA3s5U87KuiSOvF6p0PE/n5TPmfLnmb3AYFm/2tf2evmTxkEt7V2O
-	y2sg4KWkzBx9Hkg4e8ZNFQoh9HF0XbHemnU2n
-X-Gm-Gg: ASbGncsll4FV5p2ptLAcEoELcKuCa6bv8dsK87kUSgPHsKYRQwjU2iSbSZJH5slOpac
-	h8JAUHLZ5m/1W4xHoOVisg1zCovThIIqzuyrBp3A=
-X-Google-Smtp-Source: AGHT+IGtGk4zuRPsjGphCgcUl9ULsvtRiqrQbnsGUxJyzIxM0Pkb3B86Uqg8oeeWFo22g2nBFlYI/gryKDboWbBudXo=
-X-Received: by 2002:a17:907:9405:b0:aa5:53d4:8876 with SMTP id
- a640c23a62f3a-ab36e406c75mr848564966b.20.1737151635413; Fri, 17 Jan 2025
- 14:07:15 -0800 (PST)
+        d=1e100.net; s=20230601; t=1737151778; x=1737756578;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=XxWJt7vMg8HEzcChWeewww178yhKsckOUrymoyMFD/k=;
+        b=Sse+lx7B+NLL5jpyyM97HbsdOjRVp0PWi15HVfdGee+qDT0TnQKxXp1RznwI8fZhVV
+         n7efh7VmyAX8Pg9/hTsI1mnT7tS1htNGxmrCtYlym6E/1+np+0fF8Bs8mDFMsg2jm0ie
+         yCfDifHsLua2bkDjk7xrs2ofAuT5kzP/A1YSl4DjHLY5vwwNIhQmWDLdyR0xJF0V9qoy
+         8gtyfowena6sV8TvBbglScgfHFafSJtIjTebemz0xFvanRNzJj2FbPHrtFWCnJMXJ/XT
+         X9Caco7PJbQB3PxPUAFKsSGqlgJfazKIuw3DQPbzSJsHAE3eCxBFYo8c6I1TxDzcw7sS
+         N/NQ==
+X-Gm-Message-State: AOJu0Yys+rxC8nanjOEu0dRIijlmZoMy0PltinRGdOqwr0DHEpmBvSTG
+	mKzfrGbYtw+w45n3lL/M1o6eC5ysuJCfD2eVvTWAnz2pYp5cPreKlzOEiMYjG2AGmrrcxuGeDD0
+	MiXtOmZ17hFAJty5QqdJWCSTl8YAQRxM4JL7R
+X-Gm-Gg: ASbGncvy3g03iPiDwoSrj7v54xRkoQ7m/p8kpgUyt3gqh/Qvbq5iobRoBMf6rIy9a3d
+	wWpETLgaZHi60X30hteBuI8mYsK2IXSI3s4NPLuk=
+X-Google-Smtp-Source: AGHT+IHBpLn7CckltR9Iv3FEUwqti86dy6iZKoFZ11zkG4eqmbDpfEUKhkGffGpmmJ25ruXFZ3HQY0wLc7SXoZuaxqs=
+X-Received: by 2002:a05:6402:3487:b0:5d4:1ac2:277f with SMTP id
+ 4fb4d7f45d1cf-5db7d2f5efdmr3530043a12.9.1737151778437; Fri, 17 Jan 2025
+ 14:09:38 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250117194815.1514410-1-kuba@kernel.org> <20250117194815.1514410-3-kuba@kernel.org>
-In-Reply-To: <20250117194815.1514410-3-kuba@kernel.org>
-From: Michael Chan <michael.chan@broadcom.com>
-Date: Fri, 17 Jan 2025 14:07:03 -0800
-X-Gm-Features: AbW1kvaI-VVP_vSHoHAHpX2ZL1iOvOZ9JlOKmV6n85PD6wllY2YGgqJBVXRp7Tk
-Message-ID: <CACKFLinRxGgrgz8LUROsK0O+KTk=4a2B=mF-b2269JU+CigFPQ@mail.gmail.com>
-Subject: Re: [PATCH net-next 2/6] net: provide pending ring configuration in net_device
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, 
-	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, 
-	pavan.chebbi@broadcom.com, ap420073@gmail.com
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="0000000000002c1727062bee2205"
-
---0000000000002c1727062bee2205
+References: <20250117214035.2414668-1-jmaloy@redhat.com>
+In-Reply-To: <20250117214035.2414668-1-jmaloy@redhat.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Fri, 17 Jan 2025 23:09:27 +0100
+X-Gm-Features: AbW1kvbbFQPAzAZTxBmIhZC7XdXJqVnCoapPkbiNBZUDhk7bt9XvflitbtApGpU
+Message-ID: <CANn89i+Ks52JVTBsMFQBM4CqUR4cegXhbSCH77aMCqFpd-S_1A@mail.gmail.com>
+Subject: Re: [net,v2] tcp: correct handling of extreme memory squeeze
+To: jmaloy@redhat.com
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org, 
+	passt-dev@passt.top, sbrivio@redhat.com, lvivier@redhat.com, 
+	dgibson@redhat.com, imagedong@tencent.com, eric.dumazet@gmail.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jan 17, 2025 at 11:48=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> w=
-rote:
+On Fri, Jan 17, 2025 at 10:40=E2=80=AFPM <jmaloy@redhat.com> wrote:
 >
-> Record the pending configuration in net_device struct.
-> ethtool core duplicates the current config and the specific
-> handlers (for now just ringparam) can modify it.
+> From: Jon Maloy <jmaloy@redhat.com>
 >
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-
-> @@ -688,21 +690,35 @@ static int ethnl_default_set_doit(struct sk_buff *s=
-kb, struct genl_info *info)
->                         goto out_dev;
->         }
+> Testing with iperf3 using the "pasta" protocol splicer has revealed
+> a bug in the way tcp handles window advertising in extreme memory
+> squeeze situations.
 >
-> +       dev =3D req_info.dev;
-> +
-> +       dev->cfg_pending =3D kmemdup(dev->cfg, sizeof(*dev->cfg),
-> +                                  GFP_KERNEL_ACCOUNT);
-> +       if (!dev->cfg_pending) {
-> +               ret =3D -ENOMEM;
-> +               goto out_tie_cfg;
-> +       }
-> +
->         rtnl_lock();
-> -       ret =3D ethnl_ops_begin(req_info.dev);
-> +       ret =3D ethnl_ops_begin(dev);
->         if (ret < 0)
->                 goto out_rtnl;
+> Under memory pressure, a socket endpoint may temporarily advertise
+> a zero-sized window, but this is not stored as part of the socket data.
+> The reasoning behind this is that it is considered a temporary setting
+> which shouldn't influence any further calculations.
 >
->         ret =3D ops->set(&req_info, info);
->         if (ret <=3D 0)
->                 goto out_ops;
-> -       ethtool_notify(req_info.dev, ops->set_ntf_cmd, NULL);
-> +       ethtool_notify(dev, ops->set_ntf_cmd, NULL);
+> However, if we happen to stall at an unfortunate value of the current
+> window size, the algorithm selecting a new value will consistently fail
+> to advertise a non-zero window once we have freed up enough memory.
+> This means that this side's notion of the current window size is
+> different from the one last advertised to the peer, causing the latter
+> to not send any data to resolve the sitution.
 >
->         ret =3D 0;
->  out_ops:
-> -       ethnl_ops_complete(req_info.dev);
-> +       ethnl_ops_complete(dev);
->  out_rtnl:
->         rtnl_unlock();
-> +       if (ret >=3D 0) /* success! */
-> +               swap(dev->cfg, dev->cfg_pending);
-> +       kfree(dev->cfg_pending);
-> +out_tie_cfg:
-> +       dev->cfg_pending =3D dev->cfg;
+> The problem occurs on the iperf3 server side, and the socket in question
+> is a completely regular socket with the default settings for the
+> fedora40 kernel. We do not use SO_PEEK or SO_RCVBUF on the socket.
+>
+> The following excerpt of a logging session, with own comments added,
+> shows more in detail what is happening:
+>
+> //              tcp_v4_rcv(->)
+> //                tcp_rcv_established(->)
+> [5201<->39222]:     =3D=3D=3D=3D Activating log @ net/ipv4/tcp_input.c/tc=
+p_data_queue()/5257 =3D=3D=3D=3D
+> [5201<->39222]:     tcp_data_queue(->)
+> [5201<->39222]:        DROPPING skb [265600160..265665640], reason: SKB_D=
+ROP_REASON_PROTO_MEM
+>                        [rcv_nxt 265600160, rcv_wnd 262144, snt_ack 265469=
+200, win_now 131184]
+>                        [copied_seq 259909392->260034360 (124968), unread =
+5565800, qlen 85, ofoq 0]
+> [5201<->39222]:     tcp_data_queue(<-) OFO queue: gap: 65480, len: 0
+> [5201<->39222]:     __tcp_transmit_skb(->)
+> [5201<->39222]:       tcp_select_window(->) tp->rcv_wup: 265469200, tp->r=
+cv_wnd: 262144, tp->rcv_nxt 265600160
+> [5201<->39222]:         (inet_csk(sk)->icsk_ack.pending & ICSK_ACK_NOMEM)=
+ --> TRUE
+> [5201<->39222]:       tcp_select_window(<-) tp->rcv_wup: 265469200, tp->r=
+cv_wnd: 262144, tp->rcv_nxt 265600160, returning 0
+> [5201<->39222]:       ADVERTISING WIN 0, ACK_SEQ: 265600160
+> [5201<->39222]:     __tcp_transmit_skb(<-) tp->rcv_wup: 265469200, tp->rc=
+v_wnd: 262144, tp->rcv_nxt 265600160
+> [5201<->39222]:   tcp_rcv_established(<-)
+> [5201<->39222]: tcp_v4_rcv(<-)
+>
+> // Receive queue is at 85 buffers and we are out of memory.
+> // We drop the incoming buffer, although it is in sequence, and decide
+> // to send an advertisement with a window of zero.
+> // We don't update tp->rcv_wnd and tp->rcv_wup accordingly, which means
+> // we unconditionally shrink the window.
+>
+> [5201<->39222]: tcp_recvmsg_locked(->)
+> [5201<->39222]:   __tcp_cleanup_rbuf(->) tp->rcv_wup: 265469200, tp->rcv_=
+wnd: 262144, tp->rcv_nxt 265600160
+> [5201<->39222]:     [new_win =3D 0, win_now =3D 131184, 2 * win_now =3D 2=
+62368]
+> [5201<->39222]:     [new_win >=3D (2 * win_now) ? --> time_to_ack =3D 0]
+> [5201<->39222]:     NOT calling tcp_send_ack()
+> [5201<->39222]:   __tcp_cleanup_rbuf(<-) tp->rcv_wup: 265469200, tp->rcv_=
+wnd: 262144, tp->rcv_nxt 265600160
+> [5201<->39222]: tcp_recvmsg_locked(<-) returning 6104 bytes.
+>                 [rcv_nxt 265600160, rcv_wnd 262144, snt_ack 265469200, wi=
+n_now 131184]
+>                 [copied_seq 260040464->260040464 (0), unread 5559696, qle=
+n 85, ofoq 0]
+>
+> // After each read, the algorithm for calculating the new receive
+> // window in __tcp_cleanup_rbuf() finds it is too small to advertise
+> // or to update tp->rcv_wnd.
+> // Meanwhile, the peer thinks the window is zero, and will not send
+> // any more data to trigger an update from the interrupt mode side.
+>
+> [5201<->39222]: tcp_recvmsg_locked(->)
+> [5201<->39222]:   __tcp_cleanup_rbuf(->) tp->rcv_wup: 265469200, tp->rcv_=
+wnd: 262144, tp->rcv_nxt 265600160
+> [5201<->39222]:     [new_win =3D 262144, win_now =3D 131184, 2 * win_now =
+=3D 262368]
+> [5201<->39222]:     [new_win >=3D (2 * win_now) ? --> time_to_ack =3D 0]
+> [5201<->39222]:     NOT calling tcp_send_ack()
+> [5201<->39222]:   __tcp_cleanup_rbuf(<-) tp->rcv_wup: 265469200, tp->rcv_=
+wnd: 262144, tp->rcv_nxt 265600160
+> [5201<->39222]: tcp_recvmsg_locked(<-) returning 131072 bytes.
+>                 [rcv_nxt 265600160, rcv_wnd 262144, snt_ack 265469200, wi=
+n_now 131184]
+>                 [copied_seq 260099840->260171536 (71696), unread 5428624,=
+ qlen 83, ofoq 0]
+>
+> // The above pattern repeats again and again, since nothing changes
+> // between the reads.
+>
+> [...]
+>
+> [5201<->39222]: tcp_recvmsg_locked(->)
+> [5201<->39222]:   __tcp_cleanup_rbuf(->) tp->rcv_wup: 265469200, tp->rcv_=
+wnd: 262144, tp->rcv_nxt 265600160
+> [5201<->39222]:     [new_win =3D 262144, win_now =3D 131184, 2 * win_now =
+=3D 262368]
+> [5201<->39222]:     [new_win >=3D (2 * win_now) ? --> time_to_ack =3D 0]
+> [5201<->39222]:     NOT calling tcp_send_ack()
+> [5201<->39222]:   __tcp_cleanup_rbuf(<-) tp->rcv_wup: 265469200, tp->rcv_=
+wnd: 262144, tp->rcv_nxt 265600160
+> [5201<->39222]: tcp_recvmsg_locked(<-) returning 131072 bytes.
+>                 [rcv_nxt 265600160, rcv_wnd 262144, snt_ack 265469200, wi=
+n_now 131184]
+>                 [copied_seq 265469200->265545488 (76288), unread 54672, q=
+len 1, ofoq 0]
+>
+> [5201<->39222]: tcp_recvmsg_locked(->)
+> [5201<->39222]:   __tcp_cleanup_rbuf(->) tp->rcv_wup: 265469200, tp->rcv_=
+wnd: 262144, tp->rcv_nxt 265600160
+> [5201<->39222]:     [new_win =3D 262144, win_now =3D 131184, 2 * win_now =
+=3D 262368]
+> [5201<->39222]:     [new_win >=3D (2 * win_now) ? --> time_to_ack =3D 0]
+> [5201<->39222]:     NOT calling tcp_send_ack()
+> [5201<->39222]:   __tcp_cleanup_rbuf(<-) tp->rcv_wup: 265469200, tp->rcv_=
+wnd: 262144, tp->rcv_nxt 265600160
+> [5201<->39222]: tcp_recvmsg_locked(<-) returning 54672 bytes.
+>                 [rcv_nxt 265600160, rcv_wnd 262144, snt_ack 265469200, wi=
+n_now 131184]
+>                 [copied_seq 265600160->265600160 (0), unread 0, qlen 0, o=
+foq 0]
+>
+> // The receive queue is empty, but no new advertisement has been sent.
+> // The peer still thinks the receive window is zero, and sends nothing.
+> // We have ended up in a deadlock situation.
+>
+> Furthermore, we have observed that in these situations this side may
+> send out an updated 'th->ack_seq=C2=B4 which is not stored in tp->rcv_wup
+> as it should be. Backing ack_seq seems to be harmless, but is of
+> course still wrong from a protocol viewpoint.
+>
+> We fix this by setting tp->rcv_wnd and tp->rcv_wup even when a packet
+> has been dropped because of memory exhaustion and we have to advertize
+> a zero window.
+>
+> Further testing shows that the connection recovers neatly from the
+> squeeze situation, and traffic can continue indefinitely.
+>
+> Fixes: e2142825c120 ("net: tcp: send zero-window ACK when no memory")
+> Reviewed-by: Stefano Brivio <sbrivio@redhat.com>
+> Signed-off-by: Jon Maloy <jmaloy@redhat.com>
+> ---
+> v1: -Posted on Apr 6, 2024
 
-If I understand this correctly, cfg_pending can momentarily point to
-the old cfg and freed memory before pointing to the new cfg outside of
-rtnl_lock.  Shouldn't it be inside the rtnl_lock?
+Could you post the link, this was a long time ago and I forgot the context.
 
-In the bnxt patch, we now look at cfg_pending so it must always point
-to the correct cfg.
+> v2: -Improved commit log to clarify how we end up in this situation.
+>     -After feedback from Eric Dumazet, removed references to use of
+>      SO_PEEK and SO_PEEK_OFF which may lead to a misunderstanding
+>      about how this situation occurs. Those flags are used at the
+>      peer side's incoming connection, and not on this one.
+> ---
+>  net/ipv4/tcp_output.c | 8 +++++---
+>  1 file changed, 5 insertions(+), 3 deletions(-)
+>
+> diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
+> index 0e5b9a654254..ba295f798e5e 100644
+> --- a/net/ipv4/tcp_output.c
+> +++ b/net/ipv4/tcp_output.c
+> @@ -265,11 +265,13 @@ static u16 tcp_select_window(struct sock *sk)
+>         u32 cur_win, new_win;
+>
+>         /* Make the window 0 if we failed to queue the data because we
+> -        * are out of memory. The window is temporary, so we don't store
+> -        * it on the socket.
+> +        * are out of memory.
+>          */
+> -       if (unlikely(inet_csk(sk)->icsk_ack.pending & ICSK_ACK_NOMEM))
+> +       if (unlikely(inet_csk(sk)->icsk_ack.pending & ICSK_ACK_NOMEM)) {
+> +               tp->rcv_wnd =3D 0;
+> +               tp->rcv_wup =3D tp->rcv_nxt;
 
---0000000000002c1727062bee2205
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
+I wonder if we should not clear tp->pred_flags here ?
 
-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
-OnaLEot1MoQO7BIe5S9H4AcCEXXcrJJiAtMCl47ARpyHmvQFQFFTrHgUYEd9V+9bOzY7MBIGSV1N
-/JfsT1sZw6HT0lJkSQefhPGpBniAob62DJP3qr11tu8CAwEAAaOCAdowggHWMA4GA1UdDwEB/wQE
-AwIFoDCBowYIKwYBBQUHAQEEgZYwgZMwTgYIKwYBBQUHMAKGQmh0dHA6Ly9zZWN1cmUuZ2xvYmFs
-c2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNydDBBBggrBgEFBQcw
-AYY1aHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAw
-TQYDVR0gBEYwRDBCBgorBgEEAaAyASgKMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2Jh
-bHNpZ24uY29tL3JlcG9zaXRvcnkvMAkGA1UdEwQCMAAwSQYDVR0fBEIwQDA+oDygOoY4aHR0cDov
-L2NybC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcmwwJAYDVR0R
-BB0wG4EZbWljaGFlbC5jaGFuQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
-HSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQU31rAyTdZweIF0tJTFYwfOv2w
-L4QwDQYJKoZIhvcNAQELBQADggEBACcuyaGmk0NSZ7Kio7O7WSZ0j0f9xXcBnLbJvQXFYM7JI5uS
-kw5ozATEN5gfmNIe0AHzqwoYjAf3x8Dv2w7HgyrxWdpjTKQFv5jojxa3A5LVuM8mhPGZfR/L5jSk
-5xc3llsKqrWI4ov4JyW79p0E99gfPA6Waixoavxvv1CZBQ4Stu7N660kTu9sJrACf20E+hdKLoiU
-hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
-E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
-aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
-EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIPwEgWin0+1vPUi/waNyl0KsoE/boNIp
-TjQgMKS0s6fIMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI1MDEx
-NzIyMDcxNVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
-SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQBTI35vgt+57p1SAstIZFtvGL8TXxANr2UF24mzj1IBlKEI0m/6
-fYk5p8KMYW6XTryG7GIKz09m2gQlUakoZ2WLw3fFaOTePbBQwWXFNjdHGCP8U+HyxsFD/yYCkD35
-cR41twoXhFrHvEZiEo9C327Qyt9QYsKi67ahfWCJAJjl3J/jCYbChSqrRPtsUkrzZHHLT2NjcZI1
-bPec3Zfmp0XnhLlQpScnlZDYM4t/wA0J+4vOm99R0jpXix5r9AmsawDD1wdJZHavPH8E++4LHaQa
-UpWqvxIfWVIfY9qlXMxma5aay33G4993UgszQL3S4HnI62br8gU9Hd/zjUhIrxhb
---0000000000002c1727062bee2205--
+Also, any chance you could provide a packetdrill test ?
+
+Your changelog contains traces that are hard to follow.
+
+Thanks.
 
