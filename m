@@ -1,103 +1,211 @@
-Return-Path: <netdev+bounces-159352-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159353-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3BFDEA153AE
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 17:05:57 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A934CA153B0
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 17:06:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 838BB188B711
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 16:05:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 32F02168D61
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 16:05:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 886E419D092;
-	Fri, 17 Jan 2025 16:03:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8125C19D892;
+	Fri, 17 Jan 2025 16:05:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="irlFD+LH"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eUS6f46v"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-182.mta1.migadu.com (out-182.mta1.migadu.com [95.215.58.182])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 117EE13CA81
-	for <netdev@vger.kernel.org>; Fri, 17 Jan 2025 16:03:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE52319CC27
+	for <netdev@vger.kernel.org>; Fri, 17 Jan 2025 16:05:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737129824; cv=none; b=VtBYCbVwKNzlZxnMGe7lvvxjauscsYJxjlZOTLZPGJ20AOgn2BMjeW0yxfSz8MNfYU9WCocWPR5Uy0Vzs1sw+oSu+mJXjmAUlwk7fwLtPgYQuyldOWPP4QO8o+QrwwA1rLK3pPsCoshhpreLJEEezFNSUHFEHcejoGHyhl7xY4g=
+	t=1737129923; cv=none; b=Ybq1icAI2dK4sLgpBNy5fNunfDMykKkx7vi/5Y7a9HuZqEP3GU7Jh4Rq3YCjcCT0Kz5cRBZ6FuRnmdhXCW5W6KtOgBd4vZSE5a74s74v6ela1aCpWoE4sVTpHKJAeIN0nUu+gQf6foha/Bdm2AUzBSBsoyalOsJPHRpN6c4pTSg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737129824; c=relaxed/simple;
-	bh=M6Shu4apvhl9uI8Sjly+/pQFSAZeH6Fu3jETQYaNYPE=;
+	s=arc-20240116; t=1737129923; c=relaxed/simple;
+	bh=wy06xOeMzXK3wadS3i63kPM89++ahvtQfL7/0Ozreyw=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bZhfEkP6tluvPgqK2uAzWY1chbTP0OwG2/qVkxMh0Uf5Go3eWGiQMmc78M2y7NHnAE9eS09VS0kWzUlzd/RWNri1yuzMxKHbxU5Xbiq/yUYQBsHabf2xbS5J5KnzlSwR0zZDIMq8rv2VlzUrNYwescPa7fA1JGZqR5c0k/MhTCY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=irlFD+LH; arc=none smtp.client-ip=95.215.58.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <df736add-784b-40c8-9982-ed8821a8bcb6@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1737129818;
+	 In-Reply-To:Content-Type; b=sOjU/73Ucc8eNwKs+MsMUNqT9ilUdc2imW0MmJaNRApiRD7+B5RlIfSf59xRUQ2UgWYENCGib+fmX+SbtqceTuA4NkxCCJlG2CiHv5efoi2wRj/PrS/dHIIou2S1Sio56aWLvDlxP6MI2KRdaXBWjYLMhApRYkEunov4gdoj+Os=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eUS6f46v; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1737129920;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=4oRBQwoB/XNbmuywEqFIlHrwwfxoygNfyYaNW7wDjqA=;
-	b=irlFD+LHNbI33wRBfCvOrTE2gHN0/xk0o2QeRbHJPFbm6mLz2bWayz63jn1QnsH509XNkb
-	YJTkv09h8Fpya5Rred4Q3QlJP7vXd/6boR8lPB31GmW1ETdEOlwYvHx4zvlxIb7wC1l5rk
-	GS0SOZ35sG1uHGMSgzVdKlcxDc7V4/M=
-Date: Fri, 17 Jan 2025 16:03:35 +0000
+	bh=wHsWaaOnX2c6yotAQbLl567h0Yv+ErdqwoVzXqTf/7c=;
+	b=eUS6f46v/UiR67moPdYZ6RchxlpQEesEu+vn4Oz5NDDZjviSFWl2U5QjJiXsu9YODJfrGH
+	ZyPtN17qA0xlWh2lGFjQXFO7uaxE492HivnPDUpmk9ukUyui8xyKXOjOy4+HnyiES5KDyH
+	4HMM/hoJO2HmJnBnTxgzZNjoU70SAr4=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-641-vTEcMINqPqWxhQJfQAX_kA-1; Fri, 17 Jan 2025 11:05:19 -0500
+X-MC-Unique: vTEcMINqPqWxhQJfQAX_kA-1
+X-Mimecast-MFC-AGG-ID: vTEcMINqPqWxhQJfQAX_kA
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4361efc9d1fso16295325e9.2
+        for <netdev@vger.kernel.org>; Fri, 17 Jan 2025 08:05:19 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737129918; x=1737734718;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=wHsWaaOnX2c6yotAQbLl567h0Yv+ErdqwoVzXqTf/7c=;
+        b=CgxzePYIcBxz0oBOyWn739IHYlP0j9n9gMoKy9lX/0XwLa6pJkFsxAM9hZ8kGLG9f6
+         ZFzDOJHrGq09UOVGQIBnuaFTn4P/4qhC86D2xwtDpNc5ow2LXf03SYEmaAHHMA/ifU58
+         9LRgIDcXwE7rEmvPtI35aFLVqbGU8b609X1bcm8LCo2gMU4gUU6rvUUbJEubQqQaryv4
+         DtwufHyrjWY3M8T6pvabAdRInsRpF9KJZgsgtzKYEOsNCBu2e6S3Hb+yMIOyy0AfG+JC
+         /tODm7a2bmqBUgOXXTxkOlJ/GxvDeNp37wBNfilUIWyzY8Lp0qbyMexv239Q06CVo4wK
+         vwJw==
+X-Forwarded-Encrypted: i=1; AJvYcCXwKHivYsnKBi8aS/lq6Gk1OixF0imM5YPef15tflbKjme1IyjAXPvhWlrAelFvxlHtwHC9Qe8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzbfX3zLbtBXrf+v3yntWuAa7oJeQV6TGfJxUqh9lXxlpAShuYz
+	HGzLBzTaB/jEIYTntNIfOTVlcqu8zmLFs8xwrbwfn7tZVuCnq/9xJzdKj6keSwoRmyX61jYhApl
+	DoHqLi3Q90ZCpAvMldfStw5qSLNE9PW5HBV0CD2zy4waXv2Sc1EE+fA==
+X-Gm-Gg: ASbGncv0COfWveDm3xI7SOTTiKl3KMCUtg9P784bw5heiPArmdX4tvllkd9Adnuf4zV
+	ZmEADL0hshZGExsPXbi4TPsjMgkNli9iXltzjOfWMwTToq2UV3SlrOuVG8SMfIIa+PlYrJwbQXz
+	PfAW81sfLZuPBAFDGvQXErO6PrqD+G+f7OSOBl1NbbgKLXsVRPbhf+/OVrS5w6YfXXYKPyT86Oa
+	Ua6NI97/Ot518ea1uzDhWJECV/CWoQXd3x95RTe23QJ/94MlPAP+MYmZBTTXyovMylHIVUHNsW/
+	syyqoRfIgHY=
+X-Received: by 2002:a05:600c:871a:b0:436:e751:e445 with SMTP id 5b1f17b1804b1-438913c15b0mr38197605e9.5.1737129917938;
+        Fri, 17 Jan 2025 08:05:17 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IH0d42rEQIGnkhAPcw/Veub5FwU4g1DViZXIDG9aBfKC46ng0B5r5Qngxma92dAVdxJIaqNgg==
+X-Received: by 2002:a05:600c:871a:b0:436:e751:e445 with SMTP id 5b1f17b1804b1-438913c15b0mr38197045e9.5.1737129917520;
+        Fri, 17 Jan 2025 08:05:17 -0800 (PST)
+Received: from [192.168.88.253] (146-241-15-169.dyn.eolo.it. [146.241.15.169])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43890462195sm37454405e9.30.2025.01.17.08.05.15
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 17 Jan 2025 08:05:16 -0800 (PST)
+Message-ID: <c25f6c3f-e576-4c56-ba4b-328dfecbfb35@redhat.com>
+Date: Fri, 17 Jan 2025 17:05:15 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next v5 1/4] net: wangxun: Add support for PTP clock
-To: Richard Cochran <richardcochran@gmail.com>
-Cc: Jiawen Wu <jiawenwu@trustnetic.com>, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, linux@armlinux.org.uk, horms@kernel.org,
- jacob.e.keller@intel.com, netdev@vger.kernel.org, mengyuanlou@net-swift.com
-References: <20250117062051.2257073-1-jiawenwu@trustnetic.com>
- <20250117062051.2257073-2-jiawenwu@trustnetic.com>
- <9390f920-a89f-43d3-a75f-664fd05df655@linux.dev>
- <Z4p8ZuQaUe86Em9_@hoboy.vegasvil.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v11 00/21] io_uring zero copy rx
+To: Pavel Begunkov <asml.silence@gmail.com>, Jakub Kicinski <kuba@kernel.org>
+Cc: Jens Axboe <axboe@kernel.dk>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jesper Dangaard Brouer
+ <hawk@kernel.org>, David Ahern <dsahern@kernel.org>,
+ Mina Almasry <almasrymina@google.com>,
+ Stanislav Fomichev <stfomichev@gmail.com>, Joe Damato <jdamato@fastly.com>,
+ Pedro Tammela <pctammela@mojatatu.com>, David Wei <dw@davidwei.uk>,
+ io-uring@vger.kernel.org, netdev@vger.kernel.org
+References: <20250116231704.2402455-1-dw@davidwei.uk>
+ <406fcbd2-55af-4919-abee-7cd80fb449d3@redhat.com>
+ <ce9caef4-0d95-4e81-bdb8-536236377f81@gmail.com>
 Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <Z4p8ZuQaUe86Em9_@hoboy.vegasvil.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <ce9caef4-0d95-4e81-bdb8-536236377f81@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
 
-On 17/01/2025 15:51, Richard Cochran wrote:
-> On Fri, Jan 17, 2025 at 02:15:01PM +0000, Vadim Fedorenko wrote:
+On 1/17/25 3:42 PM, Pavel Begunkov wrote:
+> On 1/17/25 14:28, Paolo Abeni wrote:
+>> On 1/17/25 12:16 AM, David Wei wrote:
+>>> This patchset adds support for zero copy rx into userspace pages using
+>>> io_uring, eliminating a kernel to user copy.
+>>>
+>>> We configure a page pool that a driver uses to fill a hw rx queue to
+>>> hand out user pages instead of kernel pages. Any data that ends up
+>>> hitting this hw rx queue will thus be dma'd into userspace memory
+>>> directly, without needing to be bounced through kernel memory. 'Reading'
+>>> data out of a socket instead becomes a _notification_ mechanism, where
+>>> the kernel tells userspace where the data is. The overall approach is
+>>> similar to the devmem TCP proposal.
+>>>
+>>> This relies on hw header/data split, flow steering ad RSS to ensure
+>>> packet headers remain in kernel memory and only desired flows hit a hw
+>>> rx queue configured for zero copy. Configuring this is outside of the
+>>> scope of this patchset.
+>>>
+>>> We share netdev core infra with devmem TCP. The main difference is that
+>>> io_uring is used for the uAPI and the lifetime of all objects are bound
+>>> to an io_uring instance. Data is 'read' using a new io_uring request
+>>> type. When done, data is returned via a new shared refill queue. A zero
+>>> copy page pool refills a hw rx queue from this refill queue directly. Of
+>>> course, the lifetime of these data buffers are managed by io_uring
+>>> rather than the networking stack, with different refcounting rules.
+>>>
+>>> This patchset is the first step adding basic zero copy support. We will
+>>> extend this iteratively with new features e.g. dynamically allocated
+>>> zero copy areas, THP support, dmabuf support, improved copy fallback,
+>>> general optimisations and more.
+>>>
+>>> In terms of netdev support, we're first targeting Broadcom bnxt. Patches
+>>> aren't included since Taehee Yoo has already sent a more comprehensive
+>>> patchset adding support in [1]. Google gve should already support this,
+>>> and Mellanox mlx5 support is WIP pending driver changes.
+>>>
+>>> ===========
+>>> Performance
+>>> ===========
+>>>
+>>> Note: Comparison with epoll + TCP_ZEROCOPY_RECEIVE isn't done yet.
+>>>
+>>> Test setup:
+>>> * AMD EPYC 9454
+>>> * Broadcom BCM957508 200G
+>>> * Kernel v6.11 base [2]
+>>> * liburing fork [3]
+>>> * kperf fork [4]
+>>> * 4K MTU
+>>> * Single TCP flow
+>>>
+>>> With application thread + net rx softirq pinned to _different_ cores:
+>>>
+>>> +-------------------------------+
+>>> | epoll     | io_uring          |
+>>> |-----------|-------------------|
+>>> | 82.2 Gbps | 116.2 Gbps (+41%) |
+>>> +-------------------------------+
+>>>
+>>> Pinned to _same_ core:
+>>>
+>>> +-------------------------------+
+>>> | epoll     | io_uring          |
+>>> |-----------|-------------------|
+>>> | 62.6 Gbps | 80.9 Gbps (+29%)  |
+>>> +-------------------------------+
+>>>
+>>> =====
+>>> Links
+>>> =====
+>>>
+>>> Broadcom bnxt support:
+>>> [1]: https://lore.kernel.org/netdev/20241003160620.1521626-8-ap420073@gmail.com/
+>>>
+>>> Linux kernel branch:
+>>> [2]: https://github.com/spikeh/linux.git zcrx/v9
+>>>
+>>> liburing for testing:
+>>> [3]: https://github.com/isilence/liburing.git zcrx/next
+>>>
+>>> kperf for testing:
+>>> [4]: https://git.kernel.dk/kperf.git
+>>
+>> We are getting very close to the merge window. In order to get this
+>> series merged before such deadline the point raised by Jakub on this
+>> version must me resolved, the next iteration should land to the ML
+>> before the end of the current working day and the series must apply
+>> cleanly to net-next, so that it can be processed by our CI.
 > 
->> there is no way ptp_clock_register() will return NULL,
+> Sounds good, thanks Paolo.
 > 
-> Really?
-> 
-> include/linux/ptp_clock_kernel.h:
-> 
->   400 static inline struct ptp_clock *ptp_clock_register(struct ptp_clock_info *info,
->   401                                                    struct device *parent)
->   402 { return NULL; }
-> 
-> Also, sometimes the kernelDoc comments are correct, like in this case:
-> 
->   304 /**
->   305  * ptp_clock_register() - register a PTP hardware clock driver
->   306  *
->   307  * @info:   Structure describing the new clock.
->   308  * @parent: Pointer to the parent device of the new clock.
->   309  *
->   310  * Returns a valid pointer on success or PTR_ERR on failure.  If PHC
->   311  * support is missing at the configuration level, this function
->   312  * returns NULL, and drivers are expected to gracefully handle that
->   313  * case separately.
->   314  */
-> 
-> 
-> Thanks,
-> Richard
+> Since the merging is not trivial, I'll send a PR for the net/
+> patches instead of reposting the entire thing, if that sounds right
+> to you. The rest will be handled on the io_uring side.
 
-Well, yes, this case is a special one. Then maybe it's better to adjust
-Kconfig and Makefile to avoid it?
+I agree it is the more straight-forward path. @Jakub: do you see any
+problem with the above?
+
+/P
+
+
 
