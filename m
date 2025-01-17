@@ -1,156 +1,243 @@
-Return-Path: <netdev+bounces-159373-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159374-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2CD40A1548B
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 17:43:18 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 19156A1550F
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 17:56:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 46453168FE3
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 16:43:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 399871697B7
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 16:56:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6689919F10A;
-	Fri, 17 Jan 2025 16:43:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A261C19F41C;
+	Fri, 17 Jan 2025 16:56:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y6T+vqcd"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bb6YIGt0"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5BC1189F3F
-	for <netdev@vger.kernel.org>; Fri, 17 Jan 2025 16:43:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71D5619DF4B;
+	Fri, 17 Jan 2025 16:56:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737132183; cv=none; b=YvPu5ATTwpW7GveGhc0QNBAVDlbVI9Db8Gwh889K/8eNOD5r+zcWcWEd2fNWsYsXRbOlxSu4kv0tvTsou4BuEJqhaIHqcqBBCoSUFEPISQtgsop7+56Z/ZmJNCrFpURbaUxs+9rqwKOZ3gd4fmynphEMzzo/iV5Wts7bo5U2inY=
+	t=1737132996; cv=none; b=HHX9tiO82HPnM0WQTt6QGj4MwlDns2R3QfOpFb8AjNGhY9gKB3db1tBrMus0m7wV6dD9ewC/iDKjZU5+uSfELEIwHsKHrKRFD3qjE1Ig8FY4ZJjEiFTPSrhZBM7wkpBRLFMnyxDYPztqIwznjYSLxJSEXozRPaiLE0b0llsnfus=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737132183; c=relaxed/simple;
-	bh=FSnHYvk6TCcGSJ2aFbSgdEI20yieZkmQp81bQFGkVoQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=et0LDnYztETDcg6rhjHbjnMXqjCqm+cqvy3ILGc4/uCiwZfCJjwtDZ+sK8Sc0n+Wpex74ZEjTEFQe6kh06vxdU+pDVGcyzbOM5NuB0AhJB0MjTru31VXk87uhETRISjAMyw8lkKejvLEepiVVlZEf4yMWKAeK/avhBo4yHDpryw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Y6T+vqcd; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1737132180;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=AzH0N3Q+fMi/HkvVqAXL9WI8l6XfmBkxagfYRz+FbjQ=;
-	b=Y6T+vqcdl0Arvp4L2boaPJ66KKOXJ60vW+ahXPzcYcr7RllpemoLigEGUQi56QXjYiHOPs
-	kDR/aEtkOLaTuRdZj3V6QXKoNRDyOlvg/e4DZ2tYbX0E2Xk1Qjvg6KXsThnhFxvZBBsRE4
-	Htm+i9PWwlXI/aPTZQL6rC0P+UGH++0=
-Received: from mail-pj1-f70.google.com (mail-pj1-f70.google.com
- [209.85.216.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-648-FtNSC9gAPiKhmqLGMrrEWA-1; Fri, 17 Jan 2025 11:42:59 -0500
-X-MC-Unique: FtNSC9gAPiKhmqLGMrrEWA-1
-X-Mimecast-MFC-AGG-ID: FtNSC9gAPiKhmqLGMrrEWA
-Received: by mail-pj1-f70.google.com with SMTP id 98e67ed59e1d1-2ee5668e09bso4617916a91.3
-        for <netdev@vger.kernel.org>; Fri, 17 Jan 2025 08:42:58 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737132177; x=1737736977;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=AzH0N3Q+fMi/HkvVqAXL9WI8l6XfmBkxagfYRz+FbjQ=;
-        b=Bc9zl9E0JiDQ+CYrmqgvNOYsQfzAQznGoXhS1ejV7cgfawTcPOQpPhLuhiQ46skD/p
-         QNWdoent9frGTny3KsipqTHda/qmfuK29cZJtqkb6PxSZt4OrYq3aFyXCZexXeznvFxc
-         EP4eDnG07v5WgHiD2Vmn+p2AMKknk8vQkophmWNA6Hj8fyOGntWJG/81nmBoP8yqQT6Q
-         uE8w81Ppi+8sSn+Br12yL882sbNrhUSyrRupfjeX3YUCm6QlpqpXGOdNy7m0PXCyjaTU
-         MUH9vfE6VZBV2gbF1AcfxB9MCK05MDwQL4/Z6KujhxOaaU1j28bU4lY/IBx9GYudlGd8
-         va4A==
-X-Forwarded-Encrypted: i=1; AJvYcCXOOD7FqJ9c07U74XsYKtFaASZsNYPx/egsMgn7QNCfNmmFJnCgzNZcIE7law7w6Xp49cXSVU0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxHjRRBuMb6jDFAwapHFePZWJyWGnNjkS2P1Qoo//hCTnu9NRwp
-	jyELTl1DsLXEK17pwNLOYTZGAM7ZP94jq8sUHuPQ4JYbeWeDkXf203nPNPYue/d2GCS7J+6YLw6
-	yGpIojKX8QVbJWBdBE7jB8Tan+hXAkSv7H30gBMD5trV2HhqM/VMhuQ==
-X-Gm-Gg: ASbGncsnfjJFirw4H7RItcvuDYhMJBDmNcPJ7vMKqWitub7A3zn2KpptOas7Afrxuo4
-	kfx6FdOemyrGoXVv26vM4Ta8oEdKlaZndWBpXXruXOTgtgernsbNwiy5ZnOhoWTDKsZ3h/KIwjn
-	Ces9RkS6P5pNWe3pCN/Elxki45cNsvxILQyAFE6U54HssR/UatD5C2QR8c3fuW+sRXkPrp5NoO4
-	enapz9KNEEGpH2gsIU9MyQKA+Sl6E2e8cbT5ropc/VKDtZknAbU9lPmdseXYTfUYCNJ358wveae
-	203FTrPADdHJ
-X-Received: by 2002:a17:90b:534b:b0:2f6:f107:fae6 with SMTP id 98e67ed59e1d1-2f782d32397mr3983869a91.23.1737132177168;
-        Fri, 17 Jan 2025 08:42:57 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFUypNKVESCSeTPoEHheWM7U+PR1FuGloZujdrA5sBPWkQUoZirvOax+nHkVQHE1STgQctdxA==
-X-Received: by 2002:a17:90b:534b:b0:2f6:f107:fae6 with SMTP id 98e67ed59e1d1-2f782d32397mr3983838a91.23.1737132176853;
-        Fri, 17 Jan 2025 08:42:56 -0800 (PST)
-Received: from jkangas-thinkpadp1gen3.rmtuswa.csb ([2601:1c2:4301:5e20:98fe:4ecb:4f14:576b])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2f77619ed33sm2280866a91.23.2025.01.17.08.42.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 17 Jan 2025 08:42:56 -0800 (PST)
-Date: Fri, 17 Jan 2025 08:42:53 -0800
-From: Jared Kangas <jkangas@redhat.com>
-To: Martin KaFai Lau <martin.lau@linux.dev>
-Cc: bpf@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
-	martin.lau@kernel.org, ast@kernel.org, johannes.berg@intel.com,
-	kafai@fb.com, songliubraving@fb.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH bpf] bpf: use attach_btf instead of vmlinux in
- bpf_sk_storage_tracing_allowed
-Message-ID: <Z4qIjSMgIOqbHoef@jkangas-thinkpadp1gen3.rmtuswa.csb>
-References: <20250116162356.1054047-1-jkangas@redhat.com>
- <9e5b183e-5dd5-4d3d-b3e6-09ad5e7262dc@linux.dev>
+	s=arc-20240116; t=1737132996; c=relaxed/simple;
+	bh=zcK8WB4ZaeZlWpWWyW2l5kp3TFVT9q3fShc6jxCxxIY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=uAG2mlYfFzHTbdPD3I8Q7v8asoQui4QUJlTCtUFgfnMCvLlCoUy73VmtvRLzUr3UY0HzMPxs2bGHdZQTiaWo0uyTi1OrN17nqoxUyLkARpmCritIWO4hLPY0M8mUqIPmMl2kcCb1a2I1I8P3dsrziGOWtSFXbkp0szKXa6Lp9sU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bb6YIGt0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E93E5C4CEDD;
+	Fri, 17 Jan 2025 16:56:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1737132996;
+	bh=zcK8WB4ZaeZlWpWWyW2l5kp3TFVT9q3fShc6jxCxxIY=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=bb6YIGt0sTIzbYBBsMO6q1tiNahm67G18z2l6sNOqX2eN+qeVvyCapie3vOm3YNkc
+	 NSPdxJAZyk5vpWT8H8OfMoNtSDf6aa9OV/EUUiONZtRngj21qQDt8EiK7ffyJYnRts
+	 ArS8w77jxFubn3ytE4/vD7zSe/IvGJXpOp4Fm8O6N1S/oarFpQxX9aW4oPlB+kS1Lu
+	 T2IZlwshC9xtUyQPamQxYQoraNqsDBvQDLZyrATTmn1z5XG3QLla27QAb8TbuA3IjD
+	 9nSIXx80DDPulxnKHoBBgGp2nO3oY78eTlKe2BDnpB5egabBnxjby1utKSUTHgQ0g5
+	 deI9gnMIYNj7w==
+Message-ID: <eb2381d2-34a4-4915-b0b5-b07cc81646d3@kernel.org>
+Date: Fri, 17 Jan 2025 17:56:29 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9e5b183e-5dd5-4d3d-b3e6-09ad5e7262dc@linux.dev>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v7 3/8] page_pool: fix IOMMU crash when driver
+ has already unbound
+To: Yunsheng Lin <linyunsheng@huawei.com>, davem@davemloft.net,
+ kuba@kernel.org, pabeni@redhat.com
+Cc: zhangkun09@huawei.com, liuyonglong@huawei.com, fanghaiqing@huawei.com,
+ Robin Murphy <robin.murphy@arm.com>,
+ Alexander Duyck <alexander.duyck@gmail.com>, IOMMU <iommu@lists.linux.dev>,
+ Andrew Morton <akpm@linux-foundation.org>, Eric Dumazet
+ <edumazet@google.com>, Simon Horman <horms@kernel.org>,
+ Ilias Apalodimas <ilias.apalodimas@linaro.org>, linux-mm@kvack.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ kernel-team <kernel-team@cloudflare.com>
+References: <20250110130703.3814407-1-linyunsheng@huawei.com>
+ <20250110130703.3814407-4-linyunsheng@huawei.com>
+ <921c827c-41b7-40af-8c01-c21adbe8f41f@kernel.org>
+ <2b5a58f3-d67a-4bf7-921a-033326958ac6@huawei.com>
+ <95f258b2-52f5-4a80-a670-b9a182caec7c@kernel.org>
+ <92bb3a19-a619-4bf7-9ef5-b9eb12a57983@huawei.com>
+Content-Language: en-US
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <92bb3a19-a619-4bf7-9ef5-b9eb12a57983@huawei.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Thu, Jan 16, 2025 at 12:03:53PM -0800, Martin KaFai Lau wrote:
-> On 1/16/25 8:23 AM, Jared Kangas wrote:
-> > diff --git a/net/core/bpf_sk_storage.c b/net/core/bpf_sk_storage.c
-> > index 2f4ed83a75ae..74584dd12550 100644
-> > --- a/net/core/bpf_sk_storage.c
-> > +++ b/net/core/bpf_sk_storage.c
-> > @@ -352,8 +352,8 @@ const struct bpf_func_proto bpf_sk_storage_delete_proto = {
-> >   static bool bpf_sk_storage_tracing_allowed(const struct bpf_prog *prog)
-> >   {
-> > -	const struct btf *btf_vmlinux;
-> >   	const struct btf_type *t;
-> > +	const struct btf *btf;
-> >   	const char *tname;
-> >   	u32 btf_id;
-> > @@ -371,12 +371,12 @@ static bool bpf_sk_storage_tracing_allowed(const struct bpf_prog *prog)
-> >   		return true;
-> >   	case BPF_TRACE_FENTRY:
-> >   	case BPF_TRACE_FEXIT:
-> > -		btf_vmlinux = bpf_get_btf_vmlinux();
-> > -		if (IS_ERR_OR_NULL(btf_vmlinux))
-> > +		btf = prog->aux->attach_btf;
-> > +		if (!btf)
-> >   			return false;
-> >   		btf_id = prog->aux->attach_btf_id;
-> > -		t = btf_type_by_id(btf_vmlinux, btf_id);
-> > -		tname = btf_name_by_offset(btf_vmlinux, t->name_off);
-> > +		t = btf_type_by_id(btf, btf_id);
-> > +		tname = btf_name_by_offset(btf, t->name_off);
-> >   		return !!strncmp(tname, "bpf_sk_storage",
-> >   				 strlen("bpf_sk_storage"));
-> 
-> Thanks for the report.
-> 
-> There is a prog->aux->attach_func_name, so it can be directly used, like:
-> 
-> 	case BPF_TRACE_FENTRY:
-> 	case BPF_TRACE_FEXIT:
-> 		return !!strncmp(prog->aux->attach_func_name, "bpf_sk_storage",
-> 				 strlen("bpf_sk_storage"));
-> 
-> The above should do for the fix.
-> 
-> No need to check for null on attach_func_name. It should have been checked
-> earlier in bpf_check_attach_target (the "tname" variable).
 
-Good to know, that simplifies the patch quite a bit. Should I add a
-Suggested-by when resubmitting?
 
+On 17/01/2025 12.56, Yunsheng Lin wrote:
+> On 2025/1/17 0:09, Jesper Dangaard Brouer wrote:
 > 
-> pw-bot: cr
+> ...
+> 
+>>> Mainly because there is no space available for keeping tracking of inflight
+>>> pages, using page->pp can only find the page_pool owning the page, but page_pool
+>>> is not able to keep track of the inflight page when the page is handled by
+>>> networking stack.
+>>>
+>>> By using page_pool_item as below, the state is used to tell if a specific
+>>> item is being used/dma mapped or not by scanning all the item blocks in
+>>> pool->item_blocks. If a specific item is used by a page, then 'pp_netmem'
+>>> will point to that page so that dma unmapping can be done for that page
+>>> when page_pool_destroy() is called, otherwise free items sit in the
+>>> pool->hold_items or pool->release_items by using 'lentry':
+>>>
+>>> struct page_pool_item {
+>>>      unsigned long state;
+>>>      
+>>>      union {
+>>>          netmem_ref pp_netmem;
+>>>          struct llist_node lentry;
+>>>      };
+>>> };
+>>
+>> pahole  -C page_pool_item vmlinux
+>> struct page_pool_item {
+>>      /* An 'encoded_next' is a pointer to next item, lower 2 bits is used to
+>>       * indicate the state of current item.
+>>       */
+>>      long unsigned int          encoded_next;     /*     0     8 */
+>>      union {
+>>          netmem_ref         pp_netmem;        /*     8     8 */
+>>          struct llist_node  lentry;           /*     8     8 */
+>>      };                                           /*     8     8 */
+>>
+>>      /* size: 16, cachelines: 1, members: 2 */
+>>      /* last cacheline: 16 bytes */
+>> };
+>>
+>>
+>>> When a page is added to the page_pool, a item is deleted from pool->hold_items
+>>> or pool->release_items and set the 'pp_netmem' pointing to that page and set
+>>> 'state' accordingly in order to keep track of that page.
+>>>
+>>> When a page is deleted from the page_pool, it is able to tell which page_pool
+>>> this page belong to by using the below function, and after clearing the 'state',
+>>> the item is added back to pool->release_items so that the item is reused for new
+>>> pages.
+>>>
+>>
+>> To understand below, I'm listing struct page_pool_item_block for other
+>> reviewers:
+>>
+>> pahole  -C page_pool_item_block vmlinux
+>> struct page_pool_item_block {
+>>      struct page_pool *         pp;               /*     0     8 */
+>>      struct list_head           list;             /*     8    16 */
+>>      unsigned int               flags;            /*    24     4 */
+>>      refcount_t                 ref;              /*    28     4 */
+>>      struct page_pool_item      items[];          /*    32     0 */
+>>
+>>      /* size: 32, cachelines: 1, members: 5 */
+>>      /* last cacheline: 32 bytes */
+>> };
+>>
+>>> static inline struct page_pool_item_block *
+>>> page_pool_item_to_block(struct page_pool_item *item)
+>>> {
+>>>      return (struct page_pool_item_block *)((unsigned long)item & PAGE_MASK);
+>>
+>> This trick requires some comments explaining what is going on!
+>> Please correct me if I'm wrong: Here you a masking off the lower bits of
+>> the pointer to page_pool_item *item, as you know that a struct
+>> page_pool_item_block is stored in the top of a struct page.  This trick
+>> is like a "container_of" for going from page_pool_item to
+>> page_pool_item_block, right?
+> 
+> Yes, you are right.
+> 
+>>
+>> I do notice that you have a comment above struct page_pool_item_block
+>> (that says "item_block is always PAGE_SIZE"), which is nice, but to be
+>> more explicit/clear:
+>>   I want a big comment block (placed above the main code here) that
+>> explains the design and intention behind this newly invented
+>> "item-block" scheme, like e.g. the connection between
+>> page_pool_item_block and page_pool_item. Like the advantage/trick that
+>> allows page->pp pointer to be an "item" and be mapped back to a "block"
+>> to find the page_pool object it belongs to.  Don't write *what* the code
+>> does, but write about the intended purpose and design reasons behind the
+>> code.
+> 
+> The comment for page_pool_item_block is below, it seems I also wrote about
+> intended purpose and design reasons here.
+> 
+> /* The size of item_block is always PAGE_SIZE, so that the address of item_block
+>   * for a specific item can be calculated using 'item & PAGE_MASK'
+>   */
+> 
+> Anyway, If putting something like above for page_pool_item_to_block() does
+> make it clearer, will add some comment for page_pool_item_to_block() too.
+> 
+>>
+>>
+>>> }
+>>>
+>>>    static inline struct page_pool *page_pool_get_pp(struct page *page)
+>>>    {
+>>>         return page_pool_item_to_block(page->pp_item)->pp;
+>>>    }
+>>>
+>>>
+>>>>
+>>>>> +static void __page_pool_item_init(struct page_pool *pool, struct page *page)
+>>>>> +{
+>>>>
+>>>> Function name is confusing.  First I though this was init'ing a single
+>>>> item, but looking at the code it is iterating over ITEMS_PER_PAGE.
+>>>>
+>>>> Maybe it should be called page_pool_item_block_init ?
+>>>
+>>> The __page_pool_item_init() is added to make the below
+>>> page_pool_item_init() function more readable or maintainable, changing
+>>> it to page_pool_item_block_init doesn't seems consistent?
+>>
+>> You (of-cause) also have to rename the other function, I though that was
+>> implicitly understood.
+>>
+>> BUT does my suggested rename make sense?  What I'm seeing is that all
+>> the *items* in the "block" is getting inited. But we are also setting up
+>> the "block" (e.g.  "block->pp=pool").
+> 
+> I am not really sure about that, as using the PAGE_SIZE block to hold the
+> item seems like a implementation detail, which might change in the future,
+> renaming other function to something like that doesn't seem right to me IMHO.
+> 
+> Also the next patch will add page_pool_item_blk_add() to support unlimited
+> inflight pages, it seems a better name is needed for that too, perheps rename
+> page_pool_item_blk_add() to page_pool_dynamic_item_add()?
 > 
 
+Hmmm... not sure about this.
+I think I prefer page_pool_item_blk_add() over page_pool_dynamic_item_add().
+
+> For __page_pool_item_init(), perhaps just inline it back to page_pool_item_init()
+> as __page_pool_item_init() is only used by page_pool_item_init(), and both of them
+> are not really large function.
+
+I like that you had a helper function. So, don't merge 
+__page_pool_item_init() into page_pool_item_init() just to avoid naming 
+it differently.
+
+Let me be more explicit what I'm asking for:
+
+IMHO you should rename:
+  - __page_pool_item_init() to __page_pool_item_block_init()
+and rename:
+  - page_pool_item_init() to page_pool_item_block_init()
+
+I hope this make it more clear what I'm saying.
+
+--Jesper
 
