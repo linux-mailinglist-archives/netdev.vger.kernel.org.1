@@ -1,111 +1,137 @@
-Return-Path: <netdev+bounces-159189-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159192-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57899A14B34
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 09:30:52 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4505A14B60
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 09:44:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3DF063A9F7E
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 08:30:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1CF59168E6D
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 08:44:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4C811F9400;
-	Fri, 17 Jan 2025 08:30:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D0951F8ADF;
+	Fri, 17 Jan 2025 08:44:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MgQdy7mT"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Z6wYYyWs"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 303391F91F2
-	for <netdev@vger.kernel.org>; Fri, 17 Jan 2025 08:30:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B16781F7909
+	for <netdev@vger.kernel.org>; Fri, 17 Jan 2025 08:44:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737102631; cv=none; b=Mfb5+pdQ/3PVKoisDiooimRmArzA6lgUzV6Ml8XBcnW/HNObDH8bD/zj9/OJPHCzOweHvSY0T/but1CwzxdqxFaX5xwudzJn8kh+3JKMaX8pPUcGWReK7dMKT9UZV9x6Fjbiqp++Cx4DI9vPR+p/08douFLagO3/jXteN+V4wyo=
+	t=1737103496; cv=none; b=oXaMsiCnzPCCAl1CfBIk12c9uf4IpgvzTha3dB5jp9FVJiiviq9cOSQJJGP+dEgG2BnDduNDsW21d+HIz3Y5vTsSPe62fBA61edsDkd52x4MBZCA6tsu8jBCsAolUrWo5NyAhXZ2c6ymOzCnO2DmtkoXfLQHY1FDiJrTFXpo1/U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737102631; c=relaxed/simple;
-	bh=d/g53UtwtoeMdjaT+R1dbBcyNXXLezqX3/UcNtC6vm0=;
-	h=From:In-Reply-To:References:Cc:Subject:MIME-Version:Content-Type:
-	 Date:Message-ID; b=FbqLRmGUxxC7iL0kVwz0D0zXz/xsgeADUuYMEV3s7qQCUS60BGcMvV0n4/ZmdZi8KKDslQtDJGUztYOlezvTRPKJM7MZE3+DIoejMs8JIiyGmCcCAm33d3BRqzmcKq+M2X1Gmg67XoDHcNA1vBlbZ8dbkGS7y59jYLi9kY4/cjM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MgQdy7mT; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1737102629;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:to:
-	 cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=HDiFi/c6f0Cw5829523ALaPbNuqbpB2s/qFVysdO5PY=;
-	b=MgQdy7mTdJ1gX7UMrHv8q6FgSZt8x9Fe48pOasrd4BuLZkpQ8TXc4Rx67sHZ/FEvhAsUQM
-	QgzQjpyi5K27YeCPuOAROsfwEmb2hfAvsyaPcY3WBCxGkutBXz+zpUi5xPHi8Dc/1vn2et
-	MJC7pVnoU0/kfx2eKKTir/+Gva+kRbs=
-Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-558-a2EhEHctOkyte2ur2SK5Cg-1; Fri,
- 17 Jan 2025 03:30:24 -0500
-X-MC-Unique: a2EhEHctOkyte2ur2SK5Cg-1
-X-Mimecast-MFC-AGG-ID: a2EhEHctOkyte2ur2SK5Cg
-Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 2EFD51955D72;
-	Fri, 17 Jan 2025 08:30:22 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.5])
-	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 3B92C19560BF;
-	Fri, 17 Jan 2025 08:30:17 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <477969.1737101629@warthog.procyon.org.uk>
-References: <477969.1737101629@warthog.procyon.org.uk> <Z4Ds9NBiXUti-idl@gondor.apana.org.au> <20250110010313.1471063-1-dhowells@redhat.com> <20250110010313.1471063-3-dhowells@redhat.com>
-Cc: dhowells@redhat.com, Herbert Xu <herbert@gondor.apana.org.au>,
-    Chuck Lever <chuck.lever@oracle.com>,
-    Trond Myklebust <trond.myklebust@hammerspace.com>,
-    "David S. Miller" <davem@davemloft.net>,
-    Marc Dionne <marc.dionne@auristor.com>,
-    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-    Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-    linux-crypto@vger.kernel.org, linux-afs@lists.infradead.org,
-    linux-nfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-    netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH 2/8] crypto/krb5: Provide Kerberos 5 crypto through AEAD API
+	s=arc-20240116; t=1737103496; c=relaxed/simple;
+	bh=Z484xkyxYcSI61TkuYQBBLEqgYBK50pl3CT1AB8Rgpg=;
+	h=From:To:Cc:Subject:MIME-Version:Content-Disposition:Content-Type:
+	 Message-Id:Date; b=rszZyENp3x+Tg0QItj2M/gbWznQZ2eOTfURJIC4VIVh8fS/PcWyM9kcnkLAsyaCjL5jBvga7pEwV/t+ko6FTBc99EZCHtD78/20Dy7KCddQz54480IvR7flq+0CTj7pE6slYfUqfq4IO9tAaXd8rIB8HnIJED3GFfmNgEjBjUVI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=Z6wYYyWs; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
+	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:Reply-To:Content-ID
+	:Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:
+	Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=i4Yfty4BlHVy0fxTNfin1Lk2Mqnf2dUlMcpNONE97cA=; b=Z6wYYyWsTJAJuacHl+hKqtMhOv
+	cHQSRfxwDEIR7pi6k5juo7egzMbHrzOPga49FWMe39K/u9G8SHlYU1tOQNQjwsXTxfgxjZ604Ean3
+	oQhbqPNj2GvkwdIaDWwo2lLXXDUao7k9aMfCopHFU+Aco/CZwSkMfqX/leYlUJebsY1nZl8oxBXRp
+	CXMmkxp5o36H8Fo2scoQqEhGOILCfmdfMNTaA75QUHxWu7ms1pVMxCsFSgkVAhmEIheemwXFhea/r
+	viJOhBkg+E06MyPDint0ux4mYrJNi9ju157peGhn8XQbpu6scjrXzVXW+zecYwF4o3i6kax919BWb
+	LdKMgQYw==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:38704 helo=rmk-PC.armlinux.org.uk)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <rmk@armlinux.org.uk>)
+	id 1tYhy8-0003T5-0y;
+	Fri, 17 Jan 2025 08:44:44 +0000
+Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
+	id 1tYhxp-001FHf-Ac; Fri, 17 Jan 2025 08:44:25 +0000
+From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org
+Subject: [PATCH net-next] net: phylink: always do a major config when
+ attaching a SFP PHY
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <493306.1737102616.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 17 Jan 2025 08:30:16 +0000
-Message-ID: <493307.1737102616@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Message-Id: <E1tYhxp-001FHf-Ac@rmk-PC.armlinux.org.uk>
+Sender: Russell King <rmk@armlinux.org.uk>
+Date: Fri, 17 Jan 2025 08:44:25 +0000
 
-David Howells <dhowells@redhat.com> wrote:
+Background: https://lore.kernel.org/r/20250107123615.161095-1-ericwouds@gmail.com
 
-> > rfc8009 is basically the same as authenc.
-> =
+Since adding negotiation of in-band capabilities, it is no longer
+sufficient to just look at the MLO_AN_xxx mode and PHY interface to
+decide whether to do a major configuration, since the result now
+depends on the capabilities of the attaching PHY.
 
-> Actually, it's not quite the same :-/
-> =
+Always trigger a major configuration in this case.
 
-> rfc8009 chucks the IV from the encryption into the hash first, but authe=
-nc()
-> does not.  It may be possible to arrange the buffer so that the assoc da=
-ta is
-> also the IV buffer.
+Testing log: https://lore.kernel.org/r/f20c9744-3953-40e7-a9c9-5534b25d2e2a@gmail.com
 
-Actually actually, it's the starting IV, so I just need to chuck in a bloc=
-k of
-zeroes.
+Reported-by: Eric Woudstra <ericwouds@gmail.com>
+Tested-by: Eric Woudstra <ericwouds@gmail.com>
+Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+---
+ drivers/net/phy/phylink.c | 11 +++++------
+ 1 file changed, 5 insertions(+), 6 deletions(-)
 
-David
+diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
+index 66eea3f963d3..d130634d3bc7 100644
+--- a/drivers/net/phy/phylink.c
++++ b/drivers/net/phy/phylink.c
+@@ -3541,12 +3541,11 @@ static phy_interface_t phylink_choose_sfp_interface(struct phylink *pl,
+ 	return interface;
+ }
+ 
+-static void phylink_sfp_set_config(struct phylink *pl,
+-				   unsigned long *supported,
+-				   struct phylink_link_state *state)
++static void phylink_sfp_set_config(struct phylink *pl, unsigned long *supported,
++				   struct phylink_link_state *state,
++				   bool changed)
+ {
+ 	u8 mode = MLO_AN_INBAND;
+-	bool changed = false;
+ 
+ 	phylink_dbg(pl, "requesting link mode %s/%s with support %*pb\n",
+ 		    phylink_an_mode_str(mode), phy_modes(state->interface),
+@@ -3623,7 +3622,7 @@ static int phylink_sfp_config_phy(struct phylink *pl, struct phy_device *phy)
+ 
+ 	pl->link_port = pl->sfp_port;
+ 
+-	phylink_sfp_set_config(pl, support, &config);
++	phylink_sfp_set_config(pl, support, &config, true);
+ 
+ 	return 0;
+ }
+@@ -3698,7 +3697,7 @@ static int phylink_sfp_config_optical(struct phylink *pl)
+ 
+ 	pl->link_port = pl->sfp_port;
+ 
+-	phylink_sfp_set_config(pl, pl->sfp_support, &config);
++	phylink_sfp_set_config(pl, pl->sfp_support, &config, false);
+ 
+ 	return 0;
+ }
+-- 
+2.30.2
 
 
