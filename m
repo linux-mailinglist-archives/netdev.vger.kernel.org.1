@@ -1,181 +1,164 @@
-Return-Path: <netdev+bounces-159177-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159178-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E139A14A6E
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 08:55:10 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E109A14A99
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 09:02:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BBBC91887B90
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 07:55:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 22592160926
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 08:02:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EF321F76D6;
-	Fri, 17 Jan 2025 07:55:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC06D1F791E;
+	Fri, 17 Jan 2025 08:01:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="z/Ia54o/"
+	dkim=pass (1024-bit key) header.d=cisco.com header.i=@cisco.com header.b="KO0tS2NM"
 X-Original-To: netdev@vger.kernel.org
-Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
+Received: from rcdn-iport-9.cisco.com (rcdn-iport-9.cisco.com [173.37.86.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BCED1D6DBF;
-	Fri, 17 Jan 2025 07:55:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D52C31F7911
+	for <netdev@vger.kernel.org>; Fri, 17 Jan 2025 08:01:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=173.37.86.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737100504; cv=none; b=S72KF4mMY/Orer+rUC2hUOLJ4n1MblxK6w1Ypyo7ZWsgw+kqWSitNLt090YQo2LajleYzAgIiaPusjFq948w6BW3X2IIuk4WEZr+MddZGkgqh/gE42vL93BM2wKa9CFlHkTLCvwxwVtVa7U5E3mFubChGiTjR5sfgQoNlyPQqRQ=
+	t=1737100911; cv=none; b=Lp+PHy+aNcufECa7VZGLopIjES23g06wlqjRygmojAiHbZqtoeSkKP7mXXzPRrIHIUkz3e+/0gtjkaa6uK7c12K72GzrZyEGtBLz2yqYIoKbaNm/zL/PqZMCcRoO1M7uSKOuYEokVNBzBV47NT1s6Gn47irjyYEinG/kWoAQj4s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737100504; c=relaxed/simple;
-	bh=hn7H7geDET+9mb5AQ56X5ejzMTk9nUqCRZCg8V5piWQ=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ekUzSIjzY9Vl/bDQfHvm+CUw+e/5VMUq8UHoKAVixpwO7pKLIZl10h2XDnY9++A76MLfHpF1rxcfe4TKai3Jk1M0bi9/t2weL3+ZlBf4Cqimp1EtU2hyc6gNFsYQBlDp+q+dLTAunqWnfnHw+9KOLHBHXC9Vp8WtjmlvlmcfHMU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=z/Ia54o/; arc=none smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by a.mx.secunet.com (Postfix) with ESMTP id E039B205F0;
-	Fri, 17 Jan 2025 08:54:58 +0100 (CET)
-X-Virus-Scanned: by secunet
-Received: from a.mx.secunet.com ([127.0.0.1])
-	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id QLFnhm-4kn4s; Fri, 17 Jan 2025 08:54:58 +0100 (CET)
-Received: from cas-essen-02.secunet.de (rl2.secunet.de [10.53.40.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by a.mx.secunet.com (Postfix) with ESMTPS id 3948C205DD;
-	Fri, 17 Jan 2025 08:54:58 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 3948C205DD
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1737100498;
-	bh=Wgo5r11L3PJUcwLPF8YpuqyloBdb04bdd08H4PGudgY=;
-	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
-	b=z/Ia54o/f4yevNGTQlc0+SVnXBWjwvhZKmSBtR2pxH5NMCd4cvpNJeXVJ2/0Znwes
-	 mPceb4BAhNvvTbkNfb9/9gLnps4hay50YHLG8vkmwD5wy7b69TUV+hxhhUEC6Z+IP2
-	 HdV3YZiEzDD0EVvfBvcTkgalA6NG9eggRm1OrxLWKdgdOKm5qbfAgulREgXHJSNqlp
-	 K3P00u43pv+EYnE6We+cD35v824dzgPSC3fnx28d7kYBGnlAqMwKhBI0MftTAPmYQ2
-	 dY4pQCZwMnr7/uKwUe5f6iGxSgA3Y2RxaosWrmdSoArnLV4yO9iwH0Ur9wFSvu061Z
-	 cL/+LmOdNfskg==
-Received: from mbx-essen-02.secunet.de (10.53.40.198) by
- cas-essen-02.secunet.de (10.53.40.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Fri, 17 Jan 2025 08:54:58 +0100
-Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
- (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Fri, 17 Jan
- 2025 08:54:57 +0100
-Received: by gauss2.secunet.de (Postfix, from userid 1000)
-	id 720BC31840A6; Fri, 17 Jan 2025 08:54:57 +0100 (CET)
-Date: Fri, 17 Jan 2025 08:54:57 +0100
-From: Steffen Klassert <steffen.klassert@secunet.com>
-To: Hangbin Liu <liuhangbin@gmail.com>
-CC: Jianbo Liu <jianbol@nvidia.com>, Jakub Kicinski <kuba@kernel.org>,
-	<netdev@vger.kernel.org>, Jay Vosburgh <jv@jvosburgh.net>, Andy Gospodarek
-	<andy@greyhouse.net>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Nikolay Aleksandrov
-	<razor@blackwall.org>, Simon Horman <horms@kernel.org>, Tariq Toukan
-	<tariqt@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>, Shuah Khan
-	<shuah@kernel.org>, Herbert Xu <herbert@gondor.apana.org.au>, Sabrina Dubroca
-	<sd@queasysnail.net>, <linux-kselftest@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net 0/2] bond: fix xfrm offload feature during init
-Message-ID: <Z4oM0cWuipPCWqeo@gauss3.secunet.de>
-References: <20241212062734.182a0164@kernel.org>
- <Z1vfsAyuxcohT7th@fedora>
- <20241213193127.4c31ef80@kernel.org>
- <Z3X9pfu12GUOBUY6@fedora>
- <1d8c901f-e292-43e4-970f-8440b26e92b0@nvidia.com>
- <Z3u0q5HSOshLn2V0@fedora>
- <Z33nEKg4PxwReUu_@fedora>
- <ad289f9a-41c3-4544-8aeb-535615f45aef@nvidia.com>
- <Z34l6hpbzPP9n65Y@fedora>
- <Z4d9pVshf3RKQp_o@fedora>
+	s=arc-20240116; t=1737100911; c=relaxed/simple;
+	bh=CD3z4D6+KGCya1f0p2QM0edD2+4kXFPHcQctqjoD+I8=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=aHk0X4qY2ctP2fAT7+aPp+i4E9I6cCQ96WG+1L01Zl1b2LbpjTys3LINbn0cuM1sI3ulVPadKbi2VUFJ6VvSIbVXXj7Fgr0k30xNW2BZ/ZL5Sl5yH7Nd8Wp+lLxTQat/+lLEUZ5/L8pQ4MhtKgq6Tn8v43mZLu8YDq2oXvS4Mss=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cisco.com; spf=pass smtp.mailfrom=cisco.com; dkim=pass (1024-bit key) header.d=cisco.com header.i=@cisco.com header.b=KO0tS2NM; arc=none smtp.client-ip=173.37.86.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cisco.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cisco.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=cisco.com; i=@cisco.com; l=2314; q=dns/txt; s=iport;
+  t=1737100909; x=1738310509;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=kXoVI7oyXn7P7i7VP0IK65FLIVy4Cm4cahbGupIiaGk=;
+  b=KO0tS2NMn3cArpHZEAmMAYJQqDYYyK7k2v65leP95afIQ2ZxomFAxtxI
+   KOBx9yYxJgYZsBhc0yWD2r/FYY3NGrgYZbrWy5dSSCHwoVOOOiRBwbvhL
+   o06t2zn2P9PxASzhKqIiqASKAnKtSSqinfZobgn0WgXjK8+2RBj5JiQvX
+   k=;
+X-CSE-ConnectionGUID: u4wGIz+QQTypq6tetp4bBg==
+X-CSE-MsgGUID: 9hsFcGNES6mZsho+Qn2/Bg==
+X-IPAS-Result: =?us-ascii?q?A0BBAADmDIpn/5P/Ja1aHQEBAQEJARIBBQUBgX8IAQsBg?=
+ =?us-ascii?q?kqBT0NIjHJfiHOeGxSBEQNWDwEBAQ9EBAEBhQeKdQImNAkOAQIEAQEBAQMCA?=
+ =?us-ascii?q?wEBAQEBAQEBAQEBCwEBBQEBAQIBBwWBDhOGCIZdNgFGgQwyEoMBgmUDsx+CL?=
+ =?us-ascii?q?IEB3jOBbYFIAYVqh19whHcnG4FJRIQOb4QpZ4V3BIIygUWDbp8ySIEhA1ksA?=
+ =?us-ascii?q?VUTDQoLBwWBOTgDIgsLDAsUHBUCFR0PBhAEbUQ3gkZpSTcCDQI1gh4kWIIrh?=
+ =?us-ascii?q?FyERYRRgkdUgkeCFHqBGoI3gjhAAwsYDUgRLDcGDhsGPm4Hm1M8g3OBDgF7K?=
+ =?us-ascii?q?24UUZMOCZIfoQOEJYFjn2MaM6pTmHwio243hGaBZzyBWTMaCBsVgyJSGQ/QB?=
+ =?us-ascii?q?SUyPAIHCwEBAwmRXgEB?=
+IronPort-Data: A9a23:p4wA/qlstqGTGDgTa0lnt1Lo5gyjJ0RdPkR7XQ2eYbSJt1+Wr1Gzt
+ xIYD23SbPeLM2X3Ko11bdzlo0JVscCGmNI3SgNrqik2EFtH+JHPbTi7wugcHM8zwunrFh8PA
+ xA2M4GYRCwMZiaC4E/rav658CEUOZigHtLUEPTDNj16WThqQSIgjQMLs+Mii+aEu/Dha++2k
+ Y20+pa31GONgWYubzpNsv3b8XuDgdyr0N8mlg1mDRx0lAe2e0k9VPo3Oay3Jn3kdYhYdsbSb
+ /rD1ryw4lTC9B4rDN6/+p6jGqHdauePVeQmoiM+t5mK2nCulARrukoIHKZ0hXNsttm8t4sZJ
+ OOhGnCHYVxB0qXkwIzxWvTDes10FfUuFLTveRBTvSEPpqHLWyOE/hlgMK05FZBE5clWEyJ3z
+ MAJMClTch2fn7686r3uH4GAhux7RCXqFJkUtnclyXTSCuwrBMmbBa7L/tRfmjw3g6iiH96HO
+ JFfMmUpNkmdJUQTZT/7C7pm9Ausrnv4cztUoVaYjaE2+GPUigd21dABNfKOIoLaFJ4Jxx3wS
+ mTurmTiLBo1EvGklz+36XKrxdbJx2TRV9dHfFG/3rsw6LGJ/UQfAQMbUHO3qOe0j0q5Vc4ZL
+ UEIkgIjobU3/V6mUvHyWBq3pHPCtRkZM/JTDuczwAKA0KzZ50CeHGdsZjdHZMYrq4wwSCAm2
+ 0Ghm87vA3pksNW9UXuX+7GVhSm/NSgcMSkJYipsZQ0I/9XuvqktgR/VCNVuCqi4ipvyAz6Y/
+ tyRhDI1i7NWiYsA0L+2uAmfxTmtvZPOCAUy4207Q16Y0++wX6b9D6TA1LQRxa8owFqxJrVZg
+ EU5pg==
+IronPort-HdrOrdr: A9a23:Tq9uzKxMI5JfWfeAIqK8KrPwJ71zdoMgy1knxilNoNJuHfBw8P
+ re+cjzuiWUtN98YhwdcLO7Scu9qA3nlaKdiLN5VdzJYOCMggWVxe9ZgbcKuweQeBEXMoVmpM
+ Bdm28UMqyVMWRH
+X-Talos-CUID: =?us-ascii?q?9a23=3APMoHEWql3U81poJVpEPV38HmUd15bVL83jTpGnO?=
+ =?us-ascii?q?pEX83VLCJUQOa0qwxxg=3D=3D?=
+X-Talos-MUID: 9a23:gLYw8QjTVHE+cZWj+uqe2cMpZcdzza+BLm02z5A0oMmDdhV2YXC3g2Hi
+X-IronPort-Anti-Spam-Filtered: true
+X-IronPort-AV: E=Sophos;i="6.13,211,1732579200"; 
+   d="scan'208";a="306893413"
+Received: from rcdn-l-core-10.cisco.com ([173.37.255.147])
+  by rcdn-iport-9.cisco.com with ESMTP/TLS/TLS_AES_256_GCM_SHA384; 17 Jan 2025 08:01:41 +0000
+Received: from cisco.com (savbu-usnic-a.cisco.com [10.193.184.48])
+	by rcdn-l-core-10.cisco.com (Postfix) with ESMTP id CFF4C1800026D;
+	Fri, 17 Jan 2025 08:01:41 +0000 (GMT)
+Received: by cisco.com (Postfix, from userid 392789)
+	id A6D6420F2003; Fri, 17 Jan 2025 00:01:41 -0800 (PST)
+From: John Daley <johndale@cisco.com>
+To: benve@cisco.com,
+	satishkh@cisco.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	netdev@vger.kernel.org
+Cc: John Daley <johndale@cisco.com>
+Subject: [PATCH net-next v6 0/3] enic: Use Page Pool API for receiving packets
+Date: Fri, 17 Jan 2025 00:01:36 -0800
+Message-Id: <20250117080139.28018-1-johndale@cisco.com>
+X-Mailer: git-send-email 2.35.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <Z4d9pVshf3RKQp_o@fedora>
-X-ClientProxiedBy: cas-essen-01.secunet.de (10.53.40.201) To
- mbx-essen-02.secunet.de (10.53.40.198)
-X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
+Content-Transfer-Encoding: 8bit
+X-Outbound-SMTP-Client: 10.193.184.48, savbu-usnic-a.cisco.com
+X-Outbound-Node: rcdn-l-core-10.cisco.com
 
-On Wed, Jan 15, 2025 at 09:19:33AM +0000, Hangbin Liu wrote:
-> On Wed, Jan 08, 2025 at 07:15:00AM +0000, Hangbin Liu wrote:
-> > > > > > > I don't know how to disable bonding sleeping since we use mutex_lock now.
-> > > > > > > Hi Jianbo, do you have any idea?
-> > > > > > > 
-> > > > > > 
-> > > > > > I think we should allow drivers to sleep in the callbacks. So, maybe it's
-> > > > > > better to move driver's xdo_dev_state_delete out of state's spin lock.
-> > > > > 
-> > > > > I just check the code, xfrm_dev_state_delete() and later
-> > > > > dev->xfrmdev_ops->xdo_dev_state_delete(x) have too many xfrm_state x
-> > > > > checks. Can we really move it out of spin lock from xfrm_state_delete()
-> > > > 
-> > > > I tried to move the mutex lock code to a work queue, but found we need to
-> > > > check (ipsec->xs == xs) in bonding. So we still need xfrm_state x during bond
-> > > 
-> > > Maybe I miss something, but why need to hold spin lock. You can keep xfrm
-> > > state by its refcnt.
-> > 
-> > Do you mean move the xfrm_dev_state_delete() out of spin lock directly like:
-> > 
-> > diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
-> > index 67ca7ac955a3..6881ddeb4360 100644
-> > --- a/net/xfrm/xfrm_state.c
-> > +++ b/net/xfrm/xfrm_state.c
-> > @@ -766,13 +766,6 @@ int __xfrm_state_delete(struct xfrm_state *x)
-> >  		if (x->encap_sk)
-> >  			sock_put(rcu_dereference_raw(x->encap_sk));
-> >  
-> > -		xfrm_dev_state_delete(x);
-> > -
-> > -		/* All xfrm_state objects are created by xfrm_state_alloc.
-> > -		 * The xfrm_state_alloc call gives a reference, and that
-> > -		 * is what we are dropping here.
-> > -		 */
-> > -		xfrm_state_put(x);
-> >  		err = 0;
-> >  	}
-> >  
-> > @@ -787,8 +780,20 @@ int xfrm_state_delete(struct xfrm_state *x)
-> >  	spin_lock_bh(&x->lock);
-> >  	err = __xfrm_state_delete(x);
-> >  	spin_unlock_bh(&x->lock);
-> > +	if (err)
-> > +		return err;
-> >  
-> > -	return err;
-> > +	if (x->km.state == XFRM_STATE_DEAD) {
-> > +		xfrm_dev_state_delete(x);
-> > +
-> > +		/* All xfrm_state objects are created by xfrm_state_alloc.
-> > +		 * The xfrm_state_alloc call gives a reference, and that
-> > +		 * is what we are dropping here.
-> > +		 */
-> > +		xfrm_state_put(x);
-> > +	}
-> > +
-> > +	return 0;
-> >  }
-> >  EXPORT_SYMBOL(xfrm_state_delete);
-> >  
-> 
-> Hi Jianbo,
-> 
-> I talked with Sabrina and it looks we can't simply do this. Because both
-> xfrm_add_sa_expire() and xfrm_timer_handler() calling __xfrm_state_delete() under
-> spin lock. If we move the xfrm_dev_state_delete() out of __xfrm_state_delete(),
-> all the places need to be handled correctly.
-> 
-> At the same time xfrm_timer_handler() calling xfrm_dev_state_update_stats before
-> __xfrm_state_delete(). Should we also take care of it to make sure the state
-> change and delete are called at the same time?
-> 
-> Hi Steffen, do you have any comments?
+Use the Page Pool API for RX. The Page Pool API improves bandwidth and
+CPU overhead by recycling pages instead of allocating new buffers in the
+driver. Also, page pool fragment allocation for smaller MTUs is used
+allow multiple packets to share pages.
 
-Can't you just fix this in bonding? xfrm_timer_handler() can't sleep
-anyway, even if you remove the spinlock, it is a timer function.
+RX code was moved to its own file and some refactoring was done
+beforehand to make the page pool changes more trasparent and to simplify
+the resulting code.
+
+Signed-off-by: John Daley <johndale@cisco.com>
+
+---
+Changes in v2:
+- Fixed a valid warning found by build_clang where a variable was used
+  before it was initialized. The warnings in include/linux/mm.h were not
+  addressed since they do not appear to be realated to this patchset.
+
+Changes in v3:
+- Moved a function to before where is was called and removed the forward
+  declaration. Reworded a commit message. No functional changes.
+
+Changes in v4:
+- Replaced call to page_pool_put_page() with page_pool_put_full_page()
+  since page_pool_dev_alloc() API is used and page_pool is created with
+  PP_FLAG_DMA_SYNC_DEV flag.
+- Reworded final commit message one more time to try to make it clear
+  that there is just one fix for the commit.
+
+Changes in v5:
+- Removed link related patches from the patchset. These were merged
+  seperately.
+- Removed inappropriate calls to napi_free_frags()
+- Moved pp_alloc_error out of ethtool stats and accumulate into netdev
+  queue stat 'alloc_error'.
+
+Changes in v6:
+- Use the page pool API for all MTUs, not just <= PAGE_SIZE. Use page
+  pool 'order' field to accomodate MTUs > PAGE_SIZE. Remove the
+  function pointers and functions that handled the bigger MTUs.
+
+John Daley (3):
+  enic: Move RX functions to their own file
+  enic: Simplify RX handler function
+  enic: Use the Page Pool API for RX
+
+ drivers/net/ethernet/cisco/enic/Makefile    |   2 +-
+ drivers/net/ethernet/cisco/enic/enic.h      |   3 +
+ drivers/net/ethernet/cisco/enic/enic_main.c | 264 ++------------------
+ drivers/net/ethernet/cisco/enic/enic_rq.c   | 242 ++++++++++++++++++
+ drivers/net/ethernet/cisco/enic/enic_rq.h   |  10 +
+ drivers/net/ethernet/cisco/enic/vnic_rq.h   |   2 +
+ 6 files changed, 283 insertions(+), 240 deletions(-)
+ create mode 100644 drivers/net/ethernet/cisco/enic/enic_rq.c
+ create mode 100644 drivers/net/ethernet/cisco/enic/enic_rq.h
+
+-- 
+2.35.2
+
 
