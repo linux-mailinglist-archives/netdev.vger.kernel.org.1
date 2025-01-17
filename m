@@ -1,75 +1,103 @@
-Return-Path: <netdev+bounces-159138-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159139-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 911CAA147E5
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 03:07:34 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF293A147ED
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 03:10:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0F706188DB54
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 02:07:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3C0003A81A0
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 02:10:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DECE1F5618;
-	Fri, 17 Jan 2025 02:07:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3F4F1F5607;
+	Fri, 17 Jan 2025 02:10:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q3E/d5r2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eEtCYlrq"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02D7B1F5614;
-	Fri, 17 Jan 2025 02:07:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 823CB17084F;
+	Fri, 17 Jan 2025 02:10:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737079646; cv=none; b=BUH4qPH3XAYqp3eSZJ11+K1mryq6rv/ZVyzNc63kiyYOwgT4TokC2KnfFmH7XqaC17PhubfVwm8vb7wsrqrfY4fD69Mc/Ms0BbMYf6CvIcMwWKMNQ6UXJH51jh3s73lJrR3Z61oyNPZ6WCeJXQ/0soBPHfTp34uOhW8K9OY2+dQ=
+	t=1737079815; cv=none; b=dCJbidnQ3t/EAiWY4/x9uehaG8UorfiT/DCc/B+8/sDNp3JYnJryr/xD5hev1SR2Ew8iODr3ID3W2qd8mA6C2L2Fx6js7egZTcFsuRd8QrgRc/JkPjJm/Xd2ehDVFTYtvEtChkhULSYd2wOdgSujeyemc2tfvEamP9upRPOK8K8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737079646; c=relaxed/simple;
-	bh=kkzjE1abC9f4YTR7CcARJX5dGGH7iZDQUJXe5bBq5Tk=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=HABATZBDa3jzqS5lTgwTDuhMgT7cLhr+n2iy/1fIyT/VQTq9tZBtLsuK+ICZ8kY5sSGebsiqPOz8aQHlJXMU2zLI9m9ayNX3a0csypKgU/BB43clA2EGGredsH21hBajRld3SjUqhyvIOH/INKWvWoz+k0rKxEIdWTGX9zjpOag=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=q3E/d5r2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C601DC4CEE4;
-	Fri, 17 Jan 2025 02:07:24 +0000 (UTC)
+	s=arc-20240116; t=1737079815; c=relaxed/simple;
+	bh=N/1lM3FdjEbzOdwCyPUvi4IKptb+2FDKY0HBnjtFmY4=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=Wio0HSHKlhM+G5cswHuF1vtQl/oPDCkJAowUNvyakqTfSjPdOBRzTatlMO2Uabk8PXZ5ckfzLJRP1nCCBD5vTH8OZ66A9/qT7OU2q+Mx9AZI3PvuG7XcNh6yefKjzaHyYKpoaCEqvpkzRnP/rL/2dBAZe6ChpO4QjSuViAt6VIE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eEtCYlrq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 14880C4CED6;
+	Fri, 17 Jan 2025 02:10:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737079645;
-	bh=kkzjE1abC9f4YTR7CcARJX5dGGH7iZDQUJXe5bBq5Tk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=q3E/d5r2fdAZ6LQh0tManqWn+gvDtcCTi0/roDt1h0XzabAv4NtQA/IrIvJ2K9FmK
-	 BEwr6RFDjKYP0CEb25IypNVdTB927Lw2BHlyQIRKEl4wVaE/fVSBy6YIlh6bHS0Lka
-	 zDsJ9O70pDUcE0oSos9vhQpYXJDWiHCNEHYn5/HU2INRNszGDer9O3q3mPd/4Nvp81
-	 kMhFQiQNVGgQZWIaJzeOD4no6C2CmVXOFgU+eRygUUVLxbTWwKHNsMMJuialiNtLKm
-	 VT+K895Zp0ewsXYsY5l+cie/8pOLHWLaUwAl0pRQ3xaTY62gykWAutMUXcjvsrKyj6
-	 KjCVJM3OF+ApQ==
-Date: Thu, 16 Jan 2025 18:07:23 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: David Wei <dw@davidwei.uk>
-Cc: io-uring@vger.kernel.org, netdev@vger.kernel.org, Jens Axboe
- <axboe@kernel.dk>, Pavel Begunkov <asml.silence@gmail.com>, Paolo Abeni
- <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jesper Dangaard Brouer <hawk@kernel.org>, David
- Ahern <dsahern@kernel.org>, Mina Almasry <almasrymina@google.com>,
- Stanislav Fomichev <stfomichev@gmail.com>, Joe Damato <jdamato@fastly.com>,
- Pedro Tammela <pctammela@mojatatu.com>
-Subject: Re: [PATCH net-next v11 14/21] io_uring/zcrx: implement zerocopy
- receive pp memory provider
-Message-ID: <20250116180723.21a4e637@kernel.org>
-In-Reply-To: <20250116231704.2402455-15-dw@davidwei.uk>
-References: <20250116231704.2402455-1-dw@davidwei.uk>
-	<20250116231704.2402455-15-dw@davidwei.uk>
+	s=k20201202; t=1737079815;
+	bh=N/1lM3FdjEbzOdwCyPUvi4IKptb+2FDKY0HBnjtFmY4=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=eEtCYlrq0PEPpVp8K6+/MUygSIkLX4CXLsIF30sIc6GjtKiRtqgFLchMdHuRcF8y6
+	 53cruj8mUfRc3FXRr6kuP+nd/U9Sc2pYiAoYVtbTd07wPqbzO2iCmp5CWCPeuWFDOz
+	 0/yx5mGyyWuYBbRSMbTDF/zaR9gZFZ8cKcz0dA9ZTUURKqp3nSIwB/uQLwZcYsevRX
+	 3pLQPrUsyKQ/94QfyPU1OUf0lPiIXjpXFSvMp8u6nSTACpXdyGNVx33KN6cFQPHNiS
+	 krf71cllGQEKbXtlONHwRlPJsQjdFFSFvWB9c968bfmjqpa0LLiOAgDSM1XpseZSE9
+	 LCPO+auHHBk6w==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 71662380AA63;
+	Fri, 17 Jan 2025 02:10:39 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH bpf-next v7 0/5] Support eliding map lookup nullness
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <173707983824.1659522.18019002875638405637.git-patchwork-notify@kernel.org>
+Date: Fri, 17 Jan 2025 02:10:38 +0000
+References: <cover.1736886479.git.dxu@dxuuu.xyz>
+In-Reply-To: <cover.1736886479.git.dxu@dxuuu.xyz>
+To: Daniel Xu <dxu@dxuuu.xyz>
+Cc: linux-kernel@vger.kernel.org, bpf@vger.kernel.org, ast@kernel.org,
+ memxor@gmail.com, daniel@iogearbox.net, netdev@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, eddyz87@gmail.com, andrii@kernel.org
 
-On Thu, 16 Jan 2025 15:16:56 -0800 David Wei wrote:
-> +	type = rxq ? NETDEV_A_QUEUE_IO_URING : NETDEV_A_PAGE_POOL_IO_URING;
-> +	nest = nla_nest_start(rsp, type);
-> +	nla_nest_end(rsp, nest);
+Hello:
 
-nla_nest_start() can fail, you should return -EMSGSIZE if it does
+This series was applied to bpf/bpf-next.git (master)
+by Alexei Starovoitov <ast@kernel.org>:
+
+On Tue, 14 Jan 2025 13:28:41 -0700 you wrote:
+> This patch allows progs to elide a null check on statically known map
+> lookup keys. In other words, if the verifier can statically prove that
+> the lookup will be in-bounds, allow the prog to drop the null check.
+> 
+> This is useful for two reasons:
+> 
+> 1. Large numbers of nullness checks (especially when they cannot fail)
+>    unnecessarily pushes prog towards BPF_COMPLEXITY_LIMIT_JMP_SEQ.
+> 2. It forms a tighter contract between programmer and verifier.
+> 
+> [...]
+
+Here is the summary with links:
+  - [bpf-next,v7,1/5] bpf: verifier: Add missing newline on verbose() call
+    https://git.kernel.org/bpf/bpf-next/c/b8a81b5dd645
+  - [bpf-next,v7,2/5] bpf: tcp: Mark bpf_load_hdr_opt() arg2 as read-write
+    https://git.kernel.org/bpf/bpf-next/c/8ac412a33611
+  - [bpf-next,v7,3/5] bpf: verifier: Refactor helper access type tracking
+    https://git.kernel.org/bpf/bpf-next/c/37cce22dbd51
+  - [bpf-next,v7,4/5] bpf: verifier: Support eliding map lookup nullness
+    https://git.kernel.org/bpf/bpf-next/c/d2102f2f5d75
+  - [bpf-next,v7,5/5] bpf: selftests: verifier: Add nullness elision tests
+    https://git.kernel.org/bpf/bpf-next/c/f932a8e4824b
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
