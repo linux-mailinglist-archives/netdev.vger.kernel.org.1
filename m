@@ -1,132 +1,125 @@
-Return-Path: <netdev+bounces-159348-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159349-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5219A15326
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 16:49:53 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 470B5A1532E
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 16:51:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 109E53A1CA9
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 15:49:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 99F527A103D
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 15:51:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F15CC194A75;
-	Fri, 17 Jan 2025 15:49:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F731199939;
+	Fri, 17 Jan 2025 15:51:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PIoBaieD"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bJDD7DYZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DF7533062
-	for <netdev@vger.kernel.org>; Fri, 17 Jan 2025 15:49:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 996EED530
+	for <netdev@vger.kernel.org>; Fri, 17 Jan 2025 15:51:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737128989; cv=none; b=UIpd/WT5v90HP+Vjw4q6BP2K8bbnxjk+G1kTOLLbZi5inbGCJ5nSC10muoR84aleqICYRYLeeg/1zvLyLW1lpmQkZxtREnVXcZc+cOnIBmEqgUfeWUSL/mwzt+gTxs47FfAVB5HI6eV8lRiAfBsAvWzRgl3I0zQiSXmDXdjLnvE=
+	t=1737129068; cv=none; b=RTBlaSB/8oeig52PRlmdDWbSX/9imHyLaBg3vkbJRN6Qat/CWiutKCuVVGXX9mSFK2MrA8RTZKlIgPe5mhclcfT7/QuJkGOL4VtNLFsvP4lfxmZ0pAXbQ0LIJvyo3pbwQFUICJ7g+4LzHt9SdI6gL2jh7hrvWK0vt3iq7NmxtPk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737128989; c=relaxed/simple;
-	bh=u9mqR5GFsnLVc3LLaI0YgiNR9Lw9j+cHWpZrt16d0EQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=J4fZSZzUXFPXGeaIR2w6eV8CJWfY6tZHVQAtasWZUQYGPcLzqlSAhapGHOl7oWZqRlcusJU6nQEn9YTnumbRWSt16ZifByfa+dXb+731yaeoKQbdShmRpXwbZI/EcaXQRP5p+SOa9S1MYBFh1bWieIVafUqAO+eJK25nc9TPDaA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PIoBaieD; arc=none smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1737128989; x=1768664989;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=u9mqR5GFsnLVc3LLaI0YgiNR9Lw9j+cHWpZrt16d0EQ=;
-  b=PIoBaieDs32DnWRxrgYUz+m8PEnph0hWD/cevl2zT45RUVskc0ftISmG
-   aXdpgQadbR7rOV+6hSsqmOFsjj+SGxklqNrXPPBsy5i4LfDylDZ3qjnJR
-   1zVGhA9Hj13QOrTNaU4RTRz7x1YCK9uSHH/Uxqqw9ZJPvX5XvxpDLmehX
-   WZUarBDK4vYQdY/XjboFUca/5Y7sIzqFml7hrBsT3Rq2i6JuAAeRJe0Xe
-   lRAuQxRH3ne/JHbk4Zp9dqkyPwxd3XCDwPjOX0qBDvzatK3aXrAqhM1QG
-   iUakTh5U0yoODIEHfpkEG27vjcWRoa5tBggBeLJpU+oXtPziDs9mhNubz
-   w==;
-X-CSE-ConnectionGUID: aDMPlLk1QtycBQUXzCn6Mw==
-X-CSE-MsgGUID: mROQFUKgQJe0tveSVwe1AA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11318"; a="48055140"
-X-IronPort-AV: E=Sophos;i="6.13,212,1732608000"; 
-   d="scan'208";a="48055140"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jan 2025 07:49:48 -0800
-X-CSE-ConnectionGUID: 6vsFm0MGSISAu6IVpNSOeg==
-X-CSE-MsgGUID: BlOmfEYzQmyKPg/KmioWAg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.13,212,1732608000"; 
-   d="scan'208";a="106389208"
-Received: from pkwapuli-mobl1.ger.corp.intel.com (HELO vbox-pkwap.ger.corp.intel.com) ([10.246.2.76])
-  by fmviesa010.fm.intel.com with ESMTP; 17 Jan 2025 07:49:45 -0800
-From: Piotr Kwapulinski <piotr.kwapulinski@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	dan.carpenter@linaro.org,
-	yuehaibing@huawei.com,
-	maciej.fijalkowski@intel.com,
-	przemyslaw.kitszel@intel.com,
-	Piotr Kwapulinski <piotr.kwapulinski@intel.com>
-Subject: [PATCH iwl-next v2] ixgbe: Fix possible skb NULL pointer dereference
-Date: Fri, 17 Jan 2025 16:49:35 +0100
-Message-ID: <20250117154935.9444-1-piotr.kwapulinski@intel.com>
-X-Mailer: git-send-email 2.43.5
+	s=arc-20240116; t=1737129068; c=relaxed/simple;
+	bh=NLOKe1cn4s1nhdC+c6FVNXIoe8otKZmXdhkGLadnNXo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=g1UOokxjjdqaVehyHQfEmEyfMJ4DL0LU6BnwibgfxDVTl8E97P+a1ielDR5gJq9NbDmvPHv8hL4gJEziz/Te01iETaOkxOKkCbwcw4tejkteO7laVmQNb6sjQydyJaeGMGV60G7C69ElRdMVlVnMpEcYlIpsYqL5vaz+Z55sjAs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bJDD7DYZ; arc=none smtp.client-ip=209.85.216.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-2ee51f8c47dso3257847a91.1
+        for <netdev@vger.kernel.org>; Fri, 17 Jan 2025 07:51:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1737129066; x=1737733866; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=9x2K8irbhpzuleKwuIRA6iSNUh1BWOFDfxjXCiHmU0Y=;
+        b=bJDD7DYZ8JyvZSMp7Vj/fmXK170k+ZpG796f9vUEJiTfLwZROGGV0JTVvyAL1zZfQT
+         8nI5HJ9ZGl039FmmLd0XaRhv/3/gbJZduWcuNg4i8MHRbAltUh0rXcDH+Cu0w0PXPgAd
+         K7VeaqYkXSymivCZvfIStaOyMZwM3vAXEZe64mD9+FbccAnw9Xfjg+iqLOGtVTyQEKIn
+         MGr2XI/acS54P3VPPC00jhYVX+mExG93wNuOP00w7vc0Vh3d7ldPALCEasen1NZCG0JC
+         gbcRUwk5ZBzjMVP1GuuQu7Km/wqLXQEpd2Zjb+n0Zr2jH2EBo15DMV1IcSNT2GaZLQA+
+         aJjg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737129066; x=1737733866;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9x2K8irbhpzuleKwuIRA6iSNUh1BWOFDfxjXCiHmU0Y=;
+        b=eoYmHJQXeBtp/6YQFAXHle13/8sa/VyJoMkpeX3e4DfmNUCqYG2rjmAXtw1EJwyZSR
+         sFvpu6s3XtsULJjwAJFRuq9Gvc7BIujLuJraA0x+U8XR6csydfBLNuXfULN0ortJgZAc
+         5y0cAJHWisiIOiX43zO/+XNycPHDgxUpgomSHgA3Dyg+bufZdNYC8qwVLLK8W5jM/hfA
+         n2sOwUbKlcHKknEEEq3YYMID5HytRFh/ik5QG74Un3l9u53TcwrLKikGlnnP0p1vwaML
+         Ixb470NNUHwhcA/Z5PIleux/v+5HmfwT9oRa2E6efdNK1fxnkS+sh/Kx8lGtKpc4w1TD
+         2/JA==
+X-Forwarded-Encrypted: i=1; AJvYcCWTv+yCqxBxLfDLYUc+86CdkMJLsq8NjsLY3h8sEcn9H83SFBH/qpbwq8o11VFwWLf8btgMy6k=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxqcaDLeuuD+M5IMD3r0yqXmdbqL9xz53oWIi5HeO1Ids/wdIK7
+	fsgHWcDcBnhmq1NJsqtUpwUJSsts29S6xEvALAOZD/UCiGoqawgw
+X-Gm-Gg: ASbGncsI8Sf6bbrICfPeM37Cj489fGGbrIJjRSvPX6oCAH/xvVNZSgvZshqTRcKpSwJ
+	mtNBcaT0W+VUHc31u6ku9dYnzA9YNCeZqoFQJNvsUGQ9CkpNvRuCdd+4JcGnC7XxHvddeMioRt+
+	FGyHBFeKirrYZw0UetabrSLTimCT2m5teK/0inm/+NfhS9dyEyhMQlV33YHagxBI0NGh7H4kYnY
+	Z7o0PqyxCD7WEH3/Kt0/i/vLPBgT7kNKFnZPrU8kcAupDtl7geqWeKpFgRPVU8i766axlpm+TlK
+X-Google-Smtp-Source: AGHT+IEcq+IczZIbXYhGrBDhw2EPZszsH4NUM/TXJmfRT+nkDUlBD9nBo7gNtq8CpCo9w9EBGQiQAQ==
+X-Received: by 2002:a17:90b:1f81:b0:2ee:f22a:61dd with SMTP id 98e67ed59e1d1-2f782d9a170mr3876868a91.32.1737129065866;
+        Fri, 17 Jan 2025 07:51:05 -0800 (PST)
+Received: from hoboy.vegasvil.org ([2600:1700:2430:6f6f:e2d5:5eff:fea5:802f])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2f72c1cc2a2sm5900901a91.27.2025.01.17.07.51.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 17 Jan 2025 07:51:05 -0800 (PST)
+Date: Fri, 17 Jan 2025 07:51:02 -0800
+From: Richard Cochran <richardcochran@gmail.com>
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Cc: Jiawen Wu <jiawenwu@trustnetic.com>, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, linux@armlinux.org.uk, horms@kernel.org,
+	jacob.e.keller@intel.com, netdev@vger.kernel.org,
+	mengyuanlou@net-swift.com
+Subject: Re: [PATCH net-next v5 1/4] net: wangxun: Add support for PTP clock
+Message-ID: <Z4p8ZuQaUe86Em9_@hoboy.vegasvil.org>
+References: <20250117062051.2257073-1-jiawenwu@trustnetic.com>
+ <20250117062051.2257073-2-jiawenwu@trustnetic.com>
+ <9390f920-a89f-43d3-a75f-664fd05df655@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <9390f920-a89f-43d3-a75f-664fd05df655@linux.dev>
 
-The commit c824125cbb18 ("ixgbe: Fix passing 0 to ERR_PTR in
-ixgbe_run_xdp()") stopped utilizing the ERR-like macros for xdp status
-encoding. Propagate this logic to the ixgbe_put_rx_buffer().
+On Fri, Jan 17, 2025 at 02:15:01PM +0000, Vadim Fedorenko wrote:
 
-The commit also relaxed the skb NULL pointer check - caught by Smatch.
-Restore this check.
+> there is no way ptp_clock_register() will return NULL,
 
-Fixes: c824125cbb18 ("ixgbe: Fix passing 0 to ERR_PTR in ixgbe_run_xdp()")
-Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
-Signed-off-by: Piotr Kwapulinski <piotr.kwapulinski@intel.com>
----
- drivers/net/ethernet/intel/ixgbe/ixgbe_main.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+Really?
 
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-index 7236f20..c682c3d 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-@@ -2098,14 +2098,14 @@ static struct ixgbe_rx_buffer *ixgbe_get_rx_buffer(struct ixgbe_ring *rx_ring,
- 
- static void ixgbe_put_rx_buffer(struct ixgbe_ring *rx_ring,
- 				struct ixgbe_rx_buffer *rx_buffer,
--				struct sk_buff *skb,
--				int rx_buffer_pgcnt)
-+				struct sk_buff *skb, int rx_buffer_pgcnt,
-+				int xdp_res)
- {
- 	if (ixgbe_can_reuse_rx_page(rx_buffer, rx_buffer_pgcnt)) {
- 		/* hand second half of page back to the ring */
- 		ixgbe_reuse_rx_page(rx_ring, rx_buffer);
- 	} else {
--		if (!IS_ERR(skb) && IXGBE_CB(skb)->dma == rx_buffer->dma) {
-+		if (skb && !xdp_res && IXGBE_CB(skb)->dma == rx_buffer->dma) {
- 			/* the page has been released from the ring */
- 			IXGBE_CB(skb)->page_released = true;
- 		} else {
-@@ -2415,7 +2415,8 @@ static int ixgbe_clean_rx_irq(struct ixgbe_q_vector *q_vector,
- 			break;
- 		}
- 
--		ixgbe_put_rx_buffer(rx_ring, rx_buffer, skb, rx_buffer_pgcnt);
-+		ixgbe_put_rx_buffer(rx_ring, rx_buffer, skb, rx_buffer_pgcnt,
-+				    xdp_res);
- 		cleaned_count++;
- 
- 		/* place incomplete frames back on ring for completion */
--- 
-v1 -> v2
-  Provide extra details in commit message for motivation of this patch.
+include/linux/ptp_clock_kernel.h:
 
-2.43.0
+ 400 static inline struct ptp_clock *ptp_clock_register(struct ptp_clock_info *info,
+ 401                                                    struct device *parent)
+ 402 { return NULL; }
 
+Also, sometimes the kernelDoc comments are correct, like in this case:
+
+ 304 /**
+ 305  * ptp_clock_register() - register a PTP hardware clock driver
+ 306  *
+ 307  * @info:   Structure describing the new clock.
+ 308  * @parent: Pointer to the parent device of the new clock.
+ 309  *
+ 310  * Returns a valid pointer on success or PTR_ERR on failure.  If PHC
+ 311  * support is missing at the configuration level, this function
+ 312  * returns NULL, and drivers are expected to gracefully handle that
+ 313  * case separately.
+ 314  */
+
+
+Thanks,
+Richard
 
