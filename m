@@ -1,147 +1,155 @@
-Return-Path: <netdev+bounces-159257-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159258-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2931CA14F0D
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 13:16:26 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8169CA14F12
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 13:17:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 429D81677D3
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 12:16:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D8BDD3A5C3E
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 12:16:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC1761FC0EC;
-	Fri, 17 Jan 2025 12:16:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30FEB1FDE19;
+	Fri, 17 Jan 2025 12:16:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="eqJfxF7q";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="cSt8qx6k"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
+Received: from fout-b5-smtp.messagingengine.com (fout-b5-smtp.messagingengine.com [202.12.124.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C04C1BE87B;
-	Fri, 17 Jan 2025 12:16:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.255
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 364A71FC0EC;
+	Fri, 17 Jan 2025 12:16:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737116181; cv=none; b=STLiTRxuSrEW2p8CIT11HIiKbadHM5mDFevs6IeiEaKIofNDLMhpN1UbBRYgipmAoyboA+gvatFN/TtW2D4LC+9NOB97/wjgZEc41yEqXLI0CfN4mNr43VbxqwTf1TjleWA17fu6qPKJoe2/tqY2ctsjHrtZuE52or/XT/JrcBM=
+	t=1737116217; cv=none; b=p8R8Sa6YcyXLMyOWqMX/WtD+5nWJxh2VlPTPSVhRyzYK7Suqd5JUztkOHL1pVAvl83WuwOYm2xHuGo0hxBTuhCFCjEWDFAxxMnq2GdeEXPS1x31CCecedFrlulhISjIpRYKvo4Nx0CzyrS7qDYhD3h5uVHykY5pPzg70cYeDHJM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737116181; c=relaxed/simple;
-	bh=Vuo5GovAjDAOmmkMBMXxTd84L2fzfS9fG/Dv0na1Zjs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=j68pvJJYLtGThLqZuB/BwBF9iIu6BiQ1iTrkjza394SIyKr42cFwJ9FnNiY/DI284FN/Vj+jZF8c44ZRYRuADPddKad9sGyfUSroc4DCl3fjE6L8Qd1TalQpEf6mFvKGyxoUCnDWAf7W8fV2foaAo4AFL7wmWNZ4qKOHPnv1e+c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.255
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.105])
-	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4YZJWn47t3z1W4Jf;
-	Fri, 17 Jan 2025 20:12:21 +0800 (CST)
-Received: from kwepemf100006.china.huawei.com (unknown [7.202.181.220])
-	by mail.maildlp.com (Postfix) with ESMTPS id 116CA14010D;
-	Fri, 17 Jan 2025 20:16:15 +0800 (CST)
-Received: from [10.174.177.210] (10.174.177.210) by
- kwepemf100006.china.huawei.com (7.202.181.220) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Fri, 17 Jan 2025 20:16:13 +0800
-Message-ID: <3f889f28-907b-67a7-8b12-04e31812daac@huawei.com>
-Date: Fri, 17 Jan 2025 20:16:12 +0800
+	s=arc-20240116; t=1737116217; c=relaxed/simple;
+	bh=kTV/v+V/cycXsCi3SiMzEUMn87AolYcVMl4Tzpz9Y1w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ocm31nDK3tzFGwwyry6Q/udHMW5Q+NF3zHameXtB4Xv5cG67ieT1MWR73zd48CMOFHPtGiCioov15ntDvLQl1hpQLomgTqFzqISAthDUqiyGt39eKpeVj3KqpbL797J/H88bCJCxWkQJ8bimxThlBmbpMLqAl6yqn2OKMrPyNic=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=eqJfxF7q; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=cSt8qx6k; arc=none smtp.client-ip=202.12.124.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-03.internal (phl-compute-03.phl.internal [10.202.2.43])
+	by mailfout.stl.internal (Postfix) with ESMTP id BDFE3114017D;
+	Fri, 17 Jan 2025 07:16:52 -0500 (EST)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-03.internal (MEProxy); Fri, 17 Jan 2025 07:16:53 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm3; t=1737116212; x=
+	1737202612; bh=CyahNqnw/YyFCY6Rx2T0hKkQbVlMcU0W2AtHSdPDGSs=; b=e
+	qJfxF7qNSzZ+MlWPVOvsHfOUucrFvwkdjlWt5oHbtjUWQ/g0ZpmnF7WMToyhcuXA
+	W4wXc589vLdn5fxejMC5ENjCB6AiT5Ui1UmBPtry2jy1VM/ZxnNRnY8wh89TPtos
+	4+QA+A0SdWIT+k+F9Zynd4rVhglsG7pAXBCumU6CYCYFmb7eoOgR6JUL7aQ9OUpW
+	lOV6oDyw14G/GSWHDu5RY1B4nXMeeyjgrhkPcdBz6qsjjj7A/RQB51XNrfxbPsco
+	K3LW3gDEgCTPtShqi0lF5SH464S75R9ZTLUoIGliVuMKDfHSfLXlYMrt0Vz91gBF
+	dILuYsQDasQ5aehmEXWKQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
+	1737116212; x=1737202612; bh=CyahNqnw/YyFCY6Rx2T0hKkQbVlMcU0W2At
+	HSdPDGSs=; b=cSt8qx6k8dqxV7fIbGO/ZS2Q35Lx6BLpO5Dj5TfTl+kZ7rf31ak
+	+pmHN1pXrXfysdw9OAPnHqO35PLjutfM9ReEnQH8WReONn0Zn7Md1qRkxLgPdU5/
+	rh80XlkdC8BbzIz5FJRBuIjlK3k7OMpZYtqp9XoCR2kAaUWg1HstPeVyy0tQV50l
+	KsZ4oSHPN/PQ8wSLYgSsSjCC7gp7n8bFt6gnzR8Hp+/9JcXY8E4eyw5hifGL4iLE
+	2QnfXE3z4DhD6PCCSRMWtQdFswhOHS/fx9qdgN91UxyVgBpwcvanS3M9pypyGh93
+	8pf/JRJgAuVuAe/o3W+jgPyzRMI+ajcB8xA==
+X-ME-Sender: <xms:NEqKZ6aBN9PksvNWf2M6Gj8Y0CDHR3fPwDzvHMmtQyTq3--7KFbLTA>
+    <xme:NEqKZ9ZzG45tr_P3aWUE8HgH_IS0mXglVyVb5Km7wjqCCQ6cJkNFhw0uINcsWA5ZM
+    QeYGm4Nnbx7yNiRT_A>
+X-ME-Received: <xmr:NEqKZ0_uaoA8iQiiLmzeP52Zs1Qq3xefduxDNHEaUKt2B4T74P4lbK8D7g3->
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrudeifedgfeejucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
+    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
+    htshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtredttddtjeen
+    ucfhrhhomhepufgrsghrihhnrgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrg
+    hilhdrnhgvtheqnecuggftrfgrthhtvghrnhepuefhhfffgfffhfefueeiudegtdefhfek
+    geetheegheeifffguedvuefffefgudffnecuvehluhhsthgvrhfuihiivgeptdenucfrrg
+    hrrghmpehmrghilhhfrhhomhepshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggp
+    rhgtphhtthhopedufedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtoheprghnthhonh
+    hiohesohhpvghnvhhpnhdrnhgvthdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhk
+    vghrnhgvlhdrohhrghdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtoh
+    hmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehprggs
+    vghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtohepughonhgrlhgurdhhuhhnthgvrh
+    esghhmrghilhdrtghomhdprhgtphhtthhopehshhhurghhsehkvghrnhgvlhdrohhrghdp
+    rhgtphhtthhopehrhigriigrnhhovhdrshdrrgesghhmrghilhdrtghomhdprhgtphhtth
+    hopegrnhgurhgvfidonhgvthguvghvsehluhhnnhdrtghh
+X-ME-Proxy: <xmx:NEqKZ8rdWTcyM2u9FzPpll0WXjT0qswkdODhLevH1xR32lvpDf5tWg>
+    <xmx:NEqKZ1qvAi2CA363jqVQOMCAK2xPPfJE5p8LMgXH4XOP7oGOmLT7Yw>
+    <xmx:NEqKZ6Qhjsd6Yo6SuRfcIeXTfKmgnR1Abu_QmOVeF7QZi5IKTLQb6w>
+    <xmx:NEqKZ1o8i1fhh3FBCk5cx18ZeztxvOVITdwv4AVbaTTC7Ta3qAdi4Q>
+    <xmx:NEqKZ27eu2CHW-z8LYIa9X8gxfxxG4kGmJBt8p91DUqjPIL_y-yTLkAK>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
+ 17 Jan 2025 07:16:51 -0500 (EST)
+Date: Fri, 17 Jan 2025 13:16:50 +0100
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Antonio Quartulli <antonio@openvpn.net>
+Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Shuah Khan <shuah@kernel.org>, ryazanov.s.a@gmail.com,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, Xiao Liang <shaw.leon@gmail.com>
+Subject: Re: [PATCH net-next v18 09/25] ovpn: implement packet processing
+Message-ID: <Z4pKMkDrujMWMlCW@hog>
+References: <20250113-b4-ovpn-v18-0-1f00db9c2bd6@openvpn.net>
+ <20250113-b4-ovpn-v18-9-1f00db9c2bd6@openvpn.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.1
-Subject: Re: [PATCH] SUNRPC: Set tk_rpc_status when RPC_TASK_SIGNALLED is
- detected
-To: Trond Myklebust <trondmy@hammerspace.com>, "tom@talpey.com"
-	<tom@talpey.com>, "davem@davemloft.net" <davem@davemloft.net>,
-	"chuck.lever@oracle.com" <chuck.lever@oracle.com>, "kuba@kernel.org"
-	<kuba@kernel.org>, "lilingfeng3@huawei.com" <lilingfeng3@huawei.com>,
-	"okorniev@redhat.com" <okorniev@redhat.com>, "anna@kernel.org"
-	<anna@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
-	"horms@kernel.org" <horms@kernel.org>, "Dai.Ngo@oracle.com"
-	<Dai.Ngo@oracle.com>, "jlayton@kernel.org" <jlayton@kernel.org>,
-	"edumazet@google.com" <edumazet@google.com>, "neilb@suse.de" <neilb@suse.de>
-CC: "houtao1@huawei.com" <houtao1@huawei.com>, "linux-nfs@vger.kernel.org"
-	<linux-nfs@vger.kernel.org>, "yi.zhang@huawei.com" <yi.zhang@huawei.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"lilingfeng@huaweicloud.com" <lilingfeng@huaweicloud.com>,
-	"yukuai1@huaweicloud.com" <yukuai1@huaweicloud.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>
-References: <20250114144101.2511043-1-lilingfeng3@huawei.com>
- <fed3cd85-0a15-ae30-b167-84881d6a5efd@huawei.com>
- <642413c4bdbe296db722f0091ffa5190c992eb8e.camel@hammerspace.com>
- <58bf9d83-b58d-e5a6-4096-64eb96f3854a@huawei.com>
- <4d3e8d4385a511860ec9018b3ca864e7ef3a7b48.camel@hammerspace.com>
-From: yangerkun <yangerkun@huawei.com>
-In-Reply-To: <4d3e8d4385a511860ec9018b3ca864e7ef3a7b48.camel@hammerspace.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- kwepemf100006.china.huawei.com (7.202.181.220)
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250113-b4-ovpn-v18-9-1f00db9c2bd6@openvpn.net>
 
+2025-01-13, 10:31:28 +0100, Antonio Quartulli wrote:
+>  static bool ovpn_encrypt_one(struct ovpn_peer *peer, struct sk_buff *skb)
+>  {
+> -	ovpn_skb_cb(skb)->peer = peer;
+> +	struct ovpn_crypto_key_slot *ks;
+> +
+> +	if (unlikely(skb->ip_summed == CHECKSUM_PARTIAL &&
+> +		     skb_checksum_help(skb))) {
+> +		net_warn_ratelimited("%s: cannot compute checksum for outgoing packet for peer %u\n",
+> +				     netdev_name(peer->ovpn->dev), peer->id);
+> +		return false;
+> +	}
+> +
+> +	/* get primary key to be used for encrypting data */
+> +	ks = ovpn_crypto_key_slot_primary(&peer->crypto);
+> +	if (unlikely(!ks))
+> +		return false;
+>  
+>  	/* take a reference to the peer because the crypto code may run async.
+>  	 * ovpn_encrypt_post() will release it upon completion
+> @@ -118,7 +244,8 @@ static bool ovpn_encrypt_one(struct ovpn_peer *peer, struct sk_buff *skb)
 
+Adding in the few lines that got snipped:
 
-在 2025/1/17 11:15, Trond Myklebust 写道:
-> On Fri, 2025-01-17 at 10:29 +0800, yangerkun wrote:
->>
->>
->> 在 2025/1/17 4:52, Trond Myklebust 写道:
->>> On Thu, 2025-01-16 at 19:43 +0800, yangerkun wrote:
->>>> Hi,
->>>>
->>>> Thanks for the patch.
->>>>
->>>> Before 39494194f93b("SUNRPC: Fix races with rpc_killall_tasks()",
->>>> every
->>>> time we set RPC_TASK_SIGNALLED, when we go through __rpc_execute,
->>>> this
->>>> rpc_task will immediate break and exist.
->>>>
->>>> However after that, __rpc_execute won't judge RPC_TASK_SIGNNALED,
->>>> so
->>>> for
->>>> the case like you point out below, even after your commit
->>>> rpc_check_timeout will help break and exist eventually, but this
->>>> rpc_task has already do some work. I prefer reintroduce judging
->>>> RPC_TASK_SIGNNALED in __rpc_execute to help exist immediatly.
->>>>
->>>
->>> Better yet... Let's get rid of the RPC_TASK_SIGNALLED flag
->>> altogether
->>> and just replace
->>>
->>> #define RPC_TASK_SIGNALLED(task) (READ_ONCE(task->tk_rpc_status) ==
->>> -ERESTARTSYS)
->>
->> Hi,
->>
->> Thanks for your reply! Yeah, if all the places where tk_rpc_status is
->> updated are by calling rpc_task_set_rpc_status, we can use
->> task->tk_rpc_status == -ERESTARTSYS to determine whether rpc_task is
->> RPC_TASK_SIGNALLED. But for the case like Li has provided,
->> __rpc_restart_call won't do this, and will overwrite tk_rpc_status
->> unconditionally. This won't be a stable solution. Maybe it's better
->> to
->> change __rpc_restart_call calling rpc_task_set_rpc_status too? And
->> __rpc_execute will be enough to help solve this case.
->>
->>
-> 
-> That would break __rpc_restart_call() to the point of rendering it
-> completely useless.
+	/* take a reference to the peer because the crypto code may run async.
+	 * ovpn_encrypt_post() will release it upon completion
+	 */
+	if (unlikely(!ovpn_peer_hold(peer))) {
+		DEBUG_NET_WARN_ON_ONCE(1);
+		return false;
+	}
 
-Aha, agree with you. There maybe case tk_rpc_status != 0 but
-rpc_restart_call can also rerun this rpc_task.
+This should never happen, but just in case, we'd want
+ovpn_crypto_key_slot_put() here.
 
-The only case we should consider is when we call rpc_signal_task, we
-should break this rpc_task unconditionally. Fixing it within
-__rpc_execute is enough.
+>  		return false;
+>  	}
 
-> The whole purpose of that call is to give the NFS layer a chance to
-> handle errors in the exit callback, and then kick off a fresh call.
-> Your suggestion would mean that any RPC level error sticks around, and
-> causes the new call to immediately fail.
-> 
-> I see no point in doing anything more than fixing the looping
-> behaviour. Eliminating the redundant flag will do that.
-> 
+-- 
+Sabrina
 
