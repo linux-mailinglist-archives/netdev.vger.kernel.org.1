@@ -1,215 +1,118 @@
-Return-Path: <netdev+bounces-159367-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159368-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D3F7A15405
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 17:18:00 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 90802A1540D
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 17:18:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9A3123A35F8
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 16:17:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9F6001631CE
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 16:18:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E87419ADBA;
-	Fri, 17 Jan 2025 16:17:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63E1D19DF81;
+	Fri, 17 Jan 2025 16:18:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JcVtwo4J"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SN2bfK4D"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44C7018A6A7;
-	Fri, 17 Jan 2025 16:17:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A81B719DF62;
+	Fri, 17 Jan 2025 16:18:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737130674; cv=none; b=HHydhyGz3nv1ApssDQY4CO7qkJ73dlRvh2rW3/4YVZhB/QPRlugXi5RO80d63Y8pEFJ4trWLMAB49OrmvEhlGVMZWWB4v8wnLEPWlIHUfjCugHHktqLwzEoqznWO33Kq7zfUbd5YRCowFsPKV6n6oYWhuoSvuEXxkWRaB6sdoO4=
+	t=1737130690; cv=none; b=iQImcAgVU/3P8sLU7uMqTzNHqN9KSrSkLZKl1zJGxR/5A0ZkaKeBiJL9K98RRCJEyaxuVGOculocA3qRnNN32sgfADpbZz2qlWAH9gH2jHyvU0h3CfunBpSFjIy644TQ3xmIjtPmGLjcRuT/MWjjqwKoTG50PA0+2PY8kwwRvJg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737130674; c=relaxed/simple;
-	bh=oGFgbxw1t5e3yJPS5faOWESjS8q66sYfV8yj/ECT8vk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=cvk0bBiNwd+2x+zXmxVG1ajETPY5JonpWTmHVdZsIrqwo5hV8K4+dleorSl9aAstoCzgVVbE56PEquaL4Vqlh9Td9jfBzwVAP2yD4oPiyOFntm17GkbsqjOvYifOFThGFJfKRkMW3IrB8WI2IFmmAqNlUq/S38t6NSdIvAbX0Hg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JcVtwo4J; arc=none smtp.client-ip=209.85.208.171
+	s=arc-20240116; t=1737130690; c=relaxed/simple;
+	bh=EGU6+ilCylYYb4443P1Y1m3Nuf0m4CaRGF3lNrgVYJo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ppcaGJks7eYst2eUKzmLyjeOoMySD28DI7oDjF1sR0JNoQwn1hXI44H6dYCeOVa6+JJuJvH5r788oyT7QHMILY9m/nHyZTmPSLa8dl3EKVe6pJURq23GBMC1LPVj2Sl+LDU0VzqkEk9jQcx8iZGgsfiARI3LMpOMA3nBpr/T8p8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SN2bfK4D; arc=none smtp.client-ip=209.85.128.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-3003e203acaso20785751fa.1;
-        Fri, 17 Jan 2025 08:17:51 -0800 (PST)
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-436381876e2so3048405e9.1;
+        Fri, 17 Jan 2025 08:18:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1737130670; x=1737735470; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jMzcp+LRzkSWVc0h0fDFxdInuHd4+JS67Z6+TwySTb4=;
-        b=JcVtwo4J2GkyKgXOouclokdYtR+B9ivvNea0R5k5I5fY37Su718n1g7aTnDk8u/VZT
-         sHh7ClOpq/4DCXVetFb2meSx0JvqbfNFOxD4kWKA2/yz1ej6PDyq68XDQFql0V444r9f
-         fV5RZxvaW+PmSj/xX+z7Z96EGZ3e6HRhFlTlAah/3LooXYtCewe/VXxtJe0x+nNw0nw0
-         B912v2yZUpgDl8R1vRbsNnRHq3Og2Jx6+kQuhxZAr+fD5FtGLRNYTt0bWc2cd9mNfEEm
-         aQhJsM6ihP2sXFyD8Jyy8Q6r83p7aXXIdYNDeETTYRBg/BIyTnTXa3qBsSHr5GRp8uud
-         mhCg==
+        d=gmail.com; s=20230601; t=1737130687; x=1737735487; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=dhGM5ZRTBFqwnR3Cs8LWHXJUPSUuzE/GinBi4lm49ag=;
+        b=SN2bfK4D9pOoqQ4mEsIc1YcTlzzNaFhGPCvjBUGnjqCYx2EIoPRaOOPiks3MCZiauC
+         L4pyaTPlo8lCReV7N9TS2bb2VFeGs+mVmC+GJKk/fkO8EpYMaa1i799OQb6NqQJ0dpr2
+         Dv2bWhQrkeB+D3zJflJry9ysEDR2P2NtMxjRVFxwOB0/3QqkH/3HIBRuiRA1PZRx+Inu
+         w1oNDY8PDOijATvx3i90eCqvX3sLnvsUo5bdUbyTRypdUhGA4nAUfRV6qklDVQmcghKF
+         yrlLL9xk+wd5BBTsfJ4xhz1fs3ZbxFFOm+L+gwh+VIo1wcjzCbinZjAotPSgr/P6wIoi
+         jN/g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737130670; x=1737735470;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=jMzcp+LRzkSWVc0h0fDFxdInuHd4+JS67Z6+TwySTb4=;
-        b=QeGw2Xm4BFTkxkyKKn4rJ0/U97OnW6B2wWLYzorEolY8hStrVa93PBGGJ/141zCNc8
-         JXcFVtQuT1+HZKBCyXo4ZGu+7qt2SJlqI5jUXEIe6tbxEDGEAwbuVrvRuyZhrkB6Xagk
-         yOCvlYmIDYx95e9RyZSMxiFSKDEpkjfxUs684xL5G7EvcA9DJp5m8Eutgo5UlT9+LEN/
-         PE90csNCZuQDZcbStnpsgsFkvsgVw0x6kvRiC2WxCIlVmA5vnx84LXn57gJJ7f2Lrif3
-         NVCuxjcpsAemHqYwJ3pjE1+eHkwuMMGlSEsv9v5qEM6EWuhQmD2LLjvs8BdW3ednIt8b
-         mFeA==
-X-Forwarded-Encrypted: i=1; AJvYcCVMq6OZyUV5Q1qRlLn+Ogg0rS2RRtjzP2MKq8dl0OmxBmjAPN8HQVhw2JypJhFhj36PEoPFT0U=@vger.kernel.org
-X-Gm-Message-State: AOJu0YypViFN7PTPeFxzfEIHXqIfCV8kWJs0fRAa5wo8YfBJYNITnwTq
-	3KMibuMo3yI2SWBn6qXXewhbcfn81SWwkpE0LKlO+iTasLPnvjuIClWSJ7y5kJFpx6RarrgkowU
-	izDNtgHhZQko52BDr710TWhJI9K368xgj
-X-Gm-Gg: ASbGncusLLuYZzEi4/1GYkGA9O38NzPSnUgkhry/OkB/np4+jhMiCTR7oahbDntu3tJ
-	ijwl5b/At/LrmA1ulTJ6e92/aF+pzvzCZ6TtoeYY=
-X-Google-Smtp-Source: AGHT+IHKcvreZ7mhfGk5W6nPltlvOT2Ux9v21o7ceL1YPmRxTtEY3VkxuDYFTm2l5c1HkrNEo2hDqF9Y9pSiFlLwY5U=
-X-Received: by 2002:a2e:b90d:0:b0:304:4cec:29f9 with SMTP id
- 38308e7fff4ca-3072ca60ef9mr8790071fa.3.1737130670021; Fri, 17 Jan 2025
- 08:17:50 -0800 (PST)
+        d=1e100.net; s=20230601; t=1737130687; x=1737735487;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dhGM5ZRTBFqwnR3Cs8LWHXJUPSUuzE/GinBi4lm49ag=;
+        b=F3pWqoLMhgk3skCcyP/YqGlfgsLAXZilJ+01wFo32UJ+qJK4xzcS+JNsCy0iv5aDID
+         DvQObvTobI1cySWsT3X+DYr5ySZf3v+SE5krOgfPoBXhTYNyaYe1qZZiowjJnq7CKRn8
+         WwjUKEqqmcR6onrH5Fbmr0GHXUzbAwCEx3h38JyDXEQhRoi3ZZ+oIVKjT3guWAbpGg3A
+         jZS6p5OUTdX51pehO3K6dmwJSWJqdlbiOsLsn1wpUwZkAZNfrm3Y2VHOi1vm7aj7uTyg
+         bCNxuu8jqAoDvxoGf8QSsY+gKkFCdtKZGhAeoYsVDPM/hgZ/OBn/jtOH2THMZHagYA6Y
+         k/lw==
+X-Forwarded-Encrypted: i=1; AJvYcCX7/XqVNqo6wMDvkmsJX2JU6h03u7c1Gj42J6vrRElCQUv4RdEyP+qwl1Vtrcj66xKljL8YE/lgLVEzemY=@vger.kernel.org, AJvYcCXNZehyY9cvK5DNEy4yWXBSkh6dmGCJeVdVNMCiWA7iivhs8qgYH/roINVuWvlz5sCM96CWj79H@vger.kernel.org
+X-Gm-Message-State: AOJu0YzLQei7aZlObpWpv4+C1CmQXNjbzLrGya/vltcmj/6XPbJmso9Q
+	ue0Ebg6H9Q5aWhffcsqPP5ESm5jj/yovG9nThUqGjuWhZ9CMHuIV
+X-Gm-Gg: ASbGncs2onx06hsPoz77RSu4+28xmesXu2/MnNNvCE8qAD9FzIvPb8P3cnGPcR3ymP/
+	sYg2nEIQ+1amk4REek7k2UvXDk5Wh4re91+UFFW79QrY/6BJ108e78G7Zl8hn5r/V2/IegQHBGx
+	CS9A7nNx+rhZ+pqyejYgIWKZ5qN502LTUKP4mGBovcmVtvsrWSUlEcrZ2tS9tA6aEpYcF0H5cBF
+	ONy/T+W9fjJqBaGWV4SeWAZVGsAoMfrrebqDP2kTjUv
+X-Google-Smtp-Source: AGHT+IHVWKgmOZ99OJUsWyTHPVHc05Z6MyN8QvHf6Udqd+IQR5d1gd0DTZXMd3IiaMGRJ07tty8RTg==
+X-Received: by 2002:a05:600c:510b:b0:436:fb10:d595 with SMTP id 5b1f17b1804b1-438913bff64mr13724785e9.1.1737130686909;
+        Fri, 17 Jan 2025 08:18:06 -0800 (PST)
+Received: from skbuf ([86.127.124.81])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43890420412sm39194935e9.18.2025.01.17.08.18.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 17 Jan 2025 08:18:06 -0800 (PST)
+Date: Fri, 17 Jan 2025 18:18:04 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Tristram.Ha@microchip.com
+Cc: maxime.chevallier@bootlin.com, Woojung.Huh@microchip.com,
+	andrew@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, UNGLinuxDriver@microchip.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v2] net: dsa: microchip: Add SGMII port support
+ to KSZ9477 switch
+Message-ID: <20250117161804.p6qn653bagygwhib@skbuf>
+References: <20250114024704.36972-1-Tristram.Ha@microchip.com>
+ <20250114160908.les2vsq42ivtrvqe@skbuf>
+ <20250115111042.2bf22b61@fedora.home>
+ <20250114024704.36972-1-Tristram.Ha@microchip.com>
+ <20250114160908.les2vsq42ivtrvqe@skbuf>
+ <20250115111042.2bf22b61@fedora.home>
+ <DM3PR11MB87361CADB3A3A26772B11EEEEC1B2@DM3PR11MB8736.namprd11.prod.outlook.com>
+ <DM3PR11MB87361CADB3A3A26772B11EEEEC1B2@DM3PR11MB8736.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250115210606.3582241-1-luiz.dentz@gmail.com>
-In-Reply-To: <20250115210606.3582241-1-luiz.dentz@gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Fri, 17 Jan 2025 11:17:36 -0500
-X-Gm-Features: AbW1kvaIo8COXV3SgpgN-eYomgJ5bXgV0_9-LGJbJ7cmFhZ2pes8s75iMhDYtPM
-Message-ID: <CABBYNZJ_LfmEzZaZjxwY7uG8Bx1=+-QE5B07emtz5sios9XZ0A@mail.gmail.com>
-Subject: Re: pull request: bluetooth-next 2025-01-15
-To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>, 
-	"open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <DM3PR11MB87361CADB3A3A26772B11EEEEC1B2@DM3PR11MB8736.namprd11.prod.outlook.com>
+ <DM3PR11MB87361CADB3A3A26772B11EEEEC1B2@DM3PR11MB8736.namprd11.prod.outlook.com>
 
-Looks like Ive only send this to linux-bluetooth by mistake:
+On Fri, Jan 17, 2025 at 12:56:14AM +0000, Tristram.Ha@microchip.com wrote:
+> The KSZ9477 SGMII module does use DesignWare IP, but its implementation
+> is probably too old as some registers do not match.  When using XPCS
+> driver link detection works but the SGMII port does not pass traffic for
+> some SFPs.  It is probably doable to update the XPCS driver to work in
+> KSZ9477, but there is no way to submit that patch as that may affect
+> other hardware implementation.
+> 
+> One thing that is strange is that driver enables interrupt for 1000BaseX
+> mode but not SGMII mode, but in KSZ9477 SGMII mode can trigger link up
+> and link down interrupt but 1000BaseX can only trigger link up interrupt.
 
-On Wed, Jan 15, 2025 at 4:06=E2=80=AFPM Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
->
-> The following changes since commit d90e36f8364d99c737fe73b0c49a51dd5e749d=
-86:
->
->   Merge branch 'mlx5-next' of git://git.kernel.org/pub/scm/linux/kernel/g=
-it/mellanox/linux (2025-01-14 11:13:35 -0800)
->
-> are available in the Git repository at:
->
->   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.=
-git tags/for-net-next-2025-01-15
->
-> for you to fetch changes up to 26fbd3494a7dd26269cb0817c289267dbcfdec06:
->
->   Bluetooth: MGMT: Fix slab-use-after-free Read in mgmt_remove_adv_monito=
-r_sync (2025-01-15 10:37:38 -0500)
->
-> ----------------------------------------------------------------
-> bluetooth-next pull request for net-next:
->
->  - btusb: Add new VID/PID 13d3/3610 for MT7922
->  - btusb: Add new VID/PID 13d3/3628 for MT7925
->  - btusb: Add MT7921e device 13d3:3576
->  - btusb: Add RTL8851BE device 13d3:3600
->  - btusb: Add ID 0x2c7c:0x0130 for Qualcomm WCN785x
->  - btusb: add sysfs attribute to control USB alt setting
->  - qca: Expand firmware-name property
->  - qca: Fix poor RF performance for WCN6855
->  - L2CAP: handle NULL sock pointer in l2cap_sock_alloc
->  - Allow reset via sysfs
->  - ISO: Allow BIG re-sync
->  - dt-bindings: Utilize PMU abstraction for WCN6750
->  - MGMT: Mark LL Privacy as stable
->
-> ----------------------------------------------------------------
-> Andrew Halaney (1):
->       Bluetooth: btusb: Add new VID/PID 13d3/3610 for MT7922
->
-> Charles Han (1):
->       Bluetooth: btbcm: Fix NULL deref in btbcm_get_board_name()
->
-> Cheng Jiang (3):
->       dt-bindings: net: bluetooth: qca: Expand firmware-name property
->       Bluetooth: qca: Update firmware-name to support board specific nvm
->       Bluetooth: qca: Expand firmware-name to load specific rampatch
->
-> Dr. David Alan Gilbert (1):
->       Bluetooth: hci: Remove deadcode
->
-> En-Wei Wu (1):
->       Bluetooth: btusb: Add new VID/PID 13d3/3628 for MT7925
->
-> Fedor Pchelkin (1):
->       Bluetooth: L2CAP: handle NULL sock pointer in l2cap_sock_alloc
->
-> Garrett Wilke (2):
->       Bluetooth: btusb: Add MT7921e device 13d3:3576
->       Bluetooth: btusb: Add RTL8851BE device 13d3:3600
->
-> Hao Qin (1):
->       Bluetooth: btmtk: Remove resetting mt7921 before downloading the fw
->
-> Hsin-chen Chuang (3):
->       Bluetooth: Remove the cmd timeout count in btusb
->       Bluetooth: Get rid of cmd_timeout and use the reset callback
->       Bluetooth: Allow reset via sysfs
->
-> Iulia Tanasescu (1):
->       Bluetooth: iso: Allow BIG re-sync
->
-> Janaki Ramaiah Thota (1):
->       dt-bindings: bluetooth: Utilize PMU abstraction for WCN6750
->
-> Krzysztof Kozlowski (1):
->       Bluetooth: Use str_enable_disable-like helpers
->
-> Luiz Augusto von Dentz (1):
->       Bluetooth: MGMT: Mark LL Privacy as stable
->
-> Mark Dietzer (1):
->       Bluetooth: btusb: Add ID 0x2c7c:0x0130 for Qualcomm WCN785x
->
-> Max Chou (1):
->       Bluetooth: btrtl: check for NULL in btrtl_setup_realtek()
->
-> Mazin Al Haddad (1):
->       Bluetooth: MGMT: Fix slab-use-after-free Read in mgmt_remove_adv_mo=
-nitor_sync
->
-> Ying Hsu (1):
->       Bluetooth: btusb: add sysfs attribute to control USB alt setting
->
-> Zijun Hu (1):
->       Bluetooth: qca: Fix poor RF performance for WCN6855
->
->  .../bindings/net/bluetooth/qualcomm-bluetooth.yaml |  10 +-
->  drivers/bluetooth/btbcm.c                          |   3 +
->  drivers/bluetooth/btintel.c                        |  17 +-
->  drivers/bluetooth/btmrvl_main.c                    |   3 +-
->  drivers/bluetooth/btmtk.c                          |   4 +-
->  drivers/bluetooth/btmtksdio.c                      |   4 +-
->  drivers/bluetooth/btqca.c                          | 200 ++++++++++++++-=
-------
->  drivers/bluetooth/btqca.h                          |   5 +-
->  drivers/bluetooth/btrtl.c                          |   4 +-
->  drivers/bluetooth/btusb.c                          |  73 +++++---
->  drivers/bluetooth/hci_qca.c                        |  33 ++--
->  include/net/bluetooth/hci.h                        |   1 -
->  include/net/bluetooth/hci_core.h                   |  14 +-
->  include/net/bluetooth/hci_sync.h                   |   1 -
->  net/bluetooth/hci_core.c                           |  24 +--
->  net/bluetooth/hci_sync.c                           |  76 ++++----
->  net/bluetooth/hci_sysfs.c                          |  19 ++
->  net/bluetooth/iso.c                                |  36 ++++
->  net/bluetooth/l2cap_sock.c                         |   3 +-
->  net/bluetooth/mgmt.c                               | 145 ++-------------
->  20 files changed, 340 insertions(+), 335 deletions(-)
-
-
-
---=20
-Luiz Augusto von Dentz
+Sometimes, the "collaborative" aspect of open source projects does work
+out, and you might get help, feedback and/or regression testing for
+hardware you don't have. Sure, it doesn't always work out, but I suggest
+you give it a try and not put the cart before the horses.
 
