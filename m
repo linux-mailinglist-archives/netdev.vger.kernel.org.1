@@ -1,198 +1,226 @@
-Return-Path: <netdev+bounces-159300-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159301-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38777A1505C
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 14:18:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id F08B0A1505D
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 14:20:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 520323A5D4A
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 13:18:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 502F23A5EED
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 13:19:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BF161FC0FE;
-	Fri, 17 Jan 2025 13:18:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADB731FF1C3;
+	Fri, 17 Jan 2025 13:20:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="pFJA5ytP"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YJ9lbKs8"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2085.outbound.protection.outlook.com [40.107.94.85])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BBB825A627
-	for <netdev@vger.kernel.org>; Fri, 17 Jan 2025 13:18:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.85
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737119889; cv=fail; b=np1P3TlF7fWN1gF3KuAmggHQxPvzCCJXQu/zanHi4dfVf7E8bujgPGZracnvvXSj7cA7YFOYvdh1lBRQvTqVPhHOvj3ee3IQGshlNs4XQ2G/4m2CCATAeGQCYtH4FzXgeg14s5NTcxBLy6i6PKmru5cfMsMTfh9EQT8+MJWlfdk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737119889; c=relaxed/simple;
-	bh=yOS0ssJNE1vKeZdlxFjAvLVW9OFzNIgXvPGPO6GA10s=;
-	h=References:From:To:CC:Subject:Date:In-Reply-To:Message-ID:
-	 MIME-Version:Content-Type; b=OIvfY1RSopBbu7CFN5qY4DZnsd5DHrJz48zvHDGWNbN6HD7d0D9TBTJs+SiaFfaFoZlZ64lXrMv772owl1FJvhvtZPIa3UslvkJl/rwD2I6qUcAJiLRUEVk1NDCE2i/wlvg12gQSefKszt/3XrpTKhZsjPagRkXckbqFzfiP5tM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=pFJA5ytP; arc=fail smtp.client-ip=40.107.94.85
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=yrl99yFbbR9lcRDN8x6c1D9QN4ZkjpKQu/Mc88FaVBhbC+V1876T47ujGfbHJcrXxh7G5SuOPRviT4ENstFagxMYfoVsolmuUsg4+SjTRQBUuufD2beSHu2vxX4/nT312TE+KaYF1Sc75HH9m9uzho3NA7Ujz8KKTRsQtNk66BmMrdPGc5KpmoyoqBTscUFxHk0dDBm19rGrLOr0y9DLEgJCSizCCUfiw66OTi2eTT8wp6a5r3STryL2ZWzT830M01fEtcpAgcE3yJeS0nlhlU1k3D9lP0J2qCOPnvLWndXru+Ue8egC5FZwr7s/qIt7t3BMH36dPsG/WVqx7pxX1A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=/fvh9ys92DEMqXko1AcvoPJcttRmo/SliKqQbifK49I=;
- b=ogLKNwsK0ZlbW+rRwq1b8nKhjsy14qsfq64p9ytJpoCXGqez+zMRwOo5kDaUy2s/JDdjJvjATcfu+Nb85mwohcSDJhfZqdtW/oiZAleAiULjHyQuvKl/SpRQ5b7gt48IdB6i//J/mSkkIAI+dV4okL2XoCPx+3hXDDzoQOFko3BZbHW0CFJY2j6+4kCmAQHDk79yWHtBJx7c1DZdt5EkEqZu1TKyt7168VI7pYr4Emf+McvJyyHGquajBqssM916iBpXfzTVzMkwF2Gt9H7u+jDmuVS2X+AII1uyTsY53QyJHY/v5M5Pi+n+VXtOzrT6nc9nmdxPbrgVPCHS4l/t+w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=/fvh9ys92DEMqXko1AcvoPJcttRmo/SliKqQbifK49I=;
- b=pFJA5ytPxJKUeCw//edNy2z9SbnGBYtLlx3oUSPzKDPubIr8UxuFJltukdREBVc2GXJjojzp9GBl0pF1LvbKWVZCuuFEVOJb8CzKDbj2V9OLF1AfktjPB9IgSR5Q+OSkTqYxBRr+18tdCoI8h8VIU7D5z6NmlErcPq0CLTbuZbZkBtGymx9HuXBrnNe/ZXLVhV9u+io8srWKWWUR6GYHbVgEh345FqSFABGj3PBQxSZdP3TYaYThaFoPEC0qGcDj0qqUtZUA1gx71MKCf75yUWrw2d76LB2sTFrkXOl5jnaxdpnnsEEu2OvHrx7FM//snCTNOCXdEUodvPIcoUBiwg==
-Received: from SJ0PR13CA0239.namprd13.prod.outlook.com (2603:10b6:a03:2c1::34)
- by CH3PR12MB8936.namprd12.prod.outlook.com (2603:10b6:610:179::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8356.17; Fri, 17 Jan
- 2025 13:18:02 +0000
-Received: from MWH0EPF000989EB.namprd02.prod.outlook.com
- (2603:10b6:a03:2c1:cafe::a9) by SJ0PR13CA0239.outlook.office365.com
- (2603:10b6:a03:2c1::34) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8356.13 via Frontend Transport; Fri,
- 17 Jan 2025 13:18:02 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- MWH0EPF000989EB.mail.protection.outlook.com (10.167.241.138) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8356.11 via Frontend Transport; Fri, 17 Jan 2025 13:18:01 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Fri, 17 Jan
- 2025 05:17:48 -0800
-Received: from fedora (10.126.230.35) by rnnvmail201.nvidia.com (10.129.68.8)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Fri, 17 Jan
- 2025 05:17:44 -0800
-References: <cover.1737044384.git.petrm@nvidia.com>
- <e1c72812-ec53-4547-900e-9c9004098a4a@intel.com>
-User-agent: mu4e 1.8.14; emacs 29.4
-From: Petr Machata <petrm@nvidia.com>
-To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-CC: Petr Machata <petrm@nvidia.com>, Richard Cochran
-	<richardcochran@gmail.com>, Ido Schimmel <idosch@nvidia.com>,
-	<mlxsw@nvidia.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	<netdev@vger.kernel.org>
-Subject: Re: [PATCH net-next 0/5] mlxsw: Move Tx header handling to PCI driver
-Date: Fri, 17 Jan 2025 14:12:27 +0100
-In-Reply-To: <e1c72812-ec53-4547-900e-9c9004098a4a@intel.com>
-Message-ID: <87a5bp4m16.fsf@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8247825A627
+	for <netdev@vger.kernel.org>; Fri, 17 Jan 2025 13:19:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1737120000; cv=none; b=HEkS+6kbi46cXfxLfrEKDPnBSaPZ0CtAbHv3+ucQpCx9hnF2AGVwzIDcq7V0oQG1HBY/JF0icggcpkpIwLWLZs6L+0omzeY+1ykOJVKp8LIDU6fuhWdOgpEjxXydORZSZ84mq/h7GfRvg/E/UBvR2LHMah32SvYzqi9C1Gg90Pg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1737120000; c=relaxed/simple;
+	bh=5hrHI4tvyKGzcE04uCoclEOaXVYOD9n2OJ8uELCswXc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ryiFhe1dnD7AzxLs9VAgEQGlLWv3wJ/YhHxYJOZACqzkrSZ8LIbl8ruCKKLO7pV6imxXtbs7rObURnV9/sljPNe4qxTvAzjYT8qUcIpznabQyo2syPiUoc+KiV6OE76+2aATL+5YfPpmOz9Wy8q1R8GpCwApz1t668KVu0DHFmA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YJ9lbKs8; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1737119997;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=cMt7H4uJupL0n7CmNDQGQgqsD0sjSTEnlM24sJ8421I=;
+	b=YJ9lbKs8pwAPL6tspj8O7mXfQCaF/tL0j51TROSOHgToScw2ufvgTuJXkKXhSX0Sor7iv1
+	ZaDhC06a1nNRY04XrO8n5rrcFQ94sm2Dtk5qdxPDa/RzL3w8Xn4xtD1+KslENvvLUF3P5Q
+	siQJ5FIphusermgSqX9y7WH74vrYxhk=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-147-4YfPpel6PlyvLf1pr5dEYQ-1; Fri,
+ 17 Jan 2025 08:19:56 -0500
+X-MC-Unique: 4YfPpel6PlyvLf1pr5dEYQ-1
+X-Mimecast-MFC-AGG-ID: 4YfPpel6PlyvLf1pr5dEYQ
+Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 13E32195606B;
+	Fri, 17 Jan 2025 13:19:53 +0000 (UTC)
+Received: from wcosta-thinkpadt14gen4.rmtbr.csb (unknown [10.22.64.120])
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 9D8F719560BF;
+	Fri, 17 Jan 2025 13:19:46 +0000 (UTC)
+Date: Fri, 17 Jan 2025 10:19:44 -0300
+From: Wander Lairson Costa <wander@redhat.com>
+To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>, 
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Clark Williams <clrkwllms@kernel.org>, Steven Rostedt <rostedt@goodmis.org>, 
+	Jeff Garzik <jgarzik@redhat.com>, Auke Kok <auke-jan.h.kok@intel.com>, 
+	"moderated list:INTEL ETHERNET DRIVERS" <intel-wired-lan@lists.osuosl.org>, "open list:NETWORKING DRIVERS" <netdev@vger.kernel.org>, 
+	open list <linux-kernel@vger.kernel.org>, 
+	"open list:Real-time Linux (PREEMPT_RT):Keyword:PREEMPT_RT" <linux-rt-devel@lists.linux.dev>
+Subject: Re: [PATCH iwl-net 0/4] igb: fix igb_msix_other() handling for
+ PREEMPT_RT
+Message-ID: <givxfwonfer5kgowuxuz4bezxkhri4ottnmlmh3duhan3viznb@ic5sscp2twit>
+References: <20241204114229.21452-1-wander@redhat.com>
+ <20250107135106.WWrtBMXY@linutronix.de>
+ <taea3z7nof4szjir2azxsjtbouymqxyy4draa3hz35zbacqeeq@t3uidpha64k7>
+ <20250108102532.VWnKWvoo@linutronix.de>
+ <CAAq0SUnoS45Fctkzj4t4OxT=9qm9Bg8zu79=S3DUL_jcoLbC-A@mail.gmail.com>
+ <20250109174512.At7ZERjU@linutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MWH0EPF000989EB:EE_|CH3PR12MB8936:EE_
-X-MS-Office365-Filtering-Correlation-Id: 06cb183b-73ca-4e8b-3424-08dd36f95ea6
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|1800799024|82310400026|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?gXNeNP3t+Os4mrz2Sppwd83ajPORpTZ72X9O56eaI7Qi7QLdvcCYaV1FYVgu?=
- =?us-ascii?Q?y4vb5cy3RvuCPShrf5+Ks/jBCIVKgMJk941zhgbKE81fAwfObKcLIO5VQ46E?=
- =?us-ascii?Q?WhuzZ7uTA84F+F3qJNfFC4H96jkoM2k1EIe3NP9EMXcsl0c4qzNlvCO/Yukg?=
- =?us-ascii?Q?aeHPSockbi6Bf/lDyrdKlgszdEc2wygN6QGhg644rIer+cDJa7p6VYKiDa9j?=
- =?us-ascii?Q?6WvPVr3mgI4cqWiH9GqhWRMjCwatO5W9ey0vd7VXn2nJTiTY2Efb0uf13nPv?=
- =?us-ascii?Q?3VzaGk89vTN13N1T5/tQCDQLNyomtpAuSV72lF4rtbwFDBflraIcIopX/dV8?=
- =?us-ascii?Q?M1rwzSXtwBn3+bbTNNtcglZ8LBNepboatKk9niQYxWOfXgZFIYYH9aPXBHiv?=
- =?us-ascii?Q?rwOfJdrBnNN0WVNyxpyS/luUeS5h1NpsQ8PNspIR/NsrSHgBEN+AAFBw6HHX?=
- =?us-ascii?Q?lG8mKdMpqBHtXUgRTqTAgi/5d11PRWRn7/dPFf3Uk+ZsIPtw/YptPq6ti2O2?=
- =?us-ascii?Q?xxRVH4s2b99LUkhRgdQzl1Rrll22uZcAXkUsWl+SNfCidkpPSz7aZ2GKVhsJ?=
- =?us-ascii?Q?NbzwLGe2PYURAr4RRqClW20uqBCy69Pcr9aV7gUv0R96X+IVl0zuPSxgp2gX?=
- =?us-ascii?Q?wsZ1X4F3s8FL2pMFWBD6zJ23Ah1mC/tiD0jSbCFL9AQ5kn2vuJ0j/J4ssTfT?=
- =?us-ascii?Q?taTYnJnxqzfgowPF0nmBAOEdEhSDI0zrkkahW95asEsR3dHR68If98nwu0bm?=
- =?us-ascii?Q?q3FqbRD7xKArc+kQvIUplq+rzk5q2dORzDF3yTTNqpLlfklVUXobvlTbeGBt?=
- =?us-ascii?Q?I2Xun58Fy45A3SdYOoFoMWjy/M6nCZZ0yZpeQeY9vApF1YLAa/mNf1hMikL+?=
- =?us-ascii?Q?iIUbndhHsH82CL2dSNt2UxRD9D2svW9k/zRtiW5KKbh8T/TWH/ahso9HK426?=
- =?us-ascii?Q?+gbkOXiiB04dEME33VxaoX8+1jLFV5fe5FsulP0L6iuOqBmnKVvipvyeNuei?=
- =?us-ascii?Q?rv2V2tLhh/aBU1RwwRut/YHyolvoIlkgFjTsma3XneSPBsllJxtxdgbJfqcb?=
- =?us-ascii?Q?3cxV9v0hUWQnGDNnxXRhG5ucyW82mnflm1F7HeSCDhwEdItYT1D67NBdUGMf?=
- =?us-ascii?Q?39x69xhnGJVknmQ+MvoDMIkYVCs3hJTxSZLgejkfy73jbng2nLfMHxbYai4D?=
- =?us-ascii?Q?gKS0Gn5b2b2LSngp8wQsMW9WcBI6QLIghw2wCOvim/o93MrZAVEPID0rC7o2?=
- =?us-ascii?Q?x+Z4Ix2gTBdtCWj1sVc2gT9Ec27mzY//FvjhnJtOB+QrEb+hl6yjt5hp8yqo?=
- =?us-ascii?Q?DDoJry1WE68/kv++KpTHfYoW2+G61mIUH5IoY7QbvxMaYH/zdLtjjnP1bXAP?=
- =?us-ascii?Q?JwAgquLoKKqnKB2uFwEjRP+0XwskZtDwTlepG0rZUoT7HbCrx+d5wYz7lf+L?=
- =?us-ascii?Q?nbU0tOJ1KHtRfY88F5lfbq4o9EKGANVSIHfNPUkjG+bCZ21N9RjQgV7Ud9mF?=
- =?us-ascii?Q?V72TM0qhuLGz6fI=3D?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(1800799024)(82310400026)(376014);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Jan 2025 13:18:01.8248
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 06cb183b-73ca-4e8b-3424-08dd36f95ea6
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	MWH0EPF000989EB.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB8936
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250109174512.At7ZERjU@linutronix.de>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
+
+On Thu, Jan 09, 2025 at 06:45:12PM +0100, Sebastian Andrzej Siewior wrote:
+> On 2025-01-09 13:46:47 [-0300], Wander Lairson Costa wrote:
+> > > If the issue is indeed the use of threaded interrupts then the fix
+> > > should not be limited to be PREEMPT_RT only.
+> > >
+> > Although I was not aware of this scenario, the patch should work for it as well,
+> > as I am forcing it to run in interrupt context. I will test it to confirm.
+
+I tested with the stock kernel with threadirqs and the problem does show up.
+Applying the patches the issue is gone.
+
+> 
+> If I remember correctly there were "ifdef preempt_rt" things in it.
+
+That exists only to handle the case in which part in which the ISR needs to
+partially run in thread context (because the piece of code calling kmalloc),
+so I need an sleeping lock for that. For non-PREEMPT_RT, we don't have this
+constrain.
+
+> 
+> > > > > - What causes the failure? I see you reworked into two parts to behave
+> > > > >   similar to what happens without threaded interrupts. There is still no
+> > > > >   explanation for it. Is there a timing limit or was there another
+> > > > >   register operation which removed the mailbox message?
+> > > > >
+> > > >
+> > > > I explained the root cause of the issue in the last commit. Maybe I should
+> > > > have added the explanation to the cover letter as well.  Anyway, here is a
+> > > > partial verbatim copy of it:
+> > > >
+> > > > "During testing of SR-IOV, Red Hat QE encountered an issue where the
+> > > > ip link up command intermittently fails for the igbvf interfaces when
+> > > > using the PREEMPT_RT variant. Investigation revealed that
+> > > > e1000_write_posted_mbx returns an error due to the lack of an ACK
+> > > > from e1000_poll_for_ack.
+> > >
+> > > That ACK would have come if it would poll longer?
+
+No, the poll happens while preemption is disabled.
+
+> > >
+> > No, the service wouldn't be serviced while polling.
+
+s/service/interrupt/. Since we can't sleep at this context, there is
+no way to wait for an event.
+
+> 
+> Hmm. 
 
 
-Przemek Kitszel <przemyslaw.kitszel@intel.com> writes:
+> 
+> > > > The underlying issue arises from the fact that IRQs are threaded by
+> > > > default under PREEMPT_RT. While the exact hardware details are not
+> > > > available, it appears that the IRQ handled by igb_msix_other must
+> > > > be processed before e1000_poll_for_ack times out. However,
+> > > > e1000_write_posted_mbx is called with preemption disabled, leading
+> > > > to a scenario where the IRQ is serviced only after the failure of
+> > > > e1000_write_posted_mbx."
+> > >
+> > > Where is this disabled preemption coming from? This should be one of the
+> > > ops.write_posted() calls, right? I've been looking around and don't see
+> > > anything obvious.
+> > 
+> > I don't remember if I found the answer by looking at the code or by
+> > looking at the ftrace flags.
+> > I am currently on sick leave with covid. I can check it when I come back.
+> 
+> Don't worry, get better first. I'm kind of off myself. I'm not sure if I
+> have the hardware needed to setup so I can look at it…
+> 
 
-> On 1/16/25 17:38, Petr Machata wrote:
->> Amit Cohen writes:
->> Tx header should be added to all packets transmitted from the CPU to
->> Spectrum ASICs. Historically, handling this header was added as a driver
->> function, as Tx header is different between Spectrum and Switch-X.
->>  From May 2021, there is no support for SwitchX-2 ASIC, and all the relevant
->> code was removed.
->> For now, there is no justification to handle Tx header as part of
->> spectrum.c, we can handle this as part of PCI, in skb_transmit().
->> This change will also be useful when XDP support will be added to mlxsw,
->> as for XDP_TX and XDP_REDIRECT actions, Tx header should be added before
->> transmitting the packet.
->> Patch set overview:
->> Patches #1-#2 add structure to store Tx header info and initialize it
->> Patch #3 moves definitions of Tx header fields to txheader.h
->> Patch #4 moves Tx header handling to PCI driver
->> Patch #5 removes unnecessary attribute
->> Amit Cohen (5):
->>    mlxsw: Add mlxsw_txhdr_info structure
->>    mlxsw: Initialize txhdr_info according to PTP operations
->>    mlxsw: Define Tx header fields in txheader.h
->>    mlxsw: Move Tx header handling to PCI driver
->>    mlxsw: Do not store Tx header length as driver parameter
->>   drivers/net/ethernet/mellanox/mlxsw/core.c    |  21 +-
->>   drivers/net/ethernet/mellanox/mlxsw/core.h    |  13 +-
->>   drivers/net/ethernet/mellanox/mlxsw/i2c.c     |   2 +-
->>   drivers/net/ethernet/mellanox/mlxsw/pci.c     |  44 +++-
->>   .../net/ethernet/mellanox/mlxsw/spectrum.c    | 209 ++++--------------
->>   .../net/ethernet/mellanox/mlxsw/spectrum.h    |  11 +-
->>   .../ethernet/mellanox/mlxsw/spectrum_ptp.c    |  44 +---
->>   .../ethernet/mellanox/mlxsw/spectrum_ptp.h    |  28 ---
->>   .../net/ethernet/mellanox/mlxsw/txheader.h    |  63 ++++++
->>   9 files changed, 176 insertions(+), 259 deletions(-)
->> 
->
-> Thank you for cleaning this, nice series!
-> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+The reason of why you didn't find is because the interrupt in the igb
+driver is triggered inside the igbvf code. igbvf_reset() calls
+spin_lock_bh() [1], although in the cases I found it was already called
+with preemption disabled from process_one_work() (workqueue) and netlink_sendmsg().
 
-BTW, it's not just cleanup. When the cover letter says that it "will
-also be useful when XDP support will be added" -- we have four more
-patchsets in the pipeline that add that. It's not going to land pre
-net-next closure, but the next cycle for sure!
+Here is an ftrace log for the failure case:
 
-Thanks for the review!
+kworker/-86      0...1    85.381866: function:                   igbvf_reset
+kworker/-86      0...2    85.381866: function:                      e1000_reset_hw_vf
+kworker/-86      0...2    85.381867: function:                         e1000_check_for_rst_vf
+kworker/-86      0...2    85.381868: function:                         e1000_write_posted_mbx
+kworker/-86      0...2    85.381868: function:                            e1000_write_mbx_vf
+kworker/-86      0...2    85.381870: function:                            e1000_check_for_ack_vf // repeats for 2000 lines
+...
+kworker/-86      0.N.2    86.393782: function:                         e1000_read_posted_mbx
+kworker/-86      0.N.2    86.398606: function:                      e1000_init_hw_vf
+kworker/-86      0.N.2    86.398606: function:                         e1000_rar_set_vf
+kworker/-86      0.N.2    86.398606: function:                            e1000_write_posted_mbx
+irq/65-e-1287    0d..1    86.398609: function:             igb_msix_other
+irq/65-e-1287    0d..1    86.398609: function:                igb_rd32
+irq/65-e-1287    0d..2    86.398610: function:                igb_check_for_rst
+irq/65-e-1287    0d..2    86.398610: function:                igb_check_for_rst_pf
+irq/65-e-1287    0d..2    86.398610: function:                   igb_rd32
+irq/65-e-1287    0d..2    86.398611: function:                igb_check_for_msg
+irq/65-e-1287    0d..2    86.398611: function:                igb_check_for_msg_pf
+irq/65-e-1287    0d..2    86.398611: function:                   igb_rd32
+irq/65-e-1287    0d..2    86.398612: function:                igb_rcv_msg_from_vf
+irq/65-e-1287    0d..2    86.398612: function:                   igb_read_mbx
+irq/65-e-1287    0d..2    86.398612: function:                   igb_read_mbx_pf
+irq/65-e-1287    0d..2    86.398612: function:                      igb_obtain_mbx_lock_pf
+irq/65-e-1287    0d..2    86.398612: function:                         igb_rd32
+
+Notice the interrupt handler only executes after e1000_write_posted()
+returns. And here it is for the sucessful case:
+
+      ip-5603    0...1  1884.710747: function:             igbvf_reset
+      ip-5603    0...2  1884.710754: function:                e1000_reset_hw_vf
+      ip-5603    0...2  1884.710755: function:                   e1000_check_for_rst_vf
+      ip-5603    0...2  1884.710756: function:                   e1000_write_posted_mbx
+      ip-5603    0...2  1884.710756: function:                      e1000_write_mbx_vf
+      ip-5603    0...2  1884.710758: function:                      e1000_check_for_ack_vf
+      ip-5603    0d.h2  1884.710760: function:             igb_msix_other
+      ip-5603    0d.h2  1884.710760: function:                igb_rd32
+      ip-5603    0d.h3  1884.710761: function:                igb_check_for_rst
+      ip-5603    0d.h3  1884.710761: function:                igb_check_for_rst_pf
+      ip-5603    0d.h3  1884.710761: function:                   igb_rd32
+      ip-5603    0d.h3  1884.710762: function:                igb_check_for_msg
+      ip-5603    0d.h3  1884.710762: function:                igb_check_for_msg_pf
+      ip-5603    0d.h3  1884.710762: function:                   igb_rd32
+      ip-5603    0d.h3  1884.710763: function:                igb_rcv_msg_from_vf
+      ip-5603    0d.h3  1884.710763: function:                   igb_read_mbx
+      ip-5603    0d.h3  1884.710763: function:                   igb_read_mbx_pf
+      ip-5603    0d.h3  1884.710763: function:                      igb_obtain_mbx_lock_pf
+      ip-5603    0d.h3  1884.710763: function:                         igb_rd32
+
+The ISR executes immediately fater e1000_write_mbx_vf().
+
+[1] https://elixir.bootlin.com/linux/v6.12.6/source/drivers/net/ethernet/intel/igbvf/netdev.c#L1522
+
+> Sebastian
+> 
+
 
