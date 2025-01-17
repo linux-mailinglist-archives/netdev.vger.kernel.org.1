@@ -1,59 +1,58 @@
-Return-Path: <netdev+bounces-159488-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159489-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71F0BA1599E
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 23:52:50 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17D88A159B7
+	for <lists+netdev@lfdr.de>; Sat, 18 Jan 2025 00:00:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0D2827A2DF3
-	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 22:52:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 59FA518858B3
+	for <lists+netdev@lfdr.de>; Fri, 17 Jan 2025 23:00:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AE5E1B3F3D;
-	Fri, 17 Jan 2025 22:52:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FBC61A76B6;
+	Fri, 17 Jan 2025 23:00:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JXAn3DiZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eeByrOAy"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45CED1B0F2C
-	for <netdev@vger.kernel.org>; Fri, 17 Jan 2025 22:52:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09E21195811
+	for <netdev@vger.kernel.org>; Fri, 17 Jan 2025 23:00:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737154363; cv=none; b=WfWhHvmKr3Nz15Kxj+fRQ2ONDPsYCuWePLrXYbVCytXCerp3NgrhPncEacA5g53UsByBrH86TxnU882xc/RefQI5LytnWyM7mWGwxqfqJN3TndzpR0tH9wtBKNljWP8igrfXXaPIkzU8Zpx3m4hwyUIZHN+FzR/cd1Kb7ilmr1M=
+	t=1737154842; cv=none; b=dPQ3h07IACnfcMSGUUAPHG6a5AwOhelq6dKZ12HOlooWnKayZjy8D5smAzuFlSjWXNGG5HL0hVbtS2wgvn70OemOr7940TlVBbSRoBkSROpSV0W99Ny+g7vS96Ttnv0Jbeye0N2NzgiLAsoLPF5OF5yFK9hov07q7BI46Bt7c2Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737154363; c=relaxed/simple;
-	bh=3/pOBt7DGVRkdttmNBGDzdrnhnM5FYvRk7Or1gyqnjI=;
+	s=arc-20240116; t=1737154842; c=relaxed/simple;
+	bh=EMmsz4Guk7K0RltZtX/TLPY7POqiLi0oydB9aoWegtI=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=AedS6wYmYbGftkLUh/BqVjvSRAovRnUfrUmUbS0lbEyrG3yvI5KzPvIQ0QpJ//SflTxjWY4EEUspV0R32POhq8tEwUgeXwFOJtLfy8kLcEwL5vWdXO7G0PJCyCcteRYXcA7aNVN9OIDIQnHTHmFAlBxqv93/TPK4kudtXQfmaeU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JXAn3DiZ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 70005C4CEDD;
-	Fri, 17 Jan 2025 22:52:41 +0000 (UTC)
+	 MIME-Version:Content-Type; b=lrpjLuWIPMMEs/SHM2miuW1B8cVAZ2XmyOpUohD//igOZ43hjjfCXtfAMVXrnMUv9OrrbRwneAPEZCeN6dQ5eLSOUg4+beq76ROWlWuPcK2dRbyatevRTxoMo0Py5754nPQwWmVzpgd5JFZNC8WoPYzvvwJv6l2yYAsZ3MflpjI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eeByrOAy; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 22138C4CEDD;
+	Fri, 17 Jan 2025 23:00:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737154361;
-	bh=3/pOBt7DGVRkdttmNBGDzdrnhnM5FYvRk7Or1gyqnjI=;
+	s=k20201202; t=1737154839;
+	bh=EMmsz4Guk7K0RltZtX/TLPY7POqiLi0oydB9aoWegtI=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=JXAn3DiZg0+ya67Ac+qwH9zSaOblpVWUooRkGH/al9nPOHc3ad8V4AJyUkgaff2/B
-	 4yghjBYptoB9y5y+5mxLT+SfKDIcczgLDQkD1pRtVRsuUMIj9kliUvN8OO4c4xtqqi
-	 3xR1I16s0ZvW4ToqBd93IwwwrXPjF0ReyB8jQqrQvGcVSc6xe/RYsrMK1+5wCg+sWH
-	 swBnHoH3/qxh7Qn42OBAZiVc+1S9L5aR2N7kEnF1Qd8MTWm6TZQ73wP/X5EvQf3f18
-	 exDoqGpSFr/BDR2PQq5G+KFAbEwxu+nhnJp2FvnWNuAdy5MAzxH0MSFkOz0/F2/QSO
-	 9Mjf9zp3MM0ig==
-Date: Fri, 17 Jan 2025 14:52:40 -0800
+	b=eeByrOAy8QVzXaLyB3aS0KO/1PCs/GW9QGMoRJQYSPhFyAop/GgvDJsGBDk3PbrfF
+	 1MSohtRZz6vxUVGPo8dROir17S+G1Xfe5CuUdVc5heMWdFKCRA5AHPIrMosXbXIIPK
+	 fn2nqJ8Ui+S1ilPJCN9RPxWjhlbF3x2AjWmgIClinWWYZW/DLmi1nolR43AwZGfZvh
+	 kigqmVBGk3sc63iplGnLLBZ3KjheNsFesYk0bJxTJypBw7CDLxWC8n49EskjGLAAyX
+	 Hh4csrcQJeWaHBS8Gwn5V6KU16rbr1rUVBOO6QeYi6xf+D3YpDncaxjr9RVCkhp8zC
+	 sTaCCgHAZJPMg==
+Date: Fri, 17 Jan 2025 15:00:38 -0800
 From: Jakub Kicinski <kuba@kernel.org>
 To: Eric Dumazet <edumazet@google.com>
-Cc: Kuniyuki Iwashima <kuniyu@amazon.com>, andrew+netdev@lunn.ch,
- davem@davemloft.net, horms@kernel.org, jdamato@fastly.com,
- netdev@vger.kernel.org, pabeni@redhat.com
-Subject: Re: [PATCH net-next v2 05/11] net: protect netdev->napi_list with
- netdev_lock()
-Message-ID: <20250117145240.235c6f39@kernel.org>
-In-Reply-To: <CANn89i+o79p0tYH=ttRB7rQUp62fTrVXcxGQ3MN1vw9ZcoBg6w@mail.gmail.com>
-References: <20250115035319.559603-6-kuba@kernel.org>
-	<20250115085711.42898-1-kuniyu@amazon.com>
-	<CANn89i+o79p0tYH=ttRB7rQUp62fTrVXcxGQ3MN1vw9ZcoBg6w@mail.gmail.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Paolo Abeni
+ <pabeni@redhat.com>, netdev@vger.kernel.org, Simon Horman
+ <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@amazon.com>,
+ eric.dumazet@gmail.com,
+ syzbot+85ff1051228a04613a32@syzkaller.appspotmail.com
+Subject: Re: [PATCH net-next] net: destroy dev->lock later in free_netdev()
+Message-ID: <20250117150038.1f009a20@kernel.org>
+In-Reply-To: <20250117224626.1427577-1-edumazet@google.com>
+References: <20250117224626.1427577-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,16 +62,13 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Fri, 17 Jan 2025 23:21:43 +0100 Eric Dumazet wrote:
-> > > Reviewed-by: Joe Damato <jdamato@fastly.com>
-> > > Reviewed-by: Eric Dumazet <edumazet@google.com>
-> > > Signed-off-by: Jakub Kicinski <kuba@kernel.org>  
-> >
-> > Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>  
+On Fri, 17 Jan 2025 22:46:26 +0000 Eric Dumazet wrote:
+> syzbot complained that free_netdev() was calling netif_napi_del()
+> after dev->lock mutex has been destroyed.
 > 
-> Jakub, has anyone sent the following fix yet ?
+> This fires a warning for CONFIG_DEBUG_MUTEXES=y builds.
 > 
-> CONFIG_DEBUG_MUTEXES=y should show a splat I think otherwise.
+> Move mutex_destroy(&dev->lock) near the end of free_netdev().
 
-Ugh, no, I didn't see such a fix, looks good!
+Reviewed-by: Jakub Kicinski <kuba@kernel.org>
 
