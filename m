@@ -1,112 +1,108 @@
-Return-Path: <netdev+bounces-159521-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159522-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F502A15B02
-	for <lists+netdev@lfdr.de>; Sat, 18 Jan 2025 03:09:03 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A29FA15B05
+	for <lists+netdev@lfdr.de>; Sat, 18 Jan 2025 03:15:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8E9803A97A9
-	for <lists+netdev@lfdr.de>; Sat, 18 Jan 2025 02:08:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 31EDC168CDD
+	for <lists+netdev@lfdr.de>; Sat, 18 Jan 2025 02:15:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 193E72A1D7;
-	Sat, 18 Jan 2025 02:08:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED45FBA2E;
+	Sat, 18 Jan 2025 02:15:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XjNzjv1L"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="uGxo3V/A"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-170.mta1.migadu.com (out-170.mta1.migadu.com [95.215.58.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8C474C76;
-	Sat, 18 Jan 2025 02:08:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE4023234
+	for <netdev@vger.kernel.org>; Sat, 18 Jan 2025 02:15:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737166139; cv=none; b=n/SsO0YrsAZ2oe34E+j4MFL8zpmOAgVGyE8PgGHN+uyJrgdXpWgvK6y8deV6y6Ldz6dSNAZ5EnNoCC8hHQUXJdTsgdFMmUcOfG+5xS5HSc44akUqNg7nHXpQfDAQqgUmbRQqzjvHE5fptTzi06/8IWc2VUlc5wgIxZAEfTWrjDk=
+	t=1737166547; cv=none; b=l+C6lvHxlA3NET+y5/vvX+mbRld24qU82p0tIRGWxZplyk49jeaxk5gpmu9kioHzwKDSDi3/obAYCusYYmlTdszVBL/Veye40YtqRdPx1bu2yleODqX+tn1zoN0LUx2czbL5Wf5bYaxkzvdB7hleNalm/pRz7sJbSF6c+OPSFZ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737166139; c=relaxed/simple;
-	bh=82C9aPdSv/h/M468ysfIZYI0zf8jEucpgVq4+gRpbxM=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Symkhrk1ecl2l2S3IoySJ01p4vecJ2L/npwCC2cbQLrJV25LZLJQI8IeuezQP1A9SjxFvWt6lc4QjRghzgaSHGwGngC/giaEHZaM+zzEb5NGbmmURrZYQsSkLW1IE9+vh4VqQt5Eym/GcX6b6btielKPPxHb1xauvDjeBIQFG7U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XjNzjv1L; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B8E34C4CEDD;
-	Sat, 18 Jan 2025 02:08:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737166138;
-	bh=82C9aPdSv/h/M468ysfIZYI0zf8jEucpgVq4+gRpbxM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=XjNzjv1LeIbPLecxDOAWDXq59StZL1jshSDn87RRVbZAEL64EMtTo9OgV5MR1gC58
-	 voLZQs42YUhTJG5F6q92cfn92ONay3KWo7jELDV2elrHmu6CzDSBJUt36DIg4eYMFO
-	 wZLlMZn6ftXfHTLGtZ+THh7IxOMMQxR6QcSJoH/3Fol7CcSxHckiVU5tHN5vZ/x2Gd
-	 aPW0HTb4bYi3goEu7l7k9TFL1XHMsv8f6PXVCq5MSKSrunVuth4R+SEk/V6uoVJIZH
-	 44FvIBtiKJhJB5UpCDVUzI5fOo+M+cTzeiPTA29K0t3DzkipmUzq4bW7Wzizbj7oBa
-	 pwS7lP6xEJVcg==
-Date: Fri, 17 Jan 2025 18:08:56 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Pavel Begunkov <asml.silence@gmail.com>
-Cc: Mina Almasry <almasrymina@google.com>, David Wei <dw@davidwei.uk>,
- io-uring@vger.kernel.org, netdev@vger.kernel.org, Jens Axboe
- <axboe@kernel.dk>, Paolo Abeni <pabeni@redhat.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jesper Dangaard
- Brouer <hawk@kernel.org>, David Ahern <dsahern@kernel.org>, Stanislav
- Fomichev <stfomichev@gmail.com>, Joe Damato <jdamato@fastly.com>, Pedro
- Tammela <pctammela@mojatatu.com>
-Subject: Re: [PATCH net-next v11 10/21] net: add helpers for setting a
- memory provider on an rx queue
-Message-ID: <20250117180856.42514e9b@kernel.org>
-In-Reply-To: <0d851165-dfe3-491a-be8b-77d01ee00de4@gmail.com>
-References: <20250116231704.2402455-1-dw@davidwei.uk>
-	<20250116231704.2402455-11-dw@davidwei.uk>
-	<20250116182558.4c7b66f6@kernel.org>
-	<939728a0-b479-4b60-ad0e-9778e2a41551@gmail.com>
-	<20250117141136.6b9a0cf2@kernel.org>
-	<0d851165-dfe3-491a-be8b-77d01ee00de4@gmail.com>
+	s=arc-20240116; t=1737166547; c=relaxed/simple;
+	bh=bLHwHzBJQsONui/k9EBc0HTK9xIzdxrCOYe2bL+iCtE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=QRd546zZ52BAbYtCBwqhAY0//ULEV0Kinxc99TxNefXtlFtiOK5wWleE1rnMBku1XeT7ZacnpMIiLUHHfN7u6JG3piTrS1oOvCPwja7NKQzcBFCqGpRHe4koL9CTPu2WN4FlhZyhR9aOci+Zg1RXVC92jQYrEeKpaIYDEsSA2vA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=uGxo3V/A; arc=none smtp.client-ip=95.215.58.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <35e2c693-244f-4d55-88f3-99e1ed1e2745@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1737166534;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=J/Ny+ux2Nts//ag9xqjBiWq8B++rW5Mi4vVd0rGR2/w=;
+	b=uGxo3V/Ahqc2B3BNggVqEIIHWl8tHWNhBn+6RgaU+DsKzkSHtvE3/GTiU1jfUDbEe7qECZ
+	mm9Z9ycp0qm9BbAYmeYjWnxULJ6U8zF8GgQb0aD9iG0/KDn75squjUJolLV4p4QMRTQSab
+	AiUyKkgakPD6SHIEotDUMDVXq9jhljU=
+Date: Fri, 17 Jan 2025 18:15:26 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Subject: Re: [PATCH net-next v5 05/15] net-timestamp: add strict check in some
+ BPF calls
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, dsahern@kernel.org, willemdebruijn.kernel@gmail.com,
+ willemb@google.com, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
+ eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev,
+ john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me,
+ haoluo@google.com, jolsa@kernel.org, horms@kernel.org, bpf@vger.kernel.org,
+ netdev@vger.kernel.org
+References: <20250112113748.73504-1-kerneljasonxing@gmail.com>
+ <20250112113748.73504-6-kerneljasonxing@gmail.com>
+ <ca852e76-2627-4e07-8005-34168271bf12@linux.dev>
+ <CAL+tcoAY9jeOmZjVqG=7=FxOdXevvOXroTosaE8QpG2bYbFE_Q@mail.gmail.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+Content-Language: en-US
+In-Reply-To: <CAL+tcoAY9jeOmZjVqG=7=FxOdXevvOXroTosaE8QpG2bYbFE_Q@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Fri, 17 Jan 2025 23:20:58 +0000 Pavel Begunkov wrote:
-> > True, so not twice, but the race is there. It's not correct to call
-> > ops of a device which has already been unregistered.  
+On 1/15/25 3:32 PM, Jason Xing wrote:
+>> +static bool is_locked_tcp_sock_ops(struct bpf_sock_ops_kern *bpf_sock)
+>> +{
+>> +       return bpf_sock->op <= BPF_SOCK_OPS_WRITE_HDR_OPT_CB;
 > 
-> Ok, from what you're saying it's regardless of the netdev still
-> having refs lingering. In this case it was better a version ago
-> where io_uring was just taking the rtnl lock, which protects
-> against concurrent unregistration while io_uring is checking
-> netdev.
+> I wonder if I can use the code snippets in the previous reply in this
+> thread, only checking if we are in the timestamping callback?
+> +#define BPF_SOCK_OPTS_TS               (BPF_SOCK_OPS_TS_SCHED_OPT_CB | \
+> +                                        BPF_SOCK_OPS_TS_SW_OPT_CB | \
+> +                                        BPF_SOCK_OPS_TS_ACK_OPT_CB | \
+> +                                        BPF_SOCK_OPS_TS_TCP_SND_CB)
 
-Yes, v9 didn't have this race, it just didn't release the netdev ref
-correctly. Plus we plan to lift the rtnl_lock requirement on this API 
-in 6.14, so the locking details best live under net/
+Note that BPF_SOCK_OPS_*_CB is not a bit.
 
-The change I suggested to earlier should be fine.
+My understanding is it is a blacklist. Please correct me if I miss-interpret the 
+intention.
 
- - If uninstall path wins it will clear and put the netdev under the
-   spin lock and the close path will do nothing.
+> 
+> Then other developers won't worry too much whether they will cause
+> some safety problems. If not, they will/must add callbacks earlier
+> than BPF_SOCK_OPS_WRITE_HDR_OPT_CB.
 
- - If the close path grabs the netdev pointer the uninstall path will 
-   do nothing in io_uring, just clear the pointers in net/ side. Then 
-   the close path will grab the lock in net_mp_open_rxq() see the netdev
-   as unregistered, return early, put the ref.
+It can't be added earlier because it is in uapi. If the future new cb is safe to 
+use these helpers, then it needs to adjust the BPF_SOCK_OPS_WRITE_HDR_OPT_CB 
+check. is_locked_tcp_sock_ops() is a whitelist. The worst is someone will 
+discover the helpers are not usable in the new cb, so no safety issue.
 
-Did I miss something?
+If forgot to adjust the blacklist and the new cb should not use the helpers, 
+then it is a safety issue.
 
-> Does your patch below covers that?
+Anyhow, I don't have a strong opinion here. I did think about checking the new 
+TS callback instead. I went with the simplest way in the code and also 
+considering the BPF_SOCK_OPS_TS_*_CB is only introduced starting from patch 7.
 
-My patch below is semi-related. It prevents us from calling 
-the start/stop but we shouldn't call the alloc/free either, 
-after we enter unregister. IOW this patch fixes devmem but
-io_uring needs more. I think the "entry point" such as
-net_mp_close_rxq() is appropriate for netdev state validation,
-rather then the bowels of netdev_rx_queue_restart().
-
-> Or does it have to be resolved in this set? I assume you're going to
-> queue it as a fix.
-
-Yes, just hoping to hear from Mina first.
 
