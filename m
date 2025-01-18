@@ -1,264 +1,161 @@
-Return-Path: <netdev+bounces-159574-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159575-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E07CA15E36
-	for <lists+netdev@lfdr.de>; Sat, 18 Jan 2025 18:02:06 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0BE08A15E7C
+	for <lists+netdev@lfdr.de>; Sat, 18 Jan 2025 19:29:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 32CF016092E
-	for <lists+netdev@lfdr.de>; Sat, 18 Jan 2025 17:02:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 312A7165F7F
+	for <lists+netdev@lfdr.de>; Sat, 18 Jan 2025 18:29:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E3B3187561;
-	Sat, 18 Jan 2025 17:02:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H98Qyh9t"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95E7B1A2C27;
+	Sat, 18 Jan 2025 18:29:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f181.google.com (mail-il1-f181.google.com [209.85.166.181])
+Received: from mail-il1-f207.google.com (mail-il1-f207.google.com [209.85.166.207])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 779F713B791
-	for <netdev@vger.kernel.org>; Sat, 18 Jan 2025 17:01:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E95ADA95C
+	for <netdev@vger.kernel.org>; Sat, 18 Jan 2025 18:29:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737219721; cv=none; b=Pb7VNkKK7loZWtMrvOevtyjYjDy5jO5fIF1e5m0uVVbUphax4U34TpgfdZtMedzXOzsB84UtgJfI/5C7f922GO0okHjSShkVE8s0Cplo0HRvpPHfoKcIycKs0zEENHdM4nzKnaVTVUohxDghIzCA1AO6p57ARVrZqqC7pt3ywLg=
+	t=1737224966; cv=none; b=S8G7rHa5dJz4x2mK7lxUkpSSmGmatz8Alnlo/XTJR0N77Wq5DzVrZdmVq1wsYieIJ/Jfc0fDcpGU6P2JJIzcJ9r5B79YrX0KbGl4LHAGnsIf8k0CM+N53X/f1BMOSRq5ib9a5zbTny+iu1JnuRu/v6ZyiaPz6clKIWG/aCNXFCA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737219721; c=relaxed/simple;
-	bh=M/bcnLFzNB/pDISdLF4DNkKiwzLnSWFng0kMg7lmA0s=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=R9dg+MwYCNFN4FuaLGMzzes+lwfwaTLO+AGsCfiIgarX35qz1ZEdnK0ugGn1+SAdhi8foAwAEmp4qYMw61trEfsU2ynKTjFhDmBlyfGTB8EOI0bNZu763iuXF8YVb53s4F+45eVQARUtIOLELslfbvQaKVEDbdHgOJuZ2Vk0u2Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=H98Qyh9t; arc=none smtp.client-ip=209.85.166.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f181.google.com with SMTP id e9e14a558f8ab-3ce7c4115e8so14417875ab.1
-        for <netdev@vger.kernel.org>; Sat, 18 Jan 2025 09:01:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1737219718; x=1737824518; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mipqSWqCQw7mZMk4ZQpoBkHYub16XF6bdcgmVQvyxtA=;
-        b=H98Qyh9tKcY0mLMtqrnjNSr6d1s5ih1p42xxALRCBKv4RH9LXFHuByXhe3yNIQb5eL
-         ff3a0QpT692BIwTt2Hi66Ixb3Ma+5vFnvYaxX9fo78dFNBELqbPxqdK4FxDV9PtdLMci
-         N0aDjrsUcuLym0d5WcWWi1DFn2x9037Cyv9Xfy/P2M+y8MdVabj7TgC8BiNDSZgIMsI/
-         Xyxhsno895kLBvG1hCoe9AEsovkZHU7pgs2dh5DGFGVCWLdyTj44qtqo4s9tSQHGgobl
-         mTlekgQ20rHpFHLkbjgMVHr4nPAAlQMRWCldyadNqPXNEW548OwqJ4UVrcYKEnK83pXq
-         Qm8w==
+	s=arc-20240116; t=1737224966; c=relaxed/simple;
+	bh=icLG5B4PUiXbdzGYA/MNxhips8CnPLmgSsTeSMic3jc=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=XyP5xbSFnno2ZOHdsWbl7Je/gV+yNPOgh+r8haDo6EAfv6RA7/Uz9k3f4m2F3O+BbR3LZ8XK2HsBAiSAdIDsYqImFNsYo59VM2wdFtRYKPvTXEL9NdHAX5Aa3DWYP19uqiu+wD/dJNVfl4BUnZr2dp1hMiGLB3L20a8zWeOs3qw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.207
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f207.google.com with SMTP id e9e14a558f8ab-3ce8aa6723bso52511625ab.3
+        for <netdev@vger.kernel.org>; Sat, 18 Jan 2025 10:29:24 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737219718; x=1737824518;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=mipqSWqCQw7mZMk4ZQpoBkHYub16XF6bdcgmVQvyxtA=;
-        b=GlnbwJ0eEN2VUKohgdHssfspckX5Hr4xB2moI5Tv/yHL6nBdJzqYjHnM+1Oz7Fyfmf
-         gGhGYllIx5l+s8ufBiTjEmdVmDEufuSCRhdkZ8DppDZk4qreixgGdu1hnrRQh9TDIsON
-         zU06lAJ/D2ELj/FWnf0/3zWOi7ZNF/3td0sTV133v5vh0tZ9WLZ5QflU55nHyZE+dkYD
-         Do4HFjS6NeuPQHldt936ec9uBjzz/oPe0BaLaA1SVEv2LTn9OxJomTzFvUWtwl3fGofu
-         kjcHn9K7mZz4ugz8olS7yjgf1AZIViKHXci4FSL2uSBVkEKTm9jcqkUlDzXXoEPqC+Bp
-         Asng==
-X-Gm-Message-State: AOJu0YwqW/1fbgE80KvOT0GSlkfxxwvdj5SQxxXXyeUzUcp6cLLJxzJR
-	g7BQp/s6vUBn0KIblMzu93j7ZHtpxxfIXNvRR45F8S4f7fOcAmR6/ORRFyBN0yyGvjkr/p5dUV7
-	jJIe0gWkIWk3ta2i6OoGYqxB71QiLAxiQ
-X-Gm-Gg: ASbGnctsGYE5N7cIuXUuwTtRQlRe6nRtUX3MZKw/gsQasBXkvoDZ9DSFQe2WMHTugX6
-	Y+O2CbmFurIcE3iTVtuizRZzcBOhSKLcL6M7rtrKvh+mn2EZv4r4=
-X-Google-Smtp-Source: AGHT+IF10JQwcOIvtPv3CY+5fwkcF932UvYFvzR6ETJE6IlLVPtI8GFJUiuRsMqWJj00qZsMlmmWIvRqzVEuw+yhw1c=
-X-Received: by 2002:a05:6e02:8e:b0:3ce:7b33:8c3b with SMTP id
- e9e14a558f8ab-3cf747e2027mr53153855ab.5.1737219718316; Sat, 18 Jan 2025
- 09:01:58 -0800 (PST)
+        d=1e100.net; s=20230601; t=1737224964; x=1737829764;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=FeKLZX+9yfGUgUFinaHiwnqca2rgge7GvqnBUCnaYM0=;
+        b=R6CGoT7+J0wKDLKfWaJJHsk7i2wD906+VR3rng+2/Y3fhR4yNmumfRx7aST3S27JDD
+         cYaozdkGG+JMO/fQ6yChuAd6Dw2faOUivzL7y5bc98bCSEnKAJuKKS0E4UF4LwBVoRFv
+         iSS33ToaIG7puj3mv5HLY/IciVO06J1C8BUA4Zn67HaEXyH7WRg9BpesT1KJRr6m3k/5
+         VlHMqID09H0v4EONhviWFq2YK/y3hpXHG2Ozi2dZ8qFDC6TwhsEKd5Z8MhfH/RkaOWVH
+         N+ApAm2R2PiwXh5ztrpGzpX+RMdlD27jm8/Pg1p1DpzlZKhq5fiSye8raje4WA9s89oE
+         Q3jA==
+X-Forwarded-Encrypted: i=1; AJvYcCV20JdCP1hqHzkks4R6/bJnH7AurOjDsWMgg4fw2sMumcR0wO9+D3PNFZc9Z+dNRb7FteZFX6Q=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzJGwl/6oA5/hatpglgullBhfzFCIj45bMHzsrlIK3Smcp2b+kg
+	OYm7JnL6wcvNJK7f2refwWqIZr4bWLf2rP5vvXSCF+/R/33Ua68qox0zfWzW7nUDOQB1r/XIJh8
+	IIIy7mdmKHxkgQS/A8UcQWOGWP62vKPithrtq5B80qyDpchfngNQbZLs=
+X-Google-Smtp-Source: AGHT+IH3/Ro/4dsPi5I4ji8F/qTQ35hSlkMZf/G8K2bn9ZXo44vWPjwsJuxeOMnophFiEsuDjkKueOlxXs8T1evMsyDtwKbz18Mz
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250117214035.2414668-1-jmaloy@redhat.com>
-In-Reply-To: <20250117214035.2414668-1-jmaloy@redhat.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Sun, 19 Jan 2025 01:01:22 +0800
-X-Gm-Features: AbW1kvaM0FI6R_4QP_9t3-02uU6hJnG4ABj-eRb_TNp2n5h6Q2StvfHd4MEFDvk
-Message-ID: <CAL+tcoDW1-c8v=RMBs=gvc9nvO0nm2fmpE+cV_sRFE-QwLV1vA@mail.gmail.com>
-Subject: Re: [net,v2] tcp: correct handling of extreme memory squeeze
-To: jmaloy@redhat.com
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org, 
-	passt-dev@passt.top, sbrivio@redhat.com, lvivier@redhat.com, 
-	dgibson@redhat.com, imagedong@tencent.com, eric.dumazet@gmail.com, 
-	edumazet@google.com
+X-Received: by 2002:a05:6e02:b4c:b0:3a7:e86a:e803 with SMTP id
+ e9e14a558f8ab-3cf743f8834mr60158015ab.8.1737224964068; Sat, 18 Jan 2025
+ 10:29:24 -0800 (PST)
+Date: Sat, 18 Jan 2025 10:29:24 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <678bf304.050a0220.303755.002d.GAE@google.com>
+Subject: [syzbot] [net?] WARNING in __xfrm_state_destroy
+From: syzbot <syzbot+ffa848883c52a4422348@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, herbert@gondor.apana.org.au, 
+	horms@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, steffen.klassert@secunet.com, 
+	syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Sat, Jan 18, 2025 at 5:41=E2=80=AFAM <jmaloy@redhat.com> wrote:
->
-> From: Jon Maloy <jmaloy@redhat.com>
->
-> Testing with iperf3 using the "pasta" protocol splicer has revealed
-> a bug in the way tcp handles window advertising in extreme memory
-> squeeze situations.
->
-> Under memory pressure, a socket endpoint may temporarily advertise
-> a zero-sized window, but this is not stored as part of the socket data.
-> The reasoning behind this is that it is considered a temporary setting
-> which shouldn't influence any further calculations.
->
-> However, if we happen to stall at an unfortunate value of the current
-> window size, the algorithm selecting a new value will consistently fail
-> to advertise a non-zero window once we have freed up enough memory.
-> This means that this side's notion of the current window size is
-> different from the one last advertised to the peer, causing the latter
-> to not send any data to resolve the sitution.
->
-> The problem occurs on the iperf3 server side, and the socket in question
-> is a completely regular socket with the default settings for the
-> fedora40 kernel. We do not use SO_PEEK or SO_RCVBUF on the socket.
->
-> The following excerpt of a logging session, with own comments added,
-> shows more in detail what is happening:
->
-> //              tcp_v4_rcv(->)
-> //                tcp_rcv_established(->)
-> [5201<->39222]:     =3D=3D=3D=3D Activating log @ net/ipv4/tcp_input.c/tc=
-p_data_queue()/5257 =3D=3D=3D=3D
-> [5201<->39222]:     tcp_data_queue(->)
-> [5201<->39222]:        DROPPING skb [265600160..265665640], reason: SKB_D=
-ROP_REASON_PROTO_MEM
->                        [rcv_nxt 265600160, rcv_wnd 262144, snt_ack 265469=
-200, win_now 131184]
->                        [copied_seq 259909392->260034360 (124968), unread =
-5565800, qlen 85, ofoq 0]
-> [5201<->39222]:     tcp_data_queue(<-) OFO queue: gap: 65480, len: 0
-> [5201<->39222]:     __tcp_transmit_skb(->)
-> [5201<->39222]:       tcp_select_window(->) tp->rcv_wup: 265469200, tp->r=
-cv_wnd: 262144, tp->rcv_nxt 265600160
-> [5201<->39222]:         (inet_csk(sk)->icsk_ack.pending & ICSK_ACK_NOMEM)=
- --> TRUE
-> [5201<->39222]:       tcp_select_window(<-) tp->rcv_wup: 265469200, tp->r=
-cv_wnd: 262144, tp->rcv_nxt 265600160, returning 0
-> [5201<->39222]:       ADVERTISING WIN 0, ACK_SEQ: 265600160
-> [5201<->39222]:     __tcp_transmit_skb(<-) tp->rcv_wup: 265469200, tp->rc=
-v_wnd: 262144, tp->rcv_nxt 265600160
-> [5201<->39222]:   tcp_rcv_established(<-)
-> [5201<->39222]: tcp_v4_rcv(<-)
->
-> // Receive queue is at 85 buffers and we are out of memory.
-> // We drop the incoming buffer, although it is in sequence, and decide
-> // to send an advertisement with a window of zero.
-> // We don't update tp->rcv_wnd and tp->rcv_wup accordingly, which means
-> // we unconditionally shrink the window.
->
-> [5201<->39222]: tcp_recvmsg_locked(->)
-> [5201<->39222]:   __tcp_cleanup_rbuf(->) tp->rcv_wup: 265469200, tp->rcv_=
-wnd: 262144, tp->rcv_nxt 265600160
-> [5201<->39222]:     [new_win =3D 0, win_now =3D 131184, 2 * win_now =3D 2=
-62368]
-> [5201<->39222]:     [new_win >=3D (2 * win_now) ? --> time_to_ack =3D 0]
-> [5201<->39222]:     NOT calling tcp_send_ack()
-> [5201<->39222]:   __tcp_cleanup_rbuf(<-) tp->rcv_wup: 265469200, tp->rcv_=
-wnd: 262144, tp->rcv_nxt 265600160
-> [5201<->39222]: tcp_recvmsg_locked(<-) returning 6104 bytes.
->                 [rcv_nxt 265600160, rcv_wnd 262144, snt_ack 265469200, wi=
-n_now 131184]
->                 [copied_seq 260040464->260040464 (0), unread 5559696, qle=
-n 85, ofoq 0]
->
-> // After each read, the algorithm for calculating the new receive
-> // window in __tcp_cleanup_rbuf() finds it is too small to advertise
-> // or to update tp->rcv_wnd.
-> // Meanwhile, the peer thinks the window is zero, and will not send
-> // any more data to trigger an update from the interrupt mode side.
->
-> [5201<->39222]: tcp_recvmsg_locked(->)
-> [5201<->39222]:   __tcp_cleanup_rbuf(->) tp->rcv_wup: 265469200, tp->rcv_=
-wnd: 262144, tp->rcv_nxt 265600160
-> [5201<->39222]:     [new_win =3D 262144, win_now =3D 131184, 2 * win_now =
-=3D 262368]
-> [5201<->39222]:     [new_win >=3D (2 * win_now) ? --> time_to_ack =3D 0]
-> [5201<->39222]:     NOT calling tcp_send_ack()
-> [5201<->39222]:   __tcp_cleanup_rbuf(<-) tp->rcv_wup: 265469200, tp->rcv_=
-wnd: 262144, tp->rcv_nxt 265600160
-> [5201<->39222]: tcp_recvmsg_locked(<-) returning 131072 bytes.
->                 [rcv_nxt 265600160, rcv_wnd 262144, snt_ack 265469200, wi=
-n_now 131184]
->                 [copied_seq 260099840->260171536 (71696), unread 5428624,=
- qlen 83, ofoq 0]
->
-> // The above pattern repeats again and again, since nothing changes
-> // between the reads.
->
-> [...]
->
-> [5201<->39222]: tcp_recvmsg_locked(->)
-> [5201<->39222]:   __tcp_cleanup_rbuf(->) tp->rcv_wup: 265469200, tp->rcv_=
-wnd: 262144, tp->rcv_nxt 265600160
-> [5201<->39222]:     [new_win =3D 262144, win_now =3D 131184, 2 * win_now =
-=3D 262368]
-> [5201<->39222]:     [new_win >=3D (2 * win_now) ? --> time_to_ack =3D 0]
-> [5201<->39222]:     NOT calling tcp_send_ack()
-> [5201<->39222]:   __tcp_cleanup_rbuf(<-) tp->rcv_wup: 265469200, tp->rcv_=
-wnd: 262144, tp->rcv_nxt 265600160
-> [5201<->39222]: tcp_recvmsg_locked(<-) returning 131072 bytes.
->                 [rcv_nxt 265600160, rcv_wnd 262144, snt_ack 265469200, wi=
-n_now 131184]
->                 [copied_seq 265469200->265545488 (76288), unread 54672, q=
-len 1, ofoq 0]
->
-> [5201<->39222]: tcp_recvmsg_locked(->)
-> [5201<->39222]:   __tcp_cleanup_rbuf(->) tp->rcv_wup: 265469200, tp->rcv_=
-wnd: 262144, tp->rcv_nxt 265600160
-> [5201<->39222]:     [new_win =3D 262144, win_now =3D 131184, 2 * win_now =
-=3D 262368]
-> [5201<->39222]:     [new_win >=3D (2 * win_now) ? --> time_to_ack =3D 0]
-> [5201<->39222]:     NOT calling tcp_send_ack()
-> [5201<->39222]:   __tcp_cleanup_rbuf(<-) tp->rcv_wup: 265469200, tp->rcv_=
-wnd: 262144, tp->rcv_nxt 265600160
-> [5201<->39222]: tcp_recvmsg_locked(<-) returning 54672 bytes.
->                 [rcv_nxt 265600160, rcv_wnd 262144, snt_ack 265469200, wi=
-n_now 131184]
->                 [copied_seq 265600160->265600160 (0), unread 0, qlen 0, o=
-foq 0]
->
-> // The receive queue is empty, but no new advertisement has been sent.
-> // The peer still thinks the receive window is zero, and sends nothing.
-> // We have ended up in a deadlock situation.
->
-> Furthermore, we have observed that in these situations this side may
-> send out an updated 'th->ack_seq=C2=B4 which is not stored in tp->rcv_wup
-> as it should be. Backing ack_seq seems to be harmless, but is of
-> course still wrong from a protocol viewpoint.
->
-> We fix this by setting tp->rcv_wnd and tp->rcv_wup even when a packet
-> has been dropped because of memory exhaustion and we have to advertize
-> a zero window.
->
-> Further testing shows that the connection recovers neatly from the
-> squeeze situation, and traffic can continue indefinitely.
+Hello,
 
-Thanks for such a detailed explanation :) However, undeniably, I've
-read several times until I totally follow the issue you reported. I
-wonder if you can compact and simplify the commit message a little
-bit, say, remove the last two calltraces that can be replaced by a
-single sentence like you've already stated (which is "the queue is
-empty").
+syzbot found the following issue on:
 
-Let me rephrase the scenario to see if I'm understanding in the right way:
-1. First time the receiver sends a skb with zero window because of
-shortage of memory.
-2. Sometimes the user calls the tcp_recvmsg() to remove the data from
-kernel to user space, sending the ACK process should be triggered,
-especially when the queue is empty.
-3. Then the client reading the zero window signal stops sending data.
+HEAD commit:    c45323b7560e Merge tag 'mm-hotfixes-stable-2025-01-13-00-0..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=14dc3cb0580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=d1cb4a1f148c0861
+dashboard link: https://syzkaller.appspot.com/bug?extid=ffa848883c52a4422348
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
 
-#1 fails to update the rcv_wup and rcv_wnd, so since then in the
-manner of __tcp_cleanup_rbuf(), the rcv_window_now variable is always
-the same in this case (please see the calculation in
-tcp_receive_window()). rcv_window_now, which I presume is the same as
-win_now in the above description, should vary when
-__tcp_cleanup_rbuf() is called. Because of that, #2 could never send
-an ACK.
+Unfortunately, I don't have any reproducer for this issue yet.
 
-My small question is why is the new_window always 262144 no matter
-what amount of data the user receives? Is it because in
-__tcp_select_window() there is no wscale option?
+Downloadable assets:
+disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7feb34a89c2a/non_bootable_disk-c45323b7.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/d162460a6713/vmlinux-c45323b7.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/f905e34cb8b4/bzImage-c45323b7.xz
 
-Thanks,
-Jason
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+ffa848883c52a4422348@syzkaller.appspotmail.com
+
+------------[ cut here ]------------
+WARNING: CPU: 2 PID: 8241 at net/xfrm/xfrm_state.c:727 __xfrm_state_destroy+0x178/0x1c0 net/xfrm/xfrm_state.c:727
+Modules linked in:
+CPU: 2 UID: 0 PID: 8241 Comm: syz.3.651 Not tainted 6.13.0-rc7-syzkaller-00019-gc45323b7560e #0
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
+RIP: 0010:__xfrm_state_destroy+0x178/0x1c0 net/xfrm/xfrm_state.c:727
+Code: 48 48 8b 35 4a 5f dc 03 48 c7 c2 e0 f8 09 90 bf 08 00 00 00 e8 39 0b 98 f7 5b 5d 41 5c 41 5d e9 fe fe ce f7 e8 f9 fe ce f7 90 <0f> 0b 90 e9 dc fe ff ff e8 3b ab 31 f8 e9 b3 fe ff ff 4c 89 e7 e8
+RSP: 0018:ffffc9000752ef58 EFLAGS: 00010287
+RAX: 00000000000005bd RBX: ffff888029cd8440 RCX: ffffc90007602000
+RDX: 0000000000080000 RSI: ffffffff89cb25a7 RDI: 0000000000000001
+RBP: 0000000000000000 R08: 0000000000000001 R09: 0000000000000005
+R10: 0000000000000001 R11: 0000000000000001 R12: 0000000000000001
+R13: 0000000000000000 R14: ffff888029cd84f4 R15: ffff888029cd8440
+FS:  00007fb8552256c0(0000) GS:ffff88806a800000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000020000096 CR3: 000000004e246000 CR4: 0000000000352ef0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ xfrm_state_put include/net/xfrm.h:866 [inline]
+ xfrm_state_put include/net/xfrm.h:863 [inline]
+ xfrm_state_migrate+0x43e/0x1d70 net/xfrm/xfrm_state.c:2038
+ xfrm_migrate+0x763/0x1820 net/xfrm/xfrm_policy.c:4658
+ xfrm_do_migrate+0xc0c/0xf10 net/xfrm/xfrm_user.c:3022
+ xfrm_user_rcv_msg+0x585/0xbf0 net/xfrm/xfrm_user.c:3373
+ netlink_rcv_skb+0x16b/0x440 net/netlink/af_netlink.c:2542
+ xfrm_netlink_rcv+0x71/0x90 net/xfrm/xfrm_user.c:3395
+ netlink_unicast_kernel net/netlink/af_netlink.c:1321 [inline]
+ netlink_unicast+0x53c/0x7f0 net/netlink/af_netlink.c:1347
+ netlink_sendmsg+0x8b8/0xd70 net/netlink/af_netlink.c:1891
+ sock_sendmsg_nosec net/socket.c:711 [inline]
+ __sock_sendmsg net/socket.c:726 [inline]
+ ____sys_sendmsg+0xaaf/0xc90 net/socket.c:2583
+ ___sys_sendmsg+0x135/0x1e0 net/socket.c:2637
+ __sys_sendmsg+0x16e/0x220 net/socket.c:2669
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xcd/0x250 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7fb854385d29
+Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007fb855225038 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 00007fb854575fa0 RCX: 00007fb854385d29
+RDX: 0000000020000000 RSI: 00000000200004c0 RDI: 0000000000000005
+RBP: 00007fb854401b08 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 0000000000000000 R14: 00007fb854575fa0 R15: 00007ffe34dcdec8
+ </TASK>
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
