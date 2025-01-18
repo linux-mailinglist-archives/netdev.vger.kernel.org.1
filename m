@@ -1,94 +1,74 @@
-Return-Path: <netdev+bounces-159537-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159538-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CAEC4A15B4D
-	for <lists+netdev@lfdr.de>; Sat, 18 Jan 2025 04:50:54 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 814B0A15B4F
+	for <lists+netdev@lfdr.de>; Sat, 18 Jan 2025 04:51:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 004977A2E80
-	for <lists+netdev@lfdr.de>; Sat, 18 Jan 2025 03:50:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F0B0E188AF5A
+	for <lists+netdev@lfdr.de>; Sat, 18 Jan 2025 03:51:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64E56149C53;
-	Sat, 18 Jan 2025 03:50:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92B8B7DA6A;
+	Sat, 18 Jan 2025 03:51:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n/CJhGQw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Wg4O7nHq"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D3381474A9;
-	Sat, 18 Jan 2025 03:50:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6111C1F95E;
+	Sat, 18 Jan 2025 03:51:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737172229; cv=none; b=EJ0mI4l6Vx3321t2FNHU/S4x9zDh2G8IpsMQwvXWgsBimSwF6rlsaKSOpxdtBvgYTXSOF50QEL1P/M4hBAZRSBFiT/HhuKkXk3W8BjcvOvb+CEYFaSF2dC9xTU+l55b/8nfy2TUBy6pvYBuU2q3tTLW/lsqa0JUZjISva+IIOJA=
+	t=1737172278; cv=none; b=JLOaYti9k8afRmmSVKohjCqCBCW0rHrTCEck5C9JaNgMqcLvqn7mSTzeKBtXUnRpYK3pj0Ki6xIOF63lMjxBzFfro4R9p+ao/9iljoLmI1QqKG36zxbqxHanSP5W/f9JTz4NKdA47RmL0H/d7sbRz0PSO5E0EX1xfsqXPBhnjSs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737172229; c=relaxed/simple;
-	bh=MnoqE/Q6g5coOLxuf1HvIkumQhXCkhEEYtPnQgKYJ/w=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=aDXDB6XngnTTJfT9lq761krW1izUJHkgtmTgXxE1OcXIQ8D56I741Au0rN7INv25UuLp+6a3MerBdVDkhMFh1KcIXoin8bkyzBkHYBJ4P0PwSOdHJ/sDeNd5Rj4vZLO6GFRrSqVWxHEBFxPvJ0GWDCI6z2+aGOQ5Euc0wHBiLKk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n/CJhGQw; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C2C9EC4CED1;
-	Sat, 18 Jan 2025 03:50:28 +0000 (UTC)
+	s=arc-20240116; t=1737172278; c=relaxed/simple;
+	bh=/DyfZWIIA96g0Ckt/iF1SREvxeObReWViBxkd40Wrkw=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=kq+3y7M4ljpKOxwRqmgH1IBDadtIE2+pqaa8Hn7aG5WuhEehYlnR+99O+x92zzr5pIdpwX+gK5vgzZqAcCEoe3bnUxW7gq+0fPWDszCQBY8epinTSTJFeXkKALa5p3UKFdJBTZKvC20kqSFUMWBr9Vn9sZKOdKk4m6qF9D+o1gk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Wg4O7nHq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A859CC4CED1;
+	Sat, 18 Jan 2025 03:51:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737172228;
-	bh=MnoqE/Q6g5coOLxuf1HvIkumQhXCkhEEYtPnQgKYJ/w=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=n/CJhGQwvOnfH3zN6hzM4BYWL4Y3UluChtUcnfSNJgUpPEPP6PaMlcliK/j6omwkV
-	 ze95xMVbNQHsFVlNyJzTEdDY2aAM3LmYUbEhDdx+QLsB91EFE0UQgF9m8Y4cpBK28q
-	 JeRM21+PYyF315aQH3C9y5vSFvSnExoYasa7ppWIvI9oJfPkqfwrEF92UE84SW7H21
-	 +6gj+1SwTpgnVfgsSxAAM55Ljf3TU05vBHtjJjPDI3mwsyac7Z7XeyyPtCg48JmvZc
-	 caYAbT8a57q2SyOWVPSYl5CArOlFCmh++eR3w8w3HHKnjNPtcP5BPB9EU4ZcJiDDFD
-	 eoR7EDYit76Fg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70B67380AA62;
-	Sat, 18 Jan 2025 03:50:53 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1737172278;
+	bh=/DyfZWIIA96g0Ckt/iF1SREvxeObReWViBxkd40Wrkw=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Wg4O7nHqeAoZVFYyETYyeYu6pLx6d3Q1QDps4UyzGqUKor6alhi/0n71XGBldQ4HW
+	 TZHLh9qrSEZu5RiK1HiCETkuZ1otS4LxtUJY6RwUDnfymgyNy3ZbrOKVDeEBj9q7CU
+	 UXN0fhkBZw7KqeXXZPBMGEXi55Z/M9coD9wv2rMoS8l9qMX42xjPco8QGcWlCVpt7r
+	 gBzDWBu+xgQnyce5DuwaRJ4ubCN1fvudUEEqWXVRWjVTxqmFncxVG0lakKlY4uLFez
+	 v2s8ETIJ+tuqmEYDoo6wEkJkG31MGrlc4fLDXUJLpJQYAa6foQhUuxHZJMAuI2mox+
+	 CQFRLjx1V97pg==
+Date: Fri, 17 Jan 2025 19:51:16 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: andrew+netdev@lunn.ch
+Cc: Ninad Palsule <ninad@linux.ibm.com>, minyard@acm.org, robh@kernel.org,
+ krzk+dt@kernel.org, conor+dt@kernel.org, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com,
+ openipmi-developer@lists.sourceforge.net, netdev@vger.kernel.org,
+ joel@jms.id.au, andrew@codeconstruct.com.au, devicetree@vger.kernel.org,
+ eajames@linux.ibm.com, linux-arm-kernel@lists.infradead.org,
+ linux-aspeed@lists.ozlabs.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v6 01/10] dt-bindings: net: faraday,ftgmac100: Add phys
+ mode
+Message-ID: <20250117195116.4211ef42@kernel.org>
+In-Reply-To: <20250116203527.2102742-2-ninad@linux.ibm.com>
+References: <20250116203527.2102742-1-ninad@linux.ibm.com>
+	<20250116203527.2102742-2-ninad@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] selftests: net: give up on the cmsg_time accuracy on
- slow machines
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173717225214.2330660.14972461592963136332.git-patchwork-notify@kernel.org>
-Date: Sat, 18 Jan 2025 03:50:52 +0000
-References: <20250116020105.931338-1-kuba@kernel.org>
-In-Reply-To: <20250116020105.931338-1-kuba@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, shuah@kernel.org,
- linux-kselftest@vger.kernel.org, willemdebruijn.kernel@gmail.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Thu, 16 Jan 2025 14:35:16 -0600 Ninad Palsule wrote:
+> Aspeed device supports rgmii, rgmii-id, rgmii-rxid, rgmii-txid so
+> document them.
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Wed, 15 Jan 2025 18:01:05 -0800 you wrote:
-> Commit b9d5f5711dd8 ("selftests: net: increase the delay for relative
-> cmsg_time.sh test") widened the accepted value range 8x but we still
-> see flakes (at a rate of around 7%).
-> 
-> Return XFAIL for the most timing sensitive test on slow machines.
-> 
-> Before:
-> 
-> [...]
-
-Here is the summary with links:
-  - [net-next] selftests: net: give up on the cmsg_time accuracy on slow machines
-    https://git.kernel.org/netdev/net-next/c/54ea680b759c
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Andrew, just to be sure - you're okay with extending the bindings?
 
