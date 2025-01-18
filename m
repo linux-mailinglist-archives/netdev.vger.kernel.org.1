@@ -1,145 +1,102 @@
-Return-Path: <netdev+bounces-159572-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159573-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F071A15DAE
-	for <lists+netdev@lfdr.de>; Sat, 18 Jan 2025 16:32:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A240BA15DB9
+	for <lists+netdev@lfdr.de>; Sat, 18 Jan 2025 16:49:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 212D71886D90
-	for <lists+netdev@lfdr.de>; Sat, 18 Jan 2025 15:32:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 37590188247A
+	for <lists+netdev@lfdr.de>; Sat, 18 Jan 2025 15:49:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4574E191F7A;
-	Sat, 18 Jan 2025 15:32:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64D1E19AD87;
+	Sat, 18 Jan 2025 15:49:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="N99tlrxx"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="jVTeFStU"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-119.freemail.mail.aliyun.com (out30-119.freemail.mail.aliyun.com [115.124.30.119])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E43918A93C;
-	Sat, 18 Jan 2025 15:31:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.119
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.5])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 709DC273F9;
+	Sat, 18 Jan 2025 15:49:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737214322; cv=none; b=pbdn0JZOJ7chepKMtg7cKpeFaFF6dWFr5v841HlO+DaAjwvYMLUe2L0U9ZKIkkBjEfo5PQTWSQzdLN9IbZcZsZojvfxyfSj2KEgh4yumdd/mRHCU2pkGfnQeGHoBASuASQW4O33u6aM7L4CANaksmyjrnVAOOoMd/u2fLbcchro=
+	t=1737215349; cv=none; b=q91qAlYQt2HLv1Du2PejI1CkkZkc5t8EOlT9Wfok+Q9hA82Dkxgobo1QZ7WunwpIll5ghyb4Oxhr3GWlrZw5d8XyvC3+/qX5WxQ+U06U2YR6Becxbkqcw+GGLnQPUtPatE1En5kEzsdJYw1XiY7apXaezhF/MafFzfram/M9iQs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737214322; c=relaxed/simple;
-	bh=ZiEFqrXMXBUDaz/Mgv8SkHBj8ZsUoxRHA8O+A/UAHaE=;
+	s=arc-20240116; t=1737215349; c=relaxed/simple;
+	bh=e5nIJONa/PLWJ1IxLY3QAmLKmHxeF5YrIDqo7zj7/vM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HEXwRofuT7KbCcQoFvN9+HpjmbTXc8bRRxF+3iHPHWNJbbZlDJqkk9xQ090JYHx5nTHMaH4CTs9JjUtN0UV5zRf7poIGKwxv5mdZLY8VGppo2VvYflm7BhgSwD8gkwfjAIJeiOP+H8FLv+M1TVt1Q0HiC1OOZRDo1ogZNzUDlhA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=N99tlrxx; arc=none smtp.client-ip=115.124.30.119
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1737214315; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
-	bh=um4EpNPGGZn6uHOIvs0vt5Qo5OXfZuSdQuMmUsvwHTA=;
-	b=N99tlrxxojXtoZaqoUqNY+j7tm5dfKLj4Ul339SL6D7Nq2rzbX/RdA3iEFu9ukuHJwYJkCcURv4d5RrvP5x5AfzC+WXSz3nTPWoh0eU5NCxRZrfDRf0kt++5Q0ZNN0pVPERzkDLmHo3FocOzL8JQLtVIPQqQhH5IX2C393/oSM0=
-Received: from localhost(mailfrom:dust.li@linux.alibaba.com fp:SMTPD_---0WNrobRO_1737214314 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Sat, 18 Jan 2025 23:31:54 +0800
-Date: Sat, 18 Jan 2025 23:31:54 +0800
-From: Dust Li <dust.li@linux.alibaba.com>
-To: Niklas Schnelle <schnelle@linux.ibm.com>,
-	Alexandra Winter <wintera@linux.ibm.com>,
-	Julian Ruess <julianr@linux.ibm.com>,
-	Wenjia Zhang <wenjia@linux.ibm.com>,
-	Jan Karcher <jaka@linux.ibm.com>, Gerd Bayer <gbayer@linux.ibm.com>,
-	Halil Pasic <pasic@linux.ibm.com>,
-	"D. Wythe" <alibuda@linux.alibaba.com>,
-	Tony Lu <tonylu@linux.alibaba.com>,
-	Wen Gu <guwen@linux.alibaba.com>,
-	Peter Oberparleiter <oberpar@linux.ibm.com>,
-	David Miller <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>
-Cc: Thorsten Winkler <twinkler@linux.ibm.com>, netdev@vger.kernel.org,
-	linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Simon Horman <horms@kernel.org>
-Subject: Re: [RFC net-next 0/7] Provide an ism layer
-Message-ID: <20250118153154.GI89233@linux.alibaba.com>
-Reply-To: dust.li@linux.alibaba.com
-References: <20250115195527.2094320-1-wintera@linux.ibm.com>
- <20250116093231.GD89233@linux.alibaba.com>
- <D73H7Q080GUQ.3BDOH23P4WDOL@linux.ibm.com>
- <0f96574a-567e-495a-b815-6aef336f12e6@linux.ibm.com>
- <20250117021353.GF89233@linux.alibaba.com>
- <dc2ff4c83ce8f7884872068570454f285510bda2.camel@linux.ibm.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=qqRPHxVunBy7L8PKOwrLvKLYUidfYd6o+mhdNWctNmq9Od7UQSQUuF0vCMwHjzmng6Ki/7ylYDKqDOj6d7sR/iJZh56MdrWemuUyjqod6Los0lJTIY6kFYt9mB1H6/uT8lXTkVhayxp+P1sCp5ffu/sBoBFubYKyy2ZsyskBQgM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=jVTeFStU; arc=none smtp.client-ip=117.135.210.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=Date:From:Subject:Message-ID:MIME-Version:
+	Content-Type; bh=uZ0o+M3jbLCh9v0peRE957xke+pW1Ch4rMmlp7OhAts=;
+	b=jVTeFStUDKESalGklj4YCuDCfJom/o7DolUEYgHWojMk9Kxu1I3XRr5h5pAC3v
+	ObaOaeMuwrYYM0vkmdP7DtU7rQz3hLQagt3zTQvtIPIoDHe3xZN1x6pkpBKBIc3V
+	QqO0VQHFRgg0K71E3oP741MN3c/rVcns9NfAyo2k3VUQk=
+Received: from iZj6c3ewsy61ybpk7hrb16Z (unknown [])
+	by gzga-smtp-mtada-g0-0 (Coremail) with SMTP id _____wDnv3V3yYtnZwhtHA--.49434S2;
+	Sat, 18 Jan 2025 23:32:10 +0800 (CST)
+Date: Sat, 18 Jan 2025 23:32:07 +0800
+From: Jiayuan Chen <mrpre@163.com>
+To: Jakub Sitnicki <jakub@cloudflare.com>
+Cc: bpf@vger.kernel.org, john.fastabend@gmail.com, netdev@vger.kernel.org, 
+	martin.lau@linux.dev, ast@kernel.org, edumazet@google.com, davem@davemloft.net, 
+	dsahern@kernel.org, kuba@kernel.org, pabeni@redhat.com, linux-kernel@vger.kernel.org, 
+	song@kernel.org, andrii@kernel.org, mhal@rbox.co, yonghong.song@linux.dev, 
+	daniel@iogearbox.net, xiyou.wangcong@gmail.com, horms@kernel.org, corbet@lwn.net, 
+	eddyz87@gmail.com, cong.wang@bytedance.com, shuah@kernel.org, mykolal@fb.com, 
+	jolsa@kernel.org, haoluo@google.com, sdf@fomichev.me, kpsingh@kernel.org, 
+	linux-doc@vger.kernel.org
+Subject: Re: [PATCH bpf v7 3/5] bpf: disable non stream socket for strparser
+Message-ID: <ywlrfaa7rbutt4j35ku5zmsgtpvjx5ztmiqyqt5amty4wt63j7@mr3thty7gz7p>
+References: <20250116140531.108636-1-mrpre@163.com>
+ <20250116140531.108636-4-mrpre@163.com>
+ <87a5bodv0a.fsf@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <dc2ff4c83ce8f7884872068570454f285510bda2.camel@linux.ibm.com>
+In-Reply-To: <87a5bodv0a.fsf@cloudflare.com>
+X-CM-TRANSID:_____wDnv3V3yYtnZwhtHA--.49434S2
+X-Coremail-Antispam: 1Uf129KBjvdXoW7XFWrZrWxCFykKry3GFy8Krg_yoWDGrgEv3
+	43KFyxZF17GF43t3s0934fJFnavrWkZr1kZrWDZFnrJw1fGrWvvrW5uFnxAr9rG3yfGFy7
+	KFn5Jay0gF9I9jkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7IUbBHq7UUUUU==
+X-CM-SenderInfo: xpus2vi6rwjhhfrp/xtbBDwfYp2eLvAXPQQABst
 
-On 2025-01-17 11:38:39, Niklas Schnelle wrote:
->On Fri, 2025-01-17 at 10:13 +0800, Dust Li wrote:
->> > 
->---8<---
->> > Here are some of my thoughts on the matter:
->> > > > 
->> > > > Naming and Structure: I suggest we refer to it as SHD (Shared Memory
->> > > > Device) instead of ISM (Internal Shared Memory). 
->> > 
->> > 
->> > So where does the 'H' come from? If you want to call it Shared Memory _D_evice?
->> 
->> Oh, I was trying to refer to SHM(Share memory file in the userspace, see man
->> shm_open(3)). SMD is also OK.
->> 
->> > 
->> > 
->> > To my knowledge, a
->> > > > "Shared Memory Device" better encapsulates the functionality we're
->> > > > aiming to implement. 
->> > 
->> > 
->> > Could you explain why that would be better?
->> > 'Internal Shared Memory' is supposed to be a bit of a counterpart to the
->> > Remote 'R' in RoCE. Not the greatest name, but it is used already by our ISM
->> > devices and by ism_loopback. So what is the benefit in changing it?
->> 
->> I believe that if we are going to separate and refine the code, and add
->> a common subsystem, we should choose the most appropriate name.
->> 
->> In my opinion, "ISM" doesn’t quite capture what the device provides.
->> Since we’re adding a "Device" that enables different entities (such as
->> processes or VMs) to perform shared memory communication, I think a more
->> fitting name would be better. If you have any alternative suggestions,
->> I’m open to them.
->
->I kept thinking about this a bit and I'd like to propose yet another
->name for this group of devices: Memory Communication Devices (MCD)
->
->One important point I see is that there is a bit of a misnomer in the
->existing ISM name in that our ISM device does in fact *not* share
->memory in the common sense of the "shared memory" wording. Instead it
->copies data between partitions of memory that share a common
->cache/memory hierarchy while not sharing the memory itself. loopback-
->ism and a possibly future virtio-ism on the other hand would share
->memory in the "shared memory" sense. Though I'd very much hope they
->will retain a copy mode to allow use in partition scenarios.
->
->With that background I think the common denominator between them and
->the main idea behind ISM is that they facilitate communication via
->memory buffers and very simple and reliable copy/share operations. I
->think this would also capture our planned use-case of devices (TTYs,
->block devices, framebuffers + HID etc) provided by a peer on top of
->such a memory communication device.
-
-Make sense, I agree with MCD.
-
-Best regard,
-Dust
+On Sat, Jan 18, 2025 at 04:03:33PM +0100, Jakub Sitnicki wrote:
+> On Thu, Jan 16, 2025 at 10:05 PM +08, Jiayuan Chen wrote:
+> > +	if (sk_is_tcp(sk))
+> > +		return true;
+> > +	return false;
+> > +}
+> > +
+> 
+> We don't need this yet, so please don't add it. Especially since this is
+> fix. It should be kept down to a minimum. Do the sk_is_tcp() check
+> directly from sock_map_link().
+> 
+Ok, I will do this.
+> >  static int sock_map_link(struct bpf_map *map, struct sock *sk)
+> >  {
+> >  	struct sk_psock_progs *progs = sock_map_progs(map);
+> > @@ -303,7 +311,10 @@ static int sock_map_link(struct bpf_map *map, struct sock *sk)
+> >  
+> >  	write_lock_bh(&sk->sk_callback_lock);
+> >  	if (stream_parser && stream_verdict && !psock->saved_data_ready) {
+> > -		ret = sk_psock_init_strp(sk, psock);
+> > +		if (sock_map_sk_strp_allowed(sk))
+> > +			ret = sk_psock_init_strp(sk, psock);
+> > +		else
+> > +			ret = -EOPNOTSUPP;
+> >  		if (ret) {
+> >  			write_unlock_bh(&sk->sk_callback_lock);
+> >  			sk_psock_put(sk, psock);
 
 
