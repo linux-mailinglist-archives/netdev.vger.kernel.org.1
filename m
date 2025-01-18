@@ -1,149 +1,141 @@
-Return-Path: <netdev+bounces-159543-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159544-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B007A15B9E
-	for <lists+netdev@lfdr.de>; Sat, 18 Jan 2025 07:29:38 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 57D1DA15BBB
+	for <lists+netdev@lfdr.de>; Sat, 18 Jan 2025 08:23:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AB397167D7A
-	for <lists+netdev@lfdr.de>; Sat, 18 Jan 2025 06:29:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AA9063A922C
+	for <lists+netdev@lfdr.de>; Sat, 18 Jan 2025 07:22:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF9B813B7AE;
-	Sat, 18 Jan 2025 06:29:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C+6n12Vo"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19F6D15FA7B;
+	Sat, 18 Jan 2025 07:22:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f171.google.com (mail-il1-f171.google.com [209.85.166.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 686DE7CF16;
-	Sat, 18 Jan 2025 06:29:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8912039FD9
+	for <netdev@vger.kernel.org>; Sat, 18 Jan 2025 07:22:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737181772; cv=none; b=qnEhsXQJGBOlJ6IFNP6aWLPNzjv/wV4QHhZv9kfcClah4byBy6lIdbB5UhNrRbx/OktIJXOydoPgL1IN98zxQ9+NDa/TxjbDDekklgAalF3yJjrz6rnL+TuUuOoUle7ddai/Ks4xOl44A1eCXrpKdpJKV1a75KszxN6xshbHs9Q=
+	t=1737184976; cv=none; b=G08bRJh4ae/mv0zyWGBn4+QwwXaLuqiUd/2MysJMPvvwkOeePOhIgDQgvP34UZW24fOTFa4Q47DaAbt446sAza0U7yVFm+UAucxLrnDwRBj0QgrhwiPLvjwN3hFbY4okkA53jY5yCDLBy3OSE3eeMgfpWCKIDqK0hBYvneU3C08=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737181772; c=relaxed/simple;
-	bh=kNajPM7FJ1DP3cPX2GpEt6xD1TpMiC0bLvzaWq3QO7M=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=gjRVDItl7AfIQvWGAzd7YmAMxcGA0nqtUVwzDhYJvhIaVCPVSjSgWoz/kP73IlA/l2aZtRI+zzeDOm6dpdFvH9/YV2xiHqjEENaG2ekpMzQ8XmA9fdYZaPs4Bsw/WyKngmrnq/2GRo1WtI8QEQ6p6nhXq+YKuY/MgWHl9R6GRvY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=C+6n12Vo; arc=none smtp.client-ip=209.85.166.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f171.google.com with SMTP id e9e14a558f8ab-3a8165cfae8so7718235ab.0;
-        Fri, 17 Jan 2025 22:29:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1737181770; x=1737786570; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WgdXEUKh2ebIkCe3AAwPqW7deSJrN8l+kGHJr1UEt+M=;
-        b=C+6n12VoqMwXTIfHw23x7cJXemv+r7hI3L0tntb52pAzrSPjDgLdu+Ae6abN3vr5Qw
-         fFMaIOb3tC7srTPssHvBcGV16Xm7iiMBhymqzXya0xlgOL6VDel936TMW0Pxyii81oJd
-         KrXTGs4oN6cS+vpl1PDcdM+jBjTeC78lqmTmqmeZN/hrkuJXg8yFrL43145X8Sa1V5OG
-         SNQt6+LSGxMXfllBFKRtNfaFCD5b6bWIRmgvwAVQIkmjMLcUgZl+TlClGe35bCTg+BTW
-         OinfvWECFc2naDyI4bWoX5buVN0TIwcxdfy3E0zIBMHitWsXN9WyqJU1c4o0XsrXugN+
-         l7jw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737181770; x=1737786570;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=WgdXEUKh2ebIkCe3AAwPqW7deSJrN8l+kGHJr1UEt+M=;
-        b=uFMKiSk9wFUUwZx/OA4DL98LFVbaJ2Bpq+rTe6px2oY8Q1BvMojRT0iXucPa7BW8xS
-         oChyZt6J0UYxvDFz1WYle9OfL0gPJEheV7yZi+2u6ak7bhesMG4Boqj22KYWHm267Jzb
-         C7RkQeCjc5WD7BpNWF+FMTzQ18Suxcgj0DZkt83fo8ZJ+8GMCsuozXe605huqf2blcR8
-         1EErRXwxuZB9HzHFgqKHtP8w7w3b1ZeHhufQybC7FVWxoj9dLFBsEVU8gLRZsg4L1m+z
-         zZYA2LrFSmG6GpUVKq/c2eGcUNNQAT/aRAIP9Nn6+R/k793k93LKL5WKCPlxeaRdOJu8
-         Xojg==
-X-Forwarded-Encrypted: i=1; AJvYcCVKqrfHwO9jBuWPH3N3qhK8aFHUS/BW2ZKfMontLqF5heeAciMIFYiup8I0NnYtJDWdwQk=@vger.kernel.org, AJvYcCXWH1HkfzhksNK18BqeH7e/5HiIqyIHYbBE8Ozg0Mr4u6t2wiiBWnVCVrIufesvgsjTnEaz5K3a@vger.kernel.org
-X-Gm-Message-State: AOJu0YzLg2apX1PDp2c2hgp69rQa1mNJCT8A9wBnTU67nj3UbGogPN0A
-	9HgGkQ24u2lhHZ2Ocx6fBqq1nP3T2lKIUeeqEp01HVExu/mre2g18J8xq/gfoDyBofpSXtOsi43
-	f83MXI5tbBXdZ4oJ9MC5Lnvf8S1g=
-X-Gm-Gg: ASbGnctlgFlYIjm9UWrMwsgAZTENKGQXkj2PCQOi6G2pL5HESPSj8bILcwfselg0Ffa
-	tY4qVDHcig5acIUvYMhKCOb+J4WC4jxioosr6KkAngiqhvocGdg==
-X-Google-Smtp-Source: AGHT+IGqm/YkppXmpNbA2vzkwvJffN1fLaKwXV+Eks8Mz4lccRNjOwa3fOcFT4PNA7wNixFRSPQPaYILkyC4S1VAYhk=
-X-Received: by 2002:a05:6e02:1c23:b0:3cf:6c4f:3960 with SMTP id
- e9e14a558f8ab-3cf744906f8mr35119245ab.19.1737181770251; Fri, 17 Jan 2025
- 22:29:30 -0800 (PST)
+	s=arc-20240116; t=1737184976; c=relaxed/simple;
+	bh=mna2MRyMieEu0PR9aya6Yt14jVA8DePmpaMQ5cEw51U=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=B8gAwhAl47R95iYyKRe98UGI4cQqBMZUMjy/WEQNPL4UWs3Tje0RqyEDTraPzQHm5aDuZwpnwe9nM+FNhyA/eZ7/k7F83GNOjqV9xf/KEO82pVnvw/Wq0jj/e5jxCAWtNm0HJ99TOV78c8RIa0AaLvUUj6OSrV4hDUg7yUEry9U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1tZ39t-0002j0-Qg; Sat, 18 Jan 2025 08:22:17 +0100
+Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1tZ39r-000YqS-32;
+	Sat, 18 Jan 2025 08:22:15 +0100
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1tZ39r-0000be-2e;
+	Sat, 18 Jan 2025 08:22:15 +0100
+Date: Sat, 18 Jan 2025 08:22:15 +0100
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>, kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	UNGLinuxDriver@microchip.com, Phil Elwell <phil@raspberrypi.org>
+Subject: Re: [PATCH net-next v1 7/7] net: usb: lan78xx: Enable EEE support
+ with phylink integration
+Message-ID: <Z4tWpxvwDG9u4MwJ@pengutronix.de>
+References: <Z36WqNGpWWkHTjUE@shell.armlinux.org.uk>
+ <Z4ADpj0DlqBRUEK-@pengutronix.de>
+ <Z4AG7zvIvQDv3GTn@shell.armlinux.org.uk>
+ <Z4AJ4bxLePBbbR2u@pengutronix.de>
+ <Z4ARB96M6KDuPvv8@shell.armlinux.org.uk>
+ <80925b27-5302-4253-ad6d-221ba8bf45f4@lunn.ch>
+ <Z4UKHp0RopBT5gpI@pengutronix.de>
+ <Z4UVQRHqk8ND984c@shell.armlinux.org.uk>
+ <38ad9a25-a5b9-48ab-b92d-4c9d9f4c7d62@lunn.ch>
+ <Z4qEGIRYvSuVR9AK@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250112113748.73504-1-kerneljasonxing@gmail.com>
- <20250112113748.73504-6-kerneljasonxing@gmail.com> <ca852e76-2627-4e07-8005-34168271bf12@linux.dev>
- <CAL+tcoAY9jeOmZjVqG=7=FxOdXevvOXroTosaE8QpG2bYbFE_Q@mail.gmail.com> <35e2c693-244f-4d55-88f3-99e1ed1e2745@linux.dev>
-In-Reply-To: <35e2c693-244f-4d55-88f3-99e1ed1e2745@linux.dev>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Sat, 18 Jan 2025 14:28:53 +0800
-X-Gm-Features: AbW1kvaLqr32v74jmgaqoHtg0g8_ikex4QT2XIJe3KuXNSzHW54xWp0If3ahWLU
-Message-ID: <CAL+tcoDqnfaZq1VnqJa=RVEqMXyno7xyWJjcbU7ZGuPm7XGi6w@mail.gmail.com>
-Subject: Re: [PATCH net-next v5 05/15] net-timestamp: add strict check in some
- BPF calls
-To: Martin KaFai Lau <martin.lau@linux.dev>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, dsahern@kernel.org, willemdebruijn.kernel@gmail.com, 
-	willemb@google.com, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, 
-	eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev, 
-	john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me, 
-	haoluo@google.com, jolsa@kernel.org, horms@kernel.org, bpf@vger.kernel.org, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <Z4qEGIRYvSuVR9AK@shell.armlinux.org.uk>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Sat, Jan 18, 2025 at 10:15=E2=80=AFAM Martin KaFai Lau <martin.lau@linux=
-.dev> wrote:
->
-> On 1/15/25 3:32 PM, Jason Xing wrote:
-> >> +static bool is_locked_tcp_sock_ops(struct bpf_sock_ops_kern *bpf_sock=
-)
-> >> +{
-> >> +       return bpf_sock->op <=3D BPF_SOCK_OPS_WRITE_HDR_OPT_CB;
-> >
-> > I wonder if I can use the code snippets in the previous reply in this
-> > thread, only checking if we are in the timestamping callback?
-> > +#define BPF_SOCK_OPTS_TS               (BPF_SOCK_OPS_TS_SCHED_OPT_CB |=
- \
-> > +                                        BPF_SOCK_OPS_TS_SW_OPT_CB | \
-> > +                                        BPF_SOCK_OPS_TS_ACK_OPT_CB | \
-> > +                                        BPF_SOCK_OPS_TS_TCP_SND_CB)
->
-> Note that BPF_SOCK_OPS_*_CB is not a bit.
->
-> My understanding is it is a blacklist. Please correct me if I miss-interp=
-ret the
-> intention.
+On Fri, Jan 17, 2025 at 04:23:52PM +0000, Russell King (Oracle) wrote:
+> I'm unsure about many DSA drivers. mt753x:
+> 
+>         u32 set, mask = LPI_THRESH_MASK | LPI_MODE_EN;
+> 
+>         if (e->tx_lpi_timer > 0xFFF)
+>                 return -EINVAL;
+> 
+>         set = LPI_THRESH_SET(e->tx_lpi_timer);
+>         if (!e->tx_lpi_enabled)
+>                 /* Force LPI Mode without a delay */
+>                 set |= LPI_MODE_EN;
+>         mt7530_rmw(priv, MT753X_PMEEECR_P(port), mask, set);
+> 
+> Why force LPI *without* a delay if tx_lpi_enabled is false? This
+> seems to go against the documented API:
+> 
+>  * @tx_lpi_enabled: Whether the interface should assert its tx lpi, given
+>  *      that eee was negotiated.
 
-Yes, blacklist it is.
+According to MT7531 manual, I would say, the code is not correct:
+https://repo.librerouter.org/misc/lr2/MT7531_switch_Reference_Manual_for_Development_Board.pdf
 
->
-> >
-> > Then other developers won't worry too much whether they will cause
-> > some safety problems. If not, they will/must add callbacks earlier
-> > than BPF_SOCK_OPS_WRITE_HDR_OPT_CB.
->
-> It can't be added earlier because it is in uapi. If the future new cb is =
-safe to
-> use these helpers, then it needs to adjust the BPF_SOCK_OPS_WRITE_HDR_OPT=
-_CB
-> check. is_locked_tcp_sock_ops() is a whitelist. The worst is someone will
-> discover the helpers are not usable in the new cb, so no safety issue.
->
-> If forgot to adjust the blacklist and the new cb should not use the helpe=
-rs,
-> then it is a safety issue.
->
-> Anyhow, I don't have a strong opinion here. I did think about checking th=
-e new
-> TS callback instead. I went with the simplest way in the code and also
-> considering the BPF_SOCK_OPS_TS_*_CB is only introduced starting from pat=
-ch 7.
+The LPI_MODE_EN_Px bit has following meaning:
 
-Got it, I will follow your instructions :)
+When there is no packet to be transmitted, and the idle time is greater
+than P2_LPI_THRESHOLD, the TXMAC will automatically enter LPI (Low
+Power Idle) mode and send EEE LPI frame to the link partner.
+0: LPI mode depends on the P2_LPI_THRESHOLD.
+1: Let the system enter the LPI mode immediately and send EEE LPI frame
+   to the link partner.
 
-Thanks,
-Jason
+This chip seems to not have support for tx_lpi_enabled != eee_enabled
+configuration.
+
+> qca8k_set_mac_eee() sets the LPI enabled based off eee->eee_enabled.
+> It doesn't seem to change the register on link up/down, so I wonder
+> how the autoneg resolution is handled. Maybe it isn't, so maybe it's
+> buggy.
+
+The QCA8K_REG_EEE_CTRL_LPI_EN() bit is supported only for ports with
+integrated PHYs. There seems to be no validation for this case.
+Other problem with the code, lpi_en bit can be removed only one time.
+Executing tx_lpi off and tx_lpi on in a sequence will not work.
+
+My chip documentation do not provide any information about LPI_EN bit
+functionality. I can't say for sure how it works.
+
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
