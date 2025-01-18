@@ -1,201 +1,291 @@
-Return-Path: <netdev+bounces-159506-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159507-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 62A2DA15ABF
-	for <lists+netdev@lfdr.de>; Sat, 18 Jan 2025 01:59:43 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B5E74A15AD0
+	for <lists+netdev@lfdr.de>; Sat, 18 Jan 2025 02:18:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4603E7A40DB
-	for <lists+netdev@lfdr.de>; Sat, 18 Jan 2025 00:59:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A026D167972
+	for <lists+netdev@lfdr.de>; Sat, 18 Jan 2025 01:18:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9894DF59;
-	Sat, 18 Jan 2025 00:59:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80CC6B67F;
+	Sat, 18 Jan 2025 01:18:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="nmLPueqf"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SYDSRRZ7"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2071.outbound.protection.outlook.com [40.107.220.71])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8F58BA2D;
-	Sat, 18 Jan 2025 00:59:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.71
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737161971; cv=fail; b=m+CuxNAgtPwY0cWMP17jAiUWSxNKLhrz+3Sd3zxZr3yhR/si6LB0FF0xegN4uLG2n4z7qob57MU4eu2ElR8LoyWEp7B2K5U7Ap9yh/XrxH1fGoowa3inbifW3383XyyGOuf8nKRK+O1fmtT+NeuCVsbRjWEjPxC05jbwx8P4vzk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737161971; c=relaxed/simple;
-	bh=oDumimlvHBC8RLSRpTqdLIMoXtKT3meuWEUj/bo7Yes=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=sLgToyM3HbZ5l9gWplXVYUzIF35LpMRHnTCasW+tjei942sBi4OVy3W5YwplgjfOqP5gmJU7j2lHj4+6XdyXEnAhxWSoGWBJ+kTgEVe7OUlHbRRATyRDQ289NFkRsXgwinH40ZQpVQ3VnDqvjk/qsFKYTa/g/fW7xAcmfQufBvk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=nmLPueqf; arc=fail smtp.client-ip=40.107.220.71
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=pMB5uafbmi9SxUdPZmPExjOotS2kWKrNZR/+LiUbn1J/2WZ4ZCEauuLVHW9xvW6WRrLjdUc/NEdSeJBexp4hZCuDnovuVkmM3yG4JnwIXVsc7ETX90z9wzU8AqDBoh/yi0rZNz4Kj2rw4/5FokOiOb6uLrFaCLMvEhbRkoVH/cMEi+ntwPqSQP2jGwsBqzv/tNAWUaj7eXgwkMZL+l4lpdTmEEQkGgjF2Qsz3pMqT6JOqePZ1cW651ofGysj2PlJZAs4E4cbCObAIwAJGPkXTJ3fNgDTHwtGiay4quBiCnS0IGOOcVdbx8Aaw2Qcpkvy7+eL3Yjo2+plTZCZYcBtZg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=sYaKDLSCiroWUGDJRz2KSQk69l5JdGfvrsyNBk4ojGE=;
- b=B5Igg2f946KRQ8z82CVpd9sHNQwJS71ov5IAzI6FEd8Tb8wGQEKbt+FAG3BqLkXlUDcYwuE0aV2kXYuBzelKWGPUC8J7ZDRo1x0nkTXNpRS9zQCkyfaaRsdlvRJVXyVZdSujgu4prTSgmtGeiJEupb6PR5YTyglL6b4ycxpnisMUDbgVmvFngIFefqZjRhMjfgqFzW/HUervW5xItNufyjzIc+aM5yS9r8RS8Cz0ymTX7zprDGf5fNjUIVdX2lXTF9NN7acI4WEY98TCYvNd3qHyhKsZFiikrTALKc1pDbs7uhAoRgCUsifS/cH9NqCio9sUCRM6jm3cZWL5DiMuVA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microchip.com; dmarc=pass action=none
- header.from=microchip.com; dkim=pass header.d=microchip.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microchip.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=sYaKDLSCiroWUGDJRz2KSQk69l5JdGfvrsyNBk4ojGE=;
- b=nmLPueqfwYJ/GuNbajGq9fUE1aeCIm3iGjp/bG2MRxi3z+l2QQf89/LUdPj41ZaD8Yf5fXktUL578IsmLhB/OnWOzSgFYQ929RPS7av7JvIA4vQxun2A3r7kkPF/+K6jLVAnrYnswl9rrJdYtsy8pDtuWz+8D2yjTDLwP3Rc8Id95d3YFqAt07ZOuJBIF5pSfMM5l88vjNxAyJm9lpnnB81lb9CiJABLJRFcQlM26Y4kXiAVxn1C3P5AL2TFyejtjoyNnLtTk03ILoSD3h+0SepDV3SSF6Vs0tj1FBKsyzrE9df4pU/8KYbwPlBx5UKJr61b7zWiiF1eJsnwgT+7ig==
-Received: from DM3PR11MB8736.namprd11.prod.outlook.com (2603:10b6:0:47::9) by
- DS0PR11MB7406.namprd11.prod.outlook.com (2603:10b6:8:136::20) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8356.17; Sat, 18 Jan 2025 00:59:25 +0000
-Received: from DM3PR11MB8736.namprd11.prod.outlook.com
- ([fe80::b929:8bd0:1449:67f0]) by DM3PR11MB8736.namprd11.prod.outlook.com
- ([fe80::b929:8bd0:1449:67f0%6]) with mapi id 15.20.8356.014; Sat, 18 Jan 2025
- 00:59:25 +0000
-From: <Tristram.Ha@microchip.com>
-To: <andrew@lunn.ch>
-CC: <maxime.chevallier@bootlin.com>, <olteanv@gmail.com>,
-	<Woojung.Huh@microchip.com>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <UNGLinuxDriver@microchip.com>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH net-next v2] net: dsa: microchip: Add SGMII port support
- to KSZ9477 switch
-Thread-Topic: [PATCH net-next v2] net: dsa: microchip: Add SGMII port support
- to KSZ9477 switch
-Thread-Index: AQHbZi6jUsb5OQZHf0qguVy2R8e1urMWcOoAgAEuMACAAohtsIAA1aiAgAC9nfA=
-Date: Sat, 18 Jan 2025 00:59:25 +0000
-Message-ID:
- <DM3PR11MB873695894DC7B99A15357CCBECE52@DM3PR11MB8736.namprd11.prod.outlook.com>
-References: <20250114024704.36972-1-Tristram.Ha@microchip.com>
- <20250114160908.les2vsq42ivtrvqe@skbuf> <20250115111042.2bf22b61@fedora.home>
- <DM3PR11MB87361CADB3A3A26772B11EEEEC1B2@DM3PR11MB8736.namprd11.prod.outlook.com>
- <91b52099-20de-4b6e-8b05-661e598a3ef3@lunn.ch>
-In-Reply-To: <91b52099-20de-4b6e-8b05-661e598a3ef3@lunn.ch>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=microchip.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DM3PR11MB8736:EE_|DS0PR11MB7406:EE_
-x-ms-office365-filtering-correlation-id: 18bebd7e-f605-4345-8d23-08dd375b5a66
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM3PR11MB8736.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|366016|1800799024|376014|38070700018;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?2CkZ/VEVNNQjPZD8C6nQZw53xmnsuud8/rhtTpzNOy3IbdVP4pV3jIDN/R6g?=
- =?us-ascii?Q?6DBhCDwDQrVGgFKKRDs/hPIVMYFoT0Bf/iD3CSEZw/IXsf4A0kn/xXsuB8ie?=
- =?us-ascii?Q?hNbcEJofq+2EXyXKGSKIiMiPhUB/pSC568+2/UB944lZIuEqm2JStAmHF4x2?=
- =?us-ascii?Q?SOKqZKkcJnY9TCMQEMpHBh+2CSzjrLuRMIkt2MkXurLOnq6jsSROqldIMJYR?=
- =?us-ascii?Q?hIRy+LJeae2Iz3DKj6mlwm+jARPzJpPmDFyUMdhTPkfsmQPG71VXgR0ZTFCE?=
- =?us-ascii?Q?kndodhAJxNicUkqmRoTJo0k5rblV2jaIjeWTK+kkrLWh20IiiaCJgrC6zbZy?=
- =?us-ascii?Q?co2lrbs0gnQDvfl3dGS4hVshBCicqMox+tEKu+ILBs/C3aioNWQYZ5gB0mWJ?=
- =?us-ascii?Q?xP60Jn3YGwjqyr9ovI4DWWl51Ov0Z2H1X/mrhp3J/iGliDTGlEeBTcwmQg9T?=
- =?us-ascii?Q?DUegJ+FsC0a0Ail1RUxWDliFwgHVgT3RPQQcHbyneRXlGS+mak29eWrnZlvr?=
- =?us-ascii?Q?uxqmjoBSSR+sqGKFdLBT1TW013reUksPXyBaPxKbZG3WNJT4mbEP0OYGjQ5I?=
- =?us-ascii?Q?39ky8IsUn1uCn8VGUvAq8Iwzel+M1JHtJagLoE0KcDiyKUuJAlA153ezq4og?=
- =?us-ascii?Q?6ZgeaZB143vtm8Yif6iUpMkiYK4qpfG208VEm7NzDYXCfU7ueYXKwJZ8aJ8v?=
- =?us-ascii?Q?fNbTVVsjPwHKz8YXS4zV40vq/asJmM+xOfgvfHIZmEtHzhK4szLJ8O+PmVTi?=
- =?us-ascii?Q?wkii1/+ui8T1u2wtOF1kZz2BRlPUlDh725hQ0wzJJOKKkwV9qhVKpLZBCsKd?=
- =?us-ascii?Q?KAfsdppVh6ALmyduQtQ2PrlzoCEUD8kUAswsgYGiLrqC50gERzOdOGbS2hUq?=
- =?us-ascii?Q?sjjRzIU8Xb8HcIeJOa062Ztqx62mbXhH8dKSCNpR2R6uC1GLyqc6PjGvuTIx?=
- =?us-ascii?Q?OiOr2Lg3GtUsB+TYBMAO2FOhkzA/I1Yk8PE3AKYyFmZ+ruyo4OgOKKL2/o36?=
- =?us-ascii?Q?XYa11aO76QRCm0diL/ZHVeNjq2XYPJwOHZdo4YmPnCCsvMEPZri9egn1SHh0?=
- =?us-ascii?Q?DuIXDa3v+zvd/SDXPO21/WsclnXv2xMy4YxrdkoGgwdDas0Jp9WJO4K7d/6Z?=
- =?us-ascii?Q?93Su1V6DwfNwSxemvOyggeAHUTSkHr1SmBcULigkaQL3VS3h1vW5zQpLEDUg?=
- =?us-ascii?Q?9nGPjb3laCbi8BzNG4gvIzkSrjMrGyfVBLFDUFmio13S4jmONzaSMPKhTcEB?=
- =?us-ascii?Q?bFwxTR/dGTZJ7NfEei51UOFBAeELgNjzZdg3WZQU7GGVWvXL5AYffOXZkgYa?=
- =?us-ascii?Q?Xs1tEDVrxieqO8sKyFoyQIb0OjX2uuGDtKDGXFPgkysTXH0XSGCSYgxcfXqp?=
- =?us-ascii?Q?0seZubMM5EiTW+jBu8xx3SKT6uzQtlvbzwrazh5Nleq3H8ycd2L4WFH2XnrQ?=
- =?us-ascii?Q?JITARg6+5SSm5EEzVrV7tsNiDBdj1SGp?=
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?gE77GulypW0uepl3mtqHBXy/baX8+K2UpH1Ryx6jjMBXtW5QMVmMJ6lqyWvs?=
- =?us-ascii?Q?/GEMMXi4Pbe3uuKR5M7Q9dWHvGa5+UJkz5igOsRTi2+0e0JJApEm6Evb5WZt?=
- =?us-ascii?Q?sy3LcqYFBKpZ1AxkSZshUQHqWQimehjdgu1jDQQEDwzNUtlkNDeC/ZSqo4a8?=
- =?us-ascii?Q?f2UY1G6edC5MpUdxsX3xH7SXo94S5r4aXxS6+Hz/LZfv06XlMsa3Mu+PJPSn?=
- =?us-ascii?Q?MBVBRCNXgEEbYdRiK0tMjk6Zncx+23jFSYMMIgBLfVz/yfA9/7mvQHtQVRt2?=
- =?us-ascii?Q?GksDj9bWX4+IbJltM7fCXvr1K6sKvkK/8k9wH32DS+7hBhW5kqeUk4N1Zdgl?=
- =?us-ascii?Q?Mf73stuvP9h1t4SB521LpoAS2gQKU+FrQq/OY5lkSloLCcQRkaXT28mD6Lma?=
- =?us-ascii?Q?qgslXiSSB8UkQqKOu3qE5xw6dOJyUzWAdLc92ELfZvHkFp+PHMQ6q7jt5Omy?=
- =?us-ascii?Q?n3X6/tmblZVpN9ECGJjBB/GZ9okymmo2TZS7hnb4MCYjzEgePFA4+LdWga96?=
- =?us-ascii?Q?YqMUe0GV4VEh5XPeMCjXg/UO5QsMebQW2vj0+ZaT4TFT7dqYbiq1elqqZPdO?=
- =?us-ascii?Q?7yCZcMQW4U5fnBPsD9M7QdrwmHkcW0AuzOS6oohqX1vM8+HosJooz8+jyHID?=
- =?us-ascii?Q?X033HWJRTQCX8esI5fthPbzA6qUxS4jn0d8aMKANhWVrMGRscpB4Vj2jJMJT?=
- =?us-ascii?Q?//i+vBxfGwABZTUAea/BezMjE9KOvBGfaiugKd/kUemvuh7LLuJtK40qmcfA?=
- =?us-ascii?Q?emgsW6ZMHaXMQYZASAosZYBvt6SVY4+q6PG0zf3XG/do8J7OgfTPvpB+HngP?=
- =?us-ascii?Q?NC9DQ0qE/TSN4UJXP6IHq7Npu4e/4sFbCl7bj4hocYl6YpZKflkAxY1G95Jw?=
- =?us-ascii?Q?ac+LsUJ6u1ufNeC7lG20+0zooOHb5hjlzEs8H8EXKPwTJ/9BC7UJ8g1U1yeR?=
- =?us-ascii?Q?Sn098kltylsFiKabBR9lZiclMz3aGelcXFbFTmdVMuClyBeMiV9Lkn48dY9c?=
- =?us-ascii?Q?kuzdeQlJ27NDeSerU2t8HFxpZk95l4ysIxIn2rsYqxZ0bJCAKDGG4phxMQme?=
- =?us-ascii?Q?DY3VI2DlU8+wN9CpE5yIwDTBDgM3uv+IPyVFiELx0/AKC3BvfOKU3tunht8i?=
- =?us-ascii?Q?2CEj7o6tsxJDvfELLGp44HHKsw9haj4VVVWZF5jtquK3cKxPapcPou0ZnGJZ?=
- =?us-ascii?Q?ZLz8fjJNX0dV/T4uktZOmUCzUaES/pha4GEXAolvQKtykRogsPl6WCnjiabt?=
- =?us-ascii?Q?5f0Tq1jBRGDkjE6VQ2AJvINxMkR5GMDmXZXwrvwOwV00raXXkwAU9Y59G4MD?=
- =?us-ascii?Q?YJYFLNB+Xany7OBlQvBRtBxKt/yy9vyMl8twBLYCTDi5AHes3ER/oWyC7Jco?=
- =?us-ascii?Q?8HZ9kE9/4xQ3PAEp6G3KqOON4X63Uxf+kUxkhESmBtHLQ7BUcVQZFxvtqss3?=
- =?us-ascii?Q?CE1glTQdfbxTZj6/ZwOOdluINhM+AiKaGL1Am9Krj47nfqehhLG9/jXOWJQ2?=
- =?us-ascii?Q?N1ILPtI0vRCZLb98SKQ5O9XEOWgImnlTqxzVaFff6FksaKuzboAMuubmEZHl?=
- =?us-ascii?Q?95+zGHXiY7wS8fvQfjkq2jVIoR1EgXkZOwzqdAIu?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8909F195;
+	Sat, 18 Jan 2025 01:18:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1737163092; cv=none; b=AmF+rErQ3tZwqIkg6ixxbYYpP/MngeTq+DdOX5H2WnnMkyd71ZDb8l0e5XpeGeNC40UrgOeJkzskf+VxewlRAT+ZtzdDxXBhxIII8wn0VMryr2RK27lIYuL9dj4o/UY9jICYmoIcKG6V6w5enGTmo9sA4wnOzYsHLLTUlT4hMDM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1737163092; c=relaxed/simple;
+	bh=lxJmGCAGWDVhXp4lqRFVXP78vPeK6IArh1aFpn58QLw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WoLFjntiZo+JouEVKv2UG/shFGp/dqYFhHjUTGa6NnL+vEEVSO4LmMAUa/G8ARnBOEE/cuNMEtl9lc1vZ0pcfi0WrEXoRjkOPO28RuJBEby0uZh96DcWLEVgeYhw05MFoCLb76+G2jPmPiOWKQliJ9C2I8yDf/VBADA14Z6ZjaM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SYDSRRZ7; arc=none smtp.client-ip=209.85.128.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-4361e82e3c3so3691845e9.0;
+        Fri, 17 Jan 2025 17:18:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1737163089; x=1737767889; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=LZq0mZ3uQG+zZVXb05KA19D0Pj/aibNe67PJ/VEYbXk=;
+        b=SYDSRRZ7B6iEV3l3sLZsFTgJgcwLyhWTK+ujZmuGbh0uuNd/FDsj1BNkkgfjw6Q/G7
+         dvoO6KcmHPyq+Cg8ZK30of4HyYVw7dfyy57pm1tiGfA379EJObyEVGUv757/LmU7nHPR
+         VV4zIqcYyGHsoWZf+u7ZdS1sboTBgIDeUQ91CoQZW3vaPLWYTPgsHb7Yw4uspGa/OpXw
+         zpvR60a1CePUbuDXqab3IXa+gvQ2lZPXz1FtwDUF1yWCWqDIcuWDc/YZTTOckxsab1rN
+         CSROx7YvkMnIAqMPYeIzPw1ncgtYydNZDTJ2sk3WH8JF+ZtLiiZM7QV2cqZOnl9vArSi
+         TA2Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737163089; x=1737767889;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=LZq0mZ3uQG+zZVXb05KA19D0Pj/aibNe67PJ/VEYbXk=;
+        b=rTm6FRw/zyCx1h9/RXTpOXJV4Z5tKpSA7N6A8TmYcTUQykJ7HdLQKFtI2cdSwJGPQp
+         VMp9ohpppl8UfJVA40wSH8LKts9RgWCKgngIT2krYEs0l8i3+05yf9jYl5nwTROg/a5x
+         mtV1W/5B5ZEr+3KCMzjjV4QIKPhjN2E+qehobszOgeg1VFD0FBJ/FgGobBiAkK6lCdJJ
+         3sF1k2Kfck5NuBKtyCRWl+w10AXa7DMfxjEfmsl9P+hhMOaE/SVvnPwM7HM3TZoFn+qr
+         ZdDCmup69ai336C6q8EEFVffNsKU0EdolOyIvSfOJIrGeBMAoGqUNs+cpvVSlWsrqOf3
+         Sx4Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWjaugPiT5rHFl+HQu9LhucuVeoVAQbHiQQ9C88n9RUhPDoFrHBCDBYJ4wgUlx/qNAeU/eP9cVf@vger.kernel.org, AJvYcCXpxDBXEYphB9H15Hehgz84r6O8/VVGMwop8pGcQ672G8hPFu4nUtWjgM25A0DgPGpUHw4TaGWh8xG6/kE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzTSvRAsD0V0zwUIxA5f9eaxfIZbmNekumFn2O9GBJU778+p+oE
+	R6tzPTNHq1WWA6J58CT6CMgoj9a7Gem9Y9kMVaQm78mWSqlPWLaW
+X-Gm-Gg: ASbGncsb3chmO3vaXgR9P6c05czB+mRMWSqKP/1eSNhmCJm3ZCAqftk7sAWQjx/bPH9
+	wNhn9sznJ9s4Unhkm63dAOME9X1G8ucXbKUP59PbgrC1W6UbyBXz2O6jifH5wrYBHv8wJ2Qkuan
+	LOYhc46vuwrR1tVI0XiOjvCvAyfyL/evAWpYLdK6HO+uMtAEpOWG18WEfy2voLr6c2fuF59jRPG
+	TLb9rNXUcVOAHZot3TK+OCTc/XebrIc4mkZ6A+ROcneYNrx/rbNVpfM6Q==
+X-Google-Smtp-Source: AGHT+IHyi9DKWolGfSCipsTjrEoXHEGGaamgvCsJHsyVyxGmzZO0O/QvSIO0FE0e3vxFmiFd8XPYHg==
+X-Received: by 2002:a05:600c:cc8:b0:42c:aeee:e603 with SMTP id 5b1f17b1804b1-4389db13a7fmr11853495e9.7.1737163088385;
+        Fri, 17 Jan 2025 17:18:08 -0800 (PST)
+Received: from skbuf ([86.127.124.81])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-438a1f07e1bsm562285e9.7.2025.01.17.17.18.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 17 Jan 2025 17:18:07 -0800 (PST)
+Date: Sat, 18 Jan 2025 03:18:03 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Tim Harvey <tharvey@gateworks.com>
+Cc: Tristram.Ha@microchip.com, Arun.Ramadoss@microchip.com, andrew@lunn.ch,
+	davem@davemloft.net, Woojung.Huh@microchip.com,
+	linux-kernel@vger.kernel.org, pabeni@redhat.com,
+	netdev@vger.kernel.org, edumazet@google.com,
+	UNGLinuxDriver@microchip.com, kuba@kernel.org
+Subject: Re: [PATCH net] net: dsa: microchip: ksz9477: fix multicast filtering
+Message-ID: <20250118011803.xqlvdzizpwnytii3@skbuf>
+References: <20241213011405.ogogu5rvbjimuqji@skbuf>
+ <CAJ+vNU3pWA9jV=qAGxFbE4JY+TLMSzUS4R0vJcoAJjwUA7Z+LA@mail.gmail.com>
+ <PH7PR11MB8033DF1E5C218BB1888EDE18EF152@PH7PR11MB8033.namprd11.prod.outlook.com>
+ <CAJ+vNU3sAhtSkTjuj2ZMfa02Qk1rh1-z=1unEabrB8UOdx8nFA@mail.gmail.com>
+ <55858a5677f187e5847e7941d62f6f186f5d121c.camel@microchip.com>
+ <DM3PR11MB8736EAC16094D3BFF6CE1B30EC1B2@DM3PR11MB8736.namprd11.prod.outlook.com>
+ <CAJ+vNU2BZ2oMy2Gj7xwwsO8EQJcCq9GP-BkaMjEpLUkkmBQVeg@mail.gmail.com>
+ <20250117161334.ail2fyjuq75ef5to@skbuf>
+ <CAJ+vNU2RT2MmyO_YgoQmkb0UdWWKS42_fb1jqYLPmLJf5XNO=A@mail.gmail.com>
+ <CAJ+vNU2RT2MmyO_YgoQmkb0UdWWKS42_fb1jqYLPmLJf5XNO=A@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: microchip.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM3PR11MB8736.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 18bebd7e-f605-4345-8d23-08dd375b5a66
-X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Jan 2025 00:59:25.4424
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3f4057f3-b418-4d4e-ba84-d55b4e897d88
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: PjS38iYXheHkuCT3Ukh+Luw23+fB1FtD/lPe1wHrDpyZKRF4Sb+S7ENs2aMg6YcS6KaKkOYo73+mFfVMFgVPkQD5v9AkYGYMvb7ayvCZj2E=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB7406
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAJ+vNU2RT2MmyO_YgoQmkb0UdWWKS42_fb1jqYLPmLJf5XNO=A@mail.gmail.com>
+ <CAJ+vNU2RT2MmyO_YgoQmkb0UdWWKS42_fb1jqYLPmLJf5XNO=A@mail.gmail.com>
 
-> > The KSZ9477 SGMII module does use DesignWare IP, but its implementation
-> > is probably too old as some registers do not match.
->=20
-> Is there a revision value somewhere in the registers? Maybe the lower
-> nibble of ID registers 2 and 3?
->=20
+On Fri, Jan 17, 2025 at 01:02:31PM -0800, Tim Harvey wrote:
+> The flaw with that patch is that enabling the multicast address table
+> invokes other default rules in the table that need to be re-configured
+> for the cpu port but the patch only configures group 0
+> (01-80-C2-00-00-00). It fails to configure group 6 (01-80-C2-00-00-08)
+> which is also used for STP so I would argue that it doesn't even do
+> what the commit log says it does. It also has the side effect of
+> disabling forwarding of other groups that were previously forwarded:
+> - group 1 01-80-C2-00-00-01 (MAC Control Frame) (previously were
+> forwarded, now are dropped)
+> - group 2 01-80-C2-00-00-03 (802.1X access control) (previously were
+> forwarded, now are forwarded to the highest port which may not be the
+> cpu port)
+> - group 4 01-80-C2-00-00-20 (GMRP) (previously were forwarded, now
+> forwarded to all except the highest port number which may not be the
+> cpu port)
+> - group 5 01-80-C2-00-00-21 (GVRP) (previously were forwarded, now
+> forwarded to all except the highest port number which may not be the
+> cpu port)
+> - group 6 01-80-C2-00-00-02, 01-80-C2-00-00-04 - 01-80-C2-00-00-0F
+> (previously were forwarded, now are forwarded to the highest port
+> which may not be the cpu port)
+> - group 7 01-80-C2-00-00-11 - 01-80-C2-00-00-1F, 01-80-C2-00-00-22 -
+> 01-80-C2-00-00-2F (previously were forwarded, now forwarded to all
+> except the highest port number which may not be the cpu port)
 
-I am not aware of getting the version of the DesignWare IP to
-differentiate different implementations.  I will find out from hardware
-designers.
+> To fix this, I propose adding a function to configure each of the
+> above groups (which are hardware filtering functions of the switch)
+> with proper port masks but I need to know from the DSA experts what is
+> desired for the port mask of those groups. The multicast address table
+> can only invoke rules based on those groups of addresses so if that is
+> not flexible enough then the multicast address table should instead be
+> disabled.
 
-> > When using XPCS
-> > driver link detection works but the SGMII port does not pass traffic fo=
-r
-> > some SFPs.  It is probably doable to update the XPCS driver to work in
-> > KSZ9477, but there is no way to submit that patch as that may affect
-> > other hardware implementation.
->=20
-> We have PHY drivers which change their behaviour based on the
-> revision. So it is possible. And XPCS is used quite a bit, so i don't
-> think it will be an issue finding somebody to do some regression
-> testing.
->=20
-> Using a PCS driver is the correct way to go here. So either you need
-> to copy/paste/edit the XPCS driver to create a version specific for
-> you hardware, or you need to extend the XPCS driver so it supports
-> your hardware.
+The recommendation from the DSA maintainers will be to follow what the
+software bridge data path does, which just means testing and seeing how
+each group reacts to the known inputs which might affect it, i.e.:
 
-Some of the register definitions are not present in the XPCS driver so I
-need to add them.
+- is it a group of the form 01-80-c2-00-00-0X? if yes, group_fwd_mask
+  should dictate how it is forwarded by software. All that hardware
+  needs to take care of is to send it just to the CPU.
 
-Some register bits programmed by the XPCS driver do not have effect.
+- is multicast flooding enabled on the egress port?
 
-Actually KSZ9477 has a bug in SGMII implementation and needs a software
-workaround.  I am not sure if the generic XCPS driver can cover that.
+- is there an MDB entry towards the egress port? how about another port?
+  The groups outside the 01-80-c2-00-00-0X range should be treated as
+  regular multicast, i.e. group_fwd_mask doesn't matter, and mdb/flooding
+  does.
 
+One easy way out, if synchronizing the hardware port masks with the
+software state turns out too hard, is to configure the switch to send
+all these groups just to the CPU, and make sure skb->offload_fwd_mark is
+unset for packets belonging to these groups (don't call
+dsa_default_offload_fwd_mark() from the tagger). The software takes this
+as a cue that it should forward them where the hardware didn't reach.
+
+Also, never exclude the CPU port from the destination port mask, unless
+you really, really know what you're doing. The software bridge might
+need to forward to another foreign (non-switch) bridge port which is an
+Intel e1000 card, or a Wi-Fi AP, or a tunnel, and by cutting out the CPU
+from the flood path, you're taking that possibility away from it.
+
+Here's a script to get you started with testing.
+
+#!/bin/bash
+
+ARP=" \
+ff:ff:ff:ff:ff:ff 00:00:de:ad:be:ef 08 06 00 01 \
+08 00 06 04 00 01 e0 07 1b 81 13 40 c0 a8 01 ad \
+00 00 00 00 00 00 c0 a8 01 ea"
+groups=( \
+	01:80:C2:00:00:00 \
+	01:80:C2:00:00:08 \
+	01:80:C2:00:00:01 \
+	01:80:C2:00:00:03 \
+	01:80:C2:00:00:20 \
+	01:80:C2:00:00:21 \
+	01:80:C2:00:00:02 \
+	01:80:C2:00:00:04 \
+	01:80:C2:00:00:0F \
+	01:80:C2:00:00:11 \
+	01:80:C2:00:00:1F \
+	01:80:C2:00:00:22 \
+	01:80:C2:00:00:2F \
+)
+pkt_count=1000
+
+mac_get()
+{
+	local if_name=$1
+
+	ip -j link show dev $if_name | jq -r '.[]["address"]'
+}
+
+get_rx_stats()
+{
+	local if_name=$1
+
+	ip -j -s link show $if_name | jq '.[].stats64.rx.packets'
+}
+
+last_nibble()
+{
+	local macaddr=$1
+
+	echo "0x${macaddr:0-1}"
+}
+
+send_raw()
+{
+	local if_name=$1; shift
+	local group=$1; shift
+	local pkt="$1"; shift
+	local smac=$(mac_get $if_name)
+
+	pkt="${pkt/ff:ff:ff:ff:ff:ff/$group}"
+	pkt="${pkt/00:00:de:ad:be:ef/$smac}"
+
+	mausezahn -c $pkt_count -q $if_name "$pkt"
+}
+
+run_test()
+{
+	before=$(get_rx_stats veth4)
+	send_raw veth0 $group "$ARP"
+	after=$(get_rx_stats veth4)
+	delta=$((after - before))
+
+	[ $delta -ge $pkt_count ] && echo "forwarded" || echo "not forwarded"
+}
+
+#          br0
+#        /  |  \
+#       /   |   \
+#      /    |    \
+#     /     |     \
+#  veth1  veth3  veth5
+#    |      |      |
+#  veth0  veth2  veth4
+ip link add veth0 type veth peer name veth1
+ip link add veth2 type veth peer name veth3
+ip link add veth4 type veth peer name veth5
+ip link add br0 type bridge && ip link set br0 up
+ip link set veth1 master br0 && ip link set veth1 up
+ip link set veth3 master br0 && ip link set veth3 up
+ip link set veth5 master br0 && ip link set veth5 up
+ip link set veth0 up && ip link set veth2 up && ip link set veth4 up
+
+for group in "${groups[@]}"; do
+	ip link set veth5 type bridge_slave mcast_flood on
+	with_flooding=$(run_test $group)
+
+	ip link set veth5 type bridge_slave mcast_flood off
+	without_flooding=$(run_test $group)
+
+	bridge mdb add dev br0 port veth5 grp $group permanent
+	with_mdb_and_no_flooding=$(run_test $group)
+	bridge mdb del dev br0 port veth5 grp $group permanent # restore
+
+	ip link set veth5 type bridge_slave mcast_flood on # restore
+
+	bridge mdb add dev br0 port veth3 grp $group permanent
+	with_mdb_on_another_port=$(run_test $group)
+	bridge mdb del dev br0 port veth3 grp $group permanent # restore
+
+	ip link set br0 type bridge group_fwd_mask $((1 << $(last_nibble $group))) 2>/dev/null
+	if [ $? = 0 ]; then
+		with_group_fwd_mask=$(run_test $group)
+		ip link set br0 type bridge group_fwd_mask 0 # restore
+	else
+		with_group_fwd_mask="can't test"
+	fi
+
+	printf "Group %s: %s with flooding, %s without flooding, %s with mdb and no flooding, %s with mdb on another port and flooding, %s with group_fwd_mask\n" \
+		"$group" \
+		"$with_flooding" \
+		"$without_flooding" \
+		"$with_mdb_and_no_flooding" \
+		"$with_mdb_on_another_port" \
+		"$with_group_fwd_mask" \
+
+done
+
+ip link del veth0
+ip link del veth2
+ip link del veth4
+ip link del br0
 
