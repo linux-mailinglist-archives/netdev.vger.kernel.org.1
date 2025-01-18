@@ -1,156 +1,204 @@
-Return-Path: <netdev+bounces-159565-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159566-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A5BDA15D74
-	for <lists+netdev@lfdr.de>; Sat, 18 Jan 2025 15:50:00 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C472CA15D77
+	for <lists+netdev@lfdr.de>; Sat, 18 Jan 2025 15:50:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9C8E3166A9F
-	for <lists+netdev@lfdr.de>; Sat, 18 Jan 2025 14:49:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E8957166B41
+	for <lists+netdev@lfdr.de>; Sat, 18 Jan 2025 14:50:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D47C18DF73;
-	Sat, 18 Jan 2025 14:49:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A337192D8E;
+	Sat, 18 Jan 2025 14:50:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q9thiuN4"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="Br3r16D7"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 614B52B9A8;
-	Sat, 18 Jan 2025 14:49:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14E1C18FDBD
+	for <netdev@vger.kernel.org>; Sat, 18 Jan 2025 14:50:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737211796; cv=none; b=pgHOkMWbVASbRvbg6nwMZftGILNcW+Zt6RobbU8+y/46y3hhZolhwueSaxiyLE+Fp2qn0yYK4d1EhhmjHGyK29DHRRvc3CyGKZ/TLDkqxPVpWO0vhWu6WrURR6i3fDF1+eMSpSFcxqeQayP9amwvjmMLN2/XtorMfIzpiN8Jx4A=
+	t=1737211829; cv=none; b=dn0Orj8gt2n65TMWSsWXJ5Y7i3vRz+wxbQNBXfEtTqbloshquGyh+UNFQr8mQUC4BFqnljmlQUz7PAEKJcABhCGOqxQbeaEVZqBMKCgXOe7WAGxz8HAFSFj6RHmoRUZFSJTTm0M0+CH3q5+9bCzwQkOzpMu4RWHU4+uem8mVg3Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737211796; c=relaxed/simple;
-	bh=bVqmhetk8a5Vw9VMxllSyWuAl6BxluH53gM4ZLadOCk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=B7wtcJ88DW29QsYODJEn4gaUreJhDFmKNbmvxkbeVqYXIRCCXtZ47oKr2I5M1x5sHtNGNUrfSeLfVW9LzLKOV7R6bE5nWQvb66uGB0oKgOziHuUS+nCTQU59M/IMsYn52hglUDFIGSAh9ljJMzRWZEzc+TKZTaEG7YSfJTqU4t8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q9thiuN4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 250CFC4CED1;
-	Sat, 18 Jan 2025 14:49:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737211795;
-	bh=bVqmhetk8a5Vw9VMxllSyWuAl6BxluH53gM4ZLadOCk=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Q9thiuN4l+A5TxN2DajKUdAuhN/NsQHdy+bi6E/BEmXeM9Ixo0P/TK4SFp2SbMsXY
-	 oT9lqjwfp+OOQ6n8fVuehyPNeRIrD8kjvJjKT3oo+iiC01bV+mlv9BbNGYAFOAVA43
-	 y184/oyBS4C/XHdZtEfitMJlL/0GFm6W9vJez6omQNSJ7CMFXtNiH2ndboQldwZx9R
-	 EIQ/MTfnMplO6tv8Lj/ItuboAltPS/TOLlTr1RvX6J/nmiogQZ0jE37Z1RBrcrYDzF
-	 6WyNwdnD9gQtmWq1vASb2EwOAnu5h4IPkoqGLSlhpl7IFjcZavqsljqFxjeqleTmLU
-	 8YrgYEbhOta0w==
-Message-ID: <70a4df53-c780-40ca-9415-566fdd3c9a98@kernel.org>
-Date: Sat, 18 Jan 2025 16:49:50 +0200
+	s=arc-20240116; t=1737211829; c=relaxed/simple;
+	bh=vc8nQrJMUBVdRKVAiTLUiDvimiPHAK4SpEmgfoMXdcE=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=mHa94A4vnTgpvFtfIe/hNyqXTCn41WarQ0w+9D39DEGH2FI+9HoYoUMnTq7fsngLHiUaerWSGyN6yxqiAASq94p20zEUkvCg6ueO/aORcIJbnbaDgBr/RjpUGn/cLXd3OxihGqDBLs3oOXQ7cFMblSAr3VZqkPOfrgZaj+hl45k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=Br3r16D7; arc=none smtp.client-ip=209.85.208.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-5d96944401dso5430990a12.0
+        for <netdev@vger.kernel.org>; Sat, 18 Jan 2025 06:50:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google09082023; t=1737211825; x=1737816625; darn=vger.kernel.org;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=UVZF3YDvzHz5/Dk51MXwSo0uaGYTS1HEavqkbVKNSLw=;
+        b=Br3r16D7DQi5sorYQH+cyZSwmsHVZGxTe0B+QgorMWdSwxZV6tvZ4zdn2dbwdsVvq8
+         mBAFtO0yiLWAJpOdUacbSwN26ykBzI527QEwbAHgeQiaD/WXi2D2kvjiEFJJMuKZoFx1
+         dAgyWc3/fOCqXUGt+QEf9VQjdGrjfaeBDrZMMlMPEzq/8oAq/ROoXiDmAWgz3vUMpXVP
+         I4Igurk9HO+UTaSR0U7aP9CL6zSdoLYhcE36a/UN9oq4illl6IAX49XpG4jJ4OHKAUie
+         EmgY7XyUI67bT/WyFi+cNrNBWXThOclSDwWG05Uu8Wm7eaXUsNG56SFiGhKOpp6/nnkK
+         u3gA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737211825; x=1737816625;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=UVZF3YDvzHz5/Dk51MXwSo0uaGYTS1HEavqkbVKNSLw=;
+        b=bUZ4v5SWVBTTXSvgaAhEmCxRcEvKnMDqsABsbwocswx9wXtKZe1l1p5sWySt+9npaq
+         gvB3N/ftiHAsy/CrzBH2WX6ltgRm7FxuWRFyyeRkvOnQAp8zjboMV25a/jCjuWQtN+2X
+         I/xvPgJJ7IlB9lD0FXLIvLI4sRpI1qknXprcdMFYbxXDhjwPLaoVrEMveewjmB9PuXjX
+         j0zN8GLpeao9tOaZ5GrIJYPtbGO/ffWKKSOhU50uqOHrpdxSakeNMS7qjalvYUnTNslL
+         Va99c0qdgbFEMV9o18/laRK0hc4uIop23kv3q7FBjzzcZMpiNceAp77jju8450GJ37MI
+         Mfpg==
+X-Forwarded-Encrypted: i=1; AJvYcCUCGWKXAvoQ7STBnzIJ/4hnT+Tbnct1OUmmeZiW6ytBv/P9T7dwdnjz9apxn04TNKJu7rsblQY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzD0+n7vMuVAJcfUEDlqMJ7jQ1LobyWcij4twQiVFlVgRkhXo4g
+	kay8/tt774mhKRGWplcL2tIYSJyruTtkbjL/rjeqCJS51dJ4iAr0mh9QV7RmFts=
+X-Gm-Gg: ASbGncs4jEeZBncQbSAup/gbLSbLhbW39vojz0miA3Ux8n0+k9LeOG7L4KCDcZZ+72W
+	sHNHtn8rXTrerkjysrXJsZfAt7uWs6nNtd/5Xoc4ts9xzw84qBxHf8zug2s9D6EiVMbsB6m/AUG
+	ltvkZrNH7lo7l+eR/EAq/bXs7dv7PnUVcjAF5k3sEtHQDnNLrSY4czHzGEoRU88uV5sbncKKV7U
+	Owr1jO3/6HiN9rWQY2LJsCQQEU0g+rgxNkkRctndGuxcngWyLU9yh1OKsy2lbw=
+X-Google-Smtp-Source: AGHT+IEs5Muzy7OrbHe4BeljhEvhPf1bcgCdAU37y5Gk2HHGSKXsHepGnBdzt3gGXYdFR9LZcidACQ==
+X-Received: by 2002:a17:906:c108:b0:aa6:79fa:b47d with SMTP id a640c23a62f3a-ab38b0b8138mr604984566b.1.1737211825228;
+        Sat, 18 Jan 2025 06:50:25 -0800 (PST)
+Received: from cloudflare.com ([2a09:bac5:506b:2387::38a:14])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ab384ce2105sm349569666b.67.2025.01.18.06.50.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 18 Jan 2025 06:50:24 -0800 (PST)
+From: Jakub Sitnicki <jakub@cloudflare.com>
+To: Jiayuan Chen <mrpre@163.com>
+Cc: bpf@vger.kernel.org,  john.fastabend@gmail.com,  netdev@vger.kernel.org,
+  martin.lau@linux.dev,  ast@kernel.org,  edumazet@google.com,
+  davem@davemloft.net,  dsahern@kernel.org,  kuba@kernel.org,
+  pabeni@redhat.com,  linux-kernel@vger.kernel.org,  song@kernel.org,
+  andrii@kernel.org,  mhal@rbox.co,  yonghong.song@linux.dev,
+  daniel@iogearbox.net,  xiyou.wangcong@gmail.com,  horms@kernel.org,
+  corbet@lwn.net,  eddyz87@gmail.com,  cong.wang@bytedance.com,
+  shuah@kernel.org,  mykolal@fb.com,  jolsa@kernel.org,  haoluo@google.com,
+  sdf@fomichev.me,  kpsingh@kernel.org,  linux-doc@vger.kernel.org
+Subject: Re: [PATCH bpf v7 2/5] bpf: fix wrong copied_seq calculation
+In-Reply-To: <20250116140531.108636-3-mrpre@163.com> (Jiayuan Chen's message
+	of "Thu, 16 Jan 2025 22:05:28 +0800")
+References: <20250116140531.108636-1-mrpre@163.com>
+	<20250116140531.108636-3-mrpre@163.com>
+Date: Sat, 18 Jan 2025 15:50:22 +0100
+Message-ID: <87ikqcdvm9.fsf@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2] net: ethernet: ti: am65-cpsw: fix freeing IRQ in
- am65_cpsw_nuss_remove_tx_chns()
-To: Jacob Keller <jacob.e.keller@intel.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Grygorii Strashko <grygorii.strashko@ti.com>,
- Siddharth Vadapalli <s-vadapalli@ti.com>
-Cc: srk@ti.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- Simon Horman <horms@kernel.org>
-References: <20250116-am65-cpsw-fix-tx-irq-free-v2-1-ada49409a45f@kernel.org>
- <2d6de2f0-09a7-4d1a-9288-6a9786256b12@intel.com>
-Content-Language: en-US
-From: Roger Quadros <rogerq@kernel.org>
-In-Reply-To: <2d6de2f0-09a7-4d1a-9288-6a9786256b12@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 
+On Thu, Jan 16, 2025 at 10:05 PM +08, Jiayuan Chen wrote:
+> 'sk->copied_seq' was updated in the tcp_eat_skb() function when the
+> action of a BPF program was SK_REDIRECT. For other actions, like SK_PASS,
+> the update logic for 'sk->copied_seq' was moved to
+> tcp_bpf_recvmsg_parser() to ensure the accuracy of the 'fionread' feature.
+>
+> It works for a single stream_verdict scenario, as it also modified
+> 'sk_data_ready->sk_psock_verdict_data_ready->tcp_read_skb'
+> to remove updating 'sk->copied_seq'.
+>
+> However, for programs where both stream_parser and stream_verdict are
+> active(strparser purpose), tcp_read_sock() was used instead of
+> tcp_read_skb() (sk_data_ready->strp_data_ready->tcp_read_sock)
+> tcp_read_sock() now still update 'sk->copied_seq', leading to duplicated
+> updates.
+>
+> In summary, for strparser + SK_PASS, copied_seq is redundantly calculated
+> in both tcp_read_sock() and tcp_bpf_recvmsg_parser().
+>
+> The issue causes incorrect copied_seq calculations, which prevent
+> correct data reads from the recv() interface in user-land.
+>
+> We do not want to add new proto_ops to implement a new version of
+> tcp_read_sock, as this would introduce code complexity [1].
+>
+> We add new callback for strparser for customized read operation, also as
+> a wrapper function it provides abstraction use psock.
+>
+> [1]: https://lore.kernel.org/bpf/20241218053408.437295-1-mrpre@163.com
+> Fixes: e5c6de5fa025 ("bpf, sockmap: Incorrectly handling copied_seq")
+> Suggested-by: Jakub Sitnicki <jakub@cloudflare.com>
+> Signed-off-by: Jiayuan Chen <mrpre@163.com>
+> ---
 
+[...]
 
-On 18/01/2025 02:40, Jacob Keller wrote:
-> 
-> 
-> On 1/16/2025 5:54 AM, Roger Quadros wrote:
->> When getting the IRQ we use k3_udma_glue_tx_get_irq() which returns
->> negative error value on error. So not NULL check is not sufficient
->> to deteremine if IRQ is valid. Check that IRQ is greater then zero
->> to ensure it is valid.
->>
-> 
-> Using the phrase "NULL check" is a bit odd since the value returned
-> isn't a pointer. It is correct that checking for 0 is not sufficient
-> since it could be a negative error value. Given that IRQ numbers are
-> typically considered like an opaque object, perhaps thinking in terms of
-> pointers and NULL is common place. Either way, its not worth re-rolling
-> for a minor phrasing change like this.
+> diff --git a/net/ipv4/tcp_bpf.c b/net/ipv4/tcp_bpf.c
+> index 47f65b1b70ca..6dcde3506a9b 100644
+> --- a/net/ipv4/tcp_bpf.c
+> +++ b/net/ipv4/tcp_bpf.c
+> @@ -646,6 +646,47 @@ static int tcp_bpf_assert_proto_ops(struct proto *ops)
+>  	       ops->sendmsg  == tcp_sendmsg ? 0 : -ENOTSUPP;
+>  }
+>  
+> +#if IS_ENABLED(CONFIG_BPF_STREAM_PARSER)
+> +static int tcp_bpf_strp_read_sock(struct sock *sk, read_descriptor_t *desc,
+> +				  sk_read_actor_t recv_actor)
+> +{
+> +	struct sk_psock *psock;
+> +	struct tcp_sock *tp;
+> +	int copied = 0;
+> +
+> +	tp = tcp_sk(sk);
+> +	rcu_read_lock();
+> +	psock = sk_psock(sk);
+> +	if (WARN_ON(!psock)) {
+> +		desc->error = -EINVAL;
+> +		goto out;
+> +	}
+> +
+> +	psock->ingress_bytes = 0;
+> +	/* We could easily add copied_seq and noack into desc then call
+> +	 * ops->read_sock without calling symbol directly. But unfortunately
+> +	 * most descriptors used by other modules are not inited with zero.
+> +	 * Also it not work by replacing ops->read_sock without introducing
+> +	 * new ops as ops itself is located in rodata segment.
+> +	 */
+> +	copied = tcp_read_sock_noack(sk, desc, recv_actor, true,
+> +				     &psock->copied_seq);
+> +	if (copied < 0)
+> +		goto out;
+> +	/* recv_actor may redirect skb to another socket(SK_REDIRECT) or
+> +	 * just put skb into ingress queue of current socket(SK_PASS).
+> +	 * For SK_REDIRECT, we need 'ack' the frame immediately but for
+> +	 * SK_PASS, the 'ack' was delay to tcp_bpf_recvmsg_parser()
+> +	 */
+> +	tp->copied_seq = psock->copied_seq - psock->ingress_bytes;
+> +	tcp_rcv_space_adjust(sk);
+> +	__tcp_cleanup_rbuf(sk, copied - psock->ingress_bytes);
+> +out:
+> +	rcu_read_unlock();
+> +	return copied;
+> +}
+> +#endif /* CONFIG_BPF_STREAM_PARSER */
+> +
+>  int tcp_bpf_update_proto(struct sock *sk, struct sk_psock *psock, bool restore)
+>  {
+>  	int family = sk->sk_family == AF_INET6 ? TCP_BPF_IPV6 : TCP_BPF_IPV4;
+> @@ -681,6 +722,12 @@ int tcp_bpf_update_proto(struct sock *sk, struct sk_psock *psock, bool restore)
+>  
+>  	/* Pairs with lockless read in sk_clone_lock() */
+>  	sock_replace_proto(sk, &tcp_bpf_prots[family][config]);
+> +#if IS_ENABLED(CONFIG_BPF_STREAM_PARSER)
+> +	if (psock->progs.stream_parser && psock->progs.stream_verdict) {
+> +		psock->copied_seq = tcp_sk(sk)->copied_seq;
+> +		psock->read_sock = tcp_bpf_strp_read_sock;
 
-I agree with your view.
+Just directly set psock->strp.cb.read_sock to tcp_bpf_strp_read_sock.
+Then we don't need this intermediate psock->read_sock callback, which
+doesn't do anything useful.
 
-> 
-> Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
-
-Thanks!
-
-> 
->> There is no issue at probe time but at runtime user can invoke
->> .set_channels which results in the following call chain.
->> am65_cpsw_set_channels()
->>  am65_cpsw_nuss_update_tx_rx_chns()
->>   am65_cpsw_nuss_remove_tx_chns()
->>   am65_cpsw_nuss_init_tx_chns()
->>
->> At this point if am65_cpsw_nuss_init_tx_chns() fails due to
->> k3_udma_glue_tx_get_irq() then tx_chn->irq will be set to a
->> negative value.
->>
->> Then, at subsequent .set_channels with higher channel count we
->> will attempt to free an invalid IRQ in am65_cpsw_nuss_remove_tx_chns()
->> leading to a kernel warning.
->>
->> The issue is present in the original commit that introduced this driver,
->> although there, am65_cpsw_nuss_update_tx_rx_chns() existed as
->> am65_cpsw_nuss_update_tx_chns().
->>
->> Fixes: 93a76530316a ("net: ethernet: ti: introduce am65x/j721e gigabit eth subsystem driver")
->> Signed-off-by: Roger Quadros <rogerq@kernel.org>
->> Reviewed-by: Simon Horman <horms@kernel.org>
->> Reviewed-by: Siddharth Vadapalli <s-vadapalli@ti.com>
->> ---
->> Changes in v2:
->> - Fixed typo in commit log k3_udma_glue_rx_get_irq->k3_udma_glue_tx_get_irq
->> - Added more details to commit log
->> - Added Reviewed-by tags
->> - Link to v1: https://lore.kernel.org/r/20250114-am65-cpsw-fix-tx-irq-free-v1-1-b2069e6ed185@kernel.org
->> ---
->>  drivers/net/ethernet/ti/am65-cpsw-nuss.c | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.c b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
->> index 5465bf872734..e1de45fb18ae 100644
->> --- a/drivers/net/ethernet/ti/am65-cpsw-nuss.c
->> +++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
->> @@ -2248,7 +2248,7 @@ static void am65_cpsw_nuss_remove_tx_chns(struct am65_cpsw_common *common)
->>  	for (i = 0; i < common->tx_ch_num; i++) {
->>  		struct am65_cpsw_tx_chn *tx_chn = &common->tx_chns[i];
->>  
->> -		if (tx_chn->irq)
->> +		if (tx_chn->irq > 0)
->>  			devm_free_irq(dev, tx_chn->irq, tx_chn);
->>  
->>  		netif_napi_del(&tx_chn->napi_tx);
->>
->> ---
->> base-commit: 5bc55a333a2f7316b58edc7573e8e893f7acb532
->> change-id: 20250114-am65-cpsw-fix-tx-irq-free-846ac55ee6e1
->>
->> Best regards,
-> 
-
--- 
-cheers,
--roger
-
+> +	}
+> +#endif
+>  	return 0;
+>  }
+>  EXPORT_SYMBOL_GPL(tcp_bpf_update_proto);
 
