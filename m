@@ -1,111 +1,156 @@
-Return-Path: <netdev+bounces-159564-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159565-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44B7BA15D38
-	for <lists+netdev@lfdr.de>; Sat, 18 Jan 2025 14:45:26 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A5BDA15D74
+	for <lists+netdev@lfdr.de>; Sat, 18 Jan 2025 15:50:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 88A303A8163
-	for <lists+netdev@lfdr.de>; Sat, 18 Jan 2025 13:45:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9C8E3166A9F
+	for <lists+netdev@lfdr.de>; Sat, 18 Jan 2025 14:49:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D28918EFD4;
-	Sat, 18 Jan 2025 13:45:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D47C18DF73;
+	Sat, 18 Jan 2025 14:49:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q9thiuN4"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FAA818A6A1;
-	Sat, 18 Jan 2025 13:45:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 614B52B9A8;
+	Sat, 18 Jan 2025 14:49:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737207923; cv=none; b=Qpr/ayF2Ge1UZtw4SKVwiCUlk5QvawcavdWtqi1aYcD8CnTKWfSkADtbklvh4naMYVPVZwZiA+4NVf/tWOiMaNKxFQP34AMdbL6WPHXWxpJxr21cbLKDvmubZyTqQG8gdT4UniBpV2Eegt8cZfLRgEBeicXuaD7tRPTwhHTP1LE=
+	t=1737211796; cv=none; b=pgHOkMWbVASbRvbg6nwMZftGILNcW+Zt6RobbU8+y/46y3hhZolhwueSaxiyLE+Fp2qn0yYK4d1EhhmjHGyK29DHRRvc3CyGKZ/TLDkqxPVpWO0vhWu6WrURR6i3fDF1+eMSpSFcxqeQayP9amwvjmMLN2/XtorMfIzpiN8Jx4A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737207923; c=relaxed/simple;
-	bh=SwovSWE8oK7R1u3/KvMW8XzdLNhIpzc9XQqyxaYjrxQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=u/HhNevWhJczZ5PWh/WPOw4GGQTqicUrRpv3umQ6wHPY6wqwSiAUrF36JjKe+7VKhuTOERUxEb+vNdphOcIM6DYnDI1T1MJyGqiWREYOxpOE+JqCzwBMjOPutgO4F2UrjEhGsDdKN0txsHElyPn/Fo9u3haO9s8/W8GBJxsp18s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D30F5C4CED1;
-	Sat, 18 Jan 2025 13:45:20 +0000 (UTC)
-Date: Sat, 18 Jan 2025 13:45:18 +0000
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: torvalds@linux-foundation.org, davem@davemloft.net,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	pabeni@redhat.com, Guo Weikang <guoweikang.kernel@gmail.com>,
-	Andrew Morton <akpm@linux-foundation.org>
-Subject: Re: [GIT PULL] Networking for v6.13-rc7
-Message-ID: <Z4uwbqAwKvR4_24t@arm.com>
-References: <20250109182953.2752717-1-kuba@kernel.org>
- <173646486752.1541533.15419405499323104668.pr-tracker-bot@kernel.org>
- <20250116193821.2e12e728@kernel.org>
+	s=arc-20240116; t=1737211796; c=relaxed/simple;
+	bh=bVqmhetk8a5Vw9VMxllSyWuAl6BxluH53gM4ZLadOCk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=B7wtcJ88DW29QsYODJEn4gaUreJhDFmKNbmvxkbeVqYXIRCCXtZ47oKr2I5M1x5sHtNGNUrfSeLfVW9LzLKOV7R6bE5nWQvb66uGB0oKgOziHuUS+nCTQU59M/IMsYn52hglUDFIGSAh9ljJMzRWZEzc+TKZTaEG7YSfJTqU4t8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q9thiuN4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 250CFC4CED1;
+	Sat, 18 Jan 2025 14:49:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1737211795;
+	bh=bVqmhetk8a5Vw9VMxllSyWuAl6BxluH53gM4ZLadOCk=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=Q9thiuN4l+A5TxN2DajKUdAuhN/NsQHdy+bi6E/BEmXeM9Ixo0P/TK4SFp2SbMsXY
+	 oT9lqjwfp+OOQ6n8fVuehyPNeRIrD8kjvJjKT3oo+iiC01bV+mlv9BbNGYAFOAVA43
+	 y184/oyBS4C/XHdZtEfitMJlL/0GFm6W9vJez6omQNSJ7CMFXtNiH2ndboQldwZx9R
+	 EIQ/MTfnMplO6tv8Lj/ItuboAltPS/TOLlTr1RvX6J/nmiogQZ0jE37Z1RBrcrYDzF
+	 6WyNwdnD9gQtmWq1vASb2EwOAnu5h4IPkoqGLSlhpl7IFjcZavqsljqFxjeqleTmLU
+	 8YrgYEbhOta0w==
+Message-ID: <70a4df53-c780-40ca-9415-566fdd3c9a98@kernel.org>
+Date: Sat, 18 Jan 2025 16:49:50 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250116193821.2e12e728@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v2] net: ethernet: ti: am65-cpsw: fix freeing IRQ in
+ am65_cpsw_nuss_remove_tx_chns()
+To: Jacob Keller <jacob.e.keller@intel.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Grygorii Strashko <grygorii.strashko@ti.com>,
+ Siddharth Vadapalli <s-vadapalli@ti.com>
+Cc: srk@ti.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Simon Horman <horms@kernel.org>
+References: <20250116-am65-cpsw-fix-tx-irq-free-v2-1-ada49409a45f@kernel.org>
+ <2d6de2f0-09a7-4d1a-9288-6a9786256b12@intel.com>
+Content-Language: en-US
+From: Roger Quadros <rogerq@kernel.org>
+In-Reply-To: <2d6de2f0-09a7-4d1a-9288-6a9786256b12@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Jan 16, 2025 at 07:38:21PM -0800, Jakub Kicinski wrote:
-> On Thu, 09 Jan 2025 23:21:07 +0000 pr-tracker-bot@kernel.org wrote:
-> > The pull request you sent on Thu,  9 Jan 2025 10:29:53 -0800:
-> > 
-> > > git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-6.13-rc7  
-> > 
-> > has been merged into torvalds/linux.git:
-> > https://git.kernel.org/torvalds/c/c77cd47cee041bc1664b8e5fcd23036e5aab8e2a
-> 
-> Hi Linus!
-> 
-> After 76d5d4c53e68 ("mm/kmemleak: fix percpu memory leak detection
-> failure") we get this on every instance of our testing VMs:
-> 
-> unreferenced object 0x00042aa0 (size 64):
->   comm "swapper/0", pid 0, jiffies 4294667296
->   hex dump (first 32 bytes on cpu 2):
->     00 00 00 00 00 00 00 00 00 00 06 00 00 00 00 00  ................
->     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
->   backtrace (crc 0):
->     pcpu_alloc_noprof+0x4ad/0xab0
->     setup_zone_pageset+0x30/0x290
->     setup_per_cpu_pageset+0x6a/0x1f0
->     start_kernel+0x2a4/0x410
->     x86_64_start_reservations+0x18/0x30
->     x86_64_start_kernel+0xba/0x110
->     common_startup_64+0x12c/0x138
 
-I doubt that's related to the networking pull request but I can see it
-caused by the above commit, now that we track per-cpu allocations. Most
-likely it's a false positive. I'll try to reproduce it next week but
-something like below might fix (untested):
 
-diff --git a/mm/numa.c b/mm/numa.c
-index e2eec07707d1..c594d853cfe8 100644
---- a/mm/numa.c
-+++ b/mm/numa.c
-@@ -1,5 +1,6 @@
- // SPDX-License-Identifier: GPL-2.0-or-later
- 
-+#include <linux/kmemleak.h>
- #include <linux/memblock.h>
- #include <linux/printk.h>
- #include <linux/numa.h>
-@@ -23,6 +24,9 @@ void __init alloc_node_data(int nid)
- 		      nd_size, nid);
- 	nd = __va(nd_pa);
- 
-+	/* needed to track related allocation stored in node_data[] */
-+	kmemleak_alloc(nd, nd_size, 0, 0);
-+
- 	/* report and initialize */
- 	pr_info("NODE_DATA(%d) allocated [mem %#010Lx-%#010Lx]\n", nid,
- 		nd_pa, nd_pa + nd_size - 1);
+On 18/01/2025 02:40, Jacob Keller wrote:
+> 
+> 
+> On 1/16/2025 5:54 AM, Roger Quadros wrote:
+>> When getting the IRQ we use k3_udma_glue_tx_get_irq() which returns
+>> negative error value on error. So not NULL check is not sufficient
+>> to deteremine if IRQ is valid. Check that IRQ is greater then zero
+>> to ensure it is valid.
+>>
+> 
+> Using the phrase "NULL check" is a bit odd since the value returned
+> isn't a pointer. It is correct that checking for 0 is not sufficient
+> since it could be a negative error value. Given that IRQ numbers are
+> typically considered like an opaque object, perhaps thinking in terms of
+> pointers and NULL is common place. Either way, its not worth re-rolling
+> for a minor phrasing change like this.
+
+I agree with your view.
+
+> 
+> Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+
+Thanks!
+
+> 
+>> There is no issue at probe time but at runtime user can invoke
+>> .set_channels which results in the following call chain.
+>> am65_cpsw_set_channels()
+>>  am65_cpsw_nuss_update_tx_rx_chns()
+>>   am65_cpsw_nuss_remove_tx_chns()
+>>   am65_cpsw_nuss_init_tx_chns()
+>>
+>> At this point if am65_cpsw_nuss_init_tx_chns() fails due to
+>> k3_udma_glue_tx_get_irq() then tx_chn->irq will be set to a
+>> negative value.
+>>
+>> Then, at subsequent .set_channels with higher channel count we
+>> will attempt to free an invalid IRQ in am65_cpsw_nuss_remove_tx_chns()
+>> leading to a kernel warning.
+>>
+>> The issue is present in the original commit that introduced this driver,
+>> although there, am65_cpsw_nuss_update_tx_rx_chns() existed as
+>> am65_cpsw_nuss_update_tx_chns().
+>>
+>> Fixes: 93a76530316a ("net: ethernet: ti: introduce am65x/j721e gigabit eth subsystem driver")
+>> Signed-off-by: Roger Quadros <rogerq@kernel.org>
+>> Reviewed-by: Simon Horman <horms@kernel.org>
+>> Reviewed-by: Siddharth Vadapalli <s-vadapalli@ti.com>
+>> ---
+>> Changes in v2:
+>> - Fixed typo in commit log k3_udma_glue_rx_get_irq->k3_udma_glue_tx_get_irq
+>> - Added more details to commit log
+>> - Added Reviewed-by tags
+>> - Link to v1: https://lore.kernel.org/r/20250114-am65-cpsw-fix-tx-irq-free-v1-1-b2069e6ed185@kernel.org
+>> ---
+>>  drivers/net/ethernet/ti/am65-cpsw-nuss.c | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.c b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
+>> index 5465bf872734..e1de45fb18ae 100644
+>> --- a/drivers/net/ethernet/ti/am65-cpsw-nuss.c
+>> +++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
+>> @@ -2248,7 +2248,7 @@ static void am65_cpsw_nuss_remove_tx_chns(struct am65_cpsw_common *common)
+>>  	for (i = 0; i < common->tx_ch_num; i++) {
+>>  		struct am65_cpsw_tx_chn *tx_chn = &common->tx_chns[i];
+>>  
+>> -		if (tx_chn->irq)
+>> +		if (tx_chn->irq > 0)
+>>  			devm_free_irq(dev, tx_chn->irq, tx_chn);
+>>  
+>>  		netif_napi_del(&tx_chn->napi_tx);
+>>
+>> ---
+>> base-commit: 5bc55a333a2f7316b58edc7573e8e893f7acb532
+>> change-id: 20250114-am65-cpsw-fix-tx-irq-free-846ac55ee6e1
+>>
+>> Best regards,
+> 
 
 -- 
-Catalin
+cheers,
+-roger
+
 
