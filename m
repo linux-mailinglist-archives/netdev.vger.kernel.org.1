@@ -1,98 +1,66 @@
-Return-Path: <netdev+bounces-159523-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159524-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 747B8A15B08
-	for <lists+netdev@lfdr.de>; Sat, 18 Jan 2025 03:17:13 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5BB06A15B0A
+	for <lists+netdev@lfdr.de>; Sat, 18 Jan 2025 03:21:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BEF543A9531
-	for <lists+netdev@lfdr.de>; Sat, 18 Jan 2025 02:17:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CBF8C188BCD0
+	for <lists+netdev@lfdr.de>; Sat, 18 Jan 2025 02:21:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BB912D052;
-	Sat, 18 Jan 2025 02:17:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7112E200A3;
+	Sat, 18 Jan 2025 02:21:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="BF2QgqXO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qmslRw2Q"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-173.mta1.migadu.com (out-173.mta1.migadu.com [95.215.58.173])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F29723C9
-	for <netdev@vger.kernel.org>; Sat, 18 Jan 2025 02:17:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42A1B23CE;
+	Sat, 18 Jan 2025 02:21:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737166630; cv=none; b=MP7SUe09/Dw1kC/TZSHMmmBZ4pL1YDk8EXahZztlaU6PUwAjl5I5Uux1bhXgOHn3CMyYO/UgCCvsAlZCB2up0Nme+Nz2zuHwfpCj20cOU9O+A2k37Zo1KawNG5THP/wwqi4nKYcwiwBhhXdrGgE/B/lp01oaqOBYutfD7p8BMa8=
+	t=1737166861; cv=none; b=kJB5k2PXwnXmvjLfKjX0Vs2i+1RO5XsK/9OmXjVoUvApmIhuIeKrcMyN7Pn+umE/S4KGKdOI9KG3IAL6UXsxfipbT7roftXkiYo3JlUftWqJ5LRdBg6Q2azIlb7qobqib7fi49TcxgfuNJoBAAVm+soOsP0meoUL2fqKzzmhgB8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737166630; c=relaxed/simple;
-	bh=vIPBsoMDjFHSkDZDUt2LyephDQYYlD/+Q+78kJG0GdQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hYujCvMnBqPuxUPe1ro6kt+sqQ7SMaRE9yEwU3Mdomd+q8jOaDhgE9Ro4uG2T7St3/zc4NMiikVV5JIbF8gFFU5neVUKIvZpk/QptNhFEveBeOqK8oRGgBI9l9wuTanHVPiLVrKhGjjnvu3ZiDOb+uBss1BP3vm0VWLzRBWmuF8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=BF2QgqXO; arc=none smtp.client-ip=95.215.58.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <060c5a50-85b6-4f1c-b458-33084858db12@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1737166626;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+Wj7uhgBd6iH4mnu3+7AQ89HSzoTr/XsE+vzt6D3OTQ=;
-	b=BF2QgqXOVhXcZwv1RvGLd7C6MpIaLrQyddyREttAYvWUJrUmmKI5fDbcLzc8WNODU03ekB
-	mX7o1LGpnsG2O4ouXrqMBW4SPICE1NkKbMLJdtYgQwaLMuZ65T8/sJZrXdx0FhNJtsqKI3
-	jYXSm1mz06sgkNqZCY+xVKYs1Kj0wOM=
-Date: Fri, 17 Jan 2025 18:16:59 -0800
+	s=arc-20240116; t=1737166861; c=relaxed/simple;
+	bh=7xmog2I/sZ4sNHKLMztjs5oaWGJWj0xuoWv++R8BrYY=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type; b=LtCrKTyGKIDcADoe/ec+Bl7A93aMgDUkzAd3/IzGx9FpEBELntHS86aTOExdfSevzy//v/aW+6FWLasyvZwAF2LidEdgyPGH0SRZRN8i399VDF+RWq1XlKN5UUkB9PcKsrA1q0p4Q18Hueukc9WyuE/LcUKFGYonjE5y13svfiw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qmslRw2Q; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 82647C4CEDD;
+	Sat, 18 Jan 2025 02:21:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1737166860;
+	bh=7xmog2I/sZ4sNHKLMztjs5oaWGJWj0xuoWv++R8BrYY=;
+	h=Date:From:To:Subject:From;
+	b=qmslRw2Q/VQdHm8JuGK9u/l7wAi8eNF16TpvdT+q7QawDzKrL9TrdC0zxou8Ini/S
+	 b25F0nVOV3N7KiX9k7qxBFHTXklcGM6XG/zgvGfr9ZXgKtynIxdvgPBB+w3lC/Y3fG
+	 QVCbIWGdp+mCByLXLNOhA5SG+RHkwv277CdHJzpvQ2sXnCBxhvXW7ycE2B6qF3mjgx
+	 3Ly/evEqfVFdkVeRgllUKcp9+Zi2fNmgsH6cwiWLd53QXGTxkAa8Bu/PRbjUKomoB6
+	 srQogF3ypi4OKOnqAFApZWYmSrCFYOeV2CNL3bzV8al6piIaerErEPpOGd/oGpaT/V
+	 SVyq8Vz+OfLcw==
+Date: Fri, 17 Jan 2025 18:20:59 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: netdev@vger.kernel.org, netdev-driver-reviewers@vger.kernel.org
+Subject: [ANN] net-next is CLOSED
+Message-ID: <20250117182059.7ce1196f@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next v5 03/15] bpf: introduce timestamp_used to allow
- UDP socket fetched in bpf prog
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, dsahern@kernel.org, willemdebruijn.kernel@gmail.com,
- willemb@google.com, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
- eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev,
- john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me,
- haoluo@google.com, jolsa@kernel.org, horms@kernel.org, bpf@vger.kernel.org,
- netdev@vger.kernel.org
-References: <20250112113748.73504-1-kerneljasonxing@gmail.com>
- <20250112113748.73504-4-kerneljasonxing@gmail.com>
- <02031003-872e-49bf-a658-c22bc7e1a954@linux.dev>
- <CAL+tcoD6MqBfbpM+ESkiNoRwsQqWsxMwMb4b0qvO=Cf8s52JyA@mail.gmail.com>
- <CAL+tcoDS6H4SMDRs9r+cOM_2bdbNRFRQpuYmpVFyxoMcQJDXLQ@mail.gmail.com>
- <ba353503-bfd3-4de0-bb99-9c7e865e8a73@linux.dev>
- <CAL+tcoChGB3vA7LMm0VHb9OjmXHUw0--f6v4Crz5R7U+EPo+cg@mail.gmail.com>
- <41688754-20fc-4789-879f-60f763b3a9db@linux.dev>
- <CAL+tcoCpWs0f145_d+KLmAnuKhQ-83bANkiXXLHE_hoyhGj6Pw@mail.gmail.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-Content-Language: en-US
-In-Reply-To: <CAL+tcoCpWs0f145_d+KLmAnuKhQ-83bANkiXXLHE_hoyhGj6Pw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On 1/17/25 5:58 PM, Jason Xing wrote:
->> On 1/15/25 5:12 PM, Jason Xing wrote:
->>>>> Also, I need to set allow_direct_access to one as long as there is
->>>>> "sock_ops.is_fullsock = 1;" in the existing callbacks.
->>>> Only set allow_direct_access when the sk is fullsock in the "existing" sockops
->>>> callback.
->>> Only "existing"? Then how can the bpf program access those members of
->>> the tcp socket structure in the current/new timestamping callbacks?
->> There is at least one sk write:
->>
->>          case offsetof(struct bpf_sock_ops, sk_txhash):
->>                  SOCK_OPS_GET_OR_SET_FIELD(sk_txhash, sk_txhash,
->>                                           struct sock, type);
->>
->> afaict, the kernel always writes sk->sk_txhash with the sk lock held. The new
->> timestamping callbacks cannot write because it does not hold the lock.
-> Surely, I will handle the sk_txhash case as you suggested 🙂
+Hi!
 
-to be clear, not setting the allow_tcp_access in the new timestamping cb should do.
+Linus is expected to cut final v6.13 this weekend, so let's stop
+queuing -next material already. We'll cancel the announcement
+in case there's an -rc8. Otherwise net-next will reopen on Feb 3rd.
+
+If you have a fix for net-next do use net-next in the subject.
+And generate net patches against net.
+net-next is "closed" but we will apply fixes until the PR is ready.
 
