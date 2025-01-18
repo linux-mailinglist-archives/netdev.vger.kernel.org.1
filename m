@@ -1,105 +1,145 @@
-Return-Path: <netdev+bounces-159571-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159572-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CEC71A15DAA
-	for <lists+netdev@lfdr.de>; Sat, 18 Jan 2025 16:31:08 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F071A15DAE
+	for <lists+netdev@lfdr.de>; Sat, 18 Jan 2025 16:32:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0B7B51614DF
-	for <lists+netdev@lfdr.de>; Sat, 18 Jan 2025 15:31:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 212D71886D90
+	for <lists+netdev@lfdr.de>; Sat, 18 Jan 2025 15:32:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E67C131E2D;
-	Sat, 18 Jan 2025 15:31:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4574E191F7A;
+	Sat, 18 Jan 2025 15:32:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="pqs0xvsL"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="N99tlrxx"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.3])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DB6810F2;
-	Sat, 18 Jan 2025 15:30:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.3
+Received: from out30-119.freemail.mail.aliyun.com (out30-119.freemail.mail.aliyun.com [115.124.30.119])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E43918A93C;
+	Sat, 18 Jan 2025 15:31:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.119
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737214263; cv=none; b=scQgi93mqA7m2Sr1jv24/m8+7/eprnIR2qV0K52e0KzWdEEzHRQBpDaNWhRzcQwtJvXksFjUsm5z/+sncwuA0+xZASJcg0BhoGbzJR8NOe25t/WfvlIF1IfYCY7cUTWmCgBq5VgVLia/JQ61tuKO5crxbZJdAz+6N27PLV7VJKE=
+	t=1737214322; cv=none; b=pbdn0JZOJ7chepKMtg7cKpeFaFF6dWFr5v841HlO+DaAjwvYMLUe2L0U9ZKIkkBjEfo5PQTWSQzdLN9IbZcZsZojvfxyfSj2KEgh4yumdd/mRHCU2pkGfnQeGHoBASuASQW4O33u6aM7L4CANaksmyjrnVAOOoMd/u2fLbcchro=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737214263; c=relaxed/simple;
-	bh=k670exMaaeh2eraHJTaPRIvbegXxucyogS5+QnX5jkc=;
+	s=arc-20240116; t=1737214322; c=relaxed/simple;
+	bh=ZiEFqrXMXBUDaz/Mgv8SkHBj8ZsUoxRHA8O+A/UAHaE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FqLHzBOa33DsJxPCXShOWRs+hI4WJmv+tKdhxWr+wYTwb1dFqStVRBQbPSFikt1MU/y2g3ie32gtIohtLkl8QP1FB3+t5EauDhxbySvoQpugkqClyoazwqzv3d13TsfZSvpdKbHj2uV2jZ9G/HoIo9IglZC0zMg1I0cjD32gmvQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=pqs0xvsL; arc=none smtp.client-ip=117.135.210.3
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=Date:From:Subject:Message-ID:MIME-Version:
-	Content-Type; bh=vMAPIeNXw3fRUCPfq2DqrA0Nc9BSdEZHypXDiuZxYrw=;
-	b=pqs0xvsLy6RCXqFwOFjNoGe+MxBBstWHxO5Xw6OIjgepofDsnkPb+gkNUcxcMU
-	MLFnep7VjUHjau6pSE+ZnxLbVYQdzm/yPS32fitkWgMdH4Cq1jqm/a0koGvvkUdY
-	fl8pXHnoQwNScvNoW7BLJ5oWbyrgoMTPeN/bRTWkgL/xo=
-Received: from iZj6c3ewsy61ybpk7hrb16Z (unknown [])
-	by gzga-smtp-mtada-g0-1 (Coremail) with SMTP id _____wD3l67AyItn2QMCGw--.51932S2;
-	Sat, 18 Jan 2025 23:29:07 +0800 (CST)
-Date: Sat, 18 Jan 2025 23:29:04 +0800
-From: Jiayuan Chen <mrpre@163.com>
-To: Jakub Sitnicki <jakub@cloudflare.com>
-Cc: bpf@vger.kernel.org, john.fastabend@gmail.com, netdev@vger.kernel.org, 
-	martin.lau@linux.dev, ast@kernel.org, edumazet@google.com, davem@davemloft.net, 
-	dsahern@kernel.org, kuba@kernel.org, pabeni@redhat.com, linux-kernel@vger.kernel.org, 
-	song@kernel.org, andrii@kernel.org, mhal@rbox.co, yonghong.song@linux.dev, 
-	daniel@iogearbox.net, xiyou.wangcong@gmail.com, horms@kernel.org, corbet@lwn.net, 
-	eddyz87@gmail.com, cong.wang@bytedance.com, shuah@kernel.org, mykolal@fb.com, 
-	jolsa@kernel.org, haoluo@google.com, sdf@fomichev.me, kpsingh@kernel.org, 
-	linux-doc@vger.kernel.org
-Subject: Re: [PATCH bpf v7 2/5] bpf: fix wrong copied_seq calculation
-Message-ID: <4uacr7khoalvlshkybaq4lqu55muax5adsrnqkulc6hgeuzaeg@eakft72epszp>
-References: <20250116140531.108636-1-mrpre@163.com>
- <20250116140531.108636-3-mrpre@163.com>
- <87ikqcdvm9.fsf@cloudflare.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=HEXwRofuT7KbCcQoFvN9+HpjmbTXc8bRRxF+3iHPHWNJbbZlDJqkk9xQ090JYHx5nTHMaH4CTs9JjUtN0UV5zRf7poIGKwxv5mdZLY8VGppo2VvYflm7BhgSwD8gkwfjAIJeiOP+H8FLv+M1TVt1Q0HiC1OOZRDo1ogZNzUDlhA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=N99tlrxx; arc=none smtp.client-ip=115.124.30.119
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1737214315; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
+	bh=um4EpNPGGZn6uHOIvs0vt5Qo5OXfZuSdQuMmUsvwHTA=;
+	b=N99tlrxxojXtoZaqoUqNY+j7tm5dfKLj4Ul339SL6D7Nq2rzbX/RdA3iEFu9ukuHJwYJkCcURv4d5RrvP5x5AfzC+WXSz3nTPWoh0eU5NCxRZrfDRf0kt++5Q0ZNN0pVPERzkDLmHo3FocOzL8JQLtVIPQqQhH5IX2C393/oSM0=
+Received: from localhost(mailfrom:dust.li@linux.alibaba.com fp:SMTPD_---0WNrobRO_1737214314 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Sat, 18 Jan 2025 23:31:54 +0800
+Date: Sat, 18 Jan 2025 23:31:54 +0800
+From: Dust Li <dust.li@linux.alibaba.com>
+To: Niklas Schnelle <schnelle@linux.ibm.com>,
+	Alexandra Winter <wintera@linux.ibm.com>,
+	Julian Ruess <julianr@linux.ibm.com>,
+	Wenjia Zhang <wenjia@linux.ibm.com>,
+	Jan Karcher <jaka@linux.ibm.com>, Gerd Bayer <gbayer@linux.ibm.com>,
+	Halil Pasic <pasic@linux.ibm.com>,
+	"D. Wythe" <alibuda@linux.alibaba.com>,
+	Tony Lu <tonylu@linux.alibaba.com>,
+	Wen Gu <guwen@linux.alibaba.com>,
+	Peter Oberparleiter <oberpar@linux.ibm.com>,
+	David Miller <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>
+Cc: Thorsten Winkler <twinkler@linux.ibm.com>, netdev@vger.kernel.org,
+	linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	Simon Horman <horms@kernel.org>
+Subject: Re: [RFC net-next 0/7] Provide an ism layer
+Message-ID: <20250118153154.GI89233@linux.alibaba.com>
+Reply-To: dust.li@linux.alibaba.com
+References: <20250115195527.2094320-1-wintera@linux.ibm.com>
+ <20250116093231.GD89233@linux.alibaba.com>
+ <D73H7Q080GUQ.3BDOH23P4WDOL@linux.ibm.com>
+ <0f96574a-567e-495a-b815-6aef336f12e6@linux.ibm.com>
+ <20250117021353.GF89233@linux.alibaba.com>
+ <dc2ff4c83ce8f7884872068570454f285510bda2.camel@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <87ikqcdvm9.fsf@cloudflare.com>
-X-CM-TRANSID:_____wD3l67AyItn2QMCGw--.51932S2
-X-Coremail-Antispam: 1Uf129KBjvJXoW7uw45Zr1DKw1fJryfArWxCrg_yoW8GF45pF
-	ykAw4Y9ayDJFWUWws8tFyIkr1agrZYkayjkr48ta4xursF9w1rGFyS9rWjyr15GwnI9r13
-	ZrW7WFW3Awn7AaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07UnNVgUUUUU=
-X-CM-SenderInfo: xpus2vi6rwjhhfrp/xtbBDwHYp2eLvAVybgABs5
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <dc2ff4c83ce8f7884872068570454f285510bda2.camel@linux.ibm.com>
 
-On Sat, Jan 18, 2025 at 03:50:22PM +0100, Jakub Sitnicki wrote:
-> On Thu, Jan 16, 2025 at 10:05 PM +08, Jiayuan Chen wrote:
-> > 'sk->copied_seq' was updated in the tcp_eat_skb() function when the
-> > action of a BPF program was SK_REDIRECT. For other actions, like SK_PASS,
-> > +}
-> > +#endif /* CONFIG_BPF_STREAM_PARSER */
-> > +
-> >  int tcp_bpf_update_proto(struct sock *sk, struct sk_psock *psock, bool restore)
-> >  {
-> >  	int family = sk->sk_family == AF_INET6 ? TCP_BPF_IPV6 : TCP_BPF_IPV4;
-> > @@ -681,6 +722,12 @@ int tcp_bpf_update_proto(struct sock *sk, struct sk_psock *psock, bool restore)
-> >  
-> >  	/* Pairs with lockless read in sk_clone_lock() */
-> >  	sock_replace_proto(sk, &tcp_bpf_prots[family][config]);
-> > +#if IS_ENABLED(CONFIG_BPF_STREAM_PARSER)
-> > +	if (psock->progs.stream_parser && psock->progs.stream_verdict) {
-> > +		psock->copied_seq = tcp_sk(sk)->copied_seq;
-> > +		psock->read_sock = tcp_bpf_strp_read_sock;
-> 
-> Just directly set psock->strp.cb.read_sock to tcp_bpf_strp_read_sock.
-> Then we don't need this intermediate psock->read_sock callback, which
-> doesn't do anything useful.
+On 2025-01-17 11:38:39, Niklas Schnelle wrote:
+>On Fri, 2025-01-17 at 10:13 +0800, Dust Li wrote:
+>> > 
+>---8<---
+>> > Here are some of my thoughts on the matter:
+>> > > > 
+>> > > > Naming and Structure: I suggest we refer to it as SHD (Shared Memory
+>> > > > Device) instead of ISM (Internal Shared Memory). 
+>> > 
+>> > 
+>> > So where does the 'H' come from? If you want to call it Shared Memory _D_evice?
+>> 
+>> Oh, I was trying to refer to SHM(Share memory file in the userspace, see man
+>> shm_open(3)). SMD is also OK.
+>> 
+>> > 
+>> > 
+>> > To my knowledge, a
+>> > > > "Shared Memory Device" better encapsulates the functionality we're
+>> > > > aiming to implement. 
+>> > 
+>> > 
+>> > Could you explain why that would be better?
+>> > 'Internal Shared Memory' is supposed to be a bit of a counterpart to the
+>> > Remote 'R' in RoCE. Not the greatest name, but it is used already by our ISM
+>> > devices and by ism_loopback. So what is the benefit in changing it?
+>> 
+>> I believe that if we are going to separate and refine the code, and add
+>> a common subsystem, we should choose the most appropriate name.
+>> 
+>> In my opinion, "ISM" doesn’t quite capture what the device provides.
+>> Since we’re adding a "Device" that enables different entities (such as
+>> processes or VMs) to perform shared memory communication, I think a more
+>> fitting name would be better. If you have any alternative suggestions,
+>> I’m open to them.
 >
-Ok, I will do this.
-(BTW, I intended to avoid bringing "struct strparser" into tcp_bpf.c so I
-added a wrapper function instead in skmsg.c without calling it directly) 
-> > +	}
-> > +#endif
-> >  	return 0;
-> >  }
-> >  EXPORT_SYMBOL_GPL(tcp_bpf_update_proto);
+>I kept thinking about this a bit and I'd like to propose yet another
+>name for this group of devices: Memory Communication Devices (MCD)
+>
+>One important point I see is that there is a bit of a misnomer in the
+>existing ISM name in that our ISM device does in fact *not* share
+>memory in the common sense of the "shared memory" wording. Instead it
+>copies data between partitions of memory that share a common
+>cache/memory hierarchy while not sharing the memory itself. loopback-
+>ism and a possibly future virtio-ism on the other hand would share
+>memory in the "shared memory" sense. Though I'd very much hope they
+>will retain a copy mode to allow use in partition scenarios.
+>
+>With that background I think the common denominator between them and
+>the main idea behind ISM is that they facilitate communication via
+>memory buffers and very simple and reliable copy/share operations. I
+>think this would also capture our planned use-case of devices (TTYs,
+>block devices, framebuffers + HID etc) provided by a peer on top of
+>such a memory communication device.
+
+Make sense, I agree with MCD.
+
+Best regard,
+Dust
 
 
