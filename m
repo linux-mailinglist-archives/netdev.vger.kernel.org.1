@@ -1,365 +1,175 @@
-Return-Path: <netdev+bounces-159553-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159554-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D8F00A15C36
-	for <lists+netdev@lfdr.de>; Sat, 18 Jan 2025 10:44:01 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 39525A15C40
+	for <lists+netdev@lfdr.de>; Sat, 18 Jan 2025 10:55:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DEEB716770C
-	for <lists+netdev@lfdr.de>; Sat, 18 Jan 2025 09:43:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 653B51677E9
+	for <lists+netdev@lfdr.de>; Sat, 18 Jan 2025 09:55:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C35D188010;
-	Sat, 18 Jan 2025 09:43:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eQew/f41"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0237178CC8;
+	Sat, 18 Jan 2025 09:55:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B072A176AB5;
-	Sat, 18 Jan 2025 09:43:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 202F77DA6A;
+	Sat, 18 Jan 2025 09:55:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737193438; cv=none; b=JQPfm1A8MUuompn31oOR2teEexjadq61a7ldSmMbAPQCCKEnMI8Hu5YbQjzsF3x0beWEueknOpjNkeLUDXnxDFUH4BjSeJEJsqa7f5JSWgw1dhCyBo37V5k64/zJB/w6iekBOt6Un57S9AiAEuRZ1tyIw7n0or1e2kcYrFauyBU=
+	t=1737194107; cv=none; b=Fqv9ymGN0dPp4IE47muyNiFiC4ml5Ah6hMStaGef7WiopAWyzs4x1AGvc15PsP99rClziFRtIKtvyDL3SfA2abYjZyWeFKYS9GOTmn5IKjHCCZIa8wrdocHRjkxgQhXVb9jzryC03uxCtMBYR3ynS+8fiSoA0XLVwenM1Pb0tdU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737193438; c=relaxed/simple;
-	bh=DZn3SLH5AzE3aHMq6EC3TENadrF6Smv7SFRMTVHdYYk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=et5eoMEexf+wamtY5jcnJPHEpB2Kow07pfgVQrD2GtlWG7VdCAGDJ25rfYyxOmZFVRFpGkS7h4Y4PpchrssGfPp4XGSi4bzKIt6/tfioNwpTf5Y10YU8UgeVvFJNeso4kWz/0rFWtuf/sPcLL8UdA+BJuQoKy6has9Fd2NSmwxw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=eQew/f41; arc=none smtp.client-ip=192.198.163.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1737193435; x=1768729435;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=DZn3SLH5AzE3aHMq6EC3TENadrF6Smv7SFRMTVHdYYk=;
-  b=eQew/f41hendHMT2/p3HuhzwCS43FiJcpXoWjW+RCM2cyWpRycQ9MK3O
-   PuyyVKJUir98AcLQnAPImgbr0/6MtbgluBEB/3xaPPteV6K4mgyAs8FM3
-   tX6NrjKrHL90uOcqJ1sRjFpVbEYnRq6CiHg4WTgAcxo7FYsvcHarOu0BZ
-   StcXMs3tsuswDAe1Y8K7idCTOb60SnavnTrgEisOF+5oij3HlbGbsFbOa
-   Lpy0BklNVqHrXySiIasZFfV4Pz0KL4Ospo3pSMCz/Khyh3rhvngG+e/iH
-   8a6MGo1BJ3sQ1Rv8aPnHnF2XRRrHrrM7WmZ+HZ6oFK7HaqfAYkP1Aln7U
-   w==;
-X-CSE-ConnectionGUID: wx6qLCW+TaWTEU2W4ltgTQ==
-X-CSE-MsgGUID: 583w82ctTs+sKB2WZZxjPQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11318"; a="62997014"
-X-IronPort-AV: E=Sophos;i="6.13,214,1732608000"; 
-   d="scan'208";a="62997014"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jan 2025 01:43:55 -0800
-X-CSE-ConnectionGUID: /JYe9enJRKaTjHIOzPhqeA==
-X-CSE-MsgGUID: qRDORRzrSoGszkCXSOD4gg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.13,214,1732608000"; 
-   d="scan'208";a="111018072"
-Received: from lkp-server01.sh.intel.com (HELO d63d4d77d921) ([10.239.97.150])
-  by fmviesa004.fm.intel.com with ESMTP; 18 Jan 2025 01:43:50 -0800
-Received: from kbuild by d63d4d77d921 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1tZ5Mp-000UHT-3B;
-	Sat, 18 Jan 2025 09:43:47 +0000
-Date: Sat, 18 Jan 2025 17:43:44 +0800
-From: kernel test robot <lkp@intel.com>
-To: Suman Ghosh <sumang@marvell.com>, horms@kernel.org,
-	sgoutham@marvell.com, gakula@marvell.com, sbhatta@marvell.com,
-	hkelam@marvell.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, lcherian@marvell.com,
-	jerinj@marvell.com, john.fastabend@gmail.com, bbhushan2@marvell.com,
-	hawk@kernel.org, andrew+netdev@lunn.ch, ast@kernel.org,
-	daniel@iogearbox.net, bpf@vger.kernel.org
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	Suman Ghosh <sumang@marvell.com>
-Subject: Re: [net-next PATCH v4 3/6] octeontx2-pf: AF_XDP zero copy receive
- support
-Message-ID: <202501181725.LopOJSa2-lkp@intel.com>
-References: <20250116191116.3357181-4-sumang@marvell.com>
+	s=arc-20240116; t=1737194107; c=relaxed/simple;
+	bh=cMfa+Cn7SjPkudqqeu7IWIa/9k3e5epWuoSpJZwYThU=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=J+nGOLtfS/w6QTdBYdkDhY1JiiHZuKjTiNqIx4DGa/QaNamLKg0WixLUrO72Z0s5wC/HOKw+Ri9eQnS6pVqGgsc0hvsvyxwGSYgUcZiCY9qtPwindxe9SnmdoUFdAB5z19ULBmsmvg+I153S7GSfsbh73b6HBVZntCYTIM8FYaY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.194])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4YZsMC2rskzbnqZ;
+	Sat, 18 Jan 2025 17:51:51 +0800 (CST)
+Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id ED2EF1401E9;
+	Sat, 18 Jan 2025 17:54:56 +0800 (CST)
+Received: from localhost.localdomain (10.90.30.45) by
+ kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Sat, 18 Jan 2025 17:54:56 +0800
+From: Jijie Shao <shaojijie@huawei.com>
+To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <andrew+netdev@lunn.ch>, <horms@kernel.org>
+CC: <shenjian15@huawei.com>, <wangpeiyang1@huawei.com>,
+	<liuyonglong@huawei.com>, <chenhao418@huawei.com>,
+	<jonathan.cameron@huawei.com>, <shameerali.kolothum.thodi@huawei.com>,
+	<salil.mehta@huawei.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <shaojijie@huawei.com>
+Subject: [PATCH net] net: hns3: fix oops when unload drivers paralleling
+Date: Sat, 18 Jan 2025 17:47:41 +0800
+Message-ID: <20250118094741.3046663-1-shaojijie@huawei.com>
+X-Mailer: git-send-email 2.30.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250116191116.3357181-4-sumang@marvell.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ kwepemk100013.china.huawei.com (7.202.194.61)
 
-Hi Suman,
+From: Jian Shen <shenjian15@huawei.com>
 
-kernel test robot noticed the following build warnings:
+When unload hclge driver, it tries to disable sriov first for each
+ae_dev node from hnae3_ae_dev_list. If user unloads hns3 driver at
+the time, because it removes all the ae_dev nodes, and it may cause
+oops.
 
-[auto build test WARNING on net-next/main]
+But we can't simply use hnae3_common_lock for this. Because in the
+process flow of pci_disable_sriov(), it will trigger the remove flow
+of VF, which will also take hnae3_common_lock.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Suman-Ghosh/octeontx2-pf-Don-t-unmap-page-pool-buffer/20250117-031510
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20250116191116.3357181-4-sumang%40marvell.com
-patch subject: [net-next PATCH v4 3/6] octeontx2-pf: AF_XDP zero copy receive support
-config: arm64-randconfig-001-20250118 (https://download.01.org/0day-ci/archive/20250118/202501181725.LopOJSa2-lkp@intel.com/config)
-compiler: clang version 17.0.6 (https://github.com/llvm/llvm-project 6009708b4367171ccdbf4b5905cb6a803753fe18)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250118/202501181725.LopOJSa2-lkp@intel.com/reproduce)
+To fixes it, introduce a new mutex to protect the unload process.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202501181725.LopOJSa2-lkp@intel.com/
+Fixes: 0dd8a25f355b ("net: hns3: disable sriov before unload hclge layer")
+Signed-off-by: Jian Shen <shenjian15@huawei.com>
+Signed-off-by: Jijie Shao <shaojijie@huawei.com>
+---
+ drivers/net/ethernet/hisilicon/hns3/hnae3.c       | 15 +++++++++++++++
+ drivers/net/ethernet/hisilicon/hns3/hnae3.h       |  2 ++
+ drivers/net/ethernet/hisilicon/hns3/hns3_enet.c   |  2 ++
+ .../ethernet/hisilicon/hns3/hns3pf/hclge_main.c   |  2 ++
+ .../ethernet/hisilicon/hns3/hns3vf/hclgevf_main.c |  2 ++
+ 5 files changed, 23 insertions(+)
 
-All warnings (new ones prefixed by >>):
-
->> drivers/net/ethernet/marvell/octeontx2/nic/otx2_vf.c:740:1: warning: unused label 'err_dcbnl_set_ops' [-Wunused-label]
-     740 | err_dcbnl_set_ops:
-         | ^~~~~~~~~~~~~~~~~~
-   1 warning generated.
---
->> drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c:3222:1: warning: unused label 'err_dcbnl_set_ops' [-Wunused-label]
-    3222 | err_dcbnl_set_ops:
-         | ^~~~~~~~~~~~~~~~~~
-   1 warning generated.
-
-
-vim +/err_dcbnl_set_ops +740 drivers/net/ethernet/marvell/octeontx2/nic/otx2_vf.c
-
-   535	
-   536	static int otx2vf_probe(struct pci_dev *pdev, const struct pci_device_id *id)
-   537	{
-   538		int num_vec = pci_msix_vec_count(pdev);
-   539		struct device *dev = &pdev->dev;
-   540		int err, qcount, qos_txqs;
-   541		struct net_device *netdev;
-   542		struct otx2_nic *vf;
-   543		struct otx2_hw *hw;
-   544	
-   545		err = pcim_enable_device(pdev);
-   546		if (err) {
-   547			dev_err(dev, "Failed to enable PCI device\n");
-   548			return err;
-   549		}
-   550	
-   551		err = pci_request_regions(pdev, DRV_NAME);
-   552		if (err) {
-   553			dev_err(dev, "PCI request regions failed 0x%x\n", err);
-   554			return err;
-   555		}
-   556	
-   557		err = dma_set_mask_and_coherent(dev, DMA_BIT_MASK(48));
-   558		if (err) {
-   559			dev_err(dev, "DMA mask config failed, abort\n");
-   560			goto err_release_regions;
-   561		}
-   562	
-   563		pci_set_master(pdev);
-   564	
-   565		qcount = num_online_cpus();
-   566		qos_txqs = min_t(int, qcount, OTX2_QOS_MAX_LEAF_NODES);
-   567		netdev = alloc_etherdev_mqs(sizeof(*vf), qcount + qos_txqs, qcount);
-   568		if (!netdev) {
-   569			err = -ENOMEM;
-   570			goto err_release_regions;
-   571		}
-   572	
-   573		pci_set_drvdata(pdev, netdev);
-   574		SET_NETDEV_DEV(netdev, &pdev->dev);
-   575		vf = netdev_priv(netdev);
-   576		vf->netdev = netdev;
-   577		vf->pdev = pdev;
-   578		vf->dev = dev;
-   579		vf->iommu_domain = iommu_get_domain_for_dev(dev);
-   580	
-   581		vf->flags |= OTX2_FLAG_INTF_DOWN;
-   582		hw = &vf->hw;
-   583		hw->pdev = vf->pdev;
-   584		hw->rx_queues = qcount;
-   585		hw->tx_queues = qcount;
-   586		hw->max_queues = qcount;
-   587		hw->non_qos_queues = qcount;
-   588		hw->rbuf_len = OTX2_DEFAULT_RBUF_LEN;
-   589		/* Use CQE of 128 byte descriptor size by default */
-   590		hw->xqe_size = 128;
-   591	
-   592		hw->irq_name = devm_kmalloc_array(&hw->pdev->dev, num_vec, NAME_SIZE,
-   593						  GFP_KERNEL);
-   594		if (!hw->irq_name) {
-   595			err = -ENOMEM;
-   596			goto err_free_netdev;
-   597		}
-   598	
-   599		hw->affinity_mask = devm_kcalloc(&hw->pdev->dev, num_vec,
-   600						 sizeof(cpumask_var_t), GFP_KERNEL);
-   601		if (!hw->affinity_mask) {
-   602			err = -ENOMEM;
-   603			goto err_free_netdev;
-   604		}
-   605	
-   606		err = pci_alloc_irq_vectors(hw->pdev, num_vec, num_vec, PCI_IRQ_MSIX);
-   607		if (err < 0) {
-   608			dev_err(dev, "%s: Failed to alloc %d IRQ vectors\n",
-   609				__func__, num_vec);
-   610			goto err_free_netdev;
-   611		}
-   612	
-   613		vf->reg_base = pcim_iomap(pdev, PCI_CFG_REG_BAR_NUM, 0);
-   614		if (!vf->reg_base) {
-   615			dev_err(dev, "Unable to map physical function CSRs, aborting\n");
-   616			err = -ENOMEM;
-   617			goto err_free_irq_vectors;
-   618		}
-   619	
-   620		otx2_setup_dev_hw_settings(vf);
-   621		/* Init VF <=> PF mailbox stuff */
-   622		err = otx2vf_vfaf_mbox_init(vf);
-   623		if (err)
-   624			goto err_free_irq_vectors;
-   625	
-   626		/* Register mailbox interrupt */
-   627		err = otx2vf_register_mbox_intr(vf, true);
-   628		if (err)
-   629			goto err_mbox_destroy;
-   630	
-   631		/* Request AF to attach NPA and LIX LFs to this AF */
-   632		err = otx2_attach_npa_nix(vf);
-   633		if (err)
-   634			goto err_disable_mbox_intr;
-   635	
-   636		err = otx2vf_realloc_msix_vectors(vf);
-   637		if (err)
-   638			goto err_detach_rsrc;
-   639	
-   640		err = otx2_set_real_num_queues(netdev, qcount, qcount);
-   641		if (err)
-   642			goto err_detach_rsrc;
-   643	
-   644		err = cn10k_lmtst_init(vf);
-   645		if (err)
-   646			goto err_detach_rsrc;
-   647	
-   648		/* Don't check for error.  Proceed without ptp */
-   649		otx2_ptp_init(vf);
-   650	
-   651		/* Assign default mac address */
-   652		otx2_get_mac_from_af(netdev);
-   653	
-   654		netdev->hw_features = NETIF_F_RXCSUM | NETIF_F_IP_CSUM |
-   655				      NETIF_F_IPV6_CSUM | NETIF_F_RXHASH |
-   656				      NETIF_F_SG | NETIF_F_TSO | NETIF_F_TSO6 |
-   657				      NETIF_F_GSO_UDP_L4;
-   658		netdev->features = netdev->hw_features;
-   659		/* Support TSO on tag interface */
-   660		netdev->vlan_features |= netdev->features;
-   661		netdev->hw_features  |= NETIF_F_HW_VLAN_CTAG_TX |
-   662					NETIF_F_HW_VLAN_STAG_TX;
-   663		netdev->features |= netdev->hw_features;
-   664	
-   665		netdev->hw_features |= NETIF_F_NTUPLE;
-   666		netdev->hw_features |= NETIF_F_RXALL;
-   667		netdev->hw_features |= NETIF_F_HW_TC;
-   668	
-   669		netif_set_tso_max_segs(netdev, OTX2_MAX_GSO_SEGS);
-   670		netdev->watchdog_timeo = OTX2_TX_TIMEOUT;
-   671	
-   672		netdev->netdev_ops = &otx2vf_netdev_ops;
-   673	
-   674		netdev->min_mtu = OTX2_MIN_MTU;
-   675		netdev->max_mtu = otx2_get_max_mtu(vf);
-   676		hw->max_mtu = netdev->max_mtu;
-   677	
-   678		/* To distinguish, for LBK VFs set netdev name explicitly */
-   679		if (is_otx2_lbkvf(vf->pdev)) {
-   680			int n;
-   681	
-   682			n = (vf->pcifunc >> RVU_PFVF_FUNC_SHIFT) & RVU_PFVF_FUNC_MASK;
-   683			/* Need to subtract 1 to get proper VF number */
-   684			n -= 1;
-   685			snprintf(netdev->name, sizeof(netdev->name), "lbk%d", n);
-   686		}
-   687	
-   688		if (is_otx2_sdp_rep(vf->pdev)) {
-   689			int n;
-   690	
-   691			n = vf->pcifunc & RVU_PFVF_FUNC_MASK;
-   692			n -= 1;
-   693			snprintf(netdev->name, sizeof(netdev->name), "sdp%d-%d",
-   694				 pdev->bus->number, n);
-   695		}
-   696	
-   697		err = cn10k_ipsec_init(netdev);
-   698		if (err)
-   699			goto err_ptp_destroy;
-   700	
-   701		err = register_netdev(netdev);
-   702		if (err) {
-   703			dev_err(dev, "Failed to register netdevice\n");
-   704			goto err_ipsec_clean;
-   705		}
-   706	
-   707		err = otx2_vf_wq_init(vf);
-   708		if (err)
-   709			goto err_unreg_netdev;
-   710	
-   711		otx2vf_set_ethtool_ops(netdev);
-   712	
-   713		err = otx2vf_mcam_flow_init(vf);
-   714		if (err)
-   715			goto err_unreg_netdev;
-   716	
-   717		err = otx2_init_tc(vf);
-   718		if (err)
-   719			goto err_unreg_netdev;
-   720	
-   721		err = otx2_register_dl(vf);
-   722		if (err)
-   723			goto err_shutdown_tc;
-   724	
-   725		vf->af_xdp_zc_qidx = bitmap_zalloc(qcount, GFP_KERNEL);
-   726		if (!vf->af_xdp_zc_qidx) {
-   727			err = -ENOMEM;
-   728			goto err_af_xdp_zc;
-   729		}
-   730	
-   731	#ifdef CONFIG_DCB
-   732		err = otx2_dcbnl_set_ops(netdev);
-   733		if (err)
-   734			goto err_dcbnl_set_ops;
-   735	#endif
-   736		otx2_qos_init(vf, qos_txqs);
-   737	
-   738		return 0;
-   739	
- > 740	err_dcbnl_set_ops:
-   741		bitmap_free(vf->af_xdp_zc_qidx);
-   742	err_af_xdp_zc:
-   743		otx2_unregister_dl(vf);
-   744	err_shutdown_tc:
-   745		otx2_shutdown_tc(vf);
-   746	err_unreg_netdev:
-   747		unregister_netdev(netdev);
-   748	err_ipsec_clean:
-   749		cn10k_ipsec_clean(vf);
-   750	err_ptp_destroy:
-   751		otx2_ptp_destroy(vf);
-   752	err_detach_rsrc:
-   753		free_percpu(vf->hw.lmt_info);
-   754		if (test_bit(CN10K_LMTST, &vf->hw.cap_flag))
-   755			qmem_free(vf->dev, vf->dync_lmt);
-   756		otx2_detach_resources(&vf->mbox);
-   757	err_disable_mbox_intr:
-   758		otx2vf_disable_mbox_intr(vf);
-   759	err_mbox_destroy:
-   760		otx2vf_vfaf_mbox_destroy(vf);
-   761	err_free_irq_vectors:
-   762		pci_free_irq_vectors(hw->pdev);
-   763	err_free_netdev:
-   764		pci_set_drvdata(pdev, NULL);
-   765		free_netdev(netdev);
-   766	err_release_regions:
-   767		pci_release_regions(pdev);
-   768		return err;
-   769	}
-   770	
-
+diff --git a/drivers/net/ethernet/hisilicon/hns3/hnae3.c b/drivers/net/ethernet/hisilicon/hns3/hnae3.c
+index 9a63fbc69408..b25fb400f476 100644
+--- a/drivers/net/ethernet/hisilicon/hns3/hnae3.c
++++ b/drivers/net/ethernet/hisilicon/hns3/hnae3.c
+@@ -40,6 +40,21 @@ EXPORT_SYMBOL(hnae3_unregister_ae_algo_prepare);
+  */
+ static DEFINE_MUTEX(hnae3_common_lock);
+ 
++/* ensure the drivers being unloaded one by one */
++static DEFINE_MUTEX(hnae3_unload_lock);
++
++void hnae3_acquire_unload_lock(void)
++{
++	mutex_lock(&hnae3_unload_lock);
++}
++EXPORT_SYMBOL(hnae3_acquire_unload_lock);
++
++void hnae3_release_unload_lock(void)
++{
++	mutex_unlock(&hnae3_unload_lock);
++}
++EXPORT_SYMBOL(hnae3_release_unload_lock);
++
+ static bool hnae3_client_match(enum hnae3_client_type client_type)
+ {
+ 	if (client_type == HNAE3_CLIENT_KNIC ||
+diff --git a/drivers/net/ethernet/hisilicon/hns3/hnae3.h b/drivers/net/ethernet/hisilicon/hns3/hnae3.h
+index 12ba380eb701..4e44f28288f9 100644
+--- a/drivers/net/ethernet/hisilicon/hns3/hnae3.h
++++ b/drivers/net/ethernet/hisilicon/hns3/hnae3.h
+@@ -963,4 +963,6 @@ int hnae3_register_client(struct hnae3_client *client);
+ void hnae3_set_client_init_flag(struct hnae3_client *client,
+ 				struct hnae3_ae_dev *ae_dev,
+ 				unsigned int inited);
++void hnae3_acquire_unload_lock(void);
++void hnae3_release_unload_lock(void);
+ #endif
+diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c b/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
+index a7e3b22f641c..9ff797fb36c4 100644
+--- a/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
++++ b/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
+@@ -6002,9 +6002,11 @@ module_init(hns3_init_module);
+  */
+ static void __exit hns3_exit_module(void)
+ {
++	hnae3_acquire_unload_lock();
+ 	pci_unregister_driver(&hns3_driver);
+ 	hnae3_unregister_client(&client);
+ 	hns3_dbg_unregister_debugfs();
++	hnae3_release_unload_lock();
+ }
+ module_exit(hns3_exit_module);
+ 
+diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
+index db7845009252..3f17b3073e50 100644
+--- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
++++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
+@@ -12919,9 +12919,11 @@ static int __init hclge_init(void)
+ 
+ static void __exit hclge_exit(void)
+ {
++	hnae3_acquire_unload_lock();
+ 	hnae3_unregister_ae_algo_prepare(&ae_algo);
+ 	hnae3_unregister_ae_algo(&ae_algo);
+ 	destroy_workqueue(hclge_wq);
++	hnae3_release_unload_lock();
+ }
+ module_init(hclge_init);
+ module_exit(hclge_exit);
+diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_main.c b/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_main.c
+index 163c6e59ea4c..9ba767740a04 100644
+--- a/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_main.c
++++ b/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_main.c
+@@ -3410,8 +3410,10 @@ static int __init hclgevf_init(void)
+ 
+ static void __exit hclgevf_exit(void)
+ {
++	hnae3_acquire_unload_lock();
+ 	hnae3_unregister_ae_algo(&ae_algovf);
+ 	destroy_workqueue(hclgevf_wq);
++	hnae3_release_unload_lock();
+ }
+ module_init(hclgevf_init);
+ module_exit(hclgevf_exit);
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.33.0
+
 
