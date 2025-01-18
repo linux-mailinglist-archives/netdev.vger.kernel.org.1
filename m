@@ -1,175 +1,171 @@
-Return-Path: <netdev+bounces-159554-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159555-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 39525A15C40
-	for <lists+netdev@lfdr.de>; Sat, 18 Jan 2025 10:55:11 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 092E1A15C45
+	for <lists+netdev@lfdr.de>; Sat, 18 Jan 2025 11:01:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 653B51677E9
-	for <lists+netdev@lfdr.de>; Sat, 18 Jan 2025 09:55:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 623671886A64
+	for <lists+netdev@lfdr.de>; Sat, 18 Jan 2025 10:01:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0237178CC8;
-	Sat, 18 Jan 2025 09:55:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E0291862BD;
+	Sat, 18 Jan 2025 10:01:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 202F77DA6A;
-	Sat, 18 Jan 2025 09:55:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E202416CD33
+	for <netdev@vger.kernel.org>; Sat, 18 Jan 2025 10:01:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737194107; cv=none; b=Fqv9ymGN0dPp4IE47muyNiFiC4ml5Ah6hMStaGef7WiopAWyzs4x1AGvc15PsP99rClziFRtIKtvyDL3SfA2abYjZyWeFKYS9GOTmn5IKjHCCZIa8wrdocHRjkxgQhXVb9jzryC03uxCtMBYR3ynS+8fiSoA0XLVwenM1Pb0tdU=
+	t=1737194495; cv=none; b=h6JZslPeKOzvrDR9J+AUTxa1ikt+N5OPHOi0wGpRBRdt3Pm66Y8RO2o0AGEgyYMDQW99dKlFn/jbZ/FWYJopNKyA+6dCFBANirHdaCaokui0nHVJQv+vgPJQxWeaNH9pwz/Qumf33csRmALa3AhVFi2pXYjagyV+OAKu78erhTg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737194107; c=relaxed/simple;
-	bh=cMfa+Cn7SjPkudqqeu7IWIa/9k3e5epWuoSpJZwYThU=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=J+nGOLtfS/w6QTdBYdkDhY1JiiHZuKjTiNqIx4DGa/QaNamLKg0WixLUrO72Z0s5wC/HOKw+Ri9eQnS6pVqGgsc0hvsvyxwGSYgUcZiCY9qtPwindxe9SnmdoUFdAB5z19ULBmsmvg+I153S7GSfsbh73b6HBVZntCYTIM8FYaY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.194])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4YZsMC2rskzbnqZ;
-	Sat, 18 Jan 2025 17:51:51 +0800 (CST)
-Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id ED2EF1401E9;
-	Sat, 18 Jan 2025 17:54:56 +0800 (CST)
-Received: from localhost.localdomain (10.90.30.45) by
- kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Sat, 18 Jan 2025 17:54:56 +0800
-From: Jijie Shao <shaojijie@huawei.com>
-To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <andrew+netdev@lunn.ch>, <horms@kernel.org>
-CC: <shenjian15@huawei.com>, <wangpeiyang1@huawei.com>,
-	<liuyonglong@huawei.com>, <chenhao418@huawei.com>,
-	<jonathan.cameron@huawei.com>, <shameerali.kolothum.thodi@huawei.com>,
-	<salil.mehta@huawei.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <shaojijie@huawei.com>
-Subject: [PATCH net] net: hns3: fix oops when unload drivers paralleling
-Date: Sat, 18 Jan 2025 17:47:41 +0800
-Message-ID: <20250118094741.3046663-1-shaojijie@huawei.com>
-X-Mailer: git-send-email 2.30.0
+	s=arc-20240116; t=1737194495; c=relaxed/simple;
+	bh=k1QvJg+JfGG0m5o6x47fkcw28c1d5UfT1Xoulx23zw8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RuJhrmCy8Z90k1mJb8Hr84HDIFaAWW6MRDXJavhY1/7cyL/jTsY/ZSFy2nwQVXWGk7H29BbqBc9WC0HeakqseUAqh7K5rzvIKB/uYvMqFrDWCPu8d+vdlzt7eT4k2WlgghkaKfpsBm14rpdBHMDzwswygYLGfrOi6VgIXX+DsxI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1tZ5dr-0007Go-LS; Sat, 18 Jan 2025 11:01:23 +0100
+Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1tZ5dq-000Zo7-0p;
+	Sat, 18 Jan 2025 11:01:22 +0100
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1tZ5dq-0002DA-0U;
+	Sat, 18 Jan 2025 11:01:22 +0100
+Date: Sat, 18 Jan 2025 11:01:22 +0100
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>, kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	UNGLinuxDriver@microchip.com, Phil Elwell <phil@raspberrypi.org>
+Subject: Re: [PATCH net-next v1 7/7] net: usb: lan78xx: Enable EEE support
+ with phylink integration
+Message-ID: <Z4t78tI0gXWbDhXT@pengutronix.de>
+References: <Z4AG7zvIvQDv3GTn@shell.armlinux.org.uk>
+ <Z4AJ4bxLePBbbR2u@pengutronix.de>
+ <Z4ARB96M6KDuPvv8@shell.armlinux.org.uk>
+ <80925b27-5302-4253-ad6d-221ba8bf45f4@lunn.ch>
+ <Z4UKHp0RopBT5gpI@pengutronix.de>
+ <Z4UVQRHqk8ND984c@shell.armlinux.org.uk>
+ <38ad9a25-a5b9-48ab-b92d-4c9d9f4c7d62@lunn.ch>
+ <Z4qEGIRYvSuVR9AK@shell.armlinux.org.uk>
+ <Z4tWpxvwDG9u4MwJ@pengutronix.de>
+ <Z4tuhzHwiKFIGZ5e@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- kwepemk100013.china.huawei.com (7.202.194.61)
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <Z4tuhzHwiKFIGZ5e@shell.armlinux.org.uk>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-From: Jian Shen <shenjian15@huawei.com>
+On Sat, Jan 18, 2025 at 09:04:07AM +0000, Russell King (Oracle) wrote:
+> On Sat, Jan 18, 2025 at 08:22:15AM +0100, Oleksij Rempel wrote:
+> > On Fri, Jan 17, 2025 at 04:23:52PM +0000, Russell King (Oracle) wrote:
+> > > I'm unsure about many DSA drivers. mt753x:
+> > > 
+> > >         u32 set, mask = LPI_THRESH_MASK | LPI_MODE_EN;
+> > > 
+> > >         if (e->tx_lpi_timer > 0xFFF)
+> > >                 return -EINVAL;
+> > > 
+> > >         set = LPI_THRESH_SET(e->tx_lpi_timer);
+> > >         if (!e->tx_lpi_enabled)
+> > >                 /* Force LPI Mode without a delay */
+> > >                 set |= LPI_MODE_EN;
+> > >         mt7530_rmw(priv, MT753X_PMEEECR_P(port), mask, set);
+> > > 
+> > > Why force LPI *without* a delay if tx_lpi_enabled is false? This
+> > > seems to go against the documented API:
+> > > 
+> > >  * @tx_lpi_enabled: Whether the interface should assert its tx lpi, given
+> > >  *      that eee was negotiated.
+> > 
+> > According to MT7531 manual, I would say, the code is not correct:
+> > https://repo.librerouter.org/misc/lr2/MT7531_switch_Reference_Manual_for_Development_Board.pdf
+> > 
+> > The LPI_MODE_EN_Px bit has following meaning:
+> > 
+> > When there is no packet to be transmitted, and the idle time is greater
+> > than P2_LPI_THRESHOLD, the TXMAC will automatically enter LPI (Low
+> > Power Idle) mode and send EEE LPI frame to the link partner.
+> > 0: LPI mode depends on the P2_LPI_THRESHOLD.
+> > 1: Let the system enter the LPI mode immediately and send EEE LPI frame
+> >    to the link partner.
+> 
+> Okay, so LPI_MODE_EN_Px causes it to disregard the LPI timer, and enter
+> LPI mode immediately. Thus, the code should never set LPI_MODE_EN_Px.
+> 
+> > This chip seems to not have support for tx_lpi_enabled != eee_enabled
+> > configuration.
+> 
+> Sorry, I don't see your reasoning there - and I think your
+> interpretation is different from the documentation (which is
+> the whole point of having a generic implementation in phylib
+> to avoid these kinds of different interpretation.)
+> 
+>  * @eee_enabled: EEE configured mode (enabled/disabled).
+>  * @tx_lpi_enabled: Whether the interface should assert its tx lpi, given
+>  *      that eee was negotiated.
+> 
+>            eee on|off
+>                   Enables/disables the device support of EEE.
+> 
+>            tx-lpi on|off
+>                   Determines whether the device should assert its Tx LPI.
+> 
+> The way phylib interprets eee_enabled is whether EEE is advertised
+> to the remote device or not. If EEE is not advertised, then EEE is
+> not negotiated, and thus EEE will not become active. If EEE is not
+> active, then LPI must not be asserted. tx_lpi_enabled defines whether,
+> given that EEE has been negotiated, whether LPI should be signalled
+> after the LPI timer has expired.
+> 
+> phylib deals with all this logic, and its all encoded into the
+> phydev->enable_tx_lpi flag to give consistency of implementation.
+> 
+> Thus, phydev->enable_tx_lpi is only true when eee_enabled && eee
+> negotiated at the specified speed && tx_lpi_enabled. In that state,
+> LPI is expected to be signalled after the LPI timer has expired.
 
-When unload hclge driver, it tries to disable sriov first for each
-ae_dev node from hnae3_ae_dev_list. If user unloads hns3 driver at
-the time, because it removes all the ae_dev nodes, and it may cause
-oops.
+I mean, the configuration where EEE can be enabled and in active state,
+but TX LPI is disabled: eee_enabled = true; eee_active = true;
+enable_tx_lpi = false. UAPI allows this configuration and it seems to
+work for 100Mbit/s. Atheros documentation call it asymmetric EEE
+operation - where each link partner enters LPI mode independently. In
+comparison, the same documentation calls 1000Mbit EEE mode, symmetric
+operation - where both link partner must enter the LPI mode
+simulatneously.
 
-But we can't simply use hnae3_common_lock for this. Because in the
-process flow of pci_disable_sriov(), it will trigger the remove flow
-of VF, which will also take hnae3_common_lock.
-
-To fixes it, introduce a new mutex to protect the unload process.
-
-Fixes: 0dd8a25f355b ("net: hns3: disable sriov before unload hclge layer")
-Signed-off-by: Jian Shen <shenjian15@huawei.com>
-Signed-off-by: Jijie Shao <shaojijie@huawei.com>
----
- drivers/net/ethernet/hisilicon/hns3/hnae3.c       | 15 +++++++++++++++
- drivers/net/ethernet/hisilicon/hns3/hnae3.h       |  2 ++
- drivers/net/ethernet/hisilicon/hns3/hns3_enet.c   |  2 ++
- .../ethernet/hisilicon/hns3/hns3pf/hclge_main.c   |  2 ++
- .../ethernet/hisilicon/hns3/hns3vf/hclgevf_main.c |  2 ++
- 5 files changed, 23 insertions(+)
-
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hnae3.c b/drivers/net/ethernet/hisilicon/hns3/hnae3.c
-index 9a63fbc69408..b25fb400f476 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hnae3.c
-+++ b/drivers/net/ethernet/hisilicon/hns3/hnae3.c
-@@ -40,6 +40,21 @@ EXPORT_SYMBOL(hnae3_unregister_ae_algo_prepare);
-  */
- static DEFINE_MUTEX(hnae3_common_lock);
- 
-+/* ensure the drivers being unloaded one by one */
-+static DEFINE_MUTEX(hnae3_unload_lock);
-+
-+void hnae3_acquire_unload_lock(void)
-+{
-+	mutex_lock(&hnae3_unload_lock);
-+}
-+EXPORT_SYMBOL(hnae3_acquire_unload_lock);
-+
-+void hnae3_release_unload_lock(void)
-+{
-+	mutex_unlock(&hnae3_unload_lock);
-+}
-+EXPORT_SYMBOL(hnae3_release_unload_lock);
-+
- static bool hnae3_client_match(enum hnae3_client_type client_type)
- {
- 	if (client_type == HNAE3_CLIENT_KNIC ||
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hnae3.h b/drivers/net/ethernet/hisilicon/hns3/hnae3.h
-index 12ba380eb701..4e44f28288f9 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hnae3.h
-+++ b/drivers/net/ethernet/hisilicon/hns3/hnae3.h
-@@ -963,4 +963,6 @@ int hnae3_register_client(struct hnae3_client *client);
- void hnae3_set_client_init_flag(struct hnae3_client *client,
- 				struct hnae3_ae_dev *ae_dev,
- 				unsigned int inited);
-+void hnae3_acquire_unload_lock(void);
-+void hnae3_release_unload_lock(void);
- #endif
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c b/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
-index a7e3b22f641c..9ff797fb36c4 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
-@@ -6002,9 +6002,11 @@ module_init(hns3_init_module);
-  */
- static void __exit hns3_exit_module(void)
- {
-+	hnae3_acquire_unload_lock();
- 	pci_unregister_driver(&hns3_driver);
- 	hnae3_unregister_client(&client);
- 	hns3_dbg_unregister_debugfs();
-+	hnae3_release_unload_lock();
- }
- module_exit(hns3_exit_module);
- 
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
-index db7845009252..3f17b3073e50 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
-@@ -12919,9 +12919,11 @@ static int __init hclge_init(void)
- 
- static void __exit hclge_exit(void)
- {
-+	hnae3_acquire_unload_lock();
- 	hnae3_unregister_ae_algo_prepare(&ae_algo);
- 	hnae3_unregister_ae_algo(&ae_algo);
- 	destroy_workqueue(hclge_wq);
-+	hnae3_release_unload_lock();
- }
- module_init(hclge_init);
- module_exit(hclge_exit);
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_main.c b/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_main.c
-index 163c6e59ea4c..9ba767740a04 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_main.c
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_main.c
-@@ -3410,8 +3410,10 @@ static int __init hclgevf_init(void)
- 
- static void __exit hclgevf_exit(void)
- {
-+	hnae3_acquire_unload_lock();
- 	hnae3_unregister_ae_algo(&ae_algovf);
- 	destroy_workqueue(hclgevf_wq);
-+	hnae3_release_unload_lock();
- }
- module_init(hclgevf_init);
- module_exit(hclgevf_exit);
 -- 
-2.33.0
-
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
