@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-159536-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159537-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D83CA15B4C
-	for <lists+netdev@lfdr.de>; Sat, 18 Jan 2025 04:50:44 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CAEC4A15B4D
+	for <lists+netdev@lfdr.de>; Sat, 18 Jan 2025 04:50:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3DBA73A9200
-	for <lists+netdev@lfdr.de>; Sat, 18 Jan 2025 03:50:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 004977A2E80
+	for <lists+netdev@lfdr.de>; Sat, 18 Jan 2025 03:50:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9855513C809;
-	Sat, 18 Jan 2025 03:50:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64E56149C53;
+	Sat, 18 Jan 2025 03:50:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fFgHe2IY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n/CJhGQw"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72B6213B791
-	for <netdev@vger.kernel.org>; Sat, 18 Jan 2025 03:50:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D3381474A9;
+	Sat, 18 Jan 2025 03:50:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737172227; cv=none; b=AuV1PYQ4V1EP0mo8yoMflZfKxzD5y1wz6Xs94xo2gvzelr4GDx9YFdryYcR3VGc33SpHvH1XVj49Qv2LU7ng/gkmN4aV0f8JtUUHd8PjLfwSxsPCinYMBQZxL0dM082jo3XbiCea+pBbFVWT25JWv8hoTdNIWySrhelzjhGWzNU=
+	t=1737172229; cv=none; b=EJ0mI4l6Vx3321t2FNHU/S4x9zDh2G8IpsMQwvXWgsBimSwF6rlsaKSOpxdtBvgYTXSOF50QEL1P/M4hBAZRSBFiT/HhuKkXk3W8BjcvOvb+CEYFaSF2dC9xTU+l55b/8nfy2TUBy6pvYBuU2q3tTLW/lsqa0JUZjISva+IIOJA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737172227; c=relaxed/simple;
-	bh=bE2z+xcvhL06HGPVRIP1ZXbLvXQiiLud1zQnvIN8UKk=;
+	s=arc-20240116; t=1737172229; c=relaxed/simple;
+	bh=MnoqE/Q6g5coOLxuf1HvIkumQhXCkhEEYtPnQgKYJ/w=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=nGrIm2Bbkv7Ww3gxA/evBjnd4BRdM9dt8oa/RdhcKl8HgAqWx7miCu6ZKrKgILEZfbil+OzQQBrBtooFVy4n5dRNSBjSpyICXftL0C13IhkqbHG4Jv21NbO/VdYLu/MtSjL6fGSGeFYTYLMHbi3h/wp1wBm2L9V/RaSqlUQpl6A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fFgHe2IY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 486FCC4CEE7;
-	Sat, 18 Jan 2025 03:50:27 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=aDXDB6XngnTTJfT9lq761krW1izUJHkgtmTgXxE1OcXIQ8D56I741Au0rN7INv25UuLp+6a3MerBdVDkhMFh1KcIXoin8bkyzBkHYBJ4P0PwSOdHJ/sDeNd5Rj4vZLO6GFRrSqVWxHEBFxPvJ0GWDCI6z2+aGOQ5Euc0wHBiLKk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n/CJhGQw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C2C9EC4CED1;
+	Sat, 18 Jan 2025 03:50:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737172227;
-	bh=bE2z+xcvhL06HGPVRIP1ZXbLvXQiiLud1zQnvIN8UKk=;
+	s=k20201202; t=1737172228;
+	bh=MnoqE/Q6g5coOLxuf1HvIkumQhXCkhEEYtPnQgKYJ/w=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=fFgHe2IYMiQn1iuEXczQkX0WGDhc5b68RdvFdHI6+cPcN/7oKbRUE68Z35NJSsHt3
-	 64/l8lwbDlr8WHtRo7qqJ1EHjEI7e49XTMnHaWtBOobQM8+F33PvswhtqlLm8MauTD
-	 GXoEWa0tkUEDJroOjXhM7UkO85KO2TkC8UMMOXGC4gndiCskanmOt5T9JLLkgaM7Aw
-	 3FNrOiIzydz++Gv0SWLGDl6ABT9c8BxXHB7GxV8P4ZIHakDXuT0ntH4WmmG/OLKtI7
-	 UVORkFRx4MUTx+Vh/lemluel4oppfJ91cXOdzBOjWa/EUnXR8T9vTdjYszBXKb+yN4
-	 MxqeeRpL/EP7g==
+	b=n/CJhGQwvOnfH3zN6hzM4BYWL4Y3UluChtUcnfSNJgUpPEPP6PaMlcliK/j6omwkV
+	 ze95xMVbNQHsFVlNyJzTEdDY2aAM3LmYUbEhDdx+QLsB91EFE0UQgF9m8Y4cpBK28q
+	 JeRM21+PYyF315aQH3C9y5vSFvSnExoYasa7ppWIvI9oJfPkqfwrEF92UE84SW7H21
+	 +6gj+1SwTpgnVfgsSxAAM55Ljf3TU05vBHtjJjPDI3mwsyac7Z7XeyyPtCg48JmvZc
+	 caYAbT8a57q2SyOWVPSYl5CArOlFCmh++eR3w8w3HHKnjNPtcP5BPB9EU4ZcJiDDFD
+	 eoR7EDYit76Fg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAD8F380AA62;
-	Sat, 18 Jan 2025 03:50:51 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70B67380AA62;
+	Sat, 18 Jan 2025 03:50:53 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,38 +52,38 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2] gtp: Prepare ip4_route_output_gtp() to
- .flowi4_tos conversion.
+Subject: Re: [PATCH net-next] selftests: net: give up on the cmsg_time accuracy on
+ slow machines
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <173717225074.2330660.3713240080176094788.git-patchwork-notify@kernel.org>
-Date: Sat, 18 Jan 2025 03:50:50 +0000
-References: <06bdb310a075355ff059cd32da2efc29a63981c9.1737034675.git.gnault@redhat.com>
-In-Reply-To: <06bdb310a075355ff059cd32da2efc29a63981c9.1737034675.git.gnault@redhat.com>
-To: Guillaume Nault <gnault@redhat.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, netdev@vger.kernel.org, horms@kernel.org,
- pablo@netfilter.org, laforge@gnumonks.org, andrew+netdev@lunn.ch,
- osmocom-net-gprs@lists.osmocom.org, idosch@nvidia.com
+ <173717225214.2330660.14972461592963136332.git-patchwork-notify@kernel.org>
+Date: Sat, 18 Jan 2025 03:50:52 +0000
+References: <20250116020105.931338-1-kuba@kernel.org>
+In-Reply-To: <20250116020105.931338-1-kuba@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, shuah@kernel.org,
+ linux-kselftest@vger.kernel.org, willemdebruijn.kernel@gmail.com
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu, 16 Jan 2025 14:39:38 +0100 you wrote:
-> Use inet_sk_dscp() to get the socket DSCP value as dscp_t, instead of
-> ip_sock_rt_tos() which returns a __u8. This will ease the conversion
-> of fl4->flowi4_tos to dscp_t, which now just becomes a matter of
-> dropping the inet_dscp_to_dsfield() call.
+On Wed, 15 Jan 2025 18:01:05 -0800 you wrote:
+> Commit b9d5f5711dd8 ("selftests: net: increase the delay for relative
+> cmsg_time.sh test") widened the accepted value range 8x but we still
+> see flakes (at a rate of around 7%).
 > 
-> Signed-off-by: Guillaume Nault <gnault@redhat.com>
+> Return XFAIL for the most timing sensitive test on slow machines.
+> 
+> Before:
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v2] gtp: Prepare ip4_route_output_gtp() to .flowi4_tos conversion.
-    https://git.kernel.org/netdev/net-next/c/2ce7289f180d
+  - [net-next] selftests: net: give up on the cmsg_time accuracy on slow machines
+    https://git.kernel.org/netdev/net-next/c/54ea680b759c
 
 You are awesome, thank you!
 -- 
