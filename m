@@ -1,264 +1,132 @@
-Return-Path: <netdev+bounces-159645-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159646-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14BAFA16353
-	for <lists+netdev@lfdr.de>; Sun, 19 Jan 2025 18:22:59 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D666DA16359
+	for <lists+netdev@lfdr.de>; Sun, 19 Jan 2025 18:32:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7FA0218862F0
-	for <lists+netdev@lfdr.de>; Sun, 19 Jan 2025 17:22:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 82426160673
+	for <lists+netdev@lfdr.de>; Sun, 19 Jan 2025 17:32:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CC5F1E0DEE;
-	Sun, 19 Jan 2025 17:21:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1A5B1DF254;
+	Sun, 19 Jan 2025 17:32:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Dpa5oybn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.netfilter.org (mail.netfilter.org [217.70.188.207])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 808201DFE15;
-	Sun, 19 Jan 2025 17:21:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.188.207
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CBAA15350B;
+	Sun, 19 Jan 2025 17:31:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737307271; cv=none; b=BQmDPjXV0pzBVvYYoYVMo1my7Xie2CQNpx6DGdVBAeD/0MW0xK1VOpryz9iDr6Y8Tt3d5gza2TBPMtIfPermeXgRWTTMtOu/meBXBv34bpmFYt9bwkQkgQVFa+X4z3nPccex7yIHxf+yTuOItwS236sfe7P/3Q6zbVFBVfl1mHc=
+	t=1737307920; cv=none; b=TOOKsVYSqqXhP59Px/gq2w9TwNyixo+h3b5gtqKvYY9uKya/EjOrf3MloZLmZq6wVK0Y313z6iw/fbmY+Idcln4ynH+0Fz7k9rcB7YWXz6dxKQ3BlKvOC4ewAGE+Xh5vrgGV9lTj+TUY9F/AYS51+koeJPYzKZOZakONRjwuZAQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737307271; c=relaxed/simple;
-	bh=OpB1wcSeP0EBoDeqzXyMQooQEyNmoff0gqsajhtKBUg=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=f2jvjQbCnGRDn8c5pCJBtbSXqjwVTbiaUChfhBx7VKDS6LkaTmm4XQvPuXfYbA9ulRKMJtqdESPYc9K33eoNdSM8kl6QQSQudro7JaP6G3mlQ43dvb0E6iw5ylWDZ9kAz7ZJvX1EPPC5P+ZdU0QCHdOZM6oGIFcCSxoBKOacr+Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; arc=none smtp.client-ip=217.70.188.207
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: netfilter-devel@vger.kernel.org
-Cc: davem@davemloft.net,
-	netdev@vger.kernel.org,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	fw@strlen.de
-Subject: [PATCH net-next 14/14] netfilter: flowtable: add CLOSING state
-Date: Sun, 19 Jan 2025 18:20:51 +0100
-Message-Id: <20250119172051.8261-15-pablo@netfilter.org>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20250119172051.8261-1-pablo@netfilter.org>
-References: <20250119172051.8261-1-pablo@netfilter.org>
+	s=arc-20240116; t=1737307920; c=relaxed/simple;
+	bh=RCbJS8qDkfjIat7A5HCBX9+z/JEJVKPnWrWjcfLZw4k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=X/yotVah6Mqdc4wFBf9KgA4L6NeluIV+B9DMfXd1wigUf5FexZiAmiwXvh1h59MzTJddiRiu/o5CyifCeTdmthEEYe3BxkR5JDmC06dWr926Mb5nWrEY6/Pcu2zMyM1Pd0u4gSrDT47uK/HS7VOq2elHxCJ9xWdIjp9WE1nR3Q0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Dpa5oybn; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=AqXJtOIf4rCW4A5e2bQ1EyB3uRGWzyR+eKwMln2F0eU=; b=Dpa5oybnNfPHVmxV3G/PBBg4wO
+	ePgzRXYgm9RJQ+5DVbWvV6RQeGb6G3Pji/0gWgyWvwVydMdgJmjCfe5oqfSAmkXCa6raJn2TsBodQ
+	OkLck7d8V2VdHcoV4XPy0srE7ynBEfLEYZXnQTzAED9gj04OJ5ihlKCXZYBjCbXH9Es8=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tZZ9E-0066tP-JT; Sun, 19 Jan 2025 18:31:44 +0100
+Date: Sun, 19 Jan 2025 18:31:44 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Sky Huang <SkyLake.Huang@mediatek.com>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Qingfang Deng <dqfext@gmail.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org,
+	Steven Liu <Steven.Liu@mediatek.com>
+Subject: Re: [PATCH net-next 3/3] net: phy: mediatek: add driver for built-in
+ 2.5G ethernet PHY on MT7988
+Message-ID: <df67baa5-0f3d-4a42-a327-00452787908a@lunn.ch>
+References: <20250116012159.3816135-1-SkyLake.Huang@mediatek.com>
+ <20250116012159.3816135-4-SkyLake.Huang@mediatek.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250116012159.3816135-4-SkyLake.Huang@mediatek.com>
 
-tcp rst/fin packet triggers an immediate teardown of the flow which
-results in sending flows back to the classic forwarding path.
+> +	np = of_find_compatible_node(NULL, NULL, "mediatek,2p5gphy-fw");
+> +	if (!np)
+> +		return -ENOENT;
 
-This behaviour was introduced by:
+The device tree binding need documenting.
 
-  da5984e51063 ("netfilter: nf_flow_table: add support for sending flows back to the slow path")
-  b6f27d322a0a ("netfilter: nf_flow_table: tear down TCP flows if RST or FIN was seen")
+> +	/* Write magic number to safely stall MCU */
+> +	phy_write_mmd(phydev, MDIO_MMD_VEND1, 0x800e, 0x1100);
+> +	phy_write_mmd(phydev, MDIO_MMD_VEND1, 0x800f, 0x00df);
 
-whose goal is to expedite removal of flow entries from the hardware
-table. Before these patches, the flow was released after the flow entry
-timed out.
+0x1100 and 0x00df are magic numbers, bit 0x800e and 0x800f are
+not. Please add #defines.
 
-However, this approach leads to packet races when restoring the
-conntrack state as well as late flow re-offload situations when the TCP
-connection is ending.
 
-This patch adds a new CLOSING state that is is entered when tcp rst/fin
-packet is seen. This allows for an early removal of the flow entry from
-the hardware table. But the flow entry still remains in software, so tcp
-packets to shut down the flow are not sent back to slow path.
+> +
+> +	for (i = 0; i < MT7988_2P5GE_PMB_FW_SIZE - 1; i += 4)
+> +		writel(*((uint32_t *)(fw->data + i)), pmb_addr + i);
+> +	dev_info(dev, "Firmware date code: %x/%x/%x, version: %x.%x\n",
+> +		 be16_to_cpu(*((__be16 *)(fw->data +
+> +					  MT7988_2P5GE_PMB_FW_SIZE - 8))),
+> +		 *(fw->data + MT7988_2P5GE_PMB_FW_SIZE - 6),
+> +		 *(fw->data + MT7988_2P5GE_PMB_FW_SIZE - 5),
+> +		 *(fw->data + MT7988_2P5GE_PMB_FW_SIZE - 2),
+> +		 *(fw->data + MT7988_2P5GE_PMB_FW_SIZE - 1));
+> +
+> +	writew(reg & ~MD32_EN, mcu_csr_base + MD32_EN_CFG);
+> +	writew(reg | MD32_EN, mcu_csr_base + MD32_EN_CFG);
+> +	phy_set_bits(phydev, MII_BMCR, BMCR_RESET);
+> +	/* We need a delay here to stabilize initialization of MCU */
+> +	usleep_range(7000, 8000);
+> +	dev_info(dev, "Firmware loading/trigger ok.\n");
 
-If syn packet is seen from this new CLOSING state, then this flow enters
-teardown state, ct state is set to TCP_CONNTRACK_CLOSE state and packet
-is sent to slow path, so this TCP reopen scenario can be handled by
-conntrack. TCP_CONNTRACK_CLOSE provides a small timeout that aims at
-quickly releasing this stale entry from the conntrack table.
+We generally don't spam the log for "Happy Days" conditions. Please
+only log if firmware download fails.
 
-Moreover, skip hardware re-offload from flowtable software packet if the
-flow is in CLOSING state.
+> +static int mt798x_2p5ge_phy_get_features(struct phy_device *phydev)
+> +{
+> +	int ret;
+> +
+> +	ret = genphy_c45_pma_read_abilities(phydev);
+> +	if (ret)
+> +		return ret;
+> +
+> +	/* This phy can't handle collision, and neither can (XFI)MAC it's
+> +	 * connected to. Although it can do HDX handshake, it doesn't support
+> +	 * CSMA/CD that HDX requires.
+> +	 */
+> +	linkmode_clear_bit(ETHTOOL_LINK_MODE_100baseT_Half_BIT,
+> +			   phydev->supported);
 
-Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
----
- include/net/netfilter/nf_flow_table.h |  1 +
- net/netfilter/nf_flow_table_core.c    | 70 ++++++++++++++++++++-------
- net/netfilter/nf_flow_table_ip.c      |  6 ++-
- 3 files changed, 58 insertions(+), 19 deletions(-)
+So it can do 10BaseT_Half? What about 1000BaseT_Half?
 
-diff --git a/include/net/netfilter/nf_flow_table.h b/include/net/netfilter/nf_flow_table.h
-index b63d53bb9dd6..d711642e78b5 100644
---- a/include/net/netfilter/nf_flow_table.h
-+++ b/include/net/netfilter/nf_flow_table.h
-@@ -163,6 +163,7 @@ struct flow_offload_tuple_rhash {
- enum nf_flow_flags {
- 	NF_FLOW_SNAT,
- 	NF_FLOW_DNAT,
-+	NF_FLOW_CLOSING,
- 	NF_FLOW_TEARDOWN,
- 	NF_FLOW_HW,
- 	NF_FLOW_HW_DYING,
-diff --git a/net/netfilter/nf_flow_table_core.c b/net/netfilter/nf_flow_table_core.c
-index 35396f568ecd..9d8361526f82 100644
---- a/net/netfilter/nf_flow_table_core.c
-+++ b/net/netfilter/nf_flow_table_core.c
-@@ -161,11 +161,23 @@ void flow_offload_route_init(struct flow_offload *flow,
- }
- EXPORT_SYMBOL_GPL(flow_offload_route_init);
- 
--static void flow_offload_fixup_tcp(struct nf_conn *ct)
-+static inline bool nf_flow_has_expired(const struct flow_offload *flow)
-+{
-+	return nf_flow_timeout_delta(flow->timeout) <= 0;
-+}
-+
-+static void flow_offload_fixup_tcp(struct nf_conn *ct, u8 tcp_state)
- {
- 	struct ip_ct_tcp *tcp = &ct->proto.tcp;
- 
- 	spin_lock_bh(&ct->lock);
-+	if (tcp->state != tcp_state)
-+		tcp->state = tcp_state;
-+
-+	/* syn packet triggers the TCP reopen case from conntrack. */
-+	if (tcp->state == TCP_CONNTRACK_CLOSE)
-+		ct->proto.tcp.seen[0].flags |= IP_CT_TCP_FLAG_CLOSE_INIT;
-+
- 	/* Conntrack state is outdated due to offload bypass.
- 	 * Clear IP_CT_TCP_FLAG_MAXACK_SET, otherwise conntracks
- 	 * TCP reset validation will fail.
-@@ -177,36 +189,58 @@ static void flow_offload_fixup_tcp(struct nf_conn *ct)
- 	spin_unlock_bh(&ct->lock);
- }
- 
--static void flow_offload_fixup_ct(struct nf_conn *ct)
-+static void flow_offload_fixup_ct(struct flow_offload *flow)
- {
-+	struct nf_conn *ct = flow->ct;
- 	struct net *net = nf_ct_net(ct);
- 	int l4num = nf_ct_protonum(ct);
-+	bool expired, closing = false;
-+	u32 offload_timeout = 0;
- 	s32 timeout;
- 
- 	if (l4num == IPPROTO_TCP) {
--		struct nf_tcp_net *tn = nf_tcp_pernet(net);
-+		const struct nf_tcp_net *tn = nf_tcp_pernet(net);
-+		u8 tcp_state;
- 
--		flow_offload_fixup_tcp(ct);
-+		/* Enter CLOSE state if fin/rst packet has been seen, this
-+		 * allows TCP reopen from conntrack. Otherwise, pick up from
-+		 * the last seen TCP state.
-+		 */
-+		closing = test_bit(NF_FLOW_CLOSING, &flow->flags);
-+		if (closing) {
-+			flow_offload_fixup_tcp(ct, TCP_CONNTRACK_CLOSE);
-+			timeout = READ_ONCE(tn->timeouts[TCP_CONNTRACK_CLOSE]);
-+			expired = false;
-+		} else {
-+			tcp_state = READ_ONCE(ct->proto.tcp.state);
-+			flow_offload_fixup_tcp(ct, tcp_state);
-+			timeout = READ_ONCE(tn->timeouts[tcp_state]);
-+			expired = nf_flow_has_expired(flow);
-+		}
-+		offload_timeout = READ_ONCE(tn->offload_timeout);
- 
--		timeout = tn->timeouts[ct->proto.tcp.state];
--		timeout -= tn->offload_timeout;
- 	} else if (l4num == IPPROTO_UDP) {
--		struct nf_udp_net *tn = nf_udp_pernet(net);
-+		const struct nf_udp_net *tn = nf_udp_pernet(net);
- 		enum udp_conntrack state =
- 			test_bit(IPS_SEEN_REPLY_BIT, &ct->status) ?
- 			UDP_CT_REPLIED : UDP_CT_UNREPLIED;
- 
--		timeout = tn->timeouts[state];
--		timeout -= tn->offload_timeout;
-+		timeout = READ_ONCE(tn->timeouts[state]);
-+		expired = nf_flow_has_expired(flow);
-+		offload_timeout = READ_ONCE(tn->offload_timeout);
- 	} else {
- 		return;
- 	}
- 
-+	if (expired)
-+		timeout -= offload_timeout;
-+
- 	if (timeout < 0)
- 		timeout = 0;
- 
--	if (nf_flow_timeout_delta(READ_ONCE(ct->timeout)) > (__s32)timeout)
--		WRITE_ONCE(ct->timeout, nfct_time_stamp + timeout);
-+	if (closing ||
-+	    nf_flow_timeout_delta(READ_ONCE(ct->timeout)) > (__s32)timeout)
-+		nf_ct_refresh(ct, timeout);
- }
- 
- static void flow_offload_route_release(struct flow_offload *flow)
-@@ -326,18 +360,14 @@ void flow_offload_refresh(struct nf_flowtable *flow_table,
- 	else
- 		return;
- 
--	if (likely(!nf_flowtable_hw_offload(flow_table)))
-+	if (likely(!nf_flowtable_hw_offload(flow_table)) ||
-+	    test_bit(NF_FLOW_CLOSING, &flow->flags))
- 		return;
- 
- 	nf_flow_offload_add(flow_table, flow);
- }
- EXPORT_SYMBOL_GPL(flow_offload_refresh);
- 
--static inline bool nf_flow_has_expired(const struct flow_offload *flow)
--{
--	return nf_flow_timeout_delta(flow->timeout) <= 0;
--}
--
- static void flow_offload_del(struct nf_flowtable *flow_table,
- 			     struct flow_offload *flow)
- {
-@@ -354,7 +384,7 @@ void flow_offload_teardown(struct flow_offload *flow)
- {
- 	clear_bit(IPS_OFFLOAD_BIT, &flow->ct->status);
- 	set_bit(NF_FLOW_TEARDOWN, &flow->flags);
--	flow_offload_fixup_ct(flow->ct);
-+	flow_offload_fixup_ct(flow);
- }
- EXPORT_SYMBOL_GPL(flow_offload_teardown);
- 
-@@ -542,6 +572,10 @@ static void nf_flow_offload_gc_step(struct nf_flowtable *flow_table,
- 		} else {
- 			flow_offload_del(flow_table, flow);
- 		}
-+	} else if (test_bit(NF_FLOW_CLOSING, &flow->flags) &&
-+		   test_bit(NF_FLOW_HW, &flow->flags) &&
-+		   !test_bit(NF_FLOW_HW_DYING, &flow->flags)) {
-+		nf_flow_offload_del(flow_table, flow);
- 	} else if (test_bit(NF_FLOW_HW, &flow->flags)) {
- 		nf_flow_offload_stats(flow_table, flow);
- 	}
-diff --git a/net/netfilter/nf_flow_table_ip.c b/net/netfilter/nf_flow_table_ip.c
-index a22856106383..97c6eb8847a0 100644
---- a/net/netfilter/nf_flow_table_ip.c
-+++ b/net/netfilter/nf_flow_table_ip.c
-@@ -28,11 +28,15 @@ static int nf_flow_state_check(struct flow_offload *flow, int proto,
- 		return 0;
- 
- 	tcph = (void *)(skb_network_header(skb) + thoff);
--	if (unlikely(tcph->fin || tcph->rst)) {
-+	if (tcph->syn && test_bit(NF_FLOW_CLOSING, &flow->flags)) {
- 		flow_offload_teardown(flow);
- 		return -1;
- 	}
- 
-+	if ((tcph->fin || tcph->rst) &&
-+	    !test_bit(NF_FLOW_CLOSING, &flow->flags))
-+		set_bit(NF_FLOW_CLOSING, &flow->flags);
-+
- 	return 0;
- }
- 
--- 
-2.30.2
+As you said somewhere, 10/100/1G are not in the C45 space. So does
+genphy_c45_pma_read_abilities() report these features?
 
+	Andrew
 
