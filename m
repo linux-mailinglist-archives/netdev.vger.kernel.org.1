@@ -1,159 +1,222 @@
-Return-Path: <netdev+bounces-159613-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159614-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC297A16026
-	for <lists+netdev@lfdr.de>; Sun, 19 Jan 2025 05:11:30 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 504ECA1604A
+	for <lists+netdev@lfdr.de>; Sun, 19 Jan 2025 06:14:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DCD4B3A6D45
-	for <lists+netdev@lfdr.de>; Sun, 19 Jan 2025 04:11:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 481C9162AED
+	for <lists+netdev@lfdr.de>; Sun, 19 Jan 2025 05:14:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41CEE126C13;
-	Sun, 19 Jan 2025 04:11:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 286631F5FA;
+	Sun, 19 Jan 2025 05:14:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="e6d8tUlO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f206.google.com (mail-il1-f206.google.com [209.85.166.206])
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72EAE61FFE
-	for <netdev@vger.kernel.org>; Sun, 19 Jan 2025 04:11:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.206
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38AF610F9
+	for <netdev@vger.kernel.org>; Sun, 19 Jan 2025 05:14:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737259884; cv=none; b=BtiG42CbDkqw7clt2UTUYOFQdEdMJdNFMsrhR2t7sOSl9F0T2pUvV/i0LcqTIQIX1vWX2cxoejh1mYH/KvoOZ9cbi3SRMi1MSkemv5shv0vCVoj9nDy7SkHqMpkMXzw45UQ3X9uMl/T1UkU4pyYBVu7l+zyGIPRW7k38zRherrs=
+	t=1737263668; cv=none; b=B0xhtINCKeK9+IN9vSckcPL8m4ZzAoKmgeMGlQl4Adymz0czzYy/yHxcSOMHDm1ntC8ZYpY8xc4UwYv/TQw/U/lMXP7xTT3tKT8pgtzUs9oR0vcSYvpxuzi1v3adIRWxgNKYCaf/2nHohxaKx1I9fcTKLDLgm/X4D3JslMt4rgo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737259884; c=relaxed/simple;
-	bh=YG/GLGiiADUSprgGJZtncrCutdPRsmIdOw2QdYO0YBc=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=QP/fj83AW4S/xjU5xzLgtr5xotj72sYotYYVMQg/fEPmPmWptmtgxqtY39hQZIShQbx8k3/nIZNGykfhCLeSNc781mk3q+okHXGAfpl1r8hTJlpqWpNjxza25qWapbcwb0q5VUmih4GHMRgLDr/7UvlmKWQht++NeSpbWK9SglE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.206
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f206.google.com with SMTP id e9e14a558f8ab-3a7e39b48a2so63210555ab.0
-        for <netdev@vger.kernel.org>; Sat, 18 Jan 2025 20:11:22 -0800 (PST)
+	s=arc-20240116; t=1737263668; c=relaxed/simple;
+	bh=n8Cs/m9Npt6kWEzUJ3m2TOhJ3iH8Y9J3i5YIF32wQYo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ukPIxuIJcxzrh1+fuyC96TWSWQIVsJT8jDneeCgzi3I3zt80SS96y2slfetWCCabg9AbBNSTmg4Rmg6cJ6FD4186Aq/dHDF8V+lxltzF7Pd67jBPNM5FKrZePGjkt8HheyqdGXNgYCgVdkm9CaEAPZ4FUuf7T4SiLFOaapdb+O4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=e6d8tUlO; arc=none smtp.client-ip=209.85.208.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-5d9f06f8cf2so6573158a12.3
+        for <netdev@vger.kernel.org>; Sat, 18 Jan 2025 21:14:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1737263664; x=1737868464; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=csOJUWTIYPkEm97B8IOj54DVFqdEGAlFBA+MOBRtzQk=;
+        b=e6d8tUlOr0ET4mS1ntRlBxG0vMH/PikPermz6xnszVzgAgKZDbmAVgPRNJZobBQRVy
+         yG/QV2JgBbAAL4QXdZL0y1gnlN8xqGrq88dQ601JjnRnmYbTrSvRVm/gKCY3AKWGkITr
+         X/SncDU3e4aL/c/URAWAFxBxayaz1ANYo+CtM=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737259881; x=1737864681;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=yU2ouqUVh1gYtObA+Pke5REWteTSMcGwVyeMsYQfnmI=;
-        b=qqTfMrbKD+BudVujp7lb4EZhGxum6socKdBQoFsGuzSr94kj6staolAAwvRJz/+0eJ
-         WtZLt9B9CpLdNe5crMX1ii/HXPlGqcuqdlT4RMTfrP2uCHxBGDNWFmeHBCUI0xTJQ8S6
-         PATpo39a/E+pVYh9TIM3WIYG5WI7MjW4op6IO1kJIpBtaH9r/lpIDztPsuArT+gPJt/e
-         EYl302/mOn6HN5ElsccYwXLlmM2F8XC2EZ226NdAYNgmevi340pvP1AdxV4bs8tWkI25
-         0fk4DJuapUDZ5m5qFmmAUYYGkMQ9FdICrW9utpDFyRhoUvpDGtrd4CtpVTf/DFnFyIdl
-         tvIg==
-X-Forwarded-Encrypted: i=1; AJvYcCUmYXcoxxHGPXS9zvtIinY9eLPD9D5dvyIbFwEdTqNCDsqZN2yhO+aMHwuEufo4BUn0j3syUzA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxr9WjBIYXvdznTW68NkVg1RDY7xXHtk3tW3kdOaT8nWLKHqtCo
-	WgiV2l6Ar5GJcxlp1f7LAKAXnECOvT+5SOtMKGqI7JMwN8vZjIZNuRUzLTui8b7/ABwhyyAa1mH
-	so3VShmcZbkKHSWLOn9IznKgQ+LxTlPvwt6Fe3uwUiFPSMl4+k7psESY=
-X-Google-Smtp-Source: AGHT+IGn/0yzXjNCsAwNyQOq5Pc8Cqii7fBfCJ9axg9+o5IoP9ewhTfo0OCM1F3tGe8bA3X0XcwekYr1bHgciygGqMZKWTudfpHx
+        d=1e100.net; s=20230601; t=1737263664; x=1737868464;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=csOJUWTIYPkEm97B8IOj54DVFqdEGAlFBA+MOBRtzQk=;
+        b=Fcs5TnHG9Tg9mZuBmhAMQg0tINTkbd19D97a56MXq6N8V+xTkpZgyis+9PNf3Youy1
+         2Rl0hFSxYMI1VkrT/hb0rwUkXD/sVzdecE2CMhcr/sD8SprEdOKgiD5FOpZCH+GZjkra
+         8zLg0Tgo6CKds9LLbPJFHYodPW36ZUl4pS8w/xyYOPdcN2RvjhcXmH310JBekaepdIBd
+         oUmukaCzOJzA6Dnw4L0yhLdjLe96kJucLLePezglYvBDekj3Gl8wraph/ScxC3HVMXsh
+         FiK2NPHoZQEEt9Oe87y1MEZUU909OoSPX9irMj1DF1XMjFwsRkLxy6jYi1S01mHXXgOc
+         oNhA==
+X-Forwarded-Encrypted: i=1; AJvYcCU2mWfxBZ3XsQodpH2wKZsr0dDKmT6Y7Xp3Ggi0u+CkX2rg/nNchu82Ol73LNuykAdmSxGJETc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YymLcXlg7M58mSDWjUGbIAteb7t3zUkAXNlefJJFisywGnbPo/i
+	iuCzvLiXHCwFmM51PAtX7QyBzEZ/p69skndFFes7vZfAIH3BvkU9Dz5ZXAoTiFSqmgctOJVlGIm
+	GxJWSEMdAljZxwbzkgGa86g8VfAMB1S2ZLl1d
+X-Gm-Gg: ASbGncuEEqLGZLanCBJU0vA6kUrSTYwB+jkLDZlNazXVgxq7riLtkQzimjvnBzs20UP
+	STPRTokg0iyKVHU/aHl5doTNykN/cuZk1v8UqlymCeue7ONl+Ag==
+X-Google-Smtp-Source: AGHT+IFcPp9vFYO4IJU4/0f/k5vQ6LfM4+MNeo6GYImvC27Cda6RMlLFSyqIleyjtCX+WMc3YtcuAs4giSUvT1/g3mM=
+X-Received: by 2002:a05:6402:13d1:b0:5d1:2377:5ae2 with SMTP id
+ 4fb4d7f45d1cf-5db7d2e8fecmr6795909a12.7.1737263664452; Sat, 18 Jan 2025
+ 21:14:24 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1a47:b0:3ce:85a3:cca4 with SMTP id
- e9e14a558f8ab-3cf7449520fmr69174035ab.15.1737259881564; Sat, 18 Jan 2025
- 20:11:21 -0800 (PST)
-Date: Sat, 18 Jan 2025 20:11:21 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <678c7b69.050a0220.303755.0045.GAE@google.com>
-Subject: [syzbot] [rdma?] WARNING in rdma_restrack_clean
-From: syzbot <syzbot+65a3b37f91d0382b77fd@syzkaller.appspotmail.com>
-To: jgg@ziepe.ca, leon@kernel.org, linux-kernel@vger.kernel.org, 
-	linux-rdma@vger.kernel.org, netdev@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
+References: <20250119020518.1962249-1-kuba@kernel.org>
+In-Reply-To: <20250119020518.1962249-1-kuba@kernel.org>
+From: Michael Chan <michael.chan@broadcom.com>
+Date: Sat, 18 Jan 2025 21:14:12 -0800
+X-Gm-Features: AbW1kva5nxTt9VF88pAyfgSSBqYYa62HYODxRubC1Sar-7T2xvAQVRSfhxqSe0M
+Message-ID: <CACKFLi=XNv5wA6J-5mqk1uVmiCLgg4s+4j7Nk9_eDsZYLErGNA@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 0/7] net: ethtool: fixes for HDS threshold
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, 
+	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, 
+	pavan.chebbi@broadcom.com, ap420073@gmail.com
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="0000000000009f3bb0062c0837d6"
+
+--0000000000009f3bb0062c0837d6
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello,
+On Sat, Jan 18, 2025 at 6:05=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> Quick follow up on the HDS threshold work, since the merge window
+> is upon us.
+>
+> Fix the bnxt implementation to apply the settings right away,
+> because we update the parameters _after_ configuring HW user
+> needed to reconfig the device twice to get the settings to stick.
+>
+> For this I took the liberty of moving the config to a separate
+> struct. This follows my original thinking for the queue API.
+> It should also fit more neatly into how many drivers which
+> support safe config update operate. Drivers can allocate
+> new objects using the "pending" struct.
+>
+> netdevsim:
+>
+>   KTAP version 1
+>   1..7
+>   ok 1 hds.get_hds
+>   ok 2 hds.get_hds_thresh
+>   ok 3 hds.set_hds_disable
+>   ok 4 hds.set_hds_enable
+>   ok 5 hds.set_hds_thresh_zero
+>   ok 6 hds.set_hds_thresh_max
+>   ok 7 hds.set_hds_thresh_gt
+>   # Totals: pass:7 fail:0 xfail:0 xpass:0 skip:0 error:0
+>
+> bnxt:
+>
+>   KTAP version 1
+>   1..7
+>   ok 1 hds.get_hds
+>   ok 2 hds.get_hds_thresh
+>   ok 3 hds.set_hds_disable # SKIP disabling of HDS not supported by the d=
+evice
+>   ok 4 hds.set_hds_enable
+>   ok 5 hds.set_hds_thresh_zero
+>   ok 6 hds.set_hds_thresh_max
+>   ok 7 hds.set_hds_thresh_gt
+>   # Totals: pass:6 fail:0 xfail:0 xpass:0 skip:1 error:0
+>
+> v2:
+>  - make sure we always manipulate cfg_pending under rtnl_lock
+>  - split patch 2 into 2+3 for ease of review
+> v1: https://lore.kernel.org/20250117194815.1514410-1-kuba@kernel.org
 
-syzbot found the following issue on:
+For the series,
+Reviewed-by: Michael Chan <michael.chan@broadcom.com>
 
-HEAD commit:    c3812b15000c Merge tag 'scsi-fixes' of git://git.kernel.or..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=13c2bcb0580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=aadf89e2f6db86cc
-dashboard link: https://syzkaller.appspot.com/bug?extid=65a3b37f91d0382b77fd
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+--0000000000009f3bb0062c0837d6
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
 
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7feb34a89c2a/non_bootable_disk-c3812b15.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/97c15b4b3ce2/vmlinux-c3812b15.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/726b9643ccee/bzImage-c3812b15.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+65a3b37f91d0382b77fd@syzkaller.appspotmail.com
-
-smc: removing ib device syz1
-------------[ cut here ]------------
-WARNING: CPU: 0 PID: 5318 at drivers/infiniband/core/restrack.c:52 rdma_restrack_clean+0x2af/0x320 drivers/infiniband/core/restrack.c:52
-Modules linked in:
-CPU: 0 UID: 0 PID: 5318 Comm: syz.0.0 Not tainted 6.13.0-rc7-syzkaller-00039-gc3812b15000c #0
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
-RIP: 0010:rdma_restrack_clean+0x2af/0x320 drivers/infiniband/core/restrack.c:52
-Code: 02 dd f8 49 81 c7 68 02 00 00 4c 89 ff e8 59 2b 05 03 4c 89 f7 5b 41 5c 41 5d 41 5e 41 5f 5d e9 c7 cf 37 f9 e8 42 02 dd f8 90 <0f> 0b 90 e9 b3 fd ff ff e8 34 02 dd f8 90 0f 0b 90 e9 f1 fd ff ff
-RSP: 0018:ffffc9000d4b70e0 EFLAGS: 00010283
-RAX: ffffffff88c2802e RBX: ffff888052b10848 RCX: 0000000000100000
-RDX: ffffc9000ec9b000 RSI: 00000000000a1c6d RDI: 00000000000a1c6e
-RBP: 1ffff11007de21c3 R08: ffffffff88bb12d7 R09: 1ffff11007de21c5
-R10: dffffc0000000000 R11: ffffed1007de21c6 R12: dffffc0000000000
-R13: dffffc0000000000 R14: ffff888052b10800 R15: ffff88803ef10e18
-FS:  00007f056259c6c0(0000) GS:ffff88801fc00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000055d0f79a11d0 CR3: 000000003bbf4000 CR4: 0000000000352ef0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- ib_dealloc_device+0x168/0x200 drivers/infiniband/core/device.c:683
- __ib_unregister_device+0x366/0x3d0 drivers/infiniband/core/device.c:1537
- ib_unregister_device_and_put+0xb9/0xf0 drivers/infiniband/core/device.c:1584
- nldev_dellink+0x2c6/0x310 drivers/infiniband/core/nldev.c:1825
- rdma_nl_rcv_skb drivers/infiniband/core/netlink.c:239 [inline]
- rdma_nl_rcv+0x6dd/0x9e0 drivers/infiniband/core/netlink.c:259
- netlink_unicast_kernel net/netlink/af_netlink.c:1321 [inline]
- netlink_unicast+0x7f6/0x990 net/netlink/af_netlink.c:1347
- netlink_sendmsg+0x8e4/0xcb0 net/netlink/af_netlink.c:1891
- sock_sendmsg_nosec net/socket.c:711 [inline]
- __sock_sendmsg+0x221/0x270 net/socket.c:726
- ____sys_sendmsg+0x52a/0x7e0 net/socket.c:2583
- ___sys_sendmsg net/socket.c:2637 [inline]
- __sys_sendmsg+0x269/0x350 net/socket.c:2669
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f0561785d29
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f056259c038 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 00007f0561976080 RCX: 00007f0561785d29
-RDX: 0000000000000000 RSI: 00000000200002c0 RDI: 0000000000000009
-RBP: 00007f0561801b08 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 0000000000000000 R14: 00007f0561976080 R15: 00007ffdce037348
- </TASK>
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+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
+OnaLEot1MoQO7BIe5S9H4AcCEXXcrJJiAtMCl47ARpyHmvQFQFFTrHgUYEd9V+9bOzY7MBIGSV1N
+/JfsT1sZw6HT0lJkSQefhPGpBniAob62DJP3qr11tu8CAwEAAaOCAdowggHWMA4GA1UdDwEB/wQE
+AwIFoDCBowYIKwYBBQUHAQEEgZYwgZMwTgYIKwYBBQUHMAKGQmh0dHA6Ly9zZWN1cmUuZ2xvYmFs
+c2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNydDBBBggrBgEFBQcw
+AYY1aHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAw
+TQYDVR0gBEYwRDBCBgorBgEEAaAyASgKMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2Jh
+bHNpZ24uY29tL3JlcG9zaXRvcnkvMAkGA1UdEwQCMAAwSQYDVR0fBEIwQDA+oDygOoY4aHR0cDov
+L2NybC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcmwwJAYDVR0R
+BB0wG4EZbWljaGFlbC5jaGFuQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
+HSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQU31rAyTdZweIF0tJTFYwfOv2w
+L4QwDQYJKoZIhvcNAQELBQADggEBACcuyaGmk0NSZ7Kio7O7WSZ0j0f9xXcBnLbJvQXFYM7JI5uS
+kw5ozATEN5gfmNIe0AHzqwoYjAf3x8Dv2w7HgyrxWdpjTKQFv5jojxa3A5LVuM8mhPGZfR/L5jSk
+5xc3llsKqrWI4ov4JyW79p0E99gfPA6Waixoavxvv1CZBQ4Stu7N660kTu9sJrACf20E+hdKLoiU
+hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
+E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
+aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
+EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIAB2aWejCXSX+mJXyIOVUG+/16f+D+Wg
+QX/WZZLzY+RLMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI1MDEx
+OTA1MTQyNFowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
+ATANBgkqhkiG9w0BAQEFAASCAQAg0hW4QXDvbM1rvYQK+y/MhZjJU4vA5PooeTMBVDqH3lGypfd2
+ziBO3nNwrZr0i+VQiaxNWqTwewd2gl3Ak8fjaK+VlFSIC9bQ7pPpDvvmN1epr+RV8uUtktZoUrwE
+VVHaPlBu4zZOc01D47cB7UtkNBwK+rXnDY/e0BXF9RWF5XOhNy1nOyXBILpynQZcXxr3YojBKcl+
+i/h5cptaMcSIUdqs/y0w6u4xjtglaetnAdIqtWSeZUBSnV9P0+9qXWnuGCwkVqAguANremlPjr5c
+O4aPO4NWnCF9gSS481Lp0DaSWzX/SMDUsb1G9cwefA+Pt3wGUyD0Onh5tkz7mFn/
+--0000000000009f3bb0062c0837d6--
 
