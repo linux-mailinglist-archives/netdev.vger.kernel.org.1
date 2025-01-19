@@ -1,280 +1,165 @@
-Return-Path: <netdev+bounces-159620-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159621-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F865A161E9
-	for <lists+netdev@lfdr.de>; Sun, 19 Jan 2025 14:11:22 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C418A1620D
+	for <lists+netdev@lfdr.de>; Sun, 19 Jan 2025 14:39:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1775A7A28A6
-	for <lists+netdev@lfdr.de>; Sun, 19 Jan 2025 13:11:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 243F37A1D4A
+	for <lists+netdev@lfdr.de>; Sun, 19 Jan 2025 13:39:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E6721DED77;
-	Sun, 19 Jan 2025 13:11:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11BDE1DE3A7;
+	Sun, 19 Jan 2025 13:39:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="SNl/J3nv"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aJe4XEss"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
+Received: from mail-il1-f169.google.com (mail-il1-f169.google.com [209.85.166.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE0061DE3CE
-	for <netdev@vger.kernel.org>; Sun, 19 Jan 2025 13:11:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7800F184;
+	Sun, 19 Jan 2025 13:39:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737292274; cv=none; b=aqHxeCPX0S63ULKaIMTvZcIJDlHA0TP+yj8G70IH+um+P0fz9+Lrs/SfjEnigRBuoWWpFMzO7v6um18ZXwOiqxDyrGtih7vgcNVzuaJiEpzyhugt5xhLglvU6vi6Wsy2jP2P4VFV5J9hhfu5B0MBZ0hFu6lcutL5c8RX0xsRobU=
+	t=1737293978; cv=none; b=mI7G2qUYDAxM2tILQfNJp6rzSKI/bjV2f7J1CNCCiAxMwftF2FpG/UY6o53gzby/FcRErHq3QO99n+E40vCSopmFVFi1Gr/CzfgMoWBz+bFjzuH1JHUEeAysoaFyioWpmMFqIyH4Tz3nlbO6XPKXmKWcaVs6/sihWXimLEL3cDY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737292274; c=relaxed/simple;
-	bh=PxI044HcFUa7vo46CtAGYtaeG6xvBBraLHlWYnC24LI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=EPxdVg16i0DKiOc/SL8R2C6AN83RxxcdWO9lDc92CbFqZgKJ9H4q+F2gcEJIiyE3bcsafmBgU/xf/wmRPgNX3+dc/PIsqgLnDbeUvhPyzy3CuVkLVHGvnqyAYs3gCE5EtpMHDUrKooAmqaJAg0S6IXFiF+HP0TQqlxXmhFPayjQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=SNl/J3nv; arc=none smtp.client-ip=209.85.218.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
-Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-ab39f84cbf1so304604766b.3
-        for <netdev@vger.kernel.org>; Sun, 19 Jan 2025 05:11:11 -0800 (PST)
+	s=arc-20240116; t=1737293978; c=relaxed/simple;
+	bh=AOrMseePuFZUh7P1yTJm/E/Na9Q68+1r2WXcc8MChlQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=A/ax8xe4QL1Y+MBMRPvCThNwu9kEmZ3wXFwECRZSz/3y0FEucB/bI8mkEVxUbU4vh3t2Ujf1FTYeuwfsLQK8w11A5XTq8sFAGw1uugBtu6dPyvICRjPqM8pLuBOyCpfJ8tuN2fKY8NBzpTF3x1cPd/HgVMjcYTXfcWnQrU9fwXk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aJe4XEss; arc=none smtp.client-ip=209.85.166.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f169.google.com with SMTP id e9e14a558f8ab-3ce915a8a25so12681315ab.1;
+        Sun, 19 Jan 2025 05:39:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openvpn.net; s=google; t=1737292270; x=1737897070; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=mLE5zt1xaA0hZzhsIEoFc6P+/bMCydwGdk/j7kCZS0Y=;
-        b=SNl/J3nv58XsCh5NplO4KQmOuIG+d/+OH4BzhpCQR6QM3NCfYVUqNxdhxh/mdwn03h
-         FQR7vooUnkj6Xr7bNqbEjdwr9gd7ycYftt24QQomdfec8mULHtey34yNtm9Y/p1v5cGh
-         w0oBfGR9kiVkmUZriFllvzXtfXgHLi4izLO4+sefXm/NO5igK6dfUakK2lpg5caAKNvT
-         C5tPyllOVZSdvQD9d6tVaG2gcy7mXOoY0IKRYIsWJv2DJwQwyzW5bh3QGq/WWWug2r66
-         dz9Uj+0G3wUyG4XBAc6MtuIa96BYY1WL9ZMWY9LUXXhc5Zg65gSLNRvWBn9nwYuLvXk+
-         DopA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737292270; x=1737897070;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1737293975; x=1737898775; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=mLE5zt1xaA0hZzhsIEoFc6P+/bMCydwGdk/j7kCZS0Y=;
-        b=K63Xihs545vC1XQWMaWEVUYuceiKiq/ja0qZdGpRikhI0T4lNidGfKnVC4IUM+UpD+
-         hsJFg4trUOWiV333w3kipz/5L1EkTM/R6E5+i1hbnNGGYkj1BIvAnHVlUU78/boI3REJ
-         WvsZrtmlkKWkQd560Q1UNZwdW3fnn+K90Dg3YEqPAnvptfNGU3F82WJfrdJBpJJShl18
-         c+6RY849QEh4kgpgEp1lGrQnUVocs4d24EGcmth8iLDO+GcIxOMAP4w3Dn8VZDrmu1W0
-         6I0XNm6j6EMRCOQlgYcW6XNNiX4yQhLsY6Yb0ujpiTGXdotGXdEEGGVL94g7fjA5iFzY
-         FPCA==
-X-Forwarded-Encrypted: i=1; AJvYcCW2R1qX/9bqRnTMeudmBZLxyYts3OiNi0PMt0ie8Bpn6eqMaCPBh5y1aLLmgbp9KL3zHDIbcXM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz30ZDyhPL8UI69kpU9hIAudf1zIq/1nlBUFOiT7fRCI3yKZkw9
-	8k0BqfssPpzzn0CKt8+S0ZDrW4r6ZPnsbQZp5D1BVzXpB9PZzufB87/4yqJs3hk=
-X-Gm-Gg: ASbGncu1zbKHjpMoTEG75KeIvLBjVohOVpL/e2GHGiOflUGgio+XS4f3h7sm1mdTs25
-	i7UAbDoxMSLMqz0/jD4NCXP0cH2tyvTltnC107TMrmbbxG7Dh2QNtFxupB2gboLmTO/8HABPbyK
-	vl+YR479ldFlfvT+rnqyU92QmwWV2I0h8EqpfYjlmZfSaVKIg/8s1P5VJWAHm77LpPeutFmuorK
-	LQY6A2Qwtf1L8/nR7rIuBAAgkH7Gnkr0Sv74flbcKlU1VyJtGdxd7qd9Yt+kC4hBXF36TXS6FOj
-	TuvznP6S4tR31WkvDqzBQ5Df6dpMpXhg
-X-Google-Smtp-Source: AGHT+IECCAXGKK9MG0B2ysJLsFIVmzVza0zDcuExngkVoVbTv2s1ukNPkm2y+Lev4w9cF/BG3T7IGg==
-X-Received: by 2002:a17:907:72d0:b0:aae:8841:2bba with SMTP id a640c23a62f3a-ab38b15c348mr737215566b.22.1737292269923;
-        Sun, 19 Jan 2025 05:11:09 -0800 (PST)
-Received: from ?IPV6:2001:67c:2fbc:1:eae3:ef5c:298c:e3cc? ([2001:67c:2fbc:1:eae3:ef5c:298c:e3cc])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ab384ce1bacsm489479966b.53.2025.01.19.05.11.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 19 Jan 2025 05:11:09 -0800 (PST)
-Message-ID: <33710520-5f4f-4d33-a28d-99dc64afc9c3@openvpn.net>
-Date: Sun, 19 Jan 2025 14:12:05 +0100
+        bh=ZyLW6Nb+BwKq6P0lAx9OQ8RLychDMbpqf1N3HwTHDZY=;
+        b=aJe4XEsspOD5EUNRTllNmIWPngB0emEw8A11BbZ2t+lJJYqfMuyPZQ4J373MKXMN2t
+         qvZIkyXlfRTJPiDwf8I8tYnvrUp8w79y+GOcnhzMWJovO/EzXBue/RevFao7H+IEuUjY
+         IwZ7R4Ni6XpAV+Y5uICyDqKe+UNfJxOQze5aOj7cOz/kmZUj8LERlmst/pwLFuMH71OR
+         aOPueDD7ACGPRi7erDO8McP5evH0AOEvRlgFSAWyABZhh2tDoxUeI7vweK4wFlO+V5mm
+         lA9n3orbtL7xIHBDcbKorXlh1LUFdSag6mT51G2h0/BglKSxiPYxluqoxeY7Exq9wrBX
+         +4aA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737293975; x=1737898775;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ZyLW6Nb+BwKq6P0lAx9OQ8RLychDMbpqf1N3HwTHDZY=;
+        b=hj01Wb3rqXntt5wNJgLHy+fPTLJ6zMhwl4QlOZK8Af+pwQBlFElw90byyrpD7iJWs9
+         NpfAU9aDq1Fqhz5+NP1RBpgvPJDyocjYSB0zf9EAK3KYeKMzVKWsp6DS8vyMkEg6rOdT
+         Q3g608xepbY+tWRiBuXAJPBsBSBK14Kq3WLI6UAYfjgeeau4yS05+YkQrVkN9ql9jTqV
+         uu2IxO/BhgCXoOV5MyQvYs2YcqtrmdojMi8jtDsQQabiaVNzqW696zObj033JPwCch2n
+         E3yTsX8M7YlxbhuTgdYh+S56hC0r4kdawCDZkiFIgCZrIkd41i8GVNAp8V8iWBdzH0UW
+         OwVQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVbseT25Bt8ExqO60VT4iK9huHyEdtSnnZrxVo1kWRu1AqE0urPfZxyykjUxdcOsIkUHyJqO6Xt@vger.kernel.org, AJvYcCXForEVrk1+9Lm4wbTW8Sby5G8wpbly7AzcQJdeEGblqEh4jRQ34LDj/SpcJZZRhIzF0v4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz9yhOf9M04RmXaIfEfSpHDhXal3H3vBh2AwoS6IQhwdc6jvF1a
+	EEVAmZR9Rq5NhjHY5mTZP3KR7UOpC28JJS15q70Wz+wbUoW/Anhy8Bhu4qeZd5rN6N3rJnZyOpJ
+	jT3AVUnYgSr2eIHy54+yll7x/EDU=
+X-Gm-Gg: ASbGncsd054/mvGWlagW3QfCwmgRgdY3DAX+Gu2MYG7mp4450Ahy7KebpRZAG0fDF4b
+	25L57wLoceYHV4EyKyeAscLLhanSbJSV/42vHSgn4boNIm1T2bQ==
+X-Google-Smtp-Source: AGHT+IGg8f5eZQpNG0ez0cD3+Qd900BX8NgeG34bZBtsWI0SwjFcmMMHiIRdbgZUx1flVCz4zipAhuZnahViiVY0eKA=
+X-Received: by 2002:a92:cda7:0:b0:3ce:7bf1:526 with SMTP id
+ e9e14a558f8ab-3cf7449615bmr65232265ab.16.1737293975391; Sun, 19 Jan 2025
+ 05:39:35 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v18 20/25] ovpn: implement peer
- add/get/dump/delete via netlink
-To: Sabrina Dubroca <sd@queasysnail.net>
-Cc: ryazanov.s.a@gmail.com, netdev@vger.kernel.org,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Donald Hunter <donald.hunter@gmail.com>,
- Shuah Khan <shuah@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
- Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org, Xiao Liang <shaw.leon@gmail.com>
-References: <20250113-b4-ovpn-v18-0-1f00db9c2bd6@openvpn.net>
- <20250113-b4-ovpn-v18-20-1f00db9c2bd6@openvpn.net> <Z4pDpqN2hCc-7DGt@hog>
- <f5507529-e61c-4b81-ab93-4ea6c8df46e9@openvpn.net> <Z4qPjuK3_fQUYLJi@hog>
-Content-Language: en-US
-From: Antonio Quartulli <antonio@openvpn.net>
-Autocrypt: addr=antonio@openvpn.net; keydata=
- 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
-Organization: OpenVPN Inc.
-In-Reply-To: <Z4qPjuK3_fQUYLJi@hog>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20250112113748.73504-1-kerneljasonxing@gmail.com>
+ <20250112113748.73504-9-kerneljasonxing@gmail.com> <ef391d15-4968-42c6-b107-cbd941d98e73@linux.dev>
+ <CAL+tcoC+bXAPP94zLka5GcwbpWNQtFijxd0PcPnVrtS-F=h6vQ@mail.gmail.com>
+ <fc4dd0d9-d4ae-4601-be01-5fad7c74e585@linux.dev> <CAL+tcoCJiaO4o8y56k2p8aePzkoE6SHXc7o4hEAc+D_hw7K8+A@mail.gmail.com>
+In-Reply-To: <CAL+tcoCJiaO4o8y56k2p8aePzkoE6SHXc7o4hEAc+D_hw7K8+A@mail.gmail.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Sun, 19 Jan 2025 21:38:59 +0800
+X-Gm-Features: AbW1kvYYkcgXuSflECjdY2MrJtceOthRWr7W8YSTvTDsAPkFjt5asG1IdnfhtZU
+Message-ID: <CAL+tcoDwa-iZhZzx+vdW97Bqk28_CBOUgyhuiHv=q213v09aiA@mail.gmail.com>
+Subject: Re: [PATCH net-next v5 08/15] net-timestamp: support sw
+ SCM_TSTAMP_SND for bpf extension
+To: Martin KaFai Lau <martin.lau@linux.dev>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, dsahern@kernel.org, willemdebruijn.kernel@gmail.com, 
+	willemb@google.com, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, 
+	eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev, 
+	john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me, 
+	haoluo@google.com, jolsa@kernel.org, horms@kernel.org, bpf@vger.kernel.org, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 17/01/2025 18:12, Sabrina Dubroca wrote:
-> 2025-01-17, 13:59:35 +0100, Antonio Quartulli wrote:
->> On 17/01/2025 12:48, Sabrina Dubroca wrote:
->>> 2025-01-13, 10:31:39 +0100, Antonio Quartulli wrote:
->>>>    int ovpn_nl_peer_new_doit(struct sk_buff *skb, struct genl_info *info)
->>>>    {
->>>> -	return -EOPNOTSUPP;
->>>> +	struct nlattr *attrs[OVPN_A_PEER_MAX + 1];
->>>> +	struct ovpn_priv *ovpn = info->user_ptr[0];
->>>> +	struct ovpn_socket *ovpn_sock;
->>>> +	struct socket *sock = NULL;
->>>> +	struct ovpn_peer *peer;
->>>> +	u32 sockfd, peer_id;
->>>> +	int ret;
->>>> +
->>>> +	/* peers can only be added when the interface is up and running */
->>>> +	if (!netif_running(ovpn->dev))
->>>> +		return -ENETDOWN;
->>>
->>> Since we're not under rtnl_lock here, the device could go down while
->>> we're creating this peer, and we may end up with a down device that
->>> has a peer anyway.
->>
->> hmm, indeed. This means we must hold the rtnl_lock to prevent ending up in
->> an inconsistent state.
->>
->>>
->>> I'm not sure what this (and the peer flushing on NETDEV_DOWN) is
->>> trying to accomplish. Is it a problem to keep peers when the netdevice
->>> is down?
->>
->> This is the result of my discussion with Sergey that started in v23 5/23:
->>
->> https://lore.kernel.org/r/netdev/20241029-b4-ovpn-v11-5-de4698c73a25@openvpn.net/
->>
->> The idea was to match operational state with actual connectivity to peer(s).
->>
->> Originally I wanted to simply kee the carrier always on, but after further
->> discussion (including the meaning of the openvpn option --persist-tun) we
->> agreed on following the logic where an UP device has a peer connected (logic
->> is slightly different between MP and P2P).
->>
->> I am not extremely happy with the resulting complexity, but it seemed to be
->> blocker for Sergey.
-> 
-> [after re-reading that discussion with Sergey]
-> 
-> I don't understand why "admin does 'ip link set tun0 down'" means "we
-> should get rid of all peers. For me the carrier situation goes the
-> other way: no peer, no carrier (as if I unplugged the cable from my
-> ethernet card), and it's independent of what the user does (ip link
-> set XXX up/down). You have that with netif_carrier_{on,off}, but
-> flushing peers when the admin does "ip link set tun0 down" is separate
-> IMO.
+On Sat, Jan 18, 2025 at 9:43=E2=80=AFAM Jason Xing <kerneljasonxing@gmail.c=
+om> wrote:
+>
+> On Sat, Jan 18, 2025 at 8:47=E2=80=AFAM Martin KaFai Lau <martin.lau@linu=
+x.dev> wrote:
+> >
+> > On 1/15/25 3:56 PM, Jason Xing wrote:
+> > > On Thu, Jan 16, 2025 at 6:48=E2=80=AFAM Martin KaFai Lau <martin.lau@=
+linux.dev> wrote:
+> > >>
+> > >> On 1/12/25 3:37 AM, Jason Xing wrote:
+> > >>> Support SCM_TSTAMP_SND case. Then we will get the software
+> > >>> timestamp when the driver is about to send the skb. Later, I
+> > >>> will support the hardware timestamp.
+> > >>
+> > >>> diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+> > >>> index 169c6d03d698..0fb31df4ed95 100644
+> > >>> --- a/net/core/skbuff.c
+> > >>> +++ b/net/core/skbuff.c
+> > >>> @@ -5578,6 +5578,9 @@ static void __skb_tstamp_tx_bpf(struct sk_buf=
+f *skb, struct sock *sk, int tstype
+> > >>>        case SCM_TSTAMP_SCHED:
+> > >>>                op =3D BPF_SOCK_OPS_TS_SCHED_OPT_CB;
+> > >>>                break;
+> > >>> +     case SCM_TSTAMP_SND:
+> > >>> +             op =3D BPF_SOCK_OPS_TS_SW_OPT_CB;
+> > >>
+> > >> For the hwtstamps case, is skb_hwtstamps(skb) set? From looking at a=
+ few
+> > >> drivers, it does not look like it. I don't see the hwtstamps support=
+ in patch 10
+> > >> either. What did I miss ?
+> > >
+> > > Sorry, I missed adding a new flag, namely, BPF_SOCK_OPS_TS_HW_OPT_CB.
+> > > I can also skip adding that new one and rename
+> > > BPF_SOCK_OPS_TS_SW_OPT_CB accordingly for sw and hw cases if we
+> > > finally decide to use hwtstamps parameter to distinguish two differen=
+t
+> > > cases.
+> >
+> > I think having a separate BPF_SOCK_OPS_TS_HW_OPT_CB is better consideri=
+ng your
+> > earlier hwtstamps may be NULL comment. I don't see the drivers I looked=
+ at
+> > passing NULL though but the comment of skb_tstamp_tx did say it may be =
+NULL :/
+>
+> Yep, I was trying not to rely on or trust the hardware/driver's
+> implementation, or else it will let the bpf program fetch the software
+> timestamp instead of hardware timestamp which will cause unexpected
+> behaviour.
+>
+> After re-reading this part, I reckon that using this SKBTX_IN_PROGRESS
+> flag is enough to recognize if we are in the hardware timestamping
+> generation period. I will try this one since it requires much less
+> modification.
 
-The reasoning was "the user is asking the VPN to go down - it should be 
-assumed that from that moment on no VPN traffic whatsoever should flow 
-in either direction".
-Similarly to when you bring an Eth interface dwn - the phy link goes 
-down as well.
+For the record only, SKBTX_IN_PROGRESS cannot represent if we're
+generating the hardware timestamp. For example, in I40e driver,
+i40e_xmit_frame_ring() calls i40e_tsyn() to set SKBTX_IN_PROGRESS
+before generating the software SND timestamp in i40e_tx_map() by
+calling skb_tx_timestamp().
 
-Does it make sense?
+Therefore, I will use the current patch directly.
 
-> 
-> [...]
->>>>    int ovpn_nl_peer_del_doit(struct sk_buff *skb, struct genl_info *info)
->>>>    {
->>>> -	return -EOPNOTSUPP;
->>>> +	struct nlattr *attrs[OVPN_A_PEER_MAX + 1];
->>>> +	struct ovpn_priv *ovpn = info->user_ptr[0];
->>>> +	struct ovpn_peer *peer;
->>>> +	u32 peer_id;
->>>> +	int ret;
->>>> +
->>>> +	if (GENL_REQ_ATTR_CHECK(info, OVPN_A_PEER))
->>>> +		return -EINVAL;
->>>> +
->>>> +	ret = nla_parse_nested(attrs, OVPN_A_PEER_MAX, info->attrs[OVPN_A_PEER],
->>>> +			       ovpn_peer_nl_policy, info->extack);
->>>> +	if (ret)
->>>> +		return ret;
->>>> +
->>>> +	if (NL_REQ_ATTR_CHECK(info->extack, info->attrs[OVPN_A_PEER], attrs,
->>>> +			      OVPN_A_PEER_ID))
->>>> +		return -EINVAL;
->>>> +
->>>> +	peer_id = nla_get_u32(attrs[OVPN_A_PEER_ID]);
->>>> +	peer = ovpn_peer_get_by_id(ovpn, peer_id);
->>>> +	if (!peer) {
->>>> +		NL_SET_ERR_MSG_FMT_MOD(info->extack,
->>>> +				       "cannot find peer with id %u", peer_id);
->>>> +		return -ENOENT;
->>>> +	}
->>>> +
->>>> +	netdev_dbg(ovpn->dev, "del peer %u\n", peer->id);
->>>> +	ret = ovpn_peer_del(peer, OVPN_DEL_PEER_REASON_USERSPACE);
->>>
->>> With the delayed socket release (which is similar to what was in v11,
->>> but now with refcounting on the netdevice which should make
->>> rtnl_link_unregister in ovpn_cleanup wait [*]), we may return to
->>> userspace as if the peer was gone, but the socket hasn't been detached
->>> yet.
->>>
->>> A userspace application that tries to remove the peer and immediately
->>> re-create it with the same socket could get EBUSY if the workqueue
->>> hasn't done its job yet. That would be quite confusing to the
->>> application.
->>
->> This may happen only for TCP, because in the UDP case we would increase the
->> refcounter and keep the socket attached.
-> 
-> Not if we're re-attaching to a different ovpn instance/netdevice.
-
-Right.
-One more reason to go with the completion logic.
-
-> 
->>
->> However, re-attaching the same TCP socket is hardly going to happen (in TCP
->> we have one socket per peer, therefore if the peer is going away, we're most
->> likely killing the socket too).
->>
->> This said, the complexity added by the completion seems quite tiny,
->> therefore I'll add the code you are suggesting below.
-> 
-> Ok.
-
-Working on it!
-
-Thanks!
-Regards,
-
-
--- 
-Antonio Quartulli
-OpenVPN Inc.
-
+Thanks,
+Jason
 
