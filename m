@@ -1,439 +1,306 @@
-Return-Path: <netdev+bounces-159652-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159655-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 61304A163C7
-	for <lists+netdev@lfdr.de>; Sun, 19 Jan 2025 21:00:50 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97748A163CD
+	for <lists+netdev@lfdr.de>; Sun, 19 Jan 2025 21:05:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3E2F1163885
-	for <lists+netdev@lfdr.de>; Sun, 19 Jan 2025 20:00:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 694C83A4D5C
+	for <lists+netdev@lfdr.de>; Sun, 19 Jan 2025 20:05:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D18C01DF98B;
-	Sun, 19 Jan 2025 20:00:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B68481DF75A;
+	Sun, 19 Jan 2025 20:05:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=cisco.com header.i=@cisco.com header.b="iBQQGfxo"
+	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="V+6xcOog"
 X-Original-To: netdev@vger.kernel.org
-Received: from rcdn-iport-5.cisco.com (rcdn-iport-5.cisco.com [173.37.86.76])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A77A019408C
-	for <netdev@vger.kernel.org>; Sun, 19 Jan 2025 20:00:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=173.37.86.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B06417FAC2
+	for <netdev@vger.kernel.org>; Sun, 19 Jan 2025 20:05:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737316843; cv=none; b=FS+VA2OWn8dKjCw0KXp3OPC/QXGuvfV1ThVKqe9c7akhIXo+uFXIid063sf7Mjg5lKVIPpBrT+UukQpd6Htiel3kQdUWBXUeh/nB6pPGcg+VJtNleuSw2e4EFUAKIe8FZXkKBiNH1s607nbN7JjcmJdcFEfpS5YJjwUYtWhDFOo=
+	t=1737317155; cv=none; b=uDSnsIKGxG0P2T/E9b4fuPl9FNAsUFOpTki5MLyM4WQsIgMFgGhQaUMq0Yyd330R6HAzacXZqmXnocED3fECH6QHTf5JKhIRqQ4ZXWjeGsINIajXxPITj2lAcvmGb2pn9vnZOwyfjmPKoPkLemZAzW0ldFGe3v1itZgUQQXBeU4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737316843; c=relaxed/simple;
-	bh=GlT/8BCZ5WEB3wYMGq60MB5h6LduOnMUnmYIW2SEG18=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=F9k220o393UHg3mOmZQI9VctkELlQVkMjINGoVjFeDYAnpwpgF/Ii1iZgnsvzyl02pHgudfSgIi+YVGWAzD864Yclr1lzYrQI8OxTiVPR32fEZeklOHDtmPOZF9fR96O0/bHuSSoai3CgougX+TuEkTSsrx+Q4yBvK9+E6+306U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cisco.com; spf=pass smtp.mailfrom=cisco.com; dkim=pass (1024-bit key) header.d=cisco.com header.i=@cisco.com header.b=iBQQGfxo; arc=none smtp.client-ip=173.37.86.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cisco.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cisco.com
+	s=arc-20240116; t=1737317155; c=relaxed/simple;
+	bh=AOBelxNrqjJU0VR1awbtqU5riS/YrarayQKVIKo9o/U=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=bXqjknbJtxAIETcN4eEhG7E5MX53bUfD9C8QwVd1DoB4qPOGUqqluUz5Lk+zSy3QyY0Dvd1NY97tMyJNCS4ZAP5TtNlGYxg+bAH9xA++Xp1CquHbDTQYy2Exs6K4Jue1lBfOBB239IK9+wbhyKBkAotIi75aJez458PeQBDHLW8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=V+6xcOog; arc=none smtp.client-ip=209.85.218.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-aaf6b1a5f2bso950000466b.1
+        for <netdev@vger.kernel.org>; Sun, 19 Jan 2025 12:05:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=cisco.com; i=@cisco.com; l=11156; q=dns/txt;
-  s=iport; t=1737316841; x=1738526441;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=hGkA1xpqXiw+1em9QbvEDsWx0aOl1WIfBFPbnsQlHGE=;
-  b=iBQQGfxoyOpusvFQuogpLBt/7yLGdmcgy/FjY+msB0PdIXFnY8dkXQoj
-   F9To9UQDDg2TW21tBwdSvTXBnHA7TpETqcDs+pYxPWBnDR/CJ2mjTpqV1
-   aQHfNs2l3o9XEboa5bcJ/WRM77WQEGYH3EISrra57r1EtCreFuQgyh1YS
-   c=;
-X-CSE-ConnectionGUID: 9xcOsa88ShiCP2rr4Yq4/w==
-X-CSE-MsgGUID: 4l+JRDwlRNmxQ25TjE3s+w==
-X-IPAS-Result: =?us-ascii?q?A0APAAAUWY1n/5L/Ja1aGwEDAwEFARYBAwMBggEGAQ0Bg?=
- =?us-ascii?q?kqBT0NIjVGIc54bgSUDVg8BAQEPRAQBAYUHAopzAiY0CQ4BAgQBAQEBAwIDA?=
- =?us-ascii?q?QEBAQEBAQEBAQELAQEFAQEBAgEHBYEOE4YIhlsCAQMnCwFGEFErKwcSgwGCZ?=
- =?us-ascii?q?QO0foF5M4EB3jOBbYFIAYVqh19whHcnG4FJRIEVgTuBPm+LBwSHZZ9SSIEhA?=
- =?us-ascii?q?1ksAVUTDQoLBwWBOTgDIgsLDAsUHBUCFR0PBhAEbUQ3gkZpSTcCDQI1gh4kW?=
- =?us-ascii?q?IIrhFqERYRTgkNUgkWCFHqBHIUQQAMLGA1IESw3Bg4bBj5uB5tlPIMxRXsJC?=
- =?us-ascii?q?xsKgQFtV5Mmj3+CIKEDhCWBY59jGjOqU5h8IqQlhGaBZzyBWTMaCBsVgyJSG?=
- =?us-ascii?q?Q+OKgMWwlclMjwCBwsBAQMJkWUBAQ?=
-IronPort-Data: A9a23:8zPpbq9UBhi8ahpqTrowDrUDon+TJUtcMsCJ2f8bNWPcYEJGY0x3m
- DZLUWDTbPeLYGGhfN9waIy2o0wD6pbTyoJqTQs6/i1EQiMRo6IpJzg2wmQcns+2BpeeJK6yx
- 5xGMrEsFOhtEDmE4E/rauW5xZVF/fngbqLmD+LZMTxGSwZhSSMw4TpugOdRbrRA2bBVOCvT/
- 4qpyyHjEAX9gWMsaztFs/jrRC5H5ZwehhtJ5jTSWtgT1LPuvyF9JI4SI6i3M0z5TuF8dsamR
- /zOxa2O5WjQ+REgELuNyt4XpWVTH9Y+lSDX4pZnc/DKbipq/0Te4Y5nXBYoUnq7vh3S9zxHJ
- HqhgrTrIeshFvWkdO3wyHC0GQkmVUFN0OevzXRSLaV/wmWeG0YAzcmCA2lnLYY/4e8nUVpO9
- NcgcioXMiGa26WplefTpulE3qzPLeHxN48Z/3UlxjbDALN+ENbIQr7B4plT2zJYasJmRKmFI
- ZFGL2AyMVKZP0Mn1lQ/UPrSmM+qgXn5fzRcpXqepLE85C7YywkZPL3Fa4KFJozQGpsI9qqej
- j7CvEbDLg4eDvqa2QPfr06uq7TU3jyuDer+E5X9rJaGmma7ymUNBRg+WVKlrPy9jUCiHdRSN
- yQ89yYzqKEg+VCDQd76UBm15nWDu3Y0WMdaGsU55RuLx66S5ByWbkANSDJbZcNlssIqSTE0/
- luUmdWvDjwHmKWcQ3+b95+OoD+yMDRTJmgHDQcCQBcJ7sfLvo4+lFTMQ8xlHarzicf6cQwc2
- BiQpyQ4wrFWhskR2uDjrBbMgimnod7CSQtdChjrY19JJzhRPOaND7FEI3CChRqcBO51lmW8g
- UU=
-IronPort-HdrOrdr: A9a23:b3DZc6n8ZZvt/rjKPcGP34eWkcfpDfIr3DAbv31ZSRFFG/FwWf
- rAoB19726StN9/YhAdcLy7VZVoBEmsl6KdgrNhWYtKIjOHhILAFugLhuHfKn/bakjDH4Vmu5
- uIHZITNDSJNykYsS4/izPIaurJB7K8gcaVuds=
-X-Talos-CUID: 9a23:mY3lcWP90wxqpe5DCTls01UdSpAecnz29C3KOROJEDouV+jA
-X-Talos-MUID: 9a23:goG3LgrzHxSzLa1lcgsez21md+VSz7uqMmYIgaxc5vWGGHdreCjI2Q==
-X-IronPort-Anti-Spam-Filtered: true
-X-IronPort-AV: E=Sophos;i="6.13,218,1732579200"; 
-   d="scan'208";a="308482765"
-Received: from rcdn-l-core-09.cisco.com ([173.37.255.146])
-  by rcdn-iport-5.cisco.com with ESMTP/TLS/TLS_AES_256_GCM_SHA384; 19 Jan 2025 20:00:33 +0000
-Received: from cisco.com (savbu-usnic-a.cisco.com [10.193.184.48])
-	by rcdn-l-core-09.cisco.com (Postfix) with ESMTP id 4C2C718000234;
-	Sun, 19 Jan 2025 20:00:33 +0000 (GMT)
-Received: by cisco.com (Postfix, from userid 392789)
-	id 2801A20F2003; Sun, 19 Jan 2025 12:00:33 -0800 (PST)
-From: John Daley <johndale@cisco.com>
-To: benve@cisco.com,
-	satishkh@cisco.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	netdev@vger.kernel.org
-Cc: John Daley <johndale@cisco.com>,
-	Nelson Escobar <neescoba@cisco.com>
-Subject: [PATCH net-next v7 3/3] enic: Use the Page Pool API for RX
-Date: Sun, 19 Jan 2025 12:00:18 -0800
-Message-Id: <20250119200018.5522-4-johndale@cisco.com>
-X-Mailer: git-send-email 2.35.2
-In-Reply-To: <20250119200018.5522-1-johndale@cisco.com>
-References: <20250119200018.5522-1-johndale@cisco.com>
+        d=openvpn.net; s=google; t=1737317152; x=1737921952; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=yV4ypHv5dd1/vtw9wcV8OTRsLUlUS8P/pDeMYfSHOK4=;
+        b=V+6xcOogZDp7D6CLt1SbmlgzClTwp05a/6bO5cxcDQlXjgbqXc1I7awUVRX8AFW/l3
+         /k93jCOPniL6NbVyFny6qGouz6UYVtJmYOJTJ7AcBqlCRW2CpIGuZU8elA181R03aWjq
+         ZadWGTwZ6jP+FtG/wJsSyWNfQ9M3fMk+QQLzfeBv/ceNovi+HnSDXPUum6mh2ZPWSMH+
+         3gSMCv+SjCFpURI6TTtALbo0PJYf985h+Ne7szXFADo3wjHAwQhT6d0v60mfISGCXzZL
+         bk5P871sHHPeR4LiuJ1qfS9RHfABtrsYWVeNDy8Qih+4XYfc59vxW9oNWkfN+GXnlRJp
+         n7UQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737317152; x=1737921952;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=yV4ypHv5dd1/vtw9wcV8OTRsLUlUS8P/pDeMYfSHOK4=;
+        b=TareyjeVdwAuMvMiYbPLD8LROVD/Ia4jy4RTowkuFx3r/HIOmJTa1r0rtupkr8gw77
+         TT/SHsXatQKXBjKlgB1ZlL373CO7qidQVtsH0hGXzgshtrQsKsUy7BpdH2zBv8j3kvI+
+         aQ856s5WmEyobzq0suOske0WVQaB5XDud7UbQ4cQtiZDYUaqxBOyFbWgELuh/q0bUZK9
+         dxIafTpLSngNhJSsjNitB1yojOP8Dvqt8xAedaYd0uWYL19X4b9iajUjq643KwwP5AiN
+         GKA139HBtufEq8U0lmBLMmV8iuMn64stQKprnCanifat2YMEXmPFI2wg6HLEDNk11lvm
+         BUuQ==
+X-Gm-Message-State: AOJu0YwZPJGZNywmS7xfBADhthaEFIbMzF7kRmc0PsqYmQXQbtHQOBBD
+	fJEb8UdMMu718gbzZTSg1ouFXUE1NLt2tiJePuuzyQc0WJX7QOxYEE2wWCn3WJk=
+X-Gm-Gg: ASbGncvgq8quRKDROv6gcDUN/Y1uJK0nM9nK/kURH6SCLUiXX+X1m/MuopIHE2Yx56O
+	nYeN33gXltL4QuOJOUV5B4T0CeddxbFFpGMkY+vaYU/7By3FQ23NXJPRVkLZ3KqaHh9BmfMV019
+	vWLBzCHmtro6Pdu2LBjXcKYgXjo+4+ZiD46vX/kXTr7CSQJule89yCRyH9w3JM6rKW7CPkJtaMF
+	9hccJTWHLzUg7Unss7fIyYKv80NjnIgA2JozFfIRjPvGAlN4O204Aa+Eg46bbzt/uXmoEjwz4vx
+	ghWi8JR+53hP2KC+UhFauk9OKxE7NPJ8
+X-Google-Smtp-Source: AGHT+IFeoZAa4GLe4bA6QmHaEdN5Y+fR//FPt2afwLiomRetJ8oJ61PCbHRz6pj79NeJhUI68fju6w==
+X-Received: by 2002:a17:907:743:b0:aa6:7ff9:d248 with SMTP id a640c23a62f3a-ab36e242063mr1316645966b.8.1737317151574;
+        Sun, 19 Jan 2025 12:05:51 -0800 (PST)
+Received: from ?IPV6:2001:67c:2fbc:1:113d:ece6:3d2f:3a40? ([2001:67c:2fbc:1:113d:ece6:3d2f:3a40])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ab384d2e519sm524119266b.83.2025.01.19.12.05.50
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 19 Jan 2025 12:05:51 -0800 (PST)
+Message-ID: <6e51a8ad-dee1-45ef-ab8e-b5d73c1acd40@openvpn.net>
+Date: Sun, 19 Jan 2025 21:06:47 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Outbound-SMTP-Client: 10.193.184.48, savbu-usnic-a.cisco.com
-X-Outbound-Node: rcdn-l-core-09.cisco.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v18 12/25] ovpn: implement TCP transport
+To: Sabrina Dubroca <sd@queasysnail.net>
+Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Donald Hunter <donald.hunter@gmail.com>, Shuah Khan <shuah@kernel.org>,
+ ryazanov.s.a@gmail.com, Andrew Lunn <andrew+netdev@lunn.ch>,
+ Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, Xiao Liang <shaw.leon@gmail.com>
+References: <20250113-b4-ovpn-v18-0-1f00db9c2bd6@openvpn.net>
+ <20250113-b4-ovpn-v18-12-1f00db9c2bd6@openvpn.net> <Z4qP-x4F-lQiQTRy@hog>
+Content-Language: en-US
+From: Antonio Quartulli <antonio@openvpn.net>
+Autocrypt: addr=antonio@openvpn.net; keydata=
+ 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
+Organization: OpenVPN Inc.
+In-Reply-To: <Z4qP-x4F-lQiQTRy@hog>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-The Page Pool API improves bandwidth and CPU overhead by recycling pages
-instead of allocating new buffers in the driver. Make use of page pool
-fragment allocation for smaller MTUs so that multiple packets can share
-a page.
+On 17/01/2025 18:14, Sabrina Dubroca wrote:
+> 2025-01-13, 10:31:31 +0100, Antonio Quartulli wrote:
+>> +static int ovpn_tcp_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
+>> +			    int flags, int *addr_len)
+>> +{
+>> +	int err = 0, off, copied = 0, ret;
+>> +	struct ovpn_socket *sock;
+>> +	struct ovpn_peer *peer;
+>> +	struct sk_buff *skb;
+>> +
+>> +	rcu_read_lock();
+>> +	sock = rcu_dereference_sk_user_data(sk);
+>> +	if (!sock || !sock->peer) {
+>> +		rcu_read_unlock();
+>> +		return -EBADF;
+>> +	}
+>> +	/* we take a reference to the peer linked to this TCP socket, because
+>> +	 * in turn the peer holds a reference to the socket itself.
+> 
+> Not anymore since v12? [*]
+> 
+> I think it's ok here because we're only using peer and sk (not
+> anything from ovpn_socket), but it is relevant in _sendmsg, which has
+> the same peer_hold pattern without this comment.
+> 
+> [*]
+> v11:
+>   - https://lore.kernel.org/netdev/20241029-b4-ovpn-v11-8-de4698c73a25@openvpn.net/
+>     ovpn_peer_release -> ovpn_socket_put
+> 
+> v12:
+>   - https://lore.kernel.org/netdev/20241202-b4-ovpn-v12-9-239ff733bf97@openvpn.net/
+>     ovpn_peer_release doesn't do ovpn_socket_put
+> 
+>   - https://lore.kernel.org/netdev/20241202-b4-ovpn-v12-7-239ff733bf97@openvpn.net/
+>     ovpn_socket_put is done directly at ovpn_peer_remove time, before the final peer_put
+> 
+>> +	 * By doing so we also ensure that the peer stays alive along with
+>> +	 * the socket while executing this function
+>> +	 */
+>> +	ovpn_peer_hold(sock->peer);
+>> +	peer = sock->peer;
+>> +	rcu_read_unlock();
+>> +
+>> +	skb = __skb_recv_datagram(sk, &peer->tcp.user_queue, flags, &off, &err);
+>> +	if (!skb) {
+>> +		if (err == -EAGAIN && sk->sk_shutdown & RCV_SHUTDOWN) {
+>> +			ret = 0;
+>> +			goto out;
+>> +		}
+>> +		ret = err;
+>> +		goto out;
+>> +	}
+>> +
+>> +	copied = len;
+>> +	if (copied > skb->len)
+>> +		copied = skb->len;
+>> +	else if (copied < skb->len)
+>> +		msg->msg_flags |= MSG_TRUNC;
+>> +
+>> +	err = skb_copy_datagram_msg(skb, 0, msg, copied);
+>> +	if (unlikely(err)) {
+>> +		kfree_skb(skb);
+>> +		ret = err;
+>> +		goto out;
+>> +	}
+>> +
+>> +	if (flags & MSG_TRUNC)
+>> +		copied = skb->len;
+>> +	kfree_skb(skb);
+>> +	ret = copied;
+>> +out:
+>> +	ovpn_peer_put(peer);
+>> +	return ret;
+>> +}
+> 
+> [...]
+>> +static int ovpn_tcp_sendmsg(struct sock *sk, struct msghdr *msg, size_t size)
+>> +{
+>> +	struct ovpn_socket *sock;
+>> +	int ret, linear = PAGE_SIZE;
+>> +	struct ovpn_peer *peer;
+>> +	struct sk_buff *skb;
+>> +
+>> +	rcu_read_lock();
+>> +	sock = rcu_dereference_sk_user_data(sk);
+>> +	if (unlikely(!sock || !sock->peer || !ovpn_peer_hold(sock->peer))) {
+>> +		rcu_read_unlock();
+>> +		return -EIO;
+>> +	}
+>> +	peer = sock->peer;
+>> +	rcu_read_unlock();
+>> +
+>> +	lock_sock(peer->sock->sock->sk);
+> 
+> Isn't that just sk?
 
-The RQ descriptor field 'os_buf' is repurposed to hold page pointers
-allocated from page_pool instead of SKBs. When packets arrive, SKBs are
-allocated and the page pointers attached instead of preallocating SKBs.
+Right - it's the same object at this point. I'll use sk.
 
-'alloc_fail' netdev statistic is incremented when page_pool_dev_alloc()
-fails.
+> 
+>> +
+>> +	if (msg->msg_flags & ~MSG_DONTWAIT) {
+>> +		ret = -EOPNOTSUPP;
+>> +		goto peer_free;
+>> +	}
+>> +
+>> +	if (peer->tcp.out_msg.skb) {
+>> +		ret = -EAGAIN;
+>> +		goto peer_free;
+>> +	}
+>> +
+>> +	if (size < linear)
+>> +		linear = size;
+>> +
+>> +	skb = sock_alloc_send_pskb(sk, linear, size - linear,
+>> +				   msg->msg_flags & MSG_DONTWAIT, &ret, 0);
+>> +	if (!skb) {
+>> +		net_err_ratelimited("%s: skb alloc failed: %d\n",
+>> +				    netdev_name(sock->peer->ovpn->dev), ret);
+> 
+> Since we only have a ref on peer (but not on sock), I'd use
+> peer->... directly instead of sock->peer.
 
-Co-developed-by: Nelson Escobar <neescoba@cisco.com>
-Signed-off-by: Nelson Escobar <neescoba@cisco.com>
-Co-developed-by: Satish Kharat <satishkh@cisco.com>
-Signed-off-by: Satish Kharat <satishkh@cisco.com>
-Signed-off-by: John Daley <johndale@cisco.com>
----
- drivers/net/ethernet/cisco/enic/enic.h      |  3 +
- drivers/net/ethernet/cisco/enic/enic_main.c | 33 +++++++-
- drivers/net/ethernet/cisco/enic/enic_rq.c   | 94 ++++++++-------------
- drivers/net/ethernet/cisco/enic/vnic_rq.h   |  2 +
- 4 files changed, 71 insertions(+), 61 deletions(-)
+ACK
 
-diff --git a/drivers/net/ethernet/cisco/enic/enic.h b/drivers/net/ethernet/cisco/enic/enic.h
-index 10b7e02ba4d0..2ccf2d2a77db 100644
---- a/drivers/net/ethernet/cisco/enic/enic.h
-+++ b/drivers/net/ethernet/cisco/enic/enic.h
-@@ -17,6 +17,7 @@
- #include "vnic_nic.h"
- #include "vnic_rss.h"
- #include <linux/irq.h>
-+#include <net/page_pool/helpers.h>
- 
- #define DRV_NAME		"enic"
- #define DRV_DESCRIPTION		"Cisco VIC Ethernet NIC Driver"
-@@ -158,6 +159,7 @@ struct enic_rq_stats {
- 	u64 pkt_truncated;		/* truncated pkts */
- 	u64 no_skb;			/* out of skbs */
- 	u64 desc_skip;			/* Rx pkt went into later buffer */
-+	u64 pp_alloc_fail;		/* page pool alloc failure */
- };
- 
- struct enic_wq {
-@@ -169,6 +171,7 @@ struct enic_wq {
- struct enic_rq {
- 	struct vnic_rq vrq;
- 	struct enic_rq_stats stats;
-+	struct page_pool *pool;
- } ____cacheline_aligned;
- 
- /* Per-instance private data structure */
-diff --git a/drivers/net/ethernet/cisco/enic/enic_main.c b/drivers/net/ethernet/cisco/enic/enic_main.c
-index 1d9f109346b8..447c54dcd89b 100644
---- a/drivers/net/ethernet/cisco/enic/enic_main.c
-+++ b/drivers/net/ethernet/cisco/enic/enic_main.c
-@@ -1736,6 +1736,17 @@ static int enic_open(struct net_device *netdev)
- 	struct enic *enic = netdev_priv(netdev);
- 	unsigned int i;
- 	int err, ret;
-+	unsigned int max_pkt_len = netdev->mtu + VLAN_ETH_HLEN;
-+	struct page_pool_params pp_params = {
-+		.order = get_order(max_pkt_len),
-+		.pool_size = enic->config.rq_desc_count,
-+		.nid = dev_to_node(&enic->pdev->dev),
-+		.dev = &enic->pdev->dev,
-+		.dma_dir = DMA_FROM_DEVICE,
-+		.max_len = (max_pkt_len > PAGE_SIZE) ? max_pkt_len : PAGE_SIZE,
-+		.netdev = netdev,
-+		.flags = PP_FLAG_DMA_MAP | PP_FLAG_DMA_SYNC_DEV,
-+	};
- 
- 	err = enic_request_intr(enic);
- 	if (err) {
-@@ -1753,6 +1764,16 @@ static int enic_open(struct net_device *netdev)
- 	}
- 
- 	for (i = 0; i < enic->rq_count; i++) {
-+		/* create a page pool for each RQ */
-+		pp_params.napi = &enic->napi[i];
-+		pp_params.queue_idx = i;
-+		enic->rq[i].pool = page_pool_create(&pp_params);
-+		if (IS_ERR(enic->rq[i].pool)) {
-+			err = PTR_ERR(enic->rq[i].pool);
-+			enic->rq[i].pool = NULL;
-+			goto err_out_free_rq;
-+		}
-+
- 		/* enable rq before updating rq desc */
- 		vnic_rq_enable(&enic->rq[i].vrq);
- 		vnic_rq_fill(&enic->rq[i].vrq, enic_rq_alloc_buf);
-@@ -1793,8 +1814,11 @@ static int enic_open(struct net_device *netdev)
- err_out_free_rq:
- 	for (i = 0; i < enic->rq_count; i++) {
- 		ret = vnic_rq_disable(&enic->rq[i].vrq);
--		if (!ret)
-+		if (!ret) {
- 			vnic_rq_clean(&enic->rq[i].vrq, enic_free_rq_buf);
-+			page_pool_destroy(enic->rq[i].pool);
-+			enic->rq[i].pool = NULL;
-+		}
- 	}
- 	enic_dev_notify_unset(enic);
- err_out_free_intr:
-@@ -1852,8 +1876,11 @@ static int enic_stop(struct net_device *netdev)
- 
- 	for (i = 0; i < enic->wq_count; i++)
- 		vnic_wq_clean(&enic->wq[i].vwq, enic_free_wq_buf);
--	for (i = 0; i < enic->rq_count; i++)
-+	for (i = 0; i < enic->rq_count; i++) {
- 		vnic_rq_clean(&enic->rq[i].vrq, enic_free_rq_buf);
-+		page_pool_destroy(enic->rq[i].pool);
-+		enic->rq[i].pool = NULL;
-+	}
- 	for (i = 0; i < enic->cq_count; i++)
- 		vnic_cq_clean(&enic->cq[i]);
- 	for (i = 0; i < enic->intr_count; i++)
-@@ -2363,6 +2390,7 @@ static void enic_get_queue_stats_rx(struct net_device *dev, int idx,
- 	rxs->hw_drop_overruns = rqstats->pkt_truncated;
- 	rxs->csum_unnecessary = rqstats->csum_unnecessary +
- 				rqstats->csum_unnecessary_encap;
-+	rxs->alloc_fail = rqstats->pp_alloc_fail;
- }
- 
- static void enic_get_queue_stats_tx(struct net_device *dev, int idx,
-@@ -2390,6 +2418,7 @@ static void enic_get_base_stats(struct net_device *dev,
- 	rxs->hw_drops = 0;
- 	rxs->hw_drop_overruns = 0;
- 	rxs->csum_unnecessary = 0;
-+	rxs->alloc_fail = 0;
- 	txs->bytes = 0;
- 	txs->packets = 0;
- 	txs->csum_none = 0;
-diff --git a/drivers/net/ethernet/cisco/enic/enic_rq.c b/drivers/net/ethernet/cisco/enic/enic_rq.c
-index 48aa385aa831..e3228ef7988a 100644
---- a/drivers/net/ethernet/cisco/enic/enic_rq.c
-+++ b/drivers/net/ethernet/cisco/enic/enic_rq.c
-@@ -21,25 +21,6 @@ static void enic_intr_update_pkt_size(struct vnic_rx_bytes_counter *pkt_size,
- 		pkt_size->small_pkt_bytes_cnt += pkt_len;
- }
- 
--static bool enic_rxcopybreak(struct net_device *netdev, struct sk_buff **skb,
--			     struct vnic_rq_buf *buf, u16 len)
--{
--	struct enic *enic = netdev_priv(netdev);
--	struct sk_buff *new_skb;
--
--	if (len > enic->rx_copybreak)
--		return false;
--	new_skb = netdev_alloc_skb_ip_align(netdev, len);
--	if (!new_skb)
--		return false;
--	dma_sync_single_for_cpu(&enic->pdev->dev, buf->dma_addr, len,
--				DMA_FROM_DEVICE);
--	memcpy(new_skb->data, (*skb)->data, len);
--	*skb = new_skb;
--
--	return true;
--}
--
- int enic_rq_service(struct vnic_dev *vdev, struct cq_desc *cq_desc, u8 type,
- 		    u16 q_number, u16 completed_index, void *opaque)
- {
-@@ -142,11 +123,15 @@ int enic_rq_alloc_buf(struct vnic_rq *rq)
- {
- 	struct enic *enic = vnic_dev_priv(rq->vdev);
- 	struct net_device *netdev = enic->netdev;
--	struct sk_buff *skb;
-+	struct enic_rq *erq = &enic->rq[rq->index];
-+	struct enic_rq_stats *rqstats = &erq->stats;
-+	unsigned int offset = 0;
- 	unsigned int len = netdev->mtu + VLAN_ETH_HLEN;
- 	unsigned int os_buf_index = 0;
- 	dma_addr_t dma_addr;
- 	struct vnic_rq_buf *buf = rq->to_use;
-+	struct page *page;
-+	unsigned int truesize = len;
- 
- 	if (buf->os_buf) {
- 		enic_queue_rq_desc(rq, buf->os_buf, os_buf_index, buf->dma_addr,
-@@ -154,20 +139,16 @@ int enic_rq_alloc_buf(struct vnic_rq *rq)
- 
- 		return 0;
- 	}
--	skb = netdev_alloc_skb_ip_align(netdev, len);
--	if (!skb) {
--		enic->rq[rq->index].stats.no_skb++;
--		return -ENOMEM;
--	}
- 
--	dma_addr = dma_map_single(&enic->pdev->dev, skb->data, len,
--				  DMA_FROM_DEVICE);
--	if (unlikely(enic_dma_map_check(enic, dma_addr))) {
--		dev_kfree_skb(skb);
-+	page = page_pool_dev_alloc(erq->pool, &offset, &truesize);
-+	if (unlikely(!page)) {
-+		rqstats->pp_alloc_fail++;
- 		return -ENOMEM;
- 	}
--
--	enic_queue_rq_desc(rq, skb, os_buf_index, dma_addr, len);
-+	buf->offset = offset;
-+	buf->truesize = truesize;
-+	dma_addr = page_pool_get_dma_addr(page) + offset;
-+	enic_queue_rq_desc(rq, (void *)page, os_buf_index, dma_addr, len);
- 
- 	return 0;
- }
-@@ -175,13 +156,12 @@ int enic_rq_alloc_buf(struct vnic_rq *rq)
- void enic_free_rq_buf(struct vnic_rq *rq, struct vnic_rq_buf *buf)
- {
- 	struct enic *enic = vnic_dev_priv(rq->vdev);
-+	struct enic_rq *erq = &enic->rq[rq->index];
- 
- 	if (!buf->os_buf)
- 		return;
- 
--	dma_unmap_single(&enic->pdev->dev, buf->dma_addr, buf->len,
--			 DMA_FROM_DEVICE);
--	dev_kfree_skb_any(buf->os_buf);
-+	page_pool_put_full_page(erq->pool, (struct page *)buf->os_buf, true);
- 	buf->os_buf = NULL;
- }
- 
-@@ -189,10 +169,10 @@ void enic_rq_indicate_buf(struct vnic_rq *rq, struct cq_desc *cq_desc,
- 			  struct vnic_rq_buf *buf, int skipped, void *opaque)
- {
- 	struct enic *enic = vnic_dev_priv(rq->vdev);
--	struct net_device *netdev = enic->netdev;
- 	struct sk_buff *skb;
- 	struct vnic_cq *cq = &enic->cq[enic_cq_rq(enic, rq->index)];
- 	struct enic_rq_stats *rqstats = &enic->rq[rq->index].stats;
-+	struct napi_struct *napi;
- 
- 	u8 type, color, eop, sop, ingress_port, vlan_stripped;
- 	u8 fcoe, fcoe_sof, fcoe_fc_crc_ok, fcoe_enc_error, fcoe_eof;
-@@ -208,8 +188,6 @@ void enic_rq_indicate_buf(struct vnic_rq *rq, struct cq_desc *cq_desc,
- 		return;
- 	}
- 
--	skb = buf->os_buf;
--
- 	cq_enet_rq_desc_dec((struct cq_enet_rq_desc *)cq_desc, &type, &color,
- 			    &q_number, &completed_index, &ingress_port, &fcoe,
- 			    &eop, &sop, &rss_type, &csum_not_calc, &rss_hash,
-@@ -219,48 +197,46 @@ void enic_rq_indicate_buf(struct vnic_rq *rq, struct cq_desc *cq_desc,
- 			    &tcp, &ipv4_csum_ok, &ipv6, &ipv4, &ipv4_fragment,
- 			    &fcs_ok);
- 
--	if (enic_rq_pkt_error(rq, packet_error, fcs_ok, bytes_written)) {
--		dma_unmap_single(&enic->pdev->dev, buf->dma_addr, buf->len,
--				 DMA_FROM_DEVICE);
--		dev_kfree_skb_any(skb);
--		buf->os_buf = NULL;
--
-+	if (enic_rq_pkt_error(rq, packet_error, fcs_ok, bytes_written))
- 		return;
--	}
- 
- 	if (eop && bytes_written > 0) {
- 		/* Good receive
- 		 */
- 		rqstats->bytes += bytes_written;
--		if (!enic_rxcopybreak(netdev, &skb, buf, bytes_written)) {
--			buf->os_buf = NULL;
--			dma_unmap_single(&enic->pdev->dev, buf->dma_addr,
--					 buf->len, DMA_FROM_DEVICE);
-+		napi = &enic->napi[rq->index];
-+		skb = napi_get_frags(napi);
-+		if (unlikely(!skb)) {
-+			net_warn_ratelimited("%s: skb alloc error rq[%d], desc[%d]\n",
-+					     enic->netdev->name, rq->index,
-+					     completed_index);
-+			rqstats->no_skb++;
-+			return;
- 		}
-+
- 		prefetch(skb->data - NET_IP_ALIGN);
- 
--		skb_put(skb, bytes_written);
--		skb->protocol = eth_type_trans(skb, netdev);
-+		dma_sync_single_for_cpu(&enic->pdev->dev, buf->dma_addr,
-+					bytes_written, DMA_FROM_DEVICE);
-+		skb_add_rx_frag(skb, skb_shinfo(skb)->nr_frags,
-+				(struct page *)buf->os_buf, buf->offset,
-+				bytes_written, buf->truesize);
- 		skb_record_rx_queue(skb, q_number);
- 		enic_rq_set_skb_flags(rq, type, rss_hash, rss_type, fcoe,
- 				      fcoe_fc_crc_ok, vlan_stripped,
- 				      csum_not_calc, tcp_udp_csum_ok, ipv6,
- 				      ipv4_csum_ok, vlan_tci, skb);
--		skb_mark_napi_id(skb, &enic->napi[rq->index]);
--		if (!(netdev->features & NETIF_F_GRO))
--			netif_receive_skb(skb);
--		else
--			napi_gro_receive(&enic->napi[q_number], skb);
-+		skb_mark_for_recycle(skb);
-+		napi_gro_frags(napi);
- 		if (enic->rx_coalesce_setting.use_adaptive_rx_coalesce)
- 			enic_intr_update_pkt_size(&cq->pkt_size_counter,
- 						  bytes_written);
-+		buf->os_buf = NULL;
-+		buf->dma_addr = 0;
-+		buf = buf->next;
- 	} else {
- 		/* Buffer overflow
- 		 */
- 		rqstats->pkt_truncated++;
--		dma_unmap_single(&enic->pdev->dev, buf->dma_addr, buf->len,
--				 DMA_FROM_DEVICE);
--		dev_kfree_skb_any(skb);
--		buf->os_buf = NULL;
- 	}
- }
-diff --git a/drivers/net/ethernet/cisco/enic/vnic_rq.h b/drivers/net/ethernet/cisco/enic/vnic_rq.h
-index 0bc595abc03b..2ee4be2b9a34 100644
---- a/drivers/net/ethernet/cisco/enic/vnic_rq.h
-+++ b/drivers/net/ethernet/cisco/enic/vnic_rq.h
-@@ -61,6 +61,8 @@ struct vnic_rq_buf {
- 	unsigned int index;
- 	void *desc;
- 	uint64_t wr_id;
-+	unsigned int offset;
-+	unsigned int truesize;
- };
- 
- enum enic_poll_state {
+> 
+>> +		goto peer_free;
+>> +	}
+>> +
+>> +	skb_put(skb, linear);
+>> +	skb->len = size;
+>> +	skb->data_len = size - linear;
+>> +
+>> +	ret = skb_copy_datagram_from_iter(skb, 0, &msg->msg_iter, size);
+>> +	if (ret) {
+>> +		kfree_skb(skb);
+>> +		net_err_ratelimited("%s: skb copy from iter failed: %d\n",
+>> +				    netdev_name(sock->peer->ovpn->dev), ret);
+> 
+> s/sock->//
+
+ACK
+
+> 
+>> +		goto peer_free;
+>> +	}
+>> +
+>> +	ovpn_tcp_send_sock_skb(sock->peer, skb);
+> 
+> s/sock->//
+
+ACK
+
+> 
+>> +	ret = size;
+>> +peer_free:
+>> +	release_sock(peer->sock->sock->sk);
+>> +	ovpn_peer_put(peer);
+>> +	return ret;
+>> +}
+> 
+
 -- 
-2.39.3
+Antonio Quartulli
+OpenVPN Inc.
 
 
