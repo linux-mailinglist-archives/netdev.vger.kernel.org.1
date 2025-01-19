@@ -1,165 +1,138 @@
-Return-Path: <netdev+bounces-159621-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159622-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C418A1620D
-	for <lists+netdev@lfdr.de>; Sun, 19 Jan 2025 14:39:46 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 53C70A1620E
+	for <lists+netdev@lfdr.de>; Sun, 19 Jan 2025 14:43:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 243F37A1D4A
-	for <lists+netdev@lfdr.de>; Sun, 19 Jan 2025 13:39:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E2BE21885492
+	for <lists+netdev@lfdr.de>; Sun, 19 Jan 2025 13:43:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11BDE1DE3A7;
-	Sun, 19 Jan 2025 13:39:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B47BD1DE3CE;
+	Sun, 19 Jan 2025 13:43:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aJe4XEss"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d1d+Llp/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f169.google.com (mail-il1-f169.google.com [209.85.166.169])
+Received: from mail-lj1-f175.google.com (mail-lj1-f175.google.com [209.85.208.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7800F184;
-	Sun, 19 Jan 2025 13:39:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E80B21CEE90;
+	Sun, 19 Jan 2025 13:43:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737293978; cv=none; b=mI7G2qUYDAxM2tILQfNJp6rzSKI/bjV2f7J1CNCCiAxMwftF2FpG/UY6o53gzby/FcRErHq3QO99n+E40vCSopmFVFi1Gr/CzfgMoWBz+bFjzuH1JHUEeAysoaFyioWpmMFqIyH4Tz3nlbO6XPKXmKWcaVs6/sihWXimLEL3cDY=
+	t=1737294230; cv=none; b=j1lbgIl9W/Ca/RUj8abiCddCJFwL3fNoRAyLLG9aqZGNaTLPBiRB353dcEVYy5I/ZBR3LDTGFWGrGhUbFa/Oawf8B4BWXoHK3TNImjtGLcuqJB0C6MedRsNxjKCHrP+lMOlMw/uqA2Zm4nauj8rVY58qwU/iMVECE7+Gt+21Qf8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737293978; c=relaxed/simple;
-	bh=AOrMseePuFZUh7P1yTJm/E/Na9Q68+1r2WXcc8MChlQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=A/ax8xe4QL1Y+MBMRPvCThNwu9kEmZ3wXFwECRZSz/3y0FEucB/bI8mkEVxUbU4vh3t2Ujf1FTYeuwfsLQK8w11A5XTq8sFAGw1uugBtu6dPyvICRjPqM8pLuBOyCpfJ8tuN2fKY8NBzpTF3x1cPd/HgVMjcYTXfcWnQrU9fwXk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aJe4XEss; arc=none smtp.client-ip=209.85.166.169
+	s=arc-20240116; t=1737294230; c=relaxed/simple;
+	bh=hsyg5PxvrQfXrTU3x+H+2KmmiXuCRGJbxRYhQOugc2Y=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=SWnb8DghCSQGTsgCN61yYC89Eu4wWk8v9qIzhnxXGTb0AZsJVf3P0Dh2skMHpI27uVDoyIkd2OpEi18ElvgIB7c2pqS/HGfp14KoBdS8WnB8mxzDrnEqXfw2iMN131vEz6qVdQRYtRRNGgWCZBc7HOCyMM2zGWXiO/77KTkcJhw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=d1d+Llp/; arc=none smtp.client-ip=209.85.208.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f169.google.com with SMTP id e9e14a558f8ab-3ce915a8a25so12681315ab.1;
-        Sun, 19 Jan 2025 05:39:36 -0800 (PST)
+Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-305d840926fso28018731fa.2;
+        Sun, 19 Jan 2025 05:43:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1737293975; x=1737898775; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZyLW6Nb+BwKq6P0lAx9OQ8RLychDMbpqf1N3HwTHDZY=;
-        b=aJe4XEsspOD5EUNRTllNmIWPngB0emEw8A11BbZ2t+lJJYqfMuyPZQ4J373MKXMN2t
-         qvZIkyXlfRTJPiDwf8I8tYnvrUp8w79y+GOcnhzMWJovO/EzXBue/RevFao7H+IEuUjY
-         IwZ7R4Ni6XpAV+Y5uICyDqKe+UNfJxOQze5aOj7cOz/kmZUj8LERlmst/pwLFuMH71OR
-         aOPueDD7ACGPRi7erDO8McP5evH0AOEvRlgFSAWyABZhh2tDoxUeI7vweK4wFlO+V5mm
-         lA9n3orbtL7xIHBDcbKorXlh1LUFdSag6mT51G2h0/BglKSxiPYxluqoxeY7Exq9wrBX
-         +4aA==
+        d=gmail.com; s=20230601; t=1737294226; x=1737899026; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=8gWNi/IypbbNa7pbuablMjSeHo0lB0qQ1x7eVFjSs6I=;
+        b=d1d+Llp/YjGpDPY/3BW36xo58O2KCKB4VLvskGtee8oK4Mk1nnQM49lLxIOxNHrMm5
+         wB2oaWBaQ29B0DW7sTUWw+Sxg442yixdH8s6zPsNJWkZ+E4qUBF72Gld+11RgYA3N2qW
+         rWGSFkB2n3J/O2bD8dJ8sydoxwOsMv7ji3PtakJ4V52TxRzlqqHA22zrmZV83GpkW2lk
+         JulyeQv/uALH0eiszgZZ4a8jIKlxqAR1I8eWLjZEGFWssctJsONwikro/A+vS7M+sDY9
+         yf7XeAGe7tNrOd6YZ8AceHYr/h5nE+isBQyYj82EGz/effQ4Fl8vAuiIp35KHJxG0FT0
+         e6Wg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737293975; x=1737898775;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ZyLW6Nb+BwKq6P0lAx9OQ8RLychDMbpqf1N3HwTHDZY=;
-        b=hj01Wb3rqXntt5wNJgLHy+fPTLJ6zMhwl4QlOZK8Af+pwQBlFElw90byyrpD7iJWs9
-         NpfAU9aDq1Fqhz5+NP1RBpgvPJDyocjYSB0zf9EAK3KYeKMzVKWsp6DS8vyMkEg6rOdT
-         Q3g608xepbY+tWRiBuXAJPBsBSBK14Kq3WLI6UAYfjgeeau4yS05+YkQrVkN9ql9jTqV
-         uu2IxO/BhgCXoOV5MyQvYs2YcqtrmdojMi8jtDsQQabiaVNzqW696zObj033JPwCch2n
-         E3yTsX8M7YlxbhuTgdYh+S56hC0r4kdawCDZkiFIgCZrIkd41i8GVNAp8V8iWBdzH0UW
-         OwVQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVbseT25Bt8ExqO60VT4iK9huHyEdtSnnZrxVo1kWRu1AqE0urPfZxyykjUxdcOsIkUHyJqO6Xt@vger.kernel.org, AJvYcCXForEVrk1+9Lm4wbTW8Sby5G8wpbly7AzcQJdeEGblqEh4jRQ34LDj/SpcJZZRhIzF0v4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz9yhOf9M04RmXaIfEfSpHDhXal3H3vBh2AwoS6IQhwdc6jvF1a
-	EEVAmZR9Rq5NhjHY5mTZP3KR7UOpC28JJS15q70Wz+wbUoW/Anhy8Bhu4qeZd5rN6N3rJnZyOpJ
-	jT3AVUnYgSr2eIHy54+yll7x/EDU=
-X-Gm-Gg: ASbGncsd054/mvGWlagW3QfCwmgRgdY3DAX+Gu2MYG7mp4450Ahy7KebpRZAG0fDF4b
-	25L57wLoceYHV4EyKyeAscLLhanSbJSV/42vHSgn4boNIm1T2bQ==
-X-Google-Smtp-Source: AGHT+IGg8f5eZQpNG0ez0cD3+Qd900BX8NgeG34bZBtsWI0SwjFcmMMHiIRdbgZUx1flVCz4zipAhuZnahViiVY0eKA=
-X-Received: by 2002:a92:cda7:0:b0:3ce:7bf1:526 with SMTP id
- e9e14a558f8ab-3cf7449615bmr65232265ab.16.1737293975391; Sun, 19 Jan 2025
- 05:39:35 -0800 (PST)
+        d=1e100.net; s=20230601; t=1737294226; x=1737899026;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=8gWNi/IypbbNa7pbuablMjSeHo0lB0qQ1x7eVFjSs6I=;
+        b=v1uBR3qKVmJnDd6nhyHSr9pyg8xxvhlxxhXhgFftGoa7t5s/kj7+PDfuVtVD6Su4A4
+         ZrS2UhIhjPCfDGMhirmb7YCVDxthOun/LSFkzrdeVttaZkzdNOrH3FnswmzgyJYf+rk5
+         jIVktYJ7NqhiaoTay9DRCFpkqFEsv8jy9yDwUvOi3HLB+RMHGsD6YF5Wc+s59g+HjocY
+         9dSkZD0uw+kuHcIASdJkGF6FuxJ/AwoELzemD98ggg0o2jIwE/RvQPL7VxnGwDnZu0Bh
+         /0CrIA8VfEvuBeIsw2B7YNkSMB4sAwJocStSgggrK+v3ZC7q9DClyNYnI7F4RH0IyCDE
+         kpFw==
+X-Forwarded-Encrypted: i=1; AJvYcCWzs1/WaCUUUmjolDSIwBksbnTAYBLJWq7mWUw+J0M1MUDuyuzahztL1xV3H6eYtUrjE+V3Qnp7OEP2MZY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxmljFW+VOEFiDsohlDCfPiecI9W0Su+1cVBDYQIHINK4Lvfqwn
+	YYji1rAzxkJeCEH7B+3DHKavdDeHZ8YqMxPjfPho5Ys9K07ExsICN6RuMMzIl28=
+X-Gm-Gg: ASbGncth0SN8tNK6H1Jy+R/wSjovcaAxFjWfTl8Rl+oMXy3U+eGZjlO/rqZ9i5HIeV/
+	z/RV/DYLFsLXyN4gJ3sc4HMljW6uJdZiVeJROLhSjw200mB2YTOBmo1tddrY+CvVDwtUxFp4L2T
+	sYLv74xOcZPBJ8hPF4WSx5fSkt25CDuZVlsfyT4K9Wqr5Ixn1Wmuow4ZhR3UHyK3ZUc68gWdlCf
+	373Oc+WLKkpgv4ds5J84Etykwtq71Hu+Sp06M1vkD0z9W37Zv2zyPyb5f1y1yp8g6dqiw==
+X-Google-Smtp-Source: AGHT+IFD1n5RtEB+MVPMtBggP1RCJlrcXB24p+GJ61EeJv2QrtTgfD1yfPjJyH+PPe+5oMwwgO3z8A==
+X-Received: by 2002:a2e:b80b:0:b0:300:2c9f:ac51 with SMTP id 38308e7fff4ca-3072ca60dd0mr25158601fa.2.1737294225774;
+        Sun, 19 Jan 2025 05:43:45 -0800 (PST)
+Received: from X220-Tablet.. ([83.217.202.104])
+        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-3072a502c93sm11942831fa.101.2025.01.19.05.43.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 19 Jan 2025 05:43:44 -0800 (PST)
+From: Denis Kirjanov <kirjanov@gmail.com>
+To: netdev@vger.kernel.org
+Cc: edumazet@google.com,
+	davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux-kernel@vger.kernel.org,
+	Denis Kirjanov <kirjanov@gmail.com>
+Subject: [PATCH v2 net-next] sysctl net: Remove macro checks for CONFIG_SYSCTL
+Date: Sun, 19 Jan 2025 16:42:53 +0300
+Message-ID: <20250119134254.19250-1-kirjanov@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250112113748.73504-1-kerneljasonxing@gmail.com>
- <20250112113748.73504-9-kerneljasonxing@gmail.com> <ef391d15-4968-42c6-b107-cbd941d98e73@linux.dev>
- <CAL+tcoC+bXAPP94zLka5GcwbpWNQtFijxd0PcPnVrtS-F=h6vQ@mail.gmail.com>
- <fc4dd0d9-d4ae-4601-be01-5fad7c74e585@linux.dev> <CAL+tcoCJiaO4o8y56k2p8aePzkoE6SHXc7o4hEAc+D_hw7K8+A@mail.gmail.com>
-In-Reply-To: <CAL+tcoCJiaO4o8y56k2p8aePzkoE6SHXc7o4hEAc+D_hw7K8+A@mail.gmail.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Sun, 19 Jan 2025 21:38:59 +0800
-X-Gm-Features: AbW1kvYYkcgXuSflECjdY2MrJtceOthRWr7W8YSTvTDsAPkFjt5asG1IdnfhtZU
-Message-ID: <CAL+tcoDwa-iZhZzx+vdW97Bqk28_CBOUgyhuiHv=q213v09aiA@mail.gmail.com>
-Subject: Re: [PATCH net-next v5 08/15] net-timestamp: support sw
- SCM_TSTAMP_SND for bpf extension
-To: Martin KaFai Lau <martin.lau@linux.dev>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, dsahern@kernel.org, willemdebruijn.kernel@gmail.com, 
-	willemb@google.com, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, 
-	eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev, 
-	john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me, 
-	haoluo@google.com, jolsa@kernel.org, horms@kernel.org, bpf@vger.kernel.org, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Sat, Jan 18, 2025 at 9:43=E2=80=AFAM Jason Xing <kerneljasonxing@gmail.c=
-om> wrote:
->
-> On Sat, Jan 18, 2025 at 8:47=E2=80=AFAM Martin KaFai Lau <martin.lau@linu=
-x.dev> wrote:
-> >
-> > On 1/15/25 3:56 PM, Jason Xing wrote:
-> > > On Thu, Jan 16, 2025 at 6:48=E2=80=AFAM Martin KaFai Lau <martin.lau@=
-linux.dev> wrote:
-> > >>
-> > >> On 1/12/25 3:37 AM, Jason Xing wrote:
-> > >>> Support SCM_TSTAMP_SND case. Then we will get the software
-> > >>> timestamp when the driver is about to send the skb. Later, I
-> > >>> will support the hardware timestamp.
-> > >>
-> > >>> diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-> > >>> index 169c6d03d698..0fb31df4ed95 100644
-> > >>> --- a/net/core/skbuff.c
-> > >>> +++ b/net/core/skbuff.c
-> > >>> @@ -5578,6 +5578,9 @@ static void __skb_tstamp_tx_bpf(struct sk_buf=
-f *skb, struct sock *sk, int tstype
-> > >>>        case SCM_TSTAMP_SCHED:
-> > >>>                op =3D BPF_SOCK_OPS_TS_SCHED_OPT_CB;
-> > >>>                break;
-> > >>> +     case SCM_TSTAMP_SND:
-> > >>> +             op =3D BPF_SOCK_OPS_TS_SW_OPT_CB;
-> > >>
-> > >> For the hwtstamps case, is skb_hwtstamps(skb) set? From looking at a=
- few
-> > >> drivers, it does not look like it. I don't see the hwtstamps support=
- in patch 10
-> > >> either. What did I miss ?
-> > >
-> > > Sorry, I missed adding a new flag, namely, BPF_SOCK_OPS_TS_HW_OPT_CB.
-> > > I can also skip adding that new one and rename
-> > > BPF_SOCK_OPS_TS_SW_OPT_CB accordingly for sw and hw cases if we
-> > > finally decide to use hwtstamps parameter to distinguish two differen=
-t
-> > > cases.
-> >
-> > I think having a separate BPF_SOCK_OPS_TS_HW_OPT_CB is better consideri=
-ng your
-> > earlier hwtstamps may be NULL comment. I don't see the drivers I looked=
- at
-> > passing NULL though but the comment of skb_tstamp_tx did say it may be =
-NULL :/
->
-> Yep, I was trying not to rely on or trust the hardware/driver's
-> implementation, or else it will let the bpf program fetch the software
-> timestamp instead of hardware timestamp which will cause unexpected
-> behaviour.
->
-> After re-reading this part, I reckon that using this SKBTX_IN_PROGRESS
-> flag is enough to recognize if we are in the hardware timestamping
-> generation period. I will try this one since it requires much less
-> modification.
+Since dccp and llc makefiles already check sysctl code
+compilation with xxx-$(CONFIG_SYSCTL)
+we can drop the checks
 
-For the record only, SKBTX_IN_PROGRESS cannot represent if we're
-generating the hardware timestamp. For example, in I40e driver,
-i40e_xmit_frame_ring() calls i40e_tsyn() to set SKBTX_IN_PROGRESS
-before generating the software SND timestamp in i40e_tx_map() by
-calling skb_tx_timestamp().
+Signed-off-by: Denis Kirjanov <kirjanov@gmail.com>
+---
+changelog:
+v2: fix the spelling mistake "witn" -> "with" 
 
-Therefore, I will use the current patch directly.
+ net/dccp/sysctl.c        | 4 ----
+ net/llc/sysctl_net_llc.c | 4 ----
+ 2 files changed, 8 deletions(-)
 
-Thanks,
-Jason
+diff --git a/net/dccp/sysctl.c b/net/dccp/sysctl.c
+index 3fc474d6e57d..b15845fd6300 100644
+--- a/net/dccp/sysctl.c
++++ b/net/dccp/sysctl.c
+@@ -11,10 +11,6 @@
+ #include "dccp.h"
+ #include "feat.h"
+ 
+-#ifndef CONFIG_SYSCTL
+-#error This file should not be compiled without CONFIG_SYSCTL defined
+-#endif
+-
+ /* Boundary values */
+ static int		u8_max   = 0xFF;
+ static unsigned long	seqw_min = DCCPF_SEQ_WMIN,
+diff --git a/net/llc/sysctl_net_llc.c b/net/llc/sysctl_net_llc.c
+index 72e101135f8c..c8d88e2508fc 100644
+--- a/net/llc/sysctl_net_llc.c
++++ b/net/llc/sysctl_net_llc.c
+@@ -11,10 +11,6 @@
+ #include <net/net_namespace.h>
+ #include <net/llc.h>
+ 
+-#ifndef CONFIG_SYSCTL
+-#error This file should not be compiled without CONFIG_SYSCTL defined
+-#endif
+-
+ static struct ctl_table llc2_timeout_table[] = {
+ 	{
+ 		.procname	= "ack",
+-- 
+2.43.0
+
 
