@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-159589-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159590-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65133A15FD1
-	for <lists+netdev@lfdr.de>; Sun, 19 Jan 2025 02:50:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C5F79A15FD2
+	for <lists+netdev@lfdr.de>; Sun, 19 Jan 2025 02:50:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0CAB41886B16
-	for <lists+netdev@lfdr.de>; Sun, 19 Jan 2025 01:50:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 73E9F1886B7B
+	for <lists+netdev@lfdr.de>; Sun, 19 Jan 2025 01:50:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9BC714286;
-	Sun, 19 Jan 2025 01:50:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 413561B7F4;
+	Sun, 19 Jan 2025 01:50:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TA2GXNU4"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oLTreuTA"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93E4911185
-	for <netdev@vger.kernel.org>; Sun, 19 Jan 2025 01:50:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BBFC1B59A
+	for <netdev@vger.kernel.org>; Sun, 19 Jan 2025 01:50:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737251410; cv=none; b=roUomU6CEyjZM64SPr41KeZdlsc/4zVsG8e/Z2UfAEwyYTwfHzpBeJby3Ts83tvrM3WpqtK2lCT+vRoI2EDrKoJksrqRPpE4kwk6MoOaZL7Cixw59ncp2Kc77vowEgWTgJ9OPlFx1qwDepixM0lb6LNO0BcBYBFVPKU0+kHvykc=
+	t=1737251412; cv=none; b=SOdjpVHn03d8UF+NrpBMrRZgmlfZPmkLYx3pdpUaRRkU2AV2VEPHh0jDhCfoklaxWmm/l0j0bshDr2LByR1j3S083YXX0ytsP+tjbDYJPYx6bUPfCA9INT13IGvNivFfZI0QSSBIAlb55+hbvdBnyon/j4YDL0V6524SNq5aTj4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737251410; c=relaxed/simple;
-	bh=9nQymEnauec6QbOnnAA8pRl9+Jbx9fXNcPkeLMG9GD4=;
+	s=arc-20240116; t=1737251412; c=relaxed/simple;
+	bh=GQXZaI4e6FQPH23YUYjOqk6+QoB3FSskLTxSrSMhKb8=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=lVuks9FKEu34mTJ9SgyBJktwNIwL4tslH0sWvp7hzKOG6MOcvBhTNgdVr/8G4B5HWjq6KaeoCBWxQ9UPMQnItwfKx1/rL7s5gFI8dq7XHuKD+D6AvfxDXzQGFW8c6+bLy2o0p7uYMgxZbNRs1WphaQ1udSzUGZQlgBZ2tMd6tUw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TA2GXNU4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 11DC9C4CEE3;
-	Sun, 19 Jan 2025 01:50:10 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=YV86xoW0cnas42nGnm7UTtkVZwuYzeCF9Hhf3Mfj7BrmB56/1oAx2kztlQJ3ytOaN5Q2F9PUzTJEEENFc4w1KFb39NJATv1vwP5Q5I1Txe/tcrSLeDM7kRkTz9/cFv0F5LJD76O+lCo25kb3ffzOJxSvqvGlCtYij38dMsZGWCo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oLTreuTA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 92E8CC4CED1;
+	Sun, 19 Jan 2025 01:50:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737251410;
-	bh=9nQymEnauec6QbOnnAA8pRl9+Jbx9fXNcPkeLMG9GD4=;
+	s=k20201202; t=1737251411;
+	bh=GQXZaI4e6FQPH23YUYjOqk6+QoB3FSskLTxSrSMhKb8=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=TA2GXNU4w86jD+mcPcmUWgyV0/YlVcNChmgOXBIK8KmwMeudx97YizZVzA30U875y
-	 tMRl1k6phPZzfpFLoP5E3YIQO39yeSDx4m6v6JspswxSurWtJF5YtvBInTNmP0uC/v
-	 yLeIUudXuEbpOVifAgZcm6lcVqXpYbLTm06/inuMTr/Nj+xIs9KZ17ihK5grcxmrSn
-	 EADdMlwQOOEaks0uhkL8ed3j4lcp6pkuMsgaIm/0QwZVfZth5WQp9POTLPhZfc/eFX
-	 t9eyNw1gJUvF1vS1bQnW1J2MDIXSLm2lQl5h/4SKr/I0/ouOLiUJseF3OP/mS9fRew
-	 N3raw5R/VuzdA==
+	b=oLTreuTAZaMJAXax+AcrrFM5Co+KrfqzdOIkwXuPk65YACBooXh2cZ89R9QdDk4wt
+	 7szrbZmniGxv8J3wiVurPvvGLGGbugMOjrNGYcqmiqQwIFjmcgRuskvC+gr2Bsud0Z
+	 Jtv7oyrxwxKes9qyYCubSRed/Uoba7Vb4o5JP9VM4EWlCz4uUbQXKK0a0U5/duaK2r
+	 P8lYzZhDILtaa2K+jBMevyEGjhfO5jV5LY0zm8f8zN4NjoqdJKqNo32HfX8mIcmUdX
+	 VeBhifYxW3iivderYeS0e7FbESr5eDyO65EwHautZSM6jMg7VIvBakXvGCZgSACIcf
+	 dBfLV0rLKSSeA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAC7C380AA62;
-	Sun, 19 Jan 2025 01:50:34 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70BC9380AA62;
+	Sun, 19 Jan 2025 01:50:36 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,46 +52,46 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 0/5] mlxsw: Move Tx header handling to PCI driver
+Subject: Re: [PATCH v2 net-next 0/4] ethtool get_ts_stats() for DSA and ocelot
+ driver
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <173725143374.2533015.1397683051270788445.git-patchwork-notify@kernel.org>
-Date: Sun, 19 Jan 2025 01:50:33 +0000
-References: <cover.1737044384.git.petrm@nvidia.com>
-In-Reply-To: <cover.1737044384.git.petrm@nvidia.com>
-To: Petr Machata <petrm@nvidia.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, andrew+netdev@lunn.ch, netdev@vger.kernel.org,
- richardcochran@gmail.com, idosch@nvidia.com, mlxsw@nvidia.com
+ <173725143498.2533015.9693076056324492568.git-patchwork-notify@kernel.org>
+Date: Sun, 19 Jan 2025 01:50:34 +0000
+References: <20250116104628.123555-1-vladimir.oltean@nxp.com>
+In-Reply-To: <20250116104628.123555-1-vladimir.oltean@nxp.com>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, andrew@lunn.ch, claudiu.manoil@nxp.com,
+ alexandre.belloni@bootlin.com, horatiu.vultur@microchip.com,
+ daniel.machon@microchip.com, UNGLinuxDriver@microchip.com,
+ xiaoliang.yang_1@nxp.com, yangbo.lu@nxp.com, richardcochran@gmail.com
 
 Hello:
 
 This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu, 16 Jan 2025 17:38:13 +0100 you wrote:
-> Amit Cohen writes:
+On Thu, 16 Jan 2025 12:46:24 +0200 you wrote:
+> Picking up this set again after the end-of-year break.
 > 
-> Tx header should be added to all packets transmitted from the CPU to
-> Spectrum ASICs. Historically, handling this header was added as a driver
-> function, as Tx header is different between Spectrum and Switch-X.
+> Changes in v2: trivial rebase after the concurrent merge of the "net:
+> Make timestamping selectable" set.
 > 
-> From May 2021, there is no support for SwitchX-2 ASIC, and all the relevant
-> code was removed.
+> Link to v1:
+> https://lore.kernel.org/netdev/20241213140852.1254063-1-vladimir.oltean@nxp.com/
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,1/5] mlxsw: Add mlxsw_txhdr_info structure
-    https://git.kernel.org/netdev/net-next/c/349856655504
-  - [net-next,2/5] mlxsw: Initialize txhdr_info according to PTP operations
-    https://git.kernel.org/netdev/net-next/c/e8e08279d3ce
-  - [net-next,3/5] mlxsw: Define Tx header fields in txheader.h
-    https://git.kernel.org/netdev/net-next/c/c89d9c3d0a97
-  - [net-next,4/5] mlxsw: Move Tx header handling to PCI driver
-    https://git.kernel.org/netdev/net-next/c/6ce1aac7480e
-  - [net-next,5/5] mlxsw: Do not store Tx header length as driver parameter
-    https://git.kernel.org/netdev/net-next/c/448269fa05c1
+  - [v2,net-next,1/4] net: ethtool: ts: add separate counter for unconfirmed one-step TX timestamps
+    https://git.kernel.org/netdev/net-next/c/6a128cdf1926
+  - [v2,net-next,2/4] net: dsa: implement get_ts_stats ethtool operation for user ports
+    https://git.kernel.org/netdev/net-next/c/4b0a3ffa799b
+  - [v2,net-next,3/4] net: mscc: ocelot: add TX timestamping statistics
+    https://git.kernel.org/netdev/net-next/c/8fbd24f3d17b
+  - [v2,net-next,4/4] net: dsa: felix: report timestamping stats from the ocelot library
+    https://git.kernel.org/netdev/net-next/c/e777a4b39b14
 
 You are awesome, thank you!
 -- 
