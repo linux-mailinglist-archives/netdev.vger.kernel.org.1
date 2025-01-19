@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-159604-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159605-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD73BA15FEA
-	for <lists+netdev@lfdr.de>; Sun, 19 Jan 2025 03:05:25 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E1FA4A15FEB
+	for <lists+netdev@lfdr.de>; Sun, 19 Jan 2025 03:05:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C8F6E165C72
-	for <lists+netdev@lfdr.de>; Sun, 19 Jan 2025 02:05:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5B3831886C3E
+	for <lists+netdev@lfdr.de>; Sun, 19 Jan 2025 02:05:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78EF315E90;
-	Sun, 19 Jan 2025 02:05:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E69DB2A1BA;
+	Sun, 19 Jan 2025 02:05:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NSChqj1i"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nV7+2X4I"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53498EAF1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2DCC29CE7
 	for <netdev@vger.kernel.org>; Sun, 19 Jan 2025 02:05:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737252321; cv=none; b=ud1B05YKTdASWH3caHxg5uuqGH9w7/LdUNul/bsgsR2KWLDp6kN5pBZMpJVGIH5NQFx2PwjhpoLlG0TVVlM7rNh78hoGjJCf4iCdhjG/DtPtL72h24lXomK4FqM3bxpZM9LmGGOLvCfcJZcmhMv61mQK1KG4F1SgC//l9BA7N3s=
+	t=1737252322; cv=none; b=I6V1AWD4zjYufZYJwUFYPPXMFt2PiRhvzFz/snPvxZxLpk+WwC4ShF/xig50/Lfnpi+fe90bpQeyJCuHNk2G1pMHFUHdGIjVeHP+p/yis34W6UVUyDiA/Uvd81u8OIFPbqK71BM2s5GpC8j3LbdjvTrM2xQNIHrXVMvLp9SQyuM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737252321; c=relaxed/simple;
-	bh=VOdEhcV+2oCHLu2dS/5gu6v+QDdJ0k1n/9hrAJAkmbY=;
+	s=arc-20240116; t=1737252322; c=relaxed/simple;
+	bh=yA1KwJiIOYKNcrFJ32zpsCwi3SpkpgvUBGg6qkDGA7g=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ljKGcXUEmYKs3P8o6I7RpWNVB2Jv/9/O/+LRZWkl951U96l6c7OuqS8qF4GQ8Gh3J5+dRiicPllhmoTby7kAAYJbRiakK7a+9T66/yb7AMU3L+oJtxzNEL7YGPbEz0Y8jNnuQD3nE9sNopW350+gDMxp39kPgIHLQmViTqHNqn4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NSChqj1i; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C922FC4CEE4;
-	Sun, 19 Jan 2025 02:05:20 +0000 (UTC)
+	 MIME-Version; b=KRY/o8vVIw748qCFa7qWfHcRVrAG/V+EJuZpoPos+d30/3o4FZjyJWI5roa+zk16/S9uJu7CsX9dnuzxIJKmgG4V0JJwe2ECP8AKXBiUOHwFcLTh8sZHOXQyJo7+sHdpLC/glNkxOaKwmoPrl/e32mXREw3Fk5qghKboCVmnz0A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nV7+2X4I; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4F4DAC4CEE3;
+	Sun, 19 Jan 2025 02:05:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1737252321;
-	bh=VOdEhcV+2oCHLu2dS/5gu6v+QDdJ0k1n/9hrAJAkmbY=;
+	bh=yA1KwJiIOYKNcrFJ32zpsCwi3SpkpgvUBGg6qkDGA7g=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=NSChqj1ibz4v/Fyer/xmGEagt2XGkqQ6RzLBtZHfYPAcVOh0sfXsLgMk9FQt570OC
-	 M3cAZLQvBZ+gryW1sJdBadm0ZQVNBltnJPUTTap9ZlslV4/yNYgWbSnd1DOksCU7X3
-	 B38ixprZ/rOv3OJ/xFfNBE4oCroHoL1PTeIZpgOSBA32QkUFjbz8ylBpGyDeUwpEsl
-	 MiGhAOD1yX95ajsCRGS5zljr0Hwg7dUL6DESd4G6rhw8Ht2o4ilsbCw68Qq6b4TiX3
-	 H008RY1N9+qZIYInfwLxKKUAAqP5aRNN7oTeEOiMSY5Qmqz54nAVGmhXx7jTWL36I/
-	 CEHOySjuHdR7w==
+	b=nV7+2X4IQFEkwf0HL3OWGxDl0zCRDZrt6EiGiJ+E4gypn8hR6uflWNeRSwa2GOqSX
+	 NbS+ghePj/Go9NUOj4gjHKsnlBdfeaUFpwjBfHvMvR4LTmeikcIJ+lFESB+5L5M1hD
+	 UrJih/UO9OqruJvLM7yY+nDTQuTIc/xd0LY564FXbOmbD/XwwJ3uykkQxItXjlO+ov
+	 iSUH1SZLjmE46+BhDzp2xrCvMPWvqW7hOSHcQ1rHRqXQVjca5SAyruNOeNeFRTxYbA
+	 FM+Y9r9Cdk9ZwFUhaQy1222QpMbFTFA9EtJ/ih4XiRkv2q9kgWza5vuUlfiTR2u5x8
+	 uRolv+W2f79eA==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -52,9 +52,9 @@ Cc: netdev@vger.kernel.org,
 	pavan.chebbi@broadcom.com,
 	ap420073@gmail.com,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next v2 1/7] net: move HDS config from ethtool state
-Date: Sat, 18 Jan 2025 18:05:11 -0800
-Message-ID: <20250119020518.1962249-2-kuba@kernel.org>
+Subject: [PATCH net-next v2 2/7] net: ethtool: store netdev in a temp variable in ethnl_default_set_doit()
+Date: Sat, 18 Jan 2025 18:05:12 -0800
+Message-ID: <20250119020518.1962249-3-kuba@kernel.org>
 X-Mailer: git-send-email 2.48.1
 In-Reply-To: <20250119020518.1962249-1-kuba@kernel.org>
 References: <20250119020518.1962249-1-kuba@kernel.org>
@@ -66,306 +66,53 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Separate the HDS config from the ethtool state struct.
-The HDS config contains just simple parameters, not state.
-Having it as a separate struct will make it easier to clone / copy
-and also long term potentially make it per-queue.
+For ease of review of the next patch store the dev pointer
+on the stack, instead of referring to req_info.dev every time.
+
+No functional changes.
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- include/linux/ethtool.h                           |  4 ----
- include/linux/netdevice.h                         |  3 +++
- include/net/netdev_queues.h                       | 10 ++++++++++
- drivers/net/ethernet/broadcom/bnxt/bnxt.c         |  4 ++--
- drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c |  5 +++--
- drivers/net/netdevsim/ethtool.c                   |  9 +++++----
- drivers/net/netdevsim/netdev.c                    | 10 +++++-----
- net/core/dev.c                                    | 10 ++++++++--
- net/core/devmem.c                                 |  4 ++--
- net/ethtool/rings.c                               |  8 +++++---
- 10 files changed, 43 insertions(+), 24 deletions(-)
+ net/ethtool/netlink.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
-diff --git a/include/linux/ethtool.h b/include/linux/ethtool.h
-index 64301ddf2f59..870994cc3ef7 100644
---- a/include/linux/ethtool.h
-+++ b/include/linux/ethtool.h
-@@ -1171,16 +1171,12 @@ int ethtool_virtdev_set_link_ksettings(struct net_device *dev,
-  * @rss_ctx:		XArray of custom RSS contexts
-  * @rss_lock:		Protects entries in @rss_ctx.  May be taken from
-  *			within RTNL.
-- * @hds_thresh:		HDS Threshold value.
-- * @hds_config:		HDS value from userspace.
-  * @wol_enabled:	Wake-on-LAN is enabled
-  * @module_fw_flash_in_progress: Module firmware flashing is in progress.
-  */
- struct ethtool_netdev_state {
- 	struct xarray		rss_ctx;
- 	struct mutex		rss_lock;
--	u32			hds_thresh;
--	u8			hds_config;
- 	unsigned		wol_enabled:1;
- 	unsigned		module_fw_flash_in_progress:1;
- };
-diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index 8308d9c75918..173a8b3a9eb2 100644
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -63,6 +63,7 @@ struct dsa_port;
- struct ip_tunnel_parm_kern;
- struct macsec_context;
- struct macsec_ops;
-+struct netdev_config;
- struct netdev_name_node;
- struct sd_flow_limit;
- struct sfp_bus;
-@@ -2410,6 +2411,8 @@ struct net_device {
- 	const struct udp_tunnel_nic_info	*udp_tunnel_nic_info;
- 	struct udp_tunnel_nic	*udp_tunnel_nic;
+diff --git a/net/ethtool/netlink.c b/net/ethtool/netlink.c
+index 849c98e637c6..c17d8513d4c1 100644
+--- a/net/ethtool/netlink.c
++++ b/net/ethtool/netlink.c
+@@ -667,6 +667,7 @@ static int ethnl_default_set_doit(struct sk_buff *skb, struct genl_info *info)
+ 	const struct ethnl_request_ops *ops;
+ 	struct ethnl_req_info req_info = {};
+ 	const u8 cmd = info->genlhdr->cmd;
++	struct net_device *dev;
+ 	int ret;
  
-+	/** @cfg: net_device queue-related configuration */
-+	struct netdev_config	*cfg;
- 	struct ethtool_netdev_state *ethtool;
+ 	ops = ethnl_default_requests[cmd];
+@@ -688,19 +689,21 @@ static int ethnl_default_set_doit(struct sk_buff *skb, struct genl_info *info)
+ 			goto out_dev;
+ 	}
  
- 	/* protected by rtnl_lock */
-diff --git a/include/net/netdev_queues.h b/include/net/netdev_queues.h
-index 5ca019d294ca..b02bb9f109d5 100644
---- a/include/net/netdev_queues.h
-+++ b/include/net/netdev_queues.h
-@@ -4,6 +4,16 @@
- 
- #include <linux/netdevice.h>
- 
-+/**
-+ * struct netdev_config - queue-related configuration for a netdev
-+ * @hds_thresh:		HDS Threshold value.
-+ * @hds_config:		HDS value from userspace.
-+ */
-+struct netdev_config {
-+	u32	hds_thresh;
-+	u8	hds_config;
-+};
++	dev = req_info.dev;
 +
- /* See the netdev.yaml spec for definition of each statistic */
- struct netdev_queue_stats_rx {
- 	u64 bytes;
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index 748c9b1ea701..0998b20578b4 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -4610,7 +4610,7 @@ void bnxt_set_tpa_flags(struct bnxt *bp)
- static void bnxt_init_ring_params(struct bnxt *bp)
- {
- 	bp->rx_copybreak = BNXT_DEFAULT_RX_COPYBREAK;
--	bp->dev->ethtool->hds_thresh = BNXT_DEFAULT_RX_COPYBREAK;
-+	bp->dev->cfg->hds_thresh = BNXT_DEFAULT_RX_COPYBREAK;
- }
+ 	rtnl_lock();
+-	ret = ethnl_ops_begin(req_info.dev);
++	ret = ethnl_ops_begin(dev);
+ 	if (ret < 0)
+ 		goto out_rtnl;
  
- /* bp->rx_ring_size, bp->tx_ring_size, dev->mtu, BNXT_FLAG_{G|L}RO flags must
-@@ -6585,7 +6585,7 @@ static void bnxt_hwrm_update_rss_hash_cfg(struct bnxt *bp)
+ 	ret = ops->set(&req_info, info);
+ 	if (ret <= 0)
+ 		goto out_ops;
+-	ethtool_notify(req_info.dev, ops->set_ntf_cmd, NULL);
++	ethtool_notify(dev, ops->set_ntf_cmd, NULL);
  
- static int bnxt_hwrm_vnic_set_hds(struct bnxt *bp, struct bnxt_vnic_info *vnic)
- {
--	u16 hds_thresh = (u16)bp->dev->ethtool->hds_thresh;
-+	u16 hds_thresh = (u16)bp->dev->cfg->hds_thresh;
- 	struct hwrm_vnic_plcmodes_cfg_input *req;
- 	int rc;
- 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-index 65a20931c579..0a6d47d4d66b 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-@@ -24,6 +24,7 @@
- #include <linux/ptp_clock_kernel.h>
- #include <linux/net_tstamp.h>
- #include <linux/timecounter.h>
-+#include <net/netdev_queues.h>
- #include <net/netlink.h>
- #include "bnxt_hsi.h"
- #include "bnxt.h"
-@@ -834,7 +835,7 @@ static void bnxt_get_ringparam(struct net_device *dev,
- 	ering->rx_jumbo_pending = bp->rx_agg_ring_size;
- 	ering->tx_pending = bp->tx_ring_size;
- 
--	kernel_ering->hds_thresh = dev->ethtool->hds_thresh;
-+	kernel_ering->hds_thresh = dev->cfg->hds_thresh;
- 	kernel_ering->hds_thresh_max = BNXT_HDS_THRESHOLD_MAX;
- }
- 
-@@ -852,7 +853,7 @@ static int bnxt_set_ringparam(struct net_device *dev,
- 	    (ering->tx_pending < BNXT_MIN_TX_DESC_CNT))
- 		return -EINVAL;
- 
--	hds_config_mod = tcp_data_split != dev->ethtool->hds_config;
-+	hds_config_mod = tcp_data_split != dev->cfg->hds_config;
- 	if (tcp_data_split == ETHTOOL_TCP_DATA_SPLIT_DISABLED && hds_config_mod)
- 		return -EINVAL;
- 
-diff --git a/drivers/net/netdevsim/ethtool.c b/drivers/net/netdevsim/ethtool.c
-index 12163635b759..189793debdb7 100644
---- a/drivers/net/netdevsim/ethtool.c
-+++ b/drivers/net/netdevsim/ethtool.c
-@@ -3,6 +3,7 @@
- 
- #include <linux/debugfs.h>
- #include <linux/random.h>
-+#include <net/netdev_queues.h>
- 
- #include "netdevsim.h"
- 
-@@ -71,8 +72,8 @@ static void nsim_get_ringparam(struct net_device *dev,
- 	struct netdevsim *ns = netdev_priv(dev);
- 
- 	memcpy(ring, &ns->ethtool.ring, sizeof(ns->ethtool.ring));
--	kernel_ring->tcp_data_split = dev->ethtool->hds_config;
--	kernel_ring->hds_thresh = dev->ethtool->hds_thresh;
-+	kernel_ring->tcp_data_split = dev->cfg->hds_config;
-+	kernel_ring->hds_thresh = dev->cfg->hds_thresh;
- 	kernel_ring->hds_thresh_max = NSIM_HDS_THRESHOLD_MAX;
- 
- 	if (kernel_ring->tcp_data_split == ETHTOOL_TCP_DATA_SPLIT_UNKNOWN)
-@@ -190,8 +191,8 @@ static void nsim_ethtool_ring_init(struct netdevsim *ns)
- 	ns->ethtool.ring.rx_mini_max_pending = 4096;
- 	ns->ethtool.ring.tx_max_pending = 4096;
- 
--	ns->netdev->ethtool->hds_config = ETHTOOL_TCP_DATA_SPLIT_UNKNOWN;
--	ns->netdev->ethtool->hds_thresh = 0;
-+	ns->netdev->cfg->hds_config = ETHTOOL_TCP_DATA_SPLIT_UNKNOWN;
-+	ns->netdev->cfg->hds_thresh = 0;
- }
- 
- void nsim_ethtool_init(struct netdevsim *ns)
-diff --git a/drivers/net/netdevsim/netdev.c b/drivers/net/netdevsim/netdev.c
-index f92b05ccdca9..42f247cbdcee 100644
---- a/drivers/net/netdevsim/netdev.c
-+++ b/drivers/net/netdevsim/netdev.c
-@@ -55,10 +55,10 @@ static int nsim_forward_skb(struct net_device *dev, struct sk_buff *skb,
- static netdev_tx_t nsim_start_xmit(struct sk_buff *skb, struct net_device *dev)
- {
- 	struct netdevsim *ns = netdev_priv(dev);
--	struct ethtool_netdev_state *ethtool;
- 	struct net_device *peer_dev;
- 	unsigned int len = skb->len;
- 	struct netdevsim *peer_ns;
-+	struct netdev_config *cfg;
- 	struct nsim_rq *rq;
- 	int rxq;
- 
-@@ -76,11 +76,11 @@ static netdev_tx_t nsim_start_xmit(struct sk_buff *skb, struct net_device *dev)
- 		rxq = rxq % peer_dev->num_rx_queues;
- 	rq = peer_ns->rq[rxq];
- 
--	ethtool = peer_dev->ethtool;
-+	cfg = peer_dev->cfg;
- 	if (skb_is_nonlinear(skb) &&
--	    (ethtool->hds_config != ETHTOOL_TCP_DATA_SPLIT_ENABLED ||
--	     (ethtool->hds_config == ETHTOOL_TCP_DATA_SPLIT_ENABLED &&
--	      ethtool->hds_thresh > len)))
-+	    (cfg->hds_config != ETHTOOL_TCP_DATA_SPLIT_ENABLED ||
-+	     (cfg->hds_config == ETHTOOL_TCP_DATA_SPLIT_ENABLED &&
-+	      cfg->hds_thresh > len)))
- 		skb_linearize(skb);
- 
- 	skb_tx_timestamp(skb);
-diff --git a/net/core/dev.c b/net/core/dev.c
-index d7cbe6ff5249..71b3f786a9cd 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -106,6 +106,7 @@
- #include <net/dst.h>
- #include <net/dst_metadata.h>
- #include <net/gro.h>
-+#include <net/netdev_queues.h>
- #include <net/pkt_sched.h>
- #include <net/pkt_cls.h>
- #include <net/checksum.h>
-@@ -9716,7 +9717,7 @@ int dev_xdp_propagate(struct net_device *dev, struct netdev_bpf *bpf)
- 	if (!dev->netdev_ops->ndo_bpf)
- 		return -EOPNOTSUPP;
- 
--	if (dev->ethtool->hds_config == ETHTOOL_TCP_DATA_SPLIT_ENABLED &&
-+	if (dev->cfg->hds_config == ETHTOOL_TCP_DATA_SPLIT_ENABLED &&
- 	    bpf->command == XDP_SETUP_PROG &&
- 	    bpf->prog && !bpf->prog->aux->xdp_has_frags) {
- 		NL_SET_ERR_MSG(bpf->extack,
-@@ -9761,7 +9762,7 @@ static int dev_xdp_install(struct net_device *dev, enum bpf_xdp_mode mode,
- 	struct netdev_bpf xdp;
- 	int err;
- 
--	if (dev->ethtool->hds_config == ETHTOOL_TCP_DATA_SPLIT_ENABLED &&
-+	if (dev->cfg->hds_config == ETHTOOL_TCP_DATA_SPLIT_ENABLED &&
- 	    prog && !prog->aux->xdp_has_frags) {
- 		NL_SET_ERR_MSG(extack, "unable to install XDP to device using tcp-data-split");
- 		return -EBUSY;
-@@ -11539,6 +11540,10 @@ struct net_device *alloc_netdev_mqs(int sizeof_priv, const char *name,
- 	if (!dev->ethtool)
- 		goto free_all;
- 
-+	dev->cfg = kzalloc(sizeof(*dev->cfg), GFP_KERNEL_ACCOUNT);
-+	if (!dev->cfg)
-+		goto free_all;
-+
- 	napi_config_sz = array_size(maxqs, sizeof(*dev->napi_config));
- 	dev->napi_config = kvzalloc(napi_config_sz, GFP_KERNEL_ACCOUNT);
- 	if (!dev->napi_config)
-@@ -11607,6 +11612,7 @@ void free_netdev(struct net_device *dev)
- 		return;
- 	}
- 
-+	kfree(dev->cfg);
- 	kfree(dev->ethtool);
- 	netif_free_tx_queues(dev);
- 	netif_free_rx_queues(dev);
-diff --git a/net/core/devmem.c b/net/core/devmem.c
-index c971b8aceac8..3bba3f018df0 100644
---- a/net/core/devmem.c
-+++ b/net/core/devmem.c
-@@ -141,12 +141,12 @@ int net_devmem_bind_dmabuf_to_queue(struct net_device *dev, u32 rxq_idx,
- 		return -ERANGE;
- 	}
- 
--	if (dev->ethtool->hds_config != ETHTOOL_TCP_DATA_SPLIT_ENABLED) {
-+	if (dev->cfg->hds_config != ETHTOOL_TCP_DATA_SPLIT_ENABLED) {
- 		NL_SET_ERR_MSG(extack, "tcp-data-split is disabled");
- 		return -EINVAL;
- 	}
- 
--	if (dev->ethtool->hds_thresh) {
-+	if (dev->cfg->hds_thresh) {
- 		NL_SET_ERR_MSG(extack, "hds-thresh is not zero");
- 		return -EINVAL;
- 	}
-diff --git a/net/ethtool/rings.c b/net/ethtool/rings.c
-index d8cd4e4d7762..7a3c2a2dff12 100644
---- a/net/ethtool/rings.c
-+++ b/net/ethtool/rings.c
-@@ -1,5 +1,7 @@
- // SPDX-License-Identifier: GPL-2.0-only
- 
-+#include <net/netdev_queues.h>
-+
- #include "netlink.h"
- #include "common.h"
- 
-@@ -219,7 +221,7 @@ ethnl_set_rings(struct ethnl_req_info *req_info, struct genl_info *info)
- 
- 	dev->ethtool_ops->get_ringparam(dev, &ringparam,
- 					&kernel_ringparam, info->extack);
--	kernel_ringparam.tcp_data_split = dev->ethtool->hds_config;
-+	kernel_ringparam.tcp_data_split = dev->cfg->hds_config;
- 
- 	ethnl_update_u32(&ringparam.rx_pending, tb[ETHTOOL_A_RINGS_RX], &mod);
- 	ethnl_update_u32(&ringparam.rx_mini_pending,
-@@ -295,8 +297,8 @@ ethnl_set_rings(struct ethnl_req_info *req_info, struct genl_info *info)
- 	ret = dev->ethtool_ops->set_ringparam(dev, &ringparam,
- 					      &kernel_ringparam, info->extack);
- 	if (!ret) {
--		dev->ethtool->hds_config = kernel_ringparam.tcp_data_split;
--		dev->ethtool->hds_thresh = kernel_ringparam.hds_thresh;
-+		dev->cfg->hds_config = kernel_ringparam.tcp_data_split;
-+		dev->cfg->hds_thresh = kernel_ringparam.hds_thresh;
- 	}
- 
- 	return ret < 0 ? ret : 1;
+ 	ret = 0;
+ out_ops:
+-	ethnl_ops_complete(req_info.dev);
++	ethnl_ops_complete(dev);
+ out_rtnl:
+ 	rtnl_unlock();
+ out_dev:
 -- 
 2.48.1
 
