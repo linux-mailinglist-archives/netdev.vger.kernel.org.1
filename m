@@ -1,63 +1,50 @@
-Return-Path: <netdev+bounces-159610-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159611-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DFBFAA15FF0
-	for <lists+netdev@lfdr.de>; Sun, 19 Jan 2025 03:05:57 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 12EBEA15FF2
+	for <lists+netdev@lfdr.de>; Sun, 19 Jan 2025 03:10:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BFD9D3A6CB8
-	for <lists+netdev@lfdr.de>; Sun, 19 Jan 2025 02:05:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 99C1F18862E1
+	for <lists+netdev@lfdr.de>; Sun, 19 Jan 2025 02:10:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B40D0139D19;
-	Sun, 19 Jan 2025 02:05:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23C97179BC;
+	Sun, 19 Jan 2025 02:10:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Em6YVMe7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hm1mK/XM"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9088F2BB13
-	for <netdev@vger.kernel.org>; Sun, 19 Jan 2025 02:05:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1A1215E90
+	for <netdev@vger.kernel.org>; Sun, 19 Jan 2025 02:10:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737252324; cv=none; b=D0SErxQc8Ht4cRQ5Xx9abN/4QCOOfVlc5Bp2jJJL4jj5visyTwQny+B+Jv5EGyPyH0HWe5+BMvgo6pwaZYMkq26NDfVhDi0sYU/ZaWWEEE9/r+sRgjzAo88L6pzjVKXDw8bEp/HjkbwAjVhLIlWIRzn5tZIUL0v6aSXjXaIsx/g=
+	t=1737252608; cv=none; b=GldL7Pe45FmPZwJwfamSILEUnZNx0oEtnPjaBfKlzoo2r7W2UEkbpLA+lYeu76B8R3LGkRu4N6uNpA09U/RXPfRHdw0ceuiE5eUtUx5EJIDn0a47bTtgyvmMz2fSlmD7fFXCFdLlSz5q4cIyVzxpqTZH70wHHYYbVFlDMQ/L3Bs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737252324; c=relaxed/simple;
-	bh=W7g5mzKYbLZMyqo4vpbvxQf4UQRTdOwmKnBZtmNVrTo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=uLryeuTPyleQx2zhpdCD4I/YsuiWlRmpLeKsQdgX3I4f30k8kseLdQwq2p1G97bkJA5oLk5H6p7CwDgH/YA7dUKf1VkpYs3lY8IUNTiZn6P+wGLAzjcvPbYMgVAlT1tiCW5OvaEbjCJLkQb4BoO+PEuTz1mXhdTb1dbQg9vG888=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Em6YVMe7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 16272C4CEDF;
-	Sun, 19 Jan 2025 02:05:24 +0000 (UTC)
+	s=arc-20240116; t=1737252608; c=relaxed/simple;
+	bh=6sm0M78ese8lxeNTgxiyh3oVucEfww6ppQI9MaBhTrc=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=PuLBN1uNJHgdg+uC80s+64/vhz4CTZe7zOl47WAPETtUWxxuCa5V/AYL/Ro8qBT6JPRQmTvKpVAqJPWWhTKhtm8BinNTJ/hOxJKTf3AnhWqsh9bXZnIHimEoBeovBLxyN80iJ56m4mTN8+Lx7eyWrJ4eZRg3vJYz7ZyS28NN7g8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hm1mK/XM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 59A31C4CED1;
+	Sun, 19 Jan 2025 02:10:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737252324;
-	bh=W7g5mzKYbLZMyqo4vpbvxQf4UQRTdOwmKnBZtmNVrTo=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Em6YVMe7V2Dh3xrN8RcfFMnOiUyXBWxKvUjAGujqaxbxaM2jXADCBQOWRYAGLxbko
-	 PEF/jwfwc+yudk9TfnVaxxTboGutu1sMvjoMmrYejxZTvTuZ69hMdKxkojp7rbmk9q
-	 VZvEc5+oyZZs/ELG1QLvm2ryjYoXz6JvjSzFRK+8+GhUTex1/+ey+oF+Vn4Fbq0QZp
-	 OsOHCBVuKg3D0h+E7DrkSJ+F8vHKkDjCswI3Afn4Xbl9BvtDqi9dl9wal6lWX2muCM
-	 2JAAfHQ82+ENS5h3dEDxJp46MVDdLtJRYfeXFt36Ul0LWXhYWYapma+EfWrjz8hBZQ
-	 NNd2ibWKEKjzg==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	michael.chan@broadcom.com,
-	pavan.chebbi@broadcom.com,
-	ap420073@gmail.com,
-	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next v2 7/7] eth: bnxt: update header sizing defaults
-Date: Sat, 18 Jan 2025 18:05:17 -0800
-Message-ID: <20250119020518.1962249-8-kuba@kernel.org>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <20250119020518.1962249-1-kuba@kernel.org>
-References: <20250119020518.1962249-1-kuba@kernel.org>
+	s=k20201202; t=1737252607;
+	bh=6sm0M78ese8lxeNTgxiyh3oVucEfww6ppQI9MaBhTrc=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=hm1mK/XMoP4Eimcsnceuf4TiJC6DBarElQU4Z0JuWud5ZNhoO7gDJ1NIrt9x/ydKl
+	 ifSPobXHKv2lCxpcpYWk22D90YkPlaFVJBjXU2G8GJjihbClVY7gU949S5J1E0Wz6o
+	 6OoTFsD/Kdhe+cQauRBS+XnhNZHKUSKrUjfpd7xm4POZYg1ETTrJ9jlnS4pRVaVGQ0
+	 cSzGFRTWoTZ2FDlnWdHe+auxwdQTSUQwi/RTNwXvidRT7pgfCGlQ8Lzxjt+61/TAMI
+	 gWINKgRVuZFlp942TaliI1BllaLrhYmOy3E5XFKYPWznTq5frJwcXoMZxLA8NxsMtz
+	 Bv9XrKdTejpgg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33BFE380AA62;
+	Sun, 19 Jan 2025 02:10:32 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,48 +52,58 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH 01/10] batman-adv: Start new development cycle
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <173725263101.2537111.8912233175272298509.git-patchwork-notify@kernel.org>
+Date: Sun, 19 Jan 2025 02:10:31 +0000
+References: <20250117123910.219278-2-sw@simonwunderlich.de>
+In-Reply-To: <20250117123910.219278-2-sw@simonwunderlich.de>
+To: Simon Wunderlich <sw@simonwunderlich.de>
+Cc: kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
+ b.a.t.m.a.n@lists.open-mesh.org
 
-300-400B RPC requests are fairly common. With the current default
-of 256B HDS threshold bnxt ends up splitting those, lowering PCIe
-bandwidth efficiency and increasing the number of memory allocation.
+Hello:
 
-Increase the HDS threshold to fit 4 buffers in a 4k page.
-This works out to 640B as the threshold on a typical kernel confing.
-This change increases the performance for a microbenchmark which
-receives 400B RPCs and sends empty responses by 4.5%.
-Admittedly this is just a single benchmark, but 256B works out to
-just 6 (so 2 more) packets per head page, because shinfo size
-dominates the headers.
+This series was applied to netdev/net-next.git (main)
+by Simon Wunderlich <sw@simonwunderlich.de>:
 
-Now that we use page pool for the header pages I was also tempted
-to default rx_copybreak to 0, but in synthetic testing the copybreak
-size doesn't seem to make much difference.
+On Fri, 17 Jan 2025 13:39:01 +0100 you wrote:
+> This version will contain all the (major or even only minor) changes for
+> Linux 6.14.
+> 
+> The version number isn't a semantic version number with major and minor
+> information. It is just encoding the year of the expected publishing as
+> Linux -rc1 and the number of published versions this year (starting at 0).
+> 
+> [...]
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
- drivers/net/ethernet/broadcom/bnxt/bnxt.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+Here is the summary with links:
+  - [01/10] batman-adv: Start new development cycle
+    https://git.kernel.org/netdev/net-next/c/77a214317a6a
+  - [02/10] batman-adv: Reorder includes for distributed-arp-table.c
+    https://git.kernel.org/netdev/net-next/c/a7d5100ed009
+  - [03/10] batman-adv: Remove atomic usage for tt.local_changes
+    https://git.kernel.org/netdev/net-next/c/8587e0e3f562
+  - [04/10] batman-adv: Don't keep redundant TT change events
+    https://git.kernel.org/netdev/net-next/c/fca81aa3e653
+  - [05/10] batman-adv: Map VID 0 to untagged TT VLAN
+    https://git.kernel.org/netdev/net-next/c/bf2a5a622a50
+  - [06/10] MAINTAINERS: update email address of Marek Linder
+    https://git.kernel.org/netdev/net-next/c/7bce3f75189c
+  - [07/10] mailmap: add entries for Simon Wunderlich
+    https://git.kernel.org/netdev/net-next/c/1f5f7ff46435
+  - [08/10] mailmap: add entries for Sven Eckelmann
+    https://git.kernel.org/netdev/net-next/c/285c72be9440
+  - [09/10] MAINTAINERS: mailmap: add entries for Antonio Quartulli
+    https://git.kernel.org/netdev/net-next/c/425970f94b3c
+  - [10/10] batman-adv: netlink: reduce duplicate code by returning interfaces
+    https://git.kernel.org/netdev/net-next/c/6ecc4fd6c2f4
 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index 19e723493c4e..589a1008601c 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -4609,8 +4609,13 @@ void bnxt_set_tpa_flags(struct bnxt *bp)
- 
- static void bnxt_init_ring_params(struct bnxt *bp)
- {
-+	unsigned int rx_size;
-+
- 	bp->rx_copybreak = BNXT_DEFAULT_RX_COPYBREAK;
--	bp->dev->cfg->hds_thresh = BNXT_DEFAULT_RX_COPYBREAK;
-+	/* Try to fit 4 chunks into a 4k page */
-+	rx_size = SZ_1K -
-+		NET_SKB_PAD - SKB_DATA_ALIGN(sizeof(struct skb_shared_info));
-+	bp->dev->cfg->hds_thresh = max(BNXT_DEFAULT_RX_COPYBREAK, rx_size);
- }
- 
- /* bp->rx_ring_size, bp->tx_ring_size, dev->mtu, BNXT_FLAG_{G|L}RO flags must
+You are awesome, thank you!
 -- 
-2.48.1
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
