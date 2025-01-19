@@ -1,100 +1,98 @@
-Return-Path: <netdev+bounces-159650-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159653-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E5B3A163BB
-	for <lists+netdev@lfdr.de>; Sun, 19 Jan 2025 20:28:24 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C868BA163C8
+	for <lists+netdev@lfdr.de>; Sun, 19 Jan 2025 21:01:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6AE883A4BB1
-	for <lists+netdev@lfdr.de>; Sun, 19 Jan 2025 19:28:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6FCBE1885025
+	for <lists+netdev@lfdr.de>; Sun, 19 Jan 2025 20:01:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 374DF18BC3F;
-	Sun, 19 Jan 2025 19:28:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09B6719D072;
+	Sun, 19 Jan 2025 20:01:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=cisco.com header.i=@cisco.com header.b="Mj5d6dKl"
+	dkim=pass (1024-bit key) header.d=cisco.com header.i=@cisco.com header.b="kXXIqc9v"
 X-Original-To: netdev@vger.kernel.org
-Received: from rcdn-iport-1.cisco.com (rcdn-iport-1.cisco.com [173.37.86.72])
+Received: from rcdn-iport-6.cisco.com (rcdn-iport-6.cisco.com [173.37.86.77])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A8F9187872
-	for <netdev@vger.kernel.org>; Sun, 19 Jan 2025 19:28:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=173.37.86.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 304621632E6
+	for <netdev@vger.kernel.org>; Sun, 19 Jan 2025 20:01:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=173.37.86.77
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737314900; cv=none; b=VEyrsSVDk6azecWmkzZJ2iUfMGAuyHvkAJCxQQ2sN9jEiWbtXPhwB6hkvuYBA95S7lOc24c4OhkeXuEBJoL+GfYzaDmoi4qVDs37dPMVx7vjNErzpxKVkKqaPvPypYaDUWEamM37oquS8zEKDKtA27JnkcP1D4I8QZLo9b5ZYqE=
+	t=1737316891; cv=none; b=r1q433tky2kCXnaxZCpGwQhVvv7aLVh57231QmDJkED9qMh6KopTs8Kn+1uiFQGPDCcRGgtOJS4w/dJFoEL3+q2tPUHHN1VKEbZYyKp32xSRg4sBSZce/0yi+wUfuygzJQ3jIAX9e0DrJLo79uqTZlCnC52Yrahjoyfms9kS8MU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737314900; c=relaxed/simple;
-	bh=vjwM+TDeObmiixchDBhnjcgiGjeX9dZZhWEtEjMl2hE=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=u0NAOZahBob7EGDl/cXAJxsb4xuWjJnSZqYDZn9VVkxOsFVNmi9H9UNHaCMCQG+KZY85PyDWXShQ0M+8jF/jSIec3I9m8VpJkQYnmHHtXTiUloKAFYpnPxyijYbTb0sBj6DZ9e1QFKKU9/++XZsuMT26bikGSmHi8Qj8u+ul35M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cisco.com; spf=pass smtp.mailfrom=cisco.com; dkim=pass (1024-bit key) header.d=cisco.com header.i=@cisco.com header.b=Mj5d6dKl; arc=none smtp.client-ip=173.37.86.72
+	s=arc-20240116; t=1737316891; c=relaxed/simple;
+	bh=tHisr3zdFluxDXejgq2gykRvT+dQeDRfK1rEGACmUDE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=hOR/sX7a5a9UB9+AJq8DMpViE+SVrgjxqTfiNzH8G9Xj5fn2m/ERTm5iUgNG2vBLmsx93x9Fyy07pRb80Y7z6Ysyttj3HajelLZ3CTqToOpp6mbVsRUDQNLjDbyXWIGZOyevLfPOuCnJHUkpukzNgqU8hE59z9GsWPTzBjSCxhw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cisco.com; spf=pass smtp.mailfrom=cisco.com; dkim=pass (1024-bit key) header.d=cisco.com header.i=@cisco.com header.b=kXXIqc9v; arc=none smtp.client-ip=173.37.86.77
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cisco.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cisco.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=cisco.com; i=@cisco.com; l=629; q=dns/txt; s=iport;
-  t=1737314898; x=1738524498;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=kMHkm0fNyOwbnd7Jgg9xbqbBA7JMRJO0W2PfGa0uQLw=;
-  b=Mj5d6dKlxb/aSdjaNlugRMVCMpn+2ilYoJQSE6C5eySm0psHo2jb0bDS
-   Ap+N+EMQmEZ1BpHKPzDjLuGBPYyNSlGCYmQGcssqU3wqFkQCWG06DhP6l
-   eUWQmGP61ndptIq6UwBTjaGostt0m2pSBMOQ7upjjxBN1PWmkbIiuvZF9
-   E=;
-X-CSE-ConnectionGUID: 1HnppS2DR1yNJWc5pEm0NQ==
-X-CSE-MsgGUID: nHsPfzymRxS+Znq8fPPDIw==
-X-IPAS-Result: =?us-ascii?q?A0BaAADmUY1n/5T/Ja1aHAEBAQEBAQcBARIBAQQEAQGCA?=
- =?us-ascii?q?QUBAQsBgkqBT0NIjVGIdp4YgX4PAQEBD0QEAQGFBwKKcwImNgcOAQIEAQEBA?=
- =?us-ascii?q?QMCAwEBAQEBAQEBAQEBCwEBBQEBAQIBBwWBDhOGCIZbAQEBAycLAUYQCxguK?=
- =?us-ascii?q?ysZgwGCZQO0WoF5M4EB3jOBbYFIAYVqh19whHcnG4FJRIJQgT4xPoUQhXcEg?=
- =?us-ascii?q?n2BKINAn1JICoEXA1ksAVUTDQoLBwWBKUgDOAwLMBUkgSYFNQo3OoIMaUk3A?=
- =?us-ascii?q?g0CNYIefIIrgh+CO4RFhFOFXIIUgWgDAxYSAYMoex9NQAMLGA1IESw3FBsGP?=
- =?us-ascii?q?m4Hm2U8g3d6gn6XTY14oQOEJYFjn2MaM4NxpmKYfKNqXYRmgW4DMoFZMxoIG?=
- =?us-ascii?q?xWDIlIZD9EfJTI8AgcLAQEDCZFlAQE?=
-IronPort-Data: A9a23:OvbGgKPZf4P+ZDjvrR2HlsFynXyQoLVcMsEvi/4bfWQNrUp2gzYGx
- mQfW22DP6veYmr2etwgPYjg/EJSuZPSz4I3SnM5pCpnJ55oRWUpJjg4wmPYZX76whjrFRo/h
- ykmQoCeaphyFjmE+0/F3oHJ9RFUzbuPSqf3FNnKMyVwQR4MYCo6gHqPocZh6mJTqYb/WljlV
- e/a+ZWFZQf8gm8saAr41orawP9RlKWq0N8nlgRWicBj5Df2i3QTBZQDEqC9R1OQapVUBOOzW
- 9HYx7i/+G7Dlz91Yj9yuu+mGqGiaue60Tmm0hK6aYD76vRxjnBaPpIACRYpQRw/ZwNlMDxG4
- I4lWZSYEW/FN0BX8QgXe0Ew/ypWZcWq9FJbSJSymZT78qHIT5fj66xOClkuBtc0wL9mJ0Nx/
- qEABTVVSCnW0opawJrjIgVtrt4oIM+uOMYUvWttiGiAS/0nWpvEBa7N4Le03h9p2ZsIRqmYP
- ZdEL2MzPHwsYDUXUrsTIJA5nOGkj33yWzZZs1mS46Ew5gA/ySQqiOeyb4eEIYPiqcN9mGaDn
- mzU7mHDEipZBtqGmTS9yl6Nmbqa9c/8cMdIfFGizdZmiUOew0QfAQMbUF+8r+X/jEOiM/pSJ
- 1ER8zgjsYA980ukStS7VBq9yFaHoxQVc9ldCes37EeK0KW8yw+fCnIJUX1HZcAqudEeQSEs0
- BmCn7vBHTVlvbuUYWiQ+redsXW5Pi19BWkPeSMJUyMb7NT55oI+lBTCSpBkCqHdszHuMSv7z
- zbPqG01gK8eyJdSka665lvAxTmro/AlUzII2+keZUr9hisRWWJvT9XABYTzhRqYELukcw==
-IronPort-HdrOrdr: A9a23:JiSzAa7EyxYH8DW6DAPXwM/XdLJyesId70hD6qm+c3Nom6uj5q
- eTdZsgtCMc5Ax9ZJhko6HjBEDiewK5yXcK2+ks1N6ZNWGM0ldAbrsSiLcKqAePJ8SRzIJgPN
- 9bAstD4BmaNykCsS48izPIdeod/A==
-X-Talos-CUID: 9a23:b+sDomyboCH4lo5buXhBBgVNOsY9akaH4E2JMmmaNm00UJCQEXmprfY=
-X-Talos-MUID: 9a23:VXOWrQT8Moiat4w3RXTqpCpaOtV55p6+MwM/l4xWtfG8GQ1vbmI=
+  d=cisco.com; i=@cisco.com; l=2389; q=dns/txt; s=iport;
+  t=1737316890; x=1738526490;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=+Bbhlt7V2w8uh1bi5elPxMg2z56+wEKaV2cUd3aeiNM=;
+  b=kXXIqc9v/HW5NuOeHhsE0yO7333sXvrRnoACakQgh60TnOmJxo7AzPei
+   ZTjzZ9RcKvH0Kdcjnar5weTeXn+K4UxPCn25yaJrnxzDK3O8T5FEBoD0g
+   IvJJi6KGB9nv3dv7Cdnjm6nNG2Qvh6XJrByKrsFLkG0gt4HXWgfyRB86H
+   g=;
+X-CSE-ConnectionGUID: b4lo9JixTTql77aT/AP6Cg==
+X-CSE-MsgGUID: Nbl1hQA6QfyLIvLlsqdH6g==
+X-IPAS-Result: =?us-ascii?q?A0AnAAAUWY1n/4z/Ja1aHAECAgEHARQBBAQBggAHAQwBg?=
+ =?us-ascii?q?kqBT0NIjHJfiHOeGxSBEQNWDwEBAQ9EBAEBhQeKdQImNAkOAQIEAQEBAQMCA?=
+ =?us-ascii?q?wEBAQEBAQEBAQEBCwEBBQEBAQIBBwWBDhOGCIZdNgFGgQwyEoMBgmUDtH6CL?=
+ =?us-ascii?q?IEB3jOBbYFIAYVqh19whHcnG4FJRIQOb4QpZ4V3BIIygUWDbp9SSIEhA1ksA?=
+ =?us-ascii?q?VUTDQoLBwWBOTgDIgsLDAsUHBUCFR0PBhAEbUQ3gkZpSTcCDQI1gh4kWIIrh?=
+ =?us-ascii?q?FqERYRTgkNUgkWCFHqBHII3gllAAwsYDUgRLDcGDhsGPm4Hm2U8g3Z7EwF7K?=
+ =?us-ascii?q?24UUZMOCZIfoQOEJYFjn2MaM6pTmHwio243hGaBZzyBWTMaCBsVgyJSGQ/RG?=
+ =?us-ascii?q?iUyPAIHCwEBAwmRZQEB?=
+IronPort-Data: A9a23:ow/coKhU6dgXrcphyUeaAdgEX161QhEKZh0ujC45NGQN5FlHY01je
+ htvDW7Vb6mDYjeneNx0bIW1pkwAu8DQztFrQQU+ry48H3hjpJueD7x1DKtf0wB+jyHnZBg6h
+ ynLQoCYdKjYdleF+FH1dOCn9SQkvU2xbuKUIPbePSxsThNTRi4kiBZy88Y0mYcAbeKRW2thg
+ vus5ZSEULOZ82QsaD9MsvvS8EkHUMna4Vv0gHRvPZing3eG/5UlJMp3Db28KXL+Xr5VEoaSL
+ 87fzKu093/u5BwkDNWoiN7TKiXmlZaLYGBiIlIPM0STqkAqSh4ai87XB9JAAatjsAhlqvgqo
+ Dl7WTNcfi9yVkHEsLx1vxC1iEiSN4UekFPMCSDXXcB+UyQqflO0q8iCAn3aMqUSpuJwUENP5
+ cAkMTRSMRm/wMuOnpm0H7wEasQLdKEHPasFsX1miDWcBvE8TNWbGOPB5MRT23E7gcUm8fT2P
+ pVCL2EwKk6dPlsWZg9/5JEWxI9EglH9dD1epFuRqII84nPYy0p6172F3N/9IYTaHJgFxRrJz
+ o7A10LzBkgaDfXB8DSU1lOyouvUhC/bBo1HQdVU8dYv2jV/3Fc7BBQIWF6TrfCnh0u6XNxDb
+ UoZ5kIGoKQv8UW5Q8XVUBq/r3qJ+BUbXrJ4EPAw4SmOx7DS7gLfAXILJhZIbtA8udB1QzE22
+ lKXt9f0Azopu739YWqU/LqSrBuoNCQVJHNEbigBJSMD7sXvrZ8bkB3CVJBgHbSzg9mzHiv/q
+ w1mtwAkjLkVyMpO3KKh8BWf2HSnp4PCSUg+4QC/sn+Z0z6VrbWNP+SAgWU3J94ZRGpFZjFtZ
+ EQ5pvU=
+IronPort-HdrOrdr: A9a23:Fqxi0q01ZSKYfEsH/LsCTAqjBLkkLtp133Aq2lEZdPWaSKOlfq
+ eV7ZEmPHDP6Qr5NEtMpTniAtjjfZqjz/5ICOAqVN/INjUO01HHEGgN1+ffKkXbak7DHio379
+ YGT0C4Y+eAaWRHsQ==
+X-Talos-CUID: 9a23:og9jW2+WEepjt5X2eJaVv0RIHsd0UHzN8EvJJxDnAFouYYXLYlDFrQ==
+X-Talos-MUID: =?us-ascii?q?9a23=3AoDLqcQ6EHgu7jpDqURXb7uaRxoxO6aD3CHkkz6w?=
+ =?us-ascii?q?Iqu2lKwh0IC6RrGq4F9o=3D?=
 X-IronPort-Anti-Spam-Filtered: true
 X-IronPort-AV: E=Sophos;i="6.13,218,1732579200"; 
-   d="scan'208";a="307775937"
-Received: from rcdn-l-core-11.cisco.com ([173.37.255.148])
-  by rcdn-iport-1.cisco.com with ESMTP/TLS/TLS_AES_256_GCM_SHA384; 19 Jan 2025 19:27:54 +0000
+   d="scan'208";a="308158349"
+Received: from rcdn-l-core-03.cisco.com ([173.37.255.140])
+  by rcdn-iport-6.cisco.com with ESMTP/TLS/TLS_AES_256_GCM_SHA384; 19 Jan 2025 20:00:20 +0000
 Received: from cisco.com (savbu-usnic-a.cisco.com [10.193.184.48])
-	by rcdn-l-core-11.cisco.com (Postfix) with ESMTP id 901FE1800025C;
-	Sun, 19 Jan 2025 19:27:54 +0000 (GMT)
+	by rcdn-l-core-03.cisco.com (Postfix) with ESMTP id 56140180001F3;
+	Sun, 19 Jan 2025 20:00:20 +0000 (GMT)
 Received: by cisco.com (Postfix, from userid 392789)
-	id 5AEA120F2003; Sun, 19 Jan 2025 11:27:54 -0800 (PST)
+	id 2D5ED20F2003; Sun, 19 Jan 2025 12:00:20 -0800 (PST)
 From: John Daley <johndale@cisco.com>
-To: kuba@kernel.org
-Cc: andrew+netdev@lunn.ch,
-	benve@cisco.com,
+To: benve@cisco.com,
+	satishkh@cisco.com,
+	andrew+netdev@lunn.ch,
 	davem@davemloft.net,
 	edumazet@google.com,
-	johndale@cisco.com,
-	neescoba@cisco.com,
-	netdev@vger.kernel.org,
+	kuba@kernel.org,
 	pabeni@redhat.com,
-	satishkh@cisco.com
-Subject: Re: [PATCH net-next v6 3/3] enic: Use the Page Pool API for RX
-Date: Sun, 19 Jan 2025 11:27:54 -0800
-Message-Id: <20250119192754.5203-1-johndale@cisco.com>
+	netdev@vger.kernel.org
+Cc: John Daley <johndale@cisco.com>
+Subject: [PATCH net-next v7 0/3] enic: Use Page Pool API for receiving packets
+Date: Sun, 19 Jan 2025 12:00:15 -0800
+Message-Id: <20250119200018.5522-1-johndale@cisco.com>
 X-Mailer: git-send-email 2.35.2
-In-Reply-To: <20250118172420.48d3a914@kernel.org>
-References: <20250118172420.48d3a914@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -103,26 +101,67 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Outbound-SMTP-Client: 10.193.184.48, savbu-usnic-a.cisco.com
-X-Outbound-Node: rcdn-l-core-11.cisco.com
+X-Outbound-Node: rcdn-l-core-03.cisco.com
 
-On 1/18/25, 5:24 PM, "Jakub Kicinski" kuba@kernel.org wrote:
+Use the Page Pool API for RX. The Page Pool API improves bandwidth and
+CPU overhead by recycling pages instead of allocating new buffers in the
+driver. Also, page pool fragment allocation for smaller MTUs is used
+allow multiple packets to share pages.
 
->On Fri, 17 Jan 2025 00:01:39 -0800 John Daley wrote:
->> @@ -1752,6 +1763,11 @@ static int enic_open(struct net_device *netdev)
->>        }
->>  
->>        for (i = 0; i < enic->rq_count; i++) {
->> +             /* create a page pool for each RQ */
->> +             pp_params.napi = &enic->napi[i];
->> +             pp_params.queue_idx = i;
->> +             enic->rq[i].pool = page_pool_create(&pp_params);
->
->Aren't you missing an error check here?
+RX code was moved to its own file and some refactoring was done
+beforehand to make the page pool changes more trasparent and to simplify
+the resulting code.
 
-Yes, v7 coming. Thanks.
+Signed-off-by: John Daley <johndale@cisco.com>
 
->
->>                /* enable rq before updating rq desc */
->>                vnic_rq_enable(&enic->rq[i].vrq);
->>                vnic_rq_fill(&enic->rq[i].vrq, enic_rq_alloc_buf);
+---
+Changes in v2:
+- Fixed a valid warning found by build_clang where a variable was used
+  before it was initialized. The warnings in include/linux/mm.h were not
+  addressed since they do not appear to be realated to this patchset.
+
+Changes in v3:
+- Moved a function to before where is was called and removed the forward
+  declaration. Reworded a commit message. No functional changes.
+
+Changes in v4:
+- Replaced call to page_pool_put_page() with page_pool_put_full_page()
+  since page_pool_dev_alloc() API is used and page_pool is created with
+  PP_FLAG_DMA_SYNC_DEV flag.
+- Reworded final commit message one more time to try to make it clear
+  that there is just one fix for the commit.
+
+Changes in v5:
+- Removed link related patches from the patchset. These were merged
+  seperately.
+- Removed inappropriate calls to napi_free_frags()
+- Moved pp_alloc_error out of ethtool stats and accumulate into netdev
+  queue stat 'alloc_error'.
+
+Changes in v6:
+- Use the page pool API for all MTUs, not just <= PAGE_SIZE. Use page
+  pool 'order' field to accomodate MTUs > PAGE_SIZE. Remove the
+  function pointers and functions that handled the bigger MTUs.
+
+Changes in v7:
+- Add error return code handling for page_pool_create()
+
+John Daley (3):
+  enic: Move RX functions to their own file
+  enic: Simplify RX handler function
+  enic: Use the Page Pool API for RX
+
+ drivers/net/ethernet/cisco/enic/Makefile    |   2 +-
+ drivers/net/ethernet/cisco/enic/enic.h      |   3 +
+ drivers/net/ethernet/cisco/enic/enic_main.c | 268 +++-----------------
+ drivers/net/ethernet/cisco/enic/enic_rq.c   | 242 ++++++++++++++++++
+ drivers/net/ethernet/cisco/enic/enic_rq.h   |  10 +
+ drivers/net/ethernet/cisco/enic/vnic_rq.h   |   2 +
+ 6 files changed, 287 insertions(+), 240 deletions(-)
+ create mode 100644 drivers/net/ethernet/cisco/enic/enic_rq.c
+ create mode 100644 drivers/net/ethernet/cisco/enic/enic_rq.h
+
+-- 
+2.35.2
+
 
