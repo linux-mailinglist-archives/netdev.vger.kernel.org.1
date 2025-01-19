@@ -1,150 +1,104 @@
-Return-Path: <netdev+bounces-159624-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159625-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0621DA16230
-	for <lists+netdev@lfdr.de>; Sun, 19 Jan 2025 15:35:12 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E20E0A16284
+	for <lists+netdev@lfdr.de>; Sun, 19 Jan 2025 16:13:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 004FC3A541C
-	for <lists+netdev@lfdr.de>; Sun, 19 Jan 2025 14:35:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 89C651885C9D
+	for <lists+netdev@lfdr.de>; Sun, 19 Jan 2025 15:14:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B40CC1C5F19;
-	Sun, 19 Jan 2025 14:35:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE4091DF27E;
+	Sun, 19 Jan 2025 15:13:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R2wizI9K"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="pbECHzt3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f172.google.com (mail-il1-f172.google.com [209.85.166.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DA7F10F9;
-	Sun, 19 Jan 2025 14:35:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 737B14315F;
+	Sun, 19 Jan 2025 15:13:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737297307; cv=none; b=sr9MMMG2EyXNqQUKuB/dhy0fHPhhqLiVJPfjO3JhxEqRYOTVuXZ1HVL1iKy29uMwXHvDfa6MtSF00M9bRgUdwPasslOBk5r2BH9ftsntzvPAm+pPFuBZvnCTOrOO0xRu6P1xy30YrbJviZlLDuISmtFFawyCtu9gm5tHjQpGdCw=
+	t=1737299631; cv=none; b=fiqpI8EqszmEGX7vp0o3seeD9L0R9cDvE7OyhT0GXhtMLc3N3tpmIgEsBYu2daAj1Qdj0oYUXExLerpJ6Y+ohxuvSWYpIOIUaNbCzX/OoNuep8IsUa49ZTqE/N8gOaJcyJS/c6pZOIyGQQQ+A5BALRJ6vRPp2Eog9yT1jrWLTpU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737297307; c=relaxed/simple;
-	bh=gkxyJV6jx3Sg/SizsjSnXQXPvjhlrAqF0d6n4bogXvQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=uBE2/Cz3fjp6OvbNflw9hiYCeKoc/OK2B9/DNWVw9VtPnoh36DcPFdzGCOq6sPbWGdhkVa1aeHJSpgiguZG+m4JYi1T7y8XTcjVTNNEL6xxB5E7qZnzwiGwHMbF5CznHz70FE/VVDz5bAAvKAC4nybwkFNqMLfMhD1+THMDpO98=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=R2wizI9K; arc=none smtp.client-ip=209.85.166.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f172.google.com with SMTP id e9e14a558f8ab-3ce915a8a25so12782015ab.1;
-        Sun, 19 Jan 2025 06:35:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1737297305; x=1737902105; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=v0aW2B6tsYfIVPEta8Nh7uAXEmns1XLSPaN0nuLCDuk=;
-        b=R2wizI9KFpxteoUXSzgxkqA+EsY+XbomVJ84buJiTtYfSBvW0l5jULgwYgpu7vKsf4
-         j4ud/9Pg92QzBU18rMgcgTA219uG3wsCalxx5rWFN3R3CxSbW/BCQxMj3rkObj5OvrCp
-         b1EA+evdca3Bqw80CvgxCQn4+bM4UwwlFBYOQle7bynDaTL39AQvy8HgLRxai1IX15q/
-         51w86Qg6r81WQ8D38pdonMibT7PgjR1RzpiKAkUG5lNGMpiepNCIY2dDjIsCUPM9oVDd
-         0Hu+GGbbP+JcG8ygBcn+bTvoWmzRHYivnRP8UH6Y8fE7Ae5Du6gmZYz3z2szf+ndipUD
-         7thA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737297305; x=1737902105;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=v0aW2B6tsYfIVPEta8Nh7uAXEmns1XLSPaN0nuLCDuk=;
-        b=ISe5k93Z7VMoJlNeGu43EOj3FGe87DP+vycblQQVaFRERzK8d/YUPaqgFcletszv+r
-         rtHNQBePYce2a+1S4v/VegGfRmPHVUWnEMHlB8upDBs64fo2Q5nMxbjjCOKXvogJXwAP
-         AEb5QfnogldVYH/hdC11H+hVwiusDtgD4FuKG18M/5iKVZZpRaD2s0S7YPhnhUTLCM5N
-         +pfEhLIi6UsCWElVhVOj05bpFYqwfERRpKHGJ7FjbcpEncE3/oRhOLmENQdtnnRfPEKj
-         9NSv2AU4lXfNHOLrWR6eEhFerDkQ0RE9ftytGwiHubVW52xu5rW8NqSrQx0bdikZmeFm
-         1iOg==
-X-Forwarded-Encrypted: i=1; AJvYcCXt+bsCsv2Kt6Zkw65CJvMxeq1YqkEd9HRf5/kERMxaKwzRAtV0UszueXygjFb/r9fZ1oPGR7EPa2KmZlo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy7ORUXrPLf24rg6F97FJ8oSzDqFq036I7dMDEmFNbqGT3mEs4k
-	L4JRLtHpViVvrlhGvQIO4/iKYi74Gn+vxEmaebHRP+/nZaTTXsIy/9yMA/BRrsu+43r6/gkwFGX
-	Ibru3/dDRjYRsJ4HRrzPORoLVwlU=
-X-Gm-Gg: ASbGnctN0QMJJgY676crFCeD/r6ifm0UDDjSvB5pR+JI58sUCmVOdevyPipw7g6uuQl
-	3AIPlOE4WIE2xrbiy0VStqsXPD6V7w6GN0l1LUoyQJJSg6RDziVI=
-X-Google-Smtp-Source: AGHT+IGGxRHZLtgBAdTGbJY1oQIARd8kTTui/Tb1qN3TY8IgjJdPCl2GinS0Fb3SPmaJ9c/FTEOYqlDA1IVw+JgnhO0=
-X-Received: by 2002:a05:6e02:2149:b0:3a7:e0a5:aa98 with SMTP id
- e9e14a558f8ab-3cf74426a36mr65337695ab.13.1737297305128; Sun, 19 Jan 2025
- 06:35:05 -0800 (PST)
+	s=arc-20240116; t=1737299631; c=relaxed/simple;
+	bh=+BEF0bV2AYeoxChZxg0X7HNCIbeCM8dZSM0yxLDsPc0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=aG14v2dgyRWW23WAmeBZrkZ5P+nBaOWijV5J64V0f+FtN9J2277a1qhKaqCUXSL1oU71or/mTXhPXgYQeRqGCHNHTIkPGCRM9yNqwdc8adjCkT12AD3cXhNUJXYUie+PXhN3HnC/DMzIRgHQ1owN+13Ta8n4StJSKjUfn+E81qg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=pbECHzt3; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=+BKApviZbKOtFG0ErRA2dV5y3fesSYbnNbVtybZaCtU=; b=pbECHzt3CWWowzwNxNLHPHRLqG
+	0A3VY0/MxcS8EmxS7lO3wqSIAKucmP87CDuP8pos4U/1KN/4tClv4YrDUjQl2UhYsTnZ3AiKAyhtg
+	LqbHGhMPUXClOqKAmyDN6TJlCago8EJOs+GAVq9S1+C88HEft9Xew0TG3mnJUwpTMCqO3x2oO8Qf4
+	wODyDaRbAh1ATDOM47YVjVxMpxFcW93N5hV/FYHZmcdw3NzeSYJXUEeu/I8Dsr4iEYy7fq4jmX6os
+	QA7LXPQcpIY9+aisNHz3XKlnJuNM+NdeQRAS5zaQeKVjw/lTvKxeWY289B2rLHBOd60ev3eJyMtpS
+	xprBzxIA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:45824)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1tZWzZ-0005Kg-20;
+	Sun, 19 Jan 2025 15:13:37 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1tZWzV-0001xB-2z;
+	Sun, 19 Jan 2025 15:13:33 +0000
+Date: Sun, 19 Jan 2025 15:13:33 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: "Oleksandr Makarov [GL]" <Oleksandr.Makarov@qsc.com>
+Cc: Eric Dumazet <edumazet@google.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-stm32@st-md-mailman.stormreply.com" <linux-stm32@st-md-mailman.stormreply.com>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: BUG: UDP Packet Corruption Issue with stmmac Driver on Linux
+ 5.15.21-rt30
+Message-ID: <Z40WnTc09OOnCZ3p@shell.armlinux.org.uk>
+References: <BLAPR16MB392407EDC7DFA3089CC42E3CF0BE2@BLAPR16MB3924.namprd16.prod.outlook.com>
+ <CANn89iL_p_pQaS=yjA2yZd2_o4Xp0U=J-ww4Ztp0V3DY=AufcA@mail.gmail.com>
+ <BLAPR16MB392430582E67F952C115314CF0BE2@BLAPR16MB3924.namprd16.prod.outlook.com>
+ <BLAPR16MB3924BB32CE2982432BAE103FF0622@BLAPR16MB3924.namprd16.prod.outlook.com>
+ <BLAPR16MB3924E3DF8703DDCBC1C033BBF0E42@BLAPR16MB3924.namprd16.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250119134254.19250-1-kirjanov@gmail.com>
-In-Reply-To: <20250119134254.19250-1-kirjanov@gmail.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Sun, 19 Jan 2025 22:34:29 +0800
-X-Gm-Features: AbW1kvYZ5-YNYo-b43CqOt7kUDYmN2hLbR4V2xJentpgPT-AevgHVipBbU0eWww
-Message-ID: <CAL+tcoDVTJ8vA_6wBd6ZDh2pq__fwJ9vzm3Kx5qpMNvaxpObjA@mail.gmail.com>
-Subject: Re: [PATCH v2 net-next] sysctl net: Remove macro checks for CONFIG_SYSCTL
-To: Denis Kirjanov <kirjanov@gmail.com>
-Cc: netdev@vger.kernel.org, edumazet@google.com, davem@davemloft.net, 
-	kuba@kernel.org, pabeni@redhat.com, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <BLAPR16MB3924E3DF8703DDCBC1C033BBF0E42@BLAPR16MB3924.namprd16.prod.outlook.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Sun, Jan 19, 2025 at 9:44=E2=80=AFPM Denis Kirjanov <kirjanov@gmail.com>=
- wrote:
->
-> Since dccp and llc makefiles already check sysctl code
-> compilation with xxx-$(CONFIG_SYSCTL)
-> we can drop the checks
->
-> Signed-off-by: Denis Kirjanov <kirjanov@gmail.com>
-> ---
-> changelog:
-> v2: fix the spelling mistake "witn" -> "with"
->
->  net/dccp/sysctl.c        | 4 ----
->  net/llc/sysctl_net_llc.c | 4 ----
->  2 files changed, 8 deletions(-)
->
-> diff --git a/net/dccp/sysctl.c b/net/dccp/sysctl.c
-> index 3fc474d6e57d..b15845fd6300 100644
-> --- a/net/dccp/sysctl.c
-> +++ b/net/dccp/sysctl.c
-> @@ -11,10 +11,6 @@
->  #include "dccp.h"
->  #include "feat.h"
->
-> -#ifndef CONFIG_SYSCTL
-> -#error This file should not be compiled without CONFIG_SYSCTL defined
-> -#endif
-> -
+On Sun, Jan 19, 2025 at 12:46:54PM +0000, Oleksandr Makarov [GL] wrote:
+> I bisected kernel from 6.12, where the issue with trimming fragmented UDP packets was fixed, down to 5.15.21.
+> 
+> I have identified that commit  "47f753c1108e287edb3e27fad8a7511a9d55578e net: stmmac: disable Split Header (SPH) for Intel platforms" is fixing the problem.
 
-I'd like to know if you're still using DCCP since as far as I know it
-will soon be deprecated... If not, the whole code will be removed.
+It sounds like you're saying that it's been fixed on mainline, but the
+fix hasn't been backported to 5.15.21. Well, it won't ever be. 5.15.21
+is one instance of the 5.15-stable kernel tree, and the 5.15-stable
+tree is now at 5.15.176.
 
-Please take a look at the commit:
-commit b144fcaf46d43b1471ad6e4de66235b8cebb3c87
-Author: Kuniyuki Iwashima <kuniyu@amazon.com>
-Date:   Wed Jun 14 12:47:05 2023 -0700
+Try moving your stable kernel forward. If you're locked in to 5.15.21
+by an upstream vendor, then you need to complain to them.
 
-    dccp: Print deprecation notice.
-
-    DCCP was marked as Orphan in the MAINTAINERS entry 2 years ago in commi=
-t
-    054c4610bd05 ("MAINTAINERS: dccp: move Gerrit Renker to CREDITS").  It =
-says
-    we haven't heard from the maintainer for five years, so DCCP is not wel=
-l
-    maintained for 7 years now.
-
-    Recently DCCP only receives updates for bugs, and major distros disable=
- it
-    by default.
-
-    Removing DCCP would allow for better organisation of TCP fields to redu=
-ce
-    the number of cache lines hit in the fast path.
-
-    Let's add a deprecation notice when DCCP socket is created and schedule=
- its
-    removal to 2025.
-
-Thanks,
-Jason
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
