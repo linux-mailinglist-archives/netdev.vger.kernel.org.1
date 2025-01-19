@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-159600-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159601-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94253A15FE3
-	for <lists+netdev@lfdr.de>; Sun, 19 Jan 2025 03:00:29 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D1EC9A15FE4
+	for <lists+netdev@lfdr.de>; Sun, 19 Jan 2025 03:00:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2E3333A6472
-	for <lists+netdev@lfdr.de>; Sun, 19 Jan 2025 02:00:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 124FB165C7F
+	for <lists+netdev@lfdr.de>; Sun, 19 Jan 2025 02:00:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95D5B3CF58;
-	Sun, 19 Jan 2025 02:00:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8429D15E90;
+	Sun, 19 Jan 2025 02:00:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iRd6gPRb"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EhCZsTmK"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 717FB38FB0
-	for <netdev@vger.kernel.org>; Sun, 19 Jan 2025 02:00:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B749EAF1;
+	Sun, 19 Jan 2025 02:00:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737252011; cv=none; b=YbEgMcrJo9Gsc1KJ3aMby52tklj8PTgBolNBlZMop4g+nYiJD8Lsnb8d080+RBn/wxajGO7i1ylDYj9Y2D4pR7Kjz8FkSsPXWkQw0dWa+5wnjLwy5MG2tbWZnP7PfB6LzMz6MLKa6r9WZ1f0yRo7NmqIv2miwgWfKzULjyXmUSg=
+	t=1737252040; cv=none; b=VMD3J4/u4zPsSzZtVJvr40xnt4olil81qI/JVvN/BWVoDgZn8jPzWUpmLNzR0uoHrD0+N3zIS2E1kf5xd+bNtHWWMMtgHPlCkkefNcNCvZF6VLpstXZfbCZBqf2C258kciLxlBGw0/8Z3vffe2iPmzowyR7QO5Pn+64U0+WeH5I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737252011; c=relaxed/simple;
-	bh=QGDzs9EKTI1zbjPI7ITWcZo3bYES7/j7+QzjVgYBj18=;
+	s=arc-20240116; t=1737252040; c=relaxed/simple;
+	bh=hr4xTFEq/FmW5CeBgO7+KW8G5Hzhp9cIpSu+1K8bpgc=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=LHUPeiNKvLn6vw8N65vdOKifeNTOQO/wTi5Kj9eyMpaSsQe+KjSR7UF+NU0KcqMfFxxtMxqEf703nF0eghYVhULUspi6qVxPD1/Fb+VO9t/1WZXhOj5BqHPbvZx3U3bsY74t3mi3ZEWWOAjKKVlgMVjHsKSncO8zEsxqeLZQPOU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iRd6gPRb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D731CC4CED1;
-	Sun, 19 Jan 2025 02:00:10 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=PsZG/+qYZzM77T0W1aMec0N/NpDDpsUuvi93N1vr8y6f7aqkqkthcniF7WQWDFFAtCqWQpswgE/bzdm/YwioNWIb07Y2t6MEobYu7k2kTfOKk0t8ngUeF8K1C5+KsBhy7oNZ2d7jWW7h9fnSe1poFLspIQX25m6y3ak2Za0obpY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EhCZsTmK; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D4D62C4CED1;
+	Sun, 19 Jan 2025 02:00:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737252010;
-	bh=QGDzs9EKTI1zbjPI7ITWcZo3bYES7/j7+QzjVgYBj18=;
+	s=k20201202; t=1737252039;
+	bh=hr4xTFEq/FmW5CeBgO7+KW8G5Hzhp9cIpSu+1K8bpgc=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=iRd6gPRbfrxJpiRZsINjuSTckTNE/WawXaXKbphYfUrNvnTUhQ+dotnMS/JmOyWbd
-	 AQAzH1tY2CrSUX7Xq71A2y5CHJCGo8AY55QedQpfS66uG3xMoSHwa38z4AZCIup1iU
-	 xXkZl5JbVd+bPQAfg4+cC5GIEX8wNw3oJ32QUHP1Hzns8QwKEB4hMAVWnRO9c5jHn6
-	 qGZGBmC4NAW0b6OknuMbC5C1H2Z9fHwVC2IzwTCd8+D4RmfoBmbiBVNrsIMPdXHrjI
-	 7JL61sRP9fqOQsum8nwkdZT8jxCnpTNGeezbCxpzFHcBMSCIzbU+hdzkwh5+36i6Ws
-	 cdNkoKcfFxyNw==
+	b=EhCZsTmK8zxzKtSkh0u8/NVBW4gMK9+2dfCxk/pVceucmIFUXVPB604hblEQpKvgY
+	 sH2ranasvh8oDDo/nvLjfMM3stM6p83KiBEPUV7tyygTsANAu6CHL3Tj+1TNbM5Oxr
+	 mwCWqTuov0d472DB08Wdv/QGu4+Mk8YO2PLfk6oiFcLU2vHUDQNKBv0SZMASyNvHdi
+	 la2Oir8V3ONKs7Ik7H6drt/CEQ46ZUiZwa8A07yNnzy65bA3isqUwv9irT88V+VjWb
+	 A44PRH7/xmsCkmYLPekNWwgxhFJCOM/TDqsR0yitoqthXUjr7KVQPNcBu4uo2RQizU
+	 I/T/CRwSQ1Xxg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADCAC380AA62;
-	Sun, 19 Jan 2025 02:00:35 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADECE380AA62;
+	Sun, 19 Jan 2025 02:01:04 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,52 +52,36 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2] net: avoid race between device unregistration and
- ethnl ops
+Subject: Re: pull request: bluetooth-next 2025-01-15
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <173725203448.2534672.1226229383765943394.git-patchwork-notify@kernel.org>
-Date: Sun, 19 Jan 2025 02:00:34 +0000
-References: <20250116092159.50890-1-atenart@kernel.org>
-In-Reply-To: <20250116092159.50890-1-atenart@kernel.org>
-To: Antoine Tenart <atenart@kernel.org>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, ecree.xilinx@gmail.com, netdev@vger.kernel.org
+ <173725206323.2534672.8960005298494686018.git-patchwork-notify@kernel.org>
+Date: Sun, 19 Jan 2025 02:01:03 +0000
+References: <20250117213203.3921910-1-luiz.dentz@gmail.com>
+In-Reply-To: <20250117213203.3921910-1-luiz.dentz@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: davem@davemloft.net, kuba@kernel.org, linux-bluetooth@vger.kernel.org,
+ netdev@vger.kernel.org
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This pull request was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu, 16 Jan 2025 10:21:57 +0100 you wrote:
-> The following trace can be seen if a device is being unregistered while
-> its number of channels are being modified.
+On Fri, 17 Jan 2025 16:32:03 -0500 you wrote:
+> The following changes since commit d90e36f8364d99c737fe73b0c49a51dd5e749d86:
 > 
->   DEBUG_LOCKS_WARN_ON(lock->magic != lock)
->   WARNING: CPU: 3 PID: 3754 at kernel/locking/mutex.c:564 __mutex_lock+0xc8a/0x1120
->   CPU: 3 UID: 0 PID: 3754 Comm: ethtool Not tainted 6.13.0-rc6+ #771
->   RIP: 0010:__mutex_lock+0xc8a/0x1120
->   Call Trace:
->    <TASK>
->    ethtool_check_max_channel+0x1ea/0x880
->    ethnl_set_channels+0x3c3/0xb10
->    ethnl_default_set_doit+0x306/0x650
->    genl_family_rcv_msg_doit+0x1e3/0x2c0
->    genl_rcv_msg+0x432/0x6f0
->    netlink_rcv_skb+0x13d/0x3b0
->    genl_rcv+0x28/0x40
->    netlink_unicast+0x42e/0x720
->    netlink_sendmsg+0x765/0xc20
->    __sys_sendto+0x3ac/0x420
->    __x64_sys_sendto+0xe0/0x1c0
->    do_syscall_64+0x95/0x180
->    entry_SYSCALL_64_after_hwframe+0x76/0x7e
+>   Merge branch 'mlx5-next' of git://git.kernel.org/pub/scm/linux/kernel/git/mellanox/linux (2025-01-14 11:13:35 -0800)
+> 
+> are available in the Git repository at:
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git tags/for-net-next-2025-01-15
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,v2] net: avoid race between device unregistration and ethnl ops
-    https://git.kernel.org/netdev/net/c/12e070eb6964
+  - pull request: bluetooth-next 2025-01-15
+    https://git.kernel.org/netdev/net-next/c/1a280c54fd98
 
 You are awesome, thank you!
 -- 
