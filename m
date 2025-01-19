@@ -1,134 +1,164 @@
-Return-Path: <netdev+bounces-159630-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159634-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 37DD7A16334
-	for <lists+netdev@lfdr.de>; Sun, 19 Jan 2025 18:20:36 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 62013A1633D
+	for <lists+netdev@lfdr.de>; Sun, 19 Jan 2025 18:21:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5E68E16438A
-	for <lists+netdev@lfdr.de>; Sun, 19 Jan 2025 17:20:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A7A991885351
+	for <lists+netdev@lfdr.de>; Sun, 19 Jan 2025 17:21:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16AED45023;
-	Sun, 19 Jan 2025 17:20:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="LPld0bsq"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB52A1DF99F;
+	Sun, 19 Jan 2025 17:21:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44E2A6125;
-	Sun, 19 Jan 2025 17:20:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.188.207])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FDAF2A1BF;
+	Sun, 19 Jan 2025 17:21:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.188.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737307232; cv=none; b=ku0doJbVq1xT62sZI71aDhu3+19pOwlskfxQ2WrCqZ+XyeBt9OR3lLSvhqAA2U43uQcbGdAaS8byujKBf6ZrIpoNB1WpGoDSc4pCTA+4htiPFEwUmPeI6kQwI0zVd4KXNarEfuONFomyUDvLWAyL5QaqKfwJp5c4e9X2eltRKvU=
+	t=1737307267; cv=none; b=V3CKOjGT9GF8MdP27xLabU5MexwvPVLENOHQAXEK0rfncjkOEs1W0WpiINy3Je0ka+zpWHMmRHX8CN41rHB6R6t+HDsZak+IbJtGVoQxgxGsVRCs5PISWyt6p7wLaSVla38jCdsKYALEKC0BrGzWv8r1VA3MX4ge+nXJT19tkuQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737307232; c=relaxed/simple;
-	bh=J7v+BgIY5shT8MHdg4IpkqYCZQ3Diu+7902fJTq5oos=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bzUzcpuncqBWG4lXC/7cVRBZWOwYCFlcQgFSjyRLZO30tSxtHHOGfuqzWJhjCwQX48iNdGqWy6g+yzF01FJgW9++EKsyZBgxU5tLxpgSPWzl+eXT+8xQho4zmf+fdn+tkBSibWYSms4qnVnLcTUp/oGf6fekyqVfHYhJf6hME1s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=LPld0bsq; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=ccUdV+bJB0JqpX+VeyHCjAkIupowyxA6d+tOpsGgVs8=; b=LPld0bsqaGGBAyeqvvQre2TI23
-	miBlbXSrArijsZvPeONXoENHJdsXIGQEi9LK2NJdr6jhD1RpFJja6Kwz8Ii330917aD1RZv4CqPSF
-	WtKZ1/51B9vBAojad7ShDX/VrN3J3Keah9SOvqSm/ZYRT2SghI5OaCwnC3bqhnyYFeIc=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tZYy9-0066hN-2y; Sun, 19 Jan 2025 18:20:17 +0100
-Date: Sun, 19 Jan 2025 18:20:17 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Sky Huang <SkyLake.Huang@mediatek.com>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Qingfang Deng <dqfext@gmail.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org,
-	Steven Liu <Steven.Liu@mediatek.com>
-Subject: Re: [PATCH net-next 2/3] net: phy: mediatek: Move some macros to
- phy-lib for later use
-Message-ID: <af88a47d-9514-4969-9b39-a387d51fdf82@lunn.ch>
-References: <20250116012159.3816135-1-SkyLake.Huang@mediatek.com>
- <20250116012159.3816135-3-SkyLake.Huang@mediatek.com>
+	s=arc-20240116; t=1737307267; c=relaxed/simple;
+	bh=VI3PpbpjnbVsG3ydd3CT9VebcNHzpQ+pXosWMcAnVkI=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=VJpB+xYvxD/n84TANFD3L+86UaUXNFzX0s590M9ORzXqdtvfJC8qlT9Nk0SgL8PKSt7ane272EE00H5iRV/cQKJrtL7ErFWQO8tD38JPAW9fc9dJvjhJJFVun6CwzkVATWL3ZpUnM5i3h/PEFQd8gX2F3dC7ZwJXct7W2yZ1QXM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; arc=none smtp.client-ip=217.70.188.207
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: netfilter-devel@vger.kernel.org
+Cc: davem@davemloft.net,
+	netdev@vger.kernel.org,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	fw@strlen.de
+Subject: [PATCH net-next,v2 00/14] Netfilter updates for net-next
+Date: Sun, 19 Jan 2025 18:20:37 +0100
+Message-Id: <20250119172051.8261-1-pablo@netfilter.org>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250116012159.3816135-3-SkyLake.Huang@mediatek.com>
+Content-Transfer-Encoding: 8bit
 
-On Thu, Jan 16, 2025 at 09:21:57AM +0800, Sky Huang wrote:
-> From: Sky Huang <skylake.huang@mediatek.com>
-> 
-> Move some macros to phy-lib because MediaTek's 2.5G built-in
-> ethernet PHY will also use them.
-> 
-> Signed-off-by: Sky Huang <skylake.huang@mediatek.com>
-> ---
->  drivers/net/phy/mediatek/mtk-ge.c | 4 ----
->  drivers/net/phy/mediatek/mtk.h    | 4 ++++
->  2 files changed, 4 insertions(+), 4 deletions(-)
-> 
-> diff --git a/drivers/net/phy/mediatek/mtk-ge.c b/drivers/net/phy/mediatek/mtk-ge.c
-> index 79663da..937254a 100644
-> --- a/drivers/net/phy/mediatek/mtk-ge.c
-> +++ b/drivers/net/phy/mediatek/mtk-ge.c
-> @@ -8,10 +8,6 @@
->  #define MTK_GPHY_ID_MT7530		0x03a29412
->  #define MTK_GPHY_ID_MT7531		0x03a29441
->  
-> -#define MTK_PHY_PAGE_EXTENDED_1			0x0001
-> -#define MTK_PHY_AUX_CTRL_AND_STATUS		0x14
-> -#define   MTK_PHY_ENABLE_DOWNSHIFT		BIT(4)
-> -
->  #define MTK_PHY_PAGE_EXTENDED_2			0x0002
->  #define MTK_PHY_PAGE_EXTENDED_3			0x0003
->  #define MTK_PHY_RG_LPI_PCS_DSP_CTRL_REG11	0x11
-> diff --git a/drivers/net/phy/mediatek/mtk.h b/drivers/net/phy/mediatek/mtk.h
-> index 712a9f0..cda1dc8 100644
-> --- a/drivers/net/phy/mediatek/mtk.h
-> +++ b/drivers/net/phy/mediatek/mtk.h
-> @@ -8,7 +8,11 @@
->  #ifndef _MTK_EPHY_H_
->  #define _MTK_EPHY_H_
->  
-> +#define MTK_PHY_AUX_CTRL_AND_STATUS		0x14
-> +#define   MTK_PHY_ENABLE_DOWNSHIFT		BIT(4)
-> +
->  #define MTK_EXT_PAGE_ACCESS			0x1f
-> +#define MTK_PHY_PAGE_EXTENDED_1			0x0001
->  #define MTK_PHY_PAGE_STANDARD			0x0000
->  #define MTK_PHY_PAGE_EXTENDED_52B5		0x52b5
+v2: - addressing kdoc issues reported by Simon Horman and Jakub Kicinski
+      as well as missing SoB, related to patches 1/14, 2/14 and 8/14.
+    - set on IP_CT_TCP_FLAG_CLOSE_INIT when setting _CLOSE
+      conntrack state from flowtable in patch 14/14.
 
-A patch like this i can easily review. I can see somethings removed
-from one file and added to another, without any changes. It is
-obviously correct, and toke about 10 seconds to review.
+-o-
 
-Another way to look at this. Say somebody reports your previous patch
-breaks their system. How are you going to debug it? If rather than
-being one huge patch, it was 10 simpler patches, you could ask them to
-run a git bisect. That will narrow down the code where you need to
-look for the bug to 1/10 of the code. And that one patch will
-hopefully be a lot simpler, making the code inspection to find the
-problem a lot simpler....
+Hi,
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+The following batch contains Netfilter updates for net-next:
 
-    Andrew
+1) Unbreak set size settings for rbtree set backend, intervals in
+   rbtree are represented as two elements, this detailed is leaked
+   to userspace leading to bogus ENOSPC from control plane.
+
+2) Remove dead code in br_netfilter's br_nf_pre_routing_finish()
+   due to never matching error when looking up for route,
+   from Antoine Tenart.
+
+3) Simplify check for device already in use in flowtable,
+   from Phil Sutter.
+
+4) Three patches to restore interface name field in struct nft_hook
+   and use it, this is to prepare for wildcard interface support.
+   From Phil Sutter.
+
+5) Do not remove netdev basechain when last device is gone, this is
+   for consistency with the flowtable behaviour. This allows for netdev
+   basechains without devices. Another patch to simplify netdev event
+   notifier after this update. Also from Phil.
+
+6) Two patches to add missing spinlock when flowtable updates TCP
+   state flags, from Florian Westphal.
+
+7) Simplify __nf_ct_refresh_acct() by removing skbuff parameter,
+   also from Florian.
+
+8) Flowtable gc now extends ct timeout for offloaded flow. This
+   is to address a possible race that leads to handing over flow
+   to classic path with long ct timeouts.
+
+9) Tear down flow if cached rt_mtu is stale, before this patch,
+   packet is handed over to classic path but flow entry still remained
+   in place.
+
+10) Revisit the flowtable teardown strategy, which was originally
+    designed to release flowtable hardware entries early. Add a new
+    CLOSING flag that still allows hardware to release entries when
+    fin/rst is seen, but keeps the flow entry in place when the
+    TCP connection is closed. Release flow after timeout or when a new
+    syn packet is seen for TCP reopen scenario.
+
+Please, pull these changes from:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf-next.git nf-next-25-01-19
+
+Thanks.
+
+----------------------------------------------------------------
+
+The following changes since commit 9c7ad35632297edc08d0f2c7b599137e9fb5f9ff:
+
+  Merge branch 'arrange-pse-core-and-update-tps23881-driver' (2025-01-14 13:56:37 +0100)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf-next.git tags/nf-next-25-01-19
+
+for you to fetch changes up to fdbaf5163331342e90a2c29b87629021f4c15f0c:
+
+  netfilter: flowtable: add CLOSING state (2025-01-19 16:41:56 +0100)
+
+----------------------------------------------------------------
+netfilter pull request 25-01-19
+
+----------------------------------------------------------------
+Antoine Tenart (1):
+      netfilter: br_netfilter: remove unused conditional and dead code
+
+Florian Westphal (4):
+      netfilter: nft_flow_offload: clear tcp MAXACK flag before moving to slowpath
+      netfilter: nft_flow_offload: update tcp state flags under lock
+      netfilter: conntrack: remove skb argument from nf_ct_refresh
+      netfilter: conntrack: rework offload nf_conn timeout extension logic
+
+Pablo Neira Ayuso (3):
+      netfilter: nf_tables: fix set size with rbtree backend
+      netfilter: flowtable: teardown flow if cached mtu is stale
+      netfilter: flowtable: add CLOSING state
+
+Phil Sutter (6):
+      netfilter: nf_tables: Flowtable hook's pf value never varies
+      netfilter: nf_tables: Store user-defined hook ifname
+      netfilter: nf_tables: Use stored ifname in netdev hook dumps
+      netfilter: nf_tables: Compare netdev hooks based on stored name
+      netfilter: nf_tables: Tolerate chains with no remaining hooks
+      netfilter: nf_tables: Simplify chain netdev notifier
+
+ include/net/netfilter/nf_conntrack.h   |  18 +---
+ include/net/netfilter/nf_flow_table.h  |   1 +
+ include/net/netfilter/nf_tables.h      |  10 +-
+ net/bridge/br_netfilter_hooks.c        |  30 +-----
+ net/netfilter/nf_conntrack_amanda.c    |   2 +-
+ net/netfilter/nf_conntrack_broadcast.c |   2 +-
+ net/netfilter/nf_conntrack_core.c      |  13 +--
+ net/netfilter/nf_conntrack_h323_main.c |   4 +-
+ net/netfilter/nf_conntrack_sip.c       |   4 +-
+ net/netfilter/nf_flow_table_core.c     | 187 +++++++++++++++++++++++++++++----
+ net/netfilter/nf_flow_table_ip.c       |  14 ++-
+ net/netfilter/nf_tables_api.c          | 123 ++++++++++++----------
+ net/netfilter/nft_chain_filter.c       |  48 +++------
+ net/netfilter/nft_ct.c                 |   2 +-
+ net/netfilter/nft_flow_offload.c       |  16 ++-
+ net/netfilter/nft_set_rbtree.c         |  43 ++++++++
+ 16 files changed, 332 insertions(+), 185 deletions(-)
 
