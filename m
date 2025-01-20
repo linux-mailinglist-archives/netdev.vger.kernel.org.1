@@ -1,80 +1,84 @@
-Return-Path: <netdev+bounces-159844-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159845-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75602A171FC
-	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 18:34:51 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F0E0A17212
+	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 18:39:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B08E6160286
-	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 17:34:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 392D83A66BF
+	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 17:39:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DCE11547C0;
-	Mon, 20 Jan 2025 17:34:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76F981E3DD0;
+	Mon, 20 Jan 2025 17:39:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PiVte+wY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ny6WkUK9"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5602115381A;
-	Mon, 20 Jan 2025 17:34:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4274F182BC;
+	Mon, 20 Jan 2025 17:39:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737394486; cv=none; b=egWfgBT5Wh05+bWRMOHZLmtmpBzUYDjDEB8/Dmtfk7O56D2OvhSVGMcKLcJd/HmWqa9LkLdnSsbHhfoSFEd4nKmKRKwsedWTTPUtOs0uwVEl3ZpPAprmMlurB9+7K0r3cS4Snc/99TFfcgVVPn8aCjxobXrE/8KRMoix4MxGJYU=
+	t=1737394780; cv=none; b=P/m6S1QVp7ZpU0Le4KiMW4gnns8UIWtuUhnbPLeCB02XB3XaK9kPQVlhIQNPNLChUyPd6ox9k82La2RUMJqojtDEPLfl9ax7cJ1ha3I9QVZx+Zk5/2y/9+oCDqFtiGM8xqZlJKM6BQZ7IPaFCRbXSVzRw7p0LA8oYcY9QCz9Cn0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737394486; c=relaxed/simple;
-	bh=0gqkl+E1P9Uk9N5su1IB8MPHCCtQk14/H/NOn2rx7Ns=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hhT0DgLnHrnUgLAPT+HkiKsb7XK8xZ4Wqd7fpF01b5SiZ1uihApFVL1A+8FLQAwwjngrw8rQAXgIXenQ08q2zhBph6mK54zS42WHt5k0jOmkkZj6RAxV40D+FXZcnaHUPWNnlHCU86SNSYq+eEvixchOktBN1yz78Z9pULGmKE0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PiVte+wY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6F74EC4CEDD;
-	Mon, 20 Jan 2025 17:34:45 +0000 (UTC)
+	s=arc-20240116; t=1737394780; c=relaxed/simple;
+	bh=zNUIW78iXDkYXYeQ7bq+fzMGNLWpN2FbRWbUmFizJPg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CHc043saZFIm0aUBaiLtdHIkud840wQ4XQpLR4BpJsrJt/UvQ5yMrw6cGbdQonPpUpEYOlyNz+tm8N1QDuFsyLC5kLYIVPjomuL8ddl9KeaD9kmmAxPhLNnx22O5/Zuj12zmS+5rMffPj/bs56mHlUBkN09BxEuhPnLvmcDnGLM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ny6WkUK9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 829F1C4CEDD;
+	Mon, 20 Jan 2025 17:39:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737394485;
-	bh=0gqkl+E1P9Uk9N5su1IB8MPHCCtQk14/H/NOn2rx7Ns=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=PiVte+wYOmmi9LS4l02xNbHwRS2gO4Oz7D5evFbVEZ94sJIavhClxJ2a8D0HXDkAn
-	 iVgBZwwUt1ROEG2XHB9Ao89AlAD0scbCK8NfRZnR5hDTcJXAFnkNKhJIMosNNK6Arz
-	 SQtE0htcbNV5Gyku/5bYcDBdT9wg+J1575lNTLlTGCIlcYR6cFYmPA5Ocm+vdmBhMN
-	 WxopM4k4Xps7eoBZ3MdcwSsLgTVIkyBTFU41sLl+jAOv2rbx/I/LFJ8Em2sgNXngiX
-	 uJ8fwnnOcSJ7QF/9OaNbYpxitvRWXoSBN5NLhqfsRrzOr56rdmUYwfAt2lZ+60ZoDJ
-	 +/vbyW79YUOtQ==
-Date: Mon, 20 Jan 2025 09:34:44 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Marek Vasut <marex@denx.de>
-Cc: linux-leds@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
- Andrew Lunn <andrew@lunn.ch>, Eric Dumazet <edumazet@google.com>, Heiner
- Kallweit <hkallweit1@gmail.com>, Paolo Abeni <pabeni@redhat.com>, Russell
- King <linux@armlinux.org.uk>, netdev@vger.kernel.org
-Subject: Re: [PATCH] net: phy: Handle both led@0 and led subnode name for
- single-LED PHYs
-Message-ID: <20250120093444.683501ad@kernel.org>
-In-Reply-To: <197f3134-96fa-484f-a5f5-36779c54b340@denx.de>
-References: <20250120082609.50445-1-marex@denx.de>
-	<197f3134-96fa-484f-a5f5-36779c54b340@denx.de>
+	s=k20201202; t=1737394780;
+	bh=zNUIW78iXDkYXYeQ7bq+fzMGNLWpN2FbRWbUmFizJPg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ny6WkUK9ZpIW351bMwjChu78ws2lNbcTPbNhJUlCnbU6eWZ+687k9ZG3VU0s6oR57
+	 u/871HTl/DSdm0KhmtjWQzibIrPExDzjUlvlDI7kqqIrCoi2D9eA5Gx0UIdp/ySLYM
+	 KxyAKFDi+WyysG+29lpuO7KeIgfM153bzx0RbvAbiKEGuen70NtE9PuqnsEpw26KBL
+	 ixnSbz3b3rPUNZIR3a5RAaf2q6w1mLvl43gNAi4c0UEfA+5fMOourJG75ACOGhDd+X
+	 R4nraXHlskBzNh29/RuYxKeiiTbkLgsGgtpyOxwYdOAW2kH2J6zng1fJpmS0uKZ8od
+	 kULyOvONiDUGg==
+Date: Mon, 20 Jan 2025 09:39:37 -0800
+From: Eric Biggers <ebiggers@kernel.org>
+To: David Howells <dhowells@redhat.com>
+Cc: Simon Horman <horms@kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Chuck Lever <chuck.lever@oracle.com>,
+	Trond Myklebust <trond.myklebust@hammerspace.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Ard Biesheuvel <ardb@kernel.org>, linux-crypto@vger.kernel.org,
+	linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH 03/24] crypto: Add 'krb5enc' hash and cipher AEAD
+ algorithm
+Message-ID: <20250120173937.GA2268@sol.localdomain>
+References: <20250120135754.GX6206@kernel.org>
+ <20250117183538.881618-1-dhowells@redhat.com>
+ <20250117183538.881618-4-dhowells@redhat.com>
+ <1201143.1737383111@warthog.procyon.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1201143.1737383111@warthog.procyon.org.uk>
 
-On Mon, 20 Jan 2025 10:02:33 +0100 Marek Vasut wrote:
-> > Handle this special case. In case reg property is not present in the leds
-> > node subnode, test whether the leds node contains exactly one subnode, and
-> > if so, assume this is the one single LED with reg property set to 0.
-> > 
-> > Signed-off-by: Marek Vasut <marex@denx.de>  
-> Please ignore, V2 is coming with a trivial fix for variable rename.
+On Mon, Jan 20, 2025 at 02:25:11PM +0000, David Howells wrote:
+> 
+> I wonder if the testmgr driver tests running the algorithms asynchronously...
+> 
 
-We have a rule prohibiting reports within 24h. See:
-https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#resending-after-review
-One of the goals is to make sure people build test their patches.
-Please follow the guidelines.
--- 
-pv-bot: 24h
+Multiple requests in parallel, I think you mean?  No, it doesn't, but it should.
+
+- Eric
 
