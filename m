@@ -1,94 +1,86 @@
-Return-Path: <netdev+bounces-159800-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159801-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 477E5A16F75
-	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 16:42:41 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7BDAFA16F78
+	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 16:43:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E0C7E188206A
-	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 15:42:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8D7003A07DE
+	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 15:43:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E57001E8840;
-	Mon, 20 Jan 2025 15:42:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 680EE1E990A;
+	Mon, 20 Jan 2025 15:43:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FHE4b/WM"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="oUxkXs0l"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2081.outbound.protection.outlook.com [40.107.243.81])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11EA61E9919;
-	Mon, 20 Jan 2025 15:42:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737387745; cv=none; b=JvWQAKkHLW9sTk/9hw2fIOobeCvTtik44KD8Ym6YWy/cKhWAK27451chaFWGogPYADhXkOcPDJn0cBweVgkIgIMkdlOiXujmhlLeCfM8M07G/qQRJ+ZQKSrssxOWLjnkmXutzUXg1nK1xvVTIZsWX5dWiChf4qDE5nlt4YIMpcs=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737387745; c=relaxed/simple;
-	bh=poW/hJ8Butiz4RFFlZ2PHNtFFsAK0CwWU5mYWUeRTJk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=dzBTdi3posLONga5ItwhOgfxvgYApp6N+JHF1aQL4FK8999fTrly5pVSboNKh3D8qk9sUGJUYfL2yoqwnRWeDjnCFfWOYnnys59Wd7jz8SbK1Jk8IH/bRleZU/q6Ye05cT4wytBpQArd9TpB3t5H7lFU+jFoO9WBTOg4fQUitjs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FHE4b/WM; arc=none smtp.client-ip=209.85.128.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-4361f796586so50852795e9.3;
-        Mon, 20 Jan 2025 07:42:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1737387742; x=1737992542; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=4W4c0/LuzN7tD5LrAqYqsKuJBLRBMa73Tfh2EMWw5FM=;
-        b=FHE4b/WMbYSiDUBE9RM79QNS05XW927FWx22sSCk6WTcg5RmyP6wsKCe+2FTHS+3ol
-         vE3AjCmA8L0DAZrBr/FHoomAGTpWJUnqddC3PJrh2U+ive24XU7GdA6JxPMXxwdKISxo
-         nSEUwHcjpat34mmx9MLdYioS1nF+m/pQbiTuCBAGj3K7EH05vQKjewNzDqv8VR0cBxJp
-         kwzB61A0pXQoCgxEU+IL35bGrcFRJzzQuxqydaLizFwFklcdISL/vQchuTAGginwzpR9
-         h0K0/K24qk2BlgMtswaeZVIZmzNqbUgxotEuK9JLe5EvefRvkpVWS29vsWi6KIhigFSW
-         nutA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737387742; x=1737992542;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=4W4c0/LuzN7tD5LrAqYqsKuJBLRBMa73Tfh2EMWw5FM=;
-        b=CHY+Lvro0sbUmhMWv+tchpqnjnqdmAP3j246HfB4GPAzSlZPCo5op6OsAhdh5NaLhP
-         D0vfpgiMofTx8TCMcsX1CU2cSEv4XxUGDT9pt82QeRcPtZ9WcaHTknQiXXd8/P9YzuFi
-         6eYwfOTjRA/ogI6YWGjeBhkiU5g7sY8mHiWJxECGhC/Y9a4x5ehn0nDy0BilARelXQ6C
-         nO39B74zohBLOpXs1sKaNatvBsr4fOBFFuXo0vmVuqythY3G9RKvID+MdKq6gr7tn+tu
-         WZMgz8NwBUM4fEfwyAIIE00ErV43i5nWDpySrI3rxET0PMkA7vnf7EqKHCTNsbvw3gsz
-         Uv5A==
-X-Forwarded-Encrypted: i=1; AJvYcCUOA5RGWfEvHuEUbagLWJrREi5Yvu25A9YXzz3KTmoF7sbd+SxJz0yu/nE4ZvSlWoKlzPC/t5kx@vger.kernel.org, AJvYcCVpR+eij1pp/TJT1gSolS8a0nooABNgOeAWXFempDC6aqcNLdGudgak5yhd3/FptLn4qCU72Tja/UgxNjI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzKuVpT9b57fBPWocdQ5pmRpTgdYACgiEmgzYhdtbTW8wOqDOS3
-	saqSiB6qm55wLuIAUOy+BxLKp83bHa6WL2PyN2Qh5j6eeD65N2lzYYuPOA==
-X-Gm-Gg: ASbGncvD5b/30MYYpOewUZjlP7oOOcN8br9+EwfixUfM5Xti0vVQYEWvuCpZ8SE41xc
-	WzvjK66DV9jbf0/W+hErpJek1TiaDx5KGeu11KwCV+igPZ9PfbwQM0OsUM3gsud5IK76hIeytyk
-	9BFANyFYEQMtEuUuG+jz0HnumBVzFdBwfMqqJImp8iXmJUigZbF1FnzSLDovxdwom/YjVTyhT7r
-	CXo1rHFNyUz0E6iqHQ1uujhhDM9LNG0/Vn/l+ERNcP55XlXchnC4OjBKGRxuyU0127+Noh9aU9U
-	CxSzC7Lut8DkGBInFG85q6z/5PUsZIwPNa2aloE=
-X-Google-Smtp-Source: AGHT+IHArWGZJYxMqqA7FIuh1RrMO/IPzuG8Jyig93HVcMwBqwDYBNOX69/XG1Nj0C8lDam+sizI7Q==
-X-Received: by 2002:a05:600c:3548:b0:434:a1d3:a321 with SMTP id 5b1f17b1804b1-438913c6150mr125730205e9.3.1737387741983;
-        Mon, 20 Jan 2025 07:42:21 -0800 (PST)
-Received: from localhost.localdomain (93-34-91-161.ip49.fastwebnet.it. [93.34.91.161])
-        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-437c0f03984sm158637895e9.0.2025.01.20.07.42.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 Jan 2025 07:42:21 -0800 (PST)
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: Lorenzo Bianconi <lorenzo@kernel.org>,
-	Felix Fietkau <nbd@nbd.name>,
-	Sean Wang <sean.wang@mediatek.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Christian Marangi <ansuelsmth@gmail.com>
-Subject: [net PATCH v2] net: airoha: Fix wrong GDM4 register definition
-Date: Mon, 20 Jan 2025 16:41:40 +0100
-Message-ID: <20250120154148.13424-1-ansuelsmth@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD80F1E98FF
+	for <netdev@vger.kernel.org>; Mon, 20 Jan 2025 15:43:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.81
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1737387833; cv=fail; b=Dm/VzIG9dPbbJitM4YMk7P6n+7kLL5U0cTN85Tkh5qWp8Itmfya0iagsgLx8fCjLIqTBSb/Rn29DnIZIX3XBmA27sF9XMQ1EtohU7mq9Qmgpl+hWEOrETXo4Mk1K09uNl8Pt1Zl5cda8l/1p5Ao0b4Q1PtOUA8Lxhfb2aYTitKk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1737387833; c=relaxed/simple;
+	bh=X05pLYeCHs2dWFcO5qcIIZP7nAkTRrc7ik9P56TeeJM=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=FRVKuOF6kPcBTlmAc57+Uz/r0bVnU3JrI3HpxpE6EwOx67fOMk5fILV/X5JfCV2be0dYFn7WBxX/r3Vzc1ur4SnvTEAOltjwi3T/537WdigJMpkxR/G4mWhSKYD07kGtIywImlCRd1ekpKWdkmQYrO5Tzf7TG4uK7KDzRLkdDXU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=oUxkXs0l; arc=fail smtp.client-ip=40.107.243.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=NuUb+xRObE3Oh95Cnmh9YkYnYqo9Vq8oZqAGwOih8SFaDE9KprlwH+X7lKxrDbVVYTwH3PQR7fjFZsfH52zHREaaAPW7p2EHxeUxB5NoeKJgMaIQ6tSNcrq8XCo/fwh9o68o3f3dNyoPAZxOkB3IVfoM/z6UUXR40+A8+XWL4s9xKpXO43s5vvjUwFz3gP91zzOuIkQWTbMq89F1ivnr8wJF480dRNqwDvvirqRElG8WYruNMsiBtLlHFBmlKMWbxFBrT8JqGQpHz81HR4qXdjTwt6Ybz3DO4MeslYIQrL7PUM0KwQj7bQbeXF7x+m0qDLFXN8ptFrZ8OlNuZ3VurA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=C2CUYEB4xmsespaKUANIA5mLW1C4umCiFXzjunJZe8U=;
+ b=UYUkbIIDjtYAKzeVXbow+pJ8vszgPP9318PoyGkD8Rqq92HzWeYKx7CG7GX0JQcXuZb99+9C1Apeid8AfElj5pdNT4Mua1zegjrk9pndC8qTH76j4ZuT9zEh78mA4TcaS90xGydy3zsiXZSzZpx1SQqXv2s7TH3NFQ4o8qudYUeTu3obGqbFDjp/7zB4j+IfxhYN/xH7rpdKdNqkACaO4WCsE06jD3SSHlYUaGk8AriI5wFtqjioUatrZk3HOWmTWgqCGLAXC9soDOmNeiBqvRsZiRoJ+7TkR1ohluV3pemgRNGnx/U7rfry6iQ0I97zRctN2xwVMypO6HK4ULq64w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=networkplumber.org
+ smtp.mailfrom=nvidia.com; dmarc=pass (p=reject sp=reject pct=100) action=none
+ header.from=nvidia.com; dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=C2CUYEB4xmsespaKUANIA5mLW1C4umCiFXzjunJZe8U=;
+ b=oUxkXs0lg7nAtMH/SwMIjvWCQ1uqy+fZRsaq5lXnR9BU8N2k7Q0iT8Y2kCslGgWw29gizARU8zwkdauBjTpQ4XC9qkaU0vo0f4Dpafvf5tOAD1K8ZrrFhAFMNzVu16aJL+2xWlgygFDFMPiOKjPoJPvzQz1VtGLSriMUDxFCDtz4OQ2SKDL3nbJbLvbLrcjp0DU5uV5TsYKOaepdKq1jnONAjpimlX6flZTcHZYikm6t1k/jBXBd2D5cS2j1C2yM+U66fhE4EYNROXGIxINpr2yJ4UT0eQozs7alTrMRWQodPwDprXxb/iAxyCpK8mGCgs68UYCUQSNexBEtpZav1Q==
+Received: from BLAPR05CA0005.namprd05.prod.outlook.com (2603:10b6:208:36e::14)
+ by DS0PR12MB8416.namprd12.prod.outlook.com (2603:10b6:8:ff::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8356.20; Mon, 20 Jan
+ 2025 15:43:47 +0000
+Received: from BN1PEPF00004688.namprd05.prod.outlook.com
+ (2603:10b6:208:36e:cafe::d3) by BLAPR05CA0005.outlook.office365.com
+ (2603:10b6:208:36e::14) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8377.12 via Frontend Transport; Mon,
+ 20 Jan 2025 15:43:47 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ BN1PEPF00004688.mail.protection.outlook.com (10.167.243.133) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8377.8 via Frontend Transport; Mon, 20 Jan 2025 15:43:46 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Mon, 20 Jan
+ 2025 07:43:32 -0800
+Received: from fedora.mtl.com (10.126.230.35) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Mon, 20 Jan
+ 2025 07:43:29 -0800
+From: Petr Machata <petrm@nvidia.com>
+To: Stephen Hemminger <stephen@networkplumber.org>, David Ahern
+	<dsahern@kernel.org>, <netdev@vger.kernel.org>
+CC: Petr Machata <petrm@nvidia.com>
+Subject: [PATCH iproute2-next] ip: vxlan: Support IFLA_VXLAN_RESERVED_BITS
+Date: Mon, 20 Jan 2025 16:43:06 +0100
+Message-ID: <5eaf7a5df51b687f3354d9e065c3358f56b5ad34.1737387719.git.petrm@nvidia.com>
 X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -97,46 +89,146 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN1PEPF00004688:EE_|DS0PR12MB8416:EE_
+X-MS-Office365-Filtering-Correlation-Id: c139263e-2f4b-41d5-8b9f-08dd39693a4d
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|36860700013|82310400026|1800799024|376014|13003099007;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?qqn1CpQ9x2g4UJCfhj0l4YlAeR9LFoMErJ8WJzWymDykbAyoTxQqGbqGOO1A?=
+ =?us-ascii?Q?WCYpP+HWw2VFYH+4a1IiMdt4jVAiQAKt2sGAMAUDmZxQaHoy5owfY9RXCMgs?=
+ =?us-ascii?Q?1zpBGXPgY1RtbpccyFmUeJT/Hum94VsJ4ViRnH3grke6IbfKamoXD95FIo5d?=
+ =?us-ascii?Q?/ZxrZYstdlelVlho4UXYNjrAWu8OK10+/v4zbkJW/RI1wWGNQGznjYNWEbFl?=
+ =?us-ascii?Q?71HSkEwbdS4c9qe7wYfMqcvnhGRGH8/AYCm67nWRpdLrxGmZ9+IQmwmHDjpS?=
+ =?us-ascii?Q?oghs1qkiSZAy5kiCYSe3iaNnlUYpxZEFDfF7CyrpNgk+Yd1YC+l79KaieggU?=
+ =?us-ascii?Q?xGuHY8iv9S2R77Taz78jS+aC9dj2NuR8RhTSteAbqyUh81IUDSvRTW4K14WT?=
+ =?us-ascii?Q?RfNKEQ+t/enut3THpGAGJ32VN1MO82kE86l5ZDqzobakJoXlfBwCaM9vzYGp?=
+ =?us-ascii?Q?MvAxCgVKN0fo8MxABPiqKbJs+LcDlxqHJTgsQrKXfuFaL4VK9apaxM6Yd5Fx?=
+ =?us-ascii?Q?pyJlSG6sagThvJBybnq+Ut7fTAjS83QEGMxvMwvG5biFOcyELA+O+QTUkYnp?=
+ =?us-ascii?Q?3ODKAeKUyRC2tAQWQ5E+lBJQt/CyhvA2bGXc5w+r/4V6vQMRrKpRTosvWHUu?=
+ =?us-ascii?Q?6IWnx2X2c014MemO3p+ulmI5Bm25YSRkHviq6InBU9yqKGwH+g/gdFXKGfBC?=
+ =?us-ascii?Q?VtuGK3P2cuvI3mlfxl5fLLnE5cMqZb3Dj7GZnpZhDDGYme/hwATDg0dDBs3+?=
+ =?us-ascii?Q?2LXhTO0LTGdABMy6b2XUzoMjT86JcN3QyxarhJdlujoZcFHABy7hUebX5vDb?=
+ =?us-ascii?Q?bhOjR4nVO/9KVgA24WQ+4zJKEvUfJGOh0xRyUiM1U5DJAnyZBH8L1/HJ9anN?=
+ =?us-ascii?Q?cpkImT2SUT0LwrcswCPE4mq8a/qmMKuwvOjg9WoyDldkav1ziZ725FAdJ/bG?=
+ =?us-ascii?Q?Q7dgkODeK5QxOcbEXbPoQmbl6xbbS/WF5D9Wwm4hAamE0yHP94fuC/9riSq2?=
+ =?us-ascii?Q?jRpBg/DCzXtkUpIY6lrlnruRj1zAnooYBNcbWSHM8xIFJZScvTyCoIO+HhxV?=
+ =?us-ascii?Q?Tekmpgvsehx+bIYKhQe1FKxj8Z+2iJZQO8hQcqR4jo4lC9AXMvDC1DrnCKnm?=
+ =?us-ascii?Q?Xbk5NokV22CaDnth3Db0XApDUQM9KifiHy1pH93AksfvH4nXYClWVGYgARHd?=
+ =?us-ascii?Q?72ayxEmUJtkqprOSPRfEOhmiNwZMTgVPt0ywVdey37y2ViqJpbtpscCDm70D?=
+ =?us-ascii?Q?6HMvE4MrEzVX6oOkGG0QuurcT+fCng59LfqgAIkz9VYpB5LnHMkidpNXJBd3?=
+ =?us-ascii?Q?j1AfbK03cZKzZ0RF2t/CBQMI0+4Bfk1D257T6IoUYwGma/UJL3gmrq57ZtZw?=
+ =?us-ascii?Q?luAmVZ8BkaW1/Ef/eg0R7wDnal68yzr9MmI0EDbhQiALoyTs7zTQCRZ/38Qv?=
+ =?us-ascii?Q?q2KXcDQOMZUNZEIwXtmxVF/Ts4EcuLjzPSAYZ4jnMdEq9pSpjFGJJ2vjlZ42?=
+ =?us-ascii?Q?zk+G/Ry8hbea8D8=3D?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(82310400026)(1800799024)(376014)(13003099007);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jan 2025 15:43:46.6957
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: c139263e-2f4b-41d5-8b9f-08dd39693a4d
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BN1PEPF00004688.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB8416
 
-Fix wrong GDM4 register definition, in Airoha SDK GDM4 is defined at
-offset 0x2400 but this doesn't make sense as it does conflict with the
-CDM4 that is in the same location.
+A new attribute, IFLA_VXLAN_RESERVED_BITS, was added in Linux kernel
+commit 6c11379b104e ("vxlan: Add an attribute to make VXLAN header
+validation configurable") (See the link below for the full patchset).
 
-Following the pattern where each GDM base is at the FWD_CFG, currently
-GDM4 base offset is set to 0x2500. This is correct but REG_GDM4_FWD_CFG
-and REG_GDM4_SRC_PORT_SET are still using the SDK reference with the
-0x2400 offset. Fix these 2 define by subtracting 0x100 to each register
-to reflect the real address location.
+The payload is a 64-bit binary field that covers the VXLAN header. The set
+bits indicate which bits in a VXLAN packet header should be allowed to
+carry 1's. Support the new attribute through a CLI keyword "reserved_bits".
 
-Fixes: 23020f049327 ("net: airoha: Introduce ethernet support for EN7581 SoC")
-Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
-Acked-by: Lorenzo Bianconi <lorenzo@kernel.org>
+Link: https://patch.msgid.link/173378643250.273075.13832548579412179113.git-patchwork-notify@kernel.org
+Signed-off-by: Petr Machata <petrm@nvidia.com>
 ---
-Changes v2:
-- Target correct file (fix wrong downstream branch used)
+ ip/iplink_vxlan.c     | 20 ++++++++++++++++++++
+ man/man8/ip-link.8.in |  9 +++++++++
+ 2 files changed, 29 insertions(+)
 
- drivers/net/ethernet/mediatek/airoha_eth.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/ethernet/mediatek/airoha_eth.c b/drivers/net/ethernet/mediatek/airoha_eth.c
-index 415d784de741..09f448f29124 100644
---- a/drivers/net/ethernet/mediatek/airoha_eth.c
-+++ b/drivers/net/ethernet/mediatek/airoha_eth.c
-@@ -266,11 +266,11 @@
- #define REG_GDM3_FWD_CFG		GDM3_BASE
- #define GDM3_PAD_EN_MASK		BIT(28)
+diff --git a/ip/iplink_vxlan.c b/ip/iplink_vxlan.c
+index 7781d60b..9649a8eb 100644
+--- a/ip/iplink_vxlan.c
++++ b/ip/iplink_vxlan.c
+@@ -52,6 +52,7 @@ static void print_explain(FILE *f)
+ 		"		[ dev PHYS_DEV ]\n"
+ 		"		[ dstport PORT ]\n"
+ 		"		[ srcport MIN MAX ]\n"
++		"		[ reserved_bits VALUE ]\n"
+ 		"		[ [no]learning ]\n"
+ 		"		[ [no]proxy ]\n"
+ 		"		[ [no]rsc ]\n"
+@@ -337,6 +338,17 @@ static int vxlan_parse_opt(struct link_util *lu, int argc, char **argv,
+ 			check_duparg(&attrs, IFLA_VXLAN_LOCALBYPASS,
+ 				     *argv, *argv);
+ 			addattr8(n, 1024, IFLA_VXLAN_LOCALBYPASS, 0);
++		} else if (strcmp(*argv, "reserved_bits") == 0) {
++			NEXT_ARG();
++			__be64 bits;
++
++			check_duparg(&attrs, IFLA_VXLAN_RESERVED_BITS,
++				     *argv, *argv);
++			if (get_be64(&bits, *argv, 0))
++				invarg("reserved_bits", *argv);
++			addattr_l(n, 1024, IFLA_VXLAN_RESERVED_BITS,
++				  &bits, sizeof(bits));
++
+ 		} else if (!matches(*argv, "external")) {
+ 			check_duparg(&attrs, IFLA_VXLAN_COLLECT_METADATA,
+ 				     *argv, *argv);
+@@ -601,6 +613,14 @@ static void vxlan_print_opt(struct link_util *lu, FILE *f, struct rtattr *tb[])
+ 	    ((maxaddr = rta_getattr_u32(tb[IFLA_VXLAN_LIMIT])) != 0))
+ 		print_uint(PRINT_ANY, "limit", "maxaddr %u ", maxaddr);
  
--#define REG_GDM4_FWD_CFG		(GDM4_BASE + 0x100)
-+#define REG_GDM4_FWD_CFG		GDM4_BASE
- #define GDM4_PAD_EN_MASK		BIT(28)
- #define GDM4_SPORT_OFFSET0_MASK		GENMASK(11, 8)
++	if (tb[IFLA_VXLAN_RESERVED_BITS]) {
++		__be64 reserved_bits =
++			rta_getattr_u64(tb[IFLA_VXLAN_RESERVED_BITS]);
++
++		print_0xhex(PRINT_ANY, "reserved_bits",
++			    "reserved_bits %#llx ", ntohll(reserved_bits));
++	}
++
+ 	if (tb[IFLA_VXLAN_GBP])
+ 		print_null(PRINT_ANY, "gbp", "gbp ", NULL);
+ 	if (tb[IFLA_VXLAN_GPE])
+diff --git a/man/man8/ip-link.8.in b/man/man8/ip-link.8.in
+index 64b5ba21..d0f30556 100644
+--- a/man/man8/ip-link.8.in
++++ b/man/man8/ip-link.8.in
+@@ -632,6 +632,8 @@ the following additional arguments are supported:
+ ] [
+ .BI srcport " MIN MAX "
+ ] [
++.BI reserved_bits " VALUE "
++] [
+ .RB [ no ] learning
+ ] [
+ .RB [ no ] proxy
+@@ -725,6 +727,13 @@ bit is not set.
+ - specifies the range of port numbers to use as UDP
+ source ports to communicate to the remote VXLAN tunnel endpoint.
  
--#define REG_GDM4_SRC_PORT_SET		(GDM4_BASE + 0x33c)
-+#define REG_GDM4_SRC_PORT_SET		(GDM4_BASE + 0x23c)
- #define GDM4_SPORT_OFF2_MASK		GENMASK(19, 16)
- #define GDM4_SPORT_OFF1_MASK		GENMASK(15, 12)
- #define GDM4_SPORT_OFF0_MASK		GENMASK(11, 8)
++.sp
++.BI reserved_bits " VALUE "
++- by default the kernel rejects packets that have bits set outside of the fields
++required by the features enabled on the VXLAN netdevice. \fBreserved_bits\fR is
++a 64-bit quantity specifying which bits it should be possible to set in a VXLAN
++header. Each bit set in the value is a tolerated bit set in a packet.
++
+ .sp
+ .RB [ no ] learning
+ - specifies if unknown source link layer addresses and IP addresses
 -- 
-2.47.1
+2.47.0
 
 
