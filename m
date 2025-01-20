@@ -1,126 +1,118 @@
-Return-Path: <netdev+bounces-159785-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159786-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 473ABA16E63
-	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 15:23:17 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 663BFA16E69
+	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 15:25:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EEA6F3A40EE
-	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 14:23:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E1EC6188406F
+	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 14:25:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF8011E0E0A;
-	Mon, 20 Jan 2025 14:23:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C2C81E2854;
+	Mon, 20 Jan 2025 14:25:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="NnjPjrjZ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="flxffZEh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.denx.de (mx.denx.de [89.58.32.78])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E34F71DEFD4;
-	Mon, 20 Jan 2025 14:23:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=89.58.32.78
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B6621DEFD4
+	for <netdev@vger.kernel.org>; Mon, 20 Jan 2025 14:25:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737382992; cv=none; b=NRSAuAR6Lzwe1QgUSIuvD51sp8uC6dHMF8k83URWrY6qp4RNFyCQ4Q4MK5xLx/wxYJd6BH7uCDkqU/BBxxWnNPsKUH+2UrUz6R9iPZg1ZsUBiMnx2TWF0X06WN7VOBFWvbMELjOyPogaulQLFS8crb9rQ8HqPdfD6tX2YxRkSVg=
+	t=1737383125; cv=none; b=ATHXlxy8dAvipbv/KJ6FebLA/SHmqOZygGuRZxp0oVBD+dcuW1R4ZcybWb99jWE6ip1z7gA3rOGNBdhCNGYLWj0Mpvj3r8fXSB9IiGbdI1IjL+xDrd/lDKvff0YXZhuWLnhELbVDb4UqWdfi3oNJzBcjHIUctSkarew//MidDTI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737382992; c=relaxed/simple;
-	bh=AesDXrVBow2F+80GAvVShsFcaLr9SUV0R9n/HpToTKk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=RZqne4RhNWiuPdk+psdQ8gKKmIgZ6jy7Rq34ZahmTZY0gw7w3CkmaJVbzVC0gUP1T4E2HQBQQvXtk4rVIRBg3SR3mREByUfRKeyUZiRQILYjka/XmwK8SghMI6l5xuj932udb5Bxv6HBnzhEau0F7cM+AsUAOEAtEFLhwDpAwxw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=NnjPjrjZ; arc=none smtp.client-ip=89.58.32.78
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 87E131040DBF6;
-	Mon, 20 Jan 2025 15:23:04 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de; s=mx-20241105;
-	t=1737382987;
+	s=arc-20240116; t=1737383125; c=relaxed/simple;
+	bh=1jqY2F+d7VafsuCep+G9kl1oILdjWO4f+217zkn9+7c=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=gHJzzy4GU/i7nc/YCImEP+lhbOAG14e8Hqi6H/EVooDJ+on/Ugmz2jJmSWT94rA32fwk2ejPCyYjxsym1IaoAaUlN7P2lTzeRkjcpoO6X3/cnNh1S/ReTAejSQQjZF/UrnEQgfqOP8Y+9jbY6jt8LmtI2GH8m3jXWT/FRhz0yvU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=flxffZEh; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1737383123;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=n9Rkky1y7To39aNMDd2svVkpqBnuTsV1oius/xd9Aio=;
-	b=NnjPjrjZJN0BZ2XCvSE7bvm3saKJtGgdWN8acbGzRPH1fwFK1DCxP3EuW+scr1vtBSHtZH
-	FGk9CtwIBlI1XuZU315slW1xTmBu4BoSYfKtJWUlskq27OY3yuWDHJ+EPLWgy7RclhfOUD
-	U5sXve2oZQsg7PGphWVc4/Zg5cokjT/eBEbkA2l6r9NTMSAQ9/WC7nzGpXoqZ+hTjAjaCK
-	OrYKiLmabD0OI0VI65Yz0iWzhVRdpyVgoemFqPiO7NMCc2NhZEC1/JeH7b37p8TH+nQ8WZ
-	aZk1shopcGmlG1npzOhK1b3Z9miX0TnYAd6vkqtfK7z0vFNZl658/m652ngOGA==
-Message-ID: <953ad608-8be7-42e6-9162-05a98a42eb21@denx.de>
-Date: Mon, 20 Jan 2025 15:20:41 +0100
+	bh=91OCaOldgb4lF7g54QI98f4ovcpRBeXwcL2UnR4rY5s=;
+	b=flxffZEhF8uDnrXHkmvZR8djqqy/He+Mjq3h3gYu/IUNzmbByC80Zo2t0VgzeIN9q+wNRh
+	F3f3/VKF9kdeO2L170IHPJsQa/p5GH7IrCYY/m9x+l22AmnR7r4YFKbn91hXomUrETf1My
+	ttFoM/OHqj7oIl30ZbDzF+6R+DjYIC0=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-324-_-yZFx4XPyGlmqzgG0ATIg-1; Mon,
+ 20 Jan 2025 09:25:20 -0500
+X-MC-Unique: _-yZFx4XPyGlmqzgG0ATIg-1
+X-Mimecast-MFC-AGG-ID: _-yZFx4XPyGlmqzgG0ATIg
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id CAE5B1955F79;
+	Mon, 20 Jan 2025 14:25:16 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.5])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 2D22419560A3;
+	Mon, 20 Jan 2025 14:25:12 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <20250120135754.GX6206@kernel.org>
+References: <20250120135754.GX6206@kernel.org> <20250117183538.881618-1-dhowells@redhat.com> <20250117183538.881618-4-dhowells@redhat.com>
+To: Simon Horman <horms@kernel.org>
+Cc: dhowells@redhat.com, Herbert Xu <herbert@gondor.apana.org.au>,
+    Chuck Lever <chuck.lever@oracle.com>,
+    Trond Myklebust <trond.myklebust@hammerspace.com>,
+    "David S. Miller" <davem@davemloft.net>,
+    Marc Dionne <marc.dionne@auristor.com>,
+    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+    Paolo Abeni <pabeni@redhat.com>, Eric Biggers <ebiggers@kernel.org>,
+    Ard Biesheuvel <ardb@kernel.org>, linux-crypto@vger.kernel.org,
+    linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org,
+    linux-fsdevel@vger.kernel.org, netdev@vger.kernel.org,
+    linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH 03/24] crypto: Add 'krb5enc' hash and cipher AEAD algorithm
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [net-next,PATCH 2/2] net: phy: micrel: Add KSZ87XX Switch LED
- control
-To: Andrew Lunn <andrew@lunn.ch>, Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Heiner Kallweit <hkallweit1@gmail.com>,
- Jakub Kicinski <kuba@kernel.org>, Russell King <linux@armlinux.org.uk>,
- Tristram Ha <tristram.ha@microchip.com>, UNGLinuxDriver@microchip.com,
- Vladimir Oltean <olteanv@gmail.com>, Woojung Huh
- <woojung.huh@microchip.com>, linux-kernel@vger.kernel.org
-References: <20250113001543.296510-1-marex@denx.de>
- <20250113001543.296510-2-marex@denx.de>
- <4d02f786-e87e-4588-87ed-b5fa414a4b5a@redhat.com>
- <ef933bd4-b9ae-4f78-8f05-abd1d2832bf8@lunn.ch>
-Content-Language: en-US
-From: Marek Vasut <marex@denx.de>
-In-Reply-To: <ef933bd4-b9ae-4f78-8f05-abd1d2832bf8@lunn.ch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <1201142.1737383111.1@warthog.procyon.org.uk>
+Date: Mon, 20 Jan 2025 14:25:11 +0000
+Message-ID: <1201143.1737383111@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-On 1/16/25 2:23 PM, Andrew Lunn wrote:
-> On Thu, Jan 16, 2025 at 10:58:38AM +0100, Paolo Abeni wrote:
->> On 1/13/25 1:15 AM, Marek Vasut wrote:
->>> The KSZ87xx switch contains LED control registers. There is one shared
->>> global control register bitfield which affects behavior of all LEDs on
->>> all ports, the Register 11 (0x0B): Global Control 9 bitfield [5:4].
->>> There is also one per-port Register 29/45/61 (0x1D/0x2D/0x3D): Port 1/2/3
->>> Control 10 bit 7 which controls enablement of both LEDs on each port
->>> separately.
->>>
->>> Expose LED brightness control and HW offload support for both of the two
->>> programmable LEDs on this KSZ87XX Switch. Note that on KSZ87xx there are
->>> three or more instances of simple KSZ87XX Switch PHY, one for each port,
->>> however, the registers which control the LED behavior are mostly shared.
->>>
->>> Introduce LED brightness control using Register 29/45/61 (0x1D/0x2D/0x3D):
->>> Port 1/2/3 Control 10 bit 7. This bit selects between LEDs disabled and
->>> LEDs set to Function mode. In case LED brightness is set to 0, both LEDs
->>> are turned off, otherwise both LEDs are configured to Function mode which
->>> follows the global Register 11 (0x0B): Global Control 9 bitfield [5:4]
->>> setting.
->>
->> @Andrew, @Russel: can the above problem be address with the current phy
->> API? or does phy device need to expose a new brightness_get op?
+Simon Horman <horms@kernel.org> wrote:
 
-Sorry for the delayed reply.
-
-> Coupled LEDs cause issues. Because vendors do all sorts of weird
-> things with LEDs, i don't want to fully support everything every
-> vendor has, or the code is just going to be unmaintanable. So we have
-> the core support a subset, and some features of the hardware go
-> unused.
+> > +static void krb5enc_decrypt_hash_done(void *data, int err)
+> > +{
+> > +	struct aead_request *req = data;
+> > +
+> > +	if (err)
+> > +		return krb5enc_request_complete(req, err);
+> > +
+> > +	err = krb5enc_verify_hash(req, 0);
 > 
-> In this case, i would say software control of the LEDs is
-> impossible. You cannot individually turn an LED on/off. The core
-> supports this, Heiner added support for a PHY with similar issues. I
-> think it is as simple as not implementing led_brightness_set().
-What about the LED functionality configuration ?
+> Hi David,
+> 
+> Sparse complains that the second argument to krb5enc_verify_hash should be
+> a pointer rather than an integer. So perhaps this would be slightly better
+> expressed as (completely untested!):
+> 
+> 	err = krb5enc_verify_hash(req, NULL);
 
-I think the main issue here is that multiple LEDs exposed in sysfs 
-control the same bit(s) in hardware, and the sysfs attributes behind 
-those LEDs can get out of sync.
+Actually, no.  It should be "ahreq->result + authsize" and
+krb5enc_verify_hash() shouldn't calculate ihash, but use its hash parameter.
 
-One alternative that crossed my mind would be to register single LED in 
-the KSZ87xx switch driver to control the LED functionality, and per-port 
-LED to control the per-port LED enablement (=brightness). It does not 
-model the hardware accurately, but it does avoid the complexity.
+I wonder if the testmgr driver tests running the algorithms asynchronously...
 
-Otherwise, what is left would be custom sysfs attributes for this switch?
+Thanks,
+David
+
 
