@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-159819-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159820-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA5AAA1704F
-	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 17:38:02 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9FBF3A17053
+	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 17:38:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0B5353A6083
-	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 16:37:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4F52E1881D17
+	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 16:38:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 272EB1E9B18;
-	Mon, 20 Jan 2025 16:38:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 578AB1E9B2C;
+	Mon, 20 Jan 2025 16:38:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aPoq/TnE"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PuocawU+"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01BD4BE65
-	for <netdev@vger.kernel.org>; Mon, 20 Jan 2025 16:37:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30DE1BE65
+	for <netdev@vger.kernel.org>; Mon, 20 Jan 2025 16:38:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737391080; cv=none; b=AliiiVYXcB880k//W4lUKbPxz1qovpTJezDA9lTw47S1C4+S3YoDBnUb+q3M01/kvoiZRehcP1HBAPNLj6QNFMbHqAF+HNcdSNYWmxEHbJz9aUBjXWGRwaX7cCNBVLYAzCcvwcW03BQpnz/lIEzo04KURGzvRsff52rsvJZVC08=
+	t=1737391131; cv=none; b=iW8G7QVlQkkfQWhLAy+bom8He+leBrhQ1OrU2tIZbOToXxHaqc8GBX5VJPuDaDMbeydooKuAVWkRmikRzL43eb33fP34Za4DYVkiORZTZawg9GtEzWVoBn7zgcwD/zr8Bv4cIYQcKOojdNBtJy++LCaPxspF/6mFJz3oyryKLCg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737391080; c=relaxed/simple;
-	bh=bCEOZ7kGTrOjEenANgqdG9z+KsYk2jAcXbInvW1NJrc=;
+	s=arc-20240116; t=1737391131; c=relaxed/simple;
+	bh=c0xlwRDQNm8uVGKxRC9PeZrdMybvdgoujTDDGoxlHM0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SGd4Z2lunEqlNayri5KKulcNGetDUB9YktVcDk0lOyfoSie96626etS8/yB/lIzmNN28RP24wELeEpqiBxZUy8R4w49Ab9pcEQVW6gHgf6U60oedzeJ2Ct9l/CE5Z5YCNdCz3gUyoGt26cxVQXWJSHPKxfwlNY4F+9rsvcnMSpg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aPoq/TnE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5D84DC4CEDD;
-	Mon, 20 Jan 2025 16:37:57 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=oXNjjK4hYKsBt47iaM0SfP2ARK1l8B77dpa/sI6uU4Vm1QtBl1qXy0HLrmqRiMoTbVBrFwea6o09yidqVV3RctOnX+xUsZ6/Xx647Un3Tvi024W1wDjaM29F9Xx0OEMplF94HWfYWY5NvIneZPDhd22ys81QRXDUwXETsyIu7do=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PuocawU+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E7A9AC4CEDD;
+	Mon, 20 Jan 2025 16:38:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737391079;
-	bh=bCEOZ7kGTrOjEenANgqdG9z+KsYk2jAcXbInvW1NJrc=;
+	s=k20201202; t=1737391131;
+	bh=c0xlwRDQNm8uVGKxRC9PeZrdMybvdgoujTDDGoxlHM0=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=aPoq/TnE07WFcQ4JsRpo4fYAqy3uN1/+U0Lrk32dx2vRpUVDg9xrFLrZO0nqElJrY
-	 l7JjZIHRwpsbmrrWFNLAbYujRaQJeCb4krc902JwIrb7yTJ3ypsnAUfwqfH27TTzDw
-	 608z72pMengkoHhRnKJJnfJ4zWNF24aLMhWdem4yXeWUjusp8UUkF0JualY99Kf3Fe
-	 ywWCZCl5PvNAWka6yS/kWlFy3KibLfr9Ts5kxJlpfHgCTB77i9cEzzGveUaouYPWJm
-	 aAnJlpsCTiK2WRqvCth8Lo5eSF1M57SKVKFNzV0kX2rTtCoBhjKS36VfQn8sOZhUZZ
-	 JJfbDqILvF9zA==
-Date: Mon, 20 Jan 2025 16:37:55 +0000
+	b=PuocawU+BoxAJiHkULhiJo2gO//KfciOKMPcChpM2z6rabZQZkuC4UH5Ey9lqIXu7
+	 gRCuOpbp2KSCISCl6BNs4Md3xmmnygvy1mlA/5d6ymBJ9spuhIQTzvKvxRc0Mn2fdF
+	 oqVnQxykyq+jT2v30ps1WxI3r6KCqLRLCtZySz9gmZLLez0A2mO87DZhZFvYPtooBP
+	 bwg6ul8nNm7JuJrA/eNgIolBmop9BMR68NQzOqCYDzRSF2xRtqosToHP2X8xP2nd51
+	 6BC2Qyv4vdtv7BevHw9YcR34UTKbuJvdaKEpDG12bXXiW0Z/qW7pRdaDdZFGc+LlOM
+	 mL7PKSA1ZdJWQ==
+Date: Mon, 20 Jan 2025 16:38:46 +0000
 From: Simon Horman <horms@kernel.org>
 To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
 Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
 	anthony.l.nguyen@intel.com, magnus.karlsson@intel.com,
 	jacob.e.keller@intel.com, xudu@redhat.com, mschmidt@redhat.com,
 	jmaxwell@redhat.com, poros@redhat.com, przemyslaw.kitszel@intel.com
-Subject: Re: [PATCH v3 iwl-net 3/3] ice: stop storing XDP verdict within
- ice_rx_buf
-Message-ID: <20250120163755.GA6206@kernel.org>
+Subject: Re: [PATCH v3 iwl-net 1/3] ice: put Rx buffers after being done with
+ current frame
+Message-ID: <20250120163846.GB6206@kernel.org>
 References: <20250120155016.556735-1-maciej.fijalkowski@intel.com>
- <20250120155016.556735-4-maciej.fijalkowski@intel.com>
+ <20250120155016.556735-2-maciej.fijalkowski@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,50 +61,25 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250120155016.556735-4-maciej.fijalkowski@intel.com>
+In-Reply-To: <20250120155016.556735-2-maciej.fijalkowski@intel.com>
 
-On Mon, Jan 20, 2025 at 04:50:16PM +0100, Maciej Fijalkowski wrote:
-> Idea behind having ice_rx_buf::act was to simplify and speed up the Rx
-> data path by walking through buffers that were representing cleaned HW
-> Rx descriptors. Since it caused us a major headache recently and we
-> rolled back to old approach that 'puts' Rx buffers right after running
-> XDP prog/creating skb, this is useless now and should be removed.
+On Mon, Jan 20, 2025 at 04:50:14PM +0100, Maciej Fijalkowski wrote:
+> Introduce a new helper ice_put_rx_mbuf() that will go through gathered
+> frags from current frame and will call ice_put_rx_buf() on them. Current
+> logic that was supposed to simplify and optimize the driver where we go
+> through a batch of all buffers processed in current NAPI instance turned
+> out to be broken for jumbo frames and very heavy load that was coming
+> from both multi-thread iperf and nginx/wrk pair between server and
+> client. The delay introduced by approach that we are dropping is simply
+> too big and we need to take the decision regarding page
+> recycling/releasing as quick as we can.
 > 
-> Get rid of ice_rx_buf::act and related logic. We still need to take care
-> of a corner case where XDP program releases a particular fragment.
+> While at it, address an error path of ice_add_xdp_frag() - we were
+> missing buffer putting from day 1 there.
 > 
-> Make ice_run_xdp() to return its result and use it within
-> ice_put_rx_mbuf().
-> 
-> Fixes: 2fba7dc5157b ("ice: Add support for XDP multi-buffer on Rx side")
-> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-> Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-> ---
->  drivers/net/ethernet/intel/ice/ice_txrx.c     | 60 +++++++++++--------
->  drivers/net/ethernet/intel/ice/ice_txrx.h     |  1 -
->  drivers/net/ethernet/intel/ice/ice_txrx_lib.h | 43 -------------
->  3 files changed, 35 insertions(+), 69 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/intel/ice/ice_txrx.c b/drivers/net/ethernet/intel/ice/ice_txrx.c
-> index 9aa53ad2d8f2..77d75664c14d 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_txrx.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_txrx.c
-> @@ -532,10 +532,10 @@ int ice_setup_rx_ring(struct ice_rx_ring *rx_ring)
->   *
->   * Returns any of ICE_XDP_{PASS, CONSUMED, TX, REDIR}
->   */
-> -static void
-> +static u32
->  ice_run_xdp(struct ice_rx_ring *rx_ring, struct xdp_buff *xdp,
->  	    struct bpf_prog *xdp_prog, struct ice_tx_ring *xdp_ring,
-> -	    struct ice_rx_buf *rx_buf, union ice_32b_rx_flex_desc *eop_desc)
-> +	    union ice_32b_rx_flex_desc *eop_desc)
->  {
->  	unsigned int ret = ICE_XDP_PASS;
->  	u32 act;
+> As a nice side effect we get rid of annoying and repetetive three-liner:
 
-nit: The Kernel doc for ice_run_xdp should also be updated to no
-     longer document the rx_buf parameter.
+nit: repetitive
 
 ...
 
