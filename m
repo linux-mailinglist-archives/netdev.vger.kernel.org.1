@@ -1,58 +1,55 @@
-Return-Path: <netdev+bounces-159741-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159742-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46A49A16B13
-	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 11:56:04 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E269FA16B36
+	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 12:06:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 57BBC3A743C
-	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 10:55:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 08F963A5B48
+	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 11:06:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99B2F1B413E;
-	Mon, 20 Jan 2025 10:55:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 380341BC062;
+	Mon, 20 Jan 2025 11:06:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dTQ5JTL7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nNgdQ64x"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69FF1187872;
-	Mon, 20 Jan 2025 10:55:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AB3F33981
+	for <netdev@vger.kernel.org>; Mon, 20 Jan 2025 11:06:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737370559; cv=none; b=NiBDgJjdIDEzANm1yEsr+ulenwkSSfvARMDWqtXVLw45LLrb8T1L2yA5IvitR2qxDAlIGiRuqV6b3IWAjuynIBk5p72jsimBV9ZY/fCA7vlTSvH0cNYeN82wCWj3Z86aTzHUmyNBkdi+LbgmoFNwBBWv+Cw+L9SOVNKDAQ5MFi0=
+	t=1737371202; cv=none; b=kDcz9QWUF/FT+TnPsPUcvQWxkhXHCNtwyA56D+3Glje6k9w7mVgMYHvHhPWuWLNdRUiNjjeqT2VVrqgtcTeBWFlg/jLk8ta4XJFxawivD1W/8joD5L3/yFb0eRUm0L2bzNv4QJ9ny9JXu67KpinLA+OlRpnjBpRz5O5jC5Htjg0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737370559; c=relaxed/simple;
-	bh=ZQplCrnYOIJgt1Q4Im1edYAEoa42Ovah9tI2/a2kdgo=;
+	s=arc-20240116; t=1737371202; c=relaxed/simple;
+	bh=37gfub3Ya1whwevuLBoRfK388bZussEj/iFKl91dWHA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PeLxx35m+a6jGZR3Bo1gd1JPAShHuL9n2I22/DqX/WK6hkrwMR7gh2wmYlyVT9U/jPD35rQcDa7mM0Sd7o5GzS6J4rUfmXl/CUAOG1D9gz1CvCDiyFlZBGQZiuslTPyXHYErqJOtC8ZTQtRIefRLskTHaZ3sg56El8cdsUL4QTw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dTQ5JTL7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 945CEC4CEDD;
-	Mon, 20 Jan 2025 10:55:57 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=G8+m3fE47874KNp0n4MxS8NQzNn0tsKUXpgd/4uP9cHTWtez1ygBUXNONJ+k/c9kHshwNOH2c2bMTGnmPeaw7BKCOEcnGnbcWiMbzf4efkfadUZj+sxB0Xv2Pa+gGakrUuEpB7fe55jpKFOsFTNE+/qfO2Y649s8umPvrU1fi6Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nNgdQ64x; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 697B1C4CEDD;
+	Mon, 20 Jan 2025 11:06:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737370559;
-	bh=ZQplCrnYOIJgt1Q4Im1edYAEoa42Ovah9tI2/a2kdgo=;
+	s=k20201202; t=1737371201;
+	bh=37gfub3Ya1whwevuLBoRfK388bZussEj/iFKl91dWHA=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=dTQ5JTL7+IQhKWbNc1y/3/7SIIkqFYBaZtZ8AXf1aBMQazQT9CVM+L1FyuyPAS9eQ
-	 g2im9+RBnINnOKtEG7yvHFQ11zYWmORcgjcRKUvRnQA3YShR8bLRFsKswhWskNmjgg
-	 +KclRy30xRTN4srUKDzt0UwGcr857HmMoZYUvSPqumSInVezXZEju40TwG61Du+7eg
-	 BnZJsNjLS2ClWt5KHJL04GS2rntKJxsOcnHFILyvnrK379Sne0LzDv6AYbVW5+f0Ct
-	 D5AEgQ8J5kIjSKDBsoQot3deZAlN7CRC7visgdNDTAehX7jV8Ucsm+uCvjCNdQsfa6
-	 VSgMnkUbEC6+g==
-Date: Mon, 20 Jan 2025 10:55:55 +0000
+	b=nNgdQ64xd8aWNLylvyLca1kCwQb9VwlL2i/GAx8DAX7BKuh8IaAdqynQi0wvsA7Bd
+	 g7FQgwe9yxftCT5bu+Y7gYpUY2fhhpKzR4sqcwWq26sg1TJ4tAicJ/Bbz1IdupwqlA
+	 cH6dXCmkVwn5EFviGKWL2Eh6GHdKg12YduDCJH+1WBuyKAqjYCYsDe0sTurtuY9YP7
+	 PsSJq73/szLqvh9gjEFhdRg2t8THe3mvVOrUy3YbLkB/ya/8U2iIZ84r4VIaNCxFyf
+	 L5UpR6tzJOWnq72tcHH5DCYSDQhEo4YeO7OJQNmoWnHQHRlWagH1oLprxhueL4fRd+
+	 o4UJc+O03x5GQ==
+Date: Mon, 20 Jan 2025 11:06:38 +0000
 From: Simon Horman <horms@kernel.org>
-To: Gui-Dong Han <2045gemini@gmail.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, 3chas3@gmail.com,
-	linux-atm-general@lists.sourceforge.net, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, baijiaju1990@gmail.com,
-	stable@vger.kernel.org
-Subject: Re: [PATCH] atm/fore200e: Fix possible data race in fore200e_open()
-Message-ID: <20250120105555.GV6206@kernel.org>
-References: <20250115131006.364530-1-2045gemini@gmail.com>
- <20250116165914.35f72b1a@kernel.org>
- <CAOPYjvaVZAHqWhzYsLjtc4Q8CSCF2g4bG-efLHPOP_NMSs0crg@mail.gmail.com>
+To: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Subject: Re: [Intel-wired-lan] [PATCH iwl-next v1] ice: refactor
+ ice_fdir_create_dflt_rules() function
+Message-ID: <20250120110638.GW6206@kernel.org>
+References: <20250117080632.10053-1-mateusz.polchlopek@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,29 +58,21 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAOPYjvaVZAHqWhzYsLjtc4Q8CSCF2g4bG-efLHPOP_NMSs0crg@mail.gmail.com>
+In-Reply-To: <20250117080632.10053-1-mateusz.polchlopek@intel.com>
 
-On Fri, Jan 17, 2025 at 10:28:59AM +0800, Gui-Dong Han wrote:
-> > On Wed, 15 Jan 2025 13:10:06 +0000 Gui-Dong Han wrote:
-> > > Protect access to fore200e->available_cell_rate with rate_mtx lock to
-> > > prevent potential data race.
-> > >
-> > > The field fore200e.available_cell_rate is generally protected by the lock
-> > > fore200e.rate_mtx when accessed. In all other read and write cases, this
-> > > field is consistently protected by the lock, except for this case and
-> > > during initialization.
-> >
-> > That's not sufficient in terms of analysis.
-> >
-> > You need to be able to articulate what can go wrong.
+On Fri, Jan 17, 2025 at 09:06:32AM +0100, Mateusz Polchlopek wrote:
+> The Flow Director function ice_fdir_create_dflt_rules() calls few
+> times function ice_create_init_fdir_rule() each time with different
+> enum ice_fltr_ptype parameter. Next step is to return error code if
+> error occurred.
 > 
-> fore200e->available_cell_rate += vcc->qos.txtp.max_pcr;
-> In this case, since the update depends on a prior read, a data race
-> could lead to a wrong fore200e.available_cell_rate value.
+> Change the code to store all necessary default rules in constant array
+> and call ice_create_init_fdir_rule() in the loop. It makes it easy to
+> extend the list of default rules in the future, without the need of
+> duplicate code more and more.
+> 
+> Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+> Signed-off-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
 
-Hi Gui-Dong Han,
-
-I think it would be good to post a v2 of this patch with
-an explanation along the lines of the above included in
-the patch description.
+Reviewed-by: Simon Horman <horms@kernel.org>
 
