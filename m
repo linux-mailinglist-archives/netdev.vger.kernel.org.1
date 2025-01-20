@@ -1,116 +1,192 @@
-Return-Path: <netdev+bounces-159837-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159842-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C760A171CB
-	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 18:29:24 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C388BA171F5
+	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 18:33:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4AB9716B291
-	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 17:29:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 698543AAF50
+	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 17:31:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EBEF1F12FA;
-	Mon, 20 Jan 2025 17:27:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="l0Re9OoC"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1518315381A;
+	Mon, 20 Jan 2025 17:30:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 031F01EF085;
-	Mon, 20 Jan 2025 17:27:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2281213AA5D;
+	Mon, 20 Jan 2025 17:30:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737394055; cv=none; b=hqVf/ZGDGuy+ELcVoofSK2AtJmMtARHABKtDFRUw0HPxaqwV42ff+MvcY0umnvfhKcli0D101V3mFCR5Jru1Tf/sAPhXJ+w6+QTybDabVOAw3BVA4zZbqw+ohhG8EWzoebyb50jIZU4XE5ANg0zACXtDn1RMJ1ey+fTsfu+R2TA=
+	t=1737394255; cv=none; b=m3zlEzzHUMMIf1pjdyQ8pPwjzHIPiQie1mmh7O1Lc7sAD0Knfcc82yJ0ylVmayGRaInlxXzCpj27sDr7PLDbuUXFFjIQBubvu2X5bRpbkCqeYWt7fQ4V8azWJh32SQ3JOiElyRhfDPm0dizxWzCeT2MS4iOJNGA3ntYgDSxQJ6Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737394055; c=relaxed/simple;
-	bh=jIzfPIAqIjaxRMRxqyJH4fTGhbSvWwyaslK19lldbGM=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=jRUPEjiW3kM2XM628lAgi+wQ3Ph8aq0VkPVnHiOwsM0S1hSUyEQueTPf1RiGEszoRi1X4t1eUPz+Vcx/oZcZqgjxTxkdHN2XSDMhCLfQ0kWz5Ch3wUJ3JMuP+qAvJNGRnhrfOCF5faku+/Nc3kCce/gvfyt7UxCsS7RaKjAWWO4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=l0Re9OoC; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: from linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net (linux.microsoft.com [13.77.154.182])
-	by linux.microsoft.com (Postfix) with ESMTPSA id E3797205A9D4;
-	Mon, 20 Jan 2025 09:27:26 -0800 (PST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com E3797205A9D4
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1737394046;
-	bh=ZCD3w92Zk0owMWjZiJnQbmXGQnkMPOm62irZP7iqqIw=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=l0Re9OoCN/64jjOS67VhPaGTkuKW9zM7tJ44VpsdKnObV4wc56DLlSlOhxrnENlEd
-	 xyUTKUQefaZL3lPpAHBCiaa9Vom+IcZVs1ZLmN7ovFHvsbGKgxCOH1FVGba/+cIsZM
-	 yW+SdEgr+jKzJNGq7LqIbXi/SYh/VOHfmi5uz6xI=
-From: Konstantin Taranov <kotaranov@linux.microsoft.com>
-To: kotaranov@microsoft.com,
-	shirazsaleem@microsoft.com,
-	pabeni@redhat.com,
-	haiyangz@microsoft.com,
-	kys@microsoft.com,
-	edumazet@google.com,
-	kuba@kernel.org,
-	davem@davemloft.net,
-	decui@microsoft.com,
-	wei.liu@kernel.org,
-	sharmaajay@microsoft.com,
-	longli@microsoft.com,
-	jgg@ziepe.ca,
-	leon@kernel.org
-Cc: linux-rdma@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-hyperv@vger.kernel.org
-Subject: [PATCH rdma-next 13/13] RDMA/mana_ib: indicate CM support
-Date: Mon, 20 Jan 2025 09:27:19 -0800
-Message-Id: <1737394039-28772-14-git-send-email-kotaranov@linux.microsoft.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1737394039-28772-1-git-send-email-kotaranov@linux.microsoft.com>
-References: <1737394039-28772-1-git-send-email-kotaranov@linux.microsoft.com>
+	s=arc-20240116; t=1737394255; c=relaxed/simple;
+	bh=co4rh7mcehuLyfpxVs2kCx5deaYX52yDp0kZrDc/z8M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HJV9cA1BHEerbKeqZF272KuyAsbR0NvfhfFGDD+Z/KL55Dg0idWg2huL+cXt7VoB/OPDgEf3KFBRLZvSB72w0jaPa8m0YrdfevyztDa92cjQeSncdg3FPPqC/q/uvlJNWnVr3QsOkoyMsEPKqpf365KNzuLt/nC4K/KVK2M8ZOc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-aaef00ab172so731937366b.3;
+        Mon, 20 Jan 2025 09:30:52 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737394251; x=1737999051;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vjKwZAMnGwVfQ1uehkUpRVLkmdlR6xAZAUrURRogCUo=;
+        b=UA+tJNjEI011ydMho2eKpEGke/lnr9t3W4TkJU3JA88y+I8q4Qmp/2+8VfS+de5fZp
+         7qMFxon3YJ326lkjkBN0B++jXnwoi1VCKFgrr39w8NLavSxwW5GcNbMirINhVJQCzM6V
+         dUxCJ15KzJcSFbCwvla+TurQxfr055lzMX99QVdiGa7RKp16sJ6Ei1faz6lfDvb3VflU
+         /Wlg/NmHNfusMInhjAFbGJIIqqPjFQriTSxYNWNSPCezTAJa+H8R9sxg56oObko596w3
+         mFiSY2NVvyLU3UaPXVBLQJiYCE9idDIrg67ymp2rYeDsLO85S1kd3dofkaQ8tlK6n9l4
+         rnTg==
+X-Forwarded-Encrypted: i=1; AJvYcCV76LXJiQo9e94fk3FYMR54nkMiHghvzPGX0f2m5AdnTorBsiua2Rs+q7BxNQQ3hbIgLRuasfgo@vger.kernel.org, AJvYcCWHjn9VoDZEkYI5SC4x1HnQbl20dAT2wO5kOsf1cMD4I7SX7DTQOM822X10N6geaab8IiFIEmrIvIKgfzb/@vger.kernel.org, AJvYcCWXZ3CGBESslPQcLXu7DHZsVXrJMzJzv47Rs0YH/ekufSj8CqSHwPy09ob2fMehDGKBAjjtDTiAu9U=@vger.kernel.org, AJvYcCXdq+aVjP53tYybWRdbdWb5HW+7C9RM+zc/8QZkmNZ8twsPpxiAYyERkGLrytsFqmaAPPjfKjQNhC3YNYmmL9+d@vger.kernel.org
+X-Gm-Message-State: AOJu0YygsUuKzmLiyeuDntvjhtQ7cMUo7SK/kTF9S/jFaJp1tn9WmQ5m
+	fRrllNzFRD0kY8oDhbfQ8ZqN1H0uBW8AfM0TNWPbSrQiKUU9diQZ
+X-Gm-Gg: ASbGnctc+7zxUyYsuxCAEZJsLHBLbzNXiblKrZHlQx5/sY7aR7tHWG2R4otVWXrzVvP
+	NkwzoWhzhmEyu+k9dwP3waHI9R9K1xPzCJ2HhmS++vKj1h6mLzLF2EDAmkNzckysdhJTshJMwm0
+	Kii7nLgsjoukA/T/M+apfmkbtfNS/EenlGssH2QtymZjsywOaz1UnRudWsEK3Azp3XBT/5n6qDP
+	UYa0ZjHBCdWJglp4YCU9yTu44/CfGFx8lHD8uQhBrJQW5T89Q4cv8YHvJV3
+X-Google-Smtp-Source: AGHT+IHHBMwM1y47uiYGiCZ5wJnCsj0WmgnVWFyMm4lJpp3CtPhJHPHE4Y68jLBM9H+zTGUpmqtIfQ==
+X-Received: by 2002:a05:6402:50d4:b0:5d0:cfad:f71 with SMTP id 4fb4d7f45d1cf-5db7db2bea3mr32816210a12.32.1737394251064;
+        Mon, 20 Jan 2025 09:30:51 -0800 (PST)
+Received: from gmail.com ([2a03:2880:30ff:9::])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ab384fcd73dsm646619066b.178.2025.01.20.09.30.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 20 Jan 2025 09:30:50 -0800 (PST)
+Date: Mon, 20 Jan 2025 09:30:48 -0800
+From: Breno Leitao <leitao@debian.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, kernel-team@meta.com,
+	max@kutsevol.com, thepacketgeek@gmail.com
+Subject: Re: [PATCH net-next v2 3/5] netconsole: add support for sysdata and
+ CPU population
+Message-ID: <20250120-rational-bullfrog-of-tornado-2cd6f4@leitao>
+References: <20250115-netcon_cpu-v2-0-95971b44dc56@debian.org>
+ <20250115-netcon_cpu-v2-3-95971b44dc56@debian.org>
+ <20250116174405.20a0e20b@kernel.org>
+ <20250117-terrestrial-clam-of-satiation-cf312f@leitao>
+ <20250117183520.11d93f4d@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250117183520.11d93f4d@kernel.org>
 
-From: Konstantin Taranov <kotaranov@microsoft.com>
+On Fri, Jan 17, 2025 at 06:35:20PM -0800, Jakub Kicinski wrote:
+> On Fri, 17 Jan 2025 03:02:40 -0800 Breno Leitao wrote:
+> > > Looks like previously all the data was on the stack, now we have a mix.  
+> > 
+> > Not sure I followed. The data ({userdata,extradata}_complete) was always
+> > inside nt field, which belongs to target_list.
+> 
+> I mean the buffer we use for formatting. Today it's this:
+> 
+> 	static char buf[MAX_PRINT_CHUNK]; /* protected by target_list_lock */
+> 	int header_len, msgbody_len;
+> 	const char *msgbody;
+> 
+> right? I missed that "static" actually so it's not on the stack, 
+> it's in the .bss section.
 
-Set max_mad_size and IB_PORT_CM_SUP capability
-to enable connection manager.
+Since you raised this topic, I don't think buf needs to be static
+for a functional perspective, since `buf` is completely overwritten
+every time send_msg functions are called.
 
-Signed-off-by: Konstantin Taranov <kotaranov@microsoft.com>
-Reviewed-by: Shiraz Saleem <shirazsaleem@microsoft.com>
----
- drivers/infiniband/hw/mana/main.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+> > > Maybe we can pack all the bits of state into a struct for easier
+> > > passing around, but still put it on the stack?  
+> > 
+> > It depends on what state you need here. We can certainly pass runtime
+> > (aka sysdata in this patchset) data in the stack, but doing the same for
+> > userdata would require extra computation in runtime. In other words, the
+> > userdata_complete and length are calculated at configfs update time
+> > today, and only read during runtime, and there is no connection between
+> > configfs and runtime (write_ext_msg()) except through the stack.
+> > 
+> > 
+> > On the other side, if we want to have extradata_complete in the stack, I
+> > still think that userdata will need to be in the stack, and create a
+> > buffer in runtime's frame and copy userdata + sysdata at run time, doing
+> > an extra copy. 
+> > 
+> > Trying to put this in code, this is what I thought:
+> > 
+> > 	/* Copy to the stack (buf) the userdata string + sysdata */
+> > 	static void append_runtime_sysdata(struct netconsole_target *nt, char *buf) {
+> > 		if (!(nt->sysdata_fields & CPU_NR))
+> > 			return;
+> > 
+> > 		return scnprintf(buf,  MAX_EXTRADATA_ENTRY_LEN * MAX_EXTRADATA_ITEMS,
+> > 				  "%s cpu=%u\n", nt->userdata_complete, raw_smp_processor_id());
+> > 	}
+> > 
+> > 	/* Move complete string in the stack and send from there */
+> > 	static void send_ext_msg_udp(struct netconsole_target *nt, const char *msg,
+> > 				     int msg_len) {
+> > 		...
+> > 	#ifdef CONFIG_NETCONSOLE_DYNAMIC
+> > 		struct char buf[MAX_EXTRADATA_ENTRY_LEN * MAX_EXTRADATA_ITEMS];
+> > 		extradata_len = append_runtime_sysdata(nt, buf);
+> > 	#endif
+> > 
+> > 		send_msg_{no}_fragmentation(nt, msg, buf, extradata_len, release_len)
+> > 		...
+> > 	}
+> 
+> My thinking was to handle it like the release.
+> Print it at the send_msg_no_fragmentation() stage directly 
+> into the static buffer. Does that get hairy coding-wise?
 
-diff --git a/drivers/infiniband/hw/mana/main.c b/drivers/infiniband/hw/mana/main.c
-index 114e391..ae1fb69 100644
---- a/drivers/infiniband/hw/mana/main.c
-+++ b/drivers/infiniband/hw/mana/main.c
-@@ -561,8 +561,10 @@ int mana_ib_get_port_immutable(struct ib_device *ibdev, u32 port_num,
- 	immutable->pkey_tbl_len = attr.pkey_tbl_len;
- 	immutable->gid_tbl_len = attr.gid_tbl_len;
- 	immutable->core_cap_flags = RDMA_CORE_PORT_RAW_PACKET;
--	if (port_num == 1)
-+	if (port_num == 1) {
- 		immutable->core_cap_flags |= RDMA_CORE_PORT_IBA_ROCE_UDP_ENCAP;
-+		immutable->max_mad_size = IB_MGMT_MAD_SIZE;
-+	}
- 
- 	return 0;
- }
-@@ -621,8 +623,11 @@ int mana_ib_query_port(struct ib_device *ibdev, u32 port,
- 	props->active_width = IB_WIDTH_4X;
- 	props->active_speed = IB_SPEED_EDR;
- 	props->pkey_tbl_len = 1;
--	if (port == 1)
-+	if (port == 1) {
- 		props->gid_tbl_len = 16;
-+		props->port_cap_flags = IB_PORT_CM_SUP;
-+		props->ip_gids = true;
-+	}
- 
- 	return 0;
- }
--- 
-2.43.0
+I suppose the advantage of doing this approach is to reduce a
+memcpy/strcpy, right?
 
+If this is what your motivation, I think we cannot remove it from the
+fragmented case. Let me share my thought process:
+
+1) sysdata needs to be appended to both send_msg_fragmented() and
+send_msg_no_fragmentation(). The fragmented case is the problem.
+
+2) It is trivially done in send_msg_fragmented() case.
+
+3) For the send_msg_no_fragmentation() case, there is no trivial way to
+get it done without using a secondary buffer and then memcpy to `buf`.
+
+Let's suppose sysdata has "cpu=42", and original `buf` has only 5 available
+chars, thus it needs to have 2 msgs to accommodate the full message.
+
+Then the it needs to track that `cpu=4` will be sent in a msg and create
+another message with the missing `2`.
+
+The only way to do it properly is having a extra buffer where we
+have `cpu=42` and copy 5 bytes from there, and then copy the last one in
+the next iteration. I am not sure we can do it in one shot.
+
+On top of that, I am planning to increase other features in sysdata
+(such as current task name, modules and even consolidate the release as
+sysdata), which has two implications:
+
+1) Average messages size will become bigger. Thus, memcpy will be needed
+one way or another.
+
+2) Unless we can come up with a smart solution, this solution will be
+harder to reason about.
+
+If you want to invest more time in this direction, I am more than happy
+to create a PoC, so we can discuss more concretely. 
+
+Thanks,
+--breno
 
