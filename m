@@ -1,170 +1,236 @@
-Return-Path: <netdev+bounces-159682-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159683-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10F12A1660C
-	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 05:26:36 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 616E4A1663A
+	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 05:58:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 303023A357D
-	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 04:26:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 35F927A42EE
+	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 04:58:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73A091487D5;
-	Mon, 20 Jan 2025 04:26:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 030BC155C83;
+	Mon, 20 Jan 2025 04:58:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mfiemEm9"
+	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="1whu3BnK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E915A36D;
-	Mon, 20 Jan 2025 04:26:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51881155316
+	for <netdev@vger.kernel.org>; Mon, 20 Jan 2025 04:58:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737347192; cv=none; b=cDNf8TcRuiE1eYN2EsPBneV7K3eGohX6a3XpBl/grivzYpfCJGlGuec+q5QZyvEuC0BbGyE5hBjcqwlSIrW97/Wx3B9Oy40nF6gTGCd0PuzyrR0LlMp2u/H4CakzKVJQh3e1LFZF0mskIDrv4QKukA7KW18ztcZB34zQh5ffMi0=
+	t=1737349087; cv=none; b=ArBos0TYdhczzIMo31EvzULFNCUXuRazuCXmbVzxPTuJlRsmNxS4l0dB08wzuR3m9A+PR+heftAqpELC6HcF1Uv4KcyCp9IOhGIVGwsLh0Ji4ur/uJfkIghBaAnERFworGZOV92ImYggPE2/unhyWS8xWcZFWTQBkol8dYTsQzM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737347192; c=relaxed/simple;
-	bh=YUV/kZlqp7x5oBoGxQBRhNwBZgCb/VkEHX5Q4FFN+Uc=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=UD3gSCVUX9niW2brD8c9BcwEOwtN6vtKQE8HkprIlQ1uUHXtMaVPata4C48ceV/4YdtHLyDyLwkQ2dw+uMkE/IKfQKJT2vbUjAD43i0n2YA5OcrkWKWcWWplvTbWGzdvsnj58y0D9joqYtV9z1y1aZmnSntShW1KTeVqnHIRE5s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mfiemEm9; arc=none smtp.client-ip=209.85.214.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-216426b0865so68653985ad.0;
-        Sun, 19 Jan 2025 20:26:30 -0800 (PST)
+	s=arc-20240116; t=1737349087; c=relaxed/simple;
+	bh=JBhx4FBRzKbzrz2Al5pNMHO5F3JgbgRL5B/gVFGVg/0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=hvC2pd2rXFhROorHPSElFaG4pWZ1LWUaqIupahTUCsDLrA3wdSX9MUNnsQWjb0N4yz2mvWqJ0DngKiBAgmZ0NsFwSSLjGiiyl6hKsVFTkUTBZb0J5/WQJM/ZsSycXkKKy46fsqGwdRSB5yscdOwEgQSZqbX33LbfRz6CHRzDjzI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=pass smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=1whu3BnK; arc=none smtp.client-ip=209.85.216.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=daynix.com
+Received: by mail-pj1-f52.google.com with SMTP id 98e67ed59e1d1-2ef28f07dbaso5490272a91.2
+        for <netdev@vger.kernel.org>; Sun, 19 Jan 2025 20:58:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1737347190; x=1737951990; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=b5FC5Qqw1jL3v7FrQx+Z2e4fqL2PltW+m+8hWqQHPpg=;
-        b=mfiemEm9NxgeoRdQulh+en3EZzpB0K3LOnIMTnGgfX02q7t+MaJfHqNTge6P+KYVtE
-         Zb8MZ2NC1Q04iB4+bNbPa6FbRQpIbpX8WENIGfcOE3zh+KA+Tj4f3CD8EoPaMUrZX810
-         Yqxm9ukMHhVY146AdwqvqNrAljUMLv/f6U3ZOuUiVY8R3mANpqi6DiyciPo+2exe3t3z
-         rOwLs8bsKguWDr/Frxp/x3Yrxd7nCsohTdjpQGAdlJaqb4ItuAcVi/SL5/HNlx70aFcs
-         8gfkTPU3KO4Wi4uqH4YTsAGb5Enzn8F+cBqTC5PQ8A6zOLvz6KgxtI10xxvACqGZOMhN
-         KLYQ==
+        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1737349085; x=1737953885; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=q4oIihNr6GZKGbnqtazZfNL+Wdu+eK7TRKf6H4jFUt4=;
+        b=1whu3BnKNwtvtqezELWKQt0hPy+FN+eYxFnvphEYfi8qsgYC7W5bmfPPeQAFhfje9v
+         CbaxUnTt6ZJUMsN9QS2shX24wJG64A76ZVHipVlxgXyEAgvl2W/LCo8UaIbMIpcWZ0X5
+         Ht6uaEyQYqQOsJy/RhVomU6JHqfZ9tvSSRWxgAfHN7lvUluRmH0VrqL7ULtJ/cg3AKhm
+         jweriYhaI57MWQQL1HLbdLdrvzjT1mJJE3knFLDLbBqku7AWN5eVh22I363rpyLfcFWm
+         yJcgtQoFIZXlMUwvua1s94+1pI0FzQy1IXT0XLOlcY4cXT0mISggZP6IZFZ1k01USb2L
+         TWVQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737347190; x=1737951990;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=b5FC5Qqw1jL3v7FrQx+Z2e4fqL2PltW+m+8hWqQHPpg=;
-        b=SjE471M70a7cOAxebB8fsgewsnrwtik9BRWFQlP50LsX4Iim7ldm6vbUJpPRkDfxPX
-         Fy9G/lxaWwcmGPvVWmWutRKCZBPTkYW9RfzNt+Rsx/1GM7C+OtegKsAW1R50PIfh7StY
-         zGOpxi69RDsBk/jRnkQDD4FbYhYa8Ka0GiQvWlBSytuJfEHRp2BsX+Ar79kklaC8MbAN
-         1H5c6lbVFONxq7/kIV8uMexhm2mItskhJjzQ49pLImOajKPgbS3mqa2CQoAqb71FyhXG
-         2RliPZB+F5DmNeMZIG29DXAOTeJfGMgenp2AW6OP5qcd6poGj1hLFf6YieoARAADQwAe
-         GRbA==
-X-Forwarded-Encrypted: i=1; AJvYcCUjhjL8FoYBZFTx2yOfaOdWfenTFtOD4melP6ru+Hx22ZgsYdytKRHkAJEbgmX5wk5ZbSl9jvfn@vger.kernel.org, AJvYcCXhoZW8iFT0HV/p0Cj8IOdu1GVOAx5rRA2ZVV29hOZ5fwULu3vkyXv1ySBaDfAtN3V9R31AV8aLsMYeVf8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyg0kSN8qR6qBDQapqG1YUAXwN3iCiFViLJhF1//ggMi6Dfq+J6
-	XIMjgvzv4GCbh0UPneS8ZE05AGK5MQ8eOCsd7ejTuXPsXHUd1IAL
-X-Gm-Gg: ASbGnctCaFxMunKZ0rh3e02zHa/ZwskE/ylJUBtY17V4H+1GNcnnuTKFftnRMDFUqly
-	FdkeOxIzc1AZMu0iS8o6sQ1fvwrnCqmxRxJY7m24qPyJHc9hEgocRGSX8tybqZM6sK4QJ0GwZFA
-	ue7i7GZ8Fp7ZU6LcN81bC6arbGezGrVFAsxfFtNvoVo5Ds6huGHpwBSp1fSKFLXnQ5cbwCplwMR
-	h0+8iYGuQ0PCrSjP9MuRMbCSNFmedD26tawrcMBkvbINAEzzYJId5XVS3X4L3vbDR+31zNrzA==
-X-Google-Smtp-Source: AGHT+IFreBXW8qMfUZdbH38vaaqKKX3QrsSBIPF8z1VO+RAxIh9FlcywQ5RZy5gYFYZfHzAMqolr0A==
-X-Received: by 2002:a05:6a20:3d86:b0:1e0:9cc2:84b1 with SMTP id adf61e73a8af0-1eb2158d07amr20098664637.30.1737347190100;
-        Sun, 19 Jan 2025 20:26:30 -0800 (PST)
-Received: from HOME-PC ([223.185.135.17])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72dabaa751asm5971652b3a.162.2025.01.19.20.26.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 19 Jan 2025 20:26:29 -0800 (PST)
-From: Dheeraj Reddy Jonnalagadda <dheeraj.linuxdev@gmail.com>
-To: wei.fang@nxp.com,
-	shenwei.wang@nxp.com,
-	xiaoning.wang@nxp.com
-Cc: andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	imx@lists.linux.dev,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Dheeraj Reddy Jonnalagadda <dheeraj.linuxdev@gmail.com>
-Subject: [PATCH v3 net] net: fec: implement TSO descriptor cleanup
-Date: Mon, 20 Jan 2025 09:56:24 +0530
-Message-Id: <20250120042624.76140-1-dheeraj.linuxdev@gmail.com>
-X-Mailer: git-send-email 2.34.1
+        d=1e100.net; s=20230601; t=1737349085; x=1737953885;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=q4oIihNr6GZKGbnqtazZfNL+Wdu+eK7TRKf6H4jFUt4=;
+        b=IJDynk4VhtUPlAZA82Zgk70kB9tVbYi71JVmzwwuaE8GIcJ9RG/tdeagFxl9Ppi/91
+         KKGJNW0PQAVweZ3uYCh7LB8bb+ELgGVZ+H4p8tgSd9jh0NnQK3mjGn5xDkrm7KS6OEk0
+         105rBbnrmveF04Q1yVu3cnxnhD94ooScPvKb/W2cbMKEEo7ubjbjvLzoabxNrd0XUQT6
+         v0TcjNI74OsOgfOlNBH26vReA3RFD1oNTsHMJqMIbi2uO9aHs7rWZZ2c92qBWDZ1bqfN
+         evoGhkH7fKPi0B5xMwbxCaTRstCS2sDJ6GjPgq/VTj4D98v0+nvGrlX8OGFPYSWKXvyY
+         BjUQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXwdPg5KmhCDH/6U5LruvtYrMngyma7fWnJtZLWSVV3yqP0+MWDCCN3+4GTshxD3Qywa6S94q0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxukUbs4nE/TOJDpFLjEdSbkmO0q6VdC0Tb6GkvZPhPqurPVRTV
+	cpkl98Du5QaAXoAIpkvqWMjWmXGrV7f944gLtGnhbma5hQLbJsF6VvYLDXILlzI=
+X-Gm-Gg: ASbGncuDiJBbAQxWjBbcci7LwKKfZ/AL3GfFQgZqrnr1WNqRM4QE6YbcQsdWMLBMpEY
+	PYt2WmS3Ft9t8sX+EsKiZ5xG2SLRiZ5n6FJMFZujFv4eo25eRTY4DMMpjCdtiL260nKTRaPkXTp
+	93NLOHZm2IZ8Y6yFuUxbYZYp5kPe7YsB6Z3eC9o/Ckucm4T6apd98IvU7gwXO6Eomh6dd6qs/KT
+	h5lvPtr+3x4zIbZkOlG+wi3iLOhSEghq8qtsWCdc3mYZ9da9ix/ep/JC1lZKerATdgfHH51ekgy
+	rYZy
+X-Google-Smtp-Source: AGHT+IE8MzXrgaBKBfP61PbTUvr8PgxgGWYeOWK4EEWyIPyWkez8gj6KrIAnQzmUFU9EFnwQTPVCzw==
+X-Received: by 2002:a05:6a20:914e:b0:1e1:70ab:b369 with SMTP id adf61e73a8af0-1eb214983dfmr16605568637.13.1737349085531;
+        Sun, 19 Jan 2025 20:58:05 -0800 (PST)
+Received: from [157.82.203.37] ([157.82.203.37])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72dab817529sm6251103b3a.67.2025.01.19.20.58.00
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 19 Jan 2025 20:58:05 -0800 (PST)
+Message-ID: <8052733d-3e79-4fd5-9bea-9d3724820bb8@daynix.com>
+Date: Mon, 20 Jan 2025 13:57:59 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 3/3] tun: Set num_buffers for virtio 1.0
+To: Jason Wang <jasowang@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Shuah Khan <shuah@kernel.org>,
+ linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, kvm@vger.kernel.org,
+ virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org,
+ Yuri Benditovich <yuri.benditovich@daynix.com>,
+ Andrew Melnychenko <andrew@daynix.com>,
+ Stephen Hemminger <stephen@networkplumber.org>, gur.stavi@huawei.com,
+ devel@daynix.com
+References: <20250109-tun-v2-0-388d7d5a287a@daynix.com>
+ <20250109-tun-v2-3-388d7d5a287a@daynix.com>
+ <CACGkMEsm5DCb+n3NYeRjmq3rAANztZz5QmV8rbPNo+cH-=VzDQ@mail.gmail.com>
+ <20250110052246-mutt-send-email-mst@kernel.org>
+ <2e015ee6-8a3b-43fb-b119-e1921139c74b@daynix.com>
+ <CACGkMEuiyfH-QitiiKJ__-8NiTjoOfc8Nx5BwLM-GOfPpVEitA@mail.gmail.com>
+ <fcb301e8-c808-4e20-92dd-2e3b83998d18@daynix.com>
+ <CACGkMEvBU3mLbW+-nOscriR-SeDvPSm1mtwwgznYFOocuao5MQ@mail.gmail.com>
+ <cc79bef1-c24e-448d-bc20-f8302e341b2c@daynix.com>
+ <CACGkMEsJUb3ZLm3rLuaayDAS4kf-vbY03wL4M9j1K+Z=a4BDig@mail.gmail.com>
+Content-Language: en-US
+From: Akihiko Odaki <akihiko.odaki@daynix.com>
+In-Reply-To: <CACGkMEsJUb3ZLm3rLuaayDAS4kf-vbY03wL4M9j1K+Z=a4BDig@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-Implement cleanup of descriptors in the TSO error path of
-fec_enet_txq_submit_tso(). The cleanup
+On 2025/01/20 9:40, Jason Wang wrote:
+> On Thu, Jan 16, 2025 at 1:30 PM Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
+>>
+>> On 2025/01/16 10:06, Jason Wang wrote:
+>>> On Wed, Jan 15, 2025 at 1:07 PM Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
+>>>>
+>>>> On 2025/01/13 12:04, Jason Wang wrote:
+>>>>> On Fri, Jan 10, 2025 at 7:12 PM Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
+>>>>>>
+>>>>>> On 2025/01/10 19:23, Michael S. Tsirkin wrote:
+>>>>>>> On Fri, Jan 10, 2025 at 11:27:13AM +0800, Jason Wang wrote:
+>>>>>>>> On Thu, Jan 9, 2025 at 2:59 PM Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
+>>>>>>>>>
+>>>>>>>>> The specification says the device MUST set num_buffers to 1 if
+>>>>>>>>> VIRTIO_NET_F_MRG_RXBUF has not been negotiated.
+>>>>>>>>
+>>>>>>>> Have we agreed on how to fix the spec or not?
+>>>>>>>>
+>>>>>>>> As I replied in the spec patch, if we just remove this "MUST", it
+>>>>>>>> looks like we are all fine?
+>>>>>>>>
+>>>>>>>> Thanks
+>>>>>>>
+>>>>>>> We should replace MUST with SHOULD but it is not all fine,
+>>>>>>> ignoring SHOULD is a quality of implementation issue.
+>>>>>>>
+>>>>>
+>>>>> So is this something that the driver should notice?
+>>>>>
+>>>>>>
+>>>>>> Should we really replace it? It would mean that a driver conformant with
+>>>>>> the current specification may not be compatible with a device conformant
+>>>>>> with the future specification.
+>>>>>
+>>>>> I don't get this. We are talking about devices and we want to relax so
+>>>>> it should compatibile.
+>>>>
+>>>>
+>>>> The problem is:
+>>>> 1) On the device side, the num_buffers can be left uninitialized due to bugs
+>>>> 2) On the driver side, the specification allows assuming the num_buffers
+>>>> is set to one.
+>>>>
+>>>> Relaxing the device requirement will replace "due to bugs" with
+>>>> "according to the specification" in 1). It still contradicts with 2) so
+>>>> does not fix compatibility.
+>>>
+>>> Just to clarify I meant we can simply remove the following:
+>>>
+>>> """
+>>> The device MUST use only a single descriptor if VIRTIO_NET_F_MRG_RXBUF
+>>> was not negotiated. Note: This means that num_buffers will always be 1
+>>> if VIRTIO_NET_F_MRG_RXBUF is not negotiated.
+>>> """
+>>>
+>>> And
+>>>
+>>> """
+>>> If VIRTIO_NET_F_MRG_RXBUF has not been negotiated, the device MUST set
+>>> num_buffers to 1.
+>>> """
+>>>
+>>> This seems easier as it reflects the fact where some devices don't set
+>>> it. And it eases the transitional device as it doesn't need to have
+>>> any special care.
+>>
+>> That can potentially break existing drivers that are compliant with the
+>> current and assumes the num_buffers is set to 1.
+> 
+> Those drivers are already 'broken'. Aren't they?
 
-- Unmaps DMA buffers for data descriptors skipping TSO header
-- Clears all buffer descriptors
-- Handles extended descriptors by clearing cbd_esc when enabled
+The drivers are not broken, but vhost_net is. The driver works fine as 
+long as it's used with a device compliant with the specification. If we 
+relax the device requirement in the future specification, the drivers 
+may not work with devices compliant with the revised specification.
 
-Fixes: 79f339125ea3 ("net: fec: Add software TSO support")
-Signed-off-by: Dheeraj Reddy Jonnalagadda <dheeraj.linuxdev@gmail.com>
----
-Changelog:
-v3
-	- Update DMA unmapping logic to skip all TSO headers
-	- Use proper endianness conversion for DMA unmapping
-v2
-        - Add DMA unmapping for data descriptors
-        - Handle extended descriptor (bufdesc_ex) cleanup
-        - Move variable declarations to function scope
+Regards,
+Akihiko Odaki
 
- drivers/net/ethernet/freescale/fec_main.c | 30 ++++++++++++++++++++++-
- 1 file changed, 29 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/freescale/fec_main.c b/drivers/net/ethernet/freescale/fec_main.c
-index 68725506a095..9ac407d30e85 100644
---- a/drivers/net/ethernet/freescale/fec_main.c
-+++ b/drivers/net/ethernet/freescale/fec_main.c
-@@ -840,6 +840,8 @@ static int fec_enet_txq_submit_tso(struct fec_enet_priv_tx_q *txq,
- 	struct fec_enet_private *fep = netdev_priv(ndev);
- 	int hdr_len, total_len, data_left;
- 	struct bufdesc *bdp = txq->bd.cur;
-+	struct bufdesc *tmp_bdp;
-+	struct bufdesc_ex *ebdp;
- 	struct tso_t tso;
- 	unsigned int index = 0;
- 	int ret;
-@@ -913,7 +915,33 @@ static int fec_enet_txq_submit_tso(struct fec_enet_priv_tx_q *txq,
- 	return 0;
- 
- err_release:
--	/* TODO: Release all used data descriptors for TSO */
-+	/* Release all used data descriptors for TSO */
-+	tmp_bdp = txq->bd.cur;
-+
-+	while (tmp_bdp != bdp) {
-+		/* Unmap data buffers */
-+		if (tmp_bdp->cbd_bufaddr &&
-+		    !IS_TSO_HEADER(txq, fec32_to_cpu(tmp_bdp->cbd_bufaddr)))
-+			dma_unmap_single(&fep->pdev->dev,
-+					 fec32_to_cpu(tmp_bdp->cbd_bufaddr),
-+					 fec16_to_cpu(tmp_bdp->cbd_datlen),
-+					 DMA_TO_DEVICE);
-+
-+		/* Clear standard buffer descriptor fields */
-+		tmp_bdp->cbd_sc = 0;
-+		tmp_bdp->cbd_datlen = 0;
-+		tmp_bdp->cbd_bufaddr = 0;
-+
-+		/* Handle extended descriptor if enabled */
-+		if (fep->bufdesc_ex) {
-+			ebdp = (struct bufdesc_ex *)tmp_bdp;
-+			ebdp->cbd_esc = 0;
-+		}
-+
-+		tmp_bdp = fec_enet_get_nextdesc(tmp_bdp, &txq->bd);
-+	}
-+
-+	dev_kfree_skb_any(skb);
- 	return ret;
- }
- 
--- 
-2.34.1
+> 
+> Thanks
+> 
+>>
+>> Regards,
+>> Akihiko Odaki
+>>
+>>>
+>>> Then we don't need any driver normative so I don't see any conflict.
+>>>
+>>> Michael suggests we use "SHOULD", but if this is something that the
+>>> driver needs to be aware of I don't know how "SHOULD" can help a lot
+>>> or not.
+>>>
+>>>>
+>>>> Instead, we should make the driver requirement stricter to change 2).
+>>>> That is what "[PATCH v3] virtio-net: Ignore num_buffers when unused" does:
+>>>> https://lore.kernel.org/r/20250110-reserved-v3-1-2ade0a5d2090@daynix.com
+>>>>
+>>>>>
+>>>>>>
+>>>>>> We are going to fix all implementations known to buggy (QEMU and Linux)
+>>>>>> anyway so I think it's just fine to leave that part of specification as is.
+>>>>>
+>>>>> I don't think we can fix it all.
+>>>>
+>>>> It essentially only requires storing 16 bits. There are details we need
+>>>> to work out, but it should be possible to fix.
+>>>
+>>> I meant it's not realistic to fix all the hypervisors. Note that
+>>> modern devices have been implemented for about a decade so we may have
+>>> too many versions of various hypervisors. (E.g DPDK seems to stick
+>>> with the same behaviour of the current kernel).
+>>   > >>
+>>>> Regards,
+>>>> Akihiko Odaki
+>>>>
+>>>
+>>> Thanks
+>>>
+>>
+> 
 
 
