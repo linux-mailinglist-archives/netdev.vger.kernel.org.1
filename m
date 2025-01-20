@@ -1,149 +1,208 @@
-Return-Path: <netdev+bounces-159713-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159714-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB369A168E0
-	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 10:06:58 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3CFE6A168EB
+	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 10:08:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4367B3AA4FC
-	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 09:06:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B6CF81881C3D
+	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 09:08:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCE461A08DB;
-	Mon, 20 Jan 2025 09:03:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD91119D06B;
+	Mon, 20 Jan 2025 09:08:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="Ks+FLYXu"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="fAh7oNwB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.denx.de (mx.denx.de [89.58.32.78])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA5281A01D4;
-	Mon, 20 Jan 2025 09:03:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=89.58.32.78
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18CA319D881;
+	Mon, 20 Jan 2025 09:08:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737363796; cv=none; b=vGeHCofOTKBO+F4twK2ENW4i+28IQ3q6CE1wdZM8Vw6N9RI6gQlWeTDt+EJR6k+1Y138F8/q2wKwE5PKX+CuKu+ZDnwrcbYiUAYa/4t2WIekFuyrm1NNLT28t0Qi2F8KYB3wuUqiF3wxXVH7xxlBzLvLkiBUeDh8sFY3DYVzfOQ=
+	t=1737364113; cv=none; b=ouP3sCTAlBpecTK8OOOAQUlwYgAJqt62p1xhFBAFcZe0JU+G6T+4U6gN5gFho641dtTm6EM44Natd8FSHjFOuntpBgmNRj01MZ9GkdRkUtiWjnwz+W6P0FEghu9Wjyv5DYAdk9zJ9P0cegMAvB/hkKPrxB8O8Zgv5gR+z7W+Mg4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737363796; c=relaxed/simple;
-	bh=me489t2oKgcRAa40VsCkPhgy1HYPDmc36MpMCwStBSE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JhxhVZqk65nBorXkgI8o156w9dcUH4gYqsIh+5MYnV+No1eqXeqjrJJzXItjPnsCWPVUeVtu79u8IcG630CejdVjUdaZoHVXDiK+wYPoG3r7T3D1jYiMq9js8d8YX5Sm8YCGx2pq2gPHF08NsqaiCiNR1X8dznUbJyWgedIXato=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=Ks+FLYXu; arc=none smtp.client-ip=89.58.32.78
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id BB73A1040DBF6;
-	Mon, 20 Jan 2025 10:03:11 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de; s=mx-20241105;
-	t=1737363792;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=fJZeL9A8Sfxpp9ZRJId/CWSpdquq50ojC8038lTZBsA=;
-	b=Ks+FLYXuIrltNUKG5xevLJeyhNRdOu1eHuQQhKMB6Czjy/F/KZweuMYj/oK6+C42wmK+yR
-	6wRg0/xtgQHPHiIWhh6VxBOil7NweILvch3TP3D5XIIOTYZA+Edpq5jtpxCkPU8TEku/wA
-	kl33ZtAFSSWwk1W3KPXNeJBq2qOq8Dfydyj27pqa5gnm3A2h4lMF64Ri6n9AFh2yjcKx8l
-	QxymQhShaD1kblCQEKN8433PzaaBOWsBvrmFDAJRUmgmQaAlPa/ICBQ88g8WqFglZnLch4
-	1bK8RLBSVwgZSIako0xGq/YWiJL64/ruZYl+J2UWxdVxKJu2SFZbrwxEclpWmA==
-From: Marek Vasut <marex@denx.de>
-To: linux-leds@vger.kernel.org
-Cc: Marek Vasut <marex@denx.de>,
-	"David S. Miller" <davem@davemloft.net>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Eric Dumazet <edumazet@google.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>,
-	netdev@vger.kernel.org
-Subject: [PATCH v2] net: phy: Handle both led@0 and led subnode name for single-LED PHYs
-Date: Mon, 20 Jan 2025 10:02:46 +0100
-Message-ID: <20250120090256.54382-1-marex@denx.de>
-X-Mailer: git-send-email 2.45.2
+	s=arc-20240116; t=1737364113; c=relaxed/simple;
+	bh=hFB3PSVa/F+n3n//zozwY6R1j2j1kcMrXo7Ds38U9D4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=efwbUYX4tUVWIOlWaceeGcGIOlQHCm2TOtpbvA10GruFPr59SxVuaiLtfi7yH0xSd0MR/Rp3X6dXXUFiwhSWpkNn8icrLmYDMDlxDPf8edSeLxMqLRpZ5jFAb0HcZ1et1CIlH3wYDQV9CZqm7BFT+aIJTnK6B/i1WulNIdXibTc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=fAh7oNwB; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50K6gxTe007185;
+	Mon, 20 Jan 2025 09:07:56 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	h+vNN5xoXznfhtWxbNTpB0BOmc+kHjlUL1TlQ4NcoLk=; b=fAh7oNwBtqeKxsr/
+	fAGGaGIlv45aqyoUZ1uuLXsvMK6RLqfuK0MmO+v6SbdHOqcx1APVSidPeZYptY3w
+	+VVmvRBKOJpjaB3LKJwz5s9Lp41AQLP0iRLs8cdtfuf4quDBvapyyPVmk7zokJhR
+	VAv+66oTnyyGc46nBmVxXdreukpthVekIeQqq+3eE5SCkj5tHYxWs3UxiVLHW22O
+	KEofz6aBebzUOuZVQvWlfvuMlkIIsClv4+9HH8PMo+ZALonRKj3+Em8VFaqRTv0+
+	eFMgVlCiNS/n2e2FLAHBGFc5W1k5PuNzmzwq/qUIbstcXJ1lP9Mb1ucgBP6HAYtz
+	WWcQ6Q==
+Received: from nalasppmta02.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 449hfb0b61-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 20 Jan 2025 09:07:55 +0000 (GMT)
+Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
+	by NALASPPMTA02.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 50K97sMP024218
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 20 Jan 2025 09:07:54 GMT
+Received: from [10.253.35.93] (10.80.80.8) by nalasex01c.na.qualcomm.com
+ (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Mon, 20 Jan
+ 2025 01:07:48 -0800
+Message-ID: <5bc3f4e0-6c3f-412c-a825-54707c70f779@quicinc.com>
+Date: Mon, 20 Jan 2025 17:07:44 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Last-TLS-Session-Version: TLSv1.3
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 2/3] net: stmmac: qcom-ethqos: Enable RX programmable swap
+ on qcs615
+To: Andrew Lunn <andrew@lunn.ch>
+CC: Krzysztof Kozlowski <krzk@kernel.org>, Vinod Koul <vkoul@kernel.org>,
+        Andrew Lunn <andrew+netdev@lunn.ch>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo
+ Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski
+	<krzk+dt@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Bjorn Andersson
+	<andersson@kernel.org>,
+        Konrad Dybcio <konradybcio@kernel.org>,
+        Alexandre
+ Torgue <alexandre.torgue@foss.st.com>,
+        Jose Abreu <joabreu@synopsys.com>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>, <netdev@vger.kernel.org>,
+        <linux-arm-msm@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>,
+        <linux-stm32@st-md-mailman.stormreply.com>,
+        <linux-arm-kernel@lists.infradead.org>
+References: <20241225-support_10m100m-v1-0-4b52ef48b488@quicinc.com>
+ <20241225-support_10m100m-v1-2-4b52ef48b488@quicinc.com>
+ <4b4ef1c1-a20b-4b65-ad37-b9aabe074ae1@kernel.org>
+ <278de6e8-de8f-458a-a4b9-92b3eb81fa77@quicinc.com>
+ <e47f3b5c-9efa-4b71-b854-3a5124af06d7@lunn.ch>
+ <87a7729d-ccdd-46f0-bcfd-3915452344fd@quicinc.com>
+ <7e046761-7787-4f01-b47b-9374402489ac@lunn.ch>
+Content-Language: en-US
+From: Yijie Yang <quic_yijiyang@quicinc.com>
+In-Reply-To: <7e046761-7787-4f01-b47b-9374402489ac@lunn.ch>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01c.na.qualcomm.com (10.47.97.35)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: NP9eBnT9zEvKqkraLR4B_uiSrrYEmpmo
+X-Proofpoint-ORIG-GUID: NP9eBnT9zEvKqkraLR4B_uiSrrYEmpmo
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-01-20_01,2025-01-20_02,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 phishscore=0
+ lowpriorityscore=0 mlxscore=0 suspectscore=0 priorityscore=1501
+ malwarescore=0 adultscore=0 mlxlogscore=615 bulkscore=0 spamscore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2411120000 definitions=main-2501200075
 
-In case a PHY supports only one LED in total, like ADIN1300, and this LED
-is described in DT, it is currently necessary to include unit address in
-the LED node name and the address-cells have to be set to 1:
 
-leds {
-  #address-cells = <1>;
-  ...
-  led@0 {
-    reg = <0>;
-    ...
-  };
-};
 
-For a single LED PHY, this should not be necessary and plain 'led' node
-without unit should be acceptable as well:
+On 2025-01-08 21:29, Andrew Lunn wrote:
+>>> Why is it specific to this board? Does the board have a PHY which is
+>>> broken and requires this property? What we are missing are the details
+>>> needed to help you get to the correct way to solve the problem you are
+>>> facing.
+>>>
+>>
+>> Let me clarify why this bit is necessary and why it's board-specific. The RX
+>> programming swap bit can introduce a time delay of half a clock cycle. This
+>> bit, along with the clock delay adjustment functionality, is implemented by
+>> a module called 'IO Macro.' This is a Qualcomm-specific hardware design
+>> located between the MAC and PHY in the SoC, serving the RGMII interface. The
+>> bit works in conjunction with delay adjustment to meet the sampling
+>> requirements. The sampling of RX data is also handled by this module.
+>>
+>> During the board design stage, the RGMII requirements may not have been
+>> strictly followed, leading to uncertainty in the relationship between the
+>> clock and data waveforms when they reach the IO Macro.
+> 
+> So this indicates any board might need this feature, not just this one
+> board. Putting the board name in the driver then does not scale.
+> 
 
-leds {
-  ...
-  led {
-    ...
-  };
-};
+Should I ignore this if I choose to use the following standard properties?
 
-Handle this special case. In case reg property is not present in the leds
-node subnode, test whether the leds node contains exactly one subnode, and
-if so, assume this is the one single LED with reg property set to 0.
+>> This means the time
+>> delay introduced by the PC board may not be zero. Therefore, it's necessary
+>> for software developers to tune both the RX programming swap bit and the
+>> delay to ensure correct sampling.
+> 
+> O.K. Now look at how other boards tune their delays. There are
+> standard properties for this:
+> 
+>          rx-internal-delay-ps:
+>            description:
+>              RGMII Receive Clock Delay defined in pico seconds. This is used for
+>              controllers that have configurable RX internal delays. If this
+>              property is present then the MAC applies the RX delay.
+>          tx-internal-delay-ps:
+>            description:
+>              RGMII Transmit Clock Delay defined in pico seconds. This is used for
+>              controllers that have configurable TX internal delays. If this
+>              property is present then the MAC applies the TX delay.
+> 
+> I think you can use these properties, maybe with an additional comment
+> in the binding. RGMII running at 1G has a clock of 125MHz. That is a
+> period of 8ns. So a half clock cycle delay is then 4ns.
+> 
+> So an rx-internal-delay-ps of 0-2000 means this clock invert should be
+> disabled. A rx-internal-delay-ps of 4000-6000 means the clock invert
+> should be enabled.
 
-Signed-off-by: Marek Vasut <marex@denx.de>
----
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Andrew Lunn <andrew@lunn.ch>
-Cc: Eric Dumazet <edumazet@google.com>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>
-Cc: Russell King <linux@armlinux.org.uk>
-Cc: netdev@vger.kernel.org
----
-V2: Fix up variable rename
----
- drivers/net/phy/phy_device.c | 15 +++++++++++++--
- 1 file changed, 13 insertions(+), 2 deletions(-)
+This board was designed to operate at different speed rates, not a fixed 
+speed, and the clock rate varies for each speed. Thus, the delay 
+introduced by inverting the clock is not fixed. Additionally, I noticed 
+that some vendors apply the same routine for this property across all 
+speeds in their driver code. Can this property be used just as a flag, 
+regardless of its actual value?
 
-diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
-index 5b34d39d1d52a..e36e65e672e79 100644
---- a/drivers/net/phy/phy_device.c
-+++ b/drivers/net/phy/phy_device.c
-@@ -3346,6 +3346,7 @@ static int of_phy_led(struct phy_device *phydev,
- 	struct led_classdev *cdev;
- 	unsigned long modes = 0;
- 	struct phy_led *phyled;
-+	int led_count;
- 	u32 index;
- 	int err;
- 
-@@ -3357,8 +3358,18 @@ static int of_phy_led(struct phy_device *phydev,
- 	phyled->phydev = phydev;
- 
- 	err = of_property_read_u32(led, "reg", &index);
--	if (err)
--		return err;
-+	if (err) {
-+		led_count = of_get_available_child_count(of_get_parent(led));
-+
-+		/*
-+		 * If there is one PHY LED in total, accept 'led' subnode
-+		 * in addition to 'led@0' subnode, and assume reg = <0>;
-+		 */
-+		if (led_count != 1)
-+			return err;
-+		index = 0;
-+		err = 0;
-+	}
- 	if (index > U8_MAX)
- 		return -EINVAL;
- 
+> 
+> Now, ideally, you want the PHY to add the RGMII delays, that is what i
+> request all MAC/PHY pairs do, so we have a uniform setup across all
+> boards. So unless the PHY does not support RGMII delays, you would
+> expect rx-internal-delay-ps to be either just a small number of
+> picoseconds for fine tuning, or a small number of picoseconds + 4ns
+> for fine tuning.
+
+The delay for both TX and RX sides is added by the MAC in the Qualcomm 
+driver, which was introduced by the initial patch. I believe there may 
+be a refactor in the future to ensure it follows the requirements.
+
+> 
+> This scales, since it can be used by an board with poor design, and it
+> does not require anything proprietary to Qualcomm, except the extended
+> range, and hopefully nobody except Qualcomms broken RDK will require
+> it, because obviously you will document the issue with the RDK and
+> tell customers how to correctly design their board to be RGMII
+> compliant with the clocks.
+
+Yes, I will make a note of it.
+
+> 
+> 	Andrew
+
 -- 
-2.45.2
+Best Regards,
+Yijie
 
 
