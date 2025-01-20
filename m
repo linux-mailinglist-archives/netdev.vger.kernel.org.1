@@ -1,100 +1,147 @@
-Return-Path: <netdev+bounces-159698-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159699-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 339BCA16789
-	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 08:43:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5740EA16831
+	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 09:26:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6532A1632DD
-	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 07:43:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 86C90162E87
+	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 08:26:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E512C19048A;
-	Mon, 20 Jan 2025 07:43:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B34B1192B8F;
+	Mon, 20 Jan 2025 08:26:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ethancedwards.com header.i=@ethancedwards.com header.b="QpYehyG4"
+	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="axdD8vKH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout-p-101.mailbox.org (mout-p-101.mailbox.org [80.241.56.151])
+Received: from mx.denx.de (mx.denx.de [89.58.32.78])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CBE018FC92;
-	Mon, 20 Jan 2025 07:43:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.151
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C72641925AF;
+	Mon, 20 Jan 2025 08:26:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=89.58.32.78
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737359013; cv=none; b=iJum+k1E22km4FbuFOVk1dpkx+Fj0tXrSbWzlAzczsQ7B9QS7qy0Me4oRuKCNnkiX8/xpfxpPOZmQFeQgMoFlnYDAxbzgFbw97jIFv/oBJoJl8ufFrnfzKSpAimyoVKSBUq0cAyDa/yv0acOk+fRX2P+iaxJHuExRlo2Vr1vAXM=
+	t=1737361590; cv=none; b=XfYzmbCzMV+SnOg994dtbh01bPhhmSmeVgqn8VfksQpnuitzNnSS39EGG+Ra2KWM2u3tWWtVswETRarUMhMfywA4exX4TES5LjRIve8n2pGuZcZe5K1cGfNTixmKhVhpAU5q0+4XNUL5pqAZ9Fy/1Ejo18qPzCxEuXXly7DrS3U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737359013; c=relaxed/simple;
-	bh=LQNzZpYdYVJJOrWJwoU9T+maxwRLdMU1JC29N3sisuA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eESLu83TzVFQIegvSkOEBXxg8YmDplwah6JYU5t+qLXV68TuDZe6+7X33C40ZNAK5/jm2VBNGx9UF9RpYmhaSSF3/+VRTCqHnhY/CpXv+h05VsYHKZzagXQPacd+RAf8dfOPBa3KdrYWLJhv6URBiJ2G8xN45EG+KUrDbXFbRVc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ethancedwards.com; spf=pass smtp.mailfrom=ethancedwards.com; dkim=pass (2048-bit key) header.d=ethancedwards.com header.i=@ethancedwards.com header.b=QpYehyG4; arc=none smtp.client-ip=80.241.56.151
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ethancedwards.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ethancedwards.com
-Received: from smtp202.mailbox.org (smtp202.mailbox.org [10.196.197.202])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-p-101.mailbox.org (Postfix) with ESMTPS id 4Yc2Q71dNHz9sQb;
-	Mon, 20 Jan 2025 08:43:27 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ethancedwards.com;
-	s=MBO0001; t=1737359007;
+	s=arc-20240116; t=1737361590; c=relaxed/simple;
+	bh=QY+vaFtFKPxGY8eSAq/Lba46rv01eJ925hphLI2SxC0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qWWL8dvSTTny0MOh7IXR0qw/Oj/gJaMxl/jDlHSJxRdj4LMK9V+EDuBP2fXv+RvBKpkogouv9hChChE0CakV2ApvtkPvxmUcBODkSpsQCQ6uCqN1GiI5bsfj+Xkmu7seotizIOe0gMnDw68fIWpWVpEAgz4XTlby/7KCcAqGNPo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=axdD8vKH; arc=none smtp.client-ip=89.58.32.78
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id D0B26101C71BA;
+	Mon, 20 Jan 2025 09:26:22 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de; s=mx-20241105;
+	t=1737361585;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=LbOqci+Y+1n+DVwByFP/6eLO3g5cf2zoepibzS/0joQ=;
-	b=QpYehyG4nuZFnNv9REp6eA6YF0t4QxCCujQRuQR4NLKtgS1migUo6GWNMzo5gJRL1FxDbe
-	MnVWPPbqNXTKRyH/FXJ7oJCjjSI9rrfYe/uBExTmMDvnkrIXRNsMtMcXmvWH+44mzKGL7P
-	ppAF71QDw0EAzBL0AmTAP6QGOuwKvqCqIde+3N9Nc2Y/wBTAXHzFkvFcuD4Zo0hZ3sKJjI
-	X45Utky3uVOx4agtan2/j/K9At5XmkdjhnUW1ogtuSuBWr/HNzG89fUEgnmepGp8CpY1sc
-	GN06zo01Ic/C0N/vzhgRRRfTEEgJ5v2D7vxWyWnhDjHK5ehCY5MCOU0D5LkPeg==
-Date: Mon, 20 Jan 2025 02:43:23 -0500
-From: Ethan Carter Edwards <ethan@ethancedwards.com>
-To: Dan Carpenter <dan.carpenter@linaro.org>
-Cc: Jakub Kicinski <kuba@kernel.org>, 
-	"t.sailer@alumni.ethz.ch" <t.sailer@alumni.ethz.ch>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "linux-hams@vger.kernel.org" <linux-hams@vger.kernel.org>, 
-	"pabeni@redhat.com" <pabeni@redhat.com>
-Subject: Re: [PATCH v2] hamradio: baycom: replace strcpy() with strscpy()
-Message-ID: <uhggj2ghv63akhsuxpwmrjabkbhzotpwepogguxjvxt7ilmzeq@q3prlwntbr72>
-References: <62yrwnnvqtwv4etjeaatms5xwiixirkbm6f7urmijwp7kk7bio@r2ric7eqhsvf>
- <92b603cb-a007-4f02-bc81-34a113a04e7d@stanley.mountain>
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=K+vO5M5ma2cVFTnobnF9M0lbzykoddasACwyEX9xIlQ=;
+	b=axdD8vKHFcEICFIUiNdbiEQlkf4IZKMQ6OLaR+NyfW6NQq/4U9wqpo7GGymJMIwlI/xpBk
+	ByOMA/5Y/DqvFvJ35rco5sJzMeiISlfjdh1EyE4tTtLObaft9hodGBvNGzI+TcN2IwZ9cS
+	Q6ujVYKCovcKxVdkb0P4J9nRgux22pixsVOSVwu8snKfduQlmmx9onoysTJanDhGp2UZOT
+	P8RZNGDFyHkGegqIhq7LElFPMbmQLBRtJL6r+LLGixe9Tj7Dp/piZze+7PIGqFvv0nWEaN
+	o/7h3flDnY3K3eLAuSWnjeMdFakmknVWKsxgos3ePHS21VMuVOpbRCEjlcBzjQ==
+From: Marek Vasut <marex@denx.de>
+To: linux-leds@vger.kernel.org
+Cc: Marek Vasut <marex@denx.de>,
+	"David S. Miller" <davem@davemloft.net>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Eric Dumazet <edumazet@google.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	netdev@vger.kernel.org
+Subject: [PATCH] net: phy: Handle both led@0 and led subnode name for single-LED PHYs
+Date: Mon, 20 Jan 2025 09:25:58 +0100
+Message-ID: <20250120082609.50445-1-marex@denx.de>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <92b603cb-a007-4f02-bc81-34a113a04e7d@stanley.mountain>
+Content-Transfer-Encoding: 8bit
+X-Last-TLS-Session-Version: TLSv1.3
 
-On 25/01/20 10:40AM, Dan Carpenter wrote:
-> On Sun, Jan 19, 2025 at 07:34:51PM -0500, Ethan Carter Edwards wrote:
-> > The strcpy() function has been deprecated and replaced with strscpy().
-> > There is an effort to make this change treewide:
-> > https://github.com/KSPP/linux/issues/88.
-> > 
-> > Signed-off-by: Ethan Carter Edwards <ethan@ethancedwards.com>
-> > ---
-> >  v2: reduce verbosity
-> 
-> If you had resent this patch a week ago we would have happily merged it.
-> But now you've hit the merge window and you'll need to wait until
-> 6.14-rc1 or -rc2 have been released and then rebase it on net-next again
-> and resend it.
-I see. My apologies. High school started back for me last week, so I was
-busy getting situated with my classes and all. I'll keep this in mind
-and send it back out in a week or two.
+In case a PHY supports only one LED in total, like ADIN1300, and this LED
+is described in DT, it is currently necessary to include unit address in
+the LED node name and the address-cells have to be set to 1:
 
-Thanks,
-Ethan
-> 
-> Anyway, if you do resend it feel free to add a:
-> 
-> Reviewed-by: Dan Carpenter <dan.carpenter@linaro.org>
-> 
-> regards,
-> dan carpenter
-> 
+leds {
+  #address-cells = <1>;
+  ...
+  led@0 {
+    reg = <0>;
+    ...
+  };
+};
+
+For a single LED PHY, this should not be necessary and plain 'led' node
+without unit should be acceptable as well:
+
+leds {
+  ...
+  led {
+    ...
+  };
+};
+
+Handle this special case. In case reg property is not present in the leds
+node subnode, test whether the leds node contains exactly one subnode, and
+if so, assume this is the one single LED with reg property set to 0.
+
+Signed-off-by: Marek Vasut <marex@denx.de>
+---
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Andrew Lunn <andrew@lunn.ch>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>
+Cc: Russell King <linux@armlinux.org.uk>
+Cc: netdev@vger.kernel.org
+---
+ drivers/net/phy/phy_device.c | 15 +++++++++++++--
+ 1 file changed, 13 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
+index 5b34d39d1d52a..fa91d03d9e920 100644
+--- a/drivers/net/phy/phy_device.c
++++ b/drivers/net/phy/phy_device.c
+@@ -3346,6 +3346,7 @@ static int of_phy_led(struct phy_device *phydev,
+ 	struct led_classdev *cdev;
+ 	unsigned long modes = 0;
+ 	struct phy_led *phyled;
++	int led_count;
+ 	u32 index;
+ 	int err;
+ 
+@@ -3357,8 +3358,18 @@ static int of_phy_led(struct phy_device *phydev,
+ 	phyled->phydev = phydev;
+ 
+ 	err = of_property_read_u32(led, "reg", &index);
+-	if (err)
+-		return err;
++	if (err) {
++		led_count = of_get_available_child_count(of_get_parent(led));
++
++		/*
++		 * If there is one PHY LED in total, accept 'led' subnode
++		 * in addition to 'led@0' subnode, and assume reg = <0>;
++		 */
++		if (total_led_count != 1)
++			return err;
++		index = 0;
++		err = 0;
++	}
+ 	if (index > U8_MAX)
+ 		return -EINVAL;
+ 
+-- 
+2.45.2
+
 
