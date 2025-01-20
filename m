@@ -1,162 +1,126 @@
-Return-Path: <netdev+bounces-159784-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159785-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D62DAA16E4E
-	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 15:19:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 473ABA16E63
+	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 15:23:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E42663A2888
-	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 14:19:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EEA6F3A40EE
+	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 14:23:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFC941E282D;
-	Mon, 20 Jan 2025 14:19:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF8011E0E0A;
+	Mon, 20 Jan 2025 14:23:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="dIUMfJ86"
+	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="NnjPjrjZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
+Received: from mx.denx.de (mx.denx.de [89.58.32.78])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B43861E1A2D;
-	Mon, 20 Jan 2025 14:19:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E34F71DEFD4;
+	Mon, 20 Jan 2025 14:23:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=89.58.32.78
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737382779; cv=none; b=nDGxqrE0QNLTsUzwVtPX/D/paqoNZI/Mce9qwWcb+sNW7D0jEYCk7KaKVS2xg1zl8YKM6Yp8R5z54yrIjO+pr4LvbRDOajicIso/mzEhyYfKkPD2HMbQXdDG7Ii6bYaPDjo/Tq5GhcSOSWGKSQd48+RVLjFJcgCDwS8bSwdpILA=
+	t=1737382992; cv=none; b=NRSAuAR6Lzwe1QgUSIuvD51sp8uC6dHMF8k83URWrY6qp4RNFyCQ4Q4MK5xLx/wxYJd6BH7uCDkqU/BBxxWnNPsKUH+2UrUz6R9iPZg1ZsUBiMnx2TWF0X06WN7VOBFWvbMELjOyPogaulQLFS8crb9rQ8HqPdfD6tX2YxRkSVg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737382779; c=relaxed/simple;
-	bh=pVidTGCNoa4z0zvKE9RLaRKAlIgW+qfJFiG/vMITwoE=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=cA2e4wMtvVnBe4ypUDD5CPWrlg93CCAh5Bqi7iINwA41eGOPBED+GQkK+Uroo0zFrHe33aMMYzuvYIlWqVdzsg435FHiHWW/psxpIksxSv7gHg8ZgLfpR2y8PRx+i/OEW256iV4pBZ5Q0oNH7FM9vd+q59SC2WBUxoVBHkMxlLM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=dIUMfJ86; arc=none smtp.client-ip=217.70.183.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 614DF20004;
-	Mon, 20 Jan 2025 14:19:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1737382772;
+	s=arc-20240116; t=1737382992; c=relaxed/simple;
+	bh=AesDXrVBow2F+80GAvVShsFcaLr9SUV0R9n/HpToTKk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=RZqne4RhNWiuPdk+psdQ8gKKmIgZ6jy7Rq34ZahmTZY0gw7w3CkmaJVbzVC0gUP1T4E2HQBQQvXtk4rVIRBg3SR3mREByUfRKeyUZiRQILYjka/XmwK8SghMI6l5xuj932udb5Bxv6HBnzhEau0F7cM+AsUAOEAtEFLhwDpAwxw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=NnjPjrjZ; arc=none smtp.client-ip=89.58.32.78
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 87E131040DBF6;
+	Mon, 20 Jan 2025 15:23:04 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de; s=mx-20241105;
+	t=1737382987;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=0HVe5lcWJ1ICiNX7irGNyfKwXwwkX3hMUT/PxOg1fRE=;
-	b=dIUMfJ86/hm1RhFt1uG2TzxOBPkqLujqXzVhs+qakXIpfkk7W9mQBVSdVY1lDfD7CtaeyA
-	In4fWM7Qahsvmuu0WU/vfbqhyNdhoI9/nI73SmkHSLEm4qeBEEOVTomCWA6ytUWBgCqKmT
-	7yn2sKvYNRhgvzJeLtnph82Ue+jbif5FnUrNp1s/Fs6h2Nt3+d3HpFKP8O4NG6k3R3ZLVh
-	mbYqlltIPyaFCCtIFi/csn73g3rdlZWW2MSo2J2k7n2AOkEP+PYjLNmS3zusu9Poy+yYfE
-	Xxj/4xSpmZ0HuMClHh84g6oZ72+O2sQukURNA0jSUBLUIB6yHNfuehIz3DcJOA==
-From: Kory Maincent <kory.maincent@bootlin.com>
-To: Kory Maincent <kory.maincent@bootlin.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>,
-	thomas.petazzoni@bootlin.com,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net-next v3] net: phy: Fix suspicious rcu_dereference usage
-Date: Mon, 20 Jan 2025 15:19:25 +0100
-Message-Id: <20250120141926.1290763-1-kory.maincent@bootlin.com>
-X-Mailer: git-send-email 2.34.1
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=n9Rkky1y7To39aNMDd2svVkpqBnuTsV1oius/xd9Aio=;
+	b=NnjPjrjZJN0BZ2XCvSE7bvm3saKJtGgdWN8acbGzRPH1fwFK1DCxP3EuW+scr1vtBSHtZH
+	FGk9CtwIBlI1XuZU315slW1xTmBu4BoSYfKtJWUlskq27OY3yuWDHJ+EPLWgy7RclhfOUD
+	U5sXve2oZQsg7PGphWVc4/Zg5cokjT/eBEbkA2l6r9NTMSAQ9/WC7nzGpXoqZ+hTjAjaCK
+	OrYKiLmabD0OI0VI65Yz0iWzhVRdpyVgoemFqPiO7NMCc2NhZEC1/JeH7b37p8TH+nQ8WZ
+	aZk1shopcGmlG1npzOhK1b3Z9miX0TnYAd6vkqtfK7z0vFNZl658/m652ngOGA==
+Message-ID: <953ad608-8be7-42e6-9162-05a98a42eb21@denx.de>
+Date: Mon, 20 Jan 2025 15:20:41 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: kory.maincent@bootlin.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [net-next,PATCH 2/2] net: phy: micrel: Add KSZ87XX Switch LED
+ control
+To: Andrew Lunn <andrew@lunn.ch>, Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Heiner Kallweit <hkallweit1@gmail.com>,
+ Jakub Kicinski <kuba@kernel.org>, Russell King <linux@armlinux.org.uk>,
+ Tristram Ha <tristram.ha@microchip.com>, UNGLinuxDriver@microchip.com,
+ Vladimir Oltean <olteanv@gmail.com>, Woojung Huh
+ <woojung.huh@microchip.com>, linux-kernel@vger.kernel.org
+References: <20250113001543.296510-1-marex@denx.de>
+ <20250113001543.296510-2-marex@denx.de>
+ <4d02f786-e87e-4588-87ed-b5fa414a4b5a@redhat.com>
+ <ef933bd4-b9ae-4f78-8f05-abd1d2832bf8@lunn.ch>
+Content-Language: en-US
+From: Marek Vasut <marex@denx.de>
+In-Reply-To: <ef933bd4-b9ae-4f78-8f05-abd1d2832bf8@lunn.ch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
 
-The phy_detach function can be called with or without the rtnl lock held.
-When the rtnl lock is not held, using rtnl_dereference() triggers a
-warning due to the lack of lock context.
+On 1/16/25 2:23 PM, Andrew Lunn wrote:
+> On Thu, Jan 16, 2025 at 10:58:38AM +0100, Paolo Abeni wrote:
+>> On 1/13/25 1:15 AM, Marek Vasut wrote:
+>>> The KSZ87xx switch contains LED control registers. There is one shared
+>>> global control register bitfield which affects behavior of all LEDs on
+>>> all ports, the Register 11 (0x0B): Global Control 9 bitfield [5:4].
+>>> There is also one per-port Register 29/45/61 (0x1D/0x2D/0x3D): Port 1/2/3
+>>> Control 10 bit 7 which controls enablement of both LEDs on each port
+>>> separately.
+>>>
+>>> Expose LED brightness control and HW offload support for both of the two
+>>> programmable LEDs on this KSZ87XX Switch. Note that on KSZ87xx there are
+>>> three or more instances of simple KSZ87XX Switch PHY, one for each port,
+>>> however, the registers which control the LED behavior are mostly shared.
+>>>
+>>> Introduce LED brightness control using Register 29/45/61 (0x1D/0x2D/0x3D):
+>>> Port 1/2/3 Control 10 bit 7. This bit selects between LEDs disabled and
+>>> LEDs set to Function mode. In case LED brightness is set to 0, both LEDs
+>>> are turned off, otherwise both LEDs are configured to Function mode which
+>>> follows the global Register 11 (0x0B): Global Control 9 bitfield [5:4]
+>>> setting.
+>>
+>> @Andrew, @Russel: can the above problem be address with the current phy
+>> API? or does phy device need to expose a new brightness_get op?
 
-Add an rcu_read_lock() to ensure the lock is acquired and to maintain
-synchronization.
+Sorry for the delayed reply.
 
-The path reported to not having RTNL lock acquired is the suspend path of
-the ravb MAC driver. Without this fix we got this warning:
+> Coupled LEDs cause issues. Because vendors do all sorts of weird
+> things with LEDs, i don't want to fully support everything every
+> vendor has, or the code is just going to be unmaintanable. So we have
+> the core support a subset, and some features of the hardware go
+> unused.
+> 
+> In this case, i would say software control of the LEDs is
+> impossible. You cannot individually turn an LED on/off. The core
+> supports this, Heiner added support for a PHY with similar issues. I
+> think it is as simple as not implementing led_brightness_set().
+What about the LED functionality configuration ?
 
-[   39.032969] =============================
-[   39.032983] WARNING: suspicious RCU usage
-[   39.033019] -----------------------------
-[   39.033033] drivers/net/phy/phy_device.c:2004 suspicious
-rcu_dereference_protected() usage!
-...
-[   39.033597] stack backtrace:
-[   39.033613] CPU: 0 UID: 0 PID: 174 Comm: python3 Not tainted
-6.13.0-rc7-next-20250116-arm64-renesas-00002-g35245dfdc62c #7
-[   39.033623] Hardware name: Renesas SMARC EVK version 2 based on
-r9a08g045s33 (DT)
-[   39.033628] Call trace:
-[   39.033633]  show_stack+0x14/0x1c (C)
-[   39.033652]  dump_stack_lvl+0xb4/0xc4
-[   39.033664]  dump_stack+0x14/0x1c
-[   39.033671]  lockdep_rcu_suspicious+0x16c/0x22c
-[   39.033682]  phy_detach+0x160/0x190
-[   39.033694]  phy_disconnect+0x40/0x54
-[   39.033703]  ravb_close+0x6c/0x1cc
-[   39.033714]  ravb_suspend+0x48/0x120
-[   39.033721]  dpm_run_callback+0x4c/0x14c
-[   39.033731]  device_suspend+0x11c/0x4dc
-[   39.033740]  dpm_suspend+0xdc/0x214
-[   39.033748]  dpm_suspend_start+0x48/0x60
-[   39.033758]  suspend_devices_and_enter+0x124/0x574
-[   39.033769]  pm_suspend+0x1ac/0x274
-[   39.033778]  state_store+0x88/0x124
-[   39.033788]  kobj_attr_store+0x14/0x24
-[   39.033798]  sysfs_kf_write+0x48/0x6c
-[   39.033808]  kernfs_fop_write_iter+0x118/0x1a8
-[   39.033817]  vfs_write+0x27c/0x378
-[   39.033825]  ksys_write+0x64/0xf4
-[   39.033833]  __arm64_sys_write+0x18/0x20
-[   39.033841]  invoke_syscall+0x44/0x104
-[   39.033852]  el0_svc_common.constprop.0+0xb4/0xd4
-[   39.033862]  do_el0_svc+0x18/0x20
-[   39.033870]  el0_svc+0x3c/0xf0
-[   39.033880]  el0t_64_sync_handler+0xc0/0xc4
-[   39.033888]  el0t_64_sync+0x154/0x158
-[   39.041274] ravb 11c30000.ethernet eth0: Link is Down
+I think the main issue here is that multiple LEDs exposed in sysfs 
+control the same bit(s) in hardware, and the sysfs attributes behind 
+those LEDs can get out of sync.
 
-Tested-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
-Reported-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
-Closes: https://lore.kernel.org/netdev/4c6419d8-c06b-495c-b987-d66c2e1ff848@tuxon.dev/
-Fixes: 35f7cad1743e ("net: Add the possibility to support a selected hwtstamp in netdevice")
-Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
----
+One alternative that crossed my mind would be to register single LED in 
+the KSZ87xx switch driver to control the LED functionality, and per-port 
+LED to control the per-port LED enablement (=brightness). It does not 
+model the hardware accurately, but it does avoid the complexity.
 
-Changes in v3:
-- Update the commit message with the stack trace.
-
-Changes in v2:
-- Add a missing ;
----
- drivers/net/phy/phy_device.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
-index 5b34d39d1d52..3eeee7cba923 100644
---- a/drivers/net/phy/phy_device.c
-+++ b/drivers/net/phy/phy_device.c
-@@ -2001,12 +2001,14 @@ void phy_detach(struct phy_device *phydev)
- 	if (dev) {
- 		struct hwtstamp_provider *hwprov;
- 
--		hwprov = rtnl_dereference(dev->hwprov);
-+		rcu_read_lock();
-+		hwprov = rcu_dereference(dev->hwprov);
- 		/* Disable timestamp if it is the one selected */
- 		if (hwprov && hwprov->phydev == phydev) {
- 			rcu_assign_pointer(dev->hwprov, NULL);
- 			kfree_rcu(hwprov, rcu_head);
- 		}
-+		rcu_read_unlock();
- 
- 		phydev->attached_dev->phydev = NULL;
- 		phydev->attached_dev = NULL;
--- 
-2.34.1
-
+Otherwise, what is left would be custom sysfs attributes for this switch?
 
