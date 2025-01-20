@@ -1,133 +1,113 @@
-Return-Path: <netdev+bounces-159770-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159772-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A39D8A16C82
-	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 13:46:20 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C87EA16CDF
+	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 14:05:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4DA351889B14
-	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 12:46:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 43F031884141
+	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 13:04:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 611B41DDD1;
-	Mon, 20 Jan 2025 12:46:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=swemel.ru header.i=@swemel.ru header.b="oai8Q/QK"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 548501E1A08;
+	Mon, 20 Jan 2025 13:02:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.swemel.ru (mx.swemel.ru [95.143.211.150])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D63271FC8;
-	Mon, 20 Jan 2025 12:46:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.143.211.150
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 418651E1049;
+	Mon, 20 Jan 2025 13:02:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737377176; cv=none; b=JSMjZi5rQHYzUwhhBHD2CATgmAmCalUeXe0cIjLHADKE83kOWcxM/L7yHagQaqYh6PsGuGFSC1ZzGAMJF6NHge6KCbgq/lATrg+w+HvrGQrZ18Im9lHOcOL4QO+bC/WURVyGFQ823n42rSQ5lHjmQldU7f6DHL3tmLvZkAdEYn8=
+	t=1737378167; cv=none; b=Z+d7CaJVSYptlxluKmEpnp1P52OQV05CZco370vZlmpc91k+R6xw0rJ3xh3dVQ6EvOyJrXY4pj5zFAaUsdV4wRx1oKkfbGtVom7oDBlyHcJ8wc6tk96ouHz84n96yeLczYVVGHrSM3F9Zc9KJ75LnSaFwlbi6VsnQjJIPQySkUk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737377176; c=relaxed/simple;
-	bh=ckmUieoQ6c7b2h5qvdikaklIDj7v6vTDGluUVK1/L88=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WUhtJvOaqVjPUicDiGfkrSrysJgd2hdGUP1o2R2O+wE8VtDNnvSXSZ80fGxp+D1e8qQyJLpOEdJMS5r2q8P85f4T8j/7L5T8mb1I7ftfjPyfQXJQ+514QbVBlIKQilgYaca/gjXgpXJZ4sMwxoDivoU4ZB85Z6zqEyHq5DO0juk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=swemel.ru; spf=pass smtp.mailfrom=swemel.ru; dkim=pass (1024-bit key) header.d=swemel.ru header.i=@swemel.ru header.b=oai8Q/QK; arc=none smtp.client-ip=95.143.211.150
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=swemel.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=swemel.ru
-From: Denis Arefev <arefev@swemel.ru>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=swemel.ru; s=mail;
-	t=1737377171;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=mXZ3I+8rEu5hC7Bbr/07M4uZY5uMU2tu8N9VtF7I1iA=;
-	b=oai8Q/QKw5LqOWxxqAprZkqYpgoN8NZC/ObNCToUubGbEn/gh/nB7CRoHqDAkGqcegZSie
-	W94FUdMXxAEa6f+YMfQ1Cxato7KLUzk2lCNMiEWVD63EuGJfOkqxUPSddTfEoLjGmSlKQL
-	o9v/OvTZbUY9iASnWG4hyWlVn87tQy0=
-To: stable@vger.kernel.org,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Nick Child <nnac123@linux.ibm.com>,
-	Dany Madden <drt@linux.ibm.com>,
-	Lijun Pan <ljp@linux.ibm.com>,
-	Sukadev Bhattiprolu <sukadev@linux.ibm.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-	Paul Mackerras <paulus@samba.org>,
+	s=arc-20240116; t=1737378167; c=relaxed/simple;
+	bh=q0twFfHGNT12guejllhSUxE3e8B5i/vTquPebJJn+7k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KhLHN1VXz+AQpeM8uactQ+T6kyCTtvg6KT8Mrl1PP5rPRBjEn57K/IfCr1CZLggslSSjDnsadygLvpxomMooi7qwxCzp1F6vpU3O0+Sqg26LOTpwmaEGsf3jxyEZZVXotJz/XT2RHXRN+uJYc4F3jKaktr3gHNAcCyQYaiF8P6g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-5d9f06f8cf2so8625614a12.3;
+        Mon, 20 Jan 2025 05:02:44 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737378163; x=1737982963;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=CaO/gffB62oP/AC/Y39vqNuJAmecLo+e9irFWeGtxIs=;
+        b=bB2VPRiDleptBhQ2sORy0sUDgpK2yyrjeBjUWosknbkrFTLkVqkwojpJuaPvNgyEmH
+         mNma7BPAwhL7YI8TtDDINQW+EiIlwJmIi0ids9E83fwVpcVI6i+XpCOORyiN9pGHenQc
+         C6+esNwBfObE4x8X1uQHeUUqEaxWTYzFW81X1rbd7T7E1CkHoMWpahHcBH0v+xTgBSgV
+         X88Kw51gBDLSgpICggBDCrLD2dZp+LlCA7foG3g77Zc5xHSiOiPzCkklLBCPLGeO19Eq
+         u2fRfFqmS+S+E3jxPShTo6l0YBpxPUkY96h9Hes5vOgCp5DwpL7OHQ6vAZ+/kKrDYaWD
+         xWxw==
+X-Forwarded-Encrypted: i=1; AJvYcCUOoo6q5kidecCHp33hbiNkcze+64JDY/77L/Fpq/tDefWnfeI0uNG1Kn7qSY5fT4pbyoHOfX1P@vger.kernel.org, AJvYcCUWm8yr8I5xW8sbR3CHRFc1FRsK9OYK0mWlUSZXAWojpX1L53KGjn9e/tPlBQ8UofiuQi3vJnSphZ7IfoY=@vger.kernel.org, AJvYcCUohBAoo39DyXRWqxe4TfvyffV+ykw15k+QbCOWltz0Nqsdk6tagcqJjTPfMtkunKr3r+S5icwcAsy9S9PFVaU0FGUV@vger.kernel.org
+X-Gm-Message-State: AOJu0YwiESrrO6Ah+VxDMW/wxNjoQ6eEoiRlSP0Z8E6Y6v+fTgRtAYUC
+	IdCdVaW/Ne9PaiPT5hHHe4xYy//5dlt4PWqTgtIMyosjKdZJ2KZh
+X-Gm-Gg: ASbGncsQRGF4HPSHHu/F69H8CK5LbXM+UUAmr5IQG/c4qrqH7F4XJ1fFr1JGeiHLlsI
+	mRuRnR9dHUlYgIAWhVbQsuBpj7a+o0hCHgdPAYvUlBFZWGTjz4ErjpYV/7ffEyBGuu0N7IVNT8q
+	Qqf7e8e1djXNLFcjmh3iJZsJBqVBJS3HqB1PB26SBwf5M9+2UXWsXPSUCdN81bWmicYIH5uGR7T
+	4EwifMU9XsS+Y0Nli63Oo0BknWMTnyNIAtW1jzIAOcDeNcvP6d9uek3HgJY
+X-Google-Smtp-Source: AGHT+IHmQuhRKTaUtLO4nidtubuV2Y++Jzelf2JQ0AtRUPfk7S9RYiE7qRbxmQeJ5Ma0PZYzyNwU2Q==
+X-Received: by 2002:a17:907:7da2:b0:ab3:84b5:19b7 with SMTP id a640c23a62f3a-ab38b52ed37mr1322292066b.56.1737378160675;
+        Mon, 20 Jan 2025 05:02:40 -0800 (PST)
+Received: from gmail.com ([2a03:2880:30ff:8::])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ab384f8442esm609431466b.129.2025.01.20.05.02.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 20 Jan 2025 05:02:40 -0800 (PST)
+Date: Mon, 20 Jan 2025 05:02:37 -0800
+From: Breno Leitao <leitao@debian.org>
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: Eric Dumazet <edumazet@google.com>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
 	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	netdev@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org,
-	linux-kernel@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH 5.10] ibmvnic: Add tx check to prevent skb leak
-Date: Mon, 20 Jan 2025 15:46:10 +0300
-Message-ID: <20250120124611.51436-1-arefev@swemel.ru>
+	David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-trace-kernel@vger.kernel.org, kernel-team@meta.com,
+	Yonghong Song <yonghong.song@linux.dev>, Song Liu <song@kernel.org>,
+	Martin KaFai Lau <martin.lau@kernel.org>
+Subject: Re: [PATCH RFC net-next] trace: tcp: Add tracepoint for
+ tcp_cwnd_reduction()
+Message-ID: <20250120-panda-of-impressive-aptitude-2b714e@leitao>
+References: <20250120-cwnd_tracepoint-v1-1-36b0e0d643fa@debian.org>
+ <CAL+tcoC+A94uzaSZ+SKhV04=iDWrvUGEfxYJKYCF0ovqvyhfOg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAL+tcoC+A94uzaSZ+SKhV04=iDWrvUGEfxYJKYCF0ovqvyhfOg@mail.gmail.com>
 
-From: Nick Child <nnac123@linux.ibm.com>
+Hello Jason,
 
-From: Nick Child <nnac123@linux.ibm.com>
+On Mon, Jan 20, 2025 at 08:08:52PM +0800, Jason Xing wrote:
+> On Mon, Jan 20, 2025 at 8:03 PM Breno Leitao <leitao@debian.org> wrote:
+> > diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
+> > index 4811727b8a02258ec6fa1fd129beecf7cbb0f90e..fc88c511e81bc12ec57e8dc3e9185a920d1bd079 100644
+> > --- a/net/ipv4/tcp_input.c
+> > +++ b/net/ipv4/tcp_input.c
+> > @@ -2710,6 +2710,8 @@ void tcp_cwnd_reduction(struct sock *sk, int newly_acked_sacked, int newly_lost,
+> >         if (newly_acked_sacked <= 0 || WARN_ON_ONCE(!tp->prior_cwnd))
+> >                 return;
+> >
+> > +       trace_tcp_cwnd_reduction(sk, newly_acked_sacked, newly_lost, flag);
+> > +
+> 
+> Are there any other reasons why introducing a new tracepoint here?
+> AFAIK, it can be easily replaced by a bpf related program or script to
+> monitor in the above position.
 
-commit 0983d288caf984de0202c66641577b739caad561 upstream.
+In which position exactly?
 
-Below is a summary of how the driver stores a reference to an skb during
-transmit:
-    tx_buff[free_map[consumer_index]]->skb = new_skb;
-    free_map[consumer_index] = IBMVNIC_INVALID_MAP;
-    consumer_index ++;
-Where variable data looks like this:
-    free_map == [4, IBMVNIC_INVALID_MAP, IBMVNIC_INVALID_MAP, 0, 3]
-                                               	consumer_index^
-    tx_buff == [skb=null, skb=<ptr>, skb=<ptr>, skb=null, skb=null]
-
-The driver has checks to ensure that free_map[consumer_index] pointed to
-a valid index but there was no check to ensure that this index pointed
-to an unused/null skb address. So, if, by some chance, our free_map and
-tx_buff lists become out of sync then we were previously risking an
-skb memory leak. This could then cause tcp congestion control to stop
-sending packets, eventually leading to ETIMEDOUT.
-
-Therefore, add a conditional to ensure that the skb address is null. If
-not then warn the user (because this is still a bug that should be
-patched) and free the old pointer to prevent memleak/tcp problems.
-
-Signed-off-by: Nick Child <nnac123@linux.ibm.com>
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
-[Denis: minor fix to resolve merge conflict.]
-Signed-off-by: Denis Arefev <arefev@swemel.ru>
----
-Backport fix for CVE-2024-41066
-Link: https://nvd.nist.gov/vuln/detail/CVE-2024-41066
----
- drivers/net/ethernet/ibm/ibmvnic.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
-
-diff --git a/drivers/net/ethernet/ibm/ibmvnic.c b/drivers/net/ethernet/ibm/ibmvnic.c
-index 84da6ccaf339..439796975cbf 100644
---- a/drivers/net/ethernet/ibm/ibmvnic.c
-+++ b/drivers/net/ethernet/ibm/ibmvnic.c
-@@ -1625,6 +1625,18 @@ static netdev_tx_t ibmvnic_xmit(struct sk_buff *skb, struct net_device *netdev)
- 	    (tx_pool->consumer_index + 1) % tx_pool->num_buffers;
- 
- 	tx_buff = &tx_pool->tx_buff[index];
-+
-+	/* Sanity checks on our free map to make sure it points to an index
-+	 * that is not being occupied by another skb. If skb memory is
-+	 * not freed then we see congestion control kick in and halt tx.
-+	 */
-+	if (unlikely(tx_buff->skb)) {
-+		dev_warn_ratelimited(dev, "TX free map points to untracked skb (%s %d idx=%d)\n",
-+				     skb_is_gso(skb) ? "tso_pool" : "tx_pool",
-+				     queue_num, bufidx);
-+		dev_kfree_skb_any(tx_buff->skb);
-+	}
-+
- 	tx_buff->skb = skb;
- 	tx_buff->data_dma[0] = data_dma_addr;
- 	tx_buff->data_len[0] = skb->len;
--- 
-2.43.0
-
+Thank you,
+--breno
 
