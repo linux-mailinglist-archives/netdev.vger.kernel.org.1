@@ -1,50 +1,63 @@
-Return-Path: <netdev+bounces-159769-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159770-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98152A16C74
-	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 13:40:09 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A39D8A16C82
+	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 13:46:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B19413A524D
-	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 12:40:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4DA351889B14
+	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 12:46:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08DE81DFDBB;
-	Mon, 20 Jan 2025 12:40:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 611B41DDD1;
+	Mon, 20 Jan 2025 12:46:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pin4uBQC"
+	dkim=pass (1024-bit key) header.d=swemel.ru header.i=@swemel.ru header.b="oai8Q/QK"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx.swemel.ru (mx.swemel.ru [95.143.211.150])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1A081B86F7;
-	Mon, 20 Jan 2025 12:40:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D63271FC8;
+	Mon, 20 Jan 2025 12:46:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.143.211.150
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737376805; cv=none; b=MGBu0zaxfaMhjHggqH7KrC1Y0GX3GR3Vmscq5Zvqls7INldnwCsmHbaZXvskFzgnriJkl4WMEp6HBJtIBOp58Ja0SuL9Xb2XwRKo0uP9Vzt2z86JOxIvX4c6EtRZjLsfgvas09P7tpK1g7Tw56Vfaz5GdrVCX+x21izIIs+uf9w=
+	t=1737377176; cv=none; b=JSMjZi5rQHYzUwhhBHD2CATgmAmCalUeXe0cIjLHADKE83kOWcxM/L7yHagQaqYh6PsGuGFSC1ZzGAMJF6NHge6KCbgq/lATrg+w+HvrGQrZ18Im9lHOcOL4QO+bC/WURVyGFQ823n42rSQ5lHjmQldU7f6DHL3tmLvZkAdEYn8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737376805; c=relaxed/simple;
-	bh=fZc2a6tDS9L/wQ44T90GZf/WZl/atcL0p7qKocnG1QU=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=JLmMAUR3PG5O7BJabvUzmFOqUhhBZiEuu3dBydFp6kUS8fcTG5GcAbVZDC7DeCs+EdGsvEKybVVMCmL6zjj9yD5RKEU/L7Q+aaY9NW2b5uhpA12BpjI9B2n+4J6ciiBipkInx+/ZGK7/kHUcaAE8QmuZfc269F1C++AQswTkhBw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pin4uBQC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 47FB9C4CEDD;
-	Mon, 20 Jan 2025 12:40:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737376805;
-	bh=fZc2a6tDS9L/wQ44T90GZf/WZl/atcL0p7qKocnG1QU=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=pin4uBQCRQILpCSabhj2qJClvg0l1Gnh06iAla3++T5IK3i70hOMBMmxD4EcACfJM
-	 JfjhoBo+8hadpR2AJPDWWyyCh46rhXarg0irQ5Dn9MZXy5zlcgquUQVlIO6qgBSpwf
-	 txYIszK+T8a4MbClYg1r+PZeyskiSgxNDmvmp9GWJ4iyCmIGqV6bUDnbdhs8gGveXZ
-	 6i2tMEu1c2StwZeOx/tdHIT9ZWURRYmlbGUecos/yTHIwRsbeolfHFfWg79yLiMVHy
-	 2G5oLveSjXyW4q+t5wBSjOcL1Ey5onX3/CbueaFBM5MgCt8OmYu6Yw2SvhxuOI2x5V
-	 qs1iLrXRNqVQw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70D12380AA62;
-	Mon, 20 Jan 2025 12:40:30 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1737377176; c=relaxed/simple;
+	bh=ckmUieoQ6c7b2h5qvdikaklIDj7v6vTDGluUVK1/L88=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WUhtJvOaqVjPUicDiGfkrSrysJgd2hdGUP1o2R2O+wE8VtDNnvSXSZ80fGxp+D1e8qQyJLpOEdJMS5r2q8P85f4T8j/7L5T8mb1I7ftfjPyfQXJQ+514QbVBlIKQilgYaca/gjXgpXJZ4sMwxoDivoU4ZB85Z6zqEyHq5DO0juk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=swemel.ru; spf=pass smtp.mailfrom=swemel.ru; dkim=pass (1024-bit key) header.d=swemel.ru header.i=@swemel.ru header.b=oai8Q/QK; arc=none smtp.client-ip=95.143.211.150
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=swemel.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=swemel.ru
+From: Denis Arefev <arefev@swemel.ru>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=swemel.ru; s=mail;
+	t=1737377171;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=mXZ3I+8rEu5hC7Bbr/07M4uZY5uMU2tu8N9VtF7I1iA=;
+	b=oai8Q/QKw5LqOWxxqAprZkqYpgoN8NZC/ObNCToUubGbEn/gh/nB7CRoHqDAkGqcegZSie
+	W94FUdMXxAEa6f+YMfQ1Cxato7KLUzk2lCNMiEWVD63EuGJfOkqxUPSddTfEoLjGmSlKQL
+	o9v/OvTZbUY9iASnWG4hyWlVn87tQy0=
+To: stable@vger.kernel.org,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Nick Child <nnac123@linux.ibm.com>,
+	Dany Madden <drt@linux.ibm.com>,
+	Lijun Pan <ljp@linux.ibm.com>,
+	Sukadev Bhattiprolu <sukadev@linux.ibm.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+	Paul Mackerras <paulus@samba.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	netdev@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org,
+	linux-kernel@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: [PATCH 5.10] ibmvnic: Add tx check to prevent skb leak
+Date: Mon, 20 Jan 2025 15:46:10 +0300
+Message-ID: <20250120124611.51436-1-arefev@swemel.ru>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,43 +65,69 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: phy: realtek: HWMON support for standalone
- versions of RTL8221B and RTL8251
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173737682925.3514605.1334404716425790297.git-patchwork-notify@kernel.org>
-Date: Mon, 20 Jan 2025 12:40:29 +0000
-References: <20250117222421.3673-1-olek2@wp.pl>
-In-Reply-To: <20250117222421.3673-1-olek2@wp.pl>
-To: Aleksander Jan Bajkowski <olek2@wp.pl>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- daniel@makrotopia.org, ericwouds@gmail.com, kabel@kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Hello:
+From: Nick Child <nnac123@linux.ibm.com>
 
-This patch was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
+From: Nick Child <nnac123@linux.ibm.com>
 
-On Fri, 17 Jan 2025 23:24:21 +0100 you wrote:
-> HWMON support has been added for the RTL8221/8251 PHYs integrated together
-> with the MAC inside the RTL8125/8126 chips. This patch extends temperature
-> reading support for standalone variants of the mentioned PHYs.
-> 
-> I don't know whether the earlier revisions of the RTL8226 also have a
-> built-in temperature sensor, so they have been skipped for now.
-> 
-> [...]
+commit 0983d288caf984de0202c66641577b739caad561 upstream.
 
-Here is the summary with links:
-  - [net-next] net: phy: realtek: HWMON support for standalone versions of RTL8221B and RTL8251
-    https://git.kernel.org/netdev/net-next/c/64ff63aeefb0
+Below is a summary of how the driver stores a reference to an skb during
+transmit:
+    tx_buff[free_map[consumer_index]]->skb = new_skb;
+    free_map[consumer_index] = IBMVNIC_INVALID_MAP;
+    consumer_index ++;
+Where variable data looks like this:
+    free_map == [4, IBMVNIC_INVALID_MAP, IBMVNIC_INVALID_MAP, 0, 3]
+                                               	consumer_index^
+    tx_buff == [skb=null, skb=<ptr>, skb=<ptr>, skb=null, skb=null]
 
-You are awesome, thank you!
+The driver has checks to ensure that free_map[consumer_index] pointed to
+a valid index but there was no check to ensure that this index pointed
+to an unused/null skb address. So, if, by some chance, our free_map and
+tx_buff lists become out of sync then we were previously risking an
+skb memory leak. This could then cause tcp congestion control to stop
+sending packets, eventually leading to ETIMEDOUT.
+
+Therefore, add a conditional to ensure that the skb address is null. If
+not then warn the user (because this is still a bug that should be
+patched) and free the old pointer to prevent memleak/tcp problems.
+
+Signed-off-by: Nick Child <nnac123@linux.ibm.com>
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+[Denis: minor fix to resolve merge conflict.]
+Signed-off-by: Denis Arefev <arefev@swemel.ru>
+---
+Backport fix for CVE-2024-41066
+Link: https://nvd.nist.gov/vuln/detail/CVE-2024-41066
+---
+ drivers/net/ethernet/ibm/ibmvnic.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+diff --git a/drivers/net/ethernet/ibm/ibmvnic.c b/drivers/net/ethernet/ibm/ibmvnic.c
+index 84da6ccaf339..439796975cbf 100644
+--- a/drivers/net/ethernet/ibm/ibmvnic.c
++++ b/drivers/net/ethernet/ibm/ibmvnic.c
+@@ -1625,6 +1625,18 @@ static netdev_tx_t ibmvnic_xmit(struct sk_buff *skb, struct net_device *netdev)
+ 	    (tx_pool->consumer_index + 1) % tx_pool->num_buffers;
+ 
+ 	tx_buff = &tx_pool->tx_buff[index];
++
++	/* Sanity checks on our free map to make sure it points to an index
++	 * that is not being occupied by another skb. If skb memory is
++	 * not freed then we see congestion control kick in and halt tx.
++	 */
++	if (unlikely(tx_buff->skb)) {
++		dev_warn_ratelimited(dev, "TX free map points to untracked skb (%s %d idx=%d)\n",
++				     skb_is_gso(skb) ? "tso_pool" : "tx_pool",
++				     queue_num, bufidx);
++		dev_kfree_skb_any(tx_buff->skb);
++	}
++
+ 	tx_buff->skb = skb;
+ 	tx_buff->data_dma[0] = data_dma_addr;
+ 	tx_buff->data_len[0] = skb->len;
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.43.0
 
 
