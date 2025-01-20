@@ -1,249 +1,175 @@
-Return-Path: <netdev+bounces-159872-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159873-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CAAD6A17407
-	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 22:19:51 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 212EDA17412
+	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 22:23:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3FAFB1889E55
-	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 21:19:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 229B53A76F3
+	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 21:23:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 530141EEA46;
-	Mon, 20 Jan 2025 21:19:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98BFF1EF0AE;
+	Mon, 20 Jan 2025 21:23:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="ExslH8my"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ekNZDxZm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D093E190462
-	for <netdev@vger.kernel.org>; Mon, 20 Jan 2025 21:19:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C376919A28D
+	for <netdev@vger.kernel.org>; Mon, 20 Jan 2025 21:23:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737407987; cv=none; b=ld2dgveZlNJW3SFv817Z0t+BJSmkZgawV0qQ6FapEbgDjpmnvwYu6Aaa4gN2pgBRmyYbqCBIdE4qREzvpIP8A/afbgESGJr52W8aIvR8l6cuwjkHKfGq18N7A1B5TLaEn1OVclzsJsF0xyj5iiAAIDy+l9VjH1Tj1Nq/qe+UOHY=
+	t=1737408235; cv=none; b=Fp21a6t8zIVDHA0MJE2w69BU1HsKrP8QA5dF/5NdPzxyN/lldbFLtkuJsW86Ht5kxro+K13wFOLBMrjglP9rOZmF+QJcXKQETeXW/AVT5RNFFXsSk6fxdO4e+nu3M8k5lP1GSf6ToVViq+7dsN/29Es4pg45Oiapz5jnhDnCck0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737407987; c=relaxed/simple;
-	bh=ztHIfq+kMYRnka64Aild+IyNbHkEJmqyRdMYdvv+HVs=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=AyfuYVcC88Krmtk+rz/EaO5VNJgTK+vq0Kt91lad4DjcGl8s2UQiPubBgTzE/McOvC+HVwerRtOnDx9poDmRNsWFlnBVLQbLtGOWzNhzoAhCULv+Wexiam6hvU/49cAjZPoU/V03kNprfVQ5xSzOiQCTwabxAVbnr2k+CktFE4k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=ExslH8my; arc=none smtp.client-ip=209.85.208.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
-Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-5d3d0205bd5so7882986a12.3
-        for <netdev@vger.kernel.org>; Mon, 20 Jan 2025 13:19:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openvpn.net; s=google; t=1737407983; x=1738012783; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :content-language:references:cc:to:from:subject:user-agent
-         :mime-version:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=dLz88EtFjvCclEbYQA9vL8cyUXQFnBDlh8OoQYVWA4U=;
-        b=ExslH8myN9tumLDqWaDFUiJqeJ/dK7o0SfQ0ZhZv4HXnopuJLtUlWzLnXQ6h8sUA5V
-         t18EgeHTS5UW8YKOFphVltM4OtoKIHeuXadHqISMp7eQ+GXCizagsRsC5PBquyeu99Uy
-         mskBcCO+Lp0MVor68F8hk0nNPaEqmf4GiroAQUPIcpKy6dRrb2gmiGcTWiwcFP0kUKkH
-         VFNTqE7EsBGN4V1Hiyz0t+GEwrAlXaG0tSkfOCAVlR7KtYtjPBGy9NkDbHgAsabo+rA1
-         hWJum64ePONErXW8juCrsESMmw7oYdDY43NoFmQ8k9hhc3kftuPzWRuDu6RdWmRTqKVS
-         FBYA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737407983; x=1738012783;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :content-language:references:cc:to:from:subject:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=dLz88EtFjvCclEbYQA9vL8cyUXQFnBDlh8OoQYVWA4U=;
-        b=pCldqimnrTA9ctYBiB2ELj9lWqTHfspogukZFj4o22JFxj+I3S+2eAps4OYMvk+MZN
-         ukibkbQDXVlxYfLKk9KacGvpJr1k3yhnhBWBPbntwR57xsc3kAnv9zUehJk7HQdBkLQz
-         5HuEDFfjosvAKWDKZaMxmGCOEKBxhwPc/IH02kus5YeqsvEFjZ4wIyRvEbBunTWsCYkn
-         ze5XnTyDoQ9ycYfKAac9KC/s6Z9lBmCOULtGy15Jhq9YJXBR+X0D9RFi0YfRwoCcmwN7
-         e3VSgbMa0aUgEgvnVOi2qoTtHgMKcwmPrOfguxmavj6sq2Lsi8bo15HzZrNZn0cn3FjZ
-         T/tA==
-X-Gm-Message-State: AOJu0Yy/dcTCzRk0deL8OG7ktIDKGmG3p/8JQY9VRualoMRpDH3e4FaJ
-	0kcZuK2oHNfzE/QE6h3rvv1AgxAfAOCvy2TnfTV/aDQr184qWWsEo7EhMnRz3Fs=
-X-Gm-Gg: ASbGncvXgkmH6TVmMCYoM2aVn1yw8xCwP3L4S3jRP8G4AJJ7yrdEVhJVNRaz4ZLeiXi
-	cgck73enfTPL0uL1RanaeweLxpagwT7ZT8lWS0gJZ2Vks1JdFiT2ocG3qLxdaOYFBe8jjXfVK7q
-	4w4EKDBxiQXSMjExQolPPp/Utx1S/OXgiq6/wmfb6SrMwmWWb25ewrMaH8mNuGuftIc4YN2qdbx
-	zCLUlgCDoQXsW6vLCWNmvmmpgs4pCKNMemTC4tyKIbb+H4zwo2VtzvodXzpI//7kA9CCZMnduZS
-	e8x7AADV4sRU9/2HN1p8q90tE3Ydb3RZ
-X-Google-Smtp-Source: AGHT+IGfqqD+RQy/J1+9sdB7DCRmrqy9QWvzWCYOyeE/2D+11UrIwFdxyXSW3jJ9POG+4a4E96rLYg==
-X-Received: by 2002:a17:907:9721:b0:a9e:d4a9:2c28 with SMTP id a640c23a62f3a-ab38b41f651mr1366033766b.53.1737407983075;
-        Mon, 20 Jan 2025 13:19:43 -0800 (PST)
-Received: from ?IPV6:2001:67c:2fbc:1:533e:60a6:30e7:6862? ([2001:67c:2fbc:1:533e:60a6:30e7:6862])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ab384ce213esm671383766b.63.2025.01.20.13.19.41
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 20 Jan 2025 13:19:42 -0800 (PST)
-Message-ID: <4238ae90-9d3f-4c6a-b540-bea3c2e1addc@openvpn.net>
-Date: Mon, 20 Jan 2025 22:20:40 +0100
+	s=arc-20240116; t=1737408235; c=relaxed/simple;
+	bh=ic1YrMkJxR4nE3jNr5cjpGoYV6GC29ktrDXoEPyUpKc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=m+a01b9S9yRBAhGNHn/EproI8L+997MFu7JB16g4CbvIbqzOvUl/9sYUu2siGFWUxs1LSa0/6VuApJjotv2g6FrFjoPWIBoLW0Q+l1MrkjZmbl5u3TLDvPxv2ckGd+hRe9qW8xNpEKc467fVj3WcsJ6F6Womk3fg+2TqdpKbPOo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ekNZDxZm; arc=none smtp.client-ip=192.198.163.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1737408234; x=1768944234;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=ic1YrMkJxR4nE3jNr5cjpGoYV6GC29ktrDXoEPyUpKc=;
+  b=ekNZDxZmfQTdSjpDbWQ6ntpJF2Mp5yEmQE56HQz9PYmZDo7wQY+0pH5B
+   7ILp/ls3s6rgtUPxxgdCsRH2RsfklRA85OcIw9hcd9E5KnYJbCBhA1qMT
+   OytjVURGTZNG/LzdR5Fl+Nm4Xv4G8xMTf9k8GHjy/EOaD9LY6Kq8aCDYc
+   ooTSVFdwk/659IbUdWEHiB5EOqQe9IvdiJ2xI1GPvKaNUU4Ojk1OpeKhQ
+   mJR7O6odSgl5IH3AZdNZ+0k058YoUbjsoYpgDEtTVsic5kzngvezc+Hqb
+   OsOFACd4ia464GBHpV6O9vFjaB7ABtBCgfnIiXFvNWMnSQTpWjwq5b6If
+   g==;
+X-CSE-ConnectionGUID: QLBPh8z6SBKUcXjlKaXsFg==
+X-CSE-MsgGUID: iF1aZ1x/T6eTcGmpjis8jg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11321"; a="48475920"
+X-IronPort-AV: E=Sophos;i="6.13,220,1732608000"; 
+   d="scan'208";a="48475920"
+Received: from fmviesa006.fm.intel.com ([10.60.135.146])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jan 2025 13:23:53 -0800
+X-CSE-ConnectionGUID: Vp8efN4qTyCwHtM32NumhA==
+X-CSE-MsgGUID: AfvhZqVxR/O+qnBqFlRZrQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.13,220,1732608000"; 
+   d="scan'208";a="106434227"
+Received: from lkp-server01.sh.intel.com (HELO d63d4d77d921) ([10.239.97.150])
+  by fmviesa006.fm.intel.com with ESMTP; 20 Jan 2025 13:23:51 -0800
+Received: from kbuild by d63d4d77d921 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1tZzFM-000Wz1-2D;
+	Mon, 20 Jan 2025 21:23:48 +0000
+Date: Tue, 21 Jan 2025 05:23:05 +0800
+From: kernel test robot <lkp@intel.com>
+To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	intel-wired-lan@lists.osuosl.org
+Cc: oe-kbuild-all@lists.linux.dev,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	netdev@vger.kernel.org, xudu@redhat.com, anthony.l.nguyen@intel.com,
+	przemyslaw.kitszel@intel.com, jacob.e.keller@intel.com,
+	jmaxwell@redhat.com, magnus.karlsson@intel.com
+Subject: Re: [Intel-wired-lan] [PATCH v3 iwl-net 3/3] ice: stop storing XDP
+ verdict within ice_rx_buf
+Message-ID: <202501210750.KInYtrPt-lkp@intel.com>
+References: <20250120155016.556735-4-maciej.fijalkowski@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v18 20/25] ovpn: implement peer
- add/get/dump/delete via netlink
-From: Antonio Quartulli <antonio@openvpn.net>
-To: ryazanov.s.a@gmail.com, Sabrina Dubroca <sd@queasysnail.net>
-Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Donald Hunter <donald.hunter@gmail.com>, Shuah Khan <shuah@kernel.org>,
- Andrew Lunn <andrew+netdev@lunn.ch>, Simon Horman <horms@kernel.org>,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
- Xiao Liang <shaw.leon@gmail.com>
-References: <20250113-b4-ovpn-v18-0-1f00db9c2bd6@openvpn.net>
- <20250113-b4-ovpn-v18-20-1f00db9c2bd6@openvpn.net> <Z4pDpqN2hCc-7DGt@hog>
- <f5507529-e61c-4b81-ab93-4ea6c8df46e9@openvpn.net> <Z4qPjuK3_fQUYLJi@hog>
- <33710520-5f4f-4d33-a28d-99dc64afc9c3@openvpn.net> <Z44gwl2d8ThTshzQ@hog>
- <94e44fdb-314c-41b0-8091-cff5789735b2@openvpn.net>
-Content-Language: en-US
-Autocrypt: addr=antonio@openvpn.net; keydata=
- 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
-Organization: OpenVPN Inc.
-In-Reply-To: <94e44fdb-314c-41b0-8091-cff5789735b2@openvpn.net>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250120155016.556735-4-maciej.fijalkowski@intel.com>
 
-On 20/01/2025 11:45, Antonio Quartulli wrote:
-[...]
->>>>>> I'm not sure what this (and the peer flushing on NETDEV_DOWN) is
->>>>>> trying to accomplish. Is it a problem to keep peers when the 
->>>>>> netdevice
->>>>>> is down?
->>>>>
->>>>> This is the result of my discussion with Sergey that started in v23 
->>>>> 5/23:
->>>>>
->>>>> https://lore.kernel.org/r/netdev/20241029-b4-ovpn-v11-5- 
->>>>> de4698c73a25@openvpn.net/
->>>>>
->>>>> The idea was to match operational state with actual connectivity to 
->>>>> peer(s).
->>>>>
->>>>> Originally I wanted to simply kee the carrier always on, but after 
->>>>> further
->>>>> discussion (including the meaning of the openvpn option --persist- 
->>>>> tun) we
->>>>> agreed on following the logic where an UP device has a peer 
->>>>> connected (logic
->>>>> is slightly different between MP and P2P).
->>>>>
->>>>> I am not extremely happy with the resulting complexity, but it 
->>>>> seemed to be
->>>>> blocker for Sergey.
->>>>
->>>> [after re-reading that discussion with Sergey]
->>>>
->>>> I don't understand why "admin does 'ip link set tun0 down'" means "we
->>>> should get rid of all peers. For me the carrier situation goes the
->>>> other way: no peer, no carrier (as if I unplugged the cable from my
->>>> ethernet card), and it's independent of what the user does (ip link
->>>> set XXX up/down). You have that with netif_carrier_{on,off}, but
->>>> flushing peers when the admin does "ip link set tun0 down" is separate
->>>> IMO.
->>>
->>> The reasoning was "the user is asking the VPN to go down - it should be
->>> assumed that from that moment on no VPN traffic whatsoever should 
->>> flow in
->>> either direction".
->>> Similarly to when you bring an Eth interface dwn - the phy link goes 
->>> down as
->>> well.
->>>
->>> Does it make sense?
->>
->> I'm not sure. If I turn the ovpn interface down for a second, the
->> peers are removed. Will they come back when I bring the interface back
->> up?  That'd have to be done by userspace (which could also watch for
->> the DOWN events and tell the kernel to flush the peers) - but some of
->> the peers could have timed out in the meantime.
->>
->> If I set the VPN interface down, I expect no packets flowing through
->> that interface (dropping the peers isn't necessary for that), but all
->> non-data (key exchange etc sent by openvpn's userspace) should still
->> go through, and IMO peer keepalive fits in that "non-data" category.
-> 
-> This was my original thought too and my original proposal followed this 
-> idea :-)
-> 
-> However Sergey had a strong opinion about "the user expect no traffic 
-> whatsoever".
-> 
-> I'd be happy about going again with your proposed approach, but I need 
-> to be sure that on the next revision nobody will come asking to revert 
-> this logic again :(
-> 
->>
->>
->> What does openvpn currently do if I do
->>      ip link set tun0 down ; sleep 5 ; ip link set tun0 up
->> with a tuntap interface?
-> 
-> I think nothing happens, because userspace doesn't monitor the netdev 
-> status. Therefore, unless tun closed the socket (which I think it does 
-> only when the interface is destroyed), userspace does not even realize 
-> that the interface went down.
+Hi Maciej,
 
-What does IPsec do in this case? Does it keep connections open and 
-keepalives flowing?
+kernel test robot noticed the following build warnings:
 
-One counter example we have in the kernel are 802.11 interfaces.
-Any 802.11 interface must be brought up before you can possibly 
-establish a WiFi link. If you bring the interface down the link is 
-closed and no 802.11 control packets flow anymore.
+[auto build test WARNING on tnguy-net-queue/dev-queue]
 
-However, 802.11 is different as we are controlling a "physical 
-behaviour", while in ovpn (like other tunneling modules) we are 
-controlling a "virtual behaviour".
+url:    https://github.com/intel-lab-lkp/linux/commits/Maciej-Fijalkowski/ice-put-Rx-buffers-after-being-done-with-current-frame/20250120-235320
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/tnguy/net-queue.git dev-queue
+patch link:    https://lore.kernel.org/r/20250120155016.556735-4-maciej.fijalkowski%40intel.com
+patch subject: [Intel-wired-lan] [PATCH v3 iwl-net 3/3] ice: stop storing XDP verdict within ice_rx_buf
+config: arc-randconfig-001-20250121 (https://download.01.org/0day-ci/archive/20250121/202501210750.KInYtrPt-lkp@intel.com/config)
+compiler: arceb-elf-gcc (GCC) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250121/202501210750.KInYtrPt-lkp@intel.com/reproduce)
 
-Regards,
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202501210750.KInYtrPt-lkp@intel.com/
 
-> 
-> Regards,
-> 
->>
-> 
+All warnings (new ones prefixed by >>):
+
+>> drivers/net/ethernet/intel/ice/ice_txrx.c:539: warning: Excess function parameter 'rx_buf' description in 'ice_run_xdp'
+
+
+vim +539 drivers/net/ethernet/intel/ice/ice_txrx.c
+
+cdedef59deb020 Anirudh Venkataramanan 2018-03-20  523  
+efc2214b6047b6 Maciej Fijalkowski     2019-11-04  524  /**
+efc2214b6047b6 Maciej Fijalkowski     2019-11-04  525   * ice_run_xdp - Executes an XDP program on initialized xdp_buff
+efc2214b6047b6 Maciej Fijalkowski     2019-11-04  526   * @rx_ring: Rx ring
+efc2214b6047b6 Maciej Fijalkowski     2019-11-04  527   * @xdp: xdp_buff used as input to the XDP program
+efc2214b6047b6 Maciej Fijalkowski     2019-11-04  528   * @xdp_prog: XDP program to run
+eb087cd828648d Maciej Fijalkowski     2021-08-19  529   * @xdp_ring: ring to be used for XDP_TX action
+1dc1a7e7f4108b Maciej Fijalkowski     2023-01-31  530   * @rx_buf: Rx buffer to store the XDP action
+d951c14ad237b0 Larysa Zaremba         2023-12-05  531   * @eop_desc: Last descriptor in packet to read metadata from
+efc2214b6047b6 Maciej Fijalkowski     2019-11-04  532   *
+efc2214b6047b6 Maciej Fijalkowski     2019-11-04  533   * Returns any of ICE_XDP_{PASS, CONSUMED, TX, REDIR}
+efc2214b6047b6 Maciej Fijalkowski     2019-11-04  534   */
+55a1a17189d7a5 Maciej Fijalkowski     2025-01-20  535  static u32
+e72bba21355dbb Maciej Fijalkowski     2021-08-19  536  ice_run_xdp(struct ice_rx_ring *rx_ring, struct xdp_buff *xdp,
+1dc1a7e7f4108b Maciej Fijalkowski     2023-01-31  537  	    struct bpf_prog *xdp_prog, struct ice_tx_ring *xdp_ring,
+55a1a17189d7a5 Maciej Fijalkowski     2025-01-20  538  	    union ice_32b_rx_flex_desc *eop_desc)
+efc2214b6047b6 Maciej Fijalkowski     2019-11-04 @539  {
+1dc1a7e7f4108b Maciej Fijalkowski     2023-01-31  540  	unsigned int ret = ICE_XDP_PASS;
+efc2214b6047b6 Maciej Fijalkowski     2019-11-04  541  	u32 act;
+efc2214b6047b6 Maciej Fijalkowski     2019-11-04  542  
+1dc1a7e7f4108b Maciej Fijalkowski     2023-01-31  543  	if (!xdp_prog)
+1dc1a7e7f4108b Maciej Fijalkowski     2023-01-31  544  		goto exit;
+1dc1a7e7f4108b Maciej Fijalkowski     2023-01-31  545  
+d951c14ad237b0 Larysa Zaremba         2023-12-05  546  	ice_xdp_meta_set_desc(xdp, eop_desc);
+d951c14ad237b0 Larysa Zaremba         2023-12-05  547  
+efc2214b6047b6 Maciej Fijalkowski     2019-11-04  548  	act = bpf_prog_run_xdp(xdp_prog, xdp);
+efc2214b6047b6 Maciej Fijalkowski     2019-11-04  549  	switch (act) {
+efc2214b6047b6 Maciej Fijalkowski     2019-11-04  550  	case XDP_PASS:
+1dc1a7e7f4108b Maciej Fijalkowski     2023-01-31  551  		break;
+efc2214b6047b6 Maciej Fijalkowski     2019-11-04  552  	case XDP_TX:
+22bf877e528f68 Maciej Fijalkowski     2021-08-19  553  		if (static_branch_unlikely(&ice_xdp_locking_key))
+22bf877e528f68 Maciej Fijalkowski     2021-08-19  554  			spin_lock(&xdp_ring->tx_lock);
+055d0920685e53 Alexander Lobakin      2023-02-10  555  		ret = __ice_xmit_xdp_ring(xdp, xdp_ring, false);
+22bf877e528f68 Maciej Fijalkowski     2021-08-19  556  		if (static_branch_unlikely(&ice_xdp_locking_key))
+22bf877e528f68 Maciej Fijalkowski     2021-08-19  557  			spin_unlock(&xdp_ring->tx_lock);
+1dc1a7e7f4108b Maciej Fijalkowski     2023-01-31  558  		if (ret == ICE_XDP_CONSUMED)
+89d65df024c599 Magnus Karlsson        2021-05-10  559  			goto out_failure;
+1dc1a7e7f4108b Maciej Fijalkowski     2023-01-31  560  		break;
+efc2214b6047b6 Maciej Fijalkowski     2019-11-04  561  	case XDP_REDIRECT:
+1dc1a7e7f4108b Maciej Fijalkowski     2023-01-31  562  		if (xdp_do_redirect(rx_ring->netdev, xdp, xdp_prog))
+89d65df024c599 Magnus Karlsson        2021-05-10  563  			goto out_failure;
+1dc1a7e7f4108b Maciej Fijalkowski     2023-01-31  564  		ret = ICE_XDP_REDIR;
+1dc1a7e7f4108b Maciej Fijalkowski     2023-01-31  565  		break;
+efc2214b6047b6 Maciej Fijalkowski     2019-11-04  566  	default:
+c8064e5b4adac5 Paolo Abeni            2021-11-30  567  		bpf_warn_invalid_xdp_action(rx_ring->netdev, xdp_prog, act);
+4e83fc934e3a04 Bruce Allan            2020-01-22  568  		fallthrough;
+efc2214b6047b6 Maciej Fijalkowski     2019-11-04  569  	case XDP_ABORTED:
+89d65df024c599 Magnus Karlsson        2021-05-10  570  out_failure:
+efc2214b6047b6 Maciej Fijalkowski     2019-11-04  571  		trace_xdp_exception(rx_ring->netdev, xdp_prog, act);
+4e83fc934e3a04 Bruce Allan            2020-01-22  572  		fallthrough;
+efc2214b6047b6 Maciej Fijalkowski     2019-11-04  573  	case XDP_DROP:
+1dc1a7e7f4108b Maciej Fijalkowski     2023-01-31  574  		ret = ICE_XDP_CONSUMED;
+efc2214b6047b6 Maciej Fijalkowski     2019-11-04  575  	}
+1dc1a7e7f4108b Maciej Fijalkowski     2023-01-31  576  exit:
+55a1a17189d7a5 Maciej Fijalkowski     2025-01-20  577  	return ret;
+efc2214b6047b6 Maciej Fijalkowski     2019-11-04  578  }
+efc2214b6047b6 Maciej Fijalkowski     2019-11-04  579  
 
 -- 
-Antonio Quartulli
-OpenVPN Inc.
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
