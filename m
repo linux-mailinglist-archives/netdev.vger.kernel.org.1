@@ -1,135 +1,236 @@
-Return-Path: <netdev+bounces-159731-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159732-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E73FFA16A86
-	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 11:13:21 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96E0AA16AA5
+	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 11:20:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 03E5B3A33D2
-	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 10:13:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B7C7616529D
+	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 10:20:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 513131B4232;
-	Mon, 20 Jan 2025 10:13:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAA7E1ABEDF;
+	Mon, 20 Jan 2025 10:20:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="IXoOHnHv"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MUJxKxh1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE73019DF4A
-	for <netdev@vger.kernel.org>; Mon, 20 Jan 2025 10:13:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBDFD18FDC8
+	for <netdev@vger.kernel.org>; Mon, 20 Jan 2025 10:20:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737367994; cv=none; b=jLDTvS3oDMox4tuQqPnaaLvFiOxHkuc558TC8qKcWczIRoTxckFVG123iPpdiV0KOsUZg2NlkS70U8vu/v87HKn+iRir5oI3aSorBmemzCYThFC7n53pLaFiMHfQfGCROaJZdZreDaQxAHw4LpPnbixSDAz3rICPsPK42K65pec=
+	t=1737368416; cv=none; b=CRb2ymRG+s5t4Zm8yem9xdfhs8PYGABpEo4IahQpM11AKJa6HSx1NMKWijBu9Zjcd65LPp6XHyQ423/egK/+Yx2tmpiAlNELJ8HmOEemYLG5B1CMHa+9uT3zt6ilqqWLGiJnI/8+KriKGr1w4HtXo+KVrGIWa7/OZG4rbIrvKNQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737367994; c=relaxed/simple;
-	bh=POeSpLXqMDnf4ncHbT7WX49tYfW9PFR0KWRj+oU7i6Y=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=iLUQmDPaX5mVOtLQHvUXjuBQM0uUEvQpYWsstwhvsmehD5t4hrCrhbXq/bTHJ2wv/2gSHURPNOZ350H6slvpk5o0U5YeQXDNPEi7XoRx3nU80Ed2xWuuBD5DdauisG8MV5ce3Zq8fYTRZoTkqoOUZ5ZD/8ZqOWnPvUZ3Nn46yWk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=IXoOHnHv; arc=none smtp.client-ip=209.85.218.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-aa689a37dd4so817309066b.3
-        for <netdev@vger.kernel.org>; Mon, 20 Jan 2025 02:13:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1737367990; x=1737972790; darn=vger.kernel.org;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=s+AmXtS555KTGh368N6qrcyGQOSWOD2uM0ZEZKy8e4w=;
-        b=IXoOHnHvuITax+uU8uyj3FCD1+zVkSGMte6VFd9kwcZQy+03YCcP2InjSq6RKd7Npg
-         hWAVjMa++UZ8MMeNiBC62klRpLf4PHfqAa0avOsNoCVzSpWCPGcoLRxCRvA6el2rDep9
-         x9vCfhkZPsyq7JthqO52fkSSpIxG0inGYhr/sWPY4FOVFDpw5lJYm4YRyGF0c34hUp4m
-         9Xn0ItD47XGtKu3RXXjPehu7QNwrBPeFtyxgJ8QAxzcAktboq3sq+6ogjlfc83dcKLgz
-         8P2RZSVAYNyv/FSqCv0Xvk8+p49BPgx1z23/d1vpn4sPWmD/eV9dANZep41BMNKyiLUE
-         oJrA==
+	s=arc-20240116; t=1737368416; c=relaxed/simple;
+	bh=fxS5aIr95xtbbKhwoCve2o0SVM9sdynxpUwKr+VTQLE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jgZQwBFWubt8mQcpqIFCj85HQqbDTOsR5UGpPeKBO9yn3V2ZHOggy49YzboVmJ4QjYv/YXX1Cm5JLOQsnRIxhfcaivTnGrakWP09QVlL4bXWi+6ykCCKP20+ImAQwsoN3zX2fobvBGJ0EBhmBOReJlEa7NrFZWBUvb/RzrxNaZ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MUJxKxh1; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1737368413;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=4T6CB9eqvuQZLLOI1dcrYLKVrCbNDCw2kfSU6+r9xo4=;
+	b=MUJxKxh1QqCy2gSD/VRvvlvfBsH0U+rLjnhWqXXvLKRPiKqbTSwfetHHCFH9JGtieeu/Tj
+	dz8P6rPcNfESss52vTVgb8VAFzwf9P2gEGSJCsc25Bqrh5+mO4Lj/Fdjo6uNafrOvQdCBl
+	QkOM0RHsy2xWHeu5z+OtvoMgqzC57OY=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-6-L8E3RGIhM-KS3maqZpZxrw-1; Mon, 20 Jan 2025 05:20:11 -0500
+X-MC-Unique: L8E3RGIhM-KS3maqZpZxrw-1
+X-Mimecast-MFC-AGG-ID: L8E3RGIhM-KS3maqZpZxrw
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3862e986d17so1781668f8f.3
+        for <netdev@vger.kernel.org>; Mon, 20 Jan 2025 02:20:11 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737367990; x=1737972790;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=s+AmXtS555KTGh368N6qrcyGQOSWOD2uM0ZEZKy8e4w=;
-        b=aWz1AcweVFjOiVyjZlB1lH5UnVDTUwGc21s60mUpCDKSGH5r7tQ4ZGTGx74j/mkOR4
-         DflVQ+x6VUmT4A/lmv+bj94m4BzihU98CA5bUWEvXVMHqjkCvFTFb7M8Pp3UfUIOZ+6T
-         +mQCgC0ywWCAnnjO1tQ0deLjjowJHRC7g9ctyKKXcCu1sFIPPeI5C7eDOBSNZS9cybwC
-         wgKX4zbmpzibpKNCa6UM+OaJlenxTqPLqQxDGZX7r2jbPBCg6UIMuQAEm8wocNCJzFL0
-         /8BCGR0jS6lAP0QC7Ya9mZ+0Vh5JSSq/lGCnIzNx9160SFfp+/D7l46qk3jGXi9eJPWP
-         WL3g==
-X-Forwarded-Encrypted: i=1; AJvYcCUfdeOFt9QI3q5p9qjowh6Gt2O7UpZLuM04kAHx/YnQov+VDnS18aL/92U7Ix8d1gsLFgZzW4g=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz5G/HHHA0xKcvvkDj07+vmRbdG0SmC4hZR7d67MCi09u2/zwJB
-	LE8K+Y5hKykMxMFpsHvevSZzvg5UNaVpjc/pte1Pcqr42yO9AGq4yJ3cxFet7Qw=
-X-Gm-Gg: ASbGnctrY3wG9sY0q5zqXzP0dK2C8S/vVz3kBBHDMQ/TCK3DLr+0w/I+HBg5QolImuM
-	C5Gh7rhMG4vgSdlZnvxez3CcQ03Mhwnwbz1r/Md5yv+bx6Pnd4+WcPtBmrO4ABWODUQvJZhcmJN
-	lDESeYyNfns9Dj0UHncT5c5oMjVf+My2jtI2vMLdlp5F2dtfvHMgHxnMQ8VzJRmCQEsC30QL0Xe
-	PH+g3LKNIFg+NfKneaHhUjT+Ce30q8FmZfcpFhq7EV9QuqgQTLDSxRfs70J4JE=
-X-Google-Smtp-Source: AGHT+IG3sxDHUYpin9r1buo9Oh2Jpo9gAgFq3g/a7WzAvcrq0JBMicje/huYwTSgfgvyeKZ4VF6qOw==
-X-Received: by 2002:a17:907:7faa:b0:a9e:b150:a99d with SMTP id a640c23a62f3a-ab38b1b45aamr1198652366b.5.1737367990090;
-        Mon, 20 Jan 2025 02:13:10 -0800 (PST)
-Received: from cloudflare.com ([2a09:bac5:506f:2387::38a:15])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ab384f224casm589585666b.87.2025.01.20.02.13.09
+        d=1e100.net; s=20230601; t=1737368410; x=1737973210;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4T6CB9eqvuQZLLOI1dcrYLKVrCbNDCw2kfSU6+r9xo4=;
+        b=v/vT+xUPfv7Zn4+SiUcyXnbcETiXNGy1vzGZDMhnPPQ/32GEfmejchxHngtT4Aw06E
+         sK7/nZYM6SiBoo9B1FHIi0vJW3n9fq379wOTBNDn5Wdh9FSpQCEDTysNUDUpmdiOhueB
+         i/t7UMMZ+caqnid/PozbX7/kFlADbk3COpOV4ndzUCDwVUlOZ4thbUArptLvdroUVhHM
+         zQYfqHbWztBUeHPNDznHxRCSR8fJYHehqYpSLPEtBRYNX8ZWG0jAbrtkKTxuJTsxJmFG
+         bO4ArqX/tcdISxDnkVajuK7WcUg1uqmHVQG5zaSNGhQDw8O8q1wWJiJGpg8g6NYPElbU
+         sykQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVTJfYiC892rajgcN1K95RlMeAPh090HxAbPFNLnAv6hRyg/m7InDIqKjQ1HtgDCD8bsVx4JyM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzvwnWTdmktmYDoR15kBxMKOKi0SN54jI552C2QxwYSTKFhuxem
+	gnRtgjtwmbHPreXSXsw0wNvramat1xysWmYUnYLz2kxs/oYZhJ+uhPfe/l8qGuSzVnQ/VSvP1zY
+	e4LDO4vgvNYqfYuRrKeilMTsXssassE5E88aZTmYC41fYA72EA88RGw==
+X-Gm-Gg: ASbGncsBRl1z95YdzzNTkSG3GwuQ0JntT72Iy0m6Uhj195wU92O2Fg73kgNLOd2uMTy
+	kjxm1QkX5DobvvdFxvl30Yzt6CPoevDw9n9HezCXi+PnqhJChejEqRG4hiDYn37cJlaYazX4XrC
+	xjfp9h2JRZ7jcZJn5mYGloonJuiaVHVeoQ5a6O36XqrkhMNuL+MX3YXFktcZKZ6n0zvDYlnVZI9
+	vgSd85mTi/5Y/PZ/SNWdocC5H5SoBLEXxwKHrbKiWtcGaE5JN6RmK0xG+iT3F1AOraF/8n3NDcZ
+	aklA8RcnuvIu3MFzv8aYAg//4YaKzLWxDPWVSzxqALGepA==
+X-Received: by 2002:a05:6000:144d:b0:385:e01b:7df5 with SMTP id ffacd0b85a97d-38bf565c2d0mr13369709f8f.14.1737368409868;
+        Mon, 20 Jan 2025 02:20:09 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGaooM+V+2Rdh1iiydqA0iPhei7em7s/ST+KIlTQEVgs+9Vb2sYoT+qXfBJ82sKOevYjCiO6w==
+X-Received: by 2002:a05:6000:144d:b0:385:e01b:7df5 with SMTP id ffacd0b85a97d-38bf565c2d0mr13369663f8f.14.1737368409217;
+        Mon, 20 Jan 2025 02:20:09 -0800 (PST)
+Received: from sgarzare-redhat (host-82-53-134-100.retail.telecomitalia.it. [82.53.134.100])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38bf3275622sm10117770f8f.69.2025.01.20.02.20.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 Jan 2025 02:13:09 -0800 (PST)
-From: Jakub Sitnicki <jakub@cloudflare.com>
-To: Jiayuan Chen <mrpre@163.com>
-Cc: bpf@vger.kernel.org,  john.fastabend@gmail.com,  netdev@vger.kernel.org,
-  martin.lau@linux.dev,  ast@kernel.org,  edumazet@google.com,
-  davem@davemloft.net,  dsahern@kernel.org,  kuba@kernel.org,
-  pabeni@redhat.com,  linux-kernel@vger.kernel.org,  song@kernel.org,
-  andrii@kernel.org,  mhal@rbox.co,  yonghong.song@linux.dev,
-  daniel@iogearbox.net,  xiyou.wangcong@gmail.com,  horms@kernel.org,
-  corbet@lwn.net,  eddyz87@gmail.com,  cong.wang@bytedance.com,
-  shuah@kernel.org,  mykolal@fb.com,  jolsa@kernel.org,  haoluo@google.com,
-  sdf@fomichev.me,  kpsingh@kernel.org,  linux-doc@vger.kernel.org
-Subject: Re: [PATCH bpf v7 2/5] bpf: fix wrong copied_seq calculation
-In-Reply-To: <j5piuelz2xt65bn42bxufmk4nmigvzjotbygwd5tin7t6cvrsj@gpon5o7px7tu>
-	(Jiayuan Chen's message of "Mon, 20 Jan 2025 11:35:37 +0800")
-References: <20250116140531.108636-1-mrpre@163.com>
-	<20250116140531.108636-3-mrpre@163.com>
-	<87ikqcdvm9.fsf@cloudflare.com>
-	<4uacr7khoalvlshkybaq4lqu55muax5adsrnqkulc6hgeuzaeg@eakft72epszp>
-	<j5piuelz2xt65bn42bxufmk4nmigvzjotbygwd5tin7t6cvrsj@gpon5o7px7tu>
-Date: Mon, 20 Jan 2025 11:13:08 +0100
-Message-ID: <87a5bliyiz.fsf@cloudflare.com>
+        Mon, 20 Jan 2025 02:20:08 -0800 (PST)
+Date: Mon, 20 Jan 2025 11:20:05 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Michal Luczaj <mhal@rbox.co>
+Cc: "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	George Zhang <georgezhang@vmware.com>, Dmitry Torokhov <dtor@vmware.com>, Andy King <acking@vmware.com>, 
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net 4/5] vsock/test: Add test for UAF due to socket
+ unbinding
+Message-ID: <34yqhvkemx27yoxwodfjdc7rwvuyr6sq2e2nlpyfhzvyscvccq@du25v6ljrebj>
+References: <20250117-vsock-transport-vs-autobind-v1-0-c802c803762d@rbox.co>
+ <20250117-vsock-transport-vs-autobind-v1-4-c802c803762d@rbox.co>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20250117-vsock-transport-vs-autobind-v1-4-c802c803762d@rbox.co>
 
-On Mon, Jan 20, 2025 at 11:35 AM +08, Jiayuan Chen wrote:
-> On Sat, Jan 18, 2025 at 11:29:04PM +0800, Jiayuan Chen wrote:
->> On Sat, Jan 18, 2025 at 03:50:22PM +0100, Jakub Sitnicki wrote:
->> > On Thu, Jan 16, 2025 at 10:05 PM +08, Jiayuan Chen wrote:
->> > > 'sk->copied_seq' was updated in the tcp_eat_skb() function when the
->> > > action of a BPF program was SK_REDIRECT. For other actions, like SK_PASS,
->> > > +}
->> > > +#endif /* CONFIG_BPF_STREAM_PARSER */
->> > > +
->> > >  int tcp_bpf_update_proto(struct sock *sk, struct sk_psock *psock, bool restore)
->> > >  {
->> > >  	int family = sk->sk_family == AF_INET6 ? TCP_BPF_IPV6 : TCP_BPF_IPV4;
->> > > @@ -681,6 +722,12 @@ int tcp_bpf_update_proto(struct sock *sk, struct sk_psock *psock, bool restore)
->> > >  
->> > >  	/* Pairs with lockless read in sk_clone_lock() */
->> > >  	sock_replace_proto(sk, &tcp_bpf_prots[family][config]);
->> > > +#if IS_ENABLED(CONFIG_BPF_STREAM_PARSER)
->> > > +	if (psock->progs.stream_parser && psock->progs.stream_verdict) {
->> > > +		psock->copied_seq = tcp_sk(sk)->copied_seq;
->> > > +		psock->read_sock = tcp_bpf_strp_read_sock;
->> > 
->> > Just directly set psock->strp.cb.read_sock to tcp_bpf_strp_read_sock.
->> > Then we don't need this intermediate psock->read_sock callback, which
->> > doesn't do anything useful.
->> >
->> Ok, I will do this.
->> (BTW, I intended to avoid bringing "struct strparser" into tcp_bpf.c so I
->> added a wrapper function instead in skmsg.c without calling it directly) 
->> 
-> I find that tcp_bpf_update_proto is called before sk_psock_init_strp. Any
-> assignment of psock->cb.strp will be overwritten in sk_psock_init_strp.
+On Fri, Jan 17, 2025 at 10:59:44PM +0100, Michal Luczaj wrote:
+>Fail the autobind, then trigger a transport reassign. Socket might get
+>unbound from unbound_sockets, which then leads to a reference count
+>underflow.
+>
+>Signed-off-by: Michal Luczaj <mhal@rbox.co>
+>---
+> tools/testing/vsock/vsock_test.c | 67 ++++++++++++++++++++++++++++++++++++++++
+> 1 file changed, 67 insertions(+)
+>
+>diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
+>index 28a5083bbfd600cf84a1a85cec2f272ce6912dd3..7f1916e23858b5ba407c34742a05b7bd6cfdcc10 100644
+>--- a/tools/testing/vsock/vsock_test.c
+>+++ b/tools/testing/vsock/vsock_test.c
+>@@ -1458,6 +1458,68 @@ static void test_stream_cred_upd_on_set_rcvlowat(const struct test_opts *opts)
+> 	test_stream_credit_update_test(opts, false);
+> }
+>
+>+#define MAX_PORT_RETRIES	24	/* net/vmw_vsock/af_vsock.c */
+>+#define VMADDR_CID_NONEXISTING	42
 
-Or just don't set ->read_sock in strp_init.
-It's being reset only because you made it so in patch 1 :-)
+I would suggest a slightly bigger and weirder CID, this might actually
+exist, (e.g. 4242424242)
+
+
+>+
+>+/* Test attempts to trigger a transport release for an unbound socket. This can
+>+ * lead to a reference count mishandling.
+>+ */
+>+static void test_seqpacket_transport_uaf_client(const struct test_opts *opts)
+>+{
+>+	int sockets[MAX_PORT_RETRIES];
+>+	struct sockaddr_vm addr;
+>+	int s, i, alen;
+>+
+>+	s = vsock_bind(VMADDR_CID_LOCAL, VMADDR_PORT_ANY, SOCK_SEQPACKET);
+
+In my suite this test failed because I have instances where I run it
+without vsock_loopback loaded.
+
+26 - connectible transport release use-after-free...bind: Cannot assign requested address
+
+Is it important to use VMADDR_CID_LOCAL or can we use VMADDR_CID_ANY?
+
+>+
+>+	alen = sizeof(addr);
+>+	if (getsockname(s, (struct sockaddr *)&addr, &alen)) {
+>+		perror("getsockname");
+>+		exit(EXIT_FAILURE);
+>+	}
+>+
+>+	for (i = 0; i < MAX_PORT_RETRIES; ++i)
+>+		sockets[i] = vsock_bind(VMADDR_CID_ANY, ++addr.svm_port,
+>+					SOCK_SEQPACKET);
+>+
+>+	close(s);
+>+	s = socket(AF_VSOCK, SOCK_SEQPACKET, 0);
+>+	if (s < 0) {
+>+		perror("socket");
+>+		exit(EXIT_FAILURE);
+>+	}
+>+
+>+	if (!connect(s, (struct sockaddr *)&addr, alen)) {
+>+		fprintf(stderr, "Unexpected connect() #1 success\n");
+>+		exit(EXIT_FAILURE);
+>+	}
+>+	/* connect() #1 failed: transport set, sk in unbound list. */
+>+
+>+	addr.svm_cid = VMADDR_CID_NONEXISTING;
+>+	if (!connect(s, (struct sockaddr *)&addr, alen)) {
+>+		fprintf(stderr, "Unexpected connect() #2 success\n");
+>+		exit(EXIT_FAILURE);
+>+	}
+>+	/* connect() #2 failed: transport unset, sk ref dropped? */
+>+
+>+	addr.svm_cid = VMADDR_CID_LOCAL;
+
+Ditto.
+
+>+	addr.svm_port = VMADDR_PORT_ANY;
+>+
+>+	/* Vulnerable system may crash now. */
+>+	bind(s, (struct sockaddr *)&addr, alen);
+
+Should we check the return of this function or do we not care whether
+it fails or not?
+
+>+
+>+	close(s);
+>+	while (i--)
+>+		close(sockets[i]);
+>+
+>+	control_writeln("DONE");
+>+}
+>+
+>+static void test_seqpacket_transport_uaf_server(const struct test_opts *opts)
+>+{
+>+	control_expectln("DONE");
+>+}
+>+
+> static struct test_case test_cases[] = {
+> 	{
+> 		.name = "SOCK_STREAM connection reset",
+>@@ -1588,6 +1650,11 @@ static struct test_case test_cases[] = {
+> 		.run_client = test_seqpacket_unsent_bytes_client,
+> 		.run_server = test_seqpacket_unsent_bytes_server,
+> 	},
+>+	{
+>+		.name = "connectible transport release use-after-free",
+
+If it doesn't matter that it is SOCK_STREAM or SOCK_SEQPACKET, I would
+rather test SOCK_STREAM because it is more common.
+
+Anyway, here I would specify which of the two we are testing for
+accordance.
+
+"SOCK_STREAM transport release use-after-free".
+
+Tanks for adding this test!
+Stefano
+
+>+		.run_client = test_seqpacket_transport_uaf_client,
+>+		.run_server = test_seqpacket_transport_uaf_server,
+>+	},
+> 	{},
+> };
+>
+>
+>-- 
+>2.47.1
+>
+
 
