@@ -1,80 +1,79 @@
-Return-Path: <netdev+bounces-159703-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159704-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 748F5A168A1
-	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 10:01:47 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A759A168A4
+	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 10:02:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2020C18894D1
-	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 09:01:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D9BE43A2496
+	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 09:02:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D26CF1AF0A6;
-	Mon, 20 Jan 2025 09:00:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB3361B415B;
+	Mon, 20 Jan 2025 09:01:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="D1FLXg7w"
+	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="erS+JdCq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C436B199947
-	for <netdev@vger.kernel.org>; Mon, 20 Jan 2025 09:00:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1BEB1B3949
+	for <netdev@vger.kernel.org>; Mon, 20 Jan 2025 09:01:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737363656; cv=none; b=Qe0+/804VgfbVD9+6UrSgftC+dxKsuZB2G1aL2dhVVWKqZKzw7wRs03ZQh7NpfmiPA0/us2DLgGn1oMTxttESSgC0ZWAeT0PH9DI466xkv8JZDHcKVVDQ9Jy6KtnZFrpfWbXWcf0b4YkCztmn9tJGendOpJEKZFDTlgvhObwqDA=
+	t=1737363664; cv=none; b=gfjv/lzdrB0T+zvqYqh3/sg/3tv2LJ7btCRI/xkUCnxlPOiuyDYsGpiDj4wdx1meiWIEc6ooAgK5OrB5XxhxSNwpFVT2ld1cEKj5KWgIZT5LwZue0RvlIiimDNf6FF2+HLWOB7ee10IOnpfiipirPC+8SH4YRJ6HptCuqMjg2fI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737363656; c=relaxed/simple;
-	bh=zHg9Cy8I4qWXw+IxBd6zljTvx2oEOGkHWlUMuk6vkYk=;
+	s=arc-20240116; t=1737363664; c=relaxed/simple;
+	bh=D/KbHpktOZmWZkuzza0bk8f9eJQf34LwugBKMP/xt28=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=qNpjjA2eJBeGn2VlZJRg+WO6T3ztCofTzD59yyzPGaWP6N9a6JEn75nwXksiKP/Dh2dWfrdMHBkfWza5myjC07z6IOJ8Ad0lRfFr518sgLOiZZRSQnuUHp3n3VEqjCWBHMylyYE4GX8papo1dWmdU5TICWEHCrnc28BPKbjsQ0g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=pass smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=D1FLXg7w; arc=none smtp.client-ip=209.85.214.171
+	 In-Reply-To:To:Cc; b=VJ0on/LFSLoZDBFW5w+6W1+k2gYYnwDPxidBsGTfi+3CkncRQvnKlJ5nRu6KyAh15CHWu8XQDa5czg/FctJTiZqx41+kwlpOxmh46lLLaug1tVZm2Q/Z+mkh2vcohQQFP3chzOP1UJs6l1HGsUKbfIVy4RsocXvLU6StXT7zs5I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=pass smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=erS+JdCq; arc=none smtp.client-ip=209.85.214.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=daynix.com
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-21bc1512a63so81199135ad.1
-        for <netdev@vger.kernel.org>; Mon, 20 Jan 2025 01:00:54 -0800 (PST)
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-2166022c5caso67469705ad.2
+        for <netdev@vger.kernel.org>; Mon, 20 Jan 2025 01:01:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1737363654; x=1737968454; darn=vger.kernel.org;
+        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1737363662; x=1737968462; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=VePH2j532nDqTqhBPliR5apz+cKR0EPoqHmjo/gIw7o=;
-        b=D1FLXg7wlcDIKoTyWpjk/Lo9u1zZLocCvpWk+usisN5eG10kGnQ/rli4UzStQIGY41
-         zAQnlR1rZF+U18HmgstTX9V/CidbEIxA1FNoLcUvDDtB/1sgo3SiTmOR3lcgAH8C41wv
-         ZM+CxE5/Q9+HevKiWwszIeCTfunOwkw+UEmsUXs4HNgCtp07wVgcsZJrzQ1ecCZGc4q1
-         5Z0P8SQ4ME2GpnFEL2SfLr3/DUwpHdoq7uNrGjGQ1mc5+D9cCG8/tsLReAXGFmuLLZWZ
-         ZIcTdEOl8MZCNZIxrO4Ls2QgZIXrLPKH4aGELzQTvUlkFZQ/KC4rwospzBJlwp+83+N2
-         ZX1A==
+        bh=vp+Td7/mzSbTV1DDL8auTuqvLhIjXvEzrkpgi0EGeVI=;
+        b=erS+JdCqfnuExX8uZXModadJ1FqWrBeReeWKS7FZkm13Bxt5k7bj01bYGaspvaDrFU
+         4MqUiTfYESAZ7SggT6fCxFVHKDh5vJ5wqQHnlI4a9PEtOTKCDk531A2QBXeDsY5leKbX
+         DZaNt/FcU4nha/kjLhdDcrcfgbRD5WXOkdZ2YvW2IY/AgYCflbJVsAKlAHauHHtA66uE
+         MXDLWqcFKc3MY4qZOzKHl5qh6lU6wGf5srEy4N9JRWJKFkehV5OZO3kt8VugGPYCTyfs
+         21Jdoi+5bzBoPEPEGmg9/uBbh/4qHwJ4R+gkU8gKyYLrSGtcvru1sMFjmjUWTrJbnJbs
+         pNLQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737363654; x=1737968454;
+        d=1e100.net; s=20230601; t=1737363662; x=1737968462;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=VePH2j532nDqTqhBPliR5apz+cKR0EPoqHmjo/gIw7o=;
-        b=Eh1P9El0VdRXy4iDvean31o9Dm7osfIftXLDpE/bISOLIosY+74F96M5kQlNltfQC7
-         KqlYKWemPqJoSk2GwV438+YCB4o3ljMJ424htR/eln80Gpno5tfOa1Oyq+ZFgkdkJ1FO
-         m/57DEcuJWrWevAoFfpgfm1UnFoT/kTEZKkAp5GYDqPuJFmkAH+gD2CQZO/KgX5lvMRY
-         lJiU5G18nLI14sTYxCU7sqlooUkMdFjcDwgwpNl3gL0AHl88iUPcmDEkzDToPa3grETK
-         w/tUldrnrl1av1Hs8a1aOHju4EyxiWvOoWWYlAy2u36cjbMoa63w5RwqMV7qKnusDHOX
-         f+fg==
-X-Forwarded-Encrypted: i=1; AJvYcCWY67MS+GTNR6+C3cEHMYyFbh8QZPnlomN34hJu4arIjPIsHxHWeqff6x1+l2qhKHTVzhyIMrU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YynFsxvureZY8CS3vCm4nIV8ZGRgj/iw8+EpFWtiU4gmo/Wd9gf
-	Ioa4Lp2unSi/SjTEqE1Hb4HdVY7Pn/354SQ3SqDz0Ik0L9P032RZVA3mpyv5jTg=
-X-Gm-Gg: ASbGncuq2srB8bouKYPcPt+OEbX4zAUAAnmA6SXkVuaG6I/btUzGbPRTz0SxRj44PPg
-	vU12HYUaQmzlnDpeuIdMdLqwgHWevtptJ9KoilJqBpVK0HY5qWbayC8NEvIUYkin+em39B17BwX
-	99KRGd54yb431ysoHf9XpNLQM932ogZx9zb5U0gMMMNLOSU1AOfXBfYy42O12+aN3bzdvNRQX70
-	bPJD+H+Jc/lXCMRC05wgQ27PaBrtlv45PYain5ZC16HIi0LIo0pITFet2KKkN3cicXWUVZ8
-X-Google-Smtp-Source: AGHT+IF9xy+qbBUCxeeJNWw0q1iQeKpxfAGNhBsUiRjFFk20hQvN5icVdaETT9eWWpl4WoKAAydh6Q==
-X-Received: by 2002:a05:6a00:a95:b0:72d:8fa2:9998 with SMTP id d2e1a72fcca58-72dafa44feamr19326150b3a.14.1737363654076;
-        Mon, 20 Jan 2025 01:00:54 -0800 (PST)
+        bh=vp+Td7/mzSbTV1DDL8auTuqvLhIjXvEzrkpgi0EGeVI=;
+        b=amCPTRA5GMoi/9gt2wePIZxQ7TMZvbUhDjy+IARjMzhxeUBf8/rwi9Gm2h89gVOTYA
+         zqXu0+mqDA2JwRymoPNoCBB5ihkUnnyU2f3tZAyRK7Ny0rrudsudvflP6sXgwjdXhQR8
+         D7BmkIlPrC7+JS3b5Axg+4kQMxuwsxbZBI+RLum2s8uXiJjPMYDHLreX07QdHQXoyuP1
+         KdwRTbY2Ff5XJ3xyxzIsQoCuI5+6dyB0JrDGYGlwuqHjvFwV/sSWXLQb64TEkkDNcinq
+         xmd3d0ms+fyW16BAEbqhrK9W8bm6iRO8kyvKu2tovPHI39AZXGIoQQq41rf6XRUSafXG
+         4xfQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXlud/k+sHnOjZFxAeyuhu7ZObqrorQ9mInaYHltgq2qd6Q9Oxpwr7BHPTxRgc6C5RME1aqchI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy2BzuoYL0pzSAOSzFnQ9NBB8E0WnrOHjh3vqEys/8JBurhh0n8
+	uxvIL14Mchbhrwa091kQh65vzHdstWS94+RrbCUizX+QGb8YvSjwlsE9r/vvb+E=
+X-Gm-Gg: ASbGncua6nOd7hfTjuX/kos/HUWdno2/zTnxDT8S7q4FQVL8SjWUxGKw795HL3C/Om5
+	uGz5z5ja8sM2NsEyp1tEAU6PIt6v1SV4rJ1EKuFYM5R2NaZ1J2uattQIZR01QsbPI30lJudi+s6
+	AbTZDHbfHlslAN8jsT8ZfBw+8z0hXj3SYPnHqqlp4Nw/nGgsVH9x1gxwlMrAQbfnSGnNcL/KsQZ
+	sgQi5h1FYJpB0Q8SQNQsno9sqN4qLKhZ0zeVQwSqIBJrabZEvSw6Ngn/HY8Z8ha4b3qMZgj
+X-Google-Smtp-Source: AGHT+IFW7W3w/ZoXT2erNaTWxN+NcvV4dQQ8KrLwwzVKL+Zt7YL2px/phEUI7pHUKYl7ycKYIP1eFw==
+X-Received: by 2002:a17:902:d542:b0:215:9642:4d6d with SMTP id d9443c01a7336-21c3540c875mr170754915ad.17.1737363662228;
+        Mon, 20 Jan 2025 01:01:02 -0800 (PST)
 Received: from localhost ([157.82.203.37])
-        by smtp.gmail.com with UTF8SMTPSA id 41be03b00d2f7-a9bdf0b50c6sm5386971a12.68.2025.01.20.01.00.48
+        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-21c2cea0942sm55819465ad.10.2025.01.20.01.00.56
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 20 Jan 2025 01:00:53 -0800 (PST)
+        Mon, 20 Jan 2025 01:01:01 -0800 (PST)
 From: Akihiko Odaki <akihiko.odaki@daynix.com>
-Date: Mon, 20 Jan 2025 18:00:11 +0900
-Subject: [PATCH net-next v4 2/9] tun: Avoid double-tracking iov_iter length
- changes
+Date: Mon, 20 Jan 2025 18:00:12 +0900
+Subject: [PATCH net-next v4 3/9] tun: Keep hdr_len in tun_get_user()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,7 +82,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250120-tun-v4-2-ee81dda03d7f@daynix.com>
+Message-Id: <20250120-tun-v4-3-ee81dda03d7f@daynix.com>
 References: <20250120-tun-v4-0-ee81dda03d7f@daynix.com>
 In-Reply-To: <20250120-tun-v4-0-ee81dda03d7f@daynix.com>
 To: Jonathan Corbet <corbet@lwn.net>, 
@@ -102,66 +101,67 @@ To: Jonathan Corbet <corbet@lwn.net>,
 Cc: Willem de Bruijn <willemb@google.com>
 X-Mailer: b4 0.14.2
 
-tun_get_user() used to track the length of iov_iter with another
-variable. We can use iov_iter_count() to determine the current length
-to avoid such chores.
+hdr_len is repeatedly used so keep it in a local variable.
 
 Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
 Reviewed-by: Willem de Bruijn <willemb@google.com>
 ---
- drivers/net/tun.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ drivers/net/tun.c | 14 +++++---------
+ 1 file changed, 5 insertions(+), 9 deletions(-)
 
 diff --git a/drivers/net/tun.c b/drivers/net/tun.c
-index 452fc5104260fe7ff5fdd5cedc5d2647cbe35c79..bd272b4736fb7e9004f7d91dc83c69af5239bfe0 100644
+index bd272b4736fb7e9004f7d91dc83c69af5239bfe0..ec56ac86584813f990fabf4633e4d96ca81176ae 100644
 --- a/drivers/net/tun.c
 +++ b/drivers/net/tun.c
-@@ -1742,7 +1742,7 @@ static ssize_t tun_get_user(struct tun_struct *tun, struct tun_file *tfile,
- 	struct tun_pi pi = { 0, cpu_to_be16(ETH_P_IP) };
- 	struct sk_buff *skb;
- 	size_t total_len = iov_iter_count(from);
--	size_t len = total_len, align = tun->align, linear;
-+	size_t len, align = tun->align, linear;
+@@ -1746,6 +1746,7 @@ static ssize_t tun_get_user(struct tun_struct *tun, struct tun_file *tfile,
  	struct virtio_net_hdr gso = { 0 };
  	int good_linear;
  	int copylen;
-@@ -1754,9 +1754,8 @@ static ssize_t tun_get_user(struct tun_struct *tun, struct tun_file *tfile,
- 	enum skb_drop_reason drop_reason = SKB_DROP_REASON_NOT_SPECIFIED;
++	int hdr_len = 0;
+ 	bool zerocopy = false;
+ 	int err;
+ 	u32 rxhash = 0;
+@@ -1776,6 +1777,7 @@ static ssize_t tun_get_user(struct tun_struct *tun, struct tun_file *tfile,
  
- 	if (!(tun->flags & IFF_NO_PI)) {
--		if (len < sizeof(pi))
-+		if (iov_iter_count(from) < sizeof(pi))
+ 		if (tun16_to_cpu(tun, gso.hdr_len) > iov_iter_count(from))
  			return -EINVAL;
--		len -= sizeof(pi);
- 
- 		if (!copy_from_iter_full(&pi, sizeof(pi), from))
- 			return -EFAULT;
-@@ -1765,9 +1764,8 @@ static ssize_t tun_get_user(struct tun_struct *tun, struct tun_file *tfile,
- 	if (tun->flags & IFF_VNET_HDR) {
- 		int vnet_hdr_sz = READ_ONCE(tun->vnet_hdr_sz);
- 
--		if (len < vnet_hdr_sz)
-+		if (iov_iter_count(from) < vnet_hdr_sz)
- 			return -EINVAL;
--		len -= vnet_hdr_sz;
- 
- 		if (!copy_from_iter_full(&gso, sizeof(gso), from))
- 			return -EFAULT;
-@@ -1776,11 +1774,13 @@ static ssize_t tun_get_user(struct tun_struct *tun, struct tun_file *tfile,
- 		    tun16_to_cpu(tun, gso.csum_start) + tun16_to_cpu(tun, gso.csum_offset) + 2 > tun16_to_cpu(tun, gso.hdr_len))
- 			gso.hdr_len = cpu_to_tun16(tun, tun16_to_cpu(tun, gso.csum_start) + tun16_to_cpu(tun, gso.csum_offset) + 2);
- 
--		if (tun16_to_cpu(tun, gso.hdr_len) > len)
-+		if (tun16_to_cpu(tun, gso.hdr_len) > iov_iter_count(from))
- 			return -EINVAL;
++		hdr_len = tun16_to_cpu(tun, gso.hdr_len);
  		iov_iter_advance(from, vnet_hdr_sz - sizeof(gso));
  	}
  
-+	len = iov_iter_count(from);
-+
+@@ -1783,8 +1785,7 @@ static ssize_t tun_get_user(struct tun_struct *tun, struct tun_file *tfile,
+ 
  	if ((tun->flags & TUN_TYPE_MASK) == IFF_TAP) {
  		align += NET_IP_ALIGN;
- 		if (unlikely(len < ETH_HLEN ||
+-		if (unlikely(len < ETH_HLEN ||
+-			     (gso.hdr_len && tun16_to_cpu(tun, gso.hdr_len) < ETH_HLEN)))
++		if (unlikely(len < ETH_HLEN || (hdr_len && hdr_len < ETH_HLEN)))
+ 			return -EINVAL;
+ 	}
+ 
+@@ -1797,9 +1798,7 @@ static ssize_t tun_get_user(struct tun_struct *tun, struct tun_file *tfile,
+ 		 * enough room for skb expand head in case it is used.
+ 		 * The rest of the buffer is mapped from userspace.
+ 		 */
+-		copylen = gso.hdr_len ? tun16_to_cpu(tun, gso.hdr_len) : GOODCOPY_LEN;
+-		if (copylen > good_linear)
+-			copylen = good_linear;
++		copylen = min(hdr_len ? hdr_len : GOODCOPY_LEN, good_linear);
+ 		linear = copylen;
+ 		iov_iter_advance(&i, copylen);
+ 		if (iov_iter_npages(&i, INT_MAX) <= MAX_SKB_FRAGS)
+@@ -1820,10 +1819,7 @@ static ssize_t tun_get_user(struct tun_struct *tun, struct tun_file *tfile,
+ 	} else {
+ 		if (!zerocopy) {
+ 			copylen = len;
+-			if (tun16_to_cpu(tun, gso.hdr_len) > good_linear)
+-				linear = good_linear;
+-			else
+-				linear = tun16_to_cpu(tun, gso.hdr_len);
++			linear = min(hdr_len, good_linear);
+ 		}
+ 
+ 		if (frags) {
 
 -- 
 2.47.1
