@@ -1,79 +1,84 @@
-Return-Path: <netdev+bounces-159683-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159684-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 616E4A1663A
-	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 05:58:15 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D599A16644
+	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 06:03:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 35F927A42EE
-	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 04:58:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DFAD63AA7D2
+	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 05:03:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 030BC155C83;
-	Mon, 20 Jan 2025 04:58:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56F2315E5A6;
+	Mon, 20 Jan 2025 05:03:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="1whu3BnK"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A/ME3eDF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51881155316
-	for <netdev@vger.kernel.org>; Mon, 20 Jan 2025 04:58:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DF5B1494AB
+	for <netdev@vger.kernel.org>; Mon, 20 Jan 2025 05:03:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737349087; cv=none; b=ArBos0TYdhczzIMo31EvzULFNCUXuRazuCXmbVzxPTuJlRsmNxS4l0dB08wzuR3m9A+PR+heftAqpELC6HcF1Uv4KcyCp9IOhGIVGwsLh0Ji4ur/uJfkIghBaAnERFworGZOV92ImYggPE2/unhyWS8xWcZFWTQBkol8dYTsQzM=
+	t=1737349398; cv=none; b=bYbxJgCupnj+oi3DOimIUMtZd7DNg1MuxceGxIh7oVrKDYKPmTye/sUcVnpwLqNxjh+C3IBKzGNbjrNEpLEOOHjDxi0ypvQwYkAaBY+0fQLDBRYXnksoxerhVQLW4rJeDzPqvEgmq2p+lZIFF4VSQdQjNCn/Q4t/McHxKwbt8vo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737349087; c=relaxed/simple;
-	bh=JBhx4FBRzKbzrz2Al5pNMHO5F3JgbgRL5B/gVFGVg/0=;
+	s=arc-20240116; t=1737349398; c=relaxed/simple;
+	bh=yi5/ejharP2rgAlv/th7bUVl8jGWfYzrQePYu8WE9wk=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hvC2pd2rXFhROorHPSElFaG4pWZ1LWUaqIupahTUCsDLrA3wdSX9MUNnsQWjb0N4yz2mvWqJ0DngKiBAgmZ0NsFwSSLjGiiyl6hKsVFTkUTBZb0J5/WQJM/ZsSycXkKKy46fsqGwdRSB5yscdOwEgQSZqbX33LbfRz6CHRzDjzI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=pass smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=1whu3BnK; arc=none smtp.client-ip=209.85.216.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=daynix.com
-Received: by mail-pj1-f52.google.com with SMTP id 98e67ed59e1d1-2ef28f07dbaso5490272a91.2
-        for <netdev@vger.kernel.org>; Sun, 19 Jan 2025 20:58:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1737349085; x=1737953885; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=q4oIihNr6GZKGbnqtazZfNL+Wdu+eK7TRKf6H4jFUt4=;
-        b=1whu3BnKNwtvtqezELWKQt0hPy+FN+eYxFnvphEYfi8qsgYC7W5bmfPPeQAFhfje9v
-         CbaxUnTt6ZJUMsN9QS2shX24wJG64A76ZVHipVlxgXyEAgvl2W/LCo8UaIbMIpcWZ0X5
-         Ht6uaEyQYqQOsJy/RhVomU6JHqfZ9tvSSRWxgAfHN7lvUluRmH0VrqL7ULtJ/cg3AKhm
-         jweriYhaI57MWQQL1HLbdLdrvzjT1mJJE3knFLDLbBqku7AWN5eVh22I363rpyLfcFWm
-         yJcgtQoFIZXlMUwvua1s94+1pI0FzQy1IXT0XLOlcY4cXT0mISggZP6IZFZ1k01USb2L
-         TWVQ==
+	 In-Reply-To:Content-Type; b=nAUT7R5kZAHH4iCikTmI4Sljp+kbhv6acbvIoRpz1if11VEqMrMrXOeFL2WXktbr5dQK2lB7/c5qwknGVLDF8jbN/Asu488S16OUyu/PQW7fG5oSVi8tTM02UKaKT4iw2Ov0j6BI48fmWS5da1e7vgfbo1x9l0FCR3L4zfWW15I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=A/ME3eDF; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1737349395;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Otj/i9YxH8Ex1BKeBO3WT3iArT/Id0Vg2/Mch4GIyjE=;
+	b=A/ME3eDFbeOrzQuZ9hpLFaJ9tYib1ZVE9z8YjGO52+6f9E/oydbqKmKtqkjGHzqYQnI50m
+	XKVGEi5QHFafQQDiXO4MWGaGDK/c4V3tgMzvHgIJIJcfXp+urtN+5k+6J4bVgM8/s32ap1
+	odUfERow2xfKwu49Wv6c7NjQoJjeEtY=
+Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
+ [209.85.160.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-22-f0Or8lY8Pw2z1xXKvk-AqA-1; Mon, 20 Jan 2025 00:03:13 -0500
+X-MC-Unique: f0Or8lY8Pw2z1xXKvk-AqA-1
+X-Mimecast-MFC-AGG-ID: f0Or8lY8Pw2z1xXKvk-AqA
+Received: by mail-qt1-f197.google.com with SMTP id d75a77b69052e-4679d6ef2f9so110393401cf.1
+        for <netdev@vger.kernel.org>; Sun, 19 Jan 2025 21:03:13 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737349085; x=1737953885;
+        d=1e100.net; s=20230601; t=1737349393; x=1737954193;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=q4oIihNr6GZKGbnqtazZfNL+Wdu+eK7TRKf6H4jFUt4=;
-        b=IJDynk4VhtUPlAZA82Zgk70kB9tVbYi71JVmzwwuaE8GIcJ9RG/tdeagFxl9Ppi/91
-         KKGJNW0PQAVweZ3uYCh7LB8bb+ELgGVZ+H4p8tgSd9jh0NnQK3mjGn5xDkrm7KS6OEk0
-         105rBbnrmveF04Q1yVu3cnxnhD94ooScPvKb/W2cbMKEEo7ubjbjvLzoabxNrd0XUQT6
-         v0TcjNI74OsOgfOlNBH26vReA3RFD1oNTsHMJqMIbi2uO9aHs7rWZZ2c92qBWDZ1bqfN
-         evoGhkH7fKPi0B5xMwbxCaTRstCS2sDJ6GjPgq/VTj4D98v0+nvGrlX8OGFPYSWKXvyY
-         BjUQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXwdPg5KmhCDH/6U5LruvtYrMngyma7fWnJtZLWSVV3yqP0+MWDCCN3+4GTshxD3Qywa6S94q0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxukUbs4nE/TOJDpFLjEdSbkmO0q6VdC0Tb6GkvZPhPqurPVRTV
-	cpkl98Du5QaAXoAIpkvqWMjWmXGrV7f944gLtGnhbma5hQLbJsF6VvYLDXILlzI=
-X-Gm-Gg: ASbGncuDiJBbAQxWjBbcci7LwKKfZ/AL3GfFQgZqrnr1WNqRM4QE6YbcQsdWMLBMpEY
-	PYt2WmS3Ft9t8sX+EsKiZ5xG2SLRiZ5n6FJMFZujFv4eo25eRTY4DMMpjCdtiL260nKTRaPkXTp
-	93NLOHZm2IZ8Y6yFuUxbYZYp5kPe7YsB6Z3eC9o/Ckucm4T6apd98IvU7gwXO6Eomh6dd6qs/KT
-	h5lvPtr+3x4zIbZkOlG+wi3iLOhSEghq8qtsWCdc3mYZ9da9ix/ep/JC1lZKerATdgfHH51ekgy
-	rYZy
-X-Google-Smtp-Source: AGHT+IE8MzXrgaBKBfP61PbTUvr8PgxgGWYeOWK4EEWyIPyWkez8gj6KrIAnQzmUFU9EFnwQTPVCzw==
-X-Received: by 2002:a05:6a20:914e:b0:1e1:70ab:b369 with SMTP id adf61e73a8af0-1eb214983dfmr16605568637.13.1737349085531;
-        Sun, 19 Jan 2025 20:58:05 -0800 (PST)
-Received: from [157.82.203.37] ([157.82.203.37])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72dab817529sm6251103b3a.67.2025.01.19.20.58.00
+        bh=Otj/i9YxH8Ex1BKeBO3WT3iArT/Id0Vg2/Mch4GIyjE=;
+        b=GWu3XTrJ8IC6X4fIW6QyjhZOwXShFa5RkA2tIiC86ya6FJcB+OaY9cWrPYg4Qt1BDL
+         yux+rl6QJEo1TX55kQsTrCQJc9vI8opeqnmaioFhklFSra2cCZnUk/gwUJk4kmZQ1wJp
+         zdlXJsUzpAJf3oYv+W1d6mbZ3i20s7l/B4LPkLVGcyP4jWJQ1nHulF6UhOyKWf8F0x4z
+         v8180dENxVw/NCtUm1pRmzuzOTkOK2B2UigTS0N2hjbax4Ku6iPXDignBbAr3RHInEWq
+         3DUA+GMYAzSs5rXFo9UYxeZsZrPdV8vHr/R6BgGU+ax7E0wQNHaIQ9B7xU/Mp1K8FG8/
+         tn3g==
+X-Gm-Message-State: AOJu0Ywq6l0vVJ5AAMxJphsViB3RdfB+0+xwkQZ46RYZYa3dcGa/ZV4A
+	xEDdoP0zeg2bSxCvUdJkfMTVW0+B3SZIzJqSIki3plaqTT8rgAtHzXqG5v0cRA2pTc2oq/MOrgx
+	RWt/QRgwUdp7C8otI2KLFLxel34V4NEnleHVibjvVu39lpcyhGAvK5A==
+X-Gm-Gg: ASbGncu4tqa/y5H96/din/P5r/AnvehBikHBlJJYF4hSZjIo26PHTC1T1gKiF+r1GJT
+	bq3YkeC0ygmQhs4IMtuThThaRrSbb0LlghQNJ5kqtwF/nEvzZc1/g4dg7l3WdUC3wcK/GK6kmgz
+	znRD/Q7K0JLvOfr1tVFk9thbAfgQUlhZjoM1LGNucgDU9HzqwrWZUtDW3Ny0O8jVywJBkGtOXuJ
+	RoxaX7hiziRT6phI5AVKsRNM8zzIfy1e/9eMXHfK9di/jQFjh2kn+d3goiHzkjWicrm
+X-Received: by 2002:ac8:58c6:0:b0:467:61c1:df3e with SMTP id d75a77b69052e-46e12ab658emr167404501cf.30.1737349392689;
+        Sun, 19 Jan 2025 21:03:12 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGen5rwylzwMI56v5RM4Bya0c7VtUEr8Gq9zlBAhsh0hHbQmx946wxszvjGZE3bI8lfp/gn2Q==
+X-Received: by 2002:ac8:58c6:0:b0:467:61c1:df3e with SMTP id d75a77b69052e-46e12ab658emr167403421cf.30.1737349390765;
+        Sun, 19 Jan 2025 21:03:10 -0800 (PST)
+Received: from [10.0.0.215] ([24.225.235.209])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-46e10403dc6sm38665451cf.53.2025.01.19.21.03.09
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 19 Jan 2025 20:58:05 -0800 (PST)
-Message-ID: <8052733d-3e79-4fd5-9bea-9d3724820bb8@daynix.com>
-Date: Mon, 20 Jan 2025 13:57:59 +0900
+        Sun, 19 Jan 2025 21:03:10 -0800 (PST)
+Message-ID: <afb9ff14-a2f1-4c5a-a920-bce0105a7d41@redhat.com>
+Date: Mon, 20 Jan 2025 00:03:08 -0500
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,156 +86,167 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 3/3] tun: Set num_buffers for virtio 1.0
-To: Jason Wang <jasowang@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Shuah Khan <shuah@kernel.org>,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, kvm@vger.kernel.org,
- virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org,
- Yuri Benditovich <yuri.benditovich@daynix.com>,
- Andrew Melnychenko <andrew@daynix.com>,
- Stephen Hemminger <stephen@networkplumber.org>, gur.stavi@huawei.com,
- devel@daynix.com
-References: <20250109-tun-v2-0-388d7d5a287a@daynix.com>
- <20250109-tun-v2-3-388d7d5a287a@daynix.com>
- <CACGkMEsm5DCb+n3NYeRjmq3rAANztZz5QmV8rbPNo+cH-=VzDQ@mail.gmail.com>
- <20250110052246-mutt-send-email-mst@kernel.org>
- <2e015ee6-8a3b-43fb-b119-e1921139c74b@daynix.com>
- <CACGkMEuiyfH-QitiiKJ__-8NiTjoOfc8Nx5BwLM-GOfPpVEitA@mail.gmail.com>
- <fcb301e8-c808-4e20-92dd-2e3b83998d18@daynix.com>
- <CACGkMEvBU3mLbW+-nOscriR-SeDvPSm1mtwwgznYFOocuao5MQ@mail.gmail.com>
- <cc79bef1-c24e-448d-bc20-f8302e341b2c@daynix.com>
- <CACGkMEsJUb3ZLm3rLuaayDAS4kf-vbY03wL4M9j1K+Z=a4BDig@mail.gmail.com>
+Subject: Re: [net,v2] tcp: correct handling of extreme memory squeeze
+To: Neal Cardwell <ncardwell@google.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+ passt-dev@passt.top, sbrivio@redhat.com, lvivier@redhat.com,
+ dgibson@redhat.com, imagedong@tencent.com, eric.dumazet@gmail.com,
+ edumazet@google.com
+References: <20250117214035.2414668-1-jmaloy@redhat.com>
+ <CADVnQymiwUG3uYBGMc1ZEV9vAUQzEOD4ymdN7Rcqi7yAK9ZB5A@mail.gmail.com>
 Content-Language: en-US
-From: Akihiko Odaki <akihiko.odaki@daynix.com>
-In-Reply-To: <CACGkMEsJUb3ZLm3rLuaayDAS4kf-vbY03wL4M9j1K+Z=a4BDig@mail.gmail.com>
+From: Jon Maloy <jmaloy@redhat.com>
+In-Reply-To: <CADVnQymiwUG3uYBGMc1ZEV9vAUQzEOD4ymdN7Rcqi7yAK9ZB5A@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-On 2025/01/20 9:40, Jason Wang wrote:
-> On Thu, Jan 16, 2025 at 1:30 PM Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
->>
->> On 2025/01/16 10:06, Jason Wang wrote:
->>> On Wed, Jan 15, 2025 at 1:07 PM Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
->>>>
->>>> On 2025/01/13 12:04, Jason Wang wrote:
->>>>> On Fri, Jan 10, 2025 at 7:12 PM Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
->>>>>>
->>>>>> On 2025/01/10 19:23, Michael S. Tsirkin wrote:
->>>>>>> On Fri, Jan 10, 2025 at 11:27:13AM +0800, Jason Wang wrote:
->>>>>>>> On Thu, Jan 9, 2025 at 2:59 PM Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
->>>>>>>>>
->>>>>>>>> The specification says the device MUST set num_buffers to 1 if
->>>>>>>>> VIRTIO_NET_F_MRG_RXBUF has not been negotiated.
->>>>>>>>
->>>>>>>> Have we agreed on how to fix the spec or not?
->>>>>>>>
->>>>>>>> As I replied in the spec patch, if we just remove this "MUST", it
->>>>>>>> looks like we are all fine?
->>>>>>>>
->>>>>>>> Thanks
->>>>>>>
->>>>>>> We should replace MUST with SHOULD but it is not all fine,
->>>>>>> ignoring SHOULD is a quality of implementation issue.
->>>>>>>
->>>>>
->>>>> So is this something that the driver should notice?
->>>>>
->>>>>>
->>>>>> Should we really replace it? It would mean that a driver conformant with
->>>>>> the current specification may not be compatible with a device conformant
->>>>>> with the future specification.
->>>>>
->>>>> I don't get this. We are talking about devices and we want to relax so
->>>>> it should compatibile.
->>>>
->>>>
->>>> The problem is:
->>>> 1) On the device side, the num_buffers can be left uninitialized due to bugs
->>>> 2) On the driver side, the specification allows assuming the num_buffers
->>>> is set to one.
->>>>
->>>> Relaxing the device requirement will replace "due to bugs" with
->>>> "according to the specification" in 1). It still contradicts with 2) so
->>>> does not fix compatibility.
->>>
->>> Just to clarify I meant we can simply remove the following:
->>>
->>> """
->>> The device MUST use only a single descriptor if VIRTIO_NET_F_MRG_RXBUF
->>> was not negotiated. Note: This means that num_buffers will always be 1
->>> if VIRTIO_NET_F_MRG_RXBUF is not negotiated.
->>> """
->>>
->>> And
->>>
->>> """
->>> If VIRTIO_NET_F_MRG_RXBUF has not been negotiated, the device MUST set
->>> num_buffers to 1.
->>> """
->>>
->>> This seems easier as it reflects the fact where some devices don't set
->>> it. And it eases the transitional device as it doesn't need to have
->>> any special care.
->>
->> That can potentially break existing drivers that are compliant with the
->> current and assumes the num_buffers is set to 1.
-> 
-> Those drivers are already 'broken'. Aren't they?
 
-The drivers are not broken, but vhost_net is. The driver works fine as 
-long as it's used with a device compliant with the specification. If we 
-relax the device requirement in the future specification, the drivers 
-may not work with devices compliant with the revised specification.
 
-Regards,
-Akihiko Odaki
+On 2025-01-18 15:04, Neal Cardwell wrote:
+> On Fri, Jan 17, 2025 at 4:41 PM <jmaloy@redhat.com> wrote:
+>>
+>> From: Jon Maloy <jmaloy@redhat.com>
+>>
+>> Testing with iperf3 using the "pasta" protocol splicer has revealed
+>> a bug in the way tcp handles window advertising in extreme memory
+>> squeeze situations.
+>>
+>> Under memory pressure, a socket endpoint may temporarily advertise
+>> a zero-sized window, but this is not stored as part of the socket data.
+>> The reasoning behind this is that it is considered a temporary setting
+>> which shouldn't influence any further calculations.
+>>
+>> However, if we happen to stall at an unfortunate value of the current
+>> window size, the algorithm selecting a new value will consistently fail
+>> to advertise a non-zero window once we have freed up enough memory.
+> 
+> The "if we happen to stall at an unfortunate value of the current
+> window size" phrase is a little vague... :-) Do you have a sense of
+> what might count as "unfortunate" here? That might help in crafting a
+> packetdrill test to reproduce this and have an automated regression
+> test.
+
+Obviously, it happens when the following code snippet in
+
+__tcp_cleanup_rbuf() {
+    [....]
+    if (copied > 0 && !time_to_ack &&
+        !(sk->sk_shutdown & RCV_SHUTDOWN)) {
+             __u32 rcv_window_now = tcp_receive_window(tp);
+
+             /* Optimize, __tcp_select_window() is not cheap. */
+             if (2*rcv_window_now <= tp->window_clamp) {
+                 __u32 new_window = __tcp_select_window(sk);
+
+                 /* Send ACK now, if this read freed lots of space
+                  * in our buffer. Certainly, new_window is new window.
+                  * We can advertise it now, if it is not less than 
+
+                  * current one.
+                  * "Lots" means "at least twice" here.
+                  */
+                 if (new_window && new_window >= 2 * rcv_window_now)
+                         time_to_ack = true;
+            }
+     }
+     [....]
+}
+
+yields time_to_ack = false, i.e.  __tcp_select_window(sk) returns
+a value new_window  < (2 *  tcp_receive_window(tp)).
+
+In my log I have for brevity used the following names:
+
+win_now: same as rcv_window_now
+     (= tcp_receive_window(tp),
+      = tp->rcv_wup + tp->rcv_wnd - tp->rcv_nxt,
+      = 265469200 + 262144 -  265600160,
+      = 131184)
+
+new_win: same as new_window
+      (= __tcp_select_window(sk),
+       = 0 first time, later 262144 )
+
+rcv_wnd: same as tp->rcv_wnd,
+       (=262144)
+
+We see that although the last test actually is pretty close
+(262144 >= 262368 ? => false) it is not close enough.
+
+
+We also notice that
+(tp->rcv_nxt - tp->rcv_wup) = (265600160 - 265469200) = 130960.
+130960 < tp->rcv_wnd / 2, so the last test in __tcp_cleanup_rbuf():
+(new_window >= 2 * rcv_window_now) will always be false.
+
+
+Too me it looks like __tcp_select_window(sk) doesn't at all take the 
+freed-up memory into account when calculating a new window. I haven't
+looked into why that is happening.
 
 > 
-> Thanks
+>> This means that this side's notion of the current window size is
+>> different from the one last advertised to the peer, causing the latter
+>> to not send any data to resolve the sitution.
 > 
+> Since the peer last saw a zero receive window at the time of the
+> memory-pressure drop, shouldn't the peer be sending repeated zero
+> window probes, and shouldn't the local host respond to a ZWP with an
+> ACK with the correct non-zero window?
+
+It should, but at the moment when I found this bug the peer stack was 
+not the Linux kernel stack, but one we develop for our own purpose. We 
+fixed that later, but it still means that traffic stops for a couple of 
+seconds now and then before the timer restarts the flow. This happens
+too often for comfort in our usage scenarios.
+We can of course blame the the peer stack, but I still feel this is a
+bug, and that it could be handled better by the kernel stack.
+> 
+> Do you happen to have a tcpdump .pcap of one of these cases that you can share?
+
+I had one, although not for this particular run, and I cannot find it 
+right now. I will continue looking or make a new one. Is there some 
+shared space I can put it?
+
+> 
+>> The problem occurs on the iperf3 server side, and the socket in question
+>> is a completely regular socket with the default settings for the
+>> fedora40 kernel. We do not use SO_PEEK or SO_RCVBUF on the socket.
 >>
->> Regards,
->> Akihiko Odaki
+>> The following excerpt of a logging session, with own comments added,
+>> shows more in detail what is happening:
 >>
->>>
->>> Then we don't need any driver normative so I don't see any conflict.
->>>
->>> Michael suggests we use "SHOULD", but if this is something that the
->>> driver needs to be aware of I don't know how "SHOULD" can help a lot
->>> or not.
->>>
->>>>
->>>> Instead, we should make the driver requirement stricter to change 2).
->>>> That is what "[PATCH v3] virtio-net: Ignore num_buffers when unused" does:
->>>> https://lore.kernel.org/r/20250110-reserved-v3-1-2ade0a5d2090@daynix.com
->>>>
->>>>>
->>>>>>
->>>>>> We are going to fix all implementations known to buggy (QEMU and Linux)
->>>>>> anyway so I think it's just fine to leave that part of specification as is.
->>>>>
->>>>> I don't think we can fix it all.
->>>>
->>>> It essentially only requires storing 16 bits. There are details we need
->>>> to work out, but it should be possible to fix.
->>>
->>> I meant it's not realistic to fix all the hypervisors. Note that
->>> modern devices have been implemented for about a decade so we may have
->>> too many versions of various hypervisors. (E.g DPDK seems to stick
->>> with the same behaviour of the current kernel).
->>   > >>
->>>> Regards,
->>>> Akihiko Odaki
->>>>
->>>
->>> Thanks
->>>
->>
+>> //              tcp_v4_rcv(->)
+>> //                tcp_rcv_established(->)
+>> [5201<->39222]:     ==== Activating log @ net/ipv4/tcp_input.c/tcp_data_queue()/5257 ====
+>> [5201<->39222]:     tcp_data_queue(->)
+>> [5201<->39222]:        DROPPING skb [265600160..265665640], reason: SKB_DROP_REASON_PROTO_MEM
+>>                         [rcv_nxt 265600160, rcv_wnd 262144, snt_ack 265469200, win_now 131184]
+> 
+> What is "win_now"? That doesn't seem to correspond to any variable
+> name in the Linux source tree. 
+
+See above.
+
+  Can this be renamed to the
+> tcp_select_window() variable it is printing, like "cur_win" or
+> "effective_win" or "new_win", etc?
+> 
+> Or perhaps you can attach your debugging patch in some email thread? I
+> agree with Eric that these debug dumps are a little hard to parse
+> without seeing the patch that allows us to understand what some of
+> these fields are...
+> 
+> I agree with Eric that probably tp->pred_flags should be cleared, and
+> a packetdrill test for this would be super-helpful.
+
+I must admit I have never used packetdrill, but I can make an effort.
+
+///jon
+
+> 
+> thanks,
+> neal
 > 
 
 
