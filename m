@@ -1,53 +1,53 @@
-Return-Path: <netdev+bounces-159777-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159778-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id ABB1FA16DBD
-	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 14:50:36 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id ABC7DA16DBF
+	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 14:50:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C23B53A5983
-	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 13:50:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E642416943D
+	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 13:50:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAB861E25F6;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E10911E25FC;
 	Mon, 20 Jan 2025 13:50:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sCsPbvyu"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Oa/M5wTF"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE20E1B85DB;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE26E1E22FC;
 	Mon, 20 Jan 2025 13:50:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737381030; cv=none; b=fCJGKh1C2WvULILnT6KWgsKuf5BM1hPOENENFG7jKckChSy5TKKiVDy6MmtvpaDHnlTC6RyRRiI7pXf3DmL/NaO1u79Q7Ps3srZx2k6193O8OFG7jwXB3cLC7JH7CMeuClbOetANLEvMJk9kxSW6BThSA74PkUKyYkjOdRyYVoI=
+	t=1737381030; cv=none; b=MGu010LXLVVToR/rAY8DoBG0BI9QS72q0/yiIOTrwsSLMLtFDJi6FBmXA/NCwAY2/7m0eQGZGHWtvejFff9VlA3rqJEUqeWdhEoRM4lgKhHEckcLCXhUkD0jiXfXGbV1HjhrNDB5QmKT115ATMsqg4/TEiMzuCbjoSdfQltdeXY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1737381030; c=relaxed/simple;
-	bh=tgzpuPTlk55PqGR4hzKBitiv5FYSx8q9JuFUVygLiZU=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=lqyRUIZMx2zzlLJ3HaX2CwulV9OK4xuUTJgv5sEyfCcJQXGuto+2BNbOnsyj9+yGnypnohju4ZNBlF/NAIOs3XrWDnsuPSf0Vog4KOBbWuDYxp97u7OfKjOaHLWYzpSxM+lMup+XQZVVilG6FwrelafL/+3ZRxnJXEcNQ1cVWF8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sCsPbvyu; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id ED9B4C4CEDD;
-	Mon, 20 Jan 2025 13:50:29 +0000 (UTC)
+	bh=1ximHPbMmEHEBuLgHpQFBwbcsdYKRx5fYUW+fBDJ4NI=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=p+g2jiHX9LROvkt6A2/DsiE7sR4uz+ElEEsi+Y8A/bJKLOAArUFYFiFPhObQ7BnZAkecrC28lrxy4eN6ksgj1hpXKKRRo/2cJ3iLLU/VLbqwVuI6As/BUC8ic0fCxcVCb0DqWGLh5iX1zZZbUACbN23ajAcJc1oqk2BtvLYJX1M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Oa/M5wTF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 1ADBFC4CEE5;
+	Mon, 20 Jan 2025 13:50:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1737381030;
-	bh=tgzpuPTlk55PqGR4hzKBitiv5FYSx8q9JuFUVygLiZU=;
-	h=From:Subject:Date:To:Cc:Reply-To:From;
-	b=sCsPbvyuIHOPOcs45JCD0ioRRpldCkdSzHq97qXT1Ee5YWtbzsT4T0nbyeH3kEoBI
-	 OVmCG6/VKeQFqixX8KYPK0tqdFclAx2xInml1Qo2K1mIII7Gora3T9/+8cTv9e8z79
-	 QBgCG9cjfOc/e8wMoYWJx6rq0PdZVjD89NoIk9nuy+6TKbT+Ntl2z5VVzkFoSGOTMB
-	 y8+2VQuzsaB/vDIM0cfQcfnPZfVzRgGylysHUuWaMc7yOgTtU87j2QpCY6zvPJyuRV
-	 Ti0Eadqsh457rremp0FJMDp4T0kEfIV9gQqN/upyhR2rIpUmfotdK8WQ9ulRMVcoa/
-	 n7z690fQ11kGA==
+	bh=1ximHPbMmEHEBuLgHpQFBwbcsdYKRx5fYUW+fBDJ4NI=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
+	b=Oa/M5wTFtX1O5DURgESD8reMP52NQxnwuU7vQoh1MHLuOIyW59dlIvYZcRInzT+kx
+	 OmOypZuCEfe9SloL/4NjdH4/hVWWviqxNZRP5TiZXzMgXbu5wsCtnAi66e7ZAUb/h/
+	 ctc6LeBGbXXZLCWxvJRY9JqEM3d3RSPzTYZVQEEjj78rz2UPQ+glN/aSD9ATXmclrg
+	 6MP4jMuMhPSQ4/SoMCkKiewFlHdE8fLwCmwNlZf775XXqHUWrRfzvhfaDt8o1vxggh
+	 561hCTyDrFACkW6qwatot5YtxAZMMdl9Wye+3HKNGKDS7NFouQUKnik/k2xf1WWXYQ
+	 NK4aU5wi7HcQA==
 Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB9EBC02181;
-	Mon, 20 Jan 2025 13:50:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0928AC02185;
+	Mon, 20 Jan 2025 13:50:30 +0000 (UTC)
 From: Dimitri Fedrau via B4 Relay <devnull+dimitri.fedrau.liebherr.com@kernel.org>
-Subject: [PATCH net-next v2 0/3] net: phy: dp83822: Add support for
- changing the transmit amplitude voltage
-Date: Mon, 20 Jan 2025 14:50:20 +0100
-Message-Id: <20250120-dp83822-tx-swing-v2-0-07c99dc42627@liebherr.com>
+Date: Mon, 20 Jan 2025 14:50:21 +0100
+Subject: [PATCH net-next v2 1/3] dt-bindings: net: ethernet-phy: add
+ property tx-amplitude-100base-tx-gain-milli
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -56,11 +56,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAJxUjmcC/22NQQ6CMBBFr0Jm7ZhpsQiuvIdhAXSESbQlbYMYw
- t1tWLt8efnvbxA5CEe4FRsEXiSKdxn0qYBh6tzIKDYzaNIXpVWJdq7LWmtMK8aPuBFN31WD4qa
- nykCezYGfsh7JBzhO6HhN0GYzSUw+fI+vRR0+Zw2pf9lFIeGVrekaWxMpur+E+4lDOA/+De2+7
- z/oBY0wvQAAAA==
-X-Change-ID: 20241213-dp83822-tx-swing-5ba6c1e9b065
+Message-Id: <20250120-dp83822-tx-swing-v2-1-07c99dc42627@liebherr.com>
+References: <20250120-dp83822-tx-swing-v2-0-07c99dc42627@liebherr.com>
+In-Reply-To: <20250120-dp83822-tx-swing-v2-0-07c99dc42627@liebherr.com>
 To: Andrew Lunn <andrew+netdev@lunn.ch>, 
  "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
@@ -73,11 +71,11 @@ Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
  linux-kernel@vger.kernel.org, Dimitri Fedrau <dimitri.fedrau@liebherr.com>, 
  Dimitri Fedrau <dima.fedrau@gmail.com>
 X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1737381028; l=1257;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1737381028; l=1340;
  i=dimitri.fedrau@liebherr.com; s=20241202; h=from:subject:message-id;
- bh=tgzpuPTlk55PqGR4hzKBitiv5FYSx8q9JuFUVygLiZU=;
- b=dPLIo5u0zT2/jV5kb4jkzAGVdakwVyp3mtlz9U3opi/THSQPsrot3icWRVzpytUmDEe1NtLo4
- DlVAJf7A1wdA66zxl4S/GHwUc03AMqxHPwOrh1r0oZ/E0d/YVdb9K2o
+ bh=o9/uYCQMqtj7aA5WdqSP5I74ZoABiwwXrCBqYSBeaRI=;
+ b=HzyehliKyx0cDcSOOj1zdjTN00xtHbx8p1oWQhEu6VA+ZEHW4tacLpYoWV+UINcjc+I4h7prx
+ Qi9d8HHyTAmD0s4KUAnN6oAkRgRiacX5MoX82SV9n0eucRtIOeerheh
 X-Developer-Key: i=dimitri.fedrau@liebherr.com; a=ed25519;
  pk=rT653x09JSQvotxIqQl4/XiI4AOiBZrdOGvxDUbb5m8=
 X-Endpoint-Received: by B4 Relay for dimitri.fedrau@liebherr.com/20241202
@@ -85,35 +83,40 @@ X-Endpoint-Received: by B4 Relay for dimitri.fedrau@liebherr.com/20241202
 X-Original-From: Dimitri Fedrau <dimitri.fedrau@liebherr.com>
 Reply-To: dimitri.fedrau@liebherr.com
 
-Add support for changing the transmit amplitude voltage in 100BASE-TX mode.
-Add support for configuration via DT.
+From: Dimitri Fedrau <dimitri.fedrau@liebherr.com>
+
+Add property tx-amplitude-100base-tx-gain-milli in the device tree bindings
+for configuring the tx amplitude of 100BASE-TX PHYs. Modifying it can be
+necessary to compensate losses on the PCB and connector, so the voltages
+measured on the RJ45 pins are conforming.
 
 Signed-off-by: Dimitri Fedrau <dimitri.fedrau@liebherr.com>
 ---
-Changes in v2:
-- Remove binding ti,tx-amplitude-100base-tx-millivolt from ti,dp83822.yaml
-- Add binding tx-amplitude-100base-tx-gain-milli to ethernet-phy.yaml
-- Add helper to get tx amplitude gain from DT
-- Link to v1: https://lore.kernel.org/r/20250113-dp83822-tx-swing-v1-0-7ed5a9d80010@liebherr.com
+ Documentation/devicetree/bindings/net/ethernet-phy.yaml | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
----
-Dimitri Fedrau (3):
-      dt-bindings: net: ethernet-phy: add property tx-amplitude-100base-tx-gain-milli
-      net: phy: Add helper for getting tx amplitude gain
-      net: phy: dp83822: Add support for changing the transmit amplitude voltage
+diff --git a/Documentation/devicetree/bindings/net/ethernet-phy.yaml b/Documentation/devicetree/bindings/net/ethernet-phy.yaml
+index 2c71454ae8e362e7032e44712949e12da6826070..ce65413410c2343a3525e746e72b6c6c8bb120d0 100644
+--- a/Documentation/devicetree/bindings/net/ethernet-phy.yaml
++++ b/Documentation/devicetree/bindings/net/ethernet-phy.yaml
+@@ -232,6 +232,14 @@ properties:
+       PHY's that have configurable TX internal delays. If this property is
+       present then the PHY applies the TX delay.
+ 
++  tx-amplitude-100base-tx-gain-milli:
++    description: |
++      Transmit amplitude gain applied (in milli units) for 100BASE-TX. When
++      omitted, the PHYs default will be left as is. If not present, default to
++      1000 (no actual gain applied).
++    $ref: /schemas/types.yaml#/definitions/uint32
++    default: 1000
++
+   leds:
+     type: object
+ 
 
- .../devicetree/bindings/net/ethernet-phy.yaml      |  8 +++++
- drivers/net/phy/dp83822.c                          | 37 ++++++++++++++++++++++
- drivers/net/phy/phy_device.c                       | 20 +++++++++---
- include/linux/phy.h                                |  3 ++
- 4 files changed, 64 insertions(+), 4 deletions(-)
----
-base-commit: 64ff63aeefb03139ae27454bd4208244579ae88e
-change-id: 20241213-dp83822-tx-swing-5ba6c1e9b065
-
-Best regards,
 -- 
-Dimitri Fedrau <dimitri.fedrau@liebherr.com>
+2.39.5
 
 
 
