@@ -1,204 +1,201 @@
-Return-Path: <netdev+bounces-159733-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159736-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CFB6EA16AAD
-	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 11:24:44 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5695A16ABF
+	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 11:29:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B345C1885107
-	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 10:24:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 91EEF166713
+	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 10:29:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 378231B218A;
-	Mon, 20 Jan 2025 10:24:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 324511B423E;
+	Mon, 20 Jan 2025 10:29:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VpWDvaoY"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="KJrSBXt0"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A68F1AF0C2
-	for <netdev@vger.kernel.org>; Mon, 20 Jan 2025 10:24:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 920E21B414F;
+	Mon, 20 Jan 2025 10:29:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737368681; cv=none; b=Amm53SAmE0mIXrWhB7+y2IK4zF7jBu05RQwwzTRP7VZlmNFAPxm6/1ndr/iIApUM8E8TBkCslNt2OpJJnmQoUYS21WHKDeN7BdA1mvstmWmaHuRCSzYdJv/qmTJciiswH747gpPgc7vRZQeqLyT77HmHBG2crNyqOETJfmN3XwI=
+	t=1737368976; cv=none; b=mAEGip3l1I5S9eGQxlD/6d4Tb69ZS1OBYPF+Ghm7P6E/PyTi47pTyCcTGNwWNMSHnBTH1qjO0JKjfK4Sqso44D5f2F1u4mPPf4anP7Bd6s6bpNcr/KYERdwgseCuf9EPpxTNkzd9cR/0U0dPPJIgdthTTdTdn/bu29ylzy2F5zQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737368681; c=relaxed/simple;
-	bh=yf6HR12vgiphx26xpnRwI/ZSbZ1Lhr+S2Vo9TB07VpI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=N2VXu1ZZ7fHjhdAcKlDiaLI2JCkhXukaXCaEKe59On39NYuCcxupK/95wjncLgq/qXlvso/2DwpQKKY2YGTGmbcrvGmPTfugaLVI8lFlWaHDtY+PGEaQRu3sL/+25epB4DoXDhzEA3CCurCOg4SI9gs7FuR7YV31T5i1wR+bb0k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VpWDvaoY; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1737368677;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=LW0AIg+ZzVE0PO3mnBxk2BL4NaV9etOallTabibSD5U=;
-	b=VpWDvaoYpYj6d8XYFffrBqmGtFXYnnTQl08+zgByR2y8GlP+clCdPjFB9WXJaqtDo0CxIA
-	AnSf8F3sp4k5gPVvo9outshT28vwBOtF446zWuaTfFQ0i2DvzrxPyj477TF3+Iil444JAa
-	FaacG+CuVgZzMUr39TXHEf6Lut/qwP0=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-645-LODsI45ANXS1f0H9EKR6Sg-1; Mon, 20 Jan 2025 05:24:36 -0500
-X-MC-Unique: LODsI45ANXS1f0H9EKR6Sg-1
-X-Mimecast-MFC-AGG-ID: LODsI45ANXS1f0H9EKR6Sg
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4361ac8b25fso22808045e9.2
-        for <netdev@vger.kernel.org>; Mon, 20 Jan 2025 02:24:36 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737368675; x=1737973475;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=LW0AIg+ZzVE0PO3mnBxk2BL4NaV9etOallTabibSD5U=;
-        b=BrRc8lEyvQbGnyhkqOuxySS3e63FgGyTe9wxIWr2vq/2uYn3ySQxBIqD8LtSfcBJKd
-         RpMVcttFM2n6r2g/yD5xnTn9OAd2kyHdxB0z68ZLuTP3z6PUGGqo9KgBJeIa1gOoq95d
-         Vv83fg3xzCdNwv0eXKg0ixJ5TQ43ZN5R4QKF45Mr/FZ/L60CeTcbNf/JGaDf1YTk1glJ
-         MviRS+Ks4hZCY0xKrOvm5vNKCLAzEzWudZnQ/jdYnYZuGNwXbzXLKngqS/FFbnd0iE8S
-         iu4HiaFLOaKi4GpI18TrRVJ+zgNpR+dZogWuEuLwRxycFLDJvTRfne0aw1K/btGDkQM6
-         DKsw==
-X-Forwarded-Encrypted: i=1; AJvYcCUFYI1m4CSvSH+nc7rRLlSQM96Qdl7MuvTSh7w5noKk7ZHSoxpkMt1vdICbAveXl4rTa08Wq7g=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwLrN7bPRIkBlwoyRkXY4c9kcKKLYfJGneolZ9kioQWaG+4Tiqe
-	g3Pt2jpQEVBFc7yFk3aPlyhHCkpiQo8UJd8WtVbv0DNvgu3m1BjuTIpN5Ou76+xBB6LtRcqYYAB
-	ZQm+cgUlwXSQ1FpxuZvrBomFWOxNCrrEXde8jwTlnJ/1uoIQYiHuHiQ==
-X-Gm-Gg: ASbGncsCXzxagsyJ1xa03S7XbH+KjhMcMn0HvrMCTOkFGEF3P3M1psTlVMyp5CPf7qH
-	Lx2EEnuUK3O7ms5t1ucM8yWkqvHr82zHAvyltFHk1JlkACEjAoAcW1udXwS8CyyZ+aQXfp+DiJk
-	gYu+ODzGzHX3T3BvOpf8kO0h+xwRK+KhPt8A+OiprTyRspgH0i/ZP7wXgcvmenimRIXYcPoWmpA
-	lvx0pawI/xFn2efCdN6TO4c3CT6oV90j3tHuY9izf3BwEhL0SpfOgx8djpFvbTJSajC0u1Wzdzl
-	zDDAoM5PKN07YC2cjjIGOqaQE1s+ys10xaufaZhk9dMvIw==
-X-Received: by 2002:a05:600c:3b0f:b0:434:ffe3:bc7d with SMTP id 5b1f17b1804b1-438913f01a1mr128704515e9.16.1737368675030;
-        Mon, 20 Jan 2025 02:24:35 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFrE1oo70JL1hLkDSzofUD4xLsZ+nRy+bJufSIh/J5HvGrSXyY5lVRiPHjCxgOMZONscT3QZw==
-X-Received: by 2002:a05:600c:3b0f:b0:434:ffe3:bc7d with SMTP id 5b1f17b1804b1-438913f01a1mr128703855e9.16.1737368674313;
-        Mon, 20 Jan 2025 02:24:34 -0800 (PST)
-Received: from sgarzare-redhat (host-82-53-134-100.retail.telecomitalia.it. [82.53.134.100])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4389046bab0sm131160305e9.38.2025.01.20.02.24.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 Jan 2025 02:24:33 -0800 (PST)
-Date: Mon, 20 Jan 2025 11:24:30 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Michal Luczaj <mhal@rbox.co>
-Cc: "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	George Zhang <georgezhang@vmware.com>, Dmitry Torokhov <dtor@vmware.com>, Andy King <acking@vmware.com>, 
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net 5/5] vsock/test: Add test for connect() retries
-Message-ID: <pyun3hl67vjel7gc7k67nvelx5bmgw664gvkzauqqv6nkkt5sc@x6hzsedofchl>
-References: <20250117-vsock-transport-vs-autobind-v1-0-c802c803762d@rbox.co>
- <20250117-vsock-transport-vs-autobind-v1-5-c802c803762d@rbox.co>
+	s=arc-20240116; t=1737368976; c=relaxed/simple;
+	bh=CXpgN0NJC8aZGTtFbSm38FYutnKk3xB+Dh1aIBugdPA=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=A4frki7IxMvaf5NyZvpdnMg7NAxa7ertBdxUB/bQVy2TcFzi76JyqK/utaQ8N4DlwE4lnu6b97Jl6ZY/zoMAoGjs3FzabacG4d/fbRigJ1+0LwSHyM5zg3RW9F70TaytytffmGi1GrU8I3fY4oS6lQ1zjD/r2DhBv/BN5fIH6bg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=KJrSBXt0; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50K18YaV030661;
+	Mon, 20 Jan 2025 10:29:27 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=/69y94
+	G8dRvRRIaSAGqCqhaLVhSJxVfFfp1VbVqaEeU=; b=KJrSBXt0pp/k+101enHd94
+	EIA/S9n3ZZ3UOFVgmOosHR1VJnIjHc6+NzJL0o3jt7CL27LytYVwH1F/IxIddyzY
+	Dr1rHNUfo6dtuGBy1ivFn5JViSG9YH87uWPFuU1ocs6fgl8ypleFog70NGGfTL6D
+	03TeuZER4XmWXhV/vpFFM7zTMw9i5WaUOkwqwOts1ICmCAyaviCLAdsikWM76Ihi
+	RY5a9G0eJYlbhzvxxDVQPjcFsnNr2hub3wm3SkhbpUqcmq9MxKI9HZmdtniIOnsi
+	ofJYUvLA5GfKBCXzkZzpERJl364USyw4PJgXfSED3GyYjCLVaEH+DMrUnUee7yDw
+	==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 449cj925hf-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 20 Jan 2025 10:29:25 +0000 (GMT)
+Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 50KATOiP007060;
+	Mon, 20 Jan 2025 10:29:24 GMT
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 449cj925fw-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 20 Jan 2025 10:29:24 +0000 (GMT)
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 50K74Okx024307;
+	Mon, 20 Jan 2025 10:28:46 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 448q0xx1ya-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 20 Jan 2025 10:28:46 +0000
+Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
+	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 50KASgMm35848878
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 20 Jan 2025 10:28:42 GMT
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 5510620040;
+	Mon, 20 Jan 2025 10:28:42 +0000 (GMT)
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id E2C7220043;
+	Mon, 20 Jan 2025 10:28:41 +0000 (GMT)
+Received: from [9.152.224.153] (unknown [9.152.224.153])
+	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Mon, 20 Jan 2025 10:28:41 +0000 (GMT)
+Message-ID: <17f0cbf9-71f7-4cce-93d2-522943d9d83b@linux.ibm.com>
+Date: Mon, 20 Jan 2025 11:28:41 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20250117-vsock-transport-vs-autobind-v1-5-c802c803762d@rbox.co>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC net-next 0/7] Provide an ism layer
+From: Alexandra Winter <wintera@linux.ibm.com>
+To: dust.li@linux.alibaba.com, Julian Ruess <julianr@linux.ibm.com>,
+        Wenjia Zhang <wenjia@linux.ibm.com>, Jan Karcher <jaka@linux.ibm.com>,
+        Gerd Bayer <gbayer@linux.ibm.com>, Halil Pasic <pasic@linux.ibm.com>,
+        "D. Wythe" <alibuda@linux.alibaba.com>,
+        Tony Lu <tonylu@linux.alibaba.com>, Wen Gu <guwen@linux.alibaba.com>,
+        Peter Oberparleiter
+ <oberpar@linux.ibm.com>,
+        David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+        Andrew Lunn <andrew+netdev@lunn.ch>
+Cc: Niklas Schnelle <schnelle@linux.ibm.com>,
+        Thorsten Winkler <twinkler@linux.ibm.com>, netdev@vger.kernel.org,
+        linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev
+ <agordeev@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>, Simon Horman <horms@kernel.org>
+References: <20250115195527.2094320-1-wintera@linux.ibm.com>
+ <20250116093231.GD89233@linux.alibaba.com>
+ <D73H7Q080GUQ.3BDOH23P4WDOL@linux.ibm.com>
+ <0f96574a-567e-495a-b815-6aef336f12e6@linux.ibm.com>
+ <20250117021353.GF89233@linux.alibaba.com>
+ <80330f0e-d769-4251-be2f-a2b5adb12ef2@linux.ibm.com>
+Content-Language: en-US
+In-Reply-To: <80330f0e-d769-4251-be2f-a2b5adb12ef2@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: jQA0GXHf0fgairOX8fDqgjG_YVhC0w8a
+X-Proofpoint-GUID: AyJ_vEUcRz4Y43A35-mE5gLav_susfoR
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-01-20_02,2025-01-20_02,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 phishscore=0
+ lowpriorityscore=0 bulkscore=0 adultscore=0 spamscore=0 impostorscore=0
+ priorityscore=1501 mlxscore=0 malwarescore=0 suspectscore=0
+ mlxlogscore=601 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2411120000 definitions=main-2501200087
 
-On Fri, Jan 17, 2025 at 10:59:45PM +0100, Michal Luczaj wrote:
->Deliberately fail a connect() attempt; expect error. Then verify that
->subsequent attempt (using the same socket) can still succeed, rather than
->fail outright.
->
->Signed-off-by: Michal Luczaj <mhal@rbox.co>
->---
-> tools/testing/vsock/vsock_test.c | 52 ++++++++++++++++++++++++++++++++++++++++
-> 1 file changed, 52 insertions(+)
->
->diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
->index 7f1916e23858b5ba407c34742a05b7bd6cfdcc10..712650f993e9df68ceb68ae02334c2775be09c7c 100644
->--- a/tools/testing/vsock/vsock_test.c
->+++ b/tools/testing/vsock/vsock_test.c
->@@ -1520,6 +1520,53 @@ static void test_seqpacket_transport_uaf_server(const struct test_opts *opts)
-> 	control_expectln("DONE");
-> }
->
->+static void test_stream_connect_retry_client(const struct test_opts *opts)
->+{
->+	struct sockaddr_vm addr = {
->+		.svm_family = AF_VSOCK,
->+		.svm_cid = opts->peer_cid,
->+		.svm_port = opts->peer_port
->+	};
->+	int s, alen = sizeof(addr);
->+
->+	s = socket(AF_VSOCK, SOCK_STREAM, 0);
->+	if (s < 0) {
->+		perror("socket");
->+		exit(EXIT_FAILURE);
->+	}
->+
->+	if (!connect(s, (struct sockaddr *)&addr, alen)) {
->+		fprintf(stderr, "Unexpected connect() #1 success\n");
->+		exit(EXIT_FAILURE);
->+	}
->+
->+	control_writeln("LISTEN");
->+	control_expectln("LISTENING");
->+
->+	if (connect(s, (struct sockaddr *)&addr, alen)) {
->+		perror("connect() #2");
->+		exit(EXIT_FAILURE);
->+	}
 
-What about using the timeout_begin()/timeout_end() we used in all other
-places?
 
->+
->+	close(s);
->+}
->+
->+static void test_stream_connect_retry_server(const struct test_opts *opts)
->+{
->+	int fd;
->+
->+	control_expectln("LISTEN");
->+
->+	fd = vsock_stream_accept(VMADDR_CID_ANY, opts->peer_port, NULL);
->+	if (fd < 0) {
->+		perror("accept");
->+		exit(EXIT_FAILURE);
->+	}
->+
->+	vsock_wait_remote_close(fd);
->+	close(fd);
->+}
->+
-> static struct test_case test_cases[] = {
-> 	{
-> 		.name = "SOCK_STREAM connection reset",
->@@ -1655,6 +1702,11 @@ static struct test_case test_cases[] = {
-> 		.run_client = test_seqpacket_transport_uaf_client,
-> 		.run_server = test_seqpacket_transport_uaf_server,
-> 	},
->+	{
->+		.name = "connectible retry failed connect()",
+On 17.01.25 14:00, Alexandra Winter wrote:
+> 
+> 
+> On 17.01.25 03:13, Dust Li wrote:
+>>>>> Modular Approach: I've made the ism_loopback an independent kernel
+>>>>> module since dynamic enable/disable functionality is not yet supported
+>>>>> in SMC. Using insmod and rmmod for module management could provide the
+>>>>> flexibility needed in practical scenarios.
+>>>
+>>> With this proposal ism_loopback is just another ism device and SMC-D will
+>>> handle removal just like ism_client.remove(ism_dev) of other ism devices.
+>>>
+>>> But I understand that net/smc/ism_loopback.c today does not provide enable/disable,
+>>> which is a big disadvantage, I agree. The ism layer is prepared for dynamic
+>>> removal by ism_dev_unregister(). In case of this RFC that would only happen
+>>> in case of rmmod ism. Which should be improved.
+>>> One way to do that would be a separate ism_loopback kernel module, like you say.
+>>> Today ism_loopback is only 10k LOC, so I'd be fine with leaving it in the ism module.
+>>> I also think it is a great way for testing any ISM client, so it has benefit for
+>>> anybody using the ism module.
+>>> Another way would be e.g. an 'enable' entry in the sysfs of the loopback device.
+>>> (Once we agree if and how to represent ism devices in genera in sysfs).
+>> This works for me as well. I think it would be better to implement this
+>> within the common ISM layer, rather than duplicating the code in each
+>> device. Similar to how it's done in netdevice.
+>>
+>> Best regards,
+>> Dust
+> 
+> 
+> Is there a specific example for enable/disable in the netdevice code, you have in mind?
+> Or do you mean in general how netdevice provides a common layer?
+> Yes, everything that is common for all devices should be provided by the network layer.
 
-"SOCK_STREAM retry failed connect()"
 
-(and if you want add a comment on top of the test the in the current
-implementation the same path is shared with other connectible socket
-like SOCK_SEQPACKET)
+Dust for some reason, you did not 'Reply-all':
+Dust Li wrote:
+> I think dev_close()/dev_open() are the high-level APIs, while
+> ndo_stop()/ndo_open() are the underlying device operations that we
+> can reference.
 
-The rest LGTM.
 
-Thanks,
-Stefano
+I hear you, it can be beneficial to have a way for upper layers to
+enable/disable an ism device.
+But all this is typically a tricky area. The device driver can also have
+reasons to enable/disable a device, then hardware could do that or even
+hotplug a device. Error recovery on different levels may want to run a
+disable/enable sequence as a reset, etc. And all this has potential for
+deadlocks.
+All this is rather trivial for ism-loopback, as there is not much of a
+lower layer.
+ism-vpci already has 'HW' / device driver configure on/off and device
+add/remove.
+For a future ism-virtio, the Hipervisor may want to add/remove devices.
 
->+		.run_client = test_stream_connect_retry_client,
->+		.run_server = test_stream_connect_retry_server,
->+	},
-> 	{},
-> };
->
->
->-- 
->2.47.1
->
+I wonder what could be the simplest definition of an enable/disable for
+the ism layer, that we can start with? More sophisticated functionality
+can always be added later.
+Maybe support for add/remove ism-device by the device driver is
+sufficient as  starting point?
+
+
+
+
+
+
+
+
+
 
 
