@@ -1,172 +1,204 @@
-Return-Path: <netdev+bounces-159749-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159751-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 770D5A16B80
-	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 12:24:54 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C9007A16BB1
+	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 12:35:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A484216387A
-	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 11:24:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8929C3A5C5E
+	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 11:35:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA5861DF253;
-	Mon, 20 Jan 2025 11:24:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05B0D1BBBD3;
+	Mon, 20 Jan 2025 11:35:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Niajq6Q5"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="HFKpvEf+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 236E0167DAC;
-	Mon, 20 Jan 2025 11:24:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DDC91DEFD4;
+	Mon, 20 Jan 2025 11:35:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737372289; cv=none; b=oUCvSPzZnul1JFMksLlLRWAH4/rXNNcApGuOBZjjS4EYyFn0GCFd/NxWWhapMTOeToPS2CIOlwrmvsoRowaxBCpU7+btRVpMZZZao+ceYo6e3VlVdSwvI0Il4VgZkoAq1I6aKiolGBhjhUUyCjz82nm483wV1cEQBu5ZhigoQGw=
+	t=1737372946; cv=none; b=lyf587f/Y3W878nHj9gm7zWk9rtUTG6Y3/mIj3f8FcM9qIM8M0EIxpINn5Xxdqf1heuiwQw0ru+qR/EZHxobOduoQW3lqCKLD/8L3cG6vpIFseZUKvFz1xPDgtCZfu2VbtzPGSS78kMTLpVYnzVZlcKPrS9o85eE8vfX/dL5aFU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737372289; c=relaxed/simple;
-	bh=F8c8n8lUERUPHL+mdTKkzpkhrHzyZz5klNWhEUx/HOs=;
-	h=Date:From:To:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=G961PY+iTd4fTnjmEOGSbEfi+Wxe/DbjaYPK9dYPfqk39wd8RgwDQV59bO3ln1sQUl0PDfxJXOVNiHoyQ0JSUuoL5hQ+FdBSaAWD9fA2/xizPTZ6zjRhoAimcfbPR3tTHZRKMFYZzlSvczM0dyEBZMiNC+1Ms4K76RTJeEMgY1s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Niajq6Q5; arc=none smtp.client-ip=209.85.160.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-467a37a2a53so49222391cf.2;
-        Mon, 20 Jan 2025 03:24:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1737372287; x=1737977087; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=k2b6PEWocf214nlQxHdjOFbir3dB1Ek3Kvgqh1AcVpc=;
-        b=Niajq6Q5LmPOxaBrfFesoutYRkYaGmBLdBHt55r/RniA8Tkwsn12RpO/SzQVSjuePn
-         SMFakVWeXJF3MTcWQsQjfdaDcPTLfnlMdjBPgTyPSiBz3Lec+V9tgha+ORNop1uWWM/5
-         VAJy6kAqC3p8RcfWuxeBUSOUefzgubpuyqQWyuUyp7qvuLKbJR8mjZ3qt79nq7GVMSe3
-         ZltKOaObISIbcfScEMELp0jANrMiOwoTyag7zK4zu4uELJ6ia0K7b9C1/tkXwLg+P6TY
-         /UnR3FKun4iUsWGx3vF4JO3bygDo7/ijpLRjX2smnAQdt2TMC07OxzlOVj9X8STpKqm1
-         8w4w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737372287; x=1737977087;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=k2b6PEWocf214nlQxHdjOFbir3dB1Ek3Kvgqh1AcVpc=;
-        b=rWevPVqOCkbv/4e0VIsGbI4NCg0fbu0YGA2frPKP/f9YIq/YwdUJE7zTUlkRFLF1RF
-         1eNfMnx78yW8Z1LZIT9nzf1lOenthc7TvZnp2TXsGOfPRd7xBNV4GX+eT0Gf8VVrVS1k
-         gr0a6DOe4pkx+jDAQw1mBDRVioIfmNT3TUfu0c3jibrFzhe/zBXb0Z7xbam/WCxiUqGv
-         FOasR9bRhj/PH+v0tsVQFYwjtxYaa9ZAKjBJfwYZTZ/pR4avIr0WHdqKFJ8zj5qGBtct
-         JwKTRlGLiafH91HKHjXc6gQtsuTF+FbUrJWdZNh1e0Ru3GyF12f45nVpOxHTHyX7z11E
-         FEkw==
-X-Forwarded-Encrypted: i=1; AJvYcCUfrH3sngP28LQ5TtB1ziOP6lRjkmYziZh38AQICuVh9B9DTqn3IvTkVkQOoEYVkJpXe4Jt1luh1TFx@vger.kernel.org, AJvYcCVRdleOL5uCA6gXtjIujSO4EJIi496EjvpmNRhZRNCKk6Vl9qtcg6obX5gbYl90v/EKSGE=@vger.kernel.org, AJvYcCVnrZxJ6JEI7QtgI8wN2YQHHpMLPiCQKdXXWLOj+KLzy6xeSu6QQEv0KyRSm7wfJMHFBeiNrtS4@vger.kernel.org, AJvYcCWbQyC3t8aDlilBZuVTuT6PZlrmfigi+skdxa42OKAvOdK5/xl44Q0FW9iBhaDo8tLo4WIvD7nmsDh0ovQV@vger.kernel.org, AJvYcCXT9s5XMNJq4/l7/jnG2ZdnEieb814ZMO+XzxWNUpyDyvrs3JTSswkzwGr4bVxkVTyTjXAXBe1/CH1N1lLoSjKY@vger.kernel.org
-X-Gm-Message-State: AOJu0YxwfDLCu910T96E3ZvRX7uHEkxSSyrCSoRa6Xo2oMWuvTisFBjS
-	OcsT77P70g5SHBlM4ISVbq1I96KKbDIIX4Hj9suWt/8FYvIu7kOL
-X-Gm-Gg: ASbGnctDi0iX1cN09AoMpZ/0gsPObip5lJyng2avninFnn9LxWB4mc5GNAzMJdqXKN+
-	1uzR1/kmX9SxBgBrI6gGpbu2jNbiY3uihnYXiX8eVfKUhD4EOhlGQvssCmW2NDqjg5hMSvDM/0m
-	wMR//1laOmlry4MPsEe4d7qS+Weh8b20K0pGzGOx/faw2IzrPbAI28Uwu19K0FpBOGPjnawJX9V
-	0eKkWVQBGmohkLP7807kgSzr/pavEKNKpBZCWNeewD6sSQsW0ilB5BVINKpx0n1CBL66o7+cMZF
-	mBjLNaszuqyMcAwkLiTseAsCnlJL/vsd1lTrkbTKDA==
-X-Google-Smtp-Source: AGHT+IEbMrWKUTs5M/W8DCHFtlIrBWKmvjQeT8P8UnoJEJpMua5cPVTSwsGq0gh/5/6so3JDrbLKwQ==
-X-Received: by 2002:ac8:7f4b:0:b0:466:b394:92bc with SMTP id d75a77b69052e-46e12a0c2aamr181155671cf.6.1737372286947;
-        Mon, 20 Jan 2025 03:24:46 -0800 (PST)
-Received: from localhost (15.60.86.34.bc.googleusercontent.com. [34.86.60.15])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-46e2f67ea89sm15197411cf.10.2025.01.20.03.24.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 Jan 2025 03:24:46 -0800 (PST)
-Date: Mon, 20 Jan 2025 06:24:46 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Akihiko Odaki <akihiko.odaki@daynix.com>, 
- Jonathan Corbet <corbet@lwn.net>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- Jason Wang <jasowang@redhat.com>, 
- "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- "Michael S. Tsirkin" <mst@redhat.com>, 
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
- Shuah Khan <shuah@kernel.org>, 
- linux-doc@vger.kernel.org, 
- linux-kernel@vger.kernel.org, 
- netdev@vger.kernel.org, 
- kvm@vger.kernel.org, 
- virtualization@lists.linux-foundation.org, 
- linux-kselftest@vger.kernel.org, 
- Yuri Benditovich <yuri.benditovich@daynix.com>, 
- Andrew Melnychenko <andrew@daynix.com>, 
- Stephen Hemminger <stephen@networkplumber.org>, 
- gur.stavi@huawei.com, 
- devel@daynix.com, 
- Akihiko Odaki <akihiko.odaki@daynix.com>
-Message-ID: <678e327e34602_19c737294b4@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20250120-tun-v4-8-ee81dda03d7f@daynix.com>
-References: <20250120-tun-v4-0-ee81dda03d7f@daynix.com>
- <20250120-tun-v4-8-ee81dda03d7f@daynix.com>
-Subject: Re: [PATCH net-next v4 8/9] tap: Keep hdr_len in tap_get_user()
+	s=arc-20240116; t=1737372946; c=relaxed/simple;
+	bh=snYT/6VTAYf+xlnQYn6S2ic5MZDjlcnjLOfGWCWn6E4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=a0/Drelo9FgdBnzVYntpRkU+zkAZCQbd1cuk6ZOu7+9CEevJmGFtjOi4EmOSb/lsS0m2XUJ/iASVSz7LoV/FDsqbl8XPuxd2ZvwMVSutP6Ood5n7j/KhdeA1hlkhvlgfuF6WEgBRO9udGgUm1lWK74icfKpZp5oU2F9KpDY+Uao=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=HFKpvEf+; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50K9GSMP008671;
+	Mon, 20 Jan 2025 11:35:37 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=5Zhxbm
+	BbXsyz6OeX0qks/cZIHA3q2cufIHJNCZGfgsI=; b=HFKpvEf+9xhDorsa9bMvL6
+	EZeNaVet8ShySmbdOZP2o7Jf4qVK8zSAuiV1S5RGwxS6gp2ghXZKf4Xq1EpYxHCx
+	Zc/bWDB+i9kyrFFtPwTMkR5jnlGd9R2cwt1WLaGwpxBV2i3uLcy1rxgw3wAQeVge
+	Yf9zUEQfStgD/Ls3u+LCbsBdpFP1Z3SuXVxwtiSY6MFW+aPVXNgsE0P6WYBzYnsa
+	6LX/muDIjsA6WNlcDMAJXZV1pEMdTn8raC14+uEOulSOGKEIyqC3Gv/nxp5nk0Xb
+	mTakrqmPcPwFLkMmm27r3p1pz/lJ74+X8z7fxOHeHzbcAD1dQKVfsACK8tL26Xbg
+	==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44947suq7e-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 20 Jan 2025 11:35:37 +0000 (GMT)
+Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 50KBV6pR007162;
+	Mon, 20 Jan 2025 11:35:36 GMT
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44947suq79-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 20 Jan 2025 11:35:36 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 50K8iQeB032266;
+	Mon, 20 Jan 2025 11:35:36 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 448rujdu4u-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 20 Jan 2025 11:35:35 +0000
+Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
+	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 50KBZW0x53346582
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 20 Jan 2025 11:35:32 GMT
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 65EB92004B;
+	Mon, 20 Jan 2025 11:35:32 +0000 (GMT)
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 1351120043;
+	Mon, 20 Jan 2025 11:35:32 +0000 (GMT)
+Received: from [9.152.224.153] (unknown [9.152.224.153])
+	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Mon, 20 Jan 2025 11:35:32 +0000 (GMT)
+Message-ID: <e6461792-91e3-4fc1-b5f4-1c808a085e1e@linux.ibm.com>
+Date: Mon, 20 Jan 2025 12:35:31 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC net-next 4/7] net/ism: Add kernel-doc comments for ism
+ functions
+To: Julian Ruess <julianr@linux.ibm.com>, dust.li@linux.alibaba.com,
+        Wenjia Zhang <wenjia@linux.ibm.com>, Jan Karcher <jaka@linux.ibm.com>,
+        Gerd Bayer <gbayer@linux.ibm.com>, Halil Pasic <pasic@linux.ibm.com>,
+        "D. Wythe" <alibuda@linux.alibaba.com>,
+        Tony Lu <tonylu@linux.alibaba.com>, Wen Gu <guwen@linux.alibaba.com>,
+        Peter Oberparleiter
+ <oberpar@linux.ibm.com>,
+        David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+        Andrew Lunn <andrew+netdev@lunn.ch>
+Cc: Niklas Schnelle <schnelle@linux.ibm.com>,
+        Thorsten Winkler <twinkler@linux.ibm.com>, netdev@vger.kernel.org,
+        linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev
+ <agordeev@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>, Simon Horman <horms@kernel.org>
+References: <20250115195527.2094320-1-wintera@linux.ibm.com>
+ <20250115195527.2094320-5-wintera@linux.ibm.com>
+ <20250120063241.GM89233@linux.alibaba.com>
+ <aba18690-5ffb-4eee-8931-728d72ce90c3@linux.ibm.com>
+ <D76TFVAMAGCP.2BN616RUY7GOY@linux.ibm.com>
+Content-Language: en-US
+From: Alexandra Winter <wintera@linux.ibm.com>
+In-Reply-To: <D76TFVAMAGCP.2BN616RUY7GOY@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: JaI3a24k_yhcy0nbaOk3iwx10_4zjQOu
+X-Proofpoint-ORIG-GUID: StPekOFb0RaPPwYO8dyxvAzS2oDOpGud
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-01-20_02,2025-01-20_03,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999
+ malwarescore=0 lowpriorityscore=0 bulkscore=0 priorityscore=1501
+ clxscore=1015 impostorscore=0 phishscore=0 adultscore=0 spamscore=0
+ suspectscore=0 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2411120000 definitions=main-2501200096
 
-Akihiko Odaki wrote:
-> hdr_len is repeatedly used so keep it in a local variable.
-> 
-> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
-> ---
->  drivers/net/tap.c | 17 +++++++----------
->  1 file changed, 7 insertions(+), 10 deletions(-)
-> 
-> diff --git a/drivers/net/tap.c b/drivers/net/tap.c
-> index 061c2f27dfc83f5e6d0bea4da0e845cc429b1fd8..7ee2e9ee2a89fd539b087496b92d2f6198266f44 100644
-> --- a/drivers/net/tap.c
-> +++ b/drivers/net/tap.c
-> @@ -645,6 +645,7 @@ static ssize_t tap_get_user(struct tap_queue *q, void *msg_control,
->  	int err;
->  	struct virtio_net_hdr vnet_hdr = { 0 };
->  	int vnet_hdr_len = 0;
-> +	int hdr_len = 0;
->  	int copylen = 0;
->  	int depth;
->  	bool zerocopy = false;
-> @@ -672,6 +673,7 @@ static ssize_t tap_get_user(struct tap_queue *q, void *msg_control,
->  		err = -EINVAL;
->  		if (tap16_to_cpu(q, vnet_hdr.hdr_len) > iov_iter_count(from))
->  			goto err;
-> +		hdr_len = tap16_to_cpu(q, vnet_hdr.hdr_len);
->  	}
->  
->  	len = iov_iter_count(from);
-> @@ -683,11 +685,8 @@ static ssize_t tap_get_user(struct tap_queue *q, void *msg_control,
->  	if (msg_control && sock_flag(&q->sk, SOCK_ZEROCOPY)) {
->  		struct iov_iter i;
->  
-> -		copylen = vnet_hdr.hdr_len ?
-> -			tap16_to_cpu(q, vnet_hdr.hdr_len) : GOODCOPY_LEN;
-> -		if (copylen > good_linear)
-> -			copylen = good_linear;
-> -		else if (copylen < ETH_HLEN)
-> +		copylen = min(hdr_len ? hdr_len : GOODCOPY_LEN, good_linear);
-> +		if (copylen < ETH_HLEN)
->  			copylen = ETH_HLEN;
->  		linear = copylen;
->  		i = *from;
-> @@ -698,11 +697,9 @@ static ssize_t tap_get_user(struct tap_queue *q, void *msg_control,
->  
->  	if (!zerocopy) {
->  		copylen = len;
-> -		linear = tap16_to_cpu(q, vnet_hdr.hdr_len);
-> -		if (linear > good_linear)
-> -			linear = good_linear;
-> -		else if (linear < ETH_HLEN)
-> -			linear = ETH_HLEN;
-> +		linear = min(hdr_len, good_linear);
-> +		if (copylen < ETH_HLEN)
-> +			copylen = ETH_HLEN;
 
-Similar to previous patch, I don't think this patch is significant
-enough to warrant the code churn.
+
+On 20.01.25 11:07, Julian Ruess wrote:
+> On Mon Jan 20, 2025 at 10:56 AM CET, Alexandra Winter wrote:
+>>
+>>
+>> On 20.01.25 07:32, Dust Li wrote:
+>>>> +	/**
+>>>> +	 * move_data() - write into a remote dmb
+>>>> +	 * @dev: Local sending ism device
+>>>> +	 * @dmb_tok: Token of the remote dmb
+>>>> +	 * @idx: signalling index
+>>>> +	 * @sf: signalling flag;
+>>>> +	 *      if true, idx will be turned on at target ism interrupt mask
+>>>> +	 *      and target device will be signalled, if required.
+>>>> +	 * @offset: offset within target dmb
+>>>> +	 * @data: pointer to data to be sent
+>>>> +	 * @size: length of data to be sent
+>>>> +	 *
+>>>> +	 * Use dev to write data of size at offset into a remote dmb
+>>>> +	 * identified by dmb_tok. Data is moved synchronously, *data can
+>>>> +	 * be freed when this function returns.
+>>> When considering the API, I found this comment may be incorrect.
+>>>
+>>> IIUC, in copy mode for PCI ISM devices, the CPU only tells the
+>>> device to perform a DMA copy. As a result, when this function returns,
+>>> the device may not have completed the DMA copy.
+>>>
+>>
+>> No, it is actually one of the properties of ISM vPCI that the data is
+>> moved synchronously inside the move_data() function. (on PCI layer the
+>> data is moved inside the __zpci_store_block() command).
+>> Obviously for loopback move_data() is also synchornous.
+> 
+> That is true for the IBM ISM vPCI device but maybe we
+> should design the API also for future PCI devices
+> that do not move data synchronously.
+>
+
+An API should always be extendable
+
+>>
+>> SMC-D does not make use of it, instead they re-use the same
+>> conn->sndbuf_desc for the lifetime of a connection.
+>>
+>>
+>>> In zero-copy mode for loopback, the source and destination share the
+>>> same buffer. If the source rewrites the buffer, the destination may
+>>> encounter corrupted data. The source should only reuse the data after
+>>> the destination has finished reading it.
+>>>
+>>
+>> That is true independent of the question, whether the move is
+>> synchronous or not.
+>> It is the clients' responsibility to make sure a sender does not
+>> overwrite unread data. SMC uses the write-pointers and read-pointer for
+>> that.
+>>
+>>
+>>> Best regards,
+>>> Dust
+>>>
+>>>> +	 *
+>>>> +	 * If signalling flag (sf) is true, bit number idx bit will be
+>>>> +	 * turned on in the ism signalling mask, that belongs to the
+>>>> +	 * target dmb, and handle_irq() of the ism client that owns this
+>>>> +	 * dmb will be called, if required. The target device may chose to
+>>>> +	 * coalesce multiple signalling triggers.
+>>>> +	 */
+>>>> 	int (*move_data)(struct ism_dev *dev, u64 dmb_tok, unsigned int idx,
+>>>> 			 bool sf, unsigned int offset, void *data,
+>>>> 			 unsigned int size);
+>>>> -- 
+> 
+
 
