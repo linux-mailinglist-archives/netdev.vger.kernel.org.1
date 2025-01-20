@@ -1,203 +1,99 @@
-Return-Path: <netdev+bounces-159728-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159729-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 510D2A16A74
-	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 11:09:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9385DA16A7B
+	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 11:10:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7E28C1606F5
-	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 10:09:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CE4B8160A6E
+	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 10:10:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A943E1AF0B7;
-	Mon, 20 Jan 2025 10:09:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D522C1B423D;
+	Mon, 20 Jan 2025 10:10:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="KEAs55OG";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="XCpOx46V"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ndkng54a"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-b8-smtp.messagingengine.com (fhigh-b8-smtp.messagingengine.com [202.12.124.159])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 126463398B;
-	Mon, 20 Jan 2025 10:09:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.159
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAE9D1B4232;
+	Mon, 20 Jan 2025 10:10:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737367754; cv=none; b=g1kj6fTxESjevuWS3UKN0sEWaIH6Qpw7ghkLHejgIpnxLfCt/jWERhpYrkgN4rOIz5hWZFznO1u5iIJSOsmIzaU0szdOxhqyZkbUBbMMUOnYKovE1DG3PgVDUKsI6p9CkooZg+KaFLnnsgbxgDwGO+MrbWsJFL2AGHd6QuLSxSs=
+	t=1737367805; cv=none; b=OHnritIpi4CEvy2YQKuLlz2Bd90YgI/GnY2A3kPj5Rp8Nuah3eaHPhObvyGg6Pgu+69Y1XP51EERaPfyJG8B8KHEtN8/xl9lB59T/KQAsnHKH0N7CIQ1z0fyQTuRjMZ+slxpegGgNlyZs8DxfBHUuS/SI1ZSHJVQ87Xuwer80Lg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737367754; c=relaxed/simple;
-	bh=XH23n71DeL1i9KIo1p2fK2BbqdyYrQe0PBbsqyqJHkE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oHDcxOcKQzznwnlZkEOQSLDFT/OHypy8a+JXlzYK1tHPznBF4TuxvqfhfxGZ9Bfe19YZfXGILZffDGs2ohowe37eY8Bhu1zsbyULYBEbotCDwXqDWZQ6SRG0gVFHl5n1Gt1hdtVWRjVnXJJ7XcsXFLHRk8DQGYpOv2ElVSl0qKE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=KEAs55OG; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=XCpOx46V; arc=none smtp.client-ip=202.12.124.159
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-11.internal (phl-compute-11.phl.internal [10.202.2.51])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id 7AFC0254018F;
-	Mon, 20 Jan 2025 05:09:09 -0500 (EST)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-11.internal (MEProxy); Mon, 20 Jan 2025 05:09:09 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm1; t=1737367749; x=
-	1737454149; bh=BUp8aXKVXZnAYl3NyVGL5x3bGBCfB+C3Mkm1ITPH3yM=; b=K
-	EAs55OG9bvFq0mercZH5cFjd/6brQqIuRMc/sM4AYgKHvuYbJmNXI7OiOH3ceeNE
-	/Y57jOlhCb9/5ATbpIRETgFDd7+PCJv1+vru2jH7LB9mfyx3JgbaY6bVRKl5XWDf
-	aLVoov4rMnj9oAnxMaiBFLAFG2lRXmnVC9EJOwkuNE1sPZvMOmvjZ/LqPmrSUzGC
-	vx07uVhX9SRIVgmg9l+x3+1ITzXeeUcd9vXmguXs66SMt/UTOg8RDKobQaFFIZHR
-	gUQQGtA8twPNvlG3H9R6awtaxAcPbkMwRaEqKOUeQ7tSsY7LKAuIS2Emqx+cnd+y
-	wzcTQ1/8uurEts4YhwO4Q==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
-	1737367749; x=1737454149; bh=BUp8aXKVXZnAYl3NyVGL5x3bGBCfB+C3Mkm
-	1ITPH3yM=; b=XCpOx46VWGAi4PrdvXEqtfCiVOVdCXChuxydb2m21n499A6b5RA
-	8VHA3Juf8JQYuftbeqnI7Bd6bLBB//mQYN4E1gWvIm8jpJKJR5ELISoYQRy0Pobi
-	dKYNV5xPQmmBxZAE2zb9W1rsjebm+KjZedi3rp+OPD/SDTBU6uU8VP6fW7lc7Dgw
-	EYfzdIBK36GJ++IVRzxw/gvXXZ3ETTS2QA4QSHiHb3IYweUNTnJ7gutyyUpS0KAP
-	MY5GxpcvGZcBRWGKFKsG0T7jFj4kvMJhtb19orIJnBQkoxj7rZgIT4PJMRWUWanC
-	C49sR4vyIOsCtIIMButnai1/GQ8NRZJRWog==
-X-ME-Sender: <xms:xCCOZ1J3-rqTkkG286uW_W3NFMc-u-i51cVIZq4KWvotLDB9QB1xNA>
-    <xme:xCCOZxKWZgehUrb6DSFuauqmHgKpU3qS9RfHuwNn6eALUCsAtfssknljjau_Ovo3L
-    hqPiVPu7rHMzgIpaP4>
-X-ME-Received: <xmr:xCCOZ9tpej1_KogsHDkMDmH3N2iIAdHzHkrAP8xtasVqtiYYNj_g03Wu4HXr>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrudeiledgtdekucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
-    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
-    htshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtredttddtjeen
-    ucfhrhhomhepufgrsghrihhnrgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrg
-    hilhdrnhgvtheqnecuggftrfgrthhtvghrnhepgefhffdtvedugfekffejvdeiieelhfet
-    ffeffefghedvvefhjeejvdekfeelgefgnecuffhomhgrihhnpehkvghrnhgvlhdrohhrgh
-    enucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehsuges
-    qhhuvggrshihshhnrghilhdrnhgvthdpnhgspghrtghpthhtohepudefpdhmohguvgepsh
-    hmthhpohhuthdprhgtphhtthhopegrnhhtohhnihhosehophgvnhhvphhnrdhnvghtpdhr
-    tghpthhtoheprhihrgiirghnohhvrdhsrdgrsehgmhgrihhlrdgtohhmpdhrtghpthhtoh
-    epnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepvgguuhhm
-    rgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrd
-    horhhgpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthho
-    peguohhnrghlugdrhhhunhhtvghrsehgmhgrihhlrdgtohhmpdhrtghpthhtohepshhhuh
-    grhheskhgvrhhnvghlrdhorhhgpdhrtghpthhtoheprghnughrvgifodhnvghtuggvvhes
-    lhhunhhnrdgthh
-X-ME-Proxy: <xmx:xCCOZ2ZAAe1wj-GGzBeuUaUQwDGXaSYCxoArIxYwfyCW2PqzPcmECw>
-    <xmx:xCCOZ8bTrxew55MAV-8T48lhp-ezaJVUl0OB0iCDZJigQj4pw0R5bQ>
-    <xmx:xCCOZ6Crj31K3rjv_WnHaV4wku4ytyZ-LG0Is5sTR836e_ckQSHZBQ>
-    <xmx:xCCOZ6Zke_QQRlqzCDQoLL2wrjSTeN64Itv1-UQi-8MCU-CVqfhDNg>
-    <xmx:xSCOZ8odLpvXHdhp8NZsAro-DU92x2ml1xSQXpcRaEE8vFfMqxNFwTi_>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 20 Jan 2025 05:09:08 -0500 (EST)
-Date: Mon, 20 Jan 2025 11:09:06 +0100
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Antonio Quartulli <antonio@openvpn.net>
-Cc: ryazanov.s.a@gmail.com, netdev@vger.kernel.org,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Shuah Khan <shuah@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, Xiao Liang <shaw.leon@gmail.com>
-Subject: Re: [PATCH net-next v18 20/25] ovpn: implement peer
- add/get/dump/delete via netlink
-Message-ID: <Z44gwl2d8ThTshzQ@hog>
-References: <20250113-b4-ovpn-v18-0-1f00db9c2bd6@openvpn.net>
- <20250113-b4-ovpn-v18-20-1f00db9c2bd6@openvpn.net>
- <Z4pDpqN2hCc-7DGt@hog>
- <f5507529-e61c-4b81-ab93-4ea6c8df46e9@openvpn.net>
- <Z4qPjuK3_fQUYLJi@hog>
- <33710520-5f4f-4d33-a28d-99dc64afc9c3@openvpn.net>
+	s=arc-20240116; t=1737367805; c=relaxed/simple;
+	bh=5kVUEYGd1O3X+LS0/N3Nv0ai5flB4MmsxqkP1YSXZiQ=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=SULck1aM4TLRktKWMjvMcGOBfPYSMSch/vz+TOEcQrOe7ndt/7sKPyex6yzdwu7KDq56yjXMRt4jrIXnXhkIRM/xM3ir9fPxk4Dl8DBiPDsBgALoA5wgX/fg7JMe1tQnHH0jMxbFnv6fBn+DyTD/GyfbFNSZg5wq+lXJy6EBzyc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ndkng54a; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 09E70C4CEDD;
+	Mon, 20 Jan 2025 10:10:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1737367805;
+	bh=5kVUEYGd1O3X+LS0/N3Nv0ai5flB4MmsxqkP1YSXZiQ=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Ndkng54aMZN4gqZhKEtFuzLJjwENjULMPLb9Bn1rjAU2/d3pyi3Yilxmn9msTWpd1
+	 L27aMUASzmeugGBr+f2RWyKDJ3FXiY0aZvxcDIW/+6VTXjAyuagx/FwJXxUatB5U6v
+	 c4NHmg91aUpSIJDQWQYh/GBecnk7YGbD7yK8md5kyqRryDQ3YxzNznJiAOyylO+1iQ
+	 h8zqSBu4aVnBCLJq4BcwZvFsiu7kEyldLpY589nq2JDD/VUsheQ4oGXuI/+cqINmrl
+	 oyNnKFKuVtYT3XDOcIwwZdKFsPkdJRtJTXdZM9NSONaXAcslyH5vhMhjrs/w/X1rm7
+	 Dy17/sx6IjKGQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33A84380AA62;
+	Mon, 20 Jan 2025 10:10:30 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <33710520-5f4f-4d33-a28d-99dc64afc9c3@openvpn.net>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v2] net: ethernet: ti: am65-cpsw: fix freeing IRQ in
+ am65_cpsw_nuss_remove_tx_chns()
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <173736782902.3476879.17872430916654869095.git-patchwork-notify@kernel.org>
+Date: Mon, 20 Jan 2025 10:10:29 +0000
+References: <20250116-am65-cpsw-fix-tx-irq-free-v2-1-ada49409a45f@kernel.org>
+In-Reply-To: <20250116-am65-cpsw-fix-tx-irq-free-v2-1-ada49409a45f@kernel.org>
+To: Roger Quadros <rogerq@kernel.org>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, grygorii.strashko@ti.com,
+ s-vadapalli@ti.com, srk@ti.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, horms@kernel.org
 
-2025-01-19, 14:12:05 +0100, Antonio Quartulli wrote:
-> On 17/01/2025 18:12, Sabrina Dubroca wrote:
-> > 2025-01-17, 13:59:35 +0100, Antonio Quartulli wrote:
-> > > On 17/01/2025 12:48, Sabrina Dubroca wrote:
-> > > > 2025-01-13, 10:31:39 +0100, Antonio Quartulli wrote:
-> > > > >    int ovpn_nl_peer_new_doit(struct sk_buff *skb, struct genl_info *info)
-> > > > >    {
-> > > > > -	return -EOPNOTSUPP;
-> > > > > +	struct nlattr *attrs[OVPN_A_PEER_MAX + 1];
-> > > > > +	struct ovpn_priv *ovpn = info->user_ptr[0];
-> > > > > +	struct ovpn_socket *ovpn_sock;
-> > > > > +	struct socket *sock = NULL;
-> > > > > +	struct ovpn_peer *peer;
-> > > > > +	u32 sockfd, peer_id;
-> > > > > +	int ret;
-> > > > > +
-> > > > > +	/* peers can only be added when the interface is up and running */
-> > > > > +	if (!netif_running(ovpn->dev))
-> > > > > +		return -ENETDOWN;
-> > > > 
-> > > > Since we're not under rtnl_lock here, the device could go down while
-> > > > we're creating this peer, and we may end up with a down device that
-> > > > has a peer anyway.
-> > > 
-> > > hmm, indeed. This means we must hold the rtnl_lock to prevent ending up in
-> > > an inconsistent state.
-> > > 
-> > > > 
-> > > > I'm not sure what this (and the peer flushing on NETDEV_DOWN) is
-> > > > trying to accomplish. Is it a problem to keep peers when the netdevice
-> > > > is down?
-> > > 
-> > > This is the result of my discussion with Sergey that started in v23 5/23:
-> > > 
-> > > https://lore.kernel.org/r/netdev/20241029-b4-ovpn-v11-5-de4698c73a25@openvpn.net/
-> > > 
-> > > The idea was to match operational state with actual connectivity to peer(s).
-> > > 
-> > > Originally I wanted to simply kee the carrier always on, but after further
-> > > discussion (including the meaning of the openvpn option --persist-tun) we
-> > > agreed on following the logic where an UP device has a peer connected (logic
-> > > is slightly different between MP and P2P).
-> > > 
-> > > I am not extremely happy with the resulting complexity, but it seemed to be
-> > > blocker for Sergey.
-> > 
-> > [after re-reading that discussion with Sergey]
-> > 
-> > I don't understand why "admin does 'ip link set tun0 down'" means "we
-> > should get rid of all peers. For me the carrier situation goes the
-> > other way: no peer, no carrier (as if I unplugged the cable from my
-> > ethernet card), and it's independent of what the user does (ip link
-> > set XXX up/down). You have that with netif_carrier_{on,off}, but
-> > flushing peers when the admin does "ip link set tun0 down" is separate
-> > IMO.
+Hello:
+
+This patch was applied to netdev/net.git (main)
+by David S. Miller <davem@davemloft.net>:
+
+On Thu, 16 Jan 2025 15:54:49 +0200 you wrote:
+> When getting the IRQ we use k3_udma_glue_tx_get_irq() which returns
+> negative error value on error. So not NULL check is not sufficient
+> to deteremine if IRQ is valid. Check that IRQ is greater then zero
+> to ensure it is valid.
 > 
-> The reasoning was "the user is asking the VPN to go down - it should be
-> assumed that from that moment on no VPN traffic whatsoever should flow in
-> either direction".
-> Similarly to when you bring an Eth interface dwn - the phy link goes down as
-> well.
+> There is no issue at probe time but at runtime user can invoke
+> .set_channels which results in the following call chain.
+> am65_cpsw_set_channels()
+>  am65_cpsw_nuss_update_tx_rx_chns()
+>   am65_cpsw_nuss_remove_tx_chns()
+>   am65_cpsw_nuss_init_tx_chns()
 > 
-> Does it make sense?
+> [...]
 
-I'm not sure. If I turn the ovpn interface down for a second, the
-peers are removed. Will they come back when I bring the interface back
-up?  That'd have to be done by userspace (which could also watch for
-the DOWN events and tell the kernel to flush the peers) - but some of
-the peers could have timed out in the meantime.
+Here is the summary with links:
+  - [net,v2] net: ethernet: ti: am65-cpsw: fix freeing IRQ in am65_cpsw_nuss_remove_tx_chns()
+    https://git.kernel.org/netdev/net/c/4395a44acb15
 
-If I set the VPN interface down, I expect no packets flowing through
-that interface (dropping the peers isn't necessary for that), but all
-non-data (key exchange etc sent by openvpn's userspace) should still
-go through, and IMO peer keepalive fits in that "non-data" category.
-
-
-What does openvpn currently do if I do
-    ip link set tun0 down ; sleep 5 ; ip link set tun0 up
-with a tuntap interface?
-
+You are awesome, thank you!
 -- 
-Sabrina
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
