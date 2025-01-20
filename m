@@ -1,95 +1,135 @@
-Return-Path: <netdev+bounces-159730-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159731-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41FECA16A88
-	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 11:14:01 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E73FFA16A86
+	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 11:13:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 533EC7A6154
-	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 10:10:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 03E5B3A33D2
+	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 10:13:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9683A1B87EB;
-	Mon, 20 Jan 2025 10:10:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 513131B4232;
+	Mon, 20 Jan 2025 10:13:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NftyrO2C"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="IXoOHnHv"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A86D1B87D7;
-	Mon, 20 Jan 2025 10:10:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE73019DF4A
+	for <netdev@vger.kernel.org>; Mon, 20 Jan 2025 10:13:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737367808; cv=none; b=aUF8fqDjt44/BBOY4diVL51QF7EPwSG//H/6KX7RVEipgIZCbO9P+/dZeiQ+wLZ5/TlVdRQOpOcJURx6uYj/FGrIOuEO7tKxaTWoMnOiL10SE4tpZLOe5WIYesCVCoU4/1dryUdDgnv/mYkMadTUQXdT6WAyy2OI+yjUz/eHjmQ=
+	t=1737367994; cv=none; b=jLDTvS3oDMox4tuQqPnaaLvFiOxHkuc558TC8qKcWczIRoTxckFVG123iPpdiV0KOsUZg2NlkS70U8vu/v87HKn+iRir5oI3aSorBmemzCYThFC7n53pLaFiMHfQfGCROaJZdZreDaQxAHw4LpPnbixSDAz3rICPsPK42K65pec=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737367808; c=relaxed/simple;
-	bh=TPFCKAMe3gVNj10ZQthjkDGlKTZCDMkVH1ZwfKjjTvI=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=swoLtOs+C/4hJhwTmzF+EmlEZ6hEUI+mY2Vqb5Yb5eLt7Xf7OhXt6U03qUM01e70He15HHFapeD6tHOPIyln7gnuM9cr5d66rbyZgmelqxJ/KHxioVvsf8MKO2F7BvvR6/6Gm/TAb2kSLaNbQjjDAV/OSfUhoZfL+ZzVHk8DsTo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NftyrO2C; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C2A38C4CEDD;
-	Mon, 20 Jan 2025 10:10:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737367807;
-	bh=TPFCKAMe3gVNj10ZQthjkDGlKTZCDMkVH1ZwfKjjTvI=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=NftyrO2CkU9WCQTMMx7//gTkD4IWTrx+a0EdLeU8lleJ9Yws489KvX+4HpSCbpcK0
-	 hwXrtKT7XyO3GFjBqP5tnA7/zcUVRu3p4B3o8P/P2P0NRA2m6HtBTvDFIf5ULBv9ft
-	 N6lSShObGaIzwWKJtzXlu9cxYtBdu1gSu+tI2ZDpawvkhAR4i0huMKmJh4XT0ZiE1n
-	 Eb1LTpQBAAAcTDjbfYhNiIUyAN4FFJJndfRGsXzItSdw95sBk5jCi7BobmiYUPnwg0
-	 AmjxbWuaz+Y9riHWRe6cCWf0IZ6dbkDNcm/B1WCpQ6xJs6EWe0c8SXspUHhLFHcDC2
-	 TEKx5g9/FpkYg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EACFA380AA62;
-	Mon, 20 Jan 2025 10:10:32 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1737367994; c=relaxed/simple;
+	bh=POeSpLXqMDnf4ncHbT7WX49tYfW9PFR0KWRj+oU7i6Y=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=iLUQmDPaX5mVOtLQHvUXjuBQM0uUEvQpYWsstwhvsmehD5t4hrCrhbXq/bTHJ2wv/2gSHURPNOZ350H6slvpk5o0U5YeQXDNPEi7XoRx3nU80Ed2xWuuBD5DdauisG8MV5ce3Zq8fYTRZoTkqoOUZ5ZD/8ZqOWnPvUZ3Nn46yWk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=IXoOHnHv; arc=none smtp.client-ip=209.85.218.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-aa689a37dd4so817309066b.3
+        for <netdev@vger.kernel.org>; Mon, 20 Jan 2025 02:13:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google09082023; t=1737367990; x=1737972790; darn=vger.kernel.org;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=s+AmXtS555KTGh368N6qrcyGQOSWOD2uM0ZEZKy8e4w=;
+        b=IXoOHnHvuITax+uU8uyj3FCD1+zVkSGMte6VFd9kwcZQy+03YCcP2InjSq6RKd7Npg
+         hWAVjMa++UZ8MMeNiBC62klRpLf4PHfqAa0avOsNoCVzSpWCPGcoLRxCRvA6el2rDep9
+         x9vCfhkZPsyq7JthqO52fkSSpIxG0inGYhr/sWPY4FOVFDpw5lJYm4YRyGF0c34hUp4m
+         9Xn0ItD47XGtKu3RXXjPehu7QNwrBPeFtyxgJ8QAxzcAktboq3sq+6ogjlfc83dcKLgz
+         8P2RZSVAYNyv/FSqCv0Xvk8+p49BPgx1z23/d1vpn4sPWmD/eV9dANZep41BMNKyiLUE
+         oJrA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737367990; x=1737972790;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=s+AmXtS555KTGh368N6qrcyGQOSWOD2uM0ZEZKy8e4w=;
+        b=aWz1AcweVFjOiVyjZlB1lH5UnVDTUwGc21s60mUpCDKSGH5r7tQ4ZGTGx74j/mkOR4
+         DflVQ+x6VUmT4A/lmv+bj94m4BzihU98CA5bUWEvXVMHqjkCvFTFb7M8Pp3UfUIOZ+6T
+         +mQCgC0ywWCAnnjO1tQ0deLjjowJHRC7g9ctyKKXcCu1sFIPPeI5C7eDOBSNZS9cybwC
+         wgKX4zbmpzibpKNCa6UM+OaJlenxTqPLqQxDGZX7r2jbPBCg6UIMuQAEm8wocNCJzFL0
+         /8BCGR0jS6lAP0QC7Ya9mZ+0Vh5JSSq/lGCnIzNx9160SFfp+/D7l46qk3jGXi9eJPWP
+         WL3g==
+X-Forwarded-Encrypted: i=1; AJvYcCUfdeOFt9QI3q5p9qjowh6Gt2O7UpZLuM04kAHx/YnQov+VDnS18aL/92U7Ix8d1gsLFgZzW4g=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz5G/HHHA0xKcvvkDj07+vmRbdG0SmC4hZR7d67MCi09u2/zwJB
+	LE8K+Y5hKykMxMFpsHvevSZzvg5UNaVpjc/pte1Pcqr42yO9AGq4yJ3cxFet7Qw=
+X-Gm-Gg: ASbGnctrY3wG9sY0q5zqXzP0dK2C8S/vVz3kBBHDMQ/TCK3DLr+0w/I+HBg5QolImuM
+	C5Gh7rhMG4vgSdlZnvxez3CcQ03Mhwnwbz1r/Md5yv+bx6Pnd4+WcPtBmrO4ABWODUQvJZhcmJN
+	lDESeYyNfns9Dj0UHncT5c5oMjVf+My2jtI2vMLdlp5F2dtfvHMgHxnMQ8VzJRmCQEsC30QL0Xe
+	PH+g3LKNIFg+NfKneaHhUjT+Ce30q8FmZfcpFhq7EV9QuqgQTLDSxRfs70J4JE=
+X-Google-Smtp-Source: AGHT+IG3sxDHUYpin9r1buo9Oh2Jpo9gAgFq3g/a7WzAvcrq0JBMicje/huYwTSgfgvyeKZ4VF6qOw==
+X-Received: by 2002:a17:907:7faa:b0:a9e:b150:a99d with SMTP id a640c23a62f3a-ab38b1b45aamr1198652366b.5.1737367990090;
+        Mon, 20 Jan 2025 02:13:10 -0800 (PST)
+Received: from cloudflare.com ([2a09:bac5:506f:2387::38a:15])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ab384f224casm589585666b.87.2025.01.20.02.13.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 20 Jan 2025 02:13:09 -0800 (PST)
+From: Jakub Sitnicki <jakub@cloudflare.com>
+To: Jiayuan Chen <mrpre@163.com>
+Cc: bpf@vger.kernel.org,  john.fastabend@gmail.com,  netdev@vger.kernel.org,
+  martin.lau@linux.dev,  ast@kernel.org,  edumazet@google.com,
+  davem@davemloft.net,  dsahern@kernel.org,  kuba@kernel.org,
+  pabeni@redhat.com,  linux-kernel@vger.kernel.org,  song@kernel.org,
+  andrii@kernel.org,  mhal@rbox.co,  yonghong.song@linux.dev,
+  daniel@iogearbox.net,  xiyou.wangcong@gmail.com,  horms@kernel.org,
+  corbet@lwn.net,  eddyz87@gmail.com,  cong.wang@bytedance.com,
+  shuah@kernel.org,  mykolal@fb.com,  jolsa@kernel.org,  haoluo@google.com,
+  sdf@fomichev.me,  kpsingh@kernel.org,  linux-doc@vger.kernel.org
+Subject: Re: [PATCH bpf v7 2/5] bpf: fix wrong copied_seq calculation
+In-Reply-To: <j5piuelz2xt65bn42bxufmk4nmigvzjotbygwd5tin7t6cvrsj@gpon5o7px7tu>
+	(Jiayuan Chen's message of "Mon, 20 Jan 2025 11:35:37 +0800")
+References: <20250116140531.108636-1-mrpre@163.com>
+	<20250116140531.108636-3-mrpre@163.com>
+	<87ikqcdvm9.fsf@cloudflare.com>
+	<4uacr7khoalvlshkybaq4lqu55muax5adsrnqkulc6hgeuzaeg@eakft72epszp>
+	<j5piuelz2xt65bn42bxufmk4nmigvzjotbygwd5tin7t6cvrsj@gpon5o7px7tu>
+Date: Mon, 20 Jan 2025 11:13:08 +0100
+Message-ID: <87a5bliyiz.fsf@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v3] net: appletalk: Drop aarp_send_probe_phase1()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173736783173.3476879.5069911593463162072.git-patchwork-notify@kernel.org>
-Date: Mon, 20 Jan 2025 10:10:31 +0000
-References: <tencent_27DFF9F35BFBF50F6EE024ED508FA8F5FA06@qq.com>
-In-Reply-To: <tencent_27DFF9F35BFBF50F6EE024ED508FA8F5FA06@qq.com>
-To: XIE Zhibang <Yeking@red54.com>
-Cc: kuba@kernel.org, Yeking@Red54.com, arnd@arndb.de, davem@davemloft.net,
- edumazet@google.com, gregkh@linuxfoundation.org, horms@kernel.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com,
- prarit@redhat.com, vkuznets@redhat.com
+Content-Type: text/plain
 
-Hello:
+On Mon, Jan 20, 2025 at 11:35 AM +08, Jiayuan Chen wrote:
+> On Sat, Jan 18, 2025 at 11:29:04PM +0800, Jiayuan Chen wrote:
+>> On Sat, Jan 18, 2025 at 03:50:22PM +0100, Jakub Sitnicki wrote:
+>> > On Thu, Jan 16, 2025 at 10:05 PM +08, Jiayuan Chen wrote:
+>> > > 'sk->copied_seq' was updated in the tcp_eat_skb() function when the
+>> > > action of a BPF program was SK_REDIRECT. For other actions, like SK_PASS,
+>> > > +}
+>> > > +#endif /* CONFIG_BPF_STREAM_PARSER */
+>> > > +
+>> > >  int tcp_bpf_update_proto(struct sock *sk, struct sk_psock *psock, bool restore)
+>> > >  {
+>> > >  	int family = sk->sk_family == AF_INET6 ? TCP_BPF_IPV6 : TCP_BPF_IPV4;
+>> > > @@ -681,6 +722,12 @@ int tcp_bpf_update_proto(struct sock *sk, struct sk_psock *psock, bool restore)
+>> > >  
+>> > >  	/* Pairs with lockless read in sk_clone_lock() */
+>> > >  	sock_replace_proto(sk, &tcp_bpf_prots[family][config]);
+>> > > +#if IS_ENABLED(CONFIG_BPF_STREAM_PARSER)
+>> > > +	if (psock->progs.stream_parser && psock->progs.stream_verdict) {
+>> > > +		psock->copied_seq = tcp_sk(sk)->copied_seq;
+>> > > +		psock->read_sock = tcp_bpf_strp_read_sock;
+>> > 
+>> > Just directly set psock->strp.cb.read_sock to tcp_bpf_strp_read_sock.
+>> > Then we don't need this intermediate psock->read_sock callback, which
+>> > doesn't do anything useful.
+>> >
+>> Ok, I will do this.
+>> (BTW, I intended to avoid bringing "struct strparser" into tcp_bpf.c so I
+>> added a wrapper function instead in skmsg.c without calling it directly) 
+>> 
+> I find that tcp_bpf_update_proto is called before sk_psock_init_strp. Any
+> assignment of psock->cb.strp will be overwritten in sk_psock_init_strp.
 
-This patch was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
-
-On Fri, 17 Jan 2025 01:41:40 +0000 you wrote:
-> From: 谢致邦 (XIE Zhibang) <Yeking@Red54.com>
-> 
-> aarp_send_probe_phase1() used to work by calling ndo_do_ioctl of
-> appletalk drivers ltpc or cops, but these two drivers have been removed
-> since the following commits:
-> commit 03dcb90dbf62 ("net: appletalk: remove Apple/Farallon LocalTalk PC
-> support")
-> commit 00f3696f7555 ("net: appletalk: remove cops support")
-> 
-> [...]
-
-Here is the summary with links:
-  - [net-next,v3] net: appletalk: Drop aarp_send_probe_phase1()
-    https://git.kernel.org/netdev/net-next/c/45bd1c5ba758
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Or just don't set ->read_sock in strp_init.
+It's being reset only because you made it so in patch 1 :-)
 
