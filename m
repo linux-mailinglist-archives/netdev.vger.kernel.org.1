@@ -1,253 +1,206 @@
-Return-Path: <netdev+bounces-159724-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159727-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FDDBA16A72
-	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 11:09:04 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F113A16A6D
+	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 11:08:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2CFE07A17D8
-	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 10:06:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 952063A1343
+	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 10:08:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C62E1B4237;
-	Mon, 20 Jan 2025 10:06:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93FB01B4F15;
+	Mon, 20 Jan 2025 10:08:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BmLU7uAB"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="cR6ju4AO"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 615D01B4F23
-	for <netdev@vger.kernel.org>; Mon, 20 Jan 2025 10:06:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7C911B6D01;
+	Mon, 20 Jan 2025 10:08:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737367600; cv=none; b=fsgilOA/n72ohYJt7RTveQ+jjls7OnxZCi3p1GzpVqeHBjj3wKi5PIy5dB7m4XswVsIzfwwF7oNDsp1olPp64ZOOeDh6M7PZnaqiBDOefoJIMt4xWlBnOzm6GPj8Ix/m4meRmfJNeTz2CjGdfji1g+v7DZjXgciFjacdO+N0ZzE=
+	t=1737367689; cv=none; b=pqgEDiBEujGXNvQU+3i5TuK3ZC8Kr8u40goXa9NxOqFaspNgIujEaDS02sW4koYSB4IospoKHn5cvwiN9E8S9HY0S40UiK8GZwqmZsKyVfpSdcSHWMmYc4odYdEouOXFGn6bxQixzlh8xqG/EONzF/tA3CfMNAfk6+DWYkutH6E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737367600; c=relaxed/simple;
-	bh=oL5aHmhw7VLtvwjPSsgGX7JK+M1B8eDeLZyxlQElreg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CqYt4LYqKk/XZONzw+gPg5mNGP59DZWCHe22+Mz4Fw4rNZdT7+FdMAdrylZZOgr8gfgZtX7GX2hnu4N7RSw7/mYhpHAqVGvV3VfUNuIYuLr4qDjr8YMCK8GLhClCTWoryjKDKl9tPupiU97Ll4HQNDxRdbZQhlC0qcHjWHt6JVQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BmLU7uAB; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1737367597;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=A9szb4/Rigi+hOcaxwYZwoYZLRZ8YudCAzJVCNyuETs=;
-	b=BmLU7uABxHdhU1Bj2oEj2Z/zto2LAI2zhfAtSCqQqW2QvYgak0L+DG088pgIjGIC0mvsjT
-	p7ARHMr/mO+Sc5zX7k9GqSDKSK8tE5mUBMYjH5nvCnVfDJN3BUwVmzgagj81c0izuy32ne
-	iyuKyHzPcx48FAmKSnBXX2OOmA+hfjM=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-307-otkfHZOIPbq_ykGQbM6ZTA-1; Mon, 20 Jan 2025 05:06:35 -0500
-X-MC-Unique: otkfHZOIPbq_ykGQbM6ZTA-1
-X-Mimecast-MFC-AGG-ID: otkfHZOIPbq_ykGQbM6ZTA
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-43624b08181so21363735e9.0
-        for <netdev@vger.kernel.org>; Mon, 20 Jan 2025 02:06:35 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737367594; x=1737972394;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=A9szb4/Rigi+hOcaxwYZwoYZLRZ8YudCAzJVCNyuETs=;
-        b=NVatmQAf7KSmx01r35iH2U97QYk5LPdl4lQHAReawgEiIpkKX29kTMkhabwwdrbDfr
-         rC7Kmq3SHa5gzZyZsD5xMcA/HzwrHapd8WpiB5AEnhnHVfoGlH5/I63FPh7O/KWKxmWo
-         ldtF6wQVWcaK8fBcjrKIcqpyJyvBIz8yWT9K4IX2Sr/goETLeptCaaHOkAqhqwvSUYge
-         K2dDScDr//bo6zYnJ7OsRxP+2yyj2Fttn9B4Bsj2rtBrQicldWMmu+bec3swtBwBHzxq
-         CvKr5Cy5Jvr5VJ880AFoVoTXhWiBQyVgBitH+c8tgdLWLpdRoC2XC/pKzv31iHMFI3P1
-         aufw==
-X-Forwarded-Encrypted: i=1; AJvYcCUbwOLdE2SFvL4QhiZCB/ZzqJGeRrTSwBYntymD5mf3n37YOIoqzvjDKldgbD6xx0W6H1zRQjs=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx3w+lOo9MghUtcq1NQirecUkV4ASmStQQLW8J7dZMSDOqbs8ye
-	VasbLjxzGNfSlec4m1wU8jxkhbaLbxEcOa63pCyNl49s2XaIj90FVmnx2ZqDoLLkLuukgqnxfFk
-	s8olqd3ammeXUNn05Z/e/N26nrT3wLPhiqNVFltPdWRwVAjGfIkomfw==
-X-Gm-Gg: ASbGncvaPavayYXpBrvspebIbHYz/VW7soRcgHjLgZpfLwhueseM5EuQtWvQmFvChDQ
-	w23GqjmmkPa6m/W4aRAcJC5KZX+K47OnP6AIF0SjdRnXUJzOD3oEGlWXjeFi1HLFpUh5DDmX8Ka
-	yILhTJfbCJuGS7cNzkRm2YnCUOrYnFTwZ5RINNQniqn4gP3iYpkz9gEWzr2WyZtSJzZ81gd/zSV
-	YIntzhApZgrx+wAKUIDg5wb9OrzFbVYZcKEQNMN4DVGgXLkawDdKKbQ0+T9Jz4WVPoSWIZnNH7w
-	H7CcCOHkdvJ9cBYhJw0+TGPLPqsq5GtM+EfYRPR4ah4gVA==
-X-Received: by 2002:a05:600c:5692:b0:436:76bf:51cc with SMTP id 5b1f17b1804b1-437c6b2dcf4mr163938155e9.12.1737367594161;
-        Mon, 20 Jan 2025 02:06:34 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IExPdc8ilZ1EoTX/lgT+u0ckd4EhldQiK3bNVGABmKC9G3Vg90VuxP6ydJ25TSvnbQg/HdE2A==
-X-Received: by 2002:a05:600c:5692:b0:436:76bf:51cc with SMTP id 5b1f17b1804b1-437c6b2dcf4mr163937735e9.12.1737367593570;
-        Mon, 20 Jan 2025 02:06:33 -0800 (PST)
-Received: from sgarzare-redhat (host-82-53-134-100.retail.telecomitalia.it. [82.53.134.100])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4389041f610sm132221715e9.20.2025.01.20.02.06.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 Jan 2025 02:06:33 -0800 (PST)
-Date: Mon, 20 Jan 2025 11:06:29 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Michal Luczaj <mhal@rbox.co>
-Cc: "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	George Zhang <georgezhang@vmware.com>, Dmitry Torokhov <dtor@vmware.com>, Andy King <acking@vmware.com>, 
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net 3/5] vsock/test: Introduce vsock_bind()
-Message-ID: <kyiugvciavdrxb5y6gtuegmvla5tbohlqrrq7terl6xmpykmjo@tnw7fg6dkfdh>
-References: <20250117-vsock-transport-vs-autobind-v1-0-c802c803762d@rbox.co>
- <20250117-vsock-transport-vs-autobind-v1-3-c802c803762d@rbox.co>
+	s=arc-20240116; t=1737367689; c=relaxed/simple;
+	bh=3QIK0LeCkSSJJ6MZXDbBEv7lStjLSLrPLzCM6fCxnXI=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
+	 References:In-Reply-To; b=Pp8q0+S+LtkcRA58NRguEuGCq4wWV54OBSouWS32KFD+7ObLQa03k29farkx/Y/MwWhr9x7hrjJotzRWQbRE/XFBII1Ke7z7Mz1BmGZJKM8n7ow5R75sDK7jvz2kQPMC26FJ0yEy3Kz6n9SPJuP06FB6PJTuoMRjG0r0J3hHxGU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=cR6ju4AO; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50K20haK031849;
+	Mon, 20 Jan 2025 10:08:00 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=mbvKmJ
+	O2LGWVHPAlJeFO/UU7/ZG2FqSeMx6toZf0+gA=; b=cR6ju4AOM+CADOdDlkjQ0Y
+	l4ymDVbI614mVXyftYQ+eagsjEWMjOZA82lMBQq9NG4EWh2FZYpRt5fbqjKEYIYu
+	/jc43K2WmV/+j45wfjHSufFFoXEzflFk+1xOLwvStvBp3C5zzEcAQ610iIGpYwMz
+	4XAY6ogMUSRBX1VGytHn0q+pntbXtDrxXpJeYanl919M5wXbaz9kAZNnxlP8LeBR
+	zvcBuyQV+0YoDYkkbF18lscgJLtd3YZR/rh9L0C9cyuiwI0y+Ui8oPdbzrHDRJup
+	szmVq3NCkmncAF/sTxL0poQTDpfsC/qMAHrPTsKzljyHZHfevSquqQ1krLVeluxA
+	==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 449db0sv4s-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 20 Jan 2025 10:07:59 +0000 (GMT)
+Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 50KA7xS4022322;
+	Mon, 20 Jan 2025 10:07:59 GMT
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 449db0sv4n-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 20 Jan 2025 10:07:59 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 50K97PHt032248;
+	Mon, 20 Jan 2025 10:07:58 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 448rujdhsq-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 20 Jan 2025 10:07:58 +0000
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 50KA7t6U22217014
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 20 Jan 2025 10:07:55 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id EBDAF20065;
+	Mon, 20 Jan 2025 10:07:54 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 9B53120063;
+	Mon, 20 Jan 2025 10:07:54 +0000 (GMT)
+Received: from localhost (unknown [9.152.212.252])
+	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Mon, 20 Jan 2025 10:07:54 +0000 (GMT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20250117-vsock-transport-vs-autobind-v1-3-c802c803762d@rbox.co>
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Mon, 20 Jan 2025 11:07:54 +0100
+Message-Id: <D76TFVAMAGCP.2BN616RUY7GOY@linux.ibm.com>
+Cc: "Niklas Schnelle" <schnelle@linux.ibm.com>,
+        "Thorsten Winkler"
+ <twinkler@linux.ibm.com>, <netdev@vger.kernel.org>,
+        <linux-s390@vger.kernel.org>, "Heiko Carstens" <hca@linux.ibm.com>,
+        "Vasily
+ Gorbik" <gor@linux.ibm.com>,
+        "Alexander Gordeev" <agordeev@linux.ibm.com>,
+        "Christian Borntraeger" <borntraeger@linux.ibm.com>,
+        "Sven Schnelle"
+ <svens@linux.ibm.com>,
+        "Simon Horman" <horms@kernel.org>
+Subject: Re: [RFC net-next 4/7] net/ism: Add kernel-doc comments for ism
+ functions
+From: "Julian Ruess" <julianr@linux.ibm.com>
+To: "Alexandra Winter" <wintera@linux.ibm.com>, <dust.li@linux.alibaba.com>,
+        "Wenjia Zhang" <wenjia@linux.ibm.com>,
+        "Jan Karcher" <jaka@linux.ibm.com>,
+        "Gerd Bayer" <gbayer@linux.ibm.com>,
+        "Halil Pasic" <pasic@linux.ibm.com>,
+        "D. Wythe" <alibuda@linux.alibaba.com>,
+        "Tony Lu"
+ <tonylu@linux.alibaba.com>,
+        "Wen Gu" <guwen@linux.alibaba.com>,
+        "Peter
+ Oberparleiter" <oberpar@linux.ibm.com>,
+        "David Miller"
+ <davem@davemloft.net>,
+        "Jakub Kicinski" <kuba@kernel.org>, "Paolo Abeni"
+ <pabeni@redhat.com>,
+        "Eric Dumazet" <edumazet@google.com>,
+        "Andrew Lunn"
+ <andrew+netdev@lunn.ch>
+X-Mailer: aerc 0.18.2
+References: <20250115195527.2094320-1-wintera@linux.ibm.com>
+ <20250115195527.2094320-5-wintera@linux.ibm.com>
+ <20250120063241.GM89233@linux.alibaba.com>
+ <aba18690-5ffb-4eee-8931-728d72ce90c3@linux.ibm.com>
+In-Reply-To: <aba18690-5ffb-4eee-8931-728d72ce90c3@linux.ibm.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: bVZhpNZg5IeAKcNkE0Ln76m1MySoqTDO
+X-Proofpoint-GUID: cMT6SfS517poCO48ex2R2MymIyjOGOrn
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-01-20_02,2025-01-20_02,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 adultscore=0
+ lowpriorityscore=0 mlxlogscore=986 bulkscore=0 clxscore=1015
+ suspectscore=0 phishscore=0 mlxscore=0 priorityscore=1501 spamscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2411120000 definitions=main-2501200083
 
-On Fri, Jan 17, 2025 at 10:59:43PM +0100, Michal Luczaj wrote:
->Add a helper for socket()+bind(). Adapt callers.
+On Mon Jan 20, 2025 at 10:56 AM CET, Alexandra Winter wrote:
 >
->Signed-off-by: Michal Luczaj <mhal@rbox.co>
->---
-> tools/testing/vsock/util.c       | 56 +++++++++++++++++-----------------------
-> tools/testing/vsock/util.h       |  1 +
-> tools/testing/vsock/vsock_test.c | 17 +-----------
-> 3 files changed, 25 insertions(+), 49 deletions(-)
+>
+> On 20.01.25 07:32, Dust Li wrote:
+> >> +	/**
+> >> +	 * move_data() - write into a remote dmb
+> >> +	 * @dev: Local sending ism device
+> >> +	 * @dmb_tok: Token of the remote dmb
+> >> +	 * @idx: signalling index
+> >> +	 * @sf: signalling flag;
+> >> +	 *      if true, idx will be turned on at target ism interrupt mask
+> >> +	 *      and target device will be signalled, if required.
+> >> +	 * @offset: offset within target dmb
+> >> +	 * @data: pointer to data to be sent
+> >> +	 * @size: length of data to be sent
+> >> +	 *
+> >> +	 * Use dev to write data of size at offset into a remote dmb
+> >> +	 * identified by dmb_tok. Data is moved synchronously, *data can
+> >> +	 * be freed when this function returns.
+> > When considering the API, I found this comment may be incorrect.
+> >=20
+> > IIUC, in copy mode for PCI ISM devices, the CPU only tells the
+> > device to perform a DMA copy. As a result, when this function returns,
+> > the device may not have completed the DMA copy.
+> >=20
+>
+> No, it is actually one of the properties of ISM vPCI that the data is
+> moved synchronously inside the move_data() function. (on PCI layer the
+> data is moved inside the __zpci_store_block() command).
+> Obviously for loopback move_data() is also synchornous.
 
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+That is true for the IBM ISM vPCI device but maybe we
+should design the API also for future PCI devices
+that do not move data synchronously.
 
 >
->diff --git a/tools/testing/vsock/util.c b/tools/testing/vsock/util.c
->index 34e9dac0a105f8aeb8c9af379b080d5ce8cb2782..31ee1767c8b73c05cfd219c3d520a677df6e66a6 100644
->--- a/tools/testing/vsock/util.c
->+++ b/tools/testing/vsock/util.c
->@@ -96,33 +96,42 @@ void vsock_wait_remote_close(int fd)
-> 	close(epollfd);
-> }
+> SMC-D does not make use of it, instead they re-use the same
+> conn->sndbuf_desc for the lifetime of a connection.
 >
->-/* Bind to <bind_port>, connect to <cid, port> and return the file descriptor. */
->-int vsock_bind_connect(unsigned int cid, unsigned int port, unsigned int bind_port, int type)
->+int vsock_bind(unsigned int cid, unsigned int port, int type)
-> {
->-	struct sockaddr_vm sa_client = {
->-		.svm_family = AF_VSOCK,
->-		.svm_cid = VMADDR_CID_ANY,
->-		.svm_port = bind_port,
->-	};
->-	struct sockaddr_vm sa_server = {
->+	struct sockaddr_vm sa = {
-> 		.svm_family = AF_VSOCK,
-> 		.svm_cid = cid,
-> 		.svm_port = port,
-> 	};
->+	int fd;
 >
->-	int client_fd, ret;
->-
->-	client_fd = socket(AF_VSOCK, type, 0);
->-	if (client_fd < 0) {
->+	fd = socket(AF_VSOCK, type, 0);
->+	if (fd < 0) {
-> 		perror("socket");
-> 		exit(EXIT_FAILURE);
-> 	}
+> > In zero-copy mode for loopback, the source and destination share the
+> > same buffer. If the source rewrites the buffer, the destination may
+> > encounter corrupted data. The source should only reuse the data after
+> > the destination has finished reading it.
+> >=20
 >
->-	if (bind(client_fd, (struct sockaddr *)&sa_client, sizeof(sa_client))) {
->+	if (bind(fd, (struct sockaddr *)&sa, sizeof(sa))) {
-> 		perror("bind");
-> 		exit(EXIT_FAILURE);
-> 	}
+> That is true independent of the question, whether the move is
+> synchronous or not.
+> It is the clients' responsibility to make sure a sender does not
+> overwrite unread data. SMC uses the write-pointers and read-pointer for
+> that.
 >
->+	return fd;
->+}
->+
->+/* Bind to <bind_port>, connect to <cid, port> and return the file descriptor. */
->+int vsock_bind_connect(unsigned int cid, unsigned int port, unsigned int bind_port, int type)
->+{
->+	struct sockaddr_vm sa_server = {
->+		.svm_family = AF_VSOCK,
->+		.svm_cid = cid,
->+		.svm_port = port,
->+	};
->+
->+	int client_fd, ret;
->+
->+	client_fd = vsock_bind(VMADDR_CID_ANY, bind_port, type);
->+
-> 	timeout_begin(TIMEOUT);
-> 	do {
-> 		ret = connect(client_fd, (struct sockaddr *)&sa_server, sizeof(sa_server));
->@@ -192,28 +201,9 @@ int vsock_seqpacket_connect(unsigned int cid, unsigned int port)
-> /* Listen on <cid, port> and return the file descriptor. */
-> static int vsock_listen(unsigned int cid, unsigned int port, int type)
-> {
->-	union {
->-		struct sockaddr sa;
->-		struct sockaddr_vm svm;
->-	} addr = {
->-		.svm = {
->-			.svm_family = AF_VSOCK,
->-			.svm_port = port,
->-			.svm_cid = cid,
->-		},
->-	};
-> 	int fd;
 >
->-	fd = socket(AF_VSOCK, type, 0);
->-	if (fd < 0) {
->-		perror("socket");
->-		exit(EXIT_FAILURE);
->-	}
->-
->-	if (bind(fd, &addr.sa, sizeof(addr.svm)) < 0) {
->-		perror("bind");
->-		exit(EXIT_FAILURE);
->-	}
->+	fd = vsock_bind(cid, port, type);
->
-> 	if (listen(fd, 1) < 0) {
-> 		perror("listen");
->diff --git a/tools/testing/vsock/util.h b/tools/testing/vsock/util.h
->index ba84d296d8b71e1bcba2abdad337e07aac45e75e..7736594a15d29449d98bd1e9e19c3acd1a623443 100644
->--- a/tools/testing/vsock/util.h
->+++ b/tools/testing/vsock/util.h
->@@ -43,6 +43,7 @@ int vsock_connect(unsigned int cid, unsigned int port, int type);
-> int vsock_accept(unsigned int cid, unsigned int port,
-> 		 struct sockaddr_vm *clientaddrp, int type);
-> int vsock_stream_connect(unsigned int cid, unsigned int port);
->+int vsock_bind(unsigned int cid, unsigned int port, int type);
-> int vsock_bind_connect(unsigned int cid, unsigned int port,
-> 		       unsigned int bind_port, int type);
-> int vsock_seqpacket_connect(unsigned int cid, unsigned int port);
->diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
->index 48f17641ca504316d1199926149c9bd62eb2921d..28a5083bbfd600cf84a1a85cec2f272ce6912dd3 100644
->--- a/tools/testing/vsock/vsock_test.c
->+++ b/tools/testing/vsock/vsock_test.c
->@@ -108,24 +108,9 @@ static void test_stream_bind_only_client(const struct test_opts *opts)
->
-> static void test_stream_bind_only_server(const struct test_opts *opts)
-> {
->-	union {
->-		struct sockaddr sa;
->-		struct sockaddr_vm svm;
->-	} addr = {
->-		.svm = {
->-			.svm_family = AF_VSOCK,
->-			.svm_port = opts->peer_port,
->-			.svm_cid = VMADDR_CID_ANY,
->-		},
->-	};
-> 	int fd;
->
->-	fd = socket(AF_VSOCK, SOCK_STREAM, 0);
->-
->-	if (bind(fd, &addr.sa, sizeof(addr.svm)) < 0) {
->-		perror("bind");
->-		exit(EXIT_FAILURE);
->-	}
->+	fd = vsock_bind(VMADDR_CID_ANY, opts->peer_port, SOCK_STREAM);
->
-> 	/* Notify the client that the server is ready */
-> 	control_writeln("BIND");
->
->-- 
->2.47.1
->
+> > Best regards,
+> > Dust
+> >=20
+> >> +	 *
+> >> +	 * If signalling flag (sf) is true, bit number idx bit will be
+> >> +	 * turned on in the ism signalling mask, that belongs to the
+> >> +	 * target dmb, and handle_irq() of the ism client that owns this
+> >> +	 * dmb will be called, if required. The target device may chose to
+> >> +	 * coalesce multiple signalling triggers.
+> >> +	 */
+> >> 	int (*move_data)(struct ism_dev *dev, u64 dmb_tok, unsigned int idx,
+> >> 			 bool sf, unsigned int offset, void *data,
+> >> 			 unsigned int size);
+> >> --=20
 
 
