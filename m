@@ -1,230 +1,270 @@
-Return-Path: <netdev+bounces-159809-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159810-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75F69A16FE5
-	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 17:11:01 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 30974A16FE6
+	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 17:11:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 647143A5BEB
-	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 16:10:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5EA041680A3
+	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 16:11:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4ADA21E8855;
-	Mon, 20 Jan 2025 16:10:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABD4A1E9B1D;
+	Mon, 20 Jan 2025 16:10:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="gDRRHIr4"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WFybYBBO"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2073.outbound.protection.outlook.com [40.107.95.73])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 758D91E9B1D;
-	Mon, 20 Jan 2025 16:10:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.95.73
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737389431; cv=fail; b=JdvBWCAYH4W0dT2nU5d4sOLPY13OlF6QZ4+DSClZmmE6ee6lfXWwtr8iFFcnUDK/mis44G8HBJDDaAq7bpaBpl+kXY+J0a8FnBdp30fXkvlhsrENJ3284PScgWBUShUJ58RR9rEnSQNAOSUPizXVUM7P9drbzY1biaeevrlJHFI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737389431; c=relaxed/simple;
-	bh=Phi4Y9rH/JNPopdP9tg6femocNYfnz9e7HL3v/pKMVA=;
-	h=Message-ID:Date:Subject:To:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=ft5CnEnv1WXIWgoQa7rXmJmaQz2/QjYmw4osv6zlqVATxuwqup2u2fflccj8gePBvwLgT10wCSe8uka/nH8oD/eX7h3EvzF09RXqtrtLk356OBNeJ4l97B/M5ZPs+ZSXC5nlJWt1ShuoDSxGnISiOsiun1a5Lq4wprACT58eElo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=gDRRHIr4; arc=fail smtp.client-ip=40.107.95.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=C1GEj2wrc1n3lrU5bYBflUBD4oMVobAxadN7pOvPGpQmxbec62UVWazw6DQDlIycSGfQFZ8zpe8Hjo7hPQCCvvibRiYI20lZEs1u/oC1vja4UYhOOecWILJipdQx6+ai4KIxyC2YRA48W1KdDtjUwOMOiCe7gfeKXKQ1ioNra3veg7aY6RVb6kd+/JE/Bdr6iQqX9uthd+ptGlhhXzNbOzlFqau4i0dyU/SD/a2a06aSl5LeST/jjH8APGJtAfySskdtfHh/VcGFMsgkHISIw3JeghR0zdFF+1jaF4YBL+s39fsPFDbWlQNvy4WYMTvcxRVkh9idfQq+HfdG5CzfoA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ffWGytXDxImkukZ6QQpGFs9YXN8Q8kVDPH86wjGZV6s=;
- b=S9susbP0Iy+vS2EQJMAyxVSCityNX8oIUc8FpSTR+PQLEow2QK+wIromaez+CvRFJwTZEI91osuXRUsy/PgyDA50hnqcUewB3b9pCJTVMdk/meh4lWJ+J1fHIY7xMsruc239ncEQSwMHcEjFXjVceRAktTpVejGiFRf4WT8Cg9QomV418Oqoi0OXdu0EdVCqJQYXfJbGcqdAi3Ng/WFpjU6c12jIrn89uz0ChZx5Q/lH0scwPuocgYpdiylvEVa0owFYXg1wwdbMzEQlT0iEI3BvDnmwnCNTwGgCBn4fCMAGvLont+tAhoi63a/luH46mpDf8MnVCsp53ycepX7N4A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ffWGytXDxImkukZ6QQpGFs9YXN8Q8kVDPH86wjGZV6s=;
- b=gDRRHIr4o7q0UOyc9pFhO7lFGvzhPEZdvK1dGo2gb8pniml5VXMaKux1ybxlh2UNKyJnwPesGaeyVIiCqIyb3cJoNC4ie22PZgynCaaxCdgH/Y+Mp19LhQB6TV6K5PRnCsugTfcf0efuMu5cLnL0tA9i/IBKGKTapp6151HTLsc=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DM6PR12MB4202.namprd12.prod.outlook.com (2603:10b6:5:219::22)
- by DS0PR12MB8765.namprd12.prod.outlook.com (2603:10b6:8:14e::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8356.21; Mon, 20 Jan
- 2025 16:10:27 +0000
-Received: from DM6PR12MB4202.namprd12.prod.outlook.com
- ([fe80::f943:600c:2558:af79]) by DM6PR12MB4202.namprd12.prod.outlook.com
- ([fe80::f943:600c:2558:af79%7]) with mapi id 15.20.8356.017; Mon, 20 Jan 2025
- 16:10:26 +0000
-Message-ID: <fe48e2e9-5a13-78fe-d8f6-6c3faeecebcc@amd.com>
-Date: Mon, 20 Jan 2025 16:10:05 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH v9 10/27] resource: harden resource_contains
-Content-Language: en-US
-To: Dan Williams <dan.j.williams@intel.com>, alejandro.lucero-palau@amd.com,
- linux-cxl@vger.kernel.org, netdev@vger.kernel.org, edward.cree@amd.com,
- davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, dave.jiang@intel.com
-References: <20241230214445.27602-1-alejandro.lucero-palau@amd.com>
- <20241230214445.27602-11-alejandro.lucero-palau@amd.com>
- <678b0c0ca40ca_20fa29484@dwillia2-xfh.jf.intel.com.notmuch>
-From: Alejandro Lucero Palau <alucerop@amd.com>
-In-Reply-To: <678b0c0ca40ca_20fa29484@dwillia2-xfh.jf.intel.com.notmuch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: AM4PR0302CA0011.eurprd03.prod.outlook.com
- (2603:10a6:205:2::24) To DM6PR12MB4202.namprd12.prod.outlook.com
- (2603:10b6:5:219::22)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E451B1E990A
+	for <netdev@vger.kernel.org>; Mon, 20 Jan 2025 16:10:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1737389439; cv=none; b=U33FwsomNDSDcj6muB6iFk9g6A0L089pfCeU4bycAvihiut5Rdq9wJOz4xSNKlYWuLyx+5Et16YqS3m2yMhGDikxtdqIf8TxrdNwzi3EXZc++5aUjneZzF3rUxaJXwuCcC44o5mPH0PkVm71e+9NqHM+bd4TSziraxTFHZFc/LI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1737389439; c=relaxed/simple;
+	bh=GDx7Mu4RrnufKxEfPiKUQum3Mi8SoBc0J0Rtm1jdeTo=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=H7z2pXbpXiqV5+l+pvWuD3b9uvXNFDE3uLX9qjfFn6+YjXcJgp/9jpUH03e7Cuqpsdmz2Rd0zZTYFmxpNSKgCsrNyLvkmcrJrDTYQ+4/JxIlG0Y9K2IpHY8NL07zO8+Lizc6Rvl4cApsywpKW5tsenWUP8KKCeC5DZRQDDGPGY8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WFybYBBO; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1737389436;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ri3SMYvQPCeY1bR1GnymUd0egQws7tzEKq8qVlLHNGQ=;
+	b=WFybYBBO4SJEAlAOsAllCrq9fIrnQU6tQTlbHWIBbFAI7u82Uc2hhU2AxronMKpmEAO7hs
+	SgMdJ5aZp7xVn48rw2grwLq3fXAUydKqRAtUxBsFaS2gLLBum8T0faFJYJCBZK1UEm/8kA
+	m8V41GvT1N6RraEWLJPVsk/aVgePwhw=
+Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
+ [209.85.160.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-478-NnhYNvH-M3ak2-rsXAzFCA-1; Mon, 20 Jan 2025 11:10:35 -0500
+X-MC-Unique: NnhYNvH-M3ak2-rsXAzFCA-1
+X-Mimecast-MFC-AGG-ID: NnhYNvH-M3ak2-rsXAzFCA
+Received: by mail-qt1-f197.google.com with SMTP id d75a77b69052e-4679becb47eso125801461cf.3
+        for <netdev@vger.kernel.org>; Mon, 20 Jan 2025 08:10:35 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737389435; x=1737994235;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:from:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ri3SMYvQPCeY1bR1GnymUd0egQws7tzEKq8qVlLHNGQ=;
+        b=Ytd88aMdj3a5HtktSh4jp1Xg4eQ5iI38rsZfj1/9ginbnnqEcps36ipJNaJmLqmHqS
+         34uWjWcFBSOtbiGP/VUenIPMczwQPVgtkZ562Djoj5wO0YBVDP80S4fBm7VZDbwCfBOV
+         cDrQpoqdN0lo56wdB/ViijKuBrDUzrEk1PbvpvKcihPZcU2/+ZHB39UJ+sxiZmR4QjtT
+         dQ2q+o8PUFo2Ulam7lL2a3r9kUgBnvSc5iXDVEVS2EtYaYhbu9tPwajxgtJW0Ow4Zp7D
+         +JljAOfrVIGkFH/sO0jsCQD95c3h7Cq+bjwQ17/hBVvm2Spp6HszPgqnh3i3nNt257KU
+         cZ3g==
+X-Gm-Message-State: AOJu0YxLeNzbyQfJxfKWDww1aO7P7ERbImtzzGj6VBME0kY1UEO3Jy7E
+	xaHD4JKTYDJhEzsnheRE0Mhw88LRkyTjj9KNbmxB32mWgt4+0LEr/G0icX/b6zzAw8eEpCNl7hE
+	ZdIHCz6Jgxqf3HOZHKHnJtJY29vigOlSufSpAFvwuEhtlt5i2aVNJ5w==
+X-Gm-Gg: ASbGncuptNlc8CXGPmu+9IvE5709HxwbLAOOtXOitFJT1CDKZOuvJsQet/plwj9U+fN
+	O+tUoybun1eal6aHfTFQ76yHYhGiAJm+z//L06MVYwAMiG9orELj5qqQMHdQQ1981FJ00ACz0ox
+	52wklPKsLi8DnGrm3Ab7bDWbEmZ6VTweJ5rh5G0msN48wtQasWixtxSY9UegOP7axob0mrMV36h
+	QM4yiTvh6k3cHVqybN87NvOtQd7qsJnkzjdxb2AZccMZ/KvEdpRBCQIp3cp41LipHIk
+X-Received: by 2002:a05:620a:4252:b0:7b1:3bf5:11f8 with SMTP id af79cd13be357-7be6320a5efmr2224501585a.25.1737389435044;
+        Mon, 20 Jan 2025 08:10:35 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFlpZ0W4K8TO5Ce8IJmPQUTs/oNxMtHzbVCB0Dhz2gxAltYaO9P+5ofPeTe3G0EQsVd/7SmRw==
+X-Received: by 2002:a05:620a:4252:b0:7b1:3bf5:11f8 with SMTP id af79cd13be357-7be6320a5efmr2224496985a.25.1737389434720;
+        Mon, 20 Jan 2025 08:10:34 -0800 (PST)
+Received: from [10.0.0.215] ([24.225.235.209])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7be614dabeasm458117585a.86.2025.01.20.08.10.33
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 20 Jan 2025 08:10:34 -0800 (PST)
+Message-ID: <c41deefb-9bc8-47b8-bff0-226bb03265fe@redhat.com>
+Date: Mon, 20 Jan 2025 11:10:32 -0500
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6PR12MB4202:EE_|DS0PR12MB8765:EE_
-X-MS-Office365-Filtering-Correlation-Id: 44db78b8-7a62-4ee5-8927-08dd396cf3d4
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014|921020;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?dnZKM2wraXVPNStnWXZrVVF4c21ONzlnUG8wd1pzbnJhVkh5WUFlbnh2L1g1?=
- =?utf-8?B?V0VzZ2c2d3d4d3hFMVBJMjF2MXVuT1BlYVBOMVl2alNETWlIUDRRL290N1NK?=
- =?utf-8?B?aWEwd2cxakZsaXhQRDkvdWpTZXYwQjlhR2xGZUE1TVhRTjdnUGpaZjloenFO?=
- =?utf-8?B?WmFUbCtNN2RlejNJRnlzT2Vtb3NZbXc5Z2g4R0xCMzZNbVFzNE9oTS8xRWFI?=
- =?utf-8?B?MTEya1hjZFgyS2NmNlA2WTJvdXM3dS94U3UzRXRqb05FbDVHTHhEK3cwUTU2?=
- =?utf-8?B?dnowd0ExbXlWeFdmcFhvWlpmcTNUdklLT1p4WkVGRVl6cmhKUy9YbG1tWTBk?=
- =?utf-8?B?NVkyUTJjb09Ta3N3elJrRHhUNDlxZTBoWW5oK3BzY2dsWDVabDRtNlJBQzVK?=
- =?utf-8?B?d1BoY3VGaE1GVFJNeXV5eGdZVCtZZjA4bUdEbUhVN0MvQTNRVVFVWFR2OWVw?=
- =?utf-8?B?ZjlKNWlNKzVxU0ZUL2xiczk3Mkd3bnJGQU5WY3hNcUVaZXVYYytMZ3RHazU1?=
- =?utf-8?B?elNtREZaNGp3bU1OQWI5WUpvcWhUV1hUQStFY3o5L3ZteTFyWG8xRVFhODI2?=
- =?utf-8?B?VmtvdlE3TTZYVkk3WWdDQTBtU2ZSa0dxT3dNTXN3NzhRV0lidjFPd2lBdjNt?=
- =?utf-8?B?QkRmKzloVVE1bll0R0tpR3YyWEY2M3pwbzd6bHNKM0djU1RpajB6K0Njb3Iz?=
- =?utf-8?B?akVRdDVodTRqd2d1RWZmR25rNVgzMmpySUtlWFQwTFprZnJxVTNOVW1UVzN2?=
- =?utf-8?B?SGhhQjNzbWtpTFJtVDdrTXZiUTNvRm1QVy8vcDBraEwwUmtBUnJqUUc5SGwy?=
- =?utf-8?B?K3lCZVF5OE9GdDJ0bjdSTnVBNHltdXp3eXZkSzc0NDI0bFU1WGE2OUQzaVJF?=
- =?utf-8?B?YmxxYWxLWmR4N1EwRHpMTys1V0daWjNLUEpUanJUZmsvcllzOHI4TU0vcURV?=
- =?utf-8?B?TERpQy8wa0xsV3ZxQkRYR2JoNXBBeFJYUVl0elFjYkVmUzhiZ2ZReWRKbHhR?=
- =?utf-8?B?V1p4dFFJcWhsREhZN0ZvRmpuUVVKZXZ2ekhaWkFyUmprc05BNC9naU5jMHhZ?=
- =?utf-8?B?Y0t5Vnc3M01UYzJNT25LWXp0cnVkTlJrdVJaUlJvNUVMTnVodWlJeU9yaVdS?=
- =?utf-8?B?d2F5ZVZrMmJIOEUydW5YSEtlT05Ea2ZSWmV0VGQ0bTRFcE1BVk1pRndPeHY0?=
- =?utf-8?B?NDhPMWNzWVZiSXRSUUxJbkdFczFMUEtiR0RBUUlkcDNSK1hueTNQTDRJYUM1?=
- =?utf-8?B?em5FdkViaysvcEhraXgyU0E0eHFWVUVQNkNZb3BzY0tPT2QxbE8yc0hjYlRP?=
- =?utf-8?B?WVRKU3RydEx4QUF6OXpFVEN0WDFhMUtPSStrSmxuVkkyYW8rMlFicStRYkFR?=
- =?utf-8?B?OTBmU3d0dlpDc0RKeHhYUVIvYnBsK002QWpxSkZDanVQTGhhU2lTZU9vTWJC?=
- =?utf-8?B?OGthNkNxU0JqVGhBUmU5WUNZVDh3Q2RPWndabUx4SjVUZVRBbGRhNUhkYWJr?=
- =?utf-8?B?bmQvbTVBUHVXdGQ1aGl1Ukp4Z3BvMWFySkRJeE54WGt0b05UQmI3bjhjMWtC?=
- =?utf-8?B?cWlYb2tQN0tlMTYvZTQ4aWJGazNnbmhXYjcyZlVGQkZRUU03L2taT1ZzTnlK?=
- =?utf-8?B?czFmQ0ZTTVg1bHNLbmlMT3ZNaW5qcHBzR1NRYzhHYVFqRE5CdUJNT2M1M3Z3?=
- =?utf-8?B?TmEzOEtURVd0dzJyUnZJckQ1RGJDdXc5UjF0c3ZPeSs3bGR3ejBIejB4Skd4?=
- =?utf-8?B?ZXZTNVlLeU1rSUp2VHNSVnBva3E1V1kxcVU0WDl6NG1KRmlQdWVERk11TzhQ?=
- =?utf-8?B?MEw2NzY0Y1pHTWVxWTJtSEYxeHB0U0xQbHVTQjdheGI3OGJOZkI0ZFJZcjNB?=
- =?utf-8?B?d05DVHFxbU5Kdlg2YUwwdHRZd0t5TDBFcWtkRWZ3d3FYRTF5S2Z6T1o2OTZ3?=
- =?utf-8?Q?0tzIu6Ldi08=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB4202.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(921020);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?VUVwOXpZZldxNExDTmV0TlV1aFZzRVJNYW44QnFJVmdiOGhLeW05WHlFTlph?=
- =?utf-8?B?ZG1Odmlobjd0WjlnNXBSSjN4azJvc1NVV0ZXNWZxSklkc21KejBVWWZVVG9j?=
- =?utf-8?B?N1lPRWZPWjg0WEdDbjBCZytoRVRQeTd3aVl0R0h1Y0hRT2g0TlZsZkNGUUFk?=
- =?utf-8?B?V2pRdSt1K0RGQm9LU0RnMWhLSnJsM2lQNEJHQmcyWXUwZlZSM2xFc1VkdXJ5?=
- =?utf-8?B?dTZJMUdra21OMUlic0JRSHc5MUNtQldZTGtpKzZ1dUNiYS9rUnVRUmJtdlVF?=
- =?utf-8?B?ZXZjaHhvRk8yczQwc1YxSkx2UXcyWVptRC92aFlneElESzBKd2Y1TTlPK3Bh?=
- =?utf-8?B?WU1zcHRyRE1JWlZCaW9zVmVmZVJNUzZHb0J0TVpWbFVENEVVMnN2Q3NDREJ2?=
- =?utf-8?B?Y2FBazRST2ZBNUoySytjYnhtTWZPRmlEdDZINzFvS2xUMHM3V1pvdS9rRjB6?=
- =?utf-8?B?djJuVnAxYjkxSWxiTmtSTXp1bzNGZkNxenpMVnh2WFFTeXFBb0pzOTZZQ0Rz?=
- =?utf-8?B?Vk8wU1FiZ3B6YXlrUWxrcW5pM3pLV3NoRnpSbHk1K0JRczNiTjkxV1JuNWFh?=
- =?utf-8?B?L1VQTUhVaHVtUGlEY08zaXBxYlU1cVZRdDhUaFIxcDk1RWx3cE5tdE15Zm00?=
- =?utf-8?B?OFRmSDRIeHhudmdKNFNVTlpETExUcTV0UnhyQ2IzTTVBaWQ1ZjVCQ2NVTGli?=
- =?utf-8?B?Skc0Z1dtZmpFVnc2M0k2eWJYUUF4a0RTNVc5Z2JIVkYyQmNkOWl6MTJnNFRy?=
- =?utf-8?B?MUF0bjhOV3ZOY1ZGY2kzWTlZTDI4WVllWUkvbU5WdmFmSFNycWRTb3duQUxR?=
- =?utf-8?B?UWV1T1YvcE1hdlZDbE42NnJYa2RQd1JLREphcGhNRVZuQXF4QmhnT2wrdWtV?=
- =?utf-8?B?MzBRcy9yeUIxc0NBN1gwcWxEV0JWOFVZaWdiNUQyS3hscjA4cUdmUWRkR1Vj?=
- =?utf-8?B?WDJPakwzbFVYOHI5dkdGcHJSY0FqNEpieGltMDUwNndnbERqbWtESDNpN3hy?=
- =?utf-8?B?MnVzakxLWWRzS2dFamprVEhaSExEMEh2UkdzdmV3UmlabmJMTFNnKy8vVk4w?=
- =?utf-8?B?QVQybE92emMzSWtOREgvZ2hlNFVwNS94b1NBQVE4ekJZcnUrQVJmcityMDR3?=
- =?utf-8?B?N0wzSVZ1Y0tkSFVtekxsRUlqOVdjeVRESFVGeVhnQ0dTVjV5WDhwYTJVd1dD?=
- =?utf-8?B?TURtMDNyUkNYMm91UitkK3RBR3VzVWZsUmtGbW5NMWRHb0lLMGRUSm5qQUQ3?=
- =?utf-8?B?OFlxb21DMzhXbmF6cldRTmVmL1IzY1daOEwyZkJVaE12aXQvZjBsNktVYlkx?=
- =?utf-8?B?akFlVm5oaExYYk51Q1hud1p0TXlFaGgxOVFiNFVaTGJiN3I0djVTVnk2T1RC?=
- =?utf-8?B?d3NLazg1Skx3V1JwWnVtZUYwM0tjdVBCKytrM3BMbWFBM3oxelNydVlqaTlM?=
- =?utf-8?B?RGtnWmdkZnlneTBVVjFuTFpURkltbUxra2hTUTZsSTlJUHExRUhXaXdHbmhL?=
- =?utf-8?B?Z3pqUzJ0Qk4xbTdLa1Q5NlNWMnVPbW55MmxCQ2VFMC9uM0NjMG9MbFpvTXNT?=
- =?utf-8?B?WnAwTmEwNnc4L2VHZmEyNDE3NDV2VFBlQS92R095U1N5TXUrRFNwZEllOXNX?=
- =?utf-8?B?RkltbjVCZUh4SEw1akpzTENwc25jRm45YXlKRS9ZTndidXN6bWRxK0RFanZk?=
- =?utf-8?B?eFZ5alhUajM2T25RR3BwVExPRXYyLzhpYnVsNVprZzJsZGNabk9JNDVPT2o0?=
- =?utf-8?B?M2UwUnU1SnF0NFUrYUZEcFhnZkZMNlJJNUNkZ1lPM2NKSnlJbDdZNTcwZXN4?=
- =?utf-8?B?SFVYMFI1V2RlUENoQm9qemNYWVZrQ0VtUTZzVWVDWGQzcjdEczdVeUprNkxH?=
- =?utf-8?B?TVQvcERRY0xFc2VxWlI5NzBhcG9Ueml3U01iUU9IMjB1VjRNVkJHbmtYb2l2?=
- =?utf-8?B?T01KQVlnZS9CL3NoeVJXMStjMGFUYW1ZMHpYbWE5WGNCRmZWUXp3SDhYREtz?=
- =?utf-8?B?N1Y3aEJIMlhXelFLQjd4Yy9HTXVuWE1WRU9relVDVGsvU0orZ1JpZ2pYVjdM?=
- =?utf-8?B?MjFnMmtsMkpxVHMzMFdaN3RIYmFrSGtsazFaaXpzSXMxeGx0VWo2aGUxYks1?=
- =?utf-8?Q?EHNrWzbCjZJa2V8IZ8ElgG59F?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 44db78b8-7a62-4ee5-8927-08dd396cf3d4
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB4202.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jan 2025 16:10:26.8607
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: z9vedYTz+u/zHZDKzD7YvAEWRZVvknvSDz10gN5ohacDWIHt+5qNEnKZDzGIKeqpTRkgBq66k0sK97F/o83CAQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB8765
+User-Agent: Mozilla Thunderbird
+Subject: Re: [net,v2] tcp: correct handling of extreme memory squeeze
+From: Jon Maloy <jmaloy@redhat.com>
+To: Neal Cardwell <ncardwell@google.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+ passt-dev@passt.top, sbrivio@redhat.com, lvivier@redhat.com,
+ dgibson@redhat.com, eric.dumazet@gmail.com, edumazet@google.com,
+ Menglong Dong <menglong8.dong@gmail.com>
+References: <20250117214035.2414668-1-jmaloy@redhat.com>
+ <CADVnQymiwUG3uYBGMc1ZEV9vAUQzEOD4ymdN7Rcqi7yAK9ZB5A@mail.gmail.com>
+ <afb9ff14-a2f1-4c5a-a920-bce0105a7d41@redhat.com>
+Content-Language: en-US
+In-Reply-To: <afb9ff14-a2f1-4c5a-a920-bce0105a7d41@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
 
-On 1/18/25 02:03, Dan Williams wrote:
-> alejandro.lucero-palau@ wrote:
->> From: Alejandro Lucero <alucerop@amd.com>
+
+On 2025-01-20 00:03, Jon Maloy wrote:
+> 
+> 
+> On 2025-01-18 15:04, Neal Cardwell wrote:
+>> On Fri, Jan 17, 2025 at 4:41 PM <jmaloy@redhat.com> wrote:
+>>>
+>>> From: Jon Maloy <jmaloy@redhat.com>
+>>>
+>>> Testing with iperf3 using the "pasta" protocol splicer has revealed
+>>> a bug in the way tcp handles window advertising in extreme memory
+>>> squeeze situations.
+>>>
+>>> Under memory pressure, a socket endpoint may temporarily advertise
+>>> a zero-sized window, but this is not stored as part of the socket data.
+>>> The reasoning behind this is that it is considered a temporary setting
+>>> which shouldn't influence any further calculations.
+>>>
+>>> However, if we happen to stall at an unfortunate value of the current
+>>> window size, the algorithm selecting a new value will consistently fail
+>>> to advertise a non-zero window once we have freed up enough memory.
 >>
->> While resource_contains checks for IORESOURCE_UNSET flag for the
->> resources given, if r1 was initialized with 0 size, the function
->> returns a false positive. This is so because resource start and
->> end fields are unsigned with end initialised to size - 1 by current
->> resource macros.
+>> The "if we happen to stall at an unfortunate value of the current
+>> window size" phrase is a little vague... :-) Do you have a sense of
+>> what might count as "unfortunate" here? That might help in crafting a
+>> packetdrill test to reproduce this and have an automated regression
+>> test.
+> 
+> Obviously, it happens when the following code snippet in
+> 
+> __tcp_cleanup_rbuf() {
+>     [....]
+>     if (copied > 0 && !time_to_ack &&
+>         !(sk->sk_shutdown & RCV_SHUTDOWN)) {
+>              __u32 rcv_window_now = tcp_receive_window(tp);
+> 
+>              /* Optimize, __tcp_select_window() is not cheap. */
+>              if (2*rcv_window_now <= tp->window_clamp) {
+>                  __u32 new_window = __tcp_select_window(sk);
+> 
+>                  /* Send ACK now, if this read freed lots of space
+>                   * in our buffer. Certainly, new_window is new window.
+>                   * We can advertise it now, if it is not less than
+>                   * current one.
+>                   * "Lots" means "at least twice" here.
+>                   */
+>                  if (new_window && new_window >= 2 * rcv_window_now)
+>                          time_to_ack = true;
+>             }
+>      }
+>      [....]
+> }
+> 
+> yields time_to_ack = false, i.e.  __tcp_select_window(sk) returns
+> a value new_window  < (2 *  tcp_receive_window(tp)).
+> 
+> In my log I have for brevity used the following names:
+> 
+> win_now: same as rcv_window_now
+>      (= tcp_receive_window(tp),
+>       = tp->rcv_wup + tp->rcv_wnd - tp->rcv_nxt,
+>       = 265469200 + 262144 -  265600160,
+>       = 131184)
+> 
+> new_win: same as new_window
+>       (= __tcp_select_window(sk),
+>        = 0 first time, later 262144 )
+> 
+> rcv_wnd: same as tp->rcv_wnd,
+>        (=262144)
+> 
+> We see that although the last test actually is pretty close
+> (262144 >= 262368 ? => false) it is not close enough.
+> 
+> 
+> We also notice that
+> (tp->rcv_nxt - tp->rcv_wup) = (265600160 - 265469200) = 130960.
+> 130960 < tp->rcv_wnd / 2, so the last test in __tcp_cleanup_rbuf():
+> (new_window >= 2 * rcv_window_now) will always be false.
+> 
+> 
+> Too me it looks like __tcp_select_window(sk) doesn't at all take the 
+> freed-up memory into account when calculating a new window. I haven't
+> looked into why that is happening.
+> 
 >>
->> Make the function to check for the resource size for both resources
->> since r2 with size 0 should not be considered as valid for the function
->> purpose.
+>>> This means that this side's notion of the current window size is
+>>> different from the one last advertised to the peer, causing the latter
+>>> to not send any data to resolve the sitution.
 >>
->> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
->> Suggested-by: Alison Schofield <alison.schofield@intel.com>
->> Reviewed-by: Alison Schofield <alison.schofield@intel.com>
->> Acked-by: Bjorn Helgaas <bhelgaas@google.com>
->> Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
->> ---
->>   include/linux/ioport.h | 2 ++
->>   1 file changed, 2 insertions(+)
+>> Since the peer last saw a zero receive window at the time of the
+>> memory-pressure drop, shouldn't the peer be sending repeated zero
+>> window probes, and shouldn't the local host respond to a ZWP with an
+>> ACK with the correct non-zero window?
+> 
+> It should, but at the moment when I found this bug the peer stack was 
+> not the Linux kernel stack, but one we develop for our own purpose. We 
+> fixed that later, but it still means that traffic stops for a couple of 
+> seconds now and then before the timer restarts the flow. This happens
+> too often for comfort in our usage scenarios.
+> We can of course blame the the peer stack, but I still feel this is a
+> bug, and that it could be handled better by the kernel stack.
 >>
->> diff --git a/include/linux/ioport.h b/include/linux/ioport.h
->> index 5385349f0b8a..7ba31a222536 100644
->> --- a/include/linux/ioport.h
->> +++ b/include/linux/ioport.h
->> @@ -296,6 +296,8 @@ static inline unsigned long resource_ext_type(const struct resource *res)
->>   /* True iff r1 completely contains r2 */
->>   static inline bool resource_contains(const struct resource *r1, const struct resource *r2)
->>   {
->> +	if (!resource_size(r1) || !resource_size(r2))
->> +		return false;
-> I just worry that some code paths expect the opposite, that it is ok to
-> pass zero size resources and get a true result.
+>> Do you happen to have a tcpdump .pcap of one of these cases that you 
+>> can share?
+> 
+> I had one, although not for this particular run, and I cannot find it 
+> right now. I will continue looking or make a new one. Is there some 
+> shared space I can put it?
 
+Here it is. Look at frame #1067.
 
-That is an interesting point, I would say close to philosophic 
-arguments. I guess you mean the zero size resource being the one that is 
-contained inside the non-zero one, because the other option is making my 
-vision blurry. In fact, even that one makes me feel trapped in a 
-window-less room, in summer, with a bunch of economists, I mean 
-philosophers, and my phone without signal for emergency calls.
+https://passt.top/static/iperf3_jon_zero_window_cut.pcap
+> 
+>>
+>>> The problem occurs on the iperf3 server side, and the socket in question
+>>> is a completely regular socket with the default settings for the
+>>> fedora40 kernel. We do not use SO_PEEK or SO_RCVBUF on the socket.
+>>>
+>>> The following excerpt of a logging session, with own comments added,
+>>> shows more in detail what is happening:
+>>>
+>>> //              tcp_v4_rcv(->)
+>>> //                tcp_rcv_established(->)
+>>> [5201<->39222]:     ==== Activating log @ net/ipv4/tcp_input.c/ 
+>>> tcp_data_queue()/5257 ====
+>>> [5201<->39222]:     tcp_data_queue(->)
+>>> [5201<->39222]:        DROPPING skb [265600160..265665640], reason: 
+>>> SKB_DROP_REASON_PROTO_MEM
+>>>                         [rcv_nxt 265600160, rcv_wnd 262144, snt_ack 
+>>> 265469200, win_now 131184]
+>>
+>> What is "win_now"? That doesn't seem to correspond to any variable
+>> name in the Linux source tree. 
+> 
+> See above.
+> 
+>   Can this be renamed to the
+>> tcp_select_window() variable it is printing, like "cur_win" or
+>> "effective_win" or "new_win", etc?
+>>
+>> Or perhaps you can attach your debugging patch in some email thread? I
+>> agree with Eric that these debug dumps are a little hard to parse
+>> without seeing the patch that allows us to understand what some of
+>> these fields are...
+>>
+>> I agree with Eric that probably tp->pred_flags should be cleared, and
+>> a packetdrill test for this would be super-helpful.
+> 
+> I must admit I have never used packetdrill, but I can make an effort.
 
+I hear from other sources that you cannot force a memory exhaustion with
+packetdrill anyway, so this sounds like a pointless exercise.
 
-But maybe it is just  my lack of understanding and there exists a good 
-reason for this possibility.
+///jon
 
+> 
+> ///jon
+> 
+>>
+>> thanks,
+>> neal
+>>
+> 
 
-Bjorn, I guess the ball is in your side ...
-
-> Did you audit existing callers?
 
