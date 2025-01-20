@@ -1,192 +1,140 @@
-Return-Path: <netdev+bounces-159780-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159781-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66039A16DC4
-	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 14:50:40 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 09E57A16DE6
+	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 14:58:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CB7001888F0F
-	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 13:50:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A3FCE18825DE
+	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 13:58:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F28D31E2619;
-	Mon, 20 Jan 2025 13:50:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBA431E32AA;
+	Mon, 20 Jan 2025 13:57:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nKyr/zR4"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NuJZpKyP"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC35E1E25E5;
-	Mon, 20 Jan 2025 13:50:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A98041E2838;
+	Mon, 20 Jan 2025 13:57:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737381030; cv=none; b=ECUQCqVv62g8HxRC6yy448D/aXGcRWy4C84YQnc/8EenQI5R5O7mVGvKL//sdvLWVJupT+1ANirDqBu1V1mNWPdT2QcPQ756ARMIkVUGJz1VEwSAcXOomKvBMcONZ25WWGDFEdMFFbZs/lGc2uFMQAaVRHq5Jbta8+hMZxOeGYQ=
+	t=1737381479; cv=none; b=kIaaZARwrUfzFnRm6Y+w/NxEJKZOT96wIXsPyhXF2bzpDFgB02YuiQUKmn9+yhoVOBgq8IUJqyauO1ybT+QnkRVNgwTylSv6LGweZY8Tn6Rch6rQPzs0tpiGeDhnK6dAQo2yB/pKhHxS/6L2V3jxdUsFX47MXexcQteUPPSIS44=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737381030; c=relaxed/simple;
-	bh=iE/bcwku4KTw3/iRUxcBK9x9PA9J1U2krhjU61zQY4s=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=sA2jBsWtiJXt9Vd5sjiHYxk0fQOuv38A7eYjEhInbYAY6k50LCLdVX7wXTokrAHM5LRr+leaiEKLIjsKQp83KbNlgAoLtv8bD6IOEem64cG+dY0ssworU5N7xKRMFoPJqqXZje4QCUOAdWTCnfNfh5ulEGqsGBKWW3FJxwKYplI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nKyr/zR4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 3ED1AC4CEE9;
-	Mon, 20 Jan 2025 13:50:30 +0000 (UTC)
+	s=arc-20240116; t=1737381479; c=relaxed/simple;
+	bh=mMnF1rH8r/RyTbYhURrLkiK4JarAbi2ujmmaTjR3WKo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UG590U1NkvHUdC3b0rUhdAnGqj2fr8XjEFr2v7O4u94MKUHnU5EkK4hvmHCB56LvHiS6K895UB7LR8EeLWlZx8WTWr2AccQ9/WeOOOD/ZJXoXxkyLADIqWKGQcaGI/ibOVS1WyqHQ2VBNic8c7e+oIALLJVp7xk66nNdKbwooFg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NuJZpKyP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 49094C4CEDD;
+	Mon, 20 Jan 2025 13:57:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737381030;
-	bh=iE/bcwku4KTw3/iRUxcBK9x9PA9J1U2krhjU61zQY4s=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=nKyr/zR4MgdQsHzVaAi1eT6GU6kzeHrPXcHK03UIiiA8OskMYqztY/4jjmITrnttz
-	 pp3s+JppgbQiRZAW07vfcO6PyUSwQZqELGhEbgbWNNlgW/J21iVZwVWiazBgIBAh6x
-	 dAfjWaRH5sr67vuKy3e1aTtP0QYHGIZgJvVlLCKaVkeXUX/8fG58oe46ZpFAclb5MX
-	 hBRB6BemJwIepHV3IVfI+9R5jjw0UeBzpFS128+Ztls+DGqUczj1IHm9oKcWPsM354
-	 hbnq3sUwV08VEjDIP9g2hJFyN5s0vFmXe+Mgoykd6Wkq7BmHLBLirV7WyyDEfQycp8
-	 rU2/6N9QWe21g==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3040DC02182;
-	Mon, 20 Jan 2025 13:50:30 +0000 (UTC)
-From: Dimitri Fedrau via B4 Relay <devnull+dimitri.fedrau.liebherr.com@kernel.org>
-Date: Mon, 20 Jan 2025 14:50:23 +0100
-Subject: [PATCH net-next v2 3/3] net: phy: dp83822: Add support for
- changing the transmit amplitude voltage
+	s=k20201202; t=1737381479;
+	bh=mMnF1rH8r/RyTbYhURrLkiK4JarAbi2ujmmaTjR3WKo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=NuJZpKyPx7ny0GSbeehDbouPHXimJr0RgfJE+hx6Q4fg+QRcvvInO7rf1BGVKvVAJ
+	 D2QL3N10JPkWgv6H49sp0CxmdwGPw6gyPkUgyD+yslIxtjv87p35D5gWXVG+vVU7Bj
+	 4smk6TeGY9hii3l0EJK+grE6/2JBBod2xX5R02orL23gee8qA55XrCTSDkfCq0fcH7
+	 f2wx3JGzMxSLc+0ly6E8I1dYqLg3APFHy3LsiP+NR47Ap3O2RTgOEP3F0vRyMYhhjy
+	 2TMc3ZJ/tfL8hh8h3bknAlIEfpYIu9eZ7eeIzG9jmfAxty8suUSUpYqcepx7DwPsAz
+	 C/VQhW0CuySUQ==
+Date: Mon, 20 Jan 2025 13:57:54 +0000
+From: Simon Horman <horms@kernel.org>
+To: David Howells <dhowells@redhat.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	Chuck Lever <chuck.lever@oracle.com>,
+	Trond Myklebust <trond.myklebust@hammerspace.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Eric Biggers <ebiggers@kernel.org>,
+	Ard Biesheuvel <ardb@kernel.org>, linux-crypto@vger.kernel.org,
+	linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH 03/24] crypto: Add 'krb5enc' hash and cipher AEAD
+ algorithm
+Message-ID: <20250120135754.GX6206@kernel.org>
+References: <20250117183538.881618-1-dhowells@redhat.com>
+ <20250117183538.881618-4-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250120-dp83822-tx-swing-v2-3-07c99dc42627@liebherr.com>
-References: <20250120-dp83822-tx-swing-v2-0-07c99dc42627@liebherr.com>
-In-Reply-To: <20250120-dp83822-tx-swing-v2-0-07c99dc42627@liebherr.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
- Conor Dooley <conor+dt@kernel.org>, Andrew Davis <afd@ti.com>, 
- Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
- Russell King <linux@armlinux.org.uk>, 
- Florian Fainelli <f.fainelli@gmail.com>
-Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Dimitri Fedrau <dimitri.fedrau@liebherr.com>, 
- Dimitri Fedrau <dima.fedrau@gmail.com>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1737381028; l=3492;
- i=dimitri.fedrau@liebherr.com; s=20241202; h=from:subject:message-id;
- bh=i7JK4ez08mIrB/fvCWOiiy6f3mWMVK6RC5dLYH/FlCk=;
- b=S/2O6vcc8bP/dacaUOWDYebuPHZGwfVOeZxhsnjym5v4Sfg3FdSWqCDKBgrsvMuetE+yZHA0R
- xctx5ih/nBjAqmwmPDG0syV8TJHAy1XKwTRh3XAXgz8MiybtYnzMjm1
-X-Developer-Key: i=dimitri.fedrau@liebherr.com; a=ed25519;
- pk=rT653x09JSQvotxIqQl4/XiI4AOiBZrdOGvxDUbb5m8=
-X-Endpoint-Received: by B4 Relay for dimitri.fedrau@liebherr.com/20241202
- with auth_id=290
-X-Original-From: Dimitri Fedrau <dimitri.fedrau@liebherr.com>
-Reply-To: dimitri.fedrau@liebherr.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250117183538.881618-4-dhowells@redhat.com>
 
-From: Dimitri Fedrau <dimitri.fedrau@liebherr.com>
+On Fri, Jan 17, 2025 at 06:35:12PM +0000, David Howells wrote:
+> Add an AEAD template that does hash-then-cipher (unlike authenc that does
+> cipher-then-hash).  This is required for a number of Kerberos 5 encoding
+> types.
+> 
+> [!] Note that the net/sunrpc/auth_gss/ implementation gets a pair of
+> ciphers, one non-CTS and one CTS, using the former to do all the aligned
+> blocks and the latter to do the last two blocks if they aren't also
+> aligned.  It may be necessary to do this here too for performance reasons -
+> but there are considerations both ways:
+> 
+>  (1) firstly, there is an optimised assembly version of cts(cbc(aes)) on
+>      x86_64 that should be used instead of having two ciphers;
+> 
+>  (2) secondly, none of the hardware offload drivers seem to offer CTS
+>      support (Intel QAT does not, for instance).
+> 
+> However, I don't know if it's possible to query the crypto API to find out
+> whether there's an optimised CTS algorithm available.
+> 
+> Signed-off-by: David Howells <dhowells@redhat.com>
 
-Add support for changing the transmit amplitude voltage in 100BASE-TX mode.
-Modifying it can be necessary to compensate losses on the PCB and
-connector, so the voltages measured on the RJ45 pins are conforming.
+...
 
-Signed-off-by: Dimitri Fedrau <dimitri.fedrau@liebherr.com>
----
- drivers/net/phy/dp83822.c | 37 +++++++++++++++++++++++++++++++++++++
- 1 file changed, 37 insertions(+)
+> diff --git a/crypto/krb5enc.c b/crypto/krb5enc.c
 
-diff --git a/drivers/net/phy/dp83822.c b/drivers/net/phy/dp83822.c
-index 6599feca1967d705331d6e354205a2485ea962f2..dd5aaf1b2c61ee31c521f83aa1dccb6d3f5aae15 100644
---- a/drivers/net/phy/dp83822.c
-+++ b/drivers/net/phy/dp83822.c
-@@ -31,6 +31,7 @@
- #define MII_DP83822_RCSR	0x17
- #define MII_DP83822_RESET_CTRL	0x1f
- #define MII_DP83822_MLEDCR	0x25
-+#define MII_DP83822_LDCTRL	0x403
- #define MII_DP83822_LEDCFG1	0x460
- #define MII_DP83822_IOCTRL1	0x462
- #define MII_DP83822_IOCTRL2	0x463
-@@ -123,6 +124,9 @@
- #define DP83822_IOCTRL1_GPIO1_CTRL		GENMASK(2, 0)
- #define DP83822_IOCTRL1_GPIO1_CTRL_LED_1	BIT(0)
- 
-+/* LDCTRL bits */
-+#define DP83822_100BASE_TX_LINE_DRIVER_SWING	GENMASK(7, 4)
-+
- /* IOCTRL2 bits */
- #define DP83822_IOCTRL2_GPIO2_CLK_SRC		GENMASK(6, 4)
- #define DP83822_IOCTRL2_GPIO2_CTRL		GENMASK(2, 0)
-@@ -197,6 +201,7 @@ struct dp83822_private {
- 	bool set_gpio2_clk_out;
- 	u32 gpio2_clk_out;
- 	bool led_pin_enable[DP83822_MAX_LED_PINS];
-+	int tx_amplitude_100base_tx_index;
- };
- 
- static int dp83822_config_wol(struct phy_device *phydev,
-@@ -522,6 +527,12 @@ static int dp83822_config_init(struct phy_device *phydev)
- 			       FIELD_PREP(DP83822_IOCTRL2_GPIO2_CLK_SRC,
- 					  dp83822->gpio2_clk_out));
- 
-+	if (dp83822->tx_amplitude_100base_tx_index >= 0)
-+		phy_modify_mmd(phydev, MDIO_MMD_VEND2, MII_DP83822_LDCTRL,
-+			       DP83822_100BASE_TX_LINE_DRIVER_SWING,
-+			       FIELD_PREP(DP83822_100BASE_TX_LINE_DRIVER_SWING,
-+					  dp83822->tx_amplitude_100base_tx_index));
-+
- 	err = dp83822_config_init_leds(phydev);
- 	if (err)
- 		return err;
-@@ -720,6 +731,11 @@ static int dp83822_phy_reset(struct phy_device *phydev)
- }
- 
- #ifdef CONFIG_OF_MDIO
-+static const u32 tx_amplitude_100base_tx_gain[] = {
-+	800, 816, 833, 850, 866, 1767, 883, 916,
-+	933, 950, 966, 983, 1000, 1016, 1033, 1050,
-+};
-+
- static int dp83822_of_init_leds(struct phy_device *phydev)
- {
- 	struct device_node *node = phydev->mdio.dev.of_node;
-@@ -780,6 +796,8 @@ static int dp83822_of_init(struct phy_device *phydev)
- 	struct dp83822_private *dp83822 = phydev->priv;
- 	struct device *dev = &phydev->mdio.dev;
- 	const char *of_val;
-+	s32 val;
-+	int i;
- 
- 	/* Signal detection for the PHY is only enabled if the FX_EN and the
- 	 * SD_EN pins are strapped. Signal detection can only enabled if FX_EN
-@@ -815,6 +833,25 @@ static int dp83822_of_init(struct phy_device *phydev)
- 		dp83822->set_gpio2_clk_out = true;
- 	}
- 
-+	dp83822->tx_amplitude_100base_tx_index = -1;
-+	val = phy_get_tx_amplitude_gain(phydev, dev,
-+					ETHTOOL_LINK_MODE_100baseT_Full_BIT);
-+	if (val > 0) {
-+		for (i = 0; i < ARRAY_SIZE(tx_amplitude_100base_tx_gain); i++) {
-+			if (tx_amplitude_100base_tx_gain[i] == val) {
-+				dp83822->tx_amplitude_100base_tx_index = i;
-+				break;
-+			}
-+		}
-+
-+		if (dp83822->tx_amplitude_100base_tx_index < 0) {
-+			phydev_err(phydev,
-+				   "Invalid value for tx-amplitude-100base-tx-gain-milli property (%u)\n",
-+				   val);
-+			return -EINVAL;
-+		}
-+	}
-+
- 	return dp83822_of_init_leds(phydev);
- }
- 
+...
 
--- 
-2.39.5
+> +static int krb5enc_verify_hash(struct aead_request *req, void *hash)
+> +{
+> +	struct crypto_aead *krb5enc = crypto_aead_reqtfm(req);
+> +	struct aead_instance *inst = aead_alg_instance(krb5enc);
+> +	struct krb5enc_instance_ctx *ictx = aead_instance_ctx(inst);
+> +	struct krb5enc_request_ctx *areq_ctx = aead_request_ctx(req);
+> +	struct ahash_request *ahreq = (void *)(areq_ctx->tail + ictx->reqoff);
+> +	unsigned int authsize = crypto_aead_authsize(krb5enc);
+> +	u8 *ihash = ahreq->result + authsize;
+> +
+> +	scatterwalk_map_and_copy(ihash, req->src, ahreq->nbytes, authsize, 0);
+> +
+> +	if (crypto_memneq(ihash, ahreq->result, authsize))
+> +		return -EBADMSG;
+> +	return 0;
+> +}
+> +
+> +static void krb5enc_decrypt_hash_done(void *data, int err)
+> +{
+> +	struct aead_request *req = data;
+> +
+> +	if (err)
+> +		return krb5enc_request_complete(req, err);
+> +
+> +	err = krb5enc_verify_hash(req, 0);
 
+Hi David,
 
+Sparse complains that the second argument to krb5enc_verify_hash should be
+a pointer rather than an integer. So perhaps this would be slightly better
+expressed as (completely untested!):
+
+	err = krb5enc_verify_hash(req, NULL);
+
+> +	krb5enc_request_complete(req, err);
+
+...
+> +}
 
