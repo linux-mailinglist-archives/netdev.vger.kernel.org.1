@@ -1,141 +1,94 @@
-Return-Path: <netdev+bounces-159771-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159769-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 814BDA16C9B
-	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 13:57:01 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 98152A16C74
+	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 13:40:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 14052188902C
-	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 12:57:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B19413A524D
+	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 12:40:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEE611E0B66;
-	Mon, 20 Jan 2025 12:56:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08DE81DFDBB;
+	Mon, 20 Jan 2025 12:40:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b="aU4fQmq7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pin4uBQC"
 X-Original-To: netdev@vger.kernel.org
-Received: from sonic307-1.consmr.mail.bf2.yahoo.com (sonic307-1.consmr.mail.bf2.yahoo.com [74.6.134.40])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 103561DFD80
-	for <netdev@vger.kernel.org>; Mon, 20 Jan 2025 12:56:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.6.134.40
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1A081B86F7;
+	Mon, 20 Jan 2025 12:40:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737377816; cv=none; b=Q5MxeArK5nXsEuwsmM90dNuLMJoHImynF4jhsvhutKtPJJ0WQVoo36fEUAoc3ecQefELT4Xry2ONAC/tBc9ao5DJ8a+2A+g1u9njW7QReZtTziE0qHYtha7RHgtqj4eTICrQseyQWtcFd2AQuhvRJ+jvwoi2COBdxbkYI6uwXjo=
+	t=1737376805; cv=none; b=MGBu0zaxfaMhjHggqH7KrC1Y0GX3GR3Vmscq5Zvqls7INldnwCsmHbaZXvskFzgnriJkl4WMEp6HBJtIBOp58Ja0SuL9Xb2XwRKo0uP9Vzt2z86JOxIvX4c6EtRZjLsfgvas09P7tpK1g7Tw56Vfaz5GdrVCX+x21izIIs+uf9w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737377816; c=relaxed/simple;
-	bh=awoA4f9sL5W63XhDxfMWAOf9cG6/2ina8dOwCzpXbXE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MzES0+HrpdyoRW48H/22BKiN8crz6pEGZc4Q6DsTZRdbZSHLDAKuErIic4WWwuIfB9pbXTCrXJhWNQsNI3DhrsduBf3L9ICw7s7ASJntqNLtO6sj8lMAzSS7A8/RRBspAmiDKSPHrwCwySHFwqyNfDqbmrf2m5w+1WxBxjc69cc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com; spf=pass smtp.mailfrom=yahoo.com; dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b=aU4fQmq7; arc=none smtp.client-ip=74.6.134.40
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yahoo.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1737377808; bh=fQYkZCImzzOwlRwH2mZG/bc5/vHITdYcTTfQQ26okDU=; h=Date:Subject:To:Cc:References:From:In-Reply-To:From:Subject:Reply-To; b=aU4fQmq7eGK9Xu2UlQ5RHwmYWgMWqnD5rNVZWr2p3YzFIGnaw5imtyET6iIoNdGQAiWJ1nNA8zvbQx2Ij6yGPBaaiDpOzNrPQv9onSmBiqHKP18lETO6h5MId8pjZj55RduWAWXOYwk7mZpEVEU4Ub5/gC8juULRjW82zmuVZQex2n5O1qXNPVSDoV/6RawCI3Gj3tw5TKwA7bjezIGOs1ru+/mTcY+1npkvcgrTNoyuRj2bOVHLRNviEMZLGgz+4swsoQh63u4cRyZH+lS1vElhe0cmQSE+HD9U8zukb6KeBy+7S3clzXdzj1/pOP3ifUCW2cdHNqUD+aBl71kZwQ==
-X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1737377808; bh=ZjQDT8hxV8LNQHPUbjURxRLBPiM93Or0brglODveL8Z=; h=X-Sonic-MF:Date:Subject:To:From:From:Subject; b=Wg8+xibHRoNtuJk8FXDS/ddgnWDPhYp4JWjRTia+tmbOJB6q+lmDrI8jkUa1ktV30+MhVLoDtWaG5PHkufkyTtXvqQc59ogHGPavrAH3Vf2UYXK5ADG1OXimglzCYk/q3wnmA2jTgumSC2yg61VMKx/bP9v6b1OsVw1facOVTS3lhqrbU6lyjILnKgkWOSLxjixjmFWlsVM3XvNYGQFVVqjTDdp8lIQmZ+G1V+R7XdDj4E/6ZwsqMLtl3qIriGgWzk0JIIwM+9uo9kgkiXSeZUDRRt5Zo+UrYVWymDXu7FHlbA2C2tJ3fDbSv33yhcabkG6rjDQFsMY0Q0Lsojbyyw==
-X-YMail-OSG: 69vWWBoVM1liWpYkcOO4Cc8dWfv6BCtEjW5TeGi_O_nxoD2tZkrJ7HZWWVBU7Td
- DDIbwqCpXvAFXl8j5InDgVC.95zE23z1rTIim3PmoX.zpSNb1uRmK99x4Y7NwC20WXaEnqqaneHE
- JondmTQCeZ0AJP1LqsejZOPP0ViqrdyXZ3GZR96Kp2FaWnHHaRobTpMcMsPObTaPl8cZyLacOr2P
- fo2eYWMBwnjKbTKaoxf7amu09bk7VC9634RGWftXYIRhntS5LmIe_x50qMTzfML7ktZ0Tbx7_1nL
- yvh0jYhJhLTaeMlVyu_lK3C8a142TRirRZPb..TYHRvZ11fS2CKtu6f2f0HQEQUyvTqVuasXJLNT
- g298xaABbXQ_Bl4JwloXlwvtffS6Ta.sR7R4Y2W8Kw5jL5ZtzXabz32xZcoPs66anQLuhrThq.hA
- KOx6dpSP0e9AgxIpPH.Wiqph1OdAiCnHdEqOviZzt2ZpIvOHiv4R0lUhxerMkN8r_CJJG.jChaIL
- fg5Ph0Kefe7TP7wytxlM.swELmBnjnfxT0mGdaBrz57o9Z1CFHqcH7NqXRDEb6NclR1xgCzsN5rp
- ohLzxBn9OnRJtL0DTFZHr7IojC_PeODDsktCEZFP_Ub73jye3ySyl.L07JE0Zi3ahgmkMJwSDHtW
- XZi0Nu4.WZn41afkSIjr3U3d8xQ_TaqID__VWKCDiAZXcoyg2VGiLRjbiJsX09mMGCF2SeUhYsln
- gvxh5xbAWmaR3RW.MSYUobyeZ8oDa00MBasyAHkp7x0jOPNio2dI_viiHD3nXuzgdR0mdjH9a0XE
- 0QwEBdYmEk24UqmFAYmgYdkMwAVTOVYQ0k9QPoGxBLePyPUaI8w1DXSKArUtR083JXxrrfOUFK7b
- 4kzuUPDeyQ2u.IQsk8IHGzD6Iu9gdGVQEr6_wh4vpPdIIGh_fuyC92AKQoqJl0RSCGUwg6V9Fr6g
- .ScYqmcxEiBmCYSrG8xMa_Y3LGBeYvuAA72geqJQ.jHS0hwe2sH_CtH.uIct_72V7veIHXqKs9TX
- 3Py6a14.RwILO2FJWX4PtnLxRggvYqsaAQAYrxP_q1az3S8Q6oY3jgSVIFSndR1W2iE3w9XvYfgh
- 5yGdD1RZJMb6VGsWor1r_gUqNLzaIM3kOp6d6YQVv5c6TGBFoM2C2SNcqXTDRbmtIfJHooHdc1I3
- RQR88ZzkuFjyVpohIawdecaE0ZOdsTNKwwQedjgUngZUZTPar17u94omoLnSjn2bx9l7Wn5KmXe5
- vd38LcmXdDoFtWlYdSsk2X3GpoUJZMYtN5ac6s81LEeDhaAUBcq9yKNC7WA_VEwKxH9JimI9TdXR
- qPsXjYwgkWJIoh0OBRzXWpgSO2nAPLHW6bltAYgVD5ObalJoI494caDuTXc1Cqphy1ZM9W41mnXR
- ZdCpnUyeNTfj_Oag18lqz7CxP7v4Ahey4oE_pUfdtuFrdPnJJiga2RsgD4JJralTVVGl8zWrLOZB
- 2PyA8Dczidx_4YPFEYoRH0DVsPvpPkVlIVqORCLpAA3NrbYvm.dTJoXafSAcV57jwNnyMOYMiimU
- g0mIAe_lJCuwFiSed3aoTwUL9SAoE99J0rOfCl13eF9CVv1NkKXP_4O6S_QrAqXeeLWMcMWQsXum
- 2zfsfy7l15Z.8WvwlW_JlKk.LCkNKQ6WwbFculTlaP0CfzGTIOfEgU7HeOMqXPftWgoQiU4zcilY
- ajqhf5H5vWPPckRydbFZ0oKymtne8AkmX9TQ7eTMehPKYWcMZGOzm3mb9kk5tTnZybGBJBhPVxeT
- fF5aSk0mwdX_3XoVveS_29satTwFWg_Iuq4wK92jTJEsNp33EcjWlqOqYFy8Wnp4xLJ7fUNMicI0
- gs8eC1c5o6QFxpoJKaK.usrAZbrVGvi7rkUnqcL6yaTWqK6o7kdfG9Yk3fS2JE3UbvR2c3eqoGTO
- sf6lELZLQOiiLKaOngPlmokg8c0THfH_F14Coru8euLDeNKKarxaJKrQDxEB8s7x6aMVa4Vrrti5
- nhSzN0uUEMOhoNNoxXFQFXuWHTxFjUINvnJOyj0o7FbbUA91NGfMDz.GJWETCruWS36.MzPfIu.L
- wjw3jalqbJTnf6nYeqSht6sJiConcDZX9iDTZbOHAPhreUg2OB0LDpumhJfRByqntTgmxPG7F.SP
- CyRc_zrbFSHLpAWmtFWWi5qYQ2RtVcr6cLwEwQzgUIbr.DiNK7o65OKV.g2U_a0nApbdBX1U9a_Q
- EsBcZWecjxK.dJPwy_TET8X0omoMIoMugMUphcLejbCWZMPrPOcWejpI5vt40VqXZ
-X-Sonic-MF: <dullfire@yahoo.com>
-X-Sonic-ID: ef09f872-6111-460c-81c7-1702da353bc6
-Received: from sonic.gate.mail.ne1.yahoo.com by sonic307.consmr.mail.bf2.yahoo.com with HTTP; Mon, 20 Jan 2025 12:56:48 +0000
-Received: by hermes--production-ne1-bfc75c9cd-scmkf (Yahoo Inc. Hermes SMTP Server) with ESMTPA ID 288457ee09884436370c264f9119b1d1;
-          Mon, 20 Jan 2025 12:56:46 +0000 (UTC)
-Message-ID: <5a580609-aa5e-4153-b8dd-a6751af72685@yahoo.com>
-Date: Mon, 20 Jan 2025 06:38:19 -0600
+	s=arc-20240116; t=1737376805; c=relaxed/simple;
+	bh=fZc2a6tDS9L/wQ44T90GZf/WZl/atcL0p7qKocnG1QU=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=JLmMAUR3PG5O7BJabvUzmFOqUhhBZiEuu3dBydFp6kUS8fcTG5GcAbVZDC7DeCs+EdGsvEKybVVMCmL6zjj9yD5RKEU/L7Q+aaY9NW2b5uhpA12BpjI9B2n+4J6ciiBipkInx+/ZGK7/kHUcaAE8QmuZfc269F1C++AQswTkhBw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pin4uBQC; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 47FB9C4CEDD;
+	Mon, 20 Jan 2025 12:40:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1737376805;
+	bh=fZc2a6tDS9L/wQ44T90GZf/WZl/atcL0p7qKocnG1QU=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=pin4uBQCRQILpCSabhj2qJClvg0l1Gnh06iAla3++T5IK3i70hOMBMmxD4EcACfJM
+	 JfjhoBo+8hadpR2AJPDWWyyCh46rhXarg0irQ5Dn9MZXy5zlcgquUQVlIO6qgBSpwf
+	 txYIszK+T8a4MbClYg1r+PZeyskiSgxNDmvmp9GWJ4iyCmIGqV6bUDnbdhs8gGveXZ
+	 6i2tMEu1c2StwZeOx/tdHIT9ZWURRYmlbGUecos/yTHIwRsbeolfHFfWg79yLiMVHy
+	 2G5oLveSjXyW4q+t5wBSjOcL1Ey5onX3/CbueaFBM5MgCt8OmYu6Yw2SvhxuOI2x5V
+	 qs1iLrXRNqVQw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70D12380AA62;
+	Mon, 20 Jan 2025 12:40:30 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2] PCI/MSI: Add MSIX option to write to ENTRY_DATA
- before any reads
-Content-Language: en-US
-To: Paolo Abeni <pabeni@redhat.com>, "David S . Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>,
- Jacob Keller <jacob.e.keller@intel.com>, Simon Horman <horms@kernel.org>,
- Thomas Gleixner <tglx@linutronix.de>, Mostafa Saleh <smostafa@google.com>,
- Marc Zyngier <maz@kernel.org>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org
-Cc: stable@vger.kernel.org
-References: <20241117234843.19236-1-dullfire@yahoo.com>
- <20241117234843.19236-2-dullfire@yahoo.com>
- <a292cdfe-e319-4bbd-bcc0-a74c16db9053@redhat.com>
- <07726755-f9e7-4c01-9a3f-1762e90734af@yahoo.com>
- <4f621a9d-f527-4148-831b-aad577a6e097@redhat.com>
-From: Dullfire <dullfire@yahoo.com>
-In-Reply-To: <4f621a9d-f527-4148-831b-aad577a6e097@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Mailer: WebService/1.1.23187 mail.backend.jedi.jws.acl:role.jedi.acl.token.atz.jws.hermes.yahoo
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next] net: phy: realtek: HWMON support for standalone
+ versions of RTL8221B and RTL8251
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <173737682925.3514605.1334404716425790297.git-patchwork-notify@kernel.org>
+Date: Mon, 20 Jan 2025 12:40:29 +0000
+References: <20250117222421.3673-1-olek2@wp.pl>
+In-Reply-To: <20250117222421.3673-1-olek2@wp.pl>
+To: Aleksander Jan Bajkowski <olek2@wp.pl>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ daniel@makrotopia.org, ericwouds@gmail.com, kabel@kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+
+Hello:
+
+This patch was applied to netdev/net-next.git (main)
+by David S. Miller <davem@davemloft.net>:
+
+On Fri, 17 Jan 2025 23:24:21 +0100 you wrote:
+> HWMON support has been added for the RTL8221/8251 PHYs integrated together
+> with the MAC inside the RTL8125/8126 chips. This patch extends temperature
+> reading support for standalone variants of the mentioned PHYs.
+> 
+> I don't know whether the earlier revisions of the RTL8226 also have a
+> built-in temperature sensor, so they have been skipped for now.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next] net: phy: realtek: HWMON support for standalone versions of RTL8221B and RTL8251
+    https://git.kernel.org/netdev/net-next/c/64ff63aeefb0
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-On 11/21/24 04:28, Paolo Abeni wrote:
-> On 11/21/24 10:22, Dullfire wrote:
->> On 11/21/24 02:55, Paolo Abeni wrote:
->>> On 11/18/24 00:48, dullfire@yahoo.com wrote:
->>>> From: Jonathan Currier <dullfire@yahoo.com>
->>>>
->>>> Commit 7d5ec3d36123 ("PCI/MSI: Mask all unused MSI-X entries")
->>>> introduces a readl() from ENTRY_VECTOR_CTRL before the writel() to
->>>> ENTRY_DATA. This is correct, however some hardware, like the Sun Neptune
->>>> chips, the niu module, will cause an error and/or fatal trap if any MSIX
->>>> table entry is read before the corresponding ENTRY_DATA field is written
->>>> to. This patch adds an optional early writel() in msix_prepare_msi_desc().
->>> Why the issue can't be addressed into the relevant device driver? It
->>> looks like an H/W bug, a driver specific fix looks IMHO more fitting.
->>
->> I considered this approach, and thus asked about it in the mailing lists here:
->> https://lore.kernel.org/sparclinux/7de14cca-e2fa-49f7-b83e-5f8322cc9e56@yahoo.com/T/
-> 
-> I forgot about such thread, thank you for the reminder. Since the more
-> hackish code is IRQ specific, if Thomas is fine with that, I'll not oppose.
-> 
->>> A cross subsystem series, like this one, gives some extra complication
->>> to maintainers.
-> 
-> The niu driver is not exactly under very active development, I guess the
-> whole series could go via the IRQ subsystem, if Thomas agrees.
-> 
-> Cheers,
-> 
-> Paolo
-> 
-
-Thomas, does this work for you, or is there something else you would to see in this series?
-
-
-Sincerely,
-Jonathan Currier
 
