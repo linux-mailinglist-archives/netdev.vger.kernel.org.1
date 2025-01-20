@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-159715-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159716-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17858A16999
-	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 10:30:16 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 87145A1699A
+	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 10:30:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 96442162F69
-	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 09:30:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1F4E818850C2
+	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 09:30:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8967D1B043A;
-	Mon, 20 Jan 2025 09:30:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F3AF1B21BA;
+	Mon, 20 Jan 2025 09:30:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WFZ/cftG"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IxkrJx+J"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6598D18FDA9
-	for <netdev@vger.kernel.org>; Mon, 20 Jan 2025 09:30:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54F3D192B9D;
+	Mon, 20 Jan 2025 09:30:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737365406; cv=none; b=J287Pca5t69bhuCuxKdXYciE4LCwstZab8YhKMHBjUwmJbotn0tYuf/8eNnu46a4jwUv1KgfRBzzVZWx7/vJROlKuruY0ZmbeuiGA5F+ixR61JLdPSI3sYz54dTDJIPKn/fLbOyAn20zjnAk1Bnw2cj4CUnUtzmWQ+Ruo33qw/M=
+	t=1737365407; cv=none; b=NGykk3cHlv40ITzjrEF55sgCMzRxmqZgXJ0UlAgRHGfaEbA/CcropW9NcKV9sQMT1ux1gzgRKXZVyynxXAlOMv6WbfLqCfHVoUj0ffDE7amvdV4MJ57HJSsH0Q2GM7crZaeWDwYBd+rhAzElAhxyeiuhkVB6ZSU8GFf1xpgG8j4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737365406; c=relaxed/simple;
-	bh=1A1AYoBSCfbJkGld+MgLZKSMhSf4nv3K2N5dXRjQx7o=;
+	s=arc-20240116; t=1737365407; c=relaxed/simple;
+	bh=DYeH9jl/rbdh5LWfjxeeCO6j+Mle3v+oCo/ApNFXrUk=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=TFrXVo8XnXBMxR/U3ojm+tYIH8N+WVMp3piVcW+3wZG3Bdbq5AHcS1RanzR/Adofxqq5FqQfI21cSSnAd1W8gsXlmyUxCb6xYbxBsbc+632iJVdX9Y0dB28BgO7bzmMjExY+taQKX7DamfNFbt2Prp98KIu8MQ2nSRWjNHmlqqk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WFZ/cftG; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D4ECEC4CEDD;
-	Mon, 20 Jan 2025 09:30:05 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=hKBkk78Nmuuqt0CwVY00tXTNKbbgOmIXdDvBpaYs8u/df2wlztyFnbYUZYLcOM5qfMt1b+aucj+O+v/sLuGtMt1pZCc6xJPBlPQhth/V+e0OwOtVt4GbA4bcsCR+4B3SAaRWQXMKzksEbXjDZzR/zQmSYiK0OtSL58jOg2ion3o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IxkrJx+J; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 28E9EC4CEDD;
+	Mon, 20 Jan 2025 09:30:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737365405;
-	bh=1A1AYoBSCfbJkGld+MgLZKSMhSf4nv3K2N5dXRjQx7o=;
+	s=k20201202; t=1737365407;
+	bh=DYeH9jl/rbdh5LWfjxeeCO6j+Mle3v+oCo/ApNFXrUk=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=WFZ/cftG0RfBFdGCohcQ6Hp0w4D5iX1fJ1T5KKQHFNM+NNoRWTfDEPv+tisa9YZPm
-	 4FMs4POfcJt3UIxAjrogKmUQlTckY9uAZ+2JkB4Vfs8TKoz4DTIe1D/E7z9ROpq8eg
-	 HsW2zBgWzRM+zF4cJYrdBnnk4JsKU+KEh5ifGTDnR7RL2MVo2JVGhVM4oD2usorfee
-	 Z7xfj12DGM/NKMgBwCls/2Kg9CRKFDmLuMhmwxdUj/yKyZG8IUcTzIpJREJzUR3zZ8
-	 DpAZyyku9Tcf6+99eJ2IUlY3Q0SsD59faM2zhUD6GL2Skvjkoh0R7+ontOqvmICfOT
-	 X/7fvR/Mi9eNQ==
+	b=IxkrJx+JBjv4Ha5iGI94wHOxdvLXAN+aeBeDMg/+02PzEtL1oXNcsbmjLfBtTUCYA
+	 fR7R+pKibuWejMu5EpgafpvXvDEA8D3/Qo4ukZEvhIm1Slp8X0PcDjz+xw7AH9bUMf
+	 yYCE2XgCTA1OiwcH78zyAsJeO/VIiu6l9m3tpPgeJWedyWH8yexTtEFUXU5hAWypsp
+	 f1p2IVfBoHSR8g3ILcfVJ75kLvVZLwP0NMy3vb9p7SXqtw+7rq8QPEeLIj5VQEk4JR
+	 XfxXcF8eHkQCqW6N8ZtleY5vvoalyXYHaZqQFL0jyl2Ou7V2oibz49L0f9f4j8072S
+	 UkuhkXaWQBqcA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB33D380AA62;
-	Mon, 20 Jan 2025 09:30:30 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33DA9380AA62;
+	Mon, 20 Jan 2025 09:30:32 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,40 +52,40 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v3 net-next] net: sched: refine software bypass handling in
- tc_run
+Subject: Re: [PATCH net-next] dsa: Use str_enable_disable-like helpers
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <173736542978.3461630.14025965431425974608.git-patchwork-notify@kernel.org>
-Date: Mon, 20 Jan 2025 09:30:29 +0000
-References: <76c421c64c640f5a5868c439d6be3c6d1548789e.1736951274.git.lucien.xin@gmail.com>
-In-Reply-To: <76c421c64c640f5a5868c439d6be3c6d1548789e.1736951274.git.lucien.xin@gmail.com>
-To: Xin Long <lucien.xin@gmail.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
- edumazet@google.com, pabeni@redhat.com, jhs@mojatatu.com,
- xiyou.wangcong@gmail.com, jiri@resnulli.us, marcelo.leitner@gmail.com,
- ast@fiberby.net, shuali@redhat.com
+ <173736543100.3461630.10452403872202995121.git-patchwork-notify@kernel.org>
+Date: Mon, 20 Jan 2025 09:30:31 +0000
+References: <20250115194703.117074-1-krzysztof.kozlowski@linaro.org>
+In-Reply-To: <20250115194703.117074-1-krzysztof.kozlowski@linaro.org>
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Cc: andrew@lunn.ch, olteanv@gmail.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ linus.walleij@linaro.org, alsi@bang-olufsen.dk, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by David S. Miller <davem@davemloft.net>:
 
-On Wed, 15 Jan 2025 09:27:54 -0500 you wrote:
-> This patch addresses issues with filter counting in block (tcf_block),
-> particularly for software bypass scenarios, by introducing a more
-> accurate mechanism using useswcnt.
-> 
-> Previously, filtercnt and skipswcnt were introduced by:
-> 
->   Commit 2081fd3445fe ("net: sched: cls_api: add filter counter") and
->   Commit f631ef39d819 ("net: sched: cls_api: add skip_sw counter")
+On Wed, 15 Jan 2025 20:47:03 +0100 you wrote:
+> Replace ternary (condition ? "enable" : "disable") syntax with helpers
+> from string_choices.h because:
+> 1. Simple function call with one argument is easier to read.  Ternary
+>    operator has three arguments and with wrapping might lead to quite
+>    long code.
+> 2. Is slightly shorter thus also easier to read.
+> 3. It brings uniformity in the text - same string.
+> 4. Allows deduping by the linker, which results in a smaller binary
+>    file.
 > 
 > [...]
 
 Here is the summary with links:
-  - [v3,net-next] net: sched: refine software bypass handling in tc_run
-    https://git.kernel.org/netdev/net-next/c/a12c76a03386
+  - [net-next] dsa: Use str_enable_disable-like helpers
+    https://git.kernel.org/netdev/net-next/c/544c9394065f
 
 You are awesome, thank you!
 -- 
