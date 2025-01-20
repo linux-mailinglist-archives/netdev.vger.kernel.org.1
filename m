@@ -1,82 +1,80 @@
-Return-Path: <netdev+bounces-159849-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159851-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3DAFCA1729A
-	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 19:16:35 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE39EA172D9
+	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 19:55:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 34BA5162270
-	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 18:16:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3C7AF188587A
+	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 18:55:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5320C7DA82;
-	Mon, 20 Jan 2025 18:16:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A5E71E1043;
+	Mon, 20 Jan 2025 18:55:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="44BAiVph"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="PyALCd7x"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2043.outbound.protection.outlook.com [40.107.244.43])
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2064.outbound.protection.outlook.com [40.107.220.64])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E1961EE7C2;
-	Mon, 20 Jan 2025 18:16:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E1E880BEC
+	for <netdev@vger.kernel.org>; Mon, 20 Jan 2025 18:55:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.64
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737396986; cv=fail; b=pe6SAEiX1aCSpSlxHnRUbeiHTWJOkuio79bpkodJY8liaHsSnFeuWTSvdgeLizdf00klckD0+N79apaFlhEdmvQwDjXalr/ZulOE2x/65sJFY+cdPt6S4nTDf7lTEm1WYn8EVdvfy2CPL9HKL3v/kx9VuJJntWHWF/ThLG6GS0c=
+	t=1737399321; cv=fail; b=nXf4unI/hv4ed07GSh1ywaaV9LmE7aLBv4UQ8c/IptK4eVIlZfrcufg3LwhuaSGzJVRWT8p0BMSsF9aJy9a2fkZar9CAbWD4E8Mo2xDnVVdnjIl+Yji1Nz3VrZTdMXeCPWEINomuwyAUX8th/u2sgUrCNYrOMiooAAkQq+F4SIc=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737396986; c=relaxed/simple;
-	bh=Vh/FBx+c4vgpM/S42BJkwAjO4tkxMvGusUZIeKql1X0=;
-	h=Message-ID:Date:Subject:To:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=WYugJDyhiW1womc/wr6cOL0OcLrLG2/OEq4MwXOQeMxeDmJg+gsi4Cb4vZvQaLSczobakSluXrNdTeinr/McnvOWokwmKwq28vSb4RT7ss4hjkn7jzTRZXBXVY7tbIp9f4lsszLM6p/If0dmBGtFOJgSOHsMtajSSmQ4ZjpkqhA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=44BAiVph; arc=fail smtp.client-ip=40.107.244.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+	s=arc-20240116; t=1737399321; c=relaxed/simple;
+	bh=bYZt/vwhlkJ/HmX+irzRMrHP4866Yc+5Oyjp/CplfAo=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=cY1wcKpFzp4iB78om0jE8XlGkevHMONNy2TX487swp7HJkOhxvyC/LYJW04IPTxYoJBl6sn1WunBQF6OccpM19aH9+5+ZRHGkemagVdm84AcfMOtSTpSg/HwX9EsAOV37xoAp1rh8IacfBaSu1Vaff38Zdda42AyqfHLNH5TDoA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=PyALCd7x; arc=fail smtp.client-ip=40.107.220.64
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=naSzEMaX8HY0VFL/51JUYnjkkiTb1vga478rhvP/OhriEuXAfHWtGH/UWEC7rHpq8imrevsCm3GSFMCWmiJmPFuGz8DmMgpESINHQoTtUdz1GW8xiAx5NovFmbVUz+nbwFAC570p1AxzDNMQqI9cIUMg0jZwb5e04S4PMgKe+Sn6pNcyU1Y6GXzao8u2Xc+H8XMvnlUPloAXPMx6FrdyzI5wHhgcQ2Z6LUyIoothS6SyO7JVAAkp1BI9GkyTWF798qcRAP5abXVPzpM8NiAF96BKdc4h3GjHsmQy7sMH8V4TtXksakJhczgYj1KEDy1TuJ04vUUHsj2pFSpRqQcw2w==
+ b=HGIGaZorRXERuCVk/FxSo6m4NhUmwlH4QD5Z7zvsqrYODEUpemh04NBacskOyqKgEX0YuXhrooLI8GrKVLveYrxpnPxUl8lIWS4DiJGYgbQEVmCeYypCtSliYncFuYZWwKeTEPL4V0G4VwcbmQrXpHY5KahI6ymSfY/nAjfC788dUlBuMKZtWdbhJn9f1lqM5Xgyc6eAZE8Su4XGFHM/B3aF5k4pXVdrQ/oL4g6i5L+CwAmdxyxqlpvd8m95G1yH1E42o7GHbhydrasanRmR0oCDzpK2GHHHjqyFb3pdwK0eksXhmmRRCmMTCD3HtifTr1QCuEGoOSHiWCBWj4uH+g==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=cJhAJQtkRi4fzVd+Sw4vDTnx/K/dk+4579dO1IMjZRo=;
- b=bOAInlq8G4Pt78KBfHGP7NItvYkF7yhX1Bd5KvhzPyYyaaa8j+Vn9ERH3bfWgLN7gKuaKQe1LX8rWLKRkAawQHNJx3DWS3w9+rM8Q/r/t0KUmtcQlf2OXlk0gTxBr9DyOA0qPeCeKYVMzd+o7p/mkWpkCX7UUXJLtTWcn1r6Mm0aY7wla1C5I5PDAA0C5wjUg4KlWCuKkeU4zoB9Zdv4tLgzNHuO3RopYWPS4tg+T0pz8oupQsYXlmzWzxaLdM6OYkfq3VnRifxLhWI0xGyy4dXF+cfDWiwD9NjQpnoFY5oL3GP0ZYm6YCktlRsydJbCXhSH/E6PdSgDHhzbmnEiLA==
+ bh=j2f5wuQcdUFq4VpBjBLBzp9tj32jUja5NniYkFyYeQo=;
+ b=e+psDICkZMu6SLBADD1eKoue/MtFuCNh7Nm8ii5NVqpgrEtfElNCOIgnixTp8T4btcZYT1w1DmAwjKcUZrARtLSa1IxuiI+EX69w+lKlXI5kIpIQteb2DgXz2UKkVYooiCASNxZxAzfLFXTBiweoMHw004OrJPB8OzCqPeJBJhUlIok5O9/OgpPczVialNH7BxFwQh8XDVqbczwmgDZmBYIt3h5V7t/gH3QXM7Tm1S7NgJ5glmv2d3zeXK0iHWZ50wg0KJd/Z4hXXqk/uR2ImyGxwJPBkG608M849wdYafv+WfRuwx0JmeHVQkk3eB78585PUIELuQKe0CMIR3GzDg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=cJhAJQtkRi4fzVd+Sw4vDTnx/K/dk+4579dO1IMjZRo=;
- b=44BAiVphMNus+hyPn+qnfDc8P4GKRHhIPtPZPvFt6qjcv2xWMOzeYi4tPeSucGwy/KAU5cS8xI7Wx2LmdVvb1e+clABSjmzbv4uwyUs6NWixrag92heF7ZIlVMgC1rbt9RtppDPFA9i8j3NyOBg5O3qaQtdhgzUdUVdo4vNPeIk=
+ bh=j2f5wuQcdUFq4VpBjBLBzp9tj32jUja5NniYkFyYeQo=;
+ b=PyALCd7xSICLL2mwqPn5tnSjnp/dZgxXdI1mCzhFfbY4aU5a/uyr9Nv24Uqq5kMitx1723Zw4htzkucCVHchkYcYpKKFk7i5rrHNZAK3uctkWud0sG1hsGazLMCwiR6Wi1KEzvCTt10r2rEi6NtWPNjWRDa4Gnek54ANTYrMnFKeO9nnLUrY0zkF+ukyf2LxLuLEWhy59XIjI/9K/I6hM4rbyOH78l5aCunX4MUqXjGG9EUvDw7+genLJA60iBrIcDBZICwg23C8QrOW5UBPXLM8RjQGw3NyHdZTuPX/CJ+xVxf0ZxAxYECb9gDTZQg4qvke4SJe1kes02DkmcD5Kw==
 Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DM6PR12MB4202.namprd12.prod.outlook.com (2603:10b6:5:219::22)
- by IA1PR12MB7709.namprd12.prod.outlook.com (2603:10b6:208:423::15) with
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from SN6PR12MB2847.namprd12.prod.outlook.com (2603:10b6:805:76::10)
+ by DS7PR12MB6072.namprd12.prod.outlook.com (2603:10b6:8:9c::14) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8356.21; Mon, 20 Jan
- 2025 18:16:21 +0000
-Received: from DM6PR12MB4202.namprd12.prod.outlook.com
- ([fe80::f943:600c:2558:af79]) by DM6PR12MB4202.namprd12.prod.outlook.com
- ([fe80::f943:600c:2558:af79%7]) with mapi id 15.20.8356.017; Mon, 20 Jan 2025
- 18:16:21 +0000
-Message-ID: <80dca432-6308-26f5-99c3-47dd15858259@amd.com>
-Date: Mon, 20 Jan 2025 18:16:15 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH v9 15/27] cxl: define a driver interface for HPA free
- space enumeration
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8356.22; Mon, 20 Jan
+ 2025 18:55:13 +0000
+Received: from SN6PR12MB2847.namprd12.prod.outlook.com
+ ([fe80::1b1e:e01d:667:9d6b]) by SN6PR12MB2847.namprd12.prod.outlook.com
+ ([fe80::1b1e:e01d:667:9d6b%4]) with mapi id 15.20.8356.020; Mon, 20 Jan 2025
+ 18:55:13 +0000
+Message-ID: <dc118ae9-4ec0-4180-b7aa-90eba5283010@nvidia.com>
+Date: Mon, 20 Jan 2025 20:55:07 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1 net-next 4/4] net: Hold rtnl_net_lock() in
+ (un)?register_netdevice_notifier_dev_net().
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: davem@davemloft.net, edumazet@google.com, horms@kernel.org,
+ kuba@kernel.org, kuni1840@gmail.com, netdev@vger.kernel.org,
+ pabeni@redhat.com
+References: <146eabfe-123c-4970-901e-e961b4c09bc3@nvidia.com>
+ <20250116025435.85541-1-kuniyu@amazon.com>
 Content-Language: en-US
-To: Dan Williams <dan.j.williams@intel.com>, alejandro.lucero-palau@amd.com,
- linux-cxl@vger.kernel.org, netdev@vger.kernel.org, edward.cree@amd.com,
- davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, dave.jiang@intel.com
-References: <20241230214445.27602-1-alejandro.lucero-palau@amd.com>
- <20241230214445.27602-16-alejandro.lucero-palau@amd.com>
- <678b19bdc3d8d_20fa2944e@dwillia2-xfh.jf.intel.com.notmuch>
-From: Alejandro Lucero Palau <alucerop@amd.com>
-In-Reply-To: <678b19bdc3d8d_20fa2944e@dwillia2-xfh.jf.intel.com.notmuch>
+From: Yael Chemla <ychemla@nvidia.com>
+In-Reply-To: <20250116025435.85541-1-kuniyu@amazon.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: GV3P280CA0038.SWEP280.PROD.OUTLOOK.COM
- (2603:10a6:150:9::16) To DM6PR12MB4202.namprd12.prod.outlook.com
- (2603:10b6:5:219::22)
+X-ClientProxiedBy: LO2P123CA0045.GBRP123.PROD.OUTLOOK.COM (2603:10a6:600::33)
+ To SN6PR12MB2847.namprd12.prod.outlook.com (2603:10b6:805:76::10)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,417 +82,331 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6PR12MB4202:EE_|IA1PR12MB7709:EE_
-X-MS-Office365-Filtering-Correlation-Id: b31e5646-520c-4c58-c3c4-08dd397e8ad6
+X-MS-TrafficTypeDiagnostic: SN6PR12MB2847:EE_|DS7PR12MB6072:EE_
+X-MS-Office365-Filtering-Correlation-Id: aa864097-0119-422a-6acd-08dd3983f8aa
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|1800799024|366016|921020|7053199007;
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024;
 X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?QVU3Y2gwd1YvU3h5RHlaNXlDSDZERmxmUCtrY3NXWVRBMURJU2VYSllxaXpY?=
- =?utf-8?B?SVVaYVRhT2ROZi9aaXl6eVpxZzdWdEl5RzRQbEdLRk9vdUUyWlJaS3BvbEc2?=
- =?utf-8?B?T0MzRXV1N2pXWTEyblZHRVhrTTkxekpBd2tDdEhBSnYwQmdBNzRJYnlXcUVm?=
- =?utf-8?B?RStCeDJSUkJiMFRlRS9mRGZrVnFPaW5GZjFtN2lFWUhzNk5OVUNDU3VUdXI0?=
- =?utf-8?B?NGFnb3c5RG4wVDIrRlFQQ2toL09GSHIybUkzejJKbWlDSUpEa3hiMjczZXBt?=
- =?utf-8?B?d3J1cWRscDY1RjFDWFNhdzhmbmpDMmRMUzNoOURZZG51QTBYQ3QzM1pINVll?=
- =?utf-8?B?U01Zem1xL2JKOWh6V2dzM25JKzhqK2tTZWE2b2VWRElHUXlwYkJyMVdOeFFr?=
- =?utf-8?B?bkRBS2hqdldXcnZNSXA2am1TY0NlVHpUVW5lbW0rbjBlRXRPN2RBSm5mWU5J?=
- =?utf-8?B?VmdpZWx6VTkxaithU2FoYnVtcUp4SGpkakJidHNwcEEwQWpqeWVIVVI0Ynhj?=
- =?utf-8?B?VjdsWDBzZ2NkNVRXRVBoSk1FT09MQTc5MHhaS3h0TU90NnZzRFloM0RxVmJk?=
- =?utf-8?B?VTNQa2IyMnBUeXQ2SHk5VVNwbnY3aGRVbWlqVVJ1bi9RdlZKZkE1bk14bHdX?=
- =?utf-8?B?N2NMN21QS3p1K005bGpreVpXVGZPSi8zalVwTnAxRG51VFZUTmFaemV3RTBS?=
- =?utf-8?B?eTgzNjY4THRTaFVMaGtWMEh2TmhZemQ4UUJOZ2ZxV2JlSktReGcrbCtMSjFq?=
- =?utf-8?B?b0tISDBTOURHR0lja2s3cStablhTYzdNcVl4UjFNVHNyendzRVJGYi9sTy9z?=
- =?utf-8?B?cW9RNHJ5VFNGa3g1clNwV3U2ZDhQRHJNOE5sTXZoOVp2UHhkVjRCY2NnSHpC?=
- =?utf-8?B?b2Z2Yy80TTFBQi9FUkxNUUhYWHdMdmd6Mlpzc0RFTGZYbGlaK0tYQ2xMZzB2?=
- =?utf-8?B?Z250YURBNVNYQ1l6SEE3T0NMYnF2VVFCa1pPQVB5eFBCem5wRWdEM1lkQjR0?=
- =?utf-8?B?SEx4UlFlcGpFaUd0QXYwMkRzRWxMQmx5ckNhK283azFqU1RVMDJXVjNqUnBY?=
- =?utf-8?B?TWhBSnd4Si9YbXoyYUJtcWROcGRiUzZZS1hhUjVYaUFDV0lJZTZlSjhRQXl0?=
- =?utf-8?B?WDAvYUhjbWgzMXRENTFadFBPM0hrdWVWUE1kRGJYUVR2Z29ITTZEUkdsdno0?=
- =?utf-8?B?WmxSVzllM3VRYVhsdG1mdnlwbGhkblZMN0N4SjMvL2hORUcrb1d1OUxaYVhy?=
- =?utf-8?B?YVMwaWkwMDN5M1NSa0pwOGlacXVLZ3I5WHVyRFMrNzNHbUtNYllPUG1QaWhO?=
- =?utf-8?B?aEFoZUF0UTU2Z0pxWHhTdlpod1FyTlRENml1Z1lBekFwbEMrNkpJcisvejZm?=
- =?utf-8?B?SVhsc3k2dWk0VE5YU0tiSW5TYWlYcjFQQXpCb1gxQlh6RmxIKzNWYnFGZzJW?=
- =?utf-8?B?WXpqLzVENEpYYStiOXB3LzFvS0E2NXgxUGlsaUUyeFlpMlB0aVlVZXAzTGdW?=
- =?utf-8?B?T1lHa2tPeC9mZSsrZHI0akJvWFNjVEY0L3VyTlVCMkxEeE4xU3lHWWxORUd1?=
- =?utf-8?B?K085ZjVqbFNrUTNxS2JIckJkRTd5OXkxSjJhMEFBZzkxK1kyQklvcVFJMGt0?=
- =?utf-8?B?TWk4WUdwWXRMaS8wZXh6N25KSk0yNWllREFPMXFkdThxaGhRd29OcEsxMXBO?=
- =?utf-8?B?K2ZYM2RyajVhVmtPMjJxTmFoTjlvbUdyaFlpcDFpVCt1MjJjLzk3d3FJWThm?=
- =?utf-8?B?dGw0cEJ2RzY5TldaWnFYV1d3eGNPWkdwYmJWT2ozSm9KcDRDNDhDYS8xLzNo?=
- =?utf-8?B?SUFPYjVUL3V3eWRvTUU3ZzJXNjZpMkVjc0FWR2hWYmtGNCtOQjJjTlVpMUM1?=
- =?utf-8?Q?fZq/G7AElERnU?=
+	=?utf-8?B?Q0UvVEtRUGgrN2thQjdsSXlkQm9nbkxHM0Z1RDN6RnZUSU5jQ1pIaVh6L2t2?=
+ =?utf-8?B?Rk1hYnZxRWZORzV0TzJFTHZSVFVZcHF2NnF3ZzVBTW13TWhRT0pZNmxteC9B?=
+ =?utf-8?B?SHA5TjJmQTZaVjZqKzlhSGlCZmxHTkJnRm53R1B5L2l6ZmFoRU5sZWVLcG91?=
+ =?utf-8?B?QkNXV2YzdFptRE9GZE80RmJobnZvakYxZFhxb2wrbkQ5OWtCSHlWYWZrWkRR?=
+ =?utf-8?B?RllVRndaOWJEQUlzdjFJaTNPM2pSQXQ5bncwQmNmNWFKRmVWUmUwUVpwaWk2?=
+ =?utf-8?B?MUZvblAyeWxJNGwvS2FUcjZXSHpBcGJTWGdqYkNsYWZxQm9ZcFFSRE55MUR6?=
+ =?utf-8?B?RFZPeEhUQm5EcVduN0RLcjJEUWxaVDZUaGhVeTBON2h3cVF3Tzc3aHNETllX?=
+ =?utf-8?B?em90Z2UyaHFEekVoRTlyQitZT1JkQVAvcUxrKzFqUmxNV3crTENYOVB1MG9Z?=
+ =?utf-8?B?WFpuNUdhWFVkY21ad3R0cllJR3lwY3VIVk41aVNkY0dCS2lvaDFxTHFxR0JU?=
+ =?utf-8?B?U3FVVVhkbXZ5VjhycERlT3UzV3lxZXVNRnNTM0JmdEp6TU1PNnVCTEZNd0lL?=
+ =?utf-8?B?eXZlVWlKVVJLb3Q1MElucWZRWVcxb1ptelAvalI5c1phSjNJeGVqYWR0WnpH?=
+ =?utf-8?B?Sm04QVhLMFBUc0VvUTlENHZ5UVl5VThzZXltN0cyOWlNYldQUXJkcFlYRzR0?=
+ =?utf-8?B?czlYVWFnRDFDTlc2TVZDZnJTR3Jibk5LYWpkc2xPcG9RSFNyeHUwUmpOOG0v?=
+ =?utf-8?B?ZVlpOXE1VUZybnZiZXZmQ3NUK0ovWHdBelExSjhkUFprVzhzS2hWUnZWanNp?=
+ =?utf-8?B?elIxTkcrU0FYVTI4bVhoWGZLRTVqU1NGNWYxMjNML25rS05FTUNya05EVUNG?=
+ =?utf-8?B?ejZ1d2V1dFlwM2dCdDE1Y3QwdWtwTDB3bitiMGZYS2pRSlRFbTJ4TjZ6Nkhx?=
+ =?utf-8?B?d2hOUCtTSTE4dm5hcEcwOUtFRmkzU3g3Y1ErZkFpZzdCWWRNSVV5eThUeTda?=
+ =?utf-8?B?L0I0cmxJT29CQjNsdC9PRDBaRzk5TjZuOTJvK2ZSejNtUzdMRElGLzVEQ2ZV?=
+ =?utf-8?B?WHp4Q0RIWml5Z0pNN1lpRTdzWWZ1TDBjUlRrNFY1VGtoNGoyVjg0MW1mNkN6?=
+ =?utf-8?B?YlFzMkxWU2M1R1V6bVp5NlpEVUV2WmFVcGczbWl1aHRQcnlNOGRXTDA0clkv?=
+ =?utf-8?B?Tm92cDR6cTVZNTB6TzlsamRCRkw0VStrWUhRZFJjVVdzNWdLNWhGalVtTW1J?=
+ =?utf-8?B?LzlmK29ZWVlKYlZTNlFrbjZGdjBtMHBwWGRHVGpYUmFJcFlmVnBtditaTEhK?=
+ =?utf-8?B?akErYVBMVW5aY2s0WGRqaitabUxrQXkrN3l3ZnY0RTVSS3lVVUlKZmNWdWlJ?=
+ =?utf-8?B?WUo1ZjJtd0lOZ1BHazkvbGF6L3RubWk5RGh3WDhzSkN3dlRMMnZNS2JMRU5i?=
+ =?utf-8?B?UW9iaFJLVjFMclFpeEEvS0I1bEEzN2lBK29sTG5lREV4dENveDhDWFFmNHN2?=
+ =?utf-8?B?b1dmOVY3Y3BldzExd0pMTE1HS2hiLzZSMzBUSjNickxiK25Dcmt0by92R3dO?=
+ =?utf-8?B?VXg2TVEzaTJQMzlxMGxtY1JETU4vc3BzZEZEd0E3S1hiU2VtZVFNaFFQUHRF?=
+ =?utf-8?B?YVdTcldRRktCM2FKeGRBTHQ0OStDekx0c1lud3RoRHFMKy9oeVpVMlB0TFQr?=
+ =?utf-8?B?cThzbXU2OUUzTGRGMzNVNldmbXVYdUZDQlIyeHVHbU5HY2trL1MyUXBveEQv?=
+ =?utf-8?B?VFA1bEpiNi9TSXRqSXk3NVJpM05VTFpBaGtLUW5IWkV4R0JydGZmRDlpZG9S?=
+ =?utf-8?B?U0ZKdDl1cjJxd2FuVTNCd2tta09weUhybHZtSCtUK1hVU2lWZFNZRjM3VUpX?=
+ =?utf-8?Q?Osvfx2zid/R8f?=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB4202.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(921020)(7053199007);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2847.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?czlzeERua0l3WTBpRkFNR2ZRZDY1dkU3cnNyWHRwaGY3TFFZblVwVDBYakQv?=
- =?utf-8?B?S2dnL0w2TFphZlY1aVNsR1F0Mm1XTi9za2I5OWxOc0p4Ni9IaWZvT0FxNXph?=
- =?utf-8?B?bG5RQ3MySmMxTDE2YWMxTnZBRm42bzViNVhGZXZSelNXVC9xSTZzMEhyZGpW?=
- =?utf-8?B?akRhalZmSXBKeVdoTDlkRmNYT3pUeW15U2ptemVyWXphWW1TSHB6dGFXeUVv?=
- =?utf-8?B?RXo3NzdzU0JjUElWYnRUOU9ZZmNIajlrLzkwYWhGSFlOamRRbS95VWdwbVBq?=
- =?utf-8?B?Zlk1NHNGQzVXa2VHelFhVmdlZmNGd2xiQ290ckNEWGloSHhmKy9TRG5CVDJa?=
- =?utf-8?B?WmtrZ2w5WEgvVnZFZjZZNW5WQ2R2MWc1TExYNzFuY3NPWTV0VGdkVkE0S1dk?=
- =?utf-8?B?cll2Sll6cVFhQkhLVVhzbUt6Y2FZbERhMUVWcTlHaktjMDNvU2ZRZ2czMnBa?=
- =?utf-8?B?Z3RPenlaTWNieTd6YXVNQzZKSEg3U2hmdzFla1ZiQnFhRURjc0tqVHlDVzFL?=
- =?utf-8?B?anJjVkhtU05PVkRkVEY2VTc3QUZIaWdnZHo4QzNUaEQrbFpqdEhGeEF1aDdM?=
- =?utf-8?B?Ui9QUFJ1bFFaSDZRUnhKSmM1UEdubHpEc0Z3Q3Bod2hRZTRDTGoyRXRncGc5?=
- =?utf-8?B?U1B3QXdwMWdEcDc4RFJFa2cxNy90UHd1bnRMUzlTL2swRlgyRHBIZE1DUWpj?=
- =?utf-8?B?WGNqNGl4Wm9INHlQMlNJWVFCMURRK2lhcnpqSkF3MDFzbHp2bCtaTEY2ck45?=
- =?utf-8?B?c0E1MkVmdkpOQXV1MVE4Q2FFMjN2UHdVZ3djM1hVQUdqMUNvNmhSWUpuMzM3?=
- =?utf-8?B?dVJjc3g0ZXJtVDJIU3FNa0VWMW1iMDMycFhaQjBCM01jdXVRMDcrSkM2MVdi?=
- =?utf-8?B?THppYXVKKzluWDZLeVVHZ0JFTjA3c3dKSjdNZHBjMUszZHZjdXBabm1VOVVr?=
- =?utf-8?B?WVRndVFsV1dGY25YLzRSWVNVbFRWNXNwRG9ObGdPbmpwc0R0VDkxUE8xVXdQ?=
- =?utf-8?B?Qm5mKzhIOVF1KzN0MzNpNndMenRCcVNPemZxZTNvUXdRMHR0Qkd3UUNScW01?=
- =?utf-8?B?S0pqQUFEQ0h0YjRWdnBoZi9CaTdmcTh6V2FWZENnRmZxWmlRK1d0b25SeFkw?=
- =?utf-8?B?TlFDQW9nQ3pZSlVzekpmbTAvZHY0NTZxYjBrMjFFd1ZUN2JQeDk0RlZKZW8y?=
- =?utf-8?B?bGlzR0o1cFpTaUxoMHdaNHJIZ3lhekJFb2ZHdEpZTFgyVnZBWVkvNGVLYmNB?=
- =?utf-8?B?NkVZbWdBNUFKVEVVTFp1OGV2OEVCbXhEbGVNNHk3QVZOZy9QbW5EODZFUTdi?=
- =?utf-8?B?MzcxeEpEZE9PQ1NTSzE0L0YvMDRVQ1VPMHRPOTYrVXNUN2dxeit4YytQQzBj?=
- =?utf-8?B?b2JEQ2lERFJVdzlIcThvTUh6MEtBSUk0azFvTzltUSt3NDhZNTZSUXdaWVZ2?=
- =?utf-8?B?cTdBbFNYb0V1c1hZWDhnalFCUlIxQ1NZWTcvaXkyQVZqOEt1RWdIK2MrSmsv?=
- =?utf-8?B?SG0rYVZRN1E4NzBEMXJYUDUxWTdLUm9lajlNcnZ5a1dkRGgvU1ZqNlhWZ0tq?=
- =?utf-8?B?K1FNY3ZCaHJBUUFlVks0QkhJemx4SjhIR3lYcE5qWFJ6bkFMNmJ6UTFidFc2?=
- =?utf-8?B?WmZYYlFPNkZTb2JiZ1ordjZkWVFLckovR01XSkpVTjJaRFcxUEdKd1h1dmlP?=
- =?utf-8?B?bkl3NkZmKzg0YWVXWnY2blpBNm1LRjFXVlZ3dDhVUXRxMzVMU1J1SVljRU9q?=
- =?utf-8?B?ZmFnTWdwZVpxdXNjN0hrd1BmZ29TNG1vbnRvTnNiRXNEYW1GUnA2YkIyNFd6?=
- =?utf-8?B?NGZhdnMwQkIwME5rUFFCdVBMMVEwcE9VbWJTV3FSbUZVaEY3d2NPeTRVZU9P?=
- =?utf-8?B?NndWcGlLUnRpbjA5alZsTlJ5aU5ZWWpxYm45ZkdqZndld3J3YmF6NkR2L0V6?=
- =?utf-8?B?U0FhRHRPODJ5VEVRTWlkSERBR2I5QjJUcGZaK2E1KzI1V0MzTHRTUjdGamdF?=
- =?utf-8?B?R0l0Y3ZBS1pORVovVXZHS0dBR2thQUllZVhyaEsvTVRrU1N5SmpndjF1MUdV?=
- =?utf-8?B?a2U2emhzZ0NqbWFVcENaV3ZsY2dhK1RnOUx4RndIcjBxUkhEK2NMVm5TN3Jy?=
- =?utf-8?Q?R5cMm4YnNLC9TDxSEwEzexK2n?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b31e5646-520c-4c58-c3c4-08dd397e8ad6
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB4202.namprd12.prod.outlook.com
+	=?utf-8?B?WWxqNG13eDFnSlNON3NSVE05M1hFaVNzeUdPWmhpUnNsbmxRZ3ZWNE5KWDB2?=
+ =?utf-8?B?ejZYdTdTWGxSdzZKdzVDeUJqQTUydThNRGRxWFR5eUdZR2FhZE13dnpWTEVj?=
+ =?utf-8?B?ZmE3SVZHVnpNZS8rQ3paK2NUUnREZW12c2x4dSt3ek94ZWdOcGJCem1Ed1Na?=
+ =?utf-8?B?WUMrV09UYUxxdzQxOHlacCtCZnYzOFlqdXRQWEtKRjN2azN5ZTlMZ1VFVzli?=
+ =?utf-8?B?MUdMV3BUNDdKdDRQL3Z1cWFOMFlPTHB2M2hNeUo2LzhwMEhVTWczRmJwanBK?=
+ =?utf-8?B?NXdrMHljR1JTRHBReEtyR3Jib2FHOEI5SkdUWFBJb1JUZndzK2dJQVE0ZUNr?=
+ =?utf-8?B?MldlWWZQZG9WcWliMVE0NFhZcXcvUDk4eTk1RHB0TGU0TWQ5MmgrRVRCaURO?=
+ =?utf-8?B?aVVoaXpRWG9nV3VSd01PdjFRRm0vM3FiTlFOY1NQbDhJYkdBQ1l3NFhUSUVG?=
+ =?utf-8?B?c1E0TTFJaVhBSDlrdzRRMjh4VVlWRXZ4anB3YjBBaytZdnhzRUxCTi9rVmMy?=
+ =?utf-8?B?WjlxMDFJZmpXekhFV1NlUDNlSVdLLzJGZVNBS2xQbkl4ZStzSzhnc1hyTU1p?=
+ =?utf-8?B?YTZxS1FnY2NSZ0I5REt1dUdVUFFWc3p6SzNNaVJlREwzZGd0ZXB3VkRmVHRS?=
+ =?utf-8?B?andEZ1hVOGl6VnFDWmxrSThydEhwVkl6L2VoMklkQ0ZVblhCUmp0SUhMa0Ja?=
+ =?utf-8?B?OVlvRTNEeTFRcyt5NDNBVG9EUjN2R1lyTzhsOHpCSUMrZGdYb1FnUTdyaWk2?=
+ =?utf-8?B?Rm4zeXl3MEhFTzRsVWQ4MGRZMUwrSGg2SUZFV0MrZXNyNElEWnlCTHZ1bVJN?=
+ =?utf-8?B?WWVKbUdqU0VPMDA2S2lFQU45R1lSS04weHVoazc4SGxpczJJZGNKZVUybGdv?=
+ =?utf-8?B?TGhia2lnL0UyNXYyK2dkdVFuaUJDUW5pM3BhcTN4cmNVRWhNdHoxVzRBQUZv?=
+ =?utf-8?B?aUlNZFlqT3RuQkt5clRlL1A3RkVDdGdtUXRXWFVDUG1BczNzL08yczRVVjlV?=
+ =?utf-8?B?SU1MdEFNN3RuMkhNaEdtQTNLa3BUVFlrWTc1aENNWU9Tc2ljQlladE91ZU5C?=
+ =?utf-8?B?Kzc5dEZ2MUFuektwWHA4TFNUTTVKV2R2ajRxYjNlbDhuZVhxN0o3VnhZSk90?=
+ =?utf-8?B?enFuNmpMdUxRQ2hZVWpqRWJQaXQ5LytDZEF2RGM1b3crWk9VeXRNWnRBRVVB?=
+ =?utf-8?B?WSthYWRqY3RLdWhkSjd0Sk5uZG5vU05LeHVqdHBuZGxnQTZlR21tNkxLQWZ5?=
+ =?utf-8?B?N3dVQjdXWml5elE2blhxM0ZQZVBCbUM3V0RsWXBvU0tWcmhaVlhDdDh5Rlo4?=
+ =?utf-8?B?UTRTMHZkbXBCcHZNSXlDUkJiSnVUZk9vRDdhSTl1NENVNEUxeWZCdjVySDBL?=
+ =?utf-8?B?V0FVYTBDQmtOdW4xbnFKKzR1cDdDQ2FZeEhVQkRoQU5wa1VOOTl0ZERrTjUz?=
+ =?utf-8?B?c2ZoVk9lak1pbTBNbWVhbUhaQXdISUszaVlqRlZyZ2tXaHI5SFV0Qy9yUjZx?=
+ =?utf-8?B?NWNLTm44Y2FXNGFubWFCV0ROMVZoeGxYcUFoeExiQnVsamtsY0M3ZG53SGlZ?=
+ =?utf-8?B?WEx3ZTBWMlI1eWxuMTVPZnU2NGo2bVBiNnQrUzA1YmdzcUFyMDV6NHJFK0xa?=
+ =?utf-8?B?ZG9wVnhqb0VDc0VTeFpKMnlPTlNTdU5xNzFSTll3bGJmeGV4aWJvREQ3VjZz?=
+ =?utf-8?B?dlR1NytsOTgxSll5cDU1UDV3TE1PaTJsbWp5cFFOeG9QdTJRQ3JObGJxR1NF?=
+ =?utf-8?B?ZUpVYmZvcEZqM2l4NSt6TVc2Z3hYU3RZby84ZEFiNnh5REtMM1RrWTdkeS8w?=
+ =?utf-8?B?OWthMlJRNkJ2a2pVd085RFlQZ01jMC9odlJFWFJsT1l5dlVqd3BwVzNhTDR0?=
+ =?utf-8?B?R0JiSzR3YklHV0JoLzE2a3ZQU29wMlFTR1ZwV1pGZWxNNjA3NlhwMFZ3a0lz?=
+ =?utf-8?B?T2dvaWRGU2tkUjhtSGt5UUc0QnNURzlaRVZWVFNHanZTUWFHcTBWRjAzYndr?=
+ =?utf-8?B?U0VjMzBMM3RzdTkwWktUelFibTVVNzA3TDJZWkZZdFJ6Q3JXS3RLdXNBdmMy?=
+ =?utf-8?B?MWVnWHM4dTRIZ016RVF1akNmNW1kUE41VUVMck84RGl2T0U5S2tCSXJYMm9Y?=
+ =?utf-8?Q?SDAveY8iWOxfcKN5YIBZlMWHy?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: aa864097-0119-422a-6acd-08dd3983f8aa
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2847.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jan 2025 18:16:21.7228
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jan 2025 18:55:13.4282
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: A9/9vk6bpSqramxnBa9bTvSflpbrLE340jDlo0oWAxLaSd+H4s68ynCIzwwdRuOaJSPiHzm1jQQwC5XHD3u8nA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB7709
+X-MS-Exchange-CrossTenant-UserPrincipalName: RYavzVNJ3RZVhl7KocMqrAgJkV1EjEghMXtpN+hAH4DL+sI0kQUqPpgnzmSXuTMzsHMHg6Ih/N2M0WhGvSpqdQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB6072
 
-
-On 1/18/25 03:02, Dan Williams wrote:
-> alejandro.lucero-palau@ wrote:
->> From: Alejandro Lucero <alucerop@amd.com>
+On 16/01/2025 4:54, Kuniyuki Iwashima wrote:
+> Thanks for the report!
+> 
+> From: Yael Chemla <ychemla@nvidia.com>
+> Date: Thu, 16 Jan 2025 00:16:27 +0200
+>> we observed in our regression tests the following issue:
 >>
->> CXL region creation involves allocating capacity from device DPA
->> (device-physical-address space) and assigning it to decode a given HPA
->> (host-physical-address space). Before determining how much DPA to
->> allocate the amount of available HPA must be determined. Also, not all
->> HPA is created equal, some specifically targets RAM, some target PMEM,
->> some is prepared for device-memory flows like HDM-D and HDM-DB, and some
->> is host-only (HDM-H).
+>> BUG: KASAN: slab-use-after-free in notifier_call_chain+0x22c/0x280
+>> kasan_report+0xbd/0xf0
+>> RIP: 0033:0x7f70839018b7
+>> kasan_save_stack+0x1c/0x40
+>> kasan_save_track+0x10/0x30
+>> __kasan_kmalloc+0x83/0x90
+>> kasan_save_stack+0x1c/0x40
+>> kasan_save_track+0x10/0x30
+>> kasan_save_free_info+0x37/0x50
+>> __kasan_slab_free+0x33/0x40
+>> page dumped because: kasan: bad access detected
+>> BUG: KASAN: slab-use-after-free in notifier_call_chain+0x222/0x280
+>> kasan_report+0xbd/0xf0
+>> RIP: 0033:0x7f70839018b7
+>> kasan_save_stack+0x1c/0x40
+>> kasan_save_track+0x10/0x30
+>> __kasan_kmalloc+0x83/0x90
+>> kasan_save_stack+0x1c/0x40
+>> kasan_save_track+0x10/0x30
+>> kasan_save_free_info+0x37/0x50
+>> __kasan_slab_free+0x33/0x40
+>> page dumped because: kasan: bad access detected
 >>
->> Wrap all of those concerns into an API that retrieves a root decoder
->> (platform CXL window) that fits the specified constraints and the
->> capacity available for a new region.
+>> and there are many more of that kind.
+> 
+> Do you have any other stack traces with more callers info ?
+> Also can you decode the trace with ./scripts/decode_stacktrace.sh ?
+> 
+BUG: KASAN: slab-use-after-free in notifier_call_chain 
+(/usr/work/linux/kernel/notifier.c:75 (discriminator 2))
+Read of size 8 at addr ffff88810cefb4c8 by task test-bridge-lag/21127
+
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 
+rel-1.13.0-0-gf21b5a4aeb02-prebuilt.qemu.org 04/01/2014
+Call Trace:
+  <TASK>
+dump_stack_lvl (/usr/work/linux/lib/dump_stack.c:123)
+print_report (/usr/work/linux/mm/kasan/report.c:379 
+/usr/work/linux/mm/kasan/report.c:489)
+? __virt_addr_valid (/usr/work/linux/./arch/x86/include/asm/preempt.h:84 
+(discriminator 13) /usr/work/linux/./include/linux/rcupdate.h:964 
+(discriminator 13) /usr/work/linux/./include/linux/mmzone.h:2058 
+(discriminator 13) /usr/work/linux/arch/x86/mm/physaddr.c:65 
+(discriminator 13))
+kasan_report (/usr/work/linux/mm/kasan/report.c:604)
+? notifier_call_chain (/usr/work/linux/kernel/notifier.c:75 
+(discriminator 2))
+? notifier_call_chain (/usr/work/linux/kernel/notifier.c:75 
+(discriminator 2))
+notifier_call_chain (/usr/work/linux/kernel/notifier.c:75 (discriminator 2))
+call_netdevice_notifiers_info (/usr/work/linux/net/core/dev.c:2011)
+unregister_netdevice_many_notify (/usr/work/linux/net/core/dev.c:11551)
+? mark_held_locks (/usr/work/linux/kernel/locking/lockdep.c:4321 
+(discriminator 1))
+? __mutex_lock (/usr/work/linux/kernel/locking/mutex.c:689 
+(discriminator 2) /usr/work/linux/kernel/locking/mutex.c:735 
+(discriminator 2))
+? lockdep_hardirqs_on_prepare 
+(/usr/work/linux/kernel/locking/lockdep.c:4347 
+/usr/work/linux/kernel/locking/lockdep.c:4406)
+? dev_ingress_queue_create (/usr/work/linux/net/core/dev.c:11492)
+? __mutex_lock (/usr/work/linux/kernel/locking/mutex.c:689 
+(discriminator 2) /usr/work/linux/kernel/locking/mutex.c:735 
+(discriminator 2))
+? __mutex_lock (/usr/work/linux/./arch/x86/include/asm/preempt.h:84 
+(discriminator 13) /usr/work/linux/kernel/locking/mutex.c:715 
+(discriminator 13) /usr/work/linux/kernel/locking/mutex.c:735 
+(discriminator 13))
+? unregister_netdev (/usr/work/linux/./include/linux/netdevice.h:3236 
+/usr/work/linux/net/core/dev.c:11633)
+? mutex_lock_io_nested (/usr/work/linux/kernel/locking/mutex.c:734)
+? __mutex_unlock_slowpath 
+(/usr/work/linux/./arch/x86/include/asm/atomic64_64.h:101 
+/usr/work/linux/./include/linux/atomic/atomic-arch-fallback.h:4329 
+/usr/work/linux/./include/linux/atomic/atomic-long.h:1506 
+/usr/work/linux/./include/linux/atomic/atomic-instrumented.h:4481 
+/usr/work/linux/kernel/locking/mutex.c:913)
+unregister_netdevice_queue (/usr/work/linux/net/core/dev.c:11487)
+? unregister_netdevice_many (/usr/work/linux/net/core/dev.c:11476)
+unregister_netdev (/usr/work/linux/net/core/dev.c:11635)
+mlx5e_remove 
+(/usr/work/linux/drivers/net/ethernet/mellanox/mlx5/core/en_main.c:6552 
+/usr/work/linux/drivers/net/ethernet/mellanox/mlx5/core/en_main.c:6579) 
+mlx5_core
+auxiliary_bus_remove (/usr/work/linux/drivers/base/auxiliary.c:230)
+device_release_driver_internal (/usr/work/linux/drivers/base/dd.c:1275 
+/usr/work/linux/drivers/base/dd.c:1296)
+? kobject_put (/usr/work/linux/./arch/x86/include/asm/atomic.h:93 
+(discriminator 4) 
+/usr/work/linux/./include/linux/atomic/atomic-arch-fallback.h:949 
+(discriminator 4) 
+/usr/work/linux/./include/linux/atomic/atomic-instrumented.h:401 
+(discriminator 4) /usr/work/linux/./include/linux/refcount.h:264 
+(discriminator 4) /usr/work/linux/./include/linux/refcount.h:307 
+(discriminator 4) /usr/work/linux/./include/linux/refcount.h:325 
+(discriminator 4) /usr/work/linux/./include/linux/kref.h:64 
+(discriminator 4) /usr/work/linux/lib/kobject.c:737 (discriminator 4))
+bus_remove_device (/usr/work/linux/./include/linux/kobject.h:193 
+/usr/work/linux/drivers/base/base.h:73 
+/usr/work/linux/drivers/base/bus.c:583)
+device_del (/usr/work/linux/drivers/base/power/power.h:142 
+/usr/work/linux/drivers/base/core.c:3855)
+? mlx5_core_is_eth_enabled 
+(/usr/work/linux/drivers/net/ethernet/mellanox/mlx5/core/devlink.h:65) 
+mlx5_core
+? __device_link_del (/usr/work/linux/drivers/base/core.c:3809)
+? is_ib_enabled 
+(/usr/work/linux/drivers/net/ethernet/mellanox/mlx5/core/devlink.h:58) 
+mlx5_core
+mlx5_rescan_drivers_locked 
+(/usr/work/linux/./include/linux/auxiliary_bus.h:241 
+/usr/work/linux/drivers/net/ethernet/mellanox/mlx5/core/dev.c:333 
+/usr/work/linux/drivers/net/ethernet/mellanox/mlx5/core/dev.c:535 
+/usr/work/linux/drivers/net/ethernet/mellanox/mlx5/core/dev.c:549) mlx5_core
+mlx5_unregister_device 
+(/usr/work/linux/drivers/net/ethernet/mellanox/mlx5/core/dev.c:468) 
+mlx5_core
+mlx5_uninit_one (/usr/work/linux/./include/linux/instrumented.h:68 
+/usr/work/linux/./include/asm-generic/bitops/instrumented-non-atomic.h:141 
+/usr/work/linux/drivers/net/ethernet/mellanox/mlx5/core/main.c:1563) 
+mlx5_core
+remove_one 
+(/usr/work/linux/drivers/net/ethernet/mellanox/mlx5/core/main.c:965 
+/usr/work/linux/drivers/net/ethernet/mellanox/mlx5/core/main.c:2019) 
+mlx5_core
+pci_device_remove (/usr/work/linux/./include/linux/pm_runtime.h:129 
+/usr/work/linux/drivers/pci/pci-driver.c:475)
+device_release_driver_internal (/usr/work/linux/drivers/base/dd.c:1275 
+/usr/work/linux/drivers/base/dd.c:1296)
+unbind_store (/usr/work/linux/drivers/base/bus.c:245)
+kernfs_fop_write_iter (/usr/work/linux/fs/kernfs/file.c:338)
+vfs_write (/usr/work/linux/fs/read_write.c:587 (discriminator 1) 
+/usr/work/linux/fs/read_write.c:679 (discriminator 1))
+? do_user_addr_fault (/usr/work/linux/./include/linux/rcupdate.h:337 
+/usr/work/linux/./include/linux/rcupdate.h:849 
+/usr/work/linux/./include/linux/mm.h:740 
+/usr/work/linux/arch/x86/mm/fault.c:1340)
+? kernel_write (/usr/work/linux/fs/read_write.c:660)
+? lock_downgrade (/usr/work/linux/kernel/locking/lockdep.c:5857)
+ksys_write (/usr/work/linux/fs/read_write.c:732)
+? __x64_sys_read (/usr/work/linux/fs/read_write.c:721)
+? do_user_addr_fault 
+(/usr/work/linux/./arch/x86/include/asm/preempt.h:84 (discriminator 13) 
+/usr/work/linux/./include/linux/rcupdate.h:98 (discriminator 13) 
+/usr/work/linux/./include/linux/rcupdate.h:882 (discriminator 13) 
+/usr/work/linux/./include/linux/mm.h:742 (discriminator 13) 
+/usr/work/linux/arch/x86/mm/fault.c:1340 (discriminator 13))
+do_syscall_64 (/usr/work/linux/arch/x86/entry/common.c:52 (discriminator 
+1) /usr/work/linux/arch/x86/entry/common.c:83 (discriminator 1))
+entry_SYSCALL_64_after_hwframe 
+(/usr/work/linux/arch/x86/entry/entry_64.S:130)
+RIP: 0033:0x7f6a4d5018b7
+
 >>
->> Based on https://lore.kernel.org/linux-cxl/168592159290.1948938.13522227102445462976.stgit@dwillia2-xfh.jf.intel.com/
-> What needed changing such that you could not use the patch verbatim?
-> Then I can focus on that, although I am also critical of code I wrote
-> (like the DPA layout mess).
-
-
-One thing modified is related to that ugly double lock you found out below.
-
-I do not remember what was the problem but the original code using 
-sequential locks did not work for me.
-
-More about this later.
-
-
->> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
->> Co-developed-by: Dan Williams <dan.j.williams@intel.com>
-> Include Signed-off-by: whenever including Co-developed-by
-
-
-I'll do but it is weird. I think, at least in this case where the 
-co-development means different times and not close cooperation, you 
-should add it explicitly.
-
-
->
->> ---
->>   drivers/cxl/core/region.c | 155 ++++++++++++++++++++++++++++++++++++++
->>   drivers/cxl/cxl.h         |   3 +
->>   include/cxl/cxl.h         |   8 ++
->>   3 files changed, 166 insertions(+)
+>> it happens after applying commit 7fb1073300a2 ("net: Hold
+>> rtnl_net_lock() in (un)?register_netdevice_notifier_dev_net()")
 >>
->> diff --git a/drivers/cxl/core/region.c b/drivers/cxl/core/region.c
->> index 967132b49832..239fe49bf6a6 100644
->> --- a/drivers/cxl/core/region.c
->> +++ b/drivers/cxl/core/region.c
->> @@ -687,6 +687,161 @@ static int free_hpa(struct cxl_region *cxlr)
->>   	return 0;
->>   }
->>   
->> +struct cxlrd_max_context {
->> +	struct device *host_bridge;
->> +	unsigned long flags;
->> +	resource_size_t max_hpa;
->> +	struct cxl_root_decoder *cxlrd;
->> +};
->> +
->> +static int find_max_hpa(struct device *dev, void *data)
->> +{
->> +	struct cxlrd_max_context *ctx = data;
->> +	struct cxl_switch_decoder *cxlsd;
->> +	struct cxl_root_decoder *cxlrd;
->> +	struct resource *res, *prev;
->> +	struct cxl_decoder *cxld;
->> +	resource_size_t max;
->> +
->> +	if (!is_root_decoder(dev))
->> +		return 0;
->> +
->> +	cxlrd = to_cxl_root_decoder(dev);
->> +	cxlsd = &cxlrd->cxlsd;
->> +	cxld = &cxlsd->cxld;
->> +	if ((cxld->flags & ctx->flags) != ctx->flags) {
->> +		dev_dbg(dev, "%s, flags not matching: %08lx vs %08lx\n",
->> +			__func__, cxld->flags, ctx->flags);
->> +		return 0;
->> +	}
->> +
->> +	/*
->> +	 * The CXL specs do not forbid an accelerator being part of an
->> +	 * interleaved HPA range, but it is unlikely and because it simplifies
->> +	 * the code, don´t allow it.
->> +	 */
->> +	if (cxld->interleave_ways != 1) {
->> +		dev_dbg(dev, "interleave_ways not matching\n");
->> +		return 0;
->> +	}
-> Why does the core need to carry this quirk? If an accelerator does not
-> want to support interleaving then just don't ask for interleaved
-> capacity?
->
+>> test scenario includes configuration and traffic over two namespaces
+>> associated with two different VFs.
+> 
+> Could you elaborate more about the test scenario, especially
+> how each device/netns is dismantled after the test case ?
+> 
 
-I think it was suggested as a simplification for initial Type2 support.
+we set up a network configuration which includes two VFs isolated using 
+two namespaces (there’s also bridge in this topology), we pass some 
+traffic between VFs. At the end of test (cleanup) we delete network 
+namespaces, wait for 0.5 sec and unbind VFs of NIC.
 
+note that when I extended the timeout after deleting the namespaces the 
+issue doesn’t reproduce.
 
->> +
->> +	guard(rwsem_read)(&cxl_region_rwsem);
-> See below...
->
->> +	if (ctx->host_bridge != cxlsd->target[0]->dport_dev) {
->> +		dev_dbg(dev, "host bridge does not match\n");
->> +		return 0;
->> +	}
->> +
->> +	/*
->> +	 * Walk the root decoder resource range relying on cxl_region_rwsem to
->> +	 * preclude sibling arrival/departure and find the largest free space
->> +	 * gap.
->> +	 */
->> +	lockdep_assert_held_read(&cxl_region_rwsem);
-> The lock was just acquired a few lines up, no need for extra lockdep
-> assertion paranoia. However, I think the lock belongs outside of this
-> function otherwise the iterator of region is racing region creation.
-> However2, cxl_get_hpa_freespace() is already holding the lock!
+> I guess the VF is moved to init_net ?
+> 
 
+this should be the behavior in case deletion of the namespaces happens 
+before the unbind of VFs.
 
-You are right and  this is so obviously wrong ...
+>>
+>>
+>> On 04/01/2025 8:37, Kuniyuki Iwashima wrote:
+>>> (un)?register_netdevice_notifier_dev_net() hold RTNL before triggering
+>>> the notifier for all netdev in the netns.
+>>>
+>>> Let's convert the RTNL to rtnl_net_lock().
+>>>
+>>> Note that move_netdevice_notifiers_dev_net() is assumed to be (but not
+>>> yet) protected by per-netns RTNL of both src and dst netns; we need to
+>>> convert wireless and hyperv drivers that call dev_change_net_namespace().
+>>>
+>>> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+>>> ---
+>>>    net/core/dev.c | 16 ++++++++++------
+>>>    1 file changed, 10 insertions(+), 6 deletions(-)
+>>>
+>>> diff --git a/net/core/dev.c b/net/core/dev.c
+>>> index f6c6559e2548..a0dd34463901 100644
+>>> --- a/net/core/dev.c
+>>> +++ b/net/core/dev.c
+>>> @@ -1943,15 +1943,17 @@ int register_netdevice_notifier_dev_net(struct net_device *dev,
+>>>    					struct notifier_block *nb,
+>>>    					struct netdev_net_notifier *nn)
+>>>    {
+>>> +	struct net *net = dev_net(dev);
+>>
+>> it seems to happen since the net pointer is acquired here without a lock.
+>> Note that KASAN issue is not triggered when executing with rtnl_lock()
+>> taken before this line. and our kernel .config expands
+>> rtnl_net_lock(net) to rtnl_lock() (CONFIG_DEBUG_NET_SMALL_RTNL is not set).
+> 
+> It sounds like the device was being moved to another netns while
+> unregister_netdevice_notifier_dev_net() was called.
+> 
+> Could you check if dev_net() is changed before/after rtnl_lock() in
+> 
+>    * register_netdevice_notifier_dev_net()
+>    * unregister_netdevice_notifier_dev_net()
+> 
+> ?
 
-I think the problem is the adaptation of that initial patch with the 
-seqlocks, and I ended up mixing things here.
+When checking dev_net before and after taking the lock the issue won’t 
+reproduce.
+note that when issue reproduce we arrive to 
+unregister_netdevice_notifier_dev_net with an invalid net pointer 
+(verified it with prints of its value, and it's not the same consistent 
+value as is throughout rest of the test).
+we suspect the issue related to the async ns deletion.
 
-I'll try to figure out why I had to adapt it and if I mistook the lock 
-to use.
-
-
->
-> So, I am not sure this code path has ever been tested as lockdep should
-> complain about the double acquisition.
-
-
-Oddly enough, it has been tested with two different drivers and with the 
-kernel configuring lockdep.
-
-It is worth to investigate ...
-
-
->
->> +	max = 0;
->> +	res = cxlrd->res->child;
->> +
->> +	/* With no resource child the whole parent resource is available */
->> +	if (!res)
->> +		max = resource_size(cxlrd->res);
->> +	else
->> +		max = 0;
->> +
->> +	for (prev = NULL; res; prev = res, res = res->sibling) {
->> +		struct resource *next = res->sibling;
->> +		resource_size_t free = 0;
->> +
->> +		/*
->> +		 * Sanity check for preventing arithmetic problems below as a
->> +		 * resource with size 0 could imply using the end field below
->> +		 * when set to unsigned zero - 1 or all f in hex.
->> +		 */
->> +		if (prev && !resource_size(prev))
->> +			continue;
->> +
->> +		if (!prev && res->start > cxlrd->res->start) {
->> +			free = res->start - cxlrd->res->start;
->> +			max = max(free, max);
->> +		}
->> +		if (prev && res->start > prev->end + 1) {
->> +			free = res->start - prev->end + 1;
->> +			max = max(free, max);
->> +		}
->> +		if (next && res->end + 1 < next->start) {
->> +			free = next->start - res->end + 1;
->> +			max = max(free, max);
->> +		}
->> +		if (!next && res->end + 1 < cxlrd->res->end + 1) {
->> +			free = cxlrd->res->end + 1 - res->end + 1;
->> +			max = max(free, max);
->> +		}
->> +	}
->> +
->> +	dev_dbg(CXLRD_DEV(cxlrd), "found %pa bytes of free space\n", &max);
->> +	if (max > ctx->max_hpa) {
->> +		if (ctx->cxlrd)
->> +			put_device(CXLRD_DEV(ctx->cxlrd));
-> What drove capitalizing "cxlrd_dev"?
->
->> +		get_device(CXLRD_DEV(cxlrd));
->> +		ctx->cxlrd = cxlrd;
->> +		ctx->max_hpa = max;
->> +		dev_dbg(CXLRD_DEV(cxlrd), "found %pa bytes of free space\n",
->> +			&max);
->> +	}
->> +	return 0;
->> +}
->> +
->> +/**
->> + * cxl_get_hpa_freespace - find a root decoder with free capacity per constraints
->> + * @cxlmd: the CXL memory device with an endpoint that is mapped by the returned
->> + *	    decoder
->> + * @flags: CXL_DECODER_F flags for selecting RAM vs PMEM, and HDM-H vs HDM-D[B]
->> + * @max_avail_contig: output parameter of max contiguous bytes available in the
->> + *		      returned decoder
->> + *
->> + * The return tuple of a 'struct cxl_root_decoder' and 'bytes available given
->> + * in (@max_avail_contig))' is a point in time snapshot. If by the time the
->> + * caller goes to use this root decoder's capacity the capacity is reduced then
->> + * caller needs to loop and retry.
->> + *
->> + * The returned root decoder has an elevated reference count that needs to be
->> + * put with put_device(cxlrd_dev(cxlrd)). Locking context is with
->> + * cxl_{acquire,release}_endpoint(), that ensures removal of the root decoder
->> + * does not race.
->> + */
->> +struct cxl_root_decoder *cxl_get_hpa_freespace(struct cxl_memdev *cxlmd,
->> +					       unsigned long flags,
->> +					       resource_size_t *max_avail_contig)
-> I don't understand the rationale throwing away the ability to search
-> root decoders by additional constraints.
-
-
-Not sure I follow you here. I think the constraints, set by the caller, 
-is something to check for sure.
-
-
->> +{
->> +	struct cxl_port *endpoint = cxlmd->endpoint;
->> +	struct cxlrd_max_context ctx = {
->> +		.host_bridge = endpoint->host_bridge,
->> +		.flags = flags,
->> +	};
->> +	struct cxl_port *root_port;
->> +	struct cxl_root *root __free(put_cxl_root) = find_cxl_root(endpoint);
->> +
->> +	if (!is_cxl_endpoint(endpoint)) {
->> +		dev_dbg(&endpoint->dev, "hpa requestor is not an endpoint\n");
->> +		return ERR_PTR(-EINVAL);
->> +	}
->> +
->> +	if (!root) {
->> +		dev_dbg(&endpoint->dev, "endpoint can not be related to a root port\n");
->> +		return ERR_PTR(-ENXIO);
->> +	}
->> +
->> +	root_port = &root->port;
->> +	down_read(&cxl_region_rwsem);
->> +	device_for_each_child(&root_port->dev, &ctx, find_max_hpa);
->> +	up_read(&cxl_region_rwsem);
->> +
->> +	if (!ctx.cxlrd)
->> +		return ERR_PTR(-ENOMEM);
->> +
->> +	*max_avail_contig = ctx.max_hpa;
->> +	return ctx.cxlrd;
->> +}
->> +EXPORT_SYMBOL_NS_GPL(cxl_get_hpa_freespace, "CXL");
-> Lets just do EXPORT_SYMBOL_GPL() for any API that an accelerator would
-> use. The symbol namespace was more for warning about potential semantic
-> shortcuts and liberties taken by drivers/cxl/ modules talking to each
-> other. Anything that is exported for outside of drivers/cxl/ usage
-> should not take those liberties.
-
-
-OK
-
-
->
->> +
->>   static ssize_t size_store(struct device *dev, struct device_attribute *attr,
->>   			  const char *buf, size_t len)
->>   {
->> diff --git a/drivers/cxl/cxl.h b/drivers/cxl/cxl.h
->> index a662b1b88408..efdd4627b774 100644
->> --- a/drivers/cxl/cxl.h
->> +++ b/drivers/cxl/cxl.h
->> @@ -785,6 +785,9 @@ static inline void cxl_dport_init_ras_reporting(struct cxl_dport *dport,
->>   struct cxl_decoder *to_cxl_decoder(struct device *dev);
->>   struct cxl_root_decoder *to_cxl_root_decoder(struct device *dev);
->>   struct cxl_switch_decoder *to_cxl_switch_decoder(struct device *dev);
->> +
->> +#define CXLRD_DEV(cxlrd) (&(cxlrd)->cxlsd.cxld.dev)
-> ...oh, it's a macro now for some reason.
->
->> +
->>   struct cxl_endpoint_decoder *to_cxl_endpoint_decoder(struct device *dev);
->>   bool is_root_decoder(struct device *dev);
->>   bool is_switch_decoder(struct device *dev);
->> diff --git a/include/cxl/cxl.h b/include/cxl/cxl.h
->> index f7ce683465f0..4a8434a2b5da 100644
->> --- a/include/cxl/cxl.h
->> +++ b/include/cxl/cxl.h
->> @@ -6,6 +6,10 @@
->>   
->>   #include <linux/ioport.h>
->>   
->> +#define CXL_DECODER_F_RAM   BIT(0)
->> +#define CXL_DECODER_F_PMEM  BIT(1)
->> +#define CXL_DECODER_F_TYPE2 BIT(2)
->> +
->>   enum cxl_resource {
->>   	CXL_RES_DPA,
->>   	CXL_RES_RAM,
->> @@ -50,4 +54,8 @@ int cxl_release_resource(struct cxl_dev_state *cxlds, enum cxl_resource type);
->>   void cxl_set_media_ready(struct cxl_dev_state *cxlds);
->>   struct cxl_memdev *devm_cxl_add_memdev(struct device *host,
->>   				       struct cxl_dev_state *cxlds);
->> +struct cxl_port;
->> +struct cxl_root_decoder *cxl_get_hpa_freespace(struct cxl_memdev *cxlmd,
->> +					       unsigned long flags,
->> +					       resource_size_t *max);
-> The name does not track for me, because nothing is acquired in this
-> function. It just surveys for a root decoder that meets the constraints.
-> It is possible that by the time the caller turns around to use that
-> freespace something else already grabbed it.
-
-
-I'll think in a better name.
-
-Thanks!
 
 
 
