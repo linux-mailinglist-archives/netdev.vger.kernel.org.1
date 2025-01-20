@@ -1,76 +1,97 @@
-Return-Path: <netdev+bounces-159854-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159855-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4617A17307
-	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 20:12:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id EE289A1730B
+	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 20:12:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8F164188826A
-	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 19:12:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AA82F188868B
+	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 19:13:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 792901EC006;
-	Mon, 20 Jan 2025 19:12:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1BF71EE7A7;
+	Mon, 20 Jan 2025 19:12:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rUh8NvUz"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QDPEHSdu"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CE3C8479;
-	Mon, 20 Jan 2025 19:12:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60D1C8479;
+	Mon, 20 Jan 2025 19:12:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737400350; cv=none; b=BNAdGWZHcK6vGbZEOZJifkHXfg/c5jzuo2krQEDxiyihuknhxQGI7u7GbiqVOvK53erpdMN9xFAJ8bDNIeaiy9Adx5XnoS7iYOAxvnePqHl2Y/a45EMSOD2KiCs8QPeq8oqSVuPPXSm5L3/T2obvKcuGrEINMSaMEcJxlWtshwg=
+	t=1737400373; cv=none; b=THRp4TMOZJ2Xi7WaWvA2Y3b9ojFT+Oh/g7WAk8Cjbe6MiS1jEAtZGPb7v3nDHcQMLjrBJAH4x7/ogmxdWQHvbUnLwcrGWSSP40pTXLPn/5TWAtUQRmFuIvwCZ+pmwZjGxx06tMipWuh7OTOtstpAzogmREdRST1t+5a1emOysDU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737400350; c=relaxed/simple;
-	bh=XwrXM9q7D0qRMHaQsPhEnJ8kaTkMghuXwEN/eQQhdS0=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ElJnhN2Bs9JRFLXNNSzOwehtmk1Bv9oRmmuYYNedR2B9cPOg9MwKG2IO2zoRQiDRUwYLhbNAP29LSNqblBjMe5ucpk1xbY0sQ9TiJXSt01PpHlW7nEp/i3Vnne+Jt6oXOf5FXLHp3v5BrKyppvsr6Bnv9lPYZikHcwcRybraRME=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rUh8NvUz; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4EC75C4CEDD;
-	Mon, 20 Jan 2025 19:12:29 +0000 (UTC)
+	s=arc-20240116; t=1737400373; c=relaxed/simple;
+	bh=Kh+DQwLKyClDbQ2S17AysOYPnYbZz9VzwkaJnYw2NEw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=H2Ay+GiLfcfSP/lvktwp8jLdey1tmJEChlx5IDxVTZFn/o9ahdESK3T4yJz1rGyyfLfIhUikIZXm658WHS5B13sp9NKj+eLL9Fo1bVKCClX6u/9AjZXqKOhMNMU+AYikXij9GDZrb9n3994Mruc8gWE5aqUfoOjOFrCy1515ffA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QDPEHSdu; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5CA7EC4CEDD;
+	Mon, 20 Jan 2025 19:12:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737400349;
-	bh=XwrXM9q7D0qRMHaQsPhEnJ8kaTkMghuXwEN/eQQhdS0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=rUh8NvUzmFQb6bLEBObFhwzF/ouFutDpBPrbCqZedo+pR+9axCCzA5k/8UIfCF6Cv
-	 LaPgzWSWvk1yvMBs4+R5MvAPdRdokOkm4bKDUO8lgpDuSQU3L2UV4MiXyGFtWE2LML
-	 fcP5OQ1NShI/kSOXYkMnu/OYYEgR1SSXpEWT2au6hi9tW8JfHfbMcZYIve1W7qIIyb
-	 1uWlSVaKpjkJN/HxGkxvLGhJ1M32sRZVXFoiO0RUabODVCmLTR0HYx1xyuqINXd4QF
-	 JAJf1jwWoWp7VITSuALM8qs+Ko1xxEdpoq+e05dfPfsZkcLa4JGJgV3/3jjxkpYgXb
-	 LLsX7YHByB/NQ==
-Date: Mon, 20 Jan 2025 11:12:28 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Kory Maincent <kory.maincent@bootlin.com>
-Cc: "David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, Claudiu Beznea
- <claudiu.beznea.uj@bp.renesas.com>, thomas.petazzoni@bootlin.com, Andrew
- Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, Russell King
- <linux@armlinux.org.uk>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>
-Subject: Re: [PATCH net-next v3] net: phy: Fix suspicious rcu_dereference
- usage
-Message-ID: <20250120111228.6bd61673@kernel.org>
-In-Reply-To: <20250120141926.1290763-1-kory.maincent@bootlin.com>
-References: <20250120141926.1290763-1-kory.maincent@bootlin.com>
+	s=k20201202; t=1737400372;
+	bh=Kh+DQwLKyClDbQ2S17AysOYPnYbZz9VzwkaJnYw2NEw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=QDPEHSdu3KTXUtaudpyWdDO47omeskF37v7TUI3r61654dgTZREwK5kkE3QiQ1wtv
+	 Xv++u0RBs1QM7StarZtKfbgVEdi+HGtTzjOs3B86lUv81kgICkMryEZ7bW4oeiLz3R
+	 TJexhwlQegF74MwXknPzfnlq10JGTVm6bNkL2yeoKju4cNE/RGTn2nGoli2m5DoLK0
+	 Kv9CTAkFhJWwp7vAiqtyujSwZx/D3CmbSRI+Ux0MDJ+tOMalmKThSa7LK/TSHkIN91
+	 yvwRoSL8HYMQRSwHvT3yQ2++GMkRBFF+uVpLikXETdCSVr8GRfrsXzcVTp1QcTHZFg
+	 gWKPADSacovBw==
+Date: Mon, 20 Jan 2025 11:12:50 -0800
+From: Eric Biggers <ebiggers@kernel.org>
+To: David Howells <dhowells@redhat.com>
+Cc: Simon Horman <horms@kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Chuck Lever <chuck.lever@oracle.com>,
+	Trond Myklebust <trond.myklebust@hammerspace.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Ard Biesheuvel <ardb@kernel.org>, linux-crypto@vger.kernel.org,
+	linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH 03/24] crypto: Add 'krb5enc' hash and cipher AEAD
+ algorithm
+Message-ID: <20250120191250.GA39025@sol.localdomain>
+References: <20250120173937.GA2268@sol.localdomain>
+ <20250120135754.GX6206@kernel.org>
+ <20250117183538.881618-1-dhowells@redhat.com>
+ <20250117183538.881618-4-dhowells@redhat.com>
+ <1201143.1737383111@warthog.procyon.org.uk>
+ <1212970.1737399580@warthog.procyon.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1212970.1737399580@warthog.procyon.org.uk>
 
-On Mon, 20 Jan 2025 15:19:25 +0100 Kory Maincent wrote:
-> The path reported to not having RTNL lock acquired is the suspend path of
-> the ravb MAC driver. Without this fix we got this warning:
+On Mon, Jan 20, 2025 at 06:59:40PM +0000, David Howells wrote:
+> Eric Biggers <ebiggers@kernel.org> wrote:
+> 
+> > Multiple requests in parallel, I think you mean?  No, it doesn't, but it
+> > should.
+> 
+> Not so much.  This bug is on the asynchronous path and not tested by my
+> rxrpc/rxgk code which only exercises the synchronous path.  I haven't tried to
+> make that asynchronous yet.  I presume testmgr also only tests the sync path.
+> 
+> David
+> 
 
-I maintain that ravb is buggy, plenty of drivers take rtnl_lock 
-from the .suspend callback. We need _some_ write protection here,
-the patch as is only silences a legitimate warning.
--- 
-pw-bot: cr
+I'm not sure I understand your question.  Users of the crypto API can exclude
+asynchronous algorithms when selecting one, but the self-tests do not do that.
+
+In any case, why would you need anything to do asynchronous at all here?
+
+- Eric
 
