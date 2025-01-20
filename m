@@ -1,99 +1,186 @@
-Return-Path: <netdev+bounces-159685-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159686-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD410A16654
-	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 06:20:38 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65055A1669D
+	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 07:21:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CDED03AA4B2
-	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 05:20:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 390277A18C4
+	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 06:21:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75A6B76026;
-	Mon, 20 Jan 2025 05:20:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81BD8156F3A;
+	Mon, 20 Jan 2025 06:21:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="BHy719zu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.socionext.com (mx.socionext.com [202.248.49.38])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC7DF10E9;
-	Mon, 20 Jan 2025 05:20:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.248.49.38
+Received: from out30-101.freemail.mail.aliyun.com (out30-101.freemail.mail.aliyun.com [115.124.30.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12E27383;
+	Mon, 20 Jan 2025 06:21:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737350434; cv=none; b=JqhiFpsVH9pl7an61PDknRsR92YdJ/UCC4FI5RSEswV1s1zqEGsYymsC7liJUH54JLQx//1ZgAcQ+YEo6egGPbpqXr8/22FRFxRwO8/hwN6fErjvGqfNEmf2Sn2ELW8wuLkOwLBCRIxHuTPscou/3Xkehqk/QbdB/IU+7hEtzlM=
+	t=1737354085; cv=none; b=tpFIMycswVkMxEQC5cC0ldj8g5IJxtSnEqo93pFnmx9+5aV29Dv7KmP76oW33N9GuDIkxP7Z+wAJCW4wqRfn0Gy3PcdpbRqGGhIXnT2LLl+iysh3OQJ5c+gdVz6ZU+rxc1XzFca6p9Qp8TxdyTziCCXtC+byxOVyuvCuaUD963E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737350434; c=relaxed/simple;
-	bh=iHx2e3ApLxuDJDf+lCHDkBNMUO2RXdoz2ZUqy+x5ExQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=XNUMEfN1BJsobekBsoh6r4APfXLVauC5JZvuQ2EXrDd8FLeGWlDy9K2WWBZb8aaBcK3zoF8jUDlNaQinFuFb0Va+l9WXJjJKhvRTn+ERkQ1ew73+7bNb5Vr7fxtJrDGcNsRMBWqD8a3S762K/bIATwvZMXc9/I8vbX3MpDopcF8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=socionext.com; spf=pass smtp.mailfrom=socionext.com; arc=none smtp.client-ip=202.248.49.38
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=socionext.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=socionext.com
-Received: from unknown (HELO kinkan2-ex.css.socionext.com) ([172.31.9.52])
-  by mx.socionext.com with ESMTP; 20 Jan 2025 14:20:24 +0900
-Received: from mail.mfilter.local (mail-arc02.css.socionext.com [10.213.46.40])
-	by kinkan2-ex.css.socionext.com (Postfix) with ESMTP id 60E8D201A2CD;
-	Mon, 20 Jan 2025 14:20:24 +0900 (JST)
-Received: from iyokan2.css.socionext.com ([172.31.9.53]) by m-FILTER with ESMTP; Mon, 20 Jan 2025 14:20:24 +0900
-Received: from [10.212.247.50] (unknown [10.212.247.50])
-	by iyokan2.css.socionext.com (Postfix) with ESMTP id ECA05AB184;
-	Mon, 20 Jan 2025 14:20:23 +0900 (JST)
-Message-ID: <6aa0671d-beb2-429b-a34e-cb35651e1c12@socionext.com>
-Date: Mon, 20 Jan 2025 14:20:23 +0900
+	s=arc-20240116; t=1737354085; c=relaxed/simple;
+	bh=zfwYgDRUW9Zl6cHu4rZP3RzJXaaSwNoPlStDkgjDCDo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ano3XrDqH+B7iJLuIYbQmvk+XUtokBczr0h3ytoZ/R/8DTZ7j/6fp52w1OH9X+zNNzamwO6NMwgmjvln/BRS2pm4nt7DFzVmQ6foXx6hSmRXQNNAddbFYbn88Y0AOeBRFyh+EV8z8zZ7ljYK1VQFd9sPA5M+p95akHhAdmdccM4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=BHy719zu; arc=none smtp.client-ip=115.124.30.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1737354074; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
+	bh=Wlr3z3S7c27vFsqcrMzjiJr4K74Vv/O5ns4GoAc3b58=;
+	b=BHy719zucLsVc00i/i3RZc7BPS4BrfFkmEubaki+F/TwY5H1/efZ1tMFawXzFBhWXzcEowazXsIMI4mPZEou/651Ar2upvf1V/321o2QLAMVqBFiZUZIa1+QprDCggCmWvV2IVRVtF4JToFg1WYk9B3AFMdpOoYikk1AyP8Zn1A=
+Received: from localhost(mailfrom:dust.li@linux.alibaba.com fp:SMTPD_---0WNwwNLG_1737354072 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Mon, 20 Jan 2025 14:21:13 +0800
+Date: Mon, 20 Jan 2025 14:21:12 +0800
+From: Dust Li <dust.li@linux.alibaba.com>
+To: Andrew Lunn <andrew@lunn.ch>, Niklas Schnelle <schnelle@linux.ibm.com>
+Cc: Alexandra Winter <wintera@linux.ibm.com>,
+	Julian Ruess <julianr@linux.ibm.com>,
+	Wenjia Zhang <wenjia@linux.ibm.com>,
+	Jan Karcher <jaka@linux.ibm.com>, Gerd Bayer <gbayer@linux.ibm.com>,
+	Halil Pasic <pasic@linux.ibm.com>,
+	"D. Wythe" <alibuda@linux.alibaba.com>,
+	Tony Lu <tonylu@linux.alibaba.com>,
+	Wen Gu <guwen@linux.alibaba.com>,
+	Peter Oberparleiter <oberpar@linux.ibm.com>,
+	David Miller <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Thorsten Winkler <twinkler@linux.ibm.com>, netdev@vger.kernel.org,
+	linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	Simon Horman <horms@kernel.org>
+Subject: Re: [RFC net-next 0/7] Provide an ism layer
+Message-ID: <20250120062112.GL89233@linux.alibaba.com>
+Reply-To: dust.li@linux.alibaba.com
+References: <20250116093231.GD89233@linux.alibaba.com>
+ <D73H7Q080GUQ.3BDOH23P4WDOL@linux.ibm.com>
+ <0f96574a-567e-495a-b815-6aef336f12e6@linux.ibm.com>
+ <20250117021353.GF89233@linux.alibaba.com>
+ <dc2ff4c83ce8f7884872068570454f285510bda2.camel@linux.ibm.com>
+ <034e69fe-84b4-44f2-80d1-7c36ab4ee4c9@lunn.ch>
+ <64df7d8ca3331be205171ddaf7090cae632b7768.camel@linux.ibm.com>
+ <7dc80dfb-5a75-4638-9d44-d5a080ddb693@lunn.ch>
+ <c2eb6fd7e9a786749d70a17266a04fb50dbd5bb8.camel@linux.ibm.com>
+ <85d94131-6c2b-41bd-ad93-c0e7c24801db@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 1/2] net: stmmac: Limit FIFO size by hardware feature
- value
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Jose Abreu <joabreu@synopsys.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-References: <20250116020853.2835521-1-hayashi.kunihiko@socionext.com>
- <636bad71-8da8-4fda-a433-1586d93683a5@lunn.ch>
-Content-Language: en-US
-From: Kunihiko Hayashi <hayashi.kunihiko@socionext.com>
-In-Reply-To: <636bad71-8da8-4fda-a433-1586d93683a5@lunn.ch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <85d94131-6c2b-41bd-ad93-c0e7c24801db@lunn.ch>
 
-Hi Andrew,
+On 2025-01-17 21:29:09, Andrew Lunn wrote:
+>On Fri, Jan 17, 2025 at 05:57:10PM +0100, Niklas Schnelle wrote:
+>> On Fri, 2025-01-17 at 17:33 +0100, Andrew Lunn wrote:
+>> > > Conceptually kind of but the existing s390 specific ISM device is a bit
+>> > > special. But let me start with some background. On s390 aka Mainframes
+>> > > OSs including Linux runs in so called logical partitions (LPARs) which
+>> > > are machine hypervisor VMs which use partitioned non-paging memory. The
+>> > > fact that memory is partitioned is important because this means LPARs
+>> > > can not share physical memory by mapping it.
+>> > > 
+>> > > Now at a high level an ISM device allows communication between two such
+>> > > Linux LPARs on the same machine. The device is discovered as a PCI
+>> > > device and allows Linux to take a buffer called a DMB map that in the
+>> > > IOMMU and generate a token specific to another LPAR which also sees an
+>> > > ISM device sharing the same virtual channel identifier (VCHID). This
+>> > > token can then be transferred out of band (e.g. as part of an extended
+>> > > TCP handshake in SMC-D) to that other system. With the token the other
+>> > > system can use its ISM device to securely (authenticated by the token,
+>> > > LPAR identity and the IOMMU mapping) write into the original systems
+>> > > DMB at throughput and latency similar to doing a memcpy() via a
+>> > > syscall.
+>> > > 
+>> > > On the implementation level the ISM device is actually a piece of
+>> > > firmware and the write to a remote DMB is a special case of our PCI
+>> > > Store Block instruction (no real MMIO on s390, instead there are
+>> > > special instructions). Sadly there are a few more quirks but in
+>> > > principle you can think of it as redirecting writes to a part of the
+>> > > ISM PCI devices' BAR to the DMB in the peer system if that makes sense.
+>> > > There's of course also a mechanism to cause an interrupt on the
+>> > > receiver as the write completes.
+>> > 
+>> > So the s390 details are interesting, but as you say, it is
+>> > special. Ideally, all the special should be hidden away inside the
+>> > driver.
+>> 
+>> Yes and it will be. There are some exceptions e.g. for vfio-pci pass-
+>> through but that's not unusual and why there is already the concept of
+>> vfio-pci extension module.
+>> 
+>> > 
+>> > So please take a step back. What is the abstract model?
+>> 
+>> I think my high level description may be a good start. The abstract
+>> model is the ability to share a memory buffer (DMB) for writing by a
+>> communication partner, authenticated by a DMB Token. Plus stuff like
+>> triggering an interrupt on write or explicit trigger. Then Alibaba
+>> added optional support for what they called attaching the buffer which
+>> means it becomes truly shared between the peers but which IBM's ISM
+>> can't support. Plus a few more optional pieces such as VLANs, PNETIDs
+>> don't ask. The idea for the new layer then is to define this interface
+>> with operations and documentation.
+>> 
+>> > 
+>> > Can the abstract model be mapped onto CLX? Could it be used with a GPU
+>> > vRAM? SoC with real shared memory between a pool of CPUs.
+>> > 
+>> > 	Andrew
+>> 
+>> I'd think that yes, one could implement such a mechanism on top of CXL
+>> as well as on SoC. Or even with no special hardware between a host and
+>> a DPU (e.g. via PCIe endpoint framework). Basically anything that can
+>> DMA and IRQs between two OS instances.
+>
+>Is DMA part of the abstract model? That would suggest a true shared
+>memory system is excluded, since that would not require DMA.
+>
+>Maybe take a look at subsystems like USB, I2C.
+>
+>usb_submit_urb(struct urb *urb, gfp_t mem_flags)
+>
+>An URB is a data structure with a block of memory associated with it,
+>contains the detail to pass to the USB device.
+>
+>i2c_transfer(struct i2c_adapter *adap, struct i2c_msg *msgs, int num)
+>
+>*msgs points to num of messages which get transferred to/from the I2C
+>device.
+>
+>Could the high level API look like this? No DMA, no IRQ, no concept of
+>a somewhat shared memory. Just an API which asks for a message to be
+>sent to the other end? struct urb has some USB concepts in it, struct
+>i2c_msg has some I2C concepts in it. A struct ism_msg would follow the
+>same pattern, but does it need to care about the DMA, the IRQ, the
+>memory which is semi shared?
 
-On 2025/01/17 5:16, Andrew Lunn wrote:
-> On Thu, Jan 16, 2025 at 11:08:52AM +0900, Kunihiko Hayashi wrote:
->> Tx/Rx FIFO size is specified by the parameter "{tx,rx}-fifo-depth" from
->> the platform layer.
->>
->> However, these values are constrained by upper limits determined by the
->> capabilities of each hardware feature. There is a risk that the upper
->> bits will be truncated due to the calculation, so it's appropriate to
->> limit them to the upper limit values.
-> 
-> Are these values hard coded in the platform layer? Or can they come
-> from userspace?
+I don’t have a clear picture of what the API should look like yet, but I
+believe it’s possible to avoid DMA and IRQ. In fact, the current data
+transfer API, ops->move_data() in include/linux/ism.h, already abstracts
+away the DMA and IRQ details.
 
-My explanation is insufficient and misleading.
-"From the platform layer" means the common layer of stmmac described in
-"stmmac_platform.c".
+One thing we cannot hide, however, is whether the operation is zero-copy
+or copy. This distinction is important because we can reuse the data at
+different times in copy mode and zero-copy mode.
 
-> If they are hard coded, we should also fix them. So maybe add a
-> netdev_warn(), and encourage the platform maintainers to fix their
-> platform. If they are coming from userspace, we should consider
-> failing the ethtool call with an -EINVAL, and maybe an extack with the
-> valid range?
+Best regards,
+Dust
 
-These values are derived from the devicetree and stored in the stmmac
-private structure. They are hardware-specific values, so I think this
-fix is sufficient.
-
-Thank you,
-
----
-Best Regards
-Kunihiko Hayashi
 
