@@ -1,100 +1,183 @@
-Return-Path: <netdev+bounces-159882-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159883-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 55A48A174F0
-	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 00:10:13 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D75FA174F3
+	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 00:12:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E96CD188A7E9
-	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 23:10:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 31FFD7A1CD4
+	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 23:12:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D89D1B414F;
-	Mon, 20 Jan 2025 23:10:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12ED21B85CB;
+	Mon, 20 Jan 2025 23:12:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KNkVk4ES"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="biaknp+7"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B5AC383;
-	Mon, 20 Jan 2025 23:10:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 458A41B414F
+	for <netdev@vger.kernel.org>; Mon, 20 Jan 2025 23:12:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737414607; cv=none; b=Fy5Dd9Bc+vLf099GRO7QvO55lVihnGatR+v13Fhgv2Y91rm3y9AmHcg+3L8XlwD6Sa+ZkNyA0vcBdeKEqzVAULJkm8Almg8FQgEPOjT2YRle7nf7JRHcRaOfKukcMjbXe78pgDruI7VPbGHlsHbjAtPihdoi7EBBhcLLgTrMzC8=
+	t=1737414738; cv=none; b=QP68jesiWYN27jlHqtrP2g9/lJns96a1PGj86UDR5eXNDIci3UVu9LyD5YwTxEFc3UQ/yv7LBIzk+5jHpDAeIWRIl5No6pFLiZPmXrBSU9DPa/lmvGus4tOqqmw1j1gNjvNF9eLfjM0TOlbGwVfvsdZmpCfTpoNVVBnvAiQHwrU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737414607; c=relaxed/simple;
-	bh=gabo7M0aUIqFL5qEJ9Y+em9+3QJIvyxrYFOMg5aMtPY=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=EL+PwHSBXn4jQBNKHW4wIyK4uOdebzhEfRxLp/gVh20ROPF6LmV+ibibc2dn62YTYSI4AOEVOCDAYhqcLJZhp1Yp5eyEke816vhlSLrDUr/a2wP98WSjoN7ydH81BdaxraZ0cSCgKvF12WhISl1RrU+kLmJTJ7qO/cH36Y0rQiE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KNkVk4ES; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B4926C4CEDD;
-	Mon, 20 Jan 2025 23:10:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737414606;
-	bh=gabo7M0aUIqFL5qEJ9Y+em9+3QJIvyxrYFOMg5aMtPY=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=KNkVk4ESP2nA6nPz7ZdE/osPani2eaCU4IhxZZu4Lq1wswLSrSEi2cN3SqKCmpYM6
-	 eltBdUC9udblPtIb9w0P9AQbrOUYg/wpfCqQdcr4fD2OcdAqxUaHb4UIgzXdHqbdlP
-	 P7a7vVaGxEsk49EZFmOERqQfi+/YaXSXhMuyFxUP9rzb8aZ7w3Old9tI1KQlwDZUqM
-	 rFZhUiN3nwPqJ5q6+yJO8Q0jrVTjRaLCdpDNaugW+iUS5WHCzq2VL57FBz0UNA3shA
-	 5EGyZY7JzKdzKEAVrjbfID+GFOPv1D5wlaTDihdBK0o2W508C5COdNJpRaQzVUjbBZ
-	 r/lsLPZtBoSCQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAE1B380AA62;
-	Mon, 20 Jan 2025 23:10:31 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1737414738; c=relaxed/simple;
+	bh=SBvenXYw8OtPipXuO7LE4YWvoIngH1jvhlR3/7YWChk=;
+	h=From:In-Reply-To:References:Cc:Subject:MIME-Version:Content-Type:
+	 Date:Message-ID; b=EZYMKd3E2kh6N5TXUTg6c4yaYLVRkGSW2dQFEYhs467dEHaKZ5XUo3mc3gwi33mbLhxqsr5mRTStEBZERzN8KVDhK0QoL9IaQlTA86jmKjnEapoXcTFY8+leWQBKw5LM8/pa9lrgKbw/Eu+MjnoM+UjEMHK0XHvyYbgrHL/0zXo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=biaknp+7; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1737414735;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:to:
+	 cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=EIJQ5eR7pxgEx6HUdxvMLLK6G12t5XMgFVgt0W5+/MM=;
+	b=biaknp+7BvpxtAaNNP/wGd9UU8NE/UDpHj4lkv28cr2dx7K1bzuLwVTKl2yMmDTc607rnd
+	X6ain1cntx5+DlkMuE0HAZcAqnmzIVRVwT7sYoZ2bZn2Jwf4qknve1EQ4jqWPxgP3foHbo
+	o5jNMUnopmDDHdrFUDJfrrYncTAhkyw=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-157-TiHGSjjiOXOfCzM4ZjoB9Q-1; Mon,
+ 20 Jan 2025 18:12:12 -0500
+X-MC-Unique: TiHGSjjiOXOfCzM4ZjoB9Q-1
+X-Mimecast-MFC-AGG-ID: TiHGSjjiOXOfCzM4ZjoB9Q
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D93631955DB8;
+	Mon, 20 Jan 2025 23:12:08 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.5])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 004053003E7F;
+	Mon, 20 Jan 2025 23:12:03 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <1201143.1737383111@warthog.procyon.org.uk>
+References: <1201143.1737383111@warthog.procyon.org.uk> <20250120135754.GX6206@kernel.org> <20250117183538.881618-1-dhowells@redhat.com> <20250117183538.881618-4-dhowells@redhat.com>
+Cc: dhowells@redhat.com, Simon Horman <horms@kernel.org>,
+    Herbert Xu <herbert@gondor.apana.org.au>,
+    Chuck Lever <chuck.lever@oracle.com>,
+    Trond Myklebust <trond.myklebust@hammerspace.com>,
+    "David S. Miller" <davem@davemloft.net>,
+    Marc Dionne <marc.dionne@auristor.com>,
+    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+    Paolo Abeni <pabeni@redhat.com>, Eric Biggers <ebiggers@kernel.org>,
+    Ard Biesheuvel <ardb@kernel.org>, linux-crypto@vger.kernel.org,
+    linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org,
+    linux-fsdevel@vger.kernel.org, netdev@vger.kernel.org,
+    linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH 03/24] crypto: Add 'krb5enc' hash and cipher AEAD algorithm
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2 0/3] net: ethernet: ti: am65-cpsw: streamline
- RX/TX queue creation and cleanup
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173741463076.3679464.11933533313708043409.git-patchwork-notify@kernel.org>
-Date: Mon, 20 Jan 2025 23:10:30 +0000
-References: <20250117-am65-cpsw-streamline-v2-0-91a29c97e569@kernel.org>
-In-Reply-To: <20250117-am65-cpsw-streamline-v2-0-91a29c97e569@kernel.org>
-To: Roger Quadros <rogerq@kernel.org>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, linux@armlinux.org.uk, ast@kernel.org,
- daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com,
- s-vadapalli@ti.com, srk@ti.com, danishanwar@ti.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, bpf@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <1434957.1737414722.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 20 Jan 2025 23:12:02 +0000
+Message-ID: <1434958.1737414722@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-Hello:
+David Howells <dhowells@redhat.com> wrote:
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+> > Sparse complains that the second argument to krb5enc_verify_hash shoul=
+d be
+> > a pointer rather than an integer. So perhaps this would be slightly be=
+tter
+> > expressed as (completely untested!):
+> > =
 
-On Fri, 17 Jan 2025 16:06:32 +0200 you wrote:
-> In this series we fix an issue with missing cleanups during
-> error path of am65_cpsw_nuss_init_tx/rx_chns() when used anywhere
-> other than at probe().
-> 
-> Then we streamline RX and TX queue creation and cleanup. The queues
-> can now be created or destroyed by calling the appropriate
-> functions am65_cpsw_create_rxqs/txqs() and am65_cpsw_destroy_rxq/txqs().
-> 
-> [...]
+> > 	err =3D krb5enc_verify_hash(req, NULL);
+> =
 
-Here is the summary with links:
-  - [net-next,v2,1/3] net: ethernet: ti: am65-cpsw: ensure proper channel cleanup in error path
-    https://git.kernel.org/netdev/net-next/c/681eb2beb3ef
-  - [net-next,v2,2/3] net: ethernet: ti: am65-cpsw: streamline RX queue creation and cleanup
-    https://git.kernel.org/netdev/net-next/c/66c1ae68a1e9
-  - [net-next,v2,3/3] net: ethernet: ti: am65-cpsw: streamline TX queue creation and cleanup
-    https://git.kernel.org/netdev/net-next/c/3568d21686b7
+> Actually, no.  It should be "ahreq->result + authsize" and
+> krb5enc_verify_hash() shouldn't calculate ihash, but use its hash parame=
+ter.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Ah.  That's wrong also.  I'm going to drop the second parameter and just
+calculate the hash pointers directly.
+
+David
+---
+diff --git a/crypto/krb5enc.c b/crypto/krb5enc.c
+index 931387a8ee6f..e5cec47e7e42 100644
+--- a/crypto/krb5enc.c
++++ b/crypto/krb5enc.c
+@@ -230,7 +230,7 @@ static int krb5enc_encrypt(struct aead_request *req)
+ 	return krb5enc_dispatch_encrypt(req, aead_request_flags(req));
+ }
+ =
+
+-static int krb5enc_verify_hash(struct aead_request *req, void *hash)
++static int krb5enc_verify_hash(struct aead_request *req)
+ {
+ 	struct crypto_aead *krb5enc =3D crypto_aead_reqtfm(req);
+ 	struct aead_instance *inst =3D aead_alg_instance(krb5enc);
+@@ -238,11 +238,12 @@ static int krb5enc_verify_hash(struct aead_request *=
+req, void *hash)
+ 	struct krb5enc_request_ctx *areq_ctx =3D aead_request_ctx(req);
+ 	struct ahash_request *ahreq =3D (void *)(areq_ctx->tail + ictx->reqoff);
+ 	unsigned int authsize =3D crypto_aead_authsize(krb5enc);
+-	u8 *ihash =3D ahreq->result + authsize;
++	u8 *calc_hash =3D areq_ctx->tail;
++	u8 *msg_hash  =3D areq_ctx->tail + authsize;
+ =
+
+-	scatterwalk_map_and_copy(ihash, req->src, ahreq->nbytes, authsize, 0);
++	scatterwalk_map_and_copy(msg_hash, req->src, ahreq->nbytes, authsize, 0)=
+;
+ =
+
+-	if (crypto_memneq(ihash, ahreq->result, authsize))
++	if (crypto_memneq(msg_hash, calc_hash, authsize))
+ 		return -EBADMSG;
+ 	return 0;
+ }
+@@ -254,7 +255,7 @@ static void krb5enc_decrypt_hash_done(void *data, int =
+err)
+ 	if (err)
+ 		return krb5enc_request_complete(req, err);
+ =
+
+-	err =3D krb5enc_verify_hash(req, 0);
++	err =3D krb5enc_verify_hash(req);
+ 	krb5enc_request_complete(req, err);
+ }
+ =
+
+@@ -284,7 +285,7 @@ static int krb5enc_dispatch_decrypt_hash(struct aead_r=
+equest *req)
+ 	if (err < 0)
+ 		return err;
+ =
+
+-	return krb5enc_verify_hash(req, hash);
++	return krb5enc_verify_hash(req);
+ }
+ =
+
+ /*
+@@ -352,7 +353,7 @@ static int krb5enc_init_tfm(struct crypto_aead *tfm)
+ 	crypto_aead_set_reqsize(
+ 		tfm,
+ 		sizeof(struct krb5enc_request_ctx) +
+-		ictx->reqoff +
++		ictx->reqoff + /* Space for two checksums */
+ 		umax(sizeof(struct ahash_request) + crypto_ahash_reqsize(auth),
+ 		     sizeof(struct skcipher_request) + crypto_skcipher_reqsize(enc)));
+ =
 
 
 
