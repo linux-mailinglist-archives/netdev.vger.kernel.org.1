@@ -1,102 +1,148 @@
-Return-Path: <netdev+bounces-159852-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159853-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C09DA172F3
-	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 20:01:28 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2BF10A17300
+	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 20:07:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3EE5B1882CBE
-	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 19:01:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4960F16A8E6
+	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 19:06:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECDFC1E32DB;
-	Mon, 20 Jan 2025 18:59:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD8371EB9FF;
+	Mon, 20 Jan 2025 19:06:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y0F9KKCk"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LYNRCuAN"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DFE71F193B
-	for <netdev@vger.kernel.org>; Mon, 20 Jan 2025 18:59:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 769B91DFE0B;
+	Mon, 20 Jan 2025 19:06:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737399598; cv=none; b=tCPfP0lVuPL47ILyJqZnL04QnsRKUjbCS35yLoCbQKXHk1xCYu6HTTZo+iGTF7+xPZvKBneywsHQTYOtD6qY4RWISTdpvb9rwkJ+tK1z8zawOI15yTDoUDNFWeaHQ4UZ5J3cLwQYGClML6DPkEGtp9pF9CQXIZzq+LAYy5iGQVM=
+	t=1737400015; cv=none; b=dg4Ohr0PTt6fKu1ya8F/lq6WvWY01dRhsrHKn8XQq0584Y524QS7qEbVBVCC9q36XJOR0aBXHoAyIXaVtxDK82hZJDcDyHbm7KFUWWtCA4lPqYfbPcDW/v6To5FrZ08jJUKq6ybnQPyEI3bOocPWImxcd+0cNiLeEYI3U/m0frg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737399598; c=relaxed/simple;
-	bh=Ls1w6WAZHqAu+rKTuk9SnEmg6HlNyISTMJ4PCXdFLCM=;
-	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=HhhftilgtFu39O+oCTJ6cSAOGR7xl2kI8JLykGh14CiHxpQtLj4Gnc7/QDGg1FG5UJJj8atXTnJjt8t5wFGS153djYarweTeQ8aNtX3cGExT91aL2xSpNQntVTcsnYSFeH7H3x6p04XJJPc4rw5VHBa+JwFBU/RQVYa4sFWKCCM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Y0F9KKCk; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1737399596;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+iwfJA5iVvxl+Bip7TYLzvSBg2GTpA1L9rYj66ARLZ4=;
-	b=Y0F9KKCkK41HGBzU59vHux+5673Gqin9mZGnPZ6K34Egdr3YS6d0ki+Khgc+cuvOdPM4eG
-	5tbHSrvok7DRj3m6TFgoqRGqfD2wTBd7VmJVuTvBiUqcoWRPGObuM2dhHDyprpo0bwI4Tq
-	0SR+JnzFW+dnDuP2CPA5GtnyzFANLi8=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-601-iEfANEuSOWKUq3mmmokOjQ-1; Mon,
- 20 Jan 2025 13:59:49 -0500
-X-MC-Unique: iEfANEuSOWKUq3mmmokOjQ-1
-X-Mimecast-MFC-AGG-ID: iEfANEuSOWKUq3mmmokOjQ
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E5B93195608A;
-	Mon, 20 Jan 2025 18:59:45 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.5])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 8816919560A7;
-	Mon, 20 Jan 2025 18:59:41 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <20250120173937.GA2268@sol.localdomain>
-References: <20250120173937.GA2268@sol.localdomain> <20250120135754.GX6206@kernel.org> <20250117183538.881618-1-dhowells@redhat.com> <20250117183538.881618-4-dhowells@redhat.com> <1201143.1737383111@warthog.procyon.org.uk>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: dhowells@redhat.com, Simon Horman <horms@kernel.org>,
-    Herbert Xu <herbert@gondor.apana.org.au>,
-    Chuck Lever <chuck.lever@oracle.com>,
-    Trond Myklebust <trond.myklebust@hammerspace.com>,
-    "David S. Miller" <davem@davemloft.net>,
-    Marc Dionne <marc.dionne@auristor.com>,
-    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-    Paolo Abeni <pabeni@redhat.com>, Ard Biesheuvel <ardb@kernel.org>,
-    linux-crypto@vger.kernel.org, linux-afs@lists.infradead.org,
-    linux-nfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-    netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH 03/24] crypto: Add 'krb5enc' hash and cipher AEAD algorithm
+	s=arc-20240116; t=1737400015; c=relaxed/simple;
+	bh=jkZm3DGDoAj/io0coHmiJe0JSoPgByrZ9bxYiNRiS4Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=NDL0dr07IZFCsZBnSFwmatkKKXdc6h7JQwMb2j20toTtGm28nsGMsowSE64VZNpp8lsfPmgqcxKQaR13e+zCB2HvCdZtRCuwe/vdH3C362B7LHKWTeCRpKjC2LviB+5tjZ7GGWfcp6nNzdqANB7p/2mj12jZfInPUe1FYBw+KuI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LYNRCuAN; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 44299C4CEDD;
+	Mon, 20 Jan 2025 19:06:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1737400014;
+	bh=jkZm3DGDoAj/io0coHmiJe0JSoPgByrZ9bxYiNRiS4Q=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=LYNRCuANadi/OR50ZOBYOdiqI8HIPqhdI2GWgANdn4fqimH0IfF4b4WOCHUplFLfE
+	 YqVtay8zckFjUHQOmW0CVlj0hLuwCtXLVzsf10lYk4Ldw0Uq56JeMqVCVJz3xZwWz+
+	 D0nEjRb4ziYCqmrS6DCBP79SlYUjV+PRggJQ1+kVOiI9H3iLeEBjObtPKMsQ135c4r
+	 3Q2S557oAqp8COvR6EkqvS0JqSdtexQ2DTGDrbQvdbNTBFef9UScQL4KCPYtRlp3eP
+	 2H6KXGdHr3may++nsIEjkoqaW5sh6ig375u/8REgdKa+X0bWftr4sjc21Y/IwnsPWW
+	 5woly9KJ7kdGg==
+Date: Mon, 20 Jan 2025 11:06:53 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Breno Leitao <leitao@debian.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Jonathan Corbet
+ <corbet@lwn.net>, Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, kernel-team@meta.com, max@kutsevol.com,
+ thepacketgeek@gmail.com
+Subject: Re: [PATCH net-next v2 3/5] netconsole: add support for sysdata and
+ CPU population
+Message-ID: <20250120110653.693fd5ec@kernel.org>
+In-Reply-To: <20250120-rational-bullfrog-of-tornado-2cd6f4@leitao>
+References: <20250115-netcon_cpu-v2-0-95971b44dc56@debian.org>
+	<20250115-netcon_cpu-v2-3-95971b44dc56@debian.org>
+	<20250116174405.20a0e20b@kernel.org>
+	<20250117-terrestrial-clam-of-satiation-cf312f@leitao>
+	<20250117183520.11d93f4d@kernel.org>
+	<20250120-rational-bullfrog-of-tornado-2cd6f4@leitao>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <1212969.1737399580.1@warthog.procyon.org.uk>
-Date: Mon, 20 Jan 2025 18:59:40 +0000
-Message-ID: <1212970.1737399580@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Eric Biggers <ebiggers@kernel.org> wrote:
+On Mon, 20 Jan 2025 09:30:48 -0800 Breno Leitao wrote:
+> > > Not sure I followed. The data ({userdata,extradata}_complete) was always
+> > > inside nt field, which belongs to target_list.  
+> > 
+> > I mean the buffer we use for formatting. Today it's this:
+> > 
+> > 	static char buf[MAX_PRINT_CHUNK]; /* protected by target_list_lock */
+> > 	int header_len, msgbody_len;
+> > 	const char *msgbody;
+> > 
+> > right? I missed that "static" actually so it's not on the stack, 
+> > it's in the .bss section.  
+> 
+> Since you raised this topic, I don't think buf needs to be static
+> for a functional perspective, since `buf` is completely overwritten
+> every time send_msg functions are called.
 
-> Multiple requests in parallel, I think you mean?  No, it doesn't, but it
-> should.
+It may be because it's relatively big and stack space used to be 
+very limited.
 
-Not so much.  This bug is on the asynchronous path and not tested by my
-rxrpc/rxgk code which only exercises the synchronous path.  I haven't tried to
-make that asynchronous yet.  I presume testmgr also only tests the sync path.
+> > My thinking was to handle it like the release.
+> > Print it at the send_msg_no_fragmentation() stage directly 
+> > into the static buffer. Does that get hairy coding-wise?  
+> 
+> I suppose the advantage of doing this approach is to reduce a
+> memcpy/strcpy, right?
 
-David
+Not really, my main motivation is to try to find a common way
+of how various pieces of the output are protected and handled.
 
+> If this is what your motivation, I think we cannot remove it from the
+> fragmented case. Let me share my thought process:
+> 
+> 1) sysdata needs to be appended to both send_msg_fragmented() and
+> send_msg_no_fragmentation(). The fragmented case is the problem.
+> 
+> 2) It is trivially done in send_msg_fragmented() case.
+> 
+> 3) For the send_msg_no_fragmentation() case, there is no trivial way to
+> get it done without using a secondary buffer and then memcpy to `buf`.
+> 
+> Let's suppose sysdata has "cpu=42", and original `buf` has only 5 available
+> chars, thus it needs to have 2 msgs to accommodate the full message.
+> 
+> Then the it needs to track that `cpu=4` will be sent in a msg and create
+> another message with the missing `2`.
+> 
+> The only way to do it properly is having a extra buffer where we
+> have `cpu=42` and copy 5 bytes from there, and then copy the last one in
+> the next iteration. I am not sure we can do it in one shot.
+
+FWIW to simplify reasoning about the length I thought we could take the
+worst case, assume we'll need len(cpu=) + log10(nr_cpu_ids) of space.
+
+> On top of that, I am planning to increase other features in sysdata
+> (such as current task name, modules and even consolidate the release as
+> sysdata), which has two implications:
+> 
+> 1) Average messages size will become bigger. Thus, memcpy will be needed
+> one way or another.
+> 
+> 2) Unless we can come up with a smart solution, this solution will be
+> harder to reason about.
+> 
+> If you want to invest more time in this direction, I am more than happy
+> to create a PoC, so we can discuss more concretely. 
+
+I don't feel super strongly about this. But hacking around is always
+good to get a sense of how hairy the implementation ends up being.
+
+To rephrase my concern is that we have some data as static on the
+stack, some dynamically appended at the send_*() stage, now we're
+adding a third way of handling things. Perhaps the simplest way to
+make me happy would be to move the bufs which are currently static 
+into nt.
 
