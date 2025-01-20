@@ -1,130 +1,193 @@
-Return-Path: <netdev+bounces-159875-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159876-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CDE96A1749A
-	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 23:26:08 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0AA0BA174A8
+	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 23:33:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CD7473A8ABA
-	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 22:26:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F20363A053E
+	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 22:33:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 491D71B423C;
-	Mon, 20 Jan 2025 22:26:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8803D1AC43A;
+	Mon, 20 Jan 2025 22:33:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UOfikxNn"
+	dkim=pass (2048-bit key) header.d=buffet.re header.i=@buffet.re header.b="HeyQrtGC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f170.google.com (mail-qk1-f170.google.com [209.85.222.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx1.buffet.re (mx1.buffet.re [51.83.41.69])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B074723A9;
-	Mon, 20 Jan 2025 22:26:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6960523A9;
+	Mon, 20 Jan 2025 22:33:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=51.83.41.69
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737411964; cv=none; b=UiizmUacGDTX1cPX4lBTNOG0XCMGMuj6E67nyTfkSKU3++oeZOKytwEYf+RT51UeMhzH53nOpflKWucHn/jHW2zpRnEkt33xS5XYo6fzvTllf1yb6cfqOo4RXMzYz68KuHPzyAYG5qeZwYQLz0zTFKm1nbZAohypK1+fGN4T0bE=
+	t=1737412413; cv=none; b=m8xVxIP5mNk5/yHACxOY+1yk/aVNO6SN/F678mIhkRCcX/EiNtJj65ZphkcnV4Aft8aUN2KcFhEiC748VlCh7A7L4YSrJFldqyaQGBL7gIsniJIqTSr5vBPrZtZkcIvWn/SIPNFY5RITbW9Ld9woWVNKMRBDT5xAwAfsMF2OLG8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737411964; c=relaxed/simple;
-	bh=N1yl0a3qWWgDrksZOFD+HV6EwfRG6qtuU6kWWkZEfmE=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=p8cP3CiKy1ZyP+fE7Hg9viTkmM3TTVrDtwBP+u1YEHhppJsXB9hmEt1w22m/lSzq/6Sh9nHP8yMQHAmoZYPKhqlX2Fd7Yxbbsv3V6pOg7zGhRVYp92Tf4rUYNXM3Xi4zfcEhPo20Hcepo4cLkIv86PKeBjTPX6aGqjprG7GC3GI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UOfikxNn; arc=none smtp.client-ip=209.85.222.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f170.google.com with SMTP id af79cd13be357-7b858357124so54614485a.1;
-        Mon, 20 Jan 2025 14:26:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1737411961; x=1738016761; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=lxUxVxwLv4o/bc4XcmUkwOAtz1vz6XJrG7xLCMfGGyc=;
-        b=UOfikxNnwZBl/UiSzSqyr3RW7HseNhn831+bmNYfotCg3xOpxDtu/ClWpzwmmoLz1V
-         NDs2jMFQf8RSdpurcouv6czak9GEt4e3qIAVHVQ5ySH/sPoKSSQip6aFu7O+fo5esnRY
-         2MF+fXXLWlOV5tRjHb3MCUWqnUL8CGopcDCYg7lmbdMXadclW1RfZJtJQq5r+kMd+bVZ
-         iyNgk8fX+hEMlhOIQFv9L/urvr7dqpZdo8ZrYU64wl3G1EsdDWGI0LFpGPjp16VmvCSV
-         LayrwIQR6zaNdNJNMDPOvbz2xxLAwTC2/ZhGHojYC7pgsU+qAI/aQFPC2BTzKHTN/Wem
-         cytw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737411961; x=1738016761;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=lxUxVxwLv4o/bc4XcmUkwOAtz1vz6XJrG7xLCMfGGyc=;
-        b=HhqibZ2eUNO8NlRm/Lp0YqL2osXvMhmZESRVpo1hyWme+ZAsdFA0rhR4r7r62wImHj
-         B1SL5VtcmiwVRvRCwHBP5BBWNNI5nRmyFwFJrh39d11Lgv7r0lGIQvbReOovhm5Gb1GH
-         /5MVuMxZcErhIB7v3zBXqQeE/AbEeAvbtSg6GvuW8axwTbsXbet8fQc/thXqc1OrGWPc
-         KJkSaaCVQiCtKLwh+UOBgyL3ZR2+hWlU3VaD/24q70JxD6LyeSQPAGPmVB3ihKoroAFf
-         +nmF/gNJvNo97tSiAHXwbFnv7ykgdjYJ5Vt7jlJnlTpMdhXPadn35Gn6Bn7JE2/v75DA
-         e6wA==
-X-Forwarded-Encrypted: i=1; AJvYcCVb1bBLAUOq8yWhihgvORS2t970KMI+jqUVP6i2fHCw555y7tMQjmGHvzuafI6zR/Rq/vzjr0ZUM2W5SrU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwU4XVjzlV29f2xo0c2M79HeLDlz5SBJ/3E7sZufsTtfHYbb8jY
-	Lx17sV9+uRHAOZAsPRnyP8yRi8DiHiKHW182//FyX0WLeI8KDO4=
-X-Gm-Gg: ASbGncvl8+gFIB3mpidBfkhZ7MRt2x3BszfLhaOQEKYii10yDihGzxRVnYy0BhBMZty
-	kQ6/2vJ+HXSoXqmAQRHaM5QLPbPLIlhD8crOWfnXzO80gd4Yes+4fO1GJwLrdPANxPOBpvGS4mc
-	Jgjpg8in5gW4xj5fPs5m3/CUQ2rugn214IhPS8qpYdctr9qVIoZYyrRUMBDuslTS6qNX0qTBeVc
-	TGEPMnFp189jNUf+eSy+HJEx79tBI74xEf6aFVgptWhdY8c+1D0RR5v4vl1JF//CB8=
-X-Google-Smtp-Source: AGHT+IHXojpr0g2zpaCikrNI5TGky5sZ/uuS4mK9GhNqhhJ15GoMTtHzMAKJAgUeWquuHkotZkNOYQ==
-X-Received: by 2002:a05:622a:1b92:b0:460:3a41:a9e5 with SMTP id d75a77b69052e-46e12bb2ec9mr85421851cf.13.1737411961505;
-        Mon, 20 Jan 2025 14:26:01 -0800 (PST)
-Received: from ise-alpha.. ([2620:0:e00:550a:642:1aff:fee8:511b])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-46e1030e4e8sm47075441cf.37.2025.01.20.14.25.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 Jan 2025 14:26:00 -0800 (PST)
-From: Chenyuan Yang <chenyuan0y@gmail.com>
-To: andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	u.kleine-koenig@baylibre.com,
-	paul@crapouillou.net
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	zijie98@gmail.com,
-	Chenyuan Yang <chenyuan0y@gmail.com>
-Subject: [PATCH] net: davicom: fix UAF in dm9000_drv_remove
-Date: Mon, 20 Jan 2025 16:25:57 -0600
-Message-Id: <20250120222557.833100-1-chenyuan0y@gmail.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1737412413; c=relaxed/simple;
+	bh=vfqlpWoacPY32KroqtEX+NEFPbmL4zQF705VOYAN29U=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=SgWLW7eETgQ9zKNfyI8KjWMOwMtWDsh/VuSdUT87l+d/Jlgq+gzO8CM4IGrcCCs2o2UazmkaF0gi0nssNRKz6vFpGjU+o65o3ztC6Y/rnB6iiuhyAIJ+tHo1lTvkm3egAs1qQpJvERTf9MwzZKLdRXU/+DrUSmzXgrY5Qw3cgMY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=buffet.re; spf=pass smtp.mailfrom=buffet.re; dkim=pass (2048-bit key) header.d=buffet.re header.i=@buffet.re header.b=HeyQrtGC; arc=none smtp.client-ip=51.83.41.69
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=buffet.re
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=buffet.re
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=buffet.re; s=mx1;
+	t=1737411995; bh=vfqlpWoacPY32KroqtEX+NEFPbmL4zQF705VOYAN29U=;
+	h=Date:From:Subject:To:Cc:References:In-Reply-To:From;
+	b=HeyQrtGCYnmSxatOh/soVgJUYs0kb4bNajbUUhbDpfcdMXZZ0R+l/GaoBa6cl0Een
+	 NnRs5v3zFahBqVEsnga+h5XFGvnHNQMfOhZzOxSKsvrTNvCL/Ix8cj3XlknbzIbYqu
+	 DG5sOG3np81gaKgIZBpYbLv0wBJXFtRXv7MG6dbWUsTeluA1QQYP9sC5CQfWteJXbH
+	 mZpsLy7ks1ChFoFxy7n9UREJ09U0sPYo8m3VJz8kGLCPKh93nFjYs+XteZunVYKWqo
+	 8idar4WLbLRyOst6eQSQITXm+n/nSPw47xhynxiCuyvSRR0VmvdGBzAsF6aGmOBtL8
+	 xX0tYBqUMB1MQ==
+Received: from [192.168.100.2] (unknown [10.0.1.3])
+	by mx1.buffet.re (Postfix) with ESMTPSA id 3D402125339;
+	Mon, 20 Jan 2025 23:26:35 +0100 (CET)
+Message-ID: <d77d347c-de99-42b4-a6f5-6982ed2d413f@buffet.re>
+Date: Mon, 20 Jan 2025 23:30:09 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+From: Matthieu Buffet <matthieu@buffet.re>
+Subject: Re: [PATCH v2 3/6] landlock: Add UDP sendmsg access control
+To: Mickael Salaun <mic@digikod.net>
+Cc: Gunther Noack <gnoack@google.com>,
+ Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>,
+ konstantin.meskhidze@huawei.com, Paul Moore <paul@paul-moore.com>,
+ linux-security-module@vger.kernel.org, netdev@vger.kernel.org,
+ netfilter-devel@vger.kernel.org, Pablo Neira Ayuso <pablo@netfilter.org>,
+ Jozsef Kadlecsik <kadlec@netfilter.org>
+References: <20241214184540.3835222-1-matthieu@buffet.re>
+ <20241214184540.3835222-4-matthieu@buffet.re>
+Content-Language: en-US
+In-Reply-To: <20241214184540.3835222-4-matthieu@buffet.re>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-dm is netdev private data and it cannot be
-used after free_netdev() call. Using adpt after free_netdev()
-can cause UAF bug. Fix it by moving free_netdev() at the end of the
-function.
+Hi,
 
-This is similar to the issue fixed in commit
-ad297cd2db8953e2202970e9504cab247b6c7cb4 ("net: qcom/emac: fix UAF in emac_remove").
+(for netfilter folks added a bit late: this should be self-contained but 
+original patch is here[1], it now raises a question about netfilter hook 
+execution context at the end of this email - you can just skip to it if 
+not interested in the LSM part)
 
-Fixes: cf9e60aa69ae ("net: davicom: Fix regulator not turned off on driver removal")
-Signed-off-by: Chenyuan Yang <chenyuan0y@gmail.com>
----
- drivers/net/ethernet/davicom/dm9000.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+On 12/14/2024 7:45 PM, Matthieu Buffet wrote:
+> Add support for a LANDLOCK_ACCESS_NET_SENDTO_UDP access right,
+> complementing the two previous LANDLOCK_ACCESS_NET_CONNECT_UDP and
+> LANDLOCK_ACCESS_NET_BIND_UDP.
+> It allows denying and delegating the right to sendto() datagrams with an
+> explicit destination address and port, without requiring to connect() the
+> socket first.
+> [...]
+> +static int hook_socket_sendmsg(struct socket *const sock,
+> +			       struct msghdr *const msg, const int size)
+> +{
+> +	const struct landlock_ruleset *const dom =
+> +		landlock_get_applicable_domain(landlock_get_current_domain(),
+> +					       any_net);
+> +	const struct sockaddr *address = (const struct sockaddr *)msg->msg_name;
+> +	const int addrlen = msg->msg_namelen;
+> +	__be16 port;
+> +     [...]
+> +	if (!sk_is_udp(sock->sk))
+> +		return 0;
+> +
+> +	/* Checks for minimal header length to safely read sa_family. */
+> +	if (addrlen < offsetofend(typeof(*address), sa_family))
+> +		return -EINVAL;
+> +
+> +	switch (address->sa_family) {
+> +	case AF_UNSPEC:
+> +		/*
+> +		 * Parsed as "no address" in udpv6_sendmsg(), which means
+> +		 * we fall back into the case checked earlier: policy was
+> +		 * enforced at connect() time, nothing to enforce here.
+> +		 */
+> +		if (sock->sk->sk_prot == &udpv6_prot)
+> +			return 0;
+> +		/* Parsed as "AF_INET" in udp_sendmsg() */
+> +		fallthrough;
+> +	case AF_INET:
+> +		if (addrlen < sizeof(struct sockaddr_in))
+> +			return -EINVAL;
+> +		port = ((struct sockaddr_in *)address)->sin_port;
+> +		break;
+> +
+> +#if IS_ENABLED(CONFIG_IPV6)
+> +	case AF_INET6:
+> +		if (addrlen < SIN6_LEN_RFC2133)
+> +			return -EINVAL;
+> +		port = ((struct sockaddr_in6 *)address)->sin6_port;
+> +		break;
+> +#endif /* IS_ENABLED(CONFIG_IPV6) */
+> +
+> +	default:
+> +		return -EAFNOSUPPORT;
+> +	}
+> +
+> +	return check_access_port(dom, LANDLOCK_ACCESS_NET_SENDTO_UDP, port);
+> +}
+> +
+>   static struct security_hook_list landlock_hooks[] __ro_after_init = {
+>   	LSM_HOOK_INIT(socket_bind, hook_socket_bind),
+>   	LSM_HOOK_INIT(socket_connect, hook_socket_connect),
+> +	LSM_HOOK_INIT(socket_sendmsg, hook_socket_sendmsg),
+>   };
 
-diff --git a/drivers/net/ethernet/davicom/dm9000.c b/drivers/net/ethernet/davicom/dm9000.c
-index 8735e333034c..b87eaf0c250c 100644
---- a/drivers/net/ethernet/davicom/dm9000.c
-+++ b/drivers/net/ethernet/davicom/dm9000.c
-@@ -1777,10 +1777,11 @@ static void dm9000_drv_remove(struct platform_device *pdev)
- 
- 	unregister_netdev(ndev);
- 	dm9000_release_board(pdev, dm);
--	free_netdev(ndev);		/* free device structure */
- 	if (dm->power_supply)
- 		regulator_disable(dm->power_supply);
- 
-+	free_netdev(ndev);		/* free device structure */
-+
- 	dev_dbg(&pdev->dev, "released and freed device\n");
- }
- 
--- 
-2.34.1
+Looking back at this part of the patch to fix the stupid #ifdef, I 
+noticed sk->sk_prot can change under our feet, just like sk->sk_family 
+as highlighted by Mikhail in [2] due to setsockopt(IPV6_ADDRFORM).
+Replacing the check with READ_ONCE(sock->sk->sk_family) == AF_INET6 or 
+even taking the socket's lock would not change anything:
+setsockopt(IPV6_ADDRFORM) runs concurrently and locklessly.
 
+So with this patch, any Landlock domain with rights to connect(port A) 
+and no port allowed to be set explicitly in sendto() could actually 
+sendto(arbitrary port B) :
+1. create an IPv6 UDP socket
+2. connect it to (any IPv4-mapped-IPv6 like ::ffff:127.0.0.1, port A)
+3a. sendmsg(AF_UNSPEC + actual IPv4 target, port B)
+3b. race setsockopt(IPV6_ADDRFORM) on another thread
+4. retry from 1. until sendmsg() succeeds
+
+I've put together a quick PoC, the race works. SELinux does not have 
+this problem because it uses a netfilter hook, later down the packet 
+path. I see three "fixes", I probably missed some others:
+
+A: block IPV6_ADDRFORM support in a setsockopt() hook, if UDP_SENDMSG is 
+handled. AFAIU, not an option since this breaks a userland API
+
+B: remove sendmsg(AF_UNSPEC) support on IPv6 sockets. Same problem as A
+
+C: use a netfilter NF_INET_LOCAL_OUT hook like selinux_ip_output() 
+instead of an LSM hook
+
+For C, problem is to get the sender process' credentials, and ideally to 
+avoid tagging sockets (what SELinux uses to fetch its security context, 
+also why it does not have this problem). Otherwise, we would add another 
+case of varying semantics (like rights to truncate/ioctl) to keep in 
+mind for Landlock users, this time with sockets kept after enforcing a 
+new ruleset, or passed to/from another domain - not a fan.
+
+I don't know if it is safe to assume for UDP that NF_INET_LOCAL_OUT 
+executes in process context: [3] doesn't specify, and [4] mentions the 
+possibility to execute in interrupt context due to e.g. retransmits, but 
+that does not apply to UDP. Looking at the code, it looks like it has to 
+run in process context to be able to make the syscall return EPERM if 
+the verdict is NF_DROP, but I don't know if that's something that can be 
+relied upon to be always true, including in future revisions. Could use 
+some input from someone knowledgeable in netfilter.
+
+What do you think?
+
+[1] https://lore.kernel.org/all/20241214184540.3835222-1-matthieu@buffet.re/
+[2] https://lore.kernel.org/netdev/20241212.zoh7Eezee9ka@digikod.net/T/
+[3] 
+https://www.netfilter.org/documentation/HOWTO/netfilter-hacking-HOWTO-4.html#ss4.6
+[4] 
+https://netfilter-devel.vger.kernel.narkive.com/yZHiFEVh/execution-context-in-netfilter-hooks#post5
 
