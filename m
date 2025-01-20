@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-159729-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159730-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9385DA16A7B
-	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 11:10:22 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41FECA16A88
+	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 11:14:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CE4B8160A6E
-	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 10:10:20 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 533EC7A6154
+	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 10:10:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D522C1B423D;
-	Mon, 20 Jan 2025 10:10:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9683A1B87EB;
+	Mon, 20 Jan 2025 10:10:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ndkng54a"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NftyrO2C"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAE9D1B4232;
-	Mon, 20 Jan 2025 10:10:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A86D1B87D7;
+	Mon, 20 Jan 2025 10:10:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737367805; cv=none; b=OHnritIpi4CEvy2YQKuLlz2Bd90YgI/GnY2A3kPj5Rp8Nuah3eaHPhObvyGg6Pgu+69Y1XP51EERaPfyJG8B8KHEtN8/xl9lB59T/KQAsnHKH0N7CIQ1z0fyQTuRjMZ+slxpegGgNlyZs8DxfBHUuS/SI1ZSHJVQ87Xuwer80Lg=
+	t=1737367808; cv=none; b=aUF8fqDjt44/BBOY4diVL51QF7EPwSG//H/6KX7RVEipgIZCbO9P+/dZeiQ+wLZ5/TlVdRQOpOcJURx6uYj/FGrIOuEO7tKxaTWoMnOiL10SE4tpZLOe5WIYesCVCoU4/1dryUdDgnv/mYkMadTUQXdT6WAyy2OI+yjUz/eHjmQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737367805; c=relaxed/simple;
-	bh=5kVUEYGd1O3X+LS0/N3Nv0ai5flB4MmsxqkP1YSXZiQ=;
+	s=arc-20240116; t=1737367808; c=relaxed/simple;
+	bh=TPFCKAMe3gVNj10ZQthjkDGlKTZCDMkVH1ZwfKjjTvI=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=SULck1aM4TLRktKWMjvMcGOBfPYSMSch/vz+TOEcQrOe7ndt/7sKPyex6yzdwu7KDq56yjXMRt4jrIXnXhkIRM/xM3ir9fPxk4Dl8DBiPDsBgALoA5wgX/fg7JMe1tQnHH0jMxbFnv6fBn+DyTD/GyfbFNSZg5wq+lXJy6EBzyc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ndkng54a; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 09E70C4CEDD;
-	Mon, 20 Jan 2025 10:10:05 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=swoLtOs+C/4hJhwTmzF+EmlEZ6hEUI+mY2Vqb5Yb5eLt7Xf7OhXt6U03qUM01e70He15HHFapeD6tHOPIyln7gnuM9cr5d66rbyZgmelqxJ/KHxioVvsf8MKO2F7BvvR6/6Gm/TAb2kSLaNbQjjDAV/OSfUhoZfL+ZzVHk8DsTo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NftyrO2C; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C2A38C4CEDD;
+	Mon, 20 Jan 2025 10:10:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737367805;
-	bh=5kVUEYGd1O3X+LS0/N3Nv0ai5flB4MmsxqkP1YSXZiQ=;
+	s=k20201202; t=1737367807;
+	bh=TPFCKAMe3gVNj10ZQthjkDGlKTZCDMkVH1ZwfKjjTvI=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Ndkng54aMZN4gqZhKEtFuzLJjwENjULMPLb9Bn1rjAU2/d3pyi3Yilxmn9msTWpd1
-	 L27aMUASzmeugGBr+f2RWyKDJ3FXiY0aZvxcDIW/+6VTXjAyuagx/FwJXxUatB5U6v
-	 c4NHmg91aUpSIJDQWQYh/GBecnk7YGbD7yK8md5kyqRryDQ3YxzNznJiAOyylO+1iQ
-	 h8zqSBu4aVnBCLJq4BcwZvFsiu7kEyldLpY589nq2JDD/VUsheQ4oGXuI/+cqINmrl
-	 oyNnKFKuVtYT3XDOcIwwZdKFsPkdJRtJTXdZM9NSONaXAcslyH5vhMhjrs/w/X1rm7
-	 Dy17/sx6IjKGQ==
+	b=NftyrO2CkU9WCQTMMx7//gTkD4IWTrx+a0EdLeU8lleJ9Yws489KvX+4HpSCbpcK0
+	 hwXrtKT7XyO3GFjBqP5tnA7/zcUVRu3p4B3o8P/P2P0NRA2m6HtBTvDFIf5ULBv9ft
+	 N6lSShObGaIzwWKJtzXlu9cxYtBdu1gSu+tI2ZDpawvkhAR4i0huMKmJh4XT0ZiE1n
+	 Eb1LTpQBAAAcTDjbfYhNiIUyAN4FFJJndfRGsXzItSdw95sBk5jCi7BobmiYUPnwg0
+	 AmjxbWuaz+Y9riHWRe6cCWf0IZ6dbkDNcm/B1WCpQ6xJs6EWe0c8SXspUHhLFHcDC2
+	 TEKx5g9/FpkYg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33A84380AA62;
-	Mon, 20 Jan 2025 10:10:30 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EACFA380AA62;
+	Mon, 20 Jan 2025 10:10:32 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,43 +52,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2] net: ethernet: ti: am65-cpsw: fix freeing IRQ in
- am65_cpsw_nuss_remove_tx_chns()
+Subject: Re: [PATCH net-next v3] net: appletalk: Drop aarp_send_probe_phase1()
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <173736782902.3476879.17872430916654869095.git-patchwork-notify@kernel.org>
-Date: Mon, 20 Jan 2025 10:10:29 +0000
-References: <20250116-am65-cpsw-fix-tx-irq-free-v2-1-ada49409a45f@kernel.org>
-In-Reply-To: <20250116-am65-cpsw-fix-tx-irq-free-v2-1-ada49409a45f@kernel.org>
-To: Roger Quadros <rogerq@kernel.org>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, grygorii.strashko@ti.com,
- s-vadapalli@ti.com, srk@ti.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, horms@kernel.org
+ <173736783173.3476879.5069911593463162072.git-patchwork-notify@kernel.org>
+Date: Mon, 20 Jan 2025 10:10:31 +0000
+References: <tencent_27DFF9F35BFBF50F6EE024ED508FA8F5FA06@qq.com>
+In-Reply-To: <tencent_27DFF9F35BFBF50F6EE024ED508FA8F5FA06@qq.com>
+To: XIE Zhibang <Yeking@red54.com>
+Cc: kuba@kernel.org, Yeking@Red54.com, arnd@arndb.de, davem@davemloft.net,
+ edumazet@google.com, gregkh@linuxfoundation.org, horms@kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com,
+ prarit@redhat.com, vkuznets@redhat.com
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This patch was applied to netdev/net-next.git (main)
 by David S. Miller <davem@davemloft.net>:
 
-On Thu, 16 Jan 2025 15:54:49 +0200 you wrote:
-> When getting the IRQ we use k3_udma_glue_tx_get_irq() which returns
-> negative error value on error. So not NULL check is not sufficient
-> to deteremine if IRQ is valid. Check that IRQ is greater then zero
-> to ensure it is valid.
+On Fri, 17 Jan 2025 01:41:40 +0000 you wrote:
+> From: 谢致邦 (XIE Zhibang) <Yeking@Red54.com>
 > 
-> There is no issue at probe time but at runtime user can invoke
-> .set_channels which results in the following call chain.
-> am65_cpsw_set_channels()
->  am65_cpsw_nuss_update_tx_rx_chns()
->   am65_cpsw_nuss_remove_tx_chns()
->   am65_cpsw_nuss_init_tx_chns()
+> aarp_send_probe_phase1() used to work by calling ndo_do_ioctl of
+> appletalk drivers ltpc or cops, but these two drivers have been removed
+> since the following commits:
+> commit 03dcb90dbf62 ("net: appletalk: remove Apple/Farallon LocalTalk PC
+> support")
+> commit 00f3696f7555 ("net: appletalk: remove cops support")
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,v2] net: ethernet: ti: am65-cpsw: fix freeing IRQ in am65_cpsw_nuss_remove_tx_chns()
-    https://git.kernel.org/netdev/net/c/4395a44acb15
+  - [net-next,v3] net: appletalk: Drop aarp_send_probe_phase1()
+    https://git.kernel.org/netdev/net-next/c/45bd1c5ba758
 
 You are awesome, thank you!
 -- 
