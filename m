@@ -1,84 +1,84 @@
-Return-Path: <netdev+bounces-159732-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159733-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96E0AA16AA5
-	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 11:20:20 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id CFB6EA16AAD
+	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 11:24:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B7C7616529D
-	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 10:20:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B345C1885107
+	for <lists+netdev@lfdr.de>; Mon, 20 Jan 2025 10:24:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAA7E1ABEDF;
-	Mon, 20 Jan 2025 10:20:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 378231B218A;
+	Mon, 20 Jan 2025 10:24:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MUJxKxh1"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VpWDvaoY"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBDFD18FDC8
-	for <netdev@vger.kernel.org>; Mon, 20 Jan 2025 10:20:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A68F1AF0C2
+	for <netdev@vger.kernel.org>; Mon, 20 Jan 2025 10:24:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737368416; cv=none; b=CRb2ymRG+s5t4Zm8yem9xdfhs8PYGABpEo4IahQpM11AKJa6HSx1NMKWijBu9Zjcd65LPp6XHyQ423/egK/+Yx2tmpiAlNELJ8HmOEemYLG5B1CMHa+9uT3zt6ilqqWLGiJnI/8+KriKGr1w4HtXo+KVrGIWa7/OZG4rbIrvKNQ=
+	t=1737368681; cv=none; b=Amm53SAmE0mIXrWhB7+y2IK4zF7jBu05RQwwzTRP7VZlmNFAPxm6/1ndr/iIApUM8E8TBkCslNt2OpJJnmQoUYS21WHKDeN7BdA1mvstmWmaHuRCSzYdJv/qmTJciiswH747gpPgc7vRZQeqLyT77HmHBG2crNyqOETJfmN3XwI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737368416; c=relaxed/simple;
-	bh=fxS5aIr95xtbbKhwoCve2o0SVM9sdynxpUwKr+VTQLE=;
+	s=arc-20240116; t=1737368681; c=relaxed/simple;
+	bh=yf6HR12vgiphx26xpnRwI/ZSbZ1Lhr+S2Vo9TB07VpI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jgZQwBFWubt8mQcpqIFCj85HQqbDTOsR5UGpPeKBO9yn3V2ZHOggy49YzboVmJ4QjYv/YXX1Cm5JLOQsnRIxhfcaivTnGrakWP09QVlL4bXWi+6ykCCKP20+ImAQwsoN3zX2fobvBGJ0EBhmBOReJlEa7NrFZWBUvb/RzrxNaZ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MUJxKxh1; arc=none smtp.client-ip=170.10.133.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=N2VXu1ZZ7fHjhdAcKlDiaLI2JCkhXukaXCaEKe59On39NYuCcxupK/95wjncLgq/qXlvso/2DwpQKKY2YGTGmbcrvGmPTfugaLVI8lFlWaHDtY+PGEaQRu3sL/+25epB4DoXDhzEA3CCurCOg4SI9gs7FuR7YV31T5i1wR+bb0k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VpWDvaoY; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1737368413;
+	s=mimecast20190719; t=1737368677;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=4T6CB9eqvuQZLLOI1dcrYLKVrCbNDCw2kfSU6+r9xo4=;
-	b=MUJxKxh1QqCy2gSD/VRvvlvfBsH0U+rLjnhWqXXvLKRPiKqbTSwfetHHCFH9JGtieeu/Tj
-	dz8P6rPcNfESss52vTVgb8VAFzwf9P2gEGSJCsc25Bqrh5+mO4Lj/Fdjo6uNafrOvQdCBl
-	QkOM0RHsy2xWHeu5z+OtvoMgqzC57OY=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=LW0AIg+ZzVE0PO3mnBxk2BL4NaV9etOallTabibSD5U=;
+	b=VpWDvaoYpYj6d8XYFffrBqmGtFXYnnTQl08+zgByR2y8GlP+clCdPjFB9WXJaqtDo0CxIA
+	AnSf8F3sp4k5gPVvo9outshT28vwBOtF446zWuaTfFQ0i2DvzrxPyj477TF3+Iil444JAa
+	FaacG+CuVgZzMUr39TXHEf6Lut/qwP0=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-6-L8E3RGIhM-KS3maqZpZxrw-1; Mon, 20 Jan 2025 05:20:11 -0500
-X-MC-Unique: L8E3RGIhM-KS3maqZpZxrw-1
-X-Mimecast-MFC-AGG-ID: L8E3RGIhM-KS3maqZpZxrw
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3862e986d17so1781668f8f.3
-        for <netdev@vger.kernel.org>; Mon, 20 Jan 2025 02:20:11 -0800 (PST)
+ us-mta-645-LODsI45ANXS1f0H9EKR6Sg-1; Mon, 20 Jan 2025 05:24:36 -0500
+X-MC-Unique: LODsI45ANXS1f0H9EKR6Sg-1
+X-Mimecast-MFC-AGG-ID: LODsI45ANXS1f0H9EKR6Sg
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4361ac8b25fso22808045e9.2
+        for <netdev@vger.kernel.org>; Mon, 20 Jan 2025 02:24:36 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737368410; x=1737973210;
+        d=1e100.net; s=20230601; t=1737368675; x=1737973475;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=4T6CB9eqvuQZLLOI1dcrYLKVrCbNDCw2kfSU6+r9xo4=;
-        b=v/vT+xUPfv7Zn4+SiUcyXnbcETiXNGy1vzGZDMhnPPQ/32GEfmejchxHngtT4Aw06E
-         sK7/nZYM6SiBoo9B1FHIi0vJW3n9fq379wOTBNDn5Wdh9FSpQCEDTysNUDUpmdiOhueB
-         i/t7UMMZ+caqnid/PozbX7/kFlADbk3COpOV4ndzUCDwVUlOZ4thbUArptLvdroUVhHM
-         zQYfqHbWztBUeHPNDznHxRCSR8fJYHehqYpSLPEtBRYNX8ZWG0jAbrtkKTxuJTsxJmFG
-         bO4ArqX/tcdISxDnkVajuK7WcUg1uqmHVQG5zaSNGhQDw8O8q1wWJiJGpg8g6NYPElbU
-         sykQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVTJfYiC892rajgcN1K95RlMeAPh090HxAbPFNLnAv6hRyg/m7InDIqKjQ1HtgDCD8bsVx4JyM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzvwnWTdmktmYDoR15kBxMKOKi0SN54jI552C2QxwYSTKFhuxem
-	gnRtgjtwmbHPreXSXsw0wNvramat1xysWmYUnYLz2kxs/oYZhJ+uhPfe/l8qGuSzVnQ/VSvP1zY
-	e4LDO4vgvNYqfYuRrKeilMTsXssassE5E88aZTmYC41fYA72EA88RGw==
-X-Gm-Gg: ASbGncsBRl1z95YdzzNTkSG3GwuQ0JntT72Iy0m6Uhj195wU92O2Fg73kgNLOd2uMTy
-	kjxm1QkX5DobvvdFxvl30Yzt6CPoevDw9n9HezCXi+PnqhJChejEqRG4hiDYn37cJlaYazX4XrC
-	xjfp9h2JRZ7jcZJn5mYGloonJuiaVHVeoQ5a6O36XqrkhMNuL+MX3YXFktcZKZ6n0zvDYlnVZI9
-	vgSd85mTi/5Y/PZ/SNWdocC5H5SoBLEXxwKHrbKiWtcGaE5JN6RmK0xG+iT3F1AOraF/8n3NDcZ
-	aklA8RcnuvIu3MFzv8aYAg//4YaKzLWxDPWVSzxqALGepA==
-X-Received: by 2002:a05:6000:144d:b0:385:e01b:7df5 with SMTP id ffacd0b85a97d-38bf565c2d0mr13369709f8f.14.1737368409868;
-        Mon, 20 Jan 2025 02:20:09 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGaooM+V+2Rdh1iiydqA0iPhei7em7s/ST+KIlTQEVgs+9Vb2sYoT+qXfBJ82sKOevYjCiO6w==
-X-Received: by 2002:a05:6000:144d:b0:385:e01b:7df5 with SMTP id ffacd0b85a97d-38bf565c2d0mr13369663f8f.14.1737368409217;
-        Mon, 20 Jan 2025 02:20:09 -0800 (PST)
+        bh=LW0AIg+ZzVE0PO3mnBxk2BL4NaV9etOallTabibSD5U=;
+        b=BrRc8lEyvQbGnyhkqOuxySS3e63FgGyTe9wxIWr2vq/2uYn3ySQxBIqD8LtSfcBJKd
+         RpMVcttFM2n6r2g/yD5xnTn9OAd2kyHdxB0z68ZLuTP3z6PUGGqo9KgBJeIa1gOoq95d
+         Vv83fg3xzCdNwv0eXKg0ixJ5TQ43ZN5R4QKF45Mr/FZ/L60CeTcbNf/JGaDf1YTk1glJ
+         MviRS+Ks4hZCY0xKrOvm5vNKCLAzEzWudZnQ/jdYnYZuGNwXbzXLKngqS/FFbnd0iE8S
+         iu4HiaFLOaKi4GpI18TrRVJ+zgNpR+dZogWuEuLwRxycFLDJvTRfne0aw1K/btGDkQM6
+         DKsw==
+X-Forwarded-Encrypted: i=1; AJvYcCUFYI1m4CSvSH+nc7rRLlSQM96Qdl7MuvTSh7w5noKk7ZHSoxpkMt1vdICbAveXl4rTa08Wq7g=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwLrN7bPRIkBlwoyRkXY4c9kcKKLYfJGneolZ9kioQWaG+4Tiqe
+	g3Pt2jpQEVBFc7yFk3aPlyhHCkpiQo8UJd8WtVbv0DNvgu3m1BjuTIpN5Ou76+xBB6LtRcqYYAB
+	ZQm+cgUlwXSQ1FpxuZvrBomFWOxNCrrEXde8jwTlnJ/1uoIQYiHuHiQ==
+X-Gm-Gg: ASbGncsCXzxagsyJ1xa03S7XbH+KjhMcMn0HvrMCTOkFGEF3P3M1psTlVMyp5CPf7qH
+	Lx2EEnuUK3O7ms5t1ucM8yWkqvHr82zHAvyltFHk1JlkACEjAoAcW1udXwS8CyyZ+aQXfp+DiJk
+	gYu+ODzGzHX3T3BvOpf8kO0h+xwRK+KhPt8A+OiprTyRspgH0i/ZP7wXgcvmenimRIXYcPoWmpA
+	lvx0pawI/xFn2efCdN6TO4c3CT6oV90j3tHuY9izf3BwEhL0SpfOgx8djpFvbTJSajC0u1Wzdzl
+	zDDAoM5PKN07YC2cjjIGOqaQE1s+ys10xaufaZhk9dMvIw==
+X-Received: by 2002:a05:600c:3b0f:b0:434:ffe3:bc7d with SMTP id 5b1f17b1804b1-438913f01a1mr128704515e9.16.1737368675030;
+        Mon, 20 Jan 2025 02:24:35 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFrE1oo70JL1hLkDSzofUD4xLsZ+nRy+bJufSIh/J5HvGrSXyY5lVRiPHjCxgOMZONscT3QZw==
+X-Received: by 2002:a05:600c:3b0f:b0:434:ffe3:bc7d with SMTP id 5b1f17b1804b1-438913f01a1mr128703855e9.16.1737368674313;
+        Mon, 20 Jan 2025 02:24:34 -0800 (PST)
 Received: from sgarzare-redhat (host-82-53-134-100.retail.telecomitalia.it. [82.53.134.100])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38bf3275622sm10117770f8f.69.2025.01.20.02.20.08
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4389046bab0sm131160305e9.38.2025.01.20.02.24.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 Jan 2025 02:20:08 -0800 (PST)
-Date: Mon, 20 Jan 2025 11:20:05 +0100
+        Mon, 20 Jan 2025 02:24:33 -0800 (PST)
+Date: Mon, 20 Jan 2025 11:24:30 +0100
 From: Stefano Garzarella <sgarzare@redhat.com>
 To: Michal Luczaj <mhal@rbox.co>
 Cc: "David S. Miller" <davem@davemloft.net>, 
@@ -86,11 +86,10 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
 	George Zhang <georgezhang@vmware.com>, Dmitry Torokhov <dtor@vmware.com>, Andy King <acking@vmware.com>, 
 	netdev@vger.kernel.org
-Subject: Re: [PATCH net 4/5] vsock/test: Add test for UAF due to socket
- unbinding
-Message-ID: <34yqhvkemx27yoxwodfjdc7rwvuyr6sq2e2nlpyfhzvyscvccq@du25v6ljrebj>
+Subject: Re: [PATCH net 5/5] vsock/test: Add test for connect() retries
+Message-ID: <pyun3hl67vjel7gc7k67nvelx5bmgw664gvkzauqqv6nkkt5sc@x6hzsedofchl>
 References: <20250117-vsock-transport-vs-autobind-v1-0-c802c803762d@rbox.co>
- <20250117-vsock-transport-vs-autobind-v1-4-c802c803762d@rbox.co>
+ <20250117-vsock-transport-vs-autobind-v1-5-c802c803762d@rbox.co>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -99,65 +98,36 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <20250117-vsock-transport-vs-autobind-v1-4-c802c803762d@rbox.co>
+In-Reply-To: <20250117-vsock-transport-vs-autobind-v1-5-c802c803762d@rbox.co>
 
-On Fri, Jan 17, 2025 at 10:59:44PM +0100, Michal Luczaj wrote:
->Fail the autobind, then trigger a transport reassign. Socket might get
->unbound from unbound_sockets, which then leads to a reference count
->underflow.
+On Fri, Jan 17, 2025 at 10:59:45PM +0100, Michal Luczaj wrote:
+>Deliberately fail a connect() attempt; expect error. Then verify that
+>subsequent attempt (using the same socket) can still succeed, rather than
+>fail outright.
 >
 >Signed-off-by: Michal Luczaj <mhal@rbox.co>
 >---
-> tools/testing/vsock/vsock_test.c | 67 ++++++++++++++++++++++++++++++++++++++++
-> 1 file changed, 67 insertions(+)
+> tools/testing/vsock/vsock_test.c | 52 ++++++++++++++++++++++++++++++++++++++++
+> 1 file changed, 52 insertions(+)
 >
 >diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
->index 28a5083bbfd600cf84a1a85cec2f272ce6912dd3..7f1916e23858b5ba407c34742a05b7bd6cfdcc10 100644
+>index 7f1916e23858b5ba407c34742a05b7bd6cfdcc10..712650f993e9df68ceb68ae02334c2775be09c7c 100644
 >--- a/tools/testing/vsock/vsock_test.c
 >+++ b/tools/testing/vsock/vsock_test.c
->@@ -1458,6 +1458,68 @@ static void test_stream_cred_upd_on_set_rcvlowat(const struct test_opts *opts)
-> 	test_stream_credit_update_test(opts, false);
+>@@ -1520,6 +1520,53 @@ static void test_seqpacket_transport_uaf_server(const struct test_opts *opts)
+> 	control_expectln("DONE");
 > }
 >
->+#define MAX_PORT_RETRIES	24	/* net/vmw_vsock/af_vsock.c */
->+#define VMADDR_CID_NONEXISTING	42
-
-I would suggest a slightly bigger and weirder CID, this might actually
-exist, (e.g. 4242424242)
-
-
->+
->+/* Test attempts to trigger a transport release for an unbound socket. This can
->+ * lead to a reference count mishandling.
->+ */
->+static void test_seqpacket_transport_uaf_client(const struct test_opts *opts)
+>+static void test_stream_connect_retry_client(const struct test_opts *opts)
 >+{
->+	int sockets[MAX_PORT_RETRIES];
->+	struct sockaddr_vm addr;
->+	int s, i, alen;
+>+	struct sockaddr_vm addr = {
+>+		.svm_family = AF_VSOCK,
+>+		.svm_cid = opts->peer_cid,
+>+		.svm_port = opts->peer_port
+>+	};
+>+	int s, alen = sizeof(addr);
 >+
->+	s = vsock_bind(VMADDR_CID_LOCAL, VMADDR_PORT_ANY, SOCK_SEQPACKET);
-
-In my suite this test failed because I have instances where I run it
-without vsock_loopback loaded.
-
-26 - connectible transport release use-after-free...bind: Cannot assign requested address
-
-Is it important to use VMADDR_CID_LOCAL or can we use VMADDR_CID_ANY?
-
->+
->+	alen = sizeof(addr);
->+	if (getsockname(s, (struct sockaddr *)&addr, &alen)) {
->+		perror("getsockname");
->+		exit(EXIT_FAILURE);
->+	}
->+
->+	for (i = 0; i < MAX_PORT_RETRIES; ++i)
->+		sockets[i] = vsock_bind(VMADDR_CID_ANY, ++addr.svm_port,
->+					SOCK_SEQPACKET);
->+
->+	close(s);
->+	s = socket(AF_VSOCK, SOCK_SEQPACKET, 0);
+>+	s = socket(AF_VSOCK, SOCK_STREAM, 0);
 >+	if (s < 0) {
 >+		perror("socket");
 >+		exit(EXIT_FAILURE);
@@ -167,63 +137,61 @@ Is it important to use VMADDR_CID_LOCAL or can we use VMADDR_CID_ANY?
 >+		fprintf(stderr, "Unexpected connect() #1 success\n");
 >+		exit(EXIT_FAILURE);
 >+	}
->+	/* connect() #1 failed: transport set, sk in unbound list. */
 >+
->+	addr.svm_cid = VMADDR_CID_NONEXISTING;
->+	if (!connect(s, (struct sockaddr *)&addr, alen)) {
->+		fprintf(stderr, "Unexpected connect() #2 success\n");
+>+	control_writeln("LISTEN");
+>+	control_expectln("LISTENING");
+>+
+>+	if (connect(s, (struct sockaddr *)&addr, alen)) {
+>+		perror("connect() #2");
 >+		exit(EXIT_FAILURE);
 >+	}
->+	/* connect() #2 failed: transport unset, sk ref dropped? */
->+
->+	addr.svm_cid = VMADDR_CID_LOCAL;
 
-Ditto.
-
->+	addr.svm_port = VMADDR_PORT_ANY;
->+
->+	/* Vulnerable system may crash now. */
->+	bind(s, (struct sockaddr *)&addr, alen);
-
-Should we check the return of this function or do we not care whether
-it fails or not?
+What about using the timeout_begin()/timeout_end() we used in all other
+places?
 
 >+
 >+	close(s);
->+	while (i--)
->+		close(sockets[i]);
->+
->+	control_writeln("DONE");
 >+}
 >+
->+static void test_seqpacket_transport_uaf_server(const struct test_opts *opts)
+>+static void test_stream_connect_retry_server(const struct test_opts *opts)
 >+{
->+	control_expectln("DONE");
+>+	int fd;
+>+
+>+	control_expectln("LISTEN");
+>+
+>+	fd = vsock_stream_accept(VMADDR_CID_ANY, opts->peer_port, NULL);
+>+	if (fd < 0) {
+>+		perror("accept");
+>+		exit(EXIT_FAILURE);
+>+	}
+>+
+>+	vsock_wait_remote_close(fd);
+>+	close(fd);
 >+}
 >+
 > static struct test_case test_cases[] = {
 > 	{
 > 		.name = "SOCK_STREAM connection reset",
->@@ -1588,6 +1650,11 @@ static struct test_case test_cases[] = {
-> 		.run_client = test_seqpacket_unsent_bytes_client,
-> 		.run_server = test_seqpacket_unsent_bytes_server,
+>@@ -1655,6 +1702,11 @@ static struct test_case test_cases[] = {
+> 		.run_client = test_seqpacket_transport_uaf_client,
+> 		.run_server = test_seqpacket_transport_uaf_server,
 > 	},
 >+	{
->+		.name = "connectible transport release use-after-free",
+>+		.name = "connectible retry failed connect()",
 
-If it doesn't matter that it is SOCK_STREAM or SOCK_SEQPACKET, I would
-rather test SOCK_STREAM because it is more common.
+"SOCK_STREAM retry failed connect()"
 
-Anyway, here I would specify which of the two we are testing for
-accordance.
+(and if you want add a comment on top of the test the in the current
+implementation the same path is shared with other connectible socket
+like SOCK_SEQPACKET)
 
-"SOCK_STREAM transport release use-after-free".
+The rest LGTM.
 
-Tanks for adding this test!
+Thanks,
 Stefano
 
->+		.run_client = test_seqpacket_transport_uaf_client,
->+		.run_server = test_seqpacket_transport_uaf_server,
+>+		.run_client = test_stream_connect_retry_client,
+>+		.run_server = test_stream_connect_retry_server,
 >+	},
 > 	{},
 > };
