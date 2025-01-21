@@ -1,145 +1,129 @@
-Return-Path: <netdev+bounces-159982-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159983-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B94B9A179A2
-	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 09:55:47 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD5EEA179D5
+	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 10:09:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 945C37A20B9
-	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 08:55:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6C3361885BFD
+	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 09:09:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 003631B87CF;
-	Tue, 21 Jan 2025 08:55:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 119321BC07A;
+	Tue, 21 Jan 2025 09:09:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bZJCQnL0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="exg9+V3q"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FEDD1B87C2;
-	Tue, 21 Jan 2025 08:55:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBABC2CAB;
+	Tue, 21 Jan 2025 09:09:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737449740; cv=none; b=fXeCtalgr5CBQvobHsG4wbx+i8soPPj9hmAixY4gYcoAdyxcOExuojSTmLp6Fps17GY1tlZ/sDNGQetgWDzuuPuuNA4FwvqclC6dhSrsCdsJlatmUoY5w7GWS+RZUbJ91mAdPHwGubMusiwnNRyhsFvU7Lph1CFI0sGRZYrTgG0=
+	t=1737450555; cv=none; b=TF8uxngtt8LrKKhXfucXYdbg/StHXsuNjAKK3/Z5bzbevLsayY7lQ2VStB6m7dWCv9NrMJRIKF84EqQe1eyYI/pLAIcWDOIsIkaXT8uyJzXnWBtTwSYn1nAeGUUCRYvD8zJiuMgbwrWGgeAWxcP0X7SCMm5OgRu3bUXM2IRXEiw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737449740; c=relaxed/simple;
-	bh=BDKAnm03nCMql0XP9TjPeUam+/QucEI7RrkaEzsRqWo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Mgk7829hUF7xp0K35v1NnckKLV3VyjEKk2GclF90knfZuZ9a42po0SdITEUMuw/4pkZY6yWzMJgC++PPcJh32AIbEmnR+fj5qm5v3Y7+wcx8sdpoByuI95PxxEaZohKvCjBwbVJGkd36OYorSwehsD1E0EUqeAfwS+BHyuPMiNM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bZJCQnL0; arc=none smtp.client-ip=209.85.214.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-21661be2c2dso93867035ad.1;
-        Tue, 21 Jan 2025 00:55:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1737449738; x=1738054538; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=oa3MLh2GJnYf0RVvrJfYwNk4uvzIu7QZ3Q7ItLlQHkQ=;
-        b=bZJCQnL09gSkxQOdi7ghraUKMQT9/eIopHVn45aZR+HWh86J83e5Y4IKVtzsXjESHU
-         TR+FpJrgC58fMmuROlWg7hW/xcCVrsPhEZguBySW2Zr12g1A+rgonB8o49CN8peDJKKn
-         t5OBkGoxaLcqWkMiBwgKxp3peHf5KRB/lbPmYIZZeWvJ0nSJvDTcEp3dpb29nnGDrr00
-         8RJw7VXWNMQVvmM2314LvhgevOBFk3/iuWZd5YMtrkTRYb1QMH/oF+2sc9DilwnW0qRh
-         DOyzyteVY/mBiO8LcI2GxqntAzF90BGHaEToC952rxstZt2RXmoAJX9Cc1Lg0AVtoUnb
-         n24A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737449738; x=1738054538;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=oa3MLh2GJnYf0RVvrJfYwNk4uvzIu7QZ3Q7ItLlQHkQ=;
-        b=O7VoZIN0MBA5BMbHtSIOCcysLM8OTSuYV33UdkGpzNu++q5exH1xWb+qGl5vhA5/fC
-         0HdHCddrAEaLaaLJo8WGt6PdMZLerWNTJVoIZ5I4yVHuvI8Goy7PYEuDDVi5mMAmYbNQ
-         XPhETvFKlELjBc0BYDluvpVzaYP/bIVA5gQ8gQRjpezX5zOrHQebeo0M6tiMnEyqeC3O
-         P/xdxBHZb9HLN/kSqUm1SmyQeObkVfIUoMBGSNpjr4eLo8JS04wpwE1YxcPMf6dkJcHM
-         c38RMkAfkW8h0Qyfj+HYGwMRWRO7uglJCz1VWN95jd+DnhnpR2+5GWf86/NZYcmON6h/
-         Mmzg==
-X-Forwarded-Encrypted: i=1; AJvYcCUGIJAOnqjBuUVLLkaWCAlNF6UX3sMpIXeAGsYWUs1QlxyubM0Y1IwsR1usrFqP1pu0XJOKfX8L5vzq0DM=@vger.kernel.org, AJvYcCWx0fTvLN3lzUZQGD/Etuk29pwikCrq5/ZyZz1V9m1lCCG7CKOwIE67SpoaYotrJ0sLxgR2THyEXPzqmP90Nbxb@vger.kernel.org
-X-Gm-Message-State: AOJu0YyuZOmNkMac60nFdBOmOWVr5gfULJw9c4HMkNqiu77bH+l+J+ti
-	nJZOdmB93Tk+8syF2Hq7lT3vU3bFxAUyTE3ae/AHE7E6ILKChsmvjJFqnTur3qM=
-X-Gm-Gg: ASbGnctkkGlGrSlWxng/HjW3iSyWoerPnVBzPJfaOvYpDtBWBhAkPfn4MK1VKF0x+1U
-	zEwX/audU7m6RHoQB7YmwygbNJ0qHnTyNLcT/63z8CRp1Rxq59rJHfEkRA9YzVSsw4aGMS7J1qN
-	ivUBCsCimYVhIo1dwdBJWPh6FgypD2J7Cr5kxe3PGwKeZ/DhvlV1HCUOuknkbxJi+2tqE2DSdgd
-	UAwRiuox77nVK1Mgmhy5PGhCkv0/oEvCNFC3+D+myKZgXBl+snsxai5HKMlrImtbRXjlzufbAhQ
-	r+8m/DXFgKhm/A==
-X-Google-Smtp-Source: AGHT+IGmlSM7Uu2JYDRHKidCaqG33ZWHKzpI3WyJVmLe4pQ6iLpSvb0FcRTtXgskve/ciKvHz6rt+Q==
-X-Received: by 2002:a17:903:174c:b0:215:4394:40b5 with SMTP id d9443c01a7336-21c355dc59fmr239234925ad.43.1737449738403;
-        Tue, 21 Jan 2025 00:55:38 -0800 (PST)
-Received: from fedora.dns.podman ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21c2cebaebcsm73647475ad.99.2025.01.21.00.55.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Jan 2025 00:55:37 -0800 (PST)
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: netdev@vger.kernel.org
-Cc: Jay Vosburgh <jv@jvosburgh.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Simon Horman <horms@kernel.org>,
-	Jianbo Liu <jianbol@nvidia.com>,
-	Boris Pismenny <borisp@nvidia.com>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Hangbin Liu <liuhangbin@gmail.com>,
-	Liang Li <liali@redhat.com>
-Subject: [PATCH net] Bonding: Fix support for gso_partial_features
-Date: Tue, 21 Jan 2025 08:55:25 +0000
-Message-ID: <20250121085525.176019-1-liuhangbin@gmail.com>
-X-Mailer: git-send-email 2.46.0
+	s=arc-20240116; t=1737450555; c=relaxed/simple;
+	bh=WvHm6i4Tr8hzdI5lZXs5wNmm1gALbmDbKkWl6p6plYQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=a84uZCPxTf178AttT5fQcJZdlCzaa6JB/F/yfQuGwZPMXtns8dYsjNcNtKdc9gjLh/Xk2+1f0QOFkQLK0O/IFUp890nBsrnvAjLo/nLWLPmwl8KHT8aYUanU9ZSFzq08V8Ft9HuZREANOjAJL8cbcH0DrZGkFycHwfNMOuELQkE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=exg9+V3q; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 28F23C4CEE3;
+	Tue, 21 Jan 2025 09:09:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1737450554;
+	bh=WvHm6i4Tr8hzdI5lZXs5wNmm1gALbmDbKkWl6p6plYQ=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=exg9+V3qcugpZRV54zDjVe3k77ARbdnjZ/jgYOIuUlmEzYdHJ2gYI8L5TTImGk/RI
+	 lKQhWUCN+nzTS6zWhtgOLvvSsI0M7tnxYrtW7WWj0KOn09PUn93GQrPv2wDeKaHPdv
+	 NEe6ZnqPoPTqXmn9JfLPMuMxMikn8XkbNRMwn/OTpa9zOEMRdTr8lJ1eu7F+ojkwhe
+	 67Ws8IYc+BSUXUtOeJ7155nZZm33AVJBntx8S2moTQgzD+k4r/uFQaunnQ8M7P9XOY
+	 GcL7Uq/Mly+7NG8LTkX8VuZ0Rvl2qyAZDgF1Ip2VZumPmJ8yHryncoHG0A8qFFyK0f
+	 jEe8ypmTnt9hg==
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-5d3cf094768so9443603a12.0;
+        Tue, 21 Jan 2025 01:09:14 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCUg9UtTC6k1SoL02Y5Ni11QMtfhX2yOSV4Vsh/agn7wuc4iOVEjqyZqO/1zKZzqZMzWS3ldETra@vger.kernel.org, AJvYcCWRBgUsfZMoLXN4G+ukPp1sUN8eEvn4CJkEKj+AsWNl8euk50VdQh5VT5rz7diDkW+7ozIA+7SImdDMPec=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzdWjYBFw/WTAVKbj7Ye2G3euY/Js1pMSu9v4pgkWGxXvFPRPSb
+	8H0sHt1Sil4Wly57MA/0eN83w70G80zDY/7VeH2pHyE4dWWzCFHSSUqUqSomaTuT+qEAEs8+C3U
+	Y/zDBWeNjdmDBQfLYrocmP7+Nfx4=
+X-Google-Smtp-Source: AGHT+IGzjrh1NA3o8A3+RhJG99XOWJ4NXJI25r2bWtBsxh1tM5KrsEouxThrIGAJgk8BTeRRbRaBycet+uCxNWi9AH4=
+X-Received: by 2002:a17:906:4442:b0:ab3:a2f9:d8cc with SMTP id
+ a640c23a62f3a-ab3a2f9eef5mr1134219366b.41.1737450552640; Tue, 21 Jan 2025
+ 01:09:12 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20250110144944.32766-1-si.yanteng@linux.dev> <5e1c9623-30cb-48c8-865b-cbdc2c08f0f3@lunn.ch>
+ <20250110165458.43e312bf@kernel.org> <679e160b-6cab-43d6-990c-d1df0e243995@linux.dev>
+In-Reply-To: <679e160b-6cab-43d6-990c-d1df0e243995@linux.dev>
+From: Huacai Chen <chenhuacai@kernel.org>
+Date: Tue, 21 Jan 2025 17:09:00 +0800
+X-Gmail-Original-Message-ID: <CAAhV-H6YJyP2g45JdihZN262Ye0_LzWSibtc=6q7c2Rj-Dkzdw@mail.gmail.com>
+X-Gm-Features: AbW1kvbZ_8LkZoLKR6xf5ayFpawG2Ft9AC-WoLB5kndGe7nh_M-PN5DjUIvKbO4
+Message-ID: <CAAhV-H6YJyP2g45JdihZN262Ye0_LzWSibtc=6q7c2Rj-Dkzdw@mail.gmail.com>
+Subject: Re: [PATCH] MAINTAINERS: Become the stmmac maintainer
+To: Yanteng Si <si.yanteng@linux.dev>
+Cc: Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew@lunn.ch>, andrew+netdev@lunn.ch, 
+	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com, 
+	mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The fixed commit adds NETIF_F_GSO_ESP bit for bonding gso_partial_features.
-However, if we don't set the dev NETIF_F_GSO_PARTIAL bit, the later
-netdev_change_features() -> netdev_fix_features() will remove the
-NETIF_F_GSO_ESP bit from the dev features. This causes ethtool to show
-that the bond does not support tx-esp-segmentation. For example
+On Sat, Jan 11, 2025 at 10:11=E2=80=AFPM Yanteng Si <si.yanteng@linux.dev> =
+wrote:
+>
+> Hi Jakub, Andrew,
+>
+> On 1/11/25 08:54, Jakub Kicinski wrote:
+> > On Fri, 10 Jan 2025 18:22:03 +0100 Andrew Lunn wrote:
+> >> On Fri, Jan 10, 2025 at 10:49:43PM +0800, Yanteng Si wrote:
+> >>> I am the author of dwmac-loongson. The patch set was merged several
+> >>> months ago. For a long time hereafter, I don't wish stmmac to remain
+> >>> in an orphan state perpetually. Therefore, if no one is willing to
+> >>> assume the role of the maintainer, I would like to be responsible for
+> >>> the subsequent maintenance of stmmac. Meanwhile, Huacai is willing to
+> >>> become a reviewer.
+> >>>
+> >>> About myself, I submitted my first kernel patch on January 4th, 2021.
+> >>> I was still reviewing new patches last week, and I will remain active
+> >>> on the mailing list in the future.
+> >>>
+> >>> Co-developed-by: Huacai Chen <chenhuacai@kernel.org>
+> >>> Signed-off-by: Huacai Chen <chenhuacai@kernel.org>
+> >>> Signed-off-by: Yanteng Si <si.yanteng@linux.dev>
+> >> Thanks for volunteering for this. Your experience adding loongson
+> >> support will be useful here. But with a driver of this complexity, and
+> >> the number of different vendors using it, i think it would be good if
+> >> you first established a good reputation for doing the work before we
+> >> add you to the Maintainers. There are a number of stmmac patches on
+> >> the list at the moment, please actually do the job of being a
+> >> Maintainer and spend some time review them.
+> >>
+> >> A Synopsis engineer has also said he would start doing Maintainer
+> >> work. Hopefully in the end we can add you both to MAINTAINERS.
+> > +1, thanks a lot for volunteering! There are 22 patches for stmmac
+> > pending review in patchwork, so please don't hesitate and start
+> > reviewing and testing.
+>
+> Okay, thank you for your encouragement.
+>
+> In the following period of time, I will try to review and
+>
+> test the patches of stmmac.
+I can help Yanteng to review patches, and I also have some stmmac
+patches to be submit.
 
- # ethtool -k bond0 | grep esp
- tx-esp-segmentation: off [requested on]
- esp-hw-offload: on
- esp-tx-csum-hw-offload: on
+Huacai
 
-Add the NETIF_F_GSO_PARTIAL bit to bond dev features when set
-gso_partial_features to fix this issue.
-
-Fixes: 4861333b4217 ("bonding: add ESP offload features when slaves support")
-Reported-by: Liang Li <liali@redhat.com>
-Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
----
- drivers/net/bonding/bond_main.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
-index 7b78c2bada81..e1c054416d5e 100644
---- a/drivers/net/bonding/bond_main.c
-+++ b/drivers/net/bonding/bond_main.c
-@@ -1598,10 +1598,12 @@ static void bond_compute_features(struct bonding *bond)
- 	}
- 	bond_dev->hard_header_len = max_hard_header_len;
- 
--	if (gso_partial_features & NETIF_F_GSO_ESP)
-+	if (gso_partial_features & NETIF_F_GSO_ESP) {
- 		bond_dev->gso_partial_features |= NETIF_F_GSO_ESP;
--	else
-+		bond_dev->features |= NETIF_F_GSO_PARTIAL;
-+	} else {
- 		bond_dev->gso_partial_features &= ~NETIF_F_GSO_ESP;
-+	}
- 
- done:
- 	bond_dev->vlan_features = vlan_features;
--- 
-2.39.5 (Apple Git-154)
-
+>
+>
+> Thanks,
+>
+> Yanteng
+>
 
