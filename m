@@ -1,90 +1,93 @@
-Return-Path: <netdev+bounces-160100-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160101-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A957A18298
-	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 18:10:22 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D6978A1829B
+	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 18:10:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8A606188BE06
-	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 17:10:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3974E3A67B0
+	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 17:10:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 128BF1F5419;
-	Tue, 21 Jan 2025 17:09:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4DCF1F4E46;
+	Tue, 21 Jan 2025 17:10:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b1Pmt4Dt"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="qmQUQ2NA"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1F6C1F4E56
-	for <netdev@vger.kernel.org>; Tue, 21 Jan 2025 17:09:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9F3E1F4727;
+	Tue, 21 Jan 2025 17:10:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737479397; cv=none; b=hPErHJI7sI4MW2Zgdb1N93ldNUTqss8cZ6JW/p0eRgZh2hH//nx7wnR6EtbiqdENyfrobjw8FVtDajRYvZBOVx1dVJJOz/UnTdoos3t9vOJknPLJ8t5wV1jYbgcuLYlpnaRF/qFXJV34lvUXTVMuHBN1WiezTrqN/cM9RmurUF4=
+	t=1737479424; cv=none; b=MBNu/vYAckMaZCLRvnQiQhMm2ieBFBkWjAOz9g9ip48o6lXyqOxLMZPnMfULQoeyPoJtZv0b9akqU6yByKqB9xnOZLDgRJ32QpV1PEyK6Km2+paUXnQgmwzV+DgSLLMG4CMEKtN2LotN1Cb1fxKmkPvhvgzGsjxRA363XCaAtsY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737479397; c=relaxed/simple;
-	bh=q5pt8rBtniqfblaIvTHAjjF66dJy9eH0/hJnrHSRwm8=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=H+c3h0X5T7gngeDgbYc44RiskFYO565O6tJWOR1CO0SJP8dceT9ixWcPsltTqwlIpF44HmqsUO3Vsw750mMEsXcI0h8NtTpo2dhYEh9xm8z/9dj/GsLBBvi8tBx4N+3pZTEwmd0yYJs4Mb0VDZe5S2DwqlTD5ProqV0toYeIN0g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b1Pmt4Dt; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 076B6C4CEE7;
-	Tue, 21 Jan 2025 17:09:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737479396;
-	bh=q5pt8rBtniqfblaIvTHAjjF66dJy9eH0/hJnrHSRwm8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=b1Pmt4DtWowcr9TG1IgXLXu21fTJKZrou2o1BLF3JfaOh9v5ORteqC5xwZOSKH6xE
-	 TWLseEd2Q+i3E+ZccP3AWQ5y0GQz8dV2dUqkhNGE0v540UmQ+E0GeNj/noUdvkedC2
-	 p8gdoO8iIP8ujB2JP+jPMjZ3s/73MQIT1GCkBSDsqalPhWYG47jf+j5N0cvlQkex5s
-	 m1MP8++lIXrllyIHpPifJqRYopQzNL7pIEXbTS2sbqkOqV1Uut+Q5XCoOpQLUuYlPl
-	 qL4TX5Ibt3CpHH1kvPorvuM9TKKoopN5KCcEA8Wh7Pi2pfPn0gfOoLfVmUlMcZ9vYs
-	 CtanSQpro103g==
-Date: Tue, 21 Jan 2025 09:09:55 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Antoine Tenart <atenart@kernel.org>
-Cc: davem@davemloft.net, pabeni@redhat.com, edumazet@google.com,
- stephen@networkplumber.org, gregkh@linuxfoundation.org,
- netdev@vger.kernel.org
-Subject: Re: [PATCH net-next 3/4] net-sysfs: prevent uncleared queues from
- being re-added
-Message-ID: <20250121090955.25610044@kernel.org>
-In-Reply-To: <173745203452.4844.5509848806009835293@kwain>
-References: <20250117102612.132644-1-atenart@kernel.org>
-	<20250117102612.132644-4-atenart@kernel.org>
-	<20250120114400.55fffeda@kernel.org>
-	<173745203452.4844.5509848806009835293@kwain>
+	s=arc-20240116; t=1737479424; c=relaxed/simple;
+	bh=7KLqRXRtMpr5AnWCzUsc49VsnLV6+/Ya1LYZn3o+X+Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lB7YDeZH3z3u0LFM2aqx3E3yW9upekbJQcHQtKGDjenRy4Q+XIT473ybCvSKqoP84EVbPP8ABYezrR4UoFy0ziJIHiFfjbIZNX65UjMS3zMC+ZbC5TK0bJ7oXISlgUhnWSWuyGvIcNmTUlz1z2EkGeUQn5OUNYoTjKYK97K5YJc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=qmQUQ2NA; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=mvXQbcqOWygs/VwootWLBvcI0ZEs6gJWfjd2kJrIlyU=; b=qmQUQ2NAHWeZVwh3xqOrkfTZvj
+	yprXEINu8P2IOI6rjQdad5/dUMsBqMAdq6cCOtYFah+JRTp2FLP2i5oRuWAVob33pd9O+FCQhSoCH
+	fEk2z7/apymzPOiQLQziaXnJG0ht92ACKoorlOm8CZTEU/+eihGM2wJSPvO3GM4nc4/g=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1taHlS-006hNS-3y; Tue, 21 Jan 2025 18:10:10 +0100
+Date: Tue, 21 Jan 2025 18:10:10 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Yijie Yang <quic_yijiyang@quicinc.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, Vinod Koul <vkoul@kernel.org>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konradybcio@kernel.org>,
+	Richard Cochran <richardcochran@gmail.com>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH v3 2/4] net: stmmac: dwmac-qcom-ethqos: Mask PHY mode if
+ configured with rgmii-id
+Message-ID: <bf45ec15-d430-499a-ba30-825611369402@lunn.ch>
+References: <20250121-dts_qcs615-v3-0-fa4496950d8a@quicinc.com>
+ <20250121-dts_qcs615-v3-2-fa4496950d8a@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250121-dts_qcs615-v3-2-fa4496950d8a@quicinc.com>
 
-On Tue, 21 Jan 2025 10:33:54 +0100 Antoine Tenart wrote:
-> Quoting Jakub Kicinski (2025-01-20 20:44:00)
-> > On Fri, 17 Jan 2025 11:26:10 +0100 Antoine Tenart wrote:  
-> > > +     if (unlikely(kobj->state_initialized))
-> > > +             return -EAGAIN;  
-> > 
-> > we could do some weird stuff here like try to ignore the sysfs 
-> > objects and "resynchronize" them before releasing rtnl.
-> > Way to hacky to do now, but also debugging a transient EAGAIN
-> > will be a major PITA. How about we add a netdev_warn_once()
-> > here to leave a trace of what happened in the logs?  
-> 
-> I'm not sure as the above can happen in normal conditions, although
-> removing and re-adding queues very shortly might be questionable? On the
-> other hand I get your point and that might not happen very frequently
-> under normal conditions and that's just because I'm hammering the thing
-> for testing.
-> 
-> It feel a bit weird to warn something that is not unexpected behavior,
-> but if you still prefer having a warn_once for better UX I can add it,
-> let me know.
+> To address the ABI compatibility issue between the kernel and DTS caused by
+> this change, handle the compatible string 'qcom,qcs404-evb-4000' in the
+> code, as it is the only legacy board that mistakenly uses the 'rgmii'
+> phy-mode.
 
-IMHO it's worth adding, but I also don't feel very strongly about it :S 
+Are you saying every other board DT got this correct? How do you know
+that? Was this SoC never shipped to anybody, so the only possible
+board is the QCOM RDK which never left the lab?
+
+I doubt this is true, so you are probably breaking out of tree
+boards. We care less about out of tree boards, but we also don't
+needlessly break them.
+
+	Andrew
 
