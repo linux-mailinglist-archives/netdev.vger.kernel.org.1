@@ -1,142 +1,90 @@
-Return-Path: <netdev+bounces-160099-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160100-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65D2DA18283
-	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 18:06:08 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A957A18298
+	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 18:10:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BBB483A272D
-	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 17:06:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8A606188BE06
+	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 17:10:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02A001F4E48;
-	Tue, 21 Jan 2025 17:06:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 128BF1F5419;
+	Tue, 21 Jan 2025 17:09:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="KvgkrE0r"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b1Pmt4Dt"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 238391B394B;
-	Tue, 21 Jan 2025 17:05:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1F6C1F4E56
+	for <netdev@vger.kernel.org>; Tue, 21 Jan 2025 17:09:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737479161; cv=none; b=msYKRArBOBArvqTHyL+IG+0CXSZWKgRihf17dEpzfx0Qtfg1EGGGdB79OGiaf6lkeVqgfZOKhdMB9jU3tF8DRZDzh9xQquzU6UYwudKSGNpsPqm2txyd8Xh781qWjaFl9zhjXCqmznTbh2pMgy01K27bb+rouuX4voPdNoAJEaM=
+	t=1737479397; cv=none; b=hPErHJI7sI4MW2Zgdb1N93ldNUTqss8cZ6JW/p0eRgZh2hH//nx7wnR6EtbiqdENyfrobjw8FVtDajRYvZBOVx1dVJJOz/UnTdoos3t9vOJknPLJ8t5wV1jYbgcuLYlpnaRF/qFXJV34lvUXTVMuHBN1WiezTrqN/cM9RmurUF4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737479161; c=relaxed/simple;
-	bh=PmBFIKLTamNuhMcnkQsiWtJmWxFhkW3jVfnxJIvhdFU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lERJ/fM1BNbKx/IwyJLA9/Vx9hVGspyklMdI6daDxtFYCqMe2oKFrpV3dW9t6jSpHfMf+q5viCo+ucS9FQd3XHLLrDLYuJzJOIsJj3ebCy+BAPP5jMYhRPlT5bkE346sI1WjGyrf7PPQnYITuHPIrd2ExEHhSo/hCbm5RA8q3eQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=KvgkrE0r; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=OItftmU3nmHodeFN5LD5V3oR/F2npmbkhzoTbe1kM+o=; b=KvgkrE0rogp+a/4Foip2XP4U8x
-	7NhupLyR9KURgt2tWVnxxhnN+fuusBdQm2LJzlGsNJ8JxYZfRX7vxAPVEQnlQQRcp6gHKhf11OY5m
-	j+euHjhojXFdazNYT0+Bl9oPNw1CYGN5PmAphZw7+ncC05I8+KC9iBfRDLnHhz1d9jGpqhLoYM/HG
-	KiRudfiigr49OVXnJEIUqoWaqcGmlM83i4xUSx9zgkfaieokWY1Izd5dfoAME2pHX9PvhStQahys6
-	4esaFGu1hvglBHtS3YKHfQMw8BMlhGhj5mkDW86sud/NMo3Gr+92HOZ2YpjTGKY9FzMXGhtGt+kOj
-	VMBlOGuw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:40242)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1taHh8-0007Tf-30;
-	Tue, 21 Jan 2025 17:05:43 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1taHh0-00043L-1F;
-	Tue, 21 Jan 2025 17:05:34 +0000
-Date: Tue, 21 Jan 2025 17:05:34 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Huisong Li <lihuisong@huawei.com>
-Cc: linux-hwmon@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-media@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	arm-scmi@vger.kernel.org, netdev@vger.kernel.org,
-	linux-rtc@vger.kernel.org, oss-drivers@corigine.com,
-	linux-rdma@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-	linuxarm@huawei.com, linux@roeck-us.net, jdelvare@suse.com,
-	kernel@maidavale.org, pauk.denis@gmail.com, james@equiv.tech,
-	sudeep.holla@arm.com, cristian.marussi@arm.com, matt@ranostay.sg,
-	mchehab@kernel.org, irusskikh@marvell.com, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, saeedm@nvidia.com, leon@kernel.org,
-	tariqt@nvidia.com, louis.peens@corigine.com, hkallweit1@gmail.com,
-	kabel@kernel.org, W_Armin@gmx.de, hdegoede@redhat.com,
-	ilpo.jarvinen@linux.intel.com, alexandre.belloni@bootlin.com,
-	krzk@kernel.org, jonathan.cameron@huawei.com,
-	zhanjie9@hisilicon.com, zhenglifeng1@huawei.com,
-	liuyonglong@huawei.com
-Subject: Re: [PATCH v1 01/21] hwmon: Fix the type of 'config' in struct
- hwmon_channel_info to u64
-Message-ID: <Z4_T3s7zn3UQNkbW@shell.armlinux.org.uk>
-References: <20250121064519.18974-1-lihuisong@huawei.com>
- <20250121064519.18974-2-lihuisong@huawei.com>
+	s=arc-20240116; t=1737479397; c=relaxed/simple;
+	bh=q5pt8rBtniqfblaIvTHAjjF66dJy9eH0/hJnrHSRwm8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=H+c3h0X5T7gngeDgbYc44RiskFYO565O6tJWOR1CO0SJP8dceT9ixWcPsltTqwlIpF44HmqsUO3Vsw750mMEsXcI0h8NtTpo2dhYEh9xm8z/9dj/GsLBBvi8tBx4N+3pZTEwmd0yYJs4Mb0VDZe5S2DwqlTD5ProqV0toYeIN0g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b1Pmt4Dt; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 076B6C4CEE7;
+	Tue, 21 Jan 2025 17:09:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1737479396;
+	bh=q5pt8rBtniqfblaIvTHAjjF66dJy9eH0/hJnrHSRwm8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=b1Pmt4DtWowcr9TG1IgXLXu21fTJKZrou2o1BLF3JfaOh9v5ORteqC5xwZOSKH6xE
+	 TWLseEd2Q+i3E+ZccP3AWQ5y0GQz8dV2dUqkhNGE0v540UmQ+E0GeNj/noUdvkedC2
+	 p8gdoO8iIP8ujB2JP+jPMjZ3s/73MQIT1GCkBSDsqalPhWYG47jf+j5N0cvlQkex5s
+	 m1MP8++lIXrllyIHpPifJqRYopQzNL7pIEXbTS2sbqkOqV1Uut+Q5XCoOpQLUuYlPl
+	 qL4TX5Ibt3CpHH1kvPorvuM9TKKoopN5KCcEA8Wh7Pi2pfPn0gfOoLfVmUlMcZ9vYs
+	 CtanSQpro103g==
+Date: Tue, 21 Jan 2025 09:09:55 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Antoine Tenart <atenart@kernel.org>
+Cc: davem@davemloft.net, pabeni@redhat.com, edumazet@google.com,
+ stephen@networkplumber.org, gregkh@linuxfoundation.org,
+ netdev@vger.kernel.org
+Subject: Re: [PATCH net-next 3/4] net-sysfs: prevent uncleared queues from
+ being re-added
+Message-ID: <20250121090955.25610044@kernel.org>
+In-Reply-To: <173745203452.4844.5509848806009835293@kwain>
+References: <20250117102612.132644-1-atenart@kernel.org>
+	<20250117102612.132644-4-atenart@kernel.org>
+	<20250120114400.55fffeda@kernel.org>
+	<173745203452.4844.5509848806009835293@kwain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250121064519.18974-2-lihuisong@huawei.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Tue, Jan 21, 2025 at 02:44:59PM +0800, Huisong Li wrote:
->   */
->  struct hwmon_channel_info {
->  	enum hwmon_sensor_types type;
-> -	const u32 *config;
-> +	const u64 *config;
->  };
->  
->  #define HWMON_CHANNEL_INFO(stype, ...)		\
->  	(&(const struct hwmon_channel_info) {	\
->  		.type = hwmon_##stype,		\
-> -		.config = (const u32 []) {	\
-> +		.config = (const u64 []) {	\
->  			__VA_ARGS__, 0		\
->  		}				\
->  	})
+On Tue, 21 Jan 2025 10:33:54 +0100 Antoine Tenart wrote:
+> Quoting Jakub Kicinski (2025-01-20 20:44:00)
+> > On Fri, 17 Jan 2025 11:26:10 +0100 Antoine Tenart wrote:  
+> > > +     if (unlikely(kobj->state_initialized))
+> > > +             return -EAGAIN;  
+> > 
+> > we could do some weird stuff here like try to ignore the sysfs 
+> > objects and "resynchronize" them before releasing rtnl.
+> > Way to hacky to do now, but also debugging a transient EAGAIN
+> > will be a major PITA. How about we add a netdev_warn_once()
+> > here to leave a trace of what happened in the logs?  
+> 
+> I'm not sure as the above can happen in normal conditions, although
+> removing and re-adding queues very shortly might be questionable? On the
+> other hand I get your point and that might not happen very frequently
+> under normal conditions and that's just because I'm hammering the thing
+> for testing.
+> 
+> It feel a bit weird to warn something that is not unexpected behavior,
+> but if you still prefer having a warn_once for better UX I can add it,
+> let me know.
 
-I'm sorry, but... no. Just no. Have you tried building with only your
-first patch?
-
-It will cause the compiler to barf on, e.g. the following:
-
-static u32 marvell_hwmon_chip_config[] = {
-...
-
-static const struct hwmon_channel_info marvell_hwmon_chip = {
-        .type = hwmon_chip,
-        .config = marvell_hwmon_chip_config,
-};
-
-I suggest that you rearrange your series: first, do the conversions
-to HWMON_CHANNEL_INFO() in the drivers you have.
-
-At this point, if all the drivers that assign to hw_channel_info.config
-have been converted, this patch 1 is then suitable.
-
-If there are still drivers that assign a u32 array to
-hw_channel_info.config, then you need to consider how to handle
-that without causing regressions. You can't cast it between a u32
-array and u64 array to silence the warning, because config[1]
-won't point at the next entry.
-
-I think your only option would be to combine the conversion of struct
-hwmon_channel_info and the other drivers into a single patch. Slightly
-annoying, but without introducing more preprocessor yuckiness, I don't
-see another way.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+IMHO it's worth adding, but I also don't feel very strongly about it :S 
 
