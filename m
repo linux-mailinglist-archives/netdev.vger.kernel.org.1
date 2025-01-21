@@ -1,128 +1,111 @@
-Return-Path: <netdev+bounces-160096-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160097-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9942A18202
-	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 17:31:12 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 394D8A18208
+	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 17:34:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9B46518812CA
-	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 16:31:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 357C23A8242
+	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 16:33:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CB5C1F03D8;
-	Tue, 21 Jan 2025 16:31:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED99F1F2C4B;
+	Tue, 21 Jan 2025 16:33:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="sbMgiPgx"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HCAjZ1I+"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84A5B3BBF2;
-	Tue, 21 Jan 2025 16:31:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 329B21925AF
+	for <netdev@vger.kernel.org>; Tue, 21 Jan 2025 16:33:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737477068; cv=none; b=D9T5dZDTaQDLqWkc9m62AU70xod6OErPssdOJBudp++5SN1GHpAo+/PGmJ6MyRaaETWPTAzCXWHIGqbpEd6XK7jgH45L5K74Y7at007WkWrzc4RvxJbOBuXa1VDO7qR7apqgoWA06dRibhJe47FEqLSFaoVPY6dl6qoKWDGejd4=
+	t=1737477235; cv=none; b=jW1TAWfNQiWB6jJeqkKIljs9wfL2EpyPqPampCH+8Oh02r6EeYtNuB689KjzsFkBOqmU3CN18EveiQ/1UOQ5ZSSw6MR7tGaH7JUFS2E07Qz0Vp5163tyobKQbDKXp1gaGgxkhDMPCY6Cv+oYs6KoVLyLaiSMse1e6ZiYIxDBAT4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737477068; c=relaxed/simple;
-	bh=C4J0NuPF47tl45z8cScmZ9d88dwudF/0LWVRm9wcyuo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=E6iHnJlUpes2KqWvbX50icmfWdyAkzFRy02i+EY5NXDAgq9a/YudRbLZPe64bH8NvMSfK/IIHLHL+yVtT0aB8sDU78OJQbZvrND0HEn18UF9NkNmuXgEl3yJHqjtRIx3b5M5urx0jJm9udzlhbCd31KJnd7dK4iO3IM/mr3LLC0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=sbMgiPgx; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=TIBcQIVWAqhDi4MjOluGHd+JW49Qm54tz8wmj3F5SJQ=; b=sb
-	MgiPgx7owdHJxvwCMLSnb7/TyFTrsXtM8G5ATnONlWDzsEdY8ty2bG/Xh9w6IXMvSdBEJfXq7akmt
-	jehodMRFlSN63Qm1Y2osokh30xsMPfF+qc5882egUx+jyXgUSW1vOkh4csyFIIaLdNzGqfezXFrfq
-	jJiBKGJzF8pY7PY=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1taH9P-006gn8-Pm; Tue, 21 Jan 2025 17:30:51 +0100
-Date: Tue, 21 Jan 2025 17:30:51 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: =?iso-8859-1?Q?Bj=F8rn?= Mork <bjorn@mork.no>
-Cc: Wentao Liang <vulab@iscas.ac.cn>, Jakub Kicinski <kuba@kernel.org>,
-	Daniele Palmas <dnlplm@gmail.com>, Breno Leitao <leitao@debian.org>,
-	netdev@vger.kernel.org, linux-usb@vger.kernel.org
-Subject: Re: [PATCH] net: usb: qmi_wwan: Add error handling for
- usbnet_get_ethernet_addr
-Message-ID: <0044ac56-b391-4e2d-8c12-9ad8a14bd625@lunn.ch>
-References: <20250120170026.1880-1-vulab@iscas.ac.cn>
- <87y0z52wcj.fsf@miraculix.mork.no>
+	s=arc-20240116; t=1737477235; c=relaxed/simple;
+	bh=f6B1+Dm9poLs+mWer7ufLv5Ss2ecbBYZfpvFhsrFQak=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Y9BBCTIOC66C6469r2rPgTMnSuRnNhH1L7s3efAPeIpo5pZW151akyKF8zLS/IMbXlf8rp21eWx2pu2FGghQmFhNHcxkxeN57YGpuSHbFiEA9G70PnJAgs58ym+U1G/eOUsRXaQRYSvjt1PXxSs4S2VJXiqJiCcbesRLd51DJe0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HCAjZ1I+; arc=none smtp.client-ip=209.85.208.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-5d88c355e0dso11325654a12.0
+        for <netdev@vger.kernel.org>; Tue, 21 Jan 2025 08:33:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1737477232; x=1738082032; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZdED6c/28R5Wd2NmnaGdbGB7VZbqYu2i5SPv2e68HBU=;
+        b=HCAjZ1I+niL1WIQx67ApIb9y31FohrPPJKF9nJTBiVlYjmNt3h5xOg/1UZqbXsYwMu
+         asaZO+i3qqRUrXr6k8jULzef6wHoJmcHcTmo9EpWKMO5HpenUH8K9tsvRLakZwSp0yqW
+         JZN45i3nl+3Vy5FCrkSP0JKz4UoM+cydXAPN7ax5XDA8nr0U7/LY2DLWAFjzvcrPzRvt
+         6y14oBY11BrzJwwtom5d+y9KrfwwA17Q6IViZ3zQyEVYfrLp6oM1/ly1/+36Vl56PE0S
+         WeHN7xwRQes5CSUnQFKo31C+7+HVHAWuH/VECUzzFBkUvppmzkS1VzUKwHeJ3ARY1mcn
+         G33Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737477232; x=1738082032;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ZdED6c/28R5Wd2NmnaGdbGB7VZbqYu2i5SPv2e68HBU=;
+        b=Y5ncJEhPnByK50Thd9cKq7n6PwDj5wVrILXgiFyu05zurns7rhpi41puaYc18qckyJ
+         mKqu+EFLgZgeygtUolnpBAoh6Fe4FAqvZL6tfBT6R7uHZ8POQm18a+ROef6ArjCq0+ki
+         8UffwdbOWc90xZCwpqsiYbBrVY8w6pel2IiaGiyKJRDKXbZMlqfllebwjEXQmXFGuVO0
+         JiAJyUYBvxg/17YsFPo5xqgItMy+dkObRC/XaDNTd2/AfduExJPuVVXoKewolvTh42yC
+         AG2QB8XgjXIV+mzLbXLrK9BxuYr/zZLSCQGLclPppXjIcvYjUzwXPTH7Lfv5UQG31fpd
+         m7QQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX4v7RvK15L9Z0tAnBvIpG9E+f1AO/UVNKDErriKtJDXRl6Yn9YdCj65rkWhFuIO/zCMwt8o5s=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxFfFz4gnTxovtvclhSM2tt6C+xZf2hKig/YZjTv9zp0m0G/yCR
+	RbSbkbuvT7UqjFijTtxDOeVjqYZ5z2IrqxCELIfOLwSMewLmcTCik9EbCTjyyvy50CGGRhjT432
+	hsnPchTIsFKQcSZap4ymTeTOwDDTaUfQUJH1TEGpkuwK/LAam9w==
+X-Gm-Gg: ASbGncsS6WpSKhsN25h9/kQYMwLu7DU++Wqq8qCte6pYn/xuU4YZFZRBVdnJlmWFgd9
+	J/EdeDsgBCEoNNkIGDE0DMeRZzwqtl3Cf1w7NTnbKGAUmCttWuwY=
+X-Google-Smtp-Source: AGHT+IFyloJvbyPbipYoyrRMhP4LxZS49NfRALBwSPblHYSk8+BeMwLy/18rcC5lOMewJpqcCEPUQDhW7Qo/HFLO+JQ=
+X-Received: by 2002:a05:6402:2342:b0:5d1:2652:42ba with SMTP id
+ 4fb4d7f45d1cf-5db7d313997mr17212674a12.16.1737477232317; Tue, 21 Jan 2025
+ 08:33:52 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <87y0z52wcj.fsf@miraculix.mork.no>
+References: <20250121115010.110053-1-tbogendoerfer@suse.de>
+In-Reply-To: <20250121115010.110053-1-tbogendoerfer@suse.de>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 21 Jan 2025 17:33:40 +0100
+X-Gm-Features: AbW1kvYJBibR8xnvsBoxQdNF96aij6TjqkGT9g0BbYJTIg4RCGvWqHxu6fPmYBc
+Message-ID: <CANn89iJLC-H_zPOoAhEowiL0_viwMOA3qFN273HyEVapwPjvyw@mail.gmail.com>
+Subject: Re: [PATCH v2 net] gro_cells: Avoid packet re-ordering for cloned skbs
+To: Thomas Bogendoerfer <tbogendoerfer@suse.de>
+Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jan 20, 2025 at 07:06:52PM +0100, Bjørn Mork wrote:
-> Wentao Liang <vulab@iscas.ac.cn> writes:
-> 
-> > In qmi_wwan_bind(), usbnet_get_ethernet_addr() is called
-> > without error handling, risking unnoticed failures and
-> > inconsistent behavior compared to other parts of the code.
-> >
-> > Fix this issue by adding an error handling for the
-> > usbnet_get_ethernet_addr(), improving code robustness.
-> >
-> > Fixes: 423ce8caab7e ("net: usb: qmi_wwan: New driver for Huawei QMI based WWAN devices")
-> > Signed-off-by: Wentao Liang <vulab@iscas.ac.cn>
-> > ---
-> >  drivers/net/usb/qmi_wwan.c | 4 +++-
-> >  1 file changed, 3 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/drivers/net/usb/qmi_wwan.c b/drivers/net/usb/qmi_wwan.c
-> > index e9208a8d2bfa..7aa576bfe76b 100644
-> > --- a/drivers/net/usb/qmi_wwan.c
-> > +++ b/drivers/net/usb/qmi_wwan.c
-> > @@ -779,7 +779,9 @@ static int qmi_wwan_bind(struct usbnet *dev, struct usb_interface *intf)
-> >  	/* errors aren't fatal - we can live with the dynamic address */
-> >  	if (cdc_ether && cdc_ether->wMaxSegmentSize) {
-> >  		dev->hard_mtu = le16_to_cpu(cdc_ether->wMaxSegmentSize);
-> > -		usbnet_get_ethernet_addr(dev, cdc_ether->iMACAddress);
-> > +		status = usbnet_get_ethernet_addr(dev, cdc_ether->iMACAddress);
-> > +		if (status < 0)
-> > +			goto err;
-> >  	}
-> >  
-> >  	/* claim data interface and set it up */
-> 
-> 
-> 
-> Did you read the comment?
-> 
-> This intentinonally ignores any errors.  I don't know how to make it
-> clear anough for these AI bots to understand.  Any advice there?
+On Tue, Jan 21, 2025 at 12:50=E2=80=AFPM Thomas Bogendoerfer
+<tbogendoerfer@suse.de> wrote:
+>
+> gro_cells_receive() passes a cloned skb directly up the stack and
+> could cause re-ordering against segments still in GRO. To avoid
+> this queue cloned skbs and use gro_normal_one() to pass it during
+> normal NAPI work.
+>
+> Fixes: c9e6bc644e55 ("net: add gro_cells infrastructure")
+> Suggested-by: Eric Dumazet <edumazet@google.com>
+> Signed-off-by: Thomas Bogendoerfer <tbogendoerfer@suse.de>
+> --
+> v2: don't use skb_copy(), but make decision how to pass cloned skbs in
+>     napi poll function (suggested by Eric)
+> v1: https://lore.kernel.org/lkml/20250109142724.29228-1-tbogendoerfer@sus=
+e.de/
+>
 
-The problem is not really the AI bot, but the user of the AI bot. We
-often see this problem, and need to teach bot drivers that the bot is
-just the start. The bot points out a potential issue, but it needs a
-human developer to verify the issue and consider what the real fix is,
-which might be, as in this case, a false positive and no fix is
-needed.
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
-I don't know how to really fix this issue, other than try to teach the
-bot drivers to actually think.
-
-> NAK
-> 
-> (and why weren't I CCed?  Noticed this by chance only...)
-
-Probably the same issue. The bot driver does not know the processes,
-has not run the get_maintainers script. This is again part of the
-issue with these sorts of patched, they are often low quality and need
-careful review.
-
-	Andrew
-
+Thanks.
 
