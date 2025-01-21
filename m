@@ -1,138 +1,197 @@
-Return-Path: <netdev+bounces-160052-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160054-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3244AA17F66
-	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 15:06:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C4A5A17F7B
+	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 15:14:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1B1D51889E21
-	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 14:06:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id ED57B188BA25
+	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 14:14:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F40C1F2C50;
-	Tue, 21 Jan 2025 14:06:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E84731F37CA;
+	Tue, 21 Jan 2025 14:14:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=swemel.ru header.i=@swemel.ru header.b="mNks2lzy"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dk131RJ7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.swemel.ru (mx.swemel.ru [95.143.211.150])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE8C61F3D20;
-	Tue, 21 Jan 2025 14:05:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.143.211.150
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED6BB1F37BE;
+	Tue, 21 Jan 2025 14:14:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737468364; cv=none; b=jaHfxOLkHNQ8IPov+yXc7Z5QhX+PqUiijJorlLa4M23GYCu8w/DBWg4431Bw8YZNNN9DHzgSXWmzNJrfkHM3Xpz+gI9DCtAW/PB1yZdtfhIdzCq6iCUJ5C9qtI36WkREXddBgmKouaLNBHlc+kMtq6ROF/kvL9Nc4Qr9jw+JpyQ=
+	t=1737468862; cv=none; b=MLmNlyief/sAhcbRYIix8F/FnUCJ5n8ZUoDxYka6DCYG7PSoGF0zpn4plqfIkDG/JKtjnQduEgjmb4kcawSbpq4exZrxAbNYAK/qv7G2Z7QifjBh/n5Q9RkH8fx4fxRXkNPiU8MELTu3HW/dROI4R27iqdwj/5yQHxFaL97N6v8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737468364; c=relaxed/simple;
-	bh=Xpa7IX0n70Om8l3j5/WWMYX3ri6JfsIVsc7fH7WNX2k=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=eaKPwPjgdq8Y8Q4QsmuLPFEFoCZpYJyWQ5qYawtQJ7w9WaxeghPRTqV6gXRRfQU7ue3gA8Hu8Jyw9AyCZlfEd+1garr3DvPk7hdFGOg8LLPDel0eYtOwLN+doZ5I0uJwx8PEOjJuPPh7ITRwrlPbkEmAnsZsU1kYuq4JgU0aLDw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=swemel.ru; spf=pass smtp.mailfrom=swemel.ru; dkim=pass (1024-bit key) header.d=swemel.ru header.i=@swemel.ru header.b=mNks2lzy; arc=none smtp.client-ip=95.143.211.150
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=swemel.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=swemel.ru
-From: Denis Arefev <arefev@swemel.ru>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=swemel.ru; s=mail;
-	t=1737468356;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=8hooSNZ5KGXNJj+d5pzIQGkZP6GM4aexIpPVsywTiDk=;
-	b=mNks2lzyfk+cu8RrNPoepAQm4WdDcpfxCXPsRLoOFlElXTOHJGjpm63NynndUaNS2MR6Ho
-	JktYOTziBqc6y/hXvGLec6KpkguopqnYMegepfF7DvwRw6RXUmH2no3Ent7zMudXJS0L70
-	6oA1mM8y/3Cki8ceg2LtVobEq0uSsYw=
-To: stable@vger.kernel.org,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Fugang Duan <fugang.duan@nxp.com>,
+	s=arc-20240116; t=1737468862; c=relaxed/simple;
+	bh=FHoIyD5h8UELHGOcuWQAqIu3vCDHYj8wOGNm8Y2JtxI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=f4Tpp5tzUJfU68rRR02T6LQCfyv2kG34SoBq6cqlhWvnIqYMoxKVe0NIB6ShW3cEmxmnCuZYgbnx80GtLR86u0LLQflU3msDErF5N2k8YTBzifd6/zmDHEVRRD14aq2I8N9t0iz1XYKnXzWz9Eq1lkDThYrSkQTB+4FXoswlyvk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dk131RJ7; arc=none smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1737468861; x=1769004861;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=FHoIyD5h8UELHGOcuWQAqIu3vCDHYj8wOGNm8Y2JtxI=;
+  b=dk131RJ7gve6dd4oeu3O/FHgnzV6E9nL8AMpsphEvwZrz3W/8kwmCOkC
+   C67lt8b4HyhFpyg2aI6Tl17OSIA6aTAmibeXjCCMwJ79gbJL086dh0i2O
+   FcF4tv38r+Db8ABPWN2x03rA5CCnTdkGUJrq4/DMYQ0wo8pKrUbl8TfbF
+   Eit974QENldss1eJRhV/bAfJ4O6RhwDWA5KqaLoJtbcJh/mX6YIjvjSzi
+   gkHilyySYz4GQ/ttTKp1l1dUxXNhEsD+eVAh00uYsKVyqd9r/QwtWeCKL
+   vbh6zcGQ7UaUfCiPgF43gmWTXeqTG/cMi3XMWvn3rLyiyTk8dpF/kK1R1
+   g==;
+X-CSE-ConnectionGUID: gP2USCIFTkm0yW7kfLAvOg==
+X-CSE-MsgGUID: ctAb9QueTAaegmTOPsbusA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11322"; a="25483657"
+X-IronPort-AV: E=Sophos;i="6.13,222,1732608000"; 
+   d="scan'208";a="25483657"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jan 2025 06:14:20 -0800
+X-CSE-ConnectionGUID: OSaQhjstTjW7AbaDjjC4cg==
+X-CSE-MsgGUID: XpadcvqhTemBkQlrfFGBgw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="111435419"
+Received: from mev-dev.igk.intel.com ([10.237.112.144])
+  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jan 2025 06:14:00 -0800
+Date: Tue, 21 Jan 2025 15:10:35 +0100
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+To: =?iso-8859-1?B?Q3Pza+FzLA==?= Bence <csokas.bence@prolan.hu>
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	Laurent Badel <laurentbadel@eaton.com>, imx@lists.linux.dev,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Wei Fang <wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>,
+	Clark Wang <xiaoning.wang@nxp.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Xiao Jiang <jgq516@gmail.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	lvc-project@linuxtesting.org,
-	Wei Fang <wei.fang@nxp.com>
-Subject: [PATCH 5.10] net: fec: remove .ndo_poll_controller to avoid deadlocks
-Date: Tue, 21 Jan 2025 17:05:53 +0300
-Message-ID: <20250121140555.28188-1-arefev@swemel.ru>
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH] net: fec: Refactor MAC reset to function
+Message-ID: <Z4+q28pPnFcrMC/K@mev-dev.igk.intel.com>
+References: <20250121103857.12007-3-csokas.bence@prolan.hu>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250121103857.12007-3-csokas.bence@prolan.hu>
 
-From: Wei Fang <wei.fang@nxp.com>
+On Tue, Jan 21, 2025 at 11:38:58AM +0100, Csókás, Bence wrote:
+> The core is reset both in `fec_restart()`
+> (called on link-up) and `fec_stop()`
+> (going to sleep, driver remove etc.).
+> These two functions had their separate
+> implementations, which was at first only
+> a register write and a `udelay()` (and
+> the accompanying block comment).
+> However, since then we got soft-reset
+> (MAC disable) and Wake-on-LAN support,
+> which meant that these implementations
+> diverged, often causing bugs. For instance,
+> as of now, `fec_stop()` does not check for
+> `FEC_QUIRK_NO_HARD_RESET`. To eliminate
+> this bug-source, refactor implementation
+> to a common function.
+> 
+> Fixes: c730ab423bfa ("net: fec: Fix temporary RMII clock reset on link up")
+> Signed-off-by: Csókás, Bence <csokas.bence@prolan.hu>
+> ---
+> 
+> Notes:
+>     Recommended options for this patch:
+>     `--color-moved --color-moved-ws=allow-indentation-change`
+> 
+>  drivers/net/ethernet/freescale/fec_main.c | 50 +++++++++++------------
+>  1 file changed, 23 insertions(+), 27 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/freescale/fec_main.c b/drivers/net/ethernet/freescale/fec_main.c
+> index 68725506a095..850ef3de74ec 100644
+> --- a/drivers/net/ethernet/freescale/fec_main.c
+> +++ b/drivers/net/ethernet/freescale/fec_main.c
+> @@ -1064,6 +1064,27 @@ static void fec_enet_enable_ring(struct net_device *ndev)
+>  	}
+>  }
+>  
+> +/* Whack a reset.  We should wait for this.
+> + * For i.MX6SX SOC, enet use AXI bus, we use disable MAC
+> + * instead of reset MAC itself.
+> + */
+> +static void fec_ctrl_reset(struct fec_enet_private *fep, bool wol)
+> +{
+> +	if (!wol || !(fep->wol_flag & FEC_WOL_FLAG_SLEEP_ON)) {
+> +		if (fep->quirks & FEC_QUIRK_HAS_MULTI_QUEUES ||
+> +		    ((fep->quirks & FEC_QUIRK_NO_HARD_RESET) && fep->link)) {
+> +			writel(0, fep->hwp + FEC_ECNTRL);
+> +		} else {
+> +			writel(FEC_ECR_RESET, fep->hwp + FEC_ECNTRL);
+> +			udelay(10);
+> +		}
+> +	} else {
+> +		val = readl(fep->hwp + FEC_ECNTRL);
+> +		val |= (FEC_ECR_MAGICEN | FEC_ECR_SLEEP);
+> +		writel(val, fep->hwp + FEC_ECNTRL);
+> +	}
+> +}
+> +
+>  /*
+>   * This function is called to start or restart the FEC during a link
+>   * change, transmit timeout, or to reconfigure the FEC.  The network
+> @@ -1080,17 +1101,7 @@ fec_restart(struct net_device *ndev)
+>  	if (fep->bufdesc_ex)
+>  		fec_ptp_save_state(fep);
+>  
+> -	/* Whack a reset.  We should wait for this.
+> -	 * For i.MX6SX SOC, enet use AXI bus, we use disable MAC
+> -	 * instead of reset MAC itself.
+> -	 */
+> -	if (fep->quirks & FEC_QUIRK_HAS_MULTI_QUEUES ||
+> -	    ((fep->quirks & FEC_QUIRK_NO_HARD_RESET) && fep->link)) {
+> -		writel(0, fep->hwp + FEC_ECNTRL);
+> -	} else {
+> -		writel(1, fep->hwp + FEC_ECNTRL);
+Nit, in case of a need for v2 you can mark in commit message that
+FEC_ECR_RESET == 1, so define can be use instead of 1.
 
-commit c2e0c58b25a0a0c37ec643255558c5af4450c9f5 upstream.
+> -		udelay(10);
+> -	}
+> +	fec_ctrl_reset(fep, false);
+>  
+>  	/*
+>  	 * enet-mac reset will reset mac address registers too,
+> @@ -1344,22 +1355,7 @@ fec_stop(struct net_device *ndev)
+>  	if (fep->bufdesc_ex)
+>  		fec_ptp_save_state(fep);
+>  
+> -	/* Whack a reset.  We should wait for this.
+> -	 * For i.MX6SX SOC, enet use AXI bus, we use disable MAC
+> -	 * instead of reset MAC itself.
+> -	 */
+> -	if (!(fep->wol_flag & FEC_WOL_FLAG_SLEEP_ON)) {
+> -		if (fep->quirks & FEC_QUIRK_HAS_MULTI_QUEUES) {
+> -			writel(0, fep->hwp + FEC_ECNTRL);
+> -		} else {
+> -			writel(FEC_ECR_RESET, fep->hwp + FEC_ECNTRL);
+> -			udelay(10);
+> -		}
+> -	} else {
+> -		val = readl(fep->hwp + FEC_ECNTRL);
+> -		val |= (FEC_ECR_MAGICEN | FEC_ECR_SLEEP);
+> -		writel(val, fep->hwp + FEC_ECNTRL);
+> -	}
+> +	fec_ctrl_reset(fep, true);
+>  	writel(fep->phy_speed, fep->hwp + FEC_MII_SPEED);
+>  	writel(FEC_DEFAULT_IMASK, fep->hwp + FEC_IMASK);
+>  
 
-There is a deadlock issue found in sungem driver, please refer to the
-commit ac0a230f719b ("eth: sungem: remove .ndo_poll_controller to avoid
-deadlocks"). The root cause of the issue is that netpoll is in atomic
-context and disable_irq() is called by .ndo_poll_controller interface
-of sungem driver, however, disable_irq() might sleep. After analyzing
-the implementation of fec_poll_controller(), the fec driver should have
-the same issue. Due to the fec driver uses NAPI for TX completions, the
-.ndo_poll_controller is unnecessary to be implemented in the fec driver,
-so fec_poll_controller() can be safely removed.
+Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 
-Fixes: 7f5c6addcdc0 ("net/fec: add poll controller function for fec nic")
-Signed-off-by: Wei Fang <wei.fang@nxp.com>
-Link: https://lore.kernel.org/r/20240511062009.652918-1-wei.fang@nxp.com
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-[Denis: minor fix to resolve merge conflict.]                                           
-Signed-off-by: Denis Arefev <arefev@swemel.ru>                                    
----
-Backport fix for CVE-2024-38553
-Link: https://nvd.nist.gov/vuln/detail/cve-2024-38553
----
- drivers/net/ethernet/freescale/fec_main.c | 26 -----------------------
- 1 file changed, 26 deletions(-)
-
-diff --git a/drivers/net/ethernet/freescale/fec_main.c b/drivers/net/ethernet/freescale/fec_main.c
-index a591ca0b3778..815062c23708 100644
---- a/drivers/net/ethernet/freescale/fec_main.c
-+++ b/drivers/net/ethernet/freescale/fec_main.c
-@@ -3226,29 +3226,6 @@ fec_set_mac_address(struct net_device *ndev, void *p)
- 	return 0;
- }
- 
--#ifdef CONFIG_NET_POLL_CONTROLLER
--/**
-- * fec_poll_controller - FEC Poll controller function
-- * @dev: The FEC network adapter
-- *
-- * Polled functionality used by netconsole and others in non interrupt mode
-- *
-- */
--static void fec_poll_controller(struct net_device *dev)
--{
--	int i;
--	struct fec_enet_private *fep = netdev_priv(dev);
--
--	for (i = 0; i < FEC_IRQ_NUM; i++) {
--		if (fep->irq[i] > 0) {
--			disable_irq(fep->irq[i]);
--			fec_enet_interrupt(fep->irq[i], dev);
--			enable_irq(fep->irq[i]);
--		}
--	}
--}
--#endif
--
- static inline void fec_enet_set_netdev_features(struct net_device *netdev,
- 	netdev_features_t features)
- {
-@@ -3322,9 +3299,6 @@ static const struct net_device_ops fec_netdev_ops = {
- 	.ndo_tx_timeout		= fec_timeout,
- 	.ndo_set_mac_address	= fec_set_mac_address,
- 	.ndo_do_ioctl		= fec_enet_ioctl,
--#ifdef CONFIG_NET_POLL_CONTROLLER
--	.ndo_poll_controller	= fec_poll_controller,
--#endif
- 	.ndo_set_features	= fec_set_features,
- };
- 
--- 
-2.43.0
-
+> -- 
+> 2.48.1
 
