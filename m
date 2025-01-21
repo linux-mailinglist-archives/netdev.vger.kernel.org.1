@@ -1,176 +1,122 @@
-Return-Path: <netdev+bounces-159926-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159927-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15F24A1765A
-	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 04:41:08 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E31D5A17688
+	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 05:35:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C2CB67A3D6C
-	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 03:40:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0F6DD1697DC
+	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 04:35:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C540187848;
-	Tue, 21 Jan 2025 03:40:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6D5618E025;
+	Tue, 21 Jan 2025 04:35:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="FenAsFdY"
+	dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b="G5OKWgIr";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="WHA1YrPY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fhigh-a3-smtp.messagingengine.com (fhigh-a3-smtp.messagingengine.com [103.168.172.154])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FBC38F58
-	for <netdev@vger.kernel.org>; Tue, 21 Jan 2025 03:40:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17AEC45979;
+	Tue, 21 Jan 2025 04:35:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.154
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737430859; cv=none; b=Taa24HkuwZ1s+YtyLE34un2dpZBlKysdgmstIxaUkwdDpw3HE7YimXXy30VwlkpX4sC6GtkYUx1stTBHxyrUZW3JyXQm3NTy9pBFYdgI1Psa0B0tjSdrbWGkTzzYUiNcs7F7SnFVH/ub4emRGaCIClorlq1CY6HFDkJLSbowGM8=
+	t=1737434130; cv=none; b=rqQwLPkAeP3/fewP8Twz1VJ3rfFLzOj87qvHefqqIVSyvgcX/cpxRvtTcGhLZ5nOpomrv+nr/NrHGRQeP1LMFUsbe4LBaXuaX4CV2/BfUlkvvuwx84xbi1Ln5CXMCaghSPmxYygINrO9XZ6AnCNiFVzuFBnnblA3J/k4fDzuUdo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737430859; c=relaxed/simple;
-	bh=wF7YGurUs25CSpdYjAVHjRF0Z5PxpYeTzK4lQ1fz2KI=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=ljBwqvnAh/To7DlpVut2zmyZJ4eUXBuqk70vuytNvRnq2owkoa3J3U8PPidb1ahgLF9VtOOj8BqB2yHC+mozeAqN7quTZuFY+dPjgXV5EdQ0F68fcpvNiJMdRAzaW6Ow2hFPEKd+J/TLdCyh98jFCSl31YhXJsLAC5FFc3z2wHE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=FenAsFdY; arc=none smtp.client-ip=209.85.216.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-2f42992f608so7081639a91.0
-        for <netdev@vger.kernel.org>; Mon, 20 Jan 2025 19:40:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1737430855; x=1738035655; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:subject:cc:to
-         :from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=QkMtHsJDx+Wl3Tgdu/WbRMQpKlTovGhv9BAws4wG5Z4=;
-        b=FenAsFdYOtTZgK29hIhqio5k81d2pIYFDRcvdDa2/LIlcL2M36ZOLKszFvidumrodS
-         4FpGGYr8m2qMMn+tq5gOxjN/QE5pXWBb66385yz21QLTfXkI+jYhceOh5zwRcRNvKE38
-         c5wQckSwImuiKwzWChq5HYHPnmYiIhrLFIg/U7KLkREVBOMppUnVK/a+d2adqgrPBVRr
-         IyJcWH4CwFy6H4JYcPV5cPbpfj8TihQIaZPlqLcRXaPTy6Y/VDDhhgzyU8Jtf+AfIcI7
-         GGbZgndhMyJr7Q8VCgLKhMGZwhaGYebchFmHIqA0iY1uVH3utBmmzu6awsXr43SXrjkB
-         ADug==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737430855; x=1738035655;
-        h=content-transfer-encoding:mime-version:message-id:subject:cc:to
-         :from:date:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=QkMtHsJDx+Wl3Tgdu/WbRMQpKlTovGhv9BAws4wG5Z4=;
-        b=t/0bCq5HBuMcq85fZC3u+LrWfhh3EMod10zf2RHarGhUG6/Toy1YEgPxlb1qiDI8pB
-         6Fn9yawCd4d0TB3eHsAR1UVIsPM4s1+sL2vKkYDOvOe/n7zVcw6t4GmyvkTUA3oK+5B4
-         yr4J3NwVp5GgWc8ykLMWCzs4orclPEGeBJ2ipyPYhYwUKnjrCrfM3FRf/0XAUFkmEjP/
-         ejSJu+4BCRo5UJ2apgk8IbMdjr3ux89+dPGkedL8u28vVjiSoG4wANKMdRVsQsS+lASJ
-         WYPTaW5UC2LtWHA9hQfilARKz752s4jOTwpA1f7BdbY19+o2mpSQ5OdGD6TaUFAyQw3O
-         Sx3g==
-X-Gm-Message-State: AOJu0YzA3skB4X3KBUXetIIdX9XW5Phdp+9JV7BMOEjf3mA8hd0YxbpO
-	VJQJwKzdniLUR8B2ZCdZlnqAFu6HbZP2NdUJog3FltQlgikDjFdQ1RkHy+3T+vIjg0eC0TZkuhS
-	3
-X-Gm-Gg: ASbGncvZSVCQQB9N8AMH8XPnNzitibEBwMHLANXzRfslk6oKwErBHom3sNYgHj/8/uQ
-	AL5p7foYgA2UrFBTOAtxex1BNpK4QmgyDcAO3/AfSNlqcU329qvLgNR7l/oeTIMsTJvaLgA+Fh+
-	CsvFHSVJK9Msh5rHcX0pOBGb/ThmOaofszst07IJncfrdTMMRp+5i3z2wCFR0oI6nREM01D8YeN
-	DXHqNfepmqXKmmYlktCV4EjlK6W0mE2YBGBHg8rALSUW98aoLrA5LCNF8/iMMcIT/9QqJlhmsjR
-	IMj0EJC+qrlbKExWt0yYA0f7JtUKnzPWAi1eyyNDrd4MccM=
-X-Google-Smtp-Source: AGHT+IGs762hX4ez/VuWwtSeQT835lGaxlPEETqDj/hIHAoVgIUqnu9T+/gEerc56xGAiFI2xdobMg==
-X-Received: by 2002:aa7:9a83:0:b0:725:e325:ab3a with SMTP id d2e1a72fcca58-72daf97a541mr22452460b3a.14.1737430855175;
-        Mon, 20 Jan 2025 19:40:55 -0800 (PST)
-Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72dab9c94d0sm7915928b3a.116.2025.01.20.19.40.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 Jan 2025 19:40:54 -0800 (PST)
-Date: Mon, 20 Jan 2025 19:40:53 -0800
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
-Subject: [ANNOUNCE] iproute2 6.13 release
-Message-ID: <20250120194053.3744d96b@hermes.local>
+	s=arc-20240116; t=1737434130; c=relaxed/simple;
+	bh=lCfRqpWzuMZujFZShQOZDbGeVUrsywbdtwi215buqbs=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=lYY2+PIjLHCsKhUt2jlvNEkPM7dkdB31sT7IUavSLGCVvshyjEXN6gyf5MuYNqjMQkPYy1MwRV1YIjHlM3gmWKGtqHCePlq+7nIIPmkgwg1UNp4QxmhlQO5g0jrAHWlccgBY/Tqu5dKdXsFrexnnAx+mBpxyrS5EJeN9XhJ0c38=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dxuuu.xyz; spf=pass smtp.mailfrom=dxuuu.xyz; dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b=G5OKWgIr; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=WHA1YrPY; arc=none smtp.client-ip=103.168.172.154
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dxuuu.xyz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dxuuu.xyz
+Received: from phl-compute-10.internal (phl-compute-10.phl.internal [10.202.2.50])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id 0DA1211401CA;
+	Mon, 20 Jan 2025 23:35:27 -0500 (EST)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-10.internal (MEProxy); Mon, 20 Jan 2025 23:35:27 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dxuuu.xyz; h=cc
+	:content-transfer-encoding:content-type:date:date:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to; s=fm1; t=1737434127; x=1737520527; bh=21HB76OBIiKme0LcFSfhy
+	Qqla8eDvukUY0J6sp+JmkU=; b=G5OKWgIrF/xSaGbPLGLm6WdVtK8dcrpjVqXHI
+	kolPkXIgrm/GfCvfLIUGUzO+WIUP1Ci+a8WZa+Yymo+duOwypFgEg5ataU1Pv6+h
+	jQY5Hqa/xrBZ1xBVbEcLpf9CE+Op4O+0Bipc0AhCwZYSJ//lWjIY1h9cv2xOEzhD
+	ezXzmnonao9u2aLWUVp7+Y/9cnOdGxMvGdXL42VvZmqpphYjoxWb0UR4M02/nUlW
+	uYenug+MSKVCIbJu5D1dbccHkexssiEw54ZcoND6OvoDA1yaIruaP6Wvanrli+LJ
+	/+CL6b0tBQlwzqcpbfmSpIPMuWgadL/4nWSM4OE2uAD+Ah+vQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:content-transfer-encoding:content-type
+	:date:date:feedback-id:feedback-id:from:from:in-reply-to
+	:message-id:mime-version:reply-to:subject:subject:to:to
+	:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
+	1737434127; x=1737520527; bh=21HB76OBIiKme0LcFSfhyQqla8eDvukUY0J
+	6sp+JmkU=; b=WHA1YrPYjUmZLPNj9t8di97nHPpVRmsM0D4S5+KwAqhJoDaf7CV
+	PQcFmXgnK+4/F4mWc1lob6DRZzj3hKHUG120Ju7HxEeGDk8r4ytyMPWyl6HTJeGq
+	HVQFs2YN/VA5BLuXF2yN6MxynZ69x5+tKZq3dmm2FPNnrLe3LntCmlSWs15qkQnY
+	RhdZ6t7qXPwXYKnDOv0/XQtyKCc7TB3XwS/F4o4ogQXmP7zzcajUsktpAcezlPRq
+	ZcgmvgwSnyyGQSDTAQsX4EuTsnJY/28F9T6bk4fJ9c1fcgA4nIkZ1AAc3lTf7VxC
+	QxLBfL0zUGCKkgvhCCn31ylLNB71/NDad6A==
+X-ME-Sender: <xms:DiSPZ3r3jkDeMxqmqUVMt1ULvmPwxlqiS4beMfjoqXh-2OUSCVnmNw>
+    <xme:DiSPZxoXpSeWZ2FwAfuwUiCY4IaXK8FJUJNV6MvFSlguI3k4T7vT5D9hUUs6sM2Aq
+    NiPLZcUilreHfgY0w>
+X-ME-Received: <xmr:DiSPZ0OKZAN0qSS8GjFRQXiQQlhiHdm6i3Ba7NzgaV0rWPrzPfPL7_vNpDBpZ19TWyb6NlPr3IChomYn8yJsXxNbqAYMmK55iNQ-wFXqQ6hgL3VebvKr>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrudejtddgjedvucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
+    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucgfrhhlucfvnfffucdlje
+    dtmdenucfjughrpefhvffufffkofgggfestdekredtredttdenucfhrhhomhepffgrnhhi
+    vghlucgiuhcuoegugihusegugihuuhhurdighiiiqeenucggtffrrghtthgvrhhnpeeiff
+    fgledvffeitdeljedvteeffeeivdefheeiveevjeduieeigfetieevieffffenucevlhhu
+    shhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegugihusegugihuuh
+    hurdighiiipdhnsggprhgtphhtthhopeefpdhmohguvgepshhmthhpohhuthdprhgtphht
+    thhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlih
+    hnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopegs
+    phhfsehvghgvrhdrkhgvrhhnvghlrdhorhhg
+X-ME-Proxy: <xmx:DiSPZ658rpol8HEbhgKzA2JcXhZr5HY_Om9STbnzGnatZVWk-c8iMw>
+    <xmx:DiSPZ24u-7AqDOr-nHE5-zBk5ycIjvUUHiSJO9Tu3qa0YWgL0hfB7Q>
+    <xmx:DiSPZyg1-LjaXbsWnSBOc4ejYRalC2ZlI79ALpvk9smqsNV-rs265Q>
+    <xmx:DiSPZ44j7uSucbC8x0vEBoONKWcc7x-Fn7iZdd8w-xgrphPWP9HoQQ>
+    <xmx:DySPZ8kXc215Bv7R3YcHFdmeqzVJP205HBy04Dgs9XjQoKmsnPOFwOlU>
+Feedback-ID: i6a694271:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 20 Jan 2025 23:35:25 -0500 (EST)
+From: Daniel Xu <dxu@dxuuu.xyz>
+To: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	bpf@vger.kernel.org
+Subject: [PATCH bpf-next 0/3] bpf: Omit inlined bounds checks for null elided map lookups
+Date: Mon, 20 Jan 2025 21:35:09 -0700
+Message-ID: <cover.1737433945.git.dxu@dxuuu.xyz>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-This is regular release of iproute2 corresponding to the 6.13 kernel.
-Lots of little stuff, no big changes here.
-Happy new year.
+This follows up the null elision patchset with a corresponding codegen
+change. When the lookup is known to be inbounds, the inlined lookup can
+skip the bounds check.
 
-Download:
-    https://www.kernel.org/pub/linux/utils/net/iproute2/iproute2-6.13.0.tar=
-.gz
+See final commit for the JIT diff.
 
-Repository for current release
-    https://github.com/shemminger/iproute2.git
-    git://git.kernel.org/pub/scm/network/iproute2/iproute2.git
+Daniel Xu (3):
+  bpf: verifier: Store null elision decision in insn_aux_data
+  bpf: map: Thread null elision metadata to map_gen_lookup
+  bpf: arraymap: Skip boundscheck during inlining when possible
 
-And future release (net-next):
-    git://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git
+ include/linux/bpf.h          |  2 +-
+ include/linux/bpf_verifier.h |  4 ++++
+ kernel/bpf/arraymap.c        | 35 ++++++++++++++++++++++-------------
+ kernel/bpf/hashtab.c         | 14 ++++++++++----
+ kernel/bpf/verifier.c        |  6 ++++--
+ net/xdp/xskmap.c             |  4 +++-
+ 6 files changed, 44 insertions(+), 21 deletions(-)
 
-Contributions for this release:
-
-Alexis Lothor=C3=A9 (1):
-      man: fix two small typos on xdp manipulations
-
-Chiara Meiohas (5):
-      rdma: Add support for rdma monitor
-      rdma: Expose whether RDMA monitoring is supported
-      rdma: Fix typo in rdma-link man page
-      rdma: update uapi headers
-      rdma: Add IB device and net device rename events
-
-Choong Yong Liang (1):
-      tc: Add support for Hold/Release mechanism in TSN as per IEEE 802.1Q-=
-2018
-
-Cindy Lu (1):
-      vdpa: Add support for setting the MAC address in vDPA tool.
-
-David Lamparter (2):
-      lib: utils: move over `print_num` from ip/
-      rt_names: read `rt_addrprotos.d` directory
-
-Denis Kirjanov (1):
-      lib: utils: close file handle on error
-
-Fabian Pfitzner (1):
-      bridge: dump mcast querier state
-
-Ido Schimmel (2):
-      man: Add ip-rule(8) as generation target
-      iprule: Add DSCP support
-
-Jiri Pirko (1):
-      devlink: do dry parse for extended handle with selector
-
-Minhong He (3):
-      ip: fix memory leak in do_show()
-      devlink: fix memory leak in ifname_map_rtnl_init()
-      bridge: fix memory leak in error path
-
-Neil Svedberg (1):
-      iproute2: Fix grammar in duplicate argument error message
-
-Nikolay Aleksandrov (1):
-      bridge: add ip/iplink_bridge files to MAINTAINERS
-
-Saeed Mahameed (1):
-      devlink: use the correct handle flag for port param show
-
-Stephen Hemminger (9):
-      uapi: update headers to 6.13-rc1
-      libnetlink: add missing endian.h
-      rdma: add missing header for basename
-      ip: rearrange and prune header files
-      cg_map: use limits.h
-      flower: replace XATTR_SIZE_MAX
-      uapi: remove no longer used linux/limits.h
-      uapi: update kernel headers
-      v6.13.0
-
-Vincent Mailhol (7):
-      iplink_can: remove unused FILE *f parameter in three functions
-      iplink_can: reduce the visibility of tdc in can_parse_opt()
-      iplink_can: remove newline at the end of invarg()'s messages
-      iplink_can: use invarg() instead of fprintf()
-      iplink_can: add struct can_tdc
-      iplink_can: rename dbt into fd_dbt in can_parse_opt()
-      add .editorconfig file for basic formatting
-
-Yedaya Katsman (1):
-      ip: Add "down" filter for "ip addr/link show"
+-- 
+2.47.1
 
 
