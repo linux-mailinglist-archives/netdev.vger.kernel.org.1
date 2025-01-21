@@ -1,182 +1,189 @@
-Return-Path: <netdev+bounces-160063-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160065-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7611FA17FEF
-	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 15:36:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id DEA09A18028
+	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 15:42:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 73EF53A2FCA
-	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 14:36:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5E4C83A0648
+	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 14:42:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87A771F3D3C;
-	Tue, 21 Jan 2025 14:36:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBC581F472B;
+	Tue, 21 Jan 2025 14:40:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ow2/N6rG"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f174.google.com (mail-qk1-f174.google.com [209.85.222.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F1AF1F3D51
-	for <netdev@vger.kernel.org>; Tue, 21 Jan 2025 14:36:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AE5A1F3FD8;
+	Tue, 21 Jan 2025 14:40:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737470186; cv=none; b=KaumIUToXrknzjh4jxlBuN/YuMJ8sUKw3h0gRyTepn0EreQ2XTYwzc/hHLn7QrR2RPdWNs4ZBQPxpqaQ3cNiCdyfwkgWw6ReY9cIx8AmYGUc9bgn8W3CUCSDKLQYatV/oCayG9uF1defHpLZ5ZGQNgZWl/OoDVRfuKLZRpoOCHQ=
+	t=1737470407; cv=none; b=ZPZxoL43Nt1oAPLgqYUzv6lxLJvL5RS6DnwTDa9wX49AZ6ymx88lbFMzptq+hamAcHXkvXAKpldDpgr4SEuMevUGM0Wuu2opgo7S6HV3/gWf+SC3u+WXU9DHJsULujeaWbouWMXrYliOdRDn6Lq7UheGhW9pZMBe9ak58JV1Mwc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737470186; c=relaxed/simple;
-	bh=hsdTDRdueMnbG+uiskwcVMhMRMBzdXwYvgRD/QiFinw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=CaHp7MG9a4E+ZlKthEZWpST+XU88Gq9RcI+IM0iCcv370vas6e2iUfvj+LN4FfbBpWsSCtKXNjeQEVuElgP82CA9ehzyG5yh4M0IM5CTJWw8NLlQ0yBs3aoXAIl35m2kVABjAyfcxfyDrcZn4PS+REj+4Wk45TGYKhzkio5ho1M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from ptz.office.stw.pengutronix.de ([2a0a:edc0:0:900:1d::77] helo=[127.0.0.1])
-	by metis.whiteo.stw.pengutronix.de with esmtp (Exim 4.92)
-	(envelope-from <a.fatoum@pengutronix.de>)
-	id 1taFMT-0007tg-PJ; Tue, 21 Jan 2025 15:36:13 +0100
-Message-ID: <5c4be0e8-d8c5-4955-98c7-7face42fbb5c@pengutronix.de>
-Date: Tue, 21 Jan 2025 15:36:11 +0100
+	s=arc-20240116; t=1737470407; c=relaxed/simple;
+	bh=RoOPEw1pnjf93BWu1H+vv+vMseKv0LAkB8QIKntc2D8=;
+	h=Date:From:To:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=Cdr0s4rnZrUb2KEHrpoeMDL+uKPPB5PjjjI6THBHpLkRFjQyoU9Eizz8hzMy7KufCYZMRVLU8IDM7DTYuNS1o7dNas+KTF4fyQ8HxVyRZx8buAoynUDXIOhpStyp9Tp9dreWtWxX5ESn+tuchPff6s851b2GaPKbeLTwBp8+37o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ow2/N6rG; arc=none smtp.client-ip=209.85.222.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f174.google.com with SMTP id af79cd13be357-7b700c13edaso303446385a.3;
+        Tue, 21 Jan 2025 06:40:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1737470405; x=1738075205; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=SGQfSzGMb0K2xpDR8R+dRZzW8GV9BBlFM9+N4B0KulE=;
+        b=Ow2/N6rG03ktTfCSUj4+ZMDgjhPocbxqlwSIFd3xXQzhnFBsGTTWyKf61ZqRqKaGQc
+         29aXBOmc42ocimuf3r44m2y8MUNv2LN5BwFSwtVwZHuuNTf+ZIJ5Ghd5J1YxL+fREngP
+         6pvqz43F7ldltbZXuQsIUSB1IZyi1dQd77tLLdh5aUEdxYJm8UvLrG69N4QGflqoFEez
+         FKWgk6HC3izQBacH07DwmyOJqUJSBzDIhZ2ErABKda+1nVlS/a7Tj33ThD/IBoO2mH3i
+         QbR2agosqWixbD3nZCeVicHy4Zzi1cysMBWd0xSiKlmQiP+YRmRPUZhrlu8hfPMrrt5/
+         Q04w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737470405; x=1738075205;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=SGQfSzGMb0K2xpDR8R+dRZzW8GV9BBlFM9+N4B0KulE=;
+        b=CHP2giN/rr25Not5M4aTkZfqCFpebD/v5utLscz3yIc5jN6FumpQin0sbTcHSwS5YP
+         11NWK5ivW2cd22BdP4+8T5gBOUMC5DS55bV3C596LwJoTNy6vn9h2/V+NLxuQ/qq7C2X
+         idxrjRqndLAkuInsRoTUj3rPCouBjkAZTYGYvZ7LVGtNemOdygwkTDdz3wwlaXQrCD5/
+         XNMJbp73JjDwptCuYlbD9VmYzWqSlv0u3r9VFk023Y/AhPCPkfHYcdOMhANnTwB+ZG91
+         eLa+a+vwUhRmFFSxU+oRWrXX3EUoOSF0g1WFPl4cXRHnBXHnKS5RyoLXf3+bXMvnRtzS
+         S68g==
+X-Forwarded-Encrypted: i=1; AJvYcCUymrgrHRhuQWotFPTqplM+B9UzaXLPE1LAAFUjDk+9zgk6iy31/7bspmNspLNo1r4MwU0BhvQt6sDzL3Sy@vger.kernel.org, AJvYcCVe+Hls4EKe27WWZ2vG3vKnBh031Qiqt74vR/AmKA6j6FPRlGjqFKFXc1G9X4kkZxa6Im78MnTt/PsbgnUnYKHP@vger.kernel.org, AJvYcCWIg04mfIBKbJjSatYRPWPY9JBRqy2RVI8tixI52Rn+IUHreq9PAGapjBey5zV/RrKVTTY=@vger.kernel.org, AJvYcCWk4TkcL+GMm+3ninooQUga7TNjTEZdRX1t6D8iecy2NQxcil5FsPZGW/Mc1m2vzwwkQqidGHvgbdTF@vger.kernel.org, AJvYcCXDru/uirb6RE/ex5G4O6RniDTl24WBLGgAJelDHouDPXkBafs+3q2p89KYRvvtwBCME1I78EQM@vger.kernel.org
+X-Gm-Message-State: AOJu0YwHAOIMI6HwHxIoor+lZJ1fjkEARj0SWmMq/7XxjY6kOjjR4j3K
+	qRjMRkMwy/acI29vOxFZ0bDvdMIDLWR4aDozTHDg4YtkW/jP22IE
+X-Gm-Gg: ASbGncss6222td6S81Lc/crawGBidWM/3Bwz6930W2y7N4GmJmrrE0tggYg980/aSQj
+	S8lj8K2MQyZNroaLaPEm+egSjzALJAa5tO/KuyP8udns7IylnDHnnBRdrWIaqHUYZt7aDXH2i0B
+	KN1EopaPZpqyzI0Z3OS/Tosk7cugKew64JppV/Nf+K9nRWtAK73BYSFQzF60e416twi9L30M+50
+	TB0X8GEp0GrA2b4+Bt+F1RikOrVHMjThj/NkgXk8vSO8z2nGy+ArTiz43wr2qYyJau003A0o+TN
+	HAlKvKbWBixhWNOLNmLuBvddpT7G+UcEQ4EUaaQVsA==
+X-Google-Smtp-Source: AGHT+IEm9uh2oi8GwqrdV15LlWS/Rqn7wndmxNzv/1SRiy16/A1ivtq3hKiACLTKq3h6bJm+AeDuYg==
+X-Received: by 2002:a05:6214:c25:b0:6d8:899e:c3bf with SMTP id 6a1803df08f44-6e1b21c47f9mr251116416d6.34.1737470404863;
+        Tue, 21 Jan 2025 06:40:04 -0800 (PST)
+Received: from localhost (15.60.86.34.bc.googleusercontent.com. [34.86.60.15])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6e1afce3215sm51677466d6.100.2025.01.21.06.40.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 21 Jan 2025 06:40:04 -0800 (PST)
+Date: Tue, 21 Jan 2025 09:40:03 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Akihiko Odaki <akihiko.odaki@daynix.com>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ Jonathan Corbet <corbet@lwn.net>, 
+ Jason Wang <jasowang@redhat.com>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ "Michael S. Tsirkin" <mst@redhat.com>, 
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+ Shuah Khan <shuah@kernel.org>, 
+ linux-doc@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ netdev@vger.kernel.org, 
+ kvm@vger.kernel.org, 
+ virtualization@lists.linux-foundation.org, 
+ linux-kselftest@vger.kernel.org, 
+ Yuri Benditovich <yuri.benditovich@daynix.com>, 
+ Andrew Melnychenko <andrew@daynix.com>, 
+ Stephen Hemminger <stephen@networkplumber.org>, 
+ gur.stavi@huawei.com, 
+ devel@daynix.com
+Message-ID: <678fb1c3d123b_23e15a2946c@willemb.c.googlers.com.notmuch>
+In-Reply-To: <806def7d-16f3-4d53-abc8-7d18e8c22dcb@daynix.com>
+References: <20250120-tun-v4-0-ee81dda03d7f@daynix.com>
+ <20250120-tun-v4-8-ee81dda03d7f@daynix.com>
+ <678e327e34602_19c737294b4@willemb.c.googlers.com.notmuch>
+ <806def7d-16f3-4d53-abc8-7d18e8c22dcb@daynix.com>
+Subject: Re: [PATCH net-next v4 8/9] tap: Keep hdr_len in tap_get_user()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: fec: Refactor MAC reset to function
-To: =?UTF-8?B?Q3PDs2vDoXMsIEJlbmNl?= <csokas.bence@prolan.hu>,
- Jakub Kicinski <kuba@kernel.org>, Laurent Badel <laurentbadel@eaton.com>,
- imx@lists.linux.dev, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: Wei Fang <wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>,
- Clark Wang <xiaoning.wang@nxp.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>
-References: <20250121103857.12007-3-csokas.bence@prolan.hu>
-Content-Language: en-US
-From: Ahmad Fatoum <a.fatoum@pengutronix.de>
-In-Reply-To: <20250121103857.12007-3-csokas.bence@prolan.hu>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:900:1d::77
-X-SA-Exim-Mail-From: a.fatoum@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-Hi,
-
-On 21.01.25 11:38, Csókás, Bence wrote:
-> The core is reset both in `fec_restart()`
-> (called on link-up) and `fec_stop()`
-> (going to sleep, driver remove etc.).
-> These two functions had their separate
-> implementations, which was at first only
-> a register write and a `udelay()` (and
-> the accompanying block comment).
-> However, since then we got soft-reset
-> (MAC disable) and Wake-on-LAN support,
-> which meant that these implementations
-> diverged, often causing bugs. For instance,
-> as of now, `fec_stop()` does not check for
-> `FEC_QUIRK_NO_HARD_RESET`. To eliminate
-> this bug-source, refactor implementation
-> to a common function.
-
-please make the lines a bit longer for v2. 43 characters is much too limited.
-
-Thanks,
-Ahmad
-
+Akihiko Odaki wrote:
+> On 2025/01/20 20:24, Willem de Bruijn wrote:
+> > Akihiko Odaki wrote:
+> >> hdr_len is repeatedly used so keep it in a local variable.
+> >>
+> >> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
+> >> ---
+> >>   drivers/net/tap.c | 17 +++++++----------
+> >>   1 file changed, 7 insertions(+), 10 deletions(-)
+> >>
+> >> diff --git a/drivers/net/tap.c b/drivers/net/tap.c
+> >> index 061c2f27dfc83f5e6d0bea4da0e845cc429b1fd8..7ee2e9ee2a89fd539b087496b92d2f6198266f44 100644
+> >> --- a/drivers/net/tap.c
+> >> +++ b/drivers/net/tap.c
+> >> @@ -645,6 +645,7 @@ static ssize_t tap_get_user(struct tap_queue *q, void *msg_control,
+> >>   	int err;
+> >>   	struct virtio_net_hdr vnet_hdr = { 0 };
+> >>   	int vnet_hdr_len = 0;
+> >> +	int hdr_len = 0;
+> >>   	int copylen = 0;
+> >>   	int depth;
+> >>   	bool zerocopy = false;
+> >> @@ -672,6 +673,7 @@ static ssize_t tap_get_user(struct tap_queue *q, void *msg_control,
+> >>   		err = -EINVAL;
+> >>   		if (tap16_to_cpu(q, vnet_hdr.hdr_len) > iov_iter_count(from))
+> >>   			goto err;
+> >> +		hdr_len = tap16_to_cpu(q, vnet_hdr.hdr_len);
+> >>   	}
+> >>   
+> >>   	len = iov_iter_count(from);
+> >> @@ -683,11 +685,8 @@ static ssize_t tap_get_user(struct tap_queue *q, void *msg_control,
+> >>   	if (msg_control && sock_flag(&q->sk, SOCK_ZEROCOPY)) {
+> >>   		struct iov_iter i;
+> >>   
+> >> -		copylen = vnet_hdr.hdr_len ?
+> >> -			tap16_to_cpu(q, vnet_hdr.hdr_len) : GOODCOPY_LEN;
+> >> -		if (copylen > good_linear)
+> >> -			copylen = good_linear;
+> >> -		else if (copylen < ETH_HLEN)
+> >> +		copylen = min(hdr_len ? hdr_len : GOODCOPY_LEN, good_linear);
+> >> +		if (copylen < ETH_HLEN)
+> >>   			copylen = ETH_HLEN;
+> >>   		linear = copylen;
+> >>   		i = *from;
+> >> @@ -698,11 +697,9 @@ static ssize_t tap_get_user(struct tap_queue *q, void *msg_control,
+> >>   
+> >>   	if (!zerocopy) {
+> >>   		copylen = len;
+> >> -		linear = tap16_to_cpu(q, vnet_hdr.hdr_len);
+> >> -		if (linear > good_linear)
+> >> -			linear = good_linear;
+> >> -		else if (linear < ETH_HLEN)
+> >> -			linear = ETH_HLEN;
+> >> +		linear = min(hdr_len, good_linear);
+> >> +		if (copylen < ETH_HLEN)
+> >> +			copylen = ETH_HLEN;
+> > 
+> > Similar to previous patch, I don't think this patch is significant
+> > enough to warrant the code churn.
 > 
-> Fixes: c730ab423bfa ("net: fec: Fix temporary RMII clock reset on link up")
-> Signed-off-by: Csókás, Bence <csokas.bence@prolan.hu>
-> ---
+> The following patch will require replacing
+> tap16_to_cpu(q, vnet_hdr.hdr_len)
+> with
+> tap16_to_cpu(q->flags, vnet_hdr.hdr_len)
+>
+> It will make some lines a bit too long. Calling tap16_to_cpu() at 
+> multiple places is also not good to keep the vnet implementation unified 
+> as the function inspects vnet_hdr.
 > 
-> Notes:
->     Recommended options for this patch:
->     `--color-moved --color-moved-ws=allow-indentation-change`
-> 
->  drivers/net/ethernet/freescale/fec_main.c | 50 +++++++++++------------
->  1 file changed, 23 insertions(+), 27 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/freescale/fec_main.c b/drivers/net/ethernet/freescale/fec_main.c
-> index 68725506a095..850ef3de74ec 100644
-> --- a/drivers/net/ethernet/freescale/fec_main.c
-> +++ b/drivers/net/ethernet/freescale/fec_main.c
-> @@ -1064,6 +1064,27 @@ static void fec_enet_enable_ring(struct net_device *ndev)
->  	}
->  }
->  
-> +/* Whack a reset.  We should wait for this.
-> + * For i.MX6SX SOC, enet use AXI bus, we use disable MAC
-> + * instead of reset MAC itself.
-> + */
-> +static void fec_ctrl_reset(struct fec_enet_private *fep, bool wol)
-> +{
-> +	if (!wol || !(fep->wol_flag & FEC_WOL_FLAG_SLEEP_ON)) {
-> +		if (fep->quirks & FEC_QUIRK_HAS_MULTI_QUEUES ||
-> +		    ((fep->quirks & FEC_QUIRK_NO_HARD_RESET) && fep->link)) {
-> +			writel(0, fep->hwp + FEC_ECNTRL);
-> +		} else {
-> +			writel(FEC_ECR_RESET, fep->hwp + FEC_ECNTRL);
-> +			udelay(10);
-> +		}
-> +	} else {
-> +		val = readl(fep->hwp + FEC_ECNTRL);
-> +		val |= (FEC_ECR_MAGICEN | FEC_ECR_SLEEP);
-> +		writel(val, fep->hwp + FEC_ECNTRL);
-> +	}
-> +}
-> +
->  /*
->   * This function is called to start or restart the FEC during a link
->   * change, transmit timeout, or to reconfigure the FEC.  The network
-> @@ -1080,17 +1101,7 @@ fec_restart(struct net_device *ndev)
->  	if (fep->bufdesc_ex)
->  		fec_ptp_save_state(fep);
->  
-> -	/* Whack a reset.  We should wait for this.
-> -	 * For i.MX6SX SOC, enet use AXI bus, we use disable MAC
-> -	 * instead of reset MAC itself.
-> -	 */
-> -	if (fep->quirks & FEC_QUIRK_HAS_MULTI_QUEUES ||
-> -	    ((fep->quirks & FEC_QUIRK_NO_HARD_RESET) && fep->link)) {
-> -		writel(0, fep->hwp + FEC_ECNTRL);
-> -	} else {
-> -		writel(1, fep->hwp + FEC_ECNTRL);
-> -		udelay(10);
-> -	}
-> +	fec_ctrl_reset(fep, false);
->  
->  	/*
->  	 * enet-mac reset will reset mac address registers too,
-> @@ -1344,22 +1355,7 @@ fec_stop(struct net_device *ndev)
->  	if (fep->bufdesc_ex)
->  		fec_ptp_save_state(fep);
->  
-> -	/* Whack a reset.  We should wait for this.
-> -	 * For i.MX6SX SOC, enet use AXI bus, we use disable MAC
-> -	 * instead of reset MAC itself.
-> -	 */
-> -	if (!(fep->wol_flag & FEC_WOL_FLAG_SLEEP_ON)) {
-> -		if (fep->quirks & FEC_QUIRK_HAS_MULTI_QUEUES) {
-> -			writel(0, fep->hwp + FEC_ECNTRL);
-> -		} else {
-> -			writel(FEC_ECR_RESET, fep->hwp + FEC_ECNTRL);
-> -			udelay(10);
-> -		}
-> -	} else {
-> -		val = readl(fep->hwp + FEC_ECNTRL);
-> -		val |= (FEC_ECR_MAGICEN | FEC_ECR_SLEEP);
-> -		writel(val, fep->hwp + FEC_ECNTRL);
-> -	}
-> +	fec_ctrl_reset(fep, true);
->  	writel(fep->phy_speed, fep->hwp + FEC_MII_SPEED);
->  	writel(FEC_DEFAULT_IMASK, fep->hwp + FEC_IMASK);
->  
+> This patch is independently too trivial, but I think it is a worthwhile 
+> cleanup combined with the following patch.
 
-
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+Ok. I see what you mean.
 
