@@ -1,158 +1,182 @@
-Return-Path: <netdev+bounces-160064-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160063-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9D14A1801E
-	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 15:42:06 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7611FA17FEF
+	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 15:36:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 78C077A4BE1
-	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 14:41:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 73EF53A2FCA
+	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 14:36:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DFD41F3FD1;
-	Tue, 21 Jan 2025 14:39:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nGIn3Ng9"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87A771F3D3C;
+	Tue, 21 Jan 2025 14:36:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 904761F1508;
-	Tue, 21 Jan 2025 14:39:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F1AF1F3D51
+	for <netdev@vger.kernel.org>; Tue, 21 Jan 2025 14:36:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737470375; cv=none; b=BGlkdOLyCZF/auQf7xUyuu2J5ggV3fvC/0RewYNqjd/yWi3bn1fmLYIoNTHCfQlSLUPcGsCCqns4UiWWq6j2rxpEuse3HgGaDXw2u2QoVWIkqfUAg0OUhPC0A6YzrloQuYHqYDe/becZ8RLAg2op7NbdY31TDEMhF6otE1JlTM0=
+	t=1737470186; cv=none; b=KaumIUToXrknzjh4jxlBuN/YuMJ8sUKw3h0gRyTepn0EreQ2XTYwzc/hHLn7QrR2RPdWNs4ZBQPxpqaQ3cNiCdyfwkgWw6ReY9cIx8AmYGUc9bgn8W3CUCSDKLQYatV/oCayG9uF1defHpLZ5ZGQNgZWl/OoDVRfuKLZRpoOCHQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737470375; c=relaxed/simple;
-	bh=4TEa7Lov74WvDD9VbiPQrlS9Dg8723r7IvA82a28054=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uZlZ6DUN9ZwchugrlshOMcZqOOvXpCaO9zeyvBfPzDcNWj6PUlH3OUaQefGHwAybZAftLqFdZWtd8WPw1gpQGNbLV9Pkm9JsC1QILmVkqIMnNI647gL5I/ZKo4TkFyMAFdMFP+iLZj+bZsNVZMlE4BVPcDiIR2axUVLXb1foxtw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nGIn3Ng9; arc=none smtp.client-ip=198.175.65.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1737470374; x=1769006374;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=4TEa7Lov74WvDD9VbiPQrlS9Dg8723r7IvA82a28054=;
-  b=nGIn3Ng9viFqQqEolX4VOJHLhhnqdSfTesd2ywkGpWqA3tz6YzPEEt3E
-   uQZjyi3RiG6T2ArlUqdlwD3oVT4Kkd34e2uhcYQ7uLyz3K+hPHBt8H6b6
-   U3YmxMUS7tBm3Vt5YTKbNvZ4PGyYaosKSWdAbazpD7t+QigkHAfl/jF1T
-   KhH8pkGlBcGf/0pYeQ6fB1Bb7lMA08P5dNmdGx4FGbDLTmeoWJsMwysFO
-   oIhLLevenLfSI9kKUsrhR8PbXQsWTpNU0GsrSH9XpeVaTmXiwULuXgAQZ
-   nRk0yj8uaRYq7+g0Qf7s+bC8iw1fzhMiuRGreZZD7R3CsErchj+MzpIO7
-   Q==;
-X-CSE-ConnectionGUID: +80xK/itQa+cldqqVz/Vag==
-X-CSE-MsgGUID: wnf6R6AQTlCOxZWnjtOocQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11322"; a="48878320"
-X-IronPort-AV: E=Sophos;i="6.13,222,1732608000"; 
-   d="scan'208";a="48878320"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jan 2025 06:39:33 -0800
-X-CSE-ConnectionGUID: g4gx3czdQDWba+a06Y3bDA==
-X-CSE-MsgGUID: aO3yH/gcQAu+RD0sSwprCg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="111445223"
-Received: from mev-dev.igk.intel.com ([10.237.112.144])
-  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jan 2025 06:39:30 -0800
-Date: Tue, 21 Jan 2025 15:36:04 +0100
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: Aryan Srivastava <Aryan.Srivastava@alliedtelesis.co.nz>
-Cc: "andrew@lunn.ch" <andrew@lunn.ch>,
-	"olteanv@gmail.com" <olteanv@gmail.com>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"jiri@resnulli.us" <jiri@resnulli.us>,
-	"horms@kernel.org" <horms@kernel.org>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>
-Subject: Re: [RFC net-next v1 2/2] net: dsa: add option for bridge port HW
- offload
-Message-ID: <Z4+w1O/tS7nw0jlS@mev-dev.igk.intel.com>
-References: <20250120004913.2154398-1-aryan.srivastava@alliedtelesis.co.nz>
- <20250120004913.2154398-3-aryan.srivastava@alliedtelesis.co.nz>
- <bb9cf9af-2f17-4af6-9d1c-3981cc8468c0@lunn.ch>
- <5d5cc80b20e878d01c3d7d739f0fc7e429a840ed.camel@alliedtelesis.co.nz>
- <17952bc5-31eb-452c-8fec-957260e9afd1@lunn.ch>
- <f8e90a949d08d3aba01a77f761efa41b44924345.camel@alliedtelesis.co.nz>
+	s=arc-20240116; t=1737470186; c=relaxed/simple;
+	bh=hsdTDRdueMnbG+uiskwcVMhMRMBzdXwYvgRD/QiFinw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=CaHp7MG9a4E+ZlKthEZWpST+XU88Gq9RcI+IM0iCcv370vas6e2iUfvj+LN4FfbBpWsSCtKXNjeQEVuElgP82CA9ehzyG5yh4M0IM5CTJWw8NLlQ0yBs3aoXAIl35m2kVABjAyfcxfyDrcZn4PS+REj+4Wk45TGYKhzkio5ho1M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from ptz.office.stw.pengutronix.de ([2a0a:edc0:0:900:1d::77] helo=[127.0.0.1])
+	by metis.whiteo.stw.pengutronix.de with esmtp (Exim 4.92)
+	(envelope-from <a.fatoum@pengutronix.de>)
+	id 1taFMT-0007tg-PJ; Tue, 21 Jan 2025 15:36:13 +0100
+Message-ID: <5c4be0e8-d8c5-4955-98c7-7face42fbb5c@pengutronix.de>
+Date: Tue, 21 Jan 2025 15:36:11 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f8e90a949d08d3aba01a77f761efa41b44924345.camel@alliedtelesis.co.nz>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] net: fec: Refactor MAC reset to function
+To: =?UTF-8?B?Q3PDs2vDoXMsIEJlbmNl?= <csokas.bence@prolan.hu>,
+ Jakub Kicinski <kuba@kernel.org>, Laurent Badel <laurentbadel@eaton.com>,
+ imx@lists.linux.dev, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: Wei Fang <wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>,
+ Clark Wang <xiaoning.wang@nxp.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>
+References: <20250121103857.12007-3-csokas.bence@prolan.hu>
+Content-Language: en-US
+From: Ahmad Fatoum <a.fatoum@pengutronix.de>
+In-Reply-To: <20250121103857.12007-3-csokas.bence@prolan.hu>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:900:1d::77
+X-SA-Exim-Mail-From: a.fatoum@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Mon, Jan 20, 2025 at 09:36:57PM +0000, Aryan Srivastava wrote:
-> On Mon, 2025-01-20 at 04:12 +0100, Andrew Lunn wrote:
-> > > > This is not a very convincing description. What is your real use
-> > > > case
-> > > > for not offloading?
-> > > > 
-> > > The real use case for us is packet inspection. Due to the bridge
-> > > ports
-> > > being offloaded in hardware, we can no longer inspect the traffic
-> > > on
-> > > them, as the packets never hit the CPU.
-> > 
-> > So are you using libpcap to bring them into user space? Or are you
-> > using eBPF?
-> > 
-> > What i'm thinking about is, should this actually be a devlink option,
-> > or should it happen on its own because you have attached something
-> > which cannot be offloaded to the hardware, so hardware offload should
-> > be disabled by the kernel?
-> Yes, so we use various in-kernel (eBPF) and some out of tree methods
-> (netmap). To service both, I thought that a devlink config would be
-> best.
-> 
-> Also aside from specific kernel feature use-cases the actual port we
-> are trying to service is meant to be a dedicated NIC, whose
-> implementation detail is that it is on a switch chip. By offloading
-> aspects of its config, we end up with inconsistent behaviour across NIC
-> ports on our devices. As the port is not meant to behave like a
-> switchport, the fact it happens to be on the end of a switch should not
-> force it to HW offload bridging. The HW bridging results in CPU bypass,
-> where as SW bridging will be a more desirable method of bridging for
-> this port. Therefore it is desirable to have a method to configure
-> certain ports for SW bridging only, rather than the driver
-> automatically choosing to do HW offload if capable.
-> > 
-> > > > net-next is closed for the merge window.
-> > 
-> > > I was unsure about uploading this right now (as you said net-next
-> > > is
-> > > closed), but the netdev docs page states that RFC patches are
-> > > welcome
-> > > anytime, please let me know if this is not case, and if so I
-> > > apologize
-> > > for my erroneous submission.
-> > 
-> > It would be good to say what you are requesting comments about.
-> > 
-> Ah yes, I understand. I will add the request in the cover letter next
-> time, but essentially I just wanted comments about the best way to go
-> about this. Specifically if there was already a method in kernel to
-> prevent HW offload of certain features or if there are alternative
-> methods to devlink to add specific switch config options on a per port
-> basis.
+Hi,
 
-For debug purpouse I am turning off HW bridge offload by setting aging to 0.
-Don't know if it is appropriate in your case.
+On 21.01.25 11:38, Csókás, Bence wrote:
+> The core is reset both in `fec_restart()`
+> (called on link-up) and `fec_stop()`
+> (going to sleep, driver remove etc.).
+> These two functions had their separate
+> implementations, which was at first only
+> a register write and a `udelay()` (and
+> the accompanying block comment).
+> However, since then we got soft-reset
+> (MAC disable) and Wake-on-LAN support,
+> which meant that these implementations
+> diverged, often causing bugs. For instance,
+> as of now, `fec_stop()` does not check for
+> `FEC_QUIRK_NO_HARD_RESET`. To eliminate
+> this bug-source, refactor implementation
+> to a common function.
 
-Thanks
-Michal
+please make the lines a bit longer for v2. 43 characters is much too limited.
+
+Thanks,
+Ahmad
 
 > 
-> 	Aryan
+> Fixes: c730ab423bfa ("net: fec: Fix temporary RMII clock reset on link up")
+> Signed-off-by: Csókás, Bence <csokas.bence@prolan.hu>
+> ---
 > 
+> Notes:
+>     Recommended options for this patch:
+>     `--color-moved --color-moved-ws=allow-indentation-change`
 > 
+>  drivers/net/ethernet/freescale/fec_main.c | 50 +++++++++++------------
+>  1 file changed, 23 insertions(+), 27 deletions(-)
 > 
+> diff --git a/drivers/net/ethernet/freescale/fec_main.c b/drivers/net/ethernet/freescale/fec_main.c
+> index 68725506a095..850ef3de74ec 100644
+> --- a/drivers/net/ethernet/freescale/fec_main.c
+> +++ b/drivers/net/ethernet/freescale/fec_main.c
+> @@ -1064,6 +1064,27 @@ static void fec_enet_enable_ring(struct net_device *ndev)
+>  	}
+>  }
+>  
+> +/* Whack a reset.  We should wait for this.
+> + * For i.MX6SX SOC, enet use AXI bus, we use disable MAC
+> + * instead of reset MAC itself.
+> + */
+> +static void fec_ctrl_reset(struct fec_enet_private *fep, bool wol)
+> +{
+> +	if (!wol || !(fep->wol_flag & FEC_WOL_FLAG_SLEEP_ON)) {
+> +		if (fep->quirks & FEC_QUIRK_HAS_MULTI_QUEUES ||
+> +		    ((fep->quirks & FEC_QUIRK_NO_HARD_RESET) && fep->link)) {
+> +			writel(0, fep->hwp + FEC_ECNTRL);
+> +		} else {
+> +			writel(FEC_ECR_RESET, fep->hwp + FEC_ECNTRL);
+> +			udelay(10);
+> +		}
+> +	} else {
+> +		val = readl(fep->hwp + FEC_ECNTRL);
+> +		val |= (FEC_ECR_MAGICEN | FEC_ECR_SLEEP);
+> +		writel(val, fep->hwp + FEC_ECNTRL);
+> +	}
+> +}
+> +
+>  /*
+>   * This function is called to start or restart the FEC during a link
+>   * change, transmit timeout, or to reconfigure the FEC.  The network
+> @@ -1080,17 +1101,7 @@ fec_restart(struct net_device *ndev)
+>  	if (fep->bufdesc_ex)
+>  		fec_ptp_save_state(fep);
+>  
+> -	/* Whack a reset.  We should wait for this.
+> -	 * For i.MX6SX SOC, enet use AXI bus, we use disable MAC
+> -	 * instead of reset MAC itself.
+> -	 */
+> -	if (fep->quirks & FEC_QUIRK_HAS_MULTI_QUEUES ||
+> -	    ((fep->quirks & FEC_QUIRK_NO_HARD_RESET) && fep->link)) {
+> -		writel(0, fep->hwp + FEC_ECNTRL);
+> -	} else {
+> -		writel(1, fep->hwp + FEC_ECNTRL);
+> -		udelay(10);
+> -	}
+> +	fec_ctrl_reset(fep, false);
+>  
+>  	/*
+>  	 * enet-mac reset will reset mac address registers too,
+> @@ -1344,22 +1355,7 @@ fec_stop(struct net_device *ndev)
+>  	if (fep->bufdesc_ex)
+>  		fec_ptp_save_state(fep);
+>  
+> -	/* Whack a reset.  We should wait for this.
+> -	 * For i.MX6SX SOC, enet use AXI bus, we use disable MAC
+> -	 * instead of reset MAC itself.
+> -	 */
+> -	if (!(fep->wol_flag & FEC_WOL_FLAG_SLEEP_ON)) {
+> -		if (fep->quirks & FEC_QUIRK_HAS_MULTI_QUEUES) {
+> -			writel(0, fep->hwp + FEC_ECNTRL);
+> -		} else {
+> -			writel(FEC_ECR_RESET, fep->hwp + FEC_ECNTRL);
+> -			udelay(10);
+> -		}
+> -	} else {
+> -		val = readl(fep->hwp + FEC_ECNTRL);
+> -		val |= (FEC_ECR_MAGICEN | FEC_ECR_SLEEP);
+> -		writel(val, fep->hwp + FEC_ECNTRL);
+> -	}
+> +	fec_ctrl_reset(fep, true);
+>  	writel(fep->phy_speed, fep->hwp + FEC_MII_SPEED);
+>  	writel(FEC_DEFAULT_IMASK, fep->hwp + FEC_IMASK);
+>  
+
+
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
