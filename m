@@ -1,253 +1,113 @@
-Return-Path: <netdev+bounces-159975-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159977-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0834AA178EB
-	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 08:57:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id AE6C0A17921
+	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 09:15:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0BEF41888FD2
-	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 07:57:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 57895188B858
+	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 08:15:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F39F1B4149;
-	Tue, 21 Jan 2025 07:56:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="DlY6cghH"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B8361B87C1;
+	Tue, 21 Jan 2025 08:15:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B48018FC74;
-	Tue, 21 Jan 2025 07:56:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA242145A18;
+	Tue, 21 Jan 2025 08:15:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737446199; cv=none; b=jz88qidNPNGdtAxlki3y+t4Ax707PFwyZRh/ehKEx4u0QgjmPrWGYq8UbLk6n04cpZpwkjRnZY+zDJ6J/XideyHoSMnYFwqxrE7TfMq7R1oR/Imqn0SxOEIH25mNascTQKCafOwu+vmpoKH8eB32VC6xMHJvt8/bWu0sivOhBNQ=
+	t=1737447304; cv=none; b=pTR3V+Gl5NmcrRermjahoFYqEKyn2LWSdk2GsTXbcuuZ37mQ3qllxe9E8a6YJvHaowsPyo+VkgTo83QWhuYtf0Hu4NySjQFe3+bcUJCpjp7aALdbxNbDVCgXs9BSbplvzYfofBUb1zhVqFzxBJ8hEBiD8xnD4fRNJtOXbPHbsQI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737446199; c=relaxed/simple;
-	bh=YEt+SvlU1KY5Og1iXrbbdYg96Nx8cW4rVfwyTnmUdEk=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:References:
-	 In-Reply-To:To:CC; b=lDxolx4tZR+DwkhPcYJd9lSn/LfzXYmi/iC3rVPqI9alOofWB05nIdCKR/I54Wr+u3VD6k0l/OOX6WdICVoRwLi+CZV/arwp41bmcBDREOWJTIxCvaQ/x93SP4sbZs7YDHovO4egZzQW/hM/lSfe4QTx64S/u2vqq8WZHADAUpw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=DlY6cghH; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50L1tToG006053;
-	Tue, 21 Jan 2025 07:56:23 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	3M55RDZIhoScj1BK3E9p13CWYwK9W2yoOKDOnXxxQas=; b=DlY6cghHULhnx1HG
-	6+Wic1/p2gGnASiudSNGVR0N6m9JxJrkLAiMhckkRVNMqVtNrcv1xmuRRboJGowY
-	MUU/OLAK3M9ZoxoGULYM8KY9nex4n3Dkz8Zs3qlbr87ia6kZwxJ8FfLDHNKbopij
-	k8EjhiD/QlLRE5LlR76JkDgSozDfGiHo/7SQoivLvjMs0XmvJbC2QpWBlIGdwzci
-	Q3QD3Wqt7aCgG2Wa9ZwMZtRbTv+PPT9bJq0tAPC1pBZxlCMC/wEkPmL0DCIz2Cdn
-	D5Rq8OFTit0EiPOkBJLvcEX7Q9o12csd7rZZebKcXXSPijaPuFFjcDEEOMbgxZgl
-	hpVIMw==
-Received: from nalasppmta05.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 44a2b80rfr-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 21 Jan 2025 07:56:23 +0000 (GMT)
-Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
-	by NALASPPMTA05.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 50L7u9IM026543
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 21 Jan 2025 07:56:09 GMT
-Received: from yijiyang-gv.ap.qualcomm.com (10.80.80.8) by
- nalasex01c.na.qualcomm.com (10.47.97.35) with Microsoft SMTP Server
+	s=arc-20240116; t=1737447304; c=relaxed/simple;
+	bh=ahKx+Enfn4BHZ/bI33qcRisaH6MuqL4Vm495WshmSRY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=haW+9med9PpxyyyIJSLgdUwIgfj+BQqbe0AM3ixxMsFZENM9E65hZJLdjmhuruT16eQ9KeRG9AMtlzZ8vXRS1xz6lO2pcZWKGEguI1AR9iTyFns6efNV5vTYgcDRBHGOOs9RS8pt5l/qLAF+UAU3ziYkFfCkR0lHU6gSTqlNbC0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.174])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4Ycg0F3dPczgc2x;
+	Tue, 21 Jan 2025 16:11:41 +0800 (CST)
+Received: from dggemv704-chm.china.huawei.com (unknown [10.3.19.47])
+	by mail.maildlp.com (Postfix) with ESMTPS id 65860140203;
+	Tue, 21 Jan 2025 16:14:52 +0800 (CST)
+Received: from kwepemn100009.china.huawei.com (7.202.194.112) by
+ dggemv704-chm.china.huawei.com (10.3.19.47) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.9; Mon, 20 Jan 2025 23:56:04 -0800
-From: Yijie Yang <quic_yijiyang@quicinc.com>
-Date: Tue, 21 Jan 2025 15:54:56 +0800
-Subject: [PATCH v3 4/4] arm64: dts: qcom: qcs615-ride: Enable ethernet node
+ 15.1.2507.39; Tue, 21 Jan 2025 16:14:52 +0800
+Received: from [10.67.121.59] (10.67.121.59) by kwepemn100009.china.huawei.com
+ (7.202.194.112) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Tue, 21 Jan
+ 2025 16:14:50 +0800
+Message-ID: <d42bf49b-e71b-d31e-2784-379076ebf370@huawei.com>
+Date: Tue, 21 Jan 2025 16:14:49 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-ID: <20250121-dts_qcs615-v3-4-fa4496950d8a@quicinc.com>
-References: <20250121-dts_qcs615-v3-0-fa4496950d8a@quicinc.com>
-In-Reply-To: <20250121-dts_qcs615-v3-0-fa4496950d8a@quicinc.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
-        "David S. Miller"
-	<davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Rob Herring
-	<robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley
-	<conor+dt@kernel.org>, Vinod Koul <vkoul@kernel.org>,
-        Maxime Coquelin
-	<mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue <alexandre.torgue@foss.st.com>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio
-	<konradybcio@kernel.org>,
-        Richard Cochran <richardcochran@gmail.com>
-CC: <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linux-arm-msm@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>,
-        Yijie Yang
-	<quic_yijiyang@quicinc.com>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1737446143; l=2940;
- i=quic_yijiyang@quicinc.com; s=20240408; h=from:subject:message-id;
- bh=YEt+SvlU1KY5Og1iXrbbdYg96Nx8cW4rVfwyTnmUdEk=;
- b=xD9KuogOG/gZWOXndKcgUdDOnoY0NtYpZMXYSDQZKDQblazOug4AhbfD7xFAfLBp3JBHe7Rd4
- 3Y92ndpLH16DusosHc/DJP96pnXIBJuEnX/c2pKDcB+Lj8Kx/ce37bp
-X-Developer-Key: i=quic_yijiyang@quicinc.com; a=ed25519;
- pk=XvMv0rxjrXLYFdBXoFjTdOdAwDT5SPbQ5uAKGESDihk=
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nalasex01c.na.qualcomm.com (10.47.97.35)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: DMu55lgGJr41YrRsyIjjU1lxXKaag2k9
-X-Proofpoint-ORIG-GUID: DMu55lgGJr41YrRsyIjjU1lxXKaag2k9
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-01-21_04,2025-01-21_01,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 mlxscore=0
- suspectscore=0 malwarescore=0 mlxlogscore=999 bulkscore=0
- priorityscore=1501 lowpriorityscore=0 adultscore=0 phishscore=0
- clxscore=1015 spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2411120000 definitions=main-2501210065
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.0
+Subject: Re: [PATCH v1 00/21] hwmon: Fix the type of 'config' in struct
+ hwmon_channel_info to u64
+To: Krzysztof Kozlowski <krzk@kernel.org>, <linux-hwmon@vger.kernel.org>
+CC: <linux-kernel@vger.kernel.org>, <linux-media@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <arm-scmi@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <linux-rtc@vger.kernel.org>,
+	<oss-drivers@corigine.com>, <linux-rdma@vger.kernel.org>,
+	<platform-driver-x86@vger.kernel.org>, <linuxarm@huawei.com>,
+	<linux@roeck-us.net>, <jdelvare@suse.com>, <kernel@maidavale.org>,
+	<pauk.denis@gmail.com>, <james@equiv.tech>, <sudeep.holla@arm.com>,
+	<cristian.marussi@arm.com>, <matt@ranostay.sg>, <mchehab@kernel.org>,
+	<irusskikh@marvell.com>, <andrew+netdev@lunn.ch>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<saeedm@nvidia.com>, <leon@kernel.org>, <tariqt@nvidia.com>,
+	<louis.peens@corigine.com>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
+	<kabel@kernel.org>, <W_Armin@gmx.de>, <hdegoede@redhat.com>,
+	<ilpo.jarvinen@linux.intel.com>, <alexandre.belloni@bootlin.com>,
+	<jonathan.cameron@huawei.com>, <zhanjie9@hisilicon.com>,
+	<zhenglifeng1@huawei.com>, <liuyonglong@huawei.com>
+References: <20250121064519.18974-1-lihuisong@huawei.com>
+ <870c6b3e-d4f9-4722-934e-00e9ddb84e2e@kernel.org>
+From: "lihuisong (C)" <lihuisong@huawei.com>
+In-Reply-To: <870c6b3e-d4f9-4722-934e-00e9ddb84e2e@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ kwepemn100009.china.huawei.com (7.202.194.112)
 
-Enable the ethernet node, add the phy node and pinctrl for ethernet. This
-change is necessary to support ethernet functionality on this board.
 
-Signed-off-by: Yijie Yang <quic_yijiyang@quicinc.com>
----
- arch/arm64/boot/dts/qcom/qcs615-ride.dts | 104 +++++++++++++++++++++++++++++++
- 1 file changed, 104 insertions(+)
+在 2025/1/21 15:47, Krzysztof Kozlowski 写道:
+> On 21/01/2025 07:44, Huisong Li wrote:
+>> The hwmon_device_register() is deprecated. When I try to repace it with
+>> hwmon_device_register_with_info() for acpi_power_meter driver, I found that
+>> the power channel attribute in linux/hwmon.h have to extend and is more
+>> than 32 after this replacement.
+>>
+>> However, the maximum number of hwmon channel attributes is 32 which is
+>> limited by current hwmon codes. This is not good to add new channel
+>> attribute for some hwmon sensor type and support more channel attribute.
+>>
+>> This series are aimed to do this. And also make sure that acpi_power_meter
+>> driver can successfully replace the deprecated hwmon_device_register()
+>> later.
+> Avoid combining independent patches into one patch bomb. Or explain the
+> dependencies and how is it supposed to be merged - that's why you have
+> cover letter here.
+These patches having a title ('Use HWMON_CHANNEL_INFO macro to simplify 
+code') are also for this series.
+Or we need to modify the type of the 'xxx_config' array in these patches.
+If we directly use the macro HWMON_CHANNEL_INFO, the type of 'config' 
+has been modifyed in patch 1/21 and these driver don't need to care this 
+change.
 
-diff --git a/arch/arm64/boot/dts/qcom/qcs615-ride.dts b/arch/arm64/boot/dts/qcom/qcs615-ride.dts
-index 2b5aa3c66867676bda59ff82b902b6e4974126f8..2d201b5d09a79613364f0e514858dd30b25706a9 100644
---- a/arch/arm64/boot/dts/qcom/qcs615-ride.dts
-+++ b/arch/arm64/boot/dts/qcom/qcs615-ride.dts
-@@ -211,6 +211,59 @@ vreg_l17a: ldo17 {
- 	};
- };
- 
-+&ethernet {
-+	pinctrl-0 = <&ethernet_defaults>;
-+	pinctrl-names = "default";
-+
-+	phy-handle = <&rgmii_phy>;
-+	phy-mode = "rgmii-id";
-+
-+	snps,mtl-rx-config = <&mtl_rx_setup>;
-+	snps,mtl-tx-config = <&mtl_tx_setup>;
-+
-+	status = "okay";
-+
-+	mdio {
-+		compatible = "snps,dwmac-mdio";
-+		#address-cells = <1>;
-+		#size-cells = <0>;
-+
-+		rgmii_phy: phy@7 {
-+			compatible = "ethernet-phy-ieee802.3-c22";
-+			reg = <0x7>;
-+
-+			interrupts-extended = <&tlmm 121 IRQ_TYPE_EDGE_FALLING>;
-+			device_type = "ethernet-phy";
-+			reset-gpios = <&tlmm 104 GPIO_ACTIVE_LOW>;
-+			reset-assert-us = <11000>;
-+			reset-deassert-us = <70000>;
-+		};
-+	};
-+
-+	mtl_rx_setup: rx-queues-config {
-+		snps,rx-queues-to-use = <1>;
-+		snps,rx-sched-sp;
-+
-+		queue0 {
-+			snps,dcb-algorithm;
-+			snps,map-to-dma-channel = <0x0>;
-+			snps,route-up;
-+			snps,priority = <0x1>;
-+		};
-+	};
-+
-+	mtl_tx_setup: tx-queues-config {
-+		snps,tx-queues-to-use = <1>;
-+		snps,tx-sched-wrr;
-+
-+		queue0 {
-+			snps,weight = <0x10>;
-+			snps,dcb-algorithm;
-+			snps,priority = <0x0>;
-+		};
-+	};
-+};
-+
- &gcc {
- 	clocks = <&rpmhcc RPMH_CXO_CLK>,
- 		 <&rpmhcc RPMH_CXO_CLK_A>,
-@@ -278,6 +331,57 @@ &sdhc_2 {
- 	status = "okay";
- };
- 
-+&tlmm {
-+	ethernet_defaults: ethernet-defaults-state {
-+		mdc-pins {
-+			pins = "gpio113";
-+			function = "rgmii";
-+			bias-pull-up;
-+		};
-+
-+		mdio-pins {
-+			pins = "gpio114";
-+			function = "rgmii";
-+			bias-pull-up;
-+		};
-+
-+		rgmii-rx-pins {
-+			pins = "gpio81", "gpio82", "gpio83", "gpio102", "gpio103", "gpio112";
-+			function = "rgmii";
-+			bias-disable;
-+			drive-strength = <2>;
-+		};
-+
-+		rgmii-tx-pins {
-+			pins = "gpio92", "gpio93", "gpio94", "gpio95", "gpio96", "gpio97";
-+			function = "rgmii";
-+			bias-pull-up;
-+			drive-strength = <16>;
-+		};
-+
-+		phy-intr-pins {
-+			pins = "gpio121";
-+			function = "gpio";
-+			bias-disable;
-+			drive-strength = <8>;
-+		};
-+
-+		phy-reset-pins {
-+			pins = "gpio104";
-+			function = "gpio";
-+			bias-pull-up;
-+			drive-strength = <16>;
-+		};
-+
-+		pps-pins {
-+			pins = "gpio91";
-+			function = "rgmii";
-+			bias-disable;
-+			drive-strength = <8>;
-+		};
-+	};
-+};
-+
- &uart0 {
- 	status = "okay";
- };
-
--- 
-2.34.1
-
+/Huisong
+>
+>
+> .
 
