@@ -1,85 +1,118 @@
-Return-Path: <netdev+bounces-160047-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160048-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 003FCA17F20
-	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 14:48:56 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F9EFA17F2B
+	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 14:50:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 02C053A3D9B
-	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 13:48:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E34C8188135C
+	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 13:50:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 727A71F2C4E;
-	Tue, 21 Jan 2025 13:48:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8831D1F1301;
+	Tue, 21 Jan 2025 13:50:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="MD8geIto"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dQJ28ILK"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88E501F2C3E
-	for <netdev@vger.kernel.org>; Tue, 21 Jan 2025 13:48:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 259FA1494D9;
+	Tue, 21 Jan 2025 13:50:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737467321; cv=none; b=vC2LE04g51dVoAfEc+TFdZT0AJ6Z7BWlTpB4vOwi8zXP1aDTmqPyaff3zctzAqy6gIFqp9b5/jQ981wbIIUNSRewEkjHl/iISzCMRIV6WJ6wOGTOEI8LIJGNgEa4khb+bQYxOd4uQ6yuYoTgjicx5Fd+QrR0cNomwDZxJk3w1MQ=
+	t=1737467429; cv=none; b=EBYV5oESjyoCZuM5NyluMq6ckd9fdDMc6Y3nT3Ne8GnTrfHHt38UHY5XJKdO/mGXC9QNMyx3mrUt/zY0bDcrtm4ON43o+N7FMTccgi4zG+WyykhzYbBDwMJJUxiyPpb/1G/076+yyqxkeq11BeFJK9B4TDAoX+CM83G9VN3HRsE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737467321; c=relaxed/simple;
-	bh=A1veeuuDV4mUrpjQBHR1woepVyEYnaVMB8tp7YWwLX8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nacMlaNtpFx09iUHp/WazpUt78zHwmSg33hpuiIWBGueIjlELNIdz2abf2Ut9/llhblisj4+sxaK1xYosnEmtS8sF8nh/vmeAVQXzl7+uDtdVlihRAfWAfjP+yy3yxEd2x6eTAVKa16lBLQfA9hVjCZ5wp8pAR0ShIFZM2ayLvE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=MD8geIto; arc=none smtp.client-ip=95.215.58.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <e49da678-3bed-47e0-9169-67a777edd700@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1737467307;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=A1veeuuDV4mUrpjQBHR1woepVyEYnaVMB8tp7YWwLX8=;
-	b=MD8geItoywKwvi410Xh5hTFCZ+4Z/GAKCp/KyV1RltaFDmUNxW4MiOugDF7szcAclFwLK3
-	ofTtKmkpkINwwMfGyntCd6SSvDdJrWqe4K42C70UXeeWJaCxsGWr8pdbY6xfcCRJpEFQGp
-	b7bzRTEB7wXCImDbOfbRutZRXOGAoAE=
-Date: Tue, 21 Jan 2025 21:47:32 +0800
+	s=arc-20240116; t=1737467429; c=relaxed/simple;
+	bh=Uwt/RkUdxKy1sadP/fr/MOCM5cXoxOyVAGQazLM3GNs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rlPyKo/bHdtjBYhMUuOD7KbIO6ITzSxpwUjLrKF4rE2QGSnjIFRlWP3lmXDgBXz+9S+G776sQLk6GCSK5jD0QpaZNN7u8H2kBXdD4senjTBa/U7f4D6l6Q9uYdHNYhU2gUKQFgeCqtsTEKjuxE27MF4ttJUzK0BWGJRwbgBU6Zs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dQJ28ILK; arc=none smtp.client-ip=209.85.214.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-2165448243fso121778685ad.1;
+        Tue, 21 Jan 2025 05:50:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1737467427; x=1738072227; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=vG50rxpHrJugvxAxIhPDCM0UI0nXxZum4EQEHShr8Sg=;
+        b=dQJ28ILKkFD+KcpiQsgmvhveamhEUSlPkINp2YMPTeXf7SuAU8TMXRzL8/UBAQvZH2
+         OJPF8MwS15eFNSMF1WUq+8BHwPbNTudrDvOYtWRP1psp15O6ucxB+Vd3yBMlMxVR/P4Y
+         oxtin+QPfpJ0hUzPJDJKisEUgn5WpkYdrvB96hFVMuQ1oQAA2ohJColu/9XZgr4z09SV
+         d7epg/QJJKwbEMrzRyzPyR72UmjG+B3qPBPUvWPxXuYXsfHlk40aRwFvKNem4fHC+XVR
+         sSUaNCXTb4kcBaG5ZVweRiDkr2NtDFwJWeJ1XWiuqT92V6SstpDluUHRQQOsGI5l76SA
+         eU0A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737467427; x=1738072227;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vG50rxpHrJugvxAxIhPDCM0UI0nXxZum4EQEHShr8Sg=;
+        b=nDKK+hoqHUVRfWt6TXasVQ+vxfy/98acEt2LV3tMJMcCyy8fi771iIiJ/phpLgCCEd
+         rT1NjcIOp8ZOVMIkBBwdfGCiNl8FR7De4QbsDiaWARLhBb/PJJvOPpeRHFm2Mysx9ziE
+         Llt3BWvndlsvSdevW6JI0LxaDBO4m7h43t0wBDWr139rJG/ay50iR4U0bnjQ1Yu+VPuH
+         bbWqMoTpXMmc7fvWs8XHWiXanInPlhKDABdDfSzdGsQ6A3TIVyiM36/t2IgvnvNvCJf4
+         wgTA/0kGq9+hcgTaB1jzwBE9mLW6WAEdhNfgjMnaet+fDVRx72Q6NbCBYaPFwUNY6/PD
+         74nQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUAy+TeR1Pgl4pF1mQh8SFICA+397YbI3v5Xc5AxTPRxty7/eysdTa4hnM5DZlIwoYFtc4LixAs@vger.kernel.org, AJvYcCUFP9DNyvzMQ+ShPjwFB1x0HXKugM4NCDMrnqRa0C5oONuTZvLuoA4abPRhBvcPZC3C3EgP2+nov7cyHRk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyJEn67L5uBgxcydxsNNlLrV5HlRoFhk3P00uRtvqJcXAUdim4i
+	uu1Awokrgrui6resehnqVtTx2B9Mau5bhjOI6jbvgZbuA91rklkuVsRWRw==
+X-Gm-Gg: ASbGncu/RuHtDSr4Lo3MSQwn4KC7NsISBH2Jq+NlTHO3KzgICIOzqjDtPPdN1UoYCho
+	hRj4OCsZQmCCOdyYGuyz3NQP9eLhoU8sMxFg756wEN9D09JEyz8OiXSPjPVsbG0h283CeJlOq3B
+	1Z6f8utLwjIE9wJFB70TcptLzKKsegeqCoI9EPsuLdA/H56PV8PAwEem7rvmy0bM0k6tMCgCYmm
+	tqtiDtbSCWgge2Uf6ox0omQKPXr340MxcSvu1euKQoRPdgxb4P3WVdOF2t3GIOnhyBeHPViEw==
+X-Google-Smtp-Source: AGHT+IGt9998Bygq9uoW7YN8PkN0KrPx7K1Vo/TqAl7CuWy+dD5Cx5aGSGpWfh1fBmtBGsdnEPyUUA==
+X-Received: by 2002:a05:6a00:4c18:b0:72d:8d98:c250 with SMTP id d2e1a72fcca58-72daf9a5535mr25259429b3a.4.1737467427037;
+        Tue, 21 Jan 2025 05:50:27 -0800 (PST)
+Received: from HOME-PC ([223.185.135.17])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72dab8157f3sm9291546b3a.55.2025.01.21.05.50.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 21 Jan 2025 05:50:26 -0800 (PST)
+Date: Tue, 21 Jan 2025 19:20:23 +0530
+From: Dheeraj Reddy Jonnalagadda <dheeraj.linuxdev@gmail.com>
+To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Cc: Simon Horman <horms@kernel.org>, michal.swiatkowski@linux.intel.com,
+	anthony.l.nguyen@intel.com, piotr.kwapulinski@intel.com,
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com,
+	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 net-next] ixgbe: Fix endian handling for ACI
+ descriptor registers
+Message-ID: <Z4+mH7s/YnfdXgJ5@HOME-PC>
+References: <20250115034117.172999-1-dheeraj.linuxdev@gmail.com>
+ <20250116162157.GC6206@kernel.org>
+ <fe142f22-caff-4cab-9f6f-56d55e63f210@intel.com>
+ <20250117180944.GS6206@kernel.org>
+ <e3aebbad-42ec-44e5-b43d-b15b9cd0a9ad@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH] net: stmmac: dwmac-loongson: Add fix_soc_reset function
-To: Huacai Chen <chenhuacai@kernel.org>, Qunqin Zhao <zhaoqunqin@loongson.cn>
-Cc: kuba@kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com, fancer.lancer@gmail.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20250121082536.11752-1-zhaoqunqin@loongson.cn>
- <CAAhV-H7LA7OBCxRzQogCbDeniY39EsxA6GVN07WM=e6EzasM0w@mail.gmail.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Yanteng Si <si.yanteng@linux.dev>
-In-Reply-To: <CAAhV-H7LA7OBCxRzQogCbDeniY39EsxA6GVN07WM=e6EzasM0w@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e3aebbad-42ec-44e5-b43d-b15b9cd0a9ad@intel.com>
 
+> 
+> @Dheeraj, do you want to hone your minimal fix to avoid sparse warnings?
 
-在 1/21/25 17:29, Huacai Chen 写道:
-> Hi, Qunqin,
->
-> The patch itself looks good to me, but something can be improved.
-> 1. The title can be "net: stmmac: dwmac-loongson: Add fix_soc_reset() callback"
-> 2. You lack a "." at the end of the commit message.
+Sure, I will update the patch to avoid sparse warnings.
 
-> 3. Add a "Cc: stable@vger.kernel.org" because it is needed to backport
-> to 6.12/6.13.
+> follow up question: do you want to proceed with a full conversion?
+> 
+> @Michal is going to send patches that depend on this "full conversion"
+> next month, so he could also take care of the "full conversion".
 
-Then we also need to have a fixes tag.
+ I don't mind sending a patch with the full conversion. Although that
+ would have quite a few changes. To clarify
 
-Thanks,
+ 1. Are we updating both @reg and @value to be __le32 ?
+ 2. Should we also update ixgbe_read_reg() to also handle and return
+    __le32 values?
 
-Yanteng
-
-
+-Dheeraj
 
