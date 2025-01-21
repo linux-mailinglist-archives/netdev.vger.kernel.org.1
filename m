@@ -1,79 +1,79 @@
-Return-Path: <netdev+bounces-159940-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159941-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D21A2A176FD
-	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 06:27:26 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 73575A17715
+	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 06:44:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 16336162482
-	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 05:27:25 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6EF357A038D
+	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 05:44:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1E711A724C;
-	Tue, 21 Jan 2025 05:27:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52F5E1922F8;
+	Tue, 21 Jan 2025 05:44:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="CjFGBInK"
+	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="x0S9cVH+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC81E1A2550
-	for <netdev@vger.kernel.org>; Tue, 21 Jan 2025 05:27:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D029383
+	for <netdev@vger.kernel.org>; Tue, 21 Jan 2025 05:44:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737437241; cv=none; b=KNyZk9Ox8udo4g899hG7IqnrVSh5PI6gesxpA+fupVE+yDBWKOo145qlPHqeMcaC+jxunJtgB8M+uZf68VOdLO39qPrTJ7AUR2KS56YKFLI9GplugjU+9bsO9S+GVSODXI7bfhTwUqO3GO9B1DSjbk7DvIBLg1c55vMkH4IiUlY=
+	t=1737438288; cv=none; b=H5QX+8NmnYCqYw325VF7QpMZK60xthxFbzcMZwzI1MLcFrebcWYlDoBkBeU/gu+nc1HreyKVv/TMtBY0zAmHRJrGI0b5XY+iGbTdeB3VIk4oPzODWVVPu6nsJR5fqSWb4Chm/M89BFeJYM0AOks3nVzKNNfGZ3QhaPlIEQGLf50=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737437241; c=relaxed/simple;
-	bh=17jdquf1O8HrGT7YX1JbIULVdHRHHmmF5bL1fyAoM9k=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=KLcoY00tqHFTtwKP0AburwHceN7ho0dtXVodJ0pQRsezUQY1T8atKOQPDeTHihPi9JBY6gbLVhlpZ3r8yWAE1gim7edsPPbW4XCFBVDI0FkDYeg5DJL63s75P/oI5nepfUN7NJEx1UZd5BO31nDsoW+JWNnv9Bne4s+mU1mPR2g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=pass smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=CjFGBInK; arc=none smtp.client-ip=209.85.214.180
+	s=arc-20240116; t=1737438288; c=relaxed/simple;
+	bh=KKjKQrSywZ/HAtYTFy2CTQDgCf1VU2GQ+lX5cc5vXaI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=CdVaLS0TPQ/pNWQ6F9aqEjLkh9p0YwQLLbU670LQwyFrtjB+i27PZ9RTl8CWAW7bvKQ0+UR5kKqLZQ/ukixpXIM6nWCwaEveMwXqQ+aQrs7jShQ27E3gPxTGzzxc2SQXNIkSrniLRCQz85ZNHiGUAzZpO239xgefA7+VmogaYM8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=pass smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=x0S9cVH+; arc=none smtp.client-ip=209.85.214.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=daynix.com
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-21644aca3a0so115653095ad.3
-        for <netdev@vger.kernel.org>; Mon, 20 Jan 2025 21:27:19 -0800 (PST)
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-21669fd5c7cso91435455ad.3
+        for <netdev@vger.kernel.org>; Mon, 20 Jan 2025 21:44:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1737437239; x=1738042039; darn=vger.kernel.org;
+        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1737438286; x=1738043086; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=KuNe0V4SlZE9V8OcN/E4qhh/fBRX/xaiMcicz54Ypbc=;
-        b=CjFGBInKFSGtYLOCcEjqY8Bn27ymGEWz+08u6G22zDw2Yn46EzpuW8ioqpYyPZvdeS
-         PL+f0F6rwFmgOXeE9ks7WFaFgX4+4jqLcP+1tXkSMwOk6FpTjJAKFo92DNqefY3itE9+
-         qbnj3cTHBa9mkhch49YxEGenvFajWjpC9wKhOMRN3mg/GEgEzHW1NMt6WQtygK1yl0jT
-         KjHFTzfudxO69pYWMqpeW11YwD/40z4r8JDENBd7cuW9R3f36CPPLMIkEr4ygsBwUqlR
-         phRItPEggnf264dj8xCT/GRiNq1mVtuFb0Mb53x9B/h1AiTanITyn+rEfGqJ8n2DFfkY
-         P4jQ==
+         :references:to:subject:user-agent:mime-version:date:message-id:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=quek95SDTYVXYnePfXxFQzmJR+Lu7obq+8lhE5GmOzk=;
+        b=x0S9cVH+78ZZsjSKnRfDP0qqXDfV4PoPpohm+0pSST8TJ2V/qwePvhtGtyaATADz34
+         cMWnJAVX5i/ptl10y23jtB0aCVN2PKm0SguQmUfFcins2jgSY/jPVpqIAjZSS2OBlpsQ
+         PV7cAkrn+ALhDyHnNpo9vtqbsAdOgdK0yGIZf5sHOylSy811YQJH8230tz16b9Wb5E25
+         ll5/TrZEkikQbRR6+WSkKRHox/ZOZIE3iWVu/M4F/BrJyQyYK4h61ozMmXXehk3msD/H
+         17d8wVOEfLVAycsUnjCn74CHH+SALXwAeaHzJPM1UiptfEUTeqnMs1az81MH1G2hGhVg
+         Es7g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737437239; x=1738042039;
+        d=1e100.net; s=20230601; t=1737438286; x=1738043086;
         h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :references:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=KuNe0V4SlZE9V8OcN/E4qhh/fBRX/xaiMcicz54Ypbc=;
-        b=VLBL31SkihR+hAgLnW3xbTL3gCWUdkFhic6FBskrJFo+VrUzeeLuQ7l2DVgZp8l3vN
-         z9Stx7iyVZgny7V+vKrFEGpkvuM03RVIu8eUKNOaOdPY6iu71ICkVj4PKT/JZtDdnr5y
-         A4fdslQTSxyayegl7M2TBaua4B1qGsnsdQo794JuGcsNMTRawHHj6jQUWHmDMyfEtrki
-         lSH/Og8Go9vx2XVXf9Kgc39+16O1mCHUQpBZa1BH0Fqd62sfw2/UdELma8i5URIq9CZG
-         DdZRF0TDDmQOzsXlUMkrJ/gTiI0wP69qxryAN4s87zE5lZJxvhaI1pPShNs7xUU5Lgk4
-         XcMw==
-X-Forwarded-Encrypted: i=1; AJvYcCXNGdrw01kaEeMqtZ5gEXOtslyMqbnMNLts9sJ+VG63IiVHCIEALAtd78a0q1k44izSjo1buuc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzqjftIo3HBlFtRH2xjYt56RYNlePNYPC8SXCI1UGetZDTwsjdw
-	yvTjD6CRbG+tpwKzww5P34J7CO4UnuLN6+6qvxSMyOI24+1OMUbTRB8WA45urzA=
-X-Gm-Gg: ASbGncua4QG+LmiE1NZ/9BizONvZW6RKRSumQ5i7ADs0rh8igPYaDwqXLXZlzJKljDd
-	JhPOpYqUY4lEBioSMY+fYdd8fHeq+FuF4pxDQFRnKwThI0UtO4g8fi+MjzjCqgpsFVKkNvF7Vul
-	55gK/JzTXbdrTrOAfBk1/p5nHmRPrSBxHClB8lSuaHvOruRvUjyBtORSElqps9oPLXigHN5VhKk
-	aSel1FafSvbSg3ppJSFOtSX+xfHv/kdTbUTLZUglE9+v/VZYn1bkfXE4P09YGCmJuk4yrmfTWSx
-	slPm
-X-Google-Smtp-Source: AGHT+IF8AscE6lKE6K9gAMAkVavPAuy5ImBZTIR2UjEzttP05cs28ECPVkex5+WoyQz221rWXZqSKQ==
-X-Received: by 2002:a17:902:f7ce:b0:215:773a:c168 with SMTP id d9443c01a7336-21c352de425mr241247485ad.1.1737437239066;
-        Mon, 20 Jan 2025 21:27:19 -0800 (PST)
+        bh=quek95SDTYVXYnePfXxFQzmJR+Lu7obq+8lhE5GmOzk=;
+        b=mEgGv3o3BJSN59bEtwiN1+eQqTbhgjYaEboJmlPv7e0vuEKWyfheTaUpPzi2uRN6E7
+         U1Y2tHCRU+1vFiu/oyktNhI9KLtLmdwa5ZvEGw6tEQ3AHdbFjg8Tw9hVruL4TSRE+BjE
+         9gakk1wKPHvxxFsXAwJoU4YG3GnHljJvSJQhY6iTBw0kBrLf8Q6M9j7ePqb3Vp8rvUtM
+         M0BXFKJ14k7wKmobPWAqz52O4fUoR84/4ctVLmJKGoHwQQqe/wDy711XJ04DFkoTlDQg
+         7vSJ84pzdZcpHja5RkbojrRLPL4Sd1jCk2ZdICDA/28XkUNudvlKJsutE4cZsCtQc14i
+         oGHw==
+X-Forwarded-Encrypted: i=1; AJvYcCV86VV4XaEbLrISNiqWZwMlOJ1/kubYzvxsmliYVtAaYyTu8qrMf1y6lynCbDNnK5pxyAROkm8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzaBWc5pKpnLEQEvTR78WyDx/GuSjhMv5PSo7LlYhOL3zY6uXTB
+	LKjQrj9qeBx6lwOvheoMiCIV0BgA9a166+nm0KK+wub2JP78/MNKcWu3taUlkk0=
+X-Gm-Gg: ASbGncv1KxRq7Fv1tw03peHhdcfrSL1j1/ZRfVvtbGdTMyFfjl6+v+SRQXbg1np52Yo
+	7+siwoTw0anH0D3GhBtsuGOI4HA4uwHXx5MYj5A7VxWsbUYVclW75oxwuEkKiPVr+sELI9IriX/
+	UexrltqF85z/qyFdvZrwywiHnRTQNhP9Q6y4sSZ/lfBUfOIQB8YmeGPJp5wqxN1I1PZbvoWmA/7
+	wBs2id7MA7LB7uCsKeAgClgyR664b2o6XS/6UntKEQvQkMANqMk0sGjjjpFGaXg4GIb2dHfjfxR
+	igQH
+X-Google-Smtp-Source: AGHT+IFTVBGY3mBtHPPZNgGiKdheqCTQ97KHaRubQObIyg1+VGXEf+v/0x6j6pVWQSFPga7FkyMokQ==
+X-Received: by 2002:a05:6a20:2524:b0:1d5:10d6:92b9 with SMTP id adf61e73a8af0-1eb215894f4mr22737961637.30.1737438285826;
+        Mon, 20 Jan 2025 21:44:45 -0800 (PST)
 Received: from [157.82.203.37] ([157.82.203.37])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-a9bdf0b4503sm6710167a12.67.2025.01.20.21.27.13
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72dababc174sm8360634b3a.178.2025.01.20.21.44.40
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 20 Jan 2025 21:27:18 -0800 (PST)
-Message-ID: <92675e51-cbaf-4905-8cf8-dff741a26db9@daynix.com>
-Date: Tue, 21 Jan 2025 14:27:12 +0900
+        Mon, 20 Jan 2025 21:44:45 -0800 (PST)
+Message-ID: <806def7d-16f3-4d53-abc8-7d18e8c22dcb@daynix.com>
+Date: Tue, 21 Jan 2025 14:44:39 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,13 +81,13 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v3 9/9] tap: Use tun's vnet-related code
-To: Willem de Bruijn <willemb@google.com>, Jason Wang <jasowang@redhat.com>
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- Jonathan Corbet <corbet@lwn.net>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Shuah Khan <shuah@kernel.org>,
+Subject: Re: [PATCH net-next v4 8/9] tap: Keep hdr_len in tap_get_user()
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ Jonathan Corbet <corbet@lwn.net>, Jason Wang <jasowang@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Xuan Zhuo
+ <xuanzhuo@linux.alibaba.com>, Shuah Khan <shuah@kernel.org>,
  linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
  netdev@vger.kernel.org, kvm@vger.kernel.org,
  virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org,
@@ -95,108 +95,83 @@ Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
  Andrew Melnychenko <andrew@daynix.com>,
  Stephen Hemminger <stephen@networkplumber.org>, gur.stavi@huawei.com,
  devel@daynix.com
-References: <20250116-tun-v3-0-c6b2871e97f7@daynix.com>
- <20250116-tun-v3-9-c6b2871e97f7@daynix.com>
- <678a21a9388ae_3e503c294f4@willemb.c.googlers.com.notmuch>
- <51f0c6ba-21bc-4fef-a906-5d83ab29b7ff@daynix.com>
- <CACGkMEuPXDWHErCCdEUB7+Q0NxsAjpSH9uTvOxzuBvNeyw7_Hg@mail.gmail.com>
- <CA+FuTSec1z7-8nNNc1ZXkzekDrFHPnvYKFf8PNZg89VuwhoWSw@mail.gmail.com>
+References: <20250120-tun-v4-0-ee81dda03d7f@daynix.com>
+ <20250120-tun-v4-8-ee81dda03d7f@daynix.com>
+ <678e327e34602_19c737294b4@willemb.c.googlers.com.notmuch>
 Content-Language: en-US
 From: Akihiko Odaki <akihiko.odaki@daynix.com>
-In-Reply-To: <CA+FuTSec1z7-8nNNc1ZXkzekDrFHPnvYKFf8PNZg89VuwhoWSw@mail.gmail.com>
+In-Reply-To: <678e327e34602_19c737294b4@willemb.c.googlers.com.notmuch>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-On 2025/01/20 20:19, Willem de Bruijn wrote:
-> On Mon, Jan 20, 2025 at 1:37 AM Jason Wang <jasowang@redhat.com> wrote:
+On 2025/01/20 20:24, Willem de Bruijn wrote:
+> Akihiko Odaki wrote:
+>> hdr_len is repeatedly used so keep it in a local variable.
 >>
->> On Fri, Jan 17, 2025 at 6:35 PM Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
->>>
->>> On 2025/01/17 18:23, Willem de Bruijn wrote:
->>>> Akihiko Odaki wrote:
->>>>> tun and tap implements the same vnet-related features so reuse the code.
->>>>>
->>>>> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
->>>>> ---
->>>>>    drivers/net/Kconfig    |   1 +
->>>>>    drivers/net/Makefile   |   6 +-
->>>>>    drivers/net/tap.c      | 152 +++++--------------------------------------------
->>>>>    drivers/net/tun_vnet.c |   5 ++
->>>>>    4 files changed, 24 insertions(+), 140 deletions(-)
->>>>>
->>>>> diff --git a/drivers/net/Kconfig b/drivers/net/Kconfig
->>>>> index 1fd5acdc73c6..c420418473fc 100644
->>>>> --- a/drivers/net/Kconfig
->>>>> +++ b/drivers/net/Kconfig
->>>>> @@ -395,6 +395,7 @@ config TUN
->>>>>       tristate "Universal TUN/TAP device driver support"
->>>>>       depends on INET
->>>>>       select CRC32
->>>>> +    select TAP
->>>>>       help
->>>>>         TUN/TAP provides packet reception and transmission for user space
->>>>>         programs.  It can be viewed as a simple Point-to-Point or Ethernet
->>>>> diff --git a/drivers/net/Makefile b/drivers/net/Makefile
->>>>> index bb8eb3053772..2275309a97ee 100644
->>>>> --- a/drivers/net/Makefile
->>>>> +++ b/drivers/net/Makefile
->>>>> @@ -29,9 +29,9 @@ obj-y += mdio/
->>>>>    obj-y += pcs/
->>>>>    obj-$(CONFIG_RIONET) += rionet.o
->>>>>    obj-$(CONFIG_NET_TEAM) += team/
->>>>> -obj-$(CONFIG_TUN) += tun-drv.o
->>>>> -tun-drv-y := tun.o tun_vnet.o
->>>>> -obj-$(CONFIG_TAP) += tap.o
->>>>> +obj-$(CONFIG_TUN) += tun.o
->>>>
->>>> Is reversing the previous changes to tun.ko intentional?
->>>>
->>>> Perhaps the previous approach with a new CONFIG_TUN_VNET is preferable
->>>> over this. In particular over making TUN select TAP, a new dependency.
->>>
->>> Jason, you also commented about CONFIG_TUN_VNET for the previous
->>> version. Do you prefer the old approach, or the new one? (Or if you have
->>> another idea, please tell me.)
+>> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
+>> ---
+>>   drivers/net/tap.c | 17 +++++++----------
+>>   1 file changed, 7 insertions(+), 10 deletions(-)
 >>
->> Ideally, if we can make TUN select TAP that would be better. But there
->> are some subtle differences in the multi queue implementation. We will
->> end up with some useless code for TUN unless we can unify the multi
->> queue logic. It might not be worth it to change the TUN's multi queue
->> logic so having a new file seems to be better.
+>> diff --git a/drivers/net/tap.c b/drivers/net/tap.c
+>> index 061c2f27dfc83f5e6d0bea4da0e845cc429b1fd8..7ee2e9ee2a89fd539b087496b92d2f6198266f44 100644
+>> --- a/drivers/net/tap.c
+>> +++ b/drivers/net/tap.c
+>> @@ -645,6 +645,7 @@ static ssize_t tap_get_user(struct tap_queue *q, void *msg_control,
+>>   	int err;
+>>   	struct virtio_net_hdr vnet_hdr = { 0 };
+>>   	int vnet_hdr_len = 0;
+>> +	int hdr_len = 0;
+>>   	int copylen = 0;
+>>   	int depth;
+>>   	bool zerocopy = false;
+>> @@ -672,6 +673,7 @@ static ssize_t tap_get_user(struct tap_queue *q, void *msg_control,
+>>   		err = -EINVAL;
+>>   		if (tap16_to_cpu(q, vnet_hdr.hdr_len) > iov_iter_count(from))
+>>   			goto err;
+>> +		hdr_len = tap16_to_cpu(q, vnet_hdr.hdr_len);
+>>   	}
+>>   
+>>   	len = iov_iter_count(from);
+>> @@ -683,11 +685,8 @@ static ssize_t tap_get_user(struct tap_queue *q, void *msg_control,
+>>   	if (msg_control && sock_flag(&q->sk, SOCK_ZEROCOPY)) {
+>>   		struct iov_iter i;
+>>   
+>> -		copylen = vnet_hdr.hdr_len ?
+>> -			tap16_to_cpu(q, vnet_hdr.hdr_len) : GOODCOPY_LEN;
+>> -		if (copylen > good_linear)
+>> -			copylen = good_linear;
+>> -		else if (copylen < ETH_HLEN)
+>> +		copylen = min(hdr_len ? hdr_len : GOODCOPY_LEN, good_linear);
+>> +		if (copylen < ETH_HLEN)
+>>   			copylen = ETH_HLEN;
+>>   		linear = copylen;
+>>   		i = *from;
+>> @@ -698,11 +697,9 @@ static ssize_t tap_get_user(struct tap_queue *q, void *msg_control,
+>>   
+>>   	if (!zerocopy) {
+>>   		copylen = len;
+>> -		linear = tap16_to_cpu(q, vnet_hdr.hdr_len);
+>> -		if (linear > good_linear)
+>> -			linear = good_linear;
+>> -		else if (linear < ETH_HLEN)
+>> -			linear = ETH_HLEN;
+>> +		linear = min(hdr_len, good_linear);
+>> +		if (copylen < ETH_HLEN)
+>> +			copylen = ETH_HLEN;
 > 
-> +1 on deduplicating further. But this series is complex enough. Let's not
-> expand that.
-> 
-> The latest approach with a separate .o file may have some performance
-> cost by converting likely inlined code into real function calls.
-> Another option is to move it all into tun_vnet.h. That also resolves
-> the Makefile issues.
+> Similar to previous patch, I don't think this patch is significant
+> enough to warrant the code churn.
 
-I measured the size difference between the latest inlining approaches. 
-The numbers may vary depending on the system configuration of course, 
-but they should be useful for reference.
+The following patch will require replacing
+tap16_to_cpu(q, vnet_hdr.hdr_len)
+with
+tap16_to_cpu(q->flags, vnet_hdr.hdr_len)
 
-The below shows sizes when having a separate module: 106496 bytes in total
+It will make some lines a bit too long. Calling tap16_to_cpu() at 
+multiple places is also not good to keep the vnet implementation unified 
+as the function inspects vnet_hdr.
 
-# lsmod
-Module                  Size  Used by
-tap                    28672  0
-tun                    61440  0
-tun_vnet               16384  2 tun,tap
-
-The below shows sizes when inlining: 102400 bytes in total
-
-# lsmod
-Module                  Size  Used by
-tap                    32768  0
-tun                    69632  0
-
-So having a separate module costs 4096 bytes more.
-
-These two approaches should have similar tendency for run-time and 
-compile-time performance; the code is so trivial that the overhead of 
-having one additional module is dominant.
-
-The only downside of having all in tun_vnet.h is that it will expose its 
-internal macros and functions, which I think tolerable.
+This patch is independently too trivial, but I think it is a worthwhile 
+cleanup combined with the following patch.
 
