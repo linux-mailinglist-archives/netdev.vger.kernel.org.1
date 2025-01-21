@@ -1,165 +1,183 @@
-Return-Path: <netdev+bounces-160015-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160016-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3BFDBA17BB6
-	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 11:30:27 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F0F1A17C03
+	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 11:40:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A75E51886660
-	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 10:30:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4BC143A1DE3
+	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 10:40:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4CBB1F0E5E;
-	Tue, 21 Jan 2025 10:29:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 261E11C1F07;
+	Tue, 21 Jan 2025 10:40:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b="QO7iuEmW"
+	dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b="F6syjK2V"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fw2.prolan.hu (fw2.prolan.hu [193.68.50.107])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B0861F0E51
-	for <netdev@vger.kernel.org>; Tue, 21 Jan 2025 10:29:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9DEA1BEF82;
+	Tue, 21 Jan 2025 10:40:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.68.50.107
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737455393; cv=none; b=uJH/VcPdzYq9rQj0DCZ9Rb1ne+iCFfvjcFam1WYYXcQj506XLHBDSYifl6J+ITHWqxg7Fr1M44leCgTcp/GIBQAGXm18VcT5xNuUu66Mf8AywDiGn5aj4tDrDYMx5rEQlMKrYNKAzMQO9f2Q4yL3PG8EYahoQRyjlKssbzTDEIo=
+	t=1737456018; cv=none; b=ZMOwDYSZyKLf2EJIaCUevOCfjodHutU1iXrXii2EOT/qzMNyqBEfSJidYsHYo9O3Jshu2/fEVdkFsbFuTu3y7pdswmSgXNHWvkSufOKmBwpKUzBW5uxAWSQdrR5pApghhR8RTD/dSO8uuernkY8MwCbszG6YEe+LoLp+LptyqCo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737455393; c=relaxed/simple;
-	bh=6AaEQjUILhJ/z5XoYOm9MEfL8ZC3WYBp67J1RrUglT8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=RjO+SAyCF/unwFXMUueJsEsKfdMvPflEPUFHFcO+pg9RbAmh/P1SZfdipexfG7koadxOXb1lWd72O0S1rcXzAxreMhgyAHfXq2KV9UesAynh3bareYNhmooTp8H3Dq+Yw0Nzw67v3bt3D8flW/W11ssAmKTdEim/uqXS/snnYQg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev; spf=pass smtp.mailfrom=tuxon.dev; dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b=QO7iuEmW; arc=none smtp.client-ip=209.85.221.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tuxon.dev
-Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-3862d6d5765so3067033f8f.3
-        for <netdev@vger.kernel.org>; Tue, 21 Jan 2025 02:29:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=tuxon.dev; s=google; t=1737455388; x=1738060188; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=tREQSbIeCuUUo6kw7V1GF3H9V+/GJnzAykBmE1L7QF8=;
-        b=QO7iuEmWoihMKxcpCUSyGG3qYpdcdYYsptqpM2GW8vTzztpMc1N2ESu7UFeCBJJGvG
-         L/RpXQa87xU+8pwHzp1OPDjmA6Ujfcv6eLoB80UWYXd7KCiwZJOfykju3LbRxQpLNJvH
-         0Eh4x1TAjvjwiZMi6/y97nabST67AClFZsoGv/XV7jNdKu1Tudqsf7VYj7TzVqn12N41
-         cwVKhUpuoLg2WOS6tnKZ9fG8cE3WA5zoJKtnSG/ePgb7VVhnOi0imZl+Pu47riRq4fIx
-         GgiXUzxXQURFqs/3GR6bMTtkq6sl3Jqoc4H+jkieuUlnGczcsiwrJXT9fT2mg+8dtm8k
-         j9yA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737455388; x=1738060188;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=tREQSbIeCuUUo6kw7V1GF3H9V+/GJnzAykBmE1L7QF8=;
-        b=YyicyGuT+b6b4bKliYH6edKbuSZThorPi9U1eFT3rWd7FctVEd8acV4UtOxL3C27uV
-         bEm7shvtniW2uidlTce6H+If+Jw9Ob8ZbfRU2O2AZm2Z3S6WW4+RTmZR82CiyKsTxqxQ
-         oTcmfKPre6d8M1fdhkud5QPSAYZZUHP0J9ZVLS2DRZzD+SRkgJly7P6rRcaTTeD/HIFe
-         W4mzSqONLFE50jVeUG6vDqD9YwMvom0trg00vKcWF+S1pG4oWd2bdTBUT4q/wriwY+bI
-         QSbVcrxVCqOxYMSqoWY5AStOoeFfRjUmcsHbZ48Jj8rOZqa8tGYz0vH8t5ddBDdaXSAT
-         70jQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVUeFsspXMOGY0moUUQj+x7KmTRw3LrcaEm5INyYaQPHf795NQ6uek7gjQWlzcfH79xdVidLZg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy0HRB9oPOBtUpK2rhSBvl6tpt6CJ3G79dmKBNXp0jrtp0CQpFk
-	O0vVju+OXjSvsk9mlbIV+Cd7m7EgvsD9n4Sm0GVYcVvvLGBp9+s3sf0JJv359oA=
-X-Gm-Gg: ASbGncuk6okFWfKSR5azyQqLsK3IRjaLuX35tGWJX3V1i6q1N/ljGoDoFNBncfO4Unz
-	jhgaj42l2IDeUSEzIM5efe8IcevBrOtB5T+RQuJ6D9iFqus2DFUw/aItV2YCHoDZ5Bk+NFidzcP
-	F8ObLjRyiTLwhs7uQd/e2gNDKCoKEW/DIWKiiP6Qv6NNPn/efVkcq5uLmPPbv+NG30fUecgNoNq
-	KvMgQ/TkKhzmY+ZdMQX8cIJc27xw9knPsOdKfBMx+Mwfz9rxg944DYObFeLQCI4/LPzaXdQWUF0
-	cQ==
-X-Google-Smtp-Source: AGHT+IH8fxLpytjbLVapxMjdNWG42y58FtVvI1kFX2ItvgsyT/3cMg7QIndqQ1oqiTRwrzLAHF+Waw==
-X-Received: by 2002:a5d:4e52:0:b0:38a:88bc:aea4 with SMTP id ffacd0b85a97d-38bf57a2304mr9740432f8f.30.1737455388545;
-        Tue, 21 Jan 2025 02:29:48 -0800 (PST)
-Received: from [192.168.50.4] ([82.78.167.35])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38bf322b51bsm13148526f8f.60.2025.01.21.02.29.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 21 Jan 2025 02:29:48 -0800 (PST)
-Message-ID: <8686406e-6124-483e-af87-cc40e4d760b1@tuxon.dev>
-Date: Tue, 21 Jan 2025 12:29:46 +0200
+	s=arc-20240116; t=1737456018; c=relaxed/simple;
+	bh=/RFiy4KtEw5Ld7rO4MkJaBpq1+J6T2aRdGYD70o1fXk=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=aVjaQkXWndCQDEm1hWCGLPJeREULOj+mXqLK6abgqGYDLf1Flk/ufHKGq9rXeTbMjz1Gqht6VNr3Ei1cf/k/N0vMYCXeVmg2cKfk0OBXd0/7PDqXOOXvCyU5z5seBHZYT3pDkIyTcMbJQJLK6m1/Cvq0Yhvcv5RN039/iIlQkh4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=prolan.hu; spf=pass smtp.mailfrom=prolan.hu; dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b=F6syjK2V; arc=none smtp.client-ip=193.68.50.107
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=prolan.hu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=prolan.hu
+Received: from proxmox-mailgw.intranet.prolan.hu (localhost.localdomain [127.0.0.1])
+	by proxmox-mailgw.intranet.prolan.hu (Proxmox) with ESMTP id A0A0CA03A7;
+	Tue, 21 Jan 2025 11:40:05 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=prolan.hu; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:from:from:message-id:mime-version:reply-to:subject:subject:to
+	:to; s=mail; bh=64Jisw5Z95VY9Aga6b+rI9eNqwppYLgNfZ35UeF2PNs=; b=
+	F6syjK2VoHGpQWXERUmfUB1AGH6A+6LwFcM/V6pS0PReVdZmPY3T7Ic55i1fKc3P
+	KaLU6OooxdhWnj5O0YOkI2+Gx0uld9GMf/NAjqYszEhZydGHEBeknTKlCHBqJKx/
+	5iMykh2mSBEBvpkoGvK5t75KlBop3MbS2SuHwiBqA7CmVZ9VBh3SiwkUcnTRBZ11
+	RpjR9CZcEoZWcsITosvF28HiTQPnmOlRkrpQku8Z1hlOrYBkEmzKHSbK0RNotIHH
+	3SK7UnMnd6FioXs6HZLJoav8LGYExLhBG4LMU8g8lXelPpKoaI9UQzsQUXysq6+O
+	+hREwmfcVlWZSijN5da5V3olw97BhIdtnoaYwMegM7zcOJGqJq9Y7lcbm/xxbvVn
+	K7U2HEpuYD97yYbuAPz0ep+zIo8F9euHLciifqEP3MbgJkW0uQT/r0qNrf92YrxE
+	5J4B9rTrclwg0AD3a5h/RiaqkhSjA9F+P0lOdTyGEEkdJwzpxOIFJYJtcWEEhHEB
+	A/biMararsd3i49S3D5w5kbUM81838uhG2Z+or20XMMFWzRzAtLokpumEdIWXvMJ
+	2pplw5FUauuCHvM0op4++UvchjzzvmfztPH2f9UWWktbE8kV0PlxuMbBTkkG9nh6
+	zzkcQLzx4NglWacF3n0uJBRzloTZ4AKsokOqOyNq+W4=
+From: =?UTF-8?q?Cs=C3=B3k=C3=A1s=2C=20Bence?= <csokas.bence@prolan.hu>
+To: Jakub Kicinski <kuba@kernel.org>, Laurent Badel <laurentbadel@eaton.com>,
+	<imx@lists.linux.dev>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+CC: =?UTF-8?q?Cs=C3=B3k=C3=A1s=2C=20Bence?= <csokas.bence@prolan.hu>, Wei Fang
+	<wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang
+	<xiaoning.wang@nxp.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Paolo
+ Abeni" <pabeni@redhat.com>
+Subject: [PATCH] net: fec: Refactor MAC reset to function
+Date: Tue, 21 Jan 2025 11:38:58 +0100
+Message-ID: <20250121103857.12007-3-csokas.bence@prolan.hu>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3] net: phy: Fix suspicious rcu_dereference
- usage
-To: Kory Maincent <kory.maincent@bootlin.com>,
- Jakub Kicinski <kuba@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org,
- Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>,
- thomas.petazzoni@bootlin.com, Andrew Lunn <andrew@lunn.ch>,
- Heiner Kallweit <hkallweit1@gmail.com>, Russell King
- <linux@armlinux.org.uk>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>
-References: <20250120141926.1290763-1-kory.maincent@bootlin.com>
- <20250120111228.6bd61673@kernel.org>
- <20250121103845.6e135477@kmaincent-XPS-13-7390>
-From: Claudiu Beznea <claudiu.beznea@tuxon.dev>
-Content-Language: en-US
-In-Reply-To: <20250121103845.6e135477@kmaincent-XPS-13-7390>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ESET-AS: R=OK;S=0;OP=CALC;TIME=1737456004;VERSION=7983;MC=537548373;ID=63783;TRN=0;CRV=0;IPC=;SP=0;SIPS=0;PI=3;F=0
+X-ESET-Antispam: OK
+X-EsetResult: clean, is OK
+X-EsetId: 37303A2980D94852677467
 
-Hi, Kory,
+The core is reset both in `fec_restart()`
+(called on link-up) and `fec_stop()`
+(going to sleep, driver remove etc.).
+These two functions had their separate
+implementations, which was at first only
+a register write and a `udelay()` (and
+the accompanying block comment).
+However, since then we got soft-reset
+(MAC disable) and Wake-on-LAN support,
+which meant that these implementations
+diverged, often causing bugs. For instance,
+as of now, `fec_stop()` does not check for
+`FEC_QUIRK_NO_HARD_RESET`. To eliminate
+this bug-source, refactor implementation
+to a common function.
 
-On 21.01.2025 11:38, Kory Maincent wrote:
-> On Mon, 20 Jan 2025 11:12:28 -0800
-> Jakub Kicinski <kuba@kernel.org> wrote:
-> 
->> On Mon, 20 Jan 2025 15:19:25 +0100 Kory Maincent wrote:
->>> The path reported to not having RTNL lock acquired is the suspend path of
->>> the ravb MAC driver. Without this fix we got this warning:  
->>
->> I maintain that ravb is buggy, plenty of drivers take rtnl_lock 
->> from the .suspend callback. We need _some_ write protection here,
->> the patch as is only silences a legitimate warning.
-> 
-> Indeed if the suspend path is buggy we should fix it. Still there is lots of
-> ethernet drivers calling phy_disconnect without rtnl (IIUC) if probe return an
-> error or in the remove path. What should we do about it?
-> 
-> About ravb suspend, I don't have the board, Claudiu could you try this instead
-> of the current fix:
-> 
-> diff --git a/drivers/net/ethernet/renesas/ravb_main.c
-> b/drivers/net/ethernet/renesas/ravb_main.c index bc395294a32d..c9a0d2d6f371
-> 100644 --- a/drivers/net/ethernet/renesas/ravb_main.c
-> +++ b/drivers/net/ethernet/renesas/ravb_main.c
-> @@ -3215,15 +3215,22 @@ static int ravb_suspend(struct device *dev)
->         if (!netif_running(ndev))
->                 goto reset_assert;
->  
-> +       rtnl_lock();
->         netif_device_detach(ndev);
->  
-> -       if (priv->wol_enabled)
-> -               return ravb_wol_setup(ndev);
-> +       if (priv->wol_enabled) {
-> +               ret = ravb_wol_setup(ndev);
-> +               rtnl_unlock();
-> +               return ret;
-> +       }
->  
->         ret = ravb_close(ndev);
-> -       if (ret)
-> +       if (ret) {
-> +               rtnl_unlock();
->                 return ret;
-> +       }
->  
-> +       rtnl_unlock();
->         ret = pm_runtime_force_suspend(&priv->pdev->dev);
->         if (ret)
->                 return ret;
+Fixes: c730ab423bfa ("net: fec: Fix temporary RMII clock reset on link up")
+Signed-off-by: Csókás, Bence <csokas.bence@prolan.hu>
+---
 
-The warning is gone with this, as well.
+Notes:
+    Recommended options for this patch:
+    `--color-moved --color-moved-ws=allow-indentation-change`
 
-Thank you,
-Claudiu
+ drivers/net/ethernet/freescale/fec_main.c | 50 +++++++++++------------
+ 1 file changed, 23 insertions(+), 27 deletions(-)
 
+diff --git a/drivers/net/ethernet/freescale/fec_main.c b/drivers/net/ethernet/freescale/fec_main.c
+index 68725506a095..850ef3de74ec 100644
+--- a/drivers/net/ethernet/freescale/fec_main.c
++++ b/drivers/net/ethernet/freescale/fec_main.c
+@@ -1064,6 +1064,27 @@ static void fec_enet_enable_ring(struct net_device *ndev)
+ 	}
+ }
+ 
++/* Whack a reset.  We should wait for this.
++ * For i.MX6SX SOC, enet use AXI bus, we use disable MAC
++ * instead of reset MAC itself.
++ */
++static void fec_ctrl_reset(struct fec_enet_private *fep, bool wol)
++{
++	if (!wol || !(fep->wol_flag & FEC_WOL_FLAG_SLEEP_ON)) {
++		if (fep->quirks & FEC_QUIRK_HAS_MULTI_QUEUES ||
++		    ((fep->quirks & FEC_QUIRK_NO_HARD_RESET) && fep->link)) {
++			writel(0, fep->hwp + FEC_ECNTRL);
++		} else {
++			writel(FEC_ECR_RESET, fep->hwp + FEC_ECNTRL);
++			udelay(10);
++		}
++	} else {
++		val = readl(fep->hwp + FEC_ECNTRL);
++		val |= (FEC_ECR_MAGICEN | FEC_ECR_SLEEP);
++		writel(val, fep->hwp + FEC_ECNTRL);
++	}
++}
++
+ /*
+  * This function is called to start or restart the FEC during a link
+  * change, transmit timeout, or to reconfigure the FEC.  The network
+@@ -1080,17 +1101,7 @@ fec_restart(struct net_device *ndev)
+ 	if (fep->bufdesc_ex)
+ 		fec_ptp_save_state(fep);
+ 
+-	/* Whack a reset.  We should wait for this.
+-	 * For i.MX6SX SOC, enet use AXI bus, we use disable MAC
+-	 * instead of reset MAC itself.
+-	 */
+-	if (fep->quirks & FEC_QUIRK_HAS_MULTI_QUEUES ||
+-	    ((fep->quirks & FEC_QUIRK_NO_HARD_RESET) && fep->link)) {
+-		writel(0, fep->hwp + FEC_ECNTRL);
+-	} else {
+-		writel(1, fep->hwp + FEC_ECNTRL);
+-		udelay(10);
+-	}
++	fec_ctrl_reset(fep, false);
+ 
+ 	/*
+ 	 * enet-mac reset will reset mac address registers too,
+@@ -1344,22 +1355,7 @@ fec_stop(struct net_device *ndev)
+ 	if (fep->bufdesc_ex)
+ 		fec_ptp_save_state(fep);
+ 
+-	/* Whack a reset.  We should wait for this.
+-	 * For i.MX6SX SOC, enet use AXI bus, we use disable MAC
+-	 * instead of reset MAC itself.
+-	 */
+-	if (!(fep->wol_flag & FEC_WOL_FLAG_SLEEP_ON)) {
+-		if (fep->quirks & FEC_QUIRK_HAS_MULTI_QUEUES) {
+-			writel(0, fep->hwp + FEC_ECNTRL);
+-		} else {
+-			writel(FEC_ECR_RESET, fep->hwp + FEC_ECNTRL);
+-			udelay(10);
+-		}
+-	} else {
+-		val = readl(fep->hwp + FEC_ECNTRL);
+-		val |= (FEC_ECR_MAGICEN | FEC_ECR_SLEEP);
+-		writel(val, fep->hwp + FEC_ECNTRL);
+-	}
++	fec_ctrl_reset(fep, true);
+ 	writel(fep->phy_speed, fep->hwp + FEC_MII_SPEED);
+ 	writel(FEC_DEFAULT_IMASK, fep->hwp + FEC_IMASK);
+ 
+-- 
+2.48.1
 
-> 
-> Regards,
 
 
