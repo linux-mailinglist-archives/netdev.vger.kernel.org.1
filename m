@@ -1,138 +1,119 @@
-Return-Path: <netdev+bounces-160125-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160126-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7446A185ED
-	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 21:04:48 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5FF41A18600
+	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 21:14:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 03FE0160749
-	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 20:04:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 56E683AA53D
+	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 20:14:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2FEF1DF989;
-	Tue, 21 Jan 2025 20:04:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F5C11F707D;
+	Tue, 21 Jan 2025 20:14:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eV9Q+KpN"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=engleder-embedded.com header.i=@engleder-embedded.com header.b="P5A9r84H"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx17lb.world4you.com (mx17lb.world4you.com [81.19.149.127])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EEEA129A78;
-	Tue, 21 Jan 2025 20:04:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96B811A2550;
+	Tue, 21 Jan 2025 20:14:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=81.19.149.127
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737489883; cv=none; b=Sftc0aHK0q5Z0CbPiTvRjxPeNFAUdWyKcvNIIXcYjcHuJ6Xr0U5T6MlnUVkm90KerPRnSXCwGo5nY4AYTiDH7tRr47qOMA8ORJ1qnMhGeR/reFnSdN2ZAx0/QBGD8oV5MO262FHyey23bXz6SdpChKZM+W6oRLuPYwa90qt9G3s=
+	t=1737490442; cv=none; b=nl5AWjXP203kB/7raXXwrL2jOooNkjxwuZ+U8fefzalt5yDPioVgv858c3pomaoI0IzhIt+SOceyhKchR50vMuaz6rcx1OomVA8E+pM4G6si5xLhw3+0kx00XrBByaf4IztZrMUxs+Aa/DyDFCc0+2ARvFYkirjKiMCGU9ejaq8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737489883; c=relaxed/simple;
-	bh=datY8z3uZ6FINPElO4Av0+duadguLJSdvL8InBcdve4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rgQV6gQKPKFUta9ekNbICxFKwGl+Y2qa2hf2PYpzlbtXnMzjDv6POQqmYO3VgmlYGIpBd2bsgR9LXbH5Gq3FPlAen/MjoUupkqvTqVQwWaULaWHwJ/hxyurFpNKMBpxniuD8FxzCmFuJXEs4jOlPq0siyptiD904o6tC/pP1geE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eV9Q+KpN; arc=none smtp.client-ip=209.85.216.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-2ef79243680so1311026a91.2;
-        Tue, 21 Jan 2025 12:04:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1737489880; x=1738094680; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=datY8z3uZ6FINPElO4Av0+duadguLJSdvL8InBcdve4=;
-        b=eV9Q+KpNspoYuZn68UXcHtABVnN3/gVtNgHyOWZwpgaa1qcHvEPY7BSbCbcaYvjEb6
-         Ctzb5OKzT55fZ2l9JnfuDfJqt179+JfevPzlh8cF7xIMADsYLJ4BCBZ47WHZVigsiBMD
-         VyXQkTiJDJ0RU5FLRJq5WHxyBb1fBGepk8QqUlxl3JqVgnF6JY8MMRhCWZ4d/CXMdDEf
-         lfkkvWB4dEcwzfrJWr+RV3UcLhL0axa9CA7NMBxdGRzJ50bIdZMxXtG0697P/z4Pi9OY
-         PTfxJW3IGUJWeWfgy6E5Rs8gQo8kslqRLhuMZXACqPGdpuVHpyMyXQ01eyO9eWqFD35u
-         DEEQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737489880; x=1738094680;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=datY8z3uZ6FINPElO4Av0+duadguLJSdvL8InBcdve4=;
-        b=bOMOVhaLNz3jxKYfmepvv/pzMRxG7x7Ld5DHUPuEmV0DVFtdNUjCXT3McZNVvRAE3z
-         oLx/slG9f7ipTc6KmoWSw5pBhIyPCvFcc1szTYsXBYasPnHWO5TphNOhxy0Ov5ydPWAK
-         WRXrZkYGLHvyXB+TJur5B7gChwCUr3AXub58K2jeIlhamjZwL21Ojqv9r8FKwqjcAOks
-         8vSwCnyueQfZoHaxVzGQZUMYq2kLaUkXSXkWV3LQVKpKd+oLrTX5fzgAcnwTpd8B3pW5
-         UFNkWCV014n5VeHGvRKKiEsoxLYlKeBS3hjZ3qi9o/HX/ES8dXe2S2HIXzsunj4cklMt
-         Rexw==
-X-Forwarded-Encrypted: i=1; AJvYcCUe6n6zHRwgdHu/o5X4KtRLkR1aisLJcB1RE2iSaSd6ocwRv+wz2l5bcTLsaB4tRpRcM8biHY1KNtfqxOc=@vger.kernel.org, AJvYcCVJq+v9mNxW5Qn9YaMiye+VANN5cdBC0++TRN7I32ujyJ55g/ek/dUHZCIpXDgXa393XShHz/Sg@vger.kernel.org
-X-Gm-Message-State: AOJu0YzkgiGdBTqZAiWuT3lR3+n1KIoImUelNGUcklNCHJ2i6/y0TWrb
-	e/lC7GReoAgemzWKBErU3+XYrwqvwrGOerhf+hLlIgdQo9nQJneYNrwzpjcNWmCM/YjNWXALrBs
-	GwRoF8NeSoHWax6iLgO7QFEsY2A==
-X-Gm-Gg: ASbGncsyUsQhfhLI3Z/j9iAg2J4pn02JXuTuIGocrUnS6oa503D0ilB0rawiEJqzS+/
-	rk2bVhrlOOQulsdfY7sS/31ecm76ITOnGuMAPQYJqOnOY+IIyWePcz3uBsxVCJLO49Qbd1+rjtJ
-	Zp82iO
-X-Google-Smtp-Source: AGHT+IE71M9h633jh87AVDvssGoXfLRlohiMUXLNqh33tWGbeKHkyb3O+34fNCcs+0bG0qWawpaLuhIzk28fo61Bta4=
-X-Received: by 2002:a17:90b:4ece:b0:2ee:948b:72d3 with SMTP id
- 98e67ed59e1d1-2f782c5502cmr10449356a91.1.1737489880347; Tue, 21 Jan 2025
- 12:04:40 -0800 (PST)
+	s=arc-20240116; t=1737490442; c=relaxed/simple;
+	bh=p24p6pQf5fnXbNmEI5tmT0adiiqZzDYfw0WBaeAimNc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=SVyXaVLTerUyE/ffIkPnMO+NK7zjPVmCCR+12haIjJl+6O/tRYHVZu6dLGmajPhiOgzLJOobWMLBl80K6BGNC/eIFZda5lNUVeFZ8aR87i8J4qvMRMz4q+INxWL2OGwjC+NbWP+cwoBkWHHR6a0g2EdCNpZJjvPF4iVVTMsFWyM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=engleder-embedded.com; spf=pass smtp.mailfrom=engleder-embedded.com; dkim=pass (1024-bit key) header.d=engleder-embedded.com header.i=@engleder-embedded.com header.b=P5A9r84H; arc=none smtp.client-ip=81.19.149.127
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=engleder-embedded.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=engleder-embedded.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=engleder-embedded.com; s=dkim11; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=HJ/tLsQWKPOGKhluXilNFbDzX/GPacn+xLaKLt0cdIA=; b=P5A9r84HhhMpyecLJh+Ub/ne9H
+	vu0/CkJNA9ilNqgmayUaq/u+eRayysPYWi/qeu25OQwY7aEnDXmhqROwVQghQxKsJmy7xRcEFBpcI
+	EPEqeO0UFWq4W34WlKrO/5epEMm8uxuVS/RRdaUnAXydUBF4eW2QLW8HSMiyjNuvvh88=;
+Received: from [88.117.60.28] (helo=[10.0.0.160])
+	by mx17lb.world4you.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.97.1)
+	(envelope-from <gerhard@engleder-embedded.com>)
+	id 1taKdB-000000001YR-3ea9;
+	Tue, 21 Jan 2025 21:13:50 +0100
+Message-ID: <5b43d53d-5ab1-43da-b327-74ca29c29fad@engleder-embedded.com>
+Date: Tue, 21 Jan 2025 21:13:48 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250120222557.833100-1-chenyuan0y@gmail.com> <xttnvcmu3dep2genvce3r7spreliecx3dc3rynups25q6xilk6@tf4wxe6bdxia>
-In-Reply-To: <xttnvcmu3dep2genvce3r7spreliecx3dc3rynups25q6xilk6@tf4wxe6bdxia>
-From: Chenyuan Yang <chenyuan0y@gmail.com>
-Date: Tue, 21 Jan 2025 12:04:28 -0800
-X-Gm-Features: AbW1kva5JauRtye6rGFdp5m21Dw3u8bYGN4NLQTg2EOnnJemb8dFlZHyqF7dhus
-Message-ID: <CALGdzuqsjddPKgpCdOtDyAAJcJcfd1UUyK7o4YzL8a1E5EsNKw@mail.gmail.com>
-Subject: Re: [PATCH] net: davicom: fix UAF in dm9000_drv_remove
-To: =?UTF-8?Q?Uwe_Kleine=2DK=C3=B6nig?= <u.kleine-koenig@baylibre.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, paul@crapouillou.net, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, zijie98@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC net-next v3 3/4] virtio_net: Map NAPIs to queues
+To: Joe Damato <jdamato@fastly.com>, netdev@vger.kernel.org
+Cc: jasowang@redhat.com, leiyang@redhat.com, xuanzhuo@linux.alibaba.com,
+ mkarsten@uwaterloo.ca, "Michael S. Tsirkin" <mst@redhat.com>,
+ =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ "open list:VIRTIO CORE AND NET DRIVERS" <virtualization@lists.linux.dev>,
+ open list <linux-kernel@vger.kernel.org>
+References: <20250121191047.269844-1-jdamato@fastly.com>
+ <20250121191047.269844-4-jdamato@fastly.com>
+Content-Language: en-US
+From: Gerhard Engleder <gerhard@engleder-embedded.com>
+In-Reply-To: <20250121191047.269844-4-jdamato@fastly.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-AV-Do-Run: Yes
 
-Hello,
+On 21.01.25 20:10, Joe Damato wrote:
+> Use netif_queue_set_napi to map NAPIs to queue IDs so that the mapping
+> can be accessed by user apps.
+> 
+> $ ethtool -i ens4 | grep driver
+> driver: virtio_net
+> 
+> $ sudo ethtool -L ens4 combined 4
+> 
+> $ ./tools/net/ynl/pyynl/cli.py \
+>         --spec Documentation/netlink/specs/netdev.yaml \
+>         --dump queue-get --json='{"ifindex": 2}'
+> [{'id': 0, 'ifindex': 2, 'napi-id': 8289, 'type': 'rx'},
+>   {'id': 1, 'ifindex': 2, 'napi-id': 8290, 'type': 'rx'},
+>   {'id': 2, 'ifindex': 2, 'napi-id': 8291, 'type': 'rx'},
+>   {'id': 3, 'ifindex': 2, 'napi-id': 8292, 'type': 'rx'},
+>   {'id': 0, 'ifindex': 2, 'type': 'tx'},
+>   {'id': 1, 'ifindex': 2, 'type': 'tx'},
+>   {'id': 2, 'ifindex': 2, 'type': 'tx'},
+>   {'id': 3, 'ifindex': 2, 'type': 'tx'}]
+> 
+> Note that virtio_net has TX-only NAPIs which do not have NAPI IDs, so
+> the lack of 'napi-id' in the above output is expected.
+> 
+> Signed-off-by: Joe Damato <jdamato@fastly.com>
+> ---
+>   rfcv3:
+>     - Eliminated XDP checks; NAPIs will always be mapped to RX queues, as
+>       Gerhard Engleder suggested.
+> 
+>   v2:
+>     - Eliminate RTNL code paths using the API Jakub introduced in patch 1
+>       of this v2.
+>     - Added virtnet_napi_disable to reduce code duplication as
+>       suggested by Jason Wang.
+> 
+>   drivers/net/virtio_net.c | 23 +++++++++++++++++++----
+>   1 file changed, 19 insertions(+), 4 deletions(-)
 
-Thanks for pointing this out!
+Looks good to me. I hope I didn't get you on the wrong track!
 
-On Mon, Jan 20, 2025 at 11:33=E2=80=AFPM Uwe Kleine-K=C3=B6nig
-<u.kleine-koenig@baylibre.com> wrote:
->
-> Hello,
->
-> On Mon, Jan 20, 2025 at 04:25:57PM -0600, Chenyuan Yang wrote:
-> > dm is netdev private data and it cannot be
-> > used after free_netdev() call. Using adpt after free_netdev()
->
-> What is adpt?
-
-This should be "dm".
-
-> > can cause UAF bug. Fix it by moving free_netdev() at the end of the
-> > function.
->
-> "can cause"? Doesn't that trigger reliable?
->
-> How did you find that issue? Did this actually trigger for you, or is it
-> a static checker that found it? Please mention that in the commit log.
-
-This is detected by our static checker. Thus, we don't have a
-test-case to trigger it stably.
-Basically, it has the buggy pattern as the commit mentioned below.
-
-> > This is similar to the issue fixed in commit
-> > ad297cd2db8953e2202970e9504cab247b6c7cb4 ("net: qcom/emac: fix UAF in e=
-mac_remove").
->
-> Please shorten the commit id, typically to 12 chars as you did in the
-> Fixes line below.
-
-Sure! Should I send a Patch v2 for this commit?
-
-> > Fixes: cf9e60aa69ae ("net: davicom: Fix regulator not turned off on dri=
-ver removal")
-> > Signed-off-by: Chenyuan Yang <chenyuan0y@gmail.com>
->
-> Best regards
-> Uwe
-
-Best,
-Chenyuan
+Reviewed-by: Gerhard Engleder <gerhard@engleder-embedded.com>
 
