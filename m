@@ -1,129 +1,133 @@
-Return-Path: <netdev+bounces-159983-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159984-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD5EEA179D5
-	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 10:09:19 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DDB81A179FF
+	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 10:18:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6C3361885BFD
-	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 09:09:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DFCB03A6D3C
+	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 09:17:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 119321BC07A;
-	Tue, 21 Jan 2025 09:09:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 344441B6D0F;
+	Tue, 21 Jan 2025 09:17:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="exg9+V3q"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HNbtB8uq"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBABC2CAB;
-	Tue, 21 Jan 2025 09:09:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7567E1AB53A;
+	Tue, 21 Jan 2025 09:17:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737450555; cv=none; b=TF8uxngtt8LrKKhXfucXYdbg/StHXsuNjAKK3/Z5bzbevLsayY7lQ2VStB6m7dWCv9NrMJRIKF84EqQe1eyYI/pLAIcWDOIsIkaXT8uyJzXnWBtTwSYn1nAeGUUCRYvD8zJiuMgbwrWGgeAWxcP0X7SCMm5OgRu3bUXM2IRXEiw=
+	t=1737451076; cv=none; b=pb/ZjyF/m9g4XkmoSljdTdtsFyUzmSZFkkSsPPjCpHNec+6WkrLcjEm6cczz06BUf8sRvhz8j2tFrXKV/7zP88Fdoq8NpklX+MtW/63pYzX7IVLcn8jjqWZJBhAh7BNOz8LnBQmLCfcwbsD7MrtCxvRR4cfhiwPMS8PTg5e3FZU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737450555; c=relaxed/simple;
-	bh=WvHm6i4Tr8hzdI5lZXs5wNmm1gALbmDbKkWl6p6plYQ=;
+	s=arc-20240116; t=1737451076; c=relaxed/simple;
+	bh=ks4VYU0vAolHLN2e99mEh5LeroHbi64C8Pe0fUbFwnE=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=a84uZCPxTf178AttT5fQcJZdlCzaa6JB/F/yfQuGwZPMXtns8dYsjNcNtKdc9gjLh/Xk2+1f0QOFkQLK0O/IFUp890nBsrnvAjLo/nLWLPmwl8KHT8aYUanU9ZSFzq08V8Ft9HuZREANOjAJL8cbcH0DrZGkFycHwfNMOuELQkE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=exg9+V3q; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 28F23C4CEE3;
-	Tue, 21 Jan 2025 09:09:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737450554;
-	bh=WvHm6i4Tr8hzdI5lZXs5wNmm1gALbmDbKkWl6p6plYQ=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=exg9+V3qcugpZRV54zDjVe3k77ARbdnjZ/jgYOIuUlmEzYdHJ2gYI8L5TTImGk/RI
-	 lKQhWUCN+nzTS6zWhtgOLvvSsI0M7tnxYrtW7WWj0KOn09PUn93GQrPv2wDeKaHPdv
-	 NEe6ZnqPoPTqXmn9JfLPMuMxMikn8XkbNRMwn/OTpa9zOEMRdTr8lJ1eu7F+ojkwhe
-	 67Ws8IYc+BSUXUtOeJ7155nZZm33AVJBntx8S2moTQgzD+k4r/uFQaunnQ8M7P9XOY
-	 GcL7Uq/Mly+7NG8LTkX8VuZ0Rvl2qyAZDgF1Ip2VZumPmJ8yHryncoHG0A8qFFyK0f
-	 jEe8ypmTnt9hg==
-Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-5d3cf094768so9443603a12.0;
-        Tue, 21 Jan 2025 01:09:14 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCUg9UtTC6k1SoL02Y5Ni11QMtfhX2yOSV4Vsh/agn7wuc4iOVEjqyZqO/1zKZzqZMzWS3ldETra@vger.kernel.org, AJvYcCWRBgUsfZMoLXN4G+ukPp1sUN8eEvn4CJkEKj+AsWNl8euk50VdQh5VT5rz7diDkW+7ozIA+7SImdDMPec=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzdWjYBFw/WTAVKbj7Ye2G3euY/Js1pMSu9v4pgkWGxXvFPRPSb
-	8H0sHt1Sil4Wly57MA/0eN83w70G80zDY/7VeH2pHyE4dWWzCFHSSUqUqSomaTuT+qEAEs8+C3U
-	Y/zDBWeNjdmDBQfLYrocmP7+Nfx4=
-X-Google-Smtp-Source: AGHT+IGzjrh1NA3o8A3+RhJG99XOWJ4NXJI25r2bWtBsxh1tM5KrsEouxThrIGAJgk8BTeRRbRaBycet+uCxNWi9AH4=
-X-Received: by 2002:a17:906:4442:b0:ab3:a2f9:d8cc with SMTP id
- a640c23a62f3a-ab3a2f9eef5mr1134219366b.41.1737450552640; Tue, 21 Jan 2025
- 01:09:12 -0800 (PST)
+	 To:Cc:Content-Type; b=V3zf0XU33xljdRgkVF4IkOYKNW4pcJ3sW2sKQFBa0F9+US+JIhKXYRNfcjxovZ5XK1t7GIfNguercm4LNj9wL5ZV8DzXvIU4MyT4ZGtdQwPemK4JeOvUxoSDMn0pFvPXAdVp7ped7yEcvs8Fchz3LmwMrARzB1c7Auzgg8oD5wA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HNbtB8uq; arc=none smtp.client-ip=209.85.208.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-5d9b6b034easo10869274a12.3;
+        Tue, 21 Jan 2025 01:17:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1737451073; x=1738055873; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=b56qKkkq27woB7DpV3YJkAgA19UIaFwIBrselPFU3mQ=;
+        b=HNbtB8uq9cZxNvsBIKu9k5sAusR1VBbPeNO6iZ3W/+vK88OMbE/N/s5rWIFv8hcSth
+         jIEUhpZ2owdwgQplekAvOvH3fqeUDnHIJeGxSAmAE6zwRh/sBc/lJk1jjcGCbiDlhmNA
+         WMomKKSKZcpT836gxq+D2Qou004D4WV/gcBpHQehjM8AFtv4Js5PBELMpqF/gDG8CHao
+         7mYAxcfcj7m1cb2k/3ZgM+zdAMW10SH5tcqEbgompZYQyplVgAtnDVZbfU/5I0Bg5nNQ
+         pupl/xoXTehgz4MJH4krryGf78sV4iEQcrvXfpK2JEk/LPWPhSL3zAjqg9z0WvQxAk54
+         lYmQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737451073; x=1738055873;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=b56qKkkq27woB7DpV3YJkAgA19UIaFwIBrselPFU3mQ=;
+        b=Z+p2WFigWf4PtSm9Ny1mgFdZGZ+93G0kq9ePzevaY75mjRGwrBE6eIomHcntUItZ0B
+         v9osB2nNeTffTglL06IKBLKwErnq+rcwn6qjbAD0Hz4GDiH7aaYoD5lWOsnpsFFu52pp
+         3K3faWyknM7fvt6xG7VTBdu0i/K9P3q810j1z+o3BfxGXdbJsxVVMOr+LJ0DcnLrXo5S
+         25WZFAdytB8kqXUxUsu6h+iFccZtXtReE6enVJ6WBzfFQhQ/qvnBDc/SfqJ2M9WG2c+P
+         Sp5qnl0SrqVsqifQa7/bLtcSEJ6KjMEml8pfm3bCGNIr4D5P/un/ZI1cCs1AxzNqPAQX
+         OVbQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX2YyD5vSvXzwzZR1cCnsoBeTrEk2AnX9+k2zHFP23IdRBVzyC2aWyzUIaQVK1c1P7fqP0lqW5EYQ++R5A=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzlDTp8XFELyVsjUkOureJXprAHcieTGU2JLmYu5HxVlKnVfHJa
+	dgETtt+Nb0Ksn0D75YOir0IKJz152tg4t7Mqi3r7KtdQ7reF/o6mjLcvo/pwXqPFLXJ7G9K/W+f
+	lCeVz4C/Gtv0StlPAvKTVMj0XsZMeEB4BOYDw2A==
+X-Gm-Gg: ASbGncvzbXOHn+IrUe+9ZLt/CRm1X2Hl8u49H0Zobggd+L8M6o3shcf5ArXeO1mARHX
+	XKrsLfttwljX6g66FTj21JK7rrFYhRw5tfNYxfgXzd3fhdttjhDaz
+X-Google-Smtp-Source: AGHT+IEfYtR0AgBf8cmJ0KdutspUQtO32ja7QUkiIOPXEZXj7oqiH7wQJNFKtbt9bbpg8S67t+HaFOXnoibcTudONLg=
+X-Received: by 2002:a05:6402:5206:b0:5d0:f904:c23d with SMTP id
+ 4fb4d7f45d1cf-5db7db1d558mr18341951a12.28.1737451072346; Tue, 21 Jan 2025
+ 01:17:52 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250110144944.32766-1-si.yanteng@linux.dev> <5e1c9623-30cb-48c8-865b-cbdc2c08f0f3@lunn.ch>
- <20250110165458.43e312bf@kernel.org> <679e160b-6cab-43d6-990c-d1df0e243995@linux.dev>
-In-Reply-To: <679e160b-6cab-43d6-990c-d1df0e243995@linux.dev>
-From: Huacai Chen <chenhuacai@kernel.org>
-Date: Tue, 21 Jan 2025 17:09:00 +0800
-X-Gmail-Original-Message-ID: <CAAhV-H6YJyP2g45JdihZN262Ye0_LzWSibtc=6q7c2Rj-Dkzdw@mail.gmail.com>
-X-Gm-Features: AbW1kvbZ_8LkZoLKR6xf5ayFpawG2Ft9AC-WoLB5kndGe7nh_M-PN5DjUIvKbO4
-Message-ID: <CAAhV-H6YJyP2g45JdihZN262Ye0_LzWSibtc=6q7c2Rj-Dkzdw@mail.gmail.com>
-Subject: Re: [PATCH] MAINTAINERS: Become the stmmac maintainer
-To: Yanteng Si <si.yanteng@linux.dev>
-Cc: Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew@lunn.ch>, andrew+netdev@lunn.ch, 
-	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com, 
-	mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20250119134254.19250-1-kirjanov@gmail.com> <CAL+tcoDVTJ8vA_6wBd6ZDh2pq__fwJ9vzm3Kx5qpMNvaxpObjA@mail.gmail.com>
+In-Reply-To: <CAL+tcoDVTJ8vA_6wBd6ZDh2pq__fwJ9vzm3Kx5qpMNvaxpObjA@mail.gmail.com>
+From: Denis Kirjanov <kirjanov@gmail.com>
+Date: Tue, 21 Jan 2025 12:17:39 +0300
+X-Gm-Features: AbW1kvbiiZ2XqlqHOjOPISQicXMCzJ3Yv5VwNOV7JyUotqcsX48LDnBh_QEBdY0
+Message-ID: <CAHj3AV=wkJnX5rW4jdFycf6vtm1vW2a+gVNAcTnnaR7JqsPEeg@mail.gmail.com>
+Subject: Re: [PATCH v2 net-next] sysctl net: Remove macro checks for CONFIG_SYSCTL
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: netdev@vger.kernel.org, edumazet@google.com, davem@davemloft.net, 
+	kuba@kernel.org, pabeni@redhat.com, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Sat, Jan 11, 2025 at 10:11=E2=80=AFPM Yanteng Si <si.yanteng@linux.dev> =
-wrote:
+> Please take a look at the commit:
+> commit b144fcaf46d43b1471ad6e4de66235b8cebb3c87
+> Author: Kuniyuki Iwashima <kuniyu@amazon.com>
+> Date:   Wed Jun 14 12:47:05 2023 -0700
 >
-> Hi Jakub, Andrew,
+>     dccp: Print deprecation notice.
 >
-> On 1/11/25 08:54, Jakub Kicinski wrote:
-> > On Fri, 10 Jan 2025 18:22:03 +0100 Andrew Lunn wrote:
-> >> On Fri, Jan 10, 2025 at 10:49:43PM +0800, Yanteng Si wrote:
-> >>> I am the author of dwmac-loongson. The patch set was merged several
-> >>> months ago. For a long time hereafter, I don't wish stmmac to remain
-> >>> in an orphan state perpetually. Therefore, if no one is willing to
-> >>> assume the role of the maintainer, I would like to be responsible for
-> >>> the subsequent maintenance of stmmac. Meanwhile, Huacai is willing to
-> >>> become a reviewer.
-> >>>
-> >>> About myself, I submitted my first kernel patch on January 4th, 2021.
-> >>> I was still reviewing new patches last week, and I will remain active
-> >>> on the mailing list in the future.
-> >>>
-> >>> Co-developed-by: Huacai Chen <chenhuacai@kernel.org>
-> >>> Signed-off-by: Huacai Chen <chenhuacai@kernel.org>
-> >>> Signed-off-by: Yanteng Si <si.yanteng@linux.dev>
-> >> Thanks for volunteering for this. Your experience adding loongson
-> >> support will be useful here. But with a driver of this complexity, and
-> >> the number of different vendors using it, i think it would be good if
-> >> you first established a good reputation for doing the work before we
-> >> add you to the Maintainers. There are a number of stmmac patches on
-> >> the list at the moment, please actually do the job of being a
-> >> Maintainer and spend some time review them.
-> >>
-> >> A Synopsis engineer has also said he would start doing Maintainer
-> >> work. Hopefully in the end we can add you both to MAINTAINERS.
-> > +1, thanks a lot for volunteering! There are 22 patches for stmmac
-> > pending review in patchwork, so please don't hesitate and start
-> > reviewing and testing.
->
-> Okay, thank you for your encouragement.
->
-> In the following period of time, I will try to review and
->
-> test the patches of stmmac.
-I can help Yanteng to review patches, and I also have some stmmac
-patches to be submit.
+>     DCCP was marked as Orphan in the MAINTAINERS entry 2 years ago in com=
+mit
+>     054c4610bd05 ("MAINTAINERS: dccp: move Gerrit Renker to CREDITS").  I=
+t says
+>     we haven't heard from the maintainer for five years, so DCCP is not w=
+ell
+>     maintained for 7 years now.
 
-Huacai
+Yes, but on another hand I see that it's evolving, like MP-DCCP and
+the according ietf draft
+here: https://datatracker.ietf.org/doc/draft-ietf-tsvwg-multipath-dccp/20/
+
+Also there is a out-of-the tree repo available with the implementation
+of mp-dccp:
+https://github.com/telekom/mp-dccp
 
 >
+>     Recently DCCP only receives updates for bugs, and major distros disab=
+le it
+>     by default.
+>
+>     Removing DCCP would allow for better organisation of TCP fields to re=
+duce
+>     the number of cache lines hit in the fast path.
+>
+>     Let's add a deprecation notice when DCCP socket is created and schedu=
+le its
+>     removal to 2025.
 >
 > Thanks,
->
-> Yanteng
->
+> Jason
+
+
+
+--=20
+Regards / Mit besten Gr=C3=BC=C3=9Fen,
+Denis
 
