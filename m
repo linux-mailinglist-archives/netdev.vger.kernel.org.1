@@ -1,179 +1,202 @@
-Return-Path: <netdev+bounces-159933-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159940-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C78F1A176C9
-	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 06:09:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D21A2A176FD
+	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 06:27:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F0C8416A0DC
-	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 05:09:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 16336162482
+	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 05:27:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C162185955;
-	Tue, 21 Jan 2025 05:09:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1E711A724C;
+	Tue, 21 Jan 2025 05:27:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mUVapJcm"
+	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="CjFGBInK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f171.google.com (mail-il1-f171.google.com [209.85.166.171])
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B439FA55;
-	Tue, 21 Jan 2025 05:09:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC81E1A2550
+	for <netdev@vger.kernel.org>; Tue, 21 Jan 2025 05:27:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737436155; cv=none; b=JlnSUzunTSv5H36+L2Q8YcqFd/LQ02CeJNPvYBGY71Tx+jXW6wwVuvNKxmVUNGAQDOGkwqnboPWkBOhpt+MDfJxlFaPLv6uyR/NRIT/7x0ZEOTygvl21sKzASFS1npj7dEE0PTtsUrlQNm9c8lc2i8swP1MRLyNph5BZrEINWAA=
+	t=1737437241; cv=none; b=KNyZk9Ox8udo4g899hG7IqnrVSh5PI6gesxpA+fupVE+yDBWKOo145qlPHqeMcaC+jxunJtgB8M+uZf68VOdLO39qPrTJ7AUR2KS56YKFLI9GplugjU+9bsO9S+GVSODXI7bfhTwUqO3GO9B1DSjbk7DvIBLg1c55vMkH4IiUlY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737436155; c=relaxed/simple;
-	bh=Mpfwg8Y/Q/+cD9ry0PP+5YwfNW9+Cak+CUzG7cR8D38=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rCdpAnYffwsWQme/aV28K/JDskur431DQxahx73ZK129J7Wr2YiMUPoFpI6yZ3Um7wzK4wQP4nH9erLG8twBQNz7DAHGc2LPyVXplnZO9t3wrX8fVEOJBM45FItKsxqv2iI9M+1sm7+jyeC+2oERG+dZepFXNQqKkHy6iT/Iriw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mUVapJcm; arc=none smtp.client-ip=209.85.166.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f171.google.com with SMTP id e9e14a558f8ab-3cf880d90bdso7616905ab.3;
-        Mon, 20 Jan 2025 21:09:13 -0800 (PST)
+	s=arc-20240116; t=1737437241; c=relaxed/simple;
+	bh=17jdquf1O8HrGT7YX1JbIULVdHRHHmmF5bL1fyAoM9k=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=KLcoY00tqHFTtwKP0AburwHceN7ho0dtXVodJ0pQRsezUQY1T8atKOQPDeTHihPi9JBY6gbLVhlpZ3r8yWAE1gim7edsPPbW4XCFBVDI0FkDYeg5DJL63s75P/oI5nepfUN7NJEx1UZd5BO31nDsoW+JWNnv9Bne4s+mU1mPR2g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=pass smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=CjFGBInK; arc=none smtp.client-ip=209.85.214.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=daynix.com
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-21644aca3a0so115653095ad.3
+        for <netdev@vger.kernel.org>; Mon, 20 Jan 2025 21:27:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1737436153; x=1738040953; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=cJQfRyC3Wsudpzv9LLtI4oTXgl7XjBx9DhB6xX5CRmA=;
-        b=mUVapJcmbPWOBCQ0mv1EiZNNpGKVLFq0RUnwZ9ZWNPy9LIZuGmkrZSh+3CKqs/dTH2
-         nbJ0t2CfuC5GWfjlBH0fSRh9WZfrL5CFPYvonCrczluNx9NSjh4pWvcbCWM5rsVC0uLV
-         93RUTYJI1padj22Ec4Drq1czjc0H2zyt04jkdM9jMC5BrbIdv4LBobzu7wWZ22YTe0jk
-         fQUnktTq/ID25HAu9/8LW3tGDth8G2usYXH6k/+f/c0oKbiCzIYhkDpwnxlsOXmB8UvH
-         PQzctDUKnPIIKoKYH6UswRk8zqYvU408d9nWIt1y5KwQ0FDW7uXN+fnodEv+gDbFGNNA
-         G9bw==
+        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1737437239; x=1738042039; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=KuNe0V4SlZE9V8OcN/E4qhh/fBRX/xaiMcicz54Ypbc=;
+        b=CjFGBInKFSGtYLOCcEjqY8Bn27ymGEWz+08u6G22zDw2Yn46EzpuW8ioqpYyPZvdeS
+         PL+f0F6rwFmgOXeE9ks7WFaFgX4+4jqLcP+1tXkSMwOk6FpTjJAKFo92DNqefY3itE9+
+         qbnj3cTHBa9mkhch49YxEGenvFajWjpC9wKhOMRN3mg/GEgEzHW1NMt6WQtygK1yl0jT
+         KjHFTzfudxO69pYWMqpeW11YwD/40z4r8JDENBd7cuW9R3f36CPPLMIkEr4ygsBwUqlR
+         phRItPEggnf264dj8xCT/GRiNq1mVtuFb0Mb53x9B/h1AiTanITyn+rEfGqJ8n2DFfkY
+         P4jQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737436153; x=1738040953;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=cJQfRyC3Wsudpzv9LLtI4oTXgl7XjBx9DhB6xX5CRmA=;
-        b=eryiJPb+zTpMaXL8WBCzyOp7U+yCHbUrsyT+HTV77E2p/C8mAZ3PdIF/ROAeiZEcmD
-         iwk2c0qQ4KXckIo/wvg/quA2grC1Sg2qlXCphZ6e6Aqz+LaGmJXfQPAfw1Zo1G5BmX1n
-         3YlV0LfAEkQmOgMX5+B6DJp0w9FeUTgN9dUivSVSCRX//0/m8e15InvziFjz/yqNcvEy
-         dV1WqfF0v/V0y8yzngamXiznvWXa4Sz7w0m5SSK4dmMv4/PDrDHs0Odm8BbLVd/oO10O
-         LVdrOFX4u/LJCd4J1L+rScVlanqWHPhHSJHUoJhP7sgr/qMRPoFQgIOR9KTkANXxbPWP
-         khAA==
-X-Forwarded-Encrypted: i=1; AJvYcCWNbox1m4LfC5nqP10mZ+PVnxFNC9FJqzydB/Tay+nSMETtmkaQrYtKW6wBL4qySWGcR7Gs5B0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxsbxs1wbrosdYTPm6aT22TQCO7N2B5F7ekHAeJdluvlUUdQxBM
-	58xQJI8fJhau2tthE0EgMlYE/fX5MYaCjLJkGnT+cPc9ViTYhvOVo4jxlAlXwxWCtrJHPXwMD6e
-	zkBxapgsIr3gBkZk+cb4w70eK0dw=
-X-Gm-Gg: ASbGncumJ5wJ2hbEklG9BuBMOMs/MA8bTVCVgntzTFasPjnScdBWkTDmwPm5Gf2atMX
-	25yoplceqmzkAdh71ZfWIilJITiWpsm66vxWdP2sYV9PAG6sT2Jc=
-X-Google-Smtp-Source: AGHT+IE08hPon2t7JQWZ73xzkucKDLJ54/L0vyFfsq41RSDlrT3eZ3yA5ijWsa93jHwNsPWITrVQHFtBIQsiaJKbASI=
-X-Received: by 2002:a05:6e02:148f:b0:3cf:6c4f:396f with SMTP id
- e9e14a558f8ab-3cf7447c7cfmr125236365ab.15.1737436152686; Mon, 20 Jan 2025
- 21:09:12 -0800 (PST)
+        d=1e100.net; s=20230601; t=1737437239; x=1738042039;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=KuNe0V4SlZE9V8OcN/E4qhh/fBRX/xaiMcicz54Ypbc=;
+        b=VLBL31SkihR+hAgLnW3xbTL3gCWUdkFhic6FBskrJFo+VrUzeeLuQ7l2DVgZp8l3vN
+         z9Stx7iyVZgny7V+vKrFEGpkvuM03RVIu8eUKNOaOdPY6iu71ICkVj4PKT/JZtDdnr5y
+         A4fdslQTSxyayegl7M2TBaua4B1qGsnsdQo794JuGcsNMTRawHHj6jQUWHmDMyfEtrki
+         lSH/Og8Go9vx2XVXf9Kgc39+16O1mCHUQpBZa1BH0Fqd62sfw2/UdELma8i5URIq9CZG
+         DdZRF0TDDmQOzsXlUMkrJ/gTiI0wP69qxryAN4s87zE5lZJxvhaI1pPShNs7xUU5Lgk4
+         XcMw==
+X-Forwarded-Encrypted: i=1; AJvYcCXNGdrw01kaEeMqtZ5gEXOtslyMqbnMNLts9sJ+VG63IiVHCIEALAtd78a0q1k44izSjo1buuc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzqjftIo3HBlFtRH2xjYt56RYNlePNYPC8SXCI1UGetZDTwsjdw
+	yvTjD6CRbG+tpwKzww5P34J7CO4UnuLN6+6qvxSMyOI24+1OMUbTRB8WA45urzA=
+X-Gm-Gg: ASbGncua4QG+LmiE1NZ/9BizONvZW6RKRSumQ5i7ADs0rh8igPYaDwqXLXZlzJKljDd
+	JhPOpYqUY4lEBioSMY+fYdd8fHeq+FuF4pxDQFRnKwThI0UtO4g8fi+MjzjCqgpsFVKkNvF7Vul
+	55gK/JzTXbdrTrOAfBk1/p5nHmRPrSBxHClB8lSuaHvOruRvUjyBtORSElqps9oPLXigHN5VhKk
+	aSel1FafSvbSg3ppJSFOtSX+xfHv/kdTbUTLZUglE9+v/VZYn1bkfXE4P09YGCmJuk4yrmfTWSx
+	slPm
+X-Google-Smtp-Source: AGHT+IF8AscE6lKE6K9gAMAkVavPAuy5ImBZTIR2UjEzttP05cs28ECPVkex5+WoyQz221rWXZqSKQ==
+X-Received: by 2002:a17:902:f7ce:b0:215:773a:c168 with SMTP id d9443c01a7336-21c352de425mr241247485ad.1.1737437239066;
+        Mon, 20 Jan 2025 21:27:19 -0800 (PST)
+Received: from [157.82.203.37] ([157.82.203.37])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-a9bdf0b4503sm6710167a12.67.2025.01.20.21.27.13
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 20 Jan 2025 21:27:18 -0800 (PST)
+Message-ID: <92675e51-cbaf-4905-8cf8-dff741a26db9@daynix.com>
+Date: Tue, 21 Jan 2025 14:27:12 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250121012901.87763-1-kerneljasonxing@gmail.com> <20250121012901.87763-3-kerneljasonxing@gmail.com>
-In-Reply-To: <20250121012901.87763-3-kerneljasonxing@gmail.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Tue, 21 Jan 2025 13:08:36 +0800
-X-Gm-Features: AbW1kvYarHVuBxdCmtWDJVlNxImYh8P0fsc9x69htjnLMINBztSjTf-Mq-C2Uq4
-Message-ID: <CAL+tcoBzgjPn1Gmw9NdL0rXhomMJka=s0yvCpc=7GY+DP=AKmA@mail.gmail.com>
-Subject: Re: [RFC PATCH net-next v6 02/13] net-timestamp: prepare for
- timestamping callbacks use
-To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, dsahern@kernel.org, willemdebruijn.kernel@gmail.com, 
-	willemb@google.com, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, 
-	martin.lau@linux.dev, eddyz87@gmail.com, song@kernel.org, 
-	yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org, 
-	sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, horms@kernel.org
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v3 9/9] tap: Use tun's vnet-related code
+To: Willem de Bruijn <willemb@google.com>, Jason Wang <jasowang@redhat.com>
+Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ Jonathan Corbet <corbet@lwn.net>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Shuah Khan <shuah@kernel.org>,
+ linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, kvm@vger.kernel.org,
+ virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org,
+ Yuri Benditovich <yuri.benditovich@daynix.com>,
+ Andrew Melnychenko <andrew@daynix.com>,
+ Stephen Hemminger <stephen@networkplumber.org>, gur.stavi@huawei.com,
+ devel@daynix.com
+References: <20250116-tun-v3-0-c6b2871e97f7@daynix.com>
+ <20250116-tun-v3-9-c6b2871e97f7@daynix.com>
+ <678a21a9388ae_3e503c294f4@willemb.c.googlers.com.notmuch>
+ <51f0c6ba-21bc-4fef-a906-5d83ab29b7ff@daynix.com>
+ <CACGkMEuPXDWHErCCdEUB7+Q0NxsAjpSH9uTvOxzuBvNeyw7_Hg@mail.gmail.com>
+ <CA+FuTSec1z7-8nNNc1ZXkzekDrFHPnvYKFf8PNZg89VuwhoWSw@mail.gmail.com>
+Content-Language: en-US
+From: Akihiko Odaki <akihiko.odaki@daynix.com>
+In-Reply-To: <CA+FuTSec1z7-8nNNc1ZXkzekDrFHPnvYKFf8PNZg89VuwhoWSw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Tue, Jan 21, 2025 at 9:29=E2=80=AFAM Jason Xing <kerneljasonxing@gmail.c=
-om> wrote:
->
-> Later, I would introduce four callback points to report information
-> to user space based on this patch.
->
-> As to skb initialization here, people can follow these three steps
-> as below to fetch the shared info from the exported skb in the bpf
-> prog:
-> 1. skops_kern =3D bpf_cast_to_kern_ctx(skops);
-> 2. skb =3D skops_kern->skb;
-> 3. shinfo =3D bpf_core_cast(skb->head + skb->end, struct skb_shared_info)=
-;
->
-> More details can be seen in the last selftest patch of the series.
->
-> Signed-off-by: Jason Xing <kerneljasonxing@gmail.com>
-> ---
->  include/net/sock.h |  7 +++++++
->  net/core/sock.c    | 13 +++++++++++++
->  2 files changed, 20 insertions(+)
->
-> diff --git a/include/net/sock.h b/include/net/sock.h
-> index 7916982343c6..6f4d54faba92 100644
-> --- a/include/net/sock.h
-> +++ b/include/net/sock.h
-> @@ -2923,6 +2923,13 @@ int sock_set_timestamping(struct sock *sk, int opt=
-name,
->                           struct so_timestamping timestamping);
->
->  void sock_enable_timestamps(struct sock *sk);
-> +#if defined(CONFIG_CGROUP_BPF)
-> +void bpf_skops_tx_timestamping(struct sock *sk, struct sk_buff *skb, int=
- op);
-> +#else
-> +static inline void bpf_skops_tx_timestamping(struct sock *sk, struct sk_=
-buff *skb, int op)
-> +{
-> +}
-> +#endif
->  void sock_no_linger(struct sock *sk);
->  void sock_set_keepalive(struct sock *sk);
->  void sock_set_priority(struct sock *sk, u32 priority);
-> diff --git a/net/core/sock.c b/net/core/sock.c
-> index eae2ae70a2e0..e165163521dc 100644
-> --- a/net/core/sock.c
-> +++ b/net/core/sock.c
-> @@ -948,6 +948,19 @@ int sock_set_timestamping(struct sock *sk, int optna=
-me,
->         return 0;
->  }
->
+On 2025/01/20 20:19, Willem de Bruijn wrote:
+> On Mon, Jan 20, 2025 at 1:37 AM Jason Wang <jasowang@redhat.com> wrote:
+>>
+>> On Fri, Jan 17, 2025 at 6:35 PM Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
+>>>
+>>> On 2025/01/17 18:23, Willem de Bruijn wrote:
+>>>> Akihiko Odaki wrote:
+>>>>> tun and tap implements the same vnet-related features so reuse the code.
+>>>>>
+>>>>> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
+>>>>> ---
+>>>>>    drivers/net/Kconfig    |   1 +
+>>>>>    drivers/net/Makefile   |   6 +-
+>>>>>    drivers/net/tap.c      | 152 +++++--------------------------------------------
+>>>>>    drivers/net/tun_vnet.c |   5 ++
+>>>>>    4 files changed, 24 insertions(+), 140 deletions(-)
+>>>>>
+>>>>> diff --git a/drivers/net/Kconfig b/drivers/net/Kconfig
+>>>>> index 1fd5acdc73c6..c420418473fc 100644
+>>>>> --- a/drivers/net/Kconfig
+>>>>> +++ b/drivers/net/Kconfig
+>>>>> @@ -395,6 +395,7 @@ config TUN
+>>>>>       tristate "Universal TUN/TAP device driver support"
+>>>>>       depends on INET
+>>>>>       select CRC32
+>>>>> +    select TAP
+>>>>>       help
+>>>>>         TUN/TAP provides packet reception and transmission for user space
+>>>>>         programs.  It can be viewed as a simple Point-to-Point or Ethernet
+>>>>> diff --git a/drivers/net/Makefile b/drivers/net/Makefile
+>>>>> index bb8eb3053772..2275309a97ee 100644
+>>>>> --- a/drivers/net/Makefile
+>>>>> +++ b/drivers/net/Makefile
+>>>>> @@ -29,9 +29,9 @@ obj-y += mdio/
+>>>>>    obj-y += pcs/
+>>>>>    obj-$(CONFIG_RIONET) += rionet.o
+>>>>>    obj-$(CONFIG_NET_TEAM) += team/
+>>>>> -obj-$(CONFIG_TUN) += tun-drv.o
+>>>>> -tun-drv-y := tun.o tun_vnet.o
+>>>>> -obj-$(CONFIG_TAP) += tap.o
+>>>>> +obj-$(CONFIG_TUN) += tun.o
+>>>>
+>>>> Is reversing the previous changes to tun.ko intentional?
+>>>>
+>>>> Perhaps the previous approach with a new CONFIG_TUN_VNET is preferable
+>>>> over this. In particular over making TUN select TAP, a new dependency.
+>>>
+>>> Jason, you also commented about CONFIG_TUN_VNET for the previous
+>>> version. Do you prefer the old approach, or the new one? (Or if you have
+>>> another idea, please tell me.)
+>>
+>> Ideally, if we can make TUN select TAP that would be better. But there
+>> are some subtle differences in the multi queue implementation. We will
+>> end up with some useless code for TUN unless we can unify the multi
+>> queue logic. It might not be worth it to change the TUN's multi queue
+>> logic so having a new file seems to be better.
+> 
+> +1 on deduplicating further. But this series is complex enough. Let's not
+> expand that.
+> 
+> The latest approach with a separate .o file may have some performance
+> cost by converting likely inlined code into real function calls.
+> Another option is to move it all into tun_vnet.h. That also resolves
+> the Makefile issues.
 
-Oops, I accidentally remove the following protection:
-#if defined(CONFIG_CGROUP_BPF)
-> +void bpf_skops_tx_timestamping(struct sock *sk, struct sk_buff *skb, int=
- op)
-> +{
-> +       struct bpf_sock_ops_kern sock_ops;
-> +
-> +       memset(&sock_ops, 0, offsetof(struct bpf_sock_ops_kern, temp));
-> +       sock_ops.op =3D op;
-> +       sock_ops.is_fullsock =3D 1;
-> +       sock_ops.sk =3D sk;
-> +       bpf_skops_init_skb(&sock_ops, skb, 0);
-> +       /* Timestamping bpf extension supports only TCP and UDP full sock=
-et */
-> +       __cgroup_bpf_run_filter_sock_ops(sk, &sock_ops, CGROUP_SOCK_OPS);
-> +}
+I measured the size difference between the latest inlining approaches. 
+The numbers may vary depending on the system configuration of course, 
+but they should be useful for reference.
 
-And here:
-#endif
+The below shows sizes when having a separate module: 106496 bytes in total
 
-I'll add them in the next version.
+# lsmod
+Module                  Size  Used by
+tap                    28672  0
+tun                    61440  0
+tun_vnet               16384  2 tun,tap
 
-Thanks,
-Jason
+The below shows sizes when inlining: 102400 bytes in total
 
-> +
->  void sock_set_keepalive(struct sock *sk)
->  {
->         lock_sock(sk);
-> --
-> 2.43.5
->
+# lsmod
+Module                  Size  Used by
+tap                    32768  0
+tun                    69632  0
+
+So having a separate module costs 4096 bytes more.
+
+These two approaches should have similar tendency for run-time and 
+compile-time performance; the code is so trivial that the overhead of 
+having one additional module is dominant.
+
+The only downside of having all in tun_vnet.h is that it will expose its 
+internal macros and functions, which I think tolerable.
 
