@@ -1,61 +1,60 @@
-Return-Path: <netdev+bounces-160072-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160073-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B2243A18048
-	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 15:46:32 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D6CBFA18049
+	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 15:46:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 609BB3ABB8B
-	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 14:45:42 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B3D527A5007
+	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 14:45:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F8C41F4295;
-	Tue, 21 Jan 2025 14:44:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A19831F3FDA;
+	Tue, 21 Jan 2025 14:44:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="BbT0fp8h"
+	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="TuYs/pqJ"
 X-Original-To: netdev@vger.kernel.org
 Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 226B01F3FF4
-	for <netdev@vger.kernel.org>; Tue, 21 Jan 2025 14:44:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 084D11F4730
+	for <netdev@vger.kernel.org>; Tue, 21 Jan 2025 14:44:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737470696; cv=none; b=VJEu4mbTG0qlWjfh9+W8p8/FPLSPZeh0l4gEV8El/2BMFrM/fhEaV+o8rwKEjrOrQgKkzUXBFHCGWo0cYfYW0VT42FQwTG14AyBnD8cIG2GxI09WG15hIPR7XziBXM3GYopgKPW3ycE9+JX+XCSQWHViNRgtfRvdD5WmqwgT1O4=
+	t=1737470698; cv=none; b=polv8G70wJwWuogJTQs1QVQ7ENVon1cBG5UiVR2KvEv1qf2kSMKnexNYq1Ojjzt3wn6zAXzXxLnlEnnmfdRVfIHds+Xduc7dfFuSx09q6jstEylHtpBcFOHsJg3nVbyf+WKqXeNatKolQTdcc/BYCenviZaqU0NQGrdI252U8KE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737470696; c=relaxed/simple;
-	bh=TZCLWQzVkNs6E9f6kP5vaY9QG9zRW2VrMJCAHoRHp/4=;
+	s=arc-20240116; t=1737470698; c=relaxed/simple;
+	bh=uW1lQgTHZr75SZty0STqUI0yyG5r3HIRD8ZLlklhD8c=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=RYB/r9MECxICS9tegt34lRJdse77RBegATqaX9LsRV2zF83v7dePks/WfDdy1lxNNdx7tQmoN5eHwOAPrmIuXefzyr9nBcMu6BPsxz5fdmzlgjvrCt3bn2TnUio7yBF4lMY8qeLzAJboyIEsc1ywCpSDC0HV5M1W9J6xQ91KMRE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=BbT0fp8h; arc=none smtp.client-ip=185.226.149.37
+	 In-Reply-To:To:Cc; b=J6wr51zh0WfDPqkLdFJylcgmEWulBeBVDWhq1eSY2EcSOZEeUBR2ait7W909rhhVvbNwiJNKV6633X+gnxOYi9isLEcAuuzNTQ2VyvdZ/2BVbWDf+c/E9I0Qlbx1Rl/sDcv+mliQzuL92j7zHtrDukcKVKn9n9fFhyPdroC6lj8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=TuYs/pqJ; arc=none smtp.client-ip=185.226.149.37
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
-Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
+Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
 	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
 	(Exim 4.93)
 	(envelope-from <mhal@rbox.co>)
-	id 1taFUq-000mEV-2Q; Tue, 21 Jan 2025 15:44:52 +0100
+	id 1taFUt-000mF6-AC; Tue, 21 Jan 2025 15:44:55 +0100
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
 	s=selector2; h=Cc:To:In-Reply-To:References:Message-Id:
 	Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:Date:From;
-	bh=ldYInreJ0LkUXcXkdY7gO4eqNazyOLax6WM5tdMRfi4=; b=BbT0fp8hsV1BlpB0rKASgfUoKb
-	nuSSwOr4qj4/8EsPXdCQsQNq0AuNmUE26OP8CjYaIqeCRr1LKbVWaG/KHTko9XEpdTrs2fnTFFsAA
-	pX5ngykc/zUjTZL2zGtHVVqYHw3UuitdkY8wst59+kSVahhQ2WJ4vx3wZeqtzSkdW7iSvXqvszMl9
-	jgtdNW4QCa4iGTpvehZXV03xia7A2H6qQi5h0B/xPz5JVsHYDMaTJue/zjD6Hxf3N07h3DjO4fnKl
-	QfNFTaD3NsbL+zLCvPf1kw3jlj+N47kyZL5uVc5DSIATtFLLtFR20nfyk3cGwhkke60Qn/d7JKozL
-	bJR5So3w==;
+	bh=HHwAc9EmXoGcar1XfefmQSS/eJdt6bpVAAIiKB+ilQQ=; b=TuYs/pqJgH6tsGUx2s6HwVIAbJ
+	LTPVN84bP3aR0svcTcpZIZEKLbmi880ouVq5Fc39SBQNwxNAvpV6r5Ea/Mwd2/0xeQZwzlGAzO5WW
+	uL4Si4yaa2zFwBRevIgaWwoP/XMtJOzf+mIjDrsQrsyQotXl4+aWQsCd1nqgi2gh38OHSfJIklV88
+	m8Yz51LURW1iGRkIkhYSNmfUmmlOB6/+KTG9YZkOwNxgdyPc/58AVYQCsuSJukTYh+lzPEY4k3kOK
+	UxI8rrF6r/VNt9cHNlCSLnnezEQBxJ+2YBOFTjxZuf5+7GmIlsoCHUTi5Yiw5W/3jSaU7lxH0Me0v
+	TCP5P5xQ==;
 Received: from [10.9.9.73] (helo=submission02.runbox)
-	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
+	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
 	(envelope-from <mhal@rbox.co>)
-	id 1taFUp-0007PH-Nm; Tue, 21 Jan 2025 15:44:51 +0100
+	id 1taFUn-0005jr-Rp; Tue, 21 Jan 2025 15:44:50 +0100
 Received: by submission02.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
 	(Exim 4.93)
-	id 1taFUS-00AHot-FE; Tue, 21 Jan 2025 15:44:28 +0100
+	id 1taFUS-00AHot-Vo; Tue, 21 Jan 2025 15:44:29 +0100
 From: Michal Luczaj <mhal@rbox.co>
-Date: Tue, 21 Jan 2025 15:44:06 +0100
-Subject: [PATCH net v2 5/6] vsock/test: Add test for UAF due to socket
- unbinding
+Date: Tue, 21 Jan 2025 15:44:07 +0100
+Subject: [PATCH net v2 6/6] vsock/test: Add test for connect() retries
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,7 +63,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250121-vsock-transport-vs-autobind-v2-5-aad6069a4e8c@rbox.co>
+Message-Id: <20250121-vsock-transport-vs-autobind-v2-6-aad6069a4e8c@rbox.co>
 References: <20250121-vsock-transport-vs-autobind-v2-0-aad6069a4e8c@rbox.co>
 In-Reply-To: <20250121-vsock-transport-vs-autobind-v2-0-aad6069a4e8c@rbox.co>
 To: Stefano Garzarella <sgarzare@redhat.com>, 
@@ -75,87 +74,76 @@ To: Stefano Garzarella <sgarzare@redhat.com>,
 Cc: netdev@vger.kernel.org, Michal Luczaj <mhal@rbox.co>
 X-Mailer: b4 0.14.2
 
-Fail the autobind, then trigger a transport reassign. Socket might get
-unbound from unbound_sockets, which then leads to a reference count
-underflow.
+Deliberately fail a connect() attempt; expect error. Then verify that
+subsequent attempt (using the same socket) can still succeed, rather than
+fail outright.
 
 Signed-off-by: Michal Luczaj <mhal@rbox.co>
 ---
- tools/testing/vsock/vsock_test.c | 58 ++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 58 insertions(+)
+ tools/testing/vsock/vsock_test.c | 47 ++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 47 insertions(+)
 
 diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
-index 28a5083bbfd600cf84a1a85cec2f272ce6912dd3..572e0fd3e5a841f846fb304a24192f63d57ec052 100644
+index 572e0fd3e5a841f846fb304a24192f63d57ec052..5cac08d909fe495aec5ddc9f3779432f9e0dc2b8 100644
 --- a/tools/testing/vsock/vsock_test.c
 +++ b/tools/testing/vsock/vsock_test.c
-@@ -1458,6 +1458,59 @@ static void test_stream_cred_upd_on_set_rcvlowat(const struct test_opts *opts)
- 	test_stream_credit_update_test(opts, false);
+@@ -1511,6 +1511,48 @@ static void test_stream_transport_uaf_server(const struct test_opts *opts)
+ 	control_expectln("DONE");
  }
  
-+#define MAX_PORT_RETRIES	24	/* net/vmw_vsock/af_vsock.c */
-+
-+/* Test attempts to trigger a transport release for an unbound socket. This can
-+ * lead to a reference count mishandling.
-+ */
-+static void test_stream_transport_uaf_client(const struct test_opts *opts)
++static void test_stream_connect_retry_client(const struct test_opts *opts)
 +{
-+	int sockets[MAX_PORT_RETRIES];
-+	struct sockaddr_vm addr;
-+	int fd, i, alen;
++	int fd;
 +
-+	fd = vsock_bind(VMADDR_CID_ANY, VMADDR_PORT_ANY, SOCK_STREAM);
-+
-+	alen = sizeof(addr);
-+	if (getsockname(fd, (struct sockaddr *)&addr, &alen)) {
-+		perror("getsockname");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	for (i = 0; i < MAX_PORT_RETRIES; ++i)
-+		sockets[i] = vsock_bind(VMADDR_CID_ANY, ++addr.svm_port,
-+					SOCK_STREAM);
-+
-+	close(fd);
 +	fd = socket(AF_VSOCK, SOCK_STREAM, 0);
 +	if (fd < 0) {
 +		perror("socket");
 +		exit(EXIT_FAILURE);
 +	}
 +
-+	if (!vsock_connect_fd(fd, addr.svm_cid, addr.svm_port)) {
-+		perror("Unexpected connect() #1 success");
++	if (!vsock_connect_fd(fd, opts->peer_cid, opts->peer_port)) {
++		fprintf(stderr, "Unexpected connect() #1 success\n");
 +		exit(EXIT_FAILURE);
 +	}
 +
-+	/* Vulnerable system may crash now. */
-+	if (!vsock_connect_fd(fd, VMADDR_CID_HOST, VMADDR_PORT_ANY)) {
-+		perror("Unexpected connect() #2 success");
++	control_writeln("LISTEN");
++	control_expectln("LISTENING");
++
++	if (vsock_connect_fd(fd, opts->peer_cid, opts->peer_port)) {
++		perror("connect() #2");
 +		exit(EXIT_FAILURE);
 +	}
 +
 +	close(fd);
-+	while (i--)
-+		close(sockets[i]);
-+
-+	control_writeln("DONE");
 +}
 +
-+static void test_stream_transport_uaf_server(const struct test_opts *opts)
++static void test_stream_connect_retry_server(const struct test_opts *opts)
 +{
-+	control_expectln("DONE");
++	int fd;
++
++	control_expectln("LISTEN");
++
++	fd = vsock_stream_accept(VMADDR_CID_ANY, opts->peer_port, NULL);
++	if (fd < 0) {
++		perror("accept");
++		exit(EXIT_FAILURE);
++	}
++
++	vsock_wait_remote_close(fd);
++	close(fd);
 +}
 +
  static struct test_case test_cases[] = {
  	{
  		.name = "SOCK_STREAM connection reset",
-@@ -1588,6 +1641,11 @@ static struct test_case test_cases[] = {
- 		.run_client = test_seqpacket_unsent_bytes_client,
- 		.run_server = test_seqpacket_unsent_bytes_server,
+@@ -1646,6 +1688,11 @@ static struct test_case test_cases[] = {
+ 		.run_client = test_stream_transport_uaf_client,
+ 		.run_server = test_stream_transport_uaf_server,
  	},
 +	{
-+		.name = "SOCK_STREAM transport release use-after-free",
-+		.run_client = test_stream_transport_uaf_client,
-+		.run_server = test_stream_transport_uaf_server,
++		.name = "SOCK_STREAM retry failed connect()",
++		.run_client = test_stream_connect_retry_client,
++		.run_server = test_stream_connect_retry_server,
 +	},
  	{},
  };
