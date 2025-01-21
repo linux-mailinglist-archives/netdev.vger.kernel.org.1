@@ -1,93 +1,110 @@
-Return-Path: <netdev+bounces-160101-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160102-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6978A1829B
-	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 18:10:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 50051A182A6
+	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 18:15:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3974E3A67B0
-	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 17:10:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3F2BF3A1DF3
+	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 17:15:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4DCF1F4E46;
-	Tue, 21 Jan 2025 17:10:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3854316F851;
+	Tue, 21 Jan 2025 17:15:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="qmQUQ2NA"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="w4w3ffF/"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from out-170.mta1.migadu.com (out-170.mta1.migadu.com [95.215.58.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9F3E1F4727;
-	Tue, 21 Jan 2025 17:10:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B5F95028C
+	for <netdev@vger.kernel.org>; Tue, 21 Jan 2025 17:15:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737479424; cv=none; b=MBNu/vYAckMaZCLRvnQiQhMm2ieBFBkWjAOz9g9ip48o6lXyqOxLMZPnMfULQoeyPoJtZv0b9akqU6yByKqB9xnOZLDgRJ32QpV1PEyK6Km2+paUXnQgmwzV+DgSLLMG4CMEKtN2LotN1Cb1fxKmkPvhvgzGsjxRA363XCaAtsY=
+	t=1737479723; cv=none; b=T2JE4c37ZgoDgqTY+DCvm0nI6JQW/v/idnIdq2wqW+vnvlrouKXa8Sj0KD186eDOJz/Hk85CLN6g+msVWzBbOZt/rrH25P3XJJXsGuze0yHXnFyfktOoNUodZ1WxfDPaAHtVS3hRCs+XGi4EMVErxHy+1xtGpnNNnJlIKaNV10M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737479424; c=relaxed/simple;
-	bh=7KLqRXRtMpr5AnWCzUsc49VsnLV6+/Ya1LYZn3o+X+Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lB7YDeZH3z3u0LFM2aqx3E3yW9upekbJQcHQtKGDjenRy4Q+XIT473ybCvSKqoP84EVbPP8ABYezrR4UoFy0ziJIHiFfjbIZNX65UjMS3zMC+ZbC5TK0bJ7oXISlgUhnWSWuyGvIcNmTUlz1z2EkGeUQn5OUNYoTjKYK97K5YJc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=qmQUQ2NA; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=mvXQbcqOWygs/VwootWLBvcI0ZEs6gJWfjd2kJrIlyU=; b=qmQUQ2NAHWeZVwh3xqOrkfTZvj
-	yprXEINu8P2IOI6rjQdad5/dUMsBqMAdq6cCOtYFah+JRTp2FLP2i5oRuWAVob33pd9O+FCQhSoCH
-	fEk2z7/apymzPOiQLQziaXnJG0ht92ACKoorlOm8CZTEU/+eihGM2wJSPvO3GM4nc4/g=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1taHlS-006hNS-3y; Tue, 21 Jan 2025 18:10:10 +0100
-Date: Tue, 21 Jan 2025 18:10:10 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Yijie Yang <quic_yijiyang@quicinc.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, Vinod Koul <vkoul@kernel.org>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konradybcio@kernel.org>,
-	Richard Cochran <richardcochran@gmail.com>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH v3 2/4] net: stmmac: dwmac-qcom-ethqos: Mask PHY mode if
- configured with rgmii-id
-Message-ID: <bf45ec15-d430-499a-ba30-825611369402@lunn.ch>
-References: <20250121-dts_qcs615-v3-0-fa4496950d8a@quicinc.com>
- <20250121-dts_qcs615-v3-2-fa4496950d8a@quicinc.com>
+	s=arc-20240116; t=1737479723; c=relaxed/simple;
+	bh=CJIPSkNSikN2lAYs0JfROfc96U7D5shWXZWULnE67LQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=OdBC1V+U4vHJOGX47/xJgg2KtdE3OoncW7Fc2rcgLZAGdG5g3e/FNmOF5PmJf/zAOJT+a+kW9PWOJWL9c7aprb5dz1zL0pXrnC5NLHvwT3dMgyPbIMxH0uvG0DICQrmiuqmFD+QUiNQRZz4/DFSvpGLLwyqdwRLArSF4Hfj2/So=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=w4w3ffF/; arc=none smtp.client-ip=95.215.58.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <07f2f6d0-e025-4b21-ac41-caaf71bb6fff@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1737479718;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=tXMjBKWbVLp7SlD/7tWrcHQG3OmUUoryMMrbzMjyeUQ=;
+	b=w4w3ffF/lMpaxYHjRekgzrjKU6SZ77OpizO03U9SmJKJmy7IpJDGw1cP8JwPRCOyPZUTSu
+	wEkK2Au4Xc/VrS5EBOrzxFn0EH8NirULvAJOW+KG5hk8NlGLr7DYYVmaFQ5gFEodkcRdBL
+	ZaudTxCY8FYZL6DK0w2ugwIXcSMQMLc=
+Date: Wed, 22 Jan 2025 01:14:25 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250121-dts_qcs615-v3-2-fa4496950d8a@quicinc.com>
+Subject: Re: [PATCH net v2 2/3] net: stmmac: Limit FIFO size by hardware
+ capability
+To: Kunihiko Hayashi <hayashi.kunihiko@socionext.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Jose Abreu <joabreu@synopsys.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>
+Cc: Furong Xu <0x1207@gmail.com>, Joao Pinto <Joao.Pinto@synopsys.com>,
+ Vince Bridgers <vbridger@opensource.altera.com>, netdev@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+References: <20250121044138.2883912-1-hayashi.kunihiko@socionext.com>
+ <20250121044138.2883912-3-hayashi.kunihiko@socionext.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Yanteng Si <si.yanteng@linux.dev>
+In-Reply-To: <20250121044138.2883912-3-hayashi.kunihiko@socionext.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-> To address the ABI compatibility issue between the kernel and DTS caused by
-> this change, handle the compatible string 'qcom,qcs404-evb-4000' in the
-> code, as it is the only legacy board that mistakenly uses the 'rgmii'
-> phy-mode.
+在 1/21/25 12:41, Kunihiko Hayashi 写道:
+> Tx/Rx FIFO size is specified by the parameter "{tx,rx}-fifo-depth" from
+> stmmac_platform layer.
+> 
+> However, these values are constrained by upper limits determined by the
+> capabilities of each hardware feature. There is a risk that the upper
+> bits will be truncated due to the calculation, so it's appropriate to
+> limit them to the upper limit values and display a warning message.
+> 
+> Fixes: e7877f52fd4a ("stmmac: Read tx-fifo-depth and rx-fifo-depth from the devicetree")
+> Signed-off-by: Kunihiko Hayashi <hayashi.kunihiko@socionext.com>
+> ---
+>   drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 13 +++++++++++++
+>   1 file changed, 13 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> index 251a8c15637f..da3316e3e93b 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> @@ -7245,6 +7245,19 @@ static int stmmac_hw_init(struct stmmac_priv *priv)
+>   		priv->plat->tx_queues_to_use = priv->dma_cap.number_tx_queues;
+>   	}
+>   
 
-Are you saying every other board DT got this correct? How do you know
-that? Was this SoC never shipped to anybody, so the only possible
-board is the QCOM RDK which never left the lab?
+> +	if (priv->plat->rx_fifo_size > priv->dma_cap.rx_fifo_size) {
 
-I doubt this is true, so you are probably breaking out of tree
-boards. We care less about out of tree boards, but we also don't
-needlessly break them.
+> +		dev_warn(priv->device,
+> +			 "Rx FIFO size exceeds dma capability (%d)\n",
+> +			 priv->plat->rx_fifo_size);
+> +		priv->plat->rx_fifo_size = priv->dma_cap.rx_fifo_size;
+I executed grep and found that only dwmac4 and dwxgmac2 have initialized 
+dma_cap.rx_fifo_size. Can this code still work properly on hardware 
+other than these two?
 
-	Andrew
+
+Thanks,
+Yanteng
 
