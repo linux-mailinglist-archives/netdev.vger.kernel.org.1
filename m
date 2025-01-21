@@ -1,119 +1,89 @@
-Return-Path: <netdev+bounces-159893-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159894-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E1CEA1754E
-	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 01:50:31 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 20211A17551
+	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 01:50:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A2D823A43D9
-	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 00:50:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3A5CC169DB1
+	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 00:50:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2878BA3F;
-	Tue, 21 Jan 2025 00:50:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82E47C2C9;
+	Tue, 21 Jan 2025 00:50:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="jVWPxbYa"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ihj8ENJm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 053D579CF;
-	Tue, 21 Jan 2025 00:50:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B07179CF;
+	Tue, 21 Jan 2025 00:50:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737420626; cv=none; b=ODvXjiUSiiIyq09jgHu3+aKsn8zY0woU9O96sT6iGW2cLWhBG5Rzi9y/oloV5jsI9hO4Pb8M22Qh5JNeiIab7NOniEcDjWzzZ6+ta3+EDGSWN1G9nPc/4I+crbwiMqPU05ae0rY83Z1wh/ZuSxwmrzsgG6p3NhLQLjzP7dno6ww=
+	t=1737420647; cv=none; b=krKlcgKTm+LRkOcJM/UI7NL62yuR2WWVIPn1jV+r6/cdodv9r+ecfyct1fYpG696tI0Q1DI0IHu3+E5mDf925uHBSq0L8/FgiLsUmFmdH4ChpqExLzR2bNZKx4ec1AoVpmgInpeiJpzasYAkmmf3SLhlROb8bYHU5dOB9gp7Cww=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737420626; c=relaxed/simple;
-	bh=PN328jyx3pg410v491/brYCarztqpDWvP+P0edW2ACQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gnV4ugDwoMQBg59zGxyyFmNwTiCnX+pCTj5ZZGZDcMUGeLKj27XbQgWohkfC7eUP4jNz4CQaceTjARyS8bracgk1Bun5uSNPsy4wN5hHBNWEMFzy8qlEn0tP8pLZ3wglzOD3RdVMl65rQ7v2qHxr/a5xLL6F/jqORas6LRH50b8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=jVWPxbYa; arc=none smtp.client-ip=205.220.177.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0246632.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50KGMvar011787;
-	Tue, 21 Jan 2025 00:50:08 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=corp-2023-11-20; bh=Y0i0NIXmUMRfHjAb805Wm0NeB/eJd
-	7gYXF48XL/H0kg=; b=jVWPxbYaEmlPSOMV1w70d34Whctt/DmMCzbQsD6ZsqQm6
-	wOfz+V1Av3bUmXczNiexbwS2Y7U3xMAVQCIYkNgAAj/57zO8cagM5thFFukDhA0Q
-	EM+HH9sirKQT3fE6zRxJlF7cCmhnziCm+wRaEKvjqiMGEBIRFssF5D73gYkcyfP6
-	x39biaLaELiEeQ6TvPJz5UuZoK31Hc49tO3zibmGT6WQA1XiZPNA4Sz32Evbb1s2
-	g1arX4p/Qt3XkT5u33X648/rGmL+RbQDhc9ukjD9ceaaMfo5sf8OkfWcV/hQpuLR
-	jnZkzWTS4LHEMnyG3eoQPNzl/+wqtZMKgg7+JkGug==
-Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.appoci.oracle.com [147.154.18.20])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 4485qkvddu-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 21 Jan 2025 00:50:08 +0000 (GMT)
-Received: from pps.filterd (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 50KMB9A1030296;
-	Tue, 21 Jan 2025 00:50:07 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 4491fh5aun-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 21 Jan 2025 00:50:07 +0000
-Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 50L0o6c7000969;
-	Tue, 21 Jan 2025 00:50:06 GMT
-Received: from ca-dev112.us.oracle.com (ca-dev112.us.oracle.com [10.129.136.47])
-	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 4491fh5asy-1;
-	Tue, 21 Jan 2025 00:50:06 +0000
-From: Harshit Mogalapalli <harshit.m.mogalapalli@oracle.com>
-To: Marcin Wojtas <marcin.s.wojtas@gmail.com>,
-        Andrew Lunn <andrew+netdev@lunn.ch>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Francois Romieu <romieu@fr.zoreil.com>,
-        Kuniyuki Iwashima <kuniyu@amazon.com>, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc: dan.carpenter@linaro.org, kernel-janitors@vger.kernel.org,
-        error27@gmail.com, harshit.m.mogalapalli@oracle.com
-Subject: [PATCH] net: mvneta: fix locking in mvneta_cpu_online()
-Date: Mon, 20 Jan 2025 16:50:02 -0800
-Message-ID: <20250121005002.3938236-1-harshit.m.mogalapalli@oracle.com>
-X-Mailer: git-send-email 2.46.0
+	s=arc-20240116; t=1737420647; c=relaxed/simple;
+	bh=3WWD4KmoVkjBlzmfCgdFh92t2zv1dTpdIl06JzvCTPI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=iV1H54oTddND1pc0EsFRoIn2xrNh0MaZCffPOgj7UcVLFu3Nq9nx7kP4Qry42zRjhLg35oTYipPF9ZvHGAUmyaocdVciT53tZy1/Jj0HENHB1IX9TmCM8BS8p/4UGLxVk459l/scNj9OPQMJoK2C4fzugoyd2f2tq/o4j3UFIVU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ihj8ENJm; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 29936C4CEDD;
+	Tue, 21 Jan 2025 00:50:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1737420646;
+	bh=3WWD4KmoVkjBlzmfCgdFh92t2zv1dTpdIl06JzvCTPI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Ihj8ENJm+EuGnKDpyhundveKgaqoMrWqJeBAKIb+pXEB61SmX/DP0M9G+swWJOVIn
+	 ehuHoFKAAyYVfSvwf3Jjwnfeqg+IVMSBXerPvU25IlxAo7MqRDm3STHjgPstkexJ/g
+	 5+dFqwvvNf4oZaWfgKw8qSAt/RE7FWugXOgEeScG+rb6x5m79mxyUsnBi9GEvgo6eZ
+	 EhyXDsstSeIhBqhmzTUstVU6LVtBfRrHcFK+K4yzhTsGASO6IxgsllFNaUrexdkFVM
+	 LC3PdNzeAoJgMFD4XTVdNvdAi+leFBlng72hLW8ce6iAIVh2xKQlJ76FEnlW0cKBhl
+	 vL8GMEdhpkppw==
+Date: Mon, 20 Jan 2025 16:50:45 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Yuyang Huang <yuyanghuang@google.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+ <horms@kernel.org>, David Ahern <dsahern@kernel.org>,
+ netdev@vger.kernel.org, Donald Hunter <donald.hunter@gmail.com>, Shuah Khan
+ <shuah@kernel.org>, Nikolay Aleksandrov <razor@blackwall.org>, Hangbin Liu
+ <liuhangbin@gmail.com>, Daniel Borkmann <daniel@iogearbox.net>,
+ linux-kselftest@vger.kernel.org, "Maciej =?UTF-8?B?xbtlbmN6eWtvd3NraQ==?="
+ <maze@google.com>, Lorenzo Colitti <lorenzo@google.com>
+Subject: Re: [PATCH net-next, v6 2/2] selftests/net: Add selftest for IPv4
+ RTM_GETMULTICAST support
+Message-ID: <20250120165045.628ac29a@kernel.org>
+In-Reply-To: <20250117081600.150863-2-yuyanghuang@google.com>
+References: <20250117081600.150863-1-yuyanghuang@google.com>
+	<20250117081600.150863-2-yuyanghuang@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-01-20_07,2025-01-20_03,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 bulkscore=0
- malwarescore=0 mlxscore=0 mlxlogscore=999 adultscore=0 phishscore=0
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2411120000 definitions=main-2501210004
-X-Proofpoint-GUID: hr6sjcEIIfoZzqxUL2j_9AjwRLusbvZV
-X-Proofpoint-ORIG-GUID: hr6sjcEIIfoZzqxUL2j_9AjwRLusbvZV
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-When port is stopped, unlock before returning
+On Fri, 17 Jan 2025 17:15:59 +0900 Yuyang Huang wrote:
+> +  -
+> +    name: ifmcaddr-attrs
+> +    attributes:
+> +      -
+> +        name: addr
+> +        type: binary
+> +        value: 7
+> +      -
+> +        name: cacheinfo
+> +        type: binary
+> +        struct: ifacacheinfo
+> +        value: 6
 
-Fixes: 413f0271f396 ("net: protect NAPI enablement with netdev_lock()")
-Signed-off-by: Harshit Mogalapalli <harshit.m.mogalapalli@oracle.com>
----
-This is based on static analysis, only compile tested
----
- drivers/net/ethernet/marvell/mvneta.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/drivers/net/ethernet/marvell/mvneta.c b/drivers/net/ethernet/marvell/mvneta.c
-index 82f4333fb426..4fe121b9f94b 100644
---- a/drivers/net/ethernet/marvell/mvneta.c
-+++ b/drivers/net/ethernet/marvell/mvneta.c
-@@ -4432,6 +4432,7 @@ static int mvneta_cpu_online(unsigned int cpu, struct hlist_node *node)
- 	 */
- 	if (pp->is_stopped) {
- 		spin_unlock(&pp->lock);
-+		netdev_unlock(port->napi.dev);
- 		return 0;
- 	}
- 	netif_tx_stop_all_queues(pp->dev);
+There's already a "addr-attrs" attribute set defined..
+Oh, wait, wrong file.
+I think you should be adding to rt_addr.yaml ?
 -- 
-2.39.3
-
+pw-bot: cr
 
