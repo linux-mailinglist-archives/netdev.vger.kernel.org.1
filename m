@@ -1,147 +1,141 @@
-Return-Path: <netdev+bounces-159970-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159971-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2689CA1789B
-	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 08:33:59 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 61B4DA178B8
+	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 08:47:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B313F1884844
-	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 07:34:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 440653A3011
+	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 07:47:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AA0E1A2658;
-	Tue, 21 Jan 2025 07:33:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB3E81B3922;
+	Tue, 21 Jan 2025 07:47:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="X9gSalKm"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Uis4lMGA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BEBD2E406
-	for <netdev@vger.kernel.org>; Tue, 21 Jan 2025 07:33:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EB422913;
+	Tue, 21 Jan 2025 07:47:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737444834; cv=none; b=Sf2aI/w4g5stF8pKd3uqO/T7h2w2wVsz9kiQqkuTQb/Q4zzuLKmUvJBT8AG8I1kmnIndgQMT2vlC5j7b1hFbWRqaPzsPEI5mYgz/zpLnEiVP7ZTVH6nJmr/s5c9W68DrwMKpuHE889qwmV/jjJY5opACO/4sh+72RTa8/AC2cPw=
+	t=1737445658; cv=none; b=Tg6kcRFeG8CXRnTuAQt3IgX5vAwBVa1m/W2TIT5IGys2YKol2/8EBFkTxoSO2oW2Gz0E4kR/oYKTxx7kAxhaYEeNK+AaFc4217ZVM/pnSAfj+fyNT+Ih8EEw+AM2E89h01VWHu00m9OZcyPZxlfBywHWS0/ifwqYgO8UYhhv5kc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737444834; c=relaxed/simple;
-	bh=Yzs26VqKbTrmIGdnXsTKb2hA8dYm5k2fTOCESIYRSJQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=U/XbQygvTv15pQArNTh/b5rATqEWcl5l65j8LTOUyaf+Rr297Ij2AQJ6CPn0P+uTXrivM31/q+Jpe3F54ZzTyQuViq7Gk2UbRLt3HVCQJ5dw05dS7JeZxbQV+1kBs2riPDZEAbRxZ2maEuqLUR0pxlxk4HW3sAfilKgm6ux5QMs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b=X9gSalKm; arc=none smtp.client-ip=209.85.208.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-5d3bbb0f09dso9121317a12.2
-        for <netdev@vger.kernel.org>; Mon, 20 Jan 2025 23:33:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1737444830; x=1738049630; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Yzs26VqKbTrmIGdnXsTKb2hA8dYm5k2fTOCESIYRSJQ=;
-        b=X9gSalKmr07M1/wUuNSdBT5nFefPL5CBrIoQOL9NeWq+OdJZNxOYt4t5AsAReFoKOe
-         lE6XSXyoO4isNzt5fmIGoeOu3YKUr+fr+WcAoM67XGplJrYOtYkNHBceRKRqNfVGXF3O
-         hWLzpuvP8DUqvkz4ysAaJ/LZRGZUNjtsIKtRKxHEBK/iGqg964EzOii6ffyi08gBBzjb
-         hc7xhj8nrkRjCN0CS35PaIcY+TCyOzCXVDFQRt5PH+dlnssVgXNzuQW7q1B9816GMwMt
-         D6z7FJCKM+7ipMkvZ7sC8lUAa7YND3Sm0YgMFdHPwKgkoyC2j9lfsruVtZz7yB7Ro5f8
-         7s5Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737444830; x=1738049630;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Yzs26VqKbTrmIGdnXsTKb2hA8dYm5k2fTOCESIYRSJQ=;
-        b=ldcCU5ACh3qTNDiOBFZACPbrfmsaww115gxlRmscuwWqFyvfp3qqIJ0gzQ5PZ7nBCy
-         4PSL+oYSrVkREnJ3/7IaagviX7JHqrwh60Tc4oS+dsIVEzqxuYMRrQg6Y2yHnp7EPPtI
-         5C5d7qe8GlW5WqisTLGevrjuJb8gT+SjlQxm9n2zTrjWfD0BqGpzveIA0xJT2odx/L3A
-         9XsdJ5qYRXP1UTpeCBin23BVxVxpgRC6OIWTShLHB7/wREIHj0LAj7asfCMPnLEZO1nd
-         GR77cBiAVTGYqDOPePU1BItBnTCcLqkZGRigeJcMj9FDiKxiIkIVMFSlYu5e/WGXoOQm
-         YtBA==
-X-Forwarded-Encrypted: i=1; AJvYcCUar5i71uL3c36O6ISCGZYpRlVw6/O6hW8c1+Kc753+UlEagmXfdSuTl8Gd4e2ey8sfp9Fsba4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyKAgBe8a51rNbB9CI4KHQtPqjPxDikbDQVLDOzF2xxi+Qon3lp
-	3CoLgmqhs+WA5Th6E/uKP5KK2sBeOYYu9D9rZjzUTop0DPR3AdvWZs7Pxt6QxnA=
-X-Gm-Gg: ASbGncucNgeed3sXMvH9mUxBOcjD7FQrRwO+A6bSd8eSHJCYwTpg9yFPMCZzOAeWhi/
-	Xoimgg/VhNdFb5FEihu25ROrxwStrYOjqWOQOhmv0ME8uaiD7iwBFuvl5QN4eGZlF46DCOLrCMY
-	vswwEjQvOwoPbyTyzaShXxjRPwmoDHdXI5gcD5o3W/S/55ovsK8wEkkJIeCchllJl/dsXSRC8fG
-	yvF3KWYx00/Z6zDw0LDd6STb+GwwY7FmcTmTLrIxg+pH3V5P4N9EKhwV1JyADyTY1Ph8JZCkUM=
-X-Google-Smtp-Source: AGHT+IE8IaZxkKmu64HBjKfnj9GgkEaEDLjA+fSFVfmw5FsiBqi3KoLB/CnrwQev1xRM05yMk5Ttiw==
-X-Received: by 2002:a05:6402:5201:b0:5d1:2440:9ad3 with SMTP id 4fb4d7f45d1cf-5db7d633180mr15830571a12.30.1737444829308;
-        Mon, 20 Jan 2025 23:33:49 -0800 (PST)
-Received: from localhost ([2a02:8071:b783:6940:36f3:9aff:fec2:7e46])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5dbe6de509esm60852a12.70.2025.01.20.23.33.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 Jan 2025 23:33:48 -0800 (PST)
-Date: Tue, 21 Jan 2025 08:33:45 +0100
-From: Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>
-To: Chenyuan Yang <chenyuan0y@gmail.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, paul@crapouillou.net, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, zijie98@gmail.com
-Subject: Re: [PATCH] net: davicom: fix UAF in dm9000_drv_remove
-Message-ID: <xttnvcmu3dep2genvce3r7spreliecx3dc3rynups25q6xilk6@tf4wxe6bdxia>
-References: <20250120222557.833100-1-chenyuan0y@gmail.com>
+	s=arc-20240116; t=1737445658; c=relaxed/simple;
+	bh=qbKckhNIg6EjGDCsoRXL1mNP+H/m1P0vkbS8EI5QTjY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=qPoZ1V2FE+BcDccmEFK9zqwRiOdPB8+npPtIypRRFhl12zVcEvWwgUnG/yR9S7HRUZgzz7HXXhQZLD2dv4DY2kz6ii/TjcUpIQmaH3EMnSb/pUCTxoui75osJIzZrl1Hi40lpyI/XkRN2kiRL+8F+splG1JuJ0KLZNAcUY/HZK4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Uis4lMGA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B8D28C4CEDF;
+	Tue, 21 Jan 2025 07:47:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1737445658;
+	bh=qbKckhNIg6EjGDCsoRXL1mNP+H/m1P0vkbS8EI5QTjY=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=Uis4lMGARFE3IXP3P2lQuFMUv+mU4wXtAtK8WTZ4Wg+LtCCydVLbcay7eb7JIgxyw
+	 Ri16biOm6HEZqqUNrRZaRTjycOxytEwPjv6Gd+7dzW8oYcr0Bua4LqXmW7t8YL0ELF
+	 2Co03VZb6+bGNRzCniziF/2P2RbwqNfLYFxkB/PLpqX8I29S8ar2pWeuWByOU/zopR
+	 Lmq6VPbhcXWaHjNxQI2NAYB3FI2DCUTDI5H7BMo0EXBBYt4VlvVghZh0hKpSkITpzE
+	 jRF1cDkaO5jtcOrnJ3VRKDzTiZLImvosRb7Eduv7a8xElAiDCyRDwsrraJdyoFALf2
+	 A2RTwHxrnmSPw==
+Message-ID: <870c6b3e-d4f9-4722-934e-00e9ddb84e2e@kernel.org>
+Date: Tue, 21 Jan 2025 08:47:25 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="7ljgtlteej75idhb"
-Content-Disposition: inline
-In-Reply-To: <20250120222557.833100-1-chenyuan0y@gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1 00/21] hwmon: Fix the type of 'config' in struct
+ hwmon_channel_info to u64
+To: Huisong Li <lihuisong@huawei.com>, linux-hwmon@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, linux-media@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, arm-scmi@vger.kernel.org,
+ netdev@vger.kernel.org, linux-rtc@vger.kernel.org, oss-drivers@corigine.com,
+ linux-rdma@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+ linuxarm@huawei.com, linux@roeck-us.net, jdelvare@suse.com,
+ kernel@maidavale.org, pauk.denis@gmail.com, james@equiv.tech,
+ sudeep.holla@arm.com, cristian.marussi@arm.com, matt@ranostay.sg,
+ mchehab@kernel.org, irusskikh@marvell.com, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, saeedm@nvidia.com, leon@kernel.org, tariqt@nvidia.com,
+ louis.peens@corigine.com, hkallweit1@gmail.com, linux@armlinux.org.uk,
+ kabel@kernel.org, W_Armin@gmx.de, hdegoede@redhat.com,
+ ilpo.jarvinen@linux.intel.com, alexandre.belloni@bootlin.com,
+ jonathan.cameron@huawei.com, zhanjie9@hisilicon.com,
+ zhenglifeng1@huawei.com, liuyonglong@huawei.com
+References: <20250121064519.18974-1-lihuisong@huawei.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
+ cFgcqTTuNHjAvxtUG8pQgGTHAObYs6xeYJtjUH0ZX6ndJ33FJYf5V3yXqqjcZ30FgHzJCFUu
+ JMp7PSyMPzpUXfU12yfcRYVEMQrmplNZssmYhiTeVicuOOypWugZKVLGNm0IweVCaZ/DJDIH
+ gNbpvVwjcKYrx85m9cBVEBUGaQP6AT7qlVCkrf50v8bofSIyVa2xmubbAwwFA1oxoOusjPIE
+ J3iadrwpFvsZjF5uHAKS+7wHLoW9hVzOnLbX6ajk5Hf8Pb1m+VH/E8bPBNNYKkfTtypTDUCj
+ NYcd27tjnXfG+SDs/EXNUAIRefCyvaRG7oRYF3Ec+2RgQDRnmmjCjoQNbFrJvJkFHlPeHaeS
+ BosGY+XWKydnmsfY7SSnjAzLUGAFhLd/XDVpb1Een2XucPpKvt9ORF+48gy12FA5GduRLhQU
+ vK4tU7ojoem/G23PcowM1CwPurC8sAVsQb9KmwTGh7rVz3ks3w/zfGBy3+WmLg++C2Wct6nM
+ Pd8/6CBVjEWqD06/RjI2AnjIq5fSEH/BIfXXfC68nMp9BZoy3So4ZsbOlBmtAPvMYX6U8VwD
+ TNeBxJu5Ex0Izf1NV9CzC3nNaFUYOY8KfN01X5SExAoVTr09ewARAQABzSVLcnp5c3p0b2Yg
+ S296bG93c2tpIDxrcnprQGtlcm5lbC5vcmc+wsGVBBMBCgA/AhsDBgsJCAcDAgYVCAIJCgsE
+ FgIDAQIeAQIXgBYhBJvQfg4MUfjVlne3VBuTQ307QWKbBQJgPO8PBQkUX63hAAoJEBuTQ307
+ QWKbBn8P+QFxwl7pDsAKR1InemMAmuykCHl+XgC0LDqrsWhAH5TYeTVXGSyDsuZjHvj+FRP+
+ gZaEIYSw2Yf0e91U9HXo3RYhEwSmxUQ4Fjhc9qAwGKVPQf6YuQ5yy6pzI8brcKmHHOGrB3tP
+ /MODPt81M1zpograAC2WTDzkICfHKj8LpXp45PylD99J9q0Y+gb04CG5/wXs+1hJy/dz0tYy
+ iua4nCuSRbxnSHKBS5vvjosWWjWQXsRKd+zzXp6kfRHHpzJkhRwF6ArXi4XnQ+REnoTfM5Fk
+ VmVmSQ3yFKKePEzoIriT1b2sXO0g5QXOAvFqB65LZjXG9jGJoVG6ZJrUV1MVK8vamKoVbUEe
+ 0NlLl/tX96HLowHHoKhxEsbFzGzKiFLh7hyboTpy2whdonkDxpnv/H8wE9M3VW/fPgnL2nPe
+ xaBLqyHxy9hA9JrZvxg3IQ61x7rtBWBUQPmEaK0azW+l3ysiNpBhISkZrsW3ZUdknWu87nh6
+ eTB7mR7xBcVxnomxWwJI4B0wuMwCPdgbV6YDUKCuSgRMUEiVry10xd9KLypR9Vfyn1AhROrq
+ AubRPVeJBf9zR5UW1trJNfwVt3XmbHX50HCcHdEdCKiT9O+FiEcahIaWh9lihvO0ci0TtVGZ
+ MCEtaCE80Q3Ma9RdHYB3uVF930jwquplFLNF+IBCn5JRzsFNBFVDXDQBEADNkrQYSREUL4D3
+ Gws46JEoZ9HEQOKtkrwjrzlw/tCmqVzERRPvz2Xg8n7+HRCrgqnodIYoUh5WsU84N03KlLue
+ MNsWLJBvBaubYN4JuJIdRr4dS4oyF1/fQAQPHh8Thpiz0SAZFx6iWKB7Qrz3OrGCjTPcW6ei
+ OMheesVS5hxietSmlin+SilmIAPZHx7n242u6kdHOh+/SyLImKn/dh9RzatVpUKbv34eP1wA
+ GldWsRxbf3WP9pFNObSzI/Bo3kA89Xx2rO2roC+Gq4LeHvo7ptzcLcrqaHUAcZ3CgFG88CnA
+ 6z6lBZn0WyewEcPOPdcUB2Q7D/NiUY+HDiV99rAYPJztjeTrBSTnHeSBPb+qn5ZZGQwIdUW9
+ YegxWKvXXHTwB5eMzo/RB6vffwqcnHDoe0q7VgzRRZJwpi6aMIXLfeWZ5Wrwaw2zldFuO4Dt
+ 91pFzBSOIpeMtfgb/Pfe/a1WJ/GgaIRIBE+NUqckM+3zJHGmVPqJP/h2Iwv6nw8U+7Yyl6gU
+ BLHFTg2hYnLFJI4Xjg+AX1hHFVKmvl3VBHIsBv0oDcsQWXqY+NaFahT0lRPjYtrTa1v3tem/
+ JoFzZ4B0p27K+qQCF2R96hVvuEyjzBmdq2esyE6zIqftdo4MOJho8uctOiWbwNNq2U9pPWmu
+ 4vXVFBYIGmpyNPYzRm0QPwARAQABwsF8BBgBCgAmAhsMFiEEm9B+DgxR+NWWd7dUG5NDfTtB
+ YpsFAmA872oFCRRflLYACgkQG5NDfTtBYpvScw/9GrqBrVLuJoJ52qBBKUBDo4E+5fU1bjt0
+ Gv0nh/hNJuecuRY6aemU6HOPNc2t8QHMSvwbSF+Vp9ZkOvrM36yUOufctoqON+wXrliEY0J4
+ ksR89ZILRRAold9Mh0YDqEJc1HmuxYLJ7lnbLYH1oui8bLbMBM8S2Uo9RKqV2GROLi44enVt
+ vdrDvo+CxKj2K+d4cleCNiz5qbTxPUW/cgkwG0lJc4I4sso7l4XMDKn95c7JtNsuzqKvhEVS
+ oic5by3fbUnuI0cemeizF4QdtX2uQxrP7RwHFBd+YUia7zCcz0//rv6FZmAxWZGy5arNl6Vm
+ lQqNo7/Poh8WWfRS+xegBxc6hBXahpyUKphAKYkah+m+I0QToCfnGKnPqyYIMDEHCS/RfqA5
+ t8F+O56+oyLBAeWX7XcmyM6TGeVfb+OZVMJnZzK0s2VYAuI0Rl87FBFYgULdgqKV7R7WHzwD
+ uZwJCLykjad45hsWcOGk3OcaAGQS6NDlfhM6O9aYNwGL6tGt/6BkRikNOs7VDEa4/HlbaSJo
+ 7FgndGw1kWmkeL6oQh7wBvYll2buKod4qYntmNKEicoHGU+x91Gcan8mCoqhJkbqrL7+nXG2
+ 5Q/GS5M9RFWS+nYyJh+c3OcfKqVcZQNANItt7+ULzdNJuhvTRRdC3g9hmCEuNSr+CLMdnRBY fv0=
+In-Reply-To: <20250121064519.18974-1-lihuisong@huawei.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
+On 21/01/2025 07:44, Huisong Li wrote:
+> The hwmon_device_register() is deprecated. When I try to repace it with
+> hwmon_device_register_with_info() for acpi_power_meter driver, I found that
+> the power channel attribute in linux/hwmon.h have to extend and is more
+> than 32 after this replacement.
+> 
+> However, the maximum number of hwmon channel attributes is 32 which is
+> limited by current hwmon codes. This is not good to add new channel
+> attribute for some hwmon sensor type and support more channel attribute.
+> 
+> This series are aimed to do this. And also make sure that acpi_power_meter
+> driver can successfully replace the deprecated hwmon_device_register()
+> later.
 
---7ljgtlteej75idhb
-Content-Type: text/plain; protected-headers=v1; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [PATCH] net: davicom: fix UAF in dm9000_drv_remove
-MIME-Version: 1.0
+Avoid combining independent patches into one patch bomb. Or explain the
+dependencies and how is it supposed to be merged - that's why you have
+cover letter here.
 
-Hello,
-
-On Mon, Jan 20, 2025 at 04:25:57PM -0600, Chenyuan Yang wrote:
-> dm is netdev private data and it cannot be
-> used after free_netdev() call. Using adpt after free_netdev()
-
-What is adpt?
-
-> can cause UAF bug. Fix it by moving free_netdev() at the end of the
-> function.
-
-"can cause"? Doesn't that trigger reliable?
-
-How did you find that issue? Did this actually trigger for you, or is it
-a static checker that found it? Please mention that in the commit log.
-=20
-> This is similar to the issue fixed in commit
-> ad297cd2db8953e2202970e9504cab247b6c7cb4 ("net: qcom/emac: fix UAF in ema=
-c_remove").
-
-Please shorten the commit id, typically to 12 chars as you did in the
-Fixes line below.
-
-> Fixes: cf9e60aa69ae ("net: davicom: Fix regulator not turned off on drive=
-r removal")
-> Signed-off-by: Chenyuan Yang <chenyuan0y@gmail.com>
-
-Best regards
-Uwe
-
---7ljgtlteej75idhb
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEP4GsaTp6HlmJrf7Tj4D7WH0S/k4FAmePTdQACgkQj4D7WH0S
-/k5lRggAh5bqOp3FEgchanxSd0qVBUDRc+bz2sYknhhwMikTZnNUp0kWgpZZXX2c
-WAIe6XkmVtEEM+BLuSbRYfqwMZqXKVWWKGR4k06qFYEK03HFeSqS+dbzp5sSwRTa
-rQNL9AymnRwIqtAr0ECC0g8Dsj9rUDYY8UUjZkHK0PMM3HEk/+A+m/7xc/suud5X
-1Ms7fMpXE4EWVWeIGdZ1rUMqQfw0i0waEcNVUV6yOQJ9R6Z9n5Lzt1E4E0ruI1or
-mI935sourepBCG0niig71TfrYBHxghIG2v3VlJkEa0Iab++Hp/g8yXYSAUDcNi93
-N3dvccAjMEAjGDW8EzQ4Us4l8+Di0Q==
-=oaD9
------END PGP SIGNATURE-----
-
---7ljgtlteej75idhb--
+Best regards,
+Krzysztof
 
