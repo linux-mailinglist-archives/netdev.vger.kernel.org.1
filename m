@@ -1,178 +1,140 @@
-Return-Path: <netdev+bounces-160128-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160129-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D538A1862F
-	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 21:38:31 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C0A8CA18632
+	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 21:41:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 47829188AD72
-	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 20:38:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7B562162D3E
+	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 20:41:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A45751F75AB;
-	Tue, 21 Jan 2025 20:38:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FDFB1F8673;
+	Tue, 21 Jan 2025 20:41:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="oFtynvTk"
+	dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b="gTUZ/HOh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+Received: from fw2.prolan.hu (fw2.prolan.hu [193.68.50.107])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1E301B808;
-	Tue, 21 Jan 2025 20:38:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38E581F76D9;
+	Tue, 21 Jan 2025 20:41:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.68.50.107
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737491906; cv=none; b=TCRs3hnZM8/vemHM+yo47T7A1QZ8R1V9gXrz/EbwfrWCwK3IplPL7ClEqVMB5pzmBGepRGsyUJKhapLGTw41IBvvaFKJ7pnYV1NK0n+ym/B55rLUazatrDeLSkycexaGfCYHpmoq7UzEYJRVQX4Ruzs4pVs4FJCWUqnGUSQRgJE=
+	t=1737492103; cv=none; b=gJU9En/cS8iLJs/q1yo28bOsf2rVk3M84Yd+TRtyk50CHWK+hE49VPXHspgrb0FvAmW6kbAE6KBGA3TLES/RV3YKLKresmV+K7885XS/OSBZVawsxzXU+pie83aPnEAqUsVOtwF/WE7NPPjFYB59aZRxAt2mQwQ4vFcSOJf4hi0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737491906; c=relaxed/simple;
-	bh=e+dFX819daWsRhigdFpl01k4/NZV1QYsLroSQ01P+R8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CWBNQ6N+YvkNKnGUsMZXFWpB26Y0VnGyy0liRQb0g52QaJSmdBE04oUxQNKgLcYzLMRzImjp21XTpZrrjw6/4+axtfAIQlJuKIp/3PaPjlX0sCMgpdQypnnrAs79Ph/LAss2l5cu7xmsLFhgjMFTnC+ZEKZf14QcNTDq2c0dEPk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=oFtynvTk; arc=none smtp.client-ip=198.175.65.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1737491905; x=1769027905;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=e+dFX819daWsRhigdFpl01k4/NZV1QYsLroSQ01P+R8=;
-  b=oFtynvTkxDfGvv3wox9R+GayWz1TwPF6z0f5EiAdFFsjNaTD5gowk6g2
-   jH18U67OGqzYWD6+HMw5GVFCnV91lM2U1utQGG9NYfoC/EHv8VlC1yLx8
-   3VasF16aL2xpRdDa7P7HylCoUhulNSwuIYT0aFKheC+6iFvhc3hFZcZFx
-   rTJa1CmyvdXL85uP6wmQoaehJ7/9KpfERapxv1AqcjDQUEEx913s1kzC0
-   TXKWfLZ66Ob4uQmNTzRXa9MdBxKv+CCguWFjPlYJVLpxrZSZweY1x5NM4
-   weCAqimrBaDim5ZeTEZtQ28bmch512zyQArnAt2mJbr5npOgIGoM5pwnX
-   g==;
-X-CSE-ConnectionGUID: FebSb3iuQDevhRmsdQn6iA==
-X-CSE-MsgGUID: u6ENrYE4QK29jxFcdnWgaQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11322"; a="37801588"
-X-IronPort-AV: E=Sophos;i="6.13,223,1732608000"; 
-   d="scan'208";a="37801588"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jan 2025 12:38:24 -0800
-X-CSE-ConnectionGUID: KgMm+4BHRhiCjFtZdFzDoQ==
-X-CSE-MsgGUID: WOW83UjlRWilx0amOr1Xrw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.13,223,1732608000"; 
-   d="scan'208";a="107459209"
-Received: from aschofie-mobl2.amr.corp.intel.com (HELO aschofie-mobl2.lan) ([10.125.110.76])
-  by fmviesa010-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jan 2025 12:38:23 -0800
-Date: Tue, 21 Jan 2025 12:38:21 -0800
-From: Alison Schofield <alison.schofield@intel.com>
-To: Alejandro Lucero Palau <alucerop@amd.com>
-Cc: Dan Williams <dan.j.williams@intel.com>, alejandro.lucero-palau@amd.com,
-	linux-cxl@vger.kernel.org, netdev@vger.kernel.org,
-	edward.cree@amd.com, davem@davemloft.net, kuba@kernel.org,
-	pabeni@redhat.com, edumazet@google.com, dave.jiang@intel.com,
-	bhelgaas@google.com
-Subject: Re: [PATCH v9 10/27] resource: harden resource_contains
-Message-ID: <Z5AFvRl87OFtfF8-@aschofie-mobl2.lan>
-References: <20241230214445.27602-1-alejandro.lucero-palau@amd.com>
- <20241230214445.27602-11-alejandro.lucero-palau@amd.com>
- <678b0c0ca40ca_20fa29484@dwillia2-xfh.jf.intel.com.notmuch>
- <fe48e2e9-5a13-78fe-d8f6-6c3faeecebcc@amd.com>
- <09d6b529-57f3-290f-7e92-0291cdd461cc@amd.com>
- <a97f50df-5b0f-6ab5-80c6-531d4654c0b3@amd.com>
+	s=arc-20240116; t=1737492103; c=relaxed/simple;
+	bh=q7DoTJ4FdOJKu23a0OLBxyG5TVcFn0n3Tf/Lv8fjHuc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=YHzJtLeVJzd7wuP5dFJoeZlKD1YOMSXYN0MGQpM5vIqFquMK08/8aFDW7IcoIKNekSFFO2GNA8TTGI+OGf49+/FU3a9sVBFT+pg2jvQ7sOM2yvT5gLW3vQTwzzeVYjpA8OPoiPQIXIzrPoIFkl+bM6IPFoJCTNeBFSzsSDCznqY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=prolan.hu; spf=pass smtp.mailfrom=prolan.hu; dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b=gTUZ/HOh; arc=none smtp.client-ip=193.68.50.107
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=prolan.hu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=prolan.hu
+Received: from proxmox-mailgw.intranet.prolan.hu (localhost.localdomain [127.0.0.1])
+	by proxmox-mailgw.intranet.prolan.hu (Proxmox) with ESMTP id C3C3AA0578;
+	Tue, 21 Jan 2025 21:41:37 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=prolan.hu; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:from:from:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=mail; bh=5JnVWWuVq2AzhwTPwMTG
+	2xnTfDhIJpjBHH8/rH3BId4=; b=gTUZ/HOhepOsNotNlBHyfkYSoF6rOUNdzyQN
+	rS9Z573MCnnttPfb9lq7nqSyoVXJ0jAidTm3iSgYM00mNm8ccrFQFOTTIjC2WDe1
+	mO8xZbCwhpcu3zMvRJC7J0GhW+YUYvso0cbvUu7Ls6a5gPUwCMxo7pWnzNcTi86e
+	IkJflxURscD/wY+27fXfk5mZy3Z7/hpbaS1reH3vA8mq8ZoJQPZzWEcmnUXP7FmK
+	AifOSL6ZofhkMlsXrSEeHzRW0ayqQGKqdHcQcOPcz1Cp0KaIVB2sxY4meUt+wC2s
+	PotZBWKppFSt7S5OvVmbm9ThkisZi07TnL2Bdys5SDYpB8MxKm9wQAT0aUFZvk33
+	fT9uQVPQZGbT37z4BKgk3bzLX+0s2QsHAWI6bMMfcTRoI2sVfByXe4UC9nw5erqB
+	xmznIjjlrTguaexyZ8n8V4GVrwNQXFbCgzTnqQsIyrpAijPVdhAWLpN0h7Gf+ZOz
+	kzEhU7r9SZBQCQXbm2IfFR30rWZXoUeRJwyx+o73Cjy4zw/51DFmUFPEOVNtDZwA
+	lAMPWc7qau+ESvcRzHabBovq42G2Yoc1WzYcGgV2Iwj9lqHuLVHe7cHJ4P6SpOVB
+	roOQuqRYu8/cDcTwHULB/rVmPiPde7623aWKjxkgdPN5Ht0l1p9uAd7+NlJQpAHK
+	2zuwD9c=
+Message-ID: <8395976e-c867-4788-82e6-6d606599bf6c@prolan.hu>
+Date: Tue, 21 Jan 2025 21:41:36 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <a97f50df-5b0f-6ab5-80c6-531d4654c0b3@amd.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [EXTERNAL] [PATCH] net: fec: Refactor MAC reset to function
+To: "Badel, Laurent" <LaurentBadel@eaton.com>, Jakub Kicinski
+	<kuba@kernel.org>, "imx@lists.linux.dev" <imx@lists.linux.dev>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+CC: Wei Fang <wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>, "Clark
+ Wang" <xiaoning.wang@nxp.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Paolo
+ Abeni" <pabeni@redhat.com>
+References: <20250121103857.12007-3-csokas.bence@prolan.hu>
+ <DM4PR17MB5969CC2A8D074890B695AF2ADFE62@DM4PR17MB5969.namprd17.prod.outlook.com>
+Content-Language: en-US
+From: =?UTF-8?B?Q3PDs2vDoXMgQmVuY2U=?= <csokas.bence@prolan.hu>
+In-Reply-To: <DM4PR17MB5969CC2A8D074890B695AF2ADFE62@DM4PR17MB5969.namprd17.prod.outlook.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: ATLAS.intranet.prolan.hu (10.254.0.229) To
+ ATLAS.intranet.prolan.hu (10.254.0.229)
+X-EsetResult: clean, is OK
+X-EsetId: 37303A2980D94852677763
 
-On Mon, Jan 20, 2025 at 04:26:42PM +0000, Alejandro Lucero Palau wrote:
+Hi Laurent,
+
+On 2025. 01. 21. 17:09, Badel, Laurent wrote:
+> Hi Bence and thanks for the patch.
+
+thanks for your input.
+
+> Leaving out the check for FEC_QUIRK_NO_HARD_RESET in fec_stop() was, in fact,
+> not unintentional. Although a hard reset in fec_restart() caused link issues
+> with the iMX28, I had no particular reason to believe that it would also cause
+> issues in fec_stop(), since at this point you're turning off the interface, and
+> I did not observe any particular problems either, so I did not think the same
+> modification was warranted there.
+
+I had a feeling it was intentional, however, `fec_stop()` is called all 
+over the place - not just when removing the interface (e.g. unloading 
+the driver), but also by the PM subsystem for entering suspend, 
+restarting auto-negotiation, for handling Pause frames and changing 
+HW-accelerated RX checksum checking...
+
+> If you have reason to believe that this is a bug, then it should be fixed, but
+> currently I don't see why this is the case here. I think a refactoring
+> duplicated code is a good idea, but since it also includes a modification of
+> the behavior (specifically, there is a possible path where
+> FEC_QUIRK_NO_HARD_RESET is set and the link is up, where fec_stop() will issue
+> a soft reset instead of a hard reset), I would prefer to know that this change
+> is indeed necessary.
 > 
-> On 1/20/25 16:16, Alejandro Lucero Palau wrote:
-> > Adding Bjorn to the thread. Not sure if he just gets the email being in
-> > an Acked-by line.
-> > 
-> > 
-> > On 1/20/25 16:10, Alejandro Lucero Palau wrote:
-> > > 
-> > > On 1/18/25 02:03, Dan Williams wrote:
-> > > > alejandro.lucero-palau@ wrote:
-> > > > > From: Alejandro Lucero <alucerop@amd.com>
-> > > > > 
-> > > > > While resource_contains checks for IORESOURCE_UNSET flag for the
-> > > > > resources given, if r1 was initialized with 0 size, the function
-> > > > > returns a false positive. This is so because resource start and
-> > > > > end fields are unsigned with end initialised to size - 1 by current
-> > > > > resource macros.
-> > > > > 
-> > > > > Make the function to check for the resource size for both resources
-> > > > > since r2 with size 0 should not be considered as valid for
-> > > > > the function
-> > > > > purpose.
-> > > > > 
-> > > > > Signed-off-by: Alejandro Lucero <alucerop@amd.com>
-> > > > > Suggested-by: Alison Schofield <alison.schofield@intel.com>
-> > > > > Reviewed-by: Alison Schofield <alison.schofield@intel.com>
-> > > > > Acked-by: Bjorn Helgaas <bhelgaas@google.com>
-> > > > > Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-> > > > > ---
-> > > > >   include/linux/ioport.h | 2 ++
-> > > > >   1 file changed, 2 insertions(+)
-> > > > > 
-> > > > > diff --git a/include/linux/ioport.h b/include/linux/ioport.h
-> > > > > index 5385349f0b8a..7ba31a222536 100644
-> > > > > --- a/include/linux/ioport.h
-> > > > > +++ b/include/linux/ioport.h
-> > > > > @@ -296,6 +296,8 @@ static inline unsigned long
-> > > > > resource_ext_type(const struct resource *res)
-> > > > >   /* True iff r1 completely contains r2 */
-> > > > >   static inline bool resource_contains(const struct resource
-> > > > > *r1, const struct resource *r2)
-> > > > >   {
-> > > > > +    if (!resource_size(r1) || !resource_size(r2))
-> > > > > +        return false;
-> > > > I just worry that some code paths expect the opposite, that it is ok to
-> > > > pass zero size resources and get a true result.
-> > > 
-> > > 
-> > > That is an interesting point, I would say close to philosophic
-> > > arguments. I guess you mean the zero size resource being the one
-> > > that is contained inside the non-zero one, because the other option
-> > > is making my vision blurry. In fact, even that one makes me feel
-> > > trapped in a window-less room, in summer, with a bunch of
-> > > economists, I mean philosophers, and my phone without signal for
-> > > emergency calls.
-> > > 
-> 
-> I forgot to make my strongest point :-). If someone assumes it is or it
-> should be true a zero-size resource is contained inside a non zero-size
-> resource, we do not need to call a function since it is always true
-> regardless of the non zero-size resource ... that headache is starting again
-> ...
-> 
-> 
+> If others disagree and there's a consensus that this change is ok, I'm happy
+> for the patch to get through, but I tend to err on the side of caution in such
+> cases.
 
-Maybe start using IORESOURCE_UNSET flag -
+To me, the name `FEC_QUIRK_NO_HARD_RESET`, and its doc-comment seems to 
+suggest that we do *not* want to hard-reset this MAC *ever*; not in the 
+codepath of `fec_restart()` and not in `fec_stop()`. Did you observe 
+problems on i.MX28 if you soft-reset it in stop()? I _might_ be able to 
+get my hands on an i.MX287 and test, but I have no idea if it is 
+working; I took it out from the junk bin.
 
-Looking back on when we first discussed this -
-https://lore.kernel.org/linux-cxl/Zz-fVWhTOFG4Nek-@aschofie-mobl2.lan/
-where the thought was that checking for zero was helpful to all.
+Right now, we're chasing a different bug on the i.MX6, and this was just 
+meant to reduce the amount of clutter we have to cut through.
 
-If this path starts using the IORESOURCE_UNSET flag can it accomplish
-the same thing?  No need to touch resource_contains().
+> An additional comment - this is just my personal opinion - but in
+> fec_ctrl_reset(), it seems to me that the function of the wol argument really
+> is to distinguish if we're using the fec_restart() or the fec_stop()
+> implementation, so I think the naming may be a bit misleading in this case.
 
-Is that an option?
+True, but I would prefer to keep it separate, i.e. the `wol` parameter 
+should really only control whether we want to enable WoL. If we decide 
+to keep the old behavior of not honoring FEC_QUIRK_NO_HARD_RESET in 
+stop(), I'd rather add a new parameter `allow_soft_reset`. That way, if 
+ever someone needs to call `fec_ctrl_reset()`, they will be able to give 
+it values they make sense at that point-of-call, instead of having to 
+"fake" either restart() or stop().
 
--- Alison
+Bence
 
-
-
-> > > 
-> > > But maybe it is just  my lack of understanding and there exists a
-> > > good reason for this possibility.
-> > > 
-> > > 
-> > > Bjorn, I guess the ball is in your side ...
-> > > 
-> > > > Did you audit existing callers?
->
 
