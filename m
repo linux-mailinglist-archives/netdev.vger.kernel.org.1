@@ -1,141 +1,81 @@
-Return-Path: <netdev+bounces-159986-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159987-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD94AA17A2F
-	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 10:29:54 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C8B8A17A3F
+	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 10:34:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 03530169F25
-	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 09:29:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CBE3816A154
+	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 09:34:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A8191BE852;
-	Tue, 21 Jan 2025 09:29:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AB711BEF91;
+	Tue, 21 Jan 2025 09:33:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c1L7fJZK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UXXBL5LX"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3184D1B6D0F;
-	Tue, 21 Jan 2025 09:29:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 063AA1BEF82
+	for <netdev@vger.kernel.org>; Tue, 21 Jan 2025 09:33:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737451790; cv=none; b=FPNzkn3tfyw7HEhITDWAlienm2dnVb+J2+m8Sp+f+jL+ix2j3nABV5tRbIGxIhEol6neApiKMU6yjvH+v7VNHSEwux/tyaOXnT5rfDMAuWvDCpUopyL1bZ4RhVv8uUSuKKO5LY3XwptMeJabTeMTSZzc8v9xMCNIxEnJJOJMLJI=
+	t=1737452039; cv=none; b=KjVeuD5yiHYfxySOz2F9FqIEL5UJyoEUt2KroUhN36CnixTeERlMk1xwa0+WSDGWpDgQM6qRe6SLOQQ5rykz6ZhpQK3jy5szrDWXItiVqJ5tb6kGX0XFOIPuvQ/V22BCJSU7TII/3MtS/Ta7oWTxzP2FHzdBas+QSACwlzzwfGA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737451790; c=relaxed/simple;
-	bh=x109CagQPUDie1GwfWzTla/VzFLR6nL7cSoCg9U09qo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Gkb34Z0YWqiTbyeS9V9nV37SA1lrq0VKvXkzRaopAC4cEZvb4CG79nKchuEqSAfz15cYhIzWiiCZJowTOqEqrLuFdTDHEr/OPcCbFnIhqheIadz7fwA/Pp/GzzEfVEbn8gUCMgKUd0iCT+EROTe8Y9yKCha51xDlSXZ9AHJetBI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c1L7fJZK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A285DC4CEE5;
-	Tue, 21 Jan 2025 09:29:49 +0000 (UTC)
+	s=arc-20240116; t=1737452039; c=relaxed/simple;
+	bh=e6TimPx7ouec9YtTSSuiajrV4fB+uxQXs8SL/4d1m2U=;
+	h=Content-Type:MIME-Version:In-Reply-To:References:Subject:From:Cc:
+	 To:Date:Message-ID; b=kf25bsXxENbfqmazca5JeddIzLEiQQRGdEBMrKEK34JpNwN5rtA3/VhoSISFScscLmEb3hODRGGBG11/Q7x4Ban+/eTu/r8cTjQleqW9VEs0OyUvrGg5PRbhUzsaFsz9Kz6FMyfrFVU3eBs3isRV2kABy6+UgGO614e29IBUjhU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UXXBL5LX; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D70A0C4CEDF;
+	Tue, 21 Jan 2025 09:33:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737451789;
-	bh=x109CagQPUDie1GwfWzTla/VzFLR6nL7cSoCg9U09qo=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=c1L7fJZKcvrZWTFut2itOlg7iSmeE7jNlA+hfYZ4TyCnrQWxmnmrvrwB4F6iJN+NJ
-	 8/+Q3lzudjWj8OT0VzUMw4nQFRvoFOTI5q7jubCY5aRWFscJcCYVW+PQ4NwjxYA4P0
-	 qmnCJgTS3yT2F600/CQiPD+d+6Do1uzq2DSFMe+fC6aBuTyrE3oHyhF8QI/FscROtc
-	 rBY7LpEn+NDsywrOMgQoFMwOliUj6iDBxcqnu44Tu7f3sjTUBDyDixME0uJFGU9C1p
-	 OKJQ12n+3uxrZrl5DdLPjP+/ZLob21+LLL0W+V6vGyCpd7CNS5G6ddskEHF47cUJNg
-	 zqp1pMKV6bNRA==
-Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-aaec111762bso1021450066b.2;
-        Tue, 21 Jan 2025 01:29:49 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCUAUQQC+Fa3rBumMVSC/A8wAf6HU2VYc39ioi82GBRkyWVslGBehO57+UE6z1gxmNCXdtthIO8C@vger.kernel.org, AJvYcCXB421aM7M7YW7udm0p3U/IvZFzUJz2OmR1mNFUdhv6zvNNK7M+0c6G5mcOrww5UZ4vszSh+9+PZUN4uwQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxSilK0+rQRhBBoqJO3iDavFlJhmjAqJG7KMNkwclZs9JjdPph3
-	hZ81oFqNQklfGFvUs+jTq+4+uDs373td0lxL1Mf9uX3wi2cNfekGlx84AJzG349ifXIY+1E0En4
-	gHWkrSFPFUj0P+bwSvl2iMOIyWAU=
-X-Google-Smtp-Source: AGHT+IEAMbCk6W4xhdtMlEec0nscawo4qsaBW8BJ9oUBUOnbWm3Fg6RmGYiTTHXJE9/NPXR59+LOSZsblEZ1vwYTwTc=
-X-Received: by 2002:a17:907:7e91:b0:aa6:a572:49fd with SMTP id
- a640c23a62f3a-ab38b3ce71cmr1451509766b.54.1737451788189; Tue, 21 Jan 2025
- 01:29:48 -0800 (PST)
+	s=k20201202; t=1737452038;
+	bh=e6TimPx7ouec9YtTSSuiajrV4fB+uxQXs8SL/4d1m2U=;
+	h=In-Reply-To:References:Subject:From:Cc:To:Date:From;
+	b=UXXBL5LXiG6uXYL40VozBZpEwwQnmRjbwVx+/umlISY1dgek7WzgW2w36qx4zhBgA
+	 Ev2ZLvhKuv+3eFt8iHKsIPa6UtAUdOK2AZebqskqPzWMQg5q/EVBvMLFCORXD/s+M/
+	 YCjJVOdGPXf1RqvE1XB23rQyg1Mbom1527Mj+fTd0Upw7lhHn1ukH2YDuf4peWCSMi
+	 FfXZY1RTSgx3ZyhiZhEw8SRHb5pvYFLStnSKcZOmnn4jHFJebV1XRIGlXfpA2C1tn4
+	 T0F1cOZczp2pwmgY0qu+lUK2bpeA2nwOlbu20lUzEjQwIzrnnFVJw70hJtg+4SIuo7
+	 06+Odug/N2Ivg==
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250121082536.11752-1-zhaoqunqin@loongson.cn>
-In-Reply-To: <20250121082536.11752-1-zhaoqunqin@loongson.cn>
-From: Huacai Chen <chenhuacai@kernel.org>
-Date: Tue, 21 Jan 2025 17:29:37 +0800
-X-Gmail-Original-Message-ID: <CAAhV-H7LA7OBCxRzQogCbDeniY39EsxA6GVN07WM=e6EzasM0w@mail.gmail.com>
-X-Gm-Features: AbW1kvYj-VihQZqsBfJ8AIAvc9hWhqqIdYcG3HcBC7MDUNnfd8f0MalX2Uevqu4
-Message-ID: <CAAhV-H7LA7OBCxRzQogCbDeniY39EsxA6GVN07WM=e6EzasM0w@mail.gmail.com>
-Subject: Re: [PATCH] net: stmmac: dwmac-loongson: Add fix_soc_reset function
-To: Qunqin Zhao <zhaoqunqin@loongson.cn>
-Cc: kuba@kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net, 
-	edumazet@google.com, pabeni@redhat.com, si.yanteng@linux.dev, 
-	fancer.lancer@gmail.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20250120114400.55fffeda@kernel.org>
+References: <20250117102612.132644-1-atenart@kernel.org> <20250117102612.132644-4-atenart@kernel.org> <20250120114400.55fffeda@kernel.org>
+Subject: Re: [PATCH net-next 3/4] net-sysfs: prevent uncleared queues from being re-added
+From: Antoine Tenart <atenart@kernel.org>
+Cc: davem@davemloft.net, pabeni@redhat.com, edumazet@google.com, stephen@networkplumber.org, gregkh@linuxfoundation.org, netdev@vger.kernel.org
+To: Jakub Kicinski <kuba@kernel.org>
+Date: Tue, 21 Jan 2025 10:33:54 +0100
+Message-ID: <173745203452.4844.5509848806009835293@kwain>
 
-Hi, Qunqin,
+Quoting Jakub Kicinski (2025-01-20 20:44:00)
+> On Fri, 17 Jan 2025 11:26:10 +0100 Antoine Tenart wrote:
+> > +     if (unlikely(kobj->state_initialized))
+> > +             return -EAGAIN;
+>=20
+> we could do some weird stuff here like try to ignore the sysfs=20
+> objects and "resynchronize" them before releasing rtnl.
+> Way to hacky to do now, but also debugging a transient EAGAIN
+> will be a major PITA. How about we add a netdev_warn_once()
+> here to leave a trace of what happened in the logs?
 
-The patch itself looks good to me, but something can be improved.
-1. The title can be "net: stmmac: dwmac-loongson: Add fix_soc_reset() callb=
-ack"
-2. You lack a "." at the end of the commit message.
-3. Add a "Cc: stable@vger.kernel.org" because it is needed to backport
-to 6.12/6.13.
+I'm not sure as the above can happen in normal conditions, although
+removing and re-adding queues very shortly might be questionable? On the
+other hand I get your point and that might not happen very frequently
+under normal conditions and that's just because I'm hammering the thing
+for testing.
 
-After that you can add:
-Reviewed-by: Huacai Chen <chenhuacai@loongson.cn>
-
-
-Huacai
-
-On Tue, Jan 21, 2025 at 4:26=E2=80=AFPM Qunqin Zhao <zhaoqunqin@loongson.cn=
-> wrote:
->
-> Loongson's GMAC device takes nearly two seconds to complete DMA reset,
-> however, the default waiting time for reset is 200 milliseconds
->
-> Signed-off-by: Qunqin Zhao <zhaoqunqin@loongson.cn>
-> ---
->  .../net/ethernet/stmicro/stmmac/dwmac-loongson.c    | 13 +++++++++++++
->  1 file changed, 13 insertions(+)
->
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c b/drive=
-rs/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-> index bfe6e2d631bd..35639d26256c 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-> @@ -516,6 +516,18 @@ static int loongson_dwmac_acpi_config(struct pci_dev=
- *pdev,
->         return 0;
->  }
->
-> +static int loongson_fix_soc_reset(void *priv, void __iomem *ioaddr)
-> +{
-> +       u32 value =3D readl(ioaddr + DMA_BUS_MODE);
-> +
-> +       value |=3D DMA_BUS_MODE_SFT_RESET;
-> +       writel(value, ioaddr + DMA_BUS_MODE);
-> +
-> +       return readl_poll_timeout(ioaddr + DMA_BUS_MODE, value,
-> +                                 !(value & DMA_BUS_MODE_SFT_RESET),
-> +                                 10000, 2000000);
-> +}
-> +
->  static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_d=
-evice_id *id)
->  {
->         struct plat_stmmacenet_data *plat;
-> @@ -566,6 +578,7 @@ static int loongson_dwmac_probe(struct pci_dev *pdev,=
- const struct pci_device_id
->
->         plat->bsp_priv =3D ld;
->         plat->setup =3D loongson_dwmac_setup;
-> +       plat->fix_soc_reset =3D loongson_fix_soc_reset;
->         ld->dev =3D &pdev->dev;
->         ld->loongson_id =3D readl(res.addr + GMAC_VERSION) & 0xff;
->
->
-> base-commit: 5bc55a333a2f7316b58edc7573e8e893f7acb532
-> --
-> 2.43.0
->
+It feel a bit weird to warn something that is not unexpected behavior,
+but if you still prefer having a warn_once for better UX I can add it,
+let me know.
 
