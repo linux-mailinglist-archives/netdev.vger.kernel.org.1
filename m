@@ -1,84 +1,71 @@
-Return-Path: <netdev+bounces-160103-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160104-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86E25A182BC
-	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 18:20:24 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E132BA182C4
+	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 18:21:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7B6FD3ABC56
-	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 17:20:17 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B03857A423A
+	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 17:20:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E576C1F4E37;
-	Tue, 21 Jan 2025 17:20:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2C1A1F4E2A;
+	Tue, 21 Jan 2025 17:20:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="GciTIOuO"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="GRXxJQ4L"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4F3E5028C;
-	Tue, 21 Jan 2025 17:20:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 001371F4727;
+	Tue, 21 Jan 2025 17:20:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737480018; cv=none; b=mofYLlVWpkMPZg7jc81//rtHm7zRJrhYXdLmIqCJ+uBUb1pFPhqVbRZDQKXIqBZgCFPdFZ/luehYcoCfueo5s4vc6EEHK3l/vdyMoHLC+6ynDq3eOVcf9wzl+0PljC9Dze2GnsbMrDKBN9fv/4TocJD/Xt+3ioi6oQuzoIN7JqI=
+	t=1737480054; cv=none; b=iaTKwdgS7o4HXuc4nyq8GvD6wIneXpi8ex3rpUM4LX5KhSLhySVoEtfsSIWQIq/qFDai5OQOHxTqAyfxl+QeUVvGf7ZtkDrBcSlYURiS6lLfForYRnywPmMPzevUg43YO3Y4Wozdv8ms+7Vt63+HUAd53FNRWJ8NzMLVrjQ+dNI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737480018; c=relaxed/simple;
-	bh=PCPunsqPN4gPnF5CQnn9TVFaGWmCub+QX478Qs/QqJA=;
+	s=arc-20240116; t=1737480054; c=relaxed/simple;
+	bh=awQsp/zga7f9a/85M78VuqjOd6AVQILOYmdeMCjgkoI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PoxGLuEqNguNE4sxxdcFag8MvY4PiS7iiJXIRX1tFh9TqwjPYDkFffUTEIAHcz2q2j9fwG3hMSveVslwlBB3cD/pwF8DTne4VHd3Gw8nF/oRTabtoZg+kWGbGqIm/+vADN+yLP8PAPa9rhwY+H24TyxAo/Qj4IjmaldP7/hWOVY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=GciTIOuO; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=5q9yQxZ7qCRWB5N9g0tbP/E5H3IqId9T8M1S/6gGqmU=; b=GciTIOuOH+7z6FIEQSCiuQWUdn
-	Lac+a6Qas11PDpxfxikk9qKlgXiCCFtlMzAJe1E6UlpZbRM/x8QIuP107azsvGn60uKyXwEKhcfGg
-	F2PDh74Iymh0jzLQOgqvUgqL6eb0J0yolXdifkFiIM4/+I2erxk+OTvJlAZOCp9raslRcnSoLHHn4
-	MIa/v697Xq5DdoMXB5BqyasXJe2KNdGofqbYniMIiOvWQsPl0WF2vxFy4eB3fQIwgT49n0d9JQtLy
-	BwESQqcEeDE2DrTRQIIvAVPJRj5jzu8cz+Kn4frH+wrQH89A/GjBRfrVtvZfl6qXufO5On9XJUF2l
-	gHmPPi+g==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:53924)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1taHv3-0007VH-2A;
-	Tue, 21 Jan 2025 17:20:05 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1taHuz-00044S-29;
-	Tue, 21 Jan 2025 17:20:01 +0000
-Date: Tue, 21 Jan 2025 17:20:01 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Guenter Roeck <linux@roeck-us.net>
-Cc: Armin Wolf <W_Armin@gmx.de>, Huisong Li <lihuisong@huawei.com>,
-	linux-hwmon@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-media@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	arm-scmi@vger.kernel.org, netdev@vger.kernel.org,
-	linux-rtc@vger.kernel.org, oss-drivers@corigine.com,
-	linux-rdma@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-	linuxarm@huawei.com, jdelvare@suse.com, kernel@maidavale.org,
-	pauk.denis@gmail.com, james@equiv.tech, sudeep.holla@arm.com,
-	cristian.marussi@arm.com, matt@ranostay.sg, mchehab@kernel.org,
-	irusskikh@marvell.com, andrew+netdev@lunn.ch, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	saeedm@nvidia.com, leon@kernel.org, tariqt@nvidia.com,
-	louis.peens@corigine.com, hkallweit1@gmail.com, kabel@kernel.org,
-	hdegoede@redhat.com, ilpo.jarvinen@linux.intel.com,
-	alexandre.belloni@bootlin.com, krzk@kernel.org,
-	jonathan.cameron@huawei.com, zhanjie9@hisilicon.com,
-	zhenglifeng1@huawei.com, liuyonglong@huawei.com
-Subject: Re: [PATCH v1 00/21] hwmon: Fix the type of 'config' in struct
- hwmon_channel_info to u64
-Message-ID: <Z4_XQQ0tkD1EkOJ4@shell.armlinux.org.uk>
-References: <20250121064519.18974-1-lihuisong@huawei.com>
- <03b138e9-688f-4ebc-bd01-3d54fd20e525@gmx.de>
- <9add68ac-7d10-4011-9da8-1f2de077d3e9@roeck-us.net>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Lj6envgAArS/ls1hqry5nPDsA4xjNrhXeaG6O3Zd6EtBBVR21W+L11vTsVgXb2rpIXR3uRBvoKCGO42tcTuBZduyj0eObhHRnkUKio1ic9sS4BaaShq4ngKQOPB5r4EdMTBVESgj5n+2rOMVQtvwh/Goj3mN0UckBg32Vb/WJfY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=GRXxJQ4L; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=cfxHIP2j1h5TjSDYNb52YqchEUxPxLg0EzNjEnekIY0=; b=GRXxJQ4LdAcU77S49gb/McXylm
+	wGu48QsKPDJ8A3s6VtzXXKTgxQbxucgXzN7JzcOtUs9RE17Yn75khm2QFbQAAry5YXLmqLYV+PIKk
+	QdT4sOMZxW0v83+CJcFsiLPxF55e1E/elrHpvCHmimZjErMJ9ymcDd+SCNi9NSmNw1r4=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1taHvZ-006hXW-Kq; Tue, 21 Jan 2025 18:20:37 +0100
+Date: Tue, 21 Jan 2025 18:20:37 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Yijie Yang <quic_yijiyang@quicinc.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, Vinod Koul <vkoul@kernel.org>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konradybcio@kernel.org>,
+	Richard Cochran <richardcochran@gmail.com>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH v3 2/4] net: stmmac: dwmac-qcom-ethqos: Mask PHY mode if
+ configured with rgmii-id
+Message-ID: <717d77d1-43a4-4914-8d7d-a70c89cb1822@lunn.ch>
+References: <20250121-dts_qcs615-v3-0-fa4496950d8a@quicinc.com>
+ <20250121-dts_qcs615-v3-2-fa4496950d8a@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -87,89 +74,40 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <9add68ac-7d10-4011-9da8-1f2de077d3e9@roeck-us.net>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <20250121-dts_qcs615-v3-2-fa4496950d8a@quicinc.com>
 
-On Tue, Jan 21, 2025 at 06:50:00AM -0800, Guenter Roeck wrote:
-> On 1/21/25 06:12, Armin Wolf wrote:
-> > Am 21.01.25 um 07:44 schrieb Huisong Li:
-> > > The hwmon_device_register() is deprecated. When I try to repace it with
-> > > hwmon_device_register_with_info() for acpi_power_meter driver, I found that
-> > > the power channel attribute in linux/hwmon.h have to extend and is more
-> > > than 32 after this replacement.
-> > > 
-> > > However, the maximum number of hwmon channel attributes is 32 which is
-> > > limited by current hwmon codes. This is not good to add new channel
-> > > attribute for some hwmon sensor type and support more channel attribute.
-> > > 
-> > > This series are aimed to do this. And also make sure that acpi_power_meter
-> > > driver can successfully replace the deprecated hwmon_device_register()
-> > > later.
+On Tue, Jan 21, 2025 at 03:54:54PM +0800, Yijie Yang wrote:
+> The Qualcomm board always chooses the MAC to provide the delay instead of
+> the PHY, which is completely opposite to the suggestion of the Linux
+> kernel. The usage of phy-mode in legacy DTS was also incorrect. Change the
+> phy_mode passed from the DTS to the driver from PHY_INTERFACE_MODE_RGMII_ID
+> to PHY_INTERFACE_MODE_RGMII to ensure correct operation and adherence to
+> the definition.
+> To address the ABI compatibility issue between the kernel and DTS caused by
+> this change, handle the compatible string 'qcom,qcs404-evb-4000' in the
+> code, as it is the only legacy board that mistakenly uses the 'rgmii'
+> phy-mode.
 > 
-> This explanation completely misses the point. The series tries to make space
-> for additional "standard" attributes. Such a change should be independent
-> of a driver conversion and be discussed on its own, not in the context
-> of a new driver or a driver conversion.
+> Signed-off-by: Yijie Yang <quic_yijiyang@quicinc.com>
+> ---
+>  .../net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c    | 18 +++++++++++++-----
+>  1 file changed, 13 insertions(+), 5 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
+> index 2a5b38723635b5ef9233ca4709e99dd5ddf06b77..e228a62723e221d58d8c4f104109e0dcf682d06d 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
+> @@ -401,14 +401,11 @@ static int ethqos_dll_configure(struct qcom_ethqos *ethqos)
+>  static int ethqos_rgmii_macro_init(struct qcom_ethqos *ethqos)
+>  {
+>  	struct device *dev = &ethqos->pdev->dev;
+> -	int phase_shift;
+> +	int phase_shift = 0;
+>  	int loopback;
+>  
+>  	/* Determine if the PHY adds a 2 ns TX delay or the MAC handles it */
 
-I think something needs to budge here, because I think what you're
-asking is actually impossible!
+Please think about this comment.
 
-One can't change the type of struct hwmon_channel_info.config to be a
-u64 without also updating every hwmon driver that assigns to that
-member.
-
-This is not possible:
-
- struct hwmon_channel_info {
-         enum hwmon_sensor_types type;
--        const u32 *config;
-+        const u64 *config;
- };
-
-static u32 marvell_hwmon_chip_config[] = {
-...
-};
-
-static const struct hwmon_channel_info marvell_hwmon_chip = {
-        .type = hwmon_chip,
-        .config = marvell_hwmon_chip_config,
-};
-
-This assignment to .config will cause a warning/error with the above
-change. If instead we do:
-
--	.config = marvell_hwmon_chip_config,
-+	.config = (u64 *)marvell_hwmon_chip_config,
-
-which would have to happen to every driver, then no, this also doesn't
-work, because config[1] now points beyond the bounds of
-marvell_hwmon_chip_config, which only has two u32 entries.
-
-You can't just change the type of struct hwmon_channel_info.config
-without patching every driver that assigns to
-struct hwmon_channel_info.config as things currently stand.
-
-The only way out of that would be:
-
-1. convert *all* drivers that defines a config array to be defined by
-   their own macro in hwmon.h, and then switch that macro to make the
-   definitions be a u64 array at the same time as switching struct
-    hwmon_channel_info.config
-
-2. convert *all* drivers to use HWMON_CHANNEL_INFO() unconditionally,
-   and switch that along with struct hwmon_channel_info.config.
-
-3. add a new member to struct hwmon_channel_info such as
-   "const u64 *config64" and then gradually convert drivers to use it.
-   Once everyone is converted over, then remove "const u32 *config",
-   optionally rename "config64" back to "config" and then re-patch all
-   drivers. That'll be joyful, with multiple patches to drivers that
-   need to be merged in sync with hwmon changes - and last over several
-   kernel release cycles.
-
-This is not going to be an easy change!
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+       Andrew
 
