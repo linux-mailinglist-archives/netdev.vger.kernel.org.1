@@ -1,122 +1,120 @@
-Return-Path: <netdev+bounces-159978-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159979-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70FAEA1793E
-	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 09:26:10 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68032A17944
+	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 09:28:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9420F3AAB84
-	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 08:26:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 257AC18849B2
+	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 08:28:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9466A1B85CA;
-	Tue, 21 Jan 2025 08:26:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9CD11B21B4;
+	Tue, 21 Jan 2025 08:28:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OjVuqXD4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 132E21B4156;
-	Tue, 21 Jan 2025 08:25:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5009E18FC74
+	for <netdev@vger.kernel.org>; Tue, 21 Jan 2025 08:28:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737447960; cv=none; b=b0QAZYtseMaYZTd3i3Rx+B4YhPdYACySf7BBKsqEBsnql5aNdAXEL3x3LbSCdfRrnm9ESXP5miNkxnkFKiafW+ZId6jKaVxVNPBfAxG95iChQvpWfxhqhgo3RqAgVILqz653cZf28bH4WwP5O9LAv1ql/XoMcUKeCVoBuOnecWM=
+	t=1737448106; cv=none; b=Kq5Q72kEg0EK7dPcAcvnn+hkLG9RwThrGbjDhrQTiweb2fM4no5eksy673kp0KOAPnuK4rI8FhoxovcQPVdvd/L5LrCioAssnytLOsjYZy/PD5wGdfO3DTwuqGgqsuQTr8KGnZS8zH/1p/sUQyU3T7BeJb6nkF+n1SPvLStlsZg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737447960; c=relaxed/simple;
-	bh=Yz7LgjRtYWtSV9qBZhppFu1JFzEMz1UqreTpg+ZVBPk=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=fv84rvSl3ygtZy7gyUywHJdm1N13uuEbfLXBI6v+3Cdn1pONcMYWwZz12MwMJ0yoSicy2UOmjYhapeLfXUSvUXeeXORELfH8EJpc3vzPW+pRBGRaRfKcC2QwUnLv3yfZqCWYtXNUUZfrtv8/pmvjYK05UorCH4L11b7ijFZrRZE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [10.40.54.90])
-	by gateway (Coremail) with SMTP id _____8AxfawSWo9n4a5mAA--.15631S3;
-	Tue, 21 Jan 2025 16:25:54 +0800 (CST)
-Received: from localhost.localdomain (unknown [10.40.54.90])
-	by front1 (Coremail) with SMTP id qMiowMAx+8QRWo9n07QpAA--.29228S2;
-	Tue, 21 Jan 2025 16:25:53 +0800 (CST)
-From: Qunqin Zhao <zhaoqunqin@loongson.cn>
-To: kuba@kernel.org,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	pabeni@redhat.com
-Cc: chenhuacai@kernel.org,
-	si.yanteng@linux.dev,
-	fancer.lancer@gmail.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Qunqin Zhao <zhaoqunqin@loongson.cn>
-Subject: [PATCH] net: stmmac: dwmac-loongson: Add fix_soc_reset function
-Date: Tue, 21 Jan 2025 16:25:36 +0800
-Message-Id: <20250121082536.11752-1-zhaoqunqin@loongson.cn>
-X-Mailer: git-send-email 2.20.1
+	s=arc-20240116; t=1737448106; c=relaxed/simple;
+	bh=5iHmUYwIfoIKPLFJjEMTMUmo289yUkiCu7vo2YkD8IA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ZGBSQjPTa0wLOgOQbUA4tkkpxHuNR6IAR4r+ji1T587j5Efh/QKm8cwYdQNAGBV4Gll8QznWXMxMcb0IAeY46UW+EguDH9PK5OBGUH3BaKAsHpy6yEMCPKapQumKSDKmY+tgvDWUkaURvD9VNpl0odHXGKx2FyMcoytuRkQ1u7k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OjVuqXD4; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1737448103;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=5iHmUYwIfoIKPLFJjEMTMUmo289yUkiCu7vo2YkD8IA=;
+	b=OjVuqXD4C+XbLxUmzl6aUikkNKYAn/9aK4QXcMGKzS0QblXEhoYWKXhCszBp7R/Na9Pmbj
+	tdWn5LtsKXf3BpWzAGVNzP9fW2OA80a4Q4PScG+Bs2UaC6zuHrzKJIsLla3qteYdIamFDL
+	yCx8m6z8WHOEm7SCudPACOnkTlbjSjo=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-483-axXB71svM1edbr4k14fm9g-1; Tue, 21 Jan 2025 03:28:22 -0500
+X-MC-Unique: axXB71svM1edbr4k14fm9g-1
+X-Mimecast-MFC-AGG-ID: axXB71svM1edbr4k14fm9g
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4362b9c1641so26000945e9.3
+        for <netdev@vger.kernel.org>; Tue, 21 Jan 2025 00:28:22 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737448101; x=1738052901;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=5iHmUYwIfoIKPLFJjEMTMUmo289yUkiCu7vo2YkD8IA=;
+        b=Yi9iNaQeeLq1Q9q92TZp8HcM20KWRMDeHuCKlV0pTct1CbeI10db+unD3BmiHLFzQJ
+         KQpf7ninHj4KSZj3lpM78xt/mXf5Pa0s8kpyDMW+yft43xApjQYbvte7OI7d18Qbg5y5
+         ayGDTKwPoLitGIJ5GtjSAAIJlx2PRDDEMUw9Mxzluf+N+8pRrNjfmbeagfro+JcHDna+
+         OEfM2qCMsp6LHImGi63s4QhopnjuVdJJcJ3TFjly6UoJG8oMwDfprK+8L1aZBqYl/sxP
+         rqhRbICUIQ7iONerFvwN5b2Nkt6hSZAaSNqTiM4ghWN/q6JuFOkjYmr9CSLYgiSXoLO+
+         3mVg==
+X-Forwarded-Encrypted: i=1; AJvYcCWjbz02H2eiyHUArcyvvA3AhteScSIZUspIVJkC3esPQroWwP3Bj+smVMpEVJZx80D3P/HNqYM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwIs0pnNA3g+DcyYliQRr9FeaFQfpPRjkIm40bqVdrqMHyMNA3E
+	tFhQQlTLfrS8M0lT4OcM+hrv0KKVRhKU28dYCSzDm6xbs0PSpyIPIZm9a9fGDHMJQY5MsjFA3qg
+	EaJsXxdZuET39hain2ERWWwcNYmdbS3UL2T/iNCc5oC0l2ZVF9ZTBrg==
+X-Gm-Gg: ASbGncvLQUT4XTYbQcv/3Vw4Ku++eOfjqA3A2/716sIe+d3Zp7pTjKLQTJfkdpocpnl
+	Q2zyy1sA3xFMGtx72mdQeLV4NbUnbSGfJ1SSYQI6xDU2Nx5FN/Ps3GcMqOK4O5sCEqkVPyIptci
+	Tg08kwimOtDoaVIRxwD1I+EZBYjdZOCNAfN0dAE46bDtUrejbY9LRd5gsUWB4ZomybrXsyj6wKn
+	d8eGbPlFvaXBHV3GQj42pMuHhYSSFGR7lK/iBYsSumyfJo8AiITBtgC/7rJvg1jsa4y1lsKosa4
+	81sP89o/T+Z8/yrKv6oyry69
+X-Received: by 2002:a05:600c:511b:b0:432:d797:404a with SMTP id 5b1f17b1804b1-4389142e0e8mr137251575e9.22.1737448101084;
+        Tue, 21 Jan 2025 00:28:21 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGateLLRqFO6pgBAyQrfwZmzLT+2JUy4zXGwP9C/AUrhSw3hu0TnbxS+msir2bfqh1FkRxhlQ==
+X-Received: by 2002:a05:600c:511b:b0:432:d797:404a with SMTP id 5b1f17b1804b1-4389142e0e8mr137251365e9.22.1737448100733;
+        Tue, 21 Jan 2025 00:28:20 -0800 (PST)
+Received: from [192.168.88.253] (146-241-15-169.dyn.eolo.it. [146.241.15.169])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-437c753bee8sm232299195e9.34.2025.01.21.00.28.19
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 21 Jan 2025 00:28:20 -0800 (PST)
+Message-ID: <32e34de5-70e4-435d-8aed-24f18cfb99e1@redhat.com>
+Date: Tue, 21 Jan 2025 09:28:19 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qMiowMAx+8QRWo9n07QpAA--.29228S2
-X-CM-SenderInfo: 52kd01pxqtx0o6or00hjvr0hdfq/
-X-Coremail-Antispam: 1Uk129KBj93XoW7uF1xCw4Dur1UAr17tr13GFX_yoW8Wr48pr
-	W3Aa4agryYgryIyan8JrZ8ZFyY9rWFg3s7WFWIywsa9a9Yy3sFqFyYqF4jyr13ArZ5KF1a
-	vryjkr48WF1qkwbCm3ZEXasCq-sJn29KB7ZKAUJUUUUx529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUBYb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVWxJr0_GcWl84ACjcxK6I8E87Iv6xkF7I0E14v2
-	6F4UJVW0owAaw2AFwI0_JF0_Jw1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqjxCEc2xF0c
-	Ia020Ex4CE44I27wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_JF0_
-	Jw1lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwI
-	xGrwCY1x0262kKe7AKxVWUAVWUtwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWU
-	JVW8JwCFI7km07C267AKxVWUAVWUtwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4
-	vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IY
-	x2IY67AKxVWUCVW8JwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26c
-	xKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAF
-	wI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7IU8Dl1DUUUUU==
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v6 0/4] Support PTP clock for Wangxun NICs
+To: Jiawen Wu <jiawenwu@trustnetic.com>, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ richardcochran@gmail.com, linux@armlinux.org.uk, horms@kernel.org,
+ jacob.e.keller@intel.com, netdev@vger.kernel.org, vadim.fedorenko@linux.dev
+Cc: mengyuanlou@net-swift.com
+References: <20250121022034.2321131-1-jiawenwu@trustnetic.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250121022034.2321131-1-jiawenwu@trustnetic.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Loongson's GMAC device takes nearly two seconds to complete DMA reset,
-however, the default waiting time for reset is 200 milliseconds
+On 1/21/25 3:20 AM, Jiawen Wu wrote:
+> Implement support for PTP clock on Wangxun NICs.
 
-Signed-off-by: Qunqin Zhao <zhaoqunqin@loongson.cn>
----
- .../net/ethernet/stmicro/stmmac/dwmac-loongson.c    | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+## Form letter - net-next-closed
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-index bfe6e2d631bd..35639d26256c 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-@@ -516,6 +516,18 @@ static int loongson_dwmac_acpi_config(struct pci_dev *pdev,
- 	return 0;
- }
- 
-+static int loongson_fix_soc_reset(void *priv, void __iomem *ioaddr)
-+{
-+	u32 value = readl(ioaddr + DMA_BUS_MODE);
-+
-+	value |= DMA_BUS_MODE_SFT_RESET;
-+	writel(value, ioaddr + DMA_BUS_MODE);
-+
-+	return readl_poll_timeout(ioaddr + DMA_BUS_MODE, value,
-+				  !(value & DMA_BUS_MODE_SFT_RESET),
-+				  10000, 2000000);
-+}
-+
- static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- {
- 	struct plat_stmmacenet_data *plat;
-@@ -566,6 +578,7 @@ static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id
- 
- 	plat->bsp_priv = ld;
- 	plat->setup = loongson_dwmac_setup;
-+	plat->fix_soc_reset = loongson_fix_soc_reset;
- 	ld->dev = &pdev->dev;
- 	ld->loongson_id = readl(res.addr + GMAC_VERSION) & 0xff;
- 
+The merge window for v6.14 has begun. Therefore net-next is closed
+for new drivers, features, code refactoring and optimizations.
+We are currently accepting bug fixes only.
 
-base-commit: 5bc55a333a2f7316b58edc7573e8e893f7acb532
--- 
-2.43.0
+Please repost when net-next reopens after Feb 3rd.
+
+RFC patches sent for review only are obviously welcome at any time.
+
+See:
+https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#development-cycle
 
 
