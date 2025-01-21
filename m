@@ -1,76 +1,95 @@
-Return-Path: <netdev+bounces-160050-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160051-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B3227A17F55
-	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 15:02:50 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 845DEA17F65
+	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 15:06:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A1F523A706C
-	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 14:02:43 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BBA2E7A1896
+	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 14:06:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 166501F192A;
-	Tue, 21 Jan 2025 14:02:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A1A71F3D38;
+	Tue, 21 Jan 2025 14:06:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="IodizcoT"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YVYPwml8"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6057354765;
-	Tue, 21 Jan 2025 14:02:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAEB91F37DB
+	for <netdev@vger.kernel.org>; Tue, 21 Jan 2025 14:05:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737468166; cv=none; b=bVqek8SqkwtRkLsDwBuq+LkIVpm57okXZ+omw65H6y2awV/Zgi1kcZTtZZOol3EvCH6esNEuxXuB90m550hrV42MeGN4JyHd5N99b8ydDdDistIzngd5GSSaoe9WyF9vEvtNr+WRJ8G5wMbbqyAS9R0GBU5ZtQFqZZ9SqyaUqjY=
+	t=1737468361; cv=none; b=BQRCA10m7RRf7Aazn8A0I+cvZODnpsTXipqgaAsc/rZG/Edcz5NIo89sE9e5TQg4y6I3ZA+uWn0QGk81XTf19Cz1aI7afyknTWmUwu13iU+ngDv7QKbV5qUcf4zeCwYT9MgUMuh0UtX6M3FGzhXMek5yTv+dB8kH5/hCBYSwP4k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737468166; c=relaxed/simple;
-	bh=t98D4s6bBXUbrTynpeDozs4iloBf2qil5LWoRx3Nd3g=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RFTUsbDEYaHiNSPxU06sAlpCKUnMfxmXCS7e0FZ/zN6rc18UTxUXy0gAsZ4gCUHdZUZ0c61k2I7Wl1o1baPlW2I5XKsCfzKRebA8cLVp5nguqMH2ZSzC4vb8WEa7G4FU6t5r3x6A0hMtM57pbw73kWC7S/e1Sfk4L7FNST5H5Fg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=IodizcoT; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=+xByHtGpmiYEt5VTgj/OB4PKLKwLNhBfuz1wNDbb7Y4=; b=IodizcoTNecwFi6PuHUId1YthA
-	5ybgPJGI78cXluTfbVp19cba2ykVpc+09pkt6/Z1FEUKl5WBdL4BpSn/9mHPzj8TyMGHfs4aR3Dvq
-	LZ9jzWj3dbiy9BV8zQARkez0ccRBFgXtevepFZ+GKC/tQxPa9FzArEr/fDteLk16RmDc=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1taEpd-006eH5-Bb; Tue, 21 Jan 2025 15:02:17 +0100
-Date: Tue, 21 Jan 2025 15:02:17 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Milos Reljin <milos_reljin@outlook.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, andrei.botila@oss.nxp.com,
-	hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
-	edumazet@google.com, pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, milos.reljin@rt-rk.com
-Subject: Re: [PATCH] net: phy: c45-tjaxx: add delay between MDIO write and
- read in soft_reset
-Message-ID: <0a81c696-5d4e-4e1a-a036-eee001b393b8@lunn.ch>
-References: <AM8P250MB0124A0783965B48A29EFAE6AE11A2@AM8P250MB0124.EURP250.PROD.OUTLOOK.COM>
- <20250120144756.60f0879f@kernel.org>
- <AM8P250MB01249EC410547230AB267A78E1E62@AM8P250MB0124.EURP250.PROD.OUTLOOK.COM>
+	s=arc-20240116; t=1737468361; c=relaxed/simple;
+	bh=GqWPxcBI1O62621uazEkHIma20TC1KqwE5qvtRMqGKs=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=I5rLB+bKNJjLxYUWQYkpksoPek8tNMxSKFqydFgWLTCpYxvmpfjn8+tOgF369wqSFXJG1O8xmf8LFsMIW20FbIzNEvl/VdZuahDgZQVei2WUmX5ow4sbitmPN0eestLZBcGoN9fSnxf6PK0kd3rAc5/EymCj+la1X2a6zCxTg5Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YVYPwml8; arc=none smtp.client-ip=209.85.160.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-46df3fc7176so53852771cf.2
+        for <netdev@vger.kernel.org>; Tue, 21 Jan 2025 06:05:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1737468358; x=1738073158; darn=vger.kernel.org;
+        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=3uFLJiLya/36Gp3wG6AA+3zGGFK9QuSNGii67wdDtbY=;
+        b=YVYPwml8uuZ9V/HkhwL3DaKB21YlQDzfnm5RvfAjjwf2EJhwcOoawp3aQXe1bC2nl2
+         EMaJIhtgk6ahLAAZzx3iCQ60mcNAPdYl/jJq5fHdAT6q/WDq3J3FmlKSZAb7TNhhyhjC
+         9WLU9Eui6jZkEMf+J96KU77GFhEB6RItPewIRKNG9rUFy+z8PVt87ZZDvDf4XYccAIGC
+         vlmMt0ZYqaoyufd6kVVIngdbXArHRdNGTreKLxVkZrqHHGZcw6j1S4Yez61loNIk6XJC
+         mL6C+B7nhLrtoLf2X715hR9wap5I6XFT5XHbMWF0QTujnYwkV8qtYjRerRYhRTV/3hCI
+         MDbg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737468358; x=1738073158;
+        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=3uFLJiLya/36Gp3wG6AA+3zGGFK9QuSNGii67wdDtbY=;
+        b=gb+RDDFMoBj66+5xix4xjdI5MZUlfMB9UCVyXe0p+ehPgD6jgaORqdQzbYevkUoM1X
+         56l7DGAw6jodfjm4FwngyB94Wzt7TkWkZrUA2T2MuUV+70ZiwxD7S2SlRK+VlQ6/Ti7Q
+         7tjGWhVVPKfHowVn2puffsTu+Zg+CEpUYbVFxtH5xXWiaZRhBOLV8VOCF6mV6UIJ1o91
+         sdA+dFKdDWYAnykMmLnx6WiHK3/2e2QxtnvD2JQ2/53yqoJUmjnSiZNJ8Ff3kJ6K4+B+
+         OXpgbH75vv+3fLyDxb0p/figgvwMCz0bUyDTbuOjhGtRgNmwMuxBLVsGWlxBk8gJnKx8
+         YYew==
+X-Gm-Message-State: AOJu0YxfwAGWuxovbXX6fDdcFlf5/JItZudvjZeDlE3E/59sqt6Jhsa0
+	p2W69FEUCMuYtBjUWeM//DvgzsP28LPF4Jfl5slgBMG1W2qq8TnGnIA6wiMvtP2Ti2U17wF13J+
+	HFoJS54NznON/2CFFFRnWDdaPe5DDpFnd
+X-Gm-Gg: ASbGncsZCJ6V1Y1eF6ARSiaRbD2tCkJSZqiN5JtmTU7WB+vKSlYkqOZe/ZePkqIpt3r
+	p7qxJinbZBA352jkVrmptqBLH/uUzAPUu7Poqe4An8pisAO2WDg==
+X-Google-Smtp-Source: AGHT+IEug9yP9b1sn9NbAGS9zAgazrrEMTyiFYcTxPnjI1QtfVeMXukvp8MBKGI4bsXL9PyoxcCIaMxPHiYS3RJR4QI=
+X-Received: by 2002:a05:622a:1116:b0:467:59f6:3e56 with SMTP id
+ d75a77b69052e-46e12b56ef7mr264954941cf.36.1737468358398; Tue, 21 Jan 2025
+ 06:05:58 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <AM8P250MB01249EC410547230AB267A78E1E62@AM8P250MB0124.EURP250.PROD.OUTLOOK.COM>
+From: Ian Kumlien <ian.kumlien@gmail.com>
+Date: Tue, 21 Jan 2025 15:05:47 +0100
+X-Gm-Features: AbW1kvaqp4HSRSALyAHukb7OrzwM9Z8cQ3jsSpSRkp3MfVbVzmUoMGsVEGnI5zk
+Message-ID: <CAA85sZvPWgUdeq+R7t3g5G33TjDR+GmaNx-cCxjc=wtRapUOvg@mail.gmail.com>
+Subject: Question about offload on vlan
+To: Linux Kernel Network Developers <netdev@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-> If you have access to TJA1120's application note (AN13663), page 30
-> contains info on startup timing.
+Hi,
 
-You could summarise what the datasheet says in the commit message. It
-then becomes clear where you got the values from, making a good
-justification.
+A while ago we had a change that propadagetd offloads to bond interfaces, see:
+https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit/?h=v6.12.6&id=c6b9b1f67b6d6d4188a10d0acc9baabea3130fd3
 
-	Andrew
+But, if some offloads are enabled on the bond interface they will not
+propagate down to the vlan interfaces on top of it.  I assume that
+they'd have to be stateless, but i don't know the implementaiton so
+lets say f.ex. the esp offliads? Should they be able to tun on a vlan
+interface?
+
+Or is it the fact that this is a tagged network that causes issues
+with offloads?
+
+Anyway, questions seeking answers =)
 
