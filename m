@@ -1,111 +1,126 @@
-Return-Path: <netdev+bounces-160097-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160098-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 394D8A18208
-	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 17:34:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E519BA18276
+	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 18:01:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 357C23A8242
-	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 16:33:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 361EC3A1769
+	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 17:01:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED99F1F2C4B;
-	Tue, 21 Jan 2025 16:33:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D6F91F428A;
+	Tue, 21 Jan 2025 17:01:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HCAjZ1I+"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="qu9hGiLE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 329B21925AF
-	for <netdev@vger.kernel.org>; Tue, 21 Jan 2025 16:33:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D410B1B394B;
+	Tue, 21 Jan 2025 17:01:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737477235; cv=none; b=jW1TAWfNQiWB6jJeqkKIljs9wfL2EpyPqPampCH+8Oh02r6EeYtNuB689KjzsFkBOqmU3CN18EveiQ/1UOQ5ZSSw6MR7tGaH7JUFS2E07Qz0Vp5163tyobKQbDKXp1gaGgxkhDMPCY6Cv+oYs6KoVLyLaiSMse1e6ZiYIxDBAT4=
+	t=1737478882; cv=none; b=J8E/5GlT/QZdD4AmH3CVn4/C5VQF4Ovhg+LvpbxcnkDj1fJ2uliwa4uOFqlYjpYWOUu+PrQAZ52UgUiY/4KdGhsTnfzIJXaTjKCdbAmQWtKMnn/sK72838IjV6+5eneV9Sg2ol46K4/aQnZt6uaOFD0snnJr5UegtHhJ8Hp5ahY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737477235; c=relaxed/simple;
-	bh=f6B1+Dm9poLs+mWer7ufLv5Ss2ecbBYZfpvFhsrFQak=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Y9BBCTIOC66C6469r2rPgTMnSuRnNhH1L7s3efAPeIpo5pZW151akyKF8zLS/IMbXlf8rp21eWx2pu2FGghQmFhNHcxkxeN57YGpuSHbFiEA9G70PnJAgs58ym+U1G/eOUsRXaQRYSvjt1PXxSs4S2VJXiqJiCcbesRLd51DJe0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HCAjZ1I+; arc=none smtp.client-ip=209.85.208.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-5d88c355e0dso11325654a12.0
-        for <netdev@vger.kernel.org>; Tue, 21 Jan 2025 08:33:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1737477232; x=1738082032; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZdED6c/28R5Wd2NmnaGdbGB7VZbqYu2i5SPv2e68HBU=;
-        b=HCAjZ1I+niL1WIQx67ApIb9y31FohrPPJKF9nJTBiVlYjmNt3h5xOg/1UZqbXsYwMu
-         asaZO+i3qqRUrXr6k8jULzef6wHoJmcHcTmo9EpWKMO5HpenUH8K9tsvRLakZwSp0yqW
-         JZN45i3nl+3Vy5FCrkSP0JKz4UoM+cydXAPN7ax5XDA8nr0U7/LY2DLWAFjzvcrPzRvt
-         6y14oBY11BrzJwwtom5d+y9KrfwwA17Q6IViZ3zQyEVYfrLp6oM1/ly1/+36Vl56PE0S
-         WeHN7xwRQes5CSUnQFKo31C+7+HVHAWuH/VECUzzFBkUvppmzkS1VzUKwHeJ3ARY1mcn
-         G33Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737477232; x=1738082032;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ZdED6c/28R5Wd2NmnaGdbGB7VZbqYu2i5SPv2e68HBU=;
-        b=Y5ncJEhPnByK50Thd9cKq7n6PwDj5wVrILXgiFyu05zurns7rhpi41puaYc18qckyJ
-         mKqu+EFLgZgeygtUolnpBAoh6Fe4FAqvZL6tfBT6R7uHZ8POQm18a+ROef6ArjCq0+ki
-         8UffwdbOWc90xZCwpqsiYbBrVY8w6pel2IiaGiyKJRDKXbZMlqfllebwjEXQmXFGuVO0
-         JiAJyUYBvxg/17YsFPo5xqgItMy+dkObRC/XaDNTd2/AfduExJPuVVXoKewolvTh42yC
-         AG2QB8XgjXIV+mzLbXLrK9BxuYr/zZLSCQGLclPppXjIcvYjUzwXPTH7Lfv5UQG31fpd
-         m7QQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX4v7RvK15L9Z0tAnBvIpG9E+f1AO/UVNKDErriKtJDXRl6Yn9YdCj65rkWhFuIO/zCMwt8o5s=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxFfFz4gnTxovtvclhSM2tt6C+xZf2hKig/YZjTv9zp0m0G/yCR
-	RbSbkbuvT7UqjFijTtxDOeVjqYZ5z2IrqxCELIfOLwSMewLmcTCik9EbCTjyyvy50CGGRhjT432
-	hsnPchTIsFKQcSZap4ymTeTOwDDTaUfQUJH1TEGpkuwK/LAam9w==
-X-Gm-Gg: ASbGncsS6WpSKhsN25h9/kQYMwLu7DU++Wqq8qCte6pYn/xuU4YZFZRBVdnJlmWFgd9
-	J/EdeDsgBCEoNNkIGDE0DMeRZzwqtl3Cf1w7NTnbKGAUmCttWuwY=
-X-Google-Smtp-Source: AGHT+IFyloJvbyPbipYoyrRMhP4LxZS49NfRALBwSPblHYSk8+BeMwLy/18rcC5lOMewJpqcCEPUQDhW7Qo/HFLO+JQ=
-X-Received: by 2002:a05:6402:2342:b0:5d1:2652:42ba with SMTP id
- 4fb4d7f45d1cf-5db7d313997mr17212674a12.16.1737477232317; Tue, 21 Jan 2025
- 08:33:52 -0800 (PST)
+	s=arc-20240116; t=1737478882; c=relaxed/simple;
+	bh=wV7QW7JOBrrj65ggqIu0mtbf36kyZMzyV2RvgHR4ZcY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pcWKr65vY6RxzTPqB41873LHR6eK/J2Y7fhXsNprvW6YTPasqOanTx8RIY6fcopgxKaRrq2Y15xBuH9ST1pMu22SeiNBEUlEeKByjBt3vESQiY2rCLalcl99SfCV4iTfCUTyFsyWw8EStNzbJH6MBAyjifbluVnnn+cRB/tKeAc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=qu9hGiLE; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=7Pnocolf/+FMPBsjA4XKBOck60bqAiKE6Tl4dgyzfRI=; b=qu9hGiLEi/SYW6d2f1eyaAFdCs
+	1qp0YPhycK5jWI/BYvXgioC80c/Q4WXVxCidQ7YVf1kQrT7B3cdzujhe1g7BNEjoZb0oQxDhzuxw+
+	dn0VRXrCxykMPy7+z+08vb44I4S9nuAzxCpnkjyPfaKSN75ZWLb8i2LpNQE6FrwbtW/Y=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1taHcX-006hE0-M8; Tue, 21 Jan 2025 18:00:57 +0100
+Date: Tue, 21 Jan 2025 18:00:57 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: Yijie Yang <quic_yijiyang@quicinc.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, Vinod Koul <vkoul@kernel.org>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konradybcio@kernel.org>,
+	Richard Cochran <richardcochran@gmail.com>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH v3 1/4] dt-bindings: net: ethernet-controller: Correct
+ the definition of phy-mode
+Message-ID: <69954039-96bf-42d9-850d-48676a530ec6@lunn.ch>
+References: <20250121-dts_qcs615-v3-0-fa4496950d8a@quicinc.com>
+ <20250121-dts_qcs615-v3-1-fa4496950d8a@quicinc.com>
+ <20250121140840.18f85323@device-291.home>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250121115010.110053-1-tbogendoerfer@suse.de>
-In-Reply-To: <20250121115010.110053-1-tbogendoerfer@suse.de>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 21 Jan 2025 17:33:40 +0100
-X-Gm-Features: AbW1kvYJBibR8xnvsBoxQdNF96aij6TjqkGT9g0BbYJTIg4RCGvWqHxu6fPmYBc
-Message-ID: <CANn89iJLC-H_zPOoAhEowiL0_viwMOA3qFN273HyEVapwPjvyw@mail.gmail.com>
-Subject: Re: [PATCH v2 net] gro_cells: Avoid packet re-ordering for cloned skbs
-To: Thomas Bogendoerfer <tbogendoerfer@suse.de>
-Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250121140840.18f85323@device-291.home>
 
-On Tue, Jan 21, 2025 at 12:50=E2=80=AFPM Thomas Bogendoerfer
-<tbogendoerfer@suse.de> wrote:
->
-> gro_cells_receive() passes a cloned skb directly up the stack and
-> could cause re-ordering against segments still in GRO. To avoid
-> this queue cloned skbs and use gro_normal_one() to pass it during
-> normal NAPI work.
->
-> Fixes: c9e6bc644e55 ("net: add gro_cells infrastructure")
-> Suggested-by: Eric Dumazet <edumazet@google.com>
-> Signed-off-by: Thomas Bogendoerfer <tbogendoerfer@suse.de>
-> --
-> v2: don't use skb_copy(), but make decision how to pass cloned skbs in
->     napi poll function (suggested by Eric)
-> v1: https://lore.kernel.org/lkml/20250109142724.29228-1-tbogendoerfer@sus=
-e.de/
->
+On Tue, Jan 21, 2025 at 02:08:40PM +0100, Maxime Chevallier wrote:
+> On Tue, 21 Jan 2025 15:54:53 +0800
+> Yijie Yang <quic_yijiyang@quicinc.com> wrote:
+> 
+> > Correct the definition of 'phy-mode' to reflect that RX and TX delays are
+> > added by the board, not the MAC, to prevent confusion and ensure accurate
+> > documentation.
+> 
+> That's not entirely correct though. The purpose of the RGMII variants
+> (TXID, RXID, ID) are mostly to know whether or not the PHY must add
+> internal delays. That would be when the MAC can't AND there's no PCB
+> delay traces. Some MAC can insert delays.
+> 
+> There's documentation here as well on that point :
+> 
+> https://elixir.bootlin.com/linux/v6.13-rc3/source/Documentation/networking/phy.rst#L82
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+This is part of the problem. This describes
+PHY_INTERFACE_MODE_RGMII_*, and the value passed to phylib. The
+documentation even says:
 
-Thanks.
+   The values of phy_interface_t must be understood from the
+   perspective of the PHY device itself,
+
+But the value in DT is about the board as a whole, it describes the
+hardware. Software gets to decide if the MAC or the PHY adds the
+delays, if the board does not provide the delay.
+
+> So, MACs may insert delays. A modification for the doc, if needed,
+> would rather be :
+> 
+> -      # RX and TX delays are added by the MAC when required
+> +      # RX and TX delays are added by the MAC or PCB traces when required
+
+From the perspective of the board, this is wrong. 'rgmii' means the
+board provides the delays.
+
+There is a parallel discussion going on, about how aspeed have also
+got there implementation wrong. See:
+
+https://lore.kernel.org/netdev/0ee94fd3-d099-4d82-9ba8-eb1939450cc3@lunn.ch/
+
+and the test of that thread.
+
+	Andrew
 
