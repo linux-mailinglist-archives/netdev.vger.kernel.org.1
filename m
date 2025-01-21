@@ -1,222 +1,201 @@
-Return-Path: <netdev+bounces-160141-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160142-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5BE2A187CB
-	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 23:40:31 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C292A187CE
+	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 23:41:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6722E188A654
-	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 22:40:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6BD883A3C34
+	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 22:41:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D17BC1F8908;
-	Tue, 21 Jan 2025 22:40:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A338B1F893F;
+	Tue, 21 Jan 2025 22:41:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="A2mvzN+r"
+	dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b="Xfh1/+gJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
+Received: from todd.t-8ch.de (todd.t-8ch.de [159.69.126.157])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9739187FE4;
-	Tue, 21 Jan 2025 22:40:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.14
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737499226; cv=fail; b=OxE7ut4QMgD4cpUJkgGuL8Mv78rMGCjvn8jrJd7vm45esi7o3FzGxQm6hmhned06GEVOorHqZJWjz0b9rMNn/7wWQdRKU1j9aZOz3xu6iKGuetGQ8x/amrFOHR0rLkkuaWI11+pbIBLUzbw5FDvlE5hY2Ip2cKQNe9ZwHMOj+/I=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737499226; c=relaxed/simple;
-	bh=geV5bP1Xjv8vRBxfKvkTShw6ZC0/PfopEgTNCVOzPSA=;
-	h=Date:From:To:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=QtP/6g49RIws5QVowSC8Cpb7KWnHWkFeg0x36uncRKysElO/cA2UEYbduQpzzJI4uzJj7U318QPub4qGFpUhLjBgpHPX7P7TeP3C13O6LSNLoIv18Esn8XWMZFySNpVkeVbUS1GxbsX6Rr0R+YMPejwlrd7YOTHiZuJYWjZPSPo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=A2mvzN+r; arc=fail smtp.client-ip=198.175.65.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1737499225; x=1769035225;
-  h=date:from:to:subject:message-id:references:in-reply-to:
-   mime-version;
-  bh=geV5bP1Xjv8vRBxfKvkTShw6ZC0/PfopEgTNCVOzPSA=;
-  b=A2mvzN+rCWlQQwVsdH3tjHxd4p1YNi+Q/BiqCsT3VHZGeHYj4UqyeFOs
-   OQRx0mRkbIxPuPcbw8/d7/RNj1fo30TmBZBMzts9Zt0NkOHbWy6K09NvR
-   QTeoPM3yD55pGDuEPf0snvpoS8OeRo95A+TftRRjLaRa943EbO58R3taR
-   /ZSFvtPz0PfAY/DWV4IfZC1Q+7o/l1hzvkOAFr/5M2Kl2br0ur54190WB
-   F07v4BH5ydkTGL75gXriKJoZVeTMgbctebfkoJV6Onscww5ZzVPRLINmQ
-   LkSrG7yrKLjMiyR1i8356+VXvfn7gWzFzoFWqIpczWTC4YJHLTQCgcM0d
-   A==;
-X-CSE-ConnectionGUID: SJQFRxzZQPespcRMwp+pLg==
-X-CSE-MsgGUID: 4AkowndKTEu2ir4EW19gbA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11322"; a="41694969"
-X-IronPort-AV: E=Sophos;i="6.13,223,1732608000"; 
-   d="scan'208";a="41694969"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jan 2025 14:40:24 -0800
-X-CSE-ConnectionGUID: XyqZcAVyQiWgcnRbGrOsyA==
-X-CSE-MsgGUID: H+WUWnIjSrSd9xBgRR6YsA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="110971590"
-Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
-  by fmviesa003.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 21 Jan 2025 14:40:23 -0800
-Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
- ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44; Tue, 21 Jan 2025 14:40:23 -0800
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44 via Frontend Transport; Tue, 21 Jan 2025 14:40:23 -0800
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.49) by
- edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.44; Tue, 21 Jan 2025 14:40:22 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=I9JG400zd2FYY0ynUcU70Ilu/Eci0lJH8WjhGlIm3j3WkhqifJfA11eTbITBc6wsq2m37y2rZ6fWB97R+MqfL/+jyxHNSDwc9yK+71MQM4BoLZaAFqQBGZfSXQyHHnA71LdeNbnW6UIEkmbLLhBmWidnZ972RLUMsHwa6p8f519LOX8A52sJbq8FYPz2LjSpo5Cb4tqwZ6bGtQMevAqTy2RmrGH532MbzMzW6AWz7tTQrp5Xq1WTMI1MBsDyNxIiJwIqwXeTWJCR/6rJMe4GUQ8v1ivA8gmuhtxzm3nRK86Mmhkq6p6A8lLMP/foup+cVQeyjIlv+kVbd2DVR1nGaA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=EvWh/vocTUQxz/sTpDMe5g0ZSIzUkLG5Vmr4hGdjjO4=;
- b=awO6rBSPw545kwci2vVUNZB4QOivoQbWnY0vm++QQ/csvhPIVspSI63JyDBbhtHPqHHilCYJZKWNhaU7TBAoWtCPbvAsd6z4APHxhqx8YshUE9rbsxnN5lB5U+UQsa2zO3KDHuKPvtDid6N3Pg4bjWA3o4wn7+cpGyXElPHvaz3Nbl1ILwGji11GDRF7srYx5NkoK3/BUK/Bj5zqtrIS6j5BqQBGbFCfd243dEopoxg12lRnG0Eqdttm519UcPl6ZXuLK0pwenjgPBirQsawv8VUD6buNHW24GPvv0ew82rFVkoKpjVobxfmD42jRWpJ4SzhYK8Sy9LzE7QODU+bcg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from PH8PR11MB8107.namprd11.prod.outlook.com (2603:10b6:510:256::6)
- by CH3PR11MB8495.namprd11.prod.outlook.com (2603:10b6:610:1bd::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8356.21; Tue, 21 Jan
- 2025 22:39:40 +0000
-Received: from PH8PR11MB8107.namprd11.prod.outlook.com
- ([fe80::6b05:74cf:a304:ecd8]) by PH8PR11MB8107.namprd11.prod.outlook.com
- ([fe80::6b05:74cf:a304:ecd8%5]) with mapi id 15.20.8356.020; Tue, 21 Jan 2025
- 22:39:40 +0000
-Date: Tue, 21 Jan 2025 14:39:37 -0800
-From: Dan Williams <dan.j.williams@intel.com>
-To: Alejandro Lucero Palau <alucerop@amd.com>, Dan Williams
-	<dan.j.williams@intel.com>, <alejandro.lucero-palau@amd.com>,
-	<linux-cxl@vger.kernel.org>, <netdev@vger.kernel.org>, <edward.cree@amd.com>,
-	<davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<edumazet@google.com>, <dave.jiang@intel.com>
-Subject: Re: [PATCH v9 03/27] cxl: add capabilities field to cxl_dev_state
- and cxl_port
-Message-ID: <67902229a7e7f_20fa29437@dwillia2-xfh.jf.intel.com.notmuch>
-References: <20241230214445.27602-1-alejandro.lucero-palau@amd.com>
- <20241230214445.27602-4-alejandro.lucero-palau@amd.com>
- <678b05d3419d8_20fa2943@dwillia2-xfh.jf.intel.com.notmuch>
- <7ca6bcac-8649-5534-f581-b36620712002@amd.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <7ca6bcac-8649-5534-f581-b36620712002@amd.com>
-X-ClientProxiedBy: MW4PR04CA0191.namprd04.prod.outlook.com
- (2603:10b6:303:86::16) To PH8PR11MB8107.namprd11.prod.outlook.com
- (2603:10b6:510:256::6)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D788B187FE4;
+	Tue, 21 Jan 2025 22:41:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.69.126.157
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1737499296; cv=none; b=NtlKKg4p77S+4o/lskiY1QByjSBwkDYAdvm18v5mgMcnhbOvvygqZ4L6xiLPUmiWUZ8nEklTzrLVLVy/bnwAbwrb9rewx0XUcG6JiE2sNC6aDQiB/Ao2EGOcwZF3DEERxj7g0bt14ZotZfP5tEu5Xy7c1zjcAT8ko3S/7O0S9fI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1737499296; c=relaxed/simple;
+	bh=GLuR3iyLCe0QvSfmbDZcQKKhX1oOjMzCLBDTwWWtOcA=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=pq944TWpz2FX1AyR9P2Mpwsk2iI0Afvp/SAYUOA6g+ss2+HOyjn+xLMS9xA9fa1PBfCQasOljsXCx7JMS1JEMBPwbryRuKFID/H/3X/IwCZI72qhsf8lyXqWhD5CMkiFKRXHTyZxO+LB5Qf12nzUjjSed9pDI96VXKwsZh8RM4o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=weissschuh.net; spf=pass smtp.mailfrom=weissschuh.net; dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b=Xfh1/+gJ; arc=none smtp.client-ip=159.69.126.157
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=weissschuh.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=weissschuh.net
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=weissschuh.net;
+	s=mail; t=1737499291;
+	bh=GLuR3iyLCe0QvSfmbDZcQKKhX1oOjMzCLBDTwWWtOcA=;
+	h=From:Date:Subject:To:Cc:From;
+	b=Xfh1/+gJp69fCcEt4D1uqAcZRBPVJ5iiZpNHxJzdtPjGGF6gsDRd2IXKLpdWtYBpb
+	 x8BW9YmeNlVPkVPzn74/NX7bRp4lERa7T9RXn0HtiUMvWXG1/tCFU0Qsdrf8t+xumx
+	 DgbKIyzoUbc5tU+wso3bCGKx0t8zoHBTjqDb1qvg=
+From: =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
+Date: Tue, 21 Jan 2025 23:41:24 +0100
+Subject: [PATCH] posix-clock: Explicitly handle compat ioctls
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH8PR11MB8107:EE_|CH3PR11MB8495:EE_
-X-MS-Office365-Filtering-Correlation-Id: b9cfb788-059f-41e3-eb67-08dd3a6c7df7
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014|921020;
-X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?9hnl/gwiWMCQ3ZZFBR6RNtJfWB+2c7/23fdO1yRqZbfSUPSyaE0C6X/sOE8v?=
- =?us-ascii?Q?UwV+k6t6wUiOGk3eXM4cXkUSZdfzEsAjmPFOGLx7naAqMTFpYDpYzDXzjUcV?=
- =?us-ascii?Q?PNMerZVRYs2PImmNj0SwGnEl8nZ1pe57mfz5ngCzcYJECKbKkXUnd2K6mlqf?=
- =?us-ascii?Q?GQjmWHfvkSgmYholbkHPA5iqWworraYJTDqL7wDuG6NwWbyWLBkBV+ImxOq1?=
- =?us-ascii?Q?qZPICfbnBDefAUwAyWsUMFi82fUTidJvKNaGlJqmEVA4Qj1MydPPpMMcbFIw?=
- =?us-ascii?Q?M+7rAt7d4SOCXSd+5t/toWp2gLTSuirN7jWHegk3iwtF33wrIlvcFEC8c5hN?=
- =?us-ascii?Q?SoPw1ct/BdVXLHKYjge0rJvHkFH3Wu+vXle5i3xUWrCzvJdi4ooHWXLjb3uO?=
- =?us-ascii?Q?3fmwfBLnkvEV0gbBaSBeuI6SMjdFnM+m4qRWH/eB+ZWZ0UmXplWBd2FUz+Li?=
- =?us-ascii?Q?xnWHdhWRJ5w6K7sESOwj769rwDC/CbtHrE2nyo05eFebE7Ge4ZCHHx7RqCdL?=
- =?us-ascii?Q?K3cehkphCuD7gixVx2NYV54LIqulVpUS3paLxqDAuEzY5cdQPhAt9i5psGp3?=
- =?us-ascii?Q?pOMjM/ZN5Vtk9P4OrFe/s9j2rfkmeAhXq4RsHqLZPU+io1WGsN82UDxWcZ/S?=
- =?us-ascii?Q?jhC6HrzHdwrivRJLeNLECDVfGYmlp1X/PCDeRdy6FcYXrjy6kByQqF5dXO1+?=
- =?us-ascii?Q?16BG9ieJNWpfuwwdZ7LR1pqwVspyPGFf8ydCn6Zvxbf18fvVeK0RJtHyr8Tt?=
- =?us-ascii?Q?Dyl0JmdzGDhH/SVYIqAV+DZHe9qlBFVzEbP3gmqroe2CeKY8ioDMtup+cHjp?=
- =?us-ascii?Q?P9HyJl3Kg71C7twPrSfbV64bdD4chjXLOWQPCRxJthGkRAAI93/IbBtEDj7J?=
- =?us-ascii?Q?41iCRsx9xXvnZWi5GfZD1VIqfW81Ypir4s2hYiQb54J7umLPNrlEGxhjApWW?=
- =?us-ascii?Q?LRGHmbj65R6BbwXj1kHbNZ94iFTYOP38P4LUWn+1uDwnys+CWs6GTzSNTMAR?=
- =?us-ascii?Q?vVQf3ND8dGsBfIYGjiRpRQihlHvGYkxI6g+B9mPMv9vTOOGns3Os0UlSMUae?=
- =?us-ascii?Q?/5Lkwu0sJX/8r85q7+KvBmFZLpJKFrgnVDLLKi4669IT2iSHY71KnE8lfqph?=
- =?us-ascii?Q?IhT48usI+6HpCqc83lb4+n3NYoT7XjtLUwckuxlp0juSQqxhJAxgmkQZggaF?=
- =?us-ascii?Q?eka8zD+U0mFkhh1no750Glz2cappuKsXZOKxrmPKv3OpIdEqpbtQj9muAva7?=
- =?us-ascii?Q?GWiJCxZkYdLyBE0stzAPzWlNZ69lib8yBQM8j2z1Fk4lXPOtkwxkKa8rWDDn?=
- =?us-ascii?Q?g05hbJxGG1Aebt0hsnp7fVSduFd2vB7uJjxwlTf3069gVQo7CSwN9leKlPOI?=
- =?us-ascii?Q?02hmLJiWmJVzhIVOqR2qEULPNtvZEdl08FqM46KhzoUvGEDAIcrqqzaPjssI?=
- =?us-ascii?Q?XCbYyvy2ipE=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH8PR11MB8107.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(921020);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?HwBmg2a+TzmFVXwH41Yqt1m7QfbooiWW9OJ4dPxd8DSI0UQQqKcRJ1E01RlQ?=
- =?us-ascii?Q?l+EBhqfHOMVULL15IV/Ec9QKyyxr1+KqHGXO3H+SmajUfaAZKkOYp1jox7+c?=
- =?us-ascii?Q?TUT3378A7gIeMjdvZhx6DEgwePTxCyHAzoDnibk4BiUyj14DPgkGuKpmjJzy?=
- =?us-ascii?Q?SBk/XvGUKhlEvzkO9i6Y1MGDZGzU2tl4qvIx/cdLxVtGrkej4loKKqtOeVjb?=
- =?us-ascii?Q?K122OVfEfjoMC41aCk7tYdku4cIf1LM2vLcU7A8d+pjotPUWaTzerdpsIQeD?=
- =?us-ascii?Q?n19c5qivnSLR2e0888nACzpLexQ49F272R6tWFvkj66WTMcpER5hFA2mXLOe?=
- =?us-ascii?Q?K3kj3eS0tvQ1R8d5LGw5drdwCDgderwLIUUjR8QvkA2SbumgqdcHygyID9WO?=
- =?us-ascii?Q?frPXUYhAJiq+//d4mJ8EAdHvtxUgPSeEAuMvespn/1WohK+ILpdLtn9VLBBq?=
- =?us-ascii?Q?ToXzO3vb6AbRVD0f96x1swmRX4/DpYR2U3F2sQYNXl996r1IUW2e5DMwIgsp?=
- =?us-ascii?Q?hDlQ6N/EY3U1HJ8jP5iJaC8Xp9nkRGAQxchi6pvzNW1EjMZQchOGH1U4TrBJ?=
- =?us-ascii?Q?1lvxQxmvA30sXUmMHi7cjX4Uah93j3sUzJcismAbQV5GUa2hpU5Thc5jKxua?=
- =?us-ascii?Q?IBJ/Zokm0nmd9ksQJCi8NZGvFzMnkLOFVrTo+Iuaf+TimKgI/e+V48n13ESN?=
- =?us-ascii?Q?r6E/F60gQ/AoWDAII8zrEOiDgTeeVN1YqLy+vgoBgKQhILYdInrehCNCCS0T?=
- =?us-ascii?Q?xKebFqbFMAFuassGudGRwTiI1sbSblZ+tSqKmvipdDJM6dXGNQU2R6wb7kNp?=
- =?us-ascii?Q?EYFy0UMy8iEqpYE0MM0p6pmgqkj4II20LqBCJbREhiVEZzqOuBLUJ51r0S6O?=
- =?us-ascii?Q?UQSB8j2Nl3giLVG3O/1dgXh2xv3ynDciMAuaCqp+kfY4xP4gkflgGiOpB1d4?=
- =?us-ascii?Q?aDE4bb/1LpaHt0ZK5IQ3gsVgoR6mMeh4QlWf+eX6GaIZvHqJSEWQU0PtHIIh?=
- =?us-ascii?Q?ZoYnK9/+WW5m/kpN3J2TPUJSlvOy2GNwY1zPefUDfUtL4tN6Acmcrlzn/lMo?=
- =?us-ascii?Q?4IUStUX9eN36u7ZphVNF1dhMlRYBPlGvMDX/FF+PqrPRgZ/rELzCCWR+zz/v?=
- =?us-ascii?Q?QRVEY1WnKAVtyDrsYYbhAMGw06md06sn5YXFVpOl8098Sl7qCSbx5JzpYKfm?=
- =?us-ascii?Q?TW5NGc8KBssa6l23HanbBZ4Wq4K9OsuMeskI/Fn1hld0lKMrZoxVHK/sx5Ht?=
- =?us-ascii?Q?ROEPBRDQ4Qzdngl9/Mv2Z5SsNUq9K4sb2nAgs7qO23435uqdvhW2nSd4kTkw?=
- =?us-ascii?Q?ST1dZ+RUgejgRfpfk+Q9Ix6HEs/uPor8E7eb4GsxS0iqjhtDm3LSSvgfgkBx?=
- =?us-ascii?Q?Yy1O3P3vaj6EV6taaVnkTp3IHvhKZXAp4OrzG1HX2SbPO8S6lA5MCVHkd3rB?=
- =?us-ascii?Q?nOBeDTwRBtcG6d9bsjdNET0Km3IO1A+Vnfl2W8xpOiJz+UmCaunSlAJG3sdg?=
- =?us-ascii?Q?v/DCl2zpWxnA5n3SO2suZUbbgMQFBLSD7o5aO4HaaZJwsxdrOB1vBHkRyHqN?=
- =?us-ascii?Q?8W/BXrA0pwOhK7XIpvDoqfNit6K06Nm1ZE/WeRBKz+6vNyJyh7B23obMmB9r?=
- =?us-ascii?Q?Jw=3D=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: b9cfb788-059f-41e3-eb67-08dd3a6c7df7
-X-MS-Exchange-CrossTenant-AuthSource: PH8PR11MB8107.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Jan 2025 22:39:40.2148
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: wPayEjdI/LH/I31SKgEMONrjDT5xtBpwAImfOjQS3q8y393njwBo5yxGtJ2KPFgIwoaPnAuyI7SkTU2Kq2MKbSzZ1qB8YdlWZaDPLGd1w3s=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR11MB8495
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Message-Id: <20250121-posix-clock-compat_ioctl-v1-1-c70d5433a825@weissschuh.net>
+X-B4-Tracking: v=1; b=H4sIAJMikGcC/x3MywqEMAxA0V+RrCfQ+gL9FRmkZqIGHymtiCD+u
+ 2WWZ3HvDZGDcIQ2uyHwKVF0T7CfDGh2+8Qov2TITV4Zawr0GuVCWpUWJN28O3pROlZs6nFwVJW
+ NLWtIuQ88yvVfd9/neQFDRAHlagAAAA==
+X-Change-ID: 20250103-posix-clock-compat_ioctl-96fbac549146
+To: Richard Cochran <richardcochran@gmail.com>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Anna-Maria Behnsen <anna-maria@linutronix.de>, 
+ Frederic Weisbecker <frederic@kernel.org>, 
+ Thomas Gleixner <tglx@linutronix.de>, John Stultz <johnstul@us.ibm.com>, 
+ Arnd Bergmann <arnd@arndb.de>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Cyrill Gorcunov <gorcunov@gmail.com>, stable@vger.kernel.org, 
+ =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1737499290; l=4605;
+ i=linux@weissschuh.net; s=20221212; h=from:subject:message-id;
+ bh=GLuR3iyLCe0QvSfmbDZcQKKhX1oOjMzCLBDTwWWtOcA=;
+ b=+kJt32CCzU0y4gID7601FKEg23cAx9xVrBMbPcTKEYy5GQwd6LgSXa/oAUIpf3rgsEKlZuzAz
+ CQ5XnQeDO2YDCM/NnevupuHa6rwPz5Kok0QPMb2CKfIz4qrq1Ol0I6/
+X-Developer-Key: i=linux@weissschuh.net; a=ed25519;
+ pk=KcycQgFPX2wGR5azS7RhpBqedglOZVgRPfdFSPB1LNw=
 
-Alejandro Lucero Palau wrote:
-[..]
-> > I do not understand the rationale for a capability bitmap. There is
-> > already a 'valid' flag in 'struct cxl_reg_map' for all register blocks.
-> > Any optional core functionality should key off those existing flags.
-> 
-> 
-> The current code is based on Type3 and the registers and capabilities 
-> are defined as mandatory, I think except RAS.
-> 
-> With Type2 we have optional capabilities like mailbox and hdm, and the 
-> code probing the regs should not make any assumption about what should 
-> be there.
-> 
-> With this patchset the capabilities to expect are set by the accel 
-> driver and compared with those discovered when probing CXL regs. 
-> Although the capabilities check could use the cxl_reg_map, I consider it 
-> is convenient to have a capability bitmap for keeping those discovered 
-> and easily checking them against those expected by the accel driver, and 
-> reporting them (if necessary) as well without further processing.
+Pointer arguments passed to ioctls need to pass through compat_ptr() to
+work correctly on s390; as explained in Documentation/driver-api/ioctl.rst.
+Plumb the compat_ioctl callback through 'struct posix_clock_operations'
+and handle the different ioctls cmds in the new ptp_compat_ioctl().
 
-That is just on-loading redundancy to the core data structure for a
-workalike way of checking the available register blocks. The 'struct
-cxl_reg_map' already tracks this, the only needed change is to move the
-responsibility for validating those bits to the driver. That work is
-nearly identical to teaching the driver to inject a capability bitmask,
-but more flexible for the case where the driver wants to optionally
-enable functionality. In that latter case it will end up checking the
-valid-bits anyway.
+Using compat_ptr_ioctl is not possible.
+For the commands PTP_ENABLE_PPS/PTP_ENABLE_PPS2 on s390
+it would corrupt the argument 0x80000000, aka BIT(31) to zero.
+
+Fixes: 0606f422b453 ("posix clocks: Introduce dynamic clocks")
+Fixes: d94ba80ebbea ("ptp: Added a brand new class driver for ptp clocks.")
+Cc: stable@vger.kernel.org
+Signed-off-by: Thomas Weißschuh <linux@weissschuh.net>
+---
+ drivers/ptp/ptp_chardev.c   | 18 ++++++++++++++++++
+ drivers/ptp/ptp_clock.c     |  1 +
+ drivers/ptp/ptp_private.h   |  7 +++++++
+ include/linux/posix-clock.h |  3 +++
+ kernel/time/posix-clock.c   |  4 ++--
+ 5 files changed, 31 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/ptp/ptp_chardev.c b/drivers/ptp/ptp_chardev.c
+index ea96a14d72d141a4b255563b66bac8ed568b45e9..704af620c1173c12ee26b3b6c7982693e3c4c21f 100644
+--- a/drivers/ptp/ptp_chardev.c
++++ b/drivers/ptp/ptp_chardev.c
+@@ -4,6 +4,7 @@
+  *
+  * Copyright (C) 2010 OMICRON electronics GmbH
+  */
++#include <linux/compat.h>
+ #include <linux/module.h>
+ #include <linux/posix-clock.h>
+ #include <linux/poll.h>
+@@ -507,6 +508,23 @@ long ptp_ioctl(struct posix_clock_context *pccontext, unsigned int cmd,
+ 	return err;
+ }
+ 
++#ifdef CONFIG_COMPAT
++long ptp_compat_ioctl(struct posix_clock_context *pccontext, unsigned int cmd,
++		      unsigned long arg)
++{
++	switch (cmd) {
++	case PTP_ENABLE_PPS:
++	case PTP_ENABLE_PPS2:
++		/* These take in scalar arg, do not convert */
++		break;
++	default:
++		arg = (unsigned long)compat_ptr(arg);
++	}
++
++	return ptp_ioctl(pccontext, cmd, arg);
++}
++#endif
++
+ __poll_t ptp_poll(struct posix_clock_context *pccontext, struct file *fp,
+ 		  poll_table *wait)
+ {
+diff --git a/drivers/ptp/ptp_clock.c b/drivers/ptp/ptp_clock.c
+index 77a36e7bddd54e8f45eab317e687f033f57cc5bc..dec84b81cedfd13bcf8c97be6c3c27d73cd671f6 100644
+--- a/drivers/ptp/ptp_clock.c
++++ b/drivers/ptp/ptp_clock.c
+@@ -180,6 +180,7 @@ static struct posix_clock_operations ptp_clock_ops = {
+ 	.clock_getres	= ptp_clock_getres,
+ 	.clock_settime	= ptp_clock_settime,
+ 	.ioctl		= ptp_ioctl,
++	.compat_ioctl	= ptp_compat_ioctl,
+ 	.open		= ptp_open,
+ 	.release	= ptp_release,
+ 	.poll		= ptp_poll,
+diff --git a/drivers/ptp/ptp_private.h b/drivers/ptp/ptp_private.h
+index 18934e28469ee6e3bf9c9e6d1a1adb82808d88e6..13999a7af47a7b67ae8dc549351fbafef2ae402f 100644
+--- a/drivers/ptp/ptp_private.h
++++ b/drivers/ptp/ptp_private.h
+@@ -133,6 +133,13 @@ int ptp_set_pinfunc(struct ptp_clock *ptp, unsigned int pin,
+ long ptp_ioctl(struct posix_clock_context *pccontext, unsigned int cmd,
+ 	       unsigned long arg);
+ 
++#ifdef CONFIG_COMPAT
++long ptp_compat_ioctl(struct posix_clock_context *pccontext, unsigned int cmd,
++		      unsigned long arg);
++#else
++#define ptp_compat_ioctl NULL
++#endif
++
+ int ptp_open(struct posix_clock_context *pccontext, fmode_t fmode);
+ 
+ int ptp_release(struct posix_clock_context *pccontext);
+diff --git a/include/linux/posix-clock.h b/include/linux/posix-clock.h
+index ef8619f489203eeb369ae580fc4d4b2439c94ae9..8bdc7aec5f7979c42752a233077620818d15acdd 100644
+--- a/include/linux/posix-clock.h
++++ b/include/linux/posix-clock.h
+@@ -54,6 +54,9 @@ struct posix_clock_operations {
+ 	long (*ioctl)(struct posix_clock_context *pccontext, unsigned int cmd,
+ 		      unsigned long arg);
+ 
++	long (*compat_ioctl)(struct posix_clock_context *pccontext, unsigned int cmd,
++			     unsigned long arg);
++
+ 	int (*open)(struct posix_clock_context *pccontext, fmode_t f_mode);
+ 
+ 	__poll_t (*poll)(struct posix_clock_context *pccontext, struct file *file,
+diff --git a/kernel/time/posix-clock.c b/kernel/time/posix-clock.c
+index 1af0bb2cc45c0aab843f77eb156992de469c8fb9..63184d92ef139c3fb9254745619ebca120fecce6 100644
+--- a/kernel/time/posix-clock.c
++++ b/kernel/time/posix-clock.c
+@@ -101,8 +101,8 @@ static long posix_clock_compat_ioctl(struct file *fp,
+ 	if (!clk)
+ 		return -ENODEV;
+ 
+-	if (clk->ops.ioctl)
+-		err = clk->ops.ioctl(pccontext, cmd, arg);
++	if (clk->ops.compat_ioctl)
++		err = clk->ops.compat_ioctl(pccontext, cmd, arg);
+ 
+ 	put_posix_clock(clk);
+ 
+
+---
+base-commit: 0bc21e701a6ffacfdde7f04f87d664d82e8a13bf
+change-id: 20250103-posix-clock-compat_ioctl-96fbac549146
+
+Best regards,
+-- 
+Thomas Weißschuh <linux@weissschuh.net>
+
 
