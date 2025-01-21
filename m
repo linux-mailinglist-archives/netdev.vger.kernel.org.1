@@ -1,75 +1,95 @@
-Return-Path: <netdev+bounces-159899-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159900-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A63EA17560
-	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 02:04:51 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A7E45A17566
+	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 02:10:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0A4F83A9F8D
-	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 01:04:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D6A8C1889C6F
+	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 01:10:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C605420DF4;
-	Tue, 21 Jan 2025 01:04:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 018262C6A3;
+	Tue, 21 Jan 2025 01:10:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WH/mKDMo"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nY5Uusms"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 980027464;
-	Tue, 21 Jan 2025 01:04:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD3D48831;
+	Tue, 21 Jan 2025 01:10:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737421486; cv=none; b=o8EDlYncoQfaKkJQ7IqfLfdSk+hiM2jTTHidaSrCJdl4lwADye6H1tTgiRLPVk/V4iziv4vWBo2snH83nJRPxx7hWk39wKIf09Ek4BTcKK6RiFJtLaVR6B0F1pj9IiKZDv4WqGAftHxhANYtxLZfaYAD9UqMTsxVG0Nng/XMwmQ=
+	t=1737421807; cv=none; b=j6lb1lELACZKwHK8i8+UyMEhqFzxh9MoYF8AkQHfufvvhU9CZipolpa0QmdZltFVCEsRF1/sjNqftduMweb8IRgvs+CMFb4ZAqNdDyTrJszZsVAi5ozcM2WglZ1eHLilkRv46LjWNtxGue7q8UVaRE4xfJtRr/gpJVVOlsJJlnw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737421486; c=relaxed/simple;
-	bh=41fV2LyyQENdncIHSowB0rUO0K9rkbPCy1KcLAcGsvs=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=HOdeFAkL5amtwuoAtSS+fM68RShLiFVYwkmX1NjvkH0DZGCX1ITd/LC3pJLYKklHDUO1WvSqeAE7R2oGCJpBB8DYXe9cO6SokptuI2vGq99ErIZA+jwaedJ6ceBl2k8HB70qV7ks1OkHod/gvASzwr4g7xwzxCHcyL0Ao8vHQuU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WH/mKDMo; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7F61FC4CEDD;
-	Tue, 21 Jan 2025 01:04:45 +0000 (UTC)
+	s=arc-20240116; t=1737421807; c=relaxed/simple;
+	bh=zPO4duhBKb6fFaXj2aXHiDNik7bn4YYaXv62DXkF+Ro=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=smjkkWs3GHXy0Ag0zM6nFDFMltOqhqYRD10WxZSVt3YiqQtxVqU9pvm8lJjdYCXDe1TFOtuoWOespyXRvCiutEY2fTYPCgnaa3i+aKvhw7V1JmpGX47Xw72Xji91bV6wSzBT+zfdcUT6geqW1jy5otsPotV0+MRcjwOs2sxgtcE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nY5Uusms; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A504C4CEDD;
+	Tue, 21 Jan 2025 01:10:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737421486;
-	bh=41fV2LyyQENdncIHSowB0rUO0K9rkbPCy1KcLAcGsvs=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=WH/mKDMogQtPEr8Les67b7Sik0cbDTQj2yUPjDd6jOma9hSxqUKzSL8PmLaXttWjC
-	 MjHr6tqhvkuXcvWJGFY+LWD4f/SnwfIu+xYWEazo/RsmVr2Y86rbBNNYwD9AHAIy+P
-	 g4iuoAsgaumFfXDSpwJ53D0AeFxDjHfLuNj2bES+Gz9/HTd1BY+h9o7hhrL2FFzT0S
-	 kxdubGIZne0++p4cvM5P/np41LZfk7VgNjZJHnuQL5hnM9+ub4OEh7Q605/xM3ccpw
-	 ZWN5AePt7PfpIE7rXPryL+UyMTz8rbP+KwyWzsjNHf7zMpX8FWsdPgQ/8OHfnx1kwS
-	 U61gPgOPi4GlQ==
-Date: Mon, 20 Jan 2025 17:04:44 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Harshit Mogalapalli <harshit.m.mogalapalli@oracle.com>
-Cc: Marcin Wojtas <marcin.s.wojtas@gmail.com>, Andrew Lunn
- <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Francois
- Romieu <romieu@fr.zoreil.com>, Kuniyuki Iwashima <kuniyu@amazon.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- dan.carpenter@linaro.org, kernel-janitors@vger.kernel.org,
- error27@gmail.com
-Subject: Re: [PATCH] net: mvneta: fix locking in mvneta_cpu_online()
-Message-ID: <20250120170444.4e9128ff@kernel.org>
-In-Reply-To: <8abc7eed-028e-4fe3-a319-e0936c6bf9e7@oracle.com>
-References: <20250121005002.3938236-1-harshit.m.mogalapalli@oracle.com>
-	<8abc7eed-028e-4fe3-a319-e0936c6bf9e7@oracle.com>
+	s=k20201202; t=1737421807;
+	bh=zPO4duhBKb6fFaXj2aXHiDNik7bn4YYaXv62DXkF+Ro=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=nY5UusmsQAlzzlqhg/4AnYFc+0GqPU9NRpJLYMryRBegON2yl9Z1rCboh3lUwbD5k
+	 bkrv3mk4fyklwLsexHEG5/dh//8CzFwnyeL7oJINVrPkRACg/NyVwfjRM1m9mTBhMi
+	 UdnfGYRbT9VqtuPvp/D8BNJCoN6aD+lir3E0zp4o+XRvMD0hdCrOsNho9wm7d9FtHE
+	 tyAQXrm6hbLlamqlc2fPvyp799u9sEzrgW9pncS4uxqRRoljGJRLQT22G+G2HSGK3y
+	 ED+LArzss19JPfLcHWKKf28p9Nip2HGyYA9uN9KTFz0ggR+vCAduH9usbS2rPuIG8L
+	 3LSNXqYCfqxpg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70D13380AA62;
+	Tue, 21 Jan 2025 01:10:32 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] net/rose: prevent integer overflows in rose_setsockopt()
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <173742183130.3698671.13583555893820567462.git-patchwork-notify@kernel.org>
+Date: Tue, 21 Jan 2025 01:10:31 +0000
+References: <20250115164220.19954-1-n.zhandarovich@fintech.ru>
+In-Reply-To: <20250115164220.19954-1-n.zhandarovich@fintech.ru>
+To: Nikita Zhandarovich <n.zhandarovich@fintech.ru>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, horms@kernel.org, linux-hams@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ lvc-project@linuxtesting.org, stable@vger.kernel.org
 
-On Tue, 21 Jan 2025 06:23:16 +0530 Harshit Mogalapalli wrote:
-> On 21/01/25 06:20, Harshit Mogalapalli wrote:
-> > When port is stopped, unlock before returning
-> >   
-> Missed adding a period at the end of sentence. Should I send a V2 ?
+Hello:
 
-It's alright, we can add the period when applying.
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Wed, 15 Jan 2025 08:42:20 -0800 you wrote:
+> In case of possible unpredictably large arguments passed to
+> rose_setsockopt() and multiplied by extra values on top of that,
+> integer overflows may occur.
+> 
+> Do the safest minimum and fix these issues by checking the
+> contents of 'opt' and returning -EINVAL if they are too large. Also,
+> switch to unsigned int and remove useless check for negative 'opt'
+> in ROSE_IDLE case.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net] net/rose: prevent integer overflows in rose_setsockopt()
+    https://git.kernel.org/netdev/net/c/d640627663bf
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
