@@ -1,189 +1,261 @@
-Return-Path: <netdev+bounces-160021-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160022-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1EECA17D3D
-	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 12:50:21 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E710A17D40
+	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 12:51:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CD49C3A574F
-	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 11:50:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D0071163459
+	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 11:51:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F39B1F1503;
-	Tue, 21 Jan 2025 11:50:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54C3F1EEA46;
+	Tue, 21 Jan 2025 11:51:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="iRQ5NKOm";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="84/+LszD";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="zF6jtSxI";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="HL/fE1JG"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="ionYYaPk";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="jnnnw6AX";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="ionYYaPk";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="jnnnw6AX"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BED41B425A;
-	Tue, 21 Jan 2025 11:50:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5733E15098A;
+	Tue, 21 Jan 2025 11:51:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737460220; cv=none; b=YKF9zY95q995BPrUcMwX06SU+P7dIBCjV4IMoh/n4DFaey0+6Vjk5hn5vU8MusINpOo9YE79IwxO5xwBz5xbXcc7mxwB0vtt6tROCsW1Bu7cDrtikGeFvsmJmm26y/TBTPwsXS5ksn2QYoBl9aOANPIsA2+uS7VykEiOmEEpg/0=
+	t=1737460296; cv=none; b=LNAELfW1q7H1cDMDfqQ8osJIoY458/X3FEdv+k/la2a2nGVCeKbEzadmLVIV/JE73e56Im6wF4yN4/FOS74ReZTlxb7RmP+IyHTwCX3txRnuFQHcnxMWjrLjweKEufpDYOppZQwZ7wfJnpyWLw041sAJ2zzrqd1sUDZcW6AC3hg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737460220; c=relaxed/simple;
-	bh=krRyIIq1b6LjmqE5sDNCCZHNDPnhWSO/speX8aWbfTo=;
-	h=From:To:Subject:Date:Message-Id:MIME-Version; b=mfFLLoqEyNSs5cCf4Mbb8z8OAQU9FZ4ViglTqh/oRYylIWUsCZv1k33bNPkCjk5SeNXYB8JHOlIZVWXc2ARL+Cyv76kjgWV5mxMwWZog8ibK3s7uEV57NCaGHcDRxoTAmoRz6z14T2Dpn5kwJpLWiVkgB9wfwavmdei4Dx3BxyE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=iRQ5NKOm; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=84/+LszD; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=zF6jtSxI; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=HL/fE1JG; arc=none smtp.client-ip=195.135.223.130
+	s=arc-20240116; t=1737460296; c=relaxed/simple;
+	bh=uRE6i9z0g4n7pVrn/oGYsUh24uDrC3hJ56CgkpTLQug=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=jxVR8QhBXzh3/93SdluOpqZHFxcpbYMUGU5MXuk+8f57MAS7j2tnUT5xnThKD9RYesUNUAl75aBod3fcDlw5b/WeOUV/roMzrKaUL/5AayTjFdPTT3RtGRgNZn+sTv9LGErNFqK4XpTkcLw6i+nB64oG6eK/rbLgtvveUSDZvAk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=ionYYaPk; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=jnnnw6AX; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=ionYYaPk; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=jnnnw6AX; arc=none smtp.client-ip=195.135.223.131
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id E4B8421176;
-	Tue, 21 Jan 2025 11:50:14 +0000 (UTC)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 6086F1F397;
+	Tue, 21 Jan 2025 11:51:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1737460216; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=RIWrS1/5RhMOeOfyBh8+VB7f7ZgJUSbWeTNLGa7fnI8=;
-	b=iRQ5NKOmY9RT/DQqQX2KQUfpUwMBybiZKXoDHZKq1XQnJWMN4nI0F9SIPqaEKQvJrzsisE
-	zB8kXS7SDFHIrRiCJJRmc5CE1fjaIQMfLhU6chchokWQYNeVAmEW0iQXy+Xz9xq3WtiDeC
-	/qSv0s19Fr5t+Fn655sHsIilsAgheaE=
+	t=1737460292; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Bb+NLZ795qX3bqAQX1h71DvcPTGfIXH1iYgp38cxjM8=;
+	b=ionYYaPkQwuYlS9abMD5KhDCfPI1UrBSvhCpcmvBtItyj1zCZP9NZGrloFzoQ5FlcpB8i6
+	/YSpp23FV6DvmzGwRhZx412dlA+c156a1VKJ8O1vipHt/xQf04Z3f2pObITIccc8wNxAki
+	JPTmFfijb6Q/J49A9WDhC9itxMlFWBc=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1737460216;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=RIWrS1/5RhMOeOfyBh8+VB7f7ZgJUSbWeTNLGa7fnI8=;
-	b=84/+LszDSb2GmQdgY5us5C6uP6sqSMQaygvnWg8jU9etHmqxTF6X+rOKQfj5aECYa4qvCc
-	Tt4u7Bm2ZxXHcMAw==
-Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=zF6jtSxI;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b="HL/fE1JG"
+	s=susede2_ed25519; t=1737460292;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Bb+NLZ795qX3bqAQX1h71DvcPTGfIXH1iYgp38cxjM8=;
+	b=jnnnw6AXFztbk0uCDaTW+49tUuYCFnKAglGIe3GxuLofiXIhQalb1EQbsQhDm/qJ9OUZy6
+	PLbLCG1TMlWuiRAA==
+Authentication-Results: smtp-out2.suse.de;
+	none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1737460214; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=RIWrS1/5RhMOeOfyBh8+VB7f7ZgJUSbWeTNLGa7fnI8=;
-	b=zF6jtSxI4Eb59CiZutR9AinyVoIf4QqFhunF4YlItaJ1MW2xvawzGa4qHzDeyl5okjJhys
-	1uWdRQxvGxvyDrG94StrWLk/377o8oO/XwsfXuIJs+E6ROTHIiGCBb2xDD3k32TNCFysl4
-	mhmYfavBAvhVfFgiy8HF3cI5WTKT2Vw=
+	t=1737460292; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Bb+NLZ795qX3bqAQX1h71DvcPTGfIXH1iYgp38cxjM8=;
+	b=ionYYaPkQwuYlS9abMD5KhDCfPI1UrBSvhCpcmvBtItyj1zCZP9NZGrloFzoQ5FlcpB8i6
+	/YSpp23FV6DvmzGwRhZx412dlA+c156a1VKJ8O1vipHt/xQf04Z3f2pObITIccc8wNxAki
+	JPTmFfijb6Q/J49A9WDhC9itxMlFWBc=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1737460214;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=RIWrS1/5RhMOeOfyBh8+VB7f7ZgJUSbWeTNLGa7fnI8=;
-	b=HL/fE1JGnn5QnG0FMrbBms4Ft3YGQnps2ESwHF8qSOjp1TXy0mSvybvtcYmwlpQtGNdY6w
-	nwDtCe1H/ERcINCA==
+	s=susede2_ed25519; t=1737460292;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Bb+NLZ795qX3bqAQX1h71DvcPTGfIXH1iYgp38cxjM8=;
+	b=jnnnw6AXFztbk0uCDaTW+49tUuYCFnKAglGIe3GxuLofiXIhQalb1EQbsQhDm/qJ9OUZy6
+	PLbLCG1TMlWuiRAA==
 Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id D070813963;
-	Tue, 21 Jan 2025 11:50:14 +0000 (UTC)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 3712713963;
+	Tue, 21 Jan 2025 11:51:32 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
 	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id S9vAMvaJj2exDAAAD6G6ig
-	(envelope-from <tbogendoerfer@suse.de>); Tue, 21 Jan 2025 11:50:14 +0000
+	id KHpsDESKj2e3JAAAD6G6ig
+	(envelope-from <tbogendoerfer@suse.de>); Tue, 21 Jan 2025 11:51:32 +0000
+Date: Tue, 21 Jan 2025 12:51:30 +0100
 From: Thomas Bogendoerfer <tbogendoerfer@suse.de>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 net] gro_cells: Avoid packet re-ordering for cloned skbs
-Date: Tue, 21 Jan 2025 12:50:10 +0100
-Message-Id: <20250121115010.110053-1-tbogendoerfer@suse.de>
-X-Mailer: git-send-email 2.35.3
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+ <horms@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] gro_cells: Avoid packet re-ordering for cloned skbs
+Message-ID: <20250121125130.5a909e84@samweis>
+In-Reply-To: <CANn89iLLWZ3v46KfCuHKzskQb58tW2mp0d-uibX_GV+=ZG9iUA@mail.gmail.com>
+References: <20250109142724.29228-1-tbogendoerfer@suse.de>
+	<CANn89iKY1x11hHgQDsVtTYe6L_FtN4SKpzFhPk-8fYPp5Wp4ng@mail.gmail.com>
+	<20250113122818.2e6292a9@samweis>
+	<CANn89iL-CcBxQUvJDn7o2ETSBnwf047hXJEf=q=O3m+qAenPFw@mail.gmail.com>
+	<20250120153156.6bff963c@samweis>
+	<CANn89iLLWZ3v46KfCuHKzskQb58tW2mp0d-uibX_GV+=ZG9iUA@mail.gmail.com>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-suse-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: E4B8421176
-X-Spam-Score: -3.01
-X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-3.01 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	MID_CONTAINS_FROM(1.00)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_MISSING_CHARSET(0.50)[];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	ARC_NA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	RCVD_TLS_ALL(0.00)[];
-	DKIM_TRACE(0.00)[suse.de:+];
-	RCVD_COUNT_TWO(0.00)[2];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	ASN(0.00)[asn:25478, ipnet:::/0, country:RU];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:dkim,suse.de:mid,suse.de:email,imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo]
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
-X-Spam-Flag: NO
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 X-Spam-Level: 
+X-Spamd-Result: default: False [-3.80 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_RHS_NOT_FQDN(0.50)[];
+	NEURAL_HAM_SHORT(-0.20)[-0.998];
+	MIME_GOOD(-0.10)[text/plain];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ARC_NA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	RCVD_TLS_ALL(0.00)[];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	TO_DN_SOME(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email,imap1.dmz-prg2.suse.org:helo]
+X-Spam-Score: -3.80
+X-Spam-Flag: NO
 
-gro_cells_receive() passes a cloned skb directly up the stack and
-could cause re-ordering against segments still in GRO. To avoid
-this queue cloned skbs and use gro_normal_one() to pass it during
-normal NAPI work.
+On Mon, 20 Jan 2025 15:55:26 +0100
+Eric Dumazet <edumazet@google.com> wrote:
 
-Fixes: c9e6bc644e55 ("net: add gro_cells infrastructure")
-Suggested-by: Eric Dumazet <edumazet@google.com>
-Signed-off-by: Thomas Bogendoerfer <tbogendoerfer@suse.de>
---
-v2: don't use skb_copy(), but make decision how to pass cloned skbs in
-    napi poll function (suggested by Eric)
-v1: https://lore.kernel.org/lkml/20250109142724.29228-1-tbogendoerfer@suse.de/
-  
- net/core/gro_cells.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+> On Mon, Jan 20, 2025 at 3:32=E2=80=AFPM Thomas Bogendoerfer
+> <tbogendoerfer@suse.de> wrote:
+> >
+> > On Mon, 13 Jan 2025 13:55:18 +0100
+> > Eric Dumazet <edumazet@google.com> wrote:
+> > =20
+> > > On Mon, Jan 13, 2025 at 12:28=E2=80=AFPM Thomas Bogendoerfer
+> > > <tbogendoerfer@suse.de> wrote: =20
+> > > >
+> > > > On Thu, 9 Jan 2025 15:56:24 +0100
+> > > > Eric Dumazet <edumazet@google.com> wrote:
+> > > > =20
+> > > > > On Thu, Jan 9, 2025 at 3:27=E2=80=AFPM Thomas Bogendoerfer
+> > > > > <tbogendoerfer@suse.de> wrote: =20
+> > > > > >
+> > > > > > gro_cells_receive() passes a cloned skb directly up the stack a=
+nd
+> > > > > > could cause re-ordering against segments still in GRO. To avoid
+> > > > > > this copy the skb and let GRO do it's work.
+> > > > > >
+> > > > > > Fixes: c9e6bc644e55 ("net: add gro_cells infrastructure")
+> > > > > > Signed-off-by: Thomas Bogendoerfer <tbogendoerfer@suse.de>
+> > > > > > ---
+> > > > > >  net/core/gro_cells.c | 11 ++++++++++-
+> > > > > >  1 file changed, 10 insertions(+), 1 deletion(-)
+> > > > > >
+> > > > > > diff --git a/net/core/gro_cells.c b/net/core/gro_cells.c
+> > > > > > index ff8e5b64bf6b..2f8d688f9d82 100644
+> > > > > > --- a/net/core/gro_cells.c
+> > > > > > +++ b/net/core/gro_cells.c
+> > > > > > @@ -20,11 +20,20 @@ int gro_cells_receive(struct gro_cells *gce=
+lls, struct sk_buff *skb)
+> > > > > >         if (unlikely(!(dev->flags & IFF_UP)))
+> > > > > >                 goto drop;
+> > > > > >
+> > > > > > -       if (!gcells->cells || skb_cloned(skb) || netif_elide_gr=
+o(dev)) {
+> > > > > > +       if (!gcells->cells || netif_elide_gro(dev)) {
+> > > > > > +netif_rx:
+> > > > > >                 res =3D netif_rx(skb);
+> > > > > >                 goto unlock;
+> > > > > >         }
+> > > > > > +       if (skb_cloned(skb)) {
+> > > > > > +               struct sk_buff *n;
+> > > > > >
+> > > > > > +               n =3D skb_copy(skb, GFP_KERNEL); =20
+> > > > >
+> > > > > I do not think we want this skb_copy(). This is going to fail too=
+ often. =20
+> > > >
+> > > > ok
+> > > > =20
+> > > > > Can you remind us why we have this skb_cloned() check here ? =20
+> > > >
+> > > > some fields of the ip/tcp header are going to be changed in the fir=
+st gro
+> > > > segment =20
+> > >
+> > > Presumably we should test skb_header_cloned()
+> > >
+> > > This means something like skb_cow_head(skb, 0) could be much more
+> > > reasonable than skb_copy(). =20
+> >
+> > I don't think this will work, because at that point it's skb->data poin=
+ts
+> > at the IPv6 header in my test case (traffic between two namespaces conn=
+ected
+> > via ip6 tunnel over ipvlan). Correct header offsets are set after later,
+> > when gro_cells napi routine runs.
+> >
+> > Do you see another option ? =20
+>=20
+> Anything not attempting order-5 allocations will work :)
+>=20
+> I would try something like that.
+>=20
+> diff --git a/net/core/gro_cells.c b/net/core/gro_cells.c
+> index ff8e5b64bf6b..74416194f148 100644
+> --- a/net/core/gro_cells.c
+> +++ b/net/core/gro_cells.c
+> @@ -4,6 +4,7 @@
+>  #include <linux/netdevice.h>
+>  #include <net/gro_cells.h>
+>  #include <net/hotdata.h>
+> +#include <net/gro.h>
+>=20
+>  struct gro_cell {
+>         struct sk_buff_head     napi_skbs;
+> @@ -20,7 +21,7 @@ int gro_cells_receive(struct gro_cells *gcells,
+> struct sk_buff *skb)
+>         if (unlikely(!(dev->flags & IFF_UP)))
+>                 goto drop;
+>=20
+> -       if (!gcells->cells || skb_cloned(skb) || netif_elide_gro(dev)) {
+> +       if (!gcells->cells || netif_elide_gro(dev)) {
+>                 res =3D netif_rx(skb);
+>                 goto unlock;
+>         }
+> @@ -58,7 +59,11 @@ static int gro_cell_poll(struct napi_struct *napi,
+> int budget)
+>                 skb =3D __skb_dequeue(&cell->napi_skbs);
+>                 if (!skb)
+>                         break;
+> -               napi_gro_receive(napi, skb);
+> +               /* Core GRO stack does not play well with clones. */
+> +               if (skb_cloned(skb))
+> +                       gro_normal_one(napi, skb, 1);
+> +               else
+> +                       napi_gro_receive(napi, skb);
+>                 work_done++;
+>         }
 
-diff --git a/net/core/gro_cells.c b/net/core/gro_cells.c
-index ff8e5b64bf6b..762746d18486 100644
---- a/net/core/gro_cells.c
-+++ b/net/core/gro_cells.c
-@@ -2,6 +2,7 @@
- #include <linux/skbuff.h>
- #include <linux/slab.h>
- #include <linux/netdevice.h>
-+#include <net/gro.h>
- #include <net/gro_cells.h>
- #include <net/hotdata.h>
- 
-@@ -20,7 +21,7 @@ int gro_cells_receive(struct gro_cells *gcells, struct sk_buff *skb)
- 	if (unlikely(!(dev->flags & IFF_UP)))
- 		goto drop;
- 
--	if (!gcells->cells || skb_cloned(skb) || netif_elide_gro(dev)) {
-+	if (!gcells->cells || netif_elide_gro(dev)) {
- 		res = netif_rx(skb);
- 		goto unlock;
- 	}
-@@ -58,7 +59,11 @@ static int gro_cell_poll(struct napi_struct *napi, int budget)
- 		skb = __skb_dequeue(&cell->napi_skbs);
- 		if (!skb)
- 			break;
--		napi_gro_receive(napi, skb);
-+		/* Core GRO stack does not play well with clones. */
-+		if (skb_cloned(skb))
-+			gro_normal_one(napi, skb, 1);
-+		else
-+			napi_gro_receive(napi, skb);
- 		work_done++;
- 	}
- 
--- 
-2.35.3
+works perfectly, thank you. I've sent a v2 of the fix.
 
+Thomas.
+
+--=20
+SUSE Software Solutions Germany GmbH
+HRB 36809 (AG N=C3=BCrnberg)
+Gesch=C3=A4ftsf=C3=BChrer: Ivo Totev, Andrew McDonald, Werner Knoblich
 
