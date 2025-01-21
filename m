@@ -1,648 +1,434 @@
-Return-Path: <netdev+bounces-160131-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160132-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B14FA18798
-	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 23:08:41 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 59634A1879E
+	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 23:15:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8293D167F27
-	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 22:08:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EF42D188A8AB
+	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 22:15:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8E5F1DF26F;
-	Tue, 21 Jan 2025 22:08:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D3741F8931;
+	Tue, 21 Jan 2025 22:15:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Gg9Ds51U"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="emcNefhv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f45.google.com (mail-qv1-f45.google.com [209.85.219.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2054.outbound.protection.outlook.com [40.107.237.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 880941B041B;
-	Tue, 21 Jan 2025 22:08:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.45
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737497316; cv=none; b=SYlrXR6/QP8yETFeMIdVpQ8ZXEQPBoxBLfV2vOtUTzIFLEFNrwuNJflNxf0t/9xfRnNSWOgd1T2+X7QQaeoe7rDG+kt0ciu8pUlI1J05XkGLrtwsNtyx4/PpZDXf2+I7ZRve414qP77tHbal84HQXjavTnhH0c7lZNn6uJ40oQU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737497316; c=relaxed/simple;
-	bh=PLUFlnVAwt4pNFpkeYRqH66RIrFVLnpLJH68Qz45eMA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=F/QbXP23JtLoR2JzRjApmBIzhMB8/5BPQM4cYlK8uUFA0gol1mOk5/xctFd/YVU22WSSCIMf3hrWxNasUKVMNiH9QeCNR9Z8f2BjU1Xwov+m6vvdpM+qamKOt8rBs4GpSbXCpR2jJgXUUW7hYz1qPWS+BMmXVR48rCVHzXocR1k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Gg9Ds51U; arc=none smtp.client-ip=209.85.219.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f45.google.com with SMTP id 6a1803df08f44-6d88cb85987so2190196d6.1;
-        Tue, 21 Jan 2025 14:08:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1737497313; x=1738102113; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=YW+xb/eUVpJ5Es083p9xnw5dx6Sw/v89omK44gNmElU=;
-        b=Gg9Ds51UCYQvGjW4NM7vvnWaG4lyEl1O8W2f6/mD6qTjTCbenSwu3pgdPlKt3DJiA5
-         Q7SbT1JK09yRMxZnF2gT6WecwkTqJohhfU/zm3esCpk++XRwUTf++qqgax3LxgK2Fjst
-         mdpilRBRGp43nhtqQuJauPIpolQKKDtyNNJLbRyy/+0gSpLWlZIGWhU42KW/jLDZH2g8
-         SKpc5zfskTqHHgsYxWF2yDG/usWI/nvsO8wJFVoDYIGAgmc6/GqiUyXoGNi38o6hJJFG
-         7mVAIsfSYBbDtv2o6YHLqE2x1W5nV4yzu/kFa1YkeZ0njMDV06GTJZX6qcqMsKskc8TH
-         +h+g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737497313; x=1738102113;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=YW+xb/eUVpJ5Es083p9xnw5dx6Sw/v89omK44gNmElU=;
-        b=kyRmQrHy4E2PSA+t9UrvEb9d8ov57JknJSeixifVS2wFVal3+BSUwVttkLWSSnlApU
-         TP6PS7UNc2+nA0WOW4uEZCkioqbR0l1JpESEdBQKLyDPlCjs4YW8eVZpxEO9zByLjLX5
-         TtVq1EIuABNxGCEDyA/Cg/fPyMSxPgHr2hP1MM0Xf516EBU5qvMEyK8s56GSqiK6vqvg
-         F4LTISberE1lHLKThO9Z4V7sug1PLLJJ/jPXuYZaM87l0qg8gQUv1I9ZvkMLDzDDAtFt
-         7LWYQkkGNYqrje56sjiSlh5kPMnw1NnreyhJurZjVeEalBRpp7X3g3XEn4nbtadHvaX5
-         lbow==
-X-Forwarded-Encrypted: i=1; AJvYcCV9cPFpJ6fiado0e/yXePD4IZ3+B4fyHYDW8pptcf5SXdQx1AyPhUhgUzwgPuhDRHMdTfPSBrmR@vger.kernel.org, AJvYcCVPTcA2oGfatTCEClC71nWQXpA5hfnZshD2eDg2nafntujiwL1hAUFciswroNcD8xNsJl4exPNUR/gBgZ0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxELQ2VsnTUpErGV2jZT85GAJLDMzRI8G5uYu5iUrklOR/9WSZ9
-	fYqsJlteFjfD23XzU20yRxNcpsvjvaf8Iafe7xnclPVsGAaylJeH
-X-Gm-Gg: ASbGncuPV5qcvCiq9iH244ElE7ZB7wGDzfTr30H0ChgKDf5lurvMcy7dRBplEB6Tyc0
-	bnI5I03Xl06PSbcHNzaVcoyNXkKq9g27g5EYywDLVcWDuGppCUJgaRV6jcmmfZswDuQ4b2mdi4H
-	X1FxbMm1+K3D1z6wkGiSizzs1Kdpazf6gNNWMeaaa/QILIJbFHtiWqq9fQf9Iw706p8mla/eED4
-	ewhYoHcQtUSJcBeLw4ZziQ1slgz3q2uXVXQcc/dUtpmg1AaL5el2prOuNE0Q60Nd9F+LhQOEGeC
-	YClgl6VhU8EepsxZn3FPSJRd0eRBfMZEFxakRgmD8fV1GUgWGKi0hYkx0NUQzTg/srZB7+CLUwp
-	4HZd0duUzxvKU0aUWKtM=
-X-Google-Smtp-Source: AGHT+IEUtK2qT6jC7YTui1SsVFHu+5G2ZDu0M0COq8hiv/HrzTodMz8TVFaBlBVrVEExFh3EpDwoGw==
-X-Received: by 2002:a05:6214:3c89:b0:6d8:9f61:de6c with SMTP id 6a1803df08f44-6e1b279dc53mr334105486d6.18.1737497313297;
-        Tue, 21 Jan 2025 14:08:33 -0800 (PST)
-Received: from ip-172-31-42-18.us-east-2.compute.internal (ec2-3-13-12-112.us-east-2.compute.amazonaws.com. [3.13.12.112])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6e1e9608828sm6457606d6.70.2025.01.21.14.08.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Jan 2025 14:08:33 -0800 (PST)
-From: Feng Li <funglee@gmail.com>
-X-Google-Original-From: Feng Li <feng.li@ieee.org>
-To: 
-Cc: feng.li@viasat.com,
-	jaewon.chung@viasat.com,
-	claypool@wpi.edu,
-	mataeikachooei@wpi.edu,
-	Feng Li <feng.li@ieee.org>,
-	Eric Dumazet <edumazet@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] TCP:  SEARCH a new slow start algorithm to replace Hystart in TCP Cubic
-Date: Tue, 21 Jan 2025 17:08:07 -0500
-Message-ID: <20250121220821.24694-1-feng.li@ieee.org>
-X-Mailer: git-send-email 2.47.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AEAB1F8ADD
+	for <netdev@vger.kernel.org>; Tue, 21 Jan 2025 22:15:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.54
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1737497706; cv=fail; b=DCGPIfZr9wd9A8dEPGp6I1YWlkT/NdU5Q6aaWkQGNSQyWeR4Cprb4OQu54EWuZXUNvmEaj//Bt9ApNHk/0wKwdB5/s/UVl+OT0EkMVk73meLDmahV8BqMiCpQtmqc5RSNQ9UkmFbBI5WPKQN+jpabP4WjXkpNh2XqnsKmuL7svs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1737497706; c=relaxed/simple;
+	bh=P4w/MEGuqiYAM/v+R1uvzF9XXuOJfUN0sHyCiqs8i9U=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=dH4a3grJ3Hco5rlU4b+SrG9MJ75LzoK2suqcg45D7mQfXjGXL2PI7HpdlnPC7NtX4cs7Y0Bxi/Yw4aGxYw5dDsDiARonhasMA5zIaLsK6xdcQwNULxzcP7YvRg3+/YdGLfX0M35I9TikXKUjkiS//TLW97MQypRybKC54QqsUlk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=emcNefhv; arc=fail smtp.client-ip=40.107.237.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=HfmWp+J2PyJTtfThBC9XKPyJiXZkBqm3rsGLB3LPERuDXRGMxz1SUVnIcTwCuD3Jdq4jWRPf1PCV4Rn+lxlC0PY/OwNUsaJ5Irm4CWLaoHcn1RkuqutKejk0CIaYgmDTm3DNnmI327ibFIPitEixtZF2DmnDZuP4BC9WT8k71XwcWSv4fgOwG4C+2nNhmpFs8B8biIyk6hVBqu9UVlRre9u4hgSJ3matfME1jBCt6b/54FvQXAnoybVhfPDz94ZQzzyCRAnDraGK4ky+qnUXRV7eAjCDFdyoUAcGH7LMeyewUrum0P7lOHNQa30IqvyG3RCXaccJMGxtTuXQduaSkQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=cTJed2YHJxn17rf08p1TcyiZ/1ZNqEwNKZzZRmZ37Rw=;
+ b=T9vRAUwTvRWLxmgCI5rolC0jBznRr0adHjczYAHLuAVLESCddcavL2f6YAiP/jRSJATvhAcYBIzU5qbDNH7zsuo/DV05j/acFEC6eJWlQv2RIVasj0G1dKvUwbmocPUuqQjTBEXIgeisbMqccG9jFemsHLaoAOVoV0YzZVMl4e45gtjIudeZuTeQmJ41UKlVgTqDkM8w5LGaAolOW46K7b9fNfVTT6b9sEGMKFUHmVDDmIcNnp9notIRGF69k86xuvtYZRHmxuyEG26CWJjmhzY3lmIndTmRAvRuIp2b0eeC8T36m52cyZZttBKlQURiwXGD2cPtI4CYWpvSULTj+g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=cTJed2YHJxn17rf08p1TcyiZ/1ZNqEwNKZzZRmZ37Rw=;
+ b=emcNefhvSqiXT+Rn6++hmuC2HHfR2CBW4AJ2/P8Zk6Wdu1lbTKIcowHEi9Urvym+CpZOfWmTGHftpErVZzRyW+jeGlhjKtsY+FO0B60PZp3F8Cq28YXmqW6wGvTmW2U0I8ZCKMrc0dFETUrYQ2T+H0f8UP3zdhJB9fd/XJMmE+U=
+Received: from BN5PR12MB9486.namprd12.prod.outlook.com (2603:10b6:408:2ac::15)
+ by DS0PR12MB8788.namprd12.prod.outlook.com (2603:10b6:8:14f::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8356.21; Tue, 21 Jan
+ 2025 22:15:01 +0000
+Received: from BN5PR12MB9486.namprd12.prod.outlook.com
+ ([fe80::47b7:8302:88e1:da6e]) by BN5PR12MB9486.namprd12.prod.outlook.com
+ ([fe80::47b7:8302:88e1:da6e%4]) with mapi id 15.20.8377.009; Tue, 21 Jan 2025
+ 22:15:01 +0000
+From: "Panicker, Manoj" <Manoj.Panicker2@amd.com>
+To: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>, Michael Chan
+	<michael.chan@broadcom.com>
+CC: "davem@davemloft.net" <davem@davemloft.net>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
+	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, "pavan.chebbi@broadcom.com"
+	<pavan.chebbi@broadcom.com>, "andrew.gospodarek@broadcom.com"
+	<andrew.gospodarek@broadcom.com>, "helgaas@kernel.org" <helgaas@kernel.org>,
+	Somnath Kotur <somnath.kotur@broadcom.com>, "Huang2, Wei"
+	<Wei.Huang2@amd.com>, Ajit Khaparde <ajit.khaparde@broadcom.com>
+Subject: RE: [PATCH net-next v2 10/10] bnxt_en: Add TPH support in BNXT driver
+Thread-Topic: [PATCH net-next v2 10/10] bnxt_en: Add TPH support in BNXT
+ driver
+Thread-Index: AQHbaExVpONcG9K/okuZeFZM6MJnmLMai3OAgAdFPbA=
+Date: Tue, 21 Jan 2025 22:15:01 +0000
+Message-ID:
+ <BN5PR12MB9486BC66168772767F4D8BAAAFE62@BN5PR12MB9486.namprd12.prod.outlook.com>
+References: <20250116192343.34535-1-michael.chan@broadcom.com>
+ <20250116192343.34535-11-michael.chan@broadcom.com>
+ <Z4oA8U3opS/7Ike0@mev-dev.igk.intel.com>
+In-Reply-To: <Z4oA8U3opS/7Ike0@mev-dev.igk.intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+msip_labels:
+ MSIP_Label_7ab537de-9a15-4e91-8150-78a9f873b18c_ActionId=c858e366-b1c9-44de-ad25-82a6fdb5543e;MSIP_Label_7ab537de-9a15-4e91-8150-78a9f873b18c_ContentBits=0;MSIP_Label_7ab537de-9a15-4e91-8150-78a9f873b18c_Enabled=true;MSIP_Label_7ab537de-9a15-4e91-8150-78a9f873b18c_Method=Privileged;MSIP_Label_7ab537de-9a15-4e91-8150-78a9f873b18c_Name=Third
+ Party_New;MSIP_Label_7ab537de-9a15-4e91-8150-78a9f873b18c_SetDate=2025-01-21T22:12:01Z;MSIP_Label_7ab537de-9a15-4e91-8150-78a9f873b18c_SiteId=3dd8961f-e488-4e60-8e11-a82d994e183d;
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BN5PR12MB9486:EE_|DS0PR12MB8788:EE_
+x-ms-office365-filtering-correlation-id: dd741cbb-728a-41f4-529e-08dd3a690c69
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|366016|7416014|1800799024|376014|38070700018;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?6rrTPq1UtMUcYWCb9Kd5WNMR/DOH4cISebfIGCtMbNk0cOnMHI5O/R95IowX?=
+ =?us-ascii?Q?iY3fi5YdYUh/6I66IJVwUn/SNfsDjTbJQo0yB0FMFNaaqw3oZkkXjo2ioVu/?=
+ =?us-ascii?Q?NV5EwTWqLSlL43CvmINUoFdppDLz4CVB7o9XymOUuremmtzzCTZK/ONjf1eu?=
+ =?us-ascii?Q?n9xFkRtz/KqCnK+cidARiAevWpaCKSomoXsrnVeoquJjRQByivmV8CsfUGhR?=
+ =?us-ascii?Q?WrmRiBAvkRPJVxas2+ZnD2B6p0aNiRm73NmMVAhQozXqUU4wD1GMOGtgJUTN?=
+ =?us-ascii?Q?DXjpt+m+o2vNB/o4JJ+vB16OogUccl6OOthYmFGyw8IlCgTzKxrsacPLV5qn?=
+ =?us-ascii?Q?yHLuevhTqGkb4L/sSS8zgmd1ENSoxWiSDHfxqI29cmzhLDYVmYXub8GXi/rm?=
+ =?us-ascii?Q?kH96RK37/RBAbymnD6NjcPFHducfjAcVoujrhNyM4gYrF3IWmaWj2K80oKj3?=
+ =?us-ascii?Q?1qhyBIGsLFlIIjvbHCHuCjCVHY7Czj5HLgdT1pVJ/229wi32NHbxnGdFRgcT?=
+ =?us-ascii?Q?5T8he9qz2URl2CqbSZ57kRtxsixgjphOqxye6rKYfXDOOKVogmHGZi5bKWvS?=
+ =?us-ascii?Q?LsxFDXcy6VnRHtKpi+/9bopePrVv+/244HcmGun1/mMdxw09EnBAOrJ++EHP?=
+ =?us-ascii?Q?t93DroC4+1rgHvH/2uZypNLn5a1mVyNQ/dR8NkpYFlNk5ZnGllAAA+X6ZSpd?=
+ =?us-ascii?Q?fR32qglk4bFgayf836YfzPPDjQbR7bdxSAjCAVy9wJkP7XeSiHDe18wnLkEg?=
+ =?us-ascii?Q?WSDu4GB4YYRpgMjGmCewCWG8l8p/czM+Psrnb6m/JwMBRgQHa8zmNsJjXCb6?=
+ =?us-ascii?Q?asKFimg2AgANjqlFmBkH6ZDi5hTO+0Ui9Tl6B3LhU3SIDnVpkCbFtg1TzSU9?=
+ =?us-ascii?Q?Yf/MFjPxw3b7PNU0cL8GECgRcMKZ9K93X2Y1758unFA9V9kr9livOsLn+OuG?=
+ =?us-ascii?Q?Aby2IikEl/8qzFAM6P+6Ip4CM85PBapsFTdJp8t7Gls/HvG3zxGl9MLHtHTg?=
+ =?us-ascii?Q?cB0Y7mm/A/pTmO6sHNLJSwHzGmkV2cPV6tqFrFPiULdYFn6DbPGQfFSqSx47?=
+ =?us-ascii?Q?aorHB2OR0Wd+PfQLw5XnXipOxSSZz+CwyKXDw/iIpFoheyTe9ikBy8D5qpLQ?=
+ =?us-ascii?Q?KGPyUoZ2FZBgtnLh50x2cnXThlGpKOr3MnqZNRZjBsv/S19GlGbeM+ty1jYa?=
+ =?us-ascii?Q?HY1ncUsutNcIcKC0wQ7xLcUqmgzajOEOE+6HhlKuOitPJAZSTdS3+luqhA0O?=
+ =?us-ascii?Q?V2HU8VWpuWNuSm5n+hoRViviWyoGWnW+b0XgfVbpWdcsmI9YT1u3TGgN2oA8?=
+ =?us-ascii?Q?OcCG0IYok9BnrgL/O41a3Ab4IlUAUN0evasVJi34jVrUqjfYuE5vbbdcznEJ?=
+ =?us-ascii?Q?rH38yovyIMV94etE18dWLcC6odMw6ksB1lfE0zSViJBwEK8/6A=3D=3D?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN5PR12MB9486.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(1800799024)(376014)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?0DLwUiBD8kA2oYF4VHq5ZdrkeI1cXeXblHuXUxwX3ICfNQzrCujwyEbohKaN?=
+ =?us-ascii?Q?xeQcbmTLxbzQylC8bTjfS6xaLfc5z6ZQMSAhFkHJUHate5XibfxTQz9tiR+w?=
+ =?us-ascii?Q?2vhF6HGK/J0H4JV4Ud3lQqI6DU8L/3eK/xg4qCfjHKuqtD0PsxzBQVle54zB?=
+ =?us-ascii?Q?8l4sDfJiicBrJi+G1rQl/l44rFXs1mktxev28OLxoqnu1f3Wov8EETpqRCEy?=
+ =?us-ascii?Q?kjL9f/b9nw76Qqd69aBItLUIsF/IwE1QFsae59R1dDTFd/5nyLD1fYs/HKPD?=
+ =?us-ascii?Q?aKF/k8VVCtG7jtGWqt5RSGK2/3RoStul9LDzU+TsZ7IJT1Zpdjts1yfGaeK9?=
+ =?us-ascii?Q?BfI6T4cPSEZRzX1xyGg9zRuqRkngaMZd2Yi8oHON/kN8jDm3sOrTW1bizvjw?=
+ =?us-ascii?Q?S67/Gkja7xSFcKBQT0HGH8OaWm22kNO1DGVM0t6dcOhSdWKD7SWw7uqsSP6x?=
+ =?us-ascii?Q?2oJbprj+jnO7s8+aoor3Ek3+nTOiyrHigQWaN8zrZqdpM0HAWQg4baR2H4pN?=
+ =?us-ascii?Q?5ubfBBCUDNXb9saibQ8RydNfbS6hL0zNiQRgRdx0ym6yU8ea/4jI7i6lDH1o?=
+ =?us-ascii?Q?BMfys6/2IzJ3mZM35FXaI6+kv5yZNyld2l9kY8rL6WOMbW6I+Es5x22x/idC?=
+ =?us-ascii?Q?7JPJJtoZh4mNQtfTTXmYTR26tm7jDn0gEnoUQn3BBHEwFumKiune8UqKNde0?=
+ =?us-ascii?Q?vzORONPYHF8CF+/5yya9JFM0QkIiY0LyWVuqjnReJXzBNXwoCnST+nRSqz4B?=
+ =?us-ascii?Q?3WJgyj4oMNfsKeGKtsYK1jGIlYVqvyJdRpjoP2A/Xr5UiBInIhSInnzto0ZM?=
+ =?us-ascii?Q?jNnIvANX8DmBqr/7q6pEIPePEI7LACNEYv6q+RhvCCF8sk6Gm1TQ7kdbL1ao?=
+ =?us-ascii?Q?jjgAD4GZMm9rtN8gfiRzzQ32v2DofQQrsLmpKC3Msn/S6ZnAKAaPwx2runQA?=
+ =?us-ascii?Q?VhbcSaxVEaaOY4lT2fRyY3MxXbw2lf15P5Bwx0u+dUzz1A4BsdaXxqSNX3he?=
+ =?us-ascii?Q?3aL0q5hDCSqGYc3DtFUnNWgpKTNljJBqAsal0TC/11zTk+DzOKYg8FojDfZX?=
+ =?us-ascii?Q?9/dxXkpshe7KhHUlgeP/MwEA6HLVaEgmMQecBVi08CnYuB+O+r/h3H4VVRCZ?=
+ =?us-ascii?Q?LNEumLs1vLB5TuP2M9MT1C2xB6NxJUdTSrUZAwslUXJoO2TgH5rlKFATVE+t?=
+ =?us-ascii?Q?qx7qgHqEMP2sEUmdJm4et3DKlz3qpHJ6wKpiafMczkdWDBJHmgxzmMxHc6l3?=
+ =?us-ascii?Q?+Q/1V8kNCbr6Yn6g/vlDSHoOB5Jd/iulqKSNT+DMKCqJIP07CTTi5lgnRyYU?=
+ =?us-ascii?Q?uTss/2GYA/idlYSasE/HbsFAlbU0XF5oHA3faeblr/6XlMP2hphj4znxaIjG?=
+ =?us-ascii?Q?C2BkVBV6VlHGYegDhyKZsXmVGBC6mH/IvBqCSB/BbrfS/jys9gmBcW8fMDTT?=
+ =?us-ascii?Q?Bo/Gup1s5W31HUQ73p3XXLn/omJHbfG+rShK3U/xX0W9VwYcRSDx7vCOSf8+?=
+ =?us-ascii?Q?wjqdCV6I6xuXdzGB/z+1o3tOtBVkxWiibAa7ONU3ul8cuJQ3w0zaf1jX0+/G?=
+ =?us-ascii?Q?CeNRnOqn5D9YFBvAqOQ=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BN5PR12MB9486.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: dd741cbb-728a-41f4-529e-08dd3a690c69
+X-MS-Exchange-CrossTenant-originalarrivaltime: 21 Jan 2025 22:15:01.0556
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: AG0VPFxY34NtBNoywzED0+YiVDdPITH0SIqadmsh59kxvM0uzxSVs/eer1/hp4CEksC7BEvAZXDQMFsdYw3ncg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB8788
 
-This patch implements a new TCP slow start algorithm (SEARCH) for TCP
-Cubic congestion control algorithm.  An IETF draft
-(https://datatracker.ietf.org/doc/draft-chung-ccwg-search/detailed)
-with detailed description of SEARCH is under review.  Moreover,  a
-series of papers give more detailed implementation information of this
-new slow start algorithm.
+Hello Michal,
 
-The patch mainly adds SEARCH as the default slow start algorithm for
-TCP Cubic.  Please review the inline comments in the patch for the
-details.
+The driver changes currently attempt to enable TPH only for the Interrupt V=
+ector Mode operation when interrupts are being enabled. The check you point=
+ed out should fall through to the rest of the notifier code since the notif=
+ier is registered only when the tph_mode is set currently. I believe the ch=
+eck was added in anticipation of further changes in TPH support like NoST m=
+ode, for example, but that is not part of this submission.
 
-In tcp_cubic.c: (the only file changed in this patch).
-- add SEARCH as a new slow start algorithm
+Thanks
+Manoj
 
-- add new module parameters to configure SEARCH, allow user to enable/
-disable SEARCH or Hystart during runtime.
 
-- add SEARCH related variables into struct bictcp, to save memory
-footprint,  SEARCH shares share the space with hystart variables within
-a union
-- add SEARCH related functions search_update_bins() and search_update().
+-----Original Message-----
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>=20
+Sent: Thursday, January 16, 2025 11:04 PM
+To: Michael Chan <michael.chan@broadcom.com>
+Cc: davem@davemloft.net; netdev@vger.kernel.org; edumazet@google.com; kuba@=
+kernel.org; pabeni@redhat.com; andrew+netdev@lunn.ch; pavan.chebbi@broadcom=
+.com; andrew.gospodarek@broadcom.com; helgaas@kernel.org; Panicker, Manoj <=
+Manoj.Panicker2@amd.com>; Somnath Kotur <somnath.kotur@broadcom.com>; Huang=
+2, Wei <Wei.Huang2@amd.com>; Ajit Khaparde <ajit.khaparde@broadcom.com>
+Subject: Re: [PATCH net-next v2 10/10] bnxt_en: Add TPH support in BNXT dri=
+ver
 
-Signed-off-by: Feng Li <feng.li@ieee.org>
----
- net/ipv4/tcp_cubic.c | 386 ++++++++++++++++++++++++++++++++++++++-----
- 1 file changed, 345 insertions(+), 41 deletions(-)
+Caution: This message originated from an External Source. Use proper cautio=
+n when opening attachments, clicking links, or responding.
 
-diff --git a/net/ipv4/tcp_cubic.c b/net/ipv4/tcp_cubic.c
-index 76c23675ae50..57111641fdae 100644
---- a/net/ipv4/tcp_cubic.c
-+++ b/net/ipv4/tcp_cubic.c
-@@ -52,7 +52,6 @@ static int initial_ssthresh __read_mostly;
- static int bic_scale __read_mostly = 41;
- static int tcp_friendliness __read_mostly = 1;
- 
--static int hystart __read_mostly = 1;
- static int hystart_detect __read_mostly = HYSTART_ACK_TRAIN | HYSTART_DELAY;
- static int hystart_low_window __read_mostly = 16;
- static int hystart_ack_delta_us __read_mostly = 2000;
-@@ -72,8 +71,6 @@ module_param(bic_scale, int, 0444);
- MODULE_PARM_DESC(bic_scale, "scale (scaled by 1024) value for bic function (bic_scale/1024)");
- module_param(tcp_friendliness, int, 0644);
- MODULE_PARM_DESC(tcp_friendliness, "turn on/off tcp friendliness");
--module_param(hystart, int, 0644);
--MODULE_PARM_DESC(hystart, "turn on/off hybrid slow start algorithm");
- module_param(hystart_detect, int, 0644);
- MODULE_PARM_DESC(hystart_detect, "hybrid slow start detection mechanisms"
- 		 " 1: packet-train 2: delay 3: both packet-train and delay");
-@@ -82,6 +79,48 @@ MODULE_PARM_DESC(hystart_low_window, "lower bound cwnd for hybrid slow start");
- module_param(hystart_ack_delta_us, int, 0644);
- MODULE_PARM_DESC(hystart_ack_delta_us, "spacing between ack's indicating train (usecs)");
- 
-+//////////////////////// SEARCH ////////////////////////
-+/*	enable SEARCH with command:
-+ *		sudo sh -c "echo '1' > /sys/module/your_module_name/parameters/slow_start_mode"
-+ *	enable HyStart with command:
-+ *		sudo sh -c "echo '2' > /sys/module/cubic_with_search/parameters/slow_start_mode"
-+ *	disable both SEARCH and HyStart with command:
-+ *		sudo sh -c "echo '0' > /sys/module/cubic_with_search/parameters/slow_start_mode"
-+ */
-+
-+#define MAX_US_INT 0xffff
-+#define SEARCH_BINS 10		/* Number of bins in a window */
-+#define SEARCH_EXTRA_BINS 15	/* Number of additional bins to cover data after shiftting by RTT */
-+#define SEARCH_TOTAL_BINS 25	/* Total number of bins containing essential bins to cover RTT
-+				 * shift
-+				 */
-+
-+/* Define an enum for the slow start mode */
-+enum {
-+	SS_LEGACY = 0,	/* No slow start algorithm is used */
-+	SS_SEARCH = 1,	/* Enable the SEARCH slow start algorithm */
-+	SS_HYSTART = 2	/* Enable the HyStart slow start algorithm */
-+};
-+
-+/* Set the default mode */
-+static int slow_start_mode __read_mostly = SS_SEARCH;
-+static int search_window_duration_factor __read_mostly = 35;
-+static int search_thresh __read_mostly = 35;
-+static int cwnd_rollback __read_mostly;
-+static int search_missed_bins_threshold = 2;
-+
-+// Module parameters used by SEARCH
-+module_param(slow_start_mode, int, 0644);
-+MODULE_PARM_DESC(slow_start_mode, "0: No Algorithm, 1: SEARCH, 2: HyStart");
-+module_param(search_window_duration_factor, int, 0644);
-+MODULE_PARM_DESC(search_window_duration_factor, "Multiply with (initial RTT / 10) to set the window size");
-+module_param(search_thresh, int, 0644);
-+MODULE_PARM_DESC(search_thresh, "Threshold for exiting from slow start in percentage");
-+module_param(cwnd_rollback, int, 0644);
-+MODULE_PARM_DESC(cwnd_rollback, "Decrease the cwnd to its value in 2 initial RTT ago");
-+module_param(search_missed_bins_threshold, int, 0644);
-+MODULE_PARM_DESC(search_missed_bins_threshold, "Minimum threshold of missed bins before resetting SEARCH");
-+
- /* BIC TCP Parameters */
- struct bictcp {
- 	u32	cnt;		/* increase cwnd by 1 after ACKs */
-@@ -95,19 +134,47 @@ struct bictcp {
- 	u32	epoch_start;	/* beginning of an epoch */
- 	u32	ack_cnt;	/* number of acks */
- 	u32	tcp_cwnd;	/* estimated tcp cwnd */
--	u16	unused;
--	u8	sample_cnt;	/* number of samples to decide curr_rtt */
--	u8	found;		/* the exit point is found? */
--	u32	round_start;	/* beginning of each round */
--	u32	end_seq;	/* end_seq of the round */
--	u32	last_ack;	/* last time when the ACK spacing is close */
--	u32	curr_rtt;	/* the minimum rtt of current round */
-+
-+	/* Union of HyStart and SEARCH variables */
-+	union {
-+		/* HyStart variables */
-+		struct {
-+			u16	unused;
-+			u8	sample_cnt;/* number of samples to decide curr_rtt */
-+			u8	found;		/* the exit point is found? */
-+			u32	round_start;	/* beginning of each round */
-+			u32	end_seq;	/* end_seq of the round */
-+			u32	last_ack;	/* last time when the ACK spacing is close */
-+			u32	curr_rtt;	/* the minimum rtt of current round */
-+		} hystart;
-+
-+		/* SEARCH variables */
-+		struct {
-+			u32	bin_duration_us;	/* duration of each bin in microsecond */
-+			s32	curr_idx;	/* total number of bins */
-+			u32	bin_end_us;	/* end time of the latest bin in microsecond */
-+			u16	bin[SEARCH_TOTAL_BINS];	/* array to keep bytes for bins */
-+			u8	unused;
-+			u8	scale_factor;	/* scale factor to fit the value with bin size*/
-+		} search;
-+	};
- };
- 
-+static inline void bictcp_search_reset(struct bictcp *ca)
-+{
-+	memset(ca->search.bin, 0, sizeof(ca->search.bin));
-+	ca->search.bin_duration_us = 0;
-+	ca->search.curr_idx = -1;
-+	ca->search.bin_end_us = 0;
-+	ca->search.scale_factor = 0;
-+}
-+
- static inline void bictcp_reset(struct bictcp *ca)
- {
--	memset(ca, 0, offsetof(struct bictcp, unused));
--	ca->found = 0;
-+	memset(ca, 0, offsetof(struct bictcp, hystart.unused));
-+	if (slow_start_mode == SS_HYSTART)
-+		ca->hystart.found = 0;
-+
- }
- 
- static inline u32 bictcp_clock_us(const struct sock *sk)
-@@ -120,10 +187,10 @@ static inline void bictcp_hystart_reset(struct sock *sk)
- 	struct tcp_sock *tp = tcp_sk(sk);
- 	struct bictcp *ca = inet_csk_ca(sk);
- 
--	ca->round_start = ca->last_ack = bictcp_clock_us(sk);
--	ca->end_seq = tp->snd_nxt;
--	ca->curr_rtt = ~0U;
--	ca->sample_cnt = 0;
-+	ca->hystart.round_start = ca->hystart.last_ack = bictcp_clock_us(sk);
-+	ca->hystart.end_seq = tp->snd_nxt;
-+	ca->hystart.curr_rtt = ~0U;
-+	ca->hystart.sample_cnt = 0;
- }
- 
- __bpf_kfunc static void cubictcp_init(struct sock *sk)
-@@ -132,15 +199,17 @@ __bpf_kfunc static void cubictcp_init(struct sock *sk)
- 
- 	bictcp_reset(ca);
- 
--	if (hystart)
-+	if (slow_start_mode == SS_HYSTART)
- 		bictcp_hystart_reset(sk);
- 
--	if (!hystart && initial_ssthresh)
-+	if (slow_start_mode != SS_HYSTART && initial_ssthresh)
- 		tcp_sk(sk)->snd_ssthresh = initial_ssthresh;
- }
- 
- __bpf_kfunc static void cubictcp_cwnd_event(struct sock *sk, enum tcp_ca_event event)
- {
-+	struct bictcp *ca = inet_csk_ca(sk);
-+
- 	if (event == CA_EVENT_TX_START) {
- 		struct bictcp *ca = inet_csk_ca(sk);
- 		u32 now = tcp_jiffies32;
-@@ -158,6 +227,12 @@ __bpf_kfunc static void cubictcp_cwnd_event(struct sock *sk, enum tcp_ca_event e
- 		}
- 		return;
- 	}
-+	if (event == CA_EVENT_CWND_RESTART) {
-+		if (slow_start_mode == SS_SEARCH)
-+			bictcp_search_reset(ca);
-+		return;
-+	}
-+	return;
- }
- 
- /* calculate the cubic root of x using a table lookup followed by one
-@@ -330,6 +405,8 @@ __bpf_kfunc static void cubictcp_cong_avoid(struct sock *sk, u32 ack, u32 acked)
- 		return;
- 
- 	if (tcp_in_slow_start(tp)) {
-+		if (slow_start_mode == SS_HYSTART && after(ack, ca->hystart.end_seq))
-+			bictcp_hystart_reset(sk);
- 		acked = tcp_slow_start(tp, acked);
- 		if (!acked)
- 			return;
-@@ -359,7 +436,11 @@ __bpf_kfunc static void cubictcp_state(struct sock *sk, u8 new_state)
- {
- 	if (new_state == TCP_CA_Loss) {
- 		bictcp_reset(inet_csk_ca(sk));
--		bictcp_hystart_reset(sk);
-+		if (slow_start_mode == SS_SEARCH)
-+			bictcp_search_reset(inet_csk_ca(sk));
-+
-+		if (slow_start_mode == SS_HYSTART)
-+			bictcp_hystart_reset(sk);
- 	}
- }
- 
-@@ -389,19 +470,15 @@ static void hystart_update(struct sock *sk, u32 delay)
- 	struct bictcp *ca = inet_csk_ca(sk);
- 	u32 threshold;
- 
--	if (after(tp->snd_una, ca->end_seq))
-+	if (after(tp->snd_una, ca->hystart.end_seq))
- 		bictcp_hystart_reset(sk);
- 
--	/* hystart triggers when cwnd is larger than some threshold */
--	if (tcp_snd_cwnd(tp) < hystart_low_window)
--		return;
--
- 	if (hystart_detect & HYSTART_ACK_TRAIN) {
- 		u32 now = bictcp_clock_us(sk);
- 
- 		/* first detection parameter - ack-train detection */
--		if ((s32)(now - ca->last_ack) <= hystart_ack_delta_us) {
--			ca->last_ack = now;
-+		if ((s32)(now - ca->hystart.last_ack) <= hystart_ack_delta_us) {
-+			ca->hystart.last_ack = now;
- 
- 			threshold = ca->delay_min + hystart_ack_delay(sk);
- 
-@@ -413,31 +490,31 @@ static void hystart_update(struct sock *sk, u32 delay)
- 			if (sk->sk_pacing_status == SK_PACING_NONE)
- 				threshold >>= 1;
- 
--			if ((s32)(now - ca->round_start) > threshold) {
--				ca->found = 1;
-+			if ((s32)(now - ca->hystart.round_start) > threshold) {
-+				ca->hystart.found = 1;
- 				pr_debug("hystart_ack_train (%u > %u) delay_min %u (+ ack_delay %u) cwnd %u\n",
--					 now - ca->round_start, threshold,
--					 ca->delay_min, hystart_ack_delay(sk), tcp_snd_cwnd(tp));
-+					 now - ca->hystart.round_start, threshold,
-+					 ca->delay_min, hystart_ack_delay(sk), tp->snd_cwnd);
- 				NET_INC_STATS(sock_net(sk),
- 					      LINUX_MIB_TCPHYSTARTTRAINDETECT);
- 				NET_ADD_STATS(sock_net(sk),
- 					      LINUX_MIB_TCPHYSTARTTRAINCWND,
- 					      tcp_snd_cwnd(tp));
--				tp->snd_ssthresh = tcp_snd_cwnd(tp);
-+				tp->snd_ssthresh = tp->snd_cwnd;
- 			}
- 		}
- 	}
- 
- 	if (hystart_detect & HYSTART_DELAY) {
- 		/* obtain the minimum delay of more than sampling packets */
--		if (ca->curr_rtt > delay)
--			ca->curr_rtt = delay;
--		if (ca->sample_cnt < HYSTART_MIN_SAMPLES) {
--			ca->sample_cnt++;
-+		if (ca->hystart.curr_rtt > delay)
-+			ca->hystart.curr_rtt = delay;
-+		if (ca->hystart.sample_cnt < HYSTART_MIN_SAMPLES) {
-+			ca->hystart.sample_cnt++;
- 		} else {
--			if (ca->curr_rtt > ca->delay_min +
-+			if (ca->hystart.curr_rtt > ca->delay_min +
- 			    HYSTART_DELAY_THRESH(ca->delay_min >> 3)) {
--				ca->found = 1;
-+				ca->hystart.found = 1;
- 				NET_INC_STATS(sock_net(sk),
- 					      LINUX_MIB_TCPHYSTARTDELAYDETECT);
- 				NET_ADD_STATS(sock_net(sk),
-@@ -449,6 +526,226 @@ static void hystart_update(struct sock *sk, u32 delay)
- 	}
- }
- 
-+/* Scale bin value to fit bin size, rescale previous bins.
-+ * Return amount scaled.
-+ */
-+static inline u8 search_bit_shifting(struct sock *sk, u64 bin_value)
-+{
-+	struct bictcp *ca = inet_csk_ca(sk);
-+	u8 num_shift = 0;
-+	u32 i = 0;
-+
-+	/* Adjust bin_value if it's greater than MAX_BIN_VALUE */
-+	while (bin_value > MAX_US_INT) {
-+		num_shift += 1;
-+		bin_value >>= 1;  /* divide bin_value by 2 */
-+	}
-+
-+	/* Adjust all previous bins according to the new num_shift */
-+	for (i = 0; i < SEARCH_TOTAL_BINS; i++)
-+		ca->search.bin[i] >>= num_shift;
-+
-+	/* Update the scale factor */
-+	ca->search.scale_factor += num_shift;
-+
-+	return num_shift;
-+}
-+
-+/* Initialize bin */
-+static void search_init_bins(struct sock *sk, u32 now_us, u32 rtt_us)
-+{
-+	struct bictcp *ca = inet_csk_ca(sk);
-+	struct tcp_sock *tp = tcp_sk(sk);
-+	u8 amount_scaled = 0;
-+	u64 bin_value = 0;
-+
-+	ca->search.bin_duration_us = (rtt_us * search_window_duration_factor) / (SEARCH_BINS * 10);
-+	ca->search.bin_end_us = now_us + ca->search.bin_duration_us;
-+	ca->search.curr_idx = 0;
-+	bin_value = tp->bytes_acked;
-+	if (bin_value > MAX_US_INT) {
-+		amount_scaled = search_bit_shifting(sk, bin_value);
-+		bin_value >>= amount_scaled;
-+	}
-+	ca->search.bin[0] = bin_value;
-+}
-+
-+/* Update bins */
-+static void search_update_bins(struct sock *sk, u32 now_us, u32 rtt_us)
-+{
-+	struct bictcp *ca = inet_csk_ca(sk);
-+	struct tcp_sock *tp = tcp_sk(sk);
-+	u32 passed_bins = 0;
-+	u32 i = 0;
-+	u64 bin_value = 0;
-+	u8 amount_scaled = 0;
-+
-+	/* If passed_bins greater than 1, it means we have some missed bins */
-+	passed_bins = ((now_us - ca->search.bin_end_us) / ca->search.bin_duration_us) + 1;
-+
-+	/* If we passed more than search_missed_bins_threshold bins, need to reset
-+	 * SEARCH, and initialize bins
-+	 */
-+	if (passed_bins > search_missed_bins_threshold) {
-+		bictcp_search_reset(ca);
-+		search_init_bins(sk, now_us, rtt_us);
-+		return;
-+	}
-+
-+	for (i = ca->search.curr_idx + 1; i < ca->search.curr_idx + passed_bins; i++)
-+		ca->search.bin[i % SEARCH_TOTAL_BINS] =
-+			ca->search.bin[ca->search.curr_idx % SEARCH_TOTAL_BINS];
-+
-+	ca->search.bin_end_us += passed_bins * ca->search.bin_duration_us;
-+	ca->search.curr_idx += passed_bins;
-+
-+	/* Calculate bin_value by dividing bytes_acked by 2^scale_factor */
-+	bin_value = tp->bytes_acked >> ca->search.scale_factor;
-+
-+	if (bin_value > MAX_US_INT) {
-+		amount_scaled  = search_bit_shifting(sk, bin_value);
-+		bin_value >>= amount_scaled;
-+	}
-+
-+	/* Assign the bin_value to the current bin */
-+	ca->search.bin[ca->search.curr_idx % SEARCH_TOTAL_BINS] = bin_value;
-+}
-+
-+/* Calculate delivered bytes for a window considering interpolation */
-+static inline u64 search_compute_delivered_window(struct sock *sk,
-+						  s32 left, s32 right, u32 fraction)
-+{
-+	struct bictcp *ca = inet_csk_ca(sk);
-+	u64 delivered = 0;
-+
-+	delivered = ca->search.bin[(right - 1) % SEARCH_TOTAL_BINS]
-+				- ca->search.bin[left % SEARCH_TOTAL_BINS];
-+
-+	/* If we are interpolating using the very first bin, the "previous" bin value is 0. */
-+	if (left == 0)
-+		delivered += (ca->search.bin[left % SEARCH_TOTAL_BINS]) * fraction / 100;
-+	else
-+		delivered += (ca->search.bin[left % SEARCH_TOTAL_BINS]
-+				- ca->search.bin[(left - 1) % SEARCH_TOTAL_BINS]) * fraction / 100;
-+
-+	delivered += (ca->search.bin[right % SEARCH_TOTAL_BINS]
-+			- ca->search.bin[(right - 1) % SEARCH_TOTAL_BINS])
-+				* (100 - fraction) / 100;
-+
-+	return delivered;
-+}
-+
-+/* Handle slow start exit condition */
-+static void search_exit_slow_start(struct sock *sk, u32 now_us, u32 rtt_us)
-+{
-+	struct tcp_sock *tp = tcp_sk(sk);
-+	struct bictcp *ca = inet_csk_ca(sk);
-+	s32 cong_idx = 0;
-+	u32 initial_rtt = 0;
-+	u64 overshoot_bytes = 0;
-+	u32 overshoot_cwnd = 0;
-+
-+	/* If cwnd rollback is enabled, the code calculates the initial round-trip time (RTT)
-+	 * and determines the congestion index (`cong_idx`) from which to compute the overshoot.
-+	 * The overshoot represents the excess bytes delivered beyond the estimated target,
-+	 * which is calculated over a window defined by the current and the rollback indices.
-+	 *
-+	 * The rollback logic adjusts the congestion window (`snd_cwnd`) based on the overshoot:
-+	 * 1. It first computes the overshoot congestion window (`overshoot_cwnd`), derived by
-+	 *    dividing the overshoot bytes by the maximum segment size (MSS).
-+	 * 2. It reduces `snd_cwnd` by the calculated overshoot while ensuring it does not fall
-+	 *    below the initial congestion window (`TCP_INIT_CWND`), which acts as a safety guard.
-+	 * 3. If the overshoot exceeds the current congestion window, it resets `snd_cwnd` to the
-+	 *    initial value, providing a safeguard to avoid a drastic drop in case of miscalcula-
-+	 *    tions  or unusual network conditions (e.g., TCP reset).
-+	 *
-+	 * After adjusting the congestion window, the slow start threshold (`snd_ssthresh`) is set
-+	 * to the updated congestion window to finalize the rollback.
-+	 */
-+
-+	/* If cwnd rollback is enabled */
-+	if (cwnd_rollback) {
-+		initial_rtt = ca->search.bin_duration_us * SEARCH_BINS * 10
-+				/ search_window_duration_factor;
-+		cong_idx = ca->search.curr_idx - ((2 * initial_rtt) / ca->search.bin_duration_us);
-+
-+		/* Calculate the overshoot based on the delivered bytes between cong_idx and
-+		 * the current index
-+		 */
-+		overshoot_bytes = search_compute_delivered_window(sk, cong_idx,
-+								  ca->search.curr_idx, 0);
-+
-+		/* Calculate the rollback congestion window based on overshoot divided by MSS */
-+		overshoot_cwnd = overshoot_bytes / tp->mss_cache;
-+
-+		/* Reduce the current congestion window (cwnd) with a safety guard:
-+		 * It doesn't drop below the initial cwnd (TCP_INIT_CWND) or is not
-+		 * larger than the current cwnd (e.g., In the case of a TCP reset)
-+		 */
-+		if (overshoot_cwnd < tp->snd_cwnd)
-+			tp->snd_cwnd = max(tp->snd_cwnd - overshoot_cwnd, (u32)TCP_INIT_CWND);
-+		else
-+			tp->snd_cwnd = TCP_INIT_CWND;
-+	}
-+
-+	tp->snd_ssthresh = tp->snd_cwnd;
-+
-+	/*  If TCP re-enters slow start, the missed_bin threshold will be
-+	 *   exceeded upon a bin update, and SEARCH will reset automatically.
-+	 */
-+}
-+
-+//////////////////////// SEARCH ////////////////////////
-+static void search_update(struct sock *sk, u32 rtt_us)
-+{
-+	struct bictcp *ca = inet_csk_ca(sk);
-+
-+	s32 prev_idx = 0;
-+	u64 curr_delv_bytes = 0, prev_delv_bytes = 0;
-+	s32 norm_diff = 0;
-+	u32 now_us = bictcp_clock_us(sk);
-+	u32 fraction = 0;
-+
-+	/* by receiving the first ack packet, initialize bin duration and bin end time */
-+	if (ca->search.bin_duration_us == 0) {
-+		search_init_bins(sk, now_us, rtt_us);
-+		return;
-+	}
-+
-+	if (now_us < ca->search.bin_end_us)
-+		return;
-+
-+	/* reach or pass the bin boundary, update bins */
-+	search_update_bins(sk, now_us, rtt_us);
-+
-+	/* check if there is enough bins after shift for computing previous window */
-+	prev_idx = ca->search.curr_idx - (rtt_us / ca->search.bin_duration_us);
-+
-+	if (prev_idx >= SEARCH_BINS && (ca->search.curr_idx - prev_idx) < SEARCH_EXTRA_BINS - 1) {
-+		/* Calculate delivered bytes for the current and previous windows */
-+
-+		curr_delv_bytes = search_compute_delivered_window(sk,
-+								  ca->search.curr_idx - SEARCH_BINS,
-+								  ca->search.curr_idx, 0);
-+
-+		fraction = ((rtt_us % ca->search.bin_duration_us) * 100 /
-+				ca->search.bin_duration_us);
-+
-+		prev_delv_bytes = search_compute_delivered_window(sk, prev_idx - SEARCH_BINS,
-+								  prev_idx, fraction);
-+
-+		if (prev_delv_bytes > 0) {
-+			norm_diff = ((prev_delv_bytes << 1) - curr_delv_bytes)
-+					* 100 / (prev_delv_bytes << 1);
-+
-+			/* check for exit condition */
-+			if ((2 * prev_delv_bytes) >= curr_delv_bytes && norm_diff >= search_thresh)
-+				search_exit_slow_start(sk, now_us, rtt_us);
-+		}
-+	}
-+}
-+
-+//////////////////////////////////////////////////////////////
- __bpf_kfunc static void cubictcp_acked(struct sock *sk, const struct ack_sample *sample)
- {
- 	const struct tcp_sock *tp = tcp_sk(sk);
-@@ -471,8 +768,15 @@ __bpf_kfunc static void cubictcp_acked(struct sock *sk, const struct ack_sample
- 	if (ca->delay_min == 0 || ca->delay_min > delay)
- 		ca->delay_min = delay;
- 
--	if (!ca->found && tcp_in_slow_start(tp) && hystart)
--		hystart_update(sk, delay);
-+	//////////////////////// SEARCH ////////////////////////
-+	if (tcp_in_slow_start(tp)) {
-+		if (slow_start_mode == SS_SEARCH) {
-+			/* implement search algorithm */
-+			search_update(sk, delay);
-+		} else if (slow_start_mode == SS_HYSTART && !ca->hystart.found &&
-+			   tp->snd_cwnd >= hystart_low_window)
-+			hystart_update(sk, delay);
-+	}
- }
- 
- static struct tcp_congestion_ops cubictcp __read_mostly = {
-@@ -551,5 +855,5 @@ module_exit(cubictcp_unregister);
- 
- MODULE_AUTHOR("Sangtae Ha, Stephen Hemminger");
- MODULE_LICENSE("GPL");
--MODULE_DESCRIPTION("CUBIC TCP");
--MODULE_VERSION("2.3");
-+MODULE_DESCRIPTION("CUBIC TCP w/ SEARCH");
-+MODULE_VERSION("3.0");
--- 
-2.47.1
 
+On Thu, Jan 16, 2025 at 11:23:43AM -0800, Michael Chan wrote:
+> From: Manoj Panicker <manoj.panicker2@amd.com>
+>
+> Add TPH support to the Broadcom BNXT device driver. This allows the=20
+> driver to utilize TPH functions for retrieving and configuring=20
+> Steering Tags when changing interrupt affinity. With compatible NIC=20
+> firmware, network traffic will be tagged correctly with Steering Tags,=20
+> resulting in significant memory bandwidth savings and other advantages=20
+> as demonstrated by real network benchmarks on TPH-capable platforms.
+>
+> Co-developed-by: Somnath Kotur <somnath.kotur@broadcom.com>
+> Signed-off-by: Somnath Kotur <somnath.kotur@broadcom.com>
+> Co-developed-by: Wei Huang <wei.huang2@amd.com>
+> Signed-off-by: Wei Huang <wei.huang2@amd.com>
+> Signed-off-by: Manoj Panicker <manoj.panicker2@amd.com>
+> Reviewed-by: Ajit Khaparde <ajit.khaparde@broadcom.com>
+> Reviewed-by: Andy Gospodarek <andrew.gospodarek@broadcom.com>
+> Signed-off-by: Michael Chan <michael.chan@broadcom.com>
+> ---
+> Cc: Bjorn Helgaas <helgaas@kernel.org>
+>
+> Previous driver series fixing rtnl_lock and empty release function:
+>
+> https://lore.kernel.org/netdev/20241115200412.1340286-1-wei.huang2@amd
+> .com/
+>
+> v5 of the PCI series using netdev_rx_queue_restart():
+>
+> https://lore.kernel.org/netdev/20240916205103.3882081-5-wei.huang2@amd
+> .com/
+>
+> v1 of the PCI series using open/close:
+>
+> https://lore.kernel.org/netdev/20240509162741.1937586-9-wei.huang2@amd
+> .com/
+> ---
+>  drivers/net/ethernet/broadcom/bnxt/bnxt.c | 105 ++++++++++++++++++++++
+>  drivers/net/ethernet/broadcom/bnxt/bnxt.h |   7 ++
+>  2 files changed, 112 insertions(+)
+>
+> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c=20
+> b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> index 0a10a4cffcc8..8c24642b8812 100644
+> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> @@ -55,6 +55,8 @@
+>  #include <net/page_pool/helpers.h>
+>  #include <linux/align.h>
+>  #include <net/netdev_queues.h>
+> +#include <net/netdev_rx_queue.h>
+> +#include <linux/pci-tph.h>
+>
+>  #include "bnxt_hsi.h"
+>  #include "bnxt.h"
+> @@ -11330,6 +11332,83 @@ static int bnxt_tx_queue_start(struct bnxt *bp, =
+int idx)
+>       return 0;
+>  }
+>
+> +static void bnxt_irq_affinity_notify(struct irq_affinity_notify *notify,
+> +                                  const cpumask_t *mask) {
+> +     struct bnxt_irq *irq;
+> +     u16 tag;
+> +     int err;
+> +
+> +     irq =3D container_of(notify, struct bnxt_irq, affinity_notify);
+> +
+> +     if (!irq->bp->tph_mode)
+> +             return;
+> +
+Can it not be set? The notifier is registered only if it is set, can mode c=
+hange while irq notifier is registered? Maybe I am missing sth, but it look=
+s like it can't.
+
+> +     cpumask_copy(irq->cpu_mask, mask);
+> +
+> +     if (irq->ring_nr >=3D irq->bp->rx_nr_rings)
+> +             return;
+> +
+> +     if (pcie_tph_get_cpu_st(irq->bp->pdev, TPH_MEM_TYPE_VM,
+> +                             cpumask_first(irq->cpu_mask), &tag))
+> +             return;
+> +
+> +     if (pcie_tph_set_st_entry(irq->bp->pdev, irq->msix_nr, tag))
+> +             return;
+> +
+> +     rtnl_lock();
+> +     if (netif_running(irq->bp->dev)) {
+> +             err =3D netdev_rx_queue_restart(irq->bp->dev, irq->ring_nr)=
+;
+> +             if (err)
+> +                     netdev_err(irq->bp->dev,
+> +                                "RX queue restart failed: err=3D%d\n", e=
+rr);
+> +     }
+> +     rtnl_unlock();
+> +}
+> +
+> +static void bnxt_irq_affinity_release(struct kref *ref) {
+> +     struct irq_affinity_notify *notify =3D
+> +             container_of(ref, struct irq_affinity_notify, kref);
+> +     struct bnxt_irq *irq;
+> +
+> +     irq =3D container_of(notify, struct bnxt_irq, affinity_notify);
+> +
+> +     if (!irq->bp->tph_mode)
+The same here.
+
+> +             return;
+> +
+> +     if (pcie_tph_set_st_entry(irq->bp->pdev, irq->msix_nr, 0)) {
+> +             netdev_err(irq->bp->dev,
+> +                        "Setting ST=3D0 for MSIX entry %d failed\n",
+> +                        irq->msix_nr);
+> +             return;
+> +     }
+> +}
+> +
+> +static void bnxt_release_irq_notifier(struct bnxt_irq *irq) {
+> +     irq_set_affinity_notifier(irq->vector, NULL); }
+> +
+> +static void bnxt_register_irq_notifier(struct bnxt *bp, struct=20
+> +bnxt_irq *irq) {
+> +     struct irq_affinity_notify *notify;
+> +
+> +     irq->bp =3D bp;
+> +
+> +     /* Nothing to do if TPH is not enabled */
+> +     if (!bp->tph_mode)
+> +             return;
+> +
+> +     /* Register IRQ affinity notifier */
+> +     notify =3D &irq->affinity_notify;
+> +     notify->irq =3D irq->vector;
+> +     notify->notify =3D bnxt_irq_affinity_notify;
+> +     notify->release =3D bnxt_irq_affinity_release;
+> +
+> +     irq_set_affinity_notifier(irq->vector, notify); }
+> +
+>  static void bnxt_free_irq(struct bnxt *bp)  {
+>       struct bnxt_irq *irq;
+> @@ -11352,11 +11431,18 @@ static void bnxt_free_irq(struct bnxt *bp)
+>                               free_cpumask_var(irq->cpu_mask);
+>                               irq->have_cpumask =3D 0;
+>                       }
+> +
+> +                     bnxt_release_irq_notifier(irq);
+> +
+>                       free_irq(irq->vector, bp->bnapi[i]);
+>               }
+>
+>               irq->requested =3D 0;
+>       }
+> +
+> +     /* Disable TPH support */
+> +     pcie_disable_tph(bp->pdev);
+> +     bp->tph_mode =3D 0;
+>  }
+>
+>  static int bnxt_request_irq(struct bnxt *bp) @@ -11376,6 +11462,12 @@=20
+> static int bnxt_request_irq(struct bnxt *bp)  #ifdef CONFIG_RFS_ACCEL
+>       rmap =3D bp->dev->rx_cpu_rmap;
+>  #endif
+> +
+> +     /* Enable TPH support as part of IRQ request */
+> +     rc =3D pcie_enable_tph(bp->pdev, PCI_TPH_ST_IV_MODE);
+> +     if (!rc)
+> +             bp->tph_mode =3D PCI_TPH_ST_IV_MODE;
+> +
+>       for (i =3D 0, j =3D 0; i < bp->cp_nr_rings; i++) {
+>               int map_idx =3D bnxt_cp_num_to_irq_num(bp, i);
+>               struct bnxt_irq *irq =3D &bp->irq_tbl[map_idx]; @@=20
+> -11399,8 +11491,11 @@ static int bnxt_request_irq(struct bnxt *bp)
+>
+>               if (zalloc_cpumask_var(&irq->cpu_mask, GFP_KERNEL)) {
+>                       int numa_node =3D dev_to_node(&bp->pdev->dev);
+> +                     u16 tag;
+>
+>                       irq->have_cpumask =3D 1;
+> +                     irq->msix_nr =3D map_idx;
+> +                     irq->ring_nr =3D i;
+>                       cpumask_set_cpu(cpumask_local_spread(i, numa_node),
+>                                       irq->cpu_mask);
+>                       rc =3D irq_update_affinity_hint(irq->vector,=20
+> irq->cpu_mask); @@ -11410,6 +11505,16 @@ static int bnxt_request_irq(stru=
+ct bnxt *bp)
+>                                           irq->vector);
+>                               break;
+>                       }
+> +
+> +                     bnxt_register_irq_notifier(bp, irq);
+> +
+> +                     /* Init ST table entry */
+> +                     if (pcie_tph_get_cpu_st(irq->bp->pdev, TPH_MEM_TYPE=
+_VM,
+> +                                             cpumask_first(irq->cpu_mask=
+),
+> +                                             &tag))
+> +                             continue;
+> +
+> +                     pcie_tph_set_st_entry(irq->bp->pdev,=20
+> + irq->msix_nr, tag);
+>               }
+>       }
+>       return rc;
+> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h=20
+> b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+> index 826ae030fc09..02dc2ed9c75d 100644
+> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+> @@ -1234,6 +1234,11 @@ struct bnxt_irq {
+>       u8              have_cpumask:1;
+>       char            name[IFNAMSIZ + BNXT_IRQ_NAME_EXTRA];
+>       cpumask_var_t   cpu_mask;
+> +
+> +     struct bnxt     *bp;
+> +     int             msix_nr;
+> +     int             ring_nr;
+> +     struct irq_affinity_notify affinity_notify;
+>  };
+>
+>  #define HWRM_RING_ALLOC_TX   0x1
+> @@ -2229,6 +2234,8 @@ struct bnxt {
+>       struct net_device       *dev;
+>       struct pci_dev          *pdev;
+>
+> +     u8                      tph_mode;
+> +
+>       atomic_t                intr_sem;
+>
+>       u32                     flags;
+> --
+> 2.30.1
+>
 
