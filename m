@@ -1,183 +1,122 @@
-Return-Path: <netdev+bounces-160016-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160017-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F0F1A17C03
-	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 11:40:22 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 01645A17C84
+	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 11:59:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4BC143A1DE3
-	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 10:40:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7521318840AE
+	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 10:59:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 261E11C1F07;
-	Tue, 21 Jan 2025 10:40:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8585B1F12FD;
+	Tue, 21 Jan 2025 10:56:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b="F6syjK2V"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WNxdEDFn"
 X-Original-To: netdev@vger.kernel.org
-Received: from fw2.prolan.hu (fw2.prolan.hu [193.68.50.107])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f43.google.com (mail-io1-f43.google.com [209.85.166.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9DEA1BEF82;
-	Tue, 21 Jan 2025 10:40:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.68.50.107
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E49451F0E4E;
+	Tue, 21 Jan 2025 10:56:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737456018; cv=none; b=ZMOwDYSZyKLf2EJIaCUevOCfjodHutU1iXrXii2EOT/qzMNyqBEfSJidYsHYo9O3Jshu2/fEVdkFsbFuTu3y7pdswmSgXNHWvkSufOKmBwpKUzBW5uxAWSQdrR5pApghhR8RTD/dSO8uuernkY8MwCbszG6YEe+LoLp+LptyqCo=
+	t=1737457003; cv=none; b=mKUFxfbjeezUpIxcE2G0xxpqxf5f9UVb5P9t49eF5epSI5LlE8BsO76l/jcxsW1HdPaQY/tn+TzPHS+OKYcbhH+aIqrTG1L6voZFhB4fOOFXsBO5pf0vMGMOeoqAtNV3dPOTGC/Bke8JpgMfqtlaRg5zNNFHs3CqZDSGqHk+Sno=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737456018; c=relaxed/simple;
-	bh=/RFiy4KtEw5Ld7rO4MkJaBpq1+J6T2aRdGYD70o1fXk=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=aVjaQkXWndCQDEm1hWCGLPJeREULOj+mXqLK6abgqGYDLf1Flk/ufHKGq9rXeTbMjz1Gqht6VNr3Ei1cf/k/N0vMYCXeVmg2cKfk0OBXd0/7PDqXOOXvCyU5z5seBHZYT3pDkIyTcMbJQJLK6m1/Cvq0Yhvcv5RN039/iIlQkh4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=prolan.hu; spf=pass smtp.mailfrom=prolan.hu; dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b=F6syjK2V; arc=none smtp.client-ip=193.68.50.107
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=prolan.hu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=prolan.hu
-Received: from proxmox-mailgw.intranet.prolan.hu (localhost.localdomain [127.0.0.1])
-	by proxmox-mailgw.intranet.prolan.hu (Proxmox) with ESMTP id A0A0CA03A7;
-	Tue, 21 Jan 2025 11:40:05 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=prolan.hu; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:from:from:message-id:mime-version:reply-to:subject:subject:to
-	:to; s=mail; bh=64Jisw5Z95VY9Aga6b+rI9eNqwppYLgNfZ35UeF2PNs=; b=
-	F6syjK2VoHGpQWXERUmfUB1AGH6A+6LwFcM/V6pS0PReVdZmPY3T7Ic55i1fKc3P
-	KaLU6OooxdhWnj5O0YOkI2+Gx0uld9GMf/NAjqYszEhZydGHEBeknTKlCHBqJKx/
-	5iMykh2mSBEBvpkoGvK5t75KlBop3MbS2SuHwiBqA7CmVZ9VBh3SiwkUcnTRBZ11
-	RpjR9CZcEoZWcsITosvF28HiTQPnmOlRkrpQku8Z1hlOrYBkEmzKHSbK0RNotIHH
-	3SK7UnMnd6FioXs6HZLJoav8LGYExLhBG4LMU8g8lXelPpKoaI9UQzsQUXysq6+O
-	+hREwmfcVlWZSijN5da5V3olw97BhIdtnoaYwMegM7zcOJGqJq9Y7lcbm/xxbvVn
-	K7U2HEpuYD97yYbuAPz0ep+zIo8F9euHLciifqEP3MbgJkW0uQT/r0qNrf92YrxE
-	5J4B9rTrclwg0AD3a5h/RiaqkhSjA9F+P0lOdTyGEEkdJwzpxOIFJYJtcWEEhHEB
-	A/biMararsd3i49S3D5w5kbUM81838uhG2Z+or20XMMFWzRzAtLokpumEdIWXvMJ
-	2pplw5FUauuCHvM0op4++UvchjzzvmfztPH2f9UWWktbE8kV0PlxuMbBTkkG9nh6
-	zzkcQLzx4NglWacF3n0uJBRzloTZ4AKsokOqOyNq+W4=
-From: =?UTF-8?q?Cs=C3=B3k=C3=A1s=2C=20Bence?= <csokas.bence@prolan.hu>
-To: Jakub Kicinski <kuba@kernel.org>, Laurent Badel <laurentbadel@eaton.com>,
-	<imx@lists.linux.dev>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-CC: =?UTF-8?q?Cs=C3=B3k=C3=A1s=2C=20Bence?= <csokas.bence@prolan.hu>, Wei Fang
-	<wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang
-	<xiaoning.wang@nxp.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Paolo
- Abeni" <pabeni@redhat.com>
-Subject: [PATCH] net: fec: Refactor MAC reset to function
-Date: Tue, 21 Jan 2025 11:38:58 +0100
-Message-ID: <20250121103857.12007-3-csokas.bence@prolan.hu>
-X-Mailer: git-send-email 2.48.1
+	s=arc-20240116; t=1737457003; c=relaxed/simple;
+	bh=KuuY5pVb5eGjmHEbfnPTfZRlH4RQvSPVNOzGzVS6nfM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Fp9+GAkgDkwoBcVyujnv8K4PKB1wVPkk4z4l2sl1eTFF4iJwf8lmM5MYcXOA73mTeXc/oCU9kPjw9zvtnpdu7gM6iM+85rqw+CQ8SgyMu9VnCnFjI2Oh21+09nN/NXtDn9AeHhr1YQv99NtWogiAGHcngt++5/Q4LCr8MoZO1Ig=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WNxdEDFn; arc=none smtp.client-ip=209.85.166.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-io1-f43.google.com with SMTP id ca18e2360f4ac-84a012f7232so206445539f.0;
+        Tue, 21 Jan 2025 02:56:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1737457000; x=1738061800; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vh9vdl6b+Wwdbd8t2MqPBQqSVRZoOP68YbEuju1wfEA=;
+        b=WNxdEDFns0/K4hHSMpbBq7iQXcx/4qijENh+Ja0O+O/6m35FxEBEcQ0M+eFJxy5dOi
+         xR0BdGlAhfiKgcvAYEwClHj1Hn9qH/rsY+WEFPLhrObDoIvtl5JzRa6ICG9vOErNCYzR
+         DqrhQdaFnOVzjj5lpuw2l/lNVgBgaCUV6LDRfLSxvuqmuKJubY0ZbSjZ5T1n874sW2Q8
+         X25BtVRPTteftw8BBzAvcewye8JfS0jRgYKDrH2FJ5sKS/6NlS353oVqAEid/zXjFUU/
+         Z+GDgGM4pUdPJCilcW640dFTQGM/k8WvEI9AHx8PgOZCTeTIQFUXVS/QZf4u/c8NGvcO
+         1k6g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737457000; x=1738061800;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=vh9vdl6b+Wwdbd8t2MqPBQqSVRZoOP68YbEuju1wfEA=;
+        b=tvn+Aruz0Ayt8+d0SZ+VCimt2zz3d4sHEClzkxKIvTJqW9xWjyiz6bNQgyk9fNRsu7
+         6dyn6DKnkonjCxrDtQI2oo8btGp7gxNuU1a9Je3Rggr2qw2ToV1ZcZ0KWgiIMhYV7MnL
+         ihLldJAKU8lq6hU9lhyTFkyWEG7LmnS4sLgIqLvMOQjn8L03aqNP1UOLYQ1w8Xwsg+BC
+         ARI4ovog/xYvL6IxUrkrn4VGYLl/D79GWrodFp0BaCrJ5drm7cLrtxpuODXd0FL6xeVF
+         6IwHZ/XV+QWGC0qdlhrLBR2bFbeCgjt6noufyMGMdQyt7vmgFXGt2J2HaEiNKdqgGgfc
+         grEA==
+X-Forwarded-Encrypted: i=1; AJvYcCWVNJg2lttglBlcthM7SsAE8n9telW+rSJ05ufJPQXm0aDkzppBMM0c/Gid7OktAP6kGdNOTjgmNLY8tJg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyeH8llNFly0roQ8YIBese5VCjFqtJEFiazGPDLu6u7xyDc+7RI
+	0DcqZpDa5BIxsP0Fi7fY+kq/tH2OYdXyBFezj4hOH31FiwcXnE373Mh7gXBb/UoOVU5UtnMrNXw
+	1Phs5rpxeSMIzsfruE9ML/LsROMQ=
+X-Gm-Gg: ASbGncsLHXhbPnIJXveTOBpbtAvJV/bgvu6pK8MkKNFnSQ/BO807p6k7S7InPOkeKgw
+	kYChWUUT+HbbSg5MbcXPH82vYC62FcUNq237q0JXaK8/LSFUIbw==
+X-Google-Smtp-Source: AGHT+IEbAh91FukIr8yf8Eo9A8Hrdjt5Wkpd/TP+/u/bKuT2W/46gk0fit1nfnnLGtnQ6nlUtI4yagtnYzgi8a7/ZZg=
+X-Received: by 2002:a05:6e02:1a0c:b0:3ce:7faa:3d3f with SMTP id
+ e9e14a558f8ab-3cf747c7ad2mr117784465ab.3.1737456999869; Tue, 21 Jan 2025
+ 02:56:39 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <20250119134254.19250-1-kirjanov@gmail.com> <CAL+tcoDVTJ8vA_6wBd6ZDh2pq__fwJ9vzm3Kx5qpMNvaxpObjA@mail.gmail.com>
+ <CAHj3AV=wkJnX5rW4jdFycf6vtm1vW2a+gVNAcTnnaR7JqsPEeg@mail.gmail.com>
+In-Reply-To: <CAHj3AV=wkJnX5rW4jdFycf6vtm1vW2a+gVNAcTnnaR7JqsPEeg@mail.gmail.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Tue, 21 Jan 2025 18:56:03 +0800
+X-Gm-Features: AbW1kvZvsHcdCwYOnedppUbxs6Gzq34cjXYlw2ZKRcu71wK6DhqvLmlspYRbmog
+Message-ID: <CAL+tcoAw+KvJuhvjrdVEBD8EieSB0trJ72+YZvzb5YYCt6TAqA@mail.gmail.com>
+Subject: Re: [PATCH v2 net-next] sysctl net: Remove macro checks for CONFIG_SYSCTL
+To: Denis Kirjanov <kirjanov@gmail.com>
+Cc: netdev@vger.kernel.org, edumazet@google.com, davem@davemloft.net, 
+	kuba@kernel.org, pabeni@redhat.com, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ESET-AS: R=OK;S=0;OP=CALC;TIME=1737456004;VERSION=7983;MC=537548373;ID=63783;TRN=0;CRV=0;IPC=;SP=0;SIPS=0;PI=3;F=0
-X-ESET-Antispam: OK
-X-EsetResult: clean, is OK
-X-EsetId: 37303A2980D94852677467
+Content-Transfer-Encoding: quoted-printable
 
-The core is reset both in `fec_restart()`
-(called on link-up) and `fec_stop()`
-(going to sleep, driver remove etc.).
-These two functions had their separate
-implementations, which was at first only
-a register write and a `udelay()` (and
-the accompanying block comment).
-However, since then we got soft-reset
-(MAC disable) and Wake-on-LAN support,
-which meant that these implementations
-diverged, often causing bugs. For instance,
-as of now, `fec_stop()` does not check for
-`FEC_QUIRK_NO_HARD_RESET`. To eliminate
-this bug-source, refactor implementation
-to a common function.
+On Tue, Jan 21, 2025 at 5:17=E2=80=AFPM Denis Kirjanov <kirjanov@gmail.com>=
+ wrote:
+>
+> > Please take a look at the commit:
+> > commit b144fcaf46d43b1471ad6e4de66235b8cebb3c87
+> > Author: Kuniyuki Iwashima <kuniyu@amazon.com>
+> > Date:   Wed Jun 14 12:47:05 2023 -0700
+> >
+> >     dccp: Print deprecation notice.
+> >
+> >     DCCP was marked as Orphan in the MAINTAINERS entry 2 years ago in c=
+ommit
+> >     054c4610bd05 ("MAINTAINERS: dccp: move Gerrit Renker to CREDITS"). =
+ It says
+> >     we haven't heard from the maintainer for five years, so DCCP is not=
+ well
+> >     maintained for 7 years now.
+>
+> Yes, but on another hand I see that it's evolving, like MP-DCCP and
+> the according ietf draft
+> here: https://datatracker.ietf.org/doc/draft-ietf-tsvwg-multipath-dccp/20=
+/
+>
+> Also there is a out-of-the tree repo available with the implementation
+> of mp-dccp:
+> https://github.com/telekom/mp-dccp
 
-Fixes: c730ab423bfa ("net: fec: Fix temporary RMII clock reset on link up")
-Signed-off-by: Csókás, Bence <csokas.bence@prolan.hu>
----
+Interesting. Thanks for letting me know. It seems that we have to
+remove the deprecation warning...
 
-Notes:
-    Recommended options for this patch:
-    `--color-moved --color-moved-ws=allow-indentation-change`
-
- drivers/net/ethernet/freescale/fec_main.c | 50 +++++++++++------------
- 1 file changed, 23 insertions(+), 27 deletions(-)
-
-diff --git a/drivers/net/ethernet/freescale/fec_main.c b/drivers/net/ethernet/freescale/fec_main.c
-index 68725506a095..850ef3de74ec 100644
---- a/drivers/net/ethernet/freescale/fec_main.c
-+++ b/drivers/net/ethernet/freescale/fec_main.c
-@@ -1064,6 +1064,27 @@ static void fec_enet_enable_ring(struct net_device *ndev)
- 	}
- }
- 
-+/* Whack a reset.  We should wait for this.
-+ * For i.MX6SX SOC, enet use AXI bus, we use disable MAC
-+ * instead of reset MAC itself.
-+ */
-+static void fec_ctrl_reset(struct fec_enet_private *fep, bool wol)
-+{
-+	if (!wol || !(fep->wol_flag & FEC_WOL_FLAG_SLEEP_ON)) {
-+		if (fep->quirks & FEC_QUIRK_HAS_MULTI_QUEUES ||
-+		    ((fep->quirks & FEC_QUIRK_NO_HARD_RESET) && fep->link)) {
-+			writel(0, fep->hwp + FEC_ECNTRL);
-+		} else {
-+			writel(FEC_ECR_RESET, fep->hwp + FEC_ECNTRL);
-+			udelay(10);
-+		}
-+	} else {
-+		val = readl(fep->hwp + FEC_ECNTRL);
-+		val |= (FEC_ECR_MAGICEN | FEC_ECR_SLEEP);
-+		writel(val, fep->hwp + FEC_ECNTRL);
-+	}
-+}
-+
- /*
-  * This function is called to start or restart the FEC during a link
-  * change, transmit timeout, or to reconfigure the FEC.  The network
-@@ -1080,17 +1101,7 @@ fec_restart(struct net_device *ndev)
- 	if (fep->bufdesc_ex)
- 		fec_ptp_save_state(fep);
- 
--	/* Whack a reset.  We should wait for this.
--	 * For i.MX6SX SOC, enet use AXI bus, we use disable MAC
--	 * instead of reset MAC itself.
--	 */
--	if (fep->quirks & FEC_QUIRK_HAS_MULTI_QUEUES ||
--	    ((fep->quirks & FEC_QUIRK_NO_HARD_RESET) && fep->link)) {
--		writel(0, fep->hwp + FEC_ECNTRL);
--	} else {
--		writel(1, fep->hwp + FEC_ECNTRL);
--		udelay(10);
--	}
-+	fec_ctrl_reset(fep, false);
- 
- 	/*
- 	 * enet-mac reset will reset mac address registers too,
-@@ -1344,22 +1355,7 @@ fec_stop(struct net_device *ndev)
- 	if (fep->bufdesc_ex)
- 		fec_ptp_save_state(fep);
- 
--	/* Whack a reset.  We should wait for this.
--	 * For i.MX6SX SOC, enet use AXI bus, we use disable MAC
--	 * instead of reset MAC itself.
--	 */
--	if (!(fep->wol_flag & FEC_WOL_FLAG_SLEEP_ON)) {
--		if (fep->quirks & FEC_QUIRK_HAS_MULTI_QUEUES) {
--			writel(0, fep->hwp + FEC_ECNTRL);
--		} else {
--			writel(FEC_ECR_RESET, fep->hwp + FEC_ECNTRL);
--			udelay(10);
--		}
--	} else {
--		val = readl(fep->hwp + FEC_ECNTRL);
--		val |= (FEC_ECR_MAGICEN | FEC_ECR_SLEEP);
--		writel(val, fep->hwp + FEC_ECNTRL);
--	}
-+	fec_ctrl_reset(fep, true);
- 	writel(fep->phy_speed, fep->hwp + FEC_MII_SPEED);
- 	writel(FEC_DEFAULT_IMASK, fep->hwp + FEC_IMASK);
- 
--- 
-2.48.1
-
-
+Thanks,
+Jason
 
