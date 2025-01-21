@@ -1,113 +1,97 @@
-Return-Path: <netdev+bounces-160104-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160105-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E132BA182C4
-	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 18:21:00 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F3E1A182DE
+	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 18:28:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B03857A423A
-	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 17:20:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B6AB1168B54
+	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 17:28:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2C1A1F4E2A;
-	Tue, 21 Jan 2025 17:20:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2D921F4E4E;
+	Tue, 21 Jan 2025 17:28:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="GRXxJQ4L"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="nh35QrK8"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 001371F4727;
-	Tue, 21 Jan 2025 17:20:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EAE9187FE4;
+	Tue, 21 Jan 2025 17:28:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737480054; cv=none; b=iaTKwdgS7o4HXuc4nyq8GvD6wIneXpi8ex3rpUM4LX5KhSLhySVoEtfsSIWQIq/qFDai5OQOHxTqAyfxl+QeUVvGf7ZtkDrBcSlYURiS6lLfForYRnywPmMPzevUg43YO3Y4Wozdv8ms+7Vt63+HUAd53FNRWJ8NzMLVrjQ+dNI=
+	t=1737480505; cv=none; b=I3gSnbTdDLQ2QLO3MhGUnHBm5NGZXS1FbKmnKKRX8Rg7A/p6FMvQx+u/UL+yC5tPKwOsjTgLBKG2Rkhb537z14iE8lEFVOP+mBLem4NOfCd9zwcDLGg19T4sZCbv0A4sjQnN+DcX4cKzf8umYDHGLfP1roKoF1i0h+J7c4q1a1E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737480054; c=relaxed/simple;
-	bh=awQsp/zga7f9a/85M78VuqjOd6AVQILOYmdeMCjgkoI=;
+	s=arc-20240116; t=1737480505; c=relaxed/simple;
+	bh=aKihCuwpDjP+3WpP5pWPvpBfWV6EZUzB/Dw+KPp79Ew=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Lj6envgAArS/ls1hqry5nPDsA4xjNrhXeaG6O3Zd6EtBBVR21W+L11vTsVgXb2rpIXR3uRBvoKCGO42tcTuBZduyj0eObhHRnkUKio1ic9sS4BaaShq4ngKQOPB5r4EdMTBVESgj5n+2rOMVQtvwh/Goj3mN0UckBg32Vb/WJfY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=GRXxJQ4L; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=fiDpiAcNclIsig/1oviV0fo7KBPko3e5K/cXbU7vasJ7BFAVtqPlb68d68Aw0Tor7yqsyVvciHLo+LcTiYrsU4Bgvoz+ZUMNHVL8D8PMJ8Kf5sloHayRyPjoXhwnbzsVuzhGFrmn7bgu/FaM5bSrvxZoOoDin7bR2IEAyfMm4s4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=nh35QrK8; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=cfxHIP2j1h5TjSDYNb52YqchEUxPxLg0EzNjEnekIY0=; b=GRXxJQ4LdAcU77S49gb/McXylm
-	wGu48QsKPDJ8A3s6VtzXXKTgxQbxucgXzN7JzcOtUs9RE17Yn75khm2QFbQAAry5YXLmqLYV+PIKk
-	QdT4sOMZxW0v83+CJcFsiLPxF55e1E/elrHpvCHmimZjErMJ9ymcDd+SCNi9NSmNw1r4=;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=AULDCh3skin4ia5GKeLHsxGKbV03ce5IgBpotaDf2ec=; b=nh
+	35QrK8RCaUIKsIkRLa/caNMCkPEwIszDDVMCVYCuSBeFVw0uSNVXSSqypcAWMBcLuYWnyIQLwdvvA
+	7Uy0TGi97SsFiUealcDDdhEM2rHM0Gu2lWQkmrA0lIJMOR3x7sSDcmf6j6TCX+LRWkIxunAC7KaA3
+	8Vvw8ob9VKHPMCA=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1taHvZ-006hXW-Kq; Tue, 21 Jan 2025 18:20:37 +0100
-Date: Tue, 21 Jan 2025 18:20:37 +0100
+	id 1taI2w-006hg6-Dk; Tue, 21 Jan 2025 18:28:14 +0100
+Date: Tue, 21 Jan 2025 18:28:14 +0100
 From: Andrew Lunn <andrew@lunn.ch>
-To: Yijie Yang <quic_yijiyang@quicinc.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+To: =?iso-8859-1?B?Q3Pza+FzLA==?= Bence <csokas.bence@prolan.hu>
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	Laurent Badel <laurentbadel@eaton.com>, imx@lists.linux.dev,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Wei Fang <wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>,
+	Clark Wang <xiaoning.wang@nxp.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, Vinod Koul <vkoul@kernel.org>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konradybcio@kernel.org>,
-	Richard Cochran <richardcochran@gmail.com>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH v3 2/4] net: stmmac: dwmac-qcom-ethqos: Mask PHY mode if
- configured with rgmii-id
-Message-ID: <717d77d1-43a4-4914-8d7d-a70c89cb1822@lunn.ch>
-References: <20250121-dts_qcs615-v3-0-fa4496950d8a@quicinc.com>
- <20250121-dts_qcs615-v3-2-fa4496950d8a@quicinc.com>
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH] net: fec: Refactor MAC reset to function
+Message-ID: <c345df3f-8b5d-4f86-bef0-72870d1f9a66@lunn.ch>
+References: <20250121103857.12007-3-csokas.bence@prolan.hu>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20250121-dts_qcs615-v3-2-fa4496950d8a@quicinc.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250121103857.12007-3-csokas.bence@prolan.hu>
 
-On Tue, Jan 21, 2025 at 03:54:54PM +0800, Yijie Yang wrote:
-> The Qualcomm board always chooses the MAC to provide the delay instead of
-> the PHY, which is completely opposite to the suggestion of the Linux
-> kernel. The usage of phy-mode in legacy DTS was also incorrect. Change the
-> phy_mode passed from the DTS to the driver from PHY_INTERFACE_MODE_RGMII_ID
-> to PHY_INTERFACE_MODE_RGMII to ensure correct operation and adherence to
-> the definition.
-> To address the ABI compatibility issue between the kernel and DTS caused by
-> this change, handle the compatible string 'qcom,qcs404-evb-4000' in the
-> code, as it is the only legacy board that mistakenly uses the 'rgmii'
-> phy-mode.
+On Tue, Jan 21, 2025 at 11:38:58AM +0100, Csókás, Bence wrote:
+> The core is reset both in `fec_restart()`
+> (called on link-up) and `fec_stop()`
+> (going to sleep, driver remove etc.).
+> These two functions had their separate
+> implementations, which was at first only
+> a register write and a `udelay()` (and
+> the accompanying block comment).
+> However, since then we got soft-reset
+> (MAC disable) and Wake-on-LAN support,
+> which meant that these implementations
+> diverged, often causing bugs. For instance,
+> as of now, `fec_stop()` does not check for
+> `FEC_QUIRK_NO_HARD_RESET`. To eliminate
+> this bug-source, refactor implementation
+> to a common function.
 > 
-> Signed-off-by: Yijie Yang <quic_yijiyang@quicinc.com>
-> ---
->  .../net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c    | 18 +++++++++++++-----
->  1 file changed, 13 insertions(+), 5 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-> index 2a5b38723635b5ef9233ca4709e99dd5ddf06b77..e228a62723e221d58d8c4f104109e0dcf682d06d 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-> @@ -401,14 +401,11 @@ static int ethqos_dll_configure(struct qcom_ethqos *ethqos)
->  static int ethqos_rgmii_macro_init(struct qcom_ethqos *ethqos)
->  {
->  	struct device *dev = &ethqos->pdev->dev;
-> -	int phase_shift;
-> +	int phase_shift = 0;
->  	int loopback;
->  
->  	/* Determine if the PHY adds a 2 ns TX delay or the MAC handles it */
+> Fixes: c730ab423bfa ("net: fec: Fix temporary RMII clock reset on link up")
+> Signed-off-by: Csókás, Bence <csokas.bence@prolan.hu>
 
-Please think about this comment.
+The subject say "Refactor...." A refactor generally does not need a
+Fixes: tag. Maybe make the subject reflect the bug you are fixing, and
+reword the commit message to focus on the bug being fixed, not the
+refactor.
 
-       Andrew
+	Andrew
 
