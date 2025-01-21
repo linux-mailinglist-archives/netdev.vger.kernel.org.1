@@ -1,93 +1,77 @@
-Return-Path: <netdev+bounces-159891-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159892-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C2B9A17545
-	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 01:40:07 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A8C0A1754B
+	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 01:46:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8659C3A7EDB
-	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 00:40:00 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A876B7A2CB0
+	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 00:46:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62248EBE;
-	Tue, 21 Jan 2025 00:40:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D4E48BE8;
+	Tue, 21 Jan 2025 00:46:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WTMnZ0EC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gEy4iB9w"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B204DDAD
-	for <netdev@vger.kernel.org>; Tue, 21 Jan 2025 00:40:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75A0A7464;
+	Tue, 21 Jan 2025 00:46:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737420004; cv=none; b=brKTSEnSeGuf5PTykjUwtKQWFalsteCrVGWdwLptCAIc0TsY5m1KRQ2vbPHpt2vMxrS8y3TqIfv71L7wFV4h8QF2Zr3ODeynu+zx+boGXCGIUX+4aLEh8W+7S3FUhjKuW4tRdDzVrAUT8nSCfCAEOA9v39qRnRTbmQhV0HohN3Y=
+	t=1737420384; cv=none; b=lToGedKEniThE2zlT/Tg7WILEmGBhIMxHBKVEb9aXcZ8uEFL+XNohWGCsOxR6poYQPDrq2jaRbBPev2R5/ywaNX3bOmWjRp4TP7wR7pdK+muBO7p4nm/kz7cq8OjtaWAjJKZe0ejgcitjT4VnS7C/K6YTk2cr24WiyZB2Tt4Khw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737420004; c=relaxed/simple;
-	bh=B7VL0kUqvlcxbhdchvDU32N5rBhiWviczMnLpMAru0g=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=JJMtZGtem8Bulrb0hQitvT86w6HOzT2FvRBxpq8ytKN6h7TZMZoUv6m6g+Lb+0Ww9eqGz609C4Rp5sPZPPWjsR8R6Y+GFjZ4JIoAFNZaGM5RPAzmlNUOpO/M5WhXW1tpbTPilp3N6YtnIZjVFbXF1qGhSW8xIrxcdyd6TcOkL9c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WTMnZ0EC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A99B8C4CEDD;
-	Tue, 21 Jan 2025 00:40:03 +0000 (UTC)
+	s=arc-20240116; t=1737420384; c=relaxed/simple;
+	bh=z1LrzfOHjxZ6uJgLi9v+gJvY9HLWrNDWS8jnaEMaYb8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=rJy4ZocjbEhZtZ2mxMYOCzPyAzK619cr4FTpTLO3WG8Sw3K9yk+JudI9YIE4dkh7BWGkw78qfS/xIhqtiesUWtp8nR4RAYbTbGM8n8U0LkpGkuC53e2SFge46I2nHgrQKUZ1bUG3mNq0O88c5tEYMNC71CKHdNy+Ka1Oog25ZVc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gEy4iB9w; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D163C4CEDD;
+	Tue, 21 Jan 2025 00:46:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737420003;
-	bh=B7VL0kUqvlcxbhdchvDU32N5rBhiWviczMnLpMAru0g=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=WTMnZ0ECfoeAHItRlGCb1AiZn8edukRaOC4VvFGiINKCz+JrDzUdsXOGucj/pgpV4
-	 +Iy49prj8YBG6Jl2Acu8N9evc3cKzqGzWE5RV2P+LTItI9NO72ZJQ7C2y8WCJXugyU
-	 5COJJqfv2VI3y2pLwyLQS2sMmVX/R41ihvtKLSxkuuWiFZW1Wl+0rLcBKSZXam6HDc
-	 ZWm55vasJw2v0DfOknV0DxU2HESMktnboA0z2vD2yDLIcBd4DEffAfiAK93bN2Gq+o
-	 8ZT02f6jxwzZBLyMOzwXyqZ8zQUOGXmkrEl6hVkTvgfJ1P0U5Stp8wmo7AgLBq8A8/
-	 BF7lShc0UpO1w==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB00F380AA62;
-	Tue, 21 Jan 2025 00:40:28 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1737420382;
+	bh=z1LrzfOHjxZ6uJgLi9v+gJvY9HLWrNDWS8jnaEMaYb8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=gEy4iB9wMghfe9BhW0wPDueOXKSqvz7Mc2nZegknRTN6c5QviUjDpNwwnyFPnWjwL
+	 ZZ7N/Q64mx9F8hvEZ1R1sQiJ6Iu4Z+HgyKR8xj0Tmo9+1HqFBupqiutqRaSKp6aCKy
+	 0KFnfqzH2tyOUS1wjjAgzJ2PEy8jv7Tz55nkUWKvihkdAf4nXuxpDz9ehTp6pUJEgY
+	 klc+OOSJr4iSFRDV1GAsY8Tvgm9ajIJ/XNVK66PM9XcZsmKrcPuL4lDQPw9bDMXIbJ
+	 qIInabx4cXhaFRQoxqynaR6EiZEdmZof3ucBIGuKobiqN+Ayy82jKAqeilmu43FelM
+	 UIFHu5IISQUSg==
+Date: Mon, 20 Jan 2025 16:46:21 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Yuyang Huang <yuyanghuang@google.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+ <horms@kernel.org>, David Ahern <dsahern@kernel.org>,
+ netdev@vger.kernel.org, Donald Hunter <donald.hunter@gmail.com>, Shuah Khan
+ <shuah@kernel.org>, Nikolay Aleksandrov <razor@blackwall.org>, Hangbin Liu
+ <liuhangbin@gmail.com>, Daniel Borkmann <daniel@iogearbox.net>,
+ linux-kselftest@vger.kernel.org, "Maciej =?UTF-8?B?xbtlbmN6eWtvd3NraQ==?="
+ <maze@google.com>, Lorenzo Colitti <lorenzo@google.com>
+Subject: Re: [PATCH net-next, v6 1/2] netlink: support dumping IPv4
+ multicast addresses
+Message-ID: <20250120164621.287af2eb@kernel.org>
+In-Reply-To: <20250117081600.150863-1-yuyanghuang@google.com>
+References: <20250117081600.150863-1-yuyanghuang@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: phylink: fix regression when binding a PHY
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173742002775.3693984.5137194373335494555.git-patchwork-notify@kernel.org>
-Date: Tue, 21 Jan 2025 00:40:27 +0000
-References: <E1tZp1a-001V62-DT@rmk-PC.armlinux.org.uk>
-In-Reply-To: <E1tZp1a-001V62-DT@rmk-PC.armlinux.org.uk>
-To: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Fri, 17 Jan 2025 17:15:58 +0900 Yuyang Huang wrote:
+>  include/linux/igmp.h | 12 +++++++
+>  net/ipv4/devinet.c   | 76 ++++++++++++++++++++++++++++++++++++--------
+>  net/ipv4/igmp.c      | 13 +++++---
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Mon, 20 Jan 2025 10:28:54 +0000 you wrote:
-> Some PHYs don't support clause 45 access, and return -EOPNOTSUPP from
-> phy_modify_mmd(), which causes phylink_bringup_phy() to fail. Prevent
-> this failure by allowing -EOPNOTSUPP to also mean success.
-> 
-> Reported-by: Jiawen Wu <jiawenwu@trustnetic.com>
-> Tested-by: Jiawen Wu <jiawenwu@trustnetic.com>
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-> 
-> [...]
-
-Here is the summary with links:
-  - [net-next] net: phylink: fix regression when binding a PHY
-    https://git.kernel.org/netdev/net-next/c/b1754a69e7be
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+IIUC Paolo's suggestion was to create a new header file under net/ipv4,
+if you consider addrconf.h unsuitable. There is no need to expose this
+argument struct in kernel-wide headers.
 
