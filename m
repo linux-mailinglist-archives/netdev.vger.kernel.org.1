@@ -1,131 +1,83 @@
-Return-Path: <netdev+bounces-160113-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160114-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 007D9A18473
-	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 19:07:38 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B849A18476
+	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 19:07:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5B5907A4E57
-	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 18:06:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 378D73AC21D
+	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 18:07:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1D761F542F;
-	Tue, 21 Jan 2025 18:06:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADEEA1F63FD;
+	Tue, 21 Jan 2025 18:07:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="lZhE2ZM5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G/Ozg/TY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AAD01F472D
-	for <netdev@vger.kernel.org>; Tue, 21 Jan 2025 18:06:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 824DE1F0E36;
+	Tue, 21 Jan 2025 18:07:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737482814; cv=none; b=bIC+bDTgNy3TLdHzyorID9pCy+erH+lvrCjfFDqh+xJ47NgMCly61sEUIc0JR0o+ThlABVNEronpTz/vFkx3lrM2xeVlpeX0QdjOuW/bXfByf/K4M4JKpB4s9zC7SJdrDEMGPuQpzGpJfzL6y03ipXtkmvq9JVFKh9EeZ5Fgu1w=
+	t=1737482837; cv=none; b=VFSEAD9x7usEp4Cvfr52phCPJDsCHI0Y4RqW3/e4prMXExpwqt0i67zKaefZ2My9xnf29xG4u2MysLILgw6GX8Eog/oZMDgwPrteJZ0oL+8z6/vyt32nTwFupRxE1PpA54W/vAvAQkNxM9o60xwGKN3WKyyxE9kusSSIbhA1N8Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737482814; c=relaxed/simple;
-	bh=yzMp9OHuDafOKBn9rcCV9TmT/23Cxa4L5N2agXVJ7RY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tXJ6Ej6cSw42sGc9cgb6GUO9Md+6vKubGrIhaUqNAuBckZ5tn9Vx1vyu19VDMBrcldfK6jRSSE2Hrrc66CKBC3VsUDAqe8REgG+SdVIwo7iEqEclKOapToBR0ynzRuSejF3Oj4khl2f9Kt8pAe8+fF+jTb8LF+8g8EANa387Zt4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=lZhE2ZM5; arc=none smtp.client-ip=185.226.149.38
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
-Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
-	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.93)
-	(envelope-from <mhal@rbox.co>)
-	id 1taIeA-001V5h-Sf; Tue, 21 Jan 2025 19:06:42 +0100
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-	s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
-	References:Cc:To:Subject:MIME-Version:Date:Message-ID;
-	bh=B0NkyGC4wYzCqVt2GL2dQ8Knz8FG3vRNUr8ob8BqF5k=; b=lZhE2ZM5ebUs7A8nmbHRIqXRl8
-	MUCnJTfK17MbN21CUElCkz+PNZr31HSVtBnHd1eMmgeeSikqNLHxtf/3jU0zTXjlGBKVQmfENidkm
-	9PX2cX02Cwhpt+nUurU1kGffhyKp1uR3yOaAHgPLf2hEcMWUlWLGwIhYIC34lrJH1g71frVxPG4ko
-	PwefQEVtEe/Hsg9wcV025DbgJjKWY6KwaHMKzoyDUOMOFKsEcLJrvGeJEcjtCyKWPWslQlw3TprVT
-	WpR6AFtLuPmZhYXl+ifjoto4O8sbMlJxi6mqs1FD5AfKJA6Nl6cfWV9os9vsBqklX4Mazlll4RrjA
-	GQ3R5rpw==;
-Received: from [10.9.9.72] (helo=submission01.runbox)
-	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
-	(envelope-from <mhal@rbox.co>)
-	id 1taIe9-0006xt-CE; Tue, 21 Jan 2025 19:06:41 +0100
-Received: by submission01.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.93)
-	id 1taIe0-006jVZ-TF; Tue, 21 Jan 2025 19:06:32 +0100
-Message-ID: <2bdfe259-e182-4846-b501-a33096cc74f1@rbox.co>
-Date: Tue, 21 Jan 2025 19:06:31 +0100
+	s=arc-20240116; t=1737482837; c=relaxed/simple;
+	bh=J4UT365Ok9HELuxt2t6fBVtIwsEsrhsyX/XUzce9h8A=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ZIVrUCOrj6aJhJqi2eViNlK0x1e6xifnyDPPoNq7c8fbNt8pOo8qEsLPYz2NgMEtNYPffly44YtSutRMZtSLbSetY9ShiIw2RzXjZzLHug7r1qEuFQ50oj79PPP4/UUBdLPzyomCI95afKR1G5oCCPpc6tNnX6caoI5h5WqgWEg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G/Ozg/TY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B3439C4CEE0;
+	Tue, 21 Jan 2025 18:07:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1737482837;
+	bh=J4UT365Ok9HELuxt2t6fBVtIwsEsrhsyX/XUzce9h8A=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=G/Ozg/TYwL7PXLgd5p310P5l4Ri7DFxSKpEykMxSgOItMACtxTs/wFj2A3UQHCere
+	 W2hs0YjmVlJO26es7TxtnxXB09Q7AC5Oth3tHjz+xHRS3uW/BaURCYF9Dg6XvR/5pY
+	 /eiHXynQAeDZu7uQngaUjErbv5MOMM0Jpa56v2NiB8X/sFPMeYjVT4Dy3zzW+7VWq8
+	 8pdwvTsg91CvZAeQmRq6WXxLPiFgn2R2ADIZ3a/aYrZYJnNCFoPAJc7Wy9shS6COL5
+	 VkuMnQcBuAc887pF7KoI4QacBXRQbEhWliy8Zf8mPSzUEBE1ltgoFKopQM4HlW1SUj
+	 qr/y15DHsH97Q==
+Date: Tue, 21 Jan 2025 10:07:15 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: =?UTF-8?B?Q3PDs2vDoXM=?= Bence <csokas.bence@prolan.hu>
+Cc: Simon Horman <horms@kernel.org>, Laurent Badel <laurentbadel@eaton.com>,
+ <imx@lists.linux.dev>, <netdev@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, Wei Fang <wei.fang@nxp.com>, Shenwei Wang
+ <shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, "Eric
+ Dumazet" <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH] net: fec: Refactor MAC reset to function
+Message-ID: <20250121100715.5e2a9971@kernel.org>
+In-Reply-To: <2ddcb00f-b5dd-46fd-a8f9-9d45c0ae82ef@prolan.hu>
+References: <20250121103857.12007-3-csokas.bence@prolan.hu>
+	<20250121151936.GF324367@kernel.org>
+	<2ddcb00f-b5dd-46fd-a8f9-9d45c0ae82ef@prolan.hu>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 1/2] vsock/virtio: discard packets if the transport
- changes
-To: Luigi Leonardi <leonardi@redhat.com>
-Cc: Stefano Garzarella <sgarzare@redhat.com>, netdev@vger.kernel.org,
- Simon Horman <horms@kernel.org>, Stefan Hajnoczi <stefanha@redhat.com>,
- linux-kernel@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Wongi Lee <qwerty@theori.io>,
- "David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
- Jason Wang <jasowang@redhat.com>,
- Bobby Eshleman <bobby.eshleman@bytedance.com>,
- virtualization@lists.linux.dev, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
- <eperezma@redhat.com>, bpf@vger.kernel.org, Jakub Kicinski
- <kuba@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>,
- Hyunwoo Kim <v4bel@theori.io>, kvm@vger.kernel.org
-References: <20250108180617.154053-1-sgarzare@redhat.com>
- <20250108180617.154053-2-sgarzare@redhat.com>
- <2b3062e3-bdaa-4c94-a3c0-2930595b9670@rbox.co>
- <blvbtr3c7uxtbspbfwrobfk7qdukz6nst2bnomoxbltst2yhkm@47k6evsdceeg>
-Content-Language: pl-PL, en-GB
-From: Michal Luczaj <mhal@rbox.co>
-In-Reply-To: <blvbtr3c7uxtbspbfwrobfk7qdukz6nst2bnomoxbltst2yhkm@47k6evsdceeg>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
 
-On 1/21/25 18:30, Luigi Leonardi wrote:
-> On Thu, Jan 09, 2025 at 02:34:28PM +0100, Michal Luczaj wrote:
->> FWIW, I've tried simplifying Hyunwoo's repro to toy with some tests. 
->> Ended
->> up with
->>
->> ```
->>from threading import *
->>from socket import *
->>from signal import *
->>
->> def listener(tid):
->> 	while True:
->> 		s = socket(AF_VSOCK, SOCK_SEQPACKET)
->> 		s.bind((1, 1234))
->> 		s.listen()
->> 		pthread_kill(tid, SIGUSR1)
->>
->> signal(SIGUSR1, lambda *args: None)
->> Thread(target=listener, args=[get_ident()]).start()
->>
->> while True:
->> 	c = socket(AF_VSOCK, SOCK_SEQPACKET)
->> 	c.connect_ex((1, 1234))
->> 	c.connect_ex((42, 1234))
->> ```
->>
->> which gives me splats with or without this patch.
->>
->> That said, when I apply this patch, but drop the `sk->sk_state !=
->> TCP_LISTEN &&`: no more splats.
->>
-> Hi Michal,
-> 
-> I think it would be nice to have this test in the vsock test suite.  
-> WDYT? If you don't have any plans to port this to C, I can take care of 
-> it :)
+On Tue, 21 Jan 2025 16:51:51 +0100 Cs=C3=B3k=C3=A1s Bence wrote:
+> On 2025. 01. 21. 15:36, Ahmad Fatoum wrote:
+>  > please make the lines a bit longer for v2. 43 characters is much too  =
+=20
+> limited.
+>=20
+> Reformatted to 80 cols.
 
-Sure, go ahead, but note that this is just a (probably suboptimal) Python
-version of Hyunwoo's C repro[1].
+Quoting "Submitting patches":
 
-[1]: https://lore.kernel.org/netdev/Z2LvdTTQR7dBmPb5@v4bel-B760M-AORUS-ELITE-AX/
+  The body of the explanation, line wrapped at 75 columns, which will be
+  copied to the permanent changelog to describe this patch.
 
+https://docs.kernel.org/process/submitting-patches.html#the-canonical-patch=
+-format
 
