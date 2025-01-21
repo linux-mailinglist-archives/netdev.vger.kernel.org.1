@@ -1,216 +1,159 @@
-Return-Path: <netdev+bounces-160111-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160112-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73380A18396
-	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 18:58:43 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E900A1846E
+	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 19:07:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 10D653A3C2E
-	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 17:58:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 85E8A188C8D8
+	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 18:06:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6F311F76C7;
-	Tue, 21 Jan 2025 17:57:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E3D51F5404;
+	Tue, 21 Jan 2025 18:05:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="vMQpIwLi"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="H6XA2rtI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D24451F76BC
-	for <netdev@vger.kernel.org>; Tue, 21 Jan 2025 17:57:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E6ED1F55E5
+	for <netdev@vger.kernel.org>; Tue, 21 Jan 2025 18:05:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737482239; cv=none; b=MJqQIkXyuEU/vskYIE/5c5MRFOJfz2vwm7gR08TIqbQadlWKCpm5zHibLhKslX25arSVaYbobp6e7FBF7HefZke5aFN4uC2P/wt1KL2t3NKyAmaxQJ5V/BS1ij2MUY7ed2wEqaRVhK0AU3VgmlVVc8IJHp8JS6yAdBUrDL/xbZU=
+	t=1737482759; cv=none; b=NuREJ5jZI+nESrCJStF4Y1RIgyNQGfmTTmOlbAmdphwecdsg/gkT4HaEtjHNV/bDOuNS8xe+Mrx1+Ap6W3v5Fyo0NaNwm0nINuECD0Rl9d4A+gnpzF94y5iZmZzeUmUSLzRBaV6CPhPxL7ZBaGE50EBHb7CuVBXZcpEhQlD7UuI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737482239; c=relaxed/simple;
-	bh=XSfquQqmKI2Gaj0dXpHAa/dbcT2l9u6zX+xrg1/pkZk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=l9hsxBPj29JTFBmw8s+ajrNkkpqh63hCwotwijbKVnLn0oMuljruSFGq963fRvN0/MKfaS5P8KntFkp6TwH1rb6PYkkbljUTED01/8hr+d1q5TlK0j1mhheRPy5NxHQTbV0OV18eUyM5KwmNU/2gCXOaXeAjDyDcTDpDH6gHPJ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=vMQpIwLi; arc=none smtp.client-ip=209.85.216.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-2efd81c7ca4so8070231a91.2
-        for <netdev@vger.kernel.org>; Tue, 21 Jan 2025 09:57:17 -0800 (PST)
+	s=arc-20240116; t=1737482759; c=relaxed/simple;
+	bh=Z/5JpBlY05/+HAh63nWlsxlwvFHUY5Ud7D8gIq2iy60=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=iT5pkhfnf+V08ZoviYdmCxnj5+nprvs4t+A+iUMT6XiFwlvSAkoI34Y1IDlzCsJynumFAZQ08sCIrvgk9Hw4QOKH6JMtrTfcgwmkX6HNiQ5jlwTWE2ZjS8IsX7QsR1JpGBM/XGr/4nJJjxd17we7MAu/20Fsnm5nqkWsC6M/IGQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=H6XA2rtI; arc=none smtp.client-ip=209.85.128.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-4361d5730caso1785e9.1
+        for <netdev@vger.kernel.org>; Tue, 21 Jan 2025 10:05:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1737482237; x=1738087037; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=loeQ6r/We5SeCLLC6MzCpKw48tXiOliWFpYbk3PaSbk=;
-        b=vMQpIwLic2YnOEti6++8MbNJMSeTdC7tnIySXSk/Q0nTwDZzUpzWM33SuObGd+p9on
-         PK7cgg5K0/JGeAQwx0RuDUiYe2M9QzEPlW28PJFpwLIcXan7ufBXVmt3n0lIZI/vvotp
-         JvYHGmQMP33O3ll0NQY9vg5jq87hjA7Qto2GI=
+        d=google.com; s=20230601; t=1737482756; x=1738087556; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MYKhhqcUsfI3HSCwHgCTl8ivXkn9AieqiEzqUfNd8ho=;
+        b=H6XA2rtIU0lAohhzf9XVNLN9yWyWgQlyOovz2nI8/kJJxq5hqk/19x5FSz57xUvHm9
+         utbdPjk9Xsl+JRqt2JKU02r464VGw68DSfxrlRKnQRv/UvOrgx6QdLNMNl3g5hBC/FF5
+         RnbXT1vkDq6dz/FPUIHUuJwM1s3Kq1lryBuDMpZP3PvoFV2OfG5EZ85gtzk3nttp1760
+         RsXJD+3VqydM97uH0h8qOCr7pc/CKsnh/2QXa1OFygB9vYl7PBhtiar+BcMskQDq3VDP
+         zSU//wy4MUYu5FEsVacU0WW4cDuL1pJqk8HHJ9XbHF8MoiuGdXXz7IlsueQ2DMTehpVA
+         9YbA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737482237; x=1738087037;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=loeQ6r/We5SeCLLC6MzCpKw48tXiOliWFpYbk3PaSbk=;
-        b=vJGJc2sDeRUeohZkKO2gSZQ4ZF4eaOnisrZSYMLO96eSL2o4VA9anvFoeZSRv9JuJs
-         QdjbkO98gfRFzcyvD11l0H84yGdlL43tTipY+BBKGjmkL7lHf+bxMVpfPgoK7+2zwXvs
-         2w1h23L+IGXeRLLv/lL6epoB5RtVQSTuUpQw476PmCJgtFrtgl/kWagCMefqYwkom1+9
-         M4G1rKZdWnx3OL2YwgjibDnNPcrY4oPGfRJHWcVBA5e9UCTHn43jzlJhivGrhv+PDpgA
-         PvnIRtUTHJXdPEi5G3SgeMdbVkE81kR65rm3wQTgvIqKBLgSW5kjAkJsAAr57Wy65QX8
-         PRHQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWjxsE5dNkjIjaWyos92sHGD6uzRG2ltZiuJJLR3EwrvMJyn5OKXf0M4IucuRzG5fFEIIbEQM8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyIVjZUTID1GYHLXdh96RAjO6FJ8jgI/Tcl4GFfkDU+GErD52W6
-	e3xgSxLSwWoZbNtG4od+tEBRuYMZvRNYp8n6fYmvnWXQx9hIvxAWyOau0nQokpk=
-X-Gm-Gg: ASbGncsHioAP9nyELaGOtLlFk8+jlUldXF4apZ4vDUvIKTuYkET5uGQJ2iUCYD8bYjn
-	qOqTG2Q8HaUw6FszedNp98rjfIIFpBIaV3bcd0YShepGvUWk6BB9x3MIR4tK4eoIjRxoXrSsTHU
-	ZyuUVaC6C8f4gv90ac8h9GEaDFt4TJjhUWNgMTYYoia5COITBA8q/rVY5VPLx+2X+xSYdlTuLnu
-	Pqay/i1Q2VlYX7+R8VVq+sM3tCp5QRNV91T7IXSp6Re/kXyLMKxIBjtpiwh6eeL+RJlgCTS5TB5
-	eMoyzN5t3v0x+D6E8/3MNiE/pENB9m4Yg2Lc
-X-Google-Smtp-Source: AGHT+IF8nTdSqJGUknuS2lb7RP37aOhCWFkCHgx+4XdAmYkt2v6vsufE7wyH2eVz6huRJPSOUWyXXA==
-X-Received: by 2002:a05:6a00:a0c:b0:726:41e:b321 with SMTP id d2e1a72fcca58-72dafbdacadmr27151527b3a.21.1737482237014;
-        Tue, 21 Jan 2025 09:57:17 -0800 (PST)
-Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72dab9c8e89sm9472195b3a.109.2025.01.21.09.57.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Jan 2025 09:57:16 -0800 (PST)
-Date: Tue, 21 Jan 2025 09:57:12 -0800
-From: Joe Damato <jdamato@fastly.com>
-To: Gerhard Engleder <gerhard@engleder-embedded.com>
-Cc: Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	"open list:XDP (eXpress Data Path):Keyword:(?:b|_)xdp(?:b|_)" <bpf@vger.kernel.org>,
-	jasowang@redhat.com, leiyang@redhat.com, mkarsten@uwaterloo.ca,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	"open list:VIRTIO CORE AND NET DRIVERS" <virtualization@lists.linux.dev>,
-	open list <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v2 3/4] virtio_net: Map NAPIs to queues
-Message-ID: <Z4_f-PNEdmBaMkhP@LQ3V64L9R2>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Gerhard Engleder <gerhard@engleder-embedded.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	"open list:XDP (eXpress Data Path):Keyword:(?:b|_)xdp(?:b|_)" <bpf@vger.kernel.org>,
-	jasowang@redhat.com, leiyang@redhat.com, mkarsten@uwaterloo.ca,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	"open list:VIRTIO CORE AND NET DRIVERS" <virtualization@lists.linux.dev>,
-	open list <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org
-References: <20250116055302.14308-1-jdamato@fastly.com>
- <20250116055302.14308-4-jdamato@fastly.com>
- <1737013994.1861002-1-xuanzhuo@linux.alibaba.com>
- <Z4kvQI8GmmEGrq1F@LQ3V64L9R2>
- <f8fe5618-af94-4f5b-8dbc-e8cae744aedf@engleder-embedded.com>
+        d=1e100.net; s=20230601; t=1737482756; x=1738087556;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=MYKhhqcUsfI3HSCwHgCTl8ivXkn9AieqiEzqUfNd8ho=;
+        b=GF249n57IxNjAWRa3x4+mpeagKuLYUEQsNsjAzcM9iFyw139miKXxIjjfAq7IXWVjZ
+         95QM14EVgji7lgh11Ul/+vXsR86WxKTZSVy4NMQ79imErUqC16Q00TftcyHZEu+5p22N
+         MorfvQAy6Sh2yFedMukH+YbHeM9DEk3805A5PRRiDpIMcXQLIwnidDpSyW1r6yV34Rbu
+         hgj64k0heJFU47n/FYNWTOtXKwrwT0RjXwfX3/aH2nNmtyCCkdt6dQ/MQ5/ZIfRRtgia
+         LBcGxNK6ip0UzcWCQPfwJ9tUU8Q3b50cb/65f909McHOZYgKB6jnQDK2tBAePFnaNqMl
+         Bkfg==
+X-Forwarded-Encrypted: i=1; AJvYcCWthXgyw2wssoH8KT3Ei2Afu7Nn5Cwh94XykIlULUOgDz5myPm7Oi4JvNwVT7B8E6R4PF/t+8w=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy/YEMB9R1I43y+rQ7qJPsdEaGGgu/rHCS7ujestXUmFzXmlrBg
+	5YSghFQ+hCna3LFo/1qzlL9pe105XaPSsoHjJSitZR5c45gxHr7rAocQCcxElZ75pslSKALsdiG
+	DHGrCg/mOQZ122ov92Q8f9YVXBVO/PXN3JMyZlVsY7JIOPD6Smo09
+X-Gm-Gg: ASbGnct1kt+H0sJO5C+ExbGHMLVYyvN2QddTPY6wERUdqnAM7kLFpSG/qpwT+/5fxyD
+	6DYqooGSAwrnPNfJUUabT4uO4E2UJU3vzbot/kV/ySoixT9/zWx7UWgouo1i4Yg==
+X-Google-Smtp-Source: AGHT+IFNEJOfXjmbAMsQyJDFe0MOI0J2254FZFAb//Px7TpD56bfi5CXTVwD0XmzD2T+X5mbRCEsgF7WvlWwaE/f5nY=
+X-Received: by 2002:a05:600c:6d8c:b0:434:a0fd:95d9 with SMTP id
+ 5b1f17b1804b1-438a0f45862mr4051705e9.5.1737482755704; Tue, 21 Jan 2025
+ 10:05:55 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f8fe5618-af94-4f5b-8dbc-e8cae744aedf@engleder-embedded.com>
+References: <20250113211139.4137621-1-pkaligineedi@google.com> <20250114180237.33e61fef@kernel.org>
+In-Reply-To: <20250114180237.33e61fef@kernel.org>
+From: Ziwei Xiao <ziweixiao@google.com>
+Date: Tue, 21 Jan 2025 10:05:44 -0800
+X-Gm-Features: AbW1kvZN1J19Q9S-mEGPzzPn-sLZKSRTI98gXX7yWj3syun6rZf_UhGp7S5Zx1U
+Message-ID: <CAG-FcCP7iJaVwWXwaCPN_N83RMe2Tb5sahhnf6YxRU48gxE1gQ@mail.gmail.com>
+Subject: Re: [PATCH net-next] gve: Add RSS cache for non RSS device option scenario
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Praveen Kaligineedi <pkaligineedi@google.com>, netdev@vger.kernel.org, davem@davemloft.net, 
+	edumazet@google.com, pabeni@redhat.com, shailend@google.com, 
+	andrew+netdev@lunn.ch, willemb@google.com, hramamurthy@google.com, 
+	horms@kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jan 16, 2025 at 09:28:07PM +0100, Gerhard Engleder wrote:
-> On 16.01.25 17:09, Joe Damato wrote:
-> > On Thu, Jan 16, 2025 at 03:53:14PM +0800, Xuan Zhuo wrote:
-> > > On Thu, 16 Jan 2025 05:52:58 +0000, Joe Damato <jdamato@fastly.com> wrote:
-> > > > Use netif_queue_set_napi to map NAPIs to queue IDs so that the mapping
-> > > > can be accessed by user apps.
-> > > > 
-> > > > $ ethtool -i ens4 | grep driver
-> > > > driver: virtio_net
-> > > > 
-> > > > $ sudo ethtool -L ens4 combined 4
-> > > > 
-> > > > $ ./tools/net/ynl/pyynl/cli.py \
-> > > >         --spec Documentation/netlink/specs/netdev.yaml \
-> > > >         --dump queue-get --json='{"ifindex": 2}'
-> > > > [{'id': 0, 'ifindex': 2, 'napi-id': 8289, 'type': 'rx'},
-> > > >   {'id': 1, 'ifindex': 2, 'napi-id': 8290, 'type': 'rx'},
-> > > >   {'id': 2, 'ifindex': 2, 'napi-id': 8291, 'type': 'rx'},
-> > > >   {'id': 3, 'ifindex': 2, 'napi-id': 8292, 'type': 'rx'},
-> > > >   {'id': 0, 'ifindex': 2, 'type': 'tx'},
-> > > >   {'id': 1, 'ifindex': 2, 'type': 'tx'},
-> > > >   {'id': 2, 'ifindex': 2, 'type': 'tx'},
-> > > >   {'id': 3, 'ifindex': 2, 'type': 'tx'}]
-> > > > 
-> > > > Note that virtio_net has TX-only NAPIs which do not have NAPI IDs, so
-> > > > the lack of 'napi-id' in the above output is expected.
-> > > > 
-> > > > Signed-off-by: Joe Damato <jdamato@fastly.com>
-> > > > ---
-> > > >   v2:
-> > > >     - Eliminate RTNL code paths using the API Jakub introduced in patch 1
-> > > >       of this v2.
-> > > >     - Added virtnet_napi_disable to reduce code duplication as
-> > > >       suggested by Jason Wang.
-> > > > 
-> > > >   drivers/net/virtio_net.c | 34 +++++++++++++++++++++++++++++-----
-> > > >   1 file changed, 29 insertions(+), 5 deletions(-)
-> > > > 
-> > > > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> > > > index cff18c66b54a..c6fda756dd07 100644
-> > > > --- a/drivers/net/virtio_net.c
-> > > > +++ b/drivers/net/virtio_net.c
-> > > > @@ -2803,9 +2803,18 @@ static void virtnet_napi_do_enable(struct virtqueue *vq,
-> > > >   	local_bh_enable();
-> > > >   }
-> > > > 
-> > > > -static void virtnet_napi_enable(struct virtqueue *vq, struct napi_struct *napi)
-> > > > +static void virtnet_napi_enable(struct virtqueue *vq,
-> > > > +				struct napi_struct *napi)
-> > > >   {
-> > > > +	struct virtnet_info *vi = vq->vdev->priv;
-> > > > +	int q = vq2rxq(vq);
-> > > > +	u16 curr_qs;
-> > > > +
-> > > >   	virtnet_napi_do_enable(vq, napi);
-> > > > +
-> > > > +	curr_qs = vi->curr_queue_pairs - vi->xdp_queue_pairs;
-> > > > +	if (!vi->xdp_enabled || q < curr_qs)
-> > > > +		netif_queue_set_napi(vi->dev, q, NETDEV_QUEUE_TYPE_RX, napi);
-> > > 
-> > > So what case the check of xdp_enabled is for?
-> > 
-> > Based on a previous discussion [1], the NAPIs should not be linked
-> > for in-kernel XDP, but they _should_ be linked for XSK.
-> > 
-> > I could certainly have misread the virtio_net code (please let me
-> > know if I've gotten it wrong, I'm not an expert), but the three
-> > cases I have in mind are:
-> > 
-> >    - vi->xdp_enabled = false, which happens when no XDP is being
-> >      used, so the queue number will be < vi->curr_queue_pairs.
-> > 
-> >    - vi->xdp_enabled = false, which I believe is what happens in the
-> >      XSK case. In this case, the NAPI is linked.
-> > 
-> >    - vi->xdp_enabled = true, which I believe only happens for
-> >      in-kernel XDP - but not XSK - and in this case, the NAPI should
-> >      NOT be linked.
-> 
-> My interpretation based on [1] is that an in-kernel XDP Tx queue is a
-> queue that is only used if XDP is attached and is not visible to
-> userspace. The in-kernel XDP Tx queue is used to not load stack Tx
-> queues with XDP packets. IIRC fbnic has additional queues only for
-> XDP Tx. So for stack RX queues I would always link napi, no matter if
-> XDP is attached or not. I think most driver do not have in-kernel XDP
-> Tx queues. But I'm also not an expert.
+On Tue, Jan 14, 2025 at 6:02=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> On Mon, 13 Jan 2025 13:11:39 -0800 Praveen Kaligineedi wrote:
+> >  static int gve_set_rxfh(struct net_device *netdev, struct ethtool_rxfh=
+_param *rxfh,
+> >                       struct netlink_ext_ack *extack)
+> >  {
+> >       struct gve_priv *priv =3D netdev_priv(netdev);
+> > +     int err;
+> >
+> >       if (!priv->rss_key_size || !priv->rss_lut_size)
+> >               return -EOPNOTSUPP;
+> >
+> > -     return gve_adminq_configure_rss(priv, rxfh);
+> > +     if (priv->cache_rss_config && !priv->rss_cache_configured) {
+> > +             err =3D gve_init_rss_config(priv);
+>
+> I don't understand why this is here.
+> Why are you programming the default config the first time user asks
+> to set rxfh? And just to immediately overwrite it.
 
-I think you are probably right, so I'll send an RFC (since net-next
-is now closed) with a change as you've suggested after I test it.
-
-In this case, it'll be simply removing the if statement altogether
-and mapping the NAPIs to queues.
+>
+> Shouldn't you be doing this on probe or first open?
+Thank you for pointing this out. I will send V2 patch when the window
+is open to make it initialize RSS when the driver probe, and remove
+the gve_init_rss_config code in the gve_set_rxfh.
+>
+> Oh and in gve_setup_device_resources() you call gve_init_rss_config()
+>
+> > +     if (priv->rss_cache_configured) {
+>
+> so you reset what user wanted to defaults, only if user wanted
+> something explicitly _not_ default. Hm.
+>
+This if check will be removed in the V2 patch too.
+> > +             if (err) {
+> > +                     dev_err(&priv->pdev->dev, "Fail to init RSS confi=
+g\n");
+>
+> use extack, please
+>
+Will be updated in the V2 patch
+> > +                     return err;
+> > +             }
+> > +     }
+>
+> > +int gve_init_rss_config(struct gve_priv *priv)
+> > +{
+> > +     struct gve_rss_config *rss_config =3D &priv->rss_config;
+> > +     struct ethtool_rxfh_param rxfh;
+> > +     u16 i;
+> > +
+> > +     for (i =3D 0; i < priv->rss_lut_size; i++)
+> > +             rss_config->hash_lut[i] =3D i % priv->rx_cfg.num_queues;
+>
+> nit: ethtool_rxfh_indir_default()
+>
+Will be updated in the V2 patch
+> > +
+> > +     netdev_rss_key_fill(rss_config->hash_key, priv->rss_key_size);
+> > +
+> > +     rxfh.hfunc =3D ETH_RSS_HASH_TOP;
+> > +
+> > +     return gve_adminq_configure_rss(priv, &rxfh);
+> > +}
+> --
+> pw-bot: cr
 
