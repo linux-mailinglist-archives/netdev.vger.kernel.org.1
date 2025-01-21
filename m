@@ -1,73 +1,75 @@
-Return-Path: <netdev+bounces-160119-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160121-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64A2BA1857B
-	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 20:11:20 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C0E0A1857F
+	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 20:11:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 97F31169668
-	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 19:11:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7BEFF3AB4C0
+	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 19:11:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 395361F7084;
-	Tue, 21 Jan 2025 19:11:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C0CE1F76D8;
+	Tue, 21 Jan 2025 19:11:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="KE+iFltD"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="X422TL3N"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
+Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 810B0E57D
-	for <netdev@vger.kernel.org>; Tue, 21 Jan 2025 19:11:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A48A01F76A7
+	for <netdev@vger.kernel.org>; Tue, 21 Jan 2025 19:11:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737486669; cv=none; b=ckWFRafwmN1/7KDJ4nidBAG5lPFOJ95TbX5X35WcpY40E/nYv00VSAuysWCiqTBjxWuJMJVa+tiMc3F50NU5vN1WGsiBL0KFhnQFxRrZBLbONcVI6OwBx/vJI30/qyKdAMeeTP8/6sqgudYsRT/aQgg+IWryrxicCCbYzGq95Q8=
+	t=1737486673; cv=none; b=Qta2HK7Zfewse+FBhn8K06R52IwXMvp0kvYdhUuplPWoUs0lejIHMeKXQGNyqgRcl8uPt87cO7pN4T63ervHmdSbcwqfc4oj8y/RdUo4W4ogB94E21n/irxWd88qjO5Rek4E8neCrjRUnENdAQfzPC/DbryaK4/DIPjRJQvqELE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737486669; c=relaxed/simple;
-	bh=+0FsmQUk4wwlNbG2Q/Gp0YW679krx30KK3RM+HGyF8M=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=d/KZP/37DjOIRsjUguOX6ogfQL1Rb4ONq7aSIXR+aqpWvi2ANXorrAcrmZZ/ELVR/9Oj86j3fyIAQOQh+KcH/fmceviXCZrmghN7X988TrzHRb55sWMy0mL3IJ+RrqNLCOJS4XirBJbpz4wZWJJcB4LCzN990UyXg52K3JliAgw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=KE+iFltD; arc=none smtp.client-ip=209.85.216.46
+	s=arc-20240116; t=1737486673; c=relaxed/simple;
+	bh=36m+Ryb9CJuvJR9nbvQowFH7ClbOSrNUnAqBaTNmIQY=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=Z9JUqUTHPh8F+uNRrc1r5XRdNN/1qlOMK5hUJBhfEUL9fymw+VSpjb6JSzQNz//ZcP3KeVgkwBmF8BBFVW+4v4OFHmAW4apiSgQJloNPO5KHVKE4epI1RXODl4XwXJfLNJqHrIlTIPo5BfqJC/iZZdhMHodEK1i7uf/XrAk761g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=X422TL3N; arc=none smtp.client-ip=209.85.216.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-2ef714374c0so142145a91.0
-        for <netdev@vger.kernel.org>; Tue, 21 Jan 2025 11:11:06 -0800 (PST)
+Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-2eed82ca5b4so10396023a91.2
+        for <netdev@vger.kernel.org>; Tue, 21 Jan 2025 11:11:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1737486665; x=1738091465; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=q3Sac5q4L1YHRHONzzVYH+nRWURN24ROJ0RWQrQ27i0=;
-        b=KE+iFltD5m4xnOq/0rwt+0jIeDZ9Og5YNghAGyhrx3EQGoPfXtTjzd/0Ubdl0F5rpL
-         BdwROMUN4quo17y7CrQCoOKBE1SE7TKK28DHutoyp1wtQwJFZS0O4OyreVNmcwk7G27Y
-         AX5HQtj9GykHSJqE/U+o8jj3Zf1JeeCISppeM=
+        d=fastly.com; s=google; t=1737486669; x=1738091469; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FDwiQXOb0dtbRJ3DmhupJOiqoOo1ySphxgwOZ65b5Lc=;
+        b=X422TL3NgiDRJB9TLcq0u5EBu2w1v5ZZuFriMvZtJRVPqlQxCpFEvdkuozAlgADo09
+         wrb0sKV4WC9ZNLGRbw7W4vYgPAn2rVo0JLUNJ87Fe9XyeyP9qBsPpvuz/K/ND6pG3KaF
+         XzomIJxyA9JzADSCTyp9SgLZo2+8jQppuyxc4=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737486665; x=1738091465;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=q3Sac5q4L1YHRHONzzVYH+nRWURN24ROJ0RWQrQ27i0=;
-        b=QG38Cih56i9ToLz/0o0ZSqqe71yfaBhlr5TB4V91C1xn9+df1rBYxftU4R9ZV7HFS+
-         31sLGci5yIX+f6KRNWLKfZhxZ/aXbK/0YeQUiwWOA1W9Rtks8VsG93FUTM90F7aECLND
-         HxGoBpaoHTTknyMrrtoGh+aBM8W1COlwiwEwparPP3JQTUDLWcBGOs8FP0Q2TMzzJ9EW
-         VUQRopyPgvyZ0TWFmGaVtzKtuH1SnPI/8DAzrKiw+Mbe4uEPXAq9xXvmjdEAfKm2xXiK
-         /PlpJSZX9SY87ReJyvJtGFefbc1wkdv+bF1gSFBi0XuScWzud3i4y6NxFulNV71NOTo7
-         iyIA==
-X-Gm-Message-State: AOJu0Ywmhy3vfN56ALxMLms/biHYY+UlyNLNDGR6Oif04APHFu4dFsZd
-	PGmNZ2gGkv3P6cTsujKjLb1rU4tzWmgGGdw4n9r6m2pfmvUHQw6LTiUCo3Z6OWUiaivhooVM5wW
-	wwBUYz3/Rt7FqWGcPDMyia5DByTej6F4P/Zcbv2M7aMFj2SoauyLrHA0/OxY4cPrLkrgZPh/EbE
-	sA/a5h/kOW7Tt2srKaWzS04F/OA9tAl8EV1Tc=
-X-Gm-Gg: ASbGnctCKK1mavq/BHvwb/jq4kMocXtP69zFHok1wt3764UeWMW39BwcSRxlEdabrLk
-	KcOrogR7jwiCldcR0bDb+0ovrY1lQTGwg7u5sEMVu/sUJKV+DkZNnkbtTF59ti+FKQIBnIo3S4r
-	osrBEJtNuJ0hVGWh+orzC8P6CV0adPaoXhDBYF/eLx3URePzcc3dNhfBiq7w141+zmYW4O5sDIe
-	PNXrAwXrjmj4pEfRGWfQJ6cSyWnbfPneU4RfDYurGMU3DQcJlatk5u59wsQVmu6wh91L1308AiY
-	Jg==
-X-Google-Smtp-Source: AGHT+IESdTWYzrYdfrjHndy1A6eiSq6VjHZhj5JI29tgHseTks5JAkTBUNTjwpCAQiHydlbjVFpE3A==
-X-Received: by 2002:a17:90b:53ce:b0:2ee:cbd0:4910 with SMTP id 98e67ed59e1d1-2f782beed8bmr27056092a91.1.1737486665211;
-        Tue, 21 Jan 2025 11:11:05 -0800 (PST)
+        d=1e100.net; s=20230601; t=1737486669; x=1738091469;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=FDwiQXOb0dtbRJ3DmhupJOiqoOo1ySphxgwOZ65b5Lc=;
+        b=UkdrJOhmZ6R1qy2Yo5CojuEQUnFojPR/sm87QG+NfgwizJ2Lyt24HVvKAWS8zLNtUL
+         gSQ3KSVmWTnKVaSjoOUm8u6UGCGul+k40rIUs0Z1UniG68upovPJY+nbWHKWLQgDtwjK
+         G0VP3AHKHJTrX5lk0ku2NZQUhyczCyJT5bELP+w9Hyrj3UWarjDWxNN27QWbXhvvCRj0
+         Md1FUiWybd/xvzhESXI9WOHn3EwNRFXtQCwBAZ+2F5S9UqbeWItmStF48O/dGmTjKbB2
+         beuZr1/S3R5X6tfAy9OHmByLOh6KHolIyTbqIoKp966nKOr1l9HZvMQHj1o8a3T+qquY
+         1VVw==
+X-Gm-Message-State: AOJu0YzShw03Sswymf2w+wzcenIsHM/AIG52/HCSvt8fIU1EKNzP7YCL
+	GhxURFnHC+o9cUqWNx64OKt11sCid5hfau1FUHnKxPhgElnpNnlKswIkOEolvUKUT3YhyrqCBCj
+	YZFVZP/HF+CmGcblizq1WI/zvbj2hmhnbo0/cfwRlUWs5kBc/7m4sMMPf3kPnsN+iXuhtkOVMT7
+	nTh0Kxpkcj8mYMRiEWKFPLKJ5QWryTrQLnPFY=
+X-Gm-Gg: ASbGncvehyzVa/hFBn35cs/wFXq75hf5Xz48lNDATI1QftUoKmt3zdPeLcBWIEmDTfI
+	3dkZbMNcgpnUZOMOmvJw9DIqjKCTCuE+Q6BXgWnlrZsjMR5d1GQ79kogbCaTWBpKovM0g8jeBwp
+	U/hVWbkcnpNLMojbWKV8q7ittPZLbT/7gSxvinTTDpQNNdj4BYow5E4M+s8zikc6Senu8q70WJf
+	Bi0n/EZqCl0SKfTSGjUF5Dxb4ActLfAlYKs29m9NTa5/g6y5PQwn3XpRfPmncm4j6AZ794PVOir
+	pg==
+X-Google-Smtp-Source: AGHT+IFrbRJ/R0m0SceTG3oQbb0XNatc3hOdnfunYdBKaQ+YC8e4bymwDNEoE5iJLWgFoSXDDDTmQQ==
+X-Received: by 2002:a17:90a:d60f:b0:2ef:31a9:95af with SMTP id 98e67ed59e1d1-2f782d32956mr26450648a91.27.1737486668611;
+        Tue, 21 Jan 2025 11:11:08 -0800 (PST)
 Received: from localhost.localdomain ([2620:11a:c019:0:65e:3115:2f58:c5fd])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2f7db6ab125sm1793440a91.26.2025.01.21.11.11.03
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2f7db6ab125sm1793440a91.26.2025.01.21.11.11.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Jan 2025 11:11:04 -0800 (PST)
+        Tue, 21 Jan 2025 11:11:08 -0800 (PST)
 From: Joe Damato <jdamato@fastly.com>
 To: netdev@vger.kernel.org
 Cc: gerhard@engleder-embedded.com,
@@ -75,30 +77,24 @@ Cc: gerhard@engleder-embedded.com,
 	leiyang@redhat.com,
 	xuanzhuo@linux.alibaba.com,
 	mkarsten@uwaterloo.ca,
+	Jakub Kicinski <kuba@kernel.org>,
 	Joe Damato <jdamato@fastly.com>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Alexei Starovoitov <ast@kernel.org>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
-	bpf@vger.kernel.org (open list:XDP (eXpress Data Path):Keyword:(?:\b|_)xdp(?:\b|_)),
-	Daniel Borkmann <daniel@iogearbox.net>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Kuniyuki Iwashima <kuniyu@amazon.com>,
-	linux-kernel@vger.kernel.org (open list),
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
 	Simon Horman <horms@kernel.org>,
-	virtualization@lists.linux.dev (open list:VIRTIO CORE AND NET DRIVERS)
-Subject: [RFC net-next v3 0/4] virtio_net: Link queues to NAPIs
-Date: Tue, 21 Jan 2025 19:10:40 +0000
-Message-Id: <20250121191047.269844-1-jdamato@fastly.com>
+	Kuniyuki Iwashima <kuniyu@amazon.com>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	linux-kernel@vger.kernel.org (open list)
+Subject: [RFC net-next v3 1/4] net: protect queue -> napi linking with netdev_lock()
+Date: Tue, 21 Jan 2025 19:10:41 +0000
+Message-Id: <20250121191047.269844-2-jdamato@fastly.com>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20250121191047.269844-1-jdamato@fastly.com>
+References: <20250121191047.269844-1-jdamato@fastly.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -107,81 +103,115 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Greetings:
+From: Jakub Kicinski <kuba@kernel.org>
 
-Welcome to RFC v3, since net-next is closed. See changelog below.
+netdev netlink is the only reader of netdev_{,rx_}queue->napi,
+and it already holds netdev->lock. Switch protection of the
+writes to netdev->lock as well.
 
-Recently [1], Jakub mentioned that there were a few drivers that are not
-yet mapping queues to NAPIs.
+Add netif_queue_set_napi_locked() for API completeness,
+but the expectation is that most current drivers won't have
+to worry about locking any more. Today they jump thru hoops
+to take rtnl_lock.
 
-While I don't have any of the other hardware mentioned, I do happen to
-have a virtio_net laying around ;)
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Reviewed-by: Joe Damato <jdamato@fastly.com>
+---
+ v2:
+   - Added in v2 from Jakub.
 
-I've attempted to link queues to NAPIs, using the new locking Jakub
-introduced avoiding RTNL.
-
-Note: It seems virtio_net uses TX-only NAPIs which do not have NAPI IDs.
-As such, I've left the TX NAPIs unset (as opposed to setting them to 0).
-
-As per the discussion on the v2 [2], all RX queues now have their NAPIs
-linked.
-
-See the commit message of patch 3 for an example of how to get the NAPI
-to queue mapping information.
-
-See the commit message of patch 4 for an example of how NAPI IDs are
-persistent despite queue count changes.
-
-Thanks,
-Joe
-
-[1]: https://lore.kernel.org/netdev/20250109084301.2445a3e3@kernel.org/
-[2]: https://lore.kernel.org/netdev/f8fe5618-af94-4f5b-8dbc-e8cae744aedf@engleder-embedded.com/
-
-v3:
-  - patch 3:
-    - Removed the xdp checks completely, as Gerhard Engleder pointed
-      out, they are likely not necessary.
-
-  - patch 4:
-    - Added Xuan Zhuo's Reviewed-by.
-
-v2:
-  - patch 1:
-    - New in the v2 from Jakub.
-
-  - patch 2:
-    - Previously patch 1, unchanged from v1.
-    - Added Gerhard Engleder's Reviewed-by.
-    - Added Lei Yang's Tested-by.
-
-  - patch 3:
-    - Introduced virtnet_napi_disable to eliminate duplicated code
-      in virtnet_xdp_set, virtnet_rx_pause, virtnet_disable_queue_pair,
-      refill_work as suggested by Jason Wang.
-    - As a result of the above refactor, dropped Reviewed-by and
-      Tested-by from patch 3.
-
-  - patch 4:
-    - New in v2. Adds persistent NAPI configuration. See commit message
-      for more details.
-
-Jakub Kicinski (1):
-  net: protect queue -> napi linking with netdev_lock()
-
-Joe Damato (3):
-  virtio_net: Prepare for NAPI to queue mapping
-  virtio_net: Map NAPIs to queues
-  virtio_net: Use persistent NAPI config
-
- drivers/net/virtio_net.c      | 38 +++++++++++++++++++++++++++--------
  include/linux/netdevice.h     |  9 +++++++--
  include/net/netdev_rx_queue.h |  2 +-
- net/core/dev.c                | 16 ++++++++++++---
- 4 files changed, 51 insertions(+), 14 deletions(-)
+ net/core/dev.c                | 16 +++++++++++++---
+ 3 files changed, 21 insertions(+), 6 deletions(-)
 
-
-base-commit: cf33d96f50903214226b379b3f10d1f262dae018
+diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+index 8da4c61f97b9..4709d16bada5 100644
+--- a/include/linux/netdevice.h
++++ b/include/linux/netdevice.h
+@@ -691,7 +691,7 @@ struct netdev_queue {
+  * slow- / control-path part
+  */
+ 	/* NAPI instance for the queue
+-	 * Readers and writers must hold RTNL
++	 * Readers and writers must hold netdev->lock
+ 	 */
+ 	struct napi_struct	*napi;
+ 
+@@ -2467,7 +2467,8 @@ struct net_device {
+ 	 * Partially protects (writers must hold both @lock and rtnl_lock):
+ 	 *	@up
+ 	 *
+-	 * Also protects some fields in struct napi_struct.
++	 * Also protects some fields in:
++	 *	struct napi_struct, struct netdev_queue, struct netdev_rx_queue
+ 	 *
+ 	 * Ordering: take after rtnl_lock.
+ 	 */
+@@ -2694,6 +2695,10 @@ static inline void *netdev_priv(const struct net_device *dev)
+ void netif_queue_set_napi(struct net_device *dev, unsigned int queue_index,
+ 			  enum netdev_queue_type type,
+ 			  struct napi_struct *napi);
++void netif_queue_set_napi_locked(struct net_device *dev,
++				 unsigned int queue_index,
++				 enum netdev_queue_type type,
++				 struct napi_struct *napi);
+ 
+ static inline void netdev_lock(struct net_device *dev)
+ {
+diff --git a/include/net/netdev_rx_queue.h b/include/net/netdev_rx_queue.h
+index 596836abf7bf..9fcac0b43b71 100644
+--- a/include/net/netdev_rx_queue.h
++++ b/include/net/netdev_rx_queue.h
+@@ -23,7 +23,7 @@ struct netdev_rx_queue {
+ 	struct xsk_buff_pool            *pool;
+ #endif
+ 	/* NAPI instance for the queue
+-	 * Readers and writers must hold RTNL
++	 * Readers and writers must hold netdev->lock
+ 	 */
+ 	struct napi_struct		*napi;
+ 	struct pp_memory_provider_params mp_params;
+diff --git a/net/core/dev.c b/net/core/dev.c
+index afa2282f2604..ab361fd9efd9 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -6842,14 +6842,24 @@ EXPORT_SYMBOL(dev_set_threaded);
+  */
+ void netif_queue_set_napi(struct net_device *dev, unsigned int queue_index,
+ 			  enum netdev_queue_type type, struct napi_struct *napi)
++{
++	netdev_lock(dev);
++	netif_queue_set_napi_locked(dev, queue_index, type, napi);
++	netdev_unlock(dev);
++}
++EXPORT_SYMBOL(netif_queue_set_napi);
++
++void netif_queue_set_napi_locked(struct net_device *dev,
++				 unsigned int queue_index,
++				 enum netdev_queue_type type,
++				 struct napi_struct *napi)
+ {
+ 	struct netdev_rx_queue *rxq;
+ 	struct netdev_queue *txq;
+ 
+ 	if (WARN_ON_ONCE(napi && !napi->dev))
+ 		return;
+-	if (dev->reg_state >= NETREG_REGISTERED)
+-		ASSERT_RTNL();
++	netdev_assert_locked_or_invisible(dev);
+ 
+ 	switch (type) {
+ 	case NETDEV_QUEUE_TYPE_RX:
+@@ -6864,7 +6874,7 @@ void netif_queue_set_napi(struct net_device *dev, unsigned int queue_index,
+ 		return;
+ 	}
+ }
+-EXPORT_SYMBOL(netif_queue_set_napi);
++EXPORT_SYMBOL(netif_queue_set_napi_locked);
+ 
+ static void napi_restore_config(struct napi_struct *n)
+ {
 -- 
 2.25.1
 
