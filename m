@@ -1,114 +1,201 @@
-Return-Path: <netdev+bounces-160078-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160080-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E20DA18098
-	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 15:57:08 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95C9EA180BF
+	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 16:08:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 84E623A0357
-	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 14:57:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A5A97160C94
+	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 15:08:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D70E1F3FF5;
-	Tue, 21 Jan 2025 14:57:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 291221F540C;
+	Tue, 21 Jan 2025 15:07:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cBS1IcEP"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Jz+ur9PB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f175.google.com (mail-qk1-f175.google.com [209.85.222.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE2D81F3FDA;
-	Tue, 21 Jan 2025 14:57:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 694EB1F5408
+	for <netdev@vger.kernel.org>; Tue, 21 Jan 2025 15:07:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737471424; cv=none; b=WIaa9DbTSY2vJvMlPNO4e6P/xHjBZCRGKk37r23x2glM124BI/5KspQCmWG0u5FS5yj01NJQtgLzS3uPJNvDLhJYsd9mmI8iF9B95KQaQGQpxOiGjCkQulySG/AqgyaUPpbNdzzZwQJSlnODQp3UswY0E6+Hve517kY1byryHlY=
+	t=1737472030; cv=none; b=LUHyDyWRTw5H7wYnX5LoREkkMuW3lvapVMUeDhMFbjCnfRJKUYtatxvu27mtyp9TJgGO8b/LHARFRXKFmlQj6xqpuqL+mHsKE+yCcrpN73lbX9C4jPBgXU1SN5UXm/lwJw1ZZsoe0Oy/ek+Uiz7Rve9cM0g2PzWWE5aqM0XCSDU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737471424; c=relaxed/simple;
-	bh=STREbbKIOKaVKCyyn6Bngx/JTH8nnsrWQHdqVhI3Vp4=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=aMJCzwIbl/VqtIs4/ee4O4iP7YRYpgkD7JGI0hvlexEZcJNI9PLpHYek+PFu2VGX3ic7Qk6QuVc2DxrI2ajUcEQLc4acl7pdYZlAkQjbCyL5KYM0UFrgnriRM0eDd/09E3HFZP/roVeIWZdi7sYlS/0xOyHgh0JfJ4cRwCnx/9w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cBS1IcEP; arc=none smtp.client-ip=209.85.222.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f175.google.com with SMTP id af79cd13be357-7b6ef047e9bso526095085a.1;
-        Tue, 21 Jan 2025 06:57:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1737471421; x=1738076221; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0XhfzHaCu0hfOUT7G07sOpPFV31U0hz3p+JF3fI28lY=;
-        b=cBS1IcEPsBD6GdLXtTkJ4+qK7EKLuU2vmsiYtHkGBVFO1oIK8ILwNvPKJS1S6kXk97
-         Gwi9veTT7u42X+JxiswGgJafKsksEXdc4n9z6mnvzmVKwyC/t66Rls9otYJD3v6s7Gjt
-         TjUXBrL2VovLxkIU2ydL182ZidwFbK/mFVza7Kx7KIerIcXR+QIKx/jpyTPe7k5Im7Eb
-         JI6fUwwqhIxICn6fmTDIAW790YvTPdTWiKliBeTvY1k3Yxb0Vlgzb1/Stq3J2wzi/dG4
-         eXK4+HJFTILJlYl0xxn+jOBagBUhWWNlfP4BQCyS6ieS3EC+gNdMf6SEfiys63BBVsLR
-         IooA==
+	s=arc-20240116; t=1737472030; c=relaxed/simple;
+	bh=E4awb02GfOMHu6yIjUy62+GVOVOjQQgO9J5MZBqVA58=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WZtzR/mEPJhpKA/KZC1NB9B9j78Y4ygwjleHlO7xb6BW6bEaiLOMsjbdnRt5DQqnHgSVXSRWcU31uFFiSmrWWkfKTcYxXkf2YfUExGeu7Ikh/0CPO4SsjoSPOWUdClKeFknpcY9egedwnfLi0g7t0KOAB0FasyjBivuEYD+xseQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Jz+ur9PB; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1737472027;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=S0A13FjhF2U6qOIcW/juVfvCcYxku+JtO5E2OXUx59g=;
+	b=Jz+ur9PB+tUJ0Yz2oAPrxLPBZpzJqy3PewsJd51DiMCdUDtnfTr2rIohS20uKI9+bv1beC
+	6Zo/R4MAuGBfTAoG7SIBlQtZ2k/aOajl4o5JXIw0ou+OWht1mEoUdfhTWstAw5I0MeIfSC
+	IST2pKxX50KNskKdc9YFF+x2RrBkAOo=
+Received: from mail-pl1-f200.google.com (mail-pl1-f200.google.com
+ [209.85.214.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-292-2Nq7DPszPzavgUF7pckQ_Q-1; Tue, 21 Jan 2025 10:07:05 -0500
+X-MC-Unique: 2Nq7DPszPzavgUF7pckQ_Q-1
+X-Mimecast-MFC-AGG-ID: 2Nq7DPszPzavgUF7pckQ_Q
+Received: by mail-pl1-f200.google.com with SMTP id d9443c01a7336-2161d5b3eb5so102841445ad.3
+        for <netdev@vger.kernel.org>; Tue, 21 Jan 2025 07:07:05 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737471421; x=1738076221;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=0XhfzHaCu0hfOUT7G07sOpPFV31U0hz3p+JF3fI28lY=;
-        b=wwgV+75KpSHhUiQLuQq8sJRUFFR9Ijdsre6zWrytqr7nLFptnawQoqOgB2vid1VfJc
-         J9zwmx/pEALLoFBPVhr4YWU9U5a2xvMR/RKrrHB6jkCbwvaiC3X1zavY1bMVZWUsuLGz
-         wM7thnn3dCIvwmWBzihGTTkWSOg2/bPbTJyiOsPa/IOos3J/OkeolIB4pwQ6e89/p8/R
-         X+MaEP240J551WoilzkyMezGaDLTs+KuO8YFBKmRKHgfCnf9osVWq+D22/Drx+NVR4Dt
-         0zd9BO6Sq6dZRSZshr7n2VfoKNacUy2vD1O0RstQj4U2eeZvHfMKJ1YZ/dXUonHhGSKM
-         aeAQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXSPRN3Jla+Qt6NohJFhXm6JW2MmYe70eyqW4zFEc/1Q1e6X8TZ3fVqvbkJmHcGH+JTEEHa0QYdCNNdFjk0IzA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YydT/Lf36APu+wG+Btp3QuwXyY8xkpHD62GQeEMeHUFqaW1tS1m
-	UEuAcxXtbfgw1ZZE3BMfyOuqO+a/RqXWGoHWjxFrjd3r+Va8FIu+
-X-Gm-Gg: ASbGnctUzQxjOxTty4xx1Gf6nlX4tVnVgF6Uj5E1b6MWsSMbNdZib4xQnSZKYpLLLm5
-	A6Qvwlq9A4GKNRqhhzA0x9mvtcYheMoI5RMKumzZMW7+cMoi40TUxGR1Ko+1/EMQPBM5sitpsp2
-	Hoew1h9whKlhFPoZ2C4kCiGI/NFhLQGZ86PPD08+DK3417Oe26AR1gm0VNs0Ply2eerS2wfAPlD
-	7xXyKHj4jnpGf0APy06I2ndXjjUCuEUBkxjIb5p4FgVGOaWYBus+6rXpAl3ZDwIF3NbUXvWpybF
-	f9UXTMU1z9oU27ILdrFU3jIydkqQMJ7S9TvkTKoxyw==
-X-Google-Smtp-Source: AGHT+IEuh2jbrvxdWmCO/ZqNTdDPzcNmTGMiRRECxQHx9gKm5/A68LN7T+G9Nnb42GR3io4O/bttOw==
-X-Received: by 2002:a05:620a:43a2:b0:7b1:7508:9f38 with SMTP id af79cd13be357-7be523e2a07mr4026747485a.16.1737471421560;
-        Tue, 21 Jan 2025 06:57:01 -0800 (PST)
-Received: from localhost (15.60.86.34.bc.googleusercontent.com. [34.86.60.15])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7be614d98b2sm566139985a.76.2025.01.21.06.57.00
+        d=1e100.net; s=20230601; t=1737472025; x=1738076825;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=S0A13FjhF2U6qOIcW/juVfvCcYxku+JtO5E2OXUx59g=;
+        b=LmjJZNOA7Uoz7OK7Xhx6xeWUUEDcg73AZWCY/+fDN+t+SXSJD6OH+wBs+s1MdK5RfE
+         R/zzp9CY7cWqUfAwtLZ0B5j/yrRY8/PDD7zYY/6n5Tk3Qkks0OWbU3N9EPHpy4MKOtmY
+         NgwYXVyycEIHmrx3d2FfEuCfIzIHARadLlYBtPA82n4vt6S1qozpKRyr91if0TDSI1Ym
+         27fXu9wSrviFUhzW7UH6NDdRIyUnTgx/L4FFPkyJB9faFbjW0Tn2fT4jlEpGLTkzOB6u
+         Gsk6JWdjbnd1dpBUr/hHkZl3DPAsIzqwojMpMS/FTDX5XIYLV4pcg3doWGnaj3rD5Ev6
+         O+Zg==
+X-Forwarded-Encrypted: i=1; AJvYcCUpcTNTws9FrvoAdcOTjNvmLLTtHSGG0oALGwrQ9ciebuZDpSP0sQF49PZANHsMN6X7MIiv5Cs=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy+Zwr2nUUieMqwjHMHWHBBlruUdkEx6rgI2rpMimoExLDsT9TH
+	8JsyCVnEQen+fu18E9yfPVizUx8Yf+c2vTgpovd54k8On0Su46tjlKDuZQhDfsDwyPPt2VBH8Am
+	5sW05N6Oz+LacA1FSYIsfvcdUHcAbZyeHtF+cz+w4GrjI3f7tjgOoBg==
+X-Gm-Gg: ASbGncurobIlJLd8BPDyERfw5qeWnAN7xAi0jj1bpDuCs6IHHmK01I7qtWN80IO+iBH
+	Vack+nJBcd+Vr2z/X4e/R8n0l+GZJsZtLBBf7xmZfYT7uTc4e/bs7RguXSwROgTS1aazH41Ygvb
+	bZ5y15/E8ATVaWxN4bln2QTGi5IP6T6FU2FigDWAbegvBotjdAINo53jb2SvPleqfXAmhx+BVdc
+	bhom3haKIMbrOqhfh6MgzDPASlbMUJLfa6lsX1qhNnwTr1FqTiBv4LhhVQ5BcqQzxAJSo8R1FbP
+	kWCg/fmr6NBL/oGlvdoWVaTaefdv5J8X7Sg=
+X-Received: by 2002:a17:902:f60f:b0:215:8270:77e2 with SMTP id d9443c01a7336-21c34cb5bf8mr290507815ad.0.1737472023303;
+        Tue, 21 Jan 2025 07:07:03 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFip8Sgzo2DHVqMP4MZArU5I4YQ9MZM/9OeVcTT5mtCY+uCBZ3gqY1GJj53CP0hgom4XvZXlA==
+X-Received: by 2002:a17:902:f60f:b0:215:8270:77e2 with SMTP id d9443c01a7336-21c34cb5bf8mr290506035ad.0.1737472021406;
+        Tue, 21 Jan 2025 07:07:01 -0800 (PST)
+Received: from kernel-devel.local (fp6fd8f7a1.knge301.ap.nuro.jp. [111.216.247.161])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21c2ce9efe3sm79066215ad.20.2025.01.21.07.06.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Jan 2025 06:57:01 -0800 (PST)
-Date: Tue, 21 Jan 2025 09:57:00 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>, 
- davem@davemloft.net
-Cc: netdev@vger.kernel.org, 
- edumazet@google.com, 
- pabeni@redhat.com, 
- andrew+netdev@lunn.ch, 
- horms@kernel.org, 
- Jakub Kicinski <kuba@kernel.org>, 
- shuah@kernel.org, 
- willemb@google.com, 
- matttbe@kernel.org, 
- linux-kselftest@vger.kernel.org
-Message-ID: <678fb5bc9c42e_241c392941@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20250121143423.215261-1-kuba@kernel.org>
-References: <20250121143423.215261-1-kuba@kernel.org>
-Subject: Re: [PATCH net-next] selftests/net: packetdrill: more xfail changes
- (and a correction)
+        Tue, 21 Jan 2025 07:07:00 -0800 (PST)
+From: Shigeru Yoshida <syoshida@redhat.com>
+To: ast@kernel.org,
+	daniel@iogearbox.net,
+	andrii@kernel.org,
+	martin.lau@linux.dev,
+	eddyz87@gmail.com,
+	song@kernel.org,
+	yonghong.song@linux.dev,
+	john.fastabend@gmail.com,
+	kpsingh@kernel.org,
+	sdf@fomichev.me,
+	haoluo@google.com,
+	jolsa@kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	hawk@kernel.org,
+	lorenzo@kernel.org,
+	toke@redhat.com,
+	bpf@vger.kernel.org,
+	netdev@vger.kernel.org,
+	stfomichev@gmail.com,
+	Shigeru Yoshida <syoshida@redhat.com>,
+	syzkaller <syzkaller@googlegroups.com>
+Subject: [PATCH bpf v2 1/2] bpf, test_run: Fix use-after-free issue in eth_skb_pkt_type()
+Date: Wed, 22 Jan 2025 00:06:42 +0900
+Message-ID: <20250121150643.671650-1-syoshida@redhat.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-Jakub Kicinski wrote:
-> Recent change to add more cases to XFAIL has a broken regex,
-> the matching needs a real regex not a glob pattern.
-> 
-> While at it add the cases Willem pointed out during review.
-> 
-> Fixes: 3030e3d57ba8 ("selftests/net: packetdrill: make tcp buf limited timing tests benign")
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+KMSAN reported a use-after-free issue in eth_skb_pkt_type()[1]. The
+cause of the issue was that eth_skb_pkt_type() accessed skb's data
+that didn't contain an Ethernet header. This occurs when
+bpf_prog_test_run_xdp() passes an invalid value as the user_data
+argument to bpf_test_init().
 
-Reviewed-by: Willem de Bruijn <willemb@google.com>
+Fix this by returning an error when user_data is less than ETH_HLEN in
+bpf_test_init(). Additionally, remove the check for "if (user_size >
+size)" as it is unnecessary.
+
+[1]
+BUG: KMSAN: use-after-free in eth_skb_pkt_type include/linux/etherdevice.h:627 [inline]
+BUG: KMSAN: use-after-free in eth_type_trans+0x4ee/0x980 net/ethernet/eth.c:165
+ eth_skb_pkt_type include/linux/etherdevice.h:627 [inline]
+ eth_type_trans+0x4ee/0x980 net/ethernet/eth.c:165
+ __xdp_build_skb_from_frame+0x5a8/0xa50 net/core/xdp.c:635
+ xdp_recv_frames net/bpf/test_run.c:272 [inline]
+ xdp_test_run_batch net/bpf/test_run.c:361 [inline]
+ bpf_test_run_xdp_live+0x2954/0x3330 net/bpf/test_run.c:390
+ bpf_prog_test_run_xdp+0x148e/0x1b10 net/bpf/test_run.c:1318
+ bpf_prog_test_run+0x5b7/0xa30 kernel/bpf/syscall.c:4371
+ __sys_bpf+0x6a6/0xe20 kernel/bpf/syscall.c:5777
+ __do_sys_bpf kernel/bpf/syscall.c:5866 [inline]
+ __se_sys_bpf kernel/bpf/syscall.c:5864 [inline]
+ __x64_sys_bpf+0xa4/0xf0 kernel/bpf/syscall.c:5864
+ x64_sys_call+0x2ea0/0x3d90 arch/x86/include/generated/asm/syscalls_64.h:322
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xd9/0x1d0 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+Uninit was created at:
+ free_pages_prepare mm/page_alloc.c:1056 [inline]
+ free_unref_page+0x156/0x1320 mm/page_alloc.c:2657
+ __free_pages+0xa3/0x1b0 mm/page_alloc.c:4838
+ bpf_ringbuf_free kernel/bpf/ringbuf.c:226 [inline]
+ ringbuf_map_free+0xff/0x1e0 kernel/bpf/ringbuf.c:235
+ bpf_map_free kernel/bpf/syscall.c:838 [inline]
+ bpf_map_free_deferred+0x17c/0x310 kernel/bpf/syscall.c:862
+ process_one_work kernel/workqueue.c:3229 [inline]
+ process_scheduled_works+0xa2b/0x1b60 kernel/workqueue.c:3310
+ worker_thread+0xedf/0x1550 kernel/workqueue.c:3391
+ kthread+0x535/0x6b0 kernel/kthread.c:389
+ ret_from_fork+0x6e/0x90 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+
+CPU: 1 UID: 0 PID: 17276 Comm: syz.1.16450 Not tainted 6.12.0-05490-g9bb88c659673 #8
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.3-3.fc41 04/01/2014
+
+Fixes: be3d72a2896c ("bpf: move user_size out of bpf_test_init")
+Reported-by: syzkaller <syzkaller@googlegroups.com>
+Suggested-by: Martin KaFai Lau <martin.lau@linux.dev>
+Signed-off-by: Shigeru Yoshida <syoshida@redhat.com>
+---
+v2:
+- Rewrote the code as suggested by Martin.
+- Fixed the broken tests.
+v1:
+- https://lore.kernel.org/all/20241201152735.106681-1-syoshida@redhat.com/
+---
+ net/bpf/test_run.c | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
+
+diff --git a/net/bpf/test_run.c b/net/bpf/test_run.c
+index 501ec4249fed..8612023bec60 100644
+--- a/net/bpf/test_run.c
++++ b/net/bpf/test_run.c
+@@ -660,12 +660,9 @@ static void *bpf_test_init(const union bpf_attr *kattr, u32 user_size,
+ 	void __user *data_in = u64_to_user_ptr(kattr->test.data_in);
+ 	void *data;
+ 
+-	if (size < ETH_HLEN || size > PAGE_SIZE - headroom - tailroom)
++	if (user_size < ETH_HLEN || user_size > PAGE_SIZE - headroom - tailroom)
+ 		return ERR_PTR(-EINVAL);
+ 
+-	if (user_size > size)
+-		return ERR_PTR(-EMSGSIZE);
+-
+ 	size = SKB_DATA_ALIGN(size);
+ 	data = kzalloc(size + headroom + tailroom, GFP_USER);
+ 	if (!data)
+-- 
+2.48.1
+
 
