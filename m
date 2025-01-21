@@ -1,63 +1,78 @@
-Return-Path: <netdev+bounces-159932-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159935-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7AC52A176A3
-	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 05:42:31 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55E54A176D0
+	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 06:09:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3C888188B208
-	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 04:42:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 06D43188A5F8
+	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 05:09:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50FB61AF0D8;
-	Tue, 21 Jan 2025 04:41:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 244E31AA791;
+	Tue, 21 Jan 2025 05:09:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="Rz/DqcEg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.socionext.com (mx.socionext.com [202.248.49.38])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E71C195B37;
-	Tue, 21 Jan 2025 04:41:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.248.49.38
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.4])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78F1D1A724C;
+	Tue, 21 Jan 2025 05:09:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737434508; cv=none; b=H7VZkB9elU4JzNL/1jTqVNM/My5xU7lMN9jcVYp+0U9zuDoHk9lxYE1Hw0UDDgbUXK4RuU1edhIqUDEQHbSJZTN/O2N3cAC4G7iS5My31imtS0R08bLo1/T0y7wkvMZbbuwpvjF09c/v44O6jOzBye5ZUTIu7cg5fral3cc0FBM=
+	t=1737436176; cv=none; b=If60nVgwlnZtmi8EhqHgM97oMgeGF9Xxg781xtclSJLcNOI8Y/7I15P5O8Xhfu6Oi7HLuN7lIY4V1dYd7N7AS2CjfHRZK/KvT6uuyF/Byv3tV73cuIpU37eqB8oL9cpeQoDBNtMgx6VnEvTll2SBYckHHB316b1iOsObkVRzjFo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737434508; c=relaxed/simple;
-	bh=qIGnc4wf9D/ddorQ7LFwkA9iDLncpdyT3J3OZsAbxlc=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Z3HbNYPY7YYgTU9padn5Md7pigV4JlAytoGgVyqtW5D/tr6V2i1fEGQ7b7PSTS+y6U4yHMBuTHEGxeOr84bKhwN8P48qtP2E+p4QesFMzkHi3jHNDT+OFvDrq3ki9w+GtpE0v9rIwLkRaqFsAvoH2/JLTDsBnJffp7E5t5NrADI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=socionext.com; spf=pass smtp.mailfrom=socionext.com; arc=none smtp.client-ip=202.248.49.38
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=socionext.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=socionext.com
-Received: from unknown (HELO kinkan2-ex.css.socionext.com) ([172.31.9.52])
-  by mx.socionext.com with ESMTP; 21 Jan 2025 13:41:44 +0900
-Received: from mail.mfilter.local (mail-arc02.css.socionext.com [10.213.46.40])
-	by kinkan2-ex.css.socionext.com (Postfix) with ESMTP id 1F030200847B;
-	Tue, 21 Jan 2025 13:41:44 +0900 (JST)
-Received: from kinkan2.css.socionext.com ([172.31.9.51]) by m-FILTER with ESMTP; Tue, 21 Jan 2025 13:41:44 +0900
-Received: from plum.e01.socionext.com (unknown [10.212.245.39])
-	by kinkan2.css.socionext.com (Postfix) with ESMTP id C93EC66E;
-	Tue, 21 Jan 2025 13:41:43 +0900 (JST)
-From: Kunihiko Hayashi <hayashi.kunihiko@socionext.com>
-To: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>
-Cc: Furong Xu <0x1207@gmail.com>,
-	Joao Pinto <Joao.Pinto@synopsys.com>,
-	Vince Bridgers <vbridger@opensource.altera.com>,
-	netdev@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
+	s=arc-20240116; t=1737436176; c=relaxed/simple;
+	bh=MRbFXBRyZ6VO80r/tbLavWPYGstR7hTNcSTo0dkY3NQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mwaPS8r6FheMMIcJACT37XHEJd0zumHeaFpax7SOfAItDVSPBejMZjgzAGLK5C3z/JX/NJN/v5RvM/BigzbUWLNRL5bYXorIkbOYYRS3e4v7r0gDiKAYJwU+v1yPLj7aHC1Ytg9BPnvTFYuFvksUvKZYQsL1qyYFL3FSaNL/Mlg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=Rz/DqcEg; arc=none smtp.client-ip=117.135.210.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:Subject:Date:Message-ID:MIME-Version; bh=bTS2v
+	udIGnYCF5+bPeCAZ9C/WoAScG4XWVTYcSjmUXw=; b=Rz/DqcEghOON4BUZsxO6S
+	scO9I2lh9KWFFudRqRIF9/jeJGLZ71jNQstWO8c+U2hdvlDN009kjaexrYSW5Zwx
+	PhLWvloeWx+e9o1DR3ww/Lzbfd68P741yVio4xCgyNiSlGLrVgQLo+FEZy/L5B8E
+	Cg/7h3A054zu8Pff8zy1dk=
+Received: from localhost.localdomain (unknown [])
+	by gzga-smtp-mtada-g0-3 (Coremail) with SMTP id _____wBHwYeaK49nTErMHA--.41409S2;
+	Tue, 21 Jan 2025 13:07:49 +0800 (CST)
+From: Jiayuan Chen <mrpre@163.com>
+To: bpf@vger.kernel.org,
+	jakub@cloudflare.com,
+	john.fastabend@gmail.com
+Cc: netdev@vger.kernel.org,
+	martin.lau@linux.dev,
+	ast@kernel.org,
+	edumazet@google.com,
+	davem@davemloft.net,
+	dsahern@kernel.org,
+	kuba@kernel.org,
+	pabeni@redhat.com,
 	linux-kernel@vger.kernel.org,
-	Kunihiko Hayashi <hayashi.kunihiko@socionext.com>
-Subject: [PATCH net v2 3/3] net: stmmac: Specify hardware capability value when FIFO size isn't specified
-Date: Tue, 21 Jan 2025 13:41:38 +0900
-Message-Id: <20250121044138.2883912-4-hayashi.kunihiko@socionext.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20250121044138.2883912-1-hayashi.kunihiko@socionext.com>
-References: <20250121044138.2883912-1-hayashi.kunihiko@socionext.com>
+	song@kernel.org,
+	andrii@kernel.org,
+	mhal@rbox.co,
+	yonghong.song@linux.dev,
+	daniel@iogearbox.net,
+	xiyou.wangcong@gmail.com,
+	horms@kernel.org,
+	corbet@lwn.net,
+	eddyz87@gmail.com,
+	cong.wang@bytedance.com,
+	shuah@kernel.org,
+	mykolal@fb.com,
+	jolsa@kernel.org,
+	haoluo@google.com,
+	sdf@fomichev.me,
+	kpsingh@kernel.org,
+	linux-doc@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	Jiayuan Chen <mrpre@163.com>
+Subject: [PATCH bpf v8 0/5] bpf: fix wrong copied_seq calculation and add tests
+Date: Tue, 21 Jan 2025 13:07:02 +0800
+Message-ID: <20250121050707.55523-1-mrpre@163.com>
+X-Mailer: git-send-email 2.43.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,78 +80,87 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wBHwYeaK49nTErMHA--.41409S2
+X-Coremail-Antispam: 1Uf129KBjvJXoWxWFyrGFyfXw4kuryDAFyxKrg_yoW5Cw1DpF
+	WkC34rGr47tFyIva1DA3yIgF4Fgw4rGay5KF1Fq3yfZr4jkryYyrs293Waqrn8GrWYvF1j
+	9r13Wr4Y934DAFDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0z_pnQ7UUUUU=
+X-CM-SenderInfo: xpus2vi6rwjhhfrp/1tbiDxPbp2ePHI2amQACsY
 
-When Tx/Rx FIFO size is not specified in advance, the driver checks if the
-value is zero and sets the hardware capability value in functions where
-that value is used.
+A previous commit described in this topic
+http://lore.kernel.org/bpf/20230523025618.113937-9-john.fastabend@gmail.com
+directly updated 'sk->copied_seq' in the tcp_eat_skb() function when the
+action of a BPF program was SK_REDIRECT. For other actions, like SK_PASS,
+the update logic for 'sk->copied_seq' was moved to
+tcp_bpf_recvmsg_parser() to ensure the accuracy of the 'fionread' feature.
 
-This sets the hardware capability value as a default and removes redundant
-statements.
+That commit works for a single stream_verdict scenario, as it also
+modified 'sk_data_ready->sk_psock_verdict_data_ready->tcp_read_skb'
+to remove updating 'sk->copied_seq'.
 
-Signed-off-by: Kunihiko Hayashi <hayashi.kunihiko@socionext.com>
+However, for programs where both stream_parser and stream_verdict are
+active(strparser purpose), tcp_read_sock() was used instead of
+tcp_read_skb() (sk_data_ready->strp_data_ready->tcp_read_sock)
+tcp_read_sock() now still update 'sk->copied_seq', leading to duplicated
+updates.
+
+In summary, for strparser + SK_PASS, copied_seq is redundantly calculated
+in both tcp_read_sock() and tcp_bpf_recvmsg_parser().
+
+The issue causes incorrect copied_seq calculations, which prevent
+correct data reads from the recv() interface in user-land.
+
+Also we added test cases for bpf + strparser and separated them from
+sockmap_basic, as strparser has more encapsulation and parsing
+capabilities compared to sockmap.
+
+Fixes: e5c6de5fa025 ("bpf, sockmap: Incorrectly handling copied_seq")
+
 ---
- .../net/ethernet/stmicro/stmmac/stmmac_main.c | 21 ++++++-------------
- 1 file changed, 6 insertions(+), 15 deletions(-)
+V8 -> V7:
+https://lore.kernel.org/bpf/20250116140531.108636-1-mrpre@163.com/
+Avoid using add read_sock to psock. (Jakub Sitnicki)
+Avoid using warpper function to check whether strparser is supported.
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index da3316e3e93b..486283c27963 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -2375,11 +2375,6 @@ static void stmmac_dma_operation_mode(struct stmmac_priv *priv)
- 	u32 chan = 0;
- 	u8 qmode = 0;
- 
--	if (rxfifosz == 0)
--		rxfifosz = priv->dma_cap.rx_fifo_size;
--	if (txfifosz == 0)
--		txfifosz = priv->dma_cap.tx_fifo_size;
--
- 	/* Split up the shared Tx/Rx FIFO memory on DW QoS Eth and DW XGMAC */
- 	if (priv->plat->has_gmac4 || priv->plat->has_xgmac) {
- 		rxfifosz /= rx_channels_count;
-@@ -2851,11 +2846,6 @@ static void stmmac_set_dma_operation_mode(struct stmmac_priv *priv, u32 txmode,
- 	int rxfifosz = priv->plat->rx_fifo_size;
- 	int txfifosz = priv->plat->tx_fifo_size;
- 
--	if (rxfifosz == 0)
--		rxfifosz = priv->dma_cap.rx_fifo_size;
--	if (txfifosz == 0)
--		txfifosz = priv->dma_cap.tx_fifo_size;
--
- 	/* Adjust for real per queue fifo size */
- 	rxfifosz /= rx_channels_count;
- 	txfifosz /= tx_channels_count;
-@@ -5856,9 +5846,6 @@ static int stmmac_change_mtu(struct net_device *dev, int new_mtu)
- 	const int mtu = new_mtu;
- 	int ret;
- 
--	if (txfifosz == 0)
--		txfifosz = priv->dma_cap.tx_fifo_size;
--
- 	txfifosz /= priv->plat->tx_queues_to_use;
- 
- 	if (stmmac_xdp_is_enabled(priv) && new_mtu > ETH_DATA_LEN) {
-@@ -7245,13 +7232,17 @@ static int stmmac_hw_init(struct stmmac_priv *priv)
- 		priv->plat->tx_queues_to_use = priv->dma_cap.number_tx_queues;
- 	}
- 
--	if (priv->plat->rx_fifo_size > priv->dma_cap.rx_fifo_size) {
-+	if (!priv->plat->rx_fifo_size) {
-+		priv->plat->rx_fifo_size = priv->dma_cap.rx_fifo_size;
-+	} else if (priv->plat->rx_fifo_size > priv->dma_cap.rx_fifo_size) {
- 		dev_warn(priv->device,
- 			 "Rx FIFO size exceeds dma capability (%d)\n",
- 			 priv->plat->rx_fifo_size);
- 		priv->plat->rx_fifo_size = priv->dma_cap.rx_fifo_size;
- 	}
--	if (priv->plat->tx_fifo_size > priv->dma_cap.tx_fifo_size) {
-+	if (!priv->plat->tx_fifo_size) {
-+		priv->plat->tx_fifo_size = priv->dma_cap.tx_fifo_size;
-+	} else if (priv->plat->tx_fifo_size > priv->dma_cap.tx_fifo_size) {
- 		dev_warn(priv->device,
- 			 "Tx FIFO size exceeds dma capability (%d)\n",
- 			 priv->plat->tx_fifo_size);
+V3 -> V7:
+https://lore.kernel.org/bpf/20250109094402.50838-1-mrpre@163.com/
+https://lore.kernel.org/bpf/20241218053408.437295-1-mrpre@163.com/
+Avoid introducing new proto_ops. (Jakub Sitnicki).
+Add more edge test cases for strparser + bpf.
+Fix patchwork fail of test cases code.
+Fix psock fetch without rcu lock.
+Move code of modifying to tcp_bpf.c.
+
+V1 -> V3:
+https://lore.kernel.org/bpf/20241209152740.281125-1-mrpre@163.com/
+Fix patchwork fail by adding Fixes tag.
+Save skb data offset for ENOMEM. (John Fastabend)
+---
+
+Jiayuan Chen (5):
+  strparser: add read_sock callback
+  bpf: fix wrong copied_seq calculation
+  bpf: disable non stream socket for strparser
+  selftests/bpf: fix invalid flag of recv()
+  selftests/bpf: add strparser test for bpf
+
+ Documentation/networking/strparser.rst        |   9 +-
+ include/linux/skmsg.h                         |   2 +
+ include/net/strparser.h                       |   2 +
+ include/net/tcp.h                             |   8 +
+ net/core/skmsg.c                              |   7 +
+ net/core/sock_map.c                           |   5 +-
+ net/ipv4/tcp.c                                |  29 +-
+ net/ipv4/tcp_bpf.c                            |  42 ++
+ net/strparser/strparser.c                     |  11 +-
+ .../selftests/bpf/prog_tests/sockmap_basic.c  |  59 +--
+ .../selftests/bpf/prog_tests/sockmap_strp.c   | 452 ++++++++++++++++++
+ .../selftests/bpf/progs/test_sockmap_strp.c   |  53 ++
+ 12 files changed, 614 insertions(+), 65 deletions(-)
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/sockmap_strp.c
+ create mode 100644 tools/testing/selftests/bpf/progs/test_sockmap_strp.c
+
 -- 
-2.25.1
+2.43.5
 
 
