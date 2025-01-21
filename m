@@ -1,144 +1,118 @@
-Return-Path: <netdev+bounces-159942-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-159943-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E047A17754
-	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 07:25:41 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 645EBA17772
+	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 07:40:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 198C7188A03C
-	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 06:25:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9CCBA16745C
+	for <lists+netdev@lfdr.de>; Tue, 21 Jan 2025 06:40:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C22201A724C;
-	Tue, 21 Jan 2025 06:25:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D13041AC884;
+	Tue, 21 Jan 2025 06:40:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HQB1d+Fa"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="X54saXbS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D37D85931;
-	Tue, 21 Jan 2025 06:25:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CEB71A76D0;
+	Tue, 21 Jan 2025 06:40:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737440736; cv=none; b=Bi4OFs7hF5uadBSPcS29IXYqFyMdMzRok3diEoDdXRJQjRGtJ1QsTGJQE4+biYplDY4Ac2dqO7xdbIUZMeLJalyt1Ikr0Mn3mXgm/qjkv+mvM+W+/9SiBxmefOE9i8JUdPR+TljkzYcl7Pv92wX+TTcZR+E/QGAZcmIdRTAfoR0=
+	t=1737441615; cv=none; b=ghbFKufuEMBltkGpnour39nxEc3QRnG9VoAmxWg0tBGqGh0aF/S0D/c16GPdyMG7jGD7gTTp5Bw/PDI7rx61kD1Yq+eu179je3xqTLFcCtOQvbFpkT2MTM0vzP57JrR1+nEoeChZlkAvMewdep/6wv8stGWz2E+hu4apIPExTik=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737440736; c=relaxed/simple;
-	bh=BtpJQcEXCN8EzG7yfX9cF+1PwO5B9OaI3Jvju4N1w9g=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=iCrLFYmNgc5c3Z7MjJnQiG1YcrB0cVBejhv0G80Ts7xMV/rUiz+zbF+aGBAPfan0vfcjEv9Br2SpMVqnNv1yO7BBSSKTMrupBxoBH3JzrNinKx0bcDt5g3TlTBq1uupNbw8wZriWdb4Hjgb0VeOEcJa96EcbHnsH6tf/Ydhtpic=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HQB1d+Fa; arc=none smtp.client-ip=209.85.214.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-21680814d42so85029555ad.2;
-        Mon, 20 Jan 2025 22:25:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1737440733; x=1738045533; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=RI+Bcbtp+L0lptpp/ZEocQcR61FttKONsA5FcfRE/MI=;
-        b=HQB1d+Fam+xVqPvcWGVG/4UYmdecMPhGLpG+wAb1ncOf/C9pWrMGI82OC1GyGuZRzC
-         6WRutYkyzRGqXP+lqYW00xQiaaQeAq8FDiimZfxiNhp9f40DM8VSzT3Gntc4wWzUXFnd
-         ySYb0ydd0OUMAnQigNO0eX0Lc1H3rkdePFMig3K2um6btc5iFSSVX+TRn5s7Zbt4nhkF
-         19TPrjH+J+mrr00nbk3gvM48/Gpohm2Czt4fGmL4STkTjla+lXMfyZ3NO//2x9jUXUt5
-         KXGHrLvprRY4cjUGeorvwEYx4eLlVQ7AcI+ytcuch+z+lEqSYFmspUTtZwlfD344FEkm
-         4tDA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737440733; x=1738045533;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=RI+Bcbtp+L0lptpp/ZEocQcR61FttKONsA5FcfRE/MI=;
-        b=OBaOJekZCXtB1Vv1S/2m445poAB3gWsMWP070oPFlHAkMZuWzQNmq0XPuPbkjbaBTA
-         LPv+MQjCPewxTPpVnE+CDk4KvNxQAGNm3Rwpoh2vtUdyYwzkVyKr7M7j6IEnf2340jqg
-         ysnXccqd1OzIZz6yuyl3fwCLZifN4dnoCMighq72KhIttzea/CcJUfWEL5YSlDKx0GD+
-         shNaeZfcljJOgjuqWeZ554ztFUu0netem4N0tIOnxDrJT0BsBQP0fcXT8JIbE06mTumk
-         4Q61MMkAEcF3/I5+mXr2tIFSGFo6vcuuf7+0q1A1PIiBTMM8tV08dOCq9q5H/AjHT6DU
-         LBmA==
-X-Forwarded-Encrypted: i=1; AJvYcCWNBBT8zJF4oS0U7oVBx5cVhyGdZniT42W8JYsv8sv2Hu4+gkoQShFR4AXKozmR6QePZg3WY4AOLhtk80Q=@vger.kernel.org, AJvYcCXL1U25UAzoyF2SYA53JuLStGfMaKCM8qc5ckucStBiIb0rnJB9I6RbjwA1vfGktEtifOgVAdBL@vger.kernel.org
-X-Gm-Message-State: AOJu0YxuQt04QQc0RTxRX79Nd/aI0QARE9B7UzfcypFm/TWhahYFXxvb
-	DpiOGLVTj8kDhnYqITmSmPbJl/3yMXmwhIpBMsCnmtdM5yOO8Q42
-X-Gm-Gg: ASbGncvRlBNVzTP3CIKrBFaIyoEzCGuAtxm5u+jL4Rw4uQ6BEATRGCmOOgz1YN8CJgd
-	VzuL2AyvjPhnT9kE0JMjNSdwlqRnRPRAfGWk3BF2ZQQhQED68leWfdRLgsporYpBd05U6qEr3F3
-	hZtNQCEEdCT6lZuPxrgfshfB79zT0RUU5WxDSdOOxUdBYIw/sDIdJdRYRxvHhOsSn2n8yvTlFf7
-	HsAmYUJ25OAc6vPEtfUxSVwHzoU1wSbajSDNx7aqw+db+Qf7d/hFFnAtSaGdJdd/XI=
-X-Google-Smtp-Source: AGHT+IGEqFFcFptOhYieThLnVRw8v/b9RJDK9OgDpEyPyoFWeg55gV+CqOjA626TahjU8BmR0AsirQ==
-X-Received: by 2002:a05:6a00:4c94:b0:724:e75b:22d1 with SMTP id d2e1a72fcca58-72dafa800c4mr23351770b3a.16.1737440732288;
-        Mon, 20 Jan 2025 22:25:32 -0800 (PST)
-Received: from localhost ([129.146.253.192])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72dabacdbd5sm8280003b3a.180.2025.01.20.22.25.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 Jan 2025 22:25:32 -0800 (PST)
-Date: Tue, 21 Jan 2025 14:25:20 +0800
-From: Furong Xu <0x1207@gmail.com>
-To: Kunihiko Hayashi <hayashi.kunihiko@socionext.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu
- <joabreu@synopsys.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Maxime
- Coquelin <mcoquelin.stm32@gmail.com>, Joao Pinto <Joao.Pinto@synopsys.com>,
- Vince Bridgers <vbridger@opensource.altera.com>, netdev@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net v2 1/3] net: stmmac: Limit the number of MTL queues
- to hardware capability
-Message-ID: <20250121142520.0000702e@gmail.com>
-In-Reply-To: <20250121044138.2883912-2-hayashi.kunihiko@socionext.com>
-References: <20250121044138.2883912-1-hayashi.kunihiko@socionext.com>
-	<20250121044138.2883912-2-hayashi.kunihiko@socionext.com>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
+	s=arc-20240116; t=1737441615; c=relaxed/simple;
+	bh=P+I0ddBF4WxkHA77wQLtg+oGGuGnepDkDcNaFgYxpcI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iBLPMsHCVl7p6h79juO98dV1dMQORFkfscuaOn+o8MdPZWWaRe4omgXI5qD9ZzNNnp+g7M8oyWxmqfh3Vkcpf23IWSbd9eYwrk6Hw79THQHHjUJXG7bFwt2fhQqslnxMHIMx/bjSZT4JbySoqvjiwC0Y8zFJP8LPQN9/mXhOkDo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=X54saXbS; arc=none smtp.client-ip=192.198.163.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1737441614; x=1768977614;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=P+I0ddBF4WxkHA77wQLtg+oGGuGnepDkDcNaFgYxpcI=;
+  b=X54saXbS8HzOgrrWsjBTiUNOEU+sEG9jvy0lrr2UypVtkM9/DqM6Su0w
+   5CFfpkha0ziJA6Tb6iRKuXMgQ8YFjpOYfeT1ZBS2xOLBZf6i2L2KFVqaD
+   NVrNcMXhLbAzJKB2oXHz3ADP4baL1O+5aqF1uQCMyeFpBhx+qb9T8YJFb
+   uADmWaBjccjZMgzRlIVmtlfuMMdI6WkRm76IToMV2vYCQDTFmEDsstmwx
+   q0xpiwNipPQDFpVyOgCwYwdgUiPNHyJP1JHloCIB3eQGN3cgpwqfZbHG2
+   DmN5FUCO4NgYfzBR3bH8pO7pXD6QrJXqFH4HeZU96xyX/JjCOnuSAHRig
+   g==;
+X-CSE-ConnectionGUID: DjpioxbLR6iCXTtCw9a+GA==
+X-CSE-MsgGUID: bPwTYodMR06hRgJC+8h3jQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11321"; a="37753221"
+X-IronPort-AV: E=Sophos;i="6.13,221,1732608000"; 
+   d="scan'208";a="37753221"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jan 2025 22:40:13 -0800
+X-CSE-ConnectionGUID: LExPDTXgTzmawmWI2aNnZA==
+X-CSE-MsgGUID: nxC0kHCfRLiHenYrGKeAwg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.13,221,1732608000"; 
+   d="scan'208";a="111708082"
+Received: from mev-dev.igk.intel.com ([10.237.112.144])
+  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jan 2025 22:40:10 -0800
+Date: Tue, 21 Jan 2025 07:36:47 +0100
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+To: Chenyuan Yang <chenyuan0y@gmail.com>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, u.kleine-koenig@baylibre.com,
+	paul@crapouillou.net, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, zijie98@gmail.com
+Subject: Re: [PATCH] net: davicom: fix UAF in dm9000_drv_remove
+Message-ID: <Z49Af0yc6gbsyIyW@mev-dev.igk.intel.com>
+References: <20250120222557.833100-1-chenyuan0y@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250120222557.833100-1-chenyuan0y@gmail.com>
 
-On Tue, 21 Jan 2025 13:41:36 +0900, Kunihiko Hayashi <hayashi.kunihiko@socionext.com> wrote:
-
-> The number of MTL queues to use is specified by the parameter
-> "snps,{tx,rx}-queues-to-use" from stmmac_platform layer.
+On Mon, Jan 20, 2025 at 04:25:57PM -0600, Chenyuan Yang wrote:
+> dm is netdev private data and it cannot be
+> used after free_netdev() call. Using adpt after free_netdev()
+> can cause UAF bug. Fix it by moving free_netdev() at the end of the
+> function.
 > 
-> However, the maximum numbers of queues are constrained by upper limits
-> determined by the capability of each hardware feature. It's appropriate
-> to limit the values not to exceed the upper limit values and display
-> a warning message.
+> This is similar to the issue fixed in commit
+> ad297cd2db8953e2202970e9504cab247b6c7cb4 ("net: qcom/emac: fix UAF in emac_remove").
 > 
-> Fixes: d976a525c371 ("net: stmmac: multiple queues dt configuration")
-> Signed-off-by: Kunihiko Hayashi <hayashi.kunihiko@socionext.com>
+> Fixes: cf9e60aa69ae ("net: davicom: Fix regulator not turned off on driver removal")
+> Signed-off-by: Chenyuan Yang <chenyuan0y@gmail.com>
 > ---
->  drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 13 +++++++++++++
->  1 file changed, 13 insertions(+)
+>  drivers/net/ethernet/davicom/dm9000.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 > 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> index 7bf275f127c9..251a8c15637f 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> @@ -7232,6 +7232,19 @@ static int stmmac_hw_init(struct stmmac_priv *priv)
->  	if (priv->dma_cap.tsoen)
->  		dev_info(priv->device, "TSO supported\n");
+> diff --git a/drivers/net/ethernet/davicom/dm9000.c b/drivers/net/ethernet/davicom/dm9000.c
+> index 8735e333034c..b87eaf0c250c 100644
+> --- a/drivers/net/ethernet/davicom/dm9000.c
+> +++ b/drivers/net/ethernet/davicom/dm9000.c
+> @@ -1777,10 +1777,11 @@ static void dm9000_drv_remove(struct platform_device *pdev)
 >  
-> +	if (priv->plat->rx_queues_to_use > priv->dma_cap.number_rx_queues) {
-> +		dev_warn(priv->device,
-> +			 "Number of Rx queues exceeds dma capability (%d)\n",
-> +			 priv->plat->rx_queues_to_use);
-> +		priv->plat->rx_queues_to_use = priv->dma_cap.number_rx_queues;
-> +	}
-> +	if (priv->plat->tx_queues_to_use > priv->dma_cap.number_tx_queues) {
-> +		dev_warn(priv->device,
-> +			 "Number of Tx queues exceeds dma capability (%d)\n",
-> +			 priv->plat->tx_queues_to_use);
+>  	unregister_netdev(ndev);
+>  	dm9000_release_board(pdev, dm);
+> -	free_netdev(ndev);		/* free device structure */
+>  	if (dm->power_supply)
+>  		regulator_disable(dm->power_supply);
+>  
+> +	free_netdev(ndev);		/* free device structure */
+> +
+>  	dev_dbg(&pdev->dev, "released and freed device\n");
+>  }
 
-I would prefer print these warnings like this:
+Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 
-dev_warn(priv->device, "Number of Tx queues (%u) exceeds dma capability (%u)\n",
-priv->plat->tx_queues_to_use, priv->dma_cap.number_tx_queues);
-
-And number_tx_queues, number_rx_queues are u32, so %u would be better.
-
-This print format change is quite minor. Probably not worth a re-roll since one
-can always view DMA capabilities by reading a debugfs entry.
+>  
+> -- 
+> 2.34.1
 
