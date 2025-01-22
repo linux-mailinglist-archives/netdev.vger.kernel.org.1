@@ -1,145 +1,113 @@
-Return-Path: <netdev+bounces-160370-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160371-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9D11A19679
-	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 17:28:20 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC164A196AA
+	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 17:39:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CCC7B188E432
-	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 16:28:24 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BEEEC7A0590
+	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 16:39:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59060214816;
-	Wed, 22 Jan 2025 16:28:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 713CC2147F0;
+	Wed, 22 Jan 2025 16:39:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Fy2c+8ZW"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B6l1Rs/p"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99C15167DB7
-	for <netdev@vger.kernel.org>; Wed, 22 Jan 2025 16:28:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D0D1149E17;
+	Wed, 22 Jan 2025 16:39:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737563297; cv=none; b=ac7fqs7jnnU9lK8FkkDQN4Xq+7IgG2rWjjUl2yM5ls/yY/tbTyT/JaQAg5QUc6oov5UTbrE1FKMZN1yr/G8qGHyNNr1RLJkIUdc+reudw9mNBqY4SXeJ4O/G2Y920yz9bMsArJvuN5Eh97IwJqAcKjkGTvP07fLWwna/dq00fbA=
+	t=1737563978; cv=none; b=NiuJUa3RuPFJpGMek8RyqwVppGRGNKTHV0i8Tcau7dghzKy9jWNnYZYVaAZjC1sJrXXXJi0Jo+pWCPyd1navIKqVsDs2gGzox5Rq0Y/8NZZXj+F0tQRPx2aSDqZs3Hwv+QiWX75nIFaZKROzXTW9VIaU6dlucwBWvc1ig/harQ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737563297; c=relaxed/simple;
-	bh=jRyuSE9ZKH3JJkBu0z68kd7ijv5w+WGO/MiANG1uRM4=;
+	s=arc-20240116; t=1737563978; c=relaxed/simple;
+	bh=rLCNKq0QvcqyKFhPixmoBnEghCd7lN8c9bmfihdQyC0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=l4KZtekaSHAhrOTMeu3mVarGoauMB0qfxOSqquFfnSTBVKu2vi8c9ICv+xeZghE5OOicDXrgQjniwYB1ulJYHa1OXWX7HWWSLU4V2hUiDOE0ry+JGHhdFgRty3rPlHYmrrgdl6tFEWbeZSRmYkeptn6crg5avqQuw8w9fY5Vo+U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Fy2c+8ZW; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1737563294;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=lrchyXg/HU0XJbtKthBVKoKC+HahwM1mdawasoV9LBQ=;
-	b=Fy2c+8ZWRAISmnKQZLiw7i+98IeTyjiz8e7BwITv/6U2R+snOyepDk4qiScR+ec/WrjSVE
-	liokyfWTCtg2ZWgFQrowofQibGnkPTGizFNpfehJNX2EP1WPu8jXOwg/z/r7d8hBuHU0eP
-	C0SS6r0c6rI0xTCgnC45DeUVeC8cVsk=
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
- [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-628-TmIhHak2N6mdrsYdwHbzYw-1; Wed, 22 Jan 2025 11:28:13 -0500
-X-MC-Unique: TmIhHak2N6mdrsYdwHbzYw-1
-X-Mimecast-MFC-AGG-ID: TmIhHak2N6mdrsYdwHbzYw
-Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-7b6f943f5abso1453468785a.3
-        for <netdev@vger.kernel.org>; Wed, 22 Jan 2025 08:28:13 -0800 (PST)
+	 Content-Type:Content-Disposition:In-Reply-To; b=EDHiqE8wkSuE3f1YxgOlvJtKGCSowKgx0UkIcqQMfG0zSwgjBEdB+WzaiThXbt/pNYIm39TxPub5OXjlzB4ElX56ZqygdzbBvZir2UdTI4MOEiFb2V5Km25oQQuNIQELOnrEv4pchFhukXtVo/nGRDJ5xJczRHtm4UM3z9ll/Kk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=B6l1Rs/p; arc=none smtp.client-ip=209.85.214.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-2167141dfa1so22242415ad.1;
+        Wed, 22 Jan 2025 08:39:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1737563976; x=1738168776; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=rLCNKq0QvcqyKFhPixmoBnEghCd7lN8c9bmfihdQyC0=;
+        b=B6l1Rs/pMyaXO6N5RxcG5iinnWbi5OikrgDVjQ3oUyI7dIGaEM/22QJiOGWLQhB3Se
+         s0v2Pvi/8Gi2t8Qs/+MU0kuSmB2Y5hbZsusk1+xDNUyTjgMk4u2IiNlNP1Jr78nMMsUO
+         3wabgNECNqzRte8OR36GqQf0NqRBnUNFjFV0C5MiPkG4+PRrZs/p/k2OMKLO2N04KvJ1
+         9UKtRUky86YuzSfNjvjRzV/j0Jr2wVLjxGa2HH6FSS5o5IT3ij4j76CyowdF39UeujD3
+         yAmUih67IB6uex+c0GzpS+TBtBmpwvF1u6qEK8sTgM0s8PJD0tAc2Hjl2k4afeQOjYEN
+         QsoA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737563292; x=1738168092;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lrchyXg/HU0XJbtKthBVKoKC+HahwM1mdawasoV9LBQ=;
-        b=Bh7sV4Ovli/tH8d7nVM4kAGPlueY4PV7jcg5xl0R9BGCSY8f7pSCyj/0r99edSiCrr
-         PsHn5wF7T4R2qA8SGjlm2mwQIxko0Kl16myyZSmtWjLnwmoo25S8yyvQdywpJzYxy2KY
-         5ZzgwTUQpKaKqp3W5A0c3ET6EqjzqPzSPi6uZNoel/6afWvKd7urkN9yS0Tj2xmwJqag
-         0uV9rYoRRo/npKIw1R8k0S+dwh1t/tSugOue1VQL5/fsveeKVyZSMI5OMvbcQysj7Kbh
-         XhtX6o7L0SWNnFLlNW8t+IvXcONzETJMS3KqJdeOs1jjU7sDg1eMHI9yk8SiwQkyMB2I
-         xvfA==
-X-Forwarded-Encrypted: i=1; AJvYcCXv8WJNbJhhOtDd/bG32vEppahdkhdrCBGMwQoJdpdF1FCMWRgWdbrbcYk1BQn+P8nHvRvYthY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzgEvOI30W+tqbYpddV+N8bs12ISCtuHBwiMF7SRP8B6Z6D8S1z
-	A6KAImyiuCdeNatL1rROT2hcQqR+gEY8i79BjmEOFGDk40EGuc4XYH3Joqw6tVmkvFx7Cnz3VWc
-	kjny6HnGE+Cy32NpKwGjiRUDlHFHorNF7dh8b/KCv70eQw5AOqo36Hg==
-X-Gm-Gg: ASbGnct6587lOCHX7iVoiN5unUDKAJfDwHHAXsIaiNsr8jNOEhrA+gtu/1nPL+DOl7D
-	uAvmXTXTCqhIqp1UWgdQWbzxdDOItyTDL71bQZet9nRrEgT8ElnThEvuU1ZFhS7ct5bKZg1AVqy
-	5u2inU99xEFCFF/nPrJ/WtZl4C04+ASfszyCCxxGRVBe7xEX7KP3I3EsKagrikOonVlyFbYHXre
-	EGGiMdukDqM8TIOQ0MuuXsQCmINWabAKumcr0/nRRNwd+TPCY3NFY6S+cqredn4ZszWDOLOZw==
-X-Received: by 2002:a05:620a:1a08:b0:7b7:106a:19b2 with SMTP id af79cd13be357-7be631f4d50mr3438225585a.23.1737563292642;
-        Wed, 22 Jan 2025 08:28:12 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGClkPbHInvy/GblgeXY0upSxxBTXeIHS8CekhPKUpB3nzeuLmhh+1b/spwL0F8F79HOphYFQ==
-X-Received: by 2002:a05:620a:1a08:b0:7b7:106a:19b2 with SMTP id af79cd13be357-7be631f4d50mr3438223585a.23.1737563292382;
-        Wed, 22 Jan 2025 08:28:12 -0800 (PST)
-Received: from leonardi-redhat ([176.206.32.19])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-46e23bc8626sm47075391cf.52.2025.01.22.08.28.10
+        d=1e100.net; s=20230601; t=1737563976; x=1738168776;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=rLCNKq0QvcqyKFhPixmoBnEghCd7lN8c9bmfihdQyC0=;
+        b=AhKz6ypYpJIwDSNxkCCeSI+MDbxO62YZ8vZjUilu6VgZZy3CHryFw08aEidZ4P87vC
+         xzCoROK1QdKXh4QSKLx9Oww9ySpfCj9QfHeUJVabuhyT3dh3PNuFpp+bxNwgCxxj0y8F
+         +GKpub78ImfnAQ4BH6Es4X1TTGTd7ekZgtk53y+ZnDUfQ9vi48wv0b7ML/cNv9wqAIcc
+         NVzqE3Stg+jbVoSfaEhbpfWNeH97Dzx2mm89DdDtbjMyJS8p4ye0Wa/rOa2Z/y+JORz9
+         UjqTS11G0ZwdQLpORRBzxz/b8tIspIuF1IQGWk/3DJdOO7gbkyFMPsFyGkvHaYlR/VIh
+         Q0rA==
+X-Forwarded-Encrypted: i=1; AJvYcCULB6dech5lgo2BxbdeLW55Q9q6hPi8zWFjE7YZoFONBUTz5Ea/5vL0sjRUy8ms23eeD+yrJQBy@vger.kernel.org, AJvYcCXaVN6BGq6YUtuSdqJGI7Cjec7pE6dr1cOqTSaU4dLLC0Z8dNzPgyRxgbHfdTzEAYnF+dzZS8AV@vger.kernel.org, AJvYcCXueOCgpEEV940wbE9hrZhl3A8aYXeOzWpDM7mPmj5JwUJBxHBu2psS05O+dtAWyVUixGbEZbXlmRthfIM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YykfY7aLWxOKzwAp4zHkNB2drmIsIv3Vk+CQeO5wrgcCQp5T5Sk
+	iWDNcIGY5VnmrxNU5GVOhvtDk9PxuZihvN7w5+q0CnyvNHeInh8g
+X-Gm-Gg: ASbGncssbzIxCcSeiTGTKDW1QZvKwTi25l9JqvcpZpD6/Yrzg5Q2K7Ok0QdgtvMeHzD
+	9HH3xrb2Wg4aCyebFfS5z42to31oGBWG1DQZjBZ0IFAvabhy6E6+y8kZQnWNjk8ezXmilVjEgiI
+	dkUhRHd4jspbzaKri/OFW8hXjWrFuFlyTVrTLtzlOvMqrFqUtv28ci/kbCF41Jnm8l6ASvytXU0
+	6mF0XpZssR+ffmq7J1V6hBWq2bw0ldFAz7RIqUumkSwfK5T8fZ6+mjjqfYSyH+OJdnXlIiLSeeB
+	yypFKksWlH8tKw==
+X-Google-Smtp-Source: AGHT+IEWqZLFeawu/BLvp4QENLyalQedIGu5WNcgaP3vQ6agzb5JSRr1kEqaW59EjYzpOS7MIxrg2w==
+X-Received: by 2002:a17:902:fc87:b0:216:271d:e06c with SMTP id d9443c01a7336-21c35c5302fmr294471205ad.4.1737563976210;
+        Wed, 22 Jan 2025 08:39:36 -0800 (PST)
+Received: from hoboy.vegasvil.org ([2600:1700:2430:6f6f:e2d5:5eff:fea5:802f])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21c2cea0779sm97984035ad.14.2025.01.22.08.39.34
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Jan 2025 08:28:12 -0800 (PST)
-Date: Wed, 22 Jan 2025 17:28:07 +0100
-From: Luigi Leonardi <leonardi@redhat.com>
-To: Michal Luczaj <mhal@rbox.co>
-Cc: Stefano Garzarella <sgarzare@redhat.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	George Zhang <georgezhang@vmware.com>, Dmitry Torokhov <dtor@vmware.com>, Andy King <acking@vmware.com>, 
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net v2 2/6] vsock: Allow retrying on connect() failure
-Message-ID: <sfqi47un2r7swyle27vnwdsp7d4o7kziuqkwb5rh2rfmc23c6y@ip2fseeevluc>
-References: <20250121-vsock-transport-vs-autobind-v2-0-aad6069a4e8c@rbox.co>
- <20250121-vsock-transport-vs-autobind-v2-2-aad6069a4e8c@rbox.co>
+        Wed, 22 Jan 2025 08:39:35 -0800 (PST)
+Date: Wed, 22 Jan 2025 08:39:33 -0800
+From: Richard Cochran <richardcochran@gmail.com>
+To: Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Anna-Maria Behnsen <anna-maria@linutronix.de>,
+	Frederic Weisbecker <frederic@kernel.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	John Stultz <johnstul@us.ibm.com>, Arnd Bergmann <arnd@arndb.de>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Cyrill Gorcunov <gorcunov@gmail.com>, stable@vger.kernel.org
+Subject: Re: [PATCH] posix-clock: Explicitly handle compat ioctls
+Message-ID: <Z5EfRcA5BCsPiMcy@hoboy.vegasvil.org>
+References: <20250121-posix-clock-compat_ioctl-v1-1-c70d5433a825@weissschuh.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20250121-vsock-transport-vs-autobind-v2-2-aad6069a4e8c@rbox.co>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250121-posix-clock-compat_ioctl-v1-1-c70d5433a825@weissschuh.net>
 
-On Tue, Jan 21, 2025 at 03:44:03PM +0100, Michal Luczaj wrote:
->sk_err is set when a (connectible) connect() fails. Effectively, this makes
->an otherwise still healthy SS_UNCONNECTED socket impossible to use for any
->subsequent connection attempts.
->
->Clear sk_err upon trying to establish a connection.
->
->Fixes: d021c344051a ("VSOCK: Introduce VM Sockets")
->Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
->Signed-off-by: Michal Luczaj <mhal@rbox.co>
->---
-> net/vmw_vsock/af_vsock.c | 5 +++++
-> 1 file changed, 5 insertions(+)
->
->diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
->index cfe18bc8fdbe7ced073c6b3644d635fdbfa02610..075695173648d3a4ecbd04e908130efdbb393b41 100644
->--- a/net/vmw_vsock/af_vsock.c
->+++ b/net/vmw_vsock/af_vsock.c
->@@ -1523,6 +1523,11 @@ static int vsock_connect(struct socket *sock, struct sockaddr *addr,
-> 		if (err < 0)
-> 			goto out;
->
->+		/* sk_err might have been set as a result of an earlier
->+		 * (failed) connect attempt.
->+		 */
->+		sk->sk_err = 0;
-Just to understand: Why do you reset sk_error after calling to 
-transport->connect and not before?
+On Tue, Jan 21, 2025 at 11:41:24PM +0100, Thomas Weißschuh wrote:
+> Pointer arguments passed to ioctls need to pass through compat_ptr() to
+> work correctly on s390; as explained in Documentation/driver-api/ioctl.rst.
 
-My worry is that a transport might check this field and return an error.
-IIUC with virtio-based transports this is not the case.
->+
-> 		/* Mark sock as connecting and set the error code to in
-> 		 * progress in case this is a non-blocking connect.
-> 		 */
->
->-- 
->2.48.1
->
+PTP_ENABLE_PPS is either on of off, and the code tests whether the
+passed argument is zero or not.
+
+So does this compat code actually fix an issue for s390?
 
 Thanks,
-Luigi
-
+Richard
 
