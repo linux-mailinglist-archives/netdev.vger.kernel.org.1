@@ -1,78 +1,144 @@
-Return-Path: <netdev+bounces-160232-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160233-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80284A18F0A
-	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 10:59:46 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B38BA18F38
+	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 11:06:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4C09E3A3852
-	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 09:59:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5EC5F188430E
+	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 10:06:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB4DD2101A0;
-	Wed, 22 Jan 2025 09:59:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2922C21148F;
+	Wed, 22 Jan 2025 10:05:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Xp3nz9jj"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="NnMwcwut"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B073D1F76B5;
-	Wed, 22 Jan 2025 09:59:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A999020FA8A;
+	Wed, 22 Jan 2025 10:05:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737539982; cv=none; b=u64USRQjrq4gDXh+BwTMLIu1P7TDdZgSnWQ1gQ93Cls/85Tot2Q9GzLKtRknaQSYWaHbq5EO8o3y0ZeDu/p1Bde05JyYVIZrA/Xcl2g4MWUUBpjQWPP8eThvgGkSR3AZg6gwy1wxrnWWIIdqj+W7brUuaeMcsh5VVq8k/t03jQ4=
+	t=1737540315; cv=none; b=DgHC8WdomHragYrbhXkMfqasWONDoXiZv1bdGoUC5TxLO94ugeXvCdEck0dvWza/BWAzxLyp6WR9BA8lG6XVV/HkSoC4pNJe0iGTghBgEVJog0Gt3Hc82j7+ZcFfFrsXArVH0hfpkGOu+O0u3nIye9aZy6h8+9cpPiQ8N7zycGk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737539982; c=relaxed/simple;
-	bh=A3twpjoho0r2lM/z6ij4fhp5Yrbb7D6UP+KJ26y1ypM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lMGvy5sKX1BosR6CPCkHGVXsjJLP2uXJUCETmy7pWa3YPlygovGs46RCKTx8YgqU0JMtfVRR/TzKOPqChGPop0ygBD28LpmGGzqyLB/dxp9HuxQkmc+qoYpVy0pIAFDp1BCwxvpGjPfiSTMiOwCB9RAG/5dM2rWCyCz41q4qyuU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Xp3nz9jj; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 91F51C4CED6;
-	Wed, 22 Jan 2025 09:59:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737539981;
-	bh=A3twpjoho0r2lM/z6ij4fhp5Yrbb7D6UP+KJ26y1ypM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Xp3nz9jj8xulmfYcTFouOdUIAo3S1PNanlL7eUW04ETy2v1z46E9U0i/h6MeLXTE5
-	 OliNmcJ+GsqVW0LWTnR48mrbWhv/UPqmAOLAKtyJLO1pENlZWQCwb+SuarkneS08CE
-	 slIvMEC/82lZ9KqNZk/a6bHRaIhwph7pHcdNTdcnHPKP0csKxInaQUHRbACKp+F3ID
-	 I3PcI1u57dTcSqZ4OJunhuyXfLMugWKBFlf/mfKarzKJwaFbUhbmzhw09Lei9I3iJa
-	 NGnVIh+V2tguNV5pvWUo0x2eMuPpJsgPDFTj+SyiXytsYEfswZltocBXezVYUqKdY0
-	 4w4jjZH+yJNuA==
-Date: Wed, 22 Jan 2025 09:59:35 +0000
-From: Simon Horman <horms@kernel.org>
-To: lirongqing <lirongqing@baidu.com>
-Cc: pablo@netfilter.org, kadlec@netfilter.org, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH] net/netfilter: use kvfree_rcu to simplify the code
-Message-ID: <20250122095935.GC385045@kernel.org>
-References: <20250122074450.3185-1-lirongqing@baidu.com>
+	s=arc-20240116; t=1737540315; c=relaxed/simple;
+	bh=1/GuKaxEhwOAKgFiGB5TJk1TBjQaQ1frM+7ZuBKqiW0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=mkhEZgwUlFTdv+DBoiVxYyC5RVHhp0SaT7wbwp0xoVbNhgcLR5gaX6if2DyoRYWGAMzStTgPUCYXntLB0V2zmt3+DlgWQsKvMTntkvpYbKI3JUYE8bRMbyLhH0CI3lVju1exzg8pLugnFsJkAEmtdHTLnK7PGOhWbjDRlqQW9XU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=NnMwcwut; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279867.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50M9Qml5030077;
+	Wed, 22 Jan 2025 10:04:48 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	zFmj7zj/Lq0aydtI5Gp746tMc3UoW0yD2aMedlR5Jng=; b=NnMwcwutVfIdifgQ
+	drCmbTCZm+mM+1nGU24aAw7TJAb6OO1fJolXxfqq9cty5jAvoyergGx/DxRCM5Ek
+	acY2oBAyGlpkpBInkkvbnddd8s+DxlUEPiZZmLFnfjuCEhmaHPVMDKreyaHolD2L
+	gyKLFnNqdebpDl/kMrUIV1TZmIAkmq83Jxui5HU7askqXE72Zi3Y5iXpInyvo27A
+	OkMW45ydqMlkdWidY+NxHKV8r7BNO8zwWpaohWqEoCkHFEWSh3sbQTVtLmseWmup
+	smWWiVwUhJ1Vlsao1rOaiTvsmrFZGQvtimrpGK9/0kqnUOBROsHxxLIVosMUkzTm
+	yxrNAA==
+Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 44ax1yr38p-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 22 Jan 2025 10:04:47 +0000 (GMT)
+Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
+	by NALASPPMTA03.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 50MA4lCa010810
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 22 Jan 2025 10:04:47 GMT
+Received: from [10.253.35.93] (10.80.80.8) by nalasex01c.na.qualcomm.com
+ (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Wed, 22 Jan
+ 2025 02:04:40 -0800
+Message-ID: <23a9f6cf-3921-48c1-9c28-aeede639cf40@quicinc.com>
+Date: Wed, 22 Jan 2025 18:04:38 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250122074450.3185-1-lirongqing@baidu.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 2/4] net: stmmac: dwmac-qcom-ethqos: Mask PHY mode if
+ configured with rgmii-id
+To: Andrew Lunn <andrew@lunn.ch>
+CC: Andrew Lunn <andrew+netdev@lunn.ch>,
+        "David S. Miller"
+	<davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Rob Herring
+	<robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley
+	<conor+dt@kernel.org>, Vinod Koul <vkoul@kernel.org>,
+        Maxime Coquelin
+	<mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@foss.st.com>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio
+	<konradybcio@kernel.org>,
+        Richard Cochran <richardcochran@gmail.com>, <netdev@vger.kernel.org>,
+        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-arm-msm@vger.kernel.org>,
+        <linux-stm32@st-md-mailman.stormreply.com>,
+        <linux-arm-kernel@lists.infradead.org>
+References: <20250121-dts_qcs615-v3-0-fa4496950d8a@quicinc.com>
+ <20250121-dts_qcs615-v3-2-fa4496950d8a@quicinc.com>
+ <bf45ec15-d430-499a-ba30-825611369402@lunn.ch>
+Content-Language: en-US
+From: Yijie Yang <quic_yijiyang@quicinc.com>
+In-Reply-To: <bf45ec15-d430-499a-ba30-825611369402@lunn.ch>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01c.na.qualcomm.com (10.47.97.35)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: tYKueVtLj5-_nOleRcVBv1tEtZKa-_lh
+X-Proofpoint-GUID: tYKueVtLj5-_nOleRcVBv1tEtZKa-_lh
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-01-22_04,2025-01-22_02,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ impostorscore=0 malwarescore=0 adultscore=0 mlxlogscore=951 clxscore=1015
+ lowpriorityscore=0 spamscore=0 mlxscore=0 suspectscore=0 phishscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2411120000 definitions=main-2501220073
 
-On Wed, Jan 22, 2025 at 03:44:50PM +0800, lirongqing wrote:
-> From: Li RongQing <lirongqing@baidu.com>
-> 
-> The callback function of call_rcu() just calls kvfree(), so we can
-> use kvfree_rcu() instead of call_rcu() + callback function.
-> 
-> and move struct rcu_head into struct nf_hook_entries, then struct
-> nf_hook_entries_rcu_head can be removed
-> 
-> Signed-off-by: Li RongQing <lirongqing@baidu.com>
 
-Reviewed-by: Simon Horman <horms@kernel.org>
 
-...
+On 2025-01-22 01:10, Andrew Lunn wrote:
+>> To address the ABI compatibility issue between the kernel and DTS caused by
+>> this change, handle the compatible string 'qcom,qcs404-evb-4000' in the
+>> code, as it is the only legacy board that mistakenly uses the 'rgmii'
+>> phy-mode.
+> 
+> Are you saying every other board DT got this correct? How do you know
+> that? Was this SoC never shipped to anybody, so the only possible
+> board is the QCOM RDK which never left the lab?
+> 
+> I doubt this is true, so you are probably breaking out of tree
+> boards. We care less about out of tree boards, but we also don't
+> needlessly break them.
+
+You're right. My conclusion was based solely on browsing all RGMII-type 
+Qualcomm boards under the source tree, and I didn't take the scenario 
+you mentioned into account. I will work on coming up with a new 
+solution. If you have any suggestions, I will gladly take them as a 
+reference.
+
+> 
+> 	Andrew
+
+-- 
+Best Regards,
+Yijie
+
 
