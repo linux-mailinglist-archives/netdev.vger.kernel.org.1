@@ -1,232 +1,109 @@
-Return-Path: <netdev+bounces-160265-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160266-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF4DCA1912B
-	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 13:10:17 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1274FA1912E
+	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 13:13:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 662E97A02D4
-	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 12:10:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B31C13AB367
+	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 12:13:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E381E211A1F;
-	Wed, 22 Jan 2025 12:10:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3BBF212B11;
+	Wed, 22 Jan 2025 12:13:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="q3X0nJZV"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="sC48L8mT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-52003.amazon.com (smtp-fw-52003.amazon.com [52.119.213.152])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4577C212B2F
-	for <netdev@vger.kernel.org>; Wed, 22 Jan 2025 12:10:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56EB3211A2B
+	for <netdev@vger.kernel.org>; Wed, 22 Jan 2025 12:13:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.152
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737547809; cv=none; b=pzmOWOJkVtpLLPCxAh34ABjxe1KrrcCDqAAFBrbDfqaL/+1nGNDjSqlD1Bzz7y1qYzTQ5Y9pN8pqD+ZsSRGU2s5o4c3izU14tjoWqMkpkXnVbkXJ2EXBAsQDg1zdDovtHJ6YoJbEWpMATfeO44tPgSPGyng3kFfRxGjp4fa5E5o=
+	t=1737547992; cv=none; b=OiE2renCTT9szSTtW827BcKTfL086jEWZGa9Fw+rV0dT3tQh6w+Fc0yqi8AqRTfC5KsRbC1sT2/eWAF/Trs7RfPDvL1cXiWPtqh42W0NbBIcJfjeFzZWohhV2tcniPFlNB4jnlEFai1zKFIzgbQhjeLdlgvMaCAH+NN7wZ5WvFs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737547809; c=relaxed/simple;
-	bh=Hps69/IS2HkOWr8gqmXzaSwlR4Gw7DaBy9JYLGn2kXQ=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=YW1wtzfH8iNFgujZenboSm/uAgSW6dbA01Zzr/dwmEvw3vJai80TdFCWtAVC9W54tW+mfa4RDkv655/0p4gywAhdcWZfLNZ3k8TEoXvYviAVOdulgdq0JdNvkPkKFiAHm/uHNutaxa1sD5tcE4NrpWZW1qXcJoeUeXIIsVow5mA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--chiachangwang.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=q3X0nJZV; arc=none smtp.client-ip=209.85.214.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--chiachangwang.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-21681a2c0d5so124966175ad.2
-        for <netdev@vger.kernel.org>; Wed, 22 Jan 2025 04:10:08 -0800 (PST)
+	s=arc-20240116; t=1737547992; c=relaxed/simple;
+	bh=qK19eq+tbbytGTRDZBmWlq9uhY7R/pZ9YUTINdgzGYI=;
+	h=Subject:From:To:CC:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=cPR45xzDV/MIYaXQTdHYQywaIjo6GcowHi9f5P128dOlpjFL0FlMGXDLFKb1Nn75BoNNldZfz7k3tzuI9Xl4Se1+SWV/zdD7e8RST3Zu0swSLgQNLp84Wq5+XHNX79qQxLe30G4DIUQkA+d/Y0lWml0BeboPev81cRdJN3ofBos=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=sC48L8mT; arc=none smtp.client-ip=52.119.213.152
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1737547808; x=1738152608; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=RGCAkzJUCKIA/A/I7FRqDQ8jZW+LutmOvzFJmI3KsrI=;
-        b=q3X0nJZVVuPT4JJKrxbkd6GKTNONCS4lS3eJV3Nje7LgBf8ticyf0go9zJsgzQyO0s
-         ub9OcRiJaphFyFTC4P+X4fOF92vz7ErnRxRYs3CeTMoZwrYYfOXsr9tYjN14uyMqOKWk
-         zRV2+7o0CvQiigpyIHLxza83GAk5tMjEKVtNjPJcbErkrMWq/9Uj+yUkbgXj1wW27gnG
-         pqzhtbuwR2OSrbURQAFbmfxD+FtQScx/SjMHozvEfCigd0a1IYmNZcryZcgsChx9FD+Q
-         iWJQpKAzMI8aQmmhX51NrP838b0L8H7M4NO4KDUmbt8V3kt5DStEF2lZ8jogqAyPZo2P
-         Gpbw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737547808; x=1738152608;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=RGCAkzJUCKIA/A/I7FRqDQ8jZW+LutmOvzFJmI3KsrI=;
-        b=kCZ9g0m5mF97kdOFFxS+9bOuIYrMQk1TEFrnPeD07XKdf6wKPP0xKsPwqjvcgZFliV
-         wtw7vKGt6xEo4cXgch7VbJ/V3KHqA/yT6H+G5DA52iMrylbLISHOk/Snmq8IQqpLTNN3
-         v0HPU4TCf2f3netfxTxhCE5FV7qhPSEdyK3BTFsg8I7SFv+QqerOdY6e28KSr6gqSHIy
-         w0q0caqHXMVDkIr28D21izJbHJwG/rT76H4kjndNHjVjRrBOvG5sQ0QBq9euguTSwmT6
-         k9k6G8i9Uztx00PPP41UIp5yFGMqnukYcjDV8FbpdJTfo3EVAIFOUaicR05ZIE3KF5Vh
-         +2/g==
-X-Gm-Message-State: AOJu0YwvE/L48B49h1Bd/kTudqqA/ygVQ9AbjhWsc5evOgZ2Mi2ZaXUl
-	7NuPcAf8UJsdT+cZoF3tVo3jjFCMlF5J8BYqgErmLWjrbXvQrrULG1al+gUqOSroWm6wR077zCn
-	x2ui4pvB2VouN4nm3YqYgRnA0PBYLWr/793vAeGfqhwVgfNv9AoS6kZdpjj2xWUSvqZXV2d/xzn
-	XUgYsvln4lbn8Ai/BNCHTotrNFv0dT1XKv5oBBu02ri/eMhg+4u4ZBqvYN5DMxIHeHHC1D0A==
-X-Google-Smtp-Source: AGHT+IHjQUTdi6rs7qCNVsG2ci/YrJttEgNBRKMRECoAafvCPWu/CvL6397zg6CWolHgnFJStsq9B521mlakQsbEZ6zg
-X-Received: from plgk16.prod.google.com ([2002:a17:902:ce10:b0:216:eefe:2c35])
- (user=chiachangwang job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:903:2a88:b0:215:9894:5679 with SMTP id d9443c01a7336-21c34ccef5fmr315335595ad.0.1737547807728;
- Wed, 22 Jan 2025 04:10:07 -0800 (PST)
-Date: Wed, 22 Jan 2025 12:09:41 +0000
-In-Reply-To: <20250122120941.2634198-1-chiachangwang@google.com>
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1737547991; x=1769083991;
+  h=from:to:cc:date:message-id:references:in-reply-to:
+   content-transfer-encoding:mime-version:subject;
+  bh=qK19eq+tbbytGTRDZBmWlq9uhY7R/pZ9YUTINdgzGYI=;
+  b=sC48L8mTVixjDYyrFSEPhiTSW8r34zVU+2VBdybq8KH0TqZm7SHRelyR
+   L73zB+qDCOsZdyebUvd0VwDS1MRGg1cLmy4ghDsfVXGXXuIkaZH9iKGoA
+   8xUvI/nD/r/F4HlKc7EYG0c1zL8dexcIn2Df35DaOfeZz87VIyJXi5afu
+   4=;
+X-IronPort-AV: E=Sophos;i="6.13,225,1732579200"; 
+   d="scan'208";a="59621093"
+Subject: RE: [PATCH v5 net-next 0/5] PHC support in ENA driver
+Thread-Topic: [PATCH v5 net-next 0/5] PHC support in ENA driver
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-52003.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jan 2025 12:13:06 +0000
+Received: from EX19MTAEUC002.ant.amazon.com [10.0.43.254:3769]
+ by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.31.172:2525] with esmtp (Farcaster)
+ id 03a338b2-a08d-4494-ba34-64d9d7da591d; Wed, 22 Jan 2025 12:13:05 +0000 (UTC)
+X-Farcaster-Flow-ID: 03a338b2-a08d-4494-ba34-64d9d7da591d
+Received: from EX19D004EUA002.ant.amazon.com (10.252.50.81) by
+ EX19MTAEUC002.ant.amazon.com (10.252.51.245) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
+ Wed, 22 Jan 2025 12:13:05 +0000
+Received: from EX19D005EUA002.ant.amazon.com (10.252.50.11) by
+ EX19D004EUA002.ant.amazon.com (10.252.50.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
+ Wed, 22 Jan 2025 12:13:04 +0000
+Received: from EX19D005EUA002.ant.amazon.com ([fe80::6aa4:b4a3:92f6:8e9]) by
+ EX19D005EUA002.ant.amazon.com ([fe80::6aa4:b4a3:92f6:8e9%3]) with mapi id
+ 15.02.1258.039; Wed, 22 Jan 2025 12:13:04 +0000
+From: "Arinzon, David" <darinzon@amazon.com>
+To: Gal Pressman <gal@nvidia.com>, David Miller <davem@davemloft.net>, "Jakub
+ Kicinski" <kuba@kernel.org>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>
+CC: Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Richard Cochran <richardcochran@gmail.com>, "Woodhouse, David"
+	<dwmw@amazon.co.uk>, "Machulsky, Zorik" <zorik@amazon.com>, "Matushevsky,
+ Alexander" <matua@amazon.com>, "Bshara, Saeed" <saeedb@amazon.com>, "Wilson,
+ Matt" <msw@amazon.com>, "Liguori, Anthony" <aliguori@amazon.com>, "Bshara,
+ Nafea" <nafea@amazon.com>, "Schmeilin, Evgeny" <evgenys@amazon.com>,
+	"Belgazal, Netanel" <netanel@amazon.com>, "Saidi, Ali" <alisaidi@amazon.com>,
+	"Herrenschmidt, Benjamin" <benh@amazon.com>, "Kiyanovski, Arthur"
+	<akiyano@amazon.com>, "Dagan, Noam" <ndagan@amazon.com>, "Bernstein, Amit"
+	<amitbern@amazon.com>, "Agroskin, Shay" <shayagr@amazon.com>, "Abboud, Osama"
+	<osamaabb@amazon.com>, "Ostrovsky, Evgeny" <evostrov@amazon.com>, "Tabachnik,
+ Ofir" <ofirt@amazon.com>, "Machnikowski, Maciek" <maciek@machnikowski.net>,
+	Rahul Rameshbabu <rrameshbabu@nvidia.com>
+Thread-Index: AQHbbLdOl+GEsMbIXU2oCJBaxUPoCLMip62AgAALmLA=
+Date: Wed, 22 Jan 2025 12:13:04 +0000
+Message-ID: <00c2a1c7d4b54306ad0e083736decaac@amazon.com>
+References: <20250122102040.752-1-darinzon@amazon.com>
+ <b1e4436a-c19e-4060-bd85-4328e586e68e@nvidia.com>
+In-Reply-To: <b1e4436a-c19e-4060-bd85-4328e586e68e@nvidia.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250122120941.2634198-1-chiachangwang@google.com>
-X-Mailer: git-send-email 2.48.1.262.g85cc9f2d1e-goog
-Message-ID: <20250122120941.2634198-3-chiachangwang@google.com>
-Subject: [PATCH ipsec v1 2/2] xfrm: Migrate offload configuration
-From: Chiachang Wang <chiachangwang@google.com>
-To: netdev@vger.kernel.org, steffen.klassert@secunet.com, leonro@nvidia.com
-Cc: yumike@google.com, stanleyjhu@google.com, chiachangwang@google.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
 
-If the SA contains offload configuration, the migration
-path should update the SA as well.
-
-This change supports SA migration with the offload attribute
-configured. This allows the device to migrate with offload
-configuration.
-
-Test: Endable both in/out IPSec crypto offload, and verify
-      with Android device on both WiFi/cellular network,
-      including:
-      1. WiFi + offload -> Cellular + offload
-      2. WiFi + offload -> Cellular + no offload
-      3. WiFi + no offload -> Cellular + offload
-      4. Wifi + no offload -> Cellular + no offload
-      5. Cellular + offload -> WiFi + offload
-      6. Cellular + no offload -> WiFi + offload
-      7. Cellular + offload -> WiFi + no offload
-      8. Cell + no offload -> WiFi + no offload
-Signed-off-by: Chiachang Wang <chiachangwang@google.com>
----
- include/net/xfrm.h     |  8 ++++++--
- net/xfrm/xfrm_policy.c |  4 ++--
- net/xfrm/xfrm_state.c  | 14 +++++++++++---
- net/xfrm/xfrm_user.c   | 15 +++++++++++++--
- 4 files changed, 32 insertions(+), 9 deletions(-)
-
-diff --git a/include/net/xfrm.h b/include/net/xfrm.h
-index 32c09e85a64c..a1359f912298 100644
---- a/include/net/xfrm.h
-+++ b/include/net/xfrm.h
-@@ -1822,12 +1822,16 @@ struct xfrm_state *xfrm_migrate_state_find(struct xfrm_migrate *m, struct net *n
- 						u32 if_id);
- struct xfrm_state *xfrm_state_migrate(struct xfrm_state *x,
- 				      struct xfrm_migrate *m,
--				      struct xfrm_encap_tmpl *encap);
-+				      struct xfrm_encap_tmpl *encap,
-+				      struct net *net,
-+				      struct xfrm_user_offload *xuo,
-+				      struct netlink_ext_ack *extack);
- int xfrm_migrate(const struct xfrm_selector *sel, u8 dir, u8 type,
- 		 struct xfrm_migrate *m, int num_bundles,
- 		 struct xfrm_kmaddress *k, struct net *net,
- 		 struct xfrm_encap_tmpl *encap, u32 if_id,
--		 struct netlink_ext_ack *extack);
-+		 struct netlink_ext_ack *extack,
-+		 struct xfrm_user_offload *xuo);
- #endif
- 
- int km_new_mapping(struct xfrm_state *x, xfrm_address_t *ipaddr, __be16 sport);
-diff --git a/net/xfrm/xfrm_policy.c b/net/xfrm/xfrm_policy.c
-index 4408c11c0835..3f5a06f3f0d2 100644
---- a/net/xfrm/xfrm_policy.c
-+++ b/net/xfrm/xfrm_policy.c
-@@ -4622,7 +4622,7 @@ int xfrm_migrate(const struct xfrm_selector *sel, u8 dir, u8 type,
- 		 struct xfrm_migrate *m, int num_migrate,
- 		 struct xfrm_kmaddress *k, struct net *net,
- 		 struct xfrm_encap_tmpl *encap, u32 if_id,
--		 struct netlink_ext_ack *extack)
-+		 struct netlink_ext_ack *extack, struct xfrm_user_offload *xuo)
- {
- 	int i, err, nx_cur = 0, nx_new = 0;
- 	struct xfrm_policy *pol = NULL;
-@@ -4655,7 +4655,7 @@ int xfrm_migrate(const struct xfrm_selector *sel, u8 dir, u8 type,
- 		if ((x = xfrm_migrate_state_find(mp, net, if_id))) {
- 			x_cur[nx_cur] = x;
- 			nx_cur++;
--			xc = xfrm_state_migrate(x, mp, encap);
-+			xc = xfrm_state_migrate(x, mp, encap, net, xuo, extack);
- 			if (xc) {
- 				x_new[nx_new] = xc;
- 				nx_new++;
-diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
-index 46d75980eb2e..2fdb4ea97844 100644
---- a/net/xfrm/xfrm_state.c
-+++ b/net/xfrm/xfrm_state.c
-@@ -2007,22 +2007,30 @@ EXPORT_SYMBOL(xfrm_migrate_state_find);
- 
- struct xfrm_state *xfrm_state_migrate(struct xfrm_state *x,
- 				      struct xfrm_migrate *m,
--				      struct xfrm_encap_tmpl *encap)
-+				      struct xfrm_encap_tmpl *encap,
-+				      struct net *net,
-+				      struct xfrm_user_offload *xuo,
-+				      struct netlink_ext_ack *extack)
- {
- 	struct xfrm_state *xc;
--
-+	bool offload = (xuo);
- 	xc = xfrm_state_clone(x, encap);
- 	if (!xc)
- 		return NULL;
- 
- 	xc->props.family = m->new_family;
- 
--	if (xfrm_init_state(xc) < 0)
-+	if (__xfrm_init_state(xc, true, offload, NULL) < 0)
- 		goto error;
- 
-+	x->km.state = XFRM_STATE_VALID;
- 	memcpy(&xc->id.daddr, &m->new_daddr, sizeof(xc->id.daddr));
- 	memcpy(&xc->props.saddr, &m->new_saddr, sizeof(xc->props.saddr));
- 
-+	/* configure the hardware if offload is requested */
-+	if (offload & xfrm_dev_state_add(net, xc, xuo, extack))
-+		goto error;
-+
- 	/* add state */
- 	if (xfrm_addr_equal(&x->id.daddr, &m->new_daddr, m->new_family)) {
- 		/* a care is needed when the destination address of the
-diff --git a/net/xfrm/xfrm_user.c b/net/xfrm/xfrm_user.c
-index b2876e09328b..505ae2427822 100644
---- a/net/xfrm/xfrm_user.c
-+++ b/net/xfrm/xfrm_user.c
-@@ -2989,6 +2989,7 @@ static int xfrm_do_migrate(struct sk_buff *skb, struct nlmsghdr *nlh,
- 	int n = 0;
- 	struct net *net = sock_net(skb->sk);
- 	struct xfrm_encap_tmpl  *encap = NULL;
-+	struct xfrm_user_offload *xuo = NULL;
- 	u32 if_id = 0;
- 
- 	if (!attrs[XFRMA_MIGRATE]) {
-@@ -3019,11 +3020,21 @@ static int xfrm_do_migrate(struct sk_buff *skb, struct nlmsghdr *nlh,
- 	if (attrs[XFRMA_IF_ID])
- 		if_id = nla_get_u32(attrs[XFRMA_IF_ID]);
- 
-+	if (attrs[XFRMA_OFFLOAD_DEV]) {
-+		xuo = kmemdup(nla_data(attrs[XFRMA_OFFLOAD_DEV]),
-+			      sizeof(*xuo), GFP_KERNEL);
-+		if (!xuo) {
-+			err = -ENOMEM;
-+			goto error;
-+		}
-+	}
-+
- 	err = xfrm_migrate(&pi->sel, pi->dir, type, m, n, kmp, net, encap,
--			   if_id, extack);
-+			   if_id, extack, xuo);
- 
-+error:
- 	kfree(encap);
--
-+	kfree(xuo);
- 	return err;
- }
- #else
--- 
-2.48.1.262.g85cc9f2d1e-goog
-
+PiA+IENoYW5nZXMgaW4gdjU6DQo+ID4gLSBBZGQgUEhDIGVycm9yIGJvdW5kDQo+ID4gLSBBZGQg
+UEhDIGVuYWJsZW1lbnQgYW5kIGVycm9yIGJvdW5kIHJldHJpZXZhbCB0aHJvdWdoIHN5c2ZzDQo+
+IA0KPiBzeXNmcyBpcyBhbiBpbnRlcmVzdGluZyBhZGRpdGlvbiwgaXMgaXQgYSByZXN1bHQgb2Yg
+ZmVlZGJhY2sgZnJvbSBwcmV2aW91cw0KPiBpdGVyYXRpb25zPw0KDQpIaSBHYWwsDQoNCkl0J3Mg
+bm90IGEgcmVzdWx0IG9mIGZlZWRiYWNrIGZyb20gcHJldmlvdXMgaXRlcmF0aW9ucywgd2UgYW5h
+bHl6ZWQgdGhlDQpwYXRjaHNldCAodG9vayBzb21lIHRpbWUgdG8gcmVsZWFzZSB2NSkgYW5kIGRl
+Y2lkZWQgdGhhdCBpdCdzIGEgbWFuZGF0b3J5IGFkZGl0aW9uDQp0byB0aGlzIHBhdGNoIHNlcmll
+cy4NCg==
 
