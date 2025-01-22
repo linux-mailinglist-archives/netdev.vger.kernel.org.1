@@ -1,144 +1,169 @@
-Return-Path: <netdev+bounces-160233-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160235-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B38BA18F38
-	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 11:06:19 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C957A18F56
+	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 11:11:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5EC5F188430E
-	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 10:06:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 96082188CAF2
+	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 10:11:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2922C21148F;
-	Wed, 22 Jan 2025 10:05:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81665211272;
+	Wed, 22 Jan 2025 10:11:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="NnMwcwut"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="TTbd3Pd0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A999020FA8A;
-	Wed, 22 Jan 2025 10:05:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.5])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3BB21F7914;
+	Wed, 22 Jan 2025 10:11:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737540315; cv=none; b=DgHC8WdomHragYrbhXkMfqasWONDoXiZv1bdGoUC5TxLO94ugeXvCdEck0dvWza/BWAzxLyp6WR9BA8lG6XVV/HkSoC4pNJe0iGTghBgEVJog0Gt3Hc82j7+ZcFfFrsXArVH0hfpkGOu+O0u3nIye9aZy6h8+9cpPiQ8N7zycGk=
+	t=1737540695; cv=none; b=rgx/c62FI6Eld7wL41pz6+CEzxUSiU7MyBs+vrqqh6HP7ruX99o9BzZ/0yNar8lgexOUVuPD50/8GIaBi9foxVYMhlQIenSJT+OtUy3EdtTFCzCfavw+bgfetM0pS0dC6UV2XpBKS9ZtxiGTpQHDhRxJ/CchTowM2gp4MvVTW2A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737540315; c=relaxed/simple;
-	bh=1/GuKaxEhwOAKgFiGB5TJk1TBjQaQ1frM+7ZuBKqiW0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=mkhEZgwUlFTdv+DBoiVxYyC5RVHhp0SaT7wbwp0xoVbNhgcLR5gaX6if2DyoRYWGAMzStTgPUCYXntLB0V2zmt3+DlgWQsKvMTntkvpYbKI3JUYE8bRMbyLhH0CI3lVju1exzg8pLugnFsJkAEmtdHTLnK7PGOhWbjDRlqQW9XU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=NnMwcwut; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279867.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50M9Qml5030077;
-	Wed, 22 Jan 2025 10:04:48 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	zFmj7zj/Lq0aydtI5Gp746tMc3UoW0yD2aMedlR5Jng=; b=NnMwcwutVfIdifgQ
-	drCmbTCZm+mM+1nGU24aAw7TJAb6OO1fJolXxfqq9cty5jAvoyergGx/DxRCM5Ek
-	acY2oBAyGlpkpBInkkvbnddd8s+DxlUEPiZZmLFnfjuCEhmaHPVMDKreyaHolD2L
-	gyKLFnNqdebpDl/kMrUIV1TZmIAkmq83Jxui5HU7askqXE72Zi3Y5iXpInyvo27A
-	OkMW45ydqMlkdWidY+NxHKV8r7BNO8zwWpaohWqEoCkHFEWSh3sbQTVtLmseWmup
-	smWWiVwUhJ1Vlsao1rOaiTvsmrFZGQvtimrpGK9/0kqnUOBROsHxxLIVosMUkzTm
-	yxrNAA==
-Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 44ax1yr38p-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 22 Jan 2025 10:04:47 +0000 (GMT)
-Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
-	by NALASPPMTA03.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 50MA4lCa010810
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 22 Jan 2025 10:04:47 GMT
-Received: from [10.253.35.93] (10.80.80.8) by nalasex01c.na.qualcomm.com
- (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Wed, 22 Jan
- 2025 02:04:40 -0800
-Message-ID: <23a9f6cf-3921-48c1-9c28-aeede639cf40@quicinc.com>
-Date: Wed, 22 Jan 2025 18:04:38 +0800
+	s=arc-20240116; t=1737540695; c=relaxed/simple;
+	bh=nKWu84r5RQKGBqm5xElMSa7RfxVJ2SqHd74Gi/uAVuc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Kp1FtTeBwC5OQziVYKOwkfCBvnHhSTlivX8/QFiL1+7DpFVMFx1K68p3/o7R0rie1B0q4YpkrQAlPo9EdK827n1uKZ2kOhJmBb+9puU0c9rxKbr/nemr+MeTFEJAnysQOR0w8/HOKiBWK3RSHtn0L05pNbCmL9BadE8Pu3Yv9yU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=TTbd3Pd0; arc=none smtp.client-ip=220.197.31.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:Subject:Date:Message-ID:MIME-Version:
+	Content-Type; bh=QWWYmC4TDSJZjNRxBuhFocor1RdCIg5ChEjlLlaKCnE=;
+	b=TTbd3Pd0dveYS7fHJATPaag2gs30E4nPLyWYVMolF8pHbrYMPef9j+M9Qj2Nrv
+	XTvDgj5Qg9wDCvaP0c3/V1L9QfxleGnfRMMxzF0L6W6Y+tP23cN1XMuXHayj0Gx9
+	lZJd78gN0AczG1xChg2EwdZ4pg2nbtCJKh5PWE+QLkk3Q=
+Received: from localhost.localdomain (unknown [47.252.33.72])
+	by gzsmtp3 (Coremail) with SMTP id PigvCgAHUcjUw5Bn_UIhKA--.64788S2;
+	Wed, 22 Jan 2025 18:09:36 +0800 (CST)
+From: Jiayuan Chen <mrpre@163.com>
+To: bpf@vger.kernel.org,
+	jakub@cloudflare.com,
+	john.fastabend@gmail.com
+Cc: netdev@vger.kernel.org,
+	martin.lau@linux.dev,
+	ast@kernel.org,
+	edumazet@google.com,
+	davem@davemloft.net,
+	dsahern@kernel.org,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux-kernel@vger.kernel.org,
+	song@kernel.org,
+	andrii@kernel.org,
+	mhal@rbox.co,
+	yonghong.song@linux.dev,
+	daniel@iogearbox.net,
+	xiyou.wangcong@gmail.com,
+	horms@kernel.org,
+	corbet@lwn.net,
+	eddyz87@gmail.com,
+	cong.wang@bytedance.com,
+	shuah@kernel.org,
+	mykolal@fb.com,
+	jolsa@kernel.org,
+	haoluo@google.com,
+	sdf@fomichev.me,
+	kpsingh@kernel.org,
+	linux-doc@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	Jiayuan Chen <mrpre@163.com>
+Subject: [PATCH bpf v9 0/5] bpf: fix wrong copied_seq calculation and add tests
+Date: Wed, 22 Jan 2025 18:09:12 +0800
+Message-ID: <20250122100917.49845-1-mrpre@163.com>
+X-Mailer: git-send-email 2.43.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 2/4] net: stmmac: dwmac-qcom-ethqos: Mask PHY mode if
- configured with rgmii-id
-To: Andrew Lunn <andrew@lunn.ch>
-CC: Andrew Lunn <andrew+netdev@lunn.ch>,
-        "David S. Miller"
-	<davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Rob Herring
-	<robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley
-	<conor+dt@kernel.org>, Vinod Koul <vkoul@kernel.org>,
-        Maxime Coquelin
-	<mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue <alexandre.torgue@foss.st.com>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio
-	<konradybcio@kernel.org>,
-        Richard Cochran <richardcochran@gmail.com>, <netdev@vger.kernel.org>,
-        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-arm-msm@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>
-References: <20250121-dts_qcs615-v3-0-fa4496950d8a@quicinc.com>
- <20250121-dts_qcs615-v3-2-fa4496950d8a@quicinc.com>
- <bf45ec15-d430-499a-ba30-825611369402@lunn.ch>
-Content-Language: en-US
-From: Yijie Yang <quic_yijiyang@quicinc.com>
-In-Reply-To: <bf45ec15-d430-499a-ba30-825611369402@lunn.ch>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nalasex01c.na.qualcomm.com (10.47.97.35)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: tYKueVtLj5-_nOleRcVBv1tEtZKa-_lh
-X-Proofpoint-GUID: tYKueVtLj5-_nOleRcVBv1tEtZKa-_lh
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-01-22_04,2025-01-22_02,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- impostorscore=0 malwarescore=0 adultscore=0 mlxlogscore=951 clxscore=1015
- lowpriorityscore=0 spamscore=0 mlxscore=0 suspectscore=0 phishscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2411120000 definitions=main-2501220073
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:PigvCgAHUcjUw5Bn_UIhKA--.64788S2
+X-Coremail-Antispam: 1Uf129KBjvJXoWxWFyrGFyfXw4kuryDAFyxKrg_yoW5ZrWfpa
+	ykC34rGr47tFyxZws7A3yIqF4Fgw4rGay5KF1Fq3yfZF4jkryjvrs29F1aqr98GrWY9F1U
+	Cr13Wr4Y934UAFDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0z_pnQ7UUUUU=
+X-CM-SenderInfo: xpus2vi6rwjhhfrp/xtbBDwjcp2eQr31LCwACsb
 
+A previous commit described in this topic
+http://lore.kernel.org/bpf/20230523025618.113937-9-john.fastabend@gmail.com
+directly updated 'sk->copied_seq' in the tcp_eat_skb() function when the
+action of a BPF program was SK_REDIRECT. For other actions, like SK_PASS,
+the update logic for 'sk->copied_seq' was moved to
+tcp_bpf_recvmsg_parser() to ensure the accuracy of the 'fionread' feature.
 
+That commit works for a single stream_verdict scenario, as it also
+modified 'sk_data_ready->sk_psock_verdict_data_ready->tcp_read_skb'
+to remove updating 'sk->copied_seq'.
 
-On 2025-01-22 01:10, Andrew Lunn wrote:
->> To address the ABI compatibility issue between the kernel and DTS caused by
->> this change, handle the compatible string 'qcom,qcs404-evb-4000' in the
->> code, as it is the only legacy board that mistakenly uses the 'rgmii'
->> phy-mode.
-> 
-> Are you saying every other board DT got this correct? How do you know
-> that? Was this SoC never shipped to anybody, so the only possible
-> board is the QCOM RDK which never left the lab?
-> 
-> I doubt this is true, so you are probably breaking out of tree
-> boards. We care less about out of tree boards, but we also don't
-> needlessly break them.
+However, for programs where both stream_parser and stream_verdict are
+active (strparser purpose), tcp_read_sock() was used instead of
+tcp_read_skb() (sk_data_ready->strp_data_ready->tcp_read_sock).
+tcp_read_sock() now still updates 'sk->copied_seq', leading to duplicated
+updates.
 
-You're right. My conclusion was based solely on browsing all RGMII-type 
-Qualcomm boards under the source tree, and I didn't take the scenario 
-you mentioned into account. I will work on coming up with a new 
-solution. If you have any suggestions, I will gladly take them as a 
-reference.
+In summary, for strparser + SK_PASS, copied_seq is redundantly calculated
+in both tcp_read_sock() and tcp_bpf_recvmsg_parser().
 
-> 
-> 	Andrew
+The issue causes incorrect copied_seq calculations, which prevent
+correct data reads from the recv() interface in user-land.
+
+Also we added test cases for bpf + strparser and separated them from
+sockmap_basic, as strparser has more encapsulation and parsing
+capabilities compared to sockmap.
+
+---
+V8 -> v9
+https://lore.kernel.org/bpf/20250121050707.55523-1-mrpre@163.com/
+Fixed some issues suggested by Jakub Sitnicki.
+
+V7 -> V8
+https://lore.kernel.org/bpf/20250116140531.108636-1-mrpre@163.com/
+Avoid using add read_sock to psock. (Jakub Sitnicki)
+Avoid using warpper function to check whether strparser is supported.
+
+V3 -> V7:
+https://lore.kernel.org/bpf/20250109094402.50838-1-mrpre@163.com/
+https://lore.kernel.org/bpf/20241218053408.437295-1-mrpre@163.com/
+Avoid introducing new proto_ops. (Jakub Sitnicki).
+Add more edge test cases for strparser + bpf.
+Fix patchwork fail of test cases code.
+Fix psock fetch without rcu lock.
+Move code of modifying to tcp_bpf.c.
+
+V1 -> V3:
+https://lore.kernel.org/bpf/20241209152740.281125-1-mrpre@163.com/
+Fix patchwork fail by adding Fixes tag.
+Save skb data offset for ENOMEM. (John Fastabend)
+---
+
+Jiayuan Chen (5):
+  strparser: add read_sock callback
+  bpf: fix wrong copied_seq calculation
+  bpf: disable non stream socket for strparser
+  selftests/bpf: fix invalid flag of recv()
+  selftests/bpf: add strparser test for bpf
+
+ Documentation/networking/strparser.rst        |   9 +-
+ include/linux/skmsg.h                         |   2 +
+ include/net/strparser.h                       |   2 +
+ include/net/tcp.h                             |   8 +
+ net/core/skmsg.c                              |   7 +
+ net/core/sock_map.c                           |   5 +-
+ net/ipv4/tcp.c                                |  29 +-
+ net/ipv4/tcp_bpf.c                            |  36 ++
+ net/strparser/strparser.c                     |  11 +-
+ .../selftests/bpf/prog_tests/sockmap_basic.c  |  59 +--
+ .../selftests/bpf/prog_tests/sockmap_strp.c   | 454 ++++++++++++++++++
+ .../selftests/bpf/progs/test_sockmap_strp.c   |  53 ++
+ 12 files changed, 610 insertions(+), 65 deletions(-)
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/sockmap_strp.c
+ create mode 100644 tools/testing/selftests/bpf/progs/test_sockmap_strp.c
 
 -- 
-Best Regards,
-Yijie
+2.43.5
 
 
