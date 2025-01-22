@@ -1,139 +1,79 @@
-Return-Path: <netdev+bounces-160406-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160407-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66217A198EB
-	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 20:02:33 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E7DFA198FB
+	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 20:07:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B388316C6D5
-	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 19:02:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D7FAB3ADB4A
+	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 19:06:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACFFD21577C;
-	Wed, 22 Jan 2025 19:02:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00EB3216381;
+	Wed, 22 Jan 2025 19:06:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="dSTu3bEM"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="izObgMbJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-175.mta1.migadu.com (out-175.mta1.migadu.com [95.215.58.175])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9551E214A9B
-	for <netdev@vger.kernel.org>; Wed, 22 Jan 2025 19:02:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB32A21518C;
+	Wed, 22 Jan 2025 19:06:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737572550; cv=none; b=Iz2YDhl57ub6QSQtRBwwtkUwgrYkksl+Odjvv4VZEmdvQlxtZyMm8mULDu+kARN7jVvBNMTLCF2cJj+Stmw/8FV7B0L1dbgvG2YozU9ZBw85prGRJi4TXG95sol/201y2zHdahBKNiWKfEi6HuR0F064P2mL1CO25uMCwpvucVo=
+	t=1737572781; cv=none; b=q59qthiSwe7sL+//5qrlWJ2MK/pr25MEh8trtVDyEf1sm2UfjprGL+kg5cq82OjFslNvRSeA0n9/nx4Cw33HjG1hkMB764CBVYacvweQmUt1zpM0Q35cHO+ZgXYtnPhHXT2/vdzhQ2AE6b6FJ1M51c4chWHiZzZZAVDEfVqNBg4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737572550; c=relaxed/simple;
-	bh=yVOl7uKZwAPzL3hOo1/yIB0AA01qrS2OlwWoDfRibec=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZoQbFSBQNASyI5pEIA2/LYRlfkiIvbFGMmS09ddYv0/VzF/Judu73w51i+bfesgKgv4y1XZ5jXciTEH9WLdV3UAgFnBnXxtM+dzXW54jlOjOEIpsV1Dsw9XdzbYiIgSZjFcJRbRBmaer3qcZroKiOVZ0sCD2R6YZXKXXTen918o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=dSTu3bEM; arc=none smtp.client-ip=95.215.58.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <453fbdbc-1843-498b-9a1c-8c83e7e244ed@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1737572536;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=g8FKpvfe4T9AnrcyGP1Vg1JqYGIC8GWW31gvSYVAm1E=;
-	b=dSTu3bEMKZOMYG8VODFIRLWE+0EC6zY7TARf8/Jb94x02xb52o1JTn8e/cptSgx1KqH0Ga
-	IU/fRr9lryQk1ho9fZT7Wmrub7Ipu4/2LeE04UEAWKoScthZHY+vnijyrz0uJtEo45EzjQ
-	kd/KLlSxQ92RxISwLyMTUwv8tVxKUr4=
-Date: Wed, 22 Jan 2025 11:02:08 -0800
+	s=arc-20240116; t=1737572781; c=relaxed/simple;
+	bh=hhZmQ80KMi2K3r5BhEizbk8P3ylxqjrd/b5kjlu8E1c=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=pXTh9pgfFevUoiEL0BqTQo/ir+Trott6mt78hWLN1F47c940t/W2AOv1cfh++IGqtNh/kmznFY+vOH/9VdOfgsmulhvUwQV3+15xkMvhw+GyKeBnnUEqd44MkeI935YX/MajKQWWSonuom8yplHa9aktAB014+NTMmu9w7s8mwI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=izObgMbJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D1D3C4CED2;
+	Wed, 22 Jan 2025 19:06:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1737572781;
+	bh=hhZmQ80KMi2K3r5BhEizbk8P3ylxqjrd/b5kjlu8E1c=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=izObgMbJkIMd+a8wiSrSaVZQFk5oFZIGkBW5CfxkjolftuTxu+8tr89vDX2xUwADc
+	 2h/9YN1yZKd1d0/g2dlTB2+sjhrP0uIugdNrRSEcPYEwO5eNcjyhNAnOTjadZRyyXi
+	 xzEkX3mB5qGbuJ8n0M4Z+X1gEn89C2GYpY17tEsf8HF9SqP7uRpYAlkb32kdnANv6e
+	 feqwvU6PEP1b9sAJwJ39Tl9IkkIu+SDwUTzpkzxCMWEncwAtkLDa01oXfFrxlSuhZi
+	 34W/qa9hjvtnMbV1aG+3m0gmTPt58QxHeCf/RdYu8kl3tEgpk6agqFMQij9BGAZVPW
+	 o9CHolT/sacVw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAFA9380AA62;
+	Wed, 22 Jan 2025 19:06:46 +0000 (UTC)
+Subject: Re: [GIT PULL] Networking for v6.14
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <20250121125748.37808-1-pabeni@redhat.com>
+References: <20250121125748.37808-1-pabeni@redhat.com>
+X-PR-Tracked-List-Id: <netdev.vger.kernel.org>
+X-PR-Tracked-Message-Id: <20250121125748.37808-1-pabeni@redhat.com>
+X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git tags/net-next-6.14
+X-PR-Tracked-Commit-Id: cf33d96f50903214226b379b3f10d1f262dae018
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 0ad9617c78acbc71373fb341a6f75d4012b01d69
+Message-Id: <173757280565.783272.14009973682494742496.pr-tracker-bot@kernel.org>
+Date: Wed, 22 Jan 2025 19:06:45 +0000
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: torvalds@linux-foundation.org, kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, bpf@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Subject: Re: [PATCH RFC net-next] trace: tcp: Add tracepoint for
- tcp_cwnd_reduction()
-Content-Language: en-GB
-To: Steven Rostedt <rostedt@goodmis.org>, Breno Leitao <leitao@debian.org>
-Cc: Jason Xing <kerneljasonxing@gmail.com>, Eric Dumazet
- <edumazet@google.com>, Masami Hiramatsu <mhiramat@kernel.org>,
- Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
- "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
- kernel-team@meta.com, Song Liu <song@kernel.org>,
- Martin KaFai Lau <martin.lau@kernel.org>
-References: <20250120-cwnd_tracepoint-v1-1-36b0e0d643fa@debian.org>
- <CAL+tcoC+A94uzaSZ+SKhV04=iDWrvUGEfxYJKYCF0ovqvyhfOg@mail.gmail.com>
- <20250120-panda-of-impressive-aptitude-2b714e@leitao>
- <CAL+tcoCzStjkEMdNw5ORYbQy3VnVE9A6aj6HcmQvGj3VG1VypA@mail.gmail.com>
- <20250120-daring-outstanding-jaguarundi-c8aaed@leitao>
- <20250120100340.4129eff7@batman.local.home>
- <20250122-vengeful-myna-of-tranquility-f0f8cf@leitao>
- <20250122095604.3c93bc93@gandalf.local.home>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Yonghong Song <yonghong.song@linux.dev>
-In-Reply-To: <20250122095604.3c93bc93@gandalf.local.home>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
 
+The pull request you sent on Tue, 21 Jan 2025 13:57:48 +0100:
 
+> git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git tags/net-next-6.14
 
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/0ad9617c78acbc71373fb341a6f75d4012b01d69
 
-On 1/22/25 6:56 AM, Steven Rostedt wrote:
-> On Wed, 22 Jan 2025 01:39:42 -0800
-> Breno Leitao <leitao@debian.org> wrote:
->
->> Right, DECLARE_TRACE would solve my current problem, but, a056a5bed7fa
->> ("sched/debug: Export the newly added tracepoints") says "BPF doesn't
->> have infrastructure to access these bare tracepoints either.".
->>
->> Does BPF know how to attach to this bare tracepointers now?
->>
->> On the other side, it seems real tracepoints is getting more pervasive?
->> So, this current approach might be OK also?
->>
->> 	https://lore.kernel.org/bpf/20250118033723.GV1977892@ZenIV/T/#m4c2fb2d904e839b34800daf8578dff0b9abd69a0
-> Thanks for the pointer. I didn't know this discussion was going on. I just
-> asked to attend if this gets accepted. I'm only a 6 hour drive from
-> Montreal anyway.
->
->>> You can see its use in include/trace/events/sched.h
->> I suppose I need to export the tracepointer with
->> EXPORT_TRACEPOINT_SYMBOL_GPL(), right?
-> For modules to use them directly, yes. But there's other ways too.
->
->> I am trying to hack something as the following, but, I struggled to hook
->> BPF into it.
-> Maybe you can use the iterator to search for the tracepoint.
->
-> #include <linux/tracepoint.h>
->
-> static void fct(struct tracepoint *tp, void *priv)
-> {
-> 	if (!tp->name || strcmp(tp->name, "<tracepoint_name>") != 0)
-> 		return 0;
->
-> 	// attach to tracepoint tp
-> }
->
-> [..]
-> 	for_each_kernel_tracepoint(fct, NULL);
->
-> This is how LTTng hooks to tracepoints.
+Thank you!
 
-The LTTng approach in the above needs a kernel module to enable and disable
-the tracepoint and this is not a bpf-way to handle tracepoints.
-
-So for bpf, we need a new UAPI to pass <tracepoint_name> from user
-space to the kernel to attach to tracepoint tp since <tracepont_name> is not
-available in trace_fs.
-
-What is the criteria for a tracepoint to be a normal tp or a bare tp?
-
-
->
-> -- Steve
->
-
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
 
