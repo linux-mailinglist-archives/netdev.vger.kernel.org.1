@@ -1,144 +1,167 @@
-Return-Path: <netdev+bounces-160188-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160189-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D756BA18B76
-	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 06:58:06 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 11085A18BB3
+	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 07:07:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8CC87188BFBE
-	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 05:58:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E883F3A3103
+	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 06:07:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66DC6191F99;
-	Wed, 22 Jan 2025 05:58:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 383EC14A619;
+	Wed, 22 Jan 2025 06:07:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B778F196;
-	Wed, 22 Jan 2025 05:57:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B8151A8F7F
+	for <netdev@vger.kernel.org>; Wed, 22 Jan 2025 06:07:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737525481; cv=none; b=ckON1AiiaxhWv+6luaCcEUyrYEApDLNNms5Q4ADZJrVtrO+s4qpuInsax0ydhJ/TELY8ikAQsO9P7DwfDpu0bdJ5Dhr2D8NdAlCmNxXE0gf/k69VCv1OgWl0HXL8VWegtNHZCNARgML8QjI5jQrnvNIHn/u3tMwnP7s9R48j53g=
+	t=1737526043; cv=none; b=Xf9GIoB2S6glizE3RExNOIvDqvxeS9ULQM1A+Qe2NN1Ky7oFVk8lDIUaVSmXXO06VtbvKVxpyTcBO9yFdif7IRO2dTeXi7UG/BMMeQElW4nVCtTkmHUNfTfIbVoxeiMk3jPSrBL4wtLn8Y7JS6LVyPIunyUFykW/WmAaMBN4sAQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737525481; c=relaxed/simple;
-	bh=eoz/E3K902Ol8UoKvHfkLNgPA4v2w2hHa2uiTZoppPU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=NZe/zbXv2/8GIn+qq+eEIsP67edZnQzW7pQygRvXtHcBjHOVM15ttBxeeSi0dJhvA68VGu0/I+1xlTuWYdgiKT2mzQlncNHpCDJ/iYH9/0RNExONCkRv6+3RDGKfXymHTrAmB6XG2/IwxUO0SaDXND2fbbiTq3EdomCFRvkIBTE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.105])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4YdCxW310SzmZ87;
-	Wed, 22 Jan 2025 13:56:15 +0800 (CST)
-Received: from dggemv703-chm.china.huawei.com (unknown [10.3.19.46])
-	by mail.maildlp.com (Postfix) with ESMTPS id 4DF251400D1;
-	Wed, 22 Jan 2025 13:57:54 +0800 (CST)
-Received: from kwepemn100009.china.huawei.com (7.202.194.112) by
- dggemv703-chm.china.huawei.com (10.3.19.46) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Wed, 22 Jan 2025 13:57:54 +0800
-Received: from [10.67.121.59] (10.67.121.59) by kwepemn100009.china.huawei.com
- (7.202.194.112) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Wed, 22 Jan
- 2025 13:57:52 +0800
-Message-ID: <ef34bf8a-c8d9-13bb-011c-6a4365bb3cb8@huawei.com>
-Date: Wed, 22 Jan 2025 13:57:51 +0800
+	s=arc-20240116; t=1737526043; c=relaxed/simple;
+	bh=yF+WQD4yOcDuNUZF41jVYjxRZB1zby8f2la0pn2VWjI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GUmfn2fbY29IbDIRWyjRnj3wjoxwglHiyCDg9f56ZPuCWPNTKkhIG7278FsaSnEAlfJaWBQ+bvO9MFl0aH6c9t40b/YTg/Y+3Hqxbs57rSt10qZkZftSnqWQPvuugR2pZuH8iFKPSxbYTvWuPAEVb5qatDcThbfxthspAa3BL5A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1taTtF-0002tj-GM; Wed, 22 Jan 2025 07:07:01 +0100
+Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1taTtB-001Ef8-0G;
+	Wed, 22 Jan 2025 07:06:57 +0100
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1taTtA-007cLW-33;
+	Wed, 22 Jan 2025 07:06:56 +0100
+Date: Wed, 22 Jan 2025 07:06:56 +0100
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Thangaraj.S@microchip.com
+Cc: andrew+netdev@lunn.ch, rmk+kernel@armlinux.org.uk, davem@davemloft.net,
+	Woojung.Huh@microchip.com, pabeni@redhat.com, edumazet@google.com,
+	kuba@kernel.org, phil@raspberrypi.org, kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	UNGLinuxDriver@microchip.com
+Subject: Re: [PATCH net-next v1 1/7] net: usb: lan78xx: Convert to PHYlink
+ for improved PHY and MAC management
+Message-ID: <Z5CLAMsLJtKA43kM@pengutronix.de>
+References: <20250108121341.2689130-1-o.rempel@pengutronix.de>
+ <20250108121341.2689130-2-o.rempel@pengutronix.de>
+ <0397c3a4cac5795fc33dd313ea74a8743a587d28.camel@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
-Subject: Re: [PATCH v1 19/21] platform/x86: dell-ddv: Fix the type of 'config'
- in struct hwmon_channel_info to u64
-To: =?UTF-8?Q?Ilpo_J=c3=a4rvinen?= <ilpo.jarvinen@linux.intel.com>
-CC: <linux-hwmon@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>,
-	<linux-media@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-	<arm-scmi@vger.kernel.org>, Netdev <netdev@vger.kernel.org>,
-	<linux-rtc@vger.kernel.org>, <oss-drivers@corigine.com>,
-	<linux-rdma@vger.kernel.org>, <platform-driver-x86@vger.kernel.org>,
-	<linuxarm@huawei.com>, <linux@roeck-us.net>, <jdelvare@suse.com>,
-	<kernel@maidavale.org>, <pauk.denis@gmail.com>, <james@equiv.tech>,
-	<sudeep.holla@arm.com>, <cristian.marussi@arm.com>, <matt@ranostay.sg>,
-	<mchehab@kernel.org>, <irusskikh@marvell.com>, <andrew+netdev@lunn.ch>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <saeedm@nvidia.com>, <leon@kernel.org>,
-	<tariqt@nvidia.com>, <louis.peens@corigine.com>, <hkallweit1@gmail.com>,
-	<linux@armlinux.org.uk>, <kabel@kernel.org>, <W_Armin@gmx.de>, Hans de Goede
-	<hdegoede@redhat.com>, <alexandre.belloni@bootlin.com>, <krzk@kernel.org>,
-	<jonathan.cameron@huawei.com>, <zhanjie9@hisilicon.com>,
-	<zhenglifeng1@huawei.com>, <liuyonglong@huawei.com>
-References: <20250121064519.18974-1-lihuisong@huawei.com>
- <20250121064519.18974-20-lihuisong@huawei.com>
- <844c5097-eeb7-7275-7558-83ca4e5ee4b2@linux.intel.com>
-From: "lihuisong (C)" <lihuisong@huawei.com>
-In-Reply-To: <844c5097-eeb7-7275-7558-83ca4e5ee4b2@linux.intel.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- kwepemn100009.china.huawei.com (7.202.194.112)
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <0397c3a4cac5795fc33dd313ea74a8743a587d28.camel@microchip.com>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
+Hi Thangaraj,
 
-在 2025/1/21 20:18, Ilpo Järvinen 写道:
-> On Tue, 21 Jan 2025, Huisong Li wrote:
->
->> The type of 'config' in struct hwmon_channel_info has been fixed to u64.
->> Modify the related code in driver to avoid compiling failure.
-> Does this mean that after applying part of your series but not yet this
-> patch, compile would fail? If so, it's unacceptable. At no point in a
-> patch series are you allowed to cause a compile failure because it hinders
-> 'git bisect' that is an important troubleshooting tool.
->
-> So you might have to combine changes to drivers and API if you make an
-> API change that breaks driver build until driver too is changed. Note that
-> it will impact a lot how quickly your patches can be accepted as much
-> higher level of coordination is usually required if your patch is touching
-> things all over the place, but it cannot be avoided at times. And
-> requirement of doing minimal change only will be much much higher in such
-> a large scale change.
->
-Ack. Thanks for your reply.
->
->> Signed-off-by: Huisong Li <lihuisong@huawei.com>
->> ---
->>   drivers/platform/x86/dell/dell-wmi-ddv.c | 6 +++---
->>   1 file changed, 3 insertions(+), 3 deletions(-)
->>
->> diff --git a/drivers/platform/x86/dell/dell-wmi-ddv.c b/drivers/platform/x86/dell/dell-wmi-ddv.c
->> index e75cd6e1efe6..efb2278aabb9 100644
->> --- a/drivers/platform/x86/dell/dell-wmi-ddv.c
->> +++ b/drivers/platform/x86/dell/dell-wmi-ddv.c
->> @@ -86,7 +86,7 @@ struct thermal_sensor_entry {
->>   
->>   struct combined_channel_info {
->>   	struct hwmon_channel_info info;
->> -	u32 config[];
->> +	u64 config[];
->>   };
->>   
->>   struct combined_chip_info {
->> @@ -500,7 +500,7 @@ static const struct hwmon_ops dell_wmi_ddv_ops = {
->>   
->>   static struct hwmon_channel_info *dell_wmi_ddv_channel_create(struct device *dev, u64 count,
->>   							      enum hwmon_sensor_types type,
->> -							      u32 config)
->> +							      u64 config)
->>   {
->>   	struct combined_channel_info *cinfo;
->>   	int i;
->> @@ -543,7 +543,7 @@ static struct hwmon_channel_info *dell_wmi_ddv_channel_init(struct wmi_device *w
->>   							    struct dell_wmi_ddv_sensors *sensors,
->>   							    size_t entry_size,
->>   							    enum hwmon_sensor_types type,
->> -							    u32 config)
->> +							    u64 config)
->>   {
->>   	struct hwmon_channel_info *info;
->>   	int ret;
->>
-> .
+On Wed, Jan 22, 2025 at 04:02:42AM +0000, Thangaraj.S@microchip.com wrote:
+> Hi Oleksji,
+> 
+> On Wed, 2025-01-08 at 13:13 +0100, Oleksij Rempel wrote:
+> >  /* use ethtool to change the level for any given device */
+> > @@ -1554,40 +1558,6 @@ static void lan78xx_set_multicast(struct
+> > net_device *netdev)
+> >         schedule_work(&pdata->set_multicast);
+> >  }
+> > 
+> > 
+> > 
+> > -static int lan78xx_link_reset(struct lan78xx_net *dev)
+> > +static int lan78xx_phy_int_ack(struct lan78xx_net *dev)
+> >  {
+> 
+> Is there any specific reason why this complete logic on phy interrupt
+> handling is removed?
+
+### Before: Old PHY Interrupt Handling
+
+In the old implementation, the driver processed PHY interrupts as follows:
+
+1. When a status URB was received, the driver checked for the `INT_ENP_PHY_INT`
+   flag to detect a PHY-related interrupt:
+   - Upon detecting the interrupt, it triggered a deferred kevent
+     (`lan78xx_defer_kevent`) with the `EVENT_LINK_RESET` event.
+   - It also called `generic_handle_irq_safe` to notify the PHY subsystem of
+     the interrupt, allowing it to update the PHY state.
+
+2. The deferred kevent was handled by `lan78xx_link_reset`, which:
+   - It invoked `phy_read_status` to retrieve the PHY state.
+   - Based on the PHY state, it adjusted MAC settings (e.g., flow control,
+     USB state) and restarted the RX/TX paths if needed.
+   - Enabled/disrupted timers and submitted RX URBs when link changes occurred.
+
+This design required the driver to manually handle both PHY and MAC state
+management, leading to complex and redundant logic.
+
+### Now: PHYlink Integration
+
+In the updated code, the handling process is simplified:
+
+1. When a status URB detects a PHY interrupt (`INT_ENP_PHY_INT`), the driver
+   still calls `lan78xx_defer_kevent(dev, EVENT_PHY_INT_ACK)`. However:
+   - The deferred event now serves only to acknowledge the interrupt by calling
+     `lan78xx_phy_int_ack`.
+   - This separation is necessary because the URB completion context cannot
+     directly perform register writes.
+
+2. The interrupt is forwarded to the PHY subsystem, which updates the PHY state
+   as before. No additional logic is performed in this step.
+
+3. Once the PHY state is updated, PHYlink invokes appropriate callbacks to
+   handle MAC reconfiguration:
+   - `mac_config` for initial setup.
+   - `mac_link_up` and `mac_link_down` to manage link transitions, flow
+     control, and USB state.
+
+### Why the Old Logic is No Longer Needed
+
+The MAC is now reconfigured only through PHYlink callbacks, eliminating the
+need for deferred events to handle complex link reset logic.
+
+With PHYlink coordinating PHY and MAC interactions, the driver no longer needs
+custom logic to manage state transitions.
+
+> > +static void lan78xx_mac_config(struct phylink_config *config,
+> > unsigned int mode,
+> > +                              const struct phylink_link_state
+> > *state)
+> > +{
+> > +       struct net_device *net = to_net_dev(config->dev);
+> > +       struct lan78xx_net *dev = netdev_priv(net);
+> > +       u32 rgmii_id = 0;
+> 
+> This variable is not modified anywhere in this function. Remove this
+> variable if not needed.
+
+Thank you. I'll update it.
+
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
