@@ -1,137 +1,195 @@
-Return-Path: <netdev+bounces-160345-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160346-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9BA70A1954C
-	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 16:33:08 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3221BA19551
+	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 16:33:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7E920188157D
-	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 15:33:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A086818815FF
+	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 15:33:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F208F211475;
-	Wed, 22 Jan 2025 15:33:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68C672135C4;
+	Wed, 22 Jan 2025 15:33:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ts/m3gXn"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b="o4+FE6/m"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from server.wki.vra.mybluehostin.me (server.wki.vra.mybluehostin.me [162.240.238.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C39CCEED8;
-	Wed, 22 Jan 2025 15:33:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6462EED8;
+	Wed, 22 Jan 2025 15:33:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.240.238.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737559983; cv=none; b=lBO9XZ4d7fTghlZD6QE7nDzCwDvQTJf+OYp+wrvcj86eYoNJ+gZ2HfGWSj5ixY7rsNkZdanoyYel2AEyNDZlRjgBt/7uH+fb7xa3txv/CJWtQouC3pZdR3qMGoIzcttn6D2CeCWhmpM10yMqSRjO3XKb8wVd8zQQkExv4zVsGuI=
+	t=1737560026; cv=none; b=ERWghemM3udAnqZhx/paOhE8ATGIkpp0hPwf9K0Ty7iXWE2K3uNKLIOgSqXUL5DU9TPUP3oWbloCiNSxDEFvRNai76cW1gauGSj4aClLeJRc2jrM6svjSUDWtHxV1szJ9lGRp/Lua27dTRkfItElkVtTEZojcbJKfs/nHWRyAOc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737559983; c=relaxed/simple;
-	bh=pnzTTEYjEBkzgtMLwYNGTHvfdjJ2FBRBApOSu9zI4bE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=MJxxYOl4t2rDPtRLvzUGEtiIEhUeEX2lYY/V6Px9MMhv1Ge1rHKAd0EBIhgYBeYCpCLtpglyqOtQEiOtZSxvdtRdg+wO8pmuakUcBh+8ycLu6ElrrS7NdkkjfboiRE/5ahVJGFboL6qcV+gnyv2c70rdSShTa4dvRhWOdQ+8sss=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ts/m3gXn; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 17708C4CED2;
-	Wed, 22 Jan 2025 15:32:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737559983;
-	bh=pnzTTEYjEBkzgtMLwYNGTHvfdjJ2FBRBApOSu9zI4bE=;
-	h=Date:Subject:To:References:From:In-Reply-To:From;
-	b=Ts/m3gXnlKOhdmCT3j4oTO1nDGY8iMavW7jrnnxGcfZGNHJtO/EvhJiWD4ThyWZlD
-	 Gzy5PcB8+CzNF2XvmFY8+srh9DxcCvs/TqteBkb8yxMXSY2pORyEjE3MgnfuXtiNpj
-	 42QoC/rXndIgD5E4GicEXtA6DwJxvgO4JHRt1Y/Eo5WbguqX1/KIIhyxJkT3FhEZ7/
-	 fzkRZKJx66ywu92NR1rehJac92/TdxY8D/5Z0McUOPCWiD/tGoCt3vgao1x6cNzdK/
-	 gI5zpHcDQvPy5C6Li96FIs58wpfI/0KO6GOs2F8LOIiF6pbBFmwoonkbFEydtZb8Zf
-	 zyGjIEzCe0ksw==
-Message-ID: <d5043755-dee6-4919-bb97-8fcd17c76eae@kernel.org>
-Date: Wed, 22 Jan 2025 16:32:55 +0100
+	s=arc-20240116; t=1737560026; c=relaxed/simple;
+	bh=cQLDiiAEoU77DSQMpPh/IDlK0jdGJdYEkSEtNLZljDM=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 MIME-Version:Content-Type; b=tZTkK/HBzWraqXkvoGzoCvKCZZMUW4CK1ska3PFAy5UNuloWYdKzvp1jeUDEWX3qowhCtdQW1jKbDC74H3NpaHtbL/N7/DOqngafS0ZSFIvSajoXU5CrkIjESEsa2bsPRdWCv+XGTFuOu9K1Z43NVUb010esQaKC2lKEqHc07N0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=couthit.com; spf=pass smtp.mailfrom=couthit.com; dkim=pass (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b=o4+FE6/m; arc=none smtp.client-ip=162.240.238.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=couthit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=couthit.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=couthit.com
+	; s=default; h=Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:
+	References:In-Reply-To:Message-ID:Cc:To:From:Date:Sender:Reply-To:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=tX83hHT4aZ7+gZo2IS7Yjnxf8cn0wc/eSWvE6GZiFho=; b=o4+FE6/m1K7CzW34Ld9Pe+upII
+	14KCJI+i2yY2KIvO5Pt+a91b2lZif2kTIUYyFQ0iDusVsSEt8VYSd7ilkwlpkMCUdiN/zzMJczAOy
+	tcT+ocR563+WvKhHujTi/C8HTBgVrDezKTCYHRA7TIFv0qi7c+Z5TnmBY9In7ROCv4I4Anp63lDv6
+	vJehhQcY+U8VHT0qx3QsPZQ2S5wyg7447Ns/njpFiOg9CHTNQViEGiRiJ1WyBEVeih+zKnpf0ZnxY
+	EncZ5eKP5FW4HrvJPnYBh5PB6eSpT/dL98V/A6dWIfbok8XS+pVknGPD4LLGWBxEoQ2U5zm8rBHtu
+	El5fMB9g==;
+Received: from [122.175.9.182] (port=42840 helo=zimbra.couthit.local)
+	by server.wki.vra.mybluehostin.me with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96.2)
+	(envelope-from <basharath@couthit.com>)
+	id 1tacjb-0007OL-17;
+	Wed, 22 Jan 2025 21:03:39 +0530
+Received: from zimbra.couthit.local (localhost [127.0.0.1])
+	by zimbra.couthit.local (Postfix) with ESMTPS id E84911781F6A;
+	Wed, 22 Jan 2025 21:03:28 +0530 (IST)
+Received: from localhost (localhost [127.0.0.1])
+	by zimbra.couthit.local (Postfix) with ESMTP id B66E01783FED;
+	Wed, 22 Jan 2025 21:03:28 +0530 (IST)
+Received: from zimbra.couthit.local ([127.0.0.1])
+	by localhost (zimbra.couthit.local [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id BnQLNzz2-_tk; Wed, 22 Jan 2025 21:03:28 +0530 (IST)
+Received: from zimbra.couthit.local (zimbra.couthit.local [10.10.10.103])
+	by zimbra.couthit.local (Postfix) with ESMTP id 28DF11781F6A;
+	Wed, 22 Jan 2025 21:03:28 +0530 (IST)
+Date: Wed, 22 Jan 2025 21:03:26 +0530 (IST)
+From: Basharath Hussain Khaja <basharath@couthit.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: basharath <basharath@couthit.com>, danishanwar <danishanwar@ti.com>, 
+	rogerq <rogerq@kernel.org>, andrew+netdev <andrew+netdev@lunn.ch>, 
+	davem <davem@davemloft.net>, edumazet <edumazet@google.com>, 
+	kuba <kuba@kernel.org>, pabeni <pabeni@redhat.com>, 
+	Rob Herring <robh@kernel.org>, krzk+dt <krzk+dt@kernel.org>, 
+	conor+dt <conor+dt@kernel.org>, nm <nm@ti.com>, 
+	ssantosh <ssantosh@kernel.org>, tony <tony@atomide.com>, 
+	richardcochran <richardcochran@gmail.com>, 
+	parvathi <parvathi@couthit.com>, schnelle <schnelle@linux.ibm.com>, 
+	rdunlap <rdunlap@infradead.org>, diogo ivo <diogo.ivo@siemens.com>, 
+	m-karicheri2 <m-karicheri2@ti.com>, horms <horms@kernel.org>, 
+	jacob e keller <jacob.e.keller@intel.com>, 
+	m-malladi <m-malladi@ti.com>, 
+	javier carrasco cruz <javier.carrasco.cruz@gmail.com>, 
+	afd <afd@ti.com>, s-anna <s-anna@ti.com>, 
+	linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, 
+	netdev <netdev@vger.kernel.org>, 
+	devicetree <devicetree@vger.kernel.org>, 
+	linux-kernel <linux-kernel@vger.kernel.org>, 
+	linux-omap <linux-omap@vger.kernel.org>, 
+	pratheesh <pratheesh@ti.com>, prajith <prajith@ti.com>, 
+	vigneshr <vigneshr@ti.com>, praneeth <praneeth@ti.com>, 
+	srk <srk@ti.com>, rogerq <rogerq@ti.com>, 
+	krishna <krishna@couthit.com>, pmohan <pmohan@couthit.com>, 
+	mohan <mohan@couthit.com>
+Message-ID: <984041835.384768.1737560006836.JavaMail.zimbra@couthit.local>
+In-Reply-To: <5ba6bbf2-52e4-49d0-b6e2-134fb25ebe4c@lunn.ch>
+References: <20250109105600.41297-1-basharath@couthit.com> <20250109105600.41297-3-basharath@couthit.com> <5ba6bbf2-52e4-49d0-b6e2-134fb25ebe4c@lunn.ch>
+Subject: Re: [RFC PATCH 02/10] net: ti: prueth: Adds ICSSM Ethernet driver
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 02/10] bindings: ipmi: Add binding for IPMB device intf
-To: Ninad Palsule <ninad@linux.ibm.com>, minyard@acm.org, robh@kernel.org,
- krzk+dt@kernel.org, conor+dt@kernel.org, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, openipmi-developer@lists.sourceforge.net,
- netdev@vger.kernel.org, joel@jms.id.au, andrew@codeconstruct.com.au,
- devicetree@vger.kernel.org, eajames@linux.ibm.com,
- linux-arm-kernel@lists.infradead.org, linux-aspeed@lists.ozlabs.org,
- linux-kernel@vger.kernel.org
-References: <20250116203527.2102742-1-ninad@linux.ibm.com>
- <20250116203527.2102742-3-ninad@linux.ibm.com>
- <79c859c6-ff59-4641-8ae7-4136d7c3724e@linux.ibm.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 fv0=
-In-Reply-To: <79c859c6-ff59-4641-8ae7-4136d7c3724e@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
+X-Mailer: Zimbra 8.8.15_GA_3968 (ZimbraWebClient - FF113 (Linux)/8.8.15_GA_3968)
+Thread-Topic: prueth: Adds ICSSM Ethernet driver
+Thread-Index: QkPWDvzL1WYog89bH3HrmHjQ8Nti1A==
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - server.wki.vra.mybluehostin.me
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - couthit.com
+X-Get-Message-Sender-Via: server.wki.vra.mybluehostin.me: authenticated_id: smtp@couthit.com
+X-Authenticated-Sender: server.wki.vra.mybluehostin.me: smtp@couthit.com
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
 
-On 22/01/2025 16:10, Ninad Palsule wrote:
-> Hello Corey, Rob & Krzysztof
+
+>> +	emac->phy_node = of_parse_phandle(eth_node, "phy-handle", 0);
+>> +	if (!emac->phy_node) {
+>> +		dev_err(prueth->dev, "couldn't find phy-handle\n");
+>> +		ret = -ENODEV;
+>> +		goto free;
+>> +	}
+>> +
+>> +	ret = of_get_phy_mode(eth_node, &emac->phy_if);
+>> +	if (ret) {
+>> +		dev_err(prueth->dev, "could not get phy-mode property err %d\n",
+>> +			ret);
+>> +		goto free;
+>> +	}
+>> +
+>> +	/* connect PHY */
+>> +	emac->phydev = of_phy_connect(ndev, emac->phy_node,
+>> +				      &icssm_emac_adjust_link, 0, emac->phy_if);
+>> +	if (!emac->phydev) {
+>> +		dev_dbg(prueth->dev, "couldn't connect to phy %s\n",
+>> +			emac->phy_node->full_name);
+>> +		ret = -EPROBE_DEFER;
+>> +		goto free;
+>> +	}
 > 
-> On 1/16/25 14:35, Ninad Palsule wrote:
->> Add device tree binding document for the IPMB device interface.
->> This device is already in use in both driver and .dts files.
->>
->> Signed-off-by: Ninad Palsule <ninad@linux.ibm.com>
+> of_phy_get_and_connect() will simplify this.
 > 
-> Do you have further comments on this? If not can you please send the ACK?
 
+Yes. This API does same functionality, we will replace three APIs with single 
+API in the next version.
 
-You gave us one week to respond, of which half is during merge window.
+>> +	/* remove unsupported modes */
+>> +	phy_remove_link_mode(emac->phydev, ETHTOOL_LINK_MODE_10baseT_Half_BIT);
+>> +	phy_remove_link_mode(emac->phydev, ETHTOOL_LINK_MODE_10baseT_Full_BIT);
+> 
+> It only does 100Mbps?
+> 
 
-Don't ping during merge window. Don't ping before 2 weeks. Such pinging
-moves you to the bottom of the inbox queue.
+It is capable of both 100M/10M full/half-duplex modes. In this patch series we are 
+adding support for 100M full duplex operation. Support for other modes will be added 
+subsequently.
 
-Please relax, and help out by reviewing other patches on the mailing
-lists in order to relieve the burden of maintainers and move your
-patches higher up the list.
+>> +	if (of_property_read_bool(eth_node, "ti,no-half-duplex")) {
+> 
+> Is this becasue 100baseT_Half is broken in some versions of the
+> hardware?
+> 
 
-Best regards,
-Krzysztof
+No.This property will be removed as we have added support only for 100M full duplex.
+ 
+>> +		phy_remove_link_mode(emac->phydev,
+>> +				     ETHTOOL_LINK_MODE_100baseT_Half_BIT);
+>> +	}
+>> +
+>> +	phy_remove_link_mode(emac->phydev, ETHTOOL_LINK_MODE_Pause_BIT);
+>> +	phy_remove_link_mode(emac->phydev, ETHTOOL_LINK_MODE_Asym_Pause_BIT);
+> 
+> Is this really needed? I've not checked, but if you don't call
+> phy_support_sym_pause() or phy_support_asym_pause(), i would of
+> expected phylib to default to no pause?
+>
+ 
+Though TI PHY default state is clear(ASM_DIR - 0 & PAUSE - 0 as Default
+state in ANAR register), this bits are cleared again to handle if in case 
+of change in PHY.
+
+>> +static const struct of_device_id prueth_dt_match[];
+> 
+> Please avoid forward references. If you need the match table, define
+> it here.
+>
+ 
+Sure. This got escaped while cleanup. We will address this in the next version.
+
+Thanks & Best Regards,
+Basharath
+
 
