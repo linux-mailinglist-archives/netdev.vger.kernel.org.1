@@ -1,76 +1,62 @@
-Return-Path: <netdev+bounces-160284-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160285-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5909CA19219
-	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 14:11:37 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 970E0A19224
+	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 14:13:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9B16E160565
-	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 13:11:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 786F11885753
+	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 13:13:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31BBB212D6F;
-	Wed, 22 Jan 2025 13:11:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8630212F87;
+	Wed, 22 Jan 2025 13:13:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q2TlBkQG"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PhpoVxp2"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D5CE1EF1D
-	for <netdev@vger.kernel.org>; Wed, 22 Jan 2025 13:11:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77798212B1C;
+	Wed, 22 Jan 2025 13:13:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737551494; cv=none; b=PMgBtcdVZftsG9HkdywSdBiNadpUxAx4Lxlj96dea5xFG8/5rDamQgvmoMvxAc5Vne1V6Z/KECyeL2e4CFHT8nuHis8T+JEfFC8D9fnv8bnQwzbRzlzoXW7L7UcGDbrdW7R2/Kezk0OySrWWt0WDTbTmQjdVSZbzEoLjF6KzOYc=
+	t=1737551628; cv=none; b=PqCd9yRMKDEHt7cFNx0v0dRbmLfUyTOFP8nD/sw5SySmew/HoxyUlQ7Ba+jKC1c+E44+GICBxXBCqH540VGJ50yfSQ/xj7LMV3gVpEoJIXvVtCCdL2de4nuRjDyLbG5aOgb3TM+mn9FF114KztAZ1Fc1jbmEPkJ0wAK6BPgV95c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737551494; c=relaxed/simple;
-	bh=TtrEd6Ppz/dVHlJ8r0SZ55aFArDJLlgCToMy85KpjhU=;
+	s=arc-20240116; t=1737551628; c=relaxed/simple;
+	bh=Pg6l1vJipWXLQ85LZCUUwCiUt36EuYl/z6XJ1txMOiA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ep2ECb9YGupmnBbJbIpiB/qC9k06q1yeuXx1uZw6aO+MAt74ViUuK/afpVeiSL00XGQV0tsXGlEwYwiBVqGWUn/IkwEwY8FMRlgaVoGkOkOQhGki1JXbmTzFOiK/YNQyRy5FlhcvRColQ/48NhfvusyMGucDWUf03SPXVSNDPxA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=q2TlBkQG; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 71C2AC4CEE0;
-	Wed, 22 Jan 2025 13:11:28 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=PkCfEpAiwwY3L5C7426HcWTrM8v3OXbto6n6KfTSa8mr5SvfMWh0cT5ckGGzFryOPNgODWT8SZx7un4MQcf0jk7NgT83o2dWZ0D9VyhqDE+VzHbV3Mmnpa+RzxMkduGY4btzCgNbvJV1mectyYL+MoLruOCPni0kOanaBKudawg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PhpoVxp2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7ECCEC4CED6;
+	Wed, 22 Jan 2025 13:13:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737551493;
-	bh=TtrEd6Ppz/dVHlJ8r0SZ55aFArDJLlgCToMy85KpjhU=;
+	s=k20201202; t=1737551628;
+	bh=Pg6l1vJipWXLQ85LZCUUwCiUt36EuYl/z6XJ1txMOiA=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=q2TlBkQGv8IhTtQ3WBWvQvYrZ6NvYxkj5GSOs21j0nzmpTe2QVCnqW1QMqQLaa97p
-	 3Yun4o/E8UOOqqeKqHMg+Jj9OoS5NviavZxG86lZ6AD3XKjxjerwLK7/91xCgHq+vH
-	 yHeaUxWIGNwk9yiSXFniGQuB9RM4f7K8pl+KU+sLnlnVcNgHj08dG+RPFC3E4WIoZn
-	 hYGt/46lg/wh68q/D4pRC9VQ1SwUcOc6fm6FlJj5/6sxq3KOy/ZYE5e1O0XA70gaL/
-	 G4A5LeFEATOkTsiBGk7RLVI6XT4YfEA6pbxVLd5+gFuD78tGkghRf0Fb6ISjHIOOz+
-	 lRCs2i3bVeLsQ==
-Date: Wed, 22 Jan 2025 13:11:26 +0000
+	b=PhpoVxp2nfLJrvRCK3UG1TwY8mzw/Xl+DRTyxPH5SnMPPI8TVO8i2tf8FrOR0Cx3g
+	 xmN+HsR9s9CdLzUpGtXLf888jgJohZVZZ9mdTzYNhfeGrbBnx7L87ZjzMs7oP/vFKC
+	 P9viMoohMzqxLiMi9H3hnssoy/tu2c/5Um8I2yxpAVXkcxPQhDnz0Lolc3zUMGf30k
+	 jXGL3Lri/TOwfOgzucIrbIZwRMNzCKWzBpifyFniVBatv3dhcGqhN1AH2uVhd86Zu6
+	 W0Q8mvlGc+WX9mBhAo80U7VZEbNGDCNgd23mv6hxXMiNYW5yqH3elDHon6rQpHwpG0
+	 AR/KmgNabkHHQ==
+Date: Wed, 22 Jan 2025 13:13:41 +0000
 From: Simon Horman <horms@kernel.org>
-To: David Arinzon <darinzon@amazon.com>
-Cc: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-	netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	"Woodhouse, David" <dwmw@amazon.com>,
-	"Machulsky, Zorik" <zorik@amazon.com>,
-	"Matushevsky, Alexander" <matua@amazon.com>,
-	Saeed Bshara <saeedb@amazon.com>, "Wilson, Matt" <msw@amazon.com>,
-	"Liguori, Anthony" <aliguori@amazon.com>,
-	"Bshara, Nafea" <nafea@amazon.com>,
-	"Schmeilin, Evgeny" <evgenys@amazon.com>,
-	"Belgazal, Netanel" <netanel@amazon.com>,
-	"Saidi, Ali" <alisaidi@amazon.com>,
-	"Herrenschmidt, Benjamin" <benh@amazon.com>,
-	"Kiyanovski, Arthur" <akiyano@amazon.com>,
-	"Dagan, Noam" <ndagan@amazon.com>,
-	"Bernstein, Amit" <amitbern@amazon.com>,
-	"Agroskin, Shay" <shayagr@amazon.com>,
-	"Abboud, Osama" <osamaabb@amazon.com>,
-	"Ostrovsky, Evgeny" <evostrov@amazon.com>,
-	"Tabachnik, Ofir" <ofirt@amazon.com>,
-	"Machnikowski, Maciek" <maciek@machnikowski.net>,
-	Rahul Rameshbabu <rrameshbabu@nvidia.com>,
-	Gal Pressman <gal@nvidia.com>
-Subject: Re: [PATCH v5 net-next 0/5] PHC support in ENA driver
-Message-ID: <20250122131126.GG390877@kernel.org>
-References: <20250122102040.752-1-darinzon@amazon.com>
+To: Meghana Malladi <m-malladi@ti.com>
+Cc: rogerq@kernel.org, danishanwar@ti.com, pabeni@redhat.com,
+	kuba@kernel.org, edumazet@google.com, davem@davemloft.net,
+	andrew+netdev@lunn.ch, bpf@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, robh@kernel.org,
+	matthias.schiffer@ew.tq-group.com, dan.carpenter@linaro.org,
+	rdunlap@infradead.org, diogo.ivo@siemens.com,
+	schnelle@linux.ibm.com, glaroque@baylibre.com,
+	john.fastabend@gmail.com, hawk@kernel.org, daniel@iogearbox.net,
+	ast@kernel.org, srk@ti.com, Vignesh Raghavendra <vigneshr@ti.com>
+Subject: Re: [PATCH net 0/3] Add native mode XDP support
+Message-ID: <20250122131341.GH390877@kernel.org>
+References: <20250122124951.3072410-1-m-malladi@ti.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -79,29 +65,22 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250122102040.752-1-darinzon@amazon.com>
+In-Reply-To: <20250122124951.3072410-1-m-malladi@ti.com>
 
-On Wed, Jan 22, 2025 at 12:20:35PM +0200, David Arinzon wrote:
-> Changes in v5:
-> - Add PHC error bound
-> - Add PHC enablement and error bound retrieval through sysfs
+On Wed, Jan 22, 2025 at 06:19:48PM +0530, Meghana Malladi wrote:
+> This series adds native XDP support using page_pool.
+> XDP zero copy support is not included in this patch series.
 > 
-> Changes in v4:
-> - Minor documentation change (resolution instead of accuracy)
-> 
-> Changes in v3:
-> - Resolve a compilation error
-> 
-> Changes in v2:
-> - CCd PTP maintainer
-> - Fixed style issues
-> - Fixed documentation warning
-> 
-> This patchset adds the support for PHC (PTP Hardware Clock)
-> in the ENA driver. The documentation part of the patchset
-> includes additional information, including statistics,
-> utilization and invocation examples through the testptp
-> utility.
+> Patch 1/3: Replaces skb with page pool for Rx buffer allocation
+> Patch 2/3: Adds prueth_swdata struct for SWDATA for all swdata cases
+> Patch 3/3: Introduces native mode XDP support
+
+Hi Meghana,
+
+Unless I am mistaken this patchset should be targeted at net-next,
+as a new feature, rather than net, as bug fixes.
+
+With that in mind:
 
 ## Form letter - net-next-closed
 
