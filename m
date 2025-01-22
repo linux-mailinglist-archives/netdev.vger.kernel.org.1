@@ -1,121 +1,133 @@
-Return-Path: <netdev+bounces-160368-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160369-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0FD4A1965A
-	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 17:20:40 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6DB3A19665
+	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 17:23:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7B49116C868
-	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 16:20:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C59F83A19C3
+	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 16:23:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E716B2153C4;
-	Wed, 22 Jan 2025 16:19:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE970211A1F;
+	Wed, 22 Jan 2025 16:23:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Sd3GHeHx"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f8uHpERM"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D9A1215046;
-	Wed, 22 Jan 2025 16:19:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 480BA74C14;
+	Wed, 22 Jan 2025 16:23:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737562789; cv=none; b=WRGsQL6mgPss436nWQiLHpxu7+xddsPUFhqpH4eP8JLvxXa5DVCDStSUVtBRKRUx9P5A1ZyeyhUOtnwi6Q9/x/e0T+S1UngHR2BmsR8o5LdBFEreoSaQptby7D/WAhQTHSSDIVXTf7ADUcdT9zA0ZVlRZwfyevJzmib7u3n4T/Y=
+	t=1737563020; cv=none; b=D6jnEG9FMJF94uMK5nYph/h0gpTWwYCPKl+zJ74P1H96WQC13TR3BbrKDBhnUunrv+vFr5PcyuONoyH+QSbaoX66BnoyQNhz6to9fRoeieyfg+b9IcCyAUv02U2klqUhWwkebFoR7lkID1QleZ3cQHOeYXa0T5y2CRJCXnscsDM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737562789; c=relaxed/simple;
-	bh=KlHCWgAbljGEWm+qjEMB3BcYWWU8q/CS6WHm8zHaD40=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=N0w+O4sUvHsMWcDAlX6EeCg03/xhH1QFlZOw8DWO39m5R/5mlDHieHMVvq8L7Jv0xIH6YycQnRHH4oiAFf6rcOwQ9m6UrfdmjZ5QnEKDT7ZDvf8+xlx/hXDN8PbwRRU0PXpjL9fb4maWlLy28VHi41FmsXepX4dkna+K3EK+L1k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Sd3GHeHx; arc=none smtp.client-ip=217.70.183.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 90C3E2000F;
-	Wed, 22 Jan 2025 16:19:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1737562780;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=zCyh9rT5nFclPQ3e7i2WrZo2/oI1T2sHOYJO1/OtkOU=;
-	b=Sd3GHeHxDPoApihhIvXoeh6CCTW6mxQkrF/MBH2hvLBUEIBjVjkHxHZ7QactBeswUDYdeP
-	feHIWFuGsK98vdT/uiPPUMD/Ha6eQZ6c9Dli48FSVwU5LFkQ+v//pPOa3J/HPLdlEyHTAi
-	0G2W1Qs4iFwgbk76WepEqS1Q/hp3ieYr18lLdh6HvTrIl9QwiZYp/yYfQcygowQBsmtv9r
-	zm34flnosH4s/j1RJ2AbXhIin5jgYi9hNPFJPBRq2DgPvbux9poFkqC4eVvMc4dK98bY/X
-	/7mqj8y93yMmWsH4uln/zvgjqqYgJy5EqyJIH7M//vA70Q6VnHBGtq7DOaDlfg==
-From: Kory Maincent <kory.maincent@bootlin.com>
-Date: Wed, 22 Jan 2025 17:19:29 +0100
-Subject: [PATCH net 2/2] net: sh_eth: Fix missing rtnl lock in suspend path
+	s=arc-20240116; t=1737563020; c=relaxed/simple;
+	bh=NQ/9yKZQ8Pw6JrE0T25JCnKzA4mOWs4HJBMvLEhnigs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=l+XX0AJtnrlGwr5miWYKTTQ8bvKlulTqUiVTKic+UtRXGygXeONB5Hvtr8Cptwg5YCbaSdd/ENofifBC2PYYES8uMbiqlP/dJvfJRvCMHghfCk48PIXS+RgqijR2UDl9OCBlZPo1VMUfFT7aInGZq0tphyjjLLXaXwPGjNMWnZo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=f8uHpERM; arc=none smtp.client-ip=209.85.214.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-216634dd574so84248065ad.2;
+        Wed, 22 Jan 2025 08:23:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1737563018; x=1738167818; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=2PL2tNscT5bmKkvJGxEtyXs08tv0MMaLhB4dURpw0AY=;
+        b=f8uHpERMFG/IEJUKn8Uyj7xMuRFTi/Jb3asoEmErG2n5ZajqomDfIsBGCAELsQOO1d
+         Kf/iWx8yZPhsnyiAW6PYF8oiOEvwgB94BDFr51N92oWz7oyFUi6wcAsrlyGgRMXY7uBZ
+         4JqGWbOfxbA/f6eXEAy4ex3UjNXiIaTtjZKUYEnZz0ONt/mbY0qxMSwvHFJ2bPQtfCsy
+         55Sq8CnkhSR9rvRZ96GLqTO2rvvGDkyYivgykuhzP3VdylIGj2xo3pMCuCi00OQqCntk
+         MG+XDRRZriICltBcBJw2d5CwdcSGb+e5xbku4iYPSU8Lt/YUitpVTdvItmX7frAGFVua
+         kr/g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737563018; x=1738167818;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=2PL2tNscT5bmKkvJGxEtyXs08tv0MMaLhB4dURpw0AY=;
+        b=oSlClNge0ZRPY/Y+d6sGA3uCrDV2G2qnC3FJvGhEfeQKNLRUzesQfJazKGcVbPjVws
+         U68aCF3twPevl6KYed3hdw6vwthEeBstbSmVlKas7TNA6WWblwjn7sXm+gMFiznJPjds
+         Ff/NtMxy2xaOnT30mHqSgaemKZQTzehHAJzYdGgX1DbRXL3KN8fCm6HuAqPztrudO5A2
+         ORXu8TmqzdfJXfyPfKs3xo440ig8A+pkWa4G8obyEFX22eMdwNphPf8EL3u6jx/XbN8D
+         +lNhJGzRukrJ0Xbs5nELs9Y+dW/apfzDaqCq77g1FE53S2G+Py30FUILfARv0eVtd/2e
+         K1nQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWYf+2QlOMHBbXBcrGulRbnfIN+gQpM6RJQ9OgEawFxGlMSILyLU8wvHqp2yGN8MzBbXJXqBLQws9w0+oQ=@vger.kernel.org, AJvYcCWpWLFeTBZlzQLlMT0K62Pv0HazaGYkcj90nEawYjtnBd2ucmD5OguMCQwg8vboXs4GNFXJifum@vger.kernel.org, AJvYcCX0irLETP98B4HKCTrL+8d194ym/PuceMEDiRe7Mgpvl97WueJyIyBAf+EtzXVf7llEHkQaOLok@vger.kernel.org
+X-Gm-Message-State: AOJu0YzA9mN8tcLsJofZGUvARPqS5dOSlGzTbqX6bg+3IOG54uA0xfRz
+	W6moXtQj7YkR1CFLrTBpT8gLhG1gx67Oi5pkcKnrL/K4Wk84xp6pC31Cyw==
+X-Gm-Gg: ASbGncuI10BXJP/qI/XcSxAY1xnKOoWhXG2uce5DxAv9IBuToB7o2nrEIBXXJzu7MFR
+	p7TQE/OFlneVKslNbEwgIoIEloLZz5bbez/Jj2zAnX04zLkvG1L7o6Wua5Ppvw1vlY7tm/ZDwx/
+	h29Giq6Q9CGB1oDMinZgTg+AWKcdks/7yFRmN7tROrjU/1wBJWUPa5oCdsIed95LlO9xGCdGTqD
+	/ZuHjXgx5PMrcOV9Xr2QYa1U1M/PAq55zLqayn7e4gDC8b5sTPSzg8HyQw82nihRDXJcv1AaPld
+	HymMODJZM0JHmg==
+X-Google-Smtp-Source: AGHT+IElg0Am4eI+PQozPZbMcfeZadFzByE6HvjJAb4D0LxjbbiLWhhc2/lYG54MhwJ4L8DOFkt2sA==
+X-Received: by 2002:a17:902:f64b:b0:215:b087:5d62 with SMTP id d9443c01a7336-21c355b5684mr363334165ad.36.1737563018437;
+        Wed, 22 Jan 2025 08:23:38 -0800 (PST)
+Received: from hoboy.vegasvil.org ([2600:1700:2430:6f6f:e2d5:5eff:fea5:802f])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21c2d3ad20bsm97020905ad.128.2025.01.22.08.23.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 22 Jan 2025 08:23:37 -0800 (PST)
+Date: Wed, 22 Jan 2025 08:23:35 -0800
+From: Richard Cochran <richardcochran@gmail.com>
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Anna-Maria Gleixner <anna-maria@linutronix.de>,
+	Frederic Weisbecker <frederic@kernel.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	John Stultz <johnstul@us.ibm.com>, Netdev <netdev@vger.kernel.org>,
+	linux-kernel@vger.kernel.org, Cyrill Gorcunov <gorcunov@gmail.com>,
+	stable@vger.kernel.org
+Subject: Re: [PATCH] posix-clock: Explicitly handle compat ioctls
+Message-ID: <Z5Ebh4pbOUGh64BS@hoboy.vegasvil.org>
+References: <20250121-posix-clock-compat_ioctl-v1-1-c70d5433a825@weissschuh.net>
+ <603100b4-3895-4b7c-a70e-f207dd961550@app.fastmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250122-fix_missing_rtnl_lock_phy_disconnect-v1-2-8cb9f6f88fd1@bootlin.com>
-References: <20250122-fix_missing_rtnl_lock_phy_disconnect-v1-0-8cb9f6f88fd1@bootlin.com>
-In-Reply-To: <20250122-fix_missing_rtnl_lock_phy_disconnect-v1-0-8cb9f6f88fd1@bootlin.com>
-To: Paul Barker <paul.barker.ct@bp.renesas.com>, 
- =?utf-8?q?Niklas_S=C3=B6derlund?= <niklas.soderlund@ragnatech.se>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Mikhail Ulyanov <mikhail.ulyanov@cogentembedded.com>, 
- Sergei Shtylyov <sergei.shtylyov@cogentembedded.com>
-Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>, 
- =?utf-8?q?Niklas_S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>, 
- Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>, netdev@vger.kernel.org, 
- linux-renesas-soc@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Kory Maincent <kory.maincent@bootlin.com>
-X-Mailer: b4 0.14.1
-X-GND-Sasl: kory.maincent@bootlin.com
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <603100b4-3895-4b7c-a70e-f207dd961550@app.fastmail.com>
 
-Fix the suspend path by ensuring the rtnl lock is held where required.
-Calls to sh_eth_close, sh_eth_open and wol operations must be performed
-under the rtnl lock to prevent conflicts with ongoing ndo operations.
+On Wed, Jan 22, 2025 at 08:30:51AM +0100, Arnd Bergmann wrote:
+> On Tue, Jan 21, 2025, at 23:41, Thomas Weiﬂschuh wrote:
+> > Pointer arguments passed to ioctls need to pass through compat_ptr() to
+> > work correctly on s390; as explained in Documentation/driver-api/ioctl.rst.
+> > Plumb the compat_ioctl callback through 'struct posix_clock_operations'
+> > and handle the different ioctls cmds in the new ptp_compat_ioctl().
+> >
+> > Using compat_ptr_ioctl is not possible.
+> > For the commands PTP_ENABLE_PPS/PTP_ENABLE_PPS2 on s390
+> > it would corrupt the argument 0x80000000, aka BIT(31) to zero.
+> >
+> > Fixes: 0606f422b453 ("posix clocks: Introduce dynamic clocks")
+> > Fixes: d94ba80ebbea ("ptp: Added a brand new class driver for ptp clocks.")
+> > Cc: stable@vger.kernel.org
+> > Signed-off-by: Thomas Weiﬂschuh <linux@weissschuh.net>
+> 
+> This looks correct to me,
 
-Fixes: b71af04676e9 ("sh_eth: add more PM methods")
-Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
----
- drivers/net/ethernet/renesas/sh_eth.c | 4 ++++
- 1 file changed, 4 insertions(+)
+I'm not familiar with s390, but I can remember that the compat ioctl
+was nixed during review.
 
-diff --git a/drivers/net/ethernet/renesas/sh_eth.c b/drivers/net/ethernet/renesas/sh_eth.c
-index 8887b8921009..5fc8027c92c7 100644
---- a/drivers/net/ethernet/renesas/sh_eth.c
-+++ b/drivers/net/ethernet/renesas/sh_eth.c
-@@ -3494,10 +3494,12 @@ static int sh_eth_suspend(struct device *dev)
- 
- 	netif_device_detach(ndev);
- 
-+	rtnl_lock();
- 	if (mdp->wol_enabled)
- 		ret = sh_eth_wol_setup(ndev);
- 	else
- 		ret = sh_eth_close(ndev);
-+	rtnl_unlock();
- 
- 	return ret;
- }
-@@ -3511,10 +3513,12 @@ static int sh_eth_resume(struct device *dev)
- 	if (!netif_running(ndev))
- 		return 0;
- 
-+	rtnl_lock();
- 	if (mdp->wol_enabled)
- 		ret = sh_eth_wol_restore(ndev);
- 	else
- 		ret = sh_eth_open(ndev);
-+	rtnl_unlock();
- 
- 	if (ret < 0)
- 		return ret;
+   https://lore.kernel.org/lkml/201012161716.42520.arnd@arndb.de/
 
--- 
-2.34.1
+   https://lore.kernel.org/lkml/alpine.LFD.2.00.1012161939340.12146@localhost6.localdomain6/
 
+Can you explain what changed or what was missed?
+
+Thanks,
+Richard
 
