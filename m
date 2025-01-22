@@ -1,365 +1,282 @@
-Return-Path: <netdev+bounces-160333-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160335-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4ABCAA194AD
-	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 16:07:48 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3566BA194BA
+	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 16:10:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 02C871882B17
-	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 15:07:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DB0AB188168D
+	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 15:10:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7E17214203;
-	Wed, 22 Jan 2025 15:07:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44C5B214205;
+	Wed, 22 Jan 2025 15:10:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="kYaUUiNF"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="JQYxzSd1";
+	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="GE/eq0U9"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-111.freemail.mail.aliyun.com (out30-111.freemail.mail.aliyun.com [115.124.30.111])
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3E282135A2;
-	Wed, 22 Jan 2025 15:07:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.111
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737558462; cv=none; b=r4Va2c5fQMveqof65U6gduN6eW5IunPFha5KNJNMhCuASqiGInabsgzh838gtIO52XCMJEdt8P5rLoWz0J3scPyjVxA6EJxl588DiZ0UjwdNxAFghLqp7CQpdpFMe8JhlMTspD5oR0omGT7yeYlY5ImTUxb+rb01wxwWkd/+yCE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737558462; c=relaxed/simple;
-	bh=jC8nq1oJyXLYvRbWcdpjD2AHEBNNEvwkIoubAmNG58Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CjcCYl4GxpH7CVAp4HuMbyyMW2S2ZUSjVvfFv2yvRfSsd5yA2qiQhVxN7PsMC4q86UbBiYwATTRuUllv74kHG6QRtHnYg4jga72qLCHA1yQqt8h0W/qJAv+M6YtG94fh4opqqYL7OM57bYXO+lmhXuD5c7FPWyJsGvztmIP+UPY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=kYaUUiNF; arc=none smtp.client-ip=115.124.30.111
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1737558454; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
-	bh=/by4m5u8o9/xj1WUzd3QP8chPkopT3L+hDR8WT1numI=;
-	b=kYaUUiNFuOoMlENAUtg82u4J8Yc0QOfN4HnliGgEApasT4k3Gv9897Gz4HpqNdPtE83vhVZ/lVta7KqSZkmp1yxnDrsIiNI+7zqJG/nINAgDmUJO95OZd/lLhJJIeaLMdbLiNYQx7LrgNU4zK+DqB2Wf/ipobGdaN9PqptkS1zI=
-Received: from localhost(mailfrom:dust.li@linux.alibaba.com fp:SMTPD_---0WO8jkJT_1737558132 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Wed, 22 Jan 2025 23:02:13 +0800
-Date: Wed, 22 Jan 2025 23:02:12 +0800
-From: Dust Li <dust.li@linux.alibaba.com>
-To: Niklas Schnelle <schnelle@linux.ibm.com>,
-	Alexandra Winter <wintera@linux.ibm.com>,
-	Wenjia Zhang <wenjia@linux.ibm.com>,
-	Jan Karcher <jaka@linux.ibm.com>, Gerd Bayer <gbayer@linux.ibm.com>,
-	Halil Pasic <pasic@linux.ibm.com>,
-	"D. Wythe" <alibuda@linux.alibaba.com>,
-	Tony Lu <tonylu@linux.alibaba.com>,
-	Wen Gu <guwen@linux.alibaba.com>,
-	Peter Oberparleiter <oberpar@linux.ibm.com>,
-	David Miller <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>
-Cc: Julian Ruess <julianr@linux.ibm.com>,
-	Thorsten Winkler <twinkler@linux.ibm.com>, netdev@vger.kernel.org,
-	linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Simon Horman <horms@kernel.org>
-Subject: Re: [RFC net-next 4/7] net/ism: Add kernel-doc comments for ism
- functions
-Message-ID: <20250122150212.GP89233@linux.alibaba.com>
-Reply-To: dust.li@linux.alibaba.com
-References: <20250115195527.2094320-1-wintera@linux.ibm.com>
- <20250115195527.2094320-5-wintera@linux.ibm.com>
- <20250120063241.GM89233@linux.alibaba.com>
- <ab6bef6ce04c9ddcbf22a2d0b42180ca343839bf.camel@linux.ibm.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E9B72135CF;
+	Wed, 22 Jan 2025 15:10:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.165.32
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1737558613; cv=fail; b=QHlFhkJgHZawkpaelaAZxFKaYYuj/QCwYoBJ+kk/Rnc7Nm1hDCMnvgeszY1PUjjzeDpVITiu0giy8ZjmYQNuQaVt4fM0gYFggyR+VS5yOghvGEC4prfUWu2j+e0idpYxYL7zTfTMm8126frbD1IT4k0RzSYUTAUBNqqw1cLoejU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1737558613; c=relaxed/simple;
+	bh=+Nkc3ATUTcV1/J2NDLCzftlQDJLDh95uUsZliCNDVc0=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=Z4MOxOJNAp53QikZJHFd4xBCpnJ+IFieOjfzMmw4l4PCQMSuvcbfOeK/RTGUNJ1dFAUqpZCLJAySSvv0Hj6fvalOpgsfNEZF+KpJlLrgvmGjfVlu1qMf7sFTBCY0wrq+M99A32Y3miP7kQJlHrqya/0y4QcuC6tlvIEWxO4uAmE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=JQYxzSd1; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=GE/eq0U9; arc=fail smtp.client-ip=205.220.165.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0246627.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50MEXjEv014048;
+	Wed, 22 Jan 2025 15:09:54 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=
+	corp-2023-11-20; bh=/dTSyFmSdt6BAyZm1ePCR4i98GUHPq+1USdHRguU2Xo=; b=
+	JQYxzSd1TEXvmzmFeZNhEHKj8PKmbBZtJ55QXgbTNnDgNHGB/nXTSLpH9Wpk9bzV
+	QTeu+Mo3COKthNasZzVUasq5Y/tsrzTSKFApvHeVxHdvRC7czqq7BK6Z2tFZOft1
+	chxYheyP4yNxHDH/cZOENiYg013hY0MPEeX251mxaZtDM5uLbGkti8kGeWag/9bS
+	ruY6K+oEwXE86nKjQ0dKWFkfo42C0WBj1DByYWo+hCz6wq9a/986rZfObj5JUP6J
+	NwFLhFEt1jbXBvurun0+/E+IBlIFZCne4JIqxk9VGj9ggTsgOb7Un+C43GyNF4Pc
+	yQbeyxQYEmJ3WlEdO6be2g==
+Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 4485qaqyt5-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 22 Jan 2025 15:09:54 +0000 (GMT)
+Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 50MEYccx018765;
+	Wed, 22 Jan 2025 15:09:53 GMT
+Received: from nam10-mw2-obe.outbound.protection.outlook.com (mail-mw2nam10lp2048.outbound.protection.outlook.com [104.47.55.48])
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 4491c3r902-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 22 Jan 2025 15:09:52 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=wWzdHgyEv68zMMNPCyyTpcVCm4yMuDih0QGT3k/QJdZ6N4e1iA6p6fz3yPJEoHNhkuYXFVqAqrDAZk1naHc09Zjtkx2gDlcY8ITNPHw8bYf0SZNzDMFY2F4ebowYyC1mFWLCm9WMNy9D0Unr926qcLVtbthXxUO31dnRCNmefFlbObSnDTY4AZpjXji55DvwqNTKgB18jvijUzk5y3SNJh4N5tmBuaFomBcwdSYSh0x0JouFEtrWjwrxfFowa4UNQ3+flLME9B4s+xq47iA4daCWkw/xwQjcmH8aA0ESSqmPapw1EjomAP3dnjCtyNT8AiRYfozHdkc1LZuELzNMcg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=/dTSyFmSdt6BAyZm1ePCR4i98GUHPq+1USdHRguU2Xo=;
+ b=y/btXvFK9a8efQzn0szQ+e1HcmdLRd7ocF7ZpmsishiLrmqvywrt361cXfsbgRCcPmFA0DHUkGXq/MBDSWekMCpLLxlq9HOs4W6NNqszVsNW/a93nvs12gDc9RcPu6U+eXm8bmhKz3a41OgN8yOB60zv9n9kFNjPg1/KfyUvCvKRa9ZnqBBzmMK9jVfKnZbRwk8RJEuPbHX/DLPcv4WTuwANvepr2GCS/A6cP/cbUpJ6efyhIumDJiOx3gnAqwkm4Uzu5xz6wqmKZFt3EUltMB5NW+5pi4flj/Q6tG5GlVQLWaJTOO9VOVXFbsSdOE8clF+URcGyr99gHe075HXR2w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=/dTSyFmSdt6BAyZm1ePCR4i98GUHPq+1USdHRguU2Xo=;
+ b=GE/eq0U9zdSYf6W+k/rG+VFdR3QhIV54GD3Aqq7qXcMKXtI87LJBCunMsRiCIYL66PgG1ElcTuBwLJRWQcyBtWvbbFWv2zFHGaRC1GwqSP3epBRNvnR09hvPZU7ocYvnCvu9C84ym8kRgtHlEcETGUQEZrHvMLGxKHsy0R+Z8sE=
+Received: from BN0PR10MB5128.namprd10.prod.outlook.com (2603:10b6:408:117::24)
+ by PH7PR10MB7732.namprd10.prod.outlook.com (2603:10b6:510:2fe::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8356.22; Wed, 22 Jan
+ 2025 15:09:49 +0000
+Received: from BN0PR10MB5128.namprd10.prod.outlook.com
+ ([fe80::743a:3154:40da:cf90]) by BN0PR10MB5128.namprd10.prod.outlook.com
+ ([fe80::743a:3154:40da:cf90%3]) with mapi id 15.20.8356.020; Wed, 22 Jan 2025
+ 15:09:49 +0000
+Message-ID: <020629ee-99c0-45f2-8334-80d4cd6a5da6@oracle.com>
+Date: Wed, 22 Jan 2025 10:09:46 -0500
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] sunrpc: add netns inum and srcaddr to debugfs rpc_xprt
+ info
+To: Jeff Layton <jlayton@kernel.org>, Neil Brown <neilb@suse.de>,
+        Olga Kornievskaia <okorniev@redhat.com>, Dai Ngo <Dai.Ngo@oracle.com>,
+        Tom Talpey <tom@talpey.com>, Trond Myklebust <trondmy@kernel.org>,
+        Anna Schumaker <anna@kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
+Cc: linux-nfs@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20250122-nfs-6-14-v1-1-164b0b5aa330@kernel.org>
+Content-Language: en-US
+From: Chuck Lever <chuck.lever@oracle.com>
+In-Reply-To: <20250122-nfs-6-14-v1-1-164b0b5aa330@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: CH0P221CA0012.NAMP221.PROD.OUTLOOK.COM
+ (2603:10b6:610:11c::16) To BN0PR10MB5128.namprd10.prod.outlook.com
+ (2603:10b6:408:117::24)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ab6bef6ce04c9ddcbf22a2d0b42180ca343839bf.camel@linux.ibm.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN0PR10MB5128:EE_|PH7PR10MB7732:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6d4846bc-a8d6-4ce3-9a02-08dd3af6d0ca
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|7416014|366016|1800799024|921020|7053199007;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?NHdLKzBUR1JDRmZSeFNxVEJNRUx0RHNPM2krQTRsNW9hMFJ3KzlyajUwN3Rx?=
+ =?utf-8?B?NVNVTFFwYnM3aUJodmdKWVlORC8wdy9ndmRRYnpmbVBSYnFNSDRkelFVbDJz?=
+ =?utf-8?B?V1FNZEtMdWhaczdOZzNyb3NtQ0FQRXhZeWNwZ25xalZWaVdJZGJuNkxHb3Ri?=
+ =?utf-8?B?eWsxS1NUVFR5WU1keFh5cTNaek8xcFZ6MFhCVFE5WXlxU3N3TmRnQXFFVmkr?=
+ =?utf-8?B?NGZRN2hGaW1uZVloU1hMdFA3dkRTODltcE1WMmN2bmhLanBmenRMNktKaTZM?=
+ =?utf-8?B?Y1pLbEdKRThuN3RpQUpOY1NJRDV2NzJXU0xqaEovSjRObllrOVBvRElEUnNy?=
+ =?utf-8?B?VXg3U2xlY1pkaWdsMlgwOGZBdXJrV3pmN1JhYTdMSm1IT1lpbm9JUEgxbHNP?=
+ =?utf-8?B?cmFtRjdPbUs3WDF4dkVZMlJsRjRTZEg1SnJYSzJnR1JXSEFheHZIVHVnZkEv?=
+ =?utf-8?B?c0tnU3FiM041RzB6L1FNL3RpWnNtK293cTNhRjNnNzlCWkNvcXJJeU5KZzhH?=
+ =?utf-8?B?bWZGcThzeU5QVGloY0RnM050WHNGbDIwb05nczA1VTIwNmZRRnE0Vm5sYkQz?=
+ =?utf-8?B?SHV3emJhYlBuQ0ZwUkp2RHdQdXdXOVJMV3JNa1JocjNqVWNzZnB1KzlKU2lz?=
+ =?utf-8?B?UjhtT2RreGF1V0R1Z1MxN0tvT1Q3c3pJSWNsT2pPaUNWYTVFZ0VRSVZ5S29l?=
+ =?utf-8?B?RjRjL2IwOWxNTnpqNjZUTzJLMSs2SFdJQW9KOXBJbE11aVZ6NGtoWXpva3U2?=
+ =?utf-8?B?a2UzU1NyNWNxRG13SnprRnl1QTJvclZWNCtlMnhkSnM5MU5OamdWMWhIOTdq?=
+ =?utf-8?B?SEYvaVh6WFdrNllLcER6NHozOHNsUy9RaFBNeWtBNVhWVklsZ3lSSmlsUnJR?=
+ =?utf-8?B?K3ZyTmJkWDlqaUVpVzNrQXVaSWNPSUhlNVdiVW5QU0pvci9ET3Z6cG55Z1ZL?=
+ =?utf-8?B?Wko2bTlLdFplSjVtU1Q5ZFBORmExai9TOVMrditoUmdGOVgwZVdESVlEK3lR?=
+ =?utf-8?B?M2FkT2p6NExUT3BMWlFjL0s4dURWaThHQWJpL05VWFh6alB1MXJxcjNVcEFU?=
+ =?utf-8?B?QlBYUG9BWjRIMTMwc2VIcXlKUFpVTTNqV0ZEcnJseHNMalZxSVlCWUJvKzJD?=
+ =?utf-8?B?eDJneVZDaTQyZjJ5Ky9DcERHUDdYU0NBRDZwQVdyWVVxRy9zZmJ2aGZ1cnRG?=
+ =?utf-8?B?Z1hCdFE1SjN0cllzN2htajF5dnZWU0VTS0NibUpLbEJMMWRCVDR1T1pIcllR?=
+ =?utf-8?B?eHNaS0VJdlgvQ0dQZmZyV3dYQ2phZ0VCTWdaZ1hMQTlENFJiMUlvMTFkOGIx?=
+ =?utf-8?B?SnBwQU1DOEkyUHNyRUZnRkRaZ2p2WVVkalpIdFQrNzdaZWFOL2ljb3FFNlhN?=
+ =?utf-8?B?NHNheTZycldnVHF1eVlUQTRSNmRoVWVwUE16VEU2WUw5anNkOEk2cWN1MUxW?=
+ =?utf-8?B?T1diOUR5aklGTXBzQXgvZ1hPRDJTbHpaUEFSKy9idzhrSGZ5RVllZzRBV2I2?=
+ =?utf-8?B?TEl1cjlIaFdyZ3o1bmp3MjFPRTkySTI3M2lYQ2xCamJXVzJwVmE4bDFsM25o?=
+ =?utf-8?B?aUtOdEpIYmR5b25nTC9OcEY2Y2MxbGh5aTFyNmFaSEpHcGE4ZGxXL1Zvd3l1?=
+ =?utf-8?B?NkVQaUpTT0FGK2ZQcXUxS3JSeXRGbTIzSFBvN2VYQnM5MnNiQ1NwY0k1M2JF?=
+ =?utf-8?B?T3BXOEpKTHBKa3dKNjdabGhxK0sxaitrbzdVUDUvU1MzU044NExnVjJ4OHR0?=
+ =?utf-8?B?Sy9PbldQMVdKZGx0UzcvMEVhclFCSldJeXB5TXBpaFlMSEpJeThtZFdGcC9x?=
+ =?utf-8?B?M3AyZEJrOWVlNzIvWFp1cXR2ZkgwTmMxL0JKR21wVVB2OThyR2pDZnkrbk9j?=
+ =?utf-8?B?akdFRzdqcTg3WDZVSDB4RmtVYjJIenA0VnVWRWJaRDlneGVvT0prNDZneXFT?=
+ =?utf-8?Q?mGSNxOeArsE=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN0PR10MB5128.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024)(921020)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?bGRGQW1HbUlTYnhTN0FKb2dua2gzRHFSYTRaR0ltQjlTQW9OUkFBU3Y4Ynlw?=
+ =?utf-8?B?aXBlWWxJdkxvUFZOblpEd0dFeWVOZ3ZCWEcxSmhFWC9qRU1ldzNFa0tyUVRI?=
+ =?utf-8?B?WjJHUEJqeng4U0Fhd2s4TVIvTHI5VytEU1orUlpMV2FlT0JlcUhlTUY0N2E4?=
+ =?utf-8?B?Y3FDMmRtT2Zkem1iZVZoSTJMeDVNNERLOVBRM0c3b3V0a1ArUkpERDFHeHhY?=
+ =?utf-8?B?dG5ZcVNodmprMnZkb1NOMC9DWElFZVQ1aUg3U3M5VGhJVTN6MTd1b3ZyMTcx?=
+ =?utf-8?B?LzlLL0xCSjhQT1g3NlpNM0JkUFByM1I0RlpGdTQ2TzAzdlczNFVaRElza0sw?=
+ =?utf-8?B?MW16UXUyWDRUUmhBOWVMcGRkUUtOTDVoYTg0YXFVUlh2aEJDNDR3VTRNbzRP?=
+ =?utf-8?B?KzJzelltWFYxbHF1ajFMaVo5ZW55NHo0TlQ2enBYbVJEaEpvOFlWK2xpNEpi?=
+ =?utf-8?B?U0xRdzI0Z2dtc244TkZRTkpRNE13czBuNDZEU3FaVzdSbnp0cERZck8zcGNH?=
+ =?utf-8?B?SlVjaDAxcjFhWWZnTjBRcUxPVG5aRFQ5a2N1SEpGWENsc01Gck45UXlCcmdG?=
+ =?utf-8?B?aWZPb0YrZkhMNitkaWR3aUNKT2NJLzBOaEJFa0xPV0ppVXRNRGI2TnZBekQ1?=
+ =?utf-8?B?TE5zRjkwOUladUdudlg5MnVVbmtmb0hSeWg0bzUwTCtLZ084aElCeWlvZGRD?=
+ =?utf-8?B?T28wT2Y3dGZaUVRabDZPYjdZRmhMT09nakh3N0wrRDRzakN5OURKWWYzSEtu?=
+ =?utf-8?B?dnZSWTdVcXhYcFJiVXJzUlBXMUoxVlZWSHNMUmNka1FIWjBQZnFibWg1YjRG?=
+ =?utf-8?B?Si9VT3g0ZWlieGVJVTBKOTd5dHRyNngwK1VCOC9iNUFwVGwxUDZVU0xwMTdw?=
+ =?utf-8?B?aXVIa2hCMmJ4SFYyK0p5cXR2c1hSZWZQSUhkWDZpT08zSDdtZ0EvRGRNaEQ3?=
+ =?utf-8?B?NWNWS1hhY2IzVEtMQUxIY3Zidi9hMHpTU3YxN2gzMk82eGVmV0hIYjBjSi9T?=
+ =?utf-8?B?VnhWelRweWl2SHRwa2Q5V0x4bFVtYTg0cjJhZmNWZFlYMFROTDlMc2FPQlZG?=
+ =?utf-8?B?QmxmZlpHamFVMlFoaHVRY0NieDhTcllFZm5ZU0VpQ1ZwZEhkUElQL1FGVlJv?=
+ =?utf-8?B?YlBBaXl2ejh5cS9QYmluY0gxbVJDd2VTWEF4dGR5bytJZ2EvRFRtSWhKYXkv?=
+ =?utf-8?B?NW9GcGgxOERXblcwTkpQMGJDVTJPYXE3MStmMWlEMDlpZGI0cCs1ZTFjMDBS?=
+ =?utf-8?B?ZktzSldXbGhjR0dtd1d4ajhMeXN0NUxmOWRBampqU1B4UmpXaUpkbitQZStK?=
+ =?utf-8?B?NGZwQXRYeGZPM2hnV0U5Tit3OG9lR082OVdYZWJFMDVWTmRaeE9qbU03RUwz?=
+ =?utf-8?B?QlhSMjdYTXBKeVpvZ2xKZkRMVmtESlNMeVdTcWpLMURDMVcwYTJ0ODYwbHl0?=
+ =?utf-8?B?WWw2Uk43L05lSVBiYmFpc3pvbTM5c1dlenAwazdxTWJwejVBTkJPOU55M0Zu?=
+ =?utf-8?B?cWg3MUFvSCtLRExaSmFKV0xSOG5RUUd3K1J3b211N25LU2tDUUJPR3B3RitT?=
+ =?utf-8?B?em5RZmJLZzM5VW5NN3c4MHhRM1pXYlJzN085elR5U3BDbitBZ2k1WVE0Mlll?=
+ =?utf-8?B?TWhrdVZsZkMvQnB1RnF0UXk1Nm02NmF2VDcwWmxmTGg4OTBnaFZyN3FtZU4x?=
+ =?utf-8?B?cG4wTUZIdjJBdWx2b21QYy9JejFGT2RGSjFqVldtNGFIS1pKN0UrNno5bmtm?=
+ =?utf-8?B?SjlHc05EY0p4aVZOM1ZjS2pEQWgzS2grZ3N6TENLUmNqUmhHdkJra1JJdEZs?=
+ =?utf-8?B?dndIdkxJaVRGUCtSd2xBWmlqR3BRbGc3UWNhU2VJU2pHYTZmQ21xQnR4REhu?=
+ =?utf-8?B?bDZ4WVZvb2pQbXBqN08wQ2xZdVlmNzYzaVJDeWxocWgxRzlwMHlORG1DSjFS?=
+ =?utf-8?B?b2tTcDl6akJmZHF4MnVManlXSXJTLzBpc00wcWI2c3JxdWtRczUyM1JnT3Rt?=
+ =?utf-8?B?YWxKS1duWHZIZGZkZ3F2K1NMODIzMHRjaWdiTFEzOGdmdExCRmhaQW82U2kw?=
+ =?utf-8?B?YjBVbldEZ0JOcWI3OXRmSEkzZUxnenFxWXBUaFVSTmlkenZTT1h4cC95NGlL?=
+ =?utf-8?B?U3dVejBhdm1DTCsvdkI2cW0yZUErZUw1eENvRFRyNlVXM0w4alVDR0VRSVUv?=
+ =?utf-8?B?Z3c9PQ==?=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	b01StNEZS91Ma9M+aO/pTfO6h5MfO6c8HilmJFfNmWz0byKP0HQ0FLFiitvlcaW2Apbly4e+3ObegY0eN7XHoI36sWvzPC4clOv0ohSskWjLU3WyZeppMXylr/2TH2VKYD8ejl+Amsf/v0+8lkpJzMHFQBfmuh+Cs/MzA92PhMNweoXOFl/cm2Knxb0YaYn6uwTc6wOpWjpmo6ckX8XXJrsTvWsTiEaBFcq9sgMETSsS6GMEiXhGiQXw+JeAId8ditiiUuig7iGsHocAA22Fu7nLxcMshStBD4gosOtWFstNIGUjK04gy8cvPH+1zL/QUfLmStXSwOTDQQ+TwIMZNIKkuNg+Fe9qAvyEkN/agaxG/vJvH5nTVMLB0mrJKMuFl+Z056uOeJfR9HPvZLX4HoremzVs84tjOVjv5K6a9FR9xfQzzbLak1ogs3cRpcEM+eO7SwxCUSTiovXvmA+CcI8xLkgtdUpJBxgxDxNPlKr25HdLgly/pxmrFpM08P0UCncQwCnEqyH5nxzC66TqjgDucftK2k6YtiG5fYnGcrpsLxGv+kekolqviL+oqT6qbtS18iCZmmfhKpsRouqRtTy9CssRzckmE0oJKIrGsB0=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6d4846bc-a8d6-4ce3-9a02-08dd3af6d0ca
+X-MS-Exchange-CrossTenant-AuthSource: BN0PR10MB5128.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Jan 2025 15:09:49.6962
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: NUyVOaa9PxgqAqbWYboyR5VAe53brkFTsLZKaEggiQ5htzmmH35EcZX+9nkcxv8S+naWA5UA9laP9wdX6qVwRw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR10MB7732
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-01-22_06,2025-01-22_02,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 spamscore=0 phishscore=0
+ adultscore=0 bulkscore=0 mlxscore=0 mlxlogscore=999 suspectscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2411120000
+ definitions=main-2501220112
+X-Proofpoint-GUID: Vd923qMXEBHPKIJbjWjtk1m_UGZE8KZO
+X-Proofpoint-ORIG-GUID: Vd923qMXEBHPKIJbjWjtk1m_UGZE8KZO
 
-On 2025-01-20 11:34:21, Niklas Schnelle wrote:
->On Mon, 2025-01-20 at 14:32 +0800, Dust Li wrote:
->> On 2025-01-15 20:55:24, Alexandra Winter wrote:
->> > Note that in this RFC this patch is not complete, future versions
->> > of this patch need to contain comments for all ism_ops.
->> > Especially signal_event() and handle_event() need a good generic
->> > description.
->> > 
->> > Signed-off-by: Alexandra Winter <wintera@linux.ibm.com>
->> > ---
->> > include/linux/ism.h | 115 ++++++++++++++++++++++++++++++++++++++++----
->> > 1 file changed, 105 insertions(+), 10 deletions(-)
->> > 
->> > diff --git a/include/linux/ism.h b/include/linux/ism.h
->> > index 50975847248f..bc165d077071 100644
->> > --- a/include/linux/ism.h
->> > +++ b/include/linux/ism.h
->> > @@ -13,11 +13,26 @@
->> > #include <linux/workqueue.h>
->> > #include <linux/uuid.h>
->> > 
->> > -/* The remote peer rgid can use dmb_tok to write into this buffer. */
->> > +/*
->> > + * DMB - Direct Memory Buffer
->> > + * ==========================
->> > + * An ism client provides an DMB as input buffer for a local receiving
->> > + * ism device for exactly one (remote) sending ism device. Only this
->> > + * sending device can send data into this DMB using move_data(). Sender
->> > + * and receiver can be the same device.
->> > + * TODO: Alignment and length rules (CPU and DMA). Device specific?
->> > + */
->> > struct ism_dmb {
->> > +	/* dmb_tok - Token for this dmb
->> > +	 * Used by remote sender to address this dmb.
->> > +	 * Provided by ism fabric in register_dmb().
->> > +	 * Unique per ism fabric.
->> > +	 */
->> > 	u64 dmb_tok;
->> > +	/* rgid - GID of designated remote sending device */
->> > 	u64 rgid;
->> > 	u32 dmb_len;
->> > +	/* sba_idx - Index of this DMB on this receiving device */
->> > 	u32 sba_idx;
->> > 	u32 vlan_valid;
->> > 	u32 vlan_id;
->> > @@ -25,6 +40,8 @@ struct ism_dmb {
->> > 	dma_addr_t dma_addr;
->> > };
->> > 
->> > +/* ISM event structure (currently device type specific) */
->> > +// TODO: Define and describe generic event properties
->> > struct ism_event {
->> > 	u32 type;
->> > 	u32 code;
->> > @@ -33,38 +50,89 @@ struct ism_event {
->> > 	u64 info;
->> > };
->> > 
->> > +//TODO: use enum typedef
->> > #define ISM_EVENT_DMB	0
->> > #define ISM_EVENT_GID	1
->> > #define ISM_EVENT_SWR	2
->> > 
->> > struct ism_dev;
->> > 
->> > +/*
->> > + * ISM clients
->> > + * ===========
->> > + * All ism clients have access to all ism devices
->> > + * and must provide the following functions to be called by
->> > + * ism device drivers:
->> > + */
->> > struct ism_client {
->> > +	/* client name for logging and debugging purposes */
->> > 	const char *name;
->> > +	/**
->> > +	 *  add() - add an ism device
->> > +	 *  @dev: device that was added
->> > +	 *
->> > +	 * Will be called during ism_register_client() for all existing
->> > +	 * ism devices and whenever a new ism device is registered.
->> > +	 * *dev is valid until ism_client->remove() is called.
->> > +	 */
->> > 	void (*add)(struct ism_dev *dev);
->> > +	/**
->> > +	 * remove() - remove an ism device
->> > +	 * @dev: device to be removed
->> > +	 *
->> > +	 * Will be called whenever an ism device is unregistered.
->> > +	 * Before this call the device is already inactive: It will
->> > +	 * no longer call client handlers.
->> > +	 * The client must not access *dev after this call.
->> > +	 */
->> > 	void (*remove)(struct ism_dev *dev);
->> > +	/**
->> > +	 * handle_event() - Handle control information sent by device
->> > +	 * @dev: device reporting the event
->> > +	 * @event: ism event structure
->> > +	 */
->> > 	void (*handle_event)(struct ism_dev *dev, struct ism_event *event);
->> > -	/* Parameter dmbemask contains a bit vector with updated DMBEs, if sent
->> > -	 * via ism_move_data(). Callback function must handle all active bits
->> > -	 * indicated by dmbemask.
->> > +	/**
->> > +	 * handle_irq() - Handle signalling of a DMB
->> > +	 * @dev: device owns the dmb
->> > +	 * @bit: sba_idx=idx of the ism_dmb that got signalled
->> > +	 *	TODO: Pass a priv pointer to ism_dmb instead of 'bit'(?)
->> > +	 * @dmbemask: ism signalling mask of the dmb
->> > +	 *
->> > +	 * Handle signalling of a dmb that was registered by this client
->> > +	 * for this device.
->> > +	 * The ism device can coalesce multiple signalling triggers into a
->> > +	 * single call of handle_irq(). dmbemask can be used to indicate
->> > +	 * different kinds of triggers.
->> > 	 */
->> > 	void (*handle_irq)(struct ism_dev *dev, unsigned int bit, u16 dmbemask);
->> > -	/* Private area - don't touch! */
->> > +	/* client index - provided by ism layer */
->> > 	u8 id;
->> > };
->> > 
->> > int ism_register_client(struct ism_client *client);
->> > int  ism_unregister_client(struct ism_client *client);
->> > 
->> > +//TODO: Pair descriptions with functions
->> > +/*
->> > + * ISM devices
->> > + * ===========
->> > + */
->> > /* Mandatory operations for all ism devices:
->> >  * int (*query_remote_gid)(struct ism_dev *dev, uuid_t *rgid,
->> >  *	                   u32 vid_valid, u32 vid);
->> >  *	Query whether remote GID rgid is reachable via this device and this
->> >  *	vlan id. Vlan id is only checked if vid_valid != 0.
->> > + *	Returns 0 if remote gid is reachable.
->> >  *
->> >  * int (*register_dmb)(struct ism_dev *dev, struct ism_dmb *dmb,
->> >  *			    void *client);
->> > - *	Register an ism_dmb buffer for this device and this client.
->> > + *	Allocate and register an ism_dmb buffer for this device and this client.
->> > + *	The following fields of ism_dmb must be valid:
->> > + *	rgid, dmb_len, vlan_*; Optionally:requested sba_idx (non-zero)
->> > + *	Upon return the following fields will be valid: dmb_tok, sba_idx
->> > + *		cpu_addr, dma_addr (if applicable)
->> > + *	Returns zero on success
->> >  *
->> >  * int (*unregister_dmb)(struct ism_dev *dev, struct ism_dmb *dmb);
->> >  *	Unregister an ism_dmb buffer
->> > @@ -81,10 +149,15 @@ int  ism_unregister_client(struct ism_client *client);
->> >  * u16 (*get_chid)(struct ism_dev *dev);
->> >  *	Returns ism fabric identifier (channel id) of this device.
->> >  *	Only devices on the same ism fabric can communicate.
->> > - *	chid is unique per HW system, except for 0xFFFF, which denotes
->> > - *	an ism_loopback device that can only communicate with itself.
->> > - *	Use chid for fast negative checks, but only query_remote_gid()
->> > - *	can give a reliable positive answer.
->> > + *	chid is unique per HW system. Use chid for fast negative checks,
->> > + *	but only query_remote_gid() can give a reliable positive answer:
->> > + *	Different chid: ism is not possible
->> > + *	Same chid: ism traffic may be possible or not
->> > + *		   (e.g. different HW systems)
->> > + *	EXCEPTION: A value of 0xFFFF denotes an ism_loopback device
->> > + *		that can only communicate with itself. Use GID or
->> > + *		query_remote_gid()to determine whether sender and
->> > + *		receiver use the same ism_loopback device.
->> >  *
->> >  * struct device* (*get_dev)(struct ism_dev *dev);
->> >  *
->> > @@ -109,6 +182,28 @@ struct ism_ops {
->> > 	int (*register_dmb)(struct ism_dev *dev, struct ism_dmb *dmb,
->> > 			    struct ism_client *client);
->> > 	int (*unregister_dmb)(struct ism_dev *dev, struct ism_dmb *dmb);
->> > +	/**
->> > +	 * move_data() - write into a remote dmb
->> > +	 * @dev: Local sending ism device
->> > +	 * @dmb_tok: Token of the remote dmb
->> > +	 * @idx: signalling index
->> > +	 * @sf: signalling flag;
->> > +	 *      if true, idx will be turned on at target ism interrupt mask
->> > +	 *      and target device will be signalled, if required.
->> > +	 * @offset: offset within target dmb
->> > +	 * @data: pointer to data to be sent
->> > +	 * @size: length of data to be sent
->> > +	 *
->> > +	 * Use dev to write data of size at offset into a remote dmb
->> > +	 * identified by dmb_tok. Data is moved synchronously, *data can
->> > +	 * be freed when this function returns.
->> 
->> When considering the API, I found this comment may be incorrect.
->> 
->> IIUC, in copy mode for PCI ISM devices, the CPU only tells the
->> device to perform a DMA copy. As a result, when this function returns,
->> the device may not have completed the DMA copy.
->
->For the s390 ISM device the statement is true. The move_data() function
->does a PCI Store Block instruction which is both the write on the
->sender side but also synchronously acts as the devices DMA write on the
->receiver side. So when the PCI Store Block instruction completes the
->data has been cache coherently written to the receiver DMB. And yes
->full synchronicity would be impossible with the posted writes of real
->PCIe.
+On 1/22/25 9:59 AM, Jeff Layton wrote:
+> The output format should provide a value that matches the one in
+> the /proc/<pid>/ns/net symlink. This makes it simpler to match the
+> rpc_xprt and rpc_clnt to a particular container.
+> 
+> Also, when the xprt defines the get_srcaddr operation, use that to
+> display the source address as well.
+> 
+> Signed-off-by: Jeff Layton <jlayton@kernel.org>
+> ---
+> This is more client-side code, so I figure this should go in via the NFS
+> client tree, but if Chuck would rather pick it up, then that's fine too.
 
-Thank you guys for the detail explaination on s390! I throught it was
-like normal PCI device. @Niklas, @Alexandra, @Julian
+Hi Jeff -
+
+The change seems sensible to me, and it would be better for Anna or
+Trond to handle it IMO.
 
 
->
->That said when it comes to API design I think you have a great point
->here in that we need to decide if this synchronicity should be baked
->into the move_data() API. I think we instead want to only guarantee a
->weaker rule. That is the source buffer can be re-used after the move.
->This to me is also aligned with the word "move" here in that the data
->has been moved after the call not registered to be moved or such. This
->could be achieved with a real PCIe device by copying the data or by
->waiting on completion. If we ever get devices which need to wait on
->completion it may indeed be better to have a separate completion step
->in the API too. Then again I think the concept of having a single "move
->data" step is somewhat central to ISM and I'd hate to lose that
->simplicity.
+> ---
+>   net/sunrpc/debugfs.c | 16 ++++++++++++++++
+>   1 file changed, 16 insertions(+)
+> 
+> diff --git a/net/sunrpc/debugfs.c b/net/sunrpc/debugfs.c
+> index a176d5a0b0ee9a2c0ca1d1ed3131b67b782c3296..3b39493234d7079ff762a862bdd51725f36472dc 100644
+> --- a/net/sunrpc/debugfs.c
+> +++ b/net/sunrpc/debugfs.c
+> @@ -179,6 +179,22 @@ xprt_info_show(struct seq_file *f, void *v)
+>   	seq_printf(f, "addr:  %s\n", xprt->address_strings[RPC_DISPLAY_ADDR]);
+>   	seq_printf(f, "port:  %s\n", xprt->address_strings[RPC_DISPLAY_PORT]);
+>   	seq_printf(f, "state: 0x%lx\n", xprt->state);
+> +	seq_printf(f, "netns: %u\n", xprt->xprt_net->ns.inum);
 
-Agree.
-
-For SMC, it already handles zero-copy and copy modes differently. In
-copy mode, the current API seems appropriate, but for zero-copy mode, we
-may need to extend it.
-
-Taking the loopback device as an example, SMC requires the move_data()
-function to copy the CDC into the DMB. However, copying the data from
-the source to the destination DMB is not necessary. Instead, it needs to
-signal the peer that the data transfer is complete, so an API for
-notification is required.
-
-One solution might be to retain the move_data() function and introduce
-something like a notify() API. Alternatively, if we don't want to extend
-the API, we could use something like move_data(ismdev, data=NULL,
-length=0, ..., signal=1).
+IIRC, net->ns.inum is also what the trace points use for this purpose.
 
 
->
->I've been thinking also about a possible copy mode in a virtio-ism.
->That could be useful if we wanted to use virtio-ism between memory
->partitioned guests, or if one wanted to transparently proxy virtio-ism
->over s390 ISM to span multiple KVM hosts. And I think such a mode could
->still work with a single "move data" step and I'd love to have that in
->any future virtio-ism spec.
+> +
+> +	if (xprt->ops->get_srcaddr) {
+> +		int ret, buflen;
+> +		char buf[INET6_ADDRSTRLEN];
+> +
+> +		buflen = ARRAY_SIZE(buf);
+> +		ret = xprt->ops->get_srcaddr(xprt, buf, buflen);
+> +		if (ret > 0) {
+> +			if (ret < buflen - 1)
+> +				buf[ret] = '\0';
+> +		} else {
+> +			ret = sprintf(buf, "<closed>");
+> +		}
+> +		seq_printf(f, "saddr: %s\n", buf);
+> +	}
+>   	return 0;
+>   }
+>   
+> 
+> ---
+> base-commit: ffd294d346d185b70e28b1a28abe367bbfe53c04
+> change-id: 20250122-nfs-6-14-7f737deb6356
+> 
+> Best regards,
 
-I'm not opposed to that.
 
->
->> 
->> In zero-copy mode for loopback, the source and destination share the
->> same buffer. If the source rewrites the buffer, the destination may
->> encounter corrupted data. The source should only reuse the data after
->> the destination has finished reading it.
->
->I think there are two potential overwrite scenarios here.
->
->1. The sender re-uses the source data buffer i.e. the @data buffer of
->the move_data() call. On s390 ISM this is fine because the data was
->copied out and into the destination DMB during the call. This could
->typically become an issue if the device DMA reads directly from @data
->after the move_data() call completed.
->
->2. The sender does subsequent move_data() overwriting data in the
->destination DMB before the receiver has read the data. This can happen
->on s390 ISM too and needs to be prevented by DMB access rules.
->
->For the move_data() call I think that even in a "shared i.e. same page
->DMB" scenario move_data() must still do a copy out of the @data buffer
->into the shared DMB. Otherwise it really wouldn't "move" data and it
->would be a very weird API since @data is just a buffer not some kind of
->descriptor. In other words I think scenario 1 shouldn't be possible in
->either copy or shared DMB mode by the semantics of move_data().
-
-For the shared DMB, I now agree with you. Perhaps we can keep the
-move_data() behavior consistent with memcpy(3) or memmove(3) and leave
-the usage to the upper layer.
-
-Best regards,
-Dust
-
+-- 
+Chuck Lever
 
