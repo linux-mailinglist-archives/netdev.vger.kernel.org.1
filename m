@@ -1,103 +1,84 @@
-Return-Path: <netdev+bounces-160268-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160269-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB6B9A19174
-	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 13:39:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id BFC39A191AA
+	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 13:45:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C5BA23ABF1B
-	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 12:39:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 773AC3A3634
+	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 12:44:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC752212B1D;
-	Wed, 22 Jan 2025 12:39:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0ABE7212B37;
+	Wed, 22 Jan 2025 12:44:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aI/PS6gD"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VmmQX8kJ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D76D211484;
-	Wed, 22 Jan 2025 12:39:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8588211A31;
+	Wed, 22 Jan 2025 12:44:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737549582; cv=none; b=k2iMW8PXAUm8tX4jDz6NqbkVZ23E5ebFTQO4yn9JT2xfrrqgl10UaU0VLbI55qguagZyMSdtLHz2nyjLgsW2951t8k6wegZ/5BgNGaxSuOdWLX8ephNawofUjZhh4P7Fn8NeJZimcuYFaXn6HiVdGPqnUD0ARu5fwEZCPNHLCno=
+	t=1737549893; cv=none; b=nvh77iOs16flfPm3GIyR7l1c/JISFJsHK84z4qmHlFeK1walOhUZxNjw09Pdy0NXxrvuCIHCUh23UJ7LTcRVRvGxvpfuHn4xMJzNXmr23a1/E291D6puYZd5fdl9IbL496rtUfk7JeowgXY8IqSEmEwrE+ysAQ7bq4QRAAYGChk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737549582; c=relaxed/simple;
-	bh=Qyd+iCjoTm9xlHts+Ha4dvewQmrB9thaHu54n0DRp4w=;
+	s=arc-20240116; t=1737549893; c=relaxed/simple;
+	bh=mYxble0FKSzz/PM6/HiudFNcDeaSAlhim+xaZQ+0ZeA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Z/kwGxxYX7yh/32x/iUJxNW1uYuCYatLHCEsmaDhxmlJQq+nUUPbE5y6APwTDc5UXME0vWVTxbHQE8l7c9BONEzlrmg3eGGjK7UK1wYCP+RM8fQCizlSuqZWMBvys0hTzGJxBFs8xVgqTGcojW3HrTuamHeLHRFHKTc+VNILSH8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aI/PS6gD; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D9189C4CED6;
-	Wed, 22 Jan 2025 12:39:38 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=Q8Fp9Aw4ZLvqgSwTNTrvyxtqliFAjLSSvN73v7Z0sH/B3cMqQ/TWWiPxaTyeP6NI3snMPdCbSmV4KZinyVRwcIBx3RpDQ8ryGvz502W6BmV+az7ND0ZMOCUXAxUqJEFjabzmUQMdEJr6/4pqf57DbhZnRGUz6x4C/YeHkRW7c2I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VmmQX8kJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A1153C4CED6;
+	Wed, 22 Jan 2025 12:44:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737549580;
-	bh=Qyd+iCjoTm9xlHts+Ha4dvewQmrB9thaHu54n0DRp4w=;
+	s=k20201202; t=1737549893;
+	bh=mYxble0FKSzz/PM6/HiudFNcDeaSAlhim+xaZQ+0ZeA=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=aI/PS6gDcY+bTmVNQhsJV34/JsLscDE7ukDGJmyYaPgy8edGyj4cScdQxBBuGoU8W
-	 MjnillvI2C2VqI0tpYYSE5uNpzK9fEtFHp90DThvXhQMES1++3sj+aDp02PqW/eCou
-	 xHj4YOQkx0V887jH+sBMhuG7vyin4N5lxw5gvtjOLgu1xxYnxsCG12wDMxoTfEXj7N
-	 OPPPxEZcOYnldEQIS6ZO60B1h+AFLVZEg9Liw6myGhQmZLvW62Aop4KPalZLUwnw1y
-	 C7lm6KvmenlEAJCVviZGLjbbFQdaf+7XNvoLq1LUh+W6Hfj7+09bBaVn6ikzL2bqDR
-	 Jyk5Ky62qUFEA==
-Date: Wed, 22 Jan 2025 12:39:36 +0000
+	b=VmmQX8kJ2POQjGKy5HhUu7vCm1c1mGZPoHagUpfhprWla72zHwOspYhnZbWWdVH+A
+	 PnInCWRCeQV0VQ2sLyMu+hdQbBNBwqYC3fIfm2/SHNl7ndwbPHKxxsLuBBAygns1FZ
+	 Ge4I9v+0tki+NzKNRhmhVtCEdF764hVlm6RFSOIDTZXU5CwkRB/5jXvMb+GQQ0gDDV
+	 flZET4E8+ycAm49GjMoujLJbiMUOqg9MTIqFgFZ1hqGQ1Awh0VtDPhQao8qzv9hlhL
+	 peb2qVmItF01N/uTQYsjBI2Pb4pPiFShDjnQiJKKlBbuc/JH99eRiZzex0/SXzu5iv
+	 /YRSSgPSstnjg==
+Date: Wed, 22 Jan 2025 12:44:49 +0000
 From: Simon Horman <horms@kernel.org>
-To: Dan Carpenter <dan.carpenter@linaro.org>
-Cc: Steffen Klassert <steffen.klassert@secunet.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
+To: Yeking@red54.com
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	kernel-janitors@vger.kernel.org
-Subject: Re: [PATCH net] xfrm: fix integer overflow in
- xfrm_replay_state_esn_len()
-Message-ID: <20250122123936.GB390877@kernel.org>
-References: <018ecf13-e371-4b39-8946-c7510baf916b@stanley.mountain>
+	Andrew Lunn <andrew+netdev@lunn.ch>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net v2] net: the appletalk subsystem no longer uses
+ ndo_do_ioctl
+Message-ID: <20250122124449.GC390877@kernel.org>
+References: <tencent_D0DC3D8CD6217FA0CFAFEDE53F27810DB408@qq.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <018ecf13-e371-4b39-8946-c7510baf916b@stanley.mountain>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <tencent_D0DC3D8CD6217FA0CFAFEDE53F27810DB408@qq.com>
 
-On Tue, Jan 21, 2025 at 02:16:01PM +0300, Dan Carpenter wrote:
-> The problem is that "replay_esn->bmp_len" comes from the user and it's
-> a u32.  The xfrm_replay_state_esn_len() function also returns a u32.
-> So if we choose a ->bmp_len which very high then the total will be
-> more than UINT_MAX and value will be truncated when we return.  The
-> returned value will be smaller than expected causing problems in the
-> caller.
+On Tue, Jan 21, 2025 at 03:38:47PM +0000, Yeking@Red54.com wrote:
+> From: 谢致邦 (XIE Zhibang) <Yeking@Red54.com>
 > 
-> To fix this:
-> 1) Use size_add() and size_mul().  This change is necessary for 32bit
->    systems.
-> 2) Change the type of xfrm_replay_state_esn_len() and related variables
->    from u32 to size_t.
-> 3) Remove the casts to (int).  The size should never be negative.
->    Generally, values which come from size_add/mul() should stay as type
->    size_t and not be truncated to user fewer than all the bytes in a
->    unsigned long.
+> ndo_do_ioctl is no longer used by the appletalk subsystem after commit
+> 45bd1c5ba758 ("net: appletalk: Drop aarp_send_probe_phase1()").
 > 
-> Cc: stable@vger.kernel.org
-> Fixes: 9736acf395d3 ("xfrm: Add basic infrastructure to support IPsec extended sequence numbers")
-> Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
+> Fixes: 45bd1c5ba758 ("net: appletalk: Drop aarp_send_probe_phase1()")
+> Signed-off-by: 谢致邦 (XIE Zhibang) <Yeking@Red54.com>
 > ---
-> The one caller that I didn't modify was xfrm_sa_len().  That's a bit
-> complicated and also I'm kind of hoping that we don't handle user
-> controlled data in that function?  The place where we definitely are
-> handling user data is in xfrm_alloc_replay_state_esn() and this patch
-> fixes that.
+> V1 -> V2: Add Fixes tag
 
-Yes, that is a bit "complex".
+FWIIW, I don't think a documentation change qualifies as a fix, and thus
+should not have a Fixes tag. And as a documentation change, with no runtime
+effect, I'm ambivalent regarding this being net or net-next material.
 
-FWIIW, my opinion is that your patch is correct and it improves things -
-even if the end result may still have imperfections. And for that reason
-I'm in favour of it being accepted.
+In any case, the change looks correct to me.
 
 Reviewed-by: Simon Horman <horms@kernel.org>
 
