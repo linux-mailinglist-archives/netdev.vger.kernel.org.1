@@ -1,105 +1,102 @@
-Return-Path: <netdev+bounces-160295-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160296-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75B8CA192D8
-	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 14:44:51 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 02E1CA192DA
+	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 14:46:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B539F16C5A3
-	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 13:44:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DBC683A197F
+	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 13:46:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D58F52139BC;
-	Wed, 22 Jan 2025 13:44:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BED7D211A0C;
+	Wed, 22 Jan 2025 13:46:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XfgyXjsU"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FYTrXeIA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21DB12135DC
-	for <netdev@vger.kernel.org>; Wed, 22 Jan 2025 13:44:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13F228F49
+	for <netdev@vger.kernel.org>; Wed, 22 Jan 2025 13:46:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737553477; cv=none; b=lWgelg9XKj3jz6zihxVGrESufF1Oa3gLM69PjGmMYOdDbryjNu1LE3BNUV83/4KyHmoeNO3bhbpQDZ6feL+5G6VVh1GF2Yb2V3tu9inYRjVDlS6iU+phAJmIKxcTnQqEDrkL+AO/1BmMk48qO1hp935nik24m3MLhgDNIX6w4lQ=
+	t=1737553579; cv=none; b=U6fyVOGWa5iq9qQp+9tqSNGuVVTK3eO62kYjKeoNUdon/ahJowaANWmDOEkQflVxL8bDezXBG7KylHCgEuISvJ1EN52y56Z/kq5YS9C8sy1+6nTiKDZi7IGn3bRyJPMhz+gA/IuaTi5TFxtHSKUhyNBTJfg25kGCBVSrLfYmaZo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737553477; c=relaxed/simple;
-	bh=BIvCWp8FFu3JhEClwVZrpfTGXiC20e9nDxcxKC7KN+I=;
+	s=arc-20240116; t=1737553579; c=relaxed/simple;
+	bh=eXXv6pVLb7iKan+715mZ0jt8WuyNHV9c/5N7O/RDLp4=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rfJf9Cldvx67kumyt3yJnIjvVa2PDSoaaa05aMtOEvCydkKN6vecOQAi6YnRBBsOqzPjqkEMDAyeAeKveCRWHOJxatrVwnL2I7WWUoYq6WAtoi8+hWTxigDHo1cxClm2WUUlaPGRnOPaviVOjocc3uFessHjXJb+YxxzGizxOdE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XfgyXjsU; arc=none smtp.client-ip=209.85.208.54
+	 To:Cc:Content-Type; b=rD/zXh7AxJdZkHL05FMPRCrNIP7n5BivYFNrutHD/e1P3Pi7jekWAMNg2cdGe8Vbhjl8ngaqo3qujvzHPE9Imr6qMKdvrf9hAdeq6d4nqms1XyEUZR6mKGRXMImkb4dURILRLdX22L8BNRKayDI8jCDaYTk0gzKdywkH2bLBdEQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=FYTrXeIA; arc=none smtp.client-ip=209.85.208.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-5d4e2aa7ea9so12746260a12.2
-        for <netdev@vger.kernel.org>; Wed, 22 Jan 2025 05:44:35 -0800 (PST)
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-5d3f65844deso11771182a12.0
+        for <netdev@vger.kernel.org>; Wed, 22 Jan 2025 05:46:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1737553474; x=1738158274; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1737553576; x=1738158376; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=BIvCWp8FFu3JhEClwVZrpfTGXiC20e9nDxcxKC7KN+I=;
-        b=XfgyXjsURJWWI1SQ9+iI4bKv51kVsSjblV5Fa6TEsbq6GPUQmGrfspO6k1KNrbGdq0
-         viMReKUz2C2gJ89NkOim0zAC7XDfy/POrs3g6Z8yM/bEE3KHqtTKRYMyLnbYxCw74wFR
-         0gnGLnb+Hs9jmxI6tjkm1f0KQnAmqqRoVuTo+lZWuymRSekZngU6d0nZySLLc80ev6TF
-         rmEvNVehLEF5zqJUjs3uQv8phbuFMuNjb2nec+F4uLcJohMbZL/7AbkDlXR4y/mHZNAK
-         JEx9LLDBZG87s1NI4S9k4izWzgbezKKoDqg0fYw74uR+Yb0iutZCmAommnr6L9ncaFtM
-         Y4lQ==
+        bh=eXXv6pVLb7iKan+715mZ0jt8WuyNHV9c/5N7O/RDLp4=;
+        b=FYTrXeIAREW+Fj3SXtmSteP3xWYMA2U4yghfPHkPvUSd/worWOZmb5Za04S6U4pLJf
+         Zoji6fKOhIqayi/kNv8SbGAzB0R3TDglIefPRr5LTLPYlX1oTsG7+oFW2FOHKVqLuBUx
+         NlHUSRizhju3ty51Xs7aNyeyJ2zkHn5s1BnfqOG0B/lJ3qhf9abhAHy9J+uQxTFjV809
+         dYv3Vlt614bFBsHMHAUwRgOd5Qj+so8YXX5SE5VIkrO30zK/hMm0YaFmjXlZTDBu4sIh
+         MBctntOpCJtltlBdBYZnIpSgnkRo9SVpRZuIZj/lb5ioW3FynAscYxm99VE72xWOzOz1
+         CtJQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737553474; x=1738158274;
+        d=1e100.net; s=20230601; t=1737553576; x=1738158376;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=BIvCWp8FFu3JhEClwVZrpfTGXiC20e9nDxcxKC7KN+I=;
-        b=wmwlBtCGUr0tZH1Igo6nn64bkPXOStJEou3Z8LMp4pjPZcI8kzycPYwgahDM3ldk/Z
-         br4oBC/IxVJV1HFGTWnNUqe7g6CAiOjIKNszzUdDRUnYl9xoixK8OAs0KXCGY7s3eVy6
-         vUg01HxdAJXn+lM/DTdi84IrpRDHcXRQ0hBo+O9PZT/JzNVPkd5esRF10AGxc8odk4zD
-         OtZwKycLWMT88zHgr1EjYhFe05LPJK0K6p5XgJ4hqbqY3vOAFbwpV1XteRVw/fenQnzJ
-         qVMsXabu3F8FhWoyrYHntCYuSn7LMdldwkefaD3C/eFSNHBMMAThrKRJQVIc5RNzXr7Y
-         N12w==
-X-Forwarded-Encrypted: i=1; AJvYcCX4MFAnlJ0SGQcqZpW8Ms4u5DpL/dKCbGJhWuIc9hgE0OhKMwMRUuVM3e9rjoV2QeSejB4QwRo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxZSxNVfCbCRu9yqJ9WPZGr9QrDfDkOZQHAWURSxuulb6TeLITV
-	qPhj40j/ajwonOypx6uOMPnZQGR9w5disRfGw1rU40noRQve+iWU2uQcczMdRW7ER2jeBGXGHg9
-	zimOjyeJeoxxgl4RENgCRdRjdIlecqKCoCcrSw7dLNV6PzeGe3Q==
-X-Gm-Gg: ASbGncvFyIRQ+xv9zfzNjhtbYOhKqpIEKzB2+2nl1TXYcOg4QTrwaNh2FLt11xCOO3E
-	vJLXCR+7ZX+/l2I5rEuRCzh9NTvIpPOZPSjJrheFexhAdYHBxaw==
-X-Google-Smtp-Source: AGHT+IFIQIEMRT2LZWeFpL4TMoPbPAe83obaJAYSAVPrIeKUDOD3KAY4PXuFRASJoKQmWnfT0gvCQ/QN0jc5q1RFqMc=
-X-Received: by 2002:a05:6402:5251:b0:5d2:d72a:77e4 with SMTP id
- 4fb4d7f45d1cf-5db7db1234bmr21211043a12.28.1737553474328; Wed, 22 Jan 2025
- 05:44:34 -0800 (PST)
+        bh=eXXv6pVLb7iKan+715mZ0jt8WuyNHV9c/5N7O/RDLp4=;
+        b=p3+Kdx0neCpvmZRKNX4T6Vme3vGdbeX6QYNAuzJ8YsNw/K9rQgvfBIpKcJrsKZ6MwN
+         vvnzlEww9i2NFcvoDeoxGPpSV0E1D+ubCuRTU9htkXpdpH/nIOwZoVThAHrzzKbLvy4/
+         eR/SFq0CPX5niGDEWlXo9qx4pFGF+EC2yNINeEFcx+OoHJjsRWDYpLF3OKskSHFmSWe6
+         Zq2RAb+NUH8g1+50iiBnhtXaFqH2QudWcNWnLj3WSHG41FcKgkDXPdlOwwJId4azV3mT
+         Khac0Yty2sYaRLVDh11wxD8XkVzG+0IfyfgDL/A6kIZPP2oVKvPQ31ierf9naCuVOpXC
+         DbJg==
+X-Forwarded-Encrypted: i=1; AJvYcCWkagpCspmxrK6bfMauWHSWqfcP6jqBissi6JFHrt2g6e4ySyqvbvgnpcB/PpBXDWI+jQAYVZE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzJhcl2Gmxc2sWABPzy40CxTDkR6oAZc3Af31NwWJGA/vdvlpV9
+	eA68u2Q21u3eCEXRXH7QABiCPfsBllWFzjaVRT2kwq6v4gIhU/FFhDufFGtGUlUo1GLw1NbU2q6
+	o0PHWdzawcvyfenT4IXlhq+0OyUrhiQK3kPBg
+X-Gm-Gg: ASbGncuBzgfX6xFpORoa1j3txRaXzjeqZ5VINYXzHVM/BanNA7GDlpjb7jtvw5kusEn
+	R+qYBLjbdWgG/H60UC52BsG/JQM0RLhVSuHO9o7aW3s+XOXtRlw==
+X-Google-Smtp-Source: AGHT+IFleg/DcxGzAKFeQ2GbEp7LmcIycng1elrdcDLwiVvtb7Mqkcwjc46SpwPVCJktx5MTZvztpqr/RjMPtrcmjn4=
+X-Received: by 2002:a05:6402:2341:b0:5d9:f5c4:a227 with SMTP id
+ 4fb4d7f45d1cf-5db7d3550camr18461444a12.20.1737553576194; Wed, 22 Jan 2025
+ 05:46:16 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250121221519.392014-1-kuba@kernel.org> <20250121221519.392014-4-kuba@kernel.org>
-In-Reply-To: <20250121221519.392014-4-kuba@kernel.org>
+References: <20250121221519.392014-1-kuba@kernel.org> <20250121221519.392014-3-kuba@kernel.org>
+In-Reply-To: <20250121221519.392014-3-kuba@kernel.org>
 From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 22 Jan 2025 14:44:22 +0100
-X-Gm-Features: AbW1kvZ7amq2FQ0lgMye820n3-QVW1OgwMgjmK3wGHBWcUMzn1aXt9TVvZZIMOg
-Message-ID: <CANn89i+r5RN25jvXJmF7w_HcFph9xEKJfzAMsk+T6fgdPJUkOg@mail.gmail.com>
-Subject: Re: [PATCH net-next 3/7] eth: forcedeth: fix calling napi_enable() in
- atomic context
+Date: Wed, 22 Jan 2025 14:46:05 +0100
+X-Gm-Features: AbW1kvZ8_9mabLHytWnb3dCrkVHjmrz8m9NGZlk3qg9OwLCIpvz5BZer4tdAzR4
+Message-ID: <CANn89iJqPUm+=OOHoMTAp=K_LD196AaQdNUzzjBE+AZnuDUDNw@mail.gmail.com>
+Subject: Re: [PATCH net-next 2/7] eth: forcedeth: remove local wrappers for
+ napi enable/disable
 To: Jakub Kicinski <kuba@kernel.org>
 Cc: davem@davemloft.net, netdev@vger.kernel.org, pabeni@redhat.com, 
 	andrew+netdev@lunn.ch, horms@kernel.org, dan.carpenter@linaro.org, 
-	rain.1986.08.12@gmail.com, zyjzyj2000@gmail.com, kuniyu@amazon.com, 
-	romieu@fr.zoreil.com
+	rain.1986.08.12@gmail.com, zyjzyj2000@gmail.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
 On Tue, Jan 21, 2025 at 11:15=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> w=
 rote:
 >
-> napi_enable() may sleep now, take netdev_lock() before np->lock.
+> The local helpers for calling napi_enable() and napi_disable()
+> don't serve much purpose and they will complicate the fix in
+> the subsequent patch. Remove them, call the core functions
+> directly.
 >
-> Fixes: 413f0271f396 ("net: protect NAPI enablement with netdev_lock()")
-> Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
-> Link: https://lore.kernel.org/dcfd56bc-de32-4b11-9e19-d8bd1543745d@stanle=
-y.mountain
 > Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
 
 Reviewed-by: Eric Dumazet <edumazet@google.com>
 
