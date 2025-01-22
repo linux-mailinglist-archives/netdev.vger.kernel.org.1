@@ -1,87 +1,92 @@
-Return-Path: <netdev+bounces-160299-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160300-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A36AAA192EA
-	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 14:49:28 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 965E6A192F0
+	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 14:51:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 865AF3AC3AF
-	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 13:49:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DC257162B46
+	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 13:51:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 289D42135C1;
-	Wed, 22 Jan 2025 13:49:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EEDC2139A4;
+	Wed, 22 Jan 2025 13:50:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="YttRcNa0"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="iPqmzRd7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 608B02116FB
-	for <netdev@vger.kernel.org>; Wed, 22 Jan 2025 13:49:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EEE3212F98
+	for <netdev@vger.kernel.org>; Wed, 22 Jan 2025 13:50:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737553764; cv=none; b=FmqTtdBJE21PFYfFuLMHLckfnRw18NGcAlHBgHMFVxhA2CK0cU/GH0JtrQpo0fRsGMslFr5oMSvY3lR2WkK5zk6ZWTffKf+i0Z1rUhCAVrMuD0FctdNobMrHzk2ho/R0FcM1UiobWTekvVWKQ734c+QjWLJ5uysehAfzfcJrWCs=
+	t=1737553857; cv=none; b=gqhf03meMuBOLVUn7Yx1IkrbJcYucT+p8qNxDgVVnKtWQl1IkMMmV06svcq8GnHmsXBYQq3Ms1YtKQIITlWFfhDCtmjHyv0j32JeFpv6wxEPB2uyFe7bysBALg/Fu1L4AkDZRQ35orgSlUyuH9oWn88BsNfP+h+H/p3SyC/BQ58=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737553764; c=relaxed/simple;
-	bh=/o3/l/9afeGTYp17GP2QC2MUMdmrgWfRjZnggaQP8GY=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=thWtHtLMNWkKfCPX16k5lIIY1oYR7bl5SXZPb9zmRX6UpAEVuxjDY+UdZS50GK7dqHWN+9BBcL95MXeezKs25XoOltq1AaTOK7QvXtu1HrunzOtj3FCnrUGVvCZOIamBPwP1ME+8cNstCSZnlb5T/IBKsH/VHmNNOO4+Kz0AE9A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=YttRcNa0; arc=none smtp.client-ip=209.85.221.52
+	s=arc-20240116; t=1737553857; c=relaxed/simple;
+	bh=bks+dcymjfuxwpQMDs5ixSXGxUexUIw8mAnKAomCojs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QcMTt9jy4DQNMrF04Je1o0Y6ljZFI+epE6AlyV3kz3QGzxEjPrOmzdVP2FXU+sOkPXb1nXmb9EfSjpTqRI/H/j7BVls32u1YIygidWiLkSCYMy4oQLDD68pNp9BmXDXp4RP0QxSlkLzaBqReoCBrIhg7f9L0S/XK8ZdNpEc4cwQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=iPqmzRd7; arc=none smtp.client-ip=209.85.128.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-388cae9eb9fso3922723f8f.3
-        for <netdev@vger.kernel.org>; Wed, 22 Jan 2025 05:49:22 -0800 (PST)
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-436281c8a38so50829295e9.3
+        for <netdev@vger.kernel.org>; Wed, 22 Jan 2025 05:50:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1737553761; x=1738158561; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=K51/6g4P9GYdkZ38G8mfX52Y5q+LxzCdwPw5czgkm70=;
-        b=YttRcNa0noHwMbSsrzASNuHeMCWT2Fr6Sk06fBYAGoO40fm/2a349KQl5/05SB0XvX
-         c+c5kVzd91QlMuIEkXC/fDcf/nxQLmTVXW/bOQEWG+SPzujVD1ncEqRl+5BCtsgp4Rjm
-         nusRGYmd05ZPDkRXvYEmIv7g8HaNTuK3HweSxUmwzQtoEZM8apiVMaTTzeOaeAO7fUWD
-         SWsD86+qJA25kstpusx/fuvhnE3WfaOsJHFF8S3kt5ERDDgfbMaw65gLYXEGv3dHKjRV
-         lIIIQbtU+HKFF1X+TPZ+MUI3qR90CcBIOLD4xfTknP3d6Z1MH6WkfV5lRwJ91qyZF5Rx
-         iutw==
+        d=linaro.org; s=google; t=1737553854; x=1738158654; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=LeJQbMKgxTKE/VdTo5M9qbk3XdSIS18Xn3c/OFMKt/Y=;
+        b=iPqmzRd7baIPYn33C3KRXTrV+pCb463BW28fABHTx8ITb24hrWxLQnJ+nviGXhxSfY
+         zb+MNO9VEUyt/GeIcQCdh5cwTsZ6u81oMDftOkRtWp/lDnhFKYQnv8PgEe3AOO2Cys7B
+         jCTVTMoJsesIeF8nJDx29w/IAF3PGo4v/5WUkGHEeQUdwweIup2Lo6F39lGioVi+FYaU
+         qdkSxs1lUrSSjJg/uW2G1+TTq7j6HfgEbqcPibjxY2ZJr/rQxJ1qvAQBMz/tsTGm7XpH
+         xuvJnxFuBVBrO9Bv2ya7BYoQ3paWVENWcHjKecPQeljXyasJkXGBSqgJTE6UYddMZAvL
+         fpKA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737553761; x=1738158561;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=K51/6g4P9GYdkZ38G8mfX52Y5q+LxzCdwPw5czgkm70=;
-        b=ltxVbU4YnkvSw9c8nQcRDpBjY9oB/O8c1iRezJaTe7hOcNeylQpM56PFSNAqhcX83t
-         gQREvJKrQ9pIsbXIxwzF9OICMFscNPsgWRwuYdVXrB879QWAUSehT378neDN1tcKHjmI
-         zzM1gWn3iAR4FGX8HwdIWPMZnmu80iGNNo0IbBDdjupfTKRwmgbYPCZ+60p6Y/oplzUc
-         r4iATeEL3/swgW2AfxhJSw1d2q1Zkoc9j3k11KYYRgFAp82samYR/ScsiIP5L/ai6KZY
-         qI9y6/tp2HTtLdkkqSc8FE40yLcEYzzIEJYo/9qk0+dJNPOjV8e7bzojc/BSnvaZex3J
-         Ba7Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVopYZVlN/3U1BX9Swtbf5tsnZSAiBSnwwGwOY4HejhH8vMLCq/MnkD87FJzWG75g3E8IVrgs0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yze4LwJmH/sCnNehifji0jCflJn93a8an5keoDuxQOz0zWLVNyK
-	ZUJPuhqH8j+1nJBLx6LtBUH7AT5v+dshcF5kTt2VUPbr5S15preXYMG9MNw9pdlMPFhb4Mld7by
-	+
-X-Gm-Gg: ASbGncsqHrtg8N7qwyRQK1+PnwbvVau9UQCY5Sfjc+wcVo/LpUHY3fsE8f+X1CsNV69
-	Hx6Qrl5pp1lZxJHZpurxPdO3q0SbwRSW5WnQpDsKoWwgMhYu/NDu7eEIU6hIffe5xB0rRwYG/Iv
-	mCTckhKEy+p7sHH9PE4AarkBSTCTd2pHm9IryWxwByLeeNW/eDgzDbkh+thmpAtokQjPAdG7gdm
-	pxoyThdp/KjOGD7jQL2AB3M0li6dV2MCOyX+22IoRsCLVTAU2kRmPnYf2Sx6IP7PpsEe07Dx4it
-	kJ6XPsf/Rw==
-X-Google-Smtp-Source: AGHT+IE3o4b4BdauC6AlHv26it9Zg4i8+S7clf5AWO2pmyOuXXW5i8JwhMit4b//DvHU4sQvCrgQbw==
-X-Received: by 2002:a5d:47cf:0:b0:38c:1270:f961 with SMTP id ffacd0b85a97d-38c1270fabemr8203304f8f.46.1737553760630;
-        Wed, 22 Jan 2025 05:49:20 -0800 (PST)
+        d=1e100.net; s=20230601; t=1737553854; x=1738158654;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=LeJQbMKgxTKE/VdTo5M9qbk3XdSIS18Xn3c/OFMKt/Y=;
+        b=f4FVRb72PEJKZxs7qXX9ELBhXdJME17DQAackWZCv7Efm1+7+kxiR0xJhgxJIQw0tP
+         evEw/IXUSxUySPjaHNhQWqVcmEpMsnJfyyTiv1Kg1p7GTy4/Kx5yuS2+wlerpD5Sa2b8
+         a0UdS2SnHfnsPThpZnZUVjCQw4PDO2vg8tzOqSqQtLd6zX/j6lW455BWrvccyXE9YHp6
+         CDeXV0ZLtyFOFKk9GYbQhWoQotR338aVKmaO1De9ej4XSckRBAQUOeGf7L36WpAZ/erk
+         GWwdYkt853dhlLwdfSLWoVcQXryuhe+3PkpWTTCwc7PjaaRLfh7coJ+RVc6y0HOXEega
+         zapw==
+X-Forwarded-Encrypted: i=1; AJvYcCVnWoFDmu3UuNnspJomlMaj2UXIQLiYvbhDxW5JBMOiXy1LlJ5AtYcDsZY3S8K/0CCqE1airCg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw9VzWnXXTuLWO2m6nfUSwAgmczw4OcISxRQQRvFE2joesdFndK
+	Jbh9dqh+kvzVMDdrjD88HiLPXbKYXopebULN7FN42XlplK9xfKETYvFh7WObbm/dqnARw4EeKcm
+	9
+X-Gm-Gg: ASbGncscb9drRLIN+aQFKKJfvN6EZy7lUwnSVSMSZIjWGGsWVl8xgnHkhKtCp9kP00R
+	wtOa1xjRWVYdiO3BpMlqEjg4CpSsv624WN97Ug9P0gCDCwqQUQmIBRwyXEowzUUtpBe868kBJzv
+	IiR3gO1YoFSTTra9OC5Izj2hqud4IzEskYZuEuHEa7ZczqSd6iAQNQQGg946lKSdXM/ef+mS+m1
+	xHeK9MtIMUcjXkYo54dkRX8DyHMeJ/nkWCZAFAjixDwpFFL9dpFzRDgTHBVyXNPVImVW4kwp58=
+X-Google-Smtp-Source: AGHT+IFV7PIhFkke0uCO2oWIdMNtHM2fB8T0QZVi6jL0x9DpK6ZPV63ZMQQxSYMhiuEQfz57I9x/1A==
+X-Received: by 2002:a05:600c:4e06:b0:434:e8cf:6390 with SMTP id 5b1f17b1804b1-438913c6856mr195769175e9.6.1737553854420;
+        Wed, 22 Jan 2025 05:50:54 -0800 (PST)
 Received: from localhost ([196.207.164.177])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38bf3214c5csm16346804f8f.8.2025.01.22.05.49.19
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-438b3189924sm26248475e9.3.2025.01.22.05.50.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Jan 2025 05:49:20 -0800 (PST)
-Date: Wed, 22 Jan 2025 16:49:17 +0300
+        Wed, 22 Jan 2025 05:50:53 -0800 (PST)
+Date: Wed, 22 Jan 2025 16:50:45 +0300
 From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Thomas Graf <tgraf@suug.ch>
-Cc: "David S. Miller" <davem@davemloft.net>,
+To: Simon Horman <horms@kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Steffen Klassert <steffen.klassert@secunet.com>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
-Subject: [PATCH net] net: netlink: prevent potential integer overflow in
- nlmsg_new()
-Message-ID: <58023f9e-555e-48db-9822-283c2c1f6d0e@stanley.mountain>
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kernel-janitors@vger.kernel.org
+Subject: Re: [PATCH net] xfrm: fix integer overflow in
+ xfrm_replay_state_esn_len()
+Message-ID: <32890a3f-1258-4c03-86e1-86c0e4e8e415@stanley.mountain>
+References: <018ecf13-e371-4b39-8946-c7510baf916b@stanley.mountain>
+ <20250122123936.GB390877@kernel.org>
+ <670272e2-a4b2-4bdd-95c0-26d1e7c65816@stanley.mountain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -90,34 +95,45 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-X-Mailer: git-send-email haha only kidding
+In-Reply-To: <670272e2-a4b2-4bdd-95c0-26d1e7c65816@stanley.mountain>
 
-The "payload" variable is type size_t, however the nlmsg_total_size()
-function will a few bytes to it and then truncate the result to type
-int.  That means that if "payload" is more than UINT_MAX the alloc_skb()
-function might allocate a buffer which is smaller than intended.
+On Wed, Jan 22, 2025 at 04:16:48PM +0300, Dan Carpenter wrote:
+> On Wed, Jan 22, 2025 at 12:39:36PM +0000, Simon Horman wrote:
+> > > The one caller that I didn't modify was xfrm_sa_len().  That's a bit
+> > > complicated and also I'm kind of hoping that we don't handle user
+> > > controlled data in that function?  The place where we definitely are
+> > > handling user data is in xfrm_alloc_replay_state_esn() and this patch
+> > > fixes that.
+> > 
+> > Yes, that is a bit "complex".
+> > 
+> 
+> I don't have a reason to suspect xfrm_sa_len() but if we were to write
+> a paranoid version of it then I've written that draft below.  I stole
+> Herbert's xfrm_kblen2klen() function[1].  Also the nlmsg_new() function
+> would need to be updated as well.
+> 
+> https://lore.kernel.org/all/Z2KZC71JZ0QnrhfU@gondor.apana.org.au/
+> 
+> regards,
+> dan carpenter
+> 
+> diff --git a/include/net/netlink.h b/include/net/netlink.h
+> index e015ffbed819..ca7a8152e6d4 100644
+> --- a/include/net/netlink.h
+> +++ b/include/net/netlink.h
+> @@ -1015,6 +1015,8 @@ static inline struct nlmsghdr *nlmsg_put_answer(struct sk_buff *skb,
+>   */
+>  static inline struct sk_buff *nlmsg_new(size_t payload, gfp_t flags)
+>  {
+> +	if (payload > INT_MAX)
+> +		return NULL;
+>  	return alloc_skb(nlmsg_total_size(payload), flags);
+>  }
 
-Cc: stable@vger.kernel.org
-Fixes: bfa83a9e03cf ("[NETLINK]: Type-safe netlink messages/attributes interface")
-Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
----
- include/net/netlink.h | 2 ++
- 1 file changed, 2 insertions(+)
+Actually, this chunk is necessary.  Let me sent that by itself.
 
-diff --git a/include/net/netlink.h b/include/net/netlink.h
-index e015ffbed819..ca7a8152e6d4 100644
---- a/include/net/netlink.h
-+++ b/include/net/netlink.h
-@@ -1015,6 +1015,8 @@ static inline struct nlmsghdr *nlmsg_put_answer(struct sk_buff *skb,
-  */
- static inline struct sk_buff *nlmsg_new(size_t payload, gfp_t flags)
- {
-+	if (payload > INT_MAX)
-+		return NULL;
- 	return alloc_skb(nlmsg_total_size(payload), flags);
- }
- 
--- 
-2.45.2
+regards,
+dan carpenter
 
 
