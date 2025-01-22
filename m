@@ -1,114 +1,137 @@
-Return-Path: <netdev+bounces-160329-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160330-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4353A1946A
-	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 15:56:14 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A5B51A19474
+	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 15:59:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 989DC3AA26D
-	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 14:56:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 86CBA1882A01
+	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 14:59:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37A892144A5;
-	Wed, 22 Jan 2025 14:56:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E405214218;
+	Wed, 22 Jan 2025 14:59:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RM7Q5tBd"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11D0C19C56C;
-	Wed, 22 Jan 2025 14:56:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20D37211712;
+	Wed, 22 Jan 2025 14:59:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737557762; cv=none; b=UGIUCsUPWsjNTs5rgeoEp8uxt1aTuQQCXaiWDf5K78zwIb8DEbLrLPxrqgVAVfbTFhbEzvutaYGgjCepRadPQPFtUpmcFFjFf7F4ZAZCAHiIrt6VpPrCj2Rcw7lqZ36j8belCZrsINC+KWJQgXjd0V30eWXqFkQeegsL8dRWNg8=
+	t=1737557963; cv=none; b=H176gwrtuN1/l8JK7YNAGMFY06ouXzofnCrMeIrrWFpKuQ5/TZoZc2yfmKa6zn5lygXM4pRBH8bUzRfND5GQYWgS4Qyrxtn4qB3YZOgsfJC4Ag9LBhM6U3AcBCm+FAzM9OizqBPWysy5b/gp/18w3krTZvpwEL450ERnI+M8qzA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737557762; c=relaxed/simple;
-	bh=rvWlu+bKgz3ZewfcGUdmZW0sol8tRslku+B5BC3UbJ0=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=MfcHR+n6MrudPQEtrmIEWzaOAcBu7ha1zHmFx1BFZTpVvhyaU1eyI0wdkXj293DRadRe0sJoAN1mDTnTFCXusp3unVnwEuRBngYImqhruiMexPKo8tZE5wrVUnT0zzvM7Jd1XGqjJilCB9d2u9yqfKD+Ij82gQ724optyYJg+Aw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6B7DEC4CED3;
-	Wed, 22 Jan 2025 14:55:59 +0000 (UTC)
-Date: Wed, 22 Jan 2025 09:56:04 -0500
-From: Steven Rostedt <rostedt@goodmis.org>
-To: Breno Leitao <leitao@debian.org>
-Cc: Jason Xing <kerneljasonxing@gmail.com>, Eric Dumazet
- <edumazet@google.com>, Masami Hiramatsu <mhiramat@kernel.org>, Mathieu
- Desnoyers <mathieu.desnoyers@efficios.com>, "David S. Miller"
- <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
- <horms@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-trace-kernel@vger.kernel.org, kernel-team@meta.com, Yonghong Song
- <yonghong.song@linux.dev>, Song Liu <song@kernel.org>, Martin KaFai Lau
- <martin.lau@kernel.org>
-Subject: Re: [PATCH RFC net-next] trace: tcp: Add tracepoint for
- tcp_cwnd_reduction()
-Message-ID: <20250122095604.3c93bc93@gandalf.local.home>
-In-Reply-To: <20250122-vengeful-myna-of-tranquility-f0f8cf@leitao>
-References: <20250120-cwnd_tracepoint-v1-1-36b0e0d643fa@debian.org>
-	<CAL+tcoC+A94uzaSZ+SKhV04=iDWrvUGEfxYJKYCF0ovqvyhfOg@mail.gmail.com>
-	<20250120-panda-of-impressive-aptitude-2b714e@leitao>
-	<CAL+tcoCzStjkEMdNw5ORYbQy3VnVE9A6aj6HcmQvGj3VG1VypA@mail.gmail.com>
-	<20250120-daring-outstanding-jaguarundi-c8aaed@leitao>
-	<20250120100340.4129eff7@batman.local.home>
-	<20250122-vengeful-myna-of-tranquility-f0f8cf@leitao>
-X-Mailer: Claws Mail 3.20.0git84 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1737557963; c=relaxed/simple;
+	bh=c6nwRLk/ehaOCxcKDXFXDOxPoKD5idgpD7Lx+jfeLUM=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=uOV0+swdcO5CLPpsfAWWAGWyNqi3uCPJTYcqBSLHCXgrj9THMdDF8YAu1g6Bu/sY+DjlhbRQxiRjmvUs6EfqRxW3u2D/vA500vZTVO3QAaviAtdK6HCVOp1Aew5NTer9MeV/XxcjN6qygrFIQs/iGsNOtryG0PITqK5uOQjWl0w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RM7Q5tBd; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9FCD1C4CED2;
+	Wed, 22 Jan 2025 14:59:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1737557962;
+	bh=c6nwRLk/ehaOCxcKDXFXDOxPoKD5idgpD7Lx+jfeLUM=;
+	h=From:Date:Subject:To:Cc:From;
+	b=RM7Q5tBd/dLszol2K96sHGTGWwEZgwNyHt12baL1j0+08mLCsJVNRzo8U6V9J5+u0
+	 YakeMj7eq2N8y+E9419ySwk17pBMuJNjoKCyMmNXFlfvuefAMbH1d7E6oyPcRUfoAT
+	 pAvtduwQyzgFU49Q0oM9pgOSK+7kTckfWMavNtBatKJctymCAKurjppXACWBUVBjck
+	 Xjdd4dvEONFTVmCYAiocu99J1JTwqYSB6qcA0eTz93RYq7j4S3MB8C+zWjHehlXOig
+	 0juRCMIp+0b4rAvJBHRmqRqDHGIwB955VNVLWNhyCODOWg39O02WgeO9bpIss0TqHk
+	 31Nz5YeP/MmTg==
+From: Jeff Layton <jlayton@kernel.org>
+Date: Wed, 22 Jan 2025 09:59:17 -0500
+Subject: [PATCH] sunrpc: add netns inum and srcaddr to debugfs rpc_xprt
+ info
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+Message-Id: <20250122-nfs-6-14-v1-1-164b0b5aa330@kernel.org>
+X-B4-Tracking: v=1; b=H4sIAMQHkWcC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
+ vPSU3UzU4B8JSMDI1MDQyMj3by0Yl0zXUMTXfM0c2PzlNQkM2NTMyWg8oKi1LTMCrBR0bG1tQC
+ TqNzFWgAAAA==
+X-Change-ID: 20250122-nfs-6-14-7f737deb6356
+To: Chuck Lever <chuck.lever@oracle.com>, Neil Brown <neilb@suse.de>, 
+ Olga Kornievskaia <okorniev@redhat.com>, Dai Ngo <Dai.Ngo@oracle.com>, 
+ Tom Talpey <tom@talpey.com>, Trond Myklebust <trondmy@kernel.org>, 
+ Anna Schumaker <anna@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
+Cc: linux-nfs@vger.kernel.org, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Jeff Layton <jlayton@kernel.org>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1639; i=jlayton@kernel.org;
+ h=from:subject:message-id; bh=c6nwRLk/ehaOCxcKDXFXDOxPoKD5idgpD7Lx+jfeLUM=;
+ b=owEBbQKS/ZANAwAIAQAOaEEZVoIVAcsmYgBnkQfJ9To4FYE3jMTHQiHRtMZXCApL4M2HWSbvi
+ OLp073zk3aJAjMEAAEIAB0WIQRLwNeyRHGyoYTq9dMADmhBGVaCFQUCZ5EHyQAKCRAADmhBGVaC
+ Fb6eD/9ynCH6WFt3Gma2DvE1r5+rt4NMlryUPlYMIirXAA4LNO0IMLcJwA7zcuycIytq2BqGgBk
+ VAITZJFX9k0AfoLWOByz781rP50BhV382VDTpZz7+888ig8Jc/tewwxhlCCMBFeHFMb61dXzzF+
+ N+L1FkXd+0TeBxtMuppAwo45JnPWC7rBJ9f7CdDdmf3h4eeLovWUuJhhV2+ZhQCiT67dbeUw7oM
+ oxTdnTF3f6CWyaUOhMElHyULEPi49LyxKcmeoRoZxx+7XPg+hHtswqa/jJ1tv7JHIjL+WFyHnN6
+ lPb/ZMjitd25BwIGeEuTkCccJA/0MQv38wWneWNWX5RwRwNKVxDvkbvgLmDZSRfxvxApEM4EoRd
+ rPJG+Ut7K5OqYb6XGUl45xYMNjUv+1YBK6sA2YUJDl9W5VG/+tw8at95TCbjoOtqEjPuKmM/8Hw
+ Zqqr3fH8nKRmDTOKzukpP2Yv9bcYO7c71OX/sthanoypAIUWgzyLDTmqyuAQl3t0s71jrOXrbsD
+ Pt6sOAFI5swwHznDYsHpUBr+q4aGYa325D3FBN/NltWAWy85mAYOjNDrX5TVRy9IIlQz9prw8js
+ YDzrVBqwnjjS99APpiTuKvoZdc/9Xdlwv3xSCh45lvZ7d8Tpwtk3ttgtmL36/P7aN7ak/GuLEHu
+ j0fB+vweC/Q3TCA==
+X-Developer-Key: i=jlayton@kernel.org; a=openpgp;
+ fpr=4BC0D7B24471B2A184EAF5D3000E684119568215
 
-On Wed, 22 Jan 2025 01:39:42 -0800
-Breno Leitao <leitao@debian.org> wrote:
+The output format should provide a value that matches the one in
+the /proc/<pid>/ns/net symlink. This makes it simpler to match the
+rpc_xprt and rpc_clnt to a particular container.
 
-> Right, DECLARE_TRACE would solve my current problem, but, a056a5bed7fa
-> ("sched/debug: Export the newly added tracepoints") says "BPF doesn't
-> have infrastructure to access these bare tracepoints either.".
-> 
-> Does BPF know how to attach to this bare tracepointers now?
-> 
-> On the other side, it seems real tracepoints is getting more pervasive?
-> So, this current approach might be OK also?
-> 
-> 	https://lore.kernel.org/bpf/20250118033723.GV1977892@ZenIV/T/#m4c2fb2d904e839b34800daf8578dff0b9abd69a0
+Also, when the xprt defines the get_srcaddr operation, use that to
+display the source address as well.
 
-Thanks for the pointer. I didn't know this discussion was going on. I just
-asked to attend if this gets accepted. I'm only a 6 hour drive from
-Montreal anyway.
+Signed-off-by: Jeff Layton <jlayton@kernel.org>
+---
+This is more client-side code, so I figure this should go in via the NFS
+client tree, but if Chuck would rather pick it up, then that's fine too.
+---
+ net/sunrpc/debugfs.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-> 
-> > You can see its use in include/trace/events/sched.h  
-> 
-> I suppose I need to export the tracepointer with
-> EXPORT_TRACEPOINT_SYMBOL_GPL(), right?
+diff --git a/net/sunrpc/debugfs.c b/net/sunrpc/debugfs.c
+index a176d5a0b0ee9a2c0ca1d1ed3131b67b782c3296..3b39493234d7079ff762a862bdd51725f36472dc 100644
+--- a/net/sunrpc/debugfs.c
++++ b/net/sunrpc/debugfs.c
+@@ -179,6 +179,22 @@ xprt_info_show(struct seq_file *f, void *v)
+ 	seq_printf(f, "addr:  %s\n", xprt->address_strings[RPC_DISPLAY_ADDR]);
+ 	seq_printf(f, "port:  %s\n", xprt->address_strings[RPC_DISPLAY_PORT]);
+ 	seq_printf(f, "state: 0x%lx\n", xprt->state);
++	seq_printf(f, "netns: %u\n", xprt->xprt_net->ns.inum);
++
++	if (xprt->ops->get_srcaddr) {
++		int ret, buflen;
++		char buf[INET6_ADDRSTRLEN];
++
++		buflen = ARRAY_SIZE(buf);
++		ret = xprt->ops->get_srcaddr(xprt, buf, buflen);
++		if (ret > 0) {
++			if (ret < buflen - 1)
++				buf[ret] = '\0';
++		} else {
++			ret = sprintf(buf, "<closed>");
++		}
++		seq_printf(f, "saddr: %s\n", buf);
++	}
+ 	return 0;
+ }
+ 
 
-For modules to use them directly, yes. But there's other ways too.
+---
+base-commit: ffd294d346d185b70e28b1a28abe367bbfe53c04
+change-id: 20250122-nfs-6-14-7f737deb6356
 
-> 
-> I am trying to hack something as the following, but, I struggled to hook
-> BPF into it.
-
-Maybe you can use the iterator to search for the tracepoint.
-
-#include <linux/tracepoint.h>
-
-static void fct(struct tracepoint *tp, void *priv)
-{
-	if (!tp->name || strcmp(tp->name, "<tracepoint_name>") != 0)
-		return 0;
-
-	// attach to tracepoint tp
-}
-
-[..]
-	for_each_kernel_tracepoint(fct, NULL);
-
-This is how LTTng hooks to tracepoints.
-
--- Steve
+Best regards,
+-- 
+Jeff Layton <jlayton@kernel.org>
 
 
