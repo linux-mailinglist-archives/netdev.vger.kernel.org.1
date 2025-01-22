@@ -1,137 +1,136 @@
-Return-Path: <netdev+bounces-160290-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160291-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F08EA1925B
-	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 14:26:37 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D0FA8A192A7
+	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 14:35:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 716BD188214B
-	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 13:26:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 21A2C1620FA
+	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 13:34:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C154B21323C;
-	Wed, 22 Jan 2025 13:26:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3FB384E1C;
+	Wed, 22 Jan 2025 13:34:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b="SaQvURVw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kJpXlEyv"
 X-Original-To: netdev@vger.kernel.org
-Received: from server.wki.vra.mybluehostin.me (server.wki.vra.mybluehostin.me [162.240.238.73])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 549A818E25;
-	Wed, 22 Jan 2025 13:26:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.240.238.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE4641BDCF;
+	Wed, 22 Jan 2025 13:34:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737552390; cv=none; b=Tgu17//UItCCaiEXl4NCqQpAtfVKpJylrJJvWUv55O4XALv9Xey2/uGqwXNnyBz3gLVu0ZLgiZzq5YuDdEg/04egygV4V3hLahQrQ0Q6SdS05j9R1mGcNrYAIZgXoCN9aj8hSEhD0NBj6ikwaOapKz7BckqZq68PTjH7GEd+U6Q=
+	t=1737552895; cv=none; b=aXEjfh9GfTFUCkrETBEvGsVS/7HTjO+wSE8Sd7O19r2k7nNbzcmz85q4V8ZrnMU6vuhqW4aTAznek1zyvwuBhv6HEY4JssztM440xuRERuZ4tAMXKOKQGcGctdPl6uuWWGN5GvgmKA+yp0zTyI6awRfF3Tps8NU+PfOz6ctttBQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737552390; c=relaxed/simple;
-	bh=78HHq9EovL4XcsXoje3XFkp7ZlEDtwBMREc3iKu49vU=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 MIME-Version:Content-Type; b=NWzSgl2PvtS8UrSBRu8Scj085zlo4xFXSLmKVRHXoQLbftvuBfg0mR1nxbLvFgeNqtuC6bu7T6Dp8gTHW3/p8RUP7bpNpXmMrIlLuElTYvCqLf3iDAyI8vX+XxegY9MDSFfGeu7Nokf2P5vXRprGZVrf87FZsYixGbPiAFd4bOU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=couthit.com; spf=pass smtp.mailfrom=couthit.com; dkim=pass (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b=SaQvURVw; arc=none smtp.client-ip=162.240.238.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=couthit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=couthit.com
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=couthit.com
-	; s=default; h=Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:
-	References:In-Reply-To:Message-ID:Cc:To:From:Date:Sender:Reply-To:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=5sSXsNbKlOVO1rVxHF9g5oZKI9cP2dp7dJVKqJoqmKw=; b=SaQvURVweuvJgwVC5odAl8eXZ7
-	8+4StJGNUPY/AGK819SWCPqNyffcWe6+co9PAT8B9A6wNZsnQvTbzkL2dJHRHrpcYW6ZjoHFDj6vp
-	peP3k/buB+jYd7kFWV3+qvUEvzEXT5TQNzMnYj2gVB2/HxkLO2PqVHq9yeLQdYqt8gF8irCU4V+Cq
-	5nSI9c+JIR5R7F7DlsqIJG7acv51sazF91TjyPUKOU+EgaLaEjQnwXkuzzVWGzZpTOv4pt110OBGg
-	axEzaoEj4L9BlA+NGfoR/b9FrPtYIRFOH1UC9tC5hOC7VQzYMwHsRPfcaC5IksUGjU0qNre+X6bK6
-	Zui+nLUQ==;
-Received: from [122.175.9.182] (port=52596 helo=zimbra.couthit.local)
-	by server.wki.vra.mybluehostin.me with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96.2)
-	(envelope-from <basharath@couthit.com>)
-	id 1taakR-00053S-1X;
-	Wed, 22 Jan 2025 18:56:23 +0530
-Received: from zimbra.couthit.local (localhost [127.0.0.1])
-	by zimbra.couthit.local (Postfix) with ESMTPS id 2C0F81781C74;
-	Wed, 22 Jan 2025 18:56:15 +0530 (IST)
-Received: from localhost (localhost [127.0.0.1])
-	by zimbra.couthit.local (Postfix) with ESMTP id 0C1951783FED;
-	Wed, 22 Jan 2025 18:56:15 +0530 (IST)
-Received: from zimbra.couthit.local ([127.0.0.1])
-	by localhost (zimbra.couthit.local [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id imthwkGCwxge; Wed, 22 Jan 2025 18:56:14 +0530 (IST)
-Received: from zimbra.couthit.local (zimbra.couthit.local [10.10.10.103])
-	by zimbra.couthit.local (Postfix) with ESMTP id B924E1781C74;
-	Wed, 22 Jan 2025 18:56:14 +0530 (IST)
-Date: Wed, 22 Jan 2025 18:56:14 +0530 (IST)
-From: Basharath Hussain Khaja <basharath@couthit.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: basharath <basharath@couthit.com>, danishanwar <danishanwar@ti.com>, 
-	rogerq <rogerq@kernel.org>, andrew+netdev <andrew+netdev@lunn.ch>, 
-	davem <davem@davemloft.net>, edumazet <edumazet@google.com>, 
-	kuba <kuba@kernel.org>, pabeni <pabeni@redhat.com>, 
-	Rob Herring <robh@kernel.org>, krzk+dt <krzk+dt@kernel.org>, 
-	conor+dt <conor+dt@kernel.org>, nm <nm@ti.com>, 
-	ssantosh <ssantosh@kernel.org>, tony <tony@atomide.com>, 
-	richardcochran <richardcochran@gmail.com>, 
-	parvathi <parvathi@couthit.com>, schnelle <schnelle@linux.ibm.com>, 
-	rdunlap <rdunlap@infradead.org>, diogo ivo <diogo.ivo@siemens.com>, 
-	m-karicheri2 <m-karicheri2@ti.com>, horms <horms@kernel.org>, 
-	jacob e keller <jacob.e.keller@intel.com>, 
-	m-malladi <m-malladi@ti.com>, 
-	javier carrasco cruz <javier.carrasco.cruz@gmail.com>, 
-	afd <afd@ti.com>, s-anna <s-anna@ti.com>, 
-	linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, 
-	netdev <netdev@vger.kernel.org>, 
-	devicetree <devicetree@vger.kernel.org>, 
-	linux-kernel <linux-kernel@vger.kernel.org>, 
-	linux-omap <linux-omap@vger.kernel.org>, 
-	pratheesh <pratheesh@ti.com>, prajith <prajith@ti.com>, 
-	vigneshr <vigneshr@ti.com>, praneeth <praneeth@ti.com>, 
-	srk <srk@ti.com>, rogerq <rogerq@ti.com>, 
-	krishna <krishna@couthit.com>, pmohan <pmohan@couthit.com>, 
-	mohan <mohan@couthit.com>
-Message-ID: <1556294138.382514.1737552374554.JavaMail.zimbra@couthit.local>
-In-Reply-To: <7870d1e4-074f-4dc5-aae5-ac5fc725cc43@lunn.ch>
-References: <20250109105600.41297-1-basharath@couthit.com> <20250109105600.41297-2-basharath@couthit.com> <7870d1e4-074f-4dc5-aae5-ac5fc725cc43@lunn.ch>
-Subject: Re: [RFC PATCH 01/10] dt-bindings: net: ti: Adds device tree
- binding for DUAL-EMAC mode support on PRU-ICSS2 for AM57xx SOCs
+	s=arc-20240116; t=1737552895; c=relaxed/simple;
+	bh=7DfnBrMHaBayCccsD/q52Q3ilgtaRdWdr/x3Gw0r2XY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TX8bkL2TgxUU9VzuoIJNX2ZzUaRVxAE98ihw8U61yj5G7d2/E80kZbnCiI9HrE45JarX/1cawh8p/oKskUNUJFjYZPMX+KyzhCShFuvo2Vm2Td45U/bYeSkQPrU3SEzrEZ35DA9lVwKbwHfyj7kEa7SdfY3ERaSqgoqnT2n+l9Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kJpXlEyv; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 227BBC4CED6;
+	Wed, 22 Jan 2025 13:34:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1737552895;
+	bh=7DfnBrMHaBayCccsD/q52Q3ilgtaRdWdr/x3Gw0r2XY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=kJpXlEyv7n9CG7ZRDA2nS+LWBnhs1o58kuVfKdat3ym/LC5WJVE5RRiXv4JLyu2DM
+	 2PAOPTBFQI/WaUx8B7/CWkSeD1S42ZpsuT5UcxvBdgG7SjhddajSxgZUUCcJIIx6lf
+	 ZkBJz7qMlR2Gslw1+daM2Io4wCJK9iYx5WUPfPqNHGtuVHp7Oqjsw+w3cDOxHCH7ly
+	 S+q1AoVrZLQ9HamDm9OLRTnnrz6BKzrtI5WOlc4ov5IxxR4xlFA6rIVOsc7LDj8EN3
+	 WmJVnW/2F1MuyzHQ++ag89h1Z++m0wlreyPh1/aNvJc4jXqdgdnYonsVvW4u4t4DLd
+	 7L7ySImQEMs9w==
+Date: Wed, 22 Jan 2025 13:34:50 +0000
+From: Simon Horman <horms@kernel.org>
+To: Huacai Chen <chenhuacai@loongson.cn>
+Cc: Huacai Chen <chenhuacai@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	loongarch@lists.linux.dev, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org,
+	Chong Qiao <qiaochong@loongson.cn>,
+	Feiyang Chen <chenfeiyang@loongson.cn>,
+	Yanteng Si <si.yanteng@linux.dev>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Serge Semin <fancer.lancer@gmail.com>,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH] net: stmmac: dwmac-loongson: Set correct
+ {tx,rx}_fifo_size
+Message-ID: <20250122133450.GI390877@kernel.org>
+References: <20250121093703.2660482-1-chenhuacai@loongson.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-Mailer: Zimbra 8.8.15_GA_3968 (ZimbraWebClient - FF113 (Linux)/8.8.15_GA_3968)
-Thread-Topic: dt-bindings: net: ti: Adds device tree binding for DUAL-EMAC mode support on PRU-ICSS2 for AM57xx SOCs
-Thread-Index: 7/757csu1vp/TbaDoZJV2PkPCfrayg==
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - server.wki.vra.mybluehostin.me
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - couthit.com
-X-Get-Message-Sender-Via: server.wki.vra.mybluehostin.me: authenticated_id: smtp@couthit.com
-X-Authenticated-Sender: server.wki.vra.mybluehostin.me: smtp@couthit.com
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250121093703.2660482-1-chenhuacai@loongson.cn>
 
++ Feiyang Chen, Yanteng Si, Alexandre Torgue, Maxime Coquelin, Serge Semin,
+  linux-arm-kernel
 
->> +          ti,no-half-duplex:
->> +            type: boolean
->> +            description:
->> +              Disable half duplex operation on ICSSM MII port.
+On Tue, Jan 21, 2025 at 05:37:03PM +0800, Huacai Chen wrote:
+> Now for dwmac-loongson {tx,rx}_fifo_size are uninitialised, which means
+> zero. This means dwmac-loongson doesn't support changing MTU, so set the
+> correct tx_fifo_size and rx_fifo_size for it (16KB multiplied by channel
+> counts).
 > 
-> I already asked this in the next patch, but why have this property? Is
-> it because the hardware is broken? Or is this some sort of policy?
-> Policy should not be in DT, DT describes the hardware, not the policy
-> of how you use the hardware.
+> Note: the Fixes tag is not exactly right, but it is a key commit of the
+> dwmac-loongson series.
 > 
+> Cc: stable@vger.kernel.org
+> Fixes: ad72f783de06827a1f ("net: stmmac: Add multi-channel support")
+> Signed-off-by: Chong Qiao <qiaochong@loongson.cn>
+> Signed-off-by: Huacai Chen <chenhuacai@loongson.cn>
 
-This series of patches enables support for full-duplex only. Support for 
-half-duplex will be added in subsequent revisions. We will clean it up in
-the next version.
+Thanks, this change looks good to me.
+And I agree that MTU setting cannot succeed without it.
 
-Thanks & Best Regards,
-Basharath
+Reviewed-by: Simon Horman <horms@kernel.org>
+
+Some process notes regarding Networking patches to keep
+in mind for next time.
+
+1. Please set the target tree. In this case, as this is a fix
+   for code present in net. In general, otherwise it would be net-next.
+
+   Subject: [PATCH net] ...
+
+2. Please generate a CC list using
+
+   ./scripts/get_maintainer.pl this.patch
+
+   The b4 tool can help with this.
+
+Link: https://docs.kernel.org/process/maintainer-netdev.html
+
+> ---
+>  drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+> index bfe6e2d631bd..79acdf38c525 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+> @@ -574,6 +574,9 @@ static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id
+>  	if (ret)
+>  		goto err_disable_device;
+>  
+> +	plat->tx_fifo_size = SZ_16K * plat->tx_queues_to_use;
+> +	plat->rx_fifo_size = SZ_16K * plat->rx_queues_to_use;
+> +
+>  	if (dev_of_node(&pdev->dev))
+>  		ret = loongson_dwmac_dt_config(pdev, plat, &res);
+>  	else
+> -- 
+> 2.47.1
+> 
+> 
 
