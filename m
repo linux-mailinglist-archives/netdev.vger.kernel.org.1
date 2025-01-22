@@ -1,113 +1,206 @@
-Return-Path: <netdev+bounces-160307-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160306-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7F7CA19363
-	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 15:10:47 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 84E5BA19361
+	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 15:10:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EB72718819FC
-	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 14:10:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 639863A45AE
+	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 14:10:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35EE3213E7B;
-	Wed, 22 Jan 2025 14:10:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5E86212F82;
+	Wed, 22 Jan 2025 14:10:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bFzum6mz"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="Q6LH+uwb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-124.freemail.mail.aliyun.com (out30-124.freemail.mail.aliyun.com [115.124.30.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80DDF211A3D
-	for <netdev@vger.kernel.org>; Wed, 22 Jan 2025 14:10:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2ABE2322E;
+	Wed, 22 Jan 2025 14:10:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737555037; cv=none; b=t/H9loEYn5oEK3FZK+id0VUbmFL/4bIy8blulNHG+nh08EofbbcnCFvLIHtEAyH9EkPwjaFKWwbdfoGrY2kl1dOz6hYiI0LFLRit44UmWOWz6nF3HnC/UxSlHoPqUGbWj+W6dR7IGLAWX49ER5II+rNLVQpHTRkhmvaqK28w7lo=
+	t=1737555035; cv=none; b=jTbu7rv9wAyUB/mIIgM1tkpEz4CTDdrUM5/BRacACIXEuEdeFfhT7sN2RbpNfpSm6Q5Iw3KI8HTXKXa+m9XTsaf6ywNuyu9hMJi3k1lPBVBKLvsULTjwIejuOX0AIRlTb/PgkjethJzQsUewtMG1mo5LKvnbSs7LXirD2D/5mTg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737555037; c=relaxed/simple;
-	bh=6TJ5VnTqM5pyJvoiZqGAu7NcBiQnT7SazTezEKHorkk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=AFcyjWLkzb2CMPAX7+zHsJrWnFw9hSJhsid2liBpaLbqNq5loH7OQ18LgDgQscKzZLDYq8uS4urhyRiw/3/LoWFGxt9dP9tjU7eXVlceMV609oR3zDkTgSqsw6dm8l+Q16/nJObRqCPntlDAjaE8hT7UYQyWXFI9RLR9noHufeg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bFzum6mz; arc=none smtp.client-ip=209.85.208.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-5d3d143376dso10494446a12.3
-        for <netdev@vger.kernel.org>; Wed, 22 Jan 2025 06:10:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1737555034; x=1738159834; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6TJ5VnTqM5pyJvoiZqGAu7NcBiQnT7SazTezEKHorkk=;
-        b=bFzum6mzeby12VmAhwHZlsNiMviBUvztz+dARoPW0Y+xWB+mCT4PSkEID1ghbR9vQe
-         IigXjEU4HXz5GPoO3MsuUVoR1uY/Zbzx6XjxIH2fBrU9bNY7srCt5ZMjtqEbiZOqvlIl
-         wEWPyFnWwUq7mDwpUa106IqLN3Td9syWkjJucyF/xIRj3WYcLFqi9291lvRKdQ0G/Ilg
-         QCFJVlrXzv84BRguSTGPhlTb91wqa4aQJSSjbxm3wkQVDbAYbgPvlb9EKJAKo/3CsGhe
-         AQ08O5DwFjwJ9ZzVE/N8b4jRK57x5jviB4ZdZVaCX6ecf9yc72FOPMzqJbQHBvAXvIFY
-         b54Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737555034; x=1738159834;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=6TJ5VnTqM5pyJvoiZqGAu7NcBiQnT7SazTezEKHorkk=;
-        b=exgiOvRKmiMoFW1dlVzuXpXTphYJtKk8ERPwd+MDG+pSS0BmRFcMHFjhz3b95jahR8
-         fgfHegNk+spwhxg2mh0p3QYU2JodFC3EmEos4bH6gsFD5kzv4ETeyTyZmyU6jIKpQlcO
-         0/bPtAmJeIVORgZrKToZu76BeR6tNKht7nEhB9b26mDuU5ZPqcoq50bGN2J2RLMmPJl0
-         y7yCg3SwagMxsm4lC2q2I5HWo98ix35zfCFXMj2vUPrjBT1YNjxPk1tXWchxbeWroiph
-         aRskwjjr9A85Wyriju3eT9qLIFLNJtnDg7MzdgAjObj6qqaIroR6t5HanxaduNwZ/zFH
-         02MA==
-X-Forwarded-Encrypted: i=1; AJvYcCUQJVw8HGuA+Yi6pMrvRznxRYBLtc8oM+k2BFVLWiEv21fcb8O/i819FGokJYeT14wEUqOw8M0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yweupwi4MI4+9S9CqWKSPe7wRJvNdTxN8ys89QY222xWovArCk6
-	raoXkgERjmesVhdwNLkmKSES11GoCKUhlHCAowNFDlnGQTZuq8PRbTKmqKH+G/N60+6hVZvQlp5
-	8t+9D+10P8XpvVM2DFzjarGQYPeg0m/emCiRAT+jqYGPw386xBw==
-X-Gm-Gg: ASbGncuxHxyUrLRqJaGfywiucxsSTnXLpGrW1uH5P6qzNOtieFwy2+qWZATwCCbWNY7
-	vlcttELhNsvPb2R1ZGWdfXFi0fJEmQlwlvz0igDYImY9ZG4Vj6A==
-X-Google-Smtp-Source: AGHT+IFfOFMkpFjYviXe0YqCSfFhFwVbLFodgDNBaqGoabqPQ2tadfiZb7twFaAwo1kc9n9xtmLXAMOTFhmNJ/ta3T0=
-X-Received: by 2002:a50:954b:0:b0:5d3:cf08:d64d with SMTP id
- 4fb4d7f45d1cf-5db7db2bfcemr15436774a12.32.1737555033615; Wed, 22 Jan 2025
- 06:10:33 -0800 (PST)
+	s=arc-20240116; t=1737555035; c=relaxed/simple;
+	bh=TZ3kKxaEch8onJrqPARpr5VxlT8632AGA/VmJffmhYo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=r+xMBGfZce86d3TkN8KpOeLX0ew4o4xGrnoR9DFd6CdeD47T35Lr6AKKzNv4V1uI18cH4VvL05E7LxDCwao3DOCDMvIwFM8yWDurAcR+H8hZi96dLGTRQpqcUIZoo44Cmrt9fyUKI5YdTHnMVLUlQIRqCclYDbp/8G6Nhyo5row=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=Q6LH+uwb; arc=none smtp.client-ip=115.124.30.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1737555028; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
+	bh=WgPyzLRGnWS0Yuqpsn6bAJScp75GHEMQMQQDX10XN5k=;
+	b=Q6LH+uwbVSylc+WB7aVyoowmcoSdgKdvobnKPGSmVy63gOzU52MhaPl0hSSQ9Q+EQmyNVAq5cPXudbb2gtO7rhrVEm7369NVun/hllL/q4hK9I46x5eAIEtEfQZNKdtlFV70AXQwvYshV1C6vD19dC3C7wwmT+EKqNHnkJtBx1k=
+Received: from localhost(mailfrom:dust.li@linux.alibaba.com fp:SMTPD_---0WO8kY.F_1737555027 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Wed, 22 Jan 2025 22:10:27 +0800
+Date: Wed, 22 Jan 2025 22:10:26 +0800
+From: Dust Li <dust.li@linux.alibaba.com>
+To: Alexandra Winter <wintera@linux.ibm.com>,
+	Julian Ruess <julianr@linux.ibm.com>,
+	Wenjia Zhang <wenjia@linux.ibm.com>,
+	Jan Karcher <jaka@linux.ibm.com>, Gerd Bayer <gbayer@linux.ibm.com>,
+	Halil Pasic <pasic@linux.ibm.com>,
+	"D. Wythe" <alibuda@linux.alibaba.com>,
+	Tony Lu <tonylu@linux.alibaba.com>,
+	Wen Gu <guwen@linux.alibaba.com>,
+	Peter Oberparleiter <oberpar@linux.ibm.com>,
+	David Miller <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>
+Cc: Niklas Schnelle <schnelle@linux.ibm.com>,
+	Thorsten Winkler <twinkler@linux.ibm.com>, netdev@vger.kernel.org,
+	linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	Simon Horman <horms@kernel.org>
+Subject: Re: [RFC net-next 0/7] Provide an ism layer
+Message-ID: <20250122141026.GO89233@linux.alibaba.com>
+Reply-To: dust.li@linux.alibaba.com
+References: <20250115195527.2094320-1-wintera@linux.ibm.com>
+ <20250116093231.GD89233@linux.alibaba.com>
+ <D73H7Q080GUQ.3BDOH23P4WDOL@linux.ibm.com>
+ <0f96574a-567e-495a-b815-6aef336f12e6@linux.ibm.com>
+ <20250117021353.GF89233@linux.alibaba.com>
+ <80330f0e-d769-4251-be2f-a2b5adb12ef2@linux.ibm.com>
+ <17f0cbf9-71f7-4cce-93d2-522943d9d83b@linux.ibm.com>
+ <20250122030459.GN89233@linux.alibaba.com>
+ <3866f996-6a1f-4f5a-9f92-01268a98baaf@linux.ibm.com>
+ <029fbf44-0627-4b1b-a884-59219897f844@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250121221519.392014-1-kuba@kernel.org> <20250121221519.392014-2-kuba@kernel.org>
-In-Reply-To: <20250121221519.392014-2-kuba@kernel.org>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 22 Jan 2025 15:10:22 +0100
-X-Gm-Features: AbW1kvYlJ-M6C3qGLQrz_lj377rWYAvf_wb7SLb4AGIf4ag06YgMTwgD-WgMKmE
-Message-ID: <CANn89iLFr48RWMz4ikX=O0qPyuJmwLjpiwXMDtS8Zg4HqWoCYg@mail.gmail.com>
-Subject: Re: [PATCH net-next 1/7] eth: tg3: fix calling napi_enable() in
- atomic context
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, pabeni@redhat.com, 
-	andrew+netdev@lunn.ch, horms@kernel.org, dan.carpenter@linaro.org, 
-	pavan.chebbi@broadcom.com, mchan@broadcom.com, kuniyu@amazon.com, 
-	romieu@fr.zoreil.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <029fbf44-0627-4b1b-a884-59219897f844@linux.ibm.com>
 
-On Tue, Jan 21, 2025 at 11:15=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> w=
-rote:
+On 2025-01-22 13:05:57, Alexandra Winter wrote:
 >
-> tg3 has a spin lock protecting most of the config,
-> switch to taking netdev_lock() explicitly on enable/start
-> paths. Disable/stop paths seem to not be under the spin
-> lock (since napi_disable() already couldn't sleep),
-> so leave that side as is.
 >
-> tg3_restart_hw() releases and re-takes the spin lock,
-> we need to do the same because dev_close() needs to
-> take netdev_lock().
+>On 22.01.25 13:02, Alexandra Winter wrote:
+>> 
+>> 
+>> On 22.01.25 04:04, Dust Li wrote:
+>>> On 2025-01-20 11:28:41, Alexandra Winter wrote:
+>>>>
+>>>>
+>>>> On 17.01.25 14:00, Alexandra Winter wrote:
+>>>>>
+>>>>>
+>>>>> On 17.01.25 03:13, Dust Li wrote:
+>>>>>>>>> Modular Approach: I've made the ism_loopback an independent kernel
+>>>>>>>>> module since dynamic enable/disable functionality is not yet supported
+>>>>>>>>> in SMC. Using insmod and rmmod for module management could provide the
+>>>>>>>>> flexibility needed in practical scenarios.
+>>>>>>>
+>>>>>>> With this proposal ism_loopback is just another ism device and SMC-D will
+>>>>>>> handle removal just like ism_client.remove(ism_dev) of other ism devices.
+>>>>>>>
+>>>>>>> But I understand that net/smc/ism_loopback.c today does not provide enable/disable,
+>>>>>>> which is a big disadvantage, I agree. The ism layer is prepared for dynamic
+>>>>>>> removal by ism_dev_unregister(). In case of this RFC that would only happen
+>>>>>>> in case of rmmod ism. Which should be improved.
+>>>>>>> One way to do that would be a separate ism_loopback kernel module, like you say.
+>>>>>>> Today ism_loopback is only 10k LOC, so I'd be fine with leaving it in the ism module.
+>>>>>>> I also think it is a great way for testing any ISM client, so it has benefit for
+>>>>>>> anybody using the ism module.
+>>>>>>> Another way would be e.g. an 'enable' entry in the sysfs of the loopback device.
+>>>>>>> (Once we agree if and how to represent ism devices in genera in sysfs).
+>>>>>> This works for me as well. I think it would be better to implement this
+>>>>>> within the common ISM layer, rather than duplicating the code in each
+>>>>>> device. Similar to how it's done in netdevice.
+>>>>>>
+>>>>>> Best regards,
+>>>>>> Dust
+>>>>>
+>>>>>
+>>>>> Is there a specific example for enable/disable in the netdevice code, you have in mind?
+>>>>> Or do you mean in general how netdevice provides a common layer?
+>>>>> Yes, everything that is common for all devices should be provided by the network layer.
+>>>>
+>>>>
+>>>> Dust for some reason, you did not 'Reply-all':
+>>>
+>>> Oh, sorry I didn't notice that
+>>>
+>>>> Dust Li wrote:
+>>>>> I think dev_close()/dev_open() are the high-level APIs, while
+>>>>> ndo_stop()/ndo_open() are the underlying device operations that we
+>>>>> can reference.
+>>>>
+>>>>
+>>>> I hear you, it can be beneficial to have a way for upper layers to
+>>>> enable/disable an ism device.
+>>>> But all this is typically a tricky area. The device driver can also have
+>>>> reasons to enable/disable a device, then hardware could do that or even
+>>>> hotplug a device. Error recovery on different levels may want to run a
+>>>> disable/enable sequence as a reset, etc. And all this has potential for
+>>>> deadlocks.
+>>>> All this is rather trivial for ism-loopback, as there is not much of a
+>>>> lower layer.
+>>>> ism-vpci already has 'HW' / device driver configure on/off and device
+>>>> add/remove.
+>>>> For a future ism-virtio, the Hipervisor may want to add/remove devices.
+>>>>
+>>>> I wonder what could be the simplest definition of an enable/disable for
+>>>> the ism layer, that we can start with? More sophisticated functionality
+>>>> can always be added later.
+>>>> Maybe support for add/remove ism-device by the device driver is
+>>>> sufficient as  starting point?
+>>>
+>>> I agree; this can be added later. For now, we can simply support
+>>> unregistering a device from the device driver. Which is already handled
+>>> by ism_dev_unregister() IIUC.
+>>>
+>>> However, I believe we still need an API and the ability to enable or
+>>> disable ISM devices from the upper layer. For example, if we want to
+>>> disable a specific ISM device (such as the loopback device) in SMC, we
+>>> should not do so by disabling the loopback device at the device layer,
+>>> as it may also serve other clients beyond SMC.
+>> 
+>> 
+>> Just a thought: not all clients have to use all available ism devices.
+>> The client could opt out without removing the device.
+>> 
+>>>
+>>> Further more, I think removing the loopback from the loopback device
+>>> driver seems unnecessory ? Since we should support that from the upper
+>>> layer in the future.
 >
-> Fixes: 413f0271f396 ("net: protect NAPI enablement with netdev_lock()")
-> Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
-> Link: https://lore.kernel.org/dcfd56bc-de32-4b11-9e19-d8bd1543745d@stanle=
-y.mountain
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
+>
+>If it is not too much effort, I would like to have a simple remove for
+>ism_loopback soon, as it would allow for simple variations of testcases.
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+Yes, this is very useful for testing before we can do that from the
+upper layer.
+
+>
+>
+>>>
+>>> Best regards,
+>>> Dust
+>> 
+>> 
+>> All good points. But it also shows that there are many options how to
+>> extend ism device handling of the upper layers / clients.
+>> e.g. I can image a loop macro ism_for_each_dev() might be nice...
+>> I'd prefer to take one step at a time. Start with a minimal useful ism
+>> layer and extend by usecase.
+
+That works for me.
+
+Best regards,
+Dust
+
 
