@@ -1,91 +1,91 @@
-Return-Path: <netdev+bounces-160190-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160191-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57466A18BC4
-	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 07:13:18 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 561A9A18BC7
+	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 07:13:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F3D34188ADCC
-	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 06:13:21 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ED3E07A48C3
+	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 06:13:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06C7F1A4F22;
-	Wed, 22 Jan 2025 06:13:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C01518FDAB;
+	Wed, 22 Jan 2025 06:13:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f72PmiKI"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CYlgTkIL"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2178314A619
-	for <netdev@vger.kernel.org>; Wed, 22 Jan 2025 06:13:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8554190674
+	for <netdev@vger.kernel.org>; Wed, 22 Jan 2025 06:13:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737526387; cv=none; b=od3/xI82+LnGiuSEcqk6SXlvngNRkL3xgWCcgYML9tEirgbLWeocFoEIPBGr+qSRM1xuKudESUPlo81Shz7zn3+RCJvxJ4F1yPXHbv3wkpuWcXugIk15VY9a01rnI8WrqIoU3m/k9z2VAoX7H9Lgoi+jaAQ6DLYN0gFugT6Zx3E=
+	t=1737526409; cv=none; b=kXpDSI3a/FR2+mlmNiiLtICQcPSP/Mwkgur1kptBy5/O+P+RwegP4S00MgCBKT1wF14TmU5ktf7akinom8lkHJ+EJq1slZ7dTMG6pqgPqMcKgxFDVxkABfNa9QG5zYG5dNzY7N/A2A1J5Hpbm4m1IqasU3jBMGKlmHeXXmFIcPc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737526387; c=relaxed/simple;
-	bh=HpceXxCPMSZiMuV6NEi/uY3vmwMc8uj1BH0VLDs8Gak=;
+	s=arc-20240116; t=1737526409; c=relaxed/simple;
+	bh=N4VHTOiMr1QEkoUwXNcQJva4+4+xsiihj3nqW8BwZ+I=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ZFTW2BX2A3Wo2Zb1oWckoKS77e9/d/1/7ffBOmBxpxsB2ICC+1ZV7lc4bB+9hKnY0rsmbkHRNgNwjo5o6OGmTYZDg1Ko8mtwuJHi/mZ1/Ji47AImF4ZEWEJsg/IavXaPkEaLlTEQT91uqRp7bZ/eWN+dGUm2KGAE2wjiCUB41Yk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=f72PmiKI; arc=none smtp.client-ip=170.10.133.124
+	 To:Cc:Content-Type; b=iV1sLB64FPjEUoDekYZ6QILIVLo+H8aGaJR/JtnIHSA/nn5LxU4diEzLHM+bbUx4loOXMCW5XpFJcOY1lr8UWMpusjZatsa0mmdZaTt/ZGt5v4qbiuwVskTCxkpPFrBiyctawEHa4YEHYl+I5/8xpYvzXE+hUzwhXnecc5uoQ7g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CYlgTkIL; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1737526384;
+	s=mimecast20190719; t=1737526406;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=HhgLJ485Y6vLoQMLXTnjuRpatShBOLIyxS5mQIk6PNw=;
-	b=f72PmiKIwx3OL5Zva7++EgVXVYkH5ndCmp28MiWjkYapheMJNgsYtHWiGxDeeRVjjUb/jP
-	1usvTppYO4vp7T0FxCGFzdpisHM0Q4SuvWilRsT1FnPWqqxbvZmfbOcga/XmrURCPxekAy
-	X3iuVjrCgVW5wEH2NBSLpz1/NcKAlvI=
-Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com
- [209.85.216.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=02nNA7RsZ956EniYLNy3FanK3JnNwTY1mjUMT95zUi4=;
+	b=CYlgTkILmdX1rlfH9y34WQF8QBblpKMSFR5bBe/1GyNkTe+8AKsvDvnUo6rF0jlM4VY+kD
+	VhUdCmGNBW9DlQgx0MZLUALIg6JBaI7WftCL5tF7Nnb74S0guQnAUTGolJoPJLQ6KwH8L+
+	IRrLpOCeFgwJ2J1cCrGCFSQxkZypKAo=
+Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
+ [209.85.216.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-608-CJxoEC8pMd-Zd9y_Is13qg-1; Wed, 22 Jan 2025 01:13:02 -0500
-X-MC-Unique: CJxoEC8pMd-Zd9y_Is13qg-1
-X-Mimecast-MFC-AGG-ID: CJxoEC8pMd-Zd9y_Is13qg
-Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-2ef91d5c863so12415871a91.2
-        for <netdev@vger.kernel.org>; Tue, 21 Jan 2025 22:13:02 -0800 (PST)
+ us-mta-502-umaSEipgOnWbNn9Q8B2Glw-1; Wed, 22 Jan 2025 01:13:24 -0500
+X-MC-Unique: umaSEipgOnWbNn9Q8B2Glw-1
+X-Mimecast-MFC-AGG-ID: umaSEipgOnWbNn9Q8B2Glw
+Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-2f2a9f056a8so12220129a91.2
+        for <netdev@vger.kernel.org>; Tue, 21 Jan 2025 22:13:24 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737526381; x=1738131181;
+        d=1e100.net; s=20230601; t=1737526403; x=1738131203;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=HhgLJ485Y6vLoQMLXTnjuRpatShBOLIyxS5mQIk6PNw=;
-        b=Ff2mq7+iK3EHSOEzvIr67Z/rzrfIY9uEP9xlTeTqbKIv1lRpK2JrpbYiU6Zelh2m5O
-         CZPLyXOn/E4fQojUdC4/RH6DFrKFdNs+Enj/MNJVkyknpAVbjyA4zYAstKOx7j9oIXeM
-         Ob0ERoGRKX16uBJOPoHpRYQ5HAiYvpwC4cT0m3d7pu6FFV6wFgeV8IB2ORiXRmq0L7H+
-         hudhuy45nqucnXfKopW2rvTsPRjaKoqfmf9zA632rpoa1KkXdzO0ZuFve2ERkQMK+IGJ
-         Db1UGudwNIFAfcEBwhPZuDj2wKitlSQm3hrcArkusI6OmNeOmdwa6ItUPL3c5P4UDfV0
-         //eg==
-X-Gm-Message-State: AOJu0YxXpRJNiBNAFBIChtEkT55ZiO8cyxIzVe0VKX6iCxcS9cg1Pf3K
-	kywgvTqlqIpaT6dfAssQXga1pxZ14DnAqUmkOVXTSIvmw7zCwS9IPkjLQa98pdPdxewBXnJrq2L
-	fFZWdo6k3N5b4tZ6GHB3jXZJBOQsaadbokjRb3i49BqHaEdByP4+5pvcF+erTwbDq0dINCJ/q79
-	+QpXmEQzsw9jsV4Qh9pTy/anlYb1jl
-X-Gm-Gg: ASbGncs3fpSsXcEX0QOt2zEhyyB7VDLWolRzdatDV3TACLgUmJzj5M9nZZzjIJhwyaX
-	mh3wO+lZ+CSzjQujO/zH/qNog+xqj4o4xGZID+tzN4Ixk06HZgPuZ
-X-Received: by 2002:a05:6a00:c92:b0:725:e499:5b8a with SMTP id d2e1a72fcca58-72dafa9ac70mr26362353b3a.15.1737526380540;
-        Tue, 21 Jan 2025 22:13:00 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGqxkNQXj1qQ2FzevSQgWxRwrblUKB9YOBicFYwTenptGz2NShL/5JAi2cM6xxZQlu/BESTppyKXhalwNK8BUI=
-X-Received: by 2002:a05:6a00:c92:b0:725:e499:5b8a with SMTP id
- d2e1a72fcca58-72dafa9ac70mr26362245b3a.15.1737526378551; Tue, 21 Jan 2025
- 22:12:58 -0800 (PST)
+        bh=02nNA7RsZ956EniYLNy3FanK3JnNwTY1mjUMT95zUi4=;
+        b=SmIFKTJEkLW0u3dUT/qfNpENSoUa5WCH028b15jXon8dL6jA+3PZK6Qi9QdifsI0j6
+         UooJRdNRtpHJ7bD2U9wHdddx6+p5yn74s54JulXLXbC+jbcmSsEQg+wDcg4rJrrnblZF
+         n8lsdL7HN38J0qUxu2MecbgfVo+cQPCL1Q4VwA8MnM2aLbWwmJXmeSNeCqHfGoi0TJnl
+         wPouH0LZqci74P03KHBYVBPs5KHbxyaIaQZBbNy96Dbe3X4THukqYCQ2DJ18P9cpHb3/
+         SazEsVpAs7I4yap4Q2/GwgWFHk2ichsJOSuUdX4f3FKFP9CE62Q5iHffLXgYby3cyJ/Z
+         7EYA==
+X-Gm-Message-State: AOJu0YyXxpCX3p1KtN/6WolCvaVV24bmSq3azQajQoLB8j01zVIoXMR1
+	B8JbD5GiwngZPACSWoHCBsQYtt5qKWSwAvBpzNvQsbBgG4pasraYzTKfECWRV9vzm50NIqwXXaP
+	hYSiqxEz9jCfKyqH92ifQnP9wlRnHwI/pe6AlJmP+l6SO/SrrLk7QGrIJrFuiTQ4H1zZON638N5
+	XsUv+URB8v/N28xpHNyu6oBO/+8Grc
+X-Gm-Gg: ASbGncuUjmvaH84Y3zTuDgcD5oPWNJeAO9B00vTQ93mp8McAxEgLjZuIIT3BorQaTWt
+	HHUuG02Nogq0RTKQtI13fXZqkiTJ5hXVdLIukFow3LNynuBgQLh+t
+X-Received: by 2002:a05:6a00:2448:b0:725:322a:922c with SMTP id d2e1a72fcca58-72daf9abd78mr33122211b3a.3.1737526403543;
+        Tue, 21 Jan 2025 22:13:23 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEWZ5jD+lVwVZrfUOdJgzO9VY01R80mkMlLuikBRjnx/qrJv98YZqo4Yk3EacdxygEGirjJku2kd0ZHp3IcPyc=
+X-Received: by 2002:a05:6a00:2448:b0:725:322a:922c with SMTP id
+ d2e1a72fcca58-72daf9abd78mr33122166b3a.3.1737526403133; Tue, 21 Jan 2025
+ 22:13:23 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250121191047.269844-1-jdamato@fastly.com> <20250121191047.269844-3-jdamato@fastly.com>
-In-Reply-To: <20250121191047.269844-3-jdamato@fastly.com>
+References: <20250121191047.269844-1-jdamato@fastly.com> <20250121191047.269844-4-jdamato@fastly.com>
+In-Reply-To: <20250121191047.269844-4-jdamato@fastly.com>
 From: Jason Wang <jasowang@redhat.com>
-Date: Wed, 22 Jan 2025 14:12:46 +0800
-X-Gm-Features: AbW1kvZnr46WR0BN5DEhhgGbxfpOOIQ2_rtXVT9nGyaO7ohwjeZikWno5pKlVeI
-Message-ID: <CACGkMEvT=J4XrkGtPeiE+8fwLsMP_B-xebnocJV8c5_qQtCOTA@mail.gmail.com>
-Subject: Re: [RFC net-next v3 2/4] virtio_net: Prepare for NAPI to queue mapping
+Date: Wed, 22 Jan 2025 14:13:12 +0800
+X-Gm-Features: AbW1kvas-yRk2J2XFrXmr6vKOy8sE2Th8wv8T5Kmo1zaNBEsKqnxc_Acux4J614
+Message-ID: <CACGkMEvLb3o3xe=GVW2ivngYoGt+0KfrWWTN1dsBT7ja-eeiQQ@mail.gmail.com>
+Subject: Re: [RFC net-next v3 3/4] virtio_net: Map NAPIs to queues
 To: Joe Damato <jdamato@fastly.com>
 Cc: netdev@vger.kernel.org, gerhard@engleder-embedded.com, leiyang@redhat.com, 
 	xuanzhuo@linux.alibaba.com, mkarsten@uwaterloo.ca, 
@@ -99,72 +99,33 @@ Content-Transfer-Encoding: quoted-printable
 On Wed, Jan 22, 2025 at 3:11=E2=80=AFAM Joe Damato <jdamato@fastly.com> wro=
 te:
 >
-> Slight refactor to prepare the code for NAPI to queue mapping. No
-> functional changes.
+> Use netif_queue_set_napi to map NAPIs to queue IDs so that the mapping
+> can be accessed by user apps.
+>
+> $ ethtool -i ens4 | grep driver
+> driver: virtio_net
+>
+> $ sudo ethtool -L ens4 combined 4
+>
+> $ ./tools/net/ynl/pyynl/cli.py \
+>        --spec Documentation/netlink/specs/netdev.yaml \
+>        --dump queue-get --json=3D'{"ifindex": 2}'
+> [{'id': 0, 'ifindex': 2, 'napi-id': 8289, 'type': 'rx'},
+>  {'id': 1, 'ifindex': 2, 'napi-id': 8290, 'type': 'rx'},
+>  {'id': 2, 'ifindex': 2, 'napi-id': 8291, 'type': 'rx'},
+>  {'id': 3, 'ifindex': 2, 'napi-id': 8292, 'type': 'rx'},
+>  {'id': 0, 'ifindex': 2, 'type': 'tx'},
+>  {'id': 1, 'ifindex': 2, 'type': 'tx'},
+>  {'id': 2, 'ifindex': 2, 'type': 'tx'},
+>  {'id': 3, 'ifindex': 2, 'type': 'tx'}]
+>
+> Note that virtio_net has TX-only NAPIs which do not have NAPI IDs, so
+> the lack of 'napi-id' in the above output is expected.
 >
 > Signed-off-by: Joe Damato <jdamato@fastly.com>
-> Reviewed-by: Gerhard Engleder <gerhard@engleder-embedded.com>
-> Tested-by: Lei Yang <leiyang@redhat.com>
-> ---
->  v2:
->    - Previously patch 1 in the v1.
->    - Added Reviewed-by and Tested-by tags to commit message. No
->      functional changes.
->
->  drivers/net/virtio_net.c | 10 ++++++++--
->  1 file changed, 8 insertions(+), 2 deletions(-)
->
-> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> index 7646ddd9bef7..cff18c66b54a 100644
-> --- a/drivers/net/virtio_net.c
-> +++ b/drivers/net/virtio_net.c
-> @@ -2789,7 +2789,8 @@ static void skb_recv_done(struct virtqueue *rvq)
->         virtqueue_napi_schedule(&rq->napi, rvq);
->  }
->
-> -static void virtnet_napi_enable(struct virtqueue *vq, struct napi_struct=
- *napi)
-> +static void virtnet_napi_do_enable(struct virtqueue *vq,
-> +                                  struct napi_struct *napi)
->  {
->         napi_enable(napi);
-
-Nit: it might be better to not have this helper to avoid a misuse of
-this function directly.
-
-Other than this.
 
 Acked-by: Jason Wang <jasowang@redhat.com>
 
 Thanks
-
->
-> @@ -2802,6 +2803,11 @@ static void virtnet_napi_enable(struct virtqueue *=
-vq, struct napi_struct *napi)
->         local_bh_enable();
->  }
->
-> +static void virtnet_napi_enable(struct virtqueue *vq, struct napi_struct=
- *napi)
-> +{
-> +       virtnet_napi_do_enable(vq, napi);
-> +}
-> +
->  static void virtnet_napi_tx_enable(struct virtnet_info *vi,
->                                    struct virtqueue *vq,
->                                    struct napi_struct *napi)
-> @@ -2817,7 +2823,7 @@ static void virtnet_napi_tx_enable(struct virtnet_i=
-nfo *vi,
->                 return;
->         }
->
-> -       return virtnet_napi_enable(vq, napi);
-> +       virtnet_napi_do_enable(vq, napi);
->  }
->
->  static void virtnet_napi_tx_disable(struct napi_struct *napi)
-> --
-> 2.25.1
->
 
 
