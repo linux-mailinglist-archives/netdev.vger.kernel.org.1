@@ -1,167 +1,87 @@
-Return-Path: <netdev+bounces-160164-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160165-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0508A189B4
-	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 02:51:29 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2CA27A189BA
+	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 02:58:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9610B3A3DDD
-	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 01:51:22 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 222157A3F0B
+	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 01:58:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC67D3A1B6;
-	Wed, 22 Jan 2025 01:51:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 180B113C8F3;
+	Wed, 22 Jan 2025 01:58:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="Hgapfv9T"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G9UPUD7p"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-110.freemail.mail.aliyun.com (out30-110.freemail.mail.aliyun.com [115.124.30.110])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 978E2196;
-	Wed, 22 Jan 2025 01:51:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.110
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E887313A3ED
+	for <netdev@vger.kernel.org>; Wed, 22 Jan 2025 01:58:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737510684; cv=none; b=Wbd+X/fg1Bv2oIO0P6cpMUBVjiXBlrLYeqwPrHAe2SJVm6eiWsYI2UmTH9MbqjiUQvTix/MIbNqS8rH7sJGrFFZIHYh9VG/8w1Q8r0dsza5UxttwFEGqKFXifA4GxlffTC0j0+icPtYPqryeejkeCNRU4NS91c/fM5bXMWS42eQ=
+	t=1737511102; cv=none; b=QgeBVaImzQgjbgJ09iNQL7RVRktSjLyvQxXEKJ4oRnyTwZzhvkZeNJ0Ppm5zHkV8ezF+SwbxfzBpfWXTPJJgQsQD/Zms6rqmzjbVw/SQBLN46FLmp3OT7RKAw9JJC8LdZafD+va9sGo7r8b9PqBECGgTOxFTw82PxZqzPkm9jQw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737510684; c=relaxed/simple;
-	bh=o1vUhCZ1MIuPW9x3umjNxpr2woaO3N38+8noBsgoSXQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RqR0HsXbUsqxZ5XW4vxvlUUgu0BNWnwcT5lgnvI7sHVDcYf7O344xck0knLXylfzNX9Jp5cYzQ0CaMn+BN+lER3VJc7eqH/95VgcWdnfN+Q22YYni8F9UvtiMI26tP10y8fs4iwKeBHTnNqfQ8ijy1/Y7t/UZZkySfWL4S5xm8k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=Hgapfv9T; arc=none smtp.client-ip=115.124.30.110
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1737510672; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
-	bh=TFugPd9VsPU5LVMlrqc07WRWFR2jP8A5f/qqWIHyWZ0=;
-	b=Hgapfv9TkqlOQZjVbLdbsP/K3uhaQNMGUgpCUJ5bKkaSI5hz2dIGsksFEtiX7i6RviMoBjSwG1+tVYWPzqpTdaaCJ8TDPpyHlVCVerQ4Upw5lsqwE6RhBAVYIIGem/zOq1jfFjw00Oc31r0uTRUmO9rpNopCfpjfoqhRQld6EfU=
-Received: from localhost(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0WO6n6eL_1737510670 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Wed, 22 Jan 2025 09:51:10 +0800
-Date: Wed, 22 Jan 2025 09:51:09 +0800
-From: "D. Wythe" <alibuda@linux.alibaba.com    >
-To: Martin KaFai Lau <martin.lau@linux.dev>
-Cc: "D. Wythe" <alibuda@linux.alibaba.com>, kgraul@linux.ibm.com,
-	wenjia@linux.ibm.com, jaka@linux.ibm.com, ast@kernel.org,
-	daniel@iogearbox.net, andrii@kernel.org, pabeni@redhat.com,
-	song@kernel.org, sdf@google.com, haoluo@google.com, yhs@fb.com,
-	edumazet@google.com, john.fastabend@gmail.com, kpsingh@kernel.org,
-	jolsa@kernel.org, guwen@linux.alibaba.com, kuba@kernel.org,
-	davem@davemloft.net, netdev@vger.kernel.org,
-	linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org,
-	bpf@vger.kernel.org
-Subject: Re: [PATCH bpf-next v6 5/5] bpf/selftests: add selftest for
- bpf_smc_ops
-Message-ID: <20250122015109.GA11751@j66a10360.sqa.eu95>
-References: <20250116074442.79304-1-alibuda@linux.alibaba.com>
- <20250116074442.79304-6-alibuda@linux.alibaba.com>
- <0d398524-f335-4346-902d-7d7cd3b0685b@linux.dev>
+	s=arc-20240116; t=1737511102; c=relaxed/simple;
+	bh=9WjzxAP8kWbIspH9Ukb/GP0x4XMwGZiyCKGHct1xVK8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=fz/eOSdhgTj3QGCmNHGHaHOaWMA1HIpIyybH52s2+wQ6a5b0vWFrYARIEAQ/RaoaEqIS/bWD8iClpNTuVkPfBblYHC+nuP4ExRraUaM6zVF3pQlrgFmKc+eYRPxYpFukwg17QMcd63Af+D805J2X16ciSQIy/HUOAD7tXhbVtYU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G9UPUD7p; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E2488C4CEDF;
+	Wed, 22 Jan 2025 01:58:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1737511101;
+	bh=9WjzxAP8kWbIspH9Ukb/GP0x4XMwGZiyCKGHct1xVK8=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=G9UPUD7pY1b8FrvkHpCM0FYek5ak6EuAHB6wuvm/MOmVS1ryn1wJCzpKNtcH30KnW
+	 AfWKc6Err2JnMfa8Ssf2ONAXyxD8L1DzmuKVY1y/kUTb4Srvn37Ii5FXnFIvD9q3h5
+	 s9fOyA9n1cdKUAr54Ssl2C0pYN4w9LH1ibSGGWO+q44x22A1/O52rnuruHq06xotyf
+	 4Vyfum2EljRNocci734TE62v6v5C4mCC4xb1x914AHQJYUAGdfTZEgLliEY46vXMbr
+	 hBaPZiRZ3xH4/F7nXVWUqHI7bLUr4ptUEGT8oDNJ/w3W5q7IU9WtjYYh1MkszElHiq
+	 O4VbIYin3oNbA==
+Message-ID: <f76a142e-6d45-41b0-af94-98e819092589@kernel.org>
+Date: Tue, 21 Jan 2025 18:58:20 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0d398524-f335-4346-902d-7d7cd3b0685b@linux.dev>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] ipmr: do not call mr_mfc_uses_dev() for unres entries
+Content-Language: en-US
+To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, Simon Horman <horms@kernel.org>,
+ eric.dumazet@gmail.com, syzbot+5cfae50c0e5f2c500013@syzkaller.appspotmail.com
+References: <20250121181241.841212-1-edumazet@google.com>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <20250121181241.841212-1-edumazet@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, Jan 17, 2025 at 04:37:04PM -0800, Martin KaFai Lau wrote:
-> On 1/15/25 11:44 PM, D. Wythe wrote:
-> >This tests introduces a tiny smc_ops for filtering SMC connections based on
-> >IP pairs, and also adds a realistic topology model to verify this ops.
-> >
-> >Also, we can only use SMC loopback under CI test, so an
-> >additional configuration needs to be enabled.
-> >
-> >Follow the steps below to run this test.
-> >
-> >make -C tools/testing/selftests/bpf
-> >cd tools/testing/selftests/bpf
-> >sudo ./test_progs -t smc
-> >
-> >Results shows:
-> >Summary: 1/1 PASSED, 0 SKIPPED, 0 FAILED
-> >
-> >Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
-> >---
-> >  tools/testing/selftests/bpf/config            |   4 +
-> >  .../selftests/bpf/prog_tests/test_bpf_smc.c   | 397 ++++++++++++++++++
-> >  tools/testing/selftests/bpf/progs/bpf_smc.c   | 117 ++++++
-> >  3 files changed, 518 insertions(+)
-> >  create mode 100644 tools/testing/selftests/bpf/prog_tests/test_bpf_smc.c
-> >  create mode 100644 tools/testing/selftests/bpf/progs/bpf_smc.c
-> >
-> >diff --git a/tools/testing/selftests/bpf/config b/tools/testing/selftests/bpf/config
-> >index c378d5d07e02..fac2f2a9d02f 100644
-> >--- a/tools/testing/selftests/bpf/config
-> >+++ b/tools/testing/selftests/bpf/config
-> >@@ -113,3 +113,7 @@ CONFIG_XDP_SOCKETS=y
-> >  CONFIG_XFRM_INTERFACE=y
-> >  CONFIG_TCP_CONG_DCTCP=y
-> >  CONFIG_TCP_CONG_BBR=y
-> >+CONFIG_INFINIBAND=y
-> >+CONFIG_SMC=y
-> >+CONFIG_SMC_OPS=y
-> >+CONFIG_SMC_LO=y
-> >\ No newline at end of file
-> >+	int fd, ret;
-> >+	pid_t pid;
-> >+
-> >+	fd = socket(AF_NETLINK, SOCK_RAW, NETLINK_GENERIC);
-> >+	if (!ASSERT_GT(fd, 0, "nl_family socket"))
+On 1/21/25 11:12 AM, Eric Dumazet wrote:
+> syzbot found that calling mr_mfc_uses_dev() for unres entries
+> would crash [1], because c->mfc_un.res.minvif / c->mfc_un.res.maxvif
+> alias to "struct sk_buff_head unresolved", which contain two pointers.
 > 
-> Should be _GE. or just use ASSERT_OK_FD.
+> This code never worked, lets remove it.
 > 
-Take it.
-> >+	if (!ASSERT_GE(ret, 0, "nl_family bind"))
-> 
-> nit. ASSERT_OK.
-> 
-> >+	if (!ASSERT_EQ(ret, 0, "nl_family query"))
-> 
-> ASSERT_OK.
-> 
-> >+	if (!ASSERT_GT(fd, 0, "ueid socket"))
-> 
-> ASSERT_OK_FD
-> 
-> >+		return false;
-> >+	ret = bind(fd, (struct sockaddr *) &nl_src, sizeof(nl_src));
-> >+	if (!ASSERT_GE(ret, 0, "ueid bind"))
-> 
-> ASSERT_OK
-> 
-> >+		goto fail;
-> >+	ret = send_cmd(fd, smc_nl_family_id, pid,
-> >+		       (void *)test_ueid, sizeof(test_ueid));
-> >+	if (!ASSERT_EQ(ret, 0, "ueid cmd"))
-> 
-> ASSERT_OK
+...
+
+> Fixes: cb167893f41e ("net: Plumb support for filtering ipv4 and ipv6 multicast route dumps")
+> Reported-by: syzbot+5cfae50c0e5f2c500013@syzkaller.appspotmail.com
+> Closes: https://lore.kernel.org/netdev/678fe2d1.050a0220.15cac.00b3.GAE@google.com/T/#u
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> ---
+>  net/ipv4/ipmr_base.c | 3 ---
+>  1 file changed, 3 deletions(-)
 > 
 
-The parts of the assert macro have been all fixed, thanks for your
-suggestion.
 
-> >+		goto fail;
-> >+
-> >+int BPF_PROG(bpf_smc_switch_to_fallback, struct smc_sock___local *smc)
-> >+{
-> >+	/* only count from one side (client) */
-> >+	if (smc && !BPF_CORE_READ(smc, listen_smc))
-> 
-> It should not need BPF_CORE_READ. smc can be directly read like the
-> above sock->sk->...
+Reviewed-by: David Ahern <dsahern@kernel.org>
 
-Got it. I'll fix it in next version.
-
-Thanks,
-D. Wythe
-
-> 
-> >+		fallback_cnt++;
-> >+	return 0;
-> >+}
 
