@@ -1,133 +1,137 @@
-Return-Path: <netdev+bounces-160341-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160342-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF328A194D9
-	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 16:16:50 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5001DA194E5
+	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 16:18:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 59B657A2B80
-	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 15:16:41 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E88697A19F9
+	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 15:18:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD283211A37;
-	Wed, 22 Jan 2025 15:16:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB4D1212D62;
+	Wed, 22 Jan 2025 15:18:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="W46Uh5Vn"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cnMkk895"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BAE614B092;
-	Wed, 22 Jan 2025 15:16:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AA5014AD3F;
+	Wed, 22 Jan 2025 15:18:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737559003; cv=none; b=rpyKytEjJJYbHflVPXIiS7i52LwjMQozHU0sSTucpNsLoF7q8yMQyHcWuIgrp1JR4IHozqxasOQF4Ossj0RXe0aNtijQ+/DKBkrCZLYRlJKZEZVkgQmPNJtrkiLgqcGJV6Q5H2CBdJDt377CZn0vvlTeP120YP2vz55XDAHH8ik=
+	t=1737559113; cv=none; b=FqNxnps86lKsTn3MhRC8wUuHblnRJkDazqTz9A9Kd9/J/p/xlFORW94VfPjwYXFwZkV5vqz7KB9w0nA+ORamxW0/pgdqhuJF2C1ugjgl6xi/HufWrUS2TJvvX1lJDAUdN35FIvcHiChw8RZbna++ErRPEHPFNrlNeaOxFJgw3tQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737559003; c=relaxed/simple;
-	bh=WL2801VG29z9SPc4uzPKJm4HsS+KQzWmcz/BMu4EIRM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=M9sLK/gi0WWuWp0lsROlxHh5Fi2VVP4mwiFuM/y8i1YrINqJiL+Ys5RDvdy7nwzrkpbCmjkgLMxORIwMuULUnt2paX9FB62gvWO7j63XZ4dRQUoQEmtEgelkxvvAqB7VDg7KKZ5A4UC9eCjHkdcw+Z2lU83CLScJV5n5fBRYiU0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=W46Uh5Vn; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50MDmAH1013754;
-	Wed, 22 Jan 2025 15:16:11 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
-	content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=YBli4K
-	5HL01rSUVG2c2FKHPJs1SD/csZLpUS+Sp36Jc=; b=W46Uh5VnPtIXKwZLCOnOG5
-	EIFpF1W3yTkW/sQvMnH8cU/OM/b9ywHYAKULSFSA/iVg9RnPWJnQvkwf7isXOIYQ
-	yFt3gO2GknpX8UXALvWf5aTIyG5/8zLEoQ5UyY210WtS8HH+NOvhk9HQfEi7lPzp
-	nnSbUDjVNTbSvsxBZR9tTh/eb/codBeBGueV8VjECosVJzfhlDWkzt0Q8Xoi050K
-	bJgRe157VOmBRyYOXMmYTH8FcM1hXxj+CwlZ7SHDvvwj2FgX/KlyFygmTBfVJJ0n
-	1MReGkyAjxIGlLkcctqZz1zSpueVCXvt2/vCOSwKquACyWAm09sU04c9WZsdJg8Q
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44apr9bgj0-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 22 Jan 2025 15:16:10 +0000 (GMT)
-Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 50MF9CWB006263;
-	Wed, 22 Jan 2025 15:16:10 GMT
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44apr9bghv-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 22 Jan 2025 15:16:10 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 50MBXwPD032290;
-	Wed, 22 Jan 2025 15:16:09 GMT
-Received: from smtprelay02.wdc07v.mail.ibm.com ([172.16.1.69])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 448rujrnbx-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 22 Jan 2025 15:16:09 +0000
-Received: from smtpav06.dal12v.mail.ibm.com (smtpav06.dal12v.mail.ibm.com [10.241.53.105])
-	by smtprelay02.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 50MFG8Ys25952850
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 22 Jan 2025 15:16:08 GMT
-Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 24AFE58059;
-	Wed, 22 Jan 2025 15:16:08 +0000 (GMT)
-Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 49BD358043;
-	Wed, 22 Jan 2025 15:16:06 +0000 (GMT)
-Received: from [9.67.103.45] (unknown [9.67.103.45])
-	by smtpav06.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Wed, 22 Jan 2025 15:16:06 +0000 (GMT)
-Message-ID: <3bad433e-dfa0-4d76-915c-e6a4ee85e435@linux.ibm.com>
-Date: Wed, 22 Jan 2025 09:16:05 -0600
+	s=arc-20240116; t=1737559113; c=relaxed/simple;
+	bh=UMbOPxewzWa9KPV/AqJ9HveSc+kt7krgmlgy/yy1x0w=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=iVO0h+cqmJx3iWmX+ywQL9AbiunNFIlwmey97h3byN7owh2J4/0WMkx32GEkePGOZOGMX5BLirlolxgXo46KSYKdxuYJGEYB+KJq9TUjHY0LUEIezdURpdeKWLzN8hVwoEZzcO6LMoBHNQgC7/ZNi7GStV/vqkqtzXn40eNMEu0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cnMkk895; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BD6D4C4CED2;
+	Wed, 22 Jan 2025 15:18:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1737559113;
+	bh=UMbOPxewzWa9KPV/AqJ9HveSc+kt7krgmlgy/yy1x0w=;
+	h=From:Date:Subject:To:Cc:From;
+	b=cnMkk895nXhkzNaoX/kIhwWy1oiehi4b3QIuo4xlyCMJLkpT4FY/WsGvYctX8n3dC
+	 c1m5I01zsj3iyI8L3gHYXQPjslfmsUNQMupdnwZvHxwC+vsyKvHrUaX+fuAN552eVs
+	 1202cn6K/WNrhLN6H5KmqR1qTarj24SuKqkiBFwzJkvMT7w04qBzSlW07hlsvM+CFy
+	 01IIVYOB2PffrldURdeGh9JkeLHo1WBKd+EF2K+cKoDMVksgMWA6COR0KWT8oY7mv/
+	 f4FYstoaDqE8cA8mTn2BV0rtqjofNOsPS/MEv+nb9ezKUas8Qeg8iBwsIhrqF3Aid0
+	 iyvIebaXwpk6Q==
+From: Jeff Layton <jlayton@kernel.org>
+Date: Wed, 22 Jan 2025 10:18:12 -0500
+Subject: [PATCH v2] sunrpc: add netns inum and srcaddr to debugfs rpc_xprt
+ info
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 03/10] dt-bindings: gpio: ast2400-gpio: Add hogs
- parsing
-To: minyard@acm.org, robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
-        andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-        kuba@kernel.org, pabeni@redhat.com,
-        openipmi-developer@lists.sourceforge.net, netdev@vger.kernel.org,
-        joel@jms.id.au, andrew@codeconstruct.com.au,
-        devicetree@vger.kernel.org, eajames@linux.ibm.com,
-        linux-arm-kernel@lists.infradead.org, linux-aspeed@lists.ozlabs.org,
-        linux-kernel@vger.kernel.org, Bartosz Golaszewski <brgl@bgdev.pl>,
-        linus.walleij@linaro.org
-References: <20250116203527.2102742-1-ninad@linux.ibm.com>
- <20250116203527.2102742-4-ninad@linux.ibm.com>
-Content-Language: en-US
-From: Ninad Palsule <ninad@linux.ibm.com>
-In-Reply-To: <20250116203527.2102742-4-ninad@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: hEHfMaY5ETen2ABLSnxKhKFJs0sVZgRl
-X-Proofpoint-ORIG-GUID: Pu3fmilgIe-kY4vHe5lYNY-b-lpQJSMY
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-01-22_06,2025-01-22_02,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- priorityscore=1501 lowpriorityscore=0 suspectscore=0 mlxscore=0
- spamscore=0 clxscore=1015 bulkscore=0 phishscore=0 malwarescore=0
- mlxlogscore=722 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.19.0-2411120000 definitions=main-2501220111
+Message-Id: <20250122-nfs-6-14-v2-1-be41324fe579@kernel.org>
+X-B4-Tracking: v=1; b=H4sIADMMkWcC/22MywrDIBBFfyXMulN8RIWu+h8hC23GRFq0aJGW4
+ L/XZl3u6lwOZ4dCOVCBy7BDphpKSLGDOA1w22xcCcPSGQQTinEhMPqCGvmIxhtpFnJaKg1df2b
+ y4X2kprnzFsor5c9Rrvz3/olUjn16dMwpa6Vk1zvlSI9zyivMrbUvnSCugqEAAAA=
+X-Change-ID: 20250122-nfs-6-14-7f737deb6356
+To: Chuck Lever <chuck.lever@oracle.com>, Neil Brown <neilb@suse.de>, 
+ Olga Kornievskaia <okorniev@redhat.com>, Dai Ngo <Dai.Ngo@oracle.com>, 
+ Tom Talpey <tom@talpey.com>, Trond Myklebust <trondmy@kernel.org>, 
+ Anna Schumaker <anna@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
+Cc: linux-nfs@vger.kernel.org, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Jeff Layton <jlayton@kernel.org>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1686; i=jlayton@kernel.org;
+ h=from:subject:message-id; bh=UMbOPxewzWa9KPV/AqJ9HveSc+kt7krgmlgy/yy1x0w=;
+ b=owEBbQKS/ZANAwAIAQAOaEEZVoIVAcsmYgBnkQxHAwsvE5RI8dumi9ZidYjT9h571nLGBeEWw
+ wH2vot0ZdaJAjMEAAEIAB0WIQRLwNeyRHGyoYTq9dMADmhBGVaCFQUCZ5EMRwAKCRAADmhBGVaC
+ FQOGD/9zIsXOTrRPoZr+I+smCvxLNoY3QfhouiD1z2RoX3rxp9shMtvbhkKpvMjtxx70ONccwX9
+ KH1B1caZ7ZCGqsXreIc8rGOc6sHv9l/LJoz3/uPBZZAaAiIUmHFbNMCamvEl3GilxAoI8YAbckX
+ Xfhat7JYH6wwR+FQhDxW+t482a+7efNGhJm+vVuwdKm7dNFi8CN3jiRCtX/b23R2QfIefVJ0DHD
+ Lmzk52TSWw6seQOGzqMoCvZUX6XAnnZ83vKiC4NxSmAcjnqCafbrRG4d1ghfPrhzR6GkXFscFeU
+ QqU6XpjJax1WQfQlbn6EwoXzWaWvHtS3mpUWJjVoFmxFEdgnbDZe8gjmLdcVV61aRoLpwj80efD
+ +FEIGYF/bFUjYD/A+IPne4RnCW+1nbqZmL1H2M50bWBTKQvNmcU0/w17FuENXkm53NhnLLy11ws
+ mYVIJsOsn0UoUxwu90vP2UlIzSW70X6UeRHDjBpqm3k8ybNLePYSoDmcPPAUM9D0Q7FBdajXxYK
+ bMwBuHWpj29FIjmEh1inKFQzbn1AohSMeejreue+5FUrMnZjyPhocl3Agr8h7KI9A4YoYSO1nFQ
+ qady+exmXAaBIFfQh9CPlyb7v9sr7WYyK6JQgGpfLrBHwdMc/4MrUUFfDnHh+ot00elHGbnDh+3
+ 3rcX5QhZ+UGIK2A==
+X-Developer-Key: i=jlayton@kernel.org; a=openpgp;
+ fpr=4BC0D7B24471B2A184EAF5D3000E684119568215
 
-Hello Rob, Conor, Krzysztof,
+The output format should provide a value that matches the one in
+the /proc/<pid>/ns/net symlink. This makes it simpler to match the
+rpc_xprt and rpc_clnt to a particular container.
 
+Also, when the xprt defines the get_srcaddr operation, use that to
+display the source address as well.
 
-On 1/16/25 14:35, Ninad Palsule wrote:
-> Allow parsing GPIO controller children nodes with GPIO hogs.
-> 
-> Signed-off-by: Ninad Palsule <ninad@linux.ibm.com>
-> ---
+Signed-off-by: Jeff Layton <jlayton@kernel.org>
+---
+This is more client-side code, so I figure this should go in via the NFS
+client tree.
+---
+Changes in v2:
+- Don't bother with NUL termination, just use a length specifier
+- Link to v1: https://lore.kernel.org/r/20250122-nfs-6-14-v1-1-164b0b5aa330@kernel.org
+---
+ net/sunrpc/debugfs.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-Please let me know if you have further comments. If not, can you please 
-send a ACK?
+diff --git a/net/sunrpc/debugfs.c b/net/sunrpc/debugfs.c
+index a176d5a0b0ee9a2c0ca1d1ed3131b67b782c3296..9498f385716d5eab1c5766a2a4ef5218155432e0 100644
+--- a/net/sunrpc/debugfs.c
++++ b/net/sunrpc/debugfs.c
+@@ -179,6 +179,18 @@ xprt_info_show(struct seq_file *f, void *v)
+ 	seq_printf(f, "addr:  %s\n", xprt->address_strings[RPC_DISPLAY_ADDR]);
+ 	seq_printf(f, "port:  %s\n", xprt->address_strings[RPC_DISPLAY_PORT]);
+ 	seq_printf(f, "state: 0x%lx\n", xprt->state);
++	seq_printf(f, "netns: %u\n", xprt->xprt_net->ns.inum);
++
++	if (xprt->ops->get_srcaddr) {
++		int ret, buflen;
++		char buf[INET6_ADDRSTRLEN];
++
++		buflen = ARRAY_SIZE(buf);
++		ret = xprt->ops->get_srcaddr(xprt, buf, buflen);
++		if (ret < 0)
++			ret = sprintf(buf, "<closed>");
++		seq_printf(f, "saddr: %.*s\n", ret, buf);
++	}
+ 	return 0;
+ }
+ 
 
+---
+base-commit: ffd294d346d185b70e28b1a28abe367bbfe53c04
+change-id: 20250122-nfs-6-14-7f737deb6356
+
+Best regards,
 -- 
-Thanks & Regards,
-Ninad
+Jeff Layton <jlayton@kernel.org>
 
 
