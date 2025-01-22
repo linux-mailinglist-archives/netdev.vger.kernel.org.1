@@ -1,60 +1,63 @@
-Return-Path: <netdev+bounces-160207-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160208-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8166DA18D77
-	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 09:14:30 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0014EA18D7A
+	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 09:17:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 506591887EF1
-	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 08:14:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 313443AA8E1
+	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 08:16:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5144D1C3C0D;
-	Wed, 22 Jan 2025 08:14:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ddgU4ZR7"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF13E1C4A3B;
+	Wed, 22 Jan 2025 08:16:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 200FE196;
-	Wed, 22 Jan 2025 08:14:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D38017BB6
+	for <netdev@vger.kernel.org>; Wed, 22 Jan 2025 08:16:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737533666; cv=none; b=KyWBcu5GgUmza7tOatPryH5zIUjpGV4/y/V5dj71rWSNZxjIrDVfrDK92plrfo2z3RNg1/m8/a9IgEIHz7/KjZreOtcjvav7kRxZcNkwsXuqS1pecB+597+bcI71TM3biTvLGuYT9CmybIzHhQfDbC7UmprGsYTxUldqDF2Gbv0=
+	t=1737533808; cv=none; b=tIGqiayVVmIw4M65yF7gu3z4LvkNJpOeZ4NMwkIiIg0YB13YLTM7tLBXa4jY2tpJvDOTh+FZSScvyiMfncQpSg8uATuyftlPfEW1x2/Skfx98Mh9c/DIMJvS/bLkt8UpDX9+iy4ps0qidnZUkPQBoM+BKRzTZTmPDb5Tl3JRoZo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737533666; c=relaxed/simple;
-	bh=uqq4XjpWOJLJlKj11MwPE8w4neu4toSKao0wV6l7vlM=;
+	s=arc-20240116; t=1737533808; c=relaxed/simple;
+	bh=xXphXCFzmyCylljfxJ2f+4S+nvDKoUDTNJweNl32ry8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=U9nrU7fWg/Wdk39ptNRnaqr6BRDMKWxp7ggARuFwQdVPft3MsOgSrOQV80z2vwevskD6z0PtZRhO9NB9WPFvMLe/faXbgyoCGIolk66Sfm4jKR8LyPjK/m+MgoUPSolLXnfYCd8xQKzTyjRp1EilAuy7CZ3xvVL1MkJxpZLCM+k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ddgU4ZR7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C3C5BC4CED6;
-	Wed, 22 Jan 2025 08:14:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737533665;
-	bh=uqq4XjpWOJLJlKj11MwPE8w4neu4toSKao0wV6l7vlM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ddgU4ZR7ztPgvA7UkozItyZ95c1ocP9C/FHhbW+fiSPlp0G6ywQOXjw/XmFLv2a+N
-	 wJdVahvIWYH+78nU2bD0dsrpSObLI46yVWhb36F6sAsqVp84SnteFJvA5zUNl2KxIY
-	 unjPB9dSSG+ZW/xcyz4rNnKzIhhzYJVb9mHU8J9f+n3MoVe2hcPknD613jGwdeQ8vz
-	 1C8y8ncn/viJLp3hfVRsFMncMJoTFnH3+yXzXNXjADNBTexEF8/AbB+1zCyu2kXeMg
-	 06o4atmE2HLNxdgR74cEglgWzNXF6CQBUk9gooJ+eKdqnxId7/pOdO/fJ7RpBHWxQg
-	 +dV1KXsOl0UmA==
-Date: Wed, 22 Jan 2025 09:14:21 +0100
-From: Krzysztof Kozlowski <krzk@kernel.org>
-To: Chris Packham <chris.packham@alliedtelesis.co.nz>
-Cc: lee@kernel.org, robh@kernel.org, krzk+dt@kernel.org, 
-	conor+dt@kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, tsbogend@alpha.franken.de, 
-	hkallweit1@gmail.com, linux@armlinux.org.uk, sander@svanheule.net, 
-	markus.stockhausen@gmx.de, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-mips@vger.kernel.org
-Subject: Re: [PATCH v4 2/4] dt-bindings: mfd: Add MDIO interface to
- rtl9301-switch
-Message-ID: <20250122-macho-flat-sawfly-7ca93d@krzk-bin>
-References: <20250120040214.2538839-1-chris.packham@alliedtelesis.co.nz>
- <20250120040214.2538839-3-chris.packham@alliedtelesis.co.nz>
+	 Content-Type:Content-Disposition:In-Reply-To; b=eeaz4feiN1K9GwOfxqH6PFYH3LwGEyDTWX5v5XZE8zYZqUTP/rW3lmQyNtKrIkoMntalQcjvF5UzWvii4Wp9Kyg56s9Tek9ZK2VFzsKM8pFucr6rc+P2DhQ2a3RkaUeqZ5Wk68g9fV4ATa4fotO8t6BiBrw1KWTb4ZyH9DnybgU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1taVuZ-00048I-Gn; Wed, 22 Jan 2025 09:16:31 +0100
+Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1taVuX-001For-2T;
+	Wed, 22 Jan 2025 09:16:29 +0100
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1taVuX-007dwC-24;
+	Wed, 22 Jan 2025 09:16:29 +0100
+Date: Wed, 22 Jan 2025 09:16:29 +0100
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Rengarajan.S@microchip.com
+Cc: andrew+netdev@lunn.ch, rmk+kernel@armlinux.org.uk, davem@davemloft.net,
+	Woojung.Huh@microchip.com, pabeni@redhat.com, edumazet@google.com,
+	kuba@kernel.org, phil@raspberrypi.org, kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	UNGLinuxDriver@microchip.com
+Subject: Re: [PATCH net-next v1 1/7] net: usb: lan78xx: Convert to PHYlink
+ for improved PHY and MAC management
+Message-ID: <Z5CpXXNQrtmxuxaF@pengutronix.de>
+References: <20250108121341.2689130-1-o.rempel@pengutronix.de>
+ <20250108121341.2689130-2-o.rempel@pengutronix.de>
+ <0328797731d5ec0af580cf2f4f7e000212befa69.camel@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,58 +66,107 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20250120040214.2538839-3-chris.packham@alliedtelesis.co.nz>
+In-Reply-To: <0328797731d5ec0af580cf2f4f7e000212befa69.camel@microchip.com>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Mon, Jan 20, 2025 at 05:02:12PM +1300, Chris Packham wrote:
-> The MDIO controller is part of the switch on the RTL9300 family of
-> devices. Add a $ref to the mfd binding for these devices.
-> 
-> Signed-off-by: Chris Packham <chris.packham@alliedtelesis.co.nz>
-> ---
-> 
+Hi Rengarajan,
 
-You need to explain merging dependencies. Nothing in cover letter,
-nothing here, but this *CANNOT* be merged independently.
+On Fri, Jan 17, 2025 at 10:50:48AM +0000, Rengarajan.S@microchip.com wrote:
+> Hi Oleksji,
+> 
+> On Wed, 2025-01-08 at 13:13 +0100, Oleksij Rempel wrote:
+> > +static int lan78xx_configure_usb(struct lan78xx_net *dev, int speed)
+> > +{
+> > +       int ret;
+> > +
+> > +       if (dev->udev->speed != USB_SPEED_SUPER)
+> > +               return 0;
+> > +
+> > +       if (speed != SPEED_1000)
+> > +               return lan78xx_update_reg(dev, USB_CFG1,
+> > +                                         USB_CFG1_DEV_U2_INIT_EN_ |
+> > +                                         USB_CFG1_DEV_U1_INIT_EN_,
+> > +                                         USB_CFG1_DEV_U2_INIT_EN_ |
+> > +                                         USB_CFG1_DEV_U1_INIT_EN_);
+> > +
+> > +       /* disable U2 */
+> > +       ret = lan78xx_update_reg(dev, USB_CFG1,
+> > +                                USB_CFG1_DEV_U2_INIT_EN_, 0);
+> > +       if (ret < 0)
+> > +               return ret;
+> > +       /* enable U1 */
+> > +       return lan78xx_update_reg(dev, USB_CFG1,
+> > +                                 USB_CFG1_DEV_U1_INIT_EN_,
+> > +                                 USB_CFG1_DEV_U1_INIT_EN_);
+> 
+> Since, in the all the above cases we update the USB_CFG1 based on the
+> mask and value depending on various speeds, have a variable for mask
+> and value and use them to represent enabled flags instead of passing
+> the flags directly for better readability.
+> 
+> For Eg: have mask = USB_CFG1_DEV_U2_INIT_EN_ and val = 0 and pass them
+> as arguments.
 
-> Notes:
->     Changes in v4:
->     - There is a single MDIO controller that has MDIO buses as children
->     Changes in v3:
->     - None
->     Changes in v2:
->     - None
-> 
->  .../bindings/mfd/realtek,rtl9301-switch.yaml  | 24 +++++++++++++++++++
->  1 file changed, 24 insertions(+)
-> 
-> diff --git a/Documentation/devicetree/bindings/mfd/realtek,rtl9301-switch.yaml b/Documentation/devicetree/bindings/mfd/realtek,rtl9301-switch.yaml
-> index f053303ab1e6..c19d2c209434 100644
-> --- a/Documentation/devicetree/bindings/mfd/realtek,rtl9301-switch.yaml
-> +++ b/Documentation/devicetree/bindings/mfd/realtek,rtl9301-switch.yaml
-> @@ -28,6 +28,9 @@ properties:
->    reg:
->      maxItems: 1
->  
-> +  mdio-controller:
-> +    $ref: /schemas/net/realtek,rtl9301-mdio.yaml#
+ok.
+
 > +
->    '#address-cells':
->      const: 1
->  
-> @@ -110,5 +113,26 @@ examples:
->            };
->          };
->        };
-> +
-> +      mdio-controller {
+> > +       if (duplex == DUPLEX_FULL)
+> > +               mac_cr |= MAC_CR_FULL_DUPLEX_;
+> > +
+> > +       /* make sure TXEN and RXEN are disabled before reconfiguring
+> > MAC */
+> > +       ret = lan78xx_update_reg(dev, MAC_CR, MAC_CR_SPEED_MASK_ |
+> > +                                MAC_CR_FULL_DUPLEX_ |
+> > MAC_CR_EEE_EN_, mac_cr);
+> 
+> The auto-speed and duplex are disabled in lan78xx_mac_config is it
+> necessary to disable this again here. You can disable it once to 
+> avoid redundancy.
 
-No, no resources here, no unit address. Look at other nodes - they have
-the resource, the address. Mixing such nodes is clear indication this is
-not correct hardware description and you do this only for Linux.
+ok.
 
-Fold child device into parent.
+> > +static const struct phylink_mac_ops lan78xx_phylink_mac_ops = {
+> > +       .mac_config = lan78xx_mac_config,
+> > +       .mac_link_down = lan78xx_mac_link_down,
+> > +       .mac_link_up = lan78xx_mac_link_up,
+> > +};
+> 
+> If possible, have MAC and phy related APIs in seperate patch.
+
+I'll think about it, but I ques it will be not so good.
+
+> > @@ -2609,18 +2701,7 @@ static int lan78xx_phy_init(struct lan78xx_net
+> > *dev)
+> >                 return -EIO;
+> >         }
+> > 
+> > -       /* MAC doesn't support 1000T Half */
+> > -       phy_remove_link_mode(phydev,
+> > ETHTOOL_LINK_MODE_1000baseT_Half_BIT);
+> 
+> Since MAC doesn't support 1000Base-T half-duplex does phylink handle
+> its removal from the advertised link modes. Previously, it was done
+> using phy_remove_link_mode. If not, ensure that the phy doesn't end
+> up advertising an unsupported mode.
+
+Yes, it is done by following line:
+  dev->phylink_config.mac_capabilities = MAC_SYM_PAUSE | MAC_ASYM_PAUSE |
+    MAC_10 | MAC_100 | MAC_1000FD;
+
+Thank you,
 
 Best regards,
-Krzysztof
-
+Oleksij
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
