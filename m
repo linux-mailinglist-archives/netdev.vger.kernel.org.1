@@ -1,108 +1,159 @@
-Return-Path: <netdev+bounces-160393-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160394-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41AC8A1984B
-	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 19:19:03 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA37EA1987D
+	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 19:33:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B4E6C7A4BE5
-	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 18:18:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 804333AACC4
+	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 18:33:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEDF321505D;
-	Wed, 22 Jan 2025 18:18:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bVKMwpnX"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 213E5215189;
+	Wed, 22 Jan 2025 18:33:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3A00185B62;
-	Wed, 22 Jan 2025 18:18:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EF31215057;
+	Wed, 22 Jan 2025 18:33:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737569935; cv=none; b=Ce6opXmXk64nuSBcJlPehLGkkyVQ9sZQvZj6rNNkpZ8b1qtqzlcaw0wNeVkVvytjVAY7CVw3jdG5/F2kDQYjMzRB87mkHj0eBvLsWcI6gCP9yQOvjSkCsYMXPtf3J/ZVsLmd7ojCveWYI3/tzYwYmviH7ONXOMS/hkkdVUEBaJ0=
+	t=1737570821; cv=none; b=tzIGwJteST6K4mt7lzS/HtaI+RdHO+2mcZvbo4/qD5phm0Ud8dP4cP5YqeW0k8bWI32USZFaqdz0+uoktKt+WVWYUooiWPPaK05ViikmwdiTF6C/k9ZdNQbGWcf+q846k63AmQh2qlPcP/paJmpGoY9qIc8fw0SPNwtDg0wBQMc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737569935; c=relaxed/simple;
-	bh=JhbU4UBr00odYHn1dFYlCDCWvtocY27kc32JdJZPOnQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FJ3RKKJJeRgcmtn2CYEafiLsGuvG9BSmufEyf3oXYn69CMNk+kpwDLE+h7LSi/+L0PrPYfHig0Zp0WIRpF9M7vXAjnVo0yJbUSmq4dcopL3zQ+sru35Rbcxr8h5D3CEbjb04pIKAGxqDC7jpD7RDjPXCCdfPCD+reb/lHhla1tw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bVKMwpnX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2F100C4CED2;
-	Wed, 22 Jan 2025 18:18:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737569935;
-	bh=JhbU4UBr00odYHn1dFYlCDCWvtocY27kc32JdJZPOnQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=bVKMwpnX6ljRDmwbcd+pxClnhMOoVBk3JMav8r0XuM+4EtsV1Ie4cJTEahN0m/Jfs
-	 9gl4x0muYc1XiDsk2hPBgf+CfUPwMBMHnsQkI8EuAH1evEXICS13pO1yeMg+ivSr0H
-	 RgIsIrv4uMkMh8KwlsH3UcCHSTlrHGIRxT/BzqJUKXqZaUYdXi0QE5EOOkoReBNzPz
-	 M3NXxkaVA7+tj4j9bijjBKeBh0r77yMa/bIgXzcrD4xP+aLYAQw6TKpe1HOt1EIE16
-	 4J3sWnFqtWw3CzGEM0tzMSfHpfYr5qFwD2RtBhu+6cI69jffJRB9gXI93472o+nJRC
-	 YHDpR4+tLd+oQ==
-Date: Wed, 22 Jan 2025 18:18:51 +0000
-From: Simon Horman <horms@kernel.org>
-To: Peter Seiderer <ps.report@gmx.net>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Frederic Weisbecker <frederic@kernel.org>,
-	Artem Chernyshev <artem.chernyshev@red-soft.ru>,
-	Nam Cao <namcao@linutronix.de>
-Subject: Re: [PATCH net-next v2 0/8] Some pktgen fixes/improvments
-Message-ID: <20250122181851.GH395043@kernel.org>
-References: <20250122144110.619989-1-ps.report@gmx.net>
- <20250122181635.GG395043@kernel.org>
+	s=arc-20240116; t=1737570821; c=relaxed/simple;
+	bh=7xIBfRYOkjL4QTxozYv9TNw+XCxxGMDYX0hPUlOezRY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=GfKMc0j4HPeCktT3rGIm099DgtxyNSNe28DzzetQ8J9d+5PgnJNbN4DtxOON4rhUoBqWfTBzB7c6WwtagxYGKvqG3yts8POpAlKNuuotJCGvzplO2TvfqRzeIdXbrwMvnsPo1VEZL+mpV54yGHen7hLYOIUVTK183VSqr7FSmL8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
+Received: from [192.168.2.102] (213.87.159.248) by msexch01.omp.ru
+ (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Wed, 22 Jan
+ 2025 21:33:16 +0300
+Message-ID: <c3c57c62-f5f7-4b80-aa8f-d6edefbb5493@omp.ru>
+Date: Wed, 22 Jan 2025 21:33:15 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250122181635.GG395043@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 1/2] net: ravb: Fix missing rtnl lock in suspend path
+To: Kory Maincent <kory.maincent@bootlin.com>, Paul Barker
+	<paul.barker.ct@bp.renesas.com>, =?UTF-8?Q?Niklas_S=C3=B6derlund?=
+	<niklas.soderlund@ragnatech.se>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
+ S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Mikhail Ulyanov
+	<mikhail.ulyanov@cogentembedded.com>
+CC: Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	=?UTF-8?Q?Niklas_S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>,
+	Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>, <netdev@vger.kernel.org>,
+	<linux-renesas-soc@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+References: <20250122-fix_missing_rtnl_lock_phy_disconnect-v1-0-8cb9f6f88fd1@bootlin.com>
+ <20250122-fix_missing_rtnl_lock_phy_disconnect-v1-1-8cb9f6f88fd1@bootlin.com>
+Content-Language: en-US
+From: Sergey Shtylyov <s.shtylyov@omp.ru>
+Organization: Open Mobile Platform
+In-Reply-To: <20250122-fix_missing_rtnl_lock_phy_disconnect-v1-1-8cb9f6f88fd1@bootlin.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.1.1, Database issued on: 01/22/2025 17:29:55
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 19
+X-KSE-AntiSpam-Info: Lua profiles 190517 [Jan 22 2025]
+X-KSE-AntiSpam-Info: Version: 6.1.1.7
+X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 50 0.3.50
+ df4aeb250ed63fd3baa80a493fa6caee5dd9e10f
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_uf_ne_domains}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 213.87.159.248 in (user)
+ b.barracudacentral.org}
+X-KSE-AntiSpam-Info:
+	d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2;omp.ru:7.1.1;lore.kernel.org:7.1.1
+X-KSE-AntiSpam-Info: FromAlignment: s
+X-KSE-AntiSpam-Info: ApMailHostAddress: 213.87.159.248
+X-KSE-AntiSpam-Info: {DNS response errors}
+X-KSE-AntiSpam-Info: Rate: 19
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 01/22/2025 18:04:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 1/22/2025 3:28:00 PM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-On Wed, Jan 22, 2025 at 06:16:35PM +0000, Simon Horman wrote:
-> On Wed, Jan 22, 2025 at 03:41:02PM +0100, Peter Seiderer wrote:
-> > While taking a look at '[PATCH net] pktgen: Avoid out-of-range in
-> > get_imix_entries' ([1]) and '[PATCH net v2] pktgen: Avoid out-of-bounds access
-> > in get_imix_entries' ([2], [3]) and doing some tests and code review I
-> > detected that the /proc/net/pktgen/... parsing logic does not honour the
-> > user given buffer bounds (resulting in out-of-bounds access).
-> > 
-> > This can be observed e.g. by the following simple test (sometimes the
-> > old/'longer' previous value is re-read from the buffer):
-> > 
-> >         $ echo add_device lo@0 > /proc/net/pktgen/kpktgend_0
-> > 
-> >         $ echo "min_pkt_size 12345" > /proc/net/pktgen/lo\@0 && grep min_pkt_size /proc/net/pktgen/lo\@0
-> > Params: count 1000  min_pkt_size: 12345  max_pkt_size: 0
-> > Result: OK: min_pkt_size=12345
-> > 
-> >         $ echo -n "min_pkt_size 123" > /proc/net/pktgen/lo\@0 && grep min_pkt_size /proc/net/pktgen/lo\@0
-> > Params: count 1000  min_pkt_size: 12345  max_pkt_size: 0
-> > Result: OK: min_pkt_size=12345
-> > 
-> >         $ echo "min_pkt_size 123" > /proc/net/pktgen/lo\@0 && grep min_pkt_size /proc/net/pktgen/lo\@0
-> > Params: count 1000  min_pkt_size: 123  max_pkt_size: 0
-> > Result: OK: min_pkt_size=123
-> > 
-> > So fix the out-of-bounds access (and two minor findings) and add a simple
-> > proc_net_pktgen selftest...
-> 
-> Hi Peter,
-> 
-> Unfortunately net-next is closed at this time.
+Hello!
 
-Sorry, I was a little hasty.
+  My Cogent Embedded tenure is long over, so I dropped my old email... :-)
 
-It looks like a number of these patches are fixes.
+On 1/22/25 7:19 PM, Kory Maincent wrote:
 
-If so, please consider separating them out into a separate series,
-targeted at net (rather than net-next), each with an appropriate Fixes tag.
+> Fix the suspend path by ensuring the rtnl lock is held where required.
+
+   Maybe suspend/resume path (the same w/the subject)?
+
+> Calls to ravb_open, ravb_close and wol operations must be performed under
+> the rtnl lock to prevent conflicts with ongoing ndo operations.
+
+[...]
+
+> Reported-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+> Closes: https://lore.kernel.org/netdev/4c6419d8-c06b-495c-b987-d66c2e1ff848@tuxon.dev/
+> Fixes: 0184165b2f42 ("ravb: add sleep PM suspend/resume support")
+> Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
+
+    FWIW:
+
+Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
+
+[...]
+> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
+> index bc395294a32d..2c6d8e4966c3 100644
+> --- a/drivers/net/ethernet/renesas/ravb_main.c
+> +++ b/drivers/net/ethernet/renesas/ravb_main.c
+[...]
+> @@ -3245,19 +3250,25 @@ static int ravb_resume(struct device *dev)
+>  	if (!netif_running(ndev))
+>  		return 0;
+>  
+> +	rtnl_lock();
+>  	/* If WoL is enabled restore the interface. */
+>  	if (priv->wol_enabled) {
+>  		ret = ravb_wol_restore(ndev);
+> -		if (ret)
+> +		if (ret)  {
+> +			rtnl_unlock();
+>  			return ret;
+> +		}
+>  	} else {
+>  		ret = pm_runtime_force_resume(dev);
+> -		if (ret)
+> +		if (ret) {
+> +			rtnl_unlock();
+>  			return ret;
+
+   Hm, are you sure we need to have rtnl_lock around pm_runtime_force_resume() too?
+
+[...]
+
+MBR, Sergey
+
 
