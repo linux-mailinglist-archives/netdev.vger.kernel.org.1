@@ -1,129 +1,137 @@
-Return-Path: <netdev+bounces-160344-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160345-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C748A19540
-	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 16:29:25 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9BA70A1954C
+	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 16:33:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AEB3B3ACF1F
-	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 15:28:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7E920188157D
+	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 15:33:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD21E2144A1;
-	Wed, 22 Jan 2025 15:28:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F208F211475;
+	Wed, 22 Jan 2025 15:33:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b="xsmB9Bge"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ts/m3gXn"
 X-Original-To: netdev@vger.kernel.org
-Received: from server.wki.vra.mybluehostin.me (server.wki.vra.mybluehostin.me [162.240.238.73])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51A9F213E61;
-	Wed, 22 Jan 2025 15:28:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.240.238.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C39CCEED8;
+	Wed, 22 Jan 2025 15:33:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737559726; cv=none; b=kd2KyDwFm+Sh2ZfafYWnuab8AhRkmrKVqIPAkhToTooJVY8WRMIjR5RTy+XxoM3TR4QV2gsjDTRVbevvi22t90Lx3GIMHj8o88vgF3uB8knQTFGsbf6oX4W6Jx1py37e5uxB7CkO9FzkPPZbQldxJgxJqm1U9hbZ5Mp9IlmJpUE=
+	t=1737559983; cv=none; b=lBO9XZ4d7fTghlZD6QE7nDzCwDvQTJf+OYp+wrvcj86eYoNJ+gZ2HfGWSj5ixY7rsNkZdanoyYel2AEyNDZlRjgBt/7uH+fb7xa3txv/CJWtQouC3pZdR3qMGoIzcttn6D2CeCWhmpM10yMqSRjO3XKb8wVd8zQQkExv4zVsGuI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737559726; c=relaxed/simple;
-	bh=AM/uLRxsQpbInSq46i3ipJMYhS8rcSiOUseb2eD/n0E=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 MIME-Version:Content-Type; b=BQCpIVCA7FMn3P22l4UI2+1JRBjdJpHdFxLUbJd5B1kahg/X4WlhbDA7RP2RpVlvD5UFyrLFvdsHZ6NYgPkp4VREXpS4LVCDRt/84i1qhibAve2n19x5MiMREtiOwKLihwAcnZmouqO/tTEhRLSqKcuFTByiM68jDQzjzhtryeg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=couthit.com; spf=pass smtp.mailfrom=couthit.com; dkim=pass (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b=xsmB9Bge; arc=none smtp.client-ip=162.240.238.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=couthit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=couthit.com
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=couthit.com
-	; s=default; h=Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:
-	References:In-Reply-To:Message-ID:Cc:To:From:Date:Sender:Reply-To:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=HFiGcNjQnJET7iFrmsyNwIZEYZkLHD0z5V2mMsLkka0=; b=xsmB9Bgefw1NTFUKHxbbLbnXw/
-	96jAb6eMgUky/CnltCs1c/hZYAnFeqi+f0Zl19450TrIUMRDRVJWhPrcSZuPLfPGIP/2rMnGKNkxp
-	5jUo5OLeUTHXspbHWKggUpIr4c/sKteJhTo7qyvNuCncMBwEXAMoVPh8o+dfP0TDzckeh6Th10FKC
-	39dBl9uu/yH64YSZFPi5BKjUDgrv8LVCtX5bGJmqFXESbgKutS0FpGVdSh+Ds+fuS8+x0q+zbLr8q
-	WBWdkkW0dADAjBUjyPp5pp9GKLKFa9uBXoKmgFkT5sznnIX/e1feKB66s1Jc98muEo5kM6VJma34p
-	7CxdiHxw==;
-Received: from [122.175.9.182] (port=7750 helo=zimbra.couthit.local)
-	by server.wki.vra.mybluehostin.me with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96.2)
-	(envelope-from <basharath@couthit.com>)
-	id 1tacel-0007Ik-0t;
-	Wed, 22 Jan 2025 20:58:39 +0530
-Received: from zimbra.couthit.local (localhost [127.0.0.1])
-	by zimbra.couthit.local (Postfix) with ESMTPS id AE3951781F6A;
-	Wed, 22 Jan 2025 20:58:32 +0530 (IST)
-Received: from localhost (localhost [127.0.0.1])
-	by zimbra.couthit.local (Postfix) with ESMTP id 8E7671783FED;
-	Wed, 22 Jan 2025 20:58:32 +0530 (IST)
-Received: from zimbra.couthit.local ([127.0.0.1])
-	by localhost (zimbra.couthit.local [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id lkr0Pxa3UrtC; Wed, 22 Jan 2025 20:58:32 +0530 (IST)
-Received: from zimbra.couthit.local (zimbra.couthit.local [10.10.10.103])
-	by zimbra.couthit.local (Postfix) with ESMTP id 4DFA71781F6A;
-	Wed, 22 Jan 2025 20:58:32 +0530 (IST)
-Date: Wed, 22 Jan 2025 20:58:32 +0530 (IST)
-From: Basharath Hussain Khaja <basharath@couthit.com>
-To: Rob Herring <robh@kernel.org>
-Cc: basharath <basharath@couthit.com>, danishanwar <danishanwar@ti.com>, 
-	rogerq <rogerq@kernel.org>, andrew+netdev <andrew+netdev@lunn.ch>, 
-	davem <davem@davemloft.net>, edumazet <edumazet@google.com>, 
-	kuba <kuba@kernel.org>, pabeni <pabeni@redhat.com>, 
-	krzk+dt <krzk+dt@kernel.org>, conor+dt <conor+dt@kernel.org>, 
-	nm <nm@ti.com>, ssantosh <ssantosh@kernel.org>, 
-	tony <tony@atomide.com>, richardcochran <richardcochran@gmail.com>, 
-	parvathi <parvathi@couthit.com>, schnelle <schnelle@linux.ibm.com>, 
-	rdunlap <rdunlap@infradead.org>, diogo ivo <diogo.ivo@siemens.com>, 
-	m-karicheri2 <m-karicheri2@ti.com>, horms <horms@kernel.org>, 
-	jacob e keller <jacob.e.keller@intel.com>, 
-	m-malladi <m-malladi@ti.com>, 
-	javier carrasco cruz <javier.carrasco.cruz@gmail.com>, 
-	afd <afd@ti.com>, s-anna <s-anna@ti.com>, 
-	linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, 
-	netdev <netdev@vger.kernel.org>, 
-	devicetree <devicetree@vger.kernel.org>, 
-	linux-kernel <linux-kernel@vger.kernel.org>, 
-	linux-omap <linux-omap@vger.kernel.org>, 
-	pratheesh <pratheesh@ti.com>, prajith <prajith@ti.com>, 
-	vigneshr <vigneshr@ti.com>, praneeth <praneeth@ti.com>, 
-	srk <srk@ti.com>, rogerq <rogerq@ti.com>, 
-	krishna <krishna@couthit.com>, pmohan <pmohan@couthit.com>, 
-	mohan <mohan@couthit.com>
-Message-ID: <1255520648.384747.1737559712088.JavaMail.zimbra@couthit.local>
-In-Reply-To: <20250110161654.GB2966768-robh@kernel.org>
-References: <20250109105600.41297-1-basharath@couthit.com> <20250109105600.41297-2-basharath@couthit.com> <20250110161654.GB2966768-robh@kernel.org>
-Subject: Re: [RFC PATCH 01/10] dt-bindings: net: ti: Adds device tree
- binding for DUAL-EMAC mode support on PRU-ICSS2 for AM57xx SOCs
+	s=arc-20240116; t=1737559983; c=relaxed/simple;
+	bh=pnzTTEYjEBkzgtMLwYNGTHvfdjJ2FBRBApOSu9zI4bE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=MJxxYOl4t2rDPtRLvzUGEtiIEhUeEX2lYY/V6Px9MMhv1Ge1rHKAd0EBIhgYBeYCpCLtpglyqOtQEiOtZSxvdtRdg+wO8pmuakUcBh+8ycLu6ElrrS7NdkkjfboiRE/5ahVJGFboL6qcV+gnyv2c70rdSShTa4dvRhWOdQ+8sss=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ts/m3gXn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 17708C4CED2;
+	Wed, 22 Jan 2025 15:32:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1737559983;
+	bh=pnzTTEYjEBkzgtMLwYNGTHvfdjJ2FBRBApOSu9zI4bE=;
+	h=Date:Subject:To:References:From:In-Reply-To:From;
+	b=Ts/m3gXnlKOhdmCT3j4oTO1nDGY8iMavW7jrnnxGcfZGNHJtO/EvhJiWD4ThyWZlD
+	 Gzy5PcB8+CzNF2XvmFY8+srh9DxcCvs/TqteBkb8yxMXSY2pORyEjE3MgnfuXtiNpj
+	 42QoC/rXndIgD5E4GicEXtA6DwJxvgO4JHRt1Y/Eo5WbguqX1/KIIhyxJkT3FhEZ7/
+	 fzkRZKJx66ywu92NR1rehJac92/TdxY8D/5Z0McUOPCWiD/tGoCt3vgao1x6cNzdK/
+	 gI5zpHcDQvPy5C6Li96FIs58wpfI/0KO6GOs2F8LOIiF6pbBFmwoonkbFEydtZb8Zf
+	 zyGjIEzCe0ksw==
+Message-ID: <d5043755-dee6-4919-bb97-8fcd17c76eae@kernel.org>
+Date: Wed, 22 Jan 2025 16:32:55 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6 02/10] bindings: ipmi: Add binding for IPMB device intf
+To: Ninad Palsule <ninad@linux.ibm.com>, minyard@acm.org, robh@kernel.org,
+ krzk+dt@kernel.org, conor+dt@kernel.org, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, openipmi-developer@lists.sourceforge.net,
+ netdev@vger.kernel.org, joel@jms.id.au, andrew@codeconstruct.com.au,
+ devicetree@vger.kernel.org, eajames@linux.ibm.com,
+ linux-arm-kernel@lists.infradead.org, linux-aspeed@lists.ozlabs.org,
+ linux-kernel@vger.kernel.org
+References: <20250116203527.2102742-1-ninad@linux.ibm.com>
+ <20250116203527.2102742-3-ninad@linux.ibm.com>
+ <79c859c6-ff59-4641-8ae7-4136d7c3724e@linux.ibm.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 fv0=
+In-Reply-To: <79c859c6-ff59-4641-8ae7-4136d7c3724e@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Mailer: Zimbra 8.8.15_GA_3968 (ZimbraWebClient - FF113 (Linux)/8.8.15_GA_3968)
-Thread-Topic: dt-bindings: net: ti: Adds device tree binding for DUAL-EMAC mode support on PRU-ICSS2 for AM57xx SOCs
-Thread-Index: Y6Qm4hhadSjfHBHPZZYsz2XckjHHig==
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - server.wki.vra.mybluehostin.me
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - couthit.com
-X-Get-Message-Sender-Via: server.wki.vra.mybluehostin.me: authenticated_id: smtp@couthit.com
-X-Authenticated-Sender: server.wki.vra.mybluehostin.me: smtp@couthit.com
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
 
-> On Thu, Jan 09, 2025 at 04:25:51PM +0530, Basharath Hussain Khaja wrote:
->> From: Parvathi Pudi <parvathi@couthit.com>
+On 22/01/2025 16:10, Ninad Palsule wrote:
+> Hello Corey, Rob & Krzysztof
 > 
-> Also, drop 'device tree binding for ' in the subject. 'dt-bindings'
-> already says that and subject space is precious.
+> On 1/16/25 14:35, Ninad Palsule wrote:
+>> Add device tree binding document for the IPMB device interface.
+>> This device is already in use in both driver and .dts files.
+>>
+>> Signed-off-by: Ninad Palsule <ninad@linux.ibm.com>
 > 
+> Do you have further comments on this? If not can you please send the ACK?
 
-We will change patch subject in the next version.
 
-Thanks & Best Regards,
-Basharath
+You gave us one week to respond, of which half is during merge window.
+
+Don't ping during merge window. Don't ping before 2 weeks. Such pinging
+moves you to the bottom of the inbox queue.
+
+Please relax, and help out by reviewing other patches on the mailing
+lists in order to relieve the burden of maintainers and move your
+patches higher up the list.
+
+Best regards,
+Krzysztof
 
