@@ -1,293 +1,122 @@
-Return-Path: <netdev+bounces-160414-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160415-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE009A19979
-	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 21:04:19 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id CCA37A19982
+	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 21:11:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E6AFE16AB88
-	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 20:04:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9C6FC188D5A4
+	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 20:11:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D6841BE86E;
-	Wed, 22 Jan 2025 20:04:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6D1C21576D;
+	Wed, 22 Jan 2025 20:11:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Hsa/RVXP"
+	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="pnVG5PeJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A7561BD9C1
-	for <netdev@vger.kernel.org>; Wed, 22 Jan 2025 20:04:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9D0F1BD9C1
+	for <netdev@vger.kernel.org>; Wed, 22 Jan 2025 20:11:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737576256; cv=none; b=R2p2sYADn247eYVi5N/F2laJxMDXc10dqqDN2BfjyYDFHs0DBFVNPaeLYGZW3DAx1wr1gZD65Kl5la84U5ejcakrdZ27/iQ1k8mFmSn4uyrHg3BXXQRA+OtJfqpkqpYNdswGvqyB+3rbOEJwY4C5UR6Sm776hzGxJX8WuUUfOIA=
+	t=1737576671; cv=none; b=JphbDvxc4HWlEg2OsR9LXmiDtfrntUfCCgw0ldwkfiqQx5+MXcYPYZgIkLzNTBLkXNB9t2YgqCdgMZUrTPvhEFWujx0V1fBjFRcFk+ZRtkVnmcSn3C882I0RbZnGtXt3tJQCfkWxskZRYnKjy+29LwoDKsIwUoz1Vdfl5PbjYZ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737576256; c=relaxed/simple;
-	bh=XnOtT13HudSo/t5aTUQUe9jqx2EsCkhi+wwhAHszSpE=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Cc++LEloAPvl91rITTEzqcG9LrpLzgJF7kBByNil6Pudu16M4fkEB4pIlh4uao9a7K0a7J8gAQk0P7bI/wvGADR0U1c1nRDEuMyi7rUmfrDf3Ndmm7nn/n0qXoG9tFFgtD06Nov2Bau4vZXczDHOpWiBw6nvBni2MoguxBsTN4E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--maze.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Hsa/RVXP; arc=none smtp.client-ip=209.85.214.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--maze.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-216430a88b0so1696005ad.0
-        for <netdev@vger.kernel.org>; Wed, 22 Jan 2025 12:04:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1737576254; x=1738181054; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id
-         :mime-version:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ozi+W3TuMxcKCBieZitU4SmxxIHib2ALKkefPS+Ch58=;
-        b=Hsa/RVXPlmXIMMRobCLeCqT+IyFjujmjX8ubamYkHLH4RxKiamyoBQoZOnjWE8knUT
-         xcHyXAa/J0wICp4e+0icMojTLmDzyhzV1CNGw+XMoGyPNwb1yX2fZkU2aZeQyNmMBg8z
-         aYxwhFOpgObW/Xxg2tKgxMiJJkZ33XVIFFvdUqCesrpmtnTo/UdyiWJxrT+18pfv/Rjo
-         2IhWmoUX/jxdLpP+UCXmxig/IuawwiyBsG9i4bhgV3fAvnDIA82h3Nq3bAS1W7Vh6RRZ
-         MlSLUyQPHiUA7gpSj1txr88JzX9RDPBMbUOdbNmNiloLTtze3w9hA0S5tHG9DHRLyDqq
-         m07w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737576254; x=1738181054;
-        h=content-transfer-encoding:cc:to:from:subject:message-id
-         :mime-version:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Ozi+W3TuMxcKCBieZitU4SmxxIHib2ALKkefPS+Ch58=;
-        b=EqixZ1MuamE5J19jNsnVWEPJtY89mHEAqBnI6A/A4BIvqXRx55q/pnpKdUsEKGk2mH
-         KtMOkYPpxNaHqWRy+hf+1Gi+HrCjP4MRTqavhK5Zs8lFjEbPYYB1i9RbLrRbZYr7WEEn
-         aRQsshpqd/y4I5RhHBqgz9yCQ7uy/5siup5z4RgbEFpM40QbV5RCprouD7ys9YGWsl7N
-         ck2HUPo8DiqMNO2i3CLdHwzajix0WhRZlSgHkIm8ZQBVU3c/zUmTK8Aob6/q45kWkGJr
-         YnM5HKby7LUa1H3HLRqlo8ub7ARapZmBELw+k/GPc1API7BGf+85Jj6D1Xm2piL0aVwU
-         oIhA==
-X-Gm-Message-State: AOJu0YxICTSQ7IZed95LcFq12RpE8snW1B8A2N9S6VaPOcfECR6s/W3e
-	fI29tbHFNGonSdS9/JvEaNs0ZkSXbqXFYVyIiCZKBEOE4XJiNpYDBv/GusOci2HiGwjEtA==
-X-Google-Smtp-Source: AGHT+IHpSV7GVNyrwh5GIG16/iJ0rRkMw3mueP4dceG3gVzgrm9kryZBPCQsDNMjT1C/+MV9sYgrFxKg
-X-Received: from pllb16.prod.google.com ([2002:a17:902:e950:b0:21b:d402:6f93])
- (user=maze job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:e802:b0:215:827e:3a6
- with SMTP id d9443c01a7336-21c355ba38amr376633905ad.40.1737576253571; Wed, 22
- Jan 2025 12:04:13 -0800 (PST)
-Date: Wed, 22 Jan 2025 12:04:02 -0800
+	s=arc-20240116; t=1737576671; c=relaxed/simple;
+	bh=xiVklZWeDyqQaIb7NQirPPzWOTaC7AWuhSk1SfYzmSw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=eQI03wdGa/RDeSKnFZsef03BGVGgP8NpkORkYgQEAMy9ZSHIywzmOVJLv/L2U3i6Ag1z43DL7QGlq332/IfQluRQiwO5llqG/dH085dd7PCp5WkyEsTRaw3LWR3VPXlNTOdbhHE9yE/3L0tfZngSkSW0JspCkRxbSCWia4c5bCI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=pnVG5PeJ; arc=none smtp.client-ip=185.226.149.38
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
+Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
+	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.93)
+	(envelope-from <mhal@rbox.co>)
+	id 1tah3s-004ZhE-Ar; Wed, 22 Jan 2025 21:10:52 +0100
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+	s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
+	References:Cc:To:Subject:MIME-Version:Date:Message-ID;
+	bh=96N5yEpnpGGbPvNGnxUtkM1/nlXoKkOwvrM3xTWF/wU=; b=pnVG5PeJsGdetLBvx9EuIUz8O5
+	S14heXhNsosPvtMk5Reu5UBo3lrY/DoAVnbn+yPeCrhTRcX7SORwpc5h7rvcdOkqw+c6XxYUD7tLL
+	0IONqdKPF4GQ82QmXx00Yw0uaWQaXrEyVH7w28jbUtg3oeb58RQoaxQVJbCQFFjJcyHsBWH9TkoPC
+	xBpJvF34eRLKIDCjtddkkX2C/26iMwAPwdsM12g4zB+AUFDFMFLPAEbdgbK6M6JHm5bNJf3gkupVq
+	4+7kD6LoXbSLjdEbkAbQD5tleLdwg08iymsR32RyLHmFecHPuyQf0UMUmtEqTi5NIRqRQkyAnCSiR
+	wFRxU7cQ==;
+Received: from [10.9.9.72] (helo=submission01.runbox)
+	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
+	(envelope-from <mhal@rbox.co>)
+	id 1tah3r-0002Q4-7g; Wed, 22 Jan 2025 21:10:51 +0100
+Received: by submission01.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.93)
+	id 1tah3i-00DIsB-4c; Wed, 22 Jan 2025 21:10:42 +0100
+Message-ID: <44f050cb-b89d-4c93-ba24-18091dada750@rbox.co>
+Date: Wed, 22 Jan 2025 21:10:40 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.48.1.262.g85cc9f2d1e-goog
-Message-ID: <20250122200402.3461154-1-maze@google.com>
-Subject: [PATCH bpf] bpf: fix classic bpf reads from negative offset outside
- of linear skb portion
-From: "=?UTF-8?q?Maciej=20=C5=BBenczykowski?=" <maze@google.com>
-To: "=?UTF-8?q?Maciej=20=C5=BBenczykowski?=" <zenczykowski@gmail.com>, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>
-Cc: Linux Network Development Mailing List <netdev@vger.kernel.org>, "David S . Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, BPF Mailing List <bpf@vger.kernel.org>, 
-	"=?UTF-8?q?Maciej=20=C5=BBenczykowski?=" <maze@google.com>, Stanislav Fomichev <sdf@fomichev.me>, Willem de Bruijn <willemb@google.com>, 
-	Matt Moeller <moeller.matt@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v2 0/6] vsock: Transport reassignment and error
+ handling issues
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ George Zhang <georgezhang@vmware.com>, Dmitry Torokhov <dtor@vmware.com>,
+ Andy King <acking@vmware.com>, netdev@vger.kernel.org
+References: <20250121-vsock-transport-vs-autobind-v2-0-aad6069a4e8c@rbox.co>
+ <kxipc432xhur74ygdjw3ybcmg7amg6mnt2k4op3d4cb5d3com6@jsv3jzic5nrw>
+ <282fbb3c-97d6-4835-86d3-97eb14ff74ea@rbox.co>
+ <CAGxU2F5zhfWymY8u0hrKksW8PumXAYz-9_qRmW==92oAx1BX3g@mail.gmail.com>
+From: Michal Luczaj <mhal@rbox.co>
+Content-Language: pl-PL, en-GB
+In-Reply-To: <CAGxU2F5zhfWymY8u0hrKksW8PumXAYz-9_qRmW==92oAx1BX3g@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-We're received reports of cBPF code failing to accept DHCP packets.
-"BPF filter for DHCP not working (android14-6.1-lts + android-14.0.0_r74)"
+On 1/22/25 16:47, Stefano Garzarella wrote:
+> On Wed, 22 Jan 2025 at 15:16, Michal Luczaj <mhal@rbox.co> wrote:
+>>
+>> On 1/22/25 12:45, Stefano Garzarella wrote:
+>>> On Tue, Jan 21, 2025 at 03:44:01PM +0100, Michal Luczaj wrote:
+>>>> Series deals with two issues:
+>>>> - socket reference count imbalance due to an unforgiving transport release
+>>>>  (triggered by transport reassignment);
+>>>> - unintentional API feature, a failing connect() making the socket
+>>>>  impossible to use for any subsequent connect() attempts.
+>>>>
+>>>> Signed-off-by: Michal Luczaj <mhal@rbox.co>
+>>>> ---
+>>>> Changes in v2:
+>>>> - Introduce vsock_connect_fd(), simplify the tests, stick to SOCK_STREAM,
+>>>>  collect Reviewed-by (Stefano)
+>>>> - Link to v1: https://lore.kernel.org/r/20250117-vsock-transport-vs-autobind-v1-0-c802c803762d@rbox.co
+>>>
+>>> Thanks for sorting out my comments, I've reviewed it all and got it
+>>> running, it seems to be going well!
+>>
+>> Great! I was worried that I might have oversimplified the UAF selftest
+>> (won't trigger the splat if second transport == NULL), so please let me
+>> know if it starts acting strangely (quietly passes the test on an unpatched
+>> system), and for what combination of enabled transports.
+> 
+> Yeah, I was worrying the same and thinking if it's better to add more
+> connect also with LOOPBACK and a CID > 2 to be sure we test all the
+> scenarios, but we can do later, for now let's have this series merged
+> to fix the real issue.
 
-The relevant Android code is at:
-  https://cs.android.com/android/platform/superproject/main/+/main:packages=
-/modules/NetworkStack/jni/network_stack_utils_jni.cpp;l=3D95;drc=3D9df50aef=
-1fd163215dcba759045706253a5624f5
-which uses a lot of macros from:
-  https://cs.android.com/android/platform/superproject/main/+/main:packages=
-/modules/Connectivity/bpf/headers/include/bpf/BpfClassic.h;drc=3Dc58cfb7c7d=
-a257010346bd2d6dcca1c0acdc8321
+Sure, I'll take care of this CID galore later on.
 
-This is widely used and does work on the vast majority of drivers,
-but is exposing a core kernel cBPF bug related to driver skb layout.
+> I tested without the fixes (first 2 patches) and I can see the
+> use-after-free reports only on the "host" where I have both loopback
+> and H2G loaded, but this should be fine.
 
-Root cause is iwlwifi driver, specifically on (at least):
-  Dell 7212: Intel Dual Band Wireless AC 8265
-  Dell 7220: Intel Wireless AC 9560
-  Dell 7230: Intel Wi-Fi 6E AX211
-delivers frames where the UDP destination port is not in the skb linear
-portion, while the cBPF code is using SKF_NET_OFF relative addressing.
-
-simplified from above, effectively:
-  BPF_STMT(BPF_LDX | BPF_B | BPF_MSH, SKF_NET_OFF)
-  BPF_STMT(BPF_LD  | BPF_H | BPF_IND, SKF_NET_OFF + 2)
-  BPF_JUMP(BPF_JMP | BPF_JEQ | BPF_K, 68, 1, 0)
-  BPF_STMT(BPF_RET | BPF_K, 0)
-  BPF_STMT(BPF_RET | BPF_K, 0xFFFFFFFF)
-fails to match udp dport=3D68 packets.
-
-Specifically the 3rd cBPF instruction fails to match the condition:
-  if (ptr >=3D skb->head && ptr + size <=3D skb_tail_pointer(skb))
-within bpf_internal_load_pointer_neg_helper() and thus returns NULL,
-which results in reading -EFAULT.
-
-This is because bpf_skb_load_helper_{8,16,32} don't include the
-"data past headlen do skb_copy_bits()" logic from the non-negative
-offset branch in the negative offset branch.
-
-Note: I don't know sparc assembly, so this doesn't fix sparc...
-ideally we should just delete bpf_internal_load_pointer_neg_helper()
-This seems to have always been broken (but not pre-git era, since
-obviously there was no eBPF helpers back then), but stuff older
-than 5.4 is no longer LTS supported anyway, so using 5.4 as fixes tag.
-
-Cc: Alexei Starovoitov <ast@kernel.org>
-Cc: Daniel Borkmann <daniel@iogearbox.net>
-Cc: Stanislav Fomichev <sdf@fomichev.me>
-Cc: Willem de Bruijn <willemb@google.com>
-Reported-by: Matt Moeller <moeller.matt@gmail.com>
-Closes: https://issuetracker.google.com/384636719 [Treble - GKI partner int=
-ernal]
-Signed-off-by: Maciej =C5=BBenczykowski <maze@google.com>
-Fixes: 219d54332a09 ("Linux 5.4")
----
- include/linux/filter.h |  2 ++
- kernel/bpf/core.c      | 14 +++++++++
- net/core/filter.c      | 69 +++++++++++++++++-------------------------
- 3 files changed, 43 insertions(+), 42 deletions(-)
-
-diff --git a/include/linux/filter.h b/include/linux/filter.h
-index a3ea46281595..c24d8e338ce4 100644
---- a/include/linux/filter.h
-+++ b/include/linux/filter.h
-@@ -1479,6 +1479,8 @@ static inline u16 bpf_anc_helper(const struct sock_fi=
-lter *ftest)
- void *bpf_internal_load_pointer_neg_helper(const struct sk_buff *skb,
- 					   int k, unsigned int size);
-=20
-+int bpf_internal_neg_helper(const struct sk_buff *skb, int k);
-+
- static inline int bpf_tell_extensions(void)
- {
- 	return SKF_AD_MAX;
-diff --git a/kernel/bpf/core.c b/kernel/bpf/core.c
-index da729cbbaeb9..994988dabb97 100644
---- a/kernel/bpf/core.c
-+++ b/kernel/bpf/core.c
-@@ -89,6 +89,20 @@ void *bpf_internal_load_pointer_neg_helper(const struct =
-sk_buff *skb, int k, uns
- 	return NULL;
- }
-=20
-+int bpf_internal_neg_helper(const struct sk_buff *skb, int k)
-+{
-+	if (k >=3D 0)
-+		return k;
-+	if (k >=3D SKF_NET_OFF)
-+		return skb->network_header + k - SKF_NET_OFF;
-+	if (k >=3D SKF_LL_OFF) {
-+		if (unlikely(!skb_mac_header_was_set(skb)))
-+			return -1;
-+		return skb->mac_header + k - SKF_LL_OFF;
-+	}
-+	return -1;
-+}
-+
- /* tell bpf programs that include vmlinux.h kernel's PAGE_SIZE */
- enum page_size_enum {
- 	__PAGE_SIZE =3D PAGE_SIZE
-diff --git a/net/core/filter.c b/net/core/filter.c
-index e56a0be31678..609ef7df71ce 100644
---- a/net/core/filter.c
-+++ b/net/core/filter.c
-@@ -221,21 +221,16 @@ BPF_CALL_3(bpf_skb_get_nlattr_nest, struct sk_buff *,=
- skb, u32, a, u32, x)
- BPF_CALL_4(bpf_skb_load_helper_8, const struct sk_buff *, skb, const void =
-*,
- 	   data, int, headlen, int, offset)
- {
--	u8 tmp, *ptr;
--	const int len =3D sizeof(tmp);
--
--	if (offset >=3D 0) {
--		if (headlen - offset >=3D len)
--			return *(u8 *)(data + offset);
--		if (!skb_copy_bits(skb, offset, &tmp, sizeof(tmp)))
--			return tmp;
--	} else {
--		ptr =3D bpf_internal_load_pointer_neg_helper(skb, offset, len);
--		if (likely(ptr))
--			return *(u8 *)ptr;
--	}
-+	u8 tmp;
-=20
--	return -EFAULT;
-+	offset =3D bpf_internal_neg_helper(skb, offset);
-+	if (unlikely(offset < 0))
-+		return -EFAULT;
-+	if (headlen - offset >=3D sizeof(u8))
-+		return *(u8 *)(data + offset);
-+	if (skb_copy_bits(skb, offset, &tmp, sizeof(tmp)))
-+		return -EFAULT;
-+	return tmp;
- }
-=20
- BPF_CALL_2(bpf_skb_load_helper_8_no_cache, const struct sk_buff *, skb,
-@@ -248,21 +243,16 @@ BPF_CALL_2(bpf_skb_load_helper_8_no_cache, const stru=
-ct sk_buff *, skb,
- BPF_CALL_4(bpf_skb_load_helper_16, const struct sk_buff *, skb, const void=
- *,
- 	   data, int, headlen, int, offset)
- {
--	__be16 tmp, *ptr;
--	const int len =3D sizeof(tmp);
-+	__be16 tmp;
-=20
--	if (offset >=3D 0) {
--		if (headlen - offset >=3D len)
--			return get_unaligned_be16(data + offset);
--		if (!skb_copy_bits(skb, offset, &tmp, sizeof(tmp)))
--			return be16_to_cpu(tmp);
--	} else {
--		ptr =3D bpf_internal_load_pointer_neg_helper(skb, offset, len);
--		if (likely(ptr))
--			return get_unaligned_be16(ptr);
--	}
--
--	return -EFAULT;
-+	offset =3D bpf_internal_neg_helper(skb, offset);
-+	if (unlikely(offset < 0))
-+		return -EFAULT;
-+	if (headlen - offset >=3D sizeof(__be16))
-+		return get_unaligned_be16(data + offset);
-+	if (skb_copy_bits(skb, offset, &tmp, sizeof(tmp)))
-+		return -EFAULT;
-+	return be16_to_cpu(tmp);
- }
-=20
- BPF_CALL_2(bpf_skb_load_helper_16_no_cache, const struct sk_buff *, skb,
-@@ -275,21 +265,16 @@ BPF_CALL_2(bpf_skb_load_helper_16_no_cache, const str=
-uct sk_buff *, skb,
- BPF_CALL_4(bpf_skb_load_helper_32, const struct sk_buff *, skb, const void=
- *,
- 	   data, int, headlen, int, offset)
- {
--	__be32 tmp, *ptr;
--	const int len =3D sizeof(tmp);
--
--	if (likely(offset >=3D 0)) {
--		if (headlen - offset >=3D len)
--			return get_unaligned_be32(data + offset);
--		if (!skb_copy_bits(skb, offset, &tmp, sizeof(tmp)))
--			return be32_to_cpu(tmp);
--	} else {
--		ptr =3D bpf_internal_load_pointer_neg_helper(skb, offset, len);
--		if (likely(ptr))
--			return get_unaligned_be32(ptr);
--	}
-+	__be32 tmp;
-=20
--	return -EFAULT;
-+	offset =3D bpf_internal_neg_helper(skb, offset);
-+	if (unlikely(offset < 0))
-+		return -EFAULT;
-+	if (headlen - offset >=3D sizeof(__be32))
-+		return get_unaligned_be32(data + offset);
-+	if (skb_copy_bits(skb, offset, &tmp, sizeof(tmp)))
-+		return -EFAULT;
-+	return be32_to_cpu(tmp);
- }
-=20
- BPF_CALL_2(bpf_skb_load_helper_32_no_cache, const struct sk_buff *, skb,
---=20
-2.48.1.262.g85cc9f2d1e-goog
+Argh, sorry. FWIW, re-adding a bind() after the second connect should
+increase the coverage.
 
 
