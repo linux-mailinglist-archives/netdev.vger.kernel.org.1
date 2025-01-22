@@ -1,134 +1,141 @@
-Return-Path: <netdev+bounces-160159-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160160-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9982CA1896A
-	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 02:15:26 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B55BA1897A
+	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 02:24:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2392A7A1427
-	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 01:15:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 463713A9890
+	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 01:24:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21EEB8F40;
-	Wed, 22 Jan 2025 01:15:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="nil9KyH2"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDFE153368;
+	Wed, 22 Jan 2025 01:24:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D2C68F49
-	for <netdev@vger.kernel.org>; Wed, 22 Jan 2025 01:15:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E11EA84A3E;
+	Wed, 22 Jan 2025 01:24:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737508520; cv=none; b=sSYU5get8qSpoBKRTjMfMK1cJH6TOXFZxT4hf/iZ/Rudb/MuZRJJfj0ad98iAqgpu7FezbQkfpKCIhpzVFSJ/aw6N6H9XKrD7jNYgUVeqao5dlGTI//pFQqmmG9pd7QyDHyNnuuoM8QPYq/AozWmq3O7NTtnkpun0hJ6LNjVvx8=
+	t=1737509081; cv=none; b=HIvVkrdy60viOA7n6PoNyxtAc+jSfOgVam8rFrBJ4cix1ehq5idu6Y0PvZYX82SdSKo5JvR//r/Fywa9Tjjsf1f3HgOPMxAG16ESoAog/r2Ymb/rVgzVsingQO3EtHv8G2l0XPukad97fnx1nywx8odG2iYifqgzC2i8NFokZPE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737508520; c=relaxed/simple;
-	bh=Auil3q9VpnTTByFINJN+9PkUsN5DJlrVKm/9v2vis5U=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=m+k6RHK9NDZVgyo+2B3kqZyZ1a7twqzwnEVSJ+YSzRj0eBTPgb7x1CetUZ5A8aRnDGj3CDj4W4Q8fVMxNeZ6iTOqrUrrYTwqsYF4kxatqLF/y7AfNYJMY5fOgIN0PA+HW83fYO0SXG7oDoatyf6NJsF06NdVKwM+jkYzdN/xDcc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=nil9KyH2; arc=none smtp.client-ip=67.231.145.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
-Received: from pps.filterd (m0148461.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50M1CJ5P002927
-	for <netdev@vger.kernel.org>; Tue, 21 Jan 2025 17:15:17 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=cc
-	:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=s2048-2021-q4; bh=KNkZHhwh/R7GeGtNNM
-	eOGK4J0MhlYg+Kl09fusSjY+g=; b=nil9KyH29QkH2CQNpl3pGzFaltcNqOVOxl
-	Sb17FbdjTKvy+/fgb1SoO9R2UWRbsW8Fm1d2Fla09e2vJU8qyqVoHpjlu7eh8YNz
-	J/Q/znCSBygFXvBY4HOFJ3xhQOkFvyddzCq47nwnzIBTAU7OaC2Q0Vfftvc7qSfa
-	vXMtjRJOhzjRmixhbhuY1OsTo1z+w11lAyzQc7sWgOJUk118rUkQlVvNbF7I/JSC
-	v0hA6YG3zmjwv/Br64XEK2gCPEDZ3r6cjn+2xk57XLZKR9OCNuc3gWKF1RhbX3T9
-	bLE9Jmyus0PdLQfbGDeLiWF4C8dWYCNM1rNggmc8s4cGQvl9Jvxw==
-Received: from maileast.thefacebook.com ([163.114.135.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 44apqwr17u-3
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Tue, 21 Jan 2025 17:15:17 -0800 (PST)
-Received: from twshared24170.03.ash8.facebook.com (2620:10d:c0a8:fe::f072) by
- mail.thefacebook.com (2620:10d:c0a9:6f::8fd4) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.1544.14; Wed, 22 Jan 2025 01:15:05 +0000
-Received: by devbig072.ftw6.facebook.com (Postfix, from userid 678122)
-	id 8272D115C53B; Tue, 21 Jan 2025 17:14:54 -0800 (PST)
-From: Michael Edwards <mkedwards@meta.com>
-To: <netdev@vger.kernel.org>
-CC: Michael Edwards <mkedwards@meta.com>
-Subject: [PATCH] ethtool: Fix JSON output for IRQ coalescing
-Date: Tue, 21 Jan 2025 17:14:34 -0800
-Message-ID: <20250122011445.4026973-1-mkedwards@meta.com>
-X-Mailer: git-send-email 2.43.5
+	s=arc-20240116; t=1737509081; c=relaxed/simple;
+	bh=7J9k+vhJbkWnpKNkU1nyvXKGlDpz5XeS8fbzoe+ZSvE=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=N3UpPDL2uzIN0hPLQ7747iEPCLdV75dmLBXQcn4zl8RZTHcrWANE2NcjP/Z+Qaj6s+gy1oPUwKSYexgV1tZEscBUfoogrchDxWL1pKPvIkINAoXMuxmwP6Xy8R3amlfDX26S8n/7YoCJDyKOEiWWrlveub4sFleRYXo15MrDyjM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.20.42.164])
+	by gateway (Coremail) with SMTP id _____8DxDePTSJBnQQFnAA--.9323S3;
+	Wed, 22 Jan 2025 09:24:35 +0800 (CST)
+Received: from [10.20.42.164] (unknown [10.20.42.164])
+	by front1 (Coremail) with SMTP id qMiowMCxFOTSSJBnSSMqAA--.21666S2;
+	Wed, 22 Jan 2025 09:24:34 +0800 (CST)
+Subject: Re: [PATCH] net: stmmac: dwmac-loongson: Add fix_soc_reset function
+To: Huacai Chen <chenhuacai@kernel.org>
+Cc: kuba@kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, si.yanteng@linux.dev,
+ fancer.lancer@gmail.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20250121082536.11752-1-zhaoqunqin@loongson.cn>
+ <CAAhV-H7LA7OBCxRzQogCbDeniY39EsxA6GVN07WM=e6EzasM0w@mail.gmail.com>
+From: Qunqin Zhao <zhaoqunqin@loongson.cn>
+Message-ID: <e4497169-a14f-d29e-bd32-22bb4ed9fcfc@loongson.cn>
+Date: Wed, 22 Jan 2025 09:22:48 +0800
+User-Agent: Mozilla/5.0 (X11; Linux mips64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-FB-Internal: Safe
-Content-Type: text/plain
-X-Proofpoint-GUID: rgDPD5eVor137YbrkgJK2bS13rPZ-l4R
-X-Proofpoint-ORIG-GUID: rgDPD5eVor137YbrkgJK2bS13rPZ-l4R
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-01-21_10,2025-01-21_03,2024-11-22_01
+In-Reply-To: <CAAhV-H7LA7OBCxRzQogCbDeniY39EsxA6GVN07WM=e6EzasM0w@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-CM-TRANSID:qMiowMCxFOTSSJBnSSMqAA--.21666S2
+X-CM-SenderInfo: 52kd01pxqtx0o6or00hjvr0hdfq/
+X-Coremail-Antispam: 1Uk129KBj93XoWxJr4rWw4xXw1UXFWUGw1Utwc_yoW8tF13pr
+	W3Aa4Ygryjqry7tan0yr45ZFyYvrWFgrWxWF4xtwna9as0y34qqFyjgF4Ykr13ArWkKF12
+	vr1j9r17CF1qkrgCm3ZEXasCq-sJn29KB7ZKAUJUUUUx529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUPFb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVWxJr0_GcWl84ACjcxK6I8E87Iv6xkF7I0E14v2
+	6F4UJVW0owAaw2AFwI0_JF0_Jw1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqjxCEc2xF0c
+	Ia020Ex4CE44I27wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_JF0_
+	Jw1lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwIxGrw
+	CYjI0SjxkI62AI1cAE67vIY487MxkF7I0En4kS14v26r126r1DMxAIw28IcxkI7VAKI48J
+	MxC20s026xCaFVCjc4AY6r1j6r4UMxCIbckI1I0E14v26r126r1DMI8I3I0E5I8CrVAFwI
+	0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y
+	0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1I6r4UMIIF0xvE2Ix0cI8IcVCY1x0267AKxV
+	WUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1l
+	IxAIcVC2z280aVCY1x0267AKxVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjxUcbAwUUUUU
 
-Currently, for a NIC that supports CQE mode settings, the output of
-ethtool --json -c eth0 looks like this:
 
-[ {
-        "ifname": "eth0",
-        "rx": false,
-        "tx": false,
-        "rx-usecs": 33,
-        "rx-frames": 88,
-        "tx-usecs": 158,
-        "tx-frames": 128,
-        "rx": true,
-        "tx": false
-    } ]
-
-This diff will change the first rx/tx pair to adaptive-{rx|tx} and
-the second pair to cqe-mode-{rx|tx} to match the keys used to set
-the corresponding settings.
----
- netlink/coalesce.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
-
-diff --git a/netlink/coalesce.c b/netlink/coalesce.c
-index bb93f9b..bc8b57b 100644
---- a/netlink/coalesce.c
-+++ b/netlink/coalesce.c
-@@ -39,9 +39,9 @@ int coalesce_reply_cb(const struct nlmsghdr *nlhdr, voi=
-d *data)
- 		show_cr();
- 	print_string(PRINT_ANY, "ifname", "Coalesce parameters for %s:\n",
- 		     nlctx->devname);
--	show_bool("rx", "Adaptive RX: %s  ",
-+	show_bool("adaptive-rx", "Adaptive RX: %s  ",
- 		  tb[ETHTOOL_A_COALESCE_USE_ADAPTIVE_RX]);
--	show_bool("tx", "TX: %s\n", tb[ETHTOOL_A_COALESCE_USE_ADAPTIVE_TX]);
-+	show_bool("adaptive-tx", "TX: %s\n", tb[ETHTOOL_A_COALESCE_USE_ADAPTIVE=
-_TX]);
- 	show_u32("stats-block-usecs", "stats-block-usecs:\t",
- 		 tb[ETHTOOL_A_COALESCE_STATS_BLOCK_USECS]);
- 	show_u32("sample-interval", "sample-interval:\t",
-@@ -85,9 +85,9 @@ int coalesce_reply_cb(const struct nlmsghdr *nlhdr, voi=
-d *data)
- 	show_u32("tx-frame-high", "tx-frame-high:\t",
- 		 tb[ETHTOOL_A_COALESCE_TX_MAX_FRAMES_HIGH]);
- 	show_cr();
--	show_bool("rx", "CQE mode RX: %s  ",
-+	show_bool("cqe-mode-rx", "CQE mode RX: %s  ",
- 		  tb[ETHTOOL_A_COALESCE_USE_CQE_MODE_RX]);
--	show_bool("tx", "TX: %s\n", tb[ETHTOOL_A_COALESCE_USE_CQE_MODE_TX]);
-+	show_bool("cqe-mode-tx", "TX: %s\n", tb[ETHTOOL_A_COALESCE_USE_CQE_MODE=
-_TX]);
- 	show_cr();
- 	show_u32("tx-aggr-max-bytes", "tx-aggr-max-bytes:\t",
- 		 tb[ETHTOOL_A_COALESCE_TX_AGGR_MAX_BYTES]);
---=20
-2.43.5
+在 2025/1/21 下午5:29, Huacai Chen 写道:
+> Hi, Qunqin,
+>
+> The patch itself looks good to me, but something can be improved.
+> 1. The title can be "net: stmmac: dwmac-loongson: Add fix_soc_reset() callback"
+> 2. You lack a "." at the end of the commit message.
+> 3. Add a "Cc: stable@vger.kernel.org" because it is needed to backport
+> to 6.12/6.13.
+>
+> After that you can add:
+> Reviewed-by: Huacai Chen <chenhuacai@loongson.cn>
+OK, Thanks
+>
+>
+> Huacai
+>
+> On Tue, Jan 21, 2025 at 4:26 PM Qunqin Zhao <zhaoqunqin@loongson.cn> wrote:
+>> Loongson's GMAC device takes nearly two seconds to complete DMA reset,
+>> however, the default waiting time for reset is 200 milliseconds
+>>
+>> Signed-off-by: Qunqin Zhao <zhaoqunqin@loongson.cn>
+>> ---
+>>   .../net/ethernet/stmicro/stmmac/dwmac-loongson.c    | 13 +++++++++++++
+>>   1 file changed, 13 insertions(+)
+>>
+>> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+>> index bfe6e2d631bd..35639d26256c 100644
+>> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+>> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+>> @@ -516,6 +516,18 @@ static int loongson_dwmac_acpi_config(struct pci_dev *pdev,
+>>          return 0;
+>>   }
+>>
+>> +static int loongson_fix_soc_reset(void *priv, void __iomem *ioaddr)
+>> +{
+>> +       u32 value = readl(ioaddr + DMA_BUS_MODE);
+>> +
+>> +       value |= DMA_BUS_MODE_SFT_RESET;
+>> +       writel(value, ioaddr + DMA_BUS_MODE);
+>> +
+>> +       return readl_poll_timeout(ioaddr + DMA_BUS_MODE, value,
+>> +                                 !(value & DMA_BUS_MODE_SFT_RESET),
+>> +                                 10000, 2000000);
+>> +}
+>> +
+>>   static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+>>   {
+>>          struct plat_stmmacenet_data *plat;
+>> @@ -566,6 +578,7 @@ static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id
+>>
+>>          plat->bsp_priv = ld;
+>>          plat->setup = loongson_dwmac_setup;
+>> +       plat->fix_soc_reset = loongson_fix_soc_reset;
+>>          ld->dev = &pdev->dev;
+>>          ld->loongson_id = readl(res.addr + GMAC_VERSION) & 0xff;
+>>
+>>
+>> base-commit: 5bc55a333a2f7316b58edc7573e8e893f7acb532
+>> --
+>> 2.43.0
+>>
 
 
