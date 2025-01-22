@@ -1,179 +1,168 @@
-Return-Path: <netdev+bounces-160174-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160175-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB50DA18A41
-	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 03:53:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 29ECDA18A59
+	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 04:05:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D77AA167ABB
-	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 02:53:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5E4A816A97D
+	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 03:05:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9D9914B092;
-	Wed, 22 Jan 2025 02:53:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7A22145B0B;
+	Wed, 22 Jan 2025 03:05:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="AGoCjCA/"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+Received: from out30-118.freemail.mail.aliyun.com (out30-118.freemail.mail.aliyun.com [115.124.30.118])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4626F219FC;
-	Wed, 22 Jan 2025 02:53:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42BA41DFF0;
+	Wed, 22 Jan 2025 03:05:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.118
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737514387; cv=none; b=YwE/XIyTcUngpfH4KBu/vDFgf0/6Ea0oBO7h24H0jVk2340GwbfEEsO9aYeDv6f3sj6DEDqh5xYWBpX19p6YO/eNwg9VZDQtVUZ5kbg1kWCJ0Bc+R38l0YLJ5/eZXbKYfBpcSx5qqn8FFRtLGpL2b/o0oD3gTkx7jftxJqxAXs8=
+	t=1737515105; cv=none; b=etZj6imfLoIUbM/TZkVQN4tyf7TO+A6qIuRIwLJTWl85pOzpZ2a3ikYZMV5jCD8039SBwC7NC7as45/p6SiJd21BZi7wefxi1mUeKROQXDd3NulLGr1zxpj5Na4GXuAv9jfTiYTgaQX5Xb3vJpcMZ6eOKvDMwyHnB+/tZady1Wo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737514387; c=relaxed/simple;
-	bh=jMEZUEmyc5inTd+hFkXBvRzNFgvJvTNvNBMipEL3upg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=s+7gbmcwDCxovTK/tSKbbzRQkfQKnZyB7KPSi89My5i50aNpk8L5o8MAgVKrcSs8IuovjSA3mDAH8HFlUb6NVU1pKZpRilD9ZbfQBMHRt3TUbAHeI1wCNsCjIV7aMjFRHhaum2uSMLGb/g1l5xzFTaPfg3AyvKBHqlHke6/tuJ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.194])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4Yd7pP6tHZzgc1c;
-	Wed, 22 Jan 2025 10:49:49 +0800 (CST)
-Received: from dggemv712-chm.china.huawei.com (unknown [10.1.198.32])
-	by mail.maildlp.com (Postfix) with ESMTPS id 2B8E1140159;
-	Wed, 22 Jan 2025 10:53:01 +0800 (CST)
-Received: from kwepemn100009.china.huawei.com (7.202.194.112) by
- dggemv712-chm.china.huawei.com (10.1.198.32) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Wed, 22 Jan 2025 10:53:00 +0800
-Received: from [10.67.121.59] (10.67.121.59) by kwepemn100009.china.huawei.com
- (7.202.194.112) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Wed, 22 Jan
- 2025 10:52:58 +0800
-Message-ID: <fd412ce2-ec40-fe73-6b1b-284a99a39f12@huawei.com>
-Date: Wed, 22 Jan 2025 10:52:58 +0800
+	s=arc-20240116; t=1737515105; c=relaxed/simple;
+	bh=v7wNV92ceArbY3Q55JLdSkpDqJ235ENJaaLp30RgAK0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uiFOoiC8fzuL2m2LxQTZd4RsoELXQib3bXEvIzW1kPHoduuFLMCZZu+v8t74qIxd7VgI8mGc27tPWo4HyeRbgx37NqHYipTW9to5KAEKMmqLivlSydCCFOeFAg+1MK7h+0HgF6YGyR3bSMfqnMWKCKUNWtMFPmXDVYfvZ6jB3JQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=AGoCjCA/; arc=none smtp.client-ip=115.124.30.118
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1737515100; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
+	bh=ChLu+bsO1fPPKy1p8fiLQGD4NeUbVV1c6LJjwIvLBYU=;
+	b=AGoCjCA/yPfCcEHv8+tNbuqGR8hfxz4lp7Z00kQ4Tw6Y2ZpQgiOiS/q5ewgZt9tzgzKhzSkro+XX9UdsL4wB+RHQGEUz5ivJIz4ZE0zkcQSINQmSCNltsgbrca4AWJ+GeSBuCUK2NcMlz/W9fBzKQh+HP/CZYZcWtsrlInqaQec=
+Received: from localhost(mailfrom:dust.li@linux.alibaba.com fp:SMTPD_---0WO6zR0i_1737515099 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Wed, 22 Jan 2025 11:05:00 +0800
+Date: Wed, 22 Jan 2025 11:04:59 +0800
+From: Dust Li <dust.li@linux.alibaba.com>
+To: Alexandra Winter <wintera@linux.ibm.com>,
+	Julian Ruess <julianr@linux.ibm.com>,
+	Wenjia Zhang <wenjia@linux.ibm.com>,
+	Jan Karcher <jaka@linux.ibm.com>, Gerd Bayer <gbayer@linux.ibm.com>,
+	Halil Pasic <pasic@linux.ibm.com>,
+	"D. Wythe" <alibuda@linux.alibaba.com>,
+	Tony Lu <tonylu@linux.alibaba.com>,
+	Wen Gu <guwen@linux.alibaba.com>,
+	Peter Oberparleiter <oberpar@linux.ibm.com>,
+	David Miller <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>
+Cc: Niklas Schnelle <schnelle@linux.ibm.com>,
+	Thorsten Winkler <twinkler@linux.ibm.com>, netdev@vger.kernel.org,
+	linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	Simon Horman <horms@kernel.org>
+Subject: Re: [RFC net-next 0/7] Provide an ism layer
+Message-ID: <20250122030459.GN89233@linux.alibaba.com>
+Reply-To: dust.li@linux.alibaba.com
+References: <20250115195527.2094320-1-wintera@linux.ibm.com>
+ <20250116093231.GD89233@linux.alibaba.com>
+ <D73H7Q080GUQ.3BDOH23P4WDOL@linux.ibm.com>
+ <0f96574a-567e-495a-b815-6aef336f12e6@linux.ibm.com>
+ <20250117021353.GF89233@linux.alibaba.com>
+ <80330f0e-d769-4251-be2f-a2b5adb12ef2@linux.ibm.com>
+ <17f0cbf9-71f7-4cce-93d2-522943d9d83b@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
-Subject: Re: [PATCH v1 00/21] hwmon: Fix the type of 'config' in struct
- hwmon_channel_info to u64
-To: Guenter Roeck <linux@roeck-us.net>, Armin Wolf <W_Armin@gmx.de>,
-	<linux-hwmon@vger.kernel.org>
-CC: <linux-kernel@vger.kernel.org>, <linux-media@vger.kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>, <arm-scmi@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <linux-rtc@vger.kernel.org>,
-	<oss-drivers@corigine.com>, <linux-rdma@vger.kernel.org>,
-	<platform-driver-x86@vger.kernel.org>, <linuxarm@huawei.com>,
-	<jdelvare@suse.com>, <kernel@maidavale.org>, <pauk.denis@gmail.com>,
-	<james@equiv.tech>, <sudeep.holla@arm.com>, <cristian.marussi@arm.com>,
-	<matt@ranostay.sg>, <mchehab@kernel.org>, <irusskikh@marvell.com>,
-	<andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <saeedm@nvidia.com>,
-	<leon@kernel.org>, <tariqt@nvidia.com>, <louis.peens@corigine.com>,
-	<hkallweit1@gmail.com>, <linux@armlinux.org.uk>, <kabel@kernel.org>,
-	<hdegoede@redhat.com>, <ilpo.jarvinen@linux.intel.com>,
-	<alexandre.belloni@bootlin.com>, <krzk@kernel.org>,
-	<jonathan.cameron@huawei.com>, <zhanjie9@hisilicon.com>,
-	<zhenglifeng1@huawei.com>, <liuyonglong@huawei.com>
-References: <20250121064519.18974-1-lihuisong@huawei.com>
- <03b138e9-688f-4ebc-bd01-3d54fd20e525@gmx.de>
- <9add68ac-7d10-4011-9da8-1f2de077d3e9@roeck-us.net>
-From: "lihuisong (C)" <lihuisong@huawei.com>
-In-Reply-To: <9add68ac-7d10-4011-9da8-1f2de077d3e9@roeck-us.net>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- kwepemn100009.china.huawei.com (7.202.194.112)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <17f0cbf9-71f7-4cce-93d2-522943d9d83b@linux.ibm.com>
 
-Hi Guenter,
+On 2025-01-20 11:28:41, Alexandra Winter wrote:
+>
+>
+>On 17.01.25 14:00, Alexandra Winter wrote:
+>> 
+>> 
+>> On 17.01.25 03:13, Dust Li wrote:
+>>>>>> Modular Approach: I've made the ism_loopback an independent kernel
+>>>>>> module since dynamic enable/disable functionality is not yet supported
+>>>>>> in SMC. Using insmod and rmmod for module management could provide the
+>>>>>> flexibility needed in practical scenarios.
+>>>>
+>>>> With this proposal ism_loopback is just another ism device and SMC-D will
+>>>> handle removal just like ism_client.remove(ism_dev) of other ism devices.
+>>>>
+>>>> But I understand that net/smc/ism_loopback.c today does not provide enable/disable,
+>>>> which is a big disadvantage, I agree. The ism layer is prepared for dynamic
+>>>> removal by ism_dev_unregister(). In case of this RFC that would only happen
+>>>> in case of rmmod ism. Which should be improved.
+>>>> One way to do that would be a separate ism_loopback kernel module, like you say.
+>>>> Today ism_loopback is only 10k LOC, so I'd be fine with leaving it in the ism module.
+>>>> I also think it is a great way for testing any ISM client, so it has benefit for
+>>>> anybody using the ism module.
+>>>> Another way would be e.g. an 'enable' entry in the sysfs of the loopback device.
+>>>> (Once we agree if and how to represent ism devices in genera in sysfs).
+>>> This works for me as well. I think it would be better to implement this
+>>> within the common ISM layer, rather than duplicating the code in each
+>>> device. Similar to how it's done in netdevice.
+>>>
+>>> Best regards,
+>>> Dust
+>> 
+>> 
+>> Is there a specific example for enable/disable in the netdevice code, you have in mind?
+>> Or do you mean in general how netdevice provides a common layer?
+>> Yes, everything that is common for all devices should be provided by the network layer.
+>
+>
+>Dust for some reason, you did not 'Reply-all':
 
-在 2025/1/21 22:50, Guenter Roeck 写道:
-> On 1/21/25 06:12, Armin Wolf wrote:
->> Am 21.01.25 um 07:44 schrieb Huisong Li:
->>
->>> The hwmon_device_register() is deprecated. When I try to repace it with
->>> hwmon_device_register_with_info() for acpi_power_meter driver, I 
->>> found that
->>> the power channel attribute in linux/hwmon.h have to extend and is more
->>> than 32 after this replacement.
->>>
->>> However, the maximum number of hwmon channel attributes is 32 which is
->>> limited by current hwmon codes. This is not good to add new channel
->>> attribute for some hwmon sensor type and support more channel 
->>> attribute.
->>>
->>> This series are aimed to do this. And also make sure that 
->>> acpi_power_meter
->>> driver can successfully replace the deprecated hwmon_device_register()
->>> later.
->>
+Oh, sorry I didn't notice that
+
+>Dust Li wrote:
+>> I think dev_close()/dev_open() are the high-level APIs, while
+>> ndo_stop()/ndo_open() are the underlying device operations that we
+>> can reference.
 >
-> This explanation completely misses the point. The series tries to make 
-> space
-> for additional "standard" attributes. Such a change should be independent
-> of a driver conversion and be discussed on its own, not in the context
-> of a new driver or a driver conversion.
-Making space for new attributes later.
-After all hwmon core have ability to do that.
 >
->> Hi,
->>
->> what kind of new power attributes do you want to add to the hwmon API?
->>
->> AFAIK the acpi-power-meter driver supports the following attributes:
->>
->>      power1_accuracy            -> HWMON_P_ACCURACY
->>      power1_cap_min            -> HWMON_P_CAP_MIN
->>      power1_cap_max            -> HWMON_P_CAP_MAX
->>      power1_cap_hyst            -> HWMON_P_CAP_HYST
->>      power1_cap            -> HWMON_P_CAP
->>      power1_average            -> HWMON_P_AVERAGE
->>      power1_average_min        -> HWMON_P_AVERAGE_MIN
->>      power1_average_max        -> HWMON_P_AVERAGE_MAX
->>      power1_average_interval        -> HWMON_P_AVERAGE_INTERVAL
->>      power1_average_interval_min    -> HWMON_P_AVERAGE_INTERVAL_MIN
->>      power1_average_interval_max    -> HWMON_P_AVERAGE_INTERVAL_MAX
->>      power1_alarm            -> HWMON_P_ALARM
->>      power1_model_number
->>      power1_oem_info
->>      power1_serial_number
->>      power1_is_battery
->>      name                -> handled by hwmon core
->>
->> The remaining attributes are in my opinion not generic enough to add 
->> them to the generic
->> hwmon power attributes. I think you should implement them as a 
->> attribute_group which can
->> be passed to hwmon_device_register_with_info() using the 
->> "extra_groups" parameter.
->>
+>I hear you, it can be beneficial to have a way for upper layers to
+>enable/disable an ism device.
+>But all this is typically a tricky area. The device driver can also have
+>reasons to enable/disable a device, then hardware could do that or even
+>hotplug a device. Error recovery on different levels may want to run a
+>disable/enable sequence as a reset, etc. And all this has potential for
+>deadlocks.
+>All this is rather trivial for ism-loopback, as there is not much of a
+>lower layer.
+>ism-vpci already has 'HW' / device driver configure on/off and device
+>add/remove.
+>For a future ism-virtio, the Hipervisor may want to add/remove devices.
 >
-> I absolutely agree. More specifically, it looks like this is about the 
-> following
-> attributes.
->
-> >      power1_model_number
-> >      power1_oem_info
-> >      power1_serial_number
-> >      power1_is_battery
->
-> Those are not hwmon attributes and should not be (or have been) exposed
-> as sysfs attributes in the first place, but (if really wanted/needed)
-> through debugfs files. Even _if_ exposed as sysfs attributes they should
-> not have the power1_ prefix (except maybe for the last one).
-I plan to accept the suggestion Armin proposed that acpi_power_meter can 
-use the "extra_groups" parameter for these "not generic hwmon power 
-attributes".
-Should we drop the power1_ prefix? But this will lead to the change of 
-these attributes.
-Do you mean 'power1_is_battery' can be added to hwmon power attributes 
-in hwmon.h?
->
-> On top of that, doubling the size of configuration bits for everything
-> because one sensor type needs more than 32 bits seems excessive.
-> If we ever get to that point I think I'd rather introduce a second
-> sensor type for power sensor attributes.
->
-The bigest obstacle is that drivers which not use HWMON_CHANNEL_INFO 
-hwmon provided need to be modifyed.🙁
->
-> .
+>I wonder what could be the simplest definition of an enable/disable for
+>the ism layer, that we can start with? More sophisticated functionality
+>can always be added later.
+>Maybe support for add/remove ism-device by the device driver is
+>sufficient as  starting point?
+
+I agree; this can be added later. For now, we can simply support
+unregistering a device from the device driver. Which is already handled
+by ism_dev_unregister() IIUC.
+
+However, I believe we still need an API and the ability to enable or
+disable ISM devices from the upper layer. For example, if we want to
+disable a specific ISM device (such as the loopback device) in SMC, we
+should not do so by disabling the loopback device at the device layer,
+as it may also serve other clients beyond SMC.
+
+Further more, I think removing the loopback from the loopback device
+driver seems unnecessory ? Since we should support that from the upper
+layer in the future.
+
+Best regards,
+Dust
 
