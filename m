@@ -1,139 +1,154 @@
-Return-Path: <netdev+bounces-160300-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160301-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 965E6A192F0
-	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 14:51:03 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B558FA19301
+	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 14:52:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DC257162B46
-	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 13:51:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 14945188D753
+	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 13:52:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EEDC2139A4;
-	Wed, 22 Jan 2025 13:50:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BC052135D5;
+	Wed, 22 Jan 2025 13:52:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="iPqmzRd7"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YlYPBAmy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EEE3212F98
-	for <netdev@vger.kernel.org>; Wed, 22 Jan 2025 13:50:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D2C8212D82;
+	Wed, 22 Jan 2025 13:52:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737553857; cv=none; b=gqhf03meMuBOLVUn7Yx1IkrbJcYucT+p8qNxDgVVnKtWQl1IkMMmV06svcq8GnHmsXBYQq3Ms1YtKQIITlWFfhDCtmjHyv0j32JeFpv6wxEPB2uyFe7bysBALg/Fu1L4AkDZRQ35orgSlUyuH9oWn88BsNfP+h+H/p3SyC/BQ58=
+	t=1737553953; cv=none; b=EnEg4IJaRL09iq87BhRKrhp9U+IYBVv54MBVaZNZMg1Vr+nnpsqfYAl24LDf8sgdulaDppS/W7cWrS0gRiLS9zyHj7tK6nJ1zr5lbmCsPyXlmKN+iuA2e+SadOQUH/5H4JQ4jZ1dhn2tIVbMIZeUYJVeWMqFNi9yt4uRI3/IAQc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737553857; c=relaxed/simple;
-	bh=bks+dcymjfuxwpQMDs5ixSXGxUexUIw8mAnKAomCojs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QcMTt9jy4DQNMrF04Je1o0Y6ljZFI+epE6AlyV3kz3QGzxEjPrOmzdVP2FXU+sOkPXb1nXmb9EfSjpTqRI/H/j7BVls32u1YIygidWiLkSCYMy4oQLDD68pNp9BmXDXp4RP0QxSlkLzaBqReoCBrIhg7f9L0S/XK8ZdNpEc4cwQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=iPqmzRd7; arc=none smtp.client-ip=209.85.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-436281c8a38so50829295e9.3
-        for <netdev@vger.kernel.org>; Wed, 22 Jan 2025 05:50:55 -0800 (PST)
+	s=arc-20240116; t=1737553953; c=relaxed/simple;
+	bh=ugjOL8nijfKLzjFT/CTYc+RV7W5j52FMoWjXv+L3+FU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qgocuhjU5cLk2PBG1v+WVZauJyTZ6fZFg7UB34Qj/gQUkA8HcH2kmMUiWtu9hwnZVVtA0JKp/S1ZL/NTD44ZRwjKXhof62d/YbKLR3CBUdD+3IihYzKZ5o/80TLMzVGKF86JyPBgAlUAok92JYUidnaz1BiS379piBgGBX+crMc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YlYPBAmy; arc=none smtp.client-ip=209.85.214.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-21a7ed0155cso113409545ad.3;
+        Wed, 22 Jan 2025 05:52:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1737553854; x=1738158654; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=LeJQbMKgxTKE/VdTo5M9qbk3XdSIS18Xn3c/OFMKt/Y=;
-        b=iPqmzRd7baIPYn33C3KRXTrV+pCb463BW28fABHTx8ITb24hrWxLQnJ+nviGXhxSfY
-         zb+MNO9VEUyt/GeIcQCdh5cwTsZ6u81oMDftOkRtWp/lDnhFKYQnv8PgEe3AOO2Cys7B
-         jCTVTMoJsesIeF8nJDx29w/IAF3PGo4v/5WUkGHEeQUdwweIup2Lo6F39lGioVi+FYaU
-         qdkSxs1lUrSSjJg/uW2G1+TTq7j6HfgEbqcPibjxY2ZJr/rQxJ1qvAQBMz/tsTGm7XpH
-         xuvJnxFuBVBrO9Bv2ya7BYoQ3paWVENWcHjKecPQeljXyasJkXGBSqgJTE6UYddMZAvL
-         fpKA==
+        d=gmail.com; s=20230601; t=1737553950; x=1738158750; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=IVZfMOGQeMlwWkkNAeNmUhChlFIoaA51Jt3ZCvVjgVc=;
+        b=YlYPBAmy9SnjNHE+25CtJ8JEG+o6BPTHIb9bAaPW27We9A7kFcfEp1N8QTiO1WcX+P
+         sy+Ft1JGP6YFnSJM8pAUyIm5glhVhf+sWAXwfFSLWlAes6g+usUO3tyxMnRNr7I4l1mf
+         6icIQVF5jjltPgaahY3c3bZ4RHEOMJrN63LFEnmKNn5hbhgmFexfHW7jjg281oU2gE+S
+         8G36wbZLWEfRQPYwPimko+sOIFnP/61jVXTiUxQNuXvWVERqVu8sQIrVmuwUcSLAiK7r
+         HBBy8eCbEtEhOWNC4ujnKz+GTssh0wX3AcCNvOK3WzDst+pZGqKIfzny4aJRdXFBwzR7
+         AeRw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737553854; x=1738158654;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=LeJQbMKgxTKE/VdTo5M9qbk3XdSIS18Xn3c/OFMKt/Y=;
-        b=f4FVRb72PEJKZxs7qXX9ELBhXdJME17DQAackWZCv7Efm1+7+kxiR0xJhgxJIQw0tP
-         evEw/IXUSxUySPjaHNhQWqVcmEpMsnJfyyTiv1Kg1p7GTy4/Kx5yuS2+wlerpD5Sa2b8
-         a0UdS2SnHfnsPThpZnZUVjCQw4PDO2vg8tzOqSqQtLd6zX/j6lW455BWrvccyXE9YHp6
-         CDeXV0ZLtyFOFKk9GYbQhWoQotR338aVKmaO1De9ej4XSckRBAQUOeGf7L36WpAZ/erk
-         GWwdYkt853dhlLwdfSLWoVcQXryuhe+3PkpWTTCwc7PjaaRLfh7coJ+RVc6y0HOXEega
-         zapw==
-X-Forwarded-Encrypted: i=1; AJvYcCVnWoFDmu3UuNnspJomlMaj2UXIQLiYvbhDxW5JBMOiXy1LlJ5AtYcDsZY3S8K/0CCqE1airCg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw9VzWnXXTuLWO2m6nfUSwAgmczw4OcISxRQQRvFE2joesdFndK
-	Jbh9dqh+kvzVMDdrjD88HiLPXbKYXopebULN7FN42XlplK9xfKETYvFh7WObbm/dqnARw4EeKcm
-	9
-X-Gm-Gg: ASbGncscb9drRLIN+aQFKKJfvN6EZy7lUwnSVSMSZIjWGGsWVl8xgnHkhKtCp9kP00R
-	wtOa1xjRWVYdiO3BpMlqEjg4CpSsv624WN97Ug9P0gCDCwqQUQmIBRwyXEowzUUtpBe868kBJzv
-	IiR3gO1YoFSTTra9OC5Izj2hqud4IzEskYZuEuHEa7ZczqSd6iAQNQQGg946lKSdXM/ef+mS+m1
-	xHeK9MtIMUcjXkYo54dkRX8DyHMeJ/nkWCZAFAjixDwpFFL9dpFzRDgTHBVyXNPVImVW4kwp58=
-X-Google-Smtp-Source: AGHT+IFV7PIhFkke0uCO2oWIdMNtHM2fB8T0QZVi6jL0x9DpK6ZPV63ZMQQxSYMhiuEQfz57I9x/1A==
-X-Received: by 2002:a05:600c:4e06:b0:434:e8cf:6390 with SMTP id 5b1f17b1804b1-438913c6856mr195769175e9.6.1737553854420;
-        Wed, 22 Jan 2025 05:50:54 -0800 (PST)
-Received: from localhost ([196.207.164.177])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-438b3189924sm26248475e9.3.2025.01.22.05.50.53
+        d=1e100.net; s=20230601; t=1737553950; x=1738158750;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=IVZfMOGQeMlwWkkNAeNmUhChlFIoaA51Jt3ZCvVjgVc=;
+        b=h7pFvSqolfluyvCOK2hFqjzqNmpL+kovVtp1Mr25CWJNy/emHDHqQnj9kYSMbXiIJR
+         s0THpNHD0dA+QRT+nJSDVZ/4J2yoxyuQvlJgah6fkP1A0o6YhPyyCxZvhY6e79L6Y0RA
+         UtnoOUHclGCPdbszmcgv7yMUFgI//1z5CPhMxVlKNJveH5sO7+5r/cQHp1r7a87KdJLI
+         IZv7eu5zika5BOawKBQE8yd7xI0pMziKZQ8WxBZRf1tUaAtCcOCPNXIrT+jyfnwRluV4
+         HVAlfgW6tRGgTq7fwMBuCP+77eZZfGQomDu8Q/QN+DEGf0XJZKYzhDvgADzALpEIg80/
+         TBCQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVJEnGzNY27Ws3pV0pbXK+4S1JHV5rfz/DftZN+W03LEWKZIpM2wdOvOUl57qDB+5+Y1JiQ7r92yPJFZpk=@vger.kernel.org, AJvYcCWU/C+tVd4tBH2j1nkQsAltlzs22nAEhmjBeTHh3CRmL94CxPMgzD0iDrhj30aqjlgWbpFLuL1BOa18vb/i+/61@vger.kernel.org
+X-Gm-Message-State: AOJu0YwmO2wK0n4a80ZXGsKeUzV2uvVFrsr1qF5iZDn3rK1pah41AFSB
+	Ux/erd4U+sZnOuyW3yYfhzFtQ8wR4d0TY759UV1cW7afbeQMJ7QWSiSkFav8gVA=
+X-Gm-Gg: ASbGncvwIu1R/dE78RX2/F7nwKqx9QlnEXqq1tzr+8Mqqt6UDQLGJ24XLer4i66fEuz
+	naRyo5Nc9kRxR2w3z5MGG3bRde9ME6HfLshQgyzszQaeB5FMtEFU31Ik+mglfFE8t79MCH8SyQr
+	w5AfMc8DTEp2++OlP1qSrLz/Hdj0s37uGxRXcHE+UEaNzMwQZlVQ+DxJR2HRlajHZvLGpnnAuCI
+	01ONu3FWIxPztMaW9e6zMTrjrLWZZr5BANt9AJy6ZJd+sKlRPgwaLygz+58FkGcOyLfE+abmu27
+	tef1rg04kFjAsw==
+X-Google-Smtp-Source: AGHT+IE0jp97rM0gIVwFqkYLQ1jRgjfuRcIlaCe/sqJZyt9rHKld88UU6xmRh+WPsy2C7nBxYASi5Q==
+X-Received: by 2002:a17:903:11c3:b0:215:af12:b61a with SMTP id d9443c01a7336-21c35629a68mr302636515ad.50.1737553950170;
+        Wed, 22 Jan 2025 05:52:30 -0800 (PST)
+Received: from fedora.dns.podman ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21c2d426a3asm96121635ad.249.2025.01.22.05.52.23
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Jan 2025 05:50:53 -0800 (PST)
-Date: Wed, 22 Jan 2025 16:50:45 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Simon Horman <horms@kernel.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Steffen Klassert <steffen.klassert@secunet.com>,
+        Wed, 22 Jan 2025 05:52:29 -0800 (PST)
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: netdev@vger.kernel.org
+Cc: Jay Vosburgh <jv@jvosburgh.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	kernel-janitors@vger.kernel.org
-Subject: Re: [PATCH net] xfrm: fix integer overflow in
- xfrm_replay_state_esn_len()
-Message-ID: <32890a3f-1258-4c03-86e1-86c0e4e8e415@stanley.mountain>
-References: <018ecf13-e371-4b39-8946-c7510baf916b@stanley.mountain>
- <20250122123936.GB390877@kernel.org>
- <670272e2-a4b2-4bdd-95c0-26d1e7c65816@stanley.mountain>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Simon Horman <horms@kernel.org>,
+	Jianbo Liu <jianbol@nvidia.com>,
+	Boris Pismenny <borisp@nvidia.com>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Hangbin Liu <liuhangbin@gmail.com>,
+	Liang Li <liali@redhat.com>
+Subject: [PATCHv2 net] Bonding: Fix support for gso_partial_features
+Date: Wed, 22 Jan 2025 13:52:18 +0000
+Message-ID: <20250122135218.183578-1-liuhangbin@gmail.com>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <670272e2-a4b2-4bdd-95c0-26d1e7c65816@stanley.mountain>
+Content-Transfer-Encoding: 8bit
 
-On Wed, Jan 22, 2025 at 04:16:48PM +0300, Dan Carpenter wrote:
-> On Wed, Jan 22, 2025 at 12:39:36PM +0000, Simon Horman wrote:
-> > > The one caller that I didn't modify was xfrm_sa_len().  That's a bit
-> > > complicated and also I'm kind of hoping that we don't handle user
-> > > controlled data in that function?  The place where we definitely are
-> > > handling user data is in xfrm_alloc_replay_state_esn() and this patch
-> > > fixes that.
-> > 
-> > Yes, that is a bit "complex".
-> > 
-> 
-> I don't have a reason to suspect xfrm_sa_len() but if we were to write
-> a paranoid version of it then I've written that draft below.  I stole
-> Herbert's xfrm_kblen2klen() function[1].  Also the nlmsg_new() function
-> would need to be updated as well.
-> 
-> https://lore.kernel.org/all/Z2KZC71JZ0QnrhfU@gondor.apana.org.au/
-> 
-> regards,
-> dan carpenter
-> 
-> diff --git a/include/net/netlink.h b/include/net/netlink.h
-> index e015ffbed819..ca7a8152e6d4 100644
-> --- a/include/net/netlink.h
-> +++ b/include/net/netlink.h
-> @@ -1015,6 +1015,8 @@ static inline struct nlmsghdr *nlmsg_put_answer(struct sk_buff *skb,
->   */
->  static inline struct sk_buff *nlmsg_new(size_t payload, gfp_t flags)
->  {
-> +	if (payload > INT_MAX)
-> +		return NULL;
->  	return alloc_skb(nlmsg_total_size(payload), flags);
->  }
+The fixed commit adds NETIF_F_GSO_ESP bit for bonding gso_partial_features.
+However, if we don't set the dev NETIF_F_GSO_PARTIAL bit, the later
+netdev_change_features() -> netdev_fix_features() will remove the
+NETIF_F_GSO_ESP bit from the dev features. This causes ethtool to show
+that the bond does not support tx-esp-segmentation. For example
 
-Actually, this chunk is necessary.  Let me sent that by itself.
+ # ethtool -k bond0 | grep esp
+ tx-esp-segmentation: off [requested on]
+ esp-hw-offload: on
+ esp-tx-csum-hw-offload: on
 
-regards,
-dan carpenter
+Add the NETIF_F_GSO_PARTIAL bit to bond dev features when set
+gso_partial_features to fix this issue.
+
+Fixes: 4861333b4217 ("bonding: add ESP offload features when slaves support")
+Reported-by: Liang Li <liali@redhat.com>
+Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+---
+v2: remove NETIF_F_GSO_PARTIAL bit if not set gso_partial_features.
+
+The issue is reported internally, so there is no Closes tag.
+
+BTW, I saw some drivers set NETIF_F_GSO_PARTIAL on dev->features. Some
+other drivers set NETIF_F_GSO_PARTIAL on dev->hw_enc_features. I haven't
+see a doc about where we should set. So I just set it on dev->features.
+---
+ drivers/net/bonding/bond_main.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
+index 7b78c2bada81..09d5a8433d86 100644
+--- a/drivers/net/bonding/bond_main.c
++++ b/drivers/net/bonding/bond_main.c
+@@ -1598,10 +1598,13 @@ static void bond_compute_features(struct bonding *bond)
+ 	}
+ 	bond_dev->hard_header_len = max_hard_header_len;
+ 
+-	if (gso_partial_features & NETIF_F_GSO_ESP)
++	if (gso_partial_features & NETIF_F_GSO_ESP) {
+ 		bond_dev->gso_partial_features |= NETIF_F_GSO_ESP;
+-	else
++		bond_dev->features |= NETIF_F_GSO_PARTIAL;
++	} else {
+ 		bond_dev->gso_partial_features &= ~NETIF_F_GSO_ESP;
++		bond_dev->features &= ~NETIF_F_GSO_PARTIAL;
++	}
+ 
+ done:
+ 	bond_dev->vlan_features = vlan_features;
+-- 
+2.39.5 (Apple Git-154)
 
 
