@@ -1,181 +1,160 @@
-Return-Path: <netdev+bounces-160403-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160404-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51F74A198A5
-	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 19:40:49 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 62108A198CE
+	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 19:53:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 195FE3AA9EF
-	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 18:40:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 27F57188D197
+	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 18:53:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3B1821578B;
-	Wed, 22 Jan 2025 18:40:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="m4kqJKTe"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7089215194;
+	Wed, 22 Jan 2025 18:53:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA7BB2153FF
-	for <netdev@vger.kernel.org>; Wed, 22 Jan 2025 18:40:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBBDD2B9A4;
+	Wed, 22 Jan 2025 18:53:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737571246; cv=none; b=GsLjWPWBGgFyqZNSu7fKhqjKWRrWpeAFHb5zE6NU2ElpdsSK0ik3fARE+X9D1n/pKtdPEFXngP8B9Yh1M3Ly7CrNMZnlZGaq7uEQgC1ExER6b/7NuE4uVktUAeRiEPrjOCqPPPEgdIekbKmIzWoaxOcwTNmbER0m1AZL76C9N2s=
+	t=1737572000; cv=none; b=JYdubgJrvrMKLUl//FqD0AnaCf0CO1+GneL2oUmnVdMLxAOM7x8fDpmUjuwXQb+VikDjG308u3DYKk+XR7ZmkAelIlAS/BT8BrzClsPYY8vscN7HZC4Ff4/b+d5mK7795fy6vxr5ZXOKi4vwPk/rgTMD5lvHBciR2vRPEZuYiH4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737571246; c=relaxed/simple;
-	bh=HDCBG2UbLWzEb2RfJZlDbYKBn92wCjQsU2Mm62T+IxI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=UCOnZZDQNGrQF0yS8yX6b6YJ5DGZA2+5fkfAs1+S7wG46VtPyHKnwZ4vVsGEJlo/BYJqknEa3CBySa7OaRcewPcwHxBfEt0KfjyW6hOAwU14ncEsOWQcKDPcgztaG7ds5Hx+X0GMEjbHCuMAttgsqRH6adq1crxDq/1dvz21dQc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=m4kqJKTe; arc=none smtp.client-ip=91.218.175.185
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <be0f5d0d-479e-46a3-9e9c-ebcd0b1987e9@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1737571227;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+FoNUkA/X+kqdOijwIbqf3VGc3uuyPYzgArpkviCYQ0=;
-	b=m4kqJKTeW1SWh+W6n2bc+YQ4rGmDWkibLF5MUZpcYSLAHHUBEWCL9ZZ/N0DuClOtMYYQnU
-	d50W4XqChhFh9N+CcVP9rlleu4fyfPVERVRVNhm7tppyltO+8my4hz9MMuuPxRyvVo8Thf
-	ckv4mtEo3rgIPOdUNAwsczZF3T5GETY=
-Date: Wed, 22 Jan 2025 10:40:20 -0800
+	s=arc-20240116; t=1737572000; c=relaxed/simple;
+	bh=jTgt7ZT16DFHxck9Z41Awr89XcMluiZq0812Zd1T5CQ=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:CC:References:
+	 In-Reply-To:Content-Type; b=QSc8FcOngzZOG0joUbU+yxtoNat5ihpNbWiK1PsvISyUZTzjMDt7ojzzpmZR7eBdYZ/aS/0uGRm/JQZM9BoHHSCRkIa5HCClll30wLTKQ73zCosZ8hJyiZUu6HfZKlt3yHz5HLvBVI9G1O/SzMFEHQQZOEbQNFdauKYCq+XK6Cc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
+Received: from [192.168.2.102] (213.87.159.248) by msexch01.omp.ru
+ (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Wed, 22 Jan
+ 2025 21:53:05 +0300
+Message-ID: <d2511df5-cf68-4dfb-ae22-f4987af830d8@omp.ru>
+Date: Wed, 22 Jan 2025 21:53:02 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH RFC net-next] trace: tcp: Add tracepoint for
- tcp_cwnd_reduction()
-Content-Language: en-GB
-To: Breno Leitao <leitao@debian.org>, Steven Rostedt <rostedt@goodmis.org>
-Cc: Jason Xing <kerneljasonxing@gmail.com>, Eric Dumazet
- <edumazet@google.com>, Masami Hiramatsu <mhiramat@kernel.org>,
- Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
- "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
- kernel-team@meta.com, Song Liu <song@kernel.org>,
- Martin KaFai Lau <martin.lau@kernel.org>
-References: <20250120-cwnd_tracepoint-v1-1-36b0e0d643fa@debian.org>
- <CAL+tcoC+A94uzaSZ+SKhV04=iDWrvUGEfxYJKYCF0ovqvyhfOg@mail.gmail.com>
- <20250120-panda-of-impressive-aptitude-2b714e@leitao>
- <CAL+tcoCzStjkEMdNw5ORYbQy3VnVE9A6aj6HcmQvGj3VG1VypA@mail.gmail.com>
- <20250120-daring-outstanding-jaguarundi-c8aaed@leitao>
- <20250120100340.4129eff7@batman.local.home>
- <20250122-vengeful-myna-of-tranquility-f0f8cf@leitao>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Yonghong Song <yonghong.song@linux.dev>
-In-Reply-To: <20250122-vengeful-myna-of-tranquility-f0f8cf@leitao>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 1/2] net: ravb: Fix missing rtnl lock in suspend path
+From: Sergey Shtylyov <s.shtylyov@omp.ru>
+To: Kory Maincent <kory.maincent@bootlin.com>, Paul Barker
+	<paul.barker.ct@bp.renesas.com>, =?UTF-8?Q?Niklas_S=C3=B6derlund?=
+	<niklas.soderlund@ragnatech.se>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
+ S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Mikhail Ulyanov
+	<mikhail.ulyanov@cogentembedded.com>
+CC: Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	=?UTF-8?Q?Niklas_S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>,
+	Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>, <netdev@vger.kernel.org>,
+	<linux-renesas-soc@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+References: <20250122-fix_missing_rtnl_lock_phy_disconnect-v1-0-8cb9f6f88fd1@bootlin.com>
+ <20250122-fix_missing_rtnl_lock_phy_disconnect-v1-1-8cb9f6f88fd1@bootlin.com>
+ <c3c57c62-f5f7-4b80-aa8f-d6edefbb5493@omp.ru>
+Content-Language: en-US
+Organization: Open Mobile Platform
+In-Reply-To: <c3c57c62-f5f7-4b80-aa8f-d6edefbb5493@omp.ru>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.1.1, Database issued on: 01/22/2025 17:54:00
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 19
+X-KSE-AntiSpam-Info: Lua profiles 190517 [Jan 22 2025]
+X-KSE-AntiSpam-Info: Version: 6.1.1.7
+X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 50 0.3.50
+ df4aeb250ed63fd3baa80a493fa6caee5dd9e10f
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_uf_ne_domains}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 213.87.159.248 in (user)
+ b.barracudacentral.org}
+X-KSE-AntiSpam-Info:
+	lore.kernel.org:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;omp.ru:7.1.1;127.0.0.199:7.1.2
+X-KSE-AntiSpam-Info: FromAlignment: s
+X-KSE-AntiSpam-Info: ApMailHostAddress: 213.87.159.248
+X-KSE-AntiSpam-Info: {DNS response errors}
+X-KSE-AntiSpam-Info: Rate: 19
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 01/22/2025 18:07:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 1/22/2025 3:28:00 PM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
+On 1/22/25 9:33 PM, Sergey Shtylyov wrote:
+[...]
 
+>> Fix the suspend path by ensuring the rtnl lock is held where required.
+> 
+>    Maybe suspend/resume path (the same w/the subject)?
+> 
+>> Calls to ravb_open, ravb_close and wol operations must be performed under
+>> the rtnl lock to prevent conflicts with ongoing ndo operations.
+> 
+> [...]
+> 
+>> Reported-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+>> Closes: https://lore.kernel.org/netdev/4c6419d8-c06b-495c-b987-d66c2e1ff848@tuxon.dev/
+>> Fixes: 0184165b2f42 ("ravb: add sleep PM suspend/resume support")
+>> Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
+> 
+>     FWIW:
+> 
+> Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
+> 
+> [...]
+>> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
+>> index bc395294a32d..2c6d8e4966c3 100644
+>> --- a/drivers/net/ethernet/renesas/ravb_main.c
+>> +++ b/drivers/net/ethernet/renesas/ravb_main.c
+> [...]
+>> @@ -3245,19 +3250,25 @@ static int ravb_resume(struct device *dev)
+>>  	if (!netif_running(ndev))
+>>  		return 0;
+>>  
+>> +	rtnl_lock();
+>>  	/* If WoL is enabled restore the interface. */
+>>  	if (priv->wol_enabled) {
+>>  		ret = ravb_wol_restore(ndev);
+>> -		if (ret)
+>> +		if (ret)  {
+>> +			rtnl_unlock();
+>>  			return ret;
+>> +		}
+>>  	} else {
+>>  		ret = pm_runtime_force_resume(dev);
+>> -		if (ret)
+>> +		if (ret) {
+>> +			rtnl_unlock();
+>>  			return ret;
+> 
+>    Hm, are you sure we need to have rtnl_lock around pm_runtime_force_resume() too?
+ 
+   Anyway, the above *if* statements are needlessly duplicated, I think it's time
+that we do away with this! :-)
 
+[...]
 
-On 1/22/25 1:39 AM, Breno Leitao wrote:
-> Hello Steven,
->
-> On Mon, Jan 20, 2025 at 10:03:40AM -0500, Steven Rostedt wrote:
->> On Mon, 20 Jan 2025 05:20:05 -0800
->> Breno Leitao <leitao@debian.org> wrote:
->>
->>> This patch enhances the API's stability by introducing a guaranteed hook
->>> point, allowing the compiler to make changes without disrupting the
->>> BPF program's functionality.
->> Instead of using a TRACE_EVENT() macro, you can use DECLARE_TRACE()
->> which will create the tracepoint in the kernel, but will not create a
->> trace event that is exported to the tracefs file system. Then BPF could
->> hook to it and it will still not be exposed as an user space API.
-> Right, DECLARE_TRACE would solve my current problem, but, a056a5bed7fa
-> ("sched/debug: Export the newly added tracepoints") says "BPF doesn't
-> have infrastructure to access these bare tracepoints either.".
->
-> Does BPF know how to attach to this bare tracepointers now?
->
-> On the other side, it seems real tracepoints is getting more pervasive?
-> So, this current approach might be OK also?
->
-> 	https://lore.kernel.org/bpf/20250118033723.GV1977892@ZenIV/T/#m4c2fb2d904e839b34800daf8578dff0b9abd69a0
->
->> You can see its use in include/trace/events/sched.h
-> I suppose I need to export the tracepointer with
-> EXPORT_TRACEPOINT_SYMBOL_GPL(), right?
->
-> I am trying to hack something as the following, but, I struggled to hook
-> BPF into it.
->
-> Thank you!
-> --breno
->
-> Author: Breno Leitao <leitao@debian.org>
-> Date:   Fri Jan 17 09:26:22 2025 -0800
->
->      trace: tcp: Add tracepoint for tcp_cwnd_reduction()
->      
->      Add a lightweight tracepoint to monitor TCP congestion window
->      adjustments via tcp_cwnd_reduction(). This tracepoint enables tracking
->      of:
->        - TCP window size fluctuations
->        - Active socket behavior
->        - Congestion window reduction events
->      
->      Meta has been using BPF programs to monitor this function for years.
->      Adding a proper tracepoint provides a stable API for all users who need
->      to monitor TCP congestion window behavior.
->      
->      Use DECLARE_TRACE instead of TRACE_EVENT to avoid creating trace event
->      infrastructure and exporting to tracefs, keeping the implementation
->      minimal. (Thanks Steven Rostedt)
->
->      Signed-off-by: Breno Leitao <leitao@debian.org>
->
-> diff --git a/include/trace/events/tcp.h b/include/trace/events/tcp.h
-> index a27c4b619dffd..07add3e20931a 100644
-> --- a/include/trace/events/tcp.h
-> +++ b/include/trace/events/tcp.h
-> @@ -259,6 +259,11 @@ TRACE_EVENT(tcp_retransmit_synack,
->   		  __entry->saddr_v6, __entry->daddr_v6)
->   );
->   
-> +DECLARE_TRACE(tcp_cwnd_reduction_tp,
-> +	TP_PROTO(const struct sock *sk, const int newly_acked_sacked,
-> +		 const int newly_lost, const int flag),
-
-I don't think we need 'const' for int types. For 'const strcut sock *',
-it makes sense since we do not want sk-><fields> get changed.
-
-> +	TP_ARGS(sk, newly_acked_sacked, newly_lost, flag));
-> +
->   #include <trace/events/net_probe_common.h>
->   
->   TRACE_EVENT(tcp_probe,
-> diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
-> index 4811727b8a022..74cf8dbbedaa0 100644
-> --- a/net/ipv4/tcp_input.c
-> +++ b/net/ipv4/tcp_input.c
-> @@ -2710,6 +2710,8 @@ void tcp_cwnd_reduction(struct sock *sk, int newly_acked_sacked, int newly_lost,
->   	if (newly_acked_sacked <= 0 || WARN_ON_ONCE(!tp->prior_cwnd))
->   		return;
->   
-> +	trace_tcp_cwnd_reduction_tp(sk, newly_acked_sacked, newly_lost, flag);
-> +
->   	tp->prr_delivered += newly_acked_sacked;
->   	if (delta < 0) {
->   		u64 dividend = (u64)tp->snd_ssthresh * tp->prr_delivered +
-> @@ -2726,6 +2728,7 @@ void tcp_cwnd_reduction(struct sock *sk, int newly_acked_sacked, int newly_lost,
->   	sndcnt = max(sndcnt, (tp->prr_out ? 0 : 1));
->   	tcp_snd_cwnd_set(tp, tcp_packets_in_flight(tp) + sndcnt);
->   }
-> +EXPORT_TRACEPOINT_SYMBOL_GPL(tcp_cwnd_reduction_tp);
->   
->   static inline void tcp_end_cwnd_reduction(struct sock *sk)
->   {
+MBR, Sergey
 
 
