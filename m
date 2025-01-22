@@ -1,232 +1,130 @@
-Return-Path: <netdev+bounces-160430-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160431-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5721A19B0C
-	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 23:45:08 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0421DA19B47
+	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 00:02:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 01460160E35
-	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 22:45:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C49373A02ED
+	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 23:02:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02D9C1CACF7;
-	Wed, 22 Jan 2025 22:45:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78F561CACF7;
+	Wed, 22 Jan 2025 23:02:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kwuWDTR7"
+	dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b="vlih1fPw"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from gate2.alliedtelesis.co.nz (gate2.alliedtelesis.co.nz [202.36.163.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE44A1CAA97;
-	Wed, 22 Jan 2025 22:45:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F9801CAA88
+	for <netdev@vger.kernel.org>; Wed, 22 Jan 2025 23:02:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.36.163.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737585905; cv=none; b=FnyPSyWca42E8QWwU5OBOQGk7i7QVNAd0sES7PTbBusy3TsxoCiIf3m62nPbqSGAmWJEydaXqXbkg/ssyy3hzs7NzGgkq6rj1ijPraAODnBZiJ8TECcjezKKrHAm87EGXWW+EGShcJPQAcCh9I0dCZoNfR4YGaOWWlJpP1e0v7A=
+	t=1737586939; cv=none; b=vBWZ4rnN4puVABMlurbN9q2n0riO9hP4cpBhP49Mgpfkhzwz6OSz5kU89xvAOJ8c6vs7zp3ImXC9QWO7jKxgQbqKKpJw9O+e9KPat+/oEieOGYluNQ98etFI38NDg4Y+VZU1Jd7we/3qRqhr2CqwPPbbret2Ir43jZJpqcNaj/o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737585905; c=relaxed/simple;
-	bh=7c6cXhCmpp9gWaPJR1+MwcOY6hlnrr321kgjCgKyzag=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Vjs+w+HrEVH4K7xSi7wUOtkeoHhtkN5MsTqIig3X2LUIfNw8VxHi9BxASj4bs3my5jTdXXR+5KvYlzJM2JDw1zxk8hChi4prYdl63cj9wkHgevwrEZKRMV3LPqI0iVv59vCpwoMu0ovtW/G/OTJBfAAeugkPzHw33zU3CP5ItlM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kwuWDTR7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DF5E6C4CEE0;
-	Wed, 22 Jan 2025 22:45:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737585905;
-	bh=7c6cXhCmpp9gWaPJR1+MwcOY6hlnrr321kgjCgKyzag=;
-	h=From:To:Cc:Subject:Date:From;
-	b=kwuWDTR7VtCf8F+Jq63ha95IHrfWOt+C6+sMaLNtYYvPt9NAfsd7jYtPEWxZ1TDZ2
-	 /8Iqw9ry7ALCDmNKWevVACmYmYIf/DLSRFfMlmh6FbLUxkDB4LeI5JRetsKcZkpMu9
-	 N9BeAW1FPHepRY8faY1Nav9D1ENmaTiFIPX8sq98TAFGq5U+bMJfNbeftReMk0f/73
-	 Dm9XDNDFHcrwUJULr9G47LrkdgkCJlSdInrHHf6Ab59tMlTQ+c7bIN1XNNhWjUjEje
-	 qFm5so9AYFlPvnPFs/AWpAXBNUvSTNihYLlC0I9gcpFdzHTBP1XZKiVrPVEBCrmidE
-	 L1lResQDwu40g==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	syzbot+2e5de9e3ab986b71d2bf@syzkaller.appspotmail.com,
-	shuah@kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: [PATCH net] net: netdevsim: try to close UDP port harness races
-Date: Wed, 22 Jan 2025 14:45:03 -0800
-Message-ID: <20250122224503.762705-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.48.1
+	s=arc-20240116; t=1737586939; c=relaxed/simple;
+	bh=XMwm023H0sIBdpzqUJNYM4k4Mu+ELgEDanDBBQmExDk=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=shvCWyl8h/7POSzzSY4UkGf/v0MprQhZXO8ThPRc1P2yXvLDD7ZK1fXuwa5biypVWtZfWkeQRpaVgfg7skXJjCWQEcuW50aYr6xKEEo5N1mCSNqKJtwPbkJnPLkX4KWmQRN53xTv65Lx50IGnixo3TmQL0GnMWORJBok7/mMT0k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz; spf=pass smtp.mailfrom=alliedtelesis.co.nz; dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b=vlih1fPw; arc=none smtp.client-ip=202.36.163.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alliedtelesis.co.nz
+Received: from svr-chch-seg1.atlnz.lc (mmarshal3.atlnz.lc [10.32.18.43])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by gate2.alliedtelesis.co.nz (Postfix) with ESMTPS id 8017B2C0C39;
+	Thu, 23 Jan 2025 12:02:14 +1300 (NZDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alliedtelesis.co.nz;
+	s=mail181024; t=1737586934;
+	bh=XMwm023H0sIBdpzqUJNYM4k4Mu+ELgEDanDBBQmExDk=;
+	h=From:To:CC:Subject:Date:References:In-Reply-To:From;
+	b=vlih1fPwY/6VyD/DKpjBNvw4DRNwAgK65Vxsm+U7PNCQWq3TNL7MN6m/29I79C1Zu
+	 KNVgahx0QlitIsLx/HQTQPmshBs7WDUgO5hIgOajJKIfmA0iT/O6vYxj7Vsf0/o0d9
+	 ZtUd8L+37Lb/J9SJsVbLIarOIOTl3qGmIQ9ngTo1MzJR9OBhNnui93f1thRXF2sLDn
+	 vzobQg94nGXvAxDa3s0Oo5uTuI4oogrlF6W5d3KDXAguMPdmrJKyWgiK0Ppcsn5K14
+	 ZZxZ72iDb1RogyuxHxg/XAfEQ6vzan7QLQ5TGP7s+7F4f1zUXfmi69x/JvJJlTd/bW
+	 rago5//toshSg==
+Received: from svr-chch-ex2.atlnz.lc (Not Verified[2001:df5:b000:bc8::76]) by svr-chch-seg1.atlnz.lc with Trustwave SEG (v8,2,6,11305)
+	id <B679178f60001>; Thu, 23 Jan 2025 12:02:14 +1300
+Received: from svr-chch-ex2.atlnz.lc (2001:df5:b000:bc8:f753:6de:11c0:a008) by
+ svr-chch-ex2.atlnz.lc (2001:df5:b000:bc8:f753:6de:11c0:a008) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14; Thu, 23 Jan 2025 12:02:14 +1300
+Received: from svr-chch-ex2.atlnz.lc ([fe80::a9eb:c9b7:8b52:9567]) by
+ svr-chch-ex2.atlnz.lc ([fe80::a9eb:c9b7:8b52:9567%15]) with mapi id
+ 15.02.1544.014; Thu, 23 Jan 2025 12:02:14 +1300
+From: Chris Packham <Chris.Packham@alliedtelesis.co.nz>
+To: Andrew Lunn <andrew@lunn.ch>
+CC: Sander Vanheule <sander@svanheule.net>, "lee@kernel.org" <lee@kernel.org>,
+	"robh@kernel.org" <robh@kernel.org>, "krzk+dt@kernel.org"
+	<krzk+dt@kernel.org>, "conor+dt@kernel.org" <conor+dt@kernel.org>,
+	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, "davem@davemloft.net"
+	<davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
+	"tsbogend@alpha.franken.de" <tsbogend@alpha.franken.de>,
+	"hkallweit1@gmail.com" <hkallweit1@gmail.com>, "linux@armlinux.org.uk"
+	<linux@armlinux.org.uk>, "markus.stockhausen@gmx.de"
+	<markus.stockhausen@gmx.de>, "devicetree@vger.kernel.org"
+	<devicetree@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "linux-mips@vger.kernel.org"
+	<linux-mips@vger.kernel.org>
+Subject: Re: [PATCH v4 4/4] net: mdio: Add RTL9300 MDIO driver
+Thread-Topic: [PATCH v4 4/4] net: mdio: Add RTL9300 MDIO driver
+Thread-Index: AQHbavAahUdhqEy5FEu2vKOQZxZljLMenFsAgACoywCAAzmNAIAAFNeA
+Date: Wed, 22 Jan 2025 23:02:14 +0000
+Message-ID: <09bd2f04-96d6-4dba-92ee-22ccbd7f584f@alliedtelesis.co.nz>
+References: <20250120040214.2538839-1-chris.packham@alliedtelesis.co.nz>
+ <20250120040214.2538839-5-chris.packham@alliedtelesis.co.nz>
+ <d4194a1560ff297e5ab3e6eae6d51b7c9d469381.camel@svanheule.net>
+ <63d6cf16-9581-4736-8592-bc5836fa51af@alliedtelesis.co.nz>
+ <faa4cf6e-40eb-4509-b3f0-198a9a45ccbd@lunn.ch>
+In-Reply-To: <faa4cf6e-40eb-4509-b3f0-198a9a45ccbd@lunn.ch>
+Accept-Language: en-NZ, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <0C9CD53DCDF4DB4987A75CD73F667264@alliedtelesis.co.nz>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-SEG-SpamProfiler-Analysis: v=2.4 cv=BNQQr0QG c=1 sm=1 tr=0 ts=679178f6 a=Xf/6aR1Nyvzi7BryhOrcLQ==:117 a=xqWC_Br6kY4A:10 a=75chYTbOgJ0A:10 a=IkcTkHD0fZMA:10 a=VdSt8ZQiCzkA:10 a=yb9UF-SkSRlBYHEdGwAA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+X-SEG-SpamProfiler-Score: 0
 
-syzbot discovered that we remove the debugfs files after we free
-the netdev. Try to clean up the relevant dir while the device
-is still around.
-
-Reported-by: syzbot+2e5de9e3ab986b71d2bf@syzkaller.appspotmail.com
-Fixes: 424be63ad831 ("netdevsim: add UDP tunnel port offload support")
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-CC: shuah@kernel.org
-CC: linux-kselftest@vger.kernel.org
----
- drivers/net/netdevsim/netdevsim.h             |  1 +
- drivers/net/netdevsim/udp_tunnels.c           | 23 +++++++++++--------
- .../drivers/net/netdevsim/udp_tunnel_nic.sh   | 16 ++++++-------
- 3 files changed, 23 insertions(+), 17 deletions(-)
-
-diff --git a/drivers/net/netdevsim/netdevsim.h b/drivers/net/netdevsim/netdevsim.h
-index dcf073bc4802..96d54c08043d 100644
---- a/drivers/net/netdevsim/netdevsim.h
-+++ b/drivers/net/netdevsim/netdevsim.h
-@@ -134,6 +134,7 @@ struct netdevsim {
- 		u32 sleep;
- 		u32 __ports[2][NSIM_UDP_TUNNEL_N_PORTS];
- 		u32 (*ports)[NSIM_UDP_TUNNEL_N_PORTS];
-+		struct dentry *ddir;
- 		struct debugfs_u32_array dfs_ports[2];
- 	} udp_ports;
- 
-diff --git a/drivers/net/netdevsim/udp_tunnels.c b/drivers/net/netdevsim/udp_tunnels.c
-index 02dc3123eb6c..640b4983a9a0 100644
---- a/drivers/net/netdevsim/udp_tunnels.c
-+++ b/drivers/net/netdevsim/udp_tunnels.c
-@@ -112,9 +112,11 @@ nsim_udp_tunnels_info_reset_write(struct file *file, const char __user *data,
- 	struct net_device *dev = file->private_data;
- 	struct netdevsim *ns = netdev_priv(dev);
- 
--	memset(ns->udp_ports.ports, 0, sizeof(ns->udp_ports.__ports));
- 	rtnl_lock();
--	udp_tunnel_nic_reset_ntf(dev);
-+	if (dev->reg_state == NETREG_REGISTERED) {
-+		memset(ns->udp_ports.ports, 0, sizeof(ns->udp_ports.__ports));
-+		udp_tunnel_nic_reset_ntf(dev);
-+	}
- 	rtnl_unlock();
- 
- 	return count;
-@@ -144,23 +146,23 @@ int nsim_udp_tunnels_info_create(struct nsim_dev *nsim_dev,
- 	else
- 		ns->udp_ports.ports = nsim_dev->udp_ports.__ports;
- 
--	debugfs_create_u32("udp_ports_inject_error", 0600,
--			   ns->nsim_dev_port->ddir,
-+	ns->udp_ports.ddir = debugfs_create_dir("udp_ports",
-+						ns->nsim_dev_port->ddir);
-+
-+	debugfs_create_u32("inject_error", 0600, ns->udp_ports.ddir,
- 			   &ns->udp_ports.inject_error);
- 
- 	ns->udp_ports.dfs_ports[0].array = ns->udp_ports.ports[0];
- 	ns->udp_ports.dfs_ports[0].n_elements = NSIM_UDP_TUNNEL_N_PORTS;
--	debugfs_create_u32_array("udp_ports_table0", 0400,
--				 ns->nsim_dev_port->ddir,
-+	debugfs_create_u32_array("table0", 0400, ns->udp_ports.ddir,
- 				 &ns->udp_ports.dfs_ports[0]);
- 
- 	ns->udp_ports.dfs_ports[1].array = ns->udp_ports.ports[1];
- 	ns->udp_ports.dfs_ports[1].n_elements = NSIM_UDP_TUNNEL_N_PORTS;
--	debugfs_create_u32_array("udp_ports_table1", 0400,
--				 ns->nsim_dev_port->ddir,
-+	debugfs_create_u32_array("table1", 0400, ns->udp_ports.ddir,
- 				 &ns->udp_ports.dfs_ports[1]);
- 
--	debugfs_create_file("udp_ports_reset", 0200, ns->nsim_dev_port->ddir,
-+	debugfs_create_file("reset", 0200, ns->udp_ports.ddir,
- 			    dev, &nsim_udp_tunnels_info_reset_fops);
- 
- 	/* Note: it's not normal to allocate the info struct like this!
-@@ -196,6 +198,9 @@ int nsim_udp_tunnels_info_create(struct nsim_dev *nsim_dev,
- 
- void nsim_udp_tunnels_info_destroy(struct net_device *dev)
- {
-+	struct netdevsim *ns = netdev_priv(dev);
-+
-+	debugfs_remove_recursive(ns->udp_ports.ddir);
- 	kfree(dev->udp_tunnel_nic_info);
- 	dev->udp_tunnel_nic_info = NULL;
- }
-diff --git a/tools/testing/selftests/drivers/net/netdevsim/udp_tunnel_nic.sh b/tools/testing/selftests/drivers/net/netdevsim/udp_tunnel_nic.sh
-index 384cfa3d38a6..92c2f0376c08 100755
---- a/tools/testing/selftests/drivers/net/netdevsim/udp_tunnel_nic.sh
-+++ b/tools/testing/selftests/drivers/net/netdevsim/udp_tunnel_nic.sh
-@@ -142,7 +142,7 @@ function pre_ethtool {
- }
- 
- function check_table {
--    local path=$NSIM_DEV_DFS/ports/$port/udp_ports_table$1
-+    local path=$NSIM_DEV_DFS/ports/$port/udp_ports/table$1
-     local -n expected=$2
-     local last=$3
- 
-@@ -212,7 +212,7 @@ function check_tables {
- }
- 
- function print_table {
--    local path=$NSIM_DEV_DFS/ports/$port/udp_ports_table$1
-+    local path=$NSIM_DEV_DFS/ports/$port/udp_ports/table$1
-     read -a have < $path
- 
-     tree $NSIM_DEV_DFS/
-@@ -641,7 +641,7 @@ for port in 0 1; do
-     NSIM_NETDEV=`get_netdev_name old_netdevs`
-     ip link set dev $NSIM_NETDEV up
- 
--    echo 110 > $NSIM_DEV_DFS/ports/$port/udp_ports_inject_error
-+    echo 110 > $NSIM_DEV_DFS/ports/$port/udp_ports/inject_error
- 
-     msg="1 - create VxLANs v6"
-     exp0=( 0 0 0 0 )
-@@ -663,7 +663,7 @@ for port in 0 1; do
-     new_geneve gnv0 20000
- 
-     msg="2 - destroy GENEVE"
--    echo 2 > $NSIM_DEV_DFS/ports/$port/udp_ports_inject_error
-+    echo 2 > $NSIM_DEV_DFS/ports/$port/udp_ports/inject_error
-     exp1=( `mke 20000 2` 0 0 0 )
-     del_dev gnv0
- 
-@@ -764,7 +764,7 @@ for port in 0 1; do
-     msg="create VxLANs v4"
-     new_vxlan vxlan0 10000 $NSIM_NETDEV
- 
--    echo 1 > $NSIM_DEV_DFS/ports/$port/udp_ports_reset
-+    echo 1 > $NSIM_DEV_DFS/ports/$port/udp_ports/reset
-     check_tables
- 
-     msg="NIC device goes down"
-@@ -775,7 +775,7 @@ for port in 0 1; do
-     fi
-     check_tables
- 
--    echo 1 > $NSIM_DEV_DFS/ports/$port/udp_ports_reset
-+    echo 1 > $NSIM_DEV_DFS/ports/$port/udp_ports/reset
-     check_tables
- 
-     msg="NIC device goes up again"
-@@ -789,7 +789,7 @@ for port in 0 1; do
-     del_dev vxlan0
-     check_tables
- 
--    echo 1 > $NSIM_DEV_DFS/ports/$port/udp_ports_reset
-+    echo 1 > $NSIM_DEV_DFS/ports/$port/udp_ports/reset
-     check_tables
- 
-     msg="destroy NIC"
-@@ -896,7 +896,7 @@ msg="vacate VxLAN in overflow table"
- exp0=( `mke 10000 1` `mke 10004 1` 0 `mke 10003 1` )
- del_dev vxlan2
- 
--echo 1 > $NSIM_DEV_DFS/ports/$port/udp_ports_reset
-+echo 1 > $NSIM_DEV_DFS/ports/$port/udp_ports/reset
- check_tables
- 
- msg="tunnels destroyed 2"
--- 
-2.48.1
-
+SGkgQW5kcmV3LA0KDQpPbiAyMy8wMS8yMDI1IDEwOjQ3LCBBbmRyZXcgTHVubiB3cm90ZToNCj4+
+IEkgYmVsaWV2ZSB0aGUgUE9MTF9TRUwgY29uZmlndXJhdGlvbiBhY3R1YWxseSBhZmZlY3RzIGFu
+IGludGVybmFsIHBvcnQNCj4+IHBvbGxpbmcgdW5pdC4gRnJvbSB0aGUgZGF0YXNoZWV0cyBJIGhh
+dmUgaXQgc2VlbXMgcHJldHR5IGNvbmZpZ3VyYWJsZSwgeW91DQo+PiBjYW4gdGVsbCBpdCB3aGlj
+aCBwaHkgcmVnaXN0ZXJzIHRvIHBvbGwgYW5kIHdoYXQgdmFsdWVzIGluZGljYXRlIGxpbmsNCj4+
+IHVwL2Rvd24gKHRoZSBkZWZhdWx0cyBhcmUgY29udmVuaWVudGx5IHNldHVwIHRvIG1hdGNoIHRo
+ZSBSZWFsdGVrIFBIWXMpLg0KPiBZb3UgbmVlZCB0byBkaXNhYmxlIHRoaXMuIFRoZSBsaW51eCBQ
+SFkgZHJpdmVyIGlzIGRyaXZpbmcgdGhlIFBIWSwgYW5kDQo+IHRoZSBoYXJkd2FyZSBoYXMgbm8g
+aWRlYSB3aGF0IExpbnV4IGlzIGRvaW5nLiBTYXkgdGhlIGRyaXZlciBoYXMNCj4gY2hhbmdlZCB0
+aGUgcGFnZSB0byByZWFkIGEgdGVtcGVyYXR1cmUgc2Vuc29yLCB3aGVuIHRoZSBzd2l0Y2ggZG9l
+cyBhDQo+IHBvbGwuIFJhdGhlciB0aGFuIHJlYWRpbmcgdGhlIGxpbmsgc3RhdHVzLCBpdCBnZXRz
+IHNvbWUgcmFuZG9tIHZhbHVlDQo+IGZyb20gdGhlIHBhZ2UgY29udGFpbmluZyB0aGUgdGVtcGVy
+YXR1cmUgc2Vuc29yLg0KDQpUaGVyZSdzIGEgbWFzayB0aGF0IGNhbiBiZSBzZXQgdmlhIGEgcmVn
+aXN0ZXIgdGhhdCBjYW4gZGlzYWJsZSBwb2xsaW5nIA0KZm9yIGEgcG9ydC4gVGhlIHRyaWNrIHdp
+bGwgYmUgZGVjaWRpbmcgd2hlbiB0byBkbyBzby4NCg0KRm9yIEM0NSBQSFlzIEkgdGhpbmsgaXQn
+cyBmaW5lIGFzIHRoZSByZWdpc3RlciBzcGFjZSBpcyBzbyBsYXJnZSB0aGF0IA0KcGFnaW5nIGlz
+bid0IHJlYWxseSB1c2VkICh0aGUgb25seSB0aW1lIEkndmUgc2VlbiBpdCBpcyBpbiB0aGUgdmVu
+ZG9yIA0KTU1EKS4gVGhlIFBQVSBkb2VzIHNlZW0gdG8gaGF2ZSBzb21lIGtub3dsZWRnZSBvZiBw
+YWdpbmcgZm9yIEMyMiBidXQgYXMgDQpmYXIgYXMgSSB1bmRlcnN0YW5kIHRoZSBwYWdlIHNlbGVj
+dCByZWdpc3RlciB2YXJpZXMgdmVuZG9yIHRvIHZlbmRvciBhbmQgDQpJIGNhbid0IHNlZSBhbnkg
+d2F5IG9mIHRlbGxpbmcgaXQgc28gaXQgcHJvYmFibHkganVzdCB1c2VzIHdoYXRldmVyIHBhZ2Ug
+DQpzZWxlY3QgcmVnaXN0ZXIgdGhhdCByZWFsdGVrIHVzZSBpbiB0aGVpciBQSFlzLg0KDQpTbyBJ
+IF90aGlua18gdGhlIFBQVSBpcyBPSy4gV2hhdCBtaWdodCBiZSBhIGJpdCBtb3JlIHRyaWNreSBp
+cyB0aGUgb3RoZXIgDQp3YXkgcm91bmQgd2hlcmUgTGludXggaXMgZG9pbmcgc29tZXRoaW5nIGlu
+dm9sdmluZyBjaGFuZ2luZyBwYWdlcyBhbmQgDQpyZWFkaW5nIHJlZ2lzdGVycywgdGhlcmUgd291
+bGQgbmVlZCB0byBiZSBzb21lIGtpbmQgbWVjaGFuaXNtIHRoYXQgbWFza3MgDQp0aGUgcG9ydCBv
+dXQgb2YgdGhlIFBQVSBmb3IgdGhlIGR1cmF0aW9uIG9mIHRoZSB3aG9sZSB0cmFuc2FjdGlvbi4N
+Cg0KDQo+DQo+IAlBbmRyZXc=
 
