@@ -1,201 +1,122 @@
-Return-Path: <netdev+bounces-160399-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160400-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0CA23A19896
-	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 19:38:54 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C5C14A19898
+	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 19:39:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 879A416B2E8
-	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 18:38:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9EEE8188D4DA
+	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 18:39:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4969421576C;
-	Wed, 22 Jan 2025 18:38:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=garyguo.net header.i=@garyguo.net header.b="ZgvH8ZvQ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10C5321576C;
+	Wed, 22 Jan 2025 18:39:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from CWXP265CU009.outbound.protection.outlook.com (mail-ukwestazon11021113.outbound.protection.outlook.com [52.101.100.113])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 850BB215057;
-	Wed, 22 Jan 2025 18:38:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.100.113
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737571124; cv=fail; b=gTI4mayas7LVPfSXohqYNIEoH6nbLsP1gNPmemFj31QfTQ7FlnahIHz97H7VUmJp9RMDW/o81lu2i5N20wrT6QTsREW7D4WR6hPaZPZo8AA4NrofAx87W0PQMYtZF/r+e05ZEZ2WjNUp5KFNWpQixV8DV1g31HsG28ORkdewqSc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737571124; c=relaxed/simple;
-	bh=REAU07lGX8juS5DZKDeLAn6r3jn5qsXZST7m2WWJgLQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=s10NJBH+GpgbLJcflBxoIW8/4jMInHELbXcYKBnrIM120yB5uEZzgqA3YCF/vQdPuvTt/XPIct4hWcZVyaiWA3zNwnTkaiYwG+TuPZAP09jQJy2Ei6sZMKF8yzNyHgEVzh+ZfgS/bjIXroiVJzyts1oCfkm5sMgnUkBVfgAShOE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=garyguo.net; spf=pass smtp.mailfrom=garyguo.net; dkim=pass (1024-bit key) header.d=garyguo.net header.i=@garyguo.net header.b=ZgvH8ZvQ; arc=fail smtp.client-ip=52.101.100.113
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=garyguo.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=garyguo.net
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=qYeZHNv0FEZAQtH9ASsq7gDiYhmmYubZqZSG+XPq4hrMxioetF7wHB3LEm98umx38IMRf7o+pqQ39CxZAgUMgbHWxUpbs1LcTGb4oHEObmD7inRgoknkgAVQLP90gGQEHbeJCbDEmiqyrwhCZKo8ky07rDzg//dkozNGrDm3yIvBmHwMGs6QzPHnPEUFS/dUdkKPcCFxtDX2r1gPuIUotHa4UwjOotPNMvV5fCXhccRKVjjtwHXy0Z2geqBvvr1n6IdNI/JIKHXdZ5OwzmLam4Na4Zna71y4c7h6ZfmfGLAngAnBfNAkTLCrWrlqeQy/S1IsLr48KZ1+uswc0nJYYg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=xxBjZhcQJRs8X/9wYPFHigUK1WQUHDV+/l4CSF4gpGA=;
- b=P9+gGc7GE3PyScT3jobiyRYmKfRGYUzJm+JsdMT9E5b9zh4mhB5wCilDiOAX1A1RVye4KBFbz0qr3pG8pz8VcQ7ujCjzneF3aTd6ACfcDYHzXGTFGqMls8bXRuXx3kn1gUG0vH+vFRSnO2y6QutbvXcHdC1Z2TD5Qo0C8zlzV790k2mCdcNjGsEnC8f2XCFWbqk4n4yquzIvSHKVyY7jf/IR6d+MWmSnrLeDeuBXQDiLbWWUJduy5cW/LjWClwMQr7NsAN8TSPCB6ROBRQHz+iH6vQgbqJosJIe5nhbhC9KhxXKBhmqXUvGUsonQzTw8N7abJsbZs1E5rXxE4Pl+iA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=garyguo.net; dmarc=pass action=none header.from=garyguo.net;
- dkim=pass header.d=garyguo.net; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=garyguo.net;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=xxBjZhcQJRs8X/9wYPFHigUK1WQUHDV+/l4CSF4gpGA=;
- b=ZgvH8ZvQ4i7OxT/+KMhd4/Uah2Fkcm5U2c3WhHUPT2j4dhXbvqvoJ0h7qcIYHt6HxrLyWJRXRGQF4yboymr8AfKKbS3ZHEcp8EgH1dZ+OxYJxx3HeEdkUwJhrYwRhBKQ0lO0d70AyR/NoRoxNFNXgO07Gl9i6fNsYlYcOFLNmEc=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=garyguo.net;
-Received: from LO2P265MB5183.GBRP265.PROD.OUTLOOK.COM (2603:10a6:600:253::10)
- by LO2P265MB3183.GBRP265.PROD.OUTLOOK.COM (2603:10a6:600:164::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8377.16; Wed, 22 Jan
- 2025 18:38:40 +0000
-Received: from LO2P265MB5183.GBRP265.PROD.OUTLOOK.COM
- ([fe80::1818:a2bf:38a7:a1e7]) by LO2P265MB5183.GBRP265.PROD.OUTLOOK.COM
- ([fe80::1818:a2bf:38a7:a1e7%5]) with mapi id 15.20.8356.020; Wed, 22 Jan 2025
- 18:38:40 +0000
-Date: Wed, 22 Jan 2025 18:38:37 +0000
-From: Gary Guo <gary@garyguo.net>
-To: FUJITA Tomonori <fujita.tomonori@gmail.com>
-Cc: linux-kernel@vger.kernel.org, Trevor Gross <tmgross@umich.edu>, Alice
- Ryhl <aliceryhl@google.com>, rust-for-linux@vger.kernel.org,
- netdev@vger.kernel.org, andrew@lunn.ch, hkallweit1@gmail.com,
- ojeda@kernel.org, alex.gaynor@gmail.com, bjorn3_gh@protonmail.com,
- benno.lossin@proton.me, a.hindborg@samsung.com, anna-maria@linutronix.de,
- frederic@kernel.org, tglx@linutronix.de, arnd@arndb.de, jstultz@google.com,
- sboyd@kernel.org, mingo@redhat.com, peterz@infradead.org,
- juri.lelli@redhat.com, vincent.guittot@linaro.org,
- dietmar.eggemann@arm.com, rostedt@goodmis.org, bsegall@google.com,
- mgorman@suse.de, vschneid@redhat.com
-Subject: Re: [PATCH v8 1/7] rust: time: Add PartialEq/Eq/PartialOrd/Ord
- trait to Ktime
-Message-ID: <20250122183837.79ad9dcf.gary@garyguo.net>
-In-Reply-To: <20250116044100.80679-2-fujita.tomonori@gmail.com>
-References: <20250116044100.80679-1-fujita.tomonori@gmail.com>
-	<20250116044100.80679-2-fujita.tomonori@gmail.com>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-pc-linux-gnu)
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: LO4P123CA0083.GBRP123.PROD.OUTLOOK.COM
- (2603:10a6:600:190::16) To LO2P265MB5183.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:253::10)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97CF52153FF;
+	Wed, 22 Jan 2025 18:39:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1737571165; cv=none; b=Qn4qoAnRDy4/o7gooWKWLy6uNyhVI908LMlRHMqfSmi9jg0rwZL0qfKvR1d/0kVi2Qavz/ElUQFNSybIwPEAyjdBLUqKCHEHKZWht2WjOTUqH5LeYxX/9Jo31LaUI5iZRp67vEw3Yl46WLMVsqYRQG1X9VYpXyJsdfZws9wHNLU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1737571165; c=relaxed/simple;
+	bh=bzXcOWS9R8NyxelgO7QAkM3v6Cl6TBTIhYcH0OSGYiI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=MHJPv8vuKfyLdrzsvp1cyD3V2+h4AnjIw+WEs+Ux/4DpocDGs7sUOCDWCX8dqzR3zUqp39cmfFusTcyC+qHULxJHQDxB2D1uemN7aIe9OgbDzBRXie/GiJtmmloLs/4uzBR5sN3jNNvrU92YUaXq7X2nNRbs4ENxIWywZLHZdCo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
+Received: from [192.168.2.102] (213.87.159.248) by msexch01.omp.ru
+ (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Wed, 22 Jan
+ 2025 21:39:05 +0300
+Message-ID: <d0df2838-cd28-4403-83ca-883fece75a71@omp.ru>
+Date: Wed, 22 Jan 2025 21:39:04 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LO2P265MB5183:EE_|LO2P265MB3183:EE_
-X-MS-Office365-Filtering-Correlation-Id: 4ef88b70-1461-4d99-5291-08dd3b13fda1
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|10070799003|1800799024|376014|366016|7416014|7053199007;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?3hnc0aN+4cOjsizAUJbgC5mcsw2NCk0t0NEu6jNhNU4Mp0/jOSCxTBRS4j1x?=
- =?us-ascii?Q?OZwDErtUpLlhRbsKvh1KWoegbcYScsbjztjzjSZaSraxwQWYB9MI4GMjMjh0?=
- =?us-ascii?Q?AlFCXfnHiHpf1UYtUCCK8O0FRk82SY66KizwrFfZ9guxtlJYAxOSp9ZJSaAh?=
- =?us-ascii?Q?xabvU220cAEkg7Z7g0CPyvbD2mgFxWEPeReKYQa6vHjcPTJ+zp6NxvcRdrxA?=
- =?us-ascii?Q?1Vs6wu0ewQEWMqgP9X9UWGTcg/D4loZd5ZO0BAeZXGTF+x7f7rrBDsmo1rN7?=
- =?us-ascii?Q?nTRoJ7Zt7GNVMY80MWDem0dl+0VJLvJBXKveDajBZ46SXGQEkNPKIJ/V2jS8?=
- =?us-ascii?Q?8ICQpC/i1kIHTNscG+E/GvDjjMGrlC9/fGYrkDKpRh0PyL2wGAszkS6IlKve?=
- =?us-ascii?Q?H2OuSQt1V31eaCHpZb3lM9m55eXShYlWnL7CQdMpujfmsbBQTzvSdCJIhg38?=
- =?us-ascii?Q?rJXEs2hteWtQCmRFIT+0SU2iQGF3hDVKDNgzlNpZmczHyDg4ZvsswqVBl4X7?=
- =?us-ascii?Q?0Fk+4q/d6noHXFp8y3z36kZOwCFPxF1z7IRxFNh0idajopmddTwlBeao1aeg?=
- =?us-ascii?Q?ItKkmMbV73z+6T60IbtcybkQzUwH52LgKoHY+CuJpgBM0FKUXC1Bykk3GXlb?=
- =?us-ascii?Q?/kBrZF8a1DHPHRngKofiFZMWUDpBoWHhilBXqjZOVLsJSWOJDTt/SObLn/Nb?=
- =?us-ascii?Q?2MidfYzl+xNqT8wgXfkJ2Chfiac5rEYFvKW/6c5k8PbWIOejdDrMNvqCJhKH?=
- =?us-ascii?Q?Qx7Jn0285Ru7mz6f2BLMOX7A3EOobFSeTqd/DZxB6n2qYYt+iFacX7xYM2+g?=
- =?us-ascii?Q?jp4r44KcG7ZQB46eTzk4RnCCU5+DQRlf1RcW2Ogj9/YZiKZJdj9aPFE1A+q2?=
- =?us-ascii?Q?l5PYnOjAIK+W6aPVrYCl2rlxB9Cx/SiSJYowqKSOsEUbbLyrYbrsyucCnjOM?=
- =?us-ascii?Q?EmxXniTd6FS/O8ZXkR5ecwFAMNSzOhDt5mKO914ykUSFv6dE5Hm/Vn8rZZxR?=
- =?us-ascii?Q?5kn++3lAxgxxobavw++nvxcZch5w9sAeyhxcV3HkzbTvEEfW3jNAmJgyn8/C?=
- =?us-ascii?Q?pO2VyzfsghEdIVWIzL9YaXkJumrFubLlvgg76M5tbeYnL6dPhflvUmz/SBa0?=
- =?us-ascii?Q?E7lTnnVQLwOhE30VFN/T5iZVyCMIKoP+TLw0MO8ZYNlkNfV39hqQ3B9Yllvv?=
- =?us-ascii?Q?4AbxkHckLKz8HuZwj1rTdvQLpD6wsuM3QEf63JQAyWSiLflYtQefyURgdWkN?=
- =?us-ascii?Q?u0MawXBOsucAFQsJDMW86XOZNtjsHIW2Z0NaahC6zNxgVcEmBmevEjIq8kyl?=
- =?us-ascii?Q?iKqJPJRYGArBu7R+Uj3S2RYDaaesig74uCNHIeUJZmoDNxKW8jTa8Ae4N4CJ?=
- =?us-ascii?Q?XegiCYIlOM40F7T+dAyiIbNqiNnt?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LO2P265MB5183.GBRP265.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(10070799003)(1800799024)(376014)(366016)(7416014)(7053199007);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?xI3k8FQ1SVtA4DSpBFbyoYnStuI77THDji+vmzskht2ucsmYdigByyTbq4+Q?=
- =?us-ascii?Q?MkccMs5R5XquC3tB3hyhbGbJSyumcPoQTKlWaant6FGCLs0uUTQK3Dd9305R?=
- =?us-ascii?Q?m0ctwllR9U+5qZuNEuw+yPe8SuW2do9bqgN0azC6dcbE8RexnAhE6Xlz/CaY?=
- =?us-ascii?Q?dViQJwPGAZQYoYzg48P9/1XT8VXhm/n0bVpJl9h9xm60RfyByD7pA1+VmFY6?=
- =?us-ascii?Q?VZVGFdUtgIoCV2yT4pJo+xE8Ju6P5eCRI1Qf156sNF27TU9hCx2OsPBu0l6f?=
- =?us-ascii?Q?rp9uxKKbkRXVKy86tsnjPVqdWwWb8QZGsgeQ9SJrFVLk7aWfMUu/K+DKPnYH?=
- =?us-ascii?Q?58y25J8jEf3Y+LlHcCondrarvtkBD2RIuV9DBEYLksOCaTSEW/PKY/wUYGXU?=
- =?us-ascii?Q?u2AbL9eF4Y7iZ+GRzpmuZNayC7rdpLmBI7R5PKdFK04t+1smn5IJ3TfFHoFX?=
- =?us-ascii?Q?kd45qC230unr41DZvdi04+/T2A5+2XntVOCm4hdwlEgWfXCXZzU6dnGuIx+d?=
- =?us-ascii?Q?Jg8EHPG7H8CzWsbvxh9KG7TCKfRHNhiKRhYiCuGYAoC0rSYRsFsLlRWm03Pa?=
- =?us-ascii?Q?f0mJPpQgVhlgBZzulpbGCtzH1cmXkSshQVggaYAY5/Br/r4t7eKzV2SWUdNg?=
- =?us-ascii?Q?AfK9Zny7ElnB1ygT12BjQHIeLD9732cfCvq28lQetCabHV3wmcX3sfZisiTI?=
- =?us-ascii?Q?u1HZJlNiy6g97Wd4s5S74j3RfMaJk4HWZ8JUhOnxeLeZ3mLNh7pqImK36ZQ3?=
- =?us-ascii?Q?xw9h2I3+UWclXYP7v8aTD0d85NI6x1IMAFDk8eu1kywzIG9citu0zyFQo28W?=
- =?us-ascii?Q?fFzY0ATARS8Lw8j+OzuUfFmoiGCtrpGgX1u4kL9NpCjbcMhkYwTPo+pFGie7?=
- =?us-ascii?Q?I/obpaY46cIQFD9sXXAiPxT4FodKkJhBTMRLnJ5IjL89pzl7PB0a/bO3AqiZ?=
- =?us-ascii?Q?B1hVZx+pQO4GHfqpDCgwKBNB3i3gf1MHS7O3OVzx7v0MREJR/QyQDn/x3pFz?=
- =?us-ascii?Q?z4+q9OCaEnpFG2sBzLa3NO9OLVA6slnh6dKizOCRZnjUj/aAZnkR75X1McUy?=
- =?us-ascii?Q?cBG6M6Vyxcg6CTk94HduzwtWr7+Y6jrhXgMfJavthNdChzhvj+OTZ8w7piiM?=
- =?us-ascii?Q?WUay8rKnHjDxtGJKZL5+LmqkLxMl+Qpabl4BUp/809AMs/4ylBAnn7KPubXf?=
- =?us-ascii?Q?S+e7HBgI8CJ/a3gl0O9kC1BuRj/0XycTlZFFfCNmGA8RgMSqXSnONdkOCktb?=
- =?us-ascii?Q?ULyS7HBbNuhUoVEskWIWBzARrMVEP9XNqsfOkbbh+w94MHVomX5AqbZAvxn8?=
- =?us-ascii?Q?+PnHkrfPKG0letEq+INjPdCHGPArfdarcMouuR5uTmp0CSvp0YUUGDZkd6K2?=
- =?us-ascii?Q?lhES61nl3z9GNluWV8oSiHdjtZ1pEn7OD5+9OZ2BfofcKwiInpo83/XFrvCy?=
- =?us-ascii?Q?Jbccgx7HEsXAjt8Q8oMZBdCSU5fhK35Bk1cAR79XsSTNh11Nqzbw/xgSdRxn?=
- =?us-ascii?Q?JlgEzHCd0Oc8OsEo/B1OyBoZUkLoLCIo0f7Z4ggqMlU+LPYyog0Or0QOWi22?=
- =?us-ascii?Q?GTcj+qwycv3FTfxV47G83I3/OMByyQjNA3ALGlg7e2qyadEsM6WFwpII3n6w?=
- =?us-ascii?Q?Lg=3D=3D?=
-X-OriginatorOrg: garyguo.net
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4ef88b70-1461-4d99-5291-08dd3b13fda1
-X-MS-Exchange-CrossTenant-AuthSource: LO2P265MB5183.GBRP265.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Jan 2025 18:38:40.3390
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: bbc898ad-b10f-4e10-8552-d9377b823d45
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: iMTB193sgQEbJMDY64+yfAw0B3nHobnh4oEMosC4uQi1loHmU3Igd3NRlfXtxS6tj9Ugmw9HieOqy+4aoUMpAg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LO2P265MB3183
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 2/2] net: sh_eth: Fix missing rtnl lock in suspend
+ path
+To: Kory Maincent <kory.maincent@bootlin.com>, Paul Barker
+	<paul.barker.ct@bp.renesas.com>, =?UTF-8?Q?Niklas_S=C3=B6derlund?=
+	<niklas.soderlund@ragnatech.se>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
+ S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+CC: Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	=?UTF-8?Q?Niklas_S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>,
+	Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>, <netdev@vger.kernel.org>,
+	<linux-renesas-soc@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+References: <20250122-fix_missing_rtnl_lock_phy_disconnect-v1-0-8cb9f6f88fd1@bootlin.com>
+ <20250122-fix_missing_rtnl_lock_phy_disconnect-v1-2-8cb9f6f88fd1@bootlin.com>
+Content-Language: en-US
+From: Sergey Shtylyov <s.shtylyov@omp.ru>
+Organization: Open Mobile Platform
+In-Reply-To: <20250122-fix_missing_rtnl_lock_phy_disconnect-v1-2-8cb9f6f88fd1@bootlin.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.1.1, Database issued on: 01/22/2025 17:29:55
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 19
+X-KSE-AntiSpam-Info: Lua profiles 190517 [Jan 22 2025]
+X-KSE-AntiSpam-Info: Version: 6.1.1.7
+X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 50 0.3.50
+ df4aeb250ed63fd3baa80a493fa6caee5dd9e10f
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 213.87.159.248 in (user)
+ b.barracudacentral.org}
+X-KSE-AntiSpam-Info:
+	d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2;omp.ru:7.1.1
+X-KSE-AntiSpam-Info: FromAlignment: s
+X-KSE-AntiSpam-Info: ApMailHostAddress: 213.87.159.248
+X-KSE-AntiSpam-Info: {DNS response errors}
+X-KSE-AntiSpam-Info: Rate: 19
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 01/22/2025 18:04:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 1/22/2025 3:28:00 PM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-On Thu, 16 Jan 2025 13:40:53 +0900
-FUJITA Tomonori <fujita.tomonori@gmail.com> wrote:
+On 1/22/25 7:19 PM, Kory Maincent wrote:
 
-> Add PartialEq/Eq/PartialOrd/Ord trait to Ktime so two Ktime instances
-> can be compared to determine whether a timeout is met or not.
+> Fix the suspend path by ensuring the rtnl lock is held where required.
+
+   Maybe suspend/resume path (the same w/the subject)?
+
+> Calls to sh_eth_close, sh_eth_open and wol operations must be performed
+> under the rtnl lock to prevent conflicts with ongoing ndo operations.
 > 
-> Use the derive implements; we directly touch C's ktime_t rather than
-> using the C's accessors because it is more efficient and we already do
-> in the existing code (Ktime::sub).
-> 
-> Reviewed-by: Trevor Gross <tmgross@umich.edu>
-> Reviewed-by: Alice Ryhl <aliceryhl@google.com>
-> Signed-off-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
+> Fixes: b71af04676e9 ("sh_eth: add more PM methods")
+> Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
 
-Reviewed-by: Gary Guo <gary@garyguo.net>
+    FWIW:
 
-> ---
->  rust/kernel/time.rs | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/rust/kernel/time.rs b/rust/kernel/time.rs
-> index 379c0f5772e5..48b71e6641ce 100644
-> --- a/rust/kernel/time.rs
-> +++ b/rust/kernel/time.rs
-> @@ -27,7 +27,7 @@ pub fn msecs_to_jiffies(msecs: Msecs) -> Jiffies {
->  
->  /// A Rust wrapper around a `ktime_t`.
->  #[repr(transparent)]
-> -#[derive(Copy, Clone)]
-> +#[derive(Copy, Clone, PartialEq, PartialOrd, Eq, Ord)]
->  pub struct Ktime {
->      inner: bindings::ktime_t,
->  }
+Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
+
+[...]
+
+MBR, Sergey
 
 
