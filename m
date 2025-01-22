@@ -1,130 +1,187 @@
-Return-Path: <netdev+bounces-160251-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160252-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 84473A19018
-	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 11:44:03 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8F01A1901A
+	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 11:44:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AC4C07A5439
-	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 10:43:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 60C2818851A7
+	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 10:44:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78862211494;
-	Wed, 22 Jan 2025 10:43:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF590211488;
+	Wed, 22 Jan 2025 10:44:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JmmAnUtO"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kt2/6Dpa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38B2C211464;
-	Wed, 22 Jan 2025 10:43:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6900E1F7578;
+	Wed, 22 Jan 2025 10:44:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737542636; cv=none; b=TD6nN6Z2R7OCEx4fwDc8KKRiw8TpYL+p2UELewSOw1fqEvxqqun8ZPrXNlv55y20a/hZrao57elFYw2xRtDDy85qu067GffYUcqPuhoagDBg39c6NVfnlSiatgIAefkmJrpmlkRDSNDOc/vUQ/B5LrxXZpYU2EUqwCGH/ntBSXY=
+	t=1737542657; cv=none; b=jfFkKf4mP9svm37CUANm6BGa0RXjwtNrYXpaORFaXbtwN8kYKeyjEeJ131EocW4D/XIkpQCtXn8qAB3+BpCUAeeOxWBBKFkj5uelgkFklVyzynW7S5A7FVWYZ8784SmEMY/ZtnMoC9RYuLYvYd463XBbgTziLLCxLzzDi5qM+wo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737542636; c=relaxed/simple;
-	bh=7IGm911vUOkWZgIy+Be/s5qjNLSpBCaq3uAzUvgev5I=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=RxqvPYTJ0oL2WuhuSbrlBfpXBV/U6EYbj87BLC0bS+C1lQjDcTYEnd9dWAmWhFoWyKIwfa7++XSi9F7tHithtwUrvTv2jVjp6HCZsayFHs6NpVzV1eDD3VSE/uDEw47tHeSvn9KFuOnoylzZxXUurFIGgWCGfYU/F6BG/qh5QzA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JmmAnUtO; arc=none smtp.client-ip=209.85.216.44
+	s=arc-20240116; t=1737542657; c=relaxed/simple;
+	bh=LHfpwFkMzfAo1uIQDb5wPLmqmWu5ct/ZQUb0VDIwHQc=;
+	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=T99t8N32zFd41AvuvFz6jhovrVJjS6K1qpeXjwUnQdxfEufMHcpJlxOszJzvE/vnnqiYj7czhvdcCVNgZMSvcpciXk0v2If1MZ7roMvf0y7Abdl8VbRkrIYVpa8bqhPBDvI7A55F3dpy0TOUGi7yZAbT6vTvRXfEdj8TRod1vew=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kt2/6Dpa; arc=none smtp.client-ip=209.85.214.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-2f4409fc8fdso1094830a91.1;
-        Wed, 22 Jan 2025 02:43:53 -0800 (PST)
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-2166651f752so155297345ad.3;
+        Wed, 22 Jan 2025 02:44:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1737542633; x=1738147433; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=fkPC1i2sSxMmUrTx0VCnD5+d9HTeCHfJmCCgbIfq+Rc=;
-        b=JmmAnUtOLKFqRWN+acJhbIq6GJlT4Me0MEozer7xWvsJ0Ehy583uUFGGeDbjgxokyd
-         doVPH5O6sUM/E5ZgLKzRj4ymnJ9WXaey68t3w9uTdbra1S5WDouQAquwkP9JpBHLgoDf
-         8Wx+wQaQ5qluTzC+SOpcdVZ04iVlhcqRzz7n6eOL6gw2WW6CGT6zBSARitw8U5rsaN+H
-         1uz+FZfDY5xIY/L5HhR28XZ939GZrU3/joGEPpc5HCeVyIL+5+o3yv04Szpv8FMMd2MC
-         oUAq/bCmyzam62ZmhdLjwVUxh3E0rKYx/M7+d0xzy0P5puIHZexhUEm9JSIfmy5axhzU
-         YHQQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737542633; x=1738147433;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=gmail.com; s=20230601; t=1737542655; x=1738147455; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=fkPC1i2sSxMmUrTx0VCnD5+d9HTeCHfJmCCgbIfq+Rc=;
-        b=v4AGyS5kyMhqranI52jipJ8r0ElWdO5CRq2UsJt+bXlCy8IwmWnc7/rHFAvITiAIAS
-         tfx1mWOgQjPunoRFbnM1Qnjqzdw0Tse2Ynk4uf/m3Ld7wCL+YjZtmEnBOwsTQ7vcJRNd
-         6J3mlJX03bfUud7xAAGdUY1VxWp1D4jB1cEDTIVrule1PeqRmqGtlZAr8KTASfkBnpOS
-         O02ZSPXwchlG94oqdHTBlYdcgzym0E3rACh6c0Hn204pXTm9owMoIB87R2fQXz1Jl1Rg
-         UE285iFOiiEs+ZrFZ6x7kGpYhAbe4SRelHDAVkpigcCHV9rSyUmo3doQSuqPCRZwNB6N
-         xQ8w==
-X-Forwarded-Encrypted: i=1; AJvYcCUCiB6m2mD9COoKI6+oNVCuKhNdPgy5eh8nXex/8uWbC/Ilp/E15dc42zUUtkssW7aE2MvJRPJU@vger.kernel.org, AJvYcCXgbHK+s5KdEhLPUwywWlr9LobNieKKkzTsRENaSV+VD24OEQ3KVKKQ16CmALaIX3U94AHzXiSl/0H7a7E=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxe/TxibRT9O+ms1/RqNeL1aFIL9J2xYZXWOuBRzya/tsuODyS+
-	EWcUUK3PuXZMOaBIEBWCn1L+8ZRltX43YdXvU3a+aGS+J4FRrw/0
-X-Gm-Gg: ASbGncveOoSSQKj0aXcCv3hnaIHsIdzKxoAZs9oU428etc9g2rmOz6AX22WTLwqit8J
-	aBfIA/sx35z7hGZ0b6NWgdkupHZHvLIogWt4ovVbfAL/G6801U+xPwDuwE6xeHNxUoToexM0zEg
-	ivptmPquR59N+DgY8guUFI3BR8hxUHAWu1Cw7nu2HT8sWElI1tLIZKcii8Fj0XjX9yxWIGN+N/H
-	x+nB1Tc2UCPNI6IMj8K7aFtO7qzzYISBn/FDx8zzAan8fXWefo0DuM+1sod/Axg60XvfsBhYA==
-X-Google-Smtp-Source: AGHT+IEfVKkJ4GS364V1u71OAFpPt8DZDMt957lkAWfFJGA9SgKVgggY0puJYiM0NEkyy1x3KCPNNA==
-X-Received: by 2002:a17:90b:50c3:b0:2ee:5c9b:35c0 with SMTP id 98e67ed59e1d1-2f782c455f8mr28375950a91.9.1737542633388;
-        Wed, 22 Jan 2025 02:43:53 -0800 (PST)
-Received: from HOME-PC ([223.185.135.17])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2f7e6a78d0bsm1396369a91.15.2025.01.22.02.43.52
+        bh=15nUF4TeFgp1VzyEgGEGFlDAEz7IFOo0+dU19nH2WFM=;
+        b=kt2/6DpaJYuhXyrjGXHiPo2h7ckJwfQG0uJHkloFlvDqvWdoL7OIF54GmuqgcY4YDh
+         esXqAcgP0yr7OTxYL4V14AmJY4Db0EoZZT64xyiNmKUF6FIZlmt8unEn9tGAJH+FX1iH
+         F8XoeIrrlk860iTV3aOYnqTLvL6iTnkrXBY5lumd36WTcIseiM0IujKYduH4tqxwpZGt
+         E9AxSOszzzCVWrhH9gnP3AOrQLwPss0Resj4C7elcP0Qq4dW1lzrMf/lWxVGR9lCeycM
+         D+zhFM6XEUen6IiwSli/FRF/6pfc8DgyhZWHWsViGadBo+/Nazrj7QLt86+lLUqlWfpJ
+         J3DQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737542655; x=1738147455;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=15nUF4TeFgp1VzyEgGEGFlDAEz7IFOo0+dU19nH2WFM=;
+        b=habXn8+/2WYyebRM/rSZiEkklZu0MOkKCdBEIwuyUuQGqZFqQafyFirvqtd2nyXpy/
+         1y9L5iiM+Lb5/tBvA5GGin58oebouCwFJ5remWOX8yiP5PO0HAuKecm0vzd0kRdALf1F
+         0R0Lh/kr+hgA/BBvbqKUUi2E/99kRUF01xtDb/FrmXicFYtRxVPy+QlFdACFPUOe58FJ
+         oeMn1U0M6FKoP+V4xJSb5pxlrwuyb31tHwZXw5AYVDPOQoW75SByGU2ixG1I4eJD/SPT
+         t+yVGLLtrQxuzLQdCbMsRJ4ng67iaU68ExT9vIXmjUiGbmxtZVA/eZLbMCuC7fwdH105
+         CafQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUGKC7Mr3jlshBzUjl5wbYXO+8dlkfUj6LNuiO570w7DgMT8a/xeTzOKf/UbmGccqG5Z5KidN5sZ084potIVZY=@vger.kernel.org, AJvYcCV1hV/IFyLMiqnpC2POW2V3EsiUYuxcv1NWq4ZonZlm76q2QoNm/9bL9ReVnv1xfmzF5heuTkIvQVZRLhE=@vger.kernel.org, AJvYcCVcrfN+GleQO4S0rPWe0aSohob2KXgoPg3aF1Hyc495YAYxY7nhrjo+sAGV3pcqDCK25H7hEn1w@vger.kernel.org
+X-Gm-Message-State: AOJu0YxNNAZ6iuEg9p5ntw1CXJjU2nYLKSDhbVDzDs0LQZepOMp0q/5+
+	3smLbjHMM+8ZYt5BJ+McnBf1Yxb3VCw49ryqjRSgnlRUnvHadCff
+X-Gm-Gg: ASbGncu/JN5GZ6H0jAIwVRnFeBlm/0lTL8eMP+3riK4GHEGGo8j//sX78VwBBmaVWgs
+	XVVwcg+nHY2SeFckjx5oklpT7hK1MLEA99/OZp9c7tGvAxfHJz0jhFmuQW3rznqq3hmZiHADObt
+	uQYMMDLxAoCPyICX8ApN82tKdZoHVLjSElRSwHDwzHSxvKCpgEcg1ZXmW20KMFndfFnDunOZTlI
+	Q4i+S97s5TpDRq3PMacsYGVVsur0jNYRhiB+XJwRI55vbmLdfoYX6HL6B4dxh2pkHwgZWOAXdL/
+	7bSjQ8NVaiHdX5YpT5jLUPVFa5YZ4gQ6S+dLF+Ym0aWlO4Cs7ec=
+X-Google-Smtp-Source: AGHT+IG9HLZlD+8uq/8P1ltV+4DZ3pw21bqNFLyC10/mJt/eYb3f+WFt4QCb5qaQck3VzSCjUzF8nw==
+X-Received: by 2002:a05:6a20:729e:b0:1e4:8fdd:8c77 with SMTP id adf61e73a8af0-1eb2144d534mr33093526637.8.1737542655489;
+        Wed, 22 Jan 2025 02:44:15 -0800 (PST)
+Received: from localhost (p3882177-ipxg22501hodogaya.kanagawa.ocn.ne.jp. [180.15.148.177])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72dab9c8dc4sm10901408b3a.94.2025.01.22.02.44.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Jan 2025 02:43:53 -0800 (PST)
-From: Dheeraj Reddy Jonnalagadda <dheeraj.linuxdev@gmail.com>
-To: wei.fang@nxp.com,
-	shenwei.wang@nxp.com,
-	xiaoning.wang@nxp.com
-Cc: andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	imx@lists.linux.dev,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Dheeraj Reddy Jonnalagadda <dheeraj.linuxdev@gmail.com>
-Subject: [PATCH net] net: fec: remove unnecessary DMA mapping of TSO header
-Date: Wed, 22 Jan 2025 16:13:07 +0530
-Message-Id: <20250122104307.138659-1-dheeraj.linuxdev@gmail.com>
-X-Mailer: git-send-email 2.34.1
+        Wed, 22 Jan 2025 02:44:15 -0800 (PST)
+Date: Wed, 22 Jan 2025 19:44:05 +0900 (JST)
+Message-Id: <20250122.194405.1742941306708932313.fujita.tomonori@gmail.com>
+To: aliceryhl@google.com
+Cc: fujita.tomonori@gmail.com, miguel.ojeda.sandonis@gmail.com,
+ linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org,
+ netdev@vger.kernel.org, andrew@lunn.ch, hkallweit1@gmail.com,
+ tmgross@umich.edu, ojeda@kernel.org, alex.gaynor@gmail.com,
+ gary@garyguo.net, bjorn3_gh@protonmail.com, benno.lossin@proton.me,
+ a.hindborg@samsung.com, anna-maria@linutronix.de, frederic@kernel.org,
+ tglx@linutronix.de, arnd@arndb.de, jstultz@google.com, sboyd@kernel.org,
+ mingo@redhat.com, peterz@infradead.org, juri.lelli@redhat.com,
+ vincent.guittot@linaro.org, dietmar.eggemann@arm.com, rostedt@goodmis.org,
+ bsegall@google.com, mgorman@suse.de, vschneid@redhat.com
+Subject: Re: [PATCH v8 4/7] rust: time: Add wrapper for fsleep function
+From: FUJITA Tomonori <fujita.tomonori@gmail.com>
+In-Reply-To: <CAH5fLghgcJV6gLvPxJVvn8mq4ZN0jGF16L5w-7nDo9TGNAA86w@mail.gmail.com>
+References: <CANiq72kqu7U6CR30T5q=PvRam919eMTXNOfJHKXKJ0Z60U0=uw@mail.gmail.com>
+	<20250122.155702.1385101290715452078.fujita.tomonori@gmail.com>
+	<CAH5fLghgcJV6gLvPxJVvn8mq4ZN0jGF16L5w-7nDo9TGNAA86w@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 
-The TSO header buffer is pre-allocated DMA memory, so there's no need to
-map it again with dma_map_single() in fec_enet_txq_put_hdr_tso(). Remove
-this redundant mapping operation.
+On Wed, 22 Jan 2025 09:23:33 +0100
+Alice Ryhl <aliceryhl@google.com> wrote:
 
-Fixes: 79f339125ea3 ("net: fec: Add software TSO support")
-Signed-off-by: Dheeraj Reddy Jonnalagadda <dheeraj.linuxdev@gmail.com>
----
- drivers/net/ethernet/freescale/fec_main.c | 9 ---------
- 1 file changed, 9 deletions(-)
+>> > I would also say "the C side [`fsleep()`] or similar"; in other words,
+>> > both are "kernel's" at this point.
+>>
+>> Agreed that "the C side" is better and updated the comment. I copied
+>> that expression from the existing code; there are many "kernel's" in
+>> rust/kernel/. "good first issues" for them?
+>>
+>> You prefer "[`fsleep()`]" rather than "[`fsleep`]"? I can't find any
+>> precedent for the C side functions.
+> 
+> I think that's a matter of taste. In the Rust ecosystem, fsleep is
+> more common, in the kernel ecosystem, fsleep() is more common. I've
+> seen both in Rust code at this point.
 
-diff --git a/drivers/net/ethernet/freescale/fec_main.c b/drivers/net/ethernet/freescale/fec_main.c
-index 68725506a095..039de4c5044e 100644
---- a/drivers/net/ethernet/freescale/fec_main.c
-+++ b/drivers/net/ethernet/freescale/fec_main.c
-@@ -805,15 +805,6 @@ fec_enet_txq_put_hdr_tso(struct fec_enet_priv_tx_q *txq,
- 
- 		if (fep->quirks & FEC_QUIRK_SWAP_FRAME)
- 			swap_buffer(bufaddr, hdr_len);
--
--		dmabuf = dma_map_single(&fep->pdev->dev, bufaddr,
--					hdr_len, DMA_TO_DEVICE);
--		if (dma_mapping_error(&fep->pdev->dev, dmabuf)) {
--			dev_kfree_skb_any(skb);
--			if (net_ratelimit())
--				netdev_err(ndev, "Tx DMA memory map failed\n");
--			return NETDEV_TX_OK;
--		}
- 	}
- 
- 	bdp->cbd_bufaddr = cpu_to_fec32(dmabuf);
--- 
-2.34.1
+Understood, I'll go with [`fsleep`].
 
+
+>> > And perhaps I would simplify and say something like "The behavior
+>> > above differs from the C side [`fsleep()`] for which out-of-range
+>> > values mean "infinite timeout" instead."
+>>
+>> Yeah, simpler is better. After applying the above changes, it ended up
+>> as follows.
+>>
+>> /// Sleeps for a given duration at least.
+>> ///
+>> /// Equivalent to the C side [`fsleep`], flexible sleep function,
+>> /// which automatically chooses the best sleep method based on a duration.
+>> ///
+>> /// `delta` must be within [0, `i32::MAX`] microseconds;
+> 
+> I'd do `[0, i32::MAX]` instead for better rendering.
+
+Yeah, looks better after redering. I'll update it.
+
+
+>> /// otherwise, it is erroneous behavior. That is, it is considered a bug
+>> /// to call this function with an out-of-range value, in which case the
+>> /// function will sleep for at least the maximum value in the range and
+>> /// may warn in the future.
+>> ///
+>> /// The behavior above differs from the C side [`fsleep`] for which out-of-range
+>> /// values mean "infinite timeout" instead.
+>> ///
+>> /// This function can only be used in a nonatomic context.
+>> ///
+>> /// [`fsleep`]: https://docs.kernel.org/timers/delay_sleep_functions.html#c.fsleep
+>> pub fn fsleep(delta: Delta) {
+>>
+>>
+>> >> A range can be used for a custom type?
+>> >
+>> > I was thinking of doing it through `as_nanos()`, but it may read
+>> > worse, so please ignore it if so.
+>>
+>> Ah, it might work. The following doesn't work. Seems that we need to
+>> add another const like MAX_DELTA_NANOS or something. No strong
+>> preference but I feel the current is simpler.
+>>
+>> let delta = match delta.as_nanos() {
+>>     0..=MAX_DELTA.as_nanos() as i32 => delta,
+>>     _ => MAX_DELTA,
+>> };
+> 
+> Could you do Delta::min(delta, MAX_DELTA).as_nanos() ?
+
+We need Delta type here so you meant:
+
+let delta = std::cmp::min(delta, MAX_DELTA);
+
+?
+
+We also need to convert a negative delta to MAX_DELTA so we could do:
+
+let delta = if delta.is_negative() {
+    MAX_DELTA
+} else {
+    min(delta, MAX_DELTA)
+};
+
+looks a bit readable than the original code?
 
