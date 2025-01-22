@@ -1,136 +1,139 @@
-Return-Path: <netdev+bounces-160405-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160406-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BAF2FA198DA
-	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 19:55:41 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 66217A198EB
+	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 20:02:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0B51C16BA87
-	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 18:55:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B388316C6D5
+	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 19:02:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31B8A21576D;
-	Wed, 22 Jan 2025 18:55:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACFFD21577C;
+	Wed, 22 Jan 2025 19:02:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="wbw8FXVS"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="dSTu3bEM"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from out-175.mta1.migadu.com (out-175.mta1.migadu.com [95.215.58.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 106A0215166;
-	Wed, 22 Jan 2025 18:55:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9551E214A9B
+	for <netdev@vger.kernel.org>; Wed, 22 Jan 2025 19:02:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737572138; cv=none; b=oiyND39lx36jEdzIqtii6p87gbX9eQv5o40orW6qOpTVv5b07DIsg+tGw9gK/BEif/f2UlMpDnwRL9PxDkhsJz8IxQkn3U98+IU4gl0ADb22aQ7EOVqF8vcRZgATCqX/LBD64378P5nWljWPIGKz+lMeOCx2aiukWkDl1EFesqQ=
+	t=1737572550; cv=none; b=Iz2YDhl57ub6QSQtRBwwtkUwgrYkksl+Odjvv4VZEmdvQlxtZyMm8mULDu+kARN7jVvBNMTLCF2cJj+Stmw/8FV7B0L1dbgvG2YozU9ZBw85prGRJi4TXG95sol/201y2zHdahBKNiWKfEi6HuR0F064P2mL1CO25uMCwpvucVo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737572138; c=relaxed/simple;
-	bh=GqH+cjixCHm6pFPgJISgiNmXiquyMt+xgoCU9S/YstQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QHsmbAlTnQpor+tWrCWPqwUprtqMQ2X41XVT4D9zyLgoZd1r8cEZ9QXyvQGuPDpntjVjBh72SjlggOyRUwZBteTT565/wfidlyy+LJgYjP0y/jlVJ/6JzUjO4Q/vlAwOo++4gp2ronw1fSNW8SXTqMsluN9c0S/UBq+R3BYGKig=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=wbw8FXVS; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=hCpKDdKg4rdX1fCkNUFQGWyQg+xKmQk23jdejo83T+A=; b=wbw8FXVSTVYJs6N8NQRDei+kf6
-	WhboiXTxBHYWqR43xrZcxr76M1+HrYgItDRbn7sdkVbRhzuGIjvZfG9UWajqYcyVnjIxGPVPzRAzg
-	e1c1qx2eV5Wp822RD8Qq03WJFckWovLhpZVWwKwE2FpyNILvpIjqgZA+3ziUYuMNKsA/T6N6hnEwi
-	ElC4MioxwSWGsODlYGMPJg+8msO2fkUvf36hQ923+6RXdVwx/U6wZ7ycldajzITiFhwW+wmgqxIkO
-	jDQN1Ut68J4I76GTic1c9RFytpUQ6BKVfW41d56RqwKgzGbQWR1HU+ta3tz2wpLUbuG0WJIweeMZd
-	YrjstVLA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:53750)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1tafso-0000Ax-17;
-	Wed, 22 Jan 2025 18:55:22 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1tafsj-00058Q-3C;
-	Wed, 22 Jan 2025 18:55:18 +0000
-Date: Wed, 22 Jan 2025 18:55:17 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
-	thomas.petazzoni@bootlin.com, Andrew Lunn <andrew@lunn.ch>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	linux-arm-kernel@lists.infradead.org,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Herve Codina <herve.codina@bootlin.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	=?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>,
-	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	=?iso-8859-1?Q?Nicol=F2?= Veronese <nicveronese@gmail.com>,
-	Simon Horman <horms@kernel.org>, mwojtas@chromium.org,
-	Antoine Tenart <atenart@kernel.org>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>
-Subject: Re: [PATCH net-next RFC v2 1/6] net: ethtool: common: Make BaseT a
- 4-lanes mode
-Message-ID: <Z5E_FUxSZJWRWVAq@shell.armlinux.org.uk>
-References: <20250122174252.82730-1-maxime.chevallier@bootlin.com>
- <20250122174252.82730-2-maxime.chevallier@bootlin.com>
+	s=arc-20240116; t=1737572550; c=relaxed/simple;
+	bh=yVOl7uKZwAPzL3hOo1/yIB0AA01qrS2OlwWoDfRibec=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ZoQbFSBQNASyI5pEIA2/LYRlfkiIvbFGMmS09ddYv0/VzF/Judu73w51i+bfesgKgv4y1XZ5jXciTEH9WLdV3UAgFnBnXxtM+dzXW54jlOjOEIpsV1Dsw9XdzbYiIgSZjFcJRbRBmaer3qcZroKiOVZ0sCD2R6YZXKXXTen918o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=dSTu3bEM; arc=none smtp.client-ip=95.215.58.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <453fbdbc-1843-498b-9a1c-8c83e7e244ed@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1737572536;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=g8FKpvfe4T9AnrcyGP1Vg1JqYGIC8GWW31gvSYVAm1E=;
+	b=dSTu3bEMKZOMYG8VODFIRLWE+0EC6zY7TARf8/Jb94x02xb52o1JTn8e/cptSgx1KqH0Ga
+	IU/fRr9lryQk1ho9fZT7Wmrub7Ipu4/2LeE04UEAWKoScthZHY+vnijyrz0uJtEo45EzjQ
+	kd/KLlSxQ92RxISwLyMTUwv8tVxKUr4=
+Date: Wed, 22 Jan 2025 11:02:08 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250122174252.82730-2-maxime.chevallier@bootlin.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Subject: Re: [PATCH RFC net-next] trace: tcp: Add tracepoint for
+ tcp_cwnd_reduction()
+Content-Language: en-GB
+To: Steven Rostedt <rostedt@goodmis.org>, Breno Leitao <leitao@debian.org>
+Cc: Jason Xing <kerneljasonxing@gmail.com>, Eric Dumazet
+ <edumazet@google.com>, Masami Hiramatsu <mhiramat@kernel.org>,
+ Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+ "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+ kernel-team@meta.com, Song Liu <song@kernel.org>,
+ Martin KaFai Lau <martin.lau@kernel.org>
+References: <20250120-cwnd_tracepoint-v1-1-36b0e0d643fa@debian.org>
+ <CAL+tcoC+A94uzaSZ+SKhV04=iDWrvUGEfxYJKYCF0ovqvyhfOg@mail.gmail.com>
+ <20250120-panda-of-impressive-aptitude-2b714e@leitao>
+ <CAL+tcoCzStjkEMdNw5ORYbQy3VnVE9A6aj6HcmQvGj3VG1VypA@mail.gmail.com>
+ <20250120-daring-outstanding-jaguarundi-c8aaed@leitao>
+ <20250120100340.4129eff7@batman.local.home>
+ <20250122-vengeful-myna-of-tranquility-f0f8cf@leitao>
+ <20250122095604.3c93bc93@gandalf.local.home>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Yonghong Song <yonghong.song@linux.dev>
+In-Reply-To: <20250122095604.3c93bc93@gandalf.local.home>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Wed, Jan 22, 2025 at 06:42:46PM +0100, Maxime Chevallier wrote:
-> When referring to BaseT ethernet, we are most of the time thinking of
-> BaseT4 ethernet on Cat5/6/7 cables. This is therefore BaseT4, although
-> BaseT4 is also possible for 100BaseTX. This is even more true now that
-> we have a special __LINK_MODE_LANES_T1 mode especially for Single Pair
-> ethernet.
-> 
-> Mark BaseT as being a 4-lanes mode.
 
-This is a problem:
 
-1.4.50 10BASE-T: IEEE 802.3 Physical Layer specification for a 10 Mb/s
-CSMA/CD local area network over two pairs of twisted-pair telephone
-wire. (See IEEE Std 802.3, Clause 14.)
 
-Then we have the 100BASE-T* family, which can be T1, T2, T4 or TX.
-T1 is over a single balanced twisted pair. T2 is over two pairs of
-Cat 3 or better. T4 is over four pairs of Cat3/4/5.
+On 1/22/25 6:56 AM, Steven Rostedt wrote:
+> On Wed, 22 Jan 2025 01:39:42 -0800
+> Breno Leitao <leitao@debian.org> wrote:
+>
+>> Right, DECLARE_TRACE would solve my current problem, but, a056a5bed7fa
+>> ("sched/debug: Export the newly added tracepoints") says "BPF doesn't
+>> have infrastructure to access these bare tracepoints either.".
+>>
+>> Does BPF know how to attach to this bare tracepointers now?
+>>
+>> On the other side, it seems real tracepoints is getting more pervasive?
+>> So, this current approach might be OK also?
+>>
+>> 	https://lore.kernel.org/bpf/20250118033723.GV1977892@ZenIV/T/#m4c2fb2d904e839b34800daf8578dff0b9abd69a0
+> Thanks for the pointer. I didn't know this discussion was going on. I just
+> asked to attend if this gets accepted. I'm only a 6 hour drive from
+> Montreal anyway.
+>
+>>> You can see its use in include/trace/events/sched.h
+>> I suppose I need to export the tracepointer with
+>> EXPORT_TRACEPOINT_SYMBOL_GPL(), right?
+> For modules to use them directly, yes. But there's other ways too.
+>
+>> I am trying to hack something as the following, but, I struggled to hook
+>> BPF into it.
+> Maybe you can use the iterator to search for the tracepoint.
+>
+> #include <linux/tracepoint.h>
+>
+> static void fct(struct tracepoint *tp, void *priv)
+> {
+> 	if (!tp->name || strcmp(tp->name, "<tracepoint_name>") != 0)
+> 		return 0;
+>
+> 	// attach to tracepoint tp
+> }
+>
+> [..]
+> 	for_each_kernel_tracepoint(fct, NULL);
+>
+> This is how LTTng hooks to tracepoints.
 
-The common 100BASE-T* type is TX, which is over two pairs of Cat5.
-This is sadly what the ethtool 100baseT link modes are used to refer
-to.
+The LTTng approach in the above needs a kernel module to enable and disable
+the tracepoint and this is not a bpf-way to handle tracepoints.
 
-We do have a separate link mode for 100baseT1, but not 100baseT4.
+So for bpf, we need a new UAPI to pass <tracepoint_name> from user
+space to the kernel to attach to tracepoint tp since <tracepont_name> is not
+available in trace_fs.
 
-So, these ethtool modes that are of the form baseT so far are
-describing generally two pairs, one pair in each direction. (T1 is
-a single pair that is bidirectional.)
+What is the criteria for a tracepoint to be a normal tp or a bare tp?
 
-It's only once we get to 1000BASE-T (1000baseT) that we get to an
-ethtool link mode that has four lanes in a bidirectional fashion.
 
-So, simply redefining this ends up changing 10baseT and 100baseT from
-a single lane in each direction to four lanes (and is a "lane" here
-defined as the total number of pairs used for communication in both
-directions, or the total number of lanes used in either direction.
+>
+> -- Steve
+>
 
-Hence, I'm not sure this makes sense.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
