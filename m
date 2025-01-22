@@ -1,200 +1,138 @@
-Return-Path: <netdev+bounces-160168-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160169-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8BD00A18A12
-	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 03:40:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8211FA18A1C
+	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 03:41:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B510016011B
-	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 02:40:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C3F90163C11
+	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 02:41:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB5CE15624B;
-	Wed, 22 Jan 2025 02:34:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81E1714E2E2;
+	Wed, 22 Jan 2025 02:38:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SzN9LHPr"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A73354764;
-	Wed, 22 Jan 2025 02:34:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E624914B965;
+	Wed, 22 Jan 2025 02:38:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737513258; cv=none; b=aLBQh6w/ulWuP2PIlyFuiy6KEAPi4qNoY6OB6ddNbglelZvlGKFoFIRngjUeuMcGWJ14d2N4UHEO3+NgTmqKcG4YsMCtgxlm+DJQASyNjY5uVsVkQiwnBV+cD7Hvrh0q0PL9dtNRAe/AS8K1vLD5BZNRvz2jXeuwY/p6kLOFXW4=
+	t=1737513518; cv=none; b=Tb0vzWgANsR46F2+zBHrL4Ud8+ujNBojmLSLcYsePi96gvv0IN1qSDlQas68RIcAdrtbOuCbWvlWC0KNFbZqHEky1ytBxnjj2/cJUrnHo7Kdihdxbz4KY118MQO1TOZcRED4ANYolygkYKuC0D63V5VkdW846xehq20v0mxEbrE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737513258; c=relaxed/simple;
-	bh=ahL/0Ai3hbmd4fgtPdz9MFVO3eMVv9sVRtU0Vxotbj0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=Ku3gTH4DA7GtVTZ38PtKPQWLK5O3nXAGHk29a2rGOtwxlHwXzQ/7TOphRQoLcyJlqB4Pc8Y7Gy43BXmizTzyZ0OjSYxA7N/4RkzRrGap3bak3Bnrkw/+z7Pl3JrfbDozUIP8aUtZSeIKho/fQeg6G1iSZhhHFfxQAQQa5AYX9JE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.48])
-	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4Yd7PV04n7zRln3;
-	Wed, 22 Jan 2025 10:31:42 +0800 (CST)
-Received: from dggemv706-chm.china.huawei.com (unknown [10.3.19.33])
-	by mail.maildlp.com (Postfix) with ESMTPS id 0615818006C;
-	Wed, 22 Jan 2025 10:34:12 +0800 (CST)
-Received: from kwepemn100009.china.huawei.com (7.202.194.112) by
- dggemv706-chm.china.huawei.com (10.3.19.33) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Wed, 22 Jan 2025 10:34:11 +0800
-Received: from [10.67.121.59] (10.67.121.59) by kwepemn100009.china.huawei.com
- (7.202.194.112) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Wed, 22 Jan
- 2025 10:34:09 +0800
-Message-ID: <9575c823-4f77-8037-a4be-075b2e35d6f1@huawei.com>
-Date: Wed, 22 Jan 2025 10:34:08 +0800
+	s=arc-20240116; t=1737513518; c=relaxed/simple;
+	bh=HwneXwoCCptZ/zm0ZXEJWjR2tukJvOHDJ7S3Zhp1QHQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=cM7JQ7kuZp6t6YkBObzl8n2lp7xda7gyKP1KvHolU61XbQprqihAnzFOyRSnicN4BXOAVLKXTh20gmmi87C5OV28NsNoRghENesv5eWOGrEfmCd8NqBzay0tqHKrOxzoEQYdWrtTmqDIT6ww8uJUG0He5LpcG5BniQxvAJuUZQQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SzN9LHPr; arc=none smtp.client-ip=209.85.214.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-216426b0865so109436865ad.0;
+        Tue, 21 Jan 2025 18:38:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1737513516; x=1738118316; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=eAhufiiGR7CriB+sy9/Z2V1HuRIBYKtABJeAY4r3KAw=;
+        b=SzN9LHPrmQIf1VgoazqkaC2FSSsX/n+wL7USe42ramjeYvB2kKtqgGVmcsPQsOuuZr
+         Mv8o3c+CDSogXh4j2q8ARV6USFlZ4LVTDUvclBzHNdvgscmRsNUGfZMIYjHzkNBL6f5m
+         0CjGYaqiDBC0T5rdxA0j0HvGS0tdEab4YfDGWna94mUQuS+k1woP1+pkEVf7lVFkYajp
+         P3nuQyBHk37FZ9ikjCxQNIadSRsmzSgIVRXbziXwl4tsRWHFIShx/a79W7dZyc8W3EyE
+         C6ifLKaDTNkJX96mghAxuK3IJRwDk0UkrcWg8b+JWVk01n0YEP8vEmcqW/uKYqLPd9iW
+         tCzg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737513516; x=1738118316;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=eAhufiiGR7CriB+sy9/Z2V1HuRIBYKtABJeAY4r3KAw=;
+        b=Q2F+mydINda1ldMfl0fIpzoPcriLrk/PzP/f29C8/+7Gt4r2vMtFQVkyZ530EDYDAD
+         4hpO1AFkhqcNOJ989mrWPTOnkEvCmRpCwvjvojBJypELvpyR/C1JuJhs4hUKohoT/LTC
+         qHZ2vu3cGKHcZ21jwiu766SPpJSxhls6Lu/W9L4L1ouUKyKRtxqCFLoHftW3lnEgZY60
+         MZjUaGsIFsRv6uep8CigzXd7JLvWca10HtU/7JVoki1PEZkjh1DO50vRHUENFkIZh+AD
+         U6WhnI+ad9aKo/KC+ht+hd0J8+w6gcGXD+TRhgqPIcMiFvd6z2tzAfjitQYNnZNHO/wz
+         BxcQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWAJsr39J0VAPzS/LaCLKoQESVuLqAUOQpLXLz491XhxjTC6Y677tCQ1MaNR8E5/0NeijAJWi6k@vger.kernel.org, AJvYcCWT8hI/GJFZRY23h/F27vgycQH1qbIO68wyIZKyolJvpg/065xEq0oNKgzho02j5I9eJ2KvyHGSNuoGTHQ=@vger.kernel.org, AJvYcCXtACey6j/HJiPinpKLLPO+8dfWoNNKz907DaF+0WxgOF774VBuAonh2qWgLEKjlCG3nujo0hF9@vger.kernel.org
+X-Gm-Message-State: AOJu0YycYUHkgEoeb9SxwAoo70kozFCknRNOVsPZWg3LC2tpRAB+BM8G
+	ZVnnNXXZDusfVdX36EpEOZk11rrlviugVSdIwu978Ybp2hNLCA4fC7m+sdkR
+X-Gm-Gg: ASbGncv0fqjJVhkb+PSZKQ4u1t7MviLbdhJOa3lME/k6/7PnBFlwknYpfIEOTJMAj3s
+	Yh1ZMTVaRGdjofpqWLH7LKYV1Jpg5Fqdphl1RbXJnf3y0HANVY6K7YRAiq71lnrU1Urjxd1S1BI
+	ngOztJmGXLu68SGMSc+OeSB9eX6SpQRaYF+CDDVstKBQ7krF8ODlTHSMPovb8pRQ0dqrlYw7EuL
+	0RJfsdBB5xqcYthd7Jv5W3hxW2q7nucvL/oAx4+xYw2qCc4G1lhxGJOMeli2b+0ZrKx/aEIuR+e
+	n+RCp/M=
+X-Google-Smtp-Source: AGHT+IHGPn147w3/rFjBtnjkpJY0nXFT4US9f3eEW4jMrB4pyDjS/mNOVUrl/OB6Y0LRpxSSrvXWkA==
+X-Received: by 2002:a17:903:2291:b0:208:d856:dbb7 with SMTP id d9443c01a7336-21c355b7732mr272468795ad.39.1737513515967;
+        Tue, 21 Jan 2025 18:38:35 -0800 (PST)
+Received: from localhost.localdomain ([124.127.236.5])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21c2d3ac658sm83909695ad.127.2025.01.21.18.38.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 21 Jan 2025 18:38:35 -0800 (PST)
+From: Gui-Dong Han <2045gemini@gmail.com>
+To: 3chas3@gmail.com
+Cc: linux-atm-general@lists.sourceforge.net,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	baijiaju1990@gmail.com,
+	horms@kernel.org,
+	kuba@kernel.org,
+	Gui-Dong Han <2045gemini@gmail.com>,
+	stable@vger.kernel.org
+Subject: [PATCH v2] atm/fore200e: Fix possible data race in fore200e_open()
+Date: Wed, 22 Jan 2025 02:37:45 +0000
+Message-Id: <20250122023745.584995-1-2045gemini@gmail.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
-Subject: Re: [PATCH v1 00/21] hwmon: Fix the type of 'config' in struct
- hwmon_channel_info to u64
-To: Armin Wolf <W_Armin@gmx.de>
-CC: <linux-hwmon@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-media@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-	<arm-scmi@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<linux-rtc@vger.kernel.org>, <oss-drivers@corigine.com>,
-	<linux-rdma@vger.kernel.org>, <platform-driver-x86@vger.kernel.org>,
-	<linuxarm@huawei.com>, <linux@roeck-us.net>, <jdelvare@suse.com>,
-	<kernel@maidavale.org>, <pauk.denis@gmail.com>, <james@equiv.tech>,
-	<sudeep.holla@arm.com>, <cristian.marussi@arm.com>, <matt@ranostay.sg>,
-	<mchehab@kernel.org>, <irusskikh@marvell.com>, <andrew+netdev@lunn.ch>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <saeedm@nvidia.com>, <leon@kernel.org>,
-	<tariqt@nvidia.com>, <louis.peens@corigine.com>, <hkallweit1@gmail.com>,
-	<linux@armlinux.org.uk>, <kabel@kernel.org>, <hdegoede@redhat.com>,
-	<ilpo.jarvinen@linux.intel.com>, <alexandre.belloni@bootlin.com>,
-	<krzk@kernel.org>, <jonathan.cameron@huawei.com>, <zhanjie9@hisilicon.com>,
-	<zhenglifeng1@huawei.com>, <liuyonglong@huawei.com>
-References: <20250121064519.18974-1-lihuisong@huawei.com>
- <03b138e9-688f-4ebc-bd01-3d54fd20e525@gmx.de>
-From: "lihuisong (C)" <lihuisong@huawei.com>
-In-Reply-To: <03b138e9-688f-4ebc-bd01-3d54fd20e525@gmx.de>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- kwepemn100009.china.huawei.com (7.202.194.112)
 
+Protect access to fore200e->available_cell_rate with rate_mtx lock to
+prevent potential data race.
 
-在 2025/1/21 22:12, Armin Wolf 写道:
-> Am 21.01.25 um 07:44 schrieb Huisong Li:
->
->> The hwmon_device_register() is deprecated. When I try to repace it with
->> hwmon_device_register_with_info() for acpi_power_meter driver, I 
->> found that
->> the power channel attribute in linux/hwmon.h have to extend and is more
->> than 32 after this replacement.
->>
->> However, the maximum number of hwmon channel attributes is 32 which is
->> limited by current hwmon codes. This is not good to add new channel
->> attribute for some hwmon sensor type and support more channel attribute.
->>
->> This series are aimed to do this. And also make sure that 
->> acpi_power_meter
->> driver can successfully replace the deprecated hwmon_device_register()
->> later.
->
-> Hi,
->
-> what kind of new power attributes do you want to add to the hwmon API?
-The attributes you list is right.
->
-> AFAIK the acpi-power-meter driver supports the following attributes:
->
->     power1_accuracy            -> HWMON_P_ACCURACY
->     power1_cap_min            -> HWMON_P_CAP_MIN
->     power1_cap_max            -> HWMON_P_CAP_MAX
->     power1_cap_hyst            -> HWMON_P_CAP_HYST
->     power1_cap            -> HWMON_P_CAP
->     power1_average            -> HWMON_P_AVERAGE
->     power1_average_min        -> HWMON_P_AVERAGE_MIN
->     power1_average_max        -> HWMON_P_AVERAGE_MAX
->     power1_average_interval        -> HWMON_P_AVERAGE_INTERVAL
->     power1_average_interval_min    -> HWMON_P_AVERAGE_INTERVAL_MIN
->     power1_average_interval_max    -> HWMON_P_AVERAGE_INTERVAL_MAX
->     power1_alarm            -> HWMON_P_ALARM
->     power1_model_number
->     power1_oem_info
->     power1_serial_number
->     power1_is_battery
->     name                -> handled by hwmon core
->
-> The remaining attributes are in my opinion not generic enough to add 
-> them to the generic
-> hwmon power attributes. I think you should implement them as a 
-> attribute_group which can
-> be passed to hwmon_device_register_with_info() using the 
-> "extra_groups" parameter.
->
-This is a good idea. Thanks.
->
->>
->> Huisong Li (21):
->>    hwmon: Fix the type of 'config' in struct hwmon_channel_info to u64
->>    media: video-i2c: Use HWMON_CHANNEL_INFO macro to simplify code
->>    net: aquantia: Use HWMON_CHANNEL_INFO macro to simplify code
->>    net: nfp: Use HWMON_CHANNEL_INFO macro to simplify code
->>    net: phy: marvell: Use HWMON_CHANNEL_INFO macro to simplify code
->>    net: phy: marvell10g: Use HWMON_CHANNEL_INFO macro to simplify code
->>    rtc: ab-eoz9: Use HWMON_CHANNEL_INFO macro to simplify code
->>    rtc: ds3232: Use HWMON_CHANNEL_INFO macro to simplify code
->>    w1: w1_therm: w1: Use HWMON_CHANNEL_INFO macro to simplify code
->>    net: phy: aquantia: Use HWMON_CHANNEL_INFO macro to simplify code
->>    hwmon: (asus_wmi_sensors) Fix type of 'config' in struct
->>      hwmon_channel_info to u64
->>    hwmon: (hp-wmi-sensors) Fix type of 'config' in struct
->>      hwmon_channel_info to u64
->>    hwmon: (mr75203) Fix the type of 'config' in struct 
->> hwmon_channel_info
->>      to u64
->>    hwmon: (pwm-fan) Fix the type of 'config' in struct 
->> hwmon_channel_info
->>      to u64
->>    hwmon: (scmi-hwmon) Fix the type of 'config' in struct
->>      hwmon_channel_info to u64
->>    hwmon: (tmp401) Fix the type of 'config' in struct hwmon_channel_info
->>      to u64
->>    hwmon: (tmp421) Fix the type of 'config' in struct hwmon_channel_info
->>      to u64
->>    net/mlx5: Fix the type of 'config' in struct hwmon_channel_info to 
->> u64
->>    platform/x86: dell-ddv: Fix the type of 'config' in struct
->>      hwmon_channel_info to u64
->>    hwmon: (asus-ec-sensors) Fix the type of 'config' in struct
->>      hwmon_channel_info to u64
->>    hwmon: (lm90) Fix the type of 'config' in struct 
->> hwmon_channel_info to
->>      u64
->>
->>   drivers/hwmon/asus-ec-sensors.c               |   6 +-
->>   drivers/hwmon/asus_wmi_sensors.c              |   8 +-
->>   drivers/hwmon/hp-wmi-sensors.c                |   6 +-
->>   drivers/hwmon/hwmon.c                         |   4 +-
->>   drivers/hwmon/lm90.c                          |   4 +-
->>   drivers/hwmon/mr75203.c                       |   6 +-
->>   drivers/hwmon/pwm-fan.c                       |   4 +-
->>   drivers/hwmon/scmi-hwmon.c                    |   6 +-
->>   drivers/hwmon/tmp401.c                        |   4 +-
->>   drivers/hwmon/tmp421.c                        |   2 +-
->>   drivers/media/i2c/video-i2c.c                 |  12 +-
->>   .../ethernet/aquantia/atlantic/aq_drvinfo.c   |  14 +-
->>   .../net/ethernet/mellanox/mlx5/core/hwmon.c   |   8 +-
->>   .../net/ethernet/netronome/nfp/nfp_hwmon.c    |  40 +--
->>   drivers/net/phy/aquantia/aquantia_hwmon.c     |  32 +-
->>   drivers/net/phy/marvell.c                     |  24 +-
->>   drivers/net/phy/marvell10g.c                  |  24 +-
->>   drivers/platform/x86/dell/dell-wmi-ddv.c      |   6 +-
->>   drivers/rtc/rtc-ab-eoz9.c                     |  24 +-
->>   drivers/rtc/rtc-ds3232.c                      |  24 +-
->>   drivers/w1/slaves/w1_therm.c                  |  12 +-
->>   include/linux/hwmon.h                         | 300 +++++++++---------
->>   22 files changed, 205 insertions(+), 365 deletions(-)
->>
-> .
+In this case, since the update depends on a prior read, a data race
+could lead to a wrong fore200e.available_cell_rate value.
+
+The field fore200e.available_cell_rate is generally protected by the lock
+fore200e.rate_mtx when accessed. In all other read and write cases, this
+field is consistently protected by the lock, except for this case and
+during initialization.
+
+This potential bug was detected by our experimental static analysis tool,
+which analyzes locking APIs and paired functions to identify data races
+and atomicity violations.
+
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Cc: stable@vger.kernel.org
+Signed-off-by: Gui-Dong Han <2045gemini@gmail.com>
+---
+v2:
+* Added a description of the data race hazard in fore200e_open(), as
+suggested by Jakub Kicinski and Simon Horman.
+---
+ drivers/atm/fore200e.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/drivers/atm/fore200e.c b/drivers/atm/fore200e.c
+index 4fea1149e003..f62e38571440 100644
+--- a/drivers/atm/fore200e.c
++++ b/drivers/atm/fore200e.c
+@@ -1374,7 +1374,9 @@ fore200e_open(struct atm_vcc *vcc)
+ 
+ 	vcc->dev_data = NULL;
+ 
++	mutex_lock(&fore200e->rate_mtx);
+ 	fore200e->available_cell_rate += vcc->qos.txtp.max_pcr;
++	mutex_unlock(&fore200e->rate_mtx);
+ 
+ 	kfree(fore200e_vcc);
+ 	return -EINVAL;
+-- 
+2.25.1
+
 
