@@ -1,167 +1,182 @@
-Return-Path: <netdev+bounces-160377-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160378-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 39B95A1972A
-	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 18:07:28 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 20FCDA1973B
+	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 18:12:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 150873AAC90
-	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 17:07:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 05681188A4AF
+	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 17:12:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C31DC215198;
-	Wed, 22 Jan 2025 17:07:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB6B7215177;
+	Wed, 22 Jan 2025 17:12:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WWOUPjRt"
+	dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b="bCJOJ+z3";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="GshI7Hz7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fhigh-b2-smtp.messagingengine.com (fhigh-b2-smtp.messagingengine.com [202.12.124.153])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D102921518B
-	for <netdev@vger.kernel.org>; Wed, 22 Jan 2025 17:07:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 236C6215046;
+	Wed, 22 Jan 2025 17:12:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.153
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737565633; cv=none; b=P86f6E9FtbNZjhzvGCqQQKdvzs7ne6WV0yD8yI52dJdqnKDOIVtgjSMf+HVaFc51PgHIU6ly0k1iTdeIHtd5aYjkpdt3t5k1qwJn2evTS2wyS9I0B/jFpqmuumn6Af19hjY5GrqKZq3/pFL1FR0+KpZ26E8Yx1XSKKaRsAUIQbc=
+	t=1737565964; cv=none; b=ZbGoBzj5kb9edUoU6veC47hFRytyb5+/Dou1E1w/YhXFPaRWov83gZN41YrOnICjkp7NFzHWhy0LqserD6ZQ3Jh1D2gPjmbYrkgaFdzjKG9vznx/QIScEbFmj3lQ5nM9BydbOSYhRC8GElSPuq+ON4TbNUKfrMvJFG3DAdtbX9s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737565633; c=relaxed/simple;
-	bh=JNLfOH2aw7sz7Mhi4i5wKbrYE0THrHyy8wbZWOqimvg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=uofs7MlAxmqmb9NwCKoww3lJZv5NEu4PzieGCdyXzFMLAEaokbo9h46wG7ogOEBLGuS3CsuIgcQrE+fZPX00xLp3xOB5HfqjNcWaxvE/0MY0yR78TI9GSCFnvZG0Bo1iToFQ0bWR/V/8g+4CdgqZ5gl6KsV77FRrs1R9BpQr7og=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WWOUPjRt; arc=none smtp.client-ip=209.85.128.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-43675b1155bso82475395e9.2
-        for <netdev@vger.kernel.org>; Wed, 22 Jan 2025 09:07:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1737565630; x=1738170430; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QjbbvIvJnn+F42E7z2PwvrYdTyPTjvfdjZn3qHYBHrA=;
-        b=WWOUPjRt7XNJyqqqB59mk7D0us2lGq9SVJFuATIKcpbIFl6R87t0xIfUFk/jwsauPW
-         QYDxXFFreDZNgYZ2ntwtK9g47wBfv6Qnskg2/lbvS+rVb3vZ4QNZSJXx+bZT9rrvqn48
-         ddqftx7bHREFKvwoeiaGbAkYWtlsRMj4E9VExung3xVlxTm11gdL5+Mpuo8RtkMGDqV3
-         WXcl2roFjVp4tXDPjIwhRWvyB9c0kE8JmHC+BZZvjXjMfqba17gqbjHl6BGtMc3DOSVZ
-         MYf1C99YBBLScrthPPgOzB2/Ho7tuzJB+VKcTbxs3Iym8G/rXngM90QRfJ3oAexPj6GT
-         qhFg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737565630; x=1738170430;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=QjbbvIvJnn+F42E7z2PwvrYdTyPTjvfdjZn3qHYBHrA=;
-        b=czZ/6GYwSm5ZSBjmPyTAPzjpfrFlI1ionSBVYScvIOXdaS8bPFlc9h8eQDG7gkjPxM
-         9K/khZ/CRLOZtoUvlOSiVIuVU/x6mO2SQb4x7TYi6vFKrBQSOWPlZlcmUCOdNiRZe+SC
-         hvVY9bIwoMG9LMVB8QOzxs5V8Sb22ZH3s24ChymiwlKtqUQpwsPWc20h7bEYzcWLG/zk
-         0DeMQFaMMvamjn4lQ2KQ53VZBUjDYBZzctNv+RY3zt42c38VUyZWPiq8iC6AToQkkuoi
-         PZhpfgsEmo5c+Gmg0U6lbEQtMof1s/3Ii43/lsm0U5faU+sgdLnejesQC+H+4ZMRyija
-         zTxg==
-X-Forwarded-Encrypted: i=1; AJvYcCVIt/b5FnB21A/hINtrOhfN0YgXRHoSpvdg3g41hZuwjYh6SEno1RVMomCk2X4jXBjec31MtzQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywe/onSC6/u08YLe3nqLo8ryPorCEWr1CFus5g5ovA79G5/oZ+1
-	Ivm2f1O3xpMfCkM4f/1cSSP0Cb3FjL08/vWR2RJ8s/XPHBteTQn/TyyA1KqX6tvH5Vq5H32RMHZ
-	le/AHc5SMfNSjnURhBpG62jl0QnR3h9g9lSaA
-X-Gm-Gg: ASbGnctAbmm2yPSp/BqDijg3KyjeO4dcVnI6BD62viULfn07F2TqnfoWgnyQSWqxFtf
-	OcAW3VYwxFBTEvbUMQKuSLEuiZ4Ilr3NJ9coXTis3vKOEFW9vMa0/
-X-Google-Smtp-Source: AGHT+IH6TtBLgKrmRaEuAzXOid7fbYxQlKAbzpwzx1uSou94uVrj8sOvdmqZwkIgQNpxwgf91vHw3VHXDN5R2jcADck=
-X-Received: by 2002:a5d:5984:0:b0:38a:4de1:ac6 with SMTP id
- ffacd0b85a97d-38bf56555e9mr19777380f8f.6.1737565629943; Wed, 22 Jan 2025
- 09:07:09 -0800 (PST)
+	s=arc-20240116; t=1737565964; c=relaxed/simple;
+	bh=6SgjZb4hRVUGBh3SnTlgmRCpC4S7SRttCDI4bqrR47U=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=q/Dei7bSToE6ntX2uEDqRSvDqkZYGoXRObq86ySBhZG+aC1Y4p19EJqoCMFGBYTpcNQPFv8qiF5K79HSWtzowyftoeQjrX2RyMTfVKi+rSWHG9txsTXC/7ExrbYxXble2FyYOGszYMc0qkNk/R9j0kI5NiR1OUmOulG1RwtipVY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se; spf=pass smtp.mailfrom=ragnatech.se; dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b=bCJOJ+z3; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=GshI7Hz7; arc=none smtp.client-ip=202.12.124.153
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ragnatech.se
+Received: from phl-compute-08.internal (phl-compute-08.phl.internal [10.202.2.48])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id BDCDD2540110;
+	Wed, 22 Jan 2025 12:12:41 -0500 (EST)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-08.internal (MEProxy); Wed, 22 Jan 2025 12:12:42 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ragnatech.se; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm2; t=1737565961;
+	 x=1737652361; bh=dwXUm8YoFY119K2i5joSNw1cugyijj5TSH6LML8FXWc=; b=
+	bCJOJ+z3duE37aP5s7oDarp/kSqypI2BYu9e7S8Qh/yNOAMqBxRDJiiyLHSprDLV
+	KUVQlOotf/G3Yemcb0lzE2VLQhOpps7i3szvIROkUK2K8rmRfNwP1Iwrsl3zFsFk
+	v+9P6S9T7d5blkn2bwYXBixev/DjMOzo/zVdu2bTPiHUrIOvWbp/QGJwQgSAW5km
+	qiw+FoGvlAWMydCtQTyH8K8ddM3RJ4znU6eradxUV2C3Tl+oGv6v55vO6SLrKjE2
+	7Fs5Hqu1MDox5Bx82Q/TrZq4DhYELpRLChaq+u01Y/dBTzwxCW0eXL2/idPlKAgy
+	ZQzMFXMoMfZVjqo+yQZeww==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1737565961; x=
+	1737652361; bh=dwXUm8YoFY119K2i5joSNw1cugyijj5TSH6LML8FXWc=; b=G
+	shI7Hz7NEafgXnn9bEaeIZEmLNWdcofMAT4gUNVQb1etgPoHyVdl+e5tXyhu/lW9
+	Vyysdi3uFlgzGaMxprSP+f8+K2evUmDArD6o3FesX+hf2ZKp1nLf2bSZF7vw1Gqz
+	YleZj33hGw50ZqahLGyBVezsF8GlsUGm6Dir2Lmf4CwyH8F1i4hysJmVJKhAbPIZ
+	QSmoKtNuU7TWytGm6WieS1HKuS+4hd4wVwKwta+FeTXqjvcOTkRkfJMZmTyiVqHm
+	Inf8/t0SKej2YlvE2unE+BlikAL3q0APkRSlVRX5H6K1dZfA42xshcZHW2Gohysj
+	MARn0iydAvdXX9cgBqG8A==
+X-ME-Sender: <xms:CCeRZzTukk_fBTMpvFKINTZxZQEGRbFHOyyZkip8LJQhLnt3LJP6rg>
+    <xme:CCeRZ0xAeNu1FU2JL1H8oUCItSxuVHOm64z-jQj1LdRnQxpI4QXxunAJ1J8A5opjT
+    9_Sjpn3GgohLKHQhYk>
+X-ME-Received: <xmr:CCeRZ40AaKF8V5yWRp0aNtFVoay-Ive10UJnn3b9cFHYrO0j2UreKFzLIGvFdTXoCDf90-OIjE36LPcnC5RbWLKYQ-6CM9w7HQ>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrudejfedgvddvudcutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdp
+    uffrtefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivg
+    hnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfhfgggtugfgjgesthekredttddt
+    jeenucfhrhhomheppfhikhhlrghsucfunpguvghrlhhunhguuceonhhikhhlrghsrdhsoh
+    guvghrlhhunhgusehrrghgnhgrthgvtghhrdhsvgeqnecuggftrfgrthhtvghrnhepveet
+    gedtvddvhfdtkeeghfeffeehteehkeekgeefjeduieduueelgedtheekkeetnecuvehluh
+    hsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepnhhikhhlrghsrdhs
+    ohguvghrlhhunhgusehrrghgnhgrthgvtghhrdhsvgdpnhgspghrtghpthhtohepudegpd
+    hmohguvgepshhmthhpohhuthdprhgtphhtthhopehkohhrhidrmhgrihhntggvnhhtsegs
+    ohhothhlihhnrdgtohhmpdhrtghpthhtohepphgruhhlrdgsrghrkhgvrhdrtghtsegsph
+    drrhgvnhgvshgrshdrtghomhdprhgtphhtthhopegrnhgurhgvfidonhgvthguvghvsehl
+    uhhnnhdrtghhpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprh
+    gtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepkhhu
+    sggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrd
+    gtohhmpdhrtghpthhtohepmhhikhhhrghilhdruhhlhigrnhhovhestghoghgvnhhtvghm
+    sggvugguvggurdgtohhmpdhrtghpthhtohepshgvrhhgvghirdhshhhthihlhihovhestg
+    hoghgvnhhtvghmsggvugguvggurdgtohhm
+X-ME-Proxy: <xmx:CCeRZzBWpjYX03w41G2EEs7210WJ7r-uYtUm-QJLCM6H0LtjSYBuiw>
+    <xmx:CCeRZ8iWxQbUldT1DJaFBteo_i8tIIThYDg58TwGXjiHTshBBCtLTw>
+    <xmx:CCeRZ3p_31ibqaCBXuXXoShraVbDrE5F4g0aaZeN0XIgVjAGwMtOEg>
+    <xmx:CCeRZ3h0xmbSRSH5zv76A1_SnFTrNMOR1avYMbi0GHlylCp3rgxXng>
+    <xmx:CSeRZ87pDXGjTpoz4EkjTeIjrGR0rma_ktN1ypZ7ecKagSnt2UQLgZoK>
+Feedback-ID: i80c9496c:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 22 Jan 2025 12:12:39 -0500 (EST)
+Date: Wed, 22 Jan 2025 18:12:37 +0100
+From: Niklas =?utf-8?Q?S=C3=B6derlund?= <niklas.soderlund@ragnatech.se>
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: Paul Barker <paul.barker.ct@bp.renesas.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Mikhail Ulyanov <mikhail.ulyanov@cogentembedded.com>,
+	Sergei Shtylyov <sergei.shtylyov@cogentembedded.com>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>,
+	netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net 2/2] net: sh_eth: Fix missing rtnl lock in suspend
+ path
+Message-ID: <20250122171237.GF3436806@ragnatech.se>
+References: <20250122-fix_missing_rtnl_lock_phy_disconnect-v1-0-8cb9f6f88fd1@bootlin.com>
+ <20250122-fix_missing_rtnl_lock_phy_disconnect-v1-2-8cb9f6f88fd1@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250116044100.80679-1-fujita.tomonori@gmail.com>
- <20250116044100.80679-5-fujita.tomonori@gmail.com> <CANiq72nNsmuQz1mEx2ov8SXj_UAEURDZFtLotf4qP2pf+r97eQ@mail.gmail.com>
- <20250118.170224.1577745251770787347.fujita.tomonori@gmail.com> <20250122170537.1a92051c.gary@garyguo.net>
-In-Reply-To: <20250122170537.1a92051c.gary@garyguo.net>
-From: Alice Ryhl <aliceryhl@google.com>
-Date: Wed, 22 Jan 2025 18:06:58 +0100
-X-Gm-Features: AWEUYZmQ38ItMMuP4jNhT2eiJ2jH0mWYg_mL8dk2ga5-CGUrqvDz4IBv-_0ZZi4
-Message-ID: <CAH5fLgiEn27VMUfrXcidu0rUpM7MPZVCOjywa-vQBO7dOdQrRQ@mail.gmail.com>
-Subject: Re: [PATCH v8 4/7] rust: time: Add wrapper for fsleep function
-To: Gary Guo <gary@garyguo.net>
-Cc: FUJITA Tomonori <fujita.tomonori@gmail.com>, miguel.ojeda.sandonis@gmail.com, 
-	linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org, 
-	netdev@vger.kernel.org, andrew@lunn.ch, hkallweit1@gmail.com, 
-	tmgross@umich.edu, ojeda@kernel.org, alex.gaynor@gmail.com, 
-	bjorn3_gh@protonmail.com, benno.lossin@proton.me, a.hindborg@samsung.com, 
-	anna-maria@linutronix.de, frederic@kernel.org, tglx@linutronix.de, 
-	arnd@arndb.de, jstultz@google.com, sboyd@kernel.org, mingo@redhat.com, 
-	peterz@infradead.org, juri.lelli@redhat.com, vincent.guittot@linaro.org, 
-	dietmar.eggemann@arm.com, rostedt@goodmis.org, bsegall@google.com, 
-	mgorman@suse.de, vschneid@redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250122-fix_missing_rtnl_lock_phy_disconnect-v1-2-8cb9f6f88fd1@bootlin.com>
 
-On Wed, Jan 22, 2025 at 6:05=E2=80=AFPM Gary Guo <gary@garyguo.net> wrote:
->
-> On Sat, 18 Jan 2025 17:02:24 +0900 (JST)
-> FUJITA Tomonori <fujita.tomonori@gmail.com> wrote:
->
-> > On Fri, 17 Jan 2025 19:59:15 +0100
-> > Miguel Ojeda <miguel.ojeda.sandonis@gmail.com> wrote:
-> >
-> > > On Thu, Jan 16, 2025 at 5:42=E2=80=AFAM FUJITA Tomonori
-> > > <fujita.tomonori@gmail.com> wrote:
-> > >>
-> > >> +/// `delta` must be 0 or greater and no more than `u32::MAX / 2` mi=
-croseconds.
-> > >> +/// If a value outside the range is given, the function will sleep
-> > >> +/// for `u32::MAX / 2` microseconds (=3D ~2147 seconds or ~36 minut=
-es) at least.
-> > >
-> > > I would emphasize with something like:
-> > >
-> > >     `delta` must be within [0, `u32::MAX / 2`] microseconds;
-> > > otherwise, it is erroneous behavior. That is, it is considered a bug
-> > > to call this function with an out-of-range value, in which case the
-> > > function will sleep for at least the maximum value in the range and
-> > > may warn in the future.
-> >
-> > Thanks, I'll use the above instead.
-> >
-> > > In addition, I would add a new paragraph how the behavior differs
-> > > w.r.t. the C `fsleep()`, i.e. IIRC from the past discussions,
-> > > `fsleep()` would do an infinite sleep instead. So I think it is
-> > > important to highlight that.
-> >
-> > /// The above behavior differs from the kernel's [`fsleep`], which coul=
-d sleep
-> > /// infinitely (for [`MAX_JIFFY_OFFSET`] jiffies).
-> >
-> > Looks ok?
-> >
-> > >> +    // The argument of fsleep is an unsigned long, 32-bit on 32-bit=
- architectures.
-> > >> +    // Considering that fsleep rounds up the duration to the neares=
-t millisecond,
-> > >> +    // set the maximum value to u32::MAX / 2 microseconds.
-> > >
-> > > Nit: please use Markdown code spans in normal comments (no need for
-> > > intra-doc links there).
-> >
-> > Understood.
-> >
-> > >> +    let duration =3D if delta > MAX_DURATION || delta.is_negative()=
- {
-> > >> +        // TODO: add WARN_ONCE() when it's supported.
-> > >
-> > > Ditto (also "Add").
-> >
-> > Oops, I'll fix.
-> >
-> > > By the way, can this be written differently maybe? e.g. using a range
-> > > since it is `const`?
-> >
-> > A range can be used for a custom type?
->
-> Yes, you can say `!(Delta::ZERO..MAX_DURATION).contains(&delta)`.
-> (You'll need to add `Delta::ZERO`).
+Hi Kory,
 
-It would need to use ..=3D instead of .. to match the current check.
+Thanks for your work.
 
-Alice
+On 2025-01-22 17:19:29 +0100, Kory Maincent wrote:
+> Fix the suspend path by ensuring the rtnl lock is held where required.
+> Calls to sh_eth_close, sh_eth_open and wol operations must be performed
+> under the rtnl lock to prevent conflicts with ongoing ndo operations.
+> 
+> Fixes: b71af04676e9 ("sh_eth: add more PM methods")
+> Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
+
+Tested on R-Car M2,
+
+Tested-by: Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
+
+> ---
+>  drivers/net/ethernet/renesas/sh_eth.c | 4 ++++
+>  1 file changed, 4 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/renesas/sh_eth.c b/drivers/net/ethernet/renesas/sh_eth.c
+> index 8887b8921009..5fc8027c92c7 100644
+> --- a/drivers/net/ethernet/renesas/sh_eth.c
+> +++ b/drivers/net/ethernet/renesas/sh_eth.c
+> @@ -3494,10 +3494,12 @@ static int sh_eth_suspend(struct device *dev)
+>  
+>  	netif_device_detach(ndev);
+>  
+> +	rtnl_lock();
+>  	if (mdp->wol_enabled)
+>  		ret = sh_eth_wol_setup(ndev);
+>  	else
+>  		ret = sh_eth_close(ndev);
+> +	rtnl_unlock();
+>  
+>  	return ret;
+>  }
+> @@ -3511,10 +3513,12 @@ static int sh_eth_resume(struct device *dev)
+>  	if (!netif_running(ndev))
+>  		return 0;
+>  
+> +	rtnl_lock();
+>  	if (mdp->wol_enabled)
+>  		ret = sh_eth_wol_restore(ndev);
+>  	else
+>  		ret = sh_eth_open(ndev);
+> +	rtnl_unlock();
+>  
+>  	if (ret < 0)
+>  		return ret;
+> 
+> -- 
+> 2.34.1
+> 
+
+-- 
+Kind Regards,
+Niklas Söderlund
 
