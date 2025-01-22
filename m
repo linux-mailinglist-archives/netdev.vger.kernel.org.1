@@ -1,226 +1,241 @@
-Return-Path: <netdev+bounces-160379-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160380-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B132A19747
-	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 18:15:42 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 26656A19757
+	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 18:17:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 14532163D71
-	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 17:15:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 02382188A783
+	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 17:17:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81C71170A0A;
-	Wed, 22 Jan 2025 17:15:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22770214A77;
+	Wed, 22 Jan 2025 17:17:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="0VMRU0GP";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="X3F5A0+4"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F+oEs/Py"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-a6-smtp.messagingengine.com (fout-a6-smtp.messagingengine.com [103.168.172.149])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F89D1684AC;
-	Wed, 22 Jan 2025 17:15:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.149
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CA421369B4;
+	Wed, 22 Jan 2025 17:17:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737566137; cv=none; b=KC+2gh9ivknWHkAm6REQ6nolKZBw7Zac9hNLB+Gf5LRa4E0eWn7+nWGzRQwhaXCOXG4SqdQzy+HwameYqFxXopxMJlwpRrxKSuY82WL7jHETm1btWBHFWAnTbqc0iYAQ+ur0V3gNAECmjTusKJlfl2bxrzZOqzadt9BW/wKlWLo=
+	t=1737566233; cv=none; b=HN5qX9PQHrpnto5/hjSgaSLa8eQlBPKT5G961pAkPlHXtyk1FGHit/DAshxtUri2L0Fx5bvTM4/ELYgwE9OSjZjHFwFwpFfwem0zgcAulppXZS52NfV19uKt0QSNzKnWrmJ9fYQA9LcyukOxeprfR1pVocEI5zCIA5uiW1rQLcw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737566137; c=relaxed/simple;
-	bh=gY4kcWTwDxiC3dJTHxuzZYyCM8DiPWnyKkPoHw0mdlM=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=Gpz5UR83u5RLM06dph0mxmESghQ2jtf1/jEAGUmviYrzOuCP55XydiJe5yEQLhDY1p/rQLJ4CcQ5GinZp2+IbQUlcUfd4t+nSevi940Jh0fUhkn0HIgdxAw+Yzwmqt5nmON+C5XpTs/bClqnn5gpMZIL+pxx/p6wNIfOineSQ48=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=0VMRU0GP; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=X3F5A0+4; arc=none smtp.client-ip=103.168.172.149
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
-Received: from phl-compute-10.internal (phl-compute-10.phl.internal [10.202.2.50])
-	by mailfout.phl.internal (Postfix) with ESMTP id 11456138084C;
-	Wed, 22 Jan 2025 12:15:34 -0500 (EST)
-Received: from phl-imap-11 ([10.202.2.101])
-  by phl-compute-10.internal (MEProxy); Wed, 22 Jan 2025 12:15:34 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm2; t=1737566134;
-	 x=1737652534; bh=/05Nlb7e705OChugGX4LbV7DHq9PYMXBweBL7PB5riY=; b=
-	0VMRU0GPeyduE88lkID4Rq9UqkyJDBzdLSllaLdPWbg76Q5YQBcgBgwPetBqOmPE
-	4k27zdoRaBg0ngALV+4iWiGfB2OAnEQBkY8gW/Un4wM1oBSak9GPcHoqe8sNMROh
-	cAljC72He5aY0gRxlhQ4QgRDaL+3WgAvSaTrHJQaJGLb2tJntc/kKNflRB9qadUW
-	KPzSjzJEuBAT4MXObMQvbD3DGiMXu4sO7OrtSDQ8TWsVRk7qtCJaul+8RVUqnG+T
-	zIEZHN4gUPhwYmnAEPvPvHhJ3vm5aWA4Vbu+M3IncBWfp1TmUN1TnFUXih9LyRKE
-	yJ2xu02g9NecBXGqzBji4w==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1737566134; x=
-	1737652534; bh=/05Nlb7e705OChugGX4LbV7DHq9PYMXBweBL7PB5riY=; b=X
-	3F5A0+4sIVo7HSIJMOWNCLc8upwCSBXUbCuAPahXKykcjwWnGrPY7xBc7gcJJgDQ
-	e4lmfx8UO+yqOhuF/oqy5y5SL1I8ZiWbrMMfGwcgyJffbPEAlQ6zRuMcLshlBKoD
-	zU7OaeqeawgEqwxCbTw9O/fuGIj6xV8foUp6mWkpQcWBaei42f2Ooxc+kXESfl+A
-	2fJmb8qBFG4tmyalpzfGUeHpilZ7JHxhWA18UGYRTiUlwWyAcu5VUWmX0FX+7GNA
-	0KSiH/QLBxEWCE4vrEU/K0wREXzIMB/o8tg9gWl9VLtyEyffRn8c81hqhhu05qCQ
-	NICPae/++h+GYy6mfsTaQ==
-X-ME-Sender: <xms:tSeRZ7w7UAion0JdLLbqtkcOPb_HMRnsAZTbMPmT-F6mqn8-rmCmMA>
-    <xme:tSeRZzRzGgFqMKY1d8ZqYVGHNh5jHsgEtHZKmfvXyLEcZ300XDIl29RFQI9YkQMkT
-    eTd_XnKsclQfvVFumY>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrudejfedgvddvudcutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdp
-    uffrtefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivg
-    hnthhsucdlqddutddtmdenucfjughrpefoggffhffvvefkjghfufgtgfesthhqredtredt
-    jeenucfhrhhomhepfdetrhhnugcuuegvrhhgmhgrnhhnfdcuoegrrhhnugesrghrnhgusg
-    druggvqeenucggtffrrghtthgvrhhnpeekvdeuhfeitdeuieejvedtieeijeefleevffef
-    leekieetjeffvdekgfetuefhgfenucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecuve
-    hluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprghrnhgusegr
-    rhhnuggsrdguvgdpnhgspghrtghpthhtohepudehpdhmohguvgepshhmthhpohhuthdprh
-    gtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepghho
-    rhgtuhhnohhvsehgmhgrihhlrdgtohhmpdhrtghpthhtoheprhhitghhrghruggtohgthh
-    hrrghnsehgmhgrihhlrdgtohhmpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhl
-    vgdrtghomhdprhgtphhtthhopehfrhgvuggvrhhitgeskhgvrhhnvghlrdhorhhgpdhrtg
-    hpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegrnhhnrgdqmhgr
-    rhhirgeslhhinhhuthhrohhnihigrdguvgdprhgtphhtthhopehtghhlgieslhhinhhuth
-    hrohhnihigrdguvgdprhgtphhtthhopegrnhgurhgvfidonhgvthguvghvsehluhhnnhdr
-    tghh
-X-ME-Proxy: <xmx:tSeRZ1UdFH8VWhzze4N92ivKZAKH_kUBykOGzq_E9Lbs5rDOwQRVZA>
-    <xmx:tSeRZ1hHKjNLEB5qXEieDskFKrYOHP3QTW83-8v_-TVUjJrfV1h5CA>
-    <xmx:tSeRZ9A0fRZI9jgj4AsoogS9W2CSZquff8eCzk6i08Hzt7sBWN-0NA>
-    <xmx:tSeRZ-L4aKE_0hCjwZ-kaf18tW9TlAhUUnldgqcARaPoFEjl2F84XQ>
-    <xmx:tieRZ1YSb7E5Pbwj80W8eTsldq8WpgI1ZthEa8U27ttIkXDRAD5iGDgv>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id 6C6B22220072; Wed, 22 Jan 2025 12:15:33 -0500 (EST)
-X-Mailer: MessagingEngine.com Webmail Interface
+	s=arc-20240116; t=1737566233; c=relaxed/simple;
+	bh=o1SE3o3NcZUVY/hmBRha3xtrviGaumM9KPn/dAGuTFk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=QPALcrurHa+hSdXZBvfFMCXO5VwzZAi6mJapAvxu2LhGlKau7NEESWeD6OYsEu9KyvOMEkSeewRI6M5BqSFaDpeAGB2CtoJv6MDjEUBwilBtcgucmsf7x1G9B9eF6g2Rpsr/3kLwDjPt4/440jX7zlHqb+Wb4DNel/7JwwhhFxU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=F+oEs/Py; arc=none smtp.client-ip=209.85.216.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-2ef760a1001so99537a91.0;
+        Wed, 22 Jan 2025 09:17:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1737566231; x=1738171031; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=gFCVPvzzCocOSj8lSB1mfBdT82DT1p+MPx9OjvYvaR0=;
+        b=F+oEs/Pyob0UjEyYbUJ7b0LWFxqk0BsDzJMcmqoEvmieb+0AUBSatVQVh6GQHDzDB4
+         O1e9c+9bqlyy3wgtgvwIGGfdZ900KN7D1U6KnqUiu1dc1kopCO4eoxtTdyrMYgtWo9nl
+         NkYVinvhuggjBYoqHGMC1JVxfE9zxlh5mHx2fxdLH8m0G1pa2gbBiYBefP+1FYeeiHM1
+         U31OVehyRDCySW7yahEFHa14Zsd/rWHZF2p6hNk2q8nlsQ3lBncF+2/YE3J6fXMja5r8
+         byImxHe5tuEoWtO+ODy5VVp9KXMOw/AA84KHZkpAP9fD3ycVPv1R3fyvbVs7ewiCWSDb
+         5xhw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737566231; x=1738171031;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=gFCVPvzzCocOSj8lSB1mfBdT82DT1p+MPx9OjvYvaR0=;
+        b=WWbeUQpwAebWFAUH5ecySh9ANcKqrVa0jI407PAJXruUgdZRPWRNxu0PlgchR4gaOB
+         ykNXkaf3LJIjDHeuJDCJy4PHNT71kFIKDbHqI1w9if4QAhfgIHRVphKMAWeMlZJbrYPy
+         zetKRAtXY/fs2L4+DPEVwBA3I+53q1GR0zpvcWCvklEic+n3A7VmSIQzvZ+Hvs78PQrk
+         lKk1DZfMYnM6p1p2JfJmc59qOxc89pG3xNwmu8uYuJfZ7uV5pJewT8K/xtqdztDjS4CJ
+         D5s06k4qe1UVxbN5BpOnYcsSvJJbqfolXOjryCziJoyVkrNEi42AxzUglClucWfFGAdy
+         ATkA==
+X-Forwarded-Encrypted: i=1; AJvYcCUx/rankgafe8k97rzEUzy70NfVq8tio0S6kYkwkvWUzN+9nUukq7fX+RurkAXdy98PAfs=@vger.kernel.org, AJvYcCVKCN8zfFOOhjOBqyVavqpESeO87ivID2h3q4rpYBIfdvs04g2qCykzeWYS/nzcH4YbhXIJd9TzoJafmg==@vger.kernel.org, AJvYcCVKwfF6bG9kgmQWMdhl3YE6YRaLq9QLEq1PLkJLvvvJqcl3hJ9+NJO5h3cHTiw/4DvpVd7zp3TV@vger.kernel.org, AJvYcCXW4dveTUXyhF3G3PYBETze2Ch9HzEWgjuiOu8ZOB5j00p39D6o4r9tST0XeqCC5pWKr6UD/GzAHzBnow==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwK98E6JI84Op7m3lc6IXSYTOz9Ah8L4ERf46b6lvxeh/0OxikM
+	z3m4U65bhX5ZO/fVIBPmmogkaiQFOe9xvL7hZ4IVff65Jt6+jO/jchyM2ECjEUkMi23B46tAkkR
+	xKv2ikDWLA0cFZlUXXerVfm2gXfU=
+X-Gm-Gg: ASbGncu2KqbgZWpWTAPRoFyyOpHc5N8AQJg3W/tidYBeAtHNWZ7e2VQ1q65U709SI3o
+	h6aSKBiLZv2Va9mDtLMZldDzv2zEXBVP/I292rO9QKX6KejewKEzCVOz7AfvRELygKJQ=
+X-Google-Smtp-Source: AGHT+IHTvHTC++TojYxC/UgWgVuinh02AQWbyRQC6b5Z9w3BtCafMdo3/RyX2E4nRXqJ2H6wOGvd5dmMFKUFBshJkuA=
+X-Received: by 2002:a05:6a00:2184:b0:72a:8cc8:34aa with SMTP id
+ d2e1a72fcca58-72daf88b65dmr33962621b3a.0.1737566230650; Wed, 22 Jan 2025
+ 09:17:10 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Wed, 22 Jan 2025 18:15:13 +0100
-From: "Arnd Bergmann" <arnd@arndb.de>
-To: "Richard Cochran" <richardcochran@gmail.com>
-Cc: =?UTF-8?Q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>,
- "Andrew Lunn" <andrew+netdev@lunn.ch>,
- "David S . Miller" <davem@davemloft.net>,
- "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
- "Paolo Abeni" <pabeni@redhat.com>,
- "Anna-Maria Gleixner" <anna-maria@linutronix.de>,
- "Frederic Weisbecker" <frederic@kernel.org>,
- "Thomas Gleixner" <tglx@linutronix.de>, "John Stultz" <johnstul@us.ibm.com>,
- Netdev <netdev@vger.kernel.org>, linux-kernel@vger.kernel.org,
- "Cyrill Gorcunov" <gorcunov@gmail.com>, stable@vger.kernel.org
-Message-Id: <0ecf1a72-d6ae-46ab-ad20-c088c6888747@app.fastmail.com>
-In-Reply-To: <Z5Ebh4pbOUGh64BS@hoboy.vegasvil.org>
-References: 
- <20250121-posix-clock-compat_ioctl-v1-1-c70d5433a825@weissschuh.net>
- <603100b4-3895-4b7c-a70e-f207dd961550@app.fastmail.com>
- <Z5Ebh4pbOUGh64BS@hoboy.vegasvil.org>
-Subject: Re: [PATCH] posix-clock: Explicitly handle compat ioctls
-Content-Type: text/plain; charset=utf-8
+References: <20250116074442.79304-1-alibuda@linux.alibaba.com>
+ <20250116074442.79304-5-alibuda@linux.alibaba.com> <CAEf4BzZvxqiQ2J1XQMm-ZDBjSsmtJJk6-_RbexPk9vWxAO=ksw@mail.gmail.com>
+ <20250122024327.GA81479@j66a10360.sqa.eu95>
+In-Reply-To: <20250122024327.GA81479@j66a10360.sqa.eu95>
+From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Date: Wed, 22 Jan 2025 09:16:58 -0800
+X-Gm-Features: AbW1kvZiku1BiieaalyxZJhB_Vt4Hw2HwinTvpys0Vs7Ip41IhYFnB8AF6RUhzc
+Message-ID: <CAEf4Bzabc+83abj7gP0h0sCxp-Bajqhm0bdAyn1Gn5bNi5nNXg@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v6 4/5] libbpf: fix error when st-prefix_ops and
+ ops from differ btf
+To: "D. Wythe" <alibuda@linux.alibaba.com>
+Cc: kgraul@linux.ibm.com, wenjia@linux.ibm.com, jaka@linux.ibm.com, 
+	ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev, 
+	pabeni@redhat.com, song@kernel.org, sdf@google.com, haoluo@google.com, 
+	yhs@fb.com, edumazet@google.com, john.fastabend@gmail.com, kpsingh@kernel.org, 
+	jolsa@kernel.org, guwen@linux.alibaba.com, kuba@kernel.org, 
+	davem@davemloft.net, netdev@vger.kernel.org, linux-s390@vger.kernel.org, 
+	linux-rdma@vger.kernel.org, bpf@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jan 22, 2025, at 17:23, Richard Cochran wrote:
-> On Wed, Jan 22, 2025 at 08:30:51AM +0100, Arnd Bergmann wrote:
->> On Tue, Jan 21, 2025, at 23:41, Thomas Wei=C3=9Fschuh wrote:
->> > Pointer arguments passed to ioctls need to pass through compat_ptr(=
-) to
->> > work correctly on s390; as explained in Documentation/driver-api/io=
-ctl.rst.
->> > Plumb the compat_ioctl callback through 'struct posix_clock_operati=
-ons'
->> > and handle the different ioctls cmds in the new ptp_compat_ioctl().
->> >
->> > Using compat_ptr_ioctl is not possible.
->> > For the commands PTP_ENABLE_PPS/PTP_ENABLE_PPS2 on s390
->> > it would corrupt the argument 0x80000000, aka BIT(31) to zero.
->> >
->> > Fixes: 0606f422b453 ("posix clocks: Introduce dynamic clocks")
->> > Fixes: d94ba80ebbea ("ptp: Added a brand new class driver for ptp c=
-locks.")
->> > Cc: stable@vger.kernel.org
->> > Signed-off-by: Thomas Wei=C3=9Fschuh <linux@weissschuh.net>
->>=20
->> This looks correct to me,
+On Tue, Jan 21, 2025 at 6:43=E2=80=AFPM D. Wythe <alibuda@linux.alibaba.com=
+> wrote:
 >
-> I'm not familiar with s390, but I can remember that the compat ioctl
-> was nixed during review.
+> On Fri, Jan 17, 2025 at 10:36:50AM -0800, Andrii Nakryiko wrote:
+> > On Wed, Jan 15, 2025 at 11:45=E2=80=AFPM D. Wythe <alibuda@linux.alibab=
+a.com> wrote:
+> > >
+> > > When a struct_ops named xxx_ops was registered by a module, and
+> > > it will be used in both built-in modules and the module itself,
+> > > so that the btf_type of xxx_ops will be present in btf_vmlinux
+> > > instead of in btf_mod, which means that the btf_type of
+> > > bpf_struct_ops_xxx_ops and xxx_ops will not be in the same btf.
+> > >
+> > > Here are four possible case:
+> > >
+> > > +--------+---------------+-------------+-----------------------------=
+----+
+> > > |        | st_ops_xxx_ops| xxx_ops     |                             =
+    |
+> > > +--------+---------------+-------------+-----------------------------=
+----+
+> > > | case 0 | btf_vmlinux   | bft_vmlinux | be used and reg only in vmli=
+nux |
+> > > +--------+---------------+-------------+-----------------------------=
+----+
+> > > | case 1 | btf_vmlinux   | bpf_mod     | INVALID                     =
+    |
+> > > +--------+---------------+-------------+-----------------------------=
+----+
+> > > | case 2 | btf_mod       | btf_vmlinux | reg in mod but be used both =
+in  |
+> > > |        |               |             | vmlinux and mod.            =
+    |
+> > > +--------+---------------+-------------+-----------------------------=
+----+
+> > > | case 3 | btf_mod       | btf_mod     | be used and reg only in mod =
+    |
+> > > +--------+---------------+-------------+-----------------------------=
+----+
+> > >
+> > > At present, cases 0, 1, and 3 can be correctly identified, because
+> > > +       if (ret < 0 || ret >=3D sizeof(stname))
+> > > +               return -ENAMETOOLONG;
+> >
+> > see preexisting snprintf() above, we don't really handle truncation
+> > errors explicitly, they are extremely unlikely and not expected at
+> > all, and worst case nothing will be found and user will get some
+> > -ENOENT or something like that eventually. I'd drop this extra error
+> > checking and keep it streamlines, similar to tname
+> >
 >
->    https://lore.kernel.org/lkml/201012161716.42520.arnd@arndb.de/
+> Sounds reasonable to me. I will remove the explicit error checks in the
+> next version.
 >
->   =20
-> https://lore.kernel.org/lkml/alpine.LFD.2.00.1012161939340.12146@local=
-host6.localdomain6/
+> > > +
+> > > +       /* Look for the corresponding "map_value" type that will be u=
+sed
+> > > +        * in map_update(BPF_MAP_TYPE_STRUCT_OPS) first, figure out t=
+he btf
+> > > +        * and the mod_btf.
+> > > +        * For example, find "struct bpf_struct_ops_tcp_congestion_op=
+s".
+> > > +        */
+> > > +       kern_vtype_id =3D find_ksym_btf_id(obj, stname, BTF_KIND_STRU=
+CT,
+> > >                                         &btf, mod_btf);
+> >
+> > nit: if this fits under 100 characters, keep it single line
+> >
+> > > +       if (kern_vtype_id < 0) {
+> > > +               pr_warn("struct_ops init_kern: struct %s is not found=
+ in kernel BTF\n",
+> > > +                               stname);
+> >
+> > same nit about preserving single-line statements as much as possible,
+> > they are much easier to read
 >
-> Can you explain what changed or what was missed?
+> None of them exceed 100 lines. Usually, I would check patches with 85 lin=
+es limitations,
+> but since 100 lines is acceptable, we can modify it to a single line here=
+ for
+> better readability.
+>
+> And thanks very much for your suggestion, I plan to fix these style
+> issues in next versions with you ack, is this okay for you?
 
-The original review comment was about the complex argument
-transformation that is needed on architectures other than
-s390, which thankfully still works fine.
+yep, sgtm
 
-A lot of times we can ignore the s390 problem, and there are
-many drivers that still do, mainly because s390 has a very
-limited set of device drivers it actually uses, and also
-because 32-bit userspace is getting very rare on that
-architecture.
-
-To do things correctly on all architectures, it's usually
-sufficient to just use compat_ptr_ioctl(), as in:
-
-diff --git a/kernel/time/posix-clock.c b/kernel/time/posix-clock.c
-index 1af0bb2cc45c..e64d37f221b5 100644
---- a/kernel/time/posix-clock.c
-+++ b/kernel/time/posix-clock.c
-@@ -90,26 +90,6 @@ static long posix_clock_ioctl(struct file *fp,
-        return err;
- }
-=20
--#ifdef CONFIG_COMPAT
--static long posix_clock_compat_ioctl(struct file *fp,
--                                    unsigned int cmd, unsigned long arg)
--{
--       struct posix_clock_context *pccontext =3D fp->private_data;
--       struct posix_clock *clk =3D get_posix_clock(fp);
--       int err =3D -ENOTTY;
--
--       if (!clk)
--               return -ENODEV;
--
--       if (clk->ops.ioctl)
--               err =3D clk->ops.ioctl(pccontext, cmd, arg);
--
--       put_posix_clock(clk);
--
--       return err;
--}
--#endif
--
- static int posix_clock_open(struct inode *inode, struct file *fp)
- {
-        int err;
-@@ -173,9 +153,7 @@ static const struct file_operations posix_clock_file=
-_operations =3D {
-        .unlocked_ioctl =3D posix_clock_ioctl,
-        .open           =3D posix_clock_open,
-        .release        =3D posix_clock_release,
--#ifdef CONFIG_COMPAT
--       .compat_ioctl   =3D posix_clock_compat_ioctl,
--#endif
-+       .compat_ioctl   =3D compat_ptr_ioctl,
- };
-=20
- int posix_clock_register(struct posix_clock *clk, struct device *dev)
-
-but this was only added in 2018 and was not available in your
-original version. Unfortunately this only works if 'arg' is
-always a pointer or a nonnegative integer less than 2^31. If
-the argument can be a negative integer, it's actually broken
-on all architectures because the current code performs a
-zero-extension when it should be doing a sign-extension.
-
-A simpler variant of the patch would move the switch/case logic
-into posix_clock_compat_ioctl() and avoid the extra function
-pointer, simply calling posix_clock_ioctl() with the modified
-argument.
-
-      Arnd
+>
+> Best wishes,
+> D. Wythe
+> >
+> > > +               return kern_vtype_id;
+> > > +       }
+> > > +       kern_vtype =3D btf__type_by_id(btf, kern_vtype_id);
+> > > +
+> > > +       kern_type_id =3D btf__find_by_name_kind(btf, tname, BTF_KIND_=
+STRUCT);
+> > >         if (kern_type_id < 0) {
+> > >                 pr_warn("struct_ops init_kern: struct %s is not found=
+ in kernel BTF\n",
+> > >                         tname);
+> > > @@ -1020,20 +1039,6 @@ find_struct_ops_kern_types(struct bpf_object *=
+obj, const char *tname_raw,
+> > >         }
+> > >         kern_type =3D btf__type_by_id(btf, kern_type_id);
+> > >
+> > > -       /* Find the corresponding "map_value" type that will be used
+> > > -        * in map_update(BPF_MAP_TYPE_STRUCT_OPS).  For example,
+> > > -        * find "struct bpf_struct_ops_tcp_congestion_ops" from the
+> > > -        * btf_vmlinux.
+> > > -        */
+> > > -       kern_vtype_id =3D find_btf_by_prefix_kind(btf, STRUCT_OPS_VAL=
+UE_PREFIX,
+> > > -                                               tname, BTF_KIND_STRUC=
+T);
+> > > -       if (kern_vtype_id < 0) {
+> > > -               pr_warn("struct_ops init_kern: struct %s%s is not fou=
+nd in kernel BTF\n",
+> > > -                       STRUCT_OPS_VALUE_PREFIX, tname);
+> > > -               return kern_vtype_id;
+> > > -       }
+> > > -       kern_vtype =3D btf__type_by_id(btf, kern_vtype_id);
+> > > -
+> > >         /* Find "struct tcp_congestion_ops" from
+> > >          * struct bpf_struct_ops_tcp_congestion_ops {
+> > >          *      [ ... ]
+> > > @@ -1046,8 +1051,8 @@ find_struct_ops_kern_types(struct bpf_object *o=
+bj, const char *tname_raw,
+> > >                         break;
+> > >         }
+> > >         if (i =3D=3D btf_vlen(kern_vtype)) {
+> > > -               pr_warn("struct_ops init_kern: struct %s data is not =
+found in struct %s%s\n",
+> > > -                       tname, STRUCT_OPS_VALUE_PREFIX, tname);
+> > > +               pr_warn("struct_ops init_kern: struct %s data is not =
+found in struct %s\n",
+> > > +                       tname, stname);
+> > >                 return -EINVAL;
+> > >         }
+> > >
+> > > --
+> > > 2.45.0
+> > >
 
