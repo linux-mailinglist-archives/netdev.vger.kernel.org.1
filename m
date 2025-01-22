@@ -1,186 +1,114 @@
-Return-Path: <netdev+bounces-160390-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160392-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7CD04A1982E
-	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 19:03:02 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8629BA19846
+	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 19:16:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E9479161F36
-	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 18:02:51 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 476C47A3283
+	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 18:16:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01294170A11;
-	Wed, 22 Jan 2025 18:02:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAFF1215075;
+	Wed, 22 Jan 2025 18:16:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lYwnJmo4"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ddhWQ37B"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f202.google.com (mail-qt1-f202.google.com [209.85.160.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4635F1B808
-	for <netdev@vger.kernel.org>; Wed, 22 Jan 2025 18:02:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78FA520FABC;
+	Wed, 22 Jan 2025 18:16:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737568968; cv=none; b=Dvl9NFIIHB+/MnFlELzk3GZF2xtNUy5E7CNqSZmILr3Rte8w23Md/lKrRVGJcwvwf8jOkY3iEjoIUTjQH/FUBYnRhdFaFlTrexNjnMCORHDdc+Px067RpevfVoj3cbRew12vn7J28DDisxlmu1OMqO7I2Q+Rqpk7ctp7o1kgRJ4=
+	t=1737569800; cv=none; b=r6ryChI19rUzBBA6iVbePqFDOkzvq7g80CnQeu/vkRk8UGcZqUTzvK0INpIuuzZNTvsnPuwUJH8/I4ix9ufcTBn8/JI5OzloZ/4GfUSlLhS/1XxU70Ce0iYqz8k/j9xh7V4/LFkPQH+eSvjAr12JPC5MwmcnnycPt92E+geWoQM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737568968; c=relaxed/simple;
-	bh=rLyAXJgLL/2Ffqw6ML0Y4FFKAvNovEoRKkxltL34v6w=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=CKVeQQcx1RFcEqixTBKeWZjSt1BGg/cBo2XW319Pq07C95SxqB1zKbOWnWvQfRvoRuTkFi0ktLTYA69/H54bk3EgvbbM6AuEPhmxrWR8ENrcM2UTwJ6rzrbMH0JAjIwTscsp/qvTd9BruVeUVat5tk/zaZ/efGeh+I5cQzim85Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lYwnJmo4; arc=none smtp.client-ip=209.85.160.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qt1-f202.google.com with SMTP id d75a77b69052e-468f6f2f57aso574821cf.0
-        for <netdev@vger.kernel.org>; Wed, 22 Jan 2025 10:02:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1737568966; x=1738173766; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=5KnI9jxAXcR7oywRwA8+76jlpqhg+RydA6gAwJrgLIk=;
-        b=lYwnJmo4eI2bbyiSI1u/xJaSe2X1Go+ODIGwJxLnIRriPxtHSVq5b7qiN+BNyCdsBu
-         9+JN0dq59YlsHsZp3XyM+YtUKpb04rw55Ra2OJpkhCo27yfCxFl/k+O372zbl5lQAccM
-         6z3aVWReFL4OgnlVQGv3O/FhmBDvjT3iro+VJjJIKQo8PLFRY5FzeMWRM+39ahKxnpJQ
-         KhWXKmxjk2jmpMcGOEhV5vo+U+vuw0ezqtftBBrAvOoVZ1IZIdY8e5S8jAMGmg7WRRhE
-         OuVTwGFAvfU7f75W3SRDSLyBb7GFDziZ9mbnD5JJJjBQFTtmekCkFbvT1G3IDTg8d+sF
-         soJw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737568966; x=1738173766;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=5KnI9jxAXcR7oywRwA8+76jlpqhg+RydA6gAwJrgLIk=;
-        b=KTOk7a1ZY1bEfUW+K7xQYPw5v/eycVVVEFLXJcUZL7XI61O+qdUFz2f63Ug4CosHeq
-         yx197iorb564Wo6wF1anEAEL35Gx2et04j9rLR0w5G/FEFIwKOI8fCkpd+b0dmHobrw6
-         KUgQ+6kvatla6R4uGmN2XY6wYIaaHOKiyV90Wb4BlG0l0XUH9ZErRy9bF3NlB8AIq6+M
-         tQlT4gvIFy0WDgYp1LdvSU6c1tZxRxK9uMlvnpwU+Cy2ABZBIu++U/a8skwATrEC/COb
-         hKfeIRZklypEu39xnjSW2bTtH5F9qj4O/1PjIJjbstVhsC3doFd1WatekQZe+McDkwi2
-         8g2A==
-X-Gm-Message-State: AOJu0YwLbYFWGiZI+EkGyh3ddNUhXRALGNcU5WfoUAvd0xmvvZF5JVUp
-	jmmtC/DaueCXBzQOq/6vChwFBEtovCc6+j4lMAx+JzfGmhMq9nEauUnebWrP8il5F3PBt2i6a14
-	tvJWrnxeHvg==
-X-Google-Smtp-Source: AGHT+IF6dKcQlqg2xiUsUHwOzLzUrL6rHfDAPURD12rdPq+w2hhqUJ043iIhFDIekNSuTETP02P8lEgoxc9auw==
-X-Received: from qtqf22.prod.google.com ([2002:ac8:4996:0:b0:467:8f83:cafe])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:622a:1b92:b0:45d:9357:1cca with SMTP id d75a77b69052e-46e12a554a6mr369943781cf.14.1737568966114;
- Wed, 22 Jan 2025 10:02:46 -0800 (PST)
-Date: Wed, 22 Jan 2025 18:02:44 +0000
+	s=arc-20240116; t=1737569800; c=relaxed/simple;
+	bh=nMHBJP6DGCZ98w9FdbTFfjQ54r1wCssAZDyg9sL/Xkc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lECBibNt3up5M5anmDpFug6ov8zLuhN5v8RLA5ibWCLT2hWmA2hlJNoknejJS5LrAyMam8spYyecCg5i5I11bBQN6xxGmUzTGL6wT5APLpedIxGVfVPOBg62sam34Suq1nhKfaZd8fRWKoFjOSr1fo0YcvkPhYzTEaTuBncfOrA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ddhWQ37B; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A2A9DC4CED2;
+	Wed, 22 Jan 2025 18:16:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1737569799;
+	bh=nMHBJP6DGCZ98w9FdbTFfjQ54r1wCssAZDyg9sL/Xkc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ddhWQ37BtbypDwWu3QM7ijys8/KQsgYTPKRLtTEL/xsKFXER7lKp9RxFwd7n/JlWZ
+	 9gVaV/xGHhSkRXdo0QwCP8aE2OlK9Z2k2ZVKFRmmwFWaQ8DYiVr6bHdYFElgcNSUXL
+	 tsNpaUZRtjGVmxE4s98GQNzNOdPD4P9+Sus6uCaguO0fEwKXH3ywAkDIf12X6V5TAC
+	 0Pr60qipMBrdpxINN/XdqHAL+rNd/agPM33AvGtwv1Di1KaZ7LTngXx6jMB/oapG/6
+	 9FB4z7rMuAhV7MFcTetEZMivzr/UJZlnnTk3Bg4WAxPAm9TJirlmM/VjfZZ0ax8lvK
+	 rBuFFn3M+7RRQ==
+Date: Wed, 22 Jan 2025 18:16:35 +0000
+From: Simon Horman <horms@kernel.org>
+To: Peter Seiderer <ps.report@gmx.net>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Frederic Weisbecker <frederic@kernel.org>,
+	Artem Chernyshev <artem.chernyshev@red-soft.ru>,
+	Nam Cao <namcao@linutronix.de>
+Subject: Re: [PATCH net-next v2 0/8] Some pktgen fixes/improvments
+Message-ID: <20250122181635.GG395043@kernel.org>
+References: <20250122144110.619989-1-ps.report@gmx.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.48.1.262.g85cc9f2d1e-goog
-Message-ID: <20250122180244.1861468-1-edumazet@google.com>
-Subject: [PATCH net] net: rose: fix timer races against user threads
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, Simon Horman <horms@kernel.org>, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>, syzbot <syzkaller@googlegroups.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250122144110.619989-1-ps.report@gmx.net>
 
-Rose timers only acquire the socket spinlock, without
-checking if the socket is owned by one user thread.
+On Wed, Jan 22, 2025 at 03:41:02PM +0100, Peter Seiderer wrote:
+> While taking a look at '[PATCH net] pktgen: Avoid out-of-range in
+> get_imix_entries' ([1]) and '[PATCH net v2] pktgen: Avoid out-of-bounds access
+> in get_imix_entries' ([2], [3]) and doing some tests and code review I
+> detected that the /proc/net/pktgen/... parsing logic does not honour the
+> user given buffer bounds (resulting in out-of-bounds access).
+> 
+> This can be observed e.g. by the following simple test (sometimes the
+> old/'longer' previous value is re-read from the buffer):
+> 
+>         $ echo add_device lo@0 > /proc/net/pktgen/kpktgend_0
+> 
+>         $ echo "min_pkt_size 12345" > /proc/net/pktgen/lo\@0 && grep min_pkt_size /proc/net/pktgen/lo\@0
+> Params: count 1000  min_pkt_size: 12345  max_pkt_size: 0
+> Result: OK: min_pkt_size=12345
+> 
+>         $ echo -n "min_pkt_size 123" > /proc/net/pktgen/lo\@0 && grep min_pkt_size /proc/net/pktgen/lo\@0
+> Params: count 1000  min_pkt_size: 12345  max_pkt_size: 0
+> Result: OK: min_pkt_size=12345
+> 
+>         $ echo "min_pkt_size 123" > /proc/net/pktgen/lo\@0 && grep min_pkt_size /proc/net/pktgen/lo\@0
+> Params: count 1000  min_pkt_size: 123  max_pkt_size: 0
+> Result: OK: min_pkt_size=123
+> 
+> So fix the out-of-bounds access (and two minor findings) and add a simple
+> proc_net_pktgen selftest...
 
-Add a check and rearm the timers if needed.
+Hi Peter,
 
-BUG: KASAN: slab-use-after-free in rose_timer_expiry+0x31d/0x360 net/rose/rose_timer.c:174
-Read of size 2 at addr ffff88802f09b82a by task swapper/0/0
+Unfortunately net-next is closed at this time.
 
-CPU: 0 UID: 0 PID: 0 Comm: swapper/0 Not tainted 6.13.0-rc5-syzkaller-00172-gd1bf27c4e176 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
-Call Trace:
- <IRQ>
-  __dump_stack lib/dump_stack.c:94 [inline]
-  dump_stack_lvl+0x241/0x360 lib/dump_stack.c:120
-  print_address_description mm/kasan/report.c:378 [inline]
-  print_report+0x169/0x550 mm/kasan/report.c:489
-  kasan_report+0x143/0x180 mm/kasan/report.c:602
-  rose_timer_expiry+0x31d/0x360 net/rose/rose_timer.c:174
-  call_timer_fn+0x187/0x650 kernel/time/timer.c:1793
-  expire_timers kernel/time/timer.c:1844 [inline]
-  __run_timers kernel/time/timer.c:2418 [inline]
-  __run_timer_base+0x66a/0x8e0 kernel/time/timer.c:2430
-  run_timer_base kernel/time/timer.c:2439 [inline]
-  run_timer_softirq+0xb7/0x170 kernel/time/timer.c:2449
-  handle_softirqs+0x2d4/0x9b0 kernel/softirq.c:561
-  __do_softirq kernel/softirq.c:595 [inline]
-  invoke_softirq kernel/softirq.c:435 [inline]
-  __irq_exit_rcu+0xf7/0x220 kernel/softirq.c:662
-  irq_exit_rcu+0x9/0x30 kernel/softirq.c:678
-  instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1049 [inline]
-  sysvec_apic_timer_interrupt+0xa6/0xc0 arch/x86/kernel/apic/apic.c:1049
- </IRQ>
+## Form letter - net-next-closed
 
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Reported-by: syzbot <syzkaller@googlegroups.com>
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- net/rose/rose_timer.c | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+The merge window for v6.14 has begun. Therefore net-next is closed
+for new drivers, features, code refactoring and optimizations.
+We are currently accepting bug fixes only.
 
-diff --git a/net/rose/rose_timer.c b/net/rose/rose_timer.c
-index f06ddbed3fed6396b4ea510a29bb9f8025cfb35..1525773e94aa175dd2b73b27314259da0f1dc23 100644
---- a/net/rose/rose_timer.c
-+++ b/net/rose/rose_timer.c
-@@ -122,6 +122,10 @@ static void rose_heartbeat_expiry(struct timer_list *t)
- 	struct rose_sock *rose = rose_sk(sk);
- 
- 	bh_lock_sock(sk);
-+	if (sock_owned_by_user(sk)) {
-+		sk_reset_timer(sk, &sk->sk_timer, jiffies + HZ/20);
-+		goto out;
-+	}
- 	switch (rose->state) {
- 	case ROSE_STATE_0:
- 		/* Magic here: If we listen() and a new link dies before it
-@@ -152,6 +156,7 @@ static void rose_heartbeat_expiry(struct timer_list *t)
- 	}
- 
- 	rose_start_heartbeat(sk);
-+out:
- 	bh_unlock_sock(sk);
- 	sock_put(sk);
- }
-@@ -162,6 +167,10 @@ static void rose_timer_expiry(struct timer_list *t)
- 	struct sock *sk = &rose->sock;
- 
- 	bh_lock_sock(sk);
-+	if (sock_owned_by_user(sk)) {
-+		sk_reset_timer(sk, &rose->timer, jiffies + HZ/20);
-+		goto out;
-+	}
- 	switch (rose->state) {
- 	case ROSE_STATE_1:	/* T1 */
- 	case ROSE_STATE_4:	/* T2 */
-@@ -182,6 +191,7 @@ static void rose_timer_expiry(struct timer_list *t)
- 		}
- 		break;
- 	}
-+out:
- 	bh_unlock_sock(sk);
- 	sock_put(sk);
- }
-@@ -192,6 +202,10 @@ static void rose_idletimer_expiry(struct timer_list *t)
- 	struct sock *sk = &rose->sock;
- 
- 	bh_lock_sock(sk);
-+	if (sock_owned_by_user(sk)) {
-+		sk_reset_timer(sk, &rose->idletimer, jiffies + HZ/20);
-+		goto out;
-+	}
- 	rose_clear_queues(sk);
- 
- 	rose_write_internal(sk, ROSE_CLEAR_REQUEST);
-@@ -207,6 +221,7 @@ static void rose_idletimer_expiry(struct timer_list *t)
- 		sk->sk_state_change(sk);
- 		sock_set_flag(sk, SOCK_DEAD);
- 	}
-+out:
- 	bh_unlock_sock(sk);
- 	sock_put(sk);
- }
--- 
-2.48.1.262.g85cc9f2d1e-goog
+Please repost when net-next reopens after Feb 3rd.
 
+RFC patches sent for review only are obviously welcome at any time.
+
+See: https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#development-cycle
+
+--
+pw-bot: deferred
 
