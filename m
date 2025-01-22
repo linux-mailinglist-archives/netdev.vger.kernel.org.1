@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-160246-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160245-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A7DF0A18F98
-	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 11:21:45 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69590A18F96
+	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 11:21:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9ED6B7A2248
-	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 10:21:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9C1FE16956A
+	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 10:21:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B79ED21128A;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 057B920FA84;
 	Wed, 22 Jan 2025 10:21:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="DHDb2RDr"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="k4dkRnR/"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-6002.amazon.com (smtp-fw-6002.amazon.com [52.95.49.90])
+Received: from smtp-fw-33001.amazon.com (smtp-fw-33001.amazon.com [207.171.190.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E61B20F970
-	for <netdev@vger.kernel.org>; Wed, 22 Jan 2025 10:21:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.49.90
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20595145FE0
+	for <netdev@vger.kernel.org>; Wed, 22 Jan 2025 10:21:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.190.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737541287; cv=none; b=JUpnfMuFLg1G92AfHTVMRZcekeBGcTZioA4ryhE27NTR7o6kqJALWy1VLeMeVKwRhaDHuqt9Nu4SUOMBNQY6/5KnRzo4apUUn+Pf9c7z3y9JXfjbJBMxzAtV51A9aoZ2UlZHhmfOAFii+d9UuQdy47IhX6ZE1F4YBdB6VvexVlg=
+	t=1737541286; cv=none; b=Q/ARmjIYO9h3lzgViA2f8dyeFZtdpCh/+ni4Y6lpuh2dO11BfHfjCzP19QeyVGDVSungl30JyazH3TJMi+6I7/VbywXvC0A4Utz5btPHsOlnv15PHcGSieUMhMJZaKa1JF0IpqQZOe7R3FLVgpgaWB7hvC6BgaSrZG0xdD1+VrU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737541287; c=relaxed/simple;
-	bh=ghm5N8r/3NFY3VhcvBSd9wCKwdbaoxidYfYf+OuLK0w=;
+	s=arc-20240116; t=1737541286; c=relaxed/simple;
+	bh=7i8Y44+/p7fUVNFBG0d6z/Vi32ANUIC/X85mfALNkwM=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=sXS5SW2j13M3bJHMVg3IzdJff5d/fY/Lw4i7N1W9uKiphXLGGF6xa+m86ZUBV1YXFDmYjsdjooUgXZyVqzp/wi3SVl0prJMHVdYbURcUzsP9ghit/orOAG9wUUquC1WFzo5nGsd7yT9BovKBTbyRKnN9WGofyKwHBgMPGNFCzuM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=DHDb2RDr; arc=none smtp.client-ip=52.95.49.90
+	 MIME-Version:Content-Type; b=daFy0O7E1APFf5zN0psEmFXeXt2UK80xPi8uC9tWTSp4wo+aOB05Qogt6uI3UiV62lsVY3UUQD4VGxalrj4kokE5OR2emmmVe8vgLJiAx1569gg0u/jnOF5TyfQknRrqZSymgXTOrjEP4IhtsC6cO+vPbsvNPr3RB0uJ1ZGokoM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=k4dkRnR/; arc=none smtp.client-ip=207.171.190.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
@@ -36,34 +36,34 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   t=1737541285; x=1769077285;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=mJKqF5mOvHlnd2aM86X0/KYqMuPdq09hyHDBIDf8KWU=;
-  b=DHDb2RDrs/q+gLT51B4qxgDu7Dcf1YQf+eRvJ3oVF+xiPsn4LPVG18FD
-   FId7VIriog9ufwOYZ3rjh7qpZYlrLO6ip4vP4do0t54jhFjRYy4nlBFWF
-   9nP7JtdUZquzax0Fd9v/f6SbFciMDGJPGqljWIn4QguQYKORjPB6pfkSW
-   o=;
+  bh=J39HgrX/TRin+rw+6O/83e8/yek9FDryizOPWSrDcwc=;
+  b=k4dkRnR/wn9tr9rZbSnmcEizLhtIPjxvTwYfP3UhCq9/V5K4GPmD59IK
+   nrop8jWtoBKyzO8xhX+IKoVoZ4uA5qbtWVbBnhY6dcKQTXKnpDTCIc5b8
+   qVbXhVGvsCZx+luymykHZ2iBWxllH4uf7OdzHCtekgZGwwifvIm87ToG3
+   c=;
 X-IronPort-AV: E=Sophos;i="6.13,224,1732579200"; 
-   d="scan'208";a="465934554"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-6002.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jan 2025 10:21:22 +0000
-Received: from EX19MTAUEC001.ant.amazon.com [10.0.29.78:17429]
- by smtpin.naws.us-east-1.prod.farcaster.email.amazon.dev [10.0.91.109:2525] with esmtp (Farcaster)
- id c81696e0-4133-4432-9eed-004b16d1fa9e; Wed, 22 Jan 2025 10:21:22 +0000 (UTC)
-X-Farcaster-Flow-ID: c81696e0-4133-4432-9eed-004b16d1fa9e
-Received: from EX19D008UEA002.ant.amazon.com (10.252.134.125) by
- EX19MTAUEC001.ant.amazon.com (10.252.135.222) with Microsoft SMTP Server
+   d="scan'208";a="402617359"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-33001.sea14.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jan 2025 10:21:24 +0000
+Received: from EX19MTAUWB002.ant.amazon.com [10.0.7.35:55956]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.25.114:2525] with esmtp (Farcaster)
+ id f7c8862f-68ad-4d5f-aea9-1fab6ba2f35a; Wed, 22 Jan 2025 10:21:23 +0000 (UTC)
+X-Farcaster-Flow-ID: f7c8862f-68ad-4d5f-aea9-1fab6ba2f35a
+Received: from EX19D009UWC001.ant.amazon.com (10.13.138.163) by
+ EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Wed, 22 Jan 2025 10:21:14 +0000
-Received: from EX19MTAUEA001.ant.amazon.com (10.252.134.203) by
- EX19D008UEA002.ant.amazon.com (10.252.134.125) with Microsoft SMTP Server
+ Wed, 22 Jan 2025 10:21:23 +0000
+Received: from EX19MTAUWB001.ant.amazon.com (10.250.64.248) by
+ EX19D009UWC001.ant.amazon.com (10.13.138.163) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Wed, 22 Jan 2025 10:21:14 +0000
+ Wed, 22 Jan 2025 10:21:23 +0000
 Received: from email-imr-corp-prod-pdx-all-2c-619df93b.us-west-2.amazon.com
- (10.43.8.2) by mail-relay.amazon.com (10.252.134.102) with Microsoft SMTP
+ (10.25.36.214) by mail-relay.amazon.com (10.250.64.254) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id
- 15.2.1258.39 via Frontend Transport; Wed, 22 Jan 2025 10:21:14 +0000
+ 15.2.1258.39 via Frontend Transport; Wed, 22 Jan 2025 10:21:23 +0000
 Received: from HFA15-G9FV5D3.amazon.com (unknown [10.85.143.175])
-	by email-imr-corp-prod-pdx-all-2c-619df93b.us-west-2.amazon.com (Postfix) with ESMTP id DB6B9404A2;
-	Wed, 22 Jan 2025 10:21:07 +0000 (UTC)
+	by email-imr-corp-prod-pdx-all-2c-619df93b.us-west-2.amazon.com (Postfix) with ESMTP id 4FF72404A2;
+	Wed, 22 Jan 2025 10:21:17 +0000 (UTC)
 From: David Arinzon <darinzon@amazon.com>
 To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
 	<netdev@vger.kernel.org>
@@ -81,9 +81,9 @@ CC: David Arinzon <darinzon@amazon.com>, Eric Dumazet <edumazet@google.com>,
 	"Ostrovsky, Evgeny" <evostrov@amazon.com>, "Tabachnik, Ofir"
 	<ofirt@amazon.com>, "Machnikowski, Maciek" <maciek@machnikowski.net>, "Rahul
  Rameshbabu" <rrameshbabu@nvidia.com>, Gal Pressman <gal@nvidia.com>
-Subject: [PATCH v5 net-next 4/5] net: ena: PHC error bound/flags support
-Date: Wed, 22 Jan 2025 12:20:39 +0200
-Message-ID: <20250122102040.752-5-darinzon@amazon.com>
+Subject: [PATCH v5 net-next 5/5] net: ena: PHC enable and error_bound through sysfs
+Date: Wed, 22 Jan 2025 12:20:40 +0200
+Message-ID: <20250122102040.752-6-darinzon@amazon.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250122102040.752-1-darinzon@amazon.com>
 References: <20250122102040.752-1-darinzon@amazon.com>
@@ -96,354 +96,352 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 
-PHC algorithm is updated to support reading new PHC values.
-Until this change, the driver retrieved PHC timestamp from the device's
-PHC address, this change expands this API by adding 2 new values
-to ena_admin_phc_resp:
-1. PHC error bound:
-   PTP HW clock error bound refers to the maximum allowable difference
-   between the clock of the device and the reference clock.
-   The error bound is used to ensure that the clock of the device
-   remains within a certain level of accuracy relative to the reference
-   clock. The error bound (expressed in nanoseconds) is calculated by
-   the device, taking into account the accuracy of the PTA device,
-   march hare network, TOR, Chrony, Pacemaker and ENA driver read delay.
-   Error bound (u32) may contain values of 0-4294967295 (nsec) while
-   driver may only report values of 0-4294967294 (nsec) because max
-   error bound value (4294967295) will be used to represent error bound
-   read error. The error bound value is retrieved from the device by the
-   driver upon every get PHC timestamp request and is cached for future
-   retrieval by the user.
-2. PHC error flags:
-   Indicates any PHC timestamp and error bound errors.
-   The error flags value is retrieved from the device by the driver upon
-   every get PHC timestamp request.
-   Any PHC error type will:
-   1. Enter the PHC into blocked state until passing blocking time
-   2. Return device busy error to timestamp caller
-   3. Return device busy error to error bound caller
+This patch allows controlling PHC feature enablement
+through sysfs. The feature is disabled by default,
+and customers can use the `phc_enable` sysfs entry
+in order to enable it.
 
-Signed-off-by: Amit Bernstein <amitbern@amazon.com>
+In addition, customers are able to access the
+`phc_error_bound` sysfs entry in order to get the
+current error bound value.
+
+Documentation is also updated.
+
 Signed-off-by: David Arinzon <darinzon@amazon.com>
 ---
- .../device_drivers/ethernet/amazon/ena.rst    | 15 +++-
- .../net/ethernet/amazon/ena/ena_admin_defs.h  | 28 +++++--
- drivers/net/ethernet/amazon/ena/ena_com.c     | 83 +++++++++++++------
- drivers/net/ethernet/amazon/ena/ena_com.h     | 16 +++-
- drivers/net/ethernet/amazon/ena/ena_phc.c     |  3 +-
- 5 files changed, 107 insertions(+), 38 deletions(-)
+ .../device_drivers/ethernet/amazon/ena.rst    |  20 ++++
+ drivers/net/ethernet/amazon/ena/Makefile      |   2 +-
+ drivers/net/ethernet/amazon/ena/ena_netdev.c  |  20 +++-
+ drivers/net/ethernet/amazon/ena/ena_netdev.h  |   2 +
+ drivers/net/ethernet/amazon/ena/ena_phc.c     |   8 ++
+ drivers/net/ethernet/amazon/ena/ena_phc.h     |   1 +
+ drivers/net/ethernet/amazon/ena/ena_sysfs.c   | 110 ++++++++++++++++++
+ drivers/net/ethernet/amazon/ena/ena_sysfs.h   |  28 +++++
+ 8 files changed, 185 insertions(+), 6 deletions(-)
+ create mode 100644 drivers/net/ethernet/amazon/ena/ena_sysfs.c
+ create mode 100644 drivers/net/ethernet/amazon/ena/ena_sysfs.h
 
 diff --git a/Documentation/networking/device_drivers/ethernet/amazon/ena.rst b/Documentation/networking/device_drivers/ethernet/amazon/ena.rst
-index 12b13da0..19697f63 100644
+index 19697f63..3b2744a7 100644
 --- a/Documentation/networking/device_drivers/ethernet/amazon/ena.rst
 +++ b/Documentation/networking/device_drivers/ethernet/amazon/ena.rst
-@@ -279,6 +279,16 @@ The ENA device restricts the frequency of PHC get time requests to a maximum
- of 125 requests per second. If this limit is surpassed, the get time request
- will fail, leading to an increment in the phc_err statistic.
+@@ -53,6 +53,7 @@ ena_eth_io_defs.h   Definition of ENA data path interface.
+ ena_common_defs.h   Common definitions for ena_com layer.
+ ena_regs_defs.h     Definition of ENA PCI memory-mapped (MMIO) registers.
+ ena_netdev.[ch]     Main Linux kernel driver.
++ena_sysfs.[ch]      Sysfs files.
+ ena_ethtool.c       ethtool callbacks.
+ ena_xdp.[ch]        XDP files
+ ena_pci_id_tbl.h    Supported device IDs.
+@@ -253,6 +254,17 @@ Load PTP module:
  
-+**PHC error bound**
+   sudo modprobe ptp
+ 
++**PHC activation**
 +
-+PTP HW clock error bound refers to the maximum allowable difference
-+between the clock of the device and the reference clock.
-+The error bound is used to ensure that the clock of the device
-+remains within a certain level of accuracy relative to the reference
-+clock. The error bound (expressed in nanoseconds) is calculated by
-+the device and is retrieved and cached by the driver upon every get PHC
-+timestamp request.
++The feature is turned off by default, in order to turn the feature on,
++please use the following:
++
++- sysfs (during runtime):
++
++.. code-block:: shell
++
++  echo 1 > /sys/bus/pci/devices/<domain:bus:slot.function>/phc_enable
++
+ All available PTP clock sources can be tracked here:
+ 
+ .. code-block:: shell
+@@ -289,6 +301,14 @@ clock. The error bound (expressed in nanoseconds) is calculated by
+ the device and is retrieved and cached by the driver upon every get PHC
+ timestamp request.
+ 
++To retrieve the cached PHC error bound value, use the following:
++
++sysfs:
++
++.. code-block:: shell
++
++  cat /sys/bus/pci/devices/<domain:bus:slot.function>/phc_error_bound
 +
  **PHC statistics**
  
  PHC can be monitored using :code:`ethtool -S` counters:
-@@ -287,7 +297,10 @@ PHC can be monitored using :code:`ethtool -S` counters:
- **phc_cnt**         Number of successful retrieved timestamps (below expire timeout).
- **phc_exp**         Number of expired retrieved timestamps (above expire timeout).
- **phc_skp**         Number of skipped get time attempts (during block period).
--**phc_err**         Number of failed get time attempts (entering into block state).
-+**phc_err**         Number of failed get time attempts due to timestamp/error bound errors
-+                    (entering into block state).
-+                    Must remain below 1% of all PHC requests to maintain the desired level of
-+                    accuracy and reliability.
- =================   ======================================================
+diff --git a/drivers/net/ethernet/amazon/ena/Makefile b/drivers/net/ethernet/amazon/ena/Makefile
+index 8c874177..d950ade6 100644
+--- a/drivers/net/ethernet/amazon/ena/Makefile
++++ b/drivers/net/ethernet/amazon/ena/Makefile
+@@ -5,4 +5,4 @@
  
- PHC timeouts:
-diff --git a/drivers/net/ethernet/amazon/ena/ena_admin_defs.h b/drivers/net/ethernet/amazon/ena/ena_admin_defs.h
-index 28770e60..de5c28f5 100644
---- a/drivers/net/ethernet/amazon/ena/ena_admin_defs.h
-+++ b/drivers/net/ethernet/amazon/ena/ena_admin_defs.h
-@@ -128,8 +128,14 @@ enum ena_admin_get_stats_scope {
- 	ENA_ADMIN_ETH_TRAFFIC                       = 1,
- };
+ obj-$(CONFIG_ENA_ETHERNET) += ena.o
  
--enum ena_admin_phc_type {
--	ENA_ADMIN_PHC_TYPE_READLESS                 = 0,
-+enum ena_admin_phc_feature_version {
-+	/* Readless with error_bound */
-+	ENA_ADMIN_PHC_FEATURE_VERSION_0             = 0,
-+};
-+
-+enum ena_admin_phc_error_flags {
-+	ENA_ADMIN_PHC_ERROR_FLAG_TIMESTAMP   = BIT(0),
-+	ENA_ADMIN_PHC_ERROR_FLAG_ERROR_BOUND = BIT(1),
- };
+-ena-y := ena_netdev.o ena_com.o ena_eth_com.o ena_ethtool.o ena_xdp.o ena_phc.o
++ena-y := ena_netdev.o ena_com.o ena_eth_com.o ena_ethtool.o ena_xdp.o ena_phc.o ena_sysfs.o
+diff --git a/drivers/net/ethernet/amazon/ena/ena_netdev.c b/drivers/net/ethernet/amazon/ena/ena_netdev.c
+index 13c9d93e..db1d9d44 100644
+--- a/drivers/net/ethernet/amazon/ena/ena_netdev.c
++++ b/drivers/net/ethernet/amazon/ena/ena_netdev.c
+@@ -20,6 +20,7 @@
  
- /* ENA SRD configuration for ENI */
-@@ -1031,10 +1037,10 @@ struct ena_admin_queue_ext_feature_desc {
- };
+ #include "ena_netdev.h"
+ #include "ena_pci_id_tbl.h"
++#include "ena_sysfs.h"
+ #include "ena_xdp.h"
  
- struct ena_admin_feature_phc_desc {
--	/* PHC type as defined in enum ena_admin_get_phc_type,
--	 * used only for GET command.
-+	/* PHC version as defined in enum ena_admin_phc_feature_version,
-+	 * used only for GET command as max supported PHC version by the device.
- 	 */
--	u8 type;
-+	u8 version;
+ #include "ena_phc.h"
+@@ -44,8 +45,6 @@ MODULE_DEVICE_TABLE(pci, ena_pci_tbl);
  
- 	/* Reserved - MBZ */
- 	u8 reserved1[3];
-@@ -1212,13 +1218,23 @@ struct ena_admin_ena_mmio_req_read_less_resp {
- };
+ static int ena_rss_init_default(struct ena_adapter *adapter);
+ static void check_for_admin_com_state(struct ena_adapter *adapter);
+-static int ena_destroy_device(struct ena_adapter *adapter, bool graceful);
+-static int ena_restore_device(struct ena_adapter *adapter);
  
- struct ena_admin_phc_resp {
-+	/* Request Id, received from DB register */
- 	u16 req_id;
- 
- 	u8 reserved1[6];
- 
-+	/* PHC timestamp (nsec) */
- 	u64 timestamp;
- 
--	u8 reserved2[48];
-+	u8 reserved2[8];
-+
-+	/* Timestamp error limit (nsec) */
-+	u32 error_bound;
-+
-+	/* Bit field of enum ena_admin_phc_error_flags */
-+	u32 error_flags;
-+
-+	u8 reserved3[32];
- };
- 
- /* aq_common_desc */
-diff --git a/drivers/net/ethernet/amazon/ena/ena_com.c b/drivers/net/ethernet/amazon/ena/ena_com.c
-index c6b9939e..66b1ab92 100644
---- a/drivers/net/ethernet/amazon/ena/ena_com.c
-+++ b/drivers/net/ethernet/amazon/ena/ena_com.c
-@@ -44,8 +44,10 @@
- /* PHC definitions */
- #define ENA_PHC_DEFAULT_EXPIRE_TIMEOUT_USEC 10
- #define ENA_PHC_DEFAULT_BLOCK_TIMEOUT_USEC 1000
--#define ENA_PHC_TIMESTAMP_ERROR 0xFFFFFFFFFFFFFFFF
-+#define ENA_PHC_MAX_ERROR_BOUND 0xFFFFFFFF
- #define ENA_PHC_REQ_ID_OFFSET 0xDEAD
-+#define ENA_PHC_ERROR_FLAGS (ENA_ADMIN_PHC_ERROR_FLAG_TIMESTAMP | \
-+			     ENA_ADMIN_PHC_ERROR_FLAG_ERROR_BOUND)
- 
- /*****************************************************************************/
- /*****************************************************************************/
-@@ -1682,11 +1684,11 @@ int ena_com_phc_config(struct ena_com_dev *ena_dev)
- 	struct ena_admin_set_feat_cmd set_feat_cmd;
- 	int ret = 0;
- 
--	/* Get device PHC default configuration */
-+	/* Get default device PHC configuration */
- 	ret = ena_com_get_feature(ena_dev,
- 				  &get_feat_resp,
- 				  ENA_ADMIN_PHC_CONFIG,
--				  0);
-+				  ENA_ADMIN_PHC_FEATURE_VERSION_0);
- 	if (unlikely(ret)) {
- 		netdev_err(ena_dev->net_device,
- 			   "Failed to get PHC feature configuration, error: %d\n",
-@@ -1694,10 +1696,10 @@ int ena_com_phc_config(struct ena_com_dev *ena_dev)
- 		return ret;
- 	}
- 
--	/* Supporting only readless PHC retrieval */
--	if (get_feat_resp.u.phc.type != ENA_ADMIN_PHC_TYPE_READLESS) {
--		netdev_err(ena_dev->net_device, "Unsupported PHC type, error: %d\n",
--			   -EOPNOTSUPP);
-+	/* Supporting only PHC V0 (readless mode with error bound) */
-+	if (get_feat_resp.u.phc.version != ENA_ADMIN_PHC_FEATURE_VERSION_0) {
-+		netdev_err(ena_dev->net_device, "Unsupported PHC version (0x%X), error: %d\n",
-+			   get_feat_resp.u.phc.version, -EOPNOTSUPP);
- 		return -EOPNOTSUPP;
- 	}
- 
-@@ -1720,7 +1722,7 @@ int ena_com_phc_config(struct ena_com_dev *ena_dev)
- 				   get_feat_resp.u.phc.block_timeout_usec :
- 				   ENA_PHC_DEFAULT_BLOCK_TIMEOUT_USEC;
- 
--	/* Sanity check - expire timeout must not be above skip timeout */
-+	/* Sanity check - expire timeout must not exceed block timeout */
- 	if (phc->expire_timeout_usec > phc->block_timeout_usec)
- 		phc->expire_timeout_usec = phc->block_timeout_usec;
- 
-@@ -1778,7 +1780,7 @@ void ena_com_phc_destroy(struct ena_com_dev *ena_dev)
- 	phc->virt_addr = NULL;
- }
- 
--int ena_com_phc_get(struct ena_com_dev *ena_dev, u64 *timestamp)
-+int ena_com_phc_get_timestamp(struct ena_com_dev *ena_dev, u64 *timestamp)
+ static void ena_tx_timeout(struct net_device *dev, unsigned int txqueue)
  {
- 	volatile struct ena_admin_phc_resp *read_resp = ena_dev->phc.virt_addr;
- 	const ktime_t zero_system_time = ktime_set(0, 0);
-@@ -1806,14 +1808,13 @@ int ena_com_phc_get(struct ena_com_dev *ena_dev, u64 *timestamp)
- 			goto skip;
- 		}
- 
--		/* PHC is in active state, update statistics according to
--		 * req_id and timestamp
-+		/* PHC is in active state, update statistics according
-+		 * to req_id and error_flags
- 		 */
- 		if ((READ_ONCE(read_resp->req_id) != phc->req_id) ||
--		    read_resp->timestamp == ENA_PHC_TIMESTAMP_ERROR)
--			/* Device didn't update req_id during blocking time
--			 * or timestamp is invalid, this indicates on a
--			 * device error
-+		    (read_resp->error_flags & ENA_PHC_ERROR_FLAGS))
-+			/* Device didn't update req_id during blocking time or
-+			 * timestamp is invalid, this indicates on a device error
- 			 */
- 			phc->stats.phc_err++;
- 		else
-@@ -1845,36 +1846,46 @@ int ena_com_phc_get(struct ena_com_dev *ena_dev, u64 *timestamp)
- 	while (1) {
- 		if (unlikely(ktime_after(ktime_get(), expire_time))) {
- 			/* Gave up waiting for updated req_id,
--			 * PHC enters into blocked state until passing
--			 * blocking time
-+			 * PHC enters into blocked state until passing blocking time,
-+			 * during this time any get PHC timestamp or error bound
-+			 * requests will fail with device busy error
- 			 */
-+			phc->error_bound = ENA_PHC_MAX_ERROR_BOUND;
- 			ret = -EBUSY;
- 			break;
- 		}
- 
- 		/* Check if req_id was updated by the device */
- 		if (READ_ONCE(read_resp->req_id) != phc->req_id) {
--			/* req_id was not updated by the device,
-+			/* req_id was not updated by the device yet,
- 			 * check again on next loop
- 			 */
- 			continue;
- 		}
- 
--		/* req_id was updated which indicates that PHC timestamp
--		 * was updated too
-+		/* req_id was updated by the device which indicates that
-+		 * PHC timestamp, error_bound and error_flags are updated too,
-+		 * checking errors before retrieving timestamp and
-+		 * error_bound values
- 		 */
--		*timestamp = read_resp->timestamp;
--
--		/* PHC timestamp validty check */
--		if (unlikely(*timestamp == ENA_PHC_TIMESTAMP_ERROR)) {
--			/* Retrieved invalid PHC timestamp, PHC enters into
--			 * blocked state until passing blocking time
-+		if (unlikely(read_resp->error_flags & ENA_PHC_ERROR_FLAGS)) {
-+			/* Retrieved timestamp or error bound errors,
-+			 * PHC enters into blocked state until passing blocking time,
-+			 * during this time any get PHC timestamp or error bound
-+			 * requests will fail with device busy error
- 			 */
-+			phc->error_bound = ENA_PHC_MAX_ERROR_BOUND;
- 			ret = -EBUSY;
- 			break;
- 		}
- 
--		/* Retrieved valid PHC timestamp */
-+		/* PHC timestamp value is returned to the caller */
-+		*timestamp = read_resp->timestamp;
-+
-+		/* Error bound value is cached for future retrieval by caller */
-+		phc->error_bound = read_resp->error_bound;
-+
-+		/* Update statistic on valid PHC timestamp retrieval */
- 		phc->stats.phc_cnt++;
- 
- 		/* This indicates PHC state is active */
-@@ -1888,6 +1899,24 @@ skip:
- 	return ret;
+@@ -3270,7 +3269,7 @@ err_disable_msix:
+ 	return rc;
  }
  
-+int ena_com_phc_get_error_bound(struct ena_com_dev *ena_dev, u32 *error_bound)
-+{
-+	struct ena_com_phc_info *phc = &ena_dev->phc;
-+	u32 local_error_bound = phc->error_bound;
+-static int ena_destroy_device(struct ena_adapter *adapter, bool graceful)
++int ena_destroy_device(struct ena_adapter *adapter, bool graceful)
+ {
+ 	struct net_device *netdev = adapter->netdev;
+ 	struct ena_com_dev *ena_dev = adapter->ena_dev;
+@@ -3321,7 +3320,7 @@ static int ena_destroy_device(struct ena_adapter *adapter, bool graceful)
+ 	return rc;
+ }
+ 
+-static int ena_restore_device(struct ena_adapter *adapter)
++int ena_restore_device(struct ena_adapter *adapter)
+ {
+ 	struct ena_com_dev_get_features_ctx get_feat_ctx;
+ 	struct ena_com_dev *ena_dev = adapter->ena_dev;
+@@ -4056,10 +4055,17 @@ static int ena_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 			"Failed to enable and set the admin interrupts\n");
+ 		goto err_worker_destroy;
+ 	}
 +
-+	if (!phc->active) {
-+		netdev_err(ena_dev->net_device, "PHC feature is not active in the device\n");
++	rc = ena_sysfs_init(&adapter->pdev->dev);
++	if (rc) {
++		dev_err(&pdev->dev, "Cannot init sysfs\n");
++		goto err_free_msix;
++	}
++
+ 	rc = ena_rss_init_default(adapter);
+ 	if (rc && (rc != -EOPNOTSUPP)) {
+ 		dev_err(&pdev->dev, "Cannot init RSS rc: %d\n", rc);
+-		goto err_free_msix;
++		goto err_terminate_sysfs;
+ 	}
+ 
+ 	ena_config_debug_area(adapter);
+@@ -4104,6 +4110,8 @@ static int ena_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ err_rss:
+ 	ena_com_delete_debug_area(ena_dev);
+ 	ena_com_rss_destroy(ena_dev);
++err_terminate_sysfs:
++	ena_sysfs_terminate(&pdev->dev);
+ err_free_msix:
+ 	ena_com_dev_reset(ena_dev, ENA_REGS_RESET_INIT_ERR);
+ 	/* stop submitting admin commands on a device that was reset */
+@@ -4156,6 +4164,8 @@ static void __ena_shutoff(struct pci_dev *pdev, bool shutdown)
+ 	}
+ 
+ #endif /* CONFIG_RFS_ACCEL */
++	ena_sysfs_terminate(&adapter->pdev->dev);
++
+ 	/* Make sure timer and reset routine won't be called after
+ 	 * freeing device resources.
+ 	 */
+diff --git a/drivers/net/ethernet/amazon/ena/ena_netdev.h b/drivers/net/ethernet/amazon/ena/ena_netdev.h
+index 7867cd7f..e3c7ed9c 100644
+--- a/drivers/net/ethernet/amazon/ena/ena_netdev.h
++++ b/drivers/net/ethernet/amazon/ena/ena_netdev.h
+@@ -416,6 +416,8 @@ static inline void ena_reset_device(struct ena_adapter *adapter,
+ 	set_bit(ENA_FLAG_TRIGGER_RESET, &adapter->flags);
+ }
+ 
++int ena_destroy_device(struct ena_adapter *adapter, bool graceful);
++int ena_restore_device(struct ena_adapter *adapter);
+ int handle_invalid_req_id(struct ena_ring *ring, u16 req_id,
+ 			  struct ena_tx_buffer *tx_info, bool is_xdp);
+ 
+diff --git a/drivers/net/ethernet/amazon/ena/ena_phc.c b/drivers/net/ethernet/amazon/ena/ena_phc.c
+index 5ce9a32d..add51c8d 100644
+--- a/drivers/net/ethernet/amazon/ena/ena_phc.c
++++ b/drivers/net/ethernet/amazon/ena/ena_phc.c
+@@ -229,3 +229,11 @@ int ena_phc_get_index(struct ena_adapter *adapter)
+ 
+ 	return -1;
+ }
++
++int ena_phc_get_error_bound(struct ena_adapter *adapter, u32 *error_bound_nsec)
++{
++	if (!ena_phc_is_active(adapter))
++		return -EOPNOTSUPP;
++
++	return ena_com_phc_get_error_bound(adapter->ena_dev, error_bound_nsec);
++}
+diff --git a/drivers/net/ethernet/amazon/ena/ena_phc.h b/drivers/net/ethernet/amazon/ena/ena_phc.h
+index 7364fe71..9c47af84 100644
+--- a/drivers/net/ethernet/amazon/ena/ena_phc.h
++++ b/drivers/net/ethernet/amazon/ena/ena_phc.h
+@@ -33,5 +33,6 @@ int ena_phc_init(struct ena_adapter *adapter);
+ void ena_phc_destroy(struct ena_adapter *adapter);
+ int ena_phc_alloc(struct ena_adapter *adapter);
+ void ena_phc_free(struct ena_adapter *adapter);
++int ena_phc_get_error_bound(struct ena_adapter *adapter, u32 *error_bound);
+ 
+ #endif /* ENA_PHC_H */
+diff --git a/drivers/net/ethernet/amazon/ena/ena_sysfs.c b/drivers/net/ethernet/amazon/ena/ena_sysfs.c
+new file mode 100644
+index 00000000..dd604cc5
+--- /dev/null
++++ b/drivers/net/ethernet/amazon/ena/ena_sysfs.c
+@@ -0,0 +1,110 @@
++// SPDX-License-Identifier: GPL-2.0 OR Linux-OpenIB
++/*
++ * Copyright 2015-2020 Amazon.com, Inc. or its affiliates. All rights reserved.
++ */
++
++#include <linux/device.h>
++#include <linux/kernel.h>
++#include <linux/stat.h>
++#include <linux/sysfs.h>
++
++#include "ena_com.h"
++#include "ena_netdev.h"
++#include "ena_phc.h"
++#include "ena_sysfs.h"
++
++static ssize_t ena_phc_enable_set(struct device *dev,
++				  struct device_attribute *attr,
++				  const char *buf,
++				  size_t len)
++{
++	struct ena_adapter *adapter = dev_get_drvdata(dev);
++	unsigned long phc_enable_val;
++	int rc;
++
++	if (!ena_com_phc_supported(adapter->ena_dev)) {
++		netif_info(adapter, drv, adapter->netdev,
++			   "Device doesn't support PHC");
 +		return -EOPNOTSUPP;
 +	}
 +
-+	if (local_error_bound == ENA_PHC_MAX_ERROR_BOUND)
-+		return -EBUSY;
++	rc = kstrtoul(buf, 10, &phc_enable_val);
++	if (rc < 0)
++		return rc;
 +
-+	*error_bound = local_error_bound;
++	if (phc_enable_val != 0 && phc_enable_val != 1)
++		return -EINVAL;
++
++	rtnl_lock();
++
++	/* No change in state */
++	if ((bool)phc_enable_val == ena_phc_is_enabled(adapter))
++		goto out;
++
++	ena_phc_enable(adapter, phc_enable_val);
++
++	ena_destroy_device(adapter, false);
++	rc = ena_restore_device(adapter);
++
++out:
++	rtnl_unlock();
++	return rc ? rc : len;
++}
++
++#define ENA_PHC_ENABLE_STR_MAX_LEN 3
++
++static ssize_t ena_phc_enable_get(struct device *dev,
++				  struct device_attribute *attr, char *buf)
++{
++	struct ena_adapter *adapter = dev_get_drvdata(dev);
++
++	return snprintf(buf, ENA_PHC_ENABLE_STR_MAX_LEN, "%u\n",
++			ena_phc_is_enabled(adapter));
++}
++
++static DEVICE_ATTR(phc_enable, S_IRUGO | S_IWUSR, ena_phc_enable_get,
++		   ena_phc_enable_set);
++
++/* Max PHC error bound string size takes into account max u32 value,
++ * null and new line characters.
++ */
++#define ENA_PHC_ERROR_BOUND_STR_MAX_LEN 12
++
++static ssize_t ena_show_phc_error_bound(struct device *dev,
++					struct device_attribute *attr,
++					char *buf)
++{
++	struct ena_adapter *adapter = dev_get_drvdata(dev);
++	u32 error_bound_nsec = 0;
++	int rc;
++
++	rc = ena_phc_get_error_bound(adapter, &error_bound_nsec);
++	if (rc != 0)
++		return rc;
++
++	return snprintf(buf, ENA_PHC_ERROR_BOUND_STR_MAX_LEN, "%u\n",
++			error_bound_nsec);
++}
++
++static DEVICE_ATTR(phc_error_bound, S_IRUGO, ena_show_phc_error_bound, NULL);
++
++/******************************************************************************
++ *****************************************************************************/
++int ena_sysfs_init(struct device *dev)
++{
++	if (device_create_file(dev, &dev_attr_phc_enable))
++		dev_err(dev, "Failed to create phc_enable sysfs entry");
++
++	if (device_create_file(dev, &dev_attr_phc_error_bound))
++		dev_err(dev, "Failed to create phc_error_bound sysfs entry");
 +
 +	return 0;
 +}
 +
- int ena_com_mmio_reg_read_request_init(struct ena_com_dev *ena_dev)
- {
- 	struct ena_com_mmio_read *mmio_read = &ena_dev->mmio_read;
-diff --git a/drivers/net/ethernet/amazon/ena/ena_com.h b/drivers/net/ethernet/amazon/ena/ena_com.h
-index 3905d348..8df63eef 100644
---- a/drivers/net/ethernet/amazon/ena/ena_com.h
-+++ b/drivers/net/ethernet/amazon/ena/ena_com.h
-@@ -299,6 +299,9 @@ struct ena_com_phc_info {
- 	/* PHC shared memory - physical address */
- 	dma_addr_t phys_addr;
- 
-+	/* Cached error bound per timestamp sample */
-+	u32 error_bound;
-+
- 	/* Request id sent to the device */
- 	u16 req_id;
- 
-@@ -458,12 +461,19 @@ int ena_com_phc_config(struct ena_com_dev *ena_dev);
-  */
- void ena_com_phc_destroy(struct ena_com_dev *ena_dev);
- 
--/* ena_com_phc_get - Retrieve PHC timestamp
-+/* ena_com_phc_get_timestamp - Retrieve PHC timestamp
-+ * @ena_dev: ENA communication layer struct
-+ * @timestamp: Retrieved PHC timestamp
-+ * @return - 0 on success, negative value on failure
++/******************************************************************************
++ *****************************************************************************/
++void ena_sysfs_terminate(struct device *dev)
++{
++	device_remove_file(dev, &dev_attr_phc_enable);
++	device_remove_file(dev, &dev_attr_phc_error_bound);
++}
+diff --git a/drivers/net/ethernet/amazon/ena/ena_sysfs.h b/drivers/net/ethernet/amazon/ena/ena_sysfs.h
+new file mode 100644
+index 00000000..8c572eee
+--- /dev/null
++++ b/drivers/net/ethernet/amazon/ena/ena_sysfs.h
+@@ -0,0 +1,28 @@
++/* SPDX-License-Identifier: GPL-2.0 OR Linux-OpenIB */
++/*
++ * Copyright 2015-2020 Amazon.com, Inc. or its affiliates. All rights reserved.
 + */
-+int ena_com_phc_get_timestamp(struct ena_com_dev *ena_dev, u64 *timestamp);
 +
-+/* ena_com_phc_get_error_bound - Retrieve cached PHC error bound
-  * @ena_dev: ENA communication layer struct
-- * @timestamp: Retrieve PHC timestamp
-+ * @error_bound: Cached PHC error bound
-  * @return - 0 on success, negative value on failure
-  */
--int ena_com_phc_get(struct ena_com_dev *ena_dev, u64 *timestamp);
-+int ena_com_phc_get_error_bound(struct ena_com_dev *ena_dev, u32 *error_bound);
- 
- /* ena_com_set_mmio_read_mode - Enable/disable the indirect mmio reg read mechanism
-  * @ena_dev: ENA communication layer struct
-diff --git a/drivers/net/ethernet/amazon/ena/ena_phc.c b/drivers/net/ethernet/amazon/ena/ena_phc.c
-index 5c1acd88..5ce9a32d 100644
---- a/drivers/net/ethernet/amazon/ena/ena_phc.c
-+++ b/drivers/net/ethernet/amazon/ena/ena_phc.c
-@@ -38,7 +38,8 @@ static int ena_phc_gettimex64(struct ptp_clock_info *clock_info,
- 
- 	ptp_read_system_prets(sts);
- 
--	rc = ena_com_phc_get(phc_info->adapter->ena_dev, &timestamp_nsec);
-+	rc = ena_com_phc_get_timestamp(phc_info->adapter->ena_dev,
-+				       &timestamp_nsec);
- 
- 	ptp_read_system_postts(sts);
- 
++#ifndef __ENA_SYSFS_H__
++#define __ENA_SYSFS_H__
++
++#ifdef CONFIG_SYSFS
++
++int ena_sysfs_init(struct device *dev);
++
++void ena_sysfs_terminate(struct device *dev);
++
++#else /* CONFIG_SYSFS */
++
++static inline int ena_sysfs_init(struct device *dev)
++{
++	return 0;
++}
++
++static inline void ena_sysfs_terminate(struct device *dev)
++{
++}
++
++#endif /* CONFIG_SYSFS */
++
++#endif /* __ENA_SYSFS_H__ */
 -- 
 2.40.1
 
