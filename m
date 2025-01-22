@@ -1,143 +1,348 @@
-Return-Path: <netdev+bounces-160423-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160424-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46ACAA19A05
-	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 21:53:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 27174A19A0E
+	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 21:58:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DB3E11889784
-	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 20:53:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D970D188B496
+	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 20:58:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F4081C4A24;
-	Wed, 22 Jan 2025 20:53:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C975E1C3C14;
+	Wed, 22 Jan 2025 20:58:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b="QM7fOA/M"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hNOAU/UP"
 X-Original-To: netdev@vger.kernel.org
-Received: from gate2.alliedtelesis.co.nz (gate2.alliedtelesis.co.nz [202.36.163.20])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 084DD1B6CE0
-	for <netdev@vger.kernel.org>; Wed, 22 Jan 2025 20:53:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.36.163.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAB9B1EB2F
+	for <netdev@vger.kernel.org>; Wed, 22 Jan 2025 20:58:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737579200; cv=none; b=nc8hreqAxMjZhm9c6JSh0mCQdGJCiReYxAEWwL4dxq6cSvlCtsTdA+9UFIgV2MGrVbOcR2eQbx50RfXAN8MqqrgNgx6jKXwQ0km9b0C1xjYPUkCeDRWzg3kLaDBheAljfKXCblxqFa/mu5HDNuzlMB/+X2wSw38KDH3vq6h/mjI=
+	t=1737579499; cv=none; b=ka/hvcR7elGKVLwx136s2Lf/xjgWGR+3SAo0T0UXr7paQYfSO7gyLYqy/wH59rrcHw/VEBMLqsxl/XXSHG4jbNvZH2Arc5RL7Gg93jp2OyX1C6xwnliTMCwaOlYHbppi9p/677VhYm4cgyCck6nBtpRFmr8bxXFUPENTKxJRsuA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737579200; c=relaxed/simple;
-	bh=iCxCAx6ohnaH68e+Tgm1pRg7x5ZdMVCV9KhGCrGWUIk=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=KYxXdA3HQId6BE3WLNjI1uiyIkjLz81rIQKKmAdCoed+wZtnz3DoexK+BNmYy6jnngNBL+Afg8SOHlqGLx29S89S9cUBlH8+HaOjkWUXAAblhUCFt2S7wi731YUhawAeLukffw1LFJhxySSaK4239CTj3DQxTZ74INQVDJK8mso=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz; spf=pass smtp.mailfrom=alliedtelesis.co.nz; dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b=QM7fOA/M; arc=none smtp.client-ip=202.36.163.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alliedtelesis.co.nz
-Received: from svr-chch-seg1.atlnz.lc (mmarshal3.atlnz.lc [10.32.18.43])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by gate2.alliedtelesis.co.nz (Postfix) with ESMTPS id E21172C0B9B;
-	Thu, 23 Jan 2025 09:53:08 +1300 (NZDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alliedtelesis.co.nz;
-	s=mail181024; t=1737579188;
-	bh=iCxCAx6ohnaH68e+Tgm1pRg7x5ZdMVCV9KhGCrGWUIk=;
-	h=From:To:CC:Subject:Date:References:In-Reply-To:From;
-	b=QM7fOA/M9b5OQEFRDAj7DWSKC0oyjDg1vDpNyp6okhhxP4BIE3ePuHIVBMB3j6Z4L
-	 ePHn1pVW+6GdXMYwsvQtKgWA5irYhrOpzAXmygZyGZtKuPrx+kGUD38nhgfGha1T0u
-	 Kh/zyiMRNnxubbKb2FkIPyBU7m3QiBfXAQ6tIK7uMF9HMri3QCdnc0tuYDdRj0sm53
-	 vG5ynwng3F2jrgjwAme655kRnnDebtqcS0YWvqZdnHsfIRLk8kJV3WUylstxonpjRw
-	 9duS6uM8klwQmwgOiSCKlYnQlUlWNnNv9JgSi0F+EpiR8XNQzObh7YXa1mP9FrfQYi
-	 4edx3qKl7/6VA==
-Received: from svr-chch-ex2.atlnz.lc (Not Verified[2001:df5:b000:bc8::76]) by svr-chch-seg1.atlnz.lc with Trustwave SEG (v8,2,6,11305)
-	id <B67915ab40001>; Thu, 23 Jan 2025 09:53:08 +1300
-Received: from svr-chch-ex2.atlnz.lc (2001:df5:b000:bc8:f753:6de:11c0:a008) by
- svr-chch-ex2.atlnz.lc (2001:df5:b000:bc8:f753:6de:11c0:a008) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14; Thu, 23 Jan 2025 09:53:08 +1300
-Received: from svr-chch-ex2.atlnz.lc ([fe80::a9eb:c9b7:8b52:9567]) by
- svr-chch-ex2.atlnz.lc ([fe80::a9eb:c9b7:8b52:9567%15]) with mapi id
- 15.02.1544.014; Thu, 23 Jan 2025 09:53:08 +1300
-From: Chris Packham <Chris.Packham@alliedtelesis.co.nz>
-To: Krzysztof Kozlowski <krzk@kernel.org>
-CC: "lee@kernel.org" <lee@kernel.org>, "robh@kernel.org" <robh@kernel.org>,
-	"krzk+dt@kernel.org" <krzk+dt@kernel.org>, "conor+dt@kernel.org"
-	<conor+dt@kernel.org>, "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
-	"davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
-	<edumazet@google.com>, "kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>, "tsbogend@alpha.franken.de"
-	<tsbogend@alpha.franken.de>, "hkallweit1@gmail.com" <hkallweit1@gmail.com>,
-	"linux@armlinux.org.uk" <linux@armlinux.org.uk>, "sander@svanheule.net"
-	<sander@svanheule.net>, "markus.stockhausen@gmx.de"
-	<markus.stockhausen@gmx.de>, "devicetree@vger.kernel.org"
-	<devicetree@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "linux-mips@vger.kernel.org"
-	<linux-mips@vger.kernel.org>
-Subject: Re: [PATCH v4 2/4] dt-bindings: mfd: Add MDIO interface to
- rtl9301-switch
-Thread-Topic: [PATCH v4 2/4] dt-bindings: mfd: Add MDIO interface to
- rtl9301-switch
-Thread-Index: AQHbavAdfrwa1e98nEWkvQh+G18FzLMhm3mAgADUAAA=
-Date: Wed, 22 Jan 2025 20:53:08 +0000
-Message-ID: <db76d5ab-3eda-439d-8b92-c0423d1e39c8@alliedtelesis.co.nz>
-References: <20250120040214.2538839-1-chris.packham@alliedtelesis.co.nz>
- <20250120040214.2538839-3-chris.packham@alliedtelesis.co.nz>
- <20250122-macho-flat-sawfly-7ca93d@krzk-bin>
-In-Reply-To: <20250122-macho-flat-sawfly-7ca93d@krzk-bin>
-Accept-Language: en-NZ, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <2FD9D3F406CDB94D91BF870C48475349@alliedtelesis.co.nz>
-Content-Transfer-Encoding: base64
+	s=arc-20240116; t=1737579499; c=relaxed/simple;
+	bh=j3SvFoot4uN0mbJlN+dO5JhFkAlt6Suo7IzxTEjZu6o=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=BJQr2I3IPRplnHghvx8MUYm8xrfr77jDzMa9YkbAcuz+6l+X/y+S+9W5CXxNAIiIrELtjoediYOw6fNzwD9N+hg02rZvS3vjSuz4y2NZwU4fgXFlPFx5Rp58GkGoDOZhI66HhWRtnSiRn8qoCLZbBDdiuHX0jyw7+z4yJIYItn8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hNOAU/UP; arc=none smtp.client-ip=209.85.208.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-5d442f9d285so410a12.1
+        for <netdev@vger.kernel.org>; Wed, 22 Jan 2025 12:58:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1737579496; x=1738184296; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9qrFKq7bSwHWP1Qe5M7KUc1mcCCLWJA9iKcyrls34GM=;
+        b=hNOAU/UPQvh2oG+6xE2Bazm26GwhSChuHGeeB1JQ47KdVfTG6xgzyK/QVG8+BpgmTX
+         JFDHkKmhHbMQdVgt2419esq2bazf15OYpMp08MP/yF/aKz9Z1MJuPAEJ02Fu/RuacqC3
+         cvy9YY8hOe1gi7al4lAf1rCFp08XMSnDjLiCrumBPp/zK0z/sFqDgcDYwg7lDXkvY9pF
+         1qEC6i/03kDTH63A8KlGlYr6cUeiSNQ4EOgVLzOYbHt2zuFD3XxSuWuwQVNTWDlUlzRK
+         8kLCeZABupm3Jfg7YSYY1E+SoKeVH7jsbpGlE3AY0RcavJCWwQn8iNJNepD7vFi1ZPbQ
+         S2mg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737579496; x=1738184296;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=9qrFKq7bSwHWP1Qe5M7KUc1mcCCLWJA9iKcyrls34GM=;
+        b=vCZ78tcvU5XwJ6rrPC0lKa7VkBEl1yj/YRBacp1x6/hT5kDHKJDYKA0g9eRugOvbWm
+         zghcPATgmSw0PgUDxwxUposYKgwkCj3G85fvNXcrWXKT6fAAvL6eiqvAev0ifz4IRUpl
+         rICeCo6ydtxQtNGGPmw8HLY6o0R1DMHqjvWkKXN0c6vxVuj5jEWGtbVeGfwRlTeOPmzr
+         DTanhgF8LCQ3R6tKignCdtjHubywtP8a4RN+1cv09yhxffL2mWsut95rvVEZfNskzWTQ
+         JBF4lUndTpnFr1AD1MBHu65iDjWixznUtaW7djYUdoBhZm7dC+3kyo57r283eA5VEjw8
+         AfhQ==
+X-Gm-Message-State: AOJu0YxOLpjjctjjR4ZyoYWd30pdhuxyxHW0LthcL1LpY/ILG7v9sIjc
+	fwX62xYV0GkmvtEBluvT6hwOk9fWMAN1442PWM8CutHd++HTmwJVWqzhdFfNY4WsjLngiwxxVHf
+	E3WNUcdA7P4gI3rIJnekSLei69xUVSJDxt45T
+X-Gm-Gg: ASbGncv/5gWVH1xaY0XSobrhUx8id4fzFpUfUnsps3QcjtfHT/hDy24YrEaWpetRxZ6
+	y2vcseana9ky323r5CkQLGFZnns2c++o51YRn3HeQ5xpWPmYaP7ZAzTcsPq7LLcztHWiPfT/bUl
+	l9Wn3zcw==
+X-Google-Smtp-Source: AGHT+IGQ81yR89ala+e95+DG8BbiczVdMDRLifX2ZDD3B1UBMMExq88dURe2RLuZHEeiGvHn5xDDLlfz7b5XqkNHXNE=
+X-Received: by 2002:a50:aa97:0:b0:5d9:5a5c:f2f9 with SMTP id
+ 4fb4d7f45d1cf-5dc09f9afcfmr13777a12.7.1737579495782; Wed, 22 Jan 2025
+ 12:58:15 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-SEG-SpamProfiler-Analysis: v=2.4 cv=BNQQr0QG c=1 sm=1 tr=0 ts=67915ab4 a=Xf/6aR1Nyvzi7BryhOrcLQ==:117 a=xqWC_Br6kY4A:10 a=75chYTbOgJ0A:10 a=IkcTkHD0fZMA:10 a=VdSt8ZQiCzkA:10 a=SNri9qoxPTwurTm3CgAA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
-X-SEG-SpamProfiler-Score: 0
+References: <20250122200402.3461154-1-maze@google.com> <CANP3RGe_cspCzYe_scA37Hgr0GNbASmN94RRnPRUT1YiBcn=eg@mail.gmail.com>
+ <CANP3RGc7-ZkQ2xGtkW00+A+zcWpm4WdMEbSn=UjotBQHzO+f7w@mail.gmail.com>
+In-Reply-To: <CANP3RGc7-ZkQ2xGtkW00+A+zcWpm4WdMEbSn=UjotBQHzO+f7w@mail.gmail.com>
+From: =?UTF-8?Q?Maciej_=C5=BBenczykowski?= <zenczykowski@gmail.com>
+Date: Wed, 22 Jan 2025 12:58:02 -0800
+X-Gm-Features: AbW1kvY1tJgxFyhp1iZHXBmRZPIitcVNmePNwA-x4HwxIXspz5D5zYsxbmosD6U
+Message-ID: <CANP3RGeE4T8a9Mn4+tAKkGU8BaCrt5tu89aQt2dzq4DzNXbb4w@mail.gmail.com>
+Subject: Re: [PATCH bpf] bpf: fix classic bpf reads from negative offset
+ outside of linear skb portion
+To: =?UTF-8?Q?Maciej_=C5=BBenczykowski?= <zenczykowski@gmail.com>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>
+Cc: Linux Network Development Mailing List <netdev@vger.kernel.org>, "David S . Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, BPF Mailing List <bpf@vger.kernel.org>, 
+	Stanislav Fomichev <sdf@fomichev.me>, Willem de Bruijn <willemb@google.com>, 
+	Matt Moeller <moeller.matt@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-DQpPbiAyMi8wMS8yMDI1IDIxOjE0LCBLcnp5c3p0b2YgS296bG93c2tpIHdyb3RlOg0KPiBPbiBN
-b24sIEphbiAyMCwgMjAyNSBhdCAwNTowMjoxMlBNICsxMzAwLCBDaHJpcyBQYWNraGFtIHdyb3Rl
-Og0KPj4gVGhlIE1ESU8gY29udHJvbGxlciBpcyBwYXJ0IG9mIHRoZSBzd2l0Y2ggb24gdGhlIFJU
-TDkzMDAgZmFtaWx5IG9mDQo+PiBkZXZpY2VzLiBBZGQgYSAkcmVmIHRvIHRoZSBtZmQgYmluZGlu
-ZyBmb3IgdGhlc2UgZGV2aWNlcy4NCj4+DQo+PiBTaWduZWQtb2ZmLWJ5OiBDaHJpcyBQYWNraGFt
-IDxjaHJpcy5wYWNraGFtQGFsbGllZHRlbGVzaXMuY28ubno+DQo+PiAtLS0NCj4+DQo+IFlvdSBu
-ZWVkIHRvIGV4cGxhaW4gbWVyZ2luZyBkZXBlbmRlbmNpZXMuIE5vdGhpbmcgaW4gY292ZXIgbGV0
-dGVyLA0KPiBub3RoaW5nIGhlcmUsIGJ1dCB0aGlzICpDQU5OT1QqIGJlIG1lcmdlZCBpbmRlcGVu
-ZGVudGx5Lg0KT0suIEknbGwgbWFrZSBzdXJlIHRvIGFkZCBhIG5vdGUgaGVyZSBhbmQgdG8gdGhl
-IHNlcmllcyBjb3ZlciBsZXR0ZXIuDQo+PiBOb3RlczoNCj4+ICAgICAgQ2hhbmdlcyBpbiB2NDoN
-Cj4+ICAgICAgLSBUaGVyZSBpcyBhIHNpbmdsZSBNRElPIGNvbnRyb2xsZXIgdGhhdCBoYXMgTURJ
-TyBidXNlcyBhcyBjaGlsZHJlbg0KPj4gICAgICBDaGFuZ2VzIGluIHYzOg0KPj4gICAgICAtIE5v
-bmUNCj4+ICAgICAgQ2hhbmdlcyBpbiB2MjoNCj4+ICAgICAgLSBOb25lDQo+Pg0KPj4gICAuLi4v
-YmluZGluZ3MvbWZkL3JlYWx0ZWsscnRsOTMwMS1zd2l0Y2gueWFtbCAgfCAyNCArKysrKysrKysr
-KysrKysrKysrDQo+PiAgIDEgZmlsZSBjaGFuZ2VkLCAyNCBpbnNlcnRpb25zKCspDQo+Pg0KPj4g
-ZGlmZiAtLWdpdCBhL0RvY3VtZW50YXRpb24vZGV2aWNldHJlZS9iaW5kaW5ncy9tZmQvcmVhbHRl
-ayxydGw5MzAxLXN3aXRjaC55YW1sIGIvRG9jdW1lbnRhdGlvbi9kZXZpY2V0cmVlL2JpbmRpbmdz
-L21mZC9yZWFsdGVrLHJ0bDkzMDEtc3dpdGNoLnlhbWwNCj4+IGluZGV4IGYwNTMzMDNhYjFlNi4u
-YzE5ZDJjMjA5NDM0IDEwMDY0NA0KPj4gLS0tIGEvRG9jdW1lbnRhdGlvbi9kZXZpY2V0cmVlL2Jp
-bmRpbmdzL21mZC9yZWFsdGVrLHJ0bDkzMDEtc3dpdGNoLnlhbWwNCj4+ICsrKyBiL0RvY3VtZW50
-YXRpb24vZGV2aWNldHJlZS9iaW5kaW5ncy9tZmQvcmVhbHRlayxydGw5MzAxLXN3aXRjaC55YW1s
-DQo+PiBAQCAtMjgsNiArMjgsOSBAQCBwcm9wZXJ0aWVzOg0KPj4gICAgIHJlZzoNCj4+ICAgICAg
-IG1heEl0ZW1zOiAxDQo+PiAgIA0KPj4gKyAgbWRpby1jb250cm9sbGVyOg0KPj4gKyAgICAkcmVm
-OiAvc2NoZW1hcy9uZXQvcmVhbHRlayxydGw5MzAxLW1kaW8ueWFtbCMNCj4+ICsNCj4+ICAgICAn
-I2FkZHJlc3MtY2VsbHMnOg0KPj4gICAgICAgY29uc3Q6IDENCj4+ICAgDQo+PiBAQCAtMTEwLDUg
-KzExMywyNiBAQCBleGFtcGxlczoNCj4+ICAgICAgICAgICAgIH07DQo+PiAgICAgICAgICAgfTsN
-Cj4+ICAgICAgICAgfTsNCj4+ICsNCj4+ICsgICAgICBtZGlvLWNvbnRyb2xsZXIgew0KPiBObywg
-bm8gcmVzb3VyY2VzIGhlcmUsIG5vIHVuaXQgYWRkcmVzcy4gTG9vayBhdCBvdGhlciBub2RlcyAt
-IHRoZXkgaGF2ZQ0KPiB0aGUgcmVzb3VyY2UsIHRoZSBhZGRyZXNzLiBNaXhpbmcgc3VjaCBub2Rl
-cyBpcyBjbGVhciBpbmRpY2F0aW9uIHRoaXMgaXMNCj4gbm90IGNvcnJlY3QgaGFyZHdhcmUgZGVz
-Y3JpcHRpb24gYW5kIHlvdSBkbyB0aGlzIG9ubHkgZm9yIExpbnV4Lg0KPg0KPiBGb2xkIGNoaWxk
-IGRldmljZSBpbnRvIHBhcmVudC4NCg0KSW4gdGhpcyBwYXJ0aWN1bGFyIGNhc2UgYWxsIHRoZSBt
-ZGlvIHN0dWZmIGlzIGFjdHVhbGx5IGNvbnRhaW5lZCB0byBhIA0KcmFuZ2Ugc3RhcnRpbmcgYXQg
-b2Zmc2V0IDB4Y2EwMC4gSSBkcm9wcGVkIGl0IGJlY2F1c2UgaXQgd2FzIHNpbXBsZXIgaW4gDQp0
-aGUgZHJpdmVyIHRvIHVzZSB0aGUgZnVsbCAxNi1iaXQgYWRkcmVzcyByYXRoZXIgdGhhbiB0cnlp
-bmcgdG8gdXNlIA0Kb2Zmc2V0cyBmcm9tIHRoZSBiYXNlIGFkZHJlc3MgdGhhdCBkaWRuJ3QgY29y
-cmVzcG9uZCB0byB0aGUgZGF0YXNoZWV0LiANCkFzIHlvdSd2ZSBoaWdobGlnaHRlZCB0aGF0J3Mg
-bWFraW5nIHRoZSBkdC1iaW5kaW5nIGltcG9zZSBkcml2ZXIgDQpzcGVjaWZpY3Mgc28gd291bGQg
-YWRkaW5nIGJhY2sgYG1kaW8tY29udHJvbGxlckBjYTAwYCBhbmQgYHJlZyA9IDwweGNhMDAgDQow
-eDIwMD47YCBiZSBPSyBldmVuIGlmIHRoZSBkcml2ZXIgZG9lc24ndCBhY3R1YWxseSB1c2UgdGhl
-bT8NCg0KPg0KPiBCZXN0IHJlZ2FyZHMsDQo+IEtyenlzenRvZg0KPg==
+On Wed, Jan 22, 2025 at 12:28=E2=80=AFPM Maciej =C5=BBenczykowski
+<zenczykowski@gmail.com> wrote:
+>
+> On Wed, Jan 22, 2025 at 12:16=E2=80=AFPM Maciej =C5=BBenczykowski
+> <zenczykowski@gmail.com> wrote:
+> >
+> > On Wed, Jan 22, 2025 at 12:04=E2=80=AFPM Maciej =C5=BBenczykowski <maze=
+@google.com> wrote:
+> > >
+> > > We're received reports of cBPF code failing to accept DHCP packets.
+> > > "BPF filter for DHCP not working (android14-6.1-lts + android-14.0.0_=
+r74)"
+> > >
+> > > The relevant Android code is at:
+> > >   https://cs.android.com/android/platform/superproject/main/+/main:pa=
+ckages/modules/NetworkStack/jni/network_stack_utils_jni.cpp;l=3D95;drc=3D9d=
+f50aef1fd163215dcba759045706253a5624f5
+> > > which uses a lot of macros from:
+> > >   https://cs.android.com/android/platform/superproject/main/+/main:pa=
+ckages/modules/Connectivity/bpf/headers/include/bpf/BpfClassic.h;drc=3Dc58c=
+fb7c7da257010346bd2d6dcca1c0acdc8321
+> > >
+> > > This is widely used and does work on the vast majority of drivers,
+> > > but is exposing a core kernel cBPF bug related to driver skb layout.
+> > >
+> > > Root cause is iwlwifi driver, specifically on (at least):
+> > >   Dell 7212: Intel Dual Band Wireless AC 8265
+> > >   Dell 7220: Intel Wireless AC 9560
+> > >   Dell 7230: Intel Wi-Fi 6E AX211
+> > > delivers frames where the UDP destination port is not in the skb line=
+ar
+> > > portion, while the cBPF code is using SKF_NET_OFF relative addressing=
+.
+> > >
+> > > simplified from above, effectively:
+> > >   BPF_STMT(BPF_LDX | BPF_B | BPF_MSH, SKF_NET_OFF)
+> > >   BPF_STMT(BPF_LD  | BPF_H | BPF_IND, SKF_NET_OFF + 2)
+> > >   BPF_JUMP(BPF_JMP | BPF_JEQ | BPF_K, 68, 1, 0)
+> > >   BPF_STMT(BPF_RET | BPF_K, 0)
+> > >   BPF_STMT(BPF_RET | BPF_K, 0xFFFFFFFF)
+> > > fails to match udp dport=3D68 packets.
+> > >
+> > > Specifically the 3rd cBPF instruction fails to match the condition:
+> >
+> > 2nd of course
+> >
+> > >   if (ptr >=3D skb->head && ptr + size <=3D skb_tail_pointer(skb))
+> > > within bpf_internal_load_pointer_neg_helper() and thus returns NULL,
+> > > which results in reading -EFAULT.
+> > >
+> > > This is because bpf_skb_load_helper_{8,16,32} don't include the
+> > > "data past headlen do skb_copy_bits()" logic from the non-negative
+> > > offset branch in the negative offset branch.
+> > >
+> > > Note: I don't know sparc assembly, so this doesn't fix sparc...
+> > > ideally we should just delete bpf_internal_load_pointer_neg_helper()
+> > > This seems to have always been broken (but not pre-git era, since
+> > > obviously there was no eBPF helpers back then), but stuff older
+> > > than 5.4 is no longer LTS supported anyway, so using 5.4 as fixes tag=
+.
+> > >
+> > > Cc: Alexei Starovoitov <ast@kernel.org>
+> > > Cc: Daniel Borkmann <daniel@iogearbox.net>
+> > > Cc: Stanislav Fomichev <sdf@fomichev.me>
+> > > Cc: Willem de Bruijn <willemb@google.com>
+> > > Reported-by: Matt Moeller <moeller.matt@gmail.com>
+> > > Closes: https://issuetracker.google.com/384636719 [Treble - GKI partn=
+er internal]
+> > > Signed-off-by: Maciej =C5=BBenczykowski <maze@google.com>
+> > > Fixes: 219d54332a09 ("Linux 5.4")
+> > > ---
+> > >  include/linux/filter.h |  2 ++
+> > >  kernel/bpf/core.c      | 14 +++++++++
+> > >  net/core/filter.c      | 69 +++++++++++++++++-----------------------=
+--
+> > >  3 files changed, 43 insertions(+), 42 deletions(-)
+> > >
+> > > diff --git a/include/linux/filter.h b/include/linux/filter.h
+> > > index a3ea46281595..c24d8e338ce4 100644
+> > > --- a/include/linux/filter.h
+> > > +++ b/include/linux/filter.h
+> > > @@ -1479,6 +1479,8 @@ static inline u16 bpf_anc_helper(const struct s=
+ock_filter *ftest)
+> > >  void *bpf_internal_load_pointer_neg_helper(const struct sk_buff *skb=
+,
+> > >                                            int k, unsigned int size);
+> > >
+> > > +int bpf_internal_neg_helper(const struct sk_buff *skb, int k);
+> > > +
+> > >  static inline int bpf_tell_extensions(void)
+> > >  {
+> > >         return SKF_AD_MAX;
+> > > diff --git a/kernel/bpf/core.c b/kernel/bpf/core.c
+> > > index da729cbbaeb9..994988dabb97 100644
+> > > --- a/kernel/bpf/core.c
+> > > +++ b/kernel/bpf/core.c
+> > > @@ -89,6 +89,20 @@ void *bpf_internal_load_pointer_neg_helper(const s=
+truct sk_buff *skb, int k, uns
+> > >         return NULL;
+> > >  }
+> > >
+> > > +int bpf_internal_neg_helper(const struct sk_buff *skb, int k)
+> > > +{
+> > > +       if (k >=3D 0)
+> > > +               return k;
+> > > +       if (k >=3D SKF_NET_OFF)
+> > > +               return skb->network_header + k - SKF_NET_OFF;
+> > > +       if (k >=3D SKF_LL_OFF) {
+> > > +               if (unlikely(!skb_mac_header_was_set(skb)))
+> > > +                       return -1;
+> > > +               return skb->mac_header + k - SKF_LL_OFF;
+> > > +       }
+> > > +       return -1;
+> > > +}
+> > > +
+> > >  /* tell bpf programs that include vmlinux.h kernel's PAGE_SIZE */
+> > >  enum page_size_enum {
+> > >         __PAGE_SIZE =3D PAGE_SIZE
+> > > diff --git a/net/core/filter.c b/net/core/filter.c
+> > > index e56a0be31678..609ef7df71ce 100644
+> > > --- a/net/core/filter.c
+> > > +++ b/net/core/filter.c
+> > > @@ -221,21 +221,16 @@ BPF_CALL_3(bpf_skb_get_nlattr_nest, struct sk_b=
+uff *, skb, u32, a, u32, x)
+> > >  BPF_CALL_4(bpf_skb_load_helper_8, const struct sk_buff *, skb, const=
+ void *,
+> > >            data, int, headlen, int, offset)
+> > >  {
+> > > -       u8 tmp, *ptr;
+> > > -       const int len =3D sizeof(tmp);
+> > > -
+> > > -       if (offset >=3D 0) {
+> > > -               if (headlen - offset >=3D len)
+> > > -                       return *(u8 *)(data + offset);
+> > > -               if (!skb_copy_bits(skb, offset, &tmp, sizeof(tmp)))
+> > > -                       return tmp;
+> > > -       } else {
+> > > -               ptr =3D bpf_internal_load_pointer_neg_helper(skb, off=
+set, len);
+> > > -               if (likely(ptr))
+> > > -                       return *(u8 *)ptr;
+> > > -       }
+> > > +       u8 tmp;
+> > >
+> > > -       return -EFAULT;
+> > > +       offset =3D bpf_internal_neg_helper(skb, offset);
+> > > +       if (unlikely(offset < 0))
+> > > +               return -EFAULT;
+> > > +       if (headlen - offset >=3D sizeof(u8))
+> > > +               return *(u8 *)(data + offset);
+> > > +       if (skb_copy_bits(skb, offset, &tmp, sizeof(tmp)))
+> > > +               return -EFAULT;
+> > > +       return tmp;
+> > >  }
+> > >
+> > >  BPF_CALL_2(bpf_skb_load_helper_8_no_cache, const struct sk_buff *, s=
+kb,
+> > > @@ -248,21 +243,16 @@ BPF_CALL_2(bpf_skb_load_helper_8_no_cache, cons=
+t struct sk_buff *, skb,
+> > >  BPF_CALL_4(bpf_skb_load_helper_16, const struct sk_buff *, skb, cons=
+t void *,
+> > >            data, int, headlen, int, offset)
+> > >  {
+> > > -       __be16 tmp, *ptr;
+> > > -       const int len =3D sizeof(tmp);
+> > > +       __be16 tmp;
+> > >
+> > > -       if (offset >=3D 0) {
+> > > -               if (headlen - offset >=3D len)
+> > > -                       return get_unaligned_be16(data + offset);
+> > > -               if (!skb_copy_bits(skb, offset, &tmp, sizeof(tmp)))
+> > > -                       return be16_to_cpu(tmp);
+> > > -       } else {
+> > > -               ptr =3D bpf_internal_load_pointer_neg_helper(skb, off=
+set, len);
+> > > -               if (likely(ptr))
+> > > -                       return get_unaligned_be16(ptr);
+> > > -       }
+> > > -
+> > > -       return -EFAULT;
+> > > +       offset =3D bpf_internal_neg_helper(skb, offset);
+> > > +       if (unlikely(offset < 0))
+> > > +               return -EFAULT;
+> > > +       if (headlen - offset >=3D sizeof(__be16))
+> > > +               return get_unaligned_be16(data + offset);
+> > > +       if (skb_copy_bits(skb, offset, &tmp, sizeof(tmp)))
+> > > +               return -EFAULT;
+> > > +       return be16_to_cpu(tmp);
+> > >  }
+> > >
+> > >  BPF_CALL_2(bpf_skb_load_helper_16_no_cache, const struct sk_buff *, =
+skb,
+> > > @@ -275,21 +265,16 @@ BPF_CALL_2(bpf_skb_load_helper_16_no_cache, con=
+st struct sk_buff *, skb,
+> > >  BPF_CALL_4(bpf_skb_load_helper_32, const struct sk_buff *, skb, cons=
+t void *,
+> > >            data, int, headlen, int, offset)
+> > >  {
+> > > -       __be32 tmp, *ptr;
+> > > -       const int len =3D sizeof(tmp);
+> > > -
+> > > -       if (likely(offset >=3D 0)) {
+> > > -               if (headlen - offset >=3D len)
+> > > -                       return get_unaligned_be32(data + offset);
+> > > -               if (!skb_copy_bits(skb, offset, &tmp, sizeof(tmp)))
+> > > -                       return be32_to_cpu(tmp);
+> > > -       } else {
+> > > -               ptr =3D bpf_internal_load_pointer_neg_helper(skb, off=
+set, len);
+> > > -               if (likely(ptr))
+> > > -                       return get_unaligned_be32(ptr);
+> > > -       }
+> > > +       __be32 tmp;
+> > >
+> > > -       return -EFAULT;
+> > > +       offset =3D bpf_internal_neg_helper(skb, offset);
+> > > +       if (unlikely(offset < 0))
+> > > +               return -EFAULT;
+> > > +       if (headlen - offset >=3D sizeof(__be32))
+> > > +               return get_unaligned_be32(data + offset);
+> > > +       if (skb_copy_bits(skb, offset, &tmp, sizeof(tmp)))
+> > > +               return -EFAULT;
+> > > +       return be32_to_cpu(tmp);
+> > >  }
+> > >
+> > >  BPF_CALL_2(bpf_skb_load_helper_32_no_cache, const struct sk_buff *, =
+skb,
+> > > --
+> > > 2.48.1.262.g85cc9f2d1e-goog
+> > >
+> >
+> > Note: this is currently only compile and boot tested.
+> > Which doesn't prove all that much ;-)
+>
+> Furthermore even after cherrypicking this (or a similar style fix)
+> into older LTS:
+> - sparc jit is (presumably, maybe only 32-bit) still broken, as the
+> assembly uses the old function
+> - same for mips jit on 5.4/5.10/5.15
+> - same for powerpc jit on 5.4/5.10
+>
+> (but I would guess we don't care)
+
+and Willem points out that:
+
+"skb->network_header is an offset against head, while the
+get_unaligned_be16 and skb_copy_bits take an offset relative to data.
+
+I did check yesterday that skb_copy_bits can take negative offsets, in
+case a protocol header (e.g., SKF_LL_OFF) is smaller than skb->data."
+
+which makes me think this approach is possibly (likely?) incorrect?
+skb offsets always leave me confused...
 
