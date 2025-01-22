@@ -1,167 +1,170 @@
-Return-Path: <netdev+bounces-160189-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160190-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11085A18BB3
-	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 07:07:32 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 57466A18BC4
+	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 07:13:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E883F3A3103
-	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 06:07:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F3D34188ADCC
+	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 06:13:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 383EC14A619;
-	Wed, 22 Jan 2025 06:07:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06C7F1A4F22;
+	Wed, 22 Jan 2025 06:13:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f72PmiKI"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B8151A8F7F
-	for <netdev@vger.kernel.org>; Wed, 22 Jan 2025 06:07:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2178314A619
+	for <netdev@vger.kernel.org>; Wed, 22 Jan 2025 06:13:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737526043; cv=none; b=Xf9GIoB2S6glizE3RExNOIvDqvxeS9ULQM1A+Qe2NN1Ky7oFVk8lDIUaVSmXXO06VtbvKVxpyTcBO9yFdif7IRO2dTeXi7UG/BMMeQElW4nVCtTkmHUNfTfIbVoxeiMk3jPSrBL4wtLn8Y7JS6LVyPIunyUFykW/WmAaMBN4sAQ=
+	t=1737526387; cv=none; b=od3/xI82+LnGiuSEcqk6SXlvngNRkL3xgWCcgYML9tEirgbLWeocFoEIPBGr+qSRM1xuKudESUPlo81Shz7zn3+RCJvxJ4F1yPXHbv3wkpuWcXugIk15VY9a01rnI8WrqIoU3m/k9z2VAoX7H9Lgoi+jaAQ6DLYN0gFugT6Zx3E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737526043; c=relaxed/simple;
-	bh=yF+WQD4yOcDuNUZF41jVYjxRZB1zby8f2la0pn2VWjI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GUmfn2fbY29IbDIRWyjRnj3wjoxwglHiyCDg9f56ZPuCWPNTKkhIG7278FsaSnEAlfJaWBQ+bvO9MFl0aH6c9t40b/YTg/Y+3Hqxbs57rSt10qZkZftSnqWQPvuugR2pZuH8iFKPSxbYTvWuPAEVb5qatDcThbfxthspAa3BL5A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1taTtF-0002tj-GM; Wed, 22 Jan 2025 07:07:01 +0100
-Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1taTtB-001Ef8-0G;
-	Wed, 22 Jan 2025 07:06:57 +0100
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1taTtA-007cLW-33;
-	Wed, 22 Jan 2025 07:06:56 +0100
-Date: Wed, 22 Jan 2025 07:06:56 +0100
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Thangaraj.S@microchip.com
-Cc: andrew+netdev@lunn.ch, rmk+kernel@armlinux.org.uk, davem@davemloft.net,
-	Woojung.Huh@microchip.com, pabeni@redhat.com, edumazet@google.com,
-	kuba@kernel.org, phil@raspberrypi.org, kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	UNGLinuxDriver@microchip.com
-Subject: Re: [PATCH net-next v1 1/7] net: usb: lan78xx: Convert to PHYlink
- for improved PHY and MAC management
-Message-ID: <Z5CLAMsLJtKA43kM@pengutronix.de>
-References: <20250108121341.2689130-1-o.rempel@pengutronix.de>
- <20250108121341.2689130-2-o.rempel@pengutronix.de>
- <0397c3a4cac5795fc33dd313ea74a8743a587d28.camel@microchip.com>
+	s=arc-20240116; t=1737526387; c=relaxed/simple;
+	bh=HpceXxCPMSZiMuV6NEi/uY3vmwMc8uj1BH0VLDs8Gak=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ZFTW2BX2A3Wo2Zb1oWckoKS77e9/d/1/7ffBOmBxpxsB2ICC+1ZV7lc4bB+9hKnY0rsmbkHRNgNwjo5o6OGmTYZDg1Ko8mtwuJHi/mZ1/Ji47AImF4ZEWEJsg/IavXaPkEaLlTEQT91uqRp7bZ/eWN+dGUm2KGAE2wjiCUB41Yk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=f72PmiKI; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1737526384;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=HhgLJ485Y6vLoQMLXTnjuRpatShBOLIyxS5mQIk6PNw=;
+	b=f72PmiKIwx3OL5Zva7++EgVXVYkH5ndCmp28MiWjkYapheMJNgsYtHWiGxDeeRVjjUb/jP
+	1usvTppYO4vp7T0FxCGFzdpisHM0Q4SuvWilRsT1FnPWqqxbvZmfbOcga/XmrURCPxekAy
+	X3iuVjrCgVW5wEH2NBSLpz1/NcKAlvI=
+Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com
+ [209.85.216.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-608-CJxoEC8pMd-Zd9y_Is13qg-1; Wed, 22 Jan 2025 01:13:02 -0500
+X-MC-Unique: CJxoEC8pMd-Zd9y_Is13qg-1
+X-Mimecast-MFC-AGG-ID: CJxoEC8pMd-Zd9y_Is13qg
+Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-2ef91d5c863so12415871a91.2
+        for <netdev@vger.kernel.org>; Tue, 21 Jan 2025 22:13:02 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737526381; x=1738131181;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=HhgLJ485Y6vLoQMLXTnjuRpatShBOLIyxS5mQIk6PNw=;
+        b=Ff2mq7+iK3EHSOEzvIr67Z/rzrfIY9uEP9xlTeTqbKIv1lRpK2JrpbYiU6Zelh2m5O
+         CZPLyXOn/E4fQojUdC4/RH6DFrKFdNs+Enj/MNJVkyknpAVbjyA4zYAstKOx7j9oIXeM
+         Ob0ERoGRKX16uBJOPoHpRYQ5HAiYvpwC4cT0m3d7pu6FFV6wFgeV8IB2ORiXRmq0L7H+
+         hudhuy45nqucnXfKopW2rvTsPRjaKoqfmf9zA632rpoa1KkXdzO0ZuFve2ERkQMK+IGJ
+         Db1UGudwNIFAfcEBwhPZuDj2wKitlSQm3hrcArkusI6OmNeOmdwa6ItUPL3c5P4UDfV0
+         //eg==
+X-Gm-Message-State: AOJu0YxXpRJNiBNAFBIChtEkT55ZiO8cyxIzVe0VKX6iCxcS9cg1Pf3K
+	kywgvTqlqIpaT6dfAssQXga1pxZ14DnAqUmkOVXTSIvmw7zCwS9IPkjLQa98pdPdxewBXnJrq2L
+	fFZWdo6k3N5b4tZ6GHB3jXZJBOQsaadbokjRb3i49BqHaEdByP4+5pvcF+erTwbDq0dINCJ/q79
+	+QpXmEQzsw9jsV4Qh9pTy/anlYb1jl
+X-Gm-Gg: ASbGncs3fpSsXcEX0QOt2zEhyyB7VDLWolRzdatDV3TACLgUmJzj5M9nZZzjIJhwyaX
+	mh3wO+lZ+CSzjQujO/zH/qNog+xqj4o4xGZID+tzN4Ixk06HZgPuZ
+X-Received: by 2002:a05:6a00:c92:b0:725:e499:5b8a with SMTP id d2e1a72fcca58-72dafa9ac70mr26362353b3a.15.1737526380540;
+        Tue, 21 Jan 2025 22:13:00 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGqxkNQXj1qQ2FzevSQgWxRwrblUKB9YOBicFYwTenptGz2NShL/5JAi2cM6xxZQlu/BESTppyKXhalwNK8BUI=
+X-Received: by 2002:a05:6a00:c92:b0:725:e499:5b8a with SMTP id
+ d2e1a72fcca58-72dafa9ac70mr26362245b3a.15.1737526378551; Tue, 21 Jan 2025
+ 22:12:58 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <0397c3a4cac5795fc33dd313ea74a8743a587d28.camel@microchip.com>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+References: <20250121191047.269844-1-jdamato@fastly.com> <20250121191047.269844-3-jdamato@fastly.com>
+In-Reply-To: <20250121191047.269844-3-jdamato@fastly.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Wed, 22 Jan 2025 14:12:46 +0800
+X-Gm-Features: AbW1kvZnr46WR0BN5DEhhgGbxfpOOIQ2_rtXVT9nGyaO7ohwjeZikWno5pKlVeI
+Message-ID: <CACGkMEvT=J4XrkGtPeiE+8fwLsMP_B-xebnocJV8c5_qQtCOTA@mail.gmail.com>
+Subject: Re: [RFC net-next v3 2/4] virtio_net: Prepare for NAPI to queue mapping
+To: Joe Damato <jdamato@fastly.com>
+Cc: netdev@vger.kernel.org, gerhard@engleder-embedded.com, leiyang@redhat.com, 
+	xuanzhuo@linux.alibaba.com, mkarsten@uwaterloo.ca, 
+	"Michael S. Tsirkin" <mst@redhat.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	"open list:VIRTIO CORE AND NET DRIVERS" <virtualization@lists.linux.dev>, open list <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Thangaraj,
+On Wed, Jan 22, 2025 at 3:11=E2=80=AFAM Joe Damato <jdamato@fastly.com> wro=
+te:
+>
+> Slight refactor to prepare the code for NAPI to queue mapping. No
+> functional changes.
+>
+> Signed-off-by: Joe Damato <jdamato@fastly.com>
+> Reviewed-by: Gerhard Engleder <gerhard@engleder-embedded.com>
+> Tested-by: Lei Yang <leiyang@redhat.com>
+> ---
+>  v2:
+>    - Previously patch 1 in the v1.
+>    - Added Reviewed-by and Tested-by tags to commit message. No
+>      functional changes.
+>
+>  drivers/net/virtio_net.c | 10 ++++++++--
+>  1 file changed, 8 insertions(+), 2 deletions(-)
+>
+> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> index 7646ddd9bef7..cff18c66b54a 100644
+> --- a/drivers/net/virtio_net.c
+> +++ b/drivers/net/virtio_net.c
+> @@ -2789,7 +2789,8 @@ static void skb_recv_done(struct virtqueue *rvq)
+>         virtqueue_napi_schedule(&rq->napi, rvq);
+>  }
+>
+> -static void virtnet_napi_enable(struct virtqueue *vq, struct napi_struct=
+ *napi)
+> +static void virtnet_napi_do_enable(struct virtqueue *vq,
+> +                                  struct napi_struct *napi)
+>  {
+>         napi_enable(napi);
 
-On Wed, Jan 22, 2025 at 04:02:42AM +0000, Thangaraj.S@microchip.com wrote:
-> Hi Oleksji,
-> 
-> On Wed, 2025-01-08 at 13:13 +0100, Oleksij Rempel wrote:
-> >  /* use ethtool to change the level for any given device */
-> > @@ -1554,40 +1558,6 @@ static void lan78xx_set_multicast(struct
-> > net_device *netdev)
-> >         schedule_work(&pdata->set_multicast);
-> >  }
-> > 
-> > 
-> > 
-> > -static int lan78xx_link_reset(struct lan78xx_net *dev)
-> > +static int lan78xx_phy_int_ack(struct lan78xx_net *dev)
-> >  {
-> 
-> Is there any specific reason why this complete logic on phy interrupt
-> handling is removed?
+Nit: it might be better to not have this helper to avoid a misuse of
+this function directly.
 
-### Before: Old PHY Interrupt Handling
+Other than this.
 
-In the old implementation, the driver processed PHY interrupts as follows:
+Acked-by: Jason Wang <jasowang@redhat.com>
 
-1. When a status URB was received, the driver checked for the `INT_ENP_PHY_INT`
-   flag to detect a PHY-related interrupt:
-   - Upon detecting the interrupt, it triggered a deferred kevent
-     (`lan78xx_defer_kevent`) with the `EVENT_LINK_RESET` event.
-   - It also called `generic_handle_irq_safe` to notify the PHY subsystem of
-     the interrupt, allowing it to update the PHY state.
+Thanks
 
-2. The deferred kevent was handled by `lan78xx_link_reset`, which:
-   - It invoked `phy_read_status` to retrieve the PHY state.
-   - Based on the PHY state, it adjusted MAC settings (e.g., flow control,
-     USB state) and restarted the RX/TX paths if needed.
-   - Enabled/disrupted timers and submitted RX URBs when link changes occurred.
+>
+> @@ -2802,6 +2803,11 @@ static void virtnet_napi_enable(struct virtqueue *=
+vq, struct napi_struct *napi)
+>         local_bh_enable();
+>  }
+>
+> +static void virtnet_napi_enable(struct virtqueue *vq, struct napi_struct=
+ *napi)
+> +{
+> +       virtnet_napi_do_enable(vq, napi);
+> +}
+> +
+>  static void virtnet_napi_tx_enable(struct virtnet_info *vi,
+>                                    struct virtqueue *vq,
+>                                    struct napi_struct *napi)
+> @@ -2817,7 +2823,7 @@ static void virtnet_napi_tx_enable(struct virtnet_i=
+nfo *vi,
+>                 return;
+>         }
+>
+> -       return virtnet_napi_enable(vq, napi);
+> +       virtnet_napi_do_enable(vq, napi);
+>  }
+>
+>  static void virtnet_napi_tx_disable(struct napi_struct *napi)
+> --
+> 2.25.1
+>
 
-This design required the driver to manually handle both PHY and MAC state
-management, leading to complex and redundant logic.
-
-### Now: PHYlink Integration
-
-In the updated code, the handling process is simplified:
-
-1. When a status URB detects a PHY interrupt (`INT_ENP_PHY_INT`), the driver
-   still calls `lan78xx_defer_kevent(dev, EVENT_PHY_INT_ACK)`. However:
-   - The deferred event now serves only to acknowledge the interrupt by calling
-     `lan78xx_phy_int_ack`.
-   - This separation is necessary because the URB completion context cannot
-     directly perform register writes.
-
-2. The interrupt is forwarded to the PHY subsystem, which updates the PHY state
-   as before. No additional logic is performed in this step.
-
-3. Once the PHY state is updated, PHYlink invokes appropriate callbacks to
-   handle MAC reconfiguration:
-   - `mac_config` for initial setup.
-   - `mac_link_up` and `mac_link_down` to manage link transitions, flow
-     control, and USB state.
-
-### Why the Old Logic is No Longer Needed
-
-The MAC is now reconfigured only through PHYlink callbacks, eliminating the
-need for deferred events to handle complex link reset logic.
-
-With PHYlink coordinating PHY and MAC interactions, the driver no longer needs
-custom logic to manage state transitions.
-
-> > +static void lan78xx_mac_config(struct phylink_config *config,
-> > unsigned int mode,
-> > +                              const struct phylink_link_state
-> > *state)
-> > +{
-> > +       struct net_device *net = to_net_dev(config->dev);
-> > +       struct lan78xx_net *dev = netdev_priv(net);
-> > +       u32 rgmii_id = 0;
-> 
-> This variable is not modified anywhere in this function. Remove this
-> variable if not needed.
-
-Thank you. I'll update it.
-
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
