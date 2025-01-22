@@ -1,204 +1,140 @@
-Return-Path: <netdev+bounces-160217-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160218-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8B98A18DEA
-	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 09:57:16 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 40D9FA18DEC
+	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 09:57:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2DB9F7A46E9
-	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 08:57:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E22A9188BC93
+	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 08:58:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3A5B2045BC;
-	Wed, 22 Jan 2025 08:57:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 058711F76C7;
+	Wed, 22 Jan 2025 08:57:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="DDZNb+X2"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B/trVRql"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 445074EB38;
-	Wed, 22 Jan 2025 08:57:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 537E74EB38;
+	Wed, 22 Jan 2025 08:57:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737536228; cv=none; b=otkSbFCgk0aQ+7dnL9n7cEQ/HAUJyvk8cNe62x3RVDKsDdT8BnT3Ylwh+5ZoDXJ4PFjXf1kirOsUNQDHPFhrZTMuYF8EHvvBqmcbvZByropCO5LndyAWrWAsNDZZ5ARmOrK47xOdsQNPBaR3APAcQM5L+JGoTvrtSX5shYIdCis=
+	t=1737536274; cv=none; b=Lrf6ZDrTyVjaBR3RsIULOMC6uMGiRa4BGVZ3CBbcbNqd17pQAvOO6Idtclzx7BXQLp0HcHSGfL6+e91urwTqt2A5JdJQPt956rPiSq4LPvXDbTSJ3KKmrO3O55GS6efoTKS0I8R22Ws7naogsLp7oB7kzlGCfajhzRPbgeIUTtU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737536228; c=relaxed/simple;
-	bh=QqQKAQ4m9vg5LzmB4wGF9hk+s+EOBPJzuuumOPxQ4aw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=LTYqsSH7qo6qMIzDBP1th71c5dKA4IeKNPnEgS8w3nVLAS+8qTTwzroCaoiPQpcH2eBOLt29yU8stp95JKI8Y57JcLVfwRuEcjWC3e+j1XUHuMhqYtHCF+ILUVrZ5edsX0NpsEvyXqZNyVbqdt0GEnMGzHgorIWwSiwUlw3g8ro=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=DDZNb+X2; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50M1hAiw018045;
-	Wed, 22 Jan 2025 08:56:42 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	mmZuSHMdrepy4/YndlIJfpy2ZoZmjaeihcJX2mJ7HM4=; b=DDZNb+X20t0XiECr
-	CE0mGwulmB1T8X2jZuDXbtIcpe5h8pvuy8dPISEOo6Gv55GHGMJCduE2YJSPWrzE
-	IH/Iu71hA87YUu65kNxR9NIyhbhF0lHTdLOoWeVKSoRNCK0UgNUGJedib8VR2O4c
-	WBilhWie2mqv2FOcjQVhvC7Ft8QH8ilfQ8uX2RM/zTgesttIwosWSaoNfbewIW8E
-	yvAMakIlFA5g+7bx93xiN+FLxxacUlLQLdyoHbpfx8XWSG/fWc3Z4yrs4bkwI7Fb
-	oEvo9cizskj8MHX7/qa/XoiU5198aCtzHRgL9bdqQvx3Li97cuRRm2PjWWgzrqEz
-	YPAD7Q==
-Received: from nalasppmta04.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 44aq8grwht-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 22 Jan 2025 08:56:42 +0000 (GMT)
-Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
-	by NALASPPMTA04.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 50M8ufDi002822
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 22 Jan 2025 08:56:41 GMT
-Received: from [10.253.35.93] (10.80.80.8) by nalasex01c.na.qualcomm.com
- (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Wed, 22 Jan
- 2025 00:56:25 -0800
-Message-ID: <48ce7924-bbb7-4a0f-9f56-681c8b2a21bd@quicinc.com>
-Date: Wed, 22 Jan 2025 16:56:19 +0800
+	s=arc-20240116; t=1737536274; c=relaxed/simple;
+	bh=sU298wtMU+gMgPfWkGzp++POQ1xOAgiZrBAXE8FB4LM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=FLPGsxf9Hr0VdE+4jPjNo1rjA5NRSPqpiHv8D7v3AJIBOvr749DCkz9/Z7p9seR/32gFs0/rBUWGOSwlkPMd0WxRAgNaEbSW8V6Vdae82Y3oBPmpQ4zPSuzDOs+gdlR8+lkEsPW3U4b31g1mO1LbGNFZ5QT+DrMSfhsYuiF9ESo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=B/trVRql; arc=none smtp.client-ip=209.85.216.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-2ef6ee55225so1363133a91.0;
+        Wed, 22 Jan 2025 00:57:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1737536272; x=1738141072; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=o+4rWF4CG+aBfHBC/5V8BT3aj9TO/uoTwJ8l9BOGJeM=;
+        b=B/trVRqlu3PV7QW8hT8F/szFSxqr2m7tnclTsgwxpB4823EAEKaXFpek/FXWriJ9JV
+         XuNtG+AE1MULW4aUBT5zFJ91hl0lm/xv6VOfT4gyEKwHrbArbj6/x4uqDrLmPyFjcS5R
+         GkTr2Ia4go+TlBy9dtmwHRZm3W4G9eAIPnqmZEeSOV5Ee2Y4WMXsopePAkgzaymIXcLH
+         QVBwOAFbHVrMGUxRP4FcNCR512ZDiV2hRPnTr/Rnhh5DraubbIMpwH/oUGc5ssbMdZvE
+         dcD82nrMfWT4unAfxDIJLU9tjOTAYMyk/knIt/NLy2Pa2GgOFcANp1rQixrQnkd/fACY
+         4dpQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737536272; x=1738141072;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=o+4rWF4CG+aBfHBC/5V8BT3aj9TO/uoTwJ8l9BOGJeM=;
+        b=YtawMkn5/CipssGTr3k5r3B/6rpWjBREQRwsjaI0qhBM9xQK15rw1Qey4+2OJ+jVZB
+         L3sG/DriHKnJMHsX85ahrRBLDwyLo1iy1npr0t8YiVDQBylET+zxx0nMyDlu94i5fcID
+         2pCHaoPSXHr0GODCp4oKum39qlKWHMDPwXsy/N6tca19efNTBvYdNKKFUpRnRB6xgP1H
+         Zq/vzyGe1JwmDXT9CcAKSH8KtUSFvUpg8mPicMwJHw1LCLneuPKJDijpFB8rgfZVIIxU
+         Oxa6T7kxkga8+ZCYhEetsDF4SdzoIXqmu2r9WAoU17A2bTTA/04CvIb8AWmcCsRZd7XQ
+         CeLQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVcbTalkk8kOWUwaFRrg+ZL9ZNLcILHW/TR7eMgauRNH6XVAHR76dQcxyKlH0HurSlrkO81OwAO3aHbIAgYjfk=@vger.kernel.org, AJvYcCWDQbo8D71w/oC+ysEsgkZGULATRx8so9yxi/hgUkEyrqEBVtau9jljDPXclkCzjm71iS0Kp+c=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyhZ9x1bqSrImzcDW/+L7UbOEgFQ92V1Fncbr3lEI5NS8/7cQjV
+	uhx9PdtINmzWOza/yMmFRauyzHI6vv43a62ujTEXIzkrg89zFu+BdT0HIt/50yrFggmVV84cF73
+	PAe810PPNC/9DzoRjPjHDqgXkzNI=
+X-Gm-Gg: ASbGncu+sgQLhKoj9OrT3nNM/9akHWfWtdJBhlfIKH+HNRIbsgg5qcFo6gNpcKKt9qw
+	DznrWWBg3COrcRCqWPInXBnp2Ct5OIhjGVmXpb7Huo6vQ7nzGY+o=
+X-Google-Smtp-Source: AGHT+IET9r8JSmss5wncs58ue1ECkJgLujCKETsp3piHO3mpOMSewKO+YqHU7WDcXQ4s/4pzCBVFG86fXm1njs0O9E8=
+X-Received: by 2002:a17:90b:5387:b0:2ee:f59a:94d3 with SMTP id
+ 98e67ed59e1d1-2f7e3e0fcf1mr1749187a91.0.1737536272516; Wed, 22 Jan 2025
+ 00:57:52 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 2/4] net: stmmac: dwmac-qcom-ethqos: Mask PHY mode if
- configured with rgmii-id
-To: Krzysztof Kozlowski <krzk@kernel.org>,
-        Andrew Lunn
-	<andrew+netdev@lunn.ch>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni
-	<pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
-        Krzysztof Kozlowski
-	<krzk+dt@kernel.org>,
-        Conor Dooley <conor+dt@kernel.org>, Vinod Koul
-	<vkoul@kernel.org>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre
- Torgue <alexandre.torgue@foss.st.com>,
-        Bjorn Andersson
-	<andersson@kernel.org>,
-        Konrad Dybcio <konradybcio@kernel.org>,
-        Richard
- Cochran <richardcochran@gmail.com>
-CC: <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linux-arm-msm@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>
-References: <20250121-dts_qcs615-v3-0-fa4496950d8a@quicinc.com>
- <20250121-dts_qcs615-v3-2-fa4496950d8a@quicinc.com>
- <30450f09-83d4-4ff0-96b2-9f251f0c0896@kernel.org>
-Content-Language: en-US
-From: Yijie Yang <quic_yijiyang@quicinc.com>
-In-Reply-To: <30450f09-83d4-4ff0-96b2-9f251f0c0896@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nalasex01c.na.qualcomm.com (10.47.97.35)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: 0BYb4wTjg5Clrf8iEUS_7OaSW_qmyZo6
-X-Proofpoint-ORIG-GUID: 0BYb4wTjg5Clrf8iEUS_7OaSW_qmyZo6
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-01-22_03,2025-01-22_02,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 priorityscore=1501
- mlxlogscore=999 spamscore=0 suspectscore=0 clxscore=1015 phishscore=0
- impostorscore=0 malwarescore=0 adultscore=0 lowpriorityscore=0 bulkscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2411120000
- definitions=main-2501220064
+References: <20250116044100.80679-1-fujita.tomonori@gmail.com>
+ <20250116044100.80679-3-fujita.tomonori@gmail.com> <CANiq72=kuZcLCgsSkKa6MrYCJY9UsWSV9VLvj2TcVOQEf0Cnmg@mail.gmail.com>
+ <20250122.163728.1738626154854951916.fujita.tomonori@gmail.com>
+In-Reply-To: <20250122.163728.1738626154854951916.fujita.tomonori@gmail.com>
+From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Date: Wed, 22 Jan 2025 09:57:40 +0100
+X-Gm-Features: AbW1kva7CLhxOl4_GYMA5C5vdZCSXsUOyMdUnIwhKy-TXUNa6kTCcW4ZlzmNa0A
+Message-ID: <CANiq72nL8JYDZx8xZoUzh9KdYWCeMZ28GWAoTOSUqRN2WT8Ovw@mail.gmail.com>
+Subject: Re: [PATCH v8 2/7] rust: time: Introduce Delta type
+To: FUJITA Tomonori <fujita.tomonori@gmail.com>
+Cc: linux-kernel@vger.kernel.org, andrew@lunn.ch, 
+	rust-for-linux@vger.kernel.org, netdev@vger.kernel.org, hkallweit1@gmail.com, 
+	tmgross@umich.edu, ojeda@kernel.org, alex.gaynor@gmail.com, gary@garyguo.net, 
+	bjorn3_gh@protonmail.com, benno.lossin@proton.me, a.hindborg@samsung.com, 
+	aliceryhl@google.com, anna-maria@linutronix.de, frederic@kernel.org, 
+	tglx@linutronix.de, arnd@arndb.de, jstultz@google.com, sboyd@kernel.org, 
+	mingo@redhat.com, peterz@infradead.org, juri.lelli@redhat.com, 
+	vincent.guittot@linaro.org, dietmar.eggemann@arm.com, rostedt@goodmis.org, 
+	bsegall@google.com, mgorman@suse.de, vschneid@redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Wed, Jan 22, 2025 at 8:37=E2=80=AFAM FUJITA Tomonori
+<fujita.tomonori@gmail.com> wrote:
+>
+> Yes, please create such. I'll add more docs but I'm sure that there
+> will be room for improvement.
 
+Sounds good, will do!
 
-On 2025-01-21 20:47, Krzysztof Kozlowski wrote:
-> On 21/01/2025 08:54, Yijie Yang wrote:
->> The Qualcomm board always chooses the MAC to provide the delay instead of
->> the PHY, which is completely opposite to the suggestion of the Linux
->> kernel.
-> 
-> 
-> How does the Linux kernel suggest it?
-> 
->> The usage of phy-mode in legacy DTS was also incorrect. Change the
->> phy_mode passed from the DTS to the driver from PHY_INTERFACE_MODE_RGMII_ID
->> to PHY_INTERFACE_MODE_RGMII to ensure correct operation and adherence to
->> the definition.
->> To address the ABI compatibility issue between the kernel and DTS caused by
->> this change, handle the compatible string 'qcom,qcs404-evb-4000' in the
->> code, as it is the only legacy board that mistakenly uses the 'rgmii'
->> phy-mode.
->>
->> Signed-off-by: Yijie Yang <quic_yijiyang@quicinc.com>
->> ---
->>   .../net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c    | 18 +++++++++++++-----
->>   1 file changed, 13 insertions(+), 5 deletions(-)
->>
->> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
->> index 2a5b38723635b5ef9233ca4709e99dd5ddf06b77..e228a62723e221d58d8c4f104109e0dcf682d06d 100644
->> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
->> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
->> @@ -401,14 +401,11 @@ static int ethqos_dll_configure(struct qcom_ethqos *ethqos)
->>   static int ethqos_rgmii_macro_init(struct qcom_ethqos *ethqos)
->>   {
->>   	struct device *dev = &ethqos->pdev->dev;
->> -	int phase_shift;
->> +	int phase_shift = 0;
->>   	int loopback;
->>   
->>   	/* Determine if the PHY adds a 2 ns TX delay or the MAC handles it */
->> -	if (ethqos->phy_mode == PHY_INTERFACE_MODE_RGMII_ID ||
->> -	    ethqos->phy_mode == PHY_INTERFACE_MODE_RGMII_TXID)
->> -		phase_shift = 0;
->> -	else
->> +	if (ethqos->phy_mode == PHY_INTERFACE_MODE_RGMII_ID)
->>   		phase_shift = RGMII_CONFIG2_TX_CLK_PHASE_SHIFT_EN;
->>   
->>   	/* Disable loopback mode */
->> @@ -810,6 +807,17 @@ static int qcom_ethqos_probe(struct platform_device *pdev)
->>   	ret = of_get_phy_mode(np, &ethqos->phy_mode);
->>   	if (ret)
->>   		return dev_err_probe(dev, ret, "Failed to get phy mode\n");
->> +
->> +	root = of_find_node_by_path("/");
->> +	if (root && of_device_is_compatible(root, "qcom,qcs404-evb-4000"))
-> 
-> 
-> First, just check if machine is compatible, don't open code it.
-> 
-> Second, drivers should really, really not rely on the machine. I don't
-> think how this resolves ABI break for other users at all.
+> You want to add the above explanation to all the
+> Delta::from_[millis|micro|secs], right?
 
-As detailed in the commit description, some boards mistakenly use the 
-'rgmii' phy-mode, and the MAC driver has also incorrectly parsed and 
-added the delay for it. This code aims to prevent breaking these boards 
-while correcting the erroneous parsing. This issue is similar to the one 
-discussed in another thread:
-https://lore.kernel.org/all/20241225-support_10m100m-v1-2-4b52ef48b488@quicinc.com/
+Yeah, I meant to add the saturating note to each of them.
 
-> 
-> You need to check what the ABI is here and do not break it.
+> Is there any existing source code I can refer to? I'm not sure
+> how "module-level docs" should be written.
 
-If board compatible string matching is not recommended, can I address 
-this historical issue by adding the rx-internal-delay-ps and 
-tx-internal-delay-ps properties, as Andrew suggested in the thread 
-mentioned above? Boards without this property are considered legacy 
-boards and will follow the legacy routine, while others will apply the 
-new routine. Similar examples include ksz_parse_rgmii_delay and 
-sja1105_parse_rgmii_delays.
+You can see e.g.
 
-> 
-> 
-> Best regards,
-> Krzysztof
+    rust/kernel/block/mq.rs
+    rust/kernel/init.rs
+    rust/kernel/workqueue.rs
 
--- 
-Best Regards,
-Yijie
+(grep `^//!` for others).
 
+In general, you can use the module-level docs to talk about how things
+relate between items of that module. For instance, when I saw in your
+commit message this note:
+
+    Implement the subtraction operator for Instant:
+
+    Delta =3D Instant A - Instant B
+
+I thought something like: "It would be nice to explain how `Delta` and
+`Instant` fit together / how they are related / how all fits together
+in the `time` module".
+
+> I'll try to improve.
+
+Thanks a lot! (really -- I personally appreciate good docs)
+
+Cheers,
+Miguel
 
