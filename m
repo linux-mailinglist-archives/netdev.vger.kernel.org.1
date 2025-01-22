@@ -1,154 +1,115 @@
-Return-Path: <netdev+bounces-160204-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160205-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 63A0DA18D17
-	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 08:51:48 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 074AFA18D20
+	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 08:53:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4EAEA3A45DD
-	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 07:51:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D827C188B07B
+	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 07:53:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F77C1C1F27;
-	Wed, 22 Jan 2025 07:51:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63A171C3029;
+	Wed, 22 Jan 2025 07:53:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OcHKa0ET"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PUTSDdnj"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09DD828EC;
-	Wed, 22 Jan 2025 07:51:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6B8D1A8F98
+	for <netdev@vger.kernel.org>; Wed, 22 Jan 2025 07:53:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737532303; cv=none; b=Hb0kUGyP8TwVgbVo2Jx4W6ccuBIA9Q55O7wBCKuIil+O0LvsBN5GERtWqjfmZdfbqoVkoFK/wJpQSw38rZqSO2xvyzSVN69+z3MrQ9GnGLoRKwkothy/ncQrTFz7LPqWpBjlJck87M/L4pcfMFqD6Zu4QqKWohWTjQ+xQeKWFK4=
+	t=1737532410; cv=none; b=R4rVOUDu45eZGaxQqcBFmSt1EjhwNaCUsPDwexpGWbWhDL90HhqgGPC7VrfdYvuyejrYiitECSbmEs9lj2jqj+TJQDcra9WVqdeIxr84p5i2U+Nln4Zaq9ce3SNs9lcUrHDUy7Q22jhrG4OpDCd/7wGbuylViAuAi6fJdaQHg3w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737532303; c=relaxed/simple;
-	bh=msNhgHEYXHG3C130zRedQp0KghXab41wBWaPBjnjDiA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=d5pctgH1SASXGm6Fv5NXX2gOOtWUx/e8fFT23qwSAsrzBBMd/c5k5n/0dXlJHhg6WKQF+pcdB0Cq6nXzGfXfGuHyfZ+l/MAxNIMsnKay5a4//oZeZFT68Xv7P0SpmeSSM2f7ES+zMTMetmb+3aEvwP6KlviEes6yso+42EKIHro=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OcHKa0ET; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 011E4C4CED6;
-	Wed, 22 Jan 2025 07:51:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737532302;
-	bh=msNhgHEYXHG3C130zRedQp0KghXab41wBWaPBjnjDiA=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=OcHKa0ETgCGkBiVXh/ew2CBSZ99NvZ+uQdhJ8DMLYKfBvzvEZepe2h7xvvdMSfhmX
-	 9rwz3hSzhhRQRIhlYetOiiLol4uTtJHw0KZi0caUOTMkgzsVGkiYu+63DwtdUi+S4F
-	 Ao18BpYEpYV7V/RIRUVRioefdSufwF4MM2NW+IoXoeuXRBVvb943wXvTEZRUIYop9w
-	 vbyRGUNCsGNcNQh0it/CpQ0OG+km+Pb+ipu+lt4U7B0pjZE7UAbUWDUT/8cNQnC3ol
-	 Q9s0M5jbx6nQd0XRm8bKDkl5g5txdIQ/jE+Xf3sjQwbjW+6eNPTrhpJQkdi5rUE2Aw
-	 0TuLx/coAVXVQ==
-Message-ID: <4959c2c0-564a-4e3c-9650-228dede9a1f9@kernel.org>
-Date: Wed, 22 Jan 2025 08:51:29 +0100
+	s=arc-20240116; t=1737532410; c=relaxed/simple;
+	bh=NWi/X4EepEORBpF1EdWBM8ejrh0TAtd7EwBf34ua8eY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=q2MEdph/TGZCdEGPhwjdpfWLNqmlzMt89yr1+Kt7lbb6f+CEkCS+nkEZcg8ssUxuYRUYAD9+iUAz0cc3hO5kjef1dtkq3FsqsPzLBV3kV+B/PYvzHn7/gek3kCc7+JrbehRincyriZbmu8AktAtP3s2+IG51jI738DbZ5yLvZ+M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PUTSDdnj; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1737532407;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=NWi/X4EepEORBpF1EdWBM8ejrh0TAtd7EwBf34ua8eY=;
+	b=PUTSDdnjkloKXgA18+GXtyUBrm66W2ME4ediBGNjs3Zm4DPUNKSweh0pyuQsNK51TUcFdK
+	UKszEkidVhjBjHAoLjeLU1PEPZhu/Pw3rrEBEaQi3TiGfxHGbtgTEXviW+gsFJe/nAe5Xo
+	7CbhZjtWlNoKg0zpvpyrRXSfPOssQQg=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-636-UPxFfgc_P6G716LZ6lXO1g-1; Wed, 22 Jan 2025 02:53:25 -0500
+X-MC-Unique: UPxFfgc_P6G716LZ6lXO1g-1
+X-Mimecast-MFC-AGG-ID: UPxFfgc_P6G716LZ6lXO1g
+Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-ab341e14e27so760419566b.3
+        for <netdev@vger.kernel.org>; Tue, 21 Jan 2025 23:53:25 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737532404; x=1738137204;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=NWi/X4EepEORBpF1EdWBM8ejrh0TAtd7EwBf34ua8eY=;
+        b=lDD4k0C4HnfzJpjfKUMaR+h4yZhiwkGOJB13YB3ns56XRa9mBzyehEZnXhW+fZ+vVW
+         qx4feqsGtD0truK5pA1KXbdBSgKymAPlFsme2q2yybVwMR8c0de+R+Y1fjR9OeW8/kGj
+         6m6E5+OlsUXkKF/oayZ2kcDrkCNmpoLFQ/gE/q55ug+59KgCnkqHx2wDZ5rSZTOtpPVh
+         6fmV2CEFgs1V2/WjGhFr6B3/JFnxfVht/cek3si7vCa8yj5qtFLMLJP2hHECMpC5zFc4
+         Xq3RqschkImCSKatkV854F56kHy+efCMuRLTJM9RYgZixUNZ7/LzhfLnqgRPnxL+17yA
+         HEAA==
+X-Forwarded-Encrypted: i=1; AJvYcCVNbCO7Kyp01xyddgXQwrnNpfoPCLROK9ko2FhEOdbfHvpQPRoE3WgmjzUDRjVQA478X6mAqm0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzmBJl7DFBRPeM0DPEHeyCDiwoGtT+JjxS/gDzRQ4BfXMNv+mek
+	6jFk6OA5j/zaVZw1r72Ql8ji6oOtITe8adRzsbt00Awp2366jCerdLVwb3YedVqem//oHqrSbJc
+	D0WfpodPcb9SC1PtZcedV/P8loOrWIc8g7KDXa71i+mHq7MdHW7OihvXvH2HX3oFk9h530n6L+m
+	Q3c23eMy3ITnrg3DiJi1LgHQ/CbRIS
+X-Gm-Gg: ASbGncsZ+WxTSnt+5HlIGZ2I7TbYYQRbsMqextbt6Y1USjJQKxrl1MdO/Oaxbyv95uT
+	r1MN5PE887KFQDMOrNPs3F2K10plVF8SgVK/MRXKXe7KWynI4JpGm
+X-Received: by 2002:a17:907:3f23:b0:ab3:f88:b54e with SMTP id a640c23a62f3a-ab38b2e71e0mr1780354966b.31.1737532404273;
+        Tue, 21 Jan 2025 23:53:24 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGSBrnnYOS19m7TjOcd8x/cUksXSdlCsHJSmkD+58MAUdLUpHDe1Ee9rZmzT4ECq7IA1QGLbTFKXzGcQJZeEsE=
+X-Received: by 2002:a17:907:3f23:b0:ab3:f88:b54e with SMTP id
+ a640c23a62f3a-ab38b2e71e0mr1780353566b.31.1737532403990; Tue, 21 Jan 2025
+ 23:53:23 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 00/21] hwmon: Fix the type of 'config' in struct
- hwmon_channel_info to u64
-To: "lihuisong (C)" <lihuisong@huawei.com>, linux-hwmon@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, linux-media@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, arm-scmi@vger.kernel.org,
- netdev@vger.kernel.org, linux-rtc@vger.kernel.org, oss-drivers@corigine.com,
- linux-rdma@vger.kernel.org, platform-driver-x86@vger.kernel.org,
- linuxarm@huawei.com, linux@roeck-us.net, jdelvare@suse.com,
- kernel@maidavale.org, pauk.denis@gmail.com, james@equiv.tech,
- sudeep.holla@arm.com, cristian.marussi@arm.com, matt@ranostay.sg,
- mchehab@kernel.org, irusskikh@marvell.com, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, saeedm@nvidia.com, leon@kernel.org, tariqt@nvidia.com,
- louis.peens@corigine.com, hkallweit1@gmail.com, linux@armlinux.org.uk,
- kabel@kernel.org, W_Armin@gmx.de, hdegoede@redhat.com,
- ilpo.jarvinen@linux.intel.com, alexandre.belloni@bootlin.com,
- jonathan.cameron@huawei.com, zhanjie9@hisilicon.com,
- zhenglifeng1@huawei.com, liuyonglong@huawei.com
-References: <20250121064519.18974-1-lihuisong@huawei.com>
- <870c6b3e-d4f9-4722-934e-00e9ddb84e2e@kernel.org>
- <d42bf49b-e71b-d31e-2784-379076ebf370@huawei.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 fv0=
-In-Reply-To: <d42bf49b-e71b-d31e-2784-379076ebf370@huawei.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20241210164456.925060-1-lulu@redhat.com> <20241210164456.925060-8-lulu@redhat.com>
+ <20250108071107-mutt-send-email-mst@kernel.org> <CACLfguUffb-kTZgUoBnJAJxhpxh-xq8xBM-Hv5CZeWzDoha6tA@mail.gmail.com>
+ <CACGkMEsDjFgyFFxz9Gdi2dFbk+JHP6cr7e1xGnLYuPBce-aLHw@mail.gmail.com>
+ <CACLfguVoJP-yruzy-6UVb2SBD_hv-4aF-kBU0oLAooi8X56E7Q@mail.gmail.com> <20250122021720-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20250122021720-mutt-send-email-mst@kernel.org>
+From: Cindy Lu <lulu@redhat.com>
+Date: Wed, 22 Jan 2025 15:52:44 +0800
+X-Gm-Features: AbW1kvacW-HF7AuwY6uOBpM1Y_iEZw5oTKBTTe0PcrH7DGqKdHy2_T74XYD0FOA
+Message-ID: <CACLfguXoPMfvvio92Yq696bdm9nQKXDeBqbh4DDNXDjkK8hhbA@mail.gmail.com>
+Subject: Re: [PATCH v4 7/8] vhost: Add new UAPI to support change to task mode
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>, michael.christie@oracle.com, sgarzare@redhat.com, 
+	linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 21/01/2025 09:14, lihuisong (C) wrote:
-> 
-> 在 2025/1/21 15:47, Krzysztof Kozlowski 写道:
->> On 21/01/2025 07:44, Huisong Li wrote:
->>> The hwmon_device_register() is deprecated. When I try to repace it with
->>> hwmon_device_register_with_info() for acpi_power_meter driver, I found that
->>> the power channel attribute in linux/hwmon.h have to extend and is more
->>> than 32 after this replacement.
->>>
->>> However, the maximum number of hwmon channel attributes is 32 which is
->>> limited by current hwmon codes. This is not good to add new channel
->>> attribute for some hwmon sensor type and support more channel attribute.
->>>
->>> This series are aimed to do this. And also make sure that acpi_power_meter
->>> driver can successfully replace the deprecated hwmon_device_register()
->>> later.
->> Avoid combining independent patches into one patch bomb. Or explain the
->> dependencies and how is it supposed to be merged - that's why you have
->> cover letter here.
-> These patches having a title ('Use HWMON_CHANNEL_INFO macro to simplify 
-> code') are also for this series.
-> Or we need to modify the type of the 'xxx_config' array in these patches.
-> If we directly use the macro HWMON_CHANNEL_INFO, the type of 'config' 
-> has been modifyed in patch 1/21 and these driver don't need to care this 
-> change.
+On Wed, Jan 22, 2025 at 3:18=E2=80=AFPM Michael S. Tsirkin <mst@redhat.com>=
+ wrote:
+>
+> On Wed, Jan 22, 2025 at 10:07:19AM +0800, Cindy Lu wrote:
+> > Ping for review, Hi MST and Jason, do you have any comments on this?
+> > Thanks
+> > Cindy
+>
+>
+> I see there are unaddressed comments by Jason and Stefano.
+>
+sure, thanks, Mst. I will submit a new version.
+Thanks
+Cindy
 
-None of above addresses my concern. I am dropping the series from my
-inbox/to-review box.
-
-Best regards,
-Krzysztof
 
