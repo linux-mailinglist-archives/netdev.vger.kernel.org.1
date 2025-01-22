@@ -1,150 +1,154 @@
-Return-Path: <netdev+bounces-160203-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160204-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4157DA18CF8
-	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 08:45:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 63A0DA18D17
+	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 08:51:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2C4A53AB420
-	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 07:45:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4EAEA3A45DD
+	for <lists+netdev@lfdr.de>; Wed, 22 Jan 2025 07:51:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 876831B422D;
-	Wed, 22 Jan 2025 07:45:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F77C1C1F27;
+	Wed, 22 Jan 2025 07:51:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OcHKa0ET"
 X-Original-To: netdev@vger.kernel.org
-Received: from baidu.com (mx24.baidu.com [111.206.215.185])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05DF818FDAF;
-	Wed, 22 Jan 2025 07:45:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=111.206.215.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09DD828EC;
+	Wed, 22 Jan 2025 07:51:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737531925; cv=none; b=aKjbVoBc159VVp5vDAi7zmdmBKx3qF67GoCL6Kero9Y/Ix3Q0h5P5RZgBW/tlo4fBdpGbmekU21O9LjpRteU14EzAs2/bDtYtL0IWPLv5j4mgzvwf/wScgEJ8T1pefjuY4zd5rdkiJQJXlYP7kilHo1cBEIufN7k1Iu3ozRb26Y=
+	t=1737532303; cv=none; b=Hb0kUGyP8TwVgbVo2Jx4W6ccuBIA9Q55O7wBCKuIil+O0LvsBN5GERtWqjfmZdfbqoVkoFK/wJpQSw38rZqSO2xvyzSVN69+z3MrQ9GnGLoRKwkothy/ncQrTFz7LPqWpBjlJck87M/L4pcfMFqD6Zu4QqKWohWTjQ+xQeKWFK4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737531925; c=relaxed/simple;
-	bh=VNCnzTdmmw4fXHJMK+k19ytLDpp5wOuP1R974fbLLZs=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=KDwhYpYeu15hpV4Zv62/GCRchBTYn3ia9YoLUaAsmo/6Ibq/HN4ILNb8WUEQfJRjpBebCh6gCLUVIdqbX8KymVuHlpfdXekztlNFGImt/M5wBz8mqe+lUa/BQkfnYiiPZ4gb1DnmCyQjxA4TrWdU69Ho2zeBTBzYSei8xnnXHz4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=baidu.com; spf=pass smtp.mailfrom=baidu.com; arc=none smtp.client-ip=111.206.215.185
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=baidu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baidu.com
-From: lirongqing <lirongqing@baidu.com>
-To: <pablo@netfilter.org>, <kadlec@netfilter.org>, <davem@davemloft.net>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<horms@kernel.org>, <netfilter-devel@vger.kernel.org>,
-	<coreteam@netfilter.org>, <netdev@vger.kernel.org>
-CC: Li RongQing <lirongqing@baidu.com>
-Subject: [PATCH] net/netfilter: use kvfree_rcu to simplify the code
-Date: Wed, 22 Jan 2025 15:44:50 +0800
-Message-ID: <20250122074450.3185-1-lirongqing@baidu.com>
-X-Mailer: git-send-email 2.17.1
+	s=arc-20240116; t=1737532303; c=relaxed/simple;
+	bh=msNhgHEYXHG3C130zRedQp0KghXab41wBWaPBjnjDiA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=d5pctgH1SASXGm6Fv5NXX2gOOtWUx/e8fFT23qwSAsrzBBMd/c5k5n/0dXlJHhg6WKQF+pcdB0Cq6nXzGfXfGuHyfZ+l/MAxNIMsnKay5a4//oZeZFT68Xv7P0SpmeSSM2f7ES+zMTMetmb+3aEvwP6KlviEes6yso+42EKIHro=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OcHKa0ET; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 011E4C4CED6;
+	Wed, 22 Jan 2025 07:51:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1737532302;
+	bh=msNhgHEYXHG3C130zRedQp0KghXab41wBWaPBjnjDiA=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=OcHKa0ETgCGkBiVXh/ew2CBSZ99NvZ+uQdhJ8DMLYKfBvzvEZepe2h7xvvdMSfhmX
+	 9rwz3hSzhhRQRIhlYetOiiLol4uTtJHw0KZi0caUOTMkgzsVGkiYu+63DwtdUi+S4F
+	 Ao18BpYEpYV7V/RIRUVRioefdSufwF4MM2NW+IoXoeuXRBVvb943wXvTEZRUIYop9w
+	 vbyRGUNCsGNcNQh0it/CpQ0OG+km+Pb+ipu+lt4U7B0pjZE7UAbUWDUT/8cNQnC3ol
+	 Q9s0M5jbx6nQd0XRm8bKDkl5g5txdIQ/jE+Xf3sjQwbjW+6eNPTrhpJQkdi5rUE2Aw
+	 0TuLx/coAVXVQ==
+Message-ID: <4959c2c0-564a-4e3c-9650-228dede9a1f9@kernel.org>
+Date: Wed, 22 Jan 2025 08:51:29 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-ClientProxiedBy: BC-Mail-Ex16.internal.baidu.com (172.31.51.56) To
- BJHW-Mail-Ex15.internal.baidu.com (10.127.64.38)
-X-Baidu-BdMsfe-DateCheck: 1_BJHW-Mail-Ex15_2025-01-22 15:44:57:892
-X-Baidu-BdMsfe-DateCheck: 1_BJHW-Mail-Ex15_2025-01-22 15:44:57:907
-X-FEAS-Client-IP: 10.127.64.38
-X-FE-Policy-ID: 52:10:53:SYSTEM
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1 00/21] hwmon: Fix the type of 'config' in struct
+ hwmon_channel_info to u64
+To: "lihuisong (C)" <lihuisong@huawei.com>, linux-hwmon@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, linux-media@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, arm-scmi@vger.kernel.org,
+ netdev@vger.kernel.org, linux-rtc@vger.kernel.org, oss-drivers@corigine.com,
+ linux-rdma@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+ linuxarm@huawei.com, linux@roeck-us.net, jdelvare@suse.com,
+ kernel@maidavale.org, pauk.denis@gmail.com, james@equiv.tech,
+ sudeep.holla@arm.com, cristian.marussi@arm.com, matt@ranostay.sg,
+ mchehab@kernel.org, irusskikh@marvell.com, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, saeedm@nvidia.com, leon@kernel.org, tariqt@nvidia.com,
+ louis.peens@corigine.com, hkallweit1@gmail.com, linux@armlinux.org.uk,
+ kabel@kernel.org, W_Armin@gmx.de, hdegoede@redhat.com,
+ ilpo.jarvinen@linux.intel.com, alexandre.belloni@bootlin.com,
+ jonathan.cameron@huawei.com, zhanjie9@hisilicon.com,
+ zhenglifeng1@huawei.com, liuyonglong@huawei.com
+References: <20250121064519.18974-1-lihuisong@huawei.com>
+ <870c6b3e-d4f9-4722-934e-00e9ddb84e2e@kernel.org>
+ <d42bf49b-e71b-d31e-2784-379076ebf370@huawei.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 fv0=
+In-Reply-To: <d42bf49b-e71b-d31e-2784-379076ebf370@huawei.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-From: Li RongQing <lirongqing@baidu.com>
+On 21/01/2025 09:14, lihuisong (C) wrote:
+> 
+> 在 2025/1/21 15:47, Krzysztof Kozlowski 写道:
+>> On 21/01/2025 07:44, Huisong Li wrote:
+>>> The hwmon_device_register() is deprecated. When I try to repace it with
+>>> hwmon_device_register_with_info() for acpi_power_meter driver, I found that
+>>> the power channel attribute in linux/hwmon.h have to extend and is more
+>>> than 32 after this replacement.
+>>>
+>>> However, the maximum number of hwmon channel attributes is 32 which is
+>>> limited by current hwmon codes. This is not good to add new channel
+>>> attribute for some hwmon sensor type and support more channel attribute.
+>>>
+>>> This series are aimed to do this. And also make sure that acpi_power_meter
+>>> driver can successfully replace the deprecated hwmon_device_register()
+>>> later.
+>> Avoid combining independent patches into one patch bomb. Or explain the
+>> dependencies and how is it supposed to be merged - that's why you have
+>> cover letter here.
+> These patches having a title ('Use HWMON_CHANNEL_INFO macro to simplify 
+> code') are also for this series.
+> Or we need to modify the type of the 'xxx_config' array in these patches.
+> If we directly use the macro HWMON_CHANNEL_INFO, the type of 'config' 
+> has been modifyed in patch 1/21 and these driver don't need to care this 
+> change.
 
-The callback function of call_rcu() just calls kvfree(), so we can
-use kvfree_rcu() instead of call_rcu() + callback function.
+None of above addresses my concern. I am dropping the series from my
+inbox/to-review box.
 
-and move struct rcu_head into struct nf_hook_entries, then struct
-nf_hook_entries_rcu_head can be removed
-
-Signed-off-by: Li RongQing <lirongqing@baidu.com>
----
- include/linux/netfilter.h | 13 +------------
- net/netfilter/core.c      | 21 ++-------------------
- 2 files changed, 3 insertions(+), 31 deletions(-)
-
-diff --git a/include/linux/netfilter.h b/include/linux/netfilter.h
-index 2b8aac2..c751b0a 100644
---- a/include/linux/netfilter.h
-+++ b/include/linux/netfilter.h
-@@ -111,28 +111,17 @@ struct nf_hook_entry {
- 	void				*priv;
- };
- 
--struct nf_hook_entries_rcu_head {
--	struct rcu_head head;
--	void	*allocation;
--};
--
- struct nf_hook_entries {
- 	u16				num_hook_entries;
-+	struct rcu_head rcu;
- 	/* padding */
- 	struct nf_hook_entry		hooks[];
- 
- 	/* trailer: pointers to original orig_ops of each hook,
--	 * followed by rcu_head and scratch space used for freeing
--	 * the structure via call_rcu.
- 	 *
- 	 *   This is not part of struct nf_hook_entry since its only
- 	 *   needed in slow path (hook register/unregister):
- 	 * const struct nf_hook_ops     *orig_ops[]
--	 *
--	 *   For the same reason, we store this at end -- its
--	 *   only needed when a hook is deleted, not during
--	 *   packet path processing:
--	 * struct nf_hook_entries_rcu_head     head
- 	 */
- };
- 
-diff --git a/net/netfilter/core.c b/net/netfilter/core.c
-index b9f551f0..8889f09 100644
---- a/net/netfilter/core.c
-+++ b/net/netfilter/core.c
-@@ -52,8 +52,7 @@ static struct nf_hook_entries *allocate_hook_entries_size(u16 num)
- 	struct nf_hook_entries *e;
- 	size_t alloc = sizeof(*e) +
- 		       sizeof(struct nf_hook_entry) * num +
--		       sizeof(struct nf_hook_ops *) * num +
--		       sizeof(struct nf_hook_entries_rcu_head);
-+		       sizeof(struct nf_hook_ops *) * num;
- 
- 	if (num == 0)
- 		return NULL;
-@@ -64,28 +63,12 @@ static struct nf_hook_entries *allocate_hook_entries_size(u16 num)
- 	return e;
- }
- 
--static void __nf_hook_entries_free(struct rcu_head *h)
--{
--	struct nf_hook_entries_rcu_head *head;
--
--	head = container_of(h, struct nf_hook_entries_rcu_head, head);
--	kvfree(head->allocation);
--}
--
- static void nf_hook_entries_free(struct nf_hook_entries *e)
- {
--	struct nf_hook_entries_rcu_head *head;
--	struct nf_hook_ops **ops;
--	unsigned int num;
--
- 	if (!e)
- 		return;
- 
--	num = e->num_hook_entries;
--	ops = nf_hook_entries_get_hook_ops(e);
--	head = (void *)&ops[num];
--	head->allocation = e;
--	call_rcu(&head->head, __nf_hook_entries_free);
-+	kvfree_rcu(e, rcu);
- }
- 
- static unsigned int accept_all(void *priv,
--- 
-2.9.4
-
+Best regards,
+Krzysztof
 
