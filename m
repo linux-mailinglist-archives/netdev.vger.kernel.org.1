@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-160472-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160473-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C0C8A19D80
-	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 05:10:57 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55E09A19D82
+	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 05:11:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1CEBD188E3C1
-	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 04:11:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EDB9616C3D9
+	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 04:11:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B2C814BF87;
-	Thu, 23 Jan 2025 04:10:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D634A155359;
+	Thu, 23 Jan 2025 04:10:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="E1k9rTBt"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gS807DZG"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1321114AD38;
-	Thu, 23 Jan 2025 04:10:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8BE83F9C5;
+	Thu, 23 Jan 2025 04:10:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737605410; cv=none; b=RxkR0Oy9QDkcoHDhb3ovIZ6b0JcJJmQmUDIOc8To4CXFZ8m9uD2K0NsIW72AV2FunCG45ws1X0x3gqSNPyWd/uWtshT/f9YoxhlvTt+5Ovwh/lOFsr1vr/BzxAAowIl/4h5/M1XiR5910dbTaw/y+vhTQX27NXyMkbMTwLZC8gg=
+	t=1737605411; cv=none; b=u2H72vezh1jpBWL7QKjmxo5bl8fysx2QeVLrwpNrURiZpgMEmZRDlXfDFfBQfX2+i8HfzxbtPelTiNIWkq3MaN4XRMI5K6nuFTNBnrHfqql+iTWAWqynNHOeN6aT33kcHAzk7LglRxURQ6vDrZil6HAXQi4H473HnypU2O++BDw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737605410; c=relaxed/simple;
-	bh=F4uaoYwYwrjBcLzgutLfmtO+iPm3lDh9xNSOYQCPzks=;
+	s=arc-20240116; t=1737605411; c=relaxed/simple;
+	bh=pxRLwulr+o4G1w5QMFLlft/rLgF2P9dNP1ofylPDWgk=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=pq67AB53qeUkufcPDYYkaGr1FNVTFLYYjuoDQJgKUjhPhjNJiQMDJcEg+QBODzcZE8UNvJ/XHGcFh70A/ArWx3sf2cfzusvH6xmbHOmmz4aGJupcH7vZBuH3UeIcaLfdI9oVC4X1PEhl7Dvz+Q+TR+k8aJ3al762moZoK3eyRyY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=E1k9rTBt; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E331DC4CEE6;
-	Thu, 23 Jan 2025 04:10:09 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=qVU3UTh3SwE6EMIEEBdPwBXWO4AXgmXakbyyTSaH/kz+2DVP5zB9IG4JTajct2Wzqr2/x6lVzJoN9hQBENXRaGUMWbI2HHyLatxRy+WY7+Oy7Yg2j2SRAAdtm1eFYpUoIoYNEJNgcSoinUbYECxHxzcI3Oi83WxspA99MgmoVFQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gS807DZG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2884EC4CEDD;
+	Thu, 23 Jan 2025 04:10:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737605409;
-	bh=F4uaoYwYwrjBcLzgutLfmtO+iPm3lDh9xNSOYQCPzks=;
+	s=k20201202; t=1737605411;
+	bh=pxRLwulr+o4G1w5QMFLlft/rLgF2P9dNP1ofylPDWgk=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=E1k9rTBtG/CanPK1q9Ogxv3Jz80y1ZUlFyo5zs6PKi2G0wj5jF8LKIXhrvAN7flJK
-	 qNZpGWnWh75aCVL1EOmmMey+dN0fTvEor5tTI4fSbOZqXzaKqcXqlwVM2dSbzk68lt
-	 ksIzDd8TLAh0iyJqWn4EpdL1y73wWqBiZjQ3mNU9WhhWL0klYLdeZKfWuhax5jbbK8
-	 jS7GFbVnBVDdxQSklhgpkheT4XdQ8cDyhWoZ4p5I40k5rb1E97XJYTAhw8RGnwW6hj
-	 SBw8w/1S77Hn4gw6q1CZHPEzQDKtlF9k5I6GWxOuFqs7CXFzjzKAzwZJ+63SlvdqQL
-	 54by5t3VMEx5A==
+	b=gS807DZGpAdKeUDEcI7PKv76ETH0tVTHOPFwZco9uWZ6X3VuPy/9qpL7pCWRaQCWG
+	 JjMMg75JuCHUvvpghuuzpY+gJpFal1E4YdozvsjHWM+SX/xt1w5v1ZO+UMvCA2dmMH
+	 lAWdEIFAuaISY6MuAmD3uC5QdlW+jbnWxzL1ewZkpoZzz6GRg0qD8ZWdEEibtz6xbQ
+	 8CQZq2PQ8b0RI0593ULBoFXunTuYd5ffE7tKwomoSSjX6YZaMjrxwI/gDIt5Nsh+Ol
+	 Gy6Z8XtQpJIFZy4ZyuRFkWo86fnF3mCG92kag38GjyoGnY/aaTxtKxszMnFXHWrmZL
+	 OCfYlDCIVEalA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADDFE380AA70;
-	Thu, 23 Jan 2025 04:10:35 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB090380AA70;
+	Thu, 23 Jan 2025 04:10:36 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,39 +52,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] net: hns3: fix oops when unload drivers paralleling
+Subject: Re: [PATCH] net/ncsi: wait for the last response to Deselect Package
+ before configuring channel
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <173760543424.917319.8797865456856201603.git-patchwork-notify@kernel.org>
-Date: Thu, 23 Jan 2025 04:10:34 +0000
-References: <20250118094741.3046663-1-shaojijie@huawei.com>
-In-Reply-To: <20250118094741.3046663-1-shaojijie@huawei.com>
-To: Jijie Shao <shaojijie@huawei.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
- shenjian15@huawei.com, wangpeiyang1@huawei.com, liuyonglong@huawei.com,
- chenhao418@huawei.com, jonathan.cameron@huawei.com,
- shameerali.kolothum.thodi@huawei.com, salil.mehta@huawei.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+ <173760543574.917319.5168244429411410501.git-patchwork-notify@kernel.org>
+Date: Thu, 23 Jan 2025 04:10:35 +0000
+References: <20250116152900.8656-1-fercerpav@gmail.com>
+In-Reply-To: <20250116152900.8656-1-fercerpav@gmail.com>
+To: Paul Fertser <fercerpav@gmail.com>
+Cc: potin.lai.pt@gmail.com, chou.cosmo@gmail.com, eajames@linux.ibm.com,
+ sam@mendozajonas.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, fr0st61te@gmail.com, stable@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Sat, 18 Jan 2025 17:47:41 +0800 you wrote:
-> From: Jian Shen <shenjian15@huawei.com>
-> 
-> When unload hclge driver, it tries to disable sriov first for each
-> ae_dev node from hnae3_ae_dev_list. If user unloads hns3 driver at
-> the time, because it removes all the ae_dev nodes, and it may cause
-> oops.
+On Thu, 16 Jan 2025 18:29:00 +0300 you wrote:
+> The NCSI state machine as it's currently implemented assumes that
+> transition to the next logical state is performed either explicitly by
+> calling `schedule_work(&ndp->work)` to re-queue itself or implicitly
+> after processing the predefined (ndp->pending_req_num) number of
+> replies. Thus to avoid the configuration FSM from advancing prematurely
+> and getting out of sync with the process it's essential to not skip
+> waiting for a reply.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] net: hns3: fix oops when unload drivers paralleling
-    https://git.kernel.org/netdev/net/c/92e599577377
+  - net/ncsi: wait for the last response to Deselect Package before configuring channel
+    https://git.kernel.org/netdev/net/c/6bb194d036c6
 
 You are awesome, thank you!
 -- 
