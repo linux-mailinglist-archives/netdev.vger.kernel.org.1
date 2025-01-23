@@ -1,128 +1,186 @@
-Return-Path: <netdev+bounces-160542-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160543-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A65A0A1A1EB
-	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 11:34:20 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B98E1A1A207
+	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 11:42:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 93224188D99C
-	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 10:34:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0E13C166B72
+	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 10:42:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19CE320C47D;
-	Thu, 23 Jan 2025 10:34:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 734F320DD41;
+	Thu, 23 Jan 2025 10:42:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Hj8MOap9"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="P7AVaTW/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DACD1C5F14;
-	Thu, 23 Jan 2025 10:34:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B27BC20CCF2
+	for <netdev@vger.kernel.org>; Thu, 23 Jan 2025 10:42:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737628456; cv=none; b=SYywaFWEPthZETvR6a6ILmhm5PXHtFSHbYVjlR7ti4U2EKblTLhvs3zPzzOOyfdWnPH9yltKp0q+YWcEge4/ZWx3Z3nbfQsnHSc5Tb9RQh2zbcXr3yxgNqFhpzQZsWaGtb4TIXNtoziJ08ReoHLc4KsCJpL2ZtDhnTVdi3d+ZXE=
+	t=1737628952; cv=none; b=MxSJtsi5QlIlyRSkMZE2pFBGeHWctb21KwaTZ+1KFqNncrzi2zIfrolOWML4iIq7SxHfn+kaCUwe20UV1JU6yBZBxc3efNy+JEaW38edrPhp76CG83zcCWYH1AWQXqG24FbJBx1iZfUaR1vfD2tzD2FtYNC72hNw0WMYeiwa+rs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737628456; c=relaxed/simple;
-	bh=gsyxcjrfPRlVRrzpZn06sndNy0fCEKZf+MF9IrWJVv4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=a2nf0gtT6VHIz5DG8pwkrcemMA8+c2BpPScj6i+Wec0bR6lEvahoAotchZtFHF19aFq+qD86wKyxZyIXmIzyDq5Dxfq6VBeGgJRSw/BJe2ccY9OtdzB94gLj1oIWxrdT7mSCrvtIXdPtYTLuC16ChTBo4LjzrYTDpzGJAt5Owpk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Hj8MOap9; arc=none smtp.client-ip=209.85.214.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-21680814d42so11179975ad.2;
-        Thu, 23 Jan 2025 02:34:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1737628454; x=1738233254; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=kta1kpUGyKQ79E+obX3jn+pQXvGIiJLwWQQsshofAyo=;
-        b=Hj8MOap9vOH1Qd67NyQEpwKOmF5na4fDUNNh0dUbX5bVS6uzMpJFj9ZOv8z1IxvR/v
-         +z5VEJekKSBnhWQOlzDV4FWLDfWaKI2Mc1Ev6R8FbfOpk2f7aWaCNZgGbNd1uZ+zQ+DI
-         DCQxrbyKll8QoBHMmeMoawvVqFt2o/geCPHhThfRKpskvKcJCgSuRPiEnII9AlI4Nbh9
-         oxkPJxRp03AIhfRa0LzpVIhNgeEQWcGZFodNIXwPN98GRnKqBwcknN1mmYv3bUPghDQp
-         s05K0/jJK4bKRd/P4R33DjwuUX8i2+N2aW0hAf3+seKeqPge3Zd/BojtmqH9SMM4iRkP
-         cU7w==
+	s=arc-20240116; t=1737628952; c=relaxed/simple;
+	bh=15iSjJE65OwBsEi1SIs5NbBHsemaoOfS2Y93BrkL/sA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=sUi8vFih1pkySeHZreIaHfPGV67RpA1qxOLQN+ykaFIhfN8ldV+kWjsFkIJsz4UU4r/x4OzKLANjGNdlNS95RZCIbmBSlhyFmzjpB3qsGfxvJqON8VOhAhJePVVM7uK0IIt2ceFlk1ttztlCPkVXqdlkKv6Nv1v9cnr+yHycBpk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=P7AVaTW/; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1737628949;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=kbj+rAmB07IPAxH1pYioM15q/vNMJdmd6bCtqTPsexc=;
+	b=P7AVaTW/gd/sIuD1KclGwTAghDgbGWV4bZGa//bvt5jA0/g2Qgz7vsCn78ZNYan8DX+7BZ
+	oQICRv5ss2SLf6mwOe+h7bmR5yXEpJgWanm1ZjNG6PBsgBNChu6PMOEy1f1PlMEf5+8mVJ
+	ZSRfM0ez1ObA8tdLS99G3yMHN5HIvvY=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-170-CQT5_3R8OMOykU6glJQSxg-1; Thu, 23 Jan 2025 05:42:28 -0500
+X-MC-Unique: CQT5_3R8OMOykU6glJQSxg-1
+X-Mimecast-MFC-AGG-ID: CQT5_3R8OMOykU6glJQSxg
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-385d52591d6so335607f8f.1
+        for <netdev@vger.kernel.org>; Thu, 23 Jan 2025 02:42:27 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737628454; x=1738233254;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kta1kpUGyKQ79E+obX3jn+pQXvGIiJLwWQQsshofAyo=;
-        b=McmotIzYre9G1NMKND99iGv7J/AAXNJMdY5zq4lwb3nrySnq265lyZhB6KqUNSg86r
-         CGp/A2pHnQ0tvmePffEntDRoc14a7C04Js3JkchpKBR9Hkl6i+qFK4ko3NKvbgK2twOv
-         wDrDgHBFvfAVDAX5+ujsKWy2kyMsYtT3MUB3LNFAMIqgJuKxZI1eQbq/ppXYt2COyASy
-         hq99H/GdOSiXjQRTzPpRu9/uRHeh7xn63AbdMa09D1iy70B68WK3F2wQpJaP/2dQGv+D
-         Hiho5LuSSUqqwcf9bG0Db2FSvl+mphjrm6lXFeFMn4qQ0F0Fc7eZbwctvgV7WRryqg4d
-         Zjlw==
-X-Forwarded-Encrypted: i=1; AJvYcCUOzSOfl2ePsIac4jmGRu/9/flh15f9LF6r6SSKrCYfdLtHrVEzJrZsy/vwc03kjyhyUoqsYTuI@vger.kernel.org, AJvYcCWDwxP+vjKNhEUjpxqk0jN/x9jhVQkz7FZKF7YbqpC2Po6Sued+vUcyK7+G5EHcepyJtwGBZ4WXuva98t8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyIgVzRe7Za11/+lhQLThHf4SiVsicNJLwpIsq2P3Ren0symTzt
-	zwb8jMS/YJ9BPit2Rq620LL4UwzQxX/lp4P91T/cypiPfcYE9EbcOFlNmg==
-X-Gm-Gg: ASbGncuekiZwUwmKX4J3Up1FzTmwJOaV6mk+n1Vnq7G2dPpq130bKrVhxvXg7JucVgx
-	znBhS/0lJ7mIw3DwHs+AbKUMQX1MAW14rvmZUK13bDk42RHgMGGhhkmhLyDBbTmDxaFVxkb1j11
-	Z20lNAMQDyLtxF9ZOU2IFo4Oy/EvyXEzw8bKJmpW258peiSSX5jgC5Ipcf9FMj0yJUYn9jdwvbv
-	dfyt7wuHu8ae0+6hG2TfzccB6s1JZO78Yd5PgRNE62kJfM/SJPLrG2kbE8td4UpBvcH1pJtgFYp
-	Y27mYJRN
-X-Google-Smtp-Source: AGHT+IFQdN/5La2w5kfygfWxH2hklatSF3XsJgt3pGVejkBczyJ0ommryHlN7Qz3ElnZcfB2zwuP0A==
-X-Received: by 2002:a17:902:ebcd:b0:21c:7e22:7844 with SMTP id d9443c01a7336-21c7e22789fmr246273405ad.51.1737628453532;
-        Thu, 23 Jan 2025 02:34:13 -0800 (PST)
-Received: from HOME-PC ([223.185.135.17])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21c2d3e088bsm109217575ad.173.2025.01.23.02.34.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Jan 2025 02:34:13 -0800 (PST)
-Date: Thu, 23 Jan 2025 16:04:09 +0530
-From: Dheeraj Reddy Jonnalagadda <dheeraj.linuxdev@gmail.com>
-To: Wei Fang <wei.fang@nxp.com>
-Cc: Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>,
-	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"imx@lists.linux.dev" <imx@lists.linux.dev>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net] net: fec: remove unnecessary DMA mapping of TSO
- header
-Message-ID: <Z5IbIeOxrkMoASdJ@HOME-PC>
-References: <20250122104307.138659-1-dheeraj.linuxdev@gmail.com>
- <PAXPR04MB85106CE97288D52A04EB685388E02@PAXPR04MB8510.eurprd04.prod.outlook.com>
+        d=1e100.net; s=20230601; t=1737628947; x=1738233747;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=kbj+rAmB07IPAxH1pYioM15q/vNMJdmd6bCtqTPsexc=;
+        b=PwABEwQBWBz5QdkB8qXGb5r81/24WY3S8rx5/7AsV9276lncZNeX8MIjfWGZt2ASHs
+         925mVzlJsIeSQl2T3TWxz+bOTl87s3jsU2SDqAx98KU+qHmZflXU+HCaMN864p+8YESc
+         BKza1a6I1JauOXlZVmxRn5jND43uyLYRN0tHR/aVXiL0jdTk+X97RMkoYioAEDcyogOC
+         sCA4JoWxIRqSDIvL3f8o+bKvQd8WRJTldAbR2fk1TuKwF27rX7uuX039dvFk/NsLQl6T
+         t+hfJHNrKprDJl5aij0/+hLnXyPg27FnWKOIT4HaCDm3bPZDURhMkC/r990r7UA4ZHPo
+         tNrg==
+X-Forwarded-Encrypted: i=1; AJvYcCVbbrM02UbwPlAt1l5ZFD90zZRD62rGgzhMYiB8KSHZKrh3MCfKk2orDHfmyoF25/AT+gKbe9E=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx4WcCzZpNQzDYXKUYQB8yoqNGQhYauxcHbDrbuse5n5bDtUwjF
+	sEJkxWE5bv2S4S54GB+yRoy/QJFnwKy+nPN5UZ9lLOmHVe0cVayrMphu6n9gJmSzMMaQXRcquxl
+	mayN5xN2/pUCv5R4Q8WnkL9qjX6lBPlrrVZ6mefkSEaAl55YoQbZB/g==
+X-Gm-Gg: ASbGncuGwJxgI1UedP6XgoN7WbPo2C037xRFJqJ97hCiPBZiJDLIReRt6E74c/cnvQ+
+	fg0PPr8pDET2WBj3tx6jR72OxQyg0VKRsHg2Hl3fGvnrqNLYiJGlBq74btcgDd9yBz1fIeU5IHo
+	VCZKPicIm12gtxtjLnU9j0x5fFgqeVZv/GeHG0DFmYHRjoF99QNRslJqHJCEQjnNqtbxlIsEPwC
+	yuFhZdB85jMuVIHgJNflihz5QqM5lah3mYYhwlt7KpzMPldnOzhoqNGhlPaZiy9gzRhCWqj4JnE
+	nszBCtWr1IPhyLHU5CDa/tMG
+X-Received: by 2002:a5d:6d09:0:b0:38a:87cd:6d67 with SMTP id ffacd0b85a97d-38c2212a683mr2791139f8f.0.1737628946697;
+        Thu, 23 Jan 2025 02:42:26 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHeNBfiwkcxSVGyBkrWrqvExUU2X2pkRqCmXArdg0L2ug8l94XVqypZA8fuP9/G+ovIaZkGVw==
+X-Received: by 2002:a5d:6d09:0:b0:38a:87cd:6d67 with SMTP id ffacd0b85a97d-38c2212a683mr2791107f8f.0.1737628946325;
+        Thu, 23 Jan 2025 02:42:26 -0800 (PST)
+Received: from [192.168.88.253] (146-241-27-215.dyn.eolo.it. [146.241.27.215])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-438b31ae97dsm59140655e9.22.2025.01.23.02.42.24
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 23 Jan 2025 02:42:25 -0800 (PST)
+Message-ID: <de2d5f6e-9913-44c1-9f4e-3e274b215ebf@redhat.com>
+Date: Thu, 23 Jan 2025 11:42:24 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <PAXPR04MB85106CE97288D52A04EB685388E02@PAXPR04MB8510.eurprd04.prod.outlook.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 net] gro_cells: Avoid packet re-ordering for cloned
+ skbs
+To: Eric Dumazet <edumazet@google.com>
+Cc: Thomas Bogendoerfer <tbogendoerfer@suse.de>,
+ "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20250121115010.110053-1-tbogendoerfer@suse.de>
+ <3fe1299c-9aea-4d6a-b65b-6ac050769d6e@redhat.com>
+ <CANn89iLwOWvzZqN2VpUQ74a5BXRgvZH4_D2iesQBdnGWmZodcg@mail.gmail.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <CANn89iLwOWvzZqN2VpUQ74a5BXRgvZH4_D2iesQBdnGWmZodcg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Thu, Jan 23, 2025 at 02:58:32AM +0000, Wei Fang wrote:
+On 1/23/25 11:07 AM, Eric Dumazet wrote:
+> On Thu, Jan 23, 2025 at 9:43 AM Paolo Abeni <pabeni@redhat.com> wrote:
+>> On 1/21/25 12:50 PM, Thomas Bogendoerfer wrote:
+>>> gro_cells_receive() passes a cloned skb directly up the stack and
+>>> could cause re-ordering against segments still in GRO. To avoid
+>>> this queue cloned skbs and use gro_normal_one() to pass it during
+>>> normal NAPI work.
+>>>
+>>> Fixes: c9e6bc644e55 ("net: add gro_cells infrastructure")
+>>> Suggested-by: Eric Dumazet <edumazet@google.com>
+>>> Signed-off-by: Thomas Bogendoerfer <tbogendoerfer@suse.de>
+>>> --
+>>> v2: don't use skb_copy(), but make decision how to pass cloned skbs in
+>>>     napi poll function (suggested by Eric)
+>>> v1: https://lore.kernel.org/lkml/20250109142724.29228-1-tbogendoerfer@suse.de/
+>>>
+>>>  net/core/gro_cells.c | 9 +++++++--
+>>>  1 file changed, 7 insertions(+), 2 deletions(-)
+>>>
+>>> diff --git a/net/core/gro_cells.c b/net/core/gro_cells.c
+>>> index ff8e5b64bf6b..762746d18486 100644
+>>> --- a/net/core/gro_cells.c
+>>> +++ b/net/core/gro_cells.c
+>>> @@ -2,6 +2,7 @@
+>>>  #include <linux/skbuff.h>
+>>>  #include <linux/slab.h>
+>>>  #include <linux/netdevice.h>
+>>> +#include <net/gro.h>
+>>>  #include <net/gro_cells.h>
+>>>  #include <net/hotdata.h>
+>>>
+>>> @@ -20,7 +21,7 @@ int gro_cells_receive(struct gro_cells *gcells, struct sk_buff *skb)
+>>>       if (unlikely(!(dev->flags & IFF_UP)))
+>>>               goto drop;
+>>>
+>>> -     if (!gcells->cells || skb_cloned(skb) || netif_elide_gro(dev)) {
+>>> +     if (!gcells->cells || netif_elide_gro(dev)) {
+>>>               res = netif_rx(skb);
+>>>               goto unlock;
+>>>       }
+>>> @@ -58,7 +59,11 @@ static int gro_cell_poll(struct napi_struct *napi, int budget)
+>>>               skb = __skb_dequeue(&cell->napi_skbs);
+>>>               if (!skb)
+>>>                       break;
+>>> -             napi_gro_receive(napi, skb);
+>>> +             /* Core GRO stack does not play well with clones. */
+>>> +             if (skb_cloned(skb))
+>>> +                     gro_normal_one(napi, skb, 1);
+>>> +             else
+>>> +                     napi_gro_receive(napi, skb);
+>>
+>> I must admit it's not clear to me how/why the above will avoid OoO. I
+>> assume OoO happens when we observe both cloned and uncloned packets
+>> belonging to the same connection/flow.
+>>
+>> What if we have a (uncloned) packet for the relevant flow in the GRO,
+>> 'rx_count - 1' packets already sitting in 'rx_list' and a cloned packet
+>> for the critical flow reaches gro_cells_receive()?
+>>
+>> Don't we need to unconditionally flush any packets belonging to the same
+>> flow?
 > 
-> Hi Dheeraj,
+> It would only matter if we had 2 or more segments that would belong
+> to the same flow and packet train (potential 'GRO super packet'), with
+> the 'cloned'
+> status being of mixed value on various segments.
 > 
-> I must admit that I misread it too. There is another case in the TSO
-> header where txq->tx_bounce may be used in some cases. I think
-> the most correct fix is to make txq->tso_hdrs aligned to 32/64 bytes
-> when allocating tso_hdrs, then we do not need to use txq->tx_bounce
-> in fec_enet_txq_put_hdr_tso(), because (bufaddr) & fep->tx_align)
-> will not be true. This way we can safely remove dma_map_single()
-> from fec_enet_txq_put_hdr_tso().
+> In practice, the cloned status will be the same for all segments.
 
-Hi Fang, Simon,
+I agree with the above, but my doubt is: does the above also mean that
+in practice there are no OoO to deal with, even without this patch?
 
-Thank you for the feedback. I have a clarification question regarding 
-the alignment of txq->tso_hdrs.
+To rephrase my doubt: which scenario is addressed by this patch that
+would lead to OoO without it?
 
-In the current code, txq->tso_hdrs is allocated using fec_dma_alloc(), 
-which internally calls dma_alloc_coherent(). As I understand it, 
-dma_alloc_coherent() guarantees that the allocated buffer is properly aligned.
+Thanks,
 
-Given this, should we remove the alignment check 
-((unsigned long)bufaddr) & fep->tx_align and the associated dma_map_single() 
-logic entirely from fec_enet_txq_put_hdr_tso() as you have suggested?
-
--Dheeraj
+Paolo
 
 
