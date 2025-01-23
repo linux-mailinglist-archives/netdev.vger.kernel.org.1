@@ -1,60 +1,95 @@
-Return-Path: <netdev+bounces-160501-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160504-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C24AA19F8E
-	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 09:08:18 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 05CA1A19FDE
+	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 09:25:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1AD403A1233
-	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 08:08:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4FFF816DFFD
+	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 08:25:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E80AB20B21F;
-	Thu, 23 Jan 2025 08:08:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F7E320C02E;
+	Thu, 23 Jan 2025 08:25:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TSayIkE+"
 X-Original-To: netdev@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f66.google.com (mail-wm1-f66.google.com [209.85.128.66])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3337F26AF5;
-	Thu, 23 Jan 2025 08:08:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FAC3320B;
+	Thu, 23 Jan 2025 08:25:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.66
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737619694; cv=none; b=NIvdncbrQ5e1X5K3Ii94OEBfUibA46sjQZPONrQ5IYCtd7Ul8ztPiKhp8feJad9tvH+Rh2oThkCyPnkAeusaebXhohTSsHoSneJavjySTXrFCrfPpv5YBV+2TH5NKglHrVhJz+d+MP0f4X5WGjq3YsRaf/rb8W8oSMiVAnr/LtU=
+	t=1737620730; cv=none; b=o4WCHC2U68oFIuBpPIz6mNxFIyPf4SXlFxo62XQ1a4nrYglfL9Zpz+Qiv70VAUoxVcDX0aDGbxkcHKnttlhLLVSa3vV2LJZUkuXCAz1hv1py80hupFktCkvbPH+SL+rUJD3nLjPJ6mdHzw8Q88r7GuKP7iyUZ/HeoHXrvX2ODxM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737619694; c=relaxed/simple;
-	bh=6eUXLLsO5+YBK05pnwwwcSNSgNcQr52XvtTm4+at4Y0=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=cv/lxbWEGCaEoTgvvzqljuHmVZJK1NgWapCz3ytM67NCz/O/jp9vJtrZDToKQZO7gDiJ9CAOd2d1uxb6TBQP9RqR7LPEukEO92pmz+PNXrQw9Fta8fwR/jmje6dUpngwa3O/Pre8HOpPyfnGENoRumlSX8r313aMa7njQot0Ubk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.231])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4Ydtmn6QVRz6J7pc;
-	Thu, 23 Jan 2025 16:06:01 +0800 (CST)
-Received: from frapeml500005.china.huawei.com (unknown [7.182.85.13])
-	by mail.maildlp.com (Postfix) with ESMTPS id AD34D140519;
-	Thu, 23 Jan 2025 16:07:58 +0800 (CST)
-Received: from china (10.200.201.82) by frapeml500005.china.huawei.com
- (7.182.85.13) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Thu, 23 Jan
- 2025 09:07:46 +0100
-From: Gur Stavi <gur.stavi@huawei.com>
-To: <przemyslaw.kitszel@intel.com>
-CC: <andrew+netdev@lunn.ch>, <cai.huoqing@linux.dev>, <corbet@lwn.net>,
-	<davem@davemloft.net>, <edumazet@google.com>, <gongfan1@huawei.com>,
-	<guoxin09@huawei.com>, <gur.stavi@huawei.com>, <helgaas@kernel.org>,
-	<horms@kernel.org>, <kuba@kernel.org>, <linux-doc@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <luosifu@huawei.com>,
-	<meny.yossefi@huawei.com>, <netdev@vger.kernel.org>, <pabeni@redhat.com>,
-	<shenchenyang1@hisilicon.com>, <shijing34@huawei.com>, <sumang@marvell.com>,
-	<wulike1@huawei.com>, <zhoushuai28@huawei.com>
-Subject: Re: [PATCH net-next v04 1/1] hinic3: module initialization and tx/rx logic
-Date: Thu, 23 Jan 2025 10:20:16 +0200
-Message-ID: <20250123082016.3985519-1-gur.stavi@huawei.com>
+	s=arc-20240116; t=1737620730; c=relaxed/simple;
+	bh=0RqbJsmBYD4psvJjsPR1/k8+RZSZVR7ryEwaJzId76g=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Kyh2c7hV2ImG1G6/Nz8a8LZlYSLWnlGJU+AeYM1zGY5d/Lue3KXrGh/hXFslLAy13QQzthkoxZKsi/gJ1RqotRBxM2NULJPDZyib++1lWs039yM23K0DUn9ItgV1QqBtf+GCeR9n3ADVUQXV8NaYVC5aC4cGC3c2rux1e3VWmiw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TSayIkE+; arc=none smtp.client-ip=209.85.128.66
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f66.google.com with SMTP id 5b1f17b1804b1-436ce2ab251so3707585e9.1;
+        Thu, 23 Jan 2025 00:25:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1737620727; x=1738225527; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=7x78WrC+cTNtBpfnkOUA5kq6ry12btJ1fKxNdWFZpHE=;
+        b=TSayIkE+0U+pOvEuJnRxcZgVtCapfSagrwq/toiKmQ8w4Wb4hJCpPg6r0QO8VTxCpi
+         O5iirqYdfrYwF9HYoyZ3B1qoirJZcahDRj4VoIbT2s6qS6dETU/FOVdCTgaMxXCMVgU3
+         kawda30JBuXD/72WCKpQTS/3EEWJk47Jl3FhpbyrWtImmjS6+DDN1u1e0l/IjJLj1R9o
+         O3EUq3Rk3mPZAYVtLPJPNykU5koESxoUd0rtIW4qiv+8VfM/fCYEBTy4Qk6UYLDtzk1W
+         oLV6EDoHkmSKiktgJ+9LMmSPec9Ocj7ZyF/O8Pr1qjHOONap3CbJhKCkKGbWczR3nT2C
+         2d0g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737620727; x=1738225527;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=7x78WrC+cTNtBpfnkOUA5kq6ry12btJ1fKxNdWFZpHE=;
+        b=mxmo3pGNz6zxiC9pokMJ2tYJt0MomVCfOiYxUvJM24fAvr7EcWzbO5dcn2zGPpWont
+         67ccdR57rSp50TizY18+gdYKy6f/FIdGx/R5vm/hZncWL6NJj7cU+WzljqbKpc7P+w8S
+         gRxB63T/yod/bLcGNpo+XOUpWYizO09tWHJv4bBklEGPSC3QqzEiBp9OLYwb19WbqMCz
+         dITgnso3Nql5nHV1qMKqwvBUFhLRTpItMNbYNlNvO0EvlllIpL+TITwJt42bR9rGti5m
+         Bs7gedb8lwKr12HVIYReezZ6PsA7rYLS651zIvrHNhL618KzWw+AfCvUoZgQ04a4aFsX
+         HhJw==
+X-Forwarded-Encrypted: i=1; AJvYcCUbuOP5EvEk5GKTki3+/OehmCHq17Wqu1OAiQQZrb3PJLaIGzDS81+vPXQyLbBjzSzq1HcnvXp6@vger.kernel.org, AJvYcCVDW/khwxbsYEhBa1w9XGZL68gQtGvSV/gFyUwJdEZzM62sfLVoas3mF4bayYAY6fDf+L+QK5I1eGa60Js+@vger.kernel.org, AJvYcCVrjRI0wRHLSoVb1ZDyLwl+TwWKU3dlb0ERQKOYJ8xfpGPs+VbZa66y8+RXbhLZmyDh3BbVz5N1FgIO@vger.kernel.org, AJvYcCXNNMSU5KlhDD4rJAWdGpvu/yDfW1AxfOynrqLQ9jX2TnxzV37c8yJ3xzlptrfp9UCkq4mbGivcEwQ=@vger.kernel.org, AJvYcCXzDM37I4hjPWQ9EUCI3nS5mv9P/zzW09OOAMogCk3bjIogdCQgBlKf1kmGayYEF+RoUYEd+YfgKhD39dpjbIfqzzTOIy0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywl19QpVZVAoF3ZhSSwTw9u28bdknKZC4IIIHH7gkzxMAXRWsC9
+	vbCow9pcw4yeMB+i94ibcQKrNLsBjeSdWFy5Pbemyw4KAIhLlELe
+X-Gm-Gg: ASbGncuooC5rub8bL3fLdEg3+L4NnNFKWsODHwXDNsbGmC/VqWB5/dViDG9OMEsLkrQ
+	LD17jshJYW5hEnPYfiYTldAMmTsYMLti4NZswHGje3w2Scpr0rpSyJnMEP9DGYy9X2ozeFIYPOc
+	3xqPu/Ec8yPGqqf1QNA+j4stAqNCFq/Hq6pt44M1TnPiEsAnCkhR+mLjtdJwcpZYsxzxYbz9c/K
+	pqa5xGHlrhBdBvETlG1cn5cl9iS6jEn49i8LxKZvBCj/+2xtnLynGB7esnAIFxFVbJ+aiBBG0X4
+	NzPgxPbCZoYfh0YQ5EeVBdKvJqch7bg=
+X-Google-Smtp-Source: AGHT+IGC68+iWj/tGHITjYEzoOGz/ssjpVakkTiozXCptHX+mLeBDtIXnpipmOJtFYfncB14B/hKTA==
+X-Received: by 2002:a05:600c:3b94:b0:434:e2ea:fc94 with SMTP id 5b1f17b1804b1-438913cb620mr264534565e9.11.1737620726503;
+        Thu, 23 Jan 2025 00:25:26 -0800 (PST)
+Received: from localhost.localdomain ([197.63.236.210])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38bf3215bf2sm18829969f8f.18.2025.01.23.00.25.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 23 Jan 2025 00:25:25 -0800 (PST)
+From: Khaled Elnaggar <khaledelnaggarlinux@gmail.com>
+To: socketcan@hartkopp.net,
+	mkl@pengutronix.de,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	corbet@lwn.net
+Cc: Khaled Elnaggar <khaledelnaggarlinux@gmail.com>,
+	shuah@kernel.org,
+	linux-can@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-kernel-mentees@vger.kernel.org
+Subject: [PATCH] documentation: networking: fix spelling mistakes
+Date: Thu, 23 Jan 2025 10:25:20 +0200
+Message-ID: <20250123082521.59997-1-khaledelnaggarlinux@gmail.com>
 X-Mailer: git-send-email 2.45.2
-In-Reply-To: <566b3d82-5e66-4e97-9808-a0e8e212fe67@intel.com>
-References: <566b3d82-5e66-4e97-9808-a0e8e212fe67@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,43 +97,55 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- frapeml500005.china.huawei.com (7.182.85.13)
 
->>>> Auxiliary driver registration.
->>>> Net device_ops registration but open/stop are empty stubs.
->>>> tx/rx logic.
->>>
->>> Take care for spelling: Tx/Rx; HW (just below).
->>
->> Please elaborate. Spelling of what?
->
->In all code comments and commit messages the acronyms and abbreviations
->have their proper spelling, like "Tx", "Rx", "HW', "SW", "ID".
->
->of course lowercase names are still allowed for variables/fields
->
+Fix a couple of typos/spelling mistakes in the documentation.
 
-Grepped drivers/net/ethernet (whole word only):
+Signed-off-by: Khaled Elnaggar <khaledelnaggarlinux@gmail.com>
+---
+Hello, I hope the patch is self-explanatory. Please let me know if you
+have any comments.
 
-hw 34681   HW 3708   Hw  170
-sw  1198   SW  675   Sw    3
-rx  5913   RX 4042   Rx 4042
-tx  5424   TX 4095   Tx 4907
-id  5545   ID 1967   Id   56
+Aside: CCing Shuah and linux-kernel-mentees as I am working on the mentorship
+application tasks.
 
-I don't know a quick way to separate variables from comments but I
-believe that there are very few hw and sw variables and most tx, rx
-related variables will have some prefix or suffix so lots of the
-whole-word-only come from comments.
-Can we agree that while Hw, Sw and Id are improper, the remaining
-forms are acceptable?
+Thanks
+Khaled
+---
+ Documentation/networking/can.rst  | 4 ++--
+ Documentation/networking/napi.rst | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
->>
->>>
->>>>
->>>> All major data structures of the driver are fully introduced with the
->>>> code that uses them but without their initialization code that requires
->>>> management interface with the hw.
+diff --git a/Documentation/networking/can.rst b/Documentation/networking/can.rst
+index 62519d38c58b..b018ce346392 100644
+--- a/Documentation/networking/can.rst
++++ b/Documentation/networking/can.rst
+@@ -699,10 +699,10 @@ RAW socket option CAN_RAW_JOIN_FILTERS
+
+ The CAN_RAW socket can set multiple CAN identifier specific filters that
+ lead to multiple filters in the af_can.c filter processing. These filters
+-are indenpendent from each other which leads to logical OR'ed filters when
++are independent from each other which leads to logical OR'ed filters when
+ applied (see :ref:`socketcan-rawfilter`).
+
+-This socket option joines the given CAN filters in the way that only CAN
++This socket option joins the given CAN filters in the way that only CAN
+ frames are passed to user space that matched *all* given CAN filters. The
+ semantic for the applied filters is therefore changed to a logical AND.
+
+diff --git a/Documentation/networking/napi.rst b/Documentation/networking/napi.rst
+index 6083210ab2a4..f970a2be271a 100644
+--- a/Documentation/networking/napi.rst
++++ b/Documentation/networking/napi.rst
+@@ -362,7 +362,7 @@ It is expected that ``irq-suspend-timeout`` will be set to a value much larger
+ than ``gro_flush_timeout`` as ``irq-suspend-timeout`` should suspend IRQs for
+ the duration of one userland processing cycle.
+
+-While it is not stricly necessary to use ``napi_defer_hard_irqs`` and
++While it is not strictly necessary to use ``napi_defer_hard_irqs`` and
+ ``gro_flush_timeout`` to use IRQ suspension, their use is strongly
+ recommended.
+
+--
+2.45.2
+
 
