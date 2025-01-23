@@ -1,179 +1,123 @@
-Return-Path: <netdev+bounces-160546-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160545-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7D09A1A211
-	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 11:43:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7CFB5A1A20D
+	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 11:43:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 895AE3A7589
-	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 10:43:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2DCE63A8116
+	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 10:43:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA76420DD63;
-	Thu, 23 Jan 2025 10:43:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D45420DD64;
+	Thu, 23 Jan 2025 10:43:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="urTlaauc"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="OKTZ0eXB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C16D220CCD6
-	for <netdev@vger.kernel.org>; Thu, 23 Jan 2025 10:43:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 470B020CCD6;
+	Thu, 23 Jan 2025 10:43:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737628999; cv=none; b=VgsTUHW4tOOL2IOlFo7GkTKfh7AJQxok4tY5iaDV6RmB9E2seL3cCNbq+KG7UBtPkYdxHdfHJAbGCepIIcnHNxGg3fXXwjWdCGCE1AfbWRznnm2YE4LUMtgeSKwV0Kfuxi9mjd5sl3vWYQ9GpxlXh6DfnxnhjqDNYg7mxJ7eL0s=
+	t=1737628994; cv=none; b=u1YChVB8ctQgliTLP7W7qQYZAWvAGOWmWSN7iMN7y1PmtSlAJEbMKlmR3ZFPP9W89dnkAJCN1rcAav89klOu2uQ2B6SM95/JnZgaRjqRdyHLShAn/YWm3MRYdLcKiRHVBrtw4bLGDvNvN5EciF4+LH3m4Vd5IvcE460cQBfHIG0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737628999; c=relaxed/simple;
-	bh=6jzJuqAit8vGydskOcptJTa653MDJ+uA0FACYZguRpo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=PeIKDHrWvGAnU9egoETf3G3DkAyMdy7XRWRET8ZhpcEULclbGNMWobGb1XKOGnKn06CbqO8Lyewy63fGOOOsv2AcDYhJS7OV2CzGR/liA+gQfkZSEqs3kc89qwaCLTiq/DmjscAdIP7VGO4Tuw7nAG8CiXwckxhctKHVy5MUui8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=urTlaauc; arc=none smtp.client-ip=209.85.208.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-5d7e3f1fdafso1615981a12.0
-        for <netdev@vger.kernel.org>; Thu, 23 Jan 2025 02:43:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1737628996; x=1738233796; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5L+F1uti3TU+pcV6F9KKXdN3pOJnUvdils+I/b7AGuM=;
-        b=urTlaaucnPqQZF6ful8wInzjEKY1mtPm7fkEGJ4uzQ1Yb1r16qvLUYMG4qfzaRWieg
-         dnwVc0ORmpIAqtS46D0177BBMSmp8TwkREjskl03EvfS8yl5dTLbnnTLi+4XB89gIgHU
-         a25UbID/pDxNZ3krRowX+jV81/Mnz536UykK3PZ4llivudH6laXC5npsbMG3oo8EAyi3
-         uydrsuvFPLa5dJqkr9VGAz5knee4Veo2Gng+l8YWtWTNWf7bSPnss+PC0egnvEMul7Vn
-         0eQ4vHKRQ4lsb8UJP2XMmojBVYhZI+wTPEtA9otWj3em0ZB3ciM2yFRZJdmGnGjMENPN
-         Av3g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737628996; x=1738233796;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=5L+F1uti3TU+pcV6F9KKXdN3pOJnUvdils+I/b7AGuM=;
-        b=FO+/z5eEx0vPyCRSIDj4JFpH6GhZO5V8OuU5K6+7einfRMLfJaJ7/i+R9DTrcyjOGl
-         ABSUBLVAsBHh46ajvFfHICsHHfN2UhROkR7FpjqaGGcMH8dgbcaG43rj5iGWbvHhmJ1Y
-         1OsSZ9vLcbQqifaDD8uq5ZZY3oTyCk3fwu4cQNgQqV3ottmjVa7dVefWHRpsR1uO4fh6
-         0RlbbQqgEVJgUP1RKnrxTeJ0Z0pzDW2Ld39LYOhqdh10IiGxxF9jWERW619CZ1EnZKay
-         Q9+uFp79ZkrRcaZzBEFrpBWYDD8DWv2Qpb9zi4mzoC7/WxZ6PafseUw/lCc7idcOBngb
-         OIOQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWKpDwUgtSOsLjRucU8WYG+T/QFEI/9HFOfzylth2ho3J0bKdcDKGKTalWh1Dy5ftDINgpqg1I=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxHpkPjL1ABP4/PL21MwLddUJF6dbRcVbuE0e3+Dj7AruOCERqt
-	DT/izpF7fG/Hnq1e5CW0MirV1WZEnQn6A7/vRyj6s/A5L87df4pPe0sG3vLAbwl9DX3m1X1WTC0
-	w1+vvO6a2yMD4PR87PH0WFRLsYHolJ+LdKliM
-X-Gm-Gg: ASbGncu/9cTS7CsjZiz9UHjN5iS4RgXDdZU7Arr0LX5czGQ5f2qFswiqG01tmJYnbEE
-	OwhU72ihNpiZFiLvtroRGX9nMhLSAJj0atjZOOpQqQ+8QE3B3jbBbSiHKOV2YTVY=
-X-Google-Smtp-Source: AGHT+IF4rR7FhYICGHFnG5vMiIF7nKzKyOznEm61dzG0oDNa2BL+PjDGCPM9pWzQO/kixZFRN3eqgyi9ryO6lJ54yk4=
-X-Received: by 2002:a05:6402:1e8a:b0:5dc:11b5:c2b1 with SMTP id
- 4fb4d7f45d1cf-5dc11b5c40emr648127a12.25.1737628995908; Thu, 23 Jan 2025
- 02:43:15 -0800 (PST)
+	s=arc-20240116; t=1737628994; c=relaxed/simple;
+	bh=fnLtwIc6MV8b5IUPyw308udN4u67DVdokrzGS7M8PFo=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=QKHdoWvvZi+6qBChwp3TIru5uT78WvnWIMQwN0RTaceEWVCBRS0CA2bs0l3nny0G6OGWGrCxWsgl28MnyhIPA5hjEB/dv550SanWi3Absrecg8butWGytAWLpM1B/tilemHAjRO0vO3sl8U8hiDBDLyHF44kfrP8DHlmsO8H+8k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=OKTZ0eXB; arc=none smtp.client-ip=217.70.183.197
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 66FDF1C000E;
+	Thu, 23 Jan 2025 10:43:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1737628989;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=tLUfkUuRz3nRthcoDnA3/VSyQ9KzaT4t1CIzkWnxXYw=;
+	b=OKTZ0eXBaLQy6Rq432EqyJslmMw2hRhB07qvB1bN8W0Wt0CRMzqS8GwtweDXvvZKWvgy31
+	RTizLkQ9+JGW+tIGMkPWbTR0wU7ipdRR8npWIto6KFI/jJMLqEbUvqWJQMNLs+sFs0cc5d
+	f90N+nLimTcYUf587XRFHQ74p7RDhNQGnc5WxLIHxnOC0BjxgWNxn90abQEhgzx3I2T7Pt
+	XmYs7N5XEmhrXhLgfergYerdeNv0fzPZnbUmFw4qkVV2Cgg5KmeWDT3asDSsOqGPXux1Gg
+	MEvgJbD5Rf64zTj+4MHWbAim+8U1jSLCoFjoaLCOLZ+U/NqeC6y3aDxCrEwO5g==
+Date: Thu, 23 Jan 2025 11:43:06 +0100
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
+ thomas.petazzoni@bootlin.com, Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski
+ <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>,
+ linux-arm-kernel@lists.infradead.org, Christophe Leroy
+ <christophe.leroy@csgroup.eu>, Herve Codina <herve.codina@bootlin.com>,
+ Florian Fainelli <f.fainelli@gmail.com>, Heiner Kallweit
+ <hkallweit1@gmail.com>, Vladimir Oltean <vladimir.oltean@nxp.com>, Marek
+ =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>, Oleksij Rempel
+ <o.rempel@pengutronix.de>, =?UTF-8?B?Tmljb2zDsg==?= Veronese
+ <nicveronese@gmail.com>, Simon Horman <horms@kernel.org>,
+ mwojtas@chromium.org, Antoine Tenart <atenart@kernel.org>, Rob Herring
+ <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>
+Subject: Re: [PATCH net-next RFC v2 0/6] net: phy: Introduce a port
+ representation
+Message-ID: <20250123114306.5c2f767e@kmaincent-XPS-13-7390>
+In-Reply-To: <20250123113121.1d151582@kmaincent-XPS-13-7390>
+References: <20250122174252.82730-1-maxime.chevallier@bootlin.com>
+	<20250123113121.1d151582@kmaincent-XPS-13-7390>
+Organization: bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250121115010.110053-1-tbogendoerfer@suse.de>
- <3fe1299c-9aea-4d6a-b65b-6ac050769d6e@redhat.com> <CANn89iLwOWvzZqN2VpUQ74a5BXRgvZH4_D2iesQBdnGWmZodcg@mail.gmail.com>
- <de2d5f6e-9913-44c1-9f4e-3e274b215ebf@redhat.com>
-In-Reply-To: <de2d5f6e-9913-44c1-9f4e-3e274b215ebf@redhat.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 23 Jan 2025 11:43:05 +0100
-X-Gm-Features: AWEUYZn6dwfSi5JrnulCKChi3Bv7nwz-Yas5zpaJLmTI1bBeqS-wpb3nMVlfZkY
-Message-ID: <CANn89iJODT0+qe678jOfs4ssy10cNXg5ZsYbvgHKDYyZ6q_rgg@mail.gmail.com>
-Subject: Re: [PATCH v2 net] gro_cells: Avoid packet re-ordering for cloned skbs
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Thomas Bogendoerfer <tbogendoerfer@suse.de>, "David S. Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: kory.maincent@bootlin.com
 
-On Thu, Jan 23, 2025 at 11:42=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wr=
-ote:
->
-> On 1/23/25 11:07 AM, Eric Dumazet wrote:
-> > On Thu, Jan 23, 2025 at 9:43=E2=80=AFAM Paolo Abeni <pabeni@redhat.com>=
- wrote:
-> >> On 1/21/25 12:50 PM, Thomas Bogendoerfer wrote:
-> >>> gro_cells_receive() passes a cloned skb directly up the stack and
-> >>> could cause re-ordering against segments still in GRO. To avoid
-> >>> this queue cloned skbs and use gro_normal_one() to pass it during
-> >>> normal NAPI work.
-> >>>
-> >>> Fixes: c9e6bc644e55 ("net: add gro_cells infrastructure")
-> >>> Suggested-by: Eric Dumazet <edumazet@google.com>
-> >>> Signed-off-by: Thomas Bogendoerfer <tbogendoerfer@suse.de>
-> >>> --
-> >>> v2: don't use skb_copy(), but make decision how to pass cloned skbs i=
-n
-> >>>     napi poll function (suggested by Eric)
-> >>> v1: https://lore.kernel.org/lkml/20250109142724.29228-1-tbogendoerfer=
-@suse.de/
-> >>>
-> >>>  net/core/gro_cells.c | 9 +++++++--
-> >>>  1 file changed, 7 insertions(+), 2 deletions(-)
-> >>>
-> >>> diff --git a/net/core/gro_cells.c b/net/core/gro_cells.c
-> >>> index ff8e5b64bf6b..762746d18486 100644
-> >>> --- a/net/core/gro_cells.c
-> >>> +++ b/net/core/gro_cells.c
-> >>> @@ -2,6 +2,7 @@
-> >>>  #include <linux/skbuff.h>
-> >>>  #include <linux/slab.h>
-> >>>  #include <linux/netdevice.h>
-> >>> +#include <net/gro.h>
-> >>>  #include <net/gro_cells.h>
-> >>>  #include <net/hotdata.h>
-> >>>
-> >>> @@ -20,7 +21,7 @@ int gro_cells_receive(struct gro_cells *gcells, str=
-uct sk_buff *skb)
-> >>>       if (unlikely(!(dev->flags & IFF_UP)))
-> >>>               goto drop;
-> >>>
-> >>> -     if (!gcells->cells || skb_cloned(skb) || netif_elide_gro(dev)) =
-{
-> >>> +     if (!gcells->cells || netif_elide_gro(dev)) {
-> >>>               res =3D netif_rx(skb);
-> >>>               goto unlock;
-> >>>       }
-> >>> @@ -58,7 +59,11 @@ static int gro_cell_poll(struct napi_struct *napi,=
- int budget)
-> >>>               skb =3D __skb_dequeue(&cell->napi_skbs);
-> >>>               if (!skb)
-> >>>                       break;
-> >>> -             napi_gro_receive(napi, skb);
-> >>> +             /* Core GRO stack does not play well with clones. */
-> >>> +             if (skb_cloned(skb))
-> >>> +                     gro_normal_one(napi, skb, 1);
-> >>> +             else
-> >>> +                     napi_gro_receive(napi, skb);
-> >>
-> >> I must admit it's not clear to me how/why the above will avoid OoO. I
-> >> assume OoO happens when we observe both cloned and uncloned packets
-> >> belonging to the same connection/flow.
-> >>
-> >> What if we have a (uncloned) packet for the relevant flow in the GRO,
-> >> 'rx_count - 1' packets already sitting in 'rx_list' and a cloned packe=
-t
-> >> for the critical flow reaches gro_cells_receive()?
-> >>
-> >> Don't we need to unconditionally flush any packets belonging to the sa=
-me
-> >> flow?
-> >
-> > It would only matter if we had 2 or more segments that would belong
-> > to the same flow and packet train (potential 'GRO super packet'), with
-> > the 'cloned'
-> > status being of mixed value on various segments.
-> >
-> > In practice, the cloned status will be the same for all segments.
->
-> I agree with the above, but my doubt is: does the above also mean that
-> in practice there are no OoO to deal with, even without this patch?
->
-> To rephrase my doubt: which scenario is addressed by this patch that
-> would lead to OoO without it?
+On Thu, 23 Jan 2025 11:31:21 +0100
+Kory Maincent <kory.maincent@bootlin.com> wrote:
 
-Fair point, a detailed changelog would be really nice.
+> On Wed, 22 Jan 2025 18:42:45 +0100
+> Maxime Chevallier <maxime.chevallier@bootlin.com> wrote:
+>=20
+> > Hello everyone,
+> >=20
+> > This is a second RFC for the introduction of a front-facing interfaces
+> > for ethernet devices.
+> >=20
+> > The firts RFC[1] already got some reviews, focusing on the DT part of
+> > that work. To better lay the ground for further discussions, this second
+> > round includes a binding :)
+> >=20
+> > Oleksij suggested some further possibilities for improving this binding,
+> > as we could consider describing connectors in great details for
+> > crossover detection, PoE ping mappings, etc. However, as this is
+> > preliminary work, the included binding is still quite simple but can
+> > certainly be extended.
+> >=20
+> > This RFC V2 doesn't bring much compared to V1 :
+> >  - A binding was introduced
+> >  - A warning has been fixed in the dp83822 patch
+> >  - The "lanes" property has been made optional =20
+>=20
+> Small question, I know you want to begin with something simple but would =
+it be
+> possible to consider how to support the port representation in NIT and
+> switch drivers? Maybe it is out of your scope but it would be nice if you
+> consider how NIT and switches can support it in your development.
+
+s/NIT/NIC/
+
+Sorry.
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
