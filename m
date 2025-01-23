@@ -1,267 +1,149 @@
-Return-Path: <netdev+bounces-160562-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160563-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AADA9A1A305
-	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 12:33:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B3488A1A379
+	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 12:47:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E71F2161983
-	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 11:33:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3098D16C93F
+	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 11:45:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91A8D20E02F;
-	Thu, 23 Jan 2025 11:33:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3E2A20E33A;
+	Thu, 23 Jan 2025 11:42:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b="rLkFBjgj"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WTdyP6IN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B12020C48C
-	for <netdev@vger.kernel.org>; Thu, 23 Jan 2025 11:33:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A9C420E00E
+	for <netdev@vger.kernel.org>; Thu, 23 Jan 2025 11:42:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737632017; cv=none; b=fzUbqphsNnQBFfTxSYTcyzOZw8JWAhNiT02sshM/lCzd/WgmJ6liEgLUlOWrfq4uJmf8MpS1PxiYz6oYW0a2WA/V+vzkhf5xiyS+bda71gW8E2G84SgbP56QpzwcSJCbkQ0+9U0aKAsUiVzn56LzWxpSUAoyhoAzl5ScOqz4/i8=
+	t=1737632536; cv=none; b=rHjBAjI5et+DaCkbQeyN71+KkzMhttOl4rxXnDhRVv534Am9leXN03KLigp1kYQhQiGNKP1bAxlq/WZEIKVUtYlD3BoGbE4hY+JglxzbKn/sjquP1W0wdXeBSa8b2XoAt5pldR2iXxrZBHn5TDoYHBb0Mi+312lvdkMFskCatwQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737632017; c=relaxed/simple;
-	bh=aKzJDMPv9ht42XorTR+RjjJ61MHAfgHzBMRxo0FtBB4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=UQflUF+AUkZ9J3UCzx11rc7xoNoMSLjV7/49mfmlR6o3z26FExwJl4QKE+SzFBzOfxddEQGwKE89lfQ5ClNbFlNtuNZHNBB6sQjTSFnqadlnr8+PZNiojifb4RfBtd9iFxw+/gQbNXsGJyJCGCdY+wJrykeEvvP9bXGTalyAEkw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev; spf=pass smtp.mailfrom=tuxon.dev; dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b=rLkFBjgj; arc=none smtp.client-ip=209.85.128.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tuxon.dev
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-4361dc6322fso5216275e9.3
-        for <netdev@vger.kernel.org>; Thu, 23 Jan 2025 03:33:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=tuxon.dev; s=google; t=1737632014; x=1738236814; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=+YVE/gtiWqh1QibLG9dYV/Ym5SAd8q1/dZeT3rLUqPk=;
-        b=rLkFBjgjuZIV+OnzkDL554/UmD6mQ9mcnID2Rt5HrpOUYnLnVNA/LVCirI1WgUivnf
-         aOIHN9vzIaVJf07R6BB4dzlzBx8S6kMaEZ67DHtyyfqtpczr6L/C0slqtVmFRBcDKzg/
-         DEpAJNNBc2e66MCSQvpEsII9s8rqNEkrYCgDfVjd9dNzwRiyHCrwxgESmQXHnucZswze
-         vRXinnhMh+PtABDnGqSs51J8r8Fd+47YrIGnImQa6YUzqSNpkfc1L3YcGkatVLOVdCY7
-         rld4Btlq3IegPwkOvswlAMXcTgMfXeU0J2qvaZ/HjDheGzq/+jal2eQqaayGSiGIo3U3
-         gdVA==
+	s=arc-20240116; t=1737632536; c=relaxed/simple;
+	bh=3hD5KkiZ/PU6Yq0A+2rypE1iZ9K3OtDxiv1y5lERebg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oEzRfDMdg4ajhlr/Xm7UaO1+cQOC7JpiI1ecvZ2jkqFhIHS/JNLiSinxE06apY8SExlmhyD1NW5HMiDnUFhCYUm3KbGwQrJTuW5xObQTDvGLq0fGeJaRLP/1XASISl0njmJhGly5UACikeQW/DGuOgYGiMipxs/SL9tdJLnt2ls=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WTdyP6IN; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1737632534;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=e9nvSveIZF/sDomswUgi7zxeNXYUEUomIWSIRFmLLO4=;
+	b=WTdyP6INIBVuHohmGQshvIoQOfX9NDWK5no0/tVNAQEPQE4kZ3zGDBRzxL1KpmLJFb3wlW
+	LLJ0Yyj0YlqfiDGTC5vxYjPIE42vxkOs+Z11r7U/wTnfgmv/73IyinW0Zf1ggdvVJNHayt
+	ysqKFgyrtHFQIz6uxJySA9EtgD44lIk=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-166-VcG5JpCAOj6kAZZCOZlx9A-1; Thu, 23 Jan 2025 06:42:12 -0500
+X-MC-Unique: VcG5JpCAOj6kAZZCOZlx9A-1
+X-Mimecast-MFC-AGG-ID: VcG5JpCAOj6kAZZCOZlx9A
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-385d6ee042eso595954f8f.0
+        for <netdev@vger.kernel.org>; Thu, 23 Jan 2025 03:42:12 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737632014; x=1738236814;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=+YVE/gtiWqh1QibLG9dYV/Ym5SAd8q1/dZeT3rLUqPk=;
-        b=p+tiiuNwYONWaN9B4TkRpZaeYNQ0gRzcjbl3MP4dlChmzYQJMj4gllsC6S73X2B9jd
-         ps1kfU39HxBI41/8YeO2ANkf0bWaJsukcq1twAqpI8N3dBirnz2Zyp7qxufiNIRog8SN
-         1A5tZi6ol5XCyZD9oNKWmK8V703T/ZvaOZ3at9aSMNqm/UwwkrsEmjSLOWEmQ7eSOLdl
-         cVt5cLbmn3Ezj6Nnwdds9xXAIKVT3BNEtNx5fbwoACt3bX+td//GmjagpPJsnRLJE1Dz
-         w6S+O0KCkk62HAbiqP75soi8IeO40yc+c38/RzRBrjX+fkrZnDynJ+rmhog/vXmOQG+t
-         o2Vw==
-X-Forwarded-Encrypted: i=1; AJvYcCVjbQCJnzsk41eiGjemlF3MCbEaVnsfOC97Ew+I7bIUwF2hYzBQolw+WtYMp4nnylTOi22/ZU4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw6tzGfjO7ud/bHdG4q242T970gQe96HAh1Zjf02Qcm62FY5Yx6
-	8Zd2272S+xP6+UGnuIZVoCtbh3hX4L1dpARAr8n8uQZ3rtRBHWidjHzjHrD/4a92s4s0UpRzSTL
-	q
-X-Gm-Gg: ASbGncvO/pAF3FkltlhfVsM84YaAcKoONc3QDADHW5MIRo2WLSox7ibpt0Xfe+SGmvd
-	rh1yUl59+OmIDLI1T6G/nbvsL4M91FAq1A+URSo/lzHouyIwLCYmL7msj/Ty/DFBeehBXpLX5Vi
-	y+BV5n6fDXbbHuf2pT4LQ6TlASmUlkkzDru9GXzl6hHvaesyDtSQwUIvyQgnu9p510cyERnJlaz
-	2fyqZKXeti3SU38FmfIySvoMoalkOsS/N5BpvO5Oy4yIC7Xt7TsHBi429MxqtYw3cavmLClGw1J
-	5DiUMZ6EruN4
-X-Google-Smtp-Source: AGHT+IFQkobOQLylBs+LFRBPvbBF7c0LuXr3S1V57vJaQa4QGiZaOthU2WMGxsNN7vo5crNCtzWIfg==
-X-Received: by 2002:a05:600c:450e:b0:436:1ac2:1ad2 with SMTP id 5b1f17b1804b1-43891427485mr206669055e9.19.1737632013469;
-        Thu, 23 Jan 2025 03:33:33 -0800 (PST)
-Received: from [192.168.50.4] ([82.78.167.35])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-438b31ae155sm58789255e9.20.2025.01.23.03.33.31
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 23 Jan 2025 03:33:33 -0800 (PST)
-Message-ID: <806d2df6-68d3-4319-8ce6-7049563508cf@tuxon.dev>
-Date: Thu, 23 Jan 2025 13:33:30 +0200
+        d=1e100.net; s=20230601; t=1737632531; x=1738237331;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=e9nvSveIZF/sDomswUgi7zxeNXYUEUomIWSIRFmLLO4=;
+        b=OPvgp+Pa8lmKBdZSFFzEp1Ua5B0EOIF8Kocl7J/38p+aa1Fvc2u4vJvNbVD5xTcuj+
+         7Okedp28FGhaDHui70ZglXeSreOlmEs+ZSxEtW2tnpV5p7dM2+ZS9vjTofhXZpxaM6Hk
+         wvQ05+z+lLX2CZGENyHg57bHyCHWzdxfy3gEVfoR/uIMn0U1X3HMDDWNhovYvGQKgJOq
+         An+RXdRYcZv1JB6ck6SBmYJYaKivgZbIUVd73UEOLF1LbkLUJQXDXTkwCeTHJ8fXK6Vd
+         E0y7TKqv8YqaTUrhBmqoHInyrQX2bQ0ARNdnmjHu05Cexcfe87hCRUbjO1CFokWQbrmE
+         rp5w==
+X-Forwarded-Encrypted: i=1; AJvYcCU3eJTozRVxPZXlFMIpSCRX8WU7+cRB84/ppjjtoC+cIzPVRNcuoIyqkIOjB8J0p/y2aHthiX0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzM7EM12HKDL9c/cavaMCE0FKfo4c4Jm0HZo4ktzy1UuPoj+vJN
+	bd/l57AtIE/6ArNnI910Kaw1rFg1NXr5QW+otqa8iE2kEl8ChX+fVaL/2ClVn2DB0OPLXOl7NIM
+	zyZqGWwo2lVNdouyYH6+SAMYY4PQvrOXa1MMc5/OhWIZLQDD/s0QdyA==
+X-Gm-Gg: ASbGncudxmJBpdFkbMX0N7NOgmmvPP8zZrpMnws3uUCpq00LFBda8FTliRS1n7gIBRu
+	uQLaUeYw4LF1EgtZ5801BEhUcd1M649VyBzBa+0cLvBXlk5nzfQTLPT7JO+Kjrw8v85rQuCE9np
+	WWpPltxxTcvNBB2hEWi9zdYoJ+WSpyFpjloBMjeBbdQX3aqS0PIWl2imgLu7mjqt48Rr1lK9SBV
+	zp48BlFkp8xvEhdZD/pKQKisNa+mquTvbueDYKnYia7rc0j5aI4LtloxVNf3WEC894BSNGUvA==
+X-Received: by 2002:a5d:47cf:0:b0:38c:1270:f96b with SMTP id ffacd0b85a97d-38c1270fbb5mr13452499f8f.45.1737632531283;
+        Thu, 23 Jan 2025 03:42:11 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHMIezSgtaAVjiqyPQwwGR6RaSM+npl7GLxoTQ+6iM3XcieYSbGEY5DSWv4eAsGEMRjBAV6LQ==
+X-Received: by 2002:a5d:47cf:0:b0:38c:1270:f96b with SMTP id ffacd0b85a97d-38c1270fbb5mr13452476f8f.45.1737632530950;
+        Thu, 23 Jan 2025 03:42:10 -0800 (PST)
+Received: from leonardi-redhat ([176.206.32.19])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38bf32754f5sm19257540f8f.79.2025.01.23.03.42.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 23 Jan 2025 03:42:10 -0800 (PST)
+Date: Thu, 23 Jan 2025 12:42:08 +0100
+From: Luigi Leonardi <leonardi@redhat.com>
+To: Michal Luczaj <mhal@rbox.co>
+Cc: Stefano Garzarella <sgarzare@redhat.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net v2 2/6] vsock: Allow retrying on connect() failure
+Message-ID: <nbwte2cebsfbmdzuthcber446ytqkz7zwophbgxfrgxxaeo2xp@22si4coigduk>
+References: <20250121-vsock-transport-vs-autobind-v2-0-aad6069a4e8c@rbox.co>
+ <20250121-vsock-transport-vs-autobind-v2-2-aad6069a4e8c@rbox.co>
+ <sfqi47un2r7swyle27vnwdsp7d4o7kziuqkwb5rh2rfmc23c6y@ip2fseeevluc>
+ <1b9e780c-033f-4801-ac8a-4ed6ba01656d@rbox.co>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 1/2] net: ravb: Fix missing rtnl lock in suspend path
-To: Kory Maincent <kory.maincent@bootlin.com>,
- Paul Barker <paul.barker.ct@bp.renesas.com>,
- =?UTF-8?Q?Niklas_S=C3=B6derlund?= <niklas.soderlund@ragnatech.se>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Mikhail Ulyanov <mikhail.ulyanov@cogentembedded.com>,
- Sergei Shtylyov <sergei.shtylyov@cogentembedded.com>
-Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
- =?UTF-8?Q?Niklas_S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>,
- Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>, netdev@vger.kernel.org,
- linux-renesas-soc@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20250122-fix_missing_rtnl_lock_phy_disconnect-v1-0-8cb9f6f88fd1@bootlin.com>
- <20250122-fix_missing_rtnl_lock_phy_disconnect-v1-1-8cb9f6f88fd1@bootlin.com>
-From: Claudiu Beznea <claudiu.beznea@tuxon.dev>
-Content-Language: en-US
-In-Reply-To: <20250122-fix_missing_rtnl_lock_phy_disconnect-v1-1-8cb9f6f88fd1@bootlin.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <1b9e780c-033f-4801-ac8a-4ed6ba01656d@rbox.co>
 
-Hi, Kory,
+On Wed, Jan 22, 2025 at 10:06:51PM +0100, Michal Luczaj wrote:
+>On 1/22/25 17:28, Luigi Leonardi wrote:
+>> On Tue, Jan 21, 2025 at 03:44:03PM +0100, Michal Luczaj wrote:
+>>> sk_err is set when a (connectible) connect() fails. Effectively, this makes
+>>> an otherwise still healthy SS_UNCONNECTED socket impossible to use for any
+>>> subsequent connection attempts.
+>>>
+>>> Clear sk_err upon trying to establish a connection.
+>>>
+>>> Fixes: d021c344051a ("VSOCK: Introduce VM Sockets")
+>>> Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+>>> Signed-off-by: Michal Luczaj <mhal@rbox.co>
+>>> ---
+>>> net/vmw_vsock/af_vsock.c | 5 +++++
+>>> 1 file changed, 5 insertions(+)
+>>>
+>>> diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
+>>> index cfe18bc8fdbe7ced073c6b3644d635fdbfa02610..075695173648d3a4ecbd04e908130efdbb393b41 100644
+>>> --- a/net/vmw_vsock/af_vsock.c
+>>> +++ b/net/vmw_vsock/af_vsock.c
+>>> @@ -1523,6 +1523,11 @@ static int vsock_connect(struct socket *sock, struct sockaddr *addr,
+>>> 		if (err < 0)
+>>> 			goto out;
+>>>
+>>> +		/* sk_err might have been set as a result of an earlier
+>>> +		 * (failed) connect attempt.
+>>> +		 */
+>>> +		sk->sk_err = 0;
+>>
+>> Just to understand: Why do you reset sk_error after calling to
+>> transport->connect and not before?
+>
+>transport->connect() can fail. In such case, I thought, it would be better
+>to keep the old value of sk_err. Otherwise we'd have an early failing
+>vsock_connect() that clears sk_err.
+That's a good point, transport->connect doesn't set sk_err if it fails.
+Thanks for the clarification :)
 
-On 22.01.2025 18:19, Kory Maincent wrote:
-> Fix the suspend path by ensuring the rtnl lock is held where required.
-> Calls to ravb_open, ravb_close and wol operations must be performed under
-> the rtnl lock to prevent conflicts with ongoing ndo operations.
-> 
-> Without this fix, the following warning is triggered:
-> [   39.032969] =============================
-> [   39.032983] WARNING: suspicious RCU usage
-> [   39.033019] -----------------------------
-> [   39.033033] drivers/net/phy/phy_device.c:2004 suspicious
-> rcu_dereference_protected() usage!
-> ...
-> [   39.033597] stack backtrace:
-> [   39.033613] CPU: 0 UID: 0 PID: 174 Comm: python3 Not tainted
-> 6.13.0-rc7-next-20250116-arm64-renesas-00002-g35245dfdc62c #7
-> [   39.033623] Hardware name: Renesas SMARC EVK version 2 based on
-> r9a08g045s33 (DT)
-> [   39.033628] Call trace:
-> [   39.033633]  show_stack+0x14/0x1c (C)
-> [   39.033652]  dump_stack_lvl+0xb4/0xc4
-> [   39.033664]  dump_stack+0x14/0x1c
-> [   39.033671]  lockdep_rcu_suspicious+0x16c/0x22c
-> [   39.033682]  phy_detach+0x160/0x190
-> [   39.033694]  phy_disconnect+0x40/0x54
-> [   39.033703]  ravb_close+0x6c/0x1cc
-> [   39.033714]  ravb_suspend+0x48/0x120
-> [   39.033721]  dpm_run_callback+0x4c/0x14c
-> [   39.033731]  device_suspend+0x11c/0x4dc
-> [   39.033740]  dpm_suspend+0xdc/0x214
-> [   39.033748]  dpm_suspend_start+0x48/0x60
-> [   39.033758]  suspend_devices_and_enter+0x124/0x574
-> [   39.033769]  pm_suspend+0x1ac/0x274
-> [   39.033778]  state_store+0x88/0x124
-> [   39.033788]  kobj_attr_store+0x14/0x24
-> [   39.033798]  sysfs_kf_write+0x48/0x6c
-> [   39.033808]  kernfs_fop_write_iter+0x118/0x1a8
-> [   39.033817]  vfs_write+0x27c/0x378
-> [   39.033825]  ksys_write+0x64/0xf4
-> [   39.033833]  __arm64_sys_write+0x18/0x20
-> [   39.033841]  invoke_syscall+0x44/0x104
-> [   39.033852]  el0_svc_common.constprop.0+0xb4/0xd4
-> [   39.033862]  do_el0_svc+0x18/0x20
-> [   39.033870]  el0_svc+0x3c/0xf0
-> [   39.033880]  el0t_64_sync_handler+0xc0/0xc4
-> [   39.033888]  el0t_64_sync+0x154/0x158
-> [   39.041274] ravb 11c30000.ethernet eth0: Link is Down
-> 
-> Reported-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
-> Closes: https://lore.kernel.org/netdev/4c6419d8-c06b-495c-b987-d66c2e1ff848@tuxon.dev/
-> Fixes: 0184165b2f42 ("ravb: add sleep PM suspend/resume support")
-> Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
-
-I've test it. Looks good.
-
-Thank you for your patch. However, I think this could be simplified. The
-locking scheme looks complicated to me. E.g., this one works too:
-
-diff --git a/drivers/net/ethernet/renesas/ravb_main.c
-b/drivers/net/ethernet/renesas/ravb_main.c
-index bc395294a32d..cfe4f0f364f3 100644
---- a/drivers/net/ethernet/renesas/ravb_main.c
-+++ b/drivers/net/ethernet/renesas/ravb_main.c
-@@ -3217,10 +3217,16 @@ static int ravb_suspend(struct device *dev)
-
-        netif_device_detach(ndev);
-
--       if (priv->wol_enabled)
--               return ravb_wol_setup(ndev);
-+       if (priv->wol_enabled) {
-+               rtnl_lock();
-+               ret = ravb_wol_setup(ndev);
-+               rtnl_unlock();
-+               return ret;
-+       }
-
-+       rtnl_lock();
-        ret = ravb_close(ndev);
-+       rtnl_unlock();
-        if (ret)
-                return ret;
-
-@@ -3247,7 +3253,9 @@ static int ravb_resume(struct device *dev)
-
-        /* If WoL is enabled restore the interface. */
-        if (priv->wol_enabled) {
-+               rtnl_lock();
-                ret = ravb_wol_restore(ndev);
-+               rtnl_unlock();
-                if (ret)
-                        return ret;
-        } else {
-@@ -3257,7 +3265,9 @@ static int ravb_resume(struct device *dev)
-        }
-
-        /* Reopening the interface will restore the device to the working
-state. */
-+       rtnl_lock();
-        ret = ravb_open(ndev);
-+       rtnl_unlock();
-        if (ret < 0)
-                goto out_rpm_put;
-
-
-> ---
->  drivers/net/ethernet/renesas/ravb_main.c | 19 +++++++++++++++----
->  1 file changed, 15 insertions(+), 4 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
-> index bc395294a32d..2c6d8e4966c3 100644
-> --- a/drivers/net/ethernet/renesas/ravb_main.c
-> +++ b/drivers/net/ethernet/renesas/ravb_main.c
-> @@ -3217,10 +3217,15 @@ static int ravb_suspend(struct device *dev)
->  
->  	netif_device_detach(ndev);
->  
-> -	if (priv->wol_enabled)
-> -		return ravb_wol_setup(ndev);
-> +	rtnl_lock();
-> +	if (priv->wol_enabled) {
-> +		ret = ravb_wol_setup(ndev);
-> +		rtnl_unlock();
-> +		return ret;
-> +	}
->  
->  	ret = ravb_close(ndev);
-> +	rtnl_unlock();
->  	if (ret)
->  		return ret;
->  
-> @@ -3245,19 +3250,25 @@ static int ravb_resume(struct device *dev)
->  	if (!netif_running(ndev))
->  		return 0;
->  
-> +	rtnl_lock();
->  	/* If WoL is enabled restore the interface. */
->  	if (priv->wol_enabled) {
->  		ret = ravb_wol_restore(ndev);
-> -		if (ret)
-> +		if (ret)  {
-> +			rtnl_unlock();
->  			return ret;
-> +		}
->  	} else {
->  		ret = pm_runtime_force_resume(dev);
-> -		if (ret)
-> +		if (ret) {
-> +			rtnl_unlock();
->  			return ret;
-> +		}
->  	}
->  
->  	/* Reopening the interface will restore the device to the working state. */
->  	ret = ravb_open(ndev);
-> +	rtnl_unlock();
->  	if (ret < 0)
->  		goto out_rpm_put;
->  
-> 
+Reviewed-by: Luigi Leonardi <leonardi@redhat.com>
+>
+>> My worry is that a transport might check this field and return an error.
+>> IIUC with virtio-based transports this is not the case.
+>
+>Right, transport might check, but currently none of the transports do.
+>
 
 
