@@ -1,106 +1,91 @@
-Return-Path: <netdev+bounces-160465-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160466-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 63BDCA19D5F
-	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 04:42:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A24AA19D64
+	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 04:45:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 38BB83A64DD
-	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 03:42:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D15663A6533
+	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 03:44:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2793B126C0D;
-	Thu, 23 Jan 2025 03:42:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE14C126C0D;
+	Thu, 23 Jan 2025 03:44:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="VT3UG3Xv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SlL4aVWT"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3A783A8D0;
-	Thu, 23 Jan 2025 03:42:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B32668528E;
+	Thu, 23 Jan 2025 03:44:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737603723; cv=none; b=oW9Cmg9j3zUjjofn7Rt47k1p4m0VvmMbf4YED7gbvA9MgZ7jkRKc0vKkQg1D6ptruB6SsZIY067QXoOLRAFi0/WoYWql9pZ82yvC5huOdQt4a1tarS/UrpUKCP+fFUph5g1qMOnXBaIRPpKUU8380ZK2T3FdIOHMBK4LokfOgx8=
+	t=1737603896; cv=none; b=ENEWSPqjEtjCaK3bxIN3PH9mSNm8c6YiHbgZfYVkXH6frA83sKb2avHq1lRHHkqQH0D+Ibgd1qd4iiuoIWOXLQG9GuWr9EKqQcAzCgyY0HAjI3axlniHY36/1ALUFuU05ewU6dCt8DcCJhGmD8gTs0+0Mlbj/QPHBWlIlM0jXow=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737603723; c=relaxed/simple;
-	bh=3RY4k2zboVV5daIxlBEkCjdDsAZaLavxRnGu8nEYbec=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ugba9sDAOAS3LjSJAaeqzcYWKg4A8zGnpyN6DmXtGmc+3ZKujAMQQjGHwKx234vuDNXLSBNoLAFJPlpzSOa7Nrv9p1+vzo/NIVebWBMIXT5xh2F+pBPr+HMEZbj0eE/Sm/cgAvAYO1D3kcvvTpylBQlN8glUYaxMV0w6ZT/lUwA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=VT3UG3Xv; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=nxV6h48oOYNUXilv2b43vdsiPZOgrDsSq3hXRcY+eoY=; b=VT3UG3XvlCtX+ofHf2rAlwAlGk
-	Eg1t/wU6mPNFAxoymJ2dNMDPTLpf86x/ZLPF6018Q/qpmJH5grMNzIdgyCwQ2QNxJpBOLlvZfEwQ9
-	vhlzgRl0sM6S5go6ZxogW8bkU2jGoDEuZ2+YdrG3PlVunEPfs9+NFMvravK5IBcMDvnc=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tao66-0078OE-Du; Thu, 23 Jan 2025 04:41:38 +0100
-Date: Thu, 23 Jan 2025 04:41:38 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Chris Packham <Chris.Packham@alliedtelesis.co.nz>
-Cc: Sander Vanheule <sander@svanheule.net>,
-	"lee@kernel.org" <lee@kernel.org>,
-	"robh@kernel.org" <robh@kernel.org>,
-	"krzk+dt@kernel.org" <krzk+dt@kernel.org>,
-	"conor+dt@kernel.org" <conor+dt@kernel.org>,
-	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"tsbogend@alpha.franken.de" <tsbogend@alpha.franken.de>,
-	"hkallweit1@gmail.com" <hkallweit1@gmail.com>,
-	"linux@armlinux.org.uk" <linux@armlinux.org.uk>,
-	"markus.stockhausen@gmx.de" <markus.stockhausen@gmx.de>,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-mips@vger.kernel.org" <linux-mips@vger.kernel.org>
-Subject: Re: [PATCH v4 4/4] net: mdio: Add RTL9300 MDIO driver
-Message-ID: <11d7fe78-958d-409f-a979-25cc1bc933a2@lunn.ch>
-References: <20250120040214.2538839-1-chris.packham@alliedtelesis.co.nz>
- <20250120040214.2538839-5-chris.packham@alliedtelesis.co.nz>
- <d4194a1560ff297e5ab3e6eae6d51b7c9d469381.camel@svanheule.net>
- <63d6cf16-9581-4736-8592-bc5836fa51af@alliedtelesis.co.nz>
- <faa4cf6e-40eb-4509-b3f0-198a9a45ccbd@lunn.ch>
- <09bd2f04-96d6-4dba-92ee-22ccbd7f584f@alliedtelesis.co.nz>
+	s=arc-20240116; t=1737603896; c=relaxed/simple;
+	bh=PpQcKerF0Oe+hQQJLUk0XoGagTqz8UzMMn4d2mozXPE=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=OoIVsjd1empxtZERFd5X7rNpNje/DoTsIYQNMuCmD6JnSp3YIuRxe35mFfHZCNW6ZruGbPRxsf28MdmSEH3P6TXEwGjC/r1apyWHV9jN24Ka5wQhWlEC4hMkFsAEuhL8ZYJM2xBin/F8C6YAlvqv4JNbYNqSgjmSBkF6NyQlSig=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SlL4aVWT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D78AC4CED2;
+	Thu, 23 Jan 2025 03:44:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1737603896;
+	bh=PpQcKerF0Oe+hQQJLUk0XoGagTqz8UzMMn4d2mozXPE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=SlL4aVWTc3gRdp+DzgvygtOcetR5kZEsIyMOcO3PRmQZW2PvDnhO6MGm/JLCm9Ur9
+	 OVduZiwJnn43HBf9zkFpkqjg3rUqCgU4P0GpB+W6qkqa3uL8Wyo1gIFe1heyirZzie
+	 UQ/FXk5IXYGDJLxc+eO47fLjcsDhrgCsTbH8TJRU004DrC+aS/pTqup8HeOAMYTa5y
+	 jxAxOkwhrybdBoFd23QMaMHCJQcWXsydRsxlYTJIogxsg/FWytGm+ByYkCx0fBsv2E
+	 DoougQIM9X7/bq8EQWWmuCE1NlAA4sVkK9sFghlyflA/aXwxCHmnyNyTTS7nAEhQBY
+	 kcg2LBGEi2Jug==
+Date: Wed, 22 Jan 2025 19:44:55 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Huacai Chen <chenhuacai@kernel.org>
+Cc: Qunqin Zhao <zhaoqunqin@loongson.cn>, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ si.yanteng@linux.dev, fancer.lancer@gmail.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: stmmac: dwmac-loongson: Add fix_soc_reset function
+Message-ID: <20250122194455.764124ad@kernel.org>
+In-Reply-To: <CAAhV-H6HDOvjr5sA3n+dUMTLm22_p9fAFaTgEUcrufR3XHrj9Q@mail.gmail.com>
+References: <20250121082536.11752-1-zhaoqunqin@loongson.cn>
+	<CAAhV-H7LA7OBCxRzQogCbDeniY39EsxA6GVN07WM=e6EzasM0w@mail.gmail.com>
+	<20250121101107.349a565b@kernel.org>
+	<CAAhV-H6HDOvjr5sA3n+dUMTLm22_p9fAFaTgEUcrufR3XHrj9Q@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <09bd2f04-96d6-4dba-92ee-22ccbd7f584f@alliedtelesis.co.nz>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jan 22, 2025 at 11:02:14PM +0000, Chris Packham wrote:
-> Hi Andrew,
-> 
-> On 23/01/2025 10:47, Andrew Lunn wrote:
-> >> I believe the POLL_SEL configuration actually affects an internal port
-> >> polling unit. From the datasheets I have it seems pretty configurable, you
-> >> can tell it which phy registers to poll and what values indicate link
-> >> up/down (the defaults are conveniently setup to match the Realtek PHYs).
-> > You need to disable this. The linux PHY driver is driving the PHY, and
-> > the hardware has no idea what Linux is doing. Say the driver has
-> > changed the page to read a temperature sensor, when the switch does a
-> > poll. Rather than reading the link status, it gets some random value
-> > from the page containing the temperature sensor.
-> 
-> There's a mask that can be set via a register that can disable polling 
-> for a port. The trick will be deciding when to do so.
+On Wed, 22 Jan 2025 12:09:28 +0800 Huacai Chen wrote:
+> Subject: Re: [PATCH] net: stmmac: dwmac-loongson: Add fix_soc_reset funct=
+ion
+>=20
+> On Wed, Jan 22, 2025 at 2:11=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> =
+wrote:
+> >
+> > On Tue, 21 Jan 2025 17:29:37 +0800 Huacai Chen wrote: =20
+> > > Hi, Qunqin,
+> > >
+> > > The patch itself looks good to me, but something can be improved.
+> > > 1. The title can be "net: stmmac: dwmac-loongson: Add fix_soc_reset()=
+ callback"
+> > > 2. You lack a "." at the end of the commit message.
+> > > 3. Add a "Cc: stable@vger.kernel.org" because it is needed to backport
+> > > to 6.12/6.13. =20
+> >
+> > Please don't top post. =20
+> I know about inline replies, but in this case I agree with the code
+> itself so I cannot reply after the code.
 
-On probe. And leave is disabled. phylink will provide you with all the
-information you need about link up, what the link speed is etc. There
-is no need for PPU.
-
-	Andrew
+You're not trying hard enough. The message is Subject, body and code.
+Reply in the place where the problem is or where the CC stable should
+be added.
 
