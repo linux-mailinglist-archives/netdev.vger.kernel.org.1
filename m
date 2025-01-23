@@ -1,149 +1,131 @@
-Return-Path: <netdev+bounces-160563-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160564-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B3488A1A379
-	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 12:47:05 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6AB93A1A395
+	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 12:51:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3098D16C93F
-	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 11:45:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 39D083A3D98
+	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 11:51:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3E2A20E33A;
-	Thu, 23 Jan 2025 11:42:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FB0E20E02F;
+	Thu, 23 Jan 2025 11:51:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WTdyP6IN"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="PIQTGdD0"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from lelvem-ot01.ext.ti.com (lelvem-ot01.ext.ti.com [198.47.23.234])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A9C420E00E
-	for <netdev@vger.kernel.org>; Thu, 23 Jan 2025 11:42:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CDA729B0;
+	Thu, 23 Jan 2025 11:51:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.234
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737632536; cv=none; b=rHjBAjI5et+DaCkbQeyN71+KkzMhttOl4rxXnDhRVv534Am9leXN03KLigp1kYQhQiGNKP1bAxlq/WZEIKVUtYlD3BoGbE4hY+JglxzbKn/sjquP1W0wdXeBSa8b2XoAt5pldR2iXxrZBHn5TDoYHBb0Mi+312lvdkMFskCatwQ=
+	t=1737633067; cv=none; b=KI+LFRLr1gluFaHw0q91wgiqEalpLR51TVTkkKMWEXEMzK59XA6baguPYCvyyK/Vt2RutFFgvc5LhM+RAgXSSiMEZJkAYxGydpkB+0QSkYayvjJw99/0FmUV4VY7CWKNIKdPK7Uo/aL11dOZzM3d4uroEKOA004VI7THUA7Csmg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737632536; c=relaxed/simple;
-	bh=3hD5KkiZ/PU6Yq0A+2rypE1iZ9K3OtDxiv1y5lERebg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oEzRfDMdg4ajhlr/Xm7UaO1+cQOC7JpiI1ecvZ2jkqFhIHS/JNLiSinxE06apY8SExlmhyD1NW5HMiDnUFhCYUm3KbGwQrJTuW5xObQTDvGLq0fGeJaRLP/1XASISl0njmJhGly5UACikeQW/DGuOgYGiMipxs/SL9tdJLnt2ls=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WTdyP6IN; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1737632534;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=e9nvSveIZF/sDomswUgi7zxeNXYUEUomIWSIRFmLLO4=;
-	b=WTdyP6INIBVuHohmGQshvIoQOfX9NDWK5no0/tVNAQEPQE4kZ3zGDBRzxL1KpmLJFb3wlW
-	LLJ0Yyj0YlqfiDGTC5vxYjPIE42vxkOs+Z11r7U/wTnfgmv/73IyinW0Zf1ggdvVJNHayt
-	ysqKFgyrtHFQIz6uxJySA9EtgD44lIk=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-166-VcG5JpCAOj6kAZZCOZlx9A-1; Thu, 23 Jan 2025 06:42:12 -0500
-X-MC-Unique: VcG5JpCAOj6kAZZCOZlx9A-1
-X-Mimecast-MFC-AGG-ID: VcG5JpCAOj6kAZZCOZlx9A
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-385d6ee042eso595954f8f.0
-        for <netdev@vger.kernel.org>; Thu, 23 Jan 2025 03:42:12 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737632531; x=1738237331;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=e9nvSveIZF/sDomswUgi7zxeNXYUEUomIWSIRFmLLO4=;
-        b=OPvgp+Pa8lmKBdZSFFzEp1Ua5B0EOIF8Kocl7J/38p+aa1Fvc2u4vJvNbVD5xTcuj+
-         7Okedp28FGhaDHui70ZglXeSreOlmEs+ZSxEtW2tnpV5p7dM2+ZS9vjTofhXZpxaM6Hk
-         wvQ05+z+lLX2CZGENyHg57bHyCHWzdxfy3gEVfoR/uIMn0U1X3HMDDWNhovYvGQKgJOq
-         An+RXdRYcZv1JB6ck6SBmYJYaKivgZbIUVd73UEOLF1LbkLUJQXDXTkwCeTHJ8fXK6Vd
-         E0y7TKqv8YqaTUrhBmqoHInyrQX2bQ0ARNdnmjHu05Cexcfe87hCRUbjO1CFokWQbrmE
-         rp5w==
-X-Forwarded-Encrypted: i=1; AJvYcCU3eJTozRVxPZXlFMIpSCRX8WU7+cRB84/ppjjtoC+cIzPVRNcuoIyqkIOjB8J0p/y2aHthiX0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzM7EM12HKDL9c/cavaMCE0FKfo4c4Jm0HZo4ktzy1UuPoj+vJN
-	bd/l57AtIE/6ArNnI910Kaw1rFg1NXr5QW+otqa8iE2kEl8ChX+fVaL/2ClVn2DB0OPLXOl7NIM
-	zyZqGWwo2lVNdouyYH6+SAMYY4PQvrOXa1MMc5/OhWIZLQDD/s0QdyA==
-X-Gm-Gg: ASbGncudxmJBpdFkbMX0N7NOgmmvPP8zZrpMnws3uUCpq00LFBda8FTliRS1n7gIBRu
-	uQLaUeYw4LF1EgtZ5801BEhUcd1M649VyBzBa+0cLvBXlk5nzfQTLPT7JO+Kjrw8v85rQuCE9np
-	WWpPltxxTcvNBB2hEWi9zdYoJ+WSpyFpjloBMjeBbdQX3aqS0PIWl2imgLu7mjqt48Rr1lK9SBV
-	zp48BlFkp8xvEhdZD/pKQKisNa+mquTvbueDYKnYia7rc0j5aI4LtloxVNf3WEC894BSNGUvA==
-X-Received: by 2002:a5d:47cf:0:b0:38c:1270:f96b with SMTP id ffacd0b85a97d-38c1270fbb5mr13452499f8f.45.1737632531283;
-        Thu, 23 Jan 2025 03:42:11 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHMIezSgtaAVjiqyPQwwGR6RaSM+npl7GLxoTQ+6iM3XcieYSbGEY5DSWv4eAsGEMRjBAV6LQ==
-X-Received: by 2002:a5d:47cf:0:b0:38c:1270:f96b with SMTP id ffacd0b85a97d-38c1270fbb5mr13452476f8f.45.1737632530950;
-        Thu, 23 Jan 2025 03:42:10 -0800 (PST)
-Received: from leonardi-redhat ([176.206.32.19])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38bf32754f5sm19257540f8f.79.2025.01.23.03.42.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Jan 2025 03:42:10 -0800 (PST)
-Date: Thu, 23 Jan 2025 12:42:08 +0100
-From: Luigi Leonardi <leonardi@redhat.com>
-To: Michal Luczaj <mhal@rbox.co>
-Cc: Stefano Garzarella <sgarzare@redhat.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net v2 2/6] vsock: Allow retrying on connect() failure
-Message-ID: <nbwte2cebsfbmdzuthcber446ytqkz7zwophbgxfrgxxaeo2xp@22si4coigduk>
-References: <20250121-vsock-transport-vs-autobind-v2-0-aad6069a4e8c@rbox.co>
- <20250121-vsock-transport-vs-autobind-v2-2-aad6069a4e8c@rbox.co>
- <sfqi47un2r7swyle27vnwdsp7d4o7kziuqkwb5rh2rfmc23c6y@ip2fseeevluc>
- <1b9e780c-033f-4801-ac8a-4ed6ba01656d@rbox.co>
+	s=arc-20240116; t=1737633067; c=relaxed/simple;
+	bh=alOHbp1ghKH8XHuwSZ8JYmTr6m68l+UY4qmDmMM0ijA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=MHwPbNK5gsawBfHOr3orxffB4vYqGNlVdj+gyRHrI5CTGmuq47u8sT3Sh/sAYI9wwskEMu1qz2FjWSHCPpgg1eWpbq/BOjDc4/3R4nxlv5RBkz3K03reTpcfglvYamZ70xOERChQUioLSAhPqpnVbh1ohRRQvsYVtSDVjuFW9b0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=PIQTGdD0; arc=none smtp.client-ip=198.47.23.234
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from fllv0035.itg.ti.com ([10.64.41.0])
+	by lelvem-ot01.ext.ti.com (8.15.2/8.15.2) with ESMTPS id 50NBoEvq1193662
+	(version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 23 Jan 2025 05:50:14 -0600
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1737633014;
+	bh=BMsgE4cTOvGu1oHN2jPXinLwurlF8Y91utoENFVkqYo=;
+	h=Date:Subject:To:CC:References:From:In-Reply-To;
+	b=PIQTGdD0zerWx/dHLYjUCcDjoAEz+GBDXpI17vGfhHrA5NGrmok0w438APiNoBOAg
+	 8jsc/s+7p0tdHxD2E2GmKW3gldTWSZb2VfHhqt6CBqjGuw1Sm/XfGPytf0pY5K8DWn
+	 KdBAJkHHnBLXuIvaPABQA5nXPo0kZ6FCLByvTRRY=
+Received: from DFLE114.ent.ti.com (dfle114.ent.ti.com [10.64.6.35])
+	by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 50NBoED8054261
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Thu, 23 Jan 2025 05:50:14 -0600
+Received: from DFLE103.ent.ti.com (10.64.6.24) by DFLE114.ent.ti.com
+ (10.64.6.35) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Thu, 23
+ Jan 2025 05:50:14 -0600
+Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DFLE103.ent.ti.com
+ (10.64.6.24) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Thu, 23 Jan 2025 05:50:14 -0600
+Received: from [10.24.69.13] (meghana-pc.dhcp.ti.com [10.24.69.13] (may be forged))
+	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 50NBo7bw107089;
+	Thu, 23 Jan 2025 05:50:08 -0600
+Message-ID: <f1bdd422-5034-4390-95b1-36cd04109fb3@ti.com>
+Date: Thu, 23 Jan 2025 17:20:07 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <1b9e780c-033f-4801-ac8a-4ed6ba01656d@rbox.co>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 0/3] Add native mode XDP support
+To: Simon Horman <horms@kernel.org>
+CC: <rogerq@kernel.org>, <danishanwar@ti.com>, <pabeni@redhat.com>,
+        <kuba@kernel.org>, <edumazet@google.com>, <davem@davemloft.net>,
+        <andrew+netdev@lunn.ch>, <bpf@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <robh@kernel.org>,
+        <matthias.schiffer@ew.tq-group.com>, <dan.carpenter@linaro.org>,
+        <rdunlap@infradead.org>, <diogo.ivo@siemens.com>,
+        <schnelle@linux.ibm.com>, <glaroque@baylibre.com>,
+        <john.fastabend@gmail.com>, <hawk@kernel.org>, <daniel@iogearbox.net>,
+        <ast@kernel.org>, <srk@ti.com>, Vignesh Raghavendra
+	<vigneshr@ti.com>
+References: <20250122124951.3072410-1-m-malladi@ti.com>
+ <20250122131341.GH390877@kernel.org>
+Content-Language: en-US
+From: Meghana Malladi <m-malladi@ti.com>
+In-Reply-To: <20250122131341.GH390877@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
 
-On Wed, Jan 22, 2025 at 10:06:51PM +0100, Michal Luczaj wrote:
->On 1/22/25 17:28, Luigi Leonardi wrote:
->> On Tue, Jan 21, 2025 at 03:44:03PM +0100, Michal Luczaj wrote:
->>> sk_err is set when a (connectible) connect() fails. Effectively, this makes
->>> an otherwise still healthy SS_UNCONNECTED socket impossible to use for any
->>> subsequent connection attempts.
->>>
->>> Clear sk_err upon trying to establish a connection.
->>>
->>> Fixes: d021c344051a ("VSOCK: Introduce VM Sockets")
->>> Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
->>> Signed-off-by: Michal Luczaj <mhal@rbox.co>
->>> ---
->>> net/vmw_vsock/af_vsock.c | 5 +++++
->>> 1 file changed, 5 insertions(+)
->>>
->>> diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
->>> index cfe18bc8fdbe7ced073c6b3644d635fdbfa02610..075695173648d3a4ecbd04e908130efdbb393b41 100644
->>> --- a/net/vmw_vsock/af_vsock.c
->>> +++ b/net/vmw_vsock/af_vsock.c
->>> @@ -1523,6 +1523,11 @@ static int vsock_connect(struct socket *sock, struct sockaddr *addr,
->>> 		if (err < 0)
->>> 			goto out;
->>>
->>> +		/* sk_err might have been set as a result of an earlier
->>> +		 * (failed) connect attempt.
->>> +		 */
->>> +		sk->sk_err = 0;
+
+
+On 22/01/25 18:43, Simon Horman wrote:
+> On Wed, Jan 22, 2025 at 06:19:48PM +0530, Meghana Malladi wrote:
+>> This series adds native XDP support using page_pool.
+>> XDP zero copy support is not included in this patch series.
 >>
->> Just to understand: Why do you reset sk_error after calling to
->> transport->connect and not before?
->
->transport->connect() can fail. In such case, I thought, it would be better
->to keep the old value of sk_err. Otherwise we'd have an early failing
->vsock_connect() that clears sk_err.
-That's a good point, transport->connect doesn't set sk_err if it fails.
-Thanks for the clarification :)
+>> Patch 1/3: Replaces skb with page pool for Rx buffer allocation
+>> Patch 2/3: Adds prueth_swdata struct for SWDATA for all swdata cases
+>> Patch 3/3: Introduces native mode XDP support
+> 
+> Hi Meghana,
+> 
+> Unless I am mistaken this patchset should be targeted at net-next,
+> as a new feature, rather than net, as bug fixes.
+> 
 
-Reviewed-by: Luigi Leonardi <leonardi@redhat.com>
->
->> My worry is that a transport might check this field and return an error.
->> IIUC with virtio-based transports this is not the case.
->
->Right, transport might check, but currently none of the transports do.
->
+Yes Indeed. Thanks for pointing this to me. I will be more vigilant next 
+time I am posting to avoid such mistakes. :)
 
+> With that in mind:
+> 
+> ## Form letter - net-next-closed
+> 
+> The merge window for v6.14 has begun. Therefore net-next is closed
+> for new drivers, features, code refactoring and optimizations.
+> We are currently accepting bug fixes only.
+> 
+> Please repost when net-next reopens after Feb 3rd.
+> 
+
+My bad for not checking this before posting. I will re-post it after Feb 
+3rd. Thanks a lot.
+
+> RFC patches sent for review only are obviously welcome at any time.
+> 
+> See: https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#development-cycle
+> 
+> --
+> pw-bot: deferred
 
