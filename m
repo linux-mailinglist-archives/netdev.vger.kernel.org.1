@@ -1,136 +1,157 @@
-Return-Path: <netdev+bounces-160508-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160509-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 62B3FA1A008
-	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 09:40:01 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 49C40A1A00E
+	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 09:40:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B16B916D6CB
-	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 08:39:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7CA9216D752
+	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 08:40:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C7E520C469;
-	Thu, 23 Jan 2025 08:39:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08D4420C035;
+	Thu, 23 Jan 2025 08:40:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="I4fvgGUM"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EVRCMOQk"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBE8020C024
-	for <netdev@vger.kernel.org>; Thu, 23 Jan 2025 08:39:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EF2020C016;
+	Thu, 23 Jan 2025 08:40:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737621598; cv=none; b=b+XPI8hSALsSyqNI3O8jZnafey7011ht8iyAOQfRoa9wj+XHnwtF9Wj36WqWMv3c5ytSVjM92W0gDeBo0A1rsAKTUsJJxfAiq2Ob752Q22+wYVSC+4zrktiktbYiCw6RI7VwETmOrK6eWCNskzPgg2E7E5jlKWdQwWUqlaIq1EA=
+	t=1737621623; cv=none; b=IznbuvA7ZiDLBsGZO3JvpNvKases0hodgvswValMCPnMPPeDXmjurHCRnWtM8KDO9prsRySNaUmK3wWiQUOT4c0DgrGwRBFWg4WSjKs2Zqv/HQzaj0blTzAYJHkeJ1mRa25oulLwg8lwRJ4/aV73E5mlFpSuxgkg5yZJ0NRijSs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737621598; c=relaxed/simple;
-	bh=YrJfmBJfRM5BJl7DU/6G4DUWFE24IFCnHoyZKUXHlas=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mwc2KmkNUiJdRhlztiO6JLWgYp8zSl8PPAXrCkmUC9S/1p9OLA8uu86DcxtuRSkNE3FuBomOlvAzvZACYfVUQrmS/J4mRWqn8TOvMhBhC/Exru5NKu9yG4IFdW3GR6Fm1siRbgpCA6srdmGuQbkEC8+kaMYzqhZonBmZy6zByjg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=I4fvgGUM; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1737621595;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=GiFqxgggPoN9+s+nMZCrGcnPpT3g6d2dyyCadPevlp4=;
-	b=I4fvgGUMlDguu+wQ7E8C88mJxXin37i/MNQOVdfO6NvWlpjjK6YIwitpXKjdIA/pbNbZ0F
-	KHtDWBnyL6ACcW/z6y6hzCcIqqNnf0SpHFyz9bnudkOIgQSm6Qaco9Hv+1JFaP+bXjut77
-	GKEEjs/lYpi3ZgISzpVCOOh7KlHGhqU=
-Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
- [209.85.216.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-443-dw1Ok2SGMD6aWZ9FUpWYJA-1; Thu, 23 Jan 2025 03:39:54 -0500
-X-MC-Unique: dw1Ok2SGMD6aWZ9FUpWYJA-1
-X-Mimecast-MFC-AGG-ID: dw1Ok2SGMD6aWZ9FUpWYJA
-Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-2ef9da03117so2368892a91.1
-        for <netdev@vger.kernel.org>; Thu, 23 Jan 2025 00:39:54 -0800 (PST)
+	s=arc-20240116; t=1737621623; c=relaxed/simple;
+	bh=XD0aABv58nDK/2kXxubE7fw2Dd/4+FE2LNdabEGmXYw=;
+	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=IMnuLlhoca4DStPj5PZiHnNukMXP9ssGLuVJXu52LPWhZH8JrO2XdDduSaH1ESLzRXj/0spo9wW4UoT1dEyl8I25pmORPrKvcQWy1TQu8jj+RSbUS9ChNQ+Kv5o2e7WJCMXYFg5Dtr/uq944+42w6UhSEwxpS9vltiWT0LZkMz8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EVRCMOQk; arc=none smtp.client-ip=209.85.216.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-2ee989553c1so1226283a91.3;
+        Thu, 23 Jan 2025 00:40:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1737621622; x=1738226422; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=+9q1x174EflZkASpLdvzyaoyFXGYC2fkIourI+Rdf60=;
+        b=EVRCMOQkFPZasNOSxQ6io/uLvk/Vn0DlYhRnQLSmBFi92uZHXTVszgCKEfr7H2FEYL
+         gL+Cz/fl67+lpCOyIUal3hA8nNfbHrBzLG0ezIgLyFWNjrSufZuS9GSdOXryMS28fsp3
+         NNKEHrTKSxPsc5DPH/u7UobDgZV7Vs9rSAKFf++lxUhUw69H0pluwYARA2Jmd+SUnWUB
+         mJvTmmTSHHZ0AAv2lTv0D2dCAQ/FHiepZ6PaN6nb46wipnDvsX+aO099lDgaoo2xxYQO
+         A7SNDFXUbs8ygxTNhkzG3Yz3NzL59g+ahvO2iDaJKw0gE+fY/ixJQ48R+8SU3oFi/rHH
+         nzfQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737621593; x=1738226393;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=GiFqxgggPoN9+s+nMZCrGcnPpT3g6d2dyyCadPevlp4=;
-        b=mDA5giqgXEyukXkbIIez4bU/LXW9+QEDdVOE5jZhbTv6WRH/cAsDlPX2wQXw59LZkq
-         RdhDNVF7bWAYbzz1B0k+m4xt1aupcK4NL63q5RTf9Mp7Vv5EUWPi7vh/yCN6iofhGLG7
-         qfAvsaXya9XzT+i4esoo0qLtHK2s0B4smYlxjwIrKItXbp4OZP01mOwLdVEFtWgsJ762
-         vhiSRYfDPStQZwaWJhmhGuFTlgtTcmcKfNHrudeTGP1C7yein7N2cCyIBnTqArINVQlJ
-         sdIC4s7wpLNCVlHx5S3DgEz3vrl8HNMIgi/ARKjkZRojyecxVftt2FzNSiXWWxBdR5QH
-         Tk7g==
-X-Forwarded-Encrypted: i=1; AJvYcCWtupe7RcwbuBz6+DPL2NXYh5TcyE+V3QWMUVNxOm2YBngpWPTXgu6kKad+f0umTNbQYhjBWis=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy6Xto/EhfSzgn1r5FdZxAd0MpZq6/7OHlYdZGVLnQRw4Fs0rB+
-	s5trIVXWYKensjxwD9gLH4Q+FAcR5rUvrR62dfk7OR1jPcdvMSNY8qlygk4EdxRx9bmE1I3um7T
-	Slu8NLR3Gdtz6pKIZfxG4+YQezObrVt3aA+bhAidab3fFHZbXqUtN6KSO+Jk0Gjs=
-X-Gm-Gg: ASbGncsscePmdq9x+edc7hruGiP/JZAmQp8VR6zkIvdrwEQnHHjUXfwGSMkWYKMT0ec
-	z6+SIzUiqgK0gBRocCTfAvItZRi2PVYTgfqa29EZe+bPytMdR6YMtswFo3sJ0d6DMs6XnHZl+TZ
-	j/Ae/hkGzdn/xJ4OGpNRaa2pcaOAHOWUWA2ZDAWVXWBhNpH1y2q2sz5HNnk8N3G8NbXvR30Bo2H
-	stBPZpSRGdW53BcYH6hI7OkfabJ3CIh+TYBMyLwbs2XLzRT/o132EBlzYTp0RbDTCHT
-X-Received: by 2002:a17:90b:1f92:b0:2ee:8427:4b02 with SMTP id 98e67ed59e1d1-2f782d4ee70mr38271547a91.28.1737621593087;
-        Thu, 23 Jan 2025 00:39:53 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFhMZaYjsqNmySTRYcUMtYOJ74eIJfObrd1yiHY1EySAIXMN2gcyZKJ0eJU5K1ZveJIHc7pjw==
-X-Received: by 2002:a17:90b:1f92:b0:2ee:8427:4b02 with SMTP id 98e67ed59e1d1-2f782d4ee70mr38271536a91.28.1737621592831;
-        Thu, 23 Jan 2025 00:39:52 -0800 (PST)
-Received: from fedora ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2f7e6b9b1desm3305192a91.47.2025.01.23.00.39.50
+        d=1e100.net; s=20230601; t=1737621622; x=1738226422;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=+9q1x174EflZkASpLdvzyaoyFXGYC2fkIourI+Rdf60=;
+        b=oFNr5q3/bma8eXTuMlnRyfheFbntrUZteO4UPvauq/WhzeBYKrewP5NQX6gK1c3jP+
+         /TE64iK/GRmsX4eU5R0J/sLKObVKBeyFVMc8J2rPrNQnefLr2uyCk3qTym3gRAj06CQu
+         B4Kd17lJJKsYdvgcd6hjxYjbuhQFsnVxod52I9Hf6Ctzd4f7TZjASKBqzlxFrcXuNVyA
+         hJmecGkIwJp7BK5J3WScKEmROWT/2FdwZzgHf6AF40uYxEPj9j2a2d7V9bxmLUd9Y9z1
+         z55Mu5UUdym00dKDNd2AR+gHJ1WUGVdEu9IoxY47/ta4BV4SwujKmID2NT0HLgclwHBQ
+         Mo1A==
+X-Forwarded-Encrypted: i=1; AJvYcCUFjdmXaFxOxoqX1A4eY2cwEOMN6XwEFmP5pzI1zR5KdYrjaon9IPPN/0IZHQ0LUBgFEh82+y1xiqI55LowUHI=@vger.kernel.org, AJvYcCUocykZI5riAHFrsTpgIMY4xxQuDT9Xq0eawWvurGKPPaiO/ujFvmwZ3Tt1y7kPzC4lJQZAAuX57juAUeI=@vger.kernel.org, AJvYcCXlCZIN9J7QpOoEmtu20taCEIcnbhosS7jhjLHqx80/qThyK2uuSt+MjT7aOY9LaWYnQsO04Fo2@vger.kernel.org
+X-Gm-Message-State: AOJu0YxLaqGsJz8eBjFRd27Pe6bpHE427JGeKiNds1CZnBMVBZH0mdIh
+	3fr9/o6n312mfZHwDQjARZKe9h13+jBZtsCjarHVUTHh/6BOCvQN
+X-Gm-Gg: ASbGncvKXw1Qc2KuW5MPlGFG8s7tX7YgYsQoY7z30iT9RQ8wVG0OrAVhdTAf6wTOUNV
+	wcXw4BudF+rMjb3NaeR2CGbzZHZIYHxz+wG3BCkLztAoox1wRrS8HlSSnA4aSNwWM4+u+ooygLP
+	6pmnIDOajhriZo7S8EUq/zIa8qc+2XDswavZlJMBiZtkhN5onbFCpBbR2qI18y6J7X7Vi6z/hiZ
+	9qtqpd78g8UDs205N0lU+zBqdmMdbVFDA4kdJWR89PbZ5DwqLThxwSSNb+YHjyiN0LPxKLnUi2+
+	zmzoeswvcxbO8x3wsVo5rJAcHMeSFWYNw8lhnurzc78HNxdgczqZsHMZwx/IPw==
+X-Google-Smtp-Source: AGHT+IE9dQ9Lgeq0kGoH1d4c485K3h8IpsrVnIVD0DCtLq9V7LZOCGwH41jH3uhoQxFFbr8rVadFjw==
+X-Received: by 2002:a17:90b:2703:b0:2ee:d63f:d71 with SMTP id 98e67ed59e1d1-2f782c7252dmr41539965a91.14.1737621621721;
+        Thu, 23 Jan 2025 00:40:21 -0800 (PST)
+Received: from localhost (p3882177-ipxg22501hodogaya.kanagawa.ocn.ne.jp. [180.15.148.177])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2f7e6a7def9sm3335539a91.18.2025.01.23.00.40.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Jan 2025 00:39:52 -0800 (PST)
-Date: Thu, 23 Jan 2025 08:39:47 +0000
-From: Hangbin Liu <haliu@redhat.com>
-To: Jan Stancek <jstancek@redhat.com>
-Cc: matttbe@kernel.org, martineau@kernel.org, eliang@kernel.org,
-	netdev@vger.kernel.org, mptcp@lists.linux.dev,
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH] selftests: mptcp: extend CFLAGS to keep options from
- environment
-Message-ID: <Z5IAU4X1084EFrEd@fedora>
-References: <7abc701da9df39c2d6cd15bc3cf9e6cee445cb96.1737621162.git.jstancek@redhat.com>
+        Thu, 23 Jan 2025 00:40:21 -0800 (PST)
+Date: Thu, 23 Jan 2025 17:40:11 +0900 (JST)
+Message-Id: <20250123.174011.1712033125728284549.fujita.tomonori@gmail.com>
+To: boqun.feng@gmail.com
+Cc: fujita.tomonori@gmail.com, aliceryhl@google.com,
+ miguel.ojeda.sandonis@gmail.com, linux-kernel@vger.kernel.org,
+ rust-for-linux@vger.kernel.org, netdev@vger.kernel.org, andrew@lunn.ch,
+ hkallweit1@gmail.com, tmgross@umich.edu, ojeda@kernel.org,
+ alex.gaynor@gmail.com, gary@garyguo.net, bjorn3_gh@protonmail.com,
+ benno.lossin@proton.me, a.hindborg@samsung.com, anna-maria@linutronix.de,
+ frederic@kernel.org, tglx@linutronix.de, arnd@arndb.de,
+ jstultz@google.com, sboyd@kernel.org, mingo@redhat.com,
+ peterz@infradead.org, juri.lelli@redhat.com, vincent.guittot@linaro.org,
+ dietmar.eggemann@arm.com, rostedt@goodmis.org, bsegall@google.com,
+ mgorman@suse.de, vschneid@redhat.com
+Subject: Re: [PATCH v8 4/7] rust: time: Add wrapper for fsleep function
+From: FUJITA Tomonori <fujita.tomonori@gmail.com>
+In-Reply-To: <Z5HpvAMd6mr-6d9k@boqun-archlinux>
+References: <CAH5fLghgcJV6gLvPxJVvn8mq4ZN0jGF16L5w-7nDo9TGNAA86w@mail.gmail.com>
+	<20250122.194405.1742941306708932313.fujita.tomonori@gmail.com>
+	<Z5HpvAMd6mr-6d9k@boqun-archlinux>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7abc701da9df39c2d6cd15bc3cf9e6cee445cb96.1737621162.git.jstancek@redhat.com>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 
-On Thu, Jan 23, 2025 at 09:35:42AM +0100, Jan Stancek wrote:
-> Package build environments like Fedora rpmbuild introduced hardening
-> options (e.g. -pie -Wl,-z,now) by passing a -spec option to CFLAGS
-> and LDFLAGS.
-> 
-> mptcp Makefile currently overrides CFLAGS but not LDFLAGS, which leads
-> to a mismatch and build failure, for example:
->   make[1]: *** [../../lib.mk:222: tools/testing/selftests/net/mptcp/mptcp_sockopt] Error 1
->   /usr/bin/ld: /tmp/ccqyMVdb.o: relocation R_X86_64_32 against `.rodata.str1.8' can not be used when making a PIE object; recompile with -fPIE
->   /usr/bin/ld: failed to set dynamic section sizes: bad value
->   collect2: error: ld returned 1 exit status
-> 
-> Signed-off-by: Jan Stancek <jstancek@redhat.com>
-> ---
->  tools/testing/selftests/net/mptcp/Makefile | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/tools/testing/selftests/net/mptcp/Makefile b/tools/testing/selftests/net/mptcp/Makefile
-> index 8e3fc05a5397..9706bc73809f 100644
-> --- a/tools/testing/selftests/net/mptcp/Makefile
-> +++ b/tools/testing/selftests/net/mptcp/Makefile
-> @@ -2,7 +2,7 @@
->  
->  top_srcdir = ../../../../..
->  
-> -CFLAGS =  -Wall -Wl,--no-as-needed -O2 -g -I$(top_srcdir)/usr/include $(KHDR_INCLUDES)
-> +CFLAGS +=  -Wall -Wl,--no-as-needed -O2 -g -I$(top_srcdir)/usr/include $(KHDR_INCLUDES)
->  
->  TEST_PROGS := mptcp_connect.sh pm_netlink.sh mptcp_join.sh diag.sh \
->  	      simult_flows.sh mptcp_sockopt.sh userspace_pm.sh
-> -- 
-> 2.43.0
-> 
+On Wed, 22 Jan 2025 23:03:24 -0800
+Boqun Feng <boqun.feng@gmail.com> wrote:
 
-Reviewed-by: Hangbin Liu <liuhangbin@gmail.com>
+> On Wed, Jan 22, 2025 at 07:44:05PM +0900, FUJITA Tomonori wrote:
+>> On Wed, 22 Jan 2025 09:23:33 +0100
+>> Alice Ryhl <aliceryhl@google.com> wrote:
+>> 
+>> >> > I would also say "the C side [`fsleep()`] or similar"; in other words,
+>> >> > both are "kernel's" at this point.
+>> >>
+>> >> Agreed that "the C side" is better and updated the comment. I copied
+>> >> that expression from the existing code; there are many "kernel's" in
+>> >> rust/kernel/. "good first issues" for them?
+>> >>
+>> >> You prefer "[`fsleep()`]" rather than "[`fsleep`]"? I can't find any
+>> >> precedent for the C side functions.
+>> > 
+>> > I think that's a matter of taste. In the Rust ecosystem, fsleep is
+>> > more common, in the kernel ecosystem, fsleep() is more common. I've
+>> > seen both in Rust code at this point.
+>> 
+>> Understood, I'll go with [`fsleep`].
+>> 
+> 
+> I would suggest using [`fsleep()`], in the same spirit of this paragraph
+> in Documentation/process/maintainer-tip.rst:
+> 
+> """
+> When a function is mentioned in the changelog, either the text body or the
+> subject line, please use the format 'function_name()'. Omitting the
+> brackets after the function name can be ambiguous::
+> 
+>   Subject: subsys/component: Make reservation_count static
+> 
+>   reservation_count is only used in reservation_stats. Make it static.
+> 
+> The variant with brackets is more precise::
+> 
+>   Subject: subsys/component: Make reservation_count() static
+> 
+>   reservation_count() is only called from reservation_stats(). Make it
+>   static.
+> """
+> 
+> , since fsleep() falls into the areas of tip tree.
 
+Thanks, I overlooked this. I had better to go with [`fsleep()`] then.
+
+I think that using two styles under rust/kernel isn't ideal. Should we
+make the [`function_name()`] style the preference under rust/kernel?
+
+Unless there's a subsystem that prefers the [`function_name`] style,
+that would be a different story.
 
