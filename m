@@ -1,117 +1,211 @@
-Return-Path: <netdev+bounces-160494-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160492-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DFC7FA19EDD
-	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 08:25:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 37264A19ED6
+	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 08:24:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B151F3A19A6
-	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 07:25:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EE7463A2614
+	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 07:24:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60D0F20B1F2;
-	Thu, 23 Jan 2025 07:25:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECDDC20B219;
+	Thu, 23 Jan 2025 07:24:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b="nPgc0KvF"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b="SgsLdvtu"
 X-Original-To: netdev@vger.kernel.org
-Received: from todd.t-8ch.de (todd.t-8ch.de [159.69.126.157])
+Received: from server.wki.vra.mybluehostin.me (server.wki.vra.mybluehostin.me [162.240.238.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B47691BD01F;
-	Thu, 23 Jan 2025 07:25:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.69.126.157
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 245C3201023;
+	Thu, 23 Jan 2025 07:24:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.240.238.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737617107; cv=none; b=ZfTFzYk4GE0LlkvUiFx0iW6FdXN9Ymj9C17jXiltb6cQrU7kILTbwnBLi5uQpWOCdt2pC3FXHnZ8ijOYLtYBC/vR4HyMPLK+T1SXo633HdnOPaOb3TANjR2kP9pPoLGXJT4oUfIWEVxu04N2LebJF9S/kib3zYzh6Gn/FNwNNrA=
+	t=1737617047; cv=none; b=mVlYhfOVwkNe3gwB31X2urY7BNhE02d5UVGZFgNwkVf4TRZmus4D64RO2vLsNImUCJw5q62YpYFYxER8GRpQI5wlV+cvAuNop74C5HvI8+L4CX7K6EtIJn6weD26fCPj0QnhKbpavcyPruJNTbQhVXqbv5zEoc6Dz9Hm83lE9yI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737617107; c=relaxed/simple;
-	bh=Debs92GqllIvAo5tz//ts3ajdhLFtAitLJrVVjdqBw8=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=Pxe1sYmbGa1mYgW5/JJR8M+pKjuUfV6UanMnoRs3QiY3tzZt/qwRCUfcsysN2FY0dPyFdipyiAoWsTNy8IdhjWvcU6rwRA+JU69OzMHlHqgo/a92KjKkw2HaoKSyn9OEasMeLPUui0apxzmCdoyUMnCd03SKlAFKgzRLDSZtfwY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=weissschuh.net; spf=pass smtp.mailfrom=weissschuh.net; dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b=nPgc0KvF; arc=none smtp.client-ip=159.69.126.157
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=weissschuh.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=weissschuh.net
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=weissschuh.net;
-	s=mail; t=1737617092;
-	bh=Debs92GqllIvAo5tz//ts3ajdhLFtAitLJrVVjdqBw8=;
-	h=From:Date:Subject:To:Cc:From;
-	b=nPgc0KvFnQsgcmBz6nL7PVbWNpMqc0xTZmcKiei/kB3EXKi4GVDoHvolxaByrDc2+
-	 b8wqO6embvBMw2MmOqEYeooIJ5iQwNzeVEsjCA6ve2uNxYNLM6ZehHxpcVTt/4HpQ+
-	 jlEZDjV4aymiFEEc0wIZmnUC5JrFWMs1xbvJmnAE=
-From: =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
-Date: Thu, 23 Jan 2025 08:22:40 +0100
-Subject: [PATCH RESEND net] ptp: Ensure info->enable callback is always set
+	s=arc-20240116; t=1737617047; c=relaxed/simple;
+	bh=xCPuFq9WgMU0Gb88D39hwJO9vnvo/r4SjtAfVQU0hXI=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 MIME-Version:Content-Type; b=Ve+BhIWroCCm0aiQk3tseis5/ofXVLsV46htkZHRuRU5+8nDjgExX7GrCag9GumRC/YejRKW9cqIneIqqtWutloo7N7XClB74+4L3cN3Dxi+Wkvs8TUDcf0wmXg3+g3oox+flK07y/GbSt1YDkrhKh6FGX6sHrktfywS3HhpH7s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=couthit.com; spf=pass smtp.mailfrom=couthit.com; dkim=pass (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b=SgsLdvtu; arc=none smtp.client-ip=162.240.238.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=couthit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=couthit.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=couthit.com
+	; s=default; h=Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:
+	References:In-Reply-To:Message-ID:Cc:To:From:Date:Sender:Reply-To:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=6m+k/1Y4Uh33GKZZUwcFzs8654vi6kkMP4rcv75Y0jk=; b=SgsLdvtu8BwBVCEyiJ85RcoLua
+	NZhur8SM+haQkGsciU1J4WN1sJ+WNSbnBO83FK77bJ7RZDm9YDlIM+9nYulAX0vlNpdSyID1jr40f
+	MHQZfH4gb/dyr94F0UgFytpvlduyUZD92ZWhC8BcQgRvXXjYDOc9P00CTKRfwgSv38HFzmEqXWsBl
+	xRMw/CbArUhCNMUGF0dQ+hTMlazeV7bfs0PZgM7Gi3KGU2WN1SDRI7J2uTPytLGKEftRgllgoA3Jd
+	b7fzLOFdY5hhYoyuzEc0XXJDHBK2XBRbcEznUWG9KVQDKE84Ts20xamB9hyTGosVHRs2qKO52iXmJ
+	QMK+BRHQ==;
+Received: from [122.175.9.182] (port=30001 helo=zimbra.couthit.local)
+	by server.wki.vra.mybluehostin.me with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96.2)
+	(envelope-from <basharath@couthit.com>)
+	id 1tarZG-0008Ks-1z;
+	Thu, 23 Jan 2025 12:53:59 +0530
+Received: from zimbra.couthit.local (localhost [127.0.0.1])
+	by zimbra.couthit.local (Postfix) with ESMTPS id 4D6711781A7D;
+	Thu, 23 Jan 2025 12:53:51 +0530 (IST)
+Received: from localhost (localhost [127.0.0.1])
+	by zimbra.couthit.local (Postfix) with ESMTP id 280411782495;
+	Thu, 23 Jan 2025 12:53:51 +0530 (IST)
+Received: from zimbra.couthit.local ([127.0.0.1])
+	by localhost (zimbra.couthit.local [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id G6FJ-AEfZLuV; Thu, 23 Jan 2025 12:53:51 +0530 (IST)
+Received: from zimbra.couthit.local (zimbra.couthit.local [10.10.10.103])
+	by zimbra.couthit.local (Postfix) with ESMTP id D07AB1781A7D;
+	Thu, 23 Jan 2025 12:53:50 +0530 (IST)
+Date: Thu, 23 Jan 2025 12:53:50 +0530 (IST)
+From: Basharath Hussain Khaja <basharath@couthit.com>
+To: richardcochran <richardcochran@gmail.com>
+Cc: basharath <basharath@couthit.com>, danishanwar <danishanwar@ti.com>, 
+	rogerq <rogerq@kernel.org>, andrew+netdev <andrew+netdev@lunn.ch>, 
+	davem <davem@davemloft.net>, edumazet <edumazet@google.com>, 
+	kuba <kuba@kernel.org>, pabeni <pabeni@redhat.com>, 
+	Rob Herring <robh@kernel.org>, krzk+dt <krzk+dt@kernel.org>, 
+	conor+dt <conor+dt@kernel.org>, nm <nm@ti.com>, 
+	ssantosh <ssantosh@kernel.org>, tony <tony@atomide.com>, 
+	parvathi <parvathi@couthit.com>, schnelle <schnelle@linux.ibm.com>, 
+	rdunlap <rdunlap@infradead.org>, diogo ivo <diogo.ivo@siemens.com>, 
+	m-karicheri2 <m-karicheri2@ti.com>, horms <horms@kernel.org>, 
+	jacob e keller <jacob.e.keller@intel.com>, 
+	m-malladi <m-malladi@ti.com>, 
+	javier carrasco cruz <javier.carrasco.cruz@gmail.com>, 
+	afd <afd@ti.com>, s-anna <s-anna@ti.com>, 
+	linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, 
+	netdev <netdev@vger.kernel.org>, 
+	devicetree <devicetree@vger.kernel.org>, 
+	linux-kernel <linux-kernel@vger.kernel.org>, 
+	linux-omap <linux-omap@vger.kernel.org>, 
+	pratheesh <pratheesh@ti.com>, prajith <prajith@ti.com>, 
+	vigneshr <vigneshr@ti.com>, praneeth <praneeth@ti.com>, 
+	srk <srk@ti.com>, rogerq <rogerq@ti.com>, 
+	krishna <krishna@couthit.com>, pmohan <pmohan@couthit.com>, 
+	mohan <mohan@couthit.com>
+Message-ID: <717976963.391348.1737617030636.JavaMail.zimbra@couthit.local>
+In-Reply-To: <Z4KdxQMBXmkF37KI@hoboy.vegasvil.org>
+References: <20250109105600.41297-1-basharath@couthit.com> <20250110055906.65086-7-basharath@couthit.com> <Z4KdxQMBXmkF37KI@hoboy.vegasvil.org>
+Subject: Re: [RFC PATCH 06/10] net: ti: prueth: Adds HW timestamping support
+ for PTP using PRU-ICSS IEP module
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Message-Id: <20250123-ptp-enable-v1-1-b015834d3a47@weissschuh.net>
-To: Richard Cochran <richardcochran@gmail.com>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- John Stultz <john.stultz@linaro.org>, Arnd Bergmann <arnd@arndb.de>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- stable@vger.kernel.org, 
- =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1737617091; l=1710;
- i=linux@weissschuh.net; s=20221212; h=from:subject:message-id;
- bh=Debs92GqllIvAo5tz//ts3ajdhLFtAitLJrVVjdqBw8=;
- b=4Al51+qegCJBhYdwnvbSjp14rgVlerdoz/4tUDHZtdP5i2+8gsmxpgR9VHN3WoVl8/mo96/41
- zQ29mJfDQzXA3d/gwBvCNMcag0ocRtDk6cywydr6rt8DuZSN+a1OOi9
-X-Developer-Key: i=linux@weissschuh.net; a=ed25519;
- pk=KcycQgFPX2wGR5azS7RhpBqedglOZVgRPfdFSPB1LNw=
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-Mailer: Zimbra 8.8.15_GA_3968 (ZimbraWebClient - FF113 (Linux)/8.8.15_GA_3968)
+Thread-Topic: prueth: Adds HW timestamping support for PTP using PRU-ICSS IEP module
+Thread-Index: GveTHKWfgkR3edDiJqhjAdYwerPYPg==
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - server.wki.vra.mybluehostin.me
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - couthit.com
+X-Get-Message-Sender-Via: server.wki.vra.mybluehostin.me: authenticated_id: smtp@couthit.com
+X-Authenticated-Sender: server.wki.vra.mybluehostin.me: smtp@couthit.com
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
 
-The ioctl and sysfs handlers unconditionally call the ->enable callback.
-Not all drivers implement that callback, leading to NULL dereferences.
-Example of affected drivers: ptp_s390.c, ptp_vclock.c and ptp_mock.c.
+> On Fri, Jan 10, 2025 at 11:29:02AM +0530, Basharath Hussain Khaja wrote:
+> 
+>> @@ -189,12 +190,37 @@ static void icssm_emac_get_regs(struct net_device *ndev,
+>>  	regs->version = PRUETH_REG_DUMP_GET_VER(prueth);
+>>  }
+>>  
+>> +static int icssm_emac_get_ts_info(struct net_device *ndev,
+>> +				  struct kernel_ethtool_ts_info *info)
+>> +{
+>> +	struct prueth_emac *emac = netdev_priv(ndev);
+>> +
+>> +	if ((PRUETH_IS_EMAC(emac->prueth) && !emac->emac_ptp_tx_irq))
+>> +		return ethtool_op_get_ts_info(ndev, info);
+>> +
+>> +	info->so_timestamping =
+>> +		SOF_TIMESTAMPING_TX_HARDWARE |
+>> +		SOF_TIMESTAMPING_TX_SOFTWARE |
+> 
+> The driver advertises software Transmit time stamping, but where is
+> the call to skb_tx_timestamp() ?
+> 
+> I didn't see it in Patch #4.
+> 
 
-Instead use a dummy callback if no better was specified by the driver.
+Yes. This module always uses IEP HW time stamping for better precision. 
+We will clean this in the next version.
 
-Fixes: d94ba80ebbea ("ptp: Added a brand new class driver for ptp clocks.")
-Cc: stable@vger.kernel.org
-Signed-off-by: Thomas Weißschuh <linux@weissschuh.net>
----
- drivers/ptp/ptp_clock.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+>> +		SOF_TIMESTAMPING_RX_HARDWARE |
+>> +		SOF_TIMESTAMPING_RX_SOFTWARE |
+>> +		SOF_TIMESTAMPING_SOFTWARE |
+>> +		SOF_TIMESTAMPING_RAW_HARDWARE;
+>> +
+>> +	info->phc_index = icss_iep_get_ptp_clock_idx(emac->prueth->iep);
+>> +	info->tx_types = BIT(HWTSTAMP_TX_OFF) | BIT(HWTSTAMP_TX_ON);
+>> +	info->rx_filters = BIT(HWTSTAMP_FILTER_NONE) |
+>> +				BIT(HWTSTAMP_FILTER_PTP_V2_EVENT);
+>> +
+>> +	return 0;
+>> +}
+> 
+>> @@ -442,6 +482,173 @@ static void icssm_emac_adjust_link(struct net_device
+>> *ndev)
+>>  	spin_unlock_irqrestore(&emac->lock, flags);
+>>  }
+>>  
+>> +static u8 icssm_prueth_ptp_ts_event_type(struct sk_buff *skb, u8 *ptp_msgtype)
+>> +{
+>> +	unsigned int ptp_class = ptp_classify_raw(skb);
+>> +	struct ptp_header *hdr;
+>> +	u8 msgtype, event_type;
+>> +
+>> +	if (ptp_class == PTP_CLASS_NONE)
+>> +		return PRUETH_PTP_TS_EVENTS;
+>> +
+>> +	hdr = ptp_parse_header(skb, ptp_class);
+>> +	if (!hdr)
+>> +		return PRUETH_PTP_TS_EVENTS;
+>> +
+>> +	msgtype = ptp_get_msgtype(hdr, ptp_class);
+>> +	/* Treat E2E Delay Req/Resp messages sane as P2P peer delay req/resp
+> 
+> s/sane/in the same way/
+> 
 
-diff --git a/drivers/ptp/ptp_clock.c b/drivers/ptp/ptp_clock.c
-index b932425ddc6a3789504164a69d1b8eba47da462c..35a5994bf64f6373c08269d63aaeac3f4ab31ff0 100644
---- a/drivers/ptp/ptp_clock.c
-+++ b/drivers/ptp/ptp_clock.c
-@@ -217,6 +217,11 @@ static int ptp_getcycles64(struct ptp_clock_info *info, struct timespec64 *ts)
- 		return info->gettime64(info, ts);
- }
- 
-+static int ptp_enable(struct ptp_clock_info *ptp, struct ptp_clock_request *request, int on)
-+{
-+	return -EOPNOTSUPP;
-+}
-+
- static void ptp_aux_kworker(struct kthread_work *work)
- {
- 	struct ptp_clock *ptp = container_of(work, struct ptp_clock,
-@@ -294,6 +299,9 @@ struct ptp_clock *ptp_clock_register(struct ptp_clock_info *info,
- 			ptp->info->getcrosscycles = ptp->info->getcrosststamp;
- 	}
- 
-+	if (!ptp->info->enable)
-+		ptp->info->enable = ptp_enable;
-+
- 	if (ptp->info->do_aux_work) {
- 		kthread_init_delayed_work(&ptp->aux_work, ptp_aux_kworker);
- 		ptp->kworker = kthread_run_worker(0, "ptp%d", ptp->index);
+This was a typo, We will address this in the next version. Firmware running in PRU 
+treats E2E Delay Req/Resp messages same as P2P peer delay req/resp.
 
----
-base-commit: c4b9570cfb63501638db720f3bee9f6dfd044b82
-change-id: 20250122-ptp-enable-831339c62428
+>> +	 * in driver here since firmware stores timestamps in the same memory
+>> +	 * location for either (since they cannot operate simultaneously
+>> +	 * anyway)
+>> +	 */
+>> +	switch (msgtype) {
+>> +	case PTP_MSGTYPE_SYNC:
+>> +		event_type = PRUETH_PTP_SYNC;
+>> +		break;
+>> +	case PTP_MSGTYPE_DELAY_REQ:
+>> +	case PTP_MSGTYPE_PDELAY_REQ:
+>> +		event_type = PRUETH_PTP_DLY_REQ;
+>> +		break;
+>> +	/* TODO: Check why PTP_MSGTYPE_DELAY_RESP needs timestamp
+>> +	 * and need for it.
+>> +	 */
+>> +	case 0x9:
+> 
+> Delay response messages are PTP "general" messages and not event
+> messages, and as such they do not require time stamps.
+> 
+currently firmware sends back timestamp even for E2E Delay_response message 
+though this is a general message. To service that txts request we added this
+here. We will revisit again and clean this in the subsequent versions.
 
-Best regards,
--- 
-Thomas Weißschuh <linux@weissschuh.net>
-
+Thanks & Best Regards,
+Basharath
 
