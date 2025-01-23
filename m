@@ -1,143 +1,106 @@
-Return-Path: <netdev+bounces-160464-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160465-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31475A19D5C
-	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 04:40:14 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 63BDCA19D5F
+	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 04:42:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 111C21887448
-	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 03:40:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 38BB83A64DD
+	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 03:42:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B091812C475;
-	Thu, 23 Jan 2025 03:40:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2793B126C0D;
+	Thu, 23 Jan 2025 03:42:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fw4mO/qe"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="VT3UG3Xv"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B7408528E
-	for <netdev@vger.kernel.org>; Thu, 23 Jan 2025 03:40:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3A783A8D0;
+	Thu, 23 Jan 2025 03:42:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737603610; cv=none; b=hWktoznror5zVcE3iWPet462sG72li4aFj/jFNTfNZYVQjcMzkYTLBn0GtsvhDrIQdba7q3cYK5NQeSQpx9xO/gAMbjGuu4e1AxzhsruJu+AiFNgZRqHG9p2geWBPk0ViHn9eeU2IyJf7u6SBqp0y02tjwt/MtXDba6Bq2LShsw=
+	t=1737603723; cv=none; b=oW9Cmg9j3zUjjofn7Rt47k1p4m0VvmMbf4YED7gbvA9MgZ7jkRKc0vKkQg1D6ptruB6SsZIY067QXoOLRAFi0/WoYWql9pZ82yvC5huOdQt4a1tarS/UrpUKCP+fFUph5g1qMOnXBaIRPpKUU8380ZK2T3FdIOHMBK4LokfOgx8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737603610; c=relaxed/simple;
-	bh=X3KV16RcJLjQeYm4Jc2/XwW7Eu76ZdaUZ2FWdKtfUMg=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=cY6xgNML9a5zvVzm8Xbibc69Ocqb8vHBYVG1K08GK65Rli91aZHI8rePoe1zvklOaeL0A/Bpwnk/K++eSSvJqxWoC2Ve4fRgfLiSs4nMb+geXyVr1pNAGA/H6II9atjehFRTYvC36ynaiPeA8IXXXeKU5OqJnF9+Ct9W5dAP54s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fw4mO/qe; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EA4CEC4CED2;
-	Thu, 23 Jan 2025 03:40:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737603610;
-	bh=X3KV16RcJLjQeYm4Jc2/XwW7Eu76ZdaUZ2FWdKtfUMg=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=fw4mO/qei8ZvyeQFSyUDJT8OekZERpCZjbuW8uhaofEXSXNd+y0aNRguYtTihMJip
-	 RCSpGX+Yb77kLwjCC9XiARyMCxbvmKFfIYxT+rgZF1TgbbyigoRqfb8wMUaHJR0OFk
-	 UgsR2vTg2RoafF2OICOBvA0sOl2LesB4lobNoJuHB5YACu0i67SrnXzAjh8yDER8Gy
-	 8uxwJxmXNVUTEj6XcVQdH+jozLp6qVKxb4ahVXr8HpXbI/B/e4KqcJcXyCI1dFlpm6
-	 e7ghp7UFOsaSYKk9t63+4YoIdylcuC1GvSTvG8GZQJI+IeEsWVij92AAA0MGykaABQ
-	 2KSgWnep/UrOw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADF7B380AA70;
-	Thu, 23 Jan 2025 03:40:35 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1737603723; c=relaxed/simple;
+	bh=3RY4k2zboVV5daIxlBEkCjdDsAZaLavxRnGu8nEYbec=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ugba9sDAOAS3LjSJAaeqzcYWKg4A8zGnpyN6DmXtGmc+3ZKujAMQQjGHwKx234vuDNXLSBNoLAFJPlpzSOa7Nrv9p1+vzo/NIVebWBMIXT5xh2F+pBPr+HMEZbj0eE/Sm/cgAvAYO1D3kcvvTpylBQlN8glUYaxMV0w6ZT/lUwA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=VT3UG3Xv; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=nxV6h48oOYNUXilv2b43vdsiPZOgrDsSq3hXRcY+eoY=; b=VT3UG3XvlCtX+ofHf2rAlwAlGk
+	Eg1t/wU6mPNFAxoymJ2dNMDPTLpf86x/ZLPF6018Q/qpmJH5grMNzIdgyCwQ2QNxJpBOLlvZfEwQ9
+	vhlzgRl0sM6S5go6ZxogW8bkU2jGoDEuZ2+YdrG3PlVunEPfs9+NFMvravK5IBcMDvnc=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tao66-0078OE-Du; Thu, 23 Jan 2025 04:41:38 +0100
+Date: Thu, 23 Jan 2025 04:41:38 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Chris Packham <Chris.Packham@alliedtelesis.co.nz>
+Cc: Sander Vanheule <sander@svanheule.net>,
+	"lee@kernel.org" <lee@kernel.org>,
+	"robh@kernel.org" <robh@kernel.org>,
+	"krzk+dt@kernel.org" <krzk+dt@kernel.org>,
+	"conor+dt@kernel.org" <conor+dt@kernel.org>,
+	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"tsbogend@alpha.franken.de" <tsbogend@alpha.franken.de>,
+	"hkallweit1@gmail.com" <hkallweit1@gmail.com>,
+	"linux@armlinux.org.uk" <linux@armlinux.org.uk>,
+	"markus.stockhausen@gmx.de" <markus.stockhausen@gmx.de>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-mips@vger.kernel.org" <linux-mips@vger.kernel.org>
+Subject: Re: [PATCH v4 4/4] net: mdio: Add RTL9300 MDIO driver
+Message-ID: <11d7fe78-958d-409f-a979-25cc1bc933a2@lunn.ch>
+References: <20250120040214.2538839-1-chris.packham@alliedtelesis.co.nz>
+ <20250120040214.2538839-5-chris.packham@alliedtelesis.co.nz>
+ <d4194a1560ff297e5ab3e6eae6d51b7c9d469381.camel@svanheule.net>
+ <63d6cf16-9581-4736-8592-bc5836fa51af@alliedtelesis.co.nz>
+ <faa4cf6e-40eb-4509-b3f0-198a9a45ccbd@lunn.ch>
+ <09bd2f04-96d6-4dba-92ee-22ccbd7f584f@alliedtelesis.co.nz>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v4 1/1] net: sched: fix ets qdisc OOB Indexing
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173760363449.910604.15959100084881213045.git-patchwork-notify@kernel.org>
-Date: Thu, 23 Jan 2025 03:40:34 +0000
-References: <20250111145740.74755-1-jhs@mojatatu.com>
-In-Reply-To: <20250111145740.74755-1-jhs@mojatatu.com>
-To: Jamal Hadi Salim <jhs@mojatatu.com>
-Cc: netdev@vger.kernel.org, jiri@resnulli.us, xiyou.wangcong@gmail.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- petrm@mellanox.com, security@kernel.org, g1042620637@gmail.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <09bd2f04-96d6-4dba-92ee-22ccbd7f584f@alliedtelesis.co.nz>
 
-Hello:
-
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Sat, 11 Jan 2025 09:57:39 -0500 you wrote:
-> Haowei Yan <g1042620637@gmail.com> found that ets_class_from_arg() can
-> index an Out-Of-Bound class in ets_class_from_arg() when passed clid of
-> 0. The overflow may cause local privilege escalation.
+On Wed, Jan 22, 2025 at 11:02:14PM +0000, Chris Packham wrote:
+> Hi Andrew,
 > 
->  [   18.852298] ------------[ cut here ]------------
->  [   18.853271] UBSAN: array-index-out-of-bounds in net/sched/sch_ets.c:93:20
->  [   18.853743] index 18446744073709551615 is out of range for type 'ets_class [16]'
->  [   18.854254] CPU: 0 UID: 0 PID: 1275 Comm: poc Not tainted 6.12.6-dirty #17
->  [   18.854821] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/2014
->  [   18.856532] Call Trace:
->  [   18.857441]  <TASK>
->  [   18.858227]  dump_stack_lvl+0xc2/0xf0
->  [   18.859607]  dump_stack+0x10/0x20
->  [   18.860908]  __ubsan_handle_out_of_bounds+0xa7/0xf0
->  [   18.864022]  ets_class_change+0x3d6/0x3f0
->  [   18.864322]  tc_ctl_tclass+0x251/0x910
->  [   18.864587]  ? lock_acquire+0x5e/0x140
->  [   18.865113]  ? __mutex_lock+0x9c/0xe70
->  [   18.866009]  ? __mutex_lock+0xa34/0xe70
->  [   18.866401]  rtnetlink_rcv_msg+0x170/0x6f0
->  [   18.866806]  ? __lock_acquire+0x578/0xc10
->  [   18.867184]  ? __pfx_rtnetlink_rcv_msg+0x10/0x10
->  [   18.867503]  netlink_rcv_skb+0x59/0x110
->  [   18.867776]  rtnetlink_rcv+0x15/0x30
->  [   18.868159]  netlink_unicast+0x1c3/0x2b0
->  [   18.868440]  netlink_sendmsg+0x239/0x4b0
->  [   18.868721]  ____sys_sendmsg+0x3e2/0x410
->  [   18.869012]  ___sys_sendmsg+0x88/0xe0
->  [   18.869276]  ? rseq_ip_fixup+0x198/0x260
->  [   18.869563]  ? rseq_update_cpu_node_id+0x10a/0x190
->  [   18.869900]  ? trace_hardirqs_off+0x5a/0xd0
->  [   18.870196]  ? syscall_exit_to_user_mode+0xcc/0x220
->  [   18.870547]  ? do_syscall_64+0x93/0x150
->  [   18.870821]  ? __memcg_slab_free_hook+0x69/0x290
->  [   18.871157]  __sys_sendmsg+0x69/0xd0
->  [   18.871416]  __x64_sys_sendmsg+0x1d/0x30
->  [   18.871699]  x64_sys_call+0x9e2/0x2670
->  [   18.871979]  do_syscall_64+0x87/0x150
->  [   18.873280]  ? do_syscall_64+0x93/0x150
->  [   18.874742]  ? lock_release+0x7b/0x160
->  [   18.876157]  ? do_user_addr_fault+0x5ce/0x8f0
->  [   18.877833]  ? irqentry_exit_to_user_mode+0xc2/0x210
->  [   18.879608]  ? irqentry_exit+0x77/0xb0
->  [   18.879808]  ? clear_bhb_loop+0x15/0x70
->  [   18.880023]  ? clear_bhb_loop+0x15/0x70
->  [   18.880223]  ? clear_bhb_loop+0x15/0x70
->  [   18.880426]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
->  [   18.880683] RIP: 0033:0x44a957
->  [   18.880851] Code: ff ff e8 fc 00 00 00 66 2e 0f 1f 84 00 00 00 00 00 66 90 f3 0f 1e fa 64 8b 04 25 18 00 00 00 85 c0 75 10 b8 2e 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 51 c3 48 83 ec 28 89 54 24 1c 48 8974 24 10
->  [   18.881766] RSP: 002b:00007ffcdd00fad8 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
->  [   18.882149] RAX: ffffffffffffffda RBX: 00007ffcdd010db8 RCX: 000000000044a957
->  [   18.882507] RDX: 0000000000000000 RSI: 00007ffcdd00fb70 RDI: 0000000000000003
->  [   18.885037] RBP: 00007ffcdd010bc0 R08: 000000000703c770 R09: 000000000703c7c0
->  [   18.887203] R10: 0000000000000080 R11: 0000000000000246 R12: 0000000000000001
->  [   18.888026] R13: 00007ffcdd010da8 R14: 00000000004ca7d0 R15: 0000000000000001
->  [   18.888395]  </TASK>
->  [   18.888610] ---[ end trace ]---
+> On 23/01/2025 10:47, Andrew Lunn wrote:
+> >> I believe the POLL_SEL configuration actually affects an internal port
+> >> polling unit. From the datasheets I have it seems pretty configurable, you
+> >> can tell it which phy registers to poll and what values indicate link
+> >> up/down (the defaults are conveniently setup to match the Realtek PHYs).
+> > You need to disable this. The linux PHY driver is driving the PHY, and
+> > the hardware has no idea what Linux is doing. Say the driver has
+> > changed the page to read a temperature sensor, when the switch does a
+> > poll. Rather than reading the link status, it gets some random value
+> > from the page containing the temperature sensor.
 > 
-> [...]
+> There's a mask that can be set via a register that can disable polling 
+> for a port. The trick will be deciding when to do so.
 
-Here is the summary with links:
-  - [net,v4,1/1] net: sched: fix ets qdisc OOB Indexing
-    https://git.kernel.org/netdev/net/c/d62b04fca434
+On probe. And leave is disabled. phylink will provide you with all the
+information you need about link up, what the link speed is etc. There
+is no need for PPU.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+	Andrew
 
