@@ -1,250 +1,188 @@
-Return-Path: <netdev+bounces-160489-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160490-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3179CA19E86
-	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 07:44:06 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 25759A19EA7
+	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 08:02:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DF02E3A03BA
-	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 06:43:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 06575188DE00
+	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 07:03:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A7A91C2DB2;
-	Thu, 23 Jan 2025 06:44:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 143E020B207;
+	Thu, 23 Jan 2025 07:02:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="O7bh4qhc"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b="ex+U+1wJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+Received: from server.wki.vra.mybluehostin.me (server.wki.vra.mybluehostin.me [162.240.238.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4785929B0;
-	Thu, 23 Jan 2025 06:43:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35EA31C1F0C;
+	Thu, 23 Jan 2025 07:02:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.240.238.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737614640; cv=none; b=irrXlojQyFFUT140MSvOBt1jhkRD8M3IUyhnZFJOHRyMwk8cKcBigPIJLhKsR4SxwBFxyqdoKFTgttoSvGoO6qI8XaS7VYJ8gWnfcjd4X845Mo0HV7uRMZsEewDOdmKUqrr5+6bEb9Onb5XaKju7boEWivH5yEPrkCGNyrBxcAw=
+	t=1737615771; cv=none; b=HeFJL/6bSmc0RFyTqFM/F7OKbgUj7G4LKobr5q2CCQ6c7yo0PkXFq3b7iNd3d2KgMIW6sVQA5pE/RWlZCzPPaMgI7QlfdPgbLCTMHZ1cqxT8HcTlV7UOkGUcIeTIOUHtgQFia8iBtA7e3nauSo7oK1lSRHCjEXXSt43kgffpuns=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737614640; c=relaxed/simple;
-	bh=JktmtjqieTPQYIl1v06VLfluuGdkKBGUSRhw3p37YK0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gi+WXb6jip6O/0F7uyHq/RdeZa6AxHuRrGf9oJXqAcIp2HuBL08Pj690/PDQWUKLRSKASuB3UWJCrWc5llrIY6DI7t2GmRFaUNRsNqD0rsCmse/lth5tfvILX4aZ6Rj5XRTGcvvdzuKDIi+nYA2ASlYGH4G14fk2lBh8CNpAuik=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=O7bh4qhc; arc=none smtp.client-ip=192.198.163.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1737614638; x=1769150638;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=JktmtjqieTPQYIl1v06VLfluuGdkKBGUSRhw3p37YK0=;
-  b=O7bh4qhcq3A4TG8sEpWn2fVj40C02ffQ2iSkNXivdW50pWh+3frStA5e
-   6AfIPVNqxMseQrkS4nY2S1PR/pr5yNR0f4gPD8rfUB4QzA9Zp7e5AyuPP
-   5qQT2H9I1s3A+BaYuH37qzjwluN8pSUpSj1rpt7WfLccL/YAzuagTXYBY
-   NO3bJN41at1TZQKjEYsK/64UqwqVwZkaPzPZj6opiqcY3AoSfl8VOBsDY
-   K/zVIfY4P9oWD70XaD8Q5cU1Ii4JcZKF69TA2YZ2Voo7CFALDiFWQirnz
-   JO2Q5dFoGnxrYoNv4x08lmaJKpxWDvkPW4u4ucTPo9Py6wZD6uas3G9Zq
-   g==;
-X-CSE-ConnectionGUID: cxosbnVqRGKo0Wkvv0OyzQ==
-X-CSE-MsgGUID: fPRkA9KbTOOjhUAvEaQczw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11323"; a="25699354"
-X-IronPort-AV: E=Sophos;i="6.13,227,1732608000"; 
-   d="scan'208";a="25699354"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jan 2025 22:43:57 -0800
-X-CSE-ConnectionGUID: F9FmDasxQgqi/8cbU9OU/w==
-X-CSE-MsgGUID: Q0VSwLxLRluQdw7gRhNw9A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.13,227,1732608000"; 
-   d="scan'208";a="107365151"
-Received: from mev-dev.igk.intel.com ([10.237.112.144])
-  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jan 2025 22:43:54 -0800
-Date: Thu, 23 Jan 2025 07:40:29 +0100
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
-	syzbot+2e5de9e3ab986b71d2bf@syzkaller.appspotmail.com,
-	shuah@kernel.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net] net: netdevsim: try to close UDP port harness races
-Message-ID: <Z5HkXdx3w9aMsozu@mev-dev.igk.intel.com>
-References: <20250122224503.762705-1-kuba@kernel.org>
+	s=arc-20240116; t=1737615771; c=relaxed/simple;
+	bh=d/rF3oBuFk8AvzTIo7WgOEPnwOzuvSM8/oiwsLO7IHU=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 MIME-Version:Content-Type; b=aKKefqKn6z1LvqLjq72dKYjHK7ZDsVNy1ZWWE+4Lfu5KH3+1aiVmLPq6Nc5bf81hDWUbyifSv0bpGrk+l0hg1nytWBmWbHpKvSDdbMGg4NIekbDuXmPQBQL9ddp1u+LevK4rTiEMtybqSveBMuww7jAuqJW0w9uQjP/YnaixW7w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=couthit.com; spf=pass smtp.mailfrom=couthit.com; dkim=pass (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b=ex+U+1wJ; arc=none smtp.client-ip=162.240.238.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=couthit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=couthit.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=couthit.com
+	; s=default; h=Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:
+	References:In-Reply-To:Message-ID:Cc:To:From:Date:Sender:Reply-To:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=6EWFkR8ZwsVB5EtOpQVLpbQnF99d1xPnEL8Z+nC+xqU=; b=ex+U+1wJtT2OCD1ASNGwka9QYY
+	xypVpmUOShTnyedBAXKZOdNmwKEwkEacLFN7f/TAQ+0OBzV+if8OLP6Mrp9awA7pwB3O1hyqYa+Ab
+	R7G9AGl8sjBGIKYVSRPim0M7DRpMmcEN99aZoYyzy4wdYibA5TYfjwhL8AaqgtcVeUGIthGMcUahK
+	QtxztYiyCRAi/iMSapMZxoznwdah+M917B9Z3uxv1vIlXaDsqtwTQfiFyXBAnaj2pmeqDVRigdrlm
+	dLfB4nG9A/K0Xkdpf6RVVd18J5DGXl9Q108c69M7VJvAIcRYbNtWAw3smTBQWquNhl0qZNtoiUgOH
+	G+tsRBxw==;
+Received: from [122.175.9.182] (port=19706 helo=zimbra.couthit.local)
+	by server.wki.vra.mybluehostin.me with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96.2)
+	(envelope-from <basharath@couthit.com>)
+	id 1tarEf-0007uX-2D;
+	Thu, 23 Jan 2025 12:32:42 +0530
+Received: from zimbra.couthit.local (localhost [127.0.0.1])
+	by zimbra.couthit.local (Postfix) with ESMTPS id D476F1781A7D;
+	Thu, 23 Jan 2025 12:32:29 +0530 (IST)
+Received: from localhost (localhost [127.0.0.1])
+	by zimbra.couthit.local (Postfix) with ESMTP id B12FA1782495;
+	Thu, 23 Jan 2025 12:32:29 +0530 (IST)
+Received: from zimbra.couthit.local ([127.0.0.1])
+	by localhost (zimbra.couthit.local [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id 8r6jauI9kHCU; Thu, 23 Jan 2025 12:32:29 +0530 (IST)
+Received: from zimbra.couthit.local (zimbra.couthit.local [10.10.10.103])
+	by zimbra.couthit.local (Postfix) with ESMTP id 464731781A7D;
+	Thu, 23 Jan 2025 12:32:29 +0530 (IST)
+Date: Thu, 23 Jan 2025 12:32:29 +0530 (IST)
+From: Basharath Hussain Khaja <basharath@couthit.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: basharath <basharath@couthit.com>, danishanwar <danishanwar@ti.com>, 
+	rogerq <rogerq@kernel.org>, andrew+netdev <andrew+netdev@lunn.ch>, 
+	davem <davem@davemloft.net>, edumazet <edumazet@google.com>, 
+	kuba <kuba@kernel.org>, pabeni <pabeni@redhat.com>, 
+	Rob Herring <robh@kernel.org>, krzk+dt <krzk+dt@kernel.org>, 
+	conor+dt <conor+dt@kernel.org>, nm <nm@ti.com>, 
+	ssantosh <ssantosh@kernel.org>, tony <tony@atomide.com>, 
+	richardcochran <richardcochran@gmail.com>, 
+	parvathi <parvathi@couthit.com>, schnelle <schnelle@linux.ibm.com>, 
+	rdunlap <rdunlap@infradead.org>, diogo ivo <diogo.ivo@siemens.com>, 
+	m-karicheri2 <m-karicheri2@ti.com>, horms <horms@kernel.org>, 
+	jacob e keller <jacob.e.keller@intel.com>, 
+	m-malladi <m-malladi@ti.com>, 
+	javier carrasco cruz <javier.carrasco.cruz@gmail.com>, 
+	afd <afd@ti.com>, s-anna <s-anna@ti.com>, 
+	linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, 
+	netdev <netdev@vger.kernel.org>, 
+	devicetree <devicetree@vger.kernel.org>, 
+	linux-kernel <linux-kernel@vger.kernel.org>, 
+	linux-omap <linux-omap@vger.kernel.org>, 
+	pratheesh <pratheesh@ti.com>, prajith <prajith@ti.com>, 
+	vigneshr <vigneshr@ti.com>, praneeth <praneeth@ti.com>, 
+	srk <srk@ti.com>, rogerq <rogerq@ti.com>, 
+	krishna <krishna@couthit.com>, pmohan <pmohan@couthit.com>, 
+	mohan <mohan@couthit.com>
+Message-ID: <951581664.391198.1737615749019.JavaMail.zimbra@couthit.local>
+In-Reply-To: <fce8d698-2ae2-460c-a288-3d70d61dbf9e@lunn.ch>
+References: <20250109105600.41297-1-basharath@couthit.com> <20250109105600.41297-5-basharath@couthit.com> <fce8d698-2ae2-460c-a288-3d70d61dbf9e@lunn.ch>
+Subject: Re: [RFC PATCH 04/10] net: ti: prueth: Adds link detection, RX and
+ TX support.
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250122224503.762705-1-kuba@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-Mailer: Zimbra 8.8.15_GA_3968 (ZimbraWebClient - FF113 (Linux)/8.8.15_GA_3968)
+Thread-Topic: prueth: Adds link detection, RX and TX support.
+Thread-Index: BN38BmJZ1YvXDCRq7dlK/kmFcsDoFg==
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - server.wki.vra.mybluehostin.me
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - couthit.com
+X-Get-Message-Sender-Via: server.wki.vra.mybluehostin.me: authenticated_id: smtp@couthit.com
+X-Authenticated-Sender: server.wki.vra.mybluehostin.me: smtp@couthit.com
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
 
-On Wed, Jan 22, 2025 at 02:45:03PM -0800, Jakub Kicinski wrote:
-> syzbot discovered that we remove the debugfs files after we free
-> the netdev. Try to clean up the relevant dir while the device
-> is still around.
+>> +/* update phy/port status information for firmware */
+>> +static void icssm_emac_update_phystatus(struct prueth_emac *emac)
+>> +{
+>> +	struct prueth *prueth = emac->prueth;
+>> +	u32 phy_speed, port_status = 0;
+>> +	enum prueth_mem region;
+>> +	u32 delay;
+>> +
+>> +	region = emac->dram;
+>> +	phy_speed = emac->speed;
+>> +	icssm_prueth_write_reg(prueth, region, PHY_SPEED_OFFSET, phy_speed);
+>> +
+>> +	if (phy_speed == SPEED_10)
+>> +		delay = TX_CLK_DELAY_10M;
 > 
-> Reported-by: syzbot+2e5de9e3ab986b71d2bf@syzkaller.appspotmail.com
-> Fixes: 424be63ad831 ("netdevsim: add UDP tunnel port offload support")
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
-> CC: shuah@kernel.org
-> CC: linux-kselftest@vger.kernel.org
-> ---
->  drivers/net/netdevsim/netdevsim.h             |  1 +
->  drivers/net/netdevsim/udp_tunnels.c           | 23 +++++++++++--------
->  .../drivers/net/netdevsim/udp_tunnel_nic.sh   | 16 ++++++-------
->  3 files changed, 23 insertions(+), 17 deletions(-)
+> How can speed to 10? You removed those link modes?
 > 
-> diff --git a/drivers/net/netdevsim/netdevsim.h b/drivers/net/netdevsim/netdevsim.h
-> index dcf073bc4802..96d54c08043d 100644
-> --- a/drivers/net/netdevsim/netdevsim.h
-> +++ b/drivers/net/netdevsim/netdevsim.h
-> @@ -134,6 +134,7 @@ struct netdevsim {
->  		u32 sleep;
->  		u32 __ports[2][NSIM_UDP_TUNNEL_N_PORTS];
->  		u32 (*ports)[NSIM_UDP_TUNNEL_N_PORTS];
-> +		struct dentry *ddir;
->  		struct debugfs_u32_array dfs_ports[2];
->  	} udp_ports;
->  
-> diff --git a/drivers/net/netdevsim/udp_tunnels.c b/drivers/net/netdevsim/udp_tunnels.c
-> index 02dc3123eb6c..640b4983a9a0 100644
-> --- a/drivers/net/netdevsim/udp_tunnels.c
-> +++ b/drivers/net/netdevsim/udp_tunnels.c
-> @@ -112,9 +112,11 @@ nsim_udp_tunnels_info_reset_write(struct file *file, const char __user *data,
->  	struct net_device *dev = file->private_data;
->  	struct netdevsim *ns = netdev_priv(dev);
->  
-> -	memset(ns->udp_ports.ports, 0, sizeof(ns->udp_ports.__ports));
->  	rtnl_lock();
-> -	udp_tunnel_nic_reset_ntf(dev);
-> +	if (dev->reg_state == NETREG_REGISTERED) {
-> +		memset(ns->udp_ports.ports, 0, sizeof(ns->udp_ports.__ports));
-> +		udp_tunnel_nic_reset_ntf(dev);
-> +	}
->  	rtnl_unlock();
->  
->  	return count;
-> @@ -144,23 +146,23 @@ int nsim_udp_tunnels_info_create(struct nsim_dev *nsim_dev,
->  	else
->  		ns->udp_ports.ports = nsim_dev->udp_ports.__ports;
->  
-> -	debugfs_create_u32("udp_ports_inject_error", 0600,
-> -			   ns->nsim_dev_port->ddir,
-> +	ns->udp_ports.ddir = debugfs_create_dir("udp_ports",
-> +						ns->nsim_dev_port->ddir);
-> +
-> +	debugfs_create_u32("inject_error", 0600, ns->udp_ports.ddir,
->  			   &ns->udp_ports.inject_error);
->  
->  	ns->udp_ports.dfs_ports[0].array = ns->udp_ports.ports[0];
->  	ns->udp_ports.dfs_ports[0].n_elements = NSIM_UDP_TUNNEL_N_PORTS;
-> -	debugfs_create_u32_array("udp_ports_table0", 0400,
-> -				 ns->nsim_dev_port->ddir,
-> +	debugfs_create_u32_array("table0", 0400, ns->udp_ports.ddir,
->  				 &ns->udp_ports.dfs_ports[0]);
->  
->  	ns->udp_ports.dfs_ports[1].array = ns->udp_ports.ports[1];
->  	ns->udp_ports.dfs_ports[1].n_elements = NSIM_UDP_TUNNEL_N_PORTS;
-> -	debugfs_create_u32_array("udp_ports_table1", 0400,
-> -				 ns->nsim_dev_port->ddir,
-> +	debugfs_create_u32_array("table1", 0400, ns->udp_ports.ddir,
->  				 &ns->udp_ports.dfs_ports[1]);
->  
-> -	debugfs_create_file("udp_ports_reset", 0200, ns->nsim_dev_port->ddir,
-> +	debugfs_create_file("reset", 0200, ns->udp_ports.ddir,
->  			    dev, &nsim_udp_tunnels_info_reset_fops);
->  
->  	/* Note: it's not normal to allocate the info struct like this!
-> @@ -196,6 +198,9 @@ int nsim_udp_tunnels_info_create(struct nsim_dev *nsim_dev,
->  
->  void nsim_udp_tunnels_info_destroy(struct net_device *dev)
->  {
-> +	struct netdevsim *ns = netdev_priv(dev);
-> +
-> +	debugfs_remove_recursive(ns->udp_ports.ddir);
->  	kfree(dev->udp_tunnel_nic_info);
->  	dev->udp_tunnel_nic_info = NULL;
->  }
-> diff --git a/tools/testing/selftests/drivers/net/netdevsim/udp_tunnel_nic.sh b/tools/testing/selftests/drivers/net/netdevsim/udp_tunnel_nic.sh
-> index 384cfa3d38a6..92c2f0376c08 100755
-> --- a/tools/testing/selftests/drivers/net/netdevsim/udp_tunnel_nic.sh
-> +++ b/tools/testing/selftests/drivers/net/netdevsim/udp_tunnel_nic.sh
-> @@ -142,7 +142,7 @@ function pre_ethtool {
->  }
->  
->  function check_table {
-> -    local path=$NSIM_DEV_DFS/ports/$port/udp_ports_table$1
-> +    local path=$NSIM_DEV_DFS/ports/$port/udp_ports/table$1
->      local -n expected=$2
->      local last=$3
->  
-> @@ -212,7 +212,7 @@ function check_tables {
->  }
->  
->  function print_table {
-> -    local path=$NSIM_DEV_DFS/ports/$port/udp_ports_table$1
-> +    local path=$NSIM_DEV_DFS/ports/$port/udp_ports/table$1
->      read -a have < $path
->  
->      tree $NSIM_DEV_DFS/
-> @@ -641,7 +641,7 @@ for port in 0 1; do
->      NSIM_NETDEV=`get_netdev_name old_netdevs`
->      ip link set dev $NSIM_NETDEV up
->  
-> -    echo 110 > $NSIM_DEV_DFS/ports/$port/udp_ports_inject_error
-> +    echo 110 > $NSIM_DEV_DFS/ports/$port/udp_ports/inject_error
->  
->      msg="1 - create VxLANs v6"
->      exp0=( 0 0 0 0 )
-> @@ -663,7 +663,7 @@ for port in 0 1; do
->      new_geneve gnv0 20000
->  
->      msg="2 - destroy GENEVE"
-> -    echo 2 > $NSIM_DEV_DFS/ports/$port/udp_ports_inject_error
-> +    echo 2 > $NSIM_DEV_DFS/ports/$port/udp_ports/inject_error
->      exp1=( `mke 20000 2` 0 0 0 )
->      del_dev gnv0
->  
-> @@ -764,7 +764,7 @@ for port in 0 1; do
->      msg="create VxLANs v4"
->      new_vxlan vxlan0 10000 $NSIM_NETDEV
->  
-> -    echo 1 > $NSIM_DEV_DFS/ports/$port/udp_ports_reset
-> +    echo 1 > $NSIM_DEV_DFS/ports/$port/udp_ports/reset
->      check_tables
->  
->      msg="NIC device goes down"
-> @@ -775,7 +775,7 @@ for port in 0 1; do
->      fi
->      check_tables
->  
-> -    echo 1 > $NSIM_DEV_DFS/ports/$port/udp_ports_reset
-> +    echo 1 > $NSIM_DEV_DFS/ports/$port/udp_ports/reset
->      check_tables
->  
->      msg="NIC device goes up again"
-> @@ -789,7 +789,7 @@ for port in 0 1; do
->      del_dev vxlan0
->      check_tables
->  
-> -    echo 1 > $NSIM_DEV_DFS/ports/$port/udp_ports_reset
-> +    echo 1 > $NSIM_DEV_DFS/ports/$port/udp_ports/reset
->      check_tables
->  
->      msg="destroy NIC"
-> @@ -896,7 +896,7 @@ msg="vacate VxLAN in overflow table"
->  exp0=( `mke 10000 1` `mke 10004 1` 0 `mke 10003 1` )
->  del_dev vxlan2
->  
-> -echo 1 > $NSIM_DEV_DFS/ports/$port/udp_ports_reset
-> +echo 1 > $NSIM_DEV_DFS/ports/$port/udp_ports/reset
->  check_tables
->  
->  msg="tunnels destroyed 2"
 
-Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+We will clean it up in the next version.
 
-> -- 
-> 2.48.1
+>> +/**
+>> + * icssm_emac_ndo_start_xmit - EMAC Transmit function
+>> + * @skb: SKB pointer
+>> + * @ndev: EMAC network adapter
+>> + *
+>> + * Called by the system to transmit a packet  - we queue the packet in
+>> + * EMAC hardware transmit queue
+>> + *
+>> + * Return: success(NETDEV_TX_OK) or error code (typically out of desc's)
+>> + */
+>> +static int icssm_emac_ndo_start_xmit(struct sk_buff *skb,
+>> +				     struct net_device *ndev)
+>> +{
+>> +	struct prueth_emac *emac = netdev_priv(ndev);
+>> +	int ret = 0;
+>> +	u16 qid;
+>> +
+>> +	if (unlikely(!emac->link)) {
+>> +		if (netif_msg_tx_err(emac) && net_ratelimit())
+>> +			netdev_err(ndev, "No link to transmit");
+>> +		goto fail_tx;
+>> +	}
+> 
+> Do many other MAC drivers have this test?
+> 
+
+This was an experimental safety check to avoid pushing anymore packets 
+into PRU buffers when link down occurred but upper layers are not notified
+yet. We will remove this check in the next version.
+
+>> --- a/drivers/net/ethernet/ti/icssm/icssm_prueth.h
+>> +++ b/drivers/net/ethernet/ti/icssm/icssm_prueth.h
+>> @@ -17,6 +17,11 @@
+>>  
+>>  /* PRUSS local memory map */
+>>  #define ICSS_LOCAL_SHARED_RAM	0x00010000
+>> +#define EMAC_MAX_PKTLEN		(ETH_HLEN + VLAN_HLEN + ETH_DATA_LEN)
+>> +/* Below macro is for 1528 Byte Frame support, to Allow even with
+>> + * Redundancy tag
+>> + */
+>> +#define EMAC_MAX_FRM_SUPPORT (ETH_HLEN + VLAN_HLEN + ETH_DATA_LEN + 6)
+> 
+> This looks familiar....
+> 
+
+We will use the MACRO instead of hard-coded value.
+
+Thanks & Best Regards,
+Basharath
 
