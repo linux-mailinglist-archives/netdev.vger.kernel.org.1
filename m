@@ -1,74 +1,74 @@
-Return-Path: <netdev+bounces-160649-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160650-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B07FA1AB14
-	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 21:18:34 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2EE05A1AB1A
+	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 21:20:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 495E21882404
-	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 20:18:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A20237A28E4
+	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 20:20:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8E6F1A8408;
-	Thu, 23 Jan 2025 20:18:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5EA41B424B;
+	Thu, 23 Jan 2025 20:20:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="sk9jR01+"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="j7rXEkjl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
+Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6D1B146A71
-	for <netdev@vger.kernel.org>; Thu, 23 Jan 2025 20:18:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08884156F21
+	for <netdev@vger.kernel.org>; Thu, 23 Jan 2025 20:20:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737663510; cv=none; b=EVbH/xzA6qew9ycX5zxw482sK5mZV4hFedWXRNSc1FRCK9jdVeV8vQePqSHyMWvUsfYvNYHNaABeXsNFhtcWcsuu5WFNx/k9Ss5X3STkUqz+K9pTbh1mXtqPLCOKxAmJ1il+AsdDPpUE95hEt6TEbJ0my6skSzJkKqEew4hXcPo=
+	t=1737663640; cv=none; b=XBonkAnSaV/xnzCJEQQ8dNI7WkbOXZ8st5adt0BE2zJZyS/umGhO5WplVPEgn4E7icnBK03T7iFSbAdIT9R4CF7gIMUV/025zF6EpPpx9GVJ6S0e2fUx1n6Qxw6ATSAO7WEP3Z6b3TkQyhYmo0pUfb14zpsbWTTntkC97IZ9sOg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737663510; c=relaxed/simple;
-	bh=31KgoYf125z7wzPt6aBTz5F0sKTllwBuorKaap2ryF0=;
+	s=arc-20240116; t=1737663640; c=relaxed/simple;
+	bh=JpZk763GRNCKNUJRjotRPzNiO/3ojqiNhAdrKYLa/3Q=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Adk9rFqZafO0FxyFje0qjJ3eyroEyB3pM3rf1NLrIriqPsyrsMXIBLMsoTFmusZGz6jfP90ouwnG3UCbp88Zs9o/RudmLGULmFNzNsbuDogF0RlLElSFw7KTyj9rDQ0z9MBxSgilrnsB5ATVEVgEUrsHHpBnvlSfr/g3vyVNRQM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=sk9jR01+; arc=none smtp.client-ip=209.85.216.53
+	 Content-Type:Content-Disposition:In-Reply-To; b=o559XHgjOXx5/u/rpVD6t2GHJYWTF6Cf9u3ysyrXRV0Ny9HmcpOmYhZ/nZmg63fOzMFa90H2hk5kTHrzAFp/kfpGDpXBGZQFaPivjsupoApQgj5omD1g+sbhrdWFCrCPrrvr8wuZa45+VnD1h4BrbciUNvgAfVA4RwJ7WUFQ4FA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=j7rXEkjl; arc=none smtp.client-ip=209.85.216.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pj1-f53.google.com with SMTP id 98e67ed59e1d1-2f78a4ca5deso1965760a91.0
-        for <netdev@vger.kernel.org>; Thu, 23 Jan 2025 12:18:28 -0800 (PST)
+Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-2ef87d24c2dso2044615a91.1
+        for <netdev@vger.kernel.org>; Thu, 23 Jan 2025 12:20:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1737663508; x=1738268308; darn=vger.kernel.org;
+        d=fastly.com; s=google; t=1737663638; x=1738268438; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references
          :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=tDn8AmTSVB0kH3UfB4hskAhSERNxv7X8QRfonq5cAbM=;
-        b=sk9jR01+wdNlE8PtEw3Xm5FdZk7G4TjIjEsuoe7adSWWUbXZGtDibpJueL1qnU77Qp
-         mzwjkWYTUE57N6sy9IXgEmwlXwjF90vMRagdiM8JGRWtRU7i12Nf21HE6nbp0Ot0jL+C
-         tU73NxQ1KyUmba735jM9TsUT8G5i2iYNodL0o=
+        bh=KB1t1DSHYe/kIJpeHgsnuq5QN3rT3/xSpDRas/TVl9Q=;
+        b=j7rXEkjl0scfXd5w42Ko8vISOU2GEkACDW75PCES7vmfE1i9uSIoGWkV4kL5ns8HRT
+         zkRDhO0QJyxgm7XfOGl5i2RZdvG2xBLg/7W6PXyBgmTzWqXrD4tJ5gkOsnBIspH1yPhj
+         kKhaSrlFyoglzf1mHgas2aIn4nAxvWVTbf/bo=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737663508; x=1738268308;
+        d=1e100.net; s=20230601; t=1737663638; x=1738268438;
         h=in-reply-to:content-disposition:mime-version:references
          :mail-followup-to:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=tDn8AmTSVB0kH3UfB4hskAhSERNxv7X8QRfonq5cAbM=;
-        b=C5qd0ysJhEk8HsesMGqF/m+FTjjs98H4WwB2oc0uQY3Io5+v1i8oLE3o8diu5MJnkE
-         c4TjkCCitWcYyP32KjtVRRlAB3ymiQ4u5GtjL4bS/tDhAQfjH0YRXRotUbnIyZfc9ja1
-         ePSzdPBrFO5HMVXxQ+MHrmmxENO/ZaVH30z94qjkQ07D6N/9yy9FEbpH7X3BK3IN7m2p
-         3WRIPlnDhoEMJY99U+5UP4xhSqS6KG4yTJ1/CEiw0Y4v69MMbinEJH7xGATf1oPYwugl
-         7Phjkl2LYhqy3o3SbmB+m7ki4DtNw4eMkykQIaWTctUkJhh5gUQmeSgBkt0A8NmOhsvB
-         oeuA==
-X-Gm-Message-State: AOJu0Yyp1LGIWcvkWJ1xol7VJSca9qX/hsnNKIYZHAUtyi7ZF+nMPcQx
-	RRJ018/8Gb/lhyuIUFx6KsigPEipgFcDva/NbFqHyTXuViy/Sokj7pPohnu9HMI=
-X-Gm-Gg: ASbGnctmhp/KIlE/bdYcrhcQ1U57TtD46ELXC8Jr7+ICm20036CVoPoDlMOOHEpNOcd
-	R/r9HSpUlGe4/v3z+5edGR5rMMWxREoxVJJiOWdU6qFjj4oirJDRCj1835p88X5rSG/de2frxUA
-	m5RNb3SMGkAs3v6jLC1zC3Qez2b0pmPxRYO3A3cgsZoCyERn6++0KsLAeDMw96JbXOtg9MyfkEu
-	ZsgFG1gFeVpASN9pqQaSk/UXqeAi043ca3Iae9lCfeGOTPN0jyj0kxgFoesibwO5xUWNeasG4j9
-	RnO2+2uXcusCO2IweOWVks7lRZA5n9vxk+X+lqpDUFqwPKU=
-X-Google-Smtp-Source: AGHT+IGG8mMT9xy63Q1Tci1v3aOjMG8ehE5VqEMdDOPs0ky+kTnInX/xnpgJBsYfjpMA0MHFjXNz7g==
-X-Received: by 2002:a17:90b:534c:b0:2ee:e317:69ab with SMTP id 98e67ed59e1d1-2f782b01fafmr47985914a91.0.1737663508027;
-        Thu, 23 Jan 2025 12:18:28 -0800 (PST)
+        bh=KB1t1DSHYe/kIJpeHgsnuq5QN3rT3/xSpDRas/TVl9Q=;
+        b=w3AmAO86VUT44CYkeOfO11pfbZSnT3Ms2f1ckJ8xdzkxdtdLFRKQBR3IwuPc/Mii6l
+         vtR059hSi2uiq5QUkQVCR3IK5ZEw4VpDwXe3rKMV9XVpB/bRAzI0YjI3mSZGU+sNMkOw
+         9+b4Z2RP6zN40museQrxJl4C4DGfOsnWD2c/0XCspWsHfoh/rIga92tW1FBCs8fZ/2KO
+         HdjPT9McSdSMpWyjCy2wIuaFtY25jP47bHj8xfb6NmfikyqdJCKSaegiRi2JBE5NqxVj
+         HQZHSiSj5+9vBcu/qCwe4RPCpLWlK48zadF25DUZ5yOqI0mjAipGLmLXcdJFdHQ0jELG
+         BaNQ==
+X-Gm-Message-State: AOJu0YyyWDjRbXzr+nm4u5bM7eww2wIc0Bd6mq6Z1rpDHIiZsSgZ9fQc
+	EafjhIf7ZAyp/3w0LjoOYq4MLtFaTcDFvEC7phpihwTxvV78z32VGRnsxelH6p0=
+X-Gm-Gg: ASbGncuiauml6yDGlhoTyUyyyhdWzgH6q+QPouhSh2bj4q0aGP7lzuXVm+oN5GYP2iW
+	DJy9XY5+k7LIYpL/cueIX4fRGOjDWFO6UtSl5Z3dX8qNv7lw+FSEx4nzf65x3VH0dlE5p3mE1e4
+	aXnISatk2w4mnnEKqOTBOMF4ue0eJQzmewkwi1r0UVzafUHGrfgFdDwGtdz6TlU39maQb+3XGUX
+	P+8vk7XwPRXWkVbyH7me20sLx1Lc+kqPVxnYHCU1/Y/WPn4UTafo8ZjiGrMiacj2mXHTBL5IzL7
+	BnlG2QcjDEU/84rHq2wMmq5SWQDjh8ti6XzAYWN6+FxUQzM=
+X-Google-Smtp-Source: AGHT+IGWiW4fruTXQaig8VlUH68P+LvfxTOjfstapyawpwKg0R4SlaMZKhcLWLkqA4bHRKxUrinKdg==
+X-Received: by 2002:a17:90b:540b:b0:2ee:ba0c:1726 with SMTP id 98e67ed59e1d1-2f782d9a1c9mr34516067a91.34.1737663638298;
+        Thu, 23 Jan 2025 12:20:38 -0800 (PST)
 Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2f7ffa6a725sm143267a91.21.2025.01.23.12.18.26
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2f7ffa6b315sm127868a91.26.2025.01.23.12.20.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Jan 2025 12:18:27 -0800 (PST)
-Date: Thu, 23 Jan 2025 12:18:24 -0800
+        Thu, 23 Jan 2025 12:20:37 -0800 (PST)
+Date: Thu, 23 Jan 2025 12:20:34 -0800
 From: Joe Damato <jdamato@fastly.com>
 To: Ahmed Zaki <ahmed.zaki@intel.com>
 Cc: netdev@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
@@ -77,10 +77,10 @@ Cc: netdev@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
 	michael.chan@broadcom.com, tariqt@nvidia.com,
 	anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
 	shayd@nvidia.com, akpm@linux-foundation.org, shayagr@amazon.com,
-	kalesh-anakkur.purayil@broadcom.com
-Subject: Re: [PATCH net-next v6 2/5] net: napi: add CPU affinity to
- napi_config
-Message-ID: <Z5KkEF-2NiX4SuB_@LQ3V64L9R2>
+	kalesh-anakkur.purayil@broadcom.com,
+	David Arinzon <darinzon@amazon.com>
+Subject: Re: [PATCH net-next v6 1/5] net: move ARFS rmap management to core
+Message-ID: <Z5KkkldrWpw8wayS@LQ3V64L9R2>
 Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
 	Ahmed Zaki <ahmed.zaki@intel.com>, netdev@vger.kernel.org,
 	intel-wired-lan@lists.osuosl.org, andrew+netdev@lunn.ch,
@@ -89,9 +89,12 @@ Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
 	tariqt@nvidia.com, anthony.l.nguyen@intel.com,
 	przemyslaw.kitszel@intel.com, shayd@nvidia.com,
 	akpm@linux-foundation.org, shayagr@amazon.com,
-	kalesh-anakkur.purayil@broadcom.com
+	kalesh-anakkur.purayil@broadcom.com,
+	David Arinzon <darinzon@amazon.com>
 References: <20250118003335.155379-1-ahmed.zaki@intel.com>
- <20250118003335.155379-3-ahmed.zaki@intel.com>
+ <20250118003335.155379-2-ahmed.zaki@intel.com>
+ <Z5KYWAshgRL2GbX2@LQ3V64L9R2>
+ <414c773d-5b7b-44b8-82a7-da49168ee791@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -100,157 +103,148 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250118003335.155379-3-ahmed.zaki@intel.com>
+In-Reply-To: <414c773d-5b7b-44b8-82a7-da49168ee791@intel.com>
 
-On Fri, Jan 17, 2025 at 05:33:32PM -0700, Ahmed Zaki wrote:
-> A common task for most drivers is to remember the user-set CPU affinity
-> to its IRQs. On each netdev reset, the driver should re-assign the
-> user's settings to the IRQs.
+On Thu, Jan 23, 2025 at 01:13:10PM -0700, Ahmed Zaki wrote:
 > 
-> Add CPU affinity mask to napi_config. To delegate the CPU affinity
-> management to the core, drivers must:
->  1 - set the new netdev flag "irq_affinity_auto":
->                                        netif_enable_irq_affinity(netdev)
->  2 - create the napi with persistent config:
->                                        netif_napi_add_config()
->  3 - bind an IRQ to the napi instance: netif_napi_set_irq()
 > 
-> the core will then make sure to use re-assign affinity to the napi's
-> IRQ.
+> On 2025-01-23 12:28 p.m., Joe Damato wrote:
+> > On Fri, Jan 17, 2025 at 05:33:31PM -0700, Ahmed Zaki wrote:
+> > > Add a new netdev flag "rx_cpu_rmap_auto". Drivers supporting ARFS should
+> > > set the flag via netif_enable_cpu_rmap() and core will allocate and manage
+> > > the ARFS rmap. Freeing the rmap is also done by core when the netdev is
+> > > freed.
+> > > 
+> > > For better IRQ affinity management, move the IRQ rmap notifier inside the
+> > > napi_struct. Consequently, add new notify.notify and notify.release
+> > > functions: netif_irq_cpu_rmap_notify() and netif_napi_affinity_release().
+> > > 
+> > > Acked-by: David Arinzon <darinzon@amazon.com>
+> > > Signed-off-by: Ahmed Zaki <ahmed.zaki@intel.com>
+> > 
+> > [...]
+> > 
+> > > diff --git a/net/core/dev.c b/net/core/dev.c
+> > > index fe5f5855593d..dbb63005bc2b 100644
+> > > --- a/net/core/dev.c
+> > > +++ b/net/core/dev.c
+> > > @@ -6862,6 +6862,141 @@ void netif_queue_set_napi(struct net_device *dev, unsigned int queue_index,
+> > >   }
+> > >   EXPORT_SYMBOL(netif_queue_set_napi);
+> > > +#ifdef CONFIG_RFS_ACCEL
+> > > +static void
+> > > +netif_irq_cpu_rmap_notify(struct irq_affinity_notify *notify,
+> > > +			  const cpumask_t *mask)
+> > > +{
+> > > +	struct napi_struct *napi =
+> > > +		container_of(notify, struct napi_struct, notify);
+> > > +	struct cpu_rmap *rmap = napi->dev->rx_cpu_rmap;
+> > > +	int err;
+> > 
+> > I wonder if this generates a warning with some compilers? err is
+> > defined not used if !napi->dev->rx_cpu_rmap_auto ? Not sure.
+> > 
+> > > +	if (napi->dev->rx_cpu_rmap_auto) {
+> > > +		err = cpu_rmap_update(rmap, napi->napi_rmap_idx, mask);
+> > > +		if (err)
+> > > +			pr_warn("%s: RMAP update failed (%d)\n",
+> > > +				__func__, err);
+> > > +	}
+> > > +}
+> > > +
+> > > +static void netif_napi_affinity_release(struct kref *ref)
+> > > +{
+> > > +	struct napi_struct *napi =
+> > > +		container_of(ref, struct napi_struct, notify.kref);
+> > > +	struct cpu_rmap *rmap = napi->dev->rx_cpu_rmap;
+> > > +
+> > > +	if (!napi->dev->rx_cpu_rmap_auto)
+> > > +		return;
+> > > +	rmap->obj[napi->napi_rmap_idx] = NULL;
+> > > +	napi->napi_rmap_idx = -1;
+> > > +	cpu_rmap_put(rmap);
+> > > +}
+> > > +
+> > > +static int napi_irq_cpu_rmap_add(struct napi_struct *napi, int irq)
+> > > +{
+> > > +	struct cpu_rmap *rmap = napi->dev->rx_cpu_rmap;
+> > > +	int rc;
+> > > +
+> > > +	if (!rmap)
+> > > +		return -EINVAL;
+> > > +
+> > > +	napi->notify.notify = netif_irq_cpu_rmap_notify;
+> > > +	napi->notify.release = netif_napi_affinity_release;
+> > 
+> > Maybe the callbacks should only be set at the end after everything
+> > else is successful, just before the return 0 ?
+> > 
 > 
-> The default IRQ mask is set to one cpu starting from the closest NUMA.
-
-Maybe the above is helpful to add to
-Documentation/networking/napi.rst ?
-
-> Signed-off-by: Ahmed Zaki <ahmed.zaki@intel.com>
-> ---
->  include/linux/netdevice.h | 14 ++++++++++-
->  net/core/dev.c            | 51 +++++++++++++++++++++++++++++----------
->  2 files changed, 51 insertions(+), 14 deletions(-)
+> I believe this is needed before irq_set_affinity_notifier(), OW we could
+> have some racing. I can move it there if you like.
 > 
-> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-> index 98259f19c627..d576e5c91c43 100644
-> --- a/include/linux/netdevice.h
-> +++ b/include/linux/netdevice.h
-> @@ -351,6 +351,7 @@ struct napi_config {
->  	u64 gro_flush_timeout;
->  	u64 irq_suspend_timeout;
->  	u32 defer_hard_irqs;
-> +	cpumask_t affinity_mask;
->  	unsigned int napi_id;
->  };
->  
-> @@ -393,8 +394,8 @@ struct napi_struct {
->  	struct list_head	dev_list;
->  	struct hlist_node	napi_hash_node;
->  	int			irq;
-> -#ifdef CONFIG_RFS_ACCEL
->  	struct irq_affinity_notify notify;
-> +#ifdef CONFIG_RFS_ACCEL
->  	int			napi_rmap_idx;
->  #endif
->  	int			index;
-> @@ -1991,6 +1992,11 @@ enum netdev_reg_state {
->   *
->   *	@threaded:	napi threaded mode is enabled
->   *
-> + *	@irq_affinity_auto: driver wants the core to manage the IRQ affinity.
-> + *			    Set by netif_enable_irq_affinity(), then driver must
-> + *			    create persistent napi by netif_napi_add_config()
-> + *			    and finally bind napi to IRQ (netif_napi_set_irq).
-> + *
->   *	@rx_cpu_rmap_auto: driver wants the core to manage the ARFS rmap.
->   *	                   Set by calling netif_enable_cpu_rmap().
->   *
-> @@ -2401,6 +2407,7 @@ struct net_device {
->  	struct lock_class_key	*qdisc_tx_busylock;
->  	bool			proto_down;
->  	bool			threaded;
-> +	bool			irq_affinity_auto;
->  	bool			rx_cpu_rmap_auto;
->  
->  	/* priv_flags_slow, ungrouped to save space */
-> @@ -2653,6 +2660,11 @@ static inline void netdev_set_ml_priv(struct net_device *dev,
->  	dev->ml_priv_type = type;
->  }
->  
-> +static inline void netif_enable_irq_affinity(struct net_device *dev)
-> +{
-> +	dev->irq_affinity_auto = true;
-> +}
+> > > +	cpu_rmap_get(rmap);
+> > > +	rc = cpu_rmap_add(rmap, napi);
+> > > +	if (rc < 0)
+> > > +		goto err_add;
+> > > +
+> > > +	napi->napi_rmap_idx = rc;
+> > > +	rc = irq_set_affinity_notifier(irq, &napi->notify);
+> > > +	if (rc)
+> > > +		goto err_set;
+> > > +
+> > > +	return 0;
+> > > +
+> > > +err_set:
+> > > +	rmap->obj[napi->napi_rmap_idx] = NULL;
+> > > +	napi->napi_rmap_idx = -1;
+> > > +err_add:
+> > > +	cpu_rmap_put(rmap);
+> > > +	return rc;
+> > > +}
+> > 
+> > [...]
+> > 
+> > > +void netif_napi_set_irq_locked(struct napi_struct *napi, int irq)
+> > > +{
+> > > +	int rc;
+> > > +
+> > > +	if (!napi->dev->rx_cpu_rmap_auto)
+> > > +		goto out;
+> > 
+> > Maybe the above if statement could be extended to be something like:
+> > 
+> > if (!napi->dev->rx_cpu_rmap_auto || napi->irq < 0)
+> >    goto out;
+> > 
+> > then you can omit the irq > 0 checks in the code below, potentially?
+> 
+> I am afraid I don't get this, the checks below one is for the new irq (could
+> be valid or -1) and one for the existing (nap->irq).
 
-I'll have to look at the patches which use the above function, but
-the first thing that came to mind when I saw this was does the above
-need a WRITE_ONCE ?
+Ah yes, my mistake; I misread the other half of the if statement
+below. My apologies.
 
-The reads below seem to be protected by a lock; I haven't yet looked
-at the other patches so maybe the write is also protected by
-netdev->lock ?
-
->  /*
->   * Net namespace inlines
->   */
-> diff --git a/net/core/dev.c b/net/core/dev.c
-> index dbb63005bc2b..bc82c7f621b3 100644
-> --- a/net/core/dev.c
-> +++ b/net/core/dev.c
-
-[...]
-
->  
-> +#ifdef CONFIG_RFS_ACCEL
->  static void netif_napi_affinity_release(struct kref *ref)
->  {
->  	struct napi_struct *napi =
-> @@ -6901,7 +6908,7 @@ static int napi_irq_cpu_rmap_add(struct napi_struct *napi, int irq)
->  	if (!rmap)
->  		return -EINVAL;
->  
-> -	napi->notify.notify = netif_irq_cpu_rmap_notify;
-> +	napi->notify.notify = netif_napi_irq_notify;
-
-Same question as previous patch: does it make sense to only set the
-callbacks below when all other operations have succeeded?
-
->  	napi->notify.release = netif_napi_affinity_release;
->  	cpu_rmap_get(rmap);
->  	rc = cpu_rmap_add(rmap, napi);
-
-[...]
-
-> @@ -6976,23 +6987,28 @@ void netif_napi_set_irq_locked(struct napi_struct *napi, int irq)
->  {
->  	int rc;
->  
-> -	if (!napi->dev->rx_cpu_rmap_auto)
-> -		goto out;
-> -
-> -	/* Remove existing rmap entries */
-> -	if (napi->irq != irq && napi->irq > 0)
-> +	/* Remove existing resources */
-> +	if ((napi->dev->rx_cpu_rmap_auto || napi->dev->irq_affinity_auto) &&
-> +	    napi->irq > 0 && napi->irq != irq)
->  		irq_set_affinity_notifier(napi->irq, NULL);
->  
-> -	if (irq > 0) {
-> +	if (irq > 0 && napi->dev->rx_cpu_rmap_auto) {
->  		rc = napi_irq_cpu_rmap_add(napi, irq);
->  		if (rc) {
->  			netdev_warn(napi->dev, "Unable to update ARFS map (%d)\n",
->  				    rc);
->  			netif_disable_cpu_rmap(napi->dev);
->  		}
-> +	} else if (irq > 0 && napi->config && napi->dev->irq_affinity_auto) {
-> +		napi->notify.notify = netif_napi_irq_notify;
-> +		napi->notify.release = netif_napi_affinity_release;
-> +
-> +		rc = irq_set_affinity_notifier(irq, &napi->notify);
-> +		if (rc)
-> +			netdev_warn(napi->dev, "Unable to set IRQ notifier (%d)\n",
-> +				    rc);
-
-I see now that my comments on the previous patch are stale after
-this patch is applied. I wonder if the "irq > 0" part can be pulled
-out to simplify the branches here?
+> > 
+> > > +	/* Remove existing rmap entries */
+> > > +	if (napi->irq != irq && napi->irq > 0)
+> > > +		irq_set_affinity_notifier(napi->irq, NULL);
+> > > +
+> > > +	if (irq > 0) {
+> > > +		rc = napi_irq_cpu_rmap_add(napi, irq);
+> > > +		if (rc) {
+> > > +			netdev_warn(napi->dev, "Unable to update ARFS map (%d)\n",
+> > > +				    rc);
+> > > +			netif_disable_cpu_rmap(napi->dev);
+> > > +		}
+> > > +	}
+> > > +
+> > > +out:
+> > > +	napi->irq = irq;
+> > > +}
+> > > +EXPORT_SYMBOL(netif_napi_set_irq_locked);
+> > > +
+> 
+> Thanks.
+> 
 
