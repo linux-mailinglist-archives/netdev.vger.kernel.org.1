@@ -1,323 +1,237 @@
-Return-Path: <netdev+bounces-160512-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160513-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A311A1A040
-	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 09:59:30 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 52643A1A063
+	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 10:11:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7F91F16D561
-	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 08:59:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 10BD4188D34D
+	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 09:11:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 442EB20C03B;
-	Thu, 23 Jan 2025 08:59:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFA3020CCCA;
+	Thu, 23 Jan 2025 09:11:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bgAHK2vv"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OHj4H4cf"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DF1E20C00D
-	for <netdev@vger.kernel.org>; Thu, 23 Jan 2025 08:59:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CBA415AF6;
+	Thu, 23 Jan 2025 09:11:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737622766; cv=none; b=fHXDw0XDua8ID1V3nbmPsxtuoSrd4B+nL5uPCwdeCLyG90sya5ESrot4lk1UJ+cWprleeuFgJD59l1QqUTyyi2tMF9pdeHmDEcUkxP+F+axH4g0iOsl5bIhq21U2+FdWLozPiIN/Z1eqNmI6PmSEMqKLVKNxPFx7qZAliaMg61g=
+	t=1737623505; cv=none; b=NgsXzBu+bvpCA7GU7DpvQxfJzH6KoojylVYmU1MW0ZD4zScrjjUc+4U4UCU366Phws4xnIcCQfibA5sbv5YLofu70f2BrM82yC07IzyWrgap2oL+I38LImTO7IrReiK5zBY4IKYEglibTaJrHVCaJfM+Rk+kiOm3+yZNwjtipvo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737622766; c=relaxed/simple;
-	bh=QYwG08fv7LCe0nRLz9nAz6siZ2+lGH9Nm+l8NkJg+Cw=;
-	h=From:To:cc:Subject:MIME-Version:Content-Type:Date:Message-ID; b=aiA3dIMWqdLybHUGg0PrOUKZIF8eSmRxXOCUhOecjaGn/uHEDaH8Td0ZGeOANejIJqK1BILMBdPWCdXhcg1MuwId4z1DiNTTBOqzko6Fki78OCdVDxVXRW/nDxf5xQ/wi9AtK8e7OGKT3FME3x1AGzViUAaW7UngPLhzQrS9A4A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bgAHK2vv; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1737622763;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=u0zGpo6OTMm9f5DXUBo9iD012diEnF7FfUaJEidTJQA=;
-	b=bgAHK2vv4kVANFKOn9CUr3OP23g/m9vN2PpqUOZl8L24U2UHXzZ6S1KLVeskvIToyLO6kk
-	yWGFmqkGJbKKzHES52d4Q5hHeHkwlLTQmxxewqGrGjjoabtnQRQblswx8az0o8O/etKzGs
-	Qo9KaEhRUvHoGG4ivMcPKV4I88bhisg=
-Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-618-fi2jiBiQPCOlYS-BQQRAWQ-1; Thu,
- 23 Jan 2025 03:59:18 -0500
-X-MC-Unique: fi2jiBiQPCOlYS-BQQRAWQ-1
-X-Mimecast-MFC-AGG-ID: fi2jiBiQPCOlYS-BQQRAWQ
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8103D1955DCB;
-	Thu, 23 Jan 2025 08:59:16 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.5])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id A881930001BE;
-	Thu, 23 Jan 2025 08:59:13 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-To: netdev@vger.kernel.org
-cc: dhowells@redhat.com, Marc Dionne <marc.dionne@auristor.com>,
-    Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
-    Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-    "David S. Miller" <davem@davemloft.net>,
-    linux-afs@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: [PATCH net] rxrpc, afs: Fix peer hash locking vs RCU callback
+	s=arc-20240116; t=1737623505; c=relaxed/simple;
+	bh=C4/gkseYCHFUnrpTuEcYwbjJfhLTgduIxSPhTi4VqL0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=bxAJsHS9F8Rh8KoyyCsDBesF6qfhKbRmVQi4yFUGZgFq8/+8jg7a70MeBzQQYpXNk8WsZvQ65zF6B8mZfkRG8fAvkLKRdfsXIl+zL9HgiUz24VBRA61BW6F6Yl4/0an5lLCHHIMo5/Aa0sxktRMkJA3l7H+wt1/WHRUYfA/HCA8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OHj4H4cf; arc=none smtp.client-ip=209.85.214.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-216395e151bso9053445ad.0;
+        Thu, 23 Jan 2025 01:11:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1737623502; x=1738228302; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=hpnalNMAcB0X5bxsG0IkO4Lsa0UkqzmKINth8bDRb0M=;
+        b=OHj4H4cfBK5zJYbkZblYEQv0b+ap0SQ3LooiYZa+eSTJbJixHR+pqrNMNy5ANr1uY8
+         2UU5lXh/8NFEMmelzbPcmICNndQvVqQUnGdjOaUqFHBunTsrY2jw6gORFzqTjED2HRLB
+         PpI534a/JPavc7eg5VBynCzGhRbBnIAluRhZTwEdwaNI4h8tmDBM9ekgRw2E8UgUpjkk
+         uAIPPMGDV+3kRzh3/1lvxMxLAwxrCxMn8tPuXe6wCCDLJw0bnXL99RfG809nZQHJ338F
+         +u/ka6weNH5XKpRNgk0vh4Flxefyt9vQlAq1j8gf9Z3Dn8QPa9rqCBTHCMBVaSSiK7KW
+         wTwg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737623502; x=1738228302;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=hpnalNMAcB0X5bxsG0IkO4Lsa0UkqzmKINth8bDRb0M=;
+        b=Y2syQkszJj7o02QBRXlI5eZj4VddJBXk99ohRfDszBQ/AeZ9j5urIKnDs9pFrkQc5T
+         B42htMSQfcH7A19v8EpsmZ/FeLyVpYEMDC+ewCKwwkVM/OEcR4pHTsSlW5YCNisDwLqg
+         s8NyzDKjIvQ9j+sK8hEhMV/7EwSukyOXWlA/XHekWehN/zCb4HQK7HNHPXT9lcjTEoXb
+         odXjXWsv2FpwuzL6UIvSANjx7crQGNqO6BAsl1uRxwTMEUO6O8HS3VolpCTNzUwJGF9M
+         ECsgt3RqMERRGymjI2GkijlluIO8JDogu4Jl+5et6erqDZYAF1Q/1PtR6Q/MaOR+cEFY
+         nz8A==
+X-Forwarded-Encrypted: i=1; AJvYcCUH0QBL+BlcoevEZFr4mrq7QBTgBGLATtPl9suMPXo2vFyJBGTLVhjzScztoljqtsPx6r9sJI6XjhonxrwfJpQ=@vger.kernel.org, AJvYcCUgdehZuVI4NjjmbxgItnCQ/N9dHdTLWPjczVK70iuxkg3e6DXX5IYv3ZvXpQUTH5M+Or6aEUN4ogFImMk=@vger.kernel.org, AJvYcCV6MtnEbrw/y+f4d0MRiLcWLGmSyzJp0IHUgnSrG1z9OSpMKtO17caSRDIy7TWEeQmYZo30kQkvMsNo@vger.kernel.org, AJvYcCVTcZEL1JUjYkqIMf93mXkP4woNeaCLLuAddB8YaRlQoFA/aVp+wGvwzfz7DmipgIEQ9W5p3DjvRddn@vger.kernel.org, AJvYcCVreXUvO6tZedlo46B0icmLMxK54GMUjgYw7852xnDnU230FChoxjK+LrCErCB1ApJS5LxHboukQtcTsg==@vger.kernel.org, AJvYcCW0wO4pfC9TjB5Ox2cbdtxz5Yg+hiBJdEM8Gv+2vC+06787krvU9wsylRRV0ppFHj9X/eqx0W3P@vger.kernel.org, AJvYcCWgIAqkOzvIFyuDKL6odjKIPyJrhke9Iak1y3WYGOjsB8VrnHh2cKjT0fnURmrPnkL+Htjy+8L/Bbk=@vger.kernel.org, AJvYcCXb4ItcQBhJPTClkk612rTv1zaLsp2zg7UgI9BrO5S0wVkwDNNamJdy0IOwa60UwQ66CU6qGMDrYQtT@vger.kernel.org
+X-Gm-Message-State: AOJu0YyAai/ZISlrYHSGoI9WSG0S8vForzn4KpJg2/KiMbSomEm5vk/n
+	kauUxftrBSzvUEgQxlWLWox+8Ws8tjuN0iTNZJlXF9tydgp52JOF
+X-Gm-Gg: ASbGncuHbdjQJxObvvr0aXJnpw9pyG9X6ZSTCZc3/0xKm65hl4HAVBzV9hvnzV2wRAc
+	qDWuVmyqInIsdRqjtomzitO/QNTwieahIktHe5pNDrlz9eEyiGmWio75lkIFXmvgzCdGo+LZ4kD
+	RsgezRRgeM6OkgnMyt/9lNdKiz11WyBg1D21bwyRYq2lUbAScktnqBh9WxwDeWICnTPhk4XxQzL
+	KHt7dgoMbeADy9qfxuOJaY8vYB8Y0LASQK7cP35pEE++vD0hsucrJPjKA5fQb2HBFONloc+rYVn
+	NuQu8Kggp/sb2Xm/eQq8+7+hhV5RmHNBnHKzzBhACK5FQBqnixAmMJY8vYo=
+X-Google-Smtp-Source: AGHT+IE39pzaBCumNDr6xqj4biR1pmBXlgpwj4Dha4qjrQEuLNxAAlGgTymkd3CYYourpAruE5yynQ==
+X-Received: by 2002:a17:902:d54a:b0:215:758c:52e8 with SMTP id d9443c01a7336-21d9934b5d4mr48677125ad.12.1737623502283;
+        Thu, 23 Jan 2025 01:11:42 -0800 (PST)
+Received: from hcdev-d520mt2.. (60-250-196-139.hinet-ip.hinet.net. [60.250.196.139])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21c2ceb735esm109365365ad.64.2025.01.23.01.11.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 23 Jan 2025 01:11:41 -0800 (PST)
+From: Ming Yu <a0282524688@gmail.com>
+To: tmyu0@nuvoton.com,
+	lee@kernel.org,
+	linus.walleij@linaro.org,
+	brgl@bgdev.pl,
+	andi.shyti@kernel.org,
+	mkl@pengutronix.de,
+	mailhol.vincent@wanadoo.fr,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	wim@linux-watchdog.org,
+	linux@roeck-us.net,
+	jdelvare@suse.com,
+	alexandre.belloni@bootlin.com
+Cc: linux-kernel@vger.kernel.org,
+	linux-gpio@vger.kernel.org,
+	linux-i2c@vger.kernel.org,
+	linux-can@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-watchdog@vger.kernel.org,
+	linux-hwmon@vger.kernel.org,
+	linux-rtc@vger.kernel.org,
+	linux-usb@vger.kernel.org,
+	Ming Yu <a0282524688@gmail.com>
+Subject: [PATCH v6 0/7] Add Nuvoton NCT6694 MFD drivers
+Date: Thu, 23 Jan 2025 17:11:08 +0800
+Message-Id: <20250123091115.2079802-1-a0282524688@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <2095617.1737622752.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 23 Jan 2025 08:59:12 +0000
-Message-ID: <2095618.1737622752@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+Content-Transfer-Encoding: 8bit
 
-In its address list, afs now retains pointers to and refs on one or more
-rxrpc_peer objects.  The address list is freed under RCU and at this time,
-it puts the refs on those peers.
+This patch series introduces support for Nuvoton NCT6694, a peripheral
+expander based on USB interface. It models the chip as an MFD driver
+(1/7), GPIO driver(2/7), I2C Adapter driver(3/7), CANfd driver(4/7),
+WDT driver(5/7), HWMON driver(6/7), and RTC driver(7/7).
 
-Now, when an rxrpc_peer object runs out of refs, it gets removed from the
-peer hash table and, for that, rxrpc has to take a spinlock.  However, it
-is now being called from afs's RCU cleanup, which takes place in BH
-context - but it is just taking an ordinary spinlock.
+The MFD driver implements USB device functionality to issue
+custom-define USB bulk pipe packets for NCT6694. Each child device can
+use the USB functions nct6694_read_msg() and nct6694_write_msg() to issue
+a command. They can also request interrupt that will be called when the
+USB device receives its interrupt pipe.
 
-The put may also be called from non-BH context, and so there exists the
-possibility of deadlock if the BH-based RCU cleanup happens whilst the has=
-h
-spinlock is held.  This led to the attached lockdep complaint.
+The following introduces the custom-define USB transactions:
+	nct6694_read_msg - Send bulk-out pipe to write request packet
+			   Receive bulk-in pipe to read response packet
+			   Receive bulk-in pipe to read data packet
 
-Fix this by changing spinlocks of rxnet->peer_hash_lock back to
-BH-disabling locks.
+	nct6694_write_msg - Send bulk-out pipe to write request packet
+			    Send bulk-out pipe to write data packet
+			    Receive bulk-in pipe to read response packet
+			    Receive bulk-in pipe to read data packet
 
-    =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D
-    WARNING: inconsistent lock state
-    6.13.0-rc5-build2+ #1223 Tainted: G            E
-    --------------------------------
-    inconsistent {SOFTIRQ-ON-W} -> {IN-SOFTIRQ-W} usage.
-    swapper/1/0 [HC0[0]:SC1[1]:HE1:SE0] takes:
-    ffff88810babe228 (&rxnet->peer_hash_lock){+.?.}-{3:3}, at: rxrpc_put_p=
-eer+0xcb/0x180
-    {SOFTIRQ-ON-W} state was registered at:
-      mark_usage+0x164/0x180
-      __lock_acquire+0x544/0x990
-      lock_acquire.part.0+0x103/0x280
-      _raw_spin_lock+0x2f/0x40
-      rxrpc_peer_keepalive_worker+0x144/0x440
-      process_one_work+0x486/0x7c0
-      process_scheduled_works+0x73/0x90
-      worker_thread+0x1c8/0x2a0
-      kthread+0x19b/0x1b0
-      ret_from_fork+0x24/0x40
-      ret_from_fork_asm+0x1a/0x30
-    irq event stamp: 972402
-    hardirqs last  enabled at (972402): [<ffffffff8244360e>] _raw_spin_unl=
-ock_irqrestore+0x2e/0x50
-    hardirqs last disabled at (972401): [<ffffffff82443328>] _raw_spin_loc=
-k_irqsave+0x18/0x60
-    softirqs last  enabled at (972300): [<ffffffff810ffbbe>] handle_softir=
-qs+0x3ee/0x430
-    softirqs last disabled at (972313): [<ffffffff810ffc54>] __irq_exit_rc=
-u+0x44/0x110
+Changes since version 5:
+- Modify the module name and the driver name consistently
+- Fix mfd_cell to MFD_CELL_NAME() and MFD_CELL_BASIC()
+- Drop unnecessary macros in nct6694.c
+- Update private data and drop mutex in nct6694_canfd.c
+- Fix nct6694_can_handle_state_change() in nct6694_canfd.c
 
-    other info that might help us debug this:
-     Possible unsafe locking scenario:
-           CPU0
-           ----
-      lock(&rxnet->peer_hash_lock);
-      <Interrupt>
-        lock(&rxnet->peer_hash_lock);
+Changes since version 4:
+- Modify arguments in read/write function to a pointer to cmd_header
+- Modify all callers that call the read/write function
+- Move the nct6694_canfd.c to drivers/net/can/usb/
+- Fix the missing rx offload function in nct6694_canfd.c
+- Fix warngings in nct6694-hwmon.c
 
-     *** DEADLOCK ***
-    1 lock held by swapper/1/0:
-     #0: ffffffff83576be0 (rcu_callback){....}-{0:0}, at: rcu_lock_acquire=
-+0x7/0x30
+Changes since version 3:
+- Modify array buffer to structure for each drivers
+- Fix defines and comments for each drivers
+- Add header <linux/bits.h> and use BIT macro in nct6694.c and
+  gpio-nct6694.c
+- Modify mutex_init() to devm_mutex_init()
+- Add rx-offload helper in nct6694_canfd.c
+- Drop watchdog_init_timeout() in nct6694_wdt.c
+- Modify the division method to DIV_ROUND_CLOSEST() in nct6694-hwmon.c
+- Drop private mutex and use rtc core lock in rtc-nct6694.c
+- Modify device_set_wakeup_capable() to device_init_wakeup() in
+  rtc-nct6694.c
 
-    stack backtrace:
-    CPU: 1 UID: 0 PID: 0 Comm: swapper/1 Tainted: G            E      6.13=
-.0-rc5-build2+ #1223
-    Tainted: [E]=3DUNSIGNED_MODULE
-    Hardware name: ASUS All Series/H97-PLUS, BIOS 2306 10/09/2014
-    Call Trace:
-     <IRQ>
-     dump_stack_lvl+0x57/0x80
-     print_usage_bug.part.0+0x227/0x240
-     valid_state+0x53/0x70
-     mark_lock_irq+0xa5/0x2f0
-     mark_lock+0xf7/0x170
-     mark_usage+0xe1/0x180
-     __lock_acquire+0x544/0x990
-     lock_acquire.part.0+0x103/0x280
-     _raw_spin_lock+0x2f/0x40
-     rxrpc_put_peer+0xcb/0x180
-     afs_free_addrlist+0x46/0x90 [kafs]
-     rcu_do_batch+0x2d2/0x640
-     rcu_core+0x2f7/0x350
-     handle_softirqs+0x1ee/0x430
-     __irq_exit_rcu+0x44/0x110
-     irq_exit_rcu+0xa/0x30
-     sysvec_apic_timer_interrupt+0x7f/0xa0
-     </IRQ>
+Changes since version 2:
+- Add MODULE_ALIAS() for each child driver
+- Modify gpio line names be a local variable in gpio-nct6694.c
+- Drop unnecessary platform_get_drvdata() in gpio-nct6694.c
+- Rename each command in nct6694_canfd.c
+- Modify each function name consistently in nct6694_canfd.c
+- Modify the pretimeout validation procedure in nct6694_wdt.c
+- Fix warnings in nct6694-hwmon.c
 
-Fixes: 72904d7b9bfb ("rxrpc, afs: Allow afs to pin rxrpc_peer objects")
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Marc Dionne <marc.dionne@auristor.com>
-cc: "David S. Miller" <davem@davemloft.net>
-cc: Eric Dumazet <edumazet@google.com>
-cc: Jakub Kicinski <kuba@kernel.org>
-cc: Paolo Abeni <pabeni@redhat.com>
-cc: Simon Horman <horms@kernel.org>
-cc: linux-afs@lists.infradead.org
-cc: netdev@vger.kernel.org
----
- net/rxrpc/peer_event.c  |   16 ++++++++--------
- net/rxrpc/peer_object.c |   12 ++++++------
- 2 files changed, 14 insertions(+), 14 deletions(-)
+Changes since version 1:
+- Implement IRQ domain to handle IRQ demux in nct6694.c
+- Modify USB_DEVICE to USB_DEVICE_AND_INTERFACE_INFO API in nct6694.c
+- Add each driver's command structure
+- Fix USB functions in nct6694.c
+- Fix platform driver registration in each child driver
+- Sort each driver's header files alphabetically
+- Drop unnecessary header in gpio-nct6694.c
+- Add gpio line names in gpio-nct6694.c
+- Fix errors and warnings in nct6694_canfd.c
+- Fix TX-flow control in nct6694_canfd.c
+- Fix warnings in nct6694_wdt.c
+- Drop unnecessary logs in nct6694_wdt.c
+- Modify start() function to setup device in nct6694_wdt.c
+- Add voltage sensors functionality in nct6694-hwmon.c
+- Add temperature sensors functionality in nct6694-hwmon.c
+- Fix overwrite error return values in nct6694-hwmon.c
+- Add write value limitation for each write() function in nct6694-hwmon.c
+- Drop unnecessary logs in rtc-nct6694.c
+- Fix overwrite error return values in rtc-nct6694.c
+- Modify to use dev_err_probe API in rtc-nct6694.c
 
-diff --git a/net/rxrpc/peer_event.c b/net/rxrpc/peer_event.c
-index d82e44a3901b..e874c31fa901 100644
---- a/net/rxrpc/peer_event.c
-+++ b/net/rxrpc/peer_event.c
-@@ -246,7 +246,7 @@ static void rxrpc_peer_keepalive_dispatch(struct rxrpc=
-_net *rxnet,
- 	bool use;
- 	int slot;
- =
 
--	spin_lock(&rxnet->peer_hash_lock);
-+	spin_lock_bh(&rxnet->peer_hash_lock);
- =
+Ming Yu (7):
+  mfd: Add core driver for Nuvoton NCT6694
+  gpio: Add Nuvoton NCT6694 GPIO support
+  i2c: Add Nuvoton NCT6694 I2C support
+  can: Add Nuvoton NCT6694 CANFD support
+  watchdog: Add Nuvoton NCT6694 WDT support
+  hwmon: Add Nuvoton NCT6694 HWMON support
+  rtc: Add Nuvoton NCT6694 RTC support
 
- 	while (!list_empty(collector)) {
- 		peer =3D list_entry(collector->next,
-@@ -257,7 +257,7 @@ static void rxrpc_peer_keepalive_dispatch(struct rxrpc=
-_net *rxnet,
- 			continue;
- =
+ MAINTAINERS                         |  13 +
+ drivers/gpio/Kconfig                |  12 +
+ drivers/gpio/Makefile               |   1 +
+ drivers/gpio/gpio-nct6694.c         | 457 ++++++++++++++
+ drivers/hwmon/Kconfig               |  10 +
+ drivers/hwmon/Makefile              |   1 +
+ drivers/hwmon/nct6694-hwmon.c       | 948 ++++++++++++++++++++++++++++
+ drivers/i2c/busses/Kconfig          |  10 +
+ drivers/i2c/busses/Makefile         |   1 +
+ drivers/i2c/busses/i2c-nct6694.c    | 157 +++++
+ drivers/mfd/Kconfig                 |  18 +
+ drivers/mfd/Makefile                |   2 +
+ drivers/mfd/nct6694.c               | 373 +++++++++++
+ drivers/net/can/usb/Kconfig         |  11 +
+ drivers/net/can/usb/Makefile        |   1 +
+ drivers/net/can/usb/nct6694_canfd.c | 813 ++++++++++++++++++++++++
+ drivers/rtc/Kconfig                 |  10 +
+ drivers/rtc/Makefile                |   1 +
+ drivers/rtc/rtc-nct6694.c           | 286 +++++++++
+ drivers/watchdog/Kconfig            |  11 +
+ drivers/watchdog/Makefile           |   1 +
+ drivers/watchdog/nct6694_wdt.c      | 296 +++++++++
+ include/linux/mfd/nct6694.h         | 105 +++
+ 23 files changed, 3538 insertions(+)
+ create mode 100644 drivers/gpio/gpio-nct6694.c
+ create mode 100644 drivers/hwmon/nct6694-hwmon.c
+ create mode 100644 drivers/i2c/busses/i2c-nct6694.c
+ create mode 100644 drivers/mfd/nct6694.c
+ create mode 100644 drivers/net/can/usb/nct6694_canfd.c
+ create mode 100644 drivers/rtc/rtc-nct6694.c
+ create mode 100644 drivers/watchdog/nct6694_wdt.c
+ create mode 100644 include/linux/mfd/nct6694.h
 
- 		use =3D __rxrpc_use_local(peer->local, rxrpc_local_use_peer_keepalive);
--		spin_unlock(&rxnet->peer_hash_lock);
-+		spin_unlock_bh(&rxnet->peer_hash_lock);
- =
-
- 		if (use) {
- 			keepalive_at =3D peer->last_tx_at + RXRPC_KEEPALIVE_TIME;
-@@ -277,17 +277,17 @@ static void rxrpc_peer_keepalive_dispatch(struct rxr=
-pc_net *rxnet,
- 			 */
- 			slot +=3D cursor;
- 			slot &=3D mask;
--			spin_lock(&rxnet->peer_hash_lock);
-+			spin_lock_bh(&rxnet->peer_hash_lock);
- 			list_add_tail(&peer->keepalive_link,
- 				      &rxnet->peer_keepalive[slot & mask]);
--			spin_unlock(&rxnet->peer_hash_lock);
-+			spin_unlock_bh(&rxnet->peer_hash_lock);
- 			rxrpc_unuse_local(peer->local, rxrpc_local_unuse_peer_keepalive);
- 		}
- 		rxrpc_put_peer(peer, rxrpc_peer_put_keepalive);
--		spin_lock(&rxnet->peer_hash_lock);
-+		spin_lock_bh(&rxnet->peer_hash_lock);
- 	}
- =
-
--	spin_unlock(&rxnet->peer_hash_lock);
-+	spin_unlock_bh(&rxnet->peer_hash_lock);
- }
- =
-
- /*
-@@ -317,7 +317,7 @@ void rxrpc_peer_keepalive_worker(struct work_struct *w=
-ork)
- 	 * second; the bucket at cursor + 1 goes at now + 1s and so
- 	 * on...
- 	 */
--	spin_lock(&rxnet->peer_hash_lock);
-+	spin_lock_bh(&rxnet->peer_hash_lock);
- 	list_splice_init(&rxnet->peer_keepalive_new, &collector);
- =
-
- 	stop =3D cursor + ARRAY_SIZE(rxnet->peer_keepalive);
-@@ -329,7 +329,7 @@ void rxrpc_peer_keepalive_worker(struct work_struct *w=
-ork)
- 	}
- =
-
- 	base =3D now;
--	spin_unlock(&rxnet->peer_hash_lock);
-+	spin_unlock_bh(&rxnet->peer_hash_lock);
- =
-
- 	rxnet->peer_keepalive_base =3D base;
- 	rxnet->peer_keepalive_cursor =3D cursor;
-diff --git a/net/rxrpc/peer_object.c b/net/rxrpc/peer_object.c
-index e1c63129586b..0fcc87f0409f 100644
---- a/net/rxrpc/peer_object.c
-+++ b/net/rxrpc/peer_object.c
-@@ -325,10 +325,10 @@ void rxrpc_new_incoming_peer(struct rxrpc_local *loc=
-al, struct rxrpc_peer *peer)
- 	hash_key =3D rxrpc_peer_hash_key(local, &peer->srx);
- 	rxrpc_init_peer(local, peer, hash_key);
- =
-
--	spin_lock(&rxnet->peer_hash_lock);
-+	spin_lock_bh(&rxnet->peer_hash_lock);
- 	hash_add_rcu(rxnet->peer_hash, &peer->hash_link, hash_key);
- 	list_add_tail(&peer->keepalive_link, &rxnet->peer_keepalive_new);
--	spin_unlock(&rxnet->peer_hash_lock);
-+	spin_unlock_bh(&rxnet->peer_hash_lock);
- }
- =
-
- /*
-@@ -360,7 +360,7 @@ struct rxrpc_peer *rxrpc_lookup_peer(struct rxrpc_loca=
-l *local,
- 			return NULL;
- 		}
- =
-
--		spin_lock(&rxnet->peer_hash_lock);
-+		spin_lock_bh(&rxnet->peer_hash_lock);
- =
-
- 		/* Need to check that we aren't racing with someone else */
- 		peer =3D __rxrpc_lookup_peer_rcu(local, srx, hash_key);
-@@ -373,7 +373,7 @@ struct rxrpc_peer *rxrpc_lookup_peer(struct rxrpc_loca=
-l *local,
- 				      &rxnet->peer_keepalive_new);
- 		}
- =
-
--		spin_unlock(&rxnet->peer_hash_lock);
-+		spin_unlock_bh(&rxnet->peer_hash_lock);
- =
-
- 		if (peer)
- 			rxrpc_free_peer(candidate);
-@@ -423,10 +423,10 @@ static void __rxrpc_put_peer(struct rxrpc_peer *peer=
-)
- =
-
- 	ASSERT(hlist_empty(&peer->error_targets));
- =
-
--	spin_lock(&rxnet->peer_hash_lock);
-+	spin_lock_bh(&rxnet->peer_hash_lock);
- 	hash_del_rcu(&peer->hash_link);
- 	list_del_init(&peer->keepalive_link);
--	spin_unlock(&rxnet->peer_hash_lock);
-+	spin_unlock_bh(&rxnet->peer_hash_lock);
- =
-
- 	rxrpc_free_peer(peer);
- }
+-- 
+2.34.1
 
 
