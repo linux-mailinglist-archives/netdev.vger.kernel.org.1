@@ -1,181 +1,250 @@
-Return-Path: <netdev+bounces-160488-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160489-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6F87A19E74
-	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 07:25:32 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3179CA19E86
+	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 07:44:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ADC6B16418F
-	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 06:25:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DF02E3A03BA
+	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 06:43:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5A2F1C54AF;
-	Thu, 23 Jan 2025 06:25:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A7A91C2DB2;
+	Thu, 23 Jan 2025 06:44:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YNBzGHWi"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="O7bh4qhc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08D531C2DB2;
-	Thu, 23 Jan 2025 06:25:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4785929B0;
+	Thu, 23 Jan 2025 06:43:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737613523; cv=none; b=trn2em9aNGss3cCmSZkjGEzSTKIEMN3Fj+HbaijnNaGzWH+K4F8xDccQ4rVDq1JdAVmwv7VlNF1KN01A+rpQsvpHmVAA1TlZ4GBidao0sLzMB09nRuMatXesN0PW4oXUN82OygcloMFHNirZXXAP0+3rSCV2KkKiC/9oaEqhtTw=
+	t=1737614640; cv=none; b=irrXlojQyFFUT140MSvOBt1jhkRD8M3IUyhnZFJOHRyMwk8cKcBigPIJLhKsR4SxwBFxyqdoKFTgttoSvGoO6qI8XaS7VYJ8gWnfcjd4X845Mo0HV7uRMZsEewDOdmKUqrr5+6bEb9Onb5XaKju7boEWivH5yEPrkCGNyrBxcAw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737613523; c=relaxed/simple;
-	bh=MoJKo2TD6DB0+hKk7XbyvBjNCR9ExSuHVb/uimVpbFA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VAijVbrpA74nC1P0bvK50mSttgKg2g9CJmNlF30HKd1JBEhkN0wPhGGjvDQhvEPb++ilf96+PGZouv9FjzRKwFsiiXbBH6T6K7hFFsMLJX6NDCoTXYjeBHLW0+PT4KXyPJAL+oZifLsHbFIh11A43HqEV1GHMqc3Dcv6ycd34AE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YNBzGHWi; arc=none smtp.client-ip=209.85.208.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-5d3e9a88793so986811a12.1;
-        Wed, 22 Jan 2025 22:25:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1737613520; x=1738218320; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=TqaS9GGZm23RZfZAEY9Vl7ozP598AZjc6tLzI298NqM=;
-        b=YNBzGHWieT/EbU/Wigul4pN4C3CPfwwGIaLMDnAkklU6ymNhVkBR4fperPheDmHuTJ
-         SGZQ9lWb6G4s/WzOkCfxODrm00aVa7Re9RU1La4srwne2mdZ6/nIBjt7GRkV9Wj/Jr10
-         kbymLxSYEZTK7DRa+KkFa4VptyMw1LhR7sgpiK3hepicrYvvsJmjp05eF/qcn7a3ZSkQ
-         A7r7RxY/aEoKakRodvJpjgFzMCKxvtdPSp3PiaUyMJBth/zwCdZWusPJCdUgqcl/f7Uj
-         yguTbM9DT43DFeg9/cr8hFfCyzzJq1CiEZbUfmrkqBNvcMQDKMCkbi7UtQ55XMRJa1Mc
-         k3Dg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737613520; x=1738218320;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=TqaS9GGZm23RZfZAEY9Vl7ozP598AZjc6tLzI298NqM=;
-        b=mIhk0ryQ9jedMlaQ1awvD1GFz+noclVe9pUyf9Hxre6/D9HuoKIXaSh2ExC8eZ/3/7
-         YSMNqKNOb7ak8s9f0fBx10iJsxaiu8aQxP2BkJWs0mREeCB6RM1dy7bzPaQUwHCtBTDg
-         8yr6E/o7KT5UzlhviECPaJ/2LyRst8z+JV5VMiWxFONvIkh0/vN7rYFsnSerH9nJWCHN
-         EexlF7w5b62zsCoqupilvhmrUsIGeDv68a2UeXXH1z/JKXy1+/KwWrzl0jDezZMSsN/C
-         04tcqFQVySQgVYLjUki1plGXMol7EiHJIz+GbZpN/pC0/boe/QUCD3QW3/Bs+nEZ1QzV
-         uGMw==
-X-Forwarded-Encrypted: i=1; AJvYcCU6o6bnni0Fx6lC45Xx9U2qRqJ2LxteLyZ1tE9MvlcDFzpUi1FbucHfHp6fJvUYISqBhBnS1hTL@vger.kernel.org, AJvYcCV7YnmZlU6tihP+0GFbS880lbbEXyCMtpi6ehcgVKglYkH17ITxG0ppuVbfUa4Nuq4mnPqS74azS71U0Dw=@vger.kernel.org, AJvYcCXmUiCDp8ijqCbssGKnwPQGhxwrNuBS+QUciCSZYSvD5vC5cbFAqej9dBMLuf6FbYJ5LTliWTQzBJl0tA==@vger.kernel.org
-X-Gm-Message-State: AOJu0YztQgy2+o9Ejf5IjZ/eZTdXrHUxT7hYwkR59vhotzsN/MTqHXv/
-	GPb/q4CgST2bbyT5baBN15aFJee4SdnWp8C9qZto+Ickb2NkyBFaX+v1LA==
-X-Gm-Gg: ASbGnct2T9wCxKWeueuSa1kWvzMUxMG63T2cHVgiS+On/TjniDoqIJm540suTTk5auA
-	X8KvCFBkhXvxZmaoWHUCSuJ9gu22uPnKyUxnv+EvK92/yebQwvNbQllN5kXwcu7oigAcTM5Zv6e
-	Op6aC3dhkXpzT8VN4dAgNSAgBGIX5KFe2K3Nf/UpAhw4xyQui+yjLM1Wbuq+8AAd/eLRdqscrjP
-	/A56UOdGHSNmlzNXej/vn76UtX2phJX5IP+WTpqC1mcfPdBlrhoDNFjoakcoVK/As6PHvNnMNmd
-	JvBcAV97tteVF3Bo4aj7wA==
-X-Google-Smtp-Source: AGHT+IGccmOYDrSy3PczETUNF3V7Uq9oBwl4zX4UB0O8TKRibKqCfK+yBMEaF63Il+3/ZINyNgZK/w==
-X-Received: by 2002:a05:600c:218b:b0:436:e751:e417 with SMTP id 5b1f17b1804b1-43891919404mr233512265e9.7.1737613121882;
-        Wed, 22 Jan 2025 22:18:41 -0800 (PST)
-Received: from [10.80.1.87] ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-438b31c8764sm49307655e9.38.2025.01.22.22.18.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 22 Jan 2025 22:18:41 -0800 (PST)
-Message-ID: <c2f199f8-c9c9-4184-92cf-b179e162ece6@gmail.com>
-Date: Thu, 23 Jan 2025 08:18:37 +0200
+	s=arc-20240116; t=1737614640; c=relaxed/simple;
+	bh=JktmtjqieTPQYIl1v06VLfluuGdkKBGUSRhw3p37YK0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gi+WXb6jip6O/0F7uyHq/RdeZa6AxHuRrGf9oJXqAcIp2HuBL08Pj690/PDQWUKLRSKASuB3UWJCrWc5llrIY6DI7t2GmRFaUNRsNqD0rsCmse/lth5tfvILX4aZ6Rj5XRTGcvvdzuKDIi+nYA2ASlYGH4G14fk2lBh8CNpAuik=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=O7bh4qhc; arc=none smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1737614638; x=1769150638;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=JktmtjqieTPQYIl1v06VLfluuGdkKBGUSRhw3p37YK0=;
+  b=O7bh4qhcq3A4TG8sEpWn2fVj40C02ffQ2iSkNXivdW50pWh+3frStA5e
+   6AfIPVNqxMseQrkS4nY2S1PR/pr5yNR0f4gPD8rfUB4QzA9Zp7e5AyuPP
+   5qQT2H9I1s3A+BaYuH37qzjwluN8pSUpSj1rpt7WfLccL/YAzuagTXYBY
+   NO3bJN41at1TZQKjEYsK/64UqwqVwZkaPzPZj6opiqcY3AoSfl8VOBsDY
+   K/zVIfY4P9oWD70XaD8Q5cU1Ii4JcZKF69TA2YZ2Voo7CFALDiFWQirnz
+   JO2Q5dFoGnxrYoNv4x08lmaJKpxWDvkPW4u4ucTPo9Py6wZD6uas3G9Zq
+   g==;
+X-CSE-ConnectionGUID: cxosbnVqRGKo0Wkvv0OyzQ==
+X-CSE-MsgGUID: fPRkA9KbTOOjhUAvEaQczw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11323"; a="25699354"
+X-IronPort-AV: E=Sophos;i="6.13,227,1732608000"; 
+   d="scan'208";a="25699354"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jan 2025 22:43:57 -0800
+X-CSE-ConnectionGUID: F9FmDasxQgqi/8cbU9OU/w==
+X-CSE-MsgGUID: Q0VSwLxLRluQdw7gRhNw9A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.13,227,1732608000"; 
+   d="scan'208";a="107365151"
+Received: from mev-dev.igk.intel.com ([10.237.112.144])
+  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jan 2025 22:43:54 -0800
+Date: Thu, 23 Jan 2025 07:40:29 +0100
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+	syzbot+2e5de9e3ab986b71d2bf@syzkaller.appspotmail.com,
+	shuah@kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net] net: netdevsim: try to close UDP port harness races
+Message-ID: <Z5HkXdx3w9aMsozu@mev-dev.igk.intel.com>
+References: <20250122224503.762705-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net/mlx5e: add missing cpu_to_node to kvzalloc_node
- in mlx5e_open_xdpredirect_sq
-To: Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
- llvm@lists.linux.dev, saeedm@nvidia.com, tariqt@nvidia.com, leon@kernel.org,
- andrew+netdev@lunn.ch, nathan@kernel.org, ndesaulniers@google.com,
- morbo@google.com, justinstitt@google.com, witu@nvidia.com, parav@nvidia.com
-References: <20250123000407.3464715-1-sdf@fomichev.me>
-Content-Language: en-US
-From: Tariq Toukan <ttoukan.linux@gmail.com>
-In-Reply-To: <20250123000407.3464715-1-sdf@fomichev.me>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250122224503.762705-1-kuba@kernel.org>
 
-
-
-On 23/01/2025 2:04, Stanislav Fomichev wrote:
-> kvzalloc_node is not doing a runtime check on the node argument
-> (__alloc_pages_node_noprof does have a VM_BUG_ON, but it expands to
-> nothing on !CONFIG_DEBUG_VM builds), so doing any ethtool/netlink
-> operation that calls mlx5e_open on a CPU that's larger that MAX_NUMNODES
-> triggers OOB access and panic (see the trace below).
+On Wed, Jan 22, 2025 at 02:45:03PM -0800, Jakub Kicinski wrote:
+> syzbot discovered that we remove the debugfs files after we free
+> the netdev. Try to clean up the relevant dir while the device
+> is still around.
 > 
-> Add missing cpu_to_node call to convert cpu id to node id.
-> 
-> [  165.427394] mlx5_core 0000:5c:00.0 beth1: Link up
-> [  166.479327] BUG: unable to handle page fault for address: 0000000800000010
-> [  166.494592] #PF: supervisor read access in kernel mode
-> [  166.505995] #PF: error_code(0x0000) - not-present page
-> ...
-> [  166.816958] Call Trace:
-> [  166.822380]  <TASK>
-> [  166.827034]  ? __die_body+0x64/0xb0
-> [  166.834774]  ? page_fault_oops+0x2cd/0x3f0
-> [  166.843862]  ? exc_page_fault+0x63/0x130
-> [  166.852564]  ? asm_exc_page_fault+0x22/0x30
-> [  166.861843]  ? __kvmalloc_node_noprof+0x43/0xd0
-> [  166.871897]  ? get_partial_node+0x1c/0x320
-> [  166.880983]  ? deactivate_slab+0x269/0x2b0
-> [  166.890069]  ___slab_alloc+0x521/0xa90
-> [  166.898389]  ? __kvmalloc_node_noprof+0x43/0xd0
-> [  166.908442]  __kmalloc_node_noprof+0x216/0x3f0
-> [  166.918302]  ? __kvmalloc_node_noprof+0x43/0xd0
-> [  166.928354]  __kvmalloc_node_noprof+0x43/0xd0
-> [  166.938021]  mlx5e_open_channels+0x5e2/0xc00
-> [  166.947496]  mlx5e_open_locked+0x3e/0xf0
-> [  166.956201]  mlx5e_open+0x23/0x50
-> [  166.963551]  __dev_open+0x114/0x1c0
-> [  166.971292]  __dev_change_flags+0xa2/0x1b0
-> [  166.980378]  dev_change_flags+0x21/0x60
-> [  166.988887]  do_setlink+0x38d/0xf20
-> [  166.996628]  ? ep_poll_callback+0x1b9/0x240
-> [  167.005910]  ? __nla_validate_parse.llvm.10713395753544950386+0x80/0xd70
-> [  167.020782]  ? __wake_up_sync_key+0x52/0x80
-> [  167.030066]  ? __mutex_lock+0xff/0x550
-> [  167.038382]  ? security_capable+0x50/0x90
-> [  167.047279]  rtnl_setlink+0x1c9/0x210
-> [  167.055403]  ? ep_poll_callback+0x1b9/0x240
-> [  167.064684]  ? security_capable+0x50/0x90
-> [  167.073579]  rtnetlink_rcv_msg+0x2f9/0x310
-> [  167.082667]  ? rtnetlink_bind+0x30/0x30
-> [  167.091173]  netlink_rcv_skb+0xb1/0xe0
-> [  167.099492]  netlink_unicast+0x20f/0x2e0
-> [  167.108191]  netlink_sendmsg+0x389/0x420
-> [  167.116896]  __sys_sendto+0x158/0x1c0
-> [  167.125024]  __x64_sys_sendto+0x22/0x30
-> [  167.133534]  do_syscall_64+0x63/0x130
-> [  167.141657]  ? __irq_exit_rcu.llvm.17843942359718260576+0x52/0xd0
-> [  167.155181]  entry_SYSCALL_64_after_hwframe+0x4b/0x53
-> 
-> Fixes: bb135e40129d ("net/mlx5e: move XDP_REDIRECT sq to dynamic allocation")
-> Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
+> Reported-by: syzbot+2e5de9e3ab986b71d2bf@syzkaller.appspotmail.com
+> Fixes: 424be63ad831 ("netdevsim: add UDP tunnel port offload support")
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 > ---
->   drivers/net/ethernet/mellanox/mlx5/core/en_main.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
+> CC: shuah@kernel.org
+> CC: linux-kselftest@vger.kernel.org
+> ---
+>  drivers/net/netdevsim/netdevsim.h             |  1 +
+>  drivers/net/netdevsim/udp_tunnels.c           | 23 +++++++++++--------
+>  .../drivers/net/netdevsim/udp_tunnel_nic.sh   | 16 ++++++-------
+>  3 files changed, 23 insertions(+), 17 deletions(-)
 > 
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-> index bd41b75d246e..a814b63ed97e 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-> @@ -2087,7 +2087,7 @@ static struct mlx5e_xdpsq *mlx5e_open_xdpredirect_sq(struct mlx5e_channel *c,
->   	struct mlx5e_xdpsq *xdpsq;
->   	int err;
->   
-> -	xdpsq = kvzalloc_node(sizeof(*xdpsq), GFP_KERNEL, c->cpu);
-> +	xdpsq = kvzalloc_node(sizeof(*xdpsq), GFP_KERNEL, cpu_to_node(c->cpu));
->   	if (!xdpsq)
->   		return ERR_PTR(-ENOMEM);
->   
+> diff --git a/drivers/net/netdevsim/netdevsim.h b/drivers/net/netdevsim/netdevsim.h
+> index dcf073bc4802..96d54c08043d 100644
+> --- a/drivers/net/netdevsim/netdevsim.h
+> +++ b/drivers/net/netdevsim/netdevsim.h
+> @@ -134,6 +134,7 @@ struct netdevsim {
+>  		u32 sleep;
+>  		u32 __ports[2][NSIM_UDP_TUNNEL_N_PORTS];
+>  		u32 (*ports)[NSIM_UDP_TUNNEL_N_PORTS];
+> +		struct dentry *ddir;
+>  		struct debugfs_u32_array dfs_ports[2];
+>  	} udp_ports;
+>  
+> diff --git a/drivers/net/netdevsim/udp_tunnels.c b/drivers/net/netdevsim/udp_tunnels.c
+> index 02dc3123eb6c..640b4983a9a0 100644
+> --- a/drivers/net/netdevsim/udp_tunnels.c
+> +++ b/drivers/net/netdevsim/udp_tunnels.c
+> @@ -112,9 +112,11 @@ nsim_udp_tunnels_info_reset_write(struct file *file, const char __user *data,
+>  	struct net_device *dev = file->private_data;
+>  	struct netdevsim *ns = netdev_priv(dev);
+>  
+> -	memset(ns->udp_ports.ports, 0, sizeof(ns->udp_ports.__ports));
+>  	rtnl_lock();
+> -	udp_tunnel_nic_reset_ntf(dev);
+> +	if (dev->reg_state == NETREG_REGISTERED) {
+> +		memset(ns->udp_ports.ports, 0, sizeof(ns->udp_ports.__ports));
+> +		udp_tunnel_nic_reset_ntf(dev);
+> +	}
+>  	rtnl_unlock();
+>  
+>  	return count;
+> @@ -144,23 +146,23 @@ int nsim_udp_tunnels_info_create(struct nsim_dev *nsim_dev,
+>  	else
+>  		ns->udp_ports.ports = nsim_dev->udp_ports.__ports;
+>  
+> -	debugfs_create_u32("udp_ports_inject_error", 0600,
+> -			   ns->nsim_dev_port->ddir,
+> +	ns->udp_ports.ddir = debugfs_create_dir("udp_ports",
+> +						ns->nsim_dev_port->ddir);
+> +
+> +	debugfs_create_u32("inject_error", 0600, ns->udp_ports.ddir,
+>  			   &ns->udp_ports.inject_error);
+>  
+>  	ns->udp_ports.dfs_ports[0].array = ns->udp_ports.ports[0];
+>  	ns->udp_ports.dfs_ports[0].n_elements = NSIM_UDP_TUNNEL_N_PORTS;
+> -	debugfs_create_u32_array("udp_ports_table0", 0400,
+> -				 ns->nsim_dev_port->ddir,
+> +	debugfs_create_u32_array("table0", 0400, ns->udp_ports.ddir,
+>  				 &ns->udp_ports.dfs_ports[0]);
+>  
+>  	ns->udp_ports.dfs_ports[1].array = ns->udp_ports.ports[1];
+>  	ns->udp_ports.dfs_ports[1].n_elements = NSIM_UDP_TUNNEL_N_PORTS;
+> -	debugfs_create_u32_array("udp_ports_table1", 0400,
+> -				 ns->nsim_dev_port->ddir,
+> +	debugfs_create_u32_array("table1", 0400, ns->udp_ports.ddir,
+>  				 &ns->udp_ports.dfs_ports[1]);
+>  
+> -	debugfs_create_file("udp_ports_reset", 0200, ns->nsim_dev_port->ddir,
+> +	debugfs_create_file("reset", 0200, ns->udp_ports.ddir,
+>  			    dev, &nsim_udp_tunnels_info_reset_fops);
+>  
+>  	/* Note: it's not normal to allocate the info struct like this!
+> @@ -196,6 +198,9 @@ int nsim_udp_tunnels_info_create(struct nsim_dev *nsim_dev,
+>  
+>  void nsim_udp_tunnels_info_destroy(struct net_device *dev)
+>  {
+> +	struct netdevsim *ns = netdev_priv(dev);
+> +
+> +	debugfs_remove_recursive(ns->udp_ports.ddir);
+>  	kfree(dev->udp_tunnel_nic_info);
+>  	dev->udp_tunnel_nic_info = NULL;
+>  }
+> diff --git a/tools/testing/selftests/drivers/net/netdevsim/udp_tunnel_nic.sh b/tools/testing/selftests/drivers/net/netdevsim/udp_tunnel_nic.sh
+> index 384cfa3d38a6..92c2f0376c08 100755
+> --- a/tools/testing/selftests/drivers/net/netdevsim/udp_tunnel_nic.sh
+> +++ b/tools/testing/selftests/drivers/net/netdevsim/udp_tunnel_nic.sh
+> @@ -142,7 +142,7 @@ function pre_ethtool {
+>  }
+>  
+>  function check_table {
+> -    local path=$NSIM_DEV_DFS/ports/$port/udp_ports_table$1
+> +    local path=$NSIM_DEV_DFS/ports/$port/udp_ports/table$1
+>      local -n expected=$2
+>      local last=$3
+>  
+> @@ -212,7 +212,7 @@ function check_tables {
+>  }
+>  
+>  function print_table {
+> -    local path=$NSIM_DEV_DFS/ports/$port/udp_ports_table$1
+> +    local path=$NSIM_DEV_DFS/ports/$port/udp_ports/table$1
+>      read -a have < $path
+>  
+>      tree $NSIM_DEV_DFS/
+> @@ -641,7 +641,7 @@ for port in 0 1; do
+>      NSIM_NETDEV=`get_netdev_name old_netdevs`
+>      ip link set dev $NSIM_NETDEV up
+>  
+> -    echo 110 > $NSIM_DEV_DFS/ports/$port/udp_ports_inject_error
+> +    echo 110 > $NSIM_DEV_DFS/ports/$port/udp_ports/inject_error
+>  
+>      msg="1 - create VxLANs v6"
+>      exp0=( 0 0 0 0 )
+> @@ -663,7 +663,7 @@ for port in 0 1; do
+>      new_geneve gnv0 20000
+>  
+>      msg="2 - destroy GENEVE"
+> -    echo 2 > $NSIM_DEV_DFS/ports/$port/udp_ports_inject_error
+> +    echo 2 > $NSIM_DEV_DFS/ports/$port/udp_ports/inject_error
+>      exp1=( `mke 20000 2` 0 0 0 )
+>      del_dev gnv0
+>  
+> @@ -764,7 +764,7 @@ for port in 0 1; do
+>      msg="create VxLANs v4"
+>      new_vxlan vxlan0 10000 $NSIM_NETDEV
+>  
+> -    echo 1 > $NSIM_DEV_DFS/ports/$port/udp_ports_reset
+> +    echo 1 > $NSIM_DEV_DFS/ports/$port/udp_ports/reset
+>      check_tables
+>  
+>      msg="NIC device goes down"
+> @@ -775,7 +775,7 @@ for port in 0 1; do
+>      fi
+>      check_tables
+>  
+> -    echo 1 > $NSIM_DEV_DFS/ports/$port/udp_ports_reset
+> +    echo 1 > $NSIM_DEV_DFS/ports/$port/udp_ports/reset
+>      check_tables
+>  
+>      msg="NIC device goes up again"
+> @@ -789,7 +789,7 @@ for port in 0 1; do
+>      del_dev vxlan0
+>      check_tables
+>  
+> -    echo 1 > $NSIM_DEV_DFS/ports/$port/udp_ports_reset
+> +    echo 1 > $NSIM_DEV_DFS/ports/$port/udp_ports/reset
+>      check_tables
+>  
+>      msg="destroy NIC"
+> @@ -896,7 +896,7 @@ msg="vacate VxLAN in overflow table"
+>  exp0=( `mke 10000 1` `mke 10004 1` 0 `mke 10003 1` )
+>  del_dev vxlan2
+>  
+> -echo 1 > $NSIM_DEV_DFS/ports/$port/udp_ports_reset
+> +echo 1 > $NSIM_DEV_DFS/ports/$port/udp_ports/reset
+>  check_tables
+>  
+>  msg="tunnels destroyed 2"
 
-Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
+Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 
-Thanks for your patch.
-
-Regards,
-Tariq
+> -- 
+> 2.48.1
 
