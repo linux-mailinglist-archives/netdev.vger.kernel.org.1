@@ -1,111 +1,174 @@
-Return-Path: <netdev+bounces-160580-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160581-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93445A1A66A
-	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 16:00:47 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 495E8A1A66D
+	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 16:01:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 62D351884D16
-	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 15:00:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 134483A1C1D
+	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 15:01:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBC10208D7;
-	Thu, 23 Jan 2025 15:00:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13C2D208D7;
+	Thu, 23 Jan 2025 15:01:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XL2GqzKR"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VVjoe1LR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f50.google.com (mail-ot1-f50.google.com [209.85.210.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15F261F92A;
-	Thu, 23 Jan 2025 15:00:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3046C38B
+	for <netdev@vger.kernel.org>; Thu, 23 Jan 2025 15:01:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737644442; cv=none; b=ujMswwJrFn1MOeJf2TVHWbNfh/Zd5ira3Kk5QkCNdd8H1kLNwwgE294S861+QBCObz0+NX7GjTYFE+qQ/PZLQat6Yf6x26pMSj8NNCSy9YRX2Gi0XIp0lIVdRQLu6FQ7KRpmTcthJ7Fe5rprM+3qv+lxYePR+su4+jVOiTkMEDU=
+	t=1737644496; cv=none; b=n9cbAa/KdTs7gQf0B+j3OBPEtWlh1GtGlSzdO1H+8stk/3SkIxsrd35l4NZ6sja9TPe8EAwEJBMzweS7pw0097XsTiaHhT25Ro39M1k1JviVuYg4shTNiTHjzsSXAomBeyXbu3t96OCIo0DLnqVSxrMOz4YyDdPt6j6GbZA5Lvo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737644442; c=relaxed/simple;
-	bh=nep8o727NYLPHGiNUvsKSNAPB5PPeZ44AYRcjffQ3wI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=grX3ibWmhToT480414n8CHZjc5rfd9zV9lW0dm9c3RQoN1XeX3WicDqCbLigJmQ/cgD7i2yuXPEblGlseIG3nzLEllPO8SxKRA/3a8/nGAH3mQkiWs0ppufPvLaHCWzVcBBVjM+edAXRNki9OxsNoZ2CHPky+O7gwLkpMPwgSHY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XL2GqzKR; arc=none smtp.client-ip=209.85.210.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ot1-f50.google.com with SMTP id 46e09a7af769-71e287897ceso788083a34.0;
-        Thu, 23 Jan 2025 07:00:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1737644440; x=1738249240; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=DJj+EuMubqF2vrBF+xHjci3i0q6FGL1f+96Tt7g3asU=;
-        b=XL2GqzKRLlAyNe1gusM9YfkdcFJI/VauotgyoXi5D9zQx7E4eP6mNNIbvfqUNyWR6a
-         c9HwU7xJDoiTsjzZ6EtyLAK6CO6T9FxEWTexyrbStncNsr3NdJtlZvdzRQbng+wIkNTR
-         upa2grxjbcyfn/htVKFmPJ+BMMptovLr7X+r8QhoIS5EXPji130OrDZdjzGJ8R8Ecciz
-         7BSU/DkTMcvQyZ4ZQ0g+1vCPpAInTEd74ur7QLgPDcehHPAnH+vz1QE8pmjGF8NcbKnR
-         0s/vldX45KFeKFf9LIuDRhyeJ3v3oRpR+wRH9k+hoo6kDq8vJNldZdY1sMfL3zICba2P
-         JvlA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737644440; x=1738249240;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=DJj+EuMubqF2vrBF+xHjci3i0q6FGL1f+96Tt7g3asU=;
-        b=rXJ+nSNXEkkaLLFi0xehWghWcUJMDuPf8FfDQrWWILsDOikvutC7STPIIPavnGZQDW
-         FB8h7beb0PNson67IPBBKWapVqt6tJP4cgiOQy6CMs8pHGXd909j2//rLd832//T1EVr
-         nl8zQJjrjGoZzHf48jouEIbxbM1ILwED88avqy4X+4s9k7ETFo0e+3bAmbq0NSGRAr5l
-         F0lanNcq4AwDnXuaXxIPEsneguY8NDjcYBtihOqGvoefxYvO92NP1GbbKS4D3ZUCkTxh
-         Ntuud74xkaAvGwRRCWcgQ8WgWYx69PNmxuaxtfn3ir7iBtw1QkqKRlbrX6K3QI5Y3sMH
-         151g==
-X-Forwarded-Encrypted: i=1; AJvYcCUvaNFtneEnzPF6oFtq8XPeg76VzDJsoMiN8uHPylA3UQ+QItHtMeHOPudqh8dP0/vC4VFvLgak@vger.kernel.org, AJvYcCWJkFqjR4Thqvt75WoiC0fsQ5QPEpxciF9IIG/etKO3xIa2v1qlSleXQO4+J2hgl7QmWs4U1Cwx@vger.kernel.org, AJvYcCXX8QcEVO7rn5d7rvpwBHrrMPDKzGhOQDV8r/1VLuyqw9xmBsl9xUerzxE8w1SsrL6cLTSWycv7m0qx738=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyvnUhyIGZqj4yPTmSPy0+R0FKpVW6WzQJdz0UYZJ1KXgdHcOqY
-	2I56XgoMu/eSqXJifMwR4OeUtLxpAkGNzXKMIvvi5L36LDOtZvGR
-X-Gm-Gg: ASbGncsfzhMFDCi7gYPAG/JxyFj9tmYhNXVbI733Yj8i3jVdE70LdjtSlg7wr4Umev9
-	kNpbfDIbXwGjDgXsq34HXsIM1rKqFgSeOKYnOKXS0tRMUZKgKWJziYb1WxKrgI7l6cRXwk321YN
-	z+/L7qukMQ1Xhz/+7luWCSIQh9uA6JjyXcIhxkT/mA/4DwVri51iuYqHdGosv5ivuuF9/2UcKmz
-	8M8Qf/SJdpdEoHn5RL81+rpVfAewphVdsvBZRpleTg51FUrao1IlS9d0Nd2ILd0cmaJTZcSoYP0
-	hy+aLbii4qXq7a1rThjHh04C
-X-Google-Smtp-Source: AGHT+IHmpMquru32roxz3Z7NNyEEFwQU/w7Nn53+St1S5VkFGEPbii/Q21qE9yik6ePRspxYNnCbxQ==
-X-Received: by 2002:a05:6830:670d:b0:713:7e24:6151 with SMTP id 46e09a7af769-7249dafaa3amr15509680a34.25.1737644440027;
-        Thu, 23 Jan 2025 07:00:40 -0800 (PST)
-Received: from hoboy.vegasvil.org ([2600:1700:2430:6f6f:e2d5:5eff:fea5:802f])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7249b485eb3sm4425705a34.47.2025.01.23.07.00.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Jan 2025 07:00:39 -0800 (PST)
-Date: Thu, 23 Jan 2025 07:00:37 -0800
-From: Richard Cochran <richardcochran@gmail.com>
-To: Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	John Stultz <john.stultz@linaro.org>, Arnd Bergmann <arnd@arndb.de>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH net] ptp: Ensure info->enable callback is always set
-Message-ID: <Z5JZlU-MPc01eDnU@hoboy.vegasvil.org>
-References: <20250122-ptp-enable-v1-1-979d3d24591d@weissschuh.net>
+	s=arc-20240116; t=1737644496; c=relaxed/simple;
+	bh=ARqUgcmalthga3LTbgTcnjBIhh2qzGi/IDE/hw1VajM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ulZbzzU6v7PLtuWoWojPvBk6POgWrdiztSBqaJIENZAH48dZo/IEL+Bii6lnUX+Tim3biEWpeFPmKRz3IpoMcyzNj/qnwRgREZVNFoX+/QL5X0+iJEm2uHP/b/XFsM73MCfRZhq85UfKqu4+JNPKrbNXNnwWJH5/lQYIQajISMY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VVjoe1LR; arc=none smtp.client-ip=198.175.65.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1737644495; x=1769180495;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=ARqUgcmalthga3LTbgTcnjBIhh2qzGi/IDE/hw1VajM=;
+  b=VVjoe1LReI4pAQk9mKzyjTgqz3aJPxjqA/y826KSnJW3q5qIMqXfmF9s
+   3VTM2KSftTYcMHdNwvB8mFcNwtqe6FTUEe5JzTq1SpMHyJOQ8LyLZyfuX
+   Jjrdb5DFJm52SJsMgi5ZFQN6+zvB2TwXF3E4L1sck9itnAFSKrMpqA/XG
+   //4a5k0AAIqvMDYZ+D2Q3YDCih1ovcBEWlMri+gceO3anMpXK8a+eCzix
+   LmFgqjPfq/6pQcCce2DnM32qN2v+CyAh4ErTmS2fWVx9dG+aJnAbQ3Z+g
+   CW1Ge+zWWavTtqrawypfTmrbEdHb4dmswzik+v9um9nd+a0b2T0lYBMuW
+   g==;
+X-CSE-ConnectionGUID: Sb7fiJmIRkq52SdBNe7DGQ==
+X-CSE-MsgGUID: 8eslmz5WQuevimBNUUZ6kQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11324"; a="38293522"
+X-IronPort-AV: E=Sophos;i="6.13,228,1732608000"; 
+   d="scan'208";a="38293522"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jan 2025 07:01:34 -0800
+X-CSE-ConnectionGUID: DQXNLQ7rRlGxM6VwZrCBqQ==
+X-CSE-MsgGUID: w56aLiCgT1ejtFZRcuHtSQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="111508862"
+Received: from boxer.igk.intel.com ([10.102.20.173])
+  by fmviesa003.fm.intel.com with ESMTP; 23 Jan 2025 07:01:31 -0800
+From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	anthony.l.nguyen@intel.com,
+	magnus.karlsson@intel.com,
+	jacob.e.keller@intel.com,
+	xudu@redhat.com,
+	mschmidt@redhat.com,
+	jmaxwell@redhat.com,
+	poros@redhat.com,
+	przemyslaw.kitszel@intel.com,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Subject: [PATCH v5 iwl-net 0/3] ice: fix Rx data path for heavy 9k MTU traffic
+Date: Thu, 23 Jan 2025 16:01:15 +0100
+Message-Id: <20250123150118.583039-1-maciej.fijalkowski@intel.com>
+X-Mailer: git-send-email 2.38.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250122-ptp-enable-v1-1-979d3d24591d@weissschuh.net>
 
-On Wed, Jan 22, 2025 at 07:39:31PM +0100, Thomas Weiﬂschuh wrote:
-> The ioctl and sysfs handlers unconditionally call the ->enable callback.
-> Not all drivers implement that callback, leading to NULL dereferences.
-> Example of affected drivers: ptp_s390.c, ptp_vclock.c and ptp_mock.c.
-> 
-> Instead use a dummy callback if no better was specified by the driver.
-> 
-> Fixes: d94ba80ebbea ("ptp: Added a brand new class driver for ptp clocks.")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Thomas Weiﬂschuh <linux@weissschuh.net>
+v4->v5:
+* add missing kdoc variable description in patch 3 (Simon Horman)
+* include review tags from Simon
 
-Acked-by: Richard Cochran <richardcochran@gmail.com>
+v3->v4:
+* fix kdoc issues (Simon Horman)
+* fix typo in commit msg in patch 1 (Simon Horman)
+
+v2->v3:
+* s/intel/iwl in patch subjects (Jakub Kicinski)
+
+v1->v2:
+* pass ntc to ice_put_rx_mbuf() (pointed out by Petr Oros) in patch 1
+* add review tags from Przemek Kitszel (thanks!)
+* make sure patches compile and work ;)
+
+
+Hello in 2025,
+
+this patchset fixes a pretty nasty issue that was reported by RedHat
+folks which occured after ~30 minutes (this value varied, just trying
+here to state that it was not observed immediately but rather after a
+considerable longer amount of time) when ice driver was tortured with
+jumbo frames via mix of iperf traffic executed simultaneously with
+wrk/nginx on client/server sides (HTTP and TCP workloads basically).
+
+The reported splats were spanning across all the bad things that can
+happen to the state of page - refcount underflow, use-after-free, etc.
+One of these looked as follows:
+
+[ 2084.019891] BUG: Bad page state in process swapper/34  pfn:97fcd0
+[ 2084.025990] page:00000000a60ee772 refcount:-1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x97fcd0
+[ 2084.035462] flags: 0x17ffffc0000000(node=0|zone=2|lastcpupid=0x1fffff)
+[ 2084.041990] raw: 0017ffffc0000000 dead000000000100 dead000000000122 0000000000000000
+[ 2084.049730] raw: 0000000000000000 0000000000000000 ffffffffffffffff 0000000000000000
+[ 2084.057468] page dumped because: nonzero _refcount
+[ 2084.062260] Modules linked in: bonding tls sunrpc intel_rapl_msr intel_rapl_common intel_uncore_frequency intel_uncore_frequency_common i10nm_edac nfit libnvdimm x86_pkg_temp_thermal intel_powerclamp coretemp kvm_intel kvm mgag200 irqd
+[ 2084.137829] CPU: 34 PID: 0 Comm: swapper/34 Kdump: loaded Not tainted 5.14.0-427.37.1.el9_4.x86_64 #1
+[ 2084.147039] Hardware name: Dell Inc. PowerEdge R750/0216NK, BIOS 1.13.2 12/19/2023
+[ 2084.154604] Call Trace:
+[ 2084.157058]  <IRQ>
+[ 2084.159080]  dump_stack_lvl+0x34/0x48
+[ 2084.162752]  bad_page.cold+0x63/0x94
+[ 2084.166333]  check_new_pages+0xb3/0xe0
+[ 2084.170083]  rmqueue_bulk+0x2d2/0x9e0
+[ 2084.173749]  ? ktime_get+0x35/0xa0
+[ 2084.177159]  rmqueue_pcplist+0x13b/0x210
+[ 2084.181081]  rmqueue+0x7d3/0xd40
+[ 2084.184316]  ? xas_load+0x9/0xa0
+[ 2084.187547]  ? xas_find+0x183/0x1d0
+[ 2084.191041]  ? xa_find_after+0xd0/0x130
+[ 2084.194879]  ? intel_iommu_iotlb_sync_map+0x89/0xe0
+[ 2084.199759]  get_page_from_freelist+0x11f/0x530
+[ 2084.204291]  __alloc_pages+0xf2/0x250
+[ 2084.207958]  ice_alloc_rx_bufs+0xcc/0x1c0 [ice]
+[ 2084.212543]  ice_clean_rx_irq+0x631/0xa20 [ice]
+[ 2084.217111]  ice_napi_poll+0xdf/0x2a0 [ice]
+[ 2084.221330]  __napi_poll+0x27/0x170
+[ 2084.224824]  net_rx_action+0x233/0x2f0
+[ 2084.228575]  __do_softirq+0xc7/0x2ac
+[ 2084.232155]  __irq_exit_rcu+0xa1/0xc0
+[ 2084.235821]  common_interrupt+0x80/0xa0
+[ 2084.239662]  </IRQ>
+[ 2084.241768]  <TASK>
+
+The fix is mostly about reverting what was done in commit 1dc1a7e7f410
+("ice: Centrallize Rx buffer recycling") followed by proper timing on
+page_count() storage and then removing the ice_rx_buf::act related logic
+(which was mostly introduced for purposes from cited commit).
+
+Special thanks to Xu Du for providing reproducer and Jacob Keller for
+initial extensive analysis.
+
+Thanks,
+Maciej
+
+
+Maciej Fijalkowski (3):
+  ice: put Rx buffers after being done with current frame
+  ice: gather page_count()'s of each frag right before XDP prog call
+  ice: stop storing XDP verdict within ice_rx_buf
+
+ drivers/net/ethernet/intel/ice/ice_txrx.c     | 150 ++++++++++++------
+ drivers/net/ethernet/intel/ice/ice_txrx.h     |   1 -
+ drivers/net/ethernet/intel/ice/ice_txrx_lib.h |  43 -----
+ 3 files changed, 103 insertions(+), 91 deletions(-)
+
+-- 
+2.43.0
+
 
