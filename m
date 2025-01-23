@@ -1,280 +1,219 @@
-Return-Path: <netdev+bounces-160568-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160569-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6BE83A1A432
-	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 13:28:29 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 64119A1A447
+	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 13:30:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2E73A1887BF2
-	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 12:28:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5850D1880728
+	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 12:30:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F98020E715;
-	Thu, 23 Jan 2025 12:28:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA4A720E031;
+	Thu, 23 Jan 2025 12:30:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HkPHXVbd"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b="atGtDdFA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+Received: from server.wki.vra.mybluehostin.me (server.wki.vra.mybluehostin.me [162.240.238.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81BD520E6FE
-	for <netdev@vger.kernel.org>; Thu, 23 Jan 2025 12:28:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.11
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737635304; cv=fail; b=Kvmq93twV+7TANEA3kLJOcF6RPZYMiVIOuULtcCGzkvLrgGlUdQRxaBv2WPKJG2Fj3xRUOPtQQ8iGjzFtYUm9/uxuyG6xja0Sdqisu6+/XBQ4tfQ2USyz4cNjcm5nkF6qgi8n2LAG8LTYl9slYDTMFKk3BMO/a4P1JnnN90sxCo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737635304; c=relaxed/simple;
-	bh=ypB6FTVNTgc6Vb1MMX9RzEWJefy5CGIBaJXOSafKczs=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=tOLuoACB4TldrtIN/6NDlGV+EXMKRNreYi59ck4/3X6H9uVED41sPa6OSJi3farifr+uQoJjwVojax1bYND6gotY0iTNL6anMEngbzwEEL3+TzoD57JuODTarW8w6hX3R66AQxyE8/0ROqgTlknVUZmsw6pISymTK2SIYdxD+aI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HkPHXVbd; arc=fail smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1737635303; x=1769171303;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=ypB6FTVNTgc6Vb1MMX9RzEWJefy5CGIBaJXOSafKczs=;
-  b=HkPHXVbdL4kFP1oB1OYkREbKOjfoQr26e3XojklkkeaSV6Zov6YMZ2F5
-   3skaj9bLm+88fWazSYcHWND5CeqeN5T23IE8EvahtyvLLrHGBezLhXg5b
-   DTQlry+/sd+xdLPKSzU2/HDrvJmMHc8uUgbxFL1ka9tJeeC09YTnesztB
-   KBoxXY1UiKtTDMT9236SSqZPT0yEB1QmEpLAbRQ8PShq+5hjaIDcTvSBj
-   6hzTXwCC3d9tcGCVclGNvlTpS5NCiDiazESdxHwHwqdxrKZCRYI7dlvSR
-   Cv3R9hvmWXUFM50VD/3w+pNsIRf5qaEk53TDJKApt7KiT6m5sbh70ttSH
-   A==;
-X-CSE-ConnectionGUID: WD4FPsVwTV+blKdPjZAytg==
-X-CSE-MsgGUID: Z8h2u43gSg6I3GDuUkY7IA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11324"; a="48628790"
-X-IronPort-AV: E=Sophos;i="6.13,228,1732608000"; 
-   d="scan'208";a="48628790"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jan 2025 04:28:23 -0800
-X-CSE-ConnectionGUID: L8ZJNeGETDKPuuVpsRDrHw==
-X-CSE-MsgGUID: ZThsJ+HoSOWwTzAuJL++4g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="144683806"
-Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
-  by orviesa001.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 23 Jan 2025 04:28:22 -0800
-Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
- ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44; Thu, 23 Jan 2025 04:28:21 -0800
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44 via Frontend Transport; Thu, 23 Jan 2025 04:28:21 -0800
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.174)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.44; Thu, 23 Jan 2025 04:28:21 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Q0oTelt6PUrs2w+ulMrsprbF+6Y2t70AyDOp+b8KCwQl36iWVdrX7JYB47YE5+gUM8nOsp1rUDf9EqqSLFX3G2++CO0NXJPp2YVn+JluTO51d1HjywfMYVNSQ2Mxh86+NR0hlJylYWlDhOQzsbHst7rRBnMJct1pgCQEqxfohADNUtiAlJ4Id/kskHu6AFiGzRiPAeloA/XlvxBM/k28HGjp3/GiYEwcDHCyEfN7bplJ6OptdHs5Zo44Vi7zry/BiysPzhxe057kx/vko47NNBxZq5IagvqUASNzmOEHHPb3Za9Gjah/Vh3Myzn5felRtOX26yok2Po1VP1RnXYR/g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=W7NppWiJIFH6Bm3T5yN2xfSVcbQ2hilofihIsTKGOAs=;
- b=I10CR3MPw55QZVSZsOBk/jneMfq04wDpNah0Kx0u5kCvmaH9UItzjh0HmPSZ98Z1CmfF3xVceyf7xDNIznqj/FSyqKTwAVulMjjEVgD8i0jqa/7qxz6Pq9gbuE/gre00DPVdWQlUZRfaqjdTAXTfXeDgjcD7nwfcMpWXmi9BveiLJTQXeN86ZqVCLuobEuUWQKlfVaTZVq6Qh5KPaZS5Nk+AkONpaXyLHPYfK0X+9MZrfjRSfsM915H0h2IOcTKywvQ1HgGDiy6MuT7u9Cm5lEei/PmF/4dyoCN3NpfintmPDauMkqdoB/G6ER0uCAJJHSLT/QS14RW6VHDLhrT9ew==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DM4PR11MB6117.namprd11.prod.outlook.com (2603:10b6:8:b3::19) by
- PH7PR11MB6497.namprd11.prod.outlook.com (2603:10b6:510:1f2::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8377.18; Thu, 23 Jan
- 2025 12:27:52 +0000
-Received: from DM4PR11MB6117.namprd11.prod.outlook.com
- ([fe80::d19:56fe:5841:77ca]) by DM4PR11MB6117.namprd11.prod.outlook.com
- ([fe80::d19:56fe:5841:77ca%5]) with mapi id 15.20.8377.009; Thu, 23 Jan 2025
- 12:27:52 +0000
-Date: Thu, 23 Jan 2025 13:27:41 +0100
-From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-To: "Kwapulinski, Piotr" <piotr.kwapulinski@intel.com>
-CC: "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "dan.carpenter@linaro.org"
-	<dan.carpenter@linaro.org>, "yuehaibing@huawei.com" <yuehaibing@huawei.com>,
-	"Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>
-Subject: Re: [PATCH iwl-next v2] ixgbe: Fix possible skb NULL pointer
- dereference
-Message-ID: <Z5I1vbqNpAUnyxnC@boxer>
-References: <20250117154935.9444-1-piotr.kwapulinski@intel.com>
- <Z45hfyEC6dE2Zkm3@boxer>
- <DM6PR11MB4610D74ED1F1AB5575AE246EF3E02@DM6PR11MB4610.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <DM6PR11MB4610D74ED1F1AB5575AE246EF3E02@DM6PR11MB4610.namprd11.prod.outlook.com>
-X-ClientProxiedBy: DB8P191CA0022.EURP191.PROD.OUTLOOK.COM
- (2603:10a6:10:130::32) To DM4PR11MB6117.namprd11.prod.outlook.com
- (2603:10b6:8:b3::19)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDE331C1F0C;
+	Thu, 23 Jan 2025 12:30:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.240.238.73
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1737635431; cv=none; b=G91CW+uZDsWhD3uJYINf7n6WXoec3HJ8/5HuyBmXiMd1Jj5x4oBRZQvYCO3MKEohIK/QzrjbiiK9m6CHaNZXZPVRNsaOtLFa5P3nDt1pW5TE0L9VVeMi+UHOHT3g847D9Bzer4OPf/WrG71jIOR9BlLB442bAJ7vTZ/vHPeGbak=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1737635431; c=relaxed/simple;
+	bh=1rGZAYv2pSYn8yxsvmPAt9l//t1iayRE4F3Et4UrMgI=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 MIME-Version:Content-Type; b=fRPwwCSg36DL1b1u+Jp0FUd1+5g2XjFPNuHcl/oVwJr1p8f/hFWDn+2N80Iy855HPOpYdjUMxewl9rW5+jeYMh15/nbLXzOy12aJeOX27pnRqf7sGv+bIbj1pGBmUdt2Cxjsh7p8xCHRewPZ7u++VqfQ09s2i0+z3UYSnqNusoE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=couthit.com; spf=pass smtp.mailfrom=couthit.com; dkim=pass (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b=atGtDdFA; arc=none smtp.client-ip=162.240.238.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=couthit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=couthit.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=couthit.com
+	; s=default; h=Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:
+	References:In-Reply-To:Message-ID:Cc:To:From:Date:Sender:Reply-To:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=39CuZZZdjSJEJPQMh+OB3G3RFMPggoTrQcp5t75nl8Y=; b=atGtDdFA/e4szMovQBwMFwgXZn
+	co6f+Ko4J890WcGUnR27tQkv47WQotAMgVeGUpdhIHs0P2Ay6ftyu4fzFvUfxjY4gJXetCJDuQPVF
+	TtvHLm8RmrsIztBJvjDPjdUo1rAYIKT0D+YzQ7UWKKjTGTUbxUSoHnI6m7EreB+hqZdtGl3u7i3jK
+	jdFp5M9z4gv7koNlNHcYAhghg/IUdc18Qj+WBrSOsb4jrB8OUSqc7QEeMiOVafkvItxkP9cg1eYCO
+	j17SlYjKKx1cM+3yFH74+WkQuyZmN8tWggp4l2iWs5idkuwdGvVJWIMAnAnxKfD8R3OFlpkkcyyER
+	g0jaFJug==;
+Received: from [122.175.9.182] (port=45111 helo=zimbra.couthit.local)
+	by server.wki.vra.mybluehostin.me with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96.2)
+	(envelope-from <basharath@couthit.com>)
+	id 1tawLl-0005TL-35;
+	Thu, 23 Jan 2025 18:00:22 +0530
+Received: from zimbra.couthit.local (localhost [127.0.0.1])
+	by zimbra.couthit.local (Postfix) with ESMTPS id 5FE1A1781C63;
+	Thu, 23 Jan 2025 18:00:13 +0530 (IST)
+Received: from localhost (localhost [127.0.0.1])
+	by zimbra.couthit.local (Postfix) with ESMTP id 395D61782495;
+	Thu, 23 Jan 2025 18:00:13 +0530 (IST)
+Received: from zimbra.couthit.local ([127.0.0.1])
+	by localhost (zimbra.couthit.local [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id 2df9ieE3WTUM; Thu, 23 Jan 2025 18:00:13 +0530 (IST)
+Received: from zimbra.couthit.local (zimbra.couthit.local [10.10.10.103])
+	by zimbra.couthit.local (Postfix) with ESMTP id D9E111781C63;
+	Thu, 23 Jan 2025 18:00:12 +0530 (IST)
+Date: Thu, 23 Jan 2025 18:00:12 +0530 (IST)
+From: Basharath Hussain Khaja <basharath@couthit.com>
+To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Cc: basharath <basharath@couthit.com>, danishanwar <danishanwar@ti.com>, 
+	rogerq <rogerq@kernel.org>, andrew+netdev <andrew+netdev@lunn.ch>, 
+	davem <davem@davemloft.net>, edumazet <edumazet@google.com>, 
+	kuba <kuba@kernel.org>, pabeni <pabeni@redhat.com>, 
+	Rob Herring <robh@kernel.org>, krzk+dt <krzk+dt@kernel.org>, 
+	conor+dt <conor+dt@kernel.org>, nm <nm@ti.com>, 
+	ssantosh <ssantosh@kernel.org>, tony <tony@atomide.com>, 
+	richardcochran <richardcochran@gmail.com>, 
+	parvathi <parvathi@couthit.com>, schnelle <schnelle@linux.ibm.com>, 
+	rdunlap <rdunlap@infradead.org>, diogo ivo <diogo.ivo@siemens.com>, 
+	m-karicheri2 <m-karicheri2@ti.com>, horms <horms@kernel.org>, 
+	jacob e keller <jacob.e.keller@intel.com>, 
+	m-malladi <m-malladi@ti.com>, 
+	javier carrasco cruz <javier.carrasco.cruz@gmail.com>, 
+	afd <afd@ti.com>, s-anna <s-anna@ti.com>, 
+	linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, 
+	netdev <netdev@vger.kernel.org>, 
+	devicetree <devicetree@vger.kernel.org>, 
+	linux-kernel <linux-kernel@vger.kernel.org>, 
+	linux-omap <linux-omap@vger.kernel.org>, 
+	pratheesh <pratheesh@ti.com>, prajith <prajith@ti.com>, 
+	vigneshr <vigneshr@ti.com>, praneeth <praneeth@ti.com>, 
+	srk <srk@ti.com>, rogerq <rogerq@ti.com>, 
+	krishna <krishna@couthit.com>, pmohan <pmohan@couthit.com>, 
+	mohan <mohan@couthit.com>
+Message-ID: <1333946741.395386.1737635412707.JavaMail.zimbra@couthit.local>
+In-Reply-To: <6ac6161b-373a-47ce-801d-9e4ff1ef258c@wanadoo.fr>
+References: <20250109105600.41297-1-basharath@couthit.com> <20250109105600.41297-5-basharath@couthit.com> <6ac6161b-373a-47ce-801d-9e4ff1ef258c@wanadoo.fr>
+Subject: Re: [RFC PATCH 04/10] net: ti: prueth: Adds link detection, RX and
+ TX support.
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM4PR11MB6117:EE_|PH7PR11MB6497:EE_
-X-MS-Office365-Filtering-Correlation-Id: fd515769-3d98-4877-8968-08dd3ba95afa
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|1800799024|7053199007;
-X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?oEYfteWTmoVf9EkMObqxd/vU9gZWbsYNlH185u8Nup/zvUvhoReAVrFAVn6C?=
- =?us-ascii?Q?wOL5Q13839ZGfbfqlFCLQGY5KtKd+eFG9zGbUoNfD2cubuvVQipwQ6vWcQck?=
- =?us-ascii?Q?1phg+XEpHjxsfrQZfkBG7ucXQa8WUQ4fkvBO3H+NUbUD2pzc2Aw/8maxKvfD?=
- =?us-ascii?Q?W+JVp52jnIroYQfELfzAClHg5GgG3tvb+Z2RIIWQwBcVpdMWGVm0jqRLWYs9?=
- =?us-ascii?Q?tFAaC4kzdinWMSf9juVzfoQLQCdG82NNwJ9OOpwnplv+0WNYmvxSScpqojog?=
- =?us-ascii?Q?THnmvT4uQemvr0KwkxkjEkLAxjvJyRkqFK7gFRhxtP3+NMy2DamA8RhimCxM?=
- =?us-ascii?Q?VH96N3AArAh8qIiIBwaZwoV8vW85MhKbanmrFPk9tey17TByXzy3TcZO23g7?=
- =?us-ascii?Q?oZEMLUUka9uUuaqVS59BA9QxZpQ1Ph4fIKrTemK8Jg5N5X1dbTcCmRQ92Xuk?=
- =?us-ascii?Q?+0OGI3XZSbyyu3em2Y1tw92nHXEOjayDBZJ4j+KqUTVoR5+kER55wSyTTgTt?=
- =?us-ascii?Q?UaXEpYHPjfg3t3Ghx9miSsqZhpgyEa7cG6DGub+Qr3qbNEncBf1RO6xX9qXI?=
- =?us-ascii?Q?9uWHbM8//BmqgpFXH8iuklItuZMs6liEEkXvF955wdJ5JKpogKmXNPgbVA6+?=
- =?us-ascii?Q?YgA8KCbn2Fv5C8Xn1xWMKKNjdqMyU5qlVaJLZFV3KI/gZ+d7xTPzSbfWls2E?=
- =?us-ascii?Q?NK4ldX6wBrb5hPwM6FL81j0dTY5id4OuuB2nQ0kH7BW3mvzCattcsqUX+aNe?=
- =?us-ascii?Q?u66Wbc1ude8L0Dd3Y8UZMUkCd1UwsARs1ViSNVTT9t1N13AV6FpMbP962UM9?=
- =?us-ascii?Q?ju+j+vx3hogfG5Weo+Z4mNW1c+7Zasy6WS+aNS8ZRsUyrNTYJ6YNJv1i0k+2?=
- =?us-ascii?Q?w2sb/qWpX+t/iMF6spyTz7mZKDXTcLIILswPTK8DyO+4K15J63/uPpivWgam?=
- =?us-ascii?Q?CxLiwN1rY3m3/Lb016dI3aiwDKzgXyyeBxFzONUrB7JYiJ/zaH58Clie/Wik?=
- =?us-ascii?Q?O8exs1QKzdzEESF/vWXI5u3oSPQMjOuJ8xXlkugg6JpHs89RA6TrpI+cPt6d?=
- =?us-ascii?Q?PJiGXjehQFtGou75ijLkPmxe0pP0HfDhdkClbdL5aeXr0Xdg7yrsyQIvq5Pi?=
- =?us-ascii?Q?w3ZU5YjG44Kxrxb3kMnwSyxWu2fTkaeGzqHL6++PHk1YmJa4JVRm/BU35kPp?=
- =?us-ascii?Q?LYVN7VfOM3OT2/YXLSLpxsSZP5AMS4bus9d1VAsFJ6Vcsd+Ny54C3RJ3lItc?=
- =?us-ascii?Q?UY8jAMws4IRja2B6BccWaMA+bjLw0wtex4b1SXgRmOkD9btFhiAEHOjVFZS7?=
- =?us-ascii?Q?JqTcbp5/dHENGirBxyOIHFJgV/CGN8/zNWqlUTvHrKWBVy4UkpKMvLD/LBsr?=
- =?us-ascii?Q?13GA9U8liqZt7FgNlbHRDzUor4JH?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB6117.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?+9GtCWvuz7cgd+VH36T6q9lv+8xRLulwYg4F6nUTQhfKyCNzVJOODRzdHpFW?=
- =?us-ascii?Q?+mbkv+YwWCL34wO8So+KCvKEutV39vx6+QgARGU/tWqiX1Rffr0vg/HfkLW4?=
- =?us-ascii?Q?4yCXeDt9toQVagPzye9SCZF0B8M4Aaq7vu3EA7o0rXqDNXqaDN19NA8AXcko?=
- =?us-ascii?Q?pXvBHE6AjvvDB/cyf90LTlSo5pDjqcwqxEh0JkAFXuSh8EQFZ6EcngKjp5Mb?=
- =?us-ascii?Q?7peLxka201JuiNqgEcFIUcLoia1gMZCklWmN0/pONaTHKGHH0g2X4fm9o26x?=
- =?us-ascii?Q?dvKTD691bzSrg3W1om4RHp31sGx7z8dyLhejAkbFb3DP5ufHL7TEN+dnwaI3?=
- =?us-ascii?Q?dK+QScTHw3Gp3inJbbOMNyaIH/SJb+tL82ItCSXcRSkZ2V7shw34iQqfeBs2?=
- =?us-ascii?Q?omTlmryLloUV/K3lFKuf3d7wRcVKn3CwuNjGwL7oSB6QKIauWI+c7e53dyVO?=
- =?us-ascii?Q?0G5wm8V7dtIseDLpTA01ldcQp6ij8ogbo6MvSqB7iwqact4HDRkC24zkggZZ?=
- =?us-ascii?Q?sL/DD8spdZ0REQdfpEGC8p/s8Ux8DuS/zdGnvwUbEJhFXxH431yU+BrvNEb2?=
- =?us-ascii?Q?A1wIJqrAan08Zy+l1HGdbil42ku7+L9tmO7/BQFmteuF6p5QFh0KqEUY8rr0?=
- =?us-ascii?Q?4d9U5rRPRanI7LpjCXAcYlu3dCFJBhmAXPpSDyaeqmmDVcpji11UJrXWLOoE?=
- =?us-ascii?Q?tuOObT0m1gmTWmEvJ1vGKeWOQwmGhEvMB/JEHqRxd/PxGniR2vo3p7kVv/C6?=
- =?us-ascii?Q?eEKX9eW7MF3PJPIuIE9ca4lVSeAp53f9IEiSQrEFTRB/8YdW/C7cP4W9eJVV?=
- =?us-ascii?Q?HQDuqhLtbD2PljMn5bi/TlV23GroHXMIaNYfqvEEOEUyd83dumr1zp7cs8aw?=
- =?us-ascii?Q?Nz349NRHmvEzJ1ujCAC6lXuxtBHzoEqW+BEtB+tOgLTJOIk0fEdTk/aSSeSV?=
- =?us-ascii?Q?f5kOVV9z0gXU34EHNPxuzfkCchzaNPpMo49bgxWKZ+SbG9WPBQZYXmKwQg7u?=
- =?us-ascii?Q?X8Z9GRxz/EfCvzD5Lc3iZhETMJxc4pSmaIlh3/G8TL4eTZ0QvaTp0ujzph1+?=
- =?us-ascii?Q?vewa5FLe2a7J3acaUg+f5gRyi30YHiI0SkcNkAujFh6g/AF5XszLTgpHISXn?=
- =?us-ascii?Q?laDdR+1sErUIJ2QumiZ4CLuixieoV6HN9OJPH/QVreGReM2z4rWZ0Iezlopk?=
- =?us-ascii?Q?w4sldAjozGmwxhDkCgGy2vHLq5lmMEgz1j+B/+Cz54He8DEX3nSx3ILyzgns?=
- =?us-ascii?Q?BSsW+Z9RvO+O+yavil7iu9hNuqGkn9xjp8m04IYvUK/N6+QjA0u//syN7gxK?=
- =?us-ascii?Q?geJw0FmSyutiOhSAUqstrUheXC7L+kBlEbeFdZoKd95Q38zlu25Yiq9r/BKT?=
- =?us-ascii?Q?6XCQHW+2ntKviORDVp/pJfHyZXRMFvzDeJ7ZOIi4IdCide7ShXyecJ20cggR?=
- =?us-ascii?Q?8hcZIW0pPO+c+cWpRL1GdQQ5KVOdtsZf2mjYLH3qnGLQz8ffYdV+VYJfHUAx?=
- =?us-ascii?Q?y6ztos0MBilBWpoYzr0VRxp6HR1IIalVf2Lx1UaVh/51YY4viRRr0FKzliK8?=
- =?us-ascii?Q?gJ8bFwZ2K7sp5yBoJFNgaNH+5FvT4denWP7NC7jLLqk6A0hqinWwuQIC+E7+?=
- =?us-ascii?Q?ww=3D=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: fd515769-3d98-4877-8968-08dd3ba95afa
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB6117.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Jan 2025 12:27:51.9939
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: p7mj4rvscyI4LDCBhbOxSPhukyJkIYcLa6UY1RhpFsrxa7QlxQU9LjYHqAkf1E/iox+TzQgGtb/R2pBAeJXgdFnPzxeM8GtKAPj7ZGRvNq4=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB6497
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Mailer: Zimbra 8.8.15_GA_3968 (ZimbraWebClient - FF113 (Linux)/8.8.15_GA_3968)
+Thread-Topic: prueth: Adds link detection, RX and TX support.
+Thread-Index: wMpv7fMC/ugczbeFyu6r0nphcnNI/g==
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - server.wki.vra.mybluehostin.me
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - couthit.com
+X-Get-Message-Sender-Via: server.wki.vra.mybluehostin.me: authenticated_id: smtp@couthit.com
+X-Authenticated-Sender: server.wki.vra.mybluehostin.me: smtp@couthit.com
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
 
-On Thu, Jan 23, 2025 at 09:19:34AM +0100, Kwapulinski, Piotr wrote:
-> >-----Original Message-----
-> >From: Fijalkowski, Maciej <maciej.fijalkowski@intel.com> 
-> >Sent: Monday, January 20, 2025 3:45 PM
-> >To: Kwapulinski, Piotr <piotr.kwapulinski@intel.com>
-> >Cc: intel-wired-lan@lists.osuosl.org; netdev@vger.kernel.org; dan.carpenter@linaro.org; yuehaibing@huawei.com; Kitszel, Przemyslaw <przemyslaw.kitszel@intel.com>
-> >Subject: Re: [PATCH iwl-next v2] ixgbe: Fix possible skb NULL pointer dereference
-> >
-> >On Fri, Jan 17, 2025 at 04:49:35PM +0100, Piotr Kwapulinski wrote:
-> >> The commit c824125cbb18 ("ixgbe: Fix passing 0 to ERR_PTR in
-> >> ixgbe_run_xdp()") stopped utilizing the ERR-like macros for xdp status 
-> >> encoding. Propagate this logic to the ixgbe_put_rx_buffer().
-> >> 
-> >> The commit also relaxed the skb NULL pointer check - caught by Smatch.
-> >> Restore this check.
-> >> 
-> >> Fixes: c824125cbb18 ("ixgbe: Fix passing 0 to ERR_PTR in 
-> >> ixgbe_run_xdp()")
-> >> Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
-> >> Signed-off-by: Piotr Kwapulinski <piotr.kwapulinski@intel.com>
-> >> ---
-> >>  drivers/net/ethernet/intel/ixgbe/ixgbe_main.c | 9 +++++----
-> >>  1 file changed, 5 insertions(+), 4 deletions(-)
-> >> 
-> >> diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c 
-> >> b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-> >> index 7236f20..c682c3d 100644
-> >> --- a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-> >> +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-> >> @@ -2098,14 +2098,14 @@ static struct ixgbe_rx_buffer 
-> >> *ixgbe_get_rx_buffer(struct ixgbe_ring *rx_ring,
-> >>  
-> >>  static void ixgbe_put_rx_buffer(struct ixgbe_ring *rx_ring,
-> >>  				struct ixgbe_rx_buffer *rx_buffer,
-> >> -				struct sk_buff *skb,
-> >> -				int rx_buffer_pgcnt)
-> >> +				struct sk_buff *skb, int rx_buffer_pgcnt,
-> >> +				int xdp_res)
-> >>  {
-> >>  	if (ixgbe_can_reuse_rx_page(rx_buffer, rx_buffer_pgcnt)) {
-> >>  		/* hand second half of page back to the ring */
-> >>  		ixgbe_reuse_rx_page(rx_ring, rx_buffer);
-> >>  	} else {
-> >> -		if (!IS_ERR(skb) && IXGBE_CB(skb)->dma == rx_buffer->dma) {
-> >> +		if (skb && !xdp_res && IXGBE_CB(skb)->dma == rx_buffer->dma) {
-> >
-> >xdp_res check is redundant here. skb ptr will be non-null only for xdp_res == 0. so skb != NULL implies xdp_res == 0.
-> That was tempting but eventually the ixgbe_run_xdp() handles the error exclusively. I suggest to leave it as it is.
 
-ixgbe_run_xdp() on error paths will still return one of our homegrown XDP
-statuses:
+> Le 09/01/2025 =C3=A0 11:55, Basharath Hussain Khaja a =C3=A9crit=C2=A0:
+>> From: Roger Quadros <rogerq@ti.com>
+>>=20
+>> Changes corresponding to link configuration such as speed and duplexity.
+>> IRQ and handler initializations are performed for packet reception.Firmw=
+are
+>> receives the packet from the wire and stores it into OCMC queue. Next, i=
+t
+>> notifies the CPU via interrupt. Upon receiving the interrupt CPU will
+>> service the IRQ and packet will be processed by pushing the newly alloca=
+ted
+>> SKB to upper layers.
+>>=20
+>> When the user application want to transmit a packet, it will invoke
+>> sys_send() which will inturn invoke the PRUETH driver, then it will writ=
+e
+>> the packet into OCMC queues. PRU firmware will pick up the packet and
+>> transmit it on to the wire.
+>=20
+> Hi,
+> a few nitpicks.
+>=20
+> ...
+>=20
+>> +static int icssm_prueth_tx_enqueue(struct prueth_emac *emac,
+>> +=09=09=09=09   struct sk_buff *skb,
+>> +=09=09=09=09   enum prueth_queue_id queue_id)
+>> +{
+>> +=09struct prueth_queue_desc __iomem *queue_desc;
+>> +=09const struct prueth_queue_info *txqueue;
+>> +=09u16 bd_rd_ptr, bd_wr_ptr, update_wr_ptr;
+>> +=09struct net_device *ndev =3D emac->ndev;
+>> +=09unsigned int buffer_desc_count;
+>> +=09int free_blocks, update_block;
+>> +=09bool buffer_wrapped =3D false;
+>> +=09int write_block, read_block;
+>> +=09void *src_addr, *dst_addr;
+>> +=09int pkt_block_size;
+>> +=09void __iomem *dram;
+>> +=09int txport, pktlen;
+>> +=09u32 wr_buf_desc;
+>> +=09void *ocmc_ram;
+>> +
+>> +=09dram =3D emac->prueth->mem[emac->dram].va;
+>> +=09if (eth_skb_pad(skb)) {
+>> +=09=09if (netif_msg_tx_err(emac) && net_ratelimit())
+>> +=09=09=09netdev_err(ndev, "packet pad failed");
+>=20
+> Missing trailing \n.
+>=20
+>> +=09=09return -ENOMEM;
+>> +=09}
+>> +
+>> +=09/* which port to tx: MII0 or MII1 */
+>> +=09txport =3D emac->tx_port_queue;
+>=20
+> ...
+>=20
+>> +static int icssm_emac_request_irqs(struct prueth_emac *emac)
+>> +{
+>> +=09struct net_device *ndev =3D emac->ndev;
+>> +=09int ret =3D 0;
+>=20
+> No need to init.
+>=20
+>> +
+>> +=09ret =3D request_threaded_irq(emac->rx_irq, NULL, icssm_emac_rx_threa=
+d,
+>> +=09=09=09=09   IRQF_TRIGGER_HIGH | IRQF_ONESHOT,
+>> +=09=09=09=09   ndev->name, ndev);
+>> +=09if (ret) {
+>> +=09=09netdev_err(ndev, "unable to request RX IRQ\n");
+>> +=09=09return ret;
+>> +=09}
+>=20
+> ...
+>=20
+>> +static int icssm_emac_ndo_start_xmit(struct sk_buff *skb,
+>> +=09=09=09=09     struct net_device *ndev)
+>> +{
+>> +=09struct prueth_emac *emac =3D netdev_priv(ndev);
+>> +=09int ret =3D 0;
+>> +=09u16 qid;
+>> +
+>> +=09if (unlikely(!emac->link)) {
+>> +=09=09if (netif_msg_tx_err(emac) && net_ratelimit())
+>> +=09=09=09netdev_err(ndev, "No link to transmit");
+>=20
+> \n
+>=20
+>> +=09=09goto fail_tx;
+>> +=09}
+>> +
+>> +=09qid =3D icssm_prueth_get_tx_queue_id(emac->prueth, skb);...
 
-#define IXGBE_XDP_PASS		0
-#define IXGBE_XDP_CONSUMED	BIT(0)
-#define IXGBE_XDP_TX		BIT(1)
-#define IXGBE_XDP_REDIR		BIT(2)
-#define IXGBE_XDP_EXIT		BIT(3)
+We will handle all comments in the next version.
 
-Plus the case "!xdp_res && !skb" is explicitly checked before calling
-ixgbe_put_rx_buffer() and you're gonna break the rx loop altogether. This
-happens when you failed to alloc skb for IXGBE_XDP_PASS.
-
-> Thanks,
-> Piotr
-> 
-> >
-> >If I am not mistaken:D or ixgbe has some code path I missed.
-> >
-> >Besides this, thanks for improving commit message!
-> >
-> >>  			/* the page has been released from the ring */
-> >>  			IXGBE_CB(skb)->page_released = true;
-> >>  		} else {
-> >> @@ -2415,7 +2415,8 @@ static int ixgbe_clean_rx_irq(struct ixgbe_q_vector *q_vector,
-> >>  			break;
-> >>  		}
-> >>  
-> >> -		ixgbe_put_rx_buffer(rx_ring, rx_buffer, skb, rx_buffer_pgcnt);
-> >> +		ixgbe_put_rx_buffer(rx_ring, rx_buffer, skb, rx_buffer_pgcnt,
-> >> +				    xdp_res);
-> >>  		cleaned_count++;
-> >>  
-> >>  		/* place incomplete frames back on ring for completion */
-> >> --
-> >> v1 -> v2
-> >>   Provide extra details in commit message for motivation of this patch.
-> >> 
-> >> 2.43.0
-> >>
+Thanks & Best Regards,
+Basharath
 
