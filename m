@@ -1,134 +1,139 @@
-Return-Path: <netdev+bounces-160616-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160617-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD8B8A1A8AF
-	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 18:16:26 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E1DAEA1A8D3
+	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 18:21:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7D3E27A06F1
-	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 17:16:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1FBBB1882EC1
+	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 17:19:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E53414600F;
-	Thu, 23 Jan 2025 17:16:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2230813D520;
+	Thu, 23 Jan 2025 17:19:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="S2QfbZTq"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="N07qLtFV"
 X-Original-To: netdev@vger.kernel.org
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6D393F9C5;
-	Thu, 23 Jan 2025 17:16:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.4])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 311C2142E6F;
+	Thu, 23 Jan 2025 17:19:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737652562; cv=none; b=K1LNlokiyP64YyieI6aoZN+j4vVaS8edcjhe3JjjRglV1YXpf9RSFirlnOM/YWA353MWgG8P+Dq0U54PGwHNWT0rsSl3F75Yzomao9WZesnaE9ZbI9+REOlxhEQdXSOgJoD6AOXRpXZ5o/kloVLXlbyniBzdzpE96HYvVCVz2PM=
+	t=1737652756; cv=none; b=muf0+TeQmRizfbZ51tqF1IgdAkO629+uM48/rTBDt6jjDz8sPfSce3o3IV3tSayXPSW/Z6Vc47QBrc6cwkoTxTZs3FIa/LlQeZwjn28G5OCukDJws5GU0O5l7/l7191pMzPnuEiXNOAMFWVdXJbdXqEx4Q0DoZa3LpUZjIhgeow=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737652562; c=relaxed/simple;
-	bh=yNQRZnWuKsXXK1AYGUA2AefX8bsBey6q6K/HMCflImc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=INpN9/aSTmVbcR9VMDN7j/s9ao50Fyu96wvczvSdOaqrd6RrPOCMGh9WYsvbwB7cWktIgQ3Qq3mn56tAz5mMkYlAV0WfHz/XdLMEQUKgsGsksEQJrc8Ar2anuOoab7kmMKEctpji4gCq62I+sLcyikqCWaF4kfFjkq7+v5t8h6I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=S2QfbZTq; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description;
-	bh=GLYJkHDOUuZ3o2Lb+FJZRPmgsp7LPG76z9WRN2s2jfU=; b=S2QfbZTqd32vxBdhMIvQhWSST5
-	Mbdma79dxlCWjPgbyru8ws0z7gY4LNJfEtjtqN/6aUh3S/UXbMqR0Cs8XA/4bsPzT9E7MrgVr5cEM
-	z8zjB1geYmmwmfIt8MjjuMyqqSc8KQLyrx7XKmVC8lwQjF39rFAwQ7YuWSXM2ueVD8g5iiF5gPecl
-	PTKVOhZq5vGIlB/9srEoaAe4A3T5FHSHv13h0S6zaY7Sj3W507f47zycBRT/lC9WP7Sdz8VGyCaVa
-	C8dE1K4721fDyzIY/zKXQMpwT/VdmVZPaNROxGTUGTYKzm79wQWTk1rA2t2539cVTOho09fZ4rGSV
-	XjKegf7g==;
-Received: from [50.53.2.24] (helo=[192.168.254.17])
-	by casper.infradead.org with esmtpsa (Exim 4.98 #2 (Red Hat Linux))
-	id 1tb0o2-00000009XYe-16oH;
-	Thu, 23 Jan 2025 17:15:50 +0000
-Message-ID: <07902f4e-e823-42bc-84fe-829a3e53dbc8@infradead.org>
-Date: Thu, 23 Jan 2025 09:15:43 -0800
+	s=arc-20240116; t=1737652756; c=relaxed/simple;
+	bh=YD3cfXPS7uj8iKkK+NGgmRGEclSxSJbhk58dSFRbX8Q=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kV6FvP/Ph7JMzaE05LpbvnaYNI17Niqpkup231CFt9uxqII7Sae5f1pSlsQOHDXXHcvCQI+VN9uG4r/KkN/JwOXgRue2R8SxjOP07R2MShNIjcKlo81L+gkr5DSk/ihOdlkdIUQNd5gtbSHYqMpze8E6jHZKenfrJxQcai6qcgk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=N07qLtFV; arc=none smtp.client-ip=220.197.31.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:Subject:Date:Message-ID:MIME-Version; bh=XKiwJ
+	jFGTOM1fwCeJkho73TOTX/XyzSyxZlNbugFbq4=; b=N07qLtFVUaUnt4mefX3CJ
+	ZnA1lCq7n3LFzM7XgCC5HF4Z1Hz2IWsYidJtRJBTxQUI4eQUHgnJDwpwYRU7mUQs
+	/znw3hXX7uKg82ybgfX0q+EJXIt3Qy0sbpn0Y37zOc1wu3fYyrLnVTIb8j/dMcBb
+	AJihReLF/5Ntsbqtz+EyFg=
+Received: from localhost.localdomain (unknown [])
+	by gzga-smtp-mtada-g0-2 (Coremail) with SMTP id _____wBnjmFKeZJnNajlHw--.26171S2;
+	Fri, 24 Jan 2025 01:16:03 +0800 (CST)
+From: Jiayuan Chen <mrpre@163.com>
+To: bpf@vger.kernel.org
+Cc: borisp@nvidia.com,
+	john.fastabend@gmail.com,
+	kuba@kernel.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	andrii@kernel.org,
+	eddyz87@gmail.com,
+	mykolal@fb.com,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	martin.lau@linux.dev,
+	song@kernel.org,
+	yonghong.song@linux.dev,
+	kpsingh@kernel.org,
+	sdf@fomichev.me,
+	haoluo@google.com,
+	jolsa@kernel.org,
+	shuah@kernel.org,
+	netdev@vger.kernel.org,
+	Jiayuan Chen <mrpre@163.com>
+Subject: [PATCH bpf v1 0/2] bpf: fix ktls panic and add tests
+Date: Fri, 24 Jan 2025 01:15:50 +0800
+Message-ID: <20250123171552.57345-1-mrpre@163.com>
+X-Mailer: git-send-email 2.43.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] documentation: networking: fix spelling mistakes
-To: Khaled Elnaggar <khaledelnaggarlinux@gmail.com>, socketcan@hartkopp.net,
- mkl@pengutronix.de, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, corbet@lwn.net
-Cc: shuah@kernel.org, linux-can@vger.kernel.org, netdev@vger.kernel.org,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-kernel-mentees@vger.kernel.org
-References: <20250123082521.59997-1-khaledelnaggarlinux@gmail.com>
-Content-Language: en-US
-From: Randy Dunlap <rdunlap@infradead.org>
-In-Reply-To: <20250123082521.59997-1-khaledelnaggarlinux@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wBnjmFKeZJnNajlHw--.26171S2
+X-Coremail-Antispam: 1Uf129KBjvJXoW7tF18ZFy7tF4rtry3Aw1rXrb_yoW8tFWfpa
+	4rtr9xAryUJ34UXrWSvF4kuFyFqa1vqFy8WFn7tw1rAFZ8A3W5JFyxKr18GrZ3W34xWF9x
+	Za4vyw4rWr1UZrDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0zi5ku7UUUUU=
+X-CM-SenderInfo: xpus2vi6rwjhhfrp/xtbBDwjdp2eSaCq93gABso
 
 
+We can reproduce the issue using the existing test program:
+'test_sockmap --ktls'
+Or use the selftest I provided, which will cause a panic:
 
-On 1/23/25 12:25 AM, Khaled Elnaggar wrote:
-> Fix a couple of typos/spelling mistakes in the documentation.
-> 
-> Signed-off-by: Khaled Elnaggar <khaledelnaggarlinux@gmail.com>
+[ 2172.936997] ------------[ cut here ]------------
+[ 2172.936999] kernel BUG at lib/iov_iter.c:629!
+......
+[ 2172.944996] PKRU: 55555554
+[ 2172.945155] Call Trace:
+[ 2172.945299]  <TASK>
+[ 2172.945428]  ? die+0x36/0x90
+[ 2172.945601]  ? do_trap+0xdd/0x100
+[ 2172.945795]  ? iov_iter_revert+0x178/0x180
+[ 2172.946031]  ? iov_iter_revert+0x178/0x180
+[ 2172.946267]  ? do_error_trap+0x7d/0x110
+[ 2172.946499]  ? iov_iter_revert+0x178/0x180
+[ 2172.946736]  ? exc_invalid_op+0x50/0x70
+[ 2172.946961]  ? iov_iter_revert+0x178/0x180
+[ 2172.947197]  ? asm_exc_invalid_op+0x1a/0x20
+[ 2172.947446]  ? iov_iter_revert+0x178/0x180
+[ 2172.947683]  ? iov_iter_revert+0x5c/0x180
+[ 2172.947913]  tls_sw_sendmsg_locked.isra.0+0x794/0x840
+[ 2172.948206]  tls_sw_sendmsg+0x52/0x80
+[ 2172.948420]  ? inet_sendmsg+0x1f/0x70
+[ 2172.948634]  __sys_sendto+0x1cd/0x200
+[ 2172.948848]  ? find_held_lock+0x2b/0x80
+[ 2172.949072]  ? syscall_trace_enter+0x140/0x270
+[ 2172.949330]  ? __lock_release.isra.0+0x5e/0x170
+[ 2172.949595]  ? find_held_lock+0x2b/0x80
+[ 2172.949817]  ? syscall_trace_enter+0x140/0x270
+[ 2172.950211]  ? lockdep_hardirqs_on_prepare+0xda/0x190
+[ 2172.950632]  ? ktime_get_coarse_real_ts64+0xc2/0xd0
+[ 2172.951036]  __x64_sys_sendto+0x24/0x30
+[ 2172.951382]  do_syscall_64+0x90/0x170
 
+1. It looks like the issue started occurring after I bounding ktls and bpf
+together, and the addition of assertions to iov_iter has caused a panic.
+If my fix tag is incorrect, please assist me in correcting the fix tag.
 
-Acked-by: Randy Dunlap <rdunlap@infradead.org>
+2. I make minimal changes for now, and if there are other reasons that
+cause similar panics, we can revisit later. For now, this fix should be
+sufficient.
 
-Thanks.
+Jiayuan Chen (2):
+  bpf: fix ktls panic
+  selftests/bpf: add ktls selftest
 
-> ---
-> Hello, I hope the patch is self-explanatory. Please let me know if you
-> have any comments.
-> 
-> Aside: CCing Shuah and linux-kernel-mentees as I am working on the mentorship
-> application tasks.
-> 
-> Thanks
-> Khaled
-> ---
->  Documentation/networking/can.rst  | 4 ++--
->  Documentation/networking/napi.rst | 2 +-
->  2 files changed, 3 insertions(+), 3 deletions(-)
-> 
-> diff --git a/Documentation/networking/can.rst b/Documentation/networking/can.rst
-> index 62519d38c58b..b018ce346392 100644
-> --- a/Documentation/networking/can.rst
-> +++ b/Documentation/networking/can.rst
-> @@ -699,10 +699,10 @@ RAW socket option CAN_RAW_JOIN_FILTERS
-> 
->  The CAN_RAW socket can set multiple CAN identifier specific filters that
->  lead to multiple filters in the af_can.c filter processing. These filters
-> -are indenpendent from each other which leads to logical OR'ed filters when
-> +are independent from each other which leads to logical OR'ed filters when
->  applied (see :ref:`socketcan-rawfilter`).
-> 
-> -This socket option joines the given CAN filters in the way that only CAN
-> +This socket option joins the given CAN filters in the way that only CAN
->  frames are passed to user space that matched *all* given CAN filters. The
->  semantic for the applied filters is therefore changed to a logical AND.
-> 
-> diff --git a/Documentation/networking/napi.rst b/Documentation/networking/napi.rst
-> index 6083210ab2a4..f970a2be271a 100644
-> --- a/Documentation/networking/napi.rst
-> +++ b/Documentation/networking/napi.rst
-> @@ -362,7 +362,7 @@ It is expected that ``irq-suspend-timeout`` will be set to a value much larger
->  than ``gro_flush_timeout`` as ``irq-suspend-timeout`` should suspend IRQs for
->  the duration of one userland processing cycle.
-> 
-> -While it is not stricly necessary to use ``napi_defer_hard_irqs`` and
-> +While it is not strictly necessary to use ``napi_defer_hard_irqs`` and
->  ``gro_flush_timeout`` to use IRQ suspension, their use is strongly
->  recommended.
-> 
-> --
-> 2.45.2
-> 
-> 
+ net/tls/tls_sw.c                              |   8 +-
+ .../selftests/bpf/prog_tests/sockmap_ktls.c   | 175 +++++++++++++++++-
+ .../selftests/bpf/progs/test_sockmap_ktls.c   |  26 +++
+ 3 files changed, 205 insertions(+), 4 deletions(-)
+ create mode 100644 tools/testing/selftests/bpf/progs/test_sockmap_ktls.c
 
 -- 
-~Randy
+2.43.5
+
 
