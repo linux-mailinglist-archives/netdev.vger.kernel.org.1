@@ -1,232 +1,225 @@
-Return-Path: <netdev+bounces-160682-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160683-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 748FAA1AD29
-	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 00:16:29 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id CAA2DA1AD33
+	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 00:20:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DCD007A42CC
-	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 23:16:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5FAA97A551B
+	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 23:20:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EFE81487ED;
-	Thu, 23 Jan 2025 23:16:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 793AA1D0F46;
+	Thu, 23 Jan 2025 23:20:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b8i3Nme5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MLqpD/qf"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A9471E884
-	for <netdev@vger.kernel.org>; Thu, 23 Jan 2025 23:16:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 483E31CAA83;
+	Thu, 23 Jan 2025 23:20:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737674183; cv=none; b=ax4BQO4kloTca4VrEKMyPJQTCwam3H2kMBG4gVOCl1IcRD2RCwTR9vcHAj8iSV+gd/ti1ff9/bvjcN7Y23N4PuBd9YdNjE9qy2jtn63QSlvZ0Zt0AEOc7uRBRu/9ArzdpQb2xqgB/eZwRujwrCQbVh3aXtNnnYp5iiXRWYhWbHI=
+	t=1737674419; cv=none; b=a8Ld5W/7tI+NMgycjAoPfZTmtNEx5HDUN/kz4dI21KA9BXh/0HgQcyWO7w+fIkO/kaVeGcmmo5VIU4uFeT8HagrKr69vhpStXYkyH1JqfZw/f2mE9/IDIpGuaDBqzIKNBJK3miDwG8ldiG33ZO12J4Kby5sy52O4xL1RlFqkcfk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737674183; c=relaxed/simple;
-	bh=C+HfYRs+lKH91FhdMzOFrti471zxUsAdVtRmhH2DPcc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=m1WLYp6ku6+dyiT2qpghN5Wm+2kKzQYyMeDasxLMO9ozqyLHpkF7l2qJJyHMcc4CA5aahGk4XLbQpGmXLoO2dt2eQhYySc7EQyNgE1cEBTzUtf7YghmI4UV+pGLMps4iwzaJ7T86HI6HHlC4twABfQyeYDaVZkD8aq/1BNlZ6l4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b8i3Nme5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0BC0CC4CED3;
-	Thu, 23 Jan 2025 23:16:22 +0000 (UTC)
+	s=arc-20240116; t=1737674419; c=relaxed/simple;
+	bh=UoeGWKdJqRT1ctOK5N3/4dzYiV4QJoKwEW5108MpNEI=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=BkDErMZ3Lnru6DrJZAqWMsi7QVJyUakXHyfw66c6ag7sUyWsbm13GwwgFNRl18keB7sP+bl9LyRTW3arNv/Go01W7vei0OKGKhekOVGQGwU03+byz5/SfBjujug1/Ml+xBW2kqYhbbpJ++QejB8DD+v/vfI8q/qHFxoS6ZY8eZk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MLqpD/qf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B8375C4CED3;
+	Thu, 23 Jan 2025 23:20:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737674182;
-	bh=C+HfYRs+lKH91FhdMzOFrti471zxUsAdVtRmhH2DPcc=;
-	h=From:To:Cc:Subject:Date:From;
-	b=b8i3Nme5y0mhoQqlniLykyT190u7FL6P6FQw2xrkHas9vQLYsuJI2SCoMPBFX7Oxx
-	 1MxJO94xqmlUuh+Pd+hozzi2cTy+OmMBTumkpN2B9iV0e4LA8aQVIozgQnj4UIZPOe
-	 oVCkXnM8Hz4qcwxfBR1LvucwuqrQIsYsf1FdRXIs4ijAiPBzKP2UEVvpDnIciK5lyw
-	 rvRpnLKspkiTK55XdM8DbaaDu0JKypkCNkqp0MimDp5kx/1/nuIzxzYMpje4bDfHhq
-	 UvPs05T7gC8PFzyQkz7BdWaKW0wLqAghOsXA8uD9iuUcNmHbJ3T2FH85Fzw/31q7IG
-	 tlYiCxHcXCrpw==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	hawk@kernel.org,
-	ilias.apalodimas@linaro.org,
-	asml.silence@gmail.com,
-	almasrymina@google.com,
-	kaiyuanz@google.com,
-	willemb@google.com,
-	mkarsten@uwaterloo.ca,
-	jdamato@fastly.com
-Subject: [PATCH net] net: page_pool: don't try to stash the napi id
-Date: Thu, 23 Jan 2025 15:16:20 -0800
-Message-ID: <20250123231620.1086401-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.48.1
+	s=k20201202; t=1737674415;
+	bh=UoeGWKdJqRT1ctOK5N3/4dzYiV4QJoKwEW5108MpNEI=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+	b=MLqpD/qfyT1cQi09C0RppS9/Mt8o9Kg+8lMxfQ7I/dEZQkLOJvJUMD0MBqRmd/1j7
+	 ZjykIY+3oLHcYKcXhjXblhZppPRj9QkpNlE2CxvXzIgXPjGbk18lKlV+XeD2zMZAEo
+	 XvnW1mQWFEBW4YLDn+EsrGfJvrEh+8LOl4yD+mWnBLJxnimZV2iW7tUHD+pV6uTwDI
+	 kJeoLlcL5aPPiPUAeQTGvrGlGQxtqOfAMfeyzJ13xRwZONlPXCqp34POhI9cRSSCgA
+	 nb/edENyWA4kPlDz5iDuPqBqZim0TAfmk75A+3YvAhMJmmeYVO+cUpQmDIBmwcjbzN
+	 gC8WGN7SPABHg==
+Message-ID: <4f89125253d82233b5b14c6e0c4fd7565b1824e0.camel@kernel.org>
+Subject: Re: [PATCH 3/8] nfsd: when CB_SEQUENCE gets NFS4ERR_DELAY, release
+ the slot
+From: Jeff Layton <jlayton@kernel.org>
+To: Chuck Lever <chuck.lever@oracle.com>, Neil Brown <neilb@suse.de>, Olga
+ Kornievskaia <okorniev@redhat.com>, Dai Ngo <Dai.Ngo@oracle.com>, Tom
+ Talpey <tom@talpey.com>, "J. Bruce Fields" <bfields@fieldses.org>, Kinglong
+ Mee <kinglongmee@gmail.com>, Trond Myklebust	 <trondmy@kernel.org>, Anna
+ Schumaker <anna@kernel.org>, "David S. Miller"	 <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski	 <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Simon Horman	 <horms@kernel.org>
+Cc: linux-nfs@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org
+Date: Thu, 23 Jan 2025 18:20:08 -0500
+In-Reply-To: <a95521d2-18a2-48d2-b770-6db25bca5cab@oracle.com>
+References: <20250123-nfsd-6-14-v1-0-c1137a4fa2ae@kernel.org>
+	 <20250123-nfsd-6-14-v1-3-c1137a4fa2ae@kernel.org>
+	 <a95521d2-18a2-48d2-b770-6db25bca5cab@oracle.com>
+Autocrypt: addr=jlayton@kernel.org; prefer-encrypt=mutual;
+ keydata=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
+ QZIQXVeAA+smfTT0tDrisj1U5x6ZB9b3nBg65kc=
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.54.3 (3.54.3-1.fc41) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-Page ppol tried to cache the NAPI ID in page pool info to avoid
-having a dependency on the life cycle of the NAPI instance.
-Since commit under Fixes the NAPI ID is not populated until
-napi_enable() and there's a good chance that page pool is
-created before NAPI gets enabled.
+On Thu, 2025-01-23 at 17:18 -0500, Chuck Lever wrote:
+> On 1/23/25 3:25 PM, Jeff Layton wrote:
+> > RFC8881, 15.1.1.3 says this about NFS4ERR_DELAY:
+> >=20
+> > "For any of a number of reasons, the replier could not process this
+> >   operation in what was deemed a reasonable time. The client should wai=
+t
+> >   and then try the request with a new slot and sequence value."
+>=20
+> A little farther down, Section 15.1.1.3 says this:
+>=20
+> "If NFS4ERR_DELAY is returned on a SEQUENCE operation, the request is
+>   retried in full with the SEQUENCE operation containing the same slot
+>   and sequence values."
+>=20
+> And:
+>=20
+> "If NFS4ERR_DELAY is returned on an operation other than the first in
+>   the request, the request when retried MUST contain a SEQUENCE operation
+>   that is different than the original one, with either the slot ID or the
+>   sequence value different from that in the original request."
+>=20
+> My impression is that the slot needs to be held and used again only if
+> the server responded with NFS4ERR_DELAY on the SEQUENCE operation. If
+> the NFS4ERR_DELAY was the status of the 2nd or later operation in the
+> COMPOUND, then yes, a different slot, or the same slot with a bumped
+> sequence number, must be used.
+>=20
+> The current code in nfsd4_cb_sequence_done() appears to be correct in
+> this regard.
+>=20
 
-Protect the NAPI pointer with the existing page pool mutex,
-the reading path already holds it. napi_id itself we need
-to READ_ONCE(), it's protected by netdev_lock() which are
-not holding in page pool.
+Ok! I stand corrected. We should be able to just drop this patch, but
+some of the later patches may need some trivial merge conflicts fixed
+up.
 
-Before this patch napi IDs were missing for mlx5:
+Any idea why SEQUENCE is different in this regard? This rule seems a
+bit arbitrary. If the response is NFS4ERR_DELAY, then why would it
+matter which slot you use when retransmitting? The responder is just
+saying "go away and come back later".
 
- # ./cli.py --spec netlink/specs/netdev.yaml --dump page-pool-get
+What if the responder repeatedly returns NFS4ERR_DELAY (maybe because
+it's under resource pressure), and also shrinks the slot table in the
+meantime? It seems like that might put the requestor in an untenable
+position.
 
- [{'id': 144, 'ifindex': 2, 'inflight': 3072, 'inflight-mem': 12582912},
-  {'id': 143, 'ifindex': 2, 'inflight': 5568, 'inflight-mem': 22806528},
-  {'id': 142, 'ifindex': 2, 'inflight': 5120, 'inflight-mem': 20971520},
-  {'id': 141, 'ifindex': 2, 'inflight': 4992, 'inflight-mem': 20447232},
-  ...
+Maybe we should lobby to get this changed in the spec?
 
-After:
+>=20
+> > This is CB_SEQUENCE, but I believe the same rule applies. Release the
+> > slot before submitting the delayed RPC.
+> >=20
+> > Fixes: 7ba6cad6c88f ("nfsd: New helper nfsd4_cb_sequence_done() for pro=
+cessing more cb errors")
+> > Signed-off-by: Jeff Layton <jlayton@kernel.org>
+> > ---
+> >   fs/nfsd/nfs4callback.c | 1 +
+> >   1 file changed, 1 insertion(+)
+> >=20
+> > diff --git a/fs/nfsd/nfs4callback.c b/fs/nfsd/nfs4callback.c
+> > index bfc9de1fcb67b4f05ed2f7a28038cd8290809c17..c26ccb9485b95499fc90883=
+3a384d741e966a8db 100644
+> > --- a/fs/nfsd/nfs4callback.c
+> > +++ b/fs/nfsd/nfs4callback.c
+> > @@ -1392,6 +1392,7 @@ static bool nfsd4_cb_sequence_done(struct rpc_tas=
+k *task, struct nfsd4_callback
+> >   		goto need_restart;
+> >   	case -NFS4ERR_DELAY:
+> >   		cb->cb_seq_status =3D 1;
+> > +		nfsd41_cb_release_slot(cb);
+> >   		if (!rpc_restart_call(task))
+> >   			goto out;
+> >  =20
+> >=20
+>=20
+>=20
 
- [{'id': 144, 'ifindex': 2, 'inflight': 3072, 'inflight-mem': 12582912,
-   'napi-id': 565},
-  {'id': 143, 'ifindex': 2, 'inflight': 4224, 'inflight-mem': 17301504,
-   'napi-id': 525},
-  {'id': 142, 'ifindex': 2, 'inflight': 4288, 'inflight-mem': 17563648,
-   'napi-id': 524},
-  ...
-
-Fixes: 86e25f40aa1e ("net: napi: Add napi_config")
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-CC: hawk@kernel.org
-CC: ilias.apalodimas@linaro.org
-CC: asml.silence@gmail.com
-CC: almasrymina@google.com
-CC: kaiyuanz@google.com
-CC: willemb@google.com
-CC: mkarsten@uwaterloo.ca
-CC: jdamato@fastly.com
----
- include/net/page_pool/types.h |  1 -
- net/core/page_pool_priv.h     |  2 ++
- net/core/dev.c                |  2 +-
- net/core/page_pool.c          |  2 ++
- net/core/page_pool_user.c     | 15 +++++++++------
- 5 files changed, 14 insertions(+), 8 deletions(-)
-
-diff --git a/include/net/page_pool/types.h b/include/net/page_pool/types.h
-index ed4cd114180a..7f405672b089 100644
---- a/include/net/page_pool/types.h
-+++ b/include/net/page_pool/types.h
-@@ -237,7 +237,6 @@ struct page_pool {
- 	struct {
- 		struct hlist_node list;
- 		u64 detach_time;
--		u32 napi_id;
- 		u32 id;
- 	} user;
- };
-diff --git a/net/core/page_pool_priv.h b/net/core/page_pool_priv.h
-index 57439787b9c2..2fb06d5f6d55 100644
---- a/net/core/page_pool_priv.h
-+++ b/net/core/page_pool_priv.h
-@@ -7,6 +7,8 @@
- 
- #include "netmem_priv.h"
- 
-+extern struct mutex page_pools_lock;
-+
- s32 page_pool_inflight(const struct page_pool *pool, bool strict);
- 
- int page_pool_list(struct page_pool *pool);
-diff --git a/net/core/dev.c b/net/core/dev.c
-index afa2282f2604..07b2bb1ce64f 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -6708,7 +6708,7 @@ void napi_resume_irqs(unsigned int napi_id)
- static void __napi_hash_add_with_id(struct napi_struct *napi,
- 				    unsigned int napi_id)
- {
--	napi->napi_id = napi_id;
-+	WRITE_ONCE(napi->napi_id, napi_id);
- 	hlist_add_head_rcu(&napi->napi_hash_node,
- 			   &napi_hash[napi->napi_id % HASH_SIZE(napi_hash)]);
- }
-diff --git a/net/core/page_pool.c b/net/core/page_pool.c
-index a3de752c5178..ed0f89373259 100644
---- a/net/core/page_pool.c
-+++ b/net/core/page_pool.c
-@@ -1147,7 +1147,9 @@ void page_pool_disable_direct_recycling(struct page_pool *pool)
- 	WARN_ON(!test_bit(NAPI_STATE_SCHED, &pool->p.napi->state));
- 	WARN_ON(READ_ONCE(pool->p.napi->list_owner) != -1);
- 
-+	mutex_lock(&page_pools_lock);
- 	WRITE_ONCE(pool->p.napi, NULL);
-+	mutex_unlock(&page_pools_lock);
- }
- EXPORT_SYMBOL(page_pool_disable_direct_recycling);
- 
-diff --git a/net/core/page_pool_user.c b/net/core/page_pool_user.c
-index 48335766c1bf..6677e0c2e256 100644
---- a/net/core/page_pool_user.c
-+++ b/net/core/page_pool_user.c
-@@ -3,6 +3,7 @@
- #include <linux/mutex.h>
- #include <linux/netdevice.h>
- #include <linux/xarray.h>
-+#include <net/busy_poll.h>
- #include <net/net_debug.h>
- #include <net/netdev_rx_queue.h>
- #include <net/page_pool/helpers.h>
-@@ -14,10 +15,11 @@
- #include "netdev-genl-gen.h"
- 
- static DEFINE_XARRAY_FLAGS(page_pools, XA_FLAGS_ALLOC1);
--/* Protects: page_pools, netdevice->page_pools, pool->slow.netdev, pool->user.
-+/* Protects: page_pools, netdevice->page_pools, pool->p.napi, pool->slow.netdev,
-+ *	pool->user.
-  * Ordering: inside rtnl_lock
-  */
--static DEFINE_MUTEX(page_pools_lock);
-+DEFINE_MUTEX(page_pools_lock);
- 
- /* Page pools are only reachable from user space (via netlink) if they are
-  * linked to a netdev at creation time. Following page pool "visibility"
-@@ -216,6 +218,7 @@ page_pool_nl_fill(struct sk_buff *rsp, const struct page_pool *pool,
- {
- 	struct net_devmem_dmabuf_binding *binding = pool->mp_priv;
- 	size_t inflight, refsz;
-+	unsigned int napi_id;
- 	void *hdr;
- 
- 	hdr = genlmsg_iput(rsp, info);
-@@ -229,8 +232,10 @@ page_pool_nl_fill(struct sk_buff *rsp, const struct page_pool *pool,
- 	    nla_put_u32(rsp, NETDEV_A_PAGE_POOL_IFINDEX,
- 			pool->slow.netdev->ifindex))
- 		goto err_cancel;
--	if (pool->user.napi_id &&
--	    nla_put_uint(rsp, NETDEV_A_PAGE_POOL_NAPI_ID, pool->user.napi_id))
-+
-+	napi_id = pool->p.napi ? READ_ONCE(pool->p.napi->napi_id) : 0;
-+	if (napi_id >= MIN_NAPI_ID &&
-+	    nla_put_uint(rsp, NETDEV_A_PAGE_POOL_NAPI_ID, napi_id))
- 		goto err_cancel;
- 
- 	inflight = page_pool_inflight(pool, false);
-@@ -319,8 +324,6 @@ int page_pool_list(struct page_pool *pool)
- 	if (pool->slow.netdev) {
- 		hlist_add_head(&pool->user.list,
- 			       &pool->slow.netdev->page_pools);
--		pool->user.napi_id = pool->p.napi ? pool->p.napi->napi_id : 0;
--
- 		netdev_nl_page_pool_event(pool, NETDEV_CMD_PAGE_POOL_ADD_NTF);
- 	}
- 
--- 
-2.48.1
-
+--=20
+Jeff Layton <jlayton@kernel.org>
 
