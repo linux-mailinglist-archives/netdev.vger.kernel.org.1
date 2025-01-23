@@ -1,231 +1,218 @@
-Return-Path: <netdev+bounces-160641-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160642-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5CC73A1AA53
-	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 20:28:34 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 473E4A1AA82
+	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 20:42:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 968981688E7
-	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 19:28:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DB8CA3A52F4
+	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 19:42:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3273219D060;
-	Thu, 23 Jan 2025 19:28:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BB5E1ADC93;
+	Thu, 23 Jan 2025 19:41:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="CzDIwPrl"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mInsmFGP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+Received: from mail-yb1-f176.google.com (mail-yb1-f176.google.com [209.85.219.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67E101BC4E
-	for <netdev@vger.kernel.org>; Thu, 23 Jan 2025 19:28:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D6791ADC90;
+	Thu, 23 Jan 2025 19:41:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737660510; cv=none; b=COui0Qfn31xinywYjlyQ2BSxKuuiV1mhV7jKUMRWyUvtkMOybQxFBs/W/xGARicG1WiERHLrI67r2TQVGjpAozJvaO8Aozik6KrSO9pFIEuujX0V75w7oezo9CDCBU5HbMYCqsP1yPbtxgtHeIQZbu46g/YWAo+v1SXUgesGU7U=
+	t=1737661296; cv=none; b=eoqaNn5u0GtCGRhmEPUAO+p/RDFG94Rhy4mp1h5jj7UBjy5edBSm4cPJ/Jo5vUYSqHRrlunHBE6M6+hqeVRbGL9dfLeC3z4aUTxD/MQEU4WF7lPiRymr1/h2M2UOGq7OqWNYXBrNH6oSVt9jbKA7y99B9P/JwZh8azzOQQyscFw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737660510; c=relaxed/simple;
-	bh=jSxGbIeuK0BQTLuGqtoPdHuiGBZaDDjr2RGh/rcenp4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=g/qLB9QsEiC2bP+M6BSUvy7AIB17cfGEfnk3ptRMjFz7vD5KJpQVMv5vyfmmwrMFnLxRWtFSWFtRdYGTDP7i+MB0wsOAWuGFK2HuFr8G6ofsW1KI6Q9G3Yl9XVT2L6+HogvlAWdOAMioyIfFk6zA63++PW0kthCqAdkXwbK+MoM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=CzDIwPrl; arc=none smtp.client-ip=209.85.214.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-21628b3fe7dso22840135ad.3
-        for <netdev@vger.kernel.org>; Thu, 23 Jan 2025 11:28:28 -0800 (PST)
+	s=arc-20240116; t=1737661296; c=relaxed/simple;
+	bh=Bjl1jQvhzUuwZLTQMuDb8CiuTF4GdcydCN8OFsoboyo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=AwrIF6LnqoKXJbzezhp2hLAOYw2ND5yDgzdkSl05X+cDn+ScN9uMMykHRQk/qETwRkjiR6c8/QiZhholOyADVr0hgkOEByy+M0f6rmnf8ZeBTRrHw2VWkqA0eJgc8NMaQJqGCyQ47l/OftZdzDqB3pg53jClQpusajNSQUr2ll8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mInsmFGP; arc=none smtp.client-ip=209.85.219.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yb1-f176.google.com with SMTP id 3f1490d57ef6-e549dd7201cso2474386276.0;
+        Thu, 23 Jan 2025 11:41:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1737660507; x=1738265307; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=MKSMGBTjadOJ4VDIZc+QO+zb8RTG8n/S2QkYxKJfkO8=;
-        b=CzDIwPrloKThcdDISUimqU258zRipUeB4QVg+MGp0gjZs/hbDvd9GSC/uGyCYxLZ5k
-         XKXCjM7wvWON0CT2+EuKwO89Ag/w9GcIc7TIE3kavF7VqMdlOFmTUasYeLNvdM0zwaWl
-         sz7RheCSmpK04XsYCT2Z4ekazDUwy5Mc0pusw=
+        d=gmail.com; s=20230601; t=1737661293; x=1738266093; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=i9JKk2g2n4RajhRZ8hBTm51RbMbUFYtO3JAoB+JrWZ0=;
+        b=mInsmFGPFkT1G4yONWTa8PfGO3avr02kT+1MuZT5b/Vf/fLKEwxwpZSp37p8xsfwJd
+         CNvuVy65QI+Eo4UOMoE4WV3GAzOMogrM4nU8QOLwg0piy2DS9sBOu4KUuFZc7rdGBW4A
+         dBvcsoFH16C+QxRPLPHBf11D0QU+hQi+l9f9LUhGLERmAK+eVk+D0uBgWbteHEWd4zQj
+         upJeXBqm8lvsDvP9UbJQTn/59GAZt+8iJULSBesdlbXCVW6nzH6Q/QVLE49+VOEwYD3y
+         KNnSUYA3GaOHHYZh11VvDmO4A/4kf/R6t/XUywVb2KilT01RIGvDPoqeDbH4pjTmJkcL
+         Ax+w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737660507; x=1738265307;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=MKSMGBTjadOJ4VDIZc+QO+zb8RTG8n/S2QkYxKJfkO8=;
-        b=TLVSDvgLGeUvKSRZFkO1AwLN1XQ5xEE9fF3yxTUKya45EbYHN3oXAb+rskfcthm3Ju
-         Lx11R7PRXw6CwSj9U4LsZW2ydzkyAdcW4gTK+FZb3tjCdNwp9itlSWUnGVCy4wJLPI/1
-         0Yl8tSQZ+L0rSXPQDTDpjwe6PIhIk7cBf5vOK4AFYUDae0RrcpPR2TXXmigMzkQ08iO2
-         2xpU928SIZ31ZyzEuo+B1xsUU33OKZPdonKGLRvxcG8561TK0oxo0pDCg4dupvfFcX1o
-         m6noD4EPI3QCb1FgM4Q6IlozBb41V3RkSEWA7lPgJEgnmzcBI/tXelE4TisjbDHAezpR
-         xtZQ==
-X-Gm-Message-State: AOJu0YygIEF1mifhn3tJKuhlI6XydTXSIlWpAyeAcMCyUiY94S+mSh5i
-	3QU7HrPk3BG8+LC8c2HmfFV9maih+ax7FK1TMqLdFQ13XvKsVzRzQ1zo7xm7Dqk=
-X-Gm-Gg: ASbGncsFr7AmgxgwSDo03NtEN2IZhOnZOpH/XYhcO3iDQgVjClLwaik94eeqJE3EGsJ
-	Aj1kc9SPwe8fXLvQ423BwMNmsFeHmpR5zYXwLC03QErRdGjC6Jyp9Ua0GH221C9ZUhL7UF6RnWp
-	o8IEoRpJfOurhphN3NGByGN7o7ihsu3TLH4d5IVO9j06BsDDWIqRsZpFx6b+09KtlLqeflDce5E
-	QbbGbR/I57P+OG5V+OMme3R9fIji9nkVUmBGIVYdHvbgro9t83v1TcuznZSCojxMb2PMFg0GAgx
-	wjgHrCqNzEbb+6YKltTmUjBXY6e418vhFL0KCwjNoE/Z3Qs=
-X-Google-Smtp-Source: AGHT+IEubu9AdSDBuPgbBe6xyKegk7df8UxI964eqYegV8p/KlH2pZuqJ+bfRr+mhcSVHCdBhdXr0Q==
-X-Received: by 2002:a05:6a00:9296:b0:72d:4d77:ccc with SMTP id d2e1a72fcca58-72daf94857emr35659747b3a.6.1737660507547;
-        Thu, 23 Jan 2025 11:28:27 -0800 (PST)
-Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72f8a6b7262sm311632b3a.71.2025.01.23.11.28.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Jan 2025 11:28:27 -0800 (PST)
-Date: Thu, 23 Jan 2025 11:28:24 -0800
-From: Joe Damato <jdamato@fastly.com>
-To: Ahmed Zaki <ahmed.zaki@intel.com>
-Cc: netdev@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
-	andrew+netdev@lunn.ch, edumazet@google.com, kuba@kernel.org,
-	horms@kernel.org, pabeni@redhat.com, davem@davemloft.net,
-	michael.chan@broadcom.com, tariqt@nvidia.com,
-	anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
-	shayd@nvidia.com, akpm@linux-foundation.org, shayagr@amazon.com,
-	kalesh-anakkur.purayil@broadcom.com,
-	David Arinzon <darinzon@amazon.com>
-Subject: Re: [PATCH net-next v6 1/5] net: move ARFS rmap management to core
-Message-ID: <Z5KYWAshgRL2GbX2@LQ3V64L9R2>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Ahmed Zaki <ahmed.zaki@intel.com>, netdev@vger.kernel.org,
-	intel-wired-lan@lists.osuosl.org, andrew+netdev@lunn.ch,
-	edumazet@google.com, kuba@kernel.org, horms@kernel.org,
-	pabeni@redhat.com, davem@davemloft.net, michael.chan@broadcom.com,
-	tariqt@nvidia.com, anthony.l.nguyen@intel.com,
-	przemyslaw.kitszel@intel.com, shayd@nvidia.com,
-	akpm@linux-foundation.org, shayagr@amazon.com,
-	kalesh-anakkur.purayil@broadcom.com,
-	David Arinzon <darinzon@amazon.com>
-References: <20250118003335.155379-1-ahmed.zaki@intel.com>
- <20250118003335.155379-2-ahmed.zaki@intel.com>
+        d=1e100.net; s=20230601; t=1737661293; x=1738266093;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=i9JKk2g2n4RajhRZ8hBTm51RbMbUFYtO3JAoB+JrWZ0=;
+        b=XEScd6n8AS6Yf6Z+VbYpigN9lO7rrbrLtC7MQ3ex/aleH3+INTgstd0I55qUwKS9Sb
+         OhmpzQqdqQsKokfm+AaqJGAM4xpauvkBXsI5GjMAfaDM+t0zBpHaCWKOX97xwgXZit2g
+         5JpVeTnh2JvlkLXzylCXGKsvMGfo1c1IwrO9GORXOvj8xaJku5x3auj2kFv9013kmHvu
+         1hqv6YwWCfnadILJmmz/ZeM0BlpCLrfBsegYP+XFURRHySO8Zkox+N/vl4oXpoRkOe+x
+         FMXVR+3ZYEwPPilxqiS1PpKFmU0naUAdil2lRsFReUILKOy3aTDvFDL8ny+TiT1AUbuq
+         cd2Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUDhSMA7I6JR7ySI4B6WuFQo8u8yZQn1oeup+fT36eOiaB9Ej1kfkESQtdaUdC+JJc7x8E=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzaH0/8CjlmRrfTv4wRiBcw2XiZX47RUGJ38Qbyi5GKA47Aq7uH
+	kVKuxuK/lMAOcKYhUZJ20/l7vIUoba22pXWO9gkxhESFI0LlzDmVM6GYVLgIrz65QiGxmIK0BVN
+	xnYPnDY4Hi7M104Q6pJ0cl9vGQqQ=
+X-Gm-Gg: ASbGnctztVQL1OWeAgrnw1x0Cg/RPrbW2FEuOZkUbhjDFYzTQmnKwjxjEiK4zB25o3w
+	oBF2iAcG4zayn35g7WwPH07IKCpUt9GBrQDddIZ/tEJM0iW8PIv+p63zyv/t4IQ==
+X-Google-Smtp-Source: AGHT+IGfj0HO/WuIbNXXYyvmJ941amTp3hCmzyDEHKTX0TFEIhNbAurUyFTuvdzBh/PJ6ax/wz0iHTqKSRefHrFwaSQ=
+X-Received: by 2002:a05:6902:1581:b0:e58:33ce:87a1 with SMTP id
+ 3f1490d57ef6-e5833ce8892mr2078445276.24.1737661293138; Thu, 23 Jan 2025
+ 11:41:33 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250118003335.155379-2-ahmed.zaki@intel.com>
+References: <20241220195619.2022866-1-amery.hung@gmail.com>
+ <20241220195619.2022866-2-amery.hung@gmail.com> <ce15f61de21a4415d00d2e52c2eedc63564093c8.camel@gmail.com>
+In-Reply-To: <ce15f61de21a4415d00d2e52c2eedc63564093c8.camel@gmail.com>
+From: Amery Hung <ameryhung@gmail.com>
+Date: Thu, 23 Jan 2025 11:41:22 -0800
+X-Gm-Features: AWEUYZl8OucAG5Bobcp2FKy1Q_eECLlHpzydjWUvrjHGd2-MrNzgh9Cw0m8EAfQ
+Message-ID: <CAMB2axPoBXnrFE0iRT8rAs8txi0jabcb5ctGoFz85-HyDSpghQ@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v2 01/14] bpf: Support getting referenced kptr
+ from struct_ops argument
+To: Eduard Zingerman <eddyz87@gmail.com>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, daniel@iogearbox.net, 
+	andrii@kernel.org, alexei.starovoitov@gmail.com, martin.lau@kernel.org, 
+	sinquersw@gmail.com, toke@redhat.com, jhs@mojatatu.com, jiri@resnulli.us, 
+	stfomichev@gmail.com, ekarani.silvestre@ccc.ufcg.edu.br, 
+	yangpeihao@sjtu.edu.cn, xiyou.wangcong@gmail.com, yepeilin.cs@gmail.com, 
+	amery.hung@bytedance.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jan 17, 2025 at 05:33:31PM -0700, Ahmed Zaki wrote:
-> Add a new netdev flag "rx_cpu_rmap_auto". Drivers supporting ARFS should
-> set the flag via netif_enable_cpu_rmap() and core will allocate and manage
-> the ARFS rmap. Freeing the rmap is also done by core when the netdev is
-> freed.
-> 
-> For better IRQ affinity management, move the IRQ rmap notifier inside the
-> napi_struct. Consequently, add new notify.notify and notify.release
-> functions: netif_irq_cpu_rmap_notify() and netif_napi_affinity_release().
-> 
-> Acked-by: David Arinzon <darinzon@amazon.com>
-> Signed-off-by: Ahmed Zaki <ahmed.zaki@intel.com>
+On Thu, Jan 23, 2025 at 1:57=E2=80=AFAM Eduard Zingerman <eddyz87@gmail.com=
+> wrote:
+>
+> On Fri, 2024-12-20 at 11:55 -0800, Amery Hung wrote:
+> > From: Amery Hung <amery.hung@bytedance.com>
+> >
+> > Allows struct_ops programs to acqurie referenced kptrs from arguments
+> > by directly reading the argument.
+> >
+> > The verifier will acquire a reference for struct_ops a argument tagged
+> > with "__ref" in the stub function in the beginning of the main program.
+> > The user will be able to access the referenced kptr directly by reading
+> > the context as long as it has not been released by the program.
+> >
+> > This new mechanism to acquire referenced kptr (compared to the existing
+> > "kfunc with KF_ACQUIRE") is introduced for ergonomic and semantic reaso=
+ns.
+> > In the first use case, Qdisc_ops, an skb is passed to .enqueue in the
+> > first argument. This mechanism provides a natural way for users to get =
+a
+> > referenced kptr in the .enqueue struct_ops programs and makes sure that=
+ a
+> > qdisc will always enqueue or drop the skb.
+> >
+> > Signed-off-by: Amery Hung <amery.hung@bytedance.com>
+> > ---
+>
+> Hi Amery,
+>
+> Sorry, for joining so late in the review process.
+> Decided to take a look at verifier related changes.
+> Overall the patch looks good to me,
+> but I dislike the part allocating parameter ids.
+>
+> [...]
+>
+> > diff --git a/kernel/bpf/btf.c b/kernel/bpf/btf.c
+> > index 28246c59e12e..c2f4f84e539d 100644
+> > --- a/kernel/bpf/btf.c
+> > +++ b/kernel/bpf/btf.c
+> > @@ -6682,6 +6682,7 @@ bool btf_ctx_access(int off, int size, enum bpf_a=
+ccess_type type,
+> >                       info->reg_type =3D ctx_arg_info->reg_type;
+> >                       info->btf =3D ctx_arg_info->btf ? : btf_vmlinux;
+> >                       info->btf_id =3D ctx_arg_info->btf_id;
+> > +                     info->ref_obj_id =3D ctx_arg_info->refcounted ? +=
++nr_ref_args : 0;
+> >                       return true;
+> >               }
+> >       }
+> > diff --git a/kernel/bpf/verifier.c b/kernel/bpf/verifier.c
+> > index f27274e933e5..26305571e377 100644
+> > --- a/kernel/bpf/verifier.c
+> > +++ b/kernel/bpf/verifier.c
+>
+> [...]
+>
+> > @@ -22161,6 +22182,16 @@ static int do_check_common(struct bpf_verifier=
+_env *env, int subprog)
+> >               mark_reg_known_zero(env, regs, BPF_REG_1);
+> >       }
+> >
+> > +     /* Acquire references for struct_ops program arguments tagged wit=
+h "__ref".
+> > +      * These should be the earliest references acquired. btf_ctx_acce=
+ss() will
+> > +      * assume the ref_obj_id of the n-th __ref-tagged argument to be =
+n.
+> > +      */
+> > +     if (!subprog && env->prog->type =3D=3D BPF_PROG_TYPE_STRUCT_OPS) =
+{
+> > +             for (i =3D 0; i < env->prog->aux->ctx_arg_info_size; i++)
+> > +                     if (env->prog->aux->ctx_arg_info[i].refcounted)
+> > +                             acquire_reference(env, 0);
+> > +     }
+> > +
+> >       ret =3D do_check(env);
+> >  out:
+> >       /* check for NULL is necessary, since cur_state can be freed insi=
+de
+>
+> I think it would be cleaner if:
+> - each program would own it's instance of 'env->prog->aux->ctx_arg_info';
+> - ref_obj_id field would be added to 'struct bpf_ctx_arg_aux';
+> - parameter ids would be allocated in do_check_common(), but without
+>   reliance on being first to allocate.
 
-[...]
+This is very similar to what v1 is doing but I missed the first part.
+Replacing assignments of prog->aux->ctx_arg_info with deep copy should
+make ctx_arg_info a per-program thing. I agree with you that creating
+this assumption of ref_obj_id is unnecessary and I will change it.
 
-> diff --git a/net/core/dev.c b/net/core/dev.c
-> index fe5f5855593d..dbb63005bc2b 100644
-> --- a/net/core/dev.c
-> +++ b/net/core/dev.c
-> @@ -6862,6 +6862,141 @@ void netif_queue_set_napi(struct net_device *dev, unsigned int queue_index,
->  }
->  EXPORT_SYMBOL(netif_queue_set_napi);
->  
-> +#ifdef CONFIG_RFS_ACCEL
-> +static void
-> +netif_irq_cpu_rmap_notify(struct irq_affinity_notify *notify,
-> +			  const cpumask_t *mask)
-> +{
-> +	struct napi_struct *napi =
-> +		container_of(notify, struct napi_struct, notify);
-> +	struct cpu_rmap *rmap = napi->dev->rx_cpu_rmap;
-> +	int err;
+https://lore.kernel.org/bpf/20241213232958.2388301-1-amery.hung@bytedance.c=
+om/
 
-I wonder if this generates a warning with some compilers? err is
-defined not used if !napi->dev->rx_cpu_rmap_auto ? Not sure.
+Thanks,
+Amery
 
-> +	if (napi->dev->rx_cpu_rmap_auto) {
-> +		err = cpu_rmap_update(rmap, napi->napi_rmap_idx, mask);
-> +		if (err)
-> +			pr_warn("%s: RMAP update failed (%d)\n",
-> +				__func__, err);
-> +	}
-> +}
-> +
-> +static void netif_napi_affinity_release(struct kref *ref)
-> +{
-> +	struct napi_struct *napi =
-> +		container_of(ref, struct napi_struct, notify.kref);
-> +	struct cpu_rmap *rmap = napi->dev->rx_cpu_rmap;
-> +
-> +	if (!napi->dev->rx_cpu_rmap_auto)
-> +		return;
-> +	rmap->obj[napi->napi_rmap_idx] = NULL;
-> +	napi->napi_rmap_idx = -1;
-> +	cpu_rmap_put(rmap);
-> +}
-> +
-> +static int napi_irq_cpu_rmap_add(struct napi_struct *napi, int irq)
-> +{
-> +	struct cpu_rmap *rmap = napi->dev->rx_cpu_rmap;
-> +	int rc;
-> +
-> +	if (!rmap)
-> +		return -EINVAL;
-> +
-> +	napi->notify.notify = netif_irq_cpu_rmap_notify;
-> +	napi->notify.release = netif_napi_affinity_release;
-
-Maybe the callbacks should only be set at the end after everything
-else is successful, just before the return 0 ?
-
-> +	cpu_rmap_get(rmap);
-> +	rc = cpu_rmap_add(rmap, napi);
-> +	if (rc < 0)
-> +		goto err_add;
-> +
-> +	napi->napi_rmap_idx = rc;
-> +	rc = irq_set_affinity_notifier(irq, &napi->notify);
-> +	if (rc)
-> +		goto err_set;
-> +
-> +	return 0;
-> +
-> +err_set:
-> +	rmap->obj[napi->napi_rmap_idx] = NULL;
-> +	napi->napi_rmap_idx = -1;
-> +err_add:
-> +	cpu_rmap_put(rmap);
-> +	return rc;
-> +}
-
-[...]
-
-> +void netif_napi_set_irq_locked(struct napi_struct *napi, int irq)
-> +{
-> +	int rc;
-> +
-> +	if (!napi->dev->rx_cpu_rmap_auto)
-> +		goto out;
-
-Maybe the above if statement could be extended to be something like:
-
-if (!napi->dev->rx_cpu_rmap_auto || napi->irq < 0)
-  goto out;
-
-then you can omit the irq > 0 checks in the code below, potentially?
-
-> +	/* Remove existing rmap entries */
-> +	if (napi->irq != irq && napi->irq > 0)
-> +		irq_set_affinity_notifier(napi->irq, NULL);
-> +
-> +	if (irq > 0) {
-> +		rc = napi_irq_cpu_rmap_add(napi, irq);
-> +		if (rc) {
-> +			netdev_warn(napi->dev, "Unable to update ARFS map (%d)\n",
-> +				    rc);
-> +			netif_disable_cpu_rmap(napi->dev);
-> +		}
-> +	}
-> +
-> +out:
-> +	napi->irq = irq;
-> +}
-> +EXPORT_SYMBOL(netif_napi_set_irq_locked);
-> +
+>
+> Or add some rigour to this thing and e.g. make env->id_gen signed
+> and declare an enum of special ids like:
+>
+>   enum special_ids {
+>         STRUCT_OPS_CTX_PARAM_0 =3D -1,
+>         STRUCT_OPS_CTX_PARAM_1 =3D -2,
+>         STRUCT_OPS_CTX_PARAM_2 =3D -3,
+>         ...
+>   }
+>
+> and update the loop above as:
+>
+>         if (!subprog && env->prog->type =3D=3D BPF_PROG_TYPE_STRUCT_OPS) =
+{
+>                 for (i =3D 0; i < env->prog->aux->ctx_arg_info_size; i++)
+>                         if (env->prog->aux->ctx_arg_info[i].refcounted)
+>                 /* imagined function that acquires an id with specific va=
+lue */
+>                                 acquire_special_reference(env, 0, STRUCT_=
+OPS_CTX_PARAM_0 - i /* desired id */);
+>         }
+>
+> wdyt?
+>
 
